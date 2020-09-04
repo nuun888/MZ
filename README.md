@@ -3,7 +3,7 @@
 <a href="NUUN_EnemyBook.js">NUUN_EnemyBook.js</a>　：エネミー図鑑<br>
 <a href="NUUN_LevelEX.js">NUUN_LevelEX.js</a>　：レベル上限突破及び最大レベル任意変更<br>
 <a href="NUUN_StealableItems.js">NUUN_StealableItems.js</a>　：盗みスキル<br>
-<a href="NUUN_StealableItems.js">NUUN_StealableItems.js</a>　：アイテム個別最大数<br>
+<a href="NUUN_MaxItem.js">NUUN_MaxItem.js</a>　：アイテム個別最大数<br>
 
 利用規約<br>
 テスト

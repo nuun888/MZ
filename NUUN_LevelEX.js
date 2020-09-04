@@ -38,6 +38,8 @@
  * @desc 変更するアクターを指定します。
  * 
  */
+var Imported = Imported || {};
+Imported.NUUN_LevelEX = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_LevelEX');

@@ -83,7 +83,7 @@ Imported.NUUN_BattlePosition = true;
   Sprite_Enemy.prototype.setBattler = function(battler) {
     Sprite_Battler.prototype.setBattler.call(this, battler);
     this._enemy = battler;
-    let x = (Graphics.boxWidth - 808) / 2 - 4;
+    let x = (Graphics.boxWidth - 808) / 2;
     let y = (Graphics.boxHeight - 616) / 2 + enemyPosition;
     if ($gameSystem.isSideView()) {
       this.setHome(battler.screenX(), battler.screenY() + y);

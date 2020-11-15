@@ -5,8 +5,11 @@
 <b>システム</b>
 
 <b>戦闘</b><br>
-  NUUN_BattleStyleEX　バトルレイアウト変更<br>
-  NUUN_BattlePosition　解像度変更時のバトルポジション修正<br>
+NUUN_BattleStyleEX　バトルレイアウト変更<br>
+NUUN_BattlePosition　解像度変更時のバトルポジション修正<br>
+複数属性<br>
+吸収属性<br>
+属性ブースト<br>
   
 <b>アイテム</b><br>
 NUUN_MaxItem　アイテムの個別最大所持数<br>
@@ -42,3 +45,5 @@ NUUN_RandomItems  アイテムのランダム取得<br>
 
 <b>MZ移植</b><br>
 こちらのプラグインは各製作者様の規約に依存します。<br>
+NUUN_SkillCostEX  スキルコスト拡張（tomoaky様）<br>
+NUUN_CostShowEX　コスト表示拡張（tomoaky様）<br>

@@ -2,7 +2,7 @@
 公開しているプラグインはすべてMITライセンスで公開しています。
 
 # 公開プラグイン
-<b>システム</b>
+<b>システム</b><br>
 [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>
 
 <b>戦闘</b><br>
@@ -13,6 +13,7 @@
 NUUN_MaxItem　アイテムの個別最大所持数<br>
 [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増加アイテム、スキル<br>
+[NUUN_ConsumptionItem]アイテム消耗率<br>
 
 <b>スキル</b><br>
 [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)　盗みスキル<br>
@@ -24,7 +25,7 @@ NUUN_MaxItem　アイテムの個別最大所持数<br>
 NUUN_StatusScreen　メニュー画面（ワイド画面推奨）<br>
 [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)　エネミー図鑑<br>
 [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)　コマンドアイコン<br>
-NUUN_StatusScreen　ステータス画面スタイル変更<br>
+[NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)　ステータス画面スタイル変更<br>
 
 
 <b>バトラー</b><br>

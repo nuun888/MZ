@@ -12,7 +12,7 @@
 /*:
  * @target MZ
  * @plugindesc レベルの上限限界突破及び変動制最大レベル
- * @author ヽ(´ω`)ノ
+ * @author NUUN
  * 
  * @help
  * 最大レベルを１００以上に設定できます。

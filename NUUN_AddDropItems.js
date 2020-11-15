@@ -1,0 +1,76 @@
+﻿/*:-----------------------------------------------------------------------------------
+ * NUUN_AddDropItems.js
+ * 
+ * Copyright (C) 2020 NUUN
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
+ * -------------------------------------------------------------------------------------
+ * 
+ * 更新履歴
+ * 2020/11 Ver 1.0.0
+ */ 
+/*:
+ * 
+ * @target MZ
+ * @plugindesc ドロップアイテム増加 ver1.0.0
+ * @base NUUN_Base.js
+ * @orderAfter NUUN_Base.js
+ * @author NUUN
+ * 
+ * @help
+ * デフォルトでは敵のドロップアイテムは３つまでしか設定できませんが、
+ * このプラグインはドロップアイテムを４つ以上設定することが出来ます。
+ * 
+ * このプラグインは「NUUN_Base」が必要です。
+ * 
+ * スキルのメモ欄
+ * <DropItem I:13,20>
+ * 設定した敵のドロップアイテムに13番のアイテムがドロップ率1/20の確率追加されます。
+ * 
+ * <DropItem W:18,16>
+ * 設定した敵のドロップアイテムに18番の武器がドロップ率1/16の確率追加されます。
+ * 
+ * <DropItem A:35,32>
+ * 設定した敵のドロップアイテムに35番の防具がドロップ率1/32の確率追加されます。
+ * 
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
+ * 
+ */ 
+var Imported = Imported || {};
+Imported.NUUN_AddDropItems = true;
+
+(() => {
+const parameters = PluginManager.parameters('NUUN_AddDropItems');
+
+const _DataManager_nuun_loadDataEnemies = DataManager.nuun_loadDataEnemies;
+DataManager.nuun_loadDataEnemies = function(deta){
+  _DataManager_nuun_loadDataEnemies.call(this, deta);
+	deta.dropItems = this.dropItems(deta);
+};
+
+DataManager.dropItems = function(deta){
+	const enemy = deta;
+	const dropItems = enemy.dropItems;
+	const re =/<(?:DropItem)\s*([IWA]):\s*(\d+(?:\s*,\s*\d+)*)>/g;
+	while(true) {
+		let match = re.exec(enemy.note);
+		if (match) {
+			let data = match[2].split(',');
+			switch (match[1]) {
+				case 'I':
+					dropItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:1});
+					break;
+				case 'W':
+					dropItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:2});
+					break;
+				case 'A':
+					dropItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:3});
+					break;
+			}
+		} else {
+			return dropItems;
+		}
+	}
+};
+})();

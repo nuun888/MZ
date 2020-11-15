@@ -1,11 +1,18 @@
 ﻿/*:-----------------------------------------------------------------------------------
  * NUUN_BigEnemy.js
+ * 
+ * Copyright (C) 2020 NUUN
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */
+ * 
+ * 更新履歴
+ * 2020/11 Ver 1.0.0
+ */ 
 /*:ja
  * @target MZ
  * @plugindesc 巨大エネミー
- * @author ヽ(´ω`)ノ
+ * @author NUUN
  *            
  * @help 画面いっぱいにエネミー画像を表示します。
  * エネミーのメモ欄に以下のどちらかを記入してください。
@@ -15,12 +22,7 @@
  * 
  * 
  * 利用規約
- * このプラグインの使用に制限はありません。
- * 商用、アダルト等のゲームでも使用可能です。
- * クレジット表記は任意です。
- * 
- * 更新履歴
- * ver 1.0.0（初版）
+ * このプラグインはMITライセンスで配布しています。
  * 
  */
 var Imported = Imported || {};
@@ -35,10 +37,18 @@ Imported.NUUN_BigEnemy = true;
     this._bigEnemy = false;
   };
 
-  const _Sprite_Battler_updateBitmap = Sprite_Battler.prototype.updateBitmap;
-  Sprite_Battler.prototype.updateBitmap = function() {
-    _Sprite_Battler_updateBitmap.call(this);
-    if(this._bigEnemy && !$gameSystem.isSideView()){
+  const _Sprite_Enemy_setBattler = Sprite_Enemy.prototype.setBattler;
+  Sprite_Enemy.prototype.setBattler = function(battler) {
+    _Sprite_Enemy_setBattler.call(this, battler);
+    if($dataEnemies[battler._enemyId].meta.BigEnemy && !$gameSystem.isSideView()){
+      this._bigEnemy = $dataEnemies[battler._enemyId].meta.BigEnemy;
+    }
+  };
+
+  const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
+  Sprite_Enemy.prototype.updateBitmap = function() {
+    _Sprite_Enemy_updateBitmap.call(this);
+    if(this._bigEnemy){
       this.scale.x = Graphics.width / this.width;
       this.scale.y = (this._bigEnemy === 'OriginalRatio' ? this.scale.x : Graphics.height / this.height);
       this._homeX = Graphics.boxWidth / 2;
@@ -50,10 +60,23 @@ Imported.NUUN_BigEnemy = true;
     }
   };
 
-  Sprite_Enemy.prototype.setHome = function(x, y) {
-    Sprite_Battler.prototype.setHome.call(this, x, y);
-    if($dataEnemies[this._enemy._enemyId].meta.BigEnemy){
-      this._bigEnemy = $dataEnemies[this._enemy._enemyId].meta.BigEnemy;
+  const _Sprite_Enemy_updateStateSprite = Sprite_Enemy.prototype.updateStateSprite;
+  Sprite_Enemy.prototype.updateStateSprite = function() {
+    _Sprite_Enemy_updateStateSprite.call(this);
+    if(this._bigEnemy){
+      this._stateIconSprite.y = (40 - this.y) / this.scale.y;
+      this._stateIconSprite.scale.x = 1 / this.scale.x;
+      this._stateIconSprite.scale.y = 1 / this.scale.y;
     }
   };
+
+  const _Sprite_Enemy_damageOffsetY = Sprite_Enemy.prototype.damageOffsetY;
+  Sprite_Enemy.prototype.damageOffsetY = function() {
+    let y = _Sprite_Enemy_damageOffsetY.call(this);
+    if(this._bigEnemy){
+      y -= Graphics.boxHeight / 2;
+    }
+    return y;
+};
+
 })();

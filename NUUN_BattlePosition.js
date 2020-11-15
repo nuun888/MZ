@@ -1,11 +1,18 @@
 ﻿/*:-----------------------------------------------------------------------------------
  * NUUN_BattlePosition.js
+ * 
+ * Copyright (C) 2020 NUUN
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */
+ * 
+ * 更新履歴
+ * 2020/11 Ver 1.0.0
+ */ 
 /*:ja
  * @target MZ
  * @plugindesc 解像度変更時のバトルエネミー及びバトル背景の位置調整
- * @author ヽ(´ω`)ノ
+ * @author NUUN
  *            
  * @help 解像度を変更し、UIエリアの横幅を変更した際エネミー画像の表示位置が左寄り
  * のままなのを変更。またエネミーの基本Y座標を調整できます。
@@ -24,12 +31,7 @@
  * で調整してください。
  * 
  * 利用規約
- * このプラグインの使用に制限はありません。
- * 商用、アダルト等のゲームでも使用可能です。
- * クレジット表記は任意です。
- * 
- * 更新履歴
- * ver 1.0.0（初版）
+ * このプラグインはMITライセンスで配布しています。
  * 
  * @param ActorSideViewXPosition
  * @desc アクターの基本X座標を移動させます。
@@ -104,5 +106,12 @@ Imported.NUUN_BattlePosition = true;
       this.scale.y = Graphics.height / this.bitmap.height;
     }
     this.y += backgroundPosition;
+  };
+
+  Sprite_Enemy.prototype.updateStateSprite = function() {
+    this._stateIconSprite.y = -Math.round((this.bitmap.height + 40) * 0.9);
+    if (this._stateIconSprite.y < 20 - this.y) {
+        this._stateIconSprite.y = 40 - this.y;
+    }
   };
 })();

@@ -1,7 +1,15 @@
 ﻿/*:-----------------------------------------------------------------------------------
  * NUUN_LevelEX.js
+ * 
+ * Copyright (C) 2020 NUUN
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
+ * 更新履歴
+ * 2020/11 Ver 1.0.0
+ */ 
+/*:
  * @target MZ
  * @plugindesc レベルの上限限界突破及び変動制最大レベル
  * @author ヽ(´ω`)ノ
@@ -21,12 +29,7 @@
  * MaxLevelSet　アクターの最大レベルを変更。
  * 
  * 利用規約
- * このプラグインの使用に制限はありません。
- * 商用、アダルト等のゲームでも使用可能です。
- * クレジット表記は任意です。
- * 
- * 更新履歴
- * ver 1.0.0（初版）
+ * このプラグインはMITライセンスで配布しています。
  * 
  * 
  * @command MaxLevelSet
@@ -46,22 +49,35 @@
  * @text アクター
  * @desc 変更するアクターを指定します。
  * 
+ * @param UpLvStatus
+ * @text 参照上ステータスレベル
+ * @desc レベル１００以上での参照するステータスの上レベル。
+ * @type number
+ * @max 99
+ * @min 1
+ * @default 99
+ * 
+ * @param UnLvStatus
+ * @text 参照下ステータスレベル
+ * @desc レベル１００以上での参照するステータスの下レベル。
+ * @type number
+ * @max 98
+ * @min 1
+ * @default 95
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_LevelEX = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_LevelEX');
+const UpLvStatus = Number(parameters['UpLvStatus'] || 99);
+const UnLvStatus = Number(parameters['UnLvStatus'] || 95);
 const pluginName = "NUUN_LevelEX";
 
 PluginManager.registerCommand(pluginName, "MaxLevelSet", args => {
   $gameActors.actor(args.ActorId).changeMaxLevel(args.changeMaxLevel);
 });
-
-Game_Actor.prototype.changeMaxLevel = function(changeMaxLevel) {
-  this._maxLevel = (this._level <= changeMaxLevel ? changeMaxLevel : this._maxLevel);
-};
-
 
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
@@ -69,12 +85,16 @@ Game_Actor.prototype.initMembers = function() {
   this._maxLevel = 0;
 };
 
+Game_Actor.prototype.changeMaxLevel = function(changeMaxLevel) {
+  this._maxLevel = (this._level <= changeMaxLevel ? changeMaxLevel : this._maxLevel);
+};
+
 const _Game_Actor_paramBase = Game_Actor.prototype.paramBase;
 Game_Actor.prototype.paramBase = function(paramId) {
   if(this._level > 99){
-    const param1 = this.currentClass().params[paramId][95];
-    const param2 = this.currentClass().params[paramId][99];
-    const param = (param2 - param1) / 5;
+    const param1 = this.currentClass().params[paramId][UnLvStatus];
+    const param2 = this.currentClass().params[paramId][UpLvStatus];
+    const param = (param2 - param1) / (UpLvStatus - UnLvStatus + 1);
     return Math.round((this._level - 99) * param + param2);
   } else {
     return _Game_Actor_paramBase.call(this, paramId);
@@ -83,10 +103,10 @@ Game_Actor.prototype.paramBase = function(paramId) {
 
 const _Game_Actor_maxLevel = Game_Actor.prototype.maxLevel;
 Game_Actor.prototype.maxLevel = function() {
-  if (this.actor().meta.MaxLevel) {
-    return (this._maxLevel > 0 ? this._maxLevel : this.actor().meta.MaxLevel);
+  if(this._maxLevel > 0) {
+    return this._maxLevel;
   } else {
-    return (this._maxLevel > 0 ? this._maxLevel : _Game_Actor_maxLevel.call(this));
+    return this.actor().meta.MaxLevel ? this.actor().meta.MaxLevel : _Game_Actor_maxLevel.call(this);
   }
 };
 

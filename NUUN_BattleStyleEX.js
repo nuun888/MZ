@@ -58,11 +58,8 @@
  * 被ステート時に顔グラまたは、グラフィック画像がID１の画像に変化します。
  * なお、「アクターグラフィックアニメ許可」をtrueにしているときののみ有効です。
  * 
- * [ライセンス]
- * このプラグインは、MITライセンスの条件の下で利用可能です。
- * 
- * 更新履歴
- * ver 1.0.0（初版）
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
  * 
  * @param ActorImg
  * @text アクターの画像設定
@@ -1059,8 +1056,7 @@ Window_BattleStatus.prototype.drawItemStatus = function(index) {
   const timeY = param.TPBChangePosition ? param.ActorTPB_Y + rect.y : nameY;
   if(param.TPBShow){
     this.placeTimeGauge(actor, timeX, timeY);
-  }console.log(stateIconX+ ' '+this.stateIconX(rect))
-  console.log(stateIconY+ ' '+this.stateIconY(rect))
+  }
   this.placeActorName(actor, nameX, nameY);
   this.placeStateIcon(actor, stateIconX, stateIconY);
   this.placeStatusGauges(actor, rect);

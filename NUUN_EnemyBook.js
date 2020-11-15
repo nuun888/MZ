@@ -1,11 +1,18 @@
 ﻿/*:-----------------------------------------------------------------------------------
  * NUUN_EnemyBook.js
+ * 
+ * Copyright (C) 2020 NUUN
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */
+ * 
+ * 更新履歴
+ * 2020/11 Ver 1.0.0
+ */ 
 /*:ja
  * @target MZ
  * @plugindesc エネミー図鑑
- * @author ヽ(´ω`)ノ
+ * @author NUUN
  * 
  * @help
  * エネミー図鑑を実装します。
@@ -79,12 +86,7 @@
  * 
  * 
  * 利用規約
- * このプラグインの使用に制限はありません。
- * 商用、アダルト等のゲームでも使用可能です。
- * クレジット表記は任意です。
- * 
- * 更新履歴
- * ver 1.0.0（初版）
+ * このプラグインはMITライセンスで配布しています。
  * 
  * 
  * @command EnemyBookOpen
@@ -182,7 +184,7 @@
  * @value 0
  * @option エネミーNoを表示する。
  * @value 1
- * @option エネミーNoを表示する。0埋めをする。
+ * @option エネミーNoを表示し、0埋めをする。
  * @value 2
  * @desc エネミーのNo表示
  * @default 1
@@ -236,6 +238,8 @@
  * @text 更新フレーム間隔
  * @type number
  * @default 100
+ * @max 999999
+ * @min 0
  * 
  * @param CommandData
  * @text コマンド設定
@@ -282,7 +286,7 @@
  * @text スティールアイテム設定
  * 
  * @param ShowStealItems
- * @desc スティールアイテムの表示（盗みスキル　StealableItems.jsが必要）
+ * @desc スティールアイテムの表示（盗みスキル　NUUN_StealableItems.jsが必要）
  * @text スティールアイテム表示
  * @type boolean
  * @default false
@@ -771,7 +775,7 @@ Game_System.prototype.StealItemListFlag = function(enemyId, stealListId, mode) {
       this.setDropItemFlag(enemyId, stealListId, mode)
     } else {
       const enemy = new Game_Enemy(enemyId, 0, 0);
-      const itemList = (Imported.StealableItems ? enemy._stealItems : []);
+      const itemList = (Imported.NUUN_StealableItems ? enemy._stealItems : []);
       for(let i = 0; itemList.length > i; i++){
         this.setStealItemFlag(enemyId, i, mode)
       }
@@ -820,9 +824,6 @@ Game_Enemy.prototype.die = function() {
 Game_Enemy.prototype.dropItemFlag = function(drop) {
   const enemyId = this._enemyId;
   let di = this.enemy().dropItems;
-  if(Imported.DropItemsEX){
-    di.concat(this.dropItemList());
-  }
   for (let i = 0; i < drop.length; i++){
     for(let r = 0; r < di.length; r++){
       if(drop[i].id === di[r].dataId){
@@ -1513,7 +1514,7 @@ Window_EnemyStatus.prototype.dropItems = function(color, enemy, x, y, width, mas
     return this;
   }
   let y2 = y + this.lineHeight();
-  let list = dataEnemy.dropItems.concat(this.dropItemsEX(enemy));
+  let list = dataEnemy.dropItems;
   for(i = 0; i < list.length; i++){
     if(list[i].kind > 0){
       let item = enemy.itemObject(list[i].kind, list[i].dataId);
@@ -1539,7 +1540,7 @@ Window_EnemyStatus.prototype.dropItemsEX = function(enemy) {
 };
 
 Window_EnemyStatus.prototype.stealItems = function(color, enemy, x, y, width, mask) {
-	if(!param.ShowStealItems || !Imported.StealableItems) {
+	if(!param.ShowStealItems || !Imported.NUUN_StealableItems) {
 		return this;
 	}
 	const maxWidth = width;

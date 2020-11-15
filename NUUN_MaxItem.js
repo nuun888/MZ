@@ -12,7 +12,7 @@
 /*:
  * @target MZ
  * @plugindesc アイテムの個別最大数 ver1.0.0
- * @author ヽ(´ω`)ノ
+ * @author NUUN
  * 
  * @help
  * アイテムの所持数を個別に設定します。

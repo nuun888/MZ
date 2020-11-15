@@ -12,7 +12,7 @@
 /*:ja
  * @target MZ
  * @plugindesc ステータス画面変更
- * @author ヽ(´ω`)ノ
+ * @author NUUN
  * 
  * @help
  * ステータス画面のレイアウトを変更します。

@@ -4,41 +4,41 @@
 # 公開プラグイン
 <b>システム</b>
 
-<b>戦闘</b>
-  NUUN_BattleStyleEX　バトルレイアウト変更
-  NUUN_BattlePosition　解像度変更時のバトルポジション修正
+<b>戦闘</b><br>
+  NUUN_BattleStyleEX　バトルレイアウト変更<br>
+  NUUN_BattlePosition　解像度変更時のバトルポジション修正<br>
   
-<b>アイテム</b>
-NUUN_MaxItem　アイテムの個別最大所持数
-NUUN_ItemCategory　アイテムのカテゴリーカスタマイズ
-NUUN_ExpItem　経験値増加アイテム、スキル
+<b>アイテム</b><br>
+NUUN_MaxItem　アイテムの個別最大所持数<br>
+NUUN_ItemCategory　アイテムのカテゴリーカスタマイズ<br>
+NUUN_ExpItem　経験値増加アイテム、スキル<br>
 
-<b>スキル</b>
-NUUN_StealableItems　盗みスキル
+<b>スキル</b><br>
+NUUN_StealableItems　盗みスキル<br>
 
-<b>ステート</b>
-NUUN_AddStateFix　ステートの付与方法変更
+<b>ステート</b><br>
+NUUN_AddStateFix　ステートの付与方法変更<br>
 
-<b>メニュー系</b>
-NUUN_StatusScreen　ステータス画面（ワイド画面推奨）
-NUUN_EnemyBook　エネミー図鑑
-NUUN_CommandIcon　コマンドアイコン
-NUUN_StatusScreen　ステータス画面スタイル変更
+<b>メニュー系</b><br>
+NUUN_StatusScreen　ステータス画面（ワイド画面推奨）<br>
+NUUN_EnemyBook　エネミー図鑑<br>
+NUUN_CommandIcon　コマンドアイコン<br>
+NUUN_StatusScreen　ステータス画面スタイル変更<br>
 
 
-<b>バトラー</b>
-NUUN_AddDropItems　ドロップアイテム追加
-NUUN_BigEnemy　巨大エネミー
-NUUN_EnemyParamNoLimit　エネミーのステータス上限限界突破
-NUUN_StatusParamEX　アクターのステータス上限
-NUUN_LevelEX　アクターのレベル上限突破及びレベル上限変動
+<b>バトラー</b><br>
+NUUN_AddDropItems　ドロップアイテム追加<br>
+NUUN_BigEnemy　巨大エネミー<br>
+NUUN_EnemyParamNoLimit　エネミーのステータス上限限界突破<br>
+NUUN_StatusParamEX　アクターのステータス上限<br>
+NUUN_LevelEX　アクターのレベル上限突破及びレベル上限変動<br>
 
-<b>敵グループ</b>
-NUUN_BattleBGM　敵グループの個別BGM
-NUUN_EncounterCondition　エンカウント条件
+<b>敵グループ</b><br>
+NUUN_BattleBGM　敵グループの個別BGM<br>
+NUUN_EncounterCondition　エンカウント条件<br>
 
-<b>イベント</b>
-NUUN_RandomItems  アイテムのランダム取得
+<b>イベント</b><br>
+NUUN_RandomItems  アイテムのランダム取得<br>
 
-<b>MZ移植</b>
-こちらのプラグインは各製作者様の規約に依存します。
+<b>MZ移植</b><br>
+こちらのプラグインは各製作者様の規約に依存します。<br>

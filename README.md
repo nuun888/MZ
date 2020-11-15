@@ -13,7 +13,7 @@
 NUUN_MaxItem　アイテムの個別最大所持数<br>
 [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増加アイテム、スキル<br>
-[NUUN_ConsumptionItem]アイテム消耗率<br>
+NUUN_ConsumptionItemアイテム消耗率<br>
 
 <b>スキル</b><br>
 [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)　盗みスキル<br>

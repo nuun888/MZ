@@ -1,107 +1,113 @@
 ﻿/*:-----------------------------------------------------------------------------------
  * NUUN_BattleBGM.js
+ * 
+ * Copyright (C) 2020 NUUN
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
+ * 
+ * 更新履歴
+ * 2020/11 Ver 1.0.0
+ */ 
+/*:
  * @target MZ
- * @plugindesc 敵グループの個別ＢＧＭ
- * @author ヽ(´ω`)ノ
+ * @plugindesc 敵グループの個別BGM
+ * @author NUUN
  * 
  * @help
  * 敵グループごとにバトルBGMを設定できます。
- * また、戦闘BGMをランダムに再生する機能も実装しています。
- * 
- * プラグインパラメータからBGMを設定してください。
- * リストに設定した左側に表示されている番号がBGMの再生IDとなります。
  * 
  * 敵グループのバトルイベントの１ページ目にコメントタグで以下の
  * コメントを入力してください。
- * 指定したIDのBGMがバトルBGMとして再生されます。
  * 
- * <battleBGM:3> リストで指定した３番目のBGMが再生されます。
- * <battleBGMR:1,2,3...>設定したIDのBGMのうち一つがランダムに再生されます。
+ * <battleBGM:[name],[volume],[pitch],[pan],[conditions]> [name]で指定したBGMが再生られます。
+ *  なお、指定のBGMが見つからない場合BGMは再生されません。
+ * 
+ * [name]:BGMファイル名（拡張子なし）
+ * [volume]:音量
+ * [pitch]:ピッチ
+ * [pan]:位相
+ * [conditions]:再生条件
+ * 
+ * <RandomBGM:[name],[name],[name],...> 指定したBGMの中からいずれかが再生されます。
+ * 
+ * [name]:BGMファイル名（拡張子なし）
+ * 
+ * <RandomBGM:Battle2,Battle5,Battle6> 指定したBGMの中から１つがランダムに再生します。
+ * ランダムに再生したい場合はこのタグをbattleBGMタグの上に記入してください。※例１
+ * <battleBGM:Battle2, 90, 100, 0> Battle2のBGMが音量90、ピッチ100、位相0で再生されます。
+ * <battleBGM:Battle3, 90, 150, 0,$gameSwitches.value(2)> スイッチ番号２番がTrueなら
+ *  Battle3のBGMが音量90、ピッチ150、位相0で再生されます。
+ * 再生条件を指定する場合、条件付きのタグは通常表示再生するBGMの下に記入してください。
+ * 
+ * 例１
+ * <RandomBGM:Battle2,Battle5,Battle6>
+ * <battleBGM:Battle2, 90, 100, 0>
+ * 
+ * 複数の場合
+ * <RandomBGM:Battle2,Battle5,Battle6>
+ * <battleBGM:bgm, 90, 100, 0>
+ * <RandomBGM:Battle1,Battle7,Battle8>
+ * <battleBGM:bgm, 90, 150, 0,$gameSwitches.value(2)>
  * 
  * 利用規約
- * このプラグインの使用に制限はありません。
- * 商用、アダルト等のゲームでも使用可能です。
- * クレジット表記は任意です。
+ * このプラグインはMITライセンスで配布しています。
  * 
- * 更新履歴
- * ver 1.0.0（初版）
  * 
- * @param BGMList
- * @text 戦闘ＢＧＭ
- * @desc ＢＧＭを設定します。
- * @default []
- * @type struct<battleBgmList>[]
  */ 
-/*~struct~battleBgmList:
- * @param name
- * @text ＢＧＭファイル名
- * @desc ＢＧＭを指定します。
- * @type file
- * @dir audio/bgm
- * 
- * @param volume
- * @text ＢＧＭの音量
- * @desc ＢＧＭを音量を設定します。
- * @default 90
- * 
- * @param pitch
- * @text ＢＧＭのピッチ
- * @desc ＢＧＭをピッチを設定します。
- * @default 100
- * 
- * @param pan
- * @text ＢＧＭの位相
- * @desc ＢＧＭを位相を設定します。
- * @default 0
- * 
- */
 var Imported = Imported || {};
 Imported.NUUN_BattleBGM = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_BattleBGM');
-  const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
-    try {
-      return JSON.parse(value);
-    } catch (e) {
-      try {
-        return eval(value);
-      } catch (e) {
-        return value;
-      }
-    }
-  }));
 
   const _Game_Troop_setup = Game_Troop.prototype.setup;
   Game_Troop.prototype.setup = function(troopId) {
     _Game_Troop_setup.call(this, troopId);
-    const bgmId = this.battleBGMsetup();
-    $gameSystem.setBattleBgm(param.BGMList[bgmId - 1]);
+    const bgm = this.battleBGMSetup();
+    if(bgm){
+      $gameSystem.setBattleBgm({name:bgm[0], volume:bgm[1], pitch:bgm[2], pan:bgm[3]});
+    }
   };
+  const re = /<(?:battleBGM):\s*(.*)>/;
+  const re2 = /<(?:RandomBGM):\s*(.*)>/;
 
-  Game_Troop.prototype.battleBGMsetup = function() {
+  Game_Troop.prototype.battleBGMSetup = function() {
     const pages = this.troop().pages[0];
-    const re = /<(?:battleBGM):\s*(\d+)>/;
-    const re2 = /<(?:battleBGMR):\s*(\d+(?:\s*,\s*\d+)*)>/g;
-    let list = 0;
+    let list = null;
+    let bgm = null;
     pages.list.forEach(tag => {
-      if (tag.code === 108) {//注釈なら
+      if (tag.code === 108 || tag.code === 408) {
         let match = re.exec(tag.parameters[0]);
         let match2 = re2.exec(tag.parameters[0]);
         if (match) {
-          list = Number(match[1]);
-        } else if (match2){
-          list = this.battleBgmRandom(match2[1]);
+          list = this.battleBgmRequest(match[1], bgm);
+          bgm = null;
+        } else if(match2) {
+          bgm = this.randomBgmRequest(match2[1]);
         }
       }
     });
     return list;
   };
 
-  Game_Troop.prototype.battleBgmRandom = function(data) {
-    const list = data.split(',');
-    return Number(list[(Math.floor(Math.random() * list.length))]);
+  Game_Troop.prototype.battleBgmConditions = function(conditions) {
+    return conditions ? eval(conditions) : true;
   };
 
+  Game_Troop.prototype.battleBgmRequest = function(data, bgm) {
+    const list = data.split(',');
+    if(this.battleBgmConditions(list[4])){
+      if(bgm) {
+        list[0] = bgm;
+      }
+      return list;
+    }
+    return null;
+  };
+
+  Game_Troop.prototype.randomBgmRequest = function(data) {
+    const list = data.split(',');
+    return (list[(Math.floor(Math.random() * list.length)) - 1]);
+  };
 })();

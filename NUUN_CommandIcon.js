@@ -12,7 +12,7 @@
 /*:ja
  * @target MZ
  * @plugindesc コマンドにアイコン追加
- * @author ヽ(´ω`)ノ
+ * @author NUUN
  * 
  * @help
  * コマンドメニューにアイコンを追加します。

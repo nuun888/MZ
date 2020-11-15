@@ -30,7 +30,7 @@ NUUN_StatusScreen　ステータス画面スタイル変更<br>
 
 
 <b>バトラー</b><br>
-NUUN_AddDropItems　ドロップアイテム追加<br>
+NUUN_AddDropItems(https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js)　ドロップアイテム追加<br>
 NUUN_BigEnemy　巨大エネミー<br>
 NUUN_EnemyParamNoLimit　エネミーのステータス上限限界突破<br>
 NUUN_StatusParamEX　アクターのステータス上限<br>

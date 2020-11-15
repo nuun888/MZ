@@ -22,7 +22,7 @@ NUUN_ConsumptionItemアイテム消耗率<br>
 [NUUN_AddStateFix](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateFix.js)　ステートの付与方法変更<br>
 
 <b>メニュー系</b><br>
-NUUN_StatusScreen　メニュー画面（ワイド画面推奨）<br>
+NUUN_MenuScreen　メニュー画面（ワイド画面推奨）<br>
 [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)　エネミー図鑑<br>
 [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)　コマンドアイコン<br>
 [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)　ステータス画面スタイル変更<br>

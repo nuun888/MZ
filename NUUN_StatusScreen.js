@@ -12,7 +12,7 @@
 /*:ja
  * @target MZ
  * @plugindesc ステータス画面変更
- * @author NUUN
+ * @author ヽ(´ω`)ノ
  * 
  * @help
  * ステータス画面のレイアウトを変更します。
@@ -23,6 +23,13 @@
  * １ページ目　基本能力値　装備
  * ２ページ目　追加能力値　特殊能力値　（追加能力値、特殊能力値の表示がない場合）属性有効度　ステート有効度
  * ３ページ目　属性有効度　ステート有効度
+ * 
+ * 追加能力値、特殊能力値、属性有効度、ステート有効度のいずれかの表示をしない場合は、
+ * 表示しない項目の配列を空白にしてください。
+ * 追加能力値、特殊能力値または属性有効度、ステート有効度の配列を同時に空白にした場合は、
+ * そのページが表示されなくなります。
+ * 追加能力値、特殊能力値、属性有効度、ステート有効度をすべて配列を空白にした場合は、
+ * 最初のページのみの表示となります。
  * 
  * 
  * 利用規約
@@ -337,22 +344,22 @@ Scene_Status.prototype.statusStateWidth = function() {
 };
 
 Scene_Status.prototype.statusXParamsHeight = function() {
-  const row = param.Xparam.length;
+  const row = XparamData ? param.Xparam.length : 0;
   return this.calcWindowHeight(row, false);
 };
 
 Scene_Status.prototype.statusSParamsHeight = function() {
-  const row = param.Sparam.length;
+  const row = SparamData ? param.Sparam.length : 0;
   return this.calcWindowHeight(row, false);
 };
 
 Scene_Status.prototype.statusElementHeight = function() {
-  const row = param.ElementResist.length;
+  const row = ElementResistData ?  param.ElementResist.length : 0;
   return this.calcWindowHeight(Math.ceil(row / 2), false);
 };
 
 Scene_Status.prototype.statusStateHeight = function() {
-  const row = param.StateResist.length;
+  const row = StateResistData ? param.StateResist.length : 0;
   return this.calcWindowHeight(Math.ceil(row / 2), false);
 };
 
@@ -623,7 +630,7 @@ Window_StatusXParams.prototype.setActor = function(actor) {
 };
 
 Window_StatusXParams.prototype.maxItems = function() {
-  return param.Xparam.length;
+  return XparamData ? param.Xparam.length : 0;
 };
 
 Window_StatusXParams.prototype.maxCols = function() {
@@ -709,7 +716,7 @@ Window_StatusSParams.prototype.setActor = function(actor) {
 };
 
 Window_StatusSParams.prototype.maxItems = function() {
-  return param.Sparam.length;
+  return SparamData ? param.Sparam.length : 0;
 };
 
 Window_StatusSParams.prototype.maxCols = function() {
@@ -795,7 +802,7 @@ Window_StatusElement.prototype.setActor = function(actor) {
 };
 
 Window_StatusElement.prototype.maxItems = function() {
-  return param.ElementResist.length;
+  return ElementResistData ? param.ElementResist.length : 0;
 };
 
 Window_StatusElement.prototype.maxCols = function() {
@@ -861,7 +868,7 @@ Window_StatusState.prototype.setActor = function(actor) {
 };
 
 Window_StatusState.prototype.maxItems = function() {
-  return param.StateResist.length;
+  return StateResistData ? param.StateResist.length : 0;
 };
 
 Window_StatusState.prototype.maxCols = function() {

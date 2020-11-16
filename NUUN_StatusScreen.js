@@ -36,6 +36,13 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * @param ContentWidth
+ * @text 項目の表示横幅
+ * @desc ページ内の項目の表示横幅。(0で自動調整)
+ * @type number
+ * @default 808
+ * @min 0
+ * 
  * @param ParamName
  * @text 能力値の名称
  * @desc 能力値の名称を設定します。
@@ -301,7 +308,7 @@ Scene_Status.prototype.statusSParamsWindowRect = function() {
 };
 
 Scene_Status.prototype.statusEquipWindowRect = function() {
-  const ww = 808 - this.statusParamsWidth();
+  const ww = this.statusContenWidth() - this.statusParamsWidth();
   const wh = this.statusParamsHeight();
   const wx = this.statusParamsWidth() + 4;
   const wy = this.mainAreaTop() + this.statusHeight();
@@ -324,24 +331,28 @@ Scene_Status.prototype.statusStateWindowRect = function() {
   return new Rectangle(wx, wy, ww, wh);
 };
 
+Scene_Status.prototype.statusContenWidth = function() {
+  return param.ContentWidth === 0 ? Graphics.boxWidth : param.ContentWidth;
+};
+
 Scene_Status.prototype.statusParamsWidth = function() {
-  return 300;
+  return Math.max(this.statusContenWidth() / 3, 300);
 };
 
 Scene_Status.prototype.statusXParamsWidth = function() {
-  return XparamData ? 808 / 2 : 0;
+  return XparamData ? this.statusContenWidth() / 2 : 0;
 };
 
 Scene_Status.prototype.statusSParamsWidth = function() {
-  return SparamData ? 808 / 2 : 0;
+  return SparamData ? this.statusContenWidth() / 2 : 0;
 };
 
 Scene_Status.prototype.statusElementWidth = function() {
-  return ElementResistData ? 808 / 2 : 0;
+  return ElementResistData ? this.statusContenWidth() / 2 : 0;
 };
 
 Scene_Status.prototype.statusStateWidth = function() {
-  return StateResistData ? 808 / 2 : 0;
+  return StateResistData ? this.statusContenWidth() / 2 : 0;
 };
 
 Scene_Status.prototype.statusXParamsHeight = function() {

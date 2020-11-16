@@ -37,44 +37,44 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * @param ParamName
- * @desc 能力値の名称
- * @text 能力値の名称を設定します。
+ * @text 能力値の名称
+ * @desc 能力値の名称を設定します。
  * @type string
  * @default 能力値
  * 
  * @param EquipsName
- * @desc 装備の名称
- * @text 装備の名称を設定します。
+ * @text 装備の名称
+ * @desc 装備の名称を設定します。
  * @type string
  * @default 装備
  * 
  * @param XParamName
- * @desc 追加能力値の名称
- * @text 追加能力値の名称を設定します。
+ * @text 追加能力値の名称
+ * @desc 追加能力値の名称を設定します。
  * @type string
  * @default 追加能力値
  * 
  * @param SParamName
- * @desc 特殊能力値の名称
- * @text 特殊能力値の名称を設定します。
+ * @text 特殊能力値の名称
+ * @desc 特殊能力値の名称を設定します。
  * @type string
  * @default 特殊能力値
  * 
  * @param ElementName
- * @desc 属性有効度の名称
- * @text 属性有効度の名称を設定します。
+ * @text 属性有効度の名称
+ * @desc 属性有効度の名称を設定します。
  * @type string
  * @default 属性有効度
  * 
  * @param StateName
- * @desc ステート有効度の名称
- * @text ステート有効度の名称を設定します。
+ * @text ステート有効度の名称
+ * @desc ステート有効度の名称を設定します。
  * @type string
  * @default ステート有効度
  * 
  * @param GaugeWidth
- * @desc ゲージ横幅
- * @text HP,MP,TPゲージの横幅を指定します。
+ * @text ゲージ横幅
+ * @desc HP,MP,TPゲージの横幅を指定します。
  * @type number
  * @default 200
  * @min 0
@@ -87,22 +87,22 @@
  * 
  * @param Xparam
  * @type struct<XparamData>[]
- * @desc 追加能力値
+ * @text 追加能力値
  * @default ["{\"XparamName\":\"\",\"XparamId\":\"0\"}","{\"XparamName\":\"\",\"XparamId\":\"1\"}","{\"XparamName\":\"\",\"XparamId\":\"2\"}","{\"XparamName\":\"\",\"XparamId\":\"3\"}","{\"XparamName\":\"\",\"XparamId\":\"4\"}","{\"XparamName\":\"\",\"XparamId\":\"5\"}","{\"XparamName\":\"\",\"XparamId\":\"6\"}","{\"XparamName\":\"\",\"XparamId\":\"7\"}","{\"XparamName\":\"\",\"XparamId\":\"8\"}","{\"XparamName\":\"\",\"XparamId\":\"9\"}"]
  * 
  * @param Sparam
  * @type struct<SparamData>[]
- * @desc 特殊能力値
+ * @text 特殊能力値
  * @default ["{\"SparamName\":\"\",\"SparamId\":\"0\"}","{\"SparamName\":\"\",\"SparamId\":\"1\"}","{\"SparamName\":\"\",\"SparamId\":\"2\"}","{\"SparamName\":\"\",\"SparamId\":\"3\"}","{\"SparamName\":\"\",\"SparamId\":\"4\"}","{\"SparamName\":\"\",\"SparamId\":\"5\"}","{\"SparamName\":\"\",\"SparamId\":\"6\"}","{\"SparamName\":\"\",\"SparamId\":\"7\"}","{\"SparamName\":\"\",\"SparamId\":\"8\"}","{\"SparamName\":\"\",\"SparamId\":\"9\"}"]
  * 
  * @param ElementResist
  * @type struct<ElementData>[]
- * @desc 属性耐性
+ * @text 属性耐性
  * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"\"}"]
  * 
  * @param StateResist
  * @type struct<StateData>[]
- * @desc 状態耐性
+ * @text 状態耐性
  * @default ["{\"StateNo\":\"4\"}","{\"StateNo\":\"5\"}","{\"StateNo\":\"6\"}","{\"StateNo\":\"7\"}","{\"StateNo\":\"8\"}","{\"StateNo\":\"9\"}","{\"StateNo\":\"10\"}","{\"StateNo\":\"12\"}","{\"StateNo\":\"13\"}"]
  * 
  */

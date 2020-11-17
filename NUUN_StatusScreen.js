@@ -11,6 +11,8 @@
  * 2020/11/17 Ver 1.0.1 
  *  追加能力値、特殊能力値、属性有効度、ステート有効度の表示できる小数点の桁数を指定できる機能を追加。
  *  ページの切り替えをタッチ操作でも行えるように対応。
+ * 2020/11/18 Ver 1.0.2
+ *  表示外の少数点を四捨五入か切り捨てで丸める機能を追加。
  * 
  */ 
 /*:ja
@@ -57,6 +59,12 @@
  * @type number
  * @default 2
  * @min 0
+ * 
+ * @param DecimalMode
+ * @text 端数処理
+ * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
+ * @type boolean
+ * @default true
  * 
  * @param ParamName
  * @text 能力値の名称
@@ -491,6 +499,14 @@ Scene_Status.prototype.noShow = function() {
 };
 
 
+Window_Base.prototype.statusParamDecimal = function(val) {
+  if (param.DecimalMode) {
+    return Math.round(val * (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1)) / (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1);
+  } else {
+    return Math.floor(val * (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1)) / (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1);
+  }
+};
+
 Window_Status.prototype.refresh = function() {
   Window_StatusBase.prototype.refresh.call(this);
   if (this._actor) {
@@ -699,12 +715,14 @@ Window_StatusXParams.prototype.drawItem = function(index) {
   const paramId = param.Xparam[index].XparamId;
   const name = this.XparamName(index);
   let value = this._actor.xparam(paramId) * 100;
-  value = param.Decimal === 0 ? Math.round(value) : Math.floor(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
+  value = this.statusParamDecimal(value);
+  //value = Math.round(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(name, rect.x, rect.y, 92);
   this.resetTextColor();
   this.drawText(value +" %", rect.x + 100, rect.y, rect.width - 100, "right");
 };
+
 
 Window_StatusXParams.prototype.XparamName = function(index) {
   switch (param.Xparam[index].XparamId) {
@@ -786,7 +804,7 @@ Window_StatusSParams.prototype.drawItem = function(index) {
   const paramId = param.Sparam[index].SparamId;
   const name = this.SparamName(index);
   let value = this._actor.sparam(paramId) * 100;
-  value = param.Decimal === 0 ? Math.round(value) : Math.floor(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
+  value = this.statusParamDecimal(value);
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(name, rect.x, rect.y, 92);
   this.resetTextColor();
@@ -881,7 +899,7 @@ Window_StatusElement.prototype.drawItem = function(index) {
       this.drawText(name, rect.x, rect.y, 92);
     }
     let rate = this._actor.elementRate(elementId) * 100;
-    rate = param.Decimal === 0 ? Math.round(rate) : Math.floor(rate * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
+    rate = this.statusParamDecimal(rate);
     this.resetTextColor();
     this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
   }
@@ -949,7 +967,7 @@ Window_StatusState.prototype.drawItem = function(index) {
         this.drawText(name, rect.x, rect.y, 92);
       }
       let rate = this._actor.stateRate(stateId) * 100;
-      rate = param.Decimal === 0 ? Math.round(rate) : Math.floor(rate * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
+      rate = this.statusParamDecimal(rate);
       this.resetTextColor();
       this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
     }

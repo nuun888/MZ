@@ -8,6 +8,10 @@
  * 
  * 更新履歴
  * 2020/11/16 Ver 1.0.0
+ * 2020/11/17 Ver 1.0.1 
+ *  追加能力値、特殊能力値、属性有効度、ステート有効度の表示できる小数点の桁数を指定できる機能を追加。
+ *  ページの切り替えをタッチ操作でも行えるように対応。
+ * 
  */ 
 /*:ja
  * @target MZ
@@ -16,12 +20,16 @@
  * 
  * @help
  * ステータス画面のレイアウトを変更します。
- * 操作
+ * キーボード操作
  * QWキー　キャラ切り替え
- * ←→キー　項目切り替え
+ * ←→キー　ページ切り替え
+ * 
+ * タッチ操作
+ * <>ボタン　キャラ切り替え
+ * ΛVボタン　ページ切り替え
  * 
  * １ページ目　基本能力値　装備
- * ２ページ目　追加能力値　特殊能力値　（追加能力値、特殊能力値の表示がない場合）属性有効度　ステート有効度
+ * ２ページ目　追加能力値　特殊能力値、追加能力値、特殊能力値の表示がない場合）属性有効度　ステート有効度
  * ３ページ目　属性有効度　ステート有効度
  * 
  * 追加能力値、特殊能力値、属性有効度、ステート有効度のいずれかの表示をしない場合は、
@@ -41,6 +49,13 @@
  * @desc ページ内の項目の表示横幅。(0で自動調整)
  * @type number
  * @default 0
+ * @min 0
+ * 
+ * @param Decimal
+ * @text 小数点桁数
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 2
  * @min 0
  * 
  * @param ParamName
@@ -215,6 +230,7 @@ Scene_Status.prototype.create = function() {
   this.createStatusSParamsWindow();
   this.createStatusElementWindow();
   this.createStatusStateWindow();
+  this.createStatusButton();
 };
 
 Scene_Status.prototype.createProfileWindow = function() {
@@ -385,6 +401,22 @@ Scene_Status.prototype.statusHeight = function() {
   return this.calcWindowHeight(a, false) + 4;
 };
 
+Scene_Status.prototype.createStatusButton = function() {
+  if(pages > 1 && ConfigManager.touchUI) {
+    this._modeupButton = new Sprite_Button("up");
+    this._modeupButton.x = 24 + this._pageupButton.width + this._pagedownButton.width;
+    this._modeupButton.y = this.buttonY();
+    const modeupRight = this._modeupButton.x + this._modeupButton.width;
+    this._modedownButton = new Sprite_Button("down");
+    this._modedownButton.x = modeupRight + 4;
+    this._modedownButton.y = this.buttonY();
+    this.addWindow(this._modeupButton);
+    this.addWindow(this._modedownButton);
+    this._modeupButton.setClickHandler(this.updateContentsPageup.bind(this));
+    this._modedownButton.setClickHandler(this.updateContentsPagedown.bind(this));
+  }
+};
+
 const _Scene_Status_refreshActor = Scene_Status.prototype.refreshActor;
 Scene_Status.prototype.refreshActor = function() {
   _Scene_Status_refreshActor.call(this);
@@ -400,12 +432,10 @@ const _Scene_Status_update = Scene_Status.prototype.update;
 Scene_Status.prototype.update = function() {
 	_Scene_Status_update.call(this);
 	if (Input.isTriggered('left') && this.maxPage() > 1) {
-		SoundManager.playCursor();
 		this.updateContentsPageup();
 	} else if (Input.isTriggered('right') && this.maxPage() > 1){
-		SoundManager.playCursor();
 		this.updateContentsPagedown();
-	}
+  }
 };
 
 Scene_Status.prototype.maxPage = function() {
@@ -414,14 +444,16 @@ Scene_Status.prototype.maxPage = function() {
 
 Scene_Status.prototype.updateContentsPagedown = function() {
 	const maxPage = this.maxPage();
-	this._pageMode = (this._pageMode + 1) % maxPage;
-  	this.updatepage();
+  this._pageMode = (this._pageMode + 1) % maxPage;
+  SoundManager.playCursor();
+  this.updatepage();
 };
 
 Scene_Status.prototype.updateContentsPageup = function() {
 	const maxPage = this.maxPage();
-	this._pageMode = (this._pageMode + (maxPage - 1)) % maxPage;
-  	this.updatepage();
+  this._pageMode = (this._pageMode + (maxPage - 1)) % maxPage;
+  SoundManager.playCursor();
+  this.updatepage();
 };
 
 Scene_Status.prototype.updatepage = function() {
@@ -666,7 +698,8 @@ Window_StatusXParams.prototype.drawItem = function(index) {
   const rect = this.itemLineRect(index);
   const paramId = param.Xparam[index].XparamId;
   const name = this.XparamName(index);
-  const value = this._actor.xparam(paramId) * 100;
+  let value = this._actor.xparam(paramId) * 100;
+  value = Math.floor(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(name, rect.x, rect.y, 92);
   this.resetTextColor();
@@ -752,7 +785,8 @@ Window_StatusSParams.prototype.drawItem = function(index) {
   const rect = this.itemLineRect(index);
   const paramId = param.Sparam[index].SparamId;
   const name = this.SparamName(index);
-  const value = this._actor.sparam(paramId) * 100;
+  let value = this._actor.sparam(paramId) * 100;
+  value = Math.floor(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(name, rect.x, rect.y, 92);
   this.resetTextColor();
@@ -846,7 +880,8 @@ Window_StatusElement.prototype.drawItem = function(index) {
       this.changeTextColor(ColorManager.systemColor());
       this.drawText(name, rect.x, rect.y, 92);
     }
-    const rate = this._actor.elementRate(elementId) * 100;
+    let rate = this._actor.elementRate(elementId) * 100;
+    rate = Math.floor(rate * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
     this.resetTextColor();
     this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
   }
@@ -913,7 +948,8 @@ Window_StatusState.prototype.drawItem = function(index) {
         this.changeTextColor(ColorManager.systemColor());
         this.drawText(name, rect.x, rect.y, 92);
       }
-      const rate = this._actor.stateRate(stateId) * 100;
+      let rate = this._actor.stateRate(stateId) * 100;
+      rate = Math.floor(rate * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
       this.resetTextColor();
       this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
     }

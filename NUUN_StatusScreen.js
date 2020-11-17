@@ -699,7 +699,7 @@ Window_StatusXParams.prototype.drawItem = function(index) {
   const paramId = param.Xparam[index].XparamId;
   const name = this.XparamName(index);
   let value = this._actor.xparam(paramId) * 100;
-  value = Math.floor(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
+  value = param.Decimal === 0 ? Math.round(value) : Math.floor(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(name, rect.x, rect.y, 92);
   this.resetTextColor();
@@ -786,7 +786,7 @@ Window_StatusSParams.prototype.drawItem = function(index) {
   const paramId = param.Sparam[index].SparamId;
   const name = this.SparamName(index);
   let value = this._actor.sparam(paramId) * 100;
-  value = Math.floor(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
+  value = param.Decimal === 0 ? Math.round(value) : Math.floor(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(name, rect.x, rect.y, 92);
   this.resetTextColor();
@@ -881,7 +881,7 @@ Window_StatusElement.prototype.drawItem = function(index) {
       this.drawText(name, rect.x, rect.y, 92);
     }
     let rate = this._actor.elementRate(elementId) * 100;
-    rate = Math.floor(rate * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
+    rate = param.Decimal === 0 ? Math.round(rate) : Math.floor(rate * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
     this.resetTextColor();
     this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
   }
@@ -949,7 +949,7 @@ Window_StatusState.prototype.drawItem = function(index) {
         this.drawText(name, rect.x, rect.y, 92);
       }
       let rate = this._actor.stateRate(stateId) * 100;
-      rate = Math.floor(rate * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
+      rate = param.Decimal === 0 ? Math.round(rate) : Math.floor(rate * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
       this.resetTextColor();
       this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
     }

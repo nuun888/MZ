@@ -116,7 +116,7 @@ Window_ItemCategory.prototype.makeCommandList = function() {
 
 const _Window_ItemList_includes = Window_ItemList.prototype.includes;
 Window_ItemList.prototype.includes = function(item) {
-  if((this._category === 'allItems' || (!param.OneCategoryShow && TypeLength < 2)) && !this.secretItem(item) && item) {
+  if((this._category === 'allItems' || TypeLength < 2) && !this.secretItem(item) && item) {
     return true;
   }
   const type = item ? item.meta.CategoryType : null;

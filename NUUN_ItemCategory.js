@@ -42,12 +42,6 @@
  * @type number
  * @default 1
  * 
- * @param OneCategoryShow
- * @desc カテゴリーが１列でも表示するか。
- * @text カテゴリー１列表示
- * @type boolean
- * @default true
- * 
  * @param ItemCategory
  * @text カテゴリー項目
  * @desc カテゴリー項目の設定。
@@ -98,7 +92,7 @@ Window_ItemCategory.prototype.maxCols = function() {
 
 Window_ItemCategory.prototype.makeCommandList = function() {
   const list = param.ItemCategory;
-  if((!param.OneCategoryShow && TypeLength < 2) || !list) {
+    if(!list) {
     return;
   }
   list.forEach(names => {

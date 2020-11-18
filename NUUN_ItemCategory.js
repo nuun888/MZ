@@ -11,7 +11,7 @@
  */
 /*:ja
  * @target MZ
- * @plugindesc アイテムのカテゴリーカスタマイズ
+ * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
  * 
  * @help

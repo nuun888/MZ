@@ -13,11 +13,14 @@
  *  ページの切り替えをタッチ操作でも行えるように対応。
  * 2020/11/18 Ver 1.0.2
  *  表示外の少数点を四捨五入か切り捨てで丸める機能を追加。
+ * 2020/11/ Ver 1.0.3
+ *  ステータスパラメータの項目が画面からはみ出た際、項目名が正常に表示されない問題を修正。
+ *  一部処理を変更。
  * 
  */ 
 /*:ja
  * @target MZ
- * @plugindesc ステータス画面変更
+ * @plugindesc ステータス画面詳細表示
  * @author NUUN
  * 
  * @help
@@ -241,6 +244,15 @@ Scene_Status.prototype.create = function() {
   this.createStatusButton();
 };
 
+const _Scene_Status_createStatusWindow = Scene_Status.prototype.createStatusWindow;
+Scene_Status.prototype.createStatusWindow = function() {
+  _Scene_Status_createStatusWindow.call(this);
+  this._statusWindow.setContentY = this.statusHeight();
+  this._statusWindow.setContentEquipWidth = this.statusParamsWidth();
+  this._statusWindow.setSParamsWidth = this.statusXParamsWidth();
+  this._statusWindow.setStateWidthWidth = this.statusElementWidth();
+};
+
 Scene_Status.prototype.createProfileWindow = function() {
   const rect = this.profileWindowRect();
   this._profileWindow = new Window_Help(rect);
@@ -253,42 +265,36 @@ Scene_Status.prototype.createStatusParamsWindow = function() {
   const rect = this.statusParamsWindowRect();
   this._statusParamsWindow = new Window_StatusParams(rect);
   this.addChild(this._statusParamsWindow);
-  this._statusParamsWindow.height += this._statusParamsWindow.lineHeight();
 };
 
 Scene_Status.prototype.createStatusEquipWindow = function() {
   const rect = this.statusEquipWindowRect();
   this._statusEquipWindow = new Window_StatusEquip(rect);
   this.addChild(this._statusEquipWindow);
-  this._statusEquipWindow.height += this._statusEquipWindow.lineHeight();
 };
 
 Scene_Status.prototype.createStatusXParamsWindow = function() {
   const rect = this.statusXParamsWindowRect();
   this._statusXParamsWindow = new Window_StatusXParams(rect);
   this.addChild(this._statusXParamsWindow);
-  this._statusXParamsWindow.height += this._statusXParamsWindow.lineHeight();
 };
 
 Scene_Status.prototype.createStatusSParamsWindow = function() {
   const rect = this.statusSParamsWindowRect();
   this._statusSParamsWindow = new Window_StatusSParams(rect);
   this.addChild(this._statusSParamsWindow);
-  this._statusSParamsWindow.height += this._statusSParamsWindow.lineHeight();
 };
 
 Scene_Status.prototype.createStatusElementWindow = function() {
   const rect = this.statusElementWindowRect();
   this._statusElementWindow = new Window_StatusElement(rect);
   this.addChild(this._statusElementWindow);
-  this._statusElementWindow.height += this._statusElementWindow.lineHeight();
 };
 
 Scene_Status.prototype.createStatusStateWindow = function() {
   const rect = this.statusStateWindowRect();
   this._statusStateWindow = new Window_StatusState(rect);
   this.addChild(this._statusStateWindow);
-  this._statusStateWindow.height += this._statusStateWindow.lineHeight();
 };
 
 Scene_Status.prototype.profileWindowRect = function() {
@@ -318,7 +324,7 @@ Scene_Status.prototype.statusParamsWindowRect = function() {
 Scene_Status.prototype.statusXParamsWindowRect = function() {
   const ww = this.statusXParamsWidth();
   const wh = this.statusXParamsHeight();
-  const wx = 4;//this.statusParamsWidth() + 4;
+  const wx = 4;
   const wy = this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
@@ -380,33 +386,30 @@ Scene_Status.prototype.statusStateWidth = function() {
 };
 
 Scene_Status.prototype.statusXParamsHeight = function() {
-  const row = XparamData ? param.Xparam.length : 0;
-  return this.calcWindowHeight(row, false);
+  return XparamData ? this.statusParamsHeight() : 0;
 };
 
 Scene_Status.prototype.statusSParamsHeight = function() {
-  const row = SparamData ? param.Sparam.length : 0;
-  return this.calcWindowHeight(row, false);
+  return SparamData ? this.statusParamsHeight() : 0;
 };
 
 Scene_Status.prototype.statusElementHeight = function() {
-  const row = ElementResistData ?  param.ElementResist.length : 0;
-  return this.calcWindowHeight(Math.ceil(row / 2), false);
+  return ElementResistData ?  this.statusParamsHeight() : 0;
 };
 
 Scene_Status.prototype.statusStateHeight = function() {
-  const row = StateResistData ? param.StateResist.length : 0;
-  return this.calcWindowHeight(Math.ceil(row / 2), false);
+  return StateResistData ? this.statusParamsHeight() : 0;
+};
+
+Scene_Status.prototype.statusParamsHeight = function() {
+  const height = Graphics.boxHeight - (this.mainAreaTop() + this.statusHeight() + this.profileHeight());
+  const row = Math.floor(height / 36);
+  return this.calcWindowHeight(row, false);
 };
 
 Scene_Status.prototype.statusHeight = function() {
-  let a = 5;
-  if(Graphics.boxHeight - this.mainAreaTop() >= 652) {
-    a = 6.5;
-  } else if(Graphics.boxHeight - this.mainAreaTop() >= 616){
-    a = 5.5;
-  }
-  return this.calcWindowHeight(a, false) + 4;
+  const row = Math.floor((Graphics.boxHeight - this.mainAreaTop() - 564) / 60);
+  return this.calcWindowHeight(6 + row, false) + 4;
 };
 
 Scene_Status.prototype.createStatusButton = function() {
@@ -465,32 +468,68 @@ Scene_Status.prototype.updateContentsPageup = function() {
 };
 
 Scene_Status.prototype.updatepage = function() {
-	if(this._pageMode === 0){
-    this._statusParamsWindow.show();
-    this._statusEquipWindow.show();
-    this._statusXParamsWindow.hide();
-    this._statusSParamsWindow.hide();
-    this._statusElementWindow.hide();
-    this._statusStateWindow.hide();
-  } else if ( this._pageMode === 1) {
-    this._statusParamsWindow.hide();
-    this._statusEquipWindow.hide();
+  if(this._pageMode === 0) {
+    this.openFirstPage();
+  } else if (this._pageMode === 1) {
     if (XparamData || SparamData) {
-      this._statusElementWindow.hide();
-      this._statusStateWindow.hide();
-      XparamData ? this._statusXParamsWindow.show() : this.noShow();
-      SparamData ? this._statusSParamsWindow.show() : this.noShow();
+      this.openAbilityScorePage();
     } else {
-      ElementResistData ? this._statusElementWindow.show() : this.noShow();
-      StateResistData ? this._statusStateWindow.show() : this.noShow();
+      this.openValidityPage();
     }
-  } else if ( this._pageMode === 2) {
-    this._statusParamsWindow.hide();
-    this._statusEquipWindow.hide();
-    this._statusXParamsWindow.hide();
-    this._statusSParamsWindow.hide();
-    ElementResistData ? this._statusElementWindow.show() : this.noShow();
-    StateResistData ? this._statusStateWindow.show() : this.noShow();
+  } else if (this._pageMode === 2) {
+    this.openValidityPage();
+  }
+  this._statusWindow.contents.clear();
+  this._statusWindow.refresh();
+  this.drawContentNameBlock();
+};
+
+Scene_Status.prototype.openFirstPage = function() {
+  this._statusParamsWindow.show();
+  this._statusEquipWindow.show();
+  this._statusXParamsWindow.hide();
+  this._statusSParamsWindow.hide();
+  this._statusElementWindow.hide();
+  this._statusStateWindow.hide();
+};
+
+Scene_Status.prototype.openAbilityScorePage = function() {
+  this._statusParamsWindow.hide();
+  this._statusEquipWindow.hide();
+  XparamData ? this._statusXParamsWindow.show() : this.noShow();
+  SparamData ? this._statusSParamsWindow.show() : this.noShow();
+  this._statusElementWindow.hide();
+  this._statusStateWindow.hide();
+  this._ParamsWindowShow = true;
+};
+
+Scene_Status.prototype.openValidityPage = function() {
+  this._statusParamsWindow.hide();
+  this._statusEquipWindow.hide();
+  this._statusXParamsWindow.hide();
+  this._statusSParamsWindow.hide();
+  ElementResistData ? this._statusElementWindow.show() : this.noShow();
+  StateResistData ? this._statusStateWindow.show() : this.noShow();
+};
+
+Scene_Status.prototype.drawContentNameBlock = function() {
+  if (this._statusParamsWindow.visible) {
+    this._statusWindow.paramName();
+  }
+  if (this._statusEquipWindow.visible) {
+    this._statusWindow.EquipsName();
+  }
+  if (this._statusXParamsWindow.visible) {
+    this._statusWindow.XparamName();
+  }
+  if (this._statusSParamsWindow.visible) {
+    this._statusWindow.SparamName();
+  }
+  if (this._statusElementWindow.visible) {
+    this._statusWindow.ElementName();
+  }
+  if (this._statusStateWindow.visible) {
+    this._statusWindow.StateName();
   }
 };
 
@@ -517,7 +556,7 @@ Window_Status.prototype.refresh = function() {
 			this.bitmap.addLoadListener(this.drawBlocks.bind(this));
 		} else {
 			this.drawBlocks();
-		}
+    }
   }
 };
 
@@ -535,12 +574,7 @@ Window_Status.prototype.actorImg = function() {
 };
 
 Window_Status.prototype.blocksY = function() {
-  const lineHeight = this.lineHeight();
-  if(Graphics.boxHeight > 700 ) {
-    return lineHeight * 0.5;
-  } else {
-    return 0;
-  }
+  return Math.floor((Graphics.boxHeight - 616) / 60) * 36;
 };
 
 Window_Status.prototype.drawBlock2 = function() {
@@ -592,21 +626,60 @@ Window_Status.prototype.battlreActorImgDeta = function(id) {
   return deta;
 };
 
+Window_Status.prototype.paramName = function(id) {
+  const rect = this.itemLineRect(0);
+  const y = this.setContentY - 42;
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.ParamName, rect.x, y, rect.width);
+  this.resetTextColor();
+};
+
+Window_Status.prototype.XparamName = function(id) {
+  const rect = this.itemLineRect(0);
+  const y = this.setContentY - 42;
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.XParamName, rect.x, y, rect.width);
+  this.resetTextColor();
+};
+
+Window_Status.prototype.SparamName = function() {
+  const rect = this.itemLineRect(0);
+  const y = this.setContentY - 42;
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.SParamName, rect.x + this.setSParamsWidth, y, rect.width);
+  this.resetTextColor();
+};
+
+Window_Status.prototype.EquipsName = function() {
+  const rect = this.itemLineRect(0);
+  const y = this.setContentY - 42;
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.EquipsName, rect.x + this.setContentEquipWidth, y, rect.width);
+  this.resetTextColor();
+};
+
+Window_Status.prototype.ElementName = function() {
+  const rect = this.itemLineRect(0);
+  const y = this.setContentY - 42;
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.ElementName, rect.x, y, rect.width);
+  this.resetTextColor();
+};
+
+Window_Status.prototype.StateName = function() {
+  const rect = this.itemLineRect(0);
+  const y = this.setContentY - 42;
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.StateName, rect.x + this.setStateWidthWidth - 4, y, rect.width);
+  this.resetTextColor();
+};
+
 
 const _Window_StatusParams_initialize = Window_StatusParams.prototype.initialize;
 Window_StatusParams.prototype.initialize = function(rect) {
   _Window_StatusParams_initialize.call(this, rect);
   this.opacity = 0;
   this.frameVisible =  false;
-};
-
-Window_StatusParams.prototype.refresh = function() {
-  Window_StatusBase.prototype.refresh.call(this);
-  const rect = this.itemLineRect(0);
-  const y = rect.y - this.lineHeight();
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.ParamName, rect.x, y, rect.width);
-  this.resetTextColor();
 };
 
 Window_StatusParams.prototype.drawItem = function(index) {
@@ -624,27 +697,11 @@ Window_StatusParams.prototype.drawItemBackground = function(index) {
   Window_Selectable.prototype.drawItemBackground.call(this, index);
 };
 
-Window_StatusParams.prototype.itemRect = function(index) {
-  const rect = Window_Selectable.prototype.itemRect.call(this, index);
-  rect.y += this.lineHeight();
-  return rect;
-};
-
-
 const _Window_StatusEquip_initialize = Window_StatusEquip.prototype.initialize;
 Window_StatusEquip.prototype.initialize = function(rect) {
   _Window_StatusEquip_initialize.call(this, rect);
   this.opacity = 0;
   this.frameVisible =  false;
-};
-
-Window_StatusEquip.prototype.refresh = function() {
-  Window_StatusBase.prototype.refresh.call(this);
-  const rect = this.itemLineRect(0);
-  const y = rect.y - this.lineHeight();
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.EquipsName, rect.x, y, rect.width);
-  this.resetTextColor();
 };
 
 Window_StatusEquip.prototype.drawItem = function(index) {
@@ -662,11 +719,6 @@ Window_StatusEquip.prototype.drawItemBackground = function(index) {
   Window_Selectable.prototype.drawItemBackground.call(this, index);
 };
 
-Window_StatusEquip.prototype.itemRect = function(index) {
-  const rect = Window_Selectable.prototype.itemRect.call(this, index);
-  rect.y += this.lineHeight();
-  return rect;
-};
 
 function Window_StatusXParams() {
   this.initialize(...arguments);
@@ -701,22 +753,12 @@ Window_StatusXParams.prototype.itemHeight = function() {
   return this.lineHeight();
 };
 
-Window_StatusXParams.prototype.refresh = function() {
-  Window_StatusBase.prototype.refresh.call(this);
-  const rect = this.itemLineRect(0);
-  const y = rect.y - this.lineHeight();
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.XParamName, rect.x, y, rect.width);
-  this.resetTextColor();
-};
-
 Window_StatusXParams.prototype.drawItem = function(index) {
   const rect = this.itemLineRect(index);
   const paramId = param.Xparam[index].XparamId;
   const name = this.XparamName(index);
   let value = this._actor.xparam(paramId) * 100;
   value = this.statusParamDecimal(value);
-  //value = Math.round(value * Math.pow(10, param.Decimal)) / Math.pow(10, param.Decimal);
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(name, rect.x, rect.y, 92);
   this.resetTextColor();
@@ -748,12 +790,6 @@ Window_StatusXParams.prototype.XparamName = function(index) {
       return param.Xparam[index].XparamName ? param.Xparam[index].XparamName : "ＴＰ再生率";
   }
   return null;
-};
-
-Window_StatusXParams.prototype.itemRect = function(index) {
-  const rect = Window_Selectable.prototype.itemRect.call(this, index);
-  rect.y += this.lineHeight();
-  return rect;
 };
 
 
@@ -788,15 +824,6 @@ Window_StatusSParams.prototype.maxCols = function() {
 
 Window_StatusSParams.prototype.itemHeight = function() {
   return this.lineHeight();
-};
-
-Window_StatusSParams.prototype.refresh = function() {
-  Window_StatusBase.prototype.refresh.call(this);
-  const rect = this.itemLineRect(0);
-  const y = rect.y - this.lineHeight();
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.SParamName, rect.x, y, rect.width);
-  this.resetTextColor();
 };
 
 Window_StatusSParams.prototype.drawItem = function(index) {
@@ -837,12 +864,6 @@ Window_StatusSParams.prototype.SparamName = function(index) {
   return null;
 };
 
-Window_StatusSParams.prototype.itemRect = function(index) {
-  const rect = Window_Selectable.prototype.itemRect.call(this, index);
-  rect.y += this.lineHeight();
-  return rect;
-};
-
 
 function Window_StatusElement() {
   this.initialize(...arguments);
@@ -877,15 +898,6 @@ Window_StatusElement.prototype.itemHeight = function() {
   return this.lineHeight();
 };
 
-Window_StatusElement.prototype.refresh = function() {
-  Window_StatusBase.prototype.refresh.call(this);
-  const rect = this.itemLineRect(0);
-  const y = rect.y - this.lineHeight();
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.ElementName, rect.x, y, rect.width);
-  this.resetTextColor();
-};
-
 Window_StatusElement.prototype.drawItem = function(index) {
   const rect = this.itemLineRect(index);
   const elementId = param.ElementResist[index].ElementNo;
@@ -905,11 +917,6 @@ Window_StatusElement.prototype.drawItem = function(index) {
   }
 };
 
-Window_StatusElement.prototype.itemRect = function(index) {
-  const rect = Window_Selectable.prototype.itemRect.call(this, index);
-  rect.y += this.lineHeight();
-  return rect;
-};
 
 function Window_StatusState() {
   this.initialize(...arguments);
@@ -944,15 +951,6 @@ Window_StatusState.prototype.itemHeight = function() {
   return this.lineHeight();
 };
 
-Window_StatusState.prototype.refresh = function() {
-  Window_StatusBase.prototype.refresh.call(this);
-  const rect = this.itemLineRect(0);
-  const y = rect.y - this.lineHeight();
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.StateName, rect.x, y, rect.width);
-  this.resetTextColor();
-};
-
 Window_StatusState.prototype.drawItem = function(index) {
   const rect = this.itemLineRect(index);
   if (param.StateResist.length > 0) {
@@ -972,12 +970,6 @@ Window_StatusState.prototype.drawItem = function(index) {
       this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
     }
   }
-};
-
-Window_StatusState.prototype.itemRect = function(index) {
-  const rect = Window_Selectable.prototype.itemRect.call(this, index);
-  rect.y += this.lineHeight();
-  return rect;
 };
 
 

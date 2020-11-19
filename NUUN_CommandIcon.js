@@ -23,7 +23,7 @@
  * 
  * @param CommadIcon
  * @text コマンドアイコン設定
- * @desc コマンドに表示するアイコンを設定をします。
+ * @desc コマンドに表示するアイコンを設定します。
  * @default []
  * @type struct<CommadIconList>[]
  * 

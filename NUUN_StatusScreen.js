@@ -303,7 +303,7 @@ Scene_Status.prototype.profileWindowRect = function() {
   const ww = Graphics.boxWidth;
   const wh = this.profileHeight();
   const wx = (Graphics.width - Graphics.boxWidth) / 2;
-  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaBottom() - wh + 4;
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaBottom() - wh;
   return new Rectangle(wx, wy, ww, wh);
 };
 

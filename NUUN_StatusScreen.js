@@ -14,9 +14,11 @@
  * 2020/11/18 Ver 1.0.2
  *  表示外の少数点を四捨五入か切り捨てで丸める機能を追加。
  * 2020/11/18 Ver 1.0.3
- *  ステータスパラメータの項目が画面からはみ出た際、項目名が正常に表示されない問題を修正。
+ *  ステータス詳細項目が画面からはみ出た際、項目名が正常に表示されない問題を修正。
  *  一部処理を変更。
- * 
+ * 2020/11/19 Ver 1.0.4
+ *  解像度とUIのサイズが違う場合に、ステータス詳細項目がウィンドウ外にずれる問題や、他のステータス項目と
+ *  表示が被る問題を修正。
  */ 
 /*:ja
  * @target MZ
@@ -300,8 +302,8 @@ Scene_Status.prototype.createStatusStateWindow = function() {
 Scene_Status.prototype.profileWindowRect = function() {
   const ww = Graphics.boxWidth;
   const wh = this.profileHeight();
-  const wx = 4;
-  const wy = this.mainAreaBottom() - wh + 4;
+  const wx = (Graphics.width - Graphics.boxWidth) / 2;
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaBottom() - wh + 4;
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -316,48 +318,48 @@ Scene_Status.prototype.statusWindowRect = function() {
 Scene_Status.prototype.statusParamsWindowRect = function() {
   const ww = this.statusParamsWidth();
   const wh = this.statusParamsHeight();
-  const wx = 4;
-  const wy = this.mainAreaTop() + this.statusHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2;
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Status.prototype.statusXParamsWindowRect = function() {
   const ww = this.statusXParamsWidth();
   const wh = this.statusXParamsHeight();
-  const wx = 4;
-  const wy = this.mainAreaTop() + this.statusHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2;
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Status.prototype.statusSParamsWindowRect = function() {
   const ww = this.statusSParamsWidth();
   const wh = this.statusSParamsHeight();
-  const wx = this.statusXParamsWidth() + 4;
-  const wy = this.mainAreaTop() + this.statusHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusXParamsWidth();
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Status.prototype.statusEquipWindowRect = function() {
   const ww = this.statusContenWidth() - this.statusParamsWidth();
   const wh = this.statusParamsHeight();
-  const wx = this.statusParamsWidth() + 4;
-  const wy = this.mainAreaTop() + this.statusHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusParamsWidth();
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Status.prototype.statusElementWindowRect = function() {
   const ww = this.statusElementWidth();
   const wh = this.statusElementHeight();
-  const wx = 4;
-  const wy = this.mainAreaTop() + this.statusHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2;
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Status.prototype.statusStateWindowRect = function() {
   const ww = this.statusStateWidth();
   const wh = this.statusStateHeight();
-  const wx = this.statusElementWidth() + 4;
-  const wy = this.mainAreaTop() + this.statusHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusElementWidth();
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 

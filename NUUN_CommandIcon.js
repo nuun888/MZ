@@ -11,22 +11,19 @@
  */ 
 /*:ja
  * @target MZ
- * @plugindesc コマンドにアイコン追加
+ * @plugindesc コマンドアイコン
  * @author NUUN
  * 
  * @help
- * コマンドメニューにアイコンを追加します。
- * 
- * プラグインパラメータのアイコンを表示させるコマンド名は
- * 各コマンドに表示されている文字列を記入してください。
+ * コマンドメニューにアイコンを表示します。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 
  * @param CommadIcon
- * @text コマンドの設定をします。
- * @desc コマンド設定
+ * @text コマンドアイコン設定
+ * @desc コマンドに表示するアイコンを設定をします。
  * @default []
  * @type struct<CommadIconList>[]
  * 
@@ -34,13 +31,13 @@
 /*~struct~CommadIconList:
  * 
  * @param CommadName
- * @text アイコンを表示するコマンド名
- * @desc コマンド名
+ * @text コマンド名
+ * @desc アイコンを表示するコマンド名（表示するコマンド名と同じ名前にしてください）
  * @type string
  * 
  * @param iconId
- * @text アイコンのインデックス番号。
- * @desc アイコンインデックス番号
+ * @text アイコンインデックス番号
+ * @desc アイコンのインデックス番号。
  * @type number
  * @default 0
  * 

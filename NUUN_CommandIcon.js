@@ -8,6 +8,10 @@
  * 
  * 更新履歴
  * 2020/11/19 Ver 1.0.0
+ *  初版
+ * 
+ * 2020/11/20 Ver 1.0.1
+ *  プラグインパラメータのCommadIconが空白だった場合、エラーが出る問題を修正。
  */ 
 /*:ja
  * @target MZ
@@ -62,6 +66,10 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
   const commadName = this.commandName(index);
+  if (!param.CommadIcon) {
+    _Window_Command_drawItem.call(this, index);
+    return;
+  }
   const found = param.CommadIcon.find(icons => (icons.CommadName === commadName) && icons.iconId > 0);
   if(found){
     const rect = this.itemLineRect(index);

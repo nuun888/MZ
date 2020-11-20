@@ -9,7 +9,7 @@
  * 更新履歴
  * 2020/11/18 Ver 1.0.0
  */
-/*:ja
+/*:
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN

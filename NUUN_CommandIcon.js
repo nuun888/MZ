@@ -49,7 +49,6 @@
  * @default 0
  * 
  */
-
 /*:ja
  * @target MZ
  * @plugindesc コマンドアイコン

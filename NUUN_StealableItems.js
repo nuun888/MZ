@@ -250,7 +250,7 @@ Game_Action.prototype.stolenItem = function(target, mode){
 	if(item){
 		this.lostItem(item);
 	} else {
-		BattleManager._logWindow.addText(this.subject().name() + param.NotStealName);
+		BattleManager._logWindow.addText(target.name() + param.NotStealName);
 	}
 	this.makeSuccess(target);
 };
@@ -309,7 +309,7 @@ Game_Action.prototype.lostStolenGoldMode = function(){
 Game_Action.prototype.getStolenItemList = function(target, rate){
 	let weightSum = 0;
 	let getItem = null;
-	if(target.getStolenRate(rate)){
+	if(target.getStolenRate(rate) && param.stolenItems){
 		let stolenItemList = param.stolenItems.reduce(function(r, item) {
 			if($gameParty._items[item.stolenItemId] > 0 && $gameSystem.stolenSwitch(item)) {
 				weightSum += item.weight;

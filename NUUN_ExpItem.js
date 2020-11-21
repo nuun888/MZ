@@ -8,6 +8,9 @@
  * 
  * 更新履歴
  * 2020/11/21 Ver 1.0.0
+ * 
+ * 2020/11/21 Ver 1.0.1
+ *  レベルが１上がったら経験値の増加をしない機能と、経験値減少時にレベルダウンをしない機能を追加。
  */ 
 /*:
  * 
@@ -18,11 +21,15 @@
  * @help
  * 経験値を増減させるアイテムやスキルを作ることが出来ます。
  * 
- * アイテム、スキルのメモ欄に<ExpIncrease:[exp]]>を記入します。
- * [exp]:取得経験値
- * 
+ * アイテム、スキルのメモ欄に記入します。
  * <ExpIncrease:10000> 経験値が10000増加します。
  * <ExpIncrease:-5000> 経験値が5000減少します。
+ * <levelUpStop> レベルが１つ上がったら経験値の増加を行わないようにします。（増加経験値の上限値が、次のレベルの到達に必要な累計経験値から現在の経験値を引いた値になります）
+ * <NolevelDown> レベルダウンを行わないようにします。（減少経験値の下限値が、現在のレベルの到達に必要な累計経験値から現在の経験値を引いた値になります）
+ *               
+ * <ExpIncrease:1000000>
+ * <levelUpStop>
+ * このような記述をすることでレベルアップアイテムを作ることも可能です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -52,7 +59,12 @@ Imported.NUUN_ExpItem = true;
   };
 
   Game_BattlerBase.prototype.expItems = function(item) {
-    const expVal = item.meta.ExpIncrease;
+    let expVal = Number(item.meta.ExpIncrease);
+    if(item.meta.levelUpStop && expVal > 0) {
+      expVal = Math.min(this.nextLevelExp() - this.currentExp(), expVal);
+    } else if (item.meta.NolevelDown && expVal < 0) {
+      expVal = Math.max(this.currentLevelExp() - this.currentExp(), expVal);
+    }
     if(expVal && this.isActor()) {
       this.gainExp(expVal);
     }

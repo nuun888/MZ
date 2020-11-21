@@ -28,6 +28,9 @@
  * 11/20/2020 Ver 1.0.2
  *  Fixed because it was not multilingual.
  * 
+ * 11/21/2020 Ver 1.0.2
+ *  Added the function to color the command name.
+ * 
  * @param CommadIcon
  * @text Command icon settings
  * @desc Set the icon to be displayed in the command.
@@ -42,6 +45,12 @@
  * @desc Command name to display the icon (Please use the same name as the command name to be displayed)
  * @type string
  * 
+ * @param CommadNameColor
+ * @text Command name color
+ * @desc Command name color index number.
+ * @type number
+ * @default 0
+ * 
  * @param iconId
  * @text Icon index number
  * @desc The index number of the icon.
@@ -49,6 +58,7 @@
  * @default 0
  * 
  */
+
 /*:ja
  * @target MZ
  * @plugindesc コマンドアイコン
@@ -70,6 +80,9 @@
  * 2020/11/20 Ver 1.0.2
  *  多言語対応ではなかったため修正。
  * 
+ * 2020/11/21 Ver 1.1.0
+ *  コマンド名に色を付ける機能を追加。
+ * 
  * @param CommadIcon
  * @text コマンドアイコン設定
  * @desc コマンドに表示するアイコンを設定します。
@@ -83,6 +96,12 @@
  * @text コマンド名
  * @desc アイコンを表示するコマンド名（表示するコマンド名と同じ名前にしてください）
  * @type string
+ * 
+ * @param CommadNameColor
+ * @text コマンド名の色
+ * @desc コマンド名のカラーインデックス番号。
+ * @type number
+ * @default 0
  * 
  * @param iconId
  * @text アイコンインデックス番号
@@ -111,26 +130,29 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
   const commadName = this.commandName(index);
-  const found = param.CommadIcon ? param.CommadIcon.find(icons => (icons.CommadName === commadName) && icons.iconId > 0) : null;
-  if(found){
+  const foundIndex = param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName));
+  if(foundIndex >= 0) {
+    const commadData = param.CommadIcon[foundIndex];
+    const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;
+    this.changeTextColor(ColorManager.textColor(color));
     const rect = this.itemLineRect(index);
     const align = this.itemTextAlign();
-    const textMargin = ImageManager.iconWidth + 4;
+    const textMargin = commadData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
     const textWidth = this.textWidth(commadName);
     const itemWidth = Math.max(0, rect.width - textMargin);
     const width = Math.min(itemWidth, textWidth);
-    this.resetTextColor();
     this.changePaintOpacity(this.isCommandEnabled(index));
-    if(align === 'center') {
-      this.drawIcon(found.iconId, rect.x + (rect.width / 2 - width / 2) - textMargin / 2, rect.y + 2);
-      this.drawText(commadName, rect.x + textMargin, rect.y, itemWidth, align);
-    } else if (align === 'left') {
-      this.drawIcon(found.iconId, rect.x - 4, rect.y + 2);
-      this.drawText(commadName, rect.x + textMargin, rect.y, itemWidth, align);
-    } else {
-      this.drawIcon(found.iconId, rect.x + itemWidth - width, rect.y + 2);
-      this.drawText(commadName, rect.x + textMargin, rect.y, itemWidth, align);
+    if(commadData.iconId > 0) {
+      if(align === 'center') {
+        this.drawIcon(commadData.iconId, rect.x + (rect.width / 2 - width / 2) - textMargin / 2, rect.y + 2);
+      } else if (align === 'left') {
+        this.drawIcon(commadData.iconId, rect.x - 4, rect.y + 2);
+      } else {
+        this.drawIcon(commadData.iconId, rect.x + itemWidth - width, rect.y + 2);
+      }
     }
+    this.drawText(commadName, rect.x + textMargin, rect.y, itemWidth, align);
+    this.resetTextColor();
   } else {
     _Window_Command_drawItem.call(this, index);
   }

@@ -59,7 +59,7 @@ Imported.NUUN_ExpItem = true;
   };
 
   Game_BattlerBase.prototype.expItems = function(item) {
-    let expVal = Number(item.meta.ExpIncrease);
+    let expVal = item.meta.ExpIncrease;
     if(item.meta.levelUpStop && expVal > 0) {
       expVal = Math.min(this.nextLevelExp() - this.currentExp(), expVal);
     } else if (item.meta.NolevelDown && expVal < 0) {

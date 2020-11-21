@@ -50,12 +50,14 @@
  * @desc Command name color index number.
  * @type number
  * @default 0
+ * @min 0
  * 
  * @param iconId
  * @text Icon index number
  * @desc The index number of the icon.
  * @type number
  * @default 0
+ * @min 0
  * 
  */
 
@@ -102,12 +104,14 @@
  * @desc コマンド名のカラーインデックス番号。
  * @type number
  * @default 0
+ * @min 0
  * 
  * @param iconId
  * @text アイコンインデックス番号
  * @desc アイコンのインデックス番号。
  * @type number
  * @default 0
+ * @min 0
  * 
  */
 var Imported = Imported || {};

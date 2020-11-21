@@ -7,11 +7,11 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2020/11 Ver 1.0.0
+ * 2020/11/21 Ver 1.0.0
  */ 
-/*:ja
+/*:
  * @target MZ
- * @plugindesc 盗みスキル ver1.0.0
+ * @plugindesc 盗みスキル
  * @author NUUN
  * 
  * @help
@@ -29,6 +29,7 @@
  * エネミー専用
  * <goldStealSkill:成功確率,盗める金額>
  * <goldStealSkillRate:成功確率,所持金の割合>
+ * 
  * 例
  * <goldStealSkill:100, 400>
  * 100%の確率で400Ｇ奪われます。
@@ -37,13 +38,13 @@
  * 
  * エネミーのメモ欄
  * <steal I:アイテムID, 確率>
- * アイテムの盗み確立。
+ * 盗めるアイテムを設定します。
  * <steal W:武器ID, 確率>
- * 武器の盗み確立。
+ * 盗める防具を設定します。
  * <steal A:防具ID, 確率>
- * 防具の盗み確立。
+ * 盗める防具を設定します。
  * <steal M:金額, 確率>
- * お金の盗み確立。
+ * 盗める金額を設定します。
  * 
  * アクター、職業、武器、防具、ステート、エネミーのメモ欄
  * <steal_sr:±追加確率>
@@ -68,28 +69,34 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * @param NotStealName
+ * @text 盗めなかった時のメッセージ
  * @desc 敵からアイテムを盗めなかった時のメッセージ。
  * @default から何も盗めなかった！
  * 
  * @param GetStealName
+ * @text 敵からアイテムを盗めた時のメッセージ
  * @desc 敵からアイテムを盗めた時のメッセージ。
  * @default を盗んだ！
  * 
  * @param StolenName
- * @desc 敵からアイテムを盗めた時のメッセージ。
+ * @text 敵からアイテムを盗まれた時のメッセージ
+ * @desc 敵からアイテムを盗まれた時のメッセージ。
  * @default を盗み取った！
  * 
  * @param StolenItemDrop
+ * @text 盗まれたアイテムの回収
  * @desc 敵から盗まれたアイテムを撃破後、ドロップするか。
  * @type boolean
  * @default false
  * 
  * @param StolenGoldDrop
+ * @text 盗まれたお金の回収
  * @desc 敵から盗まれたお金を撃破後、ドロップするか。
  * @type boolean
  * @default false
  * 
  * @param stolenItems
+ * @text 敵から奪われるアイテム設定
  * @desc 敵から奪われるアイテムの設定です。
  * @default []
  * @type struct<stolenItems>[]
@@ -104,15 +111,13 @@
  * 
  * @param weight
  * @text 重み
- * @desc 盗まれるアイテムの頻度を指定します。
- * 数値が高い程盗まれやすくなります。
+ * @desc 盗まれるアイテムの頻度を指定します。数値が高い程盗まれやすくなります。
  * @type number
- * @default 1
+ * @default 5
  * 
  * @param stolenSwitch
  * @text 条件
  * @desc 盗まれるアイテム条件のスイッチ番号を指定します。
- * 数値が高い程盗まれやすくなります。
  * @type switch
  * @default 0
  * 
@@ -121,6 +126,7 @@ var Imported = Imported || {};
 Imported.NUUN_StealableItems = true;
 
 (() => {
+'use strict';
 const parameters = PluginManager.parameters('NUUN_StealableItems');
 const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   try {
@@ -137,7 +143,7 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
 Game_BattlerBase.prototype.stealBoost = function(){
 	let rate = 0;
 	this.traitObjects().forEach(function(traitObject) {
-		if (traitObject.meta['steal_sr']) {
+		if (traitObject.meta.steal_sr) {
 			rate += Number(traitObject.meta.steal_sr);
 		}
 	}, this);
@@ -233,12 +239,12 @@ Game_Action.prototype.StealItems = function(target, mode){
 Game_Action.prototype.stolenItem = function(target, mode){
 	let item;
 	if(mode === 1){
-		item = target.getStolenItemList(this.stealRate());
+		item = this.getStolenItemList(target, this.stealRate());
 		this.subject().keepStolenItem(item);
 	} else if(mode === 2){
 		const stolenGold = this.lostStolenGoldMode();
 		const rate = Number(stolenGold[0]) + this.subject().stealBoost();
-		item = target.lostStolenGold(rate, stolenGold);
+		item = this.lostStolenGold(target, rate, stolenGold);
 		this.subject().keepStolenGold(item);
 	}
 	if(item){
@@ -248,6 +254,20 @@ Game_Action.prototype.stolenItem = function(target, mode){
 	}
 	this.makeSuccess(target);
 };
+
+Game_Action.prototype.lostStolenGold = function(target, rate, stolenGold){
+	let gold = 0;
+	if(target.getStolenRate(rate)){
+		if(stolenGold[2] === 1){
+			gold = Math.floor($gameParty._gold * Number(Math.min(stolenGold[1], 100) / 100));
+		} else {
+			gold = Number(stolenGold[1]);
+		}
+		$gameSystem.onBattleStolenGold(gold);
+	}
+	return gold;
+};
+
 
 Game_Action.prototype.getStealItems = function(target, stealItem){
 	let itemName = '';
@@ -286,33 +306,10 @@ Game_Action.prototype.lostStolenGoldMode = function(){
 	return stolenGold;
 };
 
-Game_Action.prototype.stealRate = function(){
-	const rate = Number(this.item().meta.stealSkill);
-	return rate + this.subject().stealBoost();
-};
-
-Game_Action.prototype.stealGoldRate = function(){
-	const rate = Number(this.item().meta.goldStealSkill);
-	return rate + this.subject().stealBoost();
-};
-
-Game_Actor.prototype.lostStolenGold = function(rate, stolenGold){
-	let gold = 0;
-	if(this.getStolenRate(rate)){
-		if(stolenGold[2] === 1){
-			gold = Math.floor($gameParty._gold * Number(Math.min(stolenGold[1], 100) / 100));
-		} else {
-			gold = Number(stolenGold[1]);
-		}
-		$gameSystem.onBattleStolenGold(gold);
-	}
-	return gold;
-};
-
-Game_Actor.prototype.getStolenItemList = function(rate){
+Game_Action.prototype.getStolenItemList = function(target, rate){
 	let weightSum = 0;
 	let getItem = null;
-	if(this.getStolenRate(rate)){
+	if(target.getStolenRate(rate)){
 		let stolenItemList = param.stolenItems.reduce(function(r, item) {
 			if($gameParty._items[item.stolenItemId] > 0 && $gameSystem.stolenSwitch(item)) {
 				weightSum += item.weight;
@@ -338,6 +335,17 @@ Game_Actor.prototype.getStolenItemList = function(rate){
 	}
 	return getItem;
 };
+
+Game_Action.prototype.stealRate = function(){
+	const rate = Number(this.item().meta.stealSkill);
+	return rate + this.subject().stealBoost();
+};
+
+Game_Action.prototype.stealGoldRate = function(){
+	const rate = Number(this.item().meta.goldStealSkill);
+	return rate + this.subject().stealBoost();
+};
+
 
 Game_Actor.prototype.getStolenRate = function(rate) {
 	return Math.floor(Math.random() * 100) < (rate / this.stealItemRate() * 100);

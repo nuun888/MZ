@@ -134,7 +134,7 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
   const commadName = this.commandName(index);
-  const foundIndex = param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName));
+  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName)) : null;
   if(foundIndex >= 0) {
     const commadData = param.CommadIcon[foundIndex];
     const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;

@@ -9,7 +9,7 @@
  * 更新履歴
  * 2020/11 Ver 1.0.0
  */ 
-/*:ja
+/*:
  * @target MZ
  * @plugindesc 巨大エネミー
  * @author NUUN
@@ -40,7 +40,7 @@ Imported.NUUN_BigEnemy = true;
   const _Sprite_Enemy_setBattler = Sprite_Enemy.prototype.setBattler;
   Sprite_Enemy.prototype.setBattler = function(battler) {
     _Sprite_Enemy_setBattler.call(this, battler);
-    if($dataEnemies[battler._enemyId].meta.BigEnemy && !$gameSystem.isSideView()){
+    if($dataEnemies[battler._enemyId].meta.BigEnemy){
       this._bigEnemy = $dataEnemies[battler._enemyId].meta.BigEnemy;
     }
   };
@@ -50,11 +50,13 @@ Imported.NUUN_BigEnemy = true;
     _Sprite_Enemy_updateBitmap.call(this);
     if(this._bigEnemy){
       this.scale.x = Graphics.width / this.width;
-      this.scale.y = (this._bigEnemy === 'OriginalRatio' ? this.scale.x : Graphics.height / this.height);
       this._homeX = Graphics.boxWidth / 2;
       let height = 0;
-      if(this._bigEnemy === 'OriginalRatio'){
+      if(this._bigEnemy === 'OriginalRatio') {
+        this.scale.y = this.scale.x;
         height = (Graphics.height - this.height * this.scale.y) / 2;
+      } else {
+        this.scale.y = Graphics.height / this.height;
       }
       this._homeY = (Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight + 24 - height;
     }
@@ -77,6 +79,6 @@ Imported.NUUN_BigEnemy = true;
       y -= Graphics.boxHeight / 2;
     }
     return y;
-};
+  };
 
 })();

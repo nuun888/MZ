@@ -28,7 +28,7 @@
  * 11/20/2020 Ver 1.0.2
  *  Fixed because it was not multilingual.
  * 
- * 11/21/2020 Ver 1.0.2
+ * 11/21/2020 Ver 1.1.0
  *  Added the function to color the command name.
  * 
  * @param CommadIcon

@@ -11,6 +11,9 @@
  * 
  * 2020/11/21 Ver 1.0.1
  *  レベルが１上がったら経験値の増加をしない機能と、経験値減少時にレベルダウンをしない機能を追加。
+ * 
+ * 2020/11/22 Ver 1.0.2
+ *  バトルログに表示するように対応。
  */ 
 /*:
  * 
@@ -44,7 +47,7 @@ Imported.NUUN_ExpItem = true;
   const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
   Game_Action.prototype.applyItemUserEffect = function(target) {
     _Game_Action_applyItemUserEffect.call(this, target);
-    target.expItems(this.item());
+    target.expItems(target, this.item());
     this.makeSuccess(target);
   };
 
@@ -58,7 +61,7 @@ Imported.NUUN_ExpItem = true;
     (this.testLifeAndDeath(target) && (this.isExpItem() && !target.isMaxLevel()))
   };
 
-  Game_BattlerBase.prototype.expItems = function(item) {
+  Game_BattlerBase.prototype.expItems = function(target, item) {
     let expVal = item.meta.ExpIncrease;
     if(item.meta.levelUpStop && expVal > 0) {
       expVal = Math.min(this.nextLevelExp() - this.currentExp(), expVal);
@@ -67,6 +70,10 @@ Imported.NUUN_ExpItem = true;
     }
     if(expVal && this.isActor()) {
       this.gainExp(expVal);
+      if($gameParty.inBattle()) {
+        const text = expVal > 0 ? '増加した' : '減少した';
+        BattleManager._logWindow.addText(target.name() +'の'+ TextManager.basic(8) +'が'+ expVal + text);
+      }
     }
   };
 })();

@@ -8,6 +8,8 @@
  * 
  * 更新履歴
  * 2020/11/16 Ver 1.0.0
+ *  初版
+ * 
  * 2020/11/17 Ver 1.0.1 
  *  追加能力値、特殊能力値、属性有効度、ステート有効度の表示できる小数点の桁数を指定できる機能を追加。
  *  ページの切り替えをタッチ操作でも行えるように対応。
@@ -19,8 +21,11 @@
  * 2020/11/19 Ver 1.0.4
  *  解像度とUIのサイズが違う場合に、ステータス詳細項目がウィンドウ外にずれる問題や、他のステータス項目と
  *  表示が被る問題を修正。
+ * 
+ * 2020/11/22 Ver 1.0.5
+ *  背景画像を指定できる機能を追加。
  */ 
-/*:
+/*:ja
  * @target MZ
  * @plugindesc ステータス画面詳細表示
  * @author NUUN
@@ -113,6 +118,23 @@
  * @type number
  * @default 200
  * @min 0
+ * 
+ * @param BackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @type file
+ * @dir img/pictures
+ * 
+ * @param BackUiWidth
+ * @text 背景サイズをUIに合わせる
+ * @desc 背景サイズをUIに合わせる。
+ * @type boolean
+ * @default true
+ * 
+ * @param ParamBackShow
+ * @text ステータス項目背景表示
+ * @desc ステータス項目の背景画像の表示を設定します。
+ * @type boolean
+ * @default true
  * 
  * @param ActorsImgList
  * @text 画像設定
@@ -253,6 +275,10 @@ Scene_Status.prototype.createStatusWindow = function() {
   this._statusWindow.setContentEquipWidth = this.statusParamsWidth();
   this._statusWindow.setSParamsWidth = this.statusXParamsWidth();
   this._statusWindow.setStateWidthWidth = this.statusElementWidth();
+  if (param.BackGroundImg) {
+    this._statusWindow.opacity = 0;
+    this._statusWindow.frameVisible = false;
+	}
 };
 
 Scene_Status.prototype.createProfileWindow = function() {
@@ -414,6 +440,19 @@ Scene_Status.prototype.statusHeight = function() {
   return this.calcWindowHeight(6 + row, false) + 4;
 };
 
+const _Scene_Status_createBackground = Scene_Status.prototype.createBackground;
+Scene_Status.prototype.createBackground = function() {
+  _Scene_Status_createBackground.call(this);
+	if (param.BackGroundImg) {
+		sprite = new Sprite();
+    sprite.bitmap = ImageManager.loadPicture(param.BackGroundImg);
+    sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
+    sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
+    this.addChild(sprite);
+    this._backGroundImg = sprite;
+	}
+};
+
 Scene_Status.prototype.createStatusButton = function() {
   if(pages > 1 && ConfigManager.touchUI) {
     this._modeupButton = new Sprite_Button("up");
@@ -443,7 +482,17 @@ Scene_Status.prototype.refreshActor = function() {
 
 const _Scene_Status_update = Scene_Status.prototype.update;
 Scene_Status.prototype.update = function() {
-	_Scene_Status_update.call(this);
+  _Scene_Status_update.call(this);
+  if (param.BackGroundImg) {
+    const sprite = this._backGroundImg;
+    if(param.BackUiWidth) {
+      sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
+      sprite.scale.y = (Graphics.boxHeight + 8!== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+    } else {
+      sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
+      sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+    }
+	}
 	if (Input.isTriggered('left') && this.maxPage() > 1) {
 		this.updateContentsPageup();
 	} else if (Input.isTriggered('right') && this.maxPage() > 1){
@@ -696,7 +745,9 @@ Window_StatusParams.prototype.drawItem = function(index) {
 };
 
 Window_StatusParams.prototype.drawItemBackground = function(index) {
-  Window_Selectable.prototype.drawItemBackground.call(this, index);
+  if(param.ParamBackShow) {
+    Window_Selectable.prototype.drawItemBackground.call(this, index);
+  }
 };
 
 const _Window_StatusEquip_initialize = Window_StatusEquip.prototype.initialize;
@@ -718,7 +769,9 @@ Window_StatusEquip.prototype.drawItem = function(index) {
 };
 
 Window_StatusEquip.prototype.drawItemBackground = function(index) {
-  Window_Selectable.prototype.drawItemBackground.call(this, index);
+  if(param.ParamBackShow) {
+    Window_Selectable.prototype.drawItemBackground.call(this, index);
+  }
 };
 
 
@@ -794,6 +847,12 @@ Window_StatusXParams.prototype.XparamName = function(index) {
   return null;
 };
 
+Window_StatusXParams.prototype.drawItemBackground = function(index) {
+  if(param.ParamBackShow) {
+    Window_Selectable.prototype.drawItemBackground.call(this, index);
+  }
+};
+
 
 function Window_StatusSParams() {
   this.initialize(...arguments);
@@ -866,6 +925,12 @@ Window_StatusSParams.prototype.SparamName = function(index) {
   return null;
 };
 
+Window_StatusSParams.prototype.drawItemBackground = function(index) {
+  if(param.ParamBackShow) {
+    Window_Selectable.prototype.drawItemBackground.call(this, index);
+  }
+};
+
 
 function Window_StatusElement() {
   this.initialize(...arguments);
@@ -916,6 +981,12 @@ Window_StatusElement.prototype.drawItem = function(index) {
     rate = this.statusParamDecimal(rate);
     this.resetTextColor();
     this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
+  }
+};
+
+Window_StatusElement.prototype.drawItemBackground = function(index) {
+  if(param.ParamBackShow) {
+    Window_Selectable.prototype.drawItemBackground.call(this, index);
   }
 };
 
@@ -971,6 +1042,12 @@ Window_StatusState.prototype.drawItem = function(index) {
       this.resetTextColor();
       this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
     }
+  }
+};
+
+Window_StatusState.prototype.drawItemBackground = function(index) {
+  if(param.ParamBackShow) {
+    Window_Selectable.prototype.drawItemBackground.call(this, index);
   }
 };
 

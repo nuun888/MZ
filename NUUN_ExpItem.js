@@ -62,17 +62,19 @@ Imported.NUUN_ExpItem = true;
   };
 
   Game_BattlerBase.prototype.expItems = function(target, item) {
-    let expVal = item.meta.ExpIncrease;
-    if(item.meta.levelUpStop && expVal > 0) {
-      expVal = Math.min(this.nextLevelExp() - this.currentExp(), expVal);
-    } else if (item.meta.NolevelDown && expVal < 0) {
-      expVal = Math.max(this.currentLevelExp() - this.currentExp(), expVal);
-    }
-    if(expVal && this.isActor()) {
-      this.gainExp(expVal);
-      if($gameParty.inBattle()) {
-        const text = expVal > 0 ? '増加した' : '減少した';
-        BattleManager._logWindow.addText(target.name() +'の'+ TextManager.basic(8) +'が'+ expVal + text);
+    if(this.isActor()) {
+      let expVal = item.meta.ExpIncrease;
+      if(item.meta.levelUpStop && expVal > 0) {
+        expVal = Math.min(this.nextLevelExp() - this.currentExp(), expVal);
+      } else if (item.meta.NolevelDown && expVal < 0) {
+        expVal = Math.max(this.currentLevelExp() - this.currentExp(), expVal);
+      }
+      if(expVal) {
+        this.gainExp(expVal);
+        if($gameParty.inBattle()) {
+          const text = expVal > 0 ? '増加した' : '減少した';
+          BattleManager._logWindow.addText(target.name() +'の'+ TextManager.basic(8) +'が'+ expVal + text);
+        }
       }
     }
   };

@@ -24,8 +24,11 @@
  * 
  * 2020/11/22 Ver 1.0.5
  *  背景画像を指定できる機能を追加。
+ * 
+ * 2020/11/23 Ver 1.0.6
+ *  立ち絵を表示位置を左、中央、右から選択し配置出来る機能を追加。
  */ 
-/*:ja
+/*:
  * @target MZ
  * @plugindesc ステータス画面詳細表示
  * @author NUUN
@@ -142,6 +145,18 @@
  * @default []
  * @type struct<actorImgList>[]
  * 
+ * @param actorPosition
+ * @text 立ち絵表示位置
+ * @desc 立ち絵の表示位置を指定します
+ * @type select
+ * @option 左
+ * @value 0
+ * @option 中央
+ * @value 1
+ * @option 右
+ * @value 2
+ * @default 2
+ * 
  * @param Xparam
  * @type struct<XparamData>[]
  * @text 追加能力値
@@ -189,7 +204,6 @@
  * @type number
  * @default 0
  * @min -9999
- * 
  *  
  */
 /*~struct~XparamData:
@@ -600,7 +614,7 @@ Window_Base.prototype.statusParamDecimal = function(val) {
 Window_Status.prototype.refresh = function() {
   Window_StatusBase.prototype.refresh.call(this);
   if (this._actor) {
-    const deta = this.battlreActorImgDeta(this._actor.actorId());
+    const deta = this.actorImgDeta(this._actor.actorId());
     const bitmapDeta = deta.ActorImg;
     this.bitmap = bitmapDeta ? ImageManager.loadPicture(bitmapDeta) : null;
     if (this.bitmap && !this.bitmap.isReady()) {
@@ -619,8 +633,17 @@ Window_Status.prototype.drawBlocks = function() {
 
 Window_Status.prototype.actorImg = function() {
   if(this.bitmap) {
-    const deta = this.battlreActorImgDeta(this._actor.actorId())
-    this.contents.blt(this.bitmap, 0, 0, Graphics.boxWidth, Graphics.boxHeight, deta.Actor_X, deta.Actor_Y);
+    const deta = this.actorImgDeta(this._actor.actorId());
+    let x = deta.Actor_X;
+    if(param.actorPosition === 0) {
+      x += 24;
+    } else if (param.actorPosition === 1) {
+      x += Graphics.boxWidth / 2 - (this.bitmap.width / 2);
+    } else {
+      x += Graphics.boxWidth - this.bitmap.width - 24;
+    }
+    const y = deta.Actor_Y + (Graphics.boxHeight - this.bitmap.height) - this.y - 24;
+    this.contents.blt(this.bitmap, 0, 0, Graphics.boxWidth, Graphics.boxHeight, x, y);
   }
 };
 
@@ -664,17 +687,10 @@ Window_Status.prototype.placeGauge = function(actor, type, x, y) {
   sprite.show();
 };
 
-Window_Status.prototype.battlreActorImgDeta = function(id) {
+Window_Status.prototype.actorImgDeta = function(id) {
   const actors = param.ActorsImgList;
-  let deta = {actorId: id};
-  if(actors) {
-    actors.forEach(actor => {
-      if(actor.actorId === id){
-        deta = actor;
-      }
-    });
-  }
-  return deta;
+  const deta = actors.find(actor => actor.actorId === id);
+  return deta ? deta : {actorId: id};
 };
 
 Window_Status.prototype.paramName = function(id) {

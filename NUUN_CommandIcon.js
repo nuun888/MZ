@@ -8,13 +8,13 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc CommadIcon
+ * @plugindesc Command customization plugin
  * @author NUUN
  * 
  * @help
- * Display the icon in the command menu.
- * If you are using a version other than the Japanese version,
- * Enter the name displayed in the command menu in "Command Name".
+ * You can display an icon in the command menu and change the text color of the command name.
+ * You can select the position of the command name from left-aligned, center-aligned, and right-aligned.
+ * 
  * 
  * Terms of service
  * This plugin is distributed under the MIT license.
@@ -31,11 +31,38 @@
  * 11/21/2020 Ver 1.1.0
  *  Added the function to color the command name.
  * 
+ * 11/22/2020 Ver 1.1.1
+ *  Added a function to select from left alignment, center alignment, and right alignment.
+ * 
  * @param CommadIcon
  * @text Command icon settings
  * @desc Set the icon to be displayed in the command.
  * @default []
  * @type struct<CommadIconList>[]
+ * 
+ * @param CommandPosition
+ * @text Command name display position of vertical command.
+ * @desc Specifies the display position of the command name of the vertical command. (Menu screen, etc.)
+ * @type select
+ * @option Left
+ * @value 0
+ * @option Center
+ * @value 1
+ * @option Right
+ * @value 2
+ * @default 1
+ * 
+ * @param HorzCommandPosition
+ * @text Command name display position of horizontal command.
+ * @desc Specifies the display position of the command name of the horizontal command. (Item column etc.)
+ * @type select
+ * @option Left
+ * @value 0
+ * @option Center
+ * @value 1
+ * @option Right
+ * @value 2
+ * @default 1
  * 
  */
 /*~struct~CommadIconList:
@@ -63,11 +90,12 @@
 
 /*:ja
  * @target MZ
- * @plugindesc コマンドアイコン
+ * @plugindesc コマンドカスタマイズプラグイン
  * @author NUUN
  * 
  * @help
- * コマンドメニューにアイコンを表示します。
+ * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
+ * コマンド名の位置を左揃え、中央揃え、右揃えから選べます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -85,11 +113,38 @@
  * 2020/11/21 Ver 1.1.0
  *  コマンド名に色を付ける機能を追加。
  * 
+ * 2020/11/22 Ver 1.1.1
+ *  コマンド名を左揃え、中央揃え、右揃えから選べる機能を追加。
+ * 
  * @param CommadIcon
  * @text コマンドアイコン設定
  * @desc コマンドに表示するアイコンを設定します。
  * @default []
  * @type struct<CommadIconList>[]
+ * 
+ * @param CommandPosition
+ * @text 縦方向コマンドのコマンド名表示位置
+ * @desc 縦方向コマンドのコマンド名の表示位置を指定します。（メニュー画面など）
+ * @type select
+ * @option 左揃え
+ * @value 0
+ * @option 中央揃え
+ * @value 1
+ * @option 右揃え
+ * @value 2
+ * @default 1
+ * 
+ * @param HorzCommandPosition
+ * @text 横方向コマンドのコマンド名表示位置
+ * @desc 横方向コマンドのコマンド名の表示位置を指定します。（アイテム欄など）
+ * @type select
+ * @option 左揃え
+ * @value 0
+ * @option 中央揃え
+ * @value 1
+ * @option 右揃え
+ * @value 2
+ * @default 1
  * 
  */
 /*~struct~CommadIconList:ja
@@ -130,6 +185,29 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
+const _Window_Command_itemTextAlign = Window_Command.prototype.itemTextAlign;
+Window_Command.prototype.itemTextAlign = function() {
+  switch (param.CommandPosition) {
+    case 0:
+      return "left";
+    case 1:
+      return _Window_Command_itemTextAlign.call(this);
+    case 2:
+      return "right";
+  }
+};
+
+const _Window_HorzCommand_itemTextAlign = Window_HorzCommand.prototype.itemTextAlign;
+Window_HorzCommand.prototype.itemTextAlign = function() {
+  switch (param.HorzCommandPosition) {
+    case 0:
+      return "left";
+    case 1:
+      return _Window_HorzCommand_itemTextAlign.call(this);
+    case 2:
+      return "right";
+  }
+};
 
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
@@ -137,22 +215,23 @@ Window_Command.prototype.drawItem = function(index) {
   const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName)) : null;
   if(foundIndex >= 0) {
     const commadData = param.CommadIcon[foundIndex];
-    const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;
-    this.changeTextColor(ColorManager.textColor(color));
     const rect = this.itemLineRect(index);
     const align = this.itemTextAlign();
+    const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
     const textMargin = commadData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
     const textWidth = this.textWidth(commadName);
     const itemWidth = Math.max(0, rect.width - textMargin);
     const width = Math.min(itemWidth, textWidth);
+    const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;
+    this.changeTextColor(ColorManager.textColor(color));
     this.changePaintOpacity(this.isCommandEnabled(index));
     if(commadData.iconId > 0) {
       if(align === 'center') {
-        this.drawIcon(commadData.iconId, rect.x + (rect.width / 2 - width / 2) - textMargin / 2, rect.y + 2);
+        this.drawIcon(commadData.iconId, rect.x + (rect.width / 2 - width / 2) - textMargin / 2, iconY);
       } else if (align === 'left') {
-        this.drawIcon(commadData.iconId, rect.x - 4, rect.y + 2);
+        this.drawIcon(commadData.iconId, rect.x, iconY);
       } else {
-        this.drawIcon(commadData.iconId, rect.x + itemWidth - width, rect.y + 2);
+        this.drawIcon(commadData.iconId, rect.x + itemWidth - width, iconY);
       }
     }
     this.drawText(commadName, rect.x + textMargin, rect.y, itemWidth, align);

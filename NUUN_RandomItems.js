@@ -49,8 +49,8 @@
  * @default true
  * 
  * @param CommonListIdVar
- * @text 取得リストID変数
  * @desc 取得時のリストIDを格納する変数。
+ * @text 取得リストID変数
  * @type variable
  * @min 0
  * 

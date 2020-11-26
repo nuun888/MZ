@@ -27,6 +27,10 @@
  * 
  * 2020/11/23 Ver 1.0.6
  *  立ち絵を表示位置を左、中央、右から選択し配置出来る機能を追加。
+ * 
+ * 2020/11/26 Ver 1.0.7
+ *  特殊パラメータでSparamIdを3に設定し、SparamNameを空欄の状態でステータス画面を開くと
+ *  本来「薬の知識」が出るところ「回復効果率」と表示されてしまう問題を修正。
  */ 
 /*:
  * @target MZ
@@ -458,13 +462,13 @@ const _Scene_Status_createBackground = Scene_Status.prototype.createBackground;
 Scene_Status.prototype.createBackground = function() {
   _Scene_Status_createBackground.call(this);
 	if (param.BackGroundImg) {
-		sprite = new Sprite();
+		const sprite = new Sprite();
     sprite.bitmap = ImageManager.loadPicture(param.BackGroundImg);
     sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
     sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
     this.addChild(sprite);
     this._backGroundImg = sprite;
-	}
+  }
 };
 
 Scene_Status.prototype.createStatusButton = function() {
@@ -916,6 +920,7 @@ Window_StatusSParams.prototype.drawItem = function(index) {
 };
 
 Window_StatusSParams.prototype.SparamName = function(index) {
+  console.log()
   switch (param.Sparam[index].SparamId) {
     case 0:
       return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : "狙われ率";
@@ -924,7 +929,7 @@ Window_StatusSParams.prototype.SparamName = function(index) {
     case 2:
       return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : "回復効果率";
     case 3:
-      return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : "回復効果率";
+      return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : "薬の知識";
     case 4:
       return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : "ＭＰ消費率";
     case 5:

@@ -20,8 +20,7 @@
  * 設定方法は２通りあります。
  * １:プラグインパラメータから再生BGMファイル名、音量、ピッチ、位相を登録し、<battleBGMList>または<battleBGMR>タグで再生する。
  *  リストに設定した左側に表示されている番号がBGMの再生IDとなります。
- * 
- *  <battleBGMList:[name],[eval]>  [name]で指定したBGMが再生られます。※[eval]は省略できます。
+ *  <battleBGMN:[name],[eval]>  [name]で指定したBGMが再生られます。※[eval]は省略できます。
  *  <battleBGMR:[id],[id],[id]...>  設定した[id]のBGMのうち一つがランダムに再生されます。条件指定をしたい場合は下のタグを記入します。
  *  <battleBGMREval:[id],[id],[id]...,[eval]>  [eval]がtrueの場合に、設定した[id]のBGMのうち一つがランダムに再生されます。
  * 
@@ -46,10 +45,10 @@
  * 仕様上、一番最初に再生可能なBGMが見つかったらそのBGMが再生されます。
  * 
  * 例
- * <battleBGMList:Battle3>  リスト内にBattle3が登録されていれば、Battle3がBGMが再生られます。
+ * <battleBGMN:Battle3>  リスト内にBattle3が登録されていれば、Battle3がBGMが再生られます。
  * <battleBGMR:1,2,3> リストの１，２，３番目のBGMのうち一つがランダムに再生されます。
  * <battleBGM:Battle2, 90, 100, 0> Battle2のBGMが音量90、ピッチ100、位相0で再生されます。
- * <battleBGMList:Battle2,$gameSwitches.value(2)> スイッチ番号２番がTrueでリスト内にBattle2が登録されていれば、
+ * <battleBGMN:Battle2,$gameSwitches.value(2)> スイッチ番号２番がTrueでリスト内にBattle2が登録されていれば、
  *  Battle2が再生られます。
  * 
  * 利用規約
@@ -100,7 +99,7 @@ Imported.NUUN_BattleBGM = true;
       }
     }
   }));
-  const re = /<(?:battleBGMList):\s*(.*)>/;
+  const re = /<(?:battleBGMN):\s*(.*)>/;
   const re2 = /<(?:battleBGMR):\s*(.*(?:\s*,\s*\d+)*)>/;
   const re3 = /<(?:battleBGMREval):\s*(.*(?:\s*,\s*\d+)*)>/;
   const re4 = /<(?:battleBGM):\s*(.*)>/;

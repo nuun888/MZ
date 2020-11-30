@@ -8,6 +8,9 @@
  * 
  * 更新履歴
  * 2020/11/27 Ver 1.0.0
+ * 
+ * 2020/12/1 Ver 1.0.1
+ *  ID指定でBGMを再生できる機能を追加。
  */ 
 /*:
  * @target MZ
@@ -20,7 +23,8 @@
  * 設定方法は２通りあります。敵グループのバトルイベントの１ページ目に注釈で記入してください。
  * １:プラグインパラメータから再生BGMファイル名、音量、ピッチ、位相を設定し、<battleBGMN>または<battleBGMR>タグで再生する。
  *  リストに設定した左側に表示されている番号がBGMの再生IDとなります。
- *  <battleBGMN:[name],[eval]>  [name]で指定したBGMが再生られます。※[eval]は省略できます。
+ *  <battleBGMN:[name],[eval]>  [name]で指定したBGMが再生されます。※[eval]は省略できます。
+ *  <battleBGMId:[id],[eval]> [id]で指定したリストの[id]番目のBGMが再生されます。※[eval]は省略できます。
  *  <battleBGMR:[id],[id],[id]...>  設定した[id]のBGMのうち一つがランダムに再生されます。条件指定をしたい場合は下のタグを記入します。
  *  <battleBGMREval:[id],[id],[id]...,[eval]>  [eval]がtrueの場合に、設定した[id]のBGMのうち一つがランダムに再生されます。
  * 
@@ -98,10 +102,6 @@ Imported.NUUN_BattleBGM = true;
       }
     }
   }));
-  const re = /<(?:battleBGMN):\s*(.*)>/;
-  const re2 = /<(?:battleBGMR):\s*(.*(?:\s*,\s*\d+)*)>/;
-  const re3 = /<(?:battleBGMREval):\s*(.*(?:\s*,\s*\d+)*)>/;
-  const re4 = /<(?:battleBGM):\s*(.*)>/;
 
   const _Game_Troop_setup = Game_Troop.prototype.setup;
   Game_Troop.prototype.setup = function(troopId) {
@@ -111,6 +111,11 @@ Imported.NUUN_BattleBGM = true;
   };
 
   Game_Troop.prototype.battleBGMsetup = function() {
+    const re = /<(?:battleBGMN):\s*(.*)>/;
+    const re2 = /<(?:battleBGMR):\s*(.*(?:\s*,\s*\d+)*)>/;
+    const re3 = /<(?:battleBGMREval):\s*(.*(?:\s*,\s*\d+)*)>/;
+    const re4 = /<(?:battleBGM):\s*(.*)>/;
+    const re5 = /<(?:battleBGMId):\s*(.*)>/;
     const pages = this.troop().pages[0];
     let list = null;
     pages.list.forEach(tag => {
@@ -119,23 +124,34 @@ Imported.NUUN_BattleBGM = true;
         let match2 = re2.exec(tag.parameters[0]);
         let match3 = re3.exec(tag.parameters[0]);
         let match4 = re4.exec(tag.parameters[0]);
+        let match5 = re5.exec(tag.parameters[0]);
         if (match) {
-          list = this.battleBgmNumberRequest(match[1]);
+          list = this.battleBgmNameRequest(match[1]);
         } else if(match2) {
           list = this.battleBgmRandom(match2[1], 0);
         } else if (match3) {
           list = this.battleBgmRandom(match3[1], 1);
         } else if (match4) {
           list = this.battleBgmRequest(match4[1]);
+        } else if (match5) {
+          list = this.battleBgmIdRequest(match5[1]);
         }
       }
     });
     return list;
   };
-  Game_Troop.prototype.battleBgmNumberRequest = function(data) {
+  Game_Troop.prototype.battleBgmNameRequest = function(data) {
     const list = data.split(',');
     if(this.battleBgmConditions(list[1])) {
       return param.BGMList.find(bgm => bgm.name === list[0]);
+    }
+    return null;
+  };
+
+  Game_Troop.prototype.battleBgmIdRequest = function(data) {
+    const list = data.split(',');
+    if(this.battleBgmConditions(list[1])) {
+      return param.BGMList[Number(list[0]) - 1];
     }
     return null;
   };

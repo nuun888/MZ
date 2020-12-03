@@ -8,6 +8,9 @@
  * 
  * 更新履歴
  * 2020/12/2 Ver 1.0.0
+ * 
+ * 2020/12/2 Ver 1.0.1
+ * テスト戦闘でエラーが出る不具合を修正。
  */ 
 /*:
  * @target MZ
@@ -1132,7 +1135,7 @@ Game_Troop.prototype.battleBackSetup = function() {
   let battleback1Name = null;
   let battleback2Name = null;
   const battleBack = this.battleBackTroopTag();
-  if(($gameMap.regionIdBattleBack || $gameMap.mapTagIdBattleBack) && !battleBack) {
+  if(($gameMap.regionIdBattleBack.length > 0 || $gameMap.mapTagIdBattleBack.length > 0) && !battleBack) {
     const x = $gamePlayer._x;
     const y = $gamePlayer._y;
     const regionBattleback = $gameMap.regionBattleBackSetup(x, y);
@@ -1176,7 +1179,7 @@ Game_Troop.prototype.battleBackRequest = function(data) {
 
 const _Game_Map_initialize  = Game_Map.prototype.initialize ;
 Game_Map.prototype.initialize = function() {
-  _Game_Map_initialize.call(this)
+  _Game_Map_initialize.call(this);
   this.regionIdBattleBack = [];
   this.mapTagIdBattleBack = [];
 };
@@ -1264,7 +1267,7 @@ Sprite_Battleback.prototype.battleback2Name = function() {
   }
 };
 
-Sprite_Battleback.prototype.terrainBattleback1Name = function(type) {console.log(type)
+Sprite_Battleback.prototype.terrainBattleback1Name = function(type) {
   switch (type) {
     case 0:
       return param.battlebacks0_1 ? param.battlebacks0_1 : null;

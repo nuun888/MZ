@@ -115,7 +115,7 @@
  * @text エフェクト設定
  * 
  * @param ActorEffect_X
- * @desc アニメーションエフェクトのX座標（フロントビューはエフェクトモードがONの時のみ有効）
+ * @desc アニメーションエフェクトのX座標
  * @text アニメーションエフェクトX座標
  * @type number
  * @default 0
@@ -123,7 +123,7 @@
  * @parent Effect
  * 
  * @param ActorEffect_Y
- * @desc アニメーションエフェクトのY座標（フロントビューはエフェクトモードがONの時のみ有効）
+ * @desc アニメーションエフェクトのY座標
  * @text アニメーションエフェクトY座標
  * @type number
  * @default 0
@@ -131,7 +131,7 @@
  * @parent Effect
  * 
  * @param ActorDamage_X
- * @desc ダメージエフェクトのX座標（フロントビューはエフェクトモードがONの時のみ有効）
+ * @desc ダメージエフェクトのX座標
  * @text ダメージエフェクトX座標
  * @type number
  * @default 0
@@ -139,7 +139,7 @@
  * @parent Effect
  * 
  * @param ActorDamage_Y
- * @desc ダメージエフェクトのY座標（フロントビューはエフェクトモードがONの時のみ有効）
+ * @desc ダメージエフェクトのY座標
  * @text ダメージエフェクトY座標
  * @type number
  * @default 0

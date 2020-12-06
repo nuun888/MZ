@@ -1,4 +1,4 @@
-﻿/*:-----------------------------------------------------------------------------------
+/*:-----------------------------------------------------------------------------------
  * NUUN_EnemyBook.js
  * 
  * Copyright (C) 2020 NUUN
@@ -9,15 +9,15 @@
  * 更新履歴
  * 2020/11 Ver 1.0.0
  */ 
-/*:ja
+/*:
  * @target MZ
- * @plugindesc エネミー図鑑
+ * @plugindesc モンスター図鑑
  * @author NUUN
  * 
  * @help
- * エネミー図鑑を実装します。
+ * モンスター図鑑を実装します。
  * 
- * 表示パラメータ
+ * 表示基本パラメータ（常に表示されます）
  * 最大HP
  * 最大MP
  * 攻撃力
@@ -27,15 +27,14 @@
  * 敏捷性
  * 運
  * 
- * 表示項目
+ * 追加表示パラメータ
  * 獲得経験値
  * 獲得金額
- * 倒した数
+ * 撃破数
  * オリジナルパラメータ（任意のステータス）
  * 耐性属性
  * 弱点属性
  * 無効属性
- * 吸収属性（未実装　複数属性、属性吸収特徴導入時）
  * 耐性ステート
  * 弱点ステート
  * 無効ステート
@@ -49,16 +48,12 @@
  * <desc3:[text]>
  * [text]:表示するテキスト。リストの記述欄を選択すると表示されます。（desc1だと記述欄１）
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
- * <book:no>
+ * <NoBook>
  * エネミー図鑑に表示されません。
- * <book:ShowData>
- * 未撃破でも情報がすべて表示されます。
- * <book:ShowDrop>
- * 未撃破でもドロップアイテムが表示されます。
- * <book:ShowSteal>
- * 未撃破でもスティールアイテムが表示されます。
+ * <ShowDataBook>
+ * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
  * 
- * 
+ * 追加項目パラメータの行
  * 各パラメータ、経験値、お金、倒した数、オリジナルパラメータ：１行
  * 属性、ステート：２行
  * ドロップアイテム、スティールアイテム：４行
@@ -73,16 +68,26 @@
  * 上下キー：エネミー選択
  * 左右 PgUp PgDn：ページ切り替え
  * 
+ * タッチ操作
+ * <>ボタン：キャラ切り替え
+ * 
  * プラグインコマンド
- * EnemyBookOpen　図鑑を開きます。
- * EnemyBookAdd　エネミーを図鑑に追加します。
- * EnemyBookRemove　エネミーを図鑑から削除します。
- * EnemyBookComplete　図鑑を完成させます。
- * EnemyBookClear　図鑑をクリア（全削除）させます。
- * EnemyBookGetDropItem　エネミーのドロップアイテムを取得済みにさせます。
- * EnemyBookRemoveDropItem　エネミーのドロップアイテムを未取得にします。
- * EnemyBookGetStealItem　エネミーのスティールアイテムを取得済みにします。
- * EnemyBookRemoveStealItem　エネミーのスティールアイテムを未取得にします。
+ * EnemyBookOpen              図鑑を開きます。
+ * EnemyBookAdd               エネミーを図鑑に追加します。
+ * EnemyBookRemove            エネミーを図鑑から削除します。
+ * EnemyBookComplete          図鑑を完成させます。
+ * EnemyBookClear             図鑑をクリア（全削除）させます。
+ * EnemyBookRemoveDefeat      エネミーの撃破数をリセットします。
+ * EnemyBookGetDropItem       エネミーのドロップアイテムを取得済みにさせます。
+ * EnemyBookRemoveDropItem    エネミーのドロップアイテムを未収得にさせます。
+ * EnemyBookGetStealItem      エネミーのスティールアイテムを取得済みにします。
+ * EnemyBookRemoveStealItem   エネミーのスティールアイテムを未収得にさせます。
+ * EnemyBookDefeatEnemy       撃破したエネミー数を変数に格納します。
+ * EnemyBookEncounteredEnemy  遭遇済みのエネミー数を変数に格納します。
+ * EnemyBookCompleteRate      現在の完成度を変数に格納します。
+ * EnemyBookDefeatEnemySum    指定のエネミーの撃破数を変数に格納します。
+ * DorpItemAcquired           指定のアイテムがドロップ済みか判定します。
+ * StealItemAcquired          指定のアイテムが盗み済みか判定します。
  * 
  * 
  * 利用規約
@@ -93,27 +98,35 @@
  * @desc エネミー図鑑を開きます。
  * 
  * @command EnemyBookAdd
- * @desc エネミーを図鑑に追加。
+ * @desc エネミーを図鑑に追加します。
  * @arg enemyId
  * @type enemy
  * @default 0
  * @desc エネミー
  * 
  * @command EnemyBookRemove
- * @desc エネミーを図鑑から削除。
+ * @desc エネミーを図鑑から削除します。
  * @arg enemyId
  * @type enemy
  * @default 0
  * @desc エネミー
  * 
  * @command EnemyBookComplete
- * @desc 図鑑を完成させる。
+ * @desc 図鑑を完成させます。
  * 
  * @command EnemyBookClear
- * @desc 図鑑をクリアする。
+ * @desc 図鑑をクリア（消去）します。
+ *  
+ * @command EnemyBookRemoveDefeat
+ * @desc エネミーの撃破数をリセットします。
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @text エネミー
+ * @desc エネミーを指定します。
  * 
  * @command EnemyBookGetDropItem
- * @desc エネミーのドロップアイテムを取得済みにする。
+ * @desc エネミーのドロップアイテムを取得済みにします。
  * 
  * @arg enemyId
  * @type enemy
@@ -127,7 +140,7 @@
  * @text ドロップアイテムリストID
  * @desc ドロップアイテムリストIDを指定します。（0ですべて）
  * 
- * @command EnemyBookMaskDropItem
+ * @command EnemyBookRemoveDropItem
  * @desc エネミーのドロップアイテムを未収得にします。
  * 
  * @arg enemyId
@@ -157,7 +170,7 @@
  * @text スティールアイテムリストID
  * @desc スティールアイテムリストIDを指定します。（0ですべて）
  * 
- * @command EnemyBookMaskStealItem
+ * @command EnemyBookRemoveStealItem
  * @desc エネミーのスティールアイテムを未取得にします。
  * @type number
  * @default 0
@@ -174,7 +187,59 @@
  * @text スティールアイテムリストID
  * @desc スティールアイテムリストIDを指定します。（0ですべて）
  * 
+ * @command EnemyBookDefeatEnemy
+ * @desc 撃破したエネミー数を格納します。
+ * 
+ * @arg DefeatEnemy
+ * @type variable
+ * @default 0
+ * @text 変数
+ * @desc 撃破したエネミー数を代入する変数を指定します。
+ * 
+ * @command EnemyBookEncounteredEnemy
+ * @desc 遭遇したエネミー数を格納します。
+ * 
+ * @arg EncounteredEnemy
+ * @type variable
+ * @default 0
+ * @text 変数
+ * @desc 遭遇したエネミー数を代入する変数を指定します。
+ * 
+ * @command EnemyBookCompleteRate
+ * @desc 図鑑の完成度を格納します。
+ * 
+ * @arg CompleteRate
+ * @type variable
+ * @default 0
+ * @text 変数
+ * @desc  図鑑の完成度を代入する変数を指定します。
+ * 
+ * @command EnemyBookDefeatEnemySum
+ * @desc エネミーの撃破数を格納します。
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @text エネミー
+ * @desc エネミーを指定します。
+ * 
+ * @arg DefeatEnemySum
+ * @type variable
+ * @default 0
+ * @text 変数
+ * @desc エネミーの撃破数を代入する変数を指定します。
+ * 
+ * 
  * パラメータ
+ * @param WindowMode
+ * @desc エネミー選択画面の表示位置を指定します。
+ * @text エネミー選択画面位置
+ * @type select
+ * @option 左側表示
+ * @value 0
+ * @option 右側表示
+ * @value 1
+ * @default 1
  * 
  * @param NumberType
  * @text エネミーのナンバー表示
@@ -195,6 +260,12 @@
  * @type file
  * @dir img/pictures
  * 
+ * @param BackUiWidth
+ * @text 背景サイズをUIに合わせる
+ * @desc 背景サイズをUIに合わせる。
+ * @type boolean
+ * @default true
+ * 
  * @param completeName
  * @desc 完成度の名称。
  * @text 完成度の表示名
@@ -206,6 +277,12 @@
  * @text 遭遇済み表示名
  * @type string
  * @default 遭遇済み
+ * 
+ * @param DefeatName
+ * @desc 撃破済みの名称。
+ * @text 撃破済み表示名
+ * @type string
+ * @default 撃破済み
  * 
  * @param UnknownStatus
  * @desc 敵を撃破していない場合のステータス表示名
@@ -279,7 +356,7 @@
  * @desc 未確認のドロップアイテムを隠す。
  * @text 未確認ドロップアイテム名
  * @type boolean
- * @default false
+ * @default true
  * @parent DropItemData
  * 
  * @param StealItemData
@@ -302,7 +379,7 @@
  * @desc 未確認のスティールアイテムを隠す。
  * @text 未確認スティールアイテム表示
  * @type boolean
- * @default false
+ * @default true
  * @parent StealItemData
  * 
  * @param ParamData
@@ -313,6 +390,13 @@
  * @text パラメータ表示リスト
  * @type struct<ParamListData>[]
  * @default ["{\"NameColor\":\"16\",\"ShowParams\":\"1\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"2\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"3\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"4\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"5\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"6\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"7\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"8\",\"MaskMode\":\"false\"}"]
+ * @parent ParamData
+ * 
+ * @param ParamMaskMode
+ * @desc 未撃破のエネミーの基本ステータスを表示させません。
+ * @text 未撃破基本ステータス表示
+ * @type boolean
+ * @default true
  * @parent ParamData
  * 
  * @param PageData
@@ -389,6 +473,13 @@
  * @text 記述欄３表示名
  * @type string
  * @default 
+ * @parent ParamEXData
+ * 
+ * @param ParamEXMaskMode
+ * @desc 未撃破のエネミーの追加ステータスを表示させません。
+ * @text 未撃破追加ステータス表示
+ * @type boolean
+ * @default true
  * @parent ParamEXData
  * 
  * @param ResistWeakData
@@ -471,6 +562,13 @@
  * @default 無効ステート
  * @parent ResistWeakData
  * 
+ * @param ResistWeakDataMaskMode
+ * @desc 未撃破のエネミーの耐性弱点を表示させません。
+ * @text 未撃破耐性弱点表示
+ * @type boolean
+ * @default true
+ * @parent ResistWeakData
+ * 
  */
 /*~struct~ParamListData:
  * 
@@ -503,13 +601,7 @@
  * @option 運
  * @value 8
  * @default 0
- * 
- * @param MaskMode
- * @desc 未撃破のエネミーのステータスを表示させません。
- * @text 未撃破ステータス表示
- * @type boolean
- * @default false
- * 
+ *  
  */
 /*~struct~ElementData:
  * 
@@ -584,184 +676,249 @@
  * @type boolean
  * @default false
  * 
- * @param MaskMode
- * @desc 未撃破エネミーのステータス詳細情報を表示させません。
- * @text 未撃破ステータス表示
- * @type boolean
- * @default false
- * 
  */
-
 var Imported = Imported || {};
 Imported.NUUN_EnemyBook = true;
 
 (() => {
-  const parameters = PluginManager.parameters('NUUN_EnemyBook');
-  const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
-    try {
-        return JSON.parse(value);
-    } catch (e) {
-        try {
-            return eval(value);
-        } catch (e) {
-            return value;
-        }
-    }
-  }));
-
-  const pluginName = "NUUN_EnemyBook";
-
-  PluginManager.registerCommand(pluginName, 'EnemyBookOpen', args => {
-    SceneManager.push(Scene_EnemyBook);
-  });
-
-  PluginManager.registerCommand(pluginName, 'EnemyBookAdd', args => {
-    $gameSystem.addToEnemyBook(Number(args.enemyId));
-  });
-
-  PluginManager.registerCommand(pluginName, 'EnemyBookRemove', args => {
-    $gameSystem.removeFromEnemyBook(Number(args.enemyId));
-  });
-
-  PluginManager.registerCommand(pluginName, 'EnemyBookComplete', args => {
-    $gameSystem.completeEnemyBook();
-  });
-
-  PluginManager.registerCommand(pluginName, 'EnemyBookClear', args => {
-    $gameSystem.clearEnemyBook();
-  });
-
-  PluginManager.registerCommand(pluginName, 'EnemyBookGetDropItem', args => {
-    $gameSystem.DropItemListFlag(args, true);
-  });
-
-  PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDropItem', args => {
-    $gameSystem.DropItemListFlag(args, false);
-  });
-
-  PluginManager.registerCommand(pluginName, 'EnemyBookGetStealItem', args => {
-    $gameSystem.StealItemListFlag(args.ememyId , args.dropListId, true);
-  });
-
-  PluginManager.registerCommand(pluginName, 'EnemyBookRemoveStealItem', args => {
-    $gameSystem.StealItemListFlag(args.ememyId, args.stealListId, false);
-  });
-
-  Game_System.prototype.addToEnemyBook = function(enemyId) {
-    if (!this._enemyBookFlags) {
-      this.clearEnemyBook();
-    }
-    this._enemyBookFlags[enemyId] = true;
- };
-
- Game_System.prototype.removeFromEnemyBook = function(enemyId) {
-  if (this._enemyBookFlags) {
-    this._enemyBookFlags[enemyId] = false;
+const parameters = PluginManager.parameters('NUUN_EnemyBook');
+const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
+  try {
+      return JSON.parse(value);
+  } catch (e) {
+      try {
+          return eval(value);
+      } catch (e) {
+          return value;
+      }
   }
+}));
+//プラグインコマンド
+const pluginName = "NUUN_EnemyBook";
+
+PluginManager.registerCommand(pluginName, 'EnemyBookOpen', args => {
+  SceneManager.push(Scene_EnemyBook);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookAdd', args => {
+  $gameSystem.addToEnemyBook(Number(args.enemyId));
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookRemove', args => {
+  $gameSystem.removeFromEnemyBook(Number(args.enemyId));
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookComplete', args => {
+  $gameSystem.completeEnemyBook();
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookClear', args => {
+  $gameSystem.clearEnemyBook();
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDefeat', args => {
+  $gameSystem.resetDefeat();
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookGetDropItem', args => {
+  $gameSystem.dropItemListFlag(args.ememyId, args.dropListId, true);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDropItem', args => {
+  $gameSystem.dropItemListFlag(args.ememyId, args.dropListId, false);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookGetStealItem', args => {
+  $gameSystem.stealItemListFlag(args.ememyId , args.stealListId, true);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookRemoveStealItem', args => {
+  $gameSystem.stealItemListFlag(args.ememyId, args.stealListId, false);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookDefeatEnemy', args => {
+  $gameSystem.defeatEnemyVar(args.DefeatEnemy);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookEncounteredEnemy', args => {
+  $gameSystem.encounteredEnemyVar(args.EnemyBookEncounteredEnemy);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookCompleteRate', args => {
+  $gameSystem.completeRate(args.CompleteRate);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookDefeatEnemySum', args => {
+  $gameSystem.defeatEnemySumVar(args.enemy, args.DefeatEnemySum);
+});
+
+
+//Game_System
+Game_System.prototype.addToEnemyBook = function(enemyId) {
+  if(!this._enemyBookFlags) {
+    this.clearEnemyBookFlags();
+  }
+  this._enemyBookFlags[enemyId] = true;
+};
+
+Game_System.prototype.removeFromEnemyBook = function(enemyId) {
+  if(this._enemyBookFlags) {
+    this._enemyBookFlags[enemyId] = false;
+    this.dropItemListFlag(enemyId, 0, false);
+    this.stealItemListFlag(enemyId, 0, false);
+    this._defeatNumber[i] = 0;
+  }
+};
+
+Game_System.prototype.clearEnemyBookFlags = function() {
+  this._enemyBookFlags = [];
+};
+
+Game_System.prototype.clearEnemyBook = function() {
+  this.clearEnemyBookFlags();
+  this.clearDefeat();
+  this.clearDropItem();
+  this.clearStealItem();
 };
 
 Game_System.prototype.completeEnemyBook = function() {
   this.clearEnemyBook();
-  for (var i = 1; i < $dataEnemies.length; i++) {
+  for (let i = 1; i < $dataEnemies.length; i++) {
     this._enemyBookFlags[i] = true;
-    this.DropItemListFlag(i, 0, true);
-    this.StealItemListFlag(i, 0, true);
-    this.incrementDefeatNumber(i);
+    this.dropItemListFlag(i, 0, true);
+    this.stealItemListFlag(i, 0, true);
+    this.defeatCount(i);
   }
-};
-
-Game_System.prototype.clearEnemyBook = function() {
-  this._enemyBookFlags = [];
 };
 
 Game_System.prototype.isInEnemyBook = function(enemy) {
-  if (this._enemyBookFlags && enemy) {
-    return !!this._enemyBookFlags[enemy._enemyId];
-  } else {
-    return false;
+  return this._enemyBookFlags && enemy.name && this._enemyBookFlags[enemy.id];
+};
+
+Game_System.prototype.completeRate = function(val) {
+  this.setDefeatEnemy(enemyList);
+  const enemySum = $dataEnemies.reduce((r, enemy) => {
+    return r + (enemy && enemy.name && !enemy.meta.NoBook ? 1 : 0);
+  }, 0);
+  const rate = Math.floor(this._defeatEnemy / enemySum * 100);
+  $gameVariables.setValue(val, rate);
+};
+
+Game_System.prototype.clearDefeat = function() {
+	this._defeatNumber = [];
+};
+
+Game_System.prototype.defeatCount = function(enemyId) {
+  if (!this._defeatNumber) {
+    this.clearDefeat();
+  }
+  this._defeatNumber[enemyId] = this._defeatNumber[enemyId] || 0;
+  this._defeatNumber[enemyId]++;
+};
+
+Game_System.prototype.defeatNumber = function(enemyId) {
+  if(this._defeatNumber && this._defeatNumber[enemyId]) {
+    return this._defeatNumber[enemyId];
+  }
+  return 0;
+};
+
+Game_System.prototype.setDefeatEnemy = function(enemyList) {
+  const enemy = enemyList ? enemyList : $dataEnemies;
+  this._defeatEnemy = enemy.reduce((r, enemy) => {
+    return r + (this.defeatNumber(enemy.id) > 0 || enemy.meta.ShowDataBook ? 1 : 0);
+  }, 0);
+};
+
+Game_System.prototype.defeatEnemy = function(enemyList) {
+  this.setDefeatEnemy(enemyList);
+  return this._defeatEnemy;
+};
+
+Game_System.prototype.defeatEnemyVar = function(val) {
+  this.setDefeatEnemy();
+  $gameVariables.setValue(val, this._defeatEnemy);
+};
+
+Game_System.prototype.defeatEnemySumVar = function(enemy, val) {
+  $gameVariables.setValue(val, this.defeatNumber(enemy));
+};
+
+Game_System.prototype.resetDefeat = function(enemyId) {
+  if(this._defeatNumber && this._defeatNumber[enemyId]) {
+    this._defeatNumber[enemyId] = 0;
   }
 };
 
-Game_System.prototype.clearDefeatNumber = function() {
-	this._defeatNumbers = [];
+Game_System.prototype.setEncounteredEnemy = function(enemyList) {
+  const enemy = enemyList ? enemyList : $dataEnemies;
+  this._EncounteredEnemy = enemy.reduce((r ,enemy) => {
+    if(enemyList) {
+      return r + (this.isInEnemyBook(enemy) ? 1 : 0);
+    } else {
+      return r + (this.encounteredEnemyBook(enemy) ? 1 : 0);
+    }
+  }, 0);
 };
 
-Game_System.prototype.incrementDefeatNumber = function(id) {
-	if (!this._defeatNumbers) {
-		this.clearDefeatNumber();
-	}
-	if (!this._defeatNumbers[id]) {
-		this._defeatNumbers[id] = 0;
-	}
-	this._defeatNumbers[id]++;
+Game_System.prototype.encounteredEnemy = function(enemyList) {
+  this.setEncounteredEnemy(enemyList);
+  return this._EncounteredEnemy;
 };
 
-Game_System.prototype.defeatNumber = function(id) {
-	if (!this._defeatNumbers) {
-		this.clearDefeatNumber();
-	}
-	if (!this._defeatNumbers[id]) {
-		this._defeatNumbers[id] = 0;
-	}
-	return this._defeatNumbers[id];
+Game_System.prototype.encounteredEnemyVar = function(val) {
+  this.setEncounteredEnemy();
+  $gameVariables.setValue(val, this._EncounteredEnemy);
+};
+
+Game_System.prototype.encounteredEnemyBook = function(enemy) {
+  return enemy && enemy.name && !enemy.meta.NoBook && this.isInEnemyBook(enemy);
 };
 
 Game_System.prototype.clearDropItem = function() {
 	this._itemDorps = [];
 };
 
-Game_System.prototype.setDropItemFlag = function(enemyId,id, flag) {
+Game_System.prototype.setDropItemFlag = function(enemyId, dropId, flag) {
 	if (!this._itemDorps) {
 		this.clearDropItem();
   }
-	if (!this._itemDorps[enemyId]) {
-		this._itemDorps[enemyId] = [];
-  }
-  this._itemDorps[enemyId][id] = flag;
+  this._itemDorps[enemyId] = this._itemDorps[enemyId] || [];
+  this._itemDorps[enemyId][dropId] = flag;
 };
 
-Game_System.prototype.getDropItemFlag = function(enemyId,id) {
-	if (!this._itemDorps) {
-		this.clearDropItem();
-	}
-	if (!this._itemDorps[enemyId] || !this._itemDorps[enemyId][id]) {
-		return false;
+Game_System.prototype.getDropItemFlag = function(enemyId, dropId) {
+  if(!this._itemDorps || !this._itemDorps[enemyId] || !this._itemDorps[enemyId][dropId]) {
+    return false;
   }
-  return this._itemDorps[enemyId][id];
+  return this._itemDorps[enemyId][dropId];
 };
 
 Game_System.prototype.clearStealItem = function() {
 	this._stealItem = [];
 };
 
-Game_System.prototype.setStealItemFlag = function(enemyId,id, flag) {
+Game_System.prototype.setStealItemFlag = function(enemyId, stealId, flag) {
 	if (!this._stealItem) {
 		this.clearStealItem();
   }
-	if (!this._stealItem[enemyId]) {
-		this._stealItem[enemyId] = [];
-  }
-  this._stealItem[enemyId][id] = flag;
+  this._stealItem[enemyId] = this._stealItem[enemyId] || [];
+  this._stealItem[enemyId][stealId] = flag;
 };
 
-Game_System.prototype.getStealItemFlag = function(enemyId,id) {
-	if (!this._stealItem) {
-		this.clearStealItem();
-	}
-	if (!this._stealItem[enemyId] || !this._stealItem[enemyId][id]) {
-		return false;
+Game_System.prototype.getStealItemFlag = function(enemyId, stealId) {
+  if(!this._stealItem || !this._stealItem[enemyId] || !this._stealItem[enemyId][stealId]) {
+    return false;
   }
-  return this._stealItem[enemyId][id];
+  return this._stealItem[enemyId][stealId];
 };
 
-Game_System.prototype.DropItemListFlag = function(enemyId, dropListId, mode) {
+Game_System.prototype.dropItemListFlag = function(enemyId, dropListId, mode) {
 	if(enemyId > 0){
     if(dropListId > 0){
-      this.setDropItemFlag(enemyId, dropListId, mode)
+      this.setDropItemFlag(enemyId, dropListId, mode);
     } else {
-      const enemy = new Game_Enemy(enemyId, 0, 0);
-      let itemList = $dataEnemies[enemyId].dropItems.concat(Imported.DropItemsEX ? enemy._dripItemEX : []);
-      itemList = itemList.concat(Imported.DropItemsEX ? enemy._dripItemEX : []);
+      let itemList = $dataEnemies[enemyId].dropItems;
        for(let i = 0; itemList.length > i; i++){
         this.setDropItemFlag(enemyId, i, mode);
       }
@@ -769,60 +926,90 @@ Game_System.prototype.DropItemListFlag = function(enemyId, dropListId, mode) {
   }
 };
 
-Game_System.prototype.StealItemListFlag = function(enemyId, stealListId, mode) {
+Game_System.prototype.stealItemListFlag = function(enemyId, stealListId, mode) {
 	if(enemyId > 0){
     if(stealListId > 0){
-      this.setDropItemFlag(enemyId, stealListId, mode)
+      this.setDropItemFlag(enemyId, stealListId, mode);
     } else {
-      const enemy = new Game_Enemy(enemyId, 0, 0);
-      const itemList = (Imported.NUUN_StealableItems ? enemy._stealItems : []);
-      for(let i = 0; itemList.length > i; i++){
-        this.setStealItemFlag(enemyId, i, mode)
+      const enemy = $dataEnemies[enemyId];
+      const itemList = (Imported.NUUN_StealableItems ? this.getStealList(enemy) : null);
+      if(itemList) {
+        for(let i = 0; itemList.length > i; i++){
+          this.setStealItemFlag(enemyId, i, mode);
+        }
       }
     }
   }
 };
 
-Game_System.prototype.setEncounteredEnemy = function(enemyId, stealListId, mode) {
-  if(!this._EncounteredEnemy) {
-    this._EncounteredEnemy = 0;
-  }
-  const enemy = $dataEnemies;
-  this._EncounteredEnemy = enemy.reduce(function(r ,enemy) {
-		return r + (this.isInEnemyBook(enemy) ? 1 : 0);
-	}, 0);
+Game_System.prototype.dorpItemAcquired = function(enemyId, dropId) {
+  const drop = this.setDropItemFlag(val, enemyId, dropId);
+  $gameSwitches.setValue(val, drop);
 };
 
+Game_System.prototype.stealItemAcquired = function(enemyId, stealId) {
+  const steal = this.setStealItemFlag(val, enemyId, stealId);
+  $gameSwitches.setValue(val, steal);
+};
+
+Game_System.prototype.getStealList = function(enemy) {
+  const re =/<(?:steal)\s*([IWAM]):\s*(\d+(?:\s*,\s*\d+)*)>/g;
+  const stealItems = [];
+	while(true) {
+		let match = re.exec(enemy.note);
+		if (match) {
+			let data = match[2].split(',');
+			switch (match[1]) {
+				case 'I':
+					stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:1});
+					break;
+				case 'W':
+					stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:2});
+					break;
+				case 'A':
+					stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:3});
+					break;
+				case 'M':
+					stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:4});
+					break;
+			}
+		} else {
+			return stealItems;
+		}
+	}
+};
+
+//Game_Troop
 const _Game_Troop_setup = Game_Troop.prototype.setup;
 Game_Troop.prototype.setup = function(troopId) {
-   	_Game_Troop_setup.call(this, troopId);
-  	this.members().forEach(function(enemy) {
-      	if (enemy.isAppeared()) {
-       		$gameSystem.addToEnemyBook(enemy.enemyId());
-      	}
-   	}, this);
+  _Game_Troop_setup.call(this, troopId);
+  this.members().forEach(function(enemy) {
+    if (enemy.isAppeared()) {
+      $gameSystem.addToEnemyBook(enemy.enemyId());
+    }
+  }, this);
 };
 
+//Game_Enemy
 const _Game_Enemy_appear = Game_Enemy.prototype.appear;
 Game_Enemy.prototype.appear = function() {
-  	_Game_Enemy_appear.call(this);
- 	$gameSystem.addToEnemyBook(this._enemyId);
+  _Game_Enemy_appear.call(this);
+  $gameSystem.addToEnemyBook(this._enemyId);
 };
 
 const _Game_Enemy_transform = Game_Enemy.prototype.transform;
 Game_Enemy.prototype.transform = function(enemyId) {
-	_Game_Enemy_transform.call(this, enemyId);
-	$gameSystem.addToEnemyBook(enemyId);
+  _Game_Enemy_transform.call(this, enemyId);
+  $gameSystem.addToEnemyBook(enemyId);
 };
 
 const _Game_Enemy_die = Game_Enemy.prototype.die;
 Game_Enemy.prototype.die = function() {
 	_Game_Enemy_die.call(this);
-	$gameSystem.incrementDefeatNumber(this.enemyId());
+	$gameSystem.defeatCount(this.enemyId());
 };
 
 Game_Enemy.prototype.dropItemFlag = function(drop) {
-  const enemyId = this._enemyId;
   let di = this.enemy().dropItems;
   for (let i = 0; i < drop.length; i++){
     for(let r = 0; r < di.length; r++){
@@ -871,128 +1058,12 @@ Game_Enemy.prototype.makeStealItems = function(rate, mode) {
   return di;
 };
 
-function Scene_EnemyBook() {
-  this.initialize(...arguments);
-}
-
-Scene_EnemyBook.prototype = Object.create(Scene_MenuBase.prototype);
-Scene_EnemyBook.prototype.constructor = Scene_EnemyBook;
-
-Scene_EnemyBook.prototype.initialize = function() {
-	Scene_MenuBase.prototype.initialize.call(this);
-};
-
-Scene_EnemyBook.prototype.create = function() {
-  Scene_MenuBase.prototype.create.call(this);
-  this.createPercentWindow();
-  this.createIndexWindow();
-  this.createItemWindow();
-  this._indexWindow.setStatusWindow(this._enemyStatusWindow);
-  this._indexWindow.setPercentWindow(this._percentWindow);
-  if(param.BackGroundImg){
-    this._indexWindow.opacity = 0;
-		this._percentWindow.opacity = 0;
-		this._enemyStatusWindow.opacity = 0;
-  }
-};
-
-const _Scene_EnemyBook_createBackground = Scene_EnemyBook.prototype.createBackground;
-Scene_EnemyBook.prototype.createBackground = function() {
-	if (param.BackGroundImg) {
-		this._backgroundSprite = new Sprite();
-		this._backgroundSprite.bitmap = ImageManager.loadPicture(param.BackGroundImg);
-		this.addChild(this._backgroundSprite);
-		return;
-	}
-	_Scene_EnemyBook_createBackground.call(this);
-};
-
-Scene_EnemyBook.prototype.createPercentWindow = function() {
-  const rect = this.percentWindowRect();
-  this._percentWindow = new Window_EnemyBookPercent(rect);
-  this.addWindow(this._percentWindow);
-};
-
-Scene_EnemyBook.prototype.percentWindowRect = function() {
-  const ww = Graphics.boxWidth / 3;
-  const wh = this.calcWindowHeight(1, true);
-  const wx = 0;
-  const wy = this.mainAreaTop();
-  return new Rectangle(wx, wy, ww, wh);
-};
-
-Scene_EnemyBook.prototype.createIndexWindow = function() {
-  const rect = this.indexWindowRect();
-  this._indexWindow = new Window_EnemyBookIndex(rect);
-  this._indexWindow.setHandler('cancel', this.popScene.bind(this));
-  this._indexWindow.setHandler('pagedown', this.updateContentsPagedown.bind(this));
-  this._indexWindow.setHandler('pageup', this.updateContentsPageup.bind(this));
-  this.addWindow(this._indexWindow);
-};
-
-Scene_EnemyBook.prototype.updateContentsPagedown = function() {
-	const maxPage = this.setMaxPage();
-	this._enemyStatusWindow._pageMode = (this._enemyStatusWindow._pageMode + 1) % maxPage;
-  this._enemyStatusWindow.refresh();
-	this._indexWindow.activate();
-};
-
-Scene_EnemyBook.prototype.updateContentsPageup = function() {
-	const maxPage = this.setMaxPage();
-	this._enemyStatusWindow._pageMode = (this._enemyStatusWindow._pageMode + (maxPage - 1)) % maxPage;
-  this._enemyStatusWindow.refresh();
-	this._indexWindow.activate();
-};
-
-Scene_EnemyBook.prototype.setMaxPage = function() {
-  return param.MaxPage;
-};
-
-Scene_EnemyBook.prototype.indexWindowRect = function() {
-  const wx = 0;
-  const wy = this.mainAreaTop() + this._percentWindow.height;
-  const ww = Graphics.boxWidth / 3;
-  const wh = Graphics.boxHeight - wy;
-  return new Rectangle(wx, wy, ww, wh);
-};
-
-Scene_EnemyBook.prototype.createItemWindow = function() {
-  const rect = this.itemWindowRect();
-  this._enemyStatusWindow = new Window_EnemyStatus(rect);
-  this.addWindow(this._enemyStatusWindow);
-};
-
-Scene_EnemyBook.prototype.itemWindowRect = function() {
-  const wx = Graphics.boxWidth / 3;
-  const wy = this.mainAreaTop();
-  const ww = Graphics.boxWidth - wx;
-  const wh = Graphics.boxHeight - wy;
-  return new Rectangle(wx, wy, ww, wh);
-};
-
-const _Scene_EnemyBook_update = Scene_EnemyBook.prototype.update;
-Scene_EnemyBook.prototype.update = function() {
-  _Scene_EnemyBook_update.call(this);
-  if (param.BackGroundImg) {
-		var scaleX = (Graphics.boxWidth !== this._backgroundSprite.bitmap.width ? Graphics.boxWidth / this._backgroundSprite.bitmap.width : 1);
-		var scaleY = (Graphics.boxHeight !== this._backgroundSprite.bitmap.height ? Graphics.boxHeight / this._backgroundSprite.bitmap.height : 1);
-		this._backgroundSprite.scale.x = scaleX;
-		this._backgroundSprite.scale.y = scaleY;
-	}
-	if (Input.isTriggered('left')) {
-		SoundManager.playCursor();
-		this.updateContentsPageup();
-	} else if (Input.isTriggered('right')){
-		SoundManager.playCursor();
-		this.updateContentsPagedown();
-	}
-};
-
+//Scene_Menu
 const _Scene_Menu_createCommandWindow =　Scene_Menu.prototype.createCommandWindow;
 Scene_Menu.prototype.createCommandWindow = function() {
   _Scene_Menu_createCommandWindow.call(this);
     this._commandWindow.setHandler("enemyBook", this.commandEnemyBook.bind(this));
-}
+};
 
 Scene_Menu.prototype.commandEnemyBook = function() {
   SceneManager.push(Scene_EnemyBook);
@@ -1001,57 +1072,180 @@ Scene_Menu.prototype.commandEnemyBook = function() {
 const _Window_MenuCommand_addOriginalCommands = Window_MenuCommand.prototype.addOriginalCommands;
 Window_MenuCommand.prototype.addOriginalCommands = function() {
   _Window_MenuCommand_addOriginalCommands.call(this);
-  if (param.ShowCommand) {
-    if(param.enemyBookSwitch > 0 && $gameSwitches.value(param.enemyBookSwitch)) {
-      this.addCommand(param.CommandName, "enemyBook");
-    } else if(!param.enemyBookSwitch){
-      this.addCommand(param.CommandName, "enemyBook");
-    }
+  if(param.ShowCommand && ($gameSwitches.value(param.enemyBookSwitch) || param.enemyBookSwitch === 0)) {
+    this.addCommand(param.CommandName, "enemyBook");
   }
 };
 
-Window_MenuCommand.prototype.enemyBookCommandShow = function() {
-  return param.enemyBookSwitch > 0 && $gameSwitches.value(param.enemyBookSwitch);
-};
 
-function Window_EnemyBookPercent() {
+//Scene_EnemyBook
+function Scene_EnemyBook() {
   this.initialize(...arguments);
 }
 
-Window_EnemyBookPercent.prototype = Object.create(Window_Selectable.prototype);
-Window_EnemyBookPercent.prototype.constructor = Window_EnemyBookPercent;
+Scene_EnemyBook.prototype = Object.create(Scene_MenuBase.prototype);
+Scene_EnemyBook.prototype.constructor = Scene_EnemyBook;
 
-Window_EnemyBookPercent.prototype.initialize = function(rect) {
+Scene_EnemyBook.prototype.initialize = function() {
+  Scene_MenuBase.prototype.initialize.call(this);
+};
+
+Scene_EnemyBook.prototype.create = function() {
+  Scene_MenuBase.prototype.create.call(this);
+  this.createPercentWindow();
+  this.createIndexWindow();
+  this.createEnemyWindow();
+  this.createEnemyBookButton();
+};
+
+Scene_EnemyBook.prototype.createIndexWindow = function() {
+  const rect = this.indexWindowRect();
+  this._indexWindow = new Window_EnemyBook_Index(rect);
+  this._indexWindow.setHandler("cancel", this.popScene.bind(this));
+  this._indexWindow.setHandler("pagedown", this.updateContentsPagedown.bind(this));
+  this._indexWindow.setHandler("pageup", this.updateContentsPageup.bind(this));
+  this.addWindow(this._indexWindow);
+  this._indexWindow.setPercentWindow(this._percentWindow);
+};
+
+Scene_EnemyBook.prototype.createPercentWindow = function() {
+  const rect = this.percentWindowRect();
+  this._percentWindow = new Window_EnemyBook_Percent(rect);
+  this.addWindow(this._percentWindow);
+};
+
+Scene_EnemyBook.prototype.createEnemyWindow = function() {
+  const rect = this.enemyWindowRect();
+  this._enemyWindow = new Window_EnemyBook(rect);
+  this.addWindow(this._enemyWindow);
+  this._indexWindow.setEnemyWindow(this._enemyWindow);
+};
+
+Scene_EnemyBook.prototype.percentWindowRect = function() {
+  const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
+  const wy = this.mainAreaTop();
+  const ww = Graphics.boxWidth / 3;
+  const wh = this.calcWindowHeight(1, true);
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_EnemyBook.prototype.indexWindowRect = function() {
+  const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
+  const wy = this.mainAreaTop() + this._percentWindow.height;
+  const ww = Graphics.boxWidth / 3;
+  const wh = Graphics.boxHeight - wy;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_EnemyBook.prototype.enemyWindowRect = function() {
+  const wx = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
+  const wy = this.mainAreaTop();
+  const ww = this.enemyWindowWidth();
+  const wh = Graphics.boxHeight - wy;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_EnemyBook.prototype.enemyWindowWidth = function() {
+  return Graphics.boxWidth - Graphics.boxWidth / 3;
+};
+
+Scene_EnemyBook.prototype.createEnemyBookButton = function() {
+  if(ConfigManager.touchUI) {
+    this._pageupButton = new Sprite_Button("pageup");
+    this._pageupButton.x = 4;
+    this._pageupButton.y = this.buttonY();
+    const pageupRight = this._pageupButton.x + this._pageupButton.width;
+    this._pagedownButton = new Sprite_Button("pagedown");
+    this._pagedownButton.x = pageupRight + 4;
+    this._pagedownButton.y = this.buttonY();
+    this.addWindow(this._pageupButton);
+    this.addWindow(this._pagedownButton);
+    this._pageupButton.setClickHandler(this.updateContentsPageup.bind(this));
+    this._pagedownButton.setClickHandler(this.updateContentsPagedown.bind(this));
+  }
+};
+
+Scene_EnemyBook.prototype.updateContentsPagedown = function() {
+  SoundManager.playCursor();
+  const maxPage = this.setMaxPage();
+  this._enemyWindow._pageMode = (this._enemyWindow._pageMode + 1) % maxPage;
+  this._enemyWindow.refresh();
+  this._indexWindow.activate();
+};
+
+Scene_EnemyBook.prototype.updateContentsPageup = function() {
+  SoundManager.playCursor();
+  const maxPage = this.setMaxPage();
+  this._enemyWindow._pageMode = (this._enemyWindow._pageMode + (maxPage - 1)) % maxPage;
+  this._enemyWindow.refresh();
+	this._indexWindow.activate();
+};
+
+Scene_EnemyBook.prototype.setMaxPage = function() {
+  return param.MaxPage;
+};
+
+Scene_EnemyBook.prototype.update = function() {
+  Scene_MenuBase.prototype.update.call(this);
+  if (Input.isTriggered('left')) {
+		this.updateContentsPageup();
+	} else if (Input.isTriggered('right')){
+		this.updateContentsPagedown();
+	}
+};
+
+
+//Window_EnemyBook_Percent
+function Window_EnemyBook_Percent() {
+  this.initialize(...arguments);
+}
+
+Window_EnemyBook_Percent.prototype = Object.create(Window_Selectable.prototype);
+Window_EnemyBook_Percent.prototype.constructor = Window_EnemyBook_Percent;
+
+Window_EnemyBook_Percent.prototype.initialize = function(rect) {
   Window_Selectable.prototype.initialize.call(this, rect);
-  this._encounteredPercent = 0;
-  this._encountered = [];
+  this._defeat = {};
+  this._encountered = {};
   this._duration = 0;
   this._oy = 0;
 };
 
-Window_EnemyBookPercent.prototype.encountered = function(list) {
-	encountered = list.reduce(function(r ,enemy) {
-		return r + ($gameSystem.isInEnemyBook(enemy) ? 1 : 0);
-  }, 0);
-  this._encounteredPercent = Math.floor(encountered / list.length * 100);
-  this._encountered = [encountered, list.length];
+Window_EnemyBook_Percent.prototype.percentRefresh = function(enemyList) {
+  this.defeatPercent(enemyList);
+  this.encounteredPercent(enemyList);
+  this.refresh();
 };
 
-Window_EnemyBookPercent.prototype.refresh = function() {
+Window_EnemyBook_Percent.prototype.defeatPercent = function(enemyList) {
+  this._defeat.encNum = $gameSystem.defeatEnemy(enemyList);
+  this._defeat.Percent = Math.floor(this._defeat.encNum / enemyList.length * 100);
+  this._defeat.length = enemyList.length;
+};
+
+Window_EnemyBook_Percent.prototype.encounteredPercent = function(enemyList) {
+  this._encountered.encNum = $gameSystem.encounteredEnemy(enemyList);
+  //this._encountered.Percent = Math.floor(this._encountered.encNum / enemyList.length * 100);
+  this._encountered.length = enemyList.length;
+};
+
+Window_EnemyBook_Percent.prototype.refresh = function() {
   const lineHeight = this.lineHeight();
   const rect = this.itemLineRect(0);
   const y = rect.y + (this._oy * -1);
   this.contents.clear();
-  this.drawText(param.EncountName +'：'+ this._encountered[0] +'/'+ this._encountered[1], rect.x, y, rect.width, 'center');
-  this.drawText(param.EncountName +'：'+ this._encountered[0] +'/'+ this._encountered[1], rect.x, y + lineHeight * 2, rect.width, 'center');
-  this.drawText(param.completeName +'：'+ this._encounteredPercent +' %', rect.x, y + lineHeight, rect.width, 'center');
+  this.drawText(param.EncountName +'：'+ this._encountered.encNum +'/'+ this._encountered.length, rect.x, y, rect.width, 'center');
+  this.drawText(param.DefeatName +'：'+ this._defeat.encNum +'/'+ this._defeat.length, rect.x, y + lineHeight * 1, rect.width, 'center');
+  this.drawText(param.EncountName +'：'+ this._encountered.encNum +'/'+ this._encountered.length, rect.x, y + lineHeight * 3, rect.width, 'center');
+  this.drawText(param.completeName +'：'+ this._defeat.Percent +' %', rect.x, y + lineHeight * 2, rect.width, 'center');
 };
 
-Window_EnemyBookPercent.prototype.update = function() {
+Window_EnemyBook_Percent.prototype.update = function() {
   this._duration++;
   this.updateInterval();
 };
-Window_EnemyBookPercent.prototype.updateInterval = function() {
+
+Window_EnemyBook_Percent.prototype.updateInterval = function() {
   const lineHeight = this.lineHeight();
   if(this._duration >= param.Interval && this._duration < param.Interval + lineHeight){
     this._oy++;
@@ -1059,144 +1253,165 @@ Window_EnemyBookPercent.prototype.updateInterval = function() {
   }
   if(this._duration >= param.Interval + lineHeight){
     this._duration = 0;
-    if(this._oy >= lineHeight * 2){
+    if(this._oy >= lineHeight * 3){
        this._oy = 0;
     }
   }
 };
 
-function Window_EnemyBookIndex() {
+
+//Window_EnemyBook_Index
+function Window_EnemyBook_Index() {
   this.initialize(...arguments);
 }
 
-Window_EnemyBookIndex.prototype = Object.create(Window_Selectable.prototype);
-Window_EnemyBookIndex.prototype.constructor = Window_EnemyBookIndex;
+Window_EnemyBook_Index.prototype = Object.create(Window_Selectable.prototype);
+Window_EnemyBook_Index.prototype.constructor = Window_EnemyBook_Index;
 
-Window_EnemyBookIndex.lastTopRow = 0;
-Window_EnemyBookIndex.lastIndex  = 0;
+Window_EnemyBook_Index._lastTopRow = 0;
+Window_EnemyBook_Index._lastIndex = 0;
 
-Window_EnemyBookIndex.prototype.initialize = function(rect) {
+Window_EnemyBook_Index.prototype.initialize = function(rect) {
   Window_Selectable.prototype.initialize.call(this, rect);
+  this._enemyList = [];
   this.refresh();
-  this.setTopRow(Window_EnemyBookIndex.lastTopRow);
-  this.select(Window_EnemyBookIndex.lastIndex);
- 	this.activate();
+  this.setTopRow(Window_EnemyBook_Index._lastTopRow);
+  this.select(Window_EnemyBook_Index._lastIndex);
+  this.activate();
 };
 
-Window_EnemyBookIndex.prototype.maxCols = function() {
+Window_EnemyBook_Index.prototype.processCancel = function() {
+  Window_Selectable.prototype.processCancel.call(this);
+  Window_EnemyBook_Index._lastTopRow = this.topRow();
+  Window_EnemyBook_Index._lastIndex = this.index();
+};
+
+Window_EnemyBook_Index.prototype.maxCols = function() {
   return 1;
 };
 
-Window_EnemyBookIndex.prototype.maxItems = function() {
-  return this._list ? this._list.length : 0;
+Window_EnemyBook_Index.prototype.maxItems = function() {
+  return this._enemyList ? this._enemyList.length : 0;
 };
 
-Window_EnemyBookIndex.prototype.setPercentWindow = function(percentWindow) {
+Window_EnemyBook_Index.prototype.update = function() {
+	Window_Selectable.prototype.update.call(this);
+  this.updateEnemyStatus();
+};
+
+Window_EnemyBook_Index.prototype.updatePercent = function() {
+  if (this._percentWindow) {
+    const enemy = this._enemyList;
+    this._percentWindow.percentRefresh(enemy);
+  }
+};
+
+Window_EnemyBook_Index.prototype.updateEnemyStatus = function() {
+  if (this._enemyWindow) {
+    const enemy = this.getEnemy();
+    this._enemyWindow.setEnemy(enemy);
+  }
+};
+
+Window_EnemyBook_Index.prototype.getEnemy = function() {
+  return this._enemyList[this.index()];
+};
+
+Window_EnemyBook_Index.prototype.setPercentWindow = function(percentWindow) {
   this._percentWindow = percentWindow;
   this.updatePercent();
 };
 
-Window_EnemyBookIndex.prototype.setStatusWindow = function(statusWindow) {
-  this._enemyStatusWindow = statusWindow;
-  this.updateEnemyStatus();
+Window_EnemyBook_Index.prototype.setEnemyWindow = function(enemyWindow) {
+  this._enemyWindow = enemyWindow;
 };
 
-Window_EnemyBookIndex.prototype.update = function() {
-	Window_Selectable.prototype.update.call(this);
-	this.updateEnemyStatus();
+Window_EnemyBook_Index.prototype.enemyAt = function(index) {
+  return this._enemyList && index >= 0 ? this._enemyList[index] : null;
 };
 
-Window_EnemyBookIndex.prototype.updatePercent = function() {
-  if (this._percentWindow) {
-    const enemy = this._list;
-    this._percentWindow.encountered(enemy);
-    this._percentWindow.refresh();
-  }
+Window_EnemyBook_Index.prototype.makeEnemyList = function() {
+  this._enemyList = $dataEnemies.filter(enemy => this.includes(enemy));
 };
 
-Window_EnemyBookIndex.prototype.updateEnemyStatus = function() {
-  if (this._enemyStatusWindow) {
-    const enemy = this._list[this.index()];
-    this._enemyStatusWindow.setEnemy(enemy);
-  }
+Window_EnemyBook_Index.prototype.includes = function(enemy) {
+  return enemy && enemy.name && !enemy.meta.NoBook;
 };
 
-Window_EnemyBookIndex.prototype.refresh = function() {
-	this._list = [];
-	for (let i = 1; i < $dataEnemies.length; i++) {
-    let enemy = $dataEnemies[i];
-    if (enemy.name && enemy.meta.book !== 'no') {
-			let enemys = new Game_Enemy(i, 0, 0);
-      this._list.push(enemys);
+Window_EnemyBook_Index.prototype.drawItem = function(index) {
+  const enemy = this.enemyAt(index);
+  if(enemy) {
+    const rect = this.itemLineRect(index);
+    let name = '';
+    if ($gameSystem.isInEnemyBook(enemy)) {
+      name = enemy.name;
+    } else {
+      name = this.unknownDataLength(enemy);
+    }
+    if(param.NumberType > 0) {
+      let numberText = index += 1;
+      const textWidth = this.numberWidth(numberText);
+      if (param.NumberType === 2) {
+        numberText = this.numberWidthSlice(numberText);
+      }
+      this.drawText(numberText, rect.x, rect.y, textWidth);
+      this.drawText(":", rect.x + textWidth + 6, rect.y);
+      this.drawText(name, rect.x + textWidth + 16, rect.y, rect.width - textWidth - 16);
+    } else {
+      this.drawText(name, rect.x, rect.y, rect.width);
     }
   }
-  this.createContents();
-  this.drawAllItems();
 };
 
-Window_EnemyBookIndex.prototype.EnemyNameLength = function(enemy) {
-	return enemy.name().length;
+Window_EnemyBook_Index.prototype.numberWidth = function(numberText) {
+  return this.textWidth(this._enemyList.length >= 1000 || param.NumberType === 2 ? '000' : '00');
 };
 
-Window_EnemyBookIndex.prototype.unknownDataLength = function(enemy) {
-  const name_length = this.EnemyNameLength(enemy);
-	let name = '';
-	for(let i = 0; i < name_length ;i++) {
-		name += param.UnknownData;
-	}
-	return name;
+Window_EnemyBook_Index.prototype.numberWidthSlice = function(indexText) {
+  return (this._enemyList.length >= 1000 ? ('0000' + indexText).slice(-4) : ('000' + indexText).slice(-3));
 };
 
-Window_EnemyBookIndex.prototype.drawItem = function(index) {
-	const enemy = this._list[index];
-	const rect = this.itemLineRect(index);
-	let name = '';
- 	if ($gameSystem.isInEnemyBook(enemy)) {
-    name = enemy.name();
-	} else {
-    name = this.unknownDataLength(enemy);
-  }
-  let textWidth = null;
-  let numberText = index += 1;
-  if(param.NumberType === 1){
-    textWidth = (numberText >= 1000 ? "000" : "00");
-  } else if(param.NumberType === 2){
-    textWidth = "000";
-    numberText = (this._list.length >= 1000 ? ('0000' + numberText).slice(-4) : ('000' + numberText).slice(-3));
-  }
-  textWidth = (textWidth ? this.textWidth(textWidth) : 0);
-  if(param.NumberType >= 1 ){
-    this.drawText(numberText, rect.x, rect.y, textWidth);
-    this.drawText(":", rect.x + textWidth + 6, rect.y);
-    this.drawText(name, rect.x + textWidth + 16, rect.y, rect.width - textWidth - 16);
+Window_EnemyBook_Index.prototype.unknownDataLength = function(enemy) {
+  let name = '';
+  if(param.UnknownData === '？' || param.UnknownData === '?') {
+    const name_length = this.EnemyNameLength(enemy);
+    for(let i = 0; i < name_length ;i++) {
+      name += param.UnknownData;
+    }
   } else {
-    this.drawText(name, rect.x, rect.y, rect.width); 
+    name = param.UnknownData;
+  }
+  return name;
+};
+
+Window_EnemyBook_Index.prototype.EnemyNameLength = function(enemy) {
+	return enemy.name.length;
+};
+
+Window_EnemyBook_Index.prototype.drawItemBackground = function(index) {
+  if(!param.NoCursorBackground) {
+    Window_Selectable.prototype.drawItemBackground.call(this, index);
   }
 };
 
-  Window_EnemyBookIndex.prototype.drawItemBackground = function(index) {
-    if(!param.NoCursorBackground) {
-      Window_Selectable.prototype.drawItemBackground.call(this, index);
-    }
-  };
-
-Window_EnemyBookIndex.prototype.processCancel = function() {
-  Window_Selectable.prototype.processCancel.call(this);
-  Window_EnemyBookIndex.lastTopRow = this.topRow();
-  Window_EnemyBookIndex.lastIndex = this.index();
+Window_EnemyBook_Index.prototype.refresh = function() {
+  this.makeEnemyList();
+  Window_Selectable.prototype.refresh.call(this);
 };
 
 
-function Window_EnemyStatus() {
+//Window_EnemyBook
+function Window_EnemyBook() {
   this.initialize(...arguments);
 }
 
-Window_EnemyStatus.prototype = Object.create(Window_Selectable.prototype);
-Window_EnemyStatus.prototype.constructor = Window_EnemyStatus;
+Window_EnemyBook.prototype = Object.create(Window_Base.prototype);
+Window_EnemyBook.prototype.constructor = Window_EnemyBook;
 
-Window_EnemyStatus.prototype.initialize = function(rect) {
+Window_EnemyBook.prototype.initialize = function(rect) {
   Window_Base.prototype.initialize.call(this, rect);
   this._enemy = null;
+  this._enemyData = [];
   this._pageMode = 0;
   this._enemySprite = new Sprite();
   this._enemySprite.anchor.x = 0.5;
@@ -1207,430 +1422,146 @@ Window_EnemyStatus.prototype.initialize = function(rect) {
   this.refresh();
 };
 
-Window_EnemyStatus.prototype.setEnemy = function(enemy) {
-  if (this._enemy !== enemy) {
+Window_EnemyBook.prototype.setEnemy = function(enemy) {
+  if(this._enemy !== enemy) {
     this._enemy = enemy;
     this.refresh();
   }
 };
 
-Window_EnemyStatus.prototype.update = function() {
-	Window_Base.prototype.update.call(this);
-	if (this._enemySprite.bitmap) {
-    const bitmapWidth = this._enemySprite.bitmap.width;
-		const bitmapHeight = this._enemySprite.bitmap.height;
-    const contentsWidth = this.maxWidth();
-		const contentsHeight = 350;
-    let scale = 1.0;
-      if (bitmapWidth > contentsWidth || bitmapHeight > contentsHeight) {
-			  if (bitmapWidth - contentsWidth > bitmapHeight - contentsHeight) {
-				  scale = contentsWidth / bitmapWidth;
-			  } else {
-			  	scale = contentsHeight / bitmapHeight;
-			  }
-    	}
-    	this._enemySprite.scale.x = scale;
-   		this._enemySprite.scale.y = scale;
-  }
+Window_EnemyBook.prototype.defeatFlag = function() {
+  return $gameSystem.defeatNumber(this._enemy.id) > 0;
 };
 
-Window_EnemyStatus.prototype.maxWidth = function() {
+Window_EnemyBook.prototype.paramMask = function() {
+  return param.ParamMaskMode && !this.noUnknownStatus() ? this.defeatFlag() : true;
+};
+
+Window_EnemyBook.prototype.paramEXMask = function() {
+  return param.ParamEXMaskMode && !this.noUnknownStatus() ? this.defeatFlag() : true;
+};
+
+Window_EnemyBook.prototype.resistWeakDataMask = function() {
+  return param.ResistWeakDataMaskMode && !this.noUnknownStatus() ? this.defeatFlag() : true;
+};
+
+Window_EnemyBook.prototype.showDropItemMask = function() {
+  return param.ShowDropItemName && !this.noUnknownStatus() ? this.defeatFlag(): true;
+};
+
+Window_EnemyBook.prototype.dropItemFlag = function(index) {
+  return $gameSystem.getDropItemFlag(this._enemy.id, index);
+};
+
+Window_EnemyBook.prototype.showStealItemMask = function() {
+  return param.ShowStealItemName && !this.noUnknownStatus() ? this.defeatFlag(): true;
+};
+
+Window_EnemyBook.prototype.stealItemFlag = function(index) {
+  return $gameSystem.getStealItemFlag(this._enemy.id, index);
+};
+
+Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
+  return this._enemy.meta.ShowDataBook;
+};
+
+Window_EnemyBook.prototype.maxWidth = function() {
   return this.itemWidth() / 2 - this.itemPadding() * 2;
 };
 
-Window_EnemyStatus.prototype.enemyImg = function(enemy) {
-	const name = this.enemyBattlerName(enemy);
-	const hue = enemy.battlerHue();
-	let bitmap;
-  	if ($gameSystem.isSideView()) {
-      	bitmap = ImageManager.loadSvEnemy(name);
-  	} else {
-      	bitmap = ImageManager.loadEnemy(name);
-    }
-    Sprite_Battler.prototype.setHue.call(this._enemySprite, hue);
-   	this._enemySprite.bitmap = bitmap;
+Window_EnemyBook.prototype.statusLineHeight = function() {
+  return Math.floor((Graphics.boxHeight - 616) / 60) * 36;
 };
 
-Window_EnemyStatus.prototype.enemyBattlerName = function(enemy) {
-	return enemy.battlerName();
-};
-
-Window_EnemyStatus.prototype.enemyName = function(enemy, x, y) {
-	this.resetTextColor();
-	this.drawText(enemy.name(), x, y, this.contentsWidth(), 'center');
-};
-
-Window_EnemyStatus.prototype.enemyParams = function(enemy, x, y) {
-  const list = param.ParamList;
-	for (let i = 0; i < list.length; i++) {
-		this.changeTextColor(ColorManager.textColor(list[i].NameColor));
-		this.drawText(TextManager.param(list[i].ShowParams - 1), x, y, this.maxWidth());
-    this.resetTextColor();
-    let text;
-    if(list[i].MaskMode && !this.noUnknownStatus(enemy)){
-      text = ($gameSystem.defeatNumber(enemy.enemyId()) > 0 ? enemy.param(list[i].ShowParams - 1) : param.UnknownStatus);
-    } else {
-      text = enemy.param(list[i].ShowParams - 1);
-    }
-		this.drawText(text, x, y, this.maxWidth(), 'right');
-		y += this.lineHeight();
-	}
-};
-
-Window_EnemyStatus.prototype.enemyExp = function(color, enemy, x, y, width, mask) {
-	this.changeTextColor(ColorManager.textColor(color));
-	this.drawText(TextManager.exp, x, y);
-  this.resetTextColor();
-  let text;
-  if(mask && !this.noUnknownStatus(enemy)){
-    text = ($gameSystem.defeatNumber(enemy.enemyId()) > 0 ? enemy.exp() : param.UnknownStatus);
+Window_EnemyBook.prototype.refresh = function() {
+  if(!this._enemy) {
+    return;
+  }
+  let enemy = null;
+  if(!this._enemyData[this._enemy.id]) {
+    enemy = new Game_Enemy(this._enemy.id, 0, 0);
+    this._enemyData[this._enemy.id] = enemy;
   } else {
-    text = enemy.exp();
+    enemy = this._enemyData[this._enemy.id];
   }
-	this.drawText(text, x, y, width, 'right');
-};
-
-Window_EnemyStatus.prototype.enemyGold = function(color, enemy, x, y, width, mask) {
-	this.changeTextColor(ColorManager.textColor(color));
-	this.drawText(param.MoneyName, x, y);
-  this.resetTextColor();
-  let text;
-  if(mask && !this.noUnknownStatus(enemy)){
-    text = ($gameSystem.defeatNumber(enemy.enemyId()) > 0 ? enemy.gold() : param.UnknownStatus);
-  } else {
-    text = enemy.gold();
-  }
-	this.drawText(text, x, y, width, 'right');
-};
-
-Window_EnemyStatus.prototype.defeatEnemy = function(color, enemy, x, y, width, mask) {
-	this.changeTextColor(ColorManager.textColor(color));
-	this.drawText(param.defeatEnemyName, x, y);
-  this.resetTextColor();
-  let text;
-  if(mask && !this.noUnknownStatus(enemy)){
-    text = ($gameSystem.defeatNumber(enemy.enemyId()) > 0 ? $gameSystem.defeatNumber(enemy.enemyId()) : param.UnknownStatus);
-  } else {
-    text = $gameSystem.defeatNumber(enemy.enemyId())
-  }
-	  this.drawText(text, x, y, width, 'right');
-};
-
-Window_EnemyStatus.prototype.originalParams = function(color, enemy, x, y, width, mask) {
-  if(!param.originalParamName){
-    return this;
-  }
-	this.changeTextColor(ColorManager.textColor(color));
-	this.drawText(param.originalParamName, x, y);
-  this.resetTextColor();
-  let text;
-  if(mask && !this.noUnknownStatus(enemy)){
-    text = ($gameSystem.defeatNumber(enemy.enemyId()) > 0 ? eval(param.originalParamEval) : param.UnknownStatus);
-  } else {
-    text = eval(param.originalParamEval);
-  }
-	this.drawText(text, x, y, width, 'right');
-};
-
-Window_EnemyStatus.prototype.drawResistElement = function(color, enemy, x, y, width, mask) {
-  let icons = [];
-  if(!param.ElementList){
+  const padding = this.itemPadding();
+  let x = padding;
+  let x2 = x + this.itemWidth() / 2;
+  let y = 0;
+  const lineHeight = this.lineHeight();
+  
+  this.contents.clear();
+  if (!enemy || !$gameSystem.isInEnemyBook(this._enemy)) {
+    this._enemySprite.bitmap = null;
     return;
   }
-  this.changeTextColor(ColorManager.textColor(color));
-  this.drawText(param.ResistElementName, x, y);
-  if(this.unknownStatusFlag(enemy, mask) && !this.noUnknownStatus(enemy)){
-    return this;
-  }
-  param.ElementList.forEach(Element => {
-    if(Element.ElementNo){
-      let rate = enemy.elementRate(Element.ElementNo);
-      if(rate < 1 && param.ResistNoEffectElement || (rate < 1 && rate > 0 && !param.ResistNoEffectElement)){
-        let icon= Element.ElementIconId;
-        if (icon) icons.push(icon);
-      }
-    }
-  });
-	let dx = this.iconX(icons, width);
-  y += this.lineHeight();
-  icons.forEach(icon => {
-		this.drawIcon(icon, x, y);
-		x += dx;
-	});
-};
-
-Window_EnemyStatus.prototype.drawWeakElement = function(color, enemy, x, y, width, mask) {
-  let icons = [];
-  if(!param.ElementList){
-    return;
-  }
-  this.changeTextColor(ColorManager.textColor(color));
-	this.drawText(param.WeakElementName, x, y);
-  if(this.unknownStatusFlag(enemy, mask) && !this.noUnknownStatus(enemy)){
-    return this;
-  }
-  param.ElementList.forEach(Element => {
-    if (Element.ElementNo) {
-      let rate = enemy.elementRate(Element.ElementNo);
-      if (rate > 1) {
-        let icon= Element.ElementIconId;
-        if (icon) icons.push(icon);
-      }
-    }
-  });
-	let dx = this.iconX(icons, width);
-  y += this.lineHeight();
-  icons.forEach(icon => {
-		this.drawIcon(icon, x, y);
-		x += dx;
-	});
-};
-
-Window_EnemyStatus.prototype.drawNoEffectElement = function(color, enemy, x, y, width, mask) {
-  let icons = [];
-  if(!param.ElementList){
-    return;
-  }
-  this.changeTextColor(ColorManager.textColor(color));
-  this.drawText(param.NoEffectElementName, x, y);
-  if(this.unknownStatusFlag(enemy, mask) && !this.noUnknownStatus(enemy)){
-    return this;
-  }
-  param.ElementList.forEach(Element => {
-    if (Element.ElementNo) {
-      let rate = enemy.elementRate(Element.ElementNo);
-      if (rate <= 0) {
-        let icon= Element.ElementIconId;
-        if (icon) icons.push(icon);
-      }
-    }
-  });
-	let dx = this.iconX(icons, width);
-  y += this.lineHeight();
-  icons.forEach(icon => {
-		this.drawIcon(icon, x, y);
-		x += dx;
-	});
-};
-
-Window_EnemyStatus.prototype.drawResistStates = function(color, enemy, x, y, width, mask) {
-  let icons = [];
-  if(!param.StateList){
-    return;
-  }
-  this.changeTextColor(ColorManager.textColor(color));
-  this.drawText(param.ResistStateName, x, y);
-  if(this.unknownStatusFlag(enemy, mask) && !this.noUnknownStatus(enemy)){
-    return this;
-  }
-  param.StateList.forEach(State => {
-    if(State.StateId){
-      let stateId = State.StateId;
-      let rate = enemy.stateRate(stateId);
-      if(rate < 1 && param.ResistNoEffectState || (rate < 1 && rate > 0 && !param.ResistNoEffectState)){
-        let icon = $dataStates[stateId].iconIndex;
-        if (icon) icons.push(icon);
-      }
-    }
-  });
-  let dx = this.iconX(icons, width);
-  y += this.lineHeight();
-  icons.forEach(icon => {
-	  this.drawIcon(icon, x, y);
-	  x += dx;
-  });
-};
-
-Window_EnemyStatus.prototype.drawWeakStates = function(color, enemy, x, y, width, mask) {
-  let icons = [];
-  if(!param.StateList){
-    return;
-  }
-  this.changeTextColor(ColorManager.textColor(color));
-  this.drawText(param.WeakStateName, x, y);
-  if(this.unknownStatusFlag(enemy, mask) && !this.noUnknownStatus(enemy)){
-    return this;
-  }
-  param.StateList.forEach(State => {
-  if(State.StateId){
-    let stateId = State.StateId;
-    let rate = enemy.stateRate(stateId);
-    if (rate > 1 && !param.NormalWeakState || rate >= 1 && param.NormalWeakState) {
-      let icon = $dataStates[stateId].iconIndex;
-      if (icon) icons.push(icon);
-      }
-    }
-  });
-  let dx = this.iconX(icons, width);
-  y += this.lineHeight();
-  icons.forEach(icon => {
-	  this.drawIcon(icon, x, y);
-	  x += dx;
-  });
-};
-
-Window_EnemyStatus.prototype.drawNoEffectStates = function(color, enemy, x, y, width, mask) {
-  let icons = [];
-  if(!param.StateList){
-    return;
-  }
-  this.changeTextColor(ColorManager.textColor(color));
-  this.drawText(param.NoEffectStateName, x, y);
-  if(this.unknownStatusFlag(enemy, mask) && !this.noUnknownStatus(enemy)){
-    return this;
-  }
-  param.StateList.forEach(State => {
-    if(State.StateId){
-      let stateId = State.StateId;
-      let icon;
-      let rate = enemy.stateRate(stateId);
-      if (rate <= 0 || enemy.isStateResist(stateId)) {
-        icon = $dataStates[stateId].iconIndex;
-        if (icon) icons.push(icon);
-      }
-    }
-  });
-  let dx = this.iconX(icons, width);
-  y += this.lineHeight();
-  icons.forEach(icon => {
-	  this.drawIcon(icon, x, y);
-	  x += dx;
-	});
-};
-
-Window_EnemyStatus.prototype.iconX = function(icons, width) {
-	if (32 * icons.length > width) {
-		return Math.floor(width / icons.length);
-	}
-	return 32;
-};
-
-Window_EnemyStatus.prototype.dropItems = function(color, enemy, x, y, width, mask) {
-  const dataEnemy = enemy.enemy();
-  const maxWidth = width;
-	this.changeTextColor(ColorManager.textColor(color));
-  this.drawText(param.dropItemsName, x, y);
-  if(this.unknownStatusFlag(enemy, mask) && (!this.noUnknownStatus(enemy) || !this.noUnknownDrops(enemy))){
-    return this;
-  }
-  let y2 = y + this.lineHeight();
-  let list = dataEnemy.dropItems;
-  for(i = 0; i < list.length; i++){
-    if(list[i].kind > 0){
-      let item = enemy.itemObject(list[i].kind, list[i].dataId);
-      if(param.ShowDropItemName && !$gameSystem.getDropItemFlag(enemy._enemyId, i)) {
-        this.resetTextColor();
-        this.drawText(this.unknownDataLength(item.name), x, y2, maxWidth,'left');
-      } else {
-        let rate = list[i].denominator;
-        let textWidth = this.textWidth("1/" + rate);
-        this.drawItemName(item, x, y2, maxWidth - textWidth - this.itemPadding());
-        this.drawText("1/" + rate, x, y2, maxWidth,'right');
-      }
-      y2 += this.lineHeight();
-    }
+  this.enemyImg(enemy);
+  this.enemyName(enemy, x, y);
+  y += lineHeight + this.statusLineHeight();
+  this.enemyParams(enemy, x2, y);
+  y += lineHeight * 8 + this.statusLineHeight();
+  if (this._pageMode === 0) {
+    this.page(enemy, x, y);
+  } else if (this._pageMode === 1) {
+    this.page(enemy, x, y);
+  } else if (this._pageMode === 2) {
+    this.page(enemy, x, y);
   }
 };
 
-Window_EnemyStatus.prototype.dropItemsEX = function(enemy) {
-  if(!Imported.DropItemsEX){
-    return [];
-  }
-  return enemy._dripItemEX;
-};
-
-Window_EnemyStatus.prototype.stealItems = function(color, enemy, x, y, width, mask) {
-	if(!param.ShowStealItems || !Imported.NUUN_StealableItems) {
-		return this;
-	}
-	const maxWidth = width;
-	this.changeTextColor(ColorManager.textColor(color));
-  this.drawText(param.StealItemsName, x, y);
-  if(this.unknownStatusFlag(enemy, mask) && (!this.noUnknownStatus(enemy) || !this.noUnknownSteals(enemy))){
-    return this;
-  }
-  let y2 = y + this.lineHeight();
-  let list = enemy._stealItems;
-  for(let i = 0; list.length > i; i++){
-    if (list[i].kind > 0 && list[i].kind < 4) {
-      let item = enemy.stealObject(list[i].kind, list[i].dataId);
-      if(param.ShowStealItemName && !$gameSystem.getStealItemFlag(enemy._enemyId, i)) {
-        this.resetTextColor();
-        this.drawText(this.unknownDataLength(item.name), x, y2, maxWidth,'left');
-      } else {
-        let rate = list[i].denominator;
-        let textWidth = this.textWidth(rate +"%");
-        this.drawItemName(item, x, y2, maxWidth - textWidth - this.itemPadding());
-        this.drawText(rate +"%", x, y2, maxWidth,'right');
-      }
-      y2 += this.lineHeight();
-    }
-  }
-};
-
-Window_EnemyStatus.prototype.nameLength = function(name) {
-	return name.length;
-};
-
-Window_EnemyStatus.prototype.unknownDataLength = function(name) {
-const name_length = this.nameLength(name);
-let names = '';
-for(let i = 0; i < name_length ;i++) {
-  names += param.UnknownData;
-}
-return names;
-};
-
-Window_EnemyStatus.prototype.drawDesc1 = function(color, enemy, x, y, width, mask) {
-  if (param.Desc1Name) {
-    this.changeTextColor(ColorManager.textColor(color));
-    this.drawText(param.Desc1Name, x, y);
-    y += this.lineHeight();
-  }
-  if(this.unknownStatusFlag(enemy, mask) && !this.noUnknownStatus(enemy)){
-    return this;
-  }
-  this.resetTextColor();
-  const dataEnemy = enemy.enemy();
-  if(dataEnemy.meta.desc1){
-    this.drawTextEx(dataEnemy.meta.desc1, x, y, width);
+Window_EnemyBook.prototype.itemShow = function(list, enemy, x, y, width) {
+  switch (list.ShowItem) {
+    case 1:
+      this.enemyExp(list.NameColor, enemy, x, y, width);
+      return 1;
+    case 2:
+      this.enemyGold(list.NameColor, enemy, x, y, width);
+      return 1;
+    case 3:
+      this.defeat(list.NameColor, enemy, x, y, width);
+      return 1;
+    case 4:
+      this.originalParams(list.NameColor, enemy, x, y, width);
+      return 1;
+    case 10:
+      this.drawResistElement(list.NameColor, enemy, x, y, width);
+      return 2;
+    case 11:
+      this.drawWeakElement(list.NameColor, enemy, x, y, width);
+      return 2;
+    case 12:
+      this.drawNoEffectElement(list.NameColor, enemy, x, y, width);
+      return 2;
+    case 15:
+      this.drawResistStates(list.NameColor, enemy, x, y, width);
+      return 2;
+    case 16:
+      this.drawWeakStates(list.NameColor, enemy, x, y, width);
+      return 2;
+    case 17:
+      this.drawNoEffectStates(list.NameColor, enemy, x, y, width);
+      return 2;
+    case 20:
+      this.dropItems(list.NameColor, enemy, x, y, width);
+      return 4;
+    case 21:
+      this.stealItems(list.NameColor, enemy, x, y, width);
+      return 4;
+    case 30:
+      this.drawDesc1(list.NameColor, enemy, x, y, width);
+      return 2;
+    case 31:
+      this.drawDesc2(list.NameColor, enemy, x, y, width);
+      return 2;
+    case 32:
+      this.drawDesc3(list.NameColor, enemy, x, y, width);
+      return 2;
+    default:
+      return 1;
   }
 };
 
-Window_EnemyStatus.prototype.drawDesc2 = function(color, enemy, x, y, width, mask) {
-  if (param.Desc2Name) {
-    this.changeTextColor(ColorManager.textColor(color));
-    this.drawText(param.Desc2Name, x, y);
-    y += this.lineHeight();
-  }
-  if(this.unknownStatusFlag(enemy, mask) && !this.noUnknownStatus(enemy)){
-    return this;
-  }
-  this.resetTextColor();
-  const dataEnemy = enemy.enemy();
-  if(dataEnemy.meta.desc2){
-    this.drawTextEx(dataEnemy.meta.desc2, x, y, width);
-  }
-};
-
-Window_EnemyStatus.prototype.drawDesc3 = function(color, enemy, x, y, width, mask) {
-  if (param.Desc3Name) {
-    this.changeTextColor(ColorManager.textColor(color));
-    this.drawText(param.Desc3Name, x, y);
-    y += this.lineHeight();
-  }
-  if(this.unknownStatusFlag(enemy, mask) && !this.noUnknownStatus(enemy)){
-    return this;
-  }
-  this.resetTextColor();
-  const dataEnemy = enemy.enemy();
-  if(dataEnemy.meta.desc3){
-    this.drawTextEx(dataEnemy.meta.desc3, x, y, width);
-  }
-};
-
-
-Window_EnemyStatus.prototype.page = function(enemy, x, y) {
+Window_EnemyBook.prototype.page = function(enemy, x, y) {
   const list = this.pageList(this._pageMode + 1);
   if(!list) {
     return;
@@ -1655,118 +1586,416 @@ Window_EnemyStatus.prototype.page = function(enemy, x, y) {
   }
 };
 
-Window_EnemyStatus.prototype.unknownStatusFlag = function(enemy, mask) {
-  return mask && !$gameSystem.defeatNumber(enemy.enemyId()) > 0;
-};
-
-Window_EnemyStatus.prototype.noUnknownStatus = function(enemy) {
-  return enemy.enemy().meta.book === 'ShowData';
-};
-
-Window_EnemyStatus.prototype.noUnknownDrops = function(enemy) {
-  return enemy.enemy().meta.book === 'ShowDrop';
-};
-
-Window_EnemyStatus.prototype.noUnknownSteals = function(enemy) {
-  return enemy.enemy().meta.book === 'ShowSteal';
-};
-
-Window_EnemyStatus.prototype.pageList = function(page) {
-  if(page === 1){
-    return param.Page1List
-  } else if(page === 2) {
-    return param.Page2List
-  } else {
-    return param.Page3List
-  }
-};
-
-Window_EnemyStatus.prototype.widthMode = function(mode) {
+Window_EnemyBook.prototype.widthMode = function(mode) {
   return mode ? this.itemWidth() - this.itemPadding() * 2 : this.maxWidth();
 };
 
-Window_EnemyStatus.prototype.itemShow = function(list, enemy, x, y, width) {
-  if(list.ShowItem == 1){
-    this.enemyExp(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 1;
-  } else if(list.ShowItem == 2) {
-    this.enemyGold(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 1;
-  } else if (list.ShowItem == 3) {
-    this.defeatEnemy(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 1;
-  } else if (list.ShowItem == 4) {
-    this.originalParams(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 1;
-  } else if (list.ShowItem == 10) {
-    this.drawResistElement(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
-  } else if (list.ShowItem == 11) {
-    this.drawWeakElement(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
-  } else if (list.ShowItem == 12) {
-    this.drawNoEffectElement(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
-  } else if (list.ShowItem == 13) {
-    //this.drawAbsorbElement(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
-  } else if (list.ShowItem == 15) {
-    this.drawResistStates(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
-  } else if (list.ShowItem == 16) {
-    this.drawWeakStates(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
-  } else if (list.ShowItem == 17) {
-    this.drawNoEffectStates(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
-  } else if (list.ShowItem == 20) {
-    this.dropItems(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 4;
-  } else if (list.ShowItem == 21) {
-    this.stealItems(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 4;
-  } else if (list.ShowItem == 30) {
-    this.drawDesc1(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
-  } else if (list.ShowItem == 31) {
-    this.drawDesc2(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
-  } else if (list.ShowItem == 32) {
-    this.drawDesc3(list.NameColor, enemy, x, y, width, list.MaskMode);
-    return 2;
+Window_EnemyBook.prototype.pageList = function(page) {
+  switch (page) {
+    case 1:
+      return param.Page1List
+    case 2:
+      return param.Page2List;
+    case 3:
+      return param.Page3List;
   }
-  return 1;
 };
 
-Window_EnemyStatus.prototype.HDGraphics = function() {
-  return Graphics.height >= 720;
+Window_EnemyBook.prototype.enemyImg = function(enemy) {
+  const name = this.enemyBattlerName(enemy);
+	const hue = enemy.battlerHue();
+	let bitmap;
+  	if ($gameSystem.isSideView()) {
+      	bitmap = ImageManager.loadSvEnemy(name);
+  	} else {
+      	bitmap = ImageManager.loadEnemy(name);
+    }
+    Sprite_Battler.prototype.setHue.call(this._enemySprite, hue);
+    this._enemySprite.bitmap = bitmap;
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.addLoadListener(this.drowEnemy.bind(this));
+    } else {
+      this.drowEnemy(this);
+    }
 };
 
-Window_EnemyStatus.prototype.refresh = function() {
-	const enemy = this._enemy;
-  const padding = this.itemPadding();
-  let x = padding;
-  let x2 = x + this.itemWidth() / 2;
-  let y = 0;
-  const lineHeight = this.lineHeight();
+Window_EnemyBook.prototype.drowEnemy = function() {
+  if(this._enemySprite.bitmap) {
+    const bitmapWidth = this._enemySprite.bitmap.width;
+    const bitmapHeight = this._enemySprite.bitmap.height;
+    const contentsWidth = this.maxWidth();
+    const contentsHeight = 350;
+    let scale = 1.0;
+    if (bitmapWidth > contentsWidth || bitmapHeight > contentsHeight) {
+		  if (bitmapWidth - contentsWidth > bitmapHeight - contentsHeight) {
+			  scale = contentsWidth / bitmapWidth;
+		  } else {
+		  	scale = contentsHeight / bitmapHeight;
+		  }
+    }
+  	this._enemySprite.scale.x = scale;
+  	this._enemySprite.scale.y = scale;
+  }
+};
 
-	this.contents.clear();
-  if (!enemy || !$gameSystem.isInEnemyBook(enemy)) {
-    this._enemySprite.bitmap = null;
+Window_EnemyBook.prototype.enemyBattlerName = function(enemy) {
+	return enemy.battlerName();
+};
+
+Window_EnemyBook.prototype.enemyName = function(enemy, x, y) {
+	this.resetTextColor();
+	this.drawText(enemy.name(), x, y, this.itemWidth() - 16, 'center');
+};
+
+Window_EnemyBook.prototype.enemyParams = function(enemy, x, y) {
+  const list = param.ParamList;
+	for (let i = 0; i < list.length; i++) {
+		this.changeTextColor(ColorManager.textColor(list[i].NameColor));
+		this.drawText(TextManager.param(list[i].ShowParams - 1), x, y, this.maxWidth());
+    this.resetTextColor();
+    let text;
+    if(this.paramMask()){
+      text = enemy.param(list[i].ShowParams - 1);
+    } else {
+      text = param.UnknownStatus;
+    }
+    const textWidth = this.textWidth(TextManager.param(list[i].ShowParams - 1)) + 8;
+		this.drawText(text, x + textWidth, y, this.maxWidth() - textWidth, 'right');
+		y += this.lineHeight();
+	}
+};
+
+Window_EnemyBook.prototype.enemyExp = function(color, enemy, x, y, width) {
+	this.changeTextColor(ColorManager.textColor(color));
+	this.drawText(TextManager.exp, x, y);
+  this.resetTextColor();
+  let text;
+  if(this.paramEXMask()) {
+    text = enemy.exp();
+  } else {
+    text = param.UnknownStatus;
+  }
+  const textWidth = this.textWidth(TextManager.exp) + 8;
+  this.drawText(text, x + textWidth, y, width - textWidth, 'right');
+};
+  
+Window_EnemyBook.prototype.enemyGold = function(color, enemy, x, y, width) {
+  this.changeTextColor(ColorManager.textColor(color));
+  this.drawText(param.MoneyName, x, y);
+  this.resetTextColor();
+  let text;
+  if(this.paramEXMask()){
+    text = enemy.gold();
+    const textWidth = this.textWidth(param.MoneyName) + 8;
+    this.drawCurrencyValue(text, this.currencyUnit(), x + textWidth, y, width - textWidth);
+  } else {
+    text = param.UnknownStatus;
+    this.drawText(text, x, y, width, 'right');
+  }
+};
+
+Window_EnemyBook.prototype.defeat = function(color, enemy, x, y, width) {
+  this.changeTextColor(ColorManager.textColor(color));
+  this.drawText(param.defeatEnemyName, x, y);
+  this.resetTextColor();
+  text = $gameSystem.defeatNumber(enemy.enemyId())
+  this.drawText(text, x, y, width, 'right');
+};
+
+Window_EnemyBook.prototype.originalParams = function(color, enemy, x, y, width) {
+  if(!param.originalParamName){
+    return this;
+  }
+	this.changeTextColor(ColorManager.textColor(color));
+	this.drawText(param.originalParamName, x, y);
+  this.resetTextColor();
+  let text;
+  if(this.paramEXMask()){
+    text = eval(param.originalParamEval);
+  } else {
+    text = param.UnknownStatus;
+  }
+	this.drawText(text, x, y, width, 'right');
+};
+
+Window_EnemyBook.prototype.drawResistElement = function(color, enemy, x, y, width) {
+  if(!param.ElementList){
     return;
   }
-  this.enemyImg(enemy);
-  this.enemyName(enemy, x, y);
-  y += lineHeight * (this.HDGraphics() && this.height >= 712 ? 2 : 1);
-  this.enemyParams(enemy, x2, y);
-  y += lineHeight * (this.height > 610 ? 9 : 8);//564:616
-  if (this._pageMode === 0) {
-    this.page(enemy, x, y);
-  } else if (this._pageMode === 1) {
-    this.page(enemy, x, y);
-  } else if (this._pageMode === 2) {
-    this.page(enemy, x, y);
+  this.changeTextColor(ColorManager.textColor(color));
+  this.drawText(param.ResistElementName, x, y);
+  if(!this.resistWeakDataMask()){
+    return this;
+  }
+  let icons = [];
+  param.ElementList.forEach(Element => {
+    if(Element.ElementNo){
+      let rate = enemy.elementRate(Element.ElementNo);
+      if(rate < 1 && param.ResistNoEffectElement || (rate < 1 && rate > 0 && !param.ResistNoEffectElement)){
+        let icon = Element.ElementIconId;
+        if (icon && icon > 0) icons.push(icon);
+      }
+    }
+  });
+	let dx = this.iconX(icons, width);
+  y += this.lineHeight();
+  icons.forEach(icon => {
+		this.drawIcon(icon, x, y);
+		x += dx;
+	});
+};
+
+Window_EnemyBook.prototype.drawWeakElement = function(color, enemy, x, y, width) {
+  if(!param.ElementList){
+    return;
+  }
+  this.changeTextColor(ColorManager.textColor(color));
+	this.drawText(param.WeakElementName, x, y);
+  if(!this.resistWeakDataMask()){
+    return this;
+  }
+  let icons = [];
+  param.ElementList.forEach(Element => {
+    if (Element.ElementNo) {
+      let rate = enemy.elementRate(Element.ElementNo);
+      if (rate > 1) {
+        icon= Element.ElementIconId;
+        if (icon && icon > 0) icons.push(icon);
+      }
+    }
+  });
+	let dx = this.iconX(icons, width);
+  y += this.lineHeight();
+  icons.forEach(icon => {
+		this.drawIcon(icon, x, y);
+		x += dx;
+	});
+};
+
+Window_EnemyBook.prototype.drawNoEffectElement = function(color, enemy, x, y, width, mask) {
+  if(!param.ElementList){
+    return;
+  }
+  this.changeTextColor(ColorManager.textColor(color));
+  this.drawText(param.NoEffectElementName, x, y);
+  if(!this.resistWeakDataMask()){
+    return this;
+  }
+  let icons = [];
+  param.ElementList.forEach(Element => {
+    if (Element.ElementNo) {
+      let rate = enemy.elementRate(Element.ElementNo);
+      if (rate <= 0) {
+        let icon= Element.ElementIconId;
+        if (icon && icon > 0) icons.push(icon);
+      }
+    }
+  });
+	let dx = this.iconX(icons, width);
+  y += this.lineHeight();
+  icons.forEach(icon => {
+		this.drawIcon(icon, x, y);
+		x += dx;
+	});
+};
+
+Window_EnemyBook.prototype.drawResistStates = function(color, enemy, x, y, width, mask) {
+  if(!param.StateList){
+    return;
+  }
+  this.changeTextColor(ColorManager.textColor(color));
+  this.drawText(param.ResistStateName, x, y);
+  if(!this.resistWeakDataMask()){
+    return this;
+  }
+  let icons = [];
+  param.StateList.forEach(State => {
+    if(State.StateId){
+      let stateId = State.StateId;
+      let rate = enemy.stateRate(stateId);
+      if(rate < 1 && param.ResistNoEffectState || (rate < 1 && rate > 0 && !param.ResistNoEffectState)){
+        let icon = $dataStates[stateId].iconIndex;
+        if (icon && icon > 0) icons.push(icon);
+      }
+    }
+  });
+  let dx = this.iconX(icons, width);
+  y += this.lineHeight();
+  icons.forEach(icon => {
+	  this.drawIcon(icon, x, y);
+	  x += dx;
+  });
+};
+
+Window_EnemyBook.prototype.drawWeakStates = function(color, enemy, x, y, width, mask) {
+  if(!param.StateList){
+    return;
+  }
+  this.changeTextColor(ColorManager.textColor(color));
+  this.drawText(param.WeakStateName, x, y);
+  if(!this.resistWeakDataMask()){
+    return this;
+  }
+  let icons = [];
+  param.StateList.forEach(State => {
+  if(State.StateId){
+    let stateId = State.StateId;
+    let rate = enemy.stateRate(stateId);
+    if (rate > 1 && !param.NormalWeakState || rate >= 1 && param.NormalWeakState) {
+      let icon = $dataStates[stateId].iconIndex;
+      if (icon && icon > 0) icons.push(icon);
+      }
+    }
+  });
+  let dx = this.iconX(icons, width);
+  y += this.lineHeight();
+  icons.forEach(icon => {
+	  this.drawIcon(icon, x, y);
+	  x += dx;
+  });
+};
+
+Window_EnemyBook.prototype.drawNoEffectStates = function(color, enemy, x, y, width, mask) {
+  if(!param.StateList){
+    return;
+  }
+  this.changeTextColor(ColorManager.textColor(color));
+  this.drawText(param.NoEffectStateName, x, y);
+  if(!this.resistWeakDataMask()){
+    return this;
+  }
+  let icons = [];
+  param.StateList.forEach(State => {
+    if(State.StateId){
+      let stateId = State.StateId;
+      let icon = null;
+      let rate = enemy.stateRate(stateId);
+      if (rate <= 0 || enemy.isStateResist(stateId)) {
+        icon = $dataStates[stateId].iconIndex;
+        if (icon && icon > 0) icons.push(icon);
+      }
+    }
+  });
+  let dx = this.iconX(icons, width);
+  y += this.lineHeight();
+  icons.forEach(icon => {
+	  this.drawIcon(icon, x, y);
+	  x += dx;
+	});
+};
+
+Window_EnemyBook.prototype.dropItems = function(color, enemy, x, y, width, mask) {
+  const maxWidth = width;
+	this.changeTextColor(ColorManager.textColor(color));
+  this.drawText(param.dropItemsName, x, y);
+  let y2 = y + this.lineHeight();
+  let list = this._enemy.dropItems;
+  for(i = 0; i < list.length; i++){
+    if(list[i].kind > 0){
+      let item = enemy.itemObject(list[i].kind, list[i].dataId);
+      if(this.showDropItemMask() && this.dropItemFlag(i)) {
+        let rate = list[i].denominator;
+        let textWidth = this.textWidth("1/" + rate);
+        this.drawItemName(item, x, y2, maxWidth - textWidth - this.itemPadding());
+        this.drawText("1/" + rate, x, y2, maxWidth,'right');
+      } else {
+        this.resetTextColor();
+        this.drawText(this.unknownDataLength(item.name), x, y2, maxWidth,'left');
+      }
+      y2 += this.lineHeight();
+    }
   }
 };
 
+Window_EnemyBook.prototype.stealItems = function(color, enemy, x, y, width, mask) {
+	if(!param.ShowStealItems || !Imported.NUUN_StealableItems) {
+		return this;
+	}
+	const maxWidth = width;
+	this.changeTextColor(ColorManager.textColor(color));
+  this.drawText(param.StealItemsName, x, y);
+  let y2 = y + this.lineHeight();
+  let list = enemy._stealItems;
+  for(let i = 0; list.length > i; i++){
+    if (list[i].kind > 0 && list[i].kind < 4) {
+      let item = enemy.stealObject(list[i].kind, list[i].dataId);
+      if(this.showStealItemMask() && this.stealItemFlag(i)) {
+        let rate = list[i].denominator;
+        let textWidth = this.textWidth(rate +"%");
+        this.drawItemName(item, x, y2, maxWidth - textWidth - this.itemPadding());
+        this.drawText(rate +"%", x, y2, maxWidth,'right');
+      } else {
+        this.resetTextColor();
+        this.drawText(this.unknownDataLength(item.name), x, y2, maxWidth,'left');
+      }
+      y2 += this.lineHeight();
+    }
+  }
+};
+
+Window_EnemyBook.prototype.drawDesc1 = function(color, enemy, x, y, width, mask) {
+  if (param.Desc1Name) {
+    this.changeTextColor(ColorManager.textColor(color));
+    this.drawText(param.Desc1Name, x, y);
+    y += this.lineHeight();
+  }
+  if(this.paramEXMask()){
+    this.resetTextColor();
+    if(this._enemy.meta.desc1){
+      this.drawTextEx(this._enemy.meta.desc1, x, y, width);
+    }
+  }
+};
+
+Window_EnemyBook.prototype.drawDesc2 = function(color, enemy, x, y, width, mask) {
+  if (param.Desc2Name) {
+    this.changeTextColor(ColorManager.textColor(color));
+    this.drawText(param.Desc2Name, x, y);
+    y += this.lineHeight();
+  }
+  if(this.paramEXMask()){
+    this.resetTextColor();
+    if(this._enemy.meta.desc2){
+      this.drawTextEx(this._enemy.meta.desc2, x, y, width);
+    }
+  }
+};
+
+Window_EnemyBook.prototype.drawDesc3 = function(color, enemy, x, y, width, mask) {
+  if (param.Desc3Name) {
+    this.changeTextColor(ColorManager.textColor(color));
+    this.drawText(param.Desc3Name, x, y);
+    y += this.lineHeight();
+  }
+  if(this.paramEXMask()){
+    this.resetTextColor();
+    if(this._enemy.meta.desc3){
+      this.drawTextEx(this._enemy.meta.desc3, x, y, width);
+    }
+  }
+};
+
+Window_EnemyBook.prototype.nameLength = function(name) {
+	return name.length;
+};
+
+Window_EnemyBook.prototype.unknownDataLength = function(name) {
+  const name_length = this.nameLength(name);
+  let names = '';
+  for(let i = 0; i < name_length ;i++) {
+    names += param.UnknownData;
+  }
+  return names;
+  };
+
+Window_EnemyBook.prototype.iconX = function(icons, width) {
+	if (32 * icons.length > width) {
+		return Math.floor(width / icons.length);
+	}
+	return 32;
+};
+
+Window_EnemyBook.prototype.currencyUnit = function() {
+  return TextManager.currencyUnit;
+};
 })();

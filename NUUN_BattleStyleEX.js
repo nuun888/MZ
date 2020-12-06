@@ -56,22 +56,7 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
- * @param ActorsButlers
- * @text アクターの画像設定
  * 
- * @param ActorsButlerList
- * @text 画像設定
- * @desc アクターの画像設定
- * @default []
- * @type struct<actorsButlerList>[]
- * @parent ActorsButlers
- * 
- * @param damageImgFrame
- * @desc ダメージ時の画像変化フレーム。
- * @text ダメージ時変化フレーム
- * @type number
- * @default 30
- * @min 1
  * @parent ActorsButlers
  * 
  * @param Window
@@ -163,7 +148,26 @@
  * 
  * 
  * @param ActorStatus
- * @text アクターステータス位置設定
+ * @text アクター設定
+ * 
+ * @param ActorsButlers
+ * @text アクターの画像設定
+ * @parent ActorStatus
+ * 
+ * @param ActorsButlerList
+ * @text 画像設定
+ * @desc アクターの画像設定
+ * @default []
+ * @type struct<actorsButlerList>[]
+ * @parent ActorsButlers
+ * 
+ * @param damageImgFrame
+ * @desc ダメージ時の画像変化フレーム。
+ * @text ダメージ時変化フレーム
+ * @type number
+ * @default 30
+ * @min 1
+ * @parent ActorsButlers
  * 
  * @param ActorNameChangePosition
  * @text アクター名位置設定
@@ -578,6 +582,7 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   }
 }));
 
+//Game_Temp
 Game_Temp.prototype.setBattleEffectsRefresh = function(flag) {
   this._battleEffectRefresh = flag;
 };
@@ -586,6 +591,7 @@ Game_Temp.prototype.isBattleEffectsRefresh = function() {
   return this._battleEffectRefresh || false;
 };
 
+//Game_Actor
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);

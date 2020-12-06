@@ -6,11 +6,11 @@
 [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>
 
 <b>戦闘</b><br>
-[NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)　バトルレイアウト変更<br>
+[NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)　バトルスタイル拡張<br>
 [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)　解像度変更時のバトルポジション修正<br>
+[NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)　戦闘背景の変更<br>
   
 <b>アイテム</b><br>
-NUUN_MaxItem　アイテムの個別最大所持数<br>
 [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増加アイテム、スキル<br>
 NUUN_ConsumptionItemアイテム消耗率<br>
@@ -22,7 +22,6 @@ NUUN_ConsumptionItemアイテム消耗率<br>
 [NUUN_AddStateFix](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateFix.js)　ステートの付与方法変更<br>
 
 <b>メニュー系</b><br>
-NUUN_MenuScreen　メニュー画面（ワイド画面推奨）<br>
 [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)　エネミー図鑑<br>
 [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)　コマンドアイコン<br>
 [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)　ステータス画面スタイル変更<br>
@@ -42,7 +41,3 @@ NUUN_MenuScreen　メニュー画面（ワイド画面推奨）<br>
 <b>イベント</b><br>
 [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)  アイテムのランダム取得<br>
 
-<b>MZ移植</b><br>
-こちらのプラグインは各製作者様の規約に依存します。<br>
-NUUN_SkillCostEX  スキルコスト拡張（tomoaky様）<br>
-NUUN_CostShowEX　コスト表示拡張（tomoaky様）<br>

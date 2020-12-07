@@ -31,6 +31,9 @@
  * 2020/11/26 Ver 1.0.7
  *  特殊パラメータでSparamIdを3に設定し、SparamNameを空欄の状態でステータス画面を開くと
  *  本来「薬の知識」が出るところ「回復効果率」と表示されてしまう問題を修正。
+ * 
+ * 2020/12/7 Ver 1.1.0
+ *  次のレベルまでの経験値数値を百分率表示に出来るよう対応。
  */ 
 /*:
  * @target MZ
@@ -82,6 +85,12 @@
  * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
  * @type boolean
  * @default true
+ * 
+ * @param ExpPercent
+ * @text 経験値百分率表示
+ * @desc 経験値を百分率で表示
+ * @type boolean
+ * @default false
  * 
  * @param ParamName
  * @text 能力値の名称
@@ -920,7 +929,6 @@ Window_StatusSParams.prototype.drawItem = function(index) {
 };
 
 Window_StatusSParams.prototype.SparamName = function(index) {
-  console.log()
   switch (param.Sparam[index].SparamId) {
     case 0:
       return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : "狙われ率";
@@ -1105,11 +1113,28 @@ Sprite_StatusExpGauge.prototype.bitmapWidth = function() {
 };
 
 Sprite_StatusExpGauge.prototype.drawValue = function() {
-  const currentValue = this._battler.isMaxLevel() ? "-------" : this._battler.nextRequiredExp();
+  let currentValue = 0;
   const width = this.bitmapWidth();
   const height = this.bitmapHeight();
   this.setupValueFont();
+  if (param.ExpPercent) {
+    currentValue = this._battler.isMaxLevel() ? "100%" : this.currentDecimal(this.currentPercent()) +"%";
+  } else {
+    currentValue = this._battler.isMaxLevel() ? "-------" : this._battler.nextRequiredExp();
+  }
   this.bitmap.drawText(currentValue, 0, 0, width, height, "right");
+};
+
+Sprite_StatusExpGauge.prototype.currentPercent = function() {
+  return (this._battler.currentExp() - this._battler.currentLevelExp()) / (this._battler.nextLevelExp() - this._battler.currentLevelExp()) * 100;
+};
+
+Sprite_StatusExpGauge.prototype.currentDecimal = function(val) {
+  if (param.DecimalMode) {
+    return Math.round(val * (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1)) / (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1);
+  } else {
+    return Math.floor(val * (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1)) / (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1);
+  }
 };
 
 Sprite_StatusExpGauge.prototype.currentValue = function() {

@@ -8,6 +8,9 @@
  * 
  * 更新履歴
  * 2020/12/6 Ver 1.0.0
+ * 
+ * 2020/12/ Ver 1.0.1
+ * バトラーアニメーションに勝利、詠唱時の画像を変更する機能を追加。
  */ 
 /*:
  * @target MZ
@@ -468,6 +471,20 @@
  * @dir img/pictures
  * @parent ActorButlers
  * 
+ * @param victoryImg
+ * @text 勝利時画像
+ * @desc 勝利時の画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * @parent ActorButlers
+ * 
+ * @param chantImg
+ * @text 詠唱時画像
+ * @desc 詠唱時の画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * @parent ActorButlers
+ * 
  * @param stateImg
  * @text 被ステート時画像
  * @desc 被ステート時の画像を設定します。
@@ -497,6 +514,22 @@
  * @param dyingFaceIndex
  * @desc 瀕死時のインデックス番号。
  * @text 瀕死時インデックス番号
+ * @type number
+ * @default -1
+ * @min -1
+ * @parent ActorFace
+ * 
+ * @param victoryFaceIndex
+ * @desc 勝利時のインデックス番号。
+ * @text 勝利時インデックス番号
+ * @type number
+ * @default -1
+ * @min -1
+ * @parent ActorFace
+ * 
+ * @param chantFaceIndex
+ * @desc 詠唱時のインデックス番号。
+ * @text 詠唱時インデックス番号
  * @type number
  * @default -1
  * @min -1
@@ -1023,6 +1056,8 @@ Window_BattleActorImges.prototype.undefinedDeta = function(id, deta) {
   deta.deathFaceIndex = -1;
   deta.damageFaceIndex = -1;
   deta.dyingFaceIndex = -1;
+  deta.victoryFaceIndex = -1;
+  deta.chantFaceIndex = -1;
   deta.stateBitmap = [];
   return deta;
 };
@@ -1038,6 +1073,12 @@ Window_BattleActorImges.prototype.loadBitmap = function(deta) {
   }
   if (deta.damageImg) {
     deta.damageBitmap = ImageManager.loadPicture(deta.damageImg);
+  }
+  if (deta.victoryImg) {
+    deta.victoryBitmap = ImageManager.loadPicture(deta.victoryImg);
+  }
+  if (deta.chantImg) {
+    deta.chantBitmap = ImageManager.loadPicture(deta.chantImg);
   }
   if (deta.stateImg){
     for (const listdeta of deta.stateImg) {
@@ -1284,8 +1325,12 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
       this.changeBitmap("revive");
     } else if ((stateMotion === 1 || stateMotion === 2) && this.stateImgCheck(true)) {
       this.changeBitmap("alwaysAbnormal");
+    } else if (actor._imgIndex === 5 && this.changeCheck("victory")) {
+      this.changeBitmap("victory");
     } else if (actor._imgIndex === 3 && this.changeCheck("damage")) {
       this.changeBitmap("damage");
+    } else if (actor.isChanting() && this.changeCheck("chant")) {
+      this.changeBitmap("chant");
     } else if ((stateMotion === 1 || stateMotion === 2) && this.stateImgCheck(false)) {
       this.changeBitmap("abnormal");
     } else if (actor.isDying() && this.changeCheck("dying")) {
@@ -1323,6 +1368,18 @@ Sprite_ActorImges.prototype.changeCheck = function(bitmapType){
       } else {
         return this._deta.dyingBitmap ? true :false;
       }
+    case "victory":
+      if (mode) {
+        return this._deta.victoryFaceIndex > 0 ? true : false;
+      } else {
+        return this._deta.victoryBitmap ? true :false;
+      }
+    case "chant":
+      if (mode) {
+        return this._deta.chantFaceIndex > 0 ? true : false;
+      } else {
+        return this._deta.chantBitmap ? true :false;
+      }
   }
 };
 
@@ -1348,6 +1405,15 @@ Sprite_ActorImges.prototype.changeBitmap = function(bitmapType) {
         this.setDamage();
       }
       break;
+    case "chant":
+      if(this._imgIndex !== 4) {
+        this.setChant();
+      }
+      break;
+    case "victory":
+      if (this._imgIndex !== 5) {
+        this.setVictory();
+      }
     case "alwaysAbnormal":
       if (this._imgIndex < 2000) {
         this.setState(true);
@@ -1358,8 +1424,6 @@ Sprite_ActorImges.prototype.changeBitmap = function(bitmapType) {
         this.setState(false);
       }
       break;
-    case "chant":
-    case "victory":
     case "normal":
       if (this._imgIndex !== 0) {
         this.setDefault();
@@ -1397,9 +1461,19 @@ Sprite_ActorImges.prototype.refreshBitmap = function() {
         this.bitmap = this._deta.damageBitmap;
       }
     } else if (this._imgIndex === 4) { //詠唱
-
+      if (mode) {
+        faceIndex = this._deta.chantFaceIndex;
+        this.faceRefresh(faceIndex);
+      } else {
+        this.bitmap = this._deta.chantBitmap;
+      }
     } else if (this._imgIndex === 5) { //勝利
-
+      if (mode) {
+        faceIndex = this._deta.victoryFaceIndex;
+        this.faceRefresh(faceIndex);
+      } else {
+        this.bitmap = this._deta.victoryBitmap;
+      }
     } else if (this._imgIndex >= 1000) { //ステート
       if (mode) {
         faceIndex = this._deta.stateBitmap[this._changeStateImgId].FaceId;
@@ -1456,6 +1530,22 @@ Sprite_ActorImges.prototype.setRevive = function(){
     this._imgIndex = 2;
   } else {
     this._imgIndex = 0;
+  }
+};
+
+Sprite_ActorImges.prototype.setVictory = function(){
+  const mode = this.faceMode();
+  if ((mode && this._deta.victoryFaceIndex > 0) || (!mode && this._deta.victoryBitmap)) {
+    this._updateCount = Infinity;
+    this._imgIndex = 5;
+  }
+};
+
+Sprite_ActorImges.prototype.setChant = function(){
+  const mode = this.faceMode();
+  if ((mode && this._deta.chantFaceIndex > 0) || (!mode && this._deta.chantBitmap) && this._updateCount <= 0) {
+    this._updateCount = 1;
+    this._imgIndex = 4;
   }
 };
 

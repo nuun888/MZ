@@ -11,6 +11,10 @@
  * 
  * 2020/12/7 Ver 1.0.1
  * バトラーアニメーションに勝利、詠唱時の画像を変更する機能を追加。
+ * 
+ * 2020/12/8 Ver 1.0.2
+ * 戦闘開始時に戦闘不能のアクター画像が一瞬表示されないように修正。
+ * 
  */ 
 /*:
  * @target MZ
@@ -22,7 +26,7 @@
  * 　アクターの立ち絵を表示できるようになります。
  * 　フロントビューバトルでもアニメーション、ダメージエフェクトを表示できるようになります。
  * 　アクターステータスの位置を変更することが出来ます。
- * 　戦闘不能時やダメージを受けた時、瀕死の時に顔グラフィック、立ち絵を変更することが出来ます。
+ * 　戦闘不能時やダメージを受けた時、瀕死、勝利、詠唱時に顔グラフィック、立ち絵を変更することが出来ます。
  * 
  * 仕様
  * パーティコマンドは画面上部、画面上部からアクターステータス欄の中間、アクターステータス欄の上部
@@ -1130,7 +1134,6 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor, deta) 
   const y = rect.y + rect.height - (sprite.bitmap.height * deta.Actor_Scale / 100) + 7 + param.ActorImg_Y + deta.Actor_Y;
   sprite.scale.x = deta.Actor_Scale / 100;
   sprite.scale.y = deta.Actor_Scale / 100;
-  sprite._imgIndex = 0;
   sprite._battler = actor;
   sprite._deta = deta;
   sprite.setup();
@@ -1154,7 +1157,6 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor, deta) {
   const sx = (actor.faceIndex() % 4) * pw + (pw - sw) / 2;
   const sy = Math.floor(actor.faceIndex() / 4) * ph + (ph - sh) / 2;
   sprite.setFrame(sx, sy, sw, sh);
-  sprite._imgIndex = 0;
   sprite._battler = actor;
   sprite._deta = deta;
   sprite._rectWidth = rect.width;
@@ -1294,6 +1296,7 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._durationOpacity = 0;
   this._updateCount = 0;
   this._changeStateImgId = 0;
+  this._startUpdate = true;
 };
 
 Sprite_ActorImges.prototype.setup = function() {
@@ -1340,6 +1343,9 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
     }
     this.refreshBitmap();
     actor._imgIndex = 0;
+    if (this._startUpdate) {
+      this._startUpdate = false;
+    }
   }
 };
 
@@ -1496,11 +1502,11 @@ Sprite_ActorImges.prototype.updateAnimation = function(){
   if (this._updateCount > 0) {
     this._updateCount--;
     if(this._durationOpacity > 0){
-      this.opacity -= 8.5;
+      this.opacity -= 255 / this.setDeadDuration();
       this.opacity = Math.max(this.opacity, 0);
       this._durationOpacity = this.opacity;
     } else if (this._durationOpacity < 0) {
-      this.opacity += 8.5;
+      this.opacity += 255 / this.setDeadDuration();
       this.opacity = Math.min(this.opacity, 255);
       this._durationOpacity = this.opacity - 255;
     }
@@ -1581,7 +1587,7 @@ Sprite_ActorImges.prototype.setDefault = function(){
 };
 
 Sprite_ActorImges.prototype.setDeadDuration = function(){
-  return 30;
+  return this._startUpdate ? 1 : 30;
 };
 
 Sprite_ActorImges.prototype.setDamageDuration = function(){
@@ -1659,6 +1665,7 @@ Spriteset_Base.prototype.animationTarget = function(targetSprites){
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
   _Spriteset_Battle_createLowerLayer.call(this);
+  //ExStandingPictureBattle.create(this);
   this.createBattleHud();
   this.createHudBack();
   this.createEffects();

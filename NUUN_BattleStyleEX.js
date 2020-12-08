@@ -1665,7 +1665,6 @@ Spriteset_Base.prototype.animationTarget = function(targetSprites){
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
   _Spriteset_Battle_createLowerLayer.call(this);
-  //ExStandingPictureBattle.create(this);
   this.createBattleHud();
   this.createHudBack();
   this.createEffects();

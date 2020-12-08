@@ -14,6 +14,9 @@
  * 
  * 2020/11/22 Ver 1.0.2
  *  バトルログに表示するように対応。
+ * 
+ * 2020/12/8 Ver 1.0.3
+ * 最大レベルの累計必要経験値超えて取得してしまう不具合を修正。
  */ 
 /*:
  * 
@@ -69,6 +72,7 @@ Imported.NUUN_ExpItem = true;
       } else if (item.meta.NolevelDown && expVal < 0) {
         expVal = Math.max(this.currentLevelExp() - this.currentExp(), expVal);
       }
+      expVal = Math.min(this.expForLevel(this.maxLevel()) - this.currentExp(), expVal);
       if(expVal) {
         this.gainExp(expVal);
         if($gameParty.inBattle()) {

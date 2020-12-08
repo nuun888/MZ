@@ -34,6 +34,9 @@
  * 
  * 2020/12/7 Ver 1.1.0
  *  次のレベルまでの経験値表示を百分率表示に出来るよう対応。
+ * 
+ * 2020/12/8 Ver 1.1.1
+ *  最大レベル時の次のレベルまでの経験値表示のゲージMAXで100％で表示するように修正。
  */ 
 /*:
  * @target MZ
@@ -1139,7 +1142,7 @@ Sprite_StatusExpGauge.prototype.currentDecimal = function(val) {
 
 Sprite_StatusExpGauge.prototype.currentValue = function() {
   if (this._battler) {
-    return this._battler.currentExp() - this._battler.currentLevelExp();
+    return this._battler.isMaxLevel() ? this.currentMaxValue() : this._battler.currentExp() - this._battler.currentLevelExp();
   }
 };
 

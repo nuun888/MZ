@@ -7,14 +7,16 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2020/12/6 Ver 1.0.0
- * 
- * 2020/12/7 Ver 1.0.1
+ * 2020/12/6 Ver.1.0.0
+ * 初版
+ * 2020/12/7 Ver.1.0.1
  * バトラーアニメーションに勝利、詠唱時の画像を変更する機能を追加。
- * 
- * 2020/12/8 Ver 1.0.2
+ * 2020/12/8 Ver.1.0.2
  * 戦闘開始時に戦闘不能のアクター画像が一瞬表示されないように修正。
- * 
+ * 2020/12/9 Ver.1.1.0
+ * 一部のプラグインでの立ち絵画像がアクターステータスウィンドウの前面に表示されてしまうため、
+ * アクターステータスウィンドウを立ち絵より前面に表示させるように処理方法を変更。
+ * アクターステータスウィンドウに背景画像を指定出来る機能を追加。
  */ 
 /*:
  * @target MZ
@@ -84,10 +86,17 @@
  * @parent Window
  * 
  * @param cursorBackShow
- * @desc 背景を表示する。
- * @text 背景表示
+ * @desc カーソル背景を表示する。
+ * @text カーソル背景表示
  * @type boolean
  * @default true
+ * @parent Window
+ * 
+ * @param windowBackground
+ * @desc 背景画像ウィンドウを指定する。
+ * @text 背景画像ウィンドウ
+ * @type file
+ * @dir img/system
  * @parent Window
  * 
  * @param PartyCommand
@@ -660,7 +669,13 @@ Game_Enemy.prototype.bareHandsAnimationId = function() {
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
 Scene_Battle.prototype.initialize = function() {
   _Scene_Battle_initialize.call(this);
-  this._battleMember = 0;
+};
+
+const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
+Scene_Battle.prototype.createSpriteset = function() {
+  _Scene_Battle_createSpriteset.call(this);
+  this._spriteset.createStatusLayer();
+  this.addChild(this._spriteset._battleHudBase);
 };
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
@@ -1662,10 +1677,15 @@ Spriteset_Base.prototype.animationTarget = function(targetSprites){
 };
 
 //Spriteset_Battle
-const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
-Spriteset_Battle.prototype.createLowerLayer = function() {
-  _Spriteset_Battle_createLowerLayer.call(this);
+const _Spriteset_Battle_loadSystemImages = Spriteset_Battle.prototype.loadSystemImages;
+Spriteset_Battle.prototype.loadSystemImages = function() {
+  _Spriteset_Battle_loadSystemImages.call(this);
+  this.windowBackground = ImageManager.loadSystem(param.windowBackground);
+};
+
+Spriteset_Battle.prototype.createStatusLayer = function() {
   this.createBattleHud();
+  this.createBackgroundStatus();
   this.createHudBack();
   this.createEffects();
   this.createHudStatus();
@@ -1673,15 +1693,22 @@ Spriteset_Battle.prototype.createLowerLayer = function() {
 };
 
 Spriteset_Battle.prototype.createBattleHud = function() {
-  const sprite = new Sprite();
-  this._baseSprite.addChild(sprite);
-  this._battleHudBase = sprite;
+  this._baseStatusSprite = new Sprite();
+  this.addChild(this._baseStatusSprite);
+  this._battleHudBase = this._baseStatusSprite;
 };
 
 Spriteset_Battle.prototype.createHudBack = function() {
   const sprite = new Sprite();
   this._battleHudBase.addChild(sprite);
   this._battleHudBack = sprite;
+};
+
+Spriteset_Battle.prototype.createBackgroundStatus = function() {
+  const sprite = new Sprite();
+  this._battleHudBase.addChild(sprite);
+  sprite.bitmap = this.windowBackground;
+  this._backgroundSprite = sprite;
 };
 
 Spriteset_Battle.prototype.createHudStatus = function() {
@@ -1719,6 +1746,18 @@ Spriteset_Battle.prototype.createFrontActors = function() {
     }
   }
 };
+
+const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
+Spriteset_Battle.prototype.update = function() {
+  _Spriteset_Battle_update.call(this);
+  this.updateBackground();
+};
+
+Spriteset_Battle.prototype.updateBackground = function() {
+  this._backgroundSprite.x = 0;
+  this._backgroundSprite.y = Graphics.height - this._backgroundSprite.bitmap.height;
+};
+
 
 const _Spriteset_Battle_createBattleField = Spriteset_Battle.prototype.createBattleField;
 Spriteset_Battle.prototype.createBattleField = function() {

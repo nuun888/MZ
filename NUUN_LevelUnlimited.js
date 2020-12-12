@@ -25,7 +25,7 @@
  * <LearnSkill:105> レベル１０５にレベルアップした時にスキルを習得します。
  * 
  * 
- * 利用規約
+ * 利用規
  * このプラグインはMITライセンスで配布しています。
  * 
  */
@@ -59,7 +59,7 @@ Game_Actor.prototype.initSkills = function() {
   this._skills = [];
   for (const learning of this.currentClass().learnings) {
     let learnLv = Number(this.learnSkillNote(learning));
-    learnLv = learnLv > 0 ? learnLv : learning.level;console.log(learnLv)
+    learnLv = learnLv > 0 ? learnLv : learning.level;
     if (learnLv <= this._level) {
       this.learnSkill(learning.skillId);
     }
@@ -69,7 +69,7 @@ Game_Actor.prototype.initSkills = function() {
 Game_Actor.prototype.levelUp = function() {
   this._level++;
   for (const learning of this.currentClass().learnings) {
-    let learnLv = Number(this.learnSkillNote(learning));console.log(learnLv)
+    let learnLv = Number(this.learnSkillNote(learning));
     learnLv = learnLv > 0 ? learnLv : learning.level;
     if (learnLv === this._level) {
       this.learnSkill(learning.skillId);

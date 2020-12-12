@@ -8,6 +8,10 @@
  * 
  * 更新履歴
  * 2020/12/12 Ver 1.0.0
+ * 初版
+ * 
+ * 2020/12/12 Ver 1.0.1
+ *  レベル１００以上のステータスの計算が間違っていたのを修正。
  */ 
 /*:
  * @target MZ
@@ -39,7 +43,7 @@ const _Game_Actor_paramBase = Game_Actor.prototype.paramBase;
 Game_Actor.prototype.paramBase = function(paramId) {
   if (this._level >= 100) {
     const u_levelParam = this.currentClass().params[paramId][99];
-    const d_levelParam = this.currentClass().params[paramId][95];
+    const d_levelParam = this.currentClass().params[paramId][94];
     return this.overLevelParam(u_levelParam, d_levelParam);
   } else {
     return _Game_Actor_paramBase.call(this, paramId);

@@ -16,10 +16,12 @@
  * 2020/12/9 Ver.1.1.0
  * アクターステータスウィンドウの表示処理を見直し。
  * アクターステータスウィンドウに背景画像を指定出来る機能を追加。
+ * 2020/12/9 Ver.1.1.1
+ * 名前を非表示にできる機能を追加。
  */ 
 /*:
  * @target MZ
- * @plugindesc バトルスタイル拡張。
+ * @plugindesc バトルスタイル拡張
  * @author NUUN
  * 
  * @help
@@ -122,7 +124,7 @@
  * @desc 表示するコマンド項目数。
  * @text 表示コマンド項目数
  * @type number
- * @default 4
+ * @default 99
  * @min 0
  * @parent ActorCommand
  * 
@@ -187,6 +189,13 @@
  * @param ActorNameChangePosition
  * @text アクター名位置設定
  * @parent ActorStatus
+ * 
+ * @param NameShow
+ * @desc 名前を表示します。
+ * @text 名前表示
+ * @type boolean
+ * @default true
+ * @parent ActorNameChangePosition
  * 
  * @param NameChangePosition
  * @desc 名前の座標変更を許可する。
@@ -970,7 +979,9 @@ Window_BattleStatus.prototype.drawItemStatus = function(index) {
   if(param.TPBShow){
     this.placeTimeGauge(actor, timeX, timeY);
   }
-  this.placeActorName(actor, nameX, nameY);
+  if (param.NameShow) {
+    this.placeActorName(actor, nameX, nameY);
+  }
   this.placeStateIcon(actor, stateIconX, stateIconY);
   this.placeStatusGauges(actor, rect);
 };

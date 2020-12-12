@@ -8,10 +8,12 @@
  * 
  * 更新履歴
  * 2020/12/12 Ver 1.0.0
+ * 初版
+ * 2020/12/13 Ver 1.0.1
  */ 
 /*:
  * @target MZ
- * @plugindesc 最大レベル変動プラグイン  
+ * @plugindesc 最大レベル変動プラグイン
  * @author NUUN
  * @orderBefore NUUN_LevelUnlimited
  * 
@@ -61,7 +63,7 @@ Game_Actor.prototype.initMembers = function() {
 };
 
 Game_Actor.prototype.changeMaxLevel = function(changeMaxLevel) {
-  if (!Imported.NUUN_LevelUnlimited) {
+  if (!Imported.NUUN_LevelUnlimited && !Imported.VisuMZ_0_CoreEngine) {
     Math.min(changeMaxLevel, 99);
   }
   this._maxLevel = (this._level <= changeMaxLevel ? changeMaxLevel : this._maxLevel);

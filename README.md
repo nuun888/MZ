@@ -20,7 +20,6 @@ NUUN_ConsumptionItemアイテム消耗率<br>
 [NUUN_AddStateFix](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateFix.js)　ステートの付与方法変更<br>
 
 <b>アクター</b><br>
-[NUUN_StatusParamEX]()　アクターのステータス上限<br>
 [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js)　レベル上限限界突破<br>
 [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)　最大レベル変動<br>
 

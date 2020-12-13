@@ -11,7 +11,6 @@
 [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)　戦闘背景の変更<br>
   
 <b>アイテム</b><br>
-[NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増加アイテム、スキル<br>
 NUUN_ConsumptionItemアイテム消耗率<br>
 
@@ -22,8 +21,9 @@ NUUN_ConsumptionItemアイテム消耗率<br>
 [NUUN_AddStateFix](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateFix.js)　ステートの付与方法変更<br>
 
 <b>メニュー系</b><br>
+[NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>
 [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)　エネミー図鑑<br>
-[NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)　コマンドアイコン<br>
+[NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)　コマンドカスタマイズ<br>
 [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)　ステータス画面スタイル変更<br>
 
 
@@ -32,12 +32,14 @@ NUUN_ConsumptionItemアイテム消耗率<br>
 [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js)　巨大エネミー<br>
 [NUUN_EnemyParamNoLimit](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js)　エネミーのステータス上限限界突破<br>
 [NUUN_StatusParamEX]()　アクターのステータス上限<br>
-[NUUN_LevelEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelEX.js)　アクターのレベル上限突破及びレベル上限変動<br>
+[NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js)　レベル上限限界突破<br>
+[NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)　最大レベル変動<br>
 
 <b>敵グループ</b><br>
-[NUUN_BattleBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js)　敵グループの個別BGM<br>
+[NUUN_BattleBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js)　敵グループの個別ＢＧＭ設定<br>
+[NUUN_BattleME](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleME.js)　敵グループの個別戦闘勝利敗北ME設定<br>
 [NUUN_EncounterCondition](https://github.com/nuun888/MZ/blob/master/NUUN_EncounterCondition.js)　エンカウント条件<br>
 
 <b>イベント</b><br>
-[NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)  アイテムのランダム取得<br>
+[NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)  アイテムなどのランダム取得<br>
 

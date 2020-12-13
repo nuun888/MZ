@@ -10,7 +10,7 @@
 [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)　戦闘背景の変更<br>
   
 <b>アイテム</b><br>
-[NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増加アイテム、スキル<br>
+[NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>
 NUUN_ConsumptionItemアイテム消耗率<br>
 
 <b>スキル</b><br>

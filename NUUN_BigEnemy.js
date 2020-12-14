@@ -7,7 +7,10 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2020/11/22 Ver 1.0.0
+ * 2020/11/22 Ver.1.0.0
+ * 初版
+ * 2020/12/15 Ver.1.0.1
+ * OriginalRatioモードの時にポップアップの位置がずれるのを修正。
  */ 
 /*:
  * @target MZ
@@ -40,25 +43,34 @@ Imported.NUUN_BigEnemy = true;
   Sprite_Enemy.prototype.setBattler = function(battler) {
     _Sprite_Enemy_setBattler.call(this, battler);
     if($dataEnemies[battler._enemyId].meta.BigEnemy){
+      const name = this._enemy.battlerName();
       this._bigEnemy = $dataEnemies[battler._enemyId].meta.BigEnemy;
+      if ($gameSystem.isSideView()) {
+        bitmap = ImageManager.loadSvEnemy(name);
+      } else {
+        bitmap = ImageManager.loadEnemy(name);
+      }
+      if (this._bigEnemy) {
+        if (bitmap && !bitmap.isReady()) {
+          bitmap.addLoadListener(this.setBigEnemy.bind(this, bitmap));
+        } else {
+          this.setBigEnemy(bitmap);
+        }
+      }
     }
   };
 
-  const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
-  Sprite_Enemy.prototype.updateBitmap = function() {
-    _Sprite_Enemy_updateBitmap.call(this);
-    if(this._bigEnemy){
-      this.scale.x = Graphics.width / this.width;
-      this._homeX = Graphics.boxWidth / 2;
-      let height = 0;
-      if(this._bigEnemy === 'OriginalRatio') {
-        this.scale.y = this.scale.x;
-        height = (Graphics.height - this.height * this.scale.y) / 2;
-      } else {
-        this.scale.y = Graphics.height / this.height;
-      }
-      this._homeY = (Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight + 24 - height;
+  Sprite_Enemy.prototype.setBigEnemy = function(bitmap) {
+    this.scale.x = Graphics.width / bitmap.width;
+    this._homeX = Graphics.boxWidth / 2;
+    let height = 0;
+    if(this._bigEnemy === 'OriginalRatio') {
+      this.scale.y = this.scale.x;
+      height = (Graphics.height - bitmap.height * this.scale.y) / 2;
+    } else {
+      this.scale.y = Graphics.height / bitmap.height;
     }
+    this._homeY = (Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight + 24 - height;
   };
 
   const _Sprite_Enemy_updateStateSprite = Sprite_Enemy.prototype.updateStateSprite;
@@ -75,7 +87,7 @@ Imported.NUUN_BigEnemy = true;
   Sprite_Enemy.prototype.damageOffsetY = function() {
     let y = _Sprite_Enemy_damageOffsetY.call(this);
     if(this._bigEnemy){
-      y -= Graphics.boxHeight / 2;
+      y -= this._bigEnemy === 'OriginalRatio' ? this.bitmap.height * this.scale.y / 2 : Graphics.boxHeight / 2;
     }
     return y;
   };

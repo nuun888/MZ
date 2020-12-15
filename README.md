@@ -6,7 +6,7 @@
 
 <b>戦闘</b><br>
 [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)　バトルスタイル拡張<br>
-[NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)　解像度変更時のバトルポジション修正<br>
+[NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)　解像度変更時のアクター、エネミー、戦闘背景座標調整プラグイン<br>
 [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)　戦闘背景の変更<br>
   
 <b>アイテム</b><br>

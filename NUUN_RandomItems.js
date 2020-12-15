@@ -8,6 +8,9 @@
  * 
  * 更新履歴
  * 2020/11/22 Ver 1.0.0
+ * 初版
+ * 2020/12/15 Ver 1.1.0
+ * MOG_TreasurePopup対応。
  */ 
 /*:
  * @target MZ
@@ -110,17 +113,29 @@
  * @desc 取得時のメッセージ。
  * @type string
  */
+var Imported = Imported || {};
+Imported.NUUN_RandomItems = true;
 
 (() => {
+  'use strict';
   const parameters = PluginManager.parameters('NUUN_RandomItems');
   const GetTextMessage = String(parameters['GetTextMessage'] || 'を手に入れた！');
   const GetItemMessage = eval(parameters['GetItemMessage'] || true);
   const CommonListIdVar = Number(parameters['CommonListIdVar'] || 0);
+  let eventId = 0;
   
   const pluginName = "NUUN_RandomItems";
   PluginManager.registerCommand(pluginName, 'ItemList', args => {
     $gameParty.randomItems(args);
   });
+
+  const _Game_Interpreter_command357 = Game_Interpreter.prototype.command357;
+  Game_Interpreter.prototype.command357 = function(params) {
+    if (params[0] === "NUUN_RandomItems") {
+      eventId = this._eventId;
+    }
+    return _Game_Interpreter_command357.call(this, params);
+  };
 
   Game_Party.prototype.randomItems = function(args) {
     const list = JSON.parse( JSON.stringify(args ,
@@ -134,6 +149,9 @@
     }
     const itemData = this.randomItemList(list);
     const interpreter = new Game_Interpreter();
+    interpreter.clear();
+    interpreter._eventId = eventId;//MOG_TreasurePopup対応のため
+    eventId = 0;
     if(itemData.itemType === "common") {
       $gameTemp.reserveCommonEvent(itemData.deta);
       return this;

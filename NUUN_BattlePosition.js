@@ -7,9 +7,9 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2020/11 Ver 1.0.0
+ * 2020/12/15 Ver.1.0.0
  */ 
-/*:ja
+/*:
  * @target MZ
  * @plugindesc 解像度変更時のバトルエネミー及びバトル背景の位置調整
  * @author NUUN
@@ -20,15 +20,9 @@
  * 解像度を変更した際、サイドビュー時のアクターの表示位置を右寄りに変更。
  * また、サイドビューアクターの基本XY座標を調整できます。
  * 
- * フロントビューではバトル背景画像が上部起点で表示されてしまうため、
- * 解像度を横に広げた際にエネミーが宙に浮いたように表示されてしまいます。
- * このプラグインではバトル背景のY座標を変更することが出来ます。
- * 数値は解像度によって違うのでその都度、座標を調整してください。
- * デフォルトでは0です。
- * また調整が面倒という方は、画面サイズ調整をtrueにするとバトル背景が画面解像度
- * に合わせて表示されるようになります。
- * なおサイドビューバトルには対応しておりませんのでBackgroundPosition
- * で調整してください。
+ * 戦闘背景のY座標を調整できます。
+ * 
+ * 画面上部が見切れて表示されてるエネミーにステートが付与された時のアイコン表示が画面から見切れて表示される問題を修正。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -46,14 +40,22 @@
  * @default 0
  * @min -999
  * 
- * @param EnemyPosition
+ * @param EnemyXPosition
+ * @desc エネミーの基本X座標を移動させます。
+ * @text エネミーXポジション
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param EnemyYPosition
  * @desc エネミーの基本Y座標を移動させます。
  * @text エネミーYポジション
  * @type number
  * @default 0
+ * @min -999
  * 
  * @param BackgroundFit
- * @desc バトル背景を画面サイズに合わせる。
+ * @desc バトル背景を画面サイズに合わせる。(フロントビューのみ)
  * @text 画面サイズ調整
  * @type boolean
  * @default false
@@ -63,6 +65,7 @@
  * @text バトル背景Yポジション
  * @type number
  * @default 0
+ * @min -999
  * 
  */
 var Imported = Imported || {};
@@ -72,26 +75,31 @@ Imported.NUUN_BattlePosition = true;
   const parameters = PluginManager.parameters('NUUN_BattlePosition');
   const actorXPosition = Number(parameters['ActorSideViewXPosition'] || 0);
   const actorYPosition = Number(parameters['ActorSideViewYPosition'] || 0);
-  const enemyPosition = Number(parameters['EnemyPosition'] || 0);
+  const enemyXPosition = Number(parameters['EnemyXPosition'] || 0);
+  const enemyYPosition = Number(parameters['EnemyYPosition'] || 0);
   const backgroundFit = eval(parameters['BackgroundFit'] || false);
   const backgroundPosition = Number(parameters['BackgroundPosition'] || 0);
   
+  const _Game_Enemy_screenX = Game_Enemy.prototype.screenX;
+  Game_Enemy.prototype.screenX = function() {
+    return _Game_Enemy_screenX.call(this) + (Graphics.boxWidth - 808) / 2;
+  };
+
+  const _Game_Enemy_screenY = Game_Enemy.prototype.screenY;
+  Game_Enemy.prototype.screenY = function() {
+    return _Game_Enemy_screenY.call(this) + (Graphics.boxHeight - 616) / 2;
+};
+
   Sprite_Actor.prototype.setActorHome = function(index) {
-    let x = (Graphics.boxWidth - 808) / 2 + actorXPosition + 600;
-    let y = (Graphics.boxHeight - 616) / 2 + actorYPosition + 280;
-    this.setHome(x + index * 32, y + index * 48);
+    const x = ((Graphics.boxWidth - 808) / 2 + actorXPosition + 600) + index * 32;
+    const y = ((Graphics.boxHeight - 616) / 2 + actorYPosition + 280) + index * 48;
+    this.setHome(x, y);
   };
   
   Sprite_Enemy.prototype.setBattler = function(battler) {
     Sprite_Battler.prototype.setBattler.call(this, battler);
     this._enemy = battler;
-    let x = (Graphics.boxWidth - 808) / 2;
-    let y = (Graphics.boxHeight - 616) / 2 + enemyPosition;
-    if ($gameSystem.isSideView()) {
-      this.setHome(battler.screenX(), battler.screenY() + y);
-    } else {
-      this.setHome(battler.screenX() + x, battler.screenY() + y);
-    }
+    this.setHome(battler.screenX() + enemyXPosition, battler.screenY() + enemyYPosition);
     this._stateIconSprite.setup(battler);
   };
 

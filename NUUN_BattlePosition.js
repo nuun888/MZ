@@ -11,7 +11,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc 解像度変更時のバトルエネミー及びバトル背景の位置調整
+ * @plugindesc 解像度変更時のアクター、エネミー、戦闘背景座標調整プラグイン
  * @author NUUN
  *            
  * @help 解像度を変更し、UIエリアの横幅を変更した際エネミー画像の表示位置が左寄り
@@ -79,16 +79,6 @@ Imported.NUUN_BattlePosition = true;
   const enemyYPosition = Number(parameters['EnemyYPosition'] || 0);
   const backgroundFit = eval(parameters['BackgroundFit'] || false);
   const backgroundPosition = Number(parameters['BackgroundPosition'] || 0);
-  
-  const _Game_Enemy_screenX = Game_Enemy.prototype.screenX;
-  Game_Enemy.prototype.screenX = function() {
-    return _Game_Enemy_screenX.call(this) + (Graphics.boxWidth - 808) / 2;
-  };
-
-  const _Game_Enemy_screenY = Game_Enemy.prototype.screenY;
-  Game_Enemy.prototype.screenY = function() {
-    return _Game_Enemy_screenY.call(this) + (Graphics.boxHeight - 616) / 2;
-};
 
   Sprite_Actor.prototype.setActorHome = function(index) {
     const x = ((Graphics.boxWidth - 808) / 2 + actorXPosition + 600) + index * 32;
@@ -99,7 +89,9 @@ Imported.NUUN_BattlePosition = true;
   Sprite_Enemy.prototype.setBattler = function(battler) {
     Sprite_Battler.prototype.setBattler.call(this, battler);
     this._enemy = battler;
-    this.setHome(battler.screenX() + enemyXPosition, battler.screenY() + enemyYPosition);
+    let x = battler.screenX() + ($gameSystem.isSideView() ? 0 : (Graphics.boxWidth - 808) / 2) + enemyXPosition;
+    let y = battler.screenY() + (Graphics.boxHeight - 616) / 2 + enemyYPosition;
+    this.setHome(x, y);
     this._stateIconSprite.setup(battler);
   };
 

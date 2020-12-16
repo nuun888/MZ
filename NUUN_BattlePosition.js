@@ -8,10 +8,13 @@
  * 
  * 更新履歴
  * 2020/12/15 Ver.1.0.0
+ * 初版
+ * 2020/12/16 Ver.1.0.1
+ * UIサイズ変更時のエネミーの座標シフト方法にUIサイズに比例してシフトする機能を追加。
  */ 
 /*:
  * @target MZ
- * @plugindesc 解像度変更時のアクター、エネミー、戦闘背景座標調整プラグイン
+ * @plugindesc 解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整プラグイン
  * @author NUUN
  *            
  * @help UIサイズを変更した際、エネミー、アクターの表示座標がUI画面の左上基準に表示される問題を修正。
@@ -23,6 +26,7 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
  * 
  * @param ActorSideViewXPosition
  * @desc アクターの基本X座標を移動させます。
@@ -36,6 +40,12 @@
  * @type number
  * @default 0
  * @min -999
+ * 
+ * @param EnemyXPositionMode
+ * @desc UI横幅変更時のエネミーのシフト方法を指定します。（true:そのまま右にシフト　false:UI横幅サイズに比例してシフト）
+ * @text UI横幅変更時エネミーXシフト座標モード
+ * @type boolean
+ * @default true
  * 
  * @param EnemyXPosition
  * @desc エネミーの基本X座標を移動させます。
@@ -72,6 +82,7 @@ Imported.NUUN_BattlePosition = true;
   const parameters = PluginManager.parameters('NUUN_BattlePosition');
   const actorXPosition = Number(parameters['ActorSideViewXPosition'] || 0);
   const actorYPosition = Number(parameters['ActorSideViewYPosition'] || 0);
+  const EnemyXPositionMode = eval(parameters['EnemyXPositionMode'] || true);
   const enemyXPosition = Number(parameters['EnemyXPosition'] || 0);
   const enemyYPosition = Number(parameters['EnemyYPosition'] || 0);
   const backgroundFit = eval(parameters['BackgroundFit'] || false);
@@ -86,10 +97,14 @@ Imported.NUUN_BattlePosition = true;
   Sprite_Enemy.prototype.setBattler = function(battler) {
     Sprite_Battler.prototype.setBattler.call(this, battler);
     this._enemy = battler;
-    let x = battler.screenX() + ($gameSystem.isSideView() ? 0 : (Graphics.boxWidth - 808) / 2) + enemyXPosition;
+    let x = this.setPosition(battler) + enemyXPosition;
     let y = battler.screenY() + (Graphics.boxHeight - 616) / 2 + enemyYPosition;
     this.setHome(x, y);
     this._stateIconSprite.setup(battler);
+  };
+
+  Sprite_Enemy.prototype.setPosition = function(battler) {
+    return $gameSystem.isSideView() ? 0 : EnemyXPositionMode ? (Graphics.boxWidth - 808) / 2 + battler.screenX(): Graphics.boxWidth / 808 * battler.screenX();
   };
 
   const _Sprite_Battleback_adjustPosition = Sprite_Battleback.prototype.adjustPosition;

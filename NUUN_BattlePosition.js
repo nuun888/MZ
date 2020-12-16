@@ -11,6 +11,8 @@
  * 初版
  * 2020/12/16 Ver.1.0.1
  * UIサイズ変更時のエネミーの座標シフト方法にUIサイズに比例してシフトする機能を追加。
+ * 2020/12/16 Ver.1.0.1.1
+ * サイドビューバトルでエネミーの座標が左端に表示されてしまう問題を修正。
  */ 
 /*:
  * @target MZ
@@ -104,7 +106,7 @@ Imported.NUUN_BattlePosition = true;
   };
 
   Sprite_Enemy.prototype.setPosition = function(battler) {
-    return $gameSystem.isSideView() ? 0 : EnemyXPositionMode ? (Graphics.boxWidth - 808) / 2 + battler.screenX(): Graphics.boxWidth / 808 * battler.screenX();
+    return $gameSystem.isSideView() ? battler.screenX() : (EnemyXPositionMode ? (Graphics.boxWidth - 808) / 2 + battler.screenX(): Graphics.boxWidth / 808 * battler.screenX());
   };
 
   const _Sprite_Battleback_adjustPosition = Sprite_Battleback.prototype.adjustPosition;

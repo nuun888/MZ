@@ -907,7 +907,7 @@ Scene_Battle.prototype.update = function() {
     this._actorCommandWindow.refresh();
     this._statusWindow._CommandRefresh = false;
   }
-  if (this._itemWindow.active || this._itemWindow.active || this._enemyWindow.active || $gameMessage.isBusy()) {
+  if (this._skillWindow.active || this._itemWindow.active || this._enemyWindow.active) {
     this.actorWindowOpacity()
   } else{
     this.actorWindowResetOpacity();

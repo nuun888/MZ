@@ -18,6 +18,8 @@
  * アクターステータスウィンドウに背景画像を指定出来る機能を追加。
  * 2020/12/9 Ver.1.1.1
  * 名前を非表示にできる機能を追加。
+ * 2020/12/16 Ver.1.1.2
+ * エネミー、アイテム、スキル選択画面を表示している時のアクターウィンドウに不透明度を指定できる機能を追加。
  */ 
 /*:
  * @target MZ
@@ -93,6 +95,15 @@
  * @default true
  * @parent Window
  * 
+ * @param ActorWindowSelectOpacity
+ * @desc エネミー、アイテム、スキル選択画面を表示している時のアクターウィンドウの不透明度
+ * @text 選択時ウィンドウ不透明度
+ * @type number
+ * @default 100
+ * @max 255
+ * @min 0
+ * @parent Window
+ * 
  * @param windowBackground
  * @desc 背景画像ウィンドウを指定する。
  * @text 背景画像ウィンドウ
@@ -123,7 +134,7 @@
  * @param ActorCommandMaxRow
  * @desc 表示するコマンド項目数。
  * @text 表示コマンド項目数
- * @type number
+ * @type numberI
  * @default 99
  * @min 0
  * @parent ActorCommand
@@ -873,6 +884,18 @@ Scene_Battle.prototype.endCommandSelection = function() {
   this._partyCommandWindow.opacity = 255;
 };
 
+Scene_Battle.prototype.actorWindowOpacity = function() {
+  this._statusWindow.opacity = param.ActorWindowSelectOpacity;
+  this._battleHudBack.opacity = param.ActorWindowSelectOpacity;
+  this._battleHudFront.opacity = param.ActorWindowSelectOpacity;
+};
+
+Scene_Battle.prototype.actorWindowResetOpacity = function() {
+  this._statusWindow.opacity = 255;
+  this._battleHudBack.opacity = 255;
+  this._battleHudFront.opacity = 255;
+};
+
 const _Scene_Battle_update  = Scene_Battle.prototype.update ;
 Scene_Battle.prototype.update = function() {
   _Scene_Battle_update.call(this);
@@ -883,6 +906,11 @@ Scene_Battle.prototype.update = function() {
     }
     this._actorCommandWindow.refresh();
     this._statusWindow._CommandRefresh = false;
+  }
+  if (this._itemWindow.active || this._itemWindow.active || this._enemyWindow.active || $gameMessage.isBusy()) {
+    this.actorWindowOpacity()
+  } else{
+    this.actorWindowResetOpacity();
   }
 };
 

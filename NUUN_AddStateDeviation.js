@@ -78,7 +78,7 @@ Game_Action.prototype.itemEffectAddNormalState = function(target, effect) {
   if(!this.certainState(effect.dataId)){
     chance *= target.stateRate(effect.dataId);
     chance *= this.noLukState(effect.dataId) ? 1.0 : this.lukEffectRate(target);
-  }console.log(this.noLukState(effect.dataId) ? 1.0 : this.lukEffectRate(target))
+  }
   if (Math.random() < chance) {
     target.addState(effect.dataId);
     this.makeSuccess(target);

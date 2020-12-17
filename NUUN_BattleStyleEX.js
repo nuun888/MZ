@@ -20,6 +20,9 @@
  * 名前を非表示にできる機能を追加。
  * 2020/12/16 Ver.1.1.2
  * エネミー、アイテム、スキル選択画面を表示している時のアクターウィンドウに不透明度を指定できる機能を追加。
+ * 2020/12/17 Ver.1.1.3
+ * メッセージウィンドウを下に表示（アクターウィンドウの前面）させないように修正。
+ * （メッセージウィンドウを下に表示で設定した場合、バトル中のみ自動的に上に表示されます）
  */ 
 /*:
  * @target MZ
@@ -39,11 +42,14 @@
  * アクターコマンドは各アクターの上部に表示されます。
  * エネミーの座標によりダメージエフェクトがアクターのグラフィックに被り、表示が見えなくなる場合があります。
  * フロントビュー時のエフェクトはアクターのグラフィックの前面、アクターステータスの背面に表示されます。
+ * メッセージ表示時にアクターウィンドウと重なって表示されるのを防ぐため、下に表示するメッセージウィンドウは
+ * 自動的に上に表示されます。
  * 
  * 
  * 立ち絵を表示させたい場合は、プラグインパラメータから「アクターの画像設定」
  * を選択し、各アクターに表示させる画像を指定させてください。
  * デフォルトの画像が指定されてない場合は顔グラフィックが表示されます。
+ * 戦闘不能時のアクター画像（顔グラ）を変えたくない場合（非表示）、同じ画像を（顔グラの場合はインデックス番号）を指定してください。
  * 
  * 顔グラフィックが８を超える場合は、複数の顔グラフィック画像を１つのファイルに結合してください。
  * （データベースのアクター設定の顔グラフィックでも反映されます）
@@ -684,6 +690,12 @@ Game_Enemy.prototype.bareHandsAnimationId = function() {
   return $dataEnemies[this._enemyId].meta.AttackAnimation || 1;
 };
 
+//Game_Message
+const _Game_Message_positionType = Game_Message.prototype.positionType;
+Game_Message.prototype.positionType = function() {
+  return $gameParty.inBattle() && this._positionType >= 2 ? 0 : _Game_Message_positionType.call(this);
+};
+
 //Scene_Battle
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
 Scene_Battle.prototype.initialize = function() {
@@ -727,6 +739,12 @@ Scene_Battle.prototype.createActorSelectWindow = function() {
   this._actorWindow.setHandler("ok", this.onActorOk.bind(this));
   this._actorWindow.setHandler("cancel", this.onActorCancel.bind(this));
   this._battleHudBack.addChild(this._actorWindow);
+};
+
+const _Scene_Battle_createMessageWindow = Scene_Battle.prototype.createMessageWindow;
+Scene_Battle.prototype.createMessageWindow = function() {
+  _Scene_Battle_createMessageWindow.call(this);
+  //$gameMessage.setPositionType(0);
 };
 
 const _Scene_Battle_createActorWindow = Scene_Battle.prototype.createActorWindow;

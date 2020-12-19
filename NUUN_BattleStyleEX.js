@@ -23,7 +23,9 @@
  * 2020/12/17 Ver.1.1.3
  * メッセージウィンドウを下に表示（アクターウィンドウの前面）させないように修正。
  * （メッセージウィンドウを下に表示で設定した場合、バトル中のみ自動的に上に表示されます）
- */ 
+ * 2020/12/19 Ver.1.2.0
+ * アクター選択時にアクター画像（顔グラ）を点滅させる処理を追加。
+ */
 /*:
  * @target MZ
  * @plugindesc バトルスタイル拡張
@@ -178,6 +180,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent Effect
+ * 
+ * @param ActorFlash
+ * @desc アクター選択時にアクター画像（顔グラ）点滅させる
+ * @text アクター選択時点滅
+ * @type boolean
+ * @default true
  * @parent Effect
  * 
  * 
@@ -741,12 +750,6 @@ Scene_Battle.prototype.createActorSelectWindow = function() {
   this._battleHudBack.addChild(this._actorWindow);
 };
 
-const _Scene_Battle_createMessageWindow = Scene_Battle.prototype.createMessageWindow;
-Scene_Battle.prototype.createMessageWindow = function() {
-  _Scene_Battle_createMessageWindow.call(this);
-  //$gameMessage.setPositionType(0);
-};
-
 const _Scene_Battle_createActorWindow = Scene_Battle.prototype.createActorWindow;
 Scene_Battle.prototype.createActorWindow = function() {
   //_Scene_Battle_createActorWindow.call(this);
@@ -903,9 +906,9 @@ Scene_Battle.prototype.endCommandSelection = function() {
 };
 
 Scene_Battle.prototype.actorWindowOpacity = function() {
-  this._statusWindow.opacity = param.ActorWindowSelectOpacity;
-  this._battleHudBack.opacity = param.ActorWindowSelectOpacity;
-  this._battleHudFront.opacity = param.ActorWindowSelectOpacity;
+  this._statusWindow.opacity = param.ActorWindowSelectOpacity || 100;
+  this._battleHudBack.opacity = param.ActorWindowSelectOpacity || 100;
+  this._battleHudFront.opacity = param.ActorWindowSelectOpacity || 100;
 };
 
 Scene_Battle.prototype.actorWindowResetOpacity = function() {
@@ -1368,6 +1371,7 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._updateCount = 0;
   this._changeStateImgId = 0;
   this._startUpdate = true;
+  this._selectionEffectCount = 0;
 };
 
 Sprite_ActorImges.prototype.setup = function() {
@@ -1376,7 +1380,12 @@ Sprite_ActorImges.prototype.setup = function() {
 
 Sprite_ActorImges.prototype.update = function() {
   Sprite.prototype.update.call(this);
-  this.updateBitmap();
+  if (this._battler) {
+    this.updateBitmap();
+    this.updateSelectionEffect();
+  } else {
+    this.bitmap = null;
+  }
 };
 
 Sprite_ActorImges.prototype.faceRefresh = function(faceIndex) {
@@ -1699,6 +1708,23 @@ Sprite_ActorImges.prototype.faceMode = function() {
   return this._deta._onFace ? true : false;
 };
 
+Sprite_ActorImges.prototype.updateSelectionEffect = function() {
+  if (!param.ActorFlash) {
+    return;
+  }
+  const target = this;
+  if (this._battler.isSelected()) {
+      this._selectionEffectCount++;
+      if (this._selectionEffectCount % 30 < 15) {
+          target.setBlendColor([255, 255, 255, 64]);
+      } else {
+          target.setBlendColor([0, 0, 0, 0]);
+      }
+  } else if (this._selectionEffectCount > 0) {
+      this._selectionEffectCount = 0;
+      target.setBlendColor([0, 0, 0, 0]);
+  }
+};
 
 function Sprite_BattleGauge() {
   this.initialize(...arguments);
@@ -1733,6 +1759,12 @@ Spriteset_Base.prototype.animationTarget = function(targetSprites){
 };
 
 //Spriteset_Battle
+const _Spriteset_Battle_initialize = Spriteset_Battle.prototype.initialize;
+Spriteset_Battle.prototype.initialize = function() {
+  _Spriteset_Battle_initialize.call(this);
+  this._backgroundVisible = false;
+};
+
 const _Spriteset_Battle_loadSystemImages = Spriteset_Battle.prototype.loadSystemImages;
 Spriteset_Battle.prototype.loadSystemImages = function() {
   _Spriteset_Battle_loadSystemImages.call(this);
@@ -1746,7 +1778,7 @@ Spriteset_Battle.prototype.createStatusLayer = function() {
   this.createEffects();
   this.createHudStatus();
   this.createFrontActors();
-};
+  };
 
 Spriteset_Battle.prototype.createBattleHud = function() {
   this._baseStatusSprite = new Sprite();
@@ -1806,12 +1838,15 @@ Spriteset_Battle.prototype.createFrontActors = function() {
 const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
 Spriteset_Battle.prototype.update = function() {
   _Spriteset_Battle_update.call(this);
-  this.updateBackground();
+  if (!this._backgroundVisible) {
+    this.updateBackground();
+  }
 };
 
 Spriteset_Battle.prototype.updateBackground = function() {
   this._backgroundSprite.x = 0;
   this._backgroundSprite.y = Graphics.height - this._backgroundSprite.bitmap.height;
+  this._backgroundVisible = true;
 };
 
 
@@ -1820,5 +1855,4 @@ Spriteset_Battle.prototype.createBattleField = function() {
   _Spriteset_Battle_createBattleField.call(this);
   this._effectsBackContainer = this._battleField;
 };
-
 })();

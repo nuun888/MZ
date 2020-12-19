@@ -24,7 +24,9 @@
  * メッセージウィンドウを下に表示（アクターウィンドウの前面）させないように修正。
  * （メッセージウィンドウを下に表示で設定した場合、バトル中のみ自動的に上に表示されます）
  * 2020/12/19 Ver.1.2.0
- * アクター選択時にアクター画像（顔グラ）を点滅させる処理を追加。
+ * アクター選択時にアクター画像（顔グラ）を点滅させる機能を追加。
+ * 2020/12/19 Ver.1.2.0.1
+ * アクターウィンドウ表示を非表示に設定しても表示してしまう不具合を修正。
  */
 /*:
  * @target MZ
@@ -906,13 +908,13 @@ Scene_Battle.prototype.endCommandSelection = function() {
 };
 
 Scene_Battle.prototype.actorWindowOpacity = function() {
-  this._statusWindow.opacity = param.ActorWindowSelectOpacity || 100;
+  this._statusWindow.opacity = param.WindowShow ? param.ActorWindowSelectOpacity || 100 : 0;
   this._battleHudBack.opacity = param.ActorWindowSelectOpacity || 100;
   this._battleHudFront.opacity = param.ActorWindowSelectOpacity || 100;
 };
 
 Scene_Battle.prototype.actorWindowResetOpacity = function() {
-  this._statusWindow.opacity = 255;
+  this._statusWindow.opacity = param.WindowShow ? 255 : 0;
   this._battleHudBack.opacity = 255;
   this._battleHudFront.opacity = 255;
 };

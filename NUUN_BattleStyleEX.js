@@ -85,7 +85,7 @@
  * @text ウィンドウ設定
  * 
  * @param WindowShow
- * @desc アクターウィンドウ画像を表示する。
+ * @desc アクターウィンドウを表示する。
  * @text アクターウィンドウ表示
  * @type boolean
  * @default true

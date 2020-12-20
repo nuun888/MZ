@@ -22,11 +22,18 @@
  * エネミー、アイテム、スキル選択画面を表示している時のアクターウィンドウに不透明度を指定できる機能を追加。
  * 2020/12/17 Ver.1.1.3
  * メッセージウィンドウを下に表示（アクターウィンドウの前面）させないように修正。
- * （メッセージウィンドウを下に表示で設定した場合、バトル中のみ自動的に上に表示されます）
+ * （メッセージウィンドウを下に表示で設定した場合、バトル中のみ自動的に上に表示されます）Ver.1.3.0で下側にも表示できるようになりました。
  * 2020/12/19 Ver.1.2.0
  * アクター選択時にアクター画像（顔グラ）を点滅させる機能を追加。
  * 2020/12/19 Ver.1.2.0.1
  * アクターウィンドウ表示を非表示に設定しても表示してしまう不具合を修正。
+ * 2020/12/21 Ver.1.3.0
+ * 戦闘不能時のアクター画像の表示をプラグインパラメータから選択出来る機能を追加。（従来の方法でも可能）
+ * パーティコマンドの表示位置、行数、列数を指定できるように変更。
+ * アクターコマンドに上、中間、アクターウィンドウの上に表示できる機能を追加。
+ * アクターコマンドの表示位置、行数、列数を指定できるように変更。
+ * エネミー出現、リザルト、敗北、逃走メッセージを画面上側か画面下側に表示を選択できる機能を追加。
+ * メッセージウインドウを下側にも表示可能に修正。メッセージウィンドウが下側に表示された場合でも「選択時ウィンドウ不透明度」が適用されます。
  */
 /*:
  * @target MZ
@@ -46,8 +53,6 @@
  * アクターコマンドは各アクターの上部に表示されます。
  * エネミーの座標によりダメージエフェクトがアクターのグラフィックに被り、表示が見えなくなる場合があります。
  * フロントビュー時のエフェクトはアクターのグラフィックの前面、アクターステータスの背面に表示されます。
- * メッセージ表示時にアクターウィンドウと重なって表示されるのを防ぐため、下に表示するメッセージウィンドウは
- * 自動的に上に表示されます。
  * 
  * 
  * 立ち絵を表示させたい場合は、プラグインパラメータから「アクターの画像設定」
@@ -114,6 +119,13 @@
  * @min 0
  * @parent Window
  * 
+ * @param MessageWindowPosition
+ * @text エネミー出現、リザルト、敗北、逃走メッセージ等上部表示
+ * @desc エネミー出現、リザルト、敗北、逃走メッセージ等を画面上側に表示させます。
+ * @type boolean
+ * @default false
+ * @parent Window
+ * 
  * @param windowBackground
  * @desc 背景画像ウィンドウを指定する。
  * @text 背景画像ウィンドウ
@@ -138,14 +150,115 @@
  * @default 0
  * @parent PartyCommand
  * 
+ * @param PartyCommandMaxRow
+ * @desc 表示するコマンド行数。
+ * @text 表示コマンド行数
+ * @type number
+ * @default 1
+ * @min 0
+ * @parent PartyCommand
+ * 
+ * @param PartyCommandMaxCol
+ * @desc 表示するコマンド列数。
+ * @text 表示コマンド列数
+ * @type number
+ * @default 4
+ * @min 0
+ * @parent PartyCommand
+ * 
+ * @param PartyCommandCenter
+ * @text コマンド中央表示
+ * @desc コマンドを中央に表示させます。
+ * @type boolean
+ * @default true
+ * @parent PartyCommand
+ * 
+ * @param PartyCommand_X
+ * @desc コマンドのX座標。
+ * @text コマンドX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent PartyCommand
+ * 
+ * @param PartyCommand_Y
+ * @desc コマンドのY座標。
+ * @text コマンドY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent PartyCommand
+ * 
+ * @param PartyCommand_Width
+ * @desc コマンドの横幅。
+ * @text コマンド横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent PartyCommand
+ * 
  * @param ActorCommand
  * @text アクターコマンド設定
  * 
+ * @param ActorCommandMode
+ * @text アクターコマンドの表示方法
+ * @desc アクターコマンドの表示方法を選択します。
+ * @type select
+ * @option 各アクターの上
+ * @value 0
+ * @option 上部
+ * @value 1
+ * @option 中間
+ * @value 2
+ * @option アクターウィンドウの上
+ * @value 3
+ * @default 0
+ * @parent ActorCommand
+ * 
  * @param ActorCommandMaxRow
- * @desc 表示するコマンド項目数。
- * @text 表示コマンド項目数
- * @type numberI
- * @default 99
+ * @desc 表示するコマンド行数。
+ * @text 表示コマンド行数
+ * @type number
+ * @default 4
+ * @min 0
+ * @parent ActorCommand
+ * 
+ * @param ActorCommandMaxCol
+ * @desc 表示するコマンド列数。
+ * @text 表示コマンド列数
+ * @type number
+ * @default 1
+ * @min 0
+ * @parent ActorCommand
+ * 
+ * @param ActorCommandCenter
+ * @text コマンド中央表示
+ * @desc コマンドを中央に表示させます。
+ * @type boolean
+ * @default true
+ * @parent ActorCommand
+ * 
+ * @param ActorCommand_X
+ * @desc コマンドのX座標。
+ * @text コマンドX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorCommand
+ * 
+ * @param ActorCommand_Y
+ * @desc コマンドのY座標。
+ * @text コマンドY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorCommand
+ * 
+ * @param ActorCommand_Width
+ * @desc コマンドの横幅。
+ * @text コマンド横幅
+ * @type number
+ * @default 0
  * @min 0
  * @parent ActorCommand
  * 
@@ -185,7 +298,7 @@
  * @parent Effect
  * 
  * @param ActorFlash
- * @desc アクター選択時にアクター画像（顔グラ）点滅させる
+ * @desc アクター選択時にアクター画像（顔グラ）点滅させます。
  * @text アクター選択時点滅
  * @type boolean
  * @default true
@@ -212,6 +325,13 @@
  * @type number
  * @default 30
  * @min 1
+ * @parent ActorsButlers
+ * 
+ * @param imgDeathHide
+ * @desc 戦闘不能になった場合、アクター画像（顔グラ）を非表示にします。
+ * @text 戦闘不能時アクター画像表示
+ * @type boolean
+ * @default false
  * @parent ActorsButlers
  * 
  * @param ActorNameChangePosition
@@ -701,10 +821,39 @@ Game_Enemy.prototype.bareHandsAnimationId = function() {
   return $dataEnemies[this._enemyId].meta.AttackAnimation || 1;
 };
 
-//Game_Message
-const _Game_Message_positionType = Game_Message.prototype.positionType;
-Game_Message.prototype.positionType = function() {
-  return $gameParty.inBattle() && this._positionType >= 2 ? 0 : _Game_Message_positionType.call(this);
+//BattleManager
+BattleManager.displayMessagePosition = function() {
+  $gameMessage._positionType = param.MessageWindowPosition ? 0 : 2;
+};
+
+const _BattleManager_displayStartMessages = BattleManager.displayStartMessages;
+BattleManager.displayStartMessages = function() {
+  _BattleManager_displayStartMessages.call(this);
+  this.displayMessagePosition();
+};
+
+const _BattleManager_displayVictoryMessage = BattleManager.displayVictoryMessage;
+BattleManager.displayVictoryMessage = function() {
+  _BattleManager_displayVictoryMessage.call(this);
+  this.displayMessagePosition();
+};
+
+const _BattleManager_displayDefeatMessage = BattleManager.displayDefeatMessage;
+BattleManager.displayDefeatMessage = function() {
+  _BattleManager_displayDefeatMessage.call(this);
+  this.displayMessagePosition();
+};
+
+const _BattleManager_displayEscapeSuccessMessage = BattleManager.displayEscapeSuccessMessage;
+BattleManager.displayEscapeSuccessMessage = function() {
+  _BattleManager_displayEscapeSuccessMessage.call(this);
+  this.displayMessagePosition();
+};
+
+const _BattleManager_displayEscapeFailureMessage = BattleManager.displayEscapeFailureMessage;
+BattleManager.displayEscapeFailureMessage = function() {
+  _BattleManager_displayEscapeFailureMessage.call(this);
+  this.displayMessagePosition();
 };
 
 //Scene_Battle
@@ -761,6 +910,7 @@ const _Scene_Battle_createActorCommandWindow = Scene_Battle.prototype.createActo
 Scene_Battle.prototype.createActorCommandWindow = function() {
   _Scene_Battle_createActorCommandWindow.call(this);
   this._actorCommandWindow.setStatusWindow(this._statusWindow);
+  this._actorCommandWindow.y = this.actorCommandY();
 };
 
 Scene_Battle.prototype.statusWindowRect = function() {
@@ -773,19 +923,64 @@ Scene_Battle.prototype.statusWindowRect = function() {
 };
 
 Scene_Battle.prototype.partyCommandWindowRect = function() {
-  const ww = Graphics.boxWidth;
+  const ww = param.PartyCommand_Width > 0 ? param.PartyCommand_Width : Graphics.boxWidth;
   const wh = this.partyWindowAreaHeight();
-  const wx = 0;
-  const wy = this.partyCommand_YPosition();
+  const wx = param.PartyCommandCenter ? Graphics.boxWidth / 2 - ww / 2 : 0 + param.PartyCommand_X;
+  const wy = this.partyCommand_YPosition() + param.PartyCommand_Y;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.actorCommandWindowRect = function() {
-  const ww = Math.min(Graphics.boxWidth / this._statusWindow.maxCols() - 12, 192);
-  const wh = this.windowAreaHeight();
-  const wx = 0;
+  const ww = this.actorCommandWidth(); 
+  const wh = this.actorCommandHeight();
+  const wx = this.actorCommandX();
   const wy = 0;
-  return new Rectangle(wx, wy, ww, wh);
+  const rect = new Rectangle(wx, wy, ww, wh);
+  rect.statusWindowHeight = this._statusWindow.height;
+  return rect;
+};
+
+Scene_Battle.prototype.actorCommandWidth = function() {
+  if (param.ActorCommand_Width > 0) {
+    return param.ActorCommand_Width;
+  }
+  if (param.ActorCommandMode === 0) {
+    return Math.min(Graphics.boxWidth / this._statusWindow.maxCols() - 12, 192);
+  } else if (param.ActorCommandMode >= 1) {
+    return Graphics.boxWidth;
+  } else {
+    return 0;
+  }
+};
+
+Scene_Battle.prototype.actorCommandHeight = function() {
+  if (param.ActorCommandMode === 0) {
+    return this.windowAreaHeight();
+  } else if (param.ActorCommandMode >= 1) {
+    return this.calcWindowHeight(param.ActorCommandMaxRow, true);
+  } else {
+    return 0;
+  }
+};
+
+Scene_Battle.prototype.actorCommandX = function() {
+  if (param.ActorCommandMode === 0) {
+    return 0;
+  } else if (param.ActorCommandMode >= 1) {
+    return param.ActorCommandCenter ? Graphics.boxWidth / 2 - this.actorCommandWidth() / 2 : 0 + param.ActorCommand_X;
+  } else {
+    return 0;
+  }
+};
+
+Scene_Battle.prototype.actorCommandY = function() {
+  if (param.ActorCommandMode === 0) {
+    return 0;
+  } else if (param.ActorCommandMode >= 1) {
+    return this.actorCommand_YPosition() + param.ActorCommand_Y;
+  } else {
+    return 0;
+  }
 };
 
 const _Scene_Battle_enemyWindowRect = Scene_Battle.prototype.enemyWindowRect;
@@ -796,7 +991,11 @@ Scene_Battle.prototype.enemyWindowRect = function() {
 };
 
 Scene_Battle.prototype.partyWindowAreaHeight = function() {
-  return this.calcWindowHeight(1, true);
+  return this.calcWindowHeight(param.PartyCommandMaxRow, true);
+};
+
+Scene_Battle.prototype.actorWindowAreaHeight = function() {
+  return this.calcWindowHeight(param.ActorCommandMaxRow, true);
 };
 
 Scene_Battle.prototype.updateStatusWindowPosition = function() {
@@ -812,6 +1011,17 @@ Scene_Battle.prototype.partyCommand_YPosition = function() {
   }
 };
 
+Scene_Battle.prototype.actorCommand_YPosition = function() {
+  if (param.ActorCommandMode === 1) {
+    return 0;
+  } else if (param.ActorCommandMode === 2) {
+    return this._statusWindow.y / 2 - (this.actorWindowAreaHeight() / 2);
+  } else if (param.ActorCommandMode === 3){
+    return Graphics.boxHeight - this.windowAreaHeight() - this.actorWindowAreaHeight();
+  }
+  return 0;
+};
+
 const _Scene_Battle_start = Scene_Battle.prototype.start;
 Scene_Battle.prototype.start = function() {
   _Scene_Battle_start.call(this);
@@ -819,27 +1029,12 @@ Scene_Battle.prototype.start = function() {
   this._actorStatus.refresh();
 };
 
-const _Scene_Battle_stop = Scene_Battle.prototype.stop;
-Scene_Battle.prototype.stop = function() {
-  _Scene_Battle_stop.call(this);
-  this._actorImges.close();
-  this._actorStatus.close();
-};
-
+const _Scene_Battle_updateStatusWindowVisibility = Scene_Battle.prototype.updateStatusWindowVisibility;
 Scene_Battle.prototype.updateStatusWindowVisibility = function() {
-  this._statusWindow.open();
-  this._actorImges.open();
-  this._actorStatus.open();
-  this.updateStatusWindowPosition();
-};
-
-const _Scene_Battle_startPartyCommandSelection = Scene_Battle.prototype.startPartyCommandSelection;
-Scene_Battle.prototype.startPartyCommandSelection = function() {
-  _Scene_Battle_startPartyCommandSelection.call(this)
-  this._actorImges.show();
-  this._actorImges.open();
-  this._actorStatus.show();
-  this._actorStatus.open();
+  _Scene_Battle_updateStatusWindowVisibility.call(this);
+  if (this.shouldOpenStatusWindow()) {
+    this._statusWindow.show();
+  }
 };
 
 const _Scene_Battle_commandSkill = Scene_Battle.prototype.commandSkill;
@@ -930,16 +1125,44 @@ Scene_Battle.prototype.update = function() {
     this._actorCommandWindow.refresh();
     this._statusWindow._CommandRefresh = false;
   }
-  if (this._skillWindow.active || this._itemWindow.active || this._enemyWindow.active) {
+  if (this._skillWindow.active || this._itemWindow.active || this._enemyWindow.active || this._messageWindow.messageUnder) {
     this.actorWindowOpacity()
   } else{
     this.actorWindowResetOpacity();
   }
 };
 
+//Window_Message
+const _Window_Message_updatePlacement = Window_Message.prototype.updatePlacement;
+Window_Message.prototype.updatePlacement = function() {
+  _Window_Message_updatePlacement.call(this);
+  this.messageUnder = $gameParty.inBattle() && this._positionType === 2 ? true : false;
+};
+
+const _Window_Message_terminateMessage = Window_Message.prototype.terminateMessage;
+Window_Message.prototype.terminateMessage = function() {
+  _Window_Message_terminateMessage.call(this);
+  this.messageUnder = false;
+};
+
 //Window_PartyCommand
+const _Window_PartyCommand_initialize = Window_PartyCommand.prototype.initialize;
+Window_PartyCommand.prototype.initialize = function(rect) {
+  _Window_PartyCommand_initialize.call(this, rect);
+  this.statusWindowHeight = rect.statusWindowHeight;
+};
+
 Window_PartyCommand.prototype.maxCols = function() {
-  return (this._list ? Math.min(this._list.length, 4) : 4);
+  return Math.ceil((this._list ? Math.min(this._list.length, param.PartyCommandMaxCol) : param.PartyCommandMaxCol));
+};
+
+const _Window_PartyCommand_refresh = Window_PartyCommand.prototype.refresh;
+Window_PartyCommand.prototype.refresh = function() {
+  _Window_PartyCommand_refresh.call(this);
+  this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.PartyCommandMaxCol), param.PartyCommandMaxRow));
+  if (param.PartyCommandPosition === 2) {
+    this.y = Graphics.boxHeight - (this.height + this.statusWindowHeight) + (param.WindowFrameShow ? 0 : 6) + param.PartyCommand_Y;
+  }
 };
 
 //Window_ActorCommand
@@ -948,16 +1171,25 @@ Window_ActorCommand.prototype.selectActor = function(actor) {
   return members.indexOf(actor);
 };
 
+Window_ActorCommand.prototype.maxCols = function() {
+  return Math.ceil((this._list ? Math.min(this._list.length, param.ActorCommandMaxCol) : param.ActorCommandMaxCol));
+};
+
 const _Window_ActorCommand_refresh = Window_ActorCommand.prototype.refresh;
 Window_ActorCommand.prototype.refresh = function() {
   _Window_ActorCommand_refresh.call(this);
   const actorIndex = this.selectActor(this._actor);
-  if (actorIndex >= 0 || this._actor) {
+  if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode === 0) {
     const rect = this._statusWindow.itemRect(actorIndex);
-    this.height = this.fittingHeight(Math.min(this.maxItems(), param.ActorCommandMaxRow));
-    this.width = Math.min(this.width, rect.width);
-    this.x = ((rect.width - this.width) / 2) + rect.x + this.itemPadding();
-    this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + (param.WindowFrameShow ? 0 : 6);
+    this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
+    this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
+    this.x = ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + Math.max(param.ActorCommand_X, 0);
+    this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + (param.WindowFrameShow ? 0 : 6) + param.ActorCommand_Y;
+  } else if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode >= 1) {
+    this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
+    if (param.ActorCommandMode === 3) {
+      this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + (param.WindowFrameShow ? 0 : 6) + param.ActorCommand_Y;
+    }
   }
 };
 
@@ -971,6 +1203,8 @@ Window_BattleStatus.prototype.initialize = function(rect) {
   _Window_BattleStatus_initialize.call(this, rect);
   this.frameVisible = param.WindowFrameShow ? true : false;
   this.opacity = param.WindowShow ? 255 : 0;
+  this._opening = true;
+  this.visible = true;
 };
 
 Window_BattleStatus.prototype.maxCols = function() {
@@ -982,6 +1216,14 @@ Window_BattleStatus.prototype.drawItemBackground = function(index) {
   if((param.WindowShow && param.cursorBackShow) || param.cursorBackShow) {
     this.drawBackgroundRect(rect);
   }
+};
+
+Window_BattleStatus.prototype.open = function() {
+  
+};
+
+Window_BattleStatus.prototype.close = function() {
+
 };
 
 Window_BattleStatus.prototype.preparePartyRefresh = function() {
@@ -1084,6 +1326,8 @@ Window_BattleActorImges.prototype.initialize = function(rect) {
   this.openness = 0;
   this._bitmapsReady = 0;
   this.opacity = 0;
+  this._opening = true;
+  this.visible = true;
   const sprite = new Sprite();
   this.addChild(sprite);
   this._actorImgBaseSprite = sprite;
@@ -1267,6 +1511,8 @@ Window_BattleActorStatus.prototype.initialize = function(rect) {
   this.openness = 0;
   this._bitmapsReady = 0;
   this.opacity = 0;
+  this._opening = true;
+  this.visible = true;
   this.preparePartyRefresh();
 };
 
@@ -1597,7 +1843,7 @@ Sprite_ActorImges.prototype.updateAnimation = function(){
 
 Sprite_ActorImges.prototype.setDead = function(){
   const mode = this.faceMode();
-  if ((mode && this._deta.deathFaceIndex < 0) || (!mode && !this._deta.deathBitmap)) {
+  if (((mode && this._deta.deathFaceIndex < 0) || (!mode && !this._deta.deathBitmap)) && param.imgDeathHide) {
     this._updateCount = this.setDeadDuration();
     this._durationOpacity = 255;
   } else {
@@ -1608,7 +1854,7 @@ Sprite_ActorImges.prototype.setDead = function(){
 
 Sprite_ActorImges.prototype.setRevive = function(){
   const mode = this.faceMode();
-  if ((mode && this._deta.deathFaceIndex < 0) || (!mode && !this._deta.deathBitmap)) {
+  if (((mode && this._deta.deathFaceIndex < 0) || (!mode && !this._deta.deathBitmap)) && param.imgDeathHide) {
     this._updateCount = this.setDeadDuration();
     this._durationOpacity = -255;
   } else {
@@ -1780,7 +2026,7 @@ Spriteset_Battle.prototype.createStatusLayer = function() {
   this.createEffects();
   this.createHudStatus();
   this.createFrontActors();
-  };
+};
 
 Spriteset_Battle.prototype.createBattleHud = function() {
   this._baseStatusSprite = new Sprite();

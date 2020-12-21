@@ -12,6 +12,7 @@
 <b>アイテム</b><br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>
 NUUN_ConsumptionItemアイテム消耗率<br>
+アイテム使用回数<br>
 
 <b>スキル</b><br>
 [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)　盗みスキル<br>

@@ -28,12 +28,14 @@
  * 2020/12/19 Ver.1.2.0.1
  * アクターウィンドウ表示を非表示に設定しても表示してしまう不具合を修正。
  * 2020/12/21 Ver.1.3.0
- * 戦闘不能時のアクター画像の表示をプラグインパラメータから選択出来る機能を追加。（従来の方法でも可能）
+ * 戦闘不能時のグラフィックを設定してない時に、戦闘不能時のアクター画像（顔グラ）を表示したままにするか選択できるようにしました。（従来の方法でも可能）
  * パーティコマンドの表示位置、行数、列数を指定できるように変更。
  * アクターコマンドに上、中間、アクターウィンドウの上に表示できる機能を追加。
  * アクターコマンドの表示位置、行数、列数を指定できるように変更。
  * エネミー出現、リザルト、敗北、逃走メッセージを画面上側か画面下側に表示を選択できる機能を追加。
  * メッセージウインドウを下側にも表示可能に修正。メッセージウィンドウが下側に表示された場合でも「選択時ウィンドウ不透明度」が適用されます。
+ * 2020/12/23 Ver.1.3.1
+ * アクター行動選択時に表示される背景画像の表示とアクター対象選択時に表示される背景画像を非表示に出来るように機能を追加。
  */
 /*:
  * @target MZ
@@ -106,6 +108,20 @@
  * @param cursorBackShow
  * @desc カーソル背景を表示する。
  * @text カーソル背景表示
+ * @type boolean
+ * @default true
+ * @parent Window
+ * 
+ * @param SelectBackShow
+ * @desc アクターの行動選択時に表示されるアクター背景を表示する。
+ * @text アクター行動時背景表示
+ * @type boolean
+ * @default true
+ * @parent Window
+ * 
+ * @param ActorSelectBackShow
+ * @desc アクターの対象選択時に表示されるアクター背景を表示する。
+ * @text アクターの対象選択時背景表示
  * @type boolean
  * @default true
  * @parent Window
@@ -331,7 +347,7 @@
  * @desc 戦闘不能になった場合、アクター画像（顔グラ）を非表示にします。
  * @text 戦闘不能時アクター画像表示
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorsButlers
  * 
  * @param ActorNameChangePosition
@@ -1125,11 +1141,15 @@ Scene_Battle.prototype.update = function() {
     this._actorCommandWindow.refresh();
     this._statusWindow._CommandRefresh = false;
   }
-  if (this._skillWindow.active || this._itemWindow.active || this._enemyWindow.active || this._messageWindow.messageUnder) {
+  if (this.activeWindow()) {
     this.actorWindowOpacity()
   } else{
     this.actorWindowResetOpacity();
   }
+};
+
+Scene_Battle.prototype.activeWindow = function() {
+  return this._skillWindow.active || this._itemWindow.active || this._enemyWindow.active || this._messageWindow.messageUnder;
 };
 
 //Window_Message
@@ -1244,6 +1264,15 @@ Window_BattleStatus.prototype.battleEffectsRefresh = function() {
 
 Window_BattleStatus.prototype.drawItem = function(index) {
 
+};
+
+const _Window_BattleStatus_refreshCursor = Window_BattleStatus.prototype.refreshCursor;
+Window_BattleStatus.prototype.refreshCursor = function() {
+  if ((param.SelectBackShow && this.constructor === Window_BattleStatus) || (param.ActorSelectBackShow && this.constructor === Window_BattleActor)) {
+    _Window_BattleStatus_refreshCursor.call(this);
+  } else {
+    this.setCursorRect(0, 0, 0, 0);
+  }
 };
 
 Window_BattleStatus.prototype.statusPosition = function(index) {
@@ -2103,4 +2132,7 @@ Spriteset_Battle.prototype.createBattleField = function() {
   _Spriteset_Battle_createBattleField.call(this);
   this._effectsBackContainer = this._battleField;
 };
+
+
+
 })();

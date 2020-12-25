@@ -36,6 +36,8 @@
  * メッセージウインドウを下側にも表示可能に修正。メッセージウィンドウが下側に表示された場合でも「選択時ウィンドウ不透明度」が適用されます。
  * 2020/12/23 Ver.1.3.1
  * アクター行動選択時に表示される背景画像の表示とアクター対象選択時に表示される背景画像を非表示に出来るように機能を追加。
+ * 2020/12/25 Ver.1.3.2
+ * イベントコマンドでアニメーションを表示させるとエラーが出る不具合を修正。
  */
 /*:
  * @target MZ
@@ -2023,7 +2025,9 @@ Sprite_BattleGauge.prototype.bitmapWidth = function() {
 const _Spriteset_Base_makeTargetSprites = Spriteset_Base.prototype.makeTargetSprites;
 Spriteset_Base.prototype.makeTargetSprites = function(targets) {
   const targetSprites = _Spriteset_Base_makeTargetSprites.call(this, targets);
-  this._effectsContainer = this.animationTarget(targetSprites) ? this._effectsFrontContainer : this._effectsBackContainer;
+  if (this.constructor === Spriteset_Battle) {
+    this._effectsContainer = this.animationTarget(targetSprites) ? this._effectsFrontContainer : this._effectsBackContainer;
+  }
   return targetSprites;
 };
 

@@ -41,4 +41,5 @@ NUUN_ConsumptionItemアイテム消耗率<br>
 
 <b>イベント</b><br>
 [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)  アイテムなどのランダム取得<br>
+イベントでアイテム消費時消耗率、使用回数考慮<br>
 

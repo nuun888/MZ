@@ -38,6 +38,10 @@
  * アクター行動選択時に表示される背景画像の表示とアクター対象選択時に表示される背景画像を非表示に出来るように機能を追加。
  * 2020/12/25 Ver.1.3.2
  * イベントコマンドでアニメーションを表示させるとエラーが出る不具合を修正。
+ * 2020/12/28 Ver.1.3.3
+ * 特定の条件下でアクター画像、顔グラがぼやけて表示される不具合を修正。
+ * 被ステート時のグラフィックがステートのモーションが通常の時に、画像の変更が反映されない不具合を修正。
+ * 被ステート時のグラフィックが変更後に別の被ステート時のグラフィックが変更されるときに正常に表示されない不具合を修正。
  */
 /*:
  * @target MZ
@@ -1481,8 +1485,8 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor, deta) 
   const key = "actor%1-img".format(actor.actorId());
   const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
   sprite.bitmap = deta.defaultBitmap;
-  const x = rect.x + (this.itemWidth() - (sprite.bitmap.width * deta.Actor_Scale / 100)) / 2 + 4 + param.ActorImg_X + deta.Actor_X;
-  const y = rect.y + rect.height - (sprite.bitmap.height * deta.Actor_Scale / 100) + 7 + param.ActorImg_Y + deta.Actor_Y;
+  const x = rect.x + Math.floor((this.itemWidth() - (sprite.bitmap.width * deta.Actor_Scale / 100)) / 2) + 4 + param.ActorImg_X + deta.Actor_X;
+  const y = rect.y + rect.height - Math.floor(sprite.bitmap.height * deta.Actor_Scale / 100) + 7 + param.ActorImg_Y + deta.Actor_Y;
   sprite.scale.x = deta.Actor_Scale / 100;
   sprite.scale.y = deta.Actor_Scale / 100;
   sprite._battler = actor;
@@ -1505,8 +1509,8 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor, deta) {
   const sh = Math.min(height, ph);
   sprite.x = Math.floor(rect.x + Math.max(width - pw, 0) / 2) + 8;
   sprite.y = Math.floor(rect.y + Math.max(height - ph, 0) / 2);
-  const sx = (actor.faceIndex() % 4) * pw + (pw - sw) / 2;
-  const sy = Math.floor(actor.faceIndex() / 4) * ph + (ph - sh) / 2;
+  const sx = Math.floor((actor.faceIndex() % 4) * pw + (pw - sw) / 2);
+  const sy = Math.floor(Math.floor(actor.faceIndex() / 4) * ph + (ph - sh) / 2);
   sprite.setFrame(sx, sy, sw, sh);
   sprite._battler = actor;
   sprite._deta = deta;
@@ -1672,20 +1676,19 @@ Sprite_ActorImges.prototype.faceRefresh = function(faceIndex) {
   const ph = ImageManager.faceHeight;
   const sw = Math.min(this._rectWidth, pw);
   const sh = Math.min(this._rectHeight, ph);
-  const sx = (faceIndex % 4) * pw + (pw - sw) / 2;
-  const sy = Math.floor(faceIndex / 4) * ph + (ph - sh) / 2;
+  const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+  const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
   this.setFrame(sx, sy, sw, sh);
 };
 
 Sprite_ActorImges.prototype.updateBitmap = function() {
   const actor = this._battler;
   if (actor) {
-    const stateMotion = actor.stateMotionIndex();
-    if (stateMotion === 3) {
+    if (actor.isDead()) {
       this.changeBitmap("dead");   
-    } else if (stateMotion !== 3 && this._imgIndex === 1) {
+    } else if (!actor.isDead() && this._imgIndex === 1) {
       this.changeBitmap("revive");
-    } else if ((stateMotion === 1 || stateMotion === 2) && this.stateImgCheck(true)) {
+    } else if (actor._states.length > 0 && this.stateImgCheck(true)) {
       this.changeBitmap("alwaysAbnormal");
     } else if (actor._imgIndex === 5 && this.changeCheck("victory")) {
       this.changeBitmap("victory");
@@ -1693,7 +1696,7 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
       this.changeBitmap("damage");
     } else if (actor.isChanting() && this.changeCheck("chant")) {
       this.changeBitmap("chant");
-    } else if ((stateMotion === 1 || stateMotion === 2) && this.stateImgCheck(false)) {
+    } else if (actor._states.length > 0 && this.stateImgCheck(false)) {
       this.changeBitmap("abnormal");
     } else if (actor.isDying() && this.changeCheck("dying")) {
       this.changeBitmap("dying");
@@ -1779,13 +1782,14 @@ Sprite_ActorImges.prototype.changeBitmap = function(bitmapType) {
       if (this._imgIndex !== 5) {
         this.setVictory();
       }
+      break;
     case "alwaysAbnormal":
-      if (this._imgIndex < 2000) {
+      if (this._imgIndex !== this._changeStateImgId + 2000) {
         this.setState(true);
-        break;
       }
+      break;
     case "abnormal":
-      if (this._imgIndex < 1000) {
+      if (this._imgIndex !== this._changeStateImgId + 1000) {
         this.setState(false);
       }
       break;
@@ -2136,7 +2140,4 @@ Spriteset_Battle.prototype.createBattleField = function() {
   _Spriteset_Battle_createBattleField.call(this);
   this._effectsBackContainer = this._battleField;
 };
-
-
-
 })();

@@ -42,6 +42,8 @@
  * 特定の条件下でアクター画像、顔グラがぼやけて表示される不具合を修正。
  * 被ステート時のグラフィックがステートのモーションが通常の時に、画像の変更が反映されない不具合を修正。
  * 被ステート時のグラフィックが変更後に別の被ステート時のグラフィックが変更されるときに正常に表示されない不具合を修正。
+ * 2020/12/29 Ver.1.3.4
+ * パーティコマンドを「アクターの上に表示」で表示された時、表示されない問題を修正。
  */
 /*:
  * @target MZ
@@ -949,7 +951,9 @@ Scene_Battle.prototype.partyCommandWindowRect = function() {
   const wh = this.partyWindowAreaHeight();
   const wx = param.PartyCommandCenter ? Graphics.boxWidth / 2 - ww / 2 : 0 + param.PartyCommand_X;
   const wy = this.partyCommand_YPosition() + param.PartyCommand_Y;
-  return new Rectangle(wx, wy, ww, wh);
+  const rect = new Rectangle(wx, wy, ww, wh);
+  rect.statusWindowHeight = this._statusWindow.height;
+  return rect;
 };
 
 Scene_Battle.prototype.actorCommandWindowRect = function() {
@@ -957,9 +961,7 @@ Scene_Battle.prototype.actorCommandWindowRect = function() {
   const wh = this.actorCommandHeight();
   const wx = this.actorCommandX();
   const wy = 0;
-  const rect = new Rectangle(wx, wy, ww, wh);
-  rect.statusWindowHeight = this._statusWindow.height;
-  return rect;
+  return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.actorCommandWidth = function() {

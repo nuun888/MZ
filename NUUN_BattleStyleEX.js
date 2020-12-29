@@ -745,7 +745,7 @@
  * 
  * @param stateImgId
  * @text 変化ID
- * @desc 変化するステートのIDを指定します。ステートのメモ欄に<faceChangeId:[id]>を記入してください。[id]:変化ID
+ * @desc 変化するステートのIDを指定します。ステートのメモ欄に<ChangeImgId:[id]>を記入してください。[id]:変化ID
  * @type number
  * 
  * @param Always
@@ -773,7 +773,7 @@
  * 
  * @param stateFaceId
  * @text 変化ID
- * @desc 変化するステートのIDを指定します。ステートのメモ欄に<faceChangeId:[id]>を記入してください。[id]:変化ID
+ * @desc 変化するステートのIDを指定します。ステートのメモ欄に<ChangeImgId:[id]>を記入してください。[id]:変化ID
  * @type number
  * @default 0
  * 

@@ -3,6 +3,7 @@
 
 # 公開プラグイン
 <b>システム</b><br>
+[NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>
 
 <b>戦闘</b><br>
 [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)　バトルスタイル拡張<br>
@@ -26,7 +27,7 @@
 
 <b>エネミー</b><br>
 [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js)　巨大エネミー<br>
-敵のドロップアイテム追加
+[NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js)　敵のドロップアイテム追加
 
 <b>メニュー系</b><br>
 [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>

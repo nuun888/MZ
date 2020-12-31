@@ -14,8 +14,11 @@
 カウンター拡張（仮）<br>
 リザルト（仮）<br>
   
-<b>アイテム</b><br>
+<b>スキル、アイテム</b><br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>
+スキル、アイテムの色<br>
+
+<b>アイテム</b><br>
 [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)アイテム消耗率<br>
 [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)アイテム使用回数<br>
 新規入手アイテムの強調<br>

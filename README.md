@@ -12,12 +12,13 @@
 リミットゲージ<br>
 ターン表示<br>
 カウンター拡張（仮）<br>
+リザルト（仮）<br>
   
 <b>アイテム</b><br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>
 [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)アイテム消耗率<br>
 [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)アイテム使用回数<br>
-未入手アイテムの強調
+新規入手アイテムの強調<br>
 
 <b>スキル</b><br>
 [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)　盗みスキル<br>

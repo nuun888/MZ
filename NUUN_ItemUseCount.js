@@ -28,6 +28,9 @@
  * <ItemUseCount:[Num]>使用回数を設定します。[Num]:使用回数
  * <ItemUseCountHide>アイテム欄に使用回数を表示させません。
  * 
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_ItemUseCount = true;

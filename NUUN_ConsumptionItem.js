@@ -32,6 +32,9 @@
  * [pitch]:ピッチ
  * [pan]:位相
  * 
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_ConsumptionItem = true;

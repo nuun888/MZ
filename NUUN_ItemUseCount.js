@@ -9,6 +9,8 @@
  * 更新履歴
  * 2020/12/24 Ver.1.0.0
  * 初版
+ * 2020/12/31 Ver.1.0.1
+ * アイテム欄の使用回数を非表示に出来る機能を追加。
  */
 /*:
  * @target MZ
@@ -18,10 +20,13 @@
  * @help
  * アイテムに１回消費するまでの使用回数を設定できます。使用回数カウントが０になった時そのアイテムは消耗します。
  * アイテムを売却する際、全て売却した場合そのアイテムの通常売却額１つ分の売却額が使用回数に応じて減少します。
- * ※表示される売却額とは異なります。
+ * ※現在のバージョンではショップ画面で表示される売却額は使用回数を考慮していない売却額となっています。
+ * 
+ * アイテム消耗率と併用する場合は、順番によってはSE再生等の動作が異なります。
  * 
  * アイテムのメモ欄
  * <ItemUseCount:[Num]>使用回数を設定します。[Num]:使用回数
+ * <ItemUseCountHide>アイテム欄に使用回数を表示させません。
  * 
  */
 var Imported = Imported || {};
@@ -126,7 +131,7 @@ Window_ItemList.prototype.initialize = function(rect) {
 const _Window_ItemList_drawItem = Window_ItemList.prototype.drawItem;
 Window_ItemList.prototype.drawItem = function(index) {
   const item = this.itemAt(index);
-  if (item && item.meta.ItemUseCount) {
+  if (item && item.meta.ItemUseCount && !item.meta.ItemUseCountHide) {
     this._itemUseCountText = " ["+ $gameParty.getUseItemCount(item) +"/"+ item.meta.ItemUseCount +"]";
     this._itemUseCountTextWidth = this.textWidth(this._itemUseCountText);
   } else {

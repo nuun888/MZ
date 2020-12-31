@@ -11,7 +11,6 @@
 [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)　戦闘背景の変更<br>
 リミットゲージ<br>
 ターン表示<br>
-カウンター拡張（仮）<br>
 リザルト（仮）<br>
   
 <b>スキル、アイテム</b><br>
@@ -32,7 +31,6 @@
 <b>アクター</b><br>
 [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js)　レベル上限限界突破<br>
 [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)　最大レベル変動<br>
-アクターのステータス上限<br>
 
 <b>エネミー</b><br>
 [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js)　巨大エネミー<br>

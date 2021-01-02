@@ -52,6 +52,8 @@
  * フロントビューでエフェクトを表示させない機能を追加。
  * スキル、アイテム、エネミー選択画面の不透明度を個別に無効化できる機能を追加。
  * 各ゲージ長を個別に設定可能に変更。
+ * 2021/1/2 Ver.1.4.1
+ * NUUN_IconSideBySide対応
  */
 /*:
  * @target MZ
@@ -736,7 +738,7 @@
  * @desc ステートのX座標を設定します。ステートの座標変更がTrueの場合のみ適用します。
  * @text ステートX座標
  * @type number
- * @default 278
+ * @default 4
  * @min -9999
  * @parent ActorStateChangePosition
  * 
@@ -1519,6 +1521,10 @@ Window_BattleStatus.prototype.itemRect = function(index) {
   return rect;
 };
 
+Window_BattleStatus.prototype.drawItemImage = function(index) {
+
+};
+
 Window_BattleStatus.prototype.drawItemStatus = function(index) {
   const actor = this.actor(index);
   const rect = this.itemRectWithPadding(index);
@@ -1791,6 +1797,18 @@ Window_BattleActorStatus.prototype.drawItemBackground = function(index) {
 
 Window_BattleActorStatus.prototype.drawItem = function(index) {
   this.drawItemStatus(index);
+};
+
+//NUUN_IconSideBySide併用
+Window_BattleActorStatus.prototype.refreshContentsDraw = function() {
+  this.contents.clear();
+  for (const actor of $gameParty.members()) {
+    const index = actor.index();
+    const rect = this.itemRectWithPadding(index);
+    const stateIconX = param.StateChangePosition ? param.ActorState_X + rect.x : this.stateIconX(rect);
+    const stateIconY = param.StateChangePosition ? param.ActorState_Y + rect.y : this.stateIconY(rect);
+    this.drawStateIcon(actor, stateIconX, stateIconY);
+  }
 };
 
 //Window_BattleActor

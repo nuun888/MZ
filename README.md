@@ -27,7 +27,7 @@
 
 <b>ステート</b><br>
 [NUUN_AddStateDeviation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js)　ステート付与の仕様変更<br>
-戦闘中アクターステートの横並び表示
+[NUUN_IconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_IconSideBySide.js)　戦闘中アクターステートの横並び表示
 
 <b>アクター</b><br>
 [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js)　レベル上限限界突破<br>

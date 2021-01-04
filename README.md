@@ -15,6 +15,7 @@
   
 <b>スキル、アイテム</b><br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>
+キャストタイムキャンセル<br>
 スキル、アイテムの色<br>
 
 <b>アイテム</b><br>

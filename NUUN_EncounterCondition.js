@@ -55,13 +55,12 @@ Imported.NUUN_EncounterCondition = true;
   };
 
   Game_Player.prototype.conditionsData = function(encounter) {
-    const troop = $dataTroops[encounter.troopId];
-    const conditionslist = this.encounterConditions(troop);
+    const conditionslist = $gameMap._encounterConditions[encounter.troopId];
     let encount = true;
     conditionslist.forEach(list => {
 			if(!this.conditionsEval(list)){
         encount = false;
-        return this;
+        return;
       }
     });
     return encount;
@@ -92,13 +91,27 @@ Imported.NUUN_EncounterCondition = true;
           return $gameVariables.value(valId) <= val;
         }
       }
-    } else if(conditions.type === 2) {console.log(eval(conditions.deta))
+    } else if(conditions.type === 2) {
       return eval(conditions.deta);
     }
     return false;
   };
 
-  Game_Player.prototype.encounterConditions = function(troop) {
+  const _Game_Map_setup = Game_Map.prototype.setup;
+  Game_Map.prototype.setup = function(mapId) {
+    _Game_Map_setup.call(this, mapId);
+    this.encounterConditionsSetup();
+  };
+
+  Game_Map.prototype.encounterConditionsSetup = function() {
+    this._encounterConditions = [];
+    for (const encounter of this.encounterList()) {
+      const troop = $dataTroops[encounter.troopId];
+      this._encounterConditions[encounter.troopId] = this.encounterConditions(troop);
+    }
+  };
+
+  Game_Map.prototype.encounterConditions = function(troop) {
     const pages = troop.pages[0];
     list = [];
     const re1 = /<(?:Enc_Switch):\s*(.*)>/;

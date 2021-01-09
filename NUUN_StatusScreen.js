@@ -32,8 +32,10 @@
  * 2020/12/8 Ver.1.1.1
  *  最大レベル時の次のレベルまでの経験値表示のゲージMAXで100％で表示するように修正。
  * 2020/12/28 Ver.1.1.2
- * 立ち絵の座標処理を修正。
- */ 
+ *  立ち絵の座標処理を修正。
+ * 2021/1/9 Ver.1.2.0
+ * 各項目の設定方法を変更。
+ */
 /*:
  * @target MZ
  * @plugindesc ステータス画面詳細表示
@@ -49,21 +51,12 @@
  * <>ボタン　キャラ切り替え
  * ΛVボタン　ページ切り替え
  * 
- * １ページ目　基本能力値　装備
- * ２ページ目　追加能力値　特殊能力値、追加能力値、特殊能力値の表示がない場合）属性有効度　ステート有効度
- * ３ページ目　属性有効度　ステート有効度
- * 
- * 追加能力値、特殊能力値、属性有効度、ステート有効度のいずれかの表示をしない場合は、
- * プラグインパラメータの表示しない項目のリストを空白にしてください。（[]ではなく空白）
- * 追加能力値、特殊能力値または属性有効度、ステート有効度のリストを同時に空白にした場合は、
- * そのページが表示されなくなります。
- * 追加能力値、特殊能力値、属性有効度、ステート有効度をすべてリストを空白にした場合は、
- * 最初のページのみの表示となります。
- * いずれもパラメータに[]が記入されていてもその項目が表示されてしまいます。
- * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * @param Window
+ * @text ウィンドウ設定 
  * 
  * @param ContentWidth
  * @text 項目の表示横幅
@@ -71,6 +64,14 @@
  * @type number
  * @default 0
  * @min 0
+ * @parent Window
+ * 
+ * @param ParamBackShow
+ * @text ステータス項目背景表示
+ * @desc ステータス項目の背景画像の表示を設定します。
+ * @type boolean
+ * @default true
+ * @parent Window
  * 
  * @param Decimal
  * @text 小数点桁数
@@ -78,84 +79,169 @@
  * @type number
  * @default 2
  * @min 0
+ * @parent Window
  * 
  * @param DecimalMode
- * @text 端数処理
+ * @text 端数処理四捨五入
  * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
  * @type boolean
  * @default true
+ * @parent Window
  * 
  * @param ExpPercent
  * @text 経験値百分率表示
  * @desc 経験値を百分率で表示
  * @type boolean
  * @default false
- * 
- * @param ParamName
- * @text 能力値の名称
- * @desc 能力値の名称を設定します。
- * @type string
- * @default 能力値
- * 
- * @param EquipsName
- * @text 装備の名称
- * @desc 装備の名称を設定します。
- * @type string
- * @default 装備
- * 
- * @param XParamName
- * @text 追加能力値の名称
- * @desc 追加能力値の名称を設定します。
- * @type string
- * @default 追加能力値
- * 
- * @param SParamName
- * @text 特殊能力値の名称
- * @desc 特殊能力値の名称を設定します。
- * @type string
- * @default 特殊能力値
- * 
- * @param ElementName
- * @text 属性有効度の名称
- * @desc 属性有効度の名称を設定します。
- * @type string
- * @default 属性有効度
- * 
- * @param StateName
- * @text ステート有効度の名称
- * @desc ステート有効度の名称を設定します。
- * @type string
- * @default ステート有効度
- * 
- * @param GaugeWidth
- * @text ゲージ横幅
- * @desc HP,MP,TPゲージの横幅を指定します。
- * @type number
- * @default 200
- * @min 0
+ * @parent Window
  * 
  * @param BackGroundImg
  * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
  * @type file
  * @dir img/pictures
+ * @parent Window
  * 
  * @param BackUiWidth
  * @text 背景サイズをUIに合わせる
  * @desc 背景サイズをUIに合わせる。
  * @type boolean
  * @default true
+ * @parent Window
  * 
- * @param ParamBackShow
- * @text ステータス項目背景表示
- * @desc ステータス項目の背景画像の表示を設定します。
- * @type boolean
- * @default true
+ * @param Pages
+ * @text ページ設定
+ * 
+ * @param 2Pages
+ * @text ２ページ目設定
+ * @parent Pages
+ * 
+ * @param Page2Left
+ * @desc 左側に表示する項目。
+ * @text 左側表示項目
+ * @type select
+ * @option なし
+ * @value 0
+ * @option 追加能力値
+ * @value 2
+ * @option 特殊能力値
+ * @value 3
+ * @option 属性有効度
+ * @value 4
+ * @option ステート有効度
+ * @value 5
+ * @parent 2Pages
+ * @default 2
+ * 
+ * @param Page2Right
+ * @desc 右側に表示する項目。
+ * @text 右側表示項目
+ * @type select
+ * @option なし
+ * @value 0
+ * @option 追加能力値
+ * @value 2
+ * @option 特殊能力値
+ * @value 3
+ * @option 属性有効度
+ * @value 4
+ * @option ステート有効度
+ * @value 5
+ * @parent 2Pages
+ * @default 3
+ * 
+ * @param 3Pages
+ * @text ３ページ目設定
+ * @parent Pages
+ * 
+ * @param Page3Left
+ * @desc 左側に表示する項目。
+ * @text 左側表示項目
+ * @type select
+ * @option なし
+ * @value 0
+ * @option 追加能力値
+ * @value 2
+ * @option 特殊能力値
+ * @value 3
+ * @option 属性有効度
+ * @value 4
+ * @option ステート有効度
+ * @value 5
+ * @parent 3Pages
+ * @default 4
+ * 
+ * @param Page3Right
+ * @desc 右側に表示する項目。
+ * @text 右側表示項目
+ * @type select
+ * @option なし
+ * @value 0
+ * @option 追加能力値
+ * @value 2
+ * @option 特殊能力値
+ * @value 3
+ * @option 属性有効度
+ * @value 4
+ * @option ステート有効度
+ * @value 5
+ * @parent 3Pages
+ * @default 5
+ * 
+ * @param DateName
+ * @text 名称設定 
+ * 
+ * @param ParamName
+ * @text 能力値の名称
+ * @desc 能力値の名称を設定します。
+ * @type string
+ * @default 能力値
+ * @parent DateName
+ * 
+ * @param EquipsName
+ * @text 装備の名称
+ * @desc 装備の名称を設定します。
+ * @type string
+ * @default 装備
+ * @parent DateName
+ * 
+ * @param XParamName
+ * @text 追加能力値の名称
+ * @desc 追加能力値の名称を設定します。
+ * @type string
+ * @default 追加能力値
+ * @parent DateName
+ * 
+ * @param SParamName
+ * @text 特殊能力値の名称
+ * @desc 特殊能力値の名称を設定します。
+ * @type string
+ * @default 特殊能力値
+ * @parent DateName
+ * 
+ * @param ElementName
+ * @text 属性有効度の名称
+ * @desc 属性有効度の名称を設定します。
+ * @type string
+ * @default 属性有効度
+ * @parent DateName
+ * 
+ * @param StateName
+ * @text ステート有効度の名称
+ * @desc ステート有効度の名称を設定します。
+ * @type string
+ * @default ステート有効度
+ * @parent DateName
+ * 
+ * @param ActorImg
+ * @text 立ち絵設定
  * 
  * @param ActorsImgList
  * @text 画像設定
  * @desc アクターの画像設定
  * @default []
  * @type struct<actorImgList>[]
+ * @parent ActorImg
  * 
  * @param actorPosition
  * @text 立ち絵表示位置
@@ -168,27 +254,49 @@
  * @option 右
  * @value 2
  * @default 2
+ * @parent ActorImg
+ * 
+ * @param ParamDate
+ * @text パラメータ設定
  * 
  * @param Xparam
  * @type struct<XparamData>[]
  * @text 追加能力値
  * @default ["{\"XparamName\":\"\",\"XparamId\":\"0\"}","{\"XparamName\":\"\",\"XparamId\":\"1\"}","{\"XparamName\":\"\",\"XparamId\":\"2\"}","{\"XparamName\":\"\",\"XparamId\":\"3\"}","{\"XparamName\":\"\",\"XparamId\":\"4\"}","{\"XparamName\":\"\",\"XparamId\":\"5\"}","{\"XparamName\":\"\",\"XparamId\":\"6\"}","{\"XparamName\":\"\",\"XparamId\":\"7\"}","{\"XparamName\":\"\",\"XparamId\":\"8\"}","{\"XparamName\":\"\",\"XparamId\":\"9\"}"]
+ * @parent ParamDate
  * 
  * @param Sparam
  * @type struct<SparamData>[]
  * @text 特殊能力値
  * @default ["{\"SparamName\":\"\",\"SparamId\":\"0\"}","{\"SparamName\":\"\",\"SparamId\":\"1\"}","{\"SparamName\":\"\",\"SparamId\":\"2\"}","{\"SparamName\":\"\",\"SparamId\":\"3\"}","{\"SparamName\":\"\",\"SparamId\":\"4\"}","{\"SparamName\":\"\",\"SparamId\":\"5\"}","{\"SparamName\":\"\",\"SparamId\":\"6\"}","{\"SparamName\":\"\",\"SparamId\":\"7\"}","{\"SparamName\":\"\",\"SparamId\":\"8\"}","{\"SparamName\":\"\",\"SparamId\":\"9\"}"]
+ * @parent ParamDate
  * 
  * @param ElementResist
  * @type struct<ElementData>[]
  * @text 属性耐性
  * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"\"}"]
+ * @parent ParamDate
  * 
  * @param StateResist
  * @type struct<StateData>[]
  * @text 状態耐性
  * @default ["{\"StateNo\":\"4\"}","{\"StateNo\":\"5\"}","{\"StateNo\":\"6\"}","{\"StateNo\":\"7\"}","{\"StateNo\":\"8\"}","{\"StateNo\":\"9\"}","{\"StateNo\":\"10\"}","{\"StateNo\":\"12\"}","{\"StateNo\":\"13\"}"]
+ * @parent ParamDate
  * 
+ * @param StateResistText
+ * @text 有効度ステート名表示
+ * @desc ステート有効度のステートアイコンをステート名で表示させます。
+ * @type boolean
+ * @default false
+ * @parent ParamDate
+ * 
+ * @param GaugeWidth
+ * @text ゲージ横幅
+ * @desc HP,MP,TPゲージの横幅を指定します。
+ * @type number
+ * @default 200
+ * @min 0
+ * @parent ParamDate
  */
 /*~struct~actorImgList:
  * 
@@ -221,7 +329,7 @@
 /*~struct~XparamData:
  *
  * @param XparamName
- * @desc 追加能力値の用語です。
+ * @desc 追加能力値の設定します。
  * @type string
  *
  * @param XparamId
@@ -231,7 +339,7 @@
 /*~struct~SparamData:
  *
  * @param SparamName
- * @desc 追加能力値の用語です。
+ * @desc 追加能力値の用語を設定します。
  * @type string
  *
  * @param SparamId
@@ -241,7 +349,7 @@
 /*~struct~ElementData:
  *
  * @param ElementNo
- * @desc 表示する属性番号です。
+ * @desc 表示する属性番号を指定します。
  * @type number
  *
  * @param ElementIconId
@@ -251,7 +359,7 @@
 /*~struct~StateData:
  *
  * @param StateNo
- * @desc 表示するステートです。
+ * @desc 表示するステートを指定します。
  * @type state
  *
  */
@@ -272,11 +380,14 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
-const XparamData = param.Xparam ? true : false;
-const SparamData = param.Sparam ? true : false;
-const ElementResistData = param.ElementResist ? true : false;
-const StateResistData = param.StateResist ? true : false;
-const pages = 1 + (XparamData || SparamData ? 1 : 0) + (ElementResistData || StateResistData ? 1 : 0);
+
+function maxPages() {
+  let maxPages = 1;
+  maxPages += param.Page2Left > 0 || param.Page2Right > 0 ? 1 : 0;
+  maxPages += param.Page3Left > 0 || param.Page3Right > 0 ? 1 : 0;
+  return maxPages;
+};
+
 
 const _Scene_Status_initialize = Scene_Status.prototype.initialize;
 Scene_Status.prototype.initialize = function() {
@@ -298,13 +409,16 @@ const _Scene_Status_createStatusWindow = Scene_Status.prototype.createStatusWind
 Scene_Status.prototype.createStatusWindow = function() {
   _Scene_Status_createStatusWindow.call(this);
   this._statusWindow.setContentY = this.statusHeight();
-  this._statusWindow.setContentEquipWidth = this.statusParamsWidth();
-  this._statusWindow.setSParamsWidth = this.statusXParamsWidth();
-  this._statusWindow.setStateWidthWidth = this.statusElementWidth();
+  this._statusWindow.setContentEquip_x = this.statusParamsWidth();
+  this._statusWindow.setXParams_x = 0;
+  this._statusWindow.setSParams_x = 0;
+  this._statusWindow.setElement_x = 0;
+  this._statusWindow.setState_x = 0;
   if (param.BackGroundImg) {
     this._statusWindow.opacity = 0;
     this._statusWindow.frameVisible = false;
-	}
+  }
+  this.maxPage = maxPages();
 };
 
 Scene_Status.prototype.createProfileWindow = function() {
@@ -376,17 +490,17 @@ Scene_Status.prototype.statusParamsWindowRect = function() {
 };
 
 Scene_Status.prototype.statusXParamsWindowRect = function() {
-  const ww = this.statusXParamsWidth();
-  const wh = this.statusXParamsHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2;
+  const ww = this.statusContenWidth() / 2;
+  const wh = this.statusParamsHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusRightX(2);
   const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Status.prototype.statusSParamsWindowRect = function() {
-  const ww = this.statusSParamsWidth();
-  const wh = this.statusSParamsHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusXParamsWidth();
+  const ww = this.statusContenWidth() / 2;
+  const wh = this.statusParamsHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusRightX(3);
   const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
@@ -400,19 +514,36 @@ Scene_Status.prototype.statusEquipWindowRect = function() {
 };
 
 Scene_Status.prototype.statusElementWindowRect = function() {
-  const ww = this.statusElementWidth();
-  const wh = this.statusElementHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2;
+  const ww = this.statusContenWidth() / 2;
+  const wh = this.statusParamsHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusRightX(4);
   const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Status.prototype.statusStateWindowRect = function() {
-  const ww = this.statusStateWidth();
-  const wh = this.statusStateHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusElementWidth();
+  const ww = this.statusContenWidth() / 2;
+  const wh = this.statusParamsHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusRightX(5);
   const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Status.prototype.statusRightX = function(mode) {
+  if (param.Page2Right === mode || param.Page3Right === mode) {
+    const x = this.statusContenWidth() / 2;
+    if (mode === 2) {
+      this._statusWindow.setXParams_x = x;
+    } else if (mode === 3) {
+      this._statusWindow.setSParams_x = x;
+    } else if (mode === 4) {
+      this._statusWindow.setElement_x = x;
+    } else if (mode === 5) {
+      this._statusWindow.setState_x = x;
+    }
+    return x;
+  }
+  return 0;
 };
 
 Scene_Status.prototype.statusContenWidth = function() {
@@ -423,24 +554,8 @@ Scene_Status.prototype.statusParamsWidth = function() {
   return Math.max(this.statusContenWidth() / 3, 300);
 };
 
-Scene_Status.prototype.statusXParamsWidth = function() {
-  return XparamData ? this.statusContenWidth() / 2 : 0;
-};
-
-Scene_Status.prototype.statusSParamsWidth = function() {
-  return SparamData ? this.statusContenWidth() / 2 : 0;
-};
-
-Scene_Status.prototype.statusElementWidth = function() {
-  return ElementResistData ? this.statusContenWidth() / 2 : 0;
-};
-
-Scene_Status.prototype.statusStateWidth = function() {
-  return StateResistData ? this.statusContenWidth() / 2 : 0;
-};
-
-Scene_Status.prototype.statusXParamsHeight = function() {
-  return XparamData ? this.statusParamsHeight() : 0;
+Scene_Status.prototype.statusContenHeight = function() {
+  return this.statusParamsHeight();
 };
 
 Scene_Status.prototype.statusSParamsHeight = function() {
@@ -480,7 +595,7 @@ Scene_Status.prototype.createBackground = function() {
 };
 
 Scene_Status.prototype.createStatusButton = function() {
-  if(pages > 1 && ConfigManager.touchUI) {
+  if(this.maxPage > 1 && ConfigManager.touchUI) {
     this._modeupButton = new Sprite_Button("up");
     this._modeupButton.x = 24 + this._pageupButton.width + this._pagedownButton.width;
     this._modeupButton.y = this.buttonY();
@@ -519,74 +634,78 @@ Scene_Status.prototype.update = function() {
       sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
     }
 	}
-	if (Input.isTriggered('left') && this.maxPage() > 1) {
+	if (Input.isTriggered('left') && this.maxPage > 1) {
 		this.updateContentsPageup();
-	} else if (Input.isTriggered('right') && this.maxPage() > 1){
+	} else if (Input.isTriggered('right') && this.maxPage > 1){
 		this.updateContentsPagedown();
   }
 };
 
-Scene_Status.prototype.maxPage = function() {
-  return pages;
-};
-
 Scene_Status.prototype.updateContentsPagedown = function() {
-	const maxPage = this.maxPage();
+	const maxPage = this.maxPage;
   this._pageMode = (this._pageMode + 1) % maxPage;
   SoundManager.playCursor();
   this.updatepage();
 };
 
 Scene_Status.prototype.updateContentsPageup = function() {
-	const maxPage = this.maxPage();
+	const maxPage = this.maxPage;
   this._pageMode = (this._pageMode + (maxPage - 1)) % maxPage;
   SoundManager.playCursor();
   this.updatepage();
 };
 
 Scene_Status.prototype.updatepage = function() {
-  if(this._pageMode === 0) {
-    this.openFirstPage();
-  } else if (this._pageMode === 1) {
-    if (XparamData || SparamData) {
-      this.openAbilityScorePage();
-    } else {
-      this.openValidityPage();
-    }
-  } else if (this._pageMode === 2) {
-    this.openValidityPage();
-  }
   this._statusWindow.contents.clear();
   this._statusWindow.refresh();
+  this.refreshPage();
   this.drawContentNameBlock();
 };
 
-Scene_Status.prototype.openFirstPage = function() {
-  this._statusParamsWindow.show();
-  this._statusEquipWindow.show();
+Scene_Status.prototype.refreshPage = function() {
+  this.pageAllHide();
+  if (this._pageMode === 0) {
+    this._statusParamsWindow.show();
+    this._statusEquipWindow.show();
+  } else if(this._pageMode === 1) {
+    this.showPage(param.Page2Left);
+    this.showPage(param.Page2Right);
+  } else if(this._pageMode === 2) {
+    this.showPage(param.Page3Left);
+    this.showPage(param.Page3Right);
+  }
+};
+
+
+Scene_Status.prototype.showPage = function(value) {
+  switch (value) {
+  case 0:
+    break;
+  case 1:
+    this._statusEquipWindow.show();
+    break;
+  case 2:
+    this._statusXParamsWindow.show();
+    break;
+  case 3:
+    this._statusSParamsWindow.show();
+    break;
+  case 4:
+    this._statusElementWindow.show();
+    break;
+  case 5:
+    this._statusStateWindow.show();
+    break;
+  }
+};
+
+Scene_Status.prototype.pageAllHide = function() {
+  this._statusParamsWindow.hide();
+  this._statusEquipWindow.hide();
   this._statusXParamsWindow.hide();
   this._statusSParamsWindow.hide();
   this._statusElementWindow.hide();
   this._statusStateWindow.hide();
-};
-
-Scene_Status.prototype.openAbilityScorePage = function() {
-  this._statusParamsWindow.hide();
-  this._statusEquipWindow.hide();
-  XparamData ? this._statusXParamsWindow.show() : this.noShow();
-  SparamData ? this._statusSParamsWindow.show() : this.noShow();
-  this._statusElementWindow.hide();
-  this._statusStateWindow.hide();
-  this._ParamsWindowShow = true;
-};
-
-Scene_Status.prototype.openValidityPage = function() {
-  this._statusParamsWindow.hide();
-  this._statusEquipWindow.hide();
-  this._statusXParamsWindow.hide();
-  this._statusSParamsWindow.hide();
-  ElementResistData ? this._statusElementWindow.show() : this.noShow();
-  StateResistData ? this._statusStateWindow.show() : this.noShow();
 };
 
 Scene_Status.prototype.drawContentNameBlock = function() {
@@ -609,11 +728,6 @@ Scene_Status.prototype.drawContentNameBlock = function() {
     this._statusWindow.StateName();
   }
 };
-
-Scene_Status.prototype.noShow = function() {
-  
-};
-
 
 Window_Base.prototype.statusParamDecimal = function(val) {
   if (param.DecimalMode) {
@@ -717,7 +831,7 @@ Window_Status.prototype.XparamName = function(id) {
   const rect = this.itemLineRect(0);
   const y = this.setContentY - 42;
   this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.XParamName, rect.x, y, rect.width);
+  this.drawText(param.XParamName, rect.x + this.setXParams_x, y, rect.width);
   this.resetTextColor();
 };
 
@@ -725,7 +839,7 @@ Window_Status.prototype.SparamName = function() {
   const rect = this.itemLineRect(0);
   const y = this.setContentY - 42;
   this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.SParamName, rect.x + this.setSParamsWidth, y, rect.width);
+  this.drawText(param.SParamName, rect.x + this.setSParams_x, y, rect.width);
   this.resetTextColor();
 };
 
@@ -733,7 +847,7 @@ Window_Status.prototype.EquipsName = function() {
   const rect = this.itemLineRect(0);
   const y = this.setContentY - 42;
   this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.EquipsName, rect.x + this.setContentEquipWidth, y, rect.width);
+  this.drawText(param.EquipsName, rect.x + this.setContentEquip_x, y, rect.width);
   this.resetTextColor();
 };
 
@@ -741,7 +855,7 @@ Window_Status.prototype.ElementName = function() {
   const rect = this.itemLineRect(0);
   const y = this.setContentY - 42;
   this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.ElementName, rect.x, y, rect.width);
+  this.drawText(param.ElementName, rect.x + this.setElement_x, y, rect.width);
   this.resetTextColor();
 };
 
@@ -749,7 +863,7 @@ Window_Status.prototype.StateName = function() {
   const rect = this.itemLineRect(0);
   const y = this.setContentY - 42;
   this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.StateName, rect.x + this.setStateWidthWidth - 4, y, rect.width);
+  this.drawText(param.StateName, rect.x + this.setState_x - 4, y, rect.width);
   this.resetTextColor();
 };
 
@@ -825,7 +939,7 @@ Window_StatusXParams.prototype.setActor = function(actor) {
 };
 
 Window_StatusXParams.prototype.maxItems = function() {
-  return XparamData ? param.Xparam.length : 0;
+  return param.Xparam ? param.Xparam.length : 0;
 };
 
 Window_StatusXParams.prototype.maxCols = function() {
@@ -904,7 +1018,7 @@ Window_StatusSParams.prototype.setActor = function(actor) {
 };
 
 Window_StatusSParams.prototype.maxItems = function() {
-  return SparamData ? param.Sparam.length : 0;
+  return param.Sparam ? param.Sparam.length : 0;
 };
 
 Window_StatusSParams.prototype.maxCols = function() {
@@ -982,7 +1096,7 @@ Window_StatusElement.prototype.setActor = function(actor) {
 };
 
 Window_StatusElement.prototype.maxItems = function() {
-  return ElementResistData ? param.ElementResist.length : 0;
+  return param.ElementResist ? param.ElementResist.length : 0;
 };
 
 Window_StatusElement.prototype.maxCols = function() {
@@ -1041,7 +1155,7 @@ Window_StatusState.prototype.setActor = function(actor) {
 };
 
 Window_StatusState.prototype.maxItems = function() {
-  return StateResistData ? param.StateResist.length : 0;
+  return param.StateResist ? param.StateResist.length : 0;
 };
 
 Window_StatusState.prototype.maxCols = function() {
@@ -1058,7 +1172,7 @@ Window_StatusState.prototype.drawItem = function(index) {
     const stateId = param.StateResist[index].StateNo;
     if(stateId > 0) {
       const iconId = $dataStates[stateId].iconIndex;
-      if(iconId > 0) {
+      if(iconId > 0 && !param.StateResistText) {
         this.drawIcon(iconId, rect.x, rect.y + 2);
       } else {
         const name = $dataStates[stateId].name;

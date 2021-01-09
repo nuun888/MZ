@@ -12,7 +12,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc エンカウント条件
+ * @plugindesc エンカウント条件拡張
  * @author NUUN
  * 
  * @help

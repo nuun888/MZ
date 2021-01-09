@@ -54,6 +54,9 @@
  * 各ゲージ長を個別に設定可能に変更。
  * 2021/1/2 Ver.1.4.1
  * NUUN_IconSideBySide対応
+ * 2021/1/10 Ver.1.4.2
+ * アクターウィンドウ座標変更許可をtrueにした場合でもウィンドウを中央に配置できるように変更。
+ * 特定の条件でアニメーションがずれる問題を修正。
  */
 /*:
  * @target MZ
@@ -188,6 +191,13 @@
  * @min 0
  * @parent Window
  * 
+ * @param ActorStatusWindowCenter
+ * @text ウィンドウ中央表示
+ * @desc ウィンドウを中央に表示させます。
+ * @type boolean
+ * @default true
+ * @parent Window
+ * 
  * @param ActorSelectBackShow
  * @desc アクターの対象選択時に表示されるアクター背景を表示する。
  * @text アクターの対象選択時背景表示
@@ -257,7 +267,7 @@
  * @text 表示コマンド行数
  * @type number
  * @default 1
- * @min 0
+ * @min 1
  * @parent PartyCommand
  * 
  * @param PartyCommandMaxCol
@@ -265,7 +275,7 @@
  * @text 表示コマンド列数
  * @type number
  * @default 4
- * @min 0
+ * @min 1
  * @parent PartyCommand
  * 
  * @param PartyCommandCenter
@@ -1091,10 +1101,14 @@ Scene_Battle.prototype.createActorCommandWindow = function() {
 
 Scene_Battle.prototype.differenceX = function() {
   if (param.ActorStatusWindowOnPosition) {
-    return param.ActorStatusWindow_Width > 0 ? (Graphics.boxWidth - Graphics.width) / 2 + param.ActorStatusWindow_X : param.ActorStatusWindow_X;
+    if (param.ActorStatusWindowCenter) {
+      return (Graphics.boxWidth - this._statusWindow.width) / 2 + param.ActorStatusWindow_X;
+    } else {
+      return (Graphics.boxWidth - Graphics.width) / 2 + param.ActorStatusWindow_X;
+    }
   }
   if (param.ActorStatusWindow_Width > 0) {
-    return (Graphics.boxWidth - (param.ActorStatusWindow_Width - 8)) / 2;
+    return (Graphics.boxWidth - this._statusWindow.width) / 2;
   } else {
     return 0;
   }
@@ -1111,8 +1125,13 @@ Scene_Battle.prototype.statusWindowRect = function() {
   const extra = 10;
   const ww = param.ActorStatusWindow_Width > 0 ? param.ActorStatusWindow_Width - 8 : Graphics.boxWidth;
   const wh = param.ActorStatusWindow_Height > 0 ? param.ActorStatusWindow_Height : this.windowAreaHeight() + extra - (param.WindowFrameShow ? 10 : 0);
-  const wx = param.ActorStatusWindowOnPosition ? (param.ActorStatusWindow_Width > 0 ? 0 : (Graphics.width - ww) / 2) + param.ActorStatusWindow_X : (Graphics.width - ww) / 2;
-  const wy = param.ActorStatusWindowOnPosition ? param.ActorStatusWindow_Y : (Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight - wh + extra - (param.WindowFrameShow ? 6 : 0) - 4;
+  if (param.ActorStatusWindowOnPosition) {
+    wx = (param.ActorStatusWindowCenter ? (Graphics.width - ww) / 2 : 0) + param.ActorStatusWindow_X;
+    wy = param.ActorStatusWindow_Y;
+  } else {
+    wx = (Graphics.width - ww) / 2;
+    wy = (Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight - wh + extra - (param.WindowFrameShow ? 6 : 0) - 4;
+  }
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -1161,7 +1180,7 @@ Scene_Battle.prototype.actorCommandX = function() {
   if (param.ActorCommandMode === 0) {
     return 0;
   } else if (param.ActorCommandMode >= 1) {
-    return param.ActorCommandCenter ? Graphics.boxWidth / 2 - this.actorCommandWidth() / 2 : 0 + param.ActorCommand_X;
+    return (param.ActorCommandCenter ? Graphics.boxWidth / 2 - this.actorCommandWidth() / 2 : 0) + param.ActorCommand_X;
   } else {
     return 0;
   }
@@ -1295,7 +1314,7 @@ Scene_Battle.prototype.selectPreviousCommand = function() {
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
   _Scene_Battle_onSelectAction.call(this);
-  if(BattleManager.isTpb()){
+  if (BattleManager.isTpb()){
     this._partyCommandWindow.opacity = 0;
   }
 };
@@ -1446,15 +1465,15 @@ Window_BattleStatus.prototype.maxCols = function() {
   return param.ActorMaxCol > 0 ? param.ActorMaxCol : Math.max($gameParty.maxBattleMembers(), 4);
 };
 
-const _Window_BattleStatus_itemHeight = Window_BattleStatus.prototype.itemHeight;//param.ActorMaxRow
+const _Window_BattleStatus_itemHeight = Window_BattleStatus.prototype.itemHeight;
 Window_BattleStatus.prototype.itemHeight = function() {
-  const row = param.ActorMaxRow > 0 ? param.ActorMaxRow : Math.ceil(this.maxItems() / this.maxCols());
+  const row = param.ActorMaxRow > 0 ? param.ActorMaxRow : Math.ceil($gameParty.maxBattleMembers() / this.maxCols());
   return Math.floor(_Window_BattleStatus_itemHeight.call(this) / row);
 };
 
 const _Window_BattleStatus_rowSpacing = Window_BattleStatus.prototype.rowSpacing;
 Window_BattleStatus.prototype.rowSpacing = function() {
-  return Math.ceil(this.maxItems() / this.maxCols()) > 1 ? 4 : _Window_BattleStatus_rowSpacing.call(this);
+  return Math.ceil($gameParty.maxBattleMembers() / this.maxCols()) > 1 ? 4 : _Window_BattleStatus_rowSpacing.call(this);
 };
 
 Window_BattleStatus.prototype.drawItemBackground = function(index) {
@@ -1871,7 +1890,6 @@ Sprite_Actor.prototype.statusPosition = function(index, rect) {
   return rect;
 };
 
-
 Sprite_Actor.prototype.actorHomeRefresh = function(index) {
   let x = 0;
   let y = 0;
@@ -1894,13 +1912,13 @@ Sprite_Actor.prototype.actorHomeRefresh = function(index) {
 
 Sprite_Actor.prototype.differenceX = function() {
   if (param.ActorStatusWindowOnPosition) {
-    if (param.ActorStatusWindow_Width > 0) {
-      return (0 + (Graphics.boxWidth - Graphics.width) / 2) + param.ActorStatusWindow_X;
+    if (param.ActorStatusWindowCenter) {
+      return (Graphics.boxWidth - this._statusWindow.width) / 2 + param.ActorStatusWindow_X;
     } else {
-      return (Graphics.boxWidth - Graphics.boxWidth) / 2 + param.ActorStatusWindow_X;
+      return (0 + (Graphics.boxWidth - Graphics.width) / 2) + param.ActorStatusWindow_X;
     }
   }
-  return (Graphics.boxWidth - (param.ActorStatusWindow_Width > 0 ? param.ActorStatusWindow_Width - 8 : Graphics.boxWidth)) / 2;
+  return (Graphics.boxWidth - this._statusWindow.width) / 2;
 };
 
 Sprite_Actor.prototype.differenceY = function() {

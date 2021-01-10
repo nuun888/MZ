@@ -57,6 +57,8 @@
  * 2021/1/10 Ver.1.4.2
  * アクターウィンドウ座標変更許可をtrueにした場合でもウィンドウを中央に配置できるように変更。
  * 特定の条件でアニメーションがずれる問題を修正。
+ * 2021/1/11 Ver.1.5.0
+ * アクターステータスに任意の背景画像を表示できる機能を追加。
  */
 /*:
  * @target MZ
@@ -69,6 +71,8 @@
  * 　フロントビューバトルでもアニメーション、ダメージエフェクトを表示できるようになります。
  * 　アクターステータスの位置を変更することが出来ます。
  * 　戦闘不能時やダメージを受けた時、瀕死、勝利、詠唱時に顔グラフィック、立ち絵を変更することが出来ます。
+ *   アクターウィンドウ、アクターステータスに任意の背景画像を表示できます。
+ *   アクターステータスのサイズを確認したい場合は、テスト戦闘を行い「DevTools」で確認できます。
  * 
  * 仕様
  * パーティコマンドは画面上部、画面上部からアクターステータス欄の中間、アクターステータス欄の上部
@@ -454,6 +458,13 @@
  * @option 右寄り
  * @value 2
  * @default 1
+ * @parent ActorStatus
+ * 
+ * @param actorBackground
+ * @desc アクターの背景画像を指定します。
+ * @text アクター背景画像
+ * @type file
+ * @dir img/system
  * @parent ActorStatus
  * 
  * @param ActorsButlers
@@ -965,6 +976,9 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   }
 }));
 
+ImageManager.loadSystem(param.actorBackground);
+ImageManager.loadSystem(param.windowBackground);
+
 //Game_Temp
 Game_Temp.prototype.setBattleEffectsRefresh = function(flag) {
   this._battleEffectRefresh = flag;
@@ -1459,6 +1473,9 @@ Window_BattleStatus.prototype.initialize = function(rect) {
   this.opacity = param.WindowShow ? 255 : 0;
   this._opening = true;
   this.visible = true;
+  if (BattleManager.isBattleTest()) {
+    console.log("アクターステータス横幅 "+ (this.itemWidth() - this.colSpacing()) +" アクターステータス縦幅 "+ (this.itemHeight() - this.rowSpacing()))
+  }
 };
 
 Window_BattleStatus.prototype.maxCols = function() {
@@ -1478,7 +1495,9 @@ Window_BattleStatus.prototype.rowSpacing = function() {
 
 Window_BattleStatus.prototype.drawItemBackground = function(index) {
   const rect = this.itemRect(index);
-  if((param.WindowShow && param.cursorBackShow) || param.cursorBackShow) {
+  if (this._actorBack[index]){
+    this.actorBackGround(index, rect.x, rect.y);
+  } else if((param.WindowShow && param.cursorBackShow) || param.cursorBackShow) {
     this.drawBackgroundRect(rect);
   }
 };
@@ -1492,9 +1511,26 @@ Window_BattleStatus.prototype.close = function() {
 };
 
 Window_BattleStatus.prototype.preparePartyRefresh = function() {
-  this.refresh();
-  this.commandRefresh();
-  this.battleEffectsRefresh();
+  this._bitmapsReady = 0;
+  this._actorBack = [];
+  const bitmap = ImageManager.loadSystem(param.actorBackground);
+  for (let i = 0; i < $gameParty.members().length; i++) {
+    this._actorBack[i] = bitmap;
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.addLoadListener(this.performPartyRefresh.bind(this));
+    } else {
+      this.performPartyRefresh();
+    }
+  }
+};
+
+Window_BattleStatus.prototype.performPartyRefresh = function() {
+  this._bitmapsReady++;
+  if (this._bitmapsReady >= $gameParty.members().length) {
+    this.refresh();
+    this.commandRefresh();
+    this.battleEffectsRefresh();
+  }
 };
 
 Window_BattleStatus.prototype.commandRefresh = function() {
@@ -1601,6 +1637,21 @@ Window_BattleStatus.prototype.placeGauge = function(actor, type, x, y) {
   sprite.setup(actor, type);
   sprite.move(x, y);
   sprite.show();
+};
+
+Window_BattleStatus.prototype.actorBackGround = function(index, x, y) {
+  const actor = this.actor(index);
+  const key = "actor%1-back-%2".format(actor.actorId());
+  const sprite = this.createInnerSprite(key, Sprite);
+  sprite.bitmap = this._actorBack[index];
+  sprite.move(x, y);
+  sprite.show();
+};
+
+Window_BattleStatus.prototype.battlreActorImges = function(id) {
+  const actors = param.ActorsButlerList;
+  const deta = actors.find(actor => actor.actorId === id);
+  return deta ? deta : this.undefinedDeta(id, deta);
 };
 
 //Window_BattleActorImges

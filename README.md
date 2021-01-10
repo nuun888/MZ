@@ -15,12 +15,12 @@
   
 <b>スキル、アイテム</b><br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>
-キャストタイムキャンセル<br>
+[NUUN_CancelCastTime](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js)　キャストタイム（詠唱）キャンセルスキル、アイテム<br>
 スキル、アイテムの色<br>
 
 <b>アイテム</b><br>
-[NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)アイテム消耗率<br>
-[NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)アイテム使用回数<br>
+[NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)　アイテム消耗率<br>
+[NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)　アイテム使用回数<br>
 新規入手アイテムの強調<br>
 
 <b>スキル</b><br>

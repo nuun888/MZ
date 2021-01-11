@@ -48,7 +48,7 @@
 <b>敵グループ</b><br>
 [NUUN_BattleBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js)　敵グループの個別ＢＧＭ設定<br>
 [NUUN_BattleME](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleME.js)　敵グループの個別戦闘勝利敗北ME設定<br>
-[NUUN_EncounterCondition](https://github.com/nuun888/MZ/blob/master/NUUN_EncounterCondition.js)　エンカウント条件<br>
+[NUUN_EncounterCondition](https://github.com/nuun888/MZ/blob/master/NUUN_EncounterCondition.js)　エンカウント条件拡張<br>
 
 <b>イベント</b><br>
 [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)  アイテムなどのランダム取得<br>

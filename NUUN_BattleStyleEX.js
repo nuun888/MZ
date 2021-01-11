@@ -59,6 +59,8 @@
  * 特定の条件でアニメーションがずれる問題を修正。
  * 2021/1/11 Ver.1.5.0
  * アクターステータスに任意の背景画像を表示できる機能を追加。
+ * 2021/1/11 Ver.1.5.1
+ * アクターステータス背景画像が指定されてない時に、アクター背景を表示するに設定しても背景が表示されない問題を修正。
  */
 /*:
  * @target MZ
@@ -68,12 +70,13 @@
  * @help
  * バトルスタイルに以下の機能を実装します。
  * 　アクターの立ち絵を表示できるようになります。
- * 　フロントビューバトルでもアニメーション、ダメージエフェクトを表示できるようになります。
- * 　アクターステータスの位置を変更することが出来ます。
- * 　戦闘不能時やダメージを受けた時、瀕死、勝利、詠唱時に顔グラフィック、立ち絵を変更することが出来ます。
- *   アクターウィンドウ、アクターステータスに任意の背景画像を表示できます。
+ * 　戦闘不能時やダメージを受けた時、瀕死、勝利、詠唱時、ステートにかかっている時に顔グラフィック、立ち絵を変更可能
+ * 　フロントビューでもアクター側にアニメーション、ダメージエフェクト表示可能
+ * 　パーティコマンド、アクターコマンドの位置を指定可能
+ *   各ゲージ長やステータスの位置を設定可能
  * 
  * 仕様
+ * アクターステータスをコマンド非表示になった時に中央に移動しないように変更しています。
  * パーティコマンドは画面上部、画面上部からアクターステータス欄の中間、アクターステータス欄の上部
  * のいずれかから選択できます。TPBバトルでアクティブを選択している場合は、画面上部以外の選択を推奨いたします。
  * アクターコマンドは各アクターの上部に表示されます。
@@ -136,8 +139,8 @@
  * @parent Window
  * 
  * @param cursorBackShow
- * @desc カーソル背景を表示する。
- * @text カーソル背景表示
+ * @desc アクター背景を表示する。
+ * @text アクター背景表示
  * @type boolean
  * @default true
  * @parent Window
@@ -1498,7 +1501,7 @@ Window_BattleStatus.prototype.rowSpacing = function() {
 Window_BattleStatus.prototype.drawItemBackground = function(index) {
   const rect = this.itemRect(index);
   if (this._actorBack[index]){
-    this.actorBackGround(index, rect.x, rect.y);
+    this.actorBackGround(index, rect.x, rect.y);console.log(this._actorBack[index])
   } else if((param.WindowShow && param.cursorBackShow) || param.cursorBackShow) {
     this.drawBackgroundRect(rect);
   }
@@ -1515,7 +1518,7 @@ Window_BattleStatus.prototype.close = function() {
 Window_BattleStatus.prototype.preparePartyRefresh = function() {
   this._bitmapsReady = 0;
   this._actorBack = [];
-  const bitmap = ImageManager.loadSystem(param.actorBackground);
+  const bitmap = param.actorBackground ? ImageManager.loadSystem(param.actorBackground) : null;
   for (let i = 0; i < $gameParty.members().length; i++) {
     this._actorBack[i] = bitmap;
     if (bitmap && !bitmap.isReady()) {

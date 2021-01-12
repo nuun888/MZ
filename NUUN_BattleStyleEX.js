@@ -7,26 +7,35 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2020/12/6 Ver.1.0.0
- * 初版
- * 2020/12/7 Ver.1.0.1
- * バトラーアニメーションに勝利、詠唱時の画像を変更する機能を追加。
- * 2020/12/8 Ver.1.0.2
- * 戦闘開始時に戦闘不能のアクター画像が一瞬表示されないように修正。
- * 2020/12/9 Ver.1.1.0
- * アクターステータスウィンドウの表示処理を見直し。
- * アクターステータスウィンドウに背景画像を指定出来る機能を追加。
- * 2020/12/9 Ver.1.1.1
- * 名前を非表示にできる機能を追加。
- * 2020/12/16 Ver.1.1.2
- * エネミー、アイテム、スキル選択画面を表示している時のアクターウィンドウに不透明度を指定できる機能を追加。
- * 2020/12/17 Ver.1.1.3
- * メッセージウィンドウを下に表示（アクターウィンドウの前面）させないように修正。
- * （メッセージウィンドウを下に表示で設定した場合、バトル中のみ自動的に上に表示されます）Ver.1.3.0で下側にも表示できるようになりました。
- * 2020/12/19 Ver.1.2.0
- * アクター選択時にアクター画像（顔グラ）を点滅させる機能を追加。
- * 2020/12/19 Ver.1.2.0.1
- * アクターウィンドウ表示を非表示に設定しても表示してしまう不具合を修正。
+ * 2021/1/12 Ver.1.5.2
+ * アクターコマンドの設定によっては、コマンドが画面の端から見切れる問題を修正。
+ * 2021/1/11 Ver.1.5.1
+ * アクターステータス背景画像が指定されてない時に、アクター背景を表示するに設定しても背景が表示されない問題を修正。
+ * 2021/1/11 Ver.1.5.0
+ * アクターステータスに任意の背景画像を表示できる機能を追加。
+ * 2021/1/10 Ver.1.4.2
+ * アクターウィンドウ座標変更許可をtrueにした場合でもウィンドウを中央に配置できるように変更。
+ * 特定の条件でアニメーションがずれる問題を修正。
+ * 2021/1/2 Ver.1.4.1
+ * NUUN_IconSideBySide対応
+ * 2020/12/31 Ver.1.4.0
+ * アクターウィンドウを自由に配置できる機能を追加。
+ * アクターの配置をある程度設定できるように機能を追加。
+ * フロントビューでエフェクトを表示させない機能を追加。
+ * スキル、アイテム、エネミー選択画面の不透明度を個別に無効化できる機能を追加。
+ * 各ゲージ長を個別に設定可能に変更。
+ * 2020/12/29 Ver.1.3.4.1
+ * ステート変化IDの説明が古いバージョンの記述法のままだったのを修正。
+ * 2020/12/29 Ver.1.3.4
+ * パーティコマンドを「アクターウィンドウの上」で表示された時、表示されない問題を修正。
+ * 2020/12/28 Ver.1.3.3
+ * 特定の条件下でアクター画像、顔グラがぼやけて表示される不具合を修正。
+ * 被ステート時のグラフィックがステートのモーションが通常の時に、画像の変更が反映されない不具合を修正。
+ * 被ステート時のグラフィックが変更後に別の被ステート時のグラフィックが変更されるときに正常に表示されない不具合を修正。
+ * 2020/12/25 Ver.1.3.2
+ * イベントコマンドでアニメーションを表示させるとエラーが出る不具合を修正。
+ * 2020/12/23 Ver.1.3.1
+ * アクター行動選択時に表示される背景画像の表示とアクター対象選択時に表示される背景画像を非表示に出来るように機能を追加。
  * 2020/12/21 Ver.1.3.0
  * 戦闘不能時のグラフィックを設定してない時に、戦闘不能時のアクター画像（顔グラ）を表示したままにするか選択できるようにしました。（従来の方法でも可能）
  * パーティコマンドの表示位置、行数、列数を指定できるように変更。
@@ -34,33 +43,26 @@
  * アクターコマンドの表示位置、行数、列数を指定できるように変更。
  * エネミー出現、リザルト、敗北、逃走メッセージを画面上側か画面下側に表示を選択できる機能を追加。
  * メッセージウインドウを下側にも表示可能に修正。メッセージウィンドウが下側に表示された場合でも「選択時ウィンドウ不透明度」が適用されます。
- * 2020/12/23 Ver.1.3.1
- * アクター行動選択時に表示される背景画像の表示とアクター対象選択時に表示される背景画像を非表示に出来るように機能を追加。
- * 2020/12/25 Ver.1.3.2
- * イベントコマンドでアニメーションを表示させるとエラーが出る不具合を修正。
- * 2020/12/28 Ver.1.3.3
- * 特定の条件下でアクター画像、顔グラがぼやけて表示される不具合を修正。
- * 被ステート時のグラフィックがステートのモーションが通常の時に、画像の変更が反映されない不具合を修正。
- * 被ステート時のグラフィックが変更後に別の被ステート時のグラフィックが変更されるときに正常に表示されない不具合を修正。
- * 2020/12/29 Ver.1.3.4
- * パーティコマンドを「アクターウィンドウの上」で表示された時、表示されない問題を修正。
- * 2020/12/29 Ver.1.3.4.1
- * ステート変化IDの説明が古いバージョンの記述法のままだったのを修正。
- * 2020/12/31 Ver.1.4.0
- * アクターウィンドウを自由に配置できる機能を追加。
- * アクターの配置をある程度設定できるように機能を追加。
- * フロントビューでエフェクトを表示させない機能を追加。
- * スキル、アイテム、エネミー選択画面の不透明度を個別に無効化できる機能を追加。
- * 各ゲージ長を個別に設定可能に変更。
- * 2021/1/2 Ver.1.4.1
- * NUUN_IconSideBySide対応
- * 2021/1/10 Ver.1.4.2
- * アクターウィンドウ座標変更許可をtrueにした場合でもウィンドウを中央に配置できるように変更。
- * 特定の条件でアニメーションがずれる問題を修正。
- * 2021/1/11 Ver.1.5.0
- * アクターステータスに任意の背景画像を表示できる機能を追加。
- * 2021/1/11 Ver.1.5.1
- * アクターステータス背景画像が指定されてない時に、アクター背景を表示するに設定しても背景が表示されない問題を修正。
+ * 2020/12/19 Ver.1.2.0.1
+ * アクターウィンドウ表示を非表示に設定しても表示してしまう不具合を修正。
+ * 2020/12/19 Ver.1.2.0
+ * アクター選択時にアクター画像（顔グラ）を点滅させる機能を追加。
+ * 2020/12/17 Ver.1.1.3
+ * メッセージウィンドウを下に表示（アクターウィンドウの前面）させないように修正。
+ * （メッセージウィンドウを下に表示で設定した場合、バトル中のみ自動的に上に表示されます）Ver.1.3.0で下側にも表示できるようになりました。
+ * 2020/12/16 Ver.1.1.2
+ * エネミー、アイテム、スキル選択画面を表示している時のアクターウィンドウに不透明度を指定できる機能を追加。
+ * 2020/12/9 Ver.1.1.1
+ * 名前を非表示にできる機能を追加。
+ * 2020/12/9 Ver.1.1.0
+ * アクターステータスウィンドウの表示処理を見直し。
+ * アクターステータスウィンドウに背景画像を指定出来る機能を追加。
+ * 2020/12/8 Ver.1.0.2
+ * 戦闘開始時に戦闘不能のアクター画像が一瞬表示されないように修正。
+ * 2020/12/7 Ver.1.0.1
+ * バトラーアニメーションに勝利、詠唱時の画像を変更する機能を追加。
+ * 2020/12/6 Ver.1.0.0
+ * 初版
  */
 /*:
  * @target MZ
@@ -1086,6 +1088,9 @@ Scene_Battle.prototype.createHud = function() {
   this._statusWindow = new Window_BattleStatus(rect);
   this._battleHudBack.addChild(this._statusWindow);
   this.setStatusWindow_Sprite();
+  this._statusWindow.differenceX = this.differenceX();
+  this._statusWindow.differenceY = this.differenceY();
+  this._statusWindow.UI_Difference = (Graphics.width - Graphics.boxWidth) / 2;
 };
 
 Scene_Battle.prototype.createStatusWindow = function() {
@@ -1114,8 +1119,6 @@ Scene_Battle.prototype.createActorCommandWindow = function() {
   _Scene_Battle_createActorCommandWindow.call(this);
   this._actorCommandWindow.setStatusWindow(this._statusWindow);
   this._actorCommandWindow.y = this.actorCommandY();
-  this._actorCommandWindow.differenceX = this.differenceX();
-  this._actorCommandWindow.differenceY = this.differenceY();
 };
 
 Scene_Battle.prototype.differenceX = function() {
@@ -1445,10 +1448,11 @@ Window_ActorCommand.prototype.refresh = function() {
     const rect = this._statusWindow.itemRect(actorIndex);
     this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
     this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
-    this.x = ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + Math.max(param.ActorCommand_X, 0) + this.differenceX;
+    this.x = Math.max(-this._statusWindow.UI_Difference + 4, ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + Math.max(param.ActorCommand_X, 0) + this._statusWindow.differenceX);
+    this.x = Math.min(this.x, Graphics.boxWidth + this._statusWindow.UI_Difference - this.width - 4);
     let zeroPosition = 0;
     if (param.ActorStatusWindowOnPosition) {
-      this.y = this.differenceY - this.height + param.ActorCommand_Y + rect.y;
+      this.y = this._statusWindow.differenceY - this.height + param.ActorCommand_Y + rect.y;
       zeroPosition = (Graphics.boxHeight - Graphics.height) / 2;
     } else {
       this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + param.ActorCommand_Y + rect.y;

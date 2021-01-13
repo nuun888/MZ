@@ -7,12 +7,15 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2020/12/15 Ver.1.0.0
- * 初版
- * 2020/12/16 Ver.1.0.1
- * UIサイズ変更時のエネミーの座標シフト方法にUIサイズに比例してシフトする機能を追加。
+ * 2021/1/13Ver.1.0.2
+ * エネミー、アクターの位置修正の処理方法を変更。
  * 2020/12/16 Ver.1.0.1.1
  * サイドビューバトルでエネミーの座標が左端に表示されてしまう問題を修正。
+ * 2020/12/16 Ver.1.0.1
+ * UIサイズ変更時のエネミーの座標シフト方法にUIサイズに比例してシフトする機能を追加。
+ * 2020/12/15 Ver.1.0.0
+ * 初版
+ * 
  */ 
 /*:
  * @target MZ
@@ -90,23 +93,23 @@ Imported.NUUN_BattlePosition = true;
   const backgroundFit = eval(parameters['BackgroundFit'] || false);
   const backgroundPosition = Number(parameters['BackgroundPosition'] || 0);
 
-  Sprite_Actor.prototype.setActorHome = function(index) {
-    const x = ((Graphics.boxWidth - 808) / 2 + actorXPosition + 600) + index * 32;
-    const y = ((Graphics.boxHeight - 616) / 2 + actorYPosition + 280) + index * 48;
-    this.setHome(x, y);
-  };
-  
-  Sprite_Enemy.prototype.setBattler = function(battler) {
-    Sprite_Battler.prototype.setBattler.call(this, battler);
-    this._enemy = battler;
-    let x = this.setPosition(battler) + enemyXPosition;
-    let y = battler.screenY() + (Graphics.boxHeight - 616) / 2 + enemyYPosition;
-    this.setHome(x, y);
-    this._stateIconSprite.setup(battler);
+  const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
+  Sprite_Actor.prototype.setHome = function(x, y) {
+    if ($gameSystem.isSideView()) {
+      x += (Graphics.boxWidth - 808) / 2 + actorXPosition;
+      y += (Graphics.boxHeight - 616) / 2 + actorYPosition;
+    }
+    _Sprite_Actor_setHome.call(this, x, y);
   };
 
-  Sprite_Enemy.prototype.setPosition = function(battler) {
-    return $gameSystem.isSideView() ? battler.screenX() : (EnemyXPositionMode ? (Graphics.boxWidth - 808) / 2 + battler.screenX(): Graphics.boxWidth / 808 * battler.screenX());
+  const _Sprite_Enemy_setHome = Sprite_Enemy.prototype.setHome;
+  Sprite_Enemy.prototype.setHome = function(x, y) {
+    if (!$gameSystem.isSideView()) {
+      x = EnemyXPositionMode ? (Graphics.boxWidth - 808) / 2 + x : Graphics.boxWidth / 808 * x;
+    }
+    x += enemyXPosition;
+    y += (Graphics.boxHeight - 616) / 2 + enemyYPosition;
+    _Sprite_Enemy_setHome.call(this, x, y);
   };
 
   const _Sprite_Battleback_adjustPosition = Sprite_Battleback.prototype.adjustPosition;

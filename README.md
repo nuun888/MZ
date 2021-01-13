@@ -6,7 +6,10 @@
 [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>
 
 <b>戦闘</b><br>
+バトルスタイル拡張ベース<br>
 [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)　バトルスタイル拡張<br>
+バトルスタイル拡張クラシック風タイプ<br>
+バトルスタイル拡張某ゲーム風タイプ<br>
 [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)　解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整<br>
 [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)　戦闘背景の変更<br>
 リミットゲージ<br>
@@ -43,6 +46,7 @@
 [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)　エネミー図鑑<br>
 [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)　コマンドカスタマイズ<br>
 [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)　ステータス画面スタイル変更<br>
+[NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX)　所持金拡張<br>
 アイテム図鑑（仮）<br>
 
 <b>敵グループ</b><br>

@@ -12,11 +12,11 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  お金拡張
+ * @plugindesc  所持金拡張
  * @author NUUN
  * 
  * @help
- * お金を拡張します。
+ * 所持金を拡張します。
  * 
  * 主な機能
  * カンマ区切りに出来ます。
@@ -43,27 +43,27 @@
  * @default 0
  * 
  * @param GoldSeparation
- * @desc 金額の表示をカンマ区切りにします。
+ * @desc 所持金の表示をカンマ区切りにします。
  * @text カンマ区切り
  * @type boolean
  * @default true
  * 
  * 
  * @command GetGold
- * @text お金の増減。
- * @desc お金増減
+ * @text 所持金の増減。
+ * @desc 所持金増減
  * 
  * @arg Gold
  * @type number
  * @default 0
- * @text お金増減金額
- * @desc お金を増減させます。イベントコマンドの上限を超える金額または下回る金額でも可能です。（１京まで）
+ * @text 所持金増減金額
+ * @desc 所持金を増減させます。イベントコマンドの上限を超える金額または下回る金額でも可能です。（１京まで）
  * @min 0
  * @max 10000000000000000
  * 
  * @arg GoldMode
  * @text 増減処理
- * @desc お金の処理を選択します。
+ * @desc 所持金の処理を選択します。
  * @type select
  * @option 増加
  * @value 0

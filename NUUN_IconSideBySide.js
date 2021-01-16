@@ -7,12 +7,19 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/17 Ver.1.0.2
+ * バトルスタイル拡張プラグイン導入時、ステートの座標許可をtureにすると座標が反映されない問題を修正。
+ * バトルスタイル拡張プラグイン2.0.0以降対応。
+ * 2021/1/3 Ver.1.0.1
+ * 表示する横幅を指定できるように変更。
  * 2021/1/2 Ver.1.0.0
+ * 初版
  */ 
 /*:
  * @target MZ
  * @plugindesc  戦闘時アクターステート横並び表示
  * @author NUUN
+ * @orderAfter NUUN_BattleStyleEX_Base
  * 
  * 
  * @help
@@ -21,6 +28,13 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * 
+ * @param StateIconWidth_X
+ * @desc ステートアイコンの表示する横幅を指定します。
+ * @text 横幅
+ * @type number
+ * @default 0
+ * @min 0
  */
 
 var Imported = Imported || {};
@@ -28,11 +42,13 @@ Imported.NUUN_IconSideBySide = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_IconSideBySide');
+const StateIconWidth = Number(parameters['StateIconWidth'] || 0);
+const stateDate = Imported.NUUN_BattleStyleEX_Base ? BattleManager.NUUN_BattleStyleStateDate : null;
 
 const _Scene_Battle_createStatusWindow = Scene_Battle.prototype.createStatusWindow;
 Scene_Battle.prototype.createStatusWindow = function() {
   _Scene_Battle_createStatusWindow.call(this);
-  BattleManager._statusWindow = Imported.NUUN_BattleStyleEX ? this._actorStatus : this._statusWindow;
+  BattleManager._statusWindow = Imported.NUUN_BattleStyleEX_Base ? this._actorStatus : this._statusWindow;
 };
 
 const _Window_BattleStatus_placeStateIcon = Window_BattleStatus.prototype.placeStateIcon;
@@ -45,7 +61,7 @@ Window_BattleStatus.prototype.placeStateIcon = function(actor, x, y) {
 };
 
 Window_BattleStatus.prototype.drawStateIcon = function(actor, x, y) {
-  this.drawActorIcons(actor, x, y, this.itemWidth());
+  this.drawActorIcons(actor, x, y, (StateIconWidth > 0 ? StateIconWidth : this.itemWidth()));
 };
 
 Window_BattleStatus.prototype.refreshContentsDraw = function() {
@@ -54,8 +70,13 @@ Window_BattleStatus.prototype.refreshContentsDraw = function() {
     const index = actor.index();
     this.drawItemImage(index);
     const rect = this.itemRectWithPadding(index);
-    const stateIconX = this.stateIconX(rect);
-    const stateIconY = this.stateIconY(rect);
+    if (stateDate && stateDate.ChangePosition) {
+      stateIconX = stateDate.state_X + rect.x;
+      stateIconY = stateDate.state_Y + rect.y;
+    } else {
+      stateIconX = this.stateIconX(rect);
+      stateIconY = this.stateIconY(rect);
+    }
     this.drawStateIcon(actor, stateIconX, stateIconY);
   }
 };

@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_BattleStyleEX.js
+ * NUUN_BattleStyleEX_Classic.js
  * 
  * Copyright (C) 2021 NUUN
  * This software is released under the MIT License.
@@ -7,12 +7,12 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2021/1/17 Ver 1.0.0
- * ベースプラグインとレイアウト設定用のプラグインを別々に分割。
+ * 2021/1/17 Ver.1.0.0
+ * 初版
  */
 /*:
  * @target MZ
- * @plugindesc バトルスタイル拡張スタンダードタイプ
+ * @plugindesc バトルスタイル拡張クラシックタイプ
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
  * 
@@ -286,14 +286,14 @@
  * @value 2
  * @option アクターウィンドウの上
  * @value 3
- * @default 0
+ * @default 1
  * @parent ActorCommand
  * 
  * @param ActorCommandMaxRow
  * @desc 表示するコマンド行数。
  * @text 表示コマンド行数
  * @type number
- * @default 4
+ * @default 1
  * @min 1
  * @parent ActorCommand
  * 
@@ -301,7 +301,7 @@
  * @desc 表示するコマンド列数。
  * @text 表示コマンド列数
  * @type number
- * @default 1
+ * @default 5
  * @min 1
  * @parent ActorCommand
  * 
@@ -350,7 +350,7 @@
  * @desc アニメーションエフェクトのX座標（相対座標）。
  * @text アニメーションエフェクトX座標（相対座標）
  * @type number
- * @default 0
+ * @default -260
  * @min -9999
  * @parent Effect
  * 
@@ -374,7 +374,7 @@
  * @desc ダメージエフェクトのY座標（アニメーションエフェクトからの相対座標）。
  * @text ダメージエフェクトY座標（相対座標）
  * @type number
- * @default 0
+ * @default 50
  * @min -9999
  * @parent Effect
  * 
@@ -393,7 +393,7 @@
  * @desc 横に並べるアクター数。
  * @text 横アクター数
  * @type number
- * @default 0
+ * @default 1
  * @min 0
  * @parent ActorStatus
  * 
@@ -467,7 +467,7 @@
  * @desc 名前の座標変更を許可する。
  * @text 名前の座標変更
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorNameChangePosition
  * 
  * @param ActorName_X
@@ -482,7 +482,7 @@
  * @desc 名前のY座標を設定します。名前の座標変更がTrueの場合のみ適用します。（デフォルト88）
  * @text 名前Y座標
  * @type number
- * @default 88
+ * @default 10
  * @min -9999
  * @parent ActorNameChangePosition
  * 
@@ -514,14 +514,14 @@
  * @desc 顔グラフィックの座標変更を許可します。アクターのピクチャ設定がされてないアクターのみ適用されます。
  * @text 顔グラフィックの座標変更
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorFeceChangePosition
  * 
  * @param ActorFace_X
  * @desc 顔グラフィックのX座標を設定します。顔グラフィックの座標変更がTrueの場合のみ適用します。
  * @text 顔グラフィックX座標
  * @type number
- * @default 0
+ * @default -260
  * @min -9999
  * @parent ActorFeceChangePosition
  * 
@@ -553,7 +553,7 @@
  * @desc HP,MP,TPゲージの最大横幅を指定します。（デフォルト128）
  * @text ゲージ最大横幅
  * @type number
- * @default 128
+ * @default 200
  * @min 0
  * @parent ActorStatus
  * 
@@ -565,7 +565,7 @@
  * @desc HPゲージの横幅を指定します。（デフォルト128）
  * @text HPゲージ横幅
  * @type number
- * @default 128
+ * @default 160
  * @min 0
  * @parent ActorHPChangePosition
  * 
@@ -573,14 +573,14 @@
  * @desc HPの座標変更を許可します。
  * @text HPの座標変更
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorHPChangePosition
  * 
  * @param ActorHP_X
  * @desc HPのX座標を設定します。HPの座標変更がTrueの場合のみ適用します。
  * @text HP_X座標
  * @type number
- * @default 0
+ * @default 280
  * @min -9999
  * @parent ActorHPChangePosition
  * 
@@ -588,7 +588,7 @@
  * @desc HPのY座標を設定します。HPの座標変更がTrueの場合のみ適用します。（デフォルト112）
  * @text HP_Y座標
  * @type number
- * @default 112
+ * @default 10
  * @min -9999
  * @parent ActorHPChangePosition
  * 
@@ -600,7 +600,7 @@
  * @desc MPゲージの横幅を指定します。（デフォルト128）
  * @text MPゲージ横幅
  * @type number
- * @default 128
+ * @default 160
  * @min 0
  * @parent ActorMPChangePosition
  * 
@@ -608,14 +608,14 @@
  * @desc MPの座標変更を許可します。
  * @text MPの座標変更
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorMPChangePosition
  * 
  * @param ActorMP_X
  * @desc MPのX座標を設定します。MPの座標変更がTrueの場合のみ適用します。
  * @text MP_X座標
  * @type number
- * @default 0
+ * @default 450
  * @min -9999
  * @parent ActorMPChangePosition
  * 
@@ -623,7 +623,7 @@
  * @desc MPのY座標を設定します。MPの座標変更がTrueの場合のみ適用します。（デフォルト136）
  * @text MP_Y座標
  * @type number
- * @default 136
+ * @default 10
  * @parent ActorMPChangePosition
  * 
  * @param ActorTPChangePosition
@@ -634,7 +634,7 @@
  * @desc TPゲージの横幅を指定します。（デフォルト128）
  * @text TPゲージ横幅
  * @type number
- * @default 128
+ * @default 140
  * @min 0
  * @parent ActorTPChangePosition
  * 
@@ -642,14 +642,14 @@
  * @desc TPの座標変更を許可します。
  * @text TPの座標変更
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorTPChangePosition
  * 
  * @param ActorTP_X
  * @desc TPのX座標を設定します。TPの座標変更がTrueの場合のみ適用します。
  * @text TP_X座標
  * @type number
- * @default 0
+ * @default 620
  * @min -9999
  * @parent ActorTPChangePosition
  * 
@@ -657,7 +657,7 @@
  * @desc TPのY座標を設定します。TPの座標変更がTrueの場合のみ適用します。（デフォルト160）
  * @text TP_Y座標
  * @type number
- * @default 160
+ * @default 10
  * @min -9999
  * @parent ActorTPChangePosition
  * 
@@ -676,7 +676,7 @@
  * @desc TPBゲージの横幅を指定します。（デフォルト128）
  * @text TPBゲージ横幅
  * @type number
- * @default 128
+ * @default 200
  * @min 0
  * @parent ActorTPBChangePosition
  * 
@@ -684,7 +684,7 @@
  * @desc TPBの座標変更を許可します。
  * @text TPBの座標変更
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorTPBChangePosition
  * 
  * @param ActorTPB_X
@@ -699,7 +699,7 @@
  * @desc TPBのY座標を設定します。TPBの座標変更がTrueの場合のみ適用します。（デフォルト88）
  * @text TPB_Y座標
  * @type number
- * @default 88
+ * @default 19
  * @min -9999
  * @parent ActorTPBChangePosition
  * 
@@ -711,14 +711,14 @@
  * @desc ステートの座標変更を許可します。
  * @text ステートの座標変更
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorStateChangePosition
  * 
  * @param ActorState_X
  * @desc ステートのX座標を設定します。ステートの座標変更がTrueの場合のみ適用します。
  * @text ステートX座標
  * @type number
- * @default 4
+ * @default 250
  * @min -9999
  * @parent ActorStateChangePosition
  * 
@@ -726,7 +726,7 @@
  * @desc ステートのY座標ステートの座標変更がTrueの場合のみ適用します。
  * @text ステートY座標
  * @type number
- * @default 20
+ * @default 22
  * @min -9999
  * @parent ActorStateChangePosition
  * 
@@ -919,6 +919,4 @@
  */
 
 var Imported = Imported || {};
-Imported.NUUN_BattleStyleEX = true;
-
-
+Imported.NUUN_BattleStyleEX_Classic = true;

@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/17 Ver.1.0.1
+ * 少し修正。
  * 2021/1/16 Ver.1.0.0
  * 初版
  */ 
@@ -122,17 +124,20 @@ Spriteset_Battle.prototype.createLowerLayer = function() {
 
 Spriteset_Battle.prototype.createEnemyTpbGauge = function() {
   if (BattleManager.isTpb()) {
-    this._enemyTpb = new Sprite();
-    this.addChild(this._enemyTpb);
+    if (!this._enemyGaugeBase) {
+      const sprite = new Sprite();
+      this.addChild(sprite);
+      this._enemyGaugeBase = sprite;
+    }
     for (const sprites of this._enemySprites) {
       this.enemyTpbGauge(sprites);
-  }
+    }
   }
 };
 
 Spriteset_Battle.prototype.enemyTpbGauge = function(sprites) {
   const sprite = new Sprite_EnemyTPBGauge();
-  this._enemyTpb.addChild(sprite);
+  this._enemyGaugeBase.addChild(sprite);
   sprite.setup(sprites._battler, "time");
   sprite.show();
   sprite.move(0, 0);

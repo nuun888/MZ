@@ -36,7 +36,7 @@
  * 
  * @param CancelTpbChargeRate
  * @desc キャンセルされた時、チャージタイムの開始値を溜めたキャストタイムの割合からの開始値にする。（false：初期値0）
- * @text チャージタイム初期値
+ * @text キャンセル時チャージタイム割合開始
  * @type boolean
  * @default true
  * 

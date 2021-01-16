@@ -12,7 +12,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc バトルスタイル拡張スタンダードタイプ
+ * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
  * 

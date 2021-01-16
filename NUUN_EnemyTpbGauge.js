@@ -7,6 +7,9 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/17 Ver.1.1.0
+ * Y座標を調整できる機能を追加。
+ * エネミーのステート表示が被る問題を修正。
  * 2021/1/17 Ver.1.0.1
  * 少し修正。
  * 2021/1/16 Ver.1.0.0
@@ -47,6 +50,13 @@
  * @default 12
  * @min 0
  * 
+ * @param Gauge_Y
+ * @desc ゲージのY座標（相対座標）指定します。
+ * @text ゲージY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_EnemyTpbGauge = true;
@@ -56,6 +66,7 @@ const parameters = PluginManager.parameters('NUUN_EnemyTpbGauge');
 const TpbPosition = Number(parameters['TpbPosition'] || 0);
 const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
+const Gauge_Y = Number(parameters['Gauge_Y'] || 0);
 
 const _Sprite_Enemy_initVisibility = Sprite_Enemy.prototype.initVisibility;
 Sprite_Enemy.prototype.initVisibility = function() {
@@ -105,12 +116,12 @@ Sprite_Enemy.prototype.update = function() {
 
 Sprite_Enemy.prototype.updateTpbGauge = function() {
   this._enemyTpb.x = (Graphics.width - Graphics.boxWidth) / 2 + this.x - this._enemyTpb.width / 2;
-  this._enemyTpb.y = (Graphics.height - Graphics.boxHeight) / 2 + this.y - 40;
+  this._enemyTpb.y = (Graphics.height - Graphics.boxHeight) / 2 + this.y - 40 + Gauge_Y;
   if (TpbPosition === 0) {
-    this._enemyTpb.y -= Math.round((this.bitmap.height + 40) * 0.9);
+    this._enemyTpb.y -= Math.round((this.bitmap.height + 70) * 0.9);
   }
   if (this._enemyTpb.y < 0) {
-      this._enemyTpb.y = 0;
+      this._enemyTpb.y = 30;
   } else if (this._enemyTpb.y + 40 > Graphics.height) {
     this._enemyTpb.y = Graphics.height - 40;
   }

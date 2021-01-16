@@ -22,8 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * @param TpbPosition
- * @desc エネミーのＴＰＢゲージ位置
- * @text ＴＰＢゲージ位置
+ * @desc エネミーのTPBゲージ位置
+ * @text TPBゲージ位置
  * @type select
  * @option 敵画像の上
  * @value 0

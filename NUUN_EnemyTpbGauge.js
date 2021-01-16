@@ -59,14 +59,14 @@ const _Sprite_Enemy_initVisibility = Sprite_Enemy.prototype.initVisibility;
 Sprite_Enemy.prototype.initVisibility = function() {
   _Sprite_Enemy_initVisibility.call(this);
   if (!this._appeared) {
-    this._enemyTpb.opacity = 0;
+    this.setTpbOpacity(0);
   }
 };
 
 const _Sprite_Enemy_revertToNormal = Sprite_Enemy.prototype.revertToNormal;
 Sprite_Enemy.prototype.revertToNormal = function() {
   _Sprite_Enemy_revertToNormal.call(this);
-  this._enemyTpb.opacity = 255;
+  this.setTpbOpacity(255);
 };
 
 const _Sprite_Enemy_updateCollapse = Sprite_Enemy.prototype.updateCollapse;
@@ -82,13 +82,21 @@ Sprite_Enemy.prototype.updateBossCollapse = function() {
 };
 
 Sprite_Enemy.prototype.collapseTpbGauge = function() {
-  this._enemyTpb.opacity *= this._effectDuration / (this._effectDuration + 1);
+  if (BattleManager.isTpb()) {
+    this._enemyTpb.opacity *= this._effectDuration / (this._effectDuration + 1);
+  }
+};
+
+Sprite_Enemy.prototype.setTpbOpacity = function(opacity) {
+  if (BattleManager.isTpb()) {
+    this._enemyTpb.opacity = opacity;
+  }
 };
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
   _Sprite_Enemy_update.call(this);
-  if (this._enemy) {
+  if (this._enemy && BattleManager.isTpb()) {
       this.updateTpbGauge();
   }
 };
@@ -113,10 +121,12 @@ Spriteset_Battle.prototype.createLowerLayer = function() {
 };
 
 Spriteset_Battle.prototype.createEnemyTpbGauge = function() {
-  this._enemyTpb = new Sprite();
-  this.addChild(this._enemyTpb);
-  for (const sprites of this._enemySprites) {
-    this.enemyTpbGauge(sprites);
+  if (BattleManager.isTpb()) {
+    this._enemyTpb = new Sprite();
+    this.addChild(this._enemyTpb);
+    for (const sprites of this._enemySprites) {
+      this.enemyTpbGauge(sprites);
+  }
   }
 };
 

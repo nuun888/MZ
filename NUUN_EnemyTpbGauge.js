@@ -95,7 +95,7 @@ Sprite_Enemy.prototype.update = function() {
 
 Sprite_Enemy.prototype.updateTpbGauge = function() {
   this._enemyTpb.x = (Graphics.width - Graphics.boxWidth) / 2 + this.x - this._enemyTpb.width / 2;
-  this._enemyTpb.y = (Graphics.height - Graphics.boxHeight) / 2 + this.y - 40;console.log("e")
+  this._enemyTpb.y = (Graphics.height - Graphics.boxHeight) / 2 + this.y - 40;
   if (TpbPosition === 0) {
     this._enemyTpb.y -= Math.round((this.bitmap.height + 40) * 0.9);
   }

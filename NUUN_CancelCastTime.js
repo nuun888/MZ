@@ -8,6 +8,9 @@
  * 
  * 更新履歴
  * 2021/1/11 Ver.1.0.0
+ * 初版
+ * 2021/1/16 Ver.1.1.0
+ * キャンセル時のチャージタイムを０からチャージするか、キャンセル時のキャストタイムの割合から溜めさせるかチャージを指定できる機能を追加。
  */ 
 /*:
  * @target MZ
@@ -30,6 +33,12 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * @param CancelTpbChargeRate
+ * @desc キャンセルされた時、チャージタイムの開始値を溜めたキャストタイムの割合からの開始値にする。（false：初期値0）
+ * @text チャージタイム初期値
+ * @type boolean
+ * @default true
  * 
  * @param CancelCastTimeSEDate
  * @text SE設定
@@ -67,6 +76,7 @@ Imported.NUUN_CancelCastTime = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_CancelCastTime');
+const CancelTpbChargeRate = eval(parameters['CancelTpbChargeRate'] || true);
 const CancelCastTimeSE = String(parameters['CancelCastTimeSE']);
 const volume = Number(parameters['volume'] || 90);
 const pitch = Number(parameters['pitch'] || 100);
@@ -85,13 +95,17 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
   if (BattleManager.isTpb()) {
     const rate = this.cancelCastTimeAttack();
-    if (this.cancelCastTimeRate(rate, target) && target._tpbState === "casting") {
-      const tpb_rate = target._tpbCastTime / target.tpbRequiredCastTime();
-      BattleManager.endBattlerActions(target);
-      target.clearActions();
-      target.setTpbChargeTime_CancelCastTime(tpb_rate);
-      if(CancelCastTimeSE) {
-        AudioManager.playSe({"name":CancelCastTimeSE,"volume":volume,"pitch":pitch,"pan":pan});
+    if (rate > 0) {
+      if (this.cancelCastTimeRate(rate, target) && target._tpbState === "casting") {
+        const tpb_rate = target._tpbCastTime / target.tpbRequiredCastTime();
+        BattleManager.endBattlerActions(target);
+        target.clearActions();
+        if (CancelTpbChargeRate) {
+          target.setTpbChargeTime_CancelCastTime(tpb_rate);
+        }
+        if(CancelCastTimeSE) {
+          AudioManager.playSe({"name":CancelCastTimeSE,"volume":volume,"pitch":pitch,"pan":pan});
+        }
       }
     }
   }

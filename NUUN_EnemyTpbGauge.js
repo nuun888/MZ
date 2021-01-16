@@ -135,7 +135,7 @@ Spriteset_Battle.prototype.enemyTpbGauge = function(sprites) {
   this._enemyTpb.addChild(sprite);
   sprite.setup(sprites._battler, "time");
   sprite.show();
-  sprite.move(0, 0);console.log(sprite)
+  sprite.move(0, 0);
   sprites._enemyTpb = sprite;
 };
 

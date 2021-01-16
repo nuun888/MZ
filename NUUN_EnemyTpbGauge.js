@@ -36,14 +36,14 @@
  * @text ゲージ横幅
  * @type number
  * @default 128
- * @min 1
+ * @min 0
  * 
  * @param GaugeHeight
  * @desc ゲージの縦幅を指定します。
  * @text ゲージ縦幅
  * @type number
  * @default 12
- * @min 1
+ * @min 0
  * 
  */
 var Imported = Imported || {};

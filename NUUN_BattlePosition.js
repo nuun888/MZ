@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/17 Ver.1.0.3
+ * NUUN_BattlePositionの処理に影響があるため一部の処理を変更。
  * 2021/1/13 Ver.1.0.2
  * 競合対策のためエネミー、アクターの位置修正の処理方法を変更。
  * 2020/12/16 Ver.1.0.1.1
@@ -79,6 +81,7 @@
  * @default 0
  * @min -999
  * 
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_BattlePosition = true;
@@ -102,14 +105,14 @@ Imported.NUUN_BattlePosition = true;
     _Sprite_Actor_setHome.call(this, x, y);
   };
 
-  const _Sprite_Enemy_setHome = Sprite_Enemy.prototype.setHome;
-  Sprite_Enemy.prototype.setHome = function(x, y) {
-    if (!$gameSystem.isSideView()) {
-      x = EnemyXPositionMode ? (Graphics.boxWidth - 808) / 2 + x : Graphics.boxWidth / 808 * x;
-    }
-    x += enemyXPosition;
-    y += (Graphics.boxHeight - 616) / 2 + enemyYPosition;
-    _Sprite_Enemy_setHome.call(this, x, y);
+  _Game_Enemy_screenX = Game_Enemy.prototype.screenX;
+  Game_Enemy.prototype.screenX = function() {
+    return (!$gameSystem.isSideView() && EnemyXPositionMode ? (Graphics.boxWidth - 808) / 2 + _Game_Enemy_screenX.call(this) : Graphics.boxWidth / 808 * _Game_Enemy_screenX.call(this)) + enemyXPosition;
+  };
+
+  const _Game_Enemy_screenY = Game_Enemy.prototype.screenY;
+  Game_Enemy.prototype.screenY = function() {
+    return (Graphics.boxHeight - 616) / 2 + enemyYPosition + _Game_Enemy_screenY.call(this);
   };
 
   const _Sprite_Battleback_adjustPosition = Sprite_Battleback.prototype.adjustPosition;

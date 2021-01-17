@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/17 Ver 1.0.1
+ * ゲージの縦幅を指定できる機能を追加。
  * 2021/1/17 Ver 1.0.0
  * ベースプラグインとレイアウト設定用のプラグインを別々に分割。
  */
@@ -569,6 +571,15 @@
  * @min 0
  * @parent ActorHPChangePosition
  * 
+ * @param HPGaugeHeight
+ * @desc HPゲージの縦幅を指定します。（デフォルト12）
+ * @text HPゲージ縦幅
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
+ * @parent ActorHPChangePosition
+ * 
  * @param HPChangePosition
  * @desc HPの座標変更を許可します。
  * @text HPの座標変更
@@ -604,6 +615,15 @@
  * @min 0
  * @parent ActorMPChangePosition
  * 
+ * @param MPGaugeHeight
+ * @desc MPゲージの縦幅を指定します。（デフォルト12）
+ * @text MPゲージ縦幅
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
+ * @parent ActorMPChangePosition
+ * 
  * @param MPChangePosition
  * @desc MPの座標変更を許可します。
  * @text MPの座標変更
@@ -636,6 +656,15 @@
  * @type number
  * @default 128
  * @min 0
+ * @parent ActorTPChangePosition
+ * 
+ * @param TPGaugeHeight
+ * @desc TPゲージの縦幅を指定します。（デフォルト12）
+ * @text TPゲージ縦幅
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
  * @parent ActorTPChangePosition
  * 
  * @param TPChangePosition
@@ -678,6 +707,15 @@
  * @type number
  * @default 128
  * @min 0
+ * @parent ActorTPBChangePosition
+ * 
+ * @param TPBGaugeHeight
+ * @desc TPBゲージの縦幅を指定します。（デフォルト12）
+ * @text TPBゲージ縦幅
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
  * @parent ActorTPBChangePosition
  * 
  * @param TPBChangePosition

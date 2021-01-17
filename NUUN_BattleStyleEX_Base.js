@@ -7,7 +7,9 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2021/1/16 Ver 2.0.0
+ * 2021/1/17 Ver 2.0.1
+ * ゲージの縦幅を指定できる機能を追加。
+ * 2021/1/17 Ver 2.0.0
  * ベースプラグインとレイアウト設定用のプラグインを別々に分割。
  * 2021/1/12 Ver.1.5.2
  * アクターコマンドの設定によっては、コマンドが画面の端から見切れる問題を修正。
@@ -1518,6 +1520,7 @@ Sprite_BattleGauge.prototype.constructor = Sprite_BattleGauge;
 
 Sprite_BattleGauge.prototype.initialize = function() {
   Sprite_Gauge.prototype.initialize.call(this);
+  this._GaugeHeight = 0;
 };
 
 Sprite_BattleGauge.prototype.bitmapWidth = function() {
@@ -1534,6 +1537,32 @@ Sprite_BattleGauge.prototype.bitmapWidth = function() {
     default:
       return param.GaugeWidth;
   }
+};
+
+Sprite_BattleGauge.prototype.bitmapHeight = function() {
+  switch (this._statusType) {
+    case "hp":
+      this._GaugeHeight = param.HPGaugeHeight;
+      break;
+    case "mp":
+      this._GaugeHeight = param.MPGaugeHeight;
+      break;
+    case "tp":
+      this._GaugeHeight = param.TPGaugeHeight;
+      break;
+    case "time":
+    case "cast":
+      this._GaugeHeight = param.TPBGaugeHeight;
+      break;
+    default:
+      this._GaugeHeight = 12;
+      break;
+  }
+  return Sprite_Gauge.prototype.bitmapHeight.call(this);
+};
+
+Sprite_BattleGauge.prototype.gaugeHeight = function() {
+  return this._GaugeHeight;
 };
 
 //Spriteset_Base

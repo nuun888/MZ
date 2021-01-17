@@ -7,10 +7,13 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2020/11/22 Ver.1.0.0
- * 初版
+ * 2021/1/17 Ver.1.0.2
+ * 常に後ろに表示されるように変更。
  * 2020/12/15 Ver.1.0.1
  * OriginalRatioモードの時にポップアップの位置がずれるのを修正。
+ * 2020/11/22 Ver.1.0.0
+ * 初版
+ * 
  */ 
 /*:
  * @target MZ
@@ -22,6 +25,8 @@
  * <BigEnemy> 画像を画面サイズに合わせます。
  * <BigEnemy:OriginalRatio> 比率を変更せず横幅の倍率基準で拡大します。
  * 
+ * このプラグインはフロントビューで使用することを前提しています。
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -32,6 +37,11 @@ Imported.NUUN_BigEnemy = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_BigEnemy');
+
+  const _Game_Enemy_screenY = Game_Enemy.prototype.screenY;
+  Game_Enemy.prototype.screenY = function() {
+    return this.enemy().meta.BigEnemy ? 0 : _Game_Enemy_screenY.call(this);
+  };
 
   const _Sprite_Battler_initMembers = Sprite_Battler.prototype.initMembers;
   Sprite_Battler.prototype.initMembers = function() {
@@ -71,6 +81,7 @@ Imported.NUUN_BigEnemy = true;
       this.scale.y = Graphics.height / bitmap.height;
     }
     this._homeY = (Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight + 24 - height;
+    this.updatePosition();
   };
 
   const _Sprite_Enemy_updateStateSprite = Sprite_Enemy.prototype.updateStateSprite;

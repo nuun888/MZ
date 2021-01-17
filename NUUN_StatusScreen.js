@@ -69,6 +69,7 @@
  * @type number
  * @default 0
  * @min 0
+ * @max 9999
  * @parent Window
  * 
  * @param ParamBackShow
@@ -84,6 +85,7 @@
  * @type number
  * @default 2
  * @min 0
+ * @max 99
  * @parent Window
  * 
  * @param DecimalMode
@@ -295,12 +297,19 @@
  * @default false
  * @parent ParamDate
  * 
+ * @param OriginalParam
+ * @type struct<OriginalParamData>[]
+ * @text 独自表示項目
+ * @default
+ * @parent ParamDate
+ * 
  * @param GaugeWidth
  * @text ゲージ横幅
  * @desc HP,MP,TPゲージの横幅を指定します。
  * @type number
  * @default 200
  * @min 0
+ * @max 9999
  * @parent ParamDate
  */
 /*~struct~actorImgList:
@@ -322,6 +331,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * 
  * @param Actor_Y
  * @desc 画像の表示位置Y座標。
@@ -329,6 +339,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  *  
  */
 /*~struct~XparamData:
@@ -368,6 +379,19 @@
  * @type state
  *
  */
+/*~struct~OriginalParamData:
+ *
+ * @param paramName
+ * @desc 表示する名称。
+ * @text 名称
+ * @type string
+ * 
+ * @param paramValue
+ * @desc 表示する評価式。
+ * @text パラメータ
+ * @type string
+ *
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_StatusScreen = true;
@@ -385,6 +409,13 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
+
+function dateCheck(mode) {
+  if (param.Page2Left === mode || aram.Page2Right === mode || param.Page3Left === mode || param.Page3Right == mode) {
+    return true;
+  }
+  return false;
+};
 
 function maxPages() {
   let maxPages = 1;
@@ -701,6 +732,8 @@ Scene_Status.prototype.showPage = function(value) {
   case 5:
     this._statusStateWindow.show();
     break;
+  case 6:
+    break;
   }
 };
 
@@ -871,6 +904,32 @@ Window_Status.prototype.StateName = function() {
   this.drawText(param.StateName, rect.x + this.setState_x - 4, y, rect.width);
   this.resetTextColor();
 };
+
+function Window_StatusParamsEX() {
+  this.initialize(...arguments);
+}
+
+Window_StatusParamsEX.prototype = Object.create(Window_StatusBase.prototype);
+Window_StatusParamsEX.prototype.constructor = Window_StatusParamsEX;
+
+Window_StatusParamsEX.prototype.initialize = function(rect) {
+  Window_StatusBase.prototype.initialize.call(this, rect);
+  this._actor = null;
+  this.opacity = 0;
+  this.frameVisible = false;
+  this._page = 0;
+};
+
+Window_StatusParamsEX.prototype.setActor = function(actor) {
+  if (this._actor !== actor) {
+      this._actor = actor;
+      this.refresh();
+  }
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 const _Window_StatusParams_initialize = Window_StatusParams.prototype.initialize;

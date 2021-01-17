@@ -6,8 +6,8 @@
 [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>
 
 <b>戦闘</b><br>
-バトルスタイル拡張ベース<br>
-[NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)　バトルスタイル拡張<br>
+[NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) バトルスタイル拡張ベース<br>
+[NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) バトルスタイル拡張<br>
 バトルスタイル拡張クラシック風タイプ<br>
 バトルスタイル拡張某ゲーム風タイプ<br>
 [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)　解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整<br>
@@ -39,7 +39,9 @@
 
 <b>エネミー</b><br>
 [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js)　巨大エネミー<br>
-[NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js)　敵のドロップアイテム追加
+[NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js)　エネミー個別座標<br>
+[NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js)　敵のドロップアイテム追加<br>
+[NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js)　敵にTPBゲージ表示<br>
 
 <b>メニュー系</b><br>
 [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>

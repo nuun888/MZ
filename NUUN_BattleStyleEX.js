@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/18 Ver 1.0.2
+ * プラグインパラメータが正常に設定できない問題を修正。
  * 2021/1/17 Ver 1.0.1
  * ゲージの縦幅を指定できる機能を追加。
  * 2021/1/17 Ver 1.0.0
@@ -127,6 +129,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent Window
  * 
  * @param ActorStatusWindow_Y
@@ -135,6 +138,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent Window
  * 
  * @param ActorStatusWindow_Width
@@ -232,6 +236,7 @@
  * @type number
  * @default 1
  * @min 1
+ * @max 99
  * @parent PartyCommand
  * 
  * @param PartyCommandMaxCol
@@ -240,6 +245,7 @@
  * @type number
  * @default 4
  * @min 1
+ * @max 99
  * @parent PartyCommand
  * 
  * @param PartyCommandCenter
@@ -255,6 +261,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent PartyCommand
  * 
  * @param PartyCommand_Y
@@ -263,6 +270,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent PartyCommand
  * 
  * @param PartyCommand_Width
@@ -271,6 +279,7 @@
  * @type number
  * @default 0
  * @min 0
+ * @max 9999
  * @parent PartyCommand
  * 
  * @param ActorCommand
@@ -297,6 +306,7 @@
  * @type number
  * @default 4
  * @min 1
+ * @max 99
  * @parent ActorCommand
  * 
  * @param ActorCommandMaxCol
@@ -305,6 +315,7 @@
  * @type number
  * @default 1
  * @min 1
+ * @max 99
  * @parent ActorCommand
  * 
  * @param ActorCommandCenter
@@ -320,6 +331,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorCommand
  * 
  * @param ActorCommand_Y
@@ -328,6 +340,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorCommand
  * 
  * @param ActorCommand_Width
@@ -336,6 +349,7 @@
  * @type number
  * @default 0
  * @min 0
+ * @max 9999
  * @parent ActorCommand
  * 
  * @param Effect
@@ -354,6 +368,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent Effect
  * 
  * @param ActorEffect_Y
@@ -362,6 +377,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent Effect
  * 
  * @param ActorDamage_X
@@ -370,6 +386,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent Effect
  * 
  * @param ActorDamage_Y
@@ -378,6 +395,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent Effect
  * 
  * @param ActorFlash
@@ -397,6 +415,7 @@
  * @type number
  * @default 0
  * @min 0
+ * @max 99
  * @parent ActorStatus
  * 
  * @param ActorMaxRow
@@ -405,6 +424,7 @@
  * @type number
  * @default 0
  * @min 0
+ * @max 99
  * @parent ActorStatus
  * 
  * @param ActorStatusMode
@@ -444,6 +464,7 @@
  * @type number
  * @default 30
  * @min 1
+ * @max 9999
  * @parent ActorsButlers
  * 
  * @param imgDeathHide
@@ -473,19 +494,21 @@
  * @parent ActorNameChangePosition
  * 
  * @param ActorName_X
- * @desc 名前のX座標を設定します。名前の座標変更がTrueの場合のみ適用します。。
+ * @desc 名前のX座標を設定します。（デフォルト0）
  * @text 名前X座標
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorNameChangePosition
  * 
  * @param ActorName_Y
- * @desc 名前のY座標を設定します。名前の座標変更がTrueの場合のみ適用します。（デフォルト88）
+ * @desc 名前のY座標を設定します。（デフォルト88）
  * @text 名前Y座標
  * @type number
  * @default 88
  * @min -9999
+ * @max 9999
  * @parent ActorNameChangePosition
  * 
  * @param ActorImgChangePosition
@@ -498,6 +521,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorImgChangePosition
  * 
  * @param ActorImg_Y
@@ -506,6 +530,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorImgChangePosition
  * 
  * @param ActorFeceChangePosition
@@ -520,35 +545,39 @@
  * @parent ActorFeceChangePosition
  * 
  * @param ActorFace_X
- * @desc 顔グラフィックのX座標を設定します。顔グラフィックの座標変更がTrueの場合のみ適用します。
+ * @desc 顔グラフィックのX座標を設定します。
  * @text 顔グラフィックX座標
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorFeceChangePosition
  * 
  * @param ActorFace_Y
- * @desc 顔グラフィックのY座標を設定します。顔グラフィックの座標変更がTrueの場合のみ適用します。
+ * @desc 顔グラフィックのY座標を設定します。
  * @text 顔グラフィックY座標
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorFeceChangePosition
  * 
  * @param ActorFace_Width
- * @desc 顔グラフィックの横幅（0でデフォルト設定となります）
+ * @desc 顔グラフィックの横幅（デフォルト0, 0でX座標中心基準で表示できる範囲が表示されます）
  * @text 顔グラフィック横幅
  * @type number
  * @default 0
- * @min -9999
+ * @min 0
+ * @max 9999
  * @parent ActorImgChangePosition
  * 
  * @param ActorFace_Height
- * @desc 顔グラフィックの縦幅（0でデフォルト設定となります）
+ * @desc 顔グラフィックの縦幅（デフォルト98, 0でY座標中心基準で表示できる範囲が表示されます）
  * @text 顔グラフィック縦幅
  * @type number
- * @default 0
- * @min -9999
+ * @default 98
+ * @min 0
+ * @max 9999
  * @parent ActorImgChangePosition
  * 
  * @param GaugeWidth
@@ -557,6 +586,7 @@
  * @type number
  * @default 128
  * @min 0
+ * @max 999
  * @parent ActorStatus
  * 
  * @param ActorHPChangePosition
@@ -569,6 +599,7 @@
  * @type number
  * @default 128
  * @min 0
+ * @max 999
  * @parent ActorHPChangePosition
  * 
  * @param HPGaugeHeight
@@ -588,19 +619,21 @@
  * @parent ActorHPChangePosition
  * 
  * @param ActorHP_X
- * @desc HPのX座標を設定します。HPの座標変更がTrueの場合のみ適用します。
+ * @desc HPのX座標を設定します。（デフォルト0）
  * @text HP_X座標
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorHPChangePosition
  * 
  * @param ActorHP_Y
- * @desc HPのY座標を設定します。HPの座標変更がTrueの場合のみ適用します。（デフォルト112）
+ * @desc HPのY座標を設定します。（デフォルト112）
  * @text HP_Y座標
  * @type number
  * @default 112
  * @min -9999
+ * @max 9999
  * @parent ActorHPChangePosition
  * 
  * @param ActorMPChangePosition
@@ -613,6 +646,7 @@
  * @type number
  * @default 128
  * @min 0
+ * @max 999
  * @parent ActorMPChangePosition
  * 
  * @param MPGaugeHeight
@@ -632,18 +666,20 @@
  * @parent ActorMPChangePosition
  * 
  * @param ActorMP_X
- * @desc MPのX座標を設定します。MPの座標変更がTrueの場合のみ適用します。
+ * @desc MPのX座標を設定します。（デフォルト0）
  * @text MP_X座標
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorMPChangePosition
  * 
  * @param ActorMP_Y
- * @desc MPのY座標を設定します。MPの座標変更がTrueの場合のみ適用します。（デフォルト136）
+ * @desc MPのY座標を設定します。（デフォルト136）
  * @text MP_Y座標
  * @type number
  * @default 136
+ * @max 9999
  * @parent ActorMPChangePosition
  * 
  * @param ActorTPChangePosition
@@ -656,6 +692,7 @@
  * @type number
  * @default 128
  * @min 0
+ * @max 999
  * @parent ActorTPChangePosition
  * 
  * @param TPGaugeHeight
@@ -675,19 +712,21 @@
  * @parent ActorTPChangePosition
  * 
  * @param ActorTP_X
- * @desc TPのX座標を設定します。TPの座標変更がTrueの場合のみ適用します。
+ * @desc TPのX座標を設定します。（デフォルト0）
  * @text TP_X座標
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorTPChangePosition
  * 
  * @param ActorTP_Y
- * @desc TPのY座標を設定します。TPの座標変更がTrueの場合のみ適用します。（デフォルト160）
+ * @desc TPのY座標を設定します。（デフォルト160）
  * @text TP_Y座標
  * @type number
  * @default 160
  * @min -9999
+ * @max 9999
  * @parent ActorTPChangePosition
  * 
  * @param ActorTPBChangePosition
@@ -707,6 +746,7 @@
  * @type number
  * @default 128
  * @min 0
+ * @max 999
  * @parent ActorTPBChangePosition
  * 
  * @param TPBGaugeHeight
@@ -726,15 +766,16 @@
  * @parent ActorTPBChangePosition
  * 
  * @param ActorTPB_X
- * @desc TPBのX座標を設定します。TPBの座標変更がTrueの場合のみ適用します。
+ * @desc TPBのX座標を設定します。（デフォルト0）
  * @text TPB_X座標
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * @parent ActorTPBChangePosition
  * 
  * @param ActorTPB_Y
- * @desc TPBのY座標を設定します。TPBの座標変更がTrueの場合のみ適用します。（デフォルト88）
+ * @desc TPBのY座標を設定します。（デフォルト88）
  * @text TPB_Y座標
  * @type number
  * @default 88
@@ -753,19 +794,21 @@
  * @parent ActorStateChangePosition
  * 
  * @param ActorState_X
- * @desc ステートのX座標を設定します。ステートの座標変更がTrueの場合のみ適用します。
+ * @desc ステートのX座標を設定します。（デフォルト4）
  * @text ステートX座標
  * @type number
  * @default 4
  * @min -9999
+ * @max 9999
  * @parent ActorStateChangePosition
  * 
  * @param ActorState_Y
- * @desc ステートのY座標ステートの座標変更がTrueの場合のみ適用します。
+ * @desc ステートのY座標を設定します。（デフォルト20）
  * @text ステートY座標
  * @type number
  * @default 20
  * @min -9999
+ * @max 9999
  * @parent ActorStateChangePosition
  * 
  */
@@ -782,6 +825,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * 
  * @param Actor_Y
  * @desc 画像のY座標。
@@ -789,6 +833,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
  * 
  * @param Actor_Scale
  * @desc 画像の拡大率。
@@ -796,6 +841,7 @@
  * @type number
  * @default 100
  * @min 0
+ * @max 999
  * 
  * @param ActorButlers
  * @text アクターグラフィック設定
@@ -858,6 +904,7 @@
  * @type number
  * @default -1
  * @min -1
+ * @max 9999
  * @parent ActorFace
  * 
  * @param damageFaceIndex
@@ -866,6 +913,7 @@
  * @type number
  * @default -1
  * @min -1
+ * @max 9999
  * @parent ActorFace
  * 
  * @param dyingFaceIndex
@@ -874,6 +922,7 @@
  * @type number
  * @default -1
  * @min -1
+ * @max 9999
  * @parent ActorFace
  * 
  * @param victoryFaceIndex
@@ -882,6 +931,7 @@
  * @type number
  * @default -1
  * @min -1
+ * @max 9999
  * @parent ActorFace
  * 
  * @param chantFaceIndex
@@ -890,6 +940,7 @@
  * @type number
  * @default -1
  * @min -1
+ * @max 9999
  * @parent ActorFace
  * 
  * @param stateFaceIndex
@@ -911,6 +962,8 @@
  * @text 変化ID
  * @desc 変化するステートのIDを指定します。ステートのメモ欄に<ChangeImgId:[id]>を記入してください。[id]:変化ID
  * @type number
+ * @min 0
+ * @max 9999
  * 
  * @param Always
  * @desc 被ステート時画像変化。
@@ -924,6 +977,7 @@
  * @type number
  * @default 1
  * @min 0
+ * @max 9999
  * 
  */
 /*~struct~actorStateFaceIndexList:
@@ -934,12 +988,15 @@
  * @type number
  * @default -1
  * @min -1
+ * @max 9999
  * 
  * @param stateFaceId
  * @text 変化ID
  * @desc 変化するステートのIDを指定します。ステートのメモ欄に<ChangeImgId:[id]>を記入してください。[id]:変化ID
  * @type number
  * @default 0
+ * @min 0
+ * @max 9999
  * 
  * @param Always
  * @desc 被ステート時画像変化。
@@ -953,6 +1010,7 @@
  * @type number
  * @default 1
  * @min 0
+ * @max 9999
  * 
  */
 

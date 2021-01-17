@@ -8,13 +8,9 @@
 <b>戦闘</b><br>
 [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) バトルスタイル拡張ベース<br>
 [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) バトルスタイル拡張<br>
-バトルスタイル拡張クラシック風タイプ<br>
-バトルスタイル拡張某ゲーム風タイプ<br>
 [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)　解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整<br>
 [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)　戦闘背景の変更<br>
-リミットゲージ<br>
-ターン表示<br>
-リザルト（仮）<br>
+
   
 <b>スキル、アイテム</b><br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>

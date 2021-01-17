@@ -105,7 +105,7 @@ Imported.NUUN_BattlePosition = true;
     _Sprite_Actor_setHome.call(this, x, y);
   };
 
-  _Game_Enemy_screenX = Game_Enemy.prototype.screenX;
+  const _Game_Enemy_screenX = Game_Enemy.prototype.screenX;
   Game_Enemy.prototype.screenX = function() {
     return (!$gameSystem.isSideView() && EnemyXPositionMode ? (Graphics.boxWidth - 808) / 2 + _Game_Enemy_screenX.call(this) : Graphics.boxWidth / 808 * _Game_Enemy_screenX.call(this)) + enemyXPosition;
   };

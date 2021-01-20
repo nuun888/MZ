@@ -7,6 +7,9 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/20 Ver.1.1.1
+ * X座標を調整できるように変更。（相対座標）
+ * エネミーごとにY座標を調整できるように変更。（相対座標）
  * 2021/1/17 Ver.1.1.0
  * Y座標を調整できる機能を追加。
  * エネミーのステート表示が被る問題を修正。
@@ -22,6 +25,9 @@
  * 
  * @help
  * エネミーにもTPBゲージを表示します。
+ * 
+ * エネミーのメモ欄
+ * <TPBGaugeY:[position]> TPBゲージのY座標を調整します。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -50,6 +56,13 @@
  * @default 12
  * @min 0
  * 
+ * @param Gauge_X
+ * @desc ゲージのX座標（相対座標）指定します。
+ * @text ゲージX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
  * @param Gauge_Y
  * @desc ゲージのY座標（相対座標）指定します。
  * @text ゲージY座標
@@ -66,6 +79,7 @@ const parameters = PluginManager.parameters('NUUN_EnemyTpbGauge');
 const TpbPosition = Number(parameters['TpbPosition'] || 0);
 const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
+const Gauge_X = Number(parameters['Gauge_X'] || 0);
 const Gauge_Y = Number(parameters['Gauge_Y'] || 0);
 
 const _Sprite_Enemy_initVisibility = Sprite_Enemy.prototype.initVisibility;
@@ -115,8 +129,8 @@ Sprite_Enemy.prototype.update = function() {
 };
 
 Sprite_Enemy.prototype.updateTpbGauge = function() {
-  this._enemyTpb.x = (Graphics.width - Graphics.boxWidth) / 2 + this.x - this._enemyTpb.width / 2;
-  this._enemyTpb.y = (Graphics.height - Graphics.boxHeight) / 2 + this.y - 40 + Gauge_Y;
+  this._enemyTpb.x = this.tpbGaugeOffsetX + (this.x - this._enemyTpb.width / 2);
+  this._enemyTpb.y = this.tpbGaugeOffsetY + this.y - 40;
   if (TpbPosition === 0) {
     this._enemyTpb.y -= Math.round((this.bitmap.height + 70) * 0.9);
   }
@@ -153,6 +167,8 @@ Spriteset_Battle.prototype.enemyTpbGauge = function(sprites) {
   sprite.show();
   sprite.move(0, 0);
   sprites._enemyTpb = sprite;
+  sprites.tpbGaugeOffsetX = (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
+  sprites.tpbGaugeOffsetY = (sprites._enemy.enemy().meta.TPBGaugeY ? Number(sprites._enemy.enemy().meta.TPBGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
 };
 
 function Sprite_EnemyTPBGauge() {

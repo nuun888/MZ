@@ -7,7 +7,10 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/24 Ver 1.0.1
+ * アイテムを盗んだ回数などのパラメータが正常に取得できない問題を修正。
  * 2020/11/21 Ver 1.0.0
+ * 初版
  */ 
 /*:
  * @target MZ
@@ -144,6 +147,7 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
     }
   }
 }));
+param.StealWindowShow = false;
 
 Game_BattlerBase.prototype.stealBoost = function(){
 	let rate = 0;
@@ -169,35 +173,39 @@ Game_System.prototype.initialize = function() {
 };
 
 Game_System.prototype.onBattleSteal = function() {
-	this._stealCount ? this._stealCount++ : 0;
+	this._stealCount = this._stealCount || 0
+	this._stealCount++;
 };
 
 Game_System.prototype.getBattleSteal = function() {
-	return (this._stealCount ? this._stealCount : 0);
+	return this._stealCount || 0;
 };
 
 Game_System.prototype.onBattleStealGold = function(gold) {
-	this._stealGoldSum ? this._stealGoldSum += gold : 0;
+	this._stealGoldSum = this._stealGoldSum || 0;
+	this._stealGoldSum++;
 };
 
 Game_System.prototype.getBattleStealGold = function() {
-	return (this._stealGoldSum ? this._stealGoldSum : 0);
+	return this._stealGoldSum || 0;
 };
 
 Game_System.prototype.onBattleStolen = function() {
-	this._stolenCount ? this._stolenCount++ : 0;
+	this._stolenCount = this._stolenCount || 0;
+	this._stolenCount++;
 };
 
 Game_System.prototype.getBattleStolen = function() {
-	return (this._stolenCount ? this._stolenCount : 0);
+	return this._stolenCount || 0;
 };
 
 Game_System.prototype.onBattleStolenGold = function(gold) {
-	this._stolenGoldSum ? this._stolenGoldSum += gold : 0;
+	this._stolenGoldSum = this._stolenGoldSum || 0;
+	this._stolenGoldSum += gold;
 };
 
 Game_System.prototype.getBattleStolenGold = function() {
-	return (this._stolenGoldSum ? this._stolenGoldSum : 0);
+	return this._stolenGoldSum || 0;
 };
 
 Game_System.prototype.stolenSwitch = function(item){
@@ -236,7 +244,11 @@ Game_Action.prototype.StealItems = function(target, mode){
 	if (stealItem) {
 		this.getStealItems(target, stealItem);
 	} else {
-		BattleManager._logWindow.addText(target.name() + param.NotStealName);
+		if (param.StealWindowShow) {
+			$gameMessage.add(target.name() + param.NotStealName);
+		} else {
+			BattleManager._logWindow.addText(target.name() + param.NotStealName);
+		}
 	}
 	this.makeSuccess(target);
 };
@@ -255,7 +267,11 @@ Game_Action.prototype.stolenItem = function(target, mode){
 	if(item){
 		this.lostItem(item);
 	} else {
-		BattleManager._logWindow.addText(target.name() + param.NotStealName);
+		if (param.StealWindowShow) {
+			$gameMessage.add(target.name() + param.NotStealName);
+		} else {
+			BattleManager._logWindow.addText(target.name() + param.NotStealName);
+		}
 	}
 	this.makeSuccess(target);
 };
@@ -283,7 +299,11 @@ Game_Action.prototype.getStealItems = function(target, stealItem){
 		$gameParty.gainGold(stealItem);
 		itemName = stealItem + TextManager.currencyUnit;
 	}
-	BattleManager._logWindow.addText(target.name() +"から"+ itemName + param.GetStealName);
+	if (param.StealWindowShow) {
+		$gameMessage.add(target.name() +"から"+ itemName + param.GetStealName);
+	} else {
+		BattleManager._logWindow.addText(target.name() +"から"+ itemName + param.GetStealName);
+	}
 };
 
 Game_Action.prototype.lostItem = function(item){
@@ -295,7 +315,11 @@ Game_Action.prototype.lostItem = function(item){
 		$gameParty.loseGold(item);
 		itemName = item + TextManager.currencyUnit;
 	}
-	BattleManager._logWindow.addText(this.subject().name() +"は"+ itemName + param.StolenName);
+	if (param.StealWindowShow) {
+		$gameMessage.add(this.subject().name() +"は"+ itemName + param.StolenName);
+	} else {
+		BattleManager._logWindow.addText(this.subject().name() +"は"+ itemName + param.StolenName);
+	}
 };
 
 Game_Action.prototype.lostStolenGoldMode = function(){

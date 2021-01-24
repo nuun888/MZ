@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/ Ver.1.0.1
+ * 「セーブ画面拡張プラグインを使用時」、アイコン画像をセーブ画面に反映しないように修正。
  * 2021/1/13 Ver.1.0.0
  * 初版
  */ 
@@ -95,7 +97,7 @@ Window_Base.prototype.drawCurrencyValue = function(value, unit, x, y, width) {
   if (GoldSeparation) {
     value = value.toLocaleString();
   }
-  if (GoldIcon > 0) {
+  if (GoldIcon > 0 && this.constructor !== Window_SavefileList) {
     this.drawIcon(GoldIcon, x, y);
     const textMargin = ImageManager.iconWidth + 4;
     x += textMargin;

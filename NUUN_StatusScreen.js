@@ -7,34 +7,36 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2020/11/16 Ver.1.0.0
- *  初版
- * 2020/11/17 Ver.1.0.1 
- *  追加能力値、特殊能力値、属性有効度、ステート有効度の表示できる小数点の桁数を指定できる機能を追加。
- *  ページの切り替えをタッチ操作でも行えるように対応。
- * 2020/11/18 Ver.1.0.2
- *  表示外の少数点を四捨五入か切り捨てで丸める機能を追加。
- * 2020/11/18 Ver.1.0.3
- *  ステータス詳細項目が画面からはみ出た際、項目名が正常に表示されない問題を修正。
- *  一部処理を変更。
- * 2020/11/19 Ver.1.0.4
- *  解像度とUIのサイズが違う場合に、ステータス詳細項目がウィンドウ外にずれる問題や、他のステータス項目と
- *  表示が被る問題を修正。
- * 2020/11/22 Ver.1.0.5
- *  背景画像を指定できる機能を追加。
- * 2020/11/23 Ver.1.0.6
- *  立ち絵を表示位置を左、中央、右から選択し配置出来る機能を追加。
+ * 2021/1/24 Ver.1.3.0
+ *  独自パラメータを表示できる機能を追加。
+ * 2021/1/9 Ver.1.2.0
+ *  各項目の設定方法を変更。
+ * 2020/12/28 Ver.1.1.2
+ *  立ち絵の座標処理を修正。
+ * 2020/12/8 Ver.1.1.1
+ *  最大レベル時の次のレベルまでの経験値表示のゲージMAXで100％で表示するように修正。
+ * 2020/12/7 Ver.1.1.0
+ *  次のレベルまでの経験値表示を百分率表示に出来るよう対応。
  * 2020/11/26 Ver.1.0.7
  *  特殊パラメータでSparamIdを3に設定し、SparamNameを空欄の状態でステータス画面を開くと
  *  本来「薬の知識」が出るところ「回復効果率」と表示されてしまう問題を修正。
- * 2020/12/7 Ver.1.1.0
- *  次のレベルまでの経験値表示を百分率表示に出来るよう対応。
- * 2020/12/8 Ver.1.1.1
- *  最大レベル時の次のレベルまでの経験値表示のゲージMAXで100％で表示するように修正。
- * 2020/12/28 Ver.1.1.2
- *  立ち絵の座標処理を修正。
- * 2021/1/9 Ver.1.2.0
- * 各項目の設定方法を変更。
+ * 2020/11/23 Ver.1.0.6
+ *  立ち絵を表示位置を左、中央、右から選択し配置出来る機能を追加。
+ * 2020/11/22 Ver.1.0.5
+ *  背景画像を指定できる機能を追加。
+ * 2020/11/19 Ver.1.0.4
+ *  解像度とUIのサイズが違う場合に、ステータス詳細項目がウィンドウ外にずれる問題や、他のステータス項目と
+ *  表示が被る問題を修正。
+ * 2020/11/18 Ver.1.0.3
+ *  ステータス詳細項目が画面からはみ出た際、項目名が正常に表示されない問題を修正。
+ *  一部処理を変更。
+ * 2020/11/18 Ver.1.0.2
+ *  表示外の少数点を四捨五入か切り捨てで丸める機能を追加。
+ * 2020/11/17 Ver.1.0.1 
+ *  追加能力値、特殊能力値、属性有効度、ステート有効度の表示できる小数点の桁数を指定できる機能を追加。
+ *  ページの切り替えをタッチ操作でも行えるように対応。
+ * 2020/11/16 Ver.1.0.0
+ *  初版
  */
 /*:
  * @target MZ
@@ -42,7 +44,7 @@
  * @author NUUN
  * 
  * @help
- * ステータス画面に追加能力値、特殊能力値、属性有効度、ステート有効度を表示させます。
+ * ステータス画面に追加能力値、特殊能力値、属性有効度、ステート有効度、独自のパラメータを表示させます。
  * 
  * デフォルト設定では１ページ目に基本能力値、装備
  * ２ページ目に追加能力値、特殊能力値
@@ -72,7 +74,7 @@
  * @max 9999
  * @parent Window
  * 
- * @param ParamBackShow
+ * @param BackShow
  * @text ステータス項目背景表示
  * @desc ステータス項目の背景画像の表示を設定します。
  * @type boolean
@@ -128,7 +130,7 @@
  * @text 左側表示項目
  * @type select
  * @option なし
- * @value 0
+ * @value -1
  * @option 追加能力値
  * @value 2
  * @option 特殊能力値
@@ -137,6 +139,10 @@
  * @value 4
  * @option ステート有効度
  * @value 5
+ * @option 独自パラメータ１
+ * @value 10
+ * @option 独自パラメータ２
+ * @value 11
  * @parent 2Pages
  * @default 2
  * 
@@ -145,7 +151,7 @@
  * @text 右側表示項目
  * @type select
  * @option なし
- * @value 0
+ * @value -1
  * @option 追加能力値
  * @value 2
  * @option 特殊能力値
@@ -154,6 +160,10 @@
  * @value 4
  * @option ステート有効度
  * @value 5
+ * @option 独自パラメータ１
+ * @value 10
+ * @option 独自パラメータ２
+ * @value 11
  * @parent 2Pages
  * @default 3
  * 
@@ -166,7 +176,7 @@
  * @text 左側表示項目
  * @type select
  * @option なし
- * @value 0
+ * @value -1
  * @option 追加能力値
  * @value 2
  * @option 特殊能力値
@@ -175,6 +185,10 @@
  * @value 4
  * @option ステート有効度
  * @value 5
+ * @option 独自パラメータ１
+ * @value 10
+ * @option 独自パラメータ２
+ * @value 11
  * @parent 3Pages
  * @default 4
  * 
@@ -183,7 +197,7 @@
  * @text 右側表示項目
  * @type select
  * @option なし
- * @value 0
+ * @value -1
  * @option 追加能力値
  * @value 2
  * @option 特殊能力値
@@ -192,8 +206,58 @@
  * @value 4
  * @option ステート有効度
  * @value 5
+ * @option 独自パラメータ１
+ * @value 10
+ * @option 独自パラメータ２
+ * @value 11
  * @parent 3Pages
  * @default 5
+ * 
+ * @param 4Pages
+ * @text ４ページ目設定
+ * @parent Pages
+ * 
+ * @param Page4Left
+ * @desc 左側に表示する項目。
+ * @text 左側表示項目
+ * @type select
+ * @option なし
+ * @value -1
+ * @option 追加能力値
+ * @value 2
+ * @option 特殊能力値
+ * @value 3
+ * @option 属性有効度
+ * @value 4
+ * @option ステート有効度
+ * @value 5
+ * @option 独自パラメータ１
+ * @value 10
+ * @option 独自パラメータ２
+ * @value 11
+ * @parent 4Pages
+ * @default -1
+ * 
+ * @param Page4Right
+ * @desc 右側に表示する項目。
+ * @text 右側表示項目
+ * @type select
+ * @option なし
+ * @value -1
+ * @option 追加能力値
+ * @value 2
+ * @option 特殊能力値
+ * @value 3
+ * @option 属性有効度
+ * @value 4
+ * @option ステート有効度
+ * @value 5
+ * @option 独自パラメータ１
+ * @value 10
+ * @option 独自パラメータ２
+ * @value 11
+ * @parent 4Pages
+ * @default -1
  * 
  * @param DateName
  * @text 名称設定 
@@ -297,10 +361,28 @@
  * @default false
  * @parent ParamDate
  * 
- * @param OriginalParam
+ * @param OriginalParam1
  * @type struct<OriginalParamData>[]
- * @text 独自表示項目
+ * @text 独自表示項目1
  * @default
+ * @parent ParamDate
+ * 
+ * @param OriginalParam1Name
+ * @desc 独自パラメータ１の名称。
+ * @text 独自パラメータ１名称
+ * @type string
+ * @parent ParamDate
+ * 
+ * @param OriginalParam2
+ * @type struct<OriginalParamData>[]
+ * @text 独自表示項目2
+ * @default
+ * @parent ParamDate
+ * 
+ * @param OriginalParam2Name
+ * @desc 独自パラメータ２の名称。
+ * @text 独自パラメータ２名称
+ * @type string
  * @parent ParamDate
  * 
  * @param GaugeWidth
@@ -340,6 +422,14 @@
  * @default 0
  * @min -9999
  * @max 9999
+ * 
+ * @param Actor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
  *  
  */
 /*~struct~XparamData:
@@ -419,8 +509,9 @@ function dateCheck(mode) {
 
 function maxPages() {
   let maxPages = 1;
-  maxPages += param.Page2Left > 0 || param.Page2Right > 0 ? 1 : 0;
-  maxPages += param.Page3Left > 0 || param.Page3Right > 0 ? 1 : 0;
+  maxPages += param.Page2Left >= 0 || param.Page2Right >= 0 ? 1 : 0;
+  maxPages += param.Page3Left >= 0 || param.Page3Right >= 0 ? 1 : 0;
+  maxPages += param.Page4Left >= 0 || param.Page4Right >= 0 ? 1 : 0;
   return maxPages;
 };
 
@@ -431,25 +522,18 @@ Scene_Status.prototype.initialize = function() {
   this._pageMode = 0;
 };
 
-const _Scene_Status_create = Scene_Status.prototype.create;
+
 Scene_Status.prototype.create = function() {
-  _Scene_Status_create.call(this)
-  this.createStatusXParamsWindow();
-  this.createStatusSParamsWindow();
-  this.createStatusElementWindow();
-  this.createStatusStateWindow();
+  Scene_MenuBase.prototype.create.call(this);
+  this.createStatusWindow();
+  this.createStatusContentWindow();
+  this.createProfileWindow();
   this.createStatusButton();
 };
 
 const _Scene_Status_createStatusWindow = Scene_Status.prototype.createStatusWindow;
 Scene_Status.prototype.createStatusWindow = function() {
   _Scene_Status_createStatusWindow.call(this);
-  this._statusWindow.setContentY = this.statusHeight();
-  this._statusWindow.setContentEquip_x = this.statusParamsWidth();
-  this._statusWindow.setXParams_x = 0;
-  this._statusWindow.setSParams_x = 0;
-  this._statusWindow.setElement_x = 0;
-  this._statusWindow.setState_x = 0;
   if (param.BackGroundImg) {
     this._statusWindow.opacity = 0;
     this._statusWindow.frameVisible = false;
@@ -457,56 +541,13 @@ Scene_Status.prototype.createStatusWindow = function() {
   this.maxPage = maxPages();
 };
 
-Scene_Status.prototype.createProfileWindow = function() {
-  const rect = this.profileWindowRect();
-  this._profileWindow = new Window_Help(rect);
-  this.addChild(this._profileWindow);
-  this._profileWindow.opacity = 0;
-  this._profileWindow.frameVisible = false;
-};
-
-Scene_Status.prototype.createStatusParamsWindow = function() {
-  const rect = this.statusParamsWindowRect();
-  this._statusParamsWindow = new Window_StatusParams(rect);
-  this.addChild(this._statusParamsWindow);
-};
-
-Scene_Status.prototype.createStatusEquipWindow = function() {
-  const rect = this.statusEquipWindowRect();
-  this._statusEquipWindow = new Window_StatusEquip(rect);
-  this.addChild(this._statusEquipWindow);
-};
-
-Scene_Status.prototype.createStatusXParamsWindow = function() {
-  const rect = this.statusXParamsWindowRect();
-  this._statusXParamsWindow = new Window_StatusXParams(rect);
-  this.addChild(this._statusXParamsWindow);
-};
-
-Scene_Status.prototype.createStatusSParamsWindow = function() {
-  const rect = this.statusSParamsWindowRect();
-  this._statusSParamsWindow = new Window_StatusSParams(rect);
-  this.addChild(this._statusSParamsWindow);
-};
-
-Scene_Status.prototype.createStatusElementWindow = function() {
-  const rect = this.statusElementWindowRect();
-  this._statusElementWindow = new Window_StatusElement(rect);
-  this.addChild(this._statusElementWindow);
-};
-
-Scene_Status.prototype.createStatusStateWindow = function() {
-  const rect = this.statusStateWindowRect();
-  this._statusStateWindow = new Window_StatusState(rect);
-  this.addChild(this._statusStateWindow);
-};
-
-Scene_Status.prototype.profileWindowRect = function() {
-  const ww = Graphics.boxWidth;
-  const wh = this.profileHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2;
-  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaBottom() - wh;
-  return new Rectangle(wx, wy, ww, wh);
+Scene_Status.prototype.createStatusContentWindow = function() {
+  let rect = this.leftContentWindowRect();
+  this._leftContentWindow = new Window_LeftContent(rect);
+  this.addChild(this._leftContentWindow);
+  rect = this.rightContentWindowRect();
+  this._rightContentWindow = new Window_RightContent(rect);
+  this.addChild(this._rightContentWindow);
 };
 
 Scene_Status.prototype.statusWindowRect = function() {
@@ -517,104 +558,52 @@ Scene_Status.prototype.statusWindowRect = function() {
   return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_Status.prototype.statusParamsWindowRect = function() {
-  const ww = this.statusParamsWidth();
+Scene_Status.prototype.createProfileWindow = function() {
+  const rect = this.profileWindowRect();
+  this._profileWindow = new Window_Help(rect);
+  this.addChild(this._profileWindow);
+  this._profileWindow.opacity = 0;
+  this._profileWindow.frameVisible = false;
+};
+
+Scene_Status.prototype.profileWindowRect = function() {
+  const ww = Graphics.boxWidth;
+  const wh = this.profileHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2;
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaBottom() - wh;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Status.prototype.leftContentWindowRect = function() {
+  const ww = this.statusContenWidth();
   const wh = this.statusParamsHeight();
   const wx = (Graphics.width - Graphics.boxWidth) / 2;
   const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_Status.prototype.statusXParamsWindowRect = function() {
-  const ww = this.statusContenWidth() / 2;
+Scene_Status.prototype.rightContentWindowRect = function() {
+  const ww = this.statusContenWidth() + 100;
   const wh = this.statusParamsHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusRightX(2);
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + ww;
   const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_Status.prototype.statusSParamsWindowRect = function() {
-  const ww = this.statusContenWidth() / 2;
-  const wh = this.statusParamsHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusRightX(3);
-  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
-  return new Rectangle(wx, wy, ww, wh);
-};
-
-Scene_Status.prototype.statusEquipWindowRect = function() {
-  const ww = this.statusContenWidth() - this.statusParamsWidth();
-  const wh = this.statusParamsHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusParamsWidth();
-  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
-  return new Rectangle(wx, wy, ww, wh);
-};
-
-Scene_Status.prototype.statusElementWindowRect = function() {
-  const ww = this.statusContenWidth() / 2;
-  const wh = this.statusParamsHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusRightX(4);
-  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
-  return new Rectangle(wx, wy, ww, wh);
-};
-
-Scene_Status.prototype.statusStateWindowRect = function() {
-  const ww = this.statusContenWidth() / 2;
-  const wh = this.statusParamsHeight();
-  const wx = (Graphics.width - Graphics.boxWidth) / 2 + this.statusRightX(5);
-  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.mainAreaTop() + this.statusHeight();
-  return new Rectangle(wx, wy, ww, wh);
-};
-
-Scene_Status.prototype.statusRightX = function(mode) {
-  if (param.Page2Right === mode || param.Page3Right === mode) {
-    const x = this.statusContenWidth() / 2;
-    if (mode === 2) {
-      this._statusWindow.setXParams_x = x;
-    } else if (mode === 3) {
-      this._statusWindow.setSParams_x = x;
-    } else if (mode === 4) {
-      this._statusWindow.setElement_x = x;
-    } else if (mode === 5) {
-      this._statusWindow.setState_x = x;
-    }
-    return x;
+Scene_Status.prototype.createStatusButton = function() {
+  if(this.maxPage > 1 && ConfigManager.touchUI) {
+    this._statusupButton = new Sprite_Button("up");
+    this._statusupButton.x = 24 + this._pageupButton.width + this._pagedownButton.width;
+    this._statusupButton.y = this.buttonY();
+    const statusupRight = this._statusupButton.x + this._statusupButton.width;
+    this._statusdownButton = new Sprite_Button("down");
+    this._statusdownButton.x = statusupRight + 4;
+    this._statusdownButton.y = this.buttonY();
+    this.addWindow(this._statusupButton);
+    this.addWindow(this._statusdownButton);
+    this._statusupButton.setClickHandler(this.updateContentsPageup.bind(this));
+    this._statusdownButton.setClickHandler(this.updateContentsPagedown.bind(this));
   }
-  return 0;
-};
-
-Scene_Status.prototype.statusContenWidth = function() {
-  return param.ContentWidth === 0 ? Graphics.boxWidth : param.ContentWidth;
-};
-
-Scene_Status.prototype.statusParamsWidth = function() {
-  return Math.max(this.statusContenWidth() / 3, 300);
-};
-
-Scene_Status.prototype.statusContenHeight = function() {
-  return this.statusParamsHeight();
-};
-
-Scene_Status.prototype.statusSParamsHeight = function() {
-  return SparamData ? this.statusParamsHeight() : 0;
-};
-
-Scene_Status.prototype.statusElementHeight = function() {
-  return ElementResistData ?  this.statusParamsHeight() : 0;
-};
-
-Scene_Status.prototype.statusStateHeight = function() {
-  return StateResistData ? this.statusParamsHeight() : 0;
-};
-
-Scene_Status.prototype.statusParamsHeight = function() {
-  const height = Graphics.boxHeight - (this.mainAreaTop() + this.statusHeight() + this.profileHeight());
-  const row = Math.floor(height / 36);
-  return this.calcWindowHeight(row, false);
-};
-
-Scene_Status.prototype.statusHeight = function() {
-  const row = Math.floor((Graphics.boxHeight - this.mainAreaTop() - 564) / 60);
-  return this.calcWindowHeight(6 + row, false) + 4;
 };
 
 const _Scene_Status_createBackground = Scene_Status.prototype.createBackground;
@@ -630,32 +619,82 @@ Scene_Status.prototype.createBackground = function() {
   }
 };
 
-Scene_Status.prototype.createStatusButton = function() {
-  if(this.maxPage > 1 && ConfigManager.touchUI) {
-    this._modeupButton = new Sprite_Button("up");
-    this._modeupButton.x = 24 + this._pageupButton.width + this._pagedownButton.width;
-    this._modeupButton.y = this.buttonY();
-    const modeupRight = this._modeupButton.x + this._modeupButton.width;
-    this._modedownButton = new Sprite_Button("down");
-    this._modedownButton.x = modeupRight + 4;
-    this._modedownButton.y = this.buttonY();
-    this.addWindow(this._modeupButton);
-    this.addWindow(this._modedownButton);
-    this._modeupButton.setClickHandler(this.updateContentsPageup.bind(this));
-    this._modedownButton.setClickHandler(this.updateContentsPagedown.bind(this));
-  }
+Scene_Status.prototype.statusHeight = function() {
+  const row = Math.floor((Graphics.boxHeight - this.mainAreaTop() - 564) / 60);
+  return this.calcWindowHeight(5 + row, false) + 4;
 };
 
-const _Scene_Status_refreshActor = Scene_Status.prototype.refreshActor;
-Scene_Status.prototype.refreshActor = function() {
-  _Scene_Status_refreshActor.call(this);
-  const actor = this.actor();
-  this._statusXParamsWindow.setActor(actor);
-  this._statusSParamsWindow.setActor(actor);
-  this._statusElementWindow.setActor(actor);
-  this._statusStateWindow.setActor(actor);
-  this.updatepage();
+Scene_Status.prototype.statusParamsHeight = function() {
+  const height = Graphics.boxHeight - (this.mainAreaTop() + this.statusHeight() + this.profileHeight());
+  const row = Math.floor(height / 36);
+  return this.calcWindowHeight(row, false);
 };
+
+Scene_Status.prototype.statusContenWidth = function() {
+  return (param.ContentWidth > 0 ? param.ContentWidth - 8 : Graphics.boxWidth) / 2;
+};
+
+Scene_Status.prototype.refreshActor = function() {
+  const actor = this.actor();
+  this._profileWindow.setText(actor.profile());
+  this._statusWindow.setActor(actor);
+  this._leftContentWindow.setActor(actor);
+  this._rightContentWindow.setActor(actor);
+  this.updatePage();
+};
+
+Scene_Status.prototype.updateContentsPagedown = function() {
+	const maxPage = this.maxPage;
+  this._pageMode = (this._pageMode + 1) % maxPage;
+  SoundManager.playCursor();
+  this.updatePage();
+};
+
+Scene_Status.prototype.updateContentsPageup = function() {
+	const maxPage = this.maxPage;
+  this._pageMode = (this._pageMode + (maxPage - 1)) % maxPage;
+  SoundManager.playCursor();
+  this.updatePage();
+};
+
+Scene_Status.prototype.updatePage = function() {
+  this._statusWindow.contents.clear();
+  this._statusWindow.refresh();
+  this.refreshPage();
+};
+
+Scene_Status.prototype.refreshPage = function() {
+  this._leftContentWindow.contents.clear();
+  this._rightContentWindow.contents.clear();
+  if (this._pageMode === 0) {
+    this._leftContentWindow.contentShow = 0;
+    this._rightContentWindow.contentShow = 1;
+  } else if(this._pageMode === 1) {
+    this._leftContentWindow.contentShow = param.Page2Left;
+    this._rightContentWindow.contentShow = param.Page2Right;
+  } else if(this._pageMode === 2) {
+    this._leftContentWindow.contentShow = param.Page3Left;
+    this._rightContentWindow.contentShow = param.Page3Right;
+  } else if (this._pageMode === 3) {
+    this._leftContentWindow.contentShow = param.Page4Left;
+    this._rightContentWindow.contentShow = param.Page4Right;
+  }
+  this.contentsWindowRefresh();
+  this._leftContentWindow.refresh();
+  this._rightContentWindow.refresh();
+};
+
+Scene_Status.prototype.contentsWindowRefresh = function() {
+  if (this._pageMode === 0) {
+    this._leftContentWindow.width = this.statusContenWidth() - 100;
+    this._rightContentWindow.width = this.statusContenWidth() + 100;
+  } else {
+    this._leftContentWindow.width = this.statusContenWidth();
+    this._rightContentWindow.width = this.statusContenWidth();
+  }
+  this._rightContentWindow.x = (Graphics.width - Graphics.boxWidth) / 2 + this._leftContentWindow.width;
+};
+
 
 const _Scene_Status_update = Scene_Status.prototype.update;
 Scene_Status.prototype.update = function() {
@@ -677,97 +716,8 @@ Scene_Status.prototype.update = function() {
   }
 };
 
-Scene_Status.prototype.updateContentsPagedown = function() {
-	const maxPage = this.maxPage;
-  this._pageMode = (this._pageMode + 1) % maxPage;
-  SoundManager.playCursor();
-  this.updatepage();
-};
 
-Scene_Status.prototype.updateContentsPageup = function() {
-	const maxPage = this.maxPage;
-  this._pageMode = (this._pageMode + (maxPage - 1)) % maxPage;
-  SoundManager.playCursor();
-  this.updatepage();
-};
-
-Scene_Status.prototype.updatepage = function() {
-  this._statusWindow.contents.clear();
-  this._statusWindow.refresh();
-  this.refreshPage();
-  this.drawContentNameBlock();
-};
-
-Scene_Status.prototype.refreshPage = function() {
-  this.pageAllHide();
-  if (this._pageMode === 0) {
-    this._statusParamsWindow.show();
-    this._statusEquipWindow.show();
-  } else if(this._pageMode === 1) {
-    this.showPage(param.Page2Left);
-    this.showPage(param.Page2Right);
-  } else if(this._pageMode === 2) {
-    this.showPage(param.Page3Left);
-    this.showPage(param.Page3Right);
-  }
-};
-
-
-Scene_Status.prototype.showPage = function(value) {
-  switch (value) {
-  case 0:
-    break;
-  case 1:
-    this._statusEquipWindow.show();
-    break;
-  case 2:
-    this._statusXParamsWindow.show();
-    break;
-  case 3:
-    this._statusSParamsWindow.show();
-    break;
-  case 4:
-    this._statusElementWindow.show();
-    break;
-  case 5:
-    this._statusStateWindow.show();
-    break;
-  case 6:
-    break;
-  }
-};
-
-Scene_Status.prototype.pageAllHide = function() {
-  this._statusParamsWindow.hide();
-  this._statusEquipWindow.hide();
-  this._statusXParamsWindow.hide();
-  this._statusSParamsWindow.hide();
-  this._statusElementWindow.hide();
-  this._statusStateWindow.hide();
-};
-
-Scene_Status.prototype.drawContentNameBlock = function() {
-  if (this._statusParamsWindow.visible) {
-    this._statusWindow.paramName();
-  }
-  if (this._statusEquipWindow.visible) {
-    this._statusWindow.EquipsName();
-  }
-  if (this._statusXParamsWindow.visible) {
-    this._statusWindow.XparamName();
-  }
-  if (this._statusSParamsWindow.visible) {
-    this._statusWindow.SparamName();
-  }
-  if (this._statusElementWindow.visible) {
-    this._statusWindow.ElementName();
-  }
-  if (this._statusStateWindow.visible) {
-    this._statusWindow.StateName();
-  }
-};
-
-Window_Base.prototype.statusParamDecimal = function(val) {
+Window_StatusBase.prototype.statusParamDecimal = function(val) {
   if (param.DecimalMode) {
     return Math.round(val * (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1)) / (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1);
   } else {
@@ -778,13 +728,13 @@ Window_Base.prototype.statusParamDecimal = function(val) {
 Window_Status.prototype.refresh = function() {
   Window_StatusBase.prototype.refresh.call(this);
   if (this._actor) {
-    const deta = this.actorImgDeta(this._actor.actorId());
-    const bitmapDeta = deta.ActorImg;
-    this.bitmap = bitmapDeta ? ImageManager.loadPicture(bitmapDeta) : null;
-    if (this.bitmap && !this.bitmap.isReady()) {
-			this.bitmap.addLoadListener(this.drawBlocks.bind(this));
-		} else {
-			this.drawBlocks();
+    const index = this._actor.index();
+    this._imgDate = this._actorImgDate[index];
+    this.bitmap = this._imgDate ? this._imgDate.bitmap : null;
+    if ((this._imgDate && this.bitmap._url) && !this.bitmap.isReady()) {
+      this.bitmap.addLoadListener(this.drawBlocks.bind(this));
+    } else {
+      this.drawBlocks();
     }
   }
 };
@@ -796,9 +746,9 @@ Window_Status.prototype.drawBlocks = function() {
 };
 
 Window_Status.prototype.actorImg = function() {
-  if(this.bitmap) {
-    const deta = this.actorImgDeta(this._actor.actorId());
-    let x = deta.Actor_X;
+  if(this._imgDate && this.bitmap._url) {
+    const date = this._imgDate;
+    let x = date.Actor_X;
     if(param.actorPosition === 0) {
       x += 24;
     } else if (param.actorPosition === 1) {
@@ -806,9 +756,35 @@ Window_Status.prototype.actorImg = function() {
     } else {
       x += Graphics.boxWidth - this.bitmap.width - 24;
     }
-    const y = deta.Actor_Y + (Graphics.boxHeight - this.bitmap.height) - this.y - 24;
-    this.contents.blt(this.bitmap, 0, 0, Graphics.boxWidth, Graphics.boxHeight, x, y);
+    const y = date.Actor_Y + (Graphics.boxHeight - this.bitmap.height) - this.y - 24;
+    const scale = (date.Actor_Scale || 100) / 100;
+    const dw = this.bitmap.width * scale;
+    const dh = this.bitmap.height * scale;
+    this.contents.blt(this.bitmap, 0, 0, this.bitmap.width, this.bitmap.height, x, y, dw, dh);
   }
+};
+
+const _Window_Status_loadFaceImages = Window_Status.prototype.loadFaceImages;
+Window_Status.prototype.loadFaceImages = function() {
+  _Window_Status_loadFaceImages.call(this);
+  this._actorImgDate = [];
+  for (const actor of $gameParty.members()) {
+    const date = this.actorImgesDate(actor.actorId());
+    if (date) {
+      date.bitmap = ImageManager.loadPicture(date.ActorImg);
+      this._actorImgDate.push(date);
+    }
+  }
+};
+
+Window_Status.prototype.actorImgesDate = function(id) {
+  const actors = param.ActorsImgList;
+  const date = actors.find(actor => actor.actorId === id);
+  return date ? date : this.undefinedDate(id, date);
+};
+
+Window_Status.prototype.undefinedDate = function(id, date) {
+  return null;
 };
 
 Window_Status.prototype.blocksY = function() {
@@ -851,183 +827,123 @@ Window_Status.prototype.placeGauge = function(actor, type, x, y) {
   sprite.show();
 };
 
-Window_Status.prototype.actorImgDeta = function(id) {
-  const actors = param.ActorsImgList;
-  const deta = actors.find(actor => actor.actorId === id);
-  return deta ? deta : {actorId: id};
+Window_Status.prototype.characterSwitchingHelp = function(x, y) {
+  const lineHeight = this.lineHeight();console.log(y)
+  this.changeTextColor(ColorManager.textColor(6));
+  this.contents.fontSize = 18;
+  let text = ConfigManager.touchUI ? "ΛVボタン / " : "";
+  this.drawText(text +"QWキー:キャラの切替", x, y ,300,'right');
+  text = ConfigManager.touchUI ? "<>ボタン / " : "";
+	this.drawText(text +"←→キー:項目の切替", x, y + lineHeight, 300,'right');
+	this.resetTextColor();
+	this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
-Window_Status.prototype.paramName = function(id) {
-  const rect = this.itemLineRect(0);
-  const y = this.setContentY - 42;
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.ParamName, rect.x, y, rect.width);
-  this.resetTextColor();
-};
 
-Window_Status.prototype.XparamName = function(id) {
-  const rect = this.itemLineRect(0);
-  const y = this.setContentY - 42;
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.XParamName, rect.x + this.setXParams_x, y, rect.width);
-  this.resetTextColor();
-};
-
-Window_Status.prototype.SparamName = function() {
-  const rect = this.itemLineRect(0);
-  const y = this.setContentY - 42;
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.SParamName, rect.x + this.setSParams_x, y, rect.width);
-  this.resetTextColor();
-};
-
-Window_Status.prototype.EquipsName = function() {
-  const rect = this.itemLineRect(0);
-  const y = this.setContentY - 42;
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.EquipsName, rect.x + this.setContentEquip_x, y, rect.width);
-  this.resetTextColor();
-};
-
-Window_Status.prototype.ElementName = function() {
-  const rect = this.itemLineRect(0);
-  const y = this.setContentY - 42;
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.ElementName, rect.x + this.setElement_x, y, rect.width);
-  this.resetTextColor();
-};
-
-Window_Status.prototype.StateName = function() {
-  const rect = this.itemLineRect(0);
-  const y = this.setContentY - 42;
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(param.StateName, rect.x + this.setState_x - 4, y, rect.width);
-  this.resetTextColor();
-};
-
-function Window_StatusParamsEX() {
+function Window_Content() {
   this.initialize(...arguments);
 }
 
-Window_StatusParamsEX.prototype = Object.create(Window_StatusBase.prototype);
-Window_StatusParamsEX.prototype.constructor = Window_StatusParamsEX;
+Window_Content.prototype = Object.create(Window_StatusBase.prototype);
+Window_Content.prototype.constructor = Window_Content;
 
-Window_StatusParamsEX.prototype.initialize = function(rect) {
-  Window_StatusBase.prototype.initialize.call(this, rect);
-  this._actor = null;
-  this.opacity = 0;
-  this.frameVisible = false;
-  this._page = 0;
-};
-
-Window_StatusParamsEX.prototype.setActor = function(actor) {
-  if (this._actor !== actor) {
-      this._actor = actor;
-      this.refresh();
-  }
-};
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-const _Window_StatusParams_initialize = Window_StatusParams.prototype.initialize;
-Window_StatusParams.prototype.initialize = function(rect) {
-  _Window_StatusParams_initialize.call(this, rect);
-  this.opacity = 0;
-  this.frameVisible =  false;
-};
-
-Window_StatusParams.prototype.drawItem = function(index) {
-  const rect = this.itemLineRect(index);
-  const paramId = index + 2;
-  const name = TextManager.param(paramId);
-  const value = this._actor.param(paramId);
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(name, rect.x, rect.y, 92);
-  this.resetTextColor();
-  this.drawText(value, rect.x + 100, rect.y, rect.width - 100, "right");
-};
-
-Window_StatusParams.prototype.drawItemBackground = function(index) {
-  if(param.ParamBackShow) {
-    Window_Selectable.prototype.drawItemBackground.call(this, index);
-  }
-};
-
-const _Window_StatusEquip_initialize = Window_StatusEquip.prototype.initialize;
-Window_StatusEquip.prototype.initialize = function(rect) {
-  _Window_StatusEquip_initialize.call(this, rect);
-  this.opacity = 0;
-  this.frameVisible =  false;
-};
-
-Window_StatusEquip.prototype.drawItem = function(index) {
-  const rect = this.itemLineRect(index);
-  const equips = this._actor.equips();
-  const item = equips[index];
-  const slotName = this.actorSlotName(this._actor, index);
-  const sw = 138;
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(slotName, rect.x, rect.y, sw, rect.height);
-  this.drawItemName(item, rect.x + sw, rect.y, rect.width - sw);
-};
-
-Window_StatusEquip.prototype.drawItemBackground = function(index) {
-  if(param.ParamBackShow) {
-    Window_Selectable.prototype.drawItemBackground.call(this, index);
-  }
-};
-
-
-function Window_StatusXParams() {
-  this.initialize(...arguments);
-}
-
-Window_StatusXParams.prototype = Object.create(Window_StatusBase.prototype);
-Window_StatusXParams.prototype.constructor = Window_StatusXParams;
-
-Window_StatusXParams.prototype.initialize = function(rect) {
+Window_Content.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._actor = null;
   this.opacity = 0;
   this.frameVisible = false;
 };
 
-Window_StatusXParams.prototype.setActor = function(actor) {
+Window_Content.prototype.setActor = function(actor) {
   if (this._actor !== actor) {
       this._actor = actor;
       this.refresh();
   }
 };
 
-Window_StatusXParams.prototype.maxItems = function() {
-  return param.Xparam ? param.Xparam.length : 0;
-};
-
-Window_StatusXParams.prototype.maxCols = function() {
-  return 2;
-};
-
-Window_StatusXParams.prototype.itemHeight = function() {
+Window_Content.prototype.itemHeight = function() {
   return this.lineHeight();
 };
 
-Window_StatusXParams.prototype.drawItem = function(index) {
-  const rect = this.itemLineRect(index);
-  const paramId = param.Xparam[index].XparamId;
-  const name = this.XparamName(index);
-  let value = this._actor.xparam(paramId) * 100;
-  value = this.statusParamDecimal(value);
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(name, rect.x, rect.y, 92);
-  this.resetTextColor();
-  this.drawText(value +" %", rect.x + 100, rect.y, rect.width - 100, "right");
+Window_Content.prototype.maxCols = function() {
+  if (this.contentShow === 0) {
+    return 1;
+  } else if (this.contentShow === 1) {
+    return 1;
+  } else if (this.contentShow === 10) {
+    return 1;
+  } else if (this.contentShow === 11) {
+    return 1;
+  }
+  return 2;
 };
 
 
-Window_StatusXParams.prototype.XparamName = function(index) {
+
+Window_Content.prototype.refresh = function() {
+  this.pageRefresh();
+};
+
+Window_Content.prototype.drawParams = function(rect) {
+  const lineHeight = this.lineHeight();
+  const sw = 160;
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.ParamName, rect.x, rect.y, rect.width);
+  this.resetTextColor();
+  for (let i = 0; i < 6; i++) {
+    let itemRect = this.itemLineRect(i);
+    itemRect.y += lineHeight;
+    const paramId = i + 2;
+    const name = TextManager.param(paramId);
+    const value = this._actor.param(paramId);
+    this.drawItemBackground(i);
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(name, itemRect.x, itemRect.y, 152);
+    this.resetTextColor();
+    this.drawText(value, itemRect.x + 160, itemRect.y, itemRect.width - 160, "right");
+  }
+};
+
+Window_Content.prototype.drawEquip = function(rect) {
+  const lineHeight = this.lineHeight();
+  const equips = this._actor.equips();
+  const sw = 138;
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.EquipsName, rect.x, rect.y, rect.width);
+  this.resetTextColor();
+  for (let i = 0; i < equips.length; i++) {
+    let itemRect = this.itemLineRect(i);
+    itemRect.y += lineHeight;
+    let slotName = this.actorSlotName(this._actor, i);
+    let item = equips[i];
+    this.drawItemBackground(i);
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(slotName, itemRect.x, itemRect.y, sw, itemRect.height);
+    this.drawItemName(item, itemRect.x + sw, itemRect.y, itemRect.width - sw);
+  }
+};
+
+Window_Content.prototype.drawXParams = function(rect) {
+  const lineHeight = this.lineHeight();
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.XParamName, rect.x, rect.y, rect.width);
+  this.resetTextColor();
+  for (let i = 0; i < param.Xparam.length; i++) {
+    let itemRect = this.itemLineRect(i);
+    itemRect.y += lineHeight;
+    let paramId = param.Xparam[i].XparamId;
+    let name = this.XparamName(i);
+    let value = this._actor.xparam(paramId) * 100;
+    value = this.statusParamDecimal(value);
+    this.drawItemBackground(i);
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(name, itemRect.x, itemRect.y, 92);
+    this.resetTextColor();
+    this.drawText(value +" %", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
+  }
+};
+
+Window_Content.prototype.XparamName = function(index) {
   switch (param.Xparam[index].XparamId) {
     case 0:
       return param.Xparam[index].XparamName ? param.Xparam[index].XparamName : TextManager.param(8);
@@ -1053,59 +969,27 @@ Window_StatusXParams.prototype.XparamName = function(index) {
   return null;
 };
 
-Window_StatusXParams.prototype.drawItemBackground = function(index) {
-  if(param.ParamBackShow) {
-    Window_Selectable.prototype.drawItemBackground.call(this, index);
-  }
-};
-
-
-function Window_StatusSParams() {
-  this.initialize(...arguments);
-}
-
-Window_StatusSParams.prototype = Object.create(Window_StatusBase.prototype);
-Window_StatusSParams.prototype.constructor = Window_StatusSParams;
-
-Window_StatusSParams.prototype.initialize = function(rect) {
-  Window_StatusBase.prototype.initialize.call(this, rect);
-  this._actor = null;
-  this.opacity = 0;
-  this.frameVisible = false;
-};
-
-Window_StatusSParams.prototype.setActor = function(actor) {
-  if (this._actor !== actor) {
-      this._actor = actor;
-      this.refresh();
-  }
-};
-
-Window_StatusSParams.prototype.maxItems = function() {
-  return param.Sparam ? param.Sparam.length : 0;
-};
-
-Window_StatusSParams.prototype.maxCols = function() {
-  return 2;
-};
-
-Window_StatusSParams.prototype.itemHeight = function() {
-  return this.lineHeight();
-};
-
-Window_StatusSParams.prototype.drawItem = function(index) {
-  const rect = this.itemLineRect(index);
-  const paramId = param.Sparam[index].SparamId;
-  const name = this.SparamName(index);
-  let value = this._actor.sparam(paramId) * 100;
-  value = this.statusParamDecimal(value);
+Window_Content.prototype.drawSParams = function(rect) {
+  const lineHeight = this.lineHeight();
   this.changeTextColor(ColorManager.systemColor());
-  this.drawText(name, rect.x, rect.y, 92);
+  this.drawText(param.SParamName, rect.x, rect.y, rect.width);
   this.resetTextColor();
-  this.drawText(value +" %", rect.x + 100, rect.y, rect.width - 100, "right");
+  for (let i = 0; i < param.Sparam.length; i++) {
+    let itemRect = this.itemLineRect(i);
+    itemRect.y += lineHeight;
+    let paramId = param.Sparam[i].SparamId;
+    let name = this.SparamName(i);
+    let value = this._actor.sparam(paramId) * 100;
+    value = this.statusParamDecimal(value);
+    this.drawItemBackground(i);
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(name, itemRect.x, itemRect.y, 92);
+    this.resetTextColor();
+    this.drawText(value +" %", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
+  }
 };
 
-Window_StatusSParams.prototype.SparamName = function(index) {
+Window_Content.prototype.SparamName = function(index) {
   switch (param.Sparam[index].SparamId) {
     case 0:
       return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : "狙われ率";
@@ -1131,129 +1015,217 @@ Window_StatusSParams.prototype.SparamName = function(index) {
   return null;
 };
 
-Window_StatusSParams.prototype.drawItemBackground = function(index) {
-  if(param.ParamBackShow) {
-    Window_Selectable.prototype.drawItemBackground.call(this, index);
-  }
-};
-
-
-function Window_StatusElement() {
-  this.initialize(...arguments);
-}
-
-Window_StatusElement.prototype = Object.create(Window_StatusBase.prototype);
-Window_StatusElement.prototype.constructor = Window_StatusElement;
-
-Window_StatusElement.prototype.initialize = function(rect) {
-  Window_StatusBase.prototype.initialize.call(this, rect);
-  this._actor = null;
-  this.opacity = 0;
-  this.frameVisible = false;
-};
-
-Window_StatusElement.prototype.setActor = function(actor) {
-  if (this._actor !== actor) {
-      this._actor = actor;
-      this.refresh();
-  }
-};
-
-Window_StatusElement.prototype.maxItems = function() {
-  return param.ElementResist ? param.ElementResist.length : 0;
-};
-
-Window_StatusElement.prototype.maxCols = function() {
-  return 2;
-};
-
-Window_StatusElement.prototype.itemHeight = function() {
-  return this.lineHeight();
-};
-
-Window_StatusElement.prototype.drawItem = function(index) {
-  const rect = this.itemLineRect(index);
-  const elementId = param.ElementResist[index].ElementNo;
-  if(elementId > 0) {
-    const iconId = param.ElementResist[index].ElementIconId;
-    if(iconId > 0) {
-      this.drawIcon(iconId, rect.x, rect.y + 2);
-    } else {
-      const name = $dataSystem.elements[elementId];
-      this.changeTextColor(ColorManager.systemColor());
-      this.drawText(name, rect.x, rect.y, 92);
-    }
-    let rate = this._actor.elementRate(elementId) * 100;
-    rate = this.statusParamDecimal(rate);
-    this.resetTextColor();
-    this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
-  }
-};
-
-Window_StatusElement.prototype.drawItemBackground = function(index) {
-  if(param.ParamBackShow) {
-    Window_Selectable.prototype.drawItemBackground.call(this, index);
-  }
-};
-
-
-function Window_StatusState() {
-  this.initialize(...arguments);
-}
-
-Window_StatusState.prototype = Object.create(Window_StatusBase.prototype);
-Window_StatusState.prototype.constructor = Window_StatusState;
-
-Window_StatusState.prototype.initialize = function(rect) {
-  Window_StatusBase.prototype.initialize.call(this, rect);
-  this._actor = null;
-  this.opacity = 0;
-  this.frameVisible = false;
-};
-
-Window_StatusState.prototype.setActor = function(actor) {
-  if (this._actor !== actor) {
-      this._actor = actor;
-      this.refresh();
-  }
-};
-
-Window_StatusState.prototype.maxItems = function() {
-  return param.StateResist ? param.StateResist.length : 0;
-};
-
-Window_StatusState.prototype.maxCols = function() {
-  return 2;
-};
-
-Window_StatusState.prototype.itemHeight = function() {
-  return this.lineHeight();
-};
-
-Window_StatusState.prototype.drawItem = function(index) {
-  const rect = this.itemLineRect(index);
-  if (param.StateResist.length > 0) {
-    const stateId = param.StateResist[index].StateNo;
-    if(stateId > 0) {
-      const iconId = $dataStates[stateId].iconIndex;
-      if(iconId > 0 && !param.StateResistText) {
-        this.drawIcon(iconId, rect.x, rect.y + 2);
-      } else {
-        const name = $dataStates[stateId].name;
-        this.changeTextColor(ColorManager.systemColor());
-        this.drawText(name, rect.x, rect.y, 92);
+Window_Content.prototype.drawElement = function(rect) {
+  const lineHeight = this.lineHeight();
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.ElementName, rect.x, rect.y, rect.width);
+  this.resetTextColor();
+  if (param.ElementResist) {
+    for (let i = 0; i < param.ElementResist.length; i++) {
+      let itemRect = this.itemLineRect(i);
+      itemRect.y += lineHeight;
+      let elementId = param.ElementResist[i].ElementNo;
+      if(elementId > 0) {
+        this.drawItemBackground(i);
+        let iconId = param.ElementResist[i].ElementIconId;
+        if(iconId > 0) {
+          this.drawIcon(iconId, itemRect.x, itemRect.y + 2);
+        } else {
+          const name = $dataSystem.elements[elementId];
+          this.changeTextColor(ColorManager.systemColor());
+          this.drawText(name, itemRect.x, itemRect.y, 92);
+        }
+        let rate = this._actor.elementRate(elementId) * 100;
+        rate = this.statusParamDecimal(rate);
+        this.resetTextColor();
+        this.drawText(rate +" %", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
       }
-      let rate = this._actor.stateRate(stateId) * 100;
-      rate = this.statusParamDecimal(rate);
-      this.resetTextColor();
-      this.drawText(rate +" %", rect.x + 100, rect.y, rect.width - 100, "right");
     }
   }
 };
 
-Window_StatusState.prototype.drawItemBackground = function(index) {
-  if(param.ParamBackShow) {
-    Window_Selectable.prototype.drawItemBackground.call(this, index);
+Window_Content.prototype.drawState = function(rect) {
+  const lineHeight = this.lineHeight();
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.StateName, rect.x, rect.y, rect.width);
+  this.resetTextColor();
+  if (param.StateResist) {
+    for (let i = 0; i < param.StateResist.length; i++) {
+      let itemRect = this.itemLineRect(i);
+      itemRect.y += lineHeight;
+      const stateId = param.StateResist[i].StateNo;
+      if(stateId > 0) {
+        this.drawItemBackground(i);
+        const iconId = $dataStates[stateId].iconIndex;
+        if(iconId > 0 && !param.StateResistText) {
+          this.drawIcon(iconId, itemRect.x, itemRect.y + 2);
+        } else {
+          const name = $dataStates[stateId].name;
+          this.changeTextColor(ColorManager.systemColor());
+          this.drawText(name, itemRect.x, itemRect.y, 92);
+        }
+        let rate = this._actor.stateRate(stateId) * 100;
+        rate = this.statusParamDecimal(rate);
+        this.resetTextColor();
+        this.drawText(rate +" %", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
+      }
+    }
+  }
+};
+
+Window_Content.prototype.OriginalParam1 = function(rect) {
+  const lineHeight = this.lineHeight();
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.OriginalParam1Name, rect.x, rect.y, rect.width);
+  this.resetTextColor();
+  if (param.OriginalParam1) {
+    const date = param.OriginalParam1;
+    for (let i = 0; i < param.OriginalParam1.length; i++) {
+      let itemRect = this.itemLineRect(i);
+      itemRect.y += lineHeight;
+      let name = date[i].paramName;
+      let param = eval(date[i].paramValue) || 0;
+      this.drawItemBackground(i);
+      this.changeTextColor(ColorManager.systemColor());
+      this.drawText(name, itemRect.x, itemRect.y, 192);
+      this.resetTextColor();
+      this.drawText(param, itemRect.x + 200, itemRect.y, itemRect.width - 200, "right");
+    }
+  }
+};
+
+Window_Content.prototype.OriginalParam2 = function(rect) {
+  const lineHeight = this.lineHeight();
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.OriginalParam2Name, rect.x, rect.y, rect.width);
+  this.resetTextColor();
+  if (param.OriginalParam2) {
+    const date = param.OriginalParam2;
+    for (let i = 0; i < param.OriginalParam2.length; i++) {
+      let itemRect = this.itemLineRect(i);
+      itemRect.y += lineHeight;
+      let name = date[i].paramName;
+      let param = eval(date[i].paramValue) || 0;
+      this.drawItemBackground(i);
+      this.changeTextColor(ColorManager.systemColor());
+      this.drawText(name, itemRect.x, itemRect.y, 192);
+      this.resetTextColor();
+      this.drawText(param, itemRect.x + 200, itemRect.y, itemRect.width - 200, "right");
+    }
+  }
+};
+
+Window_Content.prototype.drawElementRadarChart = function(rect) {
+
+  
+};
+
+Window_Content.prototype.drawStateRadarChart = function(rect) {
+
+  
+};
+
+const _Window_Content_drawItemBackground = Window_Content.prototype.drawItemBackground;
+Window_Content.prototype.drawItemBackground = function(index) {
+  if (param.BackShow) {
+    _Window_Content_drawItemBackground.call(this, index)
+  }
+};
+
+
+const _Window_Content_drawBackgroundRect  = Window_Content.prototype.drawBackgroundRect ;
+Window_Content.prototype.drawBackgroundRect = function(rect) {
+  rect.y += this.lineHeight();
+  _Window_Content_drawBackgroundRect.call(this, rect);
+};
+
+
+function Window_LeftContent() {
+  this.initialize(...arguments);
+}
+
+Window_LeftContent.prototype = Object.create(Window_Content.prototype);
+Window_LeftContent.prototype.constructor = Window_LeftContent;
+
+Window_LeftContent.prototype.initialize = function(rect) {
+  Window_Content.prototype.initialize.call(this, rect);
+};
+
+Window_LeftContent.prototype.pageRefresh = function() {
+  this.contentsBack.clear();
+  if (this.contentShow >= 0) {
+    const rect = this.itemRect(0);
+    switch (this.contentShow) {
+      case 0:
+        this.drawParams(rect);
+        break;
+      case 1:
+        this.drawEquip(rect);
+        break;
+      case 2:
+        this.drawXParams(rect);
+        break;
+      case 3:
+        this.drawSParams(rect);
+        break;
+      case 4:
+        this.drawElement(rect);
+        break;
+      case 5:
+        this.drawState(rect);
+        break;
+      case 10:
+        this.OriginalParam1(rect);
+        break;
+      case 11:
+        this.OriginalParam2(rect);
+        break;
+    }
+  }
+};
+
+
+function Window_RightContent() {
+  this.initialize(...arguments);
+}
+
+Window_RightContent.prototype = Object.create(Window_Content.prototype);
+Window_RightContent.prototype.constructor = Window_RightContent;
+
+Window_RightContent.prototype.initialize = function(rect) {
+  Window_Content.prototype.initialize.call(this, rect);
+};
+
+Window_RightContent.prototype.pageRefresh = function() {
+  this.contentsBack.clear();
+  if (this.contentShow >= 0) {
+    const rect = this.itemRect(0);
+    switch (this.contentShow) {
+      case 0:
+        this.drawParams(rect);
+        break;
+      case 1:
+        this.drawEquip(rect);
+        break;
+      case 2:
+        this.drawXParams(rect);
+        break;
+      case 3:
+        this.drawSParams(rect);
+        break;
+      case 4:
+        this.drawElement(rect);
+        break;
+      case 5:
+        this.drawState(rect);
+        break;
+      case 10:
+        this.OriginalParam1(rect);
+        break;
+      case 11:
+        this.OriginalParam2(rect);
+        break;
+    }
   }
 };
 

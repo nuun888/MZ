@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/24 Ver.1.0.3
+ * バトルスタイル拡張併用時の処理を再度修正。
  * 2021/1/17 Ver.1.0.2
  * バトルスタイル拡張プラグイン導入時、ステートの座標許可をtureにすると座標が反映されない問題を修正。
  * バトルスタイル拡張プラグイン2.0.0以降対応。
@@ -24,7 +26,7 @@
  * 
  * @help
  * 戦闘中のアクターのステート表示を横並びに表示させます。
- * Ver.1.0.2からはバトルスタイル拡張プラグインと併用する場合はVer.2.0.0以降のみ対応しています。
+ * バトルスタイル拡張プラグインと併用する場合はVer.2.0.2以降対応。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -44,7 +46,6 @@ Imported.NUUN_IconSideBySide = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_IconSideBySide');
 const StateIconWidth = Number(parameters['StateIconWidth'] || 0);
-const stateDate = Imported.NUUN_BattleStyleEX_Base ? BattleManager.NUUN_BattleStyleStateDate : null;
 
 const _Scene_Battle_createStatusWindow = Scene_Battle.prototype.createStatusWindow;
 Scene_Battle.prototype.createStatusWindow = function() {
@@ -62,7 +63,7 @@ Window_BattleStatus.prototype.placeStateIcon = function(actor, x, y) {
 };
 
 Window_BattleStatus.prototype.drawStateIcon = function(actor, x, y) {
-  this.drawActorIcons(actor, x, y, (StateIconWidth > 0 ? StateIconWidth : this.itemWidth()));
+  this.drawActorIcons(actor, x, y, (StateIconWidth > 0 ? StateIconWidth : this.itemWidth() - 8));
 };
 
 Window_BattleStatus.prototype.refreshContentsDraw = function() {
@@ -71,13 +72,8 @@ Window_BattleStatus.prototype.refreshContentsDraw = function() {
     const index = actor.index();
     this.drawItemImage(index);
     const rect = this.itemRectWithPadding(index);
-    if (stateDate && stateDate.ChangePosition) {
-      stateIconX = stateDate.state_X + rect.x;
-      stateIconY = stateDate.state_Y + rect.y;
-    } else {
-      stateIconX = this.stateIconX(rect);
-      stateIconY = this.stateIconY(rect);
-    }
+    const stateIconX = this.stateIconX(rect);
+    const stateIconY = this.stateIconY(rect);
     this.drawStateIcon(actor, stateIconX, stateIconY);
   }
 };

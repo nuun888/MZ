@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/24 Ver 2.0.2
+ * フロントビューでアクター側に「戦闘行動結果ポップアッププラグイン」が適用されるように対応。
  * 2021/1/17 Ver 2.0.1
  * ゲージの縦幅を指定できる機能を追加。
  * 2021/1/17 Ver 2.0.0
@@ -85,10 +87,6 @@ Imported.NUUN_BattleStyleEX_Base = true;
 let parameters = null;
 if (Imported.NUUN_BattleStyleEX) {
   parameters = PluginManager.parameters('NUUN_BattleStyleEX');
-} else if (Imported.NUUN_BattleStyleEX_Classic) {
-  parameters = PluginManager.parameters('NUUN_BattleStyleEX_Classic');
-} else if (Imported.NUUN_BattleStyleEX_Labyrinth) {
-  parameters = PluginManager.parameters('NUUN_BattleStyleEX_Labyrinth');
 }
 if (parameters === null) {
   return;
@@ -104,8 +102,7 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
-
-BattleManager.NUUN_BattleStyleStateDate = {ChangePosition: param.StateChangePosition, state_X: param.ActorState_X, state_Y: param.ActorState_Y};
+BattleManager.NUUN_BattleStyleDate = param;
 
 ImageManager.loadSystem(param.actorBackground);
 ImageManager.loadSystem(param.windowBackground);
@@ -716,20 +713,62 @@ Window_BattleStatus.prototype.drawItemImage = function(index) {
 Window_BattleStatus.prototype.drawItemStatus = function(index) {
   const actor = this.actor(index);
   const rect = this.itemRectWithPadding(index);
-  const nameX = param.NameChangePosition ? param.ActorName_X + rect.x : this.nameX(rect);
-  const nameY = param.NameChangePosition ? param.ActorName_Y + rect.y : this.nameY(rect);
-  const stateIconX = param.StateChangePosition ? param.ActorState_X + rect.x : this.stateIconX(rect);
-  const stateIconY = param.StateChangePosition ? param.ActorState_Y + rect.y : this.stateIconY(rect);
-  const timeX = param.TPBChangePosition ? param.ActorTPB_X + rect.x : nameX;
-  const timeY = param.TPBChangePosition ? param.ActorTPB_Y + rect.y : nameY;
-  if(param.TPBShow){
-    this.placeTimeGauge(actor, timeX, timeY);
+  this._rect = rect;
+  const nameX = this.nameX(rect);
+  const nameY = this.nameY(rect);
+  const stateIconX = this.stateIconX(rect);
+  const stateIconY = this.stateIconY(rect);
+  const basicGaugesX = this.basicGaugesX(rect);
+  const basicGaugesY = this.basicGaugesY(rect);
+  if (param.TPBShow) {
+    this.placeTimeGauge(actor, nameX, nameY);
   }
   this.placeStateIcon(actor, stateIconX, stateIconY);
   if (param.NameShow) {
     this.placeActorName(actor, nameX, nameY);
   }
-  this.placeStatusGauges(actor, rect);
+  this.placeBasicGauges(actor, basicGaugesX, basicGaugesY);
+};
+
+const _Window_BattleStatus_placeTimeGauge = Window_BattleStatus.prototype.placeTimeGauge;
+Window_BattleStatus.prototype.placeTimeGauge = function(actor, x, y) {
+  if (BattleManager.isTpb() && param.TPBChangePosition) {
+    x = param.ActorTPB_X + this._rect.x;
+    y = param.ActorTPB_Y + this._rect.y;
+  }
+  _Window_BattleStatus_placeTimeGauge.call(this, actor, x, y);
+};
+
+Window_BattleStatus.prototype.placeBasicGauges = function(actor, x, y) {
+    x2 = param.HPChangePosition ? param.ActorHP_X + this._rect.x : x;
+    y2 = param.HPChangePosition ? param.ActorHP_Y + this._rect.y : y;
+  this.placeGauge(actor, "hp", x2, y2);
+  x2 = param.MPChangePosition ? param.ActorMP_X + this._rect.x : x;
+  y2 = param.MPChangePosition ? param.ActorMP_Y + this._rect.y : y + this.gaugeLineHeight();
+  this.placeGauge(actor, "mp", x2, y2);
+  if ($dataSystem.optDisplayTp) {
+    x2 = param.TPChangePosition ? param.ActorTP_X + this._rect.x : x;
+    y2 = param.TPChangePosition ? param.ActorTP_Y + this._rect.y : y + this.gaugeLineHeight() * 2;
+    this.placeGauge(actor, "tp", x2, y2);
+  }
+};
+
+const _Window_BattleStatus_placeStateIcon = Window_BattleStatus.prototype.placeStateIcon;
+Window_BattleStatus.prototype.placeStateIcon = function(actor, x, y) {
+  if (param.StateChangePosition) {
+    x = param.ActorState_X + this._rect.x;
+    y = param.ActorState_Y + this._rect.y;
+  }
+  _Window_BattleStatus_placeStateIcon.call(this, actor, x, y);
+};
+
+const _Window_BattleStatus_placeActorName = Window_BattleStatus.prototype.placeActorName;
+Window_BattleStatus.prototype.placeActorName = function(actor, x, y) {
+  if (param.NameChangePosition) {
+    x = param.ActorName_X + this._rect.x;
+    y = param.ActorName_Y + this._rect.y;
+  }
+  _Window_BattleStatus_placeActorName.call(this, actor, x, y);
 };
 
 Window_BattleStatus.prototype.faceRect = function(index) {
@@ -746,22 +785,6 @@ Window_BattleStatus.prototype.faceRect = function(index) {
   rect.width = param.ActorFace_Width > 0 ? param.ActorFace_Width : rect.width;
   rect.height = param.ActorFace_Height > 0 ? param.ActorFace_Height : rect.height;
   return rect;
-};
-
-Window_BattleStatus.prototype.placeStatusGauges = function(actor, rect) {
-  const basicGaugesX = this.basicGaugesX(rect);
-  const basicGaugesY = this.basicGaugesY(rect);
-  let x2 = param.HPChangePosition ? param.ActorHP_X + rect.x : basicGaugesX;
-  let y2 = param.HPChangePosition ? param.ActorHP_Y + rect.y : basicGaugesY;
-  this.placeGauge(actor, "hp", x2, y2);
-  x2 = param.MPChangePosition ? param.ActorMP_X + rect.x : basicGaugesX;
-  y2 = param.MPChangePosition ? param.ActorMP_Y + rect.y : basicGaugesY + this.gaugeLineHeight();
-  this.placeGauge(actor, "mp", x2, y2);
-  if ($dataSystem.optDisplayTp) {
-    x2 = param.TPChangePosition ? param.ActorTP_X + rect.x : basicGaugesX;
-    y2 = param.TPChangePosition ? param.ActorTP_Y + rect.y : basicGaugesY + this.gaugeLineHeight() * 2;
-    this.placeGauge(actor, "tp", x2, y2);
-  }
 };
 
 Window_BattleStatus.prototype.placeGauge = function(actor, type, x, y) {
@@ -1679,5 +1702,16 @@ const _Spriteset_Battle_createBattleField = Spriteset_Battle.prototype.createBat
 Spriteset_Battle.prototype.createBattleField = function() {
   _Spriteset_Battle_createBattleField.call(this);
   this._effectsBackContainer = this._battleField;
+};
+
+//BattleEffectPopup対応
+const _Sprite_Battler_setupMessagePopup = Sprite_Battler.prototype.setupMessagePopup;
+Sprite_Battler.prototype.setupMessagePopup = function() {
+  if (this._battler.isMessagePopupRequested()) {
+    if (!this._battler.isSpriteVisible() && param.ActorEffectShow) {
+      this.createMessagePopup();
+    }
+  }
+  _Sprite_Battler_setupMessagePopup.call(this);
 };
 })();

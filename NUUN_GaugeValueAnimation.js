@@ -46,7 +46,7 @@ Imported.NUUN_GaugeValueAnimation = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_GaugeValueAnimation');
-  const UpdateFlame = Number(parameters['UpdateFlame'] || 60);
+  const UpdateFlame = Number(parameters['UpdateFlame'] || 20);
   const UpdateFlameValue = String(parameters['UpdateFlameValue'] || "hp,mp,tp").split(',');
 
   const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;

@@ -7,7 +7,7 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2021/1/25 Ver.1.0.0
+ * 2021/1/26 Ver.1.0.0
  * 初版
  * 
  */ 
@@ -15,6 +15,7 @@
  * @target MZ
  * @plugindesc ゲージの数値増減アニメーション
  * @author NUUN
+ * @version 1.0.0
  * 
  * @help
  * ゲージの数値の増減をアニメーションさせます。
@@ -26,12 +27,18 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
- * @param ValueUpdateFlame
- * @desc 数値変化の更新フレーム数を指定します。（60で１秒）
- * @text 数値更新フレーム
+ * @param UpdateFlame
+ * @desc ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）
+ * @text ゲージ及び数値更新フレーム
  * @type number
- * @default 60
+ * @default 20
  * @min 0
+ * 
+ * @param UpdateFlameValue
+ * @desc ゲージ更新対象。（カンマ区切り）競合対策
+ * @text ゲージ更新対象
+ * @type string
+ * @default hp,mp,tp
  *
  */
 var Imported = Imported || {};
@@ -39,8 +46,8 @@ Imported.NUUN_GaugeValueAnimation = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_GaugeValueAnimation');
-  const ValueUpdateFlame = Number(parameters['ValueUpdateFlame'] || 60);
-  //const GaugeUpdateFlame = Number(parameters['GaugeUpdateFlame'] || 20);
+  const UpdateFlame = Number(parameters['UpdateFlame'] || 60);
+  const UpdateFlameValue = String(parameters['UpdateFlameValue'] || "hp,mp,tp").split(',');
 
   const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
   Sprite_Gauge.prototype.initMembers = function() {
@@ -66,13 +73,18 @@ Imported.NUUN_GaugeValueAnimation = true;
     _Sprite_Gauge_updateBitmap.call(this);
     const value = this.currentValue();
     if (this._moveValue !== value) {
-      this.redraw();
+      this.valueRedraw();
     }
+  };
+
+  Sprite_Gauge.prototype.valueRedraw = function() {
+    this.currentValueMove(this.currentValue());
+    Sprite_Gauge.prototype.redraw.call(this);
   };
 
   Sprite_Gauge.prototype.currentValueMove = function(currentValue) {
     if (this._moveDelay === 0) {
-      this._moveDelay = (currentValue - this._moveValue) / ValueUpdateFlame;
+      this._moveDelay = (currentValue - this._moveValue) / UpdateFlame;
     }
     if (this._moveValue > currentValue) {
       this._moveValue += this._moveDelay;
@@ -100,9 +112,17 @@ Imported.NUUN_GaugeValueAnimation = true;
 
   const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
   Sprite_Gauge.prototype.drawValue = function() {
-    this.currentValueMove(this.currentValue());
     this._moveMode = true;
     _Sprite_Gauge_drawValue.call(this);
+  };
+
+  const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;
+  Sprite_Gauge.prototype.smoothness = function() {
+    const find = UpdateFlameValue.find(value => (this._statusType === value));
+    if (find) {
+      return UpdateFlame;
+    }
+    return _Sprite_Gauge_smoothness.call(this);
   };
 
 })();

@@ -13,7 +13,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc ゲージの数値増減アニメーション
+ * @plugindesc ゲージの数値更新アニメーション
  * @author NUUN
  * @version 1.0.0
  * 

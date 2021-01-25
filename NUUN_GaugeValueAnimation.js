@@ -35,7 +35,7 @@
  * @min 0
  * 
  * @param UpdateFlameValue
- * @desc ゲージ更新対象。（カンマ区切り）競合対策
+ * @desc 「ゲージ及び数値更新フレーム」のゲージ更新反映対象。（カンマ区切り）競合対策
  * @text ゲージ更新対象
  * @type string
  * @default hp,mp,tp

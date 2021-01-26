@@ -7,6 +7,10 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/26 Ver.1.0.1
+ * プラグインパラメータの方式を変更。
+ * ゲージ、数値のアニメーション時間を個別に設定できるよ機能を追加。
+ * 初版
  * 2021/1/26 Ver.1.0.0
  * 初版
  * 
@@ -15,7 +19,7 @@
  * @target MZ
  * @plugindesc ゲージの数値更新アニメーション
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * ゲージの数値の増減をアニメーションさせます。
@@ -27,27 +31,44 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * @param UpdateFlameValue
+ * @text ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）
+ * @desc ゲージ及び数値更新フレーム設定
+ * @default ["{\"StatusType\":\"hp\",\"UpdateFlame\":\"20\"}","{\"StatusType\":\"mp\",\"UpdateFlame\":\"20\"}","{\"StatusType\":\"tp\",\"UpdateFlame\":\"60\"}"]
+ * @type struct<UpdateFlameValueDate>[]
+ *
+ */
+/*~struct~UpdateFlameValueDate:
+ * 
+ * @param StatusType
+ * @text ステータス
+ * @desc ステータス。
+ * @type string
+ * 
  * @param UpdateFlame
- * @desc ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）
+ * @desc ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）0または入力なしでデフォルト設定値となります。
  * @text ゲージ及び数値更新フレーム
  * @type number
  * @default 20
- * @min 0
  * 
- * @param UpdateFlameValue
- * @desc 「ゲージ及び数値更新フレーム」のゲージ更新反映対象。（カンマ区切り）競合対策
- * @text ゲージ更新対象
- * @type string
- * @default hp,mp,tp
- *
  */
+
 var Imported = Imported || {};
 Imported.NUUN_GaugeValueAnimation = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_GaugeValueAnimation');
-  const UpdateFlame = Number(parameters['UpdateFlame'] || 20);
-  const UpdateFlameValue = String(parameters['UpdateFlameValue'] || "hp,mp,tp").split(',');
+  const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
+    try {
+        return JSON.parse(value);
+    } catch (e) {
+        try {
+            return eval(value);
+        } catch (e) {
+            return value;
+        }
+    }
+  }));
 
   const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
   Sprite_Gauge.prototype.initMembers = function() {
@@ -82,25 +103,6 @@ Imported.NUUN_GaugeValueAnimation = true;
     Sprite_Gauge.prototype.redraw.call(this);
   };
 
-  Sprite_Gauge.prototype.currentValueMove = function(currentValue) {
-    if (this._moveDelay === 0) {
-      this._moveDelay = (currentValue - this._moveValue) / UpdateFlame;
-    }
-    if (this._moveValue > currentValue) {
-      this._moveValue += this._moveDelay;
-      if (this._moveValue <= currentValue) {
-        this._moveValue = currentValue;
-        this._moveDelay = 0;
-      }
-    } else if (this._moveValue < currentValue) {
-        this._moveValue += this._moveDelay;
-      if (this._moveValue >= currentValue) {
-        this._moveValue = currentValue;
-        this._moveDelay = 0;
-      }
-    }
-  };
-
   const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
   Sprite_Gauge.prototype.currentValue = function() {
     if (this._battler && this._moveMode) {
@@ -116,13 +118,35 @@ Imported.NUUN_GaugeValueAnimation = true;
     _Sprite_Gauge_drawValue.call(this);
   };
 
+  Sprite_Gauge.prototype.currentValueMove = function(currentValue) {
+    if (this._moveDelay === 0) {
+      this._moveDelay = (currentValue - this._moveValue) / this.smoothness();
+    }
+    if (this._moveValue > currentValue) {
+      this._moveValue += this._moveDelay;
+      if (this._moveValue <= currentValue) {
+        this._moveValue = currentValue;
+        this._moveDelay = 0;
+      }
+    } else if (this._moveValue < currentValue) {
+        this._moveValue += this._moveDelay;
+      if (this._moveValue >= currentValue) {
+        this._moveValue = currentValue;
+        this._moveDelay = 0;
+      }
+    }
+  };
+  
   const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;
   Sprite_Gauge.prototype.smoothness = function() {
-    const find = UpdateFlameValue.find(value => (this._statusType === value));
-    if (find) {
-      return UpdateFlame;
+    const find = this.getFlameStatus();
+    if (find && find.UpdateFlame) {
+      return find.UpdateFlame;
     }
     return _Sprite_Gauge_smoothness.call(this);
   };
 
+  Sprite_Gauge.prototype.getFlameStatus = function() {
+    return param.UpdateFlameValue ? param.UpdateFlameValue.find(value => (this._statusType === value.StatusType)) : null;
+  };
 })();

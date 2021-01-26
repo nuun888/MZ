@@ -7,6 +7,9 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/26 Ver.1.1.0
+ * 顔グラを表示できる機能を追加。
+ * 初版
  * 2021/1/24 Ver.1.0.0
  * 初版
  * 
@@ -68,6 +71,13 @@
  * @text アクターX座標
  * @type number
  * @default 40
+ * @parent Actor
+ * 
+ * @param FaceMode
+ * @desc キャラチップではなく顔グラを表示します。
+ * @text 顔グラ表示
+ * @type boolean
+ * @default false
  * @parent Actor
  * 
  * @param LevelPosition
@@ -235,6 +245,7 @@ Imported.NUUN_SaveScreen = true;
   const ContentsFontSizeMainFontSize = Number(parameters['ContentsFontSizeMainFontSize'] || 22);
   const ActorX = Number(parameters['ActorX'] || 40);
   const LevelPosition = Number(parameters['LevelPosition'] || 1);
+  const FaceMode = eval(parameters['FaceMode'] || "false");
   const ContentsX = Number(parameters['ContentsX'] || 0);
   const _ContentsWidth = Number(parameters['ContentsWidth'] || 0);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
@@ -271,13 +282,17 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Window_SavefileList.prototype.drawContents = function(info, rect) {
-    //任意の文字列
-    this.drawAnyName(info, rect.x + 200, rect.y + 2, rect.width - 200)
     //キャラクター
     const bottom = rect.y + rect.height;
     if (rect.width >= 420) {
+      if (FaceMode) {
+        this.drawPartyFace(info, rect.x, rect.y + 2, 144, rect.height - 4);
+      } else {
         this.drawPartyCharacters(info, rect.x + ActorX, bottom - 8);
+      }
     }
+    //任意の文字列
+    this.drawAnyName(info, rect.x + 200, rect.y + 2, rect.width - 200);
     //フリーゾーン
     const padding = this.itemPadding();
     const height = Math.floor(rect.height / 3);
@@ -317,20 +332,45 @@ Imported.NUUN_SaveScreen = true;
         break;
     }
   };
-
   const _Window_SavefileList_drawPartyCharacters = Window_SavefileList.prototype.drawPartyCharacters;
   Window_SavefileList.prototype.drawPartyCharacters = function(info, x, y) {
     _Window_SavefileList_drawPartyCharacters.call(this, info, x, y);
-    this.contents.fontSize = 16;
+    if (info.characters) {
+      this.drawPartyLeval(info, x - 21, y, 0, 0);
+    }
+  };
+
+  Window_SavefileList.prototype.drawPartyFace = function(info, x, y, width, height) {
+    if (info.faces) {
+        let characterX = x;
+        for (const data of info.faces) {
+          this.drawFace(data[0], data[1], characterX, y, width, height);
+          characterX += 144;
+        }
+        this.drawPartyLeval(info, x + 8, y, height, 1);
+    }
+  };
+
+  Window_SavefileList.prototype.drawPartyLeval = function(info, x, y, height, mode) {
+    this.contents.fontSize = mode === 0 ? 16 : ContentsFontSizeMainFontSize;
     if (info.levelActor && LevelPosition > 0) {
-      let levelActorX = x - 21;
-      const y2 = y - (LevelPosition === 2 ? 64 : 24);
+      const width = mode === 0 ? 48 : 144;
+      let levelActorX = x;
+      let y2 = y;
+      let textWidth = width;
+      if (mode === 0) {
+        y2 = y2 - (LevelPosition === 2 ? 64 : 24);
+        textWidth -= 6;
+      } else {
+        y2 += (LevelPosition === 2 ? MainFontSizeMainFontSize : height - ContentsFontSizeMainFontSize - 12);
+        textWidth = width / 2;
+      }
       for (const data of info.levelActor) {
         this.changeTextColor(ColorManager.systemColor());
-        this.drawText(TextManager.levelA, levelActorX, y2, 42);
+        this.drawText(TextManager.levelA, levelActorX, y2, textWidth);
         this.resetTextColor();
-        this.drawText(data, levelActorX, y2, 42, "right");
-        levelActorX += 48;
+        this.drawText(data, levelActorX, y2, textWidth, "right");
+        levelActorX += width;
       }
     }
     this.resetFontSettings();

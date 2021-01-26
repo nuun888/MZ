@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/26 Ver.1.1.1
+ * 顔グラを表示時、ファイルタイトルが隠れて表示されてしまう問題を修正。
  * 2021/1/26 Ver.1.1.0
  * 顔グラを表示できる機能を追加。
  * 2021/1/24 Ver.1.0.0
@@ -17,7 +19,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * セーブ画面にいくつかの項目を追加します。
@@ -274,11 +276,23 @@ Imported.NUUN_SaveScreen = true;
     return info;
   };
 
+  const _Window_SavefileList_drawItem = Window_SavefileList.prototype.drawItem;
+  Window_SavefileList.prototype.drawItem = function(index) {
+    this._FaceOn = false;
+    _Window_SavefileList_drawItem.call(this, index);
+    const savefileId = this.indexToSavefileId(index);
+    const rect = this.itemRectWithPadding(index);
+    this.drawTitle(savefileId, rect.x, rect.y + 4);
+  };
+
   const _Window_SavefileList_drawTitle = Window_SavefileList.prototype.drawTitle;
   Window_SavefileList.prototype.drawTitle = function(savefileId, x, y) {
-    this.contents.fontSize = MainFontSizeMainFontSize;
-    _Window_SavefileList_drawTitle.call(this, savefileId, x, y - 4);
-    this.contents.fontSize = $gameSystem.mainFontSize();
+    if (this._FaceOn) {
+      this.contents.fontSize = MainFontSizeMainFontSize;
+      _Window_SavefileList_drawTitle.call(this, savefileId, x, y - 4);
+      this.contents.fontSize = $gameSystem.mainFontSize();
+      this._FaceOn = false;
+    }
   };
 
   Window_SavefileList.prototype.drawContents = function(info, rect) {
@@ -290,6 +304,7 @@ Imported.NUUN_SaveScreen = true;
       } else {
         this.drawPartyCharacters(info, rect.x + ActorX, bottom - 8);
       }
+      this._FaceOn = true;
     }
     //任意の文字列
     this.drawAnyName(info, rect.x + 200, rect.y + 2, rect.width - 200);

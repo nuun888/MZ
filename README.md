@@ -4,6 +4,7 @@
 # 公開プラグイン
 <b>システム</b><br>
 [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>
+[NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)　ゲージの数値更新アニメーション<br>
 
 <b>戦闘</b><br>
 [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) バトルスタイル拡張ベース<br>
@@ -44,6 +45,7 @@
 [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)　エネミー図鑑<br>
 [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)　コマンドカスタマイズ<br>
 [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)　ステータス画面スタイル変更<br>
+[NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)　セーブ画面拡張<br>
 [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)　所持金拡張<br>
 アイテム図鑑（仮）<br>
 

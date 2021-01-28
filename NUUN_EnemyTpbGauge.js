@@ -7,9 +7,11 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/28 Ver.1.1.2
+ * エネミーごとにX座標を調整できるように変更。
  * 2021/1/20 Ver.1.1.1
- * X座標を調整できるように変更。（相対座標）
- * エネミーごとにY座標を調整できるように変更。（相対座標）
+ * X座標を調整できるように変更。
+ * エネミーごとにY座標を調整できるように変更。
  * 2021/1/17 Ver.1.1.0
  * Y座標を調整できる機能を追加。
  * エネミーのステート表示が被る問題を修正。
@@ -27,7 +29,8 @@
  * エネミーにもTPBゲージを表示します。
  * 
  * エネミーのメモ欄
- * <TPBGaugeY:[position]> TPBゲージのY座標を調整します。
+ * <TPBGaugeX:[position]> TPBゲージのX座標を調整します。（相対座標）
+ * <TPBGaugeY:[position]> TPBゲージのY座標を調整します。（相対座標）
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -167,7 +170,7 @@ Spriteset_Battle.prototype.enemyTpbGauge = function(sprites) {
   sprite.show();
   sprite.move(0, 0);
   sprites._enemyTpb = sprite;
-  sprites.tpbGaugeOffsetX = (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
+  sprites.tpbGaugeOffsetX = (sprites._enemy.enemy().meta.TPBGaugeX ? Number(sprites._enemy.enemy().meta.TPBGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
   sprites.tpbGaugeOffsetY = (sprites._enemy.enemy().meta.TPBGaugeY ? Number(sprites._enemy.enemy().meta.TPBGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
 };
 

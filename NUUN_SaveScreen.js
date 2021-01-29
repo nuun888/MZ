@@ -7,6 +7,9 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/29 Ver.1.2.0
+ * 顔グラの横幅、縦幅、拡大率を指定できるように変更。
+ * セーブインフォがないファイルでファイル名が表示されない問題を修正。
  * 2021/1/26 Ver.1.1.1
  * 顔グラを表示時、ファイルタイトルが隠れて表示されてしまう問題を修正。
  * 2021/1/26 Ver.1.1.0
@@ -23,9 +26,18 @@
  * 
  * @help
  * セーブ画面にいくつかの項目を追加します。
+ * 顔グラを表示できます。
  * キャラクター上にレベルを表示できます。
  * メイン文章（章など）を表示可能。（設定しない場合はタイトルが表示されます。何も表示させたくない場合はスペースを入れてください）
  * 現在地、所持金、任意の項目が表示可能です。
+ * 
+ * 仕様
+ * 拡大率は１００でセーブインフォ表示縦幅に関係なくデフォルトサイズで表示されます。
+ * それ以外は画像の縦幅（表示縦幅ではない）がセーブインフォ表示縦幅を超えるようであればそれ以下にサイズ調整されます。
+ *
+ * 右側の表示項目をなしにすると左側の表示項目が広く表示されます。
+ * 
+ * コンテンツエリアX座標を-1にすることで右寄りに表示されます。
  * 
  * 
  * 利用規約
@@ -39,6 +51,7 @@
  * @text ファイルタイトル、メイン文章フォントサイズ
  * @type number
  * @default 24
+ * @min 0
  * @parent Font
  * 
  * @param ContentsFontSizeMainFontSize
@@ -69,10 +82,18 @@
  * @text アクター設定
  * 
  * @param ActorX
- * @desc アクターのX座標
+ * @desc アクターのX座標（相対座標）デフォルト:40
  * @text アクターX座標
  * @type number
  * @default 40
+ * @parent Actor
+ * 
+ * @param ActorY
+ * @desc アクターのY座標（相対座標）
+ * @text アクターY座標
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent Actor
  * 
  * @param FaceMode
@@ -80,6 +101,28 @@
  * @text 顔グラ表示
  * @type boolean
  * @default false
+ * @parent Actor
+ * 
+ * @param FaceWidth
+ * @desc 顔グラの横幅
+ * @text 顔グラの横幅
+ * @type number
+ * @default 144
+ * @min 0
+ * @parent Actor
+ * 
+ * @param FaceHeight
+ * @desc 顔グラの縦幅
+ * @text 顔グラの縦幅
+ * @type number
+ * @default 144
+ * @parent Actor
+ * 
+ * @param FaceScale
+ * @desc 顔グラの拡大率
+ * @text 拡大率
+ * @type number
+ * @default 100
  * @parent Actor
  * 
  * @param LevelPosition
@@ -99,10 +142,11 @@
  * @text 各コンテンツ設定
  * 
  * @param ContentsX
- * @desc コンテンツエリアのX座標（０で右寄り）
+ * @desc コンテンツエリアのX座標（-1で右寄り）
  * @text コンテンツエリアX座標
  * @type number
- * @default 0
+ * @default -1
+ * @min -1
  * @parent Contents
  * 
  * @param ContentsWidth
@@ -110,6 +154,7 @@
  * @text コンテンツエリア横幅
  * @type number
  * @default 0
+ * @min 0
  * @parent Contents
  * 
  * @param PlaytimeName
@@ -246,9 +291,13 @@ Imported.NUUN_SaveScreen = true;
   const MainFontSizeMainFontSize = Number(parameters['MainFontSizeMainFontSize'] || 24);
   const ContentsFontSizeMainFontSize = Number(parameters['ContentsFontSizeMainFontSize'] || 22);
   const ActorX = Number(parameters['ActorX'] || 40);
+  const ActorY = Number(parameters['ActorY'] || 0);
+  const FaceWidth = Number(parameters['FaceWidth'] || 144);
+  const FaceHeight = Number(parameters['FaceHeight'] || 144);
+  const FaceScale = Number(parameters['FaceScale'] || 100);
   const LevelPosition = Number(parameters['LevelPosition'] || 1);
   const FaceMode = eval(parameters['FaceMode'] || "false");
-  const ContentsX = Number(parameters['ContentsX'] || 0);
+  const ContentsX = Number(parameters['ContentsX'] || -1);
   const _ContentsWidth = Number(parameters['ContentsWidth'] || 0);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
   const AnyDefaultName = String(parameters['AnyDefaultName'] || "");
@@ -281,6 +330,9 @@ Imported.NUUN_SaveScreen = true;
     this._FaceOn = false;
     _Window_SavefileList_drawItem.call(this, index);
     const savefileId = this.indexToSavefileId(index);
+    if (!DataManager.savefileInfo(savefileId)) {
+      this._FaceOn = true;
+    }
     const rect = this.itemRectWithPadding(index);
     this.drawTitle(savefileId, rect.x, rect.y + 4);
   };
@@ -297,24 +349,40 @@ Imported.NUUN_SaveScreen = true;
 
   Window_SavefileList.prototype.drawContents = function(info, rect) {
     //キャラクター
-    const bottom = rect.y + rect.height;
     if (rect.width >= 420) {
+      this._maxHeight = rect.height - 4
+      let x = ActorX + rect.x;
+      let width = 0;
+      let height = 0;
       if (FaceMode) {
-        this.drawPartyFace(info, rect.x, rect.y + 2, 144, rect.height - 4);
+        let y = ActorY + rect.y + 2;
+        const scale = FaceScale / 100;
+        width = FaceWidth > 0 ? FaceWidth : ImageManager.faceWidth;
+        height = FaceHeight > 0 ? FaceHeight : ImageManager.faceHeight;
+        const heightScale = height * scale;
+        this._scaleMode = 0;
+        if (heightScale === height) {
+          height = Math.min(height, this._maxHeight);
+          this._scaleMode = 0;
+        } else if (heightScale > this._maxHeight){
+          this._scaleMode = 1;
+        }
+        this.drawPartyFace(info, x, y, width, height);
       } else {
-        this.drawPartyCharacters(info, rect.x + ActorX, bottom - 8);
+        const bottom = rect.y + (ActorY !== 0 ? ActorY : rect.height) + ActorY;
+        this.drawPartyCharacters(info, x, bottom - 8);
       }
-      this._FaceOn = true;
     }
+    this._FaceOn = true;
     //任意の文字列
     this.drawAnyName(info, rect.x + 200, rect.y + 2, rect.width - 200);
     //フリーゾーン
     const padding = this.itemPadding();
-    const height = Math.floor(rect.height / 3);
-    const sx = ContentsX > 0 ? ContentsX : (_ContentsWidth > 0 ? Graphics.boxWidth - _ContentsWidth - 48 : 240);
+    height = Math.floor(rect.height / 3);
+    const sx = ContentsX >= 0 ? ContentsX : (_ContentsWidth > 0 ? Graphics.boxWidth - _ContentsWidth - 48 : 240);
     let x2 = rect.x + sx;
     let y2 = (height) + rect.y - 2;_ContentsWidth
-    let width = (_ContentsWidth > 0 ? _ContentsWidth : rect.width - sx) / (T_Right === 0 ? 1 : 2);
+    width = (_ContentsWidth > 0 ? _ContentsWidth : rect.width - sx) / (T_Right === 0 ? 1 : 2);
     this.drawContentsBase(info, x2, y2, width - padding, T_Left);
     x2 += width;
     this.drawContentsBase(info, x2, y2, width - padding, T_Right);
@@ -351,34 +419,38 @@ Imported.NUUN_SaveScreen = true;
   Window_SavefileList.prototype.drawPartyCharacters = function(info, x, y) {
     _Window_SavefileList_drawPartyCharacters.call(this, info, x, y);
     if (info.characters) {
-      this.drawPartyLeval(info, x - 21, y, 0, 0);
+      this.drawPartyLeval(info, x - 21, y, 48, 0, 0);
     }
   };
 
   Window_SavefileList.prototype.drawPartyFace = function(info, x, y, width, height) {
     if (info.faces) {
         let characterX = x;
+        const faceWidth = this._scaleMode === 1 ? this._maxHeight : Math.floor(width * FaceScale / 100);
         for (const data of info.faces) {
           this.drawFace(data[0], data[1], characterX, y, width, height);
-          characterX += 144;
+          characterX += faceWidth;
         }
-        this.drawPartyLeval(info, x + 8, y, height, 1);
+        this.drawPartyLeval(info, x + 8, y, faceWidth, height, 1);
     }
   };
 
-  Window_SavefileList.prototype.drawPartyLeval = function(info, x, y, height, mode) {
+  Window_SavefileList.prototype.drawPartyLeval = function(info, x, y, width, height, mode) {
     this.contents.fontSize = mode === 0 ? 16 : ContentsFontSizeMainFontSize;
     if (info.levelActor && LevelPosition > 0) {
-      const width = mode === 0 ? 48 : 144;
       let levelActorX = x;
-      let y2 = y;
       let textWidth = width;
+      let y2 = y;
       if (mode === 0) {
-        y2 = y2 - (LevelPosition === 2 ? 64 : 24);
+        y2 = y2 - (LevelPosition === 2 ? Math.min(84 - MainFontSizeMainFontSize, 60) : 24);
         textWidth -= 6;
       } else {
-        y2 += (LevelPosition === 2 ? MainFontSizeMainFontSize : height - ContentsFontSizeMainFontSize - 12);
-        textWidth = width / 2;
+        if (LevelPosition === 2) {
+          y2 += Math.max(MainFontSizeMainFontSize - ActorY, 0) - 4;
+        } else {
+          y2 += this._maxHeight - ContentsFontSizeMainFontSize - 12;
+        }
+        textWidth = Math.max(width / 2, 72) - 8;
       }
       for (const data of info.levelActor) {
         this.changeTextColor(ColorManager.systemColor());
@@ -405,7 +477,7 @@ Imported.NUUN_SaveScreen = true;
 
   const _Window_SavefileList_drawPlaytime = Window_SavefileList.prototype.drawPlaytime;
   Window_SavefileList.prototype.drawPlaytime = function(info, x, y, width) {
-    const contentsWidth = Math.floor(width / 2)
+    const contentsWidth = this.textWidth(PlaytimeName);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(PlaytimeName, x, y, contentsWidth);
@@ -415,7 +487,7 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Window_SavefileList.prototype.drawMapName = function(info, x, y, width) {
-    const contentsWidth = Math.floor(width / 3)
+    const contentsWidth = this.textWidth(LocationName);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(LocationName, x, y, contentsWidth);
@@ -427,7 +499,7 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Window_SavefileList.prototype.drawGold = function(info, x, y, width) {
-    const contentsWidth = Math.floor(width / 3)
+    const contentsWidth = this.textWidth(MoneyName);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(MoneyName, x, y, contentsWidth);
@@ -440,7 +512,7 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Window_SavefileList.prototype.drawOriginal_1 = function(info, x, y, width) {
-    const contentsWidth = Math.floor(width / 3)
+    const contentsWidth = this.textWidth(OriginalName1);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(OriginalName1, x, y, contentsWidth);
@@ -452,7 +524,7 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Window_SavefileList.prototype.drawOriginal_2 = function(info, x, y, width) {
-    const contentsWidth = Math.floor(width / 3)
+    const contentsWidth = this.textWidth(OriginalName2);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(OriginalName2, x, y, contentsWidth);
@@ -462,6 +534,24 @@ Imported.NUUN_SaveScreen = true;
     }
     this.contents.fontSize = $gameSystem.mainFontSize();
   };
+
+  Window_SavefileList.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
+    width = width || ImageManager.faceWidth;
+    height = height || ImageManager.faceHeight;
+    const scale = FaceScale / 100;
+    const bitmap = ImageManager.loadFace(faceName);
+    const pw = ImageManager.faceWidth;
+    const ph = ImageManager.faceHeight;
+    const sw = Math.min(width, pw);
+    const sh = Math.min(height, ph);
+    const dx = Math.floor(x + Math.max(width - pw, 0) / 2);
+    const dy = Math.floor(y + Math.max(height - ph, 0) / 2);
+    const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+    const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+    const dw = this._scaleMode === 1 ? this._maxHeight : Math.floor(sw * scale);
+    const dh = this._scaleMode === 1 ? this._maxHeight : Math.floor(sh * scale);
+    this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
+};
 
   Game_Party.prototype.actorLevelForSavefile = function() {
     return this.battleMembers().map(actor => [

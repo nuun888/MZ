@@ -22,7 +22,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * セーブ画面にいくつかの項目を追加します。

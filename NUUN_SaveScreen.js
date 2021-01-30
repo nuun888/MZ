@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/1/30 Ver.1.2.1
+ * コンテンツエリアX座標の設定方法を変更
  * 2021/1/29 Ver.1.2.0
  * 顔グラの横幅、縦幅、拡大率を指定できるように変更。
  * セーブインフォがないファイルでファイル名が表示されない問題を修正。
@@ -141,12 +143,19 @@
  * @param Contents
  * @text 各コンテンツ設定
  * 
+ * @param ContentsRight
+ * @text コンテンツエリアを右寄りに表示
+ * @desc コンテンツエリア右寄り
+ * @type boolean
+ * @default true
+ * @parent Contents
+ * 
  * @param ContentsX
- * @desc コンテンツエリアのX座標（-1で右寄り）
+ * @desc コンテンツエリアのX座標
  * @text コンテンツエリアX座標
  * @type number
- * @default -1
- * @min -1
+ * @default 0
+ * @min 0
  * @parent Contents
  * 
  * @param ContentsWidth
@@ -297,7 +306,8 @@ Imported.NUUN_SaveScreen = true;
   const FaceScale = Number(parameters['FaceScale'] || 100);
   const LevelPosition = Number(parameters['LevelPosition'] || 1);
   const FaceMode = eval(parameters['FaceMode'] || "false");
-  const ContentsX = Number(parameters['ContentsX'] || -1);
+  const ContentsX = Number(parameters['ContentsX'] || 0);//ContentsRight
+  const ContentsRight = eval(parameters['ContentsRight'] || "true");
   const _ContentsWidth = Number(parameters['ContentsWidth'] || 0);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
   const AnyDefaultName = String(parameters['AnyDefaultName'] || "");
@@ -379,7 +389,7 @@ Imported.NUUN_SaveScreen = true;
     //フリーゾーン
     const padding = this.itemPadding();
     height = Math.floor(rect.height / 3);
-    const sx = ContentsX >= 0 ? ContentsX : (_ContentsWidth > 0 ? Graphics.boxWidth - _ContentsWidth - 48 : 240);
+    const sx = !ContentsRight ? ContentsX : (_ContentsWidth > 0 ? Graphics.boxWidth - _ContentsWidth - 48 : 240);
     let x2 = rect.x + sx;
     let y2 = (height) + rect.y - 2;_ContentsWidth
     width = (_ContentsWidth > 0 ? _ContentsWidth : rect.width - sx) / (T_Right === 0 ? 1 : 2);

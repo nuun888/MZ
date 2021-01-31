@@ -42,7 +42,7 @@ Imported.NUUN_BattleItemSkillWindowMV = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_BattleItemSkillWindowMV');
 const VariableHeight = eval(parameters['VariableHeight'] || "false");
-const ItemMaxRow = Number(parameters['ItemMaxRow'] || 1);
+const ItemMaxRow = Number(parameters['ItemMaxRow'] || 6);
 let maxHeight = 0;
 let cancelButton_y = 0;
 

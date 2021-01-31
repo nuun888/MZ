@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  戦闘時アイテム、スキル欄MV風表示
+ * @plugindesc  戦闘中アイテム、スキル選択画面MV風表示
  * @author NUUN
  * @version 1.0.0
  * 

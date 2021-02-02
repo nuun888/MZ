@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/2/3 Ver.1.1.0
+ * 特定のクラスのみ所持金のアイコンを表示させる機能を追加(デフォルトでは"Window_ShopNumber"、"Window_Gold")
  * 2021/1/24 Ver.1.0.1
  * 「セーブ画面拡張プラグインを使用時」、アイコン画像をセーブ画面に反映しないように修正。
  * 2021/1/13 Ver.1.0.0
@@ -40,7 +42,7 @@
  * 
  * @param GoldIcon
  * @desc アイコンを表示します。
- * @text アイコン
+ * @text アイコンインデックス
  * @type number
  * @default 0
  * 
@@ -49,6 +51,12 @@
  * @text カンマ区切り
  * @type boolean
  * @default true
+ * 
+ * @param IconShowClassData
+ * @desc アイコンを表示させるクラス。
+ * @text アイコン表示クラス
+ * @type struct<ClassData>[]
+ * @default ["{\"IconShowClass\":\"\\\"Window_ShopNumber\\\"\"}","{\"IconShowClass\":\"\\\"Window_Gold\\\"\"}"]
  * 
  * 
  * @command GetGold
@@ -74,15 +82,36 @@
  * @default 0
  * 
  */
+/*~struct~ClassData:
+ * 
+ * @param IconShowClass
+ * @desc アイコンを表示させるクラス。（""及び''で囲う）
+ * @text アイコン表示クラス
+ * @type string
+ * @default 
+ * 
+ */
 var Imported = Imported || {};
 Imported.NUUN_GoldEX = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_GoldEX');
+const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
+  try {
+      return JSON.parse(value);
+  } catch (e) {
+      try {
+          return eval(value);
+      } catch (e) {
+          return value;
+      }
+  }
+}));
+const MaxGold = param.MaxGold || 9999999;
+const GoldSeparation = param.GoldSeparation || true;
+const GoldIcon = param.GoldIcon || 0;
+const IconShowClassData = param.IconShowClassData || ["{\"IconShowClass\":\"\\\"Window_ShopNumber\\\"\"}","{\"IconShowClass\":\"\\\"Window_Gold\\\"\"}"];
 const pluginName = "NUUN_GoldEX";
-const MaxGold = Number(parameters['MaxGold'] || 9999999);
-const GoldSeparation = eval(parameters['GoldSeparation'] || true);
-const GoldIcon = eval(parameters['GoldIcon'] || true);
 
 PluginManager.registerCommand(pluginName, "GetGold", args => {
   if (Number(args.GoldMode) === 0) {
@@ -97,13 +126,19 @@ Window_Base.prototype.drawCurrencyValue = function(value, unit, x, y, width) {
   if (GoldSeparation) {
     value = value.toLocaleString();
   }
-  if (GoldIcon > 0 && this.constructor !== Window_SavefileList) {
+  if (GoldIcon > 0 && this.showGoldIconClass()) {
     this.drawIcon(GoldIcon, x, y);
     const textMargin = ImageManager.iconWidth + 4;
     x += textMargin;
     width -= textMargin;
   }
   _Window_Base_drawCurrencyValue.call(this, value, unit, x, y, width);
+};
+
+Window_Base.prototype.showGoldIconClass = function() {
+  const date = IconShowClassData;
+  const thisClass = String(this.constructor.name);
+  return date.find(className => (className.IconShowClass === thisClass));
 };
 
 const _Game_Party_maxGold = Game_Party.prototype.maxGold;
@@ -115,4 +150,5 @@ Game_Party.prototype.maxGold = function() {
   }
   return _Game_Party_maxGold.call(this);
 };
+
 })();

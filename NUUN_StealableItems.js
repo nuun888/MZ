@@ -5,20 +5,16 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- * 
- * 更新履歴
- * 2021/1/24 Ver 1.0.1
- * アイテムを盗んだ回数などのパラメータが正常に取得できない問題を修正。
- * 2020/11/21 Ver 1.0.0
- * 初版
  */ 
 /*:
  * @target MZ
  * @plugindesc 盗みスキル
  * @author NUUN
+ * @version 1.1.0
  * 
  * @help
- * 敵または味方からアイテムやお金を盗むスキルを作ることが出来ます。
+ * 敵からアイテムやお金を盗むスキルまたは、敵からアイテム、お金を盗まれるスキルを
+ * 作ることが出来ます。
  * 
  * アイテムを盗むスキルを作るには、スキルのメモ欄に以下を記述します。
  * <stealSkill:成功確率>
@@ -55,8 +51,11 @@
  * 敵から盗まれるアイテムを設定するには、プラグインパラメータの「敵から奪われるアイテム設定」から設定します。
  * 
  * アクター、職業、武器、防具、ステート、エネミーのメモ欄
- * <steal_sr:±追加確率>
+ * <steal_sr: [±追加確率]> 加算増減
+ * <steal_sr_Percent: [%追加確率]> 割合増減
  * 特徴を有するメモ欄に盗みの成功確率を変更します。
+ * <stealResist: [%確率]>
+ * 特徴を有するメモ欄に盗みの抵抗率を設定します。
  * 
  * 盗んだ回数等を参照できるように以下の変数及び関数を用意しています。
  * アイテムを盗んだ回数。
@@ -75,6 +74,15 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/2/6 Ver 1.1.0
+ * 盗みの抵抗実装。
+ * 2021/1/24 Ver 1.0.1
+ * アイテムを盗んだ回数などのパラメータが正常に取得できない問題を修正。
+ * 2020/11/21 Ver 1.0.0
+ * 初版
+ * 
  * 
  * @param NotStealName
  * @text 盗めなかった時のメッセージ
@@ -159,8 +167,24 @@ Game_BattlerBase.prototype.stealBoost = function(){
 	return rate;
 };
 
+Game_BattlerBase.prototype.stealPercentBoost = function(){
+	let rate = 100;
+	this.traitObjects().forEach(function(traitObject) {
+		if (traitObject.meta.steal_sr_Percent) {
+			rate *= Number(traitObject.meta.steal_sr_Percent) / 100;
+		}
+	}, this);
+	return rate;
+};
+
 Game_BattlerBase.prototype.stealItemRate = function() {
-  return 100;
+	let rate = 100;
+	this.traitObjects().forEach(function(traitObject) {
+		if (traitObject.meta.stealResist) {
+			rate *= Number(traitObject.meta.stealResist) / 100;
+		}
+	}, this);
+  return rate;
 };
 
 const _Game_System_initialize = Game_System.prototype.initialize;
@@ -219,17 +243,20 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
 };
 
 Game_Action.prototype.getSteal = function(target){
-	if (target.isEnemy()) {
-		if(this.item().meta.stealSkill){
-			this.StealItems(target, 1);
-		} else if (this.item().meta.goldStealSkill){
-			this.StealItems(target, 2);
-		}
-	} else {
-		if(this.item().meta.stealSkill){
-			this.stolenItem(target, 1);
-		}	else if	(this.item().meta.goldStealSkill || this.item().meta.goldStealSkillRate){
-			this.stolenItem(target, 2);
+	target.stealMessage = null;
+	if (target.result().isHit()) {
+		if (target.isEnemy()) {
+			if(this.item().meta.stealSkill){
+				this.StealItems(target, 1);
+			} else if (this.item().meta.goldStealSkill){
+				this.StealItems(target, 2);
+			}
+		} else {
+			if(this.item().meta.stealSkill){
+				this.stolenItem(target, 1);
+			}	else if	(this.item().meta.goldStealSkill || this.item().meta.goldStealSkillRate){
+				this.stolenItem(target, 2);
+			}
 		}
 	}
 };
@@ -237,18 +264,14 @@ Game_Action.prototype.getSteal = function(target){
 Game_Action.prototype.StealItems = function(target, mode){
 	let stealItem;
 	if (mode === 1){
-		stealItem = target.makeStealItems(this.stealRate(), mode);
+		stealItem = target.makeStealItems(this.stealRate(target), mode);
 	} else if(mode === 2){
-		stealItem = target.makeStealItems(this.stealGoldRate(), mode);
+		stealItem = target.makeStealItems(this.stealGoldRate(target), mode);
 	}
 	if (stealItem) {
 		this.getStealItems(target, stealItem);
 	} else {
-		if (param.StealWindowShow) {
-			$gameMessage.add(target.name() + param.NotStealName);
-		} else {
-			BattleManager._logWindow.addText(target.name() + param.NotStealName);
-		}
+		target.stealMessage = target.name() + param.NotStealName;
 	}
 	this.makeSuccess(target);
 };
@@ -256,22 +279,18 @@ Game_Action.prototype.StealItems = function(target, mode){
 Game_Action.prototype.stolenItem = function(target, mode){
 	let item;
 	if(mode === 1){
-		item = this.getStolenItemList(target, this.stealRate());
+		item = this.getStolenItemList(target, this.stealRate(target));
 		this.subject().keepStolenItem(item);
 	} else if(mode === 2){
 		const stolenGold = this.lostStolenGoldMode();
-		const rate = Number(stolenGold[0]) + this.subject().stealBoost();
+		const rate = (Number(stolenGold[0]) + this.subject().stealBoost()) * target.stealPercentBoost();
 		item = this.lostStolenGold(target, rate, stolenGold);
 		this.subject().keepStolenGold(item);
 	}
 	if(item){
-		this.lostItem(item);
+		this.lostItem(target, item);
 	} else {
-		if (param.StealWindowShow) {
-			$gameMessage.add(target.name() + param.NotStealName);
-		} else {
-			BattleManager._logWindow.addText(target.name() + param.NotStealName);
-		}
+		target.stealMessage = target.name() + param.NotStealName;
 	}
 	this.makeSuccess(target);
 };
@@ -299,14 +318,10 @@ Game_Action.prototype.getStealItems = function(target, stealItem){
 		$gameParty.gainGold(stealItem);
 		itemName = stealItem + TextManager.currencyUnit;
 	}
-	if (param.StealWindowShow) {
-		$gameMessage.add(target.name() +"から"+ itemName + param.GetStealName);
-	} else {
-		BattleManager._logWindow.addText(target.name() +"から"+ itemName + param.GetStealName);
-	}
+	target.stealMessage = target.name() +"から"+ itemName + param.GetStealName;
 };
 
-Game_Action.prototype.lostItem = function(item){
+Game_Action.prototype.lostItem = function(target, item){
 	let itemName = '';
 	if (typeof(item) === 'object') {
 		$gameParty.loseItem(item, 1)
@@ -315,11 +330,7 @@ Game_Action.prototype.lostItem = function(item){
 		$gameParty.loseGold(item);
 		itemName = item + TextManager.currencyUnit;
 	}
-	if (param.StealWindowShow) {
-		$gameMessage.add(this.subject().name() +"は"+ itemName + param.StolenName);
-	} else {
-		BattleManager._logWindow.addText(this.subject().name() +"は"+ itemName + param.StolenName);
-	}
+	target.stealMessage = this.subject().name() +"は"+ itemName + param.StolenName;
 };
 
 Game_Action.prototype.lostStolenGoldMode = function(){
@@ -365,14 +376,14 @@ Game_Action.prototype.getStolenItemList = function(target, rate){
 	return getItem;
 };
 
-Game_Action.prototype.stealRate = function(){
+Game_Action.prototype.stealRate = function(target){
 	const rate = Number(this.item().meta.stealSkill);
-	return rate + this.subject().stealBoost();
+	return (rate + this.subject().stealBoost()) * target.stealPercentBoost();
 };
 
-Game_Action.prototype.stealGoldRate = function(){
+Game_Action.prototype.stealGoldRate = function(target){
 	const rate = Number(this.item().meta.goldStealSkill);
-	return rate + this.subject().stealBoost();
+	return (rate + this.subject().stealBoost()) * target.stealPercentBoost();
 };
 
 
@@ -489,4 +500,24 @@ Game_Enemy.prototype.makeDropItems = function() {
 	}
 	return dropItems;
 };
+
+const _Window_BattleLog_displayActionResults = Window_BattleLog.prototype.displayActionResults;
+Window_BattleLog.prototype.displayActionResults = function(subject, target) {
+	if (target.result().used) {
+		this.push("pushBaseLine");
+		this.displaySteal(target);
+	}
+	_Window_BattleLog_displayActionResults.call(this, subject, target);
+};
+
+Window_BattleLog.prototype.displaySteal = function(target) {
+	if (target.stealMessage) {
+		if (param.StealWindowShow) {
+			$gameMessage.add(target.stealMessage);
+		} else {
+			this.push("addText", target.stealMessage);
+		}
+	}
+};
+
 })();

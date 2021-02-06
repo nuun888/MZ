@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  アイテム、スキル欄文字色個別変更
+ * @plugindesc  アイテム、スキル欄文字色個別指定
  * @author NUUN
  * @version 1.0.0
  * 

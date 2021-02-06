@@ -1,23 +1,24 @@
 /*:-----------------------------------------------------------------------------------
  * NUUN_EnemyBook.js
  * 
- * Copyright (C) 2020 NUUN
+ * Copyright (C) 2021 NUUN
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/11 Ver 1.0.0
  */ 
 /*:
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
+ * @version 1.0.0
  * 
  * @help
  * モンスター図鑑を実装します。
  * 
- * 表示基本パラメータ（常に表示されます）
+ * 以下の項目が表示できます。
+ * 
+ * 表示基本パラメータ
  * 最大HP
  * 最大MP
  * 攻撃力
@@ -26,12 +27,20 @@
  * 魔法防御
  * 敏捷性
  * 運
+ * 命中率
+ * 回避率
+ * 会心率
+ * オリジナルパラメータ１
+ * オリジナルパラメータ２
+ * 
  * 
  * 追加表示パラメータ
  * 獲得経験値
  * 獲得金額
  * 撃破数
- * オリジナルパラメータ（任意のステータス）
+ * オリジナルパラメータ１（任意のステータス）
+ * オリジナルパラメータ２（任意のステータス）
+ * オリジナルパラメータ３（任意のステータス）
  * 耐性属性
  * 弱点属性
  * 無効属性
@@ -41,6 +50,10 @@
  * ドロップアイテム（ドロップアイテム追加対応）
  * スティールアイテム（盗みスキル導入時）
  * 記述欄（フリーテキストスペース）
+ * 
+ * 戦闘中にパーティコマンドからエネミー図鑑を開くことが出来ます。
+ * アナライズ機能を使う場合、TPBバトルでは開いている間TPBゲージを止める仕様にしています。
+ * 画面が開いたときにアイテム画面、スキル画面が閉じるのでアクティブに設定している場合はご了承ください。
  * 
  * エネミーのメモ欄
  * <desc1:[text]>
@@ -88,51 +101,71 @@
  * EnemyBookDefeatEnemySum    指定のエネミーの撃破数を変数に格納します。
  * DorpItemAcquired           指定のアイテムがドロップ済みか判定します。
  * StealItemAcquired          指定のアイテムが盗み済みか判定します。
+ * EnemyAnalyze               対象のステータスを表示します。
+ * 
+ * オリジナルパラメータ
+ * this._enemy　データベースのエネミーデータを取得します。
+ * this._enemy.meta メタタグを取得します。
+ * enemy Game_Enemyのデータを取得します。
+ * 
+ * このプラグインはYoji Ojima様及びヱビ様、TOMY (Kamesoft)様を参考にさせていただきました。
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 
+ * 更新履歴
+ * 2021/2/7 Ver 1.0.0
+ * 初版
+ * 
  * @command EnemyBookOpen
  * @desc エネミー図鑑を開きます。
+ * @text エネミー図鑑オープン
  * 
  * @command EnemyBookAdd
  * @desc エネミーを図鑑に追加します。
+ * @text エネミー追加
+ * 
  * @arg enemyId
  * @type enemy
  * @default 0
- * @desc エネミー
+ * @desc エネミーIDを指定します。
  * 
  * @command EnemyBookRemove
  * @desc エネミーを図鑑から削除します。
+ * @text エネミー削除
+ * 
  * @arg enemyId
  * @type enemy
  * @default 0
- * @desc エネミー
+ * @desc エネミーIDを指定します。
  * 
  * @command EnemyBookComplete
  * @desc 図鑑を完成させます。
+ * @text 図鑑完成
  * 
  * @command EnemyBookClear
  * @desc 図鑑をクリア（消去）します。
+ * @text 図鑑初期化
  *  
  * @command EnemyBookRemoveDefeat
  * @desc エネミーの撃破数をリセットします。
+ * @text 図鑑初期化
+ * 
  * @arg enemyId
  * @type enemy
  * @default 0
- * @text エネミー
- * @desc エネミーを指定します。
+ * @desc エネミーIDを指定します。
  * 
  * @command EnemyBookGetDropItem
  * @desc エネミーのドロップアイテムを取得済みにします。
+ * @text エネミードロップアイテム習得済み
  * 
  * @arg enemyId
  * @type enemy
  * @default 0
- * @text エネミー
- * @desc エネミーを指定します。
+ * @desc エネミーIDを指定します。
  * 
  * @arg dropListId
  * @type number
@@ -142,12 +175,12 @@
  * 
  * @command EnemyBookRemoveDropItem
  * @desc エネミーのドロップアイテムを未収得にします。
+ * @text エネミードロップアイテム未収得
  * 
  * @arg enemyId
  * @type enemy
  * @default 0
- * @text エネミー
- * @desc エネミーを指定します。
+ * @desc エネミーIDを指定します。
  * 
  * @arg dropListId
  * @type number
@@ -157,12 +190,12 @@
  * 
  * @command EnemyBookGetStealItem
  * @desc エネミーのスティールアイテムを取得済みにします。
+ * @text エネミースティールアイテム取得済み
  *
  * @arg enemyId
  * @type enemy
  * @default 0
- * @text エネミー
- * @desc エネミーを指定します。
+ * @desc エネミーIDを指定します。
  * 
  * @arg stealListId
  * @type number
@@ -172,14 +205,14 @@
  * 
  * @command EnemyBookRemoveStealItem
  * @desc エネミーのスティールアイテムを未取得にします。
- * @type number
+ * @text エネミースティールアイテム未取得
+ * @type 0
  * @default 0
  * 
  * @arg enemyId
  * @type enemy
  * @default 0
- * @text エネミー
- * @desc エネミーを指定します。
+ * @desc エネミーIDを指定します。
  * 
  * @arg stealListId
  * @type number
@@ -188,16 +221,18 @@
  * @desc スティールアイテムリストIDを指定します。（0ですべて）
  * 
  * @command EnemyBookDefeatEnemy
- * @desc 撃破したエネミー数を格納します。
+ * @desc 撃破済みのエネミー数を格納します。
+ * @text 撃破数
  * 
  * @arg DefeatEnemy
  * @type variable
  * @default 0
  * @text 変数
- * @desc 撃破したエネミー数を代入する変数を指定します。
+ * @desc 撃破済みエネミー数を代入する変数を指定します。
  * 
  * @command EnemyBookEncounteredEnemy
  * @desc 遭遇したエネミー数を格納します。
+ * @text 遭遇数
  * 
  * @arg EncounteredEnemy
  * @type variable
@@ -207,15 +242,17 @@
  * 
  * @command EnemyBookCompleteRate
  * @desc 図鑑の完成度を格納します。
+ * @text 図鑑完成度
  * 
  * @arg CompleteRate
  * @type variable
  * @default 0
  * @text 変数
- * @desc  図鑑の完成度を代入する変数を指定します。
+ * @desc 図鑑の完成度を代入する変数を指定します。
  * 
  * @command EnemyBookDefeatEnemySum
  * @desc エネミーの撃破数を格納します。
+ * @text 総撃破数
  * 
  * @arg enemyId
  * @type enemy
@@ -229,8 +266,63 @@
  * @text 変数
  * @desc エネミーの撃破数を代入する変数を指定します。
  * 
+ * @command DorpItemAcquired
+ * @desc 指定のアイテムがドロップ済みか判定します。
+ * @text アイテムドロップ済み判定。
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc エネミーIDを指定します。
+ * 
+ * @arg DorpItemAcquiredId
+ * @type number
+ * @default 0
+ * @text アイテムドロップリストID
+ * @desc アイテムドロップリストIDを指定します。（0ですべて）
+ * 
+ * @arg DorpItemAcquiredswitch
+ * @type switch
+ * @default 0
+ * @text 格納スイッチ
+ * @desc アイテムがドロップ済みかを代入する変数を指定します。
+ * 
+ * @command StealItemAcquired
+ * @desc 指定のアイテムが盗み済みか判定します。
+ * @text アイテム盗み済み判定。
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc エネミーIDを指定します。
+ * 
+ * @arg stealAcquiredId
+ * @type number
+ * @default 0
+ * @text スティールアイテムリストID
+ * @desc スティールアイテムリストIDを指定します。（0ですべて）
+ * 
+ * @arg StealAcquiredswitch
+ * @type switch
+ * @default 0
+ * @text 格納スイッチ
+ * @desc アイテムが盗み済みかを代入する変数を指定します。
+ * 
+ * @command EnemyAnalyze
+ * @desc エネミーの情報を表示します。
+ * @text アナライズ
+ * 
+ * @arg EnemyNewStatus
+ * @type boolean
+ * @default true
+ * @text エネミーの現在のステータスを表示します。
+ * @desc エネミーを指定します。
+ * 
  * 
  * パラメータ
+ * @param BasicSetting
+ * @text 基本設定
+ * 
  * @param WindowMode
  * @desc エネミー選択画面の表示位置を指定します。
  * @text エネミー選択画面位置
@@ -239,7 +331,8 @@
  * @value 0
  * @option 右側表示
  * @value 1
- * @default 1
+ * @default 0
+ * @parent BasicSetting
  * 
  * @param NumberType
  * @text エネミーのナンバー表示
@@ -253,48 +346,42 @@
  * @value 2
  * @desc エネミーのNo表示
  * @default 1
+ * @parent BasicSetting
  * 
- * @param BackGroundImg
- * @desc 背景画像ファイル名を指定します。
- * @text 背景画像
- * @type file
- * @dir img/pictures
- * 
- * @param BackUiWidth
- * @text 背景サイズをUIに合わせる
- * @desc 背景サイズをUIに合わせる。
- * @type boolean
- * @default true
- * 
- * @param completeName
- * @desc 完成度の名称。
- * @text 完成度の表示名
- * @type string
- * @default 完成度
- * 
- * @param EncountName
- * @desc 遭遇済みの名称。
- * @text 遭遇済み表示名
- * @type string
- * @default 遭遇済み
- * 
- * @param DefeatName
- * @desc 撃破済みの名称。
- * @text 撃破済み表示名
- * @type string
- * @default 撃破済み
+ * @param RegistrationTiming
+ * @text 登録タイミング
+ * @desc 図鑑の登録タイミング。
+ * @type select
+ * @option 遭遇時
+ * @value 0
+ * @option 撃破時
+ * @value 1
+ * @option アナライズ時
+ * @value 2
+ * @desc エネミーのNo表示
+ * @default 0
+ * @parent BasicSetting
  * 
  * @param UnknownStatus
  * @desc 敵を撃破していない場合のステータス表示名
- * @text 未撃破エネミーステータス名
+ * @text 未撃破エネミーステータス表示名
  * @type string
  * @default ？？？
+ * @parent BasicSetting
  * 
  * @param UnknownData
  * @desc 未確認の索引名です。？1文字だけ入れると名前の文字数に応じて？に置き換えられます。
  * @text 未確認エネミー及びアイテム名
  * @type string
  * @default ？
+ * @parent BasicSetting
+ * 
+ * @param TransformDefeat
+ * @desc 変身前の敵を撃破したものとみなす。
+ * @text 変身前撃破
+ * @type boolean
+ * @default true
+ * @parent BasicSetting
  * 
  * @param MaxPage
  * @desc 表示するページ数を設定します。
@@ -303,12 +390,55 @@
  * @default 3
  * @max 3
  * @min 1
+ * @parent BasicSetting
+ * 
+ * @param BackGround
+ * @text 背景設定
+ * 
+ * @param BackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
+ * @type file
+ * @dir img/pictures
+ * @parent BackGround
+ * 
+ * @param BackUiWidth
+ * @text 背景サイズをUIに合わせる
+ * @desc 背景サイズをUIに合わせる。
+ * @type boolean
+ * @default true
+ * @parent BackGround
  * 
  * @param NoCursorBackground
  * @desc エネミー選択欄の背景を表示しない。
  * @text カーソル背景無し
  * @type boolean
  * @default false
+ * @parent BackGround
+ * 
+ * @param PercentWindow
+ * @text 完成度ウィンドウ設定
+ * 
+ * @param completeName
+ * @desc 完成度の名称。
+ * @text 完成度の表示名
+ * @type string
+ * @default 完成度
+ * @parent PercentWindow
+ * 
+ * @param EncountName
+ * @desc 遭遇済みの名称。
+ * @text 遭遇済み表示名
+ * @type string
+ * @default 遭遇済み
+ * @parent PercentWindow
+ * 
+ * @param DefeatName
+ * @desc 撃破済みの名称。
+ * @text 撃破済み表示名
+ * @type string
+ * @default 撃破済み
+ * @parent PercentWindow
  * 
  * @param Interval
  * @desc 完成度ウィンドウの更新フレーム
@@ -317,6 +447,7 @@
  * @default 100
  * @max 999999
  * @min 0
+ * @parent PercentWindow
  * 
  * @param CommandData
  * @text コマンド設定
@@ -324,6 +455,13 @@
  * @param ShowCommand
  * @desc メニューコマンドにエネミー図鑑を追加します。
  * @text メニューコマンド表示
+ * @type boolean
+ * @default false
+ * @parent CommandData
+ * 
+ * @param ShowBattleCommand
+ * @desc 戦闘中のパーティコマンドにエネミー図鑑を追加します。
+ * @text パーティコマンド表示
  * @type boolean
  * @default false
  * @parent CommandData
@@ -356,6 +494,13 @@
  * @desc 未確認のドロップアイテムを隠す。
  * @text 未確認ドロップアイテム名
  * @type boolean
+ * @default false
+ * @parent DropItemData
+ * 
+ * @param DropItemProbabilityShow
+ * @desc 確率を表示する。
+ * @text 確率表示
+ * @type boolean
  * @default true
  * @parent DropItemData
  * 
@@ -379,11 +524,51 @@
  * @desc 未確認のスティールアイテムを隠す。
  * @text 未確認スティールアイテム表示
  * @type boolean
+ * @default false
+ * @parent StealItemData
+ * 
+ * @param StealItemProbabilityShow
+ * @desc 確率を表示する。
+ * @text 確率表示
+ * @type boolean
  * @default true
  * @parent StealItemData
  * 
  * @param ParamData
  * @text パラメータ項目設定
+ * 
+ * @param TwoColsMode
+ * @desc パラメータの表示を２列にします。
+ * @text ２列表示
+ * @type boolean
+ * @default false
+ * @parent ParamData
+ * 
+ * @param HPgaugeWidth
+ * @desc アナライズ時のHPゲージ横幅
+ * @text アナライズ時HPゲージ横幅
+ * @type number
+ * @default 0
+ * @max 999999
+ * @min 0
+ * @parent ParamData
+ * 
+ * @param MPgaugeWidth
+ * @desc アナライズ時のMPゲージ横幅
+ * @text アナライズ時MPゲージ横幅
+ * @type number
+ * @default 0
+ * @max 999999
+ * @min 0
+ * @parent ParamData
+ * 
+ * @param ContentsFontSize
+ * @desc フォントサイズ。
+ * @text フォントサイズ
+ * @type number
+ * @default 26
+ * @parent ParamData
+ * @max 99
  * 
  * @param ParamList
  * @desc パラメータの表示するリスト。
@@ -392,11 +577,46 @@
  * @default ["{\"NameColor\":\"16\",\"ShowParams\":\"1\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"2\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"3\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"4\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"5\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"6\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"7\",\"MaskMode\":\"false\"}","{\"NameColor\":\"16\",\"ShowParams\":\"8\",\"MaskMode\":\"false\"}"]
  * @parent ParamData
  * 
+ * @param ConsensusName
+ * @desc 会心率の名称。
+ * @text 会心率名称
+ * @type stirng
+ * @default 会心率
+ * @parent ParamData
+ * 
+ * @param paramOriginalName1
+ * @desc オリジナルパラメータの名称１。
+ * @text オリジナルパラメータ名称１
+ * @type stirng
+ * @default
+ * @parent ParamData
+ * 
+ * @param paramOriginalEval
+ * @desc オリジナルパラメータの評価式１。
+ * @text オリジナルパラメータ評価式１
+ * @type stirng
+ * @default
+ * @parent ParamData
+ * 
+ * @param paramOriginalName2
+ * @desc オリジナルパラメータの名称２。
+ * @text オリジナルパラメータ名称２
+ * @type stirng
+ * @default
+ * @parent ParamData
+ * 
+ * @param paramOriginalEval2
+ * @desc オリジナルパラメータの評価式２。
+ * @text オリジナルパラメータ評価式２
+ * @type stirng
+ * @default
+ * @parent ParamData
+ * 
  * @param ParamMaskMode
  * @desc 未撃破のエネミーの基本ステータスを表示させません。
- * @text 未撃破基本ステータス表示
+ * @text 未撃破基本ステータス非表示
  * @type boolean
- * @default true
+ * @default false
  * @parent ParamData
  * 
  * @param PageData
@@ -440,16 +660,44 @@
  * @default 撃破数
  * @parent ParamEXData
  * 
- * @param originalParamName
- * @desc オリジナルパラメータの名称。
- * @text オリジナルパラメータ表示名
+ * @param originalParamName1
+ * @desc オリジナルパラメータの名称１。
+ * @text オリジナルパラメータ表示名１
  * @type string
  * @default 
  * @parent ParamEXData
  * 
- * @param originalParamEval
- * @desc オリジナルパラメータの式。
- * @text オリジナルパラメータ式
+ * @param originalParamEval1
+ * @desc オリジナルパラメータの式１。
+ * @text オリジナルパラメータ式１
+ * @type string
+ * @default 
+ * @parent ParamEXData
+ * 
+ * @param originalParamName2
+ * @desc オリジナルパラメータの名称２。
+ * @text オリジナルパラメータ表示名２
+ * @type string
+ * @default 
+ * @parent ParamEXData
+ * 
+ * @param originalParamEval2
+ * @desc オリジナルパラメータの式２。
+ * @text オリジナルパラメータ式２
+ * @type string
+ * @default 
+ * @parent ParamEXData
+ * 
+ * @param originalParamName3
+ * @desc オリジナルパラメータの名称３。
+ * @text オリジナルパラメータ表示名３
+ * @type string
+ * @default 
+ * @parent ParamEXData
+ * 
+ * @param originalParamEval3
+ * @desc オリジナルパラメータの式３。
+ * @text オリジナルパラメータ式３
  * @type string
  * @default 
  * @parent ParamEXData
@@ -477,9 +725,9 @@
  * 
  * @param ParamEXMaskMode
  * @desc 未撃破のエネミーの追加ステータスを表示させません。
- * @text 未撃破追加ステータス表示
+ * @text 未撃破追加ステータス非表示
  * @type boolean
- * @default true
+ * @default false
  * @parent ParamEXData
  * 
  * @param ResistWeakData
@@ -489,7 +737,7 @@
  * @desc 表示する属性。
  * @text 表示属性
  * @type struct<ElementData>[]
- * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"76\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"66\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"67\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"68\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"69\"}"]
+ * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"76\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"66\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"67\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"68\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"69\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"70\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"71\"}"]
  * @parent ResistWeakData
  * 
  * @param StateList
@@ -564,9 +812,9 @@
  * 
  * @param ResistWeakDataMaskMode
  * @desc 未撃破のエネミーの耐性弱点を表示させません。
- * @text 未撃破耐性弱点表示
+ * @text 未撃破耐性弱点非表示
  * @type boolean
- * @default true
+ * @default false
  * @parent ResistWeakData
  * 
  */
@@ -577,6 +825,7 @@
  * @text 項目文字色
  * @type number
  * @default 16
+ * @max 999999
  * 
  * @param ShowParams
  * @desc 表示させる項目のリストです。奇数が左側、偶数が右側の順に表示させます。
@@ -600,7 +849,23 @@
  * @value 7
  * @option 運
  * @value 8
+ * @option 命中率
+ * @value 10
+ * @option 回避率
+ * @value 11
+ * @option 会心率
+ * @value 12
+ * @option オリジナルパラメータ１
+ * @value 20
+ * @option オリジナルパラメータ２
+ * @value 21
  * @default 0
+ * 
+ * @param ParamsTwoColsMode
+ * @desc 項目の横いっぱいに表示する。左側（奇数）のみ及び２列表示がtrueの時のみ有効です。
+ * @text 項目２列幅表示
+ * @type boolean
+ * @default false
  *  
  */
 /*~struct~ElementData:
@@ -643,8 +908,12 @@
  * @value 2
  * @option 倒した数
  * @value 3
- * @option オリジナルパラメータ
+ * @option オリジナルパラメータ１
  * @value 4
+ * @option オリジナルパラメータ２
+ * @value 5
+ * @option オリジナルパラメータ３
+ * @value 6
  * @option 耐性属性
  * @value 10
  * @option 弱点属性
@@ -693,6 +962,9 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
+
+let OneColsWidth = 0;
+let TwoColsWidth = 0;
 //プラグインコマンド
 const pluginName = "NUUN_EnemyBook";
 
@@ -721,19 +993,19 @@ PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDefeat', args => {
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookGetDropItem', args => {
-  $gameSystem.dropItemListFlag(args.ememyId, args.dropListId, true);
+  $gameSystem.dropItemListFlag(Number(args.enemyId), Number(args.dropListId) - 1, true);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDropItem', args => {
-  $gameSystem.dropItemListFlag(args.ememyId, args.dropListId, false);
+  $gameSystem.dropItemListFlag(Number(args.enemyId), Number(args.dropListId) - 1, false);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookGetStealItem', args => {
-  $gameSystem.stealItemListFlag(args.ememyId , args.stealListId, true);
+  $gameSystem.stealItemListFlag(Number(args.enemyId) , Number(args.stealListId) - 1, true);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookRemoveStealItem', args => {
-  $gameSystem.stealItemListFlag(args.ememyId, args.stealListId, false);
+  $gameSystem.stealItemListFlag(Number(args.enemyId) , Number(args.stealListId) - 1, false);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookDefeatEnemy', args => {
@@ -749,9 +1021,22 @@ PluginManager.registerCommand(pluginName, 'EnemyBookCompleteRate', args => {
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookDefeatEnemySum', args => {
-  $gameSystem.defeatEnemySumVar(args.enemy, args.DefeatEnemySum);
+  $gameSystem.defeatEnemySumVar(Number(args.enemy), Number(args.DefeatEnemySum));
 });
 
+PluginManager.registerCommand(pluginName, 'EnemyAnalyze', args => {
+  if ($gameParty.inBattle()) {
+    SceneManager._scene.enemyBookEnemyAnalyze();
+  }
+});
+
+PluginManager.registerCommand(pluginName, 'DorpItemAcquired', args => {
+  $gameSystem.dorpItemAcquired(Number(args.DorpItemAcquiredswitch), Number(args.enemyId), Number(args.DorpItemAcquiredId) - 1);
+});
+
+PluginManager.registerCommand(pluginName, 'StealItemAcquired', args => {
+  $gameSystem.stealItemAcquired(Number(args.StealAcquiredswitch), Number(args.enemyId), Number(args.stealAcquiredId) - 1);
+});
 
 //Game_System
 Game_System.prototype.addToEnemyBook = function(enemyId) {
@@ -888,7 +1173,7 @@ Game_System.prototype.setDropItemFlag = function(enemyId, dropId, flag) {
 };
 
 Game_System.prototype.getDropItemFlag = function(enemyId, dropId) {
-  if(!this._itemDorps || !this._itemDorps[enemyId] || !this._itemDorps[enemyId][dropId]) {
+  if(!this._itemDorps || this._itemDorps[enemyId] === null || this._itemDorps[enemyId][dropId] === null) {
     return false;
   }
   return this._itemDorps[enemyId][dropId];
@@ -907,7 +1192,7 @@ Game_System.prototype.setStealItemFlag = function(enemyId, stealId, flag) {
 };
 
 Game_System.prototype.getStealItemFlag = function(enemyId, stealId) {
-  if(!this._stealItem || !this._stealItem[enemyId] || !this._stealItem[enemyId][stealId]) {
+  if(!this._stealItem || !this._stealItem[enemyId] === null || !this._stealItem[enemyId][stealId] === null) {
     return false;
   }
   return this._stealItem[enemyId][stealId];
@@ -942,14 +1227,54 @@ Game_System.prototype.stealItemListFlag = function(enemyId, stealListId, mode) {
   }
 };
 
-Game_System.prototype.dorpItemAcquired = function(enemyId, dropId) {
-  const drop = this.setDropItemFlag(val, enemyId, dropId);
-  $gameSwitches.setValue(val, drop);
+Game_System.prototype.dorpItemAcquired = function(switchId, enemyId, dropId) {
+  if (dropId > 0) {
+    drop = this.getDropItemFlag(enemyId, dropId);
+  } else {
+    drop = false;
+    const itemList = $dataEnemies[enemyId].dropItems;
+    if (itemList) {
+      for(let i = 0; itemList.length > i; i++){
+        if (itemList[i].kind > 0) {
+          drop = this.getDropItemFlag(enemyId, i);
+          if (!drop) {
+            break;
+          }
+        }
+      }
+    }
+  }
+  if (switchId > 0) {
+    $gameSwitches.setValue(switchId, drop);
+  } else {
+    return drop;
+  }
 };
 
-Game_System.prototype.stealItemAcquired = function(enemyId, stealId) {
-  const steal = this.setStealItemFlag(val, enemyId, stealId);
-  $gameSwitches.setValue(val, steal);
+Game_System.prototype.stealItemAcquired = function(switchId, enemyId, stealId) {
+  if (stealId > 0) {
+    steal = this.getStealItemFlag(enemyId, stealId);
+  } else {
+    steal = false;
+    const itemList = this.getStealList($dataEnemies[enemyId]);
+    if (itemList) {
+      for(let i = 0; itemList.length > i; i++){
+        steal = this.getStealItemFlag(enemyId, stealId);
+        if (!steal) {
+          break;
+        }
+      }
+    }
+  }
+  if (switchId > 0) {
+    $gameSwitches.setValue(switchId, steal);
+  } else {
+    return steal;
+  }
+};
+
+Game_System.prototype.registrationTiming = function() {
+  return param.RegistrationTiming;
 };
 
 Game_System.prototype.getStealList = function(enemy) {
@@ -984,7 +1309,7 @@ const _Game_Troop_setup = Game_Troop.prototype.setup;
 Game_Troop.prototype.setup = function(troopId) {
   _Game_Troop_setup.call(this, troopId);
   this.members().forEach(function(enemy) {
-    if (enemy.isAppeared()) {
+    if (enemy.isAppeared() && $gameSystem.registrationTiming() === 0) {
       $gameSystem.addToEnemyBook(enemy.enemyId());
     }
   }, this);
@@ -994,18 +1319,28 @@ Game_Troop.prototype.setup = function(troopId) {
 const _Game_Enemy_appear = Game_Enemy.prototype.appear;
 Game_Enemy.prototype.appear = function() {
   _Game_Enemy_appear.call(this);
-  $gameSystem.addToEnemyBook(this._enemyId);
+  if ($gameSystem.registrationTiming() === 0) {
+    $gameSystem.addToEnemyBook(this._enemyId);
+  }
 };
 
 const _Game_Enemy_transform = Game_Enemy.prototype.transform;
 Game_Enemy.prototype.transform = function(enemyId) {
+  if (param.TransformDefeat) {
+    $gameSystem.defeatCount(this._enemyId);
+  }
   _Game_Enemy_transform.call(this, enemyId);
-  $gameSystem.addToEnemyBook(enemyId);
+  if ($gameSystem.registrationTiming() === 0) {
+    $gameSystem.addToEnemyBook(enemyId);
+  }
 };
 
 const _Game_Enemy_die = Game_Enemy.prototype.die;
 Game_Enemy.prototype.die = function() {
-	_Game_Enemy_die.call(this);
+  _Game_Enemy_die.call(this);
+  if ($gameSystem.registrationTiming() === 1) {
+    $gameSystem.addToEnemyBook(this.enemyId());
+  }
 	$gameSystem.defeatCount(this.enemyId());
 };
 
@@ -1106,6 +1441,7 @@ Scene_EnemyBook.prototype.createIndexWindow = function() {
   this._indexWindow.setHandler("pageup", this.updateContentsPageup.bind(this));
   this.addWindow(this._indexWindow);
   this._indexWindow.setPercentWindow(this._percentWindow);
+  this._indexWindow.activate();
 };
 
 Scene_EnemyBook.prototype.createPercentWindow = function() {
@@ -1119,6 +1455,7 @@ Scene_EnemyBook.prototype.createEnemyWindow = function() {
   this._enemyWindow = new Window_EnemyBook(rect);
   this.addWindow(this._enemyWindow);
   this._indexWindow.setEnemyWindow(this._enemyWindow);
+  this._indexWindow.select(Window_EnemyBook_Index._lastIndex);
 };
 
 Scene_EnemyBook.prototype.percentWindowRect = function() {
@@ -1241,6 +1578,7 @@ Window_EnemyBook_Percent.prototype.refresh = function() {
 };
 
 Window_EnemyBook_Percent.prototype.update = function() {
+  Window_Selectable.prototype.update.call(this);
   this._duration++;
   this.updateInterval();
 };
@@ -1277,7 +1615,6 @@ Window_EnemyBook_Index.prototype.initialize = function(rect) {
   this.refresh();
   this.setTopRow(Window_EnemyBook_Index._lastTopRow);
   this.select(Window_EnemyBook_Index._lastIndex);
-  this.activate();
 };
 
 Window_EnemyBook_Index.prototype.processCancel = function() {
@@ -1296,6 +1633,11 @@ Window_EnemyBook_Index.prototype.maxItems = function() {
 
 Window_EnemyBook_Index.prototype.update = function() {
 	Window_Selectable.prototype.update.call(this);
+  //this.updateEnemyStatus();
+};
+
+Window_EnemyBook_Index.prototype.select = function(index) {
+  Window_Selectable.prototype.select.call(this, index);
   this.updateEnemyStatus();
 };
 
@@ -1396,6 +1738,7 @@ Window_EnemyBook_Index.prototype.drawItemBackground = function(index) {
 
 Window_EnemyBook_Index.prototype.refresh = function() {
   this.makeEnemyList();
+  this.updatePercent();
   Window_Selectable.prototype.refresh.call(this);
 };
 
@@ -1410,6 +1753,9 @@ Window_EnemyBook.prototype.constructor = Window_EnemyBook;
 
 Window_EnemyBook.prototype.initialize = function(rect) {
   Window_Base.prototype.initialize.call(this, rect);
+  this._additionalSprites = {};
+  this._enemy = null;
+  this._bookMode = 0;
   this._enemy = null;
   this._enemyData = [];
   this._pageMode = 0;
@@ -1418,7 +1764,9 @@ Window_EnemyBook.prototype.initialize = function(rect) {
   this._enemySprite.anchor.y = 0.5;
   this._enemySprite.x = rect.width / 4;
   this._enemySprite.y = rect.height / 4 + this.lineHeight();
+  this.selectEnemy = null;
   this.addChildToBack(this._enemySprite);
+  console.log(this._enemy)
   this.refresh();
 };
 
@@ -1462,7 +1810,7 @@ Window_EnemyBook.prototype.stealItemFlag = function(index) {
 };
 
 Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
-  return this._enemy.meta.ShowDataBook;
+  return this._enemy.meta.ShowDataBook || this._bookMode === 1;
 };
 
 Window_EnemyBook.prototype.maxWidth = function() {
@@ -1491,6 +1839,10 @@ Window_EnemyBook.prototype.refresh = function() {
   const lineHeight = this.lineHeight();
   
   this.contents.clear();
+  if ($gameParty.inBattle() && this.selectEnemy) {
+    this.removeInnerSprite(this.selectEnemy, 'hp');
+    this.removeInnerSprite(this.selectEnemy, 'mp');
+  }
   if (!enemy || !$gameSystem.isInEnemyBook(this._enemy)) {
     this._enemySprite.bitmap = null;
     return;
@@ -1521,7 +1873,13 @@ Window_EnemyBook.prototype.itemShow = function(list, enemy, x, y, width) {
       this.defeat(list.NameColor, enemy, x, y, width);
       return 1;
     case 4:
-      this.originalParams(list.NameColor, enemy, x, y, width);
+      this.originalParams(list.NameColor, enemy, x, y, width, param.originalParamName1, param.originalParamEval1);
+      return 1;
+    case 5:
+      this.originalParams(list.NameColor, enemy, x, y, width, param.originalParamName2, param.originalParamEval2);
+      return 1;
+    case 6:
+      this.originalParams(list.NameColor, enemy, x, y, width, param.originalParamName3, param.originalParamEval3);
       return 1;
     case 10:
       this.drawResistElement(list.NameColor, enemy, x, y, width);
@@ -1648,21 +2006,91 @@ Window_EnemyBook.prototype.enemyName = function(enemy, x, y) {
 };
 
 Window_EnemyBook.prototype.enemyParams = function(enemy, x, y) {
-  const list = param.ParamList;
+  const list = param.ParamList;//param.ParamsTwoColsMode
+  const padding = this.itemPadding();
+  const maxWidth = this.maxWidth() + padding;
+  const width = maxWidth / (param.TwoColsMode ? 2 : 1);
+  this.contents.fontSize = param.ContentsFontSize;
 	for (let i = 0; i < list.length; i++) {
-		this.changeTextColor(ColorManager.textColor(list[i].NameColor));
-		this.drawText(TextManager.param(list[i].ShowParams - 1), x, y, this.maxWidth());
-    this.resetTextColor();
-    let text;
-    if(this.paramMask()){
-      text = enemy.param(list[i].ShowParams - 1);
-    } else {
-      text = param.UnknownStatus;
+    x2 = x + i % (param.TwoColsMode ? 2 : 1) * width;
+    y2 = y + Math.floor(i / (param.TwoColsMode ? 2 : 1)) * (param.ContentsFontSize + 10);
+    nameText = null;
+    let text = this.paramShow(list[i].ShowParams, enemy);
+    if (text !== null) {
+      const textWidth = ((i % 2 === 0 && list[i].ParamsTwoColsMode && param.TwoColsMode) ? maxWidth : width) / 2 - padding;
+      if ((list[i].ShowParams === 1 || list[i].ShowParams === 2) && $gameParty.inBattle() && this.selectEnemy) {
+      } else {
+        this.changeTextColor(ColorManager.textColor(list[i].NameColor));
+        nameText = this.paramNameShow(list[i].ShowParams, enemy);
+        this.drawText(nameText, x2, y2, textWidth);
+      }
+      this.resetTextColor();
+      if(!this.paramMask()){
+        text = param.UnknownStatus;
+      }
+      if (list[i].ShowParams === 1 && $gameParty.inBattle() && this.selectEnemy) {
+        this.placeGauge(this.selectEnemy, "hp", x2, y2);
+      } else if (list[i].ShowParams === 2 && $gameParty.inBattle() && this.selectEnemy) {
+        this.placeGauge(this.selectEnemy, "mp", x2, y2);
+      } else {
+        if (i % 2 === 0 && list[i].ParamsTwoColsMode && param.TwoColsMode) {
+          this.drawText(text, x2 + textWidth, y2, maxWidth - textWidth - padding, 'right');
+        } else {
+          this.drawText(text, x2 + textWidth, y2, width - textWidth - padding, 'right');
+        }
+      }
     }
-    const textWidth = this.textWidth(TextManager.param(list[i].ShowParams - 1)) + 8;
-		this.drawText(text, x + textWidth, y, this.maxWidth() - textWidth, 'right');
-		y += this.lineHeight();
-	}
+  }
+  this.contents.fontSize = $gameSystem.mainFontSize();
+};
+
+Window_EnemyBook.prototype.paramNameShow = function(params, enemy) {
+  switch (params) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+      return TextManager.param(params - 1);
+    case 10:
+    case 11:
+      return TextManager.param(params - 2);
+    case 12:
+      return param.ConsensusName;
+    case 20:
+      return param.paramOriginalName1;
+    case 21:
+      return param.paramOriginalName2;
+    default:
+      return null;
+  }
+};
+
+Window_EnemyBook.prototype.paramShow = function(params, enemy) {
+  switch (params) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+      return enemy.param(params - 1);
+    case 10:
+    case 11:
+    case 12:
+      return enemy.xparam(params - 10) * 100 +"%";
+    case 20:
+      return eval(param.paramOriginalEval1);
+    case 21:
+      return eval(param.paramOriginalEval2);
+    default:
+      return null;
+  }
 };
 
 Window_EnemyBook.prototype.enemyExp = function(color, enemy, x, y, width) {
@@ -1702,16 +2130,16 @@ Window_EnemyBook.prototype.defeat = function(color, enemy, x, y, width) {
   this.drawText(text, x, y, width, 'right');
 };
 
-Window_EnemyBook.prototype.originalParams = function(color, enemy, x, y, width) {
-  if(!param.originalParamName){
+Window_EnemyBook.prototype.originalParams = function(color, enemy, x, y, width, params, paramsEval) {
+  if(params){
     return this;
   }
 	this.changeTextColor(ColorManager.textColor(color));
-	this.drawText(param.originalParamName, x, y);
+	this.drawText(params, x, y);
   this.resetTextColor();
   let text;
   if(this.paramEXMask()){
-    text = eval(param.originalParamEval);
+    text = eval(paramsEval);
   } else {
     text = param.UnknownStatus;
   }
@@ -1893,11 +2321,13 @@ Window_EnemyBook.prototype.dropItems = function(color, enemy, x, y, width, mask)
   for(i = 0; i < list.length; i++){
     if(list[i].kind > 0){
       let item = enemy.itemObject(list[i].kind, list[i].dataId);
-      if(this.showDropItemMask() && this.dropItemFlag(i)) {
+      if((this.showDropItemMask() && this.dropItemFlag(i)) || !param.ShowDropItemName) {
         let rate = list[i].denominator;
         let textWidth = this.textWidth("1/" + rate);
         this.drawItemName(item, x, y2, maxWidth - textWidth - this.itemPadding());
-        this.drawText("1/" + rate, x, y2, maxWidth,'right');
+        if (param.DropItemProbabilityShow) {
+          this.drawEnemyBookNumber("1/" + rate, x, y2, maxWidth);
+        }
       } else {
         this.resetTextColor();
         this.drawText(this.unknownDataLength(item.name), x, y2, maxWidth,'left');
@@ -1919,11 +2349,13 @@ Window_EnemyBook.prototype.stealItems = function(color, enemy, x, y, width, mask
   for(let i = 0; list.length > i; i++){
     if (list[i].kind > 0 && list[i].kind < 4) {
       let item = enemy.stealObject(list[i].kind, list[i].dataId);
-      if(this.showStealItemMask() && this.stealItemFlag(i)) {
+      if((this.showStealItemMask() && this.stealItemFlag(i)) || !param.ShowStealItemName) {
         let rate = list[i].denominator;
         let textWidth = this.textWidth(rate +"%");
         this.drawItemName(item, x, y2, maxWidth - textWidth - this.itemPadding());
-        this.drawText(rate +"%", x, y2, maxWidth,'right');
+        if (param.StealItemProbabilityShow) {
+          this.drawEnemyBookNumber(rate +"%", x, y2, maxWidth);
+        }
       } else {
         this.resetTextColor();
         this.drawText(this.unknownDataLength(item.name), x, y2, maxWidth,'left');
@@ -1986,7 +2418,7 @@ Window_EnemyBook.prototype.unknownDataLength = function(name) {
     names += param.UnknownData;
   }
   return names;
-  };
+};
 
 Window_EnemyBook.prototype.iconX = function(icons, width) {
 	if (32 * icons.length > width) {
@@ -1995,7 +2427,325 @@ Window_EnemyBook.prototype.iconX = function(icons, width) {
 	return 32;
 };
 
+Window_EnemyBook.prototype.drawEnemyBookNumber = function(text, x, y, width,) {
+  this.resetTextColor();
+  this.drawText(text , x, y, width,'right');
+};
+
+Window_EnemyBook.prototype.placeGauge = function(enemy, type, x, y, width) {
+  const padding = this.itemPadding();
+  const key = "enemyBook-gauge-%2".format(enemy.enemyId(), type);
+  const sprite = this.createInnerSprite(key, Sprite_EnemyBookGauge);
+  sprite.bitmap.width = width - padding;
+  sprite.setup(enemy, type);
+  sprite.move(x, y);
+  sprite.show();
+};
+
+Window_EnemyBook.prototype.createInnerSprite = function(key, spriteClass) {
+  const dict = this._additionalSprites;
+  const sprite = new spriteClass();
+  dict[key] = sprite;
+  this.addInnerChild(sprite);
+  return sprite;
+};
+
+Window_EnemyBook.prototype.removeInnerSprite = function(enemy, type) {
+  const key = "enemyBook-gauge-%2".format(enemy.enemyId(), type);
+  const dict = this._additionalSprites;
+  if (dict[key]) {
+    this._clientArea.removeChild(dict[key]);
+    dict[key] = null;
+  }
+};
+
 Window_EnemyBook.prototype.currencyUnit = function() {
   return TextManager.currencyUnit;
 };
+
+/////////////////////////////////////戦闘/////////////////////////////////////////
+const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
+Scene_Battle.prototype.createAllWindows = function() {
+  _Scene_Battle_createAllWindows.call(this);
+  this.createEnemyBookWindow();
+};
+
+Scene_Battle.prototype.createEnemyBookWindow = function() {
+  this.createEnemyBookPercentWindow();
+  this.createEnemyBookDummyWindow();
+  this.createEnemyBookIndexWindow();
+  this.createEnemyBookEnemyWindow();
+  this.createEnemyBookButton();
+};
+
+Scene_Battle.prototype.createEnemyBookPercentWindow = function() {
+  const rect = this.percentEnemyBookWindowRect();
+  this._enemyBookPercentWindow = new Window_EnemyBook_Percent(rect);
+  this.addWindow(this._enemyBookPercentWindow);
+  this._enemyBookPercentWindow.hide();
+};
+
+Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
+  const rect = this.enemyBookIndexWindowRect();
+  this._enemyBookIndexWindow = new Window_EnemyBook_Index(rect);
+  this._enemyBookIndexWindow.setHandler("cancel", this.cancelEnemyBook.bind(this));
+  this._enemyBookIndexWindow.setHandler("pagedown", this.updateEnemyBookPagedown.bind(this));
+  this._enemyBookIndexWindow.setHandler("pageup", this.updateEnemyBookPageup.bind(this));
+  this.addWindow(this._enemyBookIndexWindow);
+  this._enemyBookIndexWindow.setPercentWindow(this._enemyBookPercentWindow);
+  this._enemyBookIndexWindow.hide();
+};
+
+Scene_Battle.prototype.createEnemyBookDummyWindow = function() {
+  const rect = this.dummyEnemyBookWindowRect();
+  this._enemyBookDummyWindow = new Window_EnemyBook_Dummy(rect);
+  this._enemyBookDummyWindow.setHandler("cancel", this.cancelEnemyBook.bind(this));
+  this._enemyBookDummyWindow.setHandler("pagedown", this.updateEnemyBookPagedown.bind(this));
+  this._enemyBookDummyWindow.setHandler("pageup", this.updateEnemyBookPageup.bind(this));
+  this.addWindow(this._enemyBookDummyWindow);
+  this._enemyBookDummyWindow.hide();
+};
+  
+Scene_Battle.prototype.createEnemyBookEnemyWindow = function() {
+  const rect = this.enemyBookWindowRect();
+  this._enemyBookEnemyWindow = new Window_EnemyBook(rect);
+  this.addWindow(this._enemyBookEnemyWindow);
+  this._enemyBookIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
+  this._enemyBookEnemyWindow.hide();
+};
+
+Scene_Battle.prototype.percentEnemyBookWindowRect = function() {
+  const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
+  const wy = Scene_MenuBase.prototype.mainAreaTop();
+  const ww = Graphics.boxWidth / 3;
+  const wh = this.calcWindowHeight(1, true);
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.dummyEnemyBookWindowRect = function() {
+  const wx = (Graphics.boxWidth - this.enemyBookWindowWidth()) / 2;
+  const wy = this._enemyBookPercentWindow.y;
+  const ww = this.enemyBookWindowWidth();
+  const wh = this.calcWindowHeight(1, true);
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.enemyBookIndexWindowRect = function() {
+  const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
+  const wy = this._enemyBookPercentWindow.y + this._enemyBookPercentWindow.height;
+  const ww = Graphics.boxWidth / 3;
+  const wh = Graphics.boxHeight - wy;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.enemyBookWindowRect = function() {
+  const wx = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
+  const wy = this._enemyBookPercentWindow.y;
+  const ww = this.enemyBookWindowWidth();
+  const wh = Graphics.boxHeight - wy;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.enemyBookWindowWidth = function() {
+  return Graphics.boxWidth - Graphics.boxWidth / 3;
+};
+
+const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
+Scene_Battle.prototype.createPartyCommandWindow = function() {
+  _Scene_Battle_createPartyCommandWindow.call(this);
+  this._partyCommandWindow.setHandler("enemyBook", this.commandEnemyBook.bind(this));
+};
+
+const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWindows;
+Scene_Battle.prototype.hideSubInputWindows = function() {
+  _Scene_Battle_hideSubInputWindows.call(this);
+  if (this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active) {
+  }
+};
+
+Scene_Battle.prototype.commandEnemyBook = function() {
+  this._enemyBookEnemyWindow._bookMode = 0;
+  this._enemyBookEnemyWindow.x = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
+  this._enemyBookIndexWindow.activate();
+  this._enemyBookIndexWindow.show();
+  this._enemyBookIndexWindow.open();
+  this._enemyBookPercentWindow.show();
+  this._enemyBookPercentWindow.open();
+  this._enemyBookEnemyWindow.show();
+  this._enemyBookEnemyWindow.open();
+  this._enemyBookIndexWindow.refresh();
+  this._enemyBookEnemyWindow.refresh();
+};
+
+Scene_Battle.prototype.cancelEnemyBook = function() {
+  this._enemyBookIndexWindow.deactivate();
+  this._enemyBookDummyWindow.deactivate();
+  this._enemyBookIndexWindow.close();
+  this._enemyBookPercentWindow.close();
+  this._enemyBookEnemyWindow.close();
+  this._enemyBookDummyWindow.close();
+  this._enemyBookIndexWindow.hide();
+  this._enemyBookPercentWindow.hide();
+  this._enemyBookEnemyWindow.hide();
+  this._enemyBookDummyWindow.hide();
+  this._enemyBookEnemyWindow.selectEnemy = null;
+  if (this._enemyBookEnemyWindow._bookMode === 0) {
+    this._partyCommandWindow.activate();
+  }
+};
+
+Scene_Battle.prototype.enemyBookEnemyAnalyze = function() {
+  if (this.isAnyInputWindowActive()) {
+    this.hideSubInputWindows();
+    this._actorCommandWindow.deactivate();
+    this._partyCommandWindow.deactivate();
+  }
+  this.userWindowDeactivate();
+  this._enemyBookEnemyWindow._enemy = null;
+  this._enemyBookEnemyWindow._bookMode = 1;
+  this._enemyBookEnemyWindow.x = (Graphics.boxWidth - this._enemyBookEnemyWindow.width) / 2;
+  this._enemyBookDummyWindow.activate();
+  this._enemyBookDummyWindow.show();
+  this._enemyBookDummyWindow.open();
+  this._enemyBookEnemyWindow.show();
+  this._enemyBookEnemyWindow.open();
+  this._enemyBookIndexWindow.refresh();
+  const index = this._enemyWindow.enemyIndex();
+  this._enemyBookEnemyWindow.selectEnemy = $gameTroop.members()[index];
+  const enemy = this._enemyBookEnemyWindow.selectEnemy.enemy();
+  if ($gameSystem.registrationTiming() === 2) {
+    $gameSystem.addToEnemyBook(enemy.id);
+  }
+  this._enemyBookEnemyWindow.setEnemy(enemy);
+};
+
+Scene_Battle.prototype.createEnemyBookButton = function() {
+  if(ConfigManager.touchUI) {
+    this._pageupButton = new Sprite_Button("pageup");
+    this._pageupButton.x = 4;
+    this._pageupButton.y = this.buttonY();
+    const pageupRight = this._pageupButton.x + this._pageupButton.width;
+    this._pagedownButton = new Sprite_Button("pagedown");
+    this._pagedownButton.x = pageupRight + 4;
+    this._pagedownButton.y = this.buttonY();
+    this.addWindow(this._pageupButton);
+    this.addWindow(this._pagedownButton);
+    this._pageupButton.setClickHandler(this.updateEnemyBookPageup.bind(this));
+    this._pagedownButton.setClickHandler(this.updateEnemyBookPagedown.bind(this));
+    this.updatePageupdownButton();
+  }
+};
+
+Scene_Battle.prototype.updatePageupdownButton = function() {
+  if (this._pageupButton && this._pagedownButton) {
+    this._pageupButton.visible = this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active ? true : false;
+    this._pagedownButton.visible = this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active ? true : false;
+    this._pageupButton.y = this.buttonY();
+    this._pagedownButton.y = this.buttonY();
+  }
+};
+
+Scene_Battle.prototype.updateEnemyBookPagedown = function() {
+  SoundManager.playCursor();
+  const maxPage = this.setMaxPage();
+  this._enemyBookEnemyWindow._pageMode = (this._enemyBookEnemyWindow._pageMode + 1) % maxPage;
+  this._enemyBookEnemyWindow.refresh();
+};
+
+Scene_Battle.prototype.updateEnemyBookPageup = function() {
+  SoundManager.playCursor();
+  const maxPage = this.setMaxPage();
+  this._enemyBookEnemyWindow._pageMode = (this._enemyBookEnemyWindow._pageMode + (maxPage - 1)) % maxPage;
+  this._enemyBookEnemyWindow.refresh();
+};
+
+Scene_Battle.prototype.setMaxPage = function() {
+  return param.MaxPage;
+};
+
+const _Scene_Battle_update = Scene_Battle.prototype.update;
+Scene_Battle.prototype.update = function() {
+  _Scene_Battle_update.call(this);
+  this.updatePageupdownButton();
+  if (this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active) {
+    if (Input.isTriggered('left')) {
+      this.updateEnemyBookPageup();
+    } else if (Input.isTriggered('right')){
+      this.updateEnemyBookPagedown();
+    }
+  }
+};
+
+const _Scene_Battle_updateCancelButton = Scene_Battle.prototype.updateCancelButton;
+Scene_Battle.prototype.updateCancelButton = function() {
+  _Scene_Battle_updateCancelButton.call(this);
+  if (this._cancelButton) {
+    this._cancelButton.y = this.buttonY();
+  }
+};
+
+const _Scene_Battle_buttonY = Scene_Battle.prototype.buttonY;
+Scene_Battle.prototype.buttonY = function() {
+  const y = _Scene_Battle_buttonY.call(this);
+  if (this._enemyBookIndexWindow.active) {
+    return y - this._helpWindow.height;
+  }
+  return y;
+};
+
+const _Scene_Battle_isAnyInputWindowActive  = Scene_Battle.prototype.isAnyInputWindowActive;
+Scene_Battle.prototype.isAnyInputWindowActive = function() {
+  return this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active ||_Scene_Battle_isAnyInputWindowActive.call(this);
+};
+
+
+const _Scene_Battle_isTimeActive = Scene_Battle.prototype.isTimeActive;
+Scene_Battle.prototype.isTimeActive = function() {
+  return !this._enemyBookIndexWindow.active && !this._enemyBookDummyWindow.active && _Scene_Battle_isTimeActive.call(this);
+};
+
+Scene_Battle.prototype.userWindowDeactivate = function() {//暫定競合対策
+  if (typeof this.hideFormationWindows == 'function') {
+    this.hideFormationWindows();//DarkPlasma_FormationInBattle
+  }
+};
+
+const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
+Window_PartyCommand.prototype.makeCommandList = function() {
+  _Window_PartyCommand_makeCommandList.call(this);
+  if (param.ShowBattleCommand && ($gameSwitches.value(param.enemyBookSwitch) || param.enemyBookSwitch === 0)) {
+    this.addCommand(param.CommandName, "enemyBook");
+  }
+};
+
+
+function Window_EnemyBook_Dummy() {
+  this.initialize(...arguments);
+}
+
+Window_EnemyBook_Dummy.prototype = Object.create(Window_Selectable.prototype);
+Window_EnemyBook_Dummy.prototype.constructor = Window_EnemyBook_Dummy;
+
+Window_EnemyBook_Dummy.prototype.initialize = function(rect) {
+  Window_Selectable.prototype.initialize.call(this, rect);
+  this.opacity = 0;
+};
+
+
+function Sprite_EnemyBookGauge() {
+  this.initialize(...arguments);
+}
+
+Sprite_EnemyBookGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_EnemyBookGauge.prototype.constructor = Sprite_EnemyBookGauge;
+
+Sprite_EnemyBookGauge.prototype.bitmapWidth = function() {
+  if (this._statusType === 'hp') {
+    return param.HPgaugeWidth > 0 ? param.HPgaugeWidth : 128;
+  } else if (this._statusType === 'mp') {
+    return param.MPgaugeWidth > 0 ? param.MPgaugeWidth : 128;
+  }
+  return 999;
+};
+
 })();

@@ -11,12 +11,12 @@
 [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) バトルスタイル拡張<br>
 [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)　解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整<br>
 [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)　戦闘背景の変更<br>
-
+[NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)　戦闘中アイテム、スキル選択画面MV風表示プラグイン<br>
   
 <b>スキル、アイテム</b><br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>
 [NUUN_CancelCastTime](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js)　キャストタイム（詠唱）キャンセルスキル、アイテム<br>
-スキル、アイテムの色<br>
+[NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js)  スキル、アイテムの色<br>
 
 <b>アイテム</b><br>
 [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)　アイテム消耗率<br>

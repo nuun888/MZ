@@ -14,8 +14,8 @@
  * 
  * @target MZ
  * @plugindesc ドロップアイテム増加
- * @base NUUN_Base.js
- * @orderAfter NUUN_Base.js
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * @author NUUN
  * 
  * @help

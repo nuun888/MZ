@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  アイテム、スキル欄の文字に色を変更できます。。
+ * @plugindesc  アイテム、スキル欄の文字に色を変更できます。
  * @author NUUN
  * @version 1.0.0
  * 

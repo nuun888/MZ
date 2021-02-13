@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -30,17 +30,14 @@
  * 命中率
  * 回避率
  * 会心率
- * オリジナルパラメータ１
- * オリジナルパラメータ２
+ * オリジナルパラメータ（任意のステータス）×２
  * 
  * 
  * 追加表示パラメータ
  * 獲得経験値
  * 獲得金額
  * 撃破数
- * オリジナルパラメータ１（任意のステータス）
- * オリジナルパラメータ２（任意のステータス）
- * オリジナルパラメータ３（任意のステータス）
+ * オリジナルパラメータ（任意のステータス）×３
  * 耐性属性
  * 弱点属性
  * 無効属性
@@ -49,16 +46,15 @@
  * 無効ステート
  * ドロップアイテム（ドロップアイテム追加対応）
  * スティールアイテム（盗みスキル導入時）
- * 記述欄（フリーテキストスペース）
+ * 記述欄（フリーテキストスペース）×３
  * 
  * 戦闘中にパーティコマンドからエネミー図鑑を開くことが出来ます。
  * アナライズ機能を使う場合、TPBバトルでは開いている間TPBゲージを止める仕様にしています。
- * 画面が開いたときにアイテム画面、スキル画面が閉じるのでアクティブに設定している場合はご了承ください。
  * 
  * エネミーのメモ欄
- * <desc1:[text]>
- * <desc2:[text]>
- * <desc3:[text]>
+ * <desc1:[text]> 記述欄１のテキスト
+ * <desc2:[text]> 記述欄２のテキスト
+ * <desc3:[text]> 記述欄３のテキスト
  * [text]:表示するテキスト。リストの記述欄を選択すると表示されます。（desc1だと記述欄１）
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
  * <NoBook>
@@ -116,7 +112,9 @@
  * 
  * 
  * 更新履歴
- * 2021/2/7 Ver 1.0.0
+ * 2021/2/14 Ver.1.0.1
+ * アナライズモードをオープンした際の他のウィンドウの処理を変更。
+ * 2021/2/7 Ver.1.0.0
  * 初版
  * 
  * @command EnemyBookOpen
@@ -548,8 +546,8 @@
  * @desc アナライズ時のHPゲージ横幅
  * @text アナライズ時HPゲージ横幅
  * @type number
- * @default 0
- * @max 999999
+ * @default 128
+ * @max 999
  * @min 0
  * @parent ParamData
  * 
@@ -557,8 +555,8 @@
  * @desc アナライズ時のMPゲージ横幅
  * @text アナライズ時MPゲージ横幅
  * @type number
- * @default 0
- * @max 999999
+ * @default 128
+ * @max 999
  * @min 0
  * @parent ParamData
  * 
@@ -963,8 +961,8 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   }
 }));
 
-let OneColsWidth = 0;
-let TwoColsWidth = 0;
+let openAnalyze = false;
+
 //プラグインコマンド
 const pluginName = "NUUN_EnemyBook";
 
@@ -1766,7 +1764,6 @@ Window_EnemyBook.prototype.initialize = function(rect) {
   this._enemySprite.y = rect.height / 4 + this.lineHeight();
   this.selectEnemy = null;
   this.addChildToBack(this._enemySprite);
-  console.log(this._enemy)
   this.refresh();
 };
 
@@ -2006,7 +2003,7 @@ Window_EnemyBook.prototype.enemyName = function(enemy, x, y) {
 };
 
 Window_EnemyBook.prototype.enemyParams = function(enemy, x, y) {
-  const list = param.ParamList;//param.ParamsTwoColsMode
+  const list = param.ParamList;
   const padding = this.itemPadding();
   const maxWidth = this.maxWidth() + padding;
   const width = maxWidth / (param.TwoColsMode ? 2 : 1);
@@ -2578,6 +2575,7 @@ Scene_Battle.prototype.commandEnemyBook = function() {
 };
 
 Scene_Battle.prototype.cancelEnemyBook = function() {
+  this._enemyBookDummyWindow.interruptWindow = false;
   this._enemyBookIndexWindow.deactivate();
   this._enemyBookDummyWindow.deactivate();
   this._enemyBookIndexWindow.close();
@@ -2592,15 +2590,13 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
   if (this._enemyBookEnemyWindow._bookMode === 0) {
     this._partyCommandWindow.activate();
   }
+  openAnalyze = false;
 };
 
 Scene_Battle.prototype.enemyBookEnemyAnalyze = function() {
-  if (this.isAnyInputWindowActive()) {
-    this.hideSubInputWindows();
-    this._actorCommandWindow.deactivate();
-    this._partyCommandWindow.deactivate();
-  }
-  this.userWindowDeactivate();
+  openAnalyze = true;
+  this._enemyBookDummyWindow.interruptWindow = true;
+  //this.userWindowDeactivate();
   this._enemyBookEnemyWindow._enemy = null;
   this._enemyBookEnemyWindow._bookMode = 1;
   this._enemyBookEnemyWindow.x = (Graphics.boxWidth - this._enemyBookEnemyWindow.width) / 2;
@@ -2710,6 +2706,20 @@ Scene_Battle.prototype.userWindowDeactivate = function() {//暫定競合対策
   }
 };
 
+const _Window_Selectable_initialize = Window_Selectable.prototype.initialize;
+Window_Selectable.prototype.initialize = function(rect) {
+  _Window_Selectable_initialize.call(this, rect);
+  this.interruptWindow = false;
+};
+
+const _Window_Selectable_isOpenAndActive = Window_Selectable.prototype.isOpenAndActive;
+Window_Selectable.prototype.isOpenAndActive = function() {
+  if (openAnalyze && $gameParty.inBattle()) {
+    return this.interruptWindow ? _Window_Selectable_isOpenAndActive.call(this) : false;
+  }
+  return _Window_Selectable_isOpenAndActive.call(this);
+};
+
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
 Window_PartyCommand.prototype.makeCommandList = function() {
   _Window_PartyCommand_makeCommandList.call(this);
@@ -2717,7 +2727,6 @@ Window_PartyCommand.prototype.makeCommandList = function() {
     this.addCommand(param.CommandName, "enemyBook");
   }
 };
-
 
 function Window_EnemyBook_Dummy() {
   this.initialize(...arguments);

@@ -112,6 +112,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/2/14 Ver.1.0.2
+ * 特定の条件下で図鑑を開きドロップアイテム、スティールアイテムのあるページを開くとエラーが出る問題を修正。
  * 2021/2/14 Ver.1.0.1
  * アナライズモードをオープンした際の他のウィンドウの処理を変更。
  * 2021/2/7 Ver.1.0.0
@@ -1171,7 +1173,7 @@ Game_System.prototype.setDropItemFlag = function(enemyId, dropId, flag) {
 };
 
 Game_System.prototype.getDropItemFlag = function(enemyId, dropId) {
-  if(!this._itemDorps || this._itemDorps[enemyId] === null || this._itemDorps[enemyId][dropId] === null) {
+  if(!this._itemDorps || this._itemDorps[enemyId] === undefined || this._itemDorps[enemyId][dropId] === undefined) {
     return false;
   }
   return this._itemDorps[enemyId][dropId];
@@ -1190,7 +1192,7 @@ Game_System.prototype.setStealItemFlag = function(enemyId, stealId, flag) {
 };
 
 Game_System.prototype.getStealItemFlag = function(enemyId, stealId) {
-  if(!this._stealItem || !this._stealItem[enemyId] === null || !this._stealItem[enemyId][stealId] === null) {
+  if(!this._stealItem || !this._stealItem[enemyId] === undefined || !this._stealItem[enemyId][stealId] === undefined) {
     return false;
   }
   return this._stealItem[enemyId][stealId];

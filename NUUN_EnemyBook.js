@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * モンスター図鑑を実装します。

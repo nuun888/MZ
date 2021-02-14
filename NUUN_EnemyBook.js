@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -112,6 +112,12 @@
  * 
  * 
  * 更新履歴
+ * 2021/2/14 Ver.1.0.3
+ * 戦闘中でアナライズを使用中PageUp・PageDownキーを押した後操作ができなくなる問題を修正。
+ * 図鑑の登録タイミングが「撃破時」に設定している時にアナライズを使用した際、画面が空白になる問題を修正。
+ * プラグインコマンドで「エネミー削除」「撃破数」「図鑑完成度」を実行するとエラーが出る問題を修正。
+ * プラグインコマンドで「エネミー撃破数リセット」「遭遇数」「総撃破数」を実行しても変数が変わらない問題を修正。
+ * 「エネミー撃破数リセット」が「図鑑完成度」と表示されていた問題を修正。
  * 2021/2/14 Ver.1.0.2
  * 特定の条件下で図鑑を開きドロップアイテム、スティールアイテムのあるページを開くとエラーが出る問題を修正。
  * 2021/2/14 Ver.1.0.1
@@ -150,8 +156,8 @@
  * @text 図鑑初期化
  *  
  * @command EnemyBookRemoveDefeat
- * @desc エネミーの撃破数をリセットします。
- * @text 図鑑初期化
+ * @desc エネミーの撃破数をリセットします。(0で全てのエネミーの撃破数をリセットします)
+ * @text 撃破数初期化
  * 
  * @arg enemyId
  * @type enemy
@@ -171,7 +177,7 @@
  * @type number
  * @default 0
  * @text ドロップアイテムリストID
- * @desc ドロップアイテムリストIDを指定します。（0ですべて）
+ * @desc ドロップアイテムリストIDを指定します。（0ですべて取得済みにします）
  * 
  * @command EnemyBookRemoveDropItem
  * @desc エネミーのドロップアイテムを未収得にします。
@@ -186,7 +192,7 @@
  * @type number
  * @default 0
  * @text ドロップアイテムリストID
- * @desc ドロップアイテムリストIDを指定します。（0ですべて）
+ * @desc ドロップアイテムリストIDを指定します。（0ですべて未取得済みにします）
  * 
  * @command EnemyBookGetStealItem
  * @desc エネミーのスティールアイテムを取得済みにします。
@@ -201,7 +207,7 @@
  * @type number
  * @default 0
  * @text スティールアイテムリストID
- * @desc スティールアイテムリストIDを指定します。（0ですべて）
+ * @desc スティールアイテムリストIDを指定します。（0ですべて取得済みにします）
  * 
  * @command EnemyBookRemoveStealItem
  * @desc エネミーのスティールアイテムを未取得にします。
@@ -218,11 +224,11 @@
  * @type number
  * @default 0
  * @text スティールアイテムリストID
- * @desc スティールアイテムリストIDを指定します。（0ですべて）
+ * @desc スティールアイテムリストIDを指定します。（0ですべて未取得済みにします）
  * 
  * @command EnemyBookDefeatEnemy
  * @desc 撃破済みのエネミー数を格納します。
- * @text 撃破数
+ * @text 総撃破数エネミー数
  * 
  * @arg DefeatEnemy
  * @type variable
@@ -973,11 +979,17 @@ PluginManager.registerCommand(pluginName, 'EnemyBookOpen', args => {
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookAdd', args => {
-  $gameSystem.addToEnemyBook(Number(args.enemyId));
+  const enemyId = Number(args.enemyId);
+  if (enemyId > 0) {
+    $gameSystem.addToEnemyBook(enemyId);
+  }
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookRemove', args => {
-  $gameSystem.removeFromEnemyBook(Number(args.enemyId));
+  const enemyId = Number(args.enemyId);
+  if (enemyId > 0) {
+    $gameSystem.removeFromEnemyBook(enemyId);
+  }
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookComplete', args => {
@@ -989,7 +1001,7 @@ PluginManager.registerCommand(pluginName, 'EnemyBookClear', args => {
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDefeat', args => {
-  $gameSystem.resetDefeat();
+  $gameSystem.resetDefeat(Number(args.enemyId));
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookGetDropItem', args => {
@@ -1009,19 +1021,22 @@ PluginManager.registerCommand(pluginName, 'EnemyBookRemoveStealItem', args => {
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookDefeatEnemy', args => {
-  $gameSystem.defeatEnemyVar(args.DefeatEnemy);
+  $gameSystem.defeatEnemyVar(Number(args.DefeatEnemy));
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookEncounteredEnemy', args => {
-  $gameSystem.encounteredEnemyVar(args.EnemyBookEncounteredEnemy);
+  $gameSystem.encounteredEnemyVar(Number(args.EncounteredEnemy));
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookCompleteRate', args => {
-  $gameSystem.completeRate(args.CompleteRate);
+  $gameSystem.completeRate(Number(args.CompleteRate));
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookDefeatEnemySum', args => {
-  $gameSystem.defeatEnemySumVar(Number(args.enemy), Number(args.DefeatEnemySum));
+  const enemyId = Number(args.enemyId);
+  if (enemyId > 0) {
+    $gameSystem.defeatEnemySumVar(enemyId, Number(args.DefeatEnemySum));
+  }
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyAnalyze', args => {
@@ -1051,7 +1066,10 @@ Game_System.prototype.removeFromEnemyBook = function(enemyId) {
     this._enemyBookFlags[enemyId] = false;
     this.dropItemListFlag(enemyId, 0, false);
     this.stealItemListFlag(enemyId, 0, false);
-    this._defeatNumber[i] = 0;
+    if (!this._defeatNumber) {
+      this.clearDefeat();
+    }
+    this._defeatNumber[enemyId] = 0;
   }
 };
 
@@ -1081,7 +1099,7 @@ Game_System.prototype.isInEnemyBook = function(enemy) {
 };
 
 Game_System.prototype.completeRate = function(val) {
-  this.setDefeatEnemy(enemyList);
+  this.setDefeatEnemy();
   const enemySum = $dataEnemies.reduce((r, enemy) => {
     return r + (enemy && enemy.name && !enemy.meta.NoBook ? 1 : 0);
   }, 0);
@@ -1111,7 +1129,7 @@ Game_System.prototype.defeatNumber = function(enemyId) {
 Game_System.prototype.setDefeatEnemy = function(enemyList) {
   const enemy = enemyList ? enemyList : $dataEnemies;
   this._defeatEnemy = enemy.reduce((r, enemy) => {
-    return r + (this.defeatNumber(enemy.id) > 0 || enemy.meta.ShowDataBook ? 1 : 0);
+    return r + (enemy && enemy.name && (this.defeatNumber(enemy.id) > 0 || enemy.meta.ShowDataBook && !enemy.meta.NoBook) ? 1 : 0);
   }, 0);
 };
 
@@ -1130,19 +1148,24 @@ Game_System.prototype.defeatEnemySumVar = function(enemy, val) {
 };
 
 Game_System.prototype.resetDefeat = function(enemyId) {
-  if(this._defeatNumber && this._defeatNumber[enemyId]) {
-    this._defeatNumber[enemyId] = 0;
+  if (!this._defeatNumber) {
+    this.clearDefeat();
+  }
+  if (enemyId > 0) {
+    if(this._defeatNumber[enemyId]) {
+      this._defeatNumber[enemyId] = 0;
+    }
+  } else {
+    for(let i = 1; $dataEnemies.length > i; i++) {
+      this._defeatNumber[i] = 0;
+    }
   }
 };
 
 Game_System.prototype.setEncounteredEnemy = function(enemyList) {
   const enemy = enemyList ? enemyList : $dataEnemies;
   this._EncounteredEnemy = enemy.reduce((r ,enemy) => {
-    if(enemyList) {
-      return r + (this.isInEnemyBook(enemy) ? 1 : 0);
-    } else {
-      return r + (this.encounteredEnemyBook(enemy) ? 1 : 0);
-    }
+    return r + (this.encounteredEnemyBook(enemy) ? 1 : 0);
   }, 0);
 };
 
@@ -1836,15 +1859,21 @@ Window_EnemyBook.prototype.refresh = function() {
   let x2 = x + this.itemWidth() / 2;
   let y = 0;
   const lineHeight = this.lineHeight();
-  
   this.contents.clear();
   if ($gameParty.inBattle() && this.selectEnemy) {
     this.removeInnerSprite(this.selectEnemy, 'hp');
     this.removeInnerSprite(this.selectEnemy, 'mp');
   }
-  if (!enemy || !$gameSystem.isInEnemyBook(this._enemy)) {
-    this._enemySprite.bitmap = null;
-    return;
+  if (this._bookMode === 0) {//通常モード
+    if (!enemy || !$gameSystem.isInEnemyBook(this._enemy)) {
+      this._enemySprite.bitmap = null;
+      return;
+    }
+  } else {//アナライズモード
+    if (!enemy) {
+      this._enemySprite.bitmap = null;
+      return;
+    }
   }
   this.enemyImg(enemy);
   this.enemyName(enemy, x, y);
@@ -2648,6 +2677,7 @@ Scene_Battle.prototype.updateEnemyBookPagedown = function() {
   const maxPage = this.setMaxPage();
   this._enemyBookEnemyWindow._pageMode = (this._enemyBookEnemyWindow._pageMode + 1) % maxPage;
   this._enemyBookEnemyWindow.refresh();
+  this._enemyBookEnemyWindow._bookMode === 0 ? this._enemyBookIndexWindow.activate() : this._enemyBookDummyWindow.activate();
 };
 
 Scene_Battle.prototype.updateEnemyBookPageup = function() {
@@ -2655,6 +2685,7 @@ Scene_Battle.prototype.updateEnemyBookPageup = function() {
   const maxPage = this.setMaxPage();
   this._enemyBookEnemyWindow._pageMode = (this._enemyBookEnemyWindow._pageMode + (maxPage - 1)) % maxPage;
   this._enemyBookEnemyWindow.refresh();
+  this._enemyBookEnemyWindow._bookMode === 0 ? this._enemyBookIndexWindow.activate() : this._enemyBookDummyWindow.activate();
 };
 
 Scene_Battle.prototype.setMaxPage = function() {

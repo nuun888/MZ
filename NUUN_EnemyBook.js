@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -74,11 +74,13 @@
  * 盗みスキル
  * 
  * 操作方法
- * 上下キー：エネミー選択
- * 左右 PgUp PgDn：ページ切り替え
+ * 上下（↑ ↓）キー：エネミー選択
+ * 左右（← →）キー ：ページ切り替え
+ * PgUp PgDnキー：エネミーページ送り
  * 
  * タッチ操作
- * <>ボタン：キャラ切り替え
+ * <>ボタン：ページ切り替え
+ * 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）
  * 
  * プラグインコマンド
  * EnemyBookOpen              図鑑を開きます。
@@ -112,6 +114,10 @@
  * 
  * 
  * 更新履歴
+ * 2021/2/15 Ver.1.0.4
+ * PageUp・PageDownキーでエネミーリストをページ送り出来る仕様に変更。なおエネミー情報ページの切り替えは左右（← →）キーのみになります。
+ * ターン制の時に図鑑を開いたとき、裏でアクションが進行してしまう問題を修正。
+ * アナライズモード以外で開くとHP,MPゲージが表示される問題を修正。
  * 2021/2/14 Ver.1.0.3
  * 戦闘中でアナライズを使用中PageUp・PageDownキーを押した後操作ができなくなる問題を修正。
  * 図鑑の登録タイミングが「撃破時」に設定している時にアナライズを使用した際、画面が空白になる問題を修正。
@@ -1460,8 +1466,8 @@ Scene_EnemyBook.prototype.createIndexWindow = function() {
   const rect = this.indexWindowRect();
   this._indexWindow = new Window_EnemyBook_Index(rect);
   this._indexWindow.setHandler("cancel", this.popScene.bind(this));
-  this._indexWindow.setHandler("pagedown", this.updateContentsPagedown.bind(this));
-  this._indexWindow.setHandler("pageup", this.updateContentsPageup.bind(this));
+  this._indexWindow.setHandler("pagedown", this.updatePageFeedPagedown.bind(this));
+  this._indexWindow.setHandler("pageup", this.updatePageFeedPageup.bind(this));
   this.addWindow(this._indexWindow);
   this._indexWindow.setPercentWindow(this._percentWindow);
   this._indexWindow.activate();
@@ -1523,6 +1529,18 @@ Scene_EnemyBook.prototype.createEnemyBookButton = function() {
     this._pageupButton.setClickHandler(this.updateContentsPageup.bind(this));
     this._pagedownButton.setClickHandler(this.updateContentsPagedown.bind(this));
   }
+};
+
+Scene_EnemyBook.prototype.updatePageFeedPagedown = function() {
+  SoundManager.playCursor();console.log(this._indexWindow.maxPageItems())
+  this._indexWindow.cursorPagedown();
+  this._indexWindow.activate();
+};
+
+Scene_EnemyBook.prototype.updatePageFeedPageup = function() {
+  SoundManager.playCursor();
+  this._indexWindow.cursorPageup();
+  this._indexWindow.activate();
 };
 
 Scene_EnemyBook.prototype.updateContentsPagedown = function() {
@@ -1765,7 +1783,6 @@ Window_EnemyBook_Index.prototype.refresh = function() {
   Window_Selectable.prototype.refresh.call(this);
 };
 
-
 //Window_EnemyBook
 function Window_EnemyBook() {
   this.initialize(...arguments);
@@ -1860,9 +1877,8 @@ Window_EnemyBook.prototype.refresh = function() {
   let y = 0;
   const lineHeight = this.lineHeight();
   this.contents.clear();
-  if ($gameParty.inBattle() && this.selectEnemy) {
-    this.removeInnerSprite(this.selectEnemy, 'hp');
-    this.removeInnerSprite(this.selectEnemy, 'mp');
+  if ($gameParty.inBattle()) {
+    this.removeGauge();
   }
   if (this._bookMode === 0) {//通常モード
     if (!enemy || !$gameSystem.isInEnemyBook(this._enemy)) {
@@ -2478,14 +2494,20 @@ Window_EnemyBook.prototype.createInnerSprite = function(key, spriteClass) {
   return sprite;
 };
 
-Window_EnemyBook.prototype.removeInnerSprite = function(enemy, type) {
-  const key = "enemyBook-gauge-%2".format(enemy.enemyId(), type);
+Window_EnemyBook.prototype.removeInnerSprite = function(type) {
+  const key = "enemyBook-gauge-%2".format(null, type);
   const dict = this._additionalSprites;
   if (dict[key]) {
     this._clientArea.removeChild(dict[key]);
     dict[key] = null;
   }
 };
+
+Window_EnemyBook.prototype.removeGauge = function() {
+  this.removeInnerSprite('hp');
+  this.removeInnerSprite('mp');
+};
+
 
 Window_EnemyBook.prototype.currencyUnit = function() {
   return TextManager.currencyUnit;
@@ -2517,8 +2539,8 @@ Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
   const rect = this.enemyBookIndexWindowRect();
   this._enemyBookIndexWindow = new Window_EnemyBook_Index(rect);
   this._enemyBookIndexWindow.setHandler("cancel", this.cancelEnemyBook.bind(this));
-  this._enemyBookIndexWindow.setHandler("pagedown", this.updateEnemyBookPagedown.bind(this));
-  this._enemyBookIndexWindow.setHandler("pageup", this.updateEnemyBookPageup.bind(this));
+  this._enemyBookIndexWindow.setHandler("pagedown", this.updatePageFeedPagedown.bind(this));
+  this._enemyBookIndexWindow.setHandler("pageup", this.updatePageFeedPageup.bind(this));
   this.addWindow(this._enemyBookIndexWindow);
   this._enemyBookIndexWindow.setPercentWindow(this._enemyBookPercentWindow);
   this._enemyBookIndexWindow.hide();
@@ -2528,8 +2550,6 @@ Scene_Battle.prototype.createEnemyBookDummyWindow = function() {
   const rect = this.dummyEnemyBookWindowRect();
   this._enemyBookDummyWindow = new Window_EnemyBook_Dummy(rect);
   this._enemyBookDummyWindow.setHandler("cancel", this.cancelEnemyBook.bind(this));
-  this._enemyBookDummyWindow.setHandler("pagedown", this.updateEnemyBookPagedown.bind(this));
-  this._enemyBookDummyWindow.setHandler("pageup", this.updateEnemyBookPageup.bind(this));
   this.addWindow(this._enemyBookDummyWindow);
   this._enemyBookDummyWindow.hide();
 };
@@ -2663,6 +2683,18 @@ Scene_Battle.prototype.createEnemyBookButton = function() {
   }
 };
 
+Scene_Battle.prototype.updatePageFeedPagedown = function() {
+  SoundManager.playCursor();
+  this._enemyBookIndexWindow.cursorPagedown();
+  this._enemyBookIndexWindow.activate();
+};
+
+Scene_Battle.prototype.updatePageFeedPageup = function() {
+  SoundManager.playCursor();
+  this._enemyBookIndexWindow.cursorPageup();
+  this._enemyBookIndexWindow.activate();
+};
+
 Scene_Battle.prototype.updatePageupdownButton = function() {
   if (this._pageupButton && this._pagedownButton) {
     this._pageupButton.visible = this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active ? true : false;
@@ -2761,6 +2793,24 @@ Window_PartyCommand.prototype.makeCommandList = function() {
   }
 };
 
+const _BattleManager_isBusy = BattleManager.isBusy;
+BattleManager.isBusy = function() {
+  return this.enemyBookIsBusy() || _BattleManager_isBusy.call(this);
+};
+
+BattleManager.enemyBookIsBusy = function() {
+  return openAnalyze;
+};
+
+const _Game_Interpreter_command357 = Game_Interpreter.prototype.command357;
+Game_Interpreter.prototype.command357 = function(params) {
+  const reply = _Game_Interpreter_command357.call(this, params);
+  if (params[0] === "NUUN_EnemyBook" && params[1] === "EnemyAnalyze" && reply) {
+    this.wait(1);
+  }
+  return reply;
+};
+
 function Window_EnemyBook_Dummy() {
   this.initialize(...arguments);
 }
@@ -2772,7 +2822,6 @@ Window_EnemyBook_Dummy.prototype.initialize = function(rect) {
   Window_Selectable.prototype.initialize.call(this, rect);
   this.opacity = 0;
 };
-
 
 function Sprite_EnemyBookGauge() {
   this.initialize(...arguments);

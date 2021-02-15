@@ -1466,8 +1466,6 @@ Scene_EnemyBook.prototype.createIndexWindow = function() {
   const rect = this.indexWindowRect();
   this._indexWindow = new Window_EnemyBook_Index(rect);
   this._indexWindow.setHandler("cancel", this.popScene.bind(this));
-  this._indexWindow.setHandler("pagedown", this.updatePageFeedPagedown.bind(this));
-  this._indexWindow.setHandler("pageup", this.updatePageFeedPageup.bind(this));
   this.addWindow(this._indexWindow);
   this._indexWindow.setPercentWindow(this._percentWindow);
   this._indexWindow.activate();
@@ -1529,18 +1527,6 @@ Scene_EnemyBook.prototype.createEnemyBookButton = function() {
     this._pageupButton.setClickHandler(this.updateContentsPageup.bind(this));
     this._pagedownButton.setClickHandler(this.updateContentsPagedown.bind(this));
   }
-};
-
-Scene_EnemyBook.prototype.updatePageFeedPagedown = function() {
-  SoundManager.playCursor();console.log(this._indexWindow.maxPageItems())
-  this._indexWindow.cursorPagedown();
-  this._indexWindow.activate();
-};
-
-Scene_EnemyBook.prototype.updatePageFeedPageup = function() {
-  SoundManager.playCursor();
-  this._indexWindow.cursorPageup();
-  this._indexWindow.activate();
 };
 
 Scene_EnemyBook.prototype.updateContentsPagedown = function() {
@@ -2539,8 +2525,6 @@ Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
   const rect = this.enemyBookIndexWindowRect();
   this._enemyBookIndexWindow = new Window_EnemyBook_Index(rect);
   this._enemyBookIndexWindow.setHandler("cancel", this.cancelEnemyBook.bind(this));
-  this._enemyBookIndexWindow.setHandler("pagedown", this.updatePageFeedPagedown.bind(this));
-  this._enemyBookIndexWindow.setHandler("pageup", this.updatePageFeedPageup.bind(this));
   this.addWindow(this._enemyBookIndexWindow);
   this._enemyBookIndexWindow.setPercentWindow(this._enemyBookPercentWindow);
   this._enemyBookIndexWindow.hide();
@@ -2681,18 +2665,6 @@ Scene_Battle.prototype.createEnemyBookButton = function() {
     this._pagedownButton.setClickHandler(this.updateEnemyBookPagedown.bind(this));
     this.updatePageupdownButton();
   }
-};
-
-Scene_Battle.prototype.updatePageFeedPagedown = function() {
-  SoundManager.playCursor();
-  this._enemyBookIndexWindow.cursorPagedown();
-  this._enemyBookIndexWindow.activate();
-};
-
-Scene_Battle.prototype.updatePageFeedPageup = function() {
-  SoundManager.playCursor();
-  this._enemyBookIndexWindow.cursorPageup();
-  this._enemyBookIndexWindow.activate();
 };
 
 Scene_Battle.prototype.updatePageupdownButton = function() {

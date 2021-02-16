@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * ステータス画面に追加能力値、特殊能力値、属性有効度、ステート有効度、独自のパラメータを表示させます。
@@ -18,6 +18,10 @@
  * デフォルト設定では１ページ目に基本能力値、装備
  * ２ページ目に追加能力値、特殊能力値
  * ３ページ目に属性有効度、ステート有効度となっています。
+ * 
+ * 独自のパラメータ
+ * this._actor 表示中のアクターのゲームデータ
+ * actor 表示中のアクターのデータベース
  * 
  * キーボード操作
  * QWキー　キャラ切り替え
@@ -32,6 +36,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/17 Ver.1.3.2
+ * アクター立ち絵の拡大率が100以外の時に画像X座標がずれいてた問題を修正。
+ * CharacterPictureManager.jsの機能で立ち絵画像を表示させた際に基本ステータスの背後に来るように修正。
  * 2021/2/16 Ver.1.3.1
  * Scene_Base.prototype.isBottomButtonModeで設定を変更した際、ウィンドウがずれる問題を修正。
  * アクター立ち絵の拡大率が100以外の時に画像座標が下基準になっていなかったのを修正。
@@ -530,6 +537,7 @@ Scene_Status.prototype.initialize = function() {
 Scene_Status.prototype.create = function() {
   Scene_MenuBase.prototype.create.call(this);
   this.createStatusWindow();
+  this.createStatusBasicWindow();
   this.createStatusContentWindow();
   this.createProfileWindow();
   this.createStatusButton();
@@ -543,6 +551,14 @@ Scene_Status.prototype.createStatusWindow = function() {
     this._statusWindow.frameVisible = false;
   }
   this.maxPage = maxPages();
+};
+
+Scene_Status.prototype.createStatusBasicWindow = function() {
+  const rect = this.statusWindowRect();
+  this._basicWindow = new Window_Basic(rect);
+  this._basicWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
+  this._basicWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
+  this.addChild(this._basicWindow);
 };
 
 Scene_Status.prototype.createStatusContentWindow = function() {
@@ -641,7 +657,7 @@ Scene_Status.prototype.statusContenWidth = function() {
 Scene_Status.prototype.refreshActor = function() {
   const actor = this.actor();
   this._profileWindow.setText(actor.profile());
-  this._statusWindow.setActor(actor);
+  this._basicWindow.setActor(actor);
   this._leftContentWindow.setActor(actor);
   this._rightContentWindow.setActor(actor);
   this.updatePage();
@@ -662,8 +678,8 @@ Scene_Status.prototype.updateContentsPageup = function() {
 };
 
 Scene_Status.prototype.updatePage = function() {
-  this._statusWindow.contents.clear();
-  this._statusWindow.refresh();
+  this._basicWindow.contents.clear();
+  this._basicWindow.refresh();
   this.refreshPage();
 };
 
@@ -731,16 +747,7 @@ Window_StatusBase.prototype.statusParamDecimal = function(val) {
 
 Window_Status.prototype.refresh = function() {
   Window_StatusBase.prototype.refresh.call(this);
-  if (this._actor) {
-    const index = this._actor.index();
-    this._imgDate = this._actorImgDate[index];
-    this.bitmap = this._imgDate ? this._imgDate.bitmap : null;
-    if ((this._imgDate && this.bitmap._url) && !this.bitmap.isReady()) {
-      this.bitmap.addLoadListener(this.drawBlocks.bind(this));
-    } else {
-      this.drawBlocks();
-    }
-  }
+
 };
 
 Window_Status.prototype.drawBlocks = function() {
@@ -753,14 +760,14 @@ Window_Status.prototype.actorImg = function() {
   if(this._imgDate && this.bitmap._url) {
     const date = this._imgDate;
     let x = date.Actor_X;
-    if(param.actorPosition === 0) {
-      x += 24;
-    } else if (param.actorPosition === 1) {
-      x += Math.floor(Graphics.boxWidth / 2 - (this.bitmap.width / 2));
-    } else {
-      x += Graphics.boxWidth - this.bitmap.width - 24;
-    }
     const scale = (date.Actor_Scale || 100) / 100;
+    if(param.actorPosition === 0) {
+      x += 0;
+    } else if (param.actorPosition === 1) {
+      x += Math.floor(this.width / 2 - ((this.bitmap.width * scale) / 2));
+    } else {
+      x += this.width - (this.bitmap.width * scale) - 24;
+    }
     const dw = this.bitmap.width * scale;
     const dh = this.bitmap.height * scale;
     const y = date.Actor_Y + (this.height - (this.bitmap.height * scale)) - 24;
@@ -841,6 +848,33 @@ Window_Status.prototype.characterSwitchingHelp = function(x, y) {
 	this.drawText(text +"←→キー:項目の切替", x, y + lineHeight, 300,'right');
 	this.resetTextColor();
 	this.contents.fontSize = $gameSystem.mainFontSize();
+};
+
+function Window_Basic() {
+  this.initialize(...arguments);
+}
+
+Window_Basic.prototype = Object.create(Window_Status.prototype);
+Window_Basic.prototype.constructor = Window_Basic;
+
+Window_Basic.prototype.initialize = function(rect) {
+  Window_Status.prototype.initialize.call(this, rect);
+  this.opacity = 0;
+  this.frameVisible = false;
+};
+
+Window_Basic.prototype.refresh = function() {
+  Window_StatusBase.prototype.refresh.call(this);
+  if (this._actor) {
+    const index = this._actor.index();
+    this._imgDate = this._actorImgDate[index];
+    this.bitmap = this._imgDate ? this._imgDate.bitmap : null;
+    if ((this._imgDate && this.bitmap._url) && !this.bitmap.isReady()) {
+      this.bitmap.addLoadListener(this.drawBlocks.bind(this));
+    } else {
+      this.drawBlocks();
+    }
+  }
 };
 
 
@@ -1078,6 +1112,7 @@ Window_Content.prototype.drawState = function(rect) {
 };
 
 Window_Content.prototype.OriginalParam1 = function(rect) {
+  const actor = this._actor.actor();
   const lineHeight = this.lineHeight();
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(param.OriginalParam1Name, rect.x, rect.y, rect.width);
@@ -1099,6 +1134,7 @@ Window_Content.prototype.OriginalParam1 = function(rect) {
 };
 
 Window_Content.prototype.OriginalParam2 = function(rect) {
+  const actor = this._actor.actor();
   const lineHeight = this.lineHeight();
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(param.OriginalParam2Name, rect.x, rect.y, rect.width);

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.4
+ * @version 1.0.5
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -114,6 +114,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/2/16 Ver.1.0.5
+ * Scene_Base.prototype.isBottomHelpMode、Scene_Base.prototype.isBottomButtonMode、Scene_Base.prototype.isRightInputModeで設定の反映するように修正。
  * 2021/2/15 Ver.1.0.4
  * PageUp・PageDownキーでエネミーリストをページ送り出来る仕様に変更。なおエネミー情報ページの切り替えは左右（← →）キーのみになります。
  * ターン制の時に図鑑を開いたとき、裏でアクションが進行してしまう問題を修正。
@@ -1497,7 +1499,7 @@ Scene_EnemyBook.prototype.indexWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
   const wy = this.mainAreaTop() + this._percentWindow.height;
   const ww = Graphics.boxWidth / 3;
-  const wh = Graphics.boxHeight - wy;
+  const wh = this.mainAreaHeight() - this._percentWindow.height;
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -1505,12 +1507,16 @@ Scene_EnemyBook.prototype.enemyWindowRect = function() {
   const wx = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
   const wy = this.mainAreaTop();
   const ww = this.enemyWindowWidth();
-  const wh = Graphics.boxHeight - wy;
+  const wh = this.mainAreaHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_EnemyBook.prototype.enemyWindowWidth = function() {
   return Graphics.boxWidth - Graphics.boxWidth / 3;
+};
+
+Scene_EnemyBook.prototype.helpAreaHeight = function() {
+  return 0;
 };
 
 Scene_EnemyBook.prototype.createEnemyBookButton = function() {
@@ -2548,7 +2554,7 @@ Scene_Battle.prototype.createEnemyBookEnemyWindow = function() {
 
 Scene_Battle.prototype.percentEnemyBookWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
-  const wy = Scene_MenuBase.prototype.mainAreaTop();
+  const wy = this.enemyBookMainAreaTop();
   const ww = Graphics.boxWidth / 3;
   const wh = this.calcWindowHeight(1, true);
   return new Rectangle(wx, wy, ww, wh);
@@ -2566,7 +2572,7 @@ Scene_Battle.prototype.enemyBookIndexWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
   const wy = this._enemyBookPercentWindow.y + this._enemyBookPercentWindow.height;
   const ww = Graphics.boxWidth / 3;
-  const wh = Graphics.boxHeight - wy;
+  const wh = this.enemyBookMainAreaHeight() - this._enemyBookPercentWindow.height;
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -2574,7 +2580,7 @@ Scene_Battle.prototype.enemyBookWindowRect = function() {
   const wx = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
   const wy = this._enemyBookPercentWindow.y;
   const ww = this.enemyBookWindowWidth();
-  const wh = Graphics.boxHeight - wy;
+  const wh = this.enemyBookMainAreaHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -2735,6 +2741,14 @@ Scene_Battle.prototype.isAnyInputWindowActive = function() {
 const _Scene_Battle_isTimeActive = Scene_Battle.prototype.isTimeActive;
 Scene_Battle.prototype.isTimeActive = function() {
   return !this._enemyBookIndexWindow.active && !this._enemyBookDummyWindow.active && _Scene_Battle_isTimeActive.call(this);
+};
+
+Scene_Battle.prototype.enemyBookMainAreaTop = function() {
+  return this.buttonAreaHeight();
+};
+
+Scene_Battle.prototype.enemyBookMainAreaHeight = function() {
+  return Graphics.boxHeight - this.buttonAreaHeight();
 };
 
 Scene_Battle.prototype.userWindowDeactivate = function() {//暫定競合対策

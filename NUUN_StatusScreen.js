@@ -5,43 +5,12 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- * 
- * 更新履歴
- * 2021/1/24 Ver.1.3.0
- *  独自パラメータを表示できる機能を追加。
- * 2021/1/9 Ver.1.2.0
- *  各項目の設定方法を変更。
- * 2020/12/28 Ver.1.1.2
- *  立ち絵の座標処理を修正。
- * 2020/12/8 Ver.1.1.1
- *  最大レベル時の次のレベルまでの経験値表示のゲージMAXで100％で表示するように修正。
- * 2020/12/7 Ver.1.1.0
- *  次のレベルまでの経験値表示を百分率表示に出来るよう対応。
- * 2020/11/26 Ver.1.0.7
- *  特殊パラメータでSparamIdを3に設定し、SparamNameを空欄の状態でステータス画面を開くと
- *  本来「薬の知識」が出るところ「回復効果率」と表示されてしまう問題を修正。
- * 2020/11/23 Ver.1.0.6
- *  立ち絵を表示位置を左、中央、右から選択し配置出来る機能を追加。
- * 2020/11/22 Ver.1.0.5
- *  背景画像を指定できる機能を追加。
- * 2020/11/19 Ver.1.0.4
- *  解像度とUIのサイズが違う場合に、ステータス詳細項目がウィンドウ外にずれる問題や、他のステータス項目と
- *  表示が被る問題を修正。
- * 2020/11/18 Ver.1.0.3
- *  ステータス詳細項目が画面からはみ出た際、項目名が正常に表示されない問題を修正。
- *  一部処理を変更。
- * 2020/11/18 Ver.1.0.2
- *  表示外の少数点を四捨五入か切り捨てで丸める機能を追加。
- * 2020/11/17 Ver.1.0.1 
- *  追加能力値、特殊能力値、属性有効度、ステート有効度の表示できる小数点の桁数を指定できる機能を追加。
- *  ページの切り替えをタッチ操作でも行えるように対応。
- * 2020/11/16 Ver.1.0.0
- *  初版
  */
 /*:
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
+ * @version 1.3.1
  * 
  * @help
  * ステータス画面に追加能力値、特殊能力値、属性有効度、ステート有効度、独自のパラメータを表示させます。
@@ -61,6 +30,41 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/2/16 Ver.1.3.1
+ * Scene_Base.prototype.isBottomButtonModeで設定を変更した際、ウィンドウがずれる問題を修正。
+ * アクター立ち絵の拡大率が100以外の時に画像座標が下基準になっていなかったのを修正。
+ * 2021/1/24 Ver.1.3.0
+ * 独自パラメータを表示できる機能を追加。
+ * 2021/1/9 Ver.1.2.0
+ * 各項目の設定方法を変更。
+ * 2020/12/28 Ver.1.1.2
+ * 立ち絵の座標処理を修正。
+ * 2020/12/8 Ver.1.1.1
+ * 最大レベル時の次のレベルまでの経験値表示のゲージMAXで100％で表示するように修正。
+ * 2020/12/7 Ver.1.1.0
+ * 次のレベルまでの経験値表示を百分率表示に出来るよう対応。
+ * 2020/11/26 Ver.1.0.7
+ * 特殊パラメータでSparamIdを3に設定し、SparamNameを空欄の状態でステータス画面を開くと
+ * 本来「薬の知識」が出るところ「回復効果率」と表示されてしまう問題を修正。
+ * 2020/11/23 Ver.1.0.6
+ * 立ち絵を表示位置を左、中央、右から選択し配置出来る機能を追加。
+ * 2020/11/22 Ver.1.0.5
+ * 背景画像を指定できる機能を追加。
+ * 2020/11/19 Ver.1.0.4
+ * 解像度とUIのサイズが違う場合に、ステータス詳細項目がウィンドウ外にずれる問題や、他のステータス項目と
+ * 表示が被る問題を修正。
+ * 2020/11/18 Ver.1.0.3
+ * ステータス詳細項目が画面からはみ出た際、項目名が正常に表示されない問題を修正。
+ * 一部処理を変更。
+ * 2020/11/18 Ver.1.0.2
+ * 表示外の少数点を四捨五入か切り捨てで丸める機能を追加。
+ * 2020/11/17 Ver.1.0.1 
+ * 追加能力値、特殊能力値、属性有効度、ステート有効度の表示できる小数点の桁数を指定できる機能を追加。
+ * ページの切り替えをタッチ操作でも行えるように対応。
+ * 2020/11/16 Ver.1.0.0
+ * 初版
  * 
  * @param Window
  * @text ウィンドウ設定 
@@ -554,7 +558,7 @@ Scene_Status.prototype.statusWindowRect = function() {
   const wx = 0;
   const wy = this.mainAreaTop();
   const ww = Graphics.boxWidth;
-  const wh = Graphics.boxHeight - wy;
+  const wh = this.mainAreaHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -620,12 +624,12 @@ Scene_Status.prototype.createBackground = function() {
 };
 
 Scene_Status.prototype.statusHeight = function() {
-  const row = Math.floor((Graphics.boxHeight - this.mainAreaTop() - 564) / 60);
+  const row = Math.floor((this.mainAreaHeight() - 564) / 60);
   return this.calcWindowHeight(5 + row, false) + 4;
 };
 
 Scene_Status.prototype.statusParamsHeight = function() {
-  const height = Graphics.boxHeight - (this.mainAreaTop() + this.statusHeight() + this.profileHeight());
+  const height = this.mainAreaHeight() - (this.statusHeight() + this.profileHeight());
   const row = Math.floor(height / 36);
   return this.calcWindowHeight(row, false);
 };
@@ -756,10 +760,10 @@ Window_Status.prototype.actorImg = function() {
     } else {
       x += Graphics.boxWidth - this.bitmap.width - 24;
     }
-    const y = date.Actor_Y + (Graphics.boxHeight - this.bitmap.height) - this.y - 24;
     const scale = (date.Actor_Scale || 100) / 100;
     const dw = this.bitmap.width * scale;
     const dh = this.bitmap.height * scale;
+    const y = date.Actor_Y + (this.height - (this.bitmap.height * scale)) - 24;
     this.contents.blt(this.bitmap, 0, 0, this.bitmap.width, this.bitmap.height, x, y, dw, dh);
   }
 };

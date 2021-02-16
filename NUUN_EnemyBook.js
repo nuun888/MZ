@@ -115,7 +115,7 @@
  * 
  * 更新履歴
  * 2021/2/16 Ver.1.0.5
- * Scene_Base.prototype.isBottomHelpMode、Scene_Base.prototype.isBottomButtonMode、Scene_Base.prototype.isRightInputModeで設定の反映するように修正。
+ * Scene_Base.prototype.isBottomHelpMode、Scene_Base.prototype.isBottomButtonModeで設定の反映するように修正。
  * 2021/2/15 Ver.1.0.4
  * PageUp・PageDownキーでエネミーリストをページ送り出来る仕様に変更。なおエネミー情報ページの切り替えは左右（← →）キーのみになります。
  * ターン制の時に図鑑を開いたとき、裏でアクションが進行してしまう問題を修正。

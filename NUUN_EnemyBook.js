@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.5
+ * @version 1.0.6
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -88,6 +88,7 @@
  * EnemyBookRemove            エネミーを図鑑から削除します。
  * EnemyBookComplete          図鑑を完成させます。
  * EnemyBookClear             図鑑をクリア（全削除）させます。
+ * EnemyBookAddDefeat         エネミーを撃破済みにします。
  * EnemyBookRemoveDefeat      エネミーの撃破数をリセットします。
  * EnemyBookGetDropItem       エネミーのドロップアイテムを取得済みにさせます。
  * EnemyBookRemoveDropItem    エネミーのドロップアイテムを未収得にさせます。
@@ -114,6 +115,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/2/18 Ver.1.0.6
+ * 戦闘中のモンスター図鑑の表示スイッチをメニューコマンドと別に変更。
+ * プラグインコマンドに「エネミーを撃破済みにする」を追加。
  * 2021/2/16 Ver.1.0.5
  * Scene_Base.prototype.isBottomHelpMode、Scene_Base.prototype.isBottomButtonModeで設定の反映するように修正。
  * 2021/2/15 Ver.1.0.4
@@ -162,6 +166,15 @@
  * @command EnemyBookClear
  * @desc 図鑑をクリア（消去）します。
  * @text 図鑑初期化
+ * 
+ * @command EnemyBookAddDefeat
+ * @desc エネミーを撃破済みにします。
+ * @text エネミー撃破済み
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc エネミーIDを指定します。
  *  
  * @command EnemyBookRemoveDefeat
  * @desc エネミーの撃破数をリセットします。(0で全てのエネミーの撃破数をリセットします)
@@ -473,6 +486,13 @@
  * @default false
  * @parent CommandData
  * 
+ * @param enemyBookSwitch 
+ * @desc 表示させるフラグスイッチID
+ * @text メニューコマンド表示スイッチ
+ * @type switch
+ * @default 0
+ * @parent CommandData
+ * 
  * @param ShowBattleCommand
  * @desc 戦闘中のパーティコマンドにエネミー図鑑を追加します。
  * @text パーティコマンド表示
@@ -480,9 +500,9 @@
  * @default false
  * @parent CommandData
  * 
- * @param enemyBookSwitch 
- * @desc 表示させるフラグスイッチID
- * @text メニューコマンド表示スイッチ
+ * @param enemyBookBattleSwitch
+ * @desc 戦闘中に表示させるフラグスイッチID
+ * @text パーティコマンド表示スイッチ
  * @type switch
  * @default 0
  * @parent CommandData
@@ -1008,6 +1028,13 @@ PluginManager.registerCommand(pluginName, 'EnemyBookClear', args => {
   $gameSystem.clearEnemyBook();
 });
 
+PluginManager.registerCommand(pluginName, 'EnemyBookAddDefeat', args => {
+  const enemyId = Number(args.enemyId);
+  if (enemyId > 0) {
+    $gameSystem.addDefeat(enemyId);
+  }
+});
+
 PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDefeat', args => {
   $gameSystem.resetDefeat(Number(args.enemyId));
 });
@@ -1153,6 +1180,15 @@ Game_System.prototype.defeatEnemyVar = function(val) {
 
 Game_System.prototype.defeatEnemySumVar = function(enemy, val) {
   $gameVariables.setValue(val, this.defeatNumber(enemy));
+};
+
+Game_System.prototype.addDefeat = function(enemy) {
+  if (!this.isInEnemyBook(enemy)) {
+    this.addToEnemyBook(enemy)
+  }
+  if (this.defeatNumber(enemy) <= 0) {
+    this.defeatCount(enemy);
+  }
 };
 
 Game_System.prototype.resetDefeat = function(enemyId) {
@@ -2772,9 +2808,9 @@ Window_Selectable.prototype.isOpenAndActive = function() {
 };
 
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
-Window_PartyCommand.prototype.makeCommandList = function() {
+Window_PartyCommand.prototype.makeCommandList = function() {//enemyBookBattleSwitch
   _Window_PartyCommand_makeCommandList.call(this);
-  if (param.ShowBattleCommand && ($gameSwitches.value(param.enemyBookSwitch) || param.enemyBookSwitch === 0)) {
+  if (param.ShowBattleCommand && ($gameSwitches.value(param.enemyBookBattleSwitch) || param.enemyBookBattleSwitch === 0)) {
     this.addCommand(param.CommandName, "enemyBook");
   }
 };

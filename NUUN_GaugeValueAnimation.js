@@ -7,6 +7,8 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/2/19 Ver.1.1.0
+ * 特定のゲージの数値をアニメーションさせない機能を追加。
  * 2021/1/26 Ver.1.0.1
  * プラグインパラメータの方式を変更。
  * ゲージ、数値のアニメーション時間を個別に設定できるよ機能を追加。
@@ -21,11 +23,11 @@
  * @version 1.0.1
  * 
  * @help
- * ゲージの数値の増減をアニメーションさせます。
- * 例えば３００のダメージを受けた場合、数値変化の更新フレームが６０の場合
- * １フレームごとに５ずつ数値が減りながら表示されます。
- * 
- * 通常マップ上ではゲージはアニメーションせずに増減しますが、このプラグインではマップ上でもゲージの増減をアニメーションさせます。
+ * ダメージや回復、消費などのゲージに表示されている数値が変化する時、デフォルトでは一瞬で変化後の
+ * 数値に変化します。
+ * このプラグインではゲージの数値でアニメーションで増減させて表示させます。デフォルトでは２０フレームかけて数値を徐々に変化させます。
+ * またマップ上ではゲージの変化はアニメーションをせずに変化してしまいますが、このプラグインではゲージ、数値ともに徐々に変化するようになります。
+ * ゲージの数値のアニメーションをさせない場合は、該当のプラグインパラメータの「OnUpdateValue」（数値変化アニメーショ）の値をfalseに設定してください。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -49,6 +51,12 @@
  * @text ゲージ及び数値更新フレーム
  * @type number
  * @default 20
+ * 
+ * @param OnUpdateValue
+ * @desc 数値変化のアニメーションを有効にします。
+ * @text 数値変化アニメーション
+ * @type boolean
+ * @default true
  * 
  */
 
@@ -119,7 +127,8 @@ Imported.NUUN_GaugeValueAnimation = true;
 
   Sprite_Gauge.prototype.currentValueMove = function(currentValue) {
     if (this._moveDelay === 0) {
-      this._moveDelay = (currentValue - this._moveValue) / this.smoothness();
+      const find = this.getFlameStatus();
+      this._moveDelay = (currentValue - this._moveValue) / (find && find.OnUpdateValue ? this.smoothness() : 1);
     }
     if (this._moveValue > currentValue) {
       this._moveValue += this._moveDelay;

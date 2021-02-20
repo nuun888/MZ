@@ -76,6 +76,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/20 Ver 1.1.1
+ * 盗み成功率の割合増減が正常に取得できていなかった問題を修正。
  * 2021/2/5 Ver 1.1.0
  * 盗みの抵抗実装。
  * 2021/1/24 Ver 1.0.1
@@ -283,7 +285,7 @@ Game_Action.prototype.stolenItem = function(target, mode){
 		this.subject().keepStolenItem(item);
 	} else if(mode === 2){
 		const stolenGold = this.lostStolenGoldMode();
-		const rate = (Number(stolenGold[0]) + this.subject().stealBoost()) * target.stealPercentBoost();
+		const rate = (Number(stolenGold[0]) + this.subject().stealBoost()) * this.subject().stealPercentBoost();
 		item = this.lostStolenGold(target, rate, stolenGold);
 		this.subject().keepStolenGold(item);
 	}
@@ -378,12 +380,12 @@ Game_Action.prototype.getStolenItemList = function(target, rate){
 
 Game_Action.prototype.stealRate = function(target){
 	const rate = Number(this.item().meta.stealSkill);
-	return (rate + this.subject().stealBoost()) * target.stealPercentBoost();
+	return (rate + this.subject().stealBoost()) * this.subject().stealPercentBoost();
 };
 
 Game_Action.prototype.stealGoldRate = function(target){
 	const rate = Number(this.item().meta.goldStealSkill);
-	return (rate + this.subject().stealBoost()) * target.stealPercentBoost();
+	return (rate + this.subject().stealBoost()) * this.subject().stealPercentBoost();
 };
 
 

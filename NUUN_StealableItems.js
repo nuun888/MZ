@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 敵からアイテムやお金を盗むスキルまたは、敵からアイテム、お金を盗まれるスキルを

@@ -64,7 +64,7 @@
 [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>
 アイテムのカテゴリーをカスタマイズ（追加したり減らしたり）できます。<br>
 [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)　モンスター図鑑<br>
-モンスター図鑑を実装します。<br>
+モンスター図鑑を実装します。[詳細](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)<br>
 [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)　コマンドカスタマイズ<br>
 コマンドにアイコンや色を指定できます。コマンドの文字の表示を左揃え、中央揃え、右揃えから選択できます。<br>
 [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)　ステータス画面スタイル変更<br>

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * 
  * @help
  * ステータス画面に追加能力値、特殊能力値、属性有効度、ステート有効度、独自のパラメータを表示させます。
@@ -18,6 +18,14 @@
  * デフォルト設定では１ページ目に基本能力値、装備
  * ２ページ目に追加能力値、特殊能力値
  * ３ページ目に属性有効度、ステート有効度となっています。
+ * 
+ * 追加パラメータ
+ * 0:命中 1:回避 2:会心 3:会心回避 4:魔法回避 5:魔法反射 6:反撃 7:HP再生 8:MP再生 9:TP再生
+ * 上記の数値以外を記入することで独自のパラメータを表示できます。なお「XparamEval」に記入している場合は評価式が優先されます。
+ * 
+ * 特殊パラメータ
+ * 0:狙われ率 1:防御効果率 2:回復効果率 3:薬の知識 4:MP消費率 5:TPチャージ率 6:物理ダメージ率 7:魔法ダメージ率 8:床ダメージ率 9:経験獲得値率
+ * 上記の数値以外を記入することで独自のパラメータを表示できます。なお「SparamEval」に記入している場合は評価式が優先されます。
  * 
  * 独自のパラメータ
  * this._actor 表示中のアクターのゲームデータ
@@ -36,9 +44,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/20 Ver.1.3.3
+ * 追加パラメータ、特殊パラメータに任意のパラメータを追加できる機能を追加。
  * 2021/2/17 Ver.1.3.2
  * アクター立ち絵の拡大率が100以外の時に画像X座標がずれいてた問題を修正。
- * CharacterPictureManager.jsの機能で立ち絵画像を表示させた際に基本ステータスの背後に来るように修正。
  * 2021/2/16 Ver.1.3.1
  * Scene_Base.prototype.isBottomButtonModeで設定を変更した際、ウィンドウがずれる問題を修正。
  * アクター立ち絵の拡大率が100以外の時に画像座標が下基準になっていなかったのを修正。
@@ -452,16 +461,28 @@
  * @param XparamId
  * @desc 0:命中 1:回避 2:会心 3:会心回避 4:魔法回避 5:魔法反射 6:反撃 7:HP再生 8:MP再生 9:TP再生
  * @type number
+ * 
+ * @param XparamEval
+ * @desc 追加パラメータを評価式で表示します。
+ * @text 追加パラメータ評価式
+ * @type string
+ * @default 
  */
 /*~struct~SparamData:
  *
  * @param SparamName
- * @desc 追加能力値の用語を設定します。
+ * @desc 特殊能力値の用語を設定します。
  * @type string
  *
  * @param SparamId
  * @desc 0:狙われ 1:防御効果 2:回復効果 3:薬知識 4:MP消費 5:TPチャージ 6:物理ダメージ 7:魔法ダメージ 8:床ダメージ 9:経験獲得
  * @type number
+ * 
+ * @param SparamEval
+ * @desc パラメータを評価式で表示します。
+ * @text 特殊パラメータ評価式
+ * @type string
+ * @default 
  */
 /*~struct~ElementData:
  *
@@ -971,7 +992,7 @@ Window_Content.prototype.drawXParams = function(rect) {
     itemRect.y += lineHeight;
     let paramId = param.Xparam[i].XparamId;
     let name = this.XparamName(i);
-    let value = this._actor.xparam(paramId) * 100;
+    let value = (param.Xparam[i].XparamEval ? eval(param.Xparam[i].XparamEval) : this._actor.xparam(paramId) * 100);
     value = this.statusParamDecimal(value);
     this.drawItemBackground(i);
     this.changeTextColor(ColorManager.systemColor());
@@ -1003,8 +1024,9 @@ Window_Content.prototype.XparamName = function(index) {
       return param.Xparam[index].XparamName ? param.Xparam[index].XparamName : "ＭＰ再生率";
     case 9:
       return param.Xparam[index].XparamName ? param.Xparam[index].XparamName : "ＴＰ再生率";
+    default :
+      return param.Xparam[index].XparamName ? param.Xparam[index].XparamName : null;
   }
-  return null;
 };
 
 Window_Content.prototype.drawSParams = function(rect) {
@@ -1017,7 +1039,7 @@ Window_Content.prototype.drawSParams = function(rect) {
     itemRect.y += lineHeight;
     let paramId = param.Sparam[i].SparamId;
     let name = this.SparamName(i);
-    let value = this._actor.sparam(paramId) * 100;
+    let value = (param.Sparam[i].SparamEval ? eval(param.Sparam[i].SparamEval) : this._actor.sparam(paramId) * 100);
     value = this.statusParamDecimal(value);
     this.drawItemBackground(i);
     this.changeTextColor(ColorManager.systemColor());
@@ -1049,8 +1071,9 @@ Window_Content.prototype.SparamName = function(index) {
       return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : "床ダメージ率";
     case 9:
       return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : "経験獲得率";
+    default :
+      return param.Sparam[index].SparamName ? param.Sparam[index].SparamName : null;
   }
-  return null;
 };
 
 Window_Content.prototype.drawElement = function(rect) {

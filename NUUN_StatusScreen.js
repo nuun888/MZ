@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 1.3.3
+ * @version 1.3.4
  * 
  * @help
  * ステータス画面に追加能力値、特殊能力値、属性有効度、ステート有効度、独自のパラメータを表示させます。
@@ -44,6 +44,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/21 Ver.1.3.4
+ * 追加パラメータ、特殊パラメータ、独自パラメータに任意の単位を付けられるように変更。
  * 2021/2/20 Ver.1.3.3
  * 追加パラメータ、特殊パラメータに任意のパラメータを追加できる機能を追加。
  * 2021/2/17 Ver.1.3.2
@@ -353,13 +355,13 @@
  * @param Xparam
  * @type struct<XparamData>[]
  * @text 追加能力値
- * @default ["{\"XparamName\":\"\",\"XparamId\":\"0\"}","{\"XparamName\":\"\",\"XparamId\":\"1\"}","{\"XparamName\":\"\",\"XparamId\":\"2\"}","{\"XparamName\":\"\",\"XparamId\":\"3\"}","{\"XparamName\":\"\",\"XparamId\":\"4\"}","{\"XparamName\":\"\",\"XparamId\":\"5\"}","{\"XparamName\":\"\",\"XparamId\":\"6\"}","{\"XparamName\":\"\",\"XparamId\":\"7\"}","{\"XparamName\":\"\",\"XparamId\":\"8\"}","{\"XparamName\":\"\",\"XparamId\":\"9\"}"]
+ * @default ["{\"XparamName\":\"\",\"XparamId\":\"0\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}","{\"XparamName\":\"\",\"XparamId\":\"1\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}","{\"XparamName\":\"\",\"XparamId\":\"2\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}","{\"XparamName\":\"\",\"XparamId\":\"3\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}","{\"XparamName\":\"\",\"XparamId\":\"4\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}","{\"XparamName\":\"\",\"XparamId\":\"5\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}","{\"XparamName\":\"\",\"XparamId\":\"6\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}","{\"XparamName\":\"\",\"XparamId\":\"7\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}","{\"XparamName\":\"\",\"XparamId\":\"8\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}","{\"XparamName\":\"\",\"XparamId\":\"9\",\"XparamEval\":\"\",\"XparamUnit\":\"%\"}"]
  * @parent ParamDate
  * 
  * @param Sparam
  * @type struct<SparamData>[]
  * @text 特殊能力値
- * @default ["{\"SparamName\":\"\",\"SparamId\":\"0\"}","{\"SparamName\":\"\",\"SparamId\":\"1\"}","{\"SparamName\":\"\",\"SparamId\":\"2\"}","{\"SparamName\":\"\",\"SparamId\":\"3\"}","{\"SparamName\":\"\",\"SparamId\":\"4\"}","{\"SparamName\":\"\",\"SparamId\":\"5\"}","{\"SparamName\":\"\",\"SparamId\":\"6\"}","{\"SparamName\":\"\",\"SparamId\":\"7\"}","{\"SparamName\":\"\",\"SparamId\":\"8\"}","{\"SparamName\":\"\",\"SparamId\":\"9\"}"]
+ * @default ["{\"SparamName\":\"\",\"SparamId\":\"0\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}","{\"SparamName\":\"\",\"SparamId\":\"1\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}","{\"SparamName\":\"\",\"SparamId\":\"2\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}","{\"SparamName\":\"\",\"SparamId\":\"3\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}","{\"SparamName\":\"\",\"SparamId\":\"4\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}","{\"SparamName\":\"\",\"SparamId\":\"5\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}","{\"SparamName\":\"\",\"SparamId\":\"6\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}","{\"SparamName\":\"\",\"SparamId\":\"7\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}","{\"SparamName\":\"\",\"SparamId\":\"8\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}","{\"SparamName\":\"\",\"SparamId\":\"9\",\"SparamEval\":\"\",\"SparamUnit\":\"%\"}"]
  * @parent ParamDate
  * 
  * @param ElementResist
@@ -466,7 +468,13 @@
  * @desc 追加パラメータを評価式で表示します。
  * @text 追加パラメータ評価式
  * @type string
- * @default 
+ * @default
+ * 
+ * @param XparamUnit
+ * @desc 単位を設定します。
+ * @text 単位
+ * @type string
+ * @default  %
  */
 /*~struct~SparamData:
  *
@@ -482,7 +490,13 @@
  * @desc パラメータを評価式で表示します。
  * @text 特殊パラメータ評価式
  * @type string
- * @default 
+ * @default
+ * 
+ * @param SparamUnit
+ * @desc 単位を設定します。
+ * @text 単位
+ * @type string
+ * @default  %
  */
 /*~struct~ElementData:
  *
@@ -512,6 +526,12 @@
  * @desc 表示する評価式。
  * @text パラメータ
  * @type string
+ * 
+ * @param paramUnit
+ * @desc 単位を設定します。
+ * @text 単位
+ * @type string
+ * @default
  *
  */
 
@@ -982,7 +1002,7 @@ Window_Content.prototype.drawEquip = function(rect) {
   }
 };
 
-Window_Content.prototype.drawXParams = function(rect) {
+Window_Content.prototype.drawXParams = function(rect) {//XparamUnit
   const lineHeight = this.lineHeight();
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(param.XParamName, rect.x, rect.y, rect.width);
@@ -993,12 +1013,13 @@ Window_Content.prototype.drawXParams = function(rect) {
     let paramId = param.Xparam[i].XparamId;
     let name = this.XparamName(i);
     let value = (param.Xparam[i].XparamEval ? eval(param.Xparam[i].XparamEval) : this._actor.xparam(paramId) * 100);
+    let unit = param.Xparam[i].XparamUnit || "";
     value = this.statusParamDecimal(value);
     this.drawItemBackground(i);
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(name, itemRect.x, itemRect.y, 92);
     this.resetTextColor();
-    this.drawText(value +" %", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
+    this.drawText(String(value) + unit, itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
   }
 };
 
@@ -1040,12 +1061,13 @@ Window_Content.prototype.drawSParams = function(rect) {
     let paramId = param.Sparam[i].SparamId;
     let name = this.SparamName(i);
     let value = (param.Sparam[i].SparamEval ? eval(param.Sparam[i].SparamEval) : this._actor.sparam(paramId) * 100);
+    let unit = param.Sparam[i].SparamUnit || "";
     value = this.statusParamDecimal(value);
     this.drawItemBackground(i);
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(name, itemRect.x, itemRect.y, 92);
     this.resetTextColor();
-    this.drawText(value +" %", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
+    this.drawText(String(value) + unit, itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
   }
 };
 
@@ -1099,7 +1121,7 @@ Window_Content.prototype.drawElement = function(rect) {
         let rate = this._actor.elementRate(elementId) * 100;
         rate = this.statusParamDecimal(rate);
         this.resetTextColor();
-        this.drawText(rate +" %", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
+        this.drawText(rate +"%", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
       }
     }
   }
@@ -1128,13 +1150,13 @@ Window_Content.prototype.drawState = function(rect) {
         let rate = this._actor.stateRate(stateId) * 100;
         rate = this.statusParamDecimal(rate);
         this.resetTextColor();
-        this.drawText(rate +" %", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
+        this.drawText(rate +"%", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");
       }
     }
   }
 };
 
-Window_Content.prototype.OriginalParam1 = function(rect) {
+Window_Content.prototype.OriginalParam1 = function(rect) {//paramUnit
   const actor = this._actor.actor();
   const lineHeight = this.lineHeight();
   this.changeTextColor(ColorManager.systemColor());
@@ -1147,11 +1169,12 @@ Window_Content.prototype.OriginalParam1 = function(rect) {
       itemRect.y += lineHeight;
       let name = date[i].paramName;
       let param = eval(date[i].paramValue) || 0;
+      let unit = date[i].paramUnit || "";
       this.drawItemBackground(i);
       this.changeTextColor(ColorManager.systemColor());
       this.drawText(name, itemRect.x, itemRect.y, 192);
       this.resetTextColor();
-      this.drawText(param, itemRect.x + 200, itemRect.y, itemRect.width - 200, "right");
+      this.drawText(param + unit, itemRect.x + 200, itemRect.y, itemRect.width - 200, "right");
     }
   }
 };
@@ -1169,11 +1192,12 @@ Window_Content.prototype.OriginalParam2 = function(rect) {
       itemRect.y += lineHeight;
       let name = date[i].paramName;
       let param = eval(date[i].paramValue) || 0;
+      let unit = date[i].paramUnit || "";
       this.drawItemBackground(i);
       this.changeTextColor(ColorManager.systemColor());
       this.drawText(name, itemRect.x, itemRect.y, 192);
       this.resetTextColor();
-      this.drawText(param, itemRect.x + 200, itemRect.y, itemRect.width - 200, "right");
+      this.drawText(param + unit, itemRect.x + 200, itemRect.y, itemRect.width - 200, "right");
     }
   }
 };

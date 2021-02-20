@@ -2,7 +2,7 @@
 Ver.1.0.6<br>
 https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js<br>
 
-主な機能<br>
+<B>主な機能</B><br>
 表示基本パラメータ（常に表示されます）<br>
 最大HP<br>
 最大MP<br>
@@ -18,7 +18,7 @@ https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js<br>
 オリジナルパラメータ（任意のステータス）×２<br>
 デフォルト設定では最大HP、最大MP、攻撃力、防御力、魔法力、魔法防御、敏捷性、運になっています。<br>
 
-追加表示パラメータ<br>
+<B>追加表示パラメータ</B><br>
 獲得経験値<br>
 獲得金額<br>
 撃破数<br>

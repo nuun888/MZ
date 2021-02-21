@@ -49,6 +49,8 @@
 最大レベルを１００以上にすることが出来ます。<br>
 [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)　最大レベル変動<br>
 ゲーム中に最大レベルを変更することが出来ます。<br>
+[NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)　経験値計算式変更<br>
+必要経験値の計算式を変更します。<br>
 
 <b>エネミー</b><br>
 [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js)　巨大エネミー<br>

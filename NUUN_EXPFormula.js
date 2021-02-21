@@ -8,7 +8,7 @@
  * 
  */ 
 /*:
- * @target MZ
+ * @target MZ MV
  * @plugindesc 経験値計算式変更
  * @author NUUN
  * @version 1.0.0

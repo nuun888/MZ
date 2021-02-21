@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.6
+ * @version 1.0.7
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -115,6 +115,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/2/22 Ver.1.0.7
+ * ロード後に図鑑を開いてドロップアイテムのあるページを表示するとエラーが出る問題を修正。
  * 2021/2/18 Ver.1.0.6
  * 戦闘中のモンスター図鑑の表示スイッチをメニューコマンドと別に変更。
  * プラグインコマンドに「エネミーを撃破済みにする」を追加。
@@ -1240,7 +1242,7 @@ Game_System.prototype.setDropItemFlag = function(enemyId, dropId, flag) {
 };
 
 Game_System.prototype.getDropItemFlag = function(enemyId, dropId) {
-  if(!this._itemDorps || this._itemDorps[enemyId] === undefined || this._itemDorps[enemyId][dropId] === undefined) {
+  if(!this._itemDorps || !this._itemDorps[enemyId] || !this._itemDorps[enemyId][dropId]) {
     return false;
   }
   return this._itemDorps[enemyId][dropId];
@@ -1259,7 +1261,7 @@ Game_System.prototype.setStealItemFlag = function(enemyId, stealId, flag) {
 };
 
 Game_System.prototype.getStealItemFlag = function(enemyId, stealId) {
-  if(!this._stealItem || !this._stealItem[enemyId] === undefined || !this._stealItem[enemyId][stealId] === undefined) {
+  if(!this._stealItem || !this._stealItem[enemyId] || !this._stealItem[enemyId][stealId]) {
     return false;
   }
   return this._stealItem[enemyId][stealId];
@@ -1281,7 +1283,7 @@ Game_System.prototype.dropItemListFlag = function(enemyId, dropListId, mode) {
 Game_System.prototype.stealItemListFlag = function(enemyId, stealListId, mode) {
 	if(enemyId > 0){
     if(stealListId > 0){
-      this.setDropItemFlag(enemyId, stealListId, mode);
+      this.setStealItemFlag (enemyId, stealListId, mode);
     } else {
       const enemy = $dataEnemies[enemyId];
       const itemList = (Imported.NUUN_StealableItems ? this.getStealList(enemy) : null);
@@ -1420,7 +1422,7 @@ Game_Enemy.prototype.dropItemFlag = function(drop) {
         case 1:
           if(DataManager.isItem(drop[i])){
             $gameSystem.setDropItemFlag(this._enemyId, r, true);
-          } 
+          }
           break;
         case 2:
           if(DataManager.isWeapon(drop[i])){

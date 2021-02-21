@@ -55,3 +55,10 @@ PgUp PgDn：エネミーリストページ送り<br>
 タッチ操作<br>
 <>ボタン：キャラ切り替え<br>
 
+![画像](img/EnemyBook1.png)
+![画像](img/EnemyBook2.png)
+![画像](img/EnemyBook3.png)
+
+![画像](img/EnemyBook5.png)
+
+![画像](img/EnemyBook6.png)

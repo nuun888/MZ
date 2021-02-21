@@ -1,4 +1,5 @@
-
+Ver.1.0.0<br>
+https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js<br>
 
 コアスクリプトの経験値計算式はレベルが高くなるほど必要経験値の上がり方が緩くなるため、
 中盤以降レベルが上がりやすくなってしまいます。

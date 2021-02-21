@@ -1,5 +1,5 @@
 エネミー図鑑を実装します。<br>
-Ver.1.0.6<br>
+Ver.1.0.7<br>
 https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js<br>
 
 <B>主な機能</B><br>

@@ -41,7 +41,7 @@
 <b>ステート</b><br>
 [NUUN_AddStateDeviation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js)　ステート付与の仕様変更<br>
 必中時のステート付与を有効度、運を反映させるようにします。また有効度、運を無視にするスキル、アイテム、ステートを作ることが出来ます。<br>
-[NUUN_IconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_IconSideBySide.js)　戦闘中アクターステートの横並び表示
+[NUUN_IconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_IconSideBySide.js)　戦闘中アクターステートの横並び表示<br>
 戦闘中のステートアイコンの並びを横並びに表示させます。<br>
 
 <b>アクター</b><br>
@@ -50,7 +50,7 @@
 [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)　最大レベル変動<br>
 ゲーム中に最大レベルを変更することが出来ます。<br>
 [NUUN_EXPFormula](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js)　経験値計算式変更<br>
-必要経験値の計算式を変更します。[詳細](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)<br>
+必要経験値の計算式を変更します。[詳細](https://github.com/nuun888/MZ/blob/master/NUUN_EXPFormula.md)<br>
 
 <b>エネミー</b><br>
 [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js)　巨大エネミー<br>

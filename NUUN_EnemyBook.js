@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.7
+ * @version 1.0.8
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -115,6 +115,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/2/24 Ver.1.0.8
+ * バトルリザルト中にモンスター図鑑を閉じるように修正。
  * 2021/2/22 Ver.1.0.7
  * ロード後に図鑑を開いてドロップアイテムのあるページを表示するとエラーが出る問題を修正。
  * 2021/2/18 Ver.1.0.6
@@ -2636,6 +2638,14 @@ const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWin
 Scene_Battle.prototype.hideSubInputWindows = function() {
   _Scene_Battle_hideSubInputWindows.call(this);
   if (this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active) {
+  }
+};
+
+const _Scene_Battle_updateVisibility = Scene_Battle.prototype.updateVisibility;
+Scene_Battle.prototype.updateVisibility = function() {
+  _Scene_Battle_updateVisibility.call(this);console.log(BattleManager.isBattleEnd())
+  if (BattleManager.isBattleEnd() && (this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active)) {
+    this.cancelEnemyBook();
   }
 };
 

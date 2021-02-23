@@ -44,6 +44,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/23 Ver.1.3.5
+ * プロフィール欄を表示させない機能を追加。
  * 2021/2/21 Ver.1.3.4
  * 追加パラメータ、特殊パラメータ、独自パラメータに任意の単位を付けられるように変更。
  * 2021/2/20 Ver.1.3.3
@@ -85,7 +87,7 @@
  * 初版
  * 
  * @param Window
- * @text ウィンドウ設定 
+ * @text ウィンドウ設定
  * 
  * @param ContentWidth
  * @text 項目の表示横幅
@@ -94,6 +96,13 @@
  * @default 0
  * @min 0
  * @max 9999
+ * @parent Window
+ * 
+ * @param ProfileShow
+ * @text プロフィールの表示
+ * @desc 画面下のプロフィールを表示します。
+ * @type boolean
+ * @default true
  * @parent Window
  * 
  * @param BackShow
@@ -622,7 +631,9 @@ Scene_Status.prototype.statusWindowRect = function() {
 Scene_Status.prototype.createProfileWindow = function() {
   const rect = this.profileWindowRect();
   this._profileWindow = new Window_Help(rect);
-  this.addChild(this._profileWindow);
+  if (param.ProfileShow) {
+    this.addChild(this._profileWindow);
+  }
   this._profileWindow.opacity = 0;
   this._profileWindow.frameVisible = false;
 };
@@ -680,8 +691,13 @@ Scene_Status.prototype.createBackground = function() {
   }
 };
 
+const _Scene_Status_profileHeight = Scene_Status.prototype.profileHeight;
+Scene_Status.prototype.profileHeight = function() {
+  return param.ProfileShow ? _Scene_Status_profileHeight.call(this) : 0;
+};
+
 Scene_Status.prototype.statusHeight = function() {
-  const row = Math.floor((this.mainAreaHeight() - 564) / 60);
+  const row = Math.floor((this.mainAreaHeight() - 564) / 60).clamp(0, 1);
   return this.calcWindowHeight(5 + row, false) + 4;
 };
 
@@ -786,6 +802,13 @@ Window_StatusBase.prototype.statusParamDecimal = function(val) {
   }
 };
 
+Window_StatusBase.prototype.nuun_drawHorzLine = function(y) {
+  const lineY = y + this.lineHeight() / 2 - 1;
+  this.contents.paintOpacity = 48;
+  this.contents.fillRect(0, lineY, this.contentsWidth(), 2, ColorManager.normalColor());
+  this.contents.paintOpacity = 255;
+};
+
 Window_Status.prototype.refresh = function() {
   Window_StatusBase.prototype.refresh.call(this);
 
@@ -839,15 +862,23 @@ Window_Status.prototype.undefinedDate = function(id, date) {
   return null;
 };
 
-Window_Status.prototype.blocksY = function() {
-  return Math.floor((Graphics.boxHeight - 616) / 60) * 36;
+Window_Status.prototype.block2Y = function() {
+  const lineHeight = this.lineHeight();
+  const min = lineHeight;
+  const max = this.innerHeight - lineHeight * 4;
+  const a = Math.min(1.4 * this.height / 564, 2);
+  return Math.floor((lineHeight * a).clamp(min, max));
 };
 
 Window_Status.prototype.drawBlock2 = function() {
-  const y = this.block2Y() + this.blocksY();
+  const lineHeight = this.lineHeight();
+  const y = this.block2Y();
+  //this.nuun_drawHorzLine(Math.floor(Math.max(y - lineHeight, lineHeight * 0.6)));
   this.drawActorFace(this._actor, 12, y);
   this.drawBasicInfo(204, y);
   this.drawExpInfo(456, y);
+  //this.nuun_drawHorzLine(Math.floor(y + lineHeight * (3.8 * this.height / 564).clamp(3.8, 4.2)));
+  //this.nuun_drawHorzLine(this.height - lineHeight * 3.3 + (1 * this.height / 564).clamp(1, 1.5));
 };
 
 Window_Status.prototype.drawExpInfo = function(x, y) {

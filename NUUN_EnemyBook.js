@@ -2643,7 +2643,7 @@ Scene_Battle.prototype.hideSubInputWindows = function() {
 
 const _Scene_Battle_updateVisibility = Scene_Battle.prototype.updateVisibility;
 Scene_Battle.prototype.updateVisibility = function() {
-  _Scene_Battle_updateVisibility.call(this);console.log(BattleManager.isBattleEnd())
+  _Scene_Battle_updateVisibility.call(this);
   if (BattleManager.isBattleEnd() && (this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active)) {
     this.cancelEnemyBook();
   }

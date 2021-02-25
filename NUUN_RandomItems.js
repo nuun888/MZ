@@ -6,24 +6,21 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/11/22 Ver 1.0.0
- * 初版
- * 2020/12/15 Ver 1.1.0
- * MOG_TreasurePopup対応。
  */ 
 /*:
  * @target MZ
  * @plugindesc アイテムのランダム入手
  * @author NUUN
+ * @version 1.2.0
  * 
  * @help
  * アイテムをランダムで入手します。
  * ランダムアイテムの設定はプラグインコマンドから設定します。
  * ランダムに取得できる対象は、アイテム、武器、防具、お金、コモンイベントが設定できます。
  * コモンイベントを設定した場合は、取得時に指定のコモンイベントが呼び出されます。
- * 
- * TinyGetInfoWndMZプラグインをご使用の際は、イベントコマンド用スイッチIDをONにしてください。
+ * 取得したアイテムのリストID、アイテム名、アイコンインデックス、重みを変数に代入できます。
+ * コモンイベントはアイテム名ではなくコモンイベントIDが代入されます。アイコンインデックスを代入されません。
+ * お金はアイテム名ではなく取得した金額で表示されます。アイコンインデックスは代入されません。
  * 
  * プラグインパラメータでアイテムを取得やメッセージを表示するプラグインをご使用の場合は、
  * 取得リストID変数を設定して分岐条件などで各種設定をしてください。
@@ -32,6 +29,14 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * 更新履歴
+ * 2021/2/25 Ver.1.2.0
+ * 変数にアイテム名、アイコンインデックス、重みを代入する機能を追加。
+ * アイテムを取得するときに変数にリストIDが代入されない問題を修正。
+ * 2020/12/15 Ver.1.1.0
+ * MOG_TreasurePopup対応。
+ * 2020/11/22 Ver.1.0.0
+ * 初版
  * 
  * @command ItemList
  * @desc ランダムに取得するアイテムを指定します。
@@ -55,7 +60,25 @@
  * @desc 取得時のリストIDを格納する変数。
  * @text 取得リストID変数
  * @type variable
- * @min 0
+ * @default 0
+ * 
+ * @param ItemNameVar
+ * @desc 取得アイテム名を格納する変数。
+ * @text 取得アイテム名変数
+ * @type variable
+ * @default 0
+ * 
+ * @param ItemIconIDVar
+ * @desc 取得アイテムのアイコンIDを格納する変数。
+ * @text 取得アイテムアイコンID変数
+ * @type variable
+ * @default 0
+ * 
+ * @param WeightVar
+ * @desc 取得アイテムの重みを格納する変数。
+ * @text 取得アイテム重み変数
+ * @type variable
+ * @default 0
  * 
  */ 
 /*~struct~randomList:
@@ -122,6 +145,9 @@ Imported.NUUN_RandomItems = true;
   const GetTextMessage = String(parameters['GetTextMessage'] || 'を手に入れた！');
   const GetItemMessage = eval(parameters['GetItemMessage'] || true);
   const CommonListIdVar = Number(parameters['CommonListIdVar'] || 0);
+  const ItemNameVar = Number(parameters['ItemNameVar'] || 0);
+  const ItemIconIDVar = Number(parameters['ItemIconIDVar'] || 0);
+  const WeightVar = Number(parameters['WeightVar'] || 0);
   let eventId = 0;
   
   const pluginName = "NUUN_RandomItems";
@@ -198,22 +224,36 @@ Imported.NUUN_RandomItems = true;
       if (probability > value){
         if(list[i].itemType === 0 && $dataItems[list[i].ItemId]){
           getItem = {itemType: "item", deta: $dataItems[list[i].ItemId], text: list[i].GetText};
+          $gameVariables.setValue(CommonListIdVar, i + 1);
+          $gameVariables.setValue(ItemNameVar, $dataItems[list[i].ItemId].name);
+          $gameVariables.setValue(ItemIconIDVar, $dataItems[list[i].ItemId].iconIndex);
+          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         } else if(list[i].itemType === 1 && $dataWeapons[list[i].WeaponId]){
           getItem = {itemType: "weapon", deta: $dataWeapons[list[i].WeaponId], text: list[i].GetText};
           $gameVariables.setValue(CommonListIdVar, i + 1);
+          $gameVariables.setValue(ItemNameVar, $dataWeapons[list[i].WeaponId].name);
+          $gameVariables.setValue(ItemIconIDVar, $dataWeapons[list[i].WeaponId].iconIndex);
+          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         } else if (list[i].itemType === 2 && $dataArmors[list[i].ArmorId]){
           getItem = {itemType: "armor", deta: $dataArmors[list[i].ArmorId], text: list[i].GetText};
           $gameVariables.setValue(CommonListIdVar, i + 1);
+          $gameVariables.setValue(ItemNameVar, $dataArmors[list[i].ArmorId].name);
+          $gameVariables.setValue(ItemIconIDVar, $dataArmors[list[i].ArmorId].iconIndex);
+          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         } else if (list[i].itemType === 3 && list[i].GainMoney){
           getItem = {itemType: "money", deta: list[i].GainMoney, text: list[i].GetText};
           $gameVariables.setValue(CommonListIdVar, i + 1);
+          $gameVariables.setValue(ItemNameVar, list[i].GainMoney);
+          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         } else if (list[i].itemType === 10 && list[i].Common){
           getItem = {itemType: "common", deta: list[i].Common, text: list[i].GetText}
           $gameVariables.setValue(CommonListIdVar, i + 1);
+          $gameVariables.setValue(ItemNameVar, list[i].Common);
+          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         }
       }

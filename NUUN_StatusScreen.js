@@ -44,6 +44,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/28 Ver.1.3.7
+ * 「背景サイズをUIに合わせる」をfalseに設定時UIの左上基準に表示されてしまう問題を修正。
  * 2021/2/27 Ver.1.3.6
  * ステート有効度のステート無効化が反映されていなかった問題を修正。
  * 2021/2/23 Ver.1.3.5
@@ -686,8 +688,8 @@ Scene_Status.prototype.createBackground = function() {
 	if (param.BackGroundImg) {
 		const sprite = new Sprite();
     sprite.bitmap = ImageManager.loadPicture(param.BackGroundImg);
-    sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
-    sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
+    sprite.x = param.BackUiWidth ? (Graphics.width - (Graphics.boxWidth + 8)) / 2 : 0;
+    sprite.y = param.BackUiWidth ? (Graphics.height - (Graphics.boxHeight + 8)) / 2 : 0;
     this.addChild(sprite);
     this._backGroundImg = sprite;
   }

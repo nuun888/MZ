@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテムのランダム入手
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * アイテムをランダムで入手します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/25 Ver.1.2.1
+ * ゲーム変数代入時のマップ更新を１度しか行わないようにに修正。
  * 2021/2/25 Ver.1.2.0
  * 変数にアイテム名、アイコンインデックス、重みを代入する機能を追加。
  * アイテムを取得するときに変数にリストIDが代入されない問題を修正。
@@ -143,7 +145,7 @@ Imported.NUUN_RandomItems = true;
   'use strict';
   const parameters = PluginManager.parameters('NUUN_RandomItems');
   const GetTextMessage = String(parameters['GetTextMessage'] || 'を手に入れた！');
-  const GetItemMessage = eval(parameters['GetItemMessage'] || true);
+  const GetItemMessage = eval(parameters['GetItemMessage'] || "true");
   const CommonListIdVar = Number(parameters['CommonListIdVar'] || 0);
   const ItemNameVar = Number(parameters['ItemNameVar'] || 0);
   const ItemIconIDVar = Number(parameters['ItemIconIDVar'] || 0);
@@ -224,36 +226,36 @@ Imported.NUUN_RandomItems = true;
       if (probability > value){
         if(list[i].itemType === 0 && $dataItems[list[i].ItemId]){
           getItem = {itemType: "item", deta: $dataItems[list[i].ItemId], text: list[i].GetText};
+          $gameVariables.setValueInRandomItem(ItemNameVar, $dataItems[list[i].ItemId].name);
+          $gameVariables.setValueInRandomItem(ItemIconIDVar, $dataItems[list[i].ItemId].iconIndex);
+          $gameVariables.setValueInRandomItem(WeightVar, list[i].weight);
           $gameVariables.setValue(CommonListIdVar, i + 1);
-          $gameVariables.setValue(ItemNameVar, $dataItems[list[i].ItemId].name);
-          $gameVariables.setValue(ItemIconIDVar, $dataItems[list[i].ItemId].iconIndex);
-          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         } else if(list[i].itemType === 1 && $dataWeapons[list[i].WeaponId]){
           getItem = {itemType: "weapon", deta: $dataWeapons[list[i].WeaponId], text: list[i].GetText};
+          $gameVariables.setValueInRandomItem(ItemNameVar, $dataWeapons[list[i].WeaponId].name);
+          $gameVariables.setValueInRandomItem(ItemIconIDVar, $dataWeapons[list[i].WeaponId].iconIndex);
+          $gameVariables.setValueInRandomItem(WeightVar, list[i].weight);
           $gameVariables.setValue(CommonListIdVar, i + 1);
-          $gameVariables.setValue(ItemNameVar, $dataWeapons[list[i].WeaponId].name);
-          $gameVariables.setValue(ItemIconIDVar, $dataWeapons[list[i].WeaponId].iconIndex);
-          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         } else if (list[i].itemType === 2 && $dataArmors[list[i].ArmorId]){
           getItem = {itemType: "armor", deta: $dataArmors[list[i].ArmorId], text: list[i].GetText};
+          $gameVariables.setValueInRandomItem(ItemNameVar, $dataArmors[list[i].ArmorId].name);
+          $gameVariables.setValueInRandomItem(ItemIconIDVar, $dataArmors[list[i].ArmorId].iconIndex);
+          $gameVariables.setValueInRandomItem(WeightVar, list[i].weight);
           $gameVariables.setValue(CommonListIdVar, i + 1);
-          $gameVariables.setValue(ItemNameVar, $dataArmors[list[i].ArmorId].name);
-          $gameVariables.setValue(ItemIconIDVar, $dataArmors[list[i].ArmorId].iconIndex);
-          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         } else if (list[i].itemType === 3 && list[i].GainMoney){
           getItem = {itemType: "money", deta: list[i].GainMoney, text: list[i].GetText};
+          $gameVariables.setValueInRandomItem(ItemNameVar, list[i].GainMoney);
+          $gameVariables.setValueInRandomItem(WeightVar, list[i].weight);
           $gameVariables.setValue(CommonListIdVar, i + 1);
-          $gameVariables.setValue(ItemNameVar, list[i].GainMoney);
-          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         } else if (list[i].itemType === 10 && list[i].Common){
           getItem = {itemType: "common", deta: list[i].Common, text: list[i].GetText}
+          $gameVariables.setValueInRandomItem(ItemNameVar, list[i].Common);
+          $gameVariables.setValueInRandomItem(WeightVar, list[i].weight);
           $gameVariables.setValue(CommonListIdVar, i + 1);
-          $gameVariables.setValue(ItemNameVar, list[i].Common);
-          $gameVariables.setValue(WeightVar, list[i].weight);
           break;
         }
       }
@@ -261,4 +263,13 @@ Imported.NUUN_RandomItems = true;
 		}
     return getItem;
   }
+
+  Game_Variables.prototype.setValueInRandomItem = function(variableId, value) {
+    if (variableId > 0 && variableId < $dataSystem.variables.length) {
+        if (typeof value === "number") {
+            value = Math.floor(value);
+        }
+        this._data[variableId] = value;
+    }
+};
 })();

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 1.3.5
+ * @version 1.3.6
  * 
  * @help
  * ステータス画面に追加能力値、特殊能力値、属性有効度、ステート有効度、独自のパラメータを表示させます。
@@ -44,6 +44,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/27 Ver.1.3.6
+ * ステート有効度のステート無効化が反映されていなかった問題を修正。
  * 2021/2/23 Ver.1.3.5
  * プロフィール欄を表示させない機能を追加。
  * 2021/2/21 Ver.1.3.4
@@ -1178,7 +1180,7 @@ Window_Content.prototype.drawState = function(rect) {
           this.changeTextColor(ColorManager.systemColor());
           this.drawText(name, itemRect.x, itemRect.y, 92);
         }
-        let rate = this._actor.stateRate(stateId) * 100;
+        let rate = this._actor.stateRate(stateId) * 100 * (this._actor.isStateResist(stateId) ? 0 : 1);
         rate = this.statusParamDecimal(rate);
         this.resetTextColor();
         this.drawText(rate +"%", itemRect.x + 100, itemRect.y, itemRect.width - 100, "right");

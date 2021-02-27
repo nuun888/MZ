@@ -31,6 +31,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/28 Ver.1.0.2
+ * アクター画像の設置方法を変更。
+ * レベルアップ画面のアクター名がシステムカラーになっていたので修正。
+ * ゲージの更新フレーム時間を設定できる機能を追加。
  * 2021/2/27 Ver.1.0.1
  * レベルの表示幅を修正。
  * レベルアップステータスのレベルアップ後のステータスに色付け。
@@ -52,11 +56,17 @@
  * @default 616
  * @min 0
  * 
- * @param CharacterMode
- * @desc キャラチップを表示します。
- * @text キャラチップ表示
- * @type boolean
- * @default false
+ * @param ActorShow
+ * @desc アクターの画像を表示します。
+ * @text アクター表示
+ * @type select
+ * @option 表示なし
+ * @value 0
+ * @option 顔グラを表示
+ * @value 1
+ * @option キャラチップを表示
+ * @value 2
+ * @default 1
  * 
  * @param FaceWidth
  * @desc 顔グラ、キャラチップ表示の横幅。
@@ -76,62 +86,84 @@
  * @type number
  * @default 100
  * 
+ * @param GaugeRefreshFrame
+ * @desc EXPゲージの更新フレーム
+ * @text EXPゲージ更新フレーム
+ * @type number
+ * @default 100
+ * 
+ * @param NameSetting
+ * @text 名称設定
+ * 
  * @param ResultName
  * @text 戦闘結果の名称
  * @desc 戦闘結果の名称を設定します。
  * @type string
  * @default 戦闘結果
+ * @parent NameSetting
  * 
  * @param GetGoldName
  * @text 獲得金額の名称
  * @desc 獲得金額の名称を設定します。
  * @type string
  * @default 獲得金額
+ * @parent NameSetting
  * 
  * @param GetEXPName
  * @text 獲得経験値の名称
  * @desc 獲得経験値の名称を設定します。
  * @type string
  * @default 経験値
+ * @parent NameSetting
  * 
  * @param GetItemName
  * @text 入手アイテムの名称
  * @desc 入手アイテムの名称を設定します。
  * @type string
  * @default 入手アイテム
+ * @parent NameSetting
  * 
  * @param LevelUpName
  * @text レベルアップの名称
  * @desc レベルアップの名称を設定します。
  * @type string
  * @default LEVEL UP
+ * @parent NameSetting
  * 
  * @param learnSkillName
  * @text 習得スキルの名称
  * @desc 習得スキルの名称を設定します。
  * @type string
  * @default 習得スキル
+ * @parent NameSetting
+ * 
+ * @param SESetting
+ * @text SE設定
  * 
  * @param LevelUpSe
  * @text レベルアップ時のSE
  * @desc レベルアップ時のSEを指定します。
  * @type file
  * @dir audio/se
+ * @parent SESetting
  * 
  * @param volume
  * @text SEの音量
  * @desc SEを音量を設定します。
  * @default 90
+ * @parent SESetting
  * 
  * @param pitch
  * @text SEのピッチ
  * @desc SEをピッチを設定します。
  * @default 100
+ * @parent SESetting
  * 
  * @param pan
  * @text SEの位相
  * @desc SEを位相を設定します。
  * @default 0
+ * @parent SESetting
  * 
  */
 
@@ -139,13 +171,14 @@ var Imported = Imported || {};
 Imported.NUUN_Result = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_Result');//
-const CharacterMode = eval(parameters['CharacterMode'] || "false");
+const parameters = PluginManager.parameters('NUUN_Result');
+const ActorShow = Number(parameters['ActorShow'] || 1);
 const ResultWidth = Number(parameters['ResultWidth'] || 808);
 const ResultHeight = Number(parameters['ResultHeight'] || 616);
 const FaceWidth = Number(parameters['FaceWidth'] || 144);
 const FaceHeight = Number(parameters['FaceHeight'] || 120);
 const FaceScale = Number(parameters['FaceScale'] || 100);
+const GaugeRefreshFrame = Number(parameters['GaugeRefreshFrame'] || 100);
 const ResultName = String(parameters['ResultName'] || "戦闘結果");
 const GetGoldName = String(parameters['GetGoldName'] || "");
 const GetEXPName = String(parameters['GetEXPName'] || "経験値");
@@ -389,9 +422,9 @@ Window_Result.prototype.refresh = function() {
       this._actor._learnSkill = [];
       this._actor._oldStatus = [];
       let y = i * height + rect.y;
-      if (CharacterMode) {
+      if (ActorShow === 2) {
         this.drawActorCharacter(rect.x + FaceWidth / 2, y + 60);
-      } else {
+      } else if (ActorShow === 1) {
         this.drawActorFace(rect.x, y, FaceWidth, FaceHeight);
       }
       this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112);
@@ -489,6 +522,7 @@ Window_Result.prototype.drawGetGold = function(x, y, width) {
     }
     this.resetTextColor();
     this.drawCurrencyValue(gold, this.currencyUnit(), x + 120, y, width - 120);
+    this.resetTextColor();
   }
 };
 
@@ -527,7 +561,9 @@ Window_Result.prototype.drawActorStatus = function(x, y, width) {
     this.drawText(oldValue, x + (width - 200), y, 60, "left");
     this.changeTextColor(ColorManager.systemColor());
     this.drawText("→", x + (width - 110), y, width - 160, "left");
-    this.changeTextColor(ColorManager.textColor(24));
+    if (oldValue < value) {
+      this.changeTextColor(ColorManager.textColor(24));
+    }
     this.drawText(value, x + width - 60, y, 60, "right");
     this.resetTextColor();
   }
@@ -786,7 +822,7 @@ Sprite_ResultExpGauge.prototype.smoothness = function() {
 
 const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;
 Sprite_Gauge.prototype.smoothness = function() {
-  return this._statusType === "result_exp" ? 100 : _Sprite_Gauge_smoothness.call(this);
+  return this._statusType === "result_exp" ? GaugeRefreshFrame : _Sprite_Gauge_smoothness.call(this);
 };
 
 Sprite_ResultExpGauge.prototype.currentPercent = function() {

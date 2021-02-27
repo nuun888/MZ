@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.8
+ * @version 1.0.9
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -50,6 +50,9 @@
  * 
  * 戦闘中にパーティコマンドからエネミー図鑑を開くことが出来ます。
  * アナライズ機能を使う場合、TPBバトルでは開いている間TPBゲージを止める仕様にしています。
+ * 
+ * 任意の背景画像が表示できますが、現在のバージョンでは戦闘中に表示したモンスター図鑑の背景画像は表示されません。
+ * 
  * 
  * エネミーのメモ欄
  * <desc1:[text]> 記述欄１のテキスト
@@ -115,6 +118,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/2/28 Ver.1.0.9
+ * 背景画像が反映されていなかった問題を修正。
  * 2021/2/24 Ver.1.0.8
  * バトルリザルト中にモンスター図鑑を閉じるように修正。
  * 2021/2/22 Ver.1.0.7
@@ -1511,12 +1516,20 @@ Scene_EnemyBook.prototype.createIndexWindow = function() {
   this.addWindow(this._indexWindow);
   this._indexWindow.setPercentWindow(this._percentWindow);
   this._indexWindow.activate();
+  if (param.BackGroundImg) {
+    this._indexWindow.opacity = 0;
+    this._indexWindow.frameVisible = false;
+  }
 };
 
 Scene_EnemyBook.prototype.createPercentWindow = function() {
   const rect = this.percentWindowRect();
   this._percentWindow = new Window_EnemyBook_Percent(rect);
   this.addWindow(this._percentWindow);
+  if (param.BackGroundImg) {
+    this._percentWindow.opacity = 0;
+    this._percentWindow.frameVisible = false;
+  }
 };
 
 Scene_EnemyBook.prototype.createEnemyWindow = function() {
@@ -1525,6 +1538,10 @@ Scene_EnemyBook.prototype.createEnemyWindow = function() {
   this.addWindow(this._enemyWindow);
   this._indexWindow.setEnemyWindow(this._enemyWindow);
   this._indexWindow.select(Window_EnemyBook_Index._lastIndex);
+  if (param.BackGroundImg) {
+    this._enemyWindow.opacity = 0;
+    this._enemyWindow.frameVisible = false;
+  }
 };
 
 Scene_EnemyBook.prototype.percentWindowRect = function() {
@@ -1595,12 +1612,35 @@ Scene_EnemyBook.prototype.setMaxPage = function() {
   return param.MaxPage;
 };
 
+const _Scene_EnemyBook_createBackground = Scene_EnemyBook.prototype.createBackground;
+Scene_EnemyBook.prototype.createBackground = function() {
+  _Scene_EnemyBook_createBackground.call(this);
+	if (param.BackGroundImg) {
+		const sprite = new Sprite();
+    sprite.bitmap = ImageManager.loadPicture(param.BackGroundImg);
+    sprite.x = param.BackUiWidth ? (Graphics.width - (Graphics.boxWidth + 8)) / 2 : 0;
+    sprite.y = param.BackUiWidth ? (Graphics.height - (Graphics.boxHeight + 8)) / 2 : 0;
+    this.addChild(sprite);
+    this._backGroundImg = sprite;
+  }
+};
+
 Scene_EnemyBook.prototype.update = function() {
   Scene_MenuBase.prototype.update.call(this);
   if (Input.isTriggered('left')) {
 		this.updateContentsPageup();
 	} else if (Input.isTriggered('right')){
 		this.updateContentsPagedown();
+	}
+  if (param.BackGroundImg) {
+    const sprite = this._backGroundImg;
+    if(param.BackUiWidth) {
+      sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
+      sprite.scale.y = (Graphics.boxHeight + 8!== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+    } else {
+      sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
+      sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+    }
 	}
 };
 

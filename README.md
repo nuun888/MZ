@@ -18,7 +18,7 @@
 フィールドマップで任意の戦闘背景に変更できます。また敵グループ毎、リージョン、タグIDによって戦闘背景を変更できます。<br>
 [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)　戦闘中アイテム、スキル選択画面MV風表示プラグイン<br>
 戦闘中のアイテム、スキル選択画面をMV風に変更できます。<br>
-[NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)　リザルト画面<br>
+[NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)　リザルト<br>
 戦闘終了後にリザルト画面を表示します。[詳細](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)<br>
   
 <b>スキル、アイテム</b><br>

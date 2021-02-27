@@ -1,4 +1,4 @@
-Ver.1.0.0<br>
+Ver.1.0.1<br>
 https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js<br>
 
 戦闘終了時にリザルト画面を表示します。<br>

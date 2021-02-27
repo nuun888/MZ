@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -24,13 +24,17 @@
  * 
  * 
  * 操作
- * エンター　切り替え、画面を閉じる
+ * エンター　切り替え、画面を閉じる 右クリック
  * ←→　ドロップアイテム、習得スキルページ切り替え
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/27 Ver.1.0.1
+ * レベルの表示幅を修正。
+ * レベルアップステータスのレベルアップ後のステータスに色付け。
+ * 右クリックでページ送りを出来るように変更。
  * 2021/2/27 Ver.1.0.0
  * 初版。
  * 
@@ -390,8 +394,8 @@ Window_Result.prototype.refresh = function() {
       } else {
         this.drawActorFace(rect.x, y, FaceWidth, FaceHeight);
       }
-      this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 142);
-      this.drawActorLevel(rect.x + x2 - 130, y);
+      this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112);
+      this.drawActorLevel(rect.x + x2 - 100, y);
       this.drawLevelUp(rect.x, y);
       this.drawExpGauge(rect.x + x2 - (gaugeWidth + 30), y + lineHeight * 1.3);
       this.drawGetEXP(rect.x + faceArea, y + lineHeight * 0.8);
@@ -449,7 +453,7 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
     } else {
       this.resetTextColor();
     }
-    this.drawText(level, x + 48, y, 48, "right");
+    this.drawText(level, x + 30, y, 70 - 30, "right");
     this.contents.fontSize = $gameSystem.mainFontSize();
     this.resetTextColor();
   }
@@ -521,8 +525,11 @@ Window_Result.prototype.drawActorStatus = function(x, y, width) {
     this.drawText(name, x, y, width - 200);
     this.resetTextColor();
     this.drawText(oldValue, x + (width - 200), y, 60, "left");
+    this.changeTextColor(ColorManager.systemColor());
     this.drawText("→", x + (width - 110), y, width - 160, "left");
+    this.changeTextColor(ColorManager.textColor(24));
     this.drawText(value, x + width - 60, y, 60, "right");
+    this.resetTextColor();
   }
 };
 
@@ -577,6 +584,11 @@ Window_Result.prototype.drawHorzLine = function(x, y, width) {
   this.contents.paintOpacity = 255;
 };
 
+Window_Result.prototype.onTouchCancel = function() {
+  if (this.isCancelEnabled()) {
+      this.processOk();
+  }
+};
 
 function Window_ResultDropItem() {
   this.initialize(...arguments);

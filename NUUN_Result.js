@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.2.1
+ * @version 1.3.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -19,10 +19,14 @@
  * 大量にスキルを習得した場合、メッセージウィンドウに表示できる行の関係上多くの決定キー（ボタン）を押さなければならなくなります。
  * 出来るだけ決定キー（ボタン）を押す回数を減らすために入手EXP、獲得金額、ドロップアイテムを１画面にし、レベルアップしたアクターがいない場合は決定キー（ボタン）を
  * １回押しただけでリザルトが終了します。
+ * プラグインコマンドでレベルアップ画面の表示の許可を設定できます。(注：このプラグインコマンドを実行後レベルアップ画面表示の設定が無効化されます）
  * 
  * 入手画面では顔グラ又はキャラチップ、レベルアップ後のレベル、獲得金額、入手EXP、ドロップアイテムが表示されます。
  * レベルアップ画面ではレベル差分、ステータス差分、習得スキルが表示されます。
  * レベルアップ画面はレベルアップしたアクターのみ表示されます。
+ * 
+ * 勝利ME後に任意のBGMを再生できます。
+ * またプラグインコマンドで勝利ME後のBGMの再生の許可を設定できます。
  * 
  * アクターの独自パラメータ
  * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
@@ -41,6 +45,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/1 Ver.1.3.0
+ * 勝利ME後に任意のBGMを再生する機能を追加。
+ * プラグインコマンドでレベルアップ画面を表示を許可する機能を追加。(注：このプラグインコマンドを実行後レベルアップ画面表示の設定が無効化されます）
  * 2021/3/1 Ver.1.2.1
  * EXPゲージの数値を百分率表記にする機能を追加。
  * 2021/3/1 Ver.1.2.0
@@ -312,6 +319,56 @@
  * @default 0
  * @parent SESetting
  * 
+ * @param BGMSetting
+ * @text BGM設定
+ * 
+ * @param VictoryBGM
+ * @text 勝利ME後のBGM
+ * @desc 勝利ME後のBGMを指定します。
+ * @type file
+ * @dir audio/bgm
+ * @parent BGMSetting
+ * 
+ * @param VictoryVolume
+ * @text SEの音量
+ * @desc SEを音量を設定します。
+ * @default 90
+ * @parent BGMSetting
+ * @min 0
+ * 
+ * @param VictoryPitch
+ * @text SEのピッチ
+ * @desc SEをピッチを設定します。
+ * @default 100
+ * @parent BGMSetting
+ * 
+ * @param VictoryPan
+ * @text SEの位相
+ * @desc SEを位相を設定します。
+ * @default 0
+ * @parent BGMSetting
+ * 
+ * プラグインコマンド
+ * @command VictoryBGM
+ * @desc 戦闘ME後のBGMの再生の許可を変更します。
+ * @text 戦闘ME後のBGM再生許可
+ * 
+ * @arg VictoryBGMEnable
+ * @type boolean
+ * @default true
+ * @desc 戦闘ME後のBGMの再生の許可します。
+ * @text 戦闘ME後のBGMの再生の許可
+ * 
+ * @command LevelUpPage
+ * @desc レベルアップ画面の表示を許可を変更します。
+ * @text レベルアップ画面表示許可
+ * 
+ * @arg LevelUpPageEnable
+ * @type boolean
+ * @default true
+ * @desc レベルアップ画面の表示を許可します。(このプラグインコマンドを実行後レベルアップ画面表示の設定が無効化されます）
+ * @text レベルアップ画面表示許可
+ * 
  */
 
 var Imported = Imported || {};
@@ -347,10 +404,25 @@ const ActorOriginalParam = String(parameters['ActorOriginalParam'] || "");
 const ActorOriginalParamName2 = String(parameters['ActorOriginalParamName2'] || "");
 const ActorOriginalParam2 = String(parameters['ActorOriginalParam2'] || "");
 const LevelUpSe = String(parameters['LevelUpSe'] || "");
-const volume = String(parameters['volume'] || 90);
-const pitch = String(parameters['pitch'] || 100);
-const pan = String(parameters['pan'] || 0);
+const volume = Number(parameters['volume'] || 90);
+const pitch = Number(parameters['pitch'] || 100);
+const pan = Number(parameters['pan'] || 0);
+const VictoryBGM = String(parameters['VictoryBGM'] || "");
+const VictoryVolume = Number(parameters['VictoryVolume'] || 90);
+const VictoryPitch = Number(parameters['VictoryPitch'] || 100);
+const VictoryPan = Number(parameters['VictoryPan'] || 0);
 let gaugeWidth = 300;
+
+const pluginName = "NUUN_Result";
+
+PluginManager.registerCommand(pluginName, 'VictoryBGM', args => {
+  BattleManager.victoryBGMEnable(eval(args.VictoryBGMEnable))
+});
+
+PluginManager.registerCommand(pluginName, 'LevelUpPage', args => {
+  BattleManager.levelUpPageEnable(eval(args.LevelUpPageEnable))
+});
+
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
@@ -451,6 +523,7 @@ Scene_Battle.prototype.onResultOk = function() {
     this._resultHelpWindow.close();
     this._resultWindow.close();
     this._resultDropItemWindow.close();
+    BattleManager.playMapBgm();
   }
 };
 
@@ -645,13 +718,14 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
     this.drawText(TextManager.levelA, x, y, 48);
     if (level > actor._level) {
       this._levelUp = true;
+      BattleManager._levelUpPageEnable = BattleManager._levelUpPageEnable === undefined || BattleManager._levelUpPageEnable === null ? LavelUpWindowShow : BattleManager._levelUpPageEnable;
       for (let i = 0; i < 8; i++) {
         oldStatus[i] = actor.param(i);
       }
       oldStatus.push(actor._level);
       this.actorOldStatus.push(oldStatus);
-      this.changeTextColor(ColorManager.textColor(17));
-      if (LavelUpWindowShow) {
+      this.changeTextColor(ColorManager.textColor(17));console.log(BattleManager._levelUpPageEnable)
+      if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
       }
     } else {
@@ -924,32 +998,6 @@ Window_ResultDropItem.prototype.drawLearnSkill = function(actor, x, y, width) {
   }
 };
 
-
-const _BattleManager_initMembers = BattleManager.initMembers;
-BattleManager.initMembers = function() {
-  _BattleManager_initMembers.call(this);
-  this.onResult = false;
-};
-
-BattleManager.displayVictoryMessage = function() {
-};
-
-BattleManager.displayRewards = function() {
-  SceneManager._scene.resultOpen();
-  this.onResult = true;
-};
-
-const _BattleManager_gainRewards = BattleManager.gainRewards;
-BattleManager.gainRewards = function() {
-  _BattleManager_gainRewards.call(this);
-  this.onResult = false;
-};
-
-const _BattleManager_isBusy = BattleManager.isBusy;
-BattleManager.isBusy = function() {
-  return SceneManager._scene._resultWindow.active || _BattleManager_isBusy.call(this);
-};
-
 function Sprite_ResultExpGauge() {
   this.initialize(...arguments);
 }
@@ -1170,6 +1218,79 @@ Game_Actor.prototype.learnSkill = function(skillId) {
 const _Game_Actor_shouldDisplayLevelUp = Game_Actor.prototype.shouldDisplayLevelUp;
 Game_Actor.prototype.shouldDisplayLevelUp = function() {
   return BattleManager.onResult ? false : _Game_Actor_shouldDisplayLevelUp.call(this);
+};
+
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+  _BattleManager_initMembers.call(this);
+  this.onResult = false;
+  this._victoryOn = false;
+};
+
+const _BattleManager_processVictory = BattleManager.processVictory;
+BattleManager.processVictory = function() {
+  this._victoryOn = true;
+  _BattleManager_processVictory.call(this);
+};
+
+BattleManager.displayVictoryMessage = function() {
+};
+
+BattleManager.displayRewards = function() {
+  SceneManager._scene.resultOpen();
+  this.onResult = true;
+};
+
+const _BattleManager_gainRewards = BattleManager.gainRewards;
+BattleManager.gainRewards = function() {
+  _BattleManager_gainRewards.call(this);
+  this.onResult = false;
+};
+
+const _BattleManager_isBusy = BattleManager.isBusy;
+BattleManager.isBusy = function() {
+  return SceneManager._scene._resultWindow.active || _BattleManager_isBusy.call(this);
+};
+
+const _BattleManager_replayBgmAndBgs = BattleManager.replayBgmAndBgs;
+BattleManager.replayBgmAndBgs = function() {
+  this._victoryBGMEnable = (this._victoryBGMEnable === undefined || this._victoryBGMEnable === null) ? true : this._victoryBGMEnable;
+  if (VictoryBGM && this._victoryBGMEnable && this._victoryOn) {
+    AudioManager.playBgm(this.playVictoryBgm());
+  } else {
+    _BattleManager_replayBgmAndBgs.call(this);
+  }
+};
+
+BattleManager.playVictoryBgm = function() {
+  const _victoryBgm = {};
+  _victoryBgm.name = VictoryBGM;
+  _victoryBgm.volume = VictoryVolume;
+  _victoryBgm.pitch = VictoryPitch;
+  _victoryBgm.pan = VictoryPan;
+  return _victoryBgm;
+};
+
+BattleManager.playMapBgm = function() {
+  if (!VictoryBGM) {
+    return;
+  }
+  if (this._mapBgm) {
+    AudioManager.replayBgm(this._mapBgm);
+  } else {
+    AudioManager.stopBgm();
+  }
+  if (this._mapBgs) {
+    AudioManager.replayBgs(this._mapBgs);
+  }
+};
+
+BattleManager.victoryBGMEnable = function(enable) {
+  this._victoryBGMEnable = enable;
+};
+
+BattleManager.levelUpPageEnable = function(enable) {
+  this._levelUpPageEnable = enable;
 };
 
 })();

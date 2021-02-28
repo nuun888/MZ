@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc ゲージの数値更新アニメーション
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.1
  * 
  * @help
  * ダメージや回復、消費などのゲージに表示されている数値が変化する時、デフォルトでは一瞬で変化後の

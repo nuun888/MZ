@@ -11,12 +11,16 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
  * 各キャラクターの戦闘終了後のレベル、EXPとドロップアイテムが表示されます。
  * アクターのレベルが上がったら別画面でステータスの差分と習得スキルが表示されます。
+ * 
+ * アクターの独自パラメータ
+ * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
+ * this._actor アクターのゲームデータ
  * 
  * 仕様
  * 獲得金額の名称のみ未記入にすると金額のみ表示することが出来ます。
@@ -31,6 +35,13 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/28 Ver.1.1.0
+ * 獲得金額の下に独自パラメータを表示する機能を追加。
+ * レベルアップ画面に独自パラメータを表示する機能を追加。
+ * レベルアップした時に表示するレベルアップ画面をカットする機能を追加。
+ * レベルアップ画面のレベルのレベルアップ後の数値を色付け。
+ * ドロップアイテムリストの表示が若干早く表示されていた問題を修正。
+ * レベルアップ表示で表示横幅のアクター表示拡大率を考慮されていなかった問題を修正。
  * 2021/2/28 Ver.1.0.2
  * アクター画像の設置方法を変更。
  * レベルアップ画面のアクター名がシステムカラーになっていたので修正。
@@ -42,12 +53,17 @@
  * 2021/2/27 Ver.1.0.0
  * 初版。
  * 
+ * 
+ * @param GetPage
+ * @text 入手画面設定
+ * 
  * @param ResultWidth
  * @desc ウィンドウの横幅。(0でUI横幅)デフォルト:808
  * @text ウィンドウ横幅
  * @type number
  * @default 808
  * @min 0
+ * @parent GetPage
  * 
  * @param ResultHeight
  * @desc ウィンドウの縦幅。(0でUI縦幅)デフォルト:616
@@ -55,10 +71,11 @@
  * @type number
  * @default 616
  * @min 0
+ * @parent GetPage
  * 
  * @param ActorShow
  * @desc アクターの画像を表示します。
- * @text アクター表示
+ * @text アクター表示形式
  * @type select
  * @option 表示なし
  * @value 0
@@ -67,30 +84,108 @@
  * @option キャラチップを表示
  * @value 2
  * @default 1
+ * @parent GetPage
  * 
  * @param FaceWidth
  * @desc 顔グラ、キャラチップ表示の横幅。
  * @text 顔グラの横幅
  * @type number
  * @default 144
+ * @parent GetPage
  * 
  * @param FaceHeight
  * @desc １キャラ当たりの縦幅。
  * @text １キャラ当たりの縦幅
  * @type number
  * @default 120
+ * @parent GetPage
  * 
  * @param FaceScale
  * @desc 顔グラの拡大率。（顔グラのみ）
  * @text 拡大率
  * @type number
  * @default 100
+ * @parent GetPage
+ * 
+ * @param FaceScaleHeight
+ * @type boolean
+ * @default true
+ * @text 高さ調整
+ * @desc １キャラ当たりの縦幅を、顔グラの拡大率に合わせて高さ調整します。
+ * @parent GetPage
  * 
  * @param GaugeRefreshFrame
  * @desc EXPゲージの更新フレーム
  * @text EXPゲージ更新フレーム
  * @type number
  * @default 100
+ * @parent GetPage
+ * 
+ * @param PartyOriginalParamName
+ * @text 独自パラメータ名称
+ * @desc 獲得金額の下に表示する独自パラメータの名称を設定します。
+ * @type string
+ * @default
+ * @parent GetPage
+ * 
+ * @param PartyOriginalParam
+ * @text 独自パラメータ評価式
+ * @desc 獲得金額の下に表示する独自パラメータの評価式を設定します。
+ * @type string
+ * @default
+ * @parent GetPage
+ * 
+ * @param PartyOriginalParamName2
+ * @text 独自パラメータ名称２
+ * @desc 獲得金額の下に表示する独自パラメータの名称を設定します。
+ * @type string
+ * @default
+ * @parent GetPage
+ * 
+ * @param PartyOriginalParam2
+ * @text 独自パラメータ評価式２
+ * @desc 獲得金額の下に表示する独自パラメータの評価式を設定します。
+ * @type string
+ * @default
+ * @parent GetPage
+ * 
+ * @param LevelUpPage
+ * @text レベルアップ画面設定
+ * 
+ * @param LavelUpWindowShow
+ * @type boolean
+ * @default true
+ * @text レベルアップ画面表示
+ * @desc レベルアップ画面表示します。falseでレベルアップ後のステータス差分、習得スキル演出をカットします。
+ * @parent LevelUpPage
+ * 
+ * @param ActorOriginalParamName
+ * @text 独自パラメータ名称
+ * @desc レベルアップ画面に表示する独自パラメータの名称を設定します。
+ * @type string
+ * @default
+ * @parent LevelUpPage
+ * 
+ * @param ActorOriginalParam
+ * @text 独自パラメータ評価式
+ * @desc レベルアップ画面に表示する独自パラメータの評価式を設定します。
+ * @type string
+ * @default
+ * @parent LevelUpPage
+ * 
+ * @param ActorOriginalParamName2
+ * @text 独自パラメータ名称２
+ * @desc レベルアップ画面に表示する独自パラメータの名称を設定します。
+ * @type string
+ * @default
+ * @parent LevelUpPage
+ * 
+ * @param ActorOriginalParam2
+ * @text 独自パラメータ評価式２
+ * @desc レベルアップ画面に表示する独自パラメータの評価式を設定します。
+ * @type string
+ * @default
+ * @parent LevelUpPage
  * 
  * @param NameSetting
  * @text 名称設定
@@ -131,7 +226,7 @@
  * @parent NameSetting
  * 
  * @param learnSkillName
- * @text 習得スキルの名称
+ * @text 習得スキル名称
  * @desc 習得スキルの名称を設定します。
  * @type string
  * @default 習得スキル
@@ -178,6 +273,8 @@ const ResultHeight = Number(parameters['ResultHeight'] || 616);
 const FaceWidth = Number(parameters['FaceWidth'] || 144);
 const FaceHeight = Number(parameters['FaceHeight'] || 120);
 const FaceScale = Number(parameters['FaceScale'] || 100);
+const FaceScaleHeight = eval(parameters['FaceScaleHeight'] || "true");
+const LavelUpWindowShow = eval(parameters['LavelUpWindowShow'] || "true");
 const GaugeRefreshFrame = Number(parameters['GaugeRefreshFrame'] || 100);
 const ResultName = String(parameters['ResultName'] || "戦闘結果");
 const GetGoldName = String(parameters['GetGoldName'] || "");
@@ -185,6 +282,14 @@ const GetEXPName = String(parameters['GetEXPName'] || "経験値");
 const GetItemName = String(parameters['GetItemName'] || "入手アイテム");
 const LevelUpName = String(parameters['LevelUpName'] || "LEVEL UP");
 const learnSkillName = String(parameters['learnSkillName'] || "習得スキル");
+const PartyOriginalParamName = String(parameters['PartyOriginalParamName'] || "");
+const PartyOriginalParam = String(parameters['PartyOriginalParam'] || "");
+const PartyOriginalParamName2 = String(parameters['PartyOriginalParamName2'] || "");
+const PartyOriginalParam2 = String(parameters['PartyOriginalParam2'] || "");
+const ActorOriginalParamName = String(parameters['ActorOriginalParamName'] || "");
+const ActorOriginalParam = String(parameters['ActorOriginalParam'] || "");
+const ActorOriginalParamName2 = String(parameters['ActorOriginalParamName2'] || "");
+const ActorOriginalParam2 = String(parameters['ActorOriginalParam2'] || "");
 const LevelUpSe = String(parameters['LevelUpSe'] || "");
 const volume = String(parameters['volume'] || 90);
 const pitch = String(parameters['pitch'] || 100);
@@ -289,7 +394,7 @@ Scene_Battle.prototype.onResultOk = function() {
   } else {
     this._resultHelpWindow.close();
     this._resultWindow.close();
-    this._resultDropItemWindow.hide();
+    this._resultDropItemWindow.close();
   }
 };
 
@@ -300,6 +405,7 @@ Scene_Battle.prototype.resultOpen = function() {
   this._resultDropItemWindow.show();
   this._resultHelpWindow.open();
   this._resultWindow.open();
+  this._resultDropItemWindow.open();
   this._resultWindow.refresh();
   this._resultDropItemWindow.refresh();
 };
@@ -413,7 +519,7 @@ Window_Result.prototype.refresh = function() {
   const lineHeight = this.lineHeight();
   const itemPadding = this.itemPadding();
   if (this.page === 0) {
-    const height = Math.floor(FaceHeight * scale);
+    const height = FaceScaleHeight ? Math.floor(FaceHeight * scale) : FaceHeight;
     const faceArea = rect.x + Math.floor(FaceWidth * scale) + itemPadding;
     const x2 = rect.x + (rect.width - Math.floor(rect.width / 2.6));
     gaugeWidth = rect.width - Math.floor(rect.width / 2.6) - faceArea - 40;
@@ -429,20 +535,27 @@ Window_Result.prototype.refresh = function() {
       }
       this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112);
       this.drawActorLevel(rect.x + x2 - 100, y);
-      this.drawLevelUp(rect.x, y);
+      this.drawLevelUp(rect.x, y, Math.floor(FaceWidth * scale));
       this.drawExpGauge(rect.x + x2 - (gaugeWidth + 30), y + lineHeight * 1.3);
       this.drawGetEXP(rect.x + faceArea, y + lineHeight * 0.8);
     }
-    this.drawGetGold(x2, rect.y, rect.width - x2);
-    this.drawHorzLine(x2, rect.y + lineHeight, rect.width - x2);
+    y = rect.y;
+    this.drawGetGold(x2, y, rect.width - x2);
+    y += lineHeight;
+    this.drawPartyOriginalParam(x2, y, rect.width - x2);
+    y += (PartyOriginalParam ? lineHeight : 0) + (PartyOriginalParam2 ? lineHeight : 0);
+    this.drawHorzLine(x2, y, rect.width - x2);
   } else {
     for (let i = 0; this.actorMembers() > i; i++) {
       this.removeExpGauge(this.actor(i));
     }
     this._actor = this.actorLevelUp[this.page - 1];
+    const x = rect.x + rect.width / 2 + itemPadding;
     this.drawActorFace(rect.x, rect.y, ImageManager.faceWidth, ImageManager.faceHeight);
-    this.drawActorStatusName(rect.x + 152, rect.y, rect.width - 550);
-    this.drawActorStatusLevel(rect.x + 400, rect.y);
+    this.drawActorStatusName(rect.x + 152, rect.y, rect.width - x - 152);
+    this.drawActorStatusLevel(x, rect.y);
+    this.drawActorOriginalParam(rect.x + 152, rect.y + lineHeight, rect.width - x - 152);
+    //this.drawHorzLine(rect.x + 152, rect.y + lineHeight * 3.5, rect.width - 152);
     this.drawActorStatus(rect.x, rect.y + lineHeight * 3.5, rect.width / 2 - itemPadding);
   }
 };
@@ -482,7 +595,9 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       oldStatus.push(actor._level);
       this.actorOldStatus.push(oldStatus);
       this.changeTextColor(ColorManager.textColor(17));
-      this.actorLevelUp.push(actor);
+      if (LavelUpWindowShow) {
+        this.actorLevelUp.push(actor);
+      }
     } else {
       this.resetTextColor();
     }
@@ -492,10 +607,10 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
   }
 };
 
-Window_Result.prototype.drawLevelUp = function(x, y) {
+Window_Result.prototype.drawLevelUp = function(x, y, width) {
   if (this._levelUp) {
     this.changeTextColor(ColorManager.textColor(17));
-    this.drawText(LevelUpName, x, y, FaceWidth, "center");
+    this.drawText(LevelUpName, x, y, width, "center");
     this.resetTextColor();
     this._levelUp = false;
   }
@@ -526,6 +641,38 @@ Window_Result.prototype.drawGetGold = function(x, y, width) {
   }
 };
 
+Window_Result.prototype.drawPartyOriginalParam = function(x, y, width) {
+  if (PartyOriginalParam) {
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(PartyOriginalParamName, x, y, 120, "left");
+    this.resetTextColor();
+    this.drawText(eval(PartyOriginalParam), x + 120, y, width - 120, "right");
+  }
+  if (PartyOriginalParam2) {
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(PartyOriginalParamName2, x, y + this.lineHeight(), 120, "left");
+    this.resetTextColor();
+    this.drawText(eval(PartyOriginalParam2), x + 120, y + this.lineHeight(), width - 120, "right");
+  }
+};
+
+Window_Result.prototype.drawActorOriginalParam = function(x, y, width) {
+  const actor = this._actor.actor();
+  const lineHeight = this.lineHeight();
+  if (ActorOriginalParam) {
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(ActorOriginalParamName, x, y, 120, "left");
+    this.resetTextColor();
+    this.drawText(eval(ActorOriginalParam), x + 120, y, width - 120, "right");
+  }
+  if (ActorOriginalParam2) {
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(ActorOriginalParamName2, x, y + lineHeight, 120, "left");
+    this.resetTextColor();
+    this.drawText(eval(ActorOriginalParam2), x + 120, y + lineHeight, width - 120, "right");
+  }
+};
+
 Window_Result.prototype.drawGetEXP = function(x, y, width) {
   const exp = Math.round(BattleManager._rewards.exp * this._actor.finalExpRate());
   if (exp) {
@@ -540,11 +687,17 @@ Window_Result.prototype.drawGetEXP = function(x, y, width) {
 };
 
 Window_Result.prototype.drawActorStatusLevel = function(x, y) {
+  
   const oldStatus = this.actorOldStatus[this.page - 1];
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(TextManager.levelA, x, y, 48);
   this.resetTextColor();
-  this.drawText(oldStatus[oldStatus.length - 1] +" → " +this._actor._level, x + 48, y, 100, "right");
+  this.drawText(oldStatus[oldStatus.length - 1], x + 48, y, 100, "left");
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText("→", x + 48, y, 100, "center");
+  this.changeTextColor(ColorManager.textColor(24));
+  this.drawText(this._actor._level, x + 48, y, 100, "right");
+  this.resetTextColor();
 };
 
 Window_Result.prototype.drawActorStatus = function(x, y, width) {
@@ -576,7 +729,7 @@ Window_Result.prototype.currencyUnit = function() {
 Window_Result.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
   width = width || ImageManager.faceWidth;
   height = height || ImageManager.faceHeight;
-  const scale = FaceScale / 100;
+  const scale = this.page === 0 ? FaceScale / 100 : 1;
   const bitmap = ImageManager.loadFace(faceName);
   const pw = ImageManager.faceWidth;
   const ph = ImageManager.faceHeight;
@@ -635,12 +788,17 @@ Window_ResultDropItem.prototype.constructor = Window_ResultDropItem;
 
 Window_ResultDropItem.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
+  this.openness = 0;
   this.page = 0;
   this.maxPage = 0;
-  this.dropItemRows = Math.floor((this.innerHeight - this.lineHeight() * 3) / this.lineHeight());
+  this.dropItemRows = Math.floor((this.innerHeight - this.lineHeight() * this.partyOriginalParams()) / this.lineHeight());
   this.skillRows = Math.floor((this.innerHeight - this.lineHeight() * 5.5) / this.lineHeight());
   this.opacity = 0;
   this.frameVisible = false;
+};
+
+Window_ResultDropItem.prototype.partyOriginalParams = function() {
+  return 3 + (PartyOriginalParam ? 1 : 0) + (PartyOriginalParam2 ? 1 : 0);
 };
 
 Window_ResultDropItem.prototype.setWindowResult = function(windowResult) {
@@ -673,6 +831,7 @@ Window_ResultDropItem.prototype.drawGetItems = function(x, y, width) {
   const items = BattleManager._rewards.items;
   const lineHeight = this.lineHeight();
   const maxPage = this.maxPages();
+  y += (PartyOriginalParam ? lineHeight : 0) + (PartyOriginalParam2 ? lineHeight : 0);
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(GetItemName, x, y, width - 48, "left");
   this.resetTextColor();

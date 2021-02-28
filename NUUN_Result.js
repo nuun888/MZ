@@ -11,12 +11,18 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
- * 各キャラクターの戦闘終了後のレベル、EXPとドロップアイテムが表示されます。
- * アクターのレベルが上がったら別画面でステータスの差分と習得スキルが表示されます。
+ * デフォルトのリザルトはメッセージウィンドウで表示されますが、大量のドロップアイテムやレベルアップしたアクターが
+ * 大量にスキルを習得した場合、メッセージウィンドウに表示できる行の関係上多くの決定キー（ボタン）を押さなければならなくなります。
+ * 出来るだけ決定キー（ボタン）を押す回数を減らすために入手EXP、獲得金額、ドロップアイテムを１画面にし、レベルアップしたアクターがいない場合は決定キー（ボタン）を
+ * １回押しただけでリザルトが終了します。
+ * 
+ * 入手画面では顔グラ又はキャラチップ、レベルアップ後のレベル、獲得金額、入手EXP、ドロップアイテムが表示されます。
+ * レベルアップ画面ではレベル差分、ステータス差分、習得スキルが表示されます。
+ * レベルアップ画面はレベルアップしたアクターのみ表示されます。
  * 
  * アクターの独自パラメータ
  * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
@@ -35,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/1 Ver.1.2.0
+ * EXPゲージに数値を表示する機能を追加。
  * 2021/2/28 Ver.1.1.1
  * フォントサイズを変更したとき、経験値名称と獲得経験値の文字が被る問題を修正。
  * 入手画面のアクター名、レベル、経験値のフォントサイズが２２未満の時反映されるように変更。
@@ -117,11 +125,32 @@
  * @desc １キャラ当たりの縦幅を、顔グラの拡大率に合わせて高さ調整します。
  * @parent GetPage
  * 
+ * @param GaugeValueShow
+ * @desc EXPゲージの数値を表示する。
+ * @text EXPゲージ数値表示
+ * @type select
+ * @option 表示なし
+ * @value 0
+ * @option 現在の経験値を表示
+ * @value 1
+ * @option 最大値と現在値を表示
+ * @value 2
+ * @default 1
+ * @parent GetPage
+ * 
  * @param GaugeRefreshFrame
  * @desc EXPゲージの更新フレーム
  * @text EXPゲージ更新フレーム
  * @type number
  * @default 100
+ * @parent GetPage
+ * 
+ * @param GaugeMaxValueFontSize
+ * @desc ゲージ最大値数値のフォントサイズ。基本フォントサイズからの差
+ * @text ゲージ最大値数値のフォントサイズ
+ * @type number
+ * @default -6
+ * @min -100
  * @parent GetPage
  * 
  * @param PartyOriginalParamName
@@ -250,6 +279,7 @@
  * @desc SEを音量を設定します。
  * @default 90
  * @parent SESetting
+ * @min 0
  * 
  * @param pitch
  * @text SEのピッチ
@@ -278,7 +308,9 @@ const FaceHeight = Number(parameters['FaceHeight'] || 120);
 const FaceScale = Number(parameters['FaceScale'] || 100);
 const FaceScaleHeight = eval(parameters['FaceScaleHeight'] || "true");
 const LavelUpWindowShow = eval(parameters['LavelUpWindowShow'] || "true");
+const GaugeValueShow = Number(parameters['GaugeValueShow'] || 0);
 const GaugeRefreshFrame = Number(parameters['GaugeRefreshFrame'] || 100);
+const GaugeMaxValueFontSize = Number(parameters['GaugeMaxValueFontSize'] || -6);
 const ResultName = String(parameters['ResultName'] || "戦闘結果");
 const GetGoldName = String(parameters['GetGoldName'] || "");
 const GetEXPName = String(parameters['GetEXPName'] || "経験値");
@@ -684,13 +716,12 @@ Window_Result.prototype.drawGetEXP = function(x, y, width) {
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(GetEXPName, x, y, width, "left");
     this.resetTextColor();
-    this.drawText("+"+ exp, x + textWidth + this.itemPadding(), y, width, "left");
+    this.drawText("+"+ exp, x + textWidth + this.itemPadding(), y, width - x - 190, "left");
     this.contents.fontSize = $gameSystem.mainFontSize();
   }
 };
 
 Window_Result.prototype.drawActorStatusLevel = function(x, y) {
-  
   const oldStatus = this.actorOldStatus[this.page - 1];
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(TextManager.levelA, x, y, 48);
@@ -909,6 +940,10 @@ Sprite_ResultExpGauge.prototype.initialize = function() {
   Sprite_Gauge.prototype.initialize.call(this);
   this._currentExp = 0;
   this._startCurrentExp = 0;
+  this._resultExpMoveMode = false;
+  this._resultExpMoveDelay = 0;
+  this._resultExpMoveValue = NaN;
+  this._maxValueY = Math.floor((this.bitmap.fontSize - ($gameSystem.mainFontSize() + GaugeMaxValueFontSize)) / 2);
 };
 
 Sprite_ResultExpGauge.prototype.bitmapWidth = function() {
@@ -920,20 +955,55 @@ Sprite_ResultExpGauge.prototype.setup = function(battler, statusType) {
   Sprite_Gauge.prototype.setup.call(this, battler, statusType);
   this._instant = false;
   this._startCurrentExp = battler.currentExp() - battler.currentLevelExp();
+  this._resultExpMoveMode = false;
+  this._resultExpMoveDelay = 0;
+  this._resultExpMoveValue = isNaN(this._resultExpMoveValue) ? this.currentValue() : this._resultExpMoveValue;
+};
+
+Sprite_ResultExpGauge.prototype.updateBitmap = function() {
+  Sprite_Gauge.prototype.updateBitmap.call(this);
+  const value = this.currentValue();
+  if (this._resultExpMoveValue !== value) {
+    this.valueRedraw();
+  }
+};
+
+Sprite_ResultExpGauge.prototype.valueRedraw = function() {
+  this.currentResultValueMove(this.currentValue());
+  Sprite_Gauge.prototype.redraw.call(this);
 };
 
 const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
 Sprite_Gauge.prototype.drawValue = function() {
   if (this._statusType === "result_exp") {
-    let currentValue = 0;
     const width = this.bitmapWidth();
     const height = this.bitmapHeight();
-    this.setupValueFont();
-    //currentValue = this._battler.isMaxLevel() ? "-------" : this.currentValue();
-    //this.bitmap.drawText(currentValue, width - 100, 0, 100, height, "right");
+    this._resultExpMoveMode = GaugeRefreshFrame > 0 && GaugeValueShow ? true : false;
+    const currentValue = this.currentValue();
+    if (GaugeValueShow > 0) {
+      this.setupValueFont();
+      if (GaugeValueShow === 1) {
+        this.bitmap.drawText(currentValue, width - 100, 0, 100, height, "right");
+      } else {
+        this.bitmap.fontSize = $gameSystem.mainFontSize() + GaugeMaxValueFontSize;
+        const textWidth = Math.min(this.bitmap.measureTextWidth(this.currentMaxValue()), 70);
+        this.bitmap.drawText(this.currentMaxValue(), width - textWidth, this._maxValueY, textWidth, height, "right");
+        this.bitmap.fontSize = this.valueFontSize();
+        this.bitmap.drawText(currentValue, width - (textWidth + 90), 0, 70, height, "right");
+        this.bitmap.drawText("/", width - (textWidth + 40), 0, 36, height, "right");
+      }
+    }
   } else {
     _Sprite_Gauge_drawValue.call(this);
   }
+};
+
+Sprite_ResultExpGauge.prototype.currentValue = function() {
+  if (this._battler && this._resultExpMoveMode) {
+    this._resultExpMoveMode = false;
+    return Math.round(this._resultExpMoveValue);
+  }
+  return Sprite_Gauge.prototype.currentValue.call(this);
 };
 
 const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
@@ -948,6 +1018,24 @@ Sprite_Gauge.prototype.currentMaxValue = function() {
     _Sprite_Gauge_currentMaxValue.call(this);
 };
 
+Sprite_ResultExpGauge.prototype.currentResultValueMove = function(currentValue) {
+  if (this._resultExpMoveDelay === 0) {
+    this._resultExpMoveDelay = (currentValue - this._resultExpMoveValue) / (GaugeRefreshFrame > 0 ? this.smoothness() : 1);
+  }
+  if (this._resultExpMoveValue > currentValue) {
+    if (this._resultExpMoveValue <= currentValue) {
+      this._resultExpMoveValue = currentValue;
+      this._resultExpMoveDelay = 0;
+    }
+  } else if (this._resultExpMoveValue < currentValue) {
+      this._resultExpMoveValue += this._resultExpMoveDelay;
+    if (this._resultExpMoveValue >= currentValue) {
+      this._resultExpMoveValue = currentValue;
+      this._resultExpMoveDelay = 0;
+    }
+  }
+};
+
 Sprite_ResultExpGauge.prototype.updateTargetValue = function(value, maxValue) {
   if (this._instant) {
     this._startCurrentExp = 0;
@@ -959,9 +1047,6 @@ Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {
   if (this._instant) {
     this._value = 0;
     this._maxValue = this._targetMaxValue;
-    if (Imported.NUUN_GaugeValueAnimation) {
-      this._moveValue = 0;
-    }
     this.redraw();
     this._instant = false;
   } else {
@@ -970,6 +1055,7 @@ Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {
   if (this._nowLevel < this._battler._level && this._duration === 0) {
     this._nowLevel++;
     this._instant = true;
+    this._resultExpMoveValue = 0;
     AudioManager.playSe({"name":LevelUpSe,"volume":volume,"pitch":pitch,"pan":pan});
   }
 };

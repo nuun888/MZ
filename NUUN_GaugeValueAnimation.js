@@ -6,15 +6,6 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2021/2/19 Ver.1.1.0
- * 特定のゲージの数値をアニメーションさせない機能を追加。
- * 2021/1/26 Ver.1.0.1
- * プラグインパラメータの方式を変更。
- * ゲージ、数値のアニメーション時間を個別に設定できるよ機能を追加。
- * 2021/1/26 Ver.1.0.0
- * 初版
- * 
  */ 
 /*:
  * @target MZ
@@ -31,6 +22,17 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/3/1 Ver.1.1.1
+ * ゲージ数値の更新処理を修正。
+ * 2021/2/19 Ver.1.1.0
+ * 特定のゲージの数値をアニメーションさせない機能を追加。
+ * 2021/1/26 Ver.1.0.1
+ * プラグインパラメータの方式を変更。
+ * ゲージ、数値のアニメーション時間を個別に設定できるよ機能を追加。
+ * 2021/1/26 Ver.1.0.0
+ * 初版
  * 
  * @param UpdateFlameValue
  * @text ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）
@@ -88,6 +90,7 @@ Imported.NUUN_GaugeValueAnimation = true;
   Sprite_Gauge.prototype.setup = function(battler, statusType) {
     this._battler = battler;
     this._statusType = statusType;
+    this._smoothnessMode = this.getFlameStatus();
     this._value = isNaN(this._value) ? this.currentValue() : this._value;
     this._maxValue = isNaN(this._maxValue) ? this.currentMaxValue() : this._maxValue;
     this._moveMode = false;
@@ -100,7 +103,7 @@ Imported.NUUN_GaugeValueAnimation = true;
   Sprite_Gauge.prototype.updateBitmap = function() {
     _Sprite_Gauge_updateBitmap.call(this);
     const value = this.currentValue();
-    if (this._moveValue !== value) {
+    if (this._moveValue !== value && this._smoothnessMode) {
       this.valueRedraw();
     }
   };
@@ -127,8 +130,7 @@ Imported.NUUN_GaugeValueAnimation = true;
 
   Sprite_Gauge.prototype.currentValueMove = function(currentValue) {
     if (this._moveDelay === 0) {
-      const find = this.getFlameStatus();
-      this._moveDelay = (currentValue - this._moveValue) / (find && find.OnUpdateValue ? this.smoothness() : 1);
+      this._moveDelay = (currentValue - this._moveValue) / (this._smoothnessMode && this._smoothnessMode.OnUpdateValue ? this.smoothness() : 1);
     }
     if (this._moveValue > currentValue) {
       this._moveValue += this._moveDelay;
@@ -147,9 +149,8 @@ Imported.NUUN_GaugeValueAnimation = true;
   
   const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;
   Sprite_Gauge.prototype.smoothness = function() {
-    const find = this.getFlameStatus();
-    if (find && find.UpdateFlame) {
-      return find.UpdateFlame;
+    if (this._smoothnessMode && this._smoothnessMode.UpdateFlame) {
+      return this._smoothnessMode.UpdateFlame;
     }
     return _Sprite_Gauge_smoothness.call(this);
   };

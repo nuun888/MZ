@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/1 Ver.1.2.1
+ * EXPゲージの数値を百分率表記にする機能を追加。
  * 2021/3/1 Ver.1.2.0
  * EXPゲージに数値を表示する機能を追加。
  * 2021/2/28 Ver.1.1.1
@@ -135,7 +137,24 @@
  * @value 1
  * @option 最大値と現在値を表示
  * @value 2
+ * @option 百分率で表示
+ * @value 3
  * @default 1
+ * @parent GetPage
+ * 
+ * @param Decimal
+ * @text 小数点桁数
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetPage
+ * 
+ * @param DecimalMode
+ * @text 端数処理四捨五入
+ * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
+ * @type boolean
+ * @default true
  * @parent GetPage
  * 
  * @param GaugeRefreshFrame
@@ -311,6 +330,8 @@ const LavelUpWindowShow = eval(parameters['LavelUpWindowShow'] || "true");
 const GaugeValueShow = Number(parameters['GaugeValueShow'] || 0);
 const GaugeRefreshFrame = Number(parameters['GaugeRefreshFrame'] || 100);
 const GaugeMaxValueFontSize = Number(parameters['GaugeMaxValueFontSize'] || -6);
+const Decimal = Number(parameters['Decimal'] || 0);
+const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const ResultName = String(parameters['ResultName'] || "戦闘結果");
 const GetGoldName = String(parameters['GetGoldName'] || "");
 const GetEXPName = String(parameters['GetEXPName'] || "経験値");
@@ -979,18 +1000,28 @@ Sprite_Gauge.prototype.drawValue = function() {
     const width = this.bitmapWidth();
     const height = this.bitmapHeight();
     this._resultExpMoveMode = GaugeRefreshFrame > 0 && GaugeValueShow ? true : false;
-    const currentValue = this.currentValue();
+    let currentValue = this.currentValue();
     if (GaugeValueShow > 0) {
       this.setupValueFont();
       if (GaugeValueShow === 1) {
+        currentValue = this.maxLavel() ? "----------" : currentValue;
         this.bitmap.drawText(currentValue, width - 100, 0, 100, height, "right");
+      } else if (GaugeValueShow === 2) {
+        currentValue = this.maxLavel() ? "----------" : currentValue;
+        if (!this.maxLavel()) {
+          this.bitmap.fontSize = $gameSystem.mainFontSize() + GaugeMaxValueFontSize;
+          const textWidth = Math.min(this.bitmap.measureTextWidth(this.currentMaxValue()), 70);
+          this.bitmap.drawText(this.currentMaxValue(), width - textWidth, this._maxValueY, textWidth, height, "right");
+          this.bitmap.fontSize = this.valueFontSize();
+          this.bitmap.drawText("/", width - (textWidth + 40), 0, 36, height, "right");
+          this.bitmap.drawText(currentValue, width - (textWidth + 90), 0, 70, height, "right");
+        } else {
+          this.bitmap.drawText(currentValue, width - 100, 0, 100, height, "right");
+        }
       } else {
-        this.bitmap.fontSize = $gameSystem.mainFontSize() + GaugeMaxValueFontSize;
-        const textWidth = Math.min(this.bitmap.measureTextWidth(this.currentMaxValue()), 70);
-        this.bitmap.drawText(this.currentMaxValue(), width - textWidth, this._maxValueY, textWidth, height, "right");
-        this.bitmap.fontSize = this.valueFontSize();
-        this.bitmap.drawText(currentValue, width - (textWidth + 90), 0, 70, height, "right");
-        this.bitmap.drawText("/", width - (textWidth + 40), 0, 36, height, "right");
+        currentValue = this.maxLavel() ? this.currentMaxValue() : currentValue;
+        const rate = this.currentDecimal(currentValue / this.currentMaxValue() * 100);
+        this.bitmap.drawText(rate +"%", width - 100, 0, 100, height, "right");
       }
     }
   } else {
@@ -1006,10 +1037,14 @@ Sprite_ResultExpGauge.prototype.currentValue = function() {
   return Sprite_Gauge.prototype.currentValue.call(this);
 };
 
+Sprite_ResultExpGauge.prototype.maxLavel = function() {
+  return this._nowLevel >= this._battler.maxLevel();
+};
+
 const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
 Sprite_Gauge.prototype.currentValue = function() {
   return this._battler && this._statusType === "result_exp" ? 
-  Math.min(this._battler.currentExp() - this._battler.expForLevel(this._nowLevel), this.currentMaxValue()) : _Sprite_Gauge_currentValue.call(this);
+  this.maxLavel() ? this.currentMaxValue() : Math.min(this._battler.currentExp() - this._battler.expForLevel(this._nowLevel), this.currentMaxValue()) : _Sprite_Gauge_currentValue.call(this);
 };
 
 const _Sprite_Gauge_currentMaxValue = Sprite_Gauge.prototype.currentMaxValue;
@@ -1045,7 +1080,7 @@ Sprite_ResultExpGauge.prototype.updateTargetValue = function(value, maxValue) {
 
 Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {
   if (this._instant) {
-    this._value = 0;
+    this._value = this.maxLavel() ? this._targetMaxValue : 0;
     this._maxValue = this._targetMaxValue;
     this.redraw();
     this._instant = false;
@@ -1073,15 +1108,11 @@ Sprite_Gauge.prototype.smoothness = function() {
   return this._statusType === "result_exp" ? GaugeRefreshFrame : _Sprite_Gauge_smoothness.call(this);
 };
 
-Sprite_ResultExpGauge.prototype.currentPercent = function() {
-  return (this._battler.currentExp() - this._battler.currentLevelExp()) / (this._battler.nextLevelExp() - this._battler.currentLevelExp()) * 100;
-};
-
 Sprite_ResultExpGauge.prototype.currentDecimal = function(val) {
-  if (param.DecimalMode) {
-    return Math.round(val * (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1)) / (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1);
+  if (DecimalMode) {
+    return Math.round(val * (Decimal > 0 ? Math.pow(10, Decimal) : 1)) / (Decimal > 0 ? Math.pow(10, Decimal) : 1);
   } else {
-    return Math.floor(val * (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1)) / (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1);
+    return Math.floor(val * (Decimal > 0 ? Math.pow(10, Decimal) : 1)) / (Decimal > 0 ? Math.pow(10, Decimal) : 1);
   }
 };
 

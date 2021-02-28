@@ -35,6 +35,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/2/28 Ver.1.1.1
+ * フォントサイズを変更したとき、経験値名称と獲得経験値の文字が被る問題を修正。
+ * 入手画面のアクター名、レベル、経験値のフォントサイズが２２未満の時反映されるように変更。
  * 2021/2/28 Ver.1.1.0
  * 獲得金額の下に独自パラメータを表示する機能を追加。
  * レベルアップ画面に独自パラメータを表示する機能を追加。
@@ -569,7 +572,7 @@ Window_Result.prototype.drawExpGauge = function(x, y) {
 };
 
 Window_Result.prototype.drawActorName = function(x, y, width) {
-  this.contents.fontSize = 22;
+  this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
   this.drawText(this._actor.name(), x, y, width);
   this.contents.fontSize = $gameSystem.mainFontSize();
 };
@@ -584,7 +587,7 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
   if (exp) {
     const level = actor.resultGainExp(exp);
     const oldStatus = [];
-    this.contents.fontSize = 22;
+    this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(TextManager.levelA, x, y, 48);
     if (level > actor._level) {
@@ -676,12 +679,12 @@ Window_Result.prototype.drawActorOriginalParam = function(x, y, width) {
 Window_Result.prototype.drawGetEXP = function(x, y, width) {
   const exp = Math.round(BattleManager._rewards.exp * this._actor.finalExpRate());
   if (exp) {
+    this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
     const textWidth = this.textWidth(GetEXPName);
-    this.contents.fontSize = 22;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(GetEXPName, x, y, width, "left");
     this.resetTextColor();
-    this.drawText("+"+ exp, x + textWidth, y, width, "left");
+    this.drawText("+"+ exp, x + textWidth + this.itemPadding(), y, width, "left");
     this.contents.fontSize = $gameSystem.mainFontSize();
   }
 };

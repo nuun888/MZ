@@ -29,9 +29,7 @@
  * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
  * this._actor アクターのゲームデータ
  * 
- * 仕様
- * 獲得金額の名称のみ未記入にすると金額のみ表示することが出来ます。
- * 所持金拡張プラグインで所持金のアイコンを表示させたい場合はアイコンの表示クラスに"Window_Result"を記入してください。（必ず'及び"で囲む）
+ * 獲得金額に金額アイコンを表示させる場合は「所持金拡張プラグイン」のアイコンの表示クラスに"Window_Result"を記入してください。（必ず'及び"で囲む）
  * 
  * プラグインコマンド
  * レベルアップ画面の表示の許可を設定できます。(注：このプラグインコマンドを実行後レベルアップ画面表示の設定が無効化されます）
@@ -47,6 +45,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/2 Ver.1.4.0
+ * 背景画像を表示できる機能を追加。
+ * ウィンドウ幅を0以外にしたときにドロップアイテム、習得スキルの表示位置がずれる問題を修正。
+ * ウィンドウ幅を0以外にしたときにボタンが右端に来るよう修正。
  * 2021/3/1 Ver.1.3.1
  * 戦闘勝利後のBGMを設定できるプラグインコマンドを追加。
  * 2021/3/1 Ver.1.3.0
@@ -212,6 +214,13 @@
  * @default
  * @parent GetPage
  * 
+ * @param PartyBackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
+ * @type file
+ * @dir img/pictures
+ * @parent GetPage
+ * 
  * @param LevelUpPage
  * @text レベルアップ画面設定
  * 
@@ -249,6 +258,23 @@
  * @type string
  * @default
  * @parent LevelUpPage
+ * 
+ * @param ActorBackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
+ * @type file
+ * @dir img/pictures
+ * @parent LevelUpPage
+ * 
+ * @param CommonSetting
+ * @text 共通設定
+ * 
+ * @param BackUiWidth
+ * @text 背景サイズをUIに合わせる
+ * @desc 背景サイズをUIに合わせる。
+ * @type boolean
+ * @default true
+ * @parent CommonSetting
  * 
  * @param NameSetting
  * @text 名称設定
@@ -420,14 +446,17 @@ const LavelUpWindowShow = eval(parameters['LavelUpWindowShow'] || "true");
 const GaugeValueShow = Number(parameters['GaugeValueShow'] || 0);
 const GaugeRefreshFrame = Number(parameters['GaugeRefreshFrame'] || 100);
 const GaugeMaxValueFontSize = Number(parameters['GaugeMaxValueFontSize'] || -6);
+const PartyBackGroundImg = String(parameters['PartyBackGroundImg'] || "");
+const ActorBackGroundImg = String(parameters['ActorBackGroundImg'] || "");
+const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
 const Decimal = Number(parameters['Decimal'] || 0);
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
-const ResultName = String(parameters['ResultName'] || "戦闘結果");
+const ResultName = String(parameters['ResultName'] || "");
 const GetGoldName = String(parameters['GetGoldName'] || "");
-const GetEXPName = String(parameters['GetEXPName'] || "経験値");
-const GetItemName = String(parameters['GetItemName'] || "入手アイテム");
+const GetEXPName = String(parameters['GetEXPName'] || "");
+const GetItemName = String(parameters['GetItemName'] || "");
 const LevelUpName = String(parameters['LevelUpName'] || "LEVEL UP");
-const learnSkillName = String(parameters['learnSkillName'] || "習得スキル");
+const learnSkillName = String(parameters['learnSkillName'] || "");
 const PartyOriginalParamName = String(parameters['PartyOriginalParamName'] || "");
 const PartyOriginalParam = String(parameters['PartyOriginalParam'] || "");
 const PartyOriginalParamName2 = String(parameters['PartyOriginalParamName2'] || "");
@@ -464,21 +493,81 @@ PluginManager.registerCommand(pluginName, 'LevelUpPage', args => {
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
   _Scene_Battle_createAllWindows.call(this);
+  this.createResultBaseSprite();
+  this.createResultBackGround();
   this.createResultHelpWindow();
   this.createResultWindow();
   this.createResultDropItemWindow();
   this.createResultButtons();
 };
 
+Scene_Battle.prototype.createResultBaseSprite = function() {
+  this._resultBaseSprite = null;
+  if (PartyBackGroundImg || ActorBackGroundImg) {
+    const sprite = new Sprite();
+    this._resultBaseSprite = sprite;
+    this.addChild(sprite);
+  }
+};
+
+Scene_Battle.prototype.createResultBackGround = function() {
+  if (this._resultBaseSprite) {
+    if (PartyBackGroundImg) {
+      let sprite = new Sprite();
+      this._resultBaseSprite.addChild(sprite);
+      sprite.bitmap= ImageManager.loadPicture(PartyBackGroundImg);
+      this._backGroundPartySprite = sprite;
+      sprite.hide();
+      if (sprite.bitmap && !sprite.bitmap.isReady()) {
+        sprite.bitmap.addLoadListener(this.resultBackGround.bind(this, sprite));
+      } else {
+        this.resultBackGround(sprite);
+      }
+    }
+    if (ActorBackGroundImg) {
+      sprite = new Sprite();
+      this._resultBaseSprite.addChild(sprite);
+      sprite.bitmap = ImageManager.loadPicture(ActorBackGroundImg);
+      this._backGroundActorSprite = sprite;
+      sprite.hide();
+      if (sprite.bitmap && !sprite.bitmap.isReady()) {
+        sprite.bitmap.addLoadListener(this.resultBackGround.bind(this, sprite));
+      } else {
+        this.resultBackGround(sprite);
+      }
+    }
+  }
+};
+
+Scene_Battle.prototype.resultBackGround = function(sprite) {
+  if(BackUiWidth) {
+    sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2 + (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
+    sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
+    const width = (ResultWidth > 0 ? ResultWidth : Graphics.boxWidth) + 8;
+    const height = (ResultHeight > 0 ? ResultHeight : Graphics.boxHeight) + 8;
+    sprite.scale.x = (width !== sprite.bitmap.width ? width / sprite.bitmap.width : 1);
+    sprite.scale.y = (height !== sprite.bitmap.height ? height / sprite.bitmap.height : 1);
+  } else {
+    sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
+    sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+  }
+};
+
 Scene_Battle.prototype.createResultHelpWindow = function() {
   const rect = this.resultHelpWindowRect();
   this._resultHelpWindow = new Window_ResultHelp(rect);
   this._resultHelpWindow.hide();
-  this.addWindow(this._resultHelpWindow);
+  if (this._resultBaseSprite) {
+    this._resultBaseSprite.addChild(this._resultHelpWindow);
+    this._resultHelpWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
+    this._resultHelpWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
+  } else {
+    this.addWindow(this._resultHelpWindow);
+  }
 };
 
 Scene_Battle.prototype.resultHelpWindowRect = function() {
-  const wx = ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0;
+  const wx = (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
   const wy = this.resultHelpAreaTop();
   const ww = ResultWidth > 0 ? ResultWidth : Graphics.boxWidth;
   const wh = this.resultHelpAreaHeight();
@@ -491,12 +580,18 @@ Scene_Battle.prototype.createResultWindow = function() {
   this._resultWindow.setHandler("ok", this.onResultOk.bind(this));
   this._resultWindow.setHandler("cancel", this.onResultOk.bind(this));
   this._resultWindow.hide();
-  this.addWindow(this._resultWindow);
+  if (this._resultBaseSprite) {
+    this._resultBaseSprite.addChild(this._resultWindow);
+    this._resultWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
+    this._resultWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
+  } else {
+    this.addWindow(this._resultWindow);
+  }
 };
 
 Scene_Battle.prototype.resultWindowRect = function() {
-  const wx = ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0;
-  const wy = this._resultHelpWindow.y + this.resultHelpAreaHeight();
+  const wx = (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
+  const wy = this.resultHelpAreaTop() + this.resultHelpAreaHeight();
   const ww = ResultWidth > 0 ? ResultWidth : Graphics.boxWidth;
   const wh = (ResultHeight > 0 ? ResultHeight : Graphics.boxHeight) - wy;
   return new Rectangle(wx, wy, ww, wh);
@@ -506,13 +601,17 @@ Scene_Battle.prototype.createResultDropItemWindow = function() {
   const rect = this.resultDropItemWindowRect();
   this._resultDropItemWindow = new Window_ResultDropItem(rect);
   this._resultDropItemWindow.hide();
-  this.addChild(this._resultDropItemWindow);
+  if (PartyBackGroundImg) {
+    this._resultBaseSprite.addChild(this._resultDropItemWindow);
+  } else {
+    this.addChild(this._resultDropItemWindow);
+  }
   this._resultDropItemWindow.setWindowResult(this._resultWindow);
 };
 
 Scene_Battle.prototype.resultDropItemWindowRect = function() {
-  const wx = (ResultWidth > 0 ? (Graphics.width - ResultWidth) / 2 : 0) + (Graphics.width - Graphics.boxWidth) / 2;
-  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this._resultHelpWindow.y + this.resultHelpAreaHeight();
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.resultHelpAreaTop() + this.resultHelpAreaHeight();
   const ww = this._resultWindow.width;
   const wh = this._resultWindow.height;
   return new Rectangle(wx, wy, ww, wh);
@@ -525,18 +624,30 @@ Scene_Battle.prototype.createResultButtons = function() {
 };
 
 Scene_Battle.prototype.createResultButton = function() {
-  this._okResultButton = new Sprite_Button("ok");
-  this._okResultButton.x = Graphics.boxWidth - this._okResultButton.width - 4;
+  this._okResultButton = new Sprite_Button("ok");(ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0)
+  this._okResultButton.x = (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 + ResultWidth: Graphics.boxWidth) - this._okResultButton.width - 4;
   this._okResultButton.y = this.resultbuttonY();
-  this.addWindow(this._okResultButton);
   this._downResultButton = new Sprite_Button("pagedown");
   this._downResultButton.x = this._okResultButton.x - (24 + this._downResultButton.width);
   this._downResultButton.y = this.resultbuttonY();
   this._upResultButton = new Sprite_Button("pageup");
   this._upResultButton.x = this._downResultButton.x - this._downResultButton.width - 4;
   this._upResultButton.y = this.resultbuttonY();
-  this.addWindow(this._upResultButton);
-  this.addWindow(this._downResultButton);
+  if (PartyBackGroundImg) {
+    this._resultBaseSprite.addChild(this._okResultButton);
+    this._resultBaseSprite.addChild(this._upResultButton);
+    this._resultBaseSprite.addChild(this._downResultButton);
+    this._okResultButton.x += (Graphics.width - Graphics.boxWidth) / 2;
+    this._okResultButton.y += (Graphics.height - Graphics.boxHeight) / 2;
+    this._downResultButton.x += (Graphics.width - Graphics.boxWidth) / 2;
+    this._downResultButton.y += (Graphics.height - Graphics.boxHeight) / 2;
+    this._upResultButton.x += (Graphics.width - Graphics.boxWidth) / 2;
+    this._upResultButton.y += (Graphics.height - Graphics.boxHeight) / 2;
+  } else {
+    this.addWindow(this._okResultButton);
+    this.addWindow(this._upResultButton);
+    this.addWindow(this._downResultButton);
+  }
   this._upResultButton.setClickHandler(this.updateDorpItemPageup.bind(this));
   this._downResultButton.setClickHandler(this.updateDorpItemPagedown.bind(this));
 };
@@ -551,6 +662,8 @@ Scene_Battle.prototype.resultHelpAreaTop = function() {
 
 Scene_Battle.prototype.onResultOk = function() {
   if (this._resultWindow.actorLevelUp.length > 0 && this._resultWindow.page < this._resultWindow.actorLevelUp.length) {
+    this.backGroundPartyHide();
+    this.backGroundActorShow();
     this._resultWindow.page++;
     this._resultDropItemWindow.page = 0;
     this._resultWindow.refresh();
@@ -560,11 +673,14 @@ Scene_Battle.prototype.onResultOk = function() {
     this._resultHelpWindow.close();
     this._resultWindow.close();
     this._resultDropItemWindow.close();
+    this.backGroundPartyHide();
+    this.backGroundActorHide();
     BattleManager.playMapBgm();
   }
 };
 
 Scene_Battle.prototype.resultOpen = function() {
+  this.backGroundPartyShow();
   this._resultWindow.activate();
   this._resultHelpWindow.show();
   this._resultWindow.show();
@@ -574,6 +690,43 @@ Scene_Battle.prototype.resultOpen = function() {
   this._resultDropItemWindow.open();
   this._resultWindow.refresh();
   this._resultDropItemWindow.refresh();
+};
+
+Scene_Battle.prototype.backGroundPartyShow = function() {
+  if (this._backGroundPartySprite) {
+    this._resultHelpWindow.opacity = 0;
+    this._resultHelpWindow.frameVisible = false;
+    this._resultWindow.opacity = 0;
+    this._resultWindow.frameVisible = false;
+    this._backGroundPartySprite.show();
+  }
+};
+
+Scene_Battle.prototype.backGroundActorShow = function() {
+  if (this._backGroundActorSprite) {
+    this._resultHelpWindow.opacity = 0;
+    this._resultHelpWindow.frameVisible = false;
+    this._resultWindow.opacity = 0;
+    this._resultWindow.frameVisible = false;
+    this._backGroundActorSprite.show();
+  } else {
+    this._resultHelpWindow.opacity = 255;
+    this._resultHelpWindow.frameVisible = true;
+    this._resultWindow.opacity = 255;
+    this._resultWindow.frameVisible = true;
+  }
+};
+
+Scene_Battle.prototype.backGroundPartyHide = function() {
+  if (this._backGroundPartySprite) {
+    this._backGroundPartySprite.hide();
+  }
+};
+
+Scene_Battle.prototype.backGroundActorHide = function() {
+  if (this._backGroundActorSprite) {
+    this._backGroundActorSprite.hide();
+  }
 };
 
 const _Scene_Battle_update = Scene_Battle.prototype.update;

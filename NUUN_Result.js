@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.3.1
+ * @version 1.4.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。

@@ -270,8 +270,8 @@
  * @text 共通設定
  * 
  * @param BackUiWidth
- * @text 背景サイズをUIに合わせる
- * @desc 背景サイズをUIに合わせる。
+ * @text 背景サイズをウィンドウサイズに合わせる
+ * @desc 背景サイズをウィンドウサイズに合わせる。
  * @type boolean
  * @default true
  * @parent CommonSetting

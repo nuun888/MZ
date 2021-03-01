@@ -328,8 +328,8 @@
  * @text 戦闘勝利BGM設定
  * 
  * @param VictoryBGM
- * @text 勝利ME後のBGM
- * @desc 勝利ME後のBGMを指定します。
+ * @text 戦闘勝利のBGM
+ * @desc 戦闘勝利のBGMを指定します。
  * @type file
  * @dir audio/bgm
  * @parent BGMSetting
@@ -353,7 +353,8 @@
  * @default 0
  * @parent BGMSetting
  * 
- * プラグインコマンド
+ * 
+ * 
  * @command VictoryBGM
  * @desc 戦闘ME後のBGMの再生の許可を変更します。
  * @text 戦闘ME後のBGM再生許可

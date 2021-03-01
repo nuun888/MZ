@@ -11,22 +11,19 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
- * デフォルトのリザルトはメッセージウィンドウで表示されますが、大量のドロップアイテムやレベルアップしたアクターが
- * 大量にスキルを習得した場合、メッセージウィンドウに表示できる行の関係上多くの決定キー（ボタン）を押さなければならなくなります。
- * 出来るだけ決定キー（ボタン）を押す回数を減らすために入手EXP、獲得金額、ドロップアイテムを１画面にし、レベルアップしたアクターがいない場合は決定キー（ボタン）を
+ * デフォルトのリザルトはメッセージウィンドウで表示されますが、入手EXP、獲得金額、ドロップアイテムを１画面にし、レベルアップしたアクターがいない場合は決定キー（ボタン）を
  * １回押しただけでリザルトが終了します。
- * プラグインコマンドでレベルアップ画面の表示の許可を設定できます。(注：このプラグインコマンドを実行後レベルアップ画面表示の設定が無効化されます）
  * 
  * 入手画面では顔グラ又はキャラチップ、レベルアップ後のレベル、獲得金額、入手EXP、ドロップアイテムが表示されます。
  * レベルアップ画面ではレベル差分、ステータス差分、習得スキルが表示されます。
  * レベルアップ画面はレベルアップしたアクターのみ表示されます。
  * 
- * 勝利ME後に任意のBGMを再生できます。
- * またプラグインコマンドで勝利ME後のBGMの再生の許可を設定できます。
+ * 戦闘勝利後に任意のBGMを再生できます。MEが指定してある場合はME再生終了後に再生されます。
+ * 
  * 
  * アクターの独自パラメータ
  * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
@@ -35,6 +32,11 @@
  * 仕様
  * 獲得金額の名称のみ未記入にすると金額のみ表示することが出来ます。
  * 所持金拡張プラグインで所持金のアイコンを表示させたい場合はアイコンの表示クラスに"Window_Result"を記入してください。（必ず'及び"で囲む）
+ * 
+ * プラグインコマンド
+ * レベルアップ画面の表示の許可を設定できます。(注：このプラグインコマンドを実行後レベルアップ画面表示の設定が無効化されます）
+ * 戦闘勝利後のBGMの再生の許可を設定できます。
+ * 戦闘勝利後のBGMを指定することが出来ます。BGMに何も指定しないことでプラグインコマンドで指定したBGMは再生されなくなります。
  * 
  * 
  * 操作
@@ -45,11 +47,14 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/1 Ver.1.3.1
+ * 戦闘勝利後のBGMを設定できるプラグインコマンドを追加。
  * 2021/3/1 Ver.1.3.0
  * 勝利ME後に任意のBGMを再生する機能を追加。
  * プラグインコマンドでレベルアップ画面を表示を許可する機能を追加。(注：このプラグインコマンドを実行後レベルアップ画面表示の設定が無効化されます）
  * 2021/3/1 Ver.1.2.1
  * EXPゲージの数値を百分率表記にする機能を追加。
+ * 最大レベルの時にゲージがMAXになるよう修正。
  * 2021/3/1 Ver.1.2.0
  * EXPゲージに数値を表示する機能を追加。
  * 2021/2/28 Ver.1.1.1
@@ -291,7 +296,7 @@
  * @parent NameSetting
  * 
  * @param SESetting
- * @text SE設定
+ * @text レベルアップSE設定
  * 
  * @param LevelUpSe
  * @text レベルアップ時のSE
@@ -320,7 +325,7 @@
  * @parent SESetting
  * 
  * @param BGMSetting
- * @text BGM設定
+ * @text 戦闘勝利BGM設定
  * 
  * @param VictoryBGM
  * @text 勝利ME後のBGM
@@ -358,6 +363,33 @@
  * @default true
  * @desc 戦闘ME後のBGMの再生の許可します。
  * @text 戦闘ME後のBGMの再生の許可
+ * 
+ * 
+ * @command VictoryBGMSelect
+ * @desc 戦闘勝利後のBGMを設定します。
+ * @text 戦闘勝利後BGM
+ * 
+ * @arg _BGM
+ * @text 勝利ME後のBGM
+ * @desc 勝利ME後のBGMを指定します。何も指定しないことでBGMが初期化されます。
+ * @type file
+ * @dir audio/bgm
+ * 
+ * @arg Volume
+ * @text SEの音量
+ * @desc SEを音量を設定します。
+ * @default 90
+ * 
+ * @arg Pitch
+ * @text SEのピッチ
+ * @desc SEをピッチを設定します。
+ * @default 100
+ * 
+ * @arg Pan
+ * @text SEの位相
+ * @desc SEを位相を設定します。
+ * @default 0
+ * 
  * 
  * @command LevelUpPage
  * @desc レベルアップ画面の表示を許可を変更します。
@@ -417,6 +449,10 @@ const pluginName = "NUUN_Result";
 
 PluginManager.registerCommand(pluginName, 'VictoryBGM', args => {
   BattleManager.victoryBGMEnable(eval(args.VictoryBGMEnable))
+});
+
+PluginManager.registerCommand(pluginName, 'VictoryBGMSelect', args => {
+  BattleManager.victoryBGMSelect(args)
 });
 
 PluginManager.registerCommand(pluginName, 'LevelUpPage', args => {
@@ -724,7 +760,7 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       }
       oldStatus.push(actor._level);
       this.actorOldStatus.push(oldStatus);
-      this.changeTextColor(ColorManager.textColor(17));console.log(BattleManager._levelUpPageEnable)
+      this.changeTextColor(ColorManager.textColor(17));
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
       }
@@ -1225,6 +1261,7 @@ BattleManager.initMembers = function() {
   _BattleManager_initMembers.call(this);
   this.onResult = false;
   this._victoryOn = false;
+  this._victoryBGMOn = false;
 };
 
 const _BattleManager_processVictory = BattleManager.processVictory;
@@ -1255,11 +1292,18 @@ BattleManager.isBusy = function() {
 const _BattleManager_replayBgmAndBgs = BattleManager.replayBgmAndBgs;
 BattleManager.replayBgmAndBgs = function() {
   this._victoryBGMEnable = (this._victoryBGMEnable === undefined || this._victoryBGMEnable === null) ? true : this._victoryBGMEnable;
-  if (VictoryBGM && this._victoryBGMEnable && this._victoryOn) {
-    AudioManager.playBgm(this.playVictoryBgm());
-  } else {
-    _BattleManager_replayBgmAndBgs.call(this);
+  if (this._victoryBGMEnable && this._victoryOn) {
+    if (this._victoryBgmDate && this._victoryBgmDate.name) {
+      AudioManager.playBgm(this._victoryBgmDate);
+      this._victoryBGMOn = true;
+      return;
+    } else if (VictoryBGM) {
+      AudioManager.playBgm(this.playVictoryBgm());
+      this._victoryBGMOn = true;
+      return;
+    }
   }
+  _BattleManager_replayBgmAndBgs.call(this);
 };
 
 BattleManager.playVictoryBgm = function() {
@@ -1271,8 +1315,20 @@ BattleManager.playVictoryBgm = function() {
   return _victoryBgm;
 };
 
+BattleManager.victoryBGMSelect = function(bgmDate) {
+  if (!bgmDate._BGM) {
+    this._victoryBgmDate = {};
+    return;
+  }
+  this._victoryBgmDate = {};
+  this._victoryBgmDate.name = String(bgmDate._BGM);
+  this._victoryBgmDate.volume = Number(bgmDate.Volume);
+  this._victoryBgmDate.pitch = Number(bgmDate.Pitch);
+  this._victoryBgmDate.pan = Number(bgmDate.Pan);
+};
+
 BattleManager.playMapBgm = function() {
-  if (!VictoryBGM) {
+  if (!this._victoryBGMOn) {
     return;
   }
   if (this._mapBgm) {

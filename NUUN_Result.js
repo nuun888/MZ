@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -45,6 +45,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/3 Ver.1.4.1
+ * 決定キーを押しっぱなしでウィンドウが閉じないように修正。
+ * ドロップアイテム、習得アイテムのページ切り替えを押しっぱなしで切り替えられるように修正。
  * 2021/3/2 Ver.1.4.0
  * 背景画像を表示できる機能を追加。
  * ウィンドウ幅を0以外にしたときにドロップアイテム、習得スキルの表示位置がずれる問題を修正。
@@ -699,6 +702,11 @@ Scene_Battle.prototype.backGroundPartyShow = function() {
     this._resultWindow.opacity = 0;
     this._resultWindow.frameVisible = false;
     this._backGroundPartySprite.show();
+  } else {
+    this._resultHelpWindow.opacity = 255;
+    this._resultHelpWindow.frameVisible = true;
+    this._resultWindow.opacity = 255;
+    this._resultWindow.frameVisible = true;
   }
 };
 
@@ -733,9 +741,9 @@ const _Scene_Battle_update = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
   _Scene_Battle_update.call(this);
   if (this._resultWindow.active) {
-    if (Input.isTriggered('left')) {
+    if (Input.isRepeated('left')) {
       this.updateDorpItemPageup();
-    } else if (Input.isTriggered('right')){
+    } else if (Input.isRepeated('right')){
       this.updateDorpItemPagedown();
     }
   }
@@ -816,6 +824,7 @@ Window_Result.prototype.initialize = function(rect) {
   this.actorOldStatus = [];
   this.page = 0;
   this._actor = null;
+  this._canRepeat = false;
   this.refresh();
 };
 

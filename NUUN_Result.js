@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -45,9 +45,13 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/4 Ver.1.4.2
+ * 獲得経験値が0の時に獲得経験値が表示されない問題を修正。
+ * 獲得経験値が0の時に現在経験値の数値にNaNが表示される問題を修正。
+ * 次のレベルまでの必要経験値のY座標計算に問題が生じたためユーザー側がY座標を調整できるように変更。
  * 2021/3/3 Ver.1.4.1
- * 決定キーを押しっぱなしでウィンドウが閉じないように修正。
- * ドロップアイテム、習得アイテムのページ切り替えを押しっぱなしで切り替えられるように修正。
+ * 決定キーを押しっぱなしで戦闘を終了するとリザルトウィンドウがすぐに閉じてしまう問題を修正。
+ * ドロップアイテム、習得スキルのページ切り替えを押しっぱなしで切り替えられるように修正。
  * 2021/3/2 Ver.1.4.0
  * 背景画像を表示できる機能を追加。
  * ウィンドウ幅を0以外にしたときにドロップアイテム、習得スキルの表示位置がずれる問題を修正。
@@ -187,6 +191,13 @@
  * @type number
  * @default -6
  * @min -100
+ * @parent GetPage
+ * 
+ * @param GaugeMaxValueY
+ * @type number
+ * @default 0
+ * @text ゲージ最大値Y座標調整
+ * @desc ゲージ最大値のY座標を調整します。（相対座標）
  * @parent GetPage
  * 
  * @param PartyOriginalParamName
@@ -449,6 +460,7 @@ const LavelUpWindowShow = eval(parameters['LavelUpWindowShow'] || "true");
 const GaugeValueShow = Number(parameters['GaugeValueShow'] || 0);
 const GaugeRefreshFrame = Number(parameters['GaugeRefreshFrame'] || 100);
 const GaugeMaxValueFontSize = Number(parameters['GaugeMaxValueFontSize'] || -6);
+const GaugeMaxValueY = Number(parameters['GaugeMaxValueY'] || 0);
 const PartyBackGroundImg = String(parameters['PartyBackGroundImg'] || "");
 const ActorBackGroundImg = String(parameters['ActorBackGroundImg'] || "");
 const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
@@ -456,7 +468,7 @@ const Decimal = Number(parameters['Decimal'] || 0);
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const ResultName = String(parameters['ResultName'] || "");
 const GetGoldName = String(parameters['GetGoldName'] || "");
-const GetEXPName = String(parameters['GetEXPName'] || "");
+const GetEXPName = String(parameters['GetEXPName'] || "経験値");
 const GetItemName = String(parameters['GetItemName'] || "");
 const LevelUpName = String(parameters['LevelUpName'] || "LEVEL UP");
 const learnSkillName = String(parameters['learnSkillName'] || "");
@@ -1004,7 +1016,7 @@ Window_Result.prototype.drawActorOriginalParam = function(x, y, width) {
 
 Window_Result.prototype.drawGetEXP = function(x, y, width) {
   const exp = Math.round(BattleManager._rewards.exp * this._actor.finalExpRate());
-  if (exp) {
+  if (!isNaN(exp)) {
     this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
     const textWidth = this.textWidth(GetEXPName);
     this.changeTextColor(ColorManager.systemColor());
@@ -1211,7 +1223,7 @@ Sprite_ResultExpGauge.prototype.initialize = function() {
   this._resultExpMoveMode = false;
   this._resultExpMoveDelay = 0;
   this._resultExpMoveValue = NaN;
-  this._maxValueY = Math.floor((this.bitmap.fontSize - ($gameSystem.mainFontSize() + GaugeMaxValueFontSize)) / 2);
+  this._maxValueY = GaugeMaxValueY;
 };
 
 Sprite_ResultExpGauge.prototype.bitmapWidth = function() {
@@ -1232,6 +1244,9 @@ Sprite_ResultExpGauge.prototype.updateBitmap = function() {
   Sprite_Gauge.prototype.updateBitmap.call(this);
   const value = this.currentValue();
   if (this._resultExpMoveValue !== value) {
+    if (isNaN(this._resultExpMoveValue)) {
+      this._resultExpMoveValue = this.currentValue();
+    }
     this.valueRedraw();
   }
 };
@@ -1247,27 +1262,27 @@ Sprite_Gauge.prototype.drawValue = function() {
     const width = this.bitmapWidth();
     const height = this.bitmapHeight();
     this._resultExpMoveMode = GaugeRefreshFrame > 0 && GaugeValueShow ? true : false;
-    let currentValue = this.currentValue();
+    let expValue = this.currentValue();
     if (GaugeValueShow > 0) {
       this.setupValueFont();
       if (GaugeValueShow === 1) {
-        currentValue = this.maxLavel() ? "----------" : currentValue;
-        this.bitmap.drawText(currentValue, width - 100, 0, 100, height, "right");
+        expValue = this.maxLavel() ? "----------" : expValue;
+        this.bitmap.drawText(expValue, width - 100, 0, 100, height, "right");
       } else if (GaugeValueShow === 2) {
-        currentValue = this.maxLavel() ? "----------" : currentValue;
+        expValue = this.maxLavel() ? "----------" : expValue;
         if (!this.maxLavel()) {
           this.bitmap.fontSize = $gameSystem.mainFontSize() + GaugeMaxValueFontSize;
           const textWidth = Math.min(this.bitmap.measureTextWidth(this.currentMaxValue()), 70);
           this.bitmap.drawText(this.currentMaxValue(), width - textWidth, this._maxValueY, textWidth, height, "right");
           this.bitmap.fontSize = this.valueFontSize();
           this.bitmap.drawText("/", width - (textWidth + 40), 0, 36, height, "right");
-          this.bitmap.drawText(currentValue, width - (textWidth + 90), 0, 70, height, "right");
+          this.bitmap.drawText(expValue, width - (textWidth + 90), 0, 70, height, "right");
         } else {
-          this.bitmap.drawText(currentValue, width - 100, 0, 100, height, "right");
+          this.bitmap.drawText(expValue, width - 100, 0, 100, height, "right");
         }
       } else {
-        currentValue = this.maxLavel() ? this.currentMaxValue() : currentValue;
-        const rate = this.currentDecimal(currentValue / this.currentMaxValue() * 100);
+        expValue = this.maxLavel() ? this.currentMaxValue() : expValue;
+        const rate = this.currentDecimal(expValue / this.currentMaxValue() * 100);
         this.bitmap.drawText(rate +"%", width - 100, 0, 100, height, "right");
       }
     }

@@ -47,6 +47,7 @@
  * 更新履歴
  * 2021/3/4 Ver.1.4.3
  * 獲得経験値が0の時にレベルが表示されない問題を修正。
+ * 獲得金額が0の時に金額が表示されない問題を修正。
  * 2021/3/4 Ver.1.4.2
  * 獲得経験値が0の時に獲得経験値が表示されない問題を修正。
  * 獲得経験値が0の時に現在経験値の数値にNaNが表示される問題を修正。
@@ -973,7 +974,7 @@ Window_Result.prototype.drawGetItems = function(x, y, width) {
 
 Window_Result.prototype.drawGetGold = function(x, y, width) {
   const gold = BattleManager._rewards.gold;
-  if (gold) {
+  if (!isNaN(gold)) {
     this.changeTextColor(ColorManager.systemColor());
     if (GetGoldName) {
       this.drawText(GetGoldName, x, y, 120, "left");

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.4.3
+ * @version 1.4.4
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -45,6 +45,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/5 Ver.1.4.4
+ * レベルアップ、レベルアップした時のレベル、レベルアップ後のレベル、ステータスの色を指定できる機能を追加。
+ * 獲得経験値のブーストにより数値に色付け出来る機能を追加。
+ * 戦闘不能アクターの名前を赤く表示するように変更。
+ * リザルト画面を開いた後、次のページを切り替えるまでの待機フレームを設定する機能を追加。
+ * 背景画像がボタンの前面に表示されてしまう問題を修正。
  * 2021/3/4 Ver.1.4.3
  * 獲得経験値が0の時にレベルが表示されない問題を修正。
  * 獲得金額が0の時に金額が表示されない問題を修正。
@@ -91,8 +97,8 @@
  * 初版。
  * 
  * 
- * @param GetPage
- * @text 入手画面設定
+ * @param CommonSetting
+ * @text 共通設定
  * 
  * @param ResultWidth
  * @desc ウィンドウの横幅。(0でUI横幅)デフォルト:808
@@ -100,7 +106,7 @@
  * @type number
  * @default 808
  * @min 0
- * @parent GetPage
+ * @parent CommonSetting
  * 
  * @param ResultHeight
  * @desc ウィンドウの縦幅。(0でUI縦幅)デフォルト:616
@@ -108,7 +114,32 @@
  * @type number
  * @default 616
  * @min 0
- * @parent GetPage
+ * @parent CommonSetting
+ * 
+ * @param BackUiWidth
+ * @text 背景サイズをウィンドウサイズに合わせる
+ * @desc 背景サイズをウィンドウサイズに合わせる。
+ * @type boolean
+ * @default true
+ * @parent CommonSetting
+ * 
+ * @param Decimal
+ * @text 小数点桁数
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent CommonSetting
+ * 
+ * @param DecimalMode
+ * @text 端数処理四捨五入
+ * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
+ * @type boolean
+ * @default true
+ * @parent CommonSetting
+ * 
+ * @param GetPage
+ * @text 入手画面設定
  * 
  * @param ActorShow
  * @desc アクターの画像を表示します。
@@ -151,6 +182,34 @@
  * @desc １キャラ当たりの縦幅を、顔グラの拡大率に合わせて高さ調整します。
  * @parent GetPage
  * 
+ * @param LevelUpNameColor
+ * @desc レベルアップの文字色
+ * @text レベルアップ文字色
+ * @type number
+ * @default 17
+ * @parent GetPage
+ * 
+ * @param LevelUpValueColor
+ * @desc レベルアップした時のレベルの数値の色
+ * @text レベルアップ時の数値色
+ * @type number
+ * @default 17
+ * @parent GetPage
+ * 
+ * @param EXPBoostValueColor
+ * @desc 獲得経験値が通常より多い時の数値の色
+ * @text 獲得経験値ブースト時数値色
+ * @type number
+ * @default 0
+ * @parent GetPage
+ * 
+ * @param EXPResistValueColor
+ * @desc 獲得経験値が通常よりも少ない時の数値の色
+ * @text 獲得経験値レジスト時数値色
+ * @type number
+ * @default 0
+ * @parent GetPage
+ * 
  * @param GaugeValueShow
  * @desc EXPゲージの数値を表示する。
  * @text EXPゲージ数値表示
@@ -164,21 +223,6 @@
  * @option 百分率で表示
  * @value 3
  * @default 1
- * @parent GetPage
- * 
- * @param Decimal
- * @text 小数点桁数
- * @desc 表示出来る小数点桁数。
- * @type number
- * @default 0
- * @min 0
- * @parent GetPage
- * 
- * @param DecimalMode
- * @text 端数処理四捨五入
- * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
- * @type boolean
- * @default true
  * @parent GetPage
  * 
  * @param GaugeRefreshFrame
@@ -201,6 +245,13 @@
  * @default 0
  * @text ゲージ最大値Y座標調整
  * @desc ゲージ最大値のY座標を調整します。（相対座標）
+ * @parent GetPage
+ * 
+ * @param PartyPageRefreshFrame
+ * @desc ページ切り替えまでの待機フレーム
+ * @text 待機フレーム
+ * @type number
+ * @default 0
  * @parent GetPage
  * 
  * @param PartyOriginalParamName
@@ -248,6 +299,20 @@
  * @desc レベルアップ画面表示します。falseでレベルアップ後のステータス差分、習得スキル演出をカットします。
  * @parent LevelUpPage
  * 
+ * @param DifferenceStatusColor
+ * @desc レベルアップ後のステータスの数値の色
+ * @text レベルアップ後ステータス数値色
+ * @type number
+ * @default 24
+ * @parent LevelUpPage
+ * 
+ * @param ActorPageRefreshFrame
+ * @desc ページ切り替えまでの待機フレーム
+ * @text 待機フレーム
+ * @type number
+ * @default 0
+ * @parent GetPage
+ * 
  * @param ActorOriginalParamName
  * @text 独自パラメータ名称
  * @desc レベルアップ画面に表示する独自パラメータの名称を設定します。
@@ -282,16 +347,6 @@
  * @type file
  * @dir img/pictures
  * @parent LevelUpPage
- * 
- * @param CommonSetting
- * @text 共通設定
- * 
- * @param BackUiWidth
- * @text 背景サイズをウィンドウサイズに合わせる
- * @desc 背景サイズをウィンドウサイズに合わせる。
- * @type boolean
- * @default true
- * @parent CommonSetting
  * 
  * @param NameSetting
  * @text 名称設定
@@ -464,6 +519,13 @@ const GaugeValueShow = Number(parameters['GaugeValueShow'] || 0);
 const GaugeRefreshFrame = Number(parameters['GaugeRefreshFrame'] || 100);
 const GaugeMaxValueFontSize = Number(parameters['GaugeMaxValueFontSize'] || -6);
 const GaugeMaxValueY = Number(parameters['GaugeMaxValueY'] || 0);
+const LevelUpNameColor = Number(parameters['LevelUpNameColor'] || 17);
+const LevelUpValueColor = Number(parameters['LevelUpValueColor'] || 17);
+const EXPBoostValueColor = Number(parameters['EXPBoostValueColor'] || 0);
+const EXPResistValueColor = Number(parameters['EXPResistValueColor'] || 0);
+const DifferenceStatusColor = Number(parameters['DifferenceStatusColor'] || 24);
+const PartyPageRefreshFrame = Number(parameters['PartyPageRefreshFrame'] || 0);
+const ActorPageRefreshFrame = Number(parameters['ActorPageRefreshFrame'] || 0);
 const PartyBackGroundImg = String(parameters['PartyBackGroundImg'] || "");
 const ActorBackGroundImg = String(parameters['ActorBackGroundImg'] || "");
 const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
@@ -512,7 +574,6 @@ const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
   _Scene_Battle_createAllWindows.call(this);
   this.createResultBaseSprite();
-  this.createResultBackGround();
   this.createResultHelpWindow();
   this.createResultWindow();
   this.createResultDropItemWindow();
@@ -525,36 +586,37 @@ Scene_Battle.prototype.createResultBaseSprite = function() {
     const sprite = new Sprite();
     this._resultBaseSprite = sprite;
     this.addChild(sprite);
+    this.createResultBackGround();
   }
 };
 
 Scene_Battle.prototype.createResultBackGround = function() {
   if (this._resultBaseSprite) {
     if (PartyBackGroundImg) {
-      let sprite = new Sprite();
-      this._resultBaseSprite.addChild(sprite);
-      sprite.bitmap= ImageManager.loadPicture(PartyBackGroundImg);
-      this._backGroundPartySprite = sprite;
-      sprite.hide();
-      if (sprite.bitmap && !sprite.bitmap.isReady()) {
-        sprite.bitmap.addLoadListener(this.resultBackGround.bind(this, sprite));
+      const partySprite = new Sprite();
+      this._resultBaseSprite.addChild(partySprite);
+      partySprite.bitmap = ImageManager.loadPicture(PartyBackGroundImg);
+      this._backGroundPartySprite = partySprite;
+      partySprite.hide();
+      if (partySprite.bitmap && !partySprite.bitmap.isReady()) {
+        partySprite.bitmap.addLoadListener(this.resultBackGround.bind(this, partySprite));
       } else {
-        this.resultBackGround(sprite);
+        this.resultBackGround(partySprite);
       }
     }
     if (ActorBackGroundImg) {
-      sprite = new Sprite();
-      this._resultBaseSprite.addChild(sprite);
-      sprite.bitmap = ImageManager.loadPicture(ActorBackGroundImg);
-      this._backGroundActorSprite = sprite;
-      sprite.hide();
-      if (sprite.bitmap && !sprite.bitmap.isReady()) {
-        sprite.bitmap.addLoadListener(this.resultBackGround.bind(this, sprite));
+      const actorSprite = new Sprite();
+      this._resultBaseSprite.addChild(actorSprite);
+      actorSprite.bitmap = ImageManager.loadPicture(ActorBackGroundImg);
+      this._backGroundActorSprite = actorSprite;
+      actorSprite.hide();
+      if (actorSprite.bitmap && !actorSprite.bitmap.isReady()) {
+        actorSprite.bitmap.addLoadListener(this.resultBackGround.bind(this, actorSprite));
       } else {
-        this.resultBackGround(sprite);
+        this.resultBackGround(actorSprite);
       }
     }
-  }
+  } 
 };
 
 Scene_Battle.prototype.resultBackGround = function(sprite) {
@@ -619,7 +681,7 @@ Scene_Battle.prototype.createResultDropItemWindow = function() {
   const rect = this.resultDropItemWindowRect();
   this._resultDropItemWindow = new Window_ResultDropItem(rect);
   this._resultDropItemWindow.hide();
-  if (PartyBackGroundImg) {
+  if (this._resultBaseSprite) {
     this._resultBaseSprite.addChild(this._resultDropItemWindow);
   } else {
     this.addChild(this._resultDropItemWindow);
@@ -651,7 +713,7 @@ Scene_Battle.prototype.createResultButton = function() {
   this._upResultButton = new Sprite_Button("pageup");
   this._upResultButton.x = this._downResultButton.x - this._downResultButton.width - 4;
   this._upResultButton.y = this.resultbuttonY();
-  if (PartyBackGroundImg) {
+  if (this._resultBaseSprite) {
     this._resultBaseSprite.addChild(this._okResultButton);
     this._resultBaseSprite.addChild(this._upResultButton);
     this._resultBaseSprite.addChild(this._downResultButton);
@@ -687,7 +749,8 @@ Scene_Battle.prototype.onResultOk = function() {
     this._resultWindow.refresh();
     this._resultDropItemWindow.refresh();
     this._resultWindow.activate();
-  } else {
+    BattleManager.resultRefresh = ActorPageRefreshFrame;
+ } else {
     this._resultHelpWindow.close();
     this._resultWindow.close();
     this._resultDropItemWindow.close();
@@ -708,6 +771,7 @@ Scene_Battle.prototype.resultOpen = function() {
   this._resultDropItemWindow.open();
   this._resultWindow.refresh();
   this._resultDropItemWindow.refresh();
+  BattleManager.resultRefresh = PartyPageRefreshFrame;
 };
 
 Scene_Battle.prototype.backGroundPartyShow = function() {
@@ -717,11 +781,6 @@ Scene_Battle.prototype.backGroundPartyShow = function() {
     this._resultWindow.opacity = 0;
     this._resultWindow.frameVisible = false;
     this._backGroundPartySprite.show();
-  } else {
-    this._resultHelpWindow.opacity = 255;
-    this._resultHelpWindow.frameVisible = true;
-    this._resultWindow.opacity = 255;
-    this._resultWindow.frameVisible = true;
   }
 };
 
@@ -761,6 +820,9 @@ Scene_Battle.prototype.update = function() {
     } else if (Input.isRepeated('right')){
       this.updateDorpItemPagedown();
     }
+  }
+  if (BattleManager.resultRefresh > 0) {
+    BattleManager.resultRefresh--;
   }
 };
 
@@ -912,13 +974,21 @@ Window_Result.prototype.drawExpGauge = function(x, y) {
 };
 
 Window_Result.prototype.drawActorName = function(x, y, width) {
+  if (!this._actor.isAlive()) {
+    this.changeTextColor(ColorManager.deathColor());
+  }
   this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
   this.drawText(this._actor.name(), x, y, width);
   this.contents.fontSize = $gameSystem.mainFontSize();
+  this.resetTextColor();
 };
 
 Window_Result.prototype.drawActorStatusName = function(x, y, width) {
+  if (!this._actor.isAlive()) {
+    this.changeTextColor(ColorManager.deathColor());
+  }
   this.drawText(this._actor.name(), x, y, width);
+  this.resetTextColor();
 };
 
 Window_Result.prototype.drawActorLevel = function(x, y) {
@@ -938,7 +1008,7 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       }
       oldStatus.push(actor._level);
       this.actorOldStatus.push(oldStatus);
-      this.changeTextColor(ColorManager.textColor(17));
+      this.changeTextColor(ColorManager.textColor(LevelUpValueColor));
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
       }
@@ -953,7 +1023,7 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
 
 Window_Result.prototype.drawLevelUp = function(x, y, width) {
   if (this._levelUp) {
-    this.changeTextColor(ColorManager.textColor(17));
+    this.changeTextColor(ColorManager.textColor(LevelUpNameColor));
     this.drawText(LevelUpName, x, y, width, "center");
     this.resetTextColor();
     this._levelUp = false;
@@ -986,17 +1056,19 @@ Window_Result.prototype.drawGetGold = function(x, y, width) {
 };
 
 Window_Result.prototype.drawPartyOriginalParam = function(x, y, width) {
-  if (PartyOriginalParam) {
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(PartyOriginalParamName, x, y, 120, "left");
-    this.resetTextColor();
-    this.drawText(eval(PartyOriginalParam), x + 120, y, width - 120, "right");
-  }
-  if (PartyOriginalParam2) {
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(PartyOriginalParamName2, x, y + this.lineHeight(), 120, "left");
-    this.resetTextColor();
-    this.drawText(eval(PartyOriginalParam2), x + 120, y + this.lineHeight(), width - 120, "right");
+  if (!isNaN(BattleManager._rewards.exp)) {
+    if (PartyOriginalParam) {
+      this.changeTextColor(ColorManager.systemColor());
+      this.drawText(PartyOriginalParamName, x, y, 120, "left");
+      this.resetTextColor();
+      this.drawText(eval(PartyOriginalParam), x + 120, y, width - 120, "right");
+    }
+    if (PartyOriginalParam2) {
+      this.changeTextColor(ColorManager.systemColor());
+      this.drawText(PartyOriginalParamName2, x, y + this.lineHeight(), 120, "left");
+      this.resetTextColor();
+      this.drawText(eval(PartyOriginalParam2), x + 120, y + this.lineHeight(), width - 120, "right");
+    }
   }
 };
 
@@ -1018,14 +1090,22 @@ Window_Result.prototype.drawActorOriginalParam = function(x, y, width) {
 };
 
 Window_Result.prototype.drawGetEXP = function(x, y, width) {
-  const exp = Math.round(BattleManager._rewards.exp * this._actor.finalExpRate());
+  const exp = BattleManager._rewards.exp;
   if (!isNaN(exp)) {
+    const finalExp = Math.round(exp * this._actor.finalExpRate());
     this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
     const textWidth = this.textWidth(GetEXPName);
     this.changeTextColor(ColorManager.systemColor());
-    this.drawText(GetEXPName, x, y, width, "left");
+    this.drawText(GetEXPName, x, y, width, "left");console.log(this._actor.exr)
+    if (exp > finalExp && finalExp > 0) {
+      this.changeTextColor(ColorManager.textColor(EXPResistValueColor));
+    } else if (exp < finalExp) {
+      this.changeTextColor(ColorManager.textColor(EXPBoostValueColor));
+    } else {
+      this.resetTextColor();
+    }
+    this.drawText("+"+ finalExp, x + textWidth + this.itemPadding(), y, width - x - 190, "left");
     this.resetTextColor();
-    this.drawText("+"+ exp, x + textWidth + this.itemPadding(), y, width - x - 190, "left");
     this.contents.fontSize = $gameSystem.mainFontSize();
   }
 };
@@ -1038,7 +1118,7 @@ Window_Result.prototype.drawActorStatusLevel = function(x, y) {
   this.drawText(oldStatus[oldStatus.length - 1], x + 48, y, 100, "left");
   this.changeTextColor(ColorManager.systemColor());
   this.drawText("→", x + 48, y, 100, "center");
-  this.changeTextColor(ColorManager.textColor(24));
+  this.changeTextColor(ColorManager.textColor(DifferenceStatusColor));
   this.drawText(this._actor._level, x + 48, y, 100, "right");
   this.resetTextColor();
 };
@@ -1058,7 +1138,7 @@ Window_Result.prototype.drawActorStatus = function(x, y, width) {
     this.changeTextColor(ColorManager.systemColor());
     this.drawText("→", x + (width - 110), y, width - 160, "left");
     if (oldValue < value) {
-      this.changeTextColor(ColorManager.textColor(24));
+      this.changeTextColor(ColorManager.textColor(DifferenceStatusColor));
     }
     this.drawText(value, x + width - 60, y, 60, "right");
     this.resetTextColor();
@@ -1119,6 +1199,12 @@ Window_Result.prototype.drawHorzLine = function(x, y, width) {
 Window_Result.prototype.onTouchCancel = function() {
   if (this.isCancelEnabled()) {
       this.processOk();
+  }
+};
+
+Window_Result.prototype.processOk = function() {
+  if (BattleManager.resultRefresh === 0) {
+    Window_StatusBase.prototype.processOk.call(this);
   }
 };
 
@@ -1443,6 +1529,7 @@ BattleManager.initMembers = function() {
   this.onResult = false;
   this._victoryOn = false;
   this._victoryBGMOn = false;
+  this.resultRefresh = 0;
 };
 
 const _BattleManager_processVictory = BattleManager.processVictory;

@@ -1096,7 +1096,7 @@ Window_Result.prototype.drawGetEXP = function(x, y, width) {
     this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
     const textWidth = this.textWidth(GetEXPName);
     this.changeTextColor(ColorManager.systemColor());
-    this.drawText(GetEXPName, x, y, width, "left");console.log(this._actor.exr)
+    this.drawText(GetEXPName, x, y, width, "left");
     if (exp > finalExp && finalExp > 0) {
       this.changeTextColor(ColorManager.textColor(EXPResistValueColor));
     } else if (exp < finalExp) {

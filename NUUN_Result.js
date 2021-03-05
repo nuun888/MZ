@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.4.4
+ * @version 1.4.5
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -45,9 +45,13 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/6 Ver.1.4.5
+ * 獲得経験率に変化があった時、EXPゲージ、数値の更新フレームが正常に動作していない問題を修正。
+ * 拡大率を顔グラモード以外適用しないように修正。
+ * レベルアップ画面のステータス差分で差がなかった数値の色がシステムカラーになっていた問題を修正。
  * 2021/3/5 Ver.1.4.4
  * レベルアップ、レベルアップした時のレベル、レベルアップ後のレベル、ステータスの色を指定できる機能を追加。
- * 獲得経験値のブーストにより数値に色付け出来る機能を追加。
+ * 獲得経験率により通常の獲得経験値よりも多い又は少ない時に、数値に色付け出来る機能を追加。
  * 戦闘不能アクターの名前を赤く表示するように変更。
  * リザルト画面を開いた後、次のページを切り替えるまでの待機フレームを設定する機能を追加。
  * 背景画像がボタンの前面に表示されてしまう問題を修正。
@@ -919,7 +923,7 @@ Window_Result.prototype.actorMembers = function() {
 
 Window_Result.prototype.refresh = function() {
   this.contents.clear();
-  const scale = FaceScale / 100;
+  const scale = ActorShow === 2 ? FaceScale / 100 : 1;
   const rect = this.itemRect(0);
   const lineHeight = this.lineHeight();
   const itemPadding = this.itemPadding();
@@ -934,7 +938,7 @@ Window_Result.prototype.refresh = function() {
       this._actor._oldStatus = [];
       let y = i * height + rect.y;
       if (ActorShow === 2) {
-        this.drawActorCharacter(rect.x + FaceWidth / 2, y + 60);
+        this.drawActorCharacter(rect.x + Math.floor(FaceWidth / 2), y + 60);
       } else if (ActorShow === 1) {
         this.drawActorFace(rect.x, y, FaceWidth, FaceHeight);
       }
@@ -955,13 +959,13 @@ Window_Result.prototype.refresh = function() {
       this.removeExpGauge(this.actor(i));
     }
     this._actor = this.actorLevelUp[this.page - 1];
-    const x = rect.x + rect.width / 2 + itemPadding;
+    const x = rect.x + Math.floor(rect.width / 2) + itemPadding;
     this.drawActorFace(rect.x, rect.y, ImageManager.faceWidth, ImageManager.faceHeight);
     this.drawActorStatusName(rect.x + 152, rect.y, rect.width - x - 152);
     this.drawActorStatusLevel(x, rect.y);
     this.drawActorOriginalParam(rect.x + 152, rect.y + lineHeight, rect.width - x - 152);
     //this.drawHorzLine(rect.x + 152, rect.y + lineHeight * 3.5, rect.width - 152);
-    this.drawActorStatus(rect.x, rect.y + lineHeight * 3.5, rect.width / 2 - itemPadding);
+    this.drawActorStatus(rect.x, rect.y + lineHeight * 3.5, Math.floor(rect.width / 2) - itemPadding);
   }
 };
 
@@ -1139,6 +1143,8 @@ Window_Result.prototype.drawActorStatus = function(x, y, width) {
     this.drawText("→", x + (width - 110), y, width - 160, "left");
     if (oldValue < value) {
       this.changeTextColor(ColorManager.textColor(DifferenceStatusColor));
+    } else {
+      this.resetTextColor();
     }
     this.drawText(value, x + width - 60, y, 60, "right");
     this.resetTextColor();
@@ -1447,7 +1453,7 @@ Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {
 };
 
 Sprite_ResultExpGauge.prototype.smoothSpeed = function() {
-  return (this.currentValue() - this._startCurrentExp) / BattleManager._rewards.exp;
+  return (this.currentValue() - this._startCurrentExp) / (BattleManager._rewards.exp * this._battler.finalExpRate());
 };
 
 Sprite_ResultExpGauge.prototype.smoothness = function() {

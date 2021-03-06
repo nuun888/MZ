@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.4.5
+ * @version 1.4.6
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -25,9 +25,16 @@
  * 戦闘勝利後に任意のBGMを再生できます。MEが指定してある場合はME再生終了後に再生されます。
  * 
  * 
- * アクターの独自パラメータ
+ * アクターの参照変数（独自パラメータ）
  * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
  * this._actor アクターのゲームデータ
+ * 
+ * アイテム、スキルのメモ欄
+ * <ResultItemColor:[カラーインデックス]> 取得したアイテム、習得したスキルの文字色に色を付けることが出来ます。
+ * <ResultItemColor:2> 文字色がカラーインデックス2番の色に変更されます。
+ * ※この機能を有効にするには新規獲得アイテムの色を変更するには「アイテム、スキル欄文字色個別変」プラグイン Ver.1.0.2以降が必要となります
+ * このプラグインを「アイテム、スキル欄文字色個別変」より上に配置してください。
+ * 「アイテム、スキル欄文字色個別変」のタグで設定した色変更でも反映されますが、アイテム、スキル欄に表示する色とリザルトでは別の色を設定したい場合などに使用してください。
  * 
  * 獲得金額に金額アイコンを表示させる場合は「所持金拡張プラグイン」のアイコンの表示クラスに"Window_Result"を記入してください。（必ず'及び"で囲む）
  * 
@@ -45,6 +52,15 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/7 Ver.1.4.6
+ * ドロップアイテム、習得スキルに色を付ける機能を追加。
+ * 入手画面のアクター名、レベル、獲得経験値のフォントサイスを変更できるように変更。
+ * 入手画面の獲得経験値、EXPゲージのY位置を指定できる機能を追加。
+ * プラグインパラメータ「勝利BGM」に勝利MEを再生させない機能を追加。
+ * 入手画面の経験値バーの現在値にフォントサイズを指定できるように変更。
+ * タッチUIがOFFの時にウィンドウの表示範囲を上に詰める機能を追加。
+ * リザルトウィンドウY座標を調整できる機能を追加。
+ * 線の色を変えられる機能を追加。
  * 2021/3/6 Ver.1.4.5
  * 獲得経験率に変化があった時、EXPゲージ、数値の更新フレームが正常に動作していない問題を修正。
  * 拡大率を顔グラモード以外適用しないように修正。
@@ -104,13 +120,17 @@
  * @param CommonSetting
  * @text 共通設定
  * 
+ * @param WindowSetting
+ * @text ウィンドウ設定
+ * @parent CommonSetting
+ * 
  * @param ResultWidth
  * @desc ウィンドウの横幅。(0でUI横幅)デフォルト:808
  * @text ウィンドウ横幅
  * @type number
  * @default 808
  * @min 0
- * @parent CommonSetting
+ * @parent WindowSetting
  * 
  * @param ResultHeight
  * @desc ウィンドウの縦幅。(0でUI縦幅)デフォルト:616
@@ -118,13 +138,35 @@
  * @type number
  * @default 616
  * @min 0
- * @parent CommonSetting
+ * @parent WindowSetting
+ * 
+ * @param ResultWindow_Y
+ * @desc ウィンドウのY座標。
+ * @text ウィンドウY座標
+ * @type number
+ * @default 0
+ * @min -999999
+ * @parent WindowSetting
+ * 
+ * @param NoTouchUIWindow
+ * @type boolean
+ * @default false
+ * @text タッチUI OFF時ウィンドウ上詰め
+ * @desc タッチUIがOFFの時ウィンドウを上に詰めます。
+ * @parent WindowSetting
  * 
  * @param BackUiWidth
  * @text 背景サイズをウィンドウサイズに合わせる
  * @desc 背景サイズをウィンドウサイズに合わせる。
  * @type boolean
  * @default true
+ * @parent WindowSetting
+ * 
+ * @param LineColor
+ * @desc 線の色
+ * @text 線の色
+ * @type number
+ * @default 0
  * @parent CommonSetting
  * 
  * @param Decimal
@@ -186,33 +228,73 @@
  * @desc １キャラ当たりの縦幅を、顔グラの拡大率に合わせて高さ調整します。
  * @parent GetPage
  * 
+ * @param FontColor
+ * @text 文字色設定
+ * @parent GetPage
+ * 
  * @param LevelUpNameColor
  * @desc レベルアップの文字色
  * @text レベルアップ文字色
  * @type number
  * @default 17
- * @parent GetPage
+ * @parent FontColor
  * 
  * @param LevelUpValueColor
  * @desc レベルアップした時のレベルの数値の色
  * @text レベルアップ時の数値色
  * @type number
  * @default 17
- * @parent GetPage
+ * @parent FontColor
  * 
  * @param EXPBoostValueColor
  * @desc 獲得経験値が通常より多い時の数値の色
  * @text 獲得経験値ブースト時数値色
  * @type number
  * @default 0
- * @parent GetPage
+ * @parent FontColor
  * 
  * @param EXPResistValueColor
  * @desc 獲得経験値が通常よりも少ない時の数値の色
  * @text 獲得経験値レジスト時数値色
  * @type number
  * @default 0
+ * @parent FontColor
+ * 
+ * @param FontSize
+ * @text フォントサイズ設定
  * @parent GetPage
+ * 
+ * @param ActorNameFontSize
+ * @desc アクター名のフォントサイズ（メインフォントサイズからの差）
+ * @text アクター名フォントサイズ
+ * @type number
+ * @default 0
+ * @parent FontSize
+ * 
+ * @param LevelFontSize
+ * @desc レベルのフォントサイズ（メインフォントサイズからの差）
+ * @text レベルフォントサイズ
+ * @type number
+ * @default 0
+ * @parent FontSize
+ * 
+ * @param EXPFontSize
+ * @desc 獲得経験値のフォントサイズ（メインフォントサイズからの差）
+ * @text 獲得経験値フォントサイズ
+ * @type number
+ * @default -4
+ * @parent FontSize
+ * 
+ * @param ExpSetting
+ * @text ゲージ設定
+ * @parent GetPage
+ * 
+ * @param EXP_Y
+ * @desc 獲得経験値のY座標（デフォルト:30）
+ * @text 獲得経験値Y座標
+ * @type number
+ * @default 30
+ * @parent ExpSetting
  * 
  * @param GaugeValueShow
  * @desc EXPゲージの数値を表示する。
@@ -227,35 +309,40 @@
  * @option 百分率で表示
  * @value 3
  * @default 1
- * @parent GetPage
+ * @parent ExpSetting
  * 
  * @param GaugeRefreshFrame
  * @desc EXPゲージの更新フレーム
  * @text EXPゲージ更新フレーム
  * @type number
  * @default 100
- * @parent GetPage
+ * @parent ExpSetting
+ * 
+ * @param GaugeValueFontSize
+ * @desc ゲージ現在値数値のフォントサイズ。（メインフォントサイズからの差）
+ * @text ゲージ現在値数値のフォントサイズ
+ * @type number
+ * @default -6
+ * @min -100
+ * @parent ExpSetting
  * 
  * @param GaugeMaxValueFontSize
- * @desc ゲージ最大値数値のフォントサイズ。基本フォントサイズからの差
+ * @desc ゲージ最大値数値のフォントサイズ。（メインフォントサイズからの差）
  * @text ゲージ最大値数値のフォントサイズ
  * @type number
  * @default -6
  * @min -100
- * @parent GetPage
+ * @parent ExpSetting
  * 
  * @param GaugeMaxValueY
  * @type number
  * @default 0
  * @text ゲージ最大値Y座標調整
  * @desc ゲージ最大値のY座標を調整します。（相対座標）
- * @parent GetPage
+ * @parent ExpSetting
  * 
- * @param PartyPageRefreshFrame
- * @desc ページ切り替えまでの待機フレーム
- * @text 待機フレーム
- * @type number
- * @default 0
+ * @param PartyOriginalSetting
+ * @text 独自パラメータ設定
  * @parent GetPage
  * 
  * @param PartyOriginalParamName
@@ -263,27 +350,34 @@
  * @desc 獲得金額の下に表示する独自パラメータの名称を設定します。
  * @type string
  * @default
- * @parent GetPage
+ * @parent PartyOriginalSetting
  * 
  * @param PartyOriginalParam
  * @text 独自パラメータ評価式
  * @desc 獲得金額の下に表示する独自パラメータの評価式を設定します。
  * @type string
  * @default
- * @parent GetPage
+ * @parent PartyOriginalSetting
  * 
  * @param PartyOriginalParamName2
  * @text 独自パラメータ名称２
  * @desc 獲得金額の下に表示する独自パラメータの名称を設定します。
  * @type string
  * @default
- * @parent GetPage
+ * @parent PartyOriginalSetting
  * 
  * @param PartyOriginalParam2
  * @text 独自パラメータ評価式２
  * @desc 獲得金額の下に表示する独自パラメータの評価式を設定します。
  * @type string
  * @default
+ * @parent PartyOriginalSetting
+ * 
+ * @param PartyPageRefreshFrame
+ * @desc ページ切り替えまでの待機フレーム
+ * @text 待機フレーム
+ * @type number
+ * @default 0
  * @parent GetPage
  * 
  * @param PartyBackGroundImg
@@ -310,39 +404,43 @@
  * @default 24
  * @parent LevelUpPage
  * 
- * @param ActorPageRefreshFrame
- * @desc ページ切り替えまでの待機フレーム
- * @text 待機フレーム
- * @type number
- * @default 0
- * @parent GetPage
+ * @param ActorOriginalSetting
+ * @text 独自パラメータ設定
+ * @parent LevelUpPage
  * 
  * @param ActorOriginalParamName
  * @text 独自パラメータ名称
  * @desc レベルアップ画面に表示する独自パラメータの名称を設定します。
  * @type string
  * @default
- * @parent LevelUpPage
+ * @parent ActorOriginalSetting
  * 
  * @param ActorOriginalParam
  * @text 独自パラメータ評価式
  * @desc レベルアップ画面に表示する独自パラメータの評価式を設定します。
  * @type string
  * @default
- * @parent LevelUpPage
+ * @parent ActorOriginalSetting
  * 
  * @param ActorOriginalParamName2
  * @text 独自パラメータ名称２
  * @desc レベルアップ画面に表示する独自パラメータの名称を設定します。
  * @type string
  * @default
- * @parent LevelUpPage
+ * @parent ActorOriginalSetting
  * 
  * @param ActorOriginalParam2
  * @text 独自パラメータ評価式２
  * @desc レベルアップ画面に表示する独自パラメータの評価式を設定します。
  * @type string
  * @default
+ * @parent ActorOriginalSetting
+ * 
+ * @param ActorPageRefreshFrame
+ * @desc ページ切り替えまでの待機フレーム
+ * @text 待機フレーム
+ * @type number
+ * @default 0
  * @parent LevelUpPage
  * 
  * @param ActorBackGroundImg
@@ -493,6 +591,11 @@
  * @desc BGMを位相を設定します。
  * @default 0
  * 
+ * @arg NoVictoryME
+ * @type boolean
+ * @default false
+ * @text 勝利ME再生なし
+ * @desc 勝利MEを再生しません。
  * 
  * @command LevelUpPage
  * @desc レベルアップ画面の表示を許可を変更します。
@@ -517,10 +620,14 @@ const ResultHeight = Number(parameters['ResultHeight'] || 616);
 const FaceWidth = Number(parameters['FaceWidth'] || 144);
 const FaceHeight = Number(parameters['FaceHeight'] || 120);
 const FaceScale = Number(parameters['FaceScale'] || 100);
+const LineColor = Number(parameters['LineColor'] || 0);
 const FaceScaleHeight = eval(parameters['FaceScaleHeight'] || "true");
+const NoTouchUIWindow = eval(parameters['NoTouchUIWindow'] || "false");
+const ResultWindow_Y = Number(parameters['ResultWindow_Y'] || 0);
 const LavelUpWindowShow = eval(parameters['LavelUpWindowShow'] || "true");
 const GaugeValueShow = Number(parameters['GaugeValueShow'] || 0);
 const GaugeRefreshFrame = Number(parameters['GaugeRefreshFrame'] || 100);
+const GaugeValueFontSize = Number(parameters['GaugeValueFontSize'] || -6);
 const GaugeMaxValueFontSize = Number(parameters['GaugeMaxValueFontSize'] || -6);
 const GaugeMaxValueY = Number(parameters['GaugeMaxValueY'] || 0);
 const LevelUpNameColor = Number(parameters['LevelUpNameColor'] || 17);
@@ -530,6 +637,10 @@ const EXPResistValueColor = Number(parameters['EXPResistValueColor'] || 0);
 const DifferenceStatusColor = Number(parameters['DifferenceStatusColor'] || 24);
 const PartyPageRefreshFrame = Number(parameters['PartyPageRefreshFrame'] || 0);
 const ActorPageRefreshFrame = Number(parameters['ActorPageRefreshFrame'] || 0);
+const ActorNameFontSize = Number(parameters['ActorNameFontSize'] || 0);
+const LevelFontSize = Number(parameters['LevelFontSize'] || 0);
+const EXPFontSize = Number(parameters['EXPFontSize'] || -4);
+const EXP_Y = Number(parameters['EXP_Y'] || 30);
 const PartyBackGroundImg = String(parameters['PartyBackGroundImg'] || "");
 const ActorBackGroundImg = String(parameters['ActorBackGroundImg'] || "");
 const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
@@ -652,7 +763,7 @@ Scene_Battle.prototype.createResultHelpWindow = function() {
 
 Scene_Battle.prototype.resultHelpWindowRect = function() {
   const wx = (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
-  const wy = this.resultHelpAreaTop();
+  const wy = this.resultHelpAreaTop();console.log(this.resultHelpAreaHeight())
   const ww = ResultWidth > 0 ? ResultWidth : Graphics.boxWidth;
   const wh = this.resultHelpAreaHeight();
   return new Rectangle(wx, wy, ww, wh);
@@ -741,7 +852,11 @@ Scene_Battle.prototype.resultHelpAreaHeight = function() {
 };
 
 Scene_Battle.prototype.resultHelpAreaTop = function() {
-  return this.buttonAreaHeight();
+  const y = ResultWindow_Y;
+  if (NoTouchUIWindow && !ConfigManager.touchUI) {
+    return y;
+  }
+  return y + this.buttonAreaHeight();
 };
 
 Scene_Battle.prototype.onResultOk = function() {
@@ -945,8 +1060,8 @@ Window_Result.prototype.refresh = function() {
       this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112);
       this.drawActorLevel(rect.x + x2 - 100, y);
       this.drawLevelUp(rect.x, y, Math.floor(FaceWidth * scale));
-      this.drawExpGauge(rect.x + x2 - (gaugeWidth + 30), y + lineHeight * 1.3);
-      this.drawGetEXP(rect.x + faceArea, y + lineHeight * 0.8);
+      this.drawExpGauge(rect.x + x2 - (gaugeWidth + 30), y + EXP_Y + 18);
+      this.drawGetEXP(rect.x + faceArea, y + EXP_Y);
     }
     y = rect.y;
     this.drawGetGold(x2, y, rect.width - x2);
@@ -981,7 +1096,7 @@ Window_Result.prototype.drawActorName = function(x, y, width) {
   if (!this._actor.isAlive()) {
     this.changeTextColor(ColorManager.deathColor());
   }
-  this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
+  this.contents.fontSize = $gameSystem.mainFontSize() + ActorNameFontSize;
   this.drawText(this._actor.name(), x, y, width);
   this.contents.fontSize = $gameSystem.mainFontSize();
   this.resetTextColor();
@@ -1001,7 +1116,7 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
   if (!isNaN(exp)) {
     const level = actor.resultGainExp(exp);
     const oldStatus = [];
-    this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
+    this.contents.fontSize = $gameSystem.mainFontSize() + LevelFontSize;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(TextManager.levelA, x, y, 48);
     if (level > actor._level) {
@@ -1097,7 +1212,7 @@ Window_Result.prototype.drawGetEXP = function(x, y, width) {
   const exp = BattleManager._rewards.exp;
   if (!isNaN(exp)) {
     const finalExp = Math.round(exp * this._actor.finalExpRate());
-    this.contents.fontSize = Math.min($gameSystem.mainFontSize(), 22);
+    this.contents.fontSize = $gameSystem.mainFontSize() + EXPFontSize;
     const textWidth = this.textWidth(GetEXPName);
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(GetEXPName, x, y, width, "left");
@@ -1198,7 +1313,7 @@ Window_Result.prototype.removeExpGauge = function(actor) {
 Window_Result.prototype.drawHorzLine = function(x, y, width) {
   const lineY = y + this.lineHeight() / 2 - 1;
   this.contents.paintOpacity = 48;
-  this.contents.fillRect(x, lineY, width, 2, ColorManager.normalColor());
+  this.contents.fillRect(x, lineY, width, 2, ColorManager.textColor(LineColor));
   this.contents.paintOpacity = 255;
 };
 
@@ -1273,14 +1388,26 @@ Window_ResultDropItem.prototype.drawGetItems = function(x, y, width) {
   if (items) {
     const index = this.dropItemRows * this.page;
     const maxItems = Math.min(this.dropItemRows, items.length - index);
-    if (maxPage > 1) {
+    if (maxPage > 1) {//ResultItemColor
       this.drawText(this.page + 1 +"/"+maxPage, x, y, width, "right");
     }
     for (let i = 0; maxItems > i; i++) {
+      if (Imported.NUUN_ItemNameColor && items[i + index].meta.ResultItemColor) {
+        const color = ColorManager.textColor(Number(items[i + index].meta.ResultItemColor))
+      } else {
+        this.resetTextColor();
+      }
       let y2 = y + lineHeight * (i + 1);
       this.drawItemName(items[i + index], x, y2, width);
     }
   }
+};
+
+Window_ResultDropItem.prototype.drawItemName = function(item, x, y, width) {
+  if (Imported.NUUN_ItemNameColor && item.meta.ResultItemColor) {
+    this.nameColor = ColorManager.textColor(Number(item.meta.ResultItemColor))
+  }
+  Window_Base.prototype.drawItemName.call(this, item, x, y, width);
 };
 
 Window_ResultDropItem.prototype.drawLearnSkill = function(actor, x, y, width) {
@@ -1323,6 +1450,10 @@ Sprite_ResultExpGauge.prototype.initialize = function() {
 
 Sprite_ResultExpGauge.prototype.bitmapWidth = function() {
   return gaugeWidth;
+};
+
+Sprite_ResultExpGauge.prototype.valueFontSize = function() {
+  return $gameSystem.mainFontSize() - GaugeValueFontSize;
 };
 
 Sprite_ResultExpGauge.prototype.setup = function(battler, statusType) {
@@ -1435,7 +1566,7 @@ Sprite_ResultExpGauge.prototype.updateTargetValue = function(value, maxValue) {
   Sprite_Gauge.prototype.updateTargetValue.call(this, value, maxValue);
 };
 
-Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {
+Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {//GaugeValueFontSize
   if (this._instant) {
     this._value = this.maxLavel() ? this._targetMaxValue : 0;
     this._maxValue = this._targetMaxValue;
@@ -1592,6 +1723,7 @@ BattleManager.playVictoryBgm = function() {
 BattleManager.victoryBGMSelect = function(bgmDate) {
   if (!bgmDate._BGM) {
     this._victoryBgmDate = {};
+    this._noVictoryME = false;
     return;
   }
   this._victoryBgmDate = {};
@@ -1599,6 +1731,14 @@ BattleManager.victoryBGMSelect = function(bgmDate) {
   this._victoryBgmDate.volume = Number(bgmDate.Volume);
   this._victoryBgmDate.pitch = Number(bgmDate.Pitch);
   this._victoryBgmDate.pan = Number(bgmDate.Pan);
+  this._noVictoryME = eval(bgmDate.NoVictoryME);
+};
+
+const _BattleManager_playVictoryMe = BattleManager.playVictoryMe;
+BattleManager.playVictoryMe = function() {
+  if (!this._noVictoryME) {
+    _BattleManager_playVictoryMe.call(this);
+  }
 };
 
 BattleManager.playMapBgm = function() {

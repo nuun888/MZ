@@ -437,21 +437,21 @@
  * @parent BGMSetting
  * 
  * @param VictoryVolume
- * @text SEの音量
- * @desc SEを音量を設定します。
+ * @text BGMの音量
+ * @desc BGMを音量を設定します。
  * @default 90
  * @parent BGMSetting
  * @min 0
  * 
  * @param VictoryPitch
- * @text SEのピッチ
- * @desc SEをピッチを設定します。
+ * @text BGMのピッチ
+ * @desc BGMをピッチを設定します。
  * @default 100
  * @parent BGMSetting
  * 
  * @param VictoryPan
- * @text SEの位相
- * @desc SEを位相を設定します。
+ * @text BGMの位相
+ * @desc BGMを位相を設定します。
  * @default 0
  * @parent BGMSetting
  * 

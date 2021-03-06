@@ -6,18 +6,16 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/11/18 Ver 1.0.0
  */
-/*:
+/*:ja
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
+ * @version 1.1.0
  * 
  * @help
  * アイテムに独自のカテゴリーを追加または必要な項目のみ表示させることが出来ます。
- * プラグインパラメータでカテゴリーキーを設定し、
- * アイテム、武器、防具のメモ欄に<CategoryType:[typeName]>を記入します。
+ * プラグインパラメータでカテゴリーキーを設定し、アイテム、武器、防具のメモ欄に<CategoryType:[typeName]>を記入します。
  * メモ欄に記入した[typeName]と同じカテゴリーキーのカテゴリーにアイテムが表示されるようになります。
  * カテゴリーキーに「allItems」を記入しますと、そのカテゴリーは隠しアイテムを除く
  * 全てのアイテムが表示されます。
@@ -29,17 +27,15 @@
  * <CategoryType:sozai>　このタグを記入したアイテムはsozaiカテゴリーに表示されます。
  * 
  * 
- * アイテム、武器、防具、大事なものを再度設定する場合は
- * アイテム　　カテゴリーキー:item
- * 武器　　　　カテゴリーキー:weapon
- * 防具　　　　カテゴリーキー:armor
- * 大事なもの　カテゴリーキー:keyItem
- * をそれぞれカテゴリーキーに入力してください。
- * カテゴリー名は入力しなくても機能します。
- * 名前を変更したい場合はデータベースの用語から設定してください。
- * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/3/7 Ver.1.1.0
+ * 各カテゴリーに個数を表示するか選択できる機能を追加。
+ * 売却画面でも表示行数を反映させるように修正。
+ * 2020/11/18 Ver.1.0.0
+ * 初版
  * 
  * @param CategoryCols
  * @desc カテゴリーの表示列数。
@@ -71,6 +67,12 @@
  * @desc カテゴリーキーを設定します。例:アイテムならitem
  * @type string
  * 
+ * @param NumShow
+ * @type boolean
+ * @default true
+ * @text 個数表示
+ * @desc 個数を表示する。
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_ItemCategory = true;
@@ -90,12 +92,19 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
 }));
 const TypeLength = param.ItemCategory.length
 
-const _Scene_Item_createCategoryWindow = Scene_Item.prototype.createCategoryWindow;
-Scene_Item.prototype.createCategoryWindow = function() {
-  _Scene_Item_createCategoryWindow.call(this);
-  this._categoryWindow.height = this.calcWindowHeight(param.CategoryRows, true);
+const _Scene_Item_categoryWindowRect = Scene_Item.prototype.categoryWindowRect;
+Scene_Item.prototype.categoryWindowRect = function() {
+  const rect = _Scene_Item_categoryWindowRect.call(this);
+  rect.height = this.calcWindowHeight(param.CategoryRows, true);
+  return rect;
 };
 
+const _Scene_Shop_categoryWindowRect = Scene_Shop.prototype.categoryWindowRect;
+Scene_Shop.prototype.categoryWindowRect = function() {
+  const rect = _Scene_Shop_categoryWindowRect.call(this);
+  rect.height = this.calcWindowHeight(param.CategoryRows, true);
+  return rect;
+};
 
 Window_ItemCategory.prototype.maxCols = function() {
   return param.CategoryCols;
@@ -145,5 +154,27 @@ Window_ItemList.prototype.secretItem = function(item) {
     return true;
   }
   return false;
+};
+
+Window_ItemList.prototype.needsNumber = function() {
+  if (this._category === "keyItem") {
+    return $dataSystem.optKeyItemsNumber;
+  }
+  return this._needsCategory;
+};
+
+const _Window_ItemList_setCategory = Window_ItemList.prototype.setCategory;
+Window_ItemList.prototype.setCategory = function(category) {
+  if (this._category !== category) {
+    this._needsCategory = true;
+    const list = param.ItemCategory;
+    if (list) {
+      const find = list.find(date => date.Categorykey === category);
+      if (find) {
+        this._needsCategory = find.NumShow === undefined ? true : find.NumShow;
+      }
+    }
+  }
+  _Window_ItemList_setCategory.call(this, category)
 };
 })();

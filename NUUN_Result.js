@@ -473,8 +473,8 @@
  * @text 戦闘勝利後BGM
  * 
  * @arg _BGM
- * @text 勝利ME後のBGM
- * @desc 勝利ME後のBGMを指定します。何も指定しないことでBGMが初期化されます。
+ * @text 勝利BGM
+ * @desc 勝利BGMを指定します。何も指定しないことでBGMが初期化されます。
  * @type file
  * @dir audio/bgm
  * 

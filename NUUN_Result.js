@@ -479,18 +479,18 @@
  * @dir audio/bgm
  * 
  * @arg Volume
- * @text SEの音量
- * @desc SEを音量を設定します。
+ * @text BGMの音量
+ * @desc BGMを音量を設定します。
  * @default 90
  * 
  * @arg Pitch
- * @text SEのピッチ
- * @desc SEをピッチを設定します。
+ * @text BGMのピッチ
+ * @desc BGMをピッチを設定します。
  * @default 100
  * 
  * @arg Pan
- * @text SEの位相
- * @desc SEを位相を設定します。
+ * @text BGMの位相
+ * @desc BGMを位相を設定します。
  * @default 0
  * 
  * 

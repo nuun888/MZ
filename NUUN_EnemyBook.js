@@ -118,6 +118,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/6 Ver.1.0.10
+ * タッチUIがOFFの時にウィンドウの表示範囲を上に詰める機能を追加。
  * 2021/2/28 Ver.1.0.9
  * 背景画像が反映されていなかった問題を修正。
  * 2021/2/24 Ver.1.0.8
@@ -426,6 +428,13 @@
  * @default 3
  * @max 3
  * @min 1
+ * @parent BasicSetting
+ * 
+ * @param NoTouchUIWindow
+ * @type boolean
+ * @default false
+ * @text 戦闘時タッチUI OFF時ウィンドウ上詰め
+ * @desc 戦闘時タッチUIがOFFの時ウィンドウを上に詰めます。
  * @parent BasicSetting
  * 
  * @param BackGround
@@ -2650,7 +2659,7 @@ Scene_Battle.prototype.dummyEnemyBookWindowRect = function() {
 
 Scene_Battle.prototype.enemyBookIndexWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
-  const wy = this._enemyBookPercentWindow.y + this._enemyBookPercentWindow.height;
+  const wy = this.enemyBookMainAreaTop() + this._enemyBookPercentWindow.height;
   const ww = Graphics.boxWidth / 3;
   const wh = this.enemyBookMainAreaHeight() - this._enemyBookPercentWindow.height;
   return new Rectangle(wx, wy, ww, wh);
@@ -2832,11 +2841,15 @@ Scene_Battle.prototype.isTimeActive = function() {
 };
 
 Scene_Battle.prototype.enemyBookMainAreaTop = function() {
-  return this.buttonAreaHeight();
+  const y = 0;
+  if (param.NoTouchUIWindow && !ConfigManager.touchUI) {
+    return y;
+  }
+  return y + this.buttonAreaHeight();
 };
 
 Scene_Battle.prototype.enemyBookMainAreaHeight = function() {
-  return Graphics.boxHeight - this.buttonAreaHeight();
+  return Graphics.boxHeight - this.enemyBookMainAreaTop();
 };
 
 Scene_Battle.prototype.userWindowDeactivate = function() {//暫定競合対策

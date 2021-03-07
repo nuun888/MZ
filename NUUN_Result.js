@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.4.6
+ * @version 1.4.7
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -32,7 +32,7 @@
  * アイテム、スキルのメモ欄
  * <ResultItemColor:[カラーインデックス]> 取得したアイテム、習得したスキルの文字色に色を付けることが出来ます。
  * <ResultItemColor:2> 文字色がカラーインデックス2番の色に変更されます。
- * ※この機能を有効にするには新規獲得アイテムの色を変更するには「アイテム、スキル欄文字色個別変」プラグイン Ver.1.0.2以降が必要となります
+ * ※この機能を有効にするには新規獲得アイテムの色を変更するには「アイテム、スキル欄文字色個別変」プラグイン Ver.1.0.2以降が必要となります。
  * 「アイテム、スキル欄文字色個別変」のタグで設定した色変更でも反映されますが、アイテム、スキル欄に表示する色とリザルトでは別の色を設定したい場合などに使用してください。
  * 
  * 獲得金額に金額アイコンを表示させる場合は「所持金拡張プラグイン」のアイコンの表示クラスに"Window_Result"を記入してください。（必ず'及び"で囲む）
@@ -51,6 +51,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/8 Ver.1.4.7
+ * リザルトウィンドウのY座標を変更したとき、ウィンドウがサイズ変更してしまう問題を修正。
+ * アクター名・レベル・経験値のフォントサイズで負の数値を入力できなかった問題を修正。
+ * ゲージ現在値のフォントサイズの計算が間違っていたので修正。
+ * 背景画像設定時、獲得金額下の線を表示しないように変更。
  * 2021/3/7 Ver.1.4.6
  * ドロップアイテム、習得スキルに色を付ける機能を追加。
  * 入手画面のアクター名、レベル、獲得経験値のフォントサイスを変更できるように変更。
@@ -269,6 +274,7 @@
  * @type number
  * @default 0
  * @parent FontSize
+ * @min -99
  * 
  * @param LevelFontSize
  * @desc レベルのフォントサイズ（メインフォントサイズからの差）
@@ -276,6 +282,7 @@
  * @type number
  * @default 0
  * @parent FontSize
+ * @min -99
  * 
  * @param EXPFontSize
  * @desc 獲得経験値のフォントサイズ（メインフォントサイズからの差）
@@ -283,6 +290,7 @@
  * @type number
  * @default -4
  * @parent FontSize
+ * @min -99
  * 
  * @param ExpSetting
  * @text ゲージ設定
@@ -293,6 +301,7 @@
  * @text 獲得経験値Y座標
  * @type number
  * @default 30
+ * @min -999
  * @parent ExpSetting
  * 
  * @param GaugeValueShow
@@ -315,6 +324,7 @@
  * @text EXPゲージ更新フレーム
  * @type number
  * @default 100
+ * @min 0
  * @parent ExpSetting
  * 
  * @param GaugeValueFontSize
@@ -762,7 +772,7 @@ Scene_Battle.prototype.createResultHelpWindow = function() {
 
 Scene_Battle.prototype.resultHelpWindowRect = function() {
   const wx = (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
-  const wy = this.resultHelpAreaTop();console.log(this.resultHelpAreaHeight())
+  const wy = this.resultHelpAreaTop();
   const ww = ResultWidth > 0 ? ResultWidth : Graphics.boxWidth;
   const wh = this.resultHelpAreaHeight();
   return new Rectangle(wx, wy, ww, wh);
@@ -787,7 +797,7 @@ Scene_Battle.prototype.resultWindowRect = function() {
   const wx = (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
   const wy = this.resultHelpAreaTop() + this.resultHelpAreaHeight();
   const ww = ResultWidth > 0 ? ResultWidth : Graphics.boxWidth;
-  const wh = (ResultHeight > 0 ? ResultHeight : Graphics.boxHeight) - wy;
+  const wh = (ResultHeight > 0 ? ResultHeight : Graphics.boxHeight) - wy + ResultWindow_Y;
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -1021,6 +1031,7 @@ Window_Result.prototype.initialize = function(rect) {
   this._actor = null;
   this._canRepeat = false;
   this.refresh();
+  console.log(this.height)
 };
 
 Window_Result.prototype.itemHeight = function() {
@@ -1067,7 +1078,9 @@ Window_Result.prototype.refresh = function() {
     y += lineHeight;
     this.drawPartyOriginalParam(x2, y, rect.width - x2);
     y += (PartyOriginalParam ? lineHeight : 0) + (PartyOriginalParam2 ? lineHeight : 0);
-    this.drawHorzLine(x2, y, rect.width - x2);
+    if (!PartyBackGroundImg) {
+      this.drawHorzLine(x2, y, rect.width - x2);
+    }
   } else {
     for (let i = 0; this.actorMembers() > i; i++) {
       this.removeExpGauge(this.actor(i));
@@ -1391,12 +1404,8 @@ Window_ResultDropItem.prototype.drawGetItems = function(x, y, width) {
       this.drawText(this.page + 1 +"/"+maxPage, x, y, width, "right");
     }
     for (let i = 0; maxItems > i; i++) {
-      if (Imported.NUUN_ItemNameColor && items[i + index].meta.ResultItemColor) {
-        const color = ColorManager.textColor(Number(items[i + index].meta.ResultItemColor))
-      } else {
-        this.resetTextColor();
-      }
       let y2 = y + lineHeight * (i + 1);
+      this.resetTextColor();
       this.drawItemName(items[i + index], x, y2, width);
     }
   }
@@ -1452,7 +1461,7 @@ Sprite_ResultExpGauge.prototype.bitmapWidth = function() {
 };
 
 Sprite_ResultExpGauge.prototype.valueFontSize = function() {
-  return $gameSystem.mainFontSize() - GaugeValueFontSize;
+  return $gameSystem.mainFontSize() + GaugeValueFontSize;
 };
 
 Sprite_ResultExpGauge.prototype.setup = function(battler, statusType) {
@@ -1565,7 +1574,7 @@ Sprite_ResultExpGauge.prototype.updateTargetValue = function(value, maxValue) {
   Sprite_Gauge.prototype.updateTargetValue.call(this, value, maxValue);
 };
 
-Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {//GaugeValueFontSize
+Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {
   if (this._instant) {
     this._value = this.maxLavel() ? this._targetMaxValue : 0;
     this._maxValue = this._targetMaxValue;

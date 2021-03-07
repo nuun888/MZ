@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * アイテムに独自のカテゴリーを追加または必要な項目のみ表示させることが出来ます。
@@ -31,6 +31,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/8 Ver.1.1.1
+ * 全てのアイテム表示keyItem以外の個数の表示を反映するように修正。
  * 2021/3/7 Ver.1.1.0
  * 各カテゴリーに個数を表示するか選択できる機能を追加。
  * 売却画面でも表示行数を反映させるように修正。
@@ -156,11 +158,34 @@ Window_ItemList.prototype.secretItem = function(item) {
   return false;
 };
 
+const _Window_ItemList_drawItemNumber = Window_ItemList.prototype.drawItemNumber;
+Window_ItemList.prototype.drawItemNumber = function(item, x, y, width) {
+  if (this.allItemsNeedsNumber(item)) {
+    _Window_ItemList_drawItemNumber.call(this, item, x, y, width);
+  }
+};
+
 Window_ItemList.prototype.needsNumber = function() {
   if (this._category === "keyItem") {
     return $dataSystem.optKeyItemsNumber;
   }
   return this._needsCategory;
+};
+
+Window_ItemList.prototype.allItemsNeedsNumber = function(item) {
+  if (this._category === "allItems") {
+    if (item.itypeId === 2) {
+      return $dataSystem.optKeyItemsNumber;
+    } else if (item.meta.CategoryType) {
+      const list = param.ItemCategory;
+      const find = list.find(date => date.Categorykey === item.meta.CategoryType);
+      if (find && find.NumShow !== undefined) {
+        return find.NumShow;
+      }
+      return true;
+    } 
+  }
+  return true;
 };
 
 const _Window_ItemList_setCategory = Window_ItemList.prototype.setCategory;
@@ -171,7 +196,7 @@ Window_ItemList.prototype.setCategory = function(category) {
     if (list) {
       const find = list.find(date => date.Categorykey === category);
       if (find) {
-        this._needsCategory = find.NumShow === undefined ? true : find.NumShow;
+        this._needsCategory = (find.NumShow === undefined ? true : find.NumShow);
       }
     }
   }

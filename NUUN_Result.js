@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.4.7
+ * @version 1.5.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -51,11 +51,14 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/9 Ver.1.5.0
+ * 獲得金額、独自パラメータの設定方法を変更。
+ * 戦闘結果の文字の表示位置を左、中央、右から選択し表示できる機能を追加。
  * 2021/3/8 Ver.1.4.7
  * リザルトウィンドウのY座標を変更したとき、ウィンドウがサイズ変更してしまう問題を修正。
  * アクター名・レベル・経験値のフォントサイズで負の数値を入力できなかった問題を修正。
  * ゲージ現在値のフォントサイズの計算が間違っていたので修正。
- * 背景画像設定時、獲得金額下の線を表示しないように変更。
+ * 背景画像設定時、獲得金額下の線を表示しないように変更。（暫定）
  * 2021/3/7 Ver.1.4.6
  * ドロップアイテム、習得スキルに色を付ける機能を追加。
  * 入手画面のアクター名、レベル、獲得経験値のフォントサイスを変更できるように変更。
@@ -164,6 +167,19 @@
  * @desc 背景サイズをウィンドウサイズに合わせる。
  * @type boolean
  * @default true
+ * @parent WindowSetting
+ * 
+ * @param ResultTextPosition
+ * @desc 戦闘結果の文字の表示位置を指定します。
+ * @text 戦闘結果文字の位置
+ * @type select
+ * @option 左
+ * @value "left"
+ * @option 中央
+ * @value "center"
+ * @option 右
+ * @value "right"
+ * @default center
  * @parent WindowSetting
  * 
  * @param LineColor
@@ -350,37 +366,12 @@
  * @desc ゲージ最大値のY座標を調整します。（相対座標）
  * @parent ExpSetting
  * 
- * @param PartyOriginalSetting
- * @text 独自パラメータ設定
+ * @param GainParam
+ * @text 入手項目の設定
+ * @desc 入手項目の設定。
+ * @default ["{\"GainParamName\":\"獲得金額\",\"GainParamDate\":\"1\",\"GainParamEval\":\"\"}","{\"GainParamName\":\"\",\"GainParamDate\":\"20\",\"GainParamEval\":\"\"}"]
+ * @type struct<GainParamList>[]
  * @parent GetPage
- * 
- * @param PartyOriginalParamName
- * @text 独自パラメータ名称
- * @desc 獲得金額の下に表示する独自パラメータの名称を設定します。
- * @type string
- * @default
- * @parent PartyOriginalSetting
- * 
- * @param PartyOriginalParam
- * @text 独自パラメータ評価式
- * @desc 獲得金額の下に表示する独自パラメータの評価式を設定します。
- * @type string
- * @default
- * @parent PartyOriginalSetting
- * 
- * @param PartyOriginalParamName2
- * @text 独自パラメータ名称２
- * @desc 獲得金額の下に表示する独自パラメータの名称を設定します。
- * @type string
- * @default
- * @parent PartyOriginalSetting
- * 
- * @param PartyOriginalParam2
- * @text 独自パラメータ評価式２
- * @desc 獲得金額の下に表示する独自パラメータの評価式を設定します。
- * @type string
- * @default
- * @parent PartyOriginalSetting
  * 
  * @param PartyPageRefreshFrame
  * @desc ページ切り替えまでの待機フレーム
@@ -467,13 +458,6 @@
  * @desc 戦闘結果の名称を設定します。
  * @type string
  * @default 戦闘結果
- * @parent NameSetting
- * 
- * @param GetGoldName
- * @text 獲得金額の名称
- * @desc 獲得金額の名称を設定します。
- * @type string
- * @default 獲得金額
  * @parent NameSetting
  * 
  * @param GetEXPName
@@ -617,66 +601,57 @@
  * @text レベルアップ画面表示許可
  * 
  */
+/*~struct~GainParamList:
+
+ * @param GainParamName
+ * @text 名称
+ * @desc 表示名称を設定します。
+ * @default 
+ * @type string
+ * 
+ * @param GainParamDate
+ * @text 表示項目
+ * @desc 表示項目を指定します。
+ * @type select
+ * @option 表示なし
+ * @value 0
+ * @option 獲得金額
+ * @value 1
+ * @option 獲得経験値
+ * @value 2
+ * @option 評価式
+ * @value 10
+ * @option 線
+ * @value 20
+ * @default 0
+ * 
+ * @param GainParamEval
+ * @text 評価式
+ * @desc 評価式を記入します。
+ * @default
+ * @type string
+ * 
+ */
+
 
 var Imported = Imported || {};
 Imported.NUUN_Result = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_Result');
-const ActorShow = Number(parameters['ActorShow'] || 1);
-const ResultWidth = Number(parameters['ResultWidth'] || 808);
-const ResultHeight = Number(parameters['ResultHeight'] || 616);
-const FaceWidth = Number(parameters['FaceWidth'] || 144);
-const FaceHeight = Number(parameters['FaceHeight'] || 120);
-const FaceScale = Number(parameters['FaceScale'] || 100);
-const LineColor = Number(parameters['LineColor'] || 0);
-const FaceScaleHeight = eval(parameters['FaceScaleHeight'] || "true");
-const NoTouchUIWindow = eval(parameters['NoTouchUIWindow'] || "false");
-const ResultWindow_Y = Number(parameters['ResultWindow_Y'] || 0);
-const LavelUpWindowShow = eval(parameters['LavelUpWindowShow'] || "true");
-const GaugeValueShow = Number(parameters['GaugeValueShow'] || 0);
-const GaugeRefreshFrame = Number(parameters['GaugeRefreshFrame'] || 100);
-const GaugeValueFontSize = Number(parameters['GaugeValueFontSize'] || -6);
-const GaugeMaxValueFontSize = Number(parameters['GaugeMaxValueFontSize'] || -6);
-const GaugeMaxValueY = Number(parameters['GaugeMaxValueY'] || 0);
-const LevelUpNameColor = Number(parameters['LevelUpNameColor'] || 17);
-const LevelUpValueColor = Number(parameters['LevelUpValueColor'] || 17);
-const EXPBoostValueColor = Number(parameters['EXPBoostValueColor'] || 0);
-const EXPResistValueColor = Number(parameters['EXPResistValueColor'] || 0);
-const DifferenceStatusColor = Number(parameters['DifferenceStatusColor'] || 24);
-const PartyPageRefreshFrame = Number(parameters['PartyPageRefreshFrame'] || 0);
-const ActorPageRefreshFrame = Number(parameters['ActorPageRefreshFrame'] || 0);
-const ActorNameFontSize = Number(parameters['ActorNameFontSize'] || 0);
-const LevelFontSize = Number(parameters['LevelFontSize'] || 0);
-const EXPFontSize = Number(parameters['EXPFontSize'] || -4);
-const EXP_Y = Number(parameters['EXP_Y'] || 30);
-const PartyBackGroundImg = String(parameters['PartyBackGroundImg'] || "");
-const ActorBackGroundImg = String(parameters['ActorBackGroundImg'] || "");
-const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
-const Decimal = Number(parameters['Decimal'] || 0);
-const DecimalMode = eval(parameters['DecimalMode'] || "true");
-const ResultName = String(parameters['ResultName'] || "");
-const GetGoldName = String(parameters['GetGoldName'] || "");
-const GetEXPName = String(parameters['GetEXPName'] || "経験値");
-const GetItemName = String(parameters['GetItemName'] || "");
-const LevelUpName = String(parameters['LevelUpName'] || "LEVEL UP");
-const learnSkillName = String(parameters['learnSkillName'] || "");
-const PartyOriginalParamName = String(parameters['PartyOriginalParamName'] || "");
-const PartyOriginalParam = String(parameters['PartyOriginalParam'] || "");
-const PartyOriginalParamName2 = String(parameters['PartyOriginalParamName2'] || "");
-const PartyOriginalParam2 = String(parameters['PartyOriginalParam2'] || "");
-const ActorOriginalParamName = String(parameters['ActorOriginalParamName'] || "");
-const ActorOriginalParam = String(parameters['ActorOriginalParam'] || "");
-const ActorOriginalParamName2 = String(parameters['ActorOriginalParamName2'] || "");
-const ActorOriginalParam2 = String(parameters['ActorOriginalParam2'] || "");
-const LevelUpSe = String(parameters['LevelUpSe'] || "");
-const volume = Number(parameters['volume'] || 90);
-const pitch = Number(parameters['pitch'] || 100);
-const pan = Number(parameters['pan'] || 0);
-const VictoryBGM = String(parameters['VictoryBGM'] || "");
-const VictoryVolume = Number(parameters['VictoryVolume'] || 90);
-const VictoryPitch = Number(parameters['VictoryPitch'] || 100);
-const VictoryPan = Number(parameters['VictoryPan'] || 0);
+  const parameters = PluginManager.parameters('NUUN_Result');
+  const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      try {
+        return eval(value);
+      } catch (e) {
+        return value;
+      }
+    }
+  }));
+
+param.GainParam = param.GainParam || [];
 let gaugeWidth = 300;
 
 const pluginName = "NUUN_Result";
@@ -706,7 +681,7 @@ Scene_Battle.prototype.createAllWindows = function() {
 
 Scene_Battle.prototype.createResultBaseSprite = function() {
   this._resultBaseSprite = null;
-  if (PartyBackGroundImg || ActorBackGroundImg) {
+  if (param.PartyBackGroundImg || param.ActorBackGroundImg) {
     const sprite = new Sprite();
     this._resultBaseSprite = sprite;
     this.addChild(sprite);
@@ -716,10 +691,10 @@ Scene_Battle.prototype.createResultBaseSprite = function() {
 
 Scene_Battle.prototype.createResultBackGround = function() {
   if (this._resultBaseSprite) {
-    if (PartyBackGroundImg) {
+    if (param.PartyBackGroundImg) {
       const partySprite = new Sprite();
       this._resultBaseSprite.addChild(partySprite);
-      partySprite.bitmap = ImageManager.loadPicture(PartyBackGroundImg);
+      partySprite.bitmap = ImageManager.loadPicture(param.PartyBackGroundImg);
       this._backGroundPartySprite = partySprite;
       partySprite.hide();
       if (partySprite.bitmap && !partySprite.bitmap.isReady()) {
@@ -728,10 +703,10 @@ Scene_Battle.prototype.createResultBackGround = function() {
         this.resultBackGround(partySprite);
       }
     }
-    if (ActorBackGroundImg) {
+    if (param.ActorBackGroundImg) {
       const actorSprite = new Sprite();
       this._resultBaseSprite.addChild(actorSprite);
-      actorSprite.bitmap = ImageManager.loadPicture(ActorBackGroundImg);
+      actorSprite.bitmap = ImageManager.loadPicture(param.ActorBackGroundImg);
       this._backGroundActorSprite = actorSprite;
       actorSprite.hide();
       if (actorSprite.bitmap && !actorSprite.bitmap.isReady()) {
@@ -744,11 +719,11 @@ Scene_Battle.prototype.createResultBackGround = function() {
 };
 
 Scene_Battle.prototype.resultBackGround = function(sprite) {
-  if(BackUiWidth) {
-    sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2 + (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
+  if(param.BackUiWidth) {
+    sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2 + (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0);
     sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
-    const width = (ResultWidth > 0 ? ResultWidth : Graphics.boxWidth) + 8;
-    const height = (ResultHeight > 0 ? ResultHeight : Graphics.boxHeight) + 8;
+    const width = (param.ResultWidth > 0 ? param.ResultWidth : Graphics.boxWidth) + 8;
+    const height = (param.ResultHeight > 0 ? param.ResultHeight : Graphics.boxHeight) + 8;
     sprite.scale.x = (width !== sprite.bitmap.width ? width / sprite.bitmap.width : 1);
     sprite.scale.y = (height !== sprite.bitmap.height ? height / sprite.bitmap.height : 1);
   } else {
@@ -771,9 +746,9 @@ Scene_Battle.prototype.createResultHelpWindow = function() {
 };
 
 Scene_Battle.prototype.resultHelpWindowRect = function() {
-  const wx = (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
+  const wx = (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0);
   const wy = this.resultHelpAreaTop();
-  const ww = ResultWidth > 0 ? ResultWidth : Graphics.boxWidth;
+  const ww = param.ResultWidth > 0 ? param.ResultWidth : Graphics.boxWidth;
   const wh = this.resultHelpAreaHeight();
   return new Rectangle(wx, wy, ww, wh);
 };
@@ -794,10 +769,10 @@ Scene_Battle.prototype.createResultWindow = function() {
 };
 
 Scene_Battle.prototype.resultWindowRect = function() {
-  const wx = (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
+  const wx = (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0);
   const wy = this.resultHelpAreaTop() + this.resultHelpAreaHeight();
-  const ww = ResultWidth > 0 ? ResultWidth : Graphics.boxWidth;
-  const wh = (ResultHeight > 0 ? ResultHeight : Graphics.boxHeight) - wy + ResultWindow_Y;
+  const ww = param.ResultWidth > 0 ? param.ResultWidth : Graphics.boxWidth;
+  const wh = (param.ResultHeight > 0 ? param.ResultHeight : Graphics.boxHeight) - wy + param.ResultWindow_Y;
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -814,7 +789,7 @@ Scene_Battle.prototype.createResultDropItemWindow = function() {
 };
 
 Scene_Battle.prototype.resultDropItemWindowRect = function() {
-  const wx = (Graphics.width - Graphics.boxWidth) / 2 + (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0);
+  const wx = (Graphics.width - Graphics.boxWidth) / 2 + (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0);
   const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.resultHelpAreaTop() + this.resultHelpAreaHeight();
   const ww = this._resultWindow.width;
   const wh = this._resultWindow.height;
@@ -828,8 +803,8 @@ Scene_Battle.prototype.createResultButtons = function() {
 };
 
 Scene_Battle.prototype.createResultButton = function() {
-  this._okResultButton = new Sprite_Button("ok");(ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 : 0)
-  this._okResultButton.x = (ResultWidth > 0 ? (Graphics.boxWidth - ResultWidth) / 2 + ResultWidth: Graphics.boxWidth) - this._okResultButton.width - 4;
+  this._okResultButton = new Sprite_Button("ok");(param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0)
+  this._okResultButton.x = (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 + param.ResultWidth: Graphics.boxWidth) - this._okResultButton.width - 4;
   this._okResultButton.y = this.resultbuttonY();
   this._downResultButton = new Sprite_Button("pagedown");
   this._downResultButton.x = this._okResultButton.x - (24 + this._downResultButton.width);
@@ -861,8 +836,8 @@ Scene_Battle.prototype.resultHelpAreaHeight = function() {
 };
 
 Scene_Battle.prototype.resultHelpAreaTop = function() {
-  const y = ResultWindow_Y;
-  if (NoTouchUIWindow && !ConfigManager.touchUI) {
+  const y = param.ResultWindow_Y;
+  if (param.NoTouchUIWindow && !ConfigManager.touchUI) {
     return y;
   }
   return y + this.buttonAreaHeight();
@@ -877,7 +852,7 @@ Scene_Battle.prototype.onResultOk = function() {
     this._resultWindow.refresh();
     this._resultDropItemWindow.refresh();
     this._resultWindow.activate();
-    BattleManager.resultRefresh = ActorPageRefreshFrame;
+    BattleManager.resultRefresh = param.ActorPageRefreshFrame;
  } else {
     this._resultHelpWindow.close();
     this._resultWindow.close();
@@ -899,7 +874,7 @@ Scene_Battle.prototype.resultOpen = function() {
   this._resultDropItemWindow.open();
   this._resultWindow.refresh();
   this._resultDropItemWindow.refresh();
-  BattleManager.resultRefresh = PartyPageRefreshFrame;
+  BattleManager.resultRefresh = param.PartyPageRefreshFrame;
 };
 
 Scene_Battle.prototype.backGroundPartyShow = function() {
@@ -1011,7 +986,7 @@ Window_ResultHelp.prototype.initialize = function(rect) {
 Window_ResultHelp.prototype.refresh = function() {
   const rect = this.baseTextRect();
   this.contents.clear();
-  this.drawText(ResultName, rect.x, rect.y, rect.width,"center");
+  this.drawText(param.ResultName, rect.x, rect.y, rect.width, param.ResultTextPosition);
 };
 
 function Window_Result() {
@@ -1031,7 +1006,6 @@ Window_Result.prototype.initialize = function(rect) {
   this._actor = null;
   this._canRepeat = false;
   this.refresh();
-  console.log(this.height)
 };
 
 Window_Result.prototype.itemHeight = function() {
@@ -1048,13 +1022,13 @@ Window_Result.prototype.actorMembers = function() {
 
 Window_Result.prototype.refresh = function() {
   this.contents.clear();
-  const scale = ActorShow === 2 ? FaceScale / 100 : 1;
+  const scale = param.ActorShow === 2 ? param.FaceScale / 100 : 1;
   const rect = this.itemRect(0);
   const lineHeight = this.lineHeight();
   const itemPadding = this.itemPadding();
   if (this.page === 0) {
-    const height = FaceScaleHeight ? Math.floor(FaceHeight * scale) : FaceHeight;
-    const faceArea = rect.x + Math.floor(FaceWidth * scale) + itemPadding;
+    const height = param.FaceScaleHeight ? Math.floor(param.FaceHeight * scale) : param.FaceHeight;
+    const faceArea = rect.x + Math.floor(param.FaceWidth * scale) + itemPadding;
     const x2 = rect.x + (rect.width - Math.floor(rect.width / 2.6));
     gaugeWidth = rect.width - Math.floor(rect.width / 2.6) - faceArea - 40;
     for (let i = 0; this.actorMembers() > i; i++) {
@@ -1062,25 +1036,18 @@ Window_Result.prototype.refresh = function() {
       this._actor._learnSkill = [];
       this._actor._oldStatus = [];
       let y = i * height + rect.y;
-      if (ActorShow === 2) {
-        this.drawActorCharacter(rect.x + Math.floor(FaceWidth / 2), y + 60);
-      } else if (ActorShow === 1) {
-        this.drawActorFace(rect.x, y, FaceWidth, FaceHeight);
+      if (param.ActorShow === 2) {
+        this.drawActorCharacter(rect.x + Math.floor(param.FaceWidth / 2), y + 60);
+      } else if (param.ActorShow === 1) {
+        this.drawActorFace(rect.x, y, param.FaceWidth, param.FaceHeight);
       }
       this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112);
       this.drawActorLevel(rect.x + x2 - 100, y);
-      this.drawLevelUp(rect.x, y, Math.floor(FaceWidth * scale));
-      this.drawExpGauge(rect.x + x2 - (gaugeWidth + 30), y + EXP_Y + 18);
-      this.drawGetEXP(rect.x + faceArea, y + EXP_Y);
+      this.drawLevelUp(rect.x, y, Math.floor(param.FaceWidth * scale));
+      this.drawExpGauge(rect.x + x2 - (gaugeWidth + 30), y + param.EXP_Y + 18);
+      this.drawGetEXP(rect.x + faceArea, y + param.EXP_Y);
     }
-    y = rect.y;
-    this.drawGetGold(x2, y, rect.width - x2);
-    y += lineHeight;
-    this.drawPartyOriginalParam(x2, y, rect.width - x2);
-    y += (PartyOriginalParam ? lineHeight : 0) + (PartyOriginalParam2 ? lineHeight : 0);
-    if (!PartyBackGroundImg) {
-      this.drawHorzLine(x2, y, rect.width - x2);
-    }
+    this.drawGainList(x2, rect.y, rect.width - x2);
   } else {
     for (let i = 0; this.actorMembers() > i; i++) {
       this.removeExpGauge(this.actor(i));
@@ -1096,6 +1063,35 @@ Window_Result.prototype.refresh = function() {
   }
 };
 
+Window_Result.prototype.drawGainList = function(x, y, width) {
+  let y2 = y;
+  const lineHeight = this.lineHeight();
+  const list = param.GainParam;
+    for (const date of list) {
+      switch (date.GainParamDate) {
+        case 0:
+          y2 += lineHeight;
+          break;
+        case 1:
+          this.drawGainGold(date, x, y2, width)
+          y2 += lineHeight;
+          break;
+        case 2:
+          this.drawGainExp(date, x, y2, width)
+          y2 += lineHeight;
+          break;
+        case 10:
+          this.drawPartyOriginalParam(date, x, y2, width)
+          y2 += lineHeight;
+          break;
+        case 20:
+          this.drawHorzLine(x, y2, width);
+          y2 += lineHeight;
+          break;
+      }
+    }
+};
+
 Window_Result.prototype.drawActorFace = function(x, y, width, height) {
   this.drawFace(this._actor.faceName(), this._actor.faceIndex(), x, y, width, height);
 };
@@ -1108,7 +1104,7 @@ Window_Result.prototype.drawActorName = function(x, y, width) {
   if (!this._actor.isAlive()) {
     this.changeTextColor(ColorManager.deathColor());
   }
-  this.contents.fontSize = $gameSystem.mainFontSize() + ActorNameFontSize;
+  this.contents.fontSize = $gameSystem.mainFontSize() + param.ActorNameFontSize;
   this.drawText(this._actor.name(), x, y, width);
   this.contents.fontSize = $gameSystem.mainFontSize();
   this.resetTextColor();
@@ -1128,18 +1124,18 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
   if (!isNaN(exp)) {
     const level = actor.resultGainExp(exp);
     const oldStatus = [];
-    this.contents.fontSize = $gameSystem.mainFontSize() + LevelFontSize;
+    this.contents.fontSize = $gameSystem.mainFontSize() + param.LevelFontSize;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(TextManager.levelA, x, y, 48);
     if (level > actor._level) {
       this._levelUp = true;
-      BattleManager._levelUpPageEnable = BattleManager._levelUpPageEnable === undefined || BattleManager._levelUpPageEnable === null ? LavelUpWindowShow : BattleManager._levelUpPageEnable;
+      BattleManager._levelUpPageEnable = BattleManager._levelUpPageEnable === undefined || BattleManager._levelUpPageEnable === null ? param.LavelUpWindowShow : BattleManager._levelUpPageEnable;
       for (let i = 0; i < 8; i++) {
         oldStatus[i] = actor.param(i);
       }
       oldStatus.push(actor._level);
       this.actorOldStatus.push(oldStatus);
-      this.changeTextColor(ColorManager.textColor(LevelUpValueColor));
+      this.changeTextColor(ColorManager.textColor(param.LevelUpValueColor));
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
       }
@@ -1154,8 +1150,8 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
 
 Window_Result.prototype.drawLevelUp = function(x, y, width) {
   if (this._levelUp) {
-    this.changeTextColor(ColorManager.textColor(LevelUpNameColor));
-    this.drawText(LevelUpName, x, y, width, "center");
+    this.changeTextColor(ColorManager.textColor(param.LevelUpNameColor));
+    this.drawText(param.LevelUpName, x, y, width, "center");
     this.resetTextColor();
     this._levelUp = false;
   }
@@ -1164,7 +1160,7 @@ Window_Result.prototype.drawLevelUp = function(x, y, width) {
 Window_Result.prototype.drawGetItems = function(x, y, width) {
   const items = BattleManager._rewards.items;
   const lineHeight = this.lineHeight();
-  this.drawText(GetItemName, x, y, width, "left");
+  this.drawText(param.GetItemName, x, y, width, "left");
   if (items) {
     for (let i = 0; items.length > i; i++) {
       let y2 = y + lineHeight * (i + 1);
@@ -1173,12 +1169,12 @@ Window_Result.prototype.drawGetItems = function(x, y, width) {
   }
 };
 
-Window_Result.prototype.drawGetGold = function(x, y, width) {
-  const gold = BattleManager._rewards.gold;
-  if (!isNaN(gold)) {
+Window_Result.prototype.drawGainGold = function(date, x, y, width) {
+  if (!isNaN(BattleManager._rewards.gold)) {
+    const gold = date.GainParamEval ? eval(date.GainParamEval) : BattleManager._rewards.gold;
     this.changeTextColor(ColorManager.systemColor());
-    if (GetGoldName) {
-      this.drawText(GetGoldName, x, y, 120, "left");
+    if (date.GainParamName) {
+      this.drawText(date.GainParamName, x, y, 120, "left");
     }
     this.resetTextColor();
     this.drawCurrencyValue(gold, this.currencyUnit(), x + 120, y, width - 120);
@@ -1186,37 +1182,44 @@ Window_Result.prototype.drawGetGold = function(x, y, width) {
   }
 };
 
-Window_Result.prototype.drawPartyOriginalParam = function(x, y, width) {
+Window_Result.prototype.drawGainExp = function(date, x, y, width) {
   if (!isNaN(BattleManager._rewards.exp)) {
-    if (PartyOriginalParam) {
-      this.changeTextColor(ColorManager.systemColor());
-      this.drawText(PartyOriginalParamName, x, y, 120, "left");
-      this.resetTextColor();
-      this.drawText(eval(PartyOriginalParam), x + 120, y, width - 120, "right");
+    const exp = date.GainParamEval ? eval(date.GainParamEval) : BattleManager._rewards.exp;
+    this.changeTextColor(ColorManager.systemColor());
+    if (date.GainParamName) {
+      this.drawText(date.GainParamName, x, y, 120, "left");
     }
-    if (PartyOriginalParam2) {
-      this.changeTextColor(ColorManager.systemColor());
-      this.drawText(PartyOriginalParamName2, x, y + this.lineHeight(), 120, "left");
-      this.resetTextColor();
-      this.drawText(eval(PartyOriginalParam2), x + 120, y + this.lineHeight(), width - 120, "right");
+    this.resetTextColor();
+    this.drawText(exp, x + 120, y,  width - 120, "right");
+  }
+};
+
+Window_Result.prototype.drawPartyOriginalParam = function(date, x, y, width) {
+  if (!isNaN(BattleManager._rewards.exp)) {
+    const result = eval(date.GainParamEval);
+    this.changeTextColor(ColorManager.systemColor());
+    if (date.GainParamName) {
+      this.drawText(date.GainParamName, x, y, 120, "left");
     }
+    this.resetTextColor();
+    this.drawText(result, x + 120, y,  width - 120, "right");
   }
 };
 
 Window_Result.prototype.drawActorOriginalParam = function(x, y, width) {
   const actor = this._actor.actor();
   const lineHeight = this.lineHeight();
-  if (ActorOriginalParam) {
+  if (param.ActorOriginalParam) {
     this.changeTextColor(ColorManager.systemColor());
-    this.drawText(ActorOriginalParamName, x, y, 120, "left");
+    this.drawText(param.ActorOriginalParamName, x, y, 120, "left");
     this.resetTextColor();
-    this.drawText(eval(ActorOriginalParam), x + 120, y, width - 120, "right");
+    this.drawText(eval(param.ActorOriginalParam), x + 120, y, width - 120, "right");
   }
-  if (ActorOriginalParam2) {
+  if (param.ActorOriginalParam2) {
     this.changeTextColor(ColorManager.systemColor());
-    this.drawText(ActorOriginalParamName2, x, y + lineHeight, 120, "left");
+    this.drawText(param.ActorOriginalParamName2, x, y + lineHeight, 120, "left");
     this.resetTextColor();
-    this.drawText(eval(ActorOriginalParam2), x + 120, y + lineHeight, width - 120, "right");
+    this.drawText(eval(param.ActorOriginalParam2), x + 120, y + lineHeight, width - 120, "right");
   }
 };
 
@@ -1224,14 +1227,14 @@ Window_Result.prototype.drawGetEXP = function(x, y, width) {
   const exp = BattleManager._rewards.exp;
   if (!isNaN(exp)) {
     const finalExp = Math.round(exp * this._actor.finalExpRate());
-    this.contents.fontSize = $gameSystem.mainFontSize() + EXPFontSize;
-    const textWidth = this.textWidth(GetEXPName);
+    this.contents.fontSize = $gameSystem.mainFontSize() + param.EXPFontSize;
+    const textWidth = this.textWidth(param.GetEXPName);
     this.changeTextColor(ColorManager.systemColor());
-    this.drawText(GetEXPName, x, y, width, "left");
+    this.drawText(param.GetEXPName, x, y, width, "left");
     if (exp > finalExp && finalExp > 0) {
-      this.changeTextColor(ColorManager.textColor(EXPResistValueColor));
+      this.changeTextColor(ColorManager.textColor(param.EXPResistValueColor));
     } else if (exp < finalExp) {
-      this.changeTextColor(ColorManager.textColor(EXPBoostValueColor));
+      this.changeTextColor(ColorManager.textColor(param.EXPBoostValueColor));
     } else {
       this.resetTextColor();
     }
@@ -1249,7 +1252,7 @@ Window_Result.prototype.drawActorStatusLevel = function(x, y) {
   this.drawText(oldStatus[oldStatus.length - 1], x + 48, y, 100, "left");
   this.changeTextColor(ColorManager.systemColor());
   this.drawText("→", x + 48, y, 100, "center");
-  this.changeTextColor(ColorManager.textColor(DifferenceStatusColor));
+  this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
   this.drawText(this._actor._level, x + 48, y, 100, "right");
   this.resetTextColor();
 };
@@ -1269,7 +1272,7 @@ Window_Result.prototype.drawActorStatus = function(x, y, width) {
     this.changeTextColor(ColorManager.systemColor());
     this.drawText("→", x + (width - 110), y, width - 160, "left");
     if (oldValue < value) {
-      this.changeTextColor(ColorManager.textColor(DifferenceStatusColor));
+      this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
     } else {
       this.resetTextColor();
     }
@@ -1285,7 +1288,7 @@ Window_Result.prototype.currencyUnit = function() {
 Window_Result.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
   width = width || ImageManager.faceWidth;
   height = height || ImageManager.faceHeight;
-  const scale = this.page === 0 ? FaceScale / 100 : 1;
+  const scale = this.page === 0 ? param.FaceScale / 100 : 1;
   const bitmap = ImageManager.loadFace(faceName);
   const pw = ImageManager.faceWidth;
   const ph = ImageManager.faceHeight;
@@ -1325,7 +1328,7 @@ Window_Result.prototype.removeExpGauge = function(actor) {
 Window_Result.prototype.drawHorzLine = function(x, y, width) {
   const lineY = y + this.lineHeight() / 2 - 1;
   this.contents.paintOpacity = 48;
-  this.contents.fillRect(x, lineY, width, 2, ColorManager.textColor(LineColor));
+  this.contents.fillRect(x, lineY, width, 2, ColorManager.textColor(param.LineColor));
   this.contents.paintOpacity = 255;
 };
 
@@ -1353,14 +1356,14 @@ Window_ResultDropItem.prototype.initialize = function(rect) {
   this.openness = 0;
   this.page = 0;
   this.maxPage = 0;
-  this.dropItemRows = Math.floor((this.innerHeight - this.lineHeight() * this.partyOriginalParams()) / this.lineHeight());
+  this.dropItemRows = Math.floor((this.innerHeight - this.lineHeight() * (this.gainParamLength() + 1)) / this.lineHeight());
   this.skillRows = Math.floor((this.innerHeight - this.lineHeight() * 5.5) / this.lineHeight());
   this.opacity = 0;
   this.frameVisible = false;
 };
 
-Window_ResultDropItem.prototype.partyOriginalParams = function() {
-  return 3 + (PartyOriginalParam ? 1 : 0) + (PartyOriginalParam2 ? 1 : 0);
+Window_ResultDropItem.prototype.gainParamLength = function() {
+  return param.GainParam.length;
 };
 
 Window_ResultDropItem.prototype.setWindowResult = function(windowResult) {
@@ -1385,7 +1388,7 @@ Window_ResultDropItem.prototype.refresh = function() {
     const actor = this._windowResult._actor;
     this.drawLearnSkill(actor, rect.x + rect.width / 2 + itemPadding, rect.y + lineHeight * 4.5, rect.width / 2 - itemPadding);
   } else {
-    this.drawGetItems(x, rect.y + lineHeight * 2, rect.width - x);
+    this.drawGetItems(x, rect.y, rect.width - x);
   }
 };
 
@@ -1393,14 +1396,14 @@ Window_ResultDropItem.prototype.drawGetItems = function(x, y, width) {
   const items = BattleManager._rewards.items;
   const lineHeight = this.lineHeight();
   const maxPage = this.maxPages();
-  y += (PartyOriginalParam ? lineHeight : 0) + (PartyOriginalParam2 ? lineHeight : 0);
+  y += this.gainParamLength() * lineHeight;
   this.changeTextColor(ColorManager.systemColor());
-  this.drawText(GetItemName, x, y, width - 48, "left");
+  this.drawText(param.GetItemName, x, y, width - 48, "left");
   this.resetTextColor();
   if (items) {
     const index = this.dropItemRows * this.page;
     const maxItems = Math.min(this.dropItemRows, items.length - index);
-    if (maxPage > 1) {//ResultItemColor
+    if (maxPage > 1) {
       this.drawText(this.page + 1 +"/"+maxPage, x, y, width, "right");
     }
     for (let i = 0; maxItems > i; i++) {
@@ -1423,7 +1426,7 @@ Window_ResultDropItem.prototype.drawLearnSkill = function(actor, x, y, width) {
   const learnSkill = actor._learnSkill;
   const maxPage = this.maxPages();
   this.changeTextColor(ColorManager.systemColor());
-  this.drawText(learnSkillName, x, y, width - 48, "left");
+  this.drawText(param.learnSkillName, x, y, width - 48, "left");
   this.resetTextColor();
   if (learnSkill) {
     const index = this.skillRows * this.page;
@@ -1453,7 +1456,7 @@ Sprite_ResultExpGauge.prototype.initialize = function() {
   this._resultExpMoveMode = false;
   this._resultExpMoveDelay = 0;
   this._resultExpMoveValue = NaN;
-  this._maxValueY = GaugeMaxValueY;
+  this._maxValueY = param.GaugeMaxValueY;
 };
 
 Sprite_ResultExpGauge.prototype.bitmapWidth = function() {
@@ -1461,7 +1464,7 @@ Sprite_ResultExpGauge.prototype.bitmapWidth = function() {
 };
 
 Sprite_ResultExpGauge.prototype.valueFontSize = function() {
-  return $gameSystem.mainFontSize() + GaugeValueFontSize;
+  return $gameSystem.mainFontSize() + param.GaugeValueFontSize;
 };
 
 Sprite_ResultExpGauge.prototype.setup = function(battler, statusType) {
@@ -1495,17 +1498,17 @@ Sprite_Gauge.prototype.drawValue = function() {
   if (this._statusType === "result_exp") {
     const width = this.bitmapWidth();
     const height = this.bitmapHeight();
-    this._resultExpMoveMode = GaugeRefreshFrame > 0 && GaugeValueShow ? true : false;
+    this._resultExpMoveMode = param.GaugeRefreshFrame > 0 && param.GaugeValueShow ? true : false;
     let expValue = this.currentValue();
-    if (GaugeValueShow > 0) {
+    if (param.GaugeValueShow > 0) {
       this.setupValueFont();
-      if (GaugeValueShow === 1) {
+      if (param.GaugeValueShow === 1) {
         expValue = this.maxLavel() ? "----------" : expValue;
         this.bitmap.drawText(expValue, width - 100, 0, 100, height, "right");
-      } else if (GaugeValueShow === 2) {
+      } else if (param.GaugeValueShow === 2) {
         expValue = this.maxLavel() ? "----------" : expValue;
         if (!this.maxLavel()) {
-          this.bitmap.fontSize = $gameSystem.mainFontSize() + GaugeMaxValueFontSize;
+          this.bitmap.fontSize = $gameSystem.mainFontSize() + param.GaugeMaxValueFontSize;
           const textWidth = Math.min(this.bitmap.measureTextWidth(this.currentMaxValue()), 70);
           this.bitmap.drawText(this.currentMaxValue(), width - textWidth, this._maxValueY, textWidth, height, "right");
           this.bitmap.fontSize = this.valueFontSize();
@@ -1551,7 +1554,7 @@ Sprite_Gauge.prototype.currentMaxValue = function() {
 
 Sprite_ResultExpGauge.prototype.currentResultValueMove = function(currentValue) {
   if (this._resultExpMoveDelay === 0) {
-    this._resultExpMoveDelay = (currentValue - this._resultExpMoveValue) / (GaugeRefreshFrame > 0 ? this.smoothness() : 1);
+    this._resultExpMoveDelay = (currentValue - this._resultExpMoveValue) / (param.GaugeRefreshFrame > 0 ? this.smoothness() : 1);
   }
   if (this._resultExpMoveValue > currentValue) {
     if (this._resultExpMoveValue <= currentValue) {
@@ -1587,7 +1590,7 @@ Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {
     this._nowLevel++;
     this._instant = true;
     this._resultExpMoveValue = 0;
-    AudioManager.playSe({"name":LevelUpSe,"volume":volume,"pitch":pitch,"pan":pan});
+    AudioManager.playSe({"name":param.LevelUpSe,"volume":param.volume,"pitch":param.pitch,"pan":param.pan});
   }
 };
 
@@ -1601,14 +1604,14 @@ Sprite_ResultExpGauge.prototype.smoothness = function() {
 
 const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;
 Sprite_Gauge.prototype.smoothness = function() {
-  return this._statusType === "result_exp" ? GaugeRefreshFrame : _Sprite_Gauge_smoothness.call(this);
+  return this._statusType === "result_exp" ? param.GaugeRefreshFrame : _Sprite_Gauge_smoothness.call(this);
 };
 
 Sprite_ResultExpGauge.prototype.currentDecimal = function(val) {
-  if (DecimalMode) {
-    return Math.round(val * (Decimal > 0 ? Math.pow(10, Decimal) : 1)) / (Decimal > 0 ? Math.pow(10, Decimal) : 1);
+  if (param.DecimalMode) {
+    return Math.round(val * (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1)) / (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1);
   } else {
-    return Math.floor(val * (Decimal > 0 ? Math.pow(10, Decimal) : 1)) / (Decimal > 0 ? Math.pow(10, Decimal) : 1);
+    return Math.floor(val * (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1)) / (param.Decimal > 0 ? Math.pow(10, param.Decimal) : 1);
   }
 };
 
@@ -1710,7 +1713,7 @@ BattleManager.replayBgmAndBgs = function() {
       AudioManager.playBgm(this._victoryBgmDate);
       this._victoryBGMOn = true;
       return;
-    } else if (VictoryBGM) {
+    } else if (param.VictoryBGM) {
       AudioManager.playBgm(this.playVictoryBgm());
       this._victoryBGMOn = true;
       return;
@@ -1721,10 +1724,10 @@ BattleManager.replayBgmAndBgs = function() {
 
 BattleManager.playVictoryBgm = function() {
   const _victoryBgm = {};
-  _victoryBgm.name = VictoryBGM;
-  _victoryBgm.volume = VictoryVolume;
-  _victoryBgm.pitch = VictoryPitch;
-  _victoryBgm.pan = VictoryPan;
+  _victoryBgm.name = param.VictoryBGM;
+  _victoryBgm.volume = param.VictoryVolume;
+  _victoryBgm.pitch = param.VictoryPitch;
+  _victoryBgm.pan = param.VictoryPan;
   return _victoryBgm;
 };
 

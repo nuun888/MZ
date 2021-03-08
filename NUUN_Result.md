@@ -5,7 +5,7 @@ https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js<br>
 
 戦闘終了時にリザルト画面を表示します。<br>
 
-更新履歴<br>
+<B>更新履歴</B><br>
 2021/3/9 Ver.1.5.0<br>
 獲得金額、独自パラメータの設定方法を変更。<br>
 戦闘結果の文字の表示位置を左、中央、右から選択し表示できる機能を追加。<br>

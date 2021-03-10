@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -24,8 +24,17 @@
  * 
  * 戦闘勝利後に任意のBGMを再生できます。MEが指定してある場合はME再生終了後に再生されます。
  * 
+ * 仕様
+ * ウィンドウ画面のX座標は画面の中央になるよう設定されていますが、Y座標は上よりに表示されるようになっています。Y座標を変更するには「ウィンドウY座標」で設定してください。
+ * 入手アイテム、習得アイテムは表示範囲が自動で計算されます。
+ * レベルアップ表示位置で「アクターの上」を指定の場合、「顔グラ、キャラチップの表示横幅」の表示サイズの中央からの座標となります。また「顔グラ、キャラチップの表示横幅」の
+ * サイズにより調整されます。
+ * レベルアップ表示位置で「獲得経験値の右」を指定の場合、獲得経験値の右側からの座標となります。獲得経験値の表示を非表示にしている場合はレベルアップの実表示されます。文字の表示幅の調整
+ * はされません。
+ * レベルアップ表示位置で「座標指定」を指定の場合は、各アクター表示位置左上カラの座標となります。文字の表示幅の調整は行われません。
  * 
- * アクターの参照変数（独自パラメータ）
+ * 
+ * アクターの参照変数（レベルアップ画面の独自パラメータ）
  * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
  * this._actor アクターのゲームデータ
  * 
@@ -38,9 +47,14 @@
  * 獲得金額に金額アイコンを表示させる場合は「所持金拡張プラグイン」のアイコンの表示クラスに"Window_Result"を記入してください。（必ず'及び"で囲む）
  * 
  * プラグインコマンド
+ * 「レベルアップ画面表示許可」
  * レベルアップ画面の表示の許可を設定できます。(注：このプラグインコマンドを実行後レベルアップ画面表示の設定が無効化されます）
- * 戦闘勝利後のBGMの再生の許可を設定できます。
- * 戦闘勝利後のBGMを指定することが出来ます。BGMに何も指定しないことでプラグインコマンドで指定したBGMは再生されなくなります。
+ * 「勝利BGMの再生許可」
+ * 勝利BGMの再生の許可を設定できます。
+ * 「勝利BGMの変更」
+ * 勝利BGMを変更することが出来ます。BGMに何も指定しないことでプラグインコマンドで指定したBGMは再生されなくなります。
+ * 「レベルアップSEの変更」
+ * レベルアップSEを変更することが出来ます。BGMに何も指定しないことでプラグインコマンドで指定したBGMは再生されなくなります。
  * 
  * 
  * 操作
@@ -51,6 +65,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/11 Ver.1.5.1
+ * 獲得経験値を非表示にできる機能を追加。
+ * レベルアップの位置を指定、調整できる機能を追加。(座標指定チェックのみ)
+ * プラグインコマンドでレベルアップSEを変更できる機能を追加。
+ * 拡大率による高さ調整が顔グラモードではなくキャラチップモードで反映されていた問題を修正。
+ * 入手画面のアクター表示（アクター画像、アクター名、レベル、EXP）のY座標を調整できる機能を追加。
  * 2021/3/9 Ver.1.5.0
  * 獲得金額、独自パラメータの設定方法を変更。
  * 戦闘結果の文字の表示位置を左、中央、右から選択し表示できる機能を追加。
@@ -58,7 +78,6 @@
  * リザルトウィンドウのY座標を変更したとき、ウィンドウがサイズ変更してしまう問題を修正。
  * アクター名・レベル・経験値のフォントサイズで負の数値を入力できなかった問題を修正。
  * ゲージ現在値のフォントサイズの計算が間違っていたので修正。
- * 背景画像設定時、獲得金額下の線を表示しないように変更。（暫定）
  * 2021/3/7 Ver.1.4.6
  * ドロップアイテム、習得スキルに色を付ける機能を追加。
  * 入手画面のアクター名、レベル、獲得経験値のフォントサイスを変更できるように変更。
@@ -183,8 +202,8 @@
  * @parent WindowSetting
  * 
  * @param LineColor
- * @desc 線の色
- * @text 線の色
+ * @desc ライン（線）の色。
+ * @text ライン（線）の色
  * @type number
  * @default 0
  * @parent CommonSetting
@@ -222,7 +241,7 @@
  * 
  * @param FaceWidth
  * @desc 顔グラ、キャラチップ表示の横幅。
- * @text 顔グラの横幅
+ * @text 顔グラ、キャラチップの表示横幅
  * @type number
  * @default 144
  * @parent GetPage
@@ -232,6 +251,13 @@
  * @text １キャラ当たりの縦幅
  * @type number
  * @default 120
+ * @parent GetPage
+ * 
+ * @param ActorResult_Y
+ * @desc アクター表示のY座標。
+ * @text アクター表示Y座標
+ * @type number
+ * @default 0
  * @parent GetPage
  * 
  * @param FaceScale
@@ -244,8 +270,35 @@
  * @param FaceScaleHeight
  * @type boolean
  * @default true
- * @text 高さ調整
+ * @text 高さ調整拡大率考慮
  * @desc １キャラ当たりの縦幅を、顔グラの拡大率に合わせて高さ調整します。
+ * @parent GetPage
+ * 
+ * @param LavelUpPosition
+ * @desc レベルアップの位置を指定します。
+ * @text レベルアップ表示位置
+ * @type select
+ * @option アクター画像の上
+ * @value 1
+ * @option 獲得経験値の右
+ * @value 2
+ * @option 座標指定
+ * @value 10
+ * @default 1
+ * @parent GetPage
+ * 
+ * @param LevelUp_X
+ * @desc レベルアップのX座標
+ * @text レベルアップX座標
+ * @type number
+ * @default 0
+ * @parent GetPage
+ * 
+ * @param LevelUp_Y
+ * @desc レベルアップのY座標
+ * @text レベルアップY座標
+ * @type number
+ * @default 0
  * @parent GetPage
  * 
  * @param FontColor
@@ -308,17 +361,17 @@
  * @parent FontSize
  * @min -99
  * 
+ * @param LevelUpFontSize
+ * @desc レベルアップのフォントサイズ（メインフォントサイズからの差）
+ * @text レベルアップフォントサイズ
+ * @type number
+ * @default 0
+ * @parent FontSize
+ * @min -99
+ * 
  * @param ExpSetting
  * @text ゲージ設定
  * @parent GetPage
- * 
- * @param EXP_Y
- * @desc 獲得経験値のY座標（デフォルト:30）
- * @text 獲得経験値Y座標
- * @type number
- * @default 30
- * @min -999
- * @parent ExpSetting
  * 
  * @param GaugeValueShow
  * @desc EXPゲージの数値を表示する。
@@ -333,6 +386,28 @@
  * @option 百分率で表示
  * @value 3
  * @default 1
+ * @parent ExpSetting
+ * 
+ * @param GainEXPVisible
+ * @type boolean
+ * @default true
+ * @text 獲得経験値を表示する
+ * @desc 獲得経験値を表示します。
+ * @parent ExpSetting
+ * 
+ * @param EXP_Y
+ * @desc 獲得経験値のY座標（デフォルト:30）
+ * @text 獲得経験値Y座標
+ * @type number
+ * @default 30
+ * @min -999
+ * @parent ExpSetting
+ * 
+ * @param Gauge_Margin
+ * @desc EXPゲージの余白範囲
+ * @text EXPゲージ余白範囲
+ * @type number
+ * @default 40
  * @parent ExpSetting
  * 
  * @param GaugeRefreshFrame
@@ -363,7 +438,7 @@
  * @type number
  * @default 0
  * @text ゲージ最大値Y座標調整
- * @desc ゲージ最大値のY座標を調整します。（相対座標）
+ * @desc ゲージ最大値のY座標を調整します。（表示位置からの相対座標）
  * @parent ExpSetting
  * 
  * @param GainParam
@@ -371,6 +446,14 @@
  * @desc 入手項目の設定。
  * @default ["{\"GainParamName\":\"獲得金額\",\"GainParamDate\":\"1\",\"GainParamEval\":\"\"}","{\"GainParamName\":\"\",\"GainParamDate\":\"20\",\"GainParamEval\":\"\"}"]
  * @type struct<GainParamList>[]
+ * @parent GetPage
+ * 
+ * @param DropItem_Y
+ * @desc 入手アイテムのY座標調整。(表示位置からの相対座標)
+ * @text 入手アイテムのY座標調整
+ * @type number
+ * @default 0
+ * @min -999
  * @parent GetPage
  * 
  * @param PartyPageRefreshFrame
@@ -548,24 +631,49 @@
  * 
  * 
  * 
+ * @command LevelUP_SESelect
+ * @desc レベルアップ時のSEを変更します。
+ * @text レベルアップSEの変更
+ * 
+ * @arg LevelUP_SE
+ * @text レベルアップSE
+ * @desc レベルアップSEを指定します。何も指定しないことでMEが初期化されます。
+ * @type file
+ * @dir audio/se
+ * 
+ * @arg Volume
+ * @text SEの音量
+ * @desc SEを音量を設定します。
+ * @default 90
+ * 
+ * @arg Pitch
+ * @text SEのピッチ
+ * @desc SEをピッチを設定します。
+ * @default 100
+ * 
+ * @arg Pan
+ * @text SEの位相
+ * @desc SEを位相を設定します。
+ * @default 0
+ * 
  * @command VictoryBGM
- * @desc 戦闘ME後のBGMの再生の許可を変更します。
- * @text 戦闘ME後のBGM再生許可
+ * @desc 勝利BGMの再生の許可を変更します。
+ * @text 勝利BGM再生許可
  * 
  * @arg VictoryBGMEnable
  * @type boolean
  * @default true
- * @desc 戦闘ME後のBGMの再生の許可します。
- * @text 戦闘ME後のBGMの再生の許可
+ * @desc 勝利BGMの再生の許可します。
+ * @text 勝利BGMの再生の許可
  * 
  * 
  * @command VictoryBGMSelect
- * @desc 戦闘勝利後のBGMを設定します。
- * @text 戦闘勝利後BGM
+ * @desc 勝利BGMを変更します。
+ * @text 勝利BGMの変更
  * 
  * @arg _BGM
  * @text 勝利BGM
- * @desc 勝利BGMを指定します。何も指定しないことでBGMが初期化されます。
+ * @desc 勝利BGMを変更します。何も指定しないことでBGMが初期化されます。
  * @type file
  * @dir audio/bgm
  * 
@@ -656,16 +764,20 @@ let gaugeWidth = 300;
 
 const pluginName = "NUUN_Result";
 
+PluginManager.registerCommand(pluginName, 'LevelUP_SESelect', args => {
+  BattleManager.levelUpSeSelect(args);
+});
+
 PluginManager.registerCommand(pluginName, 'VictoryBGM', args => {
-  BattleManager.victoryBGMEnable(eval(args.VictoryBGMEnable))
+  BattleManager.victoryBGMEnable(eval(args.VictoryBGMEnable));
 });
 
 PluginManager.registerCommand(pluginName, 'VictoryBGMSelect', args => {
-  BattleManager.victoryBGMSelect(args)
+  BattleManager.victoryBGMSelect(args);
 });
 
 PluginManager.registerCommand(pluginName, 'LevelUpPage', args => {
-  BattleManager.levelUpPageEnable(eval(args.LevelUpPageEnable))
+  BattleManager.levelUpPageEnable(eval(args.LevelUpPageEnable));
 });
 
 
@@ -1022,7 +1134,7 @@ Window_Result.prototype.actorMembers = function() {
 
 Window_Result.prototype.refresh = function() {
   this.contents.clear();
-  const scale = param.ActorShow === 2 ? param.FaceScale / 100 : 1;
+  const scale = param.ActorShow === 1 ? param.FaceScale / 100 : 1;
   const rect = this.itemRect(0);
   const lineHeight = this.lineHeight();
   const itemPadding = this.itemPadding();
@@ -1030,12 +1142,12 @@ Window_Result.prototype.refresh = function() {
     const height = param.FaceScaleHeight ? Math.floor(param.FaceHeight * scale) : param.FaceHeight;
     const faceArea = rect.x + Math.floor(param.FaceWidth * scale) + itemPadding;
     const x2 = rect.x + (rect.width - Math.floor(rect.width / 2.6));
-    gaugeWidth = rect.width - Math.floor(rect.width / 2.6) - faceArea - 40;
+    gaugeWidth = rect.width - Math.floor(rect.width / 2.6) - faceArea - 30;
     for (let i = 0; this.actorMembers() > i; i++) {
       this._actor = this.actor(i);
       this._actor._learnSkill = [];
       this._actor._oldStatus = [];
-      let y = i * height + rect.y;
+      let y = i * height + rect.y + param.ActorResult_Y;
       if (param.ActorShow === 2) {
         this.drawActorCharacter(rect.x + Math.floor(param.FaceWidth / 2), y + 60);
       } else if (param.ActorShow === 1) {
@@ -1043,9 +1155,14 @@ Window_Result.prototype.refresh = function() {
       }
       this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112);
       this.drawActorLevel(rect.x + x2 - 100, y);
-      this.drawLevelUp(rect.x, y, Math.floor(param.FaceWidth * scale));
-      this.drawExpGauge(rect.x + x2 - (gaugeWidth + 30), y + param.EXP_Y + 18);
-      this.drawGetEXP(rect.x + faceArea, y + param.EXP_Y);
+      if (param.LavelUpPosition === 1) {
+        this.drawLevelUp(rect.x + param.LevelUp_X, y + param.LevelUp_Y, Math.floor(param.FaceWidth * scale));
+      } else if (param.LavelUpPosition === 10) {
+        this.drawLevelUp(rect.x + param.LevelUp_X , y + param.LevelUp_Y, rect.width);
+      }
+      //this.drawExpGauge(rect.x + x2 - (gaugeWidth + param.Gauge_Margin), y + param.EXP_Y + 18);
+      this.drawExpGauge(rect.x + x2 - gaugeWidth - 30, y + param.EXP_Y + 18);
+      this.drawGetEXP(rect.x + faceArea, y + param.EXP_Y, rect.width);
     }
     this.drawGainList(x2, rect.y, rect.width - x2);
   } else {
@@ -1151,8 +1268,11 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
 Window_Result.prototype.drawLevelUp = function(x, y, width) {
   if (this._levelUp) {
     this.changeTextColor(ColorManager.textColor(param.LevelUpNameColor));
-    this.drawText(param.LevelUpName, x, y, width, "center");
+    this.contents.fontSize = $gameSystem.mainFontSize() + param.LevelUpFontSize;
+    const position = param.LavelUpPosition === 1 ? "center" : "left";
+    this.drawText(param.LevelUpName, x, y, width, position);
     this.resetTextColor();
+    this.contents.fontSize = $gameSystem.mainFontSize();
     this._levelUp = false;
   }
 };
@@ -1226,21 +1346,29 @@ Window_Result.prototype.drawActorOriginalParam = function(x, y, width) {
 Window_Result.prototype.drawGetEXP = function(x, y, width) {
   const exp = BattleManager._rewards.exp;
   if (!isNaN(exp)) {
-    const finalExp = Math.round(exp * this._actor.finalExpRate());
-    this.contents.fontSize = $gameSystem.mainFontSize() + param.EXPFontSize;
-    const textWidth = this.textWidth(param.GetEXPName);
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(param.GetEXPName, x, y, width, "left");
-    if (exp > finalExp && finalExp > 0) {
-      this.changeTextColor(ColorManager.textColor(param.EXPResistValueColor));
-    } else if (exp < finalExp) {
-      this.changeTextColor(ColorManager.textColor(param.EXPBoostValueColor));
-    } else {
+    let x2 = x;
+    if (param.GainEXPVisible) {
+      const finalExp = Math.round(exp * this._actor.finalExpRate());
+      this.contents.fontSize = $gameSystem.mainFontSize() + param.EXPFontSize;
+      const textWidth = this.textWidth(param.GetEXPName);
+      this.changeTextColor(ColorManager.systemColor());
+      this.drawText(param.GetEXPName, x, y, width, "left");
+      if (exp > finalExp && finalExp > 0) {
+        this.changeTextColor(ColorManager.textColor(param.EXPResistValueColor));
+      } else if (exp < finalExp) {
+        this.changeTextColor(ColorManager.textColor(param.EXPBoostValueColor));
+      } else {
+        this.resetTextColor();
+      }
+      const text = "+"+ finalExp;
+      x2 += param.LavelUpPosition === 2 ? Math.min(this.textWidth(text), width - x - 190) + textWidth + (this.itemPadding() * 2) : 0;
+      this.drawText(text, x + textWidth + this.itemPadding(), y, width - x - 190, "left");
       this.resetTextColor();
+      this.contents.fontSize = $gameSystem.mainFontSize();
     }
-    this.drawText("+"+ finalExp, x + textWidth + this.itemPadding(), y, width - x - 190, "left");
-    this.resetTextColor();
-    this.contents.fontSize = $gameSystem.mainFontSize();
+    if (param.LavelUpPosition === 2) {
+      this.drawLevelUp(x2 + param.LevelUp_X, y + param.LevelUp_Y, width);
+    }
   }
 };
 
@@ -1396,7 +1524,7 @@ Window_ResultDropItem.prototype.drawGetItems = function(x, y, width) {
   const items = BattleManager._rewards.items;
   const lineHeight = this.lineHeight();
   const maxPage = this.maxPages();
-  y += this.gainParamLength() * lineHeight;
+  y += this.gainParamLength() * lineHeight + param.DropItem_Y;
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(param.GetItemName, x, y, width - 48, "left");
   this.resetTextColor();
@@ -1461,6 +1589,11 @@ Sprite_ResultExpGauge.prototype.initialize = function() {
 
 Sprite_ResultExpGauge.prototype.bitmapWidth = function() {
   return gaugeWidth;
+};
+
+
+Sprite_ResultExpGauge.prototype.gaugeX = function() {
+  return param.Gauge_Margin;
 };
 
 Sprite_ResultExpGauge.prototype.valueFontSize = function() {
@@ -1590,7 +1723,11 @@ Sprite_ResultExpGauge.prototype.updateGaugeAnimation = function() {
     this._nowLevel++;
     this._instant = true;
     this._resultExpMoveValue = 0;
-    AudioManager.playSe({"name":param.LevelUpSe,"volume":param.volume,"pitch":param.pitch,"pan":param.pan});
+    if (BattleManager._levelUpSeDate) {
+      AudioManager.playSe(BattleManager._levelUpSeDate);
+    } else {
+      AudioManager.playSe({"name":param.LevelUpSe,"volume":param.volume,"pitch":param.pitch,"pan":param.pan});
+    }
   }
 };
 
@@ -1743,6 +1880,18 @@ BattleManager.victoryBGMSelect = function(bgmDate) {
   this._victoryBgmDate.pitch = Number(bgmDate.Pitch);
   this._victoryBgmDate.pan = Number(bgmDate.Pan);
   this._noVictoryME = eval(bgmDate.NoVictoryME);
+};
+
+BattleManager.levelUpSeSelect = function(bgmSe) {
+  if (!bgmSe.LevelUP_SE) {
+    this._levelUpSeDate = {};
+    return;
+  }
+  this._levelUpSeDate = {};
+  this._levelUpSeDate.name = String(bgmSe.LevelUP_SE);
+  this._levelUpSeDate.volume = Number(bgmSe.Volume);
+  this._levelUpSeDate.pitch = Number(bgmSe.Pitch);
+  this._levelUpSeDate.pan = Number(bgmSe.Pan);
 };
 
 const _BattleManager_playVictoryMe = BattleManager.playVictoryMe;

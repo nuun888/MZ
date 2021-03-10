@@ -10,19 +10,23 @@
  * @target MZ
  * @plugindesc  アイテム、スキル欄文字色個別変更
  * @author NUUN
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * アイテム、スキル欄の文字に色を指定できます。
  * 
  * <NameColor:[id]> アイテム、スキル名の文字色を変更します。[id]:カラーインデックス
  * 例：<NameColor:17> アイテム、スキルの文字色がカラーインデックス17番の色になります。
+ * <NameColor:#RRGGBB> カラーコードを指定します。
+ * 例：<NameColor:#00bfff>
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/11 Ver.1.1.0
+ * カラーコードに対応。
  * 2021/3/6 Ver.1.0.2
  * すでに別プラグインでテキストカラーが変更していた場合は処理しないように変更。
  * 2021/2/7 Ver.1.0.1
@@ -41,8 +45,6 @@ Imported.NUUN_ItemNameColor = true;
     _Window_Base_initialize.call(this, rect);
     this.nameColor = null;
   };
-
-
 
   const _Window_Base_drawItemName = Window_Base.prototype.drawItemName;
   Window_Base.prototype.drawItemName = function(item, x, y, width) {
@@ -67,15 +69,19 @@ Imported.NUUN_ItemNameColor = true;
   };
 
   Window_Base.prototype.changeNameColor = function(item) {
-    if (item.meta.NameColor) {
+    const color = item.meta.NameColor;
+    if (color) {
+      if (typeof(color) === "string" && color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) !== null) {
+        return color;
+      }
       return ColorManager.textColor(Number(item.meta.NameColor));
-    } else {
-      return this.nameColor;
     }
+    return null;
   };
 
   Window_Base.prototype.resetNameColor = function() {
     this.nameColor = null;
     this.resetTextColor();
   };
+
 })();

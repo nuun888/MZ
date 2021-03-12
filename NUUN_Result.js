@@ -1306,7 +1306,7 @@ Window_Result.prototype.drawActorImg = function() {
 };
 
 Window_Result.prototype.actorImgRefresh = function(bitmap) {
-  const date = this._actor.resultActorImg;console.log(date)
+  const date = this._actor.resultActorImg;
   let x = date.Actor_X;
   const scale = (date.Actor_Scale || 100) / 100;
   if(param.ActorPosition === 0) {

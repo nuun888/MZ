@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -65,6 +65,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/12 Ver.1.6.1
+ * 立ち絵を新規に設定した後にセーブしたデータをロードすると画像が表示されない問題を修正。
  * 2021/3/12 Ver.1.6.0
  * レベルアップ画面に立ち絵を表示する機能を追加。
  * 2021/3/11 Ver.1.5.1
@@ -856,9 +858,9 @@ Game_Actor.prototype.setup = function(actorId) {
 };
 
 Game_Actor.prototype.initResultActorImg = function(id) {
-  const list = param.ButlerActors.find(actors => actors.actorId === id);console.log(list)
+  const list = param.ButlerActors.find(actors => actors.actorId === id);
+  this.resultActorImg = list || [];
   if (list) {
-    this.resultActorImg = list || [];
     this.resultActorBitmap = list.ActorImg;
   }
 };
@@ -1296,7 +1298,6 @@ Window_Result.prototype.drawGainList = function(x, y, width) {
 Window_Result.prototype.drawActorImg = function() {
   if (this._actor.resultActorBitmap) {
     const bitmap = ImageManager.loadPicture(this._actor.resultActorBitmap);
-    console.log(bitmap)
     if (bitmap && !bitmap.isReady()) {
       bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap));
     } else {
@@ -1368,6 +1369,9 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       this.changeTextColor(ColorManager.textColor(param.LevelUpValueColor));
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
+        if (!actor.resultActorImg) {
+          actor.initResultActorImg(actor.actorId());
+        }
         ImageManager.loadPicture(actor.resultActorBitmap);
       }
     } else {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -65,6 +65,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/13 Ver.1.6.2
+ * 立ち絵を変更した後にセーブしたデータをロードをロードすると変更した画像が反映されない問題を修正。
  * 2021/3/12 Ver.1.6.1
  * 立ち絵を新規に設定した後にセーブしたデータをロードすると画像が表示されない問題を修正。
  * 2021/3/12 Ver.1.6.0
@@ -860,9 +862,6 @@ Game_Actor.prototype.setup = function(actorId) {
 Game_Actor.prototype.initResultActorImg = function(id) {
   const list = param.ButlerActors.find(actors => actors.actorId === id);
   this.resultActorImg = list || [];
-  if (list) {
-    this.resultActorBitmap = list.ActorImg;
-  }
 };
 
 
@@ -1256,7 +1255,7 @@ Window_Result.prototype.refresh = function() {
     }
     this._actor = this.actorLevelUp[this.page - 1];
     const x = rect.x + Math.floor(rect.width / 2) + itemPadding;
-    this.drawActorImg();
+    this.drawActorImg(this._actor);
     this.drawActorFace(rect.x, rect.y, ImageManager.faceWidth, ImageManager.faceHeight);
     this.drawActorStatusName(rect.x + 152, rect.y, rect.width - x - 152);
     this.drawActorStatusLevel(x, rect.y);
@@ -1295,19 +1294,19 @@ Window_Result.prototype.drawGainList = function(x, y, width) {
     }
 };
 
-Window_Result.prototype.drawActorImg = function() {
-  if (this._actor.resultActorBitmap) {
-    const bitmap = ImageManager.loadPicture(this._actor.resultActorBitmap);
+Window_Result.prototype.drawActorImg = function(actor) {
+  if (actor.resultActorBitmap || actor.resultActorImg.ActorImg) {
+    const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
+    const bitmap = ImageManager.loadPicture(loadBitmap);
     if (bitmap && !bitmap.isReady()) {
-      bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap));
+      bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
     } else {
-      this.actorImgRefresh(bitmap);
+      this.actorImgRefresh(bitmap, actor.resultActorImg);
     }
   }
 };
 
-Window_Result.prototype.actorImgRefresh = function(bitmap) {
-  const date = this._actor.resultActorImg;
+Window_Result.prototype.actorImgRefresh = function(bitmap, date) {
   let x = date.Actor_X;
   const scale = (date.Actor_Scale || 100) / 100;
   if(param.ActorPosition === 0) {
@@ -1369,10 +1368,12 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       this.changeTextColor(ColorManager.textColor(param.LevelUpValueColor));
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
-        if (!actor.resultActorImg) {
+        if (!actor.resultActorBitmap) {
           actor.initResultActorImg(actor.actorId());
+          ImageManager.loadPicture(actor.resultActorImg.ActorImg);
+        } else {
+          ImageManager.loadPicture(actor.resultActorBitmap);
         }
-        ImageManager.loadPicture(actor.resultActorBitmap);
       }
     } else {
       this.resetTextColor();

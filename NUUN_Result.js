@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.5.1
+ * @version 1.6.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -65,6 +65,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/12 Ver.1.6.0
+ * レベルアップ画面に立ち絵を表示する機能を追加。
  * 2021/3/11 Ver.1.5.1
  * 獲得経験値を非表示にできる機能を追加。
  * レベルアップの位置を指定、調整できる機能を追加。(座標指定チェックのみ)
@@ -473,6 +475,29 @@
  * @param LevelUpPage
  * @text レベルアップ画面設定
  * 
+ * @param ActorImg
+ * @text アクター画像設定
+ * @parent LevelUpPage
+ * 
+ * @param ButlerActors
+ * @text 表示アクター設定
+ * @desc 画像を表示するアクターを指定します。
+ * @type struct<ActorButlerList>[]
+ * @parent ActorImg
+ * 
+ * @param ActorPosition
+ * @text 立ち絵表示位置
+ * @desc 立ち絵の表示位置を指定します
+ * @type select
+ * @option 左
+ * @value 0
+ * @option 中央
+ * @value 1
+ * @option 右
+ * @value 2
+ * @default 2
+ * @parent ActorImg
+ * 
  * @param LavelUpWindowShow
  * @type boolean
  * @default true
@@ -740,7 +765,44 @@
  * @type string
  * 
  */
-
+/*~struct~ActorButlerList:
+ * 
+ * @param actorId
+ * @text アクター
+ * @desc アクターを指定します。
+ * @type actor
+ * 
+ * @param ActorImg
+ * @text アクター画像
+ * @desc アクターの画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * 
+ * @param Actor_X
+ * @desc 画像の表示位置X座標。
+ * @text 画像表示位置X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Y
+ * @desc 画像の表示位置Y座標。
+ * @text 画像表示位置Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ *  
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_Result = true;
@@ -779,6 +841,27 @@ PluginManager.registerCommand(pluginName, 'VictoryBGMSelect', args => {
 PluginManager.registerCommand(pluginName, 'LevelUpPage', args => {
   BattleManager.levelUpPageEnable(eval(args.LevelUpPageEnable));
 });
+
+const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
+Game_Actor.prototype.initMembers = function() {
+  _Game_Actor_initMembers.call(this);
+  this.resultActorImg = null;
+  this.resultActorBitmap = null;
+};
+
+const _Game_Actor_setup = Game_Actor.prototype.setup;
+Game_Actor.prototype.setup = function(actorId) {
+  _Game_Actor_setup.call(this, actorId);
+  this.initResultActorImg(actorId);
+};
+
+Game_Actor.prototype.initResultActorImg = function(id) {
+  const list = param.ButlerActors.find(actors => actors.actorId === id);console.log(list)
+  if (list) {
+    this.resultActorImg = list || [];
+    this.resultActorBitmap = list.ActorImg;
+  }
+};
 
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
@@ -1171,6 +1254,7 @@ Window_Result.prototype.refresh = function() {
     }
     this._actor = this.actorLevelUp[this.page - 1];
     const x = rect.x + Math.floor(rect.width / 2) + itemPadding;
+    this.drawActorImg();
     this.drawActorFace(rect.x, rect.y, ImageManager.faceWidth, ImageManager.faceHeight);
     this.drawActorStatusName(rect.x + 152, rect.y, rect.width - x - 152);
     this.drawActorStatusLevel(x, rect.y);
@@ -1207,6 +1291,35 @@ Window_Result.prototype.drawGainList = function(x, y, width) {
           break;
       }
     }
+};
+
+Window_Result.prototype.drawActorImg = function() {
+  if (this._actor.resultActorBitmap) {
+    const bitmap = ImageManager.loadPicture(this._actor.resultActorBitmap);
+    console.log(bitmap)
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap));
+    } else {
+      this.actorImgRefresh(bitmap);
+    }
+  }
+};
+
+Window_Result.prototype.actorImgRefresh = function(bitmap) {
+  const date = this._actor.resultActorImg;console.log(date)
+  let x = date.Actor_X;
+  const scale = (date.Actor_Scale || 100) / 100;
+  if(param.ActorPosition === 0) {
+    x += 0;
+  } else if (param.ActorPosition === 1) {
+    x += Math.floor(this.width / 2 - ((bitmap.width * scale) / 2));
+  } else {
+    x += this.width - (bitmap.width * scale) - 24;
+  }
+  const dw = bitmap.width * scale;
+  const dh = bitmap.height * scale;
+  const y = date.Actor_Y + (this.height - (bitmap.height * scale)) - 24;
+  this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
 };
 
 Window_Result.prototype.drawActorFace = function(x, y, width, height) {
@@ -1255,6 +1368,7 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       this.changeTextColor(ColorManager.textColor(param.LevelUpValueColor));
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
+        ImageManager.loadPicture(actor.resultActorBitmap);
       }
     } else {
       this.resetTextColor();

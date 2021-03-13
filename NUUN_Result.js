@@ -489,6 +489,7 @@
  * @text 表示アクター設定
  * @desc 画像を表示するアクターを指定します。
  * @type struct<ActorButlerList>[]
+ * @default []
  * @parent ActorImg
  * 
  * @param ActorPosition

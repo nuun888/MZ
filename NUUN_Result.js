@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -65,6 +65,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/13 Ver.1.6.3
+ * 表示アクター設定を未入力の状態でゲームを開始するとエラーが出る問題を修正。
  * 2021/3/13 Ver.1.6.2
  * 立ち絵を変更した後にセーブしたデータをロードをロードすると変更した画像が反映されない問題を修正。
  * 2021/3/12 Ver.1.6.1
@@ -826,6 +828,7 @@ Imported.NUUN_Result = true;
   }));
 
 param.GainParam = param.GainParam || [];
+param.ButlerActors = param.ButlerActors || [];
 let gaugeWidth = 300;
 
 const pluginName = "NUUN_Result";

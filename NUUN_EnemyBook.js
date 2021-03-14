@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -134,6 +134,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/14 Ver.1.1.2
+ * アナライズモードの時にバフ、デバフ以外の色指定がカラーコードになっていたので修正。
  * 2021/3/14 Ver.1.1.1
  * アナライズ設定で一部の設定が空欄の時エラーが出る問題を修正。
  * 2021/3/14 Ver.1.1.0
@@ -2254,9 +2256,9 @@ Window_EnemyBook.prototype.enemyParams = function(enemy, x, y) {
       } else {
         if (this._bookMode === 1 && this.analyzeCurrentStatus()) {
           if (!this.analyzeGaugeVisible() && list[i].ShowParams === 1) {
-            this.changeTextColor(ColorManager.textColor(this.crisisColor(enemy)));
+            this.changeTextColor(this.crisisColor(enemy));
           } else {
-            this.changeTextColor(ColorManager.textColor(this.buffColor(text, this.normalParam(i))));
+            this.changeTextColor(this.buffColor(text, this.normalParam(i)));
           }
         }
         if (i % 2 === 0 && list[i].ParamsTwoColsMode && param.TwoColsMode) {
@@ -2279,9 +2281,9 @@ Window_EnemyBook.prototype.buffColor = function(params, nparams) {
   if (!this._AnalyzeStatus) {
     return ColorManager.normalColor();
   } else if (params > nparams) {
-    return this._AnalyzeStatus.BuffColor || ColorManager.normalColor();
+    return ColorManager.textColor(this._AnalyzeStatus.BuffColor) || ColorManager.normalColor();
   } else if (params < nparams) {
-    return this._AnalyzeStatus.DebuffColor || ColorManager.normalColor();
+    return ColorManager.textColor(this._AnalyzeStatus.DebuffColor) || ColorManager.normalColor();
   } else {
     return ColorManager.normalColor();
   }

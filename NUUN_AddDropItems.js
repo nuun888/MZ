@@ -6,16 +6,14 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/12/31 Ver.1.0.0
- * 初版
  */ 
 /*:
  * 
  * @target MZ
  * @plugindesc ドロップアイテム追加
- * @base NUUN_Base
- * @orderAfter NUUN_Base
+ * @base NUUN_Base.js
+ * @version 1.0.0
+ * @orderAfter NUUN_Base.js
  * @author NUUN
  * 
  * @help
@@ -36,6 +34,10 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2020/12/31 Ver.1.0.0
+ * 初版
  * 
  */ 
 var Imported = Imported || {};

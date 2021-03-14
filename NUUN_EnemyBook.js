@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.0.10
+ * @version 1.1.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -64,6 +64,13 @@
  * エネミー図鑑に表示されません。
  * <ShowDataBook>
  * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
+ * スキル、アイテムのメモ欄
+ * <AnalyzeSkill:1> このスキル、アイテムはアナライズスキルとし、「アナライズスキル設定」の１番の設定で発動します。
+ * 
+ * アナライズスキル設定の失敗時のメッセージ
+ * %1:ターゲット名
+ * %2:使用者名
+ * 「%2はアナライズに失敗した。」の時、スキル使用者がリードの場合は「リードはアナライズに失敗した。」と表示されます。
  * 
  * 追加項目パラメータの行
  * 各パラメータ、経験値、お金、倒した数、オリジナルパラメータ：１行
@@ -75,6 +82,16 @@
  * 対応プラグイン
  * ドロップアイテム追加
  * 盗みスキル
+ * 
+ * 仕様
+ * アナライズでエネミーの現在のステータス表示をfalseにしてゲージを表示をtrueにした場合、ゲージの仕様上現在のＨＰ，ＭＰが取得されます。
+ * 図鑑の登録タイミングでアナライズ時、撃破時またはアナライズ時でアナライズを使用した後にモンスターのステータスを表示させたい場合は、
+ * 未撃破時のステータスを非表示にする設定をfalseにしてください。
+ * 
+ * 背景画像について
+ * 背景画像を表示させる場合は、ゲームフォルダーのimgフォルダーを開き右クリック→新規作成→フォルダーの順にクリックし、
+ * 「新しいフォルダー」というフォルダー名をnuun_backgroundに変更してください。
+ * また画像を表示させるには「共通処理」(NUUN_Base)プラグインが必要となります。
  * 
  * 操作方法
  * 上下（↑ ↓）キー：エネミー選択
@@ -103,7 +120,6 @@
  * EnemyBookDefeatEnemySum    指定のエネミーの撃破数を変数に格納します。
  * DorpItemAcquired           指定のアイテムがドロップ済みか判定します。
  * StealItemAcquired          指定のアイテムが盗み済みか判定します。
- * EnemyAnalyze               対象のステータスを表示します。
  * 
  * オリジナルパラメータ
  * this._enemy　データベースのエネミーデータを取得します。
@@ -118,6 +134,16 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/14 Ver.1.1.0
+ * 一部プラグイン導入時、戦闘開始時にエラーが出る問題を修正。
+ * アナライズでHP,MPの現在のステータス以外が取得できていなかった問題を修正。
+ * アナライズでエネミーの現在のステータス表示が機能していなかった問題を修正。
+ * 登録タイミングに「撃破時及びアナライズ時」を追加。
+ * アナライズモードでコモンイベント経由で使用すると行動失敗時でも画面が開いてしまう問題があったため、メモ欄での指定に変更。
+ * アナライズでバフ、デバフ時ステータスの文字色を指定できる機能を追加。
+ * 背景画像の指定先フォルダーを変更。
+ * 2021/3/10 Ver.1.0.11
+ * 新規に登録されたモンスター名の文字色を付ける機能を追加。
  * 2021/3/6 Ver.1.0.10
  * タッチUIがOFFの時にウィンドウの表示範囲を上に詰める機能を追加。
  * 2021/2/28 Ver.1.0.9
@@ -346,16 +372,6 @@
  * @text 格納スイッチ
  * @desc アイテムが盗み済みかを代入する変数を指定します。
  * 
- * @command EnemyAnalyze
- * @desc エネミーの情報を表示します。
- * @text アナライズ
- * 
- * @arg EnemyNewStatus
- * @type boolean
- * @default true
- * @text エネミーの現在のステータスを表示します。
- * @desc エネミーを指定します。
- * 
  * 
  * パラメータ
  * @param BasicSetting
@@ -396,7 +412,9 @@
  * @value 1
  * @option アナライズ時
  * @value 2
- * @desc エネミーのNo表示
+ * @option 撃破時またはアナライズ時
+ * @value 3
+ * @desc 図鑑の登録タイミング
  * @default 0
  * @parent BasicSetting
  * 
@@ -437,6 +455,13 @@
  * @desc 戦闘時タッチUIがOFFの時ウィンドウを上に詰めます。
  * @parent BasicSetting
  * 
+ * @param AnalyzeSkillMode
+ * @desc アナライズスキルの設定をします。
+ * @text アナライズスキル設定
+ * @type struct<AnalyzeSkill>[]
+ * @default ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\"}"]
+ * @parent BasicSetting
+ * 
  * @param BackGround
  * @text 背景設定
  * 
@@ -444,7 +469,7 @@
  * @desc 背景画像ファイル名を指定します。
  * @text 背景画像
  * @type file
- * @dir img/pictures
+ * @dir img/nuun_background
  * @parent BackGround
  * 
  * @param BackUiWidth
@@ -998,6 +1023,41 @@
  * @default false
  * 
  */
+/*~struct~AnalyzeSkill:
+ * @param StatusGaugeVisible
+ * @type boolean
+ * @default true
+ * @text ゲージを表示
+ * @desc HP、MPのゲージを表示します。
+ * 
+ * @param EnemyCurrentStatus
+ * @type boolean
+ * @default true
+ * @text エネミーの現在ステータス表示
+ * @desc エネミーの現在のステータスを表示します。
+ * 
+ * @param AnalyzeMissMessage
+ * @type string
+ * @default %2はアナライズに失敗した。
+ * @text アナライズ失敗時メッセージ
+ * @desc アナライズの失敗時のメッセージを設定します。
+ * 
+ * @param BuffColor
+ * @desc バフ時の文字色。
+ * @text バフ時文字色
+ * @type number
+ * @default 0
+ * @max 999999
+ * 
+ * @param DebuffColor
+ * @desc デバフ時の文字色。
+ * @text デバフ時文字色
+ * @type number
+ * @default 0
+ * @max 999999
+ * 
+ * 
+ */
 var Imported = Imported || {};
 Imported.NUUN_EnemyBook = true;
 
@@ -1014,7 +1074,7 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
-
+param.AnalyzeSkillMode = param.AnalyzeSkillMode || ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\"}"];
 let openAnalyze = false;
 
 //プラグインコマンド
@@ -1089,12 +1149,6 @@ PluginManager.registerCommand(pluginName, 'EnemyBookDefeatEnemySum', args => {
   const enemyId = Number(args.enemyId);
   if (enemyId > 0) {
     $gameSystem.defeatEnemySumVar(enemyId, Number(args.DefeatEnemySum));
-  }
-});
-
-PluginManager.registerCommand(pluginName, 'EnemyAnalyze', args => {
-  if ($gameParty.inBattle()) {
-    SceneManager._scene.enemyBookEnemyAnalyze();
   }
 });
 
@@ -1423,7 +1477,7 @@ Game_Enemy.prototype.transform = function(enemyId) {
 const _Game_Enemy_die = Game_Enemy.prototype.die;
 Game_Enemy.prototype.die = function() {
   _Game_Enemy_die.call(this);
-  if ($gameSystem.registrationTiming() === 1) {
+  if ($gameSystem.registrationTiming() === 1 || $gameSystem.registrationTiming() === 3) {
     $gameSystem.addToEnemyBook(this.enemyId());
   }
 	$gameSystem.defeatCount(this.enemyId());
@@ -1476,6 +1530,25 @@ Game_Enemy.prototype.makeStealItems = function(rate, mode) {
     this.stealItemFlag();
   }
   return di;
+};
+
+const _Game_Action_apply = Game_Action.prototype.apply
+Game_Action.prototype.apply = function(target) {
+  this._analyzeDate = this.item().meta.AnalyzeSkill ? param.AnalyzeSkillMode[Number(this.item().meta.AnalyzeSkill) - 1] : null;
+  if (this._analyzeDate) {
+    const text = this._analyzeDate.AnalyzeMissMessage
+    BattleManager.analyzeMissMessage = text.format(target.name(), this.subject().name())
+  }
+  _Game_Action_apply.call(this, target);
+};
+
+const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
+Game_Action.prototype.applyItemUserEffect = function(target) {
+  _Game_Action_applyItemUserEffect.call(this, target);
+  if (this._analyzeDate) {
+
+    SceneManager._scene.enemyBookEnemyAnalyze(this._analyzeDate);
+  }
 };
 
 //Scene_Menu
@@ -1886,8 +1959,13 @@ Window_EnemyBook.prototype.initialize = function(rect) {
   this._enemySprite.x = rect.width / 4;
   this._enemySprite.y = rect.height / 4 + this.lineHeight();
   this.selectEnemy = null;
+  this._AnalyzeStatus = null;
   this.addChildToBack(this._enemySprite);
   this.refresh();
+};
+
+Window_EnemyBook.prototype.setAnalyzeStatus = function(args) {
+  this._AnalyzeStatus = args;
 };
 
 Window_EnemyBook.prototype.setEnemy = function(enemy) {
@@ -1933,6 +2011,14 @@ Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
   return this._enemy.meta.ShowDataBook || this._bookMode === 1;
 };
 
+Window_EnemyBook.prototype.analyzeGaugeVisible = function() {
+  return this._AnalyzeStatus && eval(this._AnalyzeStatus.StatusGaugeVisible);
+};
+
+Window_EnemyBook.prototype.analyzeCurrentStatus = function() {
+  return this._AnalyzeStatus && eval(this._AnalyzeStatus.EnemyCurrentStatus);
+};
+
 Window_EnemyBook.prototype.maxWidth = function() {
   return this.itemWidth() / 2 - this.itemPadding() * 2;
 };
@@ -1944,13 +2030,17 @@ Window_EnemyBook.prototype.statusLineHeight = function() {
 Window_EnemyBook.prototype.refresh = function() {
   if(!this._enemy) {
     return;
-  }
+  }this._enemy;
   let enemy = null;
-  if(!this._enemyData[this._enemy.id]) {
-    enemy = new Game_Enemy(this._enemy.id, 0, 0);
-    this._enemyData[this._enemy.id] = enemy;
+  if (this._bookMode === 1) {
+    enemy = this.analyzeCurrentStatus() ? this.selectEnemy : new Game_Enemy(this._enemy.id, 0, 0);
   } else {
-    enemy = this._enemyData[this._enemy.id];
+    if(!this._enemyData[this._enemy.id]) {
+      enemy = new Game_Enemy(this._enemy.id, 0, 0);
+      this._enemyData[this._enemy.id] = enemy;
+    } else {
+      enemy = this._enemyData[this._enemy.id];
+    }
   }
   const padding = this.itemPadding();
   let x = padding;
@@ -2143,7 +2233,7 @@ Window_EnemyBook.prototype.enemyParams = function(enemy, x, y) {
     let text = this.paramShow(list[i].ShowParams, enemy);
     if (text !== null) {
       const textWidth = ((i % 2 === 0 && list[i].ParamsTwoColsMode && param.TwoColsMode) ? maxWidth : width) / 2 - padding;
-      if ((list[i].ShowParams === 1 || list[i].ShowParams === 2) && $gameParty.inBattle() && this.selectEnemy) {
+      if ((list[i].ShowParams === 1 || list[i].ShowParams === 2) && $gameParty.inBattle() && this.selectEnemy && this.analyzeGaugeVisible()) {
       } else {
         this.changeTextColor(ColorManager.textColor(list[i].NameColor));
         nameText = this.paramNameShow(list[i].ShowParams, enemy);
@@ -2153,20 +2243,44 @@ Window_EnemyBook.prototype.enemyParams = function(enemy, x, y) {
       if(!this.paramMask()){
         text = param.UnknownStatus;
       }
-      if (list[i].ShowParams === 1 && $gameParty.inBattle() && this.selectEnemy) {
+      if (list[i].ShowParams === 1 && $gameParty.inBattle() && this.selectEnemy && this.analyzeGaugeVisible()) {
         this.placeGauge(this.selectEnemy, "hp", x2, y2);
-      } else if (list[i].ShowParams === 2 && $gameParty.inBattle() && this.selectEnemy) {
+      } else if (list[i].ShowParams === 2 && $gameParty.inBattle() && this.selectEnemy && this.analyzeGaugeVisible()) {
         this.placeGauge(this.selectEnemy, "mp", x2, y2);
       } else {
+        if (this._bookMode === 1 && this.analyzeCurrentStatus()) {
+          if (!this.analyzeGaugeVisible() && list[i].ShowParams === 1) {
+            this.changeTextColor(ColorManager.textColor(this.crisisColor(enemy)));
+          } else {
+            this.changeTextColor(ColorManager.textColor(this.buffColor(text, this.normalParam(i))));
+          }
+        }
         if (i % 2 === 0 && list[i].ParamsTwoColsMode && param.TwoColsMode) {
           this.drawText(text, x2 + textWidth, y2, maxWidth - textWidth - padding, 'right');
         } else {
           this.drawText(text, x2 + textWidth, y2, width - textWidth - padding, 'right');
         }
+        this.resetTextColor();
       }
     }
   }
   this.contents.fontSize = $gameSystem.mainFontSize();
+};
+
+Window_EnemyBook.prototype.crisisColor = function(enemy) {
+  return enemy.isDying() ? ColorManager.crisisColor() : ColorManager.normalColor();
+};
+
+Window_EnemyBook.prototype.buffColor = function(params, nparams) {
+  if (!this._AnalyzeStatus) {
+    return ColorManager.normalColor();
+  } else if (params > nparams) {
+    return this._AnalyzeStatus.BuffColor;
+  } else if (params < nparams) {
+    return this._AnalyzeStatus.DebuffColor;
+  } else {
+    return ColorManager.normalColor();
+  }
 };
 
 Window_EnemyBook.prototype.paramNameShow = function(params, enemy) {
@@ -2197,7 +2311,9 @@ Window_EnemyBook.prototype.paramNameShow = function(params, enemy) {
 Window_EnemyBook.prototype.paramShow = function(params, enemy) {
   switch (params) {
     case 1:
+      return this._bookMode === 1 && this.analyzeCurrentStatus() ? enemy._hp : enemy.param(params - 1);
     case 2:
+      return this._bookMode === 1 && this.analyzeCurrentStatus() ? enemy._mp : enemy.param(params - 1);
     case 3:
     case 4:
     case 5:
@@ -2213,6 +2329,22 @@ Window_EnemyBook.prototype.paramShow = function(params, enemy) {
       return eval(param.paramOriginalEval1);
     case 21:
       return eval(param.paramOriginalEval2);
+    default:
+      return null;
+  }
+};
+
+Window_EnemyBook.prototype.normalParam = function(params) {
+  switch (params) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+      return this._enemy.params[params];
     default:
       return null;
   }
@@ -2614,6 +2746,7 @@ Scene_Battle.prototype.createEnemyBookPercentWindow = function() {
   this._enemyBookPercentWindow = new Window_EnemyBook_Percent(rect);
   this.addWindow(this._enemyBookPercentWindow);
   this._enemyBookPercentWindow.hide();
+  this._enemyBookPercentWindow.openness = 0;
 };
 
 Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
@@ -2623,6 +2756,7 @@ Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
   this.addWindow(this._enemyBookIndexWindow);
   this._enemyBookIndexWindow.setPercentWindow(this._enemyBookPercentWindow);
   this._enemyBookIndexWindow.hide();
+  this._enemyBookIndexWindow.openness = 0;
 };
 
 Scene_Battle.prototype.createEnemyBookDummyWindow = function() {
@@ -2639,6 +2773,7 @@ Scene_Battle.prototype.createEnemyBookEnemyWindow = function() {
   this.addWindow(this._enemyBookEnemyWindow);
   this._enemyBookIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
   this._enemyBookEnemyWindow.hide();
+  this._enemyBookEnemyWindow.openness = 0;
 };
 
 Scene_Battle.prototype.percentEnemyBookWindowRect = function() {
@@ -2720,10 +2855,10 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
   this._enemyBookPercentWindow.close();
   this._enemyBookEnemyWindow.close();
   this._enemyBookDummyWindow.close();
-  this._enemyBookIndexWindow.hide();
-  this._enemyBookPercentWindow.hide();
-  this._enemyBookEnemyWindow.hide();
-  this._enemyBookDummyWindow.hide();
+  //this._enemyBookIndexWindow.hide();
+  //this._enemyBookPercentWindow.hide();
+  //this._enemyBookEnemyWindow.hide();
+  //this._enemyBookDummyWindow.hide();
   this._enemyBookEnemyWindow.selectEnemy = null;
   if (this._enemyBookEnemyWindow._bookMode === 0) {
     this._partyCommandWindow.activate();
@@ -2731,11 +2866,12 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
   openAnalyze = false;
 };
 
-Scene_Battle.prototype.enemyBookEnemyAnalyze = function() {
+Scene_Battle.prototype.enemyBookEnemyAnalyze = function(args) {
   openAnalyze = true;
   this._enemyBookDummyWindow.interruptWindow = true;
   //this.userWindowDeactivate();
   this._enemyBookEnemyWindow._enemy = null;
+  this._enemyBookEnemyWindow.setAnalyzeStatus(args);
   this._enemyBookEnemyWindow._bookMode = 1;
   this._enemyBookEnemyWindow.x = (Graphics.boxWidth - this._enemyBookEnemyWindow.width) / 2;
   this._enemyBookDummyWindow.activate();
@@ -2747,7 +2883,7 @@ Scene_Battle.prototype.enemyBookEnemyAnalyze = function() {
   const index = this._enemyWindow.enemyIndex();
   this._enemyBookEnemyWindow.selectEnemy = $gameTroop.members()[index];
   const enemy = this._enemyBookEnemyWindow.selectEnemy.enemy();
-  if ($gameSystem.registrationTiming() === 2) {
+  if ($gameSystem.registrationTiming() === 2 || $gameSystem.registrationTiming() === 3) {
     $gameSystem.addToEnemyBook(enemy.id);
   }
   this._enemyBookEnemyWindow.setEnemy(enemy);
@@ -2823,7 +2959,7 @@ Scene_Battle.prototype.updateCancelButton = function() {
 const _Scene_Battle_buttonY = Scene_Battle.prototype.buttonY;
 Scene_Battle.prototype.buttonY = function() {
   const y = _Scene_Battle_buttonY.call(this);
-  if (this._enemyBookIndexWindow.active) {
+  if (this._enemyBookIndexWindow && this._enemyBookIndexWindow.active) {
     return y - this._helpWindow.height;
   }
   return y;
@@ -2880,6 +3016,12 @@ Window_PartyCommand.prototype.makeCommandList = function() {//enemyBookBattleSwi
   }
 };
 
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+  _BattleManager_initMembers.call(this);
+  this.analyzeMissMessage = null;
+};
+
 const _BattleManager_isBusy = BattleManager.isBusy;
 BattleManager.isBusy = function() {
   return this.enemyBookIsBusy() || _BattleManager_isBusy.call(this);
@@ -2887,15 +3029,6 @@ BattleManager.isBusy = function() {
 
 BattleManager.enemyBookIsBusy = function() {
   return openAnalyze;
-};
-
-const _Game_Interpreter_command357 = Game_Interpreter.prototype.command357;
-Game_Interpreter.prototype.command357 = function(params) {
-  const reply = _Game_Interpreter_command357.call(this, params);
-  if (params[0] === "NUUN_EnemyBook" && params[1] === "EnemyAnalyze" && reply) {
-    this.wait(1);
-  }
-  return reply;
 };
 
 function Window_EnemyBook_Dummy() {
@@ -2924,6 +3057,18 @@ Sprite_EnemyBookGauge.prototype.bitmapWidth = function() {
     return param.MPgaugeWidth > 0 ? param.MPgaugeWidth : 128;
   }
   return 999;
+};
+
+const _Window_BattleLog_displayMiss =Window_BattleLog.prototype.displayMiss;
+Window_BattleLog.prototype.displayMiss = function(target) {
+  let fmt;console.log(BattleManager.analyzeMissMessage)
+  if (BattleManager.analyzeMissMessage) {
+    fmt = BattleManager.analyzeMissMessage;
+    BattleManager.analyzeMissMessage = null;
+    this.push("addText", fmt);
+  } else {
+    _Window_BattleLog_displayMiss.call(this, target);
+  }
 };
 
 })();

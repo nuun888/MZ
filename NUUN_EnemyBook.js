@@ -134,6 +134,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/14 Ver.1.1.1
+ * アナライズ設定で一部の設定が空欄の時エラーが出る問題を修正。
  * 2021/3/14 Ver.1.1.0
  * 一部プラグイン導入時、戦闘開始時にエラーが出る問題を修正。
  * アナライズでHP,MPの現在のステータス以外が取得できていなかった問題を修正。
@@ -459,7 +461,7 @@
  * @desc アナライズスキルの設定をします。
  * @text アナライズスキル設定
  * @type struct<AnalyzeSkill>[]
- * @default ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\"}"]
+ * @default ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}"]
  * @parent BasicSetting
  * 
  * @param BackGround
@@ -1074,8 +1076,8 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
-param.AnalyzeSkillMode = param.AnalyzeSkillMode || ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\"}"];
-let openAnalyze = false;
+param.AnalyzeSkillMode = param.AnalyzeSkillMode || ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}"];
+let openAnalyze = false;console.log(param.AnalyzeSkillMode)
 
 //プラグインコマンド
 const pluginName = "NUUN_EnemyBook";
@@ -1537,7 +1539,9 @@ Game_Action.prototype.apply = function(target) {
   this._analyzeDate = this.item().meta.AnalyzeSkill ? param.AnalyzeSkillMode[Number(this.item().meta.AnalyzeSkill) - 1] : null;
   if (this._analyzeDate) {
     const text = this._analyzeDate.AnalyzeMissMessage
-    BattleManager.analyzeMissMessage = text.format(target.name(), this.subject().name())
+    if (text) {
+      BattleManager.analyzeMissMessage = text.format(target.name(), this.subject().name())
+    }
   }
   _Game_Action_apply.call(this, target);
 };
@@ -2275,9 +2279,9 @@ Window_EnemyBook.prototype.buffColor = function(params, nparams) {
   if (!this._AnalyzeStatus) {
     return ColorManager.normalColor();
   } else if (params > nparams) {
-    return this._AnalyzeStatus.BuffColor;
+    return this._AnalyzeStatus.BuffColor || ColorManager.normalColor();
   } else if (params < nparams) {
-    return this._AnalyzeStatus.DebuffColor;
+    return this._AnalyzeStatus.DebuffColor || ColorManager.normalColor();
   } else {
     return ColorManager.normalColor();
   }

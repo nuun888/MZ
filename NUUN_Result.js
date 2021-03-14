@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -33,6 +33,13 @@
  * はされません。
  * レベルアップ表示位置で「座標指定」を指定の場合は、各アクター表示位置左上カラの座標となります。文字の表示幅の調整は行われません。
  * 
+ * 背景画像を設定して「背景サイズをウィンドウサイズに合わせる」をfalseに設定した時の仕様について
+ * レベルアップ画面のアクター画像はUIサイズ、リザルト画面ウィンドウのサイズではなく、ゲーム画面サイズに合わせて表示されます。
+ * このモードのみボタンの表示位置を変更可能です。ボタン設定での座標指定はゲーム画面左上からの絶対座標となっています。-1を指定することでリザルトウィンドウサイズに合わせます。
+ * 
+ * 背景画像、アクター画像を表示させる場合は、ゲームフォルダーのimgフォルダーを開き右クリック→新規作成→フォルダーの順にクリックします。
+ * 「新しいフォルダー」というフォルダー名をnuun_actorpictures又はnuun_backgroundに変更してください。
+ * また画像を表示させるには「共通処理」(NUUN_Base)プラグインが必要となります。
  * 
  * アクターの参照変数（レベルアップ画面の独自パラメータ）
  * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
@@ -65,6 +72,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/14 Ver.1.6.4
+ * 背景画像設定時の立ち絵の表示方法を変更。
+ * リザルト画面のX座標を調整できる機能を追加。
+ * ウィンドウのY座標を変更したときにボタンの表示位置も移動しない問題を修正。
+ * フォルダーの参照先を変更。
  * 2021/3/13 Ver.1.6.3
  * 表示アクター設定を未入力の状態でゲームを開始するとエラーが出る問題を修正。
  * 2021/3/13 Ver.1.6.2
@@ -159,10 +171,10 @@
  * @parent CommonSetting
  * 
  * @param ResultWidth
- * @desc ウィンドウの横幅。(0でUI横幅)デフォルト:808
+ * @desc ウィンドウの横幅。(0でUI横幅)
  * @text ウィンドウ横幅
  * @type number
- * @default 808
+ * @default 0
  * @min 0
  * @parent WindowSetting
  * 
@@ -171,6 +183,21 @@
  * @text ウィンドウ縦幅
  * @type number
  * @default 616
+ * @min 0
+ * @parent WindowSetting
+ * 
+ * @param ResultWindowCenter
+ * @type boolean
+ * @default true
+ * @text ウィンドウを中央表示
+ * @desc ウィンドウを中央に表示します。ウィンドウのX座標はウィンドウ表示位置からの相対座標になります。
+ * @parent WindowSetting
+ * 
+ * @param ResultWindow_X
+ * @desc ウィンドウのX座標。
+ * @text ウィンドウX座標
+ * @type number
+ * @default 0
  * @min 0
  * @parent WindowSetting
  * 
@@ -208,6 +235,19 @@
  * @value "right"
  * @default center
  * @parent WindowSetting
+ * 
+ * @param ButtonSetting
+ * @text ボタン設定
+ * @desc この設定は「背景サイズをウィンドウサイズに合わせる」をfalseに設定した時のみ有効になります。
+ * @parent CommonSetting
+ * 
+ * @param ResultButton_X
+ * @desc ボタンのX座標。(背景サイズをウィンドウサイズに合わせるをfalseに設定した時のみ、-1でリザルト画面に合わせます)
+ * @text ボタンX座標
+ * @type number
+ * @default -1
+ * @min -1
+ * @parent ButtonSetting
  * 
  * @param LineColor
  * @desc ライン（線）の色。
@@ -475,7 +515,7 @@
  * @desc 背景画像ファイル名を指定します。
  * @text 背景画像
  * @type file
- * @dir img/pictures
+ * @dir img/nuun_background
  * @parent GetPage
  * 
  * @param LevelUpPage
@@ -783,7 +823,7 @@
  * @text アクター画像
  * @desc アクターの画像を表示します。
  * @type file
- * @dir img/pictures
+ * @dir img/nuun_actorpictures
  * 
  * @param Actor_X
  * @desc 画像の表示位置X座標。
@@ -850,6 +890,7 @@ PluginManager.registerCommand(pluginName, 'LevelUpPage', args => {
   BattleManager.levelUpPageEnable(eval(args.LevelUpPageEnable));
 });
 
+
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
@@ -886,6 +927,7 @@ Scene_Battle.prototype.createResultBaseSprite = function() {
     this._resultBaseSprite = sprite;
     this.addChild(sprite);
     this.createResultBackGround();
+    this.createResultActorImg();
   }
 };
 
@@ -894,7 +936,7 @@ Scene_Battle.prototype.createResultBackGround = function() {
     if (param.PartyBackGroundImg) {
       const partySprite = new Sprite();
       this._resultBaseSprite.addChild(partySprite);
-      partySprite.bitmap = ImageManager.loadPicture(param.PartyBackGroundImg);
+      partySprite.bitmap = ImageManager.nuun_backGround(param.PartyBackGroundImg);
       this._backGroundPartySprite = partySprite;
       partySprite.hide();
       if (partySprite.bitmap && !partySprite.bitmap.isReady()) {
@@ -906,7 +948,7 @@ Scene_Battle.prototype.createResultBackGround = function() {
     if (param.ActorBackGroundImg) {
       const actorSprite = new Sprite();
       this._resultBaseSprite.addChild(actorSprite);
-      actorSprite.bitmap = ImageManager.loadPicture(param.ActorBackGroundImg);
+      actorSprite.bitmap = ImageManager.nuun_backGround(param.ActorBackGroundImg);
       this._backGroundActorSprite = actorSprite;
       actorSprite.hide();
       if (actorSprite.bitmap && !actorSprite.bitmap.isReady()) {
@@ -915,13 +957,14 @@ Scene_Battle.prototype.createResultBackGround = function() {
         this.resultBackGround(actorSprite);
       }
     }
-  } 
+  }
 };
 
 Scene_Battle.prototype.resultBackGround = function(sprite) {
   if(param.BackUiWidth) {
-    sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2 + (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0);
-    sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
+    sprite.x = (param.ResultWindowCenter ? (Graphics.width - (Graphics.boxWidth + 8)) / 2 + (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0) :
+                0) + param.ResultWindow_X;
+    sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2 + param.ResultWindow_Y;
     const width = (param.ResultWidth > 0 ? param.ResultWidth : Graphics.boxWidth) + 8;
     const height = (param.ResultHeight > 0 ? param.ResultHeight : Graphics.boxHeight) + 8;
     sprite.scale.x = (width !== sprite.bitmap.width ? width / sprite.bitmap.width : 1);
@@ -930,6 +973,21 @@ Scene_Battle.prototype.resultBackGround = function(sprite) {
     sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
     sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
   }
+};
+
+Scene_Battle.prototype.createResultActorImg = function() {
+  const rect = this.resultActorImgWindowRect();
+  this._resultActorImgWindow = new Window_ResultActorImg(rect);
+  this._resultActorImgWindow.hide();
+  this._resultBaseSprite.addChild(this._resultActorImgWindow);
+};
+
+Scene_Battle.prototype.resultActorImgWindowRect = function() {
+  const wx = param.BackUiWidth ? (param.ResultWindowCenter ? (Graphics.width - (Graphics.boxWidth + 8)) / 2 + (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0) : 0) + param.ResultWindow_X : 0;
+  const wy = param.BackUiWidth ? (Graphics.height - (Graphics.boxHeight + 8)) / 2 + param.ResultWindow_Y : 0;
+  const ww = param.BackUiWidth ? (param.ResultWidth > 0 ? param.ResultWidth : Graphics.boxWidth) + 8 : Graphics.width;
+  const wh = param.BackUiWidth ? (param.ResultHeight > 0 ? param.ResultHeight : Graphics.boxHeight + param.ResultWindow_Y) + 8 : Graphics.height;
+  return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.createResultHelpWindow = function() {
@@ -946,7 +1004,7 @@ Scene_Battle.prototype.createResultHelpWindow = function() {
 };
 
 Scene_Battle.prototype.resultHelpWindowRect = function() {
-  const wx = (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0);
+  const wx = (param.ResultWindowCenter ? (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0) : (Graphics.boxWidth - Graphics.width) / 2) + param.ResultWindow_X;
   const wy = this.resultHelpAreaTop();
   const ww = param.ResultWidth > 0 ? param.ResultWidth : Graphics.boxWidth;
   const wh = this.resultHelpAreaHeight();
@@ -963,13 +1021,14 @@ Scene_Battle.prototype.createResultWindow = function() {
     this._resultBaseSprite.addChild(this._resultWindow);
     this._resultWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
     this._resultWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
+    this._resultWindow.setActorImgWindow(this._resultActorImgWindow);
   } else {
     this.addWindow(this._resultWindow);
   }
 };
 
 Scene_Battle.prototype.resultWindowRect = function() {
-  const wx = (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0);
+  const wx = (param.ResultWindowCenter ? (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0) : (Graphics.boxWidth - Graphics.width) / 2) + param.ResultWindow_X;
   const wy = this.resultHelpAreaTop() + this.resultHelpAreaHeight();
   const ww = param.ResultWidth > 0 ? param.ResultWidth : Graphics.boxWidth;
   const wh = (param.ResultHeight > 0 ? param.ResultHeight : Graphics.boxHeight) - wy + param.ResultWindow_Y;
@@ -989,7 +1048,7 @@ Scene_Battle.prototype.createResultDropItemWindow = function() {
 };
 
 Scene_Battle.prototype.resultDropItemWindowRect = function() {
-  const wx = (Graphics.width - Graphics.boxWidth) / 2 + (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0);
+  const wx = (param.ResultWindowCenter ? (Graphics.width - Graphics.boxWidth) / 2 + (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0) : 0) + param.ResultWindow_X;
   const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.resultHelpAreaTop() + this.resultHelpAreaHeight();
   const ww = this._resultWindow.width;
   const wh = this._resultWindow.height;
@@ -1002,9 +1061,14 @@ Scene_Battle.prototype.createResultButtons = function() {
   }
 };
 
-Scene_Battle.prototype.createResultButton = function() {
-  this._okResultButton = new Sprite_Button("ok");(param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0)
-  this._okResultButton.x = (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 + param.ResultWidth: Graphics.boxWidth) - this._okResultButton.width - 4;
+Scene_Battle.prototype.createResultButton = function() {//this._resultBaseSprite
+  this._okResultButton = new Sprite_Button("ok");
+  if (!this._resultBaseSprite || param.BackUiWidth || param.ResultButton_X < 0) {
+    this._okResultButton.x = (param.ResultWindowCenter ? (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0) : (Graphics.boxWidth - Graphics.width) / 2)
+    + this._resultWindow.width - this._okResultButton.width - 4 + param.ResultWindow_X;
+  } else {console.log(param.BackUiWidth)
+    this._okResultButton.x = Math.min(param.ResultButton_X, Graphics.width - this._okResultButton.width - 4) + (Graphics.boxWidth - Graphics.width) / 2;
+  }
   this._okResultButton.y = this.resultbuttonY();
   this._downResultButton = new Sprite_Button("pagedown");
   this._downResultButton.x = this._okResultButton.x - (24 + this._downResultButton.width);
@@ -1033,6 +1097,11 @@ Scene_Battle.prototype.createResultButton = function() {
 
 Scene_Battle.prototype.resultHelpAreaHeight = function() {
   return this.calcWindowHeight(1, false);
+};
+
+Scene_Battle.prototype.resultWindowAreaX = function() {
+  return param.ResultWindow_X >= 0 ? (Graphics.boxWidth - Graphics.width) / 2 + param.ResultWindow_X :
+            (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0);
 };
 
 Scene_Battle.prototype.resultHelpAreaTop = function() {
@@ -1094,11 +1163,9 @@ Scene_Battle.prototype.backGroundActorShow = function() {
     this._resultWindow.opacity = 0;
     this._resultWindow.frameVisible = false;
     this._backGroundActorSprite.show();
-  } else {
-    this._resultHelpWindow.opacity = 255;
-    this._resultHelpWindow.frameVisible = true;
-    this._resultWindow.opacity = 255;
-    this._resultWindow.frameVisible = true;
+  }
+  if (this._resultBaseSprite) {
+    this._resultActorImgWindow.show();
   }
 };
 
@@ -1111,6 +1178,9 @@ Scene_Battle.prototype.backGroundPartyHide = function() {
 Scene_Battle.prototype.backGroundActorHide = function() {
   if (this._backGroundActorSprite) {
     this._backGroundActorSprite.hide();
+  }
+  if (this._resultBaseSprite) {
+    this._resultActorImgWindow.hide();
   }
 };
 
@@ -1167,7 +1237,81 @@ Scene_Battle.prototype.updateResultButton = function() {
 
 Scene_Battle.prototype.resultbuttonY = function() {
   const y = Scene_Battle.prototype.buttonY.call(this);
-  return y - this._helpWindow.height;
+  return y - this._helpWindow.height + param.ResultWindow_Y;
+};
+
+function Window_ResultActorImg() {
+  this.initialize(...arguments);
+}
+
+Window_ResultActorImg.prototype = Object.create(Window_StatusBase.prototype);
+Window_ResultActorImg.prototype.constructor = Window_ResultActorImg;
+
+Window_ResultActorImg.prototype.initialize = function(rect) {
+  Window_StatusBase.prototype.initialize.call(this, rect);
+  this._actor = null;
+  this._actorSprite = null;
+  this.opacity = 0;
+  this.frameVisible = false;
+};
+
+Window_ResultActorImg.prototype.setActor = function(actor) {
+  this._actor = actor;
+};
+
+Window_ResultActorImg.prototype.refresh = function() {
+  this.drawActorImg(this._actor);
+};
+
+Window_ResultActorImg.prototype.drawActorImg = function(actor) {
+  if (actor.resultActorBitmap || actor.resultActorImg.ActorImg) {  
+    const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
+    const bitmap = ImageManager.loadPicture(loadBitmap);
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
+    } else {
+      this.actorImgRefresh(bitmap, actor.resultActorImg);
+    }
+  } else if (this._actorSprite && this._actorSprite.bitmap){
+    this._actorSprite.bitmap = null;
+  }
+};
+
+Window_ResultActorImg.prototype.actorImgRefresh = function(bitmap, date) {
+  let x = date.Actor_X;
+  const scale = (date.Actor_Scale || 100) / 100;
+  if(param.ActorPosition === 0) {
+    x += 0;
+  } else if (param.ActorPosition === 1) {
+    x += Math.floor(this.width / 2 - ((bitmap.width * scale) / 2));
+  } else {
+    x += this.width - (bitmap.width * scale) - 24;
+  }
+  const y = date.Actor_Y + (this.height - (bitmap.height * scale));
+  this.placeResultActorImg(this._actor, x, y, bitmap, scale);
+};
+
+Window_ResultActorImg.prototype.placeResultActorImg = function(actor, x, y, bitmap, scale) {
+  const key = "actor-result".format();
+  const sprite = this.createActorImgSprite(key, Sprite_ResultActor);
+  if (sprite._battler !== actor) {
+    sprite.setup(actor, bitmap, scale);
+    sprite.move(x, y);
+    sprite.show();
+    this._actorSprite = sprite;
+  }
+};
+
+Window_ResultActorImg.prototype.createActorImgSprite = function(key, spriteClass) {
+  const dict = this._additionalSprites;
+  if (dict[key]) {
+    return dict[key];
+  } else {
+    const sprite = new spriteClass();
+    dict[key] = sprite;
+    this.addChild(sprite);
+    return sprite;
+  }
 };
 
 function Window_ResultHelp() {
@@ -1299,15 +1443,20 @@ Window_Result.prototype.drawGainList = function(x, y, width) {
 };
 
 Window_Result.prototype.drawActorImg = function(actor) {
-  if (actor.resultActorBitmap || actor.resultActorImg.ActorImg) {
-    const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
-    const bitmap = ImageManager.loadPicture(loadBitmap);
-    if (bitmap && !bitmap.isReady()) {
-      bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
-    } else {
-      this.actorImgRefresh(bitmap, actor.resultActorImg);
+  if (this._resultActorImgWindow) {
+    this._resultActorImgWindow.setActor(actor);
+    this._resultActorImgWindow.refresh();
+  } else {
+    if (actor.resultActorBitmap || actor.resultActorImg.ActorImg) {
+      const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
+      const bitmap = ImageManager.loadPicture(loadBitmap);
+      if (bitmap && !bitmap.isReady()) {
+        bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
+      } else {
+        this.actorImgRefresh(bitmap, actor.resultActorImg);
+      }
     }
-  }
+  } 
 };
 
 Window_Result.prototype.actorImgRefresh = function(bitmap, date) {
@@ -1595,6 +1744,10 @@ Window_Result.prototype.processOk = function() {
   }
 };
 
+Window_Result.prototype.setActorImgWindow = function(resultActorImgWindow) {
+  this._resultActorImgWindow = resultActorImgWindow;
+};
+
 function Window_ResultDropItem() {
   this.initialize(...arguments);
 }
@@ -1691,6 +1844,34 @@ Window_ResultDropItem.prototype.drawLearnSkill = function(actor, x, y, width) {
       this.drawItemName(skill, x, y2, width);
     }
   }
+};
+
+function Sprite_ResultActor() {
+  this.initialize(...arguments);
+}
+
+Sprite_ResultActor.prototype = Object.create(Sprite.prototype);
+Sprite_ResultActor.prototype.constructor = Sprite_ResultActor;
+
+Sprite_ResultActor.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+};
+
+Sprite_ResultActor.prototype.initMembers = function() {
+  this._battler = null;
+};
+
+Sprite_ResultActor.prototype.destroy = function(options) {
+  this.bitmap.destroy();
+  Sprite.prototype.destroy.call(this, options);
+};
+
+Sprite_ResultActor.prototype.setup = function(battler, bitmap, scale) {
+  this._battler = battler;
+  this.bitmap = bitmap;
+  this.scale.x *= scale;
+  this.scale.y *= scale;
 };
 
 function Sprite_ResultExpGauge() {

@@ -7,12 +7,12 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2020/12/31 Ver.1.0.0
  */ 
 /*:
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
+ * @version 1.1.0
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -20,6 +20,11 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 2021/3/14 Ver.1.1.0
+ * 画像のフォルダー指定の処理を追加。
+ * 2020/12/31 Ver.1.0.0
+ * 初版
  * 
  */
 var Imported = Imported || {};
@@ -55,6 +60,14 @@ DataManager.nuun_loadDataActors = function(deta){
 };
 
 DataManager.nuun_loadDataEnemies = function(deta){
+};
+
+ImageManager.nuun_backGround = function(filename) {
+  return this.loadBitmap("img/nuun_background/", filename);
+};
+
+ImageManager.nuun_actorPictures = function(filename) {
+  return this.loadBitmap("img/nuun_actorpictures/", filename);
 };
 
 })();

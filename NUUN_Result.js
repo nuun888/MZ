@@ -1065,7 +1065,7 @@ Scene_Battle.prototype.createResultButton = function() {//this._resultBaseSprite
   if (!this._resultBaseSprite || param.BackUiWidth || param.ResultButton_X < 0) {
     this._okResultButton.x = (param.ResultWindowCenter ? (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0) : (Graphics.boxWidth - Graphics.width) / 2)
     + this._resultWindow.width - this._okResultButton.width - 4 + param.ResultWindow_X;
-  } else {console.log(param.BackUiWidth)
+  } else {
     this._okResultButton.x = Math.min(param.ResultButton_X, Graphics.width - this._okResultButton.width - 4) + (Graphics.boxWidth - Graphics.width) / 2;
   }
   this._okResultButton.y = this.resultbuttonY();

@@ -13,7 +13,7 @@
 /*:
  * 
  * @target MZ
- * @plugindesc ドロップアイテム増加
+ * @plugindesc ドロップアイテム追加
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN

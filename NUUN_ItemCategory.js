@@ -7,11 +7,11 @@
  * -------------------------------------------------------------------------------------
  * 
  */
-/*:ja
+/*:
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * アイテムに独自のカテゴリーを追加または必要な項目のみ表示させることが出来ます。
@@ -31,8 +31,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/15 Ver.1.1.2
+ * 戦闘中にアイテムの個数が表示されない問題を修正。
  * 2021/3/8 Ver.1.1.1
- * 全てのアイテム表示keyItem以外の個数の表示を反映するように修正。
+ * 全てのアイテム表示でkeyItem以外の個数の表示を反映するように修正。
  * 2021/3/7 Ver.1.1.0
  * 各カテゴリーに個数を表示するか選択できる機能を追加。
  * 売却画面でも表示行数を反映させるように修正。
@@ -169,7 +171,7 @@ Window_ItemList.prototype.needsNumber = function() {
   if (this._category === "keyItem") {
     return $dataSystem.optKeyItemsNumber;
   }
-  return this._needsCategory;
+  return this._needsCategory === undefined || this._needsCategory === null ? true : this._needsCategory;
 };
 
 Window_ItemList.prototype.allItemsNeedsNumber = function(item) {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -1077,7 +1077,7 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   }
 }));
 param.AnalyzeSkillMode = param.AnalyzeSkillMode || ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}"];
-let openAnalyze = false;console.log(param.AnalyzeSkillMode)
+let openAnalyze = false;
 
 //プラグインコマンド
 const pluginName = "NUUN_EnemyBook";

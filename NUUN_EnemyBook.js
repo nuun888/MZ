@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -121,7 +121,7 @@
  * DorpItemAcquired           指定のアイテムがドロップ済みか判定します。
  * StealItemAcquired          指定のアイテムが盗み済みか判定します。
  * 
- * オリジナルパラメータ
+ * オリジナルパラメータ参照変数
  * this._enemy　データベースのエネミーデータを取得します。
  * this._enemy.meta メタタグを取得します。
  * enemy Game_Enemyのデータを取得します。
@@ -134,6 +134,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/16 Ver.1.1.3
+ * アナライズを使用し、ウィンドウを閉じるとき一瞬別のモンスターが表示される問題を修正。
+ * アナライズを使用すると別のターゲットの情報が表示される問題を修正。
  * 2021/3/14 Ver.1.1.2
  * アナライズモードの時にバフ、デバフ以外の色指定がカラーコードになっていたので修正。
  * 2021/3/14 Ver.1.1.1
@@ -1552,7 +1555,7 @@ const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffe
 Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
   if (this._analyzeDate) {
-
+    BattleManager.analyzeTarget = target;
     SceneManager._scene.enemyBookEnemyAnalyze(this._analyzeDate);
   }
 };
@@ -1964,6 +1967,7 @@ Window_EnemyBook.prototype.initialize = function(rect) {
   this._enemySprite.anchor.y = 0.5;
   this._enemySprite.x = rect.width / 4;
   this._enemySprite.y = rect.height / 4 + this.lineHeight();
+  this._enemySprite.hide();
   this.selectEnemy = null;
   this._AnalyzeStatus = null;
   this.addChildToBack(this._enemySprite);
@@ -2036,7 +2040,7 @@ Window_EnemyBook.prototype.statusLineHeight = function() {
 Window_EnemyBook.prototype.refresh = function() {
   if(!this._enemy) {
     return;
-  }this._enemy;
+  }
   let enemy = null;
   if (this._bookMode === 1) {
     enemy = this.analyzeCurrentStatus() ? this.selectEnemy : new Game_Enemy(this._enemy.id, 0, 0);
@@ -2191,6 +2195,7 @@ Window_EnemyBook.prototype.enemyImg = function(enemy) {
     }
     Sprite_Battler.prototype.setHue.call(this._enemySprite, hue);
     this._enemySprite.bitmap = bitmap;
+    this._enemySprite.show();
     if (bitmap && !bitmap.isReady()) {
       bitmap.addLoadListener(this.drowEnemy.bind(this));
     } else {
@@ -2239,7 +2244,7 @@ Window_EnemyBook.prototype.enemyParams = function(enemy, x, y) {
     let text = this.paramShow(list[i].ShowParams, enemy);
     if (text !== null) {
       const textWidth = ((i % 2 === 0 && list[i].ParamsTwoColsMode && param.TwoColsMode) ? maxWidth : width) / 2 - padding;
-      if ((list[i].ShowParams === 1 || list[i].ShowParams === 2) && $gameParty.inBattle() && this.selectEnemy && this.analyzeGaugeVisible()) {
+      if ((list[i].ShowParams === 1 || list[i].ShowParams === 2) && $gameParty.inBattle() && enemy && this.analyzeGaugeVisible()) {
       } else {
         this.changeTextColor(ColorManager.textColor(list[i].NameColor));
         nameText = this.paramNameShow(list[i].ShowParams, enemy);
@@ -2249,10 +2254,10 @@ Window_EnemyBook.prototype.enemyParams = function(enemy, x, y) {
       if(!this.paramMask()){
         text = param.UnknownStatus;
       }
-      if (list[i].ShowParams === 1 && $gameParty.inBattle() && this.selectEnemy && this.analyzeGaugeVisible()) {
-        this.placeGauge(this.selectEnemy, "hp", x2, y2);
-      } else if (list[i].ShowParams === 2 && $gameParty.inBattle() && this.selectEnemy && this.analyzeGaugeVisible()) {
-        this.placeGauge(this.selectEnemy, "mp", x2, y2);
+      if (list[i].ShowParams === 1 && $gameParty.inBattle() && this.analyzeGaugeVisible()) {
+        this.placeGauge(enemy, "hp", x2, y2);
+      } else if (list[i].ShowParams === 2 && $gameParty.inBattle() && this.analyzeGaugeVisible()) {
+        this.placeGauge(enemy, "mp", x2, y2);
       } else {
         if (this._bookMode === 1 && this.analyzeCurrentStatus()) {
           if (!this.analyzeGaugeVisible() && list[i].ShowParams === 1) {
@@ -2855,8 +2860,6 @@ Scene_Battle.prototype.commandEnemyBook = function() {
 
 Scene_Battle.prototype.cancelEnemyBook = function() {
   this._enemyBookDummyWindow.interruptWindow = false;
-  this._enemyBookIndexWindow.deactivate();
-  this._enemyBookDummyWindow.deactivate();
   this._enemyBookIndexWindow.close();
   this._enemyBookPercentWindow.close();
   this._enemyBookEnemyWindow.close();
@@ -2865,9 +2868,13 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
   //this._enemyBookPercentWindow.hide();
   //this._enemyBookEnemyWindow.hide();
   //this._enemyBookDummyWindow.hide();
-  this._enemyBookEnemyWindow.selectEnemy = null;
+  this._enemyBookEnemyWindow._enemySprite.hide();
   if (this._enemyBookEnemyWindow._bookMode === 0) {
     this._partyCommandWindow.activate();
+    this._enemyBookIndexWindow.deactivate();
+    this._enemyBookEnemyWindow.selectEnemy = null;
+  } else {
+    this._enemyBookDummyWindow.deactivate();
   }
   openAnalyze = false;
 };
@@ -2885,10 +2892,8 @@ Scene_Battle.prototype.enemyBookEnemyAnalyze = function(args) {
   this._enemyBookDummyWindow.open();
   this._enemyBookEnemyWindow.show();
   this._enemyBookEnemyWindow.open();
-  this._enemyBookIndexWindow.refresh();
-  const index = this._enemyWindow.enemyIndex();
-  this._enemyBookEnemyWindow.selectEnemy = $gameTroop.members()[index];
-  const enemy = this._enemyBookEnemyWindow.selectEnemy.enemy();
+  this._enemyBookEnemyWindow.selectEnemy = BattleManager.analyzeTarget;
+  const enemy = BattleManager.analyzeTarget.enemy();
   if ($gameSystem.registrationTiming() === 2 || $gameSystem.registrationTiming() === 3) {
     $gameSystem.addToEnemyBook(enemy.id);
   }
@@ -3026,6 +3031,7 @@ const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
   _BattleManager_initMembers.call(this);
   this.analyzeMissMessage = null;
+  BattleManager.analyzeTarget = null;
 };
 
 const _BattleManager_isBusy = BattleManager.isBusy;
@@ -3067,7 +3073,7 @@ Sprite_EnemyBookGauge.prototype.bitmapWidth = function() {
 
 const _Window_BattleLog_displayMiss =Window_BattleLog.prototype.displayMiss;
 Window_BattleLog.prototype.displayMiss = function(target) {
-  let fmt;console.log(BattleManager.analyzeMissMessage)
+  let fmt;
   if (BattleManager.analyzeMissMessage) {
     fmt = BattleManager.analyzeMissMessage;
     BattleManager.analyzeMissMessage = null;

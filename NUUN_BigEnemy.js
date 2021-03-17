@@ -5,31 +5,34 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- * 
- * 更新履歴
- * 2021/1/17 Ver.1.0.2
- * 常に後ろに表示されるように変更。
- * 2020/12/15 Ver.1.0.1
- * OriginalRatioモードの時にポップアップの位置がずれるのを修正。
- * 2020/11/22 Ver.1.0.0
- * 初版
- * 
  */ 
 /*:
  * @target MZ
  * @plugindesc 巨大エネミー
  * @author NUUN
+ * @version 1.0.3
  *            
  * @help 画面いっぱいにエネミー画像を表示します。
  * エネミーのメモ欄に以下のどちらかを記入してください。
  * <BigEnemy> 画像を画面サイズに合わせます。
  * <BigEnemy:OriginalRatio> 比率を変更せず横幅の倍率基準で拡大します。
+ * <BigEnemyY:50> Y座標を調整します。
  * 
  * このプラグインはフロントビューで使用することを前提しています。
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/3/17 Ver.1.0.3
+ * Y座標を調整できる機能を追加。
+ * 2021/1/17 Ver.1.0.2
+ * 常に後ろに表示されるように変更。
+ * 2020/12/15 Ver.1.0.1
+ * OriginalRatioモードの時にポップアップの位置がずれるのを修正。
+ * 2020/11/22 Ver.1.0.0
+ * 初版
  * 
  */
 var Imported = Imported || {};
@@ -54,7 +57,7 @@ Imported.NUUN_BigEnemy = true;
     _Sprite_Enemy_setBattler.call(this, battler);
     if($dataEnemies[battler._enemyId].meta.BigEnemy){
       const name = this._enemy.battlerName();
-      this._bigEnemy = $dataEnemies[battler._enemyId].meta.BigEnemy;
+      this._bigEnemy = battler.enemy().meta.BigEnemy;
       if ($gameSystem.isSideView()) {
         bitmap = ImageManager.loadSvEnemy(name);
       } else {
@@ -62,25 +65,26 @@ Imported.NUUN_BigEnemy = true;
       }
       if (this._bigEnemy) {
         if (bitmap && !bitmap.isReady()) {
-          bitmap.addLoadListener(this.setBigEnemy.bind(this, bitmap));
+          bitmap.addLoadListener(this.setBigEnemy.bind(this, bitmap, battler));
         } else {
-          this.setBigEnemy(bitmap);
+          this.setBigEnemy(bitmap, battler);
         }
       }
     }
   };
 
-  Sprite_Enemy.prototype.setBigEnemy = function(bitmap) {
+  Sprite_Enemy.prototype.setBigEnemy = function(bitmap, battler) {
     this.scale.x = Graphics.width / bitmap.width;
     this._homeX = Graphics.boxWidth / 2;
     let height = 0;
     if(this._bigEnemy === 'OriginalRatio') {
       this.scale.y = this.scale.x;
-      height = (Graphics.height - bitmap.height * this.scale.y) / 2;
+      height = Math.floor((Graphics.height - bitmap.height * this.scale.y) / 2);
     } else {
       this.scale.y = Graphics.height / bitmap.height;
     }
-    this._homeY = (Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight + 24 - height;
+    this._homeY = Math.floor((Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight) + 24 - height;
+    this._homeY += battler.enemy().meta.BigEnemyY ? Number(battler.enemy().meta.BigEnemyY) : 0;
     this.updatePosition();
   };
 
@@ -98,7 +102,7 @@ Imported.NUUN_BigEnemy = true;
   Sprite_Enemy.prototype.damageOffsetY = function() {
     let y = _Sprite_Enemy_damageOffsetY.call(this);
     if(this._bigEnemy){
-      y -= this._bigEnemy === 'OriginalRatio' ? this.bitmap.height * this.scale.y / 2 : Graphics.boxHeight / 2;
+      y -= Math.floor(this._bigEnemy === 'OriginalRatio' ? this.bitmap.height * this.scale.y / 2 : Graphics.boxHeight / 2);
     }
     return y;
   };

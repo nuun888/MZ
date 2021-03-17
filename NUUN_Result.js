@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.6.4
+ * @version 1.6.6
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -25,6 +25,7 @@
  * 戦闘勝利後に任意のBGMを再生できます。MEが指定してある場合はME再生終了後に再生されます。
  * 
  * 仕様
+ * ウィンドウ画面のX座標は画面の中央になるよう設定されていますが、Y座標は上よりに表示されるようになっています。Y座標を変更するには「ウィンドウY座標」で設定してください。
  * 入手アイテム、習得アイテムは表示範囲が自動で計算されます。
  * レベルアップ表示位置で「アクターの上」を指定の場合、「顔グラ、キャラチップの表示横幅」の表示サイズの中央からの座標となります。また「顔グラ、キャラチップの表示横幅」の
  * サイズにより調整されます。
@@ -36,7 +37,8 @@
  * レベルアップ画面のアクター画像はUIサイズ、リザルト画面ウィンドウのサイズではなく、ゲーム画面サイズに合わせて表示されます。
  * このモードのみボタンの表示位置を変更可能です。ボタン設定での座標指定はゲーム画面左上からの絶対座標となっています。-1を指定することでリザルトウィンドウサイズに合わせます。
  * 
- * 背景画像、アクター画像を表示させる場合は、ゲームフォルダーのimgフォルダーを開き右クリック→新規作成→フォルダーの順にクリックします。
+ * 背景画像について
+ * 背景画像、アクター画像を表示させる場合は、ゲームフォルダーのimgフォルダーを開き右クリック→新規作成→フォルダーの順にクリックし、
  * 「新しいフォルダー」というフォルダー名をnuun_actorpictures又はnuun_backgroundに変更してください。
  * また画像を表示させるには「共通処理」(NUUN_Base)プラグインが必要となります。
  * 
@@ -71,6 +73,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/17 Ver.1.6.6
+ * アクター画像の参照先が変更されていなかった問題を修正。
+ * 2021/3/14 Ver.1.6.5
+ * ボタンのY座標を指定できる機能を追加。
+ * リザルト画面が表示されたらアクターステータス画面を閉じる機能を追加。
  * 2021/3/14 Ver.1.6.4
  * 背景画像設定時の立ち絵の表示方法を変更。
  * リザルト画面のX座標を調整できる機能を追加。
@@ -1265,7 +1272,7 @@ Window_ResultActorImg.prototype.refresh = function() {
 Window_ResultActorImg.prototype.drawActorImg = function(actor) {
   if (actor.resultActorBitmap || actor.resultActorImg.ActorImg) {  
     const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
-    const bitmap = ImageManager.loadPicture(loadBitmap);
+    const bitmap = ImageManager.nuun_actorPictures(loadBitmap);
     if (bitmap && !bitmap.isReady()) {
       bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
     } else {
@@ -1448,7 +1455,7 @@ Window_Result.prototype.drawActorImg = function(actor) {
   } else {
     if (actor.resultActorBitmap || actor.resultActorImg.ActorImg) {
       const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
-      const bitmap = ImageManager.loadPicture(loadBitmap);
+      const bitmap = ImageManager.nuun_actorPictures(loadBitmap);
       if (bitmap && !bitmap.isReady()) {
         bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
       } else {
@@ -1522,9 +1529,9 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
         this.actorLevelUp.push(actor);
         if (!actor.resultActorBitmap) {
           actor.initResultActorImg(actor.actorId());
-          ImageManager.loadPicture(actor.resultActorImg.ActorImg);
+          ImageManager.nuun_actorPictures(actor.resultActorImg.ActorImg);
         } else {
-          ImageManager.loadPicture(actor.resultActorBitmap);
+          ImageManager.nuun_actorPictures(actor.resultActorBitmap);
         }
       }
     } else {

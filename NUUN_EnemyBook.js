@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -134,6 +134,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/17 Ver.1.1.4
+ * 背景画像の参照先が変更されていなかった問題を修正。
  * 2021/3/16 Ver.1.1.3
  * アナライズを使用し、ウィンドウを閉じるとき一瞬別のモンスターが表示される問題を修正。
  * アナライズを使用すると別のターゲットの情報が表示される問題を修正。
@@ -1708,7 +1710,7 @@ Scene_EnemyBook.prototype.createBackground = function() {
   _Scene_EnemyBook_createBackground.call(this);
 	if (param.BackGroundImg) {
 		const sprite = new Sprite();
-    sprite.bitmap = ImageManager.loadPicture(param.BackGroundImg);
+    sprite.bitmap = ImageManager.nuun_backGround(param.BackGroundImg);
     sprite.x = param.BackUiWidth ? (Graphics.width - (Graphics.boxWidth + 8)) / 2 : 0;
     sprite.y = param.BackUiWidth ? (Graphics.height - (Graphics.boxHeight + 8)) / 2 : 0;
     this.addChild(sprite);

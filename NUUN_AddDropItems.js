@@ -11,9 +11,9 @@
  * 
  * @target MZ
  * @plugindesc ドロップアイテム追加
- * @base NUUN_Base.js
+ * @base NUUN_Base
  * @version 1.0.0
- * @orderAfter NUUN_Base.js
+ * @orderAfter NUUN_Base
  * @author NUUN
  * 
  * @help

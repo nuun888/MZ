@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.6.5
+ * @version 1.6.6
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -73,6 +73,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/19 Ver.1.6.6
+ * リザルト表示時のアクターステータスウィンドウを閉じる選択項目を追加。
  * 2021/3/17 Ver.1.6.5
  * アクター画像の参照先が変更されていなかった問題を修正。
  * 2021/3/14 Ver.1.6.4
@@ -224,6 +226,13 @@
  * @desc 背景サイズをウィンドウサイズに合わせる。
  * @type boolean
  * @default true
+ * @parent WindowSetting
+ * 
+ * @param CloseActorStatusWindow
+ * @type boolean
+ * @default false
+ * @text 表示時アクターウィンドウ非表示
+ * @desc リザルト画面表示時にアクターステータスウィンドウを非表示にします。
  * @parent WindowSetting
  * 
  * @param ResultTextPosition
@@ -1136,6 +1145,7 @@ Scene_Battle.prototype.onResultOk = function() {
 };
 
 Scene_Battle.prototype.resultOpen = function() {
+  this.closeStatusWindow();
   this.backGroundPartyShow();
   this._resultWindow.activate();
   this._resultHelpWindow.show();
@@ -1241,6 +1251,12 @@ Scene_Battle.prototype.updateResultButton = function() {
 Scene_Battle.prototype.resultbuttonY = function() {
   const y = Scene_Battle.prototype.buttonY.call(this);
   return y - this._helpWindow.height + param.ResultWindow_Y;
+};
+
+Scene_Battle.prototype.closeStatusWindow = function() {
+  if (param.CloseActorStatusWindow) {
+    this._statusWindow.close();
+  }
 };
 
 function Window_ResultActorImg() {

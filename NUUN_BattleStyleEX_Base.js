@@ -7,6 +7,9 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
+ * 2021/3/24 Ver 2.0.3
+ * アクション開始時にパーティコマンドが一瞬表示される問題を修正。
+ * リザルトプラグインの表示中はアクターステータスウィンドウを非表示に対応。
  * 2021/1/24 Ver 2.0.2
  * フロントビューでアクター側に「戦闘行動結果ポップアッププラグイン」が適用されるように対応。
  * 2021/1/17 Ver 2.0.1
@@ -183,6 +186,7 @@ BattleManager.displayEscapeFailureMessage = function() {
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
 Scene_Battle.prototype.initialize = function() {
   _Scene_Battle_initialize.call(this);
+  this._onAction = false;
 };
 
 const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
@@ -220,6 +224,7 @@ Scene_Battle.prototype.createStatusWindow = function() {
   this._actorStatus = new Window_BattleActorStatus(rect);
   this._battleHudBack.addChild(this._actorImges);
   this._battleHudFront.addChild(this._actorStatus);
+  this._statusWindow.setActorWindow(this._actorImges, this._actorStatus);
 };
 
 Scene_Battle.prototype.createActorSelectWindow = function() {
@@ -399,7 +404,7 @@ const _Scene_Battle_updateStatusWindowVisibility = Scene_Battle.prototype.update
 Scene_Battle.prototype.updateStatusWindowVisibility = function() {
   _Scene_Battle_updateStatusWindowVisibility.call(this);
   if (this.shouldOpenStatusWindow()) {
-    this._statusWindow.show();
+    this._statusWindow.open();
   }
 };
 
@@ -448,24 +453,31 @@ Scene_Battle.prototype.onEnemyCancel = function() {
   }
 };
 
+const _Scene_Battle_startPartyCommandSelection = Scene_Battle.prototype.startPartyCommandSelection;
+Scene_Battle.prototype.startPartyCommandSelection = function() {
+  if (this._onAction) {
+    this._partyCommandWindow.hide();
+  }
+  _Scene_Battle_startPartyCommandSelection.call(this);
+};
+
 const _Scene_Battle_selectPreviousCommand = Scene_Battle.prototype.selectPreviousCommand;
 Scene_Battle.prototype.selectPreviousCommand = function() {
   _Scene_Battle_selectPreviousCommand.call(this);
-  this._partyCommandWindow.opacity = 255;
+  this._onAction = false;
+  this._partyCommandWindow.show();
 };
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
+  this._onAction = BattleManager.isTpb();
   _Scene_Battle_onSelectAction.call(this);
-  if (BattleManager.isTpb()){
-    this._partyCommandWindow.opacity = 0;
-  }
 };
 
 const _Scene_Battle_endCommandSelection = Scene_Battle.prototype.endCommandSelection;
 Scene_Battle.prototype.endCommandSelection = function() {
   _Scene_Battle_endCommandSelection.call(this);
-  this._partyCommandWindow.opacity = 255;
+  this._onAction = false;
 };
 
 Scene_Battle.prototype.actorWindowOpacity = function() {
@@ -633,11 +645,15 @@ Window_BattleStatus.prototype.drawItemBackground = function(index) {
 };
 
 Window_BattleStatus.prototype.open = function() {
-  
+  Window_Base.prototype.open.call(this);
+  this._window_battleActorImges.open();
+  this._window_BattleActorStatus.open();
 };
 
 Window_BattleStatus.prototype.close = function() {
-
+  Window_Base.prototype.close.call(this);
+  this._window_battleActorImges.close();
+  this._window_BattleActorStatus.close();
 };
 
 Window_BattleStatus.prototype.preparePartyRefresh = function() {
@@ -810,6 +826,11 @@ Window_BattleStatus.prototype.battlreActorImges = function(id) {
   return deta ? deta : this.undefinedDeta(id, deta);
 };
 
+Window_BattleStatus.prototype.setActorWindow = function(Window_battleActorImges, Window_BattleActorStatus) {
+  this._window_battleActorImges = Window_battleActorImges;
+  this._window_BattleActorStatus = Window_BattleActorStatus;
+};
+
 //Window_BattleActorImges
 function Window_BattleActorImges() {
   this.initialize(...arguments);
@@ -829,6 +850,7 @@ Window_BattleActorImges.prototype.initialize = function(rect) {
   this.addChild(sprite);
   this._actorImgBaseSprite = sprite;
   this.preparePartyRefresh();
+  this._actorImgBaseSprite.hide();
 };
 
 Window_BattleActorImges.prototype.drawItemBackground = function(index) {
@@ -885,27 +907,27 @@ Window_BattleActorImges.prototype.undefinedDeta = function(id, deta) {
 
 Window_BattleActorImges.prototype.loadBitmap = function(deta) {
   deta.stateBitmap = [];
-  deta.defaultBitmap = ImageManager.loadPicture(deta.defaultImg);
+  deta.defaultBitmap = ImageManager.nuun_actorPictures(deta.defaultImg);
   if (deta.deathImg) {
-    deta.deathBitmap = ImageManager.loadPicture(deta.deathImg);
+    deta.deathBitmap = ImageManager.nuun_actorPictures(deta.deathImg);
   }
   if (deta.dyingImg) {
-    deta.dyingBitmap = ImageManager.loadPicture(deta.dyingImg);
+    deta.dyingBitmap = ImageManager.nuun_actorPictures(deta.dyingImg);
   }
   if (deta.damageImg) {
-    deta.damageBitmap = ImageManager.loadPicture(deta.damageImg);
+    deta.damageBitmap = ImageManager.nuun_actorPictures(deta.damageImg);
   }
   if (deta.victoryImg) {
-    deta.victoryBitmap = ImageManager.loadPicture(deta.victoryImg);
+    deta.victoryBitmap = ImageManager.nuun_actorPictures(deta.victoryImg);
   }
   if (deta.chantImg) {
-    deta.chantBitmap = ImageManager.loadPicture(deta.chantImg);
+    deta.chantBitmap = ImageManager.nuun_actorPictures(deta.chantImg);
   }
   if (deta.stateImg){
     for (const listdeta of deta.stateImg) {
       if(listdeta.actorStateImg && listdeta.stateImgId > 0){
         deta.stateBitmap[listdeta.stateImgId] = {};
-        deta.stateBitmap[listdeta.stateImgId].imges = ImageManager.loadPicture(listdeta.actorStateImg);
+        deta.stateBitmap[listdeta.stateImgId].imges = ImageManager.nuun_actorPictures(listdeta.actorStateImg);
         deta.stateBitmap[listdeta.stateImgId].always = listdeta.Always ? true : false;
         deta.stateBitmap[listdeta.stateImgId].priorityId = listdeta.priorityId;
       }
@@ -994,6 +1016,16 @@ Window_BattleActorImges.prototype.createActorImgSprite = function(key, spriteCla
   }
 };
 
+Window_BattleActorImges.prototype.open = function() {
+  Window_Base.prototype.open.call(this);
+  this._actorImgBaseSprite.show();
+};
+
+Window_BattleActorImges.prototype.close = function() {
+  Window_Base.prototype.close.call(this);
+  this._actorImgBaseSprite.hide();
+};
+
 
 //Window_BattleActorStatus
 function Window_BattleActorStatus() {
@@ -1023,6 +1055,14 @@ Window_BattleActorStatus.prototype.drawItemBackground = function(index) {
 
 Window_BattleActorStatus.prototype.drawItem = function(index) {
   this.drawItemStatus(index);
+};
+
+Window_BattleActorStatus.prototype.open = function() {
+  Window_Base.prototype.open.call(this);
+};
+
+Window_BattleActorStatus.prototype.close = function() {
+  Window_Base.prototype.close.call(this);
 };
 
 //NUUN_IconSideBySide併用

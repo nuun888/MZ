@@ -10,25 +10,32 @@
  * @target MZ
  * @plugindesc 巨大エネミー
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  *            
- * @help 画面いっぱいにエネミー画像を表示します。
- * エネミーのメモ欄に以下のどちらかを記入してください。
+ * @help エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
+ * エネミーのメモ欄に以下のいずれかを記入してください。
+ * 以下のタグは画面の横サイズに合わせて拡大されます。
  * <BigEnemy> 画像を画面サイズに合わせます。
  * <BigEnemy:OriginalRatio> 比率を変更せず横幅の倍率基準で拡大します。
- * <BigEnemy:UnderPosition> 画像を原寸倍率で画面下に合わせ表示させます。画像のサイズ調整はいたしません。
+ * 以下のタグはオリジナル画像サイズのまま、ゲーム画面の下側に画像の下を合わせて表示されます。
+ * <BigEnemy:UnderPosition> 画像を原寸倍率で画面下に合わせ表示させます。画像のサイズ調整やX座標調整はいたしません。
  * 
  * オプションタグ　エネミーのメモ欄
  * <BigEnemyFront> 画像を一番手前側に表示させます。
+ * <BigEnemyNormal> 画像に表示順を元の仕様のままにします。
  * <BigEnemyY:50> Y座標を50下にシフトして表示します。
  * 
- * このプラグインはフロントビューで使用することを前提しています。
- * 
+ * 仕様
+ * BigEnemy及びBigEnemy:OriginalRatioは画面の横サイズに合わせて拡大されます。
+ * BigEnemy:UnderPositionはオリジナルサイズのまま表示されX座標の調整は行われませんが、Yは画像の一番下が画面の下に表示されるように調整されます。
+ * BigEnemyYは表示した画像からの相対座標となります。なお巨大エネミーのみ有効です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/20 Ver.1.1.1
+ * 巨大エネミーの表示順を元の仕様にする機能を追加。
  * 2021/3/18 Ver.1.1.0
  * モンスター画像の下に合わせて表示する機能を追加。
  * ２回目の戦闘以降にモンスターが手前に表示される問題を修正。
@@ -37,7 +44,7 @@
  * 2021/1/17 Ver.1.0.2
  * 常に後ろに表示されるように変更。
  * 2020/12/15 Ver.1.0.1
- * OriginalRatioモードの時にポップアップの位置がずれるのを修正。
+ * OriginalRatioモードの時にポップアップの位置がずれる問題を修正。
  * 2020/11/22 Ver.1.0.0
  * 初版
  * 
@@ -50,7 +57,7 @@ Imported.NUUN_BigEnemy = true;
 
   const _Game_Enemy_screenY = Game_Enemy.prototype.screenY;
   Game_Enemy.prototype.screenY = function() {
-    if (this.enemy().meta.BigEnemy) {
+    if (this.enemy().meta.BigEnemy && !this.enemy().meta.BigEnemyNormal) {
       return this.enemy().meta.BigEnemyFront ? Graphics.height : 0;
     } else {
       return _Game_Enemy_screenY.call(this);

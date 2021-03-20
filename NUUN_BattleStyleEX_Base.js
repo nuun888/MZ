@@ -7,7 +7,9 @@
  * -------------------------------------------------------------------------------------
  * 
  * 更新履歴
- * 2021/3/20 Ver 2.0.3
+ * 2021/3/25 Ver 2.0.4
+ * 立ち絵画像を取得できない問題を修正。
+ * 2021/3/24 Ver 2.0.3
  * アクション開始時にパーティコマンドが一瞬表示される問題を修正。
  * リザルトプラグインの表示中はアクターステータスウィンドウを非表示に対応。
  * 2021/1/24 Ver 2.0.2
@@ -907,27 +909,27 @@ Window_BattleActorImges.prototype.undefinedDeta = function(id, deta) {
 
 Window_BattleActorImges.prototype.loadBitmap = function(deta) {
   deta.stateBitmap = [];
-  deta.defaultBitmap = ImageManager.nuun_actorPictures(deta.defaultImg);
+  deta.defaultBitmap = ImageManager.loadPicture(deta.defaultImg);
   if (deta.deathImg) {
-    deta.deathBitmap = ImageManager.nuun_actorPictures(deta.deathImg);
+    deta.deathBitmap = ImageManager.loadPicture(deta.deathImg);
   }
   if (deta.dyingImg) {
-    deta.dyingBitmap = ImageManager.nuun_actorPictures(deta.dyingImg);
+    deta.dyingBitmap = ImageManager.loadPicture(deta.dyingImg);
   }
   if (deta.damageImg) {
-    deta.damageBitmap = ImageManager.nuun_actorPictures(deta.damageImg);
+    deta.damageBitmap = ImageManager.loadPicture(deta.damageImg);
   }
   if (deta.victoryImg) {
-    deta.victoryBitmap = ImageManager.nuun_actorPictures(deta.victoryImg);
+    deta.victoryBitmap = ImageManager.loadPicture(deta.victoryImg);
   }
   if (deta.chantImg) {
-    deta.chantBitmap = ImageManager.nuun_actorPictures(deta.chantImg);
+    deta.chantBitmap = ImageManager.loadPicture(deta.chantImg);
   }
   if (deta.stateImg){
     for (const listdeta of deta.stateImg) {
       if(listdeta.actorStateImg && listdeta.stateImgId > 0){
         deta.stateBitmap[listdeta.stateImgId] = {};
-        deta.stateBitmap[listdeta.stateImgId].imges = ImageManager.nuun_actorPictures(listdeta.actorStateImg);
+        deta.stateBitmap[listdeta.stateImgId].imges = ImageManager.loadPicture(listdeta.actorStateImg);
         deta.stateBitmap[listdeta.stateImgId].always = listdeta.Always ? true : false;
         deta.stateBitmap[listdeta.stateImgId].priorityId = listdeta.priorityId;
       }

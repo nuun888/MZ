@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 巨大エネミー
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  *            
  * @help エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
  * エネミーのメモ欄に以下のいずれかを記入してください。
@@ -22,7 +22,7 @@
  * 
  * オプションタグ　エネミーのメモ欄
  * <BigEnemyFront> 画像を一番手前側に表示させます。
- * <BigEnemyNormal> 画像に表示順を元の仕様のままにします。
+ * <BigEnemyBack> 画像を一番後ろ側に表示させます。
  * <BigEnemyY:50> Y座標を50下にシフトして表示します。
  * 
  * 仕様
@@ -34,6 +34,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/20 Ver.1.1.2
+ * 標準の表示順をデフォルト仕様に変更。<BigEnemyNormal>はデフォルト設定に変更されました。<BigEnemyBack>が追加されVer.1.1.1までの
+ * デフォルト設定は<BigEnemyBack>を記入しなくてはならなくなりました。
  * 2021/3/20 Ver.1.1.1
  * 巨大エネミーの表示順を元の仕様にする機能を追加。
  * 2021/3/18 Ver.1.1.0
@@ -57,8 +60,14 @@ Imported.NUUN_BigEnemy = true;
 
   const _Game_Enemy_screenY = Game_Enemy.prototype.screenY;
   Game_Enemy.prototype.screenY = function() {
-    if (this.enemy().meta.BigEnemy && !this.enemy().meta.BigEnemyNormal) {
-      return this.enemy().meta.BigEnemyFront ? Graphics.height : 0;
+    if (this.enemy().meta.BigEnemy) {
+      if (this.enemy().meta.BigEnemyFront) {
+        return Graphics.height;
+      } else if (this.enemy().meta.BigEnemyBack) {
+        return 0;
+      } else {
+        return _Game_Enemy_screenY.call(this);
+      }
     } else {
       return _Game_Enemy_screenY.call(this);
     }

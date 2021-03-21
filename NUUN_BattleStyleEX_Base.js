@@ -6,7 +6,18 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
+ */ 
+/*:
+ * @target MZ
+ * @plugindesc バトルスタイル拡張ベース
+ * @author NUUN
+ * @version 2.0.5
+ *            
+ * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
+ * 
  * 更新履歴
+ * 2021/3/25 Ver 2.0.5
+ * 戦闘開始時に立ち絵が切り替わらない問題を修正。
  * 2021/3/25 Ver 2.0.4
  * 立ち絵画像を取得できない問題を修正。
  * 2021/3/24 Ver 2.0.3
@@ -74,16 +85,6 @@
  * バトラーアニメーションに勝利、詠唱時の画像を変更する機能を追加。
  * 2020/12/6 Ver.1.0.0
  * 初版
- * 
- */ 
-/*:
- * @target MZ
- * @plugindesc バトルスタイル拡張ベース
- * @author NUUN
- *            
- * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
- * 
- * 
  */
 var Imported = Imported || {};
 Imported.NUUN_BattleStyleEX_Base = true;
@@ -111,6 +112,10 @@ BattleManager.NUUN_BattleStyleDate = param;
 
 ImageManager.loadSystem(param.actorBackground);
 ImageManager.loadSystem(param.windowBackground);
+
+loadBattleStyleActorImg = function(filename) {
+  return ImageManager.loadPicture(filename);
+};
 
 //Game_Temp
 Game_Temp.prototype.setBattleEffectsRefresh = function(flag) {
@@ -909,27 +914,27 @@ Window_BattleActorImges.prototype.undefinedDeta = function(id, deta) {
 
 Window_BattleActorImges.prototype.loadBitmap = function(deta) {
   deta.stateBitmap = [];
-  deta.defaultBitmap = ImageManager.loadPicture(deta.defaultImg);
+  deta.defaultBitmap = loadBattleStyleActorImg(deta.defaultImg);
   if (deta.deathImg) {
-    deta.deathBitmap = ImageManager.loadPicture(deta.deathImg);
+    deta.deathBitmap = loadBattleStyleActorImg(deta.deathImg);
   }
   if (deta.dyingImg) {
-    deta.dyingBitmap = ImageManager.loadPicture(deta.dyingImg);
+    deta.dyingBitmap = loadBattleStyleActorImg(deta.dyingImg);
   }
   if (deta.damageImg) {
-    deta.damageBitmap = ImageManager.loadPicture(deta.damageImg);
+    deta.damageBitmap = loadBattleStyleActorImg(deta.damageImg);
   }
   if (deta.victoryImg) {
-    deta.victoryBitmap = ImageManager.loadPicture(deta.victoryImg);
+    deta.victoryBitmap = loadBattleStyleActorImg(deta.victoryImg);
   }
   if (deta.chantImg) {
-    deta.chantBitmap = ImageManager.loadPicture(deta.chantImg);
+    deta.chantBitmap = loadBattleStyleActorImg(deta.chantImg);
   }
   if (deta.stateImg){
     for (const listdeta of deta.stateImg) {
       if(listdeta.actorStateImg && listdeta.stateImgId > 0){
         deta.stateBitmap[listdeta.stateImgId] = {};
-        deta.stateBitmap[listdeta.stateImgId].imges = ImageManager.loadPicture(listdeta.actorStateImg);
+        deta.stateBitmap[listdeta.stateImgId].imges = loadBattleStyleActorImg(listdeta.actorStateImg);
         deta.stateBitmap[listdeta.stateImgId].always = listdeta.Always ? true : false;
         deta.stateBitmap[listdeta.stateImgId].priorityId = listdeta.priorityId;
       }
@@ -970,14 +975,11 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor, deta) 
   const rect = this.itemRect(index);
   const key = "actor%1-img".format(actor.actorId());
   const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
-  sprite.bitmap = deta.defaultBitmap;
+  sprite.setup(actor, deta);
   const x = rect.x + Math.floor((this.itemWidth() - (sprite.bitmap.width * deta.Actor_Scale / 100)) / 2) + 4 + param.ActorImg_X + deta.Actor_X;
   const y = rect.y + rect.height - Math.floor(sprite.bitmap.height * deta.Actor_Scale / 100) + 7 + param.ActorImg_Y + deta.Actor_Y;
   sprite.scale.x = deta.Actor_Scale / 100;
   sprite.scale.y = deta.Actor_Scale / 100;
-  sprite._battler = actor;
-  sprite._deta = deta;
-  sprite.setup();
   sprite.move(x, y);
   sprite.show();
 };
@@ -989,6 +991,7 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor, deta) {
   const key = "actor%1-img".format(actor.actorId());
   const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
   sprite.bitmap = ImageManager.loadFace(actor.faceName());
+  sprite.setup(actor, deta);
   const pw = ImageManager.faceWidth;
   const ph = ImageManager.faceHeight;
   const sw = Math.min(width, pw);
@@ -998,11 +1001,8 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor, deta) {
   const sx = Math.floor((actor.faceIndex() % 4) * pw + (pw - sw) / 2);
   const sy = Math.floor(Math.floor(actor.faceIndex() / 4) * ph + (ph - sh) / 2);
   sprite.setFrame(sx, sy, sw, sh);
-  sprite._battler = actor;
-  sprite._deta = deta;
   sprite._rectWidth = rect.width;
   sprite._rectHeight = rect.height;
-  sprite.setup();
   sprite.show();
 };
 
@@ -1215,7 +1215,7 @@ Sprite_ActorImges.prototype.initialize = function() {
 
 Sprite_ActorImges.prototype.initMembers = function() {
   this._battler = null;
-  this._imgIndex = 0;
+  this._imgIndex = -1;
   this._durationOpacity = 0;
   this._updateCount = 0;
   this._changeStateImgId = 0;
@@ -1223,7 +1223,9 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._selectionEffectCount = 0;
 };
 
-Sprite_ActorImges.prototype.setup = function() {
+Sprite_ActorImges.prototype.setup = function(battler, deta) {
+  this._battler = battler;
+  this._deta = deta;
   this.updateBitmap();
 };
 
@@ -1756,4 +1758,5 @@ Sprite_Battler.prototype.setupMessagePopup = function() {
   }
   _Sprite_Battler_setupMessagePopup.call(this);
 };
+
 })();

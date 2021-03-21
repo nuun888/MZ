@@ -972,8 +972,8 @@
  * @default false
  * 
  * @param priorityId
- * @text プロパティID
- * @desc プロパティID
+ * @text 表示優先度
+ * @desc 表示優先度
  * @type number
  * @default 1
  * @min 0
@@ -1005,8 +1005,8 @@
  * @default false
  * 
  * @param priorityId
- * @text プロパティID
- * @desc プロパティID
+ * @text 表示優先度
+ * @desc 表示優先度
  * @type number
  * @default 1
  * @min 0

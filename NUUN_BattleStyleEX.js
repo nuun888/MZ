@@ -1,24 +1,17 @@
 /*:-----------------------------------------------------------------------------------
  * NUUN_BattleStyleEX.js
- * 
+
  * Copyright (C) 2021 NUUN
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- * 
- * 更新履歴
- * 2021/1/18 Ver 1.0.2
- * プラグインパラメータが正常に設定できない問題を修正。
- * 2021/1/17 Ver 1.0.1
- * ゲージの縦幅を指定できる機能を追加。
- * 2021/1/17 Ver 1.0.0
- * ベースプラグインとレイアウト設定用のプラグインを別々に分割。
  */
 /*:
  * @target MZ
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
+ * @version 1.0.3
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -31,6 +24,7 @@
  * 　フロントビューでもアクター側にアニメーション、ダメージエフェクト表示可能
  * 　パーティコマンド、アクターコマンドの位置を指定可能
  *   各ゲージ長やステータスの位置を設定可能
+ * 
  * 
  * 仕様
  * アクターステータスをコマンド非表示になった時に中央に移動しないように変更しています。
@@ -75,8 +69,27 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * 更新履歴
+ * 2021/3/22 Ver 1.0.3
+ * プラグインコマンドにアクターウィンドウを非表示にする機能を追加。
+ * プラグインコマンドにアクターウィンドウを不透明化にする機能を追加。
+ * モンスターの出現メッセージをカットする機能を追加。
+ * 2021/1/18 Ver 1.0.2
+ * プラグインパラメータが正常に設定できない問題を修正。
+ * 2021/1/17 Ver 1.0.1
+ * ゲージの縦幅を指定できる機能を追加。
+ * 2021/1/17 Ver 1.0.0
+ * ベースプラグインとレイアウト設定用のプラグインを別々に分割。
  * 
- * @parent ActorsButlers
+ * @param Setting
+ * @text 共通設定
+ * 
+ * @param AppearWindowVisible
+ * @desc モンスターが出現したときのメッセージを表示しません。
+ * @text モンスター出現メッセージ非表示
+ * @type boolean
+ * @default false
+ * @parent Setting
  * 
  * @param Window
  * @text ウィンドウ設定
@@ -972,8 +985,8 @@
  * @default false
  * 
  * @param priorityId
- * @text 表示優先度
- * @desc 表示優先度
+ * @text プロパティID
+ * @desc プロパティID
  * @type number
  * @default 1
  * @min 0
@@ -1005,8 +1018,8 @@
  * @default false
  * 
  * @param priorityId
- * @text 表示優先度
- * @desc 表示優先度
+ * @text プロパティID
+ * @desc プロパティID
  * @type number
  * @default 1
  * @min 0
@@ -1016,5 +1029,4 @@
 
 var Imported = Imported || {};
 Imported.NUUN_BattleStyleEX = true;
-
 

@@ -11,11 +11,15 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.0.5
+ * @version 2.0.6
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/3/22 Ver 2.0.6
+ * プラグインコマンドにアクターウィンドウを非表示にする機能を追加。
+ * プラグインコマンドにアクターウィンドウを不透明化にする機能を追加。
+ * モンスターの出現メッセージをカットする機能を追加。
  * 2021/3/21 Ver 2.0.5
  * 戦闘開始時に立ち絵が切り替わらない問題を修正。
  * 2021/3/21 Ver 2.0.4
@@ -85,6 +89,26 @@
  * バトラーアニメーションに勝利、詠唱時の画像を変更する機能を追加。
  * 2020/12/6 Ver.1.0.0
  * 初版
+ * 
+ * @command ActorStatusWindowVisible
+ * @desc アクターステータスの表示を切り替えます。
+ * @text アクターステータス表示切替
+ * 
+ * @arg WindowVisible
+ * @type boolean
+ * @default false
+ * @text 表示切替
+ * @desc 表示の切り替えをします。(trueで表示)
+ * 
+ * @command ActorStatusWindowOpacity
+ * @desc アクターステータスを不透明化します。
+ * @text アクターステータス不透明化表示
+ * 
+ * @arg WindowOpacity
+ * @type boolean
+ * @default false
+ * @text 不透明度表示
+ * @desc ONのアクターステータスが不透明化します。(trueで不透明化)
  */
 var Imported = Imported || {};
 Imported.NUUN_BattleStyleEX_Base = true;
@@ -109,6 +133,15 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   }
 }));
 BattleManager.NUUN_BattleStyleDate = param;
+
+const pluginName = "NUUN_BattleStyleEX_Base";
+PluginManager.registerCommand(pluginName, 'ActorStatusWindowVisible', args => {
+  BattleManager.statusWindowVisible(eval(args.WindowVisible));
+});
+
+PluginManager.registerCommand(pluginName, 'ActorStatusWindowOpacity', args => {
+  BattleManager.statusWindowOpacity(eval(args.WindowOpacity));
+});
 
 ImageManager.loadSystem(param.actorBackground);
 ImageManager.loadSystem(param.windowBackground);
@@ -155,14 +188,31 @@ Game_Enemy.prototype.bareHandsAnimationId = function() {
 };
 
 //BattleManager
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+  _BattleManager_initMembers.call(this);
+  this.actorStatusWindowVisible = true;
+  this.actorStatusWindowOpacity = false;
+};
+
+BattleManager.statusWindowVisible = function(args) {
+  this.actorStatusWindowVisible = args;
+};
+
+BattleManager.statusWindowOpacity = function(args) {
+  this.actorStatusWindowOpacity = args;
+};
+
 BattleManager.displayMessagePosition = function() {
   $gameMessage._positionType = param.MessageWindowPosition ? 0 : 2;
 };
 
 const _BattleManager_displayStartMessages = BattleManager.displayStartMessages;
 BattleManager.displayStartMessages = function() {
-  _BattleManager_displayStartMessages.call(this);
-  this.displayMessagePosition();
+  if (!param.AppearWindowVisible) {
+    _BattleManager_displayStartMessages.call(this);
+    this.displayMessagePosition();
+  }
 };
 
 const _BattleManager_displayVictoryMessage = BattleManager.displayVictoryMessage;
@@ -510,15 +560,22 @@ Scene_Battle.prototype.update = function() {
     this._actorCommandWindow.refresh();
     this._statusWindow._CommandRefresh = false;
   }
+  this._statusWindow.visible = BattleManager.actorStatusWindowVisible;
+  this._actorImges.visible = BattleManager.actorStatusWindowVisible;
+  this._actorStatus.visible = BattleManager.actorStatusWindowVisible;
   if (this.activeWindow()) {
     this.actorWindowOpacity();
   } else{
     this.actorWindowResetOpacity();
   }
+  if (Imported.NUUN_ActorPicture && $gameTemp.isButlerRefresh()) {
+    this._actorImges.preparePartyRefresh();
+    $gameTemp.setButlerRefresh(false);
+  }
 };
 
 Scene_Battle.prototype.activeWindow = function() {//SkillWindowOpacity
-  return this.opacityskillWindow() || this.opacityItemWindow() || this.opacityEnemyWindow() || this.opacityMessageWindow();
+  return this.opacityskillWindow() || this.opacityItemWindow() || this.opacityEnemyWindow() || this.opacityMessageWindow() || BattleManager.actorStatusWindowOpacity;
 };
 
 Scene_Battle.prototype.opacityskillWindow = function() {
@@ -645,7 +702,7 @@ Window_BattleStatus.prototype.rowSpacing = function() {
 Window_BattleStatus.prototype.drawItemBackground = function(index) {
   const rect = this.itemRect(index);
   if (this._actorBack[index]){
-    this.actorBackGround(index, rect.x, rect.y);console.log(this._actorBack[index])
+    this.actorBackGround(index, rect.x, rect.y);
   } else if((param.WindowShow && param.cursorBackShow) || param.cursorBackShow) {
     this.drawBackgroundRect(rect);
   }
@@ -867,17 +924,27 @@ Window_BattleActorImges.prototype.preparePartyRefresh = function() {
   this._bitmapsReady = 0;
   this.actorSpriteDeta = [];
   for (const actor of $gameParty.members()) {
-    const deta = this.battlreActorImges(actor._actorId);
-    if(deta.defaultImg) {
-      deta._onFace = false;
-      this.loadBitmap(deta);
+    let date;
+    if (Imported.NUUN_ActorPicture) {
+      actor.setActorButler();
+      date = actor.getActorButlerList();
+      const date2 = this.battlreActorImges(actor._actorId);//座標拡大率取得用
+      date.Actor_X = date2.Actor_X;
+      date.Actor_Y = date2.Actor_Y;
+      date.Actor_Scale = date2.Actor_Scale;
     } else {
-      deta._onFace = true;
-      this.loadFace(actor, deta);
+      date = this.battlreActorImges(actor._actorId);
     }
-    this.actorSpriteDeta.push(deta);
-    if(deta.defaultBitmap && !deta.defaultBitmap.isReady()){
-      deta.defaultBitmap.addLoadListener(this.performPartyRefresh.bind(this));
+    if(date.defaultImg) {
+      date._onFace = false;
+      this.loadBitmap(date);
+    } else {
+      date._onFace = true;
+      this.loadFace(actor, date);
+    }
+    this.actorSpriteDeta.push(date);
+    if(date.defaultBitmap && !date.defaultBitmap.isReady()){
+      date.defaultBitmap.addLoadListener(this.performPartyRefresh.bind(this));
     } else {
       this.performPartyRefresh(this);
     }
@@ -914,27 +981,27 @@ Window_BattleActorImges.prototype.undefinedDeta = function(id, deta) {
 
 Window_BattleActorImges.prototype.loadBitmap = function(deta) {
   deta.stateBitmap = [];
-  deta.defaultBitmap = loadBattleStyleActorImg(deta.defaultImg);
+  deta.defaultBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.defaultImg) : loadBattleStyleActorImg(deta.defaultImg);
   if (deta.deathImg) {
-    deta.deathBitmap = loadBattleStyleActorImg(deta.deathImg);
+    deta.deathBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.deathImg) : loadBattleStyleActorImg(deta.deathImg);
   }
   if (deta.dyingImg) {
-    deta.dyingBitmap = loadBattleStyleActorImg(deta.dyingImg);
+    deta.dyingBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.dyingImg) : loadBattleStyleActorImg(deta.dyingImg);
   }
   if (deta.damageImg) {
-    deta.damageBitmap = loadBattleStyleActorImg(deta.damageImg);
+    deta.damageBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.damageImg) : loadBattleStyleActorImg(deta.damageImg);
   }
   if (deta.victoryImg) {
-    deta.victoryBitmap = loadBattleStyleActorImg(deta.victoryImg);
+    deta.victoryBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.victoryImg) : loadBattleStyleActorImg(deta.victoryImg);
   }
   if (deta.chantImg) {
-    deta.chantBitmap = loadBattleStyleActorImg(deta.chantImg);
+    deta.chantBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.chantImg) : loadBattleStyleActorImg(deta.chantImg);
   }
   if (deta.stateImg){
     for (const listdeta of deta.stateImg) {
       if(listdeta.actorStateImg && listdeta.stateImgId > 0){
         deta.stateBitmap[listdeta.stateImgId] = {};
-        deta.stateBitmap[listdeta.stateImgId].imges = loadBattleStyleActorImg(listdeta.actorStateImg);
+        deta.stateBitmap[listdeta.stateImgId].imges = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(listdeta.actorStateImg) : loadBattleStyleActorImg(listdeta.actorStateImg);
         deta.stateBitmap[listdeta.stateImgId].always = listdeta.Always ? true : false;
         deta.stateBitmap[listdeta.stateImgId].priorityId = listdeta.priorityId;
       }
@@ -1130,7 +1197,7 @@ Sprite_Actor.prototype.statusPosition = function(index, rect) {
   const maxCols = Math.min(this.maxItems(), this.maxCols());
   if (param.ActorStatusMode === 1) {
     rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
-  } else if (param.ActorStatusMode === 2) {console.log("a")
+  } else if (param.ActorStatusMode === 2) {
     rect.x += this.width - (maxCols * itemWidth) - this.itemPadding() * 2;
   } else {
     //x = rect.x;
@@ -1226,12 +1293,22 @@ Sprite_ActorImges.prototype.initMembers = function() {
 Sprite_ActorImges.prototype.setup = function(battler, deta) {
   this._battler = battler;
   this._deta = deta;
+  if (Imported.NUUN_ActorPicture) {
+    this._actorButler = this._battler.getActorButlerList();
+  }
   this.updateBitmap();
 };
 
 Sprite_ActorImges.prototype.update = function() {
   Sprite.prototype.update.call(this);
   if (this._battler) {
+    if (Imported.NUUN_ActorPicture) {
+      this._battler.setActorButler()
+      if (this._actorButler.imgChange) {
+        this._imgIndex = -1;
+        this._actorButler.imgChange = false;
+      }
+    }
     this.updateBitmap();
     this.updateSelectionEffect();
   } else {

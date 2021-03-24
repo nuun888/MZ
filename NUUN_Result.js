@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.6.6
+ * @version 1.6.7
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -73,6 +73,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/24 Ver.1.6.7
+ * 「共通処理」(NUUN_Base)を導入していないとエラーが出る問題を修正。
  * 2021/3/19 Ver.1.6.6
  * リザルト表示時のアクターステータスウィンドウを閉じる選択項目を追加。
  * 2021/3/17 Ver.1.6.5
@@ -1283,7 +1285,7 @@ Window_ResultActorImg.prototype.refresh = function() {
 };
 
 Window_ResultActorImg.prototype.drawActorImg = function(actor) {
-  if (actor.resultActorBitmap || actor.resultActorImg.ActorImg) {  
+  if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {  
     const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
     const bitmap = ImageManager.nuun_actorPictures(loadBitmap);
     if (bitmap && !bitmap.isReady()) {
@@ -1466,7 +1468,7 @@ Window_Result.prototype.drawActorImg = function(actor) {
     this._resultActorImgWindow.setActor(actor);
     this._resultActorImgWindow.refresh();
   } else {
-    if (actor.resultActorBitmap || actor.resultActorImg.ActorImg) {
+    if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {
       const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
       const bitmap = ImageManager.nuun_actorPictures(loadBitmap);
       if (bitmap && !bitmap.isReady()) {
@@ -1540,11 +1542,13 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       this.changeTextColor(ColorManager.textColor(param.LevelUpValueColor));
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
-        if (!actor.resultActorBitmap) {
-          actor.initResultActorImg(actor.actorId());
-          ImageManager.nuun_actorPictures(actor.resultActorImg.ActorImg);
-        } else {
-          ImageManager.nuun_actorPictures(actor.resultActorBitmap);
+        if (Imported.NUUN_Base) {
+          if (!actor.resultActorBitmap) {
+            actor.initResultActorImg(actor.actorId());
+            ImageManager.nuun_actorPictures(actor.resultActorImg.ActorImg);
+          } else {
+            ImageManager.nuun_actorPictures(actor.resultActorBitmap);
+          }
         }
       }
     } else {

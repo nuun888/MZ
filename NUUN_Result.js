@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.6.7
+ * @version 1.6.8
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -73,6 +73,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/25 Ver.1.6.8
+ * ウィンドウのX座標をマイナスに設定できるように変更。
+ * レベルアップ画面の背景画像が参照されないエラーを修正。
  * 2021/3/24 Ver.1.6.7
  * 「共通処理」(NUUN_Base)を導入していないとエラーが出る問題を修正。
  * 2021/3/19 Ver.1.6.6
@@ -205,7 +208,7 @@
  * @text ウィンドウX座標
  * @type number
  * @default 0
- * @min 0
+ * @min -9999
  * @parent WindowSetting
  * 
  * @param ResultWindow_Y
@@ -616,7 +619,7 @@
  * @desc 背景画像ファイル名を指定します。
  * @text 背景画像
  * @type file
- * @dir img/pictures
+ * @dir img/nuun_background
  * @parent LevelUpPage
  * 
  * @param NameSetting
@@ -936,7 +939,7 @@ Scene_Battle.prototype.createAllWindows = function() {
 
 Scene_Battle.prototype.createResultBaseSprite = function() {
   this._resultBaseSprite = null;
-  if (param.PartyBackGroundImg || param.ActorBackGroundImg) {
+  if (Imported.NUUN_Base && (param.PartyBackGroundImg || param.ActorBackGroundImg)) {
     const sprite = new Sprite();
     this._resultBaseSprite = sprite;
     this.addChild(sprite);

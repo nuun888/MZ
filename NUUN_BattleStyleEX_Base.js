@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.0.6
+ * @version 2.0.7
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/3/26 Ver 2.0.7
+ * 立ち絵表示EXに対応。
  * 2021/3/22 Ver 2.0.6
  * プラグインコマンドにアクターウィンドウを非表示にする機能を追加。
  * プラグインコマンドにアクターウィンドウを不透明化にする機能を追加。
@@ -570,7 +572,6 @@ Scene_Battle.prototype.update = function() {
   }
   if (Imported.NUUN_ActorPicture && $gameTemp.isButlerRefresh()) {
     this._actorImges.preparePartyRefresh();
-    $gameTemp.setButlerRefresh(false);
   }
 };
 
@@ -954,7 +955,8 @@ Window_BattleActorImges.prototype.preparePartyRefresh = function() {
 Window_BattleActorImges.prototype.performPartyRefresh = function() {
   this._bitmapsReady++;
   if (this._bitmapsReady >= $gameParty.members().length) {
-      this.refresh();
+    $gameTemp.setButlerRefresh(false);
+    this.refresh();
   }
 };
 
@@ -1294,7 +1296,7 @@ Sprite_ActorImges.prototype.setup = function(battler, deta) {
   this._battler = battler;
   this._deta = deta;
   if (Imported.NUUN_ActorPicture) {
-    this._actorButler = this._battler.getActorButlerList();
+    this._actorButler = this._battler._actorButler;
   }
   this.updateBitmap();
 };
@@ -1303,9 +1305,9 @@ Sprite_ActorImges.prototype.update = function() {
   Sprite.prototype.update.call(this);
   if (this._battler) {
     if (Imported.NUUN_ActorPicture) {
-      this._battler.setActorButler()
-      if (this._actorButler.imgChange) {
-        this._imgIndex = -1;
+      this._battler.setActorButler();
+      if (this._actorButler.imgChange && !$gameTemp.isButlerRefresh()) {
+        this._imgIndex = -1;console.log(this._actorButler)
         this._actorButler.imgChange = false;
       }
     }

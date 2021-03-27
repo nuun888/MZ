@@ -1,9 +1,18 @@
-Ver.1.5.0<br>
+Ver.1.68<br>
 https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js<br>
 
 [詳細](https://forum.tkool.jp/index.php?threads/%E3%80%90%E3%83%97%E3%83%A9%E3%82%B0%E3%82%A4%E3%83%B3%E3%80%91%E3%83%AA%E3%82%B6%E3%83%AB%E3%83%88%E3%80%80ver-1-4-3.4852/)<br>
 
 戦闘終了時にリザルト画面を表示します。<br>
+
+画像指定のフォルダーについて<br>
+Ver.1.6.4からフォルダーの参照先を変更しました。<br>
+背景画像はnuun_background、アクター画像はnuun_actorpicturesに変更となっています。<br>
+
+nuun_actorpictures、nuun_backgroundフォルダーがimgフォルダーにない場合<br>
+画像ファイルはゲームフォルダーのimgファイル直下に新規ファイルを作成し、フォルダー名をnuun_actorpictures、nuun_backgroundにそれぞれ変更してください。<br>
+また画像を表示させるには「共通処理」(NUUN_Base)プラグインが必要となります。<br>
+[NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>
 
 <B>更新履歴</B><br>
 2021/3/9 Ver.1.5.0<br>

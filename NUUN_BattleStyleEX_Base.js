@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.0.8
+ * @version 2.0.9
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/3/27 Ver 2.0.9
+ * 特定の条件でエラーが出る問題を修正。
  * 2021/3/27 Ver 2.0.8
  * フロントビュー時のエフェクト処理を改修。
  * 2021/3/26 Ver 2.0.7
@@ -1075,8 +1077,8 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor, deta) 
   const key = "actor%1-img".format(actor.actorId());
   const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
   sprite.setup(actor, deta);
-  const x = rect.x + Math.floor((this.itemWidth() - (sprite.bitmap.width * deta.Actor_Scale / 100)) / 2) + 4 + param.ActorImg_X + deta.Actor_X;
-  const y = rect.y + rect.height - Math.floor(sprite.bitmap.height * deta.Actor_Scale / 100) + 7 + param.ActorImg_Y + deta.Actor_Y;
+  const x = rect.x + Math.floor((this.itemWidth() - (deta.defaultBitmap.width * deta.Actor_Scale / 100)) / 2) + 4 + param.ActorImg_X + deta.Actor_X;
+  const y = rect.y + rect.height - Math.floor(deta.defaultBitmap.height * deta.Actor_Scale / 100) + 7 + param.ActorImg_Y + deta.Actor_Y;
   sprite.scale.x = deta.Actor_Scale / 100;
   sprite.scale.y = deta.Actor_Scale / 100;
   sprite.move(x, y);

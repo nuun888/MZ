@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -70,6 +70,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/27 Ver 1.0.4
+ * ステート画像をウィンドウ範囲外でも表示できるよ機能を追加。
  * 2021/3/22 Ver 1.0.3
  * プラグインコマンドにアクターウィンドウを非表示にする機能を追加。
  * プラグインコマンドにアクターウィンドウを不透明化にする機能を追加。
@@ -453,6 +455,15 @@
  * @default 1
  * @parent ActorStatus
  * 
+ * @param GaugeWidth
+ * @desc HP,MP,TPゲージの最大横幅を指定します。（デフォルト128）
+ * @text ゲージ最大横幅
+ * @type number
+ * @default 128
+ * @min 0
+ * @max 999
+ * @parent ActorStatus
+ * 
  * @param actorBackground
  * @desc アクターの背景画像を指定します。
  * @text アクター背景画像
@@ -546,6 +557,24 @@
  * @max 9999
  * @parent ActorImgChangePosition
  * 
+ * @param ActorFace_Width
+ * @desc 顔グラフィックの横幅（デフォルト0, 0でX座標中心基準で表示できる範囲が表示されます）
+ * @text 顔グラフィック横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * @parent ActorImgChangePosition
+ * 
+ * @param ActorFace_Height
+ * @desc 顔グラフィックの縦幅（デフォルト98, 0でY座標中心基準で表示できる範囲が表示されます）
+ * @text 顔グラフィック縦幅
+ * @type number
+ * @default 98
+ * @min 0
+ * @max 9999
+ * @parent ActorImgChangePosition
+ * 
  * @param ActorFeceChangePosition
  * @text 顔グラフィック位置設定
  * @parent ActorImgChangePosition
@@ -574,33 +603,6 @@
  * @min -9999
  * @max 9999
  * @parent ActorFeceChangePosition
- * 
- * @param ActorFace_Width
- * @desc 顔グラフィックの横幅（デフォルト0, 0でX座標中心基準で表示できる範囲が表示されます）
- * @text 顔グラフィック横幅
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgChangePosition
- * 
- * @param ActorFace_Height
- * @desc 顔グラフィックの縦幅（デフォルト98, 0でY座標中心基準で表示できる範囲が表示されます）
- * @text 顔グラフィック縦幅
- * @type number
- * @default 98
- * @min 0
- * @max 9999
- * @parent ActorImgChangePosition
- * 
- * @param GaugeWidth
- * @desc HP,MP,TPゲージの最大横幅を指定します。（デフォルト128）
- * @text ゲージ最大横幅
- * @type number
- * @default 128
- * @min 0
- * @max 999
- * @parent ActorStatus
  * 
  * @param ActorHPChangePosition
  * @text HP位置設定
@@ -806,6 +808,13 @@
  * @default false
  * @parent ActorStateChangePosition
  * 
+ * @param StateVisible
+ * @desc アイコンアイコンを表示させます。
+ * @text アイコンアイコン表示
+ * @type boolean
+ * @default true
+ * @parent ActorStateChangePosition
+ * 
  * @param ActorState_X
  * @desc ステートのX座標を設定します。（デフォルト4）
  * @text ステートX座標
@@ -822,6 +831,13 @@
  * @default 20
  * @min -9999
  * @max 9999
+ * @parent ActorStateChangePosition
+ * 
+ * @param OutsideWindowVisible
+ * @desc アイコンの表示をウィンドウ枠外でも表示させます。(アクター画像の上に表示されます)
+ * @text アイコンウィンドウ枠外表示
+ * @type boolean
+ * @default false
  * @parent ActorStateChangePosition
  * 
  */
@@ -1030,3 +1046,18 @@
 var Imported = Imported || {};
 Imported.NUUN_BattleStyleEX = true;
 
+// * @param StyleSettings
+// * @text バトルスタイル設定
+//
+// * @param StyleMode
+// * @text バトルレイアウトモード
+// * @desc バトルレイアウトのモードを指定します。
+// * @type select
+// * @option デフォルト
+// * @value "デフォルト"
+// * @option MVスタイル
+// * @value "MVスタイル"
+// * @option XPスタイル
+// * @value "XPスタイル"
+// * @default "XPスタイル"
+// * @parent StyleSettings

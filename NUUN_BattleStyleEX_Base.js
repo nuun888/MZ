@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.0.7
+ * @version 2.0.8
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/3/27 Ver 2.0.8
+ * フロントビュー時のエフェクト処理を改修。
  * 2021/3/26 Ver 2.0.7
  * 立ち絵表示EXに対応。
  * 2021/3/22 Ver 2.0.6
@@ -178,6 +180,11 @@ const _Game_Actor_performVictory = Game_Actor.prototype.performVictory;
 Game_Actor.prototype.performVictory = function() {
   _Game_Actor_performVictory.call(this);
   this._imgIndex = 5;
+};
+
+const _Game_Actor_isSpriteVisible = Game_Actor.prototype.isSpriteVisible;
+Game_Actor.prototype.isSpriteVisible = function() {
+   return !$gameSystem.isSideView() && param.ActorEffectShow ? param.ActorEffectShow : _Game_Actor_isSpriteVisible.call(this);
 };
 
 //Game_Enemy
@@ -797,14 +804,17 @@ Window_BattleStatus.prototype.drawItemStatus = function(index) {
   this._rect = rect;
   const nameX = this.nameX(rect);
   const nameY = this.nameY(rect);
-  const stateIconX = this.stateIconX(rect);
-  const stateIconY = this.stateIconY(rect);
   const basicGaugesX = this.basicGaugesX(rect);
   const basicGaugesY = this.basicGaugesY(rect);
   if (param.TPBShow) {
     this.placeTimeGauge(actor, nameX, nameY);
   }
-  this.placeStateIcon(actor, stateIconX, stateIconY);
+  if (param.StateVisible && !param.OutsideWindowVisible) {
+    const stateIconX = this.stateIconX(rect);
+    const stateIconY = this.stateIconY(rect);
+    this.placeStateIcon(actor, stateIconX, stateIconY);
+  }
+  
   if (param.NameShow) {
     this.placeActorName(actor, nameX, nameY);
   }
@@ -836,10 +846,6 @@ Window_BattleStatus.prototype.placeBasicGauges = function(actor, x, y) {
 
 const _Window_BattleStatus_placeStateIcon = Window_BattleStatus.prototype.placeStateIcon;
 Window_BattleStatus.prototype.placeStateIcon = function(actor, x, y) {
-  if (param.StateChangePosition) {
-    x = param.ActorState_X + this._rect.x;
-    y = param.ActorState_Y + this._rect.y;
-  }
   _Window_BattleStatus_placeStateIcon.call(this, actor, x, y);
 };
 
@@ -894,6 +900,16 @@ Window_BattleStatus.prototype.battlreActorImges = function(id) {
 Window_BattleStatus.prototype.setActorWindow = function(Window_battleActorImges, Window_BattleActorStatus) {
   this._window_battleActorImges = Window_battleActorImges;
   this._window_BattleActorStatus = Window_BattleActorStatus;
+};
+
+const _Window_BattleStatus_stateIconX = Window_BattleStatus.prototype.stateIconX;
+Window_BattleStatus.prototype.stateIconX = function(rect) {
+  return param.StateChangePosition ? param.ActorState_X + rect.x : _Window_BattleStatus_stateIconX.call(this, rect);
+};
+
+const _Window_BattleStatus_stateIconY = Window_BattleStatus.prototype.stateIconY;
+Window_BattleStatus.prototype.stateIconY = function(rect) {
+  return param.StateChangePosition ? param.ActorState_Y + rect.y : _Window_BattleStatus_stateIconY.call(this, rect);
 };
 
 //Window_BattleActorImges
@@ -1038,6 +1054,20 @@ Window_BattleActorImges.prototype.drawItemImage = function(index) {
   } else {
     this.drawItemFace(index, actor, deta);
   }
+  if (param.StateVisible && param.OutsideWindowVisible) {
+    const rect = this.itemRectWithPadding(index);
+    const stateIconX = this.stateIconX(rect);
+    const stateIconY = this.stateIconY(rect);
+    this.placeStateIcon(actor, stateIconX, stateIconY);
+  }
+};
+
+Window_BattleActorImges.prototype.placeStateIcon = function(actor, x, y) {
+  const key = "actor%1-stateIcon".format(actor.actorId());
+  const sprite = this.createActorImgSprite(key, Sprite_StateIcon);
+  sprite.setup(actor);
+  sprite.move(x, y);
+  sprite.show();
 };
 
 Window_BattleActorImges.prototype.drawItemButler = function(index, actor, deta) {
@@ -1173,24 +1203,34 @@ Window_BattleLog.prototype.showEnemyAttackAnimation = function(subject, targets)
   this.showNormalAnimation(targets, subject.attackAnimation(), false);
 };
 
-
-//Sprite_Battler
-const _Sprite_Battler_setupDamagePopup = Sprite_Battler.prototype.setupDamagePopup;
-Sprite_Battler.prototype.setupDamagePopup = function() {
-  if(this._battler.isDamagePopupRequested()) {
-    if(!this._battler.isSpriteVisible()) {
-      this.createDamageSprite();
-    }
-  }
-  _Sprite_Battler_setupDamagePopup.call(this);
-};
-
 const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
 Sprite_Actor.prototype.setActorHome = function(index) {
   if($gameSystem.isSideView()){
     _Sprite_Actor_setActorHome.call(this, index);
   } else {
     this.actorHomeRefresh(index);
+  }
+};
+
+const _Sprite_Battler_updateVisibility = Sprite_Battler.prototype.updateVisibility;
+Sprite_Battler.prototype.updateVisibility = function() {
+  _Sprite_Battler_updateVisibility.call(this);
+  if (this._battler && this._battler.isActor() && !$gameSystem.isSideView() && this.visible) {
+    this.visible = false;
+  }
+};
+
+const _Sprite_Battler_startMove = Sprite_Battler.prototype.startMove;
+Sprite_Battler.prototype.startMove = function(x, y, duration) {
+  if (this._battler && this._battler.isActor() && $gameSystem.isSideView()) {
+    _Sprite_Battler_startMove.call(this, x, y, duration);
+  }
+};
+
+const _Sprite_Actor_updateMotion = Sprite_Actor.prototype.updateMotion;
+Sprite_Actor.prototype.updateMotion = function() {
+  if ($gameSystem.isSideView()) {
+    _Sprite_Actor_updateMotion.call(this);
   }
 };
 
@@ -1218,11 +1258,11 @@ Sprite_Actor.prototype.actorHomeRefresh = function(index) {
   const itemWidth = this._statusWindow.itemWidth();
   const itemHeight = this._statusWindow.itemHeight();
   if (param.ActorStatusMode === 0) {
-    x = w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX() + 4;
+    x = w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX() + this._statusWindow.itemPadding();
   } else if (param.ActorStatusMode === 2) {
-    x = (width - Math.min(this._statusWindow.maxItems(), maxCols) * itemWidth) + w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX() - this._statusWindow.itemPadding() * 2 + 4;
+    x = (width - Math.min(this._statusWindow.maxItems(), maxCols) * itemWidth) + w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX() - this._statusWindow.itemPadding();
   } else {
-    x = (width / 2 - Math.min(this._statusWindow.maxItems(), maxCols) * itemWidth / 2) + w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX() - this._statusWindow.itemPadding() + 4;
+    x = (width / 2 - Math.min(this._statusWindow.maxItems(), maxCols) * itemWidth / 2) + w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX();
   }
   y = (itemHeight * h_index) + (itemHeight / 2) + this.differenceY();
   this.setHome(x + param.ActorEffect_X, y + param.ActorEffect_Y);
@@ -1307,7 +1347,7 @@ Sprite_ActorImges.prototype.update = function() {
     if (Imported.NUUN_ActorPicture) {
       this._battler.setActorButler();
       if (this._actorButler.imgChange && !$gameTemp.isButlerRefresh()) {
-        this._imgIndex = -1;console.log(this._actorButler)
+        this._imgIndex = -1;
         this._actorButler.imgChange = false;
       }
     }
@@ -1825,17 +1865,6 @@ const _Spriteset_Battle_createBattleField = Spriteset_Battle.prototype.createBat
 Spriteset_Battle.prototype.createBattleField = function() {
   _Spriteset_Battle_createBattleField.call(this);
   this._effectsBackContainer = this._battleField;
-};
-
-//BattleEffectPopup対応
-const _Sprite_Battler_setupMessagePopup = Sprite_Battler.prototype.setupMessagePopup;
-Sprite_Battler.prototype.setupMessagePopup = function() {
-  if (this._battler.isMessagePopupRequested()) {
-    if (!this._battler.isSpriteVisible() && param.ActorEffectShow) {
-      this.createMessagePopup();
-    }
-  }
-  _Sprite_Battler_setupMessagePopup.call(this);
 };
 
 })();

@@ -5,16 +5,12 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- * 
- * 更新履歴
- * 2021/1/17 Ver.1.0.0
- * 初版
- * 
  */ 
 /*:
  * @target MZ
  * @plugindesc エネミー座標調整
  * @author NUUN
+ * @version 1.0.0
  *            
  * @help 
  * エネミーの座標、ダメージエフェクトをエネミー毎に設定できます。設定できる範囲外でも配置可能です。
@@ -30,6 +26,10 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/1/17 Ver.1.0.0
+ * 初版
  * 
  */
 var Imported = Imported || {};

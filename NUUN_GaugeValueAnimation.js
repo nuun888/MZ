@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc ゲージの数値更新アニメーション
  * @author NUUN
- * @version 1.1.1
+ * @version 1.0.2
  * 
  * @help
  * ダメージや回復、消費などのゲージに表示されている数値が変化する時、デフォルトでは一瞬で変化後の
@@ -24,6 +24,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/3/27 Ver.1.1.2
+ * 数値アニメーション中に変動値が正負逆になった時、数値アニメーションが止まらなくなる問題を修正。
  * 2021/3/1 Ver.1.1.1
  * ゲージ数値の更新処理を修正。
  * 2021/2/19 Ver.1.1.0
@@ -97,6 +99,14 @@ Imported.NUUN_GaugeValueAnimation = true;
     this._moveDelay = 0;
     this._moveValue = isNaN(this._moveValue) ? this.currentValue() : this._moveValue;
     this.updateBitmap();
+  };
+
+  const _Sprite_Gauge_updateTargetValue = Sprite_Gauge.prototype.updateTargetValue;
+  Sprite_Gauge.prototype.updateTargetValue = function(value, maxValue) {
+    if (this._moveDelay !== 0) {
+      this._moveDelay = 0;
+    }
+    _Sprite_Gauge_updateTargetValue.call(this, value, maxValue)
   };
 
   const _Sprite_Gauge_updateBitmap = Sprite_Gauge.prototype.updateBitmap;

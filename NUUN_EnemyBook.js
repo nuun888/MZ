@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -134,6 +134,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/27 Ver.1.1.5
+ * オリジナルパラメータが反映されていなかった問題を修正。
  * 2021/3/17 Ver.1.1.4
  * 背景画像の参照先が変更されていなかった問題を修正。
  * 2021/3/16 Ver.1.1.3
@@ -2401,7 +2403,7 @@ Window_EnemyBook.prototype.defeat = function(color, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.originalParams = function(color, enemy, x, y, width, params, paramsEval) {
-  if(params){
+  if (!params) {
     return this;
   }
 	this.changeTextColor(ColorManager.textColor(color));

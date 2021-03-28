@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.0.9
+ * @version 2.0.10
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/3/28 Ver 2.0.10
+ * NUUN_ActorPictureを導入してないとエラーが出る問題を修正。
  * 2021/3/27 Ver 2.0.9
  * 特定の条件でエラーが出る問題を修正。
  * 2021/3/27 Ver 2.0.8
@@ -973,7 +975,9 @@ Window_BattleActorImges.prototype.preparePartyRefresh = function() {
 Window_BattleActorImges.prototype.performPartyRefresh = function() {
   this._bitmapsReady++;
   if (this._bitmapsReady >= $gameParty.members().length) {
-    $gameTemp.setButlerRefresh(false);
+    if (Imported.NUUN_ActorPicture) {
+      $gameTemp.setButlerRefresh(false);
+    }
     this.refresh();
   }
 };

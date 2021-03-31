@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.1.5
+ * @version 1.2.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -66,17 +66,27 @@
  * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
  * スキル、アイテムのメモ欄
  * <AnalyzeSkill:1> このスキル、アイテムはアナライズスキルとし、「アナライズスキル設定」の１番の設定で発動します。
+ * アイテムのメモ欄
+ * <NoDropProbability>
+ * このタグを記入したアイテムはドロップアイテムの確率表示を表示しません。
  * 
  * アナライズスキル設定の失敗時のメッセージ
  * %1:ターゲット名
  * %2:使用者名
  * 「%2はアナライズに失敗した。」の時、スキル使用者がリードの場合は「リードはアナライズに失敗した。」と表示されます。
  * 
+ * 追加項目の設定
+ * 追加項目はリストの上から順に表示されます。
+ * リスト番号が偶数の時は左側に表示、奇数の時は右側に表示されます。
+ * 各項目には最低表示行数が設定されており次の項目はその行ぶん下に表示されます。
+ * ワイドモード指定は左側の項目のみ有効となります。また右側の項目は自動では行が下がりませんので項目リスト0（なし）を選択し改行を行ってください。
+ * 
  * 追加項目パラメータの行
  * 各パラメータ、経験値、お金、倒した数、オリジナルパラメータ：１行
  * 属性、ステート：２行
- * ドロップアイテム、スティールアイテム：４行
+ * ドロップアイテム、スティールアイテム：４行（２列表示モードの場合は３行）
  * 記述欄：２行
+ * ワイドモードは左側に表示する項目（リスト番号が奇数）
  * 
  * 
  * 対応プラグイン
@@ -134,6 +144,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/31 Ver.1.2.0
+ * ドロップアイテム、スティールアイテムのWideModeをtrueにしたときにアイテムの表示を２列にする機能を追加。
+ * 特定のドロップアイテムの確率表示を表示しない機能を追加。
  * 2021/3/27 Ver.1.1.5
  * オリジナルパラメータが反映されていなかった問題を修正。
  * 2021/3/17 Ver.1.1.4
@@ -592,6 +605,13 @@
  * @default true
  * @parent DropItemData
  * 
+ * @param DropItem2Col
+ * @desc 項目２列表示の時のドロップアイテムの表示項目を２列表示にする。
+ * @text 項目２列表示時の２列表示
+ * @type boolean
+ * @default false
+ * @parent DropItemData
+ * 
  * @param StealItemData
  * @text スティールアイテム設定
  * 
@@ -620,6 +640,13 @@
  * @text 確率表示
  * @type boolean
  * @default true
+ * @parent StealItemData
+ * 
+ * @param StealItem2Col
+ * @desc 項目２列表示の時の盗みアイテムの表示項目を２列表示にする。
+ * @text 項目２列表示時の２列表示
+ * @type boolean
+ * @default false
  * @parent StealItemData
  * 
  * @param ParamData
@@ -1029,7 +1056,7 @@
  * @param WideMode
  * @desc 項目の横いっぱいに表示する。左側（奇数）のみ有効です。
  * 右の項目(偶数）は0（表示なし)に設定してください。
- * @text 項目２列幅表示
+ * @text ワイドモード
  * @type boolean
  * @default false
  * 
@@ -2129,11 +2156,11 @@ Window_EnemyBook.prototype.itemShow = function(list, enemy, x, y, width) {
       this.drawNoEffectStates(list.NameColor, enemy, x, y, width);
       return 2;
     case 20:
-      this.dropItems(list.NameColor, enemy, x, y, width);
-      return 4;
+      this.dropItems(list.NameColor, enemy, x, y, width, list.WideMode);
+      return list.WideMode && param.DropItem2Col ? 3 : 4;
     case 21:
-      this.stealItems(list.NameColor, enemy, x, y, width);
-      return 4;
+      this.stealItems(list.NameColor, enemy, x, y, width, list.WideMode);
+      return list.WideMode && param.StealItem2Col ? 3 : 4;
     case 30:
       this.drawDesc1(list.NameColor, enemy, x, y, width);
       return 2;
@@ -2161,20 +2188,30 @@ Window_EnemyBook.prototype.page = function(enemy, x, y) {
   for(let i = 0; list.length > i; i++){
     if(list[i].ShowItem >= 0){
       if(i % 2 === 0){
-        width = this.widthMode(list[i].WideMode);
-        row = this.itemShow(list[i], enemy, x, y_Right, width);
-        y_Right += row * lineHeight;
-      } else {
-        width = this.maxWidth();
-        row = this.itemShow(list[i], enemy, x + this.itemWidth() / 2, y_Left, width);
+        width = this.widthMode(list[i]);console.log(list[i])
+        row = this.itemShow(list[i], enemy, x, y_Left, width);
         y_Left += row * lineHeight;
+      } else {
+        if (list[i].WideMode) {
+          list[i].WideMode = false;
+        }
+        width = this.maxWidth();
+        row = this.itemShow(list[i], enemy, x + this.itemWidth() / 2, y_Right, width);
+        y_Right += row * lineHeight;
       }
     }
   }
 };
 
-Window_EnemyBook.prototype.widthMode = function(mode) {
-  return mode ? this.itemWidth() - this.itemPadding() * 2 : this.maxWidth();
+Window_EnemyBook.prototype.widthMode = function(list) {
+  if (list.WideMode) {
+    if ((list.ShowItem === 20 && param.DropItem2Col) || (list.ShowItem === 21 && param.stealItem2Col)) {
+      return this.maxWidth();
+    }
+    return this.itemWidth() - this.itemPadding() * 2;
+  } else {
+    return this.maxWidth();
+  }
 };
 
 Window_EnemyBook.prototype.pageList = function(page) {
@@ -2584,55 +2621,76 @@ Window_EnemyBook.prototype.drawNoEffectStates = function(color, enemy, x, y, wid
 	});
 };
 
-Window_EnemyBook.prototype.dropItems = function(color, enemy, x, y, width, mask) {
+Window_EnemyBook.prototype.dropItems = function(color, enemy, x, y, width, mode) {
   const maxWidth = width;
 	this.changeTextColor(ColorManager.textColor(color));
   this.drawText(param.dropItemsName, x, y);
-  let y2 = y + this.lineHeight();
+  const lineHeight = this.lineHeight();
+  let y2 = y;
+  let x2 = x;
   let list = this._enemy.dropItems;
+  let dropIndex = 0;
   for(i = 0; i < list.length; i++){
     if(list[i].kind > 0){
+      if (mode && param.DropItem2Col) {
+        x2 = Math.floor(dropIndex % 2 * (width + this.itemPadding() * 2)) + x;
+        y2 = Math.floor(dropIndex / 2) * lineHeight + y + lineHeight;
+      } else {
+        y2 += lineHeight;
+      }
       let item = enemy.itemObject(list[i].kind, list[i].dataId);
       if((this.showDropItemMask() && this.dropItemFlag(i)) || !param.ShowDropItemName) {
         let rate = list[i].denominator;
         let textWidth = this.textWidth("1/" + rate);
-        this.drawItemName(item, x, y2, maxWidth - textWidth - this.itemPadding());
-        if (param.DropItemProbabilityShow) {
-          this.drawEnemyBookNumber("1/" + rate, x, y2, maxWidth);
+        this.drawItemName(item, x2, y2, maxWidth - textWidth - this.itemPadding());
+        console.log(item)
+        if (param.DropItemProbabilityShow && !item.meta.NoDropProbability) {
+          this.drawEnemyBookNumber("1/" + rate, x2, y2, maxWidth);
         }
+        dropIndex++;
       } else {
         this.resetTextColor();
-        this.drawText(this.unknownDataLength(item.name), x, y2, maxWidth,'left');
+        this.drawText(this.unknownDataLength(item.name), x2, y2, maxWidth,'left');
+        dropIndex++;
       }
-      y2 += this.lineHeight();
     }
   }
 };
 
-Window_EnemyBook.prototype.stealItems = function(color, enemy, x, y, width, mask) {
+Window_EnemyBook.prototype.stealItems = function(color, enemy, x, y, width, mode) {
 	if(!param.ShowStealItems || !Imported.NUUN_StealableItems) {
 		return this;
 	}
 	const maxWidth = width;
 	this.changeTextColor(ColorManager.textColor(color));
   this.drawText(param.StealItemsName, x, y);
-  let y2 = y + this.lineHeight();
+  const lineHeight = this.lineHeight();
+  let y2 = y;
+  let x2 = x;
   let list = enemy._stealItems;
+  let stealIndex = 0;
   for(let i = 0; list.length > i; i++){
     if (list[i].kind > 0 && list[i].kind < 4) {
+      if (mode && param.DropItem2Col) {
+        x2 = Math.floor(stealIndex % 2 * (width + this.itemPadding() * 2)) + x;
+        y2 = Math.floor(stealIndex / 2) * lineHeight + y + lineHeight;
+      } else {
+        y2 += lineHeight;
+      }
       let item = enemy.stealObject(list[i].kind, list[i].dataId);
       if((this.showStealItemMask() && this.stealItemFlag(i)) || !param.ShowStealItemName) {
         let rate = list[i].denominator;
         let textWidth = this.textWidth(rate +"%");
-        this.drawItemName(item, x, y2, maxWidth - textWidth - this.itemPadding());
+        this.drawItemName(item, x2, y2, maxWidth - textWidth - this.itemPadding());
         if (param.StealItemProbabilityShow) {
-          this.drawEnemyBookNumber(rate +"%", x, y2, maxWidth);
+          this.drawEnemyBookNumber(rate +"%", x2, y2, maxWidth);
         }
+        stealIndex++;
       } else {
         this.resetTextColor();
-        this.drawText(this.unknownDataLength(item.name), x, y2, maxWidth,'left');
+        this.drawText(this.unknownDataLength(item.name), x2, y2, maxWidth,'left');
+        stealIndex++;
       }
-      y2 += this.lineHeight();
     }
   }
 };
@@ -3088,3 +3146,4 @@ Window_BattleLog.prototype.displayMiss = function(target) {
 };
 
 })();
+//1.3.0 種族別カテゴリー　戦闘時背景予定

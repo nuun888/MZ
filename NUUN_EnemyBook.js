@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -144,6 +144,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/1 Ver.1.2.1
+ * 色相の異なるモンスターを連続で表示されると一瞬別の色相が反映されてしまう問題を修正。
  * 2021/3/31 Ver.1.2.0
  * ドロップアイテム、スティールアイテムのWideModeをtrueにしたときにアイテムの表示を２列にする機能を追加。
  * 特定のドロップアイテムの確率表示を表示しない機能を追加。
@@ -2188,7 +2190,7 @@ Window_EnemyBook.prototype.page = function(enemy, x, y) {
   for(let i = 0; list.length > i; i++){
     if(list[i].ShowItem >= 0){
       if(i % 2 === 0){
-        width = this.widthMode(list[i]);console.log(list[i])
+        width = this.widthMode(list[i]);
         row = this.itemShow(list[i], enemy, x, y_Left, width);
         y_Left += row * lineHeight;
       } else {
@@ -2227,25 +2229,25 @@ Window_EnemyBook.prototype.pageList = function(page) {
 
 Window_EnemyBook.prototype.enemyImg = function(enemy) {
   const name = this.enemyBattlerName(enemy);
-	const hue = enemy.battlerHue();
 	let bitmap;
   	if ($gameSystem.isSideView()) {
       	bitmap = ImageManager.loadSvEnemy(name);
   	} else {
       	bitmap = ImageManager.loadEnemy(name);
     }
-    Sprite_Battler.prototype.setHue.call(this._enemySprite, hue);
     this._enemySprite.bitmap = bitmap;
     this._enemySprite.show();
     if (bitmap && !bitmap.isReady()) {
-      bitmap.addLoadListener(this.drowEnemy.bind(this));
+      bitmap.addLoadListener(this.drowEnemy.bind(this, enemy));
     } else {
-      this.drowEnemy(this);
+      this.drowEnemy(enemy);
     }
 };
 
-Window_EnemyBook.prototype.drowEnemy = function() {
+Window_EnemyBook.prototype.drowEnemy = function(enemy) {
   if(this._enemySprite.bitmap) {
+    const hue = enemy.battlerHue();
+    Sprite_Battler.prototype.setHue.call(this._enemySprite, hue);
     const bitmapWidth = this._enemySprite.bitmap.width;
     const bitmapHeight = this._enemySprite.bitmap.height;
     const contentsWidth = this.maxWidth();
@@ -2643,7 +2645,6 @@ Window_EnemyBook.prototype.dropItems = function(color, enemy, x, y, width, mode)
         let rate = list[i].denominator;
         let textWidth = this.textWidth("1/" + rate);
         this.drawItemName(item, x2, y2, maxWidth - textWidth - this.itemPadding());
-        console.log(item)
         if (param.DropItemProbabilityShow && !item.meta.NoDropProbability) {
           this.drawEnemyBookNumber("1/" + rate, x2, y2, maxWidth);
         }

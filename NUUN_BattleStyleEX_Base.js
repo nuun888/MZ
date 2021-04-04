@@ -11,11 +11,14 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.0.10
+ * @version 2.1.0
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/3/28 Ver 2.1.0
+ * バトルスタイルレイアウトを選択できる機能を追加。
+ * 顔グラを表示させない機能を追加。
  * 2021/3/28 Ver 2.0.10
  * NUUN_ActorPictureを導入してないとエラーが出る問題を修正。
  * 2021/3/27 Ver 2.0.9
@@ -140,6 +143,31 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
+param.HPGaugeHeight = param.HPGaugeHeight || 12;
+param.MPGaugeHeight = param.MPGaugeHeight || 12;
+param.TPGaugeHeight = param.TPGaugeHeight || 12;
+param.TPBGaugeHeight = param.TPBGaugeHeight || 12;
+if (param.StyleMode === "MVStyle") {
+  param.TPGaugeWidth = param.TPGaugeWidth || 96;
+  param.TPBGaugeWidth = param.TPBGaugeWidth || 100;
+  param.WindowShow = param.WindowShow || true;
+  param.WindowFrameShow = param.WindowFrameShow || true;
+  param.cursorBackShow = param.cursorBackShow || false;
+  param.ActorFaceVisible = param.ActorFaceVisible || false;
+  param.ActorEffectShow = param.ActorFaceVisible;
+  param.GaugeWidth = param.GaugeWidth || 210;
+} else {
+  param.HPGaugeWidth = param.HPGaugeWidth || 128;
+  param.MPGaugeWidth = param.MPGaugeWidth || 128;
+  param.TPGaugeWidth = param.TPGaugeWidth || 128;
+  param.TPBGaugeWidth = param.TPBGaugeWidth || 128;
+  param.WindowShow = param.WindowShow || true;
+  param.WindowFrameShow = param.WindowFrameShow || false;
+  param.cursorBackShow = param.cursorBackShow || true;
+  param.ActorFaceVisible = param.ActorFaceVisible || true;
+  param.GaugeWidth = param.GaugeWidth || 128;
+}
+
 BattleManager.NUUN_BattleStyleDate = param;
 
 const pluginName = "NUUN_BattleStyleEX_Base";
@@ -314,7 +342,9 @@ const _Scene_Battle_createActorCommandWindow = Scene_Battle.prototype.createActo
 Scene_Battle.prototype.createActorCommandWindow = function() {
   _Scene_Battle_createActorCommandWindow.call(this);
   this._actorCommandWindow.setStatusWindow(this._statusWindow);
-  this._actorCommandWindow.y = this.actorCommandY();
+  if (param.StyleMode === "XPStyle") {
+    this._actorCommandWindow.y = this.actorCommandY();
+  }
 };
 
 Scene_Battle.prototype.differenceX = function() {
@@ -339,36 +369,53 @@ Scene_Battle.prototype.differenceY = function() {
   return 0;
 };
 
+const _Scene_Battle_statusWindowRect = Scene_Battle.prototype.statusWindowRect
 Scene_Battle.prototype.statusWindowRect = function() {
+  const rect = _Scene_Battle_statusWindowRect.call(this);
   const extra = 10;
-  const ww = param.ActorStatusWindow_Width > 0 ? param.ActorStatusWindow_Width - 8 : Graphics.boxWidth;
-  const wh = param.ActorStatusWindow_Height > 0 ? param.ActorStatusWindow_Height : this.windowAreaHeight() + extra - (param.WindowFrameShow ? 10 : 0);
-  if (param.ActorStatusWindowOnPosition) {
-    wx = (param.ActorStatusWindowCenter ? (Graphics.width - ww) / 2 : 0) + param.ActorStatusWindow_X;
-    wy = param.ActorStatusWindow_Y;
-  } else {
-    wx = (Graphics.width - ww) / 2;
-    wy = (Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight - wh + extra - (param.WindowFrameShow ? 6 : 0) - 4;
+  if (param.StyleMode === "Default" || param.StyleMode === "MVStyle") {
+    rect.x += (Graphics.width - Graphics.boxWidth) / 2;
+    rect.y += ((Graphics.height - Graphics.boxHeight) / 2) + (param.WindowFrameShow ? 4 : 0);
+    rect.height -= param.WindowFrameShow ? extra : 0;
+  } else if (param.StyleMode === "XPStyle") {
+    rect.width = param.ActorStatusWindow_Width > 0 ? param.ActorStatusWindow_Width - 8 : Graphics.boxWidth;
+    rect.height = param.ActorStatusWindow_Height > 0 ? param.ActorStatusWindow_Height : this.windowAreaHeight() + extra - (param.WindowFrameShow ? 10 : 0);
+    if (param.ActorStatusWindowOnPosition) {
+      rect.x = (param.ActorStatusWindowCenter ? (Graphics.width - rect.width) / 2 : 0) + param.ActorStatusWindow_X;
+      rect.y = param.ActorStatusWindow_Y;
+    } else {
+      rect.x = (Graphics.width - rect.width) / 2;
+      rect.y = (Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight - rect.height + extra - (param.WindowFrameShow ? 6 : 0) - 4;
+    }
   }
-  return new Rectangle(wx, wy, ww, wh);
-};
-
-Scene_Battle.prototype.partyCommandWindowRect = function() {
-  const ww = param.PartyCommand_Width > 0 ? param.PartyCommand_Width : Graphics.boxWidth;
-  const wh = this.partyWindowAreaHeight();
-  const wx = param.PartyCommandCenter ? Graphics.boxWidth / 2 - ww / 2 : 0 + param.PartyCommand_X;
-  const wy = this.partyCommand_YPosition() + param.PartyCommand_Y;
-  const rect = new Rectangle(wx, wy, ww, wh);
-  rect.statusWindowHeight = this._statusWindow.height;
   return rect;
 };
 
+const _Scene_Battle_partyCommandWindowRect = Scene_Battle.prototype.partyCommandWindowRect;
+Scene_Battle.prototype.partyCommandWindowRect = function() {
+  const rect = _Scene_Battle_partyCommandWindowRect.call(this);
+  if (param.StyleMode === "Default" || param.StyleMode === "MVStyle") {
+  } else if (param.StyleMode === "XPStyle") {
+    rect.width = param.PartyCommand_Width > 0 ? param.PartyCommand_Width : Graphics.boxWidth;
+    rect.height = this.partyWindowAreaHeight();
+    rect.x = param.PartyCommandCenter ? Graphics.boxWidth / 2 - rect.width / 2 : 0 + param.PartyCommand_X;
+    rect.y = this.partyCommand_YPosition() + param.PartyCommand_Y;
+    rect.statusWindowHeight = this._statusWindow.height;
+  }
+  return rect;
+};
+
+const _Scene_Battle_actorCommandWindowRect = Scene_Battle.prototype.actorCommandWindowRect;
 Scene_Battle.prototype.actorCommandWindowRect = function() {
-  const ww = this.actorCommandWidth(); 
-  const wh = this.actorCommandHeight();
-  const wx = this.actorCommandX();
-  const wy = 0;
-  return new Rectangle(wx, wy, ww, wh);
+  const rect = _Scene_Battle_actorCommandWindowRect.call(this);
+  if (param.StyleMode === "Default" || param.StyleMode === "MVStyle") {
+  } else if (param.StyleMode === "XPStyle") {
+    rect.width = this.actorCommandWidth(); 
+    rect.height = this.actorCommandHeight();
+    rect.x = this.actorCommandX();
+    rect.y = 0;
+  }
+  return rect;
 };
 
 Scene_Battle.prototype.actorCommandWidth = function() {
@@ -430,8 +477,48 @@ Scene_Battle.prototype.actorWindowAreaHeight = function() {
   return this.calcWindowHeight(param.ActorCommandMaxRow, true);
 };
 
+const _Scene_Battle_updateStatusWindowPosition = Scene_Battle.prototype.updateStatusWindowPosition;
 Scene_Battle.prototype.updateStatusWindowPosition = function() {
-  
+  if (param.StyleMode === "Default" || param.StyleMode === "MVStyle") {
+    const actorImges = this._actorImges;
+    const actorStatus = this._actorStatus;
+    const targetX = this.statusWindowX();
+    _Scene_Battle_updateStatusWindowPosition.call(this);
+    if (!$gameSystem.isSideView() && this._battleEffects) {
+      const battleEffects = this._battleEffects;
+      const EffectsX = this.effectsX(targetX);
+      if (actorStatus.x < targetX) {
+        battleEffects.x = Math.min(battleEffects.x + 16, EffectsX);
+      }
+      if (actorStatus.x > targetX) {
+        battleEffects.x = Math.max(battleEffects.x - 16, EffectsX);
+      }
+    }
+    if (actorStatus.x < targetX) {
+      actorImges.x = Math.min(actorImges.x + 16, targetX);
+      actorStatus.x = Math.min(actorStatus.x + 16, targetX);
+    }
+    if (actorStatus.x > targetX) {
+      actorImges.x = Math.max(actorImges.x - 16, targetX);
+      actorStatus.x = Math.max(actorStatus.x - 16, targetX);
+    }
+  }
+};
+
+Scene_Battle.prototype.statusWindowX = function() {
+  if (this.isAnyInputWindowActive()) {
+      return this.statusWindowRect().x;
+  } else {
+      return this.statusWindowRect().x + (this._partyCommandWindow.width / 2 * (this.isRightInputMode() ? 1 : -1));
+  }
+};
+
+Scene_Battle.prototype.effectsX = function() {
+  if (this.isAnyInputWindowActive()) {
+     return (this._battleEffects.home_x + (this._partyCommandWindow.width / 2) * (this.isRightInputMode() ? -1 : 1));
+  } else {
+     return this._battleEffects.home_x;
+  }
 };
 
 Scene_Battle.prototype.partyCommand_YPosition = function() {
@@ -627,15 +714,19 @@ Window_PartyCommand.prototype.initialize = function(rect) {
 };
 
 Window_PartyCommand.prototype.maxCols = function() {
-  return Math.ceil((this._list ? Math.min(this._list.length, param.PartyCommandMaxCol) : param.PartyCommandMaxCol));
+  return (param.StyleMode === "Default" || param.StyleMode === "MVStyle") ? 1 : Math.ceil((this._list ? Math.min(this._list.length, param.PartyCommandMaxCol) : param.PartyCommandMaxCol));
 };
 
 const _Window_PartyCommand_refresh = Window_PartyCommand.prototype.refresh;
 Window_PartyCommand.prototype.refresh = function() {
   _Window_PartyCommand_refresh.call(this);
-  this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.PartyCommandMaxCol), param.PartyCommandMaxRow));
-  if (param.PartyCommandPosition === 2) {
-    this.y = Graphics.boxHeight - (this.height + this.statusWindowHeight) + (param.WindowFrameShow ? 0 : 6) + param.PartyCommand_Y;
+  if (param.StyleMode === "Default" || param.StyleMode === "MVStyle") {
+    this.height = this.fittingHeight(param.Default_PartyCommandMaxRow);
+  } else if (param.StyleMode === "XPStyle") {
+    this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.PartyCommandMaxCol), param.PartyCommandMaxRow));
+    if (param.PartyCommandPosition === 2) {
+      this.y = Graphics.boxHeight - (this.height + this.statusWindowHeight) + (param.WindowFrameShow ? 0 : 6) + param.PartyCommand_Y;
+    }
   }
 };
 
@@ -646,35 +737,39 @@ Window_ActorCommand.prototype.selectActor = function(actor) {
 };
 
 Window_ActorCommand.prototype.maxCols = function() {
-  return Math.ceil((this._list ? Math.min(this._list.length, param.ActorCommandMaxCol) : param.ActorCommandMaxCol));
+  return (param.StyleMode === "Default" || param.StyleMode === "MVStyle") ? 1 : Math.ceil((this._list ? Math.min(this._list.length, param.ActorCommandMaxCol) : param.ActorCommandMaxCol));
 };
 
 const _Window_ActorCommand_refresh = Window_ActorCommand.prototype.refresh;
 Window_ActorCommand.prototype.refresh = function() {
   _Window_ActorCommand_refresh.call(this);
   const actorIndex = this.selectActor(this._actor);
-  if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode === 0) {
-    const rect = this._statusWindow.itemRect(actorIndex);
-    this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
-    this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
-    this.x = Math.max(-this._statusWindow.UI_Difference + 4, ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + Math.max(param.ActorCommand_X, 0) + this._statusWindow.differenceX);
-    this.x = Math.min(this.x, Graphics.boxWidth + this._statusWindow.UI_Difference - this.width - 4);
-    let zeroPosition = 0;
-    if (param.ActorStatusWindowOnPosition) {
-      this.y = this._statusWindow.differenceY - this.height + param.ActorCommand_Y + rect.y;
-      zeroPosition = (Graphics.boxHeight - Graphics.height) / 2;
-    } else {
-      this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + param.ActorCommand_Y + rect.y;
-    }
-    if (this.y <= zeroPosition) {
-      this.y += this.height + this._statusWindow.itemHeight() + this.itemPadding() * 2 + (param.WindowFrameShow ? 6 : 0);
-    } else {
-      this.y += (param.WindowFrameShow ? 0 : 6);
-    }
-  } else if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode >= 1) {
-    this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
-    if (param.ActorCommandMode === 3) {
-      this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + (param.WindowFrameShow ? 0 : 6) + param.ActorCommand_Y;
+  if (param.StyleMode === "Default" || param.StyleMode === "MVStyle") {
+
+  } else if (param.StyleMode === "XPStyle") {
+    if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode === 0) {
+      const rect = this._statusWindow.itemRect(actorIndex);
+      this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
+      this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
+      this.x = Math.max(-this._statusWindow.UI_Difference + 4, ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + Math.max(param.ActorCommand_X, 0) + this._statusWindow.differenceX);
+      this.x = Math.min(this.x, Graphics.boxWidth + this._statusWindow.UI_Difference - this.width - 4);
+      let zeroPosition = 0;
+      if (param.ActorStatusWindowOnPosition) {
+        this.y = this._statusWindow.differenceY - this.height + param.ActorCommand_Y + rect.y;
+        zeroPosition = (Graphics.boxHeight - Graphics.height) / 2;
+      } else {
+        this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + param.ActorCommand_Y + rect.y;
+      }
+      if (this.y <= zeroPosition) {
+        this.y += this.height + this._statusWindow.itemHeight() + this.itemPadding() * 2 + (param.WindowFrameShow ? 6 : 0);
+      } else {
+        this.y += (param.WindowFrameShow ? 0 : 6);
+      }
+    } else if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode >= 1) {
+      this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
+      if (param.ActorCommandMode === 3) {
+        this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + (param.WindowFrameShow ? 0 : 6) + param.ActorCommand_Y;
+      }
     }
   }
 };
@@ -697,7 +792,7 @@ Window_BattleStatus.prototype.initialize = function(rect) {
 };
 
 Window_BattleStatus.prototype.maxCols = function() {
-  return param.ActorMaxCol > 0 ? param.ActorMaxCol : Math.max($gameParty.maxBattleMembers(), 4);
+  return param.StyleMode === "MVStyle" ? 1 : param.ActorMaxCol > 0 ? param.ActorMaxCol : Math.max($gameParty.maxBattleMembers(), 4);
 };
 
 const _Window_BattleStatus_itemHeight = Window_BattleStatus.prototype.itemHeight;
@@ -780,15 +875,17 @@ Window_BattleStatus.prototype.refreshCursor = function() {
 
 Window_BattleStatus.prototype.statusPosition = function(index, rect) {
   const itemWidth = this.itemWidth();
-  const maxCols = Math.min(this.maxItems(), this.maxCols());
-  if (param.ActorStatusMode === 1) {
-    rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
-  } else if (param.ActorStatusMode === 2) {
-    rect.x += this.width - (maxCols * itemWidth) - this.itemPadding() * 2;
-  } else {
-    //x = rect.x;
+  const maxCols = Math.min(this.maxItems(), this.maxCols()); 
+  if (param.StyleMode === "MVStyle") {
+
+  } else if (param.StyleMode === "XPStyle" || param.StyleMode === "Default") {
+    if (param.ActorStatusMode === 1) {
+      rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
+    } else if (param.ActorStatusMode === 2) {
+      rect.x += this.width - (maxCols * itemWidth) - this.itemPadding() * 2;
+    } else {
+    }
   }
-  //rect.x = x + width * index;
   return rect;
 };
 
@@ -818,7 +915,6 @@ Window_BattleStatus.prototype.drawItemStatus = function(index) {
     const stateIconY = this.stateIconY(rect);
     this.placeStateIcon(actor, stateIconX, stateIconY);
   }
-  
   if (param.NameShow) {
     this.placeActorName(actor, nameX, nameY);
   }
@@ -835,16 +931,30 @@ Window_BattleStatus.prototype.placeTimeGauge = function(actor, x, y) {
 };
 
 Window_BattleStatus.prototype.placeBasicGauges = function(actor, x, y) {
+  if (param.StyleMode === "MVStyle") {
     x2 = param.HPChangePosition ? param.ActorHP_X + this._rect.x : x;
     y2 = param.HPChangePosition ? param.ActorHP_Y + this._rect.y : y;
-  this.placeGauge(actor, "hp", x2, y2);
-  x2 = param.MPChangePosition ? param.ActorMP_X + this._rect.x : x;
-  y2 = param.MPChangePosition ? param.ActorMP_Y + this._rect.y : y + this.gaugeLineHeight();
-  this.placeGauge(actor, "mp", x2, y2);
-  if ($dataSystem.optDisplayTp) {
-    x2 = param.TPChangePosition ? param.ActorTP_X + this._rect.x : x;
-    y2 = param.TPChangePosition ? param.ActorTP_Y + this._rect.y : y + this.gaugeLineHeight() * 2;
-    this.placeGauge(actor, "tp", x2, y2);
+    this.placeGauge(actor, "hp", x2, y2);
+    x2 = param.MPChangePosition ? param.ActorMP_X + this._rect.x : x + ($dataSystem.optDisplayTp ? 123 : 216);
+    y2 = param.MPChangePosition ? param.ActorMP_Y + this._rect.y : y;
+    this.placeGauge(actor, "mp", x2, y2);
+    if ($dataSystem.optDisplayTp) {
+      x2 = param.TPChangePosition ? param.ActorTP_X + this._rect.x : x + 234;
+      y2 = param.TPChangePosition ? param.ActorTP_Y + this._rect.y : y;
+      this.placeGauge(actor, "tp", x2, y2);
+    }
+  } else {
+    x2 = param.HPChangePosition ? param.ActorHP_X + this._rect.x : x;
+    y2 = param.HPChangePosition ? param.ActorHP_Y + this._rect.y : y;
+    this.placeGauge(actor, "hp", x2, y2);
+    x2 = param.MPChangePosition ? param.ActorMP_X + this._rect.x : x;
+    y2 = param.MPChangePosition ? param.ActorMP_Y + this._rect.y : y + this.gaugeLineHeight();
+    this.placeGauge(actor, "mp", x2, y2);
+    if ($dataSystem.optDisplayTp) {
+      x2 = param.TPChangePosition ? param.ActorTP_X + this._rect.x : x;
+      y2 = param.TPChangePosition ? param.ActorTP_Y + this._rect.y : y + this.gaugeLineHeight() * 2;
+      this.placeGauge(actor, "tp", x2, y2);
+    }
   }
 };
 
@@ -865,7 +975,15 @@ Window_BattleStatus.prototype.placeActorName = function(actor, x, y) {
 Window_BattleStatus.prototype.faceRect = function(index) {
   const rect = this.itemRect(index);
   rect.pad(-1);
-  if (param.FaceChangePosition) {
+  if (param.StyleMode === "MVStyle") {
+    if (param.FaceChangePosition) {
+      rect.x += param.ActorFace_X;
+      rect.y += param.ActorFace_Y;
+    } else {
+      rect.x -= rect.width / 2 - ImageManager.faceWidth;
+    }
+    rect.height = this.itemHeight() - 6;
+  } else if (param.FaceChangePosition) {
     rect.x += param.ActorFace_X;
     rect.y += param.ActorFace_Y;
     rect.height = this.itemHeight() - 6;
@@ -908,12 +1026,39 @@ Window_BattleStatus.prototype.setActorWindow = function(Window_battleActorImges,
 
 const _Window_BattleStatus_stateIconX = Window_BattleStatus.prototype.stateIconX;
 Window_BattleStatus.prototype.stateIconX = function(rect) {
+  if (param.StyleMode === "MVStyle") {
+    return param.StateChangePosition ? param.ActorState_X + rect.x : rect.x + this.basicGaugesX(rect) - 32;
+  }
   return param.StateChangePosition ? param.ActorState_X + rect.x : _Window_BattleStatus_stateIconX.call(this, rect);
 };
 
 const _Window_BattleStatus_stateIconY = Window_BattleStatus.prototype.stateIconY;
 Window_BattleStatus.prototype.stateIconY = function(rect) {
+  if (param.StyleMode === "MVStyle") {
+    return param.StateChangePosition ? param.ActorState_Y + rect.y : rect.y + rect.height / 2;
+  }
   return param.StateChangePosition ? param.ActorState_Y + rect.y : _Window_BattleStatus_stateIconY.call(this, rect);
+};
+
+const _Window_BattleStatus_nameY =Window_BattleStatus.prototype.nameY;
+Window_BattleStatus.prototype.nameY = function(rect) {
+  if (param.StyleMode === "MVStyle") {
+    return rect.y + 10;
+  }
+  return _Window_BattleStatus_nameY.call(this, rect);
+};
+
+const _Window_BattleStatus_basicGaugesX = Window_BattleStatus.prototype.basicGaugesX;
+Window_BattleStatus.prototype.basicGaugesX = function(rect) {
+  return _Window_BattleStatus_basicGaugesX.call(this, rect) + (param.StyleMode === "MVStyle" ? rect.width - 338 : 0);
+};
+
+const _Window_BattleStatus_basicGaugesY = Window_BattleStatus.prototype.basicGaugesY;
+Window_BattleStatus.prototype.basicGaugesY = function(rect) {
+  if (param.StyleMode === "MVStyle") {
+    return rect.y + 10;
+  }
+  return _Window_BattleStatus_basicGaugesY.call(this, rect);
 };
 
 //Window_BattleActorImges
@@ -1057,7 +1202,7 @@ Window_BattleActorImges.prototype.drawItemImage = function(index) {
   const deta = this.actorSpriteDeta[index];
   if(!deta._onFace) {
     this.drawItemButler(index, actor, deta);
-  } else {
+  } else if (param.ActorFaceVisible) {
     this.drawItemFace(index, actor, deta);
   }
   if (param.StateVisible && param.OutsideWindowVisible) {
@@ -1271,6 +1416,10 @@ Sprite_Actor.prototype.actorHomeRefresh = function(index) {
     x = (width / 2 - Math.min(this._statusWindow.maxItems(), maxCols) * itemWidth / 2) + w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX();
   }
   y = (itemHeight * h_index) + (itemHeight / 2) + this.differenceY();
+  if (param.StyleMode === "MVStyle") {
+    x -= width / 2 - ImageManager.faceWidth - 12;
+    y += itemHeight + 4;
+  }
   this.setHome(x + param.ActorEffect_X, y + param.ActorEffect_Y);
 };
 
@@ -1712,15 +1861,17 @@ Sprite_BattleGauge.prototype.constructor = Sprite_BattleGauge;
 
 Sprite_BattleGauge.prototype.initialize = function() {
   Sprite_Gauge.prototype.initialize.call(this);
+  this._HPGaugeWidth = param.StyleMode === "MVStyle" ? (param.HPGaugeWidth || ($dataSystem.optDisplayTp ? 108 : 201)) : param.HPGaugeWidth;
+  this._MPGaugeWidth = param.StyleMode === "MVStyle" ? (param.MPGaugeWidth || ($dataSystem.optDisplayTp ? 96 : 114)) : param.MPGaugeWidth;
   this._GaugeHeight = 0;
 };
 
 Sprite_BattleGauge.prototype.bitmapWidth = function() {
   switch (this._statusType) {
     case "hp":
-      return param.HPGaugeWidth;
+      return this._HPGaugeWidth;
     case "mp":
-      return param.MPGaugeWidth;
+      return this._MPGaugeWidth;
     case "tp":
       return param.TPGaugeWidth;
     case "time":
@@ -1838,6 +1989,7 @@ Spriteset_Battle.prototype.setBattleBase = function() {
   sprite.setFrame(0, 0, width, height);
   sprite.x = x;
   sprite.y = y - this.battleFieldOffsetY();
+  sprite.home_x = x;
   return sprite;
 };
 

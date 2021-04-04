@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.0.4
+ * @version 1.1.0
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -19,6 +19,7 @@
  * 
  * 
  * バトルスタイルに以下の機能を実装します。
+ *   バトルレイアウトをデフォルト以外にMV、XPスタイルに変更できます。
  * 　アクターの立ち絵を表示できるようになります。
  * 　戦闘不能時やダメージを受けた時、瀕死、勝利、詠唱時、ステートにかかっている時に顔グラフィック、立ち絵を変更可能
  * 　フロントビューでもアクター側にアニメーション、ダメージエフェクト表示可能
@@ -70,6 +71,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/4 Ver 1.1.0
+ * バトルレイアウトをデフォルト以外にMV、XPスタイルを選択できる機能を追加。
+ * 顔グラを表示させない機能を追加。
+ * 一部のプラグインパラメータのデフォルトの設定方法を変更。
  * 2021/3/27 Ver 1.0.4
  * ステート画像をウィンドウ範囲外でも表示できるよ機能を追加。
  * 2021/3/22 Ver 1.0.3
@@ -86,6 +91,22 @@
  * @param Setting
  * @text 共通設定
  * 
+ * @param StyleSettings
+ * @text バトルスタイル設定
+
+ * @param StyleMode
+ * @text バトルレイアウトモード
+ * @desc バトルレイアウトのモードを指定します。
+ * @type select
+ * @option デフォルト
+ * @value "Default"
+ * @option MVスタイル
+ * @value "MVStyle"
+ * @option XPスタイル
+ * @value "XPStyle"
+ * @default "デフォルト"
+ * @parent StyleSettings
+ * 
  * @param AppearWindowVisible
  * @desc モンスターが出現したときのメッセージを表示しません。
  * @text モンスター出現メッセージ非表示
@@ -93,42 +114,64 @@
  * @default false
  * @parent Setting
  * 
+ * @param MessageWindowPosition
+ * @text エネミー出現、リザルト、敗北、逃走メッセージ等上部表示
+ * @desc エネミー出現、リザルト、敗北、逃走メッセージ等を画面上側に表示させます。
+ * @type boolean
+ * @default false
+ * @parent Setting
+ * 
  * @param Window
  * @text ウィンドウ設定
+ * 
+ * @param WindowVisibleSetting
+ * @text ウィンドウ表示設定
+ * @parent Window
  * 
  * @param WindowShow
  * @desc アクターウィンドウを表示する。
  * @text アクターウィンドウ表示
  * @type boolean
- * @default true
- * @parent Window
+ * @default
+ * @parent WindowVisibleSetting
  * 
  * @param WindowFrameShow
  * @desc アクターウィンドウ枠を表示する。
  * @text アクターウィンドウ枠表示
  * @type boolean
- * @default false
- * @parent Window
+ * @default
+ * @parent WindowVisibleSetting
  * 
  * @param cursorBackShow
  * @desc アクター背景を表示する。
  * @text アクター背景表示
  * @type boolean
  * @default true
- * @parent Window
+ * @parent WindowVisibleSetting
  * 
  * @param SelectBackShow
  * @desc アクターの行動選択時に表示されるアクター背景を表示する。
  * @text アクター行動時背景表示
  * @type boolean
  * @default true
- * @parent Window
+ * @parent WindowVisibleSetting
  * 
  * @param windowBackground
  * @desc 背景画像ウィンドウを指定する。
  * @text 背景画像ウィンドウ
  * @type file
  * @dir img/system
+ * @parent WindowVisibleSetting
+ * 
+ * @param ActorSelectBackShow
+ * @desc アクターの対象選択時に表示されるアクター背景を表示する。
+ * @text アクターの対象選択時背景表示
+ * @type boolean
+ * @default true
+ * @parent WindowVisibleSetting
+ * 
+ * @param WindowCoordinateSetting
+ * @text ウィンドウ座標設定
  * @parent Window
  * 
  * @param ActorStatusWindowOnPosition
@@ -136,7 +179,7 @@
  * @text アクターウィンドウ座標変更許可
  * @type boolean
  * @default false
- * @parent Window
+ * @parent WindowCoordinateSetting
  * 
  * @param ActorStatusWindow_X
  * @desc アクターステータスウィンドウのX座標（絶対座標）を指定します。
@@ -145,7 +188,7 @@
  * @default 0
  * @min -9999
  * @max 9999
- * @parent Window
+ * @parent WindowCoordinateSetting
  * 
  * @param ActorStatusWindow_Y
  * @desc アクターステータスウィンドウのY座標（絶対座標）を指定します。
@@ -154,7 +197,7 @@
  * @default 0
  * @min -9999
  * @max 9999
- * @parent Window
+ * @parent WindowCoordinateSetting
  * 
  * @param ActorStatusWindow_Width
  * @desc アクターステータスウィンドウの横幅を指定します。
@@ -163,7 +206,7 @@
  * @default 0
  * @max 9999
  * @min 0
- * @parent Window
+ * @parent WindowCoordinateSetting
  * 
  * @param ActorStatusWindow_Height
  * @desc アクターステータスウィンドウの縦幅を指定します。
@@ -172,28 +215,14 @@
  * @default 0
  * @max 9999
  * @min 0
- * @parent Window
+ * @parent WindowCoordinateSetting
  * 
  * @param ActorStatusWindowCenter
- * @text ウィンドウ中央表示
- * @desc ウィンドウを中央に表示させます。
+ * @text ウィンドウ座標中央表示
+ * @desc ウィンドウの座標を中央に表示させます。
  * @type boolean
  * @default true
- * @parent Window
- * 
- * @param ActorSelectBackShow
- * @desc アクターの対象選択時に表示されるアクター背景を表示する。
- * @text アクターの対象選択時背景表示
- * @type boolean
- * @default true
- * @parent Window
- * 
- * @param MessageWindowPosition
- * @text エネミー出現、リザルト、敗北、逃走メッセージ等上部表示
- * @desc エネミー出現、リザルト、敗北、逃走メッセージ等を画面上側に表示させます。
- * @type boolean
- * @default false
- * @parent Window
+ * @parent WindowCoordinateSetting
  * 
  * @param Opacity
  * @text 不透明度設定
@@ -231,6 +260,23 @@
  * @param PartyCommand
  * @text パーティコマンド設定
  * 
+ * @param Default_PartyCommand
+ * @text デフォルト、MVスタイルモード設定
+ * @parent PartyCommand
+ * 
+ * @param Default_PartyCommandMaxRow
+ * @desc 表示するコマンド行数。
+ * @text 表示コマンド行数
+ * @type number
+ * @default 4
+ * @min 1
+ * @max 99
+ * @parent Default_PartyCommand
+ * 
+ * @param XP_PartyCommand
+ * @text XPスタイルモード設定
+ * @parent PartyCommand
+ * 
  * @param PartyCommandPosition
  * @text パーティコマンドの表示位置
  * @desc パーティコマンドの表示位置を指定します。
@@ -243,16 +289,16 @@
  * @value 2
  * @desc エネミーのNo表示
  * @default 0
- * @parent PartyCommand
+ * @parent XP_PartyCommand
  * 
  * @param PartyCommandMaxRow
  * @desc 表示するコマンド行数。
  * @text 表示コマンド行数
  * @type number
- * @default 1
+ * @default 4
  * @min 1
  * @max 99
- * @parent PartyCommand
+ * @parent XP_PartyCommand
  * 
  * @param PartyCommandMaxCol
  * @desc 表示するコマンド列数。
@@ -261,14 +307,14 @@
  * @default 4
  * @min 1
  * @max 99
- * @parent PartyCommand
+ * @parent XP_PartyCommand
  * 
  * @param PartyCommandCenter
  * @text コマンド中央表示
  * @desc コマンドを中央に表示させます。
  * @type boolean
  * @default true
- * @parent PartyCommand
+ * @parent XP_PartyCommand
  * 
  * @param PartyCommand_X
  * @desc コマンドのX座標。
@@ -277,7 +323,7 @@
  * @default 0
  * @min -9999
  * @max 9999
- * @parent PartyCommand
+ * @parent XP_PartyCommand
  * 
  * @param PartyCommand_Y
  * @desc コマンドのY座標。
@@ -286,7 +332,7 @@
  * @default 0
  * @min -9999
  * @max 9999
- * @parent PartyCommand
+ * @parent XP_PartyCommand
  * 
  * @param PartyCommand_Width
  * @desc コマンドの横幅。
@@ -295,10 +341,14 @@
  * @default 0
  * @min 0
  * @max 9999
- * @parent PartyCommand
+ * @parent XP_PartyCommand
  * 
  * @param ActorCommand
  * @text アクターコマンド設定
+ * 
+ * @param XP_ActorCommand
+ * @text XPスタイルモード設定
+ * @parent ActorCommand
  * 
  * @param ActorCommandMode
  * @text アクターコマンドの表示方法
@@ -313,7 +363,7 @@
  * @option アクターウィンドウの上
  * @value 3
  * @default 0
- * @parent ActorCommand
+ * @parent XP_ActorCommand
  * 
  * @param ActorCommandMaxRow
  * @desc 表示するコマンド行数。
@@ -322,7 +372,7 @@
  * @default 4
  * @min 1
  * @max 99
- * @parent ActorCommand
+ * @parent XP_ActorCommand
  * 
  * @param ActorCommandMaxCol
  * @desc 表示するコマンド列数。
@@ -331,14 +381,14 @@
  * @default 1
  * @min 1
  * @max 99
- * @parent ActorCommand
+ * @parent XP_ActorCommand
  * 
  * @param ActorCommandCenter
  * @text コマンド中央表示
  * @desc コマンドを中央に表示させます。
  * @type boolean
  * @default true
- * @parent ActorCommand
+ * @parent XP_ActorCommand
  * 
  * @param ActorCommand_X
  * @desc コマンドのX座標。
@@ -347,7 +397,7 @@
  * @default 0
  * @min -9999
  * @max 9999
- * @parent ActorCommand
+ * @parent XP_ActorCommand
  * 
  * @param ActorCommand_Y
  * @desc コマンドのY座標。
@@ -356,7 +406,7 @@
  * @default 0
  * @min -9999
  * @max 9999
- * @parent ActorCommand
+ * @parent XP_ActorCommand
  * 
  * @param ActorCommand_Width
  * @desc コマンドの横幅。
@@ -365,7 +415,7 @@
  * @default 0
  * @min 0
  * @max 9999
- * @parent ActorCommand
+ * @parent XP_ActorCommand
  * 
  * @param Effect
  * @text エフェクト設定
@@ -425,7 +475,7 @@
  * @text アクター設定
  * 
  * @param ActorMaxCol
- * @desc 横に並べるアクター数。
+ * @desc 横に並べるアクター数。(MVスタイルは列数が１固定です)
  * @text 横アクター数
  * @type number
  * @default 0
@@ -456,10 +506,10 @@
  * @parent ActorStatus
  * 
  * @param GaugeWidth
- * @desc HP,MP,TPゲージの最大横幅を指定します。（デフォルト128）
+ * @desc HP,MP,TPゲージの最大横幅を指定します。
  * @text ゲージ最大横幅
  * @type number
- * @default 128
+ * @default
  * @min 0
  * @max 999
  * @parent ActorStatus
@@ -493,7 +543,7 @@
  * 
  * @param imgDeathHide
  * @desc 戦闘不能になった場合、アクター画像（顔グラ）を非表示にします。
- * @text 戦闘不能時アクター画像表示
+ * @text 戦闘不能時アクター画像非表示
  * @type boolean
  * @default true
  * @parent ActorsButlers
@@ -538,6 +588,13 @@
  * @param ActorImgChangePosition
  * @text アクターグラフィック位置設定
  * @parent ActorStatus
+ * 
+ * @param ActorFaceVisible
+ * @desc 顔グラフィックを表示させます。
+ * @text 顔グラフィック表示
+ * @type boolean
+ * @default
+ * @parent ActorImgChangePosition
  * 
  * @param ActorImg_X
  * @desc 画像のオフセットX座標（基準位置からの相対座標となります）
@@ -612,7 +669,7 @@
  * @desc HPゲージの横幅を指定します。（デフォルト128）
  * @text HPゲージ横幅
  * @type number
- * @default 128
+ * @default
  * @min 0
  * @max 999
  * @parent ActorHPChangePosition
@@ -621,7 +678,7 @@
  * @desc HPゲージの縦幅を指定します。（デフォルト12）
  * @text HPゲージ縦幅
  * @type number
- * @default 12
+ * @default 
  * @min 0
  * @max 24
  * @parent ActorHPChangePosition
@@ -659,7 +716,7 @@
  * @desc MPゲージの横幅を指定します。（デフォルト128）
  * @text MPゲージ横幅
  * @type number
- * @default 128
+ * @default
  * @min 0
  * @max 999
  * @parent ActorMPChangePosition
@@ -668,7 +725,7 @@
  * @desc MPゲージの縦幅を指定します。（デフォルト12）
  * @text MPゲージ縦幅
  * @type number
- * @default 12
+ * @default 
  * @min 0
  * @max 24
  * @parent ActorMPChangePosition
@@ -705,7 +762,7 @@
  * @desc TPゲージの横幅を指定します。（デフォルト128）
  * @text TPゲージ横幅
  * @type number
- * @default 128
+ * @default
  * @min 0
  * @max 999
  * @parent ActorTPChangePosition
@@ -714,7 +771,7 @@
  * @desc TPゲージの縦幅を指定します。（デフォルト12）
  * @text TPゲージ縦幅
  * @type number
- * @default 12
+ * @default 
  * @min 0
  * @max 24
  * @parent ActorTPChangePosition
@@ -759,7 +816,7 @@
  * @desc TPBゲージの横幅を指定します。（デフォルト128）
  * @text TPBゲージ横幅
  * @type number
- * @default 128
+ * @default
  * @min 0
  * @max 999
  * @parent ActorTPBChangePosition
@@ -768,7 +825,7 @@
  * @desc TPBゲージの縦幅を指定します。（デフォルト12）
  * @text TPBゲージ縦幅
  * @type number
- * @default 12
+ * @default 
  * @min 0
  * @max 24
  * @parent ActorTPBChangePosition
@@ -1046,18 +1103,3 @@
 var Imported = Imported || {};
 Imported.NUUN_BattleStyleEX = true;
 
-// * @param StyleSettings
-// * @text バトルスタイル設定
-//
-// * @param StyleMode
-// * @text バトルレイアウトモード
-// * @desc バトルレイアウトのモードを指定します。
-// * @type select
-// * @option デフォルト
-// * @value "デフォルト"
-// * @option MVスタイル
-// * @value "MVスタイル"
-// * @option XPスタイル
-// * @value "XPスタイル"
-// * @default "XPスタイル"
-// * @parent StyleSettings

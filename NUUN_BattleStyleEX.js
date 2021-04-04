@@ -104,7 +104,7 @@
  * @value "MVStyle"
  * @option XPスタイル
  * @value "XPStyle"
- * @default "デフォルト"
+ * @default "XPスタイル"
  * @parent StyleSettings
  * 
  * @param AppearWindowVisible

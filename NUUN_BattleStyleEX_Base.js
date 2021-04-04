@@ -11,12 +11,14 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.1.0
+ * @version 2.2.0
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2021/3/28 Ver 2.1.0
+ * 2021/4/5 Ver 2.2.0
+ * ステート、バフをポップアップする機能を追加。
+ * 2021/4/4 Ver 2.1.0
  * バトルスタイルレイアウトを選択できる機能を追加。
  * 顔グラを表示させない機能を追加。
  * 2021/3/28 Ver 2.0.10
@@ -143,6 +145,7 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
+param.PopUpBuff = param.PopUpBuff || [];
 param.HPGaugeHeight = param.HPGaugeHeight || 12;
 param.MPGaugeHeight = param.MPGaugeHeight || 12;
 param.TPGaugeHeight = param.TPGaugeHeight || 12;
@@ -195,6 +198,40 @@ Game_Temp.prototype.isBattleEffectsRefresh = function() {
   return this._battleEffectRefresh || false;
 };
 
+const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
+Game_Battler.prototype.initMembers = function() {
+  _Game_Battler_initMembers.call(this);
+  this._statePopup = false;
+};
+
+Game_Battler.prototype.isStatePopupRequested = function() {
+  return this._statePopup;
+};
+
+Game_Battler.prototype.clearStatePopup = function() {
+  this._statePopup = false;
+};
+
+Game_Battler.prototype.startStatePopup = function() {
+  this._statePopup = true;
+};
+
+Game_Battler.prototype.addSetState = function(id) {
+  this.result().addState = id;
+};
+
+Game_Battler.prototype.removeSetState = function(id) {
+  this.result().removeState = id;
+};
+
+Game_Battler.prototype.addSetBuff = function(id) {
+  this.result().addBuff = id;
+};
+
+Game_Battler.prototype.removeSetBuff = function(id) {
+  this.result().removeBuff = id;
+};
+
 //Game_Actor
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
@@ -226,6 +263,16 @@ Game_Enemy.prototype.attackAnimation = function() {
 
 Game_Enemy.prototype.bareHandsAnimationId = function() {
   return $dataEnemies[this._enemyId].meta.AttackAnimation || 1;
+};
+
+//Game_ActionResult
+const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
+Game_ActionResult.prototype.clear = function() {
+  _Game_ActionResult_clear.call(this)
+  this.addState = 0;
+  this.addBuff = -1;
+  this.removeState = 0;
+  this.removeBuff = -1;
 };
 
 //BattleManager
@@ -1354,6 +1401,87 @@ Window_BattleLog.prototype.showEnemyAttackAnimation = function(subject, targets)
   this.showNormalAnimation(targets, subject.attackAnimation(), false);
 };
 
+Window_BattleLog.prototype.popupState = function(target, id) {
+  target.startStatePopup();
+  target.addSetState(id);
+};
+
+Window_BattleLog.prototype.removeState = function(target, id) {
+  target.startStatePopup();
+  target.removeSetState(id);
+};
+
+Window_BattleLog.prototype.popupBuff = function(target, id) {
+  target.startStatePopup();
+  target.addSetBuff(id);
+};
+
+Window_BattleLog.prototype.removeBuff = function(target, id) {
+  target.startStatePopup();
+  target.removeSetBuff(id);
+};
+
+const _Window_BattleLog_displayAddedStates = Window_BattleLog.prototype.displayAddedStates;
+Window_BattleLog.prototype.displayAddedStates = function(target) {
+  _Window_BattleLog_displayAddedStates.call(this, target);
+  for (const state of target.result().addedStateObjects()) {
+    if (!state.meta.NoPopUp && !state.meta.AddNoPopUp) {
+      this.push('popupState', target, state.id);
+    }
+  }
+};
+
+const _Window_BattleLog_displayRemovedStates = Window_BattleLog.prototype.displayRemovedStates;
+Window_BattleLog.prototype.displayRemovedStates = function(target) {
+  _Window_BattleLog_displayRemovedStates.call(this, target);
+  for (const state of target.result().removedStateObjects()) {
+    if (!state.meta.NoPopUp && !state.meta.RemoveNoPopUp) {
+      this.push('removeState', target, state.id);
+    }
+  }
+};
+
+const _Window_BattleLog_displayBuffs = Window_BattleLog.prototype.displayBuffs;
+Window_BattleLog.prototype.displayBuffs = function(target, buffs, fmt) {
+  _Window_BattleLog_displayBuffs.call(this, target, buffs, fmt);
+  const result = target.result();
+  if (result.addedBuffs.length > 0 || result.addedDebuffs.length > 0) {
+    for (const paramId of buffs) {
+      const id = target.result().isDebuffAdded(paramId) ? paramId + 10 : paramId;
+      const find = param.PopUpBuff.find(buff => buff.StateType === id);
+      if (find) {
+        if (find.StatePopUpMode === 0 || find.StatePopUpMode === 3) {
+          this.push('popupBuff', target, id);
+        }
+      } else {
+        this.push('popupBuff', target, id);
+      }
+    }
+  }
+};
+
+Window_BattleLog.prototype.displayRemovedBuffs = function(target, buffs) {
+  for (const paramId of buffs) {
+    const id = target.result().isDebuffAdded(paramId) ? paramId + 10 : paramId;
+    const find = param.PopUpBuff.find(buff => buff.StateType === id);
+    if (find) {
+      if (find.StatePopUpMode === 0 || find.StatePopUpMode === 2) {
+        this.push('removeBuff', target, id);
+      }
+    } else {
+      this.push('removeBuff', target, id);
+    } 
+  }
+};
+
+const _Window_BattleLog_displayChangedBuffs = Window_BattleLog.prototype.displayChangedBuffs;
+Window_BattleLog.prototype.displayChangedBuffs = function(target) {
+  _Window_BattleLog_displayChangedBuffs.call(this, target);
+  const result = target.result();
+  this.displayRemovedBuffs(target, result.removedBuffs);
+};
+
+
 const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
 Sprite_Actor.prototype.setActorHome = function(index) {
   if($gameSystem.isSideView()){
@@ -1361,6 +1489,37 @@ Sprite_Actor.prototype.setActorHome = function(index) {
   } else {
     this.actorHomeRefresh(index);
   }
+};
+
+const _Sprite_Battler_updateDamagePopup = Sprite_Battler.prototype.updateDamagePopup;
+Sprite_Battler.prototype.updateDamagePopup = function() {
+  this.setupStatePopup();
+  _Sprite_Battler_updateDamagePopup.call(this);
+};
+
+Sprite_Battler.prototype.setupStatePopup = function() {
+  if (this._battler.isStatePopupRequested()) {
+    if (this._battler.isSpriteVisible()) {
+      this.createStatePopupSprite();
+    }
+    this._battler.clearStatePopup();
+    this._battler.clearResult();
+  }
+};
+
+Sprite_Battler.prototype.createStatePopupSprite = function() {
+  const last = this._damages[this._damages.length - 1];
+  const sprite = new Sprite_BattleStylePopUp();
+  if (last) {
+    sprite.x = last.x + 8;
+    sprite.y = last.y - 16;
+  } else {
+    sprite.x = this.x + this.damageOffsetX();
+    sprite.y = this.y + this.damageOffsetY();
+  }
+  sprite.setup(this._battler);
+  this._damages.push(sprite);
+  this.parent.addChild(sprite);
 };
 
 const _Sprite_Battler_updateVisibility = Sprite_Battler.prototype.updateVisibility;
@@ -2025,4 +2184,75 @@ Spriteset_Battle.prototype.createBattleField = function() {
   this._effectsBackContainer = this._battleField;
 };
 
+
+function Sprite_BattleStylePopUp() {
+  this.initialize(...arguments);
+}
+
+Sprite_BattleStylePopUp.prototype = Object.create(Sprite_Damage.prototype);
+Sprite_BattleStylePopUp.prototype.constructor = Sprite_BattleStylePopUp;
+
+Sprite_BattleStylePopUp.prototype.initialize = function() {
+  Sprite_Damage.prototype.initialize.call(this);
+  
+};
+
+Sprite_BattleStylePopUp.prototype.setup = function(target) {
+  const result = target.result();
+  if (result.addState > 0) {
+    this.popUpState(result.addState, "add");
+  } else if (result.addBuff >= 0) {
+    this.popUpBuff(result.addBuff, "add");
+  } else if (result.removeState > 0) {
+    this.popUpState(result.removeState, "remove");
+  } else if (result.removeBuff >= 0) {
+    this.popUpBuff(result.removeBuff, "remove");
+  }
+};
+
+Sprite_BattleStylePopUp.prototype.popUpState = function(id, mode) {
+  const state = $dataStates[id];
+  const popUpName = state.meta.PopUpStateName ? state.meta.PopUpStateName : $dataStates[id].name;
+  if (state.meta.PopUpColor) {
+    this._colorType = state.meta.PopUpColor;
+  } else if (state.meta.PositiveState) {
+    this._colorType = param.StateColor;
+  } else if (state.meta.BatState) {
+    this._colorType = param.BatStateColor;
+  } else {
+    this._colorType = 0;
+  }
+  if (mode === "remove") {
+    this.opacity = 128;
+  }
+  this.createPopUp(popUpName);
+};
+
+Sprite_BattleStylePopUp.prototype.popUpBuff = function(id, mode) {
+  const find = param.PopUpBuff.find(buff => buff.StateType === id);
+  const popUpName = find.PopUpStateName ? find.PopUpStateName : (id < 10 ? TextManager.param(id) +"上昇" : TextManager.param(id - 10) +"低下");
+  if (find && find.PopUpStateColor) {
+    this._colorType = find.PopUpStateColor;
+  } else if (id < 10) {
+    this._colorType = param.StateColor;
+  } else if (id >= 10) {
+    this._colorType = param.BatStateColor;
+  } else {
+    this._colorType = 0;
+  }
+  if (mode === "remove") {
+    this.opacity = 128;
+  }
+  this.createPopUp(popUpName);
+};
+
+Sprite_BattleStylePopUp.prototype.damageColor = function() {
+  return ColorManager.textColor(this._colorType);
+};
+
+Sprite_BattleStylePopUp.prototype.createPopUp = function(popUpName) {
+  const sprite = this.createChildSprite(240, this.fontSize());
+  sprite.bitmap.drawText(popUpName, 0, 0, 240, this.fontSize(), "center");
+  sprite.dy = 0;
+};
 })();

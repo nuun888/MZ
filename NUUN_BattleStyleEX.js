@@ -11,35 +11,30 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.1.0
+ * @version 1.2.0
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
  * バトルスタイルを変更するには「NUUN_BattleStyleEX_Base」をこのプラグインよりも下に配置してください。
  * 
  * 
- * バトルスタイルに以下の機能を実装します。
- *   バトルレイアウトをデフォルト以外にMV、XPスタイルに変更できます。
- * 　アクターの立ち絵を表示できるようになります。
- * 　戦闘不能時やダメージを受けた時、瀕死、勝利、詠唱時、ステートにかかっている時に顔グラフィック、立ち絵を変更可能
- * 　フロントビューでもアクター側にアニメーション、ダメージエフェクト表示可能
- * 　パーティコマンド、アクターコマンドの位置を指定可能
- *   各ゲージ長やステータスの位置を設定可能
+ * 戦闘レイアウト及び一部仕様を変更、拡張します。
+ * 戦闘バトルスタイルをMZ標準の仕様以外にMV、XPスタイルに変更することが出来ます。
+ * いずれもフロントビューでのアクター側にエフェクトが表示可能です。
+ * ステート、バフの付与時、解除時にポップアップします。
+ * （エフェクト、ポップアップはフロントビューの場合はフロントビューエフェクト表示がtrueのときのみ表示されます）
+ * またバトルレイアウトは自由に配置可能です。（現在XPスタイルのみ対応しています）
+ * 各アクターステータスの名前、ステート、HP、MP、TP、TPBの位置やゲージの長さを変更できます。
  * 
  * 
- * 仕様
- * アクターステータスをコマンド非表示になった時に中央に移動しないように変更しています。
- * パーティコマンドは画面上部、画面上部からアクターステータス欄の中間、アクターステータス欄の上部
- * のいずれかから選択できます。TPBバトルでアクティブを選択している場合は、画面上部以外の選択を推奨いたします。
- * アクターコマンドは各アクターの上部に表示されます。
- * エネミーの座標によりダメージエフェクトがアクターのグラフィックに被り、表示が見えなくなる場合があります。
- * フロントビュー時のエフェクトはアクターのグラフィックの前面、アクターステータスの背面に表示されます。
+ * アクター画像はデフォルトで表示するアクター画像が指定されていない場合、標準の顔グラフィックが表示されます。
+ * また条件によりアクターグラフィック、顔グラが変化します。
+ * 戦闘不能、被ダメージ時、溺死、勝利、詠唱時、ステートにかかっている時に変化されることが出来ます。
+ * 戦闘不能は画像指定しない場合はアクター画像が消える設定になっていますので消さない設定にするには、戦闘不能時の画像をデフォルト画像と同じ、デフォルトインデックスと同じにするか「戦闘不能時アクター画像表示」をfalseに設定してください。
+ * 「立ち絵表示EX」NUUN_ActorPictureを導入することで状況により画像を設定している画像設定リストを変更することが出来ます。
+ * 特定のスイッチがONならばその条件に合う条件の画像設定リストが設定されます。
+ * スイッチ、武器、防具、ステート、条件式に対応しています。
  * 
- * 
- * 立ち絵を表示させたい場合は、プラグインパラメータから「アクターの画像設定」
- * を選択し、各アクターに表示させる画像を指定させてください。
- * デフォルトの画像が指定されてない場合は顔グラフィックが表示されます。
- * 戦闘不能時のアクター画像（顔グラ）を変えたくない場合（非表示）、同じ画像を（顔グラの場合はインデックス番号）を指定してください。
  * 
  * 顔グラフィックが８を超える場合は、複数の顔グラフィック画像を１つのファイルに結合してください。
  * （データベースのアクター設定の顔グラフィックでも反映されます）
@@ -64,13 +59,25 @@
  * エネミーの通常攻撃時、11番のアニメーションが再生されます。
  * 
  * ステートのメモ欄
+ * アクター画像変化機能
  * <ChangeImgId:1>
  * 被ステート時に顔グラまたは、グラフィック画像がID１の画像に変化します。
+ * 
+ * ポップアップ機能
+ * <PopUpStateName> ポップアップするステート名。無記入の場合はデータベースのステート名が表示されます。
+ * <PositiveState> このステートは良いステートと判定します。
+ * <BatState> このステートは悪いステートと判定します。
+ * <NoPopUp> ポップアップを表示しません。
+ * <AddNoPopUp> 付与時のポップアップを表示しません。
+ * <RemoveNoPopUp> 解除時のポップアップを表示しません。
+ * <PopUpColor:[colorIndex]> ポップアップ時の色を指定します。[colorIndex]:カラーインデックス番号　例：<PopUpColor:17>
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/5 Ver 1.2.0
+ * ステート、バフをポップアップする機能を追加。
  * 2021/4/4 Ver 1.1.0
  * バトルレイアウトをデフォルト以外にMV、XPスタイルを選択できる機能を追加。
  * 顔グラを表示させない機能を追加。
@@ -897,6 +904,30 @@
  * @default false
  * @parent ActorStateChangePosition
  * 
+ * @param PopUpSettings
+ * @text ポップアップ設定
+ * 
+ * @param PopUpBuff
+ * @text ポップアップバフ設定
+ * @desc ポップアップするバフの設定をします。
+ * @default ["{\"StateType\":\"0\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"1\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"2\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"3\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"4\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"5\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"6\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"7\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"10\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"11\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"12\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"13\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"14\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"15\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"16\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"17\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}"]
+ * @type struct<PopUpBuffList>[]
+ * @parent PopUpSettings
+ * 
+ * @param StateColor
+ * @desc 有利なポップアップするときのステート、バフの色
+ * @text 有利ステート、バフ文字色
+ * @type number
+ * @default 0
+ * @parent PopUpSettings
+ * 
+ * @param BatStateColor
+ * @desc 不利なポップアップするときのステート、バフの色
+ * @text 不利ステート、バフ文字色
+ * @type number
+ * @default 0
+ * @parent PopUpSettings
+ * 
  */
 /*~struct~actorsButlerList:
  * 
@@ -1097,6 +1128,72 @@
  * @default 1
  * @min 0
  * @max 9999
+ * 
+ */
+/*~struct~PopUpBuffList:
+ * 
+ * @param StateType
+ * @text アクターステータス表示方法
+ * @desc アクターステータスの表示方法を選択します。
+ * @type select
+ * @option HP上昇
+ * @value 0
+ * @option MP上昇
+ * @value 1
+ * @option 攻撃力上昇
+ * @value 2
+ * @option 防御力上昇
+ * @value 3
+ * @option 魔法力上昇
+ * @value 4
+ * @option 魔法防御上昇
+ * @value 5
+ * @option 敏捷性上昇
+ * @value 6
+ * @option 運上昇
+ * @value 7
+ * @option HP低下
+ * @value 10
+ * @option MP低下
+ * @value 11
+ * @option 攻撃力低下
+ * @value 12
+ * @option 防御力低下
+ * @value 13
+ * @option 魔法力低下
+ * @value 14
+ * @option 魔法防御低下
+ * @value 15
+ * @option 敏捷性低下
+ * @value 16
+ * @option 運低下
+ * @value 17
+ * @default 0
+ * 
+ * @param PopUpStateName
+ * @text ポップアップステート名
+ * @desc ポップアップするステート名です。記入がない場合はデフォルトのステート名が表示されます。
+ * @type string
+ * 
+ * @param StatePopUpMode
+ * @text ポップアップの表示
+ * @desc ポップアップの表示を選択します。
+ * @type select
+ * @option ポップアップする
+ * @value 0
+ * @option ポップアップしない
+ * @value 1
+ * @option 付与時のみポップアップしない
+ * @value 2
+ * @option 解除時のみポップアップしない
+ * @value 3
+ * @default 0
+ * 
+ * @param PopUpStateColor
+ * @desc ポップアップするときのステートの色
+ * @text 文字色
+ * @type number
+ * @default 0
  * 
  */
 

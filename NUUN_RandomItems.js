@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテムのランダム入手
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * アイテムをランダムで入手します。
@@ -30,7 +30,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2021/2/27 Ver.1.2.1
+ * 2021/4/4 Ver.1.2.2
+ * お金を入手したときでもアイコンIDを取得できるように変更。
+ * 2021/2/25 Ver.1.2.1
  * ゲーム変数代入時のマップ更新を１度しか行わないようにに修正。
  * 2021/2/25 Ver.1.2.0
  * 変数にアイテム名、アイコンインデックス、重みを代入する機能を追加。
@@ -80,6 +82,12 @@
  * @desc 取得アイテムの重みを格納する変数。
  * @text 取得アイテム重み変数
  * @type variable
+ * @default 0
+ * 
+ * @param MoneyIconID
+ * @desc お金取得時のアイコンID。
+ * @text お金取得時アイコンID変数
+ * @type number
  * @default 0
  * 
  */ 
@@ -150,6 +158,7 @@ Imported.NUUN_RandomItems = true;
   const ItemNameVar = Number(parameters['ItemNameVar'] || 0);
   const ItemIconIDVar = Number(parameters['ItemIconIDVar'] || 0);
   const WeightVar = Number(parameters['WeightVar'] || 0);
+  const MoneyIconID = Number(parameters['MoneyIconID'] || 0);
   let eventId = 0;
   
   const pluginName = "NUUN_RandomItems";
@@ -248,6 +257,7 @@ Imported.NUUN_RandomItems = true;
         } else if (list[i].itemType === 3 && list[i].GainMoney){
           getItem = {itemType: "money", deta: list[i].GainMoney, text: list[i].GetText};
           $gameVariables.setValueInRandomItem(ItemNameVar, list[i].GainMoney);
+          $gameVariables.setValueInRandomItem(ItemIconIDVar, MoneyIconID);
           $gameVariables.setValueInRandomItem(WeightVar, list[i].weight);
           $gameVariables.setValue(CommonListIdVar, i + 1);
           break;

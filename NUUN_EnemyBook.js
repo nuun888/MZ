@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -144,6 +144,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/8 Ver.1.2.2
+ * 耐性ステートで無効を反映した時にステート無効化が反映されない問題を修正。
  * 2021/4/1 Ver.1.2.1
  * 色相の異なるモンスターを連続で表示されると一瞬別の色相が反映されてしまう問題を修正。
  * 2021/3/31 Ver.1.2.0
@@ -2552,7 +2554,10 @@ Window_EnemyBook.prototype.drawResistStates = function(color, enemy, x, y, width
     if(State.StateId){
       let stateId = State.StateId;
       let rate = enemy.stateRate(stateId);
-      if(rate < 1 && param.ResistNoEffectState || (rate < 1 && rate > 0 && !param.ResistNoEffectState)){
+      if (param.ResistNoEffectState) {
+        rate *= enemy.isStateResist(stateId) ? 0 : 1;
+      }
+      if (rate < 1 && (param.ResistNoEffectState || (!param.ResistNoEffectState && rate > 0))) {
         let icon = $dataStates[stateId].iconIndex;
         if (icon && icon > 0) icons.push(icon);
       }

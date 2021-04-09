@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.2.2
+ * @version 1.3.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -54,16 +54,17 @@
  * 任意の背景画像が表示できますが、現在のバージョンでは戦闘中に表示したモンスター図鑑の背景画像は表示されません。
  * 
  * 
- * エネミーのメモ欄
+ * 敵キャラのメモ欄
  * <desc1:[text]> 記述欄１のテキスト
  * <desc2:[text]> 記述欄２のテキスト
  * <desc3:[text]> 記述欄３のテキスト
  * [text]:表示するテキスト。リストの記述欄を選択すると表示されます。（desc1だと記述欄１）
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
  * <NoBook>
- * エネミー図鑑に表示されません。
+ * モンスター図鑑に表示されません。
  * <ShowDataBook>
  * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
+ * 
  * スキル、アイテムのメモ欄
  * <AnalyzeSkill:1> このスキル、アイテムはアナライズスキルとし、「アナライズスキル設定」の１番の設定で発動します。
  * アイテムのメモ欄
@@ -74,6 +75,15 @@
  * %1:ターゲット名
  * %2:使用者名
  * 「%2はアナライズに失敗した。」の時、スキル使用者がリードの場合は「リードはアナライズに失敗した。」と表示されます。
+ * 
+ * モンスターの種類カテゴリーの設定
+ * モンスターを種類別に表示させることが出来ます。
+ * カテゴリーkeyはallを除いて任意の文字列で設定可能です。
+ * allを記入の場合は図鑑に登録される全てのモンスターが表示されます。
+ * 敵キャラのメモ欄
+ * <CategoryKey:[Key]> 表示するカテゴリーを設定します。
+ * <CategoryKey:[Key],[Key]....> 表示出来るカテゴリーは複数設定可能です。
+ * [Key]:カテゴリーKey([]は付けずにプラグインパラメータで設定した文字列を記入してください)
  * 
  * 追加項目の設定
  * 追加項目はリストの上から順に表示されます。
@@ -144,10 +154,12 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/10 Ver.1.3.0
+ * モンスターを種類毎に表示する機能を追加。
  * 2021/4/8 Ver.1.2.2
  * 耐性ステートで無効を反映した時にステート無効化が反映されない問題を修正。
  * 2021/4/1 Ver.1.2.1
- * 色相の異なるモンスターを連続で表示されると一瞬別の色相が反映されてしまう問題を修正。
+ * 色相の異なるモンスターを連続で表示すると一瞬別の色相が反映されてしまう問題を修正。
  * 2021/3/31 Ver.1.2.0
  * ドロップアイテム、スティールアイテムのWideModeをtrueにしたときにアイテムの表示を２列にする機能を追加。
  * 特定のドロップアイテムの確率表示を表示しない機能を追加。
@@ -490,6 +502,23 @@
  * @default ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}"]
  * @parent BasicSetting
  * 
+ * @param Category
+ * @text カテゴリー設定
+ * 
+ * @param CategoryOn
+ * @type boolean
+ * @default false
+ * @text モンスターカテゴリー表示
+ * @desc モンスターをカテゴリー毎に表示する。
+ * @parent Category
+ * 
+ * @param EnemyBookCategory
+ * @desc モンスターカテゴリーの設定をします。
+ * @text モンスターカテゴリー設定
+ * @type struct<BookCategoryList>[]
+ * @default ["{\"CategoryName\":\"全て\",\"CategoryKey\":\"all\"}","{\"CategoryName\":\"ボス\",\"CategoryKey\":\"boss\"}"]
+ * @parent Category
+ * 
  * @param BackGround
  * @text 背景設定
  * 
@@ -516,6 +545,13 @@
  * 
  * @param PercentWindow
  * @text 完成度ウィンドウ設定
+ * 
+ * @param PercentWindowVisible
+ * @type boolean
+ * @default true
+ * @text 完成度ウィンドウ表示
+ * @desc 完成度ウィンドウを表示する。
+ * @parent PercentWindow
  * 
  * @param completeName
  * @desc 完成度の名称。
@@ -1100,6 +1136,18 @@
  * 
  * 
  */
+/*~struct~BookCategoryList:
+ * 
+ * @param CategoryName
+ * @desc カテゴリー名を設定します。
+ * @text カテゴリー名
+ * @type string
+ * 
+ * @param CategoryKey
+ * @desc カテゴリーのKeyを設定します。(all:全て表示)
+ * @text カテゴリーKey
+ * @type string
+ */
 var Imported = Imported || {};
 Imported.NUUN_EnemyBook = true;
 
@@ -1633,18 +1681,51 @@ Scene_EnemyBook.prototype.create = function() {
   this.createIndexWindow();
   this.createEnemyWindow();
   this.createEnemyBookButton();
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this.createCategoryNameWindow();
+    this.createCategoryWindow();
+    this.enemyCategorySelection();
+  } else {
+    this.enemyIndexSelection();
+  }
 };
 
 Scene_EnemyBook.prototype.createIndexWindow = function() {
   const rect = this.indexWindowRect();
   this._indexWindow = new Window_EnemyBook_Index(rect);
-  this._indexWindow.setHandler("cancel", this.popScene.bind(this));
+  this._indexWindow.setHandler("cancel", this.onEnemyIndexCancel.bind(this));
   this.addWindow(this._indexWindow);
   this._indexWindow.setPercentWindow(this._percentWindow);
   this._indexWindow.activate();
+  this._indexWindow.hide();
   if (param.BackGroundImg) {
     this._indexWindow.opacity = 0;
     this._indexWindow.frameVisible = false;
+  }
+};
+
+Scene_EnemyBook.prototype.createCategoryNameWindow = function() {
+  const rect = this.categoryNameWindowRect();
+  this._categoryNameWindow = new Window_EnemyBook_CategoryName(rect);
+  this.addWindow(this._categoryNameWindow);
+  if (param.BackGroundImg) {
+    this._categoryNameWindow.opacity = 0;
+    this._categoryNameWindow.frameVisible = false;
+  }
+};
+
+Scene_EnemyBook.prototype.createCategoryWindow = function() {
+  const rect = this.indexWindowRect();
+  this._categoryWindow = new Window_EnemyBook_Category(rect);
+  this._categoryWindow.setHandler("cancel", this.popScene.bind(this));
+  this._categoryWindow.setHandler("ok", this.onCategoryOk.bind(this));
+  this.addWindow(this._categoryWindow);
+  this._categoryWindow.hide();
+  this._indexWindow.setCategoryWindow(this._categoryWindow);
+  this._categoryNameWindow.setCategoryWindow(this._categoryWindow);
+  if (param.BackGroundImg) {
+    this._categoryWindow.opacity = 0;
+    this._categoryWindow.frameVisible = false;
   }
 };
 
@@ -1694,6 +1775,16 @@ Scene_EnemyBook.prototype.enemyWindowRect = function() {
   return new Rectangle(wx, wy, ww, wh);
 };
 
+Scene_EnemyBook.prototype.categoryNameWindowRect = function() {
+  const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
+  const wy = this.mainAreaTop() + this._percentWindow.height;
+  const ww = Graphics.boxWidth / 3;
+  const wh = this.calcWindowHeight(1, true);
+  this._indexWindow.y += wh;
+  this._indexWindow.height -= wh;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
 Scene_EnemyBook.prototype.enemyWindowWidth = function() {
   return Graphics.boxWidth - Graphics.boxWidth / 3;
 };
@@ -1719,16 +1810,20 @@ Scene_EnemyBook.prototype.createEnemyBookButton = function() {
 };
 
 Scene_EnemyBook.prototype.updateContentsPagedown = function() {
-  SoundManager.playCursor();
   const maxPage = this.setMaxPage();
+  if (maxPage > 1) {
+    SoundManager.playCursor();
+  }
   this._enemyWindow._pageMode = (this._enemyWindow._pageMode + 1) % maxPage;
   this._enemyWindow.refresh();
   this._indexWindow.activate();
 };
 
 Scene_EnemyBook.prototype.updateContentsPageup = function() {
-  SoundManager.playCursor();
   const maxPage = this.setMaxPage();
+  if (maxPage > 1) {
+    SoundManager.playCursor();
+  }
   this._enemyWindow._pageMode = (this._enemyWindow._pageMode + (maxPage - 1)) % maxPage;
   this._enemyWindow.refresh();
 	this._indexWindow.activate();
@@ -1753,9 +1848,9 @@ Scene_EnemyBook.prototype.createBackground = function() {
 
 Scene_EnemyBook.prototype.update = function() {
   Scene_MenuBase.prototype.update.call(this);
-  if (Input.isTriggered('left')) {
+  if (Input.isTriggered('left') && this._indexWindow.active) {
 		this.updateContentsPageup();
-	} else if (Input.isTriggered('right')){
+	} else if (Input.isTriggered('right') && this._indexWindow.active){
 		this.updateContentsPagedown();
 	}
   if (param.BackGroundImg) {
@@ -1768,6 +1863,40 @@ Scene_EnemyBook.prototype.update = function() {
       sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
     }
 	}
+};
+
+Scene_EnemyBook.prototype.onEnemyIndexCancel = function() {
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this.enemyCategorySelection();
+  } else {
+    this.popScene();
+  }
+};
+
+Scene_EnemyBook.prototype.onCategoryOk = function() {
+  this.enemyIndexSelection();
+  this._indexWindow.setCategory();
+  this._indexWindow.refresh();
+};
+
+Scene_EnemyBook.prototype.enemyIndexSelection = function() {
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this._categoryWindow.hide();
+    this._categoryWindow.deselect();
+    this._categoryWindow.deactivate();
+    this._categoryNameWindow.setName(this._categoryWindow.index());
+  }
+  this._indexWindow.show();
+  this._indexWindow.activate();
+};
+
+Scene_EnemyBook.prototype.enemyCategorySelection = function() {
+  this._categoryWindow.setSelect();
+  this._categoryWindow.show();
+  this._indexWindow.hide();
+  this._categoryWindow.activate();
+  this._indexWindow.deselect();
+  this._indexWindow.deactivate();
 };
 
 
@@ -1836,6 +1965,91 @@ Window_EnemyBook_Percent.prototype.updateInterval = function() {
   }
 };
 
+//Window_EnemyBook_CategoryName
+function Window_EnemyBook_CategoryName() {
+  this.initialize(...arguments);
+}
+
+Window_EnemyBook_CategoryName.prototype = Object.create(Window_Selectable.prototype);
+Window_EnemyBook_CategoryName.prototype.constructor = Window_EnemyBook_CategoryName;
+
+Window_EnemyBook_CategoryName.prototype.initialize = function(rect) {
+  Window_Selectable.prototype.initialize.call(this, rect);
+  this._categoryName = null;
+  this.refresh();
+};
+
+Window_EnemyBook_CategoryName.prototype.setName = function() {
+  const name = this._categoryWindow._categoryList[this._categoryWindow._categorySelect].CategoryName;
+  this._categoryName = name;
+  this.refresh();
+};
+
+Window_EnemyBook_CategoryName.prototype.refresh = function() {
+  const rect = this.itemLineRect(0);
+  this.contents.clear();
+  this.drawText(this._categoryName, rect.x, rect.y, rect.width);
+};
+
+Window_EnemyBook_CategoryName.prototype.setCategoryWindow = function(categoryWindow) {
+  this._categoryWindow = categoryWindow;
+};
+
+
+//Window_EnemyBook_Category
+function Window_EnemyBook_Category() {
+  this.initialize(...arguments);
+}
+
+Window_EnemyBook_Category.prototype = Object.create(Window_Selectable.prototype);
+Window_EnemyBook_Category.prototype.constructor = Window_EnemyBook_Category;
+
+Window_EnemyBook_Category.prototype.initialize = function(rect) {
+  Window_Selectable.prototype.initialize.call(this, rect);
+  this._categoryList = param.EnemyBookCategory;
+  this._categorySelect = 0;
+  this.select(this._categorySelect);
+  this.refresh();
+};
+
+Window_EnemyBook_Category.prototype.maxCols = function() {
+  return 1;
+};
+
+Window_EnemyBook_Category.prototype.maxItems = function() {
+  return this._categoryList.length;
+};
+
+Window_EnemyBook_Category.prototype.processOk = function() {
+  this._categorySelect = this.index();
+  Window_Selectable.prototype.processOk.call(this);
+};
+
+Window_EnemyBook_Category.prototype.getDate = function(index) {
+  return this._categoryList[index];
+};
+
+Window_EnemyBook_Category.prototype.drawItem = function(index) {
+  const rect = this.itemLineRect(index);
+  const categoryName = this._categoryList[index].CategoryName;
+  this.drawText(categoryName, rect.x, rect.y, rect.width);
+};
+
+Window_EnemyBook_Category.prototype.setSelect = function() {
+  this.select(this._categorySelect);
+};
+
+Window_EnemyBook_Category.prototype.processCancel = function() {
+  this._categorySelect = this.index();
+  Window_Selectable.prototype.processCancel.call(this);
+};
+
+
+Window_EnemyBook_Category.prototype.drawItemBackground = function(index) {
+  if(!param.NoCursorBackground) {
+    Window_Selectable.prototype.drawItemBackground.call(this, index);
+  }
+};
 
 //Window_EnemyBook_Index
 function Window_EnemyBook_Index() {
@@ -1851,15 +2065,25 @@ Window_EnemyBook_Index._lastIndex = 0;
 Window_EnemyBook_Index.prototype.initialize = function(rect) {
   Window_Selectable.prototype.initialize.call(this, rect);
   this._enemyList = [];
+  this._category = null;
   this.refresh();
+};
+
+Window_EnemyBook_Index.prototype.setSelect = function() {
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    Window_EnemyBook_Index._lastIndex = this.maxItems() > 0 ? Math.min(Window_EnemyBook_Index._lastIndex, this.maxItems() - 1) : 0;
+  }
+  if (Window_EnemyBook_Index._lastTopRow + this.maxPageRows() - 1 < Window_EnemyBook_Index._lastIndex) {
+    Window_EnemyBook_Index._lastTopRow += 1;
+  }
   this.setTopRow(Window_EnemyBook_Index._lastTopRow);
   this.select(Window_EnemyBook_Index._lastIndex);
 };
 
 Window_EnemyBook_Index.prototype.processCancel = function() {
-  Window_Selectable.prototype.processCancel.call(this);
   Window_EnemyBook_Index._lastTopRow = this.topRow();
   Window_EnemyBook_Index._lastIndex = this.index();
+  Window_Selectable.prototype.processCancel.call(this);
 };
 
 Window_EnemyBook_Index.prototype.maxCols = function() {
@@ -1882,7 +2106,7 @@ Window_EnemyBook_Index.prototype.select = function(index) {
 
 Window_EnemyBook_Index.prototype.updatePercent = function() {
   if (this._percentWindow) {
-    const enemy = this._enemyList;
+    const enemy = this._enemyPercentList;
     this._percentWindow.percentRefresh(enemy);
   }
 };
@@ -1907,16 +2131,45 @@ Window_EnemyBook_Index.prototype.setEnemyWindow = function(enemyWindow) {
   this._enemyWindow = enemyWindow;
 };
 
+Window_EnemyBook_Index.prototype.setCategoryWindow = function(categoryWindow) {
+  this._categoryWindow = categoryWindow;
+};
+
+Window_EnemyBook_Index.prototype.setCategory = function() {
+  const index = this._categoryWindow._categorySelect;
+  this._category = this._categoryWindow.getDate(index);
+};
+
 Window_EnemyBook_Index.prototype.enemyAt = function(index) {
   return this._enemyList && index >= 0 ? this._enemyList[index] : null;
 };
 
 Window_EnemyBook_Index.prototype.makeEnemyList = function() {
+  this._enemyPercentList = [];
+  this._listIndex = 0;
+  this._listEnemy = [];
   this._enemyList = $dataEnemies.filter(enemy => this.includes(enemy));
 };
 
 Window_EnemyBook_Index.prototype.includes = function(enemy) {
-  return enemy && enemy.name && !enemy.meta.NoBook;
+  const result = enemy && enemy.name && !enemy.meta.NoBook;
+  if (result) {
+    this._listIndex++;
+    this._enemyPercentList.push(enemy);
+  }
+  if (result && this.categoryIncludes(enemy)) {
+    this._listEnemy.push(this._listIndex);
+    return true;
+  }
+  return false;
+};
+
+Window_EnemyBook_Index.prototype.categoryIncludes = function(enemy) { 
+  if (!this._category || this._category.CategoryKey === "all") {
+    return true;
+  }
+  const enemyCategory = enemy.meta.CategoryKey ? enemy.meta.CategoryKey.split(',') : ["all"];
+  return enemyCategory.find(category => category === this._category.CategoryKey);
 };
 
 Window_EnemyBook_Index.prototype.drawItem = function(index) {
@@ -1930,14 +2183,14 @@ Window_EnemyBook_Index.prototype.drawItem = function(index) {
       name = this.unknownDataLength(enemy);
     }
     if(param.NumberType > 0) {
-      let numberText = index += 1;
+      let numberText = this._listEnemy[index];
       const textWidth = this.numberWidth(numberText);
       if (param.NumberType === 2) {
         numberText = this.numberWidthSlice(numberText);
       }
       this.drawText(numberText, rect.x, rect.y, textWidth);
       this.drawText(":", rect.x + textWidth + 6, rect.y);
-      this.drawText(name, rect.x + textWidth + 16, rect.y, rect.width - textWidth - 16);
+      this.drawText(name, rect.x + textWidth + 22, rect.y, rect.width - textWidth - 22);
     } else {
       this.drawText(name, rect.x, rect.y, rect.width);
     }
@@ -1953,16 +2206,12 @@ Window_EnemyBook_Index.prototype.numberWidthSlice = function(indexText) {
 };
 
 Window_EnemyBook_Index.prototype.unknownDataLength = function(enemy) {
-  let name = '';
   if(param.UnknownData === '？' || param.UnknownData === '?') {
     const name_length = this.EnemyNameLength(enemy);
-    for(let i = 0; i < name_length ;i++) {
-      name += param.UnknownData;
-    }
+    return param.UnknownData.repeat(name_length);
   } else {
-    name = param.UnknownData;
+    return param.UnknownData;
   }
-  return name;
 };
 
 Window_EnemyBook_Index.prototype.EnemyNameLength = function(enemy) {
@@ -1978,8 +2227,10 @@ Window_EnemyBook_Index.prototype.drawItemBackground = function(index) {
 Window_EnemyBook_Index.prototype.refresh = function() {
   this.makeEnemyList();
   this.updatePercent();
+  this.setSelect();
   Window_Selectable.prototype.refresh.call(this);
 };
+
 
 //Window_EnemyBook
 function Window_EnemyBook() {
@@ -2074,6 +2325,8 @@ Window_EnemyBook.prototype.statusLineHeight = function() {
 
 Window_EnemyBook.prototype.refresh = function() {
   if(!this._enemy) {
+    this.contents.clear();
+    this._enemySprite.bitmap = null;
     return;
   }
   let enemy = null;
@@ -2093,17 +2346,16 @@ Window_EnemyBook.prototype.refresh = function() {
   let y = 0;
   const lineHeight = this.lineHeight();
   this.contents.clear();
+  this._enemySprite.bitmap = null;
   if ($gameParty.inBattle()) {
     this.removeGauge();
   }
   if (this._bookMode === 0) {//通常モード
     if (!enemy || !$gameSystem.isInEnemyBook(this._enemy)) {
-      this._enemySprite.bitmap = null;
       return;
     }
   } else {//アナライズモード
     if (!enemy) {
-      this._enemySprite.bitmap = null;
       return;
     }
   }
@@ -2230,6 +2482,11 @@ Window_EnemyBook.prototype.pageList = function(page) {
 };
 
 Window_EnemyBook.prototype.enemyImg = function(enemy) {
+  //if (enemy.enemy().meta.SVBattler) {
+
+  //} else {
+
+  //}
   const name = this.enemyBattlerName(enemy);
 	let bitmap;
   	if ($gameSystem.isSideView()) {
@@ -2748,12 +3005,12 @@ Window_EnemyBook.prototype.nameLength = function(name) {
 };
 
 Window_EnemyBook.prototype.unknownDataLength = function(name) {
-  const name_length = this.nameLength(name);
-  let names = '';
-  for(let i = 0; i < name_length ;i++) {
-    names += param.UnknownData;
+  if(param.UnknownData === '？' || param.UnknownData === '?') {
+    const name_length = this.nameLength(name);
+    return param.UnknownData.repeat(name_length);
+  } else {
+    return param.UnknownData;
   }
-  return names;
 };
 
 Window_EnemyBook.prototype.iconX = function(icons, width) {
@@ -2818,6 +3075,10 @@ Scene_Battle.prototype.createEnemyBookWindow = function() {
   this.createEnemyBookIndexWindow();
   this.createEnemyBookEnemyWindow();
   this.createEnemyBookButton();
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this.createEnemyBookCategoryNameWindow();
+    this.createEnemyBookCategoryWindow();
+  }
 };
 
 Scene_Battle.prototype.createEnemyBookPercentWindow = function() {
@@ -2828,10 +3089,29 @@ Scene_Battle.prototype.createEnemyBookPercentWindow = function() {
   this._enemyBookPercentWindow.openness = 0;
 };
 
+Scene_Battle.prototype.createEnemyBookCategoryNameWindow = function() {
+  const rect = this.enemyBookCategoryNameWindowRect();
+  this._enemyBookCategoryNameWindow = new Window_EnemyBook_CategoryName(rect);
+  this.addWindow(this._enemyBookCategoryNameWindow);
+  this._enemyBookCategoryNameWindow.hide();
+};
+
+Scene_Battle.prototype.createEnemyBookCategoryWindow = function() {
+  const rect = this.enemyBookIndexWindowRect();
+  this._enemyBookCategoryWindow = new Window_EnemyBook_Category(rect);
+  this._enemyBookCategoryWindow.setHandler("cancel",this.cancelEnemyBook.bind(this));
+  this._enemyBookCategoryWindow.setHandler("ok", this.onEnemyBookCategoryOk.bind(this));
+  this.addWindow(this._enemyBookCategoryWindow);
+  this._enemyBookCategoryWindow.hide();
+  this._enemyBookIndexWindow.setCategoryWindow(this._enemyBookCategoryWindow);
+  this._enemyBookCategoryNameWindow.setCategoryWindow(this._enemyBookCategoryWindow);
+  this._enemyBookCategoryWindow.openness = 0;
+};
+
 Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
   const rect = this.enemyBookIndexWindowRect();
   this._enemyBookIndexWindow = new Window_EnemyBook_Index(rect);
-  this._enemyBookIndexWindow.setHandler("cancel", this.cancelEnemyBook.bind(this));
+  this._enemyBookIndexWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
   this.addWindow(this._enemyBookIndexWindow);
   this._enemyBookIndexWindow.setPercentWindow(this._enemyBookPercentWindow);
   this._enemyBookIndexWindow.hide();
@@ -2887,6 +3167,16 @@ Scene_Battle.prototype.enemyBookWindowRect = function() {
   return new Rectangle(wx, wy, ww, wh);
 };
 
+Scene_Battle.prototype.enemyBookCategoryNameWindowRect = function() {
+  const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
+  const wy = this.enemyBookMainAreaTop() + this._enemyBookPercentWindow.height;
+  const ww = Graphics.boxWidth / 3;
+  const wh = this.calcWindowHeight(1, true);
+  this._enemyBookIndexWindow.y += wh;
+  this._enemyBookIndexWindow.height -= wh;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
 Scene_Battle.prototype.enemyBookWindowWidth = function() {
   return Graphics.boxWidth - Graphics.boxWidth / 3;
 };
@@ -2913,16 +3203,17 @@ Scene_Battle.prototype.updateVisibility = function() {
 };
 
 Scene_Battle.prototype.commandEnemyBook = function() {
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this.enemyBookCategorySelection();
+  } else {
+    this.enemyBookIndexSelection();
+  }
   this._enemyBookEnemyWindow._bookMode = 0;
   this._enemyBookEnemyWindow.x = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
-  this._enemyBookIndexWindow.activate();
-  this._enemyBookIndexWindow.show();
-  this._enemyBookIndexWindow.open();
   this._enemyBookPercentWindow.show();
   this._enemyBookPercentWindow.open();
   this._enemyBookEnemyWindow.show();
   this._enemyBookEnemyWindow.open();
-  this._enemyBookIndexWindow.refresh();
   this._enemyBookEnemyWindow.refresh();
 };
 
@@ -2932,6 +3223,9 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
   this._enemyBookPercentWindow.close();
   this._enemyBookEnemyWindow.close();
   this._enemyBookDummyWindow.close();
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this._enemyBookCategoryWindow.close();
+  }
   //this._enemyBookIndexWindow.hide();
   //this._enemyBookPercentWindow.hide();
   //this._enemyBookEnemyWindow.hide();
@@ -3038,7 +3332,7 @@ Scene_Battle.prototype.updateCancelButton = function() {
 const _Scene_Battle_buttonY = Scene_Battle.prototype.buttonY;
 Scene_Battle.prototype.buttonY = function() {
   const y = _Scene_Battle_buttonY.call(this);
-  if (this._enemyBookIndexWindow && this._enemyBookIndexWindow.active) {
+  if ((this._enemyBookIndexWindow && this._enemyBookIndexWindow.active) || (this._enemyBookCategoryWindow && this._enemyBookCategoryWindow.active)) {
     return y - this._helpWindow.height;
   }
   return y;
@@ -3046,13 +3340,17 @@ Scene_Battle.prototype.buttonY = function() {
 
 const _Scene_Battle_isAnyInputWindowActive  = Scene_Battle.prototype.isAnyInputWindowActive;
 Scene_Battle.prototype.isAnyInputWindowActive = function() {
-  return this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active ||_Scene_Battle_isAnyInputWindowActive.call(this);
+  return this._enemyBookIndexWindow.active || this._enemyBookDummyWindow.active || (this._enemyBookCategoryWindow && this._enemyBookCategoryWindow.active) || _Scene_Battle_isAnyInputWindowActive.call(this);
 };
 
 
 const _Scene_Battle_isTimeActive = Scene_Battle.prototype.isTimeActive;
 Scene_Battle.prototype.isTimeActive = function() {
-  return !this._enemyBookIndexWindow.active && !this._enemyBookDummyWindow.active && _Scene_Battle_isTimeActive.call(this);
+  const result = !this._enemyBookIndexWindow.active && !this._enemyBookDummyWindow.active &&  _Scene_Battle_isTimeActive.call(this);
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    return result && (this._enemyBookCategoryWindow && !this._enemyBookCategoryWindow.active);
+  }
+  return result;
 };
 
 Scene_Battle.prototype.enemyBookMainAreaTop = function() {
@@ -3073,6 +3371,46 @@ Scene_Battle.prototype.userWindowDeactivate = function() {//暫定競合対策
   }
 };
 
+Scene_Battle.prototype.onEnemyBookIndexCancel = function() {
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this.enemyBookCategorySelection();
+  } else {
+    this.cancelEnemyBook();
+  }
+};
+
+Scene_Battle.prototype.onEnemyBookCategoryOk = function() {
+  this.enemyBookIndexSelection();
+  this._enemyBookIndexWindow.setCategory();
+  this._enemyBookIndexWindow.refresh();
+};
+
+Scene_Battle.prototype.enemyBookIndexSelection = function() {
+  this._enemyBookIndexWindow.show();
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this._enemyBookCategoryWindow.hide();
+    this._enemyBookCategoryNameWindow.show();
+    this._enemyBookCategoryWindow.deselect();
+    this._enemyBookCategoryWindow.deactivate();
+    this._enemyBookCategoryNameWindow.setName(this._enemyBookCategoryWindow.index());
+    this._enemyBookIndexWindow.openness = 255;
+  }
+  this._enemyBookIndexWindow.open();
+  this._enemyBookIndexWindow.activate();
+};
+
+Scene_Battle.prototype.enemyBookCategorySelection = function() {
+  this._enemyBookCategoryWindow.setSelect();
+  this._enemyBookCategoryWindow.show();
+  this._enemyBookCategoryWindow.open();
+  this._enemyBookCategoryNameWindow.hide();
+  this._enemyBookIndexWindow.hide();
+  this._enemyBookCategoryWindow.activate();
+  this._enemyBookIndexWindow.deselect();
+  this._enemyBookIndexWindow.deactivate();
+};
+
+
 const _Window_Selectable_initialize = Window_Selectable.prototype.initialize;
 Window_Selectable.prototype.initialize = function(rect) {
   _Window_Selectable_initialize.call(this, rect);
@@ -3088,7 +3426,7 @@ Window_Selectable.prototype.isOpenAndActive = function() {
 };
 
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
-Window_PartyCommand.prototype.makeCommandList = function() {//enemyBookBattleSwitch
+Window_PartyCommand.prototype.makeCommandList = function() {
   _Window_PartyCommand_makeCommandList.call(this);
   if (param.ShowBattleCommand && ($gameSwitches.value(param.enemyBookBattleSwitch) || param.enemyBookBattleSwitch === 0)) {
     this.addCommand(param.CommandName, "enemyBook");
@@ -3152,4 +3490,3 @@ Window_BattleLog.prototype.displayMiss = function(target) {
 };
 
 })();
-//1.3.0 種族別カテゴリー　戦闘時背景予定

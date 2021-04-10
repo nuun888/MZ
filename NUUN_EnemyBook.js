@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.3.0
+ * @version 1.4.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -64,6 +64,10 @@
  * モンスター図鑑に表示されません。
  * <ShowDataBook>
  * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
+ * <EB_SVBattler:[fileName]> モンスター画像をサイドビュー画像で表示させます。(モンスターにサイドビューアクターを表示する系のプラグイン導入が前提としています)
+ * [fileName]:サイドビューバトラー画像を指定します。sv_actorsフォルダ内のファイル名を拡張子なしで指定してください。
+ * <EB_SVBattlerMotion:[motionId]> 指定したモーションで表示させます。記入なしの場合は0のモーションで表示されます。
+ * [motionId]:モーションID
  * 
  * スキル、アイテムのメモ欄
  * <AnalyzeSkill:1> このスキル、アイテムはアナライズスキルとし、「アナライズスキル設定」の１番の設定で発動します。
@@ -154,6 +158,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/11 Ver.1.4.0
+ * サイドビューアクターを表示する機能を追加。
  * 2021/4/10 Ver.1.3.0
  * モンスターを種類毎に表示する機能を追加。
  * 2021/4/8 Ver.1.2.2
@@ -500,6 +506,13 @@
  * @text アナライズスキル設定
  * @type struct<AnalyzeSkill>[]
  * @default ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}"]
+ * @parent BasicSetting
+ * 
+ * @param SVEnemyMirror
+ * @type boolean
+ * @default true
+ * @text サイドビューバトラー反転
+ * @desc サイドビューバトラーを表示時、画像を反転させる。
  * @parent BasicSetting
  * 
  * @param Category
@@ -2248,12 +2261,7 @@ Window_EnemyBook.prototype.initialize = function(rect) {
   this._enemy = null;
   this._enemyData = [];
   this._pageMode = 0;
-  this._enemySprite = new Sprite();
-  this._enemySprite.anchor.x = 0.5;
-  this._enemySprite.anchor.y = 0.5;
-  this._enemySprite.x = rect.width / 4;
-  this._enemySprite.y = rect.height / 4 + this.lineHeight();
-  this._enemySprite.hide();
+  this._enemySprite = new Sprite_BookEnemy();
   this.selectEnemy = null;
   this._AnalyzeStatus = null;
   this.addChildToBack(this._enemySprite);
@@ -2347,6 +2355,7 @@ Window_EnemyBook.prototype.refresh = function() {
   const lineHeight = this.lineHeight();
   this.contents.clear();
   this._enemySprite.bitmap = null;
+  this._enemySprite._svEnemy = false;
   if ($gameParty.inBattle()) {
     this.removeGauge();
   }
@@ -2482,50 +2491,8 @@ Window_EnemyBook.prototype.pageList = function(page) {
 };
 
 Window_EnemyBook.prototype.enemyImg = function(enemy) {
-  //if (enemy.enemy().meta.SVBattler) {
-
-  //} else {
-
-  //}
-  const name = this.enemyBattlerName(enemy);
-	let bitmap;
-  	if ($gameSystem.isSideView()) {
-      	bitmap = ImageManager.loadSvEnemy(name);
-  	} else {
-      	bitmap = ImageManager.loadEnemy(name);
-    }
-    this._enemySprite.bitmap = bitmap;
-    this._enemySprite.show();
-    if (bitmap && !bitmap.isReady()) {
-      bitmap.addLoadListener(this.drowEnemy.bind(this, enemy));
-    } else {
-      this.drowEnemy(enemy);
-    }
-};
-
-Window_EnemyBook.prototype.drowEnemy = function(enemy) {
-  if(this._enemySprite.bitmap) {
-    const hue = enemy.battlerHue();
-    Sprite_Battler.prototype.setHue.call(this._enemySprite, hue);
-    const bitmapWidth = this._enemySprite.bitmap.width;
-    const bitmapHeight = this._enemySprite.bitmap.height;
-    const contentsWidth = this.maxWidth();
-    const contentsHeight = 350;
-    let scale = 1.0;
-    if (bitmapWidth > contentsWidth || bitmapHeight > contentsHeight) {
-		  if (bitmapWidth - contentsWidth > bitmapHeight - contentsHeight) {
-			  scale = contentsWidth / bitmapWidth;
-		  } else {
-		  	scale = contentsHeight / bitmapHeight;
-		  }
-    }
-  	this._enemySprite.scale.x = scale;
-  	this._enemySprite.scale.y = scale;
-  }
-};
-
-Window_EnemyBook.prototype.enemyBattlerName = function(enemy) {
-	return enemy.battlerName();
+  this._enemySprite.setMaxWidth(this.maxWidth());
+  this._enemySprite.setup(enemy, Math.floor(this.width / 4), Math.floor(this.height / 4) + this.lineHeight());
 };
 
 Window_EnemyBook.prototype.enemyName = function(enemy, x, y) {
@@ -3236,6 +3203,7 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
     this._enemyBookIndexWindow.deactivate();
     this._enemyBookEnemyWindow.selectEnemy = null;
   } else {
+    this._enemyBookEnemyWindow.setEnemy(null);
     this._enemyBookDummyWindow.deactivate();
   }
   openAnalyze = false;
@@ -3489,4 +3457,133 @@ Window_BattleLog.prototype.displayMiss = function(target) {
   }
 };
 
+
+function Sprite_BookEnemy() {
+  this.initialize(...arguments);
+}
+
+Sprite_BookEnemy.prototype = Object.create(Sprite.prototype);
+Sprite_BookEnemy.prototype.constructor = Sprite_BookEnemy;
+
+Sprite_BookEnemy.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+};
+
+Sprite_BookEnemy.prototype.initMembers = function() {
+  this.anchor.x = 0.5;
+  this.anchor.y = 0.5;
+  this._battler = null;
+  this._svEnemy = false;
+  this.maxWidth = 0;
+  this.hide();
+};
+
+Sprite_BookEnemy.prototype.destroy = function(options) {
+  this.bitmap.destroy();
+  Sprite.prototype.destroy.call(this, options);
+};
+
+Sprite_BookEnemy.prototype.setup = function(battler, width, height) {
+  this._battler = battler;
+  this.x = width;
+  this.y = height;
+  this._svEnemy = battler.enemy().meta.EB_SVBattler;
+  this.refresh();
+};
+
+Sprite_BookEnemy.prototype.refresh = function() {
+  let bitmap = null;
+  if (this._svEnemy) {
+    const sv_name = this.enemySVBattlerName();
+    bitmap = ImageManager.loadSvActor(sv_name);
+  } else {
+    const name = this.enemyBattlerName();
+    if ($gameSystem.isSideView()) {
+      bitmap = ImageManager.loadSvEnemy(name);
+    } else {
+      bitmap = ImageManager.loadEnemy(name);
+    }
+  }
+  this.bitmap = bitmap;
+  this.show();
+  if (bitmap && !bitmap.isReady()) {
+    bitmap.addLoadListener(this.drawEnemy.bind(this));
+  } else {
+    this.drawEnemy();
+  }
+};
+
+Sprite_BookEnemy.prototype.drawEnemy = function() {
+  if (!this.bitmap) {
+    return;
+  }
+  if (this._svEnemy) {
+    this._pattern = 0;
+    this._motionCount = 0;
+    this.scale.x = param.SVEnemyMirror ? -1 : 1;
+    this.scale.y = 1;
+    this.setSvActor();
+  } else {
+    const hue = this._battler.battlerHue();
+    Sprite_Battler.prototype.setHue.call(this, hue);
+    const bitmapWidth = this.bitmap.width;
+    const bitmapHeight = this.bitmap.height;
+    const contentsWidth = this.maxWidth;
+    const contentsHeight = 350;
+    let scale = 1.0;
+    if (bitmapWidth > contentsWidth || bitmapHeight > contentsHeight) {
+      if (bitmapWidth - contentsWidth > bitmapHeight - contentsHeight) {
+        scale = contentsWidth / bitmapWidth;
+      } else {
+        scale = contentsHeight / bitmapHeight;
+      }
+    }
+    this.scale.x = scale;
+    this.scale.y = scale;
+    this.setFrame(0, 0, this.bitmap.width, this.bitmap.height);
+  }
+};
+
+Sprite_BookEnemy.prototype.update = function() {
+  if (this.bitmap && this._svEnemy) {
+    if (++this._motionCount >= this.motionSpeed()) {
+      this._pattern = (this._pattern + 1) % 4;
+      this.setSvActor();
+      this._motionCount = 0;
+    }
+  } else if (!this.bitmap && this._svEnemy) {
+    this._svEnemy = false;
+  }
+};
+
+Sprite_BookEnemy.prototype.setSvActor = function() {
+  const motionIndex = this._battler.enemy().meta.EB_SVBattlerMotion ? Number(this._battler.enemy().meta.EB_SVBattlerMotion) : 0;
+  const pattern = this._pattern < 3 ? this._pattern : 1;
+  const cw = this.bitmap.width / 9;
+  const ch = this.bitmap.height / 6;
+  const cx = Math.floor(motionIndex / 6) * 3 + pattern;
+  const cy = motionIndex % 6;
+  this.setFrame(cx * cw, cy * ch, cw, ch);
+};
+
+Sprite_BookEnemy.prototype.motionSpeed = function() {
+  return 12;
+};
+
+Sprite_BookEnemy.prototype.enemyBattlerName = function() {
+	return this._battler.battlerName();
+};
+
+Sprite_BookEnemy.prototype.enemySVBattlerName = function() {
+	return this._battler.enemy().meta.EB_SVBattler;
+};
+
+Sprite_BookEnemy.prototype.resetSVEnemy = function() {
+  this._svEnemy = false;
+};
+
+Sprite_BookEnemy.prototype.setMaxWidth = function(width) {
+  this.maxWidth = width;
+};
 })();

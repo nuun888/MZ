@@ -611,7 +611,7 @@
  * 
  * @param StatusFontSize
  * @desc レベルアップステータスのフォントサイズ。（メインフォントサイズからの差）
- * @text レベルアップのフォントサイズ
+ * @text レベルアップステータスフォントサイズ
  * @type number
  * @default 0
  * @min -100
@@ -1719,7 +1719,6 @@ Window_Result.prototype.drawActorStatus = function(x, y, width) {
   const lineHeight = this.lineHeight() + param.StatusFontSize;
   this.contents.fontSize = $gameSystem.mainFontSize() + param.StatusFontSize;
   const oldStatus = this.actorOldStatus[this.page - 1];
-  
   visibleStatus.forEach(status => {
     const name = this.paramName(status.StatusParamDate, status.OriginalParamName);
     const oldValue = this.paramOld(status.StatusParamDate, oldStatus);
@@ -1741,6 +1740,7 @@ Window_Result.prototype.drawActorStatus = function(x, y, width) {
     this.resetTextColor();
     y2 += lineHeight;
   });
+  this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_Result.prototype.currencyUnit = function() {

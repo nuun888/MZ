@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -158,6 +158,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/11 Ver.1.4.1
+ * 未登録のモンスターを選択した状態で図鑑を閉じた時にエラーが出る問題を修正。
  * 2021/4/11 Ver.1.4.0
  * サイドビューアクターを表示する機能を追加。
  * 2021/4/10 Ver.1.3.0
@@ -3480,7 +3482,9 @@ Sprite_BookEnemy.prototype.initMembers = function() {
 };
 
 Sprite_BookEnemy.prototype.destroy = function(options) {
-  this.bitmap.destroy();
+  if (this.bitmap) {
+    this.bitmap.destroy();
+  }
   Sprite.prototype.destroy.call(this, options);
 };
 
@@ -3488,7 +3492,7 @@ Sprite_BookEnemy.prototype.setup = function(battler, width, height) {
   this._battler = battler;
   this.x = width;
   this.y = height;
-  this._svEnemy = battler.enemy().meta.EB_SVBattler;
+  this._svEnemy = battler.enemy().meta.EB_SVBattler ? true : false;
   this.refresh();
 };
 

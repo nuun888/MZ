@@ -6,7 +6,27 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
+ */ 
+/*:
+ * @target MZ
+ * @plugindesc  エネミーTPBゲージ
+ * @author NUUN
+ * @version 1.1.3
+ * 
+ * @help
+ * エネミーにもTPBゲージを表示します。
+ * 
+ * エネミーのメモ欄
+ * <TPBGaugeX:[position]> TPBゲージのX座標を調整します。（相対座標）
+ * <TPBGaugeY:[position]> TPBゲージのY座標を調整します。（相対座標）
+ * 
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
+ * 
  * 更新履歴
+ * 2021/4/11 Ver.1.1.3
+ * モンスターにサイドビューアクター表示系のプラグインに対応。
+ * サイドビューアクターを指定したモンスターと戦闘を開始したときにエラーが出る問題を修正。
  * 2021/1/28 Ver.1.1.2
  * エネミーごとにX座標を調整できるように変更。
  * 2021/1/20 Ver.1.1.1
@@ -19,21 +39,6 @@
  * 少し修正。
  * 2021/1/16 Ver.1.0.0
  * 初版
- */ 
-/*:
- * @target MZ
- * @plugindesc  エネミーTPBゲージ
- * @author NUUN
- * 
- * @help
- * エネミーにもTPBゲージを表示します。
- * 
- * エネミーのメモ欄
- * <TPBGaugeX:[position]> TPBゲージのX座標を調整します。（相対座標）
- * <TPBGaugeY:[position]> TPBゲージのY座標を調整します。（相対座標）
- * 
- * 利用規約
- * このプラグインはMITライセンスで配布しています。
  * 
  * @param TpbPosition
  * @desc エネミーのTPBゲージ位置
@@ -135,7 +140,13 @@ Sprite_Enemy.prototype.updateTpbGauge = function() {
   this._enemyTpb.x = this.tpbGaugeOffsetX + (this.x - this._enemyTpb.width / 2);
   this._enemyTpb.y = this.tpbGaugeOffsetY + this.y - 40;
   if (TpbPosition === 0) {
-    this._enemyTpb.y -= Math.round((this.bitmap.height + 70) * 0.9);
+    if (this._SVBattlername) {
+      this._enemyTpb.y -= Math.round(((this._mainSprite.bitmap.height / 6) + 30) * 0.9);
+    } else if (this._svBattlerSprite) {
+      this._enemyTpb.y -= Math.round((this.height + 30) * 0.9);
+    } else {
+      this._enemyTpb.y -= Math.round((this.bitmap.height + 70) * 0.9);
+    }
   }
   if (this._enemyTpb.y < 0) {
       this._enemyTpb.y = 30;

@@ -1515,7 +1515,6 @@ Sprite_Battler.prototype.createStatePopupSprite = function() {
   sprite.x = this.x + this.damageOffsetX();
   sprite.y = this.y + this.damageOffsetY();
   if (last) {
-    console.log(param.PopUpUpdate)
     sprite.delay = this._damages.length * param.PopUpUpdate;
     sprite.hide();
   } else {

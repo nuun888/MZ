@@ -11,7 +11,8 @@
  * @target MZ
  * @plugindesc  リザルト
  * @author NUUN
- * @version 1.6.8
+ * @base NUUN_Base
+ * @version 1.7.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -73,6 +74,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/11 Ver.1.7.0
+ * レベルアップ画面のステータスを任意に表示できるように変更。
+ * レベルアップ画面のステータスとオリジナルパラメータの表示を統合。
  * 2021/3/25 Ver.1.6.8
  * ウィンドウのX座標をマイナスに設定できるように変更。
  * レベルアップ画面の背景画像が参照されないエラーを修正。
@@ -176,6 +180,28 @@
  * @param CommonSetting
  * @text 共通設定
  * 
+ * @param LineColor
+ * @desc ライン（線）の色。
+ * @text ライン（線）の色
+ * @type number
+ * @default 0
+ * @parent CommonSetting
+ * 
+ * @param Decimal
+ * @text 小数点桁数
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent CommonSetting
+ * 
+ * @param DecimalMode
+ * @text 端数処理四捨五入
+ * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
+ * @type boolean
+ * @default true
+ * @parent CommonSetting
+ * 
  * @param WindowSetting
  * @text ウィンドウ設定
  * @parent CommonSetting
@@ -266,27 +292,6 @@
  * @min -1
  * @parent ButtonSetting
  * 
- * @param LineColor
- * @desc ライン（線）の色。
- * @text ライン（線）の色
- * @type number
- * @default 0
- * @parent CommonSetting
- * 
- * @param Decimal
- * @text 小数点桁数
- * @desc 表示出来る小数点桁数。
- * @type number
- * @default 0
- * @min 0
- * @parent CommonSetting
- * 
- * @param DecimalMode
- * @text 端数処理四捨五入
- * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
- * @type boolean
- * @default true
- * @parent CommonSetting
  * 
  * @param GetPage
  * @text 入手画面設定
@@ -538,9 +543,30 @@
  * @param LevelUpPage
  * @text レベルアップ画面設定
  * 
+ * @param ActorPageRefreshFrame
+ * @desc ページ切り替えまでの待機フレーム
+ * @text 待機フレーム
+ * @type number
+ * @default 0
+ * @parent LevelUpPage
+ * 
+ * @param ActorBackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
+ * @type file
+ * @dir img/nuun_background
+ * @parent LevelUpPage
+ * 
  * @param ActorImg
  * @text アクター画像設定
  * @parent LevelUpPage
+ * 
+ * @param FaceVisible
+ * @type boolean
+ * @default true
+ * @text 顔グラ表示
+ * @desc 顔グラを表示します。
+ * @parent ActorImg
  * 
  * @param ButlerActors
  * @text 表示アクター設定
@@ -576,50 +602,19 @@
  * @default 24
  * @parent LevelUpPage
  * 
- * @param ActorOriginalSetting
- * @text 独自パラメータ設定
+ * @param VisibleStatus
+ * @text ステータスの設定
+ * @desc ステータスの設定。
+ * @default ["{\"StatusParamDate\":\"0\",\"DifferenceVisible\":\"true\",\"OriginalParamName\":\"\",\"OriginalParamEval\":\"\"}","{\"StatusParamDate\":\"1\",\"DifferenceVisible\":\"true\",\"OriginalParamName\":\"\",\"OriginalParamEval\":\"\"}","{\"StatusParamDate\":\"2\",\"DifferenceVisible\":\"true\",\"OriginalParamName\":\"\",\"OriginalParamEval\":\"\"}","{\"StatusParamDate\":\"3\",\"DifferenceVisible\":\"true\",\"OriginalParamName\":\"\",\"OriginalParamEval\":\"\"}","{\"StatusParamDate\":\"4\",\"DifferenceVisible\":\"true\",\"OriginalParamName\":\"\",\"OriginalParamEval\":\"\"}","{\"StatusParamDate\":\"5\",\"DifferenceVisible\":\"true\",\"OriginalParamName\":\"\",\"OriginalParamEval\":\"\"}","{\"StatusParamDate\":\"6\",\"DifferenceVisible\":\"true\",\"OriginalParamName\":\"\",\"OriginalParamEval\":\"\"}","{\"StatusParamDate\":\"7\",\"DifferenceVisible\":\"true\",\"OriginalParamName\":\"\",\"OriginalParamEval\":\"\"}"]
+ * @type struct<VisibleStatusList>[]
  * @parent LevelUpPage
  * 
- * @param ActorOriginalParamName
- * @text 独自パラメータ名称
- * @desc レベルアップ画面に表示する独自パラメータの名称を設定します。
- * @type string
- * @default
- * @parent ActorOriginalSetting
- * 
- * @param ActorOriginalParam
- * @text 独自パラメータ評価式
- * @desc レベルアップ画面に表示する独自パラメータの評価式を設定します。
- * @type string
- * @default
- * @parent ActorOriginalSetting
- * 
- * @param ActorOriginalParamName2
- * @text 独自パラメータ名称２
- * @desc レベルアップ画面に表示する独自パラメータの名称を設定します。
- * @type string
- * @default
- * @parent ActorOriginalSetting
- * 
- * @param ActorOriginalParam2
- * @text 独自パラメータ評価式２
- * @desc レベルアップ画面に表示する独自パラメータの評価式を設定します。
- * @type string
- * @default
- * @parent ActorOriginalSetting
- * 
- * @param ActorPageRefreshFrame
- * @desc ページ切り替えまでの待機フレーム
- * @text 待機フレーム
+ * @param StatusFontSize
+ * @desc レベルアップステータスのフォントサイズ。（メインフォントサイズからの差）
+ * @text レベルアップのフォントサイズ
  * @type number
  * @default 0
- * @parent LevelUpPage
- * 
- * @param ActorBackGroundImg
- * @desc 背景画像ファイル名を指定します。
- * @text 背景画像
- * @type file
- * @dir img/nuun_background
+ * @min -100
  * @parent LevelUpPage
  * 
  * @param NameSetting
@@ -865,6 +860,51 @@
  * @default 100
  * @min 0
  * @max 999
+ *  
+ */
+/*~struct~VisibleStatusList:
+ * 
+ * @param StatusParamDate
+ * @text 表示項目
+ * @desc 表示項目を指定します。
+ * @type select
+ * @option HP
+ * @value 0
+ * @option MP
+ * @value 1
+ * @option 攻撃力
+ * @value 2
+ * @option 防御力
+ * @value 3
+ * @option 魔法力
+ * @value 4
+ * @option 魔法防御
+ * @value 5
+ * @option 敏捷性
+ * @value 6
+ * @option 運
+ * @value 7
+ * @option オリジナルパラメータ
+ * @value 20
+ * @default 0
+ * 
+ * @param DifferenceVisible
+ * @type boolean
+ * @default true
+ * @text 差分表示
+ * @desc 差分を表示します。オリジナルパラメータは表示しません。
+ * 
+ * @param OriginalParamName
+ * @text オリジナルパラメータ名称
+ * @desc オリジナルパラメータの名称を設定します。
+ * @default
+ * @type string
+ * 
+ * @param OriginalParamEval
+ * @text オリジナルパラメータ評価式
+ * @desc オリジナルパラメータの評価式を記入します。
+ * @default
+ * @type string
  *  
  */
 
@@ -1428,12 +1468,19 @@ Window_Result.prototype.refresh = function() {
     this._actor = this.actorLevelUp[this.page - 1];
     const x = rect.x + Math.floor(rect.width / 2) + itemPadding;
     this.drawActorImg(this._actor);
-    this.drawActorFace(rect.x, rect.y, ImageManager.faceWidth, ImageManager.faceHeight);
-    this.drawActorStatusName(rect.x + 152, rect.y, rect.width - x - 152);
+    let NoFaceX = 0;
+    let NoFaceY = lineHeight;
+    if (param.FaceVisible) {
+      this.drawActorFace(rect.x, rect.y, ImageManager.faceWidth, ImageManager.faceHeight);
+      NoFaceX += 152
+      NoFaceY += lineHeight * 3.5;
+    } else {
+      this.drawHorzLine(rect.x, rect.y + lineHeight, rect.width);
+      NoFaceY += lineHeight;
+    }
     this.drawActorStatusLevel(x, rect.y);
-    this.drawActorOriginalParam(rect.x + 152, rect.y + lineHeight, rect.width - x - 152);
-    //this.drawHorzLine(rect.x + 152, rect.y + lineHeight * 3.5, rect.width - 152);
-    this.drawActorStatus(rect.x, rect.y + lineHeight * 3.5, Math.floor(rect.width / 2) - itemPadding);
+    this.drawActorStatusName(rect.x + NoFaceX, rect.y, rect.width - x - NoFaceX);
+    this.drawActorStatus(rect.x, rect.y + NoFaceY, Math.floor(rect.width / 2) - itemPadding);
   }
 };
 
@@ -1624,23 +1671,6 @@ Window_Result.prototype.drawPartyOriginalParam = function(date, x, y, width) {
   }
 };
 
-Window_Result.prototype.drawActorOriginalParam = function(x, y, width) {
-  const actor = this._actor.actor();
-  const lineHeight = this.lineHeight();
-  if (param.ActorOriginalParam) {
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(param.ActorOriginalParamName, x, y, 120, "left");
-    this.resetTextColor();
-    this.drawText(eval(param.ActorOriginalParam), x + 120, y, width - 120, "right");
-  }
-  if (param.ActorOriginalParam2) {
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(param.ActorOriginalParamName2, x, y + lineHeight, 120, "left");
-    this.resetTextColor();
-    this.drawText(eval(param.ActorOriginalParam2), x + 120, y + lineHeight, width - 120, "right");
-  }
-};
-
 Window_Result.prototype.drawGetEXP = function(x, y, width) {
   const exp = BattleManager._rewards.exp;
   if (!isNaN(exp)) {
@@ -1684,27 +1714,33 @@ Window_Result.prototype.drawActorStatusLevel = function(x, y) {
 };
 
 Window_Result.prototype.drawActorStatus = function(x, y, width) {
-  const lineHeight = this.lineHeight();
+  let y2 = y
+  const visibleStatus = param.VisibleStatus;
+  const lineHeight = this.lineHeight() + param.StatusFontSize;
+  this.contents.fontSize = $gameSystem.mainFontSize() + param.StatusFontSize;
   const oldStatus = this.actorOldStatus[this.page - 1];
-  for (let i = 0; i < oldStatus.length - 1; i++) {
-    y += lineHeight;
-    const name = TextManager.param(i);
-    const oldValue = oldStatus[i];
-    const value = this._actor.param(i);
+  
+  visibleStatus.forEach(status => {
+    const name = this.paramName(status.StatusParamDate, status.OriginalParamName);
+    const oldValue = this.paramOld(status.StatusParamDate, oldStatus);
+    const value = this.paramValue(status.StatusParamDate, status.OriginalParamEval);
     this.changeTextColor(ColorManager.systemColor());
-    this.drawText(name, x, y, width - 200);
+    this.drawText(name, x, y2, width - 200);
     this.resetTextColor();
-    this.drawText(oldValue, x + (width - 200), y, 60, "left");
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText("→", x + (width - 110), y, width - 160, "left");
-    if (oldValue < value) {
-      this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
-    } else {
-      this.resetTextColor();
+    if (status.DifferenceVisible && oldValue) {
+      this.drawText(oldValue, x + (width - 200), y2, 60, "left");
+      this.changeTextColor(ColorManager.systemColor());
+      this.drawText("→", x + (width - 110), y2, width - 160, "left");
+      if (oldValue < value) {
+        this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
+      } else {
+        this.resetTextColor();
+      }
     }
-    this.drawText(value, x + width - 60, y, 60, "right");
+    this.drawText(value, x + width - 60, y2, 60, "right");
     this.resetTextColor();
-  }
+    y2 += lineHeight;
+  });
 };
 
 Window_Result.prototype.currencyUnit = function() {
@@ -1774,6 +1810,59 @@ Window_Result.prototype.setActorImgWindow = function(resultActorImgWindow) {
   this._resultActorImgWindow = resultActorImgWindow;
 };
 
+Window_Result.prototype.paramName = function(params, option) {
+  switch (params) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+      return TextManager.param(params);
+    case 20:
+      return option;
+    default:
+      return null;
+  }
+};
+
+Window_Result.prototype.paramOld = function(params, oldStatus) {
+  switch (params) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+      return oldStatus[params];
+    default:
+      return null;
+  }
+};
+
+Window_Result.prototype.paramValue = function(params, option) {
+  switch (params) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+      return this._actor.param(params);
+    case 20:
+      const actor = this._actor.actor();
+      return eval(option)
+    default:
+      return null;
+  }
+};
+
 function Window_ResultDropItem() {
   this.initialize(...arguments);
 }
@@ -1787,9 +1876,13 @@ Window_ResultDropItem.prototype.initialize = function(rect) {
   this.page = 0;
   this.maxPage = 0;
   this.dropItemRows = Math.floor((this.innerHeight - this.lineHeight() * (this.gainParamLength() + 1)) / this.lineHeight());
-  this.skillRows = Math.floor((this.innerHeight - this.lineHeight() * 5.5) / this.lineHeight());
+  this.skillRows = Math.floor((this.innerHeight - this.lineHeight() * (this.skillTop() + 1)) / this.lineHeight());
   this.opacity = 0;
   this.frameVisible = false;
+};
+
+Window_ResultDropItem.prototype.skillTop = function() {
+  return param.FaceVisible ? 4.5 : 2;
 };
 
 Window_ResultDropItem.prototype.gainParamLength = function() {
@@ -1816,7 +1909,7 @@ Window_ResultDropItem.prototype.refresh = function() {
   const x = rect.x + (rect.width - Math.floor(rect.width / 2.6));
   if (this._windowResult.page > 0) {
     const actor = this._windowResult._actor;
-    this.drawLearnSkill(actor, rect.x + rect.width / 2 + itemPadding, rect.y + lineHeight * 4.5, rect.width / 2 - itemPadding);
+    this.drawLearnSkill(actor, rect.x + rect.width / 2 + itemPadding, rect.y + lineHeight * this.skillTop(), rect.width / 2 - itemPadding);
   } else {
     this.drawGetItems(x, rect.y, rect.width - x);
   }

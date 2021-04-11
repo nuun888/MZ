@@ -3481,13 +3481,6 @@ Sprite_BookEnemy.prototype.initMembers = function() {
   this.hide();
 };
 
-Sprite_BookEnemy.prototype.destroy = function(options) {
-  if (this.bitmap) {
-    this.bitmap.destroy();
-  }
-  Sprite.prototype.destroy.call(this, options);
-};
-
 Sprite_BookEnemy.prototype.setup = function(battler, width, height) {
   this._battler = battler;
   this.x = width;

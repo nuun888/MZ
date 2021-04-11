@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.2.0
+ * @version 2.2.1
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/4/11 Ver 2.2.1
+ * ポップアップの表示間隔、解除時の不透明度を指定できる機能を追加。
  * 2021/4/5 Ver 2.2.0
  * ステート、バフをポップアップする機能を追加。
  * 2021/4/4 Ver 2.1.0
@@ -1510,12 +1512,14 @@ Sprite_Battler.prototype.setupStatePopup = function() {
 Sprite_Battler.prototype.createStatePopupSprite = function() {
   const last = this._damages[this._damages.length - 1];
   const sprite = new Sprite_BattleStylePopUp();
+  sprite.x = this.x + this.damageOffsetX();
+  sprite.y = this.y + this.damageOffsetY();
   if (last) {
-    sprite.x = last.x + 8;
-    sprite.y = last.y - 16;
+    console.log(param.PopUpUpdate)
+    sprite.delay = this._damages.length * param.PopUpUpdate;
+    sprite.hide();
   } else {
-    sprite.x = this.x + this.damageOffsetX();
-    sprite.y = this.y + this.damageOffsetY();
+    sprite.delay = 0;
   }
   sprite.setup(this._battler);
   this._damages.push(sprite);
@@ -2194,7 +2198,6 @@ Sprite_BattleStylePopUp.prototype.constructor = Sprite_BattleStylePopUp;
 
 Sprite_BattleStylePopUp.prototype.initialize = function() {
   Sprite_Damage.prototype.initialize.call(this);
-  
 };
 
 Sprite_BattleStylePopUp.prototype.setup = function(target) {
@@ -2223,9 +2226,10 @@ Sprite_BattleStylePopUp.prototype.popUpState = function(id, mode) {
     this._colorType = 0;
   }
   if (mode === "remove") {
-    this.opacity = 128;
+    this.opacity = param.PopUpReleaseOpacity;
   }
   this.createPopUp(popUpName);
+  this._popName = popUpName;
 };
 
 Sprite_BattleStylePopUp.prototype.popUpBuff = function(id, mode) {
@@ -2241,9 +2245,10 @@ Sprite_BattleStylePopUp.prototype.popUpBuff = function(id, mode) {
     this._colorType = 0;
   }
   if (mode === "remove") {
-    this.opacity = 128;
+    this.opacity = param.PopUpReleaseOpacity;
   }
   this.createPopUp(popUpName);
+  this._popName = popUpName;
 };
 
 Sprite_BattleStylePopUp.prototype.damageColor = function() {
@@ -2255,4 +2260,24 @@ Sprite_BattleStylePopUp.prototype.createPopUp = function(popUpName) {
   sprite.bitmap.drawText(popUpName, 0, 0, 240, this.fontSize(), "center");
   sprite.dy = 0;
 };
+
+Sprite_BattleStylePopUp.prototype.update = function() {
+  Sprite.prototype.update.call(this);
+  if (this.delay > 0) {
+    this.delay--;
+    if (this.delay <= 0) {
+      this.show();
+    }
+    return;
+  }
+  if (this._duration > 0) {
+      this._duration--;
+      for (const child of this.children) {
+          this.updateChild(child);
+      }
+  }
+  this.updateFlash();
+  this.updateOpacity();
+};
+
 })();

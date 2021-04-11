@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -76,6 +76,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/11 Ver 1.2.1
+ * ポップアップの表示間隔、解除時の不透明度を指定できる機能を追加。
  * 2021/4/5 Ver 1.2.0
  * ステート、バフをポップアップする機能を追加。
  * 2021/4/4 Ver 1.1.0
@@ -926,6 +928,20 @@
  * @text 不利ステート、バフ文字色
  * @type number
  * @default 0
+ * @parent PopUpSettings
+ * 
+ * @param PopUpReleaseOpacity
+ * @desc 解除時の不透明度
+ * @text 解除時不透明度
+ * @type number
+ * @default 128
+ * @parent PopUpSettings
+ * 
+ * @param PopUpUpdate
+ * @desc ポップアップを連続で表示するときの間隔
+ * @text ポップアップ間隔
+ * @type number
+ * @default 30
  * @parent PopUpSettings
  * 
  */

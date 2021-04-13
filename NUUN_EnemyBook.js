@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.4.2
+ * @version 1.4.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -156,6 +156,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/13 Ver.1.4.3
+ * 完成度ウィンドウを非表示にする機能が機能していなかった問題を修正。
  * 2021/4/12 Ver.1.4.2
  * 戦闘中で背景画像を表示できる機能を追加。
  * モンスターを登録した後、項目が未登録のままになる問題を修正。
@@ -1753,12 +1755,14 @@ Scene_EnemyBook.prototype.createCategoryWindow = function() {
 };
 
 Scene_EnemyBook.prototype.createPercentWindow = function() {
-  const rect = this.percentWindowRect();
-  this._percentWindow = new Window_EnemyBook_Percent(rect);
-  this.addWindow(this._percentWindow);
-  if (param.BackGroundImg) {
-    this._percentWindow.opacity = 0;
-    this._percentWindow.frameVisible = false;
+  if (param.PercentWindowVisible) {
+    const rect = this.percentWindowRect();
+    this._percentWindow = new Window_EnemyBook_Percent(rect);
+    this.addWindow(this._percentWindow);
+    if (param.BackGroundImg) {
+      this._percentWindow.opacity = 0;
+      this._percentWindow.frameVisible = false;
+    }
   }
 };
 
@@ -1778,15 +1782,16 @@ Scene_EnemyBook.prototype.percentWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
   const wy = this.mainAreaTop();
   const ww = Graphics.boxWidth / 3;
-  const wh = this.calcWindowHeight(1, true);
+  const wh = param.PercentWindowVisible ? this.calcWindowHeight(1, true) : 0;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_EnemyBook.prototype.indexWindowRect = function() {
+  const height = this.percentWindowRect().height;
   const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
-  const wy = this.mainAreaTop() + this._percentWindow.height;
+  const wy = this.mainAreaTop() + height;
   const ww = Graphics.boxWidth / 3;
-  const wh = this.mainAreaHeight() - this._percentWindow.height;
+  const wh = this.mainAreaHeight() - height;
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -1800,7 +1805,7 @@ Scene_EnemyBook.prototype.enemyWindowRect = function() {
 
 Scene_EnemyBook.prototype.categoryNameWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
-  const wy = this.mainAreaTop() + this._percentWindow.height;
+  const wy = this.mainAreaTop() + this.percentWindowRect().height;
   const ww = Graphics.boxWidth / 3;
   const wh = this.calcWindowHeight(1, true);
   this._indexWindow.y += wh;
@@ -3070,31 +3075,18 @@ Scene_Battle.prototype.createEnemyBookBackGroundSprite = function() {
 };
 
 Scene_Battle.prototype.createEnemyBookPercentWindow = function() {
-  const rect = this.percentEnemyBookWindowRect();
-  this._enemyBookPercentWindow = new Window_EnemyBook_Percent(rect);
-  if (this._enemyBookBackGround) {
-    this.addChild(this._enemyBookPercentWindow);
-    this._enemyBookPercentWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
-    this._enemyBookPercentWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
-    this._enemyBookPercentWindow.opacity = 0;
-  } else {
-    this.addWindow(this._enemyBookPercentWindow);
-    this._enemyBookPercentWindow.openness = 0;
+  if (param.PercentWindowVisible) {
+    const rect = this.percentEnemyBookWindowRect();
+    this._enemyBookPercentWindow = new Window_EnemyBook_Percent(rect);
+    this.createEnemyBookAddWindow(this._enemyBookPercentWindow, true);
+    this._enemyBookPercentWindow.hide();
   }
-  this._enemyBookPercentWindow.hide();
 };
 
 Scene_Battle.prototype.createEnemyBookCategoryNameWindow = function() {
   const rect = this.enemyBookCategoryNameWindowRect();
   this._enemyBookCategoryNameWindow = new Window_EnemyBook_CategoryName(rect);
-  if (this._enemyBookBackGround) {
-    this.addChild(this._enemyBookCategoryNameWindow);
-    this._enemyBookCategoryNameWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
-    this._enemyBookCategoryNameWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
-    this._enemyBookCategoryNameWindow.opacity = 0;
-  } else {
-    this.addWindow(this._enemyBookCategoryNameWindow);
-  }
+  this.createEnemyBookAddWindow(this._enemyBookCategoryNameWindow, false);
   this._enemyBookCategoryNameWindow.hide();
 };
 
@@ -3103,15 +3095,7 @@ Scene_Battle.prototype.createEnemyBookCategoryWindow = function() {
   this._enemyBookCategoryWindow = new Window_EnemyBook_Category(rect);
   this._enemyBookCategoryWindow.setHandler("cancel",this.cancelEnemyBook.bind(this));
   this._enemyBookCategoryWindow.setHandler("ok", this.onEnemyBookCategoryOk.bind(this));
-  if (this._enemyBookBackGround) {
-    this.addChild(this._enemyBookCategoryWindow);
-    this._enemyBookCategoryWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
-    this._enemyBookCategoryWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
-    this._enemyBookCategoryWindow.opacity = 0;
-  } else {
-    this.addWindow(this._enemyBookCategoryWindow);
-    this._enemyBookCategoryWindow.openness = 0;
-  }
+  this.createEnemyBookAddWindow(this._enemyBookCategoryWindow, true);
   this._enemyBookCategoryWindow.hide();
   this._enemyBookIndexWindow.setCategoryWindow(this._enemyBookCategoryWindow);
   this._enemyBookCategoryNameWindow.setCategoryWindow(this._enemyBookCategoryWindow);
@@ -3121,15 +3105,7 @@ Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
   const rect = this.enemyBookIndexWindowRect();
   this._enemyBookIndexWindow = new Window_EnemyBook_Index(rect);
   this._enemyBookIndexWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
-  if (this._enemyBookBackGround) {
-    this.addChild(this._enemyBookIndexWindow);
-    this._enemyBookIndexWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
-    this._enemyBookIndexWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
-    this._enemyBookIndexWindow.opacity = 0;
-  } else {
-    this.addWindow(this._enemyBookIndexWindow);
-    this._enemyBookIndexWindow.openness = 0;
-  }
+  this.createEnemyBookAddWindow(this._enemyBookIndexWindow, true);
   this._enemyBookIndexWindow.setPercentWindow(this._enemyBookPercentWindow);
   this._enemyBookIndexWindow.hide();
 };
@@ -3138,56 +3114,60 @@ Scene_Battle.prototype.createEnemyBookDummyWindow = function() {
   const rect = this.dummyEnemyBookWindowRect();
   this._enemyBookDummyWindow = new Window_EnemyBook_Dummy(rect);
   this._enemyBookDummyWindow.setHandler("cancel", this.cancelEnemyBook.bind(this));
-  if (this._enemyBookBackGround) {
-    this.addChild(this._enemyBookDummyWindow);
-    this._enemyBookDummyWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
-  } else {
-    this.addWindow(this._enemyBookDummyWindow);
-  }
+  this.createEnemyBookAddWindow(this._enemyBookDummyWindow, false);
   this._enemyBookDummyWindow.hide();
 };
   
 Scene_Battle.prototype.createEnemyBookEnemyWindow = function() {
   const rect = this.enemyBookWindowRect();
   this._enemyBookEnemyWindow = new Window_EnemyBook(rect);
-  if (this._enemyBookBackGround) {
-    this.addChild(this._enemyBookEnemyWindow);
-    this._enemyBookEnemyWindow.opacity = 0;
-  } else {
-    this.addWindow(this._enemyBookEnemyWindow);
-    this._enemyBookEnemyWindow.openness = 0;
-  }
+  this.createEnemyBookAddWindow(this._enemyBookEnemyWindow, true);
   this._enemyBookIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
   this._enemyBookEnemyWindow.hide();
+};
+
+Scene_Battle.prototype.createEnemyBookAddWindow = function(windowDate, openness) {
+  if (this._enemyBookBackGround) {
+    this.addChild(windowDate);
+    windowDate.x += (Graphics.width - Graphics.boxWidth) / 2;
+    windowDate.y += (Graphics.height - Graphics.boxHeight) / 2;
+    windowDate.opacity = 0;
+  } else {
+    this.addWindow(windowDate);
+    if (openness) {
+      windowDate.openness = 0;
+    }
+  }
 };
 
 Scene_Battle.prototype.percentEnemyBookWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
   const wy = this.enemyBookMainAreaTop();
   const ww = Graphics.boxWidth / 3;
-  const wh = this.calcWindowHeight(1, true);
+  const wh = param.PercentWindowVisible ? this.calcWindowHeight(1, true) : 0;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.dummyEnemyBookWindowRect = function() {
   const wx = (Graphics.boxWidth - this.enemyBookWindowWidth()) / 2;
-  const wy = this._enemyBookPercentWindow.y;
+  const wy = this.enemyBookMainAreaTop();
   const ww = this.enemyBookWindowWidth();
   const wh = this.calcWindowHeight(1, true);
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.enemyBookIndexWindowRect = function() {
+  const height = this.percentEnemyBookWindowRect().height;
   const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
-  const wy = this.enemyBookMainAreaTop() + this._enemyBookPercentWindow.height;
+  const wy = this.enemyBookMainAreaTop() + height;
   const ww = Graphics.boxWidth / 3;
-  const wh = this.enemyBookMainAreaHeight() - this._enemyBookPercentWindow.height;
+  const wh = this.enemyBookMainAreaHeight() - height;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.enemyBookWindowRect = function() {
   const wx = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
-  const wy = this._enemyBookPercentWindow.y;
+  const wy = this.enemyBookMainAreaTop();
   const ww = this.enemyBookWindowWidth();
   const wh = this.enemyBookMainAreaHeight();
   return new Rectangle(wx, wy, ww, wh);
@@ -3195,7 +3175,7 @@ Scene_Battle.prototype.enemyBookWindowRect = function() {
 
 Scene_Battle.prototype.enemyBookCategoryNameWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
-  const wy = this.enemyBookMainAreaTop() + this._enemyBookPercentWindow.height;
+  const wy = this.enemyBookMainAreaTop() + this.percentEnemyBookWindowRect().height;
   const ww = Graphics.boxWidth / 3;
   const wh = this.calcWindowHeight(1, true);
   this._enemyBookIndexWindow.y += wh;
@@ -3238,8 +3218,10 @@ Scene_Battle.prototype.commandEnemyBook = function() {
   this.setButtonY();
   this.setEnemyBookBackGround();
   this._enemyBookEnemyWindow.x = (param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
-  this._enemyBookPercentWindow.show();
-  this._enemyBookPercentWindow.open();
+  if (param.PercentWindowVisible) {
+    this._enemyBookPercentWindow.show();
+    this._enemyBookPercentWindow.open();
+  }
   this._enemyBookEnemyWindow.show();
   this._enemyBookEnemyWindow.open();
   this._enemyBookEnemyWindow.refresh();
@@ -3248,20 +3230,18 @@ Scene_Battle.prototype.commandEnemyBook = function() {
 Scene_Battle.prototype.cancelEnemyBook = function() {
   this._enemyBookDummyWindow.interruptWindow = false;
   this._enemyBookIndexWindow.close();
-  this._enemyBookPercentWindow.close();
   this._enemyBookEnemyWindow.close();
   this._enemyBookDummyWindow.close();
+  if (param.PercentWindowVisible) {
+    this._enemyBookPercentWindow.close();
+  }
   if (param.CategoryOn && param.EnemyBookCategory) {
     this._enemyBookCategoryWindow.close();
   }
-  //this._enemyBookIndexWindow.hide();
-  //this._enemyBookPercentWindow.hide();
-  //this._enemyBookEnemyWindow.hide();
-  //this._enemyBookDummyWindow.hide();
-  this._enemyBookEnemyWindow._enemySprite.hide();
   if (this._enemyBookBackGround) {
     this._enemyBookBackGround.hide();
   }
+  this._enemyBookEnemyWindow._enemySprite.hide();
   if (this._enemyBookEnemyWindow._bookMode === 0) {
     this._partyCommandWindow.activate();
     this._enemyBookIndexWindow.deactivate();

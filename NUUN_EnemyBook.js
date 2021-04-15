@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.4.3
+ * @version 1.4.4
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -156,6 +156,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/15 Ver.1.4.4
+ * サイズによってはモンスターのサイズ調整がうまくいっていなかった問題を修正。
+ * ボタン画像が表示されていない時に図鑑を開くとエラーが出る問題を修正。
  * 2021/4/13 Ver.1.4.3
  * 完成度ウィンドウを非表示にする機能が機能していなかった問題を修正。
  * 2021/4/12 Ver.1.4.2
@@ -3307,13 +3310,14 @@ Scene_Battle.prototype.createEnemyBookButton = function() {
 };
 
 Scene_Battle.prototype.setButtonY = function() {
-  this._EnemyBook_pageupButton.y = this.buttonY();
-  this._EnemyBook_pagedownButton.y = this.buttonY();
-  this._EnemyBook_cancelButton.y = this.buttonY();
-  if (this._enemyBookBackGround) {
-    this._EnemyBook_pageupButton.y += (Graphics.height - Graphics.boxHeight) / 2;
-    this._EnemyBook_pagedownButton.y += (Graphics.height - Graphics.boxHeight) / 2;
-    this._EnemyBook_cancelButton.y += (Graphics.height - Graphics.boxHeight) / 2;
+  if (this._EnemyBook_pageupButton) {
+    this._EnemyBook_pageupButton.y = this.buttonY() + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
+  }
+  if (this._EnemyBook_pagedownButton) {
+    this._EnemyBook_pagedownButton.y = this.buttonY() + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
+  }
+  if (this._EnemyBook_cancelButton) {
+    this._EnemyBook_cancelButton.y = this.buttonY() + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
   }
 };
 
@@ -3644,12 +3648,11 @@ Sprite_BookEnemy.prototype.drawEnemy = function() {
     const contentsWidth = this.maxWidth;
     const contentsHeight = 350;
     let scale = 1.0;
-    if (bitmapWidth > contentsWidth || bitmapHeight > contentsHeight) {
-      if (bitmapWidth - contentsWidth > bitmapHeight - contentsHeight) {
-        scale = contentsWidth / bitmapWidth;
-      } else {
-        scale = contentsHeight / bitmapHeight;
-      }
+    if (bitmapHeight > contentsHeight) {
+      scale = Math.min((contentsHeight / bitmapHeight), 1.0);
+    }
+    if (bitmapWidth > contentsWidth) {
+      scale = Math.min((contentsWidth / bitmapWidth), scale);
     }
     this.scale.x = scale;
     this.scale.y = scale;

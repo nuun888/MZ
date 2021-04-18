@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.4.4
+ * @version 1.4.5
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -156,6 +156,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/19 Ver.1.4.5
+ * 戦闘中でモンスターのカテゴリーをONにして図鑑を開いたときにスクロールしてしまう問題を修正。
+ * 一部の不具合が再発していたので修正。
  * 2021/4/15 Ver.1.4.4
  * サイズによってはモンスターのサイズ調整がうまくいっていなかった問題を修正。
  * ボタン画像が表示されていない時に図鑑を開くとエラーが出る問題を修正。
@@ -2112,9 +2115,13 @@ Window_EnemyBook_Index.prototype.setSelect = function() {
 };
 
 Window_EnemyBook_Index.prototype.processCancel = function() {
+  this.updateIndex();
+  Window_Selectable.prototype.processCancel.call(this);
+};
+
+Window_EnemyBook_Index.prototype.updateIndex = function() {
   Window_EnemyBook_Index._lastTopRow = this.topRow();
   Window_EnemyBook_Index._lastIndex = this.index();
-  Window_Selectable.prototype.processCancel.call(this);
 };
 
 Window_EnemyBook_Index.prototype.maxCols = function() {
@@ -2634,6 +2641,7 @@ Window_EnemyBook.prototype.paramShow = function(params, enemy) {
 
 Window_EnemyBook.prototype.normalParam = function(params) {
   switch (params) {
+    case 0:
     case 1:
     case 2:
     case 3:
@@ -2641,7 +2649,6 @@ Window_EnemyBook.prototype.normalParam = function(params) {
     case 5:
     case 6:
     case 7:
-    case 8:
       return this._enemy.params[params];
     default:
       return null;
@@ -3252,6 +3259,7 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
   } else {
     this._enemyBookEnemyWindow.setEnemy(null);
     this._enemyBookDummyWindow.deactivate();
+    this._enemyBookEnemyWindow.setAnalyzeStatus(null);
   }
   openAnalyze = false;
 };
@@ -3456,6 +3464,7 @@ Scene_Battle.prototype.userWindowDeactivate = function() {//暫定競合対策
 
 Scene_Battle.prototype.onEnemyBookIndexCancel = function() {
   if (param.CategoryOn && param.EnemyBookCategory) {
+    this._enemyBookIndexWindow.updateIndex();
     this.enemyBookCategorySelection();
   } else {
     this.cancelEnemyBook();
@@ -3591,13 +3600,6 @@ Sprite_BookEnemy.prototype.initMembers = function() {
   this._svEnemy = false;
   this.maxWidth = 0;
   this.hide();
-};
-
-Sprite_BookEnemy.prototype.destroy = function(options) {
-  if (this.bitmap) {
-    this.bitmap.destroy();
-  }
-  Sprite.prototype.destroy.call(this, options);
 };
 
 Sprite_BookEnemy.prototype.setup = function(battler, width, height) {

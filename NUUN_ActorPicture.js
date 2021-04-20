@@ -11,7 +11,7 @@
  * @plugindesc 立ち絵表示EX
  * @author NUUN
  * @base NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 立ち絵画像を表示します。
@@ -46,6 +46,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/20 Ver 1.0.1
+ * プラグイン導入後に戦闘を開始するとエラーが出る問題を修正。
  * 2021/3/26 Ver 1.0.0
  * 初版
  * 
@@ -299,7 +301,7 @@ Game_Actor.prototype.setup = function(actorId) {
 };
 
 Game_Actor.prototype.setActorButler = function() {
-  if (!this._actorButler) {
+  if (!this._actorButler || Object.keys(this._actorButler._actorImgDate).length === 0) {
     this._actorButler = new Game_ActorButler();
     this._actorButler.setup(this);
   }

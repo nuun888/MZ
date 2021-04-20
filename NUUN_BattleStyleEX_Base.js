@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.2.1
+ * @version 2.2.2
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/4/20 Ver 2.2.2
+ * 一部のプラグインパラメータでfalseに設定したときに設定が反映されない問題を修正。
  * 2021/4/11 Ver 2.2.1
  * ポップアップの表示間隔、解除時の不透明度を指定できる機能を追加。
  * 2021/4/5 Ver 2.2.0
@@ -155,21 +157,20 @@ param.TPBGaugeHeight = param.TPBGaugeHeight || 12;
 if (param.StyleMode === "MVStyle") {
   param.TPGaugeWidth = param.TPGaugeWidth || 96;
   param.TPBGaugeWidth = param.TPBGaugeWidth || 100;
-  param.WindowShow = param.WindowShow || true;
-  param.WindowFrameShow = param.WindowFrameShow || true;
-  param.cursorBackShow = param.cursorBackShow || false;
-  param.ActorFaceVisible = param.ActorFaceVisible || false;
-  param.ActorEffectShow = param.ActorFaceVisible;
+  param.WindowShow = param.WindowShow === undefined ? true : param.WindowShow;
+  param.WindowFrameShow = param.WindowFrameShow === undefined ? true : param.WindowFrameShow;
+  param.cursorBackShow = param.cursorBackShow === undefined ? false : param.cursorBackShow;
+  param.ActorFaceVisible = param.ActorFaceVisible === undefined ? false : param.ActorFaceVisible;
   param.GaugeWidth = param.GaugeWidth || 210;
 } else {
   param.HPGaugeWidth = param.HPGaugeWidth || 128;
   param.MPGaugeWidth = param.MPGaugeWidth || 128;
   param.TPGaugeWidth = param.TPGaugeWidth || 128;
   param.TPBGaugeWidth = param.TPBGaugeWidth || 128;
-  param.WindowShow = param.WindowShow || true;
-  param.WindowFrameShow = param.WindowFrameShow || false;
-  param.cursorBackShow = param.cursorBackShow || true;
-  param.ActorFaceVisible = param.ActorFaceVisible || true;
+  param.WindowShow = param.WindowShow === undefined ? true : param.WindowShow;
+  param.WindowFrameShow = param.WindowFrameShow === undefined ? false : param.WindowFrameShow;
+  param.cursorBackShow = param.cursorBackShow === undefined ? true : param.cursorBackShow;
+  param.ActorFaceVisible = param.ActorFaceVisible === undefined ? true : param.ActorFaceVisible;
   param.GaugeWidth = param.GaugeWidth || 128;
 }
 

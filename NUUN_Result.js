@@ -12,7 +12,7 @@
  * @plugindesc  リザルト
  * @author NUUN
  * @base NUUN_Base
- * @version 1.7.0
+ * @version 1.7.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -38,10 +38,7 @@
  * レベルアップ画面のアクター画像はUIサイズ、リザルト画面ウィンドウのサイズではなく、ゲーム画面サイズに合わせて表示されます。
  * このモードのみボタンの表示位置を変更可能です。ボタン設定での座標指定はゲーム画面左上からの絶対座標となっています。-1を指定することでリザルトウィンドウサイズに合わせます。
  * 
- * 背景画像について
- * 背景画像、アクター画像を表示させる場合は、ゲームフォルダーのimgフォルダーを開き右クリック→新規作成→フォルダーの順にクリックし、
- * 「新しいフォルダー」というフォルダー名をnuun_actorpictures又はnuun_backgroundに変更してください。
- * また画像を表示させるには「共通処理」(NUUN_Base)プラグインが必要となります。
+ * 背景画像、アクター画像（立ち絵）を表示するにはNUUN_Baseが必要です。
  * 
  * アクターの参照変数（レベルアップ画面の独自パラメータ）
  * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
@@ -64,7 +61,8 @@
  * 勝利BGMを変更することが出来ます。BGMに何も指定しないことでプラグインコマンドで指定したBGMは再生されなくなります。
  * 「レベルアップSEの変更」
  * レベルアップSEを変更することが出来ます。BGMに何も指定しないことでプラグインコマンドで指定したBGMは再生されなくなります。
- * 
+ * 「レベルアップ画面アクター画像変更」
+ * 立ち絵の画像を変更します。
  * 
  * 操作
  * エンター　切り替え、画面を閉じる 右クリック
@@ -74,6 +72,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/23 Ver.1.7.1
+ * プラグインコマンドでアクター立ち絵を変更できる機能を追加。
+ * 背景画像、アクター画像のフォルダーを指定できるように変更。
+ * レベルアップ画面のアクター画像を設定してリザルト表示後すぐにレベルアップ画面に移行するとエラーが出る問題を修正。
  * 2021/4/11 Ver.1.7.0
  * レベルアップ画面のステータスを任意に表示できるように変更。
  * レベルアップ画面のステータスとオリジナルパラメータの表示を統合。
@@ -536,8 +538,9 @@
  * @param PartyBackGroundImg
  * @desc 背景画像ファイル名を指定します。
  * @text 背景画像
- * @type file
- * @dir img/nuun_background
+ * @type file[]
+ * @dir img/
+ * @default []
  * @parent GetPage
  * 
  * @param LevelUpPage
@@ -553,8 +556,9 @@
  * @param ActorBackGroundImg
  * @desc 背景画像ファイル名を指定します。
  * @text 背景画像
- * @type file
- * @dir img/nuun_background
+ * @type file[]
+ * @dir img/
+ * @default []
  * @parent LevelUpPage
  * 
  * @param ActorImg
@@ -792,6 +796,22 @@
  * @desc レベルアップ画面の表示を許可します。(このプラグインコマンドを実行後レベルアップ画面表示の設定が無効化されます）
  * @text レベルアップ画面表示許可
  * 
+ * @command ChangeActorImg
+ * @desc レベルアップ画面のアクター画像を変更します。
+ * @text レベルアップ画面アクター画像変更
+ * 
+ * @arg actorId
+ * @type actor
+ * @default 0
+ * @desc アクターを指定します。
+ * @text アクターID
+ * 
+ * @arg ChangeActorImgId
+ * @type number
+ * @default 1
+ * @min 1
+ * @desc 変更する立ち絵のIDを指定します。
+ * @text 立ち絵ID
  */
 /*~struct~GainParamList:
 
@@ -834,8 +854,9 @@
  * @param ActorImg
  * @text アクター画像
  * @desc アクターの画像を表示します。
- * @type file
- * @dir img/nuun_actorpictures
+ * @type file[]
+ * @dir img/
+ * @default ["{\"actorId\":\"0\",\"ActorImg\":\"[\\\"pictures\\\"]\",\"Actor_X\":\"0\",\"Actor_Y\":\"0\",\"Actor_Scale\":\"100\"}"]
  * 
  * @param Actor_X
  * @desc 画像の表示位置X座標。
@@ -927,6 +948,8 @@ Imported.NUUN_Result = true;
 
 param.GainParam = param.GainParam || [];
 param.ButlerActors = param.ButlerActors || [];
+param.ActorBackGroundImg = param.ActorBackGroundImg.length < 1 ? null : param.ActorBackGroundImg[0];
+param.PartyBackGroundImg = param.PartyBackGroundImg.length < 1 ? null : param.PartyBackGroundImg[0];
 let gaugeWidth = 300;
 
 const pluginName = "NUUN_Result";
@@ -947,6 +970,10 @@ PluginManager.registerCommand(pluginName, 'LevelUpPage', args => {
   BattleManager.levelUpPageEnable(eval(args.LevelUpPageEnable));
 });
 
+PluginManager.registerCommand(pluginName, 'ChangeActorImg', args => {
+  $gameActors._data[args.actorId].setResultActorImgId(args.ChangeActorImgId);
+});
+
 
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
@@ -964,8 +991,13 @@ Game_Actor.prototype.setup = function(actorId) {
 Game_Actor.prototype.initResultActorImg = function(id) {
   const list = param.ButlerActors.find(actors => actors.actorId === id);
   this.resultActorImg = list || [];
+  this.resultImgId = this.resultImgId === undefined ? 0 : this.resultImgId;
 };
 
+Game_Actor.prototype.setResultActorImgId = function(changeActorImgId) {
+  this.resultImgId = Number(changeActorImgId) - 1;
+  this.resultActorBitmap = this.resultActorImg.ActorImg[this.resultImgId];
+};
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
@@ -993,7 +1025,7 @@ Scene_Battle.prototype.createResultBackGround = function() {
     if (param.PartyBackGroundImg) {
       const partySprite = new Sprite();
       this._resultBaseSprite.addChild(partySprite);
-      partySprite.bitmap = ImageManager.nuun_backGround(param.PartyBackGroundImg);
+      partySprite.bitmap = ImageManager.nuun_LoadPictures(param.PartyBackGroundImg);
       this._backGroundPartySprite = partySprite;
       partySprite.hide();
       if (partySprite.bitmap && !partySprite.bitmap.isReady()) {
@@ -1005,7 +1037,7 @@ Scene_Battle.prototype.createResultBackGround = function() {
     if (param.ActorBackGroundImg) {
       const actorSprite = new Sprite();
       this._resultBaseSprite.addChild(actorSprite);
-      actorSprite.bitmap = ImageManager.nuun_backGround(param.ActorBackGroundImg);
+      actorSprite.bitmap = ImageManager.nuun_LoadPictures(param.ActorBackGroundImg);
       this._backGroundActorSprite = actorSprite;
       actorSprite.hide();
       if (actorSprite.bitmap && !actorSprite.bitmap.isReady()) {
@@ -1327,14 +1359,26 @@ Window_ResultActorImg.prototype.refresh = function() {
   this.drawActorImg(this._actor);
 };
 
+Window_ResultActorImg.prototype.loadActorImg = function(actor) {
+  if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {
+    const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg[actor.resultImgId];
+    actor.resultActorBitmap = loadBitmap;
+  }
+};
+
 Window_ResultActorImg.prototype.drawActorImg = function(actor) {
-  if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {  
-    const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
-    const bitmap = ImageManager.nuun_actorPictures(loadBitmap);
-    if (bitmap && !bitmap.isReady()) {
-      bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
-    } else {
-      this.actorImgRefresh(bitmap, actor.resultActorImg);
+  if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg[actor.resultImgId])) {  
+    const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg[actor.resultImgId];
+    if (loadBitmap) {
+      const bitmap = ImageManager.nuun_LoadPictures(loadBitmap);
+      if (!actor.resultActorBitmap) {
+        actor.resultActorBitmap = loadBitmap;
+      }
+      if (bitmap && !bitmap.isReady()) {
+        bitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
+      } else {
+        this.actorImgRefresh(bitmap, actor.resultActorImg);
+      }
     }
   } else if (this._actorSprite && this._actorSprite.bitmap){
     this._actorSprite.bitmap = null;
@@ -1513,18 +1557,30 @@ Window_Result.prototype.drawGainList = function(x, y, width) {
     }
 };
 
+Window_Result.prototype.loadActorImg = function(actor) {
+  if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {
+    const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg[actor.resultImgId];
+    actor.resultActorBitmap = loadBitmap;
+  } 
+};
+
 Window_Result.prototype.drawActorImg = function(actor) {
   if (this._resultActorImgWindow) {
     this._resultActorImgWindow.setActor(actor);
     this._resultActorImgWindow.refresh();
   } else {
     if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {
-      const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg;
-      const bitmap = ImageManager.nuun_actorPictures(loadBitmap);
-      if (bitmap && !bitmap.isReady()) {
-        bitmap.defaultBitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
-      } else {
-        this.actorImgRefresh(bitmap, actor.resultActorImg);
+      const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg[actor.resultImgId];
+      if (!actor.resultActorBitmap) {
+        actor.resultActorBitmap = loadBitmap;
+      }
+      const bitmap = ImageManager.nuun_LoadPictures(loadBitmap);
+      if (loadBitmap) {
+        if (bitmap && !bitmap.isReady()) {
+          bitmap.addLoadListener(this.actorImgRefresh.bind(this, bitmap, actor.resultActorImg));
+        } else {
+          this.actorImgRefresh(bitmap, actor.resultActorImg);
+        }
       }
     }
   } 
@@ -1593,11 +1649,16 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
         if (Imported.NUUN_Base) {
+          if (this._resultActorImgWindow) {
+            this._resultActorImgWindow.loadActorImg(actor);
+          } else {
+            this.loadActorImg(actor);
+          }
           if (!actor.resultActorBitmap) {
             actor.initResultActorImg(actor.actorId());
-            ImageManager.nuun_actorPictures(actor.resultActorImg.ActorImg);
+            ImageManager.nuun_LoadPictures(actor.resultActorImg.ActorImg[actor.resultImgId]);
           } else {
-            ImageManager.nuun_actorPictures(actor.resultActorBitmap);
+            ImageManager.nuun_LoadPictures(actor.resultActorBitmap);
           }
         }
       }

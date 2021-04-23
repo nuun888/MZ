@@ -12,7 +12,7 @@
  * @plugindesc  リザルト
  * @author NUUN
  * @base NUUN_Base
- * @version 1.7.1
+ * @version 1.7.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -72,6 +72,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/24 Ver.1.7.2
+ * Ver.1.7.1以前のバージョンから立ち絵を設定した状態でアップデートすると戦闘終了時にエラーが出る問題を修正。
  * 2021/4/23 Ver.1.7.1
  * プラグインコマンドでアクター立ち絵を変更できる機能を追加。
  * 背景画像、アクター画像のフォルダーを指定できるように変更。
@@ -971,7 +973,9 @@ PluginManager.registerCommand(pluginName, 'LevelUpPage', args => {
 });
 
 PluginManager.registerCommand(pluginName, 'ChangeActorImg', args => {
-  $gameActors._data[args.actorId].setResultActorImgId(args.ChangeActorImgId);
+  if ($gameActors._data[args.actorId]) {
+    $gameActors._data[args.actorId].setResultActorImgId(args.ChangeActorImgId);
+  }
 });
 
 
@@ -1649,16 +1653,20 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
         if (Imported.NUUN_Base) {
-          if (this._resultActorImgWindow) {
-            this._resultActorImgWindow.loadActorImg(actor);
-          } else {
-            this.loadActorImg(actor);
-          }
-          if (!actor.resultActorBitmap) {
+          if (!Array.isArray(actor.resultActorImg.ActorImg) || !actor.resultActorBitmap) {
             actor.initResultActorImg(actor.actorId());
-            ImageManager.nuun_LoadPictures(actor.resultActorImg.ActorImg[actor.resultImgId]);
-          } else {
-            ImageManager.nuun_LoadPictures(actor.resultActorBitmap);
+          }
+          if (actor.resultActorImg.ActorImg) {
+            if (this._resultActorImgWindow) {
+              this._resultActorImgWindow.loadActorImg(actor);
+            } else {
+              this.loadActorImg(actor);
+            }
+            if (!actor.resultActorBitmap) {
+              ImageManager.nuun_LoadPictures(actor.resultActorImg.ActorImg[actor.resultImgId]);
+            } else {
+              ImageManager.nuun_LoadPictures(actor.resultActorBitmap);
+            }
           }
         }
       }

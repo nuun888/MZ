@@ -195,11 +195,6 @@ Window_BattleStatus.prototype.drawItemStatus = function(index) {
   _Window_BattleStatus_drawItemStatus.call(this, index);
 };
 
-Window_BattleStatus.prototype.basicGaugesY = function(rect) {
-  const bottom = rect.y + rect.height - this.extraHeight();
-  return bottom - this.gaugeLineHeight() * 2;
-};
-
 const _Window_StatusBase_placeTimeGauge = Window_StatusBase.prototype.placeTimeGauge;
 Window_StatusBase.prototype.placeTimeGauge = function(actor, x, y) {
   if (BattleManager.isTpb()) {

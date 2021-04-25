@@ -46,7 +46,7 @@
  * @value 1
  * @option バトルスタイル拡張プラグインの設定を反映する。
  * @value 10
- * @default false
+ * @default 0
  * 
  * @param GaugeX
  * @desc ゲージのX座標を指定します。

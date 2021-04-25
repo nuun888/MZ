@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -19,8 +19,9 @@
  * 
  * 以下の項目が表示できます。
  * 
- * 最大HP（アナライズモードではゲージが表示可能です）
- * 最大MP（アナライズモードではゲージが表示可能です）
+ * HP（アナライズモードではゲージが表示可能です）
+ * MP（アナライズモードではゲージが表示可能です）
+ * TP（アナライズモードで現在のステータスをONにしている時のみ表示します）（未実装）
  * 攻撃力
  * 防御力
  * 魔法力
@@ -56,13 +57,13 @@
  * 耐性ステート
  * 弱点ステート
  * 無効ステート
- * 耐性デバフ（未実装）
- * 弱点デバフ（未実装）
+ * 耐性デバフ
+ * 弱点デバフ
  * ドロップアイテム
  * スティールアイテム（盗みスキル導入時）
  * 記述欄（フリーテキストスペース　制御文字が使用できます）
  * オリジナルパラメータ（任意のステータス）
- * 行動（未実装）
+ * 行動
  * モンスター画像
  * 
  * 戦闘中にパーティコマンドからエネミー図鑑を開くことが出来ます。
@@ -180,25 +181,25 @@
  * 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）
  * 
  * プラグインコマンド
- * EnemyBookOpen              図鑑を開きます。
- * EnemyBookAdd               モンスターを図鑑に追加します。ステータス情報は登録されません。
- * EnemyBookRemove            モンスターを図鑑から削除します。
- * EnemyBookComplete          図鑑を完成させます。
- * EnemyBookClear             図鑑をクリア（全削除）させます。
- * EnemyBookStatusAdd         モンスターのステータス情報を登録します。
- * EnemyBookStatusRemove      モンスターをステータス情報を削除します。
- * EnemyBookAddDefeat         モンスターを撃破済みにします。
- * EnemyBookRemoveDefeat      モンスターの撃破数をリセットします。
- * EnemyBookGetDropItem       モンスターのドロップアイテムを取得済みにさせます。
- * EnemyBookRemoveDropItem    モンスターのドロップアイテムを未収得にさせます。
- * EnemyBookGetStealItem      モンスターのスティールアイテムを取得済みにします。
- * EnemyBookRemoveStealItem   モンスターのスティールアイテムを未収得にさせます。
- * EnemyBookDefeatEnemy       撃破したモンスター数を変数に格納します。
- * EnemyBookEncounteredEnemy  遭遇済みのモンスター数を変数に格納します。
- * EnemyBookCompleteRate      現在の完成度を変数に格納します。
- * EnemyBookDefeatEnemySum    指定のモンスターの撃破数を変数に格納します。
- * DorpItemAcquired           指定のアイテムがドロップ済みか判定します。
- * StealItemAcquired          指定のアイテムが盗み済みか判定します。
+ * モンスター図鑑オープン       図鑑を開きます。
+ * モンスター追加              モンスターを図鑑に追加します。ステータス情報は登録されません。
+ * モンスター削除              モンスターを図鑑から削除します。
+ * 図鑑完成                    図鑑を完成させます。
+ * 図鑑初期化                  図鑑をクリア（全削除）させます。
+ * モンスターステータス情報登録  モンスターのステータス情報を登録します。
+ * モンスターステータス情報削除  モンスターをステータス情報を削除します。
+ * モンスター撃破済み           モンスターを撃破済みにします。
+ * 撃破数初期化                 モンスターの撃破数をリセットします。
+ * モンスタードロップアイテム習得済み   モンスターのドロップアイテムを取得済みにさせます。
+ * モンスタードロップアイテム未収得     モンスターのドロップアイテムを未収得にさせます。
+ * モンスタースティールアイテム取得済み モンスターのスティールアイテムを取得済みにします。
+ * モンスタースティールアイテム未取得   モンスターのスティールアイテムを未収得にさせます。
+ * 総撃破数モンスター数          撃破したモンスター数を変数に格納します。
+ * 遭遇数                       遭遇済みのモンスター数を変数に格納します。
+ * 図鑑完成度                   現在の完成度を変数に格納します。
+ * 総撃破数                     指定のモンスターの撃破数を変数に格納します。
+ * アイテムドロップ済み判定      指定のアイテムがドロップ済みか判定します。
+ * アイテム盗み済み判定          指定のアイテムが盗み済みか判定します。
  * 
  * オリジナルパラメータ参照変数
  * this._enemy　データベースのモンスターデータを取得します。
@@ -215,6 +216,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/26 Ver.2.0.1
+ * 表示できる項目に行動、耐性デバフ、弱点デバフを追加。
+ * 弱点ステートに無効化ステートが表示してしまう問題を修正。
  * 2021/4/25 Ver.2.0.0
  * 敵のステータスを表示する項目を大幅にリニューアル。
  * ステータス情報の登録タイミングを指定できる機能を追加。
@@ -473,7 +477,7 @@
  * 
  * @command DorpItemAcquired
  * @desc 指定のアイテムがドロップ済みか判定します。
- * @text アイテムドロップ済み判定。
+ * @text アイテムドロップ済み判定
  * 
  * @arg enemyId
  * @type enemy
@@ -494,7 +498,7 @@
  * 
  * @command StealItemAcquired
  * @desc 指定のアイテムが盗み済みか判定します。
- * @text アイテム盗み済み判定。
+ * @text アイテム盗み済み判定
  * 
  * @arg enemyId
  * @type enemy
@@ -950,7 +954,7 @@
  * 
  * @param PageList20
  * @desc 表示するリスト。
- * @text 表示リスト１２０
+ * @text 表示リスト２０
  * @type struct<PageListData>[]
  * @default []
  * @parent ListData11_20
@@ -1005,6 +1009,25 @@
  * @default false
  * @parent StealItemData
  * 
+ * @param ActionData
+ * @text 行動設定
+ * @default ------------------------------
+ * 
+ * @param ActionMaxItems
+ * @desc 表示する最大項目数。(0で制限なし)
+ * @text 最大項目数
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ActionData
+ * 
+ * @param ActionMultiCol
+ * @desc ワイドモード２列表示以上時の複数列表示。
+ * @text ワイドモード時の複数列表示
+ * @type boolean
+ * @default false
+ * @parent ActionData
+ * 
  * @param ResistWeakData
  * @text 耐性弱点設定
  * @default ------------------------------
@@ -1023,18 +1046,11 @@
  * @default ["{\"StateId\":\"1\"}","{\"StateId\":\"4\"}","{\"StateId\":\"5\"}","{\"StateId\":\"6\"}","{\"StateId\":\"7\"}","{\"StateId\":\"8\"}","{\"StateId\":\"9\"}","{\"StateId\":\"10\"}","{\"StateId\":\"12\"}","{\"StateId\":\"13\"}"]
  * @parent ResistWeakData
  * 
- * @param WeakElementName
- * @desc 効きやすい属性の名前です。属性有効度が101%以上で表示されます。
- * @text 効きやすい属性名称。
- * @type string
- * @default 弱点属性
- * @parent ResistWeakData
- * 
- * @param ResistElementName
- * @desc 効きにくい属性の名前です。
- * @text 効きやすい属性名称。
- * @type string
- * @default 耐性属性
+ * @param DeBuffList
+ * @desc 表示するデバフ。
+ * @text 表示デバフ
+ * @type struct<DebuffData>[]
+ * @default ["{\"ParamId\":\"0\",\"DebuffIconId\":\"48\"}","{\"ParamId\":\"1\",\"DebuffIconId\":\"49\"}","{\"ParamId\":\"2\",\"DebuffIconId\":\"50\"}","{\"ParamId\":\"3\",\"DebuffIconId\":\"51\"}","{\"ParamId\":\"4\",\"DebuffIconId\":\"52\"}","{\"ParamId\":\"5\",\"DebuffIconId\":\"53\"}","{\"ParamId\":\"6\",\"DebuffIconId\":\"54\"}","{\"ParamId\":\"7\",\"DebuffIconId\":\"55\"}"]
  * @parent ResistWeakData
  * 
  * @param ResistNoEffectElement
@@ -1044,25 +1060,11 @@
  * @default true
  * @parent ResistWeakData
  * 
- * @param NoEffectElementName
- * @desc 効かない属性の名前です。
- * @text 効かない属性名称
- * @type string
- * @default 無効属性
- * @parent ResistWeakData
- * 
  * @param ElementUnknownIconId
- * @desc ステータス情報未登録時に表示するアイコンのIDを指定します。
- * @text ステータス情報未登録時アイコンID
+ * @desc ステータス情報未登録時に表示する属性アイコンのIDを指定します。
+ * @text ステータス情報未登録時属性アイコンID
  * @type number
  * @default 0
- * @parent ResistWeakData
- * 
- * @param WeakStateName
- * @desc 効きやすいステートの名前です。
- * @text 効きやすいステート名称
- * @type string
- * @default 弱点ステート
  * @parent ResistWeakData
  * 
  * @param NormalWeakState
@@ -1072,25 +1074,11 @@
  * @default true
  * @parent ResistWeakData
  * 
- * @param ResistStateName
- * @desc 効きにくいステートの名前です。
- * @text 効きにくいステート名称
- * @type string
- * @default 耐性ステート
- * @parent ResistWeakData
- * 
  * @param ResistNoEffectState
  * @desc 効きにくいステートに無効を反映させるか。
  * @text 効きにくいステートに無効反映
  * @type boolean
  * @default true
- * @parent ResistWeakData
- * 
- * @param NoEffectStateName
- * @desc 効かないステートの名前です。
- * @text 効かないステート名称
- * @type string
- * @default 無効ステート
  * @parent ResistWeakData
  * 
  * @param ResistWeakDataMaskMode
@@ -1101,8 +1089,15 @@
  * @parent ResistWeakData
  * 
  * @param StateUnknownIconId
- * @desc ステータス情報未登録時に表示するアイコンのIDを指定します。
- * @text ステータス情報未登録時アイコンID
+ * @desc ステータス情報未登録時に表示するステートアイコンのIDを指定します。
+ * @text ステータス情報未登録時ステートアイコンID
+ * @type number
+ * @default 0
+ * @parent ResistWeakData
+ * 
+ * @param DeBuffUnknownIconId
+ * @desc ステータス情報未登録時に表示するデバフアイコンのIDを指定します。
+ * @text ステータス情報未登録時デバフアイコンID
  * @type number
  * @default 0
  * @parent ResistWeakData
@@ -1127,6 +1122,35 @@
  * @text 表示ステート
  * @type state
  *
+ */
+/*~struct~DebuffData:
+ * 
+ * @param ParamId
+ * @text デバフ対象
+ * @desc 表示デバフを指定します。
+ * @type select
+ * @option ＨＰ
+ * @value 0
+ * @option ＭＰ
+ * @value 1
+ * @option 攻撃力
+ * @value 2
+ * @option 防御力
+ * @value 3
+ * @option 魔法力
+ * @value 4
+ * @option 魔法防御
+ * @value 5
+ * @option 敏捷性
+ * @value 6
+ * @option 運
+ * @value 7
+ * @default 0
+ * 
+ * @param DebuffIconId
+ * @desc アイコンのIDを指定します。
+ * @text アイコンID
+ * @type number
  */
 /*~struct~PageSettingData:
  * 
@@ -2944,8 +2968,10 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
       this.drawNoEffectStates(list, enemy, x, y, width);
       break;
     case 50:
+      this.drawWeakDebuff(list, enemy, x, y, width);
       break;
     case 51:
+      this.drawResistDebuff(list, enemy, x, y, width);
       break;
     case 60:
       this.dropItems(list, enemy, x, y, width);
@@ -2960,6 +2986,7 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
       this.originalParams(list, enemy, x, y, width);
       break;
     case 100:
+      this.enemyAction(list, enemy, x, y, width);
       break;
     case 200:
       this.enemyImg(list, enemy, x - 4, y - 4, width);
@@ -3359,7 +3386,7 @@ Window_EnemyBook.prototype.drawWeakStates = function(list, enemy, x, y, width) {
   if(State.StateId){
     let stateId = State.StateId;
     let rate = enemy.stateRate(stateId);
-    if (rate > 1 && !param.NormalWeakState || rate >= 1 && param.NormalWeakState) {
+    if (((!param.NormalWeakState && rate > 1) || (param.NormalWeakState && rate >= 1)) && !enemy.isStateResist(stateId)) {
       let icon = Unknown ? param.StateUnknownIconId : $dataStates[stateId].iconIndex;
       if (icon && icon > 0) icons.push(icon);
       }
@@ -3405,6 +3432,66 @@ Window_EnemyBook.prototype.drawNoEffectStates = function(list, enemy, x, y, widt
 	  this.drawIcon(icon, x, y);
 	  x += dx;
 	});
+};
+
+Window_EnemyBook.prototype.buffIconIndex = function(rate, paramId) {
+	if (rate > 1) {
+    return Game_BattlerBase.ICON_BUFF_START + (buffLevel - 1) * 8 + paramId;
+  }
+};
+
+Window_EnemyBook.prototype.drawWeakDebuff = function(list, enemy, x, y, width) {
+  let Unknown = false;
+  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  const nameText = list.paramName ? list.paramName : "弱点デバフ";
+  this.drawText(nameText, x, y);
+  if(!this.resistWeakDataMask(list.MaskMode)){
+    if (param.DeBuffUnknownIconId === 0) {
+      return;
+    }
+    Unknown = true;
+  }
+  let icons = [];
+  param.DeBuffList.forEach(deBuff => {
+    let rate = enemy.debuffRate(deBuff.ParamId);
+    if (rate > 1) {
+      let icon = Unknown ? param.DeBuffUnknownIconId : deBuff.DebuffIconId;
+      if (icon && icon > 0) icons.push(icon);
+    }
+  });
+  let dx = this.iconX(icons, width);
+  y += this.lineHeight();
+  icons.forEach(icon => {
+	  this.drawIcon(icon, x, y);
+	  x += dx;
+  });
+};
+
+Window_EnemyBook.prototype.drawResistDebuff = function(list, enemy, x, y, width) {
+  let Unknown = false;
+  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  const nameText = list.paramName ? list.paramName : "耐性デバフ";
+  this.drawText(nameText, x, y);
+  if(!this.resistWeakDataMask(list.MaskMode)){
+    if (param.DeBuffUnknownIconId === 0) {
+      return;
+    }
+    Unknown = true;
+  }
+  let icons = [];
+  param.DeBuffList.forEach(deBuff => {
+    let rate = enemy.debuffRate(deBuff.ParamId);
+    if (rate < 1) {
+      let icon = Unknown ? param.DeBuffUnknownIconId : deBuff.DebuffIconId;
+      if (icon && icon > 0) icons.push(icon);
+    }
+  });
+  let dx = this.iconX(icons, width);
+  y += this.lineHeight();
+  icons.forEach(icon => {
+	  this.drawIcon(icon, x, y);
+	  x += dx;
+  });
 };
 
 Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
@@ -3478,7 +3565,7 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
   const listLength = stealList.length;
   for(let i = 0; listLength > i; i++){
     if (stealList[i].kind > 0 && stealList[i].kind < 4) {
-      if (mode && param.DropItemMultiCol) {
+      if (param.DropItemMultiCol) {
         x2 = Math.floor(dropIndex % cols) * (width + this.itemPadding()) + x;
         y2 = Math.floor(dropIndex / cols) * lineHeight + y + lineHeight;
       } else {
@@ -3542,6 +3629,42 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
     text = param.UnknownStatus;
   }
   this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
+};
+
+Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
+  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  const nameText = list.paramName ? list.paramName : "行動";
+  this.drawText(nameText, x, y, width);
+  const lineHeight = this.lineHeight();
+  let cols = 1;
+  let x2 = x;
+  let y2 = y;
+  if (param.ActionMultiCol) {
+    if (list.WideMode === 2) {
+      width = (width - this.colSpacing()) / 2;
+      cols = 2;
+    } else if (list.WideMode === 3 && param.ContentCols === 3) {
+      width = (width - this.colSpacing() * 2) / 3;
+      cols = 3;
+    }
+  }
+  const action = this._enemy.actions;
+  this.resetTextColor();
+  const dateLenght = param.ActionMaxItems === 0 ? action.length : param.ActionMaxItems;
+  for (let i = 0; i < dateLenght; i++) {
+    if (param.ActionMultiCol) {
+      x2 = Math.floor(i % cols) * (width + this.itemPadding()) + x;
+      y2 = Math.floor(i / cols) * lineHeight + y + lineHeight;
+    } else {
+      y2 += lineHeight;
+    }
+    const skillDate = $dataSkills[action[i].skillId];
+    if(this.paramEXMask(list.MaskMode)){
+      this.drawItemName(skillDate, x2, y2, width);
+    } else {
+      this.drawText(this.unknownDataLength(skillDate.name), x2, y2, width);
+    }
+  }
 };
 
 Window_EnemyBook.prototype.nameLength = function(name) {

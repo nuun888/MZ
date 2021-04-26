@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.4.5
+ * @version 1.4.6
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -156,6 +156,10 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/26 Ver.1.4.6
+ * プラグインコマンド「図鑑完成」を実行した後に撃破済みのモンスターの撃破数がリセットされ１になる問題を修正。
+ * ステータス項目の文字と数値がかぶって表示される問題を修正。
+ * 弱点ステートに無効化ステートが表示してしまう問題を修正。
  * 2021/4/19 Ver.1.4.5
  * 戦闘中でモンスターのカテゴリーをONにして図鑑を開いたときにスクロールしてしまう問題を修正。
  * 一部の不具合が再発していたので修正。
@@ -1195,7 +1199,8 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
-param.AnalyzeSkillMode = param.AnalyzeSkillMode || ["{\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}"];
+param.AnalyzeSkillMode = param.AnalyzeSkillMode || [];
+param.ParamList = param.ParamList || [];
 let openAnalyze = false;
 
 //プラグインコマンド
@@ -1289,9 +1294,16 @@ Game_System.prototype.addToEnemyBook = function(enemyId) {
   this._enemyBookFlags[enemyId] = true;
 };
 
+Game_System.prototype.removeEnemyBook = function(enemyId) {
+  if(!this._enemyBookFlags) {
+    this.clearEnemyBookFlags();
+  }
+  this._enemyBookFlags[enemyId] = false;
+};
+
 Game_System.prototype.removeFromEnemyBook = function(enemyId) {
   if(this._enemyBookFlags) {
-    this._enemyBookFlags[enemyId] = false;
+    this.removeEnemyBook(enemyId);
     this.dropItemListFlag(enemyId, 0, false);
     this.stealItemListFlag(enemyId, 0, false);
     if (!this._defeatNumber) {
@@ -1313,12 +1325,13 @@ Game_System.prototype.clearEnemyBook = function() {
 };
 
 Game_System.prototype.completeEnemyBook = function() {
-  this.clearEnemyBook();
   for (let i = 1; i < $dataEnemies.length; i++) {
-    this._enemyBookFlags[i] = true;
+    this.addToEnemyBook(i);
     this.dropItemListFlag(i, 0, true);
     this.stealItemListFlag(i, 0, true);
-    this.defeatCount(i);
+    if (!this._defeatNumber || !this._defeatNumber[i]) {
+      this.defeatCount(i);
+    }
   }
 };
 
@@ -2657,6 +2670,7 @@ Window_EnemyBook.prototype.normalParam = function(params) {
 
 Window_EnemyBook.prototype.enemyExp = function(color, enemy, x, y, width) {
 	this.changeTextColor(ColorManager.textColor(color));
+  const textWidth = Math.min(this.textWidth(TextManager.exp), width - Math.floor(width / 3));
 	this.drawText(TextManager.exp, x, y);
   this.resetTextColor();
   let text;
@@ -2665,39 +2679,40 @@ Window_EnemyBook.prototype.enemyExp = function(color, enemy, x, y, width) {
   } else {
     text = param.UnknownStatus;
   }
-  const textWidth = this.textWidth(TextManager.exp) + 8;
-  this.drawText(text, x + textWidth, y, width - textWidth, 'right');
+  this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
 };
   
 Window_EnemyBook.prototype.enemyGold = function(color, enemy, x, y, width) {
   this.changeTextColor(ColorManager.textColor(color));
+  const textWidth = Math.min(this.textWidth(param.MoneyName), width - Math.floor(width / 3));
   this.drawText(param.MoneyName, x, y);
   this.resetTextColor();
   let text;
   if(this.paramEXMask()){
     text = enemy.gold();
-    const textWidth = this.textWidth(param.MoneyName) + 8;
-    this.drawCurrencyValue(text, this.currencyUnit(), x + textWidth, y, width - textWidth);
+    this.drawCurrencyValue(text, this.currencyUnit(), x + textWidth + 8, y, width - (textWidth + 8));
   } else {
     text = param.UnknownStatus;
-    this.drawText(text, x, y, width, 'right');
+    this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
   }
 };
 
 Window_EnemyBook.prototype.defeat = function(color, enemy, x, y, width) {
   this.changeTextColor(ColorManager.textColor(color));
+  const textWidth = Math.min(this.textWidth(param.defeatEnemyName), width - Math.floor(width / 3));
   this.drawText(param.defeatEnemyName, x, y);
   this.resetTextColor();
-  text = $gameSystem.defeatNumber(enemy.enemyId())
-  this.drawText(text, x, y, width, 'right');
+  const text = $gameSystem.defeatNumber(enemy.enemyId());
+  this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
 };
 
 Window_EnemyBook.prototype.originalParams = function(color, enemy, x, y, width, params, paramsEval) {
   if (!params) {
     return this;
   }
+  const textWidth = Math.min(this.textWidth(params), width - Math.floor(width / 3));
 	this.changeTextColor(ColorManager.textColor(color));
-	this.drawText(params, x, y);
+	this.drawText(params, x, y, textWidth);
   this.resetTextColor();
   let text;
   if(this.paramEXMask()){
@@ -2705,7 +2720,7 @@ Window_EnemyBook.prototype.originalParams = function(color, enemy, x, y, width, 
   } else {
     text = param.UnknownStatus;
   }
-	this.drawText(text, x, y, width, 'right');
+	this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
 };
 
 Window_EnemyBook.prototype.drawResistElement = function(color, enemy, x, y, width) {
@@ -2834,7 +2849,7 @@ Window_EnemyBook.prototype.drawWeakStates = function(color, enemy, x, y, width, 
   if(State.StateId){
     let stateId = State.StateId;
     let rate = enemy.stateRate(stateId);
-    if (rate > 1 && !param.NormalWeakState || rate >= 1 && param.NormalWeakState) {
+    if (((!param.NormalWeakState && rate > 1) || (param.NormalWeakState && rate >= 1)) && !enemy.isStateResist(stateId)) {
       let icon = $dataStates[stateId].iconIndex;
       if (icon && icon > 0) icons.push(icon);
       }

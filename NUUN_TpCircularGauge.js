@@ -11,14 +11,17 @@
  * @target MZ
  * @plugindesc TP円形ゲージプラグイン
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * TPゲージを円形にします。
  * バトルスタイル拡張プラグインと併用する場合はこのプラグインを「NUUN_BattleStyleEX_Base」より下に配置してください。
  * 
  * 更新履歴
+ * 2021/4/27 Ver.1.0.1
+ * アクターステータスにのみ表示するように修正。
  * 2021/4/25 Ver.1.0.0
+ * 初版
  * 
  * @param TPFontSize
  * @desc TPのフォントサイズ（メインフォントサイズからの差）
@@ -107,7 +110,7 @@ Imported.NUUN_TpCircularGauge = true;
   const GaugeRadius = Number(parameters['GaugeRadius'] || 25);
   const GaugeHeight = Number(parameters['GaugeHeight'] || 10);
   const StartAngle = Number(parameters['StartAngle'] || -90);
-  const EndAngle = Number(parameters['EndAngle'] || 360);
+  const EndAngle = Number(parameters['EndAngle'] || 270);
 
 
 function Sprite_CircularGauge() {
@@ -181,31 +184,30 @@ Sprite_CircularGauge.prototype.drawGauge = function() {
 };
 
 Sprite_CircularGauge.prototype.drawLabel = function() {
-  const label = this.label();
-  const x = this.labelOutlineWidth() / 2;
-  const y = this.labelY() - 15;
-  const width = this.bitmapWidth();
-  const height = this.bitmapHeight();
-  this.setupLabelFont();
-  this.bitmap.paintOpacity = this.labelOpacity();
-  this.bitmap.drawText(label, x, y, width, height, "center");
-  this.bitmap.paintOpacity = 255;
-};
-
-const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
-Sprite_Gauge.prototype.drawValue = function() {
-  if (this._statusType === 'tp') {
-    if (Imported.NUUN_GaugeValueAnimation) {
-      this._moveMode = true;
-    }
-    const currentValue = this.currentValue();
+  if (this._battler.isActor) {
+    const label = this.label();
+    const x = this.labelOutlineWidth() / 2;
+    const y = this.labelY() - 15;
     const width = this.bitmapWidth();
     const height = this.bitmapHeight();
-    this.setupValueFont();
-    this.bitmap.drawText(currentValue, 0, 6, width, height, "center");
+    this.setupLabelFont();
+    this.bitmap.paintOpacity = this.labelOpacity();
+    this.bitmap.drawText(label, x, y, width, height, "center");
+    this.bitmap.paintOpacity = 255;
   } else {
-    _Sprite_Gauge_drawValue.call(this);
+    Sprite_Gauge.prototype.drawLabel.call(this);
   }
+};
+
+Sprite_CircularGauge.prototype.drawValue = function() {
+  if (Imported.NUUN_GaugeValueAnimation) {
+    this._moveMode = true;
+  }
+  const currentValue = this.currentValue();
+  const width = this.bitmapWidth();
+  const height = this.bitmapHeight();
+  this.setupValueFont();
+  this.bitmap.drawText(currentValue, 0, 6, width, height, "center");
 };
 
 Sprite_CircularGauge.prototype.arcGaugeRect = function(x, y) {

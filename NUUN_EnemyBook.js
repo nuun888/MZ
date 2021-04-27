@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.0.1
+ * @version 2.0.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -216,6 +216,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/27 Ver.2.0.2
+ * 未情報のアイテム、スキルの表示を未確認の索引名から別々に変更。
+ * リスト型のプラグインパラメータで空白のまま図鑑を実行するとエラーが起きる問題を修正。
  * 2021/4/26 Ver.2.0.1
  * 表示できる項目に行動、耐性デバフ、弱点デバフを追加。
  * 弱点ステートに無効化ステートが表示してしまう問題を修正。
@@ -589,6 +592,13 @@
  * @param UnknownData
  * @desc 未確認の索引名です。？1文字だけ入れると名前の文字数に応じて？に置き換えられます。
  * @text 未確認エネミー及びアイテム名
+ * @type string
+ * @default ？
+ * @parent BasicSetting
+ * 
+ * @param UnknownItems
+ * @desc ステータス情報未登録時のアイテム、スキル表示名
+ * @text ステータス情報未登録時アイテム、スキル表示名
  * @type string
  * @default ？
  * @parent BasicSetting
@@ -1517,6 +1527,8 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
 param.BackGroundImg = param.BackGroundImg && param.BackGroundImg.length > 0 ? param.BackGroundImg[0] : null;
 param.AnalyzeBackGroundImg = param.AnalyzeBackGroundImg && param.AnalyzeBackGroundImg.length > 0 ? param.AnalyzeBackGroundImg[0] : null;
 const PercentContentLength = param.PercentWindowVisible && (param.PercentContent && param.PercentContent.length > 0);
+param.PageSetting = param.PageSetting || [];
+
 let openAnalyze = false;
 
 //プラグインコマンド
@@ -1652,7 +1664,7 @@ Game_System.prototype.removeStatusEnemyBook = function(enemyId) {
 
 Game_System.prototype.removeFromEnemyBook = function(enemyId) {
   if(this._enemyBookFlags) {
-    this._enemyBookFlags[enemyId] = false;
+    this.removeEnemyBook(enemyId);
     this.removeStatusEnemyBook(enemyId);
     this.dropItemListFlag(enemyId, 0, false);
     this.stealItemListFlag(enemyId, 0, false);
@@ -2249,6 +2261,7 @@ Scene_EnemyBook.prototype.helpAreaHeight = function() {
 };
 
 Scene_EnemyBook.prototype.setMaxPage = function(page) {
+  page = page || [];
   this._maxPage = page.length;
   this._enemyWindow.displayList = page;
 };
@@ -2338,7 +2351,7 @@ Window_EnemyBook_Percent.prototype.initialize = function(rect) {
   this._encountered = {};
   this._duration = 0;
   this._oy = 0;
-  this._percentContent = param.PercentContent;
+  this._percentContent = param.PercentContent || [];
   this._percentContentLength = this._percentContent.length;
 };
 
@@ -2455,7 +2468,7 @@ Window_EnemyBook_Category.prototype.constructor = Window_EnemyBook_Category;
 
 Window_EnemyBook_Category.prototype.initialize = function(rect) {
   Window_Selectable.prototype.initialize.call(this, rect);
-  this._categoryList = param.EnemyBookCategory;
+  this._categoryList = param.EnemyBookCategory || [];
   this._categorySelect = 0;
   this.select(this._categorySelect);
   this.refresh();
@@ -2829,9 +2842,9 @@ Window_EnemyBook.prototype.refresh = function() {
 Window_EnemyBook.prototype.page = function(enemy) {
   if (!this.displayList || this.displayList.length <= 0) {
     return;
-  }//ListDateSetting
+  }
   const list = this.displayList[this._pageMode];
-  const listContent = this.listDate(list);
+  const listContent = this.listDate(list) || [];
   const lineHeight = this.lineHeight();
   for (const date of listContent) {
     const x_Position = date.X_Position;
@@ -3672,11 +3685,11 @@ Window_EnemyBook.prototype.nameLength = function(name) {
 };
 
 Window_EnemyBook.prototype.unknownDataLength = function(name) {
-  if(param.UnknownData === '？' || param.UnknownData === '?') {
+  if(param.UnknownItems === '？' || param.UnknownItems === '?') {
     const name_length = this.nameLength(name);
-    return param.UnknownData.repeat(name_length);
+    return param.UnknownItems.repeat(name_length);
   } else {
-    return param.UnknownData;
+    return param.UnknownItems;
   }
 };
 
@@ -3755,7 +3768,7 @@ Window_EnemyBookPageCategory.prototype.maxItems = function() {
 };
 
 Window_EnemyBookPageCategory.prototype.setPageList = function(page, cols) {
-  this._list = page;
+  this._list = page || [];
   this.maxPageCols = cols;
 };
 
@@ -4166,6 +4179,7 @@ Scene_Battle.prototype.updateCancelButton = function() {
 };
 
 Scene_Battle.prototype.setMaxPage = function(page) {
+  page = page || [];
   this._enemyBookMaxPage = page.length;
   this._enemyBookEnemyWindow.displayList = page;
 };

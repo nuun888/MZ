@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 1.4.6
+ * @version 1.4.7
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -156,6 +156,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/4/27 Ver.1.4.7
+ * 未情報のアイテム、スキルの表示を未確認の索引名から別々に変更。
+ * リスト型のプラグインパラメータで空白のまま図鑑を実行するとエラーが起きる問題を修正。
  * 2021/4/26 Ver.1.4.6
  * プラグインコマンド「図鑑完成」を実行した後に撃破済みのモンスターの撃破数がリセットされ１になる問題を修正。
  * ステータス項目の文字と数値がかぶって表示される問題を修正。
@@ -489,6 +492,13 @@
  * @param UnknownData
  * @desc 未確認の索引名です。？1文字だけ入れると名前の文字数に応じて？に置き換えられます。
  * @text 未確認エネミー及びアイテム名
+ * @type string
+ * @default ？
+ * @parent BasicSetting
+ * 
+ * @param UnknownItems
+ * @desc ステータス情報未登録時のアイテム、スキル表示名
+ * @text ステータス情報未登録時アイテム、スキル表示名
  * @type string
  * @default ？
  * @parent BasicSetting
@@ -2053,7 +2063,7 @@ Window_EnemyBook_Category.prototype.constructor = Window_EnemyBook_Category;
 
 Window_EnemyBook_Category.prototype.initialize = function(rect) {
   Window_Selectable.prototype.initialize.call(this, rect);
-  this._categoryList = param.EnemyBookCategory;
+  this._categoryList = param.EnemyBookCategory || [];
   this._categorySelect = 0;
   this.select(this._categorySelect);
   this.refresh();
@@ -3012,11 +3022,11 @@ Window_EnemyBook.prototype.nameLength = function(name) {
 };
 
 Window_EnemyBook.prototype.unknownDataLength = function(name) {
-  if(param.UnknownData === '？' || param.UnknownData === '?') {
+  if(param.UnknownItems === '？' || param.UnknownItems === '?') {
     const name_length = this.nameLength(name);
-    return param.UnknownData.repeat(name_length);
+    return param.UnknownItems.repeat(name_length);
   } else {
-    return param.UnknownData;
+    return param.UnknownItems;
   }
 };
 

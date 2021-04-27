@@ -1020,7 +1020,7 @@
  * @parent StealItemData
  * 
  * @param ActionData
- * @text 行動設定
+ * @text 敵の使用スキル設定
  * @default ------------------------------
  * 
  * @param ActionMaxItems
@@ -1309,9 +1309,9 @@
  * @value 46
  * @option 無効ステート
  * @value 47
- * @option 耐性デバフ（未実装）
+ * @option 耐性デバフ
  * @value 50
- * @option 弱点デバフ（未実装）
+ * @option 弱点デバフ
  * @value 51
  * @option ドロップアイテム
  * @value 60
@@ -1321,7 +1321,7 @@
  * @value 70
  * @option オリジナルパラメータ
  * @value 80
- * @option 行動（未実装）
+ * @option 敵の使用スキル
  * @value 100
  * @option モンスター画像
  * @value 200

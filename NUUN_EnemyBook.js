@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.0.2
+ * @version 2.0.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -19,9 +19,9 @@
  * 
  * 以下の項目が表示できます。
  * 
- * HP（アナライズモードではゲージが表示可能です）
- * MP（アナライズモードではゲージが表示可能です）
- * TP（アナライズモードで現在のステータスをONにしている時のみ表示します）（未実装）
+ * HP（アナライズモードでは現在のステータスをONにしている時のみゲージが表示可能です）
+ * MP（アナライズモードでは現在のステータスをONにしている時のみゲージが表示可能です）
+ * TP（アナライズモードで現在のステータスをONにしている時のみ表示します）
  * 攻撃力
  * 防御力
  * 魔法力
@@ -63,7 +63,7 @@
  * スティールアイテム（盗みスキル導入時）
  * 記述欄（フリーテキストスペース　制御文字が使用できます）
  * オリジナルパラメータ（任意のステータス）
- * 行動
+ * 敵の使用スキル
  * モンスター画像
  * 
  * 戦闘中にパーティコマンドからエネミー図鑑を開くことが出来ます。
@@ -83,6 +83,10 @@
  * 
  * <ShowDataBook>
  * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
+ * 
+ * <EnemyIcon:[iconid]>
+ * モンスター名の左にアイコンを表示させることが出来ます。
+ * <EnemyIcon:120> アイコンID120番のアイコンが表示されます。
  * 
  * <EB_SVBattler:[fileName]> モンスター画像をサイドビュー画像で表示させます。(モンスターにサイドビューアクターを表示する系のプラグイン導入が前提としています)
  * [fileName]:ファイル名　サイドビューバトラー画像を指定します。sv_actorsフォルダ内のファイル名を拡張子なしで指定してください。
@@ -216,6 +220,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/28 Ver.2.0.3
+ * 敵の現在のTPを表示する機能を追加。
+ * モンスター名にアイコンを表示する機能を追加。
+ * ゲージの表示が現在のステータスを表示のみ表示以外に表示されていた問題を修正。
+ * NRP_LoopCursorと併用するとエラーが出る問題を修正。
  * 2021/4/27 Ver.2.0.2
  * 未情報のアイテム、スキルの表示を未確認の索引名から別々に変更。
  * リスト型のプラグインパラメータで空白のまま図鑑を実行するとエラーが起きる問題を修正。
@@ -624,6 +633,14 @@
  * @desc サイドビューバトラーを表示時、画像を反転させる。
  * @parent BasicSetting
  * 
+ * @param UnknownEnemyIcons
+ * @desc 未登録のモンスターアイコン。
+ * @text 未登録モンスターアイコン
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent BasicSetting
+ * 
  * @param Category
  * @text カテゴリー設定
  * @default ------------------------------
@@ -797,6 +814,13 @@
  * @default []
  * @parent AnalyzeSetting
  * 
+ * @param AnalyzePageList3
+ * @desc 表示する項目設定。
+ * @text 表示項目設定３
+ * @type struct<PageSettingData>[]
+ * @default []
+ * @parent AnalyzeSetting
+ * 
  * @param HPgaugeWidth
  * @desc アナライズ時のHPゲージ横幅
  * @text アナライズ時HPゲージ横幅
@@ -809,6 +833,15 @@
  * @param MPgaugeWidth
  * @desc アナライズ時のMPゲージ横幅
  * @text アナライズ時MPゲージ横幅
+ * @type number
+ * @default 128
+ * @max 999
+ * @min 0
+ * @parent AnalyzeSetting
+ * 
+ * @param TPgaugeWidth
+ * @desc アナライズ時のTPゲージ横幅
+ * @text アナライズ時TPゲージ横幅
  * @type number
  * @default 128
  * @max 999
@@ -1251,6 +1284,8 @@
  * @value 7
  * @option 運
  * @value 8
+ * @option TP（現在のステータスをONのときのみ）
+ * @value 9
  * @option 命中率
  * @value 10
  * @option 回避率
@@ -1439,6 +1474,8 @@
  * @value 1
  * @option 表示項目設定２
  * @value 2
+ * @option 表示項目設定３
+ * @value 3
  * @default 0
  * 
  * @param StatusGaugeVisible
@@ -1528,7 +1565,7 @@ param.BackGroundImg = param.BackGroundImg && param.BackGroundImg.length > 0 ? pa
 param.AnalyzeBackGroundImg = param.AnalyzeBackGroundImg && param.AnalyzeBackGroundImg.length > 0 ? param.AnalyzeBackGroundImg[0] : null;
 const PercentContentLength = param.PercentWindowVisible && (param.PercentContent && param.PercentContent.length > 0);
 param.PageSetting = param.PageSetting || [];
-
+const NRP_pLoopLR = PluginManager.parameters("NRP_LoopCursor").loopLR;
 let openAnalyze = false;
 
 //プラグインコマンド
@@ -1629,6 +1666,20 @@ PluginManager.registerCommand(pluginName, 'StealItemAcquired', args => {
 });
 
 //Game_System
+const _Game_System_initialize = Game_System.prototype.initialize;
+Game_System.prototype.initialize = function() {
+  _Game_System_initialize.call(this);
+  this._enemyBookFlags = [];
+  this._enemyBookStatusFlags = [];
+  this._defeatNumber = [];
+  this._itemDorps = [];
+  this._stealItem = [];
+  this._enemyBookElementFlags = [];
+  this._enemyBookStateFlags = [];
+  this._enemyBookDebuffFlags = [];
+  this._enemyBookActionFlags = [];
+};
+
 Game_System.prototype.addToEnemyBook = function(enemyId) {
   if(!this._enemyBookFlags) {
     this.clearEnemyBookFlags();
@@ -1646,6 +1697,10 @@ Game_System.prototype.addStatusToEnemyBook = function(enemyId) {
 Game_System.prototype.statusToEnemyBook = function(enemyId) {
   this.addToEnemyBook(enemyId);
   this.addStatusToEnemyBook(enemyId);
+};
+
+Game_System.prototype.addActionToEnemyBook = function(enemyId) {//敵の使用スキル
+  
 };
 
 Game_System.prototype.removeEnemyBook = function(enemyId) {
@@ -2479,7 +2534,7 @@ Window_EnemyBook_Category.prototype.maxCols = function() {
 };
 
 Window_EnemyBook_Category.prototype.maxItems = function() {
-  return this._categoryList.length;
+  return this._categoryList ? this._categoryList.length : 0;
 };
 
 Window_EnemyBook_Category.prototype.processOk = function() {
@@ -2640,11 +2695,16 @@ Window_EnemyBook_Index.prototype.drawItem = function(index) {
   if(enemy) {
     const rect = this.itemLineRect(index);
     let name = '';
+    let iconId = 0;
     if ($gameSystem.isInEnemyBook(enemy)) {
       name = enemy.name;
+      iconId = enemy.meta.EnemyIcon ? Number(enemy.meta.EnemyIcon) : 0;
     } else {
       name = this.unknownDataLength(enemy);
+      iconId = enemy.meta.EnemyIcon && enemy.meta.EnemyIcon > 0 ? param.UnknownEnemyIcons : 0;
     }
+    const textMargin = iconId > 0 ? ImageManager.iconWidth + 4 : 0;
+    const itemWidth = Math.max(0, rect.width - textMargin);
     if(param.NumberType > 0) {
       let numberText = this._listEnemy[index];
       const textWidth = this.numberWidth(numberText);
@@ -2653,9 +2713,17 @@ Window_EnemyBook_Index.prototype.drawItem = function(index) {
       }
       this.drawText(numberText, rect.x, rect.y, textWidth);
       this.drawText(":", rect.x + textWidth + 6, rect.y);
-      this.drawText(name, rect.x + textWidth + 22, rect.y, rect.width - textWidth - 22);
+      if (iconId > 0) {
+        const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+        this.drawIcon(iconId, rect.x + textWidth + 22, iconY);
+      }
+      this.drawText(name, rect.x + textWidth + 22 + textMargin, rect.y, itemWidth - textWidth - 22);
     } else {
-      this.drawText(name, rect.x, rect.y, rect.width);
+      if (iconId > 0) {
+        const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+        this.drawIcon(iconId, rect.x, iconY);
+      }
+      this.drawText(name, rect.x + textMargin, rect.y, itemWidth);
     }
   }
 };
@@ -2771,7 +2839,7 @@ Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
 };
 
 Window_EnemyBook.prototype.analyzeGaugeVisible = function() {
-  return this._AnalyzeStatus && eval(this._AnalyzeStatus.StatusGaugeVisible);
+  return this._AnalyzeStatus && this.analyzeCurrentStatus() && eval(this._AnalyzeStatus.StatusGaugeVisible);
 };
 
 Window_EnemyBook.prototype.analyzeCurrentStatus = function() {
@@ -2925,6 +2993,7 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
     case 6:
     case 7:
     case 8:
+    case 9:
     case 10:
     case 11:
     case 12:
@@ -3027,6 +3096,8 @@ Window_EnemyBook.prototype.paramNameShow = function(list, enemy) {
     case 7:
     case 8:
       return TextManager.param(params - 1);
+    case 9:
+      return TextManager.basic(6);
     case 10:
     case 11:
       return TextManager.param(params - 2);
@@ -3088,6 +3159,8 @@ Window_EnemyBook.prototype.paramShow = function(list, enemy) {
     case 7:
     case 8:
       return enemy.param(params - 1);
+    case 9:
+      return enemy._tp;
     case 10:
     case 11:
     case 12:
@@ -3142,8 +3215,11 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
   let text = this.paramShow(list, enemy);
   let textWidth = width;
   if (text !== undefined) {
-    if ((list.DateSelect === 1 || list.DateSelect === 2) && $gameParty.inBattle() && enemy && this.analyzeGaugeVisible()) {
+    if ((list.DateSelect === 1 || list.DateSelect === 2 || list.DateSelect === 9) && $gameParty.inBattle() && enemy && this.analyzeGaugeVisible()) {
     } else {
+      if (list.DateSelect === 9 && !this.analyzeCurrentStatus()) {
+        return;
+      }
       this.changeTextColor(ColorManager.textColor(list.NameColor));
       nameText = this.paramNameShow(list, enemy);
       textWidth = Math.min(this.textWidth(nameText), width - Math.floor(width / 3));
@@ -3157,6 +3233,8 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
       this.placeGauge(enemy, "hp", x, y);
     } else if ($gameParty.inBattle() && this.analyzeGaugeVisible() && list.DateSelect === 2) {
       this.placeGauge(enemy, "mp", x, y);
+    } else if ($gameParty.inBattle() && this.analyzeGaugeVisible() && list.DateSelect === 9) {
+      this.placeGauge(enemy, "tp", x, y);
     } else {
       if (this._bookMode === 1 && this.analyzeCurrentStatus()) {
         if (!this.analyzeGaugeVisible() && list.DateSelect === 1) {
@@ -3184,7 +3262,25 @@ Window_EnemyBook.prototype.enemyImg = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.enemyName = function(list, enemy, x, y, width) {
 	this.changeTextColor(ColorManager.textColor(list.NameColor));
-	this.drawText(enemy.name(), x, y, width, list.namePosition);
+  const text = enemy.name();
+  const iconId = this._enemy.meta.EnemyIcon ? Number(this._enemy.meta.EnemyIcon) : 0;
+  if (iconId > 0) {
+    const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+    const textMargin = iconId > 0 ? ImageManager.iconWidth + 4 : 0;
+    const itemWidth = Math.max(0, width - textMargin);
+    const textWidth = this.textWidth(text);
+    const width2 = Math.min(itemWidth, textWidth);
+    if(list.namePosition === 'center') {
+      this.drawIcon(iconId, x + (width / 2 - width2 / 2) - textMargin / 2, iconY);
+    } else if (list.namePosition === 'left') {
+      this.drawIcon(iconId, x, iconY);
+    } else {
+      this.drawIcon(iconId, x + itemWidth - width2, iconY);
+    }
+    this.drawText(text, x + textMargin, y, itemWidth, list.namePosition);
+  } else {
+    this.drawText(text, x, y, width, list.namePosition);
+  }
 };
 
 Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
@@ -3646,7 +3742,7 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
   this.changeTextColor(ColorManager.textColor(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "行動";
+  const nameText = list.paramName ? list.paramName : "使用スキル";
   this.drawText(nameText, x, y, width);
   const lineHeight = this.lineHeight();
   let cols = 1;
@@ -3735,6 +3831,7 @@ Window_EnemyBook.prototype.removeInnerSprite = function(type) {
 Window_EnemyBook.prototype.removeGauge = function() {
   this.removeInnerSprite('hp');
   this.removeInnerSprite('mp');
+  this.removeInnerSprite('tp');
 };
 
 
@@ -3753,7 +3850,7 @@ Window_EnemyBookPageCategory.prototype.constructor = Window_EnemyBookPageCategor
 
 Window_EnemyBookPageCategory.prototype.initialize = function(rect) {
   Window_Selectable.prototype.initialize.call(this, rect);
-  this._list = [];
+  this._bookList = [];
   this._categorySelect = 0;
   this.maxPageCols = 4;
   this.select(this._categorySelect);
@@ -3764,11 +3861,11 @@ Window_EnemyBookPageCategory.prototype.maxCols = function() {
 };
 
 Window_EnemyBookPageCategory.prototype.maxItems = function() {
-  return this._list.length;
+  return this._bookList ? this._bookList.length : 0;
 };
 
 Window_EnemyBookPageCategory.prototype.setPageList = function(page, cols) {
-  this._list = page || [];
+  this._bookList = page || [];
   this.maxPageCols = cols;
 };
 
@@ -3780,7 +3877,7 @@ Window_EnemyBookPageCategory.prototype.setPage = function() {
 
 Window_EnemyBookPageCategory.prototype.drawItem = function(index) {
   const rect = this.itemLineRect(index);
-  const text = this._list[index].PageCategoryName ? this._list[index].PageCategoryName : "ページ"+ Number(index + 1);
+  const text = this._bookList[index].PageCategoryName ? this._bookList[index].PageCategoryName : "ページ"+ Number(index + 1);
   this.drawText(text, rect.x, rect.y, rect.width);
 };
 
@@ -4012,7 +4109,7 @@ Scene_Battle.prototype.commandEnemyBook = function() {
   this._enemyBookPageWindow.setPageList(param.PageSetting, param.PageCols);
   this._enemyBookPageWindow.setPage();
   this._enemyBookEnemyWindow.x = (param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
-  const pageLength = this._enemyBookPageWindow._list.length;
+  const pageLength = this._enemyBookPageWindow._bookList.length;
   const rect = this.enemyBookWindowRect();
   this._enemyBookPageWindow.x = this._enemyBookEnemyWindow.x;
   this._enemyBookEnemyWindow.y = rect.y + (pageLength > 1 ? this._enemyBookPageWindow.height : 0) + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
@@ -4066,7 +4163,7 @@ Scene_Battle.prototype.enemyBookEnemyAnalyze = function(args) {
   this.setEnemyBookBackGround();
   this.setAnalyzeDate(args);  
   this._enemyBookEnemyWindow.x = ((Graphics.boxWidth - this._enemyBookEnemyWindow.width) / 2) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
-  const pageLength = this._enemyBookPageWindow._list.length;
+  const pageLength = this._enemyBookPageWindow._bookList.length;
   const rect = this.enemyBookWindowRect();
   this._enemyBookPageWindow.x = this._enemyBookEnemyWindow.x;
   this._enemyBookEnemyWindow.y = rect.y + (pageLength > 1 ? this._enemyBookPageWindow.height : 0) + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
@@ -4096,6 +4193,8 @@ Scene_Battle.prototype.setAnalyzeDate = function(args) {
     list = param.AnalyzePageList1;
   } else if (args.Mode === 2) {
     list = param.AnalyzePageList2;
+  } else if (args.Mode === 3) {
+    list = param.AnalyzePageList3;
   }
   this.setMaxPage(list);
   this._enemyBookPageWindow.setPageList(list, args.PageCols);
@@ -4335,6 +4434,8 @@ Sprite_EnemyBookGauge.prototype.bitmapWidth = function() {
     return param.HPgaugeWidth > 0 ? param.HPgaugeWidth : 128;
   } else if (this._statusType === 'mp') {
     return param.MPgaugeWidth > 0 ? param.MPgaugeWidth : 128;
+  }  else if (this._statusType === 'tp') {
+    return param.TPgaugeWidth > 0 ? param.TPgaugeWidth : 128;
   }
   return 999;
 };
@@ -4478,4 +4579,26 @@ Sprite_BookEnemy.prototype.setMaxWidth = function(width) {
 Sprite_BookEnemy.prototype.setMaxHeight = function(height) {
   this.maxHeight = height;
 };
+
+if (NRP_pLoopLR) {
+  Window_EnemyBookPageCategory.prototype.cursorRight = function(wrap) {
+    const index = this.index();
+    const maxItems = this.maxItems();
+    const maxCols = this.maxCols();
+    const horizontal = this.isHorizontal();
+    if (maxCols >= 2 && (index < maxItems - 1 || (wrap && horizontal))) {
+        this.smoothSelect((index + 1) % maxItems);
+    }
+  };
+
+  Window_EnemyBookPageCategory.prototype.cursorLeft = function(wrap) {
+    const index = Math.max(0, this.index());
+    const maxItems = this.maxItems();
+    const maxCols = this.maxCols();
+    const horizontal = this.isHorizontal();
+    if (maxCols >= 2 && (index > 0 || (wrap && horizontal))) {
+        this.smoothSelect((index - 1 + maxItems) % maxItems);
+    }
+  };
+}
 })();

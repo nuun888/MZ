@@ -5,8 +5,8 @@
 
 | 戦闘 | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
-| 共通処理  | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  | 共通処理を行います。 | Ver |
-| ゲージの数値更新アニメーション  | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  | ゲージの数値の増減をアニメーションさせます。 | Ver |
+| 共通処理  | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  | 共通処理を行います。 | 1.1.1 |
+| ゲージの数値更新アニメーション  | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  | ゲージの数値の増減をアニメーションさせます。 | 1.1.2 |
 
 | 戦闘 | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
@@ -15,9 +15,9 @@
 | 解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)  | 解像度変更時のエネミー、アクターの座標を修正します。またエネミーとアクター、戦闘背景のY座標の位置も調整できます。 | Ver |
 | 戦闘背景の変更  | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)  | フィールドマップで任意の戦闘背景に変更できます。また敵グループ毎、リージョン、タグIDによって戦闘背景を変更できます。 | Ver |
 | 戦闘中アイテム、スキル選択画面MV風表示  | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)  | 戦闘中のアイテム、スキル選択画面をMV風に変更できます。 | Ver |
-| [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  | 戦闘終了後にリザルト画面を表示します。 | Ver |
-| TP円形ゲージ  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | TPゲージを円形にします。 | Ver |
-| TPB円形ゲージ  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | TPBゲージを円形にします。 | Ver |
+| [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  | 戦闘終了後にリザルト画面を表示します。 | 1.7.2 |
+| TP円形ゲージ  | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)  | TPゲージを円形にします。 | 1.0.1 |
+| TPB円形ゲージ  | [NUUN_TpbCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpbCircularGauge.js)  | TPBゲージを円形にします。 | 1.0.0 |
 
 <b>システム</b><br>
 [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>

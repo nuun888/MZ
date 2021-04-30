@@ -3,7 +3,7 @@
 
 # 公開プラグイン
 
-| 戦闘 | プラグイン | 説明 | Ver |
+| システム | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
 | 共通処理  | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  | 共通処理を行います。 | 1.1.1 |
 | ゲージの数値更新アニメーション  | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  | ゲージの数値の増減をアニメーションさせます。 | 1.1.2 |
@@ -27,49 +27,28 @@
 | スキル、アイテムの色  | [NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js)  | スキル、アイテムの文字色を任意の色に変えることが出来ます。 | 1.1.0 |
 | アイテム消耗率  | [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)  | アイテムに消耗率を設定できます。 | 1.0.0 |
 | アイテム使用回数  | [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)  | アイテムに使用回数を設定できます。 | 1.0.1 |
+| 盗みスキル  | [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)  | 敵のアイテムやお金を盗んだり盗まれたりするスキルが出来ます。 | 1.1.1 |
+
+| ステート | プラグイン | 説明 | Ver |
+| ------------- | ------------- | ------------- | ------------- |
+| ステート付与の仕様変更  | [NUUN_AddStateDeviation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js)  | 必中時のステート付与を有効度、運を反映させるようにします。また有効度、運を無視にするスキル、アイテム、ステートを作ることが出来ます。 | 1.0.0 |
+| 戦闘中アクターステートの横並び表示  | [NUUN_IconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_IconSideBySide.js)  | 戦闘中のステートアイコンの並びを横並びに表示させます。 | 1.0.3 |
   
-<b>スキル、アイテム</b><br>
-[NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>
-経験値を増減させるアイテム、スキルが出来ます。<br>
-[NUUN_CancelCastTime](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js)　キャストタイム（詠唱）キャンセルスキル、アイテム<br>
-キャストタイムをキャンセルさせるスキル、アイテムが出来ます。<br>
-[NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js)  スキル、アイテムの色<br>
-スキル、アイテムの文字色を任意の色に変えることが出来ます。<br>
+| アクター | プラグイン | 説明 | Ver |
+| ------------- | ------------- | ------------- | ------------- |
+| レベル上限限界突破  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js)  | 最大レベルを１００以上にすることが出来ます。 | 1.0.1 |
+| 最大レベル変動  | [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)  | ゲーム中に最大レベルを変更することが出来ます。 | 1.0.1 |
+| [経験値計算式変更](https://github.com/nuun888/MZ/blob/master/NUUN_EXPFormula.md)  | (https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js)  | 必要経験値の計算式を変更します。 | 1.0.0 |
 
-<b>アイテム</b><br>
-[NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)　アイテム消耗率<br>
-アイテムに消耗率を設定できます。<br>
-[NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)　アイテム使用回数<br>
-アイテムに使用回数を設定できます。<br>
-新規入手アイテムの強調<br>
+| エネミー | プラグイン | 説明 | Ver |
+| ------------- | ------------- | ------------- | ------------- |
+| 巨大エネミー  | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) | 画面いっぱいにエネミーを表示させます。 | 1.1.2 |
+| エネミー個別座標  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js)  | エネミーの座標を調整できます。 | 1.1.0 |
+| 敵にTPBゲージ表示  | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js)  | 敵にTPBゲージを表示します。 | 1.1.3 |
+| 敵のドロップアイテム追加  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js)  | 敵がドロップするアイテムを４つ以上に設定できます。 | 1.0.0 |
 
-<b>スキル</b><br>
-[NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)　盗みスキル<br>
-敵のアイテムやお金を盗んだり盗まれたりするスキルが出来ます。<br>
 
-<b>ステート</b><br>
-[NUUN_AddStateDeviation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js)　ステート付与の仕様変更<br>
-必中時のステート付与を有効度、運を反映させるようにします。また有効度、運を無視にするスキル、アイテム、ステートを作ることが出来ます。<br>
-[NUUN_IconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_IconSideBySide.js)　戦闘中アクターステートの横並び表示<br>
-戦闘中のステートアイコンの並びを横並びに表示させます。<br>
 
-<b>アクター</b><br>
-[NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js)　レベル上限限界突破<br>
-最大レベルを１００以上にすることが出来ます。<br>
-[NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)　最大レベル変動<br>
-ゲーム中に最大レベルを変更することが出来ます。<br>
-[NUUN_EXPFormula](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js)　経験値計算式変更<br>
-必要経験値の計算式を変更します。[詳細](https://github.com/nuun888/MZ/blob/master/NUUN_EXPFormula.md)<br>
-
-<b>エネミー</b><br>
-[NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js)　巨大エネミー<br>
-画面いっぱいにエネミーを表示させます。<br>
-[NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js)　エネミー個別座標<br>
-エネミーの座標を調整できます。<br>
-[NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js)　敵のドロップアイテム追加<br>
-敵がドロップするアイテムを４つ以上に設定できます。<br>
-[NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js)　敵にTPBゲージ表示<br>
-敵にTPBゲージを表示します。<br>
 
 <b>メニュー系</b><br>
 [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>

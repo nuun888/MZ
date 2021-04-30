@@ -5,7 +5,7 @@ Ver.2.1.1<br>
 https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js<br>
 
 <B>表示できる項目</B><br>
-|  |
+| 表示項目 |
 | ------------- |
 HP（アナライズモードでは現在のステータスをONにしている時のみゲージが表示可能です）<br>
 MP（アナライズモードでは現在のステータスをONにしている時のみゲージが表示可能です）<br>

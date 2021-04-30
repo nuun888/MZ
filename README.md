@@ -33,6 +33,10 @@
 | ------------- | ------------- | ------------- | ------------- |
 | ステート付与の仕様変更  | [NUUN_AddStateDeviation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js)  | 必中時のステート付与を有効度、運を反映させるようにします。また有効度、運を無視にするスキル、アイテム、ステートを作ることが出来ます。 | 1.0.0 |
 | 戦闘中アクターステートの横並び表示  | [NUUN_IconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_IconSideBySide.js)  | 戦闘中のステートアイコンの並びを横並びに表示させます。 | 1.0.3 |
+
+| 特徴拡張 | プラグイン | 説明 | Ver |
+| ------------- | ------------- | ------------- | ------------- |
+| キャストタイムチャージ率特徴  | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js)  | キャストタイム中のチャージ率を変化させる特徴を付けることが出来ます。 | 1.0.0 |
   
 | アクター | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |

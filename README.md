@@ -2,6 +2,11 @@
 公開しているプラグインはすべてMITライセンスで公開しています。
 
 # 公開プラグイン
+
+| システム | ヘッダ 2 |
+| ------------- | ------------- |
+| 共通処理  | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  |
+| ゲージの数値更新アニメーション  | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  |
 <b>システム</b><br>
 [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>
 [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)　ゲージの数値更新アニメーション<br>

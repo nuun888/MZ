@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.1.0
+ * @version 2.1.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -228,6 +228,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/30 Ver.2.1.1
+ * 登録タイミングを撃破済みにしてモンスターを撃破しても登録されない問題を修正。
  * 2021/4/30 Ver.2.1.0
  * 敵の使用スキルに未確認の使用スキルを隠す機能を追加。
  * 敵の属性、ステート、デバフに未確認のアイコンを隠す機能を追加。
@@ -2426,7 +2428,7 @@ const _Game_Enemy_die = Game_Enemy.prototype.die;
 Game_Enemy.prototype.die = function() {
   _Game_Enemy_die.call(this);
   if ($gameSystem.registrationStatusTiming() === 1 || $gameSystem.registrationStatusTiming() === 3) {
-    $gameSystem.addStatusToEnemyBook(this.enemyId());
+    $gameSystem.statusToEnemyBook(this.enemyId());
   } else if ($gameSystem.registrationTiming() === 1 || $gameSystem.registrationTiming() === 3) {
     $gameSystem.addToEnemyBook(this.enemyId());
   }

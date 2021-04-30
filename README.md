@@ -56,33 +56,13 @@
 | セーブ画面拡張  | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | セーブ画面を拡張します。 | 1.2.1 |
 | 所持金拡張更  | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)  | 所持金の上限を変更したりカンマ区切りにしたりすることが出来ます。 | 1.1.0 |
 
+| 敵グループ | プラグイン | 説明 | Ver |
+| ------------- | ------------- | ------------- | ------------- |
+| 敵グループの個別ＢＧＭ設定  | [NUUN_BattleBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js) | 敵グループごとにBGMを設定できます。 | 1.0.1 |
+| 敵グループの個別戦闘勝利敗北ME設定  | [NUUN_BattleME](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleME.js)  | 敵グループごとに勝利ME,敗北MEを設定できます。 | 1.0.0 |
+| エンカウント条件拡張  | [NUUN_EncounterCondition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)  | エンカウント条件を拡張します。 | 1.0.0 |
 
-
-<b>メニュー系</b><br>
-[NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)　アイテムのカテゴリーカスタマイズ<br>
-アイテムのカテゴリーをカスタマイズ（追加したり減らしたり）できます。<br>
-[NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)　モンスター図鑑<br>
-モンスター図鑑を実装します。[詳細](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)<br>
-[NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)　コマンドカスタマイズ<br>
-コマンドにアイコンや色を指定できます。コマンドの文字の表示を左揃え、中央揃え、右揃えから選択できます。<br>
-[NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)　ステータス画面スタイル変更<br>
-ステータス画面を拡張します。<br>
-[NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)　セーブ画面拡張<br>
-セーブ画面を拡張します。<br>
-[NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)　所持金拡張<br>
-所持金の上限を変更したりカンマ区切りにしたりすることが出来ます。<br>
-アイテム図鑑（仮）<br>
-
-<b>敵グループ</b><br>
-[NUUN_BattleBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js)　敵グループの個別ＢＧＭ設定<br>
-敵グループごとにBGMを設定できます。<br>
-[NUUN_BattleME](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleME.js)　敵グループの個別戦闘勝利敗北ME設定<br>
-敵グループごとに勝利ME,敗北MEを設定できます。<br>
-[NUUN_EncounterCondition](https://github.com/nuun888/MZ/blob/master/NUUN_EncounterCondition.js)　エンカウント条件拡張<br>
-エンカウント条件を拡張します。<br>
-
-<b>イベント</b><br>
-[NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)  アイテムなどのランダム取得<br>
-アイテム、武器、防具、お金をランダムに取得します。<br>
-[NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) イベントでアイテム消費時消耗率、使用回数反映<br>
-アイテムを消費時に消耗率、使用回数を考慮します。<br>
+| イベント | プラグイン | 説明 | Ver |
+| ------------- | ------------- | ------------- | ------------- |
+| アイテムなどのランダム取得  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) | アイテム、武器、防具、お金をランダムに取得します。 | 1.2.2 |
+| イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js)  | アイテムを消費時に消耗率、使用回数を考慮します。 | 1.0.0 |

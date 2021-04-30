@@ -38,7 +38,7 @@
 | ------------- | ------------- | ------------- | ------------- |
 | レベル上限限界突破  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js)  | 最大レベルを１００以上にすることが出来ます。 | 1.0.1 |
 | 最大レベル変動  | [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)  | ゲーム中に最大レベルを変更することが出来ます。 | 1.0.1 |
-| [経験値計算式変更](https://github.com/nuun888/MZ/blob/master/NUUN_EXPFormula.md)  | (https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js)  | 必要経験値の計算式を変更します。 | 1.0.0 |
+| [経験値計算式変更](https://github.com/nuun888/MZ/blob/master/NUUN_EXPFormula.md)  | [NUUN_EXPFormula](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js)  | 必要経験値の計算式を変更します。 | 1.0.0 |
 
 | エネミー | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
@@ -47,6 +47,14 @@
 | 敵にTPBゲージ表示  | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js)  | 敵にTPBゲージを表示します。 | 1.1.3 |
 | 敵のドロップアイテム追加  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js)  | 敵がドロップするアイテムを４つ以上に設定できます。 | 1.0.0 |
 
+| メニュー | プラグイン | 説明 | Ver |
+| ------------- | ------------- | ------------- | ------------- |
+| アイテムのカテゴリーカスタマイズ  | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | アイテムのカテゴリーをカスタマイズ（追加したり減らしたり）できます。 | 1.1.2 |
+| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)  | モンスター図鑑を実装します。 | 2.1.1 |
+| コマンドカスタマイズ  | [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  | コマンドにアイコンや色を指定できます。コマンドの文字の表示を左揃え、中央揃え、右揃えから選択できます。 | 1.1.1 |
+| ステータス画面スタイル変更  | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)  | ステータス画面を拡張します。 | 1.3.7 |
+| セーブ画面拡張  | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | セーブ画面を拡張します。 | 1.2.1 |
+| 所持金拡張更  | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)  | 所持金の上限を変更したりカンマ区切りにしたりすることが出来ます。 | 1.1.0 |
 
 
 

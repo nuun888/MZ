@@ -10,8 +10,8 @@
 
 | 戦闘 | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
-| バトルスタイル拡張ベース  | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)  | 戦闘のスタイルを変更、拡張します。 | Ver |
-| バトルスタイル拡張  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです。 | Ver |
+| バトルスタイル拡張ベース  | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)  | 戦闘のスタイルを変更、拡張します。 | 2.2.2 |
+| バトルスタイル拡張  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです。 | 1.2.1 |
 | 解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)  | 解像度変更時のエネミー、アクターの座標を修正します。またエネミーとアクター、戦闘背景のY座標の位置も調整できます。 | 1.0.3 |
 | 戦闘背景の変更  | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)  | フィールドマップで任意の戦闘背景に変更できます。また敵グループ毎、リージョン、タグIDによって戦闘背景を変更できます。 | 1.0.1 |
 | 戦闘中アイテム、スキル選択画面MV風表示  | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)  | 戦闘中のアイテム、スキル選択画面をMV風に変更できます。 | 1.0.2 |
@@ -19,24 +19,14 @@
 | TP円形ゲージ  | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)  | TPゲージを円形にします。 | 1.0.1 |
 | TPB円形ゲージ  | [NUUN_TpbCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpbCircularGauge.js)  | TPBゲージを円形にします。 | 1.0.0 |
 
-<b>システム</b><br>
-[NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>
-[NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)　ゲージの数値更新アニメーション<br>
-ゲージの数値の増減をアニメーションさせます。<br>
-
-<b>戦闘</b><br>
-[NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) バトルスタイル拡張ベース<br>
-戦闘のスタイルを変更します。<br>
-[NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) バトルスタイル拡張<br>
-戦闘のスタイルを変更する設定用ファイルです。<br>
-[NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)　解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整<br>
-解像度変更時のエネミー、アクターの座標を修正します。またエネミーとアクター、戦闘背景のY座標の位置も調整できます。<br>
-[NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)　戦闘背景の変更<br>
-フィールドマップで任意の戦闘背景に変更できます。また敵グループ毎、リージョン、タグIDによって戦闘背景を変更できます。<br>
-[NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)　戦闘中アイテム、スキル選択画面MV風表示プラグイン<br>
-戦闘中のアイテム、スキル選択画面をMV風に変更できます。<br>
-[NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)　リザルト<br>
-戦闘終了後にリザルト画面を表示します。[詳細](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)<br>
+| スキル、アイテム | プラグイン | 説明 | Ver |
+| ------------- | ------------- | ------------- | ------------- |
+| 経験値増減アイテム、スキル  | [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)  | 経験値を増減させるアイテム、スキルが出来ます。 | 1.1.1 |
+| レベルアップアイテム  | [NUUN_LevelUPItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUPItem.js)  | ゲージの数値の増減をアニメーションさせます。 | 1.1.2 |
+| キャストタイム（詠唱）キャンセルスキル、アイテム  | [NUUN_CancelCastTime](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js)  | キャストタイムをキャンセルさせるスキル、アイテムが出来ます。 | 1.1.1 |
+| スキル、アイテムの色  | [NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js)  | スキル、アイテムの文字色を任意の色に変えることが出来ます。 | 1.1.1 |
+| アイテム消耗率  | [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)  | アイテムに消耗率を設定できます。 | 1.1.1 |
+| アイテム使用回数  | [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)  | アイテムに使用回数を設定できます。 | 1.1.1 |
   
 <b>スキル、アイテム</b><br>
 [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)　経験値増減アイテム、スキル<br>

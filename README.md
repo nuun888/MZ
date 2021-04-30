@@ -18,6 +18,7 @@
 | [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  | 戦闘終了後にリザルト画面を表示します。 | 1.7.2 |
 | TP円形ゲージ  | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)  | TPゲージを円形にします。 | 1.0.1 |
 | TPB円形ゲージ  | [NUUN_TpbCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpbCircularGauge.js)  | TPBゲージを円形にします。 | 1.0.0 |
+| ターン表示  |  |  |  |
 
 | スキル、アイテム | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
@@ -37,6 +38,7 @@
 | 特徴拡張 | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
 | キャストタイムチャージ率特徴  | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js)  | キャストタイム中のチャージ率を変化させる特徴を付けることが出来ます。 | 1.0.0 |
+| ファイナルアタック  |  |  |  |
   
 | アクター | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
@@ -59,6 +61,7 @@
 | ステータス画面スタイル変更  | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)  | ステータス画面を拡張します。 | 1.3.7 |
 | セーブ画面拡張  | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | セーブ画面を拡張します。 | 1.2.1 |
 | 所持金拡張更  | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)  | 所持金の上限を変更したりカンマ区切りにしたりすることが出来ます。 | 1.1.0 |
+| アイテム図鑑  |  |  |  |
 
 | 敵グループ | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |

@@ -82,10 +82,10 @@ PgUp PgDn：エネミーリストページ送り<br>
 
 モンスター図鑑はメニューコマンド、戦闘中のパーティコマンド及びプラグインコマンドの「図鑑を開く」から開くことが出来ます。<br>
 
-![画像](img/EnemyBook1.png)
-![画像](img/EnemyBook2.png)
+![画像](img/EnemyBook1.png)<br>
+![画像](img/EnemyBook2.png)<br>
 ![画像](img/EnemyBook3.png)<br>
-![画像](img/EnemyBook4.png)
+![画像](img/EnemyBook4.png)<br>
 
 任意の背景画像が設定できます。<br>
 ![画像](img/EnemyBook8.png)

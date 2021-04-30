@@ -74,3 +74,8 @@
 | ------------- | ------------- | ------------- | ------------- |
 | アイテムなどのランダム取得  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) | アイテム、武器、防具、お金をランダムに取得します。 | 1.2.2 |
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js)  | アイテムを消費時に消耗率、使用回数を考慮します。 | 1.0.0 |
+
+| 他製作者様移植 | プラグイン | 説明 | Ver |
+| ------------- | ------------- | ------------- | ------------- |
+|   |  |  |  |
+

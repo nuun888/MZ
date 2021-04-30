@@ -5,13 +5,19 @@
 
 | システム | プラグイン | バージョン |
 | ------------- | ------------- | ------------- |
-| 共通処理  | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  | Ver |
-| ゲージの数値更新アニメーション  | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  | Ver |
+| 共通処理  | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  | 共通処理を行います。 | Ver |
+| ゲージの数値更新アニメーション  | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  | ゲージの数値の増減をアニメーションさせます。 | Ver |
 
-| 戦闘 | プラグイン | バージョン |
-| ------------- | ------------- | ------------- |
-| バトルスタイル拡張ベース  | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)  | Ver |
-| バトルスタイル拡張  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | Ver |
+| 戦闘 | プラグイン | 説明 | バージョン |
+| ------------- | ------------- | ------------- | ------------- |
+| バトルスタイル拡張ベース  | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)  | 戦闘のスタイルを変更、拡張します。 | Ver |
+| バトルスタイル拡張  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
+| 解像度変更時のアクター、エネミー座標調整、<br>戦闘背景Y座標調整  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)  | 解像度変更時のエネミー、アクターの座標を修正します。またエネミーとアクター、戦闘背景のY座標の位置も調整できます。 | Ver |
+| 戦闘背景の変更  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
+| 戦闘中アイテム、スキル選択画面MV風表示  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
+| リザルト  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
+| TP円形ゲージ  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
+| TPB円形ゲージ  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
 
 <b>システム</b><br>
 [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>

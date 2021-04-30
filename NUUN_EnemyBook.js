@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.0.3
+ * @version 2.1.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -199,11 +199,19 @@
  * モンスタースティールアイテム取得済み モンスターのスティールアイテムを取得済みにします。
  * モンスタースティールアイテム未取得   モンスターのスティールアイテムを未収得にさせます。
  * 総撃破数モンスター数          撃破したモンスター数を変数に格納します。
- * 遭遇数                       遭遇済みのモンスター数を変数に格納します。
+ * 遭遇数                      遭遇済みのモンスター数を変数に格納します。
  * 図鑑完成度                   現在の完成度を変数に格納します。
- * 総撃破数                     指定のモンスターの撃破数を変数に格納します。
+ * 総撃破数                    指定のモンスターの撃破数を変数に格納します。
  * アイテムドロップ済み判定      指定のアイテムがドロップ済みか判定します。
- * アイテム盗み済み判定          指定のアイテムが盗み済みか判定します。
+ * アイテム盗み済み判定         指定のアイテムが盗み済みか判定します。
+ * 敵の使用スキル確認済み　　　　敵の使用スキルを確認済みにします。0で全て確認済みにします。
+ * 敵の使用スキル未確認　　　　　敵の使用スキルを未確認にします。0で全て未確認にします。
+ * 敵の属性耐性弱点確認済み　　　敵の属性耐性弱点を確認済みにします。0で全て確認済みにします。
+ * 敵の属性耐性弱点未確認　　　　敵の属性耐性弱点を未確認にします。0で全て未確認にします。
+ * 敵のステート耐性弱点確認済み　敵のステート耐性弱点を確認済みにします。0で全て確認済みにします。
+ * 敵のステート耐性弱点未確認　　敵のステート耐性弱点を未確認にします。0で全て未確認にします。
+ * 敵のデバフ耐性弱点確認済み　　敵のデバフ耐性弱点を確認済みにします。0で全て確認済みにします。
+ * 敵のデバフ耐性弱点未確認　　　敵のデバフ耐性弱点を未確認にします。0で全て未確認にします。
  * 
  * オリジナルパラメータ参照変数
  * this._enemy　データベースのモンスターデータを取得します。
@@ -220,6 +228,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/30 Ver.2.1.0
+ * 敵の使用スキルに未確認の使用スキルを隠す機能を追加。
+ * 敵の属性、ステート、デバフに未確認のアイコンを隠す機能を追加。
+ * 不要なプラグインパラメータを削除。
+ * アイテム、スティール情報を確認済み及び未確認にする時に、１番目のアイテムを指定したときに全てのアイテムが対象になってしまう問題を修正。
+ * 情報登録タイミングを遭遇時に設定するとエラーが出る問題を修正。
  * 2021/4/28 Ver.2.0.3
  * 敵の現在のTPを表示する機能を追加。
  * モンスター名にアイコンを表示する機能を追加。
@@ -529,6 +543,161 @@
  * @text 格納スイッチ
  * @desc アイテムが盗み済みかを代入する変数を指定します。
  * 
+ * @command EnemyBookActionAdd
+ * @desc モンスターの未確認の使用スキルを確認済みにします。
+ * @text 未確認使用スキル確認済み
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg actionId
+ * @type number
+ * @default 0
+ * @text 行動パターンID
+ * @desc 行動パターンID（一番上が１番）（0ですべて）
+ * 
+ * @command EnemyBookActionRemove
+ * @desc モンスターの確認済みの使用スキルを未確認にします。
+ * @text 確認済み使用スキル未確認
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg actionId
+ * @type number
+ * @default 0
+ * @text 行動パターンID
+ * @desc 行動パターンID（一番上が１番）（0ですべて）
+ * 
+ * @command EnemyBookElementAdd
+ * @desc モンスターの未確認の属性耐性弱点情報を確認済みにします。
+ * @text 未確認属性耐性弱点情報確認済み
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg elementId
+ * @type number
+ * @default 0
+ * @text 属性ID
+ * @desc 属性ID（データベースのタイプタグの属性）（0ですべて）
+ * 
+ * @command EnemyBookElementRemove
+ * @desc モンスターの確認済みの属性耐性弱点情報を未確認にします。
+ * @text 確認済み属性耐性弱点情報未確認
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg elementId
+ * @type number
+ * @default 0
+ * @text 属性ID
+ * @desc 属性ID（データベースのタイプタグの属性）（0ですべて）
+ * 
+ * @command EnemyBookStateAdd
+ * @desc モンスターの未確認のステート耐性弱点情報を確認済みにします。
+ * @text 未確認ステート耐性弱点情報確認済み
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg stateId
+ * @type state
+ * @default 0
+ * @text ステートID
+ * @desc ステートID（データベースのタイプタグの属性）（0ですべて）
+ * 
+ * @command EnemyBookStateRemove
+ * @desc モンスターの確認済みのステート耐性弱点情報を未確認にします。
+ * @text 確認済みステート耐性弱点情報未確認
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg stateId
+ * @type state
+ * @default 0
+ * @text ステートID
+ * @desc ステートID（データベースのタイプタグの属性）（0（なし）ですべて）
+ * 
+ * @command EnemyBookDebuffAdd
+ * @desc モンスターの未確認のデバフ耐性弱点情報を確認済みにします。
+ * @text 未確認デバフ耐性弱点情報確認済み
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg debuffId
+ * @text デバフ対象
+ * @desc 確認済みにするデバフ対象を指定します。
+ * @type select
+ * @option ＨＰ
+ * @value 0
+ * @option ＭＰ
+ * @value 1
+ * @option 攻撃力
+ * @value 2
+ * @option 防御力
+ * @value 3
+ * @option 魔法力
+ * @value 4
+ * @option 魔法防御
+ * @value 5
+ * @option 敏捷性
+ * @value 6
+ * @option 運
+ * @value 7
+ * @option 全て
+ * @value -1
+ * @default -1
+ * 
+ * @command EnemyBookDebuffRemove
+ * @desc モンスターの確認済みのデバフ耐性弱点情報を未確認にします。
+ * @text 確認済みデバフ耐性弱点情報未確認
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg debuffId
+ * @text デバフ対象
+ * @desc 確認済みにするデバフ対象を指定します。
+ * @type select
+ * @option ＨＰ
+ * @value 0
+ * @option ＭＰ
+ * @value 1
+ * @option 攻撃力
+ * @value 2
+ * @option 防御力
+ * @value 3
+ * @option 魔法力
+ * @value 4
+ * @option 魔法防御
+ * @value 5
+ * @option 敏捷性
+ * @value 6
+ * @option 運
+ * @value 7
+ * @option 全て
+ * @value -1
+ * @default -1
  * 
  * パラメータ
  * @param BasicSetting
@@ -1014,7 +1183,7 @@
  * @parent DropItemData
  * 
  * @param ShowDropItemName
- * @desc 未確認のドロップアイテムを隠す。
+ * @desc 未確認のドロップアイテムを隠す。(ステータス情報登録をしてもドロップアイテムを確認するまでは表示されません)
  * @text 未確認ドロップアイテム名
  * @type boolean
  * @default false
@@ -1031,18 +1200,18 @@
  * @text スティールアイテム設定
  * @default ------------------------------
  * 
- * @param ShowStealItemName
- * @desc 未確認のスティールアイテムを隠す。
- * @text 未確認スティールアイテム表示
- * @type boolean
- * @default false
- * @parent StealItemData
- * 
  * @param StealItemProbabilityShow
  * @desc 確率を表示する。
  * @text 確率表示
  * @type boolean
  * @default true
+ * @parent StealItemData
+ * 
+ * @param ShowStealItemName
+ * @desc 未確認のスティールアイテムを隠す。(ステータス情報登録をしてもスティールアイテムを確認するまでは表示されません)
+ * @text 未確認スティールアイテム表示
+ * @type boolean
+ * @default false
  * @parent StealItemData
  * 
  * @param StealItem2Col
@@ -1055,6 +1224,13 @@
  * @param ActionData
  * @text 敵の使用スキル設定
  * @default ------------------------------
+ * 
+ * @param ShowActionName
+ * @desc 未確認の使用スキルを隠す。(ステータス情報登録をしてもスティールアイテム使用スキルを確認するまでは表示されません)
+ * @text 未確認使用スキル表示
+ * @type boolean
+ * @default false
+ * @parent ActionData
  * 
  * @param ActionMaxItems
  * @desc 表示する最大項目数。(0で制限なし)
@@ -1071,8 +1247,8 @@
  * @default false
  * @parent ActionData
  * 
- * @param ResistWeakData
- * @text 耐性弱点設定
+ * @param ResistWeakElementData
+ * @text 属性耐性弱点設定
  * @default ------------------------------
  * 
  * @param ElementList
@@ -1080,70 +1256,92 @@
  * @text 表示属性
  * @type struct<ElementData>[]
  * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"76\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"66\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"67\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"68\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"69\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"70\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"71\"}"]
- * @parent ResistWeakData
+ * @parent ResistWeakElementData
  * 
- * @param StateList
- * @desc 表示するステート。
- * @text 表示ステート
- * @type struct<StateData>[]
- * @default ["{\"StateId\":\"1\"}","{\"StateId\":\"4\"}","{\"StateId\":\"5\"}","{\"StateId\":\"6\"}","{\"StateId\":\"7\"}","{\"StateId\":\"8\"}","{\"StateId\":\"9\"}","{\"StateId\":\"10\"}","{\"StateId\":\"12\"}","{\"StateId\":\"13\"}"]
- * @parent ResistWeakData
- * 
- * @param DeBuffList
- * @desc 表示するデバフ。
- * @text 表示デバフ
- * @type struct<DebuffData>[]
- * @default ["{\"ParamId\":\"0\",\"DebuffIconId\":\"48\"}","{\"ParamId\":\"1\",\"DebuffIconId\":\"49\"}","{\"ParamId\":\"2\",\"DebuffIconId\":\"50\"}","{\"ParamId\":\"3\",\"DebuffIconId\":\"51\"}","{\"ParamId\":\"4\",\"DebuffIconId\":\"52\"}","{\"ParamId\":\"5\",\"DebuffIconId\":\"53\"}","{\"ParamId\":\"6\",\"DebuffIconId\":\"54\"}","{\"ParamId\":\"7\",\"DebuffIconId\":\"55\"}"]
- * @parent ResistWeakData
+ * @param ShowElementsIcon
+ * @desc 耐性弱点未確認の属性を隠す。(ステータス情報登録をしても属性耐性弱点を確認するまでは表示されません)
+ * @text 未確認属性を隠す
+ * @type boolean
+ * @default false
+ * @parent ResistWeakElementData
  * 
  * @param ResistNoEffectElement
  * @desc 効きにくい属性に無効を反映させるか。
  * @text 効きにくい属性に無効反映
  * @type boolean
  * @default true
- * @parent ResistWeakData
+ * @parent ResistWeakElementData
  * 
  * @param ElementUnknownIconId
  * @desc ステータス情報未登録時に表示する属性アイコンのIDを指定します。
  * @text ステータス情報未登録時属性アイコンID
  * @type number
  * @default 0
- * @parent ResistWeakData
+ * @parent ResistWeakElementData
+ * 
+ * @param ResistWeakStateData
+ * @text ステート耐性弱点設定
+ * @default ------------------------------
+ * 
+ * @param StateList
+ * @desc 表示するステート。
+ * @text 表示ステート
+ * @type struct<StateData>[]
+ * @default ["{\"StateId\":\"1\"}","{\"StateId\":\"4\"}","{\"StateId\":\"5\"}","{\"StateId\":\"6\"}","{\"StateId\":\"7\"}","{\"StateId\":\"8\"}","{\"StateId\":\"9\"}","{\"StateId\":\"10\"}","{\"StateId\":\"12\"}","{\"StateId\":\"13\"}"]
+ * @parent ResistWeakStateData
+ * 
+ * @param ShowStateIcon
+ * @desc 耐性弱点未確認のステートを隠す。(ステータス情報登録をしてもステート耐性弱点を確認するまでは表示されません)
+ * @text 未確認ステートを隠す
+ * @type boolean
+ * @default false
+ * @parent ResistWeakStateData
  * 
  * @param NormalWeakState
  * @desc 効きやすいステート対象を有効度100%以上から反映させるか。
  * @text 効きやすい属性有効度100%反映
  * @type boolean
  * @default true
- * @parent ResistWeakData
+ * @parent ResistWeakStateData
  * 
  * @param ResistNoEffectState
  * @desc 効きにくいステートに無効を反映させるか。
  * @text 効きにくいステートに無効反映
  * @type boolean
  * @default true
- * @parent ResistWeakData
- * 
- * @param ResistWeakDataMaskMode
- * @desc 未撃破のエネミーの耐性弱点を表示させません。
- * @text 未撃破耐性弱点非表示
- * @type boolean
- * @default false
- * @parent ResistWeakData
+ * @parent ResistWeakStateData
  * 
  * @param StateUnknownIconId
  * @desc ステータス情報未登録時に表示するステートアイコンのIDを指定します。
  * @text ステータス情報未登録時ステートアイコンID
  * @type number
  * @default 0
- * @parent ResistWeakData
+ * @parent ResistWeakStateData
+ * 
+ * @param ResistWeakDebuffData
+ * @text デバフ耐性弱点設定
+ * @default ------------------------------
+ * 
+ * @param DeBuffList
+ * @desc 表示するデバフ。
+ * @text 表示デバフ
+ * @type struct<DebuffData>[]
+ * @default ["{\"ParamId\":\"0\",\"DebuffIconId\":\"48\"}","{\"ParamId\":\"1\",\"DebuffIconId\":\"49\"}","{\"ParamId\":\"2\",\"DebuffIconId\":\"50\"}","{\"ParamId\":\"3\",\"DebuffIconId\":\"51\"}","{\"ParamId\":\"4\",\"DebuffIconId\":\"52\"}","{\"ParamId\":\"5\",\"DebuffIconId\":\"53\"}","{\"ParamId\":\"6\",\"DebuffIconId\":\"54\"}","{\"ParamId\":\"7\",\"DebuffIconId\":\"55\"}"]
+ * @parent ResistWeakDebuffData
+ * 
+ * @param ShowDebuffIcon
+ * @desc 耐性弱点未確認のステートデバフを隠す。(ステータス情報登録をしてもデバフ耐性弱点を確認するまでは表示されません)
+ * @text 未確認デバフを隠す
+ * @type boolean
+ * @default false
+ * @parent ResistWeakDebuffData
  * 
  * @param DeBuffUnknownIconId
  * @desc ステータス情報未登録時に表示するデバフアイコンのIDを指定します。
  * @text ステータス情報未登録時デバフアイコンID
  * @type number
  * @default 0
- * @parent ResistWeakData
+ * @parent ResistWeakDebuffData
  * 
  */
 /*~struct~ElementData:
@@ -1623,19 +1821,19 @@ PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDefeat', args => {
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookGetDropItem', args => {
-  $gameSystem.dropItemListFlag(Number(args.enemyId), Number(args.dropListId) - 1, true);
+  $gameSystem.dropItemListFlag(Number(args.enemyId), Number(args.dropListId) - 1, true, Number(args.dropListId) > 0);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDropItem', args => {
-  $gameSystem.dropItemListFlag(Number(args.enemyId), Number(args.dropListId) - 1, false);
+  $gameSystem.dropItemListFlag(Number(args.enemyId), Number(args.dropListId) - 1, false, Number(args.dropListId) > 0);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookGetStealItem', args => {
-  $gameSystem.stealItemListFlag(Number(args.enemyId) , Number(args.stealListId) - 1, true);
+  $gameSystem.stealItemListFlag(Number(args.enemyId) , Number(args.stealListId) - 1, true, Number(args.stealListId) > 0);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookRemoveStealItem', args => {
-  $gameSystem.stealItemListFlag(Number(args.enemyId) , Number(args.stealListId) - 1, false);
+  $gameSystem.stealItemListFlag(Number(args.enemyId) , Number(args.stealListId) - 1, false, Number(args.stealListId) > 0);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookDefeatEnemy', args => {
@@ -1663,6 +1861,38 @@ PluginManager.registerCommand(pluginName, 'DorpItemAcquired', args => {
 
 PluginManager.registerCommand(pluginName, 'StealItemAcquired', args => {
   $gameSystem.stealItemAcquired(Number(args.StealAcquiredswitch), Number(args.enemyId), Number(args.stealAcquiredId) - 1);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookActionAdd', args => {
+  $gameSystem.enemyBookActionList(Number(args.enemyId), Number(args.actionId) - 1, Number(args.actionId) > 0, true);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookActionRemove', args => {
+  $gameSystem.enemyBookActionList(Number(args.enemyId), Number(args.actionId) - 1, Number(args.actionId) > 0, false);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookElementAdd', args => {
+  $gameSystem.enemyBookElementList(Number(args.enemyId), Number(args.elementId) - 1, Number(args.elementId) > 0, true);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookElementRemove', args => {
+  $gameSystem.enemyBookElementList(Number(args.enemyId), Number(args.elementId) - 1, Number(args.elementId) > 0, false);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookStateAdd', args => {
+  $gameSystem.enemyBookStateList(Number(args.enemyId), Number(args.stateId) - 1, Number(args.stateId) > 0, true);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookStateRemove', args => {
+  $gameSystem.enemyBookStateList(Number(args.enemyId), Number(args.stateId) - 1, Number(args.stateId) > 0, false);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookDebuffAdd', args => {
+  $gameSystem.enemyBookDebuffList(Number(args.enemyId), Number(args.debuffId) - 1, Number(args.debuffId) > 0, true);
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookDebuffRemove', args => {
+  $gameSystem.enemyBookDebuffList(Number(args.enemyId), Number(args.debuffId) - 1, Number(args.debuffId) > 0, false);
 });
 
 //Game_System
@@ -1699,10 +1929,6 @@ Game_System.prototype.statusToEnemyBook = function(enemyId) {
   this.addStatusToEnemyBook(enemyId);
 };
 
-Game_System.prototype.addActionToEnemyBook = function(enemyId) {//敵の使用スキル
-  
-};
-
 Game_System.prototype.removeEnemyBook = function(enemyId) {
   if(!this._enemyBookFlags) {
     this.clearEnemyBookFlags();
@@ -1721,8 +1947,12 @@ Game_System.prototype.removeFromEnemyBook = function(enemyId) {
   if(this._enemyBookFlags) {
     this.removeEnemyBook(enemyId);
     this.removeStatusEnemyBook(enemyId);
-    this.dropItemListFlag(enemyId, 0, false);
-    this.stealItemListFlag(enemyId, 0, false);
+    this.dropItemListFlag(enemyId, 0, false, false);
+    this.stealItemListFlag(enemyId, 0, false, false);
+    this.enemyBookActionList(enemyId, 0, false, false);
+    this.enemyBookElementList(enemyId, 0, false, false);
+    this.enemyBookStateList(enemyId, 0, false, false);
+    this.enemyBookDebuffList(enemyId, 0, false, false);
     if (!this._defeatNumber) {
       this.clearDefeat();
     }
@@ -1744,6 +1974,10 @@ Game_System.prototype.clearEnemyBook = function() {
   this.clearDefeat();
   this.clearDropItem();
   this.clearStealItem();
+  this.clearEnemyBookAction();
+  this.clearEnemyBookElement();
+  this.clearEnemyBookState();
+  this.clearEnemyBookDebuff();
 };
 
 Game_System.prototype.completeEnemyBook = function() {
@@ -1751,8 +1985,12 @@ Game_System.prototype.completeEnemyBook = function() {
   for (let i = 1; i < $dataEnemies.length; i++) {
     this.addToEnemyBook(i);
     this.addStatusToEnemyBook(i);
-    this.dropItemListFlag(i, 0, true);
-    this.stealItemListFlag(i, 0, true);
+    this.dropItemListFlag(i, 0, true, false);
+    this.stealItemListFlag(i, 0, true, false);
+    this.enemyBookActionList(i, 0, false, true);
+    this.enemyBookElementList(i, 0, false, true);
+    this.enemyBookStateList(i, 0, false, true);
+    this.enemyBookDebuffList(i, 0, false, true);
   }
 };
 
@@ -1906,9 +2144,9 @@ Game_System.prototype.getStealItemFlag = function(enemyId, stealId) {
   return this._stealItem[enemyId][stealId];
 };
 
-Game_System.prototype.dropItemListFlag = function(enemyId, dropListId, mode) {
+Game_System.prototype.dropItemListFlag = function(enemyId, dropListId, mode, Individual) {
 	if(enemyId > 0){
-    if(dropListId > 0){
+    if(Individual){
       this.setDropItemFlag(enemyId, dropListId, mode);
     } else {
       let itemList = $dataEnemies[enemyId].dropItems;
@@ -1919,9 +2157,9 @@ Game_System.prototype.dropItemListFlag = function(enemyId, dropListId, mode) {
   }
 };
 
-Game_System.prototype.stealItemListFlag = function(enemyId, stealListId, mode) {
+Game_System.prototype.stealItemListFlag = function(enemyId, stealListId, mode, Individual) {
 	if(enemyId > 0){
-    if(stealListId > 0){
+    if(Individual){
       this.setStealItemFlag (enemyId, stealListId, mode);
     } else {
       const enemy = $dataEnemies[enemyId];
@@ -2016,6 +2254,134 @@ Game_System.prototype.getStealList = function(enemy) {
 	}
 };
 
+Game_System.prototype.clearEnemyBookAction = function() {
+	this._enemyBookActionFlags = [];
+};
+
+Game_System.prototype.setEnemyBookActionFlag = function(enemyId, actionId, flag) {
+	if (!this._enemyBookActionFlags) {
+		this.clearEnemyBookAction();
+  }
+  this._enemyBookActionFlags[enemyId] = this._enemyBookActionFlags[enemyId] || [];
+  this._enemyBookActionFlags[enemyId][actionId] = flag;
+};
+
+Game_System.prototype.getEnemyBookActionFlag = function(enemyId, actionId) {
+  if(!this._enemyBookActionFlags || !this._enemyBookActionFlags[enemyId] || !this._enemyBookActionFlags[enemyId][actionId]) {
+    return false;
+  }
+  return this._enemyBookActionFlags[enemyId][actionId];
+};
+
+Game_System.prototype.enemyBookActionList = function(enemyId, actionId, Individual, mode) {
+  if (enemyId > 0) {
+    if (Individual) {
+      this.setEnemyBookActionFlag(enemyId, actionId, mode);
+    } else {
+      const action = $dataEnemies[enemyId].actions;
+      for(let i = 0; action.length > i; i++){
+        this.setEnemyBookActionFlag(enemyId, i, mode);
+      }
+    }
+  }
+};
+
+Game_System.prototype.clearEnemyBookElement = function() {
+	this._enemyBookElementFlags = [];
+};
+
+Game_System.prototype.setEnemyBookElementFlag = function(enemyId, elementId, flag) {
+	if (!this._enemyBookElementFlags) {
+		this.clearEnemyBookElement();
+  }
+  this._enemyBookElementFlags[enemyId] = this._enemyBookElementFlags[enemyId] || [];
+  this._enemyBookElementFlags[enemyId][elementId] = flag;
+};
+
+Game_System.prototype.getEnemyBookElementFlag = function(enemyId, elementId) {
+  if(!this._enemyBookElementFlags || !this._enemyBookElementFlags[enemyId] || !this._enemyBookElementFlags[enemyId][elementId]) {
+    return false;
+  }
+  return this._enemyBookElementFlags[enemyId][elementId];
+};
+
+Game_System.prototype.enemyBookElementList = function(enemyId, elementId, Individual, mode) {
+  if (enemyId > 0) {
+    if (Individual) {
+      this.setEnemyBookElementFlag(enemyId, elementId, mode);
+    } else {
+      const list = param.ElementList;
+      for(let i = 0; list.length > i; i++){
+        this.setEnemyBookElementFlag(enemyId, list[i].ElementNo - 1, mode);
+      }
+    }
+  }
+};
+
+Game_System.prototype.clearEnemyBookState = function() {
+	this._enemyBookStateFlags = [];
+};
+
+Game_System.prototype.setEnemyBookStateFlag = function(enemyId, stateId, flag) {
+	if (!this._enemyBookStateFlags) {
+		this.clearEnemyBookState();
+  }
+  this._enemyBookStateFlags[enemyId] = this._enemyBookStateFlags[enemyId] || [];
+  this._enemyBookStateFlags[enemyId][stateId] = flag;
+};
+
+Game_System.prototype.getEnemyBookStateFlag = function(enemyId, stateId) {
+  if(!this._enemyBookStateFlags || !this._enemyBookStateFlags[enemyId] || !this._enemyBookStateFlags[enemyId][stateId]) {
+    return false;
+  }
+  return this._enemyBookStateFlags[enemyId][stateId];
+};
+
+Game_System.prototype.enemyBookStateList = function(enemyId, stateId, Individual, mode) {
+  if (enemyId > 0) {
+    if (Individual) {
+      this.setEnemyBookStateFlag(enemyId, stateId, mode);
+    } else {
+      const list = param.StateList;
+      for(let i = 0; list.length > i; i++){
+        this.setEnemyBookStateFlag(enemyId, list[i].StateId, mode);
+      }
+    }
+  }
+};
+
+Game_System.prototype.clearEnemyBookDebuff = function() {
+	this._enemyBookDebuffFlags = [];
+};
+
+Game_System.prototype.setEnemyBookDebuffFlag = function(enemyId, debuffId, flag) {
+	if (!this._enemyBookDebuffFlags) {
+		this.clearEnemyBookDebuff();
+  }
+  this._enemyBookDebuffFlags[enemyId] = this._enemyBookDebuffFlags[enemyId] || [];
+  this._enemyBookDebuffFlags[enemyId][debuffId] = flag;
+};
+
+Game_System.prototype.getEnemyBookDebuffFlag = function(enemyId, debuffId) {
+  if(!this._enemyBookDebuffFlags || !this._enemyBookDebuffFlags[enemyId] || !this._enemyBookDebuffFlags[enemyId][debuffId]) {
+    return false;
+  }
+  return this._enemyBookDebuffFlags[enemyId][debuffId];
+};
+
+Game_System.prototype.enemyBookDebuffList = function(enemyId, debuffId, Individual, mode) {
+  if (enemyId > 0) {
+    if (Individual) {
+      this.setEnemyBookDebuffFlag(enemyId, debuffId, mode);
+    } else {
+      const list = param.DeBuffList;
+      for(let i = 0; list.length > i; i++){
+        this.setEnemyBookDebuffFlag(enemyId, list[i].ParamId, mode);
+      }
+    }
+  }
+};
+
 //Game_Troop
 const _Game_Troop_setup = Game_Troop.prototype.setup;
 Game_Troop.prototype.setup = function(troopId) {
@@ -2035,9 +2401,9 @@ const _Game_Enemy_appear = Game_Enemy.prototype.appear;
 Game_Enemy.prototype.appear = function() {
   _Game_Enemy_appear.call(this);
   if ($gameSystem.registrationTiming() === 0) {
-    $gameSystem.addToEnemyBook(this._enemyId);
+    $gameSystem.addToEnemyBook(this.enemyId());
     if ($gameSystem.registrationStatusTiming() === 0) {
-      $gameSystem.addStatusToEnemyBook(enemy.enemyId());
+      $gameSystem.addStatusToEnemyBook(this.enemyId());
     }
   }
 };
@@ -2134,6 +2500,50 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
   if (this._analyzeDate) {
     BattleManager.analyzeTarget = target;
     SceneManager._scene.enemyBookEnemyAnalyze(this._analyzeDate);
+  }
+};
+
+const _Game_Action_calcElementRate = Game_Action.prototype.calcElementRate;
+Game_Action.prototype.calcElementRate = function(target) {
+  if (target.isEnemy()) {  
+    if (this.item().damage.elementId < 0) {
+      this.enemyBookAttackElementDate(target, this.subject().attackElements());
+    } else {
+      $gameSystem.setEnemyBookElementFlag(target.enemyId(), this.item().damage.elementId, true);
+    }
+  }
+  return _Game_Action_calcElementRate.call(this, target);
+};
+
+Game_Action.prototype.enemyBookAttackElementDate = function(target, element) {
+  for (const elementId of element) {
+    $gameSystem.setEnemyBookElementFlag(target.enemyId(), elementId, true);
+  }
+};
+
+const _Game_Action_itemEffectAddState = Game_Action.prototype.itemEffectAddState;
+Game_Action.prototype.itemEffectAddState = function(target, effect) {
+  _Game_Action_itemEffectAddState.call(this, target, effect);
+  if (target.isEnemy()) {
+    if (effect.dataId === 0) {
+      this.enemyBookAttackStateDate(target);
+    } else {
+      $gameSystem.setEnemyBookStateFlag(target.enemyId(), effect.dataId, true);
+    }
+  }
+};
+
+Game_Action.prototype.enemyBookAttackStateDate = function(target) {
+  for (const stateId of this.subject().attackStates()) {
+    $gameSystem.setEnemyBookStateFlag(target.enemyId(), stateId, true);
+  }
+};
+
+const _Game_Action_itemEffectAddDebuff = Game_Action.prototype.itemEffectAddDebuff;
+Game_Action.prototype.itemEffectAddDebuff = function(target, effect) {
+  _Game_Action_itemEffectAddDebuff.call(this, target, effect);
+  if (target.isEnemy()) {
+    $gameSystem.setEnemyBookDebuffFlag(target.enemyId(), effect.dataId, true);
   }
 };
 
@@ -2834,6 +3244,26 @@ Window_EnemyBook.prototype.stealItemFlag = function(index) {
   return param.ShowStealItemName ? $gameSystem.getStealItemFlag(this._enemy.id, index) : true;
 };
 
+Window_EnemyBook.prototype.showActionMask = function(MaskMode) {
+  return MaskMode && !this.noUnknownStatus() ? $gameSystem.isInEnemyBookStatus(this._enemy): true;
+};
+
+Window_EnemyBook.prototype.actionFlag = function(index) {
+  return param.ShowActionName ? $gameSystem.getEnemyBookActionFlag(this._enemy.id, index) : true;
+};
+
+Window_EnemyBook.prototype.onElementsFlag = function(index) {
+  return param.ShowElementsIcon ? $gameSystem.getEnemyBookElementFlag(this._enemy.id, index) : true;
+};
+
+Window_EnemyBook.prototype.onStateFlag = function(index) {
+  return param.ShowStateIcon ? $gameSystem.getEnemyBookStateFlag(this._enemy.id, index) : true;
+};
+
+Window_EnemyBook.prototype.onDebuffFlag = function(index) {
+  return param.ShowDebuffIcon ? $gameSystem.getEnemyBookDebuffFlag(this._enemy.id, index) : true;
+};
+
 Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
   return this._enemy.meta.ShowDataBook || this._bookMode === 1;
 };
@@ -3359,11 +3789,16 @@ Window_EnemyBook.prototype.drawResistElement = function(list, enemy, x, y, width
     Unknown = true;
   }
   let icons = [];
+  let icon = 0;
   param.ElementList.forEach(Element => {
     if(Element.ElementNo){
       let rate = enemy.elementRate(Element.ElementNo);
       if(rate < 1 && param.ResistNoEffectElement || (rate < 1 && rate > 0 && !param.ResistNoEffectElement)){
-        let icon = Unknown ? param.ElementUnknownIconId : Element.ElementIconId;
+        if (Unknown || (param.ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
+          icon = param.ElementUnknownIconId;
+        } else {
+          icon = this.onElementsFlag(Element.ElementNo) ? Element.ElementIconId : 0;
+        }
         if (icon && icon > 0) icons.push(icon);
       }
     }
@@ -3391,11 +3826,16 @@ Window_EnemyBook.prototype.drawWeakElement = function(list, enemy, x, y, width) 
     Unknown = true;
   }
   let icons = [];
+  let icon = 0;
   param.ElementList.forEach(Element => {
     if (Element.ElementNo) {
       let rate = enemy.elementRate(Element.ElementNo);
       if (rate > 1) {
-        let icon = Unknown ? param.ElementUnknownIconId : Element.ElementIconId;
+        if (Unknown || (param.ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
+          icon = param.ElementUnknownIconId;
+        } else {
+          icon = this.onElementsFlag(Element.ElementNo) ? Element.ElementIconId : 0;
+        }
         if (icon && icon > 0) icons.push(icon);
       }
     }
@@ -3423,11 +3863,16 @@ Window_EnemyBook.prototype.drawNoEffectElement = function(list, enemy, x, y, wid
     Unknown = true;
   }
   let icons = [];
+  let icon = 0;
   param.ElementList.forEach(Element => {
     if (Element.ElementNo) {
       let rate = enemy.elementRate(Element.ElementNo);
       if (rate <= 0) {
-        let icon = Unknown ? param.ElementUnknownIconId : Element.ElementIconId;
+        if (Unknown || (param.ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
+          icon = param.ElementUnknownIconId;
+        } else {
+          icon = this.onElementsFlag(Element.ElementNo) ? Element.ElementIconId : 0;
+        }
         if (icon && icon > 0) icons.push(icon);
       }
     }
@@ -3455,6 +3900,7 @@ Window_EnemyBook.prototype.drawResistStates = function(list, enemy, x, y, width)
     Unknown = true;
   }
   let icons = [];
+  let icon = 0;
   param.StateList.forEach(State => {
     if(State.StateId){
       let stateId = State.StateId;
@@ -3463,7 +3909,11 @@ Window_EnemyBook.prototype.drawResistStates = function(list, enemy, x, y, width)
         rate *= enemy.isStateResist(stateId) ? 0 : 1;
       }
       if (rate < 1 && (param.ResistNoEffectState || (!param.ResistNoEffectState && rate > 0))) {
-        let icon = Unknown ? param.StateUnknownIconId : $dataStates[stateId].iconIndex;
+        if (Unknown || (param.StateUnknownIconId > 0 && !this.onStateFlag(stateId))) {
+          icon = param.StateUnknownIconId;
+        } else {
+          icon = this.onStateFlag(stateId) ? $dataStates[stateId].iconIndex : 0;
+        }
         if (icon && icon > 0) icons.push(icon);
       }
     }
@@ -3491,12 +3941,17 @@ Window_EnemyBook.prototype.drawWeakStates = function(list, enemy, x, y, width) {
     Unknown = true;
   }
   let icons = [];
+  let icon = 0;
   param.StateList.forEach(State => {
   if(State.StateId){
     let stateId = State.StateId;
     let rate = enemy.stateRate(stateId);
     if (((!param.NormalWeakState && rate > 1) || (param.NormalWeakState && rate >= 1)) && !enemy.isStateResist(stateId)) {
-      let icon = Unknown ? param.StateUnknownIconId : $dataStates[stateId].iconIndex;
+      if (Unknown || (param.StateUnknownIconId > 0 && !this.onStateFlag(stateId))) {
+        icon = param.StateUnknownIconId;
+      } else {
+        icon = this.onStateFlag(stateId) ? $dataStates[stateId].iconIndex : 0;
+      }
       if (icon && icon > 0) icons.push(icon);
       }
     }
@@ -3524,13 +3979,18 @@ Window_EnemyBook.prototype.drawNoEffectStates = function(list, enemy, x, y, widt
     Unknown = true;
   }
   let icons = [];
+  let icon = 0;
   param.StateList.forEach(State => {
     if(State.StateId){
       let stateId = State.StateId;
       let icon = null;
       let rate = enemy.stateRate(stateId);
       if (rate <= 0 || enemy.isStateResist(stateId)) {
-        icon = Unknown ? param.StateUnknownIconId : $dataStates[stateId].iconIndex;
+        if (Unknown || (param.StateUnknownIconId > 0 && !this.onStateFlag(stateId))) {
+          icon = param.StateUnknownIconId;
+        } else {
+          icon = this.onStateFlag(stateId) ? $dataStates[stateId].iconIndex : 0;
+        }
         if (icon && icon > 0) icons.push(icon);
       }
     }
@@ -3561,10 +4021,15 @@ Window_EnemyBook.prototype.drawWeakDebuff = function(list, enemy, x, y, width) {
     Unknown = true;
   }
   let icons = [];
+  let icon = 0;
   param.DeBuffList.forEach(deBuff => {
     let rate = enemy.debuffRate(deBuff.ParamId);
     if (rate > 1) {
-      let icon = Unknown ? param.DeBuffUnknownIconId : deBuff.DebuffIconId;
+      if (Unknown || (param.DeBuffUnknownIconId > 0 && !this.onDebuffFlag(deBuff.ParamId))) {
+        icon = param.DeBuffUnknownIconId;
+      } else {
+        icon = this.onDebuffFlag(deBuff.ParamId) ? deBuff.DebuffIconId : 0;
+      }
       if (icon && icon > 0) icons.push(icon);
     }
   });
@@ -3588,10 +4053,15 @@ Window_EnemyBook.prototype.drawResistDebuff = function(list, enemy, x, y, width)
     Unknown = true;
   }
   let icons = [];
+  let icon = 0;
   param.DeBuffList.forEach(deBuff => {
     let rate = enemy.debuffRate(deBuff.ParamId);
     if (rate < 1) {
-      let icon = Unknown ? param.DeBuffUnknownIconId : deBuff.DebuffIconId;
+      if (Unknown || (param.DeBuffUnknownIconId > 0 && !this.onDebuffFlag(deBuff.ParamId))) {
+        icon = param.DeBuffUnknownIconId;
+      } else {
+        icon = this.onDebuffFlag(deBuff.ParamId) ? deBuff.DebuffIconId : 0;
+      }
       if (icon && icon > 0) icons.push(icon);
     }
   });
@@ -3768,7 +4238,7 @@ Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
       y2 += lineHeight;
     }
     const skillDate = $dataSkills[action[i].skillId];
-    if(this.paramEXMask(list.MaskMode)){
+    if(this.showActionMask(list.MaskMode, enemy) && this.actionFlag(i)){
       this.drawItemName(skillDate, x2, y2, width);
     } else {
       this.drawText(this.unknownDataLength(skillDate.name), x2, y2, width);
@@ -4406,6 +4876,18 @@ Window_PartyCommand.prototype.makeCommandList = function() {
   }
 };
 
+const _Window_BattleLog_displayMiss =Window_BattleLog.prototype.displayMiss;
+Window_BattleLog.prototype.displayMiss = function(target) {
+  let fmt;
+  if (BattleManager.analyzeMissMessage) {
+    fmt = BattleManager.analyzeMissMessage;
+    BattleManager.analyzeMissMessage = null;
+    this.push("addText", fmt);
+  } else {
+    _Window_BattleLog_displayMiss.call(this, target);
+  }
+};
+
 const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
   _BattleManager_initMembers.call(this);
@@ -4420,6 +4902,20 @@ BattleManager.isBusy = function() {
 
 BattleManager.enemyBookIsBusy = function() {
   return openAnalyze;
+};
+
+const _BattleManager_startAction = BattleManager.startAction;
+BattleManager.startAction = function() {
+  _BattleManager_startAction.call(this);
+  this.setEnemyBookAction();
+};
+
+BattleManager.setEnemyBookAction = function() {
+  const subject = this._subject;
+  if (subject.isEnemy() && this._action) {
+    const actionId = subject.enemy().actions.findIndex(action => action.skillId === this._action.item().id);
+    $gameSystem.setEnemyBookActionFlag(subject.enemyId(), actionId, true);
+  }
 };
 
 function Sprite_EnemyBookGauge() {
@@ -4438,18 +4934,6 @@ Sprite_EnemyBookGauge.prototype.bitmapWidth = function() {
     return param.TPgaugeWidth > 0 ? param.TPgaugeWidth : 128;
   }
   return 999;
-};
-
-const _Window_BattleLog_displayMiss =Window_BattleLog.prototype.displayMiss;
-Window_BattleLog.prototype.displayMiss = function(target) {
-  let fmt;
-  if (BattleManager.analyzeMissMessage) {
-    fmt = BattleManager.analyzeMissMessage;
-    BattleManager.analyzeMissMessage = null;
-    this.push("addText", fmt);
-  } else {
-    _Window_BattleLog_displayMiss.call(this, target);
-  }
 };
 
 

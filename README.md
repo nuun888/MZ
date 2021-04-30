@@ -11,13 +11,13 @@
 | 戦闘 | プラグイン | 説明 | バージョン |
 | ------------- | ------------- | ------------- | ------------- |
 | バトルスタイル拡張ベース  | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)  | 戦闘のスタイルを変更、拡張します。 | Ver |
-| バトルスタイル拡張  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
-| 解像度変更時のアクター、エネミー座標調整、<br>戦闘背景Y座標調整  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)  | 解像度変更時のエネミー、アクターの座標を修正します。またエネミーとアクター、戦闘背景のY座標の位置も調整できます。 | Ver |
-| 戦闘背景の変更  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
-| 戦闘中アイテム、スキル選択画面MV風表示  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
-| リザルト  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
-| TP円形ゲージ  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
-| TPB円形ゲージ  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです | Ver |
+| バトルスタイル拡張  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです。 | Ver |
+| 解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)  | 解像度変更時のエネミー、アクターの座標を修正します。またエネミーとアクター、戦闘背景のY座標の位置も調整できます。 | Ver |
+| 戦闘背景の変更  | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)  | フィールドマップで任意の戦闘背景に変更できます。また敵グループ毎、リージョン、タグIDによって戦闘背景を変更できます。 | Ver |
+| 戦闘中アイテム、スキル選択画面MV風表示  | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)  | 戦闘中のアイテム、スキル選択画面をMV風に変更できます。 | Ver |
+| リザルト  | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  | 戦闘終了後にリザルト画面を表示します。 | Ver |
+| TP円形ゲージ  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | TPゲージを円形にします。 | Ver |
+| TPB円形ゲージ  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | TPBゲージを円形にします。 | Ver |
 
 <b>システム</b><br>
 [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)　共通処理<br>

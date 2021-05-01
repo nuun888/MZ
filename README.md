@@ -77,8 +77,6 @@
 
 | 他製作者様移植 | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
-| スキルコスト拡張  | [NUUN_TMCostShow](https://raw.githubusercontent.com/nuun888/MZ/master/tomoaky/NUUN_TMCostShow.js) | MPやTPの代わりにHPやアイテムを消費するスキルを設定できるようになります。
-このプラグインはtomoaky氏作のMZ移植版です。 | 1.1.1 |
-| コスト表示拡張 | [NUUN_TMSkillCostEx](https://raw.githubusercontent.com/nuun888/MZ/master/tomoaky/NUUN_TMSkillCostEx.js) | ＭＰ消費とＴＰ消費が両方設定されたスキルのコストを無理
-やり両方表示します。このプラグインはtomoaky氏作のMZ移植版です。  | 1.0.0 |
+| スキルコスト拡張  | [NUUN_TMCostShow](https://raw.githubusercontent.com/nuun888/MZ/master/tomoaky/NUUN_TMCostShow.js) | MPやTPの代わりにHPやアイテムを消費するスキルを設定できるようになります。このプラグインはtomoaky氏作のMZ移植版です。 | 1.1.1 |
+| コスト表示拡張 | [NUUN_TMSkillCostEx](https://raw.githubusercontent.com/nuun888/MZ/master/tomoaky/NUUN_TMSkillCostEx.js) | ＭＰ消費とＴＰ消費が両方設定されたスキルのコストを無理やり両方表示します。このプラグインはtomoaky氏作のMZ移植版です。  | 1.0.0 |
 

@@ -18,6 +18,8 @@
  * バトルスタイル拡張プラグインと併用する場合はこのプラグインを「NUUN_BattleStyleEX_Base」より下に配置してください。
  * 
  * 更新履歴
+ * 2021/5/1 Ver.1.0.2
+ * LL_ExGaugeDrawingの一部機能に対応。
  * 2021/4/27 Ver.1.0.1
  * アクターステータスにのみ表示するように修正。
  * 2021/4/25 Ver.1.0.0
@@ -111,7 +113,7 @@ Imported.NUUN_TpCircularGauge = true;
   const GaugeHeight = Number(parameters['GaugeHeight'] || 10);
   const StartAngle = Number(parameters['StartAngle'] || -90);
   const EndAngle = Number(parameters['EndAngle'] || 270);
-
+  const LL_parameters = PluginManager.parameters('LL_ExGaugeDrawing');
 
 function Sprite_CircularGauge() {
   this.initialize(...arguments);
@@ -176,13 +178,6 @@ Sprite_CircularGauge.prototype.valueFontSize = function() {
   return $gameSystem.mainFontSize() + TPValueFontSize;
 };
 
-Sprite_CircularGauge.prototype.drawGauge = function() {
-  const gaugeX = this.radius() + this.gaugeHeight();
-  const gaugeY = this.radius() + this.gaugeHeight();
-  this.arcGaugeBackRect(gaugeX, gaugeY);
-  this.arcGaugeRect(gaugeX, gaugeY);
-};
-
 Sprite_CircularGauge.prototype.drawLabel = function() {
   if (this._battler.isActor) {
     const label = this.label();
@@ -210,24 +205,37 @@ Sprite_CircularGauge.prototype.drawValue = function() {
   this.bitmap.drawText(currentValue, 0, 6, width, height, "center");
 };
 
-Sprite_CircularGauge.prototype.arcGaugeRect = function(x, y) {
+Sprite_CircularGauge.prototype.drawGauge = function() {
+  const gaugeX = this.radius() + this.gaugeHeight();
+  const gaugeY = this.radius() + this.gaugeHeight();
+  const gaugeHeight = this.gaugeHeight() - 2;
+  if (LL_parameters.gaugeOutlineColor) {//LL
+    this.arcGaugeBackRect(gaugeX, gaugeY, this.gaugeHeight(), this.gaugeOutlineColor());
+    this.arcGaugeBackRect(gaugeX, gaugeY, gaugeHeight, this.gaugeBackColor());
+  } else {
+    this.arcGaugeBackRect(gaugeX, gaugeY, this.gaugeHeight(), this.gaugeBackColor());
+  }
+  this.arcGaugeRect(gaugeX, gaugeY, this.gaugeHeight, this.gaugeColor1(), false);
+};
+
+Sprite_CircularGauge.prototype.arcGaugeRect = function(x, y, width, color, option) {
   const context = this.bitmap.context;
   context.save();
   context.beginPath();
-  context.lineWidth = this.gaugeHeight() - 2;
-  context.strokeStyle = this.gaugeColor1();
+  context.lineWidth = width;
+  context.strokeStyle = color;
   const rate = (this._sweepTPAngle - this._startTPAngle) * this.gaugeRate() + this._startTPAngle;
-  context.arc(x, y, this.radius(), this._startTPAngle, rate, false);
+  context.arc(x, y, this.radius(), this._startTPAngle, rate, option);
   context.stroke();
   this.bitmap._baseTexture.update();
 };
 
-Sprite_CircularGauge.prototype.arcGaugeBackRect = function(x, y) {
+Sprite_CircularGauge.prototype.arcGaugeBackRect = function(x, y, width, color) {
   const context = this.bitmap.context;
   context.save();
   context.beginPath();
-  context.lineWidth = this.gaugeHeight();
-  context.strokeStyle = this.gaugeBackColor();
+  context.lineWidth = width;
+  context.strokeStyle = color;
   context.arc(x, y, this.radius(), this._startAngle, this._sweepAngle, false);
   context.stroke();
   this.bitmap._baseTexture.update();

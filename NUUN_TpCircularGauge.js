@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc TP円形ゲージプラグイン
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * TPゲージを円形にします。

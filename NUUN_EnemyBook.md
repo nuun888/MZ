@@ -97,8 +97,8 @@ PgUp PgDn：エネミーリストページ送り<br>
 
 ![画像](img/EnemyBook1.png)<br>
 ![画像](img/EnemyBook2.png)<br>
-![画像](img/EnemyBook3.png)<br>
-![画像](img/EnemyBook4.png)<br>
+![画像](img/EnemyBook9.png)<br>
+![画像](img/EnemyBook13.png)<br>
 
 任意の背景画像が設定できます。<br>
 ![画像](img/EnemyBook8.png)

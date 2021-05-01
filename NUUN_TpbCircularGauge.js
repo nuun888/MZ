@@ -18,7 +18,11 @@
  * バトルスタイル拡張プラグインと併用する場合はこのプラグインを「NUUN_BattleStyleEX_Base」より下に配置してください。
  * 
  * 更新履歴
+ * 2021/5/1 Ver.1.0.1
+ * ゲージの色を指定できる機能を追加。
+ * LL_ExGaugeDrawingの一部機能に対応。
  * 2021/4/25 Ver.1.0.0
+ * 初版
  * 
  * @param OnGaugePosition
  * @desc ゲージの座標変更を許可します。
@@ -31,6 +35,13 @@
  * @option バトルスタイル拡張プラグインの設定を反映する。
  * @value 10
  * @default 0
+ * 
+ * @param GaugeColor
+ * @desc ゲージの色を指定します。空白の場合はSprite_Gaugeの数値が設定されます。
+ * @text ゲージ色
+ * @type number
+ * @default 26
+ * @min 0
  * 
  * @param GaugeX
  * @desc ゲージのX座標を指定します。
@@ -88,8 +99,10 @@ Imported.NUUN_TpbCircularGauge = true;
   const OnGaugePosition = Number(parameters['OnGaugePosition'] || 0);
   const GaugeRadius = Number(parameters['GaugeRadius'] || 25);
   const GaugeHeight = Number(parameters['GaugeHeight'] || 10);
+  const GaugeColor = Number(parameters['GaugeColor'] );
   const StartAngle = Number(parameters['StartAngle'] || -90);
   const EndAngle = Number(parameters['EndAngle'] || 270);
+  const LL_parameters = PluginManager.parameters('LL_ExGaugeDrawing');
 
 
 function Sprite_TPBCircularGauge() {
@@ -147,11 +160,25 @@ Sprite_TPBCircularGauge.prototype.circumference = function() {
   return EndAngle - StartAngle;
 };
 
+Sprite_TPBCircularGauge.prototype.gaugeColor1 = function() {
+  if (GaugeColor) {
+    return ColorManager.textColor(GaugeColor);
+  } else {
+    return Sprite_Gauge.prototype.gaugeColor1.call(this);
+  }
+};
+
 Sprite_TPBCircularGauge.prototype.drawGauge = function() {
   const gaugeX = this.radius() + this.gaugeHeight();
   const gaugeY = this.radius() + this.gaugeHeight();
-  this.arcGaugeBackRect(gaugeX, gaugeY);
-  this.arcGaugeRect(gaugeX, gaugeY);
+  const gaugeHeight = this.gaugeHeight() - 2;
+  if (LL_parameters.gaugeOutlineColor) {//LL
+    this.arcGaugeBackRect(gaugeX, gaugeY, this.gaugeHeight(), this.gaugeOutlineColor());
+    this.arcGaugeBackRect(gaugeX, gaugeY, gaugeHeight, this.gaugeBackColor());
+  } else {
+    this.arcGaugeBackRect(gaugeX, gaugeY, this.gaugeHeight(), this.gaugeBackColor());
+  }
+  this.arcGaugeRect(gaugeX, gaugeY, this.gaugeHeight, this.gaugeColor1(), false);
 };
 
 Sprite_TPBCircularGauge.prototype.drawLabel = function() {
@@ -166,24 +193,24 @@ Sprite_TPBCircularGauge.prototype.drawLabel = function() {
   this.bitmap.paintOpacity = 255;
 };
 
-Sprite_TPBCircularGauge.prototype.arcGaugeRect = function(x, y) {
+Sprite_TPBCircularGauge.prototype.arcGaugeRect = function(x, y, width, color, option) {
   const context = this.bitmap.context;
   context.save();
   context.beginPath();
-  context.lineWidth = this.gaugeHeight() - 2;
-  context.strokeStyle = this.gaugeColor1();
+  context.lineWidth = width;
+  context.strokeStyle = color;
   const rate = (this._sweepTPBAngle - this._startTPBAngle) * this.gaugeRate() + this._startTPBAngle;
-  context.arc(x, y, this.radius(), this._startTPBAngle, rate, false);
+  context.arc(x, y, this.radius(), this._startTPBAngle, rate, option);
   context.stroke();
   this.bitmap._baseTexture.update();
 };
 
-Sprite_TPBCircularGauge.prototype.arcGaugeBackRect = function(x, y) {
+Sprite_TPBCircularGauge.prototype.arcGaugeBackRect = function(x, y, width, color) {
   const context = this.bitmap.context;
   context.save();
   context.beginPath();
-  context.lineWidth = this.gaugeHeight();
-  context.strokeStyle = this.gaugeBackColor();
+  context.lineWidth = width;
+  context.strokeStyle = color;
   context.arc(x, y, this.radius(), this._startAngle, this._sweepAngle, false);
   context.stroke();
   this.bitmap._baseTexture.update();

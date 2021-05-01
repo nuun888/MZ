@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.1.1
+ * @version 2.1.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -79,7 +79,10 @@
  * デフォルト設定では４ページ目に表示される項目にdesc1が設定されていますので、文章を表示させる場合は<desc1:[text]>と記入してください。
  * 
  * <NoBook>
- * モンスター図鑑に表示されません。
+ * モンスター図鑑に表示されません。アナライズのみデータを見ることが出来ます。
+ * 
+ * <NoBookData>
+ * モンスター図鑑に表示されず、アナライズを使用しても表示されません。
  * 
  * <ShowDataBook>
  * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
@@ -190,7 +193,7 @@
  * モンスター削除              モンスターを図鑑から削除します。
  * 図鑑完成                    図鑑を完成させます。
  * 図鑑初期化                  図鑑をクリア（全削除）させます。
- * モンスターステータス情報登録  モンスターのステータス情報を登録します。
+ * モンスターステータス情報登録  モンスターのステータス情報を登録します。同時に「モンスター追加」の処理も行います。
  * モンスターステータス情報削除  モンスターをステータス情報を削除します。
  * モンスター撃破済み           モンスターを撃破済みにします。
  * 撃破数初期化                 モンスターの撃破数をリセットします。
@@ -228,6 +231,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/1 Ver.2.1.2
+ * プラグインコマンドから図鑑を開くコマンドを戦闘中にも対応。
+ * 図鑑登録、アナライズを使用しても表示しない機能を追加。
  * 2021/4/30 Ver.2.1.1
  * 登録タイミングを撃破済みにしてモンスターを撃破しても登録されない問題を修正。
  * 2021/4/30 Ver.2.1.0
@@ -334,7 +340,7 @@
  * @text モンスター図鑑オープン
  * 
  * @command EnemyBookAdd
- * @desc モンスターを図鑑に追加します。
+ * @desc モンスターを図鑑に追加します。ステータス情報は登録されません。
  * @text モンスター追加
  * 
  * @arg enemyId
@@ -352,7 +358,7 @@
  * @desc モンスターIDを指定します。
  * 
  * @command EnemyBookStatusAdd
- * @desc モンスターのステータス情報を登録します。
+ * @desc モンスターのステータス情報を登録します。「モンスター追加」の処理も行います。
  * @text モンスターステータス情報登録
  * 
  * @arg enemyId
@@ -1766,13 +1772,17 @@ param.AnalyzeBackGroundImg = param.AnalyzeBackGroundImg && param.AnalyzeBackGrou
 const PercentContentLength = param.PercentWindowVisible && (param.PercentContent && param.PercentContent.length > 0);
 param.PageSetting = param.PageSetting || [];
 const NRP_pLoopLR = PluginManager.parameters("NRP_LoopCursor").loopLR;
-let openAnalyze = false;
+let enemyBook_Open = false;
 
 //プラグインコマンド
 const pluginName = "NUUN_EnemyBook";
 
 PluginManager.registerCommand(pluginName, 'EnemyBookOpen', args => {
-  SceneManager.push(Scene_EnemyBook);
+  if ($gameParty.inBattle()) {
+    SceneManager._scene.commandEnemyBook();
+  } else {
+    SceneManager.push(Scene_EnemyBook);
+  }
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookAdd', args => {
@@ -2013,16 +2023,20 @@ Game_System.prototype.completeRate = function() {
   return this.onStatusEnemyDate() / this.bookEnemyDate() * 100;
 };
 
+Game_System.prototype.isEnemyBook = function(enemy) {//データベース
+  return enemy && enemy.name && !enemy.meta.NoBook && !enemy.meta.NoBookData
+};
+
 Game_System.prototype.bookEnemyDate = function() {
   return $dataEnemies.reduce((r, enemy) => {
-    return r + (enemy && enemy.name && !enemy.meta.NoBook ? 1 : 0);
+    return r + (this.isEnemyBook(enemy) ? 1 : 0);
   }, 0);
 };
 
 Game_System.prototype.onStatusEnemyDate = function(enemyList) {
   const enemy = enemyList ? enemyList : $dataEnemies;
   return enemy.reduce((r, enemy) => {
-    return r + (enemy && enemy.name && !enemy.meta.NoBook && this.isInEnemyBookStatus(enemy) ? 1 : 0);
+    return r + (this.isEnemyBook(enemy) && this.isInEnemyBookStatus(enemy) ? 1 : 0);
   }, 0);
 };
 
@@ -2048,7 +2062,7 @@ Game_System.prototype.defeatNumber = function(enemyId) {
 Game_System.prototype.setDefeatEnemy = function(enemyList) {
   const enemy = enemyList ? enemyList : $dataEnemies;
   this._defeatEnemy = enemy.reduce((r, enemy) => {
-    return r + (enemy && enemy.name && (this.defeatNumber(enemy.id) > 0 || enemy.meta.ShowDataBook && !enemy.meta.NoBook) ? 1 : 0);
+    return r + (enemy && enemy.name && (this.defeatNumber(enemy.id) > 0 || enemy.meta.ShowDataBook && !enemy.meta.NoBook && !enemy.meta.NoBookData) ? 1 : 0);
   }, 0);
 };
 
@@ -2105,7 +2119,7 @@ Game_System.prototype.encounteredEnemyVar = function(val) {
 };
 
 Game_System.prototype.encounteredEnemyBook = function(enemy) {
-  return enemy && enemy.name && !enemy.meta.NoBook && this.isInEnemyBook(enemy);
+  return this.isEnemyBook(enemy) && this.isInEnemyBook(enemy);
 };
 
 Game_System.prototype.clearDropItem = function() {
@@ -2499,9 +2513,15 @@ Game_Action.prototype.apply = function(target) {
 const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
 Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
-  if (this._analyzeDate) {
-    BattleManager.analyzeTarget = target;
-    SceneManager._scene.enemyBookEnemyAnalyze(this._analyzeDate);
+  if (target.isEnemy()) {
+    if (target.enemy().meta.NoBookData) {
+      target.result().missed = true;
+      return;
+    }
+    if (this._analyzeDate) {
+      BattleManager.analyzeTarget = target;
+      SceneManager._scene.enemyBookEnemyAnalyze(this._analyzeDate);
+    }
   }
 };
 
@@ -3082,7 +3102,7 @@ Window_EnemyBook_Index.prototype.makeEnemyList = function() {
 };
 
 Window_EnemyBook_Index.prototype.includes = function(enemy) {
-  const result = enemy && enemy.name && !enemy.meta.NoBook;
+  const result = $gameSystem.isEnemyBook(enemy);
   if (result) {
     this._listIndex++;
     this._enemyPercentList.push(enemy);
@@ -4569,17 +4589,24 @@ Scene_Battle.prototype.updateVisibility = function() {
 };
 
 Scene_Battle.prototype.commandEnemyBook = function() {
+  enemyBook_Open = true;
+  let CategoryOn = false;
+  this.setMaxPage(param.PageSetting);
+  this._enemyBookPageWindow.setPageList(param.PageSetting, param.PageCols);
+  this._enemyBookPageWindow.setPage();
+
+  this._enemyBookPageWindow.interruptWindow = true;
+  this._enemyBookIndexWindow.interruptWindow = true;
   if (param.CategoryOn && param.EnemyBookCategory) {
     this.enemyBookCategorySelection();
+    CategoryOn = true;
+    this._enemyBookCategoryWindow.interruptWindow = true;
   } else {
     this.enemyBookIndexSelection();
   }
   this._enemyBookEnemyWindow._bookMode = 0;
   this.setButtonY();
   this.setEnemyBookBackGround();
-  this.setMaxPage(param.PageSetting);
-  this._enemyBookPageWindow.setPageList(param.PageSetting, param.PageCols);
-  this._enemyBookPageWindow.setPage();
   this._enemyBookEnemyWindow.x = (param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
   const pageLength = this._enemyBookPageWindow._bookList.length;
   const rect = this.enemyBookWindowRect();
@@ -4593,6 +4620,10 @@ Scene_Battle.prototype.commandEnemyBook = function() {
   if (pageLength > 1) {
     this._enemyBookPageWindow.show();
     this._enemyBookPageWindow.open();
+    if (CategoryOn) {
+      //this._enemyBookPageWindow.itemClear();
+      //this._enemyBookPageWindow.deselect();
+    }
   }
   this._enemyBookEnemyWindow.show();
   this._enemyBookEnemyWindow.open();
@@ -4600,6 +4631,9 @@ Scene_Battle.prototype.commandEnemyBook = function() {
 };
 
 Scene_Battle.prototype.cancelEnemyBook = function() {
+  enemyBook_Open = false;
+  this._enemyBookPageWindow.interruptWindow = false;
+  this._enemyBookIndexWindow.interruptWindow = false;
   this._enemyBookIndexWindow.close();
   this._enemyBookEnemyWindow.close();
   this._enemyBookPageWindow.close();
@@ -4607,6 +4641,7 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
     this._enemyBookPercentWindow.close();
   }
   if (param.CategoryOn && param.EnemyBookCategory) {
+    this._enemyBookCategoryWindow.interruptWindow = false;
     this._enemyBookCategoryWindow.close();
   }
   if (this._enemyBookBackGround) {
@@ -4622,11 +4657,11 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
     this._enemyBookPageWindow.deactivate();
     this._enemyBookEnemyWindow.setAnalyzeStatus(null);
   }
-  openAnalyze = false;
 };
 
 Scene_Battle.prototype.enemyBookEnemyAnalyze = function(args) {
-  openAnalyze = true;
+  enemyBook_Open = true;
+  this._enemyBookPageWindow.interruptWindow = true;
   //this.userWindowDeactivate();
   this._enemyBookEnemyWindow._enemy = null;
   this._enemyBookEnemyWindow.setAnalyzeStatus(args);
@@ -4864,8 +4899,8 @@ Window_Selectable.prototype.initialize = function(rect) {
 
 const _Window_Selectable_isOpenAndActive = Window_Selectable.prototype.isOpenAndActive;
 Window_Selectable.prototype.isOpenAndActive = function() {
-  if (openAnalyze && $gameParty.inBattle()) {
-    return this.constructor === Window_EnemyBookPageCategory && this.active ? _Window_Selectable_isOpenAndActive.call(this) : false;
+  if (enemyBook_Open && $gameParty.inBattle()) {
+    return this.interruptWindow && this.active ? _Window_Selectable_isOpenAndActive.call(this) : false;
  }
   return _Window_Selectable_isOpenAndActive.call(this);
 };
@@ -4903,7 +4938,7 @@ BattleManager.isBusy = function() {
 };
 
 BattleManager.enemyBookIsBusy = function() {
-  return openAnalyze;
+  return enemyBook_Open;
 };
 
 const _BattleManager_startAction = BattleManager.startAction;

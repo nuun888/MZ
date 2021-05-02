@@ -11,13 +11,15 @@
  * @target MZ
  * @plugindesc TP円形ゲージプラグイン
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * TPゲージを円形にします。
  * バトルスタイル拡張プラグインと併用する場合はこのプラグインを「NUUN_BattleStyleEX_Base」より下に配置してください。
  * 
  * 更新履歴
+ * 2021/5/2 Ver.1.0.3
+ * 処理ミスがあったため修正。
  * 2021/5/1 Ver.1.0.2
  * LL_ExGaugeDrawingの一部機能に対応。
  * 2021/4/27 Ver.1.0.1
@@ -179,7 +181,7 @@ Sprite_CircularGauge.prototype.valueFontSize = function() {
 };
 
 Sprite_CircularGauge.prototype.drawLabel = function() {
-  if (this._battler.isActor) {
+  if (this._battler.isActor()) {
     const label = this.label();
     const x = this.labelOutlineWidth() / 2;
     const y = this.labelY() - 15;

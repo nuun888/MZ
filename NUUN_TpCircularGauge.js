@@ -84,7 +84,7 @@
  * @min 0
  * 
  * @param StartAngle
- * @desc ゲージの開始角度を指定します。
+ * @desc ゲージの開始角度を指定します。（１２時の位置が-90で３時の位置が0です）
  * @text ゲージ開始角度
  * @type number
  * @default -90

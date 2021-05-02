@@ -12,7 +12,7 @@
  * @target MZ
  * @plugindesc レベルアップアイテム、スキル
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 経験値を増減させるアイテムやスキルを作ることが出来ます。
@@ -22,11 +22,14 @@
  * <LevelUP:5> レベルが5アップします。
  * <LevelUP:-1> レベルが1ダウンします。
  * <LevelUP:-10> レベルが10ダウンします。
+ *               
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/2 Ver.1.0.1
+ * レベルをダウンさせると経験値のおかしくなる問題を修正。
  * 2021/4/29 Ver.1.0.0
  * 初版
  * 
@@ -53,38 +56,35 @@ Imported.NUUN_LevelUPItem = true;
   };
 
   Game_Action.prototype.isLevelUpItem = function() {
-    return this.item().meta.LevelUP && this.item().meta.LevelUP > 0;
+    return this.item().meta.LevelUP > 0;
   };
 
   Game_Action.prototype.isLevelDownItem = function() {
-    return this.item().meta.LevelUP && this.item().meta.LevelUP < 0;
+    return this.item().meta.LevelUP < 0;
+  };
+
+  Game_Action.prototype.testLevelUp = function(target) {
+    const result = (this.testLifeAndDeath(target) && this.item().meta.LevelUP && 
+                    (this.isLevelDownItem () && target._level > 1 || (this.isLevelUpItem() && !target.isMaxLevel()))
+                  )
+    return result;
   };
 
   const _Game_Action_testApply = Game_Action.prototype.testApply;
   Game_Action.prototype.testApply = function(target) {
-    return _Game_Action_testApply.call(this, target) || 
-    (this.testLifeAndDeath(target) && (this.isLevelDownItem () && target._level > 1 || (this.isLevelUpItem() && !target.isMaxLevel())));
+    return _Game_Action_testApply.call(this, target) || this.testLevelUp(target);
   };
 
   Game_BattlerBase.prototype.levelUpItems = function(target, item) {
     if(this.isActor()) {
       let levelUpVal = item.meta.LevelUP;
-      const lastLevel = this._level;
-      const lastSkills = this.skills();
       if (levelUpVal > 0) {
         levelUpVal = Math.min(levelUpVal, target.maxLevel() - target._level);
-        for (let i = 0; i < levelUpVal; i++) {
-          this.levelUp();
-        }
+        target.changeLevel(target.level + levelUpVal, MessageWindowShow);
       } else if (levelUpVal < 0) {
         levelUpVal = Math.abs(levelUpVal);
         levelUpVal = Math.min(levelUpVal, (target._level - 1));
-        for (let i = 0; i < levelUpVal; i++) {
-          this.levelDown();
-        }
-      }
-      if (MessageWindowShow && this._level > lastLevel) {
-        this.displayLevelUp(this.findNewSkills(lastSkills));
+        target.changeLevel(target.level - levelUpVal, MessageWindowShow);
       }
     }
   };

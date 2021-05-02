@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.1.2
+ * @version 2.1.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -49,6 +49,7 @@
  * 経験値
  * 獲得金額
  * 倒した数
+ * ターン（TPBバトルで現在のステータスをONにしている時のみ表示します）(未実装)
  * モンスター名
  * 名称のみ
  * 耐性属性
@@ -231,8 +232,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/ Ver.2.1.3
+ * 図鑑、アナライズに表示されないモンスターを攻撃したときダメージが表示されない問題を修正。
  * 2021/5/1 Ver.2.1.2
- * プラグインコマンドから図鑑を開くコマンドを戦闘中にも対応。
+ * プラグインコマンド「モンスター図鑑オープン」を戦闘中にも対応。
  * 図鑑登録、アナライズを使用しても表示しない機能を追加。
  * 2021/4/30 Ver.2.1.1
  * 登録タイミングを撃破済みにしてモンスターを撃破しても登録されない問題を修正。
@@ -1538,6 +1541,8 @@
  * @value 33
  * @option 名称のみ
  * @value 35
+ * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）(未実装)
+ * @value 39
  * @option 耐性属性
  * @value 40
  * @option 弱点属性
@@ -1556,7 +1561,7 @@
  * @value 51
  * @option ドロップアイテム
  * @value 60
- * @option スティールアイテム
+ * @option スティールアイテム（要盗みスキルプラグイン）
  * @value 61
  * @option 記述欄
  * @value 70
@@ -1566,6 +1571,8 @@
  * @value 100
  * @option モンスター画像
  * @value 200
+ * @option 盗み抵抗（要盗みスキルプラグイン）
+ * @value 300
  * @option ライン
  * @value 1000
  * @default 0
@@ -2514,11 +2521,11 @@ const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffe
 Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
   if (target.isEnemy()) {
-    if (target.enemy().meta.NoBookData) {
-      target.result().missed = true;
-      return;
-    }
     if (this._analyzeDate) {
+      if (target.enemy().meta.NoBookData) {
+        target.result().missed = true;
+        return;
+      }
       BattleManager.analyzeTarget = target;
       SceneManager._scene.enemyBookEnemyAnalyze(this._analyzeDate);
     }
@@ -3043,9 +3050,6 @@ Window_EnemyBook_Index.prototype.update = function() {
 
 Window_EnemyBook_Index.prototype.select = function(index) {
   Window_Selectable.prototype.select.call(this, index);
-  if (this.index() >= 0) {
-    this.updateIndex();
-  }
   this.updateEnemyStatus();
 };
 
@@ -3192,6 +3196,11 @@ Window_EnemyBook_Index.prototype.refresh = function() {
   this.updatePercent();
   this.setSelect();
   Window_Selectable.prototype.refresh.call(this);
+};
+
+Window_EnemyBook_Index.prototype.processCancel = function() {
+  this.updateIndex();
+  Window_Selectable.prototype.processCancel.call(this);
 };
 
 
@@ -3482,6 +3491,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
       break;
     case 35:
       this.name(list, enemy, x, y, width);
+      break;
+    case 36:
+      this.turn(list, enemy, x, y, width);
       break;
     case 40:
       this.drawResistElement(list, enemy, x, y, width);
@@ -3779,6 +3791,23 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
     text = param.UnknownStatus;
   }
   this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
+};
+
+Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
+  if (BattleManager.isTpb() && this.analyzeCurrentStatus()) {
+    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    const nameText = list.paramName ? list.paramName : "ターン";
+    const textWidth = Math.min(this.textWidth(nameText), width - Math.floor(width / 3));
+    this.drawText(nameText, x, y, textWidth);
+    this.resetTextColor();
+    let text;
+    if(this.paramEXMask(list.MaskMode)){
+      text = list.DetaEval ? eval(list.DetaEval) : enemy.turnCount();
+    } else {
+      text = param.UnknownStatus;
+    }
+    this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
+  }
 };
 
 Window_EnemyBook.prototype.name = function(list, enemy, x, y, width) {

@@ -6,16 +6,13 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/12/24 Ver.1.0.0
- * 初版
- * 2020/12/31 Ver.1.0.1
- * アイテム欄の使用回数を非表示に出来る機能を追加。
  */
 /*:
  * @target MZ
  * @plugindesc  アイテム使用回数
  * @author NUUN
+ * @version 1.0.2
+ * 
  * 
  * @help
  * アイテムに１回消費するまでの使用回数を設定できます。使用回数カウントが０になった時そのアイテムは消耗します。
@@ -30,6 +27,15 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/5/2 Ver.1.0.2
+ * 装備を外すときにエラーが出る問題を修正。
+ * 2020/12/31 Ver.1.0.1
+ * アイテム欄の使用回数を非表示に出来る機能を追加。
+ * 2020/12/24 Ver.1.0.0
+ * 初版
+ * 
  * 
  */
 var Imported = Imported || {};
@@ -60,7 +66,7 @@ Game_Party.prototype.initUseItemCount = function() {
 };
 
 Game_Party.prototype.setUseItemCount = function(item) {
-  if (!this._useItemCount[item.id]) {
+  if (item && !this._useItemCount[item.id]) {
     this._useItemCount[item.id] = Number(item.meta.ItemUseCount) || 0;
   }
 };
@@ -70,7 +76,7 @@ Game_Party.prototype.useItemCount = function(item) {
 };
 
 Game_Party.prototype.useItemCountReset = function(item) {
-  this.setUseItemCount(item);this._useItemCount[item.id] = Number(item.meta.ItemUseCount) || 0;
+  this.setUseItemCount(item);
 };
 
 Game_Party.prototype.getUseItemCount = function(item) {

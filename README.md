@@ -27,7 +27,7 @@
 | キャストタイム（詠唱）キャンセルスキル、アイテム  | [NUUN_CancelCastTime](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js)  | キャストタイムをキャンセルさせるスキル、アイテムが出来ます。 | 1.1.0 |
 | スキル、アイテムの色  | [NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js)  | スキル、アイテムの文字色を任意の色に変えることが出来ます。 | 1.1.0 |
 | アイテム消耗率  | [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)  | アイテムに消耗率を設定できます。 | 1.0.0 |
-| アイテム使用回数  | [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)  | アイテムに使用回数を設定できます。 | 1.0.1 |
+| アイテム使用回数  | [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)  | アイテムに使用回数を設定できます。 | 1.0.2 |
 | 盗みスキル  | [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)  | 敵のアイテムやお金を盗んだり盗まれたりするスキルが出来ます。 | 1.1.1 |
 
 | ステート | プラグイン | 説明 | Ver |

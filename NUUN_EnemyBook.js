@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.1.3
+ * @version 2.2.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -49,7 +49,7 @@
  * 経験値
  * 獲得金額
  * 倒した数
- * ターン（TPBバトルで現在のステータスをONにしている時のみ表示します）(未実装)
+ * ターン（TPBバトルで現在のステータスをONにしている時のみ表示します）
  * モンスター名
  * 名称のみ
  * 耐性属性
@@ -232,6 +232,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/4 Ver.2.2.0
+ * モンスター情報の各項目の座標、横幅を詳細に設定できるように変更。
+ * ターン数を表示する機能を追加。
  * 2021/5/2 Ver.2.1.3
  * 図鑑、アナライズに表示されないモンスターを攻撃したときダメージが表示されない問題を修正。
  * 2021/5/1 Ver.2.1.2
@@ -1541,8 +1544,8 @@
  * @value 33
  * @option 名称のみ
  * @value 35
- * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）(未実装)
- * @value 39
+ * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）
+ * @value 36
  * @option 耐性属性
  * @value 40
  * @option 弱点属性
@@ -1571,7 +1574,9 @@
  * @value 100
  * @option モンスター画像
  * @value 200
- * @option 盗み抵抗（要盗みスキルプラグイン）
+ * @option キャラチップ（未実装）
+ * @value 201
+ * @option 盗み抵抗（要盗みスキルプラグイン）（未実装）
  * @value 300
  * @option ライン
  * @value 1000
@@ -1594,8 +1599,8 @@
  * @parent BasicSetting
  * 
  * @param X_Position
- * @text X表示位置
- * @desc X表示位置
+ * @text X表示列位置
+ * @desc X表示列位置
  * @type number
  * @default 1
  * @min 1
@@ -1603,11 +1608,35 @@
  * @parent BasicSetting
  * 
  * @param Y_Position
- * @desc Y表示位置
- * @text Y表示位置
+ * @desc Y表示行位置
+ * @text Y表示行位置
  * @type number
  * @default 1
  * @min 1
+ * @parent BasicSetting
+ * 
+ * @param X_Coordinate
+ * @text X座標（相対）
+ * @desc X座標（X表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BasicSetting
+ * 
+ * @param Y_Coordinate
+ * @text Y座標（相対）
+ * @desc Y座標（Y表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BasicSetting
+ * 
+ * @param ItemWidth
+ * @desc 項目横幅（0で自動）
+ * @text 項目横幅
+ * @type number
+ * @default 0
+ * @min 0
  * @parent BasicSetting
  * 
  * @param WideMode
@@ -3311,10 +3340,6 @@ Window_EnemyBook.prototype.maxWidth = function() {
   return this.itemWidth() / 2 - this.itemPadding() * 2;
 };
 
-Window_EnemyBook.prototype.statusLineHeight = function() {
-  return Math.floor((Graphics.boxHeight - 616) / 60) * 36;
-};
-
 Window_EnemyBook.prototype.crisisColor = function(enemy) {
   return enemy.isDying() ? ColorManager.crisisColor() : ColorManager.normalColor();
 };
@@ -3379,9 +3404,9 @@ Window_EnemyBook.prototype.page = function(enemy) {
     const x_Position = date.X_Position;
     const position = Math.min(x_Position, this.maxCols());
     const rect = this.itemRect(position - 1);
-    const x = rect.x;
-    const y = (date.Y_Position - 1) * lineHeight + rect.y;
-    const width = this.widthMode(date, rect);
+    const x = rect.x + (date.X_Coordinate || 0);
+    const y = (date.Y_Position - 1) * lineHeight + rect.y + (date.Y_Coordinate || 0);
+    const width = date.ItemWidth && date.ItemWidth > 0 ? date.ItemWidth : this.widthMode(date, rect);
     this.dateDisplay(date, enemy, x, y, width);
   }
 };
@@ -3802,7 +3827,7 @@ Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
     this.resetTextColor();
     let text;
     if(this.paramEXMask(list.MaskMode)){
-      text = list.DetaEval ? eval(list.DetaEval) : enemy.turnCount();
+      text = list.DetaEval ? eval(list.DetaEval) : Math.max(enemy.turnCount(), 1);
     } else {
       text = param.UnknownStatus;
     }

@@ -11,13 +11,15 @@
  * @target MZ
  * @plugindesc TPB円形ゲージプラグイン
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * TPBゲージを円形にします。
  * バトルスタイル拡張プラグインと併用する場合はこのプラグインを「NUUN_BattleStyleEX_Base」より下に配置してください。
  * 
  * 更新履歴
+ * 2021/5/3 Ver.1.0.2
+ * Y座標の変更が機能していなかった問題を修正。
  * 2021/5/1 Ver.1.0.1
  * ゲージの色を指定できる機能を追加。
  * LL_ExGaugeDrawingの一部機能に対応。
@@ -228,7 +230,7 @@ Window_StatusBase.prototype.placeTimeGauge = function(actor, x, y) {
     if (Imported.NUUN_BattleStyleEX_Base && OnGaugePosition === 10) {
     } else {
       x = OnGaugePosition === 1 ? GaugeX + this.rect.x : this.rect.x + this.rect.width - (sprite.radius() * 2 + 18);
-      y = OnGaugePosition === 2 ? GaugeY + this.rect.y : this.rect.y + this.gaugeLineHeight() * 1.8;
+      y = OnGaugePosition === 1 ? GaugeY + this.rect.y : this.rect.y + this.gaugeLineHeight() * 1.8;
     }
     _Window_StatusBase_placeTimeGauge.call(this, actor, x, y);
   }

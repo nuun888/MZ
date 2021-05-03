@@ -12,7 +12,7 @@
  * @plugindesc  リザルト
  * @author NUUN
  * @base NUUN_Base
- * @version 1.7.3
+ * @version 1.7.4
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -76,6 +76,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/4 Ver.1.7.4
+ * レベルアップ画面で顔グラを非表示にした際に、線を非表示にする機能を追加。
  * 2021/5/3 Ver.1.7.3
  * 背景画像を指定して立ち絵を設定していないアクターがレベルアップしたときにエラーが出る問題を修正。
  * 背景画像を指定してレベルアップするとアクター立ち絵がキャラ切り替えのたびにサイズがおかしくなってしてしまう問題を修正。
@@ -589,6 +591,13 @@
  * @desc 顔グラを表示します。
  * @parent ActorImg
  * 
+ * @param LineVisible
+ * @type boolean
+ * @default true
+ * @text 顔グラ非表示線表示
+ * @desc 顔グラ非表示の時アクター名、レベルとステータス、習得スキルの間にある線を表示します。
+ * @parent ActorImg
+ * 
  * @param ButlerActors
  * @text 表示アクター設定
  * @desc 画像を表示するアクターを指定します。
@@ -965,8 +974,8 @@ Imported.NUUN_Result = true;
 
 param.GainParam = param.GainParam || [];
 param.ButlerActors = param.ButlerActors || [];
-param.ActorBackGroundImg = param.ActorBackGroundImg.length < 1 ? null : param.ActorBackGroundImg[0];
-param.PartyBackGroundImg = param.PartyBackGroundImg.length < 1 ? null : param.PartyBackGroundImg[0];
+param.ActorBackGroundImg = param.ActorBackGroundImg && param.ActorBackGroundImg.length > 0 ? param.ActorBackGroundImg[0] : null;
+param.PartyBackGroundImg = param.PartyBackGroundImg && param.PartyBackGroundImg.length > 0 ? param.PartyBackGroundImg[0] : null;
 let gaugeWidth = 300;
 
 const pluginName = "NUUN_Result";
@@ -1539,7 +1548,9 @@ Window_Result.prototype.refresh = function() {
       NoFaceX += 152
       NoFaceY += lineHeight * 3.5;
     } else {
-      this.drawHorzLine(rect.x, rect.y + lineHeight, rect.width);
+      if (param.LineVisible) {
+        this.drawHorzLine(rect.x, rect.y + lineHeight, rect.width);
+      }
       NoFaceY += lineHeight;
     }
     this.drawActorStatusLevel(x, rect.y);

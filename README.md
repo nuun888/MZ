@@ -38,7 +38,7 @@
 | 特徴拡張 | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
 | キャストタイムチャージ率特徴  | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js)  | キャストタイム中のチャージ率を変化させる特徴を付けることが出来ます。 | 1.0.0 |
-| ファイナルアタック  |  |  |  |
+| ファイナルアタック  | NUUN_FinalAttack | ファイナルアタック特徴 | |
 |  |  |  |  |
   
 | アクター | プラグイン | 説明 | Ver |

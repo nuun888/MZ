@@ -21,6 +21,8 @@
  * スキルのコストは考慮してませんのでスキルコストがある場合数値がマイナスに表示される場合があります。
  * 
  * 更新履歴
+ * 2021/5/3 Ver.1.0.1
+ * 少し修正。
  * 2021/5/3 Ver.1.0.0
  * 初版
  * 
@@ -187,7 +189,7 @@ Window_BattleLog.prototype.endAction = function(subject) {
 };
 
 Window_BattleLog.prototype.displayfinalAttackEndCollapse = function(subject) {
-  if (subject.finalAttackEnd) {
+  if (subject.finalAttackEnd && subject.hp === 0) {
     this.push("performCollapse", subject);
     this.push("wait");
   }

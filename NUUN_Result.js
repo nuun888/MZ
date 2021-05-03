@@ -12,7 +12,7 @@
  * @plugindesc  リザルト
  * @author NUUN
  * @base NUUN_Base
- * @version 1.7.2
+ * @version 1.7.3
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -37,6 +37,10 @@
  * 背景画像を設定して「背景サイズをウィンドウサイズに合わせる」をfalseに設定した時の仕様について
  * レベルアップ画面のアクター画像はUIサイズ、リザルト画面ウィンドウのサイズではなく、ゲーム画面サイズに合わせて表示されます。
  * このモードのみボタンの表示位置を変更可能です。ボタン設定での座標指定はゲーム画面左上からの絶対座標となっています。-1を指定することでリザルトウィンドウサイズに合わせます。
+ * 
+ * 背景画像はいずれもプラグインパラメータのリストの１番目のみ反映されます。
+ * アクターの立ち絵はプラグインパラメータのリストに複数設定可能です。（初期設定では1番目の立ち絵が表示されます）
+ * 立ち絵はプラグインコマンドで変更できます。
  * 
  * 背景画像、アクター画像（立ち絵）を表示するにはNUUN_Baseが必要です。
  * 
@@ -72,8 +76,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/3 Ver.1.7.3
+ * 背景画像を指定して立ち絵を設定していないアクターがレベルアップしたときにエラーが出る問題を修正。
+ * 背景画像を指定してレベルアップするとアクター立ち絵がキャラ切り替えのたびにサイズがおかしくなってしてしまう問題を修正。
  * 2021/4/24 Ver.1.7.2
- * Ver.1.7.0以前のバージョンから立ち絵を設定した状態でアップデートすると戦闘終了時にエラーが出る問題を修正。
+ * Ver.1.7.1以前のバージョンから立ち絵を設定した状態でアップデートすると戦闘終了時にエラーが出る問題を修正。
  * 2021/4/23 Ver.1.7.1
  * プラグインコマンドでアクター立ち絵を変更できる機能を追加。
  * 背景画像、アクター画像のフォルダーを指定できるように変更。
@@ -204,6 +211,14 @@
  * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
  * @type boolean
  * @default true
+ * @parent CommonSetting
+ * 
+ * @param ResultVisibleFrame
+ * @desc 勝利後リザルト画面が表示されるまでのフレーム数
+ * @text 勝利後リザルト画面待機フレーム数（未実装）
+ * @type number
+ * @default 0
+ * @min 0
  * @parent CommonSetting
  * 
  * @param WindowSetting
@@ -982,7 +997,7 @@ PluginManager.registerCommand(pluginName, 'ChangeActorImg', args => {
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
-  this.resultActorImg = null;
+  this.resultActorImg = [];
   this.resultActorBitmap = null;
 };
 
@@ -995,6 +1010,7 @@ Game_Actor.prototype.setup = function(actorId) {
 Game_Actor.prototype.initResultActorImg = function(id) {
   const list = param.ButlerActors.find(actors => actors.actorId === id);
   this.resultActorImg = list || [];
+  this.resultActorImg.ActorImg = this.resultActorImg.ActorImg || [];
   this.resultImgId = this.resultImgId === undefined ? 0 : this.resultImgId;
 };
 
@@ -1154,7 +1170,7 @@ Scene_Battle.prototype.createResultButtons = function() {
   }
 };
 
-Scene_Battle.prototype.createResultButton = function() {//this._resultBaseSprite
+Scene_Battle.prototype.createResultButton = function() {
   this._okResultButton = new Sprite_Button("ok");
   if (!this._resultBaseSprite || param.BackUiWidth || param.ResultButton_X < 0) {
     this._okResultButton.x = (param.ResultWindowCenter ? (param.ResultWidth > 0 ? (Graphics.boxWidth - param.ResultWidth) / 2 : 0) : (Graphics.boxWidth - Graphics.width) / 2)
@@ -2050,12 +2066,11 @@ Sprite_ResultActor.prototype.initMembers = function() {
   this._battler = null;
 };
 
-Sprite_ResultActor.prototype.destroy = function(options) {
-  this.bitmap.destroy();
-  Sprite.prototype.destroy.call(this, options);
-};
-
 Sprite_ResultActor.prototype.setup = function(battler, bitmap, scale) {
+  if (this._battler !== battler) {
+    this.scale.x = 1.0;
+    this.scale.y = 1.0;
+  }
   this._battler = battler;
   this.bitmap = bitmap;
   this.scale.x *= scale;

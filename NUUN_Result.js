@@ -12,7 +12,7 @@
  * @plugindesc  リザルト
  * @author NUUN
  * @base NUUN_Base
- * @version 1.7.4
+ * @version 1.7.5
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -76,6 +76,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/4 Ver.1.7.5
+ * 旧バージョンからアップデートした後にリザルト画面が表示されるとエラーが出る問題を修正。
  * 2021/5/4 Ver.1.7.4
  * レベルアップ画面で顔グラを非表示にした際に、線を非表示にする機能を追加。
  * 2021/5/3 Ver.1.7.3
@@ -1313,9 +1315,6 @@ Scene_Battle.prototype.update = function() {
       this.updateDorpItemPagedown();
     }
   }
-  if (BattleManager.resultRefresh > 0) {
-    BattleManager.resultRefresh--;
-  }
 };
 
 Scene_Battle.prototype.updateDorpItemPagedown = function() {
@@ -1679,8 +1678,8 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       this.changeTextColor(ColorManager.textColor(param.LevelUpValueColor));
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
-        if (Imported.NUUN_Base) {
-          if (!Array.isArray(actor.resultActorImg.ActorImg) || !actor.resultActorBitmap) {
+        if (Imported.NUUN_Base) {console.log(actor.resultActorImg)
+          if (!actor.resultActorImg || !Array.isArray(actor.resultActorImg.ActorImg) || !actor.resultActorBitmap) {//配列仕様前の判定
             actor.initResultActorImg(actor.actorId());
           }
           if (actor.resultActorImg.ActorImg) {
@@ -2333,12 +2332,26 @@ BattleManager.initMembers = function() {
   this._victoryOn = false;
   this._victoryBGMOn = false;
   this.resultRefresh = 0;
+  this.resultBusy = 0;
+};
+
+const _BattleManager_update = BattleManager.update;
+BattleManager.update = function(timeActive) {
+  _BattleManager_update.call(this, timeActive);
+  if (this.resultRefresh > 0) {
+    this.resultRefresh--;
+  }
+  if (this.resultRefresh > 0) {
+    this.resultBusy--;
+  }
 };
 
 const _BattleManager_processVictory = BattleManager.processVictory;
 BattleManager.processVictory = function() {
-  this._victoryOn = true;
-  _BattleManager_processVictory.call(this);
+  //if (this.resultBusy === 0) {
+    this._victoryOn = true;
+    _BattleManager_processVictory.call(this);
+  //}
 };
 
 BattleManager.displayVictoryMessage = function() {

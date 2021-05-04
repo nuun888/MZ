@@ -10,7 +10,7 @@ https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js<br>
 各キャラクターがレベルアップし決定キーをおしたらレベルアップ画面に移行します。レベルアップ画面ではアクターの立ち絵が表示できプラグインコマンドで立ち絵を変更することが出来ます。
 
 ![画像](img/Result1.png)<br>
-![画像](img/Result2.png)<br>
+![画像](img/Result4.png)<br>
 ![画像](img/Result18.png)<br>
 
 画像指定のフォルダーについて<br>

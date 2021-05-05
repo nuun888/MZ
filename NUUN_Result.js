@@ -2341,9 +2341,6 @@ BattleManager.update = function(timeActive) {
   if (this.resultRefresh > 0) {
     this.resultRefresh--;
   }
-  if (this.resultRefresh > 0) {
-    this.resultBusy--;
-  }
 };
 
 const _BattleManager_processVictory = BattleManager.processVictory;

@@ -33,7 +33,7 @@
  */
 var Imported = Imported || {};
 Imported.NUUN_Base = true;
-Imported.NUUN_Base.Ver = 112;
+NUUN_Base_Ver = 112;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Base');

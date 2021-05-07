@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.2.0
+ * @version 2.2.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -95,7 +95,7 @@
  * <EB_SVBattler:[fileName]> モンスター画像をサイドビュー画像で表示させます。(モンスターにサイドビューアクターを表示する系のプラグイン導入が前提としています)
  * [fileName]:ファイル名　サイドビューバトラー画像を指定します。sv_actorsフォルダ内のファイル名を拡張子なしで指定してください。
  * <EB_SVBattlerMotion:[motionId]> 指定したモーションで表示させます。記入なしの場合は0のモーションで表示されます。
- * [motionId]:モーションID
+ * [motionId]:0～17モーションID(数値で入力)
  * 
  * スキル、アイテムのメモ欄
  * <AnalyzeSkill:1> このスキル、アイテムはアナライズスキルとし、「アナライズスキル設定」の１番の設定で発動します。
@@ -232,6 +232,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/5 Ver.2.2.1
+ * 変身前のモンスターを撃破済みにしてもステータス情報が反映されなかった問題を修正。
  * 2021/5/4 Ver.2.2.0
  * モンスター情報の各項目の座標、横幅を詳細に設定できるように変更。
  * ターン数を表示する機能を追加。
@@ -809,12 +811,9 @@
  * @desc 戦闘時タッチUIがOFFの時ウィンドウを上に詰めます。
  * @parent BasicSetting
  * 
- * @param SVEnemyMirror
- * @type boolean
- * @default true
- * @text サイドビューバトラー反転
- * @desc サイドビューバトラーを表示時、画像を反転させる。
- * @parent BasicSetting
+ * @param MonsterSetting
+ * @text モンスター設定
+ * @default ------------------------------
  * 
  * @param UnknownEnemyIcons
  * @desc 未登録のモンスターアイコン。
@@ -822,7 +821,14 @@
  * @type number
  * @default 0
  * @min 0
- * @parent BasicSetting
+ * @parent MonsterSetting
+ * 
+ * @param SVEnemyMirror
+ * @type boolean
+ * @default true
+ * @text サイドビューバトラー反転
+ * @desc サイドビューバトラーを表示時、画像を反転させる。
+ * @parent MonsterSetting
  * 
  * @param Category
  * @text カテゴリー設定
@@ -939,7 +945,7 @@
  * @desc コマンドの名称。
  * @text コマンドの表示名
  * @type string
- * @default 魔物図鑑
+ * @default モンスター図鑑
  * @parent CommandData
  * 
  * @param PageData
@@ -2464,6 +2470,9 @@ const _Game_Enemy_transform = Game_Enemy.prototype.transform;
 Game_Enemy.prototype.transform = function(enemyId) {
   if (param.TransformDefeat) {
     $gameSystem.defeatCount(this.enemyId());
+    if ($gameSystem.registrationStatusTiming() !== 2) {
+      $gameSystem.addStatusToEnemyBook(this.enemyId());
+    }
   }
   _Game_Enemy_transform.call(this, enemyId);
   if ($gameSystem.registrationTiming() === 0) {

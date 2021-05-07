@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/7 Ver.1.1.2
+ * 構造体の取得処理を追加。
  * 2021/4/23 Ver.1.1.1
  * 画像のフォルダー指定の処理を追加。
  * 2021/3/14 Ver.1.1.0
@@ -31,9 +33,28 @@
  */
 var Imported = Imported || {};
 Imported.NUUN_Base = true;
+Imported.NUUN_Base.Ver = 112;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Base');
+
+function structureData(params) {
+  return JSON.parse(JSON.stringify(params, function(key, value) {
+    try {
+        return JSON.parse(value);
+    } catch (e) {
+        try {
+            return eval(value);
+        } catch (e) {
+            return value;
+        }
+    }
+  }));
+}
+
+DataManager.nuun_structureData = function(params){
+  return structureData(params);
+};
 
 const _Scene_Boot_onDatabaseLoaded = Scene_Boot.prototype.onDatabaseLoaded;
 Scene_Boot.prototype.onDatabaseLoaded = function() {
@@ -75,5 +96,7 @@ ImageManager.nuun_actorPictures = function(filename) {
 ImageManager.nuun_LoadPictures = function(filename) {
   return this.loadBitmap("img/", filename);
 };
+
+
 
 })();

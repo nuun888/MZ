@@ -18,7 +18,7 @@
 | [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  | 戦闘終了後にリザルト画面を表示します。 立ち絵表示できます。　| 1.7.5 |
 | TP円形ゲージ  | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)  | TPゲージを円形にします。 | 1.0.4 |
 | TPB円形ゲージ  | [NUUN_TpbCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpbCircularGauge.js)  | TPBゲージを円形にします。 | 1.0.2 |
-| ターン表示  |  |  |  |
+| パーティゲージシステム  |  |  |  |
 
 | スキル、アイテム | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |

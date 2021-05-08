@@ -6,7 +6,47 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
+ */ 
+/*:
+ * @target MZ
+ * @plugindesc セーブ画面拡張
+ * @author NUUN
+ * @version 1.3.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * セーブ画面にいくつかの項目を追加します。
+ * 顔グラを表示できます。
+ * キャラクター上にレベルを表示できます。
+ * メイン文章（章など）を表示可能。（設定しない場合はタイトルが表示されます。何も表示させたくない場合はスペースを入れてください）
+ * 現在地、所持金、任意の項目が表示可能です。
+ * 
+ * 変数に文字列を入れる方法
+ * イベントコマンドの変数操作でスクリプトに"又は'で括り任意の文字列を入力してください。例：'第一章　旅立ち'
+ * 
+ * 仕様
+ * 拡大率は１００でセーブインフォ表示縦幅に関係なくデフォルトサイズで表示されます。
+ * それ以外は画像の縦幅（表示縦幅ではない）がセーブインフォ表示縦幅を超えるようであればそれ以下にサイズ調整されます。
+ *
+ * 右側の表示項目をなしにすると左側の表示項目が広く表示されます。
+ * 
+ * コンテンツエリアX座標を-1にすることで右寄りに表示されます。
+ * 
+ * 
+ * Ver.1.3.0からNUUN_Base Ver.1.1.3以降が必要となります。
+ * 
+ * 
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
+ * 
  * 更新履歴
+ * 2021/5/8 Ver.1.3.0
+ * 任意の背景画像を表示できる機能を追加。
+ * アクター画像の表示の設定方法を変更。
+ * レベルのYを調整できるように変更。
+ * キャラチップ表示時のアクターY座標を相対座標に変更。
+ * 表示できるセーブ数、セーブできる最大数を指定できる機能を追加。
  * 2021/1/30 Ver.1.2.1
  * コンテンツエリアX座標の設定方法を変更
  * 2021/1/29 Ver.1.2.0
@@ -19,34 +59,10 @@
  * 2021/1/24 Ver.1.0.0
  * 初版
  * 
- */ 
-/*:
- * @target MZ
- * @plugindesc セーブ画面拡張
- * @author NUUN
- * @version 1.2.0
- * 
- * @help
- * セーブ画面にいくつかの項目を追加します。
- * 顔グラを表示できます。
- * キャラクター上にレベルを表示できます。
- * メイン文章（章など）を表示可能。（設定しない場合はタイトルが表示されます。何も表示させたくない場合はスペースを入れてください）
- * 現在地、所持金、任意の項目が表示可能です。
- * 
- * 仕様
- * 拡大率は１００でセーブインフォ表示縦幅に関係なくデフォルトサイズで表示されます。
- * それ以外は画像の縦幅（表示縦幅ではない）がセーブインフォ表示縦幅を超えるようであればそれ以下にサイズ調整されます。
- *
- * 右側の表示項目をなしにすると左側の表示項目が広く表示されます。
- * 
- * コンテンツエリアX座標を-1にすることで右寄りに表示されます。
- * 
- * 
- * 利用規約
- * このプラグインはMITライセンスで配布しています。
  * 
  * @param Font
  * @text フォント設定
+ * @default ------------------------------
  * 
  * @param MainFontSizeMainFontSize
  * @desc ファイルタイトル、メイン文章のフォントサイズ
@@ -65,6 +81,7 @@
  * 
  * @param AnyName
  * @text メイン文章
+ * @default ------------------------------
  *
  * @param AnyNameVariable
  * @desc メイン文章変数番号
@@ -74,7 +91,7 @@
  * @parent AnyName
  * 
  * @param AnyDefaultName
- * @desc メイン文章デフォルト文字列
+ * @desc メイン文章デフォルト文字列。（スペースを入れると何も表示されません。空白の場合はタイトルが表示されます。）
  * @text メイン文章デフォルト文字列
  * @type string
  * @default
@@ -82,6 +99,20 @@
  * 
  * @param Actor
  * @text アクター設定
+ * @default ------------------------------
+ * 
+ * @param ActorGraphicMode
+ * @desc アクター画像の表示モード
+ * @text 表示モード
+ * @type select
+ * @option 表示しない
+ * @value 0
+ * @option キャラチップ
+ * @value 1
+ * @option 顔グラ
+ * @value 2
+ * @default 1
+ * @parent Actor
  * 
  * @param ActorX
  * @desc アクターのX座標（相対座標）デフォルト:40
@@ -96,13 +127,6 @@
  * @type number
  * @default 0
  * @min -9999
- * @parent Actor
- * 
- * @param FaceMode
- * @desc キャラチップではなく顔グラを表示します。
- * @text 顔グラ表示
- * @type boolean
- * @default false
  * @parent Actor
  * 
  * @param FaceWidth
@@ -140,8 +164,57 @@
  * @default 1
  * @parent Actor
  * 
+ * @param LevalY
+ * @desc レベルのY座標（相対座標）
+ * @text レベルY座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent Actor
+ * 
+ * @param BackGround
+ * @text 背景設定
+ * @default ------------------------------
+ * 
+ * @param BackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent BackGround
+ * 
+ * @param BackUiWidth
+ * @text 背景サイズをウィンドウサイズに合わせる
+ * @desc 背景サイズをウィンドウサイズに合わせる。
+ * @type boolean
+ * @default true
+ * @parent BackGround
+ * 
+ * @param ContentsBackVisible
+ * @text コンテンツ背景画像非表示
+ * @desc コンテンツの背景画像を表示しない。(要NUUN_Base Ver.1.1.3以降)
+ * @type boolean
+ * @default false
+ * @parent BackGround
+ * 
  * @param Contents
  * @text 各コンテンツ設定
+ * @default ------------------------------
+ * 
+ * @param NumSaveRows
+ * @desc 画面に表示するセーブ数
+ * @text 表示セーブ数
+ * @type number
+ * @default 5
+ * @parent Contents
+ * 
+ * @param MaxSave
+ * @desc 最大セーブ数
+ * @text 最大セーブ数
+ * @type number
+ * @default 20
+ * @parent Contents
  * 
  * @param ContentsRight
  * @text コンテンツエリアを右寄りに表示
@@ -297,16 +370,22 @@ Imported.NUUN_SaveScreen = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_SaveScreen');
+  const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
   const MainFontSizeMainFontSize = Number(parameters['MainFontSizeMainFontSize'] || 24);
   const ContentsFontSizeMainFontSize = Number(parameters['ContentsFontSizeMainFontSize'] || 22);
+  const ContentsBackVisible = eval(parameters['ContentsBackVisible'] || "true");
+  const ActorGraphicMode = Number(parameters['ActorGraphicMode'] || 1);
   const ActorX = Number(parameters['ActorX'] || 40);
   const ActorY = Number(parameters['ActorY'] || 0);
+  const LevalY = Number(parameters['LevalY'] || 0);
   const FaceWidth = Number(parameters['FaceWidth'] || 144);
   const FaceHeight = Number(parameters['FaceHeight'] || 144);
   const FaceScale = Number(parameters['FaceScale'] || 100);
   const LevelPosition = Number(parameters['LevelPosition'] || 1);
-  const FaceMode = eval(parameters['FaceMode'] || "false");
-  const ContentsX = Number(parameters['ContentsX'] || 0);//ContentsRight
+  //const FaceMode = eval(parameters['FaceMode'] || "false");
+  const ContentsX = Number(parameters['ContentsX'] || 0);
+  const NumSaveRows = Number(parameters['NumSaveRows'] || 5);
+  const MaxSave = Number(parameters['MaxSave'] || 20);
   const ContentsRight = eval(parameters['ContentsRight'] || "true");
   const _ContentsWidth = Number(parameters['ContentsWidth'] || 0);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
@@ -322,6 +401,7 @@ Imported.NUUN_SaveScreen = true;
   const OriginalName2 = String(parameters['OriginalName2'] || "");
   const OriginalEval1 = String(parameters['OriginalEval1'] || "");
   const OriginalEval2 = String(parameters['OriginalEval2'] || "");
+  const BackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])[0]) : null; 
 
   const _DataManager_makeSavefileInfo  = DataManager.makeSavefileInfo ;
   DataManager.makeSavefileInfo = function() {
@@ -333,6 +413,72 @@ Imported.NUUN_SaveScreen = true;
     info.OriginalDate1 = eval(OriginalEval1);
     info.OriginalDate2 = eval(OriginalEval2);
     return info;
+  };
+
+  const _DataManager_maxSavefiles = DataManager.maxSavefiles;
+  DataManager.maxSavefiles = function() {
+    return MaxSave ? MaxSave : _DataManager_maxSavefiles.call(this);
+  };
+
+  const _Scene_File_create = Scene_File.prototype.create;
+  Scene_File.prototype.create = function() {
+    this.createBackground();
+    _Scene_File_create.call(this);
+  };
+
+  const _Scene_File_createListWindow = Scene_File.prototype.createListWindow;
+  Scene_File.prototype.createListWindow = function() {
+    _Scene_File_createListWindow.call(this);
+    if (BackGroundImg) {
+      this._listWindow.opacity = 0;
+    }
+  };
+
+  const _Scene_File_createHelpWindow = Scene_File.prototype.createHelpWindow;
+  Scene_File.prototype.createHelpWindow = function() {
+    _Scene_File_createHelpWindow.call(this);
+    if (BackGroundImg) {
+      this._helpWindow.opacity = 0;
+    }
+  };
+
+  Scene_File.prototype.createBackground = function() {
+    Scene_MenuBase.prototype.createBackground.call(this);
+    if (BackGroundImg) {
+		  const sprite = new Sprite();
+      sprite.bitmap = ImageManager.nuun_LoadPictures(BackGroundImg);
+      if (BackGroundImg) {
+        this.addChild(sprite);
+        if (sprite.bitmap && !sprite.bitmap.isReady()) {
+          sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
+        } else {
+          this.setBackGround(sprite);
+        }
+      }
+    }
+  };
+
+  Scene_File.prototype.setBackGround = function(sprite) {
+    if (BackUiWidth) {
+      sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
+      sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
+      sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
+      sprite.scale.y = (Graphics.boxHeight + 8 !== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+    } else {
+      sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
+      sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+    }
+  };
+
+  const _Window_SavefileList_initialize = Window_SavefileList.prototype.initialize;
+  Window_SavefileList.prototype.initialize = function(rect) {
+    _Window_SavefileList_initialize.call(this, rect);
+    this._contentsBackVisible = ContentsBackVisible;
+  };
+
+  const _Window_SavefileList_numVisibleRows = Window_SavefileList.prototype.numVisibleRows;
+  Window_SavefileList.prototype.numVisibleRows = function() {
+    return NumSaveRows ? NumSaveRows : _Window_SavefileList_numVisibleRows.call(this);
   };
 
   const _Window_SavefileList_drawItem = Window_SavefileList.prototype.drawItem;
@@ -364,7 +510,7 @@ Imported.NUUN_SaveScreen = true;
       let x = ActorX + rect.x;
       let width = 0;
       let height = 0;
-      if (FaceMode) {
+      if (ActorGraphicMode === 2) {
         let y = ActorY + rect.y + 2;
         const scale = FaceScale / 100;
         width = FaceWidth > 0 ? FaceWidth : ImageManager.faceWidth;
@@ -378,8 +524,8 @@ Imported.NUUN_SaveScreen = true;
           this._scaleMode = 1;
         }
         this.drawPartyFace(info, x, y, width, height);
-      } else {
-        const bottom = rect.y + (ActorY !== 0 ? ActorY : rect.height) + ActorY;
+      } else if (ActorGraphicMode === 1) {
+        const bottom = rect.y + rect.height + ActorY;
         this.drawPartyCharacters(info, x, bottom - 8);
       }
     }
@@ -458,10 +604,11 @@ Imported.NUUN_SaveScreen = true;
         if (LevelPosition === 2) {
           y2 += Math.max(MainFontSizeMainFontSize - ActorY, 0) - 4;
         } else {
-          y2 += this._maxHeight - ContentsFontSizeMainFontSize - 12;
+          y2 += this._maxHeight - ContentsFontSizeMainFontSize - 12 - ActorY;
         }
         textWidth = Math.max(width / 2, 72) - 8;
       }
+      y2 += LevalY;
       for (const data of info.levelActor) {
         this.changeTextColor(ColorManager.systemColor());
         this.drawText(TextManager.levelA, levelActorX, y2, textWidth);

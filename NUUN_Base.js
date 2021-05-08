@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/8 Ver.1.1.3
+ * 処理を一部修正。
  * 2021/5/7 Ver.1.1.2
  * 構造体の取得処理を追加。
  * 2021/4/23 Ver.1.1.1
@@ -33,7 +35,7 @@
  */
 var Imported = Imported || {};
 Imported.NUUN_Base = true;
-NUUN_Base_Ver = 112;
+const NUUN_Base_Ver = 113;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Base');
@@ -53,7 +55,7 @@ function structureData(params) {
 }
 
 DataManager.nuun_structureData = function(params){
-  return structureData(params);
+  return params ? structureData(params) : [];
 };
 
 const _Scene_Boot_onDatabaseLoaded = Scene_Boot.prototype.onDatabaseLoaded;
@@ -97,6 +99,10 @@ ImageManager.nuun_LoadPictures = function(filename) {
   return this.loadBitmap("img/", filename);
 };
 
-
-
+const _Window_Selectable_drawItemBackground = Window_Selectable.prototype.drawItemBackground;
+Window_Selectable.prototype.drawItemBackground = function(index) {
+  if (!this._contentsBackVisible) {
+    _Window_Selectable_drawItemBackground.call(this, index);
+  }
+};
 })();

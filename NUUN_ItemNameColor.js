@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  アイテム、スキル欄文字色個別変更
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * アイテム、スキル欄の文字に色を指定できます。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/10 Ver.1.1.1
+ * EquipScene_Extension併用時装備画面で装備を選択するとエラーが出る問題を修正。
  * 2021/3/10 Ver.1.1.0
  * カラーコードに対応。
  * 2021/3/6 Ver.1.0.2
@@ -48,7 +50,7 @@ Imported.NUUN_ItemNameColor = true;
 
   const _Window_Base_drawItemName = Window_Base.prototype.drawItemName;
   Window_Base.prototype.drawItemName = function(item, x, y, width) {
-    if (item) {
+    if (item && item.id > 0) {
       if (this.nameColor === null) {
         this.nameColor = this.changeNameColor(item);
       }
@@ -84,4 +86,11 @@ Imported.NUUN_ItemNameColor = true;
     this.resetTextColor();
   };
 
+  //const _ColorManager_textColor = ColorManager.textColor;
+  //ColorManager.textColor = function(n) {
+  //  if (typeof(n) === "string" && n.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) !== null) {
+  //    return n;
+  //  }
+  //  return _ColorManager_textColor.call(this, n);
+  //};
 })();

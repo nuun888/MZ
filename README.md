@@ -60,7 +60,7 @@
 | [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)  | モンスター図鑑を実装します。 | 2.2.1 |
 | コマンドカスタマイズ  | [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  | コマンドにアイコンや色を指定できます。コマンドの文字の表示を左揃え、中央揃え、右揃えから選択できます。 | 1.1.1 |
 | ステータス画面スタイル変更  | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)  | ステータス画面を拡張します。 | 1.3.7 |
-| セーブ画面拡張  | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | セーブ画面を拡張します。 | 1..0 |
+| セーブ画面拡張  | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | セーブ画面を拡張します。 | 1.4.1 |
 | 所持金拡張  | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)  | 所持金の上限を変更したりカンマ区切りにしたりすることが出来ます。 | 1.1.0 |
 | アイテム図鑑  |  |  |  |
 

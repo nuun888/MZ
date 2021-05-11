@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -45,6 +45,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/11 Ver.1.4.1
+ * 前バージョンから引き継いだセーブデータがあるセーブ画面を開くとエラーが出る問題を修正。
  * 2021/5/11 Ver.1.4.0
  * ゲームの進行度に応じて背景画像を変更できる機能を追加。
  * 2021/5/8 Ver.1.3.0
@@ -454,6 +456,8 @@ Imported.NUUN_SaveScreen = true;
     info.OriginalDate1 = eval(OriginalEval1);
     info.OriginalDate2 = eval(OriginalEval2);
     info.background = $gameSystem.saveBuckgroundImg;
+    //const bitmap = SceneManager.snap();
+    //info.snap = bitmap.canvas.toDataURL('image/png');
     return info;
   };
 
@@ -462,7 +466,7 @@ Imported.NUUN_SaveScreen = true;
     const validInfo = globalInfo.slice(1).filter(x => x);
     const id = Math.max(...validInfo.map(x => this.backgroundId(x)));
     const index = globalInfo.findIndex(x => x && this.backgroundId(x) === id);
-    return globalInfo[index].background[0];
+    return globalInfo[index].background ? globalInfo[index].background[0] : null;
   };
 
   DataManager.backgroundId = function(x) {
@@ -601,6 +605,7 @@ Imported.NUUN_SaveScreen = true;
     let x2 = rect.x + sx;
     let y2 = (height) + rect.y - 2;_ContentsWidth
     width = (_ContentsWidth > 0 ? _ContentsWidth : rect.width - sx) / (T_Right === 0 ? 1 : 2);
+    //this.drawSnapBitmap(info, x2, y2);
     this.drawContentsBase(info, x2, y2, width - padding, T_Left);
     x2 += width;
     this.drawContentsBase(info, x2, y2, width - padding, T_Right);
@@ -633,6 +638,7 @@ Imported.NUUN_SaveScreen = true;
         break;
     }
   };
+
   const _Window_SavefileList_drawPartyCharacters = Window_SavefileList.prototype.drawPartyCharacters;
   Window_SavefileList.prototype.drawPartyCharacters = function(info, x, y) {
     _Window_SavefileList_drawPartyCharacters.call(this, info, x, y);
@@ -680,6 +686,13 @@ Imported.NUUN_SaveScreen = true;
       }
     }
     this.resetFontSettings();
+  };
+
+  Window_SavefileList.prototype.drawSnapBitmap = function(info, x, y) {
+    if (info.snap) {
+      const bitmap = ImageManager.loadBitmap(info.snap);console.log(bitmap)
+      this.contents.blt(bitmap, 0, 0, 300, 150, x, y);
+    }
   };
 
   Window_SavefileList.prototype.drawAnyName = function(info, x, y, width) {

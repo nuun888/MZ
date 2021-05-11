@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.3.0
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -33,6 +33,10 @@
  * 
  * コンテンツエリアX座標を-1にすることで右寄りに表示されます。
  * 
+ * 背景画像の変更
+ * ゲームの進行によって背景画像を変更出来ます。
+ * 初期設定ではプラグインコマンド「背景画像変更」で変更したたびに背景IDが変更されます。
+ * 背景IDはロード画面でIDの一番高いセーブデータの背景が表示されます。
  * 
  * Ver.1.3.0からNUUN_Base Ver.1.1.3以降が必要となります。
  * 
@@ -41,12 +45,15 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/11 Ver.1.4.0
+ * ゲームの進行度に応じて背景画像を変更できる機能を追加。
  * 2021/5/8 Ver.1.3.0
  * 任意の背景画像を表示できる機能を追加。
  * アクター画像の表示の設定方法を変更。
  * レベルのYを調整できるように変更。
  * キャラチップ表示時のアクターY座標を相対座標に変更。
  * 表示できるセーブ数、セーブできる最大数を指定できる機能を追加。
+ * 選択画面のコンテンツ背後に表示される黒い背景画像（デフォルトの場合）を非表示にする機能を追加。
  * 2021/1/30 Ver.1.2.1
  * コンテンツエリアX座標の設定方法を変更
  * 2021/1/29 Ver.1.2.0
@@ -187,6 +194,13 @@
  * @param BackUiWidth
  * @text 背景サイズをウィンドウサイズに合わせる
  * @desc 背景サイズをウィンドウサイズに合わせる。
+ * @type boolean
+ * @default true
+ * @parent BackGround
+ * 
+ * @param AutomaticSetting
+ * @text 背景画像ID自動設定
+ * @desc 背景画像IDを自動で設定します。背景画像を変更した際、IDの高いセーブデータの背景がロード画面で表示されます。
  * @type boolean
  * @default true
  * @parent BackGround
@@ -364,6 +378,25 @@
  * @default
  * @parent Contents
  * 
+ * 
+ * @command ChangeBackground
+ * @desc 背景画像を変更します。
+ * @text 背景画像変更
+ * 
+ * @arg BackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @arg BackGroundId
+ * @desc 背景画像IDを設定します。IDの高いセーブデータの背景がロード画面で表示されます。背景画像ID自動設定がOFFの時有効です。
+ * @text 背景画像ID
+ * @type number
+ * @default 0
+ * @min 0
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_SaveScreen = true;
@@ -374,6 +407,7 @@ Imported.NUUN_SaveScreen = true;
   const MainFontSizeMainFontSize = Number(parameters['MainFontSizeMainFontSize'] || 24);
   const ContentsFontSizeMainFontSize = Number(parameters['ContentsFontSizeMainFontSize'] || 22);
   const ContentsBackVisible = eval(parameters['ContentsBackVisible'] || "true");
+  const AutomaticSetting = eval(parameters['AutomaticSetting'] || "true");
   const ActorGraphicMode = Number(parameters['ActorGraphicMode'] || 1);
   const ActorX = Number(parameters['ActorX'] || 40);
   const ActorY = Number(parameters['ActorY'] || 0);
@@ -382,7 +416,6 @@ Imported.NUUN_SaveScreen = true;
   const FaceHeight = Number(parameters['FaceHeight'] || 144);
   const FaceScale = Number(parameters['FaceScale'] || 100);
   const LevelPosition = Number(parameters['LevelPosition'] || 1);
-  //const FaceMode = eval(parameters['FaceMode'] || "false");
   const ContentsX = Number(parameters['ContentsX'] || 0);
   const NumSaveRows = Number(parameters['NumSaveRows'] || 5);
   const MaxSave = Number(parameters['MaxSave'] || 20);
@@ -401,7 +434,15 @@ Imported.NUUN_SaveScreen = true;
   const OriginalName2 = String(parameters['OriginalName2'] || "");
   const OriginalEval1 = String(parameters['OriginalEval1'] || "");
   const OriginalEval2 = String(parameters['OriginalEval2'] || "");
-  const BackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])[0]) : null; 
+  const BackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])[0]) : null;
+
+  const pluginName = "NUUN_SaveScreen";
+  PluginManager.registerCommand(pluginName, 'ChangeBackground', args => {
+    const data = DataManager.nuun_structureData(args.BackGroundImg)[0];
+    if (data) {
+      $gameSystem.setSaveBuckGround(data, Number(args.BackGroundId));
+    }
+  });
 
   const _DataManager_makeSavefileInfo  = DataManager.makeSavefileInfo ;
   DataManager.makeSavefileInfo = function() {
@@ -412,7 +453,20 @@ Imported.NUUN_SaveScreen = true;
     info.levelActor = $gameParty.actorLevelForSavefile();
     info.OriginalDate1 = eval(OriginalEval1);
     info.OriginalDate2 = eval(OriginalEval2);
+    info.background = $gameSystem.saveBuckgroundImg;
     return info;
+  };
+
+  DataManager.loadBackground = function() {
+    const globalInfo = this._globalInfo;
+    const validInfo = globalInfo.slice(1).filter(x => x);
+    const id = Math.max(...validInfo.map(x => this.backgroundId(x)));
+    const index = globalInfo.findIndex(x => x && this.backgroundId(x) === id);
+    return globalInfo[index].background[0];
+  };
+
+  DataManager.backgroundId = function(x) {
+    return x.background ? x.background[1] : 0;
   };
 
   const _DataManager_maxSavefiles = DataManager.maxSavefiles;
@@ -429,7 +483,7 @@ Imported.NUUN_SaveScreen = true;
   const _Scene_File_createListWindow = Scene_File.prototype.createListWindow;
   Scene_File.prototype.createListWindow = function() {
     _Scene_File_createListWindow.call(this);
-    if (BackGroundImg) {
+    if ($gameSystem.getSaveBuckGround()) {
       this._listWindow.opacity = 0;
     }
   };
@@ -437,7 +491,7 @@ Imported.NUUN_SaveScreen = true;
   const _Scene_File_createHelpWindow = Scene_File.prototype.createHelpWindow;
   Scene_File.prototype.createHelpWindow = function() {
     _Scene_File_createHelpWindow.call(this);
-    if (BackGroundImg) {
+    if ($gameSystem.getSaveBuckGround()) {
       this._helpWindow.opacity = 0;
     }
   };
@@ -445,14 +499,22 @@ Imported.NUUN_SaveScreen = true;
   Scene_File.prototype.createBackground = function() {
     Scene_MenuBase.prototype.createBackground.call(this);
     if (BackGroundImg) {
-		  const sprite = new Sprite();
-      sprite.bitmap = ImageManager.nuun_LoadPictures(BackGroundImg);
-      if (BackGroundImg) {
-        this.addChild(sprite);
-        if (sprite.bitmap && !sprite.bitmap.isReady()) {
-          sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
-        } else {
-          this.setBackGround(sprite);
+      let data = null;
+      if (this.mode() === 'save') {
+        data = $gameSystem.getSaveBuckGround();
+      } else {
+        data = DataManager.loadBackground() || BackGroundImg;
+      }
+      if (data) {
+        const sprite = new Sprite();
+        sprite.bitmap = ImageManager.nuun_LoadPictures(data);
+        if (data) {
+          this.addChild(sprite);
+          if (sprite.bitmap && !sprite.bitmap.isReady()) {
+            sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
+          } else {
+            this.setBackGround(sprite);
+          }
         }
       }
     }
@@ -708,7 +770,27 @@ Imported.NUUN_SaveScreen = true;
     const dw = this._scaleMode === 1 ? this._maxHeight : Math.floor(sw * scale);
     const dh = this._scaleMode === 1 ? this._maxHeight : Math.floor(sh * scale);
     this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
-};
+  };
+
+  const _Game_System_initialize = Game_System.prototype.initialize;
+  Game_System.prototype.initialize = function() {
+    _Game_System_initialize.call(this);
+    this.saveBuckgroundImg = [BackGroundImg, 0];
+  };
+
+  Game_System.prototype.setSaveBuckGround = function(img, id) {
+    const buckgroundId = AutomaticSetting ? (this.buckgroundId || 0) + 1 : id;
+    this.saveBuckgroundImg = [img, buckgroundId];
+  };
+
+  Game_System.prototype.getSaveBuckGround = function() {
+    this.saveBuckgroundImg = this.saveBuckgroundImg || [BackGroundImg, 0];
+    return this.saveBuckgroundImg[0];
+  };
+
+  Game_System.prototype.getSaveBuckGroundId = function() {
+    return this.saveBuckgroundImg[1] || 0;
+  };
 
   Game_Party.prototype.actorLevelForSavefile = function() {
     return this.battleMembers().map(actor => [

@@ -690,7 +690,7 @@ Imported.NUUN_SaveScreen = true;
 
   Window_SavefileList.prototype.drawSnapBitmap = function(info, x, y) {
     if (info.snap) {
-      const bitmap = ImageManager.loadBitmap(info.snap);console.log(bitmap)
+      const bitmap = ImageManager.loadBitmap(info.snap);
       this.contents.blt(bitmap, 0, 0, 300, 150, x, y);
     }
   };

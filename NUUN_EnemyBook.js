@@ -11,7 +11,9 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.2.1
+ * @version 2.3.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -175,10 +177,7 @@
  * ドロップアイテム追加
  * 盗みスキル
  * 
- * 背景画像について
- * 背景画像を表示させる場合は、ゲームフォルダーのimgフォルダーを開き右クリック→新規作成→フォルダーの順にクリックし、
- * 「新しいフォルダー」というフォルダー名をnuun_backgroundに変更してください。
- * また画像を表示させるには「共通処理」(NUUN_Base)プラグインが必要となります。
+ * このプラグインは「共通処理」(NUUN_Base)プラグインVer.1.1.4以降が必要となります。
  * 
  * 操作方法
  * 上下（↑ ↓）キー：モンスター選択
@@ -232,6 +231,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/15 Ver.2.3.0
+ * 各ウィンドウのウィンドウスキンを個別に設定できる機能を追加。（要NUUN_Base Ver.1.1.4以降）
  * 2021/5/7 Ver.2.2.1
  * 変身前のモンスターを撃破済みにしてもステータス情報が反映されなかった問題を修正。
  * 2021/5/4 Ver.2.2.0
@@ -849,7 +850,7 @@
  * @parent Category
  * 
  * @param BackGround
- * @text 背景設定
+ * @text 背景、ウィンドウスキン設定
  * @default ------------------------------
  * 
  * @param BackGroundImg
@@ -880,6 +881,54 @@
  * @text カーソル背景無し
  * @type boolean
  * @default false
+ * @parent BackGround
+ * 
+ * @param PercentWindowsSkin
+ * @desc 完成度のウィンドウスキンを指定します。
+ * @text 完成度ウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent BackGround
+ * 
+ * @param CategoryWindowsSkin
+ * @desc カテゴリー画面のウィンドウスキンを指定します。
+ * @text カテゴリーウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent BackGround
+ * 
+ * @param CategoryNameWindowsSkin
+ * @desc カテゴリー名画面のウィンドウスキンを指定します。
+ * @text カテゴリー名ウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent BackGround
+ * 
+ * @param IndexWindowsSkin
+ * @desc モンスター一覧画面のウィンドウスキンを指定します。
+ * @text モンスター一覧ウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent BackGround
+ * 
+ * @param PageWindowsSkin
+ * @desc ページ画面のウィンドウスキンを指定します。
+ * @text ページウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent BackGround
+ * 
+ * @param ContentWindowsSkin
+ * @desc モンスター情報画面のウィンドウスキンを指定します。
+ * @text ウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
  * @parent BackGround
  * 
  * @param PercentWindow
@@ -2804,7 +2853,7 @@ Scene_EnemyBook.prototype.getMaxPage = function() {
 
 const _Scene_EnemyBook_createBackground = Scene_EnemyBook.prototype.createBackground;
 Scene_EnemyBook.prototype.createBackground = function() {
-  _Scene_EnemyBook_createBackground.call(this);
+  Scene_MenuBase.prototype.createBackground.call(this);
 	if (param.BackGroundImg) {
 		const sprite = new Sprite();
     sprite.bitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg);
@@ -2878,6 +2927,7 @@ Window_EnemyBook_Percent.prototype = Object.create(Window_Selectable.prototype);
 Window_EnemyBook_Percent.prototype.constructor = Window_EnemyBook_Percent;
 
 Window_EnemyBook_Percent.prototype.initialize = function(rect) {
+  this._userWindowSkin = param.PercentWindowsSkin;
   Window_Selectable.prototype.initialize.call(this, rect);
   this._defeat = {};
   this._encountered = {};
@@ -2968,6 +3018,7 @@ Window_EnemyBook_CategoryName.prototype = Object.create(Window_Selectable.protot
 Window_EnemyBook_CategoryName.prototype.constructor = Window_EnemyBook_CategoryName;
 
 Window_EnemyBook_CategoryName.prototype.initialize = function(rect) {
+  this._userWindowSkin = param.CategoryNameWindowsSkin;
   Window_Selectable.prototype.initialize.call(this, rect);
   this._categoryName = null;
   this.refresh();
@@ -2999,6 +3050,7 @@ Window_EnemyBook_Category.prototype = Object.create(Window_Selectable.prototype)
 Window_EnemyBook_Category.prototype.constructor = Window_EnemyBook_Category;
 
 Window_EnemyBook_Category.prototype.initialize = function(rect) {
+  this._userWindowSkin = param.CategoryWindowsSkin;
   Window_Selectable.prototype.initialize.call(this, rect);
   this._categoryList = param.EnemyBookCategory || [];
   this._categorySelect = 0;
@@ -3056,6 +3108,7 @@ Window_EnemyBook_Index._lastTopRow = 0;
 Window_EnemyBook_Index._lastIndex = 0;
 
 Window_EnemyBook_Index.prototype.initialize = function(rect) {
+  this._userWindowSkin = param.IndexWindowsSkin;
   Window_Selectable.prototype.initialize.call(this, rect);
   this._enemyList = [];
   this._category = null;
@@ -3251,6 +3304,7 @@ Window_EnemyBook.prototype = Object.create(Window_Selectable.prototype);
 Window_EnemyBook.prototype.constructor = Window_EnemyBook;
 
 Window_EnemyBook.prototype.initialize = function(rect) {
+  this._userWindowSkin = param.ContentWindowsSkin;
   Window_Selectable.prototype.initialize.call(this, rect);
   this._additionalSprites = {};
   this._enemy = null;
@@ -4404,6 +4458,7 @@ Window_EnemyBookPageCategory.prototype = Object.create(Window_Selectable.prototy
 Window_EnemyBookPageCategory.prototype.constructor = Window_EnemyBookPageCategory;
 
 Window_EnemyBookPageCategory.prototype.initialize = function(rect) {
+  this._userWindowSkin = param.PageWindowsSkin;
   Window_Selectable.prototype.initialize.call(this, rect);
   this._bookList = [];
   this._categorySelect = 0;

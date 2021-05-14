@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/15 Ver.1.1.4
+ * ウィンドウスキンをウィンドウ毎に設定できる処理を追加。
  * 2021/5/8 Ver.1.1.3
  * 処理を一部修正。
  * 2021/5/7 Ver.1.1.2
@@ -35,7 +37,7 @@
  */
 var Imported = Imported || {};
 Imported.NUUN_Base = true;
-const NUUN_Base_Ver = 113;
+const NUUN_Base_Ver = 114;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Base');
@@ -105,4 +107,20 @@ Window_Selectable.prototype.drawItemBackground = function(index) {
     _Window_Selectable_drawItemBackground.call(this, index);
   }
 };
+
+const _Window_Base_initialize = Window_Base.prototype.initialize;
+Window_Base.prototype.initialize = function(rect) {
+  _Window_Base_initialize.call(this, rect);
+  this._userWindowSkin = null;
+};
+
+const _Window_Base_loadWindowskin = Window_Base.prototype.loadWindowskin;
+Window_Base.prototype.loadWindowskin = function() {
+  if (this._userWindowSkin) {
+    this.windowskin = ImageManager.loadSystem(this._userWindowSkin);
+  } else {
+    _Window_Base_loadWindowskin.call(this);
+  } 
+};
+
 })();

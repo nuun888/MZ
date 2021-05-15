@@ -12,7 +12,7 @@
  * @plugindesc  リザルト
  * @author NUUN
  * @base NUUN_Base
- * @version 1.7.5
+ * @version 1.8.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -24,6 +24,10 @@
  * レベルアップ画面はレベルアップしたアクターのみ表示されます。
  * 
  * 戦闘勝利後に任意のBGMを再生できます。MEが指定してある場合はME再生終了後に再生されます。
+ * 
+ * 戦闘終了後に表示されるリザルト画面を遅らせて表示させることが出来ます。
+ * BattleManager.processVictory内の処理を分割しているため一部のプラグインで競合を起こす場合があります。
+ * 「勝利後リザルト画面遅延フレーム数」の設定値0で機能無効（コアスクリプトと同じ処理）になります。
  * 
  * 仕様
  * ウィンドウ画面のX座標は画面の中央になるよう設定されていますが、Y座標は上よりに表示されるようになっています。Y座標を変更するには「ウィンドウY座標」で設定してください。
@@ -72,10 +76,16 @@
  * エンター　切り替え、画面を閉じる 右クリック
  * ←→　ドロップアイテム、習得スキルページ切り替え
  * 
+ * 蒼竜様（サイト名：ドラゴンケイヴ）の「戦闘終了処理ルーチン細分化」と併用する場合はこのプラグインを「戦闘終了処理ルーチン細分化」より下に設定してください。
+ * なお「勝利後リザルト画面遅延フレーム数」の設定値を1以上に設定すると正常に機能しない場合があります。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/15 Ver.1.8.0
+ * リザルトの表示を遅延させる機能を追加。
+ * 各ウィンドウ毎にスキンを設定できる機能を追加。
  * 2021/5/4 Ver.1.7.5
  * 旧バージョンからアップデートした後にリザルト画面が表示されるとエラーが出る問題を修正。
  * 2021/5/4 Ver.1.7.4
@@ -194,6 +204,7 @@
  * 
  * @param CommonSetting
  * @text 共通設定
+ * @default ------------------------------
  * 
  * @param LineColor
  * @desc ライン（線）の色。
@@ -219,7 +230,7 @@
  * 
  * @param ResultVisibleFrame
  * @desc 勝利後リザルト画面が表示されるまでのフレーム数
- * @text 勝利後リザルト画面待機フレーム数（未実装）
+ * @text 勝利後リザルト画面遅延フレーム数
  * @type number
  * @default 0
  * @min 0
@@ -227,6 +238,7 @@
  * 
  * @param WindowSetting
  * @text ウィンドウ設定
+ * @default ------------------------------
  * @parent CommonSetting
  * 
  * @param ResultWidth
@@ -302,9 +314,26 @@
  * @default center
  * @parent WindowSetting
  * 
+ * @param ResultWindowsSkin
+ * @desc リザルト結果ウィンドウ（上部）のウィンドウスキンを指定します。
+ * @text リザルト結果ウィンドウのスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent WindowSetting
+ * 
+ * @param ResultMainWindowsSkin
+ * @desc リザルトメインのウィンドウのウィンドウスキンを指定します。
+ * @text リザルトウィンドウのスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent WindowSetting
+ * 
  * @param ButtonSetting
  * @text ボタン設定
  * @desc この設定は「背景サイズをウィンドウサイズに合わせる」をfalseに設定した時のみ有効になります。
+ * @default ------------------------------
  * @parent CommonSetting
  * 
  * @param ResultButton_X
@@ -318,6 +347,7 @@
  * 
  * @param GetPage
  * @text 入手画面設定
+ * @default ------------------------------
  * 
  * @param ActorShow
  * @desc アクターの画像を表示します。
@@ -396,6 +426,7 @@
  * 
  * @param FontColor
  * @text 文字色設定
+ * @default ------------------------------
  * @parent GetPage
  * 
  * @param LevelUpNameColor
@@ -428,6 +459,7 @@
  * 
  * @param FontSize
  * @text フォントサイズ設定
+ * @default ------------------------------
  * @parent GetPage
  * 
  * @param ActorNameFontSize
@@ -464,6 +496,7 @@
  * 
  * @param ExpSetting
  * @text ゲージ設定
+ * @default ------------------------------
  * @parent GetPage
  * 
  * @param GaugeValueShow
@@ -566,6 +599,7 @@
  * 
  * @param LevelUpPage
  * @text レベルアップ画面設定
+ * @default ------------------------------
  * 
  * @param ActorPageRefreshFrame
  * @desc ページ切り替えまでの待機フレーム
@@ -584,6 +618,7 @@
  * 
  * @param ActorImg
  * @text アクター画像設定
+ * @default ------------------------------
  * @parent LevelUpPage
  * 
  * @param FaceVisible
@@ -651,6 +686,7 @@
  * 
  * @param NameSetting
  * @text 名称設定
+ * @default ------------------------------
  * 
  * @param ResultName
  * @text 戦闘結果の名称
@@ -689,6 +725,7 @@
  * 
  * @param SESetting
  * @text レベルアップSE設定
+ * @default ------------------------------
  * 
  * @param LevelUpSe
  * @text レベルアップ時のSE
@@ -718,6 +755,7 @@
  * 
  * @param BGMSetting
  * @text 戦闘勝利BGM設定
+ * @default ------------------------------
  * 
  * @param VictoryBGM
  * @text 戦闘勝利のBGM
@@ -744,7 +782,6 @@
  * @desc BGMを位相を設定します。
  * @default 0
  * @parent BGMSetting
- * 
  * 
  * 
  * @command LevelUP_SESelect
@@ -1458,6 +1495,7 @@ Window_ResultHelp.prototype = Object.create(Window_Help.prototype);
 Window_ResultHelp.prototype.constructor = Window_ResultHelp;
 
 Window_ResultHelp.prototype.initialize = function(rect) {
+  this._userWindowSkin = param.ResultWindowsSkin;
   Window_Help.prototype.initialize.call(this, rect);
   this.openness = 0;
   this.refresh();
@@ -1477,6 +1515,7 @@ Window_Result.prototype = Object.create(Window_StatusBase.prototype);
 Window_Result.prototype.constructor = Window_Result;
 
 Window_Result.prototype.initialize = function(rect) {
+  this._userWindowSkin = param.ResultMainWindowsSkin;
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._levelUp = false;
   this.openness = 0;
@@ -1678,7 +1717,7 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
       this.changeTextColor(ColorManager.textColor(param.LevelUpValueColor));
       if (BattleManager._levelUpPageEnable) {
         this.actorLevelUp.push(actor);
-        if (Imported.NUUN_Base) {console.log(actor.resultActorImg)
+        if (Imported.NUUN_Base) {
           if (!actor.resultActorImg || !Array.isArray(actor.resultActorImg.ActorImg) || !actor.resultActorBitmap) {//配列仕様前の判定
             actor.initResultActorImg(actor.actorId());
           }
@@ -2332,7 +2371,7 @@ BattleManager.initMembers = function() {
   this._victoryOn = false;
   this._victoryBGMOn = false;
   this.resultRefresh = 0;
-  this.resultBusy = 0;
+  this.resultBusy = this.setResultBusy();
 };
 
 const _BattleManager_update = BattleManager.update;
@@ -2343,15 +2382,49 @@ BattleManager.update = function(timeActive) {
   }
 };
 
+BattleManager.setResultBusy = function() {
+  return this.resultBusy = param.ResultVisibleFrame || 0;
+};
+
+BattleManager.startResultBusy = function() {
+  return this.resultBusy === param.ResultVisibleFrame || 0;
+};
+
 const _BattleManager_processVictory = BattleManager.processVictory;
 BattleManager.processVictory = function() {
-  //if (this.resultBusy === 0) {
+  if (this.startResultBusy()) {
     this._victoryOn = true;
-    _BattleManager_processVictory.call(this);
-  //}
+    if (this.resultBusy === 0) {
+      _BattleManager_processVictory.call(this);
+      return;
+    }
+    this.displayVictoryNoBusy();
+  }
+  $gameParty.performVictory();
+  if (this.resultBusy > 0) {
+    this.resultBusy--;
+  }
+  if (this.resultBusy === 0) {
+    this.displayVictoryOnBusy();
+  }
+};
+
+BattleManager.displayVictoryNoBusy = function() {
+  $gameParty.removeBattleStates();
+  this.playVictoryMe();
+  this.replayBgmAndBgs();
+  this.makeRewards();
+};
+
+BattleManager.displayVictoryOnBusy = function() {
+  this.displayVictoryMessage();
+  this.displayRewards();
+  this.gainRewards();
+  this.endBattle(0);
 };
 
 BattleManager.displayVictoryMessage = function() {
+  //メッセージは表示しない。
 };
 
 BattleManager.displayRewards = function() {

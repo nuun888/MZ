@@ -421,7 +421,7 @@
  * @desc スクリーンショットの拡大率（％）
  * @text スクリーンショット拡大率（％）
  * @type number
- * @default 15
+ * @default 12
  * @min 0
  * @parent SaveSnapSetting
  * 

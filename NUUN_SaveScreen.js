@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -45,6 +45,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/14 Ver.1.5.1
+ * マップサムネの処理方法を変更。
  * 2021/5/14 Ver.1.5.0
  * セーブスクリーンショットを表示する機能を追加。
  * 2021/5/11 Ver.1.4.1
@@ -184,7 +186,7 @@
  * @parent Actor
  * 
  * @param BackGround
- * @text 背景設定
+ * @text 背景、ウィンドウスキン設定
  * @default ------------------------------
  * 
  * @param BackGroundImg
@@ -394,10 +396,11 @@
  * @parent SaveSnapSetting
  * 
  * @param SaveSnapQuality
- * @desc スクリーンショットの画質。数値が高い程セーブ容量が増加します。
+ * @desc スクリーンショットの画質。(デフォルト値0.92)
  * @text スクリーンショット画質
  * @type string
- * @default 0.1
+ * @default 0.92
+ * @max 1
  * @parent SaveSnapSetting
  * 
  * @param SaveSnapX
@@ -488,7 +491,7 @@ Imported.NUUN_SaveScreen = true;
   const OriginalEval1 = String(parameters['OriginalEval1'] || "");
   const OriginalEval2 = String(parameters['OriginalEval2'] || "");
   const InfoSaveSnap = eval(parameters['InfoSaveSnap'] || "true");
-  const SaveSnapQuality = eval(parameters['SaveSnapQuality'] || 0.1);
+  const SaveSnapQuality = eval(parameters['SaveSnapQuality'] || 0.92);
   const SaveSnapX = Number(parameters['SaveSnapX'] || 0);
   const SaveSnapY = Number(parameters['SaveSnapY'] || 0);
   const SaveSnapScale = Number(parameters['SaveSnapScale'] || 15);
@@ -551,9 +554,21 @@ Imported.NUUN_SaveScreen = true;
   };
 
   DataManager.toDataURL = function() {
-    const png = this.snapBitmap()._canvas.toDataURL('image/png', SaveSnapQuality);
-    const jpeg = this.snapBitmap()._canvas.toDataURL('image/jpeg', SaveSnapQuality);
+    const png = this.svaeSnapBitmap()._canvas.toDataURL('image/png', SaveSnapQuality);
+    const jpeg = this.svaeSnapBitmap()._canvas.toDataURL('image/jpeg', SaveSnapQuality);
     return (png.length < jpeg.length) ? png : jpeg;
+  };
+
+  DataManager.svaeSnapBitmap = function(){
+    const bitmap = this.snapBitmap();
+    if (bitmap) {
+      const width = bitmap.width * SaveSnapScale / 100;
+      const height = bitmap.height * SaveSnapScale / 100;
+      const snapBitmap = new Bitmap(width, height);
+      snapBitmap.blt(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, snapBitmap.width, snapBitmap.height);
+      return snapBitmap;
+    }
+    return null;
   };
 
   SceneManager.setSnapBitmap = function() {
@@ -800,9 +815,7 @@ Imported.NUUN_SaveScreen = true;
   Window_SavefileList.prototype.drawSnapBitmap = function(info, x, y) {
     if (info.snap) {
       const bitmap = ImageManager.loadSaveSnapBitmap(info.snap);
-      const width = bitmap.width * SaveSnapScale / 100;
-      const height = bitmap.height * SaveSnapScale / 100;
-      this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, width, height);
+      this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y);
     }
   };
 

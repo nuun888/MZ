@@ -12,7 +12,8 @@
  * @plugindesc  リザルト
  * @author NUUN
  * @base NUUN_Base
- * @version 1.8.0
+ * @orderAfter NUUN_Base
+ * @version 1.8.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -76,11 +77,12 @@
  * エンター　切り替え、画面を閉じる 右クリック
  * ←→　ドロップアイテム、習得スキルページ切り替え
  * 
- * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/18 Ver.1.8.1
+ * 戦闘中にメンバーチェンジをした際、交代前メンバーのEXPゲージが残ってしまう問題を修正。
  * 2021/5/15 Ver.1.8.0
  * リザルトの表示を遅延させる機能を追加。
  * 各ウィンドウ毎にスキンを設定できる機能を追加。
@@ -1522,7 +1524,7 @@ Window_Result.prototype.initialize = function(rect) {
   this.page = 0;
   this._actor = null;
   this._canRepeat = false;
-  this.refresh();
+  //this.refresh();
 };
 
 Window_Result.prototype.itemHeight = function() {

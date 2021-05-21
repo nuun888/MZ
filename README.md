@@ -10,7 +10,7 @@
 
 | 戦闘 | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
-| バトルスタイル拡張ベース  | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)  | 戦闘のスタイルを変更、拡張します。 | 2.2.2 |
+| バトルスタイル拡張ベース  | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)  | 戦闘のスタイルを変更、拡張します。 | 2.2.3 |
 | バトルスタイル拡張  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです。 | 1.2.1 |
 | 解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)  | 解像度変更時のエネミー、アクターの座標を修正します。またエネミーとアクター、戦闘背景のY座標の位置も調整できます。 | 1.0.3 |
 | 戦闘背景の変更  | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)  | フィールドマップで任意の戦闘背景に変更できます。また敵グループ毎、リージョン、タグIDによって戦闘背景を変更できます。 | 1.0.1 |
@@ -57,7 +57,7 @@
 | メニュー | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
 | アイテムのカテゴリーカスタマイズ  | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | アイテムのカテゴリーをカスタマイズ（追加したり減らしたり）できます。 | 1.1.2 |
-| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)  | モンスター図鑑を実装します。 | 2.3.1 |
+| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)  | モンスター図鑑を実装します。 | 2.4.0 |
 | コマンドカスタマイズ  | [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  | コマンドにアイコンや色を指定できます。コマンドの文字の表示を左揃え、中央揃え、右揃えから選択できます。 | 1.1.1 |
 | ステータス画面拡張  | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)  | ステータス画面を拡張します。 | 2.0.0 |
 | セーブ画面拡張  | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | セーブ画面を拡張します。 | 1.5.0 |

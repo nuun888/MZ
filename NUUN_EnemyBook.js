@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.3.1
+ * @version 2.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -241,6 +241,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/22 Ver.2.4.0
+ * 戦闘中の敵の情報を確認する機能を追加。
  * 2021/5/20 Ver.2.3.1
  * 各項目の背景（黒い背景）を表示する機能を追加。
  * システム文字の幅を指定できる機能を追加。
@@ -929,6 +931,14 @@
  * @default 
  * @parent BackGround
  * 
+ * @param InfoIndexWindowsSkin
+ * @desc 敵の情報画面のウィンドウスキンを指定します。
+ * @text 敵の情報ウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent BackGround
+ * 
  * @param PageWindowsSkin
  * @desc ページ画面のウィンドウスキンを指定します。
  * @text ページウィンドウスキン
@@ -1009,6 +1019,27 @@
  * @text コマンドの表示名
  * @type string
  * @default モンスター図鑑
+ * @parent CommandData
+ * 
+ * @param ShowEnemyInfoCommand
+ * @desc 戦闘中のパーティコマンドに敵の情報を追加します。
+ * @text 敵の情報パーティコマンド表示
+ * @type boolean
+ * @default false
+ * @parent CommandData
+ * 
+ * @param enemyBookInfoSwitch
+ * @desc 敵の情報を戦闘中に表示させるフラグスイッチID
+ * @text 敵の情報パーティコマンド表示スイッチ
+ * @type switch
+ * @default 0
+ * @parent CommandData
+ * 
+ * @param EnemyInfoCommandName
+ * @desc 敵の情報コマンドの名称。
+ * @text 敵の情報コマンド表示名
+ * @type string
+ * @default 敵の情報
  * @parent CommandData
  * 
  * @param PageData
@@ -1100,9 +1131,80 @@
  * @min 0
  * @parent AnalyzeSetting
  * 
+ * @param EnemyInfoSetting
+ * @text 敵の情報設定
+ * @default ------------------------------
+ * 
+ * @param InfoMode
+ * @desc 表示する敵の情報データを指定します。
+ * @text 情報データ指定
+ * @type select
+ * @option 図鑑表示と同じ
+ * @value 0
+ * @option 独自に設定
+ * @value 1
+ * @default 0
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoPageSetting
+ * @desc ページ設定。（情報データが独自に設定(1)に設定している時）
+ * @text ページ設定
+ * @type struct<PageSettingData>[]
+ * @default ["{\"ListDateSetting\":\"1\",\"PageCategoryName\":\"基本情報\"}","{\"ListDateSetting\":\"2\",\"PageCategoryName\":\"属性、ステート\"}","{\"ListDateSetting\":\"3\",\"PageCategoryName\":\"ドロップアイテム\"}","{\"ListDateSetting\":\"4\",\"PageCategoryName\":\"説明\"}"]
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoPageCols
+ * @desc ページの最大表示列。
+ * @text ページ最大表示列
+ * @type number
+ * @default 4
+ * @min 1
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoContentCols
+ * @text モンスター情報項目列数
+ * @desc モンスター情報の項目列数。
+ * @type select
+ * @option ２列
+ * @value 2
+ * @option ３列
+ * @value 3
+ * @default 2
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoStatusGaugeVisible
+ * @type boolean
+ * @default true
+ * @text ゲージを表示
+ * @desc HP、MPのゲージを表示します。
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoEnemyCurrentStatus
+ * @type boolean
+ * @default true
+ * @text エネミーの現在ステータス表示
+ * @desc エネミーの現在のステータスを表示します。
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoBuffColor
+ * @desc バフ時の文字色。
+ * @text バフ時文字色
+ * @type number
+ * @default 0
+ * @max 999999
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoDebuffColor
+ * @desc デバフ時の文字色。
+ * @text デバフ時文字色
+ * @type number
+ * @default 0
+ * @max 999999
+ * @parent EnemyInfoSetting
+ * 
  * @param ListData
  * @text 表示項目設定
- * @default ------------------------------
+ * @default ------------------------------EnemyInfoMode
  * 
  * @param ListData1_10
  * @text 表示項目設定1-10
@@ -1815,6 +1917,17 @@
  * @option 表示項目設定３
  * @value 3
  * @default 0
+ * 
+ * @param ContentCols
+ * @text モンスター情報項目列数
+ * @desc モンスター情報の項目列数。
+ * @type select
+ * @option ２列
+ * @value 2
+ * @option ３列
+ * @value 3
+ * @default 2
+ * @parent EnemyInfoSetting
  * 
  * @param StatusGaugeVisible
  * @type boolean
@@ -3010,10 +3123,6 @@ Window_EnemyBook_Percent.prototype.refresh = function() {
   }
   const text = this.getParam(this._percentContent[0]);
   this.drawText(text, rect.x, y, rect.width, 'center');
-  //this.drawText(param.EncountName +'：'+ this._encountered.encNum +'/'+ this._encountered.length, rect.x, y, rect.width, 'center');
-  //this.drawText(param.DefeatName +'：'+ this._defeat.encNum +'/'+ this._defeat.length, rect.x, y + lineHeight * 1, rect.width, 'center');
-  //this.drawText(param.EncountName +'：'+ this._encountered.encNum +'/'+ this._encountered.length, rect.x, y + lineHeight * 3, rect.width, 'center');
-  //this.drawText(param.completeName +'：'+ this._defeat.complete +' %', rect.x, y + lineHeight * 2, rect.width, 'center');
 };
 
 Window_EnemyBook_Percent.prototype.getParam = function(content) {
@@ -3335,6 +3444,80 @@ Window_EnemyBook_Index.prototype.processCancel = function() {
   Window_Selectable.prototype.processCancel.call(this);
 };
 
+//Window_EnemyBook_InfoIndex
+function Window_EnemyBook_InfoIndex() {
+  this.initialize(...arguments);
+}
+
+Window_EnemyBook_InfoIndex.prototype = Object.create(Window_EnemyBook_Index.prototype);
+Window_EnemyBook_InfoIndex.prototype.constructor = Window_EnemyBook_InfoIndex;
+
+Window_EnemyBook_InfoIndex._lastTopRow = 0;
+Window_EnemyBook_InfoIndex._lastIndex = 0;
+
+Window_EnemyBook_InfoIndex.prototype.initialize = function(rect) {
+  this._userWindowSkin = param.InfoIndexWindowsSkin;
+  Window_Selectable.prototype.initialize.call(this, rect);
+  this.refresh();
+};
+
+Window_EnemyBook_InfoIndex.prototype.setSelect = function() {
+  if (Window_EnemyBook_Index._lastTopRow + this.maxPageRows() - 1 < Window_EnemyBook_Index._lastIndex) {
+    Window_EnemyBook_Index._lastTopRow += 1;
+  }
+  this.setTopRow(Window_EnemyBook_Index._lastTopRow);
+  this.select(Window_EnemyBook_Index._lastIndex);
+};
+
+Window_EnemyBook_InfoIndex.prototype.updateEnemyStatus = function() {
+  if (this._enemyWindow) {
+    const enemy = this.getEnemy();
+    this._enemyWindow.selectEnemy = this._enemyList[this.index()];
+    this._enemyWindow.setEnemy(enemy);
+  }
+};
+
+Window_EnemyBook_InfoIndex.prototype.refresh = function() {
+  this.makeEnemyList();
+  this.setSelect();
+  Window_Selectable.prototype.refresh.call(this);
+};
+
+Window_EnemyBook_InfoIndex.prototype.makeEnemyList = function() {
+  this._enemyList = [];
+  this._enemyList = $gameTroop._enemies.filter(enemy => this.includes(enemy));
+};
+
+Window_EnemyBook_InfoIndex.prototype.includes = function(enemy) {
+  if (!enemy.enemy().meta.NoBookData && enemy.isAlive()) {
+    return true;
+  }
+  return false;
+};
+
+Window_EnemyBook_InfoIndex.prototype.enemyAt = function(index) {
+  return this._enemyList && index >= 0 ? this._enemyList[index].enemy() : null;
+};
+
+Window_EnemyBook_InfoIndex.prototype.getEnemy = function() {
+  return this._enemyList[this.index()].enemy();
+};
+
+Window_EnemyBook_InfoIndex.prototype.drawItem = function(index) {
+  const enemy = this.enemyAt(index);
+  if(enemy) {
+    const rect = this.itemLineRect(index);
+    const name = this._enemyList[index].name();
+    const iconId = enemy.meta.EnemyIcon ? Number(enemy.meta.EnemyIcon) : 0;
+    const textMargin = iconId > 0 ? ImageManager.iconWidth + 4 : 0;
+    const itemWidth = Math.max(0, rect.width - textMargin);
+    if (iconId > 0) {
+      const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+      this.drawIcon(iconId, rect.x, iconY);
+    }
+    this.drawText(name, rect.x + textMargin, rect.y, itemWidth);
+  }
+};
 
 //Window_EnemyBook
 function Window_EnemyBook() {
@@ -3363,16 +3546,27 @@ Window_EnemyBook.prototype.initialize = function(rect) {
 
 Window_EnemyBook.prototype.setAnalyzeStatus = function(args) {
   this._AnalyzeStatus = args;
+  if (this._AnalyzeStatus) {
+    this._AnalyzeStatus.ContentCols = !this._AnalyzeStatus.ContentCols ? param.ContentCols : this._AnalyzeStatus.ContentCols;
+  }
 };
 
 Window_EnemyBook.prototype.setEnemy = function(enemy) {
   if(this._enemy !== enemy) {
     this._enemy = enemy;
     this.refresh();
+  } else if (this._bookMode === 2) {
+    this._enemy = enemy;
+    this.refresh();
   }
 };
 
 Window_EnemyBook.prototype.maxCols = function() {
+  if (this._bookMode === 1) {
+    return this._AnalyzeStatus.ContentCols;
+  } else if (this._bookMode === 2) {
+    return param.InfoContentCols;
+  }
   return param.ContentCols;
 };
 
@@ -3429,15 +3623,27 @@ Window_EnemyBook.prototype.onDebuffFlag = function(index) {
 };
 
 Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
-  return this._enemy.meta.ShowDataBook || this._bookMode === 1;
+  return this._enemy.meta.ShowDataBook || this._bookMode >= 1;
 };
 
 Window_EnemyBook.prototype.analyzeGaugeVisible = function() {
-  return this._AnalyzeStatus && this.analyzeCurrentStatus() && eval(this._AnalyzeStatus.StatusGaugeVisible);
+  return this._AnalyzeStatus && this.scanMode() && eval(this._AnalyzeStatus.StatusGaugeVisible);
+};
+
+Window_EnemyBook.prototype.infoGaugeVisible = function() {
+  return this.scanMode() && param.InfoStatusGaugeVisible;
+};
+
+Window_EnemyBook.prototype.gaugeVisibleMode = function() {
+  return (this._bookMode === 1 && this.analyzeGaugeVisible()) || (this._bookMode === 2 && this.infoGaugeVisible());
 };
 
 Window_EnemyBook.prototype.analyzeCurrentStatus = function() {
   return this._AnalyzeStatus && eval(this._AnalyzeStatus.EnemyCurrentStatus);
+};
+
+Window_EnemyBook.prototype.infoCurrentStatus = function() {
+  return param.InfoEnemyCurrentStatus;
 };
 
 Window_EnemyBook.prototype.maxWidth = function() {
@@ -3452,13 +3658,19 @@ Window_EnemyBook.prototype.systemWidth = function(swidth, width) {
   return swidth > 0 ? swidth : Math.floor(width / 3);
 };
 
+Window_EnemyBook.prototype.scanMode = function() {
+  return (this._bookMode === 1 && this.analyzeCurrentStatus()) || (this._bookMode === 2 && this.infoCurrentStatus());
+};
+
 Window_EnemyBook.prototype.buffColor = function(params, nparams) {
-  if (!this._AnalyzeStatus) {
+  const buffColor = this._bookMode === 1 ? this._AnalyzeStatus.BuffColor : param.InfoBuffColor;
+  const debuffColor = this._bookMode === 1 ? this._AnalyzeStatus.DebuffColor : param.InfoDebuffColor;
+  if (this._bookMode === 0) {
     return ColorManager.normalColor();
   } else if (params > nparams) {
-    return ColorManager.textColor(this._AnalyzeStatus.BuffColor) || ColorManager.normalColor();
+    return buffColor !== undefined ? ColorManager.textColor(buffColor) : ColorManager.normalColor();
   } else if (params < nparams) {
-    return ColorManager.textColor(this._AnalyzeStatus.DebuffColor) || ColorManager.normalColor();
+    return debuffColor !== undefined ? ColorManager.textColor(debuffColor) : ColorManager.normalColor();
   } else {
     return ColorManager.normalColor();
   }
@@ -3471,8 +3683,8 @@ Window_EnemyBook.prototype.refresh = function() {
     return;
   }
   let enemy = null;
-  if (this._bookMode === 1) {
-    enemy = this.analyzeCurrentStatus() ? this.selectEnemy : new Game_Enemy(this._enemy.id, 0, 0);
+  if (this._bookMode >= 1) {
+    enemy = this.scanMode() ? this.selectEnemy : new Game_Enemy(this._enemy.id, 0, 0);
   } else {
     if(!this._enemyData[this._enemy.id]) {
       enemy = new Game_Enemy(this._enemy.id, 0, 0);
@@ -3491,12 +3703,10 @@ Window_EnemyBook.prototype.refresh = function() {
     if (!enemy || !$gameSystem.isInEnemyBook(this._enemy)) {
       return;
     }
-  } else if (this._bookMode === 1){//アナライズモード
+  } else if (this._bookMode >= 1){//アナライズモード、敵の情報
     if (!enemy) {
       return;
     }
-  } else {
-
   }
   this.page(enemy);
 };
@@ -3749,9 +3959,9 @@ Window_EnemyBook.prototype.paramShow = function(list, enemy) {
   const params = list.DateSelect;
   switch (params) {
     case 1:
-      return this._bookMode === 1 && this.analyzeCurrentStatus() ? enemy._hp : enemy.param(params - 1);
+      return this._bookMode >= 1 && this.scanMode() ? enemy._hp : enemy.param(params - 1);
     case 2:
-      return this._bookMode === 1 && this.analyzeCurrentStatus() ? enemy._mp : enemy.param(params - 1);
+      return this._bookMode >= 1 && this.scanMode() ? enemy._mp : enemy.param(params - 1);
     case 3:
     case 4:
     case 5:
@@ -3812,12 +4022,12 @@ Window_EnemyBook.prototype.normalParam = function(list, enemy) {
 };
 
 Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
-  let text = this.paramShow(list, enemy);
+  let text = this.paramShow(list, enemy);//InfoStatusGaugeVisible
   let textWidth = width;
   if (text !== undefined) {
-    if ((list.DateSelect === 1 || list.DateSelect === 2 || list.DateSelect === 9) && $gameParty.inBattle() && enemy && this.analyzeGaugeVisible()) {
+    if ((list.DateSelect === 1 || list.DateSelect === 2 || list.DateSelect === 9) && $gameParty.inBattle() && enemy && this.gaugeVisibleMode()) {
     } else {
-      if (list.DateSelect === 9 && !this.analyzeCurrentStatus()) {
+      if (list.DateSelect === 9 && !this.scanMode()) {
         return;
       }
       this.drawContentsBackground(list.Back, x, y, width);
@@ -3832,15 +4042,15 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
     if(!this.paramMask(list.MaskMode)){
       text = param.UnknownStatus;
     }
-    if ($gameParty.inBattle() && this.analyzeGaugeVisible() && list.DateSelect === 1) {
+    if ($gameParty.inBattle() && this.gaugeVisibleMode() && list.DateSelect === 1) {
       this.placeGauge(enemy, "hp", x, y);
-    } else if ($gameParty.inBattle() && this.analyzeGaugeVisible() && list.DateSelect === 2) {
+    } else if ($gameParty.inBattle() && this.gaugeVisibleMode() && list.DateSelect === 2) {
       this.placeGauge(enemy, "mp", x, y);
-    } else if ($gameParty.inBattle() && this.analyzeGaugeVisible() && list.DateSelect === 9) {
+    } else if ($gameParty.inBattle() && this.gaugeVisibleMode() && list.DateSelect === 9) {
       this.placeGauge(enemy, "tp", x, y);
     } else {
-      if (this._bookMode === 1 && this.analyzeCurrentStatus()) {
-        if (!this.analyzeGaugeVisible() && list.DateSelect === 1) {
+      if (this.scanMode()) {
+        if (!this.gaugeVisibleMode() && list.DateSelect === 1) {
           this.changeTextColor(this.crisisColor(enemy));
         } else {
           this.changeTextColor(this.buffColor(text, this.normalParam(list, enemy)));
@@ -3943,7 +4153,7 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
-  if (BattleManager.isTpb() && this.analyzeCurrentStatus()) {
+  if (BattleManager.isTpb() && this.scanMode()) {
     this.drawContentsBackground(list.Back, x, y, width);
     x = this.contensX(x);
     width = this.contensWidth(width);
@@ -4669,6 +4879,7 @@ Scene_Battle.prototype.createEnemyBookWindow = function() {
   this.createEnemyPageWindow();
   //this.createEnemyBookDummyWindow();
   this.createEnemyBookIndexWindow();
+  this.createEnemyBookInfoIndexWindow();
   this.createEnemyBookEnemyWindow();
   this.createEnemyBookButton();
   if (param.CategoryOn && param.EnemyBookCategory) {
@@ -4723,6 +4934,14 @@ Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
   this._enemyBookIndexWindow.hide();
 };
 
+Scene_Battle.prototype.createEnemyBookInfoIndexWindow = function() {
+  const rect = this.enemyBookInfoIndexWindowRect();
+  this._enemyBookInfoIndexWindow = new Window_EnemyBook_InfoIndex(rect);
+  this._enemyBookInfoIndexWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
+  this.createEnemyBookAddWindow(this._enemyBookInfoIndexWindow, true);
+  this._enemyBookInfoIndexWindow.hide();
+};
+
 Scene_Battle.prototype.createEnemyPageWindow = function() {
   const rect = this.enemyBookPageWindowRect();
   this._enemyBookPageWindow = new Window_EnemyBookPageCategory(rect);
@@ -4737,6 +4956,7 @@ Scene_Battle.prototype.createEnemyBookEnemyWindow = function() {
   this._enemyBookEnemyWindow = new Window_EnemyBook(rect);
   this.createEnemyBookAddWindow(this._enemyBookEnemyWindow, true);
   this._enemyBookIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
+  this._enemyBookInfoIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
   this._enemyBookPageWindow.setEnemyWindow(this._enemyBookEnemyWindow);
   this._enemyBookEnemyWindow.hide();
 };
@@ -4780,6 +5000,14 @@ Scene_Battle.prototype.enemyBookIndexWindowRect = function() {
   return new Rectangle(wx, wy, ww, wh);
 };
 
+Scene_Battle.prototype.enemyBookInfoIndexWindowRect = function() {
+  const wx = this._enemyBookIndexWindow.x;
+  const wy = this.enemyBookMainAreaTop();
+  const ww = this._enemyBookIndexWindow.width;
+  const wh = this.enemyBookMainAreaHeight();
+  return new Rectangle(wx, wy, ww, wh);
+};
+
 Scene_Battle.prototype.enemyBookWindowRect = function() {
   const wx = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
   const wy = this.enemyBookMainAreaTop();
@@ -4806,19 +5034,20 @@ const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPart
 Scene_Battle.prototype.createPartyCommandWindow = function() {
   _Scene_Battle_createPartyCommandWindow.call(this);
   this._partyCommandWindow.setHandler("enemyBook", this.commandEnemyBook.bind(this));
+  this._partyCommandWindow.setHandler("enemyBookInfo", this.commandEnemyBookInfo.bind(this));
 };
 
 const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWindows;
 Scene_Battle.prototype.hideSubInputWindows = function() {
   _Scene_Battle_hideSubInputWindows.call(this);
-  if (this._enemyBookIndexWindow.active || this._enemyBookPageWindow.active) {
+  if (this._enemyBookIndexWindow.active || this._enemyBookInfoIndexWindow.active || this._enemyBookPageWindow.active) {
   }
 };
 
 const _Scene_Battle_updateVisibility = Scene_Battle.prototype.updateVisibility;
 Scene_Battle.prototype.updateVisibility = function() {
   _Scene_Battle_updateVisibility.call(this);
-  if (BattleManager.isBattleEnd() && (this._enemyBookIndexWindow.active || this._enemyBookPageWindow.active)) {
+  if (BattleManager.isBattleEnd() && (this._enemyBookIndexWindow.active || this._enemyBookInfoIndexWindow.active || this._enemyBookPageWindow.active)) {
     this.cancelEnemyBook();
   }
 };
@@ -4865,11 +5094,45 @@ Scene_Battle.prototype.commandEnemyBook = function() {
   this._enemyBookEnemyWindow.refresh();
 };
 
+Scene_Battle.prototype.commandEnemyBookInfo = function() {
+  enemyBook_Open = true;
+  const infoPage = param.InfoMode === 0 ? param.PageSetting : param.InfoPageSetting;
+  const cols = param.InfoMode === 0 ? param.PageCols : param.InfoPageCols;
+  this.setMaxPage(infoPage);
+  this._enemyBookPageWindow.setPageList(infoPage, cols);
+  this._enemyBookPageWindow.setPage();
+  this._enemyBookPageWindow.interruptWindow = true;
+  this._enemyBookInfoIndexWindow.interruptWindow = true;
+  this._enemyBookInfoIndexWindow.refresh();
+  this._enemyBookInfoIndexWindow.show();
+  this._enemyBookInfoIndexWindow.open();
+  this._enemyBookInfoIndexWindow.activate();
+  this._enemyBookPageWindow.activate();
+  this._enemyBookEnemyWindow._bookMode = 2;
+  this.setButtonY();
+  this.setEnemyBookBackGround();
+  this._enemyBookEnemyWindow.x = (param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
+  const pageLength = this._enemyBookPageWindow._bookList.length;
+  const rect = this.enemyBookWindowRect();
+  this._enemyBookPageWindow.x = this._enemyBookEnemyWindow.x;
+  this._enemyBookEnemyWindow.y = rect.y + (pageLength > 1 ? this._enemyBookPageWindow.height : 0) + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
+  this._enemyBookEnemyWindow.height = rect.height - (pageLength > 1 ? this._enemyBookPageWindow.height : 0);
+  if (pageLength > 1) {
+    this._enemyBookPageWindow.show();
+    this._enemyBookPageWindow.open();
+  }
+  this._enemyBookEnemyWindow.show();
+  this._enemyBookEnemyWindow.open();
+  this._enemyBookEnemyWindow.refresh();
+};
+
 Scene_Battle.prototype.cancelEnemyBook = function() {
   enemyBook_Open = false;
   this._enemyBookPageWindow.interruptWindow = false;
   this._enemyBookIndexWindow.interruptWindow = false;
+  this._enemyBookInfoIndexWindow.interruptWindow = false;
   this._enemyBookIndexWindow.close();
+  this._enemyBookInfoIndexWindow.close();
   this._enemyBookEnemyWindow.close();
   this._enemyBookPageWindow.close();
   if (PercentContentLength) {
@@ -4887,11 +5150,16 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
     this._partyCommandWindow.activate();
     this._enemyBookIndexWindow.deactivate();
     this._enemyBookEnemyWindow.selectEnemy = null;
+  } else if (this._enemyBookEnemyWindow._bookMode === 2) {
+    this._partyCommandWindow.activate();
+    this._enemyBookInfoIndexWindow.deactivate();
+    this._enemyBookEnemyWindow.selectEnemy = null;
   } else {
     this._enemyBookEnemyWindow.setEnemy(null);
     this._enemyBookPageWindow.deactivate();
     this._enemyBookEnemyWindow.setAnalyzeStatus(null);
   }
+  this._enemyBookEnemyWindow._bookMode = 0;
 };
 
 Scene_Battle.prototype.enemyBookEnemyAnalyze = function(args) {
@@ -4977,7 +5245,7 @@ Scene_Battle.prototype.setEnemyBookBackGround = function() {
     return;
   }
   let bitmap = null;
-  if (this._enemyBookEnemyWindow._bookMode === 0) {
+  if (this._enemyBookEnemyWindow._bookMode === 0 || this._enemyBookEnemyWindow._bookMode === 2) {
     bitmap = this._enemyBookBackBitmap;
   } else if (this._enemyBookEnemyWindow._bookMode === 1) {
     bitmap = this._analyzeBackBitmap;
@@ -5006,7 +5274,7 @@ Scene_Battle.prototype.setBackGround = function() {
 
 Scene_Battle.prototype.updatePageupdownButton = function() {
   if (this._EnemyBook_cancelButton) {
-    this._EnemyBook_cancelButton.visible = this._enemyBookIndexWindow.active || this._enemyBookPageWindow.active || 
+    this._EnemyBook_cancelButton.visible = this._enemyBookIndexWindow.active || this._enemyBookPageWindow.active || this._enemyBookInfoIndexWindow.active || 
     (this._enemyBookCategoryWindow && this._enemyBookCategoryWindow.active) ? true : false;
   }
 };
@@ -5038,7 +5306,9 @@ Scene_Battle.prototype.update = function() {
 const _Scene_Battle_buttonY = Scene_Battle.prototype.buttonY;
 Scene_Battle.prototype.buttonY = function() {
   const y = _Scene_Battle_buttonY.call(this);
-  if ((this._enemyBookIndexWindow && this._enemyBookIndexWindow.active) || (this._enemyBookCategoryWindow && this._enemyBookCategoryWindow.active)) {
+  if ((this._enemyBookIndexWindow && this._enemyBookIndexWindow.active) || 
+  (this._enemyBookCategoryWindow && this._enemyBookCategoryWindow.active) || 
+  (this._enemyBookInfoIndexWindow && this._enemyBookInfoIndexWindow.active)) {
     return y - this._helpWindow.height;
   }
   return y;
@@ -5046,12 +5316,12 @@ Scene_Battle.prototype.buttonY = function() {
 
 const _Scene_Battle_isAnyInputWindowActive  = Scene_Battle.prototype.isAnyInputWindowActive;
 Scene_Battle.prototype.isAnyInputWindowActive = function() {
-  return this._enemyBookIndexWindow.active || this._enemyBookPageWindow.active || (this._enemyBookCategoryWindow && this._enemyBookCategoryWindow.active) || _Scene_Battle_isAnyInputWindowActive.call(this);
+  return this._enemyBookIndexWindow.active || this._enemyBookInfoIndexWindow.active || this._enemyBookPageWindow.active || (this._enemyBookCategoryWindow && this._enemyBookCategoryWindow.active) || _Scene_Battle_isAnyInputWindowActive.call(this);
 };
 
 const _Scene_Battle_isTimeActive = Scene_Battle.prototype.isTimeActive;
 Scene_Battle.prototype.isTimeActive = function() {
-  const result = !this._enemyBookIndexWindow.active && !this._enemyBookPageWindow.active &&  _Scene_Battle_isTimeActive.call(this);
+  const result = !this._enemyBookIndexWindow.active && !this._enemyBookInfoIndexWindow.active && !this._enemyBookPageWindow.active &&  _Scene_Battle_isTimeActive.call(this);
   if (param.CategoryOn && param.EnemyBookCategory) {
     return result && (this._enemyBookCategoryWindow && !this._enemyBookCategoryWindow.active);
   }
@@ -5145,6 +5415,9 @@ Window_PartyCommand.prototype.makeCommandList = function() {
   _Window_PartyCommand_makeCommandList.call(this);
   if (param.ShowBattleCommand && ($gameSwitches.value(param.enemyBookBattleSwitch) || param.enemyBookBattleSwitch === 0)) {
     this.addCommand(param.CommandName, "enemyBook");
+  }
+  if (param.ShowEnemyInfoCommand && ($gameSwitches.value(param.enemyBookInfoSwitch) || param.enemyBookInfoSwitch === 0)) {
+    this.addCommand(param.EnemyInfoCommandName, "enemyBookInfo");
   }
 };
 

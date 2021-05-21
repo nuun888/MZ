@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.2.2
+ * @version 2.2.3
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/5/21 Ver 2.2.3
+ * 選択時ウィンドウ不透明度を0に設定すると不透明度が反映されない問題を修正。
  * 2021/4/20 Ver 2.2.2
  * 一部のプラグインパラメータでfalseに設定したときに設定が反映されない問題を修正。
  * 2021/4/11 Ver 2.2.1
@@ -154,6 +156,7 @@ param.HPGaugeHeight = param.HPGaugeHeight || 12;
 param.MPGaugeHeight = param.MPGaugeHeight || 12;
 param.TPGaugeHeight = param.TPGaugeHeight || 12;
 param.TPBGaugeHeight = param.TPBGaugeHeight || 12;
+param.ActorWindowSelectOpacity = param.ActorWindowSelectOpacity === undefined ? 255 : param.ActorWindowSelectOpacity;
 if (param.StyleMode === "MVStyle") {
   param.TPGaugeWidth = param.TPGaugeWidth || 96;
   param.TPBGaugeWidth = param.TPBGaugeWidth || 100;
@@ -688,9 +691,9 @@ Scene_Battle.prototype.endCommandSelection = function() {
 };
 
 Scene_Battle.prototype.actorWindowOpacity = function() {
-  this._statusWindow.opacity = param.WindowShow ? param.ActorWindowSelectOpacity || 255 : 0;
-  this._battleHudBack.opacity = param.ActorWindowSelectOpacity || 255;
-  this._battleHudFront.opacity = param.ActorWindowSelectOpacity || 255;
+  this._statusWindow.opacity = param.WindowShow ? param.ActorWindowSelectOpacity : 0;
+  this._battleHudBack.opacity = param.ActorWindowSelectOpacity;
+  this._battleHudFront.opacity = param.ActorWindowSelectOpacity;
 };
 
 Scene_Battle.prototype.actorWindowResetOpacity = function() {

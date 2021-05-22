@@ -10,15 +10,20 @@
  * @target MZ
  * @plugindesc コマンド拡張
  * @author NUUN
+ * @version 1.2.0
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
  * コマンド名の位置を左揃え、中央揃え、右揃えから選べます。
  * 
+ * 適用クラス設定でリストにないクラスを記入する場合は必ず'または"で囲ってください。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/21 Ver 1.2.0
+ * 設定を反映するウィンドウを指定できる機能を追加。
  * 2020/11/22 Ver 1.1.1
  * コマンド名を左揃え、中央揃え、右揃えから選べる機能を追加。
  * 2020/11/21 Ver 1.1.0
@@ -82,6 +87,23 @@
  * @default 0
  * @min 0
  * 
+ * @param CommandClass
+ * @text 適用クラス設定
+ * @desc 適用するクラスを指定します。無指定の場合は全てのコマンドで反映されます。
+ * @type combo[]
+ * @option 'Window_MenuCommand'
+ * @option 'Window_ItemCategory'
+ * @option 'Window_SkillType'
+ * @option 'Window_EquipCommand'
+ * @option 'Window_ShopCommand'
+ * @option 'Window_PartyCommand'
+ * @option 'Window_ActorCommand'
+ * @option 'Window_TitleCommand'
+ * @option 'Window_GameEnd'
+ * @option 'Window_ChoiceList'
+ * @option 'Window_Options'
+ * @default
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_CommandIcon = true;
@@ -99,6 +121,7 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
+
 const _Window_Command_itemTextAlign = Window_Command.prototype.itemTextAlign;
 Window_Command.prototype.itemTextAlign = function() {
   switch (param.CommandPosition) {
@@ -126,7 +149,7 @@ Window_HorzCommand.prototype.itemTextAlign = function() {
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
   const commadName = this.commandName(index);
-  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName)) : null;
+  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName) && this.isClass(Commad.CommandClass)) : null;
   if(foundIndex >= 0) {
     const commadData = param.CommadIcon[foundIndex];
     const rect = this.itemLineRect(index);
@@ -153,5 +176,13 @@ Window_Command.prototype.drawItem = function(index) {
   } else {
     _Window_Command_drawItem.call(this, index);
   }
+};
+
+Window_Command.prototype.isClass = function(Command) {
+  if (Command && Command.length > 0) {
+    const className = String(this.constructor.name);
+    return Command.some(_Class => _Class === className)
+  }
+  return true;
 };
 })();

@@ -52,6 +52,7 @@
 | 巨大エネミー  | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) | 画面いっぱいにエネミーを表示させます。 | 1.1.2 |
 | エネミー個別座標  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js)  | エネミーの座標を調整できます。 | 1.1.0 |
 | 敵にTPBゲージ表示  | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js)  | 敵にTPBゲージを表示します。 | 1.1.3 |
+| 敵に名前表示  |  |  |  |
 | 敵のドロップアイテム追加  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js)  | 敵がドロップするアイテムを４つ以上に設定できます。 | 1.0.0 |
 
 | メニュー | プラグイン | 説明 | Ver |

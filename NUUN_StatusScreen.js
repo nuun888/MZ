@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.0.2
+ * @version 2.0.3
  * 
  * @help
  * ステータス画面を拡張します。
@@ -59,12 +59,14 @@
  * 記述欄
  * プロフィール
  * 顔グラフィック
+ * キャラチップ
+ * サイドビューアクター
  * 
  * ページの各項目の設定
  * 
  * 各ページの項目は「ページ項目設定」から設定します。
  * ステータスに表示するには「ページ設定」の「ページ項目設定」から表示させるリストを選択してください。
- * ゲージは１ページに各ひとつずつしか表示できません。
+ * ゲージ、キャラチップは１ページに各ひとつずつしか表示できません。
  * 
  * 【名称の設定】
  * 能力値、追加能力値、特殊能力値、任意ステータス、装備、属性耐性、ステート耐性、名称のみ、記述欄、プロフィールで任意の名称を設定できます。
@@ -134,6 +136,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/23 Ver.2.0.3
+ * サイドビューアクターを表示させる機能を追加。
  * 2021/5/23 Ver.2.0.2
  * キャラチップを表示させる機能を追加。
  * 任意ステータスで単位が二つ表示される問題及び、単位を設定しないと表示されない問題を修正。
@@ -597,26 +601,6 @@
  * @default 0
  *
  */
-/*~struct~OriginalParamData:
- *
- * @param paramName
- * @desc 表示する名称。
- * @text 名称
- * @type string
- * 
- * @param paramValue
- * @desc 表示する評価式。
- * @text パラメータ
- * @type string
- * 
- * @param paramUnit
- * @desc 単位を設定します。
- * @text 単位
- * @type string
- * @default
- *
- */
-
 /*~struct~ParamListData:
  *
  * @param DateSelect
@@ -715,7 +699,7 @@
  * @value 100
  * @option キャラチップ
  * @value 101
- * @option サイドビューアクター画像（未実装）
+ * @option サイドビューアクター画像
  * @value 102
  * @option 画像（未実装）
  * @value 103
@@ -1279,6 +1263,9 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
     case 102:
       this.drawSideViewActor(list, this._actor, x, y);
       break;
+    case 103:
+      this.drawImg(list, this._actor, x, y);
+      break;
     case 1000:
       this.horzLine(list, x, y, width);
       break;
@@ -1622,12 +1609,15 @@ Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
   }
 };
 
-Window_Status.prototype.drawCharacterChip = function(list, actor, x, y, width) {
+Window_Status.prototype.drawCharacterChip = function(list, actor, x, y) {
   this.characterChipSprite(actor, x, y);
 };
 
-Window_Status.prototype.drawSideViewActor = function(list, actor, x, y, width) {
-  //const sprite = new Sprite_Actor();
+Window_Status.prototype.drawSideViewActor = function(list, actor, x, y) {
+  this.svActoeSprite(actor, x, y);
+};
+
+Window_Status.prototype.drawImg = function(list, actor, x, y) {
 
 };
 
@@ -1638,6 +1628,15 @@ Window_Status.prototype.characterChipSprite = function(actor, x, y) {
   const sprite = this.createInnerChipSprite(key, id, x, y);
   sprite._character.setPosition(x + this.x, y + this.y);
   sprite.updatePosition();
+  sprite.show();
+};
+
+Window_Status.prototype.svActoeSprite = function(actor, x, y) {
+  const type = 'sv_Actor'
+  const key = "menu_%1".format(type);
+  const sprite = this.createInnerSprite(key, Sprite_MenuSvActor);
+  sprite.setBattler(actor);
+  sprite.setActorPosition(x + this.x, y + this.y);
   sprite.show();
 };
 
@@ -1881,6 +1880,36 @@ Sprite_MenuCharacter.prototype.update = function() {
     Sprite_Character.prototype.update.call(this);
     this._character.updateAnimation();
   }
+};
+
+function Sprite_MenuSvActor() {
+  this.initialize(...arguments);
+}
+
+Sprite_MenuSvActor.prototype = Object.create(Sprite_Actor.prototype);
+Sprite_MenuSvActor.prototype.constructor = Sprite_MenuSvActor;
+
+Sprite_MenuSvActor.prototype.initialize = function(battler) {
+  Sprite_Actor.prototype.initialize.call(this, battler);
+};
+
+Sprite_MenuSvActor.prototype.moveToStartPosition = function() {
+  
+};
+
+Sprite_MenuSvActor.prototype.setActorHome = function(index) {
+  
+};
+
+Sprite_MenuSvActor.prototype.setActorPosition = function(x, y) {
+  this.setHome(x, y);
+};
+
+Sprite_MenuSvActor.prototype.startMotion = function(motionType) {
+  if (motionType === "wait") {
+    motionType = "walk";
+  }
+  Sprite_Actor.prototype.startMotion.call(this, motionType);
 };
 
 })();

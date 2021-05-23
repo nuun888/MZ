@@ -11,22 +11,23 @@
  * @target MZ
  * @plugindesc  バトラー名前表示
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * モンスターに敵名を表示します。
  * 
  * 敵キャラのメモ欄
- * <EnemyNameX:[position]> モンスターの名前X座標を調整します。（相対座標）
- * <EnemyNameY:[position]> モンスターの名前Y座標を調整します。（相対座標）
+ * <EnemyNameX:[position]> TPBゲージのX座標を調整します。（相対座標）
+ * <EnemyNameY:[position]> TPBゲージのY座標を調整します。（相対座標）
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/23 Ver.1.0.1
+ * プラグインパラメータが反映されなかった問題を修正。
  * 2021/5/23 Ver.1.0.0
  * 初版
- * 
  * 
  * @param EnemySetting
  * @text モンスター設定
@@ -67,10 +68,10 @@
  * 
  */
 var Imported = Imported || {};
-Imported.ButlerName = true;
+Imported.NUUN_ButlerName = true;
 
 (() => {
-const parameters = PluginManager.parameters('ButlerName');
+const parameters = PluginManager.parameters('NUUN_ButlerName');
 const EnemyNamePosition = Number(parameters['EnemyNamePosition'] || 0);
 const Name_X = Number(parameters['Name_X'] || 0);
 const Name_Y = Number(parameters['Name_Y'] || 0);
@@ -198,6 +199,13 @@ Spriteset_Battle.prototype.createEnemyName = function() {
     }
   }
 };
+
+//Spriteset_Battle.prototype.updateActors = function() {
+//  const members = $gameParty.battleMembers();
+//  for (let i = 0; i < this._actorSprites.length; i++) {
+//      this._actorSprites[i].setBattler(members[i]);
+//  }
+//};
 
 Spriteset_Battle.prototype.actorName = function(sprites) {
   const sprite = new Sprite_ButlerName();

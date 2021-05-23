@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.0.1
+ * @version 2.0.2
  * 
  * @help
  * ステータス画面を拡張します。
@@ -64,6 +64,7 @@
  * 
  * 各ページの項目は「ページ項目設定」から設定します。
  * ステータスに表示するには「ページ設定」の「ページ項目設定」から表示させるリストを選択してください。
+ * ゲージは１ページに各ひとつずつしか表示できません。
  * 
  * 【名称の設定】
  * 能力値、追加能力値、特殊能力値、任意ステータス、装備、属性耐性、ステート耐性、名称のみ、記述欄、プロフィールで任意の名称を設定できます。
@@ -133,6 +134,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/23 Ver.2.0.2
+ * キャラチップを表示させる機能を追加。
+ * 任意ステータスで単位が二つ表示される問題及び、単位を設定しないと表示されない問題を修正。
  * 2021/5/22 Ver.2.0.1
  * プラグインパラメータのページ設定の表示がおかしかった問題を修正。
  * 2021/5/20 Ver.2.0.0
@@ -349,6 +353,13 @@
  * @option 右
  * @value 2
  * @default 2
+ * @parent ActorImgSetting
+ * 
+ * @param ActorCharacterAnimation
+ * @text キャラチップ動作
+ * @desc キャラチップを動作させます。
+ * @type boolean
+ * @default true
  * @parent ActorImgSetting
  * 
  * @param EquipSetting
@@ -702,7 +713,7 @@
  * @value 90
  * @option 顔グラフィック
  * @value 100
- * @option キャラチップ（未実装）
+ * @option キャラチップ
  * @value 101
  * @option サイドビューアクター画像（未実装）
  * @value 102
@@ -840,6 +851,7 @@ const EXPGaugeColor1 = Number(parameters['EXPGaugeColor1'] || 17);
 const EXPGaugeColor2 = Number(parameters['EXPGaugeColor2'] || 6);
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const actorPosition = Number(parameters['actorPosition'] || 2);
+const ActorCharacterAnimation = eval(parameters['ActorCharacterAnimation'] || "true");
 const ElementResistText = eval(parameters['ElementResistText'] || "false");
 const StateResistText = eval(parameters['StateResistText'] || "false");
 const ElementResist = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ElementResist'])) : [];
@@ -1262,9 +1274,10 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
       this.drawActorFace(this._actor, x, y);
       break;
     case 101:
+      this.drawCharacterChip(list, this._actor, x, y);
       break;
     case 102:
-      this.drawSideViewActor(list, this._actor, x, y)
+      this.drawSideViewActor(list, this._actor, x, y);
       break;
     case 1000:
       this.horzLine(list, x, y, width);
@@ -1496,9 +1509,11 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
     this.drawText(nameText , x, y, textWidth);
   }
   let text = eval(list.DetaEval);
-  text += list.paramUnit; 
-  this.resetTextColor();
-  this.drawText(text + String(list.paramUnit), x + textWidth + 8, y, width - textWidth - 8, 'right');
+  if (text !== undefined) {
+    text += list.paramUnit ? String(list.paramUnit) : "";
+    this.resetTextColor();
+    this.drawText(text, x + textWidth + 8, y, width - textWidth - 8, 'right');
+  }
 };
 
 Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
@@ -1608,11 +1623,36 @@ Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
 };
 
 Window_Status.prototype.drawCharacterChip = function(list, actor, x, y, width) {
-  
+  this.characterChipSprite(actor, x, y);
 };
 
 Window_Status.prototype.drawSideViewActor = function(list, actor, x, y, width) {
   //const sprite = new Sprite_Actor();
+
+};
+
+Window_Status.prototype.characterChipSprite = function(actor, x, y) {
+  const id = actor.actorId();
+  const type = 'character'
+  const key = "menu_%1".format(type);
+  const sprite = this.createInnerChipSprite(key, id, x, y);
+  sprite._character.setPosition(x + this.x, y + this.y);
+  sprite.updatePosition();
+  sprite.show();
+};
+
+Window_StatusBase.prototype.createInnerChipSprite = function(key, id) {
+  const actorCharacter = new Game_MenuCharacter(id);
+  const dict = this._additionalSprites;
+  if (dict[key]) {
+    dict[key].setCharacter(actorCharacter);
+    return dict[key];
+  } else {
+    const sprite = new Sprite_MenuCharacter(actorCharacter);
+    dict[key] = sprite;
+    this.addInnerChild(sprite);
+    return sprite;
+  }
 };
 
 Window_Status.prototype.placeExpGauge = function(actor, x, y) {
@@ -1790,4 +1830,57 @@ ColorManager.expGaugeColor1 = function() {
 ColorManager.expGaugeColor2 = function() {
   return this.textColor(EXPGaugeColor2);
 };
+
+function Game_MenuCharacter() {
+  this.initialize(...arguments);
+}
+
+Game_MenuCharacter.prototype = Object.create(Game_Character.prototype);
+Game_MenuCharacter.prototype.constructor = Game_MenuCharacter;
+
+Game_MenuCharacter.prototype.initialize = function(id) {
+  Game_Character.prototype.initialize.call(this);
+  this._actorId = id;
+  this.setStepAnime(ActorCharacterAnimation);
+  this.refresh();
+};
+
+Game_MenuCharacter.prototype.refresh = function() {
+  const actor = $gameActors._data[this._actorId];
+  const characterName = actor ? actor.characterName() : "";
+  const characterIndex = actor ? actor.characterIndex() : 0;
+  this.setImage(characterName, characterIndex);
+};
+
+Game_MenuCharacter.prototype.setPosition = function(x, y) {
+  this._menuActorX = x;
+  this._menuActorY = y;
+};
+
+Game_MenuCharacter.prototype.screenX = function() {
+  return this._menuActorX;
+};
+
+Game_MenuCharacter.prototype.screenY = function() {
+  return this._menuActorY;
+};
+
+function Sprite_MenuCharacter() {
+  this.initialize(...arguments);
+}
+
+Sprite_MenuCharacter.prototype = Object.create(Sprite_Character.prototype);
+Sprite_MenuCharacter.prototype.constructor = Sprite_MenuCharacter;
+
+Sprite_MenuCharacter.prototype.initialize = function(character) {
+  Sprite_Character.prototype.initialize.call(this, character);
+};
+
+Sprite_MenuCharacter.prototype.update = function() {
+  if (this.visible) {
+    Sprite_Character.prototype.update.call(this);
+    this._character.updateAnimation();
+  }
+};
+
 })();

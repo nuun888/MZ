@@ -31,42 +31,6 @@
  * 2021/5/23 Ver.1.0.0
  * 初版
  * 
- * @param ActorSetting
- * @text アクター設定
- * @default ------------------------------
- * 
- * @param ActorNamePosition
- * @desc アクターの名前表示位置
- * @text 名前表示位置
- * @type select
- * @option 表示なし
- * @value -1
- * @option 敵画像の上
- * @value 0
- * @option 敵画像の下
- * @value 1
- * @default -1
- * 
- * @param ActorName_X
- * @desc X座標（相対座標）指定します。
- * @text X座標
- * @type number
- * @default 0
- * @min -9999
- * 
- * @param ActorName_Y
- * @desc Y座標（相対座標）指定します。
- * @text Y座標
- * @type number
- * @default 0
- * @min -9999
- * 
- * @param ActorName_FontSize
- * @desc モンスター名のフォントサイズ。（メインフォントから）
- * @text フォントサイズ
- * @type number
- * @default -12
- * @min -9999
  * 
  * @param EnemySetting
  * @text モンスター設定
@@ -111,10 +75,6 @@ Imported.NUUN_ButlerName = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_ButlerName');
-const ActorNamePosition = Number(parameters['ActorNamePosition'] || 0);
-const ActorName_X = Number(parameters['ActorName_X'] || 0);
-const ActorName_Y = Number(parameters['ActorName_Y'] || 0);
-const ActorName_FontSize = Number(parameters['ActorName_FontSize'] || -12);
 const EnemyNamePosition = Number(parameters['EnemyNamePosition'] || 0);
 const Name_X = Number(parameters['Name_X'] || 0);
 const Name_Y = Number(parameters['Name_Y'] || 0);

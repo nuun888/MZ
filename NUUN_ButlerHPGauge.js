@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
@@ -19,11 +19,14 @@
  * エネミーのメモ欄
  * <HPGaugeX:[position]> HPゲージのX座標を調整します。（相対座標）
  * <HPGaugeY:[position]> HPゲージのY座標を調整します。（相対座標）
+ * <NoHPGauge> HPゲージを表示しません。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/24 Ver.1.0.1
+ * HPゲージを表示させない機能を追加。
  * 2021/5/24 Ver.1.0.0
  * 初版
  * 
@@ -98,7 +101,7 @@ const LabelFontSize = Number(parameters['LabelFontSize'] || -2);
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
   _Sprite_Enemy_update.call(this);
-  if (this._enemy && HPPosition >= 0) {
+  if (this._enemy && this.showHpGauge && HPPosition >= 0) {
       this.updateHpGauge();
   }
 };
@@ -145,14 +148,17 @@ Spriteset_Battle.prototype.createEnemyHpGauge = function() {
 };
 
 Spriteset_Battle.prototype.enemyHPGauge = function(sprites) {
-  const sprite = new Sprite_EnemyHPGauge();
-  this._enemyGaugeBase.addChild(sprite);
-  sprite.setup(sprites._battler, "hp");
-  sprite.show();
-  sprite.move(0, 0);
-  sprites._butlerHp = sprite;
-  sprites.hpGaugeOffsetX = (sprites._enemy.enemy().meta.HPGaugeX ? Number(sprites._enemy.enemy().meta.HPGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
-  sprites.hpGaugeOffsetY = (sprites._enemy.enemy().meta.HPGaugeY ? Number(sprites._enemy.enemy().meta.HPGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
+  sprites.showHpGauge = !sprites._battler.enemy().meta.NoHPGauge;
+  if (sprites.showHpGauge) {
+    const sprite = new Sprite_EnemyHPGauge();
+    this._enemyGaugeBase.addChild(sprite);
+    sprite.setup(sprites._battler, "hp");
+    sprite.show();
+    sprite.move(0, 0);
+    sprites._butlerHp = sprite;
+    sprites.hpGaugeOffsetX = (sprites._enemy.enemy().meta.HPGaugeX ? Number(sprites._enemy.enemy().meta.HPGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
+    sprites.hpGaugeOffsetY = (sprites._enemy.enemy().meta.HPGaugeY ? Number(sprites._enemy.enemy().meta.HPGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
+  }
 };
 
 function Sprite_EnemyHPGauge() {

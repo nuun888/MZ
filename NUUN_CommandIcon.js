@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/22 Ver 1.2.1
+ * 設定を反映するウィンドウを適用モードか除外モードかを選択できる機能を追加。
  * 2021/5/21 Ver 1.2.0
  * 設定を反映するウィンドウを指定できる機能を追加。
  * 2020/11/22 Ver 1.1.1
@@ -72,6 +74,7 @@
  * @text コマンド名
  * @desc アイコンを表示するコマンド名（表示するコマンド名と同じ名前にしてください）
  * @type string
+ * @default 
  * 
  * @param CommadNameColor
  * @text コマンド名の色
@@ -87,9 +90,19 @@
  * @default 0
  * @min 0
  * 
+ * @param CommandClassMode
+ * @text 適用除外クラス設定モード
+ * @desc 適用除外クラス設定のモードを指定します。
+ * @type select
+ * @option 適用
+ * @value 0
+ * @option 除外
+ * @value 1
+ * @default 0
+ * 
  * @param CommandClass
- * @text 適用クラス設定
- * @desc 適用するクラスを指定します。無指定の場合は全てのコマンドで反映されます。
+ * @text 適用除外クラス設定
+ * @desc 適用、除外するクラスを指定します。無指定の場合は全てのコマンドで反映されます。
  * @type combo[]
  * @option 'Window_MenuCommand'
  * @option 'Window_ItemCategory'
@@ -149,7 +162,7 @@ Window_HorzCommand.prototype.itemTextAlign = function() {
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
   const commadName = this.commandName(index);
-  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName) && this.isClass(Commad.CommandClass)) : null;
+  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
   if(foundIndex >= 0) {
     const commadData = param.CommadIcon[foundIndex];
     const rect = this.itemLineRect(index);
@@ -178,10 +191,15 @@ Window_Command.prototype.drawItem = function(index) {
   }
 };
 
-Window_Command.prototype.isClass = function(Command) {
+Window_Command.prototype.isClass = function(Command, mode) {
   if (Command && Command.length > 0) {
     const className = String(this.constructor.name);
-    return Command.some(_Class => _Class === className)
+    const result = Command.some(_Class => _Class === className);
+    if (mode === 0 || mode === undefined) {
+      return result;
+    } else {
+      return result ? false : true;
+    }
   }
   return true;
 };

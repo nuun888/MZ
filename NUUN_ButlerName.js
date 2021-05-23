@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラー名前表示
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * モンスターに敵名を表示します。
@@ -24,10 +24,49 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/24 Ver.1.0.2
+ * 処理の一部を修正。
  * 2021/5/23 Ver.1.0.1
  * プラグインパラメータが反映されなかった問題を修正。
  * 2021/5/23 Ver.1.0.0
  * 初版
+ * 
+ * @param ActorSetting
+ * @text アクター設定
+ * @default ------------------------------
+ * 
+ * @param ActorNamePosition
+ * @desc アクターの名前表示位置
+ * @text 名前表示位置
+ * @type select
+ * @option 表示なし
+ * @value -1
+ * @option 敵画像の上
+ * @value 0
+ * @option 敵画像の下
+ * @value 1
+ * @default -1
+ * 
+ * @param ActorName_X
+ * @desc X座標（相対座標）指定します。
+ * @text X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param ActorName_Y
+ * @desc Y座標（相対座標）指定します。
+ * @text Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param ActorName_FontSize
+ * @desc モンスター名のフォントサイズ。（メインフォントから）
+ * @text フォントサイズ
+ * @type number
+ * @default -12
+ * @min -9999
  * 
  * @param EnemySetting
  * @text モンスター設定
@@ -72,62 +111,14 @@ Imported.NUUN_ButlerName = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_ButlerName');
+const ActorNamePosition = Number(parameters['ActorNamePosition'] || 0);
+const ActorName_X = Number(parameters['ActorName_X'] || 0);
+const ActorName_Y = Number(parameters['ActorName_Y'] || 0);
+const ActorName_FontSize = Number(parameters['ActorName_FontSize'] || -12);
 const EnemyNamePosition = Number(parameters['EnemyNamePosition'] || 0);
 const Name_X = Number(parameters['Name_X'] || 0);
 const Name_Y = Number(parameters['Name_Y'] || 0);
 const Name_FontSize = Number(parameters['Name_FontSize'] || -12);
-
-const _Sprite_Enemy_initVisibility = Sprite_Enemy.prototype.initVisibility;
-Sprite_Enemy.prototype.initVisibility = function() {
-  _Sprite_Enemy_initVisibility.call(this);
-  if (!this._appeared) {
-    this.setEnemyNameOpacity(0);
-  }
-};
-
-const _Sprite_Enemy_revertToNormal = Sprite_Enemy.prototype.revertToNormal;
-Sprite_Enemy.prototype.revertToNormal = function() {
-  _Sprite_Enemy_revertToNormal.call(this);
-  this.setEnemyNameOpacity(255);
-};
-
-const _Sprite_Enemy_updateCollapse = Sprite_Enemy.prototype.updateCollapse;
-Sprite_Enemy.prototype.updateCollapse = function() {
-  _Sprite_Enemy_updateCollapse.call(this);
-  this.collapseEnemyName();
-};
-
-const _Sprite_Enemy_updateBossCollapse = Sprite_Enemy.prototype.updateBossCollapse;
-Sprite_Enemy.prototype.updateBossCollapse = function() {
-  _Sprite_Enemy_updateBossCollapse.call(this);
-  this.collapseEnemyName();
-};
-
-const _Sprite_Enemy_updateAppear = Sprite_Enemy.prototype.updateAppear;
-Sprite_Enemy.prototype.updateAppear = function() {
-  _Sprite_Enemy_updateAppear.call(this);
-  this._butlerName.opacity = (16 - this._effectDuration) * 16;
-};
-
-const _Sprite_Enemy_updateDisappear = Sprite_Enemy.prototype.updateDisappear;
-Sprite_Enemy.prototype.updateDisappear = function() {
-  _Sprite_Enemy_updateDisappear.call(this);
-  this._butlerName.opacity = 256 - (32 - this._effectDuration) * 10;
-};
-
-const _Sprite_Enemy_updateInstantCollapse = Sprite_Enemy.prototype.updateInstantCollapse;
-Sprite_Enemy.prototype.updateInstantCollapse = function() {
-  _Sprite_Enemy_updateInstantCollapse.call(this);
-  this._butlerName.opacity = 0;
-};
-
-Sprite_Enemy.prototype.collapseEnemyName = function() {
-  this._butlerName.opacity *= this._effectDuration / (this._effectDuration + 1);
-};
-
-Sprite_Enemy.prototype.setEnemyNameOpacity = function(opacity) {
-  this._butlerName.opacity = opacity;
-};
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
@@ -167,6 +158,13 @@ Sprite_Enemy.prototype.updateEnemyName = function() {
       this._butlerName.y = 30;
   } else if (this._butlerName.y + 40 > Graphics.height) {
     this._butlerName.y = Graphics.height - 40;
+  }
+  this.butlerNameOpacity();
+};
+
+Sprite_Enemy.prototype.butlerNameOpacity = function() {
+  if (this._effectType !== "blink") {
+    this._butlerName.opacity = this.opacity;
   }
 };
 

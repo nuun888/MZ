@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミーTPBゲージ
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * エネミーにもTPBゲージを表示します。
@@ -24,6 +24,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/24 Ver.1.1.4
+ * 処理の一部を修正。
  * 2021/4/11 Ver.1.1.3
  * モンスターにサイドビューアクター表示系のプラグインに対応。
  * サイドビューアクターを指定したモンスターと戦闘を開始したときにエラーが出る問題を修正。
@@ -90,44 +92,6 @@ const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
 const Gauge_X = Number(parameters['Gauge_X'] || 0);
 const Gauge_Y = Number(parameters['Gauge_Y'] || 0);
 
-const _Sprite_Enemy_initVisibility = Sprite_Enemy.prototype.initVisibility;
-Sprite_Enemy.prototype.initVisibility = function() {
-  _Sprite_Enemy_initVisibility.call(this);
-  if (!this._appeared) {
-    this.setTpbOpacity(0);
-  }
-};
-
-const _Sprite_Enemy_revertToNormal = Sprite_Enemy.prototype.revertToNormal;
-Sprite_Enemy.prototype.revertToNormal = function() {
-  _Sprite_Enemy_revertToNormal.call(this);
-  this.setTpbOpacity(255);
-};
-
-const _Sprite_Enemy_updateCollapse = Sprite_Enemy.prototype.updateCollapse;
-Sprite_Enemy.prototype.updateCollapse = function() {
-  _Sprite_Enemy_updateCollapse.call(this);
-  this.collapseTpbGauge();
-};
-
-const _Sprite_Enemy_updateBossCollapse = Sprite_Enemy.prototype.updateBossCollapse;
-Sprite_Enemy.prototype.updateBossCollapse = function() {
-  _Sprite_Enemy_updateBossCollapse.call(this);
-  this.collapseTpbGauge();
-};
-
-Sprite_Enemy.prototype.collapseTpbGauge = function() {
-  if (BattleManager.isTpb()) {
-    this._enemyTpb.opacity *= this._effectDuration / (this._effectDuration + 1);
-  }
-};
-
-Sprite_Enemy.prototype.setTpbOpacity = function(opacity) {
-  if (BattleManager.isTpb()) {
-    this._enemyTpb.opacity = opacity;
-  }
-};
-
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
   _Sprite_Enemy_update.call(this);
@@ -152,6 +116,13 @@ Sprite_Enemy.prototype.updateTpbGauge = function() {
       this._enemyTpb.y = 30;
   } else if (this._enemyTpb.y + 40 > Graphics.height) {
     this._enemyTpb.y = Graphics.height - 40;
+  }
+  this.tpbGaugeOpacity();
+};
+
+Sprite_Enemy.prototype.tpbGaugeOpacity = function() {
+  if (this._effectType !== "blink") {
+    this._enemyTpb.opacity = this.opacity;
   }
 };
 

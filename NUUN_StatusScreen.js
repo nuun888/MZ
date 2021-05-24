@@ -1410,7 +1410,7 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
     width = this.contensWidth(width);
     let text = this.paramShow(list, actor, params, list.DetaEval);
     if (text !== undefined) {
-      text = this.statusParamDecimal(text, list.Decimal);console.log(list)
+      text = this.statusParamDecimal(text, list.Decimal);
       let nameText = this.paramNameShow(list, actor, params);
       let textWidth = this.systemWidth(list.SystemItemWidth, width);
       this.changeTextColor(ColorManager.textColor(list.NameColor));

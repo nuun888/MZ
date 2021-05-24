@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.4.0
+ * @version 2.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -68,7 +68,8 @@
  * オリジナルパラメータ（任意のステータス）
  * 敵の使用スキル
  * モンスター画像
- * モンスターブックナンバー
+ * キャラチップ（未実装）
+ * モンスターブックナンバー（未実装）
  * 
  * 戦闘中にパーティコマンドからエネミー図鑑を開くことが出来ます。
  * アナライズ機能を使う場合、TPBバトルでは開いている間TPBゲージを止める仕様にしています。
@@ -241,6 +242,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/24 Ver.2.4.1
+ * モンスター図鑑を開いた後に敵の情報を開くと特定の条件でエラーが起きる問題を修正。
+ * 登録タイミングを遭遇時にして途中から出現するモンスターが出現せずに戦闘を終了すると図鑑に登録してしまう問題を修正。
+ * 敵の情報でステータス情報登録をしていないモンスターの情報を隠す機能を追加。
  * 2021/5/22 Ver.2.4.0
  * 戦闘中の敵の情報を確認する機能を追加。
  * 2021/5/20 Ver.2.3.1
@@ -2661,7 +2666,7 @@ Game_Troop.prototype.setup = function(troopId) {
 const _Game_Enemy_appear = Game_Enemy.prototype.appear;
 Game_Enemy.prototype.appear = function() {
   _Game_Enemy_appear.call(this);
-  if ($gameSystem.registrationTiming() === 0) {
+  if ($gameTroop.inBattle() && $gameSystem.registrationTiming() === 0) {
     $gameSystem.addToEnemyBook(this.enemyId());
     if ($gameSystem.registrationStatusTiming() === 0) {
       $gameSystem.addStatusToEnemyBook(this.enemyId());
@@ -3462,11 +3467,11 @@ Window_EnemyBook_InfoIndex.prototype.initialize = function(rect) {
 };
 
 Window_EnemyBook_InfoIndex.prototype.setSelect = function() {
-  if (Window_EnemyBook_Index._lastTopRow + this.maxPageRows() - 1 < Window_EnemyBook_Index._lastIndex) {
-    Window_EnemyBook_Index._lastTopRow += 1;
+  if (Window_EnemyBook_InfoIndex._lastTopRow + this.maxPageRows() - 1 < Window_EnemyBook_InfoIndex._lastIndex) {
+    Window_EnemyBook_InfoIndex._lastTopRow += 1;
   }
-  this.setTopRow(Window_EnemyBook_Index._lastTopRow);
-  this.select(Window_EnemyBook_Index._lastIndex);
+  this.setTopRow(Window_EnemyBook_InfoIndex._lastTopRow);
+  this.select(Window_EnemyBook_InfoIndex._lastIndex);
 };
 
 Window_EnemyBook_InfoIndex.prototype.updateEnemyStatus = function() {
@@ -3623,7 +3628,7 @@ Window_EnemyBook.prototype.onDebuffFlag = function(index) {
 };
 
 Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
-  return this._enemy.meta.ShowDataBook || this._bookMode >= 1;
+  return this._enemy.meta.ShowDataBook || this._bookMode === 1;
 };
 
 Window_EnemyBook.prototype.analyzeGaugeVisible = function() {
@@ -3634,8 +3639,8 @@ Window_EnemyBook.prototype.infoGaugeVisible = function() {
   return this.scanMode() && param.InfoStatusGaugeVisible;
 };
 
-Window_EnemyBook.prototype.gaugeVisibleMode = function() {
-  return (this._bookMode === 1 && this.analyzeGaugeVisible()) || (this._bookMode === 2 && this.infoGaugeVisible());
+Window_EnemyBook.prototype.gaugeVisibleMode = function(maskMode) {
+  return (this._bookMode === 1 && this.analyzeGaugeVisible()) || (this._bookMode === 2 && this.infoGaugeVisible() && this.paramMask(maskMode));
 };
 
 Window_EnemyBook.prototype.analyzeCurrentStatus = function() {
@@ -4025,7 +4030,7 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
   let text = this.paramShow(list, enemy);//InfoStatusGaugeVisible
   let textWidth = width;
   if (text !== undefined) {
-    if ((list.DateSelect === 1 || list.DateSelect === 2 || list.DateSelect === 9) && $gameParty.inBattle() && enemy && this.gaugeVisibleMode()) {
+    if ((list.DateSelect === 1 || list.DateSelect === 2 || list.DateSelect === 9) && $gameParty.inBattle() && enemy && this.gaugeVisibleMode(list.MaskMode)) {
     } else {
       if (list.DateSelect === 9 && !this.scanMode()) {
         return;
@@ -4042,15 +4047,15 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
     if(!this.paramMask(list.MaskMode)){
       text = param.UnknownStatus;
     }
-    if ($gameParty.inBattle() && this.gaugeVisibleMode() && list.DateSelect === 1) {
+    if ($gameParty.inBattle() && this.gaugeVisibleMode(list.MaskMode) && list.DateSelect === 1) {
       this.placeGauge(enemy, "hp", x, y);
-    } else if ($gameParty.inBattle() && this.gaugeVisibleMode() && list.DateSelect === 2) {
+    } else if ($gameParty.inBattle() && this.gaugeVisibleMode(list.MaskMode) && list.DateSelect === 2) {
       this.placeGauge(enemy, "mp", x, y);
-    } else if ($gameParty.inBattle() && this.gaugeVisibleMode() && list.DateSelect === 9) {
+    } else if ($gameParty.inBattle() && this.gaugeVisibleMode(list.MaskMode) && list.DateSelect === 9) {
       this.placeGauge(enemy, "tp", x, y);
     } else {
       if (this.scanMode()) {
-        if (!this.gaugeVisibleMode() && list.DateSelect === 1) {
+        if (!this.gaugeVisibleMode(list.MaskMode) && list.DateSelect === 1) {
           this.changeTextColor(this.crisisColor(enemy));
         } else {
           this.changeTextColor(this.buffColor(text, this.normalParam(list, enemy)));

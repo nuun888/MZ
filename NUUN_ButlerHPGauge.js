@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/24 Ver.1.0.2
+ * HPラベル、数値を表示させない機能を追加。
  * 2021/5/24 Ver.1.0.1
  * HPゲージを表示させない機能を追加。
  * 2021/5/24 Ver.1.0.0
@@ -70,6 +72,18 @@
  * @default 0
  * @min -9999
  * 
+ * @param HPLabelVisible
+ * @text HPラベル表示
+ * @desc HPラベルを表示する。
+ * @type boolean
+ * @default true
+ * 
+ * @param HPValueVisible
+ * @text HP数値表示
+ * @desc HP数値を表示する。
+ * @type boolean
+ * @default true
+ * 
  * @param ValueFontSize
  * @desc 数値のフォントサイズ。（メインフォントサイズから）
  * @text 数値フォントサイズ
@@ -95,6 +109,8 @@ const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
 const Gauge_X = Number(parameters['Gauge_X'] || 0);
 const Gauge_Y = Number(parameters['Gauge_Y'] || 0);
+const HPLabelVisible = eval(parameters['HPLabelVisible'] || 'true');
+const HPValueVisible = eval(parameters['HPValueVisible'] || 'true');
 const ValueFontSize = Number(parameters['ValueFontSize'] || -6);
 const LabelFontSize = Number(parameters['LabelFontSize'] || -2);
 
@@ -186,6 +202,18 @@ Sprite_EnemyHPGauge.prototype.labelFontSize = function() {
 
 Sprite_EnemyHPGauge.prototype.valueFontSize = function() {
   return $gameSystem.mainFontSize() + ValueFontSize;
+};
+
+Sprite_EnemyHPGauge.prototype.drawLabel = function() {
+  if (HPLabelVisible) {
+    Sprite_Gauge.prototype.drawLabel.call(this);
+  }
+};
+
+Sprite_EnemyHPGauge.prototype.drawValue = function() {
+  if (HPValueVisible) {
+    Sprite_Gauge.prototype.drawValue.call(this);
+  }
 };
 
 })();

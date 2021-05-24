@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.0.3
+ * @version 2.0.4
  * 
  * @help
  * ステータス画面を拡張します。
@@ -104,6 +104,9 @@
  * 【ワイド表示モード】
  * 項目を複数列に跨いで表示します。
  * 
+ * 【小数点桁数】
+ * 能力値、追加能力値、特殊能力値、属性耐性、ステート耐性を指定した少数桁数まで表示させます。
+ * 
  * 【単位】
  * 追加能力値、特殊能力値、任意ステータス、属性耐性、ステート耐性で接尾につける単位を設定します。
  * 
@@ -136,6 +139,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/24 Ver.2.0.4
+ * 小数点表示を能力値にも対応。
  * 2021/5/23 Ver.2.0.3
  * サイドビューアクターを表示させる機能を追加。
  * 2021/5/23 Ver.2.0.2
@@ -196,15 +201,6 @@
  * @param Setting
  * @text 共通設定
  * @default ------------------------------
- * 
- * @param Decimal
- * @text 小数点桁数
- * @desc 表示出来る小数点桁数。
- * @type number
- * @default 2
- * @min 0
- * @max 99
- * @parent Setting
  * 
  * @param DecimalMode
  * @text 端数処理四捨五入
@@ -443,6 +439,15 @@
  * @desc EXPゲージの横幅縦を指定します。
  * @type number
  * @default 12
+ * @parent EXPSetting
+ * 
+ * @param EXPDecimal
+ * @text 小数点桁数
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 2
+ * @min 0
+ * @max 99
  * @parent EXPSetting
  * 
  * @param ElementStateSetting
@@ -787,6 +792,14 @@
  * @type string
  * @default 
  * 
+ * @param Decimal
+ * @text 小数点桁数
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
  * @param textMethod
  * @desc 記述欄に紐づけするタグ名
  * @text 記述欄タグ名
@@ -807,7 +820,6 @@ Imported.NUUN_StatusScreen = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_StatusScreen');
-const Decimal = Number(parameters['Decimal'] || 2);
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const ExpPercent = eval(parameters['ExpPercent'] || "false");
 const HPGaugeWidth = Number(parameters['HPGaugeWidth'] || 200);
@@ -833,6 +845,7 @@ const EquipNameVisible = Number(parameters['EquipNameVisible'] || 1);
 const EXPGaugeVisible = eval(parameters['EXPGaugeVisible'] || "true");
 const EXPGaugeColor1 = Number(parameters['EXPGaugeColor1'] || 17);
 const EXPGaugeColor2 = Number(parameters['EXPGaugeColor2'] || 6);
+const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const actorPosition = Number(parameters['actorPosition'] || 2);
 const ActorCharacterAnimation = eval(parameters['ActorCharacterAnimation'] || "true");
@@ -1397,6 +1410,7 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
     width = this.contensWidth(width);
     let text = this.paramShow(list, actor, params, list.DetaEval);
     if (text !== undefined) {
+      text = this.statusParamDecimal(text, list.Decimal);console.log(list)
       let nameText = this.paramNameShow(list, actor, params);
       let textWidth = this.systemWidth(list.SystemItemWidth, width);
       this.changeTextColor(ColorManager.textColor(list.NameColor));
@@ -1536,7 +1550,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
           textWidth += ImageManager.iconWidth + 4;
         }
         let rate = actor.elementRate(elementId) * 100;
-        rate = this.statusParamDecimal(rate);
+        rate = this.statusParamDecimal(rate, list.Decimal);
         rate += list.paramUnit ? String(list.paramUnit) : " %";
         this.resetTextColor();
         this.drawText(rate, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
@@ -1578,7 +1592,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
           textWidth += ImageManager.iconWidth + 4;
         }
         let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
-        rate = this.statusParamDecimal(rate);
+        rate = this.statusParamDecimal(rate, list.Decimal);
         rate += list.paramUnit ? String(list.paramUnit) : " %";
         this.resetTextColor();
         this.drawText(rate, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
@@ -1692,11 +1706,12 @@ Window_Status.prototype.characterSwitchingHelp = function(list, x, y, width) {
 	this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
-Window_Status.prototype.statusParamDecimal = function(val) {
+Window_Status.prototype.statusParamDecimal = function(val, decimal) {
+  decimal = decimal !== undefined ? Number(decimal) : 0;
   if (DecimalMode) {
-    return Math.round(val * (Decimal > 0 ? Math.pow(10, Decimal) : 1)) / (Decimal > 0 ? Math.pow(10, Decimal) : 1);
+    return Math.round(val * (decimal > 0 ? Math.pow(10, decimal) : 1)) / (decimal > 0 ? Math.pow(10, decimal) : 1);
   } else {
-    return Math.floor(val * (Decimal > 0 ? Math.pow(10, Decimal) : 1)) / (Decimal > 0 ? Math.pow(10, Decimal) : 1);
+    return Math.floor(val * (decimal > 0 ? Math.pow(10, decimal) : 1)) / (decimal > 0 ? Math.pow(10, decimal) : 1);
   }
 };
 
@@ -1796,9 +1811,9 @@ Sprite_StatusExpGauge.prototype.currentPercent = function() {
 
 Sprite_StatusExpGauge.prototype.currentDecimal = function(val) {
   if (DecimalMode) {
-    return Math.round(val * (Decimal > 0 ? Math.pow(10, Decimal) : 1)) / (Decimal > 0 ? Math.pow(10, Decimal) : 1);
+    return Math.round(val * (EXPDecimal > 0 ? Math.pow(10, EXPDecimal) : 1)) / (EXPDecimal > 0 ? Math.pow(10, EXPDecimal) : 1);
   } else {
-    return Math.floor(val * (Decimal > 0 ? Math.pow(10, Decimal) : 1)) / (Decimal > 0 ? Math.pow(10, Decimal) : 1);
+    return Math.floor(val * (EXPDecimal > 0 ? Math.pow(10, EXPDecimal) : 1)) / (EXPDecimal > 0 ? Math.pow(10, EXPDecimal) : 1);
   }
 };
 

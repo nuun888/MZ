@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラー名前表示
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * モンスターに敵名を表示します。
@@ -24,13 +24,14 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/26 Ver.1.0.3
+ * MNKR_TMBattlerExMZ.jsの拡大率を適用するように修正。
  * 2021/5/24 Ver.1.0.2
  * 処理の一部を修正。
  * 2021/5/23 Ver.1.0.1
  * プラグインパラメータが反映されなかった問題を修正。
  * 2021/5/23 Ver.1.0.0
  * 初版
- * 
  * 
  * @param EnemySetting
  * @text モンスター設定
@@ -69,16 +70,32 @@
  * @default -12
  * @min -9999
  * 
+ * @param ConflictSetting
+ * @text 競合対策
+ * @default ------------------------------
+ * 
+ * @param ConflictScale
+ * @text MNKR_TMBattlerExMZ併用時の拡大率補正
+ * @desc MNKR_TMBattlerExMZ併用時の拡大率補正適用
+ * @type boolean
+ * @default false
+ * @parent ConflictSetting
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_ButlerName = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_ButlerName');
+const ActorNamePosition = Number(parameters['ActorNamePosition'] || 0);
+const ActorName_X = Number(parameters['ActorName_X'] || 0);
+const ActorName_Y = Number(parameters['ActorName_Y'] || 0);
+const ActorName_FontSize = Number(parameters['ActorName_FontSize'] || -12);
 const EnemyNamePosition = Number(parameters['EnemyNamePosition'] || 0);
 const Name_X = Number(parameters['Name_X'] || 0);
 const Name_Y = Number(parameters['Name_Y'] || 0);
 const Name_FontSize = Number(parameters['Name_FontSize'] || -12);
+const ConflictScale = eval(parameters['ConflictScale'] || 'false');
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
@@ -106,12 +123,13 @@ Sprite_Enemy.prototype.updateEnemyName = function() {
   this._butlerName.x = this.butlerNameOffsetX + (this.x - this._butlerName.width / 2);
   this._butlerName.y = this.butlerNameOffsetY + this.y - 40;
   if (EnemyNamePosition === 0) {
+    const scale = Imported.TMBattlerEx && ConflictScale ? this._baseScale.y : 1;
     if (this._SVBattlername) {
       this._butlerName.y -= Math.round(((this._mainSprite.bitmap.height / 6)) * 0.9);
     } else if (this._svBattlerSprite) {
       this._butlerName.y -= Math.round((this.height) * 0.9);
     } else {
-      this._butlerName.y -= Math.round((this.bitmap.height + 40) * 0.9);
+      this._butlerName.y -= Math.round((this.bitmap.height + 40) * 0.9) * scale;
     }
   }
   if (this._butlerName.y < 0) {

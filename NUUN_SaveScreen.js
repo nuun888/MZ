@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -45,8 +45,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2021/5/14 Ver.1.5.1
- * マップサムネの処理方法を変更。
+ * 2021/5/27 Ver.1.5.2
+ * スクリーンショットの処理を修正。
+ * 一部プラグインコマンドを削除。
+ * 2021/5/15 Ver.1.5.1
+ * スクリーンショットの処理方法を変更。
  * 2021/5/14 Ver.1.5.0
  * セーブスクリーンショットを表示する機能を追加。
  * 2021/5/11 Ver.1.4.1
@@ -210,6 +213,13 @@
  * @type boolean
  * @default true
  * @parent BackGround
+ * 
+ * @param ContentsBackGroundImg
+ * @desc コンテンツの背景画像ファイル名を指定します。1:背後　2:前面
+ * @text 背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
  * 
  * @param ContentsBackVisible
  * @text コンテンツ背景画像非表示
@@ -443,15 +453,16 @@
  * @default 0
  * @min 0
  * 
- * @command AutoSaveSaveSnap
- * @desc オートセーブ時にスクリーンショット撮影の可否を指定します。
- * @text スクリーンショット可否
+ * @command UserAutoSave
+ * @desc オートセーブをします。
+ * @text オートセーブ
  * 
  * @arg OnSaveSnap
  * @text スクリーンショット許可
  * @desc オートセーブ時のスクリーンショットを許可します。
  * @type boolean
  * @default true
+ * 
  * 
  */
 var Imported = Imported || {};
@@ -496,6 +507,7 @@ Imported.NUUN_SaveScreen = true;
   const SaveSnapY = Number(parameters['SaveSnapY'] || 0);
   const SaveSnapScale = Number(parameters['SaveSnapScale'] || 15);
   const BackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])[0]) : null;
+  const ContentsBackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsBackGroundImg'])) : null;
 
   const pluginName = "NUUN_SaveScreen";
   PluginManager.registerCommand(pluginName, 'ChangeBackground', args => {
@@ -505,8 +517,9 @@ Imported.NUUN_SaveScreen = true;
     }
   });
 
-  PluginManager.registerCommand(pluginName, 'autoSaveSaveSnap', args => {
-    $gameSystem.autoSaveSaveSnap(eval(args.OnSaveSnap));
+  PluginManager.registerCommand(pluginName, 'UserAutoSave', args => {
+    SceneManager.snapSaveBitmap(eval(args.OnSaveSnap));
+    SceneManager._scene.executeAutosave();
   });
 
   const _DataManager_loadSavefileImages = DataManager.loadSavefileImages;
@@ -527,7 +540,12 @@ Imported.NUUN_SaveScreen = true;
     info.OriginalDate1 = eval(OriginalEval1);
     info.OriginalDate2 = eval(OriginalEval2);
     info.background = $gameSystem.saveBuckgroundImg;
-    info.snap = InfoSaveSnap ? this.urlBitmap : null;
+    if ($gameSystem.onSnap) {
+      DataManager.urlBitmapData();
+      info.snap = this.urlBitmap;
+    } else {
+      info.snap = null;
+    }
     return info;
   };
 
@@ -543,10 +561,8 @@ Imported.NUUN_SaveScreen = true;
     return x.background ? x.background[1] : 0;
   };
 
-  DataManager.snapBitmap = function() { 
-    const bitmap = this._snapBitmap ? this._snapBitmap : SceneManager.backgroundBitmap();
-    this._snapBitmap = null;
-    return bitmap;
+  DataManager.snapBitmap = function() {
+    return SceneManager.getSnapBitmap();
   };
 
   DataManager.urlBitmapData = function() {
@@ -571,8 +587,34 @@ Imported.NUUN_SaveScreen = true;
     return null;
   };
 
-  SceneManager.setSnapBitmap = function() {
-    DataManager._snapBitmap = this.snap();
+  SceneManager.snapSaveBitmap = function(mode) {
+    $gameSystem.onSnap = mode;
+    if (mode) {
+      if (this._snapBitmap) {
+        this._snapBitmap.destroy();
+      }
+      this._snapBitmap = this.snap();
+    }
+  };
+
+  SceneManager.getSnapBitmap = function() {
+    return this._snapBitmap;
+  };
+
+  SceneManager.snapSaveBackground = function() {
+    $gameSystem.onSnap = InfoSaveSnap;
+    if (InfoSaveSnap) {
+      if (this._snapBitmap) {
+        this._snapBitmap.destroy();
+      }
+      this._snapBitmap = this._backgroundBitmap;
+    }
+  };
+
+  const _SceneManager_snapForBackground = SceneManager.snapForBackground;
+  SceneManager.snapForBackground = function() {
+    _SceneManager_snapForBackground.call(this);
+    this.snapSaveBackground();
   };
 
   ImageManager.loadSaveSnapBitmap = function(url) {
@@ -586,14 +628,6 @@ Imported.NUUN_SaveScreen = true;
       bitmap = ImageManager.loadBitmapFromUrl(url);
     }
     return bitmap;
-  };
-
-  const _Scene_Base_executeAutosave = Scene_Base.prototype.executeAutosave;
-  Scene_Base.prototype.executeAutosave = function() {
-    _Scene_Base_executeAutosave.call(this);
-    if ($gameSystem.isAutoSaveSaveSnap()) {
-      SceneManager.setSnapBitmap();
-    }
   };
 
   const _DataManager_maxSavefiles = DataManager.maxSavefiles;
@@ -663,7 +697,6 @@ Imported.NUUN_SaveScreen = true;
   Window_SavefileList.prototype.initialize = function(rect) {
     _Window_SavefileList_initialize.call(this, rect);
     this._contentsBackVisible = ContentsBackVisible;
-    DataManager.urlBitmapData();
   };
 
   const _Window_SavefileList_numVisibleRows = Window_SavefileList.prototype.numVisibleRows;
@@ -914,20 +947,12 @@ Imported.NUUN_SaveScreen = true;
   Game_System.prototype.initialize = function() {
     _Game_System_initialize.call(this);
     this.saveBuckgroundImg = [BackGroundImg, 0];
-    this._autoSaveSaveSnap = true;
+    this.onSnap = false;
   };
 
   Game_System.prototype.setSaveBuckGround = function(img, id) {
     const buckgroundId = AutomaticSetting ? (this.buckgroundId || 0) + 1 : id;
     this.saveBuckgroundImg = [img, buckgroundId];
-  };
-
-  Game_System.prototype.autoSaveSaveSnap = function(args) {
-    this._autoSaveSaveSnap = args;
-  };
-
-  Game_System.prototype.isAutoSaveSaveSnap = function() {
-    return this._autoSaveSaveSnap;
   };
 
   Game_System.prototype.getSaveBuckGround = function() {

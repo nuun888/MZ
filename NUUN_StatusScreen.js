@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.0.4
+ * @version 2.0.5
  * 
  * @help
  * ステータス画面を拡張します。
@@ -139,6 +139,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/28 Ver.2.0.5
+ * フロントビューでサイドビューアクターが表示されなかった問題を修正。
+ * キャラを切り替えた時にモーションが反映されない問題を修正。
  * 2021/5/24 Ver.2.0.4
  * 小数点表示を能力値にも対応。
  * 2021/5/23 Ver.2.0.3
@@ -1918,6 +1921,7 @@ Sprite_MenuSvActor.prototype.setActorHome = function(index) {
 
 Sprite_MenuSvActor.prototype.setActorPosition = function(x, y) {
   this.setHome(x, y);
+  this.refreshMotion();
 };
 
 Sprite_MenuSvActor.prototype.startMotion = function(motionType) {
@@ -1925,6 +1929,21 @@ Sprite_MenuSvActor.prototype.startMotion = function(motionType) {
     motionType = "walk";
   }
   Sprite_Actor.prototype.startMotion.call(this, motionType);
+};
+
+Sprite_MenuSvActor.prototype.updateVisibility = function() {
+  Sprite_Clickable.prototype.updateVisibility.call(this);
+  if (!this._battler) {
+    this.visible = false;
+  }
+};
+
+Sprite_MenuSvActor.prototype.updateMain = function() {
+  Sprite_Battler.prototype.updateMain.call(this);
+  if (!this._battler.isSpriteVisible()) {
+    this.updateBitmap();
+    this.updateFrame();
+  }
 };
 
 })();

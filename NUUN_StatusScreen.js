@@ -1939,7 +1939,7 @@ Sprite_MenuSvActor.prototype.updateVisibility = function() {
 };
 
 Sprite_MenuSvActor.prototype.updateMain = function() {
-  Sprite_Battler.prototype.updateMain.call(this);
+  Sprite_Actor.prototype.updateMain.call(this);
   if (!this._battler.isSpriteVisible()) {
     this.updateBitmap();
     this.updateFrame();

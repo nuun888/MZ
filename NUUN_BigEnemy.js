@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 巨大エネミー
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.4
  *            
  * @help エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
  * エネミーのメモ欄に以下のいずれかを記入してください。
@@ -25,6 +25,9 @@
  * <BigEnemyBack> 画像を一番後ろ側に表示させます。
  * <BigEnemyY:50> Y座標を50下にシフトして表示します。
  * 
+ * オプション
+ * <CorrectionScale:1.1> 拡大率の補正を行います。
+ * 
  * 仕様
  * BigEnemy及びBigEnemy:OriginalRatioは画面の横サイズに合わせて拡大されます。
  * BigEnemy:UnderPositionはオリジナルサイズのまま表示されX座標の調整は行われませんが、Yは画像の一番下が画面の下に表示されるように調整されます。
@@ -34,6 +37,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/29 Ver.1.1.3
+ * MNKR_TMBattlerExMZの息づかい、MOG_BattlerMotionのBreath Motionに対応。
  * 2021/3/20 Ver.1.1.2
  * 標準の表示順をデフォルト仕様に変更。<BigEnemyNormal>はデフォルト設定に変更されました。<BigEnemyBack>が追加されVer.1.1.1までの
  * デフォルト設定は<BigEnemyBack>を記入しなくてはならなくなりました。
@@ -100,22 +105,40 @@ Imported.NUUN_BigEnemy = true;
 
   Sprite_Enemy.prototype.setBigEnemy = function() {
     const bitmap = this.bitmap;
+    const correctionScale = this._enemy.enemy().meta.CorrectionScale;
     if (this._bigEnemy === "UnderPosition") {
       this._homeY = Graphics.height + 20;
     } else {
-      this.scale.x = Graphics.width / bitmap.width;
+      this.scale.x = Graphics.width / bitmap.width * (correctionScale || 1);
+      this._originalscaleX = this.scale.x;
       this._homeX = Graphics.boxWidth / 2;
       let height = 0;
       if (this._bigEnemy === 'OriginalRatio') {
         this.scale.y = this.scale.x;
         height = Math.floor((Graphics.height - bitmap.height * this.scale.y) / 2);
       } else {
-        this.scale.y = Graphics.height / bitmap.height;
+        this.scale.y = Graphics.height / bitmap.height * (correctionScale || 1);
       }
+      this._originalscaleY = this.scale.y;
       this._homeY = Math.floor((Graphics.height - Graphics.boxHeight) / 2 + Graphics.boxHeight) + 24 - height;
     }
     this._homeY += this._enemy.enemy().meta.BigEnemyY ? Number(this._enemy.enemy().meta.BigEnemyY) : 0;
     this.updatePosition();
+  };
+
+  const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
+  Sprite_Enemy.prototype.update = function () {
+    _Sprite_Enemy_update.call(this);
+    this.updateBigEnemy();
+  };
+
+  Sprite_Enemy.prototype.updateBigEnemy = function () {
+    if (this._bigEnemy && this.scale.x !== this._originalscaleX) {
+      this.scale.x *= this._originalscaleX;
+    }
+    if (this._bigEnemy && this.scale.y !== this._originalscaleY) {
+      this.scale.y *= this._originalscaleY;
+    }
   };
 
   const _Sprite_Enemy_updateStateSprite = Sprite_Enemy.prototype.updateStateSprite;

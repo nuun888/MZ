@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.5.2
+ * @version 1.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -45,6 +45,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/29 Ver.1.6.0
+ * サイドビューアクターを表示する機能を追加。
  * 2021/5/27 Ver.1.5.2
  * スクリーンショットの処理を修正。
  * 一部プラグインコマンドを削除。
@@ -127,6 +129,8 @@
  * @value 1
  * @option 顔グラ
  * @value 2
+ * @option サイドビューアクター
+ * @value 3
  * @default 1
  * @parent Actor
  * 
@@ -525,6 +529,11 @@ Imported.NUUN_SaveScreen = true;
   const _DataManager_loadSavefileImages = DataManager.loadSavefileImages;
   DataManager.loadSavefileImages = function(info) {
     _DataManager_loadSavefileImages.call(this, info);
+    if (info.svActor && Symbol.iterator in info.svActor) {
+      for (const character of info.svActor) {
+        ImageManager.loadSvActor(character[0]);
+      }
+    }
     if (info.snap) {
       ImageManager.loadSaveSnapBitmap(info.snap);
     }
@@ -533,6 +542,7 @@ Imported.NUUN_SaveScreen = true;
   const _DataManager_makeSavefileInfo  = DataManager.makeSavefileInfo ;
   DataManager.makeSavefileInfo = function() {
     const info = _DataManager_makeSavefileInfo.call(this);
+    info.svActor = $gameParty.svActorForSavefile();
     info.AnyName = $gameVariables.value(AnyNameVariable);
     info.mapname = $gameMap.displayName();
     info.gold = $gameParty._gold;
@@ -750,6 +760,9 @@ Imported.NUUN_SaveScreen = true;
       } else if (ActorGraphicMode === 1) {
         const bottom = rect.y + rect.height + ActorY;
         this.drawPartyCharacters(info, x, bottom - 8);
+      } else if (ActorGraphicMode === 3) {
+        const bottom = rect.y + rect.height + ActorY;
+        this.drawPartySvActors(info, x, bottom - 8);
       }
     }
     this._FaceOn = true;
@@ -804,6 +817,17 @@ Imported.NUUN_SaveScreen = true;
     }
   };
 
+  Window_SavefileList.prototype.drawPartySvActors = function(info, x, y) {
+    if (info.svActor) {
+      let characterX = x;
+      for (const data of info.svActor) {
+          this.drawSvActor(data[0], characterX, y);
+          characterX += 64;
+      }
+      this.drawPartyLeval(info, x, y, 64, 0, 0);
+    }
+  };
+
   Window_SavefileList.prototype.drawPartyFace = function(info, x, y, width, height) {
     if (info.faces) {
         let characterX = x;
@@ -813,6 +837,18 @@ Imported.NUUN_SaveScreen = true;
           characterX += faceWidth;
         }
         this.drawPartyLeval(info, x + 8, y, faceWidth, height, 1);
+    }
+  };
+
+  Window_SavefileList.prototype.drawSvActor = function(data, x, y) {
+    if (data) {
+      const motionIndex = 0;
+      const bitmap = ImageManager.loadSvActor(data);
+      const pw = Math.floor(bitmap.width / 9);
+      const ph = Math.floor(bitmap.height / 6);
+      const sx = Math.floor(motionIndex / 6) * 3;
+      const sy = motionIndex % 6;
+      this.contents.blt(bitmap, sx, sy, pw, ph, x, y - ph);
     }
   };
 
@@ -966,7 +1002,13 @@ Imported.NUUN_SaveScreen = true;
 
   Game_Party.prototype.actorLevelForSavefile = function() {
     return this.battleMembers().map(actor => [
-        actor._level,
+        actor._level
+    ]);
+  };
+
+  Game_Party.prototype.svActorForSavefile = function() {
+    return this.battleMembers().map(actor => [
+        actor.battlerName()
     ]);
   };
 

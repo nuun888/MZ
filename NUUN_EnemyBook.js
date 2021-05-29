@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.4.1
+ * @version 2.4.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -68,7 +68,7 @@
  * オリジナルパラメータ（任意のステータス）
  * 敵の使用スキル
  * モンスター画像
- * キャラチップ（未実装）
+ * キャラチップ
  * モンスターブックナンバー（未実装）
  * 
  * 戦闘中にパーティコマンドからエネミー図鑑を開くことが出来ます。
@@ -100,6 +100,12 @@
  * [fileName]:ファイル名　サイドビューバトラー画像を指定します。sv_actorsフォルダ内のファイル名を拡張子なしで指定してください。
  * <EB_SVBattlerMotion:[motionId]> 指定したモーションで表示させます。記入なしの場合は0のモーションで表示されます。
  * [motionId]:0～17モーションID(数値で入力)
+ * 
+ * <EnemyBookCharacter:[failName],[id],[direction]> キャラチップを表示します。指定していないモンスターには表示されません。
+ * [failName]:ファイル名　charactersフォルダ内のファイル名を拡張子なしで指定してください。
+ * [id]:キャラチップのインデックス番号。3×4のキャラチップは0になります。
+ * [direction]:方向を指定します。2正面（一番上） 4左（２番目） 6右（３番目） 8後向き（一番下）　※省略可能
+ * 
  * 
  * スキル、アイテムのメモ欄
  * <AnalyzeSkill:1> このスキル、アイテムはアナライズスキルとし、「アナライズスキル設定」の１番の設定で発動します。
@@ -242,6 +248,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/29 Ver.2.4.2
+ * キャラチップを表示する機能を追加。
+ * 色相が変化しているモンスターの次にサイドビューアクターが表示されると、色相が前のモンスターの色相で表示される問題を修正。
  * 2021/5/24 Ver.2.4.1
  * モンスター図鑑を開いた後に敵の情報を開くと特定の条件でエラーが起きる問題を修正。
  * 登録タイミングを遭遇時にして途中から出現するモンスターが出現せずに戦闘を終了すると図鑑に登録してしまう問題を修正。
@@ -1722,7 +1731,7 @@
  * @value 35
  * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）
  * @value 36
- * @option モンスターブックナンバー
+ * @option モンスターブックナンバー(未実装)
  * @value 37
  * @option 耐性属性
  * @value 40
@@ -1752,7 +1761,7 @@
  * @value 100
  * @option モンスター画像
  * @value 200
- * @option キャラチップ（未実装）
+ * @option キャラチップ
  * @value 201
  * @option 盗み抵抗（要盗みスキルプラグイン）（未実装）
  * @value 300
@@ -3701,9 +3710,7 @@ Window_EnemyBook.prototype.refresh = function() {
   this.contents.clear();
   this._enemySprite.bitmap = null;
   this._enemySprite._svEnemy = false;
-  if ($gameParty.inBattle()) {
-    this.removeGauge();
-  }
+  this.removeSprite();
   if (this._bookMode === 0) {//通常モード
     if (!enemy || !$gameSystem.isInEnemyBook(this._enemy)) {
       return;
@@ -3887,6 +3894,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
       break;
     case 200:
       this.enemyImg(list, enemy, x - 4, y - 4, width);
+      break;
+    case 201:
+      this.enemyCharacter(list, enemy, x, y, width);
       break;
     case 1000:
       this.horzLine(list, enemy, x, y, width);
@@ -4682,6 +4692,10 @@ Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
   }
 };
 
+Window_EnemyBook.prototype.enemyCharacter = function(list, enemy, x, y, width) {
+  this.enemyCharacterChip(enemy, x, y);
+};
+
 Window_EnemyBook.prototype.nameLength = function(name) {
 	return name.length;
 };
@@ -4707,6 +4721,29 @@ Window_EnemyBook.prototype.drawEnemyBookNumber = function(text, x, y, width,) {
   this.drawText(text , x, y, width,'right');
 };
 
+Window_EnemyBook.prototype.enemyCharacterChip = function(enemy, x, y) { 
+  const type = 'character';
+  const key = "enemyBook_%1".format(type);
+  const sprite = this.createInnerChipSprite(key, enemy.enemyId());
+  sprite._character.setPosition(x + 24, y + this.lineHeight());
+  sprite.updatePosition();
+  sprite.show();
+};
+
+Window_EnemyBook.prototype.createInnerChipSprite = function(key, id) {
+  const enemyCharacter = new Game_EnemyBookCharacter(id);
+  const dict = this._additionalSprites;
+  if (dict[key]) {
+    dict[key].setCharacter(enemyCharacter);
+    return dict[key];
+  } else {
+    const sprite = new Sprite_EnemyBookCharacter(enemyCharacter);
+    dict[key] = sprite;
+    this.addInnerChild(sprite);
+    return sprite;
+  }
+};
+
 Window_EnemyBook.prototype.placeGauge = function(enemy, type, x, y, width) {
   const padding = this.itemPadding();
   const key = "enemyBook-gauge-%2".format(enemy.enemyId(), type);
@@ -4726,6 +4763,20 @@ Window_EnemyBook.prototype.createInnerSprite = function(key, spriteClass) {
 };
 
 Window_EnemyBook.prototype.removeInnerSprite = function(type) {
+  let key = null;
+  if (type === 'character') {
+    key = "enemyBook_%1".format(type);
+  } else {
+    key = "enemyBook-gauge-%2".format(null, type);
+  }
+  const dict = this._additionalSprites;
+  if (dict[key]) {
+    this._clientArea.removeChild(dict[key]);
+    dict[key] = null;
+  }
+};
+
+Window_EnemyBook.prototype.removeInnerCharacterSprite = function(type) {
   const key = "enemyBook-gauge-%2".format(null, type);
   const dict = this._additionalSprites;
   if (dict[key]) {
@@ -4734,10 +4785,13 @@ Window_EnemyBook.prototype.removeInnerSprite = function(type) {
   }
 };
 
-Window_EnemyBook.prototype.removeGauge = function() {
-  this.removeInnerSprite('hp');
-  this.removeInnerSprite('mp');
-  this.removeInnerSprite('tp');
+Window_EnemyBook.prototype.removeSprite = function() {
+  if ($gameParty.inBattle()) {
+    this.removeInnerSprite('hp');
+    this.removeInnerSprite('mp');
+    this.removeInnerSprite('tp');
+  }
+  this.removeInnerSprite('character');
 };
 
 
@@ -5057,6 +5111,12 @@ Scene_Battle.prototype.updateVisibility = function() {
   }
 };
 
+Scene_Battle.prototype.openyBookEnemyRefresh = function() {
+  this._enemyBookEnemyWindow.show();
+  this._enemyBookEnemyWindow.open();
+  this._enemyBookEnemyWindow.refresh();
+};
+
 Scene_Battle.prototype.commandEnemyBook = function() {
   enemyBook_Open = true;
   let CategoryOn = false;
@@ -5094,10 +5154,10 @@ Scene_Battle.prototype.commandEnemyBook = function() {
       //this._enemyBookPageWindow.deselect();
     }
   }
-  this._enemyBookEnemyWindow.show();
-  this._enemyBookEnemyWindow.open();
-  this._enemyBookEnemyWindow.refresh();
+  this.openyBookEnemyRefresh();
 };
+
+
 
 Scene_Battle.prototype.commandEnemyBookInfo = function() {
   enemyBook_Open = true;
@@ -5126,9 +5186,7 @@ Scene_Battle.prototype.commandEnemyBookInfo = function() {
     this._enemyBookPageWindow.show();
     this._enemyBookPageWindow.open();
   }
-  this._enemyBookEnemyWindow.show();
-  this._enemyBookEnemyWindow.open();
-  this._enemyBookEnemyWindow.refresh();
+  this.openyBookEnemyRefresh();
 };
 
 Scene_Battle.prototype.cancelEnemyBook = function() {
@@ -5343,12 +5401,6 @@ Scene_Battle.prototype.enemyBookMainAreaTop = function() {
 
 Scene_Battle.prototype.enemyBookMainAreaHeight = function() {
   return Graphics.boxHeight - this.enemyBookMainAreaTop();
-};
-
-Scene_Battle.prototype.userWindowDeactivate = function() {//暫定競合対策
-  if (typeof this.hideFormationWindows == 'function') {
-    this.hideFormationWindows();//DarkPlasma_FormationInBattle
-  }
 };
 
 Scene_Battle.prototype.onEnemyBookIndexCancel = function() {
@@ -5588,6 +5640,8 @@ Sprite_BookEnemy.prototype.setSvActor = function() {
   const cx = Math.floor(motionIndex / 6) * 3 + pattern;
   const cy = motionIndex % 6;
   this.setFrame(cx * cw, cy * ch, cw, ch);
+  const hue = this._battler.battlerHue();
+  Sprite_Battler.prototype.setHue.call(this, hue);
 };
 
 Sprite_BookEnemy.prototype.motionSpeed = function() {
@@ -5635,4 +5689,66 @@ if (NRP_pLoopLR) {
     }
   };
 }
+
+function Game_EnemyBookCharacter() {
+  this.initialize(...arguments);
+}
+
+Game_EnemyBookCharacter.prototype = Object.create(Game_Character.prototype);
+Game_EnemyBookCharacter.prototype.constructor = Game_EnemyBookCharacter;
+
+Game_EnemyBookCharacter.prototype.initialize = function(id) {
+  Game_Character.prototype.initialize.call(this);
+  this._enemyId = id;
+  this.setStepAnime(true);
+  this.refresh();
+};
+
+Game_EnemyBookCharacter.prototype.refresh = function() {
+  const enemy = $dataEnemies[this._enemyId];
+  if (enemy && enemy.meta.EnemyBookCharacter) {
+    const data = enemy.meta.EnemyBookCharacter.split(',');
+    const characterName = String(data[0]);
+    const characterIndex = Number(data[1]);
+    this.setImage(characterName, characterIndex);
+    this.setDirection(Number(data[2]) || 0);
+  } else {
+    this.setImage("", 0);
+  }
+};
+
+Game_EnemyBookCharacter.prototype.setPosition = function(x, y) {
+  this._bookEnemyX = x;
+  this._bookEnemyY = y;
+};
+
+Game_EnemyBookCharacter.prototype.screenX = function() {
+  return this._bookEnemyX;
+};
+
+Game_EnemyBookCharacter.prototype.screenY = function() {
+  return this._bookEnemyY;
+};
+
+function Sprite_EnemyBookCharacter() {
+  this.initialize(...arguments);
+}
+
+Sprite_EnemyBookCharacter.prototype = Object.create(Sprite_Character.prototype);
+Sprite_EnemyBookCharacter.prototype.constructor = Sprite_EnemyBookCharacter;
+
+Sprite_EnemyBookCharacter.prototype.initialize = function(character) {
+  Sprite_Character.prototype.initialize.call(this, character);
+};
+
+Sprite_EnemyBookCharacter.prototype.setCharacter = function(character) {
+  this._character = character;
+};
+
+Sprite_EnemyBookCharacter.prototype.update = function() {
+  if (this.visible) {
+  Sprite_Character.prototype.update.call(this);
+    this._character.updateAnimation();
+  }
+};
 })();

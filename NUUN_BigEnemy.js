@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 巨大エネミー
  * @author NUUN
- * @version 1.1.4
+ * @version 1.1.3
  *            
  * @help エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
  * エネミーのメモ欄に以下のいずれかを記入してください。

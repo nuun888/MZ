@@ -138,7 +138,7 @@ Imported.NUUN_BigEnemy = true;
 
   Sprite_Enemy.prototype.updateBigEnemy = function () {
     if (this._bigEnemy && this.scale.x !== this._originalscaleX) {
-      this.scale.x *= this._originalscaleX;console.log(this.scale.x)
+      this.scale.x *= this._originalscaleX;
     }
     if (this._bigEnemy && this.scale.y !== this._originalscaleY) {
       this.scale.y *= this._originalscaleY;

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 巨大エネミー
  * @author NUUN
- * @version 1.1.4
+ * @version 1.1.5
  *            
  * @help エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
  * エネミーのメモ欄に以下のいずれかを記入してください。
@@ -37,6 +37,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/31 Ver.1.1.5
+ * モンスターが出現していないときは、拡大率のアップデートをしないように修正。
  * 2021/5/30 Ver.1.1.4
  * UnderPositionモードの時に画像が表示されない問題を修正。
  * 2021/5/29 Ver.1.1.3
@@ -137,10 +139,10 @@ Imported.NUUN_BigEnemy = true;
   };
 
   Sprite_Enemy.prototype.updateBigEnemy = function () {
-    if (this._bigEnemy && this.scale.x !== this._originalscaleX) {
+    if (this._appeared && this._bigEnemy && this.scale.x !== this._originalscaleX) {
       this.scale.x *= this._originalscaleX;
     }
-    if (this._bigEnemy && this.scale.y !== this._originalscaleY) {
+    if (this._appeared && this._bigEnemy && this.scale.y !== this._originalscaleY) {
       this.scale.y *= this._originalscaleY;
     }
   };

@@ -114,7 +114,7 @@ Imported.NUUN_BigEnemy = true;
       this._originalscaleY = this.scale.y * (correctionScale || 1);
     } else {
       this.scale.x = Graphics.width / bitmap.width * (correctionScale || 1);
-      this._originalscaleY = this.scale.y;
+      this._originalscaleX = this.scale.x;
       this._homeX = Graphics.boxWidth / 2;
       let height = 0;
       if (this._bigEnemy === 'OriginalRatio') {

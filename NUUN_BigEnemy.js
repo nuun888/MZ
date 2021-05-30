@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 巨大エネミー
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  *            
  * @help エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
  * エネミーのメモ欄に以下のいずれかを記入してください。
@@ -37,6 +37,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/5/30 Ver.1.1.4
+ * UnderPositionモードの時に画像が表示されない問題を修正。
  * 2021/5/29 Ver.1.1.3
  * MNKR_TMBattlerExMZの息づかい、MOG_BattlerMotionのBreath Motionに対応。
  * 2021/3/20 Ver.1.1.2
@@ -108,9 +110,11 @@ Imported.NUUN_BigEnemy = true;
     const correctionScale = this._enemy.enemy().meta.CorrectionScale;
     if (this._bigEnemy === "UnderPosition") {
       this._homeY = Graphics.height + 20;
+      this._originalscaleX = this.scale.x * (correctionScale || 1);
+      this._originalscaleY = this.scale.y * (correctionScale || 1);
     } else {
       this.scale.x = Graphics.width / bitmap.width * (correctionScale || 1);
-      this._originalscaleX = this.scale.x;
+      this._originalscaleY = this.scale.y;
       this._homeX = Graphics.boxWidth / 2;
       let height = 0;
       if (this._bigEnemy === 'OriginalRatio') {
@@ -134,7 +138,7 @@ Imported.NUUN_BigEnemy = true;
 
   Sprite_Enemy.prototype.updateBigEnemy = function () {
     if (this._bigEnemy && this.scale.x !== this._originalscaleX) {
-      this.scale.x *= this._originalscaleX;
+      this.scale.x *= this._originalscaleX;console.log(this.scale.x)
     }
     if (this._bigEnemy && this.scale.y !== this._originalscaleY) {
       this.scale.y *= this._originalscaleY;

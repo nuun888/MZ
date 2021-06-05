@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.2.1
+ * @version 1.3.0
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -29,7 +29,7 @@
  * 
  * アクター画像はデフォルトで表示するアクター画像が指定されていない場合、標準の顔グラフィックが表示されます。
  * また条件によりアクターグラフィック、顔グラが変化します。
- * 戦闘不能、被ダメージ時、溺死、勝利、詠唱時、ステートにかかっている時に変化されることが出来ます。
+ * 戦闘不能、被ダメージ時、溺死、勝利、詠唱時、攻撃時、アイテム使用時、回復スキル使用時、ステートにかかっている時に変化されることが出来ます。
  * 戦闘不能は画像指定しない場合はアクター画像が消える設定になっていますので消さない設定にするには、戦闘不能時の画像をデフォルト画像と同じ、デフォルトインデックスと同じにするか「戦闘不能時アクター画像表示」をfalseに設定してください。
  * 「立ち絵表示EX」NUUN_ActorPictureを導入することで状況により画像を設定している画像設定リストを変更することが出来ます。
  * 特定のスイッチがONならばその条件に合う条件の画像設定リストが設定されます。
@@ -76,6 +76,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/5 Ver 1.3.0
+ * アクター画像の変化に攻撃、スキル使用時、魔法使用時、アイテム使用時を追加。
+ * アクター画像のプラグインパラメータを整理。
  * 2021/4/11 Ver 1.2.1
  * ポップアップの表示間隔、解除時の不透明度を指定できる機能を追加。
  * 2021/4/5 Ver 1.2.0
@@ -875,8 +878,8 @@
  * @parent ActorStateChangePosition
  * 
  * @param StateVisible
- * @desc アイコンアイコンを表示させます。
- * @text アイコンアイコン表示
+ * @desc アイコンを表示させます。
+ * @text アイコン表示
  * @type boolean
  * @default true
  * @parent ActorStateChangePosition
@@ -976,60 +979,36 @@
  * @min 0
  * @max 999
  * 
- * @param ActorButlers
- * @text アクターグラフィック設定
+ * @param DefaultSetting
+ * @text デフォルト画像
+ * @default ------------------------------
  * 
  * @param defaultImg
  * @text デフォルト画像
  * @desc デフォルトの画像を表示します。
  * @type file
  * @dir img/pictures
- * @parent ActorButlers
+ * @parent DefaultSetting
+ * 
+ * @param defaultFaceIndex
+ * @desc デフォルトのインデックス番号。
+ * @text デフォルトインデックス番号。
+ * @type number
+ * @default -1
+ * @min -1
+ * @max 9999
+ * @parent DefaultSetting
+ * 
+ * @param DeathSetting
+ * @text 戦闘不能時画像
+ * @default ------------------------------
  * 
  * @param deathImg
  * @text 戦闘不能画像
  * @desc 戦闘不能になった時の画像を表示します。指定しない場合は戦闘不能時に画像が透明になります。
  * @type file
  * @dir img/pictures
- * @parent ActorButlers
- * 
- * @param damageImg
- * @text ダメージ時画像
- * @desc ダメージを受けた時の画像を表示します。
- * @type file
- * @dir img/pictures
- * @parent ActorButlers
- * 
- * @param dyingImg
- * @text 瀕死時画像
- * @desc 瀕死の時の画像を表示します。
- * @type file
- * @dir img/pictures
- * @parent ActorButlers
- * 
- * @param victoryImg
- * @text 勝利時画像
- * @desc 勝利時の画像を表示します。
- * @type file
- * @dir img/pictures
- * @parent ActorButlers
- * 
- * @param chantImg
- * @text 詠唱時画像
- * @desc 詠唱時の画像を表示します。
- * @type file
- * @dir img/pictures
- * @parent ActorButlers
- * 
- * @param stateImg
- * @text 被ステート時画像
- * @desc 被ステート時の画像を設定します。
- * @type struct<actorStateImgList>[]
- * @parent ActorButlers
- *  
- * @param ActorFace
- * @text 顔グラフィック設定
- * @desc アクターグラフィック設定時では表示されません。
+ * @parent DeathSetting
  * 
  * @param deathFaceIndex
  * @desc 戦闘不能時のインデックス番号。
@@ -1038,7 +1017,18 @@
  * @default -1
  * @min -1
  * @max 9999
- * @parent ActorFace
+ * @parent DeathSetting
+ * 
+ * @param DamageSetting
+ * @text ダメージ時画像
+ * @default ------------------------------
+ * 
+ * @param damageImg
+ * @text ダメージ時画像
+ * @desc ダメージを受けた時の画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * @parent DamageSetting
  * 
  * @param damageFaceIndex
  * @desc ダメージ時のインデックス番号。
@@ -1047,7 +1037,18 @@
  * @default -1
  * @min -1
  * @max 9999
- * @parent ActorFace
+ * @parent DamageSetting
+ * 
+ * @param DyingSetting
+ * @text 瀕死時画像
+ * @default ------------------------------
+ * 
+ * @param dyingImg
+ * @text 瀕死時画像
+ * @desc 瀕死の時の画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * @parent DyingSetting
  * 
  * @param dyingFaceIndex
  * @desc 瀕死時のインデックス番号。
@@ -1056,7 +1057,18 @@
  * @default -1
  * @min -1
  * @max 9999
- * @parent ActorFace
+ * @parent DyingSetting
+ * 
+ * @param VictorySetting
+ * @text 勝利時画像
+ * @default ------------------------------
+ * 
+ * @param victoryImg
+ * @text 勝利時画像
+ * @desc 勝利時の画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * @parent VictorySetting
  * 
  * @param victoryFaceIndex
  * @desc 勝利時のインデックス番号。
@@ -1065,7 +1077,18 @@
  * @default -1
  * @min -1
  * @max 9999
- * @parent ActorFace
+ * @parent VictorySetting
+ * 
+ * @param ChantSetting
+ * @text 詠唱時画像
+ * @default ------------------------------
+ * 
+ * @param chantImg
+ * @text 詠唱時画像
+ * @desc 詠唱時の画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * @parent ChantSetting
  * 
  * @param chantFaceIndex
  * @desc 詠唱時のインデックス番号。
@@ -1074,13 +1097,69 @@
  * @default -1
  * @min -1
  * @max 9999
- * @parent ActorFace
+ * @parent ChantSetting
  * 
- * @param stateFaceIndex
- * @text 被ステート時インデックス番号
- * @desc 被ステート時のインデックス番号。
- * @type struct<actorStateFaceIndexList>[]
- * @parent ActorFace
+ * @param AttackSetting
+ * @text 攻撃時画像
+ * @default ------------------------------
+ * 
+ * @param attackImg
+ * @text 攻撃、スキル使用時画像
+ * @desc 攻撃、スキル使用時の画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * @parent AttackSetting
+ * 
+ * @param itemImg
+ * @text アイテム使用時画像
+ * @desc アイテム使用時の画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * @parent AttackSetting
+ * 
+ * @param recoveryImg
+ * @text 回復スキル使用時画像
+ * @desc 回復スキル使用時の画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * @parent AttackSetting
+ * 
+ * @param attackFaceIndex
+ * @desc 攻撃、スキル使用時のインデックス番号。
+ * @text 攻撃、スキル使用時インデックス番号
+ * @type number
+ * @default -1
+ * @min -1
+ * @max 9999
+ * @parent AttackSetting
+ * 
+ * @param itemFaceIndex
+ * @desc アイテム使用時のインデックス番号。
+ * @text アイテム使用時インデックス番号
+ * @type number
+ * @default -1
+ * @min -1
+ * @max 9999
+ * @parent AttackSetting
+ * 
+ * @param recoveryFaceIndex
+ * @desc 回復スキル使用時のインデックス番号。
+ * @text 回復スキル使用時インデックス番号
+ * @type number
+ * @default -1
+ * @min -1
+ * @max 9999
+ * @parent AttackSetting
+ * 
+ * @param StateSetting
+ * @text 被ステート時画像
+ * @default ------------------------------
+ * 
+ * @param stateImg
+ * @text 被ステート時画像
+ * @desc 被ステート時の画像を設定します。
+ * @type struct<actorStateImgList>[]
+ * @parent StateSetting
  * 
  */
 /*~struct~actorStateImgList:
@@ -1091,10 +1170,19 @@
  * @type file
  * @dir img/pictures
  * 
+ * @param stateFaceIndex
+ * @desc 被ステート時のインデックス番号。
+ * @text 被ステート時インデックス番号
+ * @type number
+ * @default -1
+ * @min -1
+ * @max 9999
+ * 
  * @param stateImgId
  * @text 変化ID
  * @desc 変化するステートのIDを指定します。ステートのメモ欄に<ChangeImgId:[id]>を記入してください。[id]:変化ID
  * @type number
+ * @default 0
  * @min 0
  * @max 9999
  * 

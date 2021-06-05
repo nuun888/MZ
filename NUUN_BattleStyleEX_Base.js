@@ -11,11 +11,14 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.2.3
+ * @version 2.3.0
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/6/5 Ver 2.3.0
+ * アクター画像表示処理を大幅に修正。
+ * 顔グラの0番が反映されなかった問題を修正。
  * 2021/5/21 Ver 2.2.3
  * 選択時ウィンドウ不透明度を0に設定すると不透明度が反映されない問題を修正。
  * 2021/4/20 Ver 2.2.2
@@ -195,6 +198,10 @@ loadBattleStyleActorImg = function(filename) {
   return ImageManager.loadPicture(filename);
 };
 
+function nuun_loadPictures(img) {
+  return Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(img) : loadBattleStyleActorImg(img);
+}
+
 //Game_Temp
 Game_Temp.prototype.setBattleEffectsRefresh = function(flag) {
   this._battleEffectRefresh = flag;
@@ -243,6 +250,7 @@ const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
   this._imgIndex = 0;
+  this._actionActorImg = null;
 };
 
 const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
@@ -257,9 +265,29 @@ Game_Actor.prototype.performVictory = function() {
   this._imgIndex = 5;
 };
 
+const _Game_Actor_performActionStart = Game_Actor.prototype.performActionStart;
+Game_Actor.prototype.performActionStart = function(action) {
+  _Game_Actor_performActionStart.call(this, action);
+  this.setAttackImg(action);
+};
+
+Game_Actor.prototype.setAttackImg = function(action) {
+  if (action.isRecover()) {
+    this._actionActorImg = "recovery"
+  } else if (action.isAttack()) {
+    this._actionActorImg = "attack"
+  } else if (action.isMagicSkill()) {
+    this._actionActorImg = "attack"
+  } else if (action.isSkill()) {
+    this._actionActorImg = "attack"
+  } else if (action.isItem()) {
+    this._actionActorImg = "item"
+  }
+};
+
 const _Game_Actor_isSpriteVisible = Game_Actor.prototype.isSpriteVisible;
 Game_Actor.prototype.isSpriteVisible = function() {
-   return !$gameSystem.isSideView() && param.ActorEffectShow ? param.ActorEffectShow : _Game_Actor_isSpriteVisible.call(this);
+  return (!$gameSystem.isSideView() && param.ActorEffectShow) ? param.ActorEffectShow : _Game_Actor_isSpriteVisible.call(this);
 };
 
 //Game_Enemy
@@ -1141,31 +1169,28 @@ Window_BattleActorImges.prototype.drawItemBackground = function(index) {
 
 Window_BattleActorImges.prototype.preparePartyRefresh = function() {
   this._bitmapsReady = 0;
-  this.actorSpriteDeta = [];
+  this.actorMainSprite = [];
+  let bitmap = null;
   for (const actor of $gameParty.members()) {
-    let date;
-    if (Imported.NUUN_ActorPicture) {
-      actor.setActorButler();
-      date = actor.getActorButlerList();
-      const date2 = this.battlreActorImges(actor._actorId);//座標拡大率取得用
-      date.Actor_X = date2.Actor_X;
-      date.Actor_Y = date2.Actor_Y;
-      date.Actor_Scale = date2.Actor_Scale;
+    const dateIndex = this.battlreActorIndex(actor._actorId);
+    const data = this.battlreActorImgesData(dateIndex);
+    if (data) {
+      actor.battleActorFaceMode = data.defaultImg ? false : true;
+      actor.butlerImgId = dateIndex;
     } else {
-      date = this.battlreActorImges(actor._actorId);
+      actor.battleActorFaceMode = true;
+      actor.butlerImgId = -1;
     }
-    if(date.defaultImg) {
-      date._onFace = false;
-      this.loadBitmap(date);
+    if (!actor.battleActorFaceMode) {
+      bitmap = this.loadBitmap(data);
     } else {
-      date._onFace = true;
-      this.loadFace(actor, date);
+      bitmap = this.loadFace(actor, data);
     }
-    this.actorSpriteDeta.push(date);
-    if(date.defaultBitmap && !date.defaultBitmap.isReady()){
-      date.defaultBitmap.addLoadListener(this.performPartyRefresh.bind(this));
+    this.actorMainSprite.push(bitmap);
+    if(bitmap && !bitmap.isReady()){
+      bitmap.addLoadListener(this.performPartyRefresh.bind(this, bitmap));
     } else {
-      this.performPartyRefresh(this);
+      this.performPartyRefresh(bitmap);
     }
   }
 };
@@ -1173,77 +1198,79 @@ Window_BattleActorImges.prototype.preparePartyRefresh = function() {
 Window_BattleActorImges.prototype.performPartyRefresh = function() {
   this._bitmapsReady++;
   if (this._bitmapsReady >= $gameParty.members().length) {
-    if (Imported.NUUN_ActorPicture) {
-      $gameTemp.setButlerRefresh(false);
-    }
+    //if (Imported.NUUN_ActorPicture) {
+    //  $gameTemp.setButlerRefresh(false);
+    //}
     this.refresh();
   }
 };
 
-Window_BattleActorImges.prototype.battlreActorImges = function(id) {
+Window_BattleActorImges.prototype.battlreActorIndex = function(id) {
   const actors = param.ActorsButlerList;
-  const deta = actors.find(actor => actor.actorId === id);
-  return deta ? deta : this.undefinedDeta(id, deta);
+  return actors.findIndex(actor => actor.actorId === id);
 };
 
-Window_BattleActorImges.prototype.undefinedDeta = function(id, deta) {
-  deta = {};
-  deta.id = id;
-  deta.Actor_X = 0;
-  deta.Actor_Y = 0;
-  deta.Actor_Scale = 100;
-  deta.deathFaceIndex = -1;
-  deta.damageFaceIndex = -1;
-  deta.dyingFaceIndex = -1;
-  deta.victoryFaceIndex = -1;
-  deta.chantFaceIndex = -1;
-  deta.stateBitmap = [];
-  return deta;
+Window_BattleActorImges.prototype.battlreActorImgesData = function(id) {
+  return param.ActorsButlerList[id];
 };
 
-Window_BattleActorImges.prototype.loadBitmap = function(deta) {
-  deta.stateBitmap = [];
-  deta.defaultBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.defaultImg) : loadBattleStyleActorImg(deta.defaultImg);
-  if (deta.deathImg) {
-    deta.deathBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.deathImg) : loadBattleStyleActorImg(deta.deathImg);
+
+
+Window_BattleActorImges.prototype.loadBitmap = function(data) {
+  if (!data) {
+    return null;
   }
-  if (deta.dyingImg) {
-    deta.dyingBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.dyingImg) : loadBattleStyleActorImg(deta.dyingImg);
+  data.stateBitmapIndex = [];
+  const defaultBitmap = nuun_loadPictures(data.defaultImg);
+  if (data.deathImg) {
+    nuun_loadPictures(data.deathImg);
   }
-  if (deta.damageImg) {
-    deta.damageBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.damageImg) : loadBattleStyleActorImg(deta.damageImg);
+  if (data.dyingImg) {
+    nuun_loadPictures(data.dyingImg);
   }
-  if (deta.victoryImg) {
-    deta.victoryBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.victoryImg) : loadBattleStyleActorImg(deta.victoryImg);
+  if (data.damageImg) {
+    nuun_loadPictures(data.damageImg);
   }
-  if (deta.chantImg) {
-    deta.chantBitmap = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(deta.chantImg) : loadBattleStyleActorImg(deta.chantImg);
+  if (data.victoryImg) {
+    nuun_loadPictures(data.victoryImg);
   }
-  if (deta.stateImg){
-    for (const listdeta of deta.stateImg) {
+  if (data.chantImg) {
+    nuun_loadPictures(data.chantImg);
+  }
+  if (data.attackImg) {
+    nuun_loadPictures(data.attackImg);
+  }
+  if (data.itemImg) {
+    nuun_loadPictures(data.itemImg);
+  }
+  if (data.recoveryImg) {
+    nuun_loadPictures(data.recoveryImg);
+  }
+  if (data.stateImg){
+    let i = 0;
+    for (const listdeta of data.stateImg) {
       if(listdeta.actorStateImg && listdeta.stateImgId > 0){
-        deta.stateBitmap[listdeta.stateImgId] = {};
-        deta.stateBitmap[listdeta.stateImgId].imges = Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(listdeta.actorStateImg) : loadBattleStyleActorImg(listdeta.actorStateImg);
-        deta.stateBitmap[listdeta.stateImgId].always = listdeta.Always ? true : false;
-        deta.stateBitmap[listdeta.stateImgId].priorityId = listdeta.priorityId;
+        nuun_loadPictures(listdeta.actorStateImg.actorStateImg);
+        data.stateBitmapIndex[listdeta.stateImgId] = i;
       }
+      i++;
     }
   }
+  return defaultBitmap;
 };
 
-Window_BattleActorImges.prototype.loadFace = function(actor,deta) {
-  deta.stateBitmap = [];
-  deta.defaultBitmap = ImageManager.loadFace(actor.faceName());
-  if(deta.stateFaceIndex){
-    for (const listdeta of deta.stateFaceIndex) {
-      if(listdeta.actorStateIndex >= 0 && listdeta.stateFaceId > 0){
-        deta.stateBitmap[listdeta.stateFaceId] = {};
-        deta.stateBitmap[listdeta.stateFaceId].FaceId = listdeta.actorStateIndex;
-        deta.stateBitmap[listdeta.stateFaceId].always = listdeta.Always ? true : false;
-        deta.stateBitmap[listdeta.stateFaceId].priorityId = listdeta.priorityId;
+Window_BattleActorImges.prototype.loadFace = function(actor, data) {
+  data.stateBitmapIndex = [];
+  if (data.stateImg){
+    let i = 0;
+    for (const listdeta of data.stateImg) {
+      if(listdeta.stateFaceIndex >= 0 && listdeta.stateImgId > 0){
+        data.stateBitmapIndex[listdeta.stateImgId] = i; 
       }
+      i++;
     }
   }
+  return ImageManager.loadFace(actor.faceName());
 };
 
 Window_BattleActorImges.prototype.drawItem = function(index) {
@@ -1252,11 +1279,11 @@ Window_BattleActorImges.prototype.drawItem = function(index) {
 
 Window_BattleActorImges.prototype.drawItemImage = function(index) {
   const actor = this.actor(index);
-  const deta = this.actorSpriteDeta[index];
-  if(!deta._onFace) {
-    this.drawItemButler(index, actor, deta);
+  const data = this.battlreActorImgesData(actor.butlerImgId);
+  if (data && !actor.battleActorFaceMode) {
+    this.drawItemButler(index, actor, data);
   } else if (param.ActorFaceVisible) {
-    this.drawItemFace(index, actor, deta);
+    this.drawItemFace(index, actor, data);
   }
   if (param.StateVisible && param.OutsideWindowVisible) {
     const rect = this.itemRectWithPadding(index);
@@ -1274,35 +1301,37 @@ Window_BattleActorImges.prototype.placeStateIcon = function(actor, x, y) {
   sprite.show();
 };
 
-Window_BattleActorImges.prototype.drawItemButler = function(index, actor, deta) {
+Window_BattleActorImges.prototype.drawItemButler = function(index, actor, data) {
+  const bitmap = this.actorMainSprite[index];
   const rect = this.itemRect(index);
   const key = "actor%1-img".format(actor.actorId());
   const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
-  sprite.setup(actor, deta);
-  const x = rect.x + Math.floor((this.itemWidth() - (deta.defaultBitmap.width * deta.Actor_Scale / 100)) / 2) + 4 + param.ActorImg_X + deta.Actor_X;
-  const y = rect.y + rect.height - Math.floor(deta.defaultBitmap.height * deta.Actor_Scale / 100) + 7 + param.ActorImg_Y + deta.Actor_Y;
-  sprite.scale.x = deta.Actor_Scale / 100;
-  sprite.scale.y = deta.Actor_Scale / 100;
+  sprite.setup(actor, data);
+  const x = rect.x + Math.floor((this.itemWidth() - (bitmap.width * data.Actor_Scale / 100)) / 2) + 4 + param.ActorImg_X + data.Actor_X;
+  const y = rect.y + rect.height - Math.floor(bitmap.height * data.Actor_Scale / 100) + 7 + param.ActorImg_Y + data.Actor_Y;
+  sprite.scale.x = data.Actor_Scale / 100;
+  sprite.scale.y = data.Actor_Scale / 100;
   sprite.move(x, y);
   sprite.show();
 };
 
-Window_BattleActorImges.prototype.drawItemFace = function(index, actor, deta) {
+Window_BattleActorImges.prototype.drawItemFace = function(index, actor, data) {
   const rect = this.faceRect(index);
   width = rect.width || ImageManager.faceWidth;
   height = rect.height || ImageManager.faceHeight;
+  const faceIndex = data.defaultFaceIndex >= 0 ? data.defaultFaceIndex : actor.faceIndex();
   const key = "actor%1-img".format(actor.actorId());
   const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
   sprite.bitmap = ImageManager.loadFace(actor.faceName());
-  sprite.setup(actor, deta);
+  sprite.setup(actor, data);
   const pw = ImageManager.faceWidth;
   const ph = ImageManager.faceHeight;
   const sw = Math.min(width, pw);
   const sh = Math.min(height, ph);
   sprite.x = Math.floor(rect.x + Math.max(width - pw, 0) / 2) + 8;
   sprite.y = Math.floor(rect.y + Math.max(height - ph, 0) / 2);
-  const sx = Math.floor((actor.faceIndex() % 4) * pw + (pw - sw) / 2);
-  const sy = Math.floor(Math.floor(actor.faceIndex() / 4) * ph + (ph - sh) / 2);
+  const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+  const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
   sprite.setFrame(sx, sy, sw, sh);
   sprite._rectWidth = rect.width;
   sprite._rectHeight = rect.height;
@@ -1529,24 +1558,24 @@ Sprite_Battler.prototype.createStatePopupSprite = function() {
   this.parent.addChild(sprite);
 };
 
-const _Sprite_Battler_updateVisibility = Sprite_Battler.prototype.updateVisibility;
-Sprite_Battler.prototype.updateVisibility = function() {
-  _Sprite_Battler_updateVisibility.call(this);
-  if (this._battler && this._battler.isActor() && !$gameSystem.isSideView() && this.visible) {
+const _Sprite_Actor_updateVisibility = Sprite_Actor.prototype.updateVisibility;
+Sprite_Actor.prototype.updateVisibility = function() {
+  _Sprite_Actor_updateVisibility.call(this);
+  if (!$gameSystem.isSideView()) {
     this.visible = false;
   }
 };
 
-const _Sprite_Battler_startMove = Sprite_Battler.prototype.startMove;
-Sprite_Battler.prototype.startMove = function(x, y, duration) {
-  if (this._battler && this._battler.isActor() && $gameSystem.isSideView()) {
-    _Sprite_Battler_startMove.call(this, x, y, duration);
+const _Sprite_Actor_startMove = Sprite_Actor.prototype.startMove;
+Sprite_Actor.prototype.startMove = function(x, y, duration) {
+  if (this.visible) {
+    _Sprite_Actor_startMove.call(this, x, y, duration);
   }
 };
 
 const _Sprite_Actor_updateMotion = Sprite_Actor.prototype.updateMotion;
 Sprite_Actor.prototype.updateMotion = function() {
-  if ($gameSystem.isSideView()) {
+  if (this.visible) {
     _Sprite_Actor_updateMotion.call(this);
   }
 };
@@ -1653,12 +1682,12 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._selectionEffectCount = 0;
 };
 
-Sprite_ActorImges.prototype.setup = function(battler, deta) {
+Sprite_ActorImges.prototype.setup = function(battler, data) {
   this._battler = battler;
-  this._deta = deta;
-  if (Imported.NUUN_ActorPicture) {
-    this._actorButler = this._battler._actorButler;
-  }
+  this._data = data;
+  //if (Imported.NUUN_ActorPicture) {
+  //  this._actorButler = this._battler._actorButler;
+  //}
   this.updateBitmap();
 };
 
@@ -1671,6 +1700,9 @@ Sprite_ActorImges.prototype.update = function() {
         this._imgIndex = -1;
         this._actorButler.imgChange = false;
       }
+    }
+    if (!this._battler.isActing() && this._battler._actionActorImg) {
+      this._battler._actionActorImg === null;
     }
     this.updateBitmap();
     this.updateSelectionEffect();
@@ -1691,16 +1723,22 @@ Sprite_ActorImges.prototype.faceRefresh = function(faceIndex) {
 
 Sprite_ActorImges.prototype.updateBitmap = function() {
   const actor = this._battler;
-  if (actor) {
+  if (actor && this._data) {
     if (actor.isDead()) {
-      this.changeBitmap("dead");   
-    } else if (!actor.isDead() && this._imgIndex === 1) {
+      this.changeBitmap("dead");
+    } else if (actor.isAlive() && this._imgIndex === actor._actionActorImg) {
       this.changeBitmap("revive");
     } else if (actor._states.length > 0 && this.stateImgCheck(true)) {
       this.changeBitmap("alwaysAbnormal");
-    } else if (actor._imgIndex === 5 && this.changeCheck("victory")) {
+    } else if (!actor.isInputting() && actor.isActing() && this.isAction(actor) && this.changeCheck("attack")) {
+      this.changeBitmap("attack");
+    } else if (!actor.isInputting() && actor.isActing() && this.isItem(actor) && this.changeCheck("item")) {
+      this.changeBitmap("item");
+    } else if (!actor.isInputting() && actor.isActing() && this.isRecovery(actor) && this.changeCheck("recovery")) {
+      this.changeBitmap("recovery");
+    } else if (this.checkVictory(actor) && this.changeCheck("victory")) {
       this.changeBitmap("victory");
-    } else if (actor._imgIndex === 3 && this.changeCheck("damage")) {
+    } else if (this.checkDamage(actor) && this.changeCheck("damage")) {
       this.changeBitmap("damage");
     } else if (actor.isChanting() && this.changeCheck("chant")) {
       this.changeBitmap("chant");
@@ -1719,6 +1757,38 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
   }
 };
 
+Sprite_ActorImges.prototype.checkDamage = function(actor) {
+  return actor._imgIndex === 3;
+};
+
+Sprite_ActorImges.prototype.checkVictory = function(actor) {
+  return actor._imgIndex === 5;
+};
+
+Sprite_ActorImges.prototype.isAction = function(actor) {
+  return actor._actionActorImg === "attack";
+};
+
+Sprite_ActorImges.prototype.isItem = function(actor) {
+  return actor._actionActorImg === "item";
+};
+
+Sprite_ActorImges.prototype.isRecovery = function(actor) {
+  return actor._actionActorImg === "recovery";
+};
+
+Sprite_ActorImges.prototype.setLoadBitmap = function() {
+  if (this.loadBitmap && !this.loadBitmap.isReady()) {
+    this.loadBitmap.addLoadListener(this.setBitmap.bind(this, this.loadBitmap));
+  } else if (this.loadBitmap) {
+    this.setBitmap(this.loadBitmap);
+  }
+};
+
+Sprite_ActorImges.prototype.setBitmap = function(bitmap) {
+  this.bitmap = bitmap;
+};
+
 Sprite_ActorImges.prototype.stateImgCheck = function(mode){
   this._changeStateImgId = 0;
   const id = this.stateImg(mode);
@@ -1734,32 +1804,51 @@ Sprite_ActorImges.prototype.changeCheck = function(bitmapType){
   switch (bitmapType) {
     case "damage":
       if (mode) {
-        return this._deta.damageFaceIndex > 0 ? true : false;
+        return this._data.damageFaceIndex >= 0 ? true : false;
       } else {
-        return this._deta.damageBitmap ? true : false;
+        return this._data.damageImg ? true : false;
       }
     case "dying":
       if (mode) {
-        return this._deta.dyingFaceIndex > 0 ? true : false;
+        return this._data.dyingFaceIndex >= 0 ? true : false;
       } else {
-        return this._deta.dyingBitmap ? true :false;
+        return this._data.dyingImg ? true : false;
       }
     case "victory":
       if (mode) {
-        return this._deta.victoryFaceIndex > 0 ? true : false;
+        return this._data.victoryFaceIndex >= 0 ? true : false;
       } else {
-        return this._deta.victoryBitmap ? true :false;
+        return this._data.victoryImg ? true : false;
       }
     case "chant":
       if (mode) {
-        return this._deta.chantFaceIndex > 0 ? true : false;
+        return this._data.chantFaceIndex >= 0 ? true : false;
       } else {
-        return this._deta.chantBitmap ? true :false;
+        return this._data.chantImg ? true : false;
+      }
+    case "attack":
+      if (mode) {
+        return this._data.attackFaceIndex >= 0 ? true : false;
+      } else {
+        return this._data.attackImg ? true : false;
+      }
+    case "item":
+      if (mode) {
+        return this._data.itemFaceIndex >= 0 ? true : false;
+      } else {
+        return this._data.itemImg ? true : false;
+      }
+    case "recovery":
+      if (mode) {
+        return this._data.recoveryFaceIndex >= 0 ? true : false;
+      } else {
+        return this._data.recoveryImg ? true : false;
       }
   }
 };
 
 Sprite_ActorImges.prototype.changeBitmap = function(bitmapType) {
+  this.loadBitmap = null;
   switch (bitmapType) {
     case "dead":
       if(this._imgIndex !== 1) {
@@ -1791,6 +1880,21 @@ Sprite_ActorImges.prototype.changeBitmap = function(bitmapType) {
         this.setVictory();
       }
       break;
+    case "attack":
+      if (this._imgIndex !== 6) {
+        this.setAttack();
+      }
+      break;
+    case "item":
+      if (this._imgIndex !== 8) {
+        this.setItem();
+      }
+      break;
+    case "recovery":
+      if (this._imgIndex !== 9) {
+        this.setRecovery();
+      }
+      break;
     case "alwaysAbnormal":
       if (this._imgIndex !== this._changeStateImgId + 2000) {
         this.setState(true);
@@ -1814,55 +1918,75 @@ Sprite_ActorImges.prototype.refreshBitmap = function() {
     const mode = this.faceMode();
     if (this._imgIndex === 1) { //戦闘不能
       if (mode) {
-        faceIndex = this._deta.deathFaceIndex;
-        if (faceIndex > 0) {
+        faceIndex = this._data.deathFaceIndex;
+        if (faceIndex >= 0) {
           this.faceRefresh(faceIndex);
         }
       } else {
-        if (this._deta.deathBitmap) {
-          this.bitmap = this._deta.deathBitmap;
-        }
+        this.setLoadBitmap();
       }
     } else if (this._imgIndex === 2) { //瀕死
       if (mode) {
-        faceIndex = this._deta.dyingFaceIndex;
+        faceIndex = this._data.dyingFaceIndex;
         this.faceRefresh(faceIndex);
       } else {
-        this.bitmap = this._deta.dyingBitmap;
+        this.setLoadBitmap();
       }
     } else if (this._imgIndex === 3) { //ダメージ
       if (mode) {
-        faceIndex = this._deta.damageFaceIndex;
+        faceIndex = this._data.damageFaceIndex;
         this.faceRefresh(faceIndex);
       } else {
-        this.bitmap = this._deta.damageBitmap;
+        this.setLoadBitmap();
       }
     } else if (this._imgIndex === 4) { //詠唱
       if (mode) {
-        faceIndex = this._deta.chantFaceIndex;
+        faceIndex = this._data.chantFaceIndex;
         this.faceRefresh(faceIndex);
       } else {
-        this.bitmap = this._deta.chantBitmap;
+        this.setLoadBitmap();
       }
     } else if (this._imgIndex === 5) { //勝利
       if (mode) {
-        faceIndex = this._deta.victoryFaceIndex;
+        faceIndex = this._data.victoryFaceIndex;
         this.faceRefresh(faceIndex);
       } else {
-        this.bitmap = this._deta.victoryBitmap;
+        this.setLoadBitmap();
+      }
+    } else if (this._imgIndex === 6) { //攻撃時 
+      if (mode) {
+        faceIndex = this._data.attackFaceIndex;
+        this.faceRefresh(faceIndex);
+      } else {
+        this.setLoadBitmap();
+      }
+    } else if (this._imgIndex === 8) { //アイテム使用時
+      if (mode) {
+        faceIndex = this._data.itemFaceIndex;
+        this.faceRefresh(faceIndex);
+      } else {
+        this.setLoadBitmap();
+      }
+    } else if (this._imgIndex === 9) { //回復時
+      if (mode) {
+        faceIndex = this._data.recoveryFaceIndex;
+        this.faceRefresh(faceIndex);
+      } else {
+        this.setLoadBitmap();
       }
     } else if (this._imgIndex >= 1000) { //ステート
       if (mode) {
-        faceIndex = this._deta.stateBitmap[this._changeStateImgId].FaceId;
+        faceIndex = this._data.stateImg[this._data.stateBitmapIndex[this._changeStateImgId]].stateFaceIndex;
         this.faceRefresh(faceIndex);
       } else {
-        this.bitmap = this._deta.stateBitmap[this._changeStateImgId].imges;
+        this.setLoadBitmap();
       }
     } else {
       if (mode) { //通常
-        this.faceRefresh(this._battler.faceIndex());
+        const faceIndex = this._data.defaultFaceIndex >= 0 ? this._data.defaultFaceIndex : this._battler.faceIndex();
+        this.faceRefresh(faceIndex);
       } else {
-        this.bitmap = this._deta.defaultBitmap;
+        this.setLoadBitmap();
       }
     }
     this.updateAnimation();
@@ -1886,59 +2010,113 @@ Sprite_ActorImges.prototype.updateAnimation = function(){
 
 Sprite_ActorImges.prototype.setDead = function(){
   const mode = this.faceMode();
-  if (((mode && this._deta.deathFaceIndex < 0) || (!mode && !this._deta.deathBitmap)) && param.imgDeathHide) {
+  if (((mode && this._data.deathFaceIndex <= 0) || (!mode && !this._data.deathImg)) && param.imgDeathHide) {
     this._updateCount = this.setDeadDuration();
     this._durationOpacity = 255;
   } else {
     this._updateCount = 1;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.deathImg);
+    }
   }
   this._imgIndex = 1;
 };
 
 Sprite_ActorImges.prototype.setRevive = function(){
   const mode = this.faceMode();
-  if (((mode && this._deta.deathFaceIndex < 0) || (!mode && !this._deta.deathBitmap)) && param.imgDeathHide) {
+  if (((mode && this._data.deathFaceIndex < 0) || (!mode && !this._data.deathImg)) && param.imgDeathHide) {
     this._updateCount = this.setDeadDuration();
     this._durationOpacity = -255;
   } else {
     this._updateCount = 1;
   }
-  if (this._battler.isDying() && ((mode && this._deta.dyingFaceIndex > 0) || (!mode && this._deta.dyingBitmap))) {
+  if (this._battler.isDying() && ((mode && this._data.dyingFaceIndex >= 0) || (!mode && this._data.dyingImg))) {
     this._imgIndex = 2;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.dyingImg);
+    }
   } else {
     this._imgIndex = 0;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.defaultImg);
+    }
   }
 };
 
 Sprite_ActorImges.prototype.setVictory = function(){
   const mode = this.faceMode();
-  if ((mode && this._deta.victoryFaceIndex > 0) || (!mode && this._deta.victoryBitmap)) {
+  if ((mode && this._data.victoryFaceIndex >= 0) || (!mode && this._data.victoryImg)) {
     this._updateCount = Infinity;
     this._imgIndex = 5;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.victoryImg);
+    }
+  }
+};
+
+Sprite_ActorImges.prototype.setAttack = function(){
+  const mode = this.faceMode();
+  if ((mode && this._data.attackFaceIndex >= 0) || (!mode && this._data.attackImg)) {
+    this._updateCount = 1;
+    this._imgIndex = 6;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.attackImg);
+    }
+  }
+};
+
+Sprite_ActorImges.prototype.setItem = function(){
+  const mode = this.faceMode();
+  if ((mode && this._data.itemFaceIndex >= 0) || (!mode && this._data.itemImg)) {
+    this._updateCount = 1;
+    this._imgIndex = 8;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.itemImg);
+    }
+  }
+};
+
+Sprite_ActorImges.prototype.setRecovery = function(){
+  const mode = this.faceMode();
+  if ((mode && this._data.recoveryFaceIndex >= 0) || (!mode && this._data.recoveryImg)) {
+    this._updateCount = 1;
+    this._imgIndex = 9;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.recoveryImg);
+    }
   }
 };
 
 Sprite_ActorImges.prototype.setChant = function(){
   const mode = this.faceMode();
-  if ((mode && this._deta.chantFaceIndex > 0) || (!mode && this._deta.chantBitmap) && this._updateCount <= 0) {
+  if ((mode && this._data.chantFaceIndex >= 0) || (!mode && this._data.chantImg) && this._updateCount <= 0) {
     this._updateCount = 1;
     this._imgIndex = 4;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.chantImg);
+    }
   }
 };
 
 Sprite_ActorImges.prototype.setDying = function(){
   const mode = this.faceMode();
-  if ((mode && this._deta.dyingFaceIndex > 0) || (!mode && this._deta.dyingBitmap) && this._updateCount <= 0) {
+  if ((mode && this._data.dyingFaceIndex >= 0) || (!mode && this._data.dyingImg) && this._updateCount <= 0) {
     this._updateCount = 1;
     this._imgIndex = 2;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.dyingImg);
+    }
   }
 };
 
 Sprite_ActorImges.prototype.setDamage = function(){
   const mode = this.faceMode();
-  if ((mode && this._deta.damageFaceIndex > 0) || (!mode && this._deta.damageBitmap)) {
+  if ((mode && this._data.damageFaceIndex >= 0) || (!mode && this._data.damageImg)) {
     this._imgIndex = 3;
     this._updateCount = this.setDamageDuration();
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.damageImg);
+    }
   }
 };
 
@@ -1947,6 +2125,9 @@ Sprite_ActorImges.prototype.setState = function(mode){
   if (id > 0 && this._imgIndex !== (mode ? 2000 : 1000 ) + id && this._updateCount <= 0) {
     this._imgIndex = (mode ? 2000 : 1000 ) + id;
     this._updateCount = 1;
+    if (!this.faceMode()) {
+      this.loadBitmap = nuun_loadPictures(this._data.stateImg[this._data.stateBitmapIndex[id]].actorStateImg);
+    }
   }
 };
 
@@ -1954,6 +2135,9 @@ Sprite_ActorImges.prototype.setDefault = function(){
   if (this._updateCount <= 0) {
     this._imgIndex = 0;
     this._updateCount = 1;
+    if (!this.faceMode()) {
+      this.loadBitmap = nuun_loadPictures(this._data.defaultImg);
+    }
   }
 };
 
@@ -1974,20 +2158,26 @@ Sprite_ActorImges.prototype.stateImg = function(mode){
   actor._states.forEach(function(stateId) {
     const state = $dataStates[stateId];
     const changeImgId = state.meta.ChangeImgId ? Number(state.meta.ChangeImgId) : 0;
-    if (faceMode) {
-      if(this._deta.stateBitmap[changeImgId] && this._deta.stateBitmap[changeImgId].FaceId >= 0 && mode === this._deta.stateBitmap[changeImgId].always){
-        priorityId = this._deta.stateBitmap[changeImgId].priorityId;
-        if(priority < priorityId) {
-          priority = priorityId;
-          id = changeImgId;
-        }
-      }
-    } else {
-      if (this._deta.stateBitmap[changeImgId] && this._deta.stateBitmap[changeImgId].imges && mode === this._deta.stateBitmap[changeImgId].always) {
-        priorityId = this._deta.stateBitmap[changeImgId].priorityId;
-        if(priority < priorityId) {
-          priority = priorityId;
-          id = changeImgId;
+    if (changeImgId > 0 && this._data.stateImg) {
+      const imgIndex = this._data.stateBitmapIndex[changeImgId] || 0;
+      const imgData = this._data.stateImg[imgIndex];
+      if (imgData.stateImgId > 0) {
+        if (faceMode) {
+          if (imgData && imgData.stateFaceIndex >= 0 && mode === imgData.Always) {
+            priorityId = imgData.priorityId;
+            if(priority < priorityId) {
+              priority = priorityId;
+              id = changeImgId;
+            }
+          }
+        } else {
+          if (imgData && imgData.actorStateImg && mode === imgData.Always) {
+            priorityId = imgData.priorityId;
+            if(priority < priorityId) {
+              priority = priorityId;
+              id = changeImgId;
+            }
+          }
         }
       }
     }
@@ -1996,7 +2186,7 @@ Sprite_ActorImges.prototype.stateImg = function(mode){
 };
 
 Sprite_ActorImges.prototype.faceMode = function() {
-  return this._deta._onFace ? true : false;
+  return this._battler.battleActorFaceMode;
 };
 
 Sprite_ActorImges.prototype.updateSelectionEffect = function() {

@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.3.0
+ * @version 2.3.1
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/6/6 Ver 2.3.1
+ * アクター画像に回復をしたときの画像を追加。
  * 2021/6/5 Ver 2.3.0
  * アクター画像表示処理を大幅に修正。
  * 顔グラの0番が反映されなかった問題を修正。
@@ -257,6 +259,12 @@ const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
 Game_Actor.prototype.performDamage = function() {
   _Game_Actor_performDamage.call(this);
   this._imgIndex = 3;
+};
+
+const _Game_Actor_performRecovery = Game_Actor.prototype.performRecovery;
+Game_Actor.prototype.performRecovery = function() {
+  _Game_Actor_performRecovery.call(this);
+  this._imgIndex = 10;
 };
 
 const _Game_Actor_performVictory = Game_Actor.prototype.performVictory;
@@ -1231,6 +1239,9 @@ Window_BattleActorImges.prototype.loadBitmap = function(data) {
   if (data.damageImg) {
     nuun_loadPictures(data.damageImg);
   }
+  if (data.recoveryDamageImg) {
+    nuun_loadPictures(data.recoveryDamageImg);
+  }
   if (data.victoryImg) {
     nuun_loadPictures(data.victoryImg);
   }
@@ -1260,14 +1271,16 @@ Window_BattleActorImges.prototype.loadBitmap = function(data) {
 };
 
 Window_BattleActorImges.prototype.loadFace = function(actor, data) {
-  data.stateBitmapIndex = [];
-  if (data.stateImg){
-    let i = 0;
-    for (const listdeta of data.stateImg) {
-      if(listdeta.stateFaceIndex >= 0 && listdeta.stateImgId > 0){
-        data.stateBitmapIndex[listdeta.stateImgId] = i; 
+  if (data) {
+    data.stateBitmapIndex = [];
+    if (data.stateImg){
+      let i = 0;
+      for (const listdeta of data.stateImg) {
+        if(listdeta.stateFaceIndex >= 0 && listdeta.stateImgId > 0){
+          data.stateBitmapIndex[listdeta.stateImgId] = i; 
+        }
+        i++;
       }
-      i++;
     }
   }
   return ImageManager.loadFace(actor.faceName());
@@ -1319,7 +1332,7 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor, data) {
   const rect = this.faceRect(index);
   width = rect.width || ImageManager.faceWidth;
   height = rect.height || ImageManager.faceHeight;
-  const faceIndex = data.defaultFaceIndex >= 0 ? data.defaultFaceIndex : actor.faceIndex();
+  const faceIndex = data && data.defaultFaceIndex >= 0 ? data.defaultFaceIndex : actor.faceIndex();
   const key = "actor%1-img".format(actor.actorId());
   const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
   sprite.bitmap = ImageManager.loadFace(actor.faceName());
@@ -1740,6 +1753,8 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
       this.changeBitmap("victory");
     } else if (this.checkDamage(actor) && this.changeCheck("damage")) {
       this.changeBitmap("damage");
+    } else if (this.checkRecoveryDamage(actor) && this.changeCheck("recoveryDamage")) {
+      this.changeBitmap("recoveryDamage");
     } else if (actor.isChanting() && this.changeCheck("chant")) {
       this.changeBitmap("chant");
     } else if (actor._states.length > 0 && this.stateImgCheck(false)) {
@@ -1758,7 +1773,12 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
 };
 
 Sprite_ActorImges.prototype.checkDamage = function(actor) {
+  
   return actor._imgIndex === 3;
+};
+
+Sprite_ActorImges.prototype.checkRecoveryDamage = function(actor) {
+  return actor._imgIndex === 10;
 };
 
 Sprite_ActorImges.prototype.checkVictory = function(actor) {
@@ -1807,6 +1827,12 @@ Sprite_ActorImges.prototype.changeCheck = function(bitmapType){
         return this._data.damageFaceIndex >= 0 ? true : false;
       } else {
         return this._data.damageImg ? true : false;
+      }
+    case "recoveryDamage":
+      if (mode) {
+        return this._data.recoveryDamageFaceIndex >= 0 ? true : false;
+      } else {
+        return this._data.recoveryDamageImg ? true : false;
       }
     case "dying":
       if (mode) {
@@ -1895,6 +1921,11 @@ Sprite_ActorImges.prototype.changeBitmap = function(bitmapType) {
         this.setRecovery();
       }
       break;
+    case "recoveryDamage":
+        if (this._imgIndex !== 10) {
+          this.setRecoveryDamage();
+        }
+        break;
     case "alwaysAbnormal":
       if (this._imgIndex !== this._changeStateImgId + 2000) {
         this.setState(true);
@@ -1970,6 +2001,13 @@ Sprite_ActorImges.prototype.refreshBitmap = function() {
     } else if (this._imgIndex === 9) { //回復時
       if (mode) {
         faceIndex = this._data.recoveryFaceIndex;
+        this.faceRefresh(faceIndex);
+      } else {
+        this.setLoadBitmap();
+      }
+    } else if (this._imgIndex === 10) { //回復した時
+      if (mode) {
+        faceIndex = this._data.recoveryDamageFaceIndex;
         this.faceRefresh(faceIndex);
       } else {
         this.setLoadBitmap();
@@ -2116,6 +2154,17 @@ Sprite_ActorImges.prototype.setDamage = function(){
     this._updateCount = this.setDamageDuration();
     if (!mode) {
       this.loadBitmap = nuun_loadPictures(this._data.damageImg);
+    }
+  }
+};
+
+Sprite_ActorImges.prototype.setRecoveryDamage = function(){
+  const mode = this.faceMode();
+  if ((mode && this._data.recoveryDamageFaceIndex >= 0) || (!mode && this._data.recoveryDamageImg)) {
+    this._imgIndex = 3;
+    this._updateCount = this.setDamageDuration();
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.recoveryDamageImg);
     }
   }
 };

@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.8.1
+ * @version 1.9.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/5 Ver.1.9.0
+ * サイドビューアクターを表示できる機能を追加。
+ * 戦闘終了後からリザルト表示までコマンドなどのウィンドウを閉じるように修正。
  * 2021/5/18 Ver.1.8.1
  * 戦闘中にメンバーチェンジをした際、交代前メンバーのEXPゲージが残ってしまう問題を修正。
  * 2021/5/15 Ver.1.8.0
@@ -359,6 +362,8 @@
  * @value 1
  * @option キャラチップを表示
  * @value 2
+ * @option サイドビューアクターを表示
+ * @value 3
  * @default 1
  * @parent GetPage
  * 
@@ -1380,6 +1385,15 @@ Scene_Battle.prototype.updateVisibility = function() {
   this.updateResultButton();
 };
 
+const _Scene_Battle_updateInputWindowVisibility = Scene_Battle.prototype.updateInputWindowVisibility;
+Scene_Battle.prototype.updateInputWindowVisibility = function() {
+  _Scene_Battle_updateInputWindowVisibility.call(this);
+  if (BattleManager._victoryOn) {
+      this.closeCommandWindows();
+      this.hideSubInputWindows();
+  }
+};
+
 Scene_Battle.prototype.updateResultButton = function() {
   if (this._okResultButton) {
       this._okResultButton.visible = this._resultWindow.active;
@@ -1559,6 +1573,8 @@ Window_Result.prototype.refresh = function() {
         this.drawActorCharacter(rect.x + Math.floor(param.FaceWidth / 2), y + 60);
       } else if (param.ActorShow === 1) {
         this.drawActorFace(rect.x, y, param.FaceWidth, param.FaceHeight);
+      } else if (param.ActorShow === 3) {
+        this.drawSvActor(rect.x, y + (height / 2), param.FaceWidth, param.FaceHeight);
       }
       this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112);
       this.drawActorLevel(rect.x + x2 - 100, y);
@@ -1673,6 +1689,24 @@ Window_Result.prototype.actorImgRefresh = function(bitmap, date) {
 
 Window_Result.prototype.drawActorFace = function(x, y, width, height) {
   this.drawFace(this._actor.faceName(), this._actor.faceIndex(), x, y, width, height);
+};
+
+Window_Result.prototype.drawSvActor = function(x, y, width, height) {
+  const bitmap = ImageManager.loadSvActor(this._actor.battlerName());
+  if (bitmap && !bitmap.isReady()) {
+    bitmap.addLoadListener(this.drawSvActorImg.bind(this, bitmap, x, y));
+  } else {
+    this.drawSvActorImg(bitmap, x, y);
+  }
+};
+
+Window_Result.prototype.drawSvActorImg = function(bitmap, x, y) {
+    const motionIndex = 0;
+    const pw = Math.floor(bitmap.width / 9);
+    const ph = Math.floor(bitmap.height / 6);
+    const sx = Math.floor(motionIndex / 6) * 3;
+    const sy = motionIndex % 6;
+    this.contents.blt(bitmap, sx, sy, pw, ph, x, y - ph);
 };
 
 Window_Result.prototype.drawExpGauge = function(x, y) {

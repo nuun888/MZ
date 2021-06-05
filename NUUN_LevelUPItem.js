@@ -12,7 +12,7 @@
  * @target MZ
  * @plugindesc レベルアップアイテム、スキル
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 経験値を増減させるアイテムやスキルを作ることが出来ます。
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/5 Ver.1.0.2
+ * スキル失敗時のメッセージが表示しなくなる問題を修正。
  * 2021/5/2 Ver.1.0.1
  * レベルをダウンさせると経験値のおかしくなる問題を修正。
  * 2021/4/29 Ver.1.0.0
@@ -51,8 +53,14 @@ Imported.NUUN_LevelUPItem = true;
   const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
   Game_Action.prototype.applyItemUserEffect = function(target) {
     _Game_Action_applyItemUserEffect.call(this, target);
-    target.levelUpItems(target, this.item());
-    this.makeSuccess(target);
+    this.useLevelUpItem(target);
+  };
+
+  Game_Action.prototype.useLevelUpItem = function(target) {
+    if (target.isActor() && (this.isLevelUpItem() || this.isLevelDownItem())) {
+      target.levelUpItems(target, this.item());
+      this.makeSuccess(target);
+    }
   };
 
   Game_Action.prototype.isLevelUpItem = function() {

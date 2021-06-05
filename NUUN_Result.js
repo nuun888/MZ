@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.9.1
+ * @version 1.9.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/6 Ver.1.9.2
+ * 顔グラ以外でアクター画像の表示横幅が反映されていなかった問題を修正。
  * 2021/6/6 Ver.1.9.1
  * アクター画像に合わせてアクター名、獲得経験値の座標を調整するように修正。
  * キャラ画像が表示されない問題を修正。
@@ -371,8 +373,8 @@
  * @parent GetPage
  * 
  * @param FaceWidth
- * @desc 顔グラ、キャラチップ表示の横幅。
- * @text 顔グラ、キャラチップの表示横幅
+ * @desc アクター画像の表示の横幅。(0で自動調整します)
+ * @text アクター画像の表示横幅
  * @type number
  * @default 144
  * @parent GetPage
@@ -1570,10 +1572,13 @@ Window_Result.prototype.actorMembers = function() {
 };
 
 Window_Result.prototype.actorAreaWidth = function(scale) {
+  if (param.FaceWidth > 0) {
+    return param.FaceWidth;
+  }
   if (param.ActorShow === 0) {
     return 0;
   } else if (param.ActorShow === 1) {
-    return Math.floor(param.FaceWidth * scale) + this.itemPadding();
+    return Math.floor(ImageManager.faceWidth * scale) + this.itemPadding();
   } else if (param.ActorShow === 2) {
     return 60 + this.itemPadding();
   } else {
@@ -1608,7 +1613,7 @@ Window_Result.prototype.refresh = function() {
       this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112);
       this.drawActorLevel(rect.x + x2 - 100, y);
       if (param.LavelUpPosition === 1) {
-        this.drawLevelUp(rect.x + param.LevelUp_X, y + param.LevelUp_Y, Math.floor(param.FaceWidth * scale));
+        this.drawLevelUp(rect.x + param.LevelUp_X, y + param.LevelUp_Y, Math.floor(this.actorAreaWidth(scale)));
       } else if (param.LavelUpPosition === 10) {
         this.drawLevelUp(rect.x + param.LevelUp_X , y + param.LevelUp_Y, rect.width);
       }

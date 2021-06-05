@@ -81,6 +81,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/6 Ver.1.9.1
+ * アクター画像に合わせてアクター名、獲得経験値の座標を調整するように修正。
+ * キャラ画像が表示されない問題を修正。
  * 2021/6/5 Ver.1.9.0
  * サイドビューアクターを表示できる機能を追加。
  * 戦闘終了後からリザルト表示までコマンドなどのウィンドウを閉じるように修正。
@@ -1538,7 +1541,20 @@ Window_Result.prototype.initialize = function(rect) {
   this.page = 0;
   this._actor = null;
   this._canRepeat = false;
+  this.loadImages();
   //this.refresh();
+};
+
+Window_Result.prototype.loadImages = function() {
+  for (const actor of $gameParty.members()) {
+    if (param.ActorShow === 1) {
+      ImageManager.loadFace(actor.faceName());
+    } else if (param.ActorShow === 2) {
+      ImageManager.loadCharacter(actor.characterName());
+    } else if (param.ActorShow === 3) {
+      ImageManager.loadSvEnemy(actor.battlerName());
+    }
+  }
 };
 
 Window_Result.prototype.itemHeight = function() {
@@ -1553,6 +1569,19 @@ Window_Result.prototype.actorMembers = function() {
   return $gameParty.battleMembers().length;
 };
 
+Window_Result.prototype.actorAreaWidth = function(scale) {
+  if (param.ActorShow === 0) {
+    return 0;
+  } else if (param.ActorShow === 1) {
+    return Math.floor(param.FaceWidth * scale) + this.itemPadding();
+  } else if (param.ActorShow === 2) {
+    return 60 + this.itemPadding();
+  } else {
+    return 64 + this.itemPadding();
+  }
+};
+
+
 Window_Result.prototype.refresh = function() {
   this.contents.clear();
   const scale = param.ActorShow === 1 ? param.FaceScale / 100 : 1;
@@ -1561,7 +1590,7 @@ Window_Result.prototype.refresh = function() {
   const itemPadding = this.itemPadding();
   if (this.page === 0) {
     const height = param.FaceScaleHeight ? Math.floor(param.FaceHeight * scale) : param.FaceHeight;
-    const faceArea = rect.x + Math.floor(param.FaceWidth * scale) + itemPadding;
+    const faceArea = rect.x + this.actorAreaWidth(scale);
     const x2 = rect.x + (rect.width - Math.floor(rect.width / 2.6));
     gaugeWidth = rect.width - Math.floor(rect.width / 2.6) - faceArea - 30;
     for (let i = 0; this.actorMembers() > i; i++) {
@@ -1570,7 +1599,7 @@ Window_Result.prototype.refresh = function() {
       this._actor._oldStatus = [];
       let y = i * height + rect.y + param.ActorResult_Y;
       if (param.ActorShow === 2) {
-        this.drawActorCharacter(rect.x + Math.floor(param.FaceWidth / 2), y + 60);
+        this.drawActorCharacter(rect.x + Math.floor(this.actorAreaWidth() / 2), y + 60);
       } else if (param.ActorShow === 1) {
         this.drawActorFace(rect.x, y, param.FaceWidth, param.FaceHeight);
       } else if (param.ActorShow === 3) {
@@ -1807,10 +1836,10 @@ Window_Result.prototype.drawGainGold = function(date, x, y, width) {
     const gold = date.GainParamEval ? eval(date.GainParamEval) : BattleManager._rewards.gold;
     this.changeTextColor(ColorManager.systemColor());
     if (date.GainParamName) {
-      this.drawText(date.GainParamName, x, y, 120, "left");
+      this.drawText(date.GainParamName, x, y, 80, "left");
     }
     this.resetTextColor();
-    this.drawCurrencyValue(gold, this.currencyUnit(), x + 120, y, width - 120);
+    this.drawCurrencyValue(gold, this.currencyUnit(), x + 80, y, width - 80);
     this.resetTextColor();
   }
 };

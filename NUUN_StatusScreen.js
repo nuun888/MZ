@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.0.5
+ * @version 2.0.6
  * 
  * @help
  * ステータス画面を拡張します。
@@ -139,6 +139,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/5 Ver.2.0.6
+ * サイドビューアクター画像で戦闘終了後にステータス画面を開くと戦闘勝利時のモーションが実行してしまう問題を修正。。
  * 2021/5/28 Ver.2.0.5
  * フロントビューでサイドビューアクターが表示されなかった問題を修正。
  * キャラを切り替えた時にモーションが反映されない問題を修正。
@@ -1924,6 +1926,9 @@ Sprite_MenuSvActor.prototype.setActorPosition = function(x, y) {
   this.refreshMotion();
 };
 
+Sprite_MenuSvActor.prototype.setupMotion = function() {
+};
+
 Sprite_MenuSvActor.prototype.startMotion = function(motionType) {
   if (motionType === "wait") {
     motionType = "walk";
@@ -1939,8 +1944,8 @@ Sprite_MenuSvActor.prototype.updateVisibility = function() {
 };
 
 Sprite_MenuSvActor.prototype.updateMain = function() {
-  Sprite_Actor.prototype.updateMain.call(this);
-  if (!this._battler.isSpriteVisible()) {
+  Sprite_Battler.prototype.updateMain.call(this);
+  if (!this._battler.isSpriteVisible() && this.visible) {
     this.updateBitmap();
     this.updateFrame();
   }

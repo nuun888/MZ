@@ -10,12 +10,12 @@
 
 | 戦闘 | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
-| バトルスタイル拡張ベース  | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)  | 戦闘のスタイルを変更、拡張します。 | 2.2.3 |
-| バトルスタイル拡張  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです。 | 1.2.1 |
+| バトルスタイル拡張ベース  | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)  | 戦闘のスタイルを変更、拡張します。 | 2.3.0 |
+| バトルスタイル拡張  | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)  | 戦闘のスタイルを変更、拡張する設定用ファイルです。 | 1.3.0 |
 | 解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlePosition.js)  | 解像度変更時のエネミー、アクターの座標を修正します。またエネミーとアクター、戦闘背景のY座標の位置も調整できます。 | 1.0.3 |
 | 戦闘背景の変更  | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)  | フィールドマップで任意の戦闘背景に変更できます。また敵グループ毎、リージョン、タグIDによって戦闘背景を変更できます。 | 1.0.1 |
 | 戦闘中アイテム、スキル選択画面MV風表示  | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)  | 戦闘中のアイテム、スキル選択画面をMV風に変更できます。 | 1.0.2 |
-| [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  | 戦闘終了後にリザルト画面を表示します。 立ち絵表示できます。　| 1.8.0 |
+| [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  | 戦闘終了後にリザルト画面を表示します。 立ち絵表示できます。　| 1.9.0 |
 | TP円形ゲージ  | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)  | TPゲージを円形にします。 | 1.0.4 |
 | TPB円形ゲージ  | [NUUN_TpbCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpbCircularGauge.js)  | TPBゲージを円形にします。 | 1.0.2 |
 | パーティゲージシステム  |  |  |  |
@@ -49,7 +49,7 @@
 
 | エネミー | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
-| 巨大エネミー  | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) | 画面いっぱいにエネミーを表示させます。 | 1.1.2 |
+| 巨大エネミー  | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) | 画面いっぱいにエネミーを表示させます。 | 1.1.5 |
 | エネミー個別座標  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js)  | エネミーの座標を調整できます。 | 1.1.0 |
 | 敵にTPBゲージ表示  | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js)  | 敵にTPBゲージを表示します。 | 1.1.3 |
 | 敵に名前表示  |  |  |  |
@@ -58,7 +58,7 @@
 | メニュー | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
 | アイテムのカテゴリーカスタマイズ  | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | アイテムのカテゴリーをカスタマイズ（追加したり減らしたり）できます。 | 1.1.2 |
-| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)  | モンスター図鑑を実装します。 | 2.4.1 |
+| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)  | モンスター図鑑を実装します。 | 2.4.2 |
 | コマンド拡張  | [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  | コマンドにアイコンや色を指定できます。コマンドの文字の表示を左揃え、中央揃え、右揃えから選択できます。 | 1.2.1 |
 | ステータス画面拡張  | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)  | ステータス画面を拡張します。 | 2.0.2 |
 | セーブ画面拡張  | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | セーブ画面を拡張します。 | 1.5.0 |

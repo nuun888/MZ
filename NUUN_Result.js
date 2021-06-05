@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.9.0
+ * @version 1.9.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。

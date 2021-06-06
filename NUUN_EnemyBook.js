@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.4.2
+ * @version 2.4.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -91,6 +91,8 @@
  * 
  * <ShowDataBook>
  * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
+ * 
+ * <AnalyzeResist:50> アナライズの抵抗値を設定します。この場合５０％の確率でアナライズが成功します。
  * 
  * <EnemyIcon:[iconid]>
  * モンスター名の左にアイコンを表示させることが出来ます。
@@ -222,6 +224,8 @@
  * 遭遇数                      遭遇済みのモンスター数を変数に格納します。
  * 図鑑完成度                   現在の完成度を変数に格納します。
  * 総撃破数                    指定のモンスターの撃破数を変数に格納します。
+ * 図鑑登録済み判定             指定のモンスターが図鑑登録済みが判定します。
+ * ステータス情報登録済み判定    指定のモンスターのステータス情報登録済みか判定します。
  * アイテムドロップ済み判定      指定のアイテムがドロップ済みか判定します。
  * アイテム盗み済み判定         指定のアイテムが盗み済みか判定します。
  * 敵の使用スキル確認済み　　　　敵の使用スキルを確認済みにします。0で全て確認済みにします。
@@ -248,6 +252,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/6 Ver.2.4.3
+ * プラグインコマンドに図鑑登録済み判定とステータス情報登録済み判定を追加。
+ * モンスターにアナライズ耐性を設定できる機能を追加。
+ * TPBアクティブで敵を全滅させた直後に敵の情報を開くとエラーが出る問題を修正。
  * 2021/5/29 Ver.2.4.2
  * キャラチップを表示する機能を追加。
  * 色相が変化しているモンスターの次にサイドビューアクターが表示されると、色相が前のモンスターの色相で表示される問題を修正。
@@ -531,6 +539,38 @@
  * @default 0
  * @text 変数
  * @desc 図鑑の完成度を代入する変数を指定します。
+ * 
+ * @command EnemyBookRegistration
+ * @desc モンスターが図鑑に登録済みか判定します。
+ * @text 図鑑登録済み判定
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @text モンスター
+ * @desc モンスターを指定します。
+ * 
+ * @arg registrationSwitch
+ * @type switch
+ * @default 0
+ * @text スイッチ
+ * @desc モンスターが図鑑に登録済みかを代入するスイッチを指定します。
+ * 
+ * @command EnemyBookStatusRegistration
+ * @desc モンスターのステータス情報が図鑑に登録済みか判定します。
+ * @text ステータス情報登録済み判定
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @text モンスター
+ * @desc モンスターを指定します。
+ * 
+ * @arg statusRegistrationSwitch
+ * @type switch
+ * @default 0
+ * @text スイッチ
+ * @desc モンスターが図鑑に登録済みかを代入するスイッチを指定します。
  * 
  * @command EnemyBookDefeatEnemySum
  * @desc モンスターの撃破数を格納します。
@@ -2091,6 +2131,24 @@ PluginManager.registerCommand(pluginName, 'EnemyBookRemoveDefeat', args => {
   $gameSystem.resetDefeat(Number(args.enemyId));
 });
 
+PluginManager.registerCommand(pluginName, 'EnemyBookRegistration', args => {
+  const enemyId = Number(args.enemyId);
+  if (enemyId > 0) {
+    $gameSwitches.setValue(Number(args.registrationSwitch), $gameSystem.isInEnemyBook($dataEnemies[enemyId]));
+  } else {
+    $gameSwitches.setValue(Number(args.registrationSwitch), false);
+  }
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyBookStatusRegistration', args => {
+  const enemyId = Number(args.enemyId);
+  if (enemyId > 0) {
+    $gameSwitches.setValue(Number(args.statusRegistrationSwitch), $gameSystem.isInEnemyBookStatus($dataEnemies[enemyId]));
+  } else {
+    $gameSwitches.setValue(Number(args.statusRegistrationSwitch), false);
+  }
+});
+
 PluginManager.registerCommand(pluginName, 'EnemyBookGetDropItem', args => {
   $gameSystem.dropItemListFlag(Number(args.enemyId), Number(args.dropListId) - 1, true, Number(args.dropListId) > 0);
 });
@@ -2777,7 +2835,8 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
   if (target.isEnemy()) {
     if (this._analyzeDate) {
-      if (target.enemy().meta.NoBookData) {
+      const rate = target.enemy().meta.AnalyzeResist;console.log(target.enemy())
+      if (Math.floor(Math.random() * 100 >= rate) || target.enemy().meta.NoBookData) {
         target.result().missed = true;
         return;
       }
@@ -3514,7 +3573,7 @@ Window_EnemyBook_InfoIndex.prototype.enemyAt = function(index) {
 };
 
 Window_EnemyBook_InfoIndex.prototype.getEnemy = function() {
-  return this._enemyList[this.index()].enemy();
+  return this._enemyList[this.index()] ? this._enemyList[this.index()].enemy() : null;
 };
 
 Window_EnemyBook_InfoIndex.prototype.drawItem = function(index) {

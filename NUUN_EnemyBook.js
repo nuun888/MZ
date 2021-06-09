@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.4.3
+ * @version 2.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -85,15 +85,11 @@
  * 
  * <NoBook>
  * モンスター図鑑に表示されません。アナライズのみデータを見ることが出来ます。
- * 
  * <NoBookData>
  * モンスター図鑑に表示されず、アナライズを使用しても表示されません。
- * 
  * <ShowDataBook>
  * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
- * 
  * <AnalyzeResist:50> アナライズの抵抗値を設定します。この場合５０％の確率でアナライズが成功します。
- * 
  * <EnemyIcon:[iconid]>
  * モンスター名の左にアイコンを表示させることが出来ます。
  * <EnemyIcon:120> アイコンID120番のアイコンが表示されます。
@@ -114,6 +110,8 @@
  * アイテムのメモ欄
  * <NoDropProbability>
  * このタグを記入したアイテムはドロップアイテムの確率表示を表示しません。
+ * <CertainAnalyze> アナライズ耐性を無視します。
+ * 
  * 
  * 図鑑の登録タイミングを遭遇時、撃破時、アナライズ時、撃破またはアナライズ時から選択できます。（ステータス情報は登録されません）
  * モンスターのステータス情報の登録タイミングを遭遇時、撃破時、アナライズ時、撃破またはアナライズ時から選択可能です。
@@ -252,6 +250,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/9 Ver.2.5.0
+ * 遭遇していないカテゴリーをシークレット表示、非表示にする機能を追加。
+ * アナライズ耐性を無視するスキルを設定できる機能を追加。
  * 2021/6/6 Ver.2.4.3
  * プラグインコマンドに図鑑登録済み判定とステータス情報登録済み判定を追加。
  * モンスターにアナライズ耐性を設定できる機能を追加。
@@ -917,6 +918,19 @@
  * @text モンスターカテゴリー設定
  * @type struct<BookCategoryList>[]
  * @default ["{\"CategoryName\":\"全て\",\"CategoryKey\":\"all\"}","{\"CategoryName\":\"ボス\",\"CategoryKey\":\"boss\"}"]
+ * @parent Category
+ * 
+ * @param CategoryVisibleType
+ * @text 未遭遇カテゴリー表示
+ * @desc １体も遭遇してない場合のカテゴリー表示。
+ * @type select
+ * @option 表示
+ * @value 0
+ * @option 非表示
+ * @value 1
+ * @option 別の文字列で隠す
+ * @value 2
+ * @default 0
  * @parent Category
  * 
  * @param BackGround
@@ -2070,6 +2084,7 @@ param.BackGroundImg = param.BackGroundImg && param.BackGroundImg.length > 0 ? pa
 param.AnalyzeBackGroundImg = param.AnalyzeBackGroundImg && param.AnalyzeBackGroundImg.length > 0 ? param.AnalyzeBackGroundImg[0] : null;
 const PercentContentLength = param.PercentWindowVisible && (param.PercentContent && param.PercentContent.length > 0);
 param.PageSetting = param.PageSetting || [];
+param.EnemyBookCategory = param.EnemyBookCategory || [];
 const NRP_pLoopLR = PluginManager.parameters("NRP_LoopCursor").loopLR;
 let enemyBook_Open = false;
 
@@ -2237,6 +2252,7 @@ Game_System.prototype.initialize = function() {
   this._enemyBookStateFlags = [];
   this._enemyBookDebuffFlags = [];
   this._enemyBookActionFlags = [];
+  this.initCategoryEnemyBook();
 };
 
 Game_System.prototype.addToEnemyBook = function(enemyId) {
@@ -2251,6 +2267,37 @@ Game_System.prototype.addStatusToEnemyBook = function(enemyId) {
     this.clearEnemyBookStatusFlags();
   }
   this._enemyBookStatusFlags[enemyId] = true;
+};
+
+Game_System.prototype.categoryToEnemyBook = function(enemy) {
+  this.initCategoryEnemyBook();
+  if (enemy && this.isInEnemyBook(enemy)) {
+    const enemyCategory = enemy.meta.CategoryKey ? enemy.meta.CategoryKey.split(',') : [];
+    for (key of enemyCategory) {
+      const index = param.EnemyBookCategory.findIndex(category => category.CategoryKey === key);
+      if (index >= 0) {
+        this._enemyBookCategoryFlags[index] = true;
+      }
+    }
+  }
+};
+
+Game_System.prototype.getCategoryEnemyBook = function(index) {
+  return this._enemyBookCategoryFlags[index];
+};
+
+Game_System.prototype.initCategoryEnemyBook = function() {
+  if (!this._enemyBookCategoryFlags) {
+    this._enemyBookCategoryFlags = [];
+    const enemyBookCategoryLength = param.EnemyBookCategory.length;
+    for (let i = 0; i < enemyBookCategoryLength; i++) {
+      this._enemyBookCategoryFlags[i] = false;
+    }
+    const index = param.EnemyBookCategory.findIndex(category => category.CategoryKey === 'all');
+    if (index >= 0) {
+      this._enemyBookCategoryFlags[index] = true;
+    }
+  }
 };
 
 Game_System.prototype.statusToEnemyBook = function(enemyId) {
@@ -2835,7 +2882,7 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
   if (target.isEnemy()) {
     if (this._analyzeDate) {
-      const rate = target.enemy().meta.AnalyzeResist;console.log(target.enemy())
+      const rate = this.item().meta.CertainAnalyze || !target.enemy().meta.AnalyzeResist ? 100 : Number(target.enemy().meta.AnalyzeResist);
       if (Math.floor(Math.random() * 100 >= rate) || target.enemy().meta.NoBookData) {
         target.result().missed = true;
         return;
@@ -3277,8 +3324,20 @@ Window_EnemyBook_Category.prototype.initialize = function(rect) {
   Window_Selectable.prototype.initialize.call(this, rect);
   this._categoryList = param.EnemyBookCategory || [];
   this._categorySelect = 0;
+  this.setCategoryFlags();
+  this._maxNum = param.CategoryVisibleType === 1 ? this.maxItemsVisible() : (this._categoryList ? this._categoryList.length : 0);
   this.select(this._categorySelect);
   this.refresh();
+};
+
+Window_EnemyBook_Category.prototype.setCategoryFlags = function() {
+  for (enemy of $dataEnemies) {
+    $gameSystem.categoryToEnemyBook(enemy);
+  }
+};
+
+Window_EnemyBook_Category.prototype.isCurrentItemEnabled = function() {
+  return param.CategoryVisibleType === 2 ? $gameSystem.getCategoryEnemyBook(this.index()) : true;
 };
 
 Window_EnemyBook_Category.prototype.maxCols = function() {
@@ -3286,7 +3345,21 @@ Window_EnemyBook_Category.prototype.maxCols = function() {
 };
 
 Window_EnemyBook_Category.prototype.maxItems = function() {
-  return this._categoryList ? this._categoryList.length : 0;
+  return this._maxNum;
+};
+
+Window_EnemyBook_Category.prototype.maxItemsVisible = function() {
+  const categoryLength = this._categoryList.length;
+  this._newCategoryList = [];
+  let num = 0;
+  for (let i = 0; i < categoryLength; i++) {
+    const result = $gameSystem.getCategoryEnemyBook(i);
+    if (result) {
+      this._newCategoryList.push({category : this._categoryList[i], categoryVisible : result});
+      num++;
+    }
+  }
+  return num;
 };
 
 Window_EnemyBook_Category.prototype.processOk = function() {
@@ -3300,13 +3373,33 @@ Window_EnemyBook_Category.prototype.processCancel = function() {
 };
 
 Window_EnemyBook_Category.prototype.getDate = function(index) {
-  return this._categoryList[index];
+  return param.CategoryVisibleType === 1 ? this._newCategoryList[index].category : this._categoryList[index];
 };
 
 Window_EnemyBook_Category.prototype.drawItem = function(index) {
   const rect = this.itemLineRect(index);
-  const categoryName = this._categoryList[index].CategoryName;
+  let categoryName = this.getDate(index).CategoryName;
+  const result = this.getCategoryVisible(index);
+  if (param.CategoryVisibleType === 1 && !result) {
+    return;
+  }
+  if (param.CategoryVisibleType === 2 && !result) {
+    categoryName = this.unknownDataLength(categoryName);
+  }
   this.drawText(categoryName, rect.x, rect.y, rect.width);
+};
+
+Window_EnemyBook_Category.prototype.getCategoryVisible = function(index) {
+  return param.CategoryVisibleType === 1 ? this._newCategoryList[index].categoryVisible : $gameSystem.getCategoryEnemyBook(index);
+};
+
+Window_EnemyBook_Category.prototype.unknownDataLength = function(name) {
+  if(param.UnknownData === '？' || param.UnknownData === '?') {
+    const name_length = name.length;
+    return param.UnknownData.repeat(name_length);
+  } else {
+    return param.UnknownData;
+  }
 };
 
 Window_EnemyBook_Category.prototype.setSelect = function() {

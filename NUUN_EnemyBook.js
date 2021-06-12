@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.5.0
+ * @version 2.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -250,6 +250,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/12 Ver.2.5.1
+ * ウィンドウの端に謎の黒い縦線が出る問題を修正。
  * 2021/6/9 Ver.2.5.0
  * 遭遇していないカテゴリーをシークレット表示、非表示にする機能を追加。
  * アナライズ耐性を無視するスキルを設定できる機能を追加。
@@ -3067,13 +3069,13 @@ Scene_EnemyBook.prototype.createEnemyPageWindow = function() {
 Scene_EnemyBook.prototype.percentWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
   const wy = this.mainAreaTop();
-  const ww = Graphics.boxWidth / 3;
+  const ww = Math.floor(Graphics.boxWidth / 3);
   const wh = PercentContentLength ? this.calcWindowHeight(1, true) : 0;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_EnemyBook.prototype.enemyWindowPageRect = function() {
-  const wx = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
+  const wx = param.WindowMode === 0 ? Math.floor(Graphics.boxWidth / 3) : 0;
   const wy = this.mainAreaTop();
   const ww = this.enemyWindowWidth();
   const wh = this.calcWindowHeight(1, true);
@@ -3084,13 +3086,13 @@ Scene_EnemyBook.prototype.indexWindowRect = function() {
   const height = this.percentWindowRect().height;
   const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
   const wy = this.mainAreaTop() + height;
-  const ww = Graphics.boxWidth / 3;
+  const ww = Math.floor(Graphics.boxWidth / 3);
   const wh = this.mainAreaHeight() - height;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_EnemyBook.prototype.enemyWindowRect = function() {
-  const wx = param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0;
+  const wx = param.WindowMode === 0 ? Math.floor(Graphics.boxWidth / 3) : 0;
   const wy = this.mainAreaTop() + this._enemyPageWindow.height;
   const ww = this.enemyWindowWidth();
   const wh = this.mainAreaHeight() - this._enemyPageWindow.height;
@@ -3100,7 +3102,7 @@ Scene_EnemyBook.prototype.enemyWindowRect = function() {
 Scene_EnemyBook.prototype.categoryNameWindowRect = function() {
   const wx = param.WindowMode === 0 ? 0 : this.enemyWindowWidth();
   const wy = this.mainAreaTop() + this.percentWindowRect().height;
-  const ww = Graphics.boxWidth / 3;
+  const ww = Math.floor(Graphics.boxWidth / 3);
   const wh = this.calcWindowHeight(1, true);
   this._indexWindow.y += wh;
   this._indexWindow.height -= wh;
@@ -3108,7 +3110,7 @@ Scene_EnemyBook.prototype.categoryNameWindowRect = function() {
 };
 
 Scene_EnemyBook.prototype.enemyWindowWidth = function() {
-  return Graphics.boxWidth - Graphics.boxWidth / 3;
+  return Graphics.boxWidth - Math.floor(Graphics.boxWidth / 3);
 };
 
 Scene_EnemyBook.prototype.helpAreaHeight = function() {

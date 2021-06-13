@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.9.2
+ * @version 1.10.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/13 Ver.1.10.0
+ * アクターの獲得経験値表示を表示しない機能を追加。
+ * メンバーによってアクターの獲得経験値表示の縦幅を調整する機能を追加。
  * 2021/6/6 Ver.1.9.2
  * 顔グラ以外でアクター画像の表示横幅が反映されていなかった問題を修正。
  * 2021/6/6 Ver.1.9.1
@@ -247,23 +250,6 @@
  * @param WindowSetting
  * @text ウィンドウ設定
  * @default ------------------------------
- * @parent CommonSetting
- * 
- * @param ResultWidth
- * @desc ウィンドウの横幅。(0でUI横幅)
- * @text ウィンドウ横幅
- * @type number
- * @default 0
- * @min 0
- * @parent WindowSetting
- * 
- * @param ResultHeight
- * @desc ウィンドウの縦幅。(0でUI縦幅)デフォルト:616
- * @text ウィンドウ縦幅
- * @type number
- * @default 616
- * @min 0
- * @parent WindowSetting
  * 
  * @param ResultWindowCenter
  * @type boolean
@@ -272,20 +258,11 @@
  * @desc ウィンドウを中央に表示します。ウィンドウのX座標はウィンドウ表示位置からの相対座標になります。
  * @parent WindowSetting
  * 
- * @param ResultWindow_X
- * @desc ウィンドウのX座標。
- * @text ウィンドウX座標
- * @type number
- * @default 0
- * @min -9999
- * @parent WindowSetting
- * 
- * @param ResultWindow_Y
- * @desc ウィンドウのY座標。
- * @text ウィンドウY座標
- * @type number
- * @default 0
- * @min -999999
+ * @param CloseActorStatusWindow
+ * @type boolean
+ * @default false
+ * @text 表示時アクターウィンドウ非表示
+ * @desc リザルト画面表示時にアクターステータスウィンドウを非表示にします。
  * @parent WindowSetting
  * 
  * @param NoTouchUIWindow
@@ -302,11 +279,52 @@
  * @default true
  * @parent WindowSetting
  * 
- * @param CloseActorStatusWindow
- * @type boolean
- * @default false
- * @text 表示時アクターウィンドウ非表示
- * @desc リザルト画面表示時にアクターステータスウィンドウを非表示にします。
+ * @param GetWindowSetting
+ * @text 入手ウィンドウ設定
+ * @default ------------------------------
+ * @parent WindowSetting
+ * 
+ * @param ResultWidth
+ * @desc ウィンドウの横幅。(0でUI横幅)
+ * @text ウィンドウ横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetWindowSetting
+ * 
+ * @param ResultHeight
+ * @desc ウィンドウの縦幅。(0でUI縦幅)デフォルト:616
+ * @text ウィンドウ縦幅
+ * @type number
+ * @default 616
+ * @min 0
+ * @parent GetWindowSetting
+ * 
+ * @param ResultWindow_X
+ * @desc ウィンドウのX座標。
+ * @text ウィンドウX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GetWindowSetting
+ * 
+ * @param ResultWindow_Y
+ * @desc ウィンドウのY座標。
+ * @text ウィンドウY座標
+ * @type number
+ * @default 0
+ * @min -999999
+ * @parent GetWindowSetting
+ * 
+ * @param LevelUpWindowSetting
+ * @text レベルアップウィンドウ設定
+ * @default ------------------------------
+ * @parent WindowSetting
+ * 
+ * 
+ * @param HelpWindowSetting
+ * @text 戦闘結果ウィンドウ設定
+ * @default ------------------------------
  * @parent WindowSetting
  * 
  * @param ResultTextPosition
@@ -320,6 +338,11 @@
  * @option 右
  * @value "right"
  * @default center
+ * @parent HelpWindowSetting
+ * 
+ * @param SkinSetting
+ * @text ウィンドウスキン設定
+ * @default ------------------------------
  * @parent WindowSetting
  * 
  * @param ResultWindowsSkin
@@ -328,7 +351,7 @@
  * @type file
  * @dir img/system
  * @default 
- * @parent WindowSetting
+ * @parent SkinSetting
  * 
  * @param ResultMainWindowsSkin
  * @desc リザルトメインのウィンドウのウィンドウスキンを指定します。
@@ -336,7 +359,7 @@
  * @type file
  * @dir img/system
  * @default 
- * @parent WindowSetting
+ * @parent SkinSetting
  * 
  * @param ButtonSetting
  * @text ボタン設定
@@ -351,7 +374,6 @@
  * @default -1
  * @min -1
  * @parent ButtonSetting
- * 
  * 
  * @param GetPage
  * @text 入手画面設定
@@ -380,7 +402,7 @@
  * @parent GetPage
  * 
  * @param FaceHeight
- * @desc １キャラ当たりの縦幅。
+ * @desc １キャラ当たりの縦幅。(0で自動調整)
  * @text １キャラ当たりの縦幅
  * @type number
  * @default 120
@@ -405,6 +427,50 @@
  * @default true
  * @text 高さ調整拡大率考慮
  * @desc １キャラ当たりの縦幅を、顔グラの拡大率に合わせて高さ調整します。
+ * @parent GetPage
+ * 
+ * @param ResultActorWidth
+ * @desc 経験値獲得時アクター表示の表示横幅。(-1で自動)
+ * @text 経験値獲得時アクター表示横幅
+ * @type number
+ * @default -1
+ * @min -1
+ * @parent GetPage
+ * 
+ * @param ResultActorVisible
+ * @type boolean
+ * @default true
+ * @text 経験値獲得時アクター表示
+ * @desc 経験値獲得時のアクターを表示します。
+ * @parent GetPage
+ * 
+ * @param ResultActorDefaultAutoSize
+ * @type boolean
+ * @default false
+ * @text アクター数縦幅自動調整
+ * @desc デフォルト表示数と同じ時にアクター表示縦幅を自動調整します。OFFの場合は「１キャラ当たりの縦幅」が適用されます。
+ * @parent GetPage
+ * 
+ * @param ResultActorLessThanSize
+ * @type boolean
+ * @default false
+ * @text アクター数縦幅自動調整（未満）
+ * @desc デフォルト表示数未満時にアクター表示縦幅を自動調整します。
+ * @parent GetPage
+ * 
+ * @param ResultActorAutoSize
+ * @type boolean
+ * @default false
+ * @text アクター数縦幅自動調整（より大きい）
+ * @desc デフォルト表示数より大きいの時にアクター表示縦幅を自動調整します。
+ * @parent GetPage
+ * 
+ * @param DefaultActorVisible
+ * @desc 経験値獲得時アクターのデフォルト表示数
+ * @text デフォルトアクター表示数
+ * @type number
+ * @default 4
+ * @min 0
  * @parent GetPage
  * 
  * @param LavelUpPosition
@@ -1559,8 +1625,18 @@ Window_Result.prototype.loadImages = function() {
   }
 };
 
-Window_Result.prototype.itemHeight = function() {
-  return ImageManager.faceHeight;
+Window_Result.prototype.actorContentHeight = function(scale) {
+  const itemPadding = this.itemPadding();
+  if (param.ResultActorAutoSize && param.DefaultActorVisible < this.actorMembers()) {
+    return Math.floor((this.height - itemPadding * 2) / this.actorMembers());
+  } else if (param.ResultActorLessThanSize && param.DefaultActorVisible > this.actorMembers()) {
+    return Math.floor((this.height - itemPadding * 2) / this.actorMembers());
+  } else {
+    if (!param.ResultActorDefaultAutoSize && param.FaceHeight > 0) {
+      return (param.ActorShow === 1 && param.FaceScaleHeight) ? Math.floor(param.FaceHeight * scale) : param.FaceHeight;
+    }
+    return Math.floor((this.height - itemPadding * 2) / param.DefaultActorVisible);
+  }
 };
 
 Window_Result.prototype.actor = function(index) {
@@ -1586,6 +1662,9 @@ Window_Result.prototype.actorAreaWidth = function(scale) {
   }
 };
 
+Window_Result.prototype.actorContentWidth = function(rect) {
+  return param.ResultActorWidth < 0 ? (rect.width - Math.floor(rect.width / 2.6)) : param.ResultActorWidth;
+};
 
 Window_Result.prototype.refresh = function() {
   this.contents.clear();
@@ -1594,9 +1673,9 @@ Window_Result.prototype.refresh = function() {
   const lineHeight = this.lineHeight();
   const itemPadding = this.itemPadding();
   if (this.page === 0) {
-    const height = param.FaceScaleHeight ? Math.floor(param.FaceHeight * scale) : param.FaceHeight;
+    const height = this.actorContentHeight(scale);
     const faceArea = rect.x + this.actorAreaWidth(scale);
-    const x2 = rect.x + (rect.width - Math.floor(rect.width / 2.6));
+    const x2 = rect.x + this.actorContentWidth(rect);
     gaugeWidth = rect.width - Math.floor(rect.width / 2.6) - faceArea - 30;
     for (let i = 0; this.actorMembers() > i; i++) {
       this._actor = this.actor(i);
@@ -1604,22 +1683,22 @@ Window_Result.prototype.refresh = function() {
       this._actor._oldStatus = [];
       let y = i * height + rect.y + param.ActorResult_Y;
       if (param.ActorShow === 2) {
-        this.drawActorCharacter(rect.x + Math.floor(this.actorAreaWidth() / 2), y + 60);
+        this.drawActorCharacter(rect.x + Math.floor(this.actorAreaWidth() / 2), y + 60, param.ResultActorVisible);
       } else if (param.ActorShow === 1) {
-        this.drawActorFace(rect.x, y, param.FaceWidth, param.FaceHeight);
+        this.drawActorFace(rect.x, y, param.FaceWidth, param.FaceHeight, param.ResultActorVisible);
       } else if (param.ActorShow === 3) {
-        this.drawSvActor(rect.x, y + (height / 2), param.FaceWidth, param.FaceHeight);
+        this.drawSvActor(rect.x, y + (height / 2), param.ResultActorVisible);
       }
-      this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112);
-      this.drawActorLevel(rect.x + x2 - 100, y);
+      this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112, param.ResultActorVisible);
+      this.drawActorLevel(rect.x + x2 - 100, y, param.ResultActorVisible);
       if (param.LavelUpPosition === 1) {
-        this.drawLevelUp(rect.x + param.LevelUp_X, y + param.LevelUp_Y, Math.floor(this.actorAreaWidth(scale)));
+        this.drawLevelUp(rect.x + param.LevelUp_X, y + param.LevelUp_Y, Math.floor(this.actorAreaWidth(scale)), param.ResultActorVisible);
       } else if (param.LavelUpPosition === 10) {
-        this.drawLevelUp(rect.x + param.LevelUp_X , y + param.LevelUp_Y, rect.width);
+        this.drawLevelUp(rect.x + param.LevelUp_X , y + param.LevelUp_Y, rect.width, param.ResultActorVisible);
       }
       //this.drawExpGauge(rect.x + x2 - (gaugeWidth + param.Gauge_Margin), y + param.EXP_Y + 18);
-      this.drawExpGauge(rect.x + x2 - gaugeWidth - 30, y + param.EXP_Y + 18);
-      this.drawGetEXP(rect.x + faceArea, y + param.EXP_Y, rect.width);
+      this.drawExpGauge(rect.x + x2 - gaugeWidth - 30, y + param.EXP_Y + 18, param.ResultActorVisible);
+      this.drawGetEXP(rect.x + faceArea, y + param.EXP_Y, rect.width, param.ResultActorVisible);
     }
     this.drawGainList(x2, rect.y, rect.width - x2);
   } else {
@@ -1721,16 +1800,20 @@ Window_Result.prototype.actorImgRefresh = function(bitmap, date) {
   this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
 };
 
-Window_Result.prototype.drawActorFace = function(x, y, width, height) {
-  this.drawFace(this._actor.faceName(), this._actor.faceIndex(), x, y, width, height);
+Window_Result.prototype.drawActorFace = function(x, y, width, height, mode) {
+  if (mode || this.page > 0) {
+    this.drawFace(this._actor.faceName(), this._actor.faceIndex(), x, y, width, height);
+  }
 };
 
-Window_Result.prototype.drawSvActor = function(x, y, width, height) {
-  const bitmap = ImageManager.loadSvActor(this._actor.battlerName());
-  if (bitmap && !bitmap.isReady()) {
-    bitmap.addLoadListener(this.drawSvActorImg.bind(this, bitmap, x, y));
-  } else {
-    this.drawSvActorImg(bitmap, x, y);
+Window_Result.prototype.drawSvActor = function(x, y, mode) {
+  if (mode) {
+    const bitmap = ImageManager.loadSvActor(this._actor.battlerName());
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.addLoadListener(this.drawSvActorImg.bind(this, bitmap, x, y));
+    } else {
+      this.drawSvActorImg(bitmap, x, y);
+    }
   }
 };
 
@@ -1743,18 +1826,22 @@ Window_Result.prototype.drawSvActorImg = function(bitmap, x, y) {
     this.contents.blt(bitmap, sx, sy, pw, ph, x, y - ph);
 };
 
-Window_Result.prototype.drawExpGauge = function(x, y) {
-  this.placeExpGauge(this._actor, x, y);
+Window_Result.prototype.drawExpGauge = function(x, y, mode) {
+  if (mode) {
+    this.placeExpGauge(this._actor, x, y);
+  }
 };
 
-Window_Result.prototype.drawActorName = function(x, y, width) {
-  if (!this._actor.isAlive()) {
-    this.changeTextColor(ColorManager.deathColor());
+Window_Result.prototype.drawActorName = function(x, y, width, mode) {
+  if (mode) {
+    if (!this._actor.isAlive()) {
+      this.changeTextColor(ColorManager.deathColor());
+    }
+    this.contents.fontSize = $gameSystem.mainFontSize() + param.ActorNameFontSize;
+    this.drawText(this._actor.name(), x, y, width);
+    this.contents.fontSize = $gameSystem.mainFontSize();
+    this.resetTextColor();
   }
-  this.contents.fontSize = $gameSystem.mainFontSize() + param.ActorNameFontSize;
-  this.drawText(this._actor.name(), x, y, width);
-  this.contents.fontSize = $gameSystem.mainFontSize();
-  this.resetTextColor();
 };
 
 Window_Result.prototype.drawActorStatusName = function(x, y, width) {
@@ -1765,15 +1852,17 @@ Window_Result.prototype.drawActorStatusName = function(x, y, width) {
   this.resetTextColor();
 };
 
-Window_Result.prototype.drawActorLevel = function(x, y) {
+Window_Result.prototype.drawActorLevel = function(x, y, mode) {
   const exp = BattleManager._rewards.exp;
   const actor = this._actor;
   if (!isNaN(exp)) {
     const level = actor.resultGainExp(exp);
     const oldStatus = [];
-    this.contents.fontSize = $gameSystem.mainFontSize() + param.LevelFontSize;
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(TextManager.levelA, x, y, 48);
+    if (mode) {
+      this.contents.fontSize = $gameSystem.mainFontSize() + param.LevelFontSize;
+      this.changeTextColor(ColorManager.systemColor());
+      this.drawText(TextManager.levelA, x, y, 48);
+    }
     if (level > actor._level) {
       this._levelUp = true;
       BattleManager._levelUpPageEnable = BattleManager._levelUpPageEnable === undefined || BattleManager._levelUpPageEnable === null ? param.LavelUpWindowShow : BattleManager._levelUpPageEnable;
@@ -1806,20 +1895,24 @@ Window_Result.prototype.drawActorLevel = function(x, y) {
     } else {
       this.resetTextColor();
     }
+    if (mode) {
     this.drawText(level, x + 30, y, 70 - 30, "right");
+    }
     this.contents.fontSize = $gameSystem.mainFontSize();
     this.resetTextColor();
   }
 };
 
-Window_Result.prototype.drawLevelUp = function(x, y, width) {
+Window_Result.prototype.drawLevelUp = function(x, y, width, mode) {
   if (this._levelUp) {
-    this.changeTextColor(ColorManager.textColor(param.LevelUpNameColor));
-    this.contents.fontSize = $gameSystem.mainFontSize() + param.LevelUpFontSize;
-    const position = param.LavelUpPosition === 1 ? "center" : "left";
-    this.drawText(param.LevelUpName, x, y, width, position);
-    this.resetTextColor();
-    this.contents.fontSize = $gameSystem.mainFontSize();
+    if (mode) {
+      this.changeTextColor(ColorManager.textColor(param.LevelUpNameColor));
+      this.contents.fontSize = $gameSystem.mainFontSize() + param.LevelUpFontSize;
+      const position = param.LavelUpPosition === 1 ? "center" : "left";
+      this.drawText(param.LevelUpName, x, y, width, position);
+      this.resetTextColor();
+      this.contents.fontSize = $gameSystem.mainFontSize();
+    }
     this._levelUp = false;
   }
 };
@@ -1873,31 +1966,33 @@ Window_Result.prototype.drawPartyOriginalParam = function(date, x, y, width) {
   }
 };
 
-Window_Result.prototype.drawGetEXP = function(x, y, width) {
-  const exp = BattleManager._rewards.exp;
-  if (!isNaN(exp)) {
-    let x2 = x;
-    if (param.GainEXPVisible) {
-      const finalExp = Math.round(exp * this._actor.finalExpRate());
-      this.contents.fontSize = $gameSystem.mainFontSize() + param.EXPFontSize;
-      const textWidth = this.textWidth(param.GetEXPName);
-      this.changeTextColor(ColorManager.systemColor());
-      this.drawText(param.GetEXPName, x, y, width, "left");
-      if (exp > finalExp && finalExp > 0) {
-        this.changeTextColor(ColorManager.textColor(param.EXPResistValueColor));
-      } else if (exp < finalExp) {
-        this.changeTextColor(ColorManager.textColor(param.EXPBoostValueColor));
-      } else {
+Window_Result.prototype.drawGetEXP = function(x, y, width, mode) {
+  if (mode) {
+    const exp = BattleManager._rewards.exp;
+    if (!isNaN(exp)) {
+      let x2 = x;
+      if (param.GainEXPVisible) {
+        const finalExp = Math.round(exp * this._actor.finalExpRate());
+        this.contents.fontSize = $gameSystem.mainFontSize() + param.EXPFontSize;
+        const textWidth = this.textWidth(param.GetEXPName);
+        this.changeTextColor(ColorManager.systemColor());
+        this.drawText(param.GetEXPName, x, y, width, "left");
+        if (exp > finalExp && finalExp > 0) {
+          this.changeTextColor(ColorManager.textColor(param.EXPResistValueColor));
+        } else if (exp < finalExp) {
+          this.changeTextColor(ColorManager.textColor(param.EXPBoostValueColor));
+        } else {
+          this.resetTextColor();
+        }
+        const text = "+"+ finalExp;
+        x2 += param.LavelUpPosition === 2 ? Math.min(this.textWidth(text), width - x - 190) + textWidth + (this.itemPadding() * 2) : 0;
+        this.drawText(text, x + textWidth + this.itemPadding(), y, width - x - 190, "left");
         this.resetTextColor();
+        this.contents.fontSize = $gameSystem.mainFontSize();
       }
-      const text = "+"+ finalExp;
-      x2 += param.LavelUpPosition === 2 ? Math.min(this.textWidth(text), width - x - 190) + textWidth + (this.itemPadding() * 2) : 0;
-      this.drawText(text, x + textWidth + this.itemPadding(), y, width - x - 190, "left");
-      this.resetTextColor();
-      this.contents.fontSize = $gameSystem.mainFontSize();
-    }
-    if (param.LavelUpPosition === 2) {
-      this.drawLevelUp(x2 + param.LevelUp_X, y + param.LevelUp_Y, width);
+      if (param.LavelUpPosition === 2) {
+        this.drawLevelUp(x2 + param.LevelUp_X, y + param.LevelUp_Y, width);
+      }
     }
   }
 };
@@ -1950,24 +2045,44 @@ Window_Result.prototype.currencyUnit = function() {
 };
 
 Window_Result.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
+  const scale = this.page === 0 ? param.FaceScale / 100 : 1;
   width = width || ImageManager.faceWidth;
   height = height || ImageManager.faceHeight;
-  const scale = this.page === 0 ? param.FaceScale / 100 : 1;
   const bitmap = ImageManager.loadFace(faceName);
-  const pw = ImageManager.faceWidth;
-  const ph = ImageManager.faceHeight;
-  const sw = Math.min(width, pw);
-  const sh = Math.min(height, ph);
-  const dy = Math.floor(y + Math.max(height - ph, 0) / 2);
-  const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
-  const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
-  const dw = Math.floor(sw * scale);
-  const dh = Math.floor(sh * scale);
+  if (this.page === 0) {
+    const contentsHeight = this.actorContentHeight(scale);
+    if (param.ResultActorAutoSize) {
+      if (height * scale > contentsHeight) {
+        height = Math.floor((contentsHeight / (contentsHeight * scale)) * contentsHeight);
+      }
+    }
+    var pw = ImageManager.faceWidth;
+    var ph = ImageManager.faceHeight;
+    var sw = Math.min(width, pw);
+    var sh = Math.min(height, ph);
+    var dy = Math.floor(y + Math.max(height - ph, 0) / 2);
+    var sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+    var sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+    var dw = Math.floor(sw * scale);
+    var dh = Math.floor(sh * scale);
+  } else {
+    var pw = ImageManager.faceWidth;
+    var ph = ImageManager.faceHeight;
+    var sw = Math.min(width, pw);
+    var sh = Math.min(height, ph);
+    var dy = Math.floor(y + Math.max(height - ph, 0) / 2);
+    var sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+    var sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+    var dw = Math.floor(sw * scale);
+    var dh = Math.floor(sh * scale);
+  }
   this.contents.blt(bitmap, sx, sy, sw, sh, x, dy, dw, dh);
 };
 
-Window_Result.prototype.drawActorCharacter = function(x, y) {
-  this.drawCharacter(this._actor.characterName(), this._actor.characterIndex(), x, y);
+Window_Result.prototype.drawActorCharacter = function(x, y, mode) {
+  if (mode) {
+    this.drawCharacter(this._actor.characterName(), this._actor.characterIndex(), x, y);
+  }
 };
 
 Window_Result.prototype.placeExpGauge = function(actor, x, y) {
@@ -2083,6 +2198,10 @@ Window_ResultDropItem.prototype.initialize = function(rect) {
   this.frameVisible = false;
 };
 
+Window_ResultDropItem.prototype.actorContentWidth = function(rect) {
+  return param.ResultActorWidth < 0 ? (rect.width - Math.floor(rect.width / 2.6)) : param.ResultActorWidth;
+};
+
 Window_ResultDropItem.prototype.skillTop = function() {
   return param.FaceVisible ? 4.5 : 2;
 };
@@ -2113,7 +2232,8 @@ Window_ResultDropItem.prototype.refresh = function() {
     const actor = this._windowResult._actor;
     this.drawLearnSkill(actor, rect.x + rect.width / 2 + itemPadding, rect.y + lineHeight * this.skillTop(), rect.width / 2 - itemPadding);
   } else {
-    this.drawGetItems(x, rect.y, rect.width - x);
+    const width = this.actorContentWidth(rect);
+    this.drawGetItems(rect.x + width, rect.y, width - rect.x);
   }
 };
 
@@ -2166,6 +2286,8 @@ Window_ResultDropItem.prototype.drawLearnSkill = function(actor, x, y, width) {
     }
   }
 };
+
+
 
 function Sprite_ResultActor() {
   this.initialize(...arguments);

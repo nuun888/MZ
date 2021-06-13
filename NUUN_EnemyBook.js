@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.5.1
+ * @version 2.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -111,6 +111,7 @@
  * <NoDropProbability>
  * このタグを記入したアイテムはドロップアイテムの確率表示を表示しません。
  * <CertainAnalyze> アナライズ耐性を無視します。
+ * <EnemyInfo> 敵の情報を表示します。
  * 
  * 
  * 図鑑の登録タイミングを遭遇時、撃破時、アナライズ時、撃破またはアナライズ時から選択できます。（ステータス情報は登録されません）
@@ -206,6 +207,7 @@
  * 
  * プラグインコマンド
  * モンスター図鑑オープン       図鑑を開きます。
+ * 敵の情報表示　　　　　       敵の情報を開きます。
  * モンスター追加              モンスターを図鑑に追加します。ステータス情報は登録されません。
  * モンスター削除              モンスターを図鑑から削除します。
  * 図鑑完成                    図鑑を完成させます。
@@ -250,6 +252,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/13 Ver.2.5.2
+ * プラグインコマンドで敵の情報を表示できる機能を追加。
  * 2021/6/12 Ver.2.5.1
  * ウィンドウの端に謎の黒い縦線が出る問題を修正。
  * 2021/6/9 Ver.2.5.0
@@ -388,6 +392,10 @@
  * @command EnemyBookOpen
  * @desc モンスター図鑑を開きます。
  * @text モンスター図鑑オープン
+ * 
+ * @command EnemyInfoOpen
+ * @desc 敵の情報を開きます。
+ * @text 敵の情報表示
  * 
  * @command EnemyBookAdd
  * @desc モンスターを図鑑に追加します。ステータス情報は登録されません。
@@ -1272,6 +1280,13 @@
  * @max 999999
  * @parent EnemyInfoSetting
  * 
+ * @param InfoMaskMode
+ * @desc 情報開示してない場合はステータスを隠す。表示リストの各項目で設定した「情報未登録ステータス表」を反映。
+ * @text 情報未登録ステータス表示
+ * @type boolean
+ * @default false
+ * @parent EnemyInfoSetting
+ * 
  * @param ListData
  * @text 表示項目設定
  * @default ------------------------------EnemyInfoMode
@@ -2098,6 +2113,12 @@ PluginManager.registerCommand(pluginName, 'EnemyBookOpen', args => {
     SceneManager._scene.commandEnemyBook();
   } else {
     SceneManager.push(Scene_EnemyBook);
+  }
+});
+
+PluginManager.registerCommand(pluginName, 'EnemyInfoOpen', args => {
+  if ($gameParty.inBattle()) {
+    SceneManager._scene.commandEnemyBookInfo();
   }
 });
 
@@ -3791,7 +3812,7 @@ Window_EnemyBook.prototype.onDebuffFlag = function(index) {
 };
 
 Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
-  return this._enemy.meta.ShowDataBook || this._bookMode === 1;
+  return this._enemy.meta.ShowDataBook || this._bookMode === 1 || (this._bookMode === 2 && !param.InfoMaskMode);
 };
 
 Window_EnemyBook.prototype.analyzeGaugeVisible = function() {

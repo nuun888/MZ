@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.3.1
+ * @version 2.3.2
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/6/13 Ver 2.3.2
+ * 疑似3Dバトル暫定競合対策。
  * 2021/6/6 Ver 2.3.1
  * アクター画像に回復をしたときの画像を追加。
  * 2021/6/5 Ver 2.3.0
@@ -1569,6 +1571,7 @@ Sprite_Battler.prototype.createStatePopupSprite = function() {
   sprite.setup(this._battler);
   this._damages.push(sprite);
   this.parent.addChild(sprite);
+  this._popUpSprite = sprite;
 };
 
 const _Sprite_Actor_updateVisibility = Sprite_Actor.prototype.updateVisibility;
@@ -1718,6 +1721,7 @@ Sprite_ActorImges.prototype.update = function() {
       this._battler._actionActorImg === null;
     }
     this.updateBitmap();
+    this.updateMotion();
     this.updateSelectionEffect();
   } else {
     this.bitmap = null;
@@ -1772,8 +1776,17 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
   }
 };
 
+Sprite_ActorImges.prototype.updateMotion = function() {
+  const actor = this._battler;
+  if (actor) {
+    const result = actor.result();
+    if (result.hpDamage > 0) {
+      
+    }
+  }
+};
+
 Sprite_ActorImges.prototype.checkDamage = function(actor) {
-  
   return actor._imgIndex === 3;
 };
 

@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.10.0
+ * @version 1.10.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/13 Ver.1.10.1
+ * 入手アイテムの文字が枠内からはみ出てしまう問題を修正。
  * 2021/6/13 Ver.1.10.0
  * アクターの獲得経験値表示を表示しない機能を追加。
  * メンバーによってアクターの獲得経験値表示の縦幅を調整する機能を追加。
@@ -2233,7 +2235,7 @@ Window_ResultDropItem.prototype.refresh = function() {
     this.drawLearnSkill(actor, rect.x + rect.width / 2 + itemPadding, rect.y + lineHeight * this.skillTop(), rect.width / 2 - itemPadding);
   } else {
     const width = this.actorContentWidth(rect);
-    this.drawGetItems(rect.x + width, rect.y, width - rect.x);
+    this.drawGetItems(rect.x + width, rect.y, rect.width - width - rect.x);
   }
 };
 

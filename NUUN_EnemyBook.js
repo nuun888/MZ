@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.5.2
+ * @version 2.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -252,6 +252,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/16 Ver.2.6.0
+ * モンスターブックナンバーを表示する機能を追加。
+ * 図鑑に登録されていないモンスターをリストから表示しない機能を追加。
+ * 完成度ウィンドウに幾つかの項目を追加。
  * 2021/6/13 Ver.2.5.2
  * プラグインコマンドで敵の情報を表示できる機能を追加。
  * 2021/6/12 Ver.2.5.1
@@ -858,11 +862,11 @@
  * @default 1
  * @parent BasicSetting
  * 
- * @param UnknownStatus
- * @desc ステータス情報未登録時のステータス表示名
- * @text ステータス情報未登録時ステータス表示名
- * @type string
- * @default ？？？
+ * @param UnknownVisible
+ * @desc 未確認のモンスターをリストに表示しません。
+ * @text 未確認モンスター表示
+ * @type boolean
+ * @default false
  * @parent BasicSetting
  * 
  * @param UnknownData
@@ -870,6 +874,13 @@
  * @text 未確認エネミー及びアイテム名
  * @type string
  * @default ？
+ * @parent BasicSetting
+ * 
+ * @param UnknownStatus
+ * @desc ステータス情報未登録時のステータス表示名
+ * @text ステータス情報未登録時ステータス表示名
+ * @type string
+ * @default ？？？
  * @parent BasicSetting
  * 
  * @param UnknownItems
@@ -1802,7 +1813,7 @@
  * @value 35
  * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）
  * @value 36
- * @option モンスターブックナンバー(未実装)
+ * @option モンスターブックナンバー
  * @value 37
  * @option 耐性属性
  * @value 40
@@ -2078,6 +2089,14 @@
  * @value 1
  * @option 撃破済み
  * @value 2
+ * @option 情報登録済み
+ * @value 3
+ * @option 遭遇数
+ * @value 11
+ * @option 撃破数
+ * @value 12
+ * @option 情報登録数
+ * @value 13
  * @default 0
  * @parent nameSetting
 *
@@ -2262,6 +2281,12 @@ PluginManager.registerCommand(pluginName, 'EnemyBookDebuffRemove', args => {
   $gameSystem.enemyBookDebuffList(Number(args.enemyId), Number(args.debuffId) - 1, Number(args.debuffId) > 0, false);
 });
 
+const _DataManager_extractSaveContents = DataManager.extractSaveContents;
+DataManager.extractSaveContents = function(contents) {
+  _DataManager_extractSaveContents.call(this, contents);
+  $gameSystem.initEnemyBookNumber();
+};
+
 //Game_System
 const _Game_System_initialize = Game_System.prototype.initialize;
 Game_System.prototype.initialize = function() {
@@ -2275,6 +2300,7 @@ Game_System.prototype.initialize = function() {
   this._enemyBookStateFlags = [];
   this._enemyBookDebuffFlags = [];
   this._enemyBookActionFlags = [];
+  this.initEnemyBookNumber();
   this.initCategoryEnemyBook();
 };
 
@@ -2785,6 +2811,33 @@ Game_System.prototype.enemyBookDebuffList = function(enemyId, debuffId, Individu
   }
 };
 
+Game_System.prototype.initEnemyBookNumber = function() {
+  if(!this._enemyBookNumber) {
+    this._enemyBookNumber = [];
+  }
+  let index = 0;
+  for (enemy of $dataEnemies) {
+    if (enemy && this.isEnemyBook(enemy)) {
+      index++;
+      this._enemyBookNumber.push(index);
+    } else {
+      this._enemyBookNumber.push(-1);
+    }
+  }
+  this._enemyBookLength = index;
+};
+
+Game_System.prototype.addToEnemyBookNumber = function(enemyId, index) {
+  if(!this._enemyBookNumber) {
+    this._enemyBookNumber = [];
+  }
+  this._enemyBookNumber[enemyId] = index;
+};
+
+Game_System.prototype.getEnemyBookNumber = function(enemyId) {
+  return enemyId === 0 ? this._enemyBookNumber : this._enemyBookNumber[enemyId];
+};
+
 //Game_Troop
 const _Game_Troop_setup = Game_Troop.prototype.setup;
 Game_Troop.prototype.setup = function(troopId) {
@@ -3235,23 +3288,29 @@ Window_EnemyBook_Percent.prototype.initialize = function(rect) {
 };
 
 Window_EnemyBook_Percent.prototype.percentRefresh = function(enemyList) {
+  this._enemyListLength = enemyList.length;
   this.defeatPercent(enemyList);
   this.encounteredPercent(enemyList);
+  //this.registrationPercent(enemyList);
   this.refresh();
 };
 
 Window_EnemyBook_Percent.prototype.defeatPercent = function(enemyList) {
+  this._defeat.length = enemyList.length;
   this._defeat.encNum = $gameSystem.defeatEnemy(enemyList);
   this._defeat.onStatus = $gameSystem.onStatusEnemyDate(enemyList);
-  this._defeat.Percent = Math.floor(this._defeat.encNum / enemyList.length * 100);
-  this._defeat.complete = Math.floor(this._defeat.onStatus / enemyList.length * 100);
-  this._defeat.length = enemyList.length;
+  this._defeat.Percent = Math.floor(this._defeat.encNum / this._defeat.length * 100);
+  this._defeat.complete = Math.floor(this._defeat.onStatus / this._defeat.length * 100);
 };
 
 Window_EnemyBook_Percent.prototype.encounteredPercent = function(enemyList) {
   this._encountered.encNum = $gameSystem.encounteredEnemy(enemyList);
   //this._encountered.Percent = Math.floor(this._encountered.encNum / enemyList.length * 100);
   this._encountered.length = enemyList.length;
+};
+
+Window_EnemyBook_Percent.prototype.registrationPercent = function(enemyList) {
+  this.registration.encNum = $gameSystem.registrationEnemy(enemyList);
 };
 
 Window_EnemyBook_Percent.prototype.refresh = function() {
@@ -3276,6 +3335,14 @@ Window_EnemyBook_Percent.prototype.getParam = function(content) {
     text = content.ContentName +' : '+ this._encountered.encNum +'/'+ this._encountered.length;
   } else if (content.ContentDate === 2) {
     text = content.ContentName +' : '+ this._defeat.encNum +'/'+ this._defeat.length;
+  } else if (content.ContentDate === 3) {
+    text = content.ContentName +' : '+ this._defeat.onStatus +'/'+ this._defeat.length;
+  } else if (content.ContentDate === 11) {
+    text = content.ContentName +' : '+ this._encountered.encNum;
+  } else if (content.ContentDate === 12) {
+    text = content.ContentName +' : '+ this._defeat.encNum;
+  } else if (content.ContentDate === 13) {
+    text = content.ContentName +' : '+ this._defeat.onStatus;
   }
   return text;
 };
@@ -3530,22 +3597,22 @@ Window_EnemyBook_Index.prototype.enemyAt = function(index) {
 
 Window_EnemyBook_Index.prototype.makeEnemyList = function() {
   this._enemyPercentList = [];
-  this._listIndex = 0;
-  this._listEnemy = [];
   this._enemyList = $dataEnemies.filter(enemy => this.includes(enemy));
 };
 
 Window_EnemyBook_Index.prototype.includes = function(enemy) {
   const result = $gameSystem.isEnemyBook(enemy);
   if (result) {
-    this._listIndex++;
     this._enemyPercentList.push(enemy);
   }
-  if (result && this.categoryIncludes(enemy)) {
-    this._listEnemy.push(this._listIndex);
+  if (result && this.categoryIncludes(enemy) && this.unknownEnemyVisible(enemy)) {
     return true;
   }
   return false;
+};
+
+Window_EnemyBook_Index.prototype.unknownEnemyVisible = function(enemy) {
+  return !param.UnknownVisible || (param.UnknownVisible && $gameSystem.isInEnemyBook(enemy));
 };
 
 Window_EnemyBook_Index.prototype.categoryIncludes = function(enemy) { 
@@ -3572,7 +3639,7 @@ Window_EnemyBook_Index.prototype.drawItem = function(index) {
     const textMargin = iconId > 0 ? ImageManager.iconWidth + 4 : 0;
     const itemWidth = Math.max(0, rect.width - textMargin);
     if(param.NumberType > 0) {
-      let numberText = this._listEnemy[index];
+      let numberText = $gameSystem.getEnemyBookNumber(enemy.id);
       const textWidth = this.numberWidth(numberText);
       if (param.NumberType === 2) {
         numberText = this.numberWidthSlice(numberText);
@@ -3595,11 +3662,11 @@ Window_EnemyBook_Index.prototype.drawItem = function(index) {
 };
 
 Window_EnemyBook_Index.prototype.numberWidth = function(numberText) {
-  return this.textWidth(this._enemyList.length >= 1000 || param.NumberType === 2 ? '000' : '00');
+  return this.textWidth($gameSystem._enemyBookLength >= 1000 || param.NumberType === 2 ? '000' : '00');
 };
 
 Window_EnemyBook_Index.prototype.numberWidthSlice = function(indexText) {
-  return (this._enemyList.length >= 1000 ? ('0000' + indexText).slice(-4) : ('000' + indexText).slice(-3));
+  return ($gameSystem._enemyBookLength >= 1000 ? ('0000' + indexText).slice(-4) : ('000' + indexText).slice(-3));
 };
 
 Window_EnemyBook_Index.prototype.unknownDataLength = function(enemy) {
@@ -4363,7 +4430,7 @@ Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.name = function(list, enemy, x, y, width) {
-  const nameText = list.paramName
+  const nameText = list.paramName;
   if (nameText) {
     this.changeTextColor(ColorManager.textColor(list.NameColor));
     this.drawText(nameText, x, y, width, list.namePosition);
@@ -4371,7 +4438,19 @@ Window_EnemyBook.prototype.name = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.bookEnemyNo = function(list, enemy, x, y, width) {
-  
+  const nameText = list.paramName;
+  let textWidth  = 0;
+  if (nameText) {
+    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.drawText(nameText, x, y, width, list.namePosition);
+    textWidth = this.textWidth(nameText) + this.itemPadding();
+    this.resetTextColor();
+  }
+  let text = $gameSystem.getEnemyBookNumber(this._enemy.id);
+  if (param.NumberType === 2) {
+    text = this.numberWidthSlice(text);
+  }
+  this.drawText(text, x + textWidth, y, width - textWidth, "left");
 };
 
 Window_EnemyBook.prototype.horzLine = function(list, enemy, x, y, width) {
@@ -5007,6 +5086,10 @@ Window_EnemyBook.prototype.contensX = function(x) {
 
 Window_EnemyBook.prototype.contensWidth = function(width) {
   return width - this.itemPadding();
+};
+
+Window_EnemyBook.prototype.numberWidthSlice = function(indexText) {
+  return ($gameSystem._enemyBookLength >= 1000 ? ('0000' + indexText).slice(-4) : ('000' + indexText).slice(-3));
 };
 
 

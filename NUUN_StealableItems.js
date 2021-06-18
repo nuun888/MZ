@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * 敵からアイテムやお金を盗むスキルまたは、敵からアイテム、お金を盗まれるスキルを
@@ -74,10 +74,14 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
- *  
+ * 
  * このプラグインはTOMY (Kamesoft)様の「盗む」を参考にさせていただきました。
  * 
  * 更新履歴
+ * 2021/6/18 Ver 1.2.0
+ * ブーストの計算が正常に行えていなかった問題を修正。
+ * アイテム、お金を持っていない場合のメッセージを表示する機能を追加。
+ * 盗み成功時にSEを鳴らす機能を追加。
  * 2021/2/20 Ver 1.1.1
  * 盗み成功率の割合増減が正常に取得できていなかった問題を修正。
  * 2021/2/5 Ver 1.1.0
@@ -90,17 +94,27 @@
  * 
  * @param NotStealName
  * @text 盗めなかった時のメッセージ
- * @desc 敵からアイテムを盗めなかった時のメッセージ。
+ * @desc 敵からアイテムを盗めなかった時のメッセージ。[ターゲット]は～
  * @default から何も盗めなかった！
+ * 
+ * @param NonStealName
+ * @text 盗めるアイテムがない時のメッセージ
+ * @desc 盗めるアイテムがなかった時のメッセージ。[ターゲット]は～
+ * @default は何も持っていない！
+ * 
+ * @param NonStealGoldName
+ * @text 盗めるお金がない時のメッセージ
+ * @desc 盗めるお金がなかった時のメッセージ。[ターゲット]は～
+ * @default は何も持っていない！
  * 
  * @param GetStealName
  * @text 敵からアイテムを盗めた時のメッセージ
- * @desc 敵からアイテムを盗めた時のメッセージ。
+ * @desc 敵からアイテムを盗めた時のメッセージ。[ターゲット]から～
  * @default を盗んだ！
  * 
  * @param StolenName
  * @text 敵からアイテムを盗まれた時のメッセージ
- * @desc 敵からアイテムを盗まれた時のメッセージ。
+ * @desc 敵からアイテムを盗まれた時のメッセージ。[使用者]は～
  * @default を盗み取った！
  * 
  * @param StolenItemDrop
@@ -120,6 +134,68 @@
  * @desc 敵から奪われるアイテムの設定です。
  * @default []
  * @type struct<stolenItems>[]
+ * 
+ * @param SuccessSE
+ * @text アイテム盗みSE設定
+ * 
+ * @param StealSuccessSE
+ * @text 盗み成功時SE
+ * @desc 盗み成功時のSE
+ * @type file
+ * @dir audio/se/
+ * @parent SuccessSE
+ * 
+ * @param volume
+ * @text 音量
+ * @desc 音量。
+ * @type number
+ * @default 90
+ * @parent SuccessSE
+ * 
+ * @param pitch
+ * @text ピッチ
+ * @desc ピッチ。
+ * @type number
+ * @default 100
+ * @parent SuccessSE
+ * 
+ * @param pan
+ * @text 位相
+ * @desc 位相。
+ * @type number
+ * @default 50
+ * @parent SuccessSE
+ * 
+ * @param GoldSuccessSE
+ * @text お金盗み成功時のSE設定
+ * 
+ * @param StealGoldSuccessSE
+ * @text お金盗み成功時SE
+ * @desc お金盗み成功時のSE
+ * @type file
+ * @dir audio/se/
+ * @parent GoldSuccessSE
+ * 
+ * @param G_volume
+ * @text 音量
+ * @desc 音量。
+ * @type number
+ * @default 90
+ * @parent GoldSuccessSE
+ * 
+ * @param G_pitch
+ * @text ピッチ
+ * @desc ピッチ。
+ * @type number
+ * @default 100
+ * @parent GoldSuccessSE
+ * 
+ * @param G_pan
+ * @text 位相
+ * @desc 位相。
+ * @type number
+ * @default 50
+ * @parent GoldSuccessSE
  * 
  */ 
 /*~struct~stolenItems:
@@ -178,7 +254,7 @@ Game_BattlerBase.prototype.stealPercentBoost = function(){
 			rate *= Number(traitObject.meta.steal_sr_Percent) / 100;
 		}
 	}, this);
-	return rate;
+	return rate / 100;
 };
 
 Game_BattlerBase.prototype.stealItemRate = function() {
@@ -275,7 +351,13 @@ Game_Action.prototype.StealItems = function(target, mode){
 	if (stealItem) {
 		this.getStealItems(target, stealItem);
 	} else {
-		target.stealMessage = target.name() + param.NotStealName;
+		if (mode === 1 && !target.isStealItems()) {
+			target.stealMessage = target.name() + param.NonStealName;
+		} else if (mode === 2 && !target.isStealGold()) {
+			target.stealMessage = target.name() + param.NonStealGoldName;
+		} else {
+			target.stealMessage = target.name() + param.NotStealName;
+		}
 	}
 	this.makeSuccess(target);
 };
@@ -318,10 +400,17 @@ Game_Action.prototype.getStealItems = function(target, stealItem){
 	if (typeof(stealItem) === 'object') {
 		$gameParty.gainItem(stealItem,1);
 		itemName = stealItem.name;
+		if(param.StealSuccessSE) {
+			AudioManager.playSe({"name":param.StealSuccessSE,"volume":param.volume,"pitch":param.pitch,"pan":param.pan});
+		}
 	} else {
 		$gameParty.gainGold(stealItem);
 		itemName = stealItem + TextManager.currencyUnit;
+		if(param.StealGoldSuccessSE) {
+			AudioManager.playSe({"name":param.StealGoldSuccessSE,"volume":param.G_volume,"pitch":param.G_pitch,"pan":param.G_pan});
+		}
 	}
+	
 	target.stealMessage = target.name() +"から"+ itemName + param.GetStealName;
 };
 
@@ -330,9 +419,15 @@ Game_Action.prototype.lostItem = function(target, item){
 	if (typeof(item) === 'object') {
 		$gameParty.loseItem(item, 1)
 		itemName = item.name;
+		if(param.StealSuccessSE) {
+			AudioManager.playSe({"name":param.StealSuccessSE,"volume":param.volume,"pitch":param.pitch,"pan":param.pan});
+		}
 	} else {
 		$gameParty.loseGold(item);
 		itemName = item + TextManager.currencyUnit;
+		if(param.StealGoldSuccessSE) {
+			AudioManager.playSe({"name":param.StealGoldSuccessSE,"volume":param.G_volume,"pitch":param.G_pitch,"pan":param.G_pan});
+		}
 	}
 	target.stealMessage = this.subject().name() +"は"+ itemName + param.StolenName;
 };
@@ -425,6 +520,14 @@ Game_Enemy.prototype.makeStealItems = function(rate, mode) {//最初に一致し
 		}
 	}
 return null;
+};
+
+Game_Enemy.prototype.isStealItems = function() {
+	return this._stealItems.some(item => item.kind > 0 && item.kind <= 3);
+};
+
+Game_Enemy.prototype.isStealGold = function() {
+	return this._stealItems.some(item => item.kind === 4);
 };
 
 Game_Enemy.prototype.getStealRate = function(rate, di) {

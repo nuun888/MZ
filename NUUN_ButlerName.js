@@ -9,21 +9,22 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  バトラー名前表示
+ * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.0.3
- * 
+ * @version 1.0.4
  * @help
  * モンスターに敵名を表示します。
  * 
  * 敵キャラのメモ欄
- * <EnemyNameX:[position]> TPBゲージのX座標を調整します。（相対座標）
- * <EnemyNameY:[position]> TPBゲージのY座標を調整します。（相対座標）
+ * <EnemyNameX:[position]> モンスター名のX座標を調整します。（相対座標）
+ * <EnemyNameY:[position]> モンスター名のY座標を調整します。（相対座標）
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/18 Ver.1.0.4
+ * ヘルプの説明の一部が間違っていたのを修正。
  * 2021/5/26 Ver.1.0.3
  * MNKR_TMBattlerExMZ.jsの拡大率を適用するように修正。
  * 2021/5/24 Ver.1.0.2

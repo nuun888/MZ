@@ -11,19 +11,18 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張疑似3Dバトル併用対応
  * @author NUUN
+ * @version 1.1.0
  * 
  * @help
  * バトルスタイル拡張と疑似3Dバトルを併用する際の競合対策プラグインです。
  * このプラグインを疑似3Dバトルより下に配置してください。
- * 
- * 既知の競合
- * フロントビューでアクター側にもエフェクトを表示をONに設定している場合、アクターがコマンド選択時に画面がズームしてしまう。
- * ポップアップが正常に表示されない。
- * 
+ *  
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/19 Ver.1.1.0
+ * 疑似3DプラグインVer.1.1以降に対応。
  * 2021/6/13 Ver.1.0.0
  * ポップアップ時にエラーが出る問題を修正。
  * アクターのダメージエフェクト、敵の画像が正常に動作しない問題を修正。
@@ -35,22 +34,25 @@ Imported.NUUN_BattleStyleEXInMPP_Pseudo3DBattle = true;
 (() => {
   const parameters = PluginManager.parameters('NUUN_BattleStyleEXInMPP_Pseudo3DBattle');
 
-  const _Sprite_Battler_createStatePopupSprite = Sprite_Battler.prototype.createStatePopupSprite;
-  Sprite_Battler.prototype.createStatePopupSprite = function() {
-    _Sprite_Battler_createStatePopupSprite.call(this);
-    this._popUpSprite.setupPseudo3dPosition(this, this._popUpSprite.x, this._popUpSprite.y);
+  Spriteset_Battle.prototype.pseudo3dSprites = function() {
+    return this._effectsBackContainer.children;
   };
-  
-  Spriteset_Battle.prototype.convertPseudo3dPosition = function() {
-    this._back1Sprite.convertPseudo3dPosition();
-    this._back2Sprite.convertPseudo3dPosition();
-    if (this._back1FixSprite) {
-        this._back1FixSprite.convertPseudo3dPosition();
+
+  const _Spriteset_Battle_createAnimationSprite = Spriteset_Battle.prototype.createAnimationSprite;
+  Spriteset_Battle.prototype.createAnimationSprite = function(targets, animation, mirror, delay) {
+    this._targetMode = true;
+    _Spriteset_Battle_createAnimationSprite.call(this, targets, animation, mirror, delay);
+};
+
+  const _Spriteset_Battle_makeTargetSprites = Spriteset_Battle.prototype.makeTargetSprites;
+  Spriteset_Battle.prototype.makeTargetSprites = function(targets) {
+    const targetSprites = _Spriteset_Battle_makeTargetSprites.call(this, targets);
+    if (!this._targetMode) {
+      if (this.animationTarget(targetSprites)) {
+        return [];
+      }
     }
-    for (const sprite of this._effectsBackContainer.children) {
-        if (sprite.convertPseudo3dPosition) {
-            sprite.convertPseudo3dPosition();
-        }
-    } 
+    this._targetMode = false;
+    return targetSprites;
   };
 })();

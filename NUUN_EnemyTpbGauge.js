@@ -11,12 +11,12 @@
  * @target MZ
  * @plugindesc  エネミーTPBゲージ
  * @author NUUN
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * エネミーにもTPBゲージを表示します。
  * 
- * エネミーのメモ欄
+ * 敵キャラのメモ欄
  * <TPBGaugeX:[position]> TPBゲージのX座標を調整します。（相対座標）
  * <TPBGaugeY:[position]> TPBゲージのY座標を調整します。（相対座標）
  * 
@@ -24,6 +24,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/19 Ver.1.1.5
+ * 疑似3DバトルVer.1.1対応のため一部の処理を変更。
  * 2021/5/24 Ver.1.1.4
  * 処理の一部を修正。
  * 2021/4/11 Ver.1.1.3
@@ -80,6 +82,18 @@
  * @default 0
  * @min -9999
  * 
+ * @param ConflictScale
+ * @desc 敵画像の上設定時の拡大率の考慮
+ * @text 拡大率の考慮
+ * @type select
+ * @option 元のサイズ基準
+ * @value 0
+ * @option 現在のサイズ基準
+ * @value 1
+ * @option 元のサイズ基準（MNKR_TMBattlerExMZ併用時）
+ * @value 2
+ * @default 0
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_EnemyTpbGauge = true;
@@ -91,6 +105,7 @@ const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
 const Gauge_X = Number(parameters['Gauge_X'] || 0);
 const Gauge_Y = Number(parameters['Gauge_Y'] || 0);
+const ConflictScale = Number(parameters['ConflictScale'] || 0);
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
@@ -103,14 +118,8 @@ Sprite_Enemy.prototype.update = function() {
 Sprite_Enemy.prototype.updateTpbGauge = function() {
   this._enemyTpb.x = this.tpbGaugeOffsetX + (this.x - this._enemyTpb.width / 2);
   this._enemyTpb.y = this.tpbGaugeOffsetY + this.y - 40;
-  if (TpbPosition === 0) {
-    if (this._SVBattlername) {
-      this._enemyTpb.y -= Math.round(((this._mainSprite.bitmap.height / 6) + 30) * 0.9);
-    } else if (this._svBattlerSprite) {
-      this._enemyTpb.y -= Math.round((this.height + 30) * 0.9);
-    } else {
-      this._enemyTpb.y -= Math.round((this.bitmap.height + 70) * 0.9);
-    }
+  if (this.getButlerTpbPosition() === 0) {
+    this._enemyTpb.y -= this.getButlerTpbPosition();
   }
   if (this._enemyTpb.y < 0) {
       this._enemyTpb.y = 30;
@@ -118,6 +127,31 @@ Sprite_Enemy.prototype.updateTpbGauge = function() {
     this._enemyTpb.y = Graphics.height - 40;
   }
   this.tpbGaugeOpacity();
+};
+
+Sprite_Enemy.prototype.getButlerTpbHeight = function() {
+  const scale = this.getButlerTpbConflict();
+  if (this._SVBattlername) {
+    return Math.floor(((this._mainSprite.bitmap.height / 6) + 30) * 0.9);
+  } else if (this._svBattlerSprite) {
+    return Math.floor((this.height + 30) * 0.9);
+  } else {
+    return Math.floor(((this.bitmap.height + 70) * 0.9) * scale);
+  }
+};
+
+Sprite_Enemy.prototype.getButlerTpbConflict = function() {
+  if (ConflictScale === 1) {
+    return this.scale.y;
+  } else if (ConflictScale === 2) {
+    return this._baseScale.y;
+  } else {
+    return 1;
+  }
+};
+
+Sprite_Enemy.prototype.getButlerTpbPosition = function() {
+  return TpbPosition;
 };
 
 Sprite_Enemy.prototype.tpbGaugeOpacity = function() {

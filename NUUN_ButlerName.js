@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.0.4
+ * @version 1.0.5
  * @help
  * モンスターに敵名を表示します。
  * 
@@ -23,6 +23,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/19 Ver.1.0.5
+ * 疑似3DバトルVer.1.1対応のため一部の処理を変更。
+ * 敵画像の上表示時の画像拡大時の処理方法の設定方法を変更。
  * 2021/6/18 Ver.1.0.4
  * ヘルプの説明の一部が間違っていたのを修正。
  * 2021/5/26 Ver.1.0.3
@@ -71,16 +74,17 @@
  * @default -12
  * @min -9999
  * 
- * @param ConflictSetting
- * @text 競合対策
- * @default ------------------------------
- * 
- * @param ConflictScale
- * @text MNKR_TMBattlerExMZ併用時の拡大率補正
- * @desc MNKR_TMBattlerExMZ併用時の拡大率補正適用
- * @type boolean
- * @default false
- * @parent ConflictSetting
+ * @param  ConflictScale
+ * @desc 敵画像の上設定時の拡大率の考慮
+ * @text 拡大率の考慮
+ * @type select
+ * @option 元のサイズ基準
+ * @value 0
+ * @option 現在のサイズ基準
+ * @value 1
+ * @option 元のサイズ基準（MNKR_TMBattlerExMZ併用時）
+ * @value 2
+ * @default 0
  * 
  */
 var Imported = Imported || {};
@@ -96,7 +100,7 @@ const EnemyNamePosition = Number(parameters['EnemyNamePosition'] || 0);
 const Name_X = Number(parameters['Name_X'] || 0);
 const Name_Y = Number(parameters['Name_Y'] || 0);
 const Name_FontSize = Number(parameters['Name_FontSize'] || -12);
-const ConflictScale = eval(parameters['ConflictScale'] || 'false');
+const ConflictScale = Number(parameters['ConflictScale'] || 0);
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
@@ -123,15 +127,8 @@ Sprite_Enemy.prototype.updateActorName = function() {
 Sprite_Enemy.prototype.updateEnemyName = function() {
   this._butlerName.x = this.butlerNameOffsetX + (this.x - this._butlerName.width / 2);
   this._butlerName.y = this.butlerNameOffsetY + this.y - 40;
-  if (EnemyNamePosition === 0) {
-    const scale = Imported.TMBattlerEx && ConflictScale ? this._baseScale.y : 1;
-    if (this._SVBattlername) {
-      this._butlerName.y -= Math.round(((this._mainSprite.bitmap.height / 6)) * 0.9);
-    } else if (this._svBattlerSprite) {
-      this._butlerName.y -= Math.round((this.height) * 0.9);
-    } else {
-      this._butlerName.y -= Math.round((this.bitmap.height + 40) * 0.9) * scale;
-    }
+  if (this.getButlerNamePosition() === 0) {
+    this._butlerName.y -= this.getButlerNameHeight();
   }
   if (this._butlerName.y < 0) {
       this._butlerName.y = 30;
@@ -139,6 +136,31 @@ Sprite_Enemy.prototype.updateEnemyName = function() {
     this._butlerName.y = Graphics.height - 40;
   }
   this.butlerNameOpacity();
+};
+
+Sprite_Enemy.prototype.getButlerNameHeight = function() {
+  const scale = this.getButlerNameConflict();
+  if (this._SVBattlername) {
+    return Math.floor((this._mainSprite.bitmap.height / 6) * 0.9);
+  } else if (this._svBattlerSprite) {
+    return Math.floor(this.height * 0.9);
+  } else {
+    return Math.floor(((this.bitmap.height + 40) * 0.9) * scale);
+  }
+};
+
+Sprite_Enemy.prototype.getButlerNameConflict = function() {
+  if (ConflictScale === 1) {
+    return this.scale.y;
+  } else if (ConflictScale === 2) {
+    return this._baseScale.y;
+  } else {
+    return 1;
+  }
+};
+
+Sprite_Enemy.prototype.getButlerNamePosition = function() {
+  return EnemyNamePosition;
 };
 
 Sprite_Enemy.prototype.butlerNameOpacity = function() {

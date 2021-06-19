@@ -11,12 +11,12 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
  * 
- * エネミーのメモ欄
+ * 敵キャラのメモ欄
  * <HPGaugeX:[position]> HPゲージのX座標を調整します。（相対座標）
  * <HPGaugeY:[position]> HPゲージのY座標を調整します。（相対座標）
  * <NoHPGauge> HPゲージを表示しません。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/19 Ver.1.0.3
+ * 疑似3DバトルVer.1.1対応のため一部の処理を変更。
  * 2021/5/24 Ver.1.0.2
  * HPラベル、数値を表示させない機能を追加。
  * 2021/5/24 Ver.1.0.1
@@ -98,6 +100,18 @@
  * @default -2
  * @min -9999
  * 
+ * @param ConflictScale
+ * @desc 敵画像の上設定時の拡大率の考慮
+ * @text 拡大率の考慮
+ * @type select
+ * @option 元のサイズ基準
+ * @value 0
+ * @option 現在のサイズ基準
+ * @value 1
+ * @option 元のサイズ基準（MNKR_TMBattlerExMZ併用時）
+ * @value 2
+ * @default 0
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_ButlerHPGauge = true;
@@ -113,6 +127,7 @@ const HPLabelVisible = eval(parameters['HPLabelVisible'] || 'true');
 const HPValueVisible = eval(parameters['HPValueVisible'] || 'true');
 const ValueFontSize = Number(parameters['ValueFontSize'] || -6);
 const LabelFontSize = Number(parameters['LabelFontSize'] || -2);
+const ConflictScale = Number(parameters['ConflictScale'] || 0);
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
@@ -125,16 +140,35 @@ Sprite_Enemy.prototype.update = function() {
 Sprite_Enemy.prototype.updateHpGauge = function() {
   this._butlerHp.x = this.hpGaugeOffsetX + (this.x - this._butlerHp.width / 2);
   this._butlerHp.y = this.hpGaugeOffsetY + this.y - 40;
-  if (HPPosition === 0) {
-    if (this._SVBattlername) {
-      this._butlerHp.y -= Math.round(((this._mainSprite.bitmap.height / 6) + 30) * 0.9);
-    } else if (this._svBattlerSprite) {
-      this._butlerHp.y -= Math.round((this.height + 30) * 0.9);
-    } else {
-      this._butlerHp.y -= Math.round((this.bitmap.height + 70) * 0.9);
-    }
+  if (this.getButlerHpPosition() === 0) {
+    this._butlerHp.y -= this.getButlerHpHeight();
   }
   this.hpGaugeOpacity();
+};
+
+Sprite_Enemy.prototype.getButlerHpHeight = function() {
+  const scale = this.getButlerHPConflict();
+  if (this._SVBattlername) {
+    return Math.floor(((this._mainSprite.bitmap.height / 6) + 30) * 0.9);
+  } else if (this._svBattlerSprite) {
+    return Math.floor((this.height + 30) * 0.9);
+  } else {
+    return Math.floor(((this.bitmap.height + 70) * 0.9) * scale);
+  }
+};
+
+Sprite_Enemy.prototype.getButlerHPConflict = function() {
+  if (ConflictScale === 1) {
+    return this.scale.y;
+  } else if (ConflictScale === 2) {
+    return this._baseScale.y;
+  } else {
+    return 1;
+  }
+};
+
+Sprite_Enemy.prototype.getButlerHpPosition = function() {
+  return HPPosition;
 };
 
 Sprite_Enemy.prototype.hpGaugeOpacity = function() {

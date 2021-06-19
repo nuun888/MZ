@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.0.6
+ * @version 2.0.7
  * 
  * @help
  * ステータス画面を拡張します。
@@ -139,6 +139,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/19 Ver.2.0.7
+ * メンバーが一人の時にアクター切り替えのボタンを表示させないように修正。
  * 2021/6/5 Ver.2.0.6
  * サイドビューアクター画像で戦闘終了後にステータス画面を開くと戦闘勝利時のモーションが実行してしまう問題を修正。。
  * 2021/5/28 Ver.2.0.5
@@ -976,7 +978,7 @@ Scene_Status.prototype.createStatusWindow = function() {
 Scene_Status.prototype.createStatusButton = function() {
   if(this.maxPage() > 1 && ConfigManager.touchUI) {
     this._statusupButton = new Sprite_Button("up");
-    this._statusupButton.x = 24 + this._pageupButton.width + this._pagedownButton.width;
+    this._statusupButton.x = this.arePageButtonsEnabled() ? 24 + this._pageupButton.width + this._pagedownButton.width : 0;
     this._statusupButton.y = this.buttonY();
     const statusupRight = this._statusupButton.x + this._statusupButton.width;
     this._statusdownButton = new Sprite_Button("down");
@@ -1006,6 +1008,10 @@ Scene_Status.prototype.isPage = function() {
 
 Scene_Status.prototype.maxPage = function() {
   return PageList ? PageList.length : 1;
+};
+
+Scene_Status.prototype.arePageButtonsEnabled = function() {
+  return $gameParty.allMembers().length > 1;
 };
 
 Scene_Status.prototype.updateStatusPagedown = function() {

@@ -11,9 +11,9 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.0.5
+ * @version 1.1.0
  * @help
- * モンスターに敵名を表示します。
+ * モンスターの敵名を表示します。
  * 
  * 敵キャラのメモ欄
  * <EnemyNameX:[position]> モンスター名のX座標を調整します。（相対座標）
@@ -23,6 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/19 Ver.1.1.0
+ * 名前の表示タイミングを設定できる機能を追加。
  * 2021/6/19 Ver.1.0.5
  * 疑似3DバトルVer.1.1対応のため一部の処理を変更。
  * 敵画像の上表示時の画像拡大時の処理方法の設定方法を変更。
@@ -50,6 +52,16 @@
  * @option 敵画像の上
  * @value 0
  * @option 敵画像の下
+ * @value 1
+ * @default 0
+ * 
+ * @param EnemyNameVisible
+ * @desc モンスターの名前の表示タイミング
+ * @text 名前表示タイミング
+ * @type select
+ * @option 常に表示
+ * @value 0
+ * @option 選択時
  * @value 1
  * @default 0
  * 
@@ -97,6 +109,7 @@ const ActorName_X = Number(parameters['ActorName_X'] || 0);
 const ActorName_Y = Number(parameters['ActorName_Y'] || 0);
 const ActorName_FontSize = Number(parameters['ActorName_FontSize'] || -12);
 const EnemyNamePosition = Number(parameters['EnemyNamePosition'] || 0);
+const EnemyNameVisible = Number(parameters['EnemyNameVisible'] || 0);
 const Name_X = Number(parameters['Name_X'] || 0);
 const Name_Y = Number(parameters['Name_Y'] || 0);
 const Name_FontSize = Number(parameters['Name_FontSize'] || -12);
@@ -252,6 +265,23 @@ Sprite_ButlerName.prototype.redraw = function() {
   this.setupFont();
   this.bitmap.clear();
   this.bitmap.drawText(name, 0, 0, width, height, "center");
+};
+
+const _Sprite_ButlerName_updateBitmap = Sprite_ButlerName.prototype.updateBitmap;
+Sprite_ButlerName.prototype.updateBitmap = function() {
+  _Sprite_ButlerName_updateBitmap.call(this);
+  this.butlerNameVisible();
+};
+
+Sprite_ButlerName.prototype.butlerNameVisible = function() {
+  this.visible = this.butlerNameVisibleInSelect();
+};
+
+Sprite_ButlerName.prototype.butlerNameVisibleInSelect = function() {
+  if (EnemyNameVisible === 1) {
+    return this._battler.isSelected();
+  }
+  return true;
 };
 
 })();

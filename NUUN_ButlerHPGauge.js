@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.0.3
+ * @version 1.1.0
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/19 Ver.1.1.0
+ * HPゲージの表示タイミングを設定できる機能を追加。
  * 2021/6/19 Ver.1.0.3
  * 疑似3DバトルVer.1.1対応のため一部の処理を変更。
  * 2021/5/24 Ver.1.0.2
@@ -44,6 +46,20 @@
  * @value 0
  * @option 敵画像の下
  * @value 1
+ * @default 0
+ * 
+ * @param HPVisible
+ * @desc HPゲージの表示タイミング
+ * @text HPゲージ表示タイミング
+ * @type select
+ * @option 常に表示
+ * @value 0
+ * @option 選択時
+ * @value 1
+ * @option ダメージ時
+ * @value 2
+ * @option 選択時、ダメージ時
+ * @value 3
  * @default 0
  * 
  * @param GaugeWidth
@@ -119,6 +135,7 @@ Imported.NUUN_ButlerHPGauge = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_ButlerHPGauge');
 const HPPosition = Number(parameters['HPPosition'] || 0);
+const HPVisible = Number(parameters['HPVisible'] || 0);
 const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
 const Gauge_X = Number(parameters['Gauge_X'] || 0);
@@ -220,6 +237,8 @@ Sprite_EnemyHPGauge.prototype.constructor = Sprite_EnemyHPGauge;
 
 Sprite_EnemyHPGauge.prototype.initialize = function() {
   Sprite_Gauge.prototype.initialize.call(this);
+  this._gaugeDuration = 0;
+  this._startVisible = true;
 };
 
 Sprite_EnemyHPGauge.prototype.bitmapWidth = function() {
@@ -248,6 +267,52 @@ Sprite_EnemyHPGauge.prototype.drawValue = function() {
   if (HPValueVisible) {
     Sprite_Gauge.prototype.drawValue.call(this);
   }
+};
+
+const _Sprite_EnemyHPGauge_updateBitmap = Sprite_EnemyHPGauge.prototype.updateBitmap;
+Sprite_EnemyHPGauge.prototype.updateBitmap = function() {
+  _Sprite_EnemyHPGauge_updateBitmap.call(this);
+  this.gaugeVisible();
+};
+
+Sprite_EnemyHPGauge.prototype.gaugeVisible = function() {
+  this.visible = this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect();
+};
+
+const _Sprite_EnemyHPGauge_updateTargetValue = Sprite_EnemyHPGauge.prototype.updateTargetValue;
+Sprite_EnemyHPGauge.prototype.updateTargetValue = function(value, maxValue) {
+  if (!this._startVisible && !isNaN(this._value) && HPVisible >= 2) {
+    this._gaugeDuration = 60;
+  } else if (this._startVisible) {
+    this._startVisible = false;
+  }
+  _Sprite_EnemyHPGauge_updateTargetValue.call(this, value, maxValue);
+};
+
+const _Sprite_EnemyHPGauge_updateGaugeAnimation  = Sprite_EnemyHPGauge.prototype.updateGaugeAnimation;
+Sprite_EnemyHPGauge.prototype.updateGaugeAnimation = function() {
+  if (this._gaugeDuration > 0) {
+    this._gaugeDuration--;
+  }
+  _Sprite_EnemyHPGauge_updateGaugeAnimation.call(this);
+};
+
+Sprite_EnemyHPGauge.prototype.gaugeVisibleInDamage = function() {
+  if (HPVisible >= 2) {
+    return this._gaugeDuration > 0;
+  } else if (HPVisible === 1) {
+    return false;
+  }
+  return true;
+};
+
+Sprite_EnemyHPGauge.prototype.gaugeVisibleInSelect = function() {
+  if (HPVisible === 1 || HPVisible === 3) {
+    return this._battler.isSelected();
+  } else if (HPVisible === 2) {
+    return false;
+  }
+  return true;
 };
 
 })();

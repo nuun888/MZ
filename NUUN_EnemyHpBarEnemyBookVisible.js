@@ -49,7 +49,7 @@ Imported.NUUN_EnemyHpBarEnemyBookVisible = true;
 const parameters = PluginManager.parameters('NUUN_EnemyHpBarEnemyBookVisible');
 const HPEXVisible = Number(parameters['HPEXVisible'] || 0);
 
-Sprite_Enemy.prototype.torigoyaEnemyHpBar_updateGaugeSprite = function () {
+Sprite_Enemy.prototype.torigoyaEnemyHpBar_updateGaugeSprite = function () {//Ru
   this._torigoyaEnemyHpBar_gaugeSprite.x = this.torigoyaEnemyHpBar_posX();
   this._torigoyaEnemyHpBar_gaugeSprite.y = this.torigoyaEnemyHpBar_posY();
   this._torigoyaEnemyHpBar_gaugeSprite.opacity += gaugeEnemyBookVisible(this._enemy) && this._torigoyaEnemyHpBar_gaugeSprite.shouldShow() ? 48 : -48;

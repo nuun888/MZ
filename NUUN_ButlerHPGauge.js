@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/20 Ver.1.1.1
+ * モンスター図鑑（NUUN_EnemyBook）の登録により表示する機能を追加。
  * 2021/6/19 Ver.1.1.0
  * HPゲージの表示タイミングを設定できる機能を追加。
  * 2021/6/19 Ver.1.0.3
@@ -60,6 +62,18 @@
  * @value 2
  * @option 選択時、ダメージ時
  * @value 3
+ * @default 0
+ * 
+ * @param HPEXVisible
+ * @desc HPゲージの表示オプション
+ * @text HPゲージ表示オプション
+ * @type select
+ * @option 指定なし
+ * @value 0
+ * @option 図鑑登録後
+ * @value 1
+ * @option 図鑑情報登録後
+ * @value 2
  * @default 0
  * 
  * @param GaugeWidth
@@ -136,6 +150,7 @@ Imported.NUUN_ButlerHPGauge = true;
 const parameters = PluginManager.parameters('NUUN_ButlerHPGauge');
 const HPPosition = Number(parameters['HPPosition'] || 0);
 const HPVisible = Number(parameters['HPVisible'] || 0);
+const HPEXVisible = Number(parameters['HPEXVisible'] || 0);
 const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
 const Gauge_X = Number(parameters['Gauge_X'] || 0);
@@ -276,7 +291,18 @@ Sprite_EnemyHPGauge.prototype.updateBitmap = function() {
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeVisible = function() {
-  this.visible = this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect();
+  this.visible = this.gaugeEnemyBookVisible() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+};
+
+Sprite_EnemyHPGauge.prototype.gaugeEnemyBookVisible = function() {
+  if (Imported.NUUN_EnemyBook) {
+    if (HPEXVisible === 1) {
+      return $gameSystem.isInEnemyBook(this._battler.enemy());
+    } else if (HPEXVisible === 2) {
+      return $gameSystem.isInEnemyBookStatus(this._battler.enemy());
+    }
+  }
+  return true;
 };
 
 const _Sprite_EnemyHPGauge_updateTargetValue = Sprite_EnemyHPGauge.prototype.updateTargetValue;

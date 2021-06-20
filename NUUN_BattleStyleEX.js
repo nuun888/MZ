@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.4.0
+ * @version 1.4.1
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。

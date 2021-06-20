@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.3.1
+ * @version 1.4.0
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -54,6 +54,9 @@
  * アクターステータスのサイズを確認したい場合は、テスト戦闘を行い「DevTools」で確認できます。
  * 背景画像はアクターウィンドウ、アクターステータス背景ともにimg/systemに配置してください。
  * 
+ * アクター画像のダメージ時のシェイク、行動時のズームを行いたくない場合は「シェイクフレーム」「行動時エフェクトフレーム」の値を0に
+ * 設定してください。
+ * 
  * エネミーのメモ欄
  * <AttackAnimation:11>
  * エネミーの通常攻撃時、11番のアニメーションが再生されます。
@@ -76,6 +79,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/20 Ver 1.4.0
+ * アクターのダメージ時にアクター画像をシェイクする機能、行動時にズームする機能を追加しました。
+ * パーティコマンド、アクターコマンドの背景を非表示にする機能を追加。
  * 2021/6/6 Ver 1.3.1
  * アクター画像に回復をしたときの画像を追加。
  * 2021/6/5 Ver 1.3.0
@@ -159,6 +165,34 @@
  * @param cursorBackShow
  * @desc アクター背景を表示する。
  * @text アクター背景表示
+ * @type boolean
+ * @default true
+ * @parent WindowVisibleSetting
+ * 
+ * @param PartyCommandWindowShow
+ * @desc パーティコマンドウィンドウを表示する。
+ * @text パーティコマンドウィンドウ表示
+ * @type boolean
+ * @default true
+ * @parent WindowVisibleSetting
+ * 
+ * @param PartyCommandCursorBackShow
+ * @desc パーティウィンドウの選択背景を表示する。
+ * @text パーティウィンドウ選択背景表示
+ * @type boolean
+ * @default true
+ * @parent WindowVisibleSetting
+ * 
+ * @param ActorCommandWindowShow
+ * @desc パーティコマンドウィンドウを表示する。
+ * @text パーティコマンドウィンドウ表示
+ * @type boolean
+ * @default true
+ * @parent WindowVisibleSetting
+ * 
+ * @param ActorCommandCursorBackShow
+ * @desc アクターウィンドウの選択背景を表示する。
+ * @text アクターウィンドウ選択背景表示
  * @type boolean
  * @default true
  * @parent WindowVisibleSetting
@@ -910,6 +944,42 @@
  * @type boolean
  * @default false
  * @parent ActorStateChangePosition
+ * 
+ * @param ActorEffect
+ * @text アクターエフェクト設定
+ * 
+ * @param ActorShakeFlame
+ * @desc ダメージ時のシェイクフレーム。（デフォルト36）
+ * @text シェイクフレーム
+ * @type number
+ * @default 36
+ * @min 0
+ * @parent ActorEffect
+ * 
+ * @param ActorShakePower
+ * @desc ダメージ時のシェイクの大きさ。（デフォルト2）
+ * @text シェイクの大きさ
+ * @type number
+ * @default 2
+ * @min 0
+ * @parent ActorEffect
+ * 
+ * @param ActorShakeSpeed
+ * @desc ダメージ時のシェイクのスピード。（デフォルト20）
+ * @text シェイクスピード
+ * @type number
+ * @default 20
+ * @min 0
+ * @parent ActorEffect
+ * 
+ * @param ActionZoomDuration
+ * @desc 行動時のエフェクトフレーム
+ * @text 行動時エフェクトフレーム
+ * @type number
+ * @default 60
+ * @min 0
+ * @parent ActorEffect
+ * 
  * 
  * @param PopUpSettings
  * @text ポップアップ設定

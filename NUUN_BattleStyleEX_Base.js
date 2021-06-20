@@ -11,11 +11,14 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.3.2
+ * @version 2.4.0
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/6/20 Ver 2.4.0
+ * アクターのダメージ時にアクター画像をシェイクする機能、行動時にズームする機能を追加しました。
+ * パーティコマンド、アクターコマンドの背景を非表示にする機能を追加。
  * 2021/6/13 Ver 2.3.2
  * 疑似3Dバトル暫定競合対策。
  * 2021/6/6 Ver 2.3.1
@@ -255,6 +258,7 @@ Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
   this._imgIndex = 0;
   this._actionActorImg = null;
+  this._isEffectAction = false;
 };
 
 const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
@@ -279,6 +283,7 @@ const _Game_Actor_performActionStart = Game_Actor.prototype.performActionStart;
 Game_Actor.prototype.performActionStart = function(action) {
   _Game_Actor_performActionStart.call(this, action);
   this.setAttackImg(action);
+  this._isEffectAction = true;
 };
 
 Game_Actor.prototype.setAttackImg = function(action) {
@@ -429,6 +434,12 @@ Scene_Battle.prototype.createActorWindow = function() {
   //_Scene_Battle_createActorWindow.call(this);
 };
 
+const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
+Scene_Battle.prototype.createPartyCommandWindow = function() {
+  _Scene_Battle_createPartyCommandWindow.call(this);
+  this._partyCommandWindow.opacity = param.PartyCommandWindowShow ? 255 : 0;
+};
+
 const _Scene_Battle_createActorCommandWindow = Scene_Battle.prototype.createActorCommandWindow;
 Scene_Battle.prototype.createActorCommandWindow = function() {
   _Scene_Battle_createActorCommandWindow.call(this);
@@ -436,6 +447,7 @@ Scene_Battle.prototype.createActorCommandWindow = function() {
   if (param.StyleMode === "XPStyle") {
     this._actorCommandWindow.y = this.actorCommandY();
   }
+  this._actorCommandWindow.opacity = param.ActorCommandWindowShow ? 255 : 0;
 };
 
 Scene_Battle.prototype.differenceX = function() {
@@ -821,6 +833,13 @@ Window_PartyCommand.prototype.refresh = function() {
   }
 };
 
+const _Window_PartyCommand_drawItemBackground = Window_PartyCommand.prototype.drawItemBackground;
+Window_PartyCommand.prototype.drawItemBackground = function(index) {
+  if (param.PartyCommandCursorBackShow) {
+    _Window_PartyCommand_drawItemBackground.call(this, index);
+  }
+};
+
 //Window_ActorCommand
 Window_ActorCommand.prototype.selectActor = function(actor) {
   const members = $gameParty.battleMembers();
@@ -867,6 +886,13 @@ Window_ActorCommand.prototype.refresh = function() {
 
 Window_ActorCommand.prototype.setStatusWindow = function(statusWindow) {
   this._statusWindow = statusWindow;
+};
+
+const _Window_ActorCommand_drawItemBackground = Window_ActorCommand.prototype.drawItemBackground;
+Window_ActorCommand.prototype.drawItemBackground = function(index) {
+  if (param.ActorCommandCursorBackShow) {
+    _Window_ActorCommand_drawItemBackground.call(this, index);
+  }
 };
 
 //Window_BattleStatus
@@ -1224,8 +1250,6 @@ Window_BattleActorImges.prototype.battlreActorImgesData = function(id) {
   return param.ActorsButlerList[id];
 };
 
-
-
 Window_BattleActorImges.prototype.loadBitmap = function(data) {
   if (!data) {
     return null;
@@ -1322,11 +1346,11 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor, data) 
   const key = "actor%1-img".format(actor.actorId());
   const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
   sprite.setup(actor, data);
-  const x = rect.x + Math.floor((this.itemWidth() - (bitmap.width * data.Actor_Scale / 100)) / 2) + 4 + param.ActorImg_X + data.Actor_X;
-  const y = rect.y + rect.height - Math.floor(bitmap.height * data.Actor_Scale / 100) + 7 + param.ActorImg_Y + data.Actor_Y;
+  const x = rect.x + Math.floor(this.itemWidth() / 2) + 4 + param.ActorImg_X + data.Actor_X;
+  const y = rect.y + rect.height + this.itemPadding() + param.ActorImg_Y + data.Actor_Y;
   sprite.scale.x = data.Actor_Scale / 100;
   sprite.scale.y = data.Actor_Scale / 100;
-  sprite.move(x, y);
+  sprite.setHome(x, y);
   sprite.show();
 };
 
@@ -1343,8 +1367,9 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor, data) {
   const ph = ImageManager.faceHeight;
   const sw = Math.min(width, pw);
   const sh = Math.min(height, ph);
-  sprite.x = Math.floor(rect.x + Math.max(width - pw, 0) / 2) + 8;
-  sprite.y = Math.floor(rect.y + Math.max(height - ph, 0) / 2);
+  const x = rect.x + Math.floor(this.itemWidth() / 2) + 4 + (data ? data.Actor_X : 0);
+  const y = rect.y + sh + (data ? data.Actor_Y : 0);
+  sprite.setHome(x, y);
   const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
   const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
   sprite.setFrame(sx, sy, sw, sh);
@@ -1689,6 +1714,8 @@ Sprite_ActorImges.prototype.initialize = function() {
 };
 
 Sprite_ActorImges.prototype.initMembers = function() {
+  this.anchor.x = 0.5;
+  this.anchor.y = 1;
   this._battler = null;
   this._imgIndex = -1;
   this._durationOpacity = 0;
@@ -1696,6 +1723,14 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._changeStateImgId = 0;
   this._startUpdate = true;
   this._selectionEffectCount = 0;
+  this._shake = 0;
+  this._shakePower = param.ActorShakePower;
+  this._shakeSpeed = param.ActorShakeSpeed;
+  this._shakeDuration = 0;
+  this._shakeDirection = 1;
+  this._zoomDuration = 0;
+  this._zoomScale = 1;
+  this._zoomScaleTarget = 1.2;
 };
 
 Sprite_ActorImges.prototype.setup = function(battler, data) {
@@ -1705,6 +1740,13 @@ Sprite_ActorImges.prototype.setup = function(battler, data) {
   //  this._actorButler = this._battler._actorButler;
   //}
   this.updateBitmap();
+};
+
+Sprite_ActorImges.prototype.setHome = function(x, y) {
+  this._homeX = x;
+  this._homeY = y;
+  this._baseScale = this._data ? this._data.Actor_Scale / 100 : 1;
+  this.move(x, y);
 };
 
 Sprite_ActorImges.prototype.update = function() {
@@ -1777,13 +1819,62 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
 };
 
 Sprite_ActorImges.prototype.updateMotion = function() {
-  const actor = this._battler;
-  if (actor) {
-    const result = actor.result();
-    if (result.hpDamage > 0) {
-      
-    }
+  this.setupEffect();
+  this.updateDamage();
+  this.updateZoom()
+};
+
+Sprite_ActorImges.prototype.setupEffect = function() {
+  if (this._battler._result.hpDamage > 0) {
+    this._shakeDuration = param.ActorShakeFlame;
   }
+  if (this._battler._isEffectAction) {
+    this._zoomDuration = param.ActionZoomDuration;
+    this._battler._isEffectAction = false;
+  }
+};
+
+Sprite_ActorImges.prototype.updateDamage = function() {
+  if (this._shakeDuration > 0 || this._shake !== 0) {
+    const delta = (this._shakePower * this._shakeSpeed * this._shakeDirection) / 10;
+    if (this._shakeDirection <= 1 && this._shake * (this._shake + delta) < 0) {
+      this._shake = 0;
+    } else {
+      this._shake += delta;
+    }
+    if (this._shake > this._shakePower * 2) {
+      this._shakeDirection = -1;
+    }
+    if (this._shake < -this._shakePower * 2) {
+      this._shakeDirection = 1;
+    }
+    this._shakeDuration--;
+    this.x += Math.round(this._shake);
+  } else if (this.x !== this._homeX) {
+    this.resetDamage();
+  }
+};
+
+Sprite_ActorImges.prototype.updateZoom = function() {
+  if (this._zoomDuration > 0) {
+    const d = this._zoomDuration;
+    const t = this._zoomDuration <= param.ActionZoomDuration / 2  ? 1 : this._zoomScaleTarget;
+    this._zoomScale = ((this._zoomScale * (d - 1) + t) / d);
+    this._zoomDuration--;
+    this.scale.x = this._zoomScale * this._baseScale;
+    this.scale.y = this._zoomScale * this._baseScale;
+  } else if (this.scale.x !== this._baseScale) {
+    this.resetZoom();
+  }
+};
+
+Sprite_ActorImges.prototype.resetDamage = function() {
+  this.x = this._homeX;
+};
+
+Sprite_ActorImges.prototype.resetZoom = function() {
+  this.scale.x = this._baseScale;
+  this.scale.y = this._baseScale;
 };
 
 Sprite_ActorImges.prototype.checkDamage = function(actor) {
@@ -2327,12 +2418,10 @@ Sprite_BattleGauge.prototype.gaugeHeight = function() {
 };
 
 //Spriteset_Base
-const _Spriteset_Base_makeTargetSprites = Spriteset_Base.prototype.makeTargetSprites;
-Spriteset_Base.prototype.makeTargetSprites = function(targets) {
-  const targetSprites = _Spriteset_Base_makeTargetSprites.call(this, targets);
-  if (this.constructor === Spriteset_Battle) {
-    this._effectsContainer = this.animationTarget(targetSprites) ? this._effectsFrontContainer : this._effectsBackContainer;
-  }
+const _Spriteset_Battle_makeTargetSprites = Spriteset_Battle.prototype.makeTargetSprites;
+Spriteset_Battle.prototype.makeTargetSprites = function(targets) {
+  const targetSprites = _Spriteset_Battle_makeTargetSprites.call(this, targets);
+  this._effectsContainer = this.animationTarget(targetSprites) ? this._effectsFrontContainer : this._effectsBackContainer;
   return targetSprites;
 };
 

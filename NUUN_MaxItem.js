@@ -1,18 +1,17 @@
 ﻿/*:-----------------------------------------------------------------------------------
  * NUUN_MaxItem.js
  * 
- * Copyright (C) 2020 NUUN
+ * Copyright (C) 2021 NUUN
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/11 Ver 1.0.0
  */ 
 /*:
  * @target MZ
- * @plugindesc アイテムの個別最大数 ver1.0.0
+ * @plugindesc アイテムの個別最大所持制限
  * @author NUUN
+ * @version 1.0.0
  * 
  * @help
  * アイテムの所持数を個別に設定します。
@@ -25,9 +24,15 @@
  * 最大所持数を高く設定すると個数表示上、文字が潰れて読みづらくなった場合、
  * 個数の桁数の増やしてみてください。（デフォルト00)
  * 
+ * NUUN_ItemCategory（アイテムカテゴリーカスタマイズ）と併用している場合、そのカテゴリー内の
+ * アイテムのデフォルトの愛大所持数を設定できます。なおアイテムのみ有効です。
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/6/20 Ver 1.0.0
  * 
  * @param DefaultMaxItem
  * @desc デフォルトの最大アイテム所持数
@@ -47,6 +52,11 @@
  * @type number
  * @default 99
  * 
+ * @param CustomDefault
+ * @desc アイテムカテゴリーカスタマイズで設定したカテゴリーアイテムのデフォルト最大所持数(要NUUN_ItemCategory)
+ * @text カテゴリー最大所持数
+ * @type struct<CustomDefaultList>[]
+ * @default []
  * 
  * @param NumberDigits
  * @desc 個数の桁数
@@ -55,6 +65,21 @@
  * @default 00
  * 
  */
+/*~struct~CustomDefaultList:
+ *
+ * @param CustomDefaultKey
+ * @desc カテゴリーキーを設定します。NUUN_ItemCategoryのカテゴリー設定と同じように設定してください。
+ * @text カテゴリーキー
+ * @type string
+ * @default
+ * 
+ * @param CustomDefaultMax
+ * @desc カテゴリーのデフォルト最大所持数
+ * @text カテゴリー最大所持数
+ * @type number
+ * @default 99
+ *
+ */
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_MaxItem');
@@ -62,6 +87,7 @@
   const defaultMaxWeapon = Number(parameters['DefaultMaxWeapon'] || 99);
   const defaultMaxArmor = Number(parameters['DefaultMaxArmor'] || 99);
   const numberDigits = String(parameters['NumberDigits'] || '00');
+  const CustomDefault = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CustomDefault'])) : null) || [];
 
   Game_Party.prototype.maxItems = function(item) {//再定義
     if (item.meta.MaxItems) {
@@ -74,7 +100,7 @@
     if (!item) {
       return null;
     } else if (DataManager.isItem(item)) {
-      return defaultMaxItem;
+      return Imported.NUUN_ItemCategory ? this.customDefaultMax(item) : defaultMaxItem;
     } else if (DataManager.isWeapon(item)) {
       return defaultMaxWeapon;
     } else if (DataManager.isArmor(item)) {
@@ -82,6 +108,15 @@
     } else {
       return null;
     }
+  };
+
+  Game_Party.prototype.customDefaultMax = function(item) {
+    const find = CustomDefault.find(data => data.CustomDefaultKey === this.getCategoryType(item));
+    return find ? find.CustomDefaultMax || defaultMaxItem : defaultMaxItem;
+  };
+
+  Game_Party.prototype.getCategoryType = function(item) {
+    return item.meta.CategoryType ? item.meta.CategoryType : (item.itypeId === 2 ? "keyItem" : null);
   };
 
   Window_ItemList.prototype.numberWidth = function() {//再定義

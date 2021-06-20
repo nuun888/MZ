@@ -79,6 +79,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/21 Ver 1.4.1
+ * 一部修正。
  * 2021/6/20 Ver 1.4.0
  * アクターのダメージ時にアクター画像をシェイクする機能、行動時にズームする機能を追加しました。
  * パーティコマンド、アクターコマンドの背景を非表示にする機能を追加。
@@ -124,7 +126,7 @@
  * @value "MVStyle"
  * @option XPスタイル
  * @value "XPStyle"
- * @default "XPスタイル"
+ * @default "XPStyle"
  * @parent StyleSettings
  * 
  * @param AppearWindowVisible

@@ -9,7 +9,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc アイテムの個別最大所持制限
+ * @plugindesc アイテム最大所持数変更
  * @author NUUN
  * @version 1.0.0
  * 

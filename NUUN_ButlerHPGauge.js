@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
@@ -21,10 +21,16 @@
  * <HPGaugeY:[position]> HPゲージのY座標を調整します。（相対座標）
  * <NoHPGauge> HPゲージを表示しません。
  * 
+ * 特徴を有するメモ欄
+ * <HPGaugeVisible> この特徴を持つアクターが存在すれば、敵のHPゲージが表示されます。
+ * <EnemyHPGaugeVisible> この特徴を持つ敵はHPゲージが表示されます。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/26 Ver.1.2.0
+ * 状況によってHPゲージを表示する機能を追加。
  * 2021/6/20 Ver.1.1.1
  * モンスター図鑑（NUUN_EnemyBook）の登録により表示する機能を追加。
  * 2021/6/19 Ver.1.1.0
@@ -50,6 +56,16 @@
  * @value 1
  * @default 0
  * 
+ * @param HPVisibleMode
+ * @desc HPゲージの表示
+ * @text HPゲージ表示
+ * @type select
+ * @option 表示
+ * @value 0
+ * @option 非表示（図鑑、特徴により表示）
+ * @value 1
+ * @default 0
+ * 
  * @param HPVisible
  * @desc HPゲージの表示タイミング
  * @text HPゲージ表示タイミング
@@ -64,9 +80,9 @@
  * @value 3
  * @default 0
  * 
- * @param HPEXVisible
- * @desc HPゲージの表示オプション
- * @text HPゲージ表示オプション
+ * @param HPEnemyBookVisible
+ * @desc HPゲージの表示タイミング（モンスター図鑑）
+ * @text HPゲージ表示タイミング（モンスター図鑑）
  * @type select
  * @option 指定なし
  * @value 0
@@ -150,7 +166,8 @@ Imported.NUUN_ButlerHPGauge = true;
 const parameters = PluginManager.parameters('NUUN_ButlerHPGauge');
 const HPPosition = Number(parameters['HPPosition'] || 0);
 const HPVisible = Number(parameters['HPVisible'] || 0);
-const HPEXVisible = Number(parameters['HPEXVisible'] || 0);
+const HPVisibleMode = Number(parameters['HPVisibleMode'] || 0);
+const HPEnemyBookVisible = Number(parameters['HPEnemyBookVisible'] || 0);
 const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
 const Gauge_X = Number(parameters['Gauge_X'] || 0);
@@ -291,14 +308,30 @@ Sprite_EnemyHPGauge.prototype.updateBitmap = function() {
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeVisible = function() {
-  this.visible = this.gaugeEnemyBookVisible() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+  this.visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+};
+
+Sprite_EnemyHPGauge.prototype.gaugeVisibleResult = function() {
+  if (HPVisibleMode === 1) {
+    const result = this.gaugeVisibleBattler();
+    if (HPEnemyBookVisible === 0) {
+      return result;
+    }
+    return result || this.gaugeEnemyBookVisible();
+  } else {
+    return true;
+  }
+};
+
+Sprite_EnemyHPGauge.prototype.gaugeVisibleBattler = function() {
+  return BattleManager.visibleHpGauge || this._battler._visibleHpGauge;
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeEnemyBookVisible = function() {
   if (Imported.NUUN_EnemyBook) {
-    if (HPEXVisible === 1) {
+    if (HPEnemyBookVisible === 1) {
       return $gameSystem.isInEnemyBook(this._battler.enemy());
-    } else if (HPEXVisible === 2) {
+    } else if (HPEnemyBookVisible === 2) {
       return $gameSystem.isInEnemyBookStatus(this._battler.enemy());
     }
   }
@@ -341,4 +374,30 @@ Sprite_EnemyHPGauge.prototype.gaugeVisibleInSelect = function() {
   return true;
 };
 
+Game_Actor.prototype.HpGaugeVisibleTrait = function(){
+  return this.traitObjects().some(traitObject => traitObject.meta.HPGaugeVisible);
+};
+
+Game_Actor.prototype.HpGaugeVisible = function(){
+  this._visibleHpGauge = this.HpGaugeVisibleTrait();
+  BattleManager.hpGaugeVisible();
+};
+
+const _Game_Battler_refresh = Game_Battler.prototype.refresh;
+Game_Battler.prototype.refresh = function() {
+  _Game_Battler_refresh.call(this);
+  this.HpGaugeVisible();
+};
+
+Game_Enemy.prototype.HpGaugeVisibleTrait = function(){
+  return this.traitObjects().some(traitObject => traitObject.meta.EnemyHPGaugeVisible);
+};
+
+Game_Enemy.prototype.HpGaugeVisible = function(){
+  this._visibleHpGauge = this.HpGaugeVisibleTrait();
+};
+
+BattleManager.hpGaugeVisible = function() {
+  this.visibleHpGauge = $gameParty.battleMembers().some(actor => actor._visibleHpGauge);
+};
 })();

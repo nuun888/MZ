@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.6.0
+ * @version 2.6.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -93,6 +93,8 @@
  * <EnemyIcon:[iconid]>
  * モンスター名の左にアイコンを表示させることが出来ます。
  * <EnemyIcon:120> アイコンID120番のアイコンが表示されます。
+ * <NoTransformInData> 変身時に撃破扱いに図鑑に登録しません。（変身前撃破をONにしている時のみ）
+ * 
  * 
  * <EB_SVBattler:[fileName]> モンスター画像をサイドビュー画像で表示させます。(モンスターにサイドビューアクターを表示する系のプラグイン導入が前提としています)
  * [fileName]:ファイル名　サイドビューバトラー画像を指定します。sv_actorsフォルダ内のファイル名を拡張子なしで指定してください。
@@ -252,6 +254,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/26 Ver.2.6.1
+ * 変身時撃破をONにしても変身時の図鑑登録をしない機能を追加。
  * 2021/6/16 Ver.2.6.0
  * モンスターブックナンバーを表示する機能を追加。
  * 図鑑に登録されていないモンスターをリストから表示しない機能を追加。
@@ -1300,7 +1304,7 @@
  * 
  * @param ListData
  * @text 表示項目設定
- * @default ------------------------------EnemyInfoMode
+ * @default ------------------------------
  * 
  * @param ListData1_10
  * @text 表示項目設定1-10
@@ -2104,6 +2108,7 @@
 var Imported = Imported || {};
 Imported.NUUN_EnemyBook = true;
 (() => {
+
 const parameters = PluginManager.parameters('NUUN_EnemyBook');
 const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   try {
@@ -2437,7 +2442,7 @@ Game_System.prototype.completeRate = function() {
 };
 
 Game_System.prototype.isEnemyBook = function(enemy) {//データベース
-  return enemy && enemy.name && !enemy.meta.NoBook && !enemy.meta.NoBookData
+  return enemy && enemy.name && !enemy.meta.NoBook && !enemy.meta.NoBookData;
 };
 
 Game_System.prototype.bookEnemyDate = function() {
@@ -2866,7 +2871,7 @@ Game_Enemy.prototype.appear = function() {
 
 const _Game_Enemy_transform = Game_Enemy.prototype.transform;
 Game_Enemy.prototype.transform = function(enemyId) {
-  if (param.TransformDefeat) {
+  if (param.TransformDefeat && !this.enemy().meta.NoTransformInData) {
     $gameSystem.defeatCount(this.enemyId());
     if ($gameSystem.registrationStatusTiming() !== 2) {
       $gameSystem.addStatusToEnemyBook(this.enemyId());
@@ -3328,23 +3333,20 @@ Window_EnemyBook_Percent.prototype.refresh = function() {
 };
 
 Window_EnemyBook_Percent.prototype.getParam = function(content) {
-  let text = null;
-  if (content.ContentDate === 0) {
-    text = content.ContentName +' : '+ this._defeat.complete +' %';
-  } else if (content.ContentDate === 1) {
-    text = content.ContentName +' : '+ this._encountered.encNum +'/'+ this._encountered.length;
-  } else if (content.ContentDate === 2) {
-    text = content.ContentName +' : '+ this._defeat.encNum +'/'+ this._defeat.length;
-  } else if (content.ContentDate === 3) {
-    text = content.ContentName +' : '+ this._defeat.onStatus +'/'+ this._defeat.length;
-  } else if (content.ContentDate === 11) {
-    text = content.ContentName +' : '+ this._encountered.encNum;
-  } else if (content.ContentDate === 12) {
-    text = content.ContentName +' : '+ this._defeat.encNum;
-  } else if (content.ContentDate === 13) {
-    text = content.ContentName +' : '+ this._defeat.onStatus;
+  switch (content.ContentDate) {
+    case 0:
+      return content.ContentName +' : '+ this._defeat.complete +' %';
+    case 1:
+      return content.ContentName +' : '+ this._encountered.encNum +'/'+ this._encountered.length;
+    case 2:
+      return content.ContentName +' : '+ this._defeat.encNum +'/'+ this._defeat.length;
+    case 11:
+      return content.ContentName +' : '+ this._encountered.encNum;
+    case 12:
+      return content.ContentName +' : '+ this._defeat.encNum;
+    case 13:
+      return content.ContentName +' : '+ this._defeat.onStatus;
   }
-  return text;
 };
 
 Window_EnemyBook_Percent.prototype.update = function() {
@@ -3648,9 +3650,9 @@ Window_EnemyBook_Index.prototype.drawItem = function(index) {
       this.drawText(":", rect.x + textWidth + 6, rect.y);
       if (iconId > 0) {
         const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
-        this.drawIcon(iconId, rect.x + textWidth + 22, iconY);
+        this.drawIcon(iconId, rect.x + textWidth + 24, iconY);
       }
-      this.drawText(name, rect.x + textWidth + 22 + textMargin, rect.y, itemWidth - textWidth - 22);
+      this.drawText(name, rect.x + textWidth + 24 + textMargin, rect.y, itemWidth - textWidth - 24);
     } else {
       if (iconId > 0) {
         const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
@@ -4140,6 +4142,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
     case 201:
       this.enemyCharacter(list, enemy, x, y, width);
       break;
+    case 300:
+    //this.enemyCharacter(list, enemy, x, y, width);
+    break;
     case 1000:
       this.horzLine(list, enemy, x, y, width);
       break;
@@ -4451,6 +4456,11 @@ Window_EnemyBook.prototype.bookEnemyNo = function(list, enemy, x, y, width) {
     text = this.numberWidthSlice(text);
   }
   this.drawText(text, x + textWidth, y, width - textWidth, "left");
+};
+
+Window_EnemyBook.prototype.drawEnemyBookStealRate = function(text, x, y, width,) {
+  this.drawContentsBackground(list.Back, x, y, width);
+  const nameText = list.paramName;
 };
 
 Window_EnemyBook.prototype.horzLine = function(list, enemy, x, y, width) {

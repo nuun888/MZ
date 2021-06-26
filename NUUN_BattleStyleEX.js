@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.4.1
+ * @version 1.4.2
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -79,6 +79,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/26 Ver 1.4.2
+ * 画像指定の設定方法を変更。
+ * アイテム、スキル、モンスター対象選択ウィンドウ、ヘルプウィンドウのウィンドウを表示しない機能及び背景画像を設定できる機能を追加。
  * 2021/6/21 Ver 1.4.1
  * 一部修正。
  * 2021/6/20 Ver 1.4.0
@@ -112,10 +115,8 @@
  * 
  * @param Setting
  * @text 共通設定
+ * @default ------------------------------
  * 
- * @param StyleSettings
- * @text バトルスタイル設定
-
  * @param StyleMode
  * @text バトルレイアウトモード
  * @desc バトルレイアウトのモードを指定します。
@@ -127,7 +128,7 @@
  * @option XPスタイル
  * @value "XPStyle"
  * @default "XPStyle"
- * @parent StyleSettings
+ * @parent Setting
  * 
  * @param AppearWindowVisible
  * @desc モンスターが出現したときのメッセージを表示しません。
@@ -145,9 +146,10 @@
  * 
  * @param Window
  * @text ウィンドウ設定
+ * @default ------------------------------
  * 
- * @param WindowVisibleSetting
- * @text ウィンドウ表示設定
+ * @param ActorStatusWindowVisibleSetting
+ * @text アクターステータスウィンドウ表示設定
  * @parent Window
  * 
  * @param WindowShow
@@ -155,74 +157,379 @@
  * @text アクターウィンドウ表示
  * @type boolean
  * @default
- * @parent WindowVisibleSetting
+ * @parent ActorStatusWindowVisibleSetting
  * 
  * @param WindowFrameShow
  * @desc アクターウィンドウ枠を表示する。
  * @text アクターウィンドウ枠表示
  * @type boolean
  * @default
- * @parent WindowVisibleSetting
+ * @parent ActorStatusWindowVisibleSetting
  * 
  * @param cursorBackShow
- * @desc アクター背景を表示する。
- * @text アクター背景表示
+ * @desc アクター選択背景を表示する。
+ * @text アクター選択背景表示
  * @type boolean
  * @default true
- * @parent WindowVisibleSetting
+ * @parent ActorStatusWindowVisibleSetting
+ * 
+ * @param windowBackground
+ * @desc 背景画像ウィンドウを指定する。
+ * @text 背景画像ウィンドウ
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent ActorStatusWindowVisibleSetting
+ * 
+ * @param PartyCommandWindowVisibleSetting
+ * @text パーティコマンドウィンドウ表示設定
+ * @parent Window
+ * @default ------------------------------
  * 
  * @param PartyCommandWindowShow
  * @desc パーティコマンドウィンドウを表示する。
  * @text パーティコマンドウィンドウ表示
  * @type boolean
  * @default true
- * @parent WindowVisibleSetting
+ * @parent PartyCommandWindowVisibleSetting
  * 
  * @param PartyCommandCursorBackShow
  * @desc パーティウィンドウの選択背景を表示する。
  * @text パーティウィンドウ選択背景表示
  * @type boolean
  * @default true
- * @parent WindowVisibleSetting
+ * @parent PartyCommandWindowVisibleSetting
+ * 
+ * @param PartyCommandBackground
+ * @desc パーティコマンドの背景画像ウィンドウを指定する。（未実装）
+ * @text パーティコマンド背景画像ウィンドウ
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent PartyCommandWindowVisibleSetting
+ * 
+ * @param PartyCommandBackgroundAnchorMode
+ * @text パーティコマンド背景画像の基準位置
+ * @desc パーティコマンド背景画像の基準位置。
+ * @type select
+ * @option 上基準
+ * @value 0
+ * @option 下基準
+ * @value 1
+ * @default 1
+ * @parent PartyCommandWindowVisibleSetting
+ * 
+ * @param PartyCommandBackground_X
+ * @desc パーティコマンドの背景画像のX座標（相対座標）を調整します。
+ * @text 背景画像のX座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent PartyCommandWindowVisibleSetting
+ * 
+ * @param PartyCommandBackground_Y
+ * @desc パーティコマンドの背景画像のY座標（相対座標）を調整します。
+ * @text 背景画像のY座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent PartyCommandWindowVisibleSetting
+ * 
+ * @param ActorCommandWindowVisibleSetting
+ * @text アクターコマンドウィンドウ表示設定
+ * @parent Window
+ * @default ------------------------------
  * 
  * @param ActorCommandWindowShow
- * @desc パーティコマンドウィンドウを表示する。
- * @text パーティコマンドウィンドウ表示
+ * @desc アクターコマンドウィンドウを表示する。
+ * @text アクターコマンドウィンドウ表示
  * @type boolean
  * @default true
- * @parent WindowVisibleSetting
+ * @parent ActorCommandWindowVisibleSetting
  * 
  * @param ActorCommandCursorBackShow
  * @desc アクターウィンドウの選択背景を表示する。
  * @text アクターウィンドウ選択背景表示
  * @type boolean
  * @default true
- * @parent WindowVisibleSetting
+ * @parent ActorCommandWindowVisibleSetting
+ * 
+ * @param ActorCommandBackground
+ * @desc アクターコマンドの背景画像ウィンドウを指定する。（未実装）
+ * @text アクターコマンド背景画像ウィンドウ
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent ActorCommandWindowVisibleSetting
+ * 
+ * @param ActorCommandBackgroundAnchorMode
+ * @text アクターコマンド背景画像の基準位置
+ * @desc アクターコマンド背景画像の基準位置。
+ * @type select
+ * @option 上基準
+ * @value 0
+ * @option 下基準
+ * @value 1
+ * @default 1
+ * @parent ActorCommandWindowVisibleSetting
+ * 
+ * @param ActorCommandBackground_X
+ * @desc アクターコマンドの背景画像のX座標（相対座標）を調整します。
+ * @text 背景画像のX座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorCommandWindowVisibleSetting
+ * 
+ * @param ActorCommandBackground_Y
+ * @desc アクターコマンドの背景画像のY座標（相対座標）を調整します。
+ * @text 背景画像のY座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorCommandWindowVisibleSetting
+ * 
+ * @param SelectWindowVisibleSetting
+ * @text アイテムウィンドウ表示設定
+ * @parent Window
+ * @default ------------------------------
+ * 
+ * @param SelectWindowShow
+ * @desc アイテム、スキル、敵選択のウィンドウ画像を表示する。
+ * @text アイテム、スキル、敵選択ウィンドウ表示
+ * @type boolean
+ * @default true
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param SelectCursorBackShow
+ * @desc アイテム、スキル、敵選択の選択背景を表示する。
+ * @text アイテム、スキル、敵選択選択背景表示
+ * @type boolean
+ * @default true
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param ItemWindowBackground
+ * @desc アイテム背景画像ウィンドウを指定する。
+ * @text アイテム背景画像ウィンドウ
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param ItemBackgroundAnchorMode
+ * @text アイテム背景画像の基準位置
+ * @desc アイテム背景画像の基準位置。
+ * @type select
+ * @option 上基準
+ * @value 0
+ * @option 下基準
+ * @value 1
+ * @default 1
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param ItemBackground_X
+ * @desc アイテムウィンドウの背景画像のX座標（相対座標）を調整します。
+ * @text アイテムウィンドウ背景画像のX座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param ItemBackground_Y
+ * @desc アイテムウィンドウの背景画像のY座標（相対座標）を調整します。
+ * @text アイテムウィンドウ背景画像のY座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param SkillWindowBackground
+ * @desc スキル背景画像ウィンドウを指定する。
+ * @text スキル背景画像ウィンドウ
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param SkillBackgroundAnchorMode
+ * @text スキル背景画像の基準位置
+ * @desc スキル背景画像の基準位置。
+ * @type select
+ * @option 上基準
+ * @value 0
+ * @option 下基準
+ * @value 1
+ * @default 1
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param SkillBackground_X
+ * @desc スキルウィンドウの背景画像のX座標（相対座標）を調整します。
+ * @text スキルウィンドウ背景画像のX座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param SkillBackground_Y
+ * @desc スキルウィンドウの背景画像のY座標（相対座標）を調整します。
+ * @text スキルウィンドウ背景画像のY座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param EnemyWindowBackground
+ * @desc エネミー選択画面背景画像ウィンドウを指定する。
+ * @text エネミー選択画面背景画像ウィンドウ
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param EnemyBackgroundAnchorMode
+ * @text エネミー選択画面背景画像の基準位置
+ * @desc エネミー選択画面背景画像の基準位置。
+ * @type select
+ * @option 上基準
+ * @value 0
+ * @option 下基準
+ * @value 1
+ * @default 1
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param EnemyBackground_X
+ * @desc エネミー選択画面の背景画像のX座標（相対座標）を調整します。
+ * @text エネミー選択画面背景画像のX座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param EnemyBackground_Y
+ * @desc エネミー選択画面の背景画像のY座標（相対座標）を調整します。
+ * @text エネミー選択画面背景画像のY座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param HelpVisibleSetting
+ * @text ヘルプウィンドウ表示設定
+ * @parent Window
+ * @default ------------------------------
+ * 
+ * @param HelpWindowShow
+ * @desc ヘルプウィンドウ画像を表示する。
+ * @text ヘルプウィンドウ表示
+ * @type boolean
+ * @default true
+ * @parent HelpVisibleSetting
+ * 
+ * @param HelpWindowBackground
+ * @desc ヘルプウィンドウの背景画像ウィンドウを指定する。
+ * @text ヘルプウィンドウ背景画像ウィンドウ
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent HelpVisibleSetting
+ * 
+ * @param HelpBackgroundAnchorMode
+ * @text ヘルプ背景画像の基準位置
+ * @desc ヘルプ背景画像の基準位置。
+ * @type select
+ * @option 上基準
+ * @value 0
+ * @option 下基準
+ * @value 1
+ * @default 0
+ * @parent HelpVisibleSetting
+ * 
+ * @param HelpBackground_X
+ * @desc ヘルプ選択画面の背景画像のX座標（相対座標）を調整します。
+ * @text ヘルプ選択画面背景画像のX座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent HelpVisibleSetting
+ * 
+ * @param HelpBackground_Y
+ * @desc ヘルプ選択画面の背景画像のY座標（相対座標）を調整します。
+ * @text ヘルプ選択画面背景画像のY座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent HelpVisibleSetting
+ * 
+ * @param MessageWindowVisibleSetting
+ * @text メッセージウィンドウ表示設定
+ * @parent Window
+ * @default ------------------------------
+ * 
+ * @param MessageWindowShow
+ * @desc メッセージウィンドウを表示する。
+ * @text メッセージウィンドウ表示
+ * @type boolean
+ * @default true
+ * @parent MessageWindowVisibleSetting
+ * 
+ * @param MessageWindowBackground
+ * @desc メッセージウィンドウの背景画像ウィンドウを指定する。
+ * @text メッセージウィンドウ背景画像ウィンドウ
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent MessageWindowVisibleSetting
+ * 
+ * @param MessageBackgroundAnchorMode
+ * @text メッセージ背景画像の基準位置
+ * @desc メッセージ背景画像の基準位置。
+ * @type select
+ * @option 上基準
+ * @value 0
+ * @option 下基準
+ * @value 1
+ * @default 1
+ * @parent MessageWindowVisibleSetting
+ * 
+ * @param MessageBackground_X
+ * @desc メッセージ選択画面の背景画像のX座標（相対座標）を調整します。
+ * @text メッセージ選択画面背景画像のX座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent MessageWindowVisibleSetting
+ * 
+ * @param MessageBackground_Y
+ * @desc メッセージ選択画面の背景画像のY座標（相対座標）を調整します。
+ * @text メッセージ選択画面背景画像のY座標調整（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent MessageWindowVisibleSetting
+ * 
+ * @param AtherVisibleSetting
+ * @text その他ウィンドウ表示設定
+ * @parent Window
+ * @default ------------------------------
  * 
  * @param SelectBackShow
  * @desc アクターの行動選択時に表示されるアクター背景を表示する。
  * @text アクター行動時背景表示
  * @type boolean
  * @default true
- * @parent WindowVisibleSetting
- * 
- * @param windowBackground
- * @desc 背景画像ウィンドウを指定する。
- * @text 背景画像ウィンドウ
- * @type file
- * @dir img/system
- * @parent WindowVisibleSetting
+ * @parent AtherVisibleSetting
  * 
  * @param ActorSelectBackShow
  * @desc アクターの対象選択時に表示されるアクター背景を表示する。
  * @text アクターの対象選択時背景表示
  * @type boolean
  * @default true
- * @parent WindowVisibleSetting
+ * @parent AtherVisibleSetting
  * 
  * @param WindowCoordinateSetting
  * @text ウィンドウ座標設定
  * @parent Window
+ * @default ------------------------------
  * 
  * @param ActorStatusWindowOnPosition
  * @desc アクターウィンドウ全体の座標の変更を許可します。
@@ -276,6 +583,7 @@
  * 
  * @param Opacity
  * @text 不透明度設定
+ * @default ------------------------------
  * 
  * @param ActorWindowSelectOpacity
  * @desc エネミー、アイテム、スキル選択画面を表示している時のアクターウィンドウの不透明度
@@ -309,6 +617,7 @@
  * 
  * @param PartyCommand
  * @text パーティコマンド設定
+ * @default ------------------------------
  * 
  * @param Default_PartyCommand
  * @text デフォルト、MVスタイルモード設定
@@ -326,6 +635,7 @@
  * @param XP_PartyCommand
  * @text XPスタイルモード設定
  * @parent PartyCommand
+ * @default ------------------------------
  * 
  * @param PartyCommandPosition
  * @text パーティコマンドの表示位置
@@ -469,6 +779,7 @@
  * 
  * @param Effect
  * @text エフェクト設定
+ * @default ------------------------------
  * 
  * @param ActorEffectShow
  * @desc フロントビューでもエフェクトを表示。
@@ -523,6 +834,7 @@
  * 
  * @param ActorStatus
  * @text アクター設定
+ * @default ------------------------------
  * 
  * @param ActorMaxCol
  * @desc 横に並べるアクター数。(MVスタイルは列数が１固定です)
@@ -567,13 +879,15 @@
  * @param actorBackground
  * @desc アクターの背景画像を指定します。
  * @text アクター背景画像
- * @type file
- * @dir img/system
+ * @type file[]
+ * @default []
+ * @dir img/
  * @parent ActorStatus
  * 
  * @param ActorsButlers
  * @text アクターの画像設定
  * @parent ActorStatus
+ * @default ------------------------------
  * 
  * @param ActorsButlerList
  * @text 画像設定
@@ -638,6 +952,7 @@
  * @param ActorImgChangePosition
  * @text アクターグラフィック位置設定
  * @parent ActorStatus
+ * @default ------------------------------
  * 
  * @param ActorFaceVisible
  * @desc 顔グラフィックを表示させます。
@@ -714,6 +1029,7 @@
  * @param ActorHPChangePosition
  * @text HP位置設定
  * @parent ActorStatus
+ * @default ------------------------------
  * 
  * @param HPGaugeWidth
  * @desc HPゲージの横幅を指定します。（デフォルト128）
@@ -761,6 +1077,7 @@
  * @param ActorMPChangePosition
  * @text MP位置設定
  * @parent ActorStatus
+ * @default ------------------------------
  * 
  * @param MPGaugeWidth
  * @desc MPゲージの横幅を指定します。（デフォルト128）
@@ -807,6 +1124,7 @@
  * @param ActorTPChangePosition
  * @text TP位置設定
  * @parent ActorStatus
+ * @default ------------------------------
  * 
  * @param TPGaugeWidth
  * @desc TPゲージの横幅を指定します。（デフォルト128）
@@ -854,6 +1172,7 @@
  * @param ActorTPBChangePosition
  * @text TPB位置設定
  * @parent ActorStatus
+ * @default ------------------------------
  * 
  * @param TPBShow
  * @desc TPBゲージを表示します。
@@ -905,8 +1224,9 @@
  * @parent ActorTPBChangePosition
  * 
  * @param ActorStateChangePosition
- * @text State位置設定
+ * @text ステート位置設定
  * @parent ActorStatus
+ * @default ------------------------------
  * 
  * @param StateChangePosition
  * @desc ステートの座標変更を許可します。
@@ -949,6 +1269,7 @@
  * 
  * @param ActorEffect
  * @text アクターエフェクト設定
+ * @default ------------------------------
  * 
  * @param ActorShakeFlame
  * @desc ダメージ時のシェイクフレーム。（デフォルト36）
@@ -985,6 +1306,7 @@
  * 
  * @param PopUpSettings
  * @text ポップアップ設定
+ * @default ------------------------------
  * 
  * @param PopUpBuff
  * @text ポップアップバフ設定

@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.0
+ * @version 2.4.1
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/6/26 Ver 2.4.1
+ * アイテム、スキル、モンスター対象選択ウィンドウ、ヘルプウィンドウ、メッセージウィンドウのウィンドウを表示しない機能及び背景画像を設定できる機能を追加。
  * 2021/6/20 Ver 2.4.0
  * アクターのダメージ時にアクター画像をシェイクする機能、行動時にズームする機能を追加しました。
  * パーティコマンド、アクターコマンドの背景を非表示にする機能を追加。
@@ -150,6 +152,12 @@ if (Imported.NUUN_BattleStyleEX) {
 if (parameters === null) {
   return;
 }
+//バトルスタイル設定
+//param.StyleMode = 
+
+
+
+
 const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   try {
       return JSON.parse(value);
@@ -186,6 +194,16 @@ if (param.StyleMode === "MVStyle") {
   param.ActorFaceVisible = param.ActorFaceVisible === undefined ? true : param.ActorFaceVisible;
   param.GaugeWidth = param.GaugeWidth || 128;
 }
+param.actorBackground = param.actorBackground ? param.actorBackground[0] : null;
+param.windowBackground = param.windowBackground ? param.windowBackground[0] : null;//メインウィンドウ
+param.ItemWindowBackground = param.ItemWindowBackground ? param.ItemWindowBackground[0] : null;//アイテム
+param.SkillWindowBackground = param.SkillWindowBackground ? param.SkillWindowBackground[0] : null;//スキル
+param.EnemyWindowBackground = param.EnemyWindowBackground ? param.EnemyWindowBackground[0] : null;//対象
+param.HelpWindowBackground = param.HelpWindowBackground ? param.HelpWindowBackground[0] : null;//ヘルプ
+param.MessageWindowBackground = param.MessageWindowBackground ? param.MessageWindowBackground[0] : null;//ヘルプ
+
+loadNormalPicture(param.actorBackground);
+loadNormalPicture(param.windowBackground);
 
 BattleManager.NUUN_BattleStyleDate = param;
 
@@ -198,15 +216,16 @@ PluginManager.registerCommand(pluginName, 'ActorStatusWindowOpacity', args => {
   BattleManager.statusWindowOpacity(eval(args.WindowOpacity));
 });
 
-ImageManager.loadSystem(param.actorBackground);
-ImageManager.loadSystem(param.windowBackground);
-
 loadBattleStyleActorImg = function(filename) {
   return ImageManager.loadPicture(filename);
 };
 
 function nuun_loadPictures(img) {
   return Imported.NUUN_ActorPicture ? ImageManager.nuun_actorPictures(img) : loadBattleStyleActorImg(img);
+}
+
+function loadNormalPicture(filename) {
+  return ImageManager.nuun_LoadPictures(filename);
 }
 
 //Game_Temp
@@ -344,11 +363,20 @@ BattleManager.displayMessagePosition = function() {
   $gameMessage._positionType = param.MessageWindowPosition ? 0 : 2;
 };
 
+BattleManager.displayMessageType = function(type) {
+  $gameMessage._messageType = type;
+};
+
+BattleManager.getDisplayMessageType = function() {
+  return $gameMessage._messageType;
+};
+
 const _BattleManager_displayStartMessages = BattleManager.displayStartMessages;
 BattleManager.displayStartMessages = function() {
   if (!param.AppearWindowVisible) {
     _BattleManager_displayStartMessages.call(this);
     this.displayMessagePosition();
+    this.displayMessageType("Appear");
   }
 };
 
@@ -356,24 +384,28 @@ const _BattleManager_displayVictoryMessage = BattleManager.displayVictoryMessage
 BattleManager.displayVictoryMessage = function() {
   _BattleManager_displayVictoryMessage.call(this);
   this.displayMessagePosition();
+  this.displayMessageType("Victory");
 };
 
 const _BattleManager_displayDefeatMessage = BattleManager.displayDefeatMessage;
 BattleManager.displayDefeatMessage = function() {
   _BattleManager_displayDefeatMessage.call(this);
   this.displayMessagePosition();
+  this.displayMessageType("Defeat");
 };
 
 const _BattleManager_displayEscapeSuccessMessage = BattleManager.displayEscapeSuccessMessage;
 BattleManager.displayEscapeSuccessMessage = function() {
   _BattleManager_displayEscapeSuccessMessage.call(this);
   this.displayMessagePosition();
+  this.displayMessageType("Escape");
 };
 
 const _BattleManager_displayEscapeFailureMessage = BattleManager.displayEscapeFailureMessage;
 BattleManager.displayEscapeFailureMessage = function() {
   _BattleManager_displayEscapeFailureMessage.call(this);
   this.displayMessagePosition();
+  this.displayMessageType("EscapeFailure");
 };
 
 //Scene_Battle
@@ -437,7 +469,21 @@ Scene_Battle.prototype.createActorWindow = function() {
 const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
 Scene_Battle.prototype.createPartyCommandWindow = function() {
   _Scene_Battle_createPartyCommandWindow.call(this);
-  this._partyCommandWindow.opacity = param.PartyCommandWindowShow ? 255 : 0;
+  if (!param.PartyCommandWindowShow) {
+    if (this._partyCommandWindow) {
+      this._partyCommandWindow.opacity = 0;
+      
+    }
+  }
+  if (param.PartyCommandBackground) {
+    const sprite = new Sprite(loadNormalPicture(param.PartyCommandBackground));
+    sprite.anchor.y = param.PartyCommandBackgroundAnchorMode === 0 ? 0 : 1.0;
+    sprite.x = this._partyCommandWindow.x + this._statusWindow.UI_Difference + param.PartyCommandBackground_X;
+    sprite.y = this._partyCommandWindow.y + (param.PartyCommandBackgroundAnchorMode === 0 ? 0 : this._partyCommandWindow.height) + (Graphics.height - Graphics.boxHeight) / 2
+                  param.PartyCommandBackground_Y;
+    this._battleHudFront.addChild(sprite);
+    this._partyCommandWindow.windowBackground = sprite;
+  }
 };
 
 const _Scene_Battle_createActorCommandWindow = Scene_Battle.prototype.createActorCommandWindow;
@@ -447,7 +493,107 @@ Scene_Battle.prototype.createActorCommandWindow = function() {
   if (param.StyleMode === "XPStyle") {
     this._actorCommandWindow.y = this.actorCommandY();
   }
-  this._actorCommandWindow.opacity = param.ActorCommandWindowShow ? 255 : 0;
+  if (!param.ActorCommandWindowShow) {
+    if (this._actorCommandWindow) {
+      this._actorCommandWindow.opacity = 0;
+    }
+  }
+  if (param.ActorCommandBackground) {
+    const sprite = new Sprite(loadNormalPicture(param.ActorCommandBackground));
+    sprite.anchor.y = param.ActorCommandBackgroundAnchorMode === 0 ? 0 : 1.0;
+    sprite.x = this._actorCommandWindow.x + this._statusWindow.UI_Difference + param.ActorCommandBackground_X;
+    sprite.y = this._actorCommandWindow.y + (param.ActorCommandBackgroundAnchorMode === 0 ? 0 : this._actorCommandWindow.height) + (Graphics.height - Graphics.boxHeight) / 2
+                param.ActorCommandBackground_Y;
+    this._battleHudFront.addChild(sprite);
+    this._actorCommandWindow.windowBackground = sprite;
+  }
+};
+
+const _Scene_Battle_createSkillWindow = Scene_Battle.prototype.createSkillWindow;
+Scene_Battle.prototype.createSkillWindow = function() {
+  _Scene_Battle_createSkillWindow.call(this);
+  if (!param.SelectWindowShow) {
+    if (this._skillWindow) {
+      this._skillWindow.opacity = 0;
+    }
+  }
+  if (param.SkillWindowBackground) {
+    const sprite = new Sprite(loadNormalPicture(param.SkillWindowBackground));
+    sprite.anchor.y = param.SkillBackgroundAnchorMode === 0 ? 0 : 1.0;
+    sprite.x = this._skillWindow.x + this._statusWindow.UI_Difference + param.SkillBackground_X;
+    sprite.y = this._skillWindow.y + (param.SkillBackgroundAnchorMode === 0 ? 0 : this._skillWindow.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.SkillBackground_Y;
+    this._battleHudFront.addChild(sprite);
+    this._skillWindow.windowBackground = sprite;
+  }
+};
+
+const _Scene_Battle_createItemWindow = Scene_Battle.prototype.createItemWindow;
+Scene_Battle.prototype.createItemWindow = function() {
+  _Scene_Battle_createItemWindow.call(this);
+  if (!param.SelectWindowShow) {
+    if (this._itemWindow) {
+      this._itemWindow.opacity = 0;
+    }
+  }
+  if (param.ItemWindowBackground) {
+    const sprite = new Sprite(loadNormalPicture(param.ItemWindowBackground));
+    sprite.anchor.y = param.ItemBackgroundAnchorMode === 0 ? 0 : 1.0;
+    sprite.x = this._itemWindow.x + this._statusWindow.UI_Difference + param.ItemBackground_X;
+    sprite.y = this._itemWindow.y + (param.ItemBackgroundAnchorMode === 0 ? 0 : this._itemWindow.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.ItemBackground_Y;
+    this._battleHudFront.addChild(sprite);
+    this._itemWindow.windowBackground = sprite;
+  }
+};
+
+const _Scene_Battle_createEnemyWindow = Scene_Battle.prototype.createEnemyWindow;
+Scene_Battle.prototype.createEnemyWindow = function() {
+  _Scene_Battle_createEnemyWindow.call(this);
+  if (!param.SelectWindowShow) {
+    if (this._enemyWindow) {
+      this._enemyWindow.opacity = 0;
+    }
+  }
+  if (param.EnemyWindowBackground) {
+    const sprite = new Sprite(loadNormalPicture(param.EnemyWindowBackground));
+    sprite.anchor.y = param.EnemyWindowBackground === 0 ? 0 : 1.0;
+    sprite.x = this._enemyWindow.x + this._statusWindow.UI_Difference + param.EnemyBackground_X;
+    sprite.y = this._enemyWindow.y + (param.EnemyWindowBackground === 0 ? 0 : this._enemyWindow.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.EnemyBackground_Y;
+    this._battleHudFront.addChild(sprite);
+    this._enemyWindow.windowBackground = sprite;
+  }
+};
+
+const _Scene_Battle_createHelpWindow = Scene_Battle.prototype.createHelpWindow;
+Scene_Battle.prototype.createHelpWindow = function() {
+  _Scene_Battle_createHelpWindow.call(this);
+  if (!param.HelpWindowShow) {
+    if (this._helpWindow) {
+      this._helpWindow.opacity = 0;
+    }
+  }
+  if (param.HelpWindowBackground) {
+    const sprite = new Sprite(loadNormalPicture(param.HelpWindowBackground));
+    sprite.anchor.y = param.HelpBackgroundAnchorMode === 0 ? 0 : 1.0;
+    sprite.x = this._helpWindow.x + this._statusWindow.UI_Difference + param.HelpBackground_X;
+    sprite.y = this._helpWindow.y + (param.HelpBackgroundAnchorMode === 0 ? 0 : this._helpWindow.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.HelpBackground_Y;
+    this._battleHudFront.addChild(sprite);
+    this._helpWindow.windowBackground = sprite;
+  }
+};
+
+const _Scene_Battle_createMessageWindow = Scene_Battle.prototype.createMessageWindow;
+Scene_Battle.prototype.createMessageWindow = function() {
+  _Scene_Battle_createMessageWindow.call(this);
+  this.MessageWindowBackGround();
+};
+
+Scene_Battle.prototype.MessageWindowBackGround = function() {
+  if (param.MessageWindowBackground) {
+    const sprite = new Sprite(loadNormalPicture(param.MessageWindowBackground));
+    sprite.anchor.y = param.MessageWindowVisibleSetting === 0 ? 0 : 1.0;
+    this._battleHudFront.addChild(sprite);
+    this._messageWindow.windowBackground = sprite;
+  }
 };
 
 Scene_Battle.prototype.differenceX = function() {
@@ -774,9 +920,37 @@ Scene_Battle.prototype.update = function() {
   if (Imported.NUUN_ActorPicture && $gameTemp.isButlerRefresh()) {
     this._actorImges.preparePartyRefresh();
   }
+  this.updateBackground();
 };
 
-Scene_Battle.prototype.activeWindow = function() {//SkillWindowOpacity
+Scene_Battle.prototype.updateBackground = function() {
+  if (param.PartyCommandBackground) {
+    this._partyCommandWindow.windowBackground.visible = this._partyCommandWindow._commandOpen && this._partyCommandWindow.visible;
+  }
+  if (param.ActorCommandBackground) {
+    this._actorCommandWindow.windowBackground.visible = this._actorCommandWindow._commandOpen && this._actorCommandWindow.visible;
+  }
+  if (param.ItemWindowBackground) {
+    this._itemWindow.windowBackground.visible = this._itemWindow.visible;
+  }
+  if (param.SkillWindowBackground) {
+    this._skillWindow.windowBackground.visible = this._skillWindow.visible;
+  }
+  if (param.EnemyWindowBackground) {
+    this._enemyWindow.windowBackground.visible = this._enemyWindow.visible;
+  }
+  if (param.HelpWindowBackground) {
+    this._helpWindow.windowBackground.visible = this._helpWindow.visible;
+  }
+  if (param.MessageWindowBackground) {
+    this._messageWindow.windowBackground.visible = !BattleManager.getDisplayMessageType() && this._messageWindow.openness >= 200;
+  }
+  if (this._messageWindow.isClosing() && BattleManager.getDisplayMessageType()) {
+    BattleManager.displayMessageType(null);
+  }
+}; 
+
+Scene_Battle.prototype.activeWindow = function() {
   return this.opacityskillWindow() || this.opacityItemWindow() || this.opacityEnemyWindow() || this.opacityMessageWindow() || BattleManager.actorStatusWindowOpacity;
 };
 
@@ -800,13 +974,29 @@ Scene_Battle.prototype.opacityMessageWindow = function() {
 const _Window_Message_updatePlacement = Window_Message.prototype.updatePlacement;
 Window_Message.prototype.updatePlacement = function() {
   _Window_Message_updatePlacement.call(this);
-  this.onMessage = true;
+  if ($gameParty.inBattle()) {
+    this.onMessage = true;
+    if (param.MessageWindowBackground) {
+      this.windowBackground.x = this.x + (Graphics.width - Graphics.boxWidth) / 2 + param.MessageBackground_X;
+      this.windowBackground.y = this.y + (param.MessageWindowVisibleSetting === 0 ? 0 : this.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.MessageBackground_Y;
+    }
+  }
 };
 
 const _Window_Message_terminateMessage = Window_Message.prototype.terminateMessage;
 Window_Message.prototype.terminateMessage = function() {
   _Window_Message_terminateMessage.call(this);
-  this.onMessage = false;
+  if ($gameParty.inBattle()) {
+    this.onMessage = false; 
+  }
+};
+
+const _Window_Message_setBackgroundType = Window_Message.prototype.setBackgroundType;
+Window_Message.prototype.setBackgroundType = function(type) {
+  _Window_Message_setBackgroundType.call(this, type);
+  if ($gameParty.inBattle() && !BattleManager.getDisplayMessageType() && !param.MessageWindowShow && type === 0) {
+    this.opacity = 0;
+  }
 };
 
 //Window_PartyCommand
@@ -838,6 +1028,25 @@ Window_PartyCommand.prototype.drawItemBackground = function(index) {
   if (param.PartyCommandCursorBackShow) {
     _Window_PartyCommand_drawItemBackground.call(this, index);
   }
+};
+
+const _Window_PartyCommand_open = Window_PartyCommand.prototype.open;
+Window_PartyCommand.prototype.open = function() {
+  if (!param.PartyCommandWindowShow) {
+    this.openness = 255;
+    this.show();
+  }
+  _Window_PartyCommand_open.call(this);
+  this._commandOpen = true;
+};
+
+const _Window_PartyCommand_close = Window_PartyCommand.prototype.close;
+Window_PartyCommand.prototype.close = function() {
+  if (!param.PartyCommandWindowShow) {
+    this.hide();
+  }
+  _Window_PartyCommand_close.call(this);
+  this._commandOpen = false;
 };
 
 //Window_ActorCommand
@@ -875,6 +1084,8 @@ Window_ActorCommand.prototype.refresh = function() {
       } else {
         this.y += (param.WindowFrameShow ? 0 : 6);
       }
+      this.windowBackground.x = this.x + this._statusWindow.UI_Difference + param.ActorCommandBackground_X;
+      this.windowBackground.y = this.y + (param.ActorommandBackgroundAnchorMode === 0 ? 0 : this.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.ActorCommandBackground_Y;
     } else if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode >= 1) {
       this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
       if (param.ActorCommandMode === 3) {
@@ -892,6 +1103,47 @@ const _Window_ActorCommand_drawItemBackground = Window_ActorCommand.prototype.dr
 Window_ActorCommand.prototype.drawItemBackground = function(index) {
   if (param.ActorCommandCursorBackShow) {
     _Window_ActorCommand_drawItemBackground.call(this, index);
+  }
+};
+
+const _Window_ActorCommand_open = Window_ActorCommand.prototype.open;
+Window_ActorCommand.prototype.open = function() {
+  if (!param.ActorCommandWindowShow) {
+    this.openness = 255;
+    this.show();
+  }
+  this._commandOpen = true;
+  _Window_ActorCommand_open.call(this);
+};
+
+const _Window_ActorCommand_close = Window_ActorCommand.prototype.close;
+Window_ActorCommand.prototype.close = function() {
+  if (!param.ActorCommandWindowShow) {
+    this.hide();
+  }
+  _Window_ActorCommand_close.call(this);
+  this._commandOpen = false;
+};
+
+
+const _Window_ItemList_drawItemBackground = Window_ItemList.prototype.drawItemBackground;
+Window_ItemList.prototype.drawItemBackground = function(index) {
+  if (param.ActorSelectBackShow) {
+    _Window_ItemList_drawItemBackground.call(this, index);
+  }
+};
+
+const _Window_SkillList_drawItemBackground = Window_SkillList.prototype.drawItemBackground;
+Window_SkillList.prototype.drawItemBackground = function(index) {
+  if (param.ActorSelectBackShow) {
+    _Window_SkillList_drawItemBackground.call(this, index);
+  }
+};
+
+const _Window_BattleEnemy_drawItemBackground = Window_BattleEnemy.prototype.drawItemBackground;
+Window_BattleEnemy.prototype.drawItemBackground = function(index) {
+  if (param.ActorSelectBackShow) {
+    _Window_BattleEnemy_drawItemBackground.call(this, index);
   }
 };
 
@@ -947,7 +1199,7 @@ Window_BattleStatus.prototype.close = function() {
 Window_BattleStatus.prototype.preparePartyRefresh = function() {
   this._bitmapsReady = 0;
   this._actorBack = [];
-  const bitmap = param.actorBackground ? ImageManager.loadSystem(param.actorBackground) : null;
+  const bitmap = loadNormalPicture(param.actorBackground);
   for (let i = 0; i < $gameParty.members().length; i++) {
     this._actorBack[i] = bitmap;
     if (bitmap && !bitmap.isReady()) {
@@ -2443,7 +2695,7 @@ Spriteset_Battle.prototype.initialize = function() {
 const _Spriteset_Battle_loadSystemImages = Spriteset_Battle.prototype.loadSystemImages;
 Spriteset_Battle.prototype.loadSystemImages = function() {
   _Spriteset_Battle_loadSystemImages.call(this);
-  this.windowBackground = ImageManager.loadSystem(param.windowBackground);
+  this.windowBackground = loadNormalPicture(param.windowBackground);
 };
 
 Spriteset_Battle.prototype.createStatusLayer = function() {

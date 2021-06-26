@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.10.1
+ * @version 1.10.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/27 Ver.1.10.2
+ * 入手画面のアクターを複数列に表示する機能を追加。
  * 2021/6/13 Ver.1.10.1
  * 入手アイテムの文字が枠内からはみ出てしまう問題を修正。
  * 2021/6/13 Ver.1.10.0
@@ -473,6 +475,14 @@
  * @type number
  * @default 4
  * @min 0
+ * @parent GetPage
+ * 
+ * @param ActorCols
+ * @desc アクターの表示列数
+ * @text アクター表示列数
+ * @type number
+ * @default 1
+ * @min 1
  * @parent GetPage
  * 
  * @param LavelUpPosition
@@ -1676,33 +1686,36 @@ Window_Result.prototype.refresh = function() {
   const itemPadding = this.itemPadding();
   if (this.page === 0) {
     const height = this.actorContentHeight(scale);
+    const contentWidth = this.actorContentWidth(rect);
+    const width = Math.floor(contentWidth / param.ActorCols);
     const faceArea = rect.x + this.actorAreaWidth(scale);
-    const x2 = rect.x + this.actorContentWidth(rect);
-    gaugeWidth = rect.width - Math.floor(rect.width / 2.6) - faceArea - 30;
+    const x2 = rect.x + width;
+    gaugeWidth = width - faceArea - 30;//
     for (let i = 0; this.actorMembers() > i; i++) {
       this._actor = this.actor(i);
       this._actor._learnSkill = [];
       this._actor._oldStatus = [];
-      let y = i * height + rect.y + param.ActorResult_Y;
+      let x = Math.floor(i % param.ActorCols) * width + rect.x;
+      let y = Math.floor(i / param.ActorCols) * height + rect.y + param.ActorResult_Y;
       if (param.ActorShow === 2) {
-        this.drawActorCharacter(rect.x + Math.floor(this.actorAreaWidth() / 2), y + 60, param.ResultActorVisible);
+        this.drawActorCharacter(x + Math.floor(this.actorAreaWidth() / 2), y + 60, param.ResultActorVisible);
       } else if (param.ActorShow === 1) {
-        this.drawActorFace(rect.x, y, param.FaceWidth, param.FaceHeight, param.ResultActorVisible);
+        this.drawActorFace(x, y, param.FaceWidth, param.FaceHeight, param.ResultActorVisible);
       } else if (param.ActorShow === 3) {
-        this.drawSvActor(rect.x, y + (height / 2), param.ResultActorVisible);
+        this.drawSvActor(x, y + (height / 2), param.ResultActorVisible);
       }
-      this.drawActorName(rect.x + faceArea, y, rect.width - (rect.width - x2) - faceArea - 112, param.ResultActorVisible);
-      this.drawActorLevel(rect.x + x2 - 100, y, param.ResultActorVisible);
+      this.drawActorName(x + faceArea, y, width - faceArea - 112, param.ResultActorVisible);
+      this.drawActorLevel(x + x2 - 100, y, param.ResultActorVisible);
       if (param.LavelUpPosition === 1) {
-        this.drawLevelUp(rect.x + param.LevelUp_X, y + param.LevelUp_Y, Math.floor(this.actorAreaWidth(scale)), param.ResultActorVisible);
+        this.drawLevelUp(x + param.LevelUp_X, y + param.LevelUp_Y, Math.floor(this.actorAreaWidth(scale)), param.ResultActorVisible);
       } else if (param.LavelUpPosition === 10) {
-        this.drawLevelUp(rect.x + param.LevelUp_X , y + param.LevelUp_Y, rect.width, param.ResultActorVisible);
+        this.drawLevelUp(x + param.LevelUp_X , y + param.LevelUp_Y, width, param.ResultActorVisible);
       }
       //this.drawExpGauge(rect.x + x2 - (gaugeWidth + param.Gauge_Margin), y + param.EXP_Y + 18);
-      this.drawExpGauge(rect.x + x2 - gaugeWidth - 30, y + param.EXP_Y + 18, param.ResultActorVisible);
-      this.drawGetEXP(rect.x + faceArea, y + param.EXP_Y, rect.width, param.ResultActorVisible);
+      this.drawExpGauge(x + width - gaugeWidth - 30, y + param.EXP_Y + 18, param.ResultActorVisible);
+      this.drawGetEXP(x + faceArea, y + param.EXP_Y, width, param.ResultActorVisible);
     }
-    this.drawGainList(x2, rect.y, rect.width - x2);
+    this.drawGainList(rect.x + contentWidth, rect.y, rect.width - contentWidth);
   } else {
     for (let i = 0; this.actorMembers() > i; i++) {
       this.removeExpGauge(this.actor(i));

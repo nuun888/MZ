@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.2
+ * @version 2.4.3
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/6/27 Ver 2.4.3
+ * アクターコマンドの背景画像を設定していない時で、コマンドの表示を各アクターの上に設定するとエラーが出る問題を修正。
  * 2021/6/26 Ver 2.4.2
  * パーティ、アクターコマンドの背景画像を指定していないとエラーが出る問題を修正。
  * 2021/6/26 Ver 2.4.1
@@ -475,7 +477,6 @@ Scene_Battle.prototype.createPartyCommandWindow = function() {
   if (!param.PartyCommandWindowShow) {
     if (this._partyCommandWindow) {
       this._partyCommandWindow.opacity = 0;
-      
     }
   }
   if (param.PartyCommandBackground) {
@@ -1087,8 +1088,10 @@ Window_ActorCommand.prototype.refresh = function() {
       } else {
         this.y += (param.WindowFrameShow ? 0 : 6);
       }
-      this.windowBackground.x = this.x + this._statusWindow.UI_Difference + param.ActorCommandBackground_X;
-      this.windowBackground.y = this.y + (param.ActorommandBackgroundAnchorMode === 0 ? 0 : this.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.ActorCommandBackground_Y;
+      if (this.windowBackground) {
+        this.windowBackground.x = this.x + this._statusWindow.UI_Difference + param.ActorCommandBackground_X;
+        this.windowBackground.y = this.y + (param.ActorommandBackgroundAnchorMode === 0 ? 0 : this.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.ActorCommandBackground_Y;
+      }
     } else if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode >= 1) {
       this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
       if (param.ActorCommandMode === 3) {

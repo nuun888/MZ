@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.1
+ * @version 2.4.2
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/6/26 Ver 2.4.2
+ * パーティ、アクターコマンドの背景画像を指定していないとエラーが出る問題を修正。
  * 2021/6/26 Ver 2.4.1
  * アイテム、スキル、モンスター対象選択ウィンドウ、ヘルプウィンドウ、メッセージウィンドウのウィンドウを表示しない機能及び背景画像を設定できる機能を追加。
  * 2021/6/20 Ver 2.4.0
@@ -196,12 +198,13 @@ if (param.StyleMode === "MVStyle") {
 }
 param.actorBackground = param.actorBackground ? param.actorBackground[0] : null;
 param.windowBackground = param.windowBackground ? param.windowBackground[0] : null;//メインウィンドウ
+param.PartyCommandBackground = param.PartyCommandBackground ? param.PartyCommandBackground[0] : null;
+param.ActorCommandBackground = param.ActorCommandBackground ? param.ActorCommandBackground[0] : null;
 param.ItemWindowBackground = param.ItemWindowBackground ? param.ItemWindowBackground[0] : null;//アイテム
 param.SkillWindowBackground = param.SkillWindowBackground ? param.SkillWindowBackground[0] : null;//スキル
 param.EnemyWindowBackground = param.EnemyWindowBackground ? param.EnemyWindowBackground[0] : null;//対象
 param.HelpWindowBackground = param.HelpWindowBackground ? param.HelpWindowBackground[0] : null;//ヘルプ
-param.MessageWindowBackground = param.MessageWindowBackground ? param.MessageWindowBackground[0] : null;//ヘルプ
-
+param.MessageWindowBackground = param.MessageWindowBackground ? param.MessageWindowBackground[0] : null;//メッセージ
 loadNormalPicture(param.actorBackground);
 loadNormalPicture(param.windowBackground);
 

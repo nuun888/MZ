@@ -6,16 +6,12 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/12/2 Ver 1.0.0
- * 
- * 2020/12/2 Ver 1.0.1
- * テスト戦闘でエラーが出る不具合を修正。
  */ 
 /*:
  * @target MZ
  * @plugindesc  戦闘背景変更プラグイン
  * @author NUUN
+ * @version 1.1.0
  * 
  * @help
  * 戦闘背景をリージョン、地形タグによって変更及び、敵グループごとに設定することが出来ます。
@@ -40,6 +36,52 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/6/27 Ver.1.1.0
+ * 背景画像の位置を調整する機能を追加。
+ * 戦闘中に戦闘背景を変更できる機能を追加。
+ * 2020/12/2 Ver.1.0.1
+ * テスト戦闘でエラーが出る不具合を修正。
+ * 2020/12/2 Ver.1.0.0
+ * 初版
+ * 
+ * @command ChangeBattleBackground
+ * @desc 戦闘中に背景画像を変更します。
+ * @text 戦闘中戦闘背景変更
+ * 
+ * @arg ChangeBackground1
+ * @text 変更戦闘背景１
+ * @desc 変更する戦闘背景１を設定します。
+ * @type file
+ * @default
+ * @dir img/battlebacks1
+ * 
+ * @arg ChangeBackground2
+ * @text 変更戦闘背景２
+ * @desc 変更する戦闘背景２を設定します。
+ * @type file
+ * @default
+ * @dir img/battlebacks2
+ * 
+ * 
+ * @param Setting
+ * @text 基本設定
+ * 
+ * @param BackgroundFit
+ * @desc バトル背景を画面サイズに合わせる。(フロントビューのみ)
+ * @text 画面サイズ調整
+ * @type boolean
+ * @default false
+ * @parent Setting
+ * 
+ * @param BackgroundPosition
+ * @desc バトル背景のY座標を移動させます。
+ * @text バトル背景Yポジション
+ * @type number
+ * @default 0
+ * @min -999
+ * @parent Setting
  * 
  * @param TagBattleBackground
  * @text リージョン、地形タグ、敵グループで使用する戦闘背景
@@ -1125,6 +1167,32 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   }
 }));
 
+const pluginName = "NUUN_BattleBackgroundEX";
+PluginManager.registerCommand(pluginName, 'ChangeBattleBackground', args => {
+  changeBattleBackground(args);
+});
+
+function changeBattleBackground(args) {
+  BattleManager.nuun_ChangeBattleback(args.ChangeBackground1, args.ChangeBackground2);
+  $gameTemp.BattleBackgroundRefresh = true;
+};
+
+BattleManager.nuun_ChangeBattleback = function(battleback1Name, battleback2Name) {
+  this._changeBattleback1Name = battleback1Name;
+  this._changeBattleback2Name = battleback2Name;
+};
+
+const _Spriteset_Battle_updateBattleback = Spriteset_Battle.prototype.updateBattleback;
+Spriteset_Battle.prototype.updateBattleback = function() {
+  _Spriteset_Battle_updateBattleback.call(this);
+  if ($gameTemp.BattleBackgroundRefresh) {
+    this._back1Sprite.bitmap = this._back1Sprite.battleback1Bitmap();
+    this._back2Sprite.bitmap = this._back2Sprite.battleback2Bitmap();
+    BattleManager.nuun_ChangeBattleback(null, null);
+    $gameTemp.BattleBackgroundRefresh = false;
+  }
+};
+
 const _Game_Troop_setup = Game_Troop.prototype.setup;
 Game_Troop.prototype.setup = function(troopId) {
   _Game_Troop_setup.call(this, troopId);
@@ -1251,7 +1319,9 @@ Game_Map.prototype.battleback2Name = function() {
 
 const _Sprite_Battleback_battleback1Name = Sprite_Battleback.prototype.battleback1Name;
 Sprite_Battleback.prototype.battleback1Name = function() {
-  if (BattleManager.isBattleTest() && $gameMap.NUUN_battleback1Name) {
+  if ($gameTemp.BattleBackgroundRefresh && BattleManager._changeBattleback1Name) {
+    return BattleManager._changeBattleback1Name;
+  } else if (BattleManager.isBattleTest() && $gameMap.NUUN_battleback1Name) {
     return $gameMap.battleback1Name();
   } else {
     return _Sprite_Battleback_battleback1Name.call(this)
@@ -1260,7 +1330,9 @@ Sprite_Battleback.prototype.battleback1Name = function() {
 
 const _Sprite_Battleback_battleback2Name = Sprite_Battleback.prototype.battleback2Name;
 Sprite_Battleback.prototype.battleback2Name = function() {
-  if (BattleManager.isBattleTest() && $gameMap.NUUN_battleback2Name) {
+  if ($gameTemp.BattleBackgroundRefresh && BattleManager._changeBattleback2Name) {
+    return BattleManager._changeBattleback2Name;
+  } else if (BattleManager.isBattleTest() && $gameMap.NUUN_battleback2Name) {
     return $gameMap.battleback2Name();
   } else {
     return _Sprite_Battleback_battleback2Name.call(this)
@@ -1502,4 +1574,17 @@ Sprite_Battleback.prototype.shipBattleback2Name = function() {
   }
   return _Sprite_Battleback_shipBattleback2Name.call(this);
 };
+
+const _Sprite_Battleback_adjustPosition = Sprite_Battleback.prototype.adjustPosition;
+  Sprite_Battleback.prototype.adjustPosition = function() {
+    _Sprite_Battleback_adjustPosition.call(this);
+    if (param.BackgroundFit && !$gameSystem.isSideView()){
+      this.width = this.bitmap.width;
+      this.height = this.bitmap.height;
+      this.x = 0;
+      this.scale.x = Graphics.width / this.bitmap.width;
+      this.scale.y = Graphics.height / this.bitmap.height;
+    }
+    this.y += param.BackgroundPosition;
+  };
 })();

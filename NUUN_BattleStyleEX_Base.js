@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.3
+ * @version 2.4.4
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/6/27 Ver 2.4.4
+ * 戦闘中ではない時にアイテム、スキル画面を開くと項目の背景が表示されない問題を修正。
  * 2021/6/27 Ver 2.4.3
  * アクターコマンドの背景画像を設定していない時で、コマンドの表示を各アクターの上に設定するとエラーが出る問題を修正。
  * 2021/6/26 Ver 2.4.2
@@ -1134,21 +1136,21 @@ Window_ActorCommand.prototype.close = function() {
 
 const _Window_ItemList_drawItemBackground = Window_ItemList.prototype.drawItemBackground;
 Window_ItemList.prototype.drawItemBackground = function(index) {
-  if (param.ActorSelectBackShow) {
+  if (!$gameParty.inBattle() || ($gameParty.inBattle() && param.ActorSelectBackShow)) {
     _Window_ItemList_drawItemBackground.call(this, index);
   }
 };
 
 const _Window_SkillList_drawItemBackground = Window_SkillList.prototype.drawItemBackground;
 Window_SkillList.prototype.drawItemBackground = function(index) {
-  if (param.ActorSelectBackShow) {
+  if (!$gameParty.inBattle() || ($gameParty.inBattle() && param.ActorSelectBackShow)) {
     _Window_SkillList_drawItemBackground.call(this, index);
   }
 };
 
 const _Window_BattleEnemy_drawItemBackground = Window_BattleEnemy.prototype.drawItemBackground;
 Window_BattleEnemy.prototype.drawItemBackground = function(index) {
-  if (param.ActorSelectBackShow) {
+  if (!$gameParty.inBattle() || ($gameParty.inBattle() && param.ActorSelectBackShow)) {
     _Window_BattleEnemy_drawItemBackground.call(this, index);
   }
 };

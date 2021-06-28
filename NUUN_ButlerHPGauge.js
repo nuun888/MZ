@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
@@ -36,6 +36,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/28 Ver.1.2.2
+ * 一部が機能しなくなっていたので処理修正
  * 2021/6/28 Ver.1.2.1
  * 条件によりHPを隠す機能を追加。
  * 2021/6/26 Ver.1.2.0
@@ -159,7 +161,7 @@
  * @desc HPの数値を隠す時の文字。
  * @text HPの数値を隠す時の文字
  * @type string
- * @default '????'
+ * @default ????
  * 
  * @param ConflictScale
  * @desc 敵画像の上設定時の拡大率の考慮
@@ -313,18 +315,14 @@ Sprite_EnemyHPGauge.prototype.drawLabel = function() {
 
 Sprite_EnemyHPGauge.prototype.drawValue = function() {
   if (HPValueVisible) {
-    Sprite_Gauge.prototype.drawValue.call(this);
-  }
-};
-
-Sprite_EnemyHPGauge.prototype.drawValue = function() {
-  if (this._battler._HPGaugeValueVisible && !this._battler._HPGaugeMask) {
-    const width = this.bitmapWidth();
-    const height = this.bitmapHeight();
-    this.setupValueFont();
-    this.bitmap.drawText(MaskValueName, 0, 0, width, height, "right");
-  } else {
-    Sprite_Gauge.prototype.drawValue.call(this);
+    if (this._battler._HPGaugeValueVisible && !this._battler._HPGaugeMask) {
+      const width = this.bitmapWidth();
+      const height = this.bitmapHeight();
+      this.setupValueFont();
+      this.bitmap.drawText(MaskValueName, 0, 0, width, height, "right");
+    } else {
+      Sprite_Gauge.prototype.drawValue.call(this);
+    }
   }
 };
 

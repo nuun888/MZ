@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
@@ -24,11 +24,20 @@
  * 特徴を有するメモ欄
  * <HPGaugeVisible> この特徴を持つアクターが存在すれば、敵のHPゲージが表示されます。
  * <EnemyHPGaugeVisible> この特徴を持つ敵はHPゲージが表示されます。
+ * 敵のメモ欄
+ * <HPGaugeMask:[eval]> 条件に一致しなければHP値の表示を？？？にします。
+ * this 敵データ
+ * this.enemy() 敵のデータベースデータ
+ * 例　<HPGaugeMask:this.hp < this.mhp * 0.3>
+ * 敵のHPが３０％未満の時のみHP値を表示します。
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/28 Ver.1.2.1
+ * 条件によりHPを隠す機能を追加。
  * 2021/6/26 Ver.1.2.0
  * 状況によってHPゲージを表示する機能を追加。
  * 2021/6/20 Ver.1.1.1
@@ -146,6 +155,12 @@
  * @default -2
  * @min -9999
  * 
+ * @param MaskValueName
+ * @desc HPの数値を隠す時の文字。
+ * @text HPの数値を隠す時の文字
+ * @type string
+ * @default '????'
+ * 
  * @param ConflictScale
  * @desc 敵画像の上設定時の拡大率の考慮
  * @text 拡大率の考慮
@@ -177,6 +192,7 @@ const HPValueVisible = eval(parameters['HPValueVisible'] || 'true');
 const ValueFontSize = Number(parameters['ValueFontSize'] || -6);
 const LabelFontSize = Number(parameters['LabelFontSize'] || -2);
 const ConflictScale = Number(parameters['ConflictScale'] || 0);
+const MaskValueName = String(parameters['MaskValueName'] || '????');
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
@@ -301,6 +317,17 @@ Sprite_EnemyHPGauge.prototype.drawValue = function() {
   }
 };
 
+Sprite_EnemyHPGauge.prototype.drawValue = function() {
+  if (this._battler._HPGaugeValueVisible && !this._battler._HPGaugeMask) {
+    const width = this.bitmapWidth();
+    const height = this.bitmapHeight();
+    this.setupValueFont();
+    this.bitmap.drawText(MaskValueName, 0, 0, width, height, "right");
+  } else {
+    Sprite_Gauge.prototype.drawValue.call(this);
+  }
+};
+
 const _Sprite_EnemyHPGauge_updateBitmap = Sprite_EnemyHPGauge.prototype.updateBitmap;
 Sprite_EnemyHPGauge.prototype.updateBitmap = function() {
   _Sprite_EnemyHPGauge_updateBitmap.call(this);
@@ -383,10 +410,28 @@ Game_Actor.prototype.HpGaugeVisible = function(){
   BattleManager.hpGaugeVisible();
 };
 
+Game_Actor.prototype.HpGaugeMask = function(){
+  this._HPGaugeMask = false;
+};
+
 const _Game_Battler_refresh = Game_Battler.prototype.refresh;
 Game_Battler.prototype.refresh = function() {
   _Game_Battler_refresh.call(this);
   this.HpGaugeVisible();
+  this.HpGaugeMask();
+};
+
+const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
+Game_Enemy.prototype.initMembers = function() {
+  _Game_Enemy_initMembers.call(this);
+  this._visibleHpGauge = false;
+  this._HPGaugeMask = false;
+};
+
+const _Game_Enemy_setup = Game_Enemy.prototype.setup;
+Game_Enemy.prototype.setup = function(enemyId, x, y) {
+  _Game_Enemy_setup.call(this, enemyId, x, y);
+  this._HPGaugeValueVisible = this.enemy().meta.HPGaugeMask ? true : false;
 };
 
 Game_Enemy.prototype.HpGaugeVisibleTrait = function(){
@@ -395,6 +440,12 @@ Game_Enemy.prototype.HpGaugeVisibleTrait = function(){
 
 Game_Enemy.prototype.HpGaugeVisible = function(){
   this._visibleHpGauge = this.HpGaugeVisibleTrait();
+};
+
+Game_Enemy.prototype.HpGaugeMask = function(){
+  if (this._HPGaugeValueVisible) {
+    this._HPGaugeMask = eval(this.enemy().meta.HPGaugeMask);
+  }
 };
 
 BattleManager.hpGaugeVisible = function() {

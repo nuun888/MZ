@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.10.2
+ * @version 1.10.3
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/6/29 Ver.1.10.3
+ * アクターを複数列に設定したとき２列目以降のアクターの獲得経験値が表示されない問題を修正。
+ * アクターを複数列に設定したときにアクターの表示枠の高さに列数が考慮していなかった問題を修正。
  * 2021/6/27 Ver.1.10.2
  * 入手画面のアクターを複数列に表示する機能を追加。
  * 2021/6/13 Ver.1.10.1
@@ -1639,10 +1642,11 @@ Window_Result.prototype.loadImages = function() {
 
 Window_Result.prototype.actorContentHeight = function(scale) {
   const itemPadding = this.itemPadding();
-  if (param.ResultActorAutoSize && param.DefaultActorVisible < this.actorMembers()) {
-    return Math.floor((this.height - itemPadding * 2) / this.actorMembers());
-  } else if (param.ResultActorLessThanSize && param.DefaultActorVisible > this.actorMembers()) {
-    return Math.floor((this.height - itemPadding * 2) / this.actorMembers());
+  const showMembers = Math.ceil(this.actorMembers() / param.ActorCols);
+  if (param.ResultActorAutoSize && param.DefaultActorVisible < showMembers) {
+    return Math.floor((this.height - itemPadding * 2) / showMembers);
+  } else if (param.ResultActorLessThanSize && param.DefaultActorVisible > this.actorMembers() / param.ActorCols) {
+    return Math.floor((this.height - itemPadding * 2) / showMembers);
   } else {
     if (!param.ResultActorDefaultAutoSize && param.FaceHeight > 0) {
       return (param.ActorShow === 1 && param.FaceScaleHeight) ? Math.floor(param.FaceHeight * scale) : param.FaceHeight;
@@ -2001,7 +2005,7 @@ Window_Result.prototype.drawGetEXP = function(x, y, width, mode) {
         }
         const text = "+"+ finalExp;
         x2 += param.LavelUpPosition === 2 ? Math.min(this.textWidth(text), width - x - 190) + textWidth + (this.itemPadding() * 2) : 0;
-        this.drawText(text, x + textWidth + this.itemPadding(), y, width - x - 190, "left");
+        this.drawText(text, x + textWidth + this.itemPadding(), y, width - textWidth - 190, "left");
         this.resetTextColor();
         this.contents.fontSize = $gameSystem.mainFontSize();
       }

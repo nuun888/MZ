@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.10.3
+ * @version 1.11.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,13 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/2 Ver.1.11.0
+ * ページ切り替えを左クリックでも対応。
+ * 戦闘結果の設定を空白にしたときにundefinedと表示されてしまう問題を修正。
+ * レベルアップのアクター切り替え時にSEを指定できる機能を追加。
+ * リザルト画面表示までの待機フレーム中のサイドビューアクターの処理を変更。
+ * リザルト画面をフェードインさせて表示する機能を追加。
+ * 背景画像をフェードインさせて表示させるように変更。
  * 2021/6/29 Ver.1.10.3
  * アクターを複数列に設定したとき２列目以降のアクターの獲得経験値が表示されない問題を修正。
  * アクターを複数列に設定したときにアクターの表示枠の高さに列数が考慮していなかった問題を修正。
@@ -252,6 +259,13 @@
  * @type number
  * @default 0
  * @min 0
+ * @parent CommonSetting
+ * 
+ * @param ResultFadein
+ * @type boolean
+ * @default false
+ * @text フェードイン表示
+ * @desc リザルト画面をフェードインで表示する。
  * @parent CommonSetting
  * 
  * @param WindowSetting
@@ -775,6 +789,37 @@
  * @min -100
  * @parent LevelUpPage
  * 
+ * @param LevelUpActorSeSetting
+ * @text レベルアップ時のアクター切り替え時のSE設定
+ * @default ------------------------------
+ * @parent LevelUpPage
+ * 
+ * @param LevelUpActorSe
+ * @text アクター切り替え時SE
+ * @desc レベルアップ時のアクター切り替え時のSE。
+ * @type file
+ * @dir audio/se
+ * @parent LevelUpActorSeSetting
+ * 
+ * @param LevelUpActorVolume
+ * @text SEの音量
+ * @desc SEを音量を設定します。
+ * @default 90
+ * @parent LevelUpActorSeSetting
+ * @min 0
+ * 
+ * @param LevelUpActorPitch
+ * @text SEのピッチ
+ * @desc SEをピッチを設定します。
+ * @default 100
+ * @parent LevelUpActorSeSetting
+ * 
+ * @param LevelUpActorPan
+ * @text SEの位相
+ * @desc SEを位相を設定します。
+ * @default 0
+ * @parent LevelUpActorSeSetting
+ * 
  * @param NameSetting
  * @text 名称設定
  * @default ------------------------------
@@ -1106,6 +1151,7 @@ param.GainParam = param.GainParam || [];
 param.ButlerActors = param.ButlerActors || [];
 param.ActorBackGroundImg = param.ActorBackGroundImg && param.ActorBackGroundImg.length > 0 ? param.ActorBackGroundImg[0] : null;
 param.PartyBackGroundImg = param.PartyBackGroundImg && param.PartyBackGroundImg.length > 0 ? param.PartyBackGroundImg[0] : null;
+const LevelUpActorSeData = param.LevelUpActorSe ? {name: param.LevelUpActorSe, volume: param.LevelUpActorVolume, pitch: param.LevelUpActorPitch, pan: param.LevelUpActorPan} : null;
 let gaugeWidth = 300;
 
 const pluginName = "NUUN_Result";
@@ -1156,6 +1202,13 @@ Game_Actor.prototype.initResultActorImg = function(id) {
 Game_Actor.prototype.setResultActorImgId = function(changeActorImgId) {
   this.resultImgId = Number(changeActorImgId) - 1;
   this.resultActorBitmap = this.resultActorImg.ActorImg[this.resultImgId];
+};
+
+const _Game_Actor_requestMotionRefresh = Game_Actor.prototype.requestMotionRefresh;
+Game_Actor.prototype.requestMotionRefresh = function() {
+  if (!BattleManager._victoryOn) {
+    _Game_Actor_requestMotionRefresh.call(this);
+  }
 };
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
@@ -1270,6 +1323,7 @@ Scene_Battle.prototype.createResultWindow = function() {
     this._resultWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
     this._resultWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
     this._resultWindow.setActorImgWindow(this._resultActorImgWindow);
+    this.setResultBuckground(this._resultBaseSprite);
   } else {
     this.addWindow(this._resultWindow);
   }
@@ -1501,6 +1555,10 @@ Scene_Battle.prototype.closeStatusWindow = function() {
   }
 };
 
+Scene_Battle.prototype.setResultBuckground = function(sprite) {
+  this._resultWindow.resultBuckgroundSprite = sprite;
+};
+
 function Window_ResultActorImg() {
   this.initialize(...arguments);
 }
@@ -1598,13 +1656,33 @@ Window_ResultHelp.prototype.initialize = function(rect) {
   this._userWindowSkin = param.ResultWindowsSkin;
   Window_Help.prototype.initialize.call(this, rect);
   this.openness = 0;
+  this.openOpacity = 0;
   this.refresh();
 };
 
 Window_ResultHelp.prototype.refresh = function() {
-  const rect = this.baseTextRect();
-  this.contents.clear();
-  this.drawText(param.ResultName, rect.x, rect.y, rect.width, param.ResultTextPosition);
+  if (param.ResultName) {
+    const rect = this.baseTextRect();
+    this.contents.clear();
+    this.drawText(param.ResultName, rect.x, rect.y, rect.width, param.ResultTextPosition);
+  }
+};
+
+const _Window_ResultHelp_updateOpen = Window_ResultHelp.prototype.updateOpen;
+Window_ResultHelp.prototype.updateOpen = function() {
+  if (param.ResultFadein && this._opening) {
+    this.openness = 255;
+    this.openOpacity += 32;
+    if (!param.PartyBackGroundImg && !param.ActorBackGroundImg) {
+      this.opacity = this.openOpacity;
+    }
+  }
+  _Window_ResultHelp_updateOpen.call(this);
+};
+
+const _Window_ResultHelp_isOpen = Window_ResultHelp.prototype.isOpen;
+Window_ResultHelp.prototype.isOpen = function() {
+  return param.ResultFadein ? this.openOpacity >= 255 : _Window_ResultHelp_isOpen.call(this);
 };
 
 function Window_Result() {
@@ -1624,6 +1702,7 @@ Window_Result.prototype.initialize = function(rect) {
   this.page = 0;
   this._actor = null;
   this._canRepeat = false;
+  this.openOpacity = 0;
   this.loadImages();
   //this.refresh();
 };
@@ -2130,6 +2209,12 @@ Window_Result.prototype.drawHorzLine = function(x, y, width) {
   this.contents.paintOpacity = 255;
 };
 
+Window_Result.prototype.onTouchOk = function() {
+  if (this.isOkEnabled()) {
+    this.processOk();
+  }
+};
+
 Window_Result.prototype.onTouchCancel = function() {
   if (this.isCancelEnabled()) {
       this.processOk();
@@ -2139,6 +2224,23 @@ Window_Result.prototype.onTouchCancel = function() {
 Window_Result.prototype.processOk = function() {
   if (BattleManager.resultRefresh === 0) {
     Window_StatusBase.prototype.processOk.call(this);
+  }
+};
+
+Window_Result.prototype.processCancel = function() {
+  this.processOk();
+};
+
+Window_Result.prototype.playOkSound = function() {
+  this.changeActorSound();
+};
+
+Window_Result.prototype.changeActorSound = function() {
+  const dataLength = this.actorLevelUp.length;
+  if (LevelUpActorSeData && dataLength > 0 && dataLength - 1 >= this.page) {
+    AudioManager.playStaticSe(LevelUpActorSeData);
+  } else {
+    SoundManager.playOk();
   }
 };
 
@@ -2197,6 +2299,25 @@ Window_Result.prototype.paramValue = function(params, option) {
     default:
       return null;
   }
+};
+
+const _Window_Result_updateOpen = Window_Result.prototype.updateOpen;
+Window_Result.prototype.updateOpen = function() {
+  if ((param.PartyBackGroundImg || param.ActorBackGroundImg || param.ResultFadein) && this._opening) {
+    this.openness = 255;
+    this.openOpacity += 32;
+    if (param.PartyBackGroundImg || param.ActorBackGroundImg) {
+      this.resultBuckgroundSprite.opacity = this.openOpacity;
+    } else if (!param.PartyBackGroundImg && !param.ActorBackGroundImg) {
+      this.opacity = this.openOpacity;
+    }
+  }
+  _Window_Result_updateOpen.call(this);
+};
+
+const _Window_Result_isOpen = Window_Result.prototype.isOpen;
+Window_Result.prototype.isOpen = function() {
+  return param.ResultFadein || param.PartyBackGroundImg || param.ActorBackGroundImg ? this.openOpacity >= 255 : _Window_Result_isOpen.call(this);
 };
 
 function Window_ResultDropItem() {
@@ -2305,8 +2426,6 @@ Window_ResultDropItem.prototype.drawLearnSkill = function(actor, x, y, width) {
     }
   }
 };
-
-
 
 function Sprite_ResultActor() {
   this.initialize(...arguments);
@@ -2609,7 +2728,6 @@ BattleManager.processVictory = function() {
     }
     this.displayVictoryNoBusy();
   }
-  $gameParty.performVictory();
   if (this.resultBusy > 0) {
     this.resultBusy--;
   }
@@ -2620,6 +2738,7 @@ BattleManager.processVictory = function() {
 
 BattleManager.displayVictoryNoBusy = function() {
   $gameParty.removeBattleStates();
+  $gameParty.performVictory();
   this.playVictoryMe();
   this.replayBgmAndBgs();
   this.makeRewards();

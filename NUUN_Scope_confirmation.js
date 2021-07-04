@@ -9,7 +9,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc 全体、ランダム範囲でも対象選択表示
+ * @plugindesc 全体、ランダム攻撃でも対象選択表示
  * @author NUUN
  * @version 1.0.0
  *            

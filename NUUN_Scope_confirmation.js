@@ -11,17 +11,21 @@
  * @target MZ
  * @plugindesc 全体、ランダム攻撃でも対象選択表示
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  *            
  * @help  
  * 全体、ランダム範囲でも対象選択画面を表示させます。
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 
  * 更新履歴
+ * 2021/7/5 Ver.1.0.1
+ * 味方が奇数の時にカーソル全選択時の表示が正常に表示されない問題を修正。
  * 2021/7/4 Ver.1.0.0
+ * 初版
  * 
  * @param ForEveryoneSelect
  * @desc 対象が使用者の時に選択画面を表示する。
@@ -100,7 +104,7 @@ Window_BattleEnemy.prototype.selectForItem = function(action) {
   }
 };
 
-Window_BattleActor.prototype.select = function(index) {
+Window_BattleActor.prototype.select = function(index) {//再定義
   Window_BattleStatus.prototype.select.call(this, index);
   let activeMember = []
   if (this.cursorAll()) {
@@ -141,7 +145,7 @@ Game_Unit.prototype.select = function(activeMember) {//再定義
   }
 };
 //不具合修正
-Window_Selectable.prototype.refreshCursorForAll = function() {//再定義
+Window_BattleEnemy.prototype.refreshCursorForAll = function() {//再定義
   const maxItems = this.maxItems();
   if (maxItems > 0) {
     const items = maxItems + (maxItems > 1 && maxItems % 2 ? 0 : -1);

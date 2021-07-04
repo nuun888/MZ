@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.11.0
+ * @version 1.11.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/4 Ver.1.11.1
+ * 戦闘終了時にコマンド選択中のアクターのモーションが正常に表示されない問題を修正。
  * 2021/7/2 Ver.1.11.0
  * ページ切り替えを左クリックでも対応。
  * 戦闘結果の設定を空白にしたときにundefinedと表示されてしまう問題を修正。
@@ -2852,4 +2854,8 @@ BattleManager.levelUpPageEnable = function(enable) {
   this._levelUpPageEnable = enable;
 };
 
+const _BattleManager_isBattleEnd = BattleManager.isBattleEnd;
+BattleManager.isBattleEnd = function() {
+  return _BattleManager_isBattleEnd.call(this) || this._victoryOn;
+};
 })();

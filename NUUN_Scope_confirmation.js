@@ -47,6 +47,14 @@ Scene_Battle.prototype.onSelectAction = function() {
   } else if (action.isForEveryone()) {
     this.startEnemySelection();
     this._enemyWindow.selectForItem(action);
+  } else if (action.isForRandom()) {
+    if (action.isForOpponent()) {
+      this.startEnemySelection();
+      this._enemyWindow.selectForItem(action); 
+    } else {
+      this.startActorSelection();
+      this._actorWindow.selectForItem(action);
+    }
   } else if (action.isForAll()) {
     if (action.isForOpponent()) {
       this.startEnemySelection();
@@ -73,6 +81,9 @@ Window_BattleActor.prototype.selectForItem = function(action) {
   } else if (action.isForAll()) {
     this.setCursorAll(true);
     this.forceSelect(0);
+  } else if (action.isForRandom()) {
+    this.setCursorAll(true);
+    this.forceSelect(0);
   }
 };
 
@@ -81,6 +92,9 @@ Window_BattleEnemy.prototype.selectForItem = function(action) {
     this.setCursorAll(true);
     this.forceSelect(0);
   } else if (action.isForAll()) {
+    this.setCursorAll(true);
+    this.forceSelect(0);
+  } else if (action.isForRandom()) {
     this.setCursorAll(true);
     this.forceSelect(0);
   }

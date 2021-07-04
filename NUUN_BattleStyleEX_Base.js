@@ -11,11 +11,14 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.4
+ * @version 2.4.5
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/7/5 Ver 2.4.5
+ * アクターステータスウィンドウのカーソル背景画像が表示されない問題を修正。
+ * アイテム、スキル、敵選択のカーソル背景画像が表示されない問題を修正。
  * 2021/6/27 Ver 2.4.4
  * 戦闘中ではない時にアイテム、スキル画面を開くと項目の背景が表示されない問題を修正。
  * 2021/6/27 Ver 2.4.3
@@ -1136,21 +1139,21 @@ Window_ActorCommand.prototype.close = function() {
 
 const _Window_ItemList_drawItemBackground = Window_ItemList.prototype.drawItemBackground;
 Window_ItemList.prototype.drawItemBackground = function(index) {
-  if (!$gameParty.inBattle() || ($gameParty.inBattle() && param.ActorSelectBackShow)) {
+  if (!$gameParty.inBattle() || ($gameParty.inBattle() && param.SelectCursorBackShow)) {
     _Window_ItemList_drawItemBackground.call(this, index);
   }
 };
 
 const _Window_SkillList_drawItemBackground = Window_SkillList.prototype.drawItemBackground;
 Window_SkillList.prototype.drawItemBackground = function(index) {
-  if (!$gameParty.inBattle() || ($gameParty.inBattle() && param.ActorSelectBackShow)) {
+  if (!$gameParty.inBattle() || ($gameParty.inBattle() && param.SelectCursorBackShow)) {
     _Window_SkillList_drawItemBackground.call(this, index);
   }
 };
 
 const _Window_BattleEnemy_drawItemBackground = Window_BattleEnemy.prototype.drawItemBackground;
 Window_BattleEnemy.prototype.drawItemBackground = function(index) {
-  if (!$gameParty.inBattle() || ($gameParty.inBattle() && param.ActorSelectBackShow)) {
+  if (!$gameParty.inBattle() || ($gameParty.inBattle() && param.SelectCursorBackShow)) {
     _Window_BattleEnemy_drawItemBackground.call(this, index);
   }
 };
@@ -1207,7 +1210,7 @@ Window_BattleStatus.prototype.close = function() {
 Window_BattleStatus.prototype.preparePartyRefresh = function() {
   this._bitmapsReady = 0;
   this._actorBack = [];
-  const bitmap = loadNormalPicture(param.actorBackground);
+  const bitmap = param.actorBackground ? loadNormalPicture(param.actorBackground) : null;
   for (let i = 0; i < $gameParty.members().length; i++) {
     this._actorBack[i] = bitmap;
     if (bitmap && !bitmap.isReady()) {

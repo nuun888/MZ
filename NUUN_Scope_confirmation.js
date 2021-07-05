@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc 全体、ランダム攻撃でも対象選択表示
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  *            
  * @help  
  * 全体、ランダム範囲でも対象選択画面を表示させます。
@@ -22,12 +22,15 @@
  * 
  * 
  * 更新履歴
+ * 2021/7/5 Ver.1.0.2
+ * カーソル全体選択時の処理を修正。
+ * プラグインパラメータのパラメータが間違っていたので修正。
  * 2021/7/5 Ver.1.0.1
  * 味方が奇数の時にカーソル全選択時の表示が正常に表示されない問題を修正。
  * 2021/7/4 Ver.1.0.0
  * 初版
  * 
- * @param ForEveryoneSelect
+ * @param ForUserSelect
  * @desc 対象が使用者の時に選択画面を表示する。
  * @text 対象使用者選択表示
  * @type boolean
@@ -39,13 +42,13 @@ Imported.NUUN_Scope_confirmation = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Scope_confirmation');
-const ForEveryoneSelect = eval(parameters['ForEveryoneSelect'] || 'false');
+const ForUserSelect = eval(parameters['ForUserSelect'] || 'false');
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
   this.resetCursor();
   const action = BattleManager.inputtingAction();
-  if (ForEveryoneSelect && action.isForUser()) {
+  if (ForUserSelect && action.isForUser()) {
     this.startActorSelection();
     this._actorWindow.selectForItem(action);
   } else if (action.isForEveryone()) {
@@ -145,10 +148,10 @@ Game_Unit.prototype.select = function(activeMember) {//再定義
   }
 };
 //不具合修正
-Window_BattleEnemy.prototype.refreshCursorForAll = function() {//再定義
+Window_Selectable.prototype.refreshCursorForAll = function() {//再定義
   const maxItems = this.maxItems();
   if (maxItems > 0) {
-    const items = maxItems + (maxItems > 1 && maxItems % 2 ? 0 : -1);
+    const items = maxItems + (maxItems >= this.maxCols() && maxItems % this.maxCols() ? 0 : -1);
       const rect = this.itemRect(0);
       rect.enlarge(this.itemRect(items));
       this.setCursorRect(rect.x, rect.y, rect.width, rect.height);

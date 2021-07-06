@@ -290,6 +290,15 @@ Game_Actor.prototype.initMembers = function() {
   this._imgIndex = 0;
   this._actionActorImg = null;
   this._isEffectAction = false;
+  this._onDamageEffect = false;
+};
+
+const _Game_Actor_gainHp = Game_Actor.prototype.gainHp;
+Game_Actor.prototype.gainHp = function(value) {
+  _Game_Actor_gainHp.call(this, value);
+  if ($gameParty.inBattle() && this._result.hpDamage > 0) {
+    this._onDamageEffect = true;
+  }
 };
 
 const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
@@ -2097,14 +2106,6 @@ Sprite_ActorImges.prototype.setupEffect = function() {
   if (this._battler._isEffectAction) {
     this._zoomDuration = param.ActionZoomDuration;
     this._battler._isEffectAction = false;
-  }
-};
-
-const _Game_Actor_gainHp = Game_Actor.prototype.gainHp;
-Game_Actor.prototype.gainHp = function(value) {
-  _Game_Actor_gainHp.call(this, value);
-  if ($gameParty.inBattle() && this._result.hpDamage > 0) {
-    this._onDamageEffect = true;
   }
 };
 

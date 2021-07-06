@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.5
+ * @version 2.4.6
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/7/6 Ver 2.4.6
+ * 戦闘開始前にダメージを受けるとアクターの震えが止まらなくなる問題を修正。
  * 2021/7/5 Ver 2.4.5
  * アクターステータスウィンドウのカーソル背景画像が表示されない問題を修正。
  * アイテム、スキル、敵選択のカーソル背景画像が表示されない問題を修正。
@@ -2088,12 +2090,21 @@ Sprite_ActorImges.prototype.updateMotion = function() {
 };
 
 Sprite_ActorImges.prototype.setupEffect = function() {
-  if (this._battler._result.hpDamage > 0) {
+  if (this._battler._onDamageEffect) {
     this._shakeDuration = param.ActorShakeFlame;
+    this._battler._onDamageEffect = false;
   }
   if (this._battler._isEffectAction) {
     this._zoomDuration = param.ActionZoomDuration;
     this._battler._isEffectAction = false;
+  }
+};
+
+const _Game_Actor_gainHp = Game_Actor.prototype.gainHp;
+Game_Actor.prototype.gainHp = function(value) {
+  _Game_Actor_gainHp.call(this, value);
+  if ($gameParty.inBattle() && this._result.hpDamage > 0) {
+    this._onDamageEffect = true;
   }
 };
 

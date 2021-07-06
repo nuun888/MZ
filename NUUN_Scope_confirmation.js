@@ -11,10 +11,14 @@
  * @target MZ
  * @plugindesc 全体、ランダム攻撃でも対象選択表示
  * @author NUUN
- * @version 1.0.2
+ * @version 1.1.0
  *            
  * @help  
  * 全体、ランダム範囲でも対象選択画面を表示させます。
+ * 
+ * アイテム、スキルのメモ欄
+ * <NoTargetSelect> このアイテム、スキルは対象選択画面を表示しません。
+ * 対象が全体、ランダム、敵味方全て、使用者のみ（対象使用者のみ選択表示をON）で有効です。
  * 
  * 
  * 利用規約
@@ -22,6 +26,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/7/6 Ver.1.1.0
+ * 敵味方全体対象の時に味方にも点滅するように変更。
+ * 対象選択の表示省略をアイテム、スキルごとに設定できる機能を追加。
  * 2021/7/5 Ver.1.0.2
  * カーソル全体選択時の処理を修正。
  * プラグインパラメータのパラメータが間違っていたので修正。
@@ -31,8 +38,8 @@
  * 初版
  * 
  * @param ForUserSelect
- * @desc 対象が使用者の時に選択画面を表示する。
- * @text 対象使用者選択表示
+ * @desc 対象が使用者のみの時に選択画面を表示する。
+ * @text 対象使用者のみ選択表示
  * @type boolean
  * @default false
  * 
@@ -48,13 +55,15 @@ const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
   this.resetCursor();
   const action = BattleManager.inputtingAction();
-  if (ForUserSelect && action.isForUser()) {
+  const item = action.item();
+  if (ForUserSelect && !this.noTargetSelect(item) && action.isForUser()) {
     this.startActorSelection();
     this._actorWindow.selectForItem(action);
-  } else if (action.isForEveryone()) {
+  } else if (!this.noTargetSelect(item) && action.isForEveryone()) {
     this.startEnemySelection();
     this._enemyWindow.selectForItem(action);
-  } else if (action.isForRandom()) {
+    this._actorWindow.selectForItem(action);
+  } else if (!this.noTargetSelect(item) && action.isForRandom()) {
     if (action.isForOpponent()) {
       this.startEnemySelection();
       this._enemyWindow.selectForItem(action); 
@@ -62,7 +71,7 @@ Scene_Battle.prototype.onSelectAction = function() {
       this.startActorSelection();
       this._actorWindow.selectForItem(action);
     }
-  } else if (action.isForAll()) {
+  } else if (!this.noTargetSelect(item) && action.isForAll()) {
     if (action.isForOpponent()) {
       this.startEnemySelection();
       this._enemyWindow.selectForItem(action); 
@@ -73,6 +82,10 @@ Scene_Battle.prototype.onSelectAction = function() {
   } else {
     _Scene_Battle_onSelectAction.call(this);
   }
+};
+
+Scene_Battle.prototype.noTargetSelect = function(item) {
+  return item.meta.NoTargetSelect;
 };
 
 Scene_Battle.prototype.resetCursor = function() {
@@ -94,10 +107,17 @@ Window_BattleActor.prototype.selectForItem = function(action) {
   }
 };
 
+const _Window_BattleEnemy_initialize = Window_BattleEnemy.prototype.initialize;
+Window_BattleEnemy.prototype.initialize = function(rect) {
+  _Window_BattleEnemy_initialize.call(this, rect);
+  this._forEveryoneSelect = false;
+};
+
 Window_BattleEnemy.prototype.selectForItem = function(action) {
   if (action.isForEveryone()) {
     this.setCursorAll(true);
     this.forceSelect(0);
+    this._forEveryoneSelect = true;
   } else if (action.isForAll()) {
     this.setCursorAll(true);
     this.forceSelect(0);
@@ -130,6 +150,16 @@ Window_BattleEnemy.prototype.select = function(index) {//再定義
     $gameTroop.select(activeMember);
   }
 };
+
+const _Window_BattleEnemy_hide = Window_BattleEnemy.prototype.hide;
+Window_BattleEnemy.prototype.hide = function() {
+  _Window_BattleEnemy_hide.call(this);
+  if (this._forEveryoneSelect) {
+    $gameParty.select(null);
+    this._forEveryoneSelect = false;
+  }
+};
+
 
 Game_Unit.prototype.select = function(activeMember) {//再定義
   if (activeMember && activeMember[0]) {

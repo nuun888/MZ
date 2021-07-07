@@ -163,11 +163,6 @@ if (Imported.NUUN_BattleStyleEX) {
 if (parameters === null) {
   return;
 }
-//バトルスタイル設定
-//param.StyleMode = 
-
-
-
 
 const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   try {
@@ -849,8 +844,8 @@ Scene_Battle.prototype.commandItem = function() {
 const _Scene_Battle_startActorSelection = Scene_Battle.prototype.startActorSelection;
 Scene_Battle.prototype.startActorSelection = function() {
   _Scene_Battle_startActorSelection.call(this);
-  this._skillWindow.hide();
-  this._itemWindow.hide();
+  this._skillWindow.selectionHide();
+  this._itemWindow.selectionHide();
   this._statusWindow.deselect();
 };
 
@@ -864,8 +859,8 @@ const _Scene_Battle_startEnemySelection = Scene_Battle.prototype.startEnemySelec
 Scene_Battle.prototype.startEnemySelection = function() {
   _Scene_Battle_startEnemySelection.call(this);
   this._statusWindow.show();
-  this._skillWindow.hide();
-  this._itemWindow.hide();
+  this._skillWindow.selectionHide();
+  this._itemWindow.selectionHide();
   this._actorCommandWindow.hide();
 };
 
@@ -1016,6 +1011,22 @@ Window_Message.prototype.setBackgroundType = function(type) {
   _Window_Message_setBackgroundType.call(this, type);
   if ($gameParty.inBattle() && !BattleManager.getDisplayMessageType() && !param.MessageWindowShow && type === 0) {
     this.opacity = 0;
+  }
+};
+
+Window_BattleSkill.prototype.selectionHide = function() {
+  if (param.HelpWindowSelectShow) {
+    Window_SkillList.prototype.hide.call(this);
+  } else {
+    Window_BattleSkill.prototype.hide.call(this);
+  }
+};
+
+Window_BattleItem.prototype.selectionHide = function() {
+  if (param.HelpWindowSelectShow) {
+    Window_ItemList.prototype.hide.call(this);
+  } else {
+    Window_SkillList.prototype.hide.call(this);
   }
 };
 

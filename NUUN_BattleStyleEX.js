@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.4.2
+ * @version 1.4.3
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -79,6 +79,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/7 Ver 1.4.3
+ * 対象選択時にヘルプウィンドウを表示したままにする機能を追加。
  * 2021/6/26 Ver 1.4.2
  * 画像指定の設定方法を変更。
  * アイテム、スキル、モンスター対象選択ウィンドウ、ヘルプウィンドウのウィンドウを表示しない機能及び背景画像を設定できる機能を追加。
@@ -293,6 +295,13 @@
  * @text アイテムウィンドウ表示設定
  * @parent Window
  * @default ------------------------------
+ * 
+ * @param HelpWindowSelectShow
+ * @desc 対象選択時にヘルプウィンドウを表示する。
+ * @text 対象選択時ヘルプウィンドウ表示
+ * @type boolean
+ * @default true
+ * @parent SelectWindowVisibleSetting
  * 
  * @param SelectWindowShow
  * @desc アイテム、スキル、敵選択のウィンドウ画像を表示する。

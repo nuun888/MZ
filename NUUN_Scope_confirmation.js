@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc 全体、ランダム攻撃でも対象選択表示
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  *            
  * @help  
  * 全体、ランダム範囲でも対象選択画面を表示させます。
@@ -26,6 +26,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/7/7 Ver.1.2.0
+ * 全体選択の時にカーソルを一つにまとめずに別々に表示する機能を追加。
  * 2021/7/6 Ver.1.1.0
  * 敵味方全体対象の時に味方にも点滅するように変更。
  * 対象選択の表示省略をアイテム、スキルごとに設定できる機能を追加。
@@ -43,6 +45,12 @@
  * @type boolean
  * @default false
  * 
+ * @param MultiCursorMode
+ * @desc 複数対象選択の時にカーソルを個別に表示する。
+ * @text 複数対象カーソル個別表示
+ * @type boolean
+ * @default true
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_Scope_confirmation = true;
@@ -50,6 +58,7 @@ Imported.NUUN_Scope_confirmation = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_Scope_confirmation');
 const ForUserSelect = eval(parameters['ForUserSelect'] || 'false');
+const MultiCursorMode = eval(parameters['MultiCursorMode'] || 'true');
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
@@ -92,16 +101,21 @@ Scene_Battle.prototype.resetCursor = function() {
   this._enemyWindow.setCursorAll(false);
   this._actorWindow.setCursorAll(false);
   this._actorWindow.setCursorFixed(false);
+  this._enemyWindow.setMultiCursor(false);
+  this._actorWindow.setMultiCursor(false);
 };
 
 Window_BattleActor.prototype.selectForItem = function(action) {
   if (action.isForUser()) {
+    this.setMultiCursor(MultiCursorMode);
     this.forceSelect(BattleManager.actor().index());
     this.setCursorFixed(true);
   } else if (action.isForAll()) {
+    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.forceSelect(0);
   } else if (action.isForRandom()) {
+    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.forceSelect(0);
   }
@@ -115,13 +129,16 @@ Window_BattleEnemy.prototype.initialize = function(rect) {
 
 Window_BattleEnemy.prototype.selectForItem = function(action) {
   if (action.isForEveryone()) {
+    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.forceSelect(0);
     this._forEveryoneSelect = true;
   } else if (action.isForAll()) {
+    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.forceSelect(0);
   } else if (action.isForRandom()) {
+    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.forceSelect(0);
   }
@@ -177,16 +194,118 @@ Game_Unit.prototype.select = function(activeMember) {//再定義
     }
   }
 };
-//不具合修正
+
 Window_Selectable.prototype.refreshCursorForAll = function() {//再定義
   const maxItems = this.maxItems();
+  let rect;
   if (maxItems > 0) {
-    const items = maxItems + (maxItems >= this.maxCols() && maxItems % this.maxCols() ? 0 : -1);
-      const rect = this.itemRect(0);
+    if (this._multiCursor) {
+      this.setCursorRect(0, 0, 0, 0);
+      for (let i = 0; maxItems > i; i++) {
+        rect = this.itemRect(i);
+        this.setCursorRects(rect.x, rect.y, rect.width, rect.height, i);
+      } 
+    } else {
+      const items = maxItems + (maxItems >= this.maxCols() && maxItems % this.maxCols() ? 0 : -1);
+      rect = this.itemRect(0);
       rect.enlarge(this.itemRect(items));
       this.setCursorRect(rect.x, rect.y, rect.width, rect.height);
+    }
   } else {
       this.setCursorRect(0, 0, 0, 0);
+  }
+};
+
+const _Window_Selectable_initialize = Window_Selectable.prototype.initialize;
+Window_Selectable.prototype.initialize = function(rect) {
+  this._multiCursor = false;
+  _Window_Selectable_initialize.call(this, rect);
+};
+
+Window_Selectable.prototype.setMultiCursor = function(mode) {
+  this._multiCursor = mode;
+};
+
+const _Window_initialize = Window.prototype.initialize;
+Window.prototype.initialize = function() {
+  _Window_initialize.call(this);
+  this._multiCursorRect = [];
+  this._multiCursorSprite = [];
+  this._cursorIndex = 0;
+};
+
+Window.prototype.setCursorRects = function(x, y, width, height, index) {
+  this._createCursorSprites(index);
+  this._cursorIndex = index;
+  const cw = Math.floor(width || 0);
+  const ch = Math.floor(height || 0);
+  this._multiCursorRect[index].x = Math.floor(x || 0);
+  this._multiCursorRect[index].y = Math.floor(y || 0);
+  if (this._multiCursorRect[index].width !== cw || this._multiCursorRect[index].height !== ch) {
+    this._multiCursorRect[index].width = cw;
+    this._multiCursorRect[index].height = ch;
+      this._multiRefreshCursor(index);
+  }
+};
+
+const _Window_setCursorRect = Window.prototype.setCursorRect;
+Window.prototype.setCursorRect = function(x, y, width, height) {
+  _Window_setCursorRect.call(this, x, y, width, height);
+  this._multiCursorSprite.forEach((sprite, i) => {
+    if (sprite.width > 0 && sprite.height > 0) {
+      this.setCursorRects(0, 0, 0, 0, i);
+    }
+  });
+};
+
+Window.prototype._createCursorSprites = function(index) {
+  if (!this._multiCursorSprite[index]) {
+    const cursorSprite = new Sprite();
+    for (let i = 0; i < 9; i++) {
+        cursorSprite.addChild(new Sprite());
+    }
+    this._clientArea.addChildAt(cursorSprite, 1);
+    this._multiCursorSprite[index] = cursorSprite;
+    this._multiCursorRect[index] = new Rectangle();
+  }
+};
+
+Window.prototype._multiRefreshCursor = function(index) {
+  const drect = this._multiCursorRect[index].clone();
+  const srect = { x: 96, y: 96, width: 48, height: 48 };
+  const m = 4;
+  for (const child of this._multiCursorSprite[index].children) {
+    child.bitmap = this._windowskin;
+  }
+  this._setRectPartsGeometry(this._multiCursorSprite[index], srect, drect, m);
+};
+
+const _Window_refreshCursor = Window.prototype._refreshCursor;
+Window.prototype._refreshCursor = function() {
+  _Window_refreshCursor.call(this);
+  if (this._multiCursor) {
+    this._multiCursorSprite.forEach((sprite, i) => {
+      const drect = this._multiCursorRect[i].clone();
+      const srect = { x: 96, y: 96, width: 48, height: 48 };
+      const m = 4;
+      for (const child of sprite.children) {
+        child.bitmap = this._windowskin;
+      }
+      this._setRectPartsGeometry(sprite, srect, drect, m);
+    });
+  }
+};
+
+const _Window_updateCursor = Window.prototype._updateCursor;
+Window.prototype._updateCursor = function() {
+  _Window_updateCursor.call(this);
+  if (this._multiCursor) {
+    this._multiCursorSprite.forEach((sprite, i) => {
+      sprite.alpha = this._makeCursorAlpha();
+      sprite.visible = this.isOpen() && this.cursorVisible;
+      sprite.x = this._multiCursorRect[i].x;
+      sprite.y = this._multiCursorRect[i].y;
+    });
   }
 };
 

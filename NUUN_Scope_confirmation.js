@@ -9,15 +9,15 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc 全体、ランダム攻撃でも対象選択表示
+ * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
  *            
  * @help  
- * 全体、ランダム範囲でも対象選択画面を表示させます。
+ * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
  * 
  * アイテム、スキルのメモ欄
- * <NoTargetSelect> このアイテム、スキルは対象選択画面を表示しません。
+ * <NoTargetSelect> このアイテム、スキルは対象選択しません。デフォルトと同様に省略されます。
  * 対象が全体、ランダム、敵味方全て、使用者のみ（対象使用者のみ選択表示をON）で有効です。
  * 
  * 
@@ -26,6 +26,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/7/8 Ver.1.3.0
+ * 全体、ランダム攻撃対象選択を敵選択時のみ表示させる機能を追加。
  * 2021/7/7 Ver.1.2.0
  * 全体選択の時にカーソルを一つにまとめずに別々に表示する機能を追加。
  * 2021/7/6 Ver.1.1.0
@@ -38,6 +40,12 @@
  * 味方が奇数の時にカーソル全選択時の表示が正常に表示されない問題を修正。
  * 2021/7/4 Ver.1.0.0
  * 初版
+ * 
+ * @param EnemyOnrySelect
+ * @desc 全体、ランダム攻撃の対象選択を敵のみ表示にします。
+ * @text 全体、ランダム攻撃対象選択敵のみ表示
+ * @type boolean
+ * @default false
  * 
  * @param ForUserSelect
  * @desc 対象が使用者のみの時に選択画面を表示する。
@@ -59,20 +67,21 @@ Imported.NUUN_Scope_confirmation = true;
 const parameters = PluginManager.parameters('NUUN_Scope_confirmation');
 const ForUserSelect = eval(parameters['ForUserSelect'] || 'false');
 const MultiCursorMode = eval(parameters['MultiCursorMode'] || 'true');
+const EnemyOnrySelect = eval(parameters['EnemyOnrySelect'] || 'false');
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
   this.resetCursor();
   const action = BattleManager.inputtingAction();
   const item = action.item();
-  if (ForUserSelect && !this.noTargetSelect(item) && action.isForUser()) {
+  if (this.isTargetSelectForUser(action, item)) {
     this.startActorSelection();
     this._actorWindow.selectForItem(action);
-  } else if (!this.noTargetSelect(item) && action.isForEveryone()) {
+  } else if (this.isTargetSelectEveryone(action, item)) {
     this.startEnemySelection();
     this._enemyWindow.selectForItem(action);
     this._actorWindow.selectForItem(action);
-  } else if (!this.noTargetSelect(item) && action.isForRandom()) {
+  } else if (this.isTargetSelectForRandom(action, item)) {
     if (action.isForOpponent()) {
       this.startEnemySelection();
       this._enemyWindow.selectForItem(action); 
@@ -80,7 +89,7 @@ Scene_Battle.prototype.onSelectAction = function() {
       this.startActorSelection();
       this._actorWindow.selectForItem(action);
     }
-  } else if (!this.noTargetSelect(item) && action.isForAll()) {
+  } else if (this.isTargetSelectisForAll(action, item)) {
     if (action.isForOpponent()) {
       this.startEnemySelection();
       this._enemyWindow.selectForItem(action); 
@@ -93,8 +102,28 @@ Scene_Battle.prototype.onSelectAction = function() {
   }
 };
 
+Scene_Battle.prototype.isTargetSelectForUser = function(action, item) {
+  return ForUserSelect && this.enemyOnrySelect(action) && !this.noTargetSelect(item) && action.isForUser();
+};
+
+Scene_Battle.prototype.isTargetSelectEveryone = function(action, item) {
+  return !this.noTargetSelect(item) && action.isForEveryone();
+};
+
+Scene_Battle.prototype.isTargetSelectForRandom = function(action, item) {
+  return this.enemyOnrySelect(action) && !this.noTargetSelect(item) && action.isForRandom();
+};
+
+Scene_Battle.prototype.isTargetSelectisForAll = function(action, item) {
+  return this.enemyOnrySelect(action) && !this.noTargetSelect(item) && action.isForAll();
+};
+
 Scene_Battle.prototype.noTargetSelect = function(item) {
   return item.meta.NoTargetSelect;
+};
+
+Scene_Battle.prototype.enemyOnrySelect = function(action) {
+  return !EnemyOnrySelect || (EnemyOnrySelect && action.isForOpponent());
 };
 
 Scene_Battle.prototype.resetCursor = function() {

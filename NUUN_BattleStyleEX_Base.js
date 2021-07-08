@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.7
+ * @version 2.4.8
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/7/9 Ver 2.4.8
+ * 回復した時の顔グラがダメージ時の顔グラが反映されてしまう問題を修正。
  * 2021/7/7 Ver 2.4.7
  * 対象選択時にヘルプウィンドウを表示したままにする機能を追加。
  * 2021/7/6 Ver 2.4.6
@@ -2553,7 +2555,7 @@ Sprite_ActorImges.prototype.setDamage = function(){
 Sprite_ActorImges.prototype.setRecoveryDamage = function(){
   const mode = this.faceMode();
   if ((mode && this._data.recoveryDamageFaceIndex >= 0) || (!mode && this._data.recoveryDamageImg)) {
-    this._imgIndex = 3;
+    this._imgIndex = 10;
     this._updateCount = this.setDamageDuration();
     if (!mode) {
       this.loadBitmap = nuun_loadPictures(this._data.recoveryDamageImg);

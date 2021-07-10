@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @help
  * モンスターの敵名を表示します。
  * 
@@ -23,6 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/10 Ver.1.1.1
+ * 戦闘途中でエネミースプライトを生成するとエラーが出る場合があるので修正。
  * 2021/6/19 Ver.1.1.0
  * 名前の表示タイミングを設定できる機能を追加。
  * 2021/6/19 Ver.1.0.5
@@ -138,6 +140,9 @@ Sprite_Enemy.prototype.updateActorName = function() {
 };
 
 Sprite_Enemy.prototype.updateEnemyName = function() {
+  if (!this._butlerName) {
+    this.enemyName();
+  }
   this._butlerName.x = this.butlerNameOffsetX + (this.x - this._butlerName.width / 2);
   this._butlerName.y = this.butlerNameOffsetY + this.y - 40;
   if (this.getButlerNamePosition() === 0) {
@@ -149,6 +154,18 @@ Sprite_Enemy.prototype.updateEnemyName = function() {
     this._butlerName.y = Graphics.height - 40;
   }
   this.butlerNameOpacity();
+};
+
+Sprite_Enemy.prototype.enemyName = function() {
+  const butlerGaugeBase = BattleManager.gaugeBaseSprite;
+  const sprite = new Sprite_ButlerName();
+  butlerGaugeBase.addChild(sprite);
+  sprite.setup(this._enemy);
+  sprite.show();
+  sprite.move(0, 0);
+  this._butlerName = sprite;
+  this.butlerNameOffsetX = (this._enemy.enemy().meta.EnemyNameX ? Number(this._enemy.enemy().meta.EnemyNameX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Name_X;
+  this.butlerNameOffsetY = (this._enemy.enemy().meta.EnemyNameY ? Number(this._enemy.enemy().meta.EnemyNameY) : 0) + Name_Y + (Graphics.height - Graphics.boxHeight) / 2;
 };
 
 Sprite_Enemy.prototype.getButlerNameHeight = function() {
@@ -185,8 +202,20 @@ Sprite_Enemy.prototype.butlerNameOpacity = function() {
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
   _Spriteset_Battle_createLowerLayer.call(this);
+  this.createGaugeBase();
   this.createEnemyName();
   //this.createActorName();
+};
+
+Spriteset_Battle.prototype.createGaugeBase = function() {
+  if (EnemyNamePosition >= 0) {
+    if (!this._butlerGaugeBase) {
+      const sprite = new Sprite();
+      this.addChild(sprite);
+      this._butlerGaugeBase = sprite;
+      BattleManager.gaugeBaseSprite = sprite;
+    }
+  }
 };
 
 Spriteset_Battle.prototype.createActorName = function() {
@@ -201,11 +230,6 @@ Spriteset_Battle.prototype.createActorName = function() {
 
 Spriteset_Battle.prototype.createEnemyName = function() {
   if (EnemyNamePosition >= 0) {
-    if (!this._butlerGaugeBase) {
-      const sprite = new Sprite();
-      this.addChild(sprite);
-      this._butlerGaugeBase = sprite;
-    }
     for (const sprites of this._enemySprites) {
       this.enemyName(sprites);
     }
@@ -233,14 +257,7 @@ Spriteset_Battle.prototype.actorName = function(sprites) {
 };
 
 Spriteset_Battle.prototype.enemyName = function(sprites) {
-  const sprite = new Sprite_ButlerName();
-  this._butlerGaugeBase.addChild(sprite);
-  sprite.setup(sprites._battler);
-  sprite.show();
-  sprite.move(0, 0);
-  sprites._butlerName = sprite;
-  sprites.butlerNameOffsetX = (sprites._enemy.enemy().meta.EnemyNameX ? Number(sprites._enemy.enemy().meta.EnemyNameX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Name_X;
-  sprites.butlerNameOffsetY = (sprites._enemy.enemy().meta.EnemyNameY ? Number(sprites._enemy.enemy().meta.EnemyNameY) : 0) + Name_Y + (Graphics.height - Graphics.boxHeight) / 2;
+  sprites.enemyName();
 };
 
 function Sprite_ButlerName() {
@@ -284,4 +301,9 @@ Sprite_ButlerName.prototype.butlerNameVisibleInSelect = function() {
   return true;
 };
 
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+  _BattleManager_initMembers.call(this);
+  this.gaugeBaseSprite = null;
+};
 })();

@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.11.1
+ * @version 1.12.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,10 +81,14 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/10 Ver.1.12.0
+ * ウィンドウの処理を変更。（レベルアップ画面では戦闘結果ウィンドウを表示しないように変更しました）
+ * レベルアップ時のアクター毎にウィンドウスキン又は背景画像を指定できる機能を追加。
+ * 画像ロードの処理を修正。
+ * 左クリックでのページ送りを廃止。
  * 2021/7/4 Ver.1.11.1
  * 戦闘終了時にコマンド選択中のアクターのモーションが正常に表示されない問題を修正。
  * 2021/7/2 Ver.1.11.0
- * ページ切り替えを左クリックでも対応。
  * 戦闘結果の設定を空白にしたときにundefinedと表示されてしまう問題を修正。
  * レベルアップのアクター切り替え時にSEを指定できる機能を追加。
  * リザルト画面表示までの待機フレーム中のサイドビューアクターの処理を変更。
@@ -343,6 +347,38 @@
  * @text レベルアップウィンドウ設定
  * @default ------------------------------
  * @parent WindowSetting
+ * 
+ * @param LevelUpResultWidth
+ * @desc ウィンドウの横幅。(0でUI横幅)
+ * @text ウィンドウ横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent LevelUpWindowSetting
+ * 
+ * @param LevelUpResultHeight
+ * @desc ウィンドウの縦幅。(0でUI縦幅)デフォルト:616
+ * @text ウィンドウ縦幅
+ * @type number
+ * @default 616
+ * @min 0
+ * @parent LevelUpWindowSetting
+ * 
+ * @param LevelUpResultWindow_X
+ * @desc ウィンドウのX座標。
+ * @text ウィンドウX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent LevelUpWindowSetting
+ * 
+ * @param LevelUpResultWindow_Y
+ * @desc ウィンドウのY座標。
+ * @text ウィンドウY座標
+ * @type number
+ * @default 0
+ * @min -999999
+ * @parent LevelUpWindowSetting
  * 
  * 
  * @param HelpWindowSetting
@@ -1219,7 +1255,9 @@ Scene_Battle.prototype.createAllWindows = function() {
   this.createResultBaseSprite();
   this.createResultHelpWindow();
   this.createResultWindow();
+  this.createActorResultWindow();
   this.createResultDropItemWindow();
+  this.createResultLearnSkillWindow();
   this.createResultButtons();
 };
 
@@ -1237,11 +1275,11 @@ Scene_Battle.prototype.createResultBaseSprite = function() {
 Scene_Battle.prototype.createResultBackGround = function() {
   if (this._resultBaseSprite) {
     if (param.PartyBackGroundImg) {
-      const partySprite = new Sprite();
+      const partySprite = new Sprite(ImageManager.nuun_LoadPictures(param.PartyBackGroundImg));
       this._resultBaseSprite.addChild(partySprite);
-      partySprite.bitmap = ImageManager.nuun_LoadPictures(param.PartyBackGroundImg);
       this._backGroundPartySprite = partySprite;
       partySprite.hide();
+      this.resultBackGround(partySprite);
       if (partySprite.bitmap && !partySprite.bitmap.isReady()) {
         partySprite.bitmap.addLoadListener(this.resultBackGround.bind(this, partySprite));
       } else {
@@ -1249,9 +1287,8 @@ Scene_Battle.prototype.createResultBackGround = function() {
       }
     }
     if (param.ActorBackGroundImg) {
-      const actorSprite = new Sprite();
+      const actorSprite = new Sprite(ImageManager.nuun_LoadPictures(param.ActorBackGroundImg));
       this._resultBaseSprite.addChild(actorSprite);
-      actorSprite.bitmap = ImageManager.nuun_LoadPictures(param.ActorBackGroundImg);
       this._backGroundActorSprite = actorSprite;
       actorSprite.hide();
       if (actorSprite.bitmap && !actorSprite.bitmap.isReady()) {
@@ -1324,7 +1361,6 @@ Scene_Battle.prototype.createResultWindow = function() {
     this._resultBaseSprite.addChild(this._resultWindow);
     this._resultWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
     this._resultWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
-    this._resultWindow.setActorImgWindow(this._resultActorImgWindow);
     this.setResultBuckground(this._resultBaseSprite);
   } else {
     this.addWindow(this._resultWindow);
@@ -1336,6 +1372,32 @@ Scene_Battle.prototype.resultWindowRect = function() {
   const wy = this.resultHelpAreaTop() + this.resultHelpAreaHeight();
   const ww = param.ResultWidth > 0 ? param.ResultWidth : Graphics.boxWidth;
   const wh = (param.ResultHeight > 0 ? param.ResultHeight : Graphics.boxHeight) - wy + param.ResultWindow_Y;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.createActorResultWindow = function() {
+  const rect = this.actorResultWindowRect();
+  this._actorResultWindow = new Window_ActorResult(rect);
+  this._actorResultWindow.setHandler("ok", this.onResultOk.bind(this));
+  this._actorResultWindow.setHandler("cancel", this.onResultOk.bind(this));
+  this._actorResultWindow.hide();
+  if (this._resultBaseSprite) {
+    this._resultBaseSprite.addChild(this._resultWindow);
+    this._actorResultWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
+    this._actorResultWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
+    this._actorResultWindow.setActorImgWindow(this._resultActorImgWindow);
+    this.setResultBuckground(this._resultBaseSprite);
+  } else {
+    this.addWindow(this._actorResultWindow);
+  }
+  this._resultWindow.setActorResultWindow(this._actorResultWindow);
+};
+
+Scene_Battle.prototype.actorResultWindowRect = function() {
+  const wx = (param.ResultWindowCenter ? (param.LevelUpResultWidth > 0 ? (Graphics.boxWidth - param.LevelUpResultWidth) / 2 : 0) : (Graphics.boxWidth - Graphics.width) / 2) + param.LevelUpResultWindow_X;
+  const wy = this.resultHelpAreaTop();
+  const ww = param.LevelUpResultWidth > 0 ? param.LevelUpResultWidth : Graphics.boxWidth;
+  const wh = (param.LevelUpResultHeight > 0 ? param.LevelUpResultHeight : Graphics.boxHeight) - wy + param.LevelUpResultWindow_Y;
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -1356,6 +1418,26 @@ Scene_Battle.prototype.resultDropItemWindowRect = function() {
   const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.resultHelpAreaTop() + this.resultHelpAreaHeight();
   const ww = this._resultWindow.width;
   const wh = this._resultWindow.height;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.createResultLearnSkillWindow = function() {
+  const rect = this.resultResultLearnSkillWindowRect();
+  this._resultLearnSkillWindow = new Window_ResultLearnSkill(rect);
+  this._resultLearnSkillWindow.hide();
+  if (this._resultBaseSprite) {
+    this._resultBaseSprite.addChild(this._resultLearnSkillWindow);
+  } else {
+    this.addChild(this._resultLearnSkillWindow);
+  }
+  this._resultLearnSkillWindow.setWindowActorResult(this._actorResultWindow);
+};
+
+Scene_Battle.prototype.resultResultLearnSkillWindowRect = function() {
+  const wx = (param.ResultWindowCenter ? (Graphics.width - Graphics.boxWidth) / 2 + (param.LevelUpResultWidth > 0 ? (Graphics.boxWidth - param.LevelUpResultWidth) / 2 : 0) : 0) + param.LevelUpResultWindow_X;
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.resultHelpAreaTop();
+  const ww = this._actorResultWindow.width;
+  const wh = this._actorResultWindow.height;
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -1395,8 +1477,8 @@ Scene_Battle.prototype.createResultButton = function() {
     this.addWindow(this._upResultButton);
     this.addWindow(this._downResultButton);
   }
-  this._upResultButton.setClickHandler(this.updateDorpItemPageup.bind(this));
-  this._downResultButton.setClickHandler(this.updateDorpItemPagedown.bind(this));
+  this._upResultButton.setClickHandler(this.updatePageupButton.bind(this));
+  this._downResultButton.setClickHandler(this.updatePagedownButton.bind(this));
 };
 
 Scene_Battle.prototype.resultHelpAreaHeight = function() {
@@ -1417,19 +1499,26 @@ Scene_Battle.prototype.resultHelpAreaTop = function() {
 };
 
 Scene_Battle.prototype.onResultOk = function() {
-  if (this._resultWindow.actorLevelUp.length > 0 && this._resultWindow.page < this._resultWindow.actorLevelUp.length) {
+  if (this._actorResultWindow.actorLevelUp.length > 0 && BattleManager.resultPage < this._actorResultWindow.actorLevelUp.length) {
     this.backGroundPartyHide();
     this.backGroundActorShow();
-    this._resultWindow.page++;
+    BattleManager.resultPage++;
     this._resultDropItemWindow.page = 0;
-    this._resultWindow.refresh();
-    this._resultDropItemWindow.refresh();
-    this._resultWindow.activate();
+    this._resultHelpWindow.hide();
+    this._resultWindow.hide();
+    this._resultDropItemWindow.hide();
+    this._resultLearnSkillWindow.show();
+    this._actorResultWindow.show();
+    this._actorResultWindow.refresh();
+    this._resultLearnSkillWindow.refresh();
+    this._actorResultWindow.activate();
     BattleManager.resultRefresh = param.ActorPageRefreshFrame;
- } else {
+  } else {
     this._resultHelpWindow.close();
+    this._actorResultWindow.close();
     this._resultWindow.close();
     this._resultDropItemWindow.close();
+    this._resultLearnSkillWindow.close();
     this.backGroundPartyHide();
     this.backGroundActorHide();
     BattleManager.playMapBgm();
@@ -1489,6 +1578,22 @@ Scene_Battle.prototype.backGroundActorHide = function() {
   }
 };
 
+Scene_Battle.prototype.updatePageupButton = function() {
+  if (this._resultWindow.active) {
+    this.updateDorpItemPageup();
+  } else if (this._actorResultWindow.active) {
+    this.updateLearnSkillPageup();
+  }
+};
+
+Scene_Battle.prototype.updatePagedownButton = function() {
+  if (this._resultWindow.active) {
+    this.updateDorpItemPagedown();
+  } else if (this._actorResultWindow.active) {
+    this.updateLearnSkillPagedown();
+  }
+};
+
 const _Scene_Battle_update = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
   _Scene_Battle_update.call(this);
@@ -1497,6 +1602,12 @@ Scene_Battle.prototype.update = function() {
       this.updateDorpItemPageup();
     } else if (Input.isRepeated('right')){
       this.updateDorpItemPagedown();
+    }
+  } else if (this._actorResultWindow.active) {
+    if (Input.isRepeated('left')) {
+      this.updateLearnSkillPageup();
+    } else if (Input.isRepeated('right')){
+      this.updateLearnSkillPagedown();
     }
   }
 };
@@ -1521,6 +1632,26 @@ Scene_Battle.prototype.updateDorpItemPageup = function() {
   }
 };
 
+Scene_Battle.prototype.updateLearnSkillPagedown = function() {
+  const maxPage = this._resultLearnSkillWindow.maxPages();
+  if (maxPage > 1) {
+    SoundManager.playCursor();
+    this._resultLearnSkillWindow.page = (this._resultLearnSkillWindow.page + 1) % maxPage;
+    this._resultLearnSkillWindow.refresh();
+    this._actorResultWindow.activate();
+  }
+};
+
+Scene_Battle.prototype.updateLearnSkillPageup = function() {
+  const maxPage = this._resultLearnSkillWindow.maxPages();
+  if (maxPage > 1) {
+    SoundManager.playCursor();
+    this._resultLearnSkillWindow.page = (this._resultLearnSkillWindow.page + (maxPage - 1)) % maxPage;
+    this._resultLearnSkillWindow.refresh();
+    this._actorResultWindow.activate();
+  }
+};
+
 const _Scene_Battle_updateVisibility = Scene_Battle.prototype.updateVisibility;
 Scene_Battle.prototype.updateVisibility = function() {
   _Scene_Battle_updateVisibility.call(this);
@@ -1538,11 +1669,13 @@ Scene_Battle.prototype.updateInputWindowVisibility = function() {
 
 Scene_Battle.prototype.updateResultButton = function() {
   if (this._okResultButton) {
-      this._okResultButton.visible = this._resultWindow.active;
+      this._okResultButton.visible = (this._resultWindow.active || this._actorResultWindow.active);
   }
   if (this._upResultButton && this._downResultButton) {
-    this._upResultButton.visible = this._resultWindow.active && this._resultDropItemWindow.maxPages() > 1;
-    this._downResultButton.visible = this._resultWindow.active && this._resultDropItemWindow.maxPages() > 1;
+    this._upResultButton.visible = (this._resultWindow.active && this._resultDropItemWindow.maxPages() > 1) ||
+    (this._actorResultWindow.active && this._resultLearnSkillWindow.maxPages() > 1);
+    this._downResultButton.visible = (this._resultWindow.active && this._resultDropItemWindow.maxPages() > 1) ||
+    (this._actorResultWindow.active && this._resultLearnSkillWindow.maxPages() > 1);
   }
 };
 
@@ -1695,18 +1828,18 @@ Window_Result.prototype = Object.create(Window_StatusBase.prototype);
 Window_Result.prototype.constructor = Window_Result;
 
 Window_Result.prototype.initialize = function(rect) {
-  this._userWindowSkin = param.ResultMainWindowsSkin;
+  this._userWindowSkin = this.resultSkin();
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._levelUp = false;
   this.openness = 0;
-  this.actorLevelUp = [];
-  this.actorOldStatus = [];
-  this.page = 0;
   this._actor = null;
   this._canRepeat = false;
   this.openOpacity = 0;
   this.loadImages();
-  //this.refresh();
+};
+
+Window_Result.prototype.resultSkin = function() {
+  return param.ResultMainWindowsSkin;
 };
 
 Window_Result.prototype.loadImages = function() {
@@ -1769,61 +1902,36 @@ Window_Result.prototype.refresh = function() {
   const rect = this.itemRect(0);
   const lineHeight = this.lineHeight();
   const itemPadding = this.itemPadding();
-  if (this.page === 0) {
-    const height = this.actorContentHeight(scale);
-    const contentWidth = this.actorContentWidth(rect);
-    const width = Math.floor(contentWidth / param.ActorCols);
-    const faceArea = rect.x + this.actorAreaWidth(scale);
-    const x2 = rect.x + width;
-    gaugeWidth = width - faceArea - 30;//
-    for (let i = 0; this.actorMembers() > i; i++) {
-      this._actor = this.actor(i);
-      this._actor._learnSkill = [];
-      this._actor._oldStatus = [];
-      let x = Math.floor(i % param.ActorCols) * width + rect.x;
-      let y = Math.floor(i / param.ActorCols) * height + rect.y + param.ActorResult_Y;
-      if (param.ActorShow === 2) {
-        this.drawActorCharacter(x + Math.floor(this.actorAreaWidth() / 2), y + 60, param.ResultActorVisible);
-      } else if (param.ActorShow === 1) {
-        this.drawActorFace(x, y, param.FaceWidth, param.FaceHeight, param.ResultActorVisible);
-      } else if (param.ActorShow === 3) {
-        this.drawSvActor(x, y + (height / 2), param.ResultActorVisible);
-      }
-      this.drawActorName(x + faceArea, y, width - faceArea - 112, param.ResultActorVisible);
-      this.drawActorLevel(x + x2 - 100, y, param.ResultActorVisible);
-      if (param.LavelUpPosition === 1) {
-        this.drawLevelUp(x + param.LevelUp_X, y + param.LevelUp_Y, Math.floor(this.actorAreaWidth(scale)), param.ResultActorVisible);
-      } else if (param.LavelUpPosition === 10) {
-        this.drawLevelUp(x + param.LevelUp_X , y + param.LevelUp_Y, width, param.ResultActorVisible);
-      }
-      //this.drawExpGauge(rect.x + x2 - (gaugeWidth + param.Gauge_Margin), y + param.EXP_Y + 18);
-      this.drawExpGauge(x + width - gaugeWidth - 30, y + param.EXP_Y + 18, param.ResultActorVisible);
-      this.drawGetEXP(x + faceArea, y + param.EXP_Y, width, param.ResultActorVisible);
+  const height = this.actorContentHeight(scale);
+  const contentWidth = this.actorContentWidth(rect);
+  const width = Math.floor(contentWidth / param.ActorCols);
+  const faceArea = rect.x + this.actorAreaWidth(scale);
+  const x2 = rect.x + width;
+  gaugeWidth = width - faceArea - 30;//
+  for (let i = 0; this.actorMembers() > i; i++) {
+    this._actor = this.actor(i);
+    this._actor._learnSkill = [];
+    this._actor._oldStatus = [];
+    let x = Math.floor(i % param.ActorCols) * width + rect.x;
+    let y = Math.floor(i / param.ActorCols) * height + rect.y + param.ActorResult_Y;
+    if (param.ActorShow === 2) {
+      this.drawActorCharacter(x + Math.floor(this.actorAreaWidth() / 2), y + 60, param.ResultActorVisible);
+    } else if (param.ActorShow === 1) {
+      this.drawActorFace(x, y, param.FaceWidth, param.FaceHeight, param.ResultActorVisible);
+    } else if (param.ActorShow === 3) {
+      this.drawSvActor(x, y + (height / 2), param.ResultActorVisible);
     }
-    this.drawGainList(rect.x + contentWidth, rect.y, rect.width - contentWidth);
-  } else {
-    for (let i = 0; this.actorMembers() > i; i++) {
-      this.removeExpGauge(this.actor(i));
+    this.drawActorName(x + faceArea, y, width - faceArea - 112, param.ResultActorVisible);
+    this.drawActorLevel(x + x2 - 100, y, param.ResultActorVisible);
+    if (param.LavelUpPosition === 1) {
+      this.drawLevelUp(x + param.LevelUp_X, y + param.LevelUp_Y, Math.floor(this.actorAreaWidth(scale)), param.ResultActorVisible);
+    } else if (param.LavelUpPosition === 10) {
+      this.drawLevelUp(x + param.LevelUp_X , y + param.LevelUp_Y, width, param.ResultActorVisible);
     }
-    this._actor = this.actorLevelUp[this.page - 1];
-    const x = rect.x + Math.floor(rect.width / 2) + itemPadding;
-    this.drawActorImg(this._actor);
-    let NoFaceX = 0;
-    let NoFaceY = lineHeight;
-    if (param.FaceVisible) {
-      this.drawActorFace(rect.x, rect.y, ImageManager.faceWidth, ImageManager.faceHeight);
-      NoFaceX += 152
-      NoFaceY += lineHeight * 3.5;
-    } else {
-      if (param.LineVisible) {
-        this.drawHorzLine(rect.x, rect.y + lineHeight, rect.width);
-      }
-      NoFaceY += lineHeight;
-    }
-    this.drawActorStatusLevel(x, rect.y);
-    this.drawActorStatusName(rect.x + NoFaceX, rect.y, rect.width - x - NoFaceX);
-    this.drawActorStatus(rect.x, rect.y + NoFaceY, Math.floor(rect.width / 2) - itemPadding);
+    this.drawExpGauge(x + width - gaugeWidth - 30, y + param.EXP_Y + 18, param.ResultActorVisible);
+    this.drawGetEXP(x + faceArea, y + param.EXP_Y, width, param.ResultActorVisible);
   }
+  this.drawGainList(rect.x + contentWidth, rect.y, rect.width - contentWidth);
 };
 
 Window_Result.prototype.drawGainList = function(x, y, width) {
@@ -1901,7 +2009,7 @@ Window_Result.prototype.actorImgRefresh = function(bitmap, date) {
 };
 
 Window_Result.prototype.drawActorFace = function(x, y, width, height, mode) {
-  if (mode || this.page > 0) {
+  if (mode || BattleManager.resultPage > 0) {
     this.drawFace(this._actor.faceName(), this._actor.faceIndex(), x, y, width, height);
   }
 };
@@ -1944,14 +2052,6 @@ Window_Result.prototype.drawActorName = function(x, y, width, mode) {
   }
 };
 
-Window_Result.prototype.drawActorStatusName = function(x, y, width) {
-  if (!this._actor.isAlive()) {
-    this.changeTextColor(ColorManager.deathColor());
-  }
-  this.drawText(this._actor.name(), x, y, width);
-  this.resetTextColor();
-};
-
 Window_Result.prototype.drawActorLevel = function(x, y, mode) {
   const exp = BattleManager._rewards.exp;
   const actor = this._actor;
@@ -1970,10 +2070,10 @@ Window_Result.prototype.drawActorLevel = function(x, y, mode) {
         oldStatus[i] = actor.param(i);
       }
       oldStatus.push(actor._level);
-      this.actorOldStatus.push(oldStatus);
+      this._actorResultWindow.actorOldStatus.push(oldStatus);
       this.changeTextColor(ColorManager.textColor(param.LevelUpValueColor));
       if (BattleManager._levelUpPageEnable) {
-        this.actorLevelUp.push(actor);
+        this._actorResultWindow.actorLevelUp.push(actor);
         if (Imported.NUUN_Base) {
           if (!actor.resultActorImg || !Array.isArray(actor.resultActorImg.ActorImg) || !actor.resultActorBitmap) {//配列仕様前の判定
             actor.initResultActorImg(actor.actorId());
@@ -2097,59 +2197,16 @@ Window_Result.prototype.drawGetEXP = function(x, y, width, mode) {
   }
 };
 
-Window_Result.prototype.drawActorStatusLevel = function(x, y) {
-  const oldStatus = this.actorOldStatus[this.page - 1];
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText(TextManager.levelA, x, y, 48);
-  this.resetTextColor();
-  this.drawText(oldStatus[oldStatus.length - 1], x + 48, y, 100, "left");
-  this.changeTextColor(ColorManager.systemColor());
-  this.drawText("→", x + 48, y, 100, "center");
-  this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
-  this.drawText(this._actor._level, x + 48, y, 100, "right");
-  this.resetTextColor();
-};
-
-Window_Result.prototype.drawActorStatus = function(x, y, width) {
-  let y2 = y
-  const visibleStatus = param.VisibleStatus;
-  const lineHeight = this.lineHeight() + param.StatusFontSize;
-  this.contents.fontSize = $gameSystem.mainFontSize() + param.StatusFontSize;
-  const oldStatus = this.actorOldStatus[this.page - 1];
-  visibleStatus.forEach(status => {
-    const name = this.paramName(status.StatusParamDate, status.OriginalParamName);
-    const oldValue = this.paramOld(status.StatusParamDate, oldStatus);
-    const value = this.paramValue(status.StatusParamDate, status.OriginalParamEval);
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(name, x, y2, width - 200);
-    this.resetTextColor();
-    if (status.DifferenceVisible && oldValue) {
-      this.drawText(oldValue, x + (width - 200), y2, 60, "left");
-      this.changeTextColor(ColorManager.systemColor());
-      this.drawText("→", x + (width - 110), y2, width - 160, "left");
-      if (oldValue < value) {
-        this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
-      } else {
-        this.resetTextColor();
-      }
-    }
-    this.drawText(value, x + width - 60, y2, 60, "right");
-    this.resetTextColor();
-    y2 += lineHeight;
-  });
-  this.contents.fontSize = $gameSystem.mainFontSize();
-};
-
 Window_Result.prototype.currencyUnit = function() {
   return TextManager.currencyUnit;
 };
 
 Window_Result.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
-  const scale = this.page === 0 ? param.FaceScale / 100 : 1;
+  const scale = BattleManager.resultPage === 0 ? param.FaceScale / 100 : 1;
   width = width || ImageManager.faceWidth;
   height = height || ImageManager.faceHeight;
   const bitmap = ImageManager.loadFace(faceName);
-  if (this.page === 0) {
+  if (BattleManager.resultPage === 0) {
     const contentsHeight = this.actorContentHeight(scale);
     if (param.ResultActorAutoSize) {
       if (height * scale > contentsHeight) {
@@ -2211,12 +2268,6 @@ Window_Result.prototype.drawHorzLine = function(x, y, width) {
   this.contents.paintOpacity = 255;
 };
 
-Window_Result.prototype.onTouchOk = function() {
-  if (this.isOkEnabled()) {
-    this.processOk();
-  }
-};
-
 Window_Result.prototype.onTouchCancel = function() {
   if (this.isCancelEnabled()) {
       this.processOk();
@@ -2238,8 +2289,8 @@ Window_Result.prototype.playOkSound = function() {
 };
 
 Window_Result.prototype.changeActorSound = function() {
-  const dataLength = this.actorLevelUp.length;
-  if (LevelUpActorSeData && dataLength > 0 && dataLength - 1 >= this.page) {
+  const dataLength = this._actorResultWindow.actorLevelUp.length;
+  if (LevelUpActorSeData && dataLength > 0 && dataLength - 1 >= BattleManager.resultPage) {
     AudioManager.playStaticSe(LevelUpActorSeData);
   } else {
     SoundManager.playOk();
@@ -2322,6 +2373,117 @@ Window_Result.prototype.isOpen = function() {
   return param.ResultFadein || param.PartyBackGroundImg || param.ActorBackGroundImg ? this.openOpacity >= 255 : _Window_Result_isOpen.call(this);
 };
 
+Window_Result.prototype.setActorResultWindow = function(actorResultWindow) {
+  this._actorResultWindow = actorResultWindow;
+};
+
+function Window_ActorResult() {
+  this.initialize(...arguments);
+}
+
+Window_ActorResult.prototype = Object.create(Window_Result.prototype);
+Window_ActorResult.prototype.constructor = Window_ActorResult;
+
+Window_ActorResult.prototype.initialize = function(rect) {
+  Window_Result.prototype.initialize.call(this, rect);
+  this.actorLevelUp = [];
+  this.actorOldStatus = [];
+  this.openness = 255;
+};
+
+Window_ActorResult.prototype.resultSkin = function() {
+  return param.ResultMainWindowsSkin;
+};
+
+Window_ActorResult.prototype.refresh = function() {
+  this.contents.clear();
+  const rect = this.itemRect(0);
+  const lineHeight = this.lineHeight();
+  const itemPadding = this.itemPadding();
+  for (let i = 0; this.actorMembers() > i; i++) {
+    this.removeExpGauge(this.actor(i));
+  }
+  this._actor = this.actorLevelUp[BattleManager.resultPage - 1];
+  const x = rect.x + Math.floor(rect.width / 2) + itemPadding;
+  this.drawActorImg(this._actor);
+  let NoFaceX = 0;
+  let NoFaceY = lineHeight;
+  if (param.FaceVisible) {
+    this.drawActorFace(rect.x, rect.y, ImageManager.faceWidth, ImageManager.faceHeight);
+    NoFaceX += 152
+    NoFaceY += lineHeight * 3.5;
+  } else {
+    if (param.LineVisible) {
+      this.drawHorzLine(rect.x, rect.y + lineHeight, rect.width);
+    }
+    NoFaceY += lineHeight;
+  }
+  this.drawActorStatusLevel(x, rect.y);
+  this.drawActorStatusName(rect.x + NoFaceX, rect.y, rect.width - x - NoFaceX);
+  this.drawActorStatus(rect.x, rect.y + NoFaceY, Math.floor(rect.width / 2) - itemPadding);
+};
+
+Window_ActorResult.prototype.drawActorStatusLevel = function(x, y) {
+  const oldStatus = this.actorOldStatus[BattleManager.resultPage - 1];
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(TextManager.levelA, x, y, 48);
+  this.resetTextColor();
+  this.drawText(oldStatus[oldStatus.length - 1], x + 48, y, 100, "left");
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText("→", x + 48, y, 100, "center");
+  this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
+  this.drawText(this._actor._level, x + 48, y, 100, "right");
+  this.resetTextColor();
+};
+
+Window_ActorResult.prototype.drawActorStatus = function(x, y, width) {
+  let y2 = y
+  const visibleStatus = param.VisibleStatus;
+  const lineHeight = this.lineHeight() + param.StatusFontSize;
+  this.contents.fontSize = $gameSystem.mainFontSize() + param.StatusFontSize;
+  const oldStatus = this.actorOldStatus[BattleManager.resultPage - 1];
+  visibleStatus.forEach(status => {
+    const name = this.paramName(status.StatusParamDate, status.OriginalParamName);
+    const oldValue = this.paramOld(status.StatusParamDate, oldStatus);
+    const value = this.paramValue(status.StatusParamDate, status.OriginalParamEval);
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(name, x, y2, width - 200);
+    this.resetTextColor();
+    if (status.DifferenceVisible && oldValue) {
+      this.drawText(oldValue, x + (width - 200), y2, 60, "left");
+      this.changeTextColor(ColorManager.systemColor());
+      this.drawText("→", x + (width - 110), y2, width - 160, "left");
+      if (oldValue < value) {
+        this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
+      } else {
+        this.resetTextColor();
+      }
+    }
+    this.drawText(value, x + width - 60, y2, 60, "right");
+    this.resetTextColor();
+    y2 += lineHeight;
+  });
+  this.contents.fontSize = $gameSystem.mainFontSize();
+};
+
+Window_ActorResult.prototype.drawActorStatusName = function(x, y, width) {
+  if (!this._actor.isAlive()) {
+    this.changeTextColor(ColorManager.deathColor());
+  }
+  this.drawText(this._actor.name(), x, y, width);
+  this.resetTextColor();
+};
+
+Window_ActorResult.prototype.changeActorSound = function() {
+  const dataLength = this.actorLevelUp.length;
+  if (LevelUpActorSeData && dataLength > 0 && dataLength - 1 >= BattleManager.resultPage) {
+    AudioManager.playStaticSe(LevelUpActorSeData);
+  } else {
+    SoundManager.playOk();
+  }
+};
+
+
 function Window_ResultDropItem() {
   this.initialize(...arguments);
 }
@@ -2335,17 +2497,12 @@ Window_ResultDropItem.prototype.initialize = function(rect) {
   this.page = 0;
   this.maxPage = 0;
   this.dropItemRows = Math.floor((this.innerHeight - this.lineHeight() * (this.gainParamLength() + 1)) / this.lineHeight());
-  this.skillRows = Math.floor((this.innerHeight - this.lineHeight() * (this.skillTop() + 1)) / this.lineHeight());
   this.opacity = 0;
   this.frameVisible = false;
 };
 
 Window_ResultDropItem.prototype.actorContentWidth = function(rect) {
   return param.ResultActorWidth < 0 ? (rect.width - Math.floor(rect.width / 2.6)) : param.ResultActorWidth;
-};
-
-Window_ResultDropItem.prototype.skillTop = function() {
-  return param.FaceVisible ? 4.5 : 2;
 };
 
 Window_ResultDropItem.prototype.gainParamLength = function() {
@@ -2357,11 +2514,7 @@ Window_ResultDropItem.prototype.setWindowResult = function(windowResult) {
 };
 
 Window_ResultDropItem.prototype.maxPages = function() {
-  if (this._windowResult.page > 0) {
-    return Math.ceil(this._windowResult._actor._learnSkill.length / this.skillRows)
-  } else {
-    return Math.ceil(BattleManager._rewards.items.length / this.dropItemRows);
-  }
+  return Math.ceil(BattleManager._rewards.items.length / this.dropItemRows);
 };
 
 Window_ResultDropItem.prototype.refresh = function() {
@@ -2369,14 +2522,8 @@ Window_ResultDropItem.prototype.refresh = function() {
   const rect = this.itemRect(0);
   const lineHeight = this.lineHeight();
   const itemPadding = this.itemPadding();
-  const x = rect.x + (rect.width - Math.floor(rect.width / 2.6));
-  if (this._windowResult.page > 0) {
-    const actor = this._windowResult._actor;
-    this.drawLearnSkill(actor, rect.x + rect.width / 2 + itemPadding, rect.y + lineHeight * this.skillTop(), rect.width / 2 - itemPadding);
-  } else {
-    const width = this.actorContentWidth(rect);
-    this.drawGetItems(rect.x + width, rect.y, rect.width - width - rect.x);
-  }
+  const width = this.actorContentWidth(rect);
+  this.drawGetItems(rect.x + width, rect.y, rect.width - width - rect.x);
 };
 
 Window_ResultDropItem.prototype.drawGetItems = function(x, y, width) {
@@ -2408,7 +2555,43 @@ Window_ResultDropItem.prototype.drawItemName = function(item, x, y, width) {
   Window_Base.prototype.drawItemName.call(this, item, x, y, width);
 };
 
-Window_ResultDropItem.prototype.drawLearnSkill = function(actor, x, y, width) {
+
+
+function Window_ResultLearnSkill() {
+  this.initialize(...arguments);
+}
+
+Window_ResultLearnSkill.prototype = Object.create(Window_StatusBase.prototype);
+Window_ResultLearnSkill.prototype.constructor = Window_ResultLearnSkill;
+
+Window_ResultLearnSkill.prototype.initialize = function(rect) {
+  Window_StatusBase.prototype.initialize.call(this, rect);
+  this.openness = 255;
+  this.page = 0;
+  this.maxPage = 0;
+  this.skillRows = Math.floor((this.innerHeight - this.lineHeight() * (this.skillTop() + 1)) / this.lineHeight());
+  this.opacity = 0;
+  this.frameVisible = false;
+};
+
+Window_ResultLearnSkill.prototype.setWindowActorResult = function(windowActorResult) {
+  this._windowActorResult = windowActorResult;
+};
+
+Window_ResultLearnSkill.prototype.maxPages = function() {
+  return Math.ceil(this._windowActorResult._actor._learnSkill.length / this.skillRows)
+};
+
+Window_ResultLearnSkill.prototype.refresh = function() {
+  this.contents.clear();
+  const rect = this.itemRect(0);
+  const lineHeight = this.lineHeight();
+  const itemPadding = this.itemPadding();
+  const actor = this._windowActorResult._actor;
+  this.drawLearnSkill(actor, rect.x + rect.width / 2 + itemPadding, rect.y + lineHeight * this.skillTop(), rect.width / 2 - itemPadding);
+};
+
+Window_ResultLearnSkill.prototype.drawLearnSkill = function(actor, x, y, width) {
   const lineHeight = this.lineHeight();
   const learnSkill = actor._learnSkill;
   const maxPage = this.maxPages();
@@ -2428,6 +2611,22 @@ Window_ResultDropItem.prototype.drawLearnSkill = function(actor, x, y, width) {
     }
   }
 };
+
+Window_ResultLearnSkill.prototype.skillTop = function() {
+  return param.FaceVisible ? 4.5 : 2;
+};
+
+Window_ResultLearnSkill.prototype.gainParamLength = function() {
+  return param.GainParam.length;
+};
+
+Window_ResultLearnSkill.prototype.drawItemName = function(item, x, y, width) {
+  if (Imported.NUUN_ItemNameColor && item.meta.ResultItemColor) {
+    this.nameColor = ColorManager.textColor(Number(item.meta.ResultItemColor))
+  }
+  Window_Base.prototype.drawItemName.call(this, item, x, y, width);
+};
+
 
 function Sprite_ResultActor() {
   this.initialize(...arguments);
@@ -2702,6 +2901,7 @@ BattleManager.initMembers = function() {
   this._victoryBGMOn = false;
   this.resultRefresh = 0;
   this.resultBusy = this.setResultBusy();
+  this.resultPage = 0;
 };
 
 const _BattleManager_update = BattleManager.update;
@@ -2770,7 +2970,7 @@ BattleManager.gainRewards = function() {
 
 const _BattleManager_isBusy = BattleManager.isBusy;
 BattleManager.isBusy = function() {
-  return SceneManager._scene._resultWindow.active || _BattleManager_isBusy.call(this);
+  return SceneManager._scene._resultWindow.active || SceneManager._scene._actorResultWindow.active || _BattleManager_isBusy.call(this);
 };
 
 const _BattleManager_replayBgmAndBgs = BattleManager.replayBgmAndBgs;

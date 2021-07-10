@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -26,6 +26,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/7/10 Ver.1.3.1
+ * 処理を一部変更。
+ * NRP_SkillRangeEXとの併用の対応。（NRP_SkillRangeEXをこのプラグインより上に配置してください）
  * 2021/7/8 Ver.1.3.0
  * 全体、ランダム攻撃対象選択を敵選択時のみ表示させる機能を追加。
  * 2021/7/7 Ver.1.2.0
@@ -173,27 +176,29 @@ Window_BattleEnemy.prototype.selectForItem = function(action) {
   }
 };
 
-Window_BattleActor.prototype.select = function(index) {//再定義
-  Window_BattleStatus.prototype.select.call(this, index);
-  let activeMember = []
+const _Window_BattleActor_select = Window_BattleActor.prototype.select;
+Window_BattleActor.prototype.select = function(index) {
   if (this.cursorAll()) {
+    Window_Selectable.prototype.select.call(this, index);
+    let activeMember = [];
     activeMember = $gameParty.aliveMembers();
-    $gameParty.select(activeMember);
+    $gameParty.targetSelect(activeMember);
+    this.refreshCursor();
   } else {
-    activeMember[0] = this.actor(index);
-    $gameParty.select(activeMember);
+    _Window_BattleActor_select.call(this, index);
   }
 };
 
-Window_BattleEnemy.prototype.select = function(index) {//再定義
-  Window_Selectable.prototype.select.call(this, index);
-  let activeMember = []
+const _Window_BattleEnemy_select = Window_BattleEnemy.prototype.select;
+Window_BattleEnemy.prototype.select = function(index) {
   if (this.cursorAll()) {
+    Window_Selectable.prototype.select.call(this, index);
+    let activeMember = [];
     activeMember = $gameTroop.aliveMembers();
-    $gameTroop.select(activeMember);
+    $gameTroop.targetSelect(activeMember);
+    this.refreshCursor();
   } else {
-    activeMember[0] = this.enemy();
-    $gameTroop.select(activeMember);
+    _Window_BattleEnemy_select.call(this, index);
   }
 };
 
@@ -207,7 +212,7 @@ Window_BattleEnemy.prototype.hide = function() {
 };
 
 
-Game_Unit.prototype.select = function(activeMember) {//再定義
+Game_Unit.prototype.targetSelect = function(activeMember) {
   if (activeMember && activeMember[0]) {
     for (const member of this.members()) {
       const find = activeMember.find(target => member === target);
@@ -224,6 +229,12 @@ Game_Unit.prototype.select = function(activeMember) {//再定義
   }
 };
 
+Game_Unit.prototype.select = function(target) {
+  activeMember = [];
+  activeMember.push(target);
+  this.targetSelect(activeMember);
+};
+
 Window_Selectable.prototype.refreshCursorForAll = function() {//再定義
   const maxItems = this.maxItems();
   let rect;
@@ -231,8 +242,11 @@ Window_Selectable.prototype.refreshCursorForAll = function() {//再定義
     if (this._multiCursor) {
       this.setCursorRect(0, 0, 0, 0);
       for (let i = 0; maxItems > i; i++) {
-        rect = this.itemRect(i);
-        this.setCursorRects(rect.x, rect.y, rect.width, rect.height, i);
+        const target = this.selectTarget(i);
+        if (target) {
+          rect = this.itemRect(i);
+          this.setCursorRects(rect.x, rect.y, rect.width, rect.height, i);
+        }
       } 
     } else {
       const items = maxItems + (maxItems >= this.maxCols() && maxItems % this.maxCols() ? 0 : -1);
@@ -244,6 +258,15 @@ Window_Selectable.prototype.refreshCursorForAll = function() {//再定義
       this.setCursorRect(0, 0, 0, 0);
   }
 };
+
+Window_BattleEnemy.prototype.selectTarget = function(index) {
+  return $gameTroop.aliveMembers()[index].isSelected();
+};
+
+Window_BattleActor.prototype.selectTarget = function(index) {
+  return $gameParty.aliveMembers()[index].isSelected();
+};
+
 
 const _Window_Selectable_initialize = Window_Selectable.prototype.initialize;
 Window_Selectable.prototype.initialize = function(rect) {

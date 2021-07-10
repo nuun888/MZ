@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @help
  * モンスターの敵名を表示します。
  * 
@@ -23,6 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/10 Ver.1.1.2
+ * 一部の変数名が重複していた問題を修正。
  * 2021/7/10 Ver.1.1.1
  * 戦闘途中でエネミースプライトを生成するとエラーが出る場合があるので修正。
  * 2021/6/19 Ver.1.1.0
@@ -117,9 +119,9 @@ const Name_Y = Number(parameters['Name_Y'] || 0);
 const Name_FontSize = Number(parameters['Name_FontSize'] || -12);
 const ConflictScale = Number(parameters['ConflictScale'] || 0);
 
-const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
-Sprite_Enemy.prototype.update = function() {
-  _Sprite_Enemy_update.call(this);
+const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
+Sprite_Enemy.prototype.updateBitmap = function() {
+  _Sprite_Enemy_updateBitmap.call(this);
   if (this._enemy && EnemyNamePosition >= 0) {
       this.updateEnemyName();
   }
@@ -129,29 +131,29 @@ Sprite_Enemy.prototype.update = function() {
 };
 
 Sprite_Enemy.prototype.updateActorName = function() {
-  this._butlerName.x = this.butlerNameOffsetX + (this.x - this._butlerName.width / 2);
-  this._butlerName.y = this.butlerNameOffsetY + this.y - 40;
-  this._butlerName.y -= Math.round((this.bitmap.height + 40) * 0.9);
-  if (this._butlerName.y < 0) {
-      this._butlerName.y = 30;
-  } else if (this._butlerName.y + 40 > Graphics.height) {
-    this._butlerName.y = Graphics.height - 40;
+  this._butlerNameSprite.x = this.butlerNameOffsetX + (this.x - this._butlerNameSprite.width / 2);
+  this._butlerNameSprite.y = this.butlerNameOffsetY + this.y - 40;
+  this._butlerNameSprite.y -= Math.round((this.bitmap.height + 40) * 0.9);
+  if (this._butlerNameSprite.y < 0) {
+    this._butlerNameSprite.y = 30;
+  } else if (this._butlerNameSprite.y + 40 > Graphics.height) {
+    this._butlerNameSprite.y = Graphics.height - 40;
   }
 };
 
 Sprite_Enemy.prototype.updateEnemyName = function() {
-  if (!this._butlerName) {
+  if (!this._butlerNameSprite) {
     this.enemyName();
   }
-  this._butlerName.x = this.butlerNameOffsetX + (this.x - this._butlerName.width / 2);
-  this._butlerName.y = this.butlerNameOffsetY + this.y - 40;
+  this._butlerNameSprite.x = this.butlerNameOffsetX + (this.x - this._butlerNameSprite.width / 2);
+  this._butlerNameSprite.y = this.butlerNameOffsetY + this.y - 40;
   if (this.getButlerNamePosition() === 0) {
-    this._butlerName.y -= this.getButlerNameHeight();
+    this._butlerNameSprite.y -= this.getButlerNameHeight();
   }
-  if (this._butlerName.y < 0) {
-      this._butlerName.y = 30;
-  } else if (this._butlerName.y + 40 > Graphics.height) {
-    this._butlerName.y = Graphics.height - 40;
+  if (this._butlerNameSprite.y < 0) {
+    this._butlerNameSprite.y = 30;
+  } else if (this._butlerNameSprite.y + 40 > Graphics.height) {
+    this._butlerNameSprite.y = Graphics.height - 40;
   }
   this.butlerNameOpacity();
 };
@@ -163,7 +165,7 @@ Sprite_Enemy.prototype.enemyName = function() {
   sprite.setup(this._enemy);
   sprite.show();
   sprite.move(0, 0);
-  this._butlerName = sprite;
+  this._butlerNameSprite = sprite;
   this.butlerNameOffsetX = (this._enemy.enemy().meta.EnemyNameX ? Number(this._enemy.enemy().meta.EnemyNameX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Name_X;
   this.butlerNameOffsetY = (this._enemy.enemy().meta.EnemyNameY ? Number(this._enemy.enemy().meta.EnemyNameY) : 0) + Name_Y + (Graphics.height - Graphics.boxHeight) / 2;
 };
@@ -195,7 +197,7 @@ Sprite_Enemy.prototype.getButlerNamePosition = function() {
 
 Sprite_Enemy.prototype.butlerNameOpacity = function() {
   if (this._effectType !== "blink") {
-    this._butlerName.opacity = this.opacity;
+    this._butlerNameSprite.opacity = this.opacity;
   }
 };
 

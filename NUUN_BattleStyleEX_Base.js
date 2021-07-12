@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.9
+ * @version 2.4.10
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/7/12 Ver 2.4.10
+ * 復活時にアクター画像が反映されない問題を修正。
  * 2021/7/12 Ver 2.4.9
  * 立ち絵表示EX修正に関する処理の修正。
  * 2021/7/9 Ver 2.4.8
@@ -2101,7 +2103,7 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
   if (actor && this._data) {
     if (actor.isDead()) {
       this.changeBitmap("dead");
-    } else if (actor.isAlive() && this._imgIndex === actor._actionActorImg) {
+    } else if (actor.isAlive() && this._imgIndex === 1) {
       this.changeBitmap("revive");
     } else if (actor._states.length > 0 && this.stateImgCheck(true)) {
       this.changeBitmap("alwaysAbnormal");

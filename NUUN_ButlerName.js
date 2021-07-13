@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @help
  * モンスターの敵名を表示します。
  * 
@@ -23,6 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/13 Ver.1.1.3
+ * エネミー画像を消去するプラグインとの競合対策。
  * 2021/7/10 Ver.1.1.2
  * 一部の変数名が重複していた問題を修正。
  * 2021/7/10 Ver.1.1.1
@@ -166,6 +168,7 @@ Sprite_Enemy.prototype.enemyName = function() {
   sprite.show();
   sprite.move(0, 0);
   this._butlerNameSprite = sprite;
+  sprite.enemySpriteId = this.spriteId;
   this.butlerNameOffsetX = (this._enemy.enemy().meta.EnemyNameX ? Number(this._enemy.enemy().meta.EnemyNameX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Name_X;
   this.butlerNameOffsetY = (this._enemy.enemy().meta.EnemyNameY ? Number(this._enemy.enemy().meta.EnemyNameY) : 0) + Name_Y + (Graphics.height - Graphics.boxHeight) / 2;
 };
@@ -262,6 +265,21 @@ Spriteset_Battle.prototype.enemyName = function(sprites) {
   sprites.enemyName();
 };
 
+const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
+Spriteset_Battle.prototype.update = function() {
+  _Spriteset_Battle_update.call(this);
+  this.updateButlerName();
+};
+
+Spriteset_Battle.prototype.updateButlerName = function() {
+  for (const sprite of this._butlerGaugeBase.children) {
+    const spriteData = this._enemySprites.some(enemy => enemy.spriteId === sprite.enemySpriteId);
+    if (!spriteData) {
+      this._butlerGaugeBase.removeChild(sprite);
+    }
+  }
+};
+
 function Sprite_ButlerName() {
   this.initialize(...arguments);
 }
@@ -271,6 +289,7 @@ Sprite_ButlerName.prototype.constructor = Sprite_ButlerName;
 
 Sprite_ButlerName.prototype.initialize = function() {
   Sprite_Name.prototype.initialize.call(this);
+  this.enemySpriteId = -1;
 };
 
 Sprite_ButlerName.prototype.fontSize = function() {

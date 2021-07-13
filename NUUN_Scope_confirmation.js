@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -26,6 +26,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/7/14 Ver.1.3.2
+ * 味方に戦闘不能者がいるときに全体選択するとエラーが出る問題を修正。
  * 2021/7/10 Ver.1.3.1
  * 処理を一部変更。
  * 2021/7/8 Ver.1.3.0
@@ -210,7 +212,6 @@ Window_BattleEnemy.prototype.hide = function() {
   }
 };
 
-
 Game_Unit.prototype.targetSelect = function(activeMember) {
   if (activeMember && activeMember[0]) {
     for (const member of this.members()) {
@@ -263,7 +264,7 @@ Window_BattleEnemy.prototype.selectTarget = function(index) {
 };
 
 Window_BattleActor.prototype.selectTarget = function(index) {
-  return $gameParty.aliveMembers()[index].isSelected();
+  return $gameParty.members()[index].isSelected();
 };
 
 
@@ -295,7 +296,7 @@ Window.prototype.setCursorRects = function(x, y, width, height, index) {
   if (this._multiCursorRect[index].width !== cw || this._multiCursorRect[index].height !== ch) {
     this._multiCursorRect[index].width = cw;
     this._multiCursorRect[index].height = ch;
-      this._multiRefreshCursor(index);
+    this._multiRefreshCursor(index);
   }
 };
 

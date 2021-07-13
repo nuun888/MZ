@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
@@ -36,6 +36,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/13 Ver.1.2.3
+ * エネミー画像を消去する及び新たにエネミー画像を追加表示するプラグインとの競合対策。
  * 2021/6/28 Ver.1.2.2
  * 一部が機能しなくなっていたので処理修正
  * 2021/6/28 Ver.1.2.1
@@ -196,21 +198,39 @@ const LabelFontSize = Number(parameters['LabelFontSize'] || -2);
 const ConflictScale = Number(parameters['ConflictScale'] || 0);
 const MaskValueName = String(parameters['MaskValueName'] || '????');
 
-const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
-Sprite_Enemy.prototype.update = function() {
-  _Sprite_Enemy_update.call(this);
-  if (this._enemy && this.showHpGauge && HPPosition >= 0) {
-      this.updateHpGauge();
+const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
+Sprite_Enemy.prototype.updateBitmap = function() {
+  _Sprite_Enemy_updateBitmap.call(this);
+  if (this._enemy && this._enemy.showHpGauge && HPPosition >= 0) {
+    this.updateHpGauge();
   }
 };
 
 Sprite_Enemy.prototype.updateHpGauge = function() {
+  if (!this._butlerHp) {
+    this.enemyHPGauge();
+  }
   this._butlerHp.x = this.hpGaugeOffsetX + (this.x - this._butlerHp.width / 2);
   this._butlerHp.y = this.hpGaugeOffsetY + this.y - 40;
   if (this.getButlerHpPosition() === 0) {
     this._butlerHp.y -= this.getButlerHpHeight();
   }
   this.hpGaugeOpacity();
+};
+
+Sprite_Enemy.prototype.enemyHPGauge = function() {
+  const butlerGaugeBase = BattleManager.gaugeBaseSprite;
+  if (this._enemy.showHpGauge) {
+    const sprite = new Sprite_EnemyHPGauge();
+    butlerGaugeBase.addChild(sprite);
+    sprite.setup(this._enemy, "hp");
+    sprite.show();
+    sprite.move(0, 0);
+    this._butlerHp = sprite;
+    sprite.enemySpriteId = this.spriteId;
+    this.hpGaugeOffsetX = (this._enemy.enemy().meta.HPGaugeX ? Number(this._enemy.enemy().meta.HPGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
+    this.hpGaugeOffsetY = (this._enemy.enemy().meta.HPGaugeY ? Number(this._enemy.enemy().meta.HPGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
+  }
 };
 
 Sprite_Enemy.prototype.getButlerHpHeight = function() {
@@ -248,16 +268,21 @@ Sprite_Enemy.prototype.hpGaugeOpacity = function() {
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
   _Spriteset_Battle_createLowerLayer.call(this);
+  this.createGaugeBase();
   this.createEnemyHpGauge();
+};
+
+Spriteset_Battle.prototype.createGaugeBase = function() {
+  if (!this._butlerGaugeBase) {
+    const sprite = new Sprite();
+    this.addChild(sprite);
+    this._butlerGaugeBase = sprite;
+    BattleManager.gaugeBaseSprite = sprite;
+  }
 };
 
 Spriteset_Battle.prototype.createEnemyHpGauge = function() {
   if (HPPosition >= 0) {
-    if (!this._enemyGaugeBase) {
-      const sprite = new Sprite();
-      this.addChild(sprite);
-      this._enemyGaugeBase = sprite;
-    }
     for (const sprites of this._enemySprites) {
       this.enemyHPGauge(sprites);
     }
@@ -265,16 +290,21 @@ Spriteset_Battle.prototype.createEnemyHpGauge = function() {
 };
 
 Spriteset_Battle.prototype.enemyHPGauge = function(sprites) {
-  sprites.showHpGauge = !sprites._battler.enemy().meta.NoHPGauge;
-  if (sprites.showHpGauge) {
-    const sprite = new Sprite_EnemyHPGauge();
-    this._enemyGaugeBase.addChild(sprite);
-    sprite.setup(sprites._battler, "hp");
-    sprite.show();
-    sprite.move(0, 0);
-    sprites._butlerHp = sprite;
-    sprites.hpGaugeOffsetX = (sprites._enemy.enemy().meta.HPGaugeX ? Number(sprites._enemy.enemy().meta.HPGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
-    sprites.hpGaugeOffsetY = (sprites._enemy.enemy().meta.HPGaugeY ? Number(sprites._enemy.enemy().meta.HPGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
+  sprites.enemyHPGauge();
+};
+
+const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
+Spriteset_Battle.prototype.update = function() {
+  _Spriteset_Battle_update.call(this);
+  this.updateButlerName();
+};
+
+Spriteset_Battle.prototype.updateButlerName = function() {
+  for (const sprite of this._butlerGaugeBase.children) {
+    const spriteData = this._enemySprites.some(enemy => enemy.spriteId === sprite.enemySpriteId);
+    if (!spriteData) {
+      this._butlerGaugeBase.removeChild(sprite);
+    }
   }
 };
 
@@ -430,6 +460,7 @@ const _Game_Enemy_setup = Game_Enemy.prototype.setup;
 Game_Enemy.prototype.setup = function(enemyId, x, y) {
   _Game_Enemy_setup.call(this, enemyId, x, y);
   this._HPGaugeValueVisible = this.enemy().meta.HPGaugeMask ? true : false;
+  this.showHpGauge = !this.enemy().meta.NoHPGauge;
 };
 
 Game_Enemy.prototype.HpGaugeVisibleTrait = function(){
@@ -449,4 +480,11 @@ Game_Enemy.prototype.HpGaugeMask = function(){
 BattleManager.hpGaugeVisible = function() {
   this.visibleHpGauge = $gameParty.battleMembers().some(actor => actor._visibleHpGauge);
 };
+
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+  _BattleManager_initMembers.call(this);
+  this.gaugeBaseSprite = null;
+};
+
 })();

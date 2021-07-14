@@ -236,7 +236,7 @@ const _Window_BattleActor_select = Window_BattleActor.prototype.select;
 Window_BattleActor.prototype.select = function(index) {
   if (this.cursorAll()) {
     Window_Selectable.prototype.select.call(this, index);
-    let activeMember = [];console.log(this)
+    let activeMember = [];
     if (this._userTargetTag && this._userTargetTag.UserTagEval) {
       const subject = this._NUUN_subject;
       const members = $gameParty.members();

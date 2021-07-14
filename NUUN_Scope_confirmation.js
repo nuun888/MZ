@@ -42,8 +42,10 @@
  * 
  * 
  * 更新履歴
+ * 
  * 2021/7/14 Ver.1.4.1
  * 敵の対象選択時にエラーが出る問題を修正。
+ * カーソル選択中にモンスターが倒されるとエラーが出る問題を修正。
  * 2021/7/14 Ver.1.4.0
  * 全体カーソル表示時のウィンドウのカーソル表示対象指定を独自に定義できる機能を追加。
  * 2021/7/14 Ver.1.3.2
@@ -333,11 +335,13 @@ Window_Selectable.prototype.refreshCursorForAll = function() {//再定義
 };
 
 Window_BattleEnemy.prototype.selectTarget = function(index) {
-  return $gameTroop.aliveMembers()[index].isSelected();
+  const enemy = $gameTroop.aliveMembers()[index];
+  return enemy ? enemy.isSelected() : false;
 };
 
 Window_BattleActor.prototype.selectTarget = function(index) {
-  return $gameParty.members()[index].isSelected();
+  const actor = $gameParty.members()[index];
+  return actor ? actor.isSelected() : false;
 };
 
 

@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.10
+ * @version 2.4.11
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/7/14 Ver 2.4.11
+ * スリップダメージ時にアクター画像がシェイクしてしまう問題を修正。
  * 2021/7/12 Ver 2.4.10
  * 復活時にアクター画像が反映されない問題を修正。
  * 2021/7/12 Ver 2.4.9
@@ -301,17 +303,10 @@ Game_Actor.prototype.initMembers = function() {
   this._onDamageEffect = false;
 };
 
-const _Game_Actor_gainHp = Game_Actor.prototype.gainHp;
-Game_Actor.prototype.gainHp = function(value) {
-  _Game_Actor_gainHp.call(this, value);
-  if ($gameParty.inBattle() && this._result.hpDamage > 0) {
-    this._onDamageEffect = true;
-  }
-};
-
 const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
 Game_Actor.prototype.performDamage = function() {
   _Game_Actor_performDamage.call(this);
+  this._onDamageEffect = true;
   this._imgIndex = 3;
 };
 

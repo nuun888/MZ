@@ -6,7 +6,22 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
+ */ 
+/*:
+ * @target MZ
+ * @plugindesc 解像度変更時のアクター座標修正＆調整
+ * @author NUUN
+ * @version 2.0.0
+ *            
+ * @help 解像度を変更した際、アクターの表示座標を解像度に応じて座標修正します。
+ * 
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
+ * 
  * 更新履歴
+ * 2021/7/14 Ver.2.0.0
+ * Ver.1.3以降の仕様変更により正式に対応されたためエネミーの座標修正を行わないように変更。
+ * 背景画像の調整を戦闘背景変更プラグインに移行。
  * 2021/1/17 Ver.1.0.3
  * NUUN_BattlePositionの処理に影響があるため一部の処理を変更。
  * 2021/1/13 Ver.1.0.2
@@ -17,23 +32,6 @@
  * UIサイズ変更時のエネミーの座標シフト方法にUIサイズに比例してシフトする機能を追加。
  * 2020/12/15 Ver.1.0.0
  * 初版
- * 
- */ 
-/*:
- * @target MZ
- * @plugindesc 解像度変更時のアクター、エネミー座標調整、戦闘背景Y座標調整プラグイン
- * @author NUUN
- *            
- * @help UIサイズを変更した際、エネミー、アクターの表示座標がUI画面の左上基準に表示される問題を修正。
- * またアクターとエネミーの座標の調整が出来ます。
- * 
- * 戦闘背景のY座標を調整できます。
- * 
- * 画面上部に見切れて表示されてるエネミーにステートが付与された時のアイコン表示が、画面から見切れて表示される問題を修正。
- * 
- * 利用規約
- * このプラグインはMITライセンスで配布しています。
- * 
  * 
  * @param ActorSideViewXPosition
  * @desc アクターの基本X座標を移動させます。
@@ -48,39 +46,6 @@
  * @default 0
  * @min -999
  * 
- * @param EnemyXPositionMode
- * @desc UI横幅変更時のエネミーのシフト方法を指定します。（true:そのまま右にシフト　false:UI横幅サイズに比例してシフト）
- * @text UI横幅変更時エネミーXシフト座標モード
- * @type boolean
- * @default true
- * 
- * @param EnemyXPosition
- * @desc エネミーの基本X座標を移動させます。
- * @text エネミーXポジション
- * @type number
- * @default 0
- * @min -999
- * 
- * @param EnemyYPosition
- * @desc エネミーの基本Y座標を移動させます。
- * @text エネミーYポジション
- * @type number
- * @default 0
- * @min -999
- * 
- * @param BackgroundFit
- * @desc バトル背景を画面サイズに合わせる。(フロントビューのみ)
- * @text 画面サイズ調整
- * @type boolean
- * @default false
- * 
- * @param BackgroundPosition
- * @desc バトル背景のY座標を移動させます。
- * @text バトル背景Yポジション
- * @type number
- * @default 0
- * @min -999
- * 
  * 
  */
 var Imported = Imported || {};
@@ -90,48 +55,13 @@ Imported.NUUN_BattlePosition = true;
   const parameters = PluginManager.parameters('NUUN_BattlePosition');
   const actorXPosition = Number(parameters['ActorSideViewXPosition'] || 0);
   const actorYPosition = Number(parameters['ActorSideViewYPosition'] || 0);
-  const EnemyXPositionMode = eval(parameters['EnemyXPositionMode'] || true);
-  const enemyXPosition = Number(parameters['EnemyXPosition'] || 0);
-  const enemyYPosition = Number(parameters['EnemyYPosition'] || 0);
-  const backgroundFit = eval(parameters['BackgroundFit'] || false);
-  const backgroundPosition = Number(parameters['BackgroundPosition'] || 0);
 
-  const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
+  const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;//再定義
   Sprite_Actor.prototype.setHome = function(x, y) {
     if ($gameSystem.isSideView()) {
       x += (Graphics.boxWidth - 808) / 2 + actorXPosition;
       y += (Graphics.boxHeight - 616) / 2 + actorYPosition;
     }
     _Sprite_Actor_setHome.call(this, x, y);
-  };
-
-  const _Game_Enemy_screenX = Game_Enemy.prototype.screenX;
-  Game_Enemy.prototype.screenX = function() {
-    return (!$gameSystem.isSideView() && EnemyXPositionMode ? (Graphics.boxWidth - 808) / 2 + _Game_Enemy_screenX.call(this) : Graphics.boxWidth / 808 * _Game_Enemy_screenX.call(this)) + enemyXPosition;
-  };
-
-  const _Game_Enemy_screenY = Game_Enemy.prototype.screenY;
-  Game_Enemy.prototype.screenY = function() {
-    return (Graphics.boxHeight - 616) / 2 + enemyYPosition + _Game_Enemy_screenY.call(this);
-  };
-
-  const _Sprite_Battleback_adjustPosition = Sprite_Battleback.prototype.adjustPosition;
-  Sprite_Battleback.prototype.adjustPosition = function() {
-    _Sprite_Battleback_adjustPosition.call(this);
-    if (backgroundFit && !$gameSystem.isSideView()){
-      this.width = this.bitmap.width;
-      this.height = this.bitmap.height;
-      this.x = 0;
-      this.scale.x = Graphics.width / this.bitmap.width;
-      this.scale.y = Graphics.height / this.bitmap.height;
-    }
-    this.y += backgroundPosition;
-  };
-
-  Sprite_Enemy.prototype.updateStateSprite = function() {
-    this._stateIconSprite.y = -Math.round((this.bitmap.height + 40) * 0.9);
-    if (this._stateIconSprite.y < 20 - this.y) {
-        this._stateIconSprite.y = 40 - this.y;
-    }
   };
 })();

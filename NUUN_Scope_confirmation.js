@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
- * @version 1.3.2
+ * @version 1.4.0
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -19,13 +19,31 @@
  * アイテム、スキルのメモ欄
  * <NoTargetSelect> このアイテム、スキルは対象選択しません。デフォルトと同様に省略されます。
  * 対象が全体、ランダム、敵味方全て、使用者のみ（対象使用者のみ選択表示をON）で有効です。
+ * 以下のタグは範囲を全体、ランダム、敵味方全てにしたときに有効です。
  * 
+ * 対象範囲が全体、ランダム、敵味方全体時のウィンドウカーソルの表示対象を独自に定義することが出来ます。
+ * なおエネミー画像、SV画像、アクター画像には反映されません。また複数対象カーソル個別表示がONの時のみ有効です。
+ * subject = 使用者;
+ * members = 対象のメンバー;
+ * 取得するデータはカーソル表示させるメンバーを配列として取得します。
+ * 例：members.filter(member => member.isAlive() && member !== subject)
+ * 使用者以外にカーソルが表示させます。
+ * 
+ * タグはアイテム、スキルのメモ欄に記述します。
+ * <[tag]> [tag]：全カーソル表示時対象設定で設定したタグ名
+ * 例：<NotUserTarget> NotUserTargetは全カーソル表示時対象設定のタグ名を変更してない限り、使用者以外のカーソルを表示します。
+ * 
+ * デフォルト設定
+ * <NotUserTarget> 使用者除外。
+ * <DeathTarget> 戦闘不能者を含む。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 
  * 更新履歴
+ * 2021/7/14 Ver.1.4.0
+ * 全体カーソル表示時のウィンドウのカーソル表示対象指定を独自に定義できる機能を追加。
  * 2021/7/14 Ver.1.3.2
  * 味方に戦闘不能者がいるときに全体選択するとエラーが出る問題を修正。
  * 2021/7/10 Ver.1.3.1
@@ -63,6 +81,27 @@
  * @type boolean
  * @default true
  * 
+ * @param UserSelectTasg
+ * @desc 全カーソル表示時に表示するカーソル表示対象設定。（複数対象カーソル個別表示がONの時に有効）
+ * @text 全カーソル表示時対象設定
+ * @type struct<UserSelectTasList>[]
+ * @default ["{\"UserTagName\":\"NotUserTarget\",\"UserTagEval\":\"members.filter(member => member.isAlive() && member !== subject)\"}","{\"UserTagName\":\"DeathTarget\",\"UserTagEval\":\"members\"}"]
+ * 
+ */
+/*~struct~UserSelectTasList:
+ * 
+ * @param UserTagName
+ * @desc 全カーソル表示で表示させる対象を指定するタグ名。
+ * @text タグ名
+ * @type string
+ * @default
+ * 
+ * @param UserTagEval
+ * @desc 全カーソル表示で対象のカーソル表示を判定させる評価式。
+ * @text 評価式
+ * @type string
+ * @default
+ *
  */
 var Imported = Imported || {};
 Imported.NUUN_Scope_confirmation = true;
@@ -72,6 +111,7 @@ const parameters = PluginManager.parameters('NUUN_Scope_confirmation');
 const ForUserSelect = eval(parameters['ForUserSelect'] || 'false');
 const MultiCursorMode = eval(parameters['MultiCursorMode'] || 'true');
 const EnemyOnrySelect = eval(parameters['EnemyOnrySelect'] || 'false');
+const UserSelectTasg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['UserSelectTasg'])) : null) || [];
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
@@ -138,6 +178,16 @@ Scene_Battle.prototype.resetCursor = function() {
   this._actorWindow.setMultiCursor(false);
 };
 
+Window_Selectable.prototype.setCursorNotUserTarget = function(action) {
+  const item = action.item().meta;
+  this._userTargetTag = UserSelectTasg.find(tag => item[tag.UserTagName]);
+  this.setUserTargetSubject(action.subject())
+};
+
+Window_BattleActor.prototype.setUserTargetSubject = function(butler) {
+  this._NUUN_subject = butler;
+};
+
 Window_BattleActor.prototype.selectForItem = function(action) {
   if (action.isForUser()) {
     this.setMultiCursor(MultiCursorMode);
@@ -146,13 +196,16 @@ Window_BattleActor.prototype.selectForItem = function(action) {
   } else if (action.isForAll()) {
     this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
+    this.setCursorNotUserTarget(action);
     this.forceSelect(0);
   } else if (action.isForRandom()) {
     this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
+    this.setCursorNotUserTarget(action);
     this.forceSelect(0);
   }
 };
+
 
 const _Window_BattleEnemy_initialize = Window_BattleEnemy.prototype.initialize;
 Window_BattleEnemy.prototype.initialize = function(rect) {
@@ -169,10 +222,12 @@ Window_BattleEnemy.prototype.selectForItem = function(action) {
   } else if (action.isForAll()) {
     this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
+    this.setCursorNotUserTarget(action);
     this.forceSelect(0);
   } else if (action.isForRandom()) {
     this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
+    this.setCursorNotUserTarget(action);
     this.forceSelect(0);
   }
 };
@@ -181,8 +236,14 @@ const _Window_BattleActor_select = Window_BattleActor.prototype.select;
 Window_BattleActor.prototype.select = function(index) {
   if (this.cursorAll()) {
     Window_Selectable.prototype.select.call(this, index);
-    let activeMember = [];
-    activeMember = $gameParty.aliveMembers();
+    let activeMember = [];console.log(this)
+    if (this._userTargetTag && this._userTargetTag.UserTagEval) {
+      const subject = this._NUUN_subject;
+      const members = $gameParty.members();
+      activeMember = eval(this._userTargetTag.UserTagEval);
+    } else {
+      activeMember = $gameParty.aliveMembers();
+    }
     $gameParty.targetSelect(activeMember);
     this.refreshCursor();
   } else {
@@ -195,7 +256,13 @@ Window_BattleEnemy.prototype.select = function(index) {
   if (this.cursorAll()) {
     Window_Selectable.prototype.select.call(this, index);
     let activeMember = [];
-    activeMember = $gameTroop.aliveMembers();
+    if (this._userTargetTag && this._userTargetTag.UserTagEval) {
+      const subject = this._NUUN_subject;
+      const members = $gameTroop.members();
+      activeMember = eval(this._userTargetTag.UserTagEval);
+    } else {
+      activeMember = $gameTroop.aliveMembers();
+    }
     $gameTroop.targetSelect(activeMember);
     this.refreshCursor();
   } else {

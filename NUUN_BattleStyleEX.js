@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.4.3
+ * @version 1.5.0
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -79,6 +79,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/14 Ver 1.5.0
+ * アクターコマンドモードにSVアクターの上、左、右に表示させる機能を追加。
  * 2021/7/7 Ver 1.4.3
  * 対象選択時にヘルプウィンドウを表示したままにする機能を追加。
  * 2021/6/26 Ver 1.4.2
@@ -723,7 +725,7 @@
  * @text アクターコマンドの表示方法
  * @desc アクターコマンドの表示方法を選択します。
  * @type select
- * @option 各アクターの上
+ * @option ステータスウィンドウの各アクターの上
  * @value 0
  * @option 上部
  * @value 1
@@ -731,6 +733,12 @@
  * @value 2
  * @option アクターウィンドウの上
  * @value 3
+ * @option 各SVアクターの上（SV推奨）
+ * @value 4
+ * @option 各SVアクターの左（SV推奨）
+ * @value 5
+ * @option 各SVアクターの右（SV推奨）
+ * @value 6
  * @default 0
  * @parent XP_ActorCommand
  * 

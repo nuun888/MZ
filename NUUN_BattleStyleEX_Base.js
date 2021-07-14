@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.4.11
+ * @version 2.5.0
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/7/14 Ver 2.5.0
+ * アクターコマンドモードにSVアクターの上、左、右に表示させる機能を追加。
  * 2021/7/14 Ver 2.4.11
  * スリップダメージ時にアクター画像がシェイクしてしまう問題を修正。
  * 2021/7/12 Ver 2.4.10
@@ -524,6 +526,7 @@ Scene_Battle.prototype.createActorCommandWindow = function() {
   if (param.StyleMode === "XPStyle") {
     this._actorCommandWindow.y = this.actorCommandY();
   }
+  this._actorCommandWindow.SvActorData = (param.ActorCommandMode >= 4 && param.ActorCommandMode <= 6) ? this._spriteset._actorSprites : null;
   if (!param.ActorCommandWindowShow) {
     if (this._actorCommandWindow) {
       this._actorCommandWindow.opacity = 0;
@@ -702,7 +705,7 @@ Scene_Battle.prototype.actorCommandWidth = function() {
   if (param.ActorCommand_Width > 0) {
     return param.ActorCommand_Width;
   }
-  if (param.ActorCommandMode === 0) {
+  if (param.ActorCommandMode === 0 || (param.ActorCommandMode >= 4 && param.ActorCommandMode <= 6)) {
     return Math.min((param.ActorStatusWindow_Width > 0 ? param.ActorStatusWindow_Width : Graphics.boxWidth) / this._statusWindow.maxCols() - 12, 192);
   } else if (param.ActorCommandMode >= 1) {
     return Graphics.boxWidth;
@@ -1111,34 +1114,54 @@ Window_ActorCommand.prototype.refresh = function() {
   _Window_ActorCommand_refresh.call(this);
   const actorIndex = this.selectActor(this._actor);
   if (param.StyleMode === "Default" || param.StyleMode === "MVStyle") {
-
   } else if (param.StyleMode === "XPStyle") {
-    if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode === 0) {
-      const rect = this._statusWindow.itemRect(actorIndex);
-      this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
-      this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
-      this.x = Math.max(-this._statusWindow.UI_Difference + 4, ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + Math.max(param.ActorCommand_X, 0) + this._statusWindow.differenceX);
-      this.x = Math.min(this.x, Graphics.boxWidth + this._statusWindow.UI_Difference - this.width - 4);
-      let zeroPosition = 0;
-      if (param.ActorStatusWindowOnPosition) {
-        this.y = this._statusWindow.differenceY - this.height + param.ActorCommand_Y + rect.y;
-        zeroPosition = (Graphics.boxHeight - Graphics.height) / 2;
-      } else {
-        this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + param.ActorCommand_Y + rect.y;
-      }
-      if (this.y <= zeroPosition) {
-        this.y += this.height + this._statusWindow.itemHeight() + this.itemPadding() * 2 + (param.WindowFrameShow ? 6 : 0);
-      } else {
-        this.y += (param.WindowFrameShow ? 0 : 6);
-      }
-      if (this.windowBackground) {
-        this.windowBackground.x = this.x + this._statusWindow.UI_Difference + param.ActorCommandBackground_X;
-        this.windowBackground.y = this.y + (param.ActorommandBackgroundAnchorMode === 0 ? 0 : this.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.ActorCommandBackground_Y;
-      }
-    } else if ((actorIndex >= 0 || this._actor) && param.ActorCommandMode >= 1) {
-      this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
-      if (param.ActorCommandMode === 3) {
-        this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + (param.WindowFrameShow ? 0 : 6) + param.ActorCommand_Y;
+    if (actorIndex >= 0 || this._actor) {
+      if (param.ActorCommandMode === 0) {
+        const rect = this._statusWindow.itemRect(actorIndex);
+        this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
+        this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
+        this.x = Math.max(-this._statusWindow.UI_Difference + 4, ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + Math.max(param.ActorCommand_X, 0) + this._statusWindow.differenceX);
+        this.x = Math.min(this.x, Graphics.boxWidth + this._statusWindow.UI_Difference - this.width - 4);
+        let zeroPosition = 0;
+        if (param.ActorStatusWindowOnPosition) {
+          this.y = this._statusWindow.differenceY - this.height + param.ActorCommand_Y + rect.y;
+          zeroPosition = (Graphics.boxHeight - Graphics.height) / 2;
+        } else {
+          this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + param.ActorCommand_Y + rect.y;
+        }
+        if (this.y <= zeroPosition) {
+          this.y += this.height + this._statusWindow.itemHeight() + this.itemPadding() * 2 + (param.WindowFrameShow ? 6 : 0);
+        } else {
+          this.y += (param.WindowFrameShow ? 0 : 6);
+        }
+        if (this.windowBackground) {
+          this.windowBackground.x = this.x + this._statusWindow.UI_Difference + param.ActorCommandBackground_X;
+          this.windowBackground.y = this.y + (param.ActorommandBackgroundAnchorMode === 0 ? 0 : this.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.ActorCommandBackground_Y;
+        }
+      } else if ((param.ActorCommandMode >= 4 && param.ActorCommandMode <= 6)) {
+        const rect = this._statusWindow.itemRect(actorIndex);
+        const data = this.SvActorData[actorIndex];
+        this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
+        this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
+        if (param.ActorCommandMode === 4) {
+          this.x = data.x - (this.width + data.width + 32) / 2;
+          this.y = data.y - (this.height + data.height + 48);
+        } else if (param.ActorCommandMode === 5) {
+          this.x = data.x - (this.width + data.width + 32);
+          this.y = data.y - (this.height + data.height + 48) / 2;
+        } else {
+          this.x = data.x;
+          this.y = data.y - (this.height + data.height + 48) / 2;
+        }
+        if (this.windowBackground) {
+          this.windowBackground.x = this.x + this._statusWindow.UI_Difference + param.ActorCommandBackground_X;
+          this.windowBackground.y = this.y + (param.ActorommandBackgroundAnchorMode === 0 ? 0 : this.height) + (Graphics.height - Graphics.boxHeight) / 2 + param.ActorCommandBackground_Y;
+        }
+      } else if (param.ActorCommandMode >= 1) {
+        this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
+        if (param.ActorCommandMode === 3) {
+          this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + (param.WindowFrameShow ? 0 : 6) + param.ActorCommand_Y;
+        }
       }
     }
   }

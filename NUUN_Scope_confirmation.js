@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -42,6 +42,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/7/14 Ver.1.4.1
+ * 敵の対象選択時にエラーが出る問題を修正。
  * 2021/7/14 Ver.1.4.0
  * 全体カーソル表示時のウィンドウのカーソル表示対象指定を独自に定義できる機能を追加。
  * 2021/7/14 Ver.1.3.2
@@ -178,10 +180,14 @@ Scene_Battle.prototype.resetCursor = function() {
   this._actorWindow.setMultiCursor(false);
 };
 
+Window_BattleActor.prototype.setCursorNotUserTarget = function(action) {
+  Window_Selectable.prototype.setCursorNotUserTarget.call(this, action);
+  this.setUserTargetSubject(action.subject());
+};
+
 Window_Selectable.prototype.setCursorNotUserTarget = function(action) {
   const item = action.item().meta;
   this._userTargetTag = UserSelectTasg.find(tag => item[tag.UserTagName]);
-  this.setUserTargetSubject(action.subject())
 };
 
 Window_BattleActor.prototype.setUserTargetSubject = function(butler) {

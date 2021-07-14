@@ -11,6 +11,7 @@
  * @target MZ
  * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
+ * @base NUUN_Base
  * @version 1.4.1
  *            
  * @help  

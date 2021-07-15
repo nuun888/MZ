@@ -44,6 +44,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/15 Ver 1.1.1
+ * アイテム使用時の画像が取得できなかった問題を修正。
  * 2021/7/12 Ver 1.1.0
  * プラグインパラメータの仕様を大幅に見直し。
  * 戦闘を行うとセーブが出来なくなる問題を修正。
@@ -289,8 +291,8 @@
  * @param itemImg
  * @text アイテム使用時画像（戦闘）
  * @desc アイテム使用時の画像を表示します。
- * @type file
- * @dir img/pictures
+ * @type file[]
+ * @dir img/
  * @parent AttackSetting
  * 
  * @param recoveryImg

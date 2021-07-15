@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.1.4
+ * @version 1.2.0
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/15 Ver.1.2.0
+ * ゲージ、名前表示関連プラグインの共通処理を追加。
  * 2021/5/15 Ver.1.1.4
  * ウィンドウスキンをウィンドウ毎に設定できる処理を追加。
  * 2021/5/8 Ver.1.1.3
@@ -37,7 +39,7 @@
  */
 var Imported = Imported || {};
 Imported.NUUN_Base = true;
-const NUUN_Base_Ver = 114;
+const NUUN_Base_Ver = 113;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Base');
@@ -54,6 +56,10 @@ function structureData(params) {
         }
     }
   }));
+}
+
+function nuun_GausePlugins() {
+  return Imported.NUUN_ButlerHPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge;
 }
 
 DataManager.nuun_structureData = function(params){
@@ -101,6 +107,12 @@ ImageManager.nuun_LoadPictures = function(filename) {
   return this.loadBitmap("img/", filename);
 };
 
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+  _BattleManager_initMembers.call(this);
+  this.gaugeBaseSprite = null;
+};
+
 const _Window_Selectable_drawItemBackground = Window_Selectable.prototype.drawItemBackground;
 Window_Selectable.prototype.drawItemBackground = function(index) {
   if (!this._contentsBackVisible) {
@@ -120,7 +132,41 @@ Window_Base.prototype.loadWindowskin = function() {
     this.windowskin = ImageManager.loadSystem(this._userWindowSkin);
   } else {
     _Window_Base_loadWindowskin.call(this);
-  } 
+  }
+};
+
+const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
+Spriteset_Battle.prototype.createLowerLayer = function() {
+  _Spriteset_Battle_createLowerLayer.call(this);
+  if (nuun_GausePlugins()) {
+    this.createGaugeBase();
+  }
+};
+
+Spriteset_Battle.prototype.createGaugeBase = function() {
+  if (!this._butlerGaugeBase) {
+    const sprite = new Sprite();
+    this.addChild(sprite);
+    this._butlerGaugeBase = sprite;
+    BattleManager.gaugeBaseSprite = sprite;
+  }
+};
+
+const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
+Spriteset_Battle.prototype.update = function() {
+  _Spriteset_Battle_update.call(this);
+  this.updateButlerGauge();
+};
+
+Spriteset_Battle.prototype.updateButlerGauge = function() {
+  if (this._butlerGaugeBase) {
+    for (const sprite of this._butlerGaugeBase.children) {
+      const spriteData = this._enemySprites.some(enemy => enemy.spriteId === sprite.enemySpriteId);
+      if (!spriteData) {
+        this._butlerGaugeBase.removeChild(sprite);
+      }
+    }
+  }
 };
 
 })();

@@ -11,7 +11,7 @@
  * @plugindesc 立ち絵表示EX
  * @author NUUN
  * @base NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 立ち絵画像を表示します。

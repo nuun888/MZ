@@ -11,7 +11,8 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @version 1.2.3
+ * @orderAfter NUUN_Base
+ * @version 1.2.4
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。
@@ -31,11 +32,15 @@
  * 例　<HPGaugeMask:this.hp < this.mhp * 0.3>
  * 敵のHPが３０％未満の時のみHP値を表示します。
  * 
+ * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/15 Ver.1.2.4
+ * 処理の最適化により一部処理をNUUN_Baseに移行。
  * 2021/7/13 Ver.1.2.3
  * エネミー画像を消去する及び新たにエネミー画像を追加表示するプラグインとの競合対策。
  * 2021/6/28 Ver.1.2.2
@@ -268,17 +273,7 @@ Sprite_Enemy.prototype.hpGaugeOpacity = function() {
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
   _Spriteset_Battle_createLowerLayer.call(this);
-  this.createGaugeBase();
   this.createEnemyHpGauge();
-};
-
-Spriteset_Battle.prototype.createGaugeBase = function() {
-  if (!this._butlerGaugeBase) {
-    const sprite = new Sprite();
-    this.addChild(sprite);
-    this._butlerGaugeBase = sprite;
-    BattleManager.gaugeBaseSprite = sprite;
-  }
 };
 
 Spriteset_Battle.prototype.createEnemyHpGauge = function() {
@@ -291,21 +286,6 @@ Spriteset_Battle.prototype.createEnemyHpGauge = function() {
 
 Spriteset_Battle.prototype.enemyHPGauge = function(sprites) {
   sprites.enemyHPGauge();
-};
-
-const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
-Spriteset_Battle.prototype.update = function() {
-  _Spriteset_Battle_update.call(this);
-  this.updateButlerName();
-};
-
-Spriteset_Battle.prototype.updateButlerName = function() {
-  for (const sprite of this._butlerGaugeBase.children) {
-    const spriteData = this._enemySprites.some(enemy => enemy.spriteId === sprite.enemySpriteId);
-    if (!spriteData) {
-      this._butlerGaugeBase.removeChild(sprite);
-    }
-  }
 };
 
 function Sprite_EnemyHPGauge() {
@@ -479,12 +459,6 @@ Game_Enemy.prototype.HpGaugeMask = function(){
 
 BattleManager.hpGaugeVisible = function() {
   this.visibleHpGauge = $gameParty.battleMembers().some(actor => actor._visibleHpGauge);
-};
-
-const _BattleManager_initMembers = BattleManager.initMembers;
-BattleManager.initMembers = function() {
-  _BattleManager_initMembers.call(this);
-  this.gaugeBaseSprite = null;
 };
 
 })();

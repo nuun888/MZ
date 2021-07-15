@@ -11,7 +11,8 @@
  * @target MZ
  * @plugindesc  エネミーTPBゲージ
  * @author NUUN
- * @version 1.1.6
+ * @version 1.1.7
+ * @base NUUN_Base
  * 
  * @help
  * エネミーにもTPBゲージを表示します。
@@ -20,10 +21,14 @@
  * <TPBGaugeX:[position]> TPBゲージのX座標を調整します。（相対座標）
  * <TPBGaugeY:[position]> TPBゲージのY座標を調整します。（相対座標）
  * 
+ * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/15 Ver.1.1.7
+ * 処理の最適化により一部処理をNUUN_Baseに移行。
  * 2021/7/14 Ver.1.1.6
  * エネミー画像を消去する及び新たにエネミー画像を追加表示するプラグインとの競合対策。
  * 2021/6/19 Ver.1.1.5
@@ -182,17 +187,7 @@ Sprite_Enemy.prototype.tpbGaugeOpacity = function() {
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
   _Spriteset_Battle_createLowerLayer.call(this);
-  this.createGaugeBase();
   this.createEnemyTpbGauge();
-};
-
-Spriteset_Battle.prototype.createGaugeBase = function() {
-  if (!this._butlerGaugeBase) {
-    const sprite = new Sprite();
-    this.addChild(sprite);
-    this._butlerGaugeBase = sprite;
-    BattleManager.gaugeBaseSprite = sprite;
-  }
 };
 
 Spriteset_Battle.prototype.createEnemyTpbGauge = function() {
@@ -205,21 +200,6 @@ Spriteset_Battle.prototype.createEnemyTpbGauge = function() {
 
 Spriteset_Battle.prototype.enemyTpbGauge = function(sprites) {
   sprites.enemyTpbGauge();
-};
-
-const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
-Spriteset_Battle.prototype.update = function() {
-  _Spriteset_Battle_update.call(this);
-  this.updateButlerName();
-};
-
-Spriteset_Battle.prototype.updateButlerName = function() {
-  for (const sprite of this._butlerGaugeBase.children) {
-    const spriteData = this._enemySprites.some(enemy => enemy.spriteId === sprite.enemySpriteId);
-    if (!spriteData) {
-      this._butlerGaugeBase.removeChild(sprite);
-    }
-  }
 };
 
 function Sprite_EnemyTPBGauge() {
@@ -239,12 +219,6 @@ Sprite_EnemyTPBGauge.prototype.bitmapWidth = function() {
 
 Sprite_EnemyTPBGauge.prototype.gaugeHeight = function() {
   return GaugeHeight > 0 ? GaugeHeight : 12;
-};
-
-const _BattleManager_initMembers = BattleManager.initMembers;
-BattleManager.initMembers = function() {
-  _BattleManager_initMembers.call(this);
-  this.gaugeBaseSprite = null;
 };
 
 })();

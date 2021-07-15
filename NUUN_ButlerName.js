@@ -11,7 +11,10 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
+ * @base NUUN_Base
+ * 
+ * 
  * @help
  * モンスターの敵名を表示します。
  * 
@@ -19,10 +22,14 @@
  * <EnemyNameX:[position]> モンスター名のX座標を調整します。（相対座標）
  * <EnemyNameY:[position]> モンスター名のY座標を調整します。（相対座標）
  * 
+ * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/15 Ver.1.1.4
+ * 処理の最適化により一部処理をNUUN_Baseに移行。
  * 2021/7/13 Ver.1.1.3
  * エネミー画像を消去するプラグインとの競合対策。
  * 2021/7/10 Ver.1.1.2
@@ -207,20 +214,8 @@ Sprite_Enemy.prototype.butlerNameOpacity = function() {
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
   _Spriteset_Battle_createLowerLayer.call(this);
-  this.createGaugeBase();
   this.createEnemyName();
   //this.createActorName();
-};
-
-Spriteset_Battle.prototype.createGaugeBase = function() {
-  if (EnemyNamePosition >= 0) {
-    if (!this._butlerGaugeBase) {
-      const sprite = new Sprite();
-      this.addChild(sprite);
-      this._butlerGaugeBase = sprite;
-      BattleManager.gaugeBaseSprite = sprite;
-    }
-  }
 };
 
 Spriteset_Battle.prototype.createActorName = function() {
@@ -265,21 +260,6 @@ Spriteset_Battle.prototype.enemyName = function(sprites) {
   sprites.enemyName();
 };
 
-const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
-Spriteset_Battle.prototype.update = function() {
-  _Spriteset_Battle_update.call(this);
-  this.updateButlerName();
-};
-
-Spriteset_Battle.prototype.updateButlerName = function() {
-  for (const sprite of this._butlerGaugeBase.children) {
-    const spriteData = this._enemySprites.some(enemy => enemy.spriteId === sprite.enemySpriteId);
-    if (!spriteData) {
-      this._butlerGaugeBase.removeChild(sprite);
-    }
-  }
-};
-
 function Sprite_ButlerName() {
   this.initialize(...arguments);
 }
@@ -320,11 +300,5 @@ Sprite_ButlerName.prototype.butlerNameVisibleInSelect = function() {
     return this._battler.isSelected();
   }
   return true;
-};
-
-const _BattleManager_initMembers = BattleManager.initMembers;
-BattleManager.initMembers = function() {
-  _BattleManager_initMembers.call(this);
-  this.gaugeBaseSprite = null;
 };
 })();

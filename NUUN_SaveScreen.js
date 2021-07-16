@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.6.0
+ * @version 1.7.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -45,6 +45,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/16 Ver.1.7.0
+ * セーブ日時を表示する機能を追加。
  * 2021/5/29 Ver.1.6.0
  * サイドビューアクターを表示する機能を追加。
  * 2021/5/27 Ver.1.5.2
@@ -218,13 +220,6 @@
  * @default true
  * @parent BackGround
  * 
- * @param ContentsBackGroundImg
- * @desc コンテンツの背景画像ファイル名を指定します。1:背後　2:前面
- * @text 背景画像
- * @type file[]
- * @dir img/
- * @default []
- * 
  * @param ContentsBackVisible
  * @text コンテンツ背景画像非表示
  * @desc コンテンツの背景画像を表示しない。(要NUUN_Base Ver.1.1.3以降)
@@ -294,6 +289,19 @@
  * @default
  * @parent Contents
  * 
+ * @param DayTime
+ * @desc 表示する日時フォーマット
+ * @text 日時フォーマット
+ * @type select
+ * @option 標準（年/月/日 時：分：秒）
+ * @value 
+ * @option 英表記（日/月/年 時：分：秒）
+ * @value 'en-GB'
+ * @option 元号表記（日表記）
+ * @value 'ja-JP-u-ca-japanese'
+ * @default 
+ * @parent Contents
+ * 
  * @param T_Left
  * @desc 左上に表示する項目。
  * @text 左上表示項目
@@ -306,6 +314,8 @@
  * @value 2
  * @option 所持金
  * @value 3
+ * @option セーブ時刻
+ * @value 4
  * @option 任意項目１
  * @value 10
  * @option 任意項目２
@@ -325,6 +335,8 @@
  * @value 2
  * @option 所持金
  * @value 3
+ * @option セーブ時刻
+ * @value 4
  * @option 任意項目１
  * @value 10
  * @option 任意項目２
@@ -333,8 +345,8 @@
  * @parent Contents
  * 
  * @param B_Left
- * @desc 右上に表示する項目。
- * @text 右上表示項目
+ * @desc 左下に表示する項目。
+ * @text 左下表示項目
  * @type select
  * @option なし
  * @value 0
@@ -344,6 +356,8 @@
  * @value 2
  * @option 所持金
  * @value 3
+ * @option セーブ時刻
+ * @value 4
  * @option 任意項目１
  * @value 10
  * @option 任意項目２
@@ -363,6 +377,8 @@
  * @value 2
  * @option 所持金
  * @value 3
+ * @option セーブ時刻
+ * @value 4
  * @option 任意項目1
  * @value 10
  * @option 任意項目２
@@ -510,6 +526,7 @@ Imported.NUUN_SaveScreen = true;
   const SaveSnapX = Number(parameters['SaveSnapX'] || 0);
   const SaveSnapY = Number(parameters['SaveSnapY'] || 0);
   const SaveSnapScale = Number(parameters['SaveSnapScale'] || 15);
+  const DayTime = String(parameters['DayTime']);
   const BackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])[0]) : null;
   const ContentsBackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsBackGroundImg'])) : null;
 
@@ -800,6 +817,9 @@ Imported.NUUN_SaveScreen = true;
       case 3:
         this.drawGold(info, x, y, width);
         break;
+      case 4:
+        this.drawDayTime(info, x, y, width);
+        break;
       case 10:
         this.drawOriginal_1(info, x, y, width);
         break;
@@ -909,6 +929,17 @@ Imported.NUUN_SaveScreen = true;
     this.drawText(PlaytimeName, x, y, contentsWidth);
     this.resetTextColor();
     _Window_SavefileList_drawPlaytime.call(this, info, x + contentsWidth, y, width - contentsWidth);
+    this.contents.fontSize = $gameSystem.mainFontSize();
+  };
+
+  Window_SavefileList.prototype.drawDayTime = function(info, x, y, width) {
+    this.resetTextColor();
+    if (info.timestamp) {
+      this.contents.fontSize = ContentsFontSizeMainFontSize;
+      const _dayTime = new Date(info.timestamp);
+      const format = _dayTime.toLocaleString(eval(DayTime));
+      this.drawText(format, x, y, width, "right");
+    }
     this.contents.fontSize = $gameSystem.mainFontSize();
   };
 

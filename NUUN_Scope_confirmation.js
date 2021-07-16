@@ -12,7 +12,7 @@
  * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
  * @base NUUN_Base
- * @version 1.4.1
+ * @version 1.5.0
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -43,7 +43,8 @@
  * 
  * 
  * 更新履歴
- * 
+ * 2021/7/17 Ver.1.5.0
+ * 複数対象カーソル個別表示をメニューにも対応。
  * 2021/7/14 Ver.1.4.1
  * 敵の対象選択時にエラーが出る問題を修正。
  * カーソル選択中にモンスターが倒されるとエラーが出る問題を修正。
@@ -183,6 +184,60 @@ Scene_Battle.prototype.resetCursor = function() {
   this._actorWindow.setMultiCursor(false);
 };
 
+const _Window_Selectable_initialize = Window_Selectable.prototype.initialize;
+Window_Selectable.prototype.initialize = function(rect) {
+  this._multiCursor = false;
+  _Window_Selectable_initialize.call(this, rect);
+};
+
+Window_Selectable.prototype.setMultiCursor = function(mode) {
+  this._multiCursor = mode;
+};
+
+const _Window_Selectable_setCursorAll = Window_Selectable.prototype.setCursorAll;
+Window_Selectable.prototype.setCursorAll = function(cursorAll) {
+  _Window_Selectable_setCursorAll.call(this, cursorAll);
+  const multiCursor = MultiCursorMode ? cursorAll : false;
+  this.setMultiCursor(multiCursor);
+};
+
+Window_MenuActor.prototype.setUserTargetSubject = function(butler) {
+  this._NUUN_subject = butler;
+};
+
+const _Window_MenuActor_select = Window_MenuActor.prototype.select;
+Window_MenuActor.prototype.select = function(index) {
+  if (this.cursorAll()) {
+    Window_Selectable.prototype.select.call(this, index);
+    let activeMember = [];
+    if (this._userTargetTag && this._userTargetTag.UserTagEval) {
+      const subject = this._NUUN_subject;
+      const members = $gameParty.members();
+      activeMember = eval(this._userTargetTag.UserTagEval);
+    } else {
+      activeMember = $gameParty.aliveMembers();
+    }
+    $gameParty.targetSelect(activeMember);
+    this.refreshCursor();
+  } else {
+    _Window_MenuActor_select.call(this, index);
+  }
+};
+
+const _Window_MenuActor_selectForItem = Window_MenuActor.prototype.selectForItem;
+Window_MenuActor.prototype.selectForItem = function(item) {
+  this.setCursorNotUserTarget(item);
+  this.setMultiCursor(false);
+  _Window_MenuActor_selectForItem.call(this, item);
+};
+
+Window_MenuActor.prototype.setCursorNotUserTarget = function(item) {
+  this._userTargetTag = UserSelectTasg.find(tag => item[tag.UserTagName]);
+  const actor = $gameParty.menuActor();
+  this.setUserTargetSubject(actor);
+};
+
+
 Window_BattleActor.prototype.setCursorNotUserTarget = function(action) {
   Window_Selectable.prototype.setCursorNotUserTarget.call(this, action);
   this.setUserTargetSubject(action.subject());
@@ -199,22 +254,23 @@ Window_BattleActor.prototype.setUserTargetSubject = function(butler) {
 
 Window_BattleActor.prototype.selectForItem = function(action) {
   if (action.isForUser()) {
-    this.setMultiCursor(MultiCursorMode);
     this.forceSelect(BattleManager.actor().index());
     this.setCursorFixed(true);
   } else if (action.isForAll()) {
-    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.setCursorNotUserTarget(action);
     this.forceSelect(0);
   } else if (action.isForRandom()) {
-    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.setCursorNotUserTarget(action);
     this.forceSelect(0);
   }
 };
 
+Window_MenuActor.prototype.selectTarget = function(index) {
+  const actor = $gameParty.members()[index];
+  return actor ? actor.isSelected() : false;
+};
 
 const _Window_BattleEnemy_initialize = Window_BattleEnemy.prototype.initialize;
 Window_BattleEnemy.prototype.initialize = function(rect) {
@@ -224,17 +280,14 @@ Window_BattleEnemy.prototype.initialize = function(rect) {
 
 Window_BattleEnemy.prototype.selectForItem = function(action) {
   if (action.isForEveryone()) {
-    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.forceSelect(0);
     this._forEveryoneSelect = true;
   } else if (action.isForAll()) {
-    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.setCursorNotUserTarget(action);
     this.forceSelect(0);
   } else if (action.isForRandom()) {
-    this.setMultiCursor(MultiCursorMode);
     this.setCursorAll(true);
     this.setCursorNotUserTarget(action);
     this.forceSelect(0);
@@ -345,16 +398,6 @@ Window_BattleActor.prototype.selectTarget = function(index) {
   return actor ? actor.isSelected() : false;
 };
 
-
-const _Window_Selectable_initialize = Window_Selectable.prototype.initialize;
-Window_Selectable.prototype.initialize = function(rect) {
-  this._multiCursor = false;
-  _Window_Selectable_initialize.call(this, rect);
-};
-
-Window_Selectable.prototype.setMultiCursor = function(mode) {
-  this._multiCursor = mode;
-};
 
 const _Window_initialize = Window.prototype.initialize;
 Window.prototype.initialize = function() {

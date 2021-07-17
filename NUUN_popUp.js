@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  *            
  * @help
  * ステート、バフ付加解除時にステート、バフ名をポップアップさせます。
@@ -23,10 +23,15 @@
  * <RemoveNoPopUp> 解除時のポップアップを表示しません。
  * <PopUpColor:[colorIndex]> ポップアップ時の色を指定します。[colorIndex]:カラーインデックス番号　例：<PopUpColor:17>
  * 
+ * バトルスタイル拡張プラグインの互換モードを使用する場合はこのプラグインをバトルスタイル拡張プラグインの設定用プラグインの下に配置してください。
+ * 初期設定ではOFFになっています。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/17 Ver 1.0.1
+ * バトルスタイル拡張プラグインの互換モード対応。
  * 2021/7/17 Ver 1.0.0
  * 初版
  * 
@@ -142,12 +147,26 @@ var Imported = Imported || {};
 Imported.NUUN_popUp = true;
 
 (() => {
+  let parametersEX = null;
+  if (Imported.NUUN_BattleStyleEX) {
+    parametersEX = PluginManager.parameters('NUUN_BattleStyleEX');
+    
+  }
   const parameters = PluginManager.parameters('NUUN_popUp');
-  const PopUpBuff = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopUpBuff'])) : null) || [];
-  const StateColor = Number(parameters['StateColor'] || 0);
-  const BatStateColor = Number(parameters['BatStateColor'] || 0);
-  const PopUpReleaseOpacity = Number(parameters['PopUpReleaseOpacity'] || 128);
-  const PopUpUpdate = Number(parameters['PopUpUpdate'] || 0);
+  const BattleStyleEXSettings = parametersEX ? eval(parametersEX['BattleStyleEXSettings'] || 'false') : false;
+  if (BattleStyleEXSettings) {
+    var PopUpBuff = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parametersEX['PopUpBuff'])) : null) || [];
+    var StateColor = Number(parametersEX['StateColor'] || 0);
+    var BatStateColor = Number(parametersEX['BatStateColor'] || 0);
+    var PopUpReleaseOpacity = Number(parametersEX['PopUpReleaseOpacity'] || 128);
+    var PopUpUpdate = Number(parametersEX['PopUpUpdate'] || 0);
+  } else {
+    var PopUpBuff = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopUpBuff'])) : null) || [];
+    var StateColor = Number(parameters['StateColor'] || 0);
+    var BatStateColor = Number(parameters['BatStateColor'] || 0);
+    var PopUpReleaseOpacity = Number(parameters['PopUpReleaseOpacity'] || 128);
+    var PopUpUpdate = Number(parameters['PopUpUpdate'] || 0);
+  }
   const DeadNoPopup = eval(parameters['DeadNoPopup'] || 'false');
 
   const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;

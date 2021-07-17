@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.5.0
+ * @version 1.5.1
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -79,6 +79,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/17 Ver 1.5.1
+ * ポップアップ機能の個別プラグイン化により既に設定済みの方用に互換機能を追加。
  * 2021/7/14 Ver 1.5.0
  * アクターコマンドモードにSVアクターの上、左、右に表示させる機能を追加。
  * 2021/7/7 Ver 1.4.3
@@ -1322,8 +1324,15 @@
  * 
  * 
  * @param PopUpSettings
- * @text ポップアップ設定
+ * @text 互換機能　ポップアップ設定(要NUUN_popUp)
  * @default ------------------------------
+ * 
+ * @param BattleStyleEXSettings
+ * @desc バトルスタイル拡張の設定を有効にする。（OFFの場合はNUUN_popUpの設定が反映されます）
+ * @text バトルスタイル拡張設定有効
+ * @type boolean
+ * @default false
+ * @parent PopUpSettings
  * 
  * @param PopUpBuff
  * @text ポップアップバフ設定

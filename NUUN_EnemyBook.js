@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.6.1
+ * @version 2.7.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -69,6 +69,8 @@
  * 敵の使用スキル
  * モンスター画像
  * キャラチップ
+ * 属性耐性レーダーチャート
+ * ステート耐性レーダーチャート
  * モンスターブックナンバー
  * 
  * 戦闘中にパーティコマンドからエネミー図鑑を開くことが出来ます。
@@ -254,6 +256,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/18 Ver.2.7.0
+ * 属性耐性、ステート耐性をレーダーチャートで表示できる機能を追加。(要NUUN_RadarChartBase)
  * 2021/6/26 Ver.2.6.1
  * 変身時撃破をONにしても変身時の図鑑登録をしない機能を追加。
  * 2021/6/16 Ver.2.6.0
@@ -1564,6 +1568,68 @@
  * @default 0
  * @parent ResistWeakElementData
  * 
+ * @param ElementRadarChart
+ * @text 属性耐性レーダーチャート
+ * @default ------------------------------
+ * @parent ResistWeakElementData
+ * 
+ * @param ElementRadarChartRadius
+ * @desc レーダチャートの半径。
+ * @text レーダチャート半径
+ * @type number
+ * @default 100
+ * @parent ElementRadarChart
+ * 
+ * @param ElementRadarChartFramecolor
+ * @desc レーダチャートの枠の色を設定します。
+ * @text レーダチャート枠色
+ * @type number
+ * @default 15
+ * @parent ElementRadarChart
+ * 
+ * @param ElementRadarChartLineColor
+ * @desc レーダチャートの線の色を設定します。
+ * @text レーダチャート線色
+ * @type number
+ * @default 15
+ * @parent ElementRadarChart
+ * 
+ * @param ElementRadarChartMainColor1
+ * @desc レーダチャートの中心の背景色を設定します。
+ * @text レーダチャート中心背景色
+ * @type number
+ * @default 3
+ * @parent ElementRadarChart
+ * 
+ * @param ElementRadarChartMainColor2
+ * @desc レーダチャートの外側背景色を設定します。
+ * @text レーダチャート外側背景色
+ * @type number
+ * @default 3
+ * @parent ElementRadarChart
+ * 
+ * @param ElementRadarChartX
+ * @desc レーダチャートのX座標（相対）。
+ * @text レーダチャートX座標
+ * @type number
+ * @default 64
+ * @parent ElementRadarChart
+ * 
+ * @param ElementRadarChartY
+ * @desc レーダチャートのY座標（相対）。
+ * @text レーダチャートY座標
+ * @type number
+ * @default 48
+ * @parent ElementRadarChart
+ * 
+ * @param ElementRadarChart_FontSize
+ * @desc フォントサイズ。（メインフォントから）
+ * @text フォントサイズ
+ * @type number
+ * @default -12
+ * @min -9999
+ * @parent ElementRadarChart
+ * 
  * @param ResistWeakStateData
  * @text ステート耐性弱点設定
  * @default ------------------------------
@@ -1602,6 +1668,75 @@
  * @type number
  * @default 0
  * @parent ResistWeakStateData
+ * 
+ * @param StateRadarChart
+ * @text ステート耐性レーダーチャート
+ * @default ------------------------------
+ * @parent ResistWeakStateData
+ * 
+ * @param StateRadarChartRadius
+ * @desc レーダチャートの半径。
+ * @text レーダチャート半径
+ * @type number
+ * @default 100
+ * @parent StateRadarChart
+ * 
+ * @param StateRadarChartFramecolor
+ * @desc レーダチャートの枠の色を設定します。
+ * @text レーダチャート枠色
+ * @type number
+ * @default 15
+ * @parent StateRadarChart
+ * 
+ * @param StateRadarChartLineColor
+ * @desc レーダチャートの線の色を設定します。
+ * @text レーダチャート線色
+ * @type number
+ * @default 15
+ * @parent StateRadarChart
+ * 
+ * @param StateRadarChartMainColor1
+ * @desc レーダチャートの中心の背景色を設定します。
+ * @text レーダチャート中心背景色
+ * @type number
+ * @default 3
+ * @parent StateRadarChart
+ * 
+ * @param StateRadarChartMainColor2
+ * @desc レーダチャートの外側背景色を設定します。
+ * @text レーダチャート外側背景色
+ * @type number
+ * @default 3
+ * @parent StateRadarChart
+ * 
+ * @param StateRadarChartX
+ * @desc レーダチャートのX座標（相対）。
+ * @text レーダチャートX座標
+ * @type number
+ * @default 64
+ * @parent StateRadarChart
+ * 
+ * @param StateRadarChartY
+ * @desc レーダチャートのY座標（相対）。
+ * @text レーダチャートY座標
+ * @type number
+ * @default 48
+ * @parent StateRadarChart
+ * 
+ * @param StateRadarChart_FontSize
+ * @desc フォントサイズ。（メインフォントから）
+ * @text フォントサイズ
+ * @type number
+ * @default -12
+ * @min -9999
+ * @parent StateRadarChart
+ * 
+ * @param RadarChartIcon
+ * @desc ステートの表示をアイコンで表示する。OFFはステート名
+ * @text アイコン表示
+ * @type boolean
+ * @default true
+ * @parent StateRadarChart
  * 
  * @param ResistWeakDebuffData
  * @text デバフ耐性弱点設定
@@ -1845,6 +1980,10 @@
  * @value 80
  * @option 敵の使用スキル
  * @value 100
+ * @option 属性レーダーチャート
+ * @value 121
+ * @option ステートレーダーチャート
+ * @value 122
  * @option モンスター画像
  * @value 200
  * @option キャラチップ
@@ -3937,6 +4076,7 @@ Window_EnemyBook.prototype.buffColor = function(params, nparams) {
 Window_EnemyBook.prototype.refresh = function() {
   if(!this._enemy || this._pageMode < 0) {
     this.contents.clear();
+    this.removeSprite();
     this._enemySprite.bitmap = null;
     return;
   }
@@ -4136,6 +4276,12 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
     case 100:
       this.enemyAction(list, enemy, x, y, width);
       break;
+    case 121:
+      this.enemyElementChart(list, enemy, x, y, width);
+      break;
+    case 122:
+      this.enemyStateChart(list, enemy, x, y, width);
+      break;
     case 200:
       this.enemyImg(list, enemy, x - 4, y - 4, width);
       break;
@@ -4284,7 +4430,7 @@ Window_EnemyBook.prototype.normalParam = function(list, enemy) {
 };
 
 Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
-  let text = this.paramShow(list, enemy);//InfoStatusGaugeVisible
+  let text = this.paramShow(list, enemy);
   let textWidth = width;
   if (text !== undefined) {
     if ((list.DateSelect === 1 || list.DateSelect === 2 || list.DateSelect === 9) && $gameParty.inBattle() && enemy && this.gaugeVisibleMode(list.MaskMode)) {
@@ -4956,6 +5102,52 @@ Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
   }
 };
 
+Window_EnemyBook.prototype.enemyElementChart = function(list, enemy, x, y, width) {
+  if (!Imported.NUUN_RadarChartBase) {
+    return;
+  }
+  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  const nameText = list.paramName ? list.paramName : "属性耐性";
+  this.drawText(nameText, x, y, width);
+  const lineHeight = this.lineHeight();
+  this.enemyElementRadarChart(this.setEnemyElementChart(enemy), enemy, x, y + lineHeight ,'element');
+};
+
+Window_EnemyBook.prototype.setEnemyElementChart = function(enemy) {
+  const data = [];
+  for (const element of param.ElementList) {
+    let rate = enemy.elementRate(element.ElementNo);
+    const elementName = $dataSystem.elements[element.ElementNo];
+    const elementIconId = element.ElementIconId || 0;
+    data.push(this.setRadarChart(elementName, rate, elementIconId));
+  }
+  return data;
+};
+
+Window_EnemyBook.prototype.enemyStateChart = function(list, enemy, x, y, width) {
+  if (!Imported.NUUN_RadarChartBase) {
+    return;
+  }
+  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  const nameText = list.paramName ? list.paramName : "ステート耐性";
+  this.drawText(nameText, x, y, width);
+  const lineHeight = this.lineHeight();
+  this.enemyStateRadarChart(this.setEnemyStateChart(enemy), enemy, x, y + lineHeight ,'state');
+};
+
+Window_EnemyBook.prototype.setEnemyStateChart = function(enemy) {
+  const data = [];
+  for (const state of param.StateList) {
+    let stateId = state.StateId;
+    let rate = enemy.stateRate(stateId);
+    rate *= enemy.isStateResist(stateId) ? 0 : 1;
+    const stateName = $dataStates[stateId].name;
+    const iconId = param.RadarChartIcon ? $dataStates[stateId].iconIndex : 0;
+    data.push(this.setRadarChart(stateName, rate, iconId));
+  }
+  return data;
+};
+
 Window_EnemyBook.prototype.enemyCharacter = function(list, enemy, x, y, width) {
   this.enemyCharacterChip(enemy, x, y);
 };
@@ -5011,14 +5203,14 @@ Window_EnemyBook.prototype.createInnerChipSprite = function(key, id) {
 Window_EnemyBook.prototype.placeGauge = function(enemy, type, x, y, width) {
   const padding = this.itemPadding();
   const key = "enemyBook-gauge-%2".format(enemy.enemyId(), type);
-  const sprite = this.createInnerSprite(key, Sprite_EnemyBookGauge);
+  const sprite = this.createInnerGaugeSprite(key, Sprite_EnemyBookGauge);
   sprite.bitmap.width = width - padding;
   sprite.setup(enemy, type);
   sprite.move(x, y);
   sprite.show();
 };
 
-Window_EnemyBook.prototype.createInnerSprite = function(key, spriteClass) {
+Window_EnemyBook.prototype.createInnerGaugeSprite = function(key, spriteClass) {
   const dict = this._additionalSprites;
   const sprite = new spriteClass();
   dict[key] = sprite;
@@ -5026,9 +5218,23 @@ Window_EnemyBook.prototype.createInnerSprite = function(key, spriteClass) {
   return sprite;
 };
 
+Window_EnemyBook.prototype.createInnerSprite = function(key, spriteClass) {
+  const dict = this._additionalSprites;
+  if (dict[key]) {
+      return dict[key];
+  } else {
+      const sprite = new spriteClass();
+      dict[key] = sprite;
+      this.addInnerChild(sprite);
+      return sprite;
+  }
+};
+
 Window_EnemyBook.prototype.removeInnerSprite = function(type) {
   let key = null;
-  if (type === 'character') {
+  if (type === 'element' || type === 'state') {
+    key = "enemyRadarChart_%1".format(type);
+  } else if (type === 'character') {
     key = "enemyBook_%1".format(type);
   } else {
     key = "enemyBook-gauge-%2".format(null, type);
@@ -5056,8 +5262,25 @@ Window_EnemyBook.prototype.removeSprite = function() {
     this.removeInnerSprite('tp');
   }
   this.removeInnerSprite('character');
+  this.removeInnerSprite('element');
+  this.removeInnerSprite('state');
 };
 
+Window_EnemyBook.prototype.enemyElementRadarChart = function(list, enemy, x, y, type) { 
+  const key = "enemyRadarChart_%1".format(type);
+  const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
+  sprite.setupColor(param.ElementRadarChartFramecolor,param.ElementRadarChartLineColor, param.ElementRadarChartMainColor1, param.ElementRadarChartMainColor2);
+  sprite.setup(enemy, type, list, param.ElementRadarChartRadius, param.ElementRadarChartX, param.ElementRadarChartY, param.ElementRadarChart_FontSize);
+  sprite.move(x, y);
+};
+
+Window_EnemyBook.prototype.enemyStateRadarChart = function(list, enemy, x, y, type) { 
+  const key = "enemyRadarChart_%1".format(type);
+  const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
+  sprite.setupColor(param.StateRadarChartFramecolor,param.StateRadarChartLineColor, param.StateRadarChartMainColor1, param.StateRadarChartMainColor2);
+  sprite.setup(enemy, type, list, param.StateRadarChartRadius, param.StateRadarChartX, param.StateRadarChartY, param.StateRadarChart_FontSize);
+  sprite.move(x, y);
+};
 
 Window_EnemyBook.prototype.currencyUnit = function() {
   return TextManager.currencyUnit;

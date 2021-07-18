@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.1.0
+ * @version 2.1.1
  * 
  * @help
  * ステータス画面を拡張します。
@@ -143,6 +143,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/19 Ver.2.1.1
+ * レーダーチャートの座標調整でマイナス側に設定できなかった問題を修正。
  * 2021/7/19 Ver.2.1.0
  * 属性耐性、ステート耐性をレーダーチャートで表示する機能を追加。
  * ページ設定が正常に取得できていなかった問題を修正。
@@ -464,74 +466,7 @@
  * @max 99
  * @parent EXPSetting
  * 
- * @param StatusRadarChart
- * @text ステータスレーダーチャート
- * @default ------------------------------
- * 
- * @param StatusRadarChartParamList
- * @text レーダーチャートの表示するステータスを設定します。
- * @desc ステータス設定
- * @default []
- * @type struct<RadarChartParamList>[]
- * @parent StatusRadarChart
- * 
- * @param StatusRadarChartRadius
- * @desc レーダチャートの半径。
- * @text レーダチャート半径
- * @type number
- * @default 100
- * @parent StatusRadarChart
- * 
- * @param StatusRadarChartFramecolor
- * @desc レーダチャートの枠の色を設定します。
- * @text レーダチャート枠色
- * @type number
- * @default 15
- * @parent StatusRadarChart
- * 
- * @param StatusRadarChartLineColor
- * @desc レーダチャートの線の色を設定します。
- * @text レーダチャート線色
- * @type number
- * @default 15
- * @parent StatusRadarChart
- * 
- * @param StatusRadarChartMainColor1
- * @desc レーダチャートの中心の背景色を設定します。
- * @text レーダチャート中心背景色
- * @type number
- * @default 3
- * @parent StatusRadarChart
- * 
- * @param StatusRadarChartMainColor2
- * @desc レーダチャートの外側背景色を設定します。
- * @text レーダチャート外側背景色
- * @type number
- * @default 3
- * @parent StatusRadarChart
- * 
- * @param StatusRadarChartX
- * @desc レーダチャートのX座標（相対）。
- * @text レーダチャートX座標
- * @type number
- * @default 64
- * @parent StatusRadarChart
- * 
- * @param StatusRadarChartY
- * @desc レーダチャートのY座標（相対）。
- * @text レーダチャートY座標
- * @type number
- * @default 48
- * @parent StatusRadarChart
- * 
- * @param StatusRadarChart_FontSize
- * @desc フォントサイズ。（メインフォントから）
- * @text フォントサイズ
- * @type number
- * @default -12
- * @min -9999
- * @parent StatusRadarChart
- * 
+ *  
  * @param ElementStateSetting
  * @text 表示属性、ステート設定
  * @default ------------------------------
@@ -619,13 +554,15 @@
  * @desc レーダチャートのX座標（相対）。
  * @text レーダチャートX座標
  * @type number
- * @default 64
+ * @min -9999
+ * @default 48
  * @parent ElementRadarChart
  * 
  * @param ElementRadarChartY
  * @desc レーダチャートのY座標（相対）。
  * @text レーダチャートY座標
  * @type number
+ * @min -9999
  * @default 48
  * @parent ElementRadarChart
  * 
@@ -680,13 +617,15 @@
  * @desc レーダチャートのX座標（相対）。
  * @text レーダチャートX座標
  * @type number
- * @default 64
+ * @min -9999
+ * @default 48
  * @parent StateRadarChart
  * 
  * @param StateRadarChartY
  * @desc レーダチャートのY座標（相対）。
  * @text レーダチャートY座標
  * @type number
+ * @min -9999
  * @default 48
  * @parent StateRadarChart
  * 

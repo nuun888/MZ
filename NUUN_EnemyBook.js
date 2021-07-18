@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.7.0
+ * @version 2.7.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -258,6 +258,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/19 Ver.2.7.1
+ * レーダーチャートの座標調整でマイナス側に設定できなかった問題を修正。
  * 2021/7/18 Ver.2.7.0
  * 属性耐性、ステート耐性をレーダーチャートで表示できる機能を追加。(要NUUN_RadarChartBase)
  * 2021/6/26 Ver.2.6.1
@@ -1614,13 +1616,15 @@
  * @desc レーダチャートのX座標（相対）。
  * @text レーダチャートX座標
  * @type number
- * @default 64
+ * @min -9999
+ * @default 48
  * @parent ElementRadarChart
  * 
  * @param ElementRadarChartY
  * @desc レーダチャートのY座標（相対）。
  * @text レーダチャートY座標
  * @type number
+ * @min -9999
  * @default 48
  * @parent ElementRadarChart
  * 
@@ -1715,12 +1719,14 @@
  * @desc レーダチャートのX座標（相対）。
  * @text レーダチャートX座標
  * @type number
- * @default 64
+ * @min -9999
+ * @default 48
  * @parent StateRadarChart
  * 
  * @param StateRadarChartY
  * @desc レーダチャートのY座標（相対）。
  * @text レーダチャートY座標
+ * @min -9999
  * @type number
  * @default 48
  * @parent StateRadarChart

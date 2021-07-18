@@ -12,7 +12,7 @@
  * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
  * @base NUUN_Base
- * @version 1.5.0
+ * @version 1.5.1
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -43,6 +43,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/7/18 Ver.1.5.1
+ * 全カーソル表示時対象設定で設定したタグが取得できていない問題を修正。
+ * スクロールしたときに選択対象になっていないアクターにカーソルが表示されてしまう問題を修正。
  * 2021/7/17 Ver.1.5.0
  * 複数対象カーソル個別表示をメニューにも対応。
  * 2021/7/14 Ver.1.4.1
@@ -184,6 +187,14 @@ Scene_Battle.prototype.resetCursor = function() {
   this._actorWindow.setMultiCursor(false);
 };
 
+const _Window_Selectable_paint = Window_Selectable.prototype.paint;
+Window_Selectable.prototype.paint = function() {
+  _Window_Selectable_paint.call(this);
+  if (this.contents && this._multiCursor) {
+    this.refreshCursorForAll();
+  }
+};
+
 const _Window_Selectable_initialize = Window_Selectable.prototype.initialize;
 Window_Selectable.prototype.initialize = function(rect) {
   this._multiCursor = false;
@@ -232,7 +243,7 @@ Window_MenuActor.prototype.selectForItem = function(item) {
 };
 
 Window_MenuActor.prototype.setCursorNotUserTarget = function(item) {
-  this._userTargetTag = UserSelectTasg.find(tag => item[tag.UserTagName]);
+  this._userTargetTag = UserSelectTasg.find(tag => item.meta[tag.UserTagName]);
   const actor = $gameParty.menuActor();
   this.setUserTargetSubject(actor);
 };

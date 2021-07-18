@@ -6,6 +6,7 @@
 | システム | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
 | 共通処理  | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  | 共通処理を行います。 | 1.2.0 |
+| レーダーチャート表示ベース  | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js)  | | 1.0.0 |
 | ゲージの数値更新アニメーション  | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  | ゲージの数値の増減をアニメーションさせます。 | 1.1.2 |
 
 | 戦闘 | プラグイン | 説明 | Ver |
@@ -18,7 +19,7 @@
 | [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  | 戦闘終了後にリザルト画面を表示します。 立ち絵表示できます。　| 1.12.0 |
 | TP円形ゲージ  | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)  | TPゲージを円形にします。 | 1.0.4 |
 | TPB円形ゲージ  | [NUUN_TpbCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpbCircularGauge.js)  | TPBゲージを円形にします。 | 1.0.2 |
-| 全体、ランダム、敵味方全体攻撃でも対象選択  | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js)  |  | 1.4.1 |
+| 全体、ランダム、敵味方全体攻撃でも対象選択  | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js)  |  | 1.5.1 |
 | パーティゲージシステム  |  |  |  |
 
 | スキル、アイテム | プラグイン | 説明 | Ver |
@@ -61,10 +62,10 @@
 | メニュー | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
 | アイテムのカテゴリーカスタマイズ  | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | アイテムのカテゴリーをカスタマイズ（追加したり減らしたり）できます。 | 1.1.2 |
-| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)  | モンスター図鑑を実装します。 | 2.6.1 |
+| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)  | モンスター図鑑を実装します。 | 2.7.0 |
 | コマンド拡張  | [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  | コマンドにアイコンや色を指定できます。コマンドの文字の表示を左揃え、中央揃え、右揃えから選択できます。 | 1.2.1 |
-| ステータス画面拡張  | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)  | ステータス画面を拡張します。 | 2.0.7 |
-| セーブ画面拡張  | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | セーブ画面を拡張します。 | 1.5.0 |
+| ステータス画面拡張  | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)  | ステータス画面を拡張します。 | 2.1.0 |
+| セーブ画面拡張  | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | セーブ画面を拡張します。 | 1.7.0 |
 | 所持金拡張  | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)  | 所持金の上限を変更したりカンマ区切りにしたりすることが出来ます。 | 1.1.0 |
 | アイテム図鑑  |  |  |  |
 

@@ -20,6 +20,7 @@
 | TP円形ゲージ  | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)  | TPゲージを円形にします。 | 1.0.4 |
 | TPB円形ゲージ  | [NUUN_TpbCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpbCircularGauge.js)  | TPBゲージを円形にします。 | 1.0.2 |
 | 全体、ランダム、敵味方全体攻撃でも対象選択  | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js)  |  | 1.5.1 |
+| ダメージポップアップ画像化  |  | [NUUN_DamagePopUpImg](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpImg.js) | 1.0.0 |
 | パーティゲージシステム  |  |  |  |
 
 | スキル、アイテム | プラグイン | 説明 | Ver |

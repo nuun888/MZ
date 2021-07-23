@@ -8,6 +8,7 @@
 | 共通処理  | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  | 共通処理を行います。 | 1.2.0 |
 | レーダーチャート表示ベース  | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js)  | | 1.0.0 |
 | ゲージの数値更新アニメーション  | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  | ゲージの数値の増減をアニメーションさせます。 | 1.1.2 |
+| ゲージ画像化  |  |  |  |
 
 | 戦闘 | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
@@ -62,6 +63,7 @@
 
 | メニュー | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |
+| メニュー画面拡張  |  |  |  |
 | アイテムのカテゴリーカスタマイズ  | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | アイテムのカテゴリーをカスタマイズ（追加したり減らしたり）できます。 | 1.1.2 |
 | [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)  | モンスター図鑑を実装します。 | 2.7.0 |
 | コマンド拡張  | [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  | コマンドにアイコンや色を指定できます。コマンドの文字の表示を左揃え、中央揃え、右揃えから選択できます。 | 1.2.1 |

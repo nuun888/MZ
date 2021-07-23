@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.5.1
+ * @version 2.5.2
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/7/23 Ver 2.5.2
+ * 可変コマンド時にコマンドが表示されない問題を修正。
  * 2021/7/17 Ver 2.5.1
  * ポップアップ機能個別プラグイン化により処理を削除。
  * 2021/7/14 Ver 2.5.0
@@ -484,6 +486,11 @@ Scene_Battle.prototype.createActorCommandWindow = function() {
   if (param.StyleMode === "XPStyle") {
     this._actorCommandWindow.y = this.actorCommandY();
   }
+  if (param.ActorCommandMode === 0) {
+    this._actorCommandWindow.variable = true;
+  } else if ((param.ActorCommandMode >= 4 && param.ActorCommandMode <= 6)) {
+    this._actorCommandWindow.variable = true;
+  }
   this._actorCommandWindow.SvActorData = (param.ActorCommandMode >= 4 && param.ActorCommandMode <= 6) ? this._spriteset._actorSprites : null;
   if (!param.ActorCommandWindowShow) {
     if (this._actorCommandWindow) {
@@ -673,8 +680,8 @@ Scene_Battle.prototype.actorCommandWidth = function() {
 };
 
 Scene_Battle.prototype.actorCommandHeight = function() {
-  if (param.ActorCommandMode === 0) {
-    return this.windowAreaHeight();
+  if (param.ActorCommandMode >= 0) {
+    return this.calcWindowHeight(param.ActorCommandMaxRow, true);
   } else if (param.ActorCommandMode >= 1) {
     return this.calcWindowHeight(param.ActorCommandMaxRow, true);
   } else {
@@ -1058,6 +1065,12 @@ Window_PartyCommand.prototype.close = function() {
 };
 
 //Window_ActorCommand
+const _Window_ActorCommand_initialize = Window_ActorCommand.prototype.initialize;
+Window_ActorCommand.prototype.initialize = function(rect) {
+  _Window_ActorCommand_initialize.call(this, rect);
+  this.variable = false;
+};
+
 Window_ActorCommand.prototype.selectActor = function(actor) {
   const members = $gameParty.battleMembers();
   return members.indexOf(actor);
@@ -1065,6 +1078,19 @@ Window_ActorCommand.prototype.selectActor = function(actor) {
 
 Window_ActorCommand.prototype.maxCols = function() {
   return (param.StyleMode === "Default" || param.StyleMode === "MVStyle") ? 1 : Math.ceil((this._list ? Math.min(this._list.length, param.ActorCommandMaxCol) : param.ActorCommandMaxCol));
+};
+
+Window_ActorCommand.prototype.setCommandHeight = function() {
+  this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
+};
+
+const _Window_ActorCommand_paint = Window_ActorCommand.prototype.paint;
+Window_ActorCommand.prototype.paint = function() {
+  //可変コマンドなら高さを計算
+  if (this.variable) {
+    this.setCommandHeight();
+  }
+  _Window_ActorCommand_paint.call(this);
 };
 
 const _Window_ActorCommand_refresh = Window_ActorCommand.prototype.refresh;
@@ -1076,7 +1102,7 @@ Window_ActorCommand.prototype.refresh = function() {
     if (actorIndex >= 0 || this._actor) {
       if (param.ActorCommandMode === 0) {
         const rect = this._statusWindow.itemRect(actorIndex);
-        this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
+        //this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
         this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
         this.x = Math.max(-this._statusWindow.UI_Difference + 4, ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + Math.max(param.ActorCommand_X, 0) + this._statusWindow.differenceX);
         this.x = Math.min(this.x, Graphics.boxWidth + this._statusWindow.UI_Difference - this.width - 4);
@@ -1099,7 +1125,6 @@ Window_ActorCommand.prototype.refresh = function() {
       } else if ((param.ActorCommandMode >= 4 && param.ActorCommandMode <= 6)) {
         const rect = this._statusWindow.itemRect(actorIndex);
         const data = this.SvActorData[actorIndex];
-        this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
         this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
         if (param.ActorCommandMode === 4) {
           this.x = data.x - (this.width + data.width + 32) / 2;

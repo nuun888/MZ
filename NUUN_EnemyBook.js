@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.7.1
+ * @version 2.7.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -258,6 +258,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/25 Ver.2.7.2
+ * 登録タイミングに登録なしを追加。
  * 2021/7/19 Ver.2.7.1
  * レーダーチャートの座標調整でマイナス側に設定できなかった問題を修正。
  * 2021/7/18 Ver.2.7.0
@@ -855,6 +857,8 @@
  * @value 2
  * @option 撃破時またはアナライズ時
  * @value 3
+ * @option 登録なし
+ * @value 10
  * @desc 図鑑の登録タイミング
  * @default 0
  * @parent BasicSetting
@@ -871,6 +875,8 @@
  * @value 2
  * @option 撃破時またはアナライズ時
  * @value 3
+ * @option 登録なし
+ * @value 10
  * @default 1
  * @parent BasicSetting
  * 
@@ -5969,12 +5975,20 @@ Window_Selectable.prototype.isOpenAndActive = function() {
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
 Window_PartyCommand.prototype.makeCommandList = function() {
   _Window_PartyCommand_makeCommandList.call(this);
-  if (param.ShowBattleCommand && ($gameSwitches.value(param.enemyBookBattleSwitch) || param.enemyBookBattleSwitch === 0)) {
+  if (this.isEnemyBook()) {
     this.addCommand(param.CommandName, "enemyBook");
   }
-  if (param.ShowEnemyInfoCommand && ($gameSwitches.value(param.enemyBookInfoSwitch) || param.enemyBookInfoSwitch === 0)) {
+  if (this.isEnemyInfo()) {
     this.addCommand(param.EnemyInfoCommandName, "enemyBookInfo");
   }
+};
+
+Window_Command.prototype.isEnemyBook = function() {
+  return param.ShowBattleCommand && ($gameSwitches.value(param.enemyBookBattleSwitch) || param.enemyBookBattleSwitch === 0);
+};
+
+Window_Command.prototype.isEnemyInfo = function() {
+  return param.ShowEnemyInfoCommand && ($gameSwitches.value(param.enemyBookInfoSwitch) || param.enemyBookInfoSwitch === 0);
 };
 
 const _Window_BattleLog_displayMiss =Window_BattleLog.prototype.displayMiss;

@@ -34,6 +34,7 @@
 | アイテム使用回数  | [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js)  | アイテムに使用回数を設定できます。 | 1.0.2 |
 | 盗みスキル  | [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)  | 敵のアイテムやお金を盗んだり盗まれたりするスキルが出来ます。 | 1.2.0 |
 | アイテム最大所持数変更 | [NUUN_MaxItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxItem.js) | アイテムの所持数を個別に設定します。 | 1.1.0 |
+| 条件付きパッシブスキル | [NUUN_PassiveSkill](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js) |  | 1.1.1 |
 
 | ステート | プラグイン | 説明 | Ver |
 | ------------- | ------------- | ------------- | ------------- |

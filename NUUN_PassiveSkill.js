@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * 
  * @help
@@ -51,6 +51,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/29 Ver.1.1.1
+ * 処理の修正。
  * 2021/7/28 Ver.1.1.0
  * ステートに掛かっていない時に反映させる機能を追加。
  * 特定の武器、防具タイプを装備している時のみ反映させる機能を追加。
@@ -148,33 +150,6 @@ Imported.NUUN_PassiveSkill = true;
   const PassiveSkillConditions = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PassiveSkillConditions'])) : null) || [];
   const PassiveSkillType = Number(parameters['PassiveSkillType'] || 0);
 
-  const _Game_Actor_refresh = Game_Actor.prototype.refresh;
-  Game_Actor.prototype.refresh = function() {
-    this.passiveRefresh();
-    _Game_Actor_refresh.call(this);
-  };
-
-  const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
-  Game_Actor.prototype.initMembers = function() {
-    _Game_Actor_initMembers.call(this);
-    this._passiveWeapon = [];
-  };
-
-  const _Game_Actor_setup =Game_Actor.prototype.setup;
-  Game_Actor.prototype.setup = function(actorId) {
-    _Game_Actor_setup.call(this, actorId);
-    this.passiveRefresh();
-    this.recoverAll();
-  };
-
-  Game_Actor.prototype.passiveRefresh = function() {
-    this._passiveWeapon = this.setPassiveSkill();
-  };
-
-  Game_Actor.prototype.getPassiveWeapon = function() {
-    return this._passiveWeapon || [];
-  };
-
   Game_Actor.prototype.getPassiveSkill = function(item) {
     return item.meta.PassiveSkill ? Number(item.meta.PassiveSkill) : 0;
   };
@@ -220,8 +195,6 @@ Imported.NUUN_PassiveSkill = true;
          (list.UpLimit > 0 ? $gameVariables.value(list.VariableId) <= list.UpLimit : true);
       case 'GSwc':
         return $gameSwitches.value(list.SwitchId);
-      case 'Eval':
-        return new Function(String(list.EvalData));
     }
     return false;
   };
@@ -247,14 +220,21 @@ Imported.NUUN_PassiveSkill = true;
     return passiveSkills;
   };
 
-  const _Game_Actor_paramBasePlus = Game_Actor.prototype.paramBasePlus;
-  Game_Actor.prototype.paramBasePlus = function(paramId) {
-    return Math.max(0, _Game_Actor_paramBasePlus.call(this, paramId) + this.paramPassive(paramId));
+  const _Game_Actor_paramPlus = Game_Actor.prototype.paramPlus;
+  Game_Actor.prototype.paramPlus = function(paramId) {
+    let value = _Game_Actor_paramPlus.call(this, paramId);
+    if (this._passiveCalc) {
+      return value;
+    }
+    this._passiveCalc = true;
+    value += this.paramPassive(paramId);
+    this._passiveCalc = false;
+    return value;
   };
 
   Game_Actor.prototype.paramPassive = function(paramId) {
     let value = 0;
-    for (const item of this.getPassiveWeapon()) {
+    for (const item of this.setPassiveSkill()) {
       if (item) {
         value += item.params[paramId];
       }
@@ -265,7 +245,13 @@ Imported.NUUN_PassiveSkill = true;
   const _Game_Actor_traitObjects = Game_Actor.prototype.traitObjects;
   Game_Actor.prototype.traitObjects = function() {
     const objects = _Game_Actor_traitObjects.call(this);
-    return objects.concat(this.getPassiveWeapon());
+    if (this._passiveCalc) {
+      return objects;
+    }
+    this._passiveCalc = true;
+    const passiveObjects = this.setPassiveSkill();
+    this._passiveCalc = false;
+    return objects.concat(passiveObjects);
   };
 
   const _Game_Actor_addedSkillTypes = Game_Actor.prototype.addedSkillTypes;
@@ -275,28 +261,6 @@ Imported.NUUN_PassiveSkill = true;
       return traits.filter(id => id !== PassiveSkillType);
     }
     return traits;
-  };
-
-  const _Game_Variables_onChange = Game_Variables.prototype.onChange;
-  Game_Variables.prototype.onChange = function() {
-    _Game_Variables_onChange.call(this);
-    $gameParty.passiveRefresh();
-  };
-
-  const _Game_SelfSwitches_onChange = Game_SelfSwitches.prototype.onChange;
-  Game_SelfSwitches.prototype.onChange = function() {
-    _Game_SelfSwitches_onChange.call(this);
-    $gameParty.passiveRefresh();
-  };
-
-  Game_Party.prototype.passiveRefresh = function() {
-    this.allMembers().forEach(actor => actor.passiveRefresh());
-  };
-
-  const _BattleManager_setup = BattleManager.setup;
-  BattleManager.setup = function(troopId, canEscape, canLose) {
-    _BattleManager_setup.call(this, troopId, canEscape, canLose);
-    $gameParty.passiveRefresh();
   };
 
 })();

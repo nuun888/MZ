@@ -10,18 +10,21 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * @base NUUN_Base
  * 
  * @help
  * パッシブスキルを実装します。
  * スキルを習得していれば指定した武器のステータスが反映されます。
  * 発動条件は指定することで特定の条件でのみ発動するパッシブスキルを作ることが出来ます。条件はプラグインパラメータで
- * 設定し、そのリストIDを指定することで判定します。条件は複数指定可能です。すべての条件が一致した時にパッシブスキルが反映されます。
+ * 設定し、そのリストIDを指定することで判定します。条件は複数指定可能です。
  * 
  * スキルのメモ欄
  * <PassiveSkill:[id]> [id]:適用する武器ID
  * <PassiveSkill:10> 武器ID10番の武器のステータスが反映されます。
+ * <PassiveMatch:[mode]> 条件判定するモードを指定します。[mode] all:全て　partial:一部一致　無記入の場合は全て一致で判定します。
+ * <PassiveMatch:partial> いずれかの条件が一致したときに反映します。
+ * <PassiveMatch:all> 全ての条件が一致したときに反映します。
  * 
  * <PassiveConditions:[id],[id],....> [id]:発動条件で設定したリスト番号
  * <PassiveConditions:1> 発動条件リストID1番の条件が一致したときに発動します。
@@ -46,11 +49,17 @@
  * 
  * このプラグインはNUUN_Baseが必要です。
  * 
+ * 仕様
+ * 条件比較時の最大HP、MPはパッシブスキルを適用していない最大値から算出されます。
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/31 Ver.1.2.0
+ * 条件一致の判定方法を指定できる機能を追加。
+ * 条件でHP、MPを判定するスキルを習得した場合、戦闘時に処理が重くなる問題を修正。
  * 2021/7/29 Ver.1.1.1
  * 処理の修正。
  * 2021/7/28 Ver.1.1.0
@@ -67,7 +76,7 @@
  * 
  * @param PassiveSkillType
  * @text パッシブスキルタイプID
- * @desc パッシブスキルのスキルタイプID。
+ * @desc パッシブスキルのスキルタイプID。戦闘中のアクターコマンドに表示されなくします。
  * @type number
  * @default 0
  * 
@@ -158,15 +167,22 @@ Imported.NUUN_PassiveSkill = true;
     return item.meta.PassiveConditions ? item.meta.PassiveConditions.split(',') : [];
   };
 
+  Game_Actor.prototype.getPassiveMode = function(item) {
+    return item.meta.PassiveMatch ? item.meta.PassiveMatch : 'all';
+  };
+
   Game_Actor.prototype.isPassiveSkill = function(item) {
     const passive = this.getPassiveSkill(item);
     if (passive > 0) {
       const conditions = this.getPassiveConditions(item);
       const list = PassiveSkillConditions;
-      this.setPassive = true;
-      const every = conditions.every(id => this.skillConditions(list[Number(id.trim()) - 1]));
-      this.setPassive = false;
-      if (every) {
+      let result = null;
+      if (this.getPassiveMode(item).trim() === 'all') {
+        result = conditions.every(id => this.skillConditions(list[Number(id.trim()) - 1]));
+      } else {
+        result = conditions.some(id => this.skillConditions(list[Number(id.trim()) - 1]));
+      }
+      if (result) {
         return passive;
       }
       return 0;
@@ -175,8 +191,12 @@ Imported.NUUN_PassiveSkill = true;
   };
 
   Game_Actor.prototype.skillConditions = function(list) {
+    if (!list) {
+      return true;
+    }
     switch (list.ParamConditions) {
       case 'HP':
+        //console.log(this.name()+" "+this.mhp)
         return this.hp >= this.mhp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.hp <= this.mhp * list.UpLimit / 100) : true);
       case 'MP':
         return this.mp >= this.mmp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.mp <= this.mmp * list.UpLimit / 100) : true);
@@ -220,18 +240,6 @@ Imported.NUUN_PassiveSkill = true;
     return passiveSkills;
   };
 
-  const _Game_Actor_paramPlus = Game_Actor.prototype.paramPlus;
-  Game_Actor.prototype.paramPlus = function(paramId) {
-    let value = _Game_Actor_paramPlus.call(this, paramId);
-    if (this._passiveCalc) {
-      return value;
-    }
-    this._passiveCalc = true;
-    value += this.paramPassive(paramId);
-    this._passiveCalc = false;
-    return value;
-  };
-
   Game_Actor.prototype.paramPassive = function(paramId) {
     let value = 0;
     for (const item of this.setPassiveSkill()) {
@@ -239,6 +247,22 @@ Imported.NUUN_PassiveSkill = true;
         value += item.params[paramId];
       }
     }
+    return value;
+  };
+
+  const _Game_Actor_paramPlus = Game_Actor.prototype.paramPlus;
+  Game_Actor.prototype.paramPlusDirect = function(paramId) {
+    return _Game_Actor_paramPlus.call(this, paramId);
+  };
+
+  Game_Actor.prototype.paramPlus = function(paramId) {
+    let value = this.paramPlusDirect(paramId);
+    if (this._passiveCalc) {
+      return value;
+    }
+    this._passiveCalc = true;
+    value += this.paramPassive(paramId);
+    this._passiveCalc = false;
     return value;
   };
 

@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.12.0
+ * @version 1.12.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,8 +81,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/7/31 Ver.1.12.1
+ * 競合対策
  * 2021/7/10 Ver.1.12.0
  * ウィンドウの処理を変更。（レベルアップ画面では戦闘結果ウィンドウを表示しないように変更しました）
+ * レベルアップ時のアクター毎にウィンドウスキン又は背景画像を指定できる機能を追加。
  * 画像ロードの処理を修正。
  * 左クリックでのページ送りを廃止。
  * 2021/7/4 Ver.1.11.1
@@ -1248,6 +1251,14 @@ Game_Actor.prototype.requestMotionRefresh = function() {
   }
 };
 
+const _Game_Party_performVictory = Game_Party.prototype.performVictory;
+Game_Party.prototype.performVictory = function() {
+  if (!BattleManager._victoryStart) {
+    _Game_Party_performVictory.call(this)
+  }
+};
+
+
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
   _Scene_Battle_createAllWindows.call(this);
@@ -1717,6 +1728,9 @@ Window_ResultActorImg.prototype.refresh = function() {
 };
 
 Window_ResultActorImg.prototype.loadActorImg = function(actor) {
+  //if (Imported.NUUN_ActorPictur) {
+  //  actor.resultActorBitmap = actor.staticGetImg();
+  //} else if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {
   if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {
     const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg[actor.resultImgId];
     actor.resultActorBitmap = loadBitmap;
@@ -1906,7 +1920,7 @@ Window_Result.prototype.refresh = function() {
   const width = Math.floor(contentWidth / param.ActorCols);
   const faceArea = rect.x + this.actorAreaWidth(scale);
   const x2 = rect.x + width;
-  gaugeWidth = width - faceArea - 30;//
+  gaugeWidth = width - faceArea - 30;
   for (let i = 0; this.actorMembers() > i; i++) {
     this._actor = this.actor(i);
     this._actor._learnSkill = [];
@@ -1963,8 +1977,11 @@ Window_Result.prototype.drawGainList = function(x, y, width) {
 };
 
 Window_Result.prototype.loadActorImg = function(actor) {
+  //if (Imported.NUUN_ActorPictur) {
+  //  actor.resultActorBitmap = actor.staticGetImg();
+  //} else 
   if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {
-    const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg[actor.resultImgId];
+    loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg[actor.resultImgId];
     actor.resultActorBitmap = loadBitmap;
   } 
 };
@@ -1974,6 +1991,11 @@ Window_Result.prototype.drawActorImg = function(actor) {
     this._resultActorImgWindow.setActor(actor);
     this._resultActorImgWindow.refresh();
   } else {
+    //if (Imported.NUUN_ActorPictur) {
+    //  if (actor.resultActorBitmap) {
+    //    
+    //  }
+    //}
     if (Imported.NUUN_Base && (actor.resultActorBitmap || actor.resultActorImg.ActorImg)) {
       const loadBitmap = actor.resultActorBitmap ? actor.resultActorBitmap : actor.resultActorImg.ActorImg[actor.resultImgId];
       if (!actor.resultActorBitmap) {
@@ -2074,21 +2096,32 @@ Window_Result.prototype.drawActorLevel = function(x, y, mode) {
       if (BattleManager._levelUpPageEnable) {
         this._actorResultWindow.actorLevelUp.push(actor);
         if (Imported.NUUN_Base) {
-          if (!actor.resultActorImg || !Array.isArray(actor.resultActorImg.ActorImg) || !actor.resultActorBitmap) {//配列仕様前の判定
-            actor.initResultActorImg(actor.actorId());
-          }
-          if (actor.resultActorImg.ActorImg) {
-            if (this._resultActorImgWindow) {
-              this._resultActorImgWindow.loadActorImg(actor);
-            } else {
-              this.loadActorImg(actor);
+          //if (Imported.NUUN_ActorPicture) {
+          //  actor.setButlerImg();
+          // if (actor.getButlerGraphicData()) {
+          //    if (this._resultActorImgWindow) {
+          //      this._resultActorImgWindow.loadActorImg(actor);
+          //    } else {
+          //      this.loadActorImg(actor);
+          //    }
+          //  }
+          //} else {
+            if (!actor.resultActorImg || !Array.isArray(actor.resultActorImg.ActorImg) || !actor.resultActorBitmap) {//配列仕様前の判定
+              actor.initResultActorImg(actor.actorId());
             }
-            if (!actor.resultActorBitmap) {
-              ImageManager.nuun_LoadPictures(actor.resultActorImg.ActorImg[actor.resultImgId]);
-            } else {
-              ImageManager.nuun_LoadPictures(actor.resultActorBitmap);
-            }
-          }
+            if (actor.resultActorImg.ActorImg) {
+              if (this._resultActorImgWindow) {
+                this._resultActorImgWindow.loadActorImg(actor);
+              } else {
+                this.loadActorImg(actor);
+              }
+              if (!actor.resultActorBitmap) {
+                ImageManager.nuun_LoadPictures(actor.resultActorImg.ActorImg[actor.resultImgId]);
+              } else {
+                ImageManager.nuun_LoadPictures(actor.resultActorBitmap);
+              }
+            } 
+          //}
         }
       }
     } else {
@@ -2898,6 +2931,7 @@ BattleManager.initMembers = function() {
   this.onResult = false;
   this._victoryOn = false;
   this._victoryBGMOn = false;
+  this._victoryStart = false;
   this.resultRefresh = 0;
   this.resultBusy = this.setResultBusy();
   this.resultPage = 0;
@@ -2933,6 +2967,7 @@ BattleManager.processVictory = function() {
     this.resultBusy--;
   }
   if (this.resultBusy === 0) {
+    _BattleManager_processVictory.call(this);
     this.displayVictoryOnBusy();
   }
 };
@@ -2943,13 +2978,23 @@ BattleManager.displayVictoryNoBusy = function() {
   this.playVictoryMe();
   this.replayBgmAndBgs();
   this.makeRewards();
+  this._victoryStart = true;
 };
 
 BattleManager.displayVictoryOnBusy = function() {
+  this._victoryStart = false;
+  return;
   this.displayVictoryMessage();
   this.displayRewards();
   this.gainRewards();
   this.endBattle(0);
+};
+
+const _BattleManager_makeRewards = BattleManager.makeRewards;
+BattleManager.makeRewards = function() {
+  if (!this._victoryStart) {
+    _BattleManager_makeRewards.call(this);
+  }
 };
 
 BattleManager.displayVictoryMessage = function() {
@@ -2974,6 +3019,9 @@ BattleManager.isBusy = function() {
 
 const _BattleManager_replayBgmAndBgs = BattleManager.replayBgmAndBgs;
 BattleManager.replayBgmAndBgs = function() {
+  if (this._victoryStart) {
+    return;
+  }
   this._victoryBGMEnable = (this._victoryBGMEnable === undefined || this._victoryBGMEnable === null) ? true : this._victoryBGMEnable;
   if (this._victoryBGMEnable && this._victoryOn) {
     if (this._victoryBgmDate && this._victoryBgmDate.name) {
@@ -3026,6 +3074,9 @@ BattleManager.levelUpSeSelect = function(bgmSe) {
 
 const _BattleManager_playVictoryMe = BattleManager.playVictoryMe;
 BattleManager.playVictoryMe = function() {
+  if (this._victoryStart) {
+    return;
+  }
   if (!this._noVictoryME) {
     _BattleManager_playVictoryMe.call(this);
   }

@@ -93,7 +93,6 @@ Imported.NUUN_ManaShield = true;
     if (newValue > 0) {
       const mpValue = Math.floor(Math.min(newValue * (MPBurdenRate / 100), target.mp))
       this.executeMpDamage(target, mpValue);
-      console.log(ManaShieldSE)
       if(ManaShieldSE) {
         AudioManager.playSe({"name":ManaShieldSE,"volume":volume,"pitch":pitch,"pan":pan});
       }

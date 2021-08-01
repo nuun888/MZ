@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc マナシールド
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * HPダメージの代わりにMPにダメージを受けさせます。
@@ -26,6 +26,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/1 Ver.1.0.1
+ * MPダメージを受けてないのにSEgaなる問題を修正。
+ * MP不足だった時のHPダメージが正常に計算されていなかった問題を修正。
+ * 回復時にも影響していた問題を修正。
  * 2021/8/1 Ver.1.0.0
  * 初版
  * 
@@ -45,28 +49,24 @@
  * @desc キャストタイム（詠唱）キャンセル時のSE
  * @type file
  * @dir audio/se/
- * @parent CancelCastTimeSEDate
  * 
  * @param volume
  * @text 音量
  * @desc 音量。
  * @type number
  * @default 90
- * @parent CancelCastTimeSEDate
  * 
  * @param pitch
  * @text ピッチ
  * @desc ピッチ。
  * @type number
  * @default 100
- * @parent CancelCastTimeSEDate
  * 
  * @param pan
  * @text 位相
  * @desc 位相。
  * @type number
  * @default 50
- * @parent CancelCastTimeSEDate
  * 
  */
 
@@ -88,16 +88,20 @@ Imported.NUUN_ManaShield = true;
   };
 
   Game_Action.prototype.manaShield = function(target, value) {
-    const rate = target.traitsManaShieldPi();console.log(value)
-    let newValue = Math.floor(value * rate);
-    if (newValue > 0) {
-      const mpValue = Math.floor(Math.min(newValue * (MPBurdenRate / 100), target.mp))
-      this.executeMpDamage(target, mpValue);
-      if(ManaShieldSE) {
-        AudioManager.playSe({"name":ManaShieldSE,"volume":volume,"pitch":pitch,"pan":pan});
+    if (value > 0) {
+      const rate = target.traitsManaShieldPi();
+      let newValue = Math.floor(value * rate);
+      if (newValue > 0) {
+        const mpValue = Math.floor(Math.min(newValue * (MPBurdenRate / 100), target.mp))
+        newValue = Math.min(newValue, target.mp);
+        this.executeMpDamage(target, mpValue);
+        if(mpValue > 0 && ManaShieldSE) {
+          AudioManager.playSe({"name":ManaShieldSE,"volume":volume,"pitch":pitch,"pan":pan});
+        }
       }
+      return value - newValue;
     }
-    return value - newValue;
+    return value;
   };
 
   Game_BattlerBase.prototype.traitsManaShieldPi = function() {

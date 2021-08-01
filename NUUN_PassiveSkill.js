@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * 
  * @help
@@ -50,13 +50,16 @@
  * このプラグインはNUUN_Baseが必要です。
  * 
  * 仕様
- * 条件比較時の最大HP、MPはパッシブスキルを適用していない最大値から算出されます。
+ * 条件でHP、MPを判定する場合、最大HP,最大MPは「HP,MPで判定を行うパッシブスキル」以外から算出した数値となります。
+ * HP、MP条件でHP、MPを増減させるパッシブスキルを覚えさせる場合はご注意ください。
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/1 Ver.1.2.1
+ * パッシブスキルの適用条件の仕様を変更。
  * 2021/7/31 Ver.1.2.0
  * 条件一致の判定方法を指定できる機能を追加。
  * 条件でHP、MPを判定するスキルを習得した場合、戦闘時に処理が重くなる問題を修正。
@@ -171,19 +174,36 @@ Imported.NUUN_PassiveSkill = true;
     return item.meta.PassiveMatch ? item.meta.PassiveMatch : 'all';
   };
 
-  Game_Actor.prototype.isPassiveSkill = function(item) {
+  Game_Actor.prototype.isParamConditions = function(data) {
+    return data.ParamConditions === 'HP' || data.ParamConditions === 'MP';
+  };
+
+  Game_Actor.prototype.isPassiveSkill = function(item, mode) {
     const passive = this.getPassiveSkill(item);
+    let result;
     if (passive > 0) {
       const conditions = this.getPassiveConditions(item);
-      const list = PassiveSkillConditions;
-      let result = null;
-      if (this.getPassiveMode(item).trim() === 'all') {
-        result = conditions.every(id => this.skillConditions(list[Number(id.trim()) - 1]));
-      } else {
-        result = conditions.some(id => this.skillConditions(list[Number(id.trim()) - 1]));
-      }
-      if (result) {
-        return passive;
+      if (conditions.length > 0) {
+        const list = PassiveSkillConditions;
+        result = conditions.some(id => this.isParamConditions(list[Number(id.trim()) - 1]));
+        if (mode === 0) {
+          if (result) {
+            return 0;
+          }
+        } else if (mode === 1) {
+          if (!result) {
+            return 0;
+          }
+        }
+        result = null;
+        if (this.getPassiveMode(item).trim() === 'all') {
+          result = conditions.every(id => this.skillConditions(list[Number(id.trim()) - 1]));
+        } else {
+          result = conditions.some(id => this.skillConditions(list[Number(id.trim()) - 1]));
+        }
+        if (result) {
+          return passive;
+        }
       }
       return 0;
     }
@@ -196,7 +216,6 @@ Imported.NUUN_PassiveSkill = true;
     }
     switch (list.ParamConditions) {
       case 'HP':
-        //console.log(this.name()+" "+this.mhp)
         return this.hp >= this.mhp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.hp <= this.mhp * list.UpLimit / 100) : true);
       case 'MP':
         return this.mp >= this.mmp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.mp <= this.mmp * list.UpLimit / 100) : true);
@@ -227,12 +246,12 @@ Imported.NUUN_PassiveSkill = true;
     return this.equips().some(equip => equip && equip.atypeId === type);
   };
 
-  Game_Actor.prototype.setPassiveSkill = function() {
+  Game_Actor.prototype.setPassiveSkill = function(mode) {
     const passiveSkills = [];
     const passiveSkillList = this._skills.filter(item => this.getPassiveSkill($dataSkills[item]));
     passiveSkillList.forEach(itemId => {
       const item = $dataSkills[itemId];
-      const weapon = this.isPassiveSkill(item);
+      const weapon = this.isPassiveSkill(item, mode);
       if (weapon > 0) {
         passiveSkills.push($dataWeapons[weapon]);
       }
@@ -240,9 +259,9 @@ Imported.NUUN_PassiveSkill = true;
     return passiveSkills;
   };
 
-  Game_Actor.prototype.paramPassive = function(paramId) {
+  Game_Actor.prototype.paramPassive = function(paramId, mode) {
     let value = 0;
-    for (const item of this.setPassiveSkill()) {
+    for (const item of this.setPassiveSkill(mode)) {
       if (item) {
         value += item.params[paramId];
       }
@@ -257,25 +276,17 @@ Imported.NUUN_PassiveSkill = true;
 
   Game_Actor.prototype.paramPlus = function(paramId) {
     let value = this.paramPlusDirect(paramId);
-    if (this._passiveCalc) {
-      return value;
-    }
-    this._passiveCalc = true;
-    value += this.paramPassive(paramId);
-    this._passiveCalc = false;
+    value += this.passiveNormal(paramId);
+    value += this.passivePlus(paramId);
     return value;
   };
 
   const _Game_Actor_traitObjects = Game_Actor.prototype.traitObjects;
   Game_Actor.prototype.traitObjects = function() {
-    const objects = _Game_Actor_traitObjects.call(this);
-    if (this._passiveCalc) {
-      return objects;
-    }
-    this._passiveCalc = true;
-    const passiveObjects = this.setPassiveSkill();
-    this._passiveCalc = false;
-    return objects.concat(passiveObjects);
+    let objects = _Game_Actor_traitObjects.call(this);
+    objects = objects.concat(this.passiveTraitsNormal());
+    objects = objects.concat(this.passiveTraitsPlus());
+    return objects;
   };
 
   const _Game_Actor_addedSkillTypes = Game_Actor.prototype.addedSkillTypes;
@@ -285,6 +296,46 @@ Imported.NUUN_PassiveSkill = true;
       return traits.filter(id => id !== PassiveSkillType);
     }
     return traits;
+  };
+
+  Game_Actor.prototype.passiveNormal = function(paramId) {
+    if (this._passiveNormalCalc) {
+      return 0;
+    }
+    this._passiveNormalCalc = true;
+    const value = this.paramPassive(paramId, 0);
+    this._passiveNormalCalc = false;
+    return value;
+  };
+
+  Game_Actor.prototype.passivePlus = function(paramId) {
+    if (this._passiveCalc) {
+      return 0;
+    }
+    this._passiveCalc = true;
+    const value = this.paramPassive(paramId, 1);
+    this._passiveCalc = false;
+    return value;
+  };
+
+  Game_Actor.prototype.passiveTraitsNormal = function() {
+    if (this._passiveNormalCalc) {
+      return [];
+    }
+    this._passiveNormalCalc = true;
+    const object = this.setPassiveSkill(0);
+    this._passiveNormalCalc = false;
+    return object;
+  };
+
+  Game_Actor.prototype.passiveTraitsPlus = function() {
+    if (this._passiveCalc) {
+      return [];
+    }
+    this._passiveCalc = true;
+    const object = this.setPassiveSkill(1);
+    this._passiveCalc = false;
+    return object;
   };
 
 })();

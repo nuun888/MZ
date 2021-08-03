@@ -6,15 +6,15 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/11 Ver 1.0.0
+ * 
  */ 
-/*:ja
+/*:
  * @target MZ
  * @plugindesc エネミーのスタータス上限突破
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
+ * @version 1.0.0
  *            
  * @help
  * データベース上ではエネミーの各ステータス設定には上限がかけられていて、
@@ -37,6 +37,9 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2020/11 Ver 1.0.0
  * 
  */
 var Imported = Imported || {};

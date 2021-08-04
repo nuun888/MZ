@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.1.1
+ * @version 2.2.0
  * 
  * @help
  * ステータス画面を拡張します。
@@ -51,7 +51,7 @@
  * 獲得経験値率
  * 現在の経験値
  * 次のレベルまでの経験値
- * 任意ステータス
+ * 独自パラメータ
  * 名称のみ
  * 属性耐性
  * ステート耐性
@@ -143,6 +143,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/4 Ver.2.2.0
+ * 装備表示機能拡張。
  * 2021/7/19 Ver.2.1.1
  * レーダーチャートの座標調整でマイナス側に設定できなかった問題を修正。
  * 2021/7/19 Ver.2.1.0
@@ -400,7 +402,7 @@
  * @param EquipIcons
  * @type struct<EquipIconsData>[]
  * @text 装備アイコン
- * @desc 装備アイコンを設定します。
+ * @desc 装備アイコンを設定します。IDは装備スロットの番号と同じです。
  * @default []
  * @parent EquipSetting
  * 
@@ -466,7 +468,6 @@
  * @max 99
  * @parent EXPSetting
  * 
- *  
  * @param ElementStateSetting
  * @text 表示属性、ステート設定
  * @default ------------------------------
@@ -885,6 +886,10 @@
  * @value 101
  * @option サイドビューアクター画像
  * @value 102
+ * @option 画像（未実装）
+ * @value 103
+ * @option ステータスレーダーチャート（未実装）
+ * @value 200
  * @option 属性耐性レーダーチャート
  * @value 201
  * @option ステート耐性レーダーチャート
@@ -908,7 +913,7 @@
  * 
  * @param DetaEval
  * @desc 評価式。
- * @text 評価式
+ * @text 評価式(javaScript)
  * @type 
  * @default
  * 
@@ -986,6 +991,24 @@
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
+ * 
+ * @param EquipSetting
+ * @text 装備設定
+ * @default ------------------------------
+ * 
+ * @param EquipStartIndex
+ * @text 開始インデックス
+ * @desc 装備欄の開始インデックスを指定します。
+ * @type number
+ * @default 0
+ * @parent EquipSetting
+ * 
+ * @param EquipNum
+ * @text 表示装備数
+ * @desc 装備欄の表示を指定します。(0で制限なし)
+ * @type number
+ * @default 0
+ * @parent EquipSetting
  * 
  *
  */
@@ -1664,7 +1687,7 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
 Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
   const equips = this._actor.equips();
-  const e1uipsLength = equips.length;
+  const e1uipsLength = list.EquipNum > 0 ? list.EquipNum : equips.length;
   let y2 = y;
   this.changeTextColor(ColorManager.textColor(list.NameColor));
   const text = list.paramName;
@@ -1673,10 +1696,11 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
     y2 += lineHeight;
   }
   for (let i = 0; i < e1uipsLength; i++) {
+    const index = i + (list.EquipStartIndex || 0);
     y = y2 + lineHeight * i;
     let sw = 0;
     let iconWidth = 0;
-    const item = equips[i];
+    const item = equips[index];
     this.drawContentsBackground(list.Back, x, y, width);
     x2 = this.contensX(x);
     width2 = this.contensWidth(width);
@@ -1688,7 +1712,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
       iconWidth = ImageManager.iconWidth + (EquipNameVisible === 2 ? 24 : 4);
     }
     if (EquipNameVisible === 1 || EquipNameVisible === 3) {//デフォルト
-      const slotName = this.actorSlotName(actor, i);
+      const slotName = this.actorSlotName(actor, index);
       sw += this.systemWidth(list.SystemItemWidth, width2);
       this.changeTextColor(ColorManager.textColor(list.NameColor));
       this.drawText(slotName, x2 + iconWidth, y, sw);

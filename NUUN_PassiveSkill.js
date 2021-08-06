@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.2.1
+ * @version 1.3.0
  * @base NUUN_Base
  * 
  * @help
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/6 Ver.1.3.0
+ * 条件にバフ、デバフを追加。
  * 2021/8/1 Ver.1.2.1
  * パッシブスキルの適用条件の仕様を変更。
  * 2021/7/31 Ver.1.2.0
@@ -101,6 +103,14 @@
  * @value 'State'
  * @option ステート除外
  * @value 'StateR'
+ * @option バフ適用
+ * @value 'Buff'
+ * @option バフ除外
+ * @value 'BuffR'
+ * @option デバフ適用
+ * @value 'Debuff'
+ * @option デバフ除外
+ * @value 'DebuffR'
  * @option 装備タイプ
  * @value 'Equip'
  * @option ターン
@@ -139,6 +149,50 @@
  * @text ステートID
  * @desc ステートIDを指定します。指定した状態に掛かっている時に反映します。
  * @type state
+ * @default 0
+ * 
+ * @param BuffType
+ * @text バフ
+ * @desc バフを指定します。
+ * @type select
+ * @option HP上昇
+ * @value 0
+ * @option MP上昇
+ * @value 1
+ * @option 攻撃力上昇
+ * @value 2
+ * @option 防御力上昇
+ * @value 3
+ * @option 魔法力上昇
+ * @value 4
+ * @option 魔法防御上昇
+ * @value 5
+ * @option 敏捷性上昇
+ * @value 6
+ * @option 運上昇
+ * @value 7
+ * @default 0
+ * 
+ * @param DebuffType
+ * @text デバフ
+ * @desc デバフを指定します。
+ * @type select
+ * @option HP低下
+ * @value 0
+ * @option MP低下
+ * @value 1
+ * @option 攻撃力低下
+ * @value 2
+ * @option 防御力低下
+ * @value 3
+ * @option 魔法力低下
+ * @value 4
+ * @option 魔法防御低下
+ * @value 5
+ * @option 敏捷性低下
+ * @value 6
+ * @option 運低下
+ * @value 7
  * @default 0
  * 
  * @param VariableId
@@ -225,6 +279,14 @@ Imported.NUUN_PassiveSkill = true;
         return this._states.find(id => id === list.StateId);
       case 'StateR':
         return !(this._states.some(id => id === list.StateId));
+      case 'Buff':
+        return this._buffs[list.BuffType] > 0;
+      case 'BuffR':
+        return this._buffs[list.BuffType] === 0;
+      case 'Debuff':
+        return this._buffs[list.DebuffType] < 0;
+      case 'DebuffR':
+        return this._buffs[list.DebuffType] === 0;
       case 'Equip':
         return list.EquipWeapon > 0 ? this.isEquippedWeaponType(list.EquipWeapon) : this.isEquippedArmorType(list.EquipWeapon);
       case 'Turn':

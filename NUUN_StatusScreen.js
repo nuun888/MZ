@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.0
+ * @version 2.2.1
  * 
  * @help
  * ステータス画面を拡張します。
@@ -143,6 +143,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/7 Ver.2.2.1
+ * ページ設定を初期設定のままステータス画面を開くとエラーが出る問題を修正。
  * 2021/8/4 Ver.2.2.0
  * 装備表示機能拡張。
  * 2021/7/19 Ver.2.1.1
@@ -284,7 +286,7 @@
  * @desc ページ項目設定
  * @text ページ項目設定
  * @type struct<PageListData>[]
- * @default ["{\"ParamList\":\"1\"}","{\"ParamList\":\"2\"}","{\"ParamList\":\"3\"}"]
+ * @default ["{\"ParamLists\":\"1\"}","{\"ParamLists\":\"2\"}","{\"ParamLists\":\"3\"}"]
  * @parent PageSetting
  * 
  * @param ParamList_1Page

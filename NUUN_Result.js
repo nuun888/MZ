@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.12.1
+ * @version 1.12.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/7 Ver.1.12.2
+ * 控えメンバーを表示する機能を追加。
  * 2021/7/31 Ver.1.12.1
  * 競合対策
  * 2021/7/10 Ver.1.12.0
@@ -453,6 +455,13 @@
  * @option サイドビューアクターを表示
  * @value 3
  * @default 1
+ * @parent GetPage
+ * 
+ * @param ReserveMembers
+ * @type boolean
+ * @default false
+ * @text 控えメンバー表示
+ * @desc 控えメンバー表示。
  * @parent GetPage
  * 
  * @param FaceWidth
@@ -1883,11 +1892,19 @@ Window_Result.prototype.actorContentHeight = function(scale) {
 };
 
 Window_Result.prototype.actor = function(index) {
-  return $gameParty.battleMembers()[index];
+  return this.members()[index];
 };
 
 Window_Result.prototype.actorMembers = function() {
-  return $gameParty.battleMembers().length;
+  return this.members().length;
+};
+
+Window_Result.prototype.members = function() {
+  if (param.ReserveMembers) {
+    return $gameParty.allMembers();
+  } else {
+    return $gameParty.battleMembers();
+  }
 };
 
 Window_Result.prototype.actorAreaWidth = function(scale) {

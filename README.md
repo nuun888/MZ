@@ -23,7 +23,7 @@
 | 全体、ランダム、敵味方全体攻撃でも対象選択  | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js)  |  | 1.5.1 |
 | マナシールド  | [NUUN_ManaShield](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js) |  | 1.0.1 |
 | ダメージポップアップ画像化  | [NUUN_DamagePopUpImg](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpImg.js) |  | 1.0.0 |
-| 複数属性  | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js) |  | 1.0.0 |
+| 複数属性  | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) |  | 1.0.0 |
 | パーティゲージシステム  |  |  |  |
 
 | スキル、アイテム | プラグイン | 説明 | Ver |

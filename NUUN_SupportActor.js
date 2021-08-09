@@ -195,7 +195,7 @@ Imported.NUUN_SupportActor = true;
 
   Scene_Battle.prototype.supportActorWindowRect = function() {
     const ww = Window_Width;
-    const wh = this.calcWindowHeight(1, true);console.log(this.calcWindowHeight(2, false))
+    const wh = this.calcWindowHeight(1, true);
     const wx = Window_X;
     const wy = Window_Y;
     return new Rectangle(wx, wy, ww, wh);

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  *            
  * @help
  * 戦闘でサポートするアクターを設定します。
@@ -25,6 +25,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/9 Ver.1.1.1
+ * セーブ画面拡張でサポートアクターのレベル、サイドビューアクターが表示されなかった問題を修正。
+ * 並び替えでサポートアクターを先頭にすると先頭の歩行グラが変わらない問題を修正。
  * 2021/8/9 Ver.1.1.0
  * サポートアクターがフォロワーに表示されていなかった問題を修正。
  * ターン制時のコマンドの処理を修正。
@@ -71,6 +74,10 @@ Imported.NUUN_SupportActor = true;
     return this.actor().meta.SupportActor;
   };
 
+  Game_Actor.prototype.noResultSupportActor = function() {
+    return this.actor().meta.NoResultSupportActor;
+  };
+
   const _Game_Actor_isBattleMember = Game_Actor.prototype.isBattleMember;
   Game_Actor.prototype.isBattleMember = function() {
     const result = _Game_Actor_isBattleMember.call(this);
@@ -115,7 +122,7 @@ Imported.NUUN_SupportActor = true;
   Game_Party.prototype.battleMembers = function() {
     let members = _Game_Party_battleMembers.call(this);
     members = members.concat(this.addBattleMembers());
-    if (!this.membersMode) {
+    if (!this.membersMode && this.inBattle()) {
       members = this.MainBattleMembers(members);//サポートメンバーを除外
       return members.slice(0,this.maxBattleMembers());
     } else {
@@ -168,20 +175,15 @@ Imported.NUUN_SupportActor = true;
     return _Game_Follower_actor.call(this);
   };
 
-  const _Game_Party_charactersForSavefile = Game_Party.prototype.charactersForSavefile;
-  Game_Party.prototype.charactersForSavefile = function() {
-    if (SaveActorShow) {
+  Game_Party.prototype.resultSupportMembers = function(reserve, support) {
+    if (support) {
       this.membersMode = true;
     }
-    return _Game_Party_charactersForSavefile.call(this);
-  };
-
-  const _Game_Party_facesForSavefile = Game_Party.prototype.facesForSavefile;
-  Game_Party.prototype.facesForSavefile = function() {
-    if (SaveActorShow) {
-      this.membersMode = true;
+    if (reserve) {
+      return this.resultMembers();
+    } else {
+      return this.battleMembers();
     }
-    return _Game_Party_facesForSavefile.call(this);
   };
 
   const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;

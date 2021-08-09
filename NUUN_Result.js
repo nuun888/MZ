@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.12.2
+ * @version 1.12.3
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -81,6 +81,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/9 Ver.1.12.3
+ * サポートアクターを表示するように修正。
  * 2021/8/7 Ver.1.12.2
  * 控えメンバーを表示する機能を追加。
  * 2021/7/31 Ver.1.12.1
@@ -1903,6 +1905,9 @@ Window_Result.prototype.members = function() {
   if (param.ReserveMembers) {
     return $gameParty.allMembers();
   } else {
+    if (Imported.NUUN_SupportActor) {
+      $gameParty.membersMode = true;
+    }
     return $gameParty.battleMembers();
   }
 };

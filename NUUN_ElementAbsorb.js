@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 属性吸収特徴
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 属性を吸収する特徴を設定できます。
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/9 Ver.1.0.1
+ * 吸収する属性にリスト設定していないIDを指定した場合エラーが出る問題を修正。
  * 2021/8/9 Ver.1.0.0
  * 初版
  * 
@@ -107,7 +109,7 @@ Game_BattlerBase.prototype.absorbElementRate = function(elementId) {
   let absorb = false;
   const rate = (this.absorbElementsList().reduce((r, listId) => {
     const data = AbsorbElement[listId - 1];
-    if (data.ElementId === elementId) {
+    if (data && data.ElementId === elementId) {
       absorb = true;
       return r * data.AbsorbValidity / 100
     } else {

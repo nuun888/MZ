@@ -53,12 +53,6 @@
  * @type number
  * @default 128
  * 
- * @param SaveActorShow
- * @text セーブ画面サポートアクター表示
- * @desc セーブ画面にサポートアクターを表示します。
- * @type boolean
- * @default false
- * 
  */
 var Imported = Imported || {};
 Imported.NUUN_SupportActor = true;
@@ -68,7 +62,6 @@ Imported.NUUN_SupportActor = true;
   const Window_X = Number(parameters['Window_X'] || 0);
   const Window_Y = Number(parameters['Window_Y'] || 96);
   const Window_Width = Number(parameters['Window_Width'] || 128);
-  const SaveActorShow = eval(parameters['SaveActorShow'] || 'false');
 
   Game_Actor.prototype.isSupportActor = function() {
     return this.actor().meta.SupportActor;

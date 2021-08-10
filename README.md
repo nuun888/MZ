@@ -47,7 +47,7 @@
 | ファイナルアタック | [NUUN_FinalAttack](https://github.com/nuun888/MZ/blob/master/NUUN_FinalAttack.js) |  | 1.0.1 |
 | マナシールド | [NUUN_ManaShield](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js) |  | 1.0.1 |
 | レベル上限限界突破  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js) |  | 1.1.0 |
-| 加速特徴 | [NUUN_AccelerationFeature]https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js |  | 1.0.1 |
+| 加速特徴 | [NUUN_AccelerationFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js) |  | 1.0.1 |
 |  |  |  |  |
 |  |  |  |  |
 

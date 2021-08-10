@@ -36,6 +36,8 @@
 | 条件付きパッシブスキル | [NUUN_PassiveSkill](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js) |  | 1.2.0 |
 |  |  |  |  |
 |  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
 
 | 能力拡張　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
@@ -44,6 +46,8 @@
 | キャストタイムチャージ率特徴 | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js) |  | 1.0.0 |
 | ファイナルアタック | [NUUN_FinalAttack](https://github.com/nuun888/MZ/blob/master/NUUN_FinalAttack.js) |  | 1.0.1 |
 | マナシールド | [NUUN_ManaShield](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js) |  | 1.0.1 |
+| レベル上限限界突破  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js) |  | 1.1.0 |
+|  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -53,6 +57,11 @@
 | ゲージの数値更新アニメーション | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js) |  | 1.0.0 |
 | スキル、アイテムの色 | [NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js) |  | 1.1.1 |
 | レーダーチャート表示ベース | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) |  | 1.0.0 |
+| 巨大エネミー | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) |  | 1.1.5 |
+| バトラーHPゲージ | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) |  | 1.2.4 |
+| 敵に名前表示 | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) |  | 1.1.4 |
+| 敵にTPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.1.7 |
+|  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
@@ -62,6 +71,13 @@
 | エンカウント条件拡張  | [NUUN_EncounterCondition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js) |  | 1.0.0 |
 | 敵グループの個別ＢＧＭ設定 | [NUUN_BattleBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js) |  | 1.0.1 |
 | 敵グループの個別戦闘勝利敗北ME設定  | [NUUN_BattleME](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleME.js) |  | 1.0.0 |
+| ステート付与の仕様変更  | [NUUN_AddStateDeviation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js) |  | 1.0.0 |
+| エネミー個別座標  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js) |  | 1.1.0 |
+| 敵のドロップアイテム追加  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js) |  | 1.0.0 |
+| 最大レベル変動  | [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js) |  | 1.0.1 |
+| [経験値計算式変更](https://github.com/nuun888/MZ/blob/master/NUUN_EXPFormula.md) | [NUUN_EXPFormula](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js) |  |  | 1.0.0 |
+| アイテムなどのランダム取得  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.2.2 |
+| イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
 
 | メニュー　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
@@ -74,6 +90,14 @@
 | 所持金拡張 | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.0 |
 |  |  |  |  |
 |  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+
+| 競合対策　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
+| ------------- | ------------- | ------------- | ------------- |
+| ゲージ、名前疑似３Dバトル併用パッチ | [NUUN_ButlerGaugeNameIn3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerGaugeNameIn3DBattle.js) |  | 1.0.0 |
+| バトルスタイル拡張疑似３Dバトル併用パッチ | [NUUN_BattleStyleEXInMPP_Pseudo3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEXInMPP_Pseudo3DBattle.js) |  | 1.1.0 |
+
 
 
 | システム | プラグイン | 説明 | Ver |

@@ -12,7 +12,7 @@
 | ---------- | ------------- | ------------- | -------- |
 | バトルスタイル拡張ベース | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) |  | 2.5.2 |
 | バトルスタイル拡張 | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.5.1 |
-|  |  |  |  |
+| [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) |  | 1.12.3 |
 |  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |

@@ -48,6 +48,8 @@
 | マナシールド | [NUUN_ManaShield](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js) |  | 1.0.1 |
 | レベル上限限界突破  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js) |  | 1.1.0 |
 | 加速特徴 | [NUUN_AccelerationFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js) |  | 1.0.1 |
+| エネミーステータスの上限突破 | [NUUN_EnemyParamNoLimit](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js) |  | 1.0.0 |
+|  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 

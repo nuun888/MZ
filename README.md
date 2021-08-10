@@ -93,7 +93,7 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| 競合対策　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
+| 競合対策　　　　　　　　　　　| プラグイン　　　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
 | ゲージ、名前疑似３Dバトル併用パッチ | [NUUN_ButlerGaugeNameIn3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerGaugeNameIn3DBattle.js) |  | 1.0.0 |
 | バトルスタイル拡張疑似３Dバトル併用パッチ | [NUUN_BattleStyleEXInMPP_Pseudo3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEXInMPP_Pseudo3DBattle.js) |  | 1.1.0 |

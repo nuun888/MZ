@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.1
+ * @version 2.2.2
  * 
  * @help
  * ステータス画面を拡張します。
@@ -128,7 +128,7 @@
  * 
  * 独自のパラメータ
  * this._actor 表示中のアクターのゲームデータ
- * actor 表示中のアクターのデータベース
+ * dactor 表示中のアクターのデータベース
  * 
  * キーボード操作
  * QWキー　キャラ切り替え
@@ -143,6 +143,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/11 Ver.2.2.2
+ * パラメータの任意名称が取得できない問題を修正。
+ * アクターのデータベースデータが記載のパラメータで取得出来ていなかった問題を修正。
  * 2021/8/7 Ver.2.2.1
  * ページ設定を初期設定のままステータス画面を開くとエラーが出る問題を修正。
  * 2021/8/4 Ver.2.2.0
@@ -868,7 +871,7 @@
  * @value 40
  * @option 次のレベルまでの経験値
  * @value 41
- * @option 任意ステータス
+ * @option オリジナルパラメータ
  * @value 50
  * @option 名称のみ
  * @value 51
@@ -1549,8 +1552,8 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
 };
 
 Window_Status.prototype.paramNameShow = function(list, actor, params) {
-  if (list.paramName) {
-    return list.paramName
+  if (list.ParamName) {
+    return list.ParamName;
   }
   switch (params) {
     case 1:
@@ -1761,6 +1764,7 @@ Window_Status.prototype.drawName = function(list, x, y, width) {
 };
 
 Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) {
+  const dactor = actor.actor();
   const nameText = list.paramName;
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);

@@ -3,13 +3,22 @@
 
 # 公開プラグイン
 
-| システム　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　　 | Ver 
+| システム　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　　 | Ver |
 | ----------------------------- | ----------------------------- | ----------------------------- | ----------------------------- |
+| 共通処理 | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.2.0 |
 | システム | プラグイン | 説明 | Ver |
-| システム | プラグイン | 説明 | Ver |
-| システム | プラグイン | 説明 | Ver |
+
+| 戦闘　　　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| システム | プラグイン | 説明 | Ver |
+| バトルスタイル拡張ベース | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) |  | Ver2.5.2 |
+| バトルスタイル拡張 | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.5.1 |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
 
 
 | システム | プラグイン | 説明 | Ver |

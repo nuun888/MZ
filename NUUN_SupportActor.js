@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  *            
  * @help
  * 戦闘でサポートするアクターを設定します。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/10 Ver.1.2.0
+ * サイドビューアクターにサポートアクターを表示する機能を追加。
  * 2021/8/9 Ver.1.1.1
  * セーブ画面拡張でサポートアクターのレベル、サイドビューアクターが表示されなかった問題を修正。
  * 並び替えでサポートアクターを先頭にすると先頭の歩行グラが変わらない問題を修正。
@@ -53,6 +55,27 @@
  * @type number
  * @default 128
  * 
+ * @param SupportActorSV
+ * @text 属性ブーストリスト
+ * @desc 属性ブーストリスト。
+ * @default []
+ * @type struct<SupportActorSVList>[]
+ * 
+ */
+/*~struct~SupportActorSVList:
+ * 
+ * @param SupportActorSV_X
+ * @text サポートアクターSV座標X
+ * @desc サポートアクターSV座標X
+ * @type number
+ * @default 0
+ * 
+ * @param SupportActorSV_Y
+ * @text サポートアクターSV座標Y
+ * @desc サポートアクターSV座標Y
+ * @type number
+ * @default 96
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_SupportActor = true;
@@ -62,6 +85,7 @@ Imported.NUUN_SupportActor = true;
   const Window_X = Number(parameters['Window_X'] || 0);
   const Window_Y = Number(parameters['Window_Y'] || 96);
   const Window_Width = Number(parameters['Window_Width'] || 128);
+  const SupportActorSV = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SupportActorSV'])) : null) || [];
 
   Game_Actor.prototype.isSupportActor = function() {
     return this.actor().meta.SupportActor;
@@ -70,6 +94,10 @@ Imported.NUUN_SupportActor = true;
   Game_Actor.prototype.noResultSupportActor = function() {
     return this.actor().meta.NoResultSupportActor;
   };
+
+  Game_Actor.prototype.supportActorindex = function() {
+    return $gameParty.supportBattleMembers().indexOf(this);
+};
 
   const _Game_Actor_isBattleMember = Game_Actor.prototype.isBattleMember;
   Game_Actor.prototype.isBattleMember = function() {
@@ -116,8 +144,12 @@ Imported.NUUN_SupportActor = true;
     let members = _Game_Party_battleMembers.call(this);
     members = members.concat(this.addBattleMembers());
     if (!this.membersMode && this.inBattle()) {
-      members = this.MainBattleMembers(members);//サポートメンバーを除外
-      return members.slice(0,this.maxBattleMembers());
+      members = this.MainBattleMembers(members).slice(0,this.maxBattleMembers());//サポートメンバーを除外
+      if (this.svMembersMode) {
+        this.svMembersMode = false;
+        return members.concat(this.supportBattleMembers());
+      }
+      return members;
     } else {
       this.membersMode = false;
     }
@@ -243,12 +275,59 @@ Imported.NUUN_SupportActor = true;
   Window_SupportActor.prototype.refresh = function() {
     const rect = this.itemLineRect(0);
     this.contents.clear();
-    this.drawText(this._actor.name(), rect.x, rect.y, rect.width);
+    this.drawName(rect.x, rect.y, rect.width);
+    this.drawFace(rect.x, rect.y, rect.width);
+  };
+
+  Window_SupportActor.prototype.drawName = function(x, y, width) {
+    this.drawText(this._actor.name(), x, y, width);
+  };
+
+  Window_SupportActor.prototype.drawFace = function() {
+  
   };
 
   Window_SupportActor.prototype.open = function() {
     this.refresh();
     Window_Selectable.prototype.open.call(this);
+  };
+
+
+  const _Spriteset_Battle_createActors = Spriteset_Battle.prototype.createActors;
+  Spriteset_Battle.prototype.createActors = function() {
+    _Spriteset_Battle_createActors.call(this);
+    const SupportActorSVLength = SupportActorSV.length;
+    if ($gameSystem.isSideView()) {
+      for (let i = 0; i < SupportActorSVLength; i++) {
+        const sprite = new Sprite_Actor();
+        this._actorSprites.push(sprite);
+        this._battleField.addChild(sprite);
+      }
+    }
+  };
+
+  const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
+  Spriteset_Battle.prototype.updateActors = function() {
+    $gameParty.svMembersMode = true;
+    _Spriteset_Battle_updateActors.call(this);
+  };
+
+  const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
+  Sprite_Actor.prototype.setActorHome = function(index) {
+    if (this._actor.isSupportActor()) {
+      index = this._actor.supportActorindex();
+    }
+    _Sprite_Actor_setActorHome.call(this, index);
+  };
+
+  const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
+  Sprite_Actor.prototype.setHome = function(x, y) {
+    if (this._actor.isSupportActor()) {
+      const index = this._actor.supportActorindex();
+      x += SupportActorSV[index].SupportActorSV_X;
+      y += SupportActorSV[index].SupportActorSV_Y;
+    }
+    _Sprite_Actor_setHome.call(this, x, y);
   };
 
 })();

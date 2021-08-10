@@ -77,7 +77,7 @@ const _Game_BattlerBase_paramRate = Game_BattlerBase.prototype.paramRate;
 Game_BattlerBase.prototype.paramRate = function(paramId) {
   const rate = _Game_BattlerBase_paramRate.call(this, paramId);
   if (paramId === 6) {
-    return rate * (this._accelerationbAgi / 100 + 1);
+    return rate * ((this._accelerationbAgi || 0) / 100 + 1);
   }
   return rate;
 };

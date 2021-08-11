@@ -263,7 +263,11 @@ Scene_Battle.prototype.updateSupportActor = function() {
 
 Scene_Battle.prototype.updateSupportActorMove = function() {
   if (!BattleManager.actor() && this._supportActorCommand) {
-    this._supportActorCommand.setMove(0, -5);
+    if (this._commandStartActor) {
+      this._supportActorCommand.setMove(0, -5);
+    } else {
+      this.supportActorHide();
+    }
     this._supportActorCommand = null;
   }
 };
@@ -298,7 +302,8 @@ Scene_Battle.prototype.startActorCommandSelection = function() {
   _Scene_Battle_startActorCommandSelection.call(this);
   const supportActorSprite = this._supportActorWindowEX.find(sprite => sprite._actor.actorId() === BattleManager.actor().actorId());
     if (supportActorSprite) {
-      supportActorSprite.setMove(30, 5);
+      const speed = this._commandStartActor ? 5 : 20;
+      supportActorSprite.setMove(30, speed);
       this._supportActorCommand = supportActorSprite;
     }
 };

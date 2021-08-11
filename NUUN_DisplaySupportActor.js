@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクター表示（サポートアクター拡張）
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
  * @base NUUN_SupportActor
  * 
  * @help
@@ -21,6 +21,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/12 Ver.1.1.0
+ * ウィンドウの表示の仕様を変更。
+ * 右側表示に対応。
  * 2021/8/11 Ver.1.0.0
  * 初版
  * 
@@ -54,6 +57,12 @@
  * @type string
  * @default Supporter
  * 
+ * @param RightDisplay
+ * @text 右側表示
+ * @desc 右側表示
+ * @type boolean
+ * @default false
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_DisplaySupportActor = true;
@@ -65,6 +74,7 @@ const Window_Y = Number(parameters['Window_Y'] || 96);
 const Window_Width = Number(parameters['Window_Width'] || 128);
 const Window_Margin = Number(parameters['Window_Margin'] || 24);
 const SupporterName = String(parameters['SupporterName']);
+const RightDisplay = eval(parameters['RightDisplay'], 'false');
 
 
 const _Game_Temp_requestBattleRefresh = Game_Temp.prototype.requestBattleRefresh;
@@ -135,8 +145,9 @@ Window_SupportActorEX.prototype.updateMove = function() {
 };
 
 Window_SupportActorEX.prototype.setMove = function(x, speed) {
-  this._move_x = x;
-  this._speed = speed || 1;
+  const a = (RightDisplay ? -1 : 1);
+  this._move_x = x * a;
+  this._speed = (speed || 1) * a;
   this._moveOn = true;
 };
 
@@ -150,7 +161,9 @@ Window_SupportActorEX.prototype.refresh = function() {
 
 Window_SupportActorEX.prototype.drawName = function(x, y, width) {
   this.contents.fontSize += -4;
-  this.drawText(this._actor.name(), x + 36, y + 6, width - 32);
+  const a = RightDisplay ? 0 : 72;
+  const align = RightDisplay ? 'right' : 'left';
+  this.drawText(this._actor.name(), x + a, y + 6, width - 72, align);
   this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
@@ -159,14 +172,16 @@ Window_SupportActorEX.prototype.drawSupporterName = function(x, y, width) {
     this.contents.fontSize += -12;
     this.changeTextColor(ColorManager.textColor(5));
     this.contents.outlineColor = 'rgba(64, 32, 128, 0.6)';
-    this.drawText(SupporterName, x + 36, y - 14, width - 32);
+    const a = RightDisplay ? 0 : 72;
+    const align = RightDisplay ? 'right' : 'left';
+    this.drawText(SupporterName, x + a, y - 14, width - 72, align);
     this.resetTextColor();
     this.contents.fontSize = $gameSystem.mainFontSize();
   }
 };
 
 Window_SupportActorEX.prototype.drawActorCharacter = function(x, y, width) {
-  x += 12;
+  x += RightDisplay ? this.itemWidth() - 62 : 48;
   y += 46;
   const bitmap = ImageManager.loadCharacter(this._actor.characterName());
   if (!bitmap.isReady()) {
@@ -210,9 +225,9 @@ Scene_Battle.prototype.createSupportActorWindow = function() {
 };
 
 Scene_Battle.prototype.supportActorWindowRect = function(index) {
-  const ww = Window_Width;
+  const ww = Window_Width + 40;
   const wh = this.calcWindowHeight(1, true);
-  const wx = Window_X;
+  const wx = Window_X + (RightDisplay ? Graphics.width - Window_Width : -40);
   const wy = Window_Y + (wh + Window_Margin) * index;
   return new Rectangle(wx, wy, ww, wh);
 };

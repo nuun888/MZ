@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクター表示（サポートアクター拡張）
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  * @base NUUN_SupportActor
  * 
  * @help
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/12 Ver.1.2.0
+ * サポートアクターウィンドウを非表示にする機能を追加。
  * 2021/8/12 Ver.1.1.0
  * ウィンドウの表示の仕様を変更。
  * 右側表示に対応。
@@ -63,6 +65,12 @@
  * @type boolean
  * @default false
  * 
+ * @param SupportShowName
+ * @text サポートアクターウィンドウ間余白幅
+ * @desc サポートアクターウィンドウ間の余白幅
+ * @type string
+ * @default サポートアクター表示
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_DisplaySupportActor = true;
@@ -74,6 +82,7 @@ const Window_Y = Number(parameters['Window_Y'] || 96);
 const Window_Width = Number(parameters['Window_Width'] || 128);
 const Window_Margin = Number(parameters['Window_Margin'] || 24);
 const SupporterName = String(parameters['SupporterName']);
+const SupportShowName = String(parameters['SupportShowName'] || "サポートアクター表示");
 const RightDisplay = eval(parameters['RightDisplay'], 'false');
 
 
@@ -195,6 +204,7 @@ const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
 Scene_Battle.prototype.initialize = function() {
   _Scene_Battle_initialize.call(this);
   this._supportActorWindowEX = [];
+  this._commandStartActor = true;
 };
 
 const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
@@ -262,6 +272,27 @@ Scene_Battle.prototype.updateSupportActorButton = function() {
 
 };
 
+Scene_Battle.prototype.supportActorShow = function() {
+  this._supportActorWindowEX.find(sprite => {
+    if (sprite.visible && sprite._actor) {
+      const a = RightDisplay ? -1 : 1;
+      const move = (this._supportActorCommand && (this._supportActorCommand._actor.actorId() === sprite._actor.actorId())) ? 30 * a : 0;
+      sprite.setMove(move, 20 * a);
+      this._commandStartActor = true;
+    }
+  });
+};
+
+Scene_Battle.prototype.supportActorHide = function() {
+  this._supportActorWindowEX.find(sprite => {
+    if (sprite.visible && sprite._actor) {
+      const a = RightDisplay ? 1 : -1;
+      sprite.setMove(Window_Width * a, 20 * a);
+      this._commandStartActor = false;
+    }
+  });
+};
+
 const _Scene_Battle_startActorCommandSelection = Scene_Battle.prototype.startActorCommandSelection;
 Scene_Battle.prototype.startActorCommandSelection = function() {
   _Scene_Battle_startActorCommandSelection.call(this);
@@ -270,6 +301,28 @@ Scene_Battle.prototype.startActorCommandSelection = function() {
       supportActorSprite.setMove(30, 5);
       this._supportActorCommand = supportActorSprite;
     }
+};
+
+Scene_Battle.prototype.commandStartActor = function() {
+  if (this._commandStartActor) {
+    this.supportActorHide();
+    this._partyCommandWindow.activate();
+  } else {
+    this.supportActorShow();
+    this._partyCommandWindow.activate();
+  }
+};
+
+const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
+Scene_Battle.prototype.createPartyCommandWindow = function() {
+  _Scene_Battle_createPartyCommandWindow.call(this);
+  this._partyCommandWindow.setHandler("startActor", this.commandStartActor.bind(this));
+};
+
+const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
+Window_PartyCommand.prototype.makeCommandList = function() {
+  _Window_PartyCommand_makeCommandList.call(this);
+  this.addCommand(SupportShowName, "startActor");
 };
 
 })();

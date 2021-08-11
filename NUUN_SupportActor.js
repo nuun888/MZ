@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  *            
  * @help
  * 戦闘でサポートするアクターを設定します。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/11 Ver.1.2.2
+ * サイドビューに表示するサポートアクターの最大数を超えてサポートアクターがメンバーに追加されるとエラーが出る問題を修正。
  * 2021/8/11 Ver.1.2.1
  * 一部のプラグインパラメータの説明が別の説明になっていた問題を修正。
  * 2021/8/10 Ver.1.2.0
@@ -239,7 +241,7 @@ Imported.NUUN_SupportActor = true;
   Scene_Battle.prototype.startActorCommandSelection = function() {
     _Scene_Battle_startActorCommandSelection.call(this);
     const supportActor = $gameParty.supportBattleMembers().find(actor => actor.actorId() === BattleManager.actor().actorId());
-    if (supportActor) {
+    if (supportActor && this._supportActorWindow) {
       this._supportActorWindow.setActor(supportActor);
       this._supportActorWindow.show();
       this._supportActorWindow.open();
@@ -249,7 +251,9 @@ Imported.NUUN_SupportActor = true;
   const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWindows;
   Scene_Battle.prototype.hideSubInputWindows = function() {
     _Scene_Battle_hideSubInputWindows.call(this);
-    this._supportActorWindow.close();
+    if (this._supportActorWindow) {
+      this._supportActorWindow.close();
+    }
   };
 
 
@@ -286,7 +290,7 @@ Imported.NUUN_SupportActor = true;
   };
 
   Window_SupportActor.prototype.drawFace = function() {
-  
+
   };
 
   Window_SupportActor.prototype.open = function() {
@@ -326,6 +330,10 @@ Imported.NUUN_SupportActor = true;
   Sprite_Actor.prototype.setHome = function(x, y) {
     if (this._actor.isSupportActor()) {
       const index = this._actor.supportActorindex();
+      if (!SupportActorSV[index]) {
+        console.log("ERROR:サポートアクターを表示できません。");
+        return;
+      }
       x += SupportActorSV[index].SupportActorSV_X;
       y += SupportActorSV[index].SupportActorSV_Y;
     }

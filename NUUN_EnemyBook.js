@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.7.2
+ * @version 2.7.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -236,12 +236,12 @@
  * アイテム盗み済み判定         指定のアイテムが盗み済みか判定します。
  * 敵の使用スキル確認済み　　　　敵の使用スキルを確認済みにします。0で全て確認済みにします。
  * 敵の使用スキル未確認　　　　　敵の使用スキルを未確認にします。0で全て未確認にします。
- * 敵の属性耐性弱点確認済み　　　敵の属性耐性弱点を確認済みにします。0で全て確認済みにします。
- * 敵の属性耐性弱点未確認　　　　敵の属性耐性弱点を未確認にします。0で全て未確認にします。
- * 敵のステート耐性弱点確認済み　敵のステート耐性弱点を確認済みにします。0で全て確認済みにします。
- * 敵のステート耐性弱点未確認　　敵のステート耐性弱点を未確認にします。0で全て未確認にします。
- * 敵のデバフ耐性弱点確認済み　　敵のデバフ耐性弱点を確認済みにします。0で全て確認済みにします。
- * 敵のデバフ耐性弱点未確認　　　敵のデバフ耐性弱点を未確認にします。0で全て未確認にします。
+ * 敵の属性耐性弱点確認済み　　　敵の属性耐性弱点を確認済みにします。0で全て確認済みにします。(要NUUN_EnemyBookEX_1)
+ * 敵の属性耐性弱点未確認　　　　敵の属性耐性弱点を未確認にします。0で全て未確認にします。(要NUUN_EnemyBookEX_1)
+ * 敵のステート耐性弱点確認済み　敵のステート耐性弱点を確認済みにします。0で全て確認済みにします。(要NUUN_EnemyBookEX_1)
+ * 敵のステート耐性弱点未確認　　敵のステート耐性弱点を未確認にします。0で全て未確認にします。(要NUUN_EnemyBookEX_1)
+ * 敵のデバフ耐性弱点確認済み　　敵のデバフ耐性弱点を確認済みにします。0で全て確認済みにします。(要NUUN_EnemyBookEX_1)
+ * 敵のデバフ耐性弱点未確認　　　敵のデバフ耐性弱点を未確認にします。0で全て未確認にします。(要NUUN_EnemyBookEX_1)
  * 
  * オリジナルパラメータ参照変数
  * this._enemy　データベースのモンスターデータを取得します。
@@ -258,6 +258,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/13 Ver.2.7.3
+ * アイテム百分率化プラグインに対応。
+ * 受けた属性、ステート、デバフ表示機能を別プラグイン化。
  * 2021/7/25 Ver.2.7.2
  * 登録タイミングに登録なしを追加。
  * 2021/7/19 Ver.2.7.1
@@ -690,7 +693,7 @@
  * @desc 行動パターンID（一番上が１番）（0ですべて）
  * 
  * @command EnemyBookElementAdd
- * @desc モンスターの未確認の属性耐性弱点情報を確認済みにします。
+ * @desc モンスターの未確認の属性耐性弱点情報を確認済みにします。(要NUUN_EnemyBookEX_1)
  * @text 未確認属性耐性弱点情報確認済み
  * 
  * @arg enemyId
@@ -705,7 +708,7 @@
  * @desc 属性ID（データベースのタイプタグの属性）（0ですべて）
  * 
  * @command EnemyBookElementRemove
- * @desc モンスターの確認済みの属性耐性弱点情報を未確認にします。
+ * @desc モンスターの確認済みの属性耐性弱点情報を未確認にします。(要NUUN_EnemyBookEX_1)
  * @text 確認済み属性耐性弱点情報未確認
  * 
  * @arg enemyId
@@ -720,7 +723,7 @@
  * @desc 属性ID（データベースのタイプタグの属性）（0ですべて）
  * 
  * @command EnemyBookStateAdd
- * @desc モンスターの未確認のステート耐性弱点情報を確認済みにします。
+ * @desc モンスターの未確認のステート耐性弱点情報を確認済みにします。(要NUUN_EnemyBookEX_1)
  * @text 未確認ステート耐性弱点情報確認済み
  * 
  * @arg enemyId
@@ -735,7 +738,7 @@
  * @desc ステートID（データベースのタイプタグの属性）（0ですべて）
  * 
  * @command EnemyBookStateRemove
- * @desc モンスターの確認済みのステート耐性弱点情報を未確認にします。
+ * @desc モンスターの確認済みのステート耐性弱点情報を未確認にします。(要NUUN_EnemyBookEX_1)
  * @text 確認済みステート耐性弱点情報未確認
  * 
  * @arg enemyId
@@ -750,7 +753,7 @@
  * @desc ステートID（データベースのタイプタグの属性）（0（なし）ですべて）
  * 
  * @command EnemyBookDebuffAdd
- * @desc モンスターの未確認のデバフ耐性弱点情報を確認済みにします。
+ * @desc モンスターの未確認のデバフ耐性弱点情報を確認済みにします。(要NUUN_EnemyBookEX_1)
  * @text 未確認デバフ耐性弱点情報確認済み
  * 
  * @arg enemyId
@@ -783,7 +786,7 @@
  * @default -1
  * 
  * @command EnemyBookDebuffRemove
- * @desc モンスターの確認済みのデバフ耐性弱点情報を未確認にします。
+ * @desc モンスターの確認済みのデバフ耐性弱点情報を未確認にします。(要NUUN_EnemyBookEX_1)
  * @text 確認済みデバフ耐性弱点情報未確認
  * 
  * @arg enemyId
@@ -1526,7 +1529,7 @@
  * 
  * @param ShowActionName
  * @desc 未確認の使用スキルを隠す。(ステータス情報登録をしてもスティールアイテム使用スキルを確認するまでは表示されません)
- * @text 未確認使用スキル表示
+ * @text 未確認使用スキル表示(要NUUN_EnemyBookEX_1)
  * @type boolean
  * @default false
  * @parent ActionData
@@ -1655,7 +1658,7 @@
  * 
  * @param ShowStateIcon
  * @desc 耐性弱点未確認のステートを隠す。(ステータス情報登録をしてもステート耐性弱点を確認するまでは表示されません)
- * @text 未確認ステートを隠す
+ * @text 未確認ステートを隠す(要NUUN_EnemyBookEX_1)
  * @type boolean
  * @default false
  * @parent ResistWeakStateData
@@ -1765,7 +1768,7 @@
  * 
  * @param ShowDebuffIcon
  * @desc 耐性弱点未確認のステートデバフを隠す。(ステータス情報登録をしてもデバフ耐性弱点を確認するまでは表示されません)
- * @text 未確認デバフを隠す
+ * @text 未確認デバフを隠す(要NUUN_EnemyBookEX_1)
  * @type boolean
  * @default false
  * @parent ResistWeakDebuffData
@@ -2416,26 +2419,44 @@ PluginManager.registerCommand(pluginName, 'EnemyBookActionRemove', args => {
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookElementAdd', args => {
+  if (!Imported.NUUN_EnemyBookEX_1) {
+    return;
+  }
   $gameSystem.enemyBookElementList(Number(args.enemyId), Number(args.elementId) - 1, Number(args.elementId) > 0, true);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookElementRemove', args => {
+  if (!Imported.NUUN_EnemyBookEX_1) {
+    return;
+  }
   $gameSystem.enemyBookElementList(Number(args.enemyId), Number(args.elementId) - 1, Number(args.elementId) > 0, false);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookStateAdd', args => {
+  if (!Imported.NUUN_EnemyBookEX_1) {
+    return;
+  }
   $gameSystem.enemyBookStateList(Number(args.enemyId), Number(args.stateId) - 1, Number(args.stateId) > 0, true);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookStateRemove', args => {
+  if (!Imported.NUUN_EnemyBookEX_1) {
+    return;
+  }
   $gameSystem.enemyBookStateList(Number(args.enemyId), Number(args.stateId) - 1, Number(args.stateId) > 0, false);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookDebuffAdd', args => {
+  if (!Imported.NUUN_EnemyBookEX_1) {
+    return;
+  }
   $gameSystem.enemyBookDebuffList(Number(args.enemyId), Number(args.debuffId) - 1, Number(args.debuffId) > 0, true);
 });
 
 PluginManager.registerCommand(pluginName, 'EnemyBookDebuffRemove', args => {
+  if (!Imported.NUUN_EnemyBookEX_1) {
+    return;
+  }
   $gameSystem.enemyBookDebuffList(Number(args.enemyId), Number(args.debuffId) - 1, Number(args.debuffId) > 0, false);
 });
 
@@ -2533,9 +2554,11 @@ Game_System.prototype.removeFromEnemyBook = function(enemyId) {
     this.dropItemListFlag(enemyId, 0, false, false);
     this.stealItemListFlag(enemyId, 0, false, false);
     this.enemyBookActionList(enemyId, 0, false, false);
-    this.enemyBookElementList(enemyId, 0, false, false);
-    this.enemyBookStateList(enemyId, 0, false, false);
-    this.enemyBookDebuffList(enemyId, 0, false, false);
+    if (Imported.NUUN_EnemyBookEX_1) {
+      this.enemyBookElementList(enemyId, 0, false, false);
+      this.enemyBookStateList(enemyId, 0, false, false);
+      this.enemyBookDebuffList(enemyId, 0, false, false);
+    }
     if (!this._defeatNumber) {
       this.clearDefeat();
     }
@@ -2558,9 +2581,11 @@ Game_System.prototype.clearEnemyBook = function() {
   this.clearDropItem();
   this.clearStealItem();
   this.clearEnemyBookAction();
-  this.clearEnemyBookElement();
-  this.clearEnemyBookState();
-  this.clearEnemyBookDebuff();
+  if (Imported.NUUN_EnemyBookEX_1) {
+    this.clearEnemyBookElement();
+    this.clearEnemyBookState();
+    this.clearEnemyBookDebuff();
+  }
 };
 
 Game_System.prototype.completeEnemyBook = function() {
@@ -2571,9 +2596,11 @@ Game_System.prototype.completeEnemyBook = function() {
     this.dropItemListFlag(i, 0, true, false);
     this.stealItemListFlag(i, 0, true, false);
     this.enemyBookActionList(i, 0, false, true);
-    this.enemyBookElementList(i, 0, false, true);
-    this.enemyBookStateList(i, 0, false, true);
-    this.enemyBookDebuffList(i, 0, false, true);
+    if (Imported.NUUN_EnemyBookEX_1) {
+      this.enemyBookElementList(i, 0, false, true);
+      this.enemyBookStateList(i, 0, false, true);
+      this.enemyBookDebuffList(i, 0, false, true);
+    }
   }
 };
 
@@ -3124,50 +3151,6 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
       BattleManager.analyzeTarget = target;
       SceneManager._scene.enemyBookEnemyAnalyze(this._analyzeDate);
     }
-  }
-};
-
-const _Game_Action_calcElementRate = Game_Action.prototype.calcElementRate;
-Game_Action.prototype.calcElementRate = function(target) {
-  if (target.isEnemy()) {  
-    if (this.item().damage.elementId < 0) {
-      this.enemyBookAttackElementDate(target, this.subject().attackElements());
-    } else {
-      $gameSystem.setEnemyBookElementFlag(target.enemyId(), this.item().damage.elementId, true);
-    }
-  }
-  return _Game_Action_calcElementRate.call(this, target);
-};
-
-Game_Action.prototype.enemyBookAttackElementDate = function(target, element) {
-  for (const elementId of element) {
-    $gameSystem.setEnemyBookElementFlag(target.enemyId(), elementId, true);
-  }
-};
-
-const _Game_Action_itemEffectAddState = Game_Action.prototype.itemEffectAddState;
-Game_Action.prototype.itemEffectAddState = function(target, effect) {
-  _Game_Action_itemEffectAddState.call(this, target, effect);
-  if (target.isEnemy()) {
-    if (effect.dataId === 0) {
-      this.enemyBookAttackStateDate(target);
-    } else {
-      $gameSystem.setEnemyBookStateFlag(target.enemyId(), effect.dataId, true);
-    }
-  }
-};
-
-Game_Action.prototype.enemyBookAttackStateDate = function(target) {
-  for (const stateId of this.subject().attackStates()) {
-    $gameSystem.setEnemyBookStateFlag(target.enemyId(), stateId, true);
-  }
-};
-
-const _Game_Action_itemEffectAddDebuff = Game_Action.prototype.itemEffectAddDebuff;
-Game_Action.prototype.itemEffectAddDebuff = function(target, effect) {
-  _Game_Action_itemEffectAddDebuff.call(this, target, effect);
-  if (target.isEnemy()) {
-    $gameSystem.setEnemyBookDebuffFlag(target.enemyId(), effect.dataId, true);
   }
 };
 
@@ -4022,15 +4005,15 @@ Window_EnemyBook.prototype.actionFlag = function(index) {
 };
 
 Window_EnemyBook.prototype.onElementsFlag = function(index) {
-  return param.ShowElementsIcon ? $gameSystem.getEnemyBookElementFlag(this._enemy.id, index) : true;
+  return Imported.NUUN_EnemyBookEX_1 && param.ShowElementsIcon ? $gameSystem.getEnemyBookElementFlag(this._enemy.id, index) : true;
 };
 
 Window_EnemyBook.prototype.onStateFlag = function(index) {
-  return param.ShowStateIcon ? $gameSystem.getEnemyBookStateFlag(this._enemy.id, index) : true;
+  return Imported.NUUN_EnemyBookEX_1 && param.ShowStateIcon ? $gameSystem.getEnemyBookStateFlag(this._enemy.id, index) : true;
 };
 
 Window_EnemyBook.prototype.onDebuffFlag = function(index) {
-  return param.ShowDebuffIcon ? $gameSystem.getEnemyBookDebuffFlag(this._enemy.id, index) : true;
+  return Imported.NUUN_EnemyBookEX_1 && param.ShowDebuffIcon ? $gameSystem.getEnemyBookDebuffFlag(this._enemy.id, index) : true;
 };
 
 Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
@@ -4963,10 +4946,11 @@ Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
       let item = enemy.itemObject(dropList[i].kind, dropList[i].dataId);
       if((this.showDropItemMask(list.MaskMode, enemy) && this.dropItemFlag(i))) {
         let rate = dropList[i].denominator;
-        let textWidth = this.textWidth("1/" + rate);
+        const text = Imported.NUUN_DropRatePercentage ? rate / 10 +" %": "1/" + rate;
+        let textWidth = this.textWidth(text);
         this.drawItemName(item, x3, y2, width2 - textWidth - this.itemPadding());
         if (param.DropItemProbabilityShow && !item.meta.NoDropProbability) {
-          this.drawEnemyBookNumber("1/" + rate, x3, y2, width2);
+          this.drawEnemyBookNumber(text, x3, y2, width2);
         }
         dropIndex++;
       } else {

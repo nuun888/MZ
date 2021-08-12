@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクター表示（サポートアクター拡張）
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
  * @base NUUN_SupportActor
  * 
  * @help
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/13 Ver.1.3.0
+ * サポートアクターウィンドウの初期表示を指定できる機能を追加。
  * 2021/8/12 Ver.1.2.0
  * サポートアクターウィンドウを非表示にする機能を追加。
  * 2021/8/12 Ver.1.1.0
@@ -29,47 +31,76 @@
  * 2021/8/11 Ver.1.0.0
  * 初版
  * 
+ * @param WindowSetting
+ * @text ウィンドウ設定
+ * @default ------------------------------
+ * 
  * @param Window_X
  * @text 基本サポートアクターウィンドウX
  * @desc 基準となるサポートアクターウィンドウX座標
  * @type number
  * @default 0
+ * @parent WindowSetting
  * 
  * @param Window_Y
  * @text 基本サポートアクターウィンドウY
  * @desc 基準となるサポートアクターウィンドウY座標
  * @type number
  * @default 96
+ * @parent WindowSetting
  * 
  * @param Window_Width
  * @text サポートアクターウィンドウ横幅
  * @desc サポートアクターウィンドウ横幅
  * @type number
  * @default 128
+ * @parent WindowSetting
  * 
  * @param Window_Margin
  * @text サポートアクターウィンドウ間余白幅
  * @desc サポートアクターウィンドウ間の余白幅
  * @type number
  * @default 24
+ * @parent WindowSetting
  * 
  * @param SupporterName
  * @text サポートアクターウィンドウ間余白幅
  * @desc サポートアクターウィンドウ間の余白幅
  * @type string
  * @default Supporter
+ * @parent WindowSetting
+ * 
+ * @param InitSupport
+ * @text サポートアクターウィンドウ初期表示状態
+ * @desc サポートアクターウィンドウ初期表示状態を指定します。ONで表示します。
+ * @type boolean
+ * @default true
+ * @parent WindowSetting
  * 
  * @param RightDisplay
  * @text 右側表示
  * @desc 右側表示
  * @type boolean
  * @default false
+ * @parent WindowSetting
+ * 
+ * @param CommandSetting
+ * @text コマンド設定
+ * @default ------------------------------
+ * 
+ * @param CommandShow
+ * @text コマンド表示
+ * @desc サポートアクター表示コマンドをパーティコマンドに表示させます。
+ * @type boolean
+ * @default true
+ * @parent CommandSetting
  * 
  * @param SupportShowName
- * @text サポートアクターウィンドウ間余白幅
- * @desc サポートアクターウィンドウ間の余白幅
+ * @text サポートアクター表示コマンド名
+ * @desc サポートアクター表示コマンド名
  * @type string
  * @default サポートアクター表示
+ * @parent CommandSetting
  * 
  */
 var Imported = Imported || {};
@@ -83,8 +114,9 @@ const Window_Width = Number(parameters['Window_Width'] || 128);
 const Window_Margin = Number(parameters['Window_Margin'] || 24);
 const SupporterName = String(parameters['SupporterName']);
 const SupportShowName = String(parameters['SupportShowName'] || "サポートアクター表示");
-const RightDisplay = eval(parameters['RightDisplay'], 'false');
-
+const InitSupport = eval(parameters['InitSupport'] || 'true');
+const RightDisplay = eval(parameters['RightDisplay'] || 'false');
+const CommandShow = eval(parameters['CommandShow'] || 'true');
 
 const _Game_Temp_requestBattleRefresh = Game_Temp.prototype.requestBattleRefresh;
 Game_Temp.prototype.requestBattleRefresh = function() {
@@ -204,7 +236,7 @@ const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
 Scene_Battle.prototype.initialize = function() {
   _Scene_Battle_initialize.call(this);
   this._supportActorWindowEX = [];
-  this._commandStartActor = true;
+  this._commandStartActor = InitSupport;
 };
 
 const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
@@ -223,21 +255,35 @@ Scene_Battle.prototype.createSupportActorBaseSprite = function() {
 
 Scene_Battle.prototype.createSupportActorWindow = function() {
   $gameParty.supportBattleMembers().forEach((actor, i) => {
-    const rect = this.supportActorWindowRect(i);
-    if (!this._supportActorWindowEX[i]) {
-      const supportActorWindow = new Window_SupportActorEX(rect);
-      this._supportActorBaseSprite.addChild(supportActorWindow);
-      this._supportActorWindowEX[i] = supportActorWindow;
+    this.setSupportActorWindow(actor, i);
+    if (!InitSupport) {
+      const a = RightDisplay ? 1 : -1;
+      this._supportActorWindowEX[i].x = this._supportActorWindowEX[i]._homeX + (Window_Width * a);
     }
-    this._supportActorWindowEX[i].setActor(actor);
-    this._supportActorWindowEX[i].show();
   });
+};
+
+Scene_Battle.prototype.refreshSupportActorWindow = function() {
+  $gameParty.supportBattleMembers().forEach((actor, i) => {
+    this.setSupportActorWindow(actor, i);
+  });
+};
+
+Scene_Battle.prototype.setSupportActorWindow = function(actor, index) {
+  if (!this._supportActorWindowEX[index]) {
+    const rect = this.supportActorWindowRect(index);
+    const supportActorWindow = new Window_SupportActorEX(rect);
+    this._supportActorBaseSprite.addChild(supportActorWindow);
+    this._supportActorWindowEX[index] = supportActorWindow;
+  }
+  this._supportActorWindowEX[index].setActor(actor);
+  this._supportActorWindowEX[index].show();
 };
 
 Scene_Battle.prototype.supportActorWindowRect = function(index) {
   const ww = Window_Width + 40;
   const wh = this.calcWindowHeight(1, true);
-  const wx = Window_X + (RightDisplay ? Graphics.width - Window_Width : -40);
+  const wx = Window_X + (RightDisplay ? Graphics.width - Window_Width : -40) ;
   const wy = Window_Y + (wh + Window_Margin) * index;
   return new Rectangle(wx, wy, ww, wh);
 };
@@ -256,7 +302,7 @@ Scene_Battle.prototype.updateSupportActor = function() {
       sprite._actor = null
       sprite.hide();
     })
-    this.createSupportActorWindow();
+    this.refreshSupportActorWindow();
     $gameTemp.clearSupportActorRequest();
   }
 };
@@ -321,13 +367,17 @@ Scene_Battle.prototype.commandStartActor = function() {
 const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
 Scene_Battle.prototype.createPartyCommandWindow = function() {
   _Scene_Battle_createPartyCommandWindow.call(this);
-  this._partyCommandWindow.setHandler("startActor", this.commandStartActor.bind(this));
+  if (CommandShow) {
+    this._partyCommandWindow.setHandler("startActor", this.commandStartActor.bind(this));
+  }
 };
 
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
 Window_PartyCommand.prototype.makeCommandList = function() {
   _Window_PartyCommand_makeCommandList.call(this);
-  this.addCommand(SupportShowName, "startActor");
+  if (CommandShow) {
+    this.addCommand(SupportShowName, "startActor");
+  }
 };
 
 })();

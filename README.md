@@ -96,9 +96,9 @@
 | ステータス画面拡張 | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) |  |  | 2.2.2 |
 | セーブ画面拡張 | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  |  | 1.7.0 |
 | 所持金拡張 | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.0 |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| メンバー変更画面 |  |  |  |
+| ┗ メンバー変更戦闘時 |  |  |  |
+| メニュー画面 |  |  |  |
 |  |  |  |  |
 
 | 競合対策　　　　　　　　　　　| プラグイン　　　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　 | Ver　 |

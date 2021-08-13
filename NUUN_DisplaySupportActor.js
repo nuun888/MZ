@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクター表示（サポートアクター拡張）
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_SupportActor
  * 
  * @help
@@ -21,6 +21,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/13 Ver.1.3.1
+ * サポートアクターが追加されたときにサポートアクターウィンドウの動作がおかしくなる問題を修正。
+ * サポートアクターが参加していない場合はコマンドに表示しないように修正。
  * 2021/8/13 Ver.1.3.0
  * サポートアクターウィンドウの初期表示を指定できる機能を追加。
  * 2021/8/12 Ver.1.2.0
@@ -152,11 +155,11 @@ Window_SupportActorEX.prototype.initialize = function(rect) {
   this._speed = 1;
   this._move_x = 0;
   this._moveOn = false;
+  this._homeX = this.x;
 };
 
 Window_SupportActorEX.prototype.setActor = function(actor) {
   this._actor = actor;
-  this._homeX = this.x;
   this.refresh();
 };
 
@@ -256,7 +259,7 @@ Scene_Battle.prototype.createSupportActorBaseSprite = function() {
 Scene_Battle.prototype.createSupportActorWindow = function() {
   $gameParty.supportBattleMembers().forEach((actor, i) => {
     this.setSupportActorWindow(actor, i);
-    if (!InitSupport) {
+    if (!this._commandStartActor) {
       const a = RightDisplay ? 1 : -1;
       this._supportActorWindowEX[i].x = this._supportActorWindowEX[i]._homeX + (Window_Width * a);
     }
@@ -266,6 +269,10 @@ Scene_Battle.prototype.createSupportActorWindow = function() {
 Scene_Battle.prototype.refreshSupportActorWindow = function() {
   $gameParty.supportBattleMembers().forEach((actor, i) => {
     this.setSupportActorWindow(actor, i);
+    if (!this._commandStartActor) {
+      const a = RightDisplay ? 1 : -1;
+      this._supportActorWindowEX[i].x = this._supportActorWindowEX[i]._homeX + (Window_Width * a);
+    }
   });
 };
 
@@ -367,15 +374,13 @@ Scene_Battle.prototype.commandStartActor = function() {
 const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
 Scene_Battle.prototype.createPartyCommandWindow = function() {
   _Scene_Battle_createPartyCommandWindow.call(this);
-  if (CommandShow) {
-    this._partyCommandWindow.setHandler("startActor", this.commandStartActor.bind(this));
-  }
+  this._partyCommandWindow.setHandler("startActor", this.commandStartActor.bind(this));
 };
 
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
 Window_PartyCommand.prototype.makeCommandList = function() {
   _Window_PartyCommand_makeCommandList.call(this);
-  if (CommandShow) {
+  if (CommandShow && $gameParty.supportBattleMembers().length > 0) {
     this.addCommand(SupportShowName, "startActor");
   }
 };

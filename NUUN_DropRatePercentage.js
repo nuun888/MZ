@@ -35,7 +35,7 @@ Imported.NUUN_DropRatePercentage = true;
 const parameters = PluginManager.parameters('NUUN_DropRatePercentage');
 
 Game_Enemy.prototype.makeDropItems = function() {//再定義
-  const rate = this.dropItemRate();console.log(rate)
+  const rate = this.dropItemRate();
   return this.enemy().dropItems.reduce((r, di) => {
       if (di.kind > 0 && Math.random() * 1000 < di.denominator * rate) {
           return r.concat(this.itemObject(di.kind, di.dataId));

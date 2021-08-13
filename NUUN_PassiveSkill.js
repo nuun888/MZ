@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.3.0
+ * @version 1.4.0
  * @base NUUN_Base
  * 
  * @help
@@ -50,14 +50,16 @@
  * このプラグインはNUUN_Baseが必要です。
  * 
  * 仕様
- * 条件でHP、MPを判定する場合、最大HP,最大MPは「HP,MPで判定を行うパッシブスキル」以外から算出した数値となります。
- * HP、MP条件でHP、MPを増減させるパッシブスキルを覚えさせる場合はご注意ください。
+ * HP、MPの条件判定はHP、MPを条件とするパッシブスキルを除いた補正後の最大HP、最大MPを判定します。
+ * 
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/13 Ver.1.4.0
+ * 条件に乗り物を追加。
  * 2021/8/6 Ver.1.3.0
  * 条件にバフ、デバフを追加。
  * 2021/8/1 Ver.1.2.1
@@ -89,6 +91,12 @@
  */
 /*~struct~Conditions:
  * 
+ * @param NameStr
+ * @text 識別名
+ * @desc 識別名
+ * @type string
+ * @default 
+ * 
  * @param ParamConditions
  * @text 対象
  * @desc パラメータの対象を指定します。[上限値][下限値]　下限値0で[上限値]以上
@@ -113,6 +121,8 @@
  * @value 'DebuffR'
  * @option 装備タイプ
  * @value 'Equip'
+ * @option 乗り物
+ * @value 'Vehicle'
  * @option ターン
  * @value 'Turn'
  * @option ゲーム変数
@@ -194,6 +204,16 @@
  * @option 運低下
  * @value 7
  * @default 0
+ * 
+ * @param Vehicle
+ * @text 乗り物
+ * @desc デバフを指定します。(リスト１番目のみ反映)
+ * @type combo[]
+ * @option 'vehicle'
+ * @option 'boat'
+ * @option 'ship'
+ * @option 'airship'
+ * @default 'vehicle'
  * 
  * @param VariableId
  * @text ゲーム変数
@@ -287,6 +307,8 @@ Imported.NUUN_PassiveSkill = true;
         return this._buffs[list.DebuffType] < 0;
       case 'DebuffR':
         return this._buffs[list.DebuffType] === 0;
+      case 'Vehicle':
+        return this.isVehicle(list.Vehicle[0]);
       case 'Equip':
         return list.EquipWeapon > 0 ? this.isEquippedWeaponType(list.EquipWeapon) : this.isEquippedArmorType(list.EquipWeapon);
       case 'Turn':
@@ -298,6 +320,18 @@ Imported.NUUN_PassiveSkill = true;
         return $gameSwitches.value(list.SwitchId);
     }
     return false;
+  };
+
+  Game_Actor.prototype.isVehicle = function(type) {
+    if (type === 'boat') {
+      return $gamePlayer.isInBoat();
+    } else if (type === 'ship') {
+      return $gamePlayer.isInShip();
+    } else if (type === 'airship') {
+      return $gamePlayer.isInAirship();
+    } else {
+      return $gamePlayer.isInVehicle();
+    }
   };
 
   Game_Actor.prototype.isEquippedWeaponType = function(type) {

@@ -8,7 +8,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc 並び替えシーン(戦闘)
+ * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
  * @version 1.0.0
  * @base NUUN_SceneFormation
@@ -16,7 +16,7 @@
  * 
  * @help
  * 戦闘中にメンバーを変更できるようにします。
- * このプラグインは並び替えシーン（NUUN_SceneFormation）の拡張機能です。
+ * このプラグインはメンバー変更画面（NUUN_SceneFormation）の拡張機能です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。

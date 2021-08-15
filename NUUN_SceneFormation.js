@@ -8,7 +8,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc 並び替えシーン
+ * @plugindesc メンバー変更画面
  * @author NUUN
  * @version 1.0.0
  * @orderAfter NUUN_Base

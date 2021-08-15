@@ -83,7 +83,7 @@
 | [経験値計算式変更](https://github.com/nuun888/MZ/blob/master/NUUN_EXPFormula.md) | [NUUN_EXPFormula](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js) |  |  | 1.0.0 |
 | アイテムなどのランダム取得  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.2.2 |
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
-|  |  |  |  |
+| アクター並び替え固定 |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -92,12 +92,16 @@
 | アイテムのカテゴリーカスタマイズ | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) |  | 1.1.2 |
 | コマンド拡張 | [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js) |  | 1.2.1 |
 | [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) |  | 2.7.1 |
-| アイテム図鑑 | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) |  | 1.0.0 |
+| アイテム図鑑 | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) |  | 1.0.1 |
 | ステータス画面拡張 | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) |  |  | 2.2.2 |
 | セーブ画面拡張 | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  |  | 1.7.0 |
 | 所持金拡張 | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.0 |
 | メンバー変更画面 | [NUUN_SceneFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js) |  | 1.0.0 |
-| ┗ メンバー変更戦闘時 | [NUUN_SceneBattleFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js) |  | 1.0.0 |
+| ┣ メンバー変更画面戦闘時 | [NUUN_SceneBattleFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js) |  | 1.0.0 |
+| ┣ メンバー変更画面（サポートアクター対応） |  |  |  |
+| ┗ メンバー変更画面（アクター並び替え固定対応） |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
 | メニュー画面 |  |  |  |
 |  |  |  |  |
 

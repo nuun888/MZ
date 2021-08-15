@@ -36,6 +36,10 @@ const parameters = PluginManager.parameters('NUUN_SceneBattleFormation');
 const parameters2 = PluginManager.parameters('NUUN_SceneFormation');
 const Member_Cols = Number(parameters2['Member_Cols'] || 10);
 const Member_Rows = Number(parameters2['Member_Rows'] || 1);
+const BattleMemberName_X = Number(parameters2['BattleMemberName_X'] || 100);
+const MemberName_X = Number(parameters2['MemberName_X'] || 100);
+const BattleMember_X = Number(parameters2['BattleMember_X'] || 100);
+const Member_X = Number(parameters2['Member_X'] || 100);
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
@@ -93,7 +97,7 @@ Scene_Battle.prototype.createFormationMemberStatusWindow = function() {
 };
 
 Scene_Battle.prototype.battleMemberFormationNameWindowRect = function() {
-  const wx = 0;
+  const wx = BattleMemberName_X;
   const wy = 0;
   const ww = this.nameFormationWidth();
   const wh = this.calcWindowHeight(1, true);
@@ -101,7 +105,7 @@ Scene_Battle.prototype.battleMemberFormationNameWindowRect = function() {
 };
 
 Scene_Battle.prototype.memberNameFormationWindowRect = function() {
-  const wx = 0;
+  const wx = MemberName_X;
   const wy = this.memberFormationY();
   const ww = this.nameFormationWidth();
   const wh = this.calcWindowHeight(1, true);
@@ -109,7 +113,7 @@ Scene_Battle.prototype.memberNameFormationWindowRect = function() {
 };
 
 Scene_Battle.prototype.battleMemberFormationWindowRect = function() {
-  const wx = 0;
+  const wx = BattleMember_X;
   const wy = this.calcWindowHeight(1, true);
   const ww = $gameSystem.windowPadding() * 2 + $gameParty.defaultMaxBattleMembers() * 56;
   const wh = 80;
@@ -117,7 +121,7 @@ Scene_Battle.prototype.battleMemberFormationWindowRect = function() {
 };
 
 Scene_Battle.prototype.memberFormationWindowRect = function() {
-  const wx = 0;
+  const wx = Member_X;
   const wy = this.memberFormationY() + this.calcWindowHeight(1, true);
   const ww = $gameSystem.windowPadding() * 2 + Member_Cols * 56;
   const wh = 86 + (Member_Rows - 1) * 48;

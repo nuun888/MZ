@@ -769,7 +769,7 @@ Window_StatusBase.prototype.drawBackSupportActor = function(index) {
     const height = 48;
     const y = rect.y + (this.itemHeight() - this.rowSpacing() - height);
     this.contentsBack.paintOpacity = 128;
-    if (Imported.NUUN_SceneSupportActorFormation && SupportActorColor >= 0 && actor && actor.actor().meta.SupportActor) {
+    if (Imported.NUUN_SceneFormation_SupportActor && SupportActorColor >= 0 && actor && actor.actor().meta.SupportActor) {
       const supportcolor = ColorManager.textColor(SupportActorColor);
       this.contentsBack.fillRect(rect.x, y, rect.width, height, supportcolor);
     }

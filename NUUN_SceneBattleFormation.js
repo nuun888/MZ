@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/17 Ver.1.0.1
+ * サポートアクターに対応。
+ * アクター並び替え固定に対応。
  * 2021/8/15 Ver.1.0.0
  * 初版
  * 
@@ -186,7 +189,7 @@ Scene_Battle.prototype.onChangeBattleMemberFormationOk = function() {
 
 Scene_Battle.prototype.onChangeMemberFormationOk = function() {
   this.setBattleMemberFormationCursor();
-  const selectIndex = Math.min(this._memberFormationWindow.getSelectIndex(), $gameParty.battleMembers().length - 1);
+  const selectIndex = Math.min(this._memberFormationWindow.getSelectIndex(), $gameParty.maxFormationBattleMembers() - 1);
   this._memberFormationWindow.deselect();
   this._memberFormationWindow.deactivate();
   this._battleMemberFormationWindow.activate();
@@ -219,18 +222,25 @@ Scene_Battle.prototype.onBattleMemberFormationOk = function() {
     }
   }
   if (pendingIndex >= 0) {
-    setPendingIndex = pendingIndex + (refreshMode ? $gameParty.maxBattleMembers() : 0);
-    const actor = $gameParty.allMembers()[setPendingIndex];
-    if (actor) {
-      this.onFormationOk(actorIndex, setPendingIndex);
+    setPendingIndex = pendingIndex + (refreshMode ? $gameParty.maxFormationBattleMembers() : 0);
+    //const actor = $gameParty.allMembers()[setPendingIndex];
+    const maxMember = $gameParty.maxFormationBattleMembers();
+    this.onFormationOk(actorIndex, setPendingIndex);
+    let newMaxMember = $gameParty.maxFormationBattleMembers();
+    if (actorIndex >= newMaxMember) {
+      const selectIndex = Math.min(actorIndex, newMaxMember - 1);
+      this._battleMemberFormationWindow.select(selectIndex);
     } else {
-      this.onAddActorFormationOk(actorIndex, -1, 'battle');
+      this._battleMemberFormationWindow.redrawItem(actorIndex);
     }
-    this._battleMemberFormationWindow.redrawItem(actorIndex);
     if (refreshMode) {
       this._memberFormationWindow.redrawItem(pendingIndex);
     } else {
       this._battleMemberFormationWindow.redrawItem(pendingIndex);
+    }
+    if ( maxMember !== newMaxMember) {
+      this._memberFormationWindow.refresh();
+      this._battleMemberFormationWindow.refresh();
     }
   } else {
     this._battleMemberFormationWindow.setPendingIndex(actorIndex);
@@ -250,13 +260,19 @@ Scene_Battle.prototype.onMemberFormationOk = function() {
     }
   }
   if (pendingIndex >= 0) {
-    setPendingIndex = pendingIndex + (refreshMode ? $gameParty.maxBattleMembers() : 0);
-    this.onFormationOk(actorIndex + $gameParty.maxBattleMembers(), setPendingIndex);
-    this._memberFormationWindow.redrawItem(actorIndex);
+    setPendingIndex = pendingIndex + (refreshMode ? $gameParty.maxFormationBattleMembers() : 0);
+    const maxMember = $gameParty.maxFormationBattleMembers();
+    this.onFormationOk(actorIndex + $gameParty.maxFormationBattleMembers(), setPendingIndex);
+    let newMaxMember = $gameParty.maxFormationBattleMembers();
     if (refreshMode) {
       this._memberFormationWindow.redrawItem(pendingIndex);
     } else {
       this._battleMemberFormationWindow.redrawItem(pendingIndex);
+    }
+    this._memberFormationWindow.redrawItem(actorIndex);
+    if ( maxMember !== newMaxMember) {
+      this._memberFormationWindow.refresh();
+      this._battleMemberFormationWindow.refresh();
     }
   } else {
     this._memberFormationWindow.setPendingIndex(actorIndex);

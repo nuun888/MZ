@@ -84,7 +84,7 @@ Game_Actor.prototype.getFixed = function() {
 };
 
 const _Game_Actor_isFormationChangeOk = Game_Actor.prototype.isFormationChangeOk;
-Game_Actor.prototype.isFormationChangeOk = function() {console.log(this.getFixed())
+Game_Actor.prototype.isFormationChangeOk = function() {
   return _Game_Actor_isFormationChangeOk.call(this) && !this.getFixed();
 };
 

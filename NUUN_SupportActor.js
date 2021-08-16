@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  *            
  * @help
  * 戦闘でサポートするアクターを設定します。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/17 Ver.1.2.3
+ * メンバー変更画面反映のための処理追加。
  * 2021/8/11 Ver.1.2.2
  * サイドビューに表示するサポートアクターの最大数を超えてサポートアクターがメンバーに追加されるとエラーが出る問題を修正。
  * 2021/8/11 Ver.1.2.1
@@ -90,6 +92,7 @@ Imported.NUUN_SupportActor = true;
   const Window_Y = Number(parameters['Window_Y'] || 96);
   const Window_Width = Number(parameters['Window_Width'] || 128);
   const SupportActorSV = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SupportActorSV'])) : null) || [];
+  const SupportActorMode = eval(parameters['SupportActorMode'] || 'true');
 
   Game_Actor.prototype.isSupportActor = function() {
     return this.actor().meta.SupportActor;
@@ -101,7 +104,7 @@ Imported.NUUN_SupportActor = true;
 
   Game_Actor.prototype.supportActorindex = function() {
     return $gameParty.supportBattleMembers().indexOf(this);
-};
+  };
 
   const _Game_Actor_isBattleMember = Game_Actor.prototype.isBattleMember;
   Game_Actor.prototype.isBattleMember = function() {
@@ -139,14 +142,13 @@ Imported.NUUN_SupportActor = true;
 
   const _Game_Party_initialize = Game_Party.prototype.initialize;
   Game_Party.prototype.initialize = function() {
-    this._mainSupportNum = 0;
     _Game_Party_initialize.call(this);
   };
 
   const _Game_Party_battleMembers = Game_Party.prototype.battleMembers;
   Game_Party.prototype.battleMembers = function() {
     let members = _Game_Party_battleMembers.call(this);
-    members = members.concat(this.addBattleMembers());
+    members = members.concat(this.addBattleMembers());//SupportActorMode
     if (!this.membersMode && this.inBattle()) {
       members = this.MainBattleMembers(members).slice(0,this.maxBattleMembers());//サポートメンバーを除外
       if (this.svMembersMode) {
@@ -174,7 +176,25 @@ Imported.NUUN_SupportActor = true;
   };
 
   Game_Party.prototype.supportMainBattleMembers = function() {
-    return this.allMembers().slice(0, this.maxBattleMembers()).filter(actor => actor.isAppeared() && actor.isSupportActor());
+    let index = 0;
+    this.membersMode = true;
+    const maxMembers = this.battleMembers().length;
+    return this.allMembers().slice(0, maxMembers).filter(actor => {
+      if (actor.isAppeared() && !actor.isSupportActor()) {
+      index++;
+      }
+      if (actor.isAppeared() && actor.isSupportActor() && this.maxBattleMembers() > index) {
+        return true;
+      }
+    },); 
+  };
+
+  Game_Party.prototype.setSupportBattleMembersNum = function() {
+    this._supportBattleMembersNum = this.supportMainBattleMembers().length;
+  };
+
+  Game_Party.prototype.getSupportBattleMembersNum = function() {
+    return this._supportBattleMembersNum;
   };
 
   const _Game_Party_makeActions = Game_Party.prototype.makeActions;
@@ -198,12 +218,6 @@ Imported.NUUN_SupportActor = true;
     return _Game_Party_canInput.call(this) || this.supportBattleMembers().some(actor => actor.canInput());
   };
 
-  const _Game_Follower_actor = Game_Follower.prototype.actor;
-  Game_Follower.prototype.actor = function() {
-    $gameParty.membersMode = true;
-    return _Game_Follower_actor.call(this);
-  };
-
   Game_Party.prototype.resultSupportMembers = function(reserve, support) {
     if (support) {
       this.membersMode = true;
@@ -213,6 +227,19 @@ Imported.NUUN_SupportActor = true;
     } else {
       return this.battleMembers();
     }
+  };
+
+  const _Game_Player_refresh = Game_Player.prototype.refresh;
+  Game_Player.prototype.refresh = function() {
+    $gameParty.setSupportBattleMembersNum();
+    _Game_Player_refresh.call(this);
+  };
+
+
+  const _Game_Follower_actor = Game_Follower.prototype.actor;
+  Game_Follower.prototype.actor = function() {
+    $gameParty.membersMode = true;
+    return _Game_Follower_actor.call(this);
   };
 
   const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;

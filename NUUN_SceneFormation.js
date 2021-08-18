@@ -25,9 +25,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/18 Ver.1.0.2
+ * 戦闘メンバーが最大戦闘メンバー未満の時にエラーが起きる問題を修正。
  * 2021/8/17 Ver.1.0.1
  * サポートアクターに対応。
- * アクター並び替え固定に対応。
  * 2021/8/15 Ver.1.0.0
  * 初版
  * 
@@ -160,6 +161,7 @@
  * @default []
  * @parent StatusSetting
  * 
+ *  
  */
 /*~struct~ActorStatusList:
  *
@@ -829,7 +831,7 @@ Window_FormationBattleMember.prototype.initialize = function(rect) {
 };
 
 Window_FormationBattleMember.prototype.maxItems = function() {
-  return $gameParty.maxFormationBattleMembers();
+  return Math.min($gameParty.maxFormationBattleMembers(), $gameParty.battleMembers().length);
 };
 
 Window_FormationBattleMember.prototype.maxCols = function() {
@@ -1127,7 +1129,6 @@ Window_FormationMember.prototype.pendingIndex = function() {
 };
 
 Window_FormationMember.prototype.setPendingIndex = function(index) {
-  
   const lastPendingIndex = this._pendingIndex;
   this._pendingIndex = index;
   this.redrawItem(this._pendingIndex);

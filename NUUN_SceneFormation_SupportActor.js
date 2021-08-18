@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(サポートアクター反映)
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_SceneFormation
  * @base NUUN_SupportActor
  * @orderAfter NUUN_SceneFormation
@@ -23,6 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/18 Ver.1.0.1
+ * 戦闘メンバーが最大戦闘メンバー未満の時にエラーが起きる問題による処理の修正。
  * 2021/8/17 Ver.1.0.0
  * 初版
  * 
@@ -59,6 +61,12 @@ const _Window_FormationBattleMember_actor = Window_FormationBattleMember.prototy
 Window_FormationBattleMember.prototype.actor = function(index) {
   $gameParty.membersMode = true;
   return _Window_FormationBattleMember_actor.call(this, index);
+};
+
+const _Window_FormationBattleMember_maxItems = Window_FormationBattleMember.prototype.maxItems;
+Window_FormationBattleMember.prototype.maxItems = function() {
+  $gameParty.membersMode = true;
+  return _Window_FormationBattleMember_maxItems.call(this);
 };
 
 })();

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @orderAfter NUUN_Base
  * 
  * @help

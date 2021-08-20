@@ -53,7 +53,12 @@
 | レベル上限限界突破  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js) |  | 1.1.0 |
 | 加速特徴 | [NUUN_AccelerationFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js) |  | 1.0.1 |
 | エネミーステータスの上限突破 | [NUUN_EnemyParamNoLimit](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js) |  | 1.0.0 |
-| 攻撃ブースト特徴 |  |  |  |
+| アクターパラメータの最大値設定 |  |  |  |
+| 行動時ブースト特徴 | [NUUN_boostEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_boostEX.js) |  | 1.0.0 |
+| 踏みとどまり特徴 |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -85,6 +90,9 @@
 | アイテムなどのランダム取得  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.2.2 |
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
 | アクター並び替え固定 | [NUUN_ActorFixed](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js) |  | 1.0.0 |
+| パーティゲージ |  |  |  |
+|  |  |  |  |
+|  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -100,7 +108,7 @@
 | メンバー変更画面 | [NUUN_SceneFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js) |  | 1.0.2 |
 | ┣ メンバー変更画面戦闘時 | [NUUN_SceneBattleFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js) |  | 1.0.1 |
 | ┗ メンバー変更画面（サポートアクター対応） | [NUUN_SceneFormation_SupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation_SupportActor.js) |  | 1.0.1 |
-|  |  |  |  |
+| スキルセット |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 | メニュー画面 |  |  |  |

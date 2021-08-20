@@ -8,7 +8,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc 属性ブースト特徴
+ * @plugindesc 行動時ブースト特徴
  * @author NUUN
  * @version 1.0.0
  * 

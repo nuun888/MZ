@@ -72,7 +72,7 @@
 | バトラーHPゲージ | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) |  | 1.2.4 |
 | 敵に名前表示 | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) |  | 1.1.4 |
 | 敵にTPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.1.7 |
-|  |  |  |  |
+| スリップダメージ拡張 |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |

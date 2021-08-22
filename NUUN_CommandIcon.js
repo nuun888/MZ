@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc コマンド拡張
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/23 Ver 1.2.2
+ * 適用除外クラス設定にアイテム図鑑カテゴリーを追加。(要NUUN_ItemBook)
  * 2021/5/22 Ver 1.2.1
  * 設定を反映するウィンドウを適用モードか除外モードかを選択できる機能を追加。
  * 2021/5/21 Ver 1.2.0
@@ -68,7 +70,7 @@
  * @default 1
  * 
  */
-/*~struct~CommadIconList:ja
+/*~struct~CommadIconList:
  * 
  * @param CommadName
  * @text コマンド名
@@ -115,6 +117,7 @@
  * @option 'Window_GameEnd'
  * @option 'Window_ChoiceList'
  * @option 'Window_Options'
+ * @option 'Window_ItemBook_Category'
  * @default
  * 
  */

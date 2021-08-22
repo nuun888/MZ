@@ -12,6 +12,7 @@
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
  * @version 1.1.3
+ * @base NUUN_Base
  * 
  * @help
  * アイテムに独自のカテゴリーを追加または必要な項目のみ表示させることが出来ます。

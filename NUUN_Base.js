@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/22 Ver.1.3.0
+ * Window_ItemListに処理を追加。
  * 2021/7/15 Ver.1.2.0
  * ゲージ、名前表示関連プラグインの共通処理を追加。
  * 2021/5/15 Ver.1.1.4
@@ -167,6 +169,16 @@ Spriteset_Battle.prototype.updateButlerGauge = function() {
       }
     }
   }
+};
+
+const _Window_ItemList_initialize  = Window_ItemList.prototype.initialize;
+Window_ItemList.prototype.initialize = function(rect) {
+  _Window_ItemList_initialize.call(this, rect);
+  this._className = String(this.constructor.name);
+};
+
+Window_ItemList.prototype.isConstructor = function() {
+  return false;
 };
 
 })();

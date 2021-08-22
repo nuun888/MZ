@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * アイテムに独自のカテゴリーを追加または必要な項目のみ表示させることが出来ます。
@@ -26,11 +26,14 @@
  * 
  * <CategoryType:sozai>　このタグを記入したアイテムはsozaiカテゴリーに表示されます。
  * 
+ * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/22 Ver.1.1.3
+ * アイテム図鑑の独自カテゴリー機能追加による競合対策。
  * 2021/3/15 Ver.1.1.2
  * 戦闘中にアイテムの個数が表示されない問題を修正。
  * 2021/3/8 Ver.1.1.1
@@ -138,6 +141,9 @@ Window_ItemCategory.prototype.makeCommandList = function() {
 
 const _Window_ItemList_includes = Window_ItemList.prototype.includes;
 Window_ItemList.prototype.includes = function(item) {
+  if (this.isConstructor()) {
+    return _Window_ItemList_includes.call(this, item);
+  }
   if(this._category === 'allItems' && !this.secretItem(item) && item) {
     return true;
   }
@@ -146,10 +152,13 @@ Window_ItemList.prototype.includes = function(item) {
   if(category && !type) {
     return category;
   }
-  switch (this._category) {
-    case type:
-      return true;
+  if (this._category === type) {
+    return true;
   }
+  //switch (this._category) {
+  //  case type:
+  //    return true;
+  //}
   return false;
 };
 

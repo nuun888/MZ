@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -55,6 +55,12 @@
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
  * <desc1:ああああ> desc1とタグ付けされた項目に「ああああ」が表示されます。
  * 文章を表示させる場合は<desc1:[text]>と記入してください。
+ * 
+ * <[categorytag]:[categorykey]> 表示するアイテムのカテゴリーを記入します。
+ * [categorytag]:「カテゴリータグ名」で設定したタグ名
+ * [categorykey]:カテゴリーキー
+ * allItem:キーアイテムを含む全てのアイテム
+ * allItems:アイテム、武器、防具全て
  * 
  * ページの各項目の設定
  * 
@@ -114,7 +120,11 @@
  * 参照パラメータ
  * item　アイテムデータ
  * 
+ * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
+ * 
  * 更新履歴
+ * 2021/8/22 Ver.1.1.0
+ * 任意のアイテムカテゴリーを設定できる機能を追加。
  * 2021/8/13 Ver.1.0.1
  * ブックナンバーの表示がおかしくなる問題を修正。
  * 特定の武器、防具タイプを表示しない機能を追加。
@@ -229,6 +239,24 @@
  * @type string
  * @default ？
  * @parent BasicSetting
+ * 
+ * @param Category
+ * @text カテゴリー設定
+ * @default ------------------------------
+ * 
+ * @param ItemBookCategory
+ * @desc アイテムカテゴリーの設定をします。未設定の場合は通常のアイテムカテゴリーが表示されます。
+ * @text アイテムカテゴリー設定
+ * @type struct<BookCategoryList>[]
+ * @default ["{\"CategoryName\":\"アイテム\",\"CategoryKey\":\"[\\\"'allItem'\\\"]\"}","{\"CategoryName\":\"\",\"CategoryKey\":\"[\\\"'weapon'\\\"]\"}","{\"CategoryName\":\"\",\"CategoryKey\":\"[\\\"'armor'\\\"]\"}"]
+ * @parent Category
+ * 
+ * @param ItemBookCategoryTagName
+ * @desc メモ欄に記入するアイテムカテゴリー識別用タグの名称を指定します。。
+ * @text カテゴリータグ名
+ * @type string
+ * @default 'CategoryType'
+ * @parent Category
  * 
  * @param PercentWindow
  * @text 完成度ウィンドウ設定
@@ -1009,6 +1037,25 @@
  * @parent nameSetting
 *
 */
+/*~struct~BookCategoryList:
+ * 
+ * @param CategoryName
+ * @desc カテゴリー名を設定します。
+ * @text カテゴリー名
+ * @type string
+ * 
+ * @param CategoryKey
+ * @text カテゴリーKey
+ * @desc カテゴリーのKeyを設定します。(all:全て表示)(１番目のみ入力)
+ * @type combo[]
+ * @option 'item'
+ * @option 'allItem'
+ * @option 'keyItem'
+ * @option 'weapon'
+ * @option 'armor'
+ * @option 'allItems'
+ * @default
+ */
 var Imported = Imported || {};
 Imported.NUUN_ItemBook = true;
 
@@ -1037,6 +1084,8 @@ const EffectMaxItems = Number(parameters['EffectMaxItems'] || 0);
 const EffectMultiCol = eval(parameters['EffectMultiCol'] || "false");
 const TraitsMaxItems = Number(parameters['TraitsMaxItems'] || 0);
 const TraitsMultiCol = eval(parameters['TraitsMultiCol'] || "false");
+const ItemBookCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemBookCategory'])) : null) || [];
+const ItemBookCategoryTagName = String(parameters['ItemBookCategoryTagName'] || 'CategoryType');
 
 const PercentContentLength = PercentWindowVisible && (PercentContent && PercentContent.length > 0);
 
@@ -1607,6 +1656,31 @@ Window_ItemBook_Category.prototype.setItemWindow = function(itembookWindow) {
   this._itembookWindow = itembookWindow;
 };
 
+const _Window_ItemBook_Category_makeCommandList = Window_ItemBook_Category.prototype.makeCommandList;
+Window_ItemBook_Category.prototype.makeCommandList = function() {
+  const list = ItemBookCategory;
+  if (list.length > 0) {
+    list.forEach(names => {
+      const categorykey = names.CategoryKey[0];
+      if(this.needsCommand(categorykey) && categorykey === 'item') {
+        this.addCommand(TextManager.item, categorykey);
+      } else if(this.needsCommand(categorykey) && categorykey === 'weapon') {
+        this.addCommand(TextManager.weapon, categorykey);
+      } else if(this.needsCommand(categorykey) && categorykey === 'armor') {
+        this.addCommand(TextManager.armor, categorykey);
+      } else if(this.needsCommand(categorykey) && categorykey === 'keyItem') {
+        this.addCommand(TextManager.keyItem, categorykey);
+      } else if (this.needsCommand(categorykey) && categorykey === 'allItems') {
+        this.addCommand(names.CategoryName, categorykey);
+      } else if(this.needsCommand(categorykey) && names.CategoryName) { 
+        this.addCommand(names.CategoryName, categorykey);
+      }
+    });
+  } else {
+    _Window_ItemBook_Category_makeCommandList.call(this);
+  }
+};
+
 Window_ItemBook_Category.prototype.processOk = function() {
   this._itembookWindow.setCategory(this.currentSymbol());
   this._categorySelect = this.index();
@@ -1767,13 +1841,36 @@ Window_ItemBook_Index.prototype.isCurrentItemEnabled = function() {
   return true;
 };
 
-const _Window_ItemBook_Index_includes = Window_ItemBook_Index.prototype.includes;
 Window_ItemBook_Index.prototype.includes = function(item) {
   const result = $gameSystem.isItemBook(item);
   if (result) {
     this._itemPercentList.push(item);
   }
-  return _Window_ItemBook_Index_includes.call(this, item) && result;
+  return this.categoryIncludes(item) && result;
+};
+
+Window_ItemBook_Index.prototype.categoryIncludes = function(item) {
+  if(this._category === 'allItems' && !this.secretItem(item) && item) {
+    return true;
+  } else if (this._category === 'allItem' && !this.secretItem(item) && item) {
+    return DataManager.isItem(item);
+  }
+  const type = item ? item.meta[ItemBookCategoryTagName] : null;
+  const category = Window_ItemList.prototype.includes.call(this, item);
+  if(category && !type) {
+    return category;
+  }
+  if (this._category === type) {
+    return true;
+  }
+  return false;
+};
+
+Window_ItemBook_Index.prototype.secretItem = function(item) {
+  if(DataManager.isItem(item) && item.itypeId > 2) {
+    return true;
+  }
+  return false;
 };
 
 Window_ItemBook_Index.prototype.unknownEnemyVisible = function(item) {
@@ -1859,6 +1956,10 @@ Window_ItemBook_Index.prototype.setPercentWindow = function(percentWindow) {
 
 Window_ItemBook_Index.prototype.setItemWindow = function(itemWindow) {
   this._itemWindow = itemWindow;
+};
+
+Window_ItemBook_Index.prototype.isConstructor = function() {
+  return this._className === 'Window_ItemBook_Index';
 };
 
 function Window_ItemBook() {

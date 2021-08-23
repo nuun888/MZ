@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/23 Ver.1.0.2
+ * ターン制でメンバーを交代した後にコマンドで攻撃を選択するとエラーが出る問題を修正。
  * 2021/8/17 Ver.1.0.1
  * サポートアクターに対応。
  * アクター並び替え固定に対応。
@@ -353,6 +355,9 @@ Scene_Battle.prototype.openFormationWindow = function() {
 
 Scene_Battle.prototype.closeFormationWindow = function() {
   $gameTemp.requestBattleRefresh();
+  if (!BattleManager.isTpb()) {
+    BattleManager.startInput();
+  }
   this._battleMemberFormationNameWindow.close();
   this._memberFormationNameWindow.close();
   this._battleMemberFormationWindow.close();

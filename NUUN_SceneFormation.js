@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -25,6 +25,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/25 Ver.1.1.1
+ * アクター並び替え固定プラグインの待機固定アクター移動可に対応。
+ * 固定アクターの背景色を変更できる機能を追加。
  * 2021/8/24 Ver.1.1.0
  * ステータスウィンドウ以外を中央（待機メンバーウィンドウ基準）揃えにする機能を追加。（戦闘時共通）
  * Y座標を指定できる機能を追加。（戦闘時共通）
@@ -208,6 +211,18 @@
  * @default []
  * @parent StatusSetting
  * 
+ * 
+ * @param ActorFixedSetting
+ * @text アクター並び替え固定設定(要Imported.NUUN_ActorFixed)
+ * @default ------------------------------
+ * 
+ * @param FixedActorBackColor
+ * @text 固定アクター背景色
+ * @desc 固定アクターの背景色。
+ * @type number
+ * @default 3
+ * @min -1
+ * @parent ActorFixedSetting
  *  
  */
 /*~struct~ActorStatusList:
@@ -482,8 +497,7 @@ const EquipNameVisible = Number(parameters['EquipNameVisible'] || 1);
 const DeadActorColor = Number(parameters['DeadActorColor'] || 18);
 const parameters2 = PluginManager.parameters('NUUN_SceneSupportActorFormation');
 const SupportActorColor = Number(parameters2['SupportActorColor'] || 5);
-const parameters3 = PluginManager.parameters('NUUN_ActorFixed');
-const FixedActorBackColor = Number(parameters3['FixedActorBackColor'] || -1);
+const FixedActorBackColor = Number(parameters['FixedActorBackColor'] || 3);
 const pluginName = "NUUN_SceneFormation";
 
 PluginManager.registerCommand(pluginName, 'SceneFormationOpen', args => {
@@ -922,6 +936,9 @@ Window_FormationBattleMember.prototype.setActorStatus = function(index) {
 
 Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
   const actor = this.actor(this.index());
+  if (Imported.NUUN_ActorFixed) {
+    actor.setFixedMovable(false);
+  }
   const memberPendingIndex = this._memberWindow.pendingIndex();
   if (actor && !actor.isDead() && memberPendingIndex >= 0 && this._memberWindow.actor(memberPendingIndex).isDead()) {
     return this.isbattleMembersDead() < $gameParty.maxBattleMembers() - 1;
@@ -1081,6 +1098,9 @@ Window_FormationMember.prototype.setActorStatus = function(index) {
 
 Window_FormationMember.prototype.isCurrentItemEnabled = function() {
   const actor = this.actor(this.index());
+  if (Imported.NUUN_ActorFixed) {
+    actor.setFixedMovable_pp();
+  }
   const memberPendingIndex = this._battleMemberWindow.pendingIndex();
   const battleMemberActor = this._battleMemberWindow.actor(memberPendingIndex);
   if (battleMemberActor && !battleMemberActor.isDead() && actor && actor.isDead()){
@@ -1088,6 +1108,11 @@ Window_FormationMember.prototype.isCurrentItemEnabled = function() {
   }
   return (actor && actor.isFormationChangeOk()) || (this.maxItems() - 1 === this.index());
 };
+
+
+
+
+
 
 Window_FormationMember.prototype.setMemberStatusWindow = function(memberStatusWindow) {
   this._memberStatusWindow = memberStatusWindow;

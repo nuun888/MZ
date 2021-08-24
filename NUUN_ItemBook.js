@@ -502,6 +502,7 @@
  * @type number
  * @default 1
  * @min 1
+ * @max 9999
  * @parent BasicSetting
  * 
  * @param X_Coordinate
@@ -704,6 +705,7 @@
  * @text Y表示行位置
  * @type number
  * @default 1
+ * @max 9999
  * @min 1
  * @parent BasicSetting
  * 
@@ -907,6 +909,7 @@
  * @text Y表示行位置
  * @type number
  * @default 1
+ * @max 9999
  * @min 1
  * @parent BasicSetting
  * 
@@ -1046,7 +1049,7 @@
  * 
  * @param CategoryKey
  * @text カテゴリーKey
- * @desc カテゴリーのKeyを設定します。(all:全て表示)(１番目のみ入力)
+ * @desc カテゴリーのKeyを設定します。(１番目のみ入力)
  * @type combo[]
  * @option 'item'
  * @option 'allItem'

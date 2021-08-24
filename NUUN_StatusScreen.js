@@ -144,7 +144,7 @@
  * 
  * 更新履歴
  * 2021/8/24 Ver.2.2.3
- * 少し修正
+ * 旧バージョンにプラグインパラメータの最大最小設定に関する修正。
  * 2021/8/11 Ver.2.2.2
  * パラメータの任意名称が取得できない問題を修正。
  * アクターのデータベースデータが記載のパラメータで取得出来ていなかった問題を修正。
@@ -563,6 +563,7 @@
  * @text レーダチャートX座標
  * @type number
  * @min -9999
+ * @max 9999
  * @default 48
  * @parent ElementRadarChart
  * 
@@ -571,6 +572,7 @@
  * @text レーダチャートY座標
  * @type number
  * @min -9999
+ * @max 9999
  * @default 48
  * @parent ElementRadarChart
  * 
@@ -580,6 +582,7 @@
  * @type number
  * @default -12
  * @min -9999
+ * @max 9999
  * @parent ElementRadarChart
  * 
  * @param StateRadarChart
@@ -700,6 +703,7 @@
  * @type number
  * @default 0
  * @min 0
+ * @max 99999
  *  
  */
 /*~struct~actorImgList:
@@ -752,6 +756,8 @@
  * @text アイコンID
  * @desc アイコンのIDを指定します。
  * @type number
+ * @min 0
+ * @max 99999
  * @default 0
  */
 /*~struct~StateData:
@@ -769,6 +775,8 @@
  * @text アイコンID
  * @desc 表示するステート装備アイコンを指定します。データベースの「タイプ」の「装備タイプ」のIDと同じリストIDのアイコンが表示されます。
  * @type number
+ * @min 0
+ * @max 99999
  * @default 0
  *
  */
@@ -945,6 +953,7 @@
  * @desc X座標（X表示列位置からの相対座標）
  * @type number
  * @default 0
+ * @max 9999
  * @min -9999
  * 
  * @param Y_Coordinate
@@ -952,6 +961,7 @@
  * @desc Y座標（Y表示列位置からの相対座標）
  * @type number
  * @default 0
+ * @max 9999
  * @min -9999
  * 
  * @param ItemWidth
@@ -1009,6 +1019,8 @@
  * @desc 装備欄の開始インデックスを指定します。
  * @type number
  * @default 0
+ * @min 0
+ * @max 99999
  * @parent EquipSetting
  * 
  * @param EquipNum

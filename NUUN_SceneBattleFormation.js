@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/24 Ver.1.0.3
+ * パーティコマンドに表示させる位置を指定できる機能を追加。（1で逃げるより先に表示されます）
  * 2021/8/23 Ver.1.0.2
  * ターン制でメンバーを交代した後にコマンドで攻撃を選択するとエラーが出る問題を修正。
  * 2021/8/17 Ver.1.0.1
@@ -30,6 +32,13 @@
  * 2021/8/15 Ver.1.0.0
  * 初版
  * 
+ * 
+ * @param CommandIndex
+ * @text 挿入インデックス番号
+ * @desc 挿入するパーティコマンドインデックス番号。
+ * @type number
+ * @default 1
+ * @min 0
  * 
  */
 
@@ -41,10 +50,16 @@ const parameters = PluginManager.parameters('NUUN_SceneBattleFormation');
 const parameters2 = PluginManager.parameters('NUUN_SceneFormation');
 const Member_Cols = Number(parameters2['Member_Cols'] || 10);
 const Member_Rows = Number(parameters2['Member_Rows'] || 1);
-const BattleMemberName_X = Number(parameters2['BattleMemberName_X'] || 100);
-const MemberName_X = Number(parameters2['MemberName_X'] || 100);
-const BattleMember_X = Number(parameters2['BattleMember_X'] || 100);
-const Member_X = Number(parameters2['Member_X'] || 100);
+const BattleMemberName_X = Number(parameters2['BattleMemberName_X'] || 0);
+const BattleMemberName_Y = Number(parameters2['BattleMemberName_Y'] || 0);
+const MemberName_X = Number(parameters2['MemberName_X'] || 0);
+const MemberName_Y = Number(parameters2['MemberName_Y'] || 0);
+const BattleMember_X = Number(parameters2['BattleMember_X'] || 0);
+const BattleMember_Y = Number(parameters2['BattleMember_Y'] || 0);
+const Member_X = Number(parameters2['Member_X'] || 0);
+const Member_Y = Number(parameters2['Member_Y'] || 0);
+const WindowCenter = eval(parameters2['WindowCenter'] || "true");
+const CommandIndex = Number(parameters['CommandIndex'] || 1);
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
@@ -102,33 +117,33 @@ Scene_Battle.prototype.createFormationMemberStatusWindow = function() {
 };
 
 Scene_Battle.prototype.battleMemberFormationNameWindowRect = function() {
-  const wx = BattleMemberName_X;
-  const wy = 0;
+  const wx = BattleMemberName_X + (WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
+  const wy = BattleMemberName_Y;
   const ww = this.nameFormationWidth();
   const wh = this.calcWindowHeight(1, true);
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.memberNameFormationWindowRect = function() {
-  const wx = MemberName_X;
-  const wy = this.memberFormationY();
+  const wx = MemberName_X + (WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
+  const wy = this.memberFormationY() + MemberName_Y;
   const ww = this.nameFormationWidth();
   const wh = this.calcWindowHeight(1, true);
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.battleMemberFormationWindowRect = function() {
-  const wx = BattleMember_X;
-  const wy = this.calcWindowHeight(1, true);
+  const wx = BattleMember_X + (WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
+  const wy = this.calcWindowHeight(1, true) + BattleMember_Y;
   const ww = $gameSystem.windowPadding() * 2 + $gameParty.defaultMaxBattleMembers() * 56;
   const wh = 80;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.memberFormationWindowRect = function() {
-  const wx = Member_X;
-  const wy = this.memberFormationY() + this.calcWindowHeight(1, true);
-  const ww = $gameSystem.windowPadding() * 2 + Member_Cols * 56;
+  const ww = this.memberWindowWidth();
+  const wx = Member_X + WindowCenter ? (Graphics.boxWidth - ww) / 2 : 0;
+  const wy = this.memberFormationY() + this.calcWindowHeight(1, true) + Member_Y;
   const wh = 86 + (Member_Rows - 1) * 48;
   return new Rectangle(wx, wy, ww, wh);
 };
@@ -144,6 +159,10 @@ Scene_Battle.prototype.memberFormationStatusWindowRect = function() {
 
 Scene_Battle.prototype.nameFormationWidth = function() {
   return 240;
+};
+
+Scene_Battle.prototype.memberWindowWidth = function() {
+  return $gameSystem.windowPadding() * 2 + Member_Cols * 56;
 };
 
 Scene_Battle.prototype.memberFormationY = function() {
@@ -372,6 +391,7 @@ const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeC
 Window_PartyCommand.prototype.makeCommandList = function() {
   _Window_PartyCommand_makeCommandList.call(this);
   this.addCommand(TextManager.formation, "formation", $gameParty.useFormation());
+  this._list.splice(CommandIndex, 0, this._list.pop());
 };
 
 const _Window_FormationBattleMemberName_initialize = Window_FormationBattleMemberName.prototype.initialize;

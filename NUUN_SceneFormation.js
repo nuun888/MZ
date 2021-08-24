@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.0.2
+ * @version 1.1.0
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -25,6 +25,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/24 Ver.1.1.0
+ * ステータスウィンドウ以外を中央（待機メンバーウィンドウ基準）揃えにする機能を追加。（戦闘時共通）
+ * Y座標を指定できる機能を追加。（戦闘時共通）
  * 2021/8/18 Ver.1.0.2
  * 戦闘メンバーが最大戦闘メンバー未満の時にエラーが起きる問題を修正。
  * 2021/8/17 Ver.1.0.1
@@ -40,6 +43,13 @@
  * @param BasicSetting
  * @text 基本設定
  * @default ------------------------------
+ * 
+ * @param WindowCenter
+ * @text ウィンドウ中央自動調整
+ * @desc ウィンドウを中央に自動調整します。待機メンバーウィンドウの横幅で調整されます。
+ * @type boolean
+ * @default true
+ * @parent Setting
  * 
  * @param DeadActorColor
  * @text 戦闘不能アクター背景色
@@ -71,7 +81,16 @@
  * @text 戦闘メンバー名称ウィンドウX座標
  * @desc 戦闘メンバー名称ウィンドウX座標
  * @type number
- * @default 100
+ * @default 0
+ * @min -9999
+ * @parent BattleMemberNameSetting
+ * 
+ * @param BattleMemberName_Y
+ * @text 戦闘メンバー名称ウィンドウY座標（相対）
+ * @desc 戦闘メンバー名称ウィンドウY座標（相対）
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent BattleMemberNameSetting
  * 
  * @param MemberNameSetting
@@ -89,7 +108,16 @@
  * @text 待機メンバー名称ウィンドウX座標
  * @desc 待機メンバー名称ウィンドウX座標
  * @type number
- * @default 100
+ * @default 0
+ * @min -9999
+ * @parent MemberNameSetting
+ * 
+ * @param MemberName_Y
+ * @text 待機メンバー名称ウィンドウY座標（相対）
+ * @desc 待機メンバー名称ウィンドウY座標（相対）
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent MemberNameSetting
  * 
  * @param BattleMemberSetting
@@ -100,7 +128,16 @@
  * @text バトルメンバーウィンドウX座標
  * @desc バトルメンバーウィンドウX座標
  * @type number
- * @default 100
+ * @default 0
+ * @min -9999
+ * @parent BattleMemberSetting
+ * 
+ * @param BattleMember_Y
+ * @text バトルメンバーウィンドウY座標（相対）
+ * @desc バトルメンバーウィンドウY座標（相対）
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent BattleMemberSetting
  * 
  * @param MemberSetting
@@ -112,6 +149,7 @@
  * @desc 待機メンバー横表示数
  * @type number
  * @default 10
+ * @min 0
  * @parent MemberSetting
  * 
  * @param Member_Rows
@@ -125,7 +163,16 @@
  * @text 待機メンバーウィンドウX座標
  * @desc 待機メンバーウィンドウX座標
  * @type number
- * @default 100
+ * @default 0
+ * @min -9999
+ * @parent MemberSetting
+ * 
+ * @param Member_Y
+ * @text 待機メンバーウィンドウY座標（相対）
+ * @desc 待機メンバーウィンドウY座標（相対）
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent MemberSetting
  * 
  * @param StatusSetting
@@ -291,6 +338,7 @@
  * @text Y表示行位置
  * @type number
  * @default 1
+ * @max 9999
  * @min 1
  * 
  * @param X_Coordinate
@@ -356,6 +404,7 @@
  * @desc 装備欄の開始インデックスを指定します。
  * @type number
  * @default 0
+ * @max 999999
  * @parent EquipSetting
  * 
  * @param EquipNum
@@ -414,14 +463,19 @@ Window_FormationStatus.prototype.constructor = Window_FormationStatus;
 const parameters = PluginManager.parameters('NUUN_SceneFormation');
 const BattleMemberName = String(parameters['BattleMemberName'] || "戦闘メンバー");
 const MemberName = String(parameters['MemberName'] || "待機メンバー");
-const BattleMemberName_X = Number(parameters['BattleMemberName_X'] || 100);
-const MemberName_X = Number(parameters['MemberName_X'] || 100);
-const BattleMember_X = Number(parameters['BattleMember_X'] || 100);
-const Member_X = Number(parameters['Member_X'] || 100);
+const BattleMemberName_X = Number(parameters['BattleMemberName_X'] || 0);
+const BattleMemberName_Y = Number(parameters['BattleMemberName_Y'] || 0);
+const MemberName_X = Number(parameters['MemberName_X'] || 0);
+const MemberName_Y = Number(parameters['MemberName_Y'] || 0);
+const BattleMember_X = Number(parameters['BattleMember_X'] || 0);
+const BattleMember_Y = Number(parameters['BattleMember_Y'] || 0);
+const Member_X = Number(parameters['Member_X'] || 0);
+const Member_Y = Number(parameters['Member_Y'] || 0);
 const Member_Cols = Number(parameters['Member_Cols'] || 10);
 const Member_Rows = Number(parameters['Member_Rows'] || 1);
 const ActorStatus = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorStatus'])) : [];
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
+const WindowCenter = eval(parameters['WindowCenter'] || "true");
 const VariableBattleMember = eval(parameters['VariableBattleMember'] || "false");
 const EquipIcons = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipIcons'])) : [];
 const EquipNameVisible = Number(parameters['EquipNameVisible'] || 1);
@@ -542,33 +596,33 @@ Scene_Formation.prototype.createMemberStatusWindow = function() {
 };
 
 Scene_Formation.prototype.battleMemberNameWindowRect = function() {
-  const wx = BattleMemberName_X;
-  const wy = 0;
+  const wx = BattleMemberName_X + (WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
+  const wy = BattleMemberName_Y;
   const ww = this.nameWidth();
   const wh = this.calcWindowHeight(1, true);
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Formation.prototype.memberNameWindowRect = function() {
-  const wx = MemberName_X;
-  const wy = this.memberY();
+  const wx = MemberName_X + (WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
+  const wy = this.memberY() + MemberName_Y;
   const ww = this.nameWidth();
   const wh = this.calcWindowHeight(1, true);
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Formation.prototype.battleMemberWindowRect = function() {
-  const wx = BattleMember_X;
-  const wy = this.calcWindowHeight(1, true);
+  const wx = BattleMember_X + (WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
+  const wy = this.calcWindowHeight(1, true) + BattleMember_Y;
   const ww = $gameSystem.windowPadding() * 2 + $gameParty.defaultMaxBattleMembers() * 56;
   const wh = 80;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Formation.prototype.memberWindowRect = function() {
-  const wx = Member_X;
-  const wy = this.memberY() + this.calcWindowHeight(1, true);
-  const ww = $gameSystem.windowPadding() * 2 + Member_Cols * 56;
+  const ww = this.memberWindowWidth();
+  const wx = Member_X + WindowCenter ? (Graphics.boxWidth - ww) / 2 : 0;
+  const wy = this.memberY() + this.calcWindowHeight(1, true) + Member_Y;
   const wh = 86 + (Member_Rows - 1) * 48;
   return new Rectangle(wx, wy, ww, wh);
 };
@@ -578,8 +632,11 @@ Scene_Formation.prototype.memberStatusWindowRect = function() {
   const wh = this.calcWindowHeight(5, true);
   const wy = Graphics.boxHeight - wh;
   const ww = Graphics.boxWidth;
-  
   return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Formation.prototype.memberWindowWidth = function() {
+  return $gameSystem.windowPadding() * 2 + Member_Cols * 56;
 };
 
 Scene_Formation.prototype.nameWidth = function() {

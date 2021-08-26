@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -44,17 +44,28 @@
  * 武器タイプ
  * 防具タイプ
  * 装備タイプ
+ * 共通画像
+ * アイテム個別画像
  * 
  * 
  * アイテム、武器、防具のメモ欄
  * <NoBook> アイテム図鑑に表示されません。
  * 
  * <[tag]:[text]> 記述欄のテキスト
- * [tag]:記述欄タグ名
+ * [tag]:記述欄タグ名（記述欄、個別指定画像タグで設定します）
  * [text]:表示するテキスト。
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
  * <desc1:ああああ> desc1とタグ付けされた項目に「ああああ」が表示されます。
  * 文章を表示させる場合は<desc1:[text]>と記入してください。
+ * 
+ * <[tag]:[img],[x],[y]> アイテム個別画像の表示
+ * [tag]:アイテム個別画像タグ名（記述欄、個別指定画像タグで設定します）
+ * [img]:画像パス(拡張子なし)　
+ * 個別指定画像フォルダが'pictures'ならimg/pictures直下のファイルを拡張子なしで記入してください。
+ * サブフォルダーから取得する場合はサブフォルダー名も記入してください。例 items/tankobu
+ * [x]:x座標(相対)
+ * [y]:y座標(相対)
+ * 複数画像を指定したい場合は項目リストで表示する分だけ設定し、記述欄、個別指定画像タグ名で別々の名前で設定してください。
  * 
  * <[categorytag]:[categorykey]> 表示するアイテムのカテゴリーを記入します。
  * [categorytag]:「カテゴリータグ名」で設定したタグ名
@@ -117,12 +128,26 @@
  * 能力値、所持数、最大所持数、価格、オリジナルパラメータ、使用可能時、消耗、速度補正率、得TP、武器タイプ、防具タイプ、装備タイプ
  * で設定可能です。
  * 
+ * 【記述欄、個別指定画像タグ名】
+ * 任意の文字列を記入してください。一部文字列は使用できない場合もありますのでその場合は''で囲むと表示される場合があります。
+ * desc1と記入した場合はモンスターのメモ欄に<desc1:ああああ>と記入したとき、記述欄タグ名にdesc1と
+ * 記入した項目に「ああああ」と表示されます。
+ * 
+ * 【共通画像】
+ * アイテム、武器、防具それぞれのカテゴリーで表示される共通の画像を指定します。
+ * 
+ * 【画像の最大縦幅】
+ * 画像の表示サイズを指定した行分のサイズに調整します。デフォルトで８行で設定されていますので８行分の高さを超えたらサイズ調整します。
+ * 共通画像、アイテム個別画像で設定可能です。
+ * 
  * 参照パラメータ
  * item　アイテムデータ
  * 
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2021/8/27 Ver.1.2.0
+ * 画像を表示できる機能を追加。
  * 2021/8/22 Ver.1.1.0
  * 任意のアイテムカテゴリーを設定できる機能を追加。
  * 2021/8/13 Ver.1.0.1
@@ -240,6 +265,13 @@
  * @default ？
  * @parent BasicSetting
  * 
+ * @param ImgFolder
+ * @desc 個別指定画像をフォルダ名を指定します。(img直下)
+ * @text 個別指定画像フォルダ
+ * @type string
+ * @default 'pictures'
+ * @parent BasicSetting
+ * 
  * @param Category
  * @text カテゴリー設定
  * @default ------------------------------
@@ -318,7 +350,7 @@
  * @desc アイテム項目設定。
  * @text アイテム項目設定
  * @type struct<PageSettingData>[]
- * @default ["{\"displayData\":\"[\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"MaskMode\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"center\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"No\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"MaskMode\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"3\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"4\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"MaskMode\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"5\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"4\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"MaskMode\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"10\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"5\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"MaskMode\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"11\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"5\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"MaskMode\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\"]\",\"PageName\":\"\"}"]
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"101\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"Itemimg\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"6\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"No\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"true\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"true\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"10\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"true\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"11\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"true\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"9\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"disp\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent PageData
  * 
  * @param WeaponPageSetting
@@ -460,8 +492,6 @@
  * @value 13
  * @option 得TP
  * @value 14
- * @option 画像（未実装）
- * @value 50
  * @option 名称のみ
  * @value 51
  * @option ライン
@@ -470,6 +500,10 @@
  * @value 60
  * @option 使用回数(未実装)
  * @value 61
+ * @option 画像（共通画像）
+ * @value 100
+ * @option 画像（個別指定画像）
+ * @value 101
  * @parent BasicSetting
  * 
  * @param DetaEval
@@ -577,8 +611,8 @@
  * @text 記述欄設定
  * 
  * @param textMethod
- * @desc 記述欄に紐づけするタグ名
- * @text 記述欄タグ名
+ * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
+ * @text 記述欄、個別指定画像タグ名
  * @type string
  * @default 
  * @parent textSetting
@@ -588,7 +622,7 @@
  * 
  * @param ImgData
  * @desc 画像ファイル名を指定します。
- * @text 画像(未実装)
+ * @text 画像
  * @type file[]
  * @dir img/
  * @default []
@@ -666,14 +700,16 @@
  * @value 30
  * @option 装備タイプ
  * @value 32
- * @option 画像（未実装）
- * @value 50
  * @option 名称のみ
  * @value 51
  * @option ライン
  * @value 52
  * @option 取得回数（未実装）
  * @value 60
+ * @option 画像（共通画像）
+ * @value 100
+ * @option 画像（個別指定画像）
+ * @value 101
  * @parent BasicSetting
  * 
  * @param DetaEval
@@ -781,8 +817,8 @@
  * @text 記述欄設定
  * 
  * @param textMethod
- * @desc 記述欄に紐づけするタグ名
- * @text 記述欄タグ名
+ * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
+ * @text 記述欄、個別指定画像タグ名
  * @type string
  * @default 
  * @parent textSetting
@@ -791,8 +827,8 @@
  * @text 画像設定
  * 
  * @param ImgData
- * @desc 画像ファイル名を指定します。
- * @text 画像(未実装)
+ * @desc 共通画像ファイル名を指定します。
+ * @text 共通画像
  * @type file[]
  * @dir img/
  * @default []
@@ -870,14 +906,16 @@
  * @value 31
  * @option 装備タイプ
  * @value 32
- * @option 画像（未実装）
- * @value 50
  * @option 名称のみ
  * @value 51
  * @option ライン
  * @value 52
  * @option 取得回数(未実装)
  * @value 60
+ * @option 画像（共通画像）
+ * @value 100
+ * @option 画像（個別指定画像）
+ * @value 101
  * @parent BasicSetting
  * 
  * @param DetaEval
@@ -985,8 +1023,8 @@
  * @text 記述欄設定
  * 
  * @param textMethod
- * @desc 記述欄に紐づけするタグ名
- * @text 記述欄タグ名
+ * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
+ * @text 記述欄、個別指定画像タグ名
  * @type string
  * @default 
  * @parent textSetting
@@ -995,8 +1033,8 @@
  * @text 画像設定
  * 
  * @param ImgData
- * @desc 画像ファイル名を指定します。
- * @text 画像(未実装)
+ * @desc 共通画像ファイル名を指定します。
+ * @text 共通画像
  * @type file[]
  * @dir img/
  * @default []
@@ -1070,6 +1108,7 @@ const RegistrationTiming = Number(parameters['RegistrationTiming'] || 0);
 const RegistrationItemTiming = Number(parameters['RegistrationItemTiming'] || 0);
 const UnknownData = String(parameters['UnknownData'] || '？');
 const UnknownItemData = String(parameters['UnknownItemData'] || '？？？');
+const ImgFolder = eval(parameters['ImgFolder'] || 'pictures');
 let PercentWindowVisible = eval(parameters['PercentWindowVisible'] || 'true');
 const PercentContent = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PercentContent'])) : null) || [];
 const Interval = Number(parameters['Interval'] || 100);
@@ -2020,12 +2059,36 @@ Window_ItemBook.prototype.updateHelp = function() {
   this.setHelpWindowItem(this._item);
 };
 
+Window_ItemBook.prototype.getItemBitmap = function(list, item) {
+  let bitmap = null;
+  for (const data of list) {
+    const commonItemBitmap = data.DateSelect === 100 && data.ImgData[0] ? ImageManager.nuun_LoadPictures(data.ImgData[0]) : null;
+    const itemBitmapData = data.DateSelect === 101 && item.meta[data.textMethod] ? item.meta[data.textMethod].split(',') : null;
+    const itemBitmap = itemBitmapData ? ImageManager.loadBitmap("img/"+ ImgFolder +"/", itemBitmapData[0]) : null;  
+    if (commonItemBitmap && !commonItemBitmap.isReady()) {
+      bitmap = commonItemBitmap;
+    } else if (itemBitmap && !itemBitmap.isReady()) {
+      bitmap = itemBitmap;
+    }
+  }
+  return bitmap;
+};
+
 Window_ItemBook.prototype.page = function(item) {
   const displayList = this.setDisplayList(item);
   if (!displayList || displayList.length <= 0) {
     return;
   }
   const listContent = displayList[this._pageMode].displayData;
+  const bitmap = this.getItemBitmap(listContent, item);
+  if (bitmap) {
+    bitmap.addLoadListener(this.drawPage.bind(this, listContent, item));
+  } else {
+    this.drawPage(listContent, item);
+  }
+};
+
+Window_ItemBook.prototype.drawPage = function(listContent, item) {
   const lineHeight = this.lineHeight();
   for (const data of listContent) {
     const x_Position = data.X_Position;
@@ -2138,10 +2201,10 @@ Window_ItemBook.prototype.dataDisplay = function(list, item, x, y, width) {
       this.horzLine(list, item, x, y, width);
       break;
     case 100:
-      this.effectOfUse(list, item, x, y, width);
+      this.commonItemBitmap(list, item, x, y, width);
       break;
     case 101:
-      this.feature(list, item, x, y, width);
+      this.itemBitmap(list, item, x, y, width);
       break;
     case 103:
     case 111:
@@ -2156,13 +2219,6 @@ Window_ItemBook.prototype.dataDisplay = function(list, item, x, y, width) {
     default:
       break;
   }
-};
-
-Window_ItemBook.prototype.itemBitmap = function(list, enemy, x, y, width) {
-  const height = list.ImgMaxHeight * this.lineHeight();
-  const itemPadding = this.itemPadding();
-  const sprite = new Sprite();
-  this.addChildToBack(sprite);
 };
 
 Window_ItemBook.prototype.itemName = function(list, item, x, y, width) {
@@ -2572,6 +2628,40 @@ Window_ItemBook.prototype.feature = function(list, item, x, y, width) {
       }
     }
   }
+};
+
+Window_ItemBook.prototype.commonItemBitmap = function(list, item, x, y, width) {
+  const bitmap = ImageManager.nuun_LoadPictures(list.ImgData[0]);
+  if (bitmap && !bitmap.isReady()) {
+    bitmap.addLoadListener(this.drawImg.bind(this, bitmap, list, x, y, width));
+  } else if (bitmap) {
+    this.drawImg(bitmap, list, x, y, width);
+  }
+};
+
+Window_ItemBook.prototype.itemBitmap = function(list, item, x, y, width) {
+  const dataImg = item.meta[list.textMethod] ? item.meta[list.textMethod].split(',') : null;
+  if (dataImg) {
+    const bitmap = ImageManager.loadBitmap("img/"+ ImgFolder +"/", dataImg[0]);
+    x += dataImg[1] || 0;
+    y += dataImg[2] || 0;
+    if (!bitmap.isReady()) {
+      bitmap.addLoadListener(this.drawImg.bind(this, bitmap, list, x, y, width));
+    } else if (bitmap) {
+      this.drawImg(bitmap, list, x, y, width);
+    }
+  }
+};
+
+Window_ItemBook.prototype.drawImg = function(bitmap, list, x, y, width) {
+  const height = list.ImgMaxHeight * this.lineHeight();
+  const scalex = Math.min(1.0, width / bitmap.width);
+  const scaley = Math.min(1.0, height / bitmap.height);
+  const scale = scalex > scaley ? scaley : scalex;
+  const dw = Math.floor(bitmap.width * scale);
+  const dh = Math.floor(bitmap.height * scale);
+  x = Math.floor(width / 2 - dw / 2);
+  this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
 };
 
 Window_ItemBook.prototype.paramMask = function() {

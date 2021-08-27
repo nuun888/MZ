@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -146,6 +146,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2021/8/28 Ver.1.2.1
+ * 共通画像を空白のままでアイテム図鑑を開くとエラーが出る問題を修正。
  * 2021/8/27 Ver.1.2.0
  * 画像を表示できる機能を追加。
  * 2021/8/22 Ver.1.1.0
@@ -634,7 +636,7 @@
  * @type number
  * @default 8
  * @min 0
- * @parent enemySetting
+ * @parent ImgSetting
  * 
  * @param UnitSetting
  * @text 単位設定
@@ -840,7 +842,7 @@
  * @type number
  * @default 8
  * @min 0
- * @parent enemySetting
+ * @parent ImgSetting
  * 
  * @param UnitSetting
  * @text 単位設定
@@ -1046,7 +1048,7 @@
  * @type number
  * @default 8
  * @min 0
- * @parent enemySetting
+ * @parent ImgSetting
  * 
  * @param UnitSetting
  * @text 単位設定
@@ -2062,7 +2064,7 @@ Window_ItemBook.prototype.updateHelp = function() {
 Window_ItemBook.prototype.getItemBitmap = function(list, item) {
   let bitmap = null;
   for (const data of list) {
-    const commonItemBitmap = data.DateSelect === 100 && data.ImgData[0] ? ImageManager.nuun_LoadPictures(data.ImgData[0]) : null;
+    const commonItemBitmap = data.DateSelect === 100 && data.ImgData && data.ImgData[0] ? ImageManager.nuun_LoadPictures(data.ImgData[0]) : null;
     const itemBitmapData = data.DateSelect === 101 && item.meta[data.textMethod] ? item.meta[data.textMethod].split(',') : null;
     const itemBitmap = itemBitmapData ? ImageManager.loadBitmap("img/"+ ImgFolder +"/", itemBitmapData[0]) : null;  
     if (commonItemBitmap && !commonItemBitmap.isReady()) {

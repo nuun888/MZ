@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -146,6 +146,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2021/8/28 Ver.1.2.2
+ * カテゴリーキーが反映しなかった問題を修正。
  * 2021/8/28 Ver.1.2.1
  * 共通画像を空白のままでアイテム図鑑を開くとエラーが出る問題を修正。
  * 2021/8/27 Ver.1.2.0
@@ -1129,7 +1131,7 @@ const EffectMultiCol = eval(parameters['EffectMultiCol'] || "false");
 const TraitsMaxItems = Number(parameters['TraitsMaxItems'] || 0);
 const TraitsMultiCol = eval(parameters['TraitsMultiCol'] || "false");
 const ItemBookCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemBookCategory'])) : null) || [];
-const ItemBookCategoryTagName = String(parameters['ItemBookCategoryTagName'] || 'CategoryType');
+const ItemBookCategoryTagName = eval(parameters['ItemBookCategoryTagName'] || 'CategoryType');
 
 const PercentContentLength = PercentWindowVisible && (PercentContent && PercentContent.length > 0);
 

@@ -12,6 +12,13 @@
 | ---------- | ------------- | ------------- | -------- |
 | バトルスタイル拡張ベース | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) |  | 2.5.2 |
 | バトルスタイル拡張 | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.5.1 |
+| アクターステータス拡張 |  |  |  |
+| フロントビューアクターエフェクト |  |  |  |
+| バトルコマンド拡張 |  |  |  |
+| 条件付きアクターグラフィック |  |  |  |
+| バトルデザインMV |  |  |  |
+| バトルデザインXP |  |  |  |
+| バトルデザイン(仮) |  |  |  |
 | [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) |  | 1.12.3 |
 | サポートアクター | [NUUN_SupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js) |  | 1.2.2 |
 | ┣  サポートアクター表示 | [NUUN_DisplaySupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) |  | 1.2.0 |

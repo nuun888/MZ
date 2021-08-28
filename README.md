@@ -30,6 +30,7 @@
 | 複数属性 | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) |  | 1.0.0 |
 | 戦闘背景の変更 | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) |  | 1.1.0 |
 | 戦闘中アイテム、スキル選択画面MV風表示 | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js) |  | 1.0.2 |
+| 最大戦闘メンバー数変更 | [NUUN_MaxBattleMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
@@ -108,8 +109,8 @@
 | ---------- | ------------- | ------------- | -------- |
 | アイテムのカテゴリーカスタマイズ | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) |  | 1.1.3 |
 | コマンド拡張 | [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js) |  | 1.2.1 |
-| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) |  | 2.7.1 |
-| アイテム図鑑 | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) |  | 1.1.0 |
+| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) |  | 2.8.0 |
+| アイテム図鑑 | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) |  | 1.2.2 |
 | ステータス画面拡張 | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) |  |  | 2.2.2 |
 | セーブ画面拡張 | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  |  | 1.7.0 |
 | セーブ上書き確認 |  |  |  |

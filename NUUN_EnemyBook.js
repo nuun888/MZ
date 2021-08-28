@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.7.3
+ * @version 2.8.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -69,6 +69,8 @@
  * 敵の使用スキル
  * モンスター画像
  * キャラチップ
+ * 共通画像
+ * 画像
  * 属性耐性レーダーチャート
  * ステート耐性レーダーチャート
  * モンスターブックナンバー
@@ -86,6 +88,17 @@
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
  * <desc1:ああああ> desc1とタグ付けされた項目に「ああああ」が表示されます。
  * デフォルト設定では４ページ目に表示される項目にdesc1が設定されていますので、文章を表示させる場合は<desc1:[text]>と記入してください。
+ * 
+ * <[tag]:[img],[x],[y]> アイテム個別画像の表示
+ * [tag]:アイテム個別画像タグ名（記述欄、個別指定画像タグで設定します）
+ * [img]:画像パス(拡張子なし)　
+ * 個別指定画像フォルダが'pictures'ならimg/pictures直下のファイルを拡張子なしで記入してください。
+ * サブフォルダーから取得する場合はサブフォルダー名も記入してください。例 items/tankobu
+ * [x]:x座標(相対)
+ * [y]:y座標(相対)
+ * 複数画像を指定したい場合は項目リストで表示する分だけ設定し、記述欄、個別指定画像タグ名で別々の名前で設定してください。
+ * デフォルトの設定ではpicturesフォルダーが指定されています。
+ * モンスター個別画像はモンスター毎に異なる任意の画像を表示させるための機能です。モンスター画像を表示させる場合はモンスター画像で表示させてください。
  * 
  * <NoBook>
  * モンスター図鑑に表示されません。アナライズのみデータを見ることが出来ます。
@@ -141,7 +154,7 @@
  * この設定は「アナライズ設定」の「表示項目設定」でも同じです。
  * 
  * 【名称の設定】
- * モンスター名、モンスター画像以外で任意の名称を設定できます。
+ * モンスター名、画像以外で任意の名称を設定できます。
  * 無記入の場合はデーターベース及びこのプラグイン内で設定した名称が表示されます。
  * 
  * 【システム項目文字色の設定】
@@ -176,7 +189,11 @@
  * 名称、モンスター名の文字の位置を指定します。
  * 
  * 【画像の最大縦幅】
- * モンスターの表示サイズを指定した行分のサイズに調整します。デフォルトで８行で設定されていますので８行分の高さを超えたらサイズ調整します。
+ * 画像の表示サイズを指定した行分のサイズに調整します。デフォルトで８行で設定されていますので８行分の高さを超えたらサイズ調整します。
+ * モンスター画像、共通画像、モンスター個別画像で設定します。
+ * 
+ * 【共通画像】
+ * 同一ページ内で表示される共通の画像を指定します。
  * 
  * 【単位】
  * 追加能力値、特殊能力値、任意ステータス、盗めるアイテム、倒した数で接尾につける単位を設定します。
@@ -200,6 +217,7 @@
  * 対応プラグイン
  * ドロップアイテム追加
  * 盗みスキル
+ * ドロップ率百分率化
  * 
  * このプラグインは「共通処理」(NUUN_Base)プラグインVer.1.1.4以降が必要となります。
  * 
@@ -252,12 +270,15 @@
  * 
  * 仕様
  * ページ選択ウィンドウのカーソル移動は左右キーのみ動作します。
- * 
+ * モンスター画像は共通画像、モンスター個別画像の背後に表示されます。
+ * 共通画像、モンスター個別画像は複数設定、表示可能です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/28 Ver.2.8.0
+ * 画像を表示できる機能を追加。
  * 2021/8/13 Ver.2.7.3
  * アイテム百分率化プラグインに対応。
  * 受けた属性、ステート、デバフ表示機能を別プラグイン化。
@@ -923,6 +944,13 @@
  * @default false
  * @text 戦闘時タッチUI OFF時ウィンドウ上詰め
  * @desc 戦闘時タッチUIがOFFの時ウィンドウを上に詰めます。
+ * @parent BasicSetting
+ * 
+ * @param ImgFolder
+ * @desc 個別指定画像をフォルダ名を指定します。(img直下)
+ * @text 個別指定画像フォルダ
+ * @type string
+ * @default 'pictures'
  * @parent BasicSetting
  * 
  * @param MonsterSetting
@@ -1903,132 +1931,136 @@
  * @type select
  * @option 表示なし
  * @value 0
- * @option 最大HP
+ * @option 最大HP(1)～(11)
  * @value 1
- * @option 最大MP
+ * @option 最大MP(1)～(11)
  * @value 2
- * @option 攻撃力
+ * @option 攻撃力(1)～(11)
  * @value 3
- * @option 防御力
+ * @option 防御力(1)～(11)
  * @value 4
- * @option 魔法力
+ * @option 魔法力(1)～(11)
  * @value 5
- * @option 魔法防御
+ * @option 魔法防御(1)～(11)
  * @value 6
- * @option 敏捷性
+ * @option 敏捷性(1)～(11)
  * @value 7
- * @option 運
+ * @option 運(1)～(11)
  * @value 8
- * @option TP（現在のステータスをONのときのみ）
+ * @option TP（現在のステータスをONのときのみ）(1)～(11)
  * @value 9
- * @option 命中率
+ * @option 命中率(1)～(11)(16)
  * @value 10
- * @option 回避率
+ * @option 回避率(1)～(11)(16)
  * @value 11
- * @option 会心率
+ * @option 会心率(1)～(11)(16)
  * @value 12
- * @option 会心回避率
+ * @option 会心回避率(1)～(11)(16)
  * @value 13
- * @option 魔法回避率
+ * @option 魔法回避率(1)～(11)(16)
  * @value 14
- * @option 魔法反射率
+ * @option 魔法反射率(1)～(11)(16)
  * @value 15
- * @option 反撃率
+ * @option 反撃率(1)～(11)(16)
  * @value 16
- * @option HP再生率
+ * @option HP再生率(1)～(11)(16)
  * @value 17
- * @option MP再生率
+ * @option MP再生率(1)～(11)(16)
  * @value 18
- * @option TP再生率
+ * @option TP再生率(1)～(11)(16)
  * @value 19
- * @option 狙われ率
+ * @option 狙われ率(1)～(11)(16)
  * @value 20
- * @option 防御効果率
+ * @option 防御効果率(1)～(11)(16)
  * @value 21
- * @option 回復効果率
+ * @option 回復効果率(1)～(11)(16)
  * @value 22
- * @option 薬の知識
+ * @option 薬の知識(1)～(11)(16)
  * @value 23
- * @option MP消費率
+ * @option MP消費率(1)～(11)(16)
  * @value 24
- * @option TPチャージ率
+ * @option TPチャージ率(1)～(11)(16)
  * @value 25
- * @option 物理ダメージ率
+ * @option 物理ダメージ率(1)～(11)(16)
  * @value 26
- * @option 魔法ダメージ率
+ * @option 魔法ダメージ率(1)～(11)(16)
  * @value 27
- * @option 経験値
+ * @option 経験値(1)～(11)
  * @value 30
- * @option 獲得金額
+ * @option 獲得金額(1)～(11)
  * @value 31
- * @option 倒した数
+ * @option 倒した数(1)～(11)(16)
  * @value 32
- * @option モンスター名
+ * @option モンスター名(2)～(7)(9)(12)
  * @value 33
- * @option 名称のみ
+ * @option 名称のみ(2)～(7)(9)(12)
  * @value 35
- * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）
+ * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）(1)～(11)
  * @value 36
- * @option モンスターブックナンバー
+ * @option モンスターブックナンバー(2)～(7)(9)
  * @value 37
- * @option 耐性属性
+ * @option 耐性属性(2)～(7)(9)(10)(11)
  * @value 40
- * @option 弱点属性
+ * @option 弱点属性(2)～(7)(9)(10)(11)
  * @value 41
- * @option 無効属性
+ * @option 無効属性(2)～(7)(9)(10)(11)
  * @value 42
- * @option 耐性ステート
+ * @option 耐性ステート(2)～(7)(9)(10)(11)
  * @value 45
- * @option 弱点ステート
+ * @option 弱点ステート(2)～(7)(9)(10)(11)
  * @value 46
- * @option 無効ステート
+ * @option 無効ステート(2)～(7)(9)(10)(11)
  * @value 47
- * @option 耐性デバフ
+ * @option 耐性デバフ(2)～(7)(9)(10)(11)
  * @value 50
- * @option 弱点デバフ
+ * @option 弱点デバフ(2)～(7)(9)(10)(11)
  * @value 51
- * @option ドロップアイテム
+ * @option ドロップアイテム(2)～(7)(9)(10)(11)
  * @value 60
- * @option スティールアイテム（要盗みスキルプラグイン）
+ * @option スティールアイテム（要盗みスキルプラグイン）(2)～(7)(9)(10)(11)
  * @value 61
- * @option 記述欄
+ * @option 記述欄(1)～(7)(9)(10)(13)
  * @value 70
- * @option オリジナルパラメータ
+ * @option オリジナルパラメータ(1)～(11)(16)
  * @value 80
- * @option 敵の使用スキル
+ * @option 敵の使用スキル(2)～(7)(9)(10)(11)
  * @value 100
- * @option 属性レーダーチャート
+ * @option 属性レーダーチャート(2)～(7)(9)
  * @value 121
- * @option ステートレーダーチャート
+ * @option ステートレーダーチャート(2)～(7)(9)
  * @value 122
- * @option モンスター画像
+ * @option モンスター画像(3)～(7)(9)(15)
  * @value 200
- * @option キャラチップ
+ * @option キャラチップ(3)～(7)(9)
  * @value 201
+ * @option 共通画像(3)～(7)(9)(14)(15)
+ * @value 250
+ * @option モンスター個別画像(3)～(7)(9)(13)(15)
+ * @value 251
  * @option 盗み抵抗（要盗みスキルプラグイン）（未実装）
  * @value 300
- * @option ライン
+ * @option ライン(2)～(7)(9)
  * @value 1000
  * @default 0
  * @parent BasicSetting
  * 
  * @param DetaEval
  * @desc パラメータ評価式を設定します。
- * @text パラメータ評価式
+ * @text パラメータ評価式(1)
  * @type string
  * @default 
  * @parent BasicSetting
  * 
  * @param NameColor
  * @desc システム項目の文字色。
- * @text システム項目文字色
+ * @text システム項目文字色(2)
  * @type number
  * @default 16
  * @min 0
  * @parent BasicSetting
  * 
  * @param X_Position
- * @text X表示列位置
+ * @text X表示列位置(3)
  * @desc X表示列位置
  * @type number
  * @default 1
@@ -2038,14 +2070,14 @@
  * 
  * @param Y_Position
  * @desc Y表示行位置
- * @text Y表示行位置
+ * @text Y表示行位置(4)
  * @type number
  * @default 1
  * @min 1
  * @parent BasicSetting
  * 
  * @param X_Coordinate
- * @text X座標（相対）
+ * @text X座標（相対）(5)
  * @desc X座標（X表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -2053,7 +2085,7 @@
  * @parent BasicSetting
  * 
  * @param Y_Coordinate
- * @text Y座標（相対）
+ * @text Y座標（相対）(6)
  * @desc Y座標（Y表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -2062,7 +2094,7 @@
  * 
  * @param ItemWidth
  * @desc 項目横幅（0で自動）
- * @text 項目横幅
+ * @text 項目横幅(7)
  * @type number
  * @default 0
  * @min 0
@@ -2070,7 +2102,7 @@
  * 
  * @param SystemItemWidth
  * @desc システム項目の横幅（0でデフォルト幅）
- * @text システム項目横幅
+ * @text システム項目横幅(8)
  * @type number
  * @default 0
  * @min 0
@@ -2078,7 +2110,7 @@
  * 
  * @param WideMode
  * @desc 項目表示モード
- * @text 項目表示モード
+ * @text 項目表示モード(9)
  * @type select
  * @option １列表示
  * @value 1
@@ -2091,13 +2123,13 @@
  * 
  * @param MaskMode
  * @desc 図鑑登録の際、撃破及びアナライズで情報開示してない場合はステータスを隠す。
- * @text 情報未登録ステータス表示
+ * @text 情報未登録ステータス表示(10)
  * @type boolean
  * @default true
  * @parent BasicSetting
  * 
  * @param Back
- * @text コンテンツ背景表示
+ * @text コンテンツ背景表示(11)
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
@@ -2107,8 +2139,8 @@
  * @text 名称、モンスター名設定
  * 
  * @param namePosition
- * @desc 名称、モンスター名の表示位置を指定します
- * @text 名称、モンスター名表示位置
+ * @desc 名称、モンスター名の表示位置を指定します。
+ * @text 名称、モンスター名表示位置(12)
  * @type select
  * @option 左
  * @value "left"
@@ -2124,28 +2156,36 @@
  * 
  * @param textMethod
  * @desc 記述欄に紐づけするタグ名
- * @text 記述欄タグ名
+ * @text 記述欄タグ名(13)
  * @type string
  * @default 
  * @parent textSetting
  * 
- * @param enemySetting
- * @text モンスター画像設定
+ * @param ImgSetting
+ * @text 画像設定
+ * 
+ * @param ImgData
+ * @desc 共通画像ファイル名を指定します。
+ * @text 共通画像(14)
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent ImgSetting
  * 
  * @param ImgMaxHeight
  * @desc 画像の最大縦幅（行数で指定）
- * @text 画像の最大縦幅
+ * @text 画像の最大縦幅(15)
  * @type number
  * @default 8
  * @min 0
- * @parent enemySetting
+ * @parent ImgSetting
  * 
  * @param UnitSetting
- * @text モンスター画像設定
+ * @text 単位設定
  * 
  * @param paramUnit
  * @desc 単位を設定します。
- * @text 単位
+ * @text 単位(16)
  * @type string
  * @default 
  * @parent UnitSetting
@@ -4110,6 +4150,15 @@ Window_EnemyBook.prototype.page = function(enemy) {
   }
   const list = this.displayList[this._pageMode];
   const listContent = this.listDate(list) || [];
+  const bitmap = this.getEnemyBitmap(listContent, enemy);
+  if (bitmap) {
+    bitmap.addLoadListener(this.drawPage.bind(this, listContent, enemy));
+  } else {
+    this.drawPage(listContent, enemy);
+  }
+};
+
+Window_EnemyBook.prototype.drawPage = function(listContent, enemy) {
   const lineHeight = this.lineHeight();
   for (const date of listContent) {
     const x_Position = date.X_Position;
@@ -4284,6 +4333,12 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
       break;
     case 201:
       this.enemyCharacter(list, enemy, x, y, width);
+      break;
+    case 250:
+      this.commonEnemyBitmap(list, enemy, x, y, width);
+      break;
+    case 251:
+      this.enemyBitmap(list, enemy, x, y, width);
       break;
     case 300:
     //this.enemyCharacter(list, enemy, x, y, width);
@@ -5100,6 +5155,40 @@ Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
   }
 };
 
+Window_EnemyBook.prototype.commonEnemyBitmap = function(list, enemy, x, y, width) {
+  const bitmap = ImageManager.nuun_LoadPictures(list.ImgData[0]);
+  if (bitmap && !bitmap.isReady()) {
+    bitmap.addLoadListener(this.drawImg.bind(this, bitmap, list, x, y, width));
+  } else if (bitmap) {
+    this.drawImg(bitmap, list, x, y, width);
+  }
+};
+
+Window_EnemyBook.prototype.enemyBitmap = function(list, enemy, x, y, width) {
+  const dataImg = this._enemy.meta[list.textMethod] ? this._enemy.meta[list.textMethod].split(',') : null;
+  if (dataImg) {
+    const bitmap = ImageManager.loadBitmap("img/"+ param.ImgFolder +"/", dataImg[0]);
+    x += dataImg[1] || 0;
+    y += dataImg[2] || 0;
+    if (!bitmap.isReady()) {
+      bitmap.addLoadListener(this.drawImg.bind(this, bitmap, list, x, y, width));
+    } else if (bitmap) {
+      this.drawImg(bitmap, list, x, y, width);
+    }
+  }
+};
+
+Window_EnemyBook.prototype.drawImg = function(bitmap, list, x, y, width) {
+  const height = list.ImgMaxHeight * this.lineHeight();
+  const scalex = Math.min(1.0, width / bitmap.width);
+  const scaley = Math.min(1.0, height / bitmap.height);
+  const scale = scalex > scaley ? scaley : scalex;
+  const dw = Math.floor(bitmap.width * scale);
+  const dh = Math.floor(bitmap.height * scale);
+  x = Math.floor(width / 2 - dw / 2);
+  this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
+};
+
 Window_EnemyBook.prototype.enemyElementChart = function(list, enemy, x, y, width) {
   if (!Imported.NUUN_RadarChartBase) {
     return;
@@ -5301,6 +5390,22 @@ Window_EnemyBook.prototype.drawContentsBackgroundRect = function(rect) {
     this.contents.gradientFillRect(x, y, w, h, c1, c2, true);
     this.contents.strokeRect(x, y, w, h, c1);
 };
+
+Window_EnemyBook.prototype.getEnemyBitmap = function(list, enemy) {
+  let bitmap = null;
+  for (const data of list) {
+    const commonEnemyBitmap = (data.DateSelect === 200 || data.DateSelect === 250) && data.ImgData && data.ImgData[0] ? ImageManager.nuun_LoadPictures(data.ImgData[0]) : null;
+    const enemyBitmapData = data.DateSelect === 251 && this._enemy.meta[data.textMethod] ? this._enemy.meta[data.textMethod].split(',') : null;
+    const enemyBitmap = enemyBitmapData ? ImageManager.loadBitmap("img/"+ param.ImgFolder +"/", enemyBitmapData[0]) : null;  
+    if (commonEnemyBitmap && !commonEnemyBitmap.isReady()) {
+      bitmap = commonEnemyBitmap;
+    } else if (enemyBitmap && !enemyBitmap.isReady()) {
+      bitmap = enemyBitmap;
+    }
+  }
+  return bitmap;
+};
+
 
 Window_EnemyBook.prototype.contentsRect = function(x, y, width) {
   const height = this.lineHeight() - this.rowSpacing();

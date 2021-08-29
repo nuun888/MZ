@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
- * @orderAfter NUUN_Base
+ * @base NUUN_Base
  * @version 1.2.4
  * 
  * @help
@@ -212,15 +212,17 @@ Sprite_Enemy.prototype.updateBitmap = function() {
 };
 
 Sprite_Enemy.prototype.updateHpGauge = function() {
-  if (!this._butlerHp) {
-    this.enemyHPGauge();
+  if (BattleManager.gaugeBaseSprite) {
+    if (!this._butlerHp) {
+      this.enemyHPGauge();
+    }
+    this._butlerHp.x = this.hpGaugeOffsetX + (this.x - this._butlerHp.width / 2);
+    this._butlerHp.y = this.hpGaugeOffsetY + this.y - 40;
+    if (this.getButlerHpPosition() === 0) {
+      this._butlerHp.y -= this.getButlerHpHeight();
+    }
+    this.hpGaugeOpacity();
   }
-  this._butlerHp.x = this.hpGaugeOffsetX + (this.x - this._butlerHp.width / 2);
-  this._butlerHp.y = this.hpGaugeOffsetY + this.y - 40;
-  if (this.getButlerHpPosition() === 0) {
-    this._butlerHp.y -= this.getButlerHpHeight();
-  }
-  this.hpGaugeOpacity();
 };
 
 Sprite_Enemy.prototype.enemyHPGauge = function() {

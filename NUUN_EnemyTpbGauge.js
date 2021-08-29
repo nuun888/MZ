@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミーTPBゲージ
  * @author NUUN
- * @version 1.1.7
+ * @version 1.1.8
  * @base NUUN_Base
  * 
  * @help
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/29 Ver.1.1.8
+ * 競合対策のための処理追加。
  * 2021/7/15 Ver.1.1.7
  * 処理の最適化により一部処理をNUUN_Baseに移行。
  * 2021/7/14 Ver.1.1.6
@@ -62,29 +64,29 @@
  * @default 0
  * 
  * @param GaugeWidth
- * @desc ゲージの横幅を指定します。
- * @text ゲージ横幅
+ * @desc TPBゲージの横幅を指定します。
+ * @text TPBゲージ横幅
  * @type number
  * @default 128
  * @min 0
  * 
  * @param GaugeHeight
- * @desc ゲージの縦幅を指定します。
- * @text ゲージ縦幅
+ * @desc TPBゲージの縦幅を指定します。
+ * @text TPBゲージ縦幅
  * @type number
  * @default 12
  * @min 0
  * 
  * @param Gauge_X
- * @desc ゲージのX座標（相対座標）指定します。
- * @text ゲージX座標
+ * @desc TPBゲージのX座標（相対座標）指定します。
+ * @text TPBゲージX座標
  * @type number
  * @default 0
  * @min -9999
  * 
  * @param Gauge_Y
- * @desc ゲージのY座標（相対座標）指定します。
- * @text ゲージY座標
+ * @desc TPBゲージのY座標（相対座標）指定します。
+ * @text TPBゲージY座標
  * @type number
  * @default 0
  * @min -9999
@@ -123,20 +125,22 @@ Sprite_Enemy.prototype.updateBitmap = function() {
 };
 
 Sprite_Enemy.prototype.updateTpbGauge = function() {
-  if (!this._enemyTpb) {
-    this.enemyTpbGauge();
+  if (BattleManager.gaugeBaseSprite) {
+    if (!this._enemyTpb) {
+      this.enemyTpbGauge();
+    }
+    this._enemyTpb.x = this.tpbGaugeOffsetX + (this.x - this._enemyTpb.width / 2);
+    this._enemyTpb.y = this.tpbGaugeOffsetY + this.y - 40;
+    if (this.getButlerTpbPosition() === 0) {
+      this._enemyTpb.y -= this.getButlerTpbPosition();
+    }
+    if (this._enemyTpb.y < 0) {
+        this._enemyTpb.y = 30;
+    } else if (this._enemyTpb.y + 40 > Graphics.height) {
+      this._enemyTpb.y = Graphics.height - 40;
+    }
+    this.tpbGaugeOpacity();
   }
-  this._enemyTpb.x = this.tpbGaugeOffsetX + (this.x - this._enemyTpb.width / 2);
-  this._enemyTpb.y = this.tpbGaugeOffsetY + this.y - 40;
-  if (this.getButlerTpbPosition() === 0) {
-    this._enemyTpb.y -= this.getButlerTpbPosition();
-  }
-  if (this._enemyTpb.y < 0) {
-      this._enemyTpb.y = 30;
-  } else if (this._enemyTpb.y + 40 > Graphics.height) {
-    this._enemyTpb.y = Graphics.height - 40;
-  }
-  this.tpbGaugeOpacity();
 };
 
 Sprite_Enemy.prototype.enemyTpbGauge = function() {

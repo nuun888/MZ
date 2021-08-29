@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.1.4
+ * @version 1.1.5
  * @base NUUN_Base
  * 
  * 
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/29 Ver.1.1.5
+ * 競合対策のための処理追加。
  * 2021/7/15 Ver.1.1.4
  * 処理の最適化により一部処理をNUUN_Baseに移行。
  * 2021/7/13 Ver.1.1.3
@@ -151,20 +153,22 @@ Sprite_Enemy.prototype.updateActorName = function() {
 };
 
 Sprite_Enemy.prototype.updateEnemyName = function() {
-  if (!this._butlerNameSprite) {
-    this.enemyName();
+  if (BattleManager.gaugeBaseSprite) {
+    if (!this._butlerNameSprite) {
+      this.enemyName();
+    }
+    this._butlerNameSprite.x = this.butlerNameOffsetX + (this.x - this._butlerNameSprite.width / 2);
+    this._butlerNameSprite.y = this.butlerNameOffsetY + this.y - 40;
+    if (this.getButlerNamePosition() === 0) {
+      this._butlerNameSprite.y -= this.getButlerNameHeight();
+    }
+    if (this._butlerNameSprite.y < 0) {
+      this._butlerNameSprite.y = 30;
+    } else if (this._butlerNameSprite.y + 40 > Graphics.height) {
+      this._butlerNameSprite.y = Graphics.height - 40;
+    }
+    this.butlerNameOpacity();
   }
-  this._butlerNameSprite.x = this.butlerNameOffsetX + (this.x - this._butlerNameSprite.width / 2);
-  this._butlerNameSprite.y = this.butlerNameOffsetY + this.y - 40;
-  if (this.getButlerNamePosition() === 0) {
-    this._butlerNameSprite.y -= this.getButlerNameHeight();
-  }
-  if (this._butlerNameSprite.y < 0) {
-    this._butlerNameSprite.y = 30;
-  } else if (this._butlerNameSprite.y + 40 > Graphics.height) {
-    this._butlerNameSprite.y = Graphics.height - 40;
-  }
-  this.butlerNameOpacity();
 };
 
 Sprite_Enemy.prototype.enemyName = function() {

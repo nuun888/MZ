@@ -13,6 +13,7 @@
  * @author NUUN
  * @version 1.1.8
  * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * エネミーにもTPBゲージを表示します。

@@ -13,6 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @version 1.2.5
+ * @orderAfter NUUN_Base
  * 
  * @help
  * 敵のバトラー上にHPゲージを表示します。

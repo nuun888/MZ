@@ -13,7 +13,7 @@
  * @author NUUN
  * @version 1.1.5
  * @base NUUN_Base
- * 
+ * @orderAfter NUUN_Base
  * 
  * @help
  * モンスターの敵名を表示します。

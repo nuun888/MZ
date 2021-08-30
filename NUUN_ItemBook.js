@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -72,6 +72,8 @@
  * [categorykey]:カテゴリーキー
  * allItem:キーアイテムを含む全てのアイテム
  * allItems:アイテム、武器、防具全て
+ * 文字の最初と最後の'及び"は付けなくても問題ありませんが、一部の文字列で反映されない場合があるため念のため付いています。
+ * メモ欄のタグ記入時では付けないでください。
  * 
  * ページの各項目の設定
  * 
@@ -146,6 +148,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2021/8/30 Ver.1.2.3
+ * プラグインパラメータのアイテム項目設定が初期設定のままだとエラーが出る問題を修正。
  * 2021/8/28 Ver.1.2.2
  * カテゴリーキーが反映しなかった問題を修正。
  * 2021/8/28 Ver.1.2.1
@@ -288,8 +292,7 @@
  * @parent Category
  * 
  * @param ItemBookCategoryTagName
- * @desc メモ欄に記入するアイテムカテゴリー識別用タグの名称を指定します。。
- * @text カテゴリータグ名
+ * @desc メモ欄に記入するアイテムカテゴリー識別用タグの名称を指定します。
  * @type string
  * @default 'CategoryType'
  * @parent Category
@@ -353,8 +356,8 @@
  * @param ItemPageSetting
  * @desc アイテム項目設定。
  * @text アイテム項目設定
- * @type struct<PageSettingData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"101\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"Itemimg\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"6\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"No\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"true\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"true\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"10\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"true\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"11\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"true\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"9\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"disp\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @type struct<ItemPageSettingData>[]
+ * @default ["{\"displayData\":\"[\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"101\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"7\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"Itemimg\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"6\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"MaskMode\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"center\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"No\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"MaskMode\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"3\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"4\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"5\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"4\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"10\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"5\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"11\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"2\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"5\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"true\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\",\\\"{\\\\\\\"BasicSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"DateSelect\\\\\\\":\\\\\\\"9\\\\\\\",\\\\\\\"DetaEval\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"NameColor\\\\\\\":\\\\\\\"16\\\\\\\",\\\\\\\"X_Position\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Y_Position\\\\\\\":\\\\\\\"10\\\\\\\",\\\\\\\"X_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Y_Coordinate\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"ItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"SystemItemWidth\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"WideMode\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Back\\\\\\\":\\\\\\\"false\\\\\\\",\\\\\\\"nameSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"namePosition\\\\\\\":\\\\\\\"\\\\\\\\\\\\\\\"left\\\\\\\\\\\\\\\"\\\\\\\",\\\\\\\"textSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"textMethod\\\\\\\":\\\\\\\"disp\\\\\\\",\\\\\\\"ImgSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"ImgData\\\\\\\":\\\\\\\"[]\\\\\\\",\\\\\\\"ImgMaxHeight\\\\\\\":\\\\\\\"8\\\\\\\",\\\\\\\"UnitSetting\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"paramUnit\\\\\\\":\\\\\\\"\\\\\\\"}\\\"]\",\"PageName\":\"\"}"]
  * @parent PageData
  * 
  * @param WeaponPageSetting
@@ -406,7 +409,7 @@
  * 
  * 
  */
-/*~struct~PageSettingData:
+/*~struct~ItemPageSettingData:
  * 
  * @param displayData
  * @desc 表示するリスト項目。
@@ -472,61 +475,61 @@
  * @type select
  * @option 表示なし
  * @value 0
- * @option アイテム名
+ * @option アイテム名(2)～(7)(9)(11)
  * @value 1
- * @option ブックナンバー
+ * @option ブックナンバー(2)～(7)(9)
  * @value 2
- * @option 所持数
+ * @option 所持数(1)～(10)
  * @value 3
- * @option 最大所持数
+ * @option 最大所持数(1)～(10)
  * @value 4
- * @option 価格
+ * @option 価格(1)～(10)
  * @value 5
- * @option オリジナルパラメータ
+ * @option オリジナルパラメータ(1)～(10)(15)
  * @value 8
- * @option 記述欄
+ * @option 記述欄(1)～(7)(9)(12)
  * @value 9
- * @option 使用可能時
+ * @option 使用可能時(1)～(10)
  * @value 10
- * @option 消耗
+ * @option 消耗(1)～(10)
  * @value 11
- * @option 速度補正
+ * @option 速度補正(1)～(10)
  * @value 12
- * @option 成功率
+ * @option 成功率(1)～(10)(15)
  * @value 13
- * @option 得TP
+ * @option 得TP(1)～(10)
  * @value 14
- * @option 名称のみ
+ * @option 名称のみ(2)～(7)(9)
  * @value 51
- * @option ライン
+ * @option ライン(2)～(7)(9)
  * @value 52
  * @option 取得回数(未実装)
  * @value 60
  * @option 使用回数(未実装)
  * @value 61
- * @option 画像（共通画像）
+ * @option 画像（共通画像）(2)～(7)(9)(13)(14)
  * @value 100
- * @option 画像（個別指定画像）
+ * @option 画像（個別指定画像）(2)～(7)(9)(12)(14)
  * @value 101
  * @parent BasicSetting
  * 
  * @param DetaEval
  * @desc パラメータ評価式を設定します。
- * @text パラメータ評価式
+ * @text パラメータ評価式(1)
  * @type string
  * @default 
  * @parent BasicSetting
  * 
  * @param NameColor
  * @desc システム項目の文字色。
- * @text システム項目文字色
+ * @text システム項目文字色(2)
  * @type number
  * @default 16
  * @min 0
  * @parent BasicSetting
  * 
  * @param X_Position
- * @text X表示列位置
+ * @text X表示列位置(3)
  * @desc X表示列位置
  * @type number
  * @default 1
@@ -536,7 +539,7 @@
  * 
  * @param Y_Position
  * @desc Y表示行位置
- * @text Y表示行位置
+ * @text Y表示行位置(4)
  * @type number
  * @default 1
  * @min 1
@@ -544,7 +547,7 @@
  * @parent BasicSetting
  * 
  * @param X_Coordinate
- * @text X座標（相対）
+ * @text X座標（相対）(5)
  * @desc X座標（X表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -552,7 +555,7 @@
  * @parent BasicSetting
  * 
  * @param Y_Coordinate
- * @text Y座標（相対）
+ * @text Y座標（相対）(6)
  * @desc Y座標（Y表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -561,7 +564,7 @@
  * 
  * @param ItemWidth
  * @desc 項目横幅（0で自動）
- * @text 項目横幅
+ * @text 項目横幅(7)
  * @type number
  * @default 0
  * @min 0
@@ -569,7 +572,7 @@
  * 
  * @param SystemItemWidth
  * @desc システム項目の横幅（0でデフォルト幅）
- * @text システム項目横幅
+ * @text システム項目横幅(8)
  * @type number
  * @default 0
  * @min 0
@@ -577,7 +580,7 @@
  * 
  * @param WideMode
  * @desc 項目表示モード
- * @text 項目表示モード
+ * @text 項目表示モード(9)
  * @type select
  * @option １列表示
  * @value 1
@@ -589,7 +592,7 @@
  * @parent BasicSetting
  * 
  * @param Back
- * @text コンテンツ背景表示
+ * @text コンテンツ背景表示(10)
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
@@ -600,7 +603,7 @@
  * 
  * @param namePosition
  * @desc 名称、アイテム名の表示位置を指定します
- * @text 名称、アイテム名表示位置
+ * @text 名称、アイテム名表示位置(11)
  * @type select
  * @option 左
  * @value "left"
@@ -616,7 +619,7 @@
  * 
  * @param textMethod
  * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
- * @text 記述欄、個別指定画像タグ名
+ * @text 記述欄、個別指定画像タグ名(12)
  * @type string
  * @default 
  * @parent textSetting
@@ -626,7 +629,7 @@
  * 
  * @param ImgData
  * @desc 画像ファイル名を指定します。
- * @text 画像
+ * @text 画像(13)
  * @type file[]
  * @dir img/
  * @default []
@@ -634,7 +637,7 @@
  * 
  * @param ImgMaxHeight
  * @desc 画像の最大縦幅（行数で指定）
- * @text 画像の最大縦幅
+ * @text 画像の最大縦幅(14)
  * @type number
  * @default 8
  * @min 0
@@ -645,7 +648,7 @@
  * 
  * @param paramUnit
  * @desc 単位を設定します。
- * @text 単位
+ * @text 単位(15)
  * @type string
  * @default 
  * @parent UnitSetting
@@ -670,69 +673,69 @@
  * @type select
  * @option 表示なし
  * @value 0
- * @option 武器名
+ * @option 武器名(2)～(7)(9)(11)
  * @value 1
- * @option ブックナンバー
+ * @option ブックナンバー(2)～(7)(9)
  * @value 2
- * @option 所持数
+ * @option 所持数(1)～(10)
  * @value 3
- * @option 最大所持数
+ * @option 最大所持数(1)～(10)
  * @value 4
- * @option 価格
+ * @option 価格(1)～(10)
  * @value 5
- * @option オリジナルパラメータ
+ * @option オリジナルパラメータ(1)～(10)(15)
  * @value 8
- * @option 記述欄
+ * @option 記述欄(1)～(7)(9)(12)
  * @value 9
- * @option HP
+ * @option HP(1)～(10)
  * @value 20
- * @option MP
+ * @option MP(1)～(10)
  * @value 21
- * @option 攻撃力
+ * @option 攻撃力(1)～(10)
  * @value 22
- * @option 防御力
+ * @option 防御力(1)～(10)
  * @value 23
- * @option 魔力
+ * @option 魔力(1)～(10)
  * @value 24
- * @option 魔法防御
+ * @option 魔法防御(1)～(10)
  * @value 25
- * @option 敏捷性
+ * @option 敏捷性(1)～(10)
  * @value 26
- * @option 運
+ * @option 運(1)～(10)
  * @value 27
- * @option 武器タイプ
+ * @option 武器タイプ(1)～(10)
  * @value 30
- * @option 装備タイプ
+ * @option 装備タイプ(1)～(10)
  * @value 32
- * @option 名称のみ
+ * @option 名称のみ(2)～(7)(9)
  * @value 51
- * @option ライン
+ * @option ライン(2)～(7)(9)
  * @value 52
  * @option 取得回数（未実装）
  * @value 60
- * @option 画像（共通画像）
+ * @option 画像（共通画像）(2)～(7)(9)(13)(14)
  * @value 100
- * @option 画像（個別指定画像）
+ * @option 画像（個別指定画像）(2)～(7)(9)(12)(14)
  * @value 101
  * @parent BasicSetting
  * 
  * @param DetaEval
  * @desc パラメータ評価式を設定します。
- * @text パラメータ評価式
+ * @text パラメータ評価式(1)
  * @type string
  * @default 
  * @parent BasicSetting
  * 
  * @param NameColor
  * @desc システム項目の文字色。
- * @text システム項目文字色
+ * @text システム項目文字色(2)
  * @type number
  * @default 16
  * @min 0
  * @parent BasicSetting
  * 
  * @param X_Position
- * @text X表示列位置
+ * @text X表示列位置(3)
  * @desc X表示列位置
  * @type number
  * @default 1
@@ -742,7 +745,7 @@
  * 
  * @param Y_Position
  * @desc Y表示行位置
- * @text Y表示行位置
+ * @text Y表示行位置(4)
  * @type number
  * @default 1
  * @max 9999
@@ -750,7 +753,7 @@
  * @parent BasicSetting
  * 
  * @param X_Coordinate
- * @text X座標（相対）
+ * @text X座標（相対）(5)
  * @desc X座標（X表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -758,7 +761,7 @@
  * @parent BasicSetting
  * 
  * @param Y_Coordinate
- * @text Y座標（相対）
+ * @text Y座標（相対）(6)
  * @desc Y座標（Y表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -767,7 +770,7 @@
  * 
  * @param ItemWidth
  * @desc 項目横幅（0で自動）
- * @text 項目横幅
+ * @text 項目横幅(7)
  * @type number
  * @default 0
  * @min 0
@@ -775,7 +778,7 @@
  * 
  * @param SystemItemWidth
  * @desc システム項目の横幅（0でデフォルト幅）
- * @text システム項目横幅
+ * @text システム項目横幅(8)
  * @type number
  * @default 0
  * @min 0
@@ -783,7 +786,7 @@
  * 
  * @param WideMode
  * @desc 項目表示モード
- * @text 項目表示モード
+ * @text 項目表示モード(9)
  * @type select
  * @option １列表示
  * @value 1
@@ -795,7 +798,7 @@
  * @parent BasicSetting
  * 
  * @param Back
- * @text コンテンツ背景表示
+ * @text コンテンツ背景表示(10)
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
@@ -806,7 +809,7 @@
  * 
  * @param namePosition
  * @desc 名称、アイテム名の表示位置を指定します
- * @text 名称、アイテム名表示位置
+ * @text 名称、アイテム名表示位置(11)
  * @type select
  * @option 左
  * @value "left"
@@ -822,7 +825,7 @@
  * 
  * @param textMethod
  * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
- * @text 記述欄、個別指定画像タグ名
+ * @text 記述欄、個別指定画像タグ名(12)
  * @type string
  * @default 
  * @parent textSetting
@@ -832,7 +835,7 @@
  * 
  * @param ImgData
  * @desc 共通画像ファイル名を指定します。
- * @text 共通画像
+ * @text 共通画像(13)
  * @type file[]
  * @dir img/
  * @default []
@@ -840,7 +843,7 @@
  * 
  * @param ImgMaxHeight
  * @desc 画像の最大縦幅（行数で指定）
- * @text 画像の最大縦幅
+ * @text 画像の最大縦幅(14)
  * @type number
  * @default 8
  * @min 0
@@ -851,7 +854,7 @@
  * 
  * @param paramUnit
  * @desc 単位を設定します。
- * @text 単位
+ * @text 単位(15)
  * @type string
  * @default 
  * @parent UnitSetting
@@ -876,69 +879,69 @@
  * @type select
  * @option 表示なし
  * @value 0
- * @option アイテム名
+ * @option 武器名(2)～(7)(9)(11)
  * @value 1
- * @option ブックナンバー
+ * @option ブックナンバー(2)～(7)(9)
  * @value 2
- * @option 所持数
+ * @option 所持数(1)～(10)
  * @value 3
- * @option 最大所持数
+ * @option 最大所持数(1)～(10)
  * @value 4
- * @option 価格
+ * @option 価格(1)～(10)
  * @value 5
- * @option オリジナルパラメータ
+ * @option オリジナルパラメータ(1)～(10)(15)
  * @value 8
- * @option 記述欄
+ * @option 記述欄(1)～(7)(9)(12)
  * @value 9
- * @option HP
+ * @option HP(1)～(10)
  * @value 20
- * @option MP
+ * @option MP(1)～(10)
  * @value 21
- * @option 攻撃力
+ * @option 攻撃力(1)～(10)
  * @value 22
- * @option 防御力
+ * @option 防御力(1)～(10)
  * @value 23
- * @option 魔力
+ * @option 魔力(1)～(10)
  * @value 24
- * @option 魔法防御
+ * @option 魔法防御(1)～(10)
  * @value 25
- * @option 敏捷性
+ * @option 敏捷性(1)～(10)
  * @value 26
- * @option 運
+ * @option 運(1)～(10)
  * @value 27
- * @option 防具タイプ
+ * @option 防具タイプ(1)～(10)
  * @value 31
- * @option 装備タイプ
+ * @option 装備タイプ(1)～(10)
  * @value 32
- * @option 名称のみ
+ * @option 名称のみ(2)～(7)(9)
  * @value 51
- * @option ライン
+ * @option ライン(2)～(7)(9)
  * @value 52
  * @option 取得回数(未実装)
  * @value 60
- * @option 画像（共通画像）
+ * @option 画像（共通画像）(2)～(7)(9)(13)(14)
  * @value 100
- * @option 画像（個別指定画像）
+ * @option 画像（個別指定画像）(2)～(7)(9)(12)(14)
  * @value 101
  * @parent BasicSetting
  * 
  * @param DetaEval
  * @desc パラメータ評価式を設定します。
- * @text パラメータ評価式
+ * @text パラメータ評価式(1)
  * @type string
  * @default 
  * @parent BasicSetting
  * 
  * @param NameColor
  * @desc システム項目の文字色。
- * @text システム項目文字色
+ * @text システム項目文字色(2)
  * @type number
  * @default 16
  * @min 0
  * @parent BasicSetting
  * 
  * @param X_Position
- * @text X表示列位置
+ * @text X表示列位置(3)
  * @desc X表示列位置
  * @type number
  * @default 1
@@ -948,7 +951,7 @@
  * 
  * @param Y_Position
  * @desc Y表示行位置
- * @text Y表示行位置
+ * @text Y表示行位置(4)
  * @type number
  * @default 1
  * @max 9999
@@ -956,7 +959,7 @@
  * @parent BasicSetting
  * 
  * @param X_Coordinate
- * @text X座標（相対）
+ * @text X座標（相対）(5)
  * @desc X座標（X表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -964,7 +967,7 @@
  * @parent BasicSetting
  * 
  * @param Y_Coordinate
- * @text Y座標（相対）
+ * @text Y座標（相対）(6)
  * @desc Y座標（Y表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -973,7 +976,7 @@
  * 
  * @param ItemWidth
  * @desc 項目横幅（0で自動）
- * @text 項目横幅
+ * @text 項目横幅(7)
  * @type number
  * @default 0
  * @min 0
@@ -981,7 +984,7 @@
  * 
  * @param SystemItemWidth
  * @desc システム項目の横幅（0でデフォルト幅）
- * @text システム項目横幅
+ * @text システム項目横幅(8)
  * @type number
  * @default 0
  * @min 0
@@ -989,7 +992,7 @@
  * 
  * @param WideMode
  * @desc 項目表示モード
- * @text 項目表示モード
+ * @text 項目表示モード(9)
  * @type select
  * @option １列表示
  * @value 1
@@ -1001,7 +1004,7 @@
  * @parent BasicSetting
  * 
  * @param Back
- * @text コンテンツ背景表示
+ * @text コンテンツ背景表示(10)
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
@@ -1012,7 +1015,7 @@
  * 
  * @param namePosition
  * @desc 名称、アイテム名の表示位置を指定します
- * @text 名称、アイテム名表示位置
+ * @text 名称、アイテム名表示位置(11)
  * @type select
  * @option 左
  * @value "left"
@@ -1028,7 +1031,7 @@
  * 
  * @param textMethod
  * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
- * @text 記述欄、個別指定画像タグ名
+ * @text 記述欄、個別指定画像タグ名(12)
  * @type string
  * @default 
  * @parent textSetting
@@ -1038,7 +1041,7 @@
  * 
  * @param ImgData
  * @desc 共通画像ファイル名を指定します。
- * @text 共通画像
+ * @text 共通画像(13)
  * @type file[]
  * @dir img/
  * @default []
@@ -1046,7 +1049,7 @@
  * 
  * @param ImgMaxHeight
  * @desc 画像の最大縦幅（行数で指定）
- * @text 画像の最大縦幅
+ * @text 画像の最大縦幅(14)
  * @type number
  * @default 8
  * @min 0
@@ -1057,7 +1060,7 @@
  * 
  * @param paramUnit
  * @desc 単位を設定します。
- * @text 単位
+ * @text 単位(15)
  * @type string
  * @default 
  * @parent UnitSetting
@@ -2063,9 +2066,9 @@ Window_ItemBook.prototype.updateHelp = function() {
   this.setHelpWindowItem(this._item);
 };
 
-Window_ItemBook.prototype.getItemBitmap = function(list, item) {
+Window_ItemBook.prototype.getItemBitmap = function(listContent, item) {
   let bitmap = null;
-  for (const data of list) {
+  for (const data of listContent) {
     const commonItemBitmap = data.DateSelect === 100 && data.ImgData && data.ImgData[0] ? ImageManager.nuun_LoadPictures(data.ImgData[0]) : null;
     const itemBitmapData = data.DateSelect === 101 && item.meta[data.textMethod] ? item.meta[data.textMethod].split(',') : null;
     const itemBitmap = itemBitmapData ? ImageManager.loadBitmap("img/"+ ImgFolder +"/", itemBitmapData[0]) : null;  
@@ -2107,13 +2110,13 @@ Window_ItemBook.prototype.drawPage = function(listContent, item) {
 
 Window_ItemBook.prototype.setDisplayList = function(item) {
   if (DataManager.isItem(item)) {
-    this._itemType ='item';
+    this._itemType = 'item';
     return ItemPageSetting;
   } else if (DataManager.isWeapon(item)) {
-    this._itemType ='weapon';
+    this._itemType = 'weapon';
     return WeaponPageSetting;
   } else if (DataManager.isArmor(item)) {
-    this._itemType ='armor';
+    this._itemType = 'armor';
     return ArmorPageSetting;
   }
   this._itemType = null;

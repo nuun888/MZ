@@ -12,7 +12,7 @@
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.2.5
+ * @version 1.2.6
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -40,6 +40,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/8/31 Ver.1.2.6
+ * HPラベルが非表示の時にラベル分の余白が空いてしまう問題を修正。
  * 2021/8/29 Ver.1.2.5
  * 一部プラグインとの競合対策。
  * 2021/7/15 Ver.1.2.4
@@ -325,6 +327,15 @@ Sprite_EnemyHPGauge.prototype.valueFontSize = function() {
 Sprite_EnemyHPGauge.prototype.drawLabel = function() {
   if (HPLabelVisible) {
     Sprite_Gauge.prototype.drawLabel.call(this);
+  }
+};
+
+const _Sprite_EnemyHPGauge_gaugeX = Sprite_EnemyHPGauge.prototype.gaugeX ;
+Sprite_EnemyHPGauge.prototype.gaugeX = function() {
+  if (!HPLabelVisible) {
+    return 0;
+  } else {
+    return _Sprite_EnemyHPGauge_gaugeX.call(this);
   }
 };
 

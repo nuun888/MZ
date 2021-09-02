@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.8.0
+ * @version 2.8.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -277,6 +277,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/2 Ver.2.8.1
+ * モンスター毎の個別画像の座標設定が反映されていなかった問題を修正。
  * 2021/8/28 Ver.2.8.0
  * 画像を表示できる機能を追加。
  * 2021/8/13 Ver.2.7.3
@@ -5168,8 +5170,8 @@ Window_EnemyBook.prototype.enemyBitmap = function(list, enemy, x, y, width) {
   const dataImg = this._enemy.meta[list.textMethod] ? this._enemy.meta[list.textMethod].split(',') : null;
   if (dataImg) {
     const bitmap = ImageManager.loadBitmap("img/"+ param.ImgFolder +"/", dataImg[0]);
-    x += dataImg[1] || 0;
-    y += dataImg[2] || 0;
+    x += Number(dataImg[1]) || 0;
+    y += Number(dataImg[2]) || 0;
     if (!bitmap.isReady()) {
       bitmap.addLoadListener(this.drawImg.bind(this, bitmap, list, x, y, width));
     } else if (bitmap) {
@@ -5185,7 +5187,7 @@ Window_EnemyBook.prototype.drawImg = function(bitmap, list, x, y, width) {
   const scale = scalex > scaley ? scaley : scalex;
   const dw = Math.floor(bitmap.width * scale);
   const dh = Math.floor(bitmap.height * scale);
-  x = Math.floor(width / 2 - dw / 2);
+  x += Math.floor(width / 2 - dw / 2);
   this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
 };
 

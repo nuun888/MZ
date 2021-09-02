@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.1.5
+ * @version 1.1.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/2 Ver.1.1.6
+ * 中心に表示する機能を追加。
  * 2021/8/29 Ver.1.1.5
  * 競合対策のための処理追加。
  * 2021/7/15 Ver.1.1.4
@@ -68,6 +70,8 @@
  * @value 0
  * @option 敵画像の下
  * @value 1
+ * @option 敵画像の中心
+ * @value 2
  * @default 0
  * 
  * @param EnemyNameVisible
@@ -161,6 +165,8 @@ Sprite_Enemy.prototype.updateEnemyName = function() {
     this._butlerNameSprite.y = this.butlerNameOffsetY + this.y - 40;
     if (this.getButlerNamePosition() === 0) {
       this._butlerNameSprite.y -= this.getButlerNameHeight();
+    } else if (this.getButlerNamePosition() === 2) {
+      this._butlerNameSprite.y -= Math.floor(this.getButlerNameHeight() / 2);
     }
     if (this._butlerNameSprite.y < 0) {
       this._butlerNameSprite.y = 30;

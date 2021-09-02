@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミーTPBゲージ
  * @author NUUN
- * @version 1.1.8
+ * @version 1.1.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/2 Ver.1.1.9
+ * 中心に表示する機能を追加。
  * 2021/8/29 Ver.1.1.8
  * 競合対策のための処理追加。
  * 2021/7/15 Ver.1.1.7
@@ -62,6 +64,8 @@
  * @value 0
  * @option 敵画像の下
  * @value 1
+ * @option 敵画像の中心
+ * @value 2
  * @default 0
  * 
  * @param GaugeWidth
@@ -133,7 +137,9 @@ Sprite_Enemy.prototype.updateTpbGauge = function() {
     this._enemyTpb.x = this.tpbGaugeOffsetX + (this.x - this._enemyTpb.width / 2);
     this._enemyTpb.y = this.tpbGaugeOffsetY + this.y - 40;
     if (this.getButlerTpbPosition() === 0) {
-      this._enemyTpb.y -= this.getButlerTpbPosition();
+      this._enemyTpb.y -= this.getButlerTpbHeight();
+    } else if (this.getButlerTpbPosition() === 2) {
+      this._enemyTpb.y -= Math.floor(this.getButlerTpbHeight() / 2);
     }
     if (this._enemyTpb.y < 0) {
         this._enemyTpb.y = 30;

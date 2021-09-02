@@ -12,7 +12,7 @@
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.2.6
+ * @version 1.2.7
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -40,6 +40,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/2 Ver.1.2.7
+ * 中心に表示する機能を追加。
  * 2021/8/31 Ver.1.2.6
  * HPラベルが非表示の時にラベル分の余白が空いてしまう問題を修正。
  * 2021/8/29 Ver.1.2.5
@@ -77,6 +79,8 @@
  * @value 0
  * @option 敵画像の下
  * @value 1
+ * @option 敵画像の中心
+ * @value 2
  * @default 0
  * 
  * @param HPVisibleMode
@@ -225,6 +229,8 @@ Sprite_Enemy.prototype.updateHpGauge = function() {
     this._butlerHp.y = this.hpGaugeOffsetY + this.y - 40;
     if (this.getButlerHpPosition() === 0) {
       this._butlerHp.y -= this.getButlerHpHeight();
+    } else if (this.getButlerHpPosition() === 2) {
+      this._butlerHp.y -= Math.floor(this.getButlerHpHeight() / 2);
     }
     this.hpGaugeOpacity();
   }

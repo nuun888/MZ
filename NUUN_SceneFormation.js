@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -25,6 +25,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/4 Ver.1.2.0
+ * 表示できるステータスに経験値を追加。
+ * 戦闘メンバー、待機メンバーにレベルを表示する機能を追加。
  * 2021/8/25 Ver.1.1.1
  * アクター並び替え固定プラグインの待機固定アクター移動可に対応。
  * 固定アクターの背景色を変更できる機能を追加。
@@ -46,6 +49,13 @@
  * @param BasicSetting
  * @text 基本設定
  * @default ------------------------------
+ * 
+ * @param LavelVisible
+ * @text レベル表示
+ * @desc 戦闘メンバー及び待機メンバーのアクターにレベルを表示。
+ * @type boolean
+ * @default false
+ * @parent Setting
  * 
  * @param WindowCenter
  * @text ウィンドウ中央自動調整
@@ -185,7 +195,7 @@
  * @param ActorStatus
  * @text 表示ステータス設定
  * @desc アクターの表示ステータス設定
- * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"100\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"1\",\"X_Coordinate\":\"-50\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"10\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"20\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"60\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"4\",\"Y_Position\":\"1\",\"X_Coordinate\":\"-50\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"240\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"4\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"14\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"15\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"5\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"16\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"17\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"6\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"100\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"1\",\"X_Coordinate\":\"-50\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"144\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"10\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"20\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"60\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"4\",\"Y_Position\":\"1\",\"X_Coordinate\":\"-50\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"240\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"14\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"15\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"2\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"16\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"3\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"17\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"4\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"40\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"380\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"41\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"380\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}"]
  * @type struct<ActorStatusList>[]
  * @parent StatusSetting
  * 
@@ -233,115 +243,115 @@
  * @type select
  * @option なし
  * @value 0
- * @option アクター名
+ * @option アクター名(4)(5)(6)(7)(8)
  * @value 1
- * @option 二つ名
+ * @option 二つ名(4)(5)(6)(7)(8)
  * @value 2
- * @option 職業
+ * @option 職業(4)(5)(6)(7)(8)
  * @value 3
- * @option レベル
+ * @option レベル(4)(5)(6)(7)(8)
  * @value 4
- * @option ステート
+ * @option ステート(4)(5)(6)(7)(8)
  * @value 5
- * @option ＨＰ
+ * @option ＨＰ(4)(5)(6)(7)(8)
  * @value 10
- * @option ＭＰ
+ * @option ＭＰ(4)(5)(6)(7)(8)
  * @value 11
- * @option 攻撃力
+ * @option 攻撃力(1)～(9)(13)
  * @value 12
- * @option 防御力
+ * @option 防御力(1)～(9)(13)
  * @value 13
- * @option 魔力
+ * @option 魔力(1)～(9)(13)
  * @value 14
- * @option 魔法防御
+ * @option 魔法防御(1)～(9)(13)
  * @value 15
- * @option 敏捷性
+ * @option 敏捷性(1)～(9)(13)
  * @value 16
- * @option 運
+ * @option 運(1)～(9)(13)
  * @value 17
- * @option ＴＰ
+ * @option ＴＰ(4)(5)(6)(7)(8)
  * @value 19
- * @option 命中率
+ * @option 命中率(1)～(11)(13)
  * @value 20
- * @option 回避率
+ * @option 回避率(1)～(11)(13)
  * @value 21
- * @option 会心率
+ * @option 会心率(1)～(11)(13)
  * @value 22
- * @option 会心回避率
+ * @option 会心回避率(1)～(11)(13)
  * @value 23
- * @option 魔法回避率
+ * @option 魔法回避率(1)～(11)(13)
  * @value 24
- * @option 魔法反射率
+ * @option 魔法反射率(1)～(11)(13)
  * @value 25
- * @option 反撃率
+ * @option 反撃率(1)～(11)(13)
  * @value 26
- * @option HP再生率
+ * @option HP再生率(1)～(11)(13)
  * @value 27
- * @option MP再生率
+ * @option MP再生率(1)～(11)(13)
  * @value 28
- * @option TP再生率
+ * @option TP再生率(1)～(11)(13)
  * @value 29
- * @option 狙われ率
+ * @option 狙われ率(1)～(11)(13)
  * @value 30
- * @option 防御効果率
+ * @option 防御効果率(1)～(11)(13)
  * @value 31
- * @option 回復効果率
+ * @option 回復効果率(1)～(11)(13)
  * @value 32
- * @option 薬の知識
+ * @option 薬の知識(1)～(11)(13)
  * @value 33
- * @option MP消費率
+ * @option MP消費率(1)～(11)(13)
  * @value 34
- * @option TPチャージ率
+ * @option TPチャージ率(1)～(11)(13)
  * @value 35
- * @option 物理ダメージ率
+ * @option 物理ダメージ率(1)～(11)(13)
  * @value 36
- * @option 魔法ダメージ率
+ * @option 魔法ダメージ率(1)～(11)(13)
  * @value 37
- * @option 床ダメージ率
+ * @option 床ダメージ率(1)～(11)(13)
  * @value 38
- * @option 獲得経験値率
+ * @option 獲得経験値率(1)～(11)(12)
  * @value 39
- * @option 現在の経験値
+ * @option 現在の経験値(1)(4)(5)(6)(7)(8)(9)(12)
  * @value 40
- * @option 次のレベルまでの経験値
+ * @option 次のレベルまでの経験値(1)(4)(5)(6)(7)(8)(9)(12)
  * @value 41
- * @option オリジナルパラメータ
+ * @option オリジナルパラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(12)
  * @value 50
- * @option 名称のみ
+ * @option 名称のみ(1)(2)(4)(5)(6)(7)(8)
  * @value 51
- * @option 装備
+ * @option 装備(1)(4)(5)(6)(7)(8)(9)(13)(14)(15)
  * @value 60
- * @option 記述欄
+ * @option 記述欄(1)(4)(5)(6)(7)(8)(12)
  * @value 70
- * @option 顔グラフィック
+ * @option 顔グラフィック(4)(5)(6)(7)
  * @value 100
- * @option キャラチップ
+ * @option キャラチップ（未実装）
  * @value 101
- * @option ライン
+ * @option ライン(1)(3)(4)(5)(6)(7)(8)
  * @value 1000
  * @default 0
  * 
  * @param NameColor
  * @desc システム項目の文字色。
- * @text システム項目文字色
+ * @text システム項目文字色(1)
  * @type number
  * @default 16
  * @min 0
  * 
  * @param ParamName
  * @desc 項目の名称を設定します。
- * @text 名称
+ * @text 名称(2)
  * @type string
  * @default
  * 
  * @param DetaEval
  * @desc 評価式。
- * @text 評価式(javaScript)
+ * @text 評価式(javaScript)(3)
  * @type 
  * @default
  * 
  * @param X_Position
- * @text X表示列位置
+ * @text X表示列位置(4)
  * @desc X表示列位置
  * @type number
  * @default 1
@@ -350,21 +360,21 @@
  * 
  * @param Y_Position
  * @desc Y表示行位置
- * @text Y表示行位置
+ * @text Y表示行位置(5)
  * @type number
  * @default 1
  * @max 9999
  * @min 1
  * 
  * @param X_Coordinate
- * @text X座標（相対）
+ * @text X座標（相対）(6)
  * @desc X座標（X表示列位置からの相対座標）
  * @type number
  * @default 0
  * @min -9999
  * 
  * @param Y_Coordinate
- * @text Y座標（相対）
+ * @text Y座標（相対）(7)
  * @desc Y座標（Y表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -372,26 +382,26 @@
  * 
  * @param ItemWidth
  * @desc 項目横幅（0でデフォルト幅）
- * @text 項目横幅
+ * @text 項目横幅(8)
  * @type number
  * @default 0
  * @min 0
  * 
  * @param SystemItemWidth
  * @desc システム項目の横幅（0でデフォルト幅）
- * @text システム項目横幅
+ * @text システム項目横幅(9)
  * @type number
  * @default 0
  * @min 0
  * 
  * @param paramUnit
  * @desc 単位を設定します。
- * @text 単位
+ * @text 単位(10)
  * @type string
  * @default 
  * 
  * @param Decimal
- * @text 小数点桁数
+ * @text 小数点桁数(11)
  * @desc 表示出来る小数点桁数。
  * @type number
  * @default 0
@@ -400,12 +410,12 @@
  * 
  * @param textMethod
  * @desc 記述欄に紐づけするタグ名
- * @text 記述欄タグ名
+ * @text 記述欄タグ名(12)
  * @type string
  * @default 
  * 
  * @param Back
- * @text コンテンツ背景表示
+ * @text コンテンツ背景表示(13)
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
@@ -415,7 +425,7 @@
  * @default ------------------------------
  * 
  * @param EquipStartIndex
- * @text 開始インデックス
+ * @text 開始インデックス(14)
  * @desc 装備欄の開始インデックスを指定します。
  * @type number
  * @default 0
@@ -423,7 +433,7 @@
  * @parent EquipSetting
  * 
  * @param EquipNum
- * @text 表示装備数
+ * @text 表示装備数(15)
  * @desc 装備欄の表示を指定します。(0で制限なし)
  * @type number
  * @default 0
@@ -498,6 +508,7 @@ const DeadActorColor = Number(parameters['DeadActorColor'] || 18);
 const parameters2 = PluginManager.parameters('NUUN_SceneSupportActorFormation');
 const SupportActorColor = Number(parameters2['SupportActorColor'] || 5);
 const FixedActorBackColor = Number(parameters['FixedActorBackColor'] || 3);
+const LavelVisible = eval(parameters['LavelVisible'] || "false");
 const pluginName = "NUUN_SceneFormation";
 
 PluginManager.registerCommand(pluginName, 'SceneFormationOpen', args => {
@@ -974,14 +985,35 @@ Window_FormationBattleMember.prototype.drawItem = function(index) {
   if (VariableBattleMember && this.maxItems() - 1 === index && !actor) {
     this.drawText('-', rect.x, rect.y + 16, 48, 'center');
   } else {
-    const x = rect.x + Math.floor(rect.width / 2);
-    const y = rect.y + this.itemHeight() - this.rowSpacing();
     const bitmap = ImageManager.loadCharacter(actor.characterName());
     if (!bitmap.isReady()) {
-      bitmap.addLoadListener(this.drawCharacter.bind(this, actor.characterName(), actor.characterIndex(), x, y));
+      bitmap.addLoadListener(this.drawContents.bind(this, actor, rect.x, rect.y, rect.width));
     } else {
-      this.drawCharacter(actor.characterName(), actor.characterIndex(), x, y);
+      this.drawContents(actor, rect.x, rect.y, rect.width);
     }
+  }
+};
+
+Window_FormationBattleMember.prototype.drawContents = function(actor, x, y, width) {
+  let x2 = x + Math.floor(width / 2);
+  let y2 = y +  + this.itemHeight() - this.rowSpacing();
+  this.drawCharacter(actor.characterName(), actor.characterIndex(), x2, y2);
+  this.drawLavel(actor, x, y, width);
+};
+
+Window_FormationBattleMember.prototype.drawLavel = function(actor, x, y, width) {
+  if (LavelVisible) {
+    const padding = Math.floor(this.itemPadding() / 2);
+    y += this.itemHeight() - 32;
+    x += padding;
+    width -= padding;
+    const textWidth = this.textWidth(TextManager.levelA);
+    this.contents.fontSize = 16;
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(TextManager.levelA, x, y, width);
+    this.resetTextColor();
+    this.drawText(actor.level, x + textWidth, y, width - textWidth - padding, "right");
+    this.contents.fontSize = $gameSystem.mainFontSize();
   }
 };
 
@@ -1109,11 +1141,6 @@ Window_FormationMember.prototype.isCurrentItemEnabled = function() {
   return (actor && actor.isFormationChangeOk()) || (this.maxItems() - 1 === this.index());
 };
 
-
-
-
-
-
 Window_FormationMember.prototype.setMemberStatusWindow = function(memberStatusWindow) {
   this._memberStatusWindow = memberStatusWindow;
 };
@@ -1138,14 +1165,35 @@ Window_FormationMember.prototype.drawItem = function(index) {
   if (VariableBattleMember && this.maxItems() - 1 === index) {
     this.drawText('-', rect.x, rect.y + 16, 48, 'center');
   } else if (actor) {
-    const x = rect.x + Math.floor(rect.width / 2);
-    const y = rect.y + this.itemHeight() - this.rowSpacing();
     const bitmap = ImageManager.loadCharacter(actor.characterName());
     if (!bitmap.isReady()) {
-      bitmap.addLoadListener(this.drawCharacter.bind(this, actor.characterName(), actor.characterIndex(), x, y));
+      bitmap.addLoadListener(this.drawContents.bind(this, actor, rect.x, rect.y, rect.width));
     } else {
-      this.drawCharacter(actor.characterName(), actor.characterIndex(), x, y);
+      this.drawContents(actor, rect.x, rect.y, rect.width);
     }
+  }
+};
+
+Window_FormationMember.prototype.drawContents = function(actor, x, y, width) {
+  let x2 = x + Math.floor(width / 2);
+  let y2 = y +  + this.itemHeight() - this.rowSpacing();
+  this.drawCharacter(actor.characterName(), actor.characterIndex(), x2, y2);
+  this.drawLavel(actor, x, y, width);
+};
+
+Window_FormationMember.prototype.drawLavel = function(actor, x, y, width) {
+  if (LavelVisible) {
+    const padding = Math.floor(this.itemPadding() / 2);
+    y += this.itemHeight() - 32;
+    x += padding;
+    width -= padding;
+    const textWidth = this.textWidth(TextManager.levelA);
+    this.contents.fontSize = 16;
+    this.changeTextColor(ColorManager.systemColor());
+    this.drawText(TextManager.levelA, x, y, width);
+    this.resetTextColor();
+    this.drawText(actor.level, x + textWidth, y, width - textWidth - padding, "right");
+    this.contents.fontSize = $gameSystem.mainFontSize();
   }
 };
 
@@ -1270,7 +1318,7 @@ Window_FormationStatus.prototype.dateDisplay = function(list, x, y, width) {
       this.drawActorLevel(this._actor, x, y, width);
       break;
     case 5:
-      this.drawActorIcons(this._actor, x, y, width);
+      this.drawState(list, this._actor, x, y, width);
       break;
     case 10:
     case 11:
@@ -1311,7 +1359,7 @@ Window_FormationStatus.prototype.dateDisplay = function(list, x, y, width) {
       this.drawExpInfo(list, this._actor, x, y, width);
       break;
     case 41:
-      this.drawExpGaugeInfo(list, this._actor, x, y, width);
+      this.drawNextExpInfo(list, this._actor, x, y, width);
       break;
     case 50:
       this.drawOriginalStatus(list, this._actor, x, y, width);
@@ -1324,6 +1372,9 @@ Window_FormationStatus.prototype.dateDisplay = function(list, x, y, width) {
       break;
     case 70:
       this.drawDesc(list, this._actor, x, y, width);
+      break;
+    case 80:
+      this.drawState(list, this._actor, x, y, width);
       break;
     case 100:
       this.drawActorFace(this._actor, x, y);
@@ -1473,6 +1524,10 @@ Window_FormationStatus.prototype.drawDesc = function(list, actor, x, y, width) {
   }
 };
 
+Window_FormationStatus.prototype.drawState = function(list, actor, x, y, width) {
+  this.drawActorIcons(actor, x, y, width);
+};
+
 Window_FormationStatus.prototype.drawParams = function(list, actor, x, y, width, params) {
   if (params === 0) {
     this.placeGauge(actor, "hp", x, y);
@@ -1552,6 +1607,42 @@ Window_FormationStatus.prototype.drawEquip = function(list, actor, x, y, width) 
     this.drawItemName(item, x2 + sw, y2, width2 - sw);
   }
 };
+
+Window_FormationStatus.prototype.drawExpInfo = function(list, actor, x, y, width) {
+  const lineHeight = this.lineHeight();
+  const expTotal = TextManager.expTotal.format(TextManager.exp);
+  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.drawText(expTotal, x, y, width);
+  this.resetTextColor();
+  this.drawText(this.expTotalValue(), x, y, width, "right");
+};
+
+Window_FormationStatus.prototype.drawNextExpInfo = function(list, actor, x, y, width) {
+  const lineHeight = this.lineHeight();
+  const expNext = TextManager.expNext.format(TextManager.level);
+  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.drawText(expNext, x, y, width);
+  this.resetTextColor();
+  this.drawText(this.expNextValue(), x, y, width, "right");
+};
+
+Window_FormationStatus.prototype.expTotalValue = function() {
+  if (this._actor.isMaxLevel()) {
+      return "-------";
+  } else {
+      return this._actor.currentExp();
+  }
+};
+
+Window_FormationStatus.prototype.expNextValue = function() {
+  if (this._actor.isMaxLevel()) {
+      return "-------";
+  } else {
+      return this._actor.nextRequiredExp();
+  }
+};
+
+
 
 Window_FormationStatus.prototype.statusParamDecimal = function(val, decimal) {
   decimal = decimal !== undefined ? Number(decimal) : 0;

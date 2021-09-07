@@ -11,11 +11,13 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.5.2
+ * @version 2.5.3
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/9/8 Ver 2.5.3
+ * リングステートプラグインと併用するとステートアイコンの表示が正常に表示されない問題を修正。
  * 2021/7/23 Ver 2.5.2
  * 可変コマンド時にコマンドが表示されない問題を修正。
  * 2021/7/17 Ver 2.5.1
@@ -1382,9 +1384,9 @@ Window_BattleStatus.prototype.placeBasicGauges = function(actor, x, y) {
   }
 };
 
-const _Window_BattleStatus_placeStateIcon = Window_BattleStatus.prototype.placeStateIcon;
-Window_BattleStatus.prototype.placeStateIcon = function(actor, x, y) {
-  _Window_BattleStatus_placeStateIcon.call(this, actor, x, y);
+const _Window_StatusBase_placeStateIcon = Window_StatusBase.prototype.placeStateIcon;
+Window_StatusBase.prototype.placeStateIcon = function(actor, x, y) {
+  _Window_StatusBase_placeStateIcon.call(this, actor, x, y);
 };
 
 const _Window_BattleStatus_placeActorName = Window_BattleStatus.prototype.placeActorName;

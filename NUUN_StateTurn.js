@@ -24,14 +24,14 @@
  * 
  * 
  * @param ActorStateIconVisible
- * @desc 味方のステートアイコンにターンの表示。
- * @text 味方ステートアイコン表示
+ * @desc 味方のステートに残りターンの表示。
+ * @text 味方ステート残りターン表示
  * @type boolean
  * @default true
  * 
  * @param EnemyStateIconVisible
- * @desc 敵のステートアイコンにターンの表示。
- * @text 敵ステートアイコン表示
+ * @desc 敵のステートに残りターンの表示。
+ * @text 敵ステート残りターン表示
  * @type boolean
  * @default true
  * 

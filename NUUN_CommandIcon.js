@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc コマンド拡張
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/11 Ver 1.2.3
+ * フィルタリングクラスにセーブ上書き確認を追加（要NUUN_SaveVerification）
  * 2021/8/23 Ver 1.2.2
  * 適用除外クラス設定にアイテム図鑑カテゴリーを追加。(要NUUN_ItemBook)
  * 2021/5/22 Ver 1.2.1
@@ -121,6 +123,7 @@
  * @option 'Window_ChoiceList'
  * @option 'Window_Options'
  * @option 'Window_ItemBook_Category'
+ * @option 'Window_SaveVerificationWindow'
  * @default
  * 
  */

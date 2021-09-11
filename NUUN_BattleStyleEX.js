@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.5.1
+ * @version 1.5.2
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -57,6 +57,9 @@
  * アクター画像のダメージ時のシェイク、行動時のズームを行いたくない場合は「シェイクフレーム」「行動時エフェクトフレーム」の値を0に
  * 設定してください。
  * 
+ * アクターコマンド
+ * 最大表示コマンド行数を最低表示コマンド行数より大きい数値に設定することでコマンドの表示が可変になります。表示できる数は最大表示コマンドの行数まで表示できます。
+ * 
  * エネミーのメモ欄
  * <AttackAnimation:11>
  * エネミーの通常攻撃時、11番のアニメーションが再生されます。
@@ -79,6 +82,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/11 Ver 1.5.2
+ * アクターコマンドを全てのモードにおいて可変に表示できるよう変更。
  * 2021/7/17 Ver 1.5.1
  * ポップアップ機能の個別プラグイン化により既に設定済みの方用に互換機能を追加。
  * 2021/7/14 Ver 1.5.0
@@ -719,6 +724,33 @@
  * @param ActorCommand
  * @text アクターコマンド設定
  * 
+ * @param ActorCommandMinRow
+ * @desc 表示する最低コマンド行数。
+ * @text 最低表示コマンド行数
+ * @type number
+ * @default 4
+ * @min 1
+ * @max 99
+ * @parent ActorCommand
+ * 
+ * @param ActorCommandMaxRow
+ * @desc 表示する最大コマンド行数。
+ * @text 表示最大コマンド行数
+ * @type number
+ * @default 4
+ * @min 1
+ * @max 99
+ * @parent ActorCommand
+ * 
+ * @param ActorCommandMaxCol
+ * @desc 表示するコマンド列数。
+ * @text 表示コマンド列数
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * @parent ActorCommand
+ * 
  * @param XP_ActorCommand
  * @text XPスタイルモード設定
  * @parent ActorCommand
@@ -742,24 +774,6 @@
  * @option 各SVアクターの右（SV推奨）
  * @value 6
  * @default 0
- * @parent XP_ActorCommand
- * 
- * @param ActorCommandMaxRow
- * @desc 表示するコマンド行数。
- * @text 表示コマンド行数
- * @type number
- * @default 4
- * @min 1
- * @max 99
- * @parent XP_ActorCommand
- * 
- * @param ActorCommandMaxCol
- * @desc 表示するコマンド列数。
- * @text 表示コマンド列数
- * @type number
- * @default 1
- * @min 1
- * @max 99
  * @parent XP_ActorCommand
  * 
  * @param ActorCommandCenter

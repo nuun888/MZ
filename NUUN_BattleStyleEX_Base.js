@@ -12,6 +12,9 @@
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
  * @version 2.5.4
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_BattleStyleEX
  *            
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 

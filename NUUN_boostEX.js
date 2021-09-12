@@ -86,6 +86,9 @@ Game_Action.prototype.boostConditions = function(target, critical, damage) {
 };
 
 Game_Action.prototype.boostConditionsEX = function(target, damage) {
+  if (!Imported.NUUN_ConditionsBase) {
+    return 0;
+  }
   return this.subject().traitObjects().reduce((r, trait) => {
     if (trait.meta.BoostCond) {
       if (this.triggerConditions(trait, target, 'ConditionalBoost', 'TargetConditionalBoost', 'PartyConditionalBoost', 'TroopConditionalBoost', this, damage, 'PartialMatchBoost')) {

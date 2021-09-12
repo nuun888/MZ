@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 行動時ブースト特徴
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * 攻撃時に特定の行動によってダメージを補正する効果を得ることができます。
@@ -42,7 +42,15 @@
  * 反撃時にダメージを増幅させます。
  * <BoostEX:MRF, [rate]>
  * 
- * [rate]:確率±
+ * 以下は条件付きベースが必要です。
+ * <BoostCond:[rate]>
+ * 条件付きベースの条件が一致した時にダメージを増幅させます。
+ *  <ConditionalBoost:[id],[id]....> 
+ *  <TargetConditionalBoost:[id],[id]....> 
+ *  <PartyConditionalBoost:[id],[id]....> 
+ *  <TroopConditionalBoost:[id],[id]....> 
+ * 
+ * [rate]:増幅率±
  * 
  * ２つ以上該当する場合は加算した合計で算出されます。
  * 魔法属性+20%と炎属性+30の場合は50%ダメージが増幅されます。
@@ -52,6 +60,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/13 Ver.1.1.0
+ * 条件付きベースに対応。
  * 2021/8/20 Ver.1.0.0
  * 初版
  * 
@@ -66,16 +76,27 @@ const parameters = PluginManager.parameters('NUUN_boostEX');
 const _Game_Action_makeDamageValue = Game_Action.prototype.makeDamageValue;
 Game_Action.prototype.makeDamageValue = function(target, critical) {
   const value = _Game_Action_makeDamageValue.call(this, target, critical);
-  return Math.round(value * Math.max((this.boostConditions(target, critical) + 100) / 100), 0.0);
+  return Math.round(value * Math.max((this.boostConditions(target, critical, value) + 100) / 100), 0.0);
 };
 
-Game_Action.prototype.boostConditions = function(target, critical) {
+Game_Action.prototype.boostConditions = function(target, critical, damage) {
   const item = this.item();
   const boostList = this.subject().boostAllTraits();
-  return boostList.reduce((r, data) => r + this.isBoostConditions(data, item, target, critical), 0);
+  return boostList.reduce((r, data) => r + this.isBoostConditions(data, item, target, critical, damage) , 0) + this.boostConditionsEX(target, damage);
 };
 
-Game_Action.prototype.isBoostConditions = function(data, item, target, critical) {
+Game_Action.prototype.boostConditionsEX = function(target, damage) {
+  return this.subject().traitObjects().reduce((r, trait) => {
+    if (trait.meta.BoostCond) {
+      if (this.triggerConditions(trait, target, 'ConditionalBoost', 'TargetConditionalBoost', 'PartyConditionalBoost', 'TroopConditionalBoost', this, damage, 'PartialMatchBoost')) {
+        return r + Number(trait.meta.BoostCond);
+      }
+    }
+    return r;
+  }, 0);
+};
+
+Game_Action.prototype.isBoostConditions = function(data, item, target, critical, damage) {
   if (data[0] === 'EL' && this.isBoostElement(Number(data[1]))) {
     return Number(data[2]);
   } else if (data[0] === 'PH' && this.isPhysical()) {
@@ -151,7 +172,7 @@ Game_Battler.prototype.boostNoteData = function(traits) {
   while(true)  {
     let match = re.exec(traits.note);
     if (match) {
-      data.push(match[1].split(','))
+      data.push(match[1].split(','));
     } else {
       break;
     }

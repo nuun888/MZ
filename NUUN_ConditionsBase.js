@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -174,6 +174,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/13 Ver.1.0.1
+ * 属性時の条件が正常に判定されていなかった問題を修正。
  * 2021/9/13 Ver.1.0.0
  * 初版
  * 
@@ -849,7 +851,7 @@ function elementTriggerConditions(data, target, mode, action) {
     return false;
   }
   if (data.ElementConditionsType === 'Element') {
-    return attackElement(data, action);
+    return attackElement(data.IDList, action);
   }
 };
 
@@ -1109,13 +1111,13 @@ function attackElement(idList, action) {
     if (action.item().damage.elementId < 0) {
       elementsList = action.getAttackElements();
     } else {
-      elementsList = action.subject().attackElements();
+      elementsList = action.getItemElements();
     }
   } else {
     if (action.item().damage.elementId < 0) {
-      elementsList = action.getItemElements();
+      elementsList = action.subject().attackElements();
     } else {
-      elementsList = action.item().damage.elementId
+      elementsList.push(action.item().damage.elementId);
     }
   }
   const list = getValList(idList);

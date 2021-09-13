@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.5.4
+ * @version 2.5.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,9 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/9/13 Ver 2.5.5
+ * コマンドスキルプラグインでのコマンド化したスキルを選択し、エネミー対象でキャンセルした場合にコマンドが表示されなくなる
+ * 問題を修正。
  * 2021/9/11 Ver 2.5.4
  * 全てのモードにおいてアクターコマンドを可変に表示できるように変更。
  * 2021/9/8 Ver 2.5.3
@@ -853,6 +856,7 @@ Scene_Battle.prototype.onEnemyCancel = function() {
   _Scene_Battle_onEnemyCancel.call(this);
   switch (this._actorCommandWindow.currentSymbol()) {
     case "attack":
+    case "special":
       this._actorCommandWindow.show();
       break;
   }

@@ -10,7 +10,7 @@
 
 | 戦闘　　　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
-| バトルスタイル拡張ベース | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) |  | 2.5.2 |
+| バトルスタイル拡張ベース | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) |  | 2.5.5 |
 | バトルスタイル拡張 | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.5.1 |
 | アクターステータス拡張 |  |  |  |
 | フロントビューアクターエフェクト |  |  |  |

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステート、バフ残りターン表示
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * ステートアイコンに残りターンを表示します。
@@ -19,6 +19,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/15 Ver.1.0.1
+ * ターン表示が正常に取得できていなかった問題を修正。
+ * 自動解除のないステートのターンが表示されていた問題を修正。
  * 2021/9/9 Ver.1.0.0
  * 初版
  * 
@@ -110,10 +113,10 @@ Imported.NUUN_StateTurn = true;
       }
     }
     if (turns.length > 0) {
-      if (stateTurns.length <= this._animationIndex) {
+      if (this._animationIndex >= stateTurns.length) {
         this._stateBuffTurns = this.nuun_getBuffTurns(turns);
       } else {
-        this._stateBuffTurns = this.nuun_getStateTurns(turns);
+        this._stateBuffTurns = this.nuun_isNonRemoval(turns) ? 0 : this.nuun_getStateTurns(turns);
       }
     } else {
       this._stateBuffTurns = 0;
@@ -126,6 +129,10 @@ Imported.NUUN_StateTurn = true;
 
   Sprite_StateIcon.prototype.nuun_getBuffTurns = function(turns) {
     return this._battler._buffTurns[turns[this._animationIndex]] + TurnCorrection;
+  };
+
+  Sprite_StateIcon.prototype.nuun_isNonRemoval = function(turns) {
+    return turns[this._animationIndex].autoRemovalTiming === 0;
   };
 
   const _Sprite_StateIcon_updateFrame = Sprite_StateIcon.prototype.updateFrame;

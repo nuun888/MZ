@@ -2595,10 +2595,10 @@ Sprite_BattleGauge.prototype.initialize = function() {
   this._GaugeHeight = 0;
 };
 
-const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
-Sprite_Gauge.prototype.setup = function(battler, statusType) {
+const _Sprite_BattleGauge_setup = Sprite_BattleGauge.prototype.setup;
+Sprite_BattleGauge.prototype.setup = function(battler, statusType) {
   this.setGaugeHeight(statusType);
-  _Sprite_Gauge_setup.call(this, battler, statusType);
+  _Sprite_BattleGauge_setup.call(this, battler, statusType);
 };
 
 Sprite_BattleGauge.prototype.bitmapWidth = function() {

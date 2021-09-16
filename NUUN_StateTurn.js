@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステート、バフ残りターン表示
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * ステートアイコンに残りターンを表示します。
@@ -19,6 +19,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/16 Ver.1.0.2
+ * 競合が起きないよう一部の関数名を変更。
+ * 不要な処理を削除。
  * 2021/9/15 Ver.1.0.1
  * ターン表示が正常に取得できていなかった問題を修正。
  * 自動解除のないステートのターンが表示されていた問題を修正。
@@ -170,18 +173,18 @@ Imported.NUUN_StateTurn = true;
 
 
   Game_BattlerBase.prototype.allStateTurns = function() {
-    return this.stateTurns();
+    return this.nuun_stateTurns();
   };
 
   Game_BattlerBase.prototype.allBuffTurns = function() {
-    return this.buffTurns();
+    return this.nuun_buffTurns();
   };
 
-  Game_BattlerBase.prototype.stateTurns = function() {
+  Game_BattlerBase.prototype.nuun_stateTurns = function() {
     return this.states().filter(state => state.iconIndex > 0);
   };
 
-  Game_BattlerBase.prototype.buffTurns = function() {
+  Game_BattlerBase.prototype.nuun_buffTurns = function() {
     const buffs = [];
     for (let i = 0; i < this._buffs.length; i++) {
       if (this._buffs[i] !== 0) {
@@ -189,15 +192,5 @@ Imported.NUUN_StateTurn = true;
       }
     }
     return buffs;
-  };
-
-  Game_BattlerBase.prototype.buffIcons = function() {
-    const icons = [];
-    for (let i = 0; i < this._buffs.length; i++) {
-        if (this._buffs[i] !== 0) {
-            icons.push(this.buffIconIndex(this._buffs[i], i));
-        }
-    }
-    return icons;
   };
 })();

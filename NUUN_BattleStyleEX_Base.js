@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.5.5
+ * @version 2.5.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/9/16 Ver 2.5.6
+ * コアスクリプトVer.1.3.3でゲージの高さがおかしくなる問題を修正。
  * 2021/9/13 Ver 2.5.5
  * コマンドスキルプラグインでのコマンド化したスキルを選択し、エネミー対象でキャンセルした場合にコマンドが表示されなくなる
  * 問題を修正。
@@ -2581,6 +2583,7 @@ function Sprite_BattleGauge() {
   this.initialize(...arguments);
 }
 
+
 //Sprite_BattleGauge
 Sprite_BattleGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_BattleGauge.prototype.constructor = Sprite_BattleGauge;
@@ -2590,6 +2593,12 @@ Sprite_BattleGauge.prototype.initialize = function() {
   this._HPGaugeWidth = param.StyleMode === "MVStyle" ? (param.HPGaugeWidth || ($dataSystem.optDisplayTp ? 108 : 201)) : param.HPGaugeWidth;
   this._MPGaugeWidth = param.StyleMode === "MVStyle" ? (param.MPGaugeWidth || ($dataSystem.optDisplayTp ? 96 : 114)) : param.MPGaugeWidth;
   this._GaugeHeight = 0;
+};
+
+const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
+Sprite_Gauge.prototype.setup = function(battler, statusType) {
+  this.setGaugeHeight(statusType);
+  _Sprite_Gauge_setup.call(this, battler, statusType);
 };
 
 Sprite_BattleGauge.prototype.bitmapWidth = function() {
@@ -2608,8 +2617,8 @@ Sprite_BattleGauge.prototype.bitmapWidth = function() {
   }
 };
 
-Sprite_BattleGauge.prototype.bitmapHeight = function() {
-  switch (this._statusType) {
+Sprite_BattleGauge.prototype.setGaugeHeight = function(statusType) {
+  switch (statusType) {
     case "hp":
       this._GaugeHeight = param.HPGaugeHeight;
       break;
@@ -2627,7 +2636,6 @@ Sprite_BattleGauge.prototype.bitmapHeight = function() {
       this._GaugeHeight = 12;
       break;
   }
-  return Sprite_Gauge.prototype.bitmapHeight.call(this);
 };
 
 Sprite_BattleGauge.prototype.gaugeHeight = function() {

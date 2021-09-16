@@ -10,7 +10,8 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
+ * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -25,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/17 Ver.1.2.1
+ * 戦闘メンバーから控えメンバーにカーソルが移るときに空白にカーソルが選択してしまう問題を修正。
  * 2021/9/4 Ver.1.2.0
  * 表示できるステータスに経験値を追加。
  * 戦闘メンバー、待機メンバーにレベルを表示する機能を追加。
@@ -686,7 +689,7 @@ Scene_Formation.prototype.update = function() {
 
 Scene_Formation.prototype.onChangeBattleMemberOk = function() {
   this.setMemberCursor();
-  const selectIndex = Math.min(this._battleMemberWindow.getSelectIndex(), $gameParty.standbyMembers().length, Member_Cols);
+  const selectIndex = Math.min(this._battleMemberWindow.getSelectIndex(), $gameParty.standbyMembers().length - 1, Member_Cols);
   this._battleMemberWindow.deselect();
   this._battleMemberWindow.deactivate();
   this._memberWindow.activate();
@@ -948,7 +951,16 @@ Window_FormationBattleMember.prototype.setActorStatus = function(index) {
 Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
   const actor = this.actor(this.index());
   if (Imported.NUUN_ActorFixed) {
-    actor.setFixedMovable(false);
+    if (this.pendingIndex() < 0) {
+      actor.setFixedMovable_org();
+    } else if (this.pendingIndex() >= $gameParty.maxBattleMembers()) {
+      actor.setFixedMovable(false);
+    } else if (this.index() < $gameParty.maxBattleMembers()) {
+      actor.setFixedMovable_org();
+    } else {
+
+    }
+    //actor.setFixedMovable(false);
   }
   const memberPendingIndex = this._memberWindow.pendingIndex();
   if (actor && !actor.isDead() && memberPendingIndex >= 0 && this._memberWindow.actor(memberPendingIndex).isDead()) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/17 Ver.1.0.4
+ * 戦闘メンバーから控えメンバーにカーソルが移るときに空白にカーソルが選択してしまう問題を修正。
  * 2021/8/24 Ver.1.0.3
  * パーティコマンドに表示させる位置を指定できる機能を追加。（1で逃げるより先に表示されます）
  * 2021/8/23 Ver.1.0.2
@@ -196,7 +198,7 @@ Scene_Battle.prototype.isAnyInputWindowActive = function() {
 
 Scene_Battle.prototype.onChangeBattleMemberFormationOk = function() {
   this.setMemberFormationCursor();
-  const selectIndex = Math.min(this._battleMemberFormationWindow.getSelectIndex(), $gameParty.standbyMembers().length, Member_Cols);
+  const selectIndex = Math.min(this._battleMemberFormationWindow.getSelectIndex(), $gameParty.standbyMembers().length - 1, Member_Cols);
   this._battleMemberFormationWindow.deselect();
   this._battleMemberFormationWindow.deactivate();
   this._memberFormationWindow.activate();

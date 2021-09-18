@@ -55,13 +55,6 @@
  * @text 基本設定
  * @default ------------------------------
  * 
- * @param VariableBattleMember
- * @text 戦闘メンバー数可変
- * @desc 戦闘メンバー数。
- * @type boolean
- * @default true
- * @parent BasicSetting
- * 
  * @param LavelVisible
  * @text レベル表示
  * @desc 戦闘メンバー及び待機メンバーのアクターにレベルを表示。

@@ -491,7 +491,7 @@ Window_FormationStatus.prototype.constructor = Window_FormationStatus;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_SceneFormation');
-const VariableBattleMember = eval(parameters['VariableBattleMember'] || "true");
+const VariableBattleMember = eval(parameters['VariableBattleMember'] || "false");
 const BattleMemberName = String(parameters['BattleMemberName'] || "戦闘メンバー");
 const MemberName = String(parameters['MemberName'] || "待機メンバー");
 const BattleMemberName_X = Number(parameters['BattleMemberName_X'] || 0);

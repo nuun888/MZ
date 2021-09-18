@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc アクター並び替え固定
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * アクターの並び替えを固定します。
@@ -19,6 +19,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/18 Ver.1.1.2
+ * 一部処理を変更。
  * 2021/9/8 Ver.1.1.1
  * 固定アクターを戦闘メンバー内でも入れ替えできるように修正。
  * 2021/8/25 Ver.1.1.0
@@ -119,7 +121,6 @@ const _Window_MenuStatus_isCurrentItemEnabled = Window_MenuStatus.prototype.isCu
 Window_MenuStatus.prototype.isCurrentItemEnabled = function() {
   if (this._formationMode) {
     const actor = this.actor(this.index());
-    let pendingActor = true;
     if (this._pendingIndex < 0) {
       actor.setFixedMovable(ActorFixedMovable);
     } else if (this._pendingIndex >= $gameParty.maxBattleMembers()) {
@@ -128,11 +129,14 @@ Window_MenuStatus.prototype.isCurrentItemEnabled = function() {
       actor.setFixedMovable(ActorFixedMovable);
     } else {
       actor.setFixedMovable(false);
-      pendingActor = !this.actor(this._pendingIndex).isFixed();
+      return _Window_MenuStatus_isCurrentItemEnabled.call(this) && !this.actor(this._pendingIndex).isFixed();
     }
-    return _Window_MenuStatus_isCurrentItemEnabled.call(this) && pendingActor;
   }
   return _Window_MenuStatus_isCurrentItemEnabled.call(this);
+};
+
+Window_StatusBase.prototype.isFixedMovable = function() {
+  actor.setFixedMovable(ActorFixedMovable);
 };
 
 })();

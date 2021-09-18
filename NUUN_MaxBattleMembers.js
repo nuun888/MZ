@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 戦闘メンバー数変更プラグイン
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 戦闘参加メンバーの人数を変更します。またゲーム途中で最大バトルメンバー数を変更できます。
@@ -19,6 +19,8 @@
  * 最大戦闘メンバー数を前の数値より高く変更した場合、セーブ後のデータでは前の最大戦闘メンバー数よりフォロワーの画像が表示されません。
  * 
  * 更新履歴
+ * 2021/9/18 Ver.1.0.1
+ * 戦闘開始時にエラーが出る問題を修正。
  * 2021/8/28 Ver.1.0.0
  * 初版
  * 
@@ -40,13 +42,6 @@
  * @default 4
  * @min 1
  * 
- * @param BattleMemberCols
- * @text バトルステータス表示列数
- * @desc バトルステータス表示列数を設定します。
- * @type number
- * @default 4
- * @min 1
- * 
  */
 
 var Imported = Imported || {};
@@ -55,7 +50,6 @@ Imported.NUUN_MaxBattleMembers = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_MaxBattleMembers');
 const MaxBattleMemberNum = Number(parameters['MaxBattleMemberNum'] || 4);
-const BattleMemberCols = Number(parameters['BattleMemberCols'] || 4);
 
 const pluginName = "NUUN_MaxBattleMembers";
 PluginManager.registerCommand(pluginName, 'SetMaxBattleMember', args => {
@@ -81,7 +75,7 @@ Game_Party.prototype.setMaxBattleMembers = function(num) {
 };
 
 Window_BattleStatus.prototype.maxCols = function() {//再定義
-  return BattleMemberCols;
+  return $gameParty._maxBattleMembers;
 };
 
 })();

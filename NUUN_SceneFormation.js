@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/18 Ver.1.2.2
+ * アクター並び替え固定プラグインとの併用時にエラーが出る問題を修正。
  * 2021/9/17 Ver.1.2.1
  * 戦闘メンバーから控えメンバーにカーソルが移るときに空白にカーソルが選択してしまう問題を修正。
  * 2021/9/4 Ver.1.2.0
@@ -53,19 +55,26 @@
  * @text 基本設定
  * @default ------------------------------
  * 
+ * @param VariableBattleMember
+ * @text 戦闘メンバー数可変
+ * @desc 戦闘メンバー数。
+ * @type boolean
+ * @default true
+ * @parent BasicSetting
+ * 
  * @param LavelVisible
  * @text レベル表示
  * @desc 戦闘メンバー及び待機メンバーのアクターにレベルを表示。
  * @type boolean
  * @default false
- * @parent Setting
+ * @parent BasicSetting
  * 
  * @param WindowCenter
  * @text ウィンドウ中央自動調整
  * @desc ウィンドウを中央に自動調整します。待機メンバーウィンドウの横幅で調整されます。
  * @type boolean
  * @default true
- * @parent Setting
+ * @parent BasicSetting
  * 
  * @param DeadActorColor
  * @text 戦闘不能アクター背景色
@@ -489,6 +498,7 @@ Window_FormationStatus.prototype.constructor = Window_FormationStatus;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_SceneFormation');
+const VariableBattleMember = eval(parameters['VariableBattleMember'] || "true");
 const BattleMemberName = String(parameters['BattleMemberName'] || "戦闘メンバー");
 const MemberName = String(parameters['MemberName'] || "待機メンバー");
 const BattleMemberName_X = Number(parameters['BattleMemberName_X'] || 0);
@@ -504,7 +514,6 @@ const Member_Rows = Number(parameters['Member_Rows'] || 1);
 const ActorStatus = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorStatus'])) : [];
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const WindowCenter = eval(parameters['WindowCenter'] || "true");
-const VariableBattleMember = eval(parameters['VariableBattleMember'] || "false");
 const EquipIcons = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipIcons'])) : [];
 const EquipNameVisible = Number(parameters['EquipNameVisible'] || 1);
 const DeadActorColor = Number(parameters['DeadActorColor'] || 18);
@@ -689,7 +698,7 @@ Scene_Formation.prototype.update = function() {
 
 Scene_Formation.prototype.onChangeBattleMemberOk = function() {
   this.setMemberCursor();
-  const selectIndex = Math.min(this._battleMemberWindow.getSelectIndex(), $gameParty.standbyMembers().length - 1, Member_Cols);
+  const selectIndex = Math.min(this._battleMemberWindow.getSelectIndex(), $gameParty.standbyMembers().length - 1 + (VariableBattleMember ? 1 : 0), Member_Cols);
   this._battleMemberWindow.deselect();
   this._battleMemberWindow.deactivate();
   this._memberWindow.activate();
@@ -703,7 +712,7 @@ Scene_Formation.prototype.onChangeBattleMemberOk = function() {
 
 Scene_Formation.prototype.onChangeMemberOk = function() {
   this.setBattleMemberCursor();
-  const selectIndex = Math.min(this._memberWindow.getSelectIndex(), $gameParty.maxFormationBattleMembers() - 1);
+  const selectIndex = Math.min(this._memberWindow.getSelectIndex(), $gameParty.maxFormationBattleMembers() - 1 + (VariableBattleMember ? 1 : 0));
   this._memberWindow.deselect();
   this._memberWindow.deactivate();
   this._battleMemberWindow.activate();
@@ -916,7 +925,7 @@ Window_FormationBattleMember.prototype.initialize = function(rect) {
 };
 
 Window_FormationBattleMember.prototype.maxItems = function() {
-  return Math.min($gameParty.maxFormationBattleMembers(), $gameParty.battleMembers().length);
+  return Math.min($gameParty.maxFormationBattleMembers(), $gameParty.battleMembers().length + (VariableBattleMember ? 1 : 0));
 };
 
 Window_FormationBattleMember.prototype.maxCols = function() {
@@ -948,22 +957,16 @@ Window_FormationBattleMember.prototype.setActorStatus = function(index) {
   }
 };
 
+
 Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
   const actor = this.actor(this.index());
-  if (Imported.NUUN_ActorFixed) {
-    if (this.pendingIndex() < 0) {
-      actor.setFixedMovable_org();
-    } else if (this.pendingIndex() >= $gameParty.maxBattleMembers()) {
-      actor.setFixedMovable(false);
-    } else if (this.index() < $gameParty.maxBattleMembers()) {
-      actor.setFixedMovable_org();
-    } else {
-
-    }
-    //actor.setFixedMovable(false);
-  }
   const memberPendingIndex = this._memberWindow.pendingIndex();
-  if (actor && !actor.isDead() && memberPendingIndex >= 0 && this._memberWindow.actor(memberPendingIndex).isDead()) {
+  const pendingActor = this._memberWindow.actor(memberPendingIndex);
+  if (Imported.NUUN_ActorFixed) {
+    actor.setFixedMovable(false);
+    //return this.isFixedMovable(actor, pendingActor);
+  }
+  if (actor && !actor.isDead() && memberPendingIndex >= 0 && pendingActor.isDead()) {
     return this.isbattleMembersDead() < $gameParty.maxBattleMembers() - 1;
   }
   return actor && actor.isFormationChangeOk();
@@ -1142,11 +1145,12 @@ Window_FormationMember.prototype.setActorStatus = function(index) {
 
 Window_FormationMember.prototype.isCurrentItemEnabled = function() {
   const actor = this.actor(this.index());
-  if (Imported.NUUN_ActorFixed) {
-    actor.setFixedMovable_pp();
-  }
   const memberPendingIndex = this._battleMemberWindow.pendingIndex();
   const battleMemberActor = this._battleMemberWindow.actor(memberPendingIndex);
+  if (Imported.NUUN_ActorFixed) {
+    actor.setFixedMovable_org();
+    //return this.isFixedMovable(actor, battleMemberActor);
+  }
   if (battleMemberActor && !battleMemberActor.isDead() && actor && actor.isDead()){
     return this.isbattleMembersDead() < $gameParty.maxBattleMembers() - 1;
   }

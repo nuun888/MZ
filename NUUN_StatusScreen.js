@@ -10,7 +10,9 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.3
+ * @version 2.2.4
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * ステータス画面を拡張します。
@@ -143,6 +145,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/19 Ver.2.2.4
+ * コアスクリプトVer.1.3.3による修正。
  * 2021/8/24 Ver.2.2.3
  * 旧バージョンにプラグインパラメータの最大最小設定に関する修正。
  * 2021/8/11 Ver.2.2.2
@@ -2034,6 +2038,9 @@ Window_StatusBase.prototype.createInnerChipSprite = function(key, id) {
 
 Window_Status.prototype.placeExpGauge = function(actor, x, y) {
   const type = 'exp'
+  if (Imported.NUUN_GaugeImage) {
+    this.placeGaugeImg(actor, type, x, y);
+  }
   const key = "actor%1-gauge-%2".format(actor.actorId(), type);
   const sprite = this.createInnerSprite(key, Sprite_StatusExpGauge);
   sprite.setup(actor, type);
@@ -2042,6 +2049,9 @@ Window_Status.prototype.placeExpGauge = function(actor, x, y) {
 };
 
 Window_Status.prototype.placeGauge = function(actor, type, x, y) {
+  if (Imported.NUUN_GaugeImage) {
+    this.placeGaugeImg(actor, type, x, y);
+  }
   const key = "actor%1-gauge-%2".format(actor.actorId(), type);
   let sprite;
   if (type === 'hp') {
@@ -2161,7 +2171,7 @@ Sprite_StatusExpGauge.prototype.gaugeHeight = function() {
 Sprite_StatusExpGauge.prototype.drawValue = function() {
   let currentValue = 0;
   const width = this.bitmapWidth();
-  const height = this.bitmapHeight();
+  const height = this.textHeight();
   this.setupValueFont();
   if (ExpPercent) {
     currentValue = this._battler.isMaxLevel() ? "100%" : this.currentDecimal(this.currentPercent()) +"%";

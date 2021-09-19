@@ -2171,7 +2171,7 @@ Sprite_StatusExpGauge.prototype.gaugeHeight = function() {
 Sprite_StatusExpGauge.prototype.drawValue = function() {
   let currentValue = 0;
   const width = this.bitmapWidth();
-  const height = this.textHeight();
+  const height = typeof this.textHeight === 'function' ? this.textHeight() : this.bitmapHeight();
   this.setupValueFont();
   if (ExpPercent) {
     currentValue = this._battler.isMaxLevel() ? "100%" : this.currentDecimal(this.currentPercent()) +"%";

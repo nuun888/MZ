@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * 
  * @help
@@ -25,6 +25,9 @@
  * 特定条件：HPが瀕死の時に設定した画像に切り替わります。
  *          TPBがキャストタイム中なら設定した画像に切り替わります。(別途キャストタイムを可視化できるプラグインが必要です)
  * 
+ * 'result_exp'　リザルト獲得経験値ゲージ
+ * 'exp' ステータス画面経験値ゲージ
+ * 
  * このプラグインはコアスクリプトVer.1.3.3以降でみ対応です。
  * 
  * 
@@ -32,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/20 Ver.1.0.1
+ * 当プラグインに対応していないゲージで、ゲージが表示されない問題を修正。
  * 2021/9/20 Ver.1.0.0
  * 初版
  * 
@@ -272,10 +277,11 @@ Imported.NUUN_GaugeImage = true;
 
   const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
   Sprite_Gauge.prototype.setup = function(battler, statusType) {
-    this._gaugeImgData = this.isGaugeImage(statusType);
+    this._gaugeImgData = imgSprite ? this.isGaugeImage(statusType) : null;
     if (this._gaugeImgData) {
       this.defaultGaugeImg();
       this.setGaugeImg();
+      imgSprite = null;
     }
     _Sprite_Gauge_setup.call(this, battler, statusType);
   };

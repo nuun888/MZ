@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.12.3
+ * @version 1.12.4
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -77,10 +77,13 @@
  * エンター　切り替え、画面を閉じる 右クリック
  * ←→　ドロップアイテム、習得スキルページ切り替え
  * 
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/19 Ver.1.12.4
+ * コアスクリプトVer.1.3.3による修正。
  * 2021/8/9 Ver.1.12.3
  * サポートアクターを表示するように修正。
  * 2021/8/7 Ver.1.12.2
@@ -279,6 +282,7 @@
  * @text フェードイン表示
  * @desc リザルト画面をフェードインで表示する。
  * @parent CommonSetting
+ * 
  * 
  * @param WindowSetting
  * @text ウィンドウ設定
@@ -2209,7 +2213,8 @@ Window_Result.prototype.drawGainExp = function(date, x, y, width) {
 };
 
 Window_Result.prototype.drawPartyOriginalParam = function(date, x, y, width) {
-  if (!isNaN(BattleManager._rewards.exp)) {
+  const rewards = BattleManager._rewards;console.log(rewards)
+  if (!isNaN(rewards)) {
     const result = eval(date.GainParamEval);
     this.changeTextColor(ColorManager.systemColor());
     if (date.GainParamName) {
@@ -2298,6 +2303,9 @@ Window_Result.prototype.drawActorCharacter = function(x, y, mode) {
 
 Window_Result.prototype.placeExpGauge = function(actor, x, y) {
   const type = 'result_exp'
+  if (Imported.NUUN_GaugeImage) {
+    this.placeGaugeImg(actor, type, x, y);
+  }
   const key = "resultActor%1-gauge-%2".format(actor.actorId(), type);
   const sprite = this.createInnerSprite(key, Sprite_ResultExpGauge);
   sprite.setup(actor, type);
@@ -2769,7 +2777,7 @@ const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
 Sprite_Gauge.prototype.drawValue = function() {
   if (this._statusType === "result_exp") {
     const width = this.bitmapWidth();
-    const height = this.bitmapHeight();
+    const height = typeof this.textHeight === 'function' ? this.textHeight() : this.bitmapHeight();
     this._resultExpMoveMode = param.GaugeRefreshFrame > 0 && param.GaugeValueShow ? true : false;
     let expValue = this.currentValue();
     if (param.GaugeValueShow > 0) {
@@ -3005,11 +3013,6 @@ BattleManager.displayVictoryNoBusy = function() {
 
 BattleManager.displayVictoryOnBusy = function() {
   this._victoryStart = false;
-  return;
-  this.displayVictoryMessage();
-  this.displayRewards();
-  this.gainRewards();
-  this.endBattle(0);
 };
 
 const _BattleManager_makeRewards = BattleManager.makeRewards;
@@ -3130,4 +3133,5 @@ const _BattleManager_isBattleEnd = BattleManager.isBattleEnd;
 BattleManager.isBattleEnd = function() {
   return _BattleManager_isBattleEnd.call(this) || this._victoryOn;
 };
+
 })();

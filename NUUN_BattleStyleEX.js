@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.5.2
+ * @version 1.5.3
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -82,6 +82,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/19 Ver 1.5.3
+ * アクター側のアニメーションを反転しない機能を追加。
  * 2021/9/11 Ver 1.5.2
  * アクターコマンドを全てのモードにおいて可変に表示できるよう変更。
  * 2021/7/17 Ver 1.5.1
@@ -864,6 +866,13 @@
  * @default true
  * @parent Effect
  * 
+ * @param ActorsMirror
+ * @desc アクターのアニメーションを反転します。
+ * @text アクターアニメーション反転
+ * @type boolean
+ * @default true
+ * @parent Effect
+ * 
  * 
  * @param ActorStatus
  * @text アクター設定
@@ -901,7 +910,7 @@
  * @parent ActorStatus
  * 
  * @param GaugeWidth
- * @desc HP,MP,TPゲージの最大横幅を指定します。
+ * @desc HP,MP,TPゲージの最大横幅を指定します。(ベースプラグインVer.2.5.7以降使用廃止)
  * @text ゲージ最大横幅
  * @type number
  * @default

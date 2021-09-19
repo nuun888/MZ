@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.5.6
+ * @version 2.5.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/9/19 Ver 2.5.7
+ * ゲージの表示処理を変更。
  * 2021/9/16 Ver 2.5.6
  * コアスクリプトVer.1.3.3でゲージの高さがおかしくなる問題を修正。
  * 2021/9/13 Ver 2.5.5
@@ -1434,8 +1436,20 @@ Window_BattleStatus.prototype.faceRect = function(index) {
 };
 
 Window_BattleStatus.prototype.placeGauge = function(actor, type, x, y) {
+  if (Imported.NUUN_GaugeImage) {
+    this.placeGaugeImg(actor, type, x, y);
+  }
   const key = "actor%1-gauge-%2".format(actor.actorId(), type);
-  const sprite = this.createInnerSprite(key, Sprite_BattleGauge);
+  let sprite = null;
+  if (type === 'hp') {
+    sprite = this.createInnerSprite(key, Sprite_BattleHpGauge);
+  } else if (type === 'mp') {
+    sprite = this.createInnerSprite(key, Sprite_BattleMpGauge);
+  } else if (type === 'tp') {
+    sprite = this.createInnerSprite(key, Sprite_BattleTpGauge);
+  } else if (type === 'time') {
+    sprite = this.createInnerSprite(key, Sprite_BattleTpbGauge);
+  }
   sprite.setup(actor, type);
   sprite.move(x, y);
   sprite.show();
@@ -2579,12 +2593,97 @@ Sprite_ActorImges.prototype.updateSelectionEffect = function() {
   }
 };
 
+function Sprite_BattleHpGauge() {
+  this.initialize(...arguments);
+}
+
+Sprite_BattleHpGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_BattleHpGauge.prototype.constructor = Sprite_BattleHpGauge;
+
+Sprite_BattleHpGauge.prototype.initialize = function() {
+  this._HPGaugeWidth = param.StyleMode === "MVStyle" ? (param.HPGaugeWidth || ($dataSystem.optDisplayTp ? 108 : 201)) : param.HPGaugeWidth;
+  this._GaugeHeight = 0;
+  Sprite_Gauge.prototype.initialize.call(this);
+};
+
+Sprite_BattleHpGauge.prototype.bitmapWidth = function() {
+  return this._HPGaugeWidth;
+};
+
+Sprite_BattleHpGauge.prototype.gaugeHeight = function() {
+  return param.HPGaugeHeight;
+};
+
+
+function Sprite_BattleMpGauge() {
+  this.initialize(...arguments);
+}
+
+Sprite_BattleMpGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_BattleMpGauge.prototype.constructor = Sprite_BattleMpGauge;
+
+Sprite_BattleMpGauge.prototype.initialize = function() {
+  this._MPGaugeWidth = param.StyleMode === "MVStyle" ? (param.MPGaugeWidth || ($dataSystem.optDisplayTp ? 96 : 114)) : param.MPGaugeWidth;
+  this._GaugeHeight = 0;
+  Sprite_Gauge.prototype.initialize.call(this);
+};
+
+Sprite_BattleMpGauge.prototype.bitmapWidth = function() {
+  return this._MPGaugeWidth;
+};
+
+Sprite_BattleMpGauge.prototype.gaugeHeight = function() {
+  return param.MPGaugeHeight;
+};
+
+
+function Sprite_BattleTpGauge() {
+  this.initialize(...arguments);
+}
+
+Sprite_BattleTpGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_BattleTpGauge.prototype.constructor = Sprite_BattleTpGauge;
+
+Sprite_BattleTpGauge.prototype.initialize = function() {
+  Sprite_Gauge.prototype.initialize.call(this);
+  this._GaugeHeight = 0;
+};
+
+Sprite_BattleTpGauge.prototype.bitmapWidth = function() {
+  return param.TPGaugeWidth;
+};
+
+Sprite_BattleTpGauge.prototype.gaugeHeight = function() {
+  return param.TPGaugeHeight;
+};
+
+
+function Sprite_BattleTpbGauge() {
+  this.initialize(...arguments);
+}
+
+Sprite_BattleTpbGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_BattleTpbGauge.prototype.constructor = Sprite_BattleTpbGauge;
+
+Sprite_BattleTpbGauge.prototype.initialize = function() {
+  Sprite_Gauge.prototype.initialize.call(this);
+  this._GaugeHeight = 0;
+};
+
+Sprite_BattleTpbGauge.prototype.bitmapWidth = function() {
+  return param.TPBGaugeWidth;
+};
+
+Sprite_BattleTpbGauge.prototype.gaugeHeight = function() {
+  return param.TPBGaugeHeight;
+};
+
+
+
 function Sprite_BattleGauge() {
   this.initialize(...arguments);
 }
 
-
-//Sprite_BattleGauge
 Sprite_BattleGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_BattleGauge.prototype.constructor = Sprite_BattleGauge;
 
@@ -2602,6 +2701,7 @@ Sprite_BattleGauge.prototype.setup = function(battler, statusType) {
 };
 
 Sprite_BattleGauge.prototype.bitmapWidth = function() {
+  console.log()
   switch (this._statusType) {
     case "hp":
       return this._HPGaugeWidth;
@@ -2656,6 +2756,11 @@ Spriteset_Base.prototype.animationTarget = function(targetSprites){
     return target ? true : false;
   }
   return false;
+};
+
+const _Spriteset_Base_animationShouldMirror = Spriteset_Base.prototype.animationShouldMirror;
+Spriteset_Base.prototype.animationShouldMirror = function(target) {
+  return param.ActorsMirror ? _Spriteset_Base_animationShouldMirror.call(this, target) : false;
 };
 
 //Spriteset_Battle

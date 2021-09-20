@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * @base NUUN_Base
  * 
  * @help
@@ -28,13 +28,18 @@
  * 'result_exp'　リザルト獲得経験値ゲージ
  * 'exp' ステータス画面経験値ゲージ
  * 
- * このプラグインはコアスクリプトVer.1.3.3以降でみ対応です。
+ * ゲージの画像化を戦闘中のみ反映させる場合はフィルタリングクラス設定で'Window_BattleStatus'、'Window_BattleActor'を設定してください。
  * 
+ * 仕様
+ * このプラグインはコアスクリプトVer.1.3.3以降でみ対応です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/20 Ver.1.1.0
+ * フィルタリング機能を追加。
+ * ゲージの前面に画像をしてい出来る機能を追加。
  * 2021/9/20 Ver.1.0.1
  * 当プラグインに対応していないゲージで、ゲージが表示されない問題を修正。
  * 2021/9/20 Ver.1.0.0
@@ -70,16 +75,23 @@
  * @default []
  * 
  * @param GaugeImgVariable
- * @text 画像拡大縮小
- * @desc 画像を拡大縮小します。
+ * @text ゲージ幅引き伸ばし
+ * @desc ゲージを横幅に合わせ拡大縮小します。
  * @type boolean
- * @default true
+ * @default false
+ * 
+ * @param GaugeImgScale
+ * @text 画像拡大率
+ * @desc 画像を拡大率を指定。
+ * @type number
+ * @default 100
  * 
  * @param GaugeOffSetX
  * @desc 全ゲージ画像のオフセット座標X
  * @text 全ゲージ画像オフセット座標X
  * @type number
  * @default 0
+ * @min -999
  * 
  * @param GaugeBaseWidth
  * @desc ゲージの表示横幅
@@ -94,6 +106,31 @@
  * @type number
  * @default 0
  * @min -99
+ * 
+ * @param BackImg
+ * @text 背景画像設定
+ * @default ------------------------------
+ * 
+ * @param GaugeX
+ * @desc 背景画像の表示オフセット位置X
+ * @text 背景画像表示オフセット位置X
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeY
+ * @desc 背景画像の表示オフセット位置Y
+ * @text 背景画像表示オフセット位置Y
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeCorrectionWidth
+ * @desc 背景画像の補正幅（表示幅からの差）
+ * @text 背景画像補正幅
+ * @type number
+ * @default 0
+ * @min -999
  * 
  * @param GaugeWidth
  * @desc 背景ゲージ画像のトリミング横幅
@@ -120,23 +157,80 @@
  * @type number
  * @default 0
  * 
- * @param GaugeX
- * @desc メインゲージの表示座標X
- * @text メインゲージの表示座標X
+ * @param FrontImg
+ * @text 前面画像設定
+ * @default ------------------------------
+ * 
+ * @param FrontGaugeX
+ * @desc 前面画像の表示オフセット位置X
+ * @text 前面画像表示オフセット位置X
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param FrontGaugeY
+ * @desc 前面画像の表示オフセット位置Y
+ * @text 前面画像表示オフセット位置Y
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param FrontGaugeWidth
+ * @desc 前面ゲージ画像のトリミング横幅
+ * @text 前面ゲージ画像トリミング横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param FrontGaugeHeight
+ * @desc 前面ゲージ画像のトリミング高さ
+ * @text 前面ゲージ画像トリミング高さ
  * @type number
  * @default 0
  * 
- * @param GaugeY
- * @desc メインゲージの表示座標Y
- * @text メインゲージの表示座標Y
+ * @param FrontGaugeSX
+ * @desc 前面ゲージ画像のトリミング座標X
+ * @text 前面ゲージ画像トリミング座標X
  * @type number
  * @default 0
+ * 
+ * @param FrontGaugeSY
+ * @desc 前面ゲージ画像のトリミング座標Y
+ * @text 前面ゲージ画像トリミング座標Y
+ * @type number
+ * @default 0
+ * 
+ * @param MainImg
+ * @text ゲージ画像設定
+ * @default ------------------------------
+ * 
+ * @param MainGaugeX
+ * @desc メインゲージの表示オフセット位置X
+ * @text メインゲージ表示オフセット位置X
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param MainGaugeY
+ * @desc メインゲージの表示オフセット位置Y
+ * @text メインゲージ表示オフセット位置Y
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param MainGaugeCorrectionWidth
+ * @desc メインゲージの補正幅（表示幅からの差）
+ * @text メインゲージ補正幅
+ * @type number
+ * @default 0
+ * @min -999
  * 
  * @param MainGaugeWidth
  * @desc メインゲージ画像のトリミング横幅
  * @text メインゲージ画像トリミング横幅
  * @type number
  * @default 0
+ * @min 0
  * 
  * @param MainGaugeHeight
  * @desc メインゲージ画像のトリミング高さ
@@ -180,6 +274,19 @@
  * @type number
  * @default 0
  * 
+ * @param FilteringClass
+ * @text フィルタリングクラス設定
+ * @desc 適用するウィンドウクラスを指定します。無指定の場合は全てのウィンドウで反映されます。
+ * @type combo[]
+ * @option 'Window_MenuStatus'
+ * @option 'Window_MenuActor'
+ * @option 'Window_Status'
+ * @option 'Window_BattleStatus'
+ * @option 'Window_BattleActor'
+ * @option 'Window_Result'
+ * @option 'Window_FormationStatus'
+ * @default
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_GaugeImage = true;
@@ -189,8 +296,15 @@ Imported.NUUN_GaugeImage = true;
   const GaugeImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['GaugeImgList'])) : null) || [];
   let imgSprite = null;
 
-  function isGaugeImage(statusType) {
-    return GaugeImgList.find(data => data.Type[0] === statusType && data.GaugeImg && data.GaugeImg[0]);
+  function isGaugeImage(statusType, className) {
+    return GaugeImgList.find(data => data.Type[0] === statusType && data.GaugeImg && data.GaugeImg[0] && filteringClass(data, className));
+  };
+
+  function filteringClass(data, className) {
+    if (!data.FilteringClass) {
+      return true;
+    }
+    return data.FilteringClass.find(filterClass => filterClass === className);
   };
 
   const _Window_StatusBase_placeGauge = Window_StatusBase.prototype.placeGauge;
@@ -201,11 +315,12 @@ Imported.NUUN_GaugeImage = true;
 
   Window_StatusBase.prototype.placeGaugeImg = function(actor, type, x, y) {
     imgSprite = null;
-    if (isGaugeImage(type)) {
+    const className = String(this.constructor.name);
+    if (isGaugeImage(type, className)) {
       const key = "actor%1-gaugeImg-%2".format(actor.actorId(), type);
       const sprite = this.createInnerSprite(key, Sprite_GaugeImg);
       imgSprite = sprite;
-      sprite.setup(type);
+      sprite.setup(type, className);
       sprite.move(x, y);
       sprite.show();
     }
@@ -214,6 +329,19 @@ Imported.NUUN_GaugeImage = true;
 
   Sprite.prototype.isGaugeImage = function(statusType) {
     return GaugeImgList.find(data => data.Type[0] === statusType && data.GaugeImg && data.GaugeImg[0]);
+  };
+
+  Sprite.prototype.createGaugeImg = function(base, type) {
+    imgSprite = null;
+    const className = String(this.constructor.name);
+    if (isGaugeImage(type, className)) {
+      const sprite = new Sprite_GaugeImg();
+      base.addChild(sprite);
+      imgSprite = sprite;
+      sprite.setup(type);
+      sprite.move(0, 0);
+      sprite.show();
+    }
   };
 
 
@@ -254,6 +382,7 @@ Imported.NUUN_GaugeImage = true;
     const height = this.bitmapHeight();
     this.createGaugeImges(width, height);
     this.createMainGaugeImges(width, height);
+    this.createFrontGaugeImges(width, height);
   };
 
   Sprite_GaugeImg.prototype.createGaugeImges = function(width, height) {
@@ -274,6 +403,15 @@ Imported.NUUN_GaugeImage = true;
     }
   };
 
+  Sprite_GaugeImg.prototype.createFrontGaugeImges = function(width, height) {
+    if (!this._frontGaugeSprite && this._gaugeImgData.FrontGaugeWidth > 0) {
+      const sprite = new Sprite();
+      this.addChild(sprite);
+      sprite.bitmap = new Bitmap(width, height);
+      this._frontGaugeSprite = sprite;
+    }
+  };
+
 
   const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
   Sprite_Gauge.prototype.setup = function(battler, statusType) {
@@ -291,6 +429,7 @@ Imported.NUUN_GaugeImage = true;
       this._gaugeImgSprite = imgSprite;
       this._baseGaugeSprite = imgSprite._baseGaugeSprite;
       this._mainGaugeSprite = imgSprite._mainGaugeSprite;
+      this._frontGaugeSprite = imgSprite._frontGaugeSprite;
       this.createGaugeBitmap();
     }
   };
@@ -309,22 +448,41 @@ Imported.NUUN_GaugeImage = true;
   };
 
   Sprite_Gauge.prototype.baseGaugeSetup  = function(bitmap, data) {
+    const scale = (data.GaugeImgScale || 100) / 100;
+    const correctionWidth = data.GaugeCorrectionWidth || 0;
     const sx = data.GaugeSX;
     const sy = data.GaugeSY;
     const sw = data.GaugeWidth;
     const sh = data.GaugeHeight;
-    const x = this.gaugeX() + data.GaugeOffSetX;
-    const y = this.textHeight() - data.GaugeHeight;//Ver.1.3.3以降
-    const gaugewidth = data.GaugeImgVariable ? this.bitmapWidth() - x : sw;
+    const x = this.gaugeX() + data.GaugeX + data.GaugeOffSetX;
+    const y = this.textHeight() - (sh * scale) + data.GaugeY;//Ver.1.3.3以降
+    const gaugewidth = data.GaugeImgVariable ? this.bitmapWidth() - x + correctionWidth : sw * scale + correctionWidth;
     const context = this._baseGaugeSprite.bitmap.context;
     context.setTransform(1, 0, this.gaugeInclinedRate(data), 1, 0, 0);
-    this._baseGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth);
+    this._baseGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth, sh * scale);
     this.mainGaugeSetup(bitmap, data);
+  };
+
+  Sprite_Gauge.prototype.frontGaugeSetup  = function(bitmap, data) {
+    if (this._frontGaugeSprite) {
+      const scale = (data.GaugeImgScale || 100) / 100;
+      const sx = data.FrontGaugeSX;
+      const sy = data.FrontGaugeSY;
+      const sw = data.FrontGaugeWidth;
+      const sh = data.FrontGaugeHeight;
+      const x = this.gaugeX() + data.FrontGaugeX + data.GaugeOffSetX;
+      const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;//Ver.1.3.3以降
+      const gaugewidth = data.GaugeImgVariable ? this.bitmapWidth() - x : sw * scale;
+      const context = this._frontGaugeSprite.bitmap.context;
+      context.setTransform(1, 0, this.gaugeInclinedRate(data), 1, 0, 0);
+      this._frontGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth ,sh * scale);
+    }
   };
 
   Sprite_Gauge.prototype.mainGaugeSetup  = function(bitmap, data) {
     const context = this._mainGaugeSprite.bitmap.context;
     context.setTransform(1, 0, this.gaugeInclinedRate(data), 1, 0, 0);
+    this.frontGaugeSetup(bitmap, data);
   };
 
   const _Sprite_Gauge_drawGaugeRect = Sprite_Gauge.prototype.drawGaugeRect;
@@ -332,6 +490,8 @@ Imported.NUUN_GaugeImage = true;
     if (this._gaugeImgSprite) {
       this._mainGaugeSprite.bitmap.clear();
       const data = this._gaugeImgData;
+      const scale = (data.GaugeImgScale || 100) / 100;
+      const correctionWidth = data.MainGaugeCorrectionWidth || 0;
       const gaugeX = this.gaugeX();
       const sx = this._mainGaugeSX;
       const sy = this._mainGaugeSY;
@@ -340,10 +500,10 @@ Imported.NUUN_GaugeImage = true;
       const rate = this.gaugeRate();
       const dw = Math.floor((data.GaugeWidth - sw) / 2 * rate);
       const gaugeWidth = Math.floor(sw * rate);
-      const x = gaugeX + data.GaugeX + data.GaugeOffSetX;
-      const y = this.textHeight() - sh + data.GaugeY;//Ver.1.3.3以降;
-      const w = data.GaugeImgVariable ? (width - dw - data.GaugeOffSetX) * rate : gaugeWidth;
-      this._mainGaugeSprite.bitmap.blt(this._gaugeBitmap, sx, sy, gaugeWidth, sh, x, y, w);
+      const x = gaugeX + data.MainGaugeX + data.GaugeOffSetX;
+      const y = this.textHeight() - (sh * scale) + data.MainGaugeY;//Ver.1.3.3以降;
+      const w = data.GaugeImgVariable ? (width - dw - x + correctionWidth) * rate : gaugeWidth * scale + correctionWidth;
+      this._mainGaugeSprite.bitmap.blt(this._gaugeBitmap, sx, sy, gaugeWidth, sh, x, y, w, sh * scale);
     } else {
       _Sprite_Gauge_drawGaugeRect.call(this, x, y, width, height);
     }

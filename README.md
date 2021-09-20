@@ -81,7 +81,7 @@
 | 敵に名前表示 | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) |  | 1.1.4 |
 | 敵にTPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.1.7 |
 | スリップダメージ拡張 |  |  |  |
-|  |  |  |  |
+| ゲージ画像化 | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) |  | 1.1.0 |
 |  |  |  |  |
 |  |  |  |  |
 

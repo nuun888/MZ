@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc アクター並び替え固定
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * アクターの並び替えを固定します。
@@ -19,6 +19,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/21 Ver.1.1.3
+ * メンバー変更画面の固定アクター戦闘メンバーへの移動可対応による処理の追加。
  * 2021/9/18 Ver.1.1.2
  * 一部処理を変更。
  * 2021/9/8 Ver.1.1.1
@@ -137,6 +139,26 @@ Window_MenuStatus.prototype.isCurrentItemEnabled = function() {
 
 Window_StatusBase.prototype.isFixedMovable = function() {
   actor.setFixedMovable(ActorFixedMovable);
+};
+
+const _Window_StatusBase_isCurrentItemEnabled = Window_StatusBase.prototype.isCurrentItemEnabled;
+Window_StatusBase.prototype.isCurrentItemEnabled = function() {
+  if (this._nuun_FormationMode) {
+    const actor = this.actor(this.index());
+    let result = true;
+    if (this._pendingIndexs < 0) {
+      actor.setFixedMovable(ActorFixedMovable);
+    } else if (this._pendingIndexs >= $gameParty.maxFormationBattleMembers()) {
+      actor.setFixedMovable(false);
+    } else if (this.index() < $gameParty.maxFormationBattleMembers()) {
+      actor.setFixedMovable(ActorFixedMovable);
+    } else {
+      actor.setFixedMovable(false);
+      result = !this.actor(this._pendingIndexs).isFixed();console.log(esult)
+    }
+    return result;
+  }
+  return _Window_StatusBase_isCurrentItemEnabled.call(this);
 };
 
 })();

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/21 Ver.1.2.3
+ * アクター並び替え固定プラグインの固定アクター戦闘メンバーへの移動可対応。
  * 2021/9/18 Ver.1.2.2
  * アクター並び替え固定プラグインとの併用時にエラーが出る問題を修正。
  * 2021/9/17 Ver.1.2.1
@@ -54,6 +56,13 @@
  * @param BasicSetting
  * @text 基本設定
  * @default ------------------------------
+ * 
+ * @param VariableBattleMember
+ * @text 戦闘メンバー数可変（未実装）
+ * @desc 戦闘メンバー数。
+ * @type boolean
+ * @default false
+ * @parent BasicSetting
  * 
  * @param LavelVisible
  * @text レベル表示
@@ -491,7 +500,8 @@ Window_FormationStatus.prototype.constructor = Window_FormationStatus;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_SceneFormation');
-const VariableBattleMember = eval(parameters['VariableBattleMember'] || "false");
+//const VariableBattleMember = eval(parameters['VariableBattleMember'] || "false");
+const VariableBattleMember = false;
 const BattleMemberName = String(parameters['BattleMemberName'] || "戦闘メンバー");
 const MemberName = String(parameters['MemberName'] || "待機メンバー");
 const BattleMemberName_X = Number(parameters['BattleMemberName_X'] || 0);
@@ -914,6 +924,8 @@ Window_FormationBattleMember.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._cursorMode = 'battle';
   this._pendingIndex = -1;
+  this._pendingIndexs = -1;
+  this._nuun_FormationMode = true;
   this.refresh();
 };
 
@@ -955,14 +967,10 @@ Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
   const actor = this.actor(this.index());
   const memberPendingIndex = this._memberWindow.pendingIndex();
   const pendingActor = this._memberWindow.actor(memberPendingIndex);
-  if (Imported.NUUN_ActorFixed) {
-    actor.setFixedMovable(false);
-    //return this.isFixedMovable(actor, pendingActor);
-  }
   if (actor && !actor.isDead() && memberPendingIndex >= 0 && pendingActor.isDead()) {
     return this.isbattleMembersDead() < $gameParty.maxBattleMembers() - 1;
   }
-  return actor && actor.isFormationChangeOk();
+  return actor && Window_StatusBase.prototype.isCurrentItemEnabled.call(this) && actor.isFormationChangeOk();
 };
 
 Window_FormationBattleMember.prototype.playOkSound = function() {
@@ -1090,6 +1098,8 @@ Window_FormationBattleMember.prototype.pendingIndex = function() {
 Window_FormationBattleMember.prototype.setPendingIndex = function(index) {
   const lastPendingIndex = this._pendingIndex;
   this._pendingIndex = index;
+  this._pendingIndexs = index;
+  this._memberWindow._pendingIndexs = this._pendingIndexs;
   this.redrawItem(this._pendingIndex);
   this.redrawItem(lastPendingIndex);
 };
@@ -1100,6 +1110,8 @@ Window_FormationMember.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._cursorMode = 'battle';
   this._pendingIndex = -1;
+  this._pendingIndexs = -1;
+  this._nuun_FormationMode = true;
   this.refresh();
 };
 
@@ -1140,14 +1152,12 @@ Window_FormationMember.prototype.isCurrentItemEnabled = function() {
   const actor = this.actor(this.index());
   const memberPendingIndex = this._battleMemberWindow.pendingIndex();
   const battleMemberActor = this._battleMemberWindow.actor(memberPendingIndex);
-  if (Imported.NUUN_ActorFixed) {
-    actor.setFixedMovable_org();
-    //return this.isFixedMovable(actor, battleMemberActor);
-  }
+  
   if (battleMemberActor && !battleMemberActor.isDead() && actor && actor.isDead()){
     return this.isbattleMembersDead() < $gameParty.maxBattleMembers() - 1;
   }
-  return (actor && actor.isFormationChangeOk()) || (this.maxItems() - 1 === this.index());
+  return (actor && Window_StatusBase.prototype.isCurrentItemEnabled.call(this) && actor.isFormationChangeOk()) || (this.maxItems() - 1 === this.index());
+  //return (actor && actor.isFormationChangeOk()) || (this.maxItems() - 1 === this.index());
 };
 
 Window_FormationMember.prototype.setMemberStatusWindow = function(memberStatusWindow) {
@@ -1270,6 +1280,8 @@ Window_FormationMember.prototype.pendingIndex = function() {
 Window_FormationMember.prototype.setPendingIndex = function(index) {
   const lastPendingIndex = this._pendingIndex;
   this._pendingIndex = index;
+  this._pendingIndexs = index + $gameParty.maxFormationBattleMembers();
+  this._battleMemberWindow._pendingIndexs = this._pendingIndexs;
   this.redrawItem(this._pendingIndex);
   this.redrawItem(lastPendingIndex);
 };

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc アクター並び替え固定
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * アクターの並び替えを固定します。
@@ -19,6 +19,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/22 Ver.1.1.4
+ * 固定アクターの移動が正常に行えていなかった問題を修正。
  * 2021/9/21 Ver.1.1.3
  * メンバー変更画面の固定アクター戦闘メンバーへの移動可対応による処理の追加。
  * 2021/9/18 Ver.1.1.2
@@ -123,15 +125,20 @@ const _Window_MenuStatus_isCurrentItemEnabled = Window_MenuStatus.prototype.isCu
 Window_MenuStatus.prototype.isCurrentItemEnabled = function() {
   if (this._formationMode) {
     const actor = this.actor(this.index());
+    let result = true;
     if (this._pendingIndex < 0) {
       actor.setFixedMovable(ActorFixedMovable);
     } else if (this._pendingIndex >= $gameParty.maxBattleMembers()) {
       actor.setFixedMovable(false);
+      result = index < $gameParty.maxBattleMembers() ? true : !this.actor(this._pendingIndex).isFixed();
     } else if (this.index() < $gameParty.maxBattleMembers()) {
       actor.setFixedMovable(ActorFixedMovable);
+    } else if (index >= $gameParty.maxBattleMembers()) {
+      actor.setFixedMovable(ActorFixedMovable);
+      result = !this.actor(this._pendingIndex).isFixed();
     } else {
       actor.setFixedMovable(false);
-      return _Window_MenuStatus_isCurrentItemEnabled.call(this) && !this.actor(this._pendingIndex).isFixed();
+      result = !this.actor(this._pendingIndex).isFixed();
     }
   }
   return _Window_MenuStatus_isCurrentItemEnabled.call(this);
@@ -144,19 +151,24 @@ Window_StatusBase.prototype.isFixedMovable = function() {
 const _Window_StatusBase_isCurrentItemEnabled = Window_StatusBase.prototype.isCurrentItemEnabled;
 Window_StatusBase.prototype.isCurrentItemEnabled = function() {
   if (this._nuun_FormationMode) {
-    const actor = this.actor(this.index());
+    const index = this._allSelectIndex;
+    const actor = this.actorAll(index);
     let result = true;
     if (this._pendingIndexs < 0) {
       actor.setFixedMovable(ActorFixedMovable);
     } else if (this._pendingIndexs >= $gameParty.maxFormationBattleMembers()) {
       actor.setFixedMovable(false);
-    } else if (this.index() < $gameParty.maxFormationBattleMembers()) {
+      result = index < $gameParty.maxFormationBattleMembers() ? true : !this.actorAll(this._pendingIndexs).isFixed();
+    } else if (index < $gameParty.maxFormationBattleMembers()) {
       actor.setFixedMovable(ActorFixedMovable);
+    } else if (index >= $gameParty.maxFormationBattleMembers()) {
+      actor.setFixedMovable(ActorFixedMovable);
+      result = !this.actorAll(this._pendingIndexs).isFixed();
     } else {
       actor.setFixedMovable(false);
-      result = !this.actor(this._pendingIndexs).isFixed();console.log(esult)
+      result = !this.actorAll(this._pendingIndexs).isFixed();
     }
-    return result;
+    return result && _Window_StatusBase_isCurrentItemEnabled.call(this);
   }
   return _Window_StatusBase_isCurrentItemEnabled.call(this);
 };

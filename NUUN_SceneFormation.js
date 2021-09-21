@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.2.3
+ * @version 1.2.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/22 Ver.1.2.4
+ * アクター並び替え固定プラグインの固定アクターの移動が正常に行えていなかった問題を修正。
  * 2021/9/21 Ver.1.2.3
  * アクター並び替え固定プラグインの固定アクター戦闘メンバーへの移動可対応。
  * 2021/9/18 Ver.1.2.2
@@ -925,6 +927,7 @@ Window_FormationBattleMember.prototype.initialize = function(rect) {
   this._cursorMode = 'battle';
   this._pendingIndex = -1;
   this._pendingIndexs = -1;
+  this._allSelectIndex = -1;
   this._nuun_FormationMode = true;
   this.refresh();
 };
@@ -943,6 +946,10 @@ Window_FormationBattleMember.prototype.itemHeight = function() {
 
 Window_FormationBattleMember.prototype.actor = function(index) {
   return $gameParty.battleMembers()[index];
+};
+
+Window_FormationBattleMember.prototype.actorAll = function(index) {
+  return $gameParty.allMembers()[index];
 };
 
 Window_FormationBattleMember.prototype.processOk = function() {
@@ -964,7 +971,8 @@ Window_FormationBattleMember.prototype.setActorStatus = function(index) {
 
 
 Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
-  const actor = this.actor(this.index());
+  this._allSelectIndex = this.index();
+  const actor = this.actorAll(this._allSelectIndex);
   const memberPendingIndex = this._memberWindow.pendingIndex();
   const pendingActor = this._memberWindow.actor(memberPendingIndex);
   if (actor && !actor.isDead() && memberPendingIndex >= 0 && pendingActor.isDead()) {
@@ -1111,6 +1119,7 @@ Window_FormationMember.prototype.initialize = function(rect) {
   this._cursorMode = 'battle';
   this._pendingIndex = -1;
   this._pendingIndexs = -1;
+  this._allSelectIndex = -1;
   this._nuun_FormationMode = true;
   this.refresh();
 };
@@ -1131,6 +1140,10 @@ Window_FormationMember.prototype.actor = function(index) {
   return $gameParty.standbyMembers()[index];
 };
 
+Window_FormationMember.prototype.actorAll = function(index) {
+  return $gameParty.allMembers()[index];
+};
+
 Window_FormationMember.prototype.processOk = function() {
   this.setSelectIndex(this.index());
   Window_StatusBase.prototype.processOk.call(this);
@@ -1149,10 +1162,10 @@ Window_FormationMember.prototype.setActorStatus = function(index) {
 };
 
 Window_FormationMember.prototype.isCurrentItemEnabled = function() {
-  const actor = this.actor(this.index());
+  this._allSelectIndex = this.index() + $gameParty.maxFormationBattleMembers();
+  const actor = this.actorAll(this._allSelectIndex);
   const memberPendingIndex = this._battleMemberWindow.pendingIndex();
   const battleMemberActor = this._battleMemberWindow.actor(memberPendingIndex);
-  
   if (battleMemberActor && !battleMemberActor.isDead() && actor && actor.isDead()){
     return this.isbattleMembersDead() < $gameParty.maxBattleMembers() - 1;
   }

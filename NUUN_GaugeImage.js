@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * 
  * @help
@@ -37,6 +37,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/22 Ver.1.1.1
+ * メインゲージが正常に表示されない問題を修正。
  * 2021/9/20 Ver.1.1.0
  * フィルタリング機能を追加。
  * ゲージの前面に画像を表示出来る機能を追加。
@@ -276,13 +278,14 @@
  * 
  * @param FilteringClass
  * @text フィルタリングクラス設定
- * @desc 適用するウィンドウクラスを指定します。無指定の場合は全てのウィンドウで反映されます。
+ * @desc 適用するウィンドウクラスを指定します。無指定の場合は全てのウィンドウで反映されます。(複数指定可)
  * @type combo[]
  * @option 'Window_MenuStatus'
  * @option 'Window_MenuActor'
  * @option 'Window_Status'
  * @option 'Window_BattleStatus'
  * @option 'Window_BattleActor'
+ * @option 'Window_BattleActorStatus'
  * @option 'Window_Result'
  * @option 'Window_FormationStatus'
  * @default
@@ -502,7 +505,7 @@ Imported.NUUN_GaugeImage = true;
       const gaugeWidth = Math.floor(sw * rate);
       const x = gaugeX + data.MainGaugeX + data.GaugeOffSetX;
       const y = this.textHeight() - (sh * scale) + data.MainGaugeY;//Ver.1.3.3以降;
-      const w = data.GaugeImgVariable ? (width - dw - x + correctionWidth) * rate : gaugeWidth * scale + correctionWidth;
+      const w = data.GaugeImgVariable ? (this.bitmapWidth() - x - dw + correctionWidth) * rate : gaugeWidth * scale + correctionWidth;
       this._mainGaugeSprite.bitmap.blt(this._gaugeBitmap, sx, sy, gaugeWidth, sh, x, y, w, sh * scale);
     } else {
       _Sprite_Gauge_drawGaugeRect.call(this, x, y, width, height);

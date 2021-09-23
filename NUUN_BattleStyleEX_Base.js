@@ -513,7 +513,7 @@ Scene_Battle.prototype.createActorCommandWindow = function() {
     const sprite = new Sprite(loadNormalPicture(param.ActorCommandBackground));
     sprite.anchor.y = param.ActorCommandBackgroundAnchorMode === 0 ? 0 : 1.0;
     sprite.x = this._actorCommandWindow.x + this._statusWindow.UI_Difference + param.ActorCommandBackground_X;
-    sprite.y = this._actorCommandWindow.y + (param.ActorCommandBackgroundAnchorMode === 0 ? 0 : this._actorCommandWindow.height) + (Graphics.height - Graphics.boxHeight) / 2
+    sprite.y = this._actorCommandWindow.y + (param.ActorCommandBackgroundAnchorMode === 0 ? 0 : this._actorCommandWindow.height) + (Graphics.height - Graphics.boxHeight) / 2 +
                 param.ActorCommandBackground_Y;
     this._battleHudFront.addChild(sprite);
     this._actorCommandWindow.windowBackground = sprite;
@@ -1159,6 +1159,7 @@ Window_ActorCommand.prototype.refresh = function() {
           if (param.ActorCommandMode === 3) {
             this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + (param.WindowFrameShow ? 0 : 6) + param.ActorCommand_Y;
           }
+
         }
       }
     }

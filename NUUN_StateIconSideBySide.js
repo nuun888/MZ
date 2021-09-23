@@ -225,7 +225,7 @@ Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
     this._iconSprite.forEach((sprite, r) => {
     if (displayIcons[r]) {
       sprite._iconIndex = displayIcons[r];
-      sprite._stateTurn = displayTurn[r] + TurnCorrection;
+      sprite._stateTurn = displayTurn[r];
     } else {
       sprite._iconIndex = 0;
       sprite._stateTurn = 0;
@@ -343,7 +343,7 @@ Game_BattlerBase.prototype.allBuffTurns = function() {
 Game_BattlerBase.prototype.nuun_stateTurns = function() {
   return this.states().reduce((r, state) => {
     if (state.iconIndex > 0) {
-      return r.concat([this.nuun_isNonRemoval(state) ? 0 : this._stateTurns[state.id]]);
+      return r.concat([this.nuun_isNonRemoval(state) ? 0 : this._stateTurns[state.id]  + TurnCorrection]);
     } 
     return r;
   }, []);
@@ -352,7 +352,7 @@ Game_BattlerBase.prototype.nuun_stateTurns = function() {
 Game_BattlerBase.prototype.nuun_buffTurns = function() {
   return this._buffs.reduce((r, buff, i) => {
     if (buff !== 0) {
-      return r.concat([this._buffTurns[i]]);
+      return r.concat([this._buffTurns[i] + TurnCorrection]);
     } else {
       return r;
     }

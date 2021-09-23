@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.2.4
+ * @version 1.2.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/23 Ver.1.2.5
+ * 固定アクターが待機メンバーの最後のキャラと入れ替えた時に入れ替えが出来てしまう問題を修正。
  * 2021/9/22 Ver.1.2.4
  * アクター並び替え固定プラグインの固定アクターの移動が正常に行えていなかった問題を修正。
  * 2021/9/21 Ver.1.2.3
@@ -1169,7 +1171,7 @@ Window_FormationMember.prototype.isCurrentItemEnabled = function() {
   if (battleMemberActor && !battleMemberActor.isDead() && actor && actor.isDead()){
     return this.isbattleMembersDead() < $gameParty.maxBattleMembers() - 1;
   }
-  return (actor && Window_StatusBase.prototype.isCurrentItemEnabled.call(this) && actor.isFormationChangeOk()) || (this.maxItems() - 1 === this.index());
+  return (actor && Window_StatusBase.prototype.isCurrentItemEnabled.call(this) && actor.isFormationChangeOk()) || (this.maxItems() === this.index());
   //return (actor && actor.isFormationChangeOk()) || (this.maxItems() - 1 === this.index());
 };
 

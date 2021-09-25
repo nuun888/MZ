@@ -39,7 +39,7 @@
  * @desc 味方の表示するステート数。
  * @text 味方の表示ステート数
  * @type number
- * @default 5
+ * @default 4
  * @min 1
  * 
  * @param EnemyStateIconShowVal
@@ -134,7 +134,7 @@ Imported.NUUN_StateIconSideBySide = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_StateIconSideBySide');
 let StateIconWidth = Number(parameters['StateIconWidth'] || 0);
-const ActorStateIconShowVal = Number(parameters['ActorStateIconShowVal'] || 5);
+const ActorStateIconShowVal = Number(parameters['ActorStateIconShowVal'] || 4);
 const EnemyStateIconShowVal = Number(parameters['EnemyStateIconShowVal'] || 1);
 const ActorStateIconAlign = eval(parameters['ActorStateIconAlign'] || 'right');
 const EnemyStateIconAlign = eval(parameters['EnemyStateIconAlign'] || 'center');

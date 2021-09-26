@@ -11,13 +11,16 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.8.1
+ * @version 2.9.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * モンスター図鑑を実装します。
  * このプラグインではエネミーの表示内容を自由に設定することが出来ます。
+ * 
+ * 敵の情報：現在出現している敵の情報を確認できます。
+ * アナライズ：指定の敵の情報を表示します。
  * 
  * 以下の項目が表示できます。
  * 
@@ -272,11 +275,17 @@
  * ページ選択ウィンドウのカーソル移動は左右キーのみ動作します。
  * モンスター画像は共通画像、モンスター個別画像の背後に表示されます。
  * 共通画像、モンスター個別画像は複数設定、表示可能です。
+ * 戦闘中に背景画像を表示をONにした場合、図鑑、敵の情報、アナライズが背景画像表示モードになります。
+ * 敵の画像、アナライズ画像が指定されてない場合は図鑑背景の１番目の背景が表示されます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/26 Ver.2.9.0
+ * 背景画像はページ、アナライズ、敵の情報毎に設定できるように変更。
+ * ナンバー表示をカテゴリー順に表示させる機能を追加。
+ * 背景画像を指定して敵の情報を開いた後に閉じるとモンスターの画像が残ってしまう問題を修正。
  * 2021/9/2 Ver.2.8.1
  * モンスター毎の個別画像の座標設定が反映されていなかった問題を修正。
  * 2021/8/28 Ver.2.8.0
@@ -941,6 +950,13 @@
  * @default true
  * @parent BasicSetting
  * 
+ * @param NumberMode
+ * @desc ナンバー表示を各カテゴリー表示順で表示します。
+ * @text ナンバーカテゴリー表示順表示
+ * @type boolean
+ * @default false
+ * @parent BasicSetting
+ * 
  * @param NoTouchUIWindow
  * @type boolean
  * @default false
@@ -1017,9 +1033,24 @@
  * @default []
  * @parent BackGround
  * 
+ * @param BattleBackGround
+ * @text 戦闘時背景画像表示
+ * @desc 戦闘時に背景画像を表示させます。図鑑、敵の情報、アナライズ全てが適用されます。
+ * @type boolean
+ * @default false
+ * @parent BackGround
+ * 
+ * @param EnemyInfoGroundImg
+ * @desc 敵の情報の背景画像ファイル名を指定します。
+ * @text 敵の情報背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent BackGround
+ * 
  * @param AnalyzeBackGroundImg
- * @desc アナライズ用の背景画像ファイル名を指定します。
- * @text アナライズ用背景画像
+ * @desc アナライズの背景画像ファイル名を指定します。
+ * @text アナライズ背景画像
  * @type file[]
  * @dir img/
  * @default []
@@ -1244,33 +1275,6 @@
  * @default []
  * @parent AnalyzeSetting
  * 
- * @param HPgaugeWidth
- * @desc アナライズ時のHPゲージ横幅
- * @text アナライズ時HPゲージ横幅
- * @type number
- * @default 128
- * @max 999
- * @min 0
- * @parent AnalyzeSetting
- * 
- * @param MPgaugeWidth
- * @desc アナライズ時のMPゲージ横幅
- * @text アナライズ時MPゲージ横幅
- * @type number
- * @default 128
- * @max 999
- * @min 0
- * @parent AnalyzeSetting
- * 
- * @param TPgaugeWidth
- * @desc アナライズ時のTPゲージ横幅
- * @text アナライズ時TPゲージ横幅
- * @type number
- * @default 128
- * @max 999
- * @min 0
- * @parent AnalyzeSetting
- * 
  * @param EnemyInfoSetting
  * @text 敵の情報設定
  * @default ------------------------------
@@ -1340,6 +1344,21 @@
  * @type number
  * @default 0
  * @max 999999
+ * @parent EnemyInfoSetting
+ * 
+ * @param RegistrationEnemyInfo
+ * @desc 登録タイミングを敵の情報にも反映させます。
+ * @text 敵の情報登録タイミング反映
+ * @type boolean
+ * @default false
+ * @parent 
+ * 
+ * @param RegistrationEnemyInfoColor
+ * @desc 登録済みモンスター名の色。（敵の情報登録タイミング反映がONの時に有効です）
+ * @text 登録済みモンスター名色
+ * @type number
+ * @default 0
+ * @max 999
  * @parent EnemyInfoSetting
  * 
  * @param InfoMaskMode
@@ -1502,6 +1521,37 @@
  * @type struct<PageListData>[]
  * @default []
  * @parent ListData11_20
+ * 
+ * @param GaugeSetting
+ * @text ゲージ設定
+ * @default ------------------------------
+ * 
+ * @param HPgaugeWidth
+ * @desc HPゲージ横幅
+ * @text HPゲージ横幅
+ * @type number
+ * @default 128
+ * @max 999
+ * @min 0
+ * @parent GaugeSetting
+ * 
+ * @param MPgaugeWidth
+ * @desc MPゲージ横幅
+ * @text MPゲージ横幅
+ * @type number
+ * @default 128
+ * @max 999
+ * @min 0
+ * @parent GaugeSetting
+ * 
+ * @param TPgaugeWidth
+ * @desc TPゲージ横幅
+ * @text TPゲージ横幅
+ * @type number
+ * @default 128
+ * @max 999
+ * @min 0
+ * @parent GaugeSetting
  * 
  * @param DropItemData
  * @text ドロップアイテム設定
@@ -1913,6 +1963,12 @@
  * @text ページカテゴリー名
  * @type string
  * @default
+ * 
+ * @param PageBackGroundId
+ * @desc 背景画像を指定します。0の場合はリスト1番の画像が表示されます。
+ * @text 背景画像Id
+ * @type number
+ * @default 1
  *  
  */
 /*~struct~PageListData:
@@ -2319,13 +2375,11 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
       }
   }
 }));
-param.BackGroundImg = param.BackGroundImg && param.BackGroundImg.length > 0 ? param.BackGroundImg[0] : null;
-param.AnalyzeBackGroundImg = param.AnalyzeBackGroundImg && param.AnalyzeBackGroundImg.length > 0 ? param.AnalyzeBackGroundImg[0] : null;
+
 const PercentContentLength = param.PercentWindowVisible && (param.PercentContent && param.PercentContent.length > 0);
 param.PageSetting = param.PageSetting || [];
 param.EnemyBookCategory = param.EnemyBookCategory || [];
 const NRP_pLoopLR = PluginManager.parameters("NRP_LoopCursor").loopLR;
-let enemyBook_Open = false;
 
 //プラグインコマンド
 const pluginName = "NUUN_EnemyBook";
@@ -3226,6 +3280,7 @@ Scene_EnemyBook.prototype.constructor = Scene_EnemyBook;
 
 Scene_EnemyBook.prototype.initialize = function() {
   Scene_MenuBase.prototype.initialize.call(this);
+  this._backGroundImg = null;
 };
 
 Scene_EnemyBook.prototype.create = function() {
@@ -3387,28 +3442,40 @@ Scene_EnemyBook.prototype.getMaxPage = function() {
 const _Scene_EnemyBook_createBackground = Scene_EnemyBook.prototype.createBackground;
 Scene_EnemyBook.prototype.createBackground = function() {
   Scene_MenuBase.prototype.createBackground.call(this);
-	if (param.BackGroundImg) {
-		const sprite = new Sprite();
-    sprite.bitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg);
-    sprite.x = param.BackUiWidth ? (Graphics.width - (Graphics.boxWidth + 8)) / 2 : 0;
-    sprite.y = param.BackUiWidth ? (Graphics.height - (Graphics.boxHeight + 8)) / 2 : 0;
+  if (param.BackGroundImg && param.BackGroundImg[0]) {
+    const sprite = new Sprite();
+    //sprite.bitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg[0]);
     this.addChild(sprite);
     this._backGroundImg = sprite;
+    sprite.x = param.BackUiWidth ? (Graphics.width - (Graphics.boxWidth + 8)) / 2 : 0;
+    sprite.y = param.BackUiWidth ? (Graphics.height - (Graphics.boxHeight + 8)) / 2 : 0;
   }
 };
 
 Scene_EnemyBook.prototype.update = function() {
   Scene_MenuBase.prototype.update.call(this);
-  if (param.BackGroundImg) {
+  if (this._backGroundImg && $gameTemp.backGroundEbookRefresh) {
+    $gameTemp.backGroundEbookRefresh = false;
     const sprite = this._backGroundImg;
-    if(param.BackUiWidth) {
-      sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
-      sprite.scale.y = (Graphics.boxHeight + 8!== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+    const bitmapId = this._enemyWindow.getBackgroundId();
+    bitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg[bitmapId]);
+    if (!bitmap.isReady()) {
+      bitmap.addLoadListener(this.setBackground.bind(this, sprite, bitmap)); 
     } else {
-      sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
-      sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+      this.setBackground(sprite, bitmap);
     }
-	}
+  }
+};
+
+Scene_EnemyBook.prototype.setBackground = function(sprite, bitmap) {
+  sprite.bitmap = bitmap;
+  if(param.BackUiWidth) {
+    sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
+    sprite.scale.y = (Graphics.boxHeight + 8!== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+  } else {
+    sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
+    sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+  }
 };
 
 Scene_EnemyBook.prototype.onEnemyIndexCancel = function() {
@@ -3943,8 +4010,20 @@ Window_EnemyBook_InfoIndex.prototype.drawItem = function(index) {
   const enemy = this.enemyAt(index);
   if(enemy) {
     const rect = this.itemLineRect(index);
-    const name = this._enemyList[index].name();
-    const iconId = enemy.meta.EnemyIcon ? Number(enemy.meta.EnemyIcon) : 0;
+    let name = null;
+    if (param.RegistrationEnemyInfo) {
+      if ($gameSystem.isInEnemyBook(enemy)) {
+        name = this._enemyList[index].name();
+        this.changeTextColor(ColorManager.textColor(param.RegistrationEnemyInfoColor));
+        iconId = enemy.meta.EnemyIcon ? Number(enemy.meta.EnemyIcon) : 0;
+      } else {
+        name = this.unknownDataLength(enemy);
+        iconId = enemy.meta.EnemyIcon && enemy.meta.EnemyIcon > 0 ? param.UnknownEnemyIcons : 0;
+      }
+    } else {
+      name = this._enemyList[index].name();
+      iconId = enemy.meta.EnemyIcon ? Number(enemy.meta.EnemyIcon) : 0;
+    }
     const textMargin = iconId > 0 ? ImageManager.iconWidth + 4 : 0;
     const itemWidth = Math.max(0, rect.width - textMargin);
     if (iconId > 0) {
@@ -3952,6 +4031,7 @@ Window_EnemyBook_InfoIndex.prototype.drawItem = function(index) {
       this.drawIcon(iconId, rect.x, iconY);
     }
     this.drawText(name, rect.x + textMargin, rect.y, itemWidth);
+    this.resetTextColor();
   }
 };
 
@@ -4004,6 +4084,10 @@ Window_EnemyBook.prototype.maxCols = function() {
     return param.InfoContentCols;
   }
   return param.ContentCols;
+};
+
+Window_EnemyBook.prototype.getBackgroundId = function() {
+  return Math.max(this.displayList[this._pageMode].PageBackGroundId, 1) - 1 || 0;
 };
 
 Window_EnemyBook.prototype.defeatFlag = function() {
@@ -4134,7 +4218,7 @@ Window_EnemyBook.prototype.refresh = function() {
   this._enemySprite.bitmap = null;
   this._enemySprite._svEnemy = false;
   this.removeSprite();
-  if (this._bookMode === 0) {//通常モード
+  if (this._bookMode === 0 || (param.RegistrationEnemyInfo && this._bookMode === 2)) {//通常モード
     if (!enemy || !$gameSystem.isInEnemyBook(this._enemy)) {
       return;
     }
@@ -5255,10 +5339,10 @@ Window_EnemyBook.prototype.unknownDataLength = function(name) {
 };
 
 Window_EnemyBook.prototype.iconX = function(icons, width) {
-	if (32 * icons.length > width) {
+	if (ImageManager.iconWidth * icons.length > width) {
 		return Math.floor(width / icons.length);
 	}
-	return 32;
+	return ImageManager.iconWidth;
 };
 
 Window_EnemyBook.prototype.drawEnemyBookNumber = function(text, x, y, width,) {
@@ -5290,9 +5374,13 @@ Window_EnemyBook.prototype.createInnerChipSprite = function(key, id) {
 };
 
 Window_EnemyBook.prototype.placeGauge = function(enemy, type, x, y, width) {
+  //if (Imported.NUUN_GaugeImage) {
+  //  Window_StatusBase.prototype.placeGaugeImg.call(this, enemy, type, x, y)
+    //this.placeGaugeImg(enemy, type, x, y);
+  //}
   const padding = this.itemPadding();
   const key = "enemyBook-gauge-%2".format(enemy.enemyId(), type);
-  const sprite = this.createInnerGaugeSprite(key, Sprite_EnemyBookGauge);
+  const sprite = this.createInnerSprite(key, Sprite_EnemyBookGauge);
   sprite.bitmap.width = width - padding;
   sprite.setup(enemy, type);
   sprite.move(x, y);
@@ -5336,7 +5424,7 @@ Window_EnemyBook.prototype.removeInnerSprite = function(type) {
 };
 
 Window_EnemyBook.prototype.removeInnerCharacterSprite = function(type) {
-  const key = "enemyBook-gauge-%2".format(null, type);
+  const key = "enemyBook_%1".format(null, type);
   const dict = this._additionalSprites;
   if (dict[key]) {
     this._clientArea.removeChild(dict[key]);
@@ -5487,10 +5575,13 @@ Window_EnemyBookPageCategory.prototype.select = function(index) {
 
 Window_EnemyBookPageCategory.prototype.updateEnemyStatus = function() {
   if (this.index() >= 0) {
-    this._categorySelect = this.index();
+    this._categorySelect = this.index();   
   }
   if (this._enemyWindow) {
     this._enemyWindow._pageMode = this._categorySelect;
+    if (this.active) {
+      $gameTemp.backGroundEbookRefresh = true;
+    }
     this._enemyWindow.refresh();
   }
 };
@@ -5532,7 +5623,6 @@ Scene_Battle.prototype.createEnemyBookWindow = function() {
   this.createEnemyBookBackGroundSprite();
   this.createEnemyBookPercentWindow();
   this.createEnemyPageWindow();
-  //this.createEnemyBookDummyWindow();
   this.createEnemyBookIndexWindow();
   this.createEnemyBookInfoIndexWindow();
   this.createEnemyBookEnemyWindow();
@@ -5545,11 +5635,11 @@ Scene_Battle.prototype.createEnemyBookWindow = function() {
 
 Scene_Battle.prototype.createEnemyBookBackGroundSprite = function() {
   this._enemyBookBackGround = null;
-  if (param.BackGroundImg || param.AnalyzeBackGroundImg) {
+  if (param.BattleBackGround && !this._enemyBookBackGround) {
     const sprite = new Sprite();
     this._enemyBookBackGround = sprite;
     this.addChild(sprite);
-    this.loadEnemyBookBackGround();
+    this._enemyBookBackGround.hide();
   }
 };
 
@@ -5560,6 +5650,42 @@ Scene_Battle.prototype.createEnemyBookPercentWindow = function() {
     this.createEnemyBookAddWindow(this._enemyBookPercentWindow, true);
     this._enemyBookPercentWindow.hide();
   }
+};
+
+Scene_Battle.prototype.createEnemyPageWindow = function() {
+  const rect = this.enemyBookPageWindowRect();
+  this._enemyBookPageWindow = new Window_EnemyBookPageCategory(rect);
+  this._enemyBookPageWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
+  this.createEnemyBookAddWindow(this._enemyBookPageWindow, true);
+  this._enemyBookPageWindow.hide();
+  this._enemyBookPageWindow.setPageList(param.PageSetting, param.PageCols);
+};
+
+Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
+  const rect = this.enemyBookIndexWindowRect();
+  this._enemyBookIndexWindow = new Window_EnemyBook_Index(rect);
+  this._enemyBookIndexWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
+  this.createEnemyBookAddWindow(this._enemyBookIndexWindow, true);
+  this._enemyBookIndexWindow.setPercentWindow(this._enemyBookPercentWindow);
+  this._enemyBookIndexWindow.hide();
+};
+
+Scene_Battle.prototype.createEnemyBookInfoIndexWindow = function() {
+  const rect = this.enemyBookInfoIndexWindowRect();
+  this._enemyBookInfoIndexWindow = new Window_EnemyBook_InfoIndex(rect);
+  this._enemyBookInfoIndexWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
+  this.createEnemyBookAddWindow(this._enemyBookInfoIndexWindow, true);
+  this._enemyBookInfoIndexWindow.hide();
+};
+
+Scene_Battle.prototype.createEnemyBookEnemyWindow = function() {
+  const rect = this.enemyBookWindowRect();
+  this._enemyBookEnemyWindow = new Window_EnemyBook(rect);
+  this.createEnemyBookAddWindow(this._enemyBookEnemyWindow, true);
+  this._enemyBookIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
+  this._enemyBookInfoIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
+  this._enemyBookPageWindow.setEnemyWindow(this._enemyBookEnemyWindow);
+  this._enemyBookEnemyWindow.hide();
 };
 
 Scene_Battle.prototype.createEnemyBookCategoryNameWindow = function() {
@@ -5580,40 +5706,19 @@ Scene_Battle.prototype.createEnemyBookCategoryWindow = function() {
   this._enemyBookCategoryNameWindow.setCategoryWindow(this._enemyBookCategoryWindow);
 };
 
-Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
-  const rect = this.enemyBookIndexWindowRect();
-  this._enemyBookIndexWindow = new Window_EnemyBook_Index(rect);
-  this._enemyBookIndexWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
-  this.createEnemyBookAddWindow(this._enemyBookIndexWindow, true);
-  this._enemyBookIndexWindow.setPercentWindow(this._enemyBookPercentWindow);
-  this._enemyBookIndexWindow.hide();
-};
-
-Scene_Battle.prototype.createEnemyBookInfoIndexWindow = function() {
-  const rect = this.enemyBookInfoIndexWindowRect();
-  this._enemyBookInfoIndexWindow = new Window_EnemyBook_InfoIndex(rect);
-  this._enemyBookInfoIndexWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
-  this.createEnemyBookAddWindow(this._enemyBookInfoIndexWindow, true);
-  this._enemyBookInfoIndexWindow.hide();
-};
-
-Scene_Battle.prototype.createEnemyPageWindow = function() {
-  const rect = this.enemyBookPageWindowRect();
-  this._enemyBookPageWindow = new Window_EnemyBookPageCategory(rect);
-  this._enemyBookPageWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
-  this.createEnemyBookAddWindow(this._enemyBookPageWindow, true);
-  this._enemyBookPageWindow.hide();
-  this._enemyBookPageWindow.setPageList(param.PageSetting, param.PageCols);
-};
-  
-Scene_Battle.prototype.createEnemyBookEnemyWindow = function() {
-  const rect = this.enemyBookWindowRect();
-  this._enemyBookEnemyWindow = new Window_EnemyBook(rect);
-  this.createEnemyBookAddWindow(this._enemyBookEnemyWindow, true);
-  this._enemyBookIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
-  this._enemyBookInfoIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
-  this._enemyBookPageWindow.setEnemyWindow(this._enemyBookEnemyWindow);
-  this._enemyBookEnemyWindow.hide();
+Scene_Battle.prototype.createEnemyBookButton = function() {
+  if(ConfigManager.touchUI) {
+    this._EnemyBook_cancelButton = new Sprite_Button("cancel");
+    this._EnemyBook_cancelButton.x = Graphics.boxWidth - this._EnemyBook_cancelButton.width - 4;
+    this._EnemyBook_cancelButton.y = 0;
+    if (this._enemyBookBackGround) {
+      this.addChild(this._EnemyBook_cancelButton);
+      this._EnemyBook_cancelButton.x += (Graphics.width - Graphics.boxWidth) / 2;
+    } else {
+      this.addWindow(this._EnemyBook_cancelButton);
+    }
+    this.updatePageupdownButton();
+  }
 };
 
 Scene_Battle.prototype.createEnemyBookAddWindow = function(windowDate, openness) {
@@ -5684,7 +5789,7 @@ Scene_Battle.prototype.enemyBookCategoryNameWindowRect = function() {
 Scene_Battle.prototype.enemyBookWindowWidth = function() {
   return Graphics.boxWidth - Graphics.boxWidth / 3;
 };
-
+//コマンド登録
 const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
 Scene_Battle.prototype.createPartyCommandWindow = function() {
   _Scene_Battle_createPartyCommandWindow.call(this);
@@ -5707,227 +5812,9 @@ Scene_Battle.prototype.updateVisibility = function() {
   }
 };
 
-Scene_Battle.prototype.openyBookEnemyRefresh = function() {
-  this._enemyBookEnemyWindow.show();
-  this._enemyBookEnemyWindow.open();
-  this._enemyBookEnemyWindow.refresh();
-};
-
-Scene_Battle.prototype.commandEnemyBook = function() {
-  enemyBook_Open = true;
-  let CategoryOn = false;
-  this.setMaxPage(param.PageSetting);
-  this._enemyBookPageWindow.setPageList(param.PageSetting, param.PageCols);
-  this._enemyBookPageWindow.setPage();
-
-  this._enemyBookPageWindow.interruptWindow = true;
-  this._enemyBookIndexWindow.interruptWindow = true;
-  if (param.CategoryOn && param.EnemyBookCategory) {
-    this.enemyBookCategorySelection();
-    CategoryOn = true;
-    this._enemyBookCategoryWindow.interruptWindow = true;
-  } else {
-    this.enemyBookIndexSelection();
-  }
-  this._enemyBookEnemyWindow._bookMode = 0;
-  this.setButtonY();
-  this.setEnemyBookBackGround();
-  this._enemyBookEnemyWindow.x = (param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
-  const pageLength = this._enemyBookPageWindow._bookList.length;
-  const rect = this.enemyBookWindowRect();
-  this._enemyBookPageWindow.x = this._enemyBookEnemyWindow.x;
-  this._enemyBookEnemyWindow.y = rect.y + (pageLength > 1 ? this._enemyBookPageWindow.height : 0) + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
-  this._enemyBookEnemyWindow.height = rect.height - (pageLength > 1 ? this._enemyBookPageWindow.height : 0);
-  if (PercentContentLength) {
-    this._enemyBookPercentWindow.show();
-    this._enemyBookPercentWindow.open();
-  }
-  if (pageLength > 1) {
-    this._enemyBookPageWindow.show();
-    this._enemyBookPageWindow.open();
-    if (CategoryOn) {
-      //this._enemyBookPageWindow.itemClear();
-      //this._enemyBookPageWindow.deselect();
-    }
-  }
-  this.openyBookEnemyRefresh();
-};
-
-
-
-Scene_Battle.prototype.commandEnemyBookInfo = function() {
-  enemyBook_Open = true;
-  const infoPage = param.InfoMode === 0 ? param.PageSetting : param.InfoPageSetting;
-  const cols = param.InfoMode === 0 ? param.PageCols : param.InfoPageCols;
-  this.setMaxPage(infoPage);
-  this._enemyBookPageWindow.setPageList(infoPage, cols);
-  this._enemyBookPageWindow.setPage();
-  this._enemyBookPageWindow.interruptWindow = true;
-  this._enemyBookInfoIndexWindow.interruptWindow = true;
-  this._enemyBookInfoIndexWindow.refresh();
-  this._enemyBookInfoIndexWindow.show();
-  this._enemyBookInfoIndexWindow.open();
-  this._enemyBookInfoIndexWindow.activate();
-  this._enemyBookPageWindow.activate();
-  this._enemyBookEnemyWindow._bookMode = 2;
-  this.setButtonY();
-  this.setEnemyBookBackGround();
-  this._enemyBookEnemyWindow.x = (param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
-  const pageLength = this._enemyBookPageWindow._bookList.length;
-  const rect = this.enemyBookWindowRect();
-  this._enemyBookPageWindow.x = this._enemyBookEnemyWindow.x;
-  this._enemyBookEnemyWindow.y = rect.y + (pageLength > 1 ? this._enemyBookPageWindow.height : 0) + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
-  this._enemyBookEnemyWindow.height = rect.height - (pageLength > 1 ? this._enemyBookPageWindow.height : 0);
-  if (pageLength > 1) {
-    this._enemyBookPageWindow.show();
-    this._enemyBookPageWindow.open();
-  }
-  this.openyBookEnemyRefresh();
-};
-
-Scene_Battle.prototype.cancelEnemyBook = function() {
-  enemyBook_Open = false;
-  this._enemyBookPageWindow.interruptWindow = false;
-  this._enemyBookIndexWindow.interruptWindow = false;
-  this._enemyBookInfoIndexWindow.interruptWindow = false;
-  this._enemyBookIndexWindow.close();
-  this._enemyBookInfoIndexWindow.close();
-  this._enemyBookEnemyWindow.close();
-  this._enemyBookPageWindow.close();
-  if (PercentContentLength) {
-    this._enemyBookPercentWindow.close();
-  }
-  if (param.CategoryOn && param.EnemyBookCategory) {
-    this._enemyBookCategoryWindow.interruptWindow = false;
-    this._enemyBookCategoryWindow.close();
-  }
-  if (this._enemyBookBackGround) {
-    this._enemyBookBackGround.hide();
-  }
-  this._enemyBookEnemyWindow._enemySprite.hide();
-  if (this._enemyBookEnemyWindow._bookMode === 0) {
-    this._partyCommandWindow.activate();
-    this._enemyBookIndexWindow.deactivate();
-    this._enemyBookEnemyWindow.selectEnemy = null;
-  } else if (this._enemyBookEnemyWindow._bookMode === 2) {
-    this._partyCommandWindow.activate();
-    this._enemyBookInfoIndexWindow.deactivate();
-    this._enemyBookEnemyWindow.selectEnemy = null;
-  } else {
-    this._enemyBookEnemyWindow.setEnemy(null);
-    this._enemyBookPageWindow.deactivate();
-    this._enemyBookEnemyWindow.setAnalyzeStatus(null);
-  }
-  this._enemyBookEnemyWindow._bookMode = 0;
-};
-
-Scene_Battle.prototype.enemyBookEnemyAnalyze = function(args) {
-  enemyBook_Open = true;
-  this._enemyBookPageWindow.interruptWindow = true;
-  //this.userWindowDeactivate();
-  this._enemyBookEnemyWindow._enemy = null;
-  this._enemyBookEnemyWindow.setAnalyzeStatus(args);
-  this._enemyBookEnemyWindow._bookMode = 1;
-  this.setButtonY();
-  this.setEnemyBookBackGround();
-  this.setAnalyzeDate(args);  
-  this._enemyBookEnemyWindow.x = ((Graphics.boxWidth - this._enemyBookEnemyWindow.width) / 2) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
-  const pageLength = this._enemyBookPageWindow._bookList.length;
-  const rect = this.enemyBookWindowRect();
-  this._enemyBookPageWindow.x = this._enemyBookEnemyWindow.x;
-  this._enemyBookEnemyWindow.y = rect.y + (pageLength > 1 ? this._enemyBookPageWindow.height : 0) + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
-  this._enemyBookEnemyWindow.height = rect.height - (pageLength > 1 ? this._enemyBookPageWindow.height : 0);
-  this._enemyBookPageWindow.activate();
-  this._enemyBookPageWindow.show();
-  this._enemyBookPageWindow.open();
-  this._enemyBookEnemyWindow.show();
-  this._enemyBookEnemyWindow.open();
-  this._enemyBookEnemyWindow.selectEnemy = BattleManager.analyzeTarget;
-  const enemy = BattleManager.analyzeTarget.enemy();
-  if (!$gameSystem.isInEnemyBook(enemy) && ($gameSystem.registrationTiming() === 2 || $gameSystem.registrationTiming() === 3)) {
-    $gameSystem.addToEnemyBook(enemy.id);
-  }
-  if (!$gameSystem.isInEnemyBookStatus(enemy) && ($gameSystem.registrationStatusTiming() === 2 || $gameSystem.registrationStatusTiming() === 3)) {
-    $gameSystem.addStatusToEnemyBook(enemy.id);
-  }
-  this._enemyBookPageWindow.refresh();
-  this._enemyBookEnemyWindow.setEnemy(enemy);
-};
-
-Scene_Battle.prototype.setAnalyzeDate = function(args) {
-  let list = null;
-  if (args.Mode === 0) {
-    list = param.PageSetting;
-  } else if (args.Mode === 1) {
-    list = param.AnalyzePageList1;
-  } else if (args.Mode === 2) {
-    list = param.AnalyzePageList2;
-  } else if (args.Mode === 3) {
-    list = param.AnalyzePageList3;
-  }
-  this.setMaxPage(list);
-  this._enemyBookPageWindow.setPageList(list, args.PageCols);
-  this._enemyBookPageWindow.setPage();
-};
-
-Scene_Battle.prototype.createEnemyBookButton = function() {
-  if(ConfigManager.touchUI) {
-    this._EnemyBook_cancelButton = new Sprite_Button("cancel");
-    this._EnemyBook_cancelButton.x = Graphics.boxWidth - this._EnemyBook_cancelButton.width - 4;
-    this._EnemyBook_cancelButton.y = 0;
-    if (this._enemyBookBackGround) {
-      this.addChild(this._EnemyBook_cancelButton);
-      this._EnemyBook_cancelButton.x += (Graphics.width - Graphics.boxWidth) / 2;
-    } else {
-      this.addWindow(this._EnemyBook_cancelButton);
-    }
-    this.updatePageupdownButton();
-  }
-};
-
 Scene_Battle.prototype.setButtonY = function() {
   if (this._EnemyBook_cancelButton) {
     this._EnemyBook_cancelButton.y = this.buttonY() + (this._enemyBookBackGround ? (Graphics.height - Graphics.boxHeight) / 2 : 0);
-  }
-};
-
-Scene_Battle.prototype.loadEnemyBookBackGround = function() {
-  if (this._enemyBookBackGround) {
-    this._enemyBookBackBitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg);
-    this._analyzeBackBitmap = ImageManager.nuun_LoadPictures(param.AnalyzeBackGroundImg);
-    this._enemyBookBackGround.hide();
-  }
-};
-
-Scene_Battle.prototype.setEnemyBookBackGround = function() {
-  if (!this._enemyBookBackGround) {
-    return;
-  }
-  let bitmap = null;
-  if (this._enemyBookEnemyWindow._bookMode === 0 || this._enemyBookEnemyWindow._bookMode === 2) {
-    bitmap = this._enemyBookBackBitmap;
-  } else if (this._enemyBookEnemyWindow._bookMode === 1) {
-    bitmap = this._analyzeBackBitmap;
-  }
-  this._enemyBookBackGround.bitmap = bitmap;
-  this._enemyBookBackGround.show();
-  if (bitmap && !bitmap.isReady()) {
-    bitmap.addLoadListener(this.setBackGround.bind(this));
-  } else {
-    this.setBackGround();
-  }
-};
-
-Scene_Battle.prototype.setBackGround = function() {
-  const sprite = this._enemyBookBackGround;
-  if (param.BackUiWidth) {
-    sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
-    sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
-    sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
-    sprite.scale.y = (Graphics.boxHeight + 8!== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
-  } else {
-    sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
-    sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
   }
 };
 
@@ -5960,6 +5847,9 @@ const _Scene_Battle_update = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
   _Scene_Battle_update.call(this);
   this.updatePageupdownButton();
+  if ($gameTemp.backGroundEbookRefresh) {
+    this.setEnemyBookBackGround();
+  }
 };
 
 const _Scene_Battle_buttonY = Scene_Battle.prototype.buttonY;
@@ -5998,6 +5888,263 @@ Scene_Battle.prototype.enemyBookMainAreaTop = function() {
 Scene_Battle.prototype.enemyBookMainAreaHeight = function() {
   return Graphics.boxHeight - this.enemyBookMainAreaTop();
 };
+//開く処理
+Scene_Battle.prototype.openyBookEnemyRefresh = function() {
+  this._enemyBookEnemyWindow.show();
+  this._enemyBookEnemyWindow.open();
+  this._enemyBookEnemyWindow.refresh();
+};
+
+Scene_Battle.prototype.commandEnemyBook = function() {
+  $gameTemp.enemyBook_Open = true;
+  //let CategoryOn = false;
+  this.setEnemyBookPage(param.PageSetting, param.PageCols);
+  this.setEenemyBookOnInterruptWindow(this._enemyBookPageWindow);
+  this.setEenemyBookOnInterruptWindow(this._enemyBookIndexWindow);
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this.enemyBookCategorySelection();
+    CategoryOn = true;
+    this.setEenemyBookOnInterruptWindow(this._enemyBookCategoryWindow);
+  } else {
+    this.enemyBookIndexSelection();
+  }
+  this._enemyBookEnemyWindow._bookMode = 0;
+  this.setButtonY();
+  this.setEnemyBookBackGround();
+  this.setEnemyBook_X();
+  const pageLength = this.getEnemuBookPageLength();
+  const rect = this.enemyBookWindowRect();
+  this.setEnemyBookPage_X();
+  this.setEnemyBook_Y(rect, pageLength);
+  this.setEnemyBook_Height(rect, pageLength);
+  this.openEnemyBookPercentWindow(pageLength);
+  this.openyBookEnemyRefresh();
+};
+
+Scene_Battle.prototype.commandEnemyBookInfo = function() {
+  $gameTemp.enemyBook_Open = true;
+  const infoPage = param.InfoMode === 0 ? param.PageSetting : param.InfoPageSetting;
+  const cols = param.InfoMode === 0 ? param.PageCols : param.InfoPageCols;
+  this.setEnemyBookPage(infoPage, cols);
+  this.setEenemyBookOnInterruptWindow(this._enemyBookPageWindow);
+  this.setEenemyBookOnInterruptWindow(this._enemyBookInfoIndexWindow);
+  this.openEnemyBookInfoIndex();
+  this._enemyBookEnemyWindow._bookMode = 2;
+  this.setButtonY();
+  this.setEnemyBookBackGround();
+  this.setEnemyBook_X();
+  const pageLength = this.getEnemuBookPageLength();
+  const rect = this.enemyBookWindowRect();
+  this.setEnemyBookPage_X();
+  this.setEnemyBook_Y(rect, pageLength);
+  this.setEnemyBook_Height(rect, pageLength);
+  if (pageLength > 1) {
+    this._enemyBookPageWindow.show();
+    this._enemyBookPageWindow.open();
+  }
+  this.openyBookEnemyRefresh();
+};
+
+Scene_Battle.prototype.enemyBookEnemyAnalyze = function(args) {
+  $gameTemp.enemyBook_Open = true;
+  this.setEenemyBookOnInterruptWindow(this._enemyBookPageWindow);
+  this._enemyBookEnemyWindow._enemy = null;
+  this._enemyBookEnemyWindow.setAnalyzeStatus(args);
+  this._enemyBookEnemyWindow._bookMode = 1;
+  this.setButtonY();
+  this.setAnalyzeDate(args);
+  this.setEnemyBookBackGround();
+  this.setEnemyBookAnalyze_X();
+  const pageLength = this.getEnemuBookPageLength();
+  const rect = this.enemyBookWindowRect();
+  this.setEnemyBookPage_X();
+  this.setEnemyBook_Y(rect, pageLength);
+  this.setEnemyBook_Height(rect, pageLength);
+  this.openEnemyBookAnalyze();
+  this.setAnalyzeTarget();
+  const enemy = this.getAnalyzeTarget();
+  this.addEnemyDataEnemyBook(enemy);
+  this._enemyBookPageWindow.refresh();
+  this._enemyBookEnemyWindow.setEnemy(enemy);
+};
+
+Scene_Battle.prototype.setEnemyBookPage = function(page, cols) {
+  this.setMaxPage(page);
+  this._enemyBookPageWindow.setPageList(page, cols);
+  this._enemyBookPageWindow.setPage();
+};
+
+Scene_Battle.prototype.setEenemyBookOnInterruptWindow = function(ebwindow) {
+  ebwindow.interruptWindow = true;
+};
+
+Scene_Battle.prototype.setEnemyBook_X = function() {
+  this._enemyBookEnemyWindow.x = (param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
+};
+
+Scene_Battle.prototype.setEnemyBook_Y = function(rect, pageLength) {
+  const ui_y = (Graphics.height - Graphics.boxHeight) / 2;
+  let y = rect.y + (this._enemyBookBackGround ? ui_y / 2 : 0);
+  if (pageLength > 1) {
+    this._enemyBookPageWindow.y = y;
+    y += this._enemyBookPageWindow.height;
+  } else {
+    this._enemyBookPageWindow.y = 0 - (ui_y + this._enemyBookPageWindow.height);
+  }
+  this._enemyBookEnemyWindow.y = y;
+};
+
+Scene_Battle.prototype.setEnemyBookAnalyze_X = function() {
+  this._enemyBookEnemyWindow.x = ((Graphics.boxWidth - this._enemyBookEnemyWindow.width) / 2) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
+};
+
+Scene_Battle.prototype.getEnemuBookPageLength = function() {
+  return this._enemyBookPageWindow._bookList.length;
+};
+
+Scene_Battle.prototype.setEnemyBookPage_X = function() {
+  this._enemyBookPageWindow.x = this._enemyBookEnemyWindow.x;
+};
+
+Scene_Battle.prototype.setEnemyBook_Height = function(rect, pageLength) {
+  this._enemyBookEnemyWindow.height = rect.height - (pageLength > 1 ? this._enemyBookPageWindow.height : 0);
+};
+
+Scene_Battle.prototype.openEnemyBookPercentWindow = function(pageLength) {
+  if (PercentContentLength) {
+    this._enemyBookPercentWindow.show();
+    this._enemyBookPercentWindow.open();
+  }
+  if (pageLength > 1) {
+    this._enemyBookPageWindow.show();
+    this._enemyBookPageWindow.open();
+    //if (CategoryOn) {
+      //this._enemyBookPageWindow.itemClear();
+      //this._enemyBookPageWindow.deselect();
+    //}
+  }
+};
+
+Scene_Battle.prototype.openEnemyBookInfoIndex = function() {
+  const infoIndex = this._enemyBookInfoIndexWindow;
+  infoIndex.refresh();
+  infoIndex.show();
+  infoIndex.open();
+  infoIndex.activate();
+  this._enemyBookPageWindow.activate();
+};
+
+Scene_Battle.prototype.openEnemyBookAnalyze = function() {
+  this._enemyBookPageWindow.activate();
+  this._enemyBookPageWindow.show();
+  this._enemyBookPageWindow.open();
+  this._enemyBookEnemyWindow.show();
+  this._enemyBookEnemyWindow.open();
+};
+
+Scene_Battle.prototype.setAnalyzeTarget = function() {
+  this._enemyBookEnemyWindow.selectEnemy = BattleManager.analyzeTarget;
+};
+
+Scene_Battle.prototype.getAnalyzeTarget = function() {
+  return BattleManager.analyzeTarget.enemy();
+};
+
+Scene_Battle.prototype.addEnemyDataEnemyBook = function(enemy) {
+  if (!$gameSystem.isInEnemyBook(enemy) && ($gameSystem.registrationTiming() === 2 || $gameSystem.registrationTiming() === 3)) {
+    $gameSystem.addToEnemyBook(enemy.id);
+  }
+  if (!$gameSystem.isInEnemyBookStatus(enemy) && ($gameSystem.registrationStatusTiming() === 2 || $gameSystem.registrationStatusTiming() === 3)) {
+    $gameSystem.addStatusToEnemyBook(enemy.id);
+  }
+};
+
+Scene_Battle.prototype.cancelEnemyBook = function() {
+  $gameTemp.enemyBook_Open = false;
+  this.setEenemyBookOffInterruptWindow(this._enemyBookPageWindow);
+  this.setEenemyBookOffInterruptWindow(this._enemyBookIndexWindow);
+  this.setEenemyBookOffInterruptWindow(this._enemyBookInfoIndexWindow);
+  this.closeEenemyBook();
+  this.hideEnemyBookBackground();
+  this.deactivateEnemyBook();
+};
+
+Scene_Battle.prototype.setEenemyBookOffInterruptWindow = function(ebwindow) {
+  ebwindow.interruptWindow = false;
+};
+
+Scene_Battle.prototype.closeEenemyBook = function() {
+  if (this._enemyBookBackGround) {
+    this.hideEenemyBook();
+  } else {
+    this._enemyBookIndexWindow.close();
+    this._enemyBookInfoIndexWindow.close();
+    this._enemyBookEnemyWindow.close();
+    this._enemyBookPageWindow.close();
+    if (PercentContentLength) {
+      this._enemyBookPercentWindow.close();
+    }
+    if (param.CategoryOn && param.EnemyBookCategory) {
+      this.setEenemyBookOffInterruptWindow(this._enemyBookCategoryWindow);
+      this._enemyBookCategoryWindow.close();
+    }
+  }
+};
+
+Scene_Battle.prototype.hideEenemyBook = function() {
+  this._enemyBookIndexWindow.hide();
+  this._enemyBookInfoIndexWindow.hide();
+  this._enemyBookEnemyWindow.hide();
+  this._enemyBookPageWindow.hide();
+  if (PercentContentLength) {
+    this._enemyBookPercentWindow.hide();
+  }
+  if (param.CategoryOn && param.EnemyBookCategory) {
+    this.setEenemyBookOffInterruptWindow(this._enemyBookCategoryWindow);
+    this._enemyBookCategoryWindow.hide();
+  }
+};
+
+Scene_Battle.prototype.hideEnemyBookBackground = function() {
+  if (this._enemyBookBackGround) {
+    this._enemyBookBackGround.hide();
+  }
+};
+
+Scene_Battle.prototype.deactivateEnemyBook = function() {
+  const bookMode = this._enemyBookEnemyWindow._bookMode;
+  this._enemyBookEnemyWindow._bookMode = 0;
+  this._enemyBookEnemyWindow._enemySprite.hide();
+  if (bookMode === 0) {
+    this._partyCommandWindow.activate();
+    this._enemyBookIndexWindow.deactivate();
+    this._enemyBookEnemyWindow.selectEnemy = null;
+  } else if (bookMode === 2) {
+    this._partyCommandWindow.activate();
+    this._enemyBookInfoIndexWindow.deactivate();
+    this._enemyBookEnemyWindow.selectEnemy = null;
+  } else {
+    this._enemyBookEnemyWindow.setEnemy(null);
+    this._enemyBookPageWindow.deactivate();
+    this._enemyBookEnemyWindow.setAnalyzeStatus(null);
+  }
+};
+
+Scene_Battle.prototype.setAnalyzeDate = function(args) {
+  let list = null;
+  if (args.Mode === 0) {
+    list = param.PageSetting;
+  } else if (args.Mode === 1) {
+    list = param.AnalyzePageList1;
+  } else if (args.Mode === 2) {
+    list = param.AnalyzePageList2;
+  } else if (args.Mode === 3) {
+    list = param.AnalyzePageList3;
+  }
+  this.setMaxPage(list);
+  this._enemyBookPageWindow.setPageList(list, args.PageCols);
+  this._enemyBookPageWindow.setPage();
+};
 
 Scene_Battle.prototype.onEnemyBookIndexCancel = function() {
   if (this._enemyBookEnemyWindow._bookMode === 0) {
@@ -6010,7 +6157,6 @@ Scene_Battle.prototype.onEnemyBookIndexCancel = function() {
   } else {
     this.cancelEnemyBook();
   }
-  
 };
 
 Scene_Battle.prototype.onEnemyBookCategoryOk = function() {
@@ -6049,6 +6195,51 @@ Scene_Battle.prototype.enemyBookCategorySelection = function() {
   this._enemyBookPageWindow.itemClear();
 };
 
+Scene_Battle.prototype.setEnemyBookBackGround = function() {
+  if (this._enemyBookBackGround) {
+    let bitmap = null;
+    $gameTemp.backGroundEbookRefresh = false;
+    const bitmapId = this._enemyBookEnemyWindow.getBackgroundId();
+    if (this._enemyBookEnemyWindow._bookMode === 0 && param.BackGroundImg) {
+      bitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg[bitmapId]);
+    } else if (this._enemyBookEnemyWindow._bookMode === 2) {
+      if (param.InfoMode === 1 && param.EnemyInfoGroundImg && param.EnemyInfoGroundImg[0]) {
+        bitmap = ImageManager.nuun_LoadPictures(param.EnemyInfoGroundImg[bitmapId]);
+      } else {
+        bitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg[0]);
+      }
+    } else {
+      const mode = this._enemyBookEnemyWindow._AnalyzeStatus.Mode;
+      if (mode === 1 && param.AnalyzeBackGroundImg && param.AnalyzeBackGroundImg[0]) {
+        bitmap = ImageManager.nuun_LoadPictures(param.AnalyzeBackGroundImg[bitmapId]);
+      } else {
+        bitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg[bitmapId]);
+      }
+    }
+    this._enemyBookBackGround.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
+    this._enemyBookBackGround.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
+    this._enemyBookBackGround.show();
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.addLoadListener(this.setBackGround.bind(this, bitmap));
+    } else {
+      this.setBackGround(bitmap);
+    }
+  }
+};
+
+Scene_Battle.prototype.setBackGround = function(bitmap) {
+  this._enemyBookBackGround.bitmap = bitmap;
+  const sprite = this._enemyBookBackGround;
+  if (param.BackUiWidth) {
+    sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
+    sprite.scale.y = (Graphics.boxHeight + 8!== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+  } else {
+    sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
+    sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+  }
+};
+
+
 const _Window_Selectable_initialize = Window_Selectable.prototype.initialize;
 Window_Selectable.prototype.initialize = function(rect) {
   _Window_Selectable_initialize.call(this, rect);
@@ -6057,7 +6248,7 @@ Window_Selectable.prototype.initialize = function(rect) {
 
 const _Window_Selectable_isOpenAndActive = Window_Selectable.prototype.isOpenAndActive;
 Window_Selectable.prototype.isOpenAndActive = function() {
-  if (enemyBook_Open && $gameParty.inBattle()) {
+  if ($gameTemp.enemyBook_Open && $gameParty.inBattle()) {
     return this.interruptWindow && this.active ? _Window_Selectable_isOpenAndActive.call(this) : false;
  }
   return _Window_Selectable_isOpenAndActive.call(this);
@@ -6107,7 +6298,7 @@ BattleManager.isBusy = function() {
 };
 
 BattleManager.enemyBookIsBusy = function() {
-  return enemyBook_Open;
+  return $gameTemp.enemyBook_Open;
 };
 
 const _BattleManager_startAction = BattleManager.startAction;
@@ -6124,6 +6315,43 @@ BattleManager.setEnemyBookAction = function() {
   }
 };
 
+
+function Sprite_EnemyBookHPGauge() {
+  this.initialize(...arguments);
+}
+
+Sprite_EnemyBookHPGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_EnemyBookHPGauge.prototype.constructor = Sprite_EnemyBookHPGauge;
+
+Sprite_EnemyBookHPGauge.prototype.bitmapWidth = function() {
+  return param.HPgaugeWidth > 0 ? param.HPgaugeWidth : 128;
+};
+
+
+function Sprite_EnemyBookMPGauge() {
+  this.initialize(...arguments);
+}
+
+Sprite_EnemyBookMPGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_EnemyBookMPGauge.prototype.constructor = Sprite_EnemyBookMPGauge;
+
+Sprite_EnemyBookMPGauge.prototype.bitmapWidth = function() {
+  return param.MPgaugeWidth > 0 ? param.MPgaugeWidth : 128;
+};
+
+
+function Sprite_EnemyBookTPGauge() {
+  this.initialize(...arguments);
+}
+
+Sprite_EnemyBookTPGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_EnemyBookTPGauge.prototype.constructor = Sprite_EnemyBookTPGauge;
+
+Sprite_EnemyBookTPGauge.prototype.bitmapWidth = function() {
+  return param.TPgaugeWidth > 0 ? param.TPgaugeWidth : 128;
+};
+
+//とりあえず残しておく
 function Sprite_EnemyBookGauge() {
   this.initialize(...arguments);
 }

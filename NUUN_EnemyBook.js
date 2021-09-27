@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.9.0
+ * @version 2.9.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -282,6 +282,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/27 Ver.2.9.1
+ * 敵の情報に情報登録しているエネミー名に色を付けれる機能を追加。
+ * 敵の情報の登録済みエネミー名の色の反映を登録タイミングに関係なく反映するように変更。
+ * ナンバー表示をカテゴリー順に表示させる機能を追加。
  * 2021/9/26 Ver.2.9.0
  * 背景画像はページ、アナライズ、敵の情報毎に設定できるように変更。
  * 敵の情報に登録タイミングを反映させるように変更。
@@ -952,7 +956,7 @@
  * @parent BasicSetting
  * 
  * @param NumberMode
- * @desc ナンバー表示を各カテゴリー表示順で表示します。（未実装）
+ * @desc ナンバー表示を各カテゴリー表示順で表示します。
  * @text ナンバーカテゴリー表示順表示
  * @type boolean
  * @default false
@@ -1352,11 +1356,19 @@
  * @text 敵の情報登録タイミング反映
  * @type boolean
  * @default false
- * @parent 
+ * @parent EnemyInfoSetting
  * 
  * @param RegistrationEnemyInfoColor
- * @desc 登録済みモンスター名の色。（敵の情報登録タイミング反映がONの時に有効です）
+ * @desc 登録済みモンスター名の色。
  * @text 登録済みモンスター名色
+ * @type number
+ * @default 0
+ * @max 999
+ * @parent EnemyInfoSetting
+ * 
+ * @param RegistrationStatusEnemyInfoColor
+ * @desc 情報登録済みモンスター名の色。
+ * @text 情報登録済みモンスター名色
  * @type number
  * @default 0
  * @max 999
@@ -3887,7 +3899,8 @@ Window_EnemyBook_Index.prototype.drawItem = function(index) {
     const textMargin = iconId > 0 ? ImageManager.iconWidth + 4 : 0;
     const itemWidth = Math.max(0, rect.width - textMargin);
     if(param.NumberType > 0) {
-      let numberText = $gameSystem.getEnemyBookNumber(enemy.id);
+      let numberText = param.NumberMode ? index + 1 : $gameSystem.getEnemyBookNumber(enemy.id);
+      //let numberText = $gameSystem.getEnemyBookNumber(enemy.id);
       const textWidth = this.numberWidth(numberText);
       if (param.NumberType === 2) {
         numberText = this.numberWidthSlice(numberText);
@@ -4023,7 +4036,13 @@ Window_EnemyBook_InfoIndex.prototype.drawItem = function(index) {
       }
     } else {
       name = this._enemyList[index].name();
+      if ($gameSystem.isInEnemyBook(enemy)) {
+        this.changeTextColor(ColorManager.textColor(param.RegistrationEnemyInfoColor));
+      }
       iconId = enemy.meta.EnemyIcon ? Number(enemy.meta.EnemyIcon) : 0;
+    }
+    if ($gameSystem.isInEnemyBookStatus(enemy)) {
+      this.changeTextColor(ColorManager.textColor(param.RegistrationStatusEnemyInfoColor));
     }
     const textMargin = iconId > 0 ? ImageManager.iconWidth + 4 : 0;
     const itemWidth = Math.max(0, rect.width - textMargin);

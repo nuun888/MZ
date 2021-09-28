@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.2.4
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -148,6 +148,10 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2021/9/28 Ver.1.3.0
+ * プラグインコマンドに図鑑完成度、情報登録済みアイテム数を変数に代入する機能を追加。
+ * ナンバー表示をカテゴリー順に表示させる機能を追加。
+ * 背景画像を指定できる機能を追加。
  * 2021/9/2 Ver.1.2.4
  * 個別アイテム画像の座標設定がされていなかった問題を修正。
  * 2021/8/30 Ver.1.2.3
@@ -228,6 +232,78 @@
  * @desc 図鑑を完成させます。
  * @text 図鑑完成
  * 
+ * @command ItemBookCompleteness
+ * @desc 図鑑完成率を変数に代入します。
+ * @text 図鑑完成率取得
+ * 
+ * @arg VariableId
+ * @type variable
+ * @default 0
+ * @desc 変数
+ * 
+ * @command ItemBookItemCompleteness
+ * @desc 図鑑のアイテム完成率を変数に代入します。
+ * @text 図鑑アイテム完成率取得
+ * 
+ * @arg VariableId
+ * @type variable
+ * @default 0
+ * @desc 変数
+ * 
+ * @command ItemBookWeaponCompleteness
+ * @desc 図鑑の武器完成率を変数に代入します。
+ * @text 図鑑武器完成率取得
+ * 
+ * @arg VariableId
+ * @type variable
+ * @default 0
+ * @desc 変数
+ * 
+ * @command ItemBookArmorCompleteness
+ * @desc 図鑑の防具完成率を変数に代入します。
+ * @text 図鑑防具完成率取得
+ * 
+ * @arg VariableId
+ * @type variable
+ * @default 0
+ * @desc 変数
+ * 
+ * @command ItemBookInfoVar
+ * @desc 図鑑情報登録している全てのアイテム（武器、防具含む）の数を変数に代入します。
+ * @text 図鑑登録数取得
+ * 
+ * @arg VariableId
+ * @type variable
+ * @default 0
+ * @desc 変数
+ * 
+ * @command ItemBookItemInfoVar
+ * @desc 図鑑情報登録しているアイテムの数を変数に代入します。
+ * @text 図鑑登録アイテム数取得
+ * 
+ * @arg VariableId
+ * @type variable
+ * @default 0
+ * @desc 変数
+ * 
+ * @command ItemBookWeaponInfoVar
+ * @desc 図鑑情報登録している武器数を変数に代入します。
+ * @text 図鑑登録武器数取得
+ * 
+ * @arg VariableId
+ * @type variable
+ * @default 0
+ * @desc 変数
+ * 
+ * @command ItemBookArmorInfoVar
+ * @desc 図鑑情報登録している防具数を変数に代入します。
+ * @text 図鑑登録防具数取得
+ * 
+ * @arg VariableId
+ * @type variable
+ * @default 0
+ * @desc 変数
+ * 
  * 
  * @param BasicSetting
  * @text 基本設定
@@ -275,11 +351,33 @@
  * @default ？
  * @parent BasicSetting
  * 
+ * @param NumberMode
+ * @text ナンバー表示を各カテゴリー表示順で表示します。
+ * @desc ナンバーカテゴリー表示順表示
+ * @type boolean
+ * @default false
+ * @parent 
+ * 
  * @param ImgFolder
  * @desc 個別指定画像をフォルダ名を指定します。(img直下)
  * @text 個別指定画像フォルダ
  * @type string
  * @default 'pictures'
+ * @parent BasicSetting
+ * 
+ * @param BackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent BasicSetting
+ * 
+ * @param BackUiWidth
+ * @text 背景サイズをUIに合わせる
+ * @desc 背景サイズをUIに合わせる。
+ * @type boolean
+ * @default true
  * @parent BasicSetting
  * 
  * @param Category
@@ -425,6 +523,12 @@
  * @text ページ名
  * @type string
  * @default
+ * 
+ * @param PageBackGroundId
+ * @desc 背景画像を指定します。0の場合はリスト1番の画像が表示されます。
+ * @text 背景画像Id
+ * @type number
+ * @default 1
  *  
  */
 /*~struct~WeaponPageSettingData:
@@ -440,7 +544,13 @@
  * @desc ページの名前を設定します。
  * @text ページ名
  * @type string
- * @default
+ * @
+ * 
+ * @param PageBackGroundId
+ * @desc 背景画像を指定します。0の場合はリスト1番の画像が表示されます。
+ * @text 背景画像Id
+ * @type number
+ * @default 1
  *  
  */
 /*~struct~ArmorPageSettingData:
@@ -457,6 +567,12 @@
  * @text ページ名
  * @type string
  * @default
+ * 
+ * @param PageBackGroundId
+ * @desc 背景画像を指定します。0の場合はリスト1番の画像が表示されます。
+ * @text 背景画像Id
+ * @type number
+ * @default 1
  *  
  */
 /*~struct~ItemPageListData:
@@ -1119,6 +1235,7 @@ const UnknownData = String(parameters['UnknownData'] || '？');
 const UnknownItemData = String(parameters['UnknownItemData'] || '？？？');
 const ImgFolder = eval(parameters['ImgFolder'] || 'pictures');
 let PercentWindowVisible = eval(parameters['PercentWindowVisible'] || 'true');
+const NumberMode = eval(parameters['NumberMode'] || "false");
 const PercentContent = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PercentContent'])) : null) || [];
 const Interval = Number(parameters['Interval'] || 100);
 const ShowCommand = eval(parameters['ShowCommand'] || 'false');
@@ -1135,10 +1252,13 @@ const EffectMaxItems = Number(parameters['EffectMaxItems'] || 0);
 const EffectMultiCol = eval(parameters['EffectMultiCol'] || "false");
 const TraitsMaxItems = Number(parameters['TraitsMaxItems'] || 0);
 const TraitsMultiCol = eval(parameters['TraitsMultiCol'] || "false");
+const BackGroundImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])) : null) || [];
 const ItemBookCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemBookCategory'])) : null) || [];
 const ItemBookCategoryTagName = eval(parameters['ItemBookCategoryTagName'] || 'CategoryType');
+const BackUiWidth = eval(parameters['BackUiWidth'] || "false");
 
 const PercentContentLength = PercentWindowVisible && (PercentContent && PercentContent.length > 0);
+let backGroundId = -1;
 
 const pluginName = "NUUN_ItemBook";
 
@@ -1216,6 +1336,58 @@ PluginManager.registerCommand(pluginName, 'ArmorBookInfoRemove', args => {
 PluginManager.registerCommand(pluginName, 'ItemBookComplete', args => {
   $gameSystem.completeItemBook();
 });
+
+PluginManager.registerCommand(pluginName, 'ItemBookCompleteness', args => {
+  $gameVariables.setValue(Number(args.VariableId), $gameSystem.getCompletenessPercent('all'));
+});
+
+PluginManager.registerCommand(pluginName, 'ItemBookItemCompleteness', args => {
+  $gameVariables.setValue(Number(args.VariableId), $gameSystem.getCompletenessPercent('item'));
+});
+
+PluginManager.registerCommand(pluginName, 'ItemBookWeaponCompleteness', args => {
+  $gameVariables.setValue(Number(args.VariableId), $gameSystem.getCompletenessPercent('weapon'));
+});
+
+PluginManager.registerCommand(pluginName, 'ItemBookArmorCompleteness', args => {
+  $gameVariables.setValue(Number(args.VariableId), $gameSystem.getCompletenessPercent('armor'));
+});
+
+PluginManager.registerCommand(pluginName, 'ItemBookInfoVar', args => {
+  $gameVariables.setValue(Number(args.VariableId), $gameSystem.getCompletenessItemNum('all'));
+});
+
+PluginManager.registerCommand(pluginName, 'ItemBookItemInfoVar', args => {
+  $gameVariables.setValue(Number(args.VariableId), $gameSystem.getCompletenessItemNum('item'));
+});
+
+PluginManager.registerCommand(pluginName, 'ItemBookWeaponsInfoVar', args => {
+  $gameVariables.setValue(Number(args.VariableId), $gameSystem.getCompletenessItemNum('weapon'));
+});
+
+PluginManager.registerCommand(pluginName, 'ItemBookArmorInfoVar', args => {
+  $gameVariables.setValue(Number(args.VariableId), $gameSystem.getCompletenessItemNum('armor'));
+});
+
+
+function getAllItemData() {
+  return $dataItems.concat($dataWeapons, $dataArmors);
+};
+
+function getItemData(mode) {
+  if (mode === 'all') {
+    return getAllItemData();
+  } else if (mode === 'item') {
+    return $dataItems;
+  } else if (mode === 'weapon') {
+    return $dataWeapons;
+  } else if (mode === 'armor') {
+    return $dataArmors;
+  } else {
+    return [];
+  }
+}
+
 
 const _DataManager_extractSaveContents = DataManager.extractSaveContents;
 DataManager.extractSaveContents = function(contents) {
@@ -1480,6 +1652,22 @@ Game_System.prototype.getItemBookInfoFlagsNum = function(itemList) {
   return itemList.reduce((r, item) => r + (this.isItemBook(item) && this.isInItemBookStatus(item) ? 1 : 0), 0);
 };
 
+Game_System.prototype.getIsItemBook = function(itemList) {
+  return itemList.filter(item => this.isItemBook(item));
+};
+
+Game_System.prototype.getCompletenessPercent = function(mode) {
+  const bookItems = this.getIsItemBook(getItemData(mode));
+  const onData = this.getItemBookInfoFlagsNum(bookItems);
+  return Math.floor(onData / bookItems.length * 100);
+};
+
+Game_System.prototype.getCompletenessItemNum = function(mode) {
+  const bookItems = this.getIsItemBook(getItemData(mode));
+  return this.getItemBookInfoFlagsNum(bookItems);
+};
+
+
 const _Game_Actor_initEquips = Game_Actor.prototype.initEquips;
 Game_Actor.prototype.initEquips = function(equips) {
   _Game_Actor_initEquips.call(this, equips);
@@ -1552,6 +1740,7 @@ Scene_ItemBook.prototype.create = function() {
   this.createItemPageWindow();
   this.createItemWindow();
   this.createCategoryWindow();
+  this.backgroundOpacity(this._helpWindow);
 };
 
 Scene_ItemBook.prototype.createPercentWindow = function() {
@@ -1559,6 +1748,7 @@ Scene_ItemBook.prototype.createPercentWindow = function() {
     const rect = this.percentWindowRect();
     this._percentWindow = new Window_ItemBook_Percent(rect);
     this.addWindow(this._percentWindow);
+    this.backgroundOpacity(this._percentWindow);
   }
 };
 
@@ -1568,6 +1758,7 @@ Scene_ItemBook.prototype.createIndexWindow = function() {
   this.addWindow(this._indexWindow);
   this._indexWindow.setHandler("cancel", this.onItemIndexCancel.bind(this));
   this._indexWindow.hide();
+  this.backgroundOpacity(this._indexWindow);
 };
 
 Scene_ItemBook.prototype.createCategoryWindow = function() {
@@ -1587,6 +1778,7 @@ Scene_ItemBook.prototype.createCategoryWindow = function() {
   }
   this._indexWindow.setCategoryWindow(this._categoryWindow);
   this._indexWindow.setPercentWindow(this._percentWindow);
+  this.backgroundOpacity(this._categoryWindow);
 };
 
 Scene_ItemBook.prototype.createItemWindow = function() {
@@ -1597,6 +1789,8 @@ Scene_ItemBook.prototype.createItemWindow = function() {
   this._itemPageWindow.setItemWindow(this._itembookWindow);
   this._indexWindow.select(Window_ItemBook_Index._lastIndex);
   this._itembookWindow.setHelpWindow(this._helpWindow);
+  this.backgroundOpacity(this._itembookWindow);
+  this.setMaxPage(ItemPageSetting);
 };
 
 Scene_ItemBook.prototype.createItemPageWindow = function() {
@@ -1609,6 +1803,7 @@ Scene_ItemBook.prototype.createItemPageWindow = function() {
     this._itemPageWindow.height = 0;
     this._itemPageWindow.hide();
   }
+  this.backgroundOpacity(this._itemPageWindow);
 };
 
 Scene_ItemBook.prototype.percentWindowRect = function() {
@@ -1642,6 +1837,12 @@ Scene_ItemBook.prototype.itemWindowRect = function() {
   const ww = this.itemWindowWidth();
   const wh = this.mainAreaHeight() - this._itemPageWindow.height;
   return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_ItemBook.prototype.backgroundOpacity = function(window) {
+  if (BackGroundImg && BackGroundImg[0]) {
+    window.opacity = 0;
+  }
 };
 
 Scene_ItemBook.prototype.itemWindowWidth = function() {
@@ -1680,6 +1881,46 @@ Scene_ItemBook.prototype.onCategoryOk = function() {
   this._itemPageWindow.activate();
 };
 
+Scene_ItemBook.prototype.createBackground = function() {
+  Scene_MenuBase.prototype.createBackground.call(this);
+  if (BackGroundImg && BackGroundImg[0]) {
+    const sprite = new Sprite();
+    this.addChild(sprite);
+    this._backGroundImg = sprite;
+    sprite.x = BackUiWidth ? (Graphics.width - (Graphics.boxWidth + 8)) / 2 : 0;
+    sprite.y = BackUiWidth ? (Graphics.height - (Graphics.boxHeight + 8)) / 2 : 0;
+    $gameTemp.backGroundEbookRefresh = true;
+  }
+};
+
+Scene_ItemBook.prototype.update = function() {
+  Scene_MenuBase.prototype.update.call(this);
+  if (this._backGroundImg && $gameTemp.backGroundEbookRefresh) {
+    $gameTemp.backGroundEbookRefresh = false;
+    const sprite = this._backGroundImg;
+    const bitmapId = this._itembookWindow.getBackgroundId();
+    if (backGroundId !== bitmapId) {
+      backGroundId = bitmapId;
+      bitmap = ImageManager.nuun_LoadPictures(BackGroundImg[bitmapId]);
+      if (!bitmap.isReady()) {
+        bitmap.addLoadListener(this.setBackground.bind(this, sprite, bitmap)); 
+      } else {
+        this.setBackground(sprite, bitmap);
+      }
+    }
+  }
+};
+
+Scene_ItemBook.prototype.setBackground = function(sprite, bitmap) {
+  sprite.bitmap = bitmap;
+  if(BackUiWidth) {
+    sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
+    sprite.scale.y = (Graphics.boxHeight + 8!== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+  } else {
+    sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
+    sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+  }
+};
 
 function Window_ItemBook_Category() {
   this.initialize(...arguments);
@@ -1836,6 +2077,7 @@ Window_ItemBook_Index.prototype.initialize = function(rect) {
   //this._userWindowSkin = param.IndexWindowsSkin;
   Window_ItemList.prototype.initialize.call(this, rect);
   this._itemType = 0;
+  backGroundId = -1;
 };
 
 Window_ItemBook_Index.prototype.setSelect = function() {
@@ -1880,6 +2122,9 @@ Window_ItemBook_Index.prototype.updateItemData = function() {
   }
   if (this._pageWindow) {
     this._pageWindow.setItem(this.getItem());
+  }
+  if (this.active) {
+    $gameTemp.backGroundEbookRefresh = true;
   }
 };
 
@@ -1937,7 +2182,7 @@ Window_ItemBook_Index.prototype.drawItem = function(index) {
   if (item) {
     const rect = this.itemLineRect(index);
     if(NumberType > 0) {
-      let numberText = $gameSystem.getItemBookNumber(item);
+      let numberText = NumberMode ? index + 1 : $gameSystem.getItemBookNumber(item);
       const numberWidth = this.numberWidth(numberText);
       if (NumberType === 2) {
         numberText = this.numberWidthSlice(numberText);
@@ -2036,6 +2281,12 @@ Window_ItemBook.prototype.initialize = function(rect) {
 
 Window_ItemBook.prototype.setHelpWindow = function(helpWindow) {
   this._helpWindow = helpWindow;
+};
+
+Window_ItemBook.prototype.getBackgroundId = function() {
+  const displayList = this.setDisplayList(this._item);
+  return displayList && displayList.length > 0 ? 
+  (Math.max(displayList[this._pageMode].PageBackGroundId, 1) - 1 || 0) : 0;
 };
 
 Window_ItemBook.prototype.setItem = function(item) {
@@ -3161,6 +3412,9 @@ Window_ItemBookPageCategory.prototype.updateItemStatus = function() {
   }
   if (this._itemWindow) {
     this._itemWindow._pageMode = this._pageSelect;
+    if (this.active) {
+      $gameTemp.backGroundEbookRefresh = true;
+    }
     this._itemWindow.refresh();
   }
 };

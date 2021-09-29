@@ -1695,10 +1695,19 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor, data) 
   sprite.setup(actor, data);
   const x = rect.x + Math.floor(this.itemWidth() / 2) + 4 + param.ActorImg_X + data.Actor_X;
   const y = rect.y + rect.height + this.itemPadding() + param.ActorImg_Y + data.Actor_Y;
-  sprite.scale.x = data.Actor_Scale / 100;
-  sprite.scale.y = data.Actor_Scale / 100;
+  const scale = data.Actor_Scale / 100;
+  sprite.scale.x = scale;
+  sprite.scale.y = scale;
   sprite.setHome(x, y);
   sprite.show();
+  if (param.Img_SW > 0 || param.Img_SH > 0) {
+    const oriScale = 1 / scale;
+    const sw = (param.Img_SW || Infinity) * oriScale;
+    const sh = (param.Img_SH || Infinity) * oriScale;
+    const sx = (data.Img_SX || 0) * oriScale;
+    const sy = (data.Img_SY || 0) * oriScale;
+    sprite.setFrame(sx, sy, sw, sh);
+  }
 };
 
 Window_BattleActorImges.prototype.drawItemFace = function(index, actor, data) {

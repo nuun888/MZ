@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.5.3
+ * @version 1.6.0
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -69,19 +69,12 @@
  * <ChangeImgId:1>
  * 被ステート時に顔グラまたは、グラフィック画像がID１の画像に変化します。
  * 
- * ポップアップ機能
- * <PopUpStateName> ポップアップするステート名。無記入の場合はデータベースのステート名が表示されます。
- * <PositiveState> このステートは良いステートと判定します。
- * <BatState> このステートは悪いステートと判定します。
- * <NoPopUp> ポップアップを表示しません。
- * <AddNoPopUp> 付与時のポップアップを表示しません。
- * <RemoveNoPopUp> 解除時のポップアップを表示しません。
- * <PopUpColor:[colorIndex]> ポップアップ時の色を指定します。[colorIndex]:カラーインデックス番号　例：<PopUpColor:17>
- * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/9/29 Ver 1.6.0
+ * アクター画像の表示範囲を指定できる機能を追加。
  * 2021/9/19 Ver 1.5.3
  * アクター側のアニメーションを反転しない機能を追加。
  * 2021/9/11 Ver 1.5.2
@@ -860,8 +853,8 @@
  * @parent Effect
  * 
  * @param ActorFlash
- * @desc アクター選択時にアクター画像（顔グラ）点滅させます。
- * @text アクター選択時点滅
+ * @desc アクター対象選択時にアクター画像（顔グラ）点滅させます。
+ * @text アクター対象選択時点滅
  * @type boolean
  * @default true
  * @parent Effect
@@ -937,6 +930,26 @@
  * @default []
  * @type struct<actorsButlerList>[]
  * @parent ActorsButlers
+ * 
+ * 
+ * @param Img_SW
+ * @desc 画像の表示横幅。
+ * @text 画像表示横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * @parent ActorsButlers
+ * 
+ * @param Img_SH
+ * @desc 画像の表示縦幅。
+ * @text 画像表示横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * @parent ActorsButlers
+ * 
  * 
  * @param damageImgFrame
  * @desc ダメージ時の画像変化フレーム。
@@ -1414,6 +1427,22 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
+ * 
+ * @param Img_SX
+ * @desc 画像の表示開始座標X。
+ * @text 画像表示開始座標X
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * 
+ * @param Img_SY
+ * @desc 画像の表示開始座標Y
+ * @text 画像表示開始座標Y
+ * @type number
+ * @default 0
+ * @min 0
  * @max 9999
  * 
  * @param Actor_Scale

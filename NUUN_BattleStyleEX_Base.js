@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.5.8
+ * @version 2.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/9/29 Ver 2.6.0
+ * アクター画像の表示範囲を指定できる機能を追加。
  * 2021/9/23 Ver 2.5.8
  * アクターコマンドの表示モードが中間、上部、アクターウィンドウの上を指定したときにアクターコマンドの背景画像のY座標調整が機能していなかった問題を修正。
  * 2021/9/19 Ver 2.5.7

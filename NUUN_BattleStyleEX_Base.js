@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.0
+ * @version 2.6.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/10/3 Ver 2.6.1
+ * ステータスとアクター画像の間に背景画像を表示できる機能を追加。
  * 2021/9/29 Ver 2.6.0
  * アクター画像の表示範囲を指定できる機能を追加。
  * 2021/9/23 Ver 2.5.8
@@ -235,6 +237,7 @@ if (param.StyleMode === "MVStyle") {
   param.GaugeWidth = param.GaugeWidth || 128;
 }
 param.actorBackground = param.actorBackground ? param.actorBackground[0] : null;
+param.ActorFrontBackground = param.ActorFrontBackground ? param.ActorFrontBackground[0] : null;
 param.windowBackground = param.windowBackground ? param.windowBackground[0] : null;//メインウィンドウ
 param.PartyCommandBackground = param.PartyCommandBackground ? param.PartyCommandBackground[0] : null;
 param.ActorCommandBackground = param.ActorCommandBackground ? param.ActorCommandBackground[0] : null;
@@ -245,6 +248,7 @@ param.HelpWindowBackground = param.HelpWindowBackground ? param.HelpWindowBackgr
 param.MessageWindowBackground = param.MessageWindowBackground ? param.MessageWindowBackground[0] : null;//メッセージ
 loadNormalPicture(param.actorBackground);
 loadNormalPicture(param.windowBackground);
+loadNormalPicture(param.ActorFrontBackground);
 
 BattleManager.NUUN_BattleStyleDate = param;
 
@@ -1257,6 +1261,7 @@ Window_BattleStatus.prototype.drawItemBackground = function(index) {
   } else if((param.WindowShow && param.cursorBackShow) || param.cursorBackShow) {
     this.drawBackgroundRect(rect);
   }
+  
 };
 
 Window_BattleStatus.prototype.open = function() {
@@ -1779,10 +1784,17 @@ Window_BattleActorStatus.prototype.initialize = function(rect) {
 
 Window_BattleActorStatus.prototype.preparePartyRefresh = function() {
   $gameTemp.clearBattleRefreshRequest();
-  this.refresh();
+  const bitmap = param.ActorFrontBackground ? loadNormalPicture(param.ActorFrontBackground) : null;
+  if (bitmap && !bitmap.isReady()) {
+    bitmap.addLoadListener(this.refresh.bind(this));
+  } else {
+    this.refresh();
+  }
 };
 
 Window_BattleActorStatus.prototype.drawItemBackground = function(index) {
+  const rect = this.itemRect(index);
+  this.actorFrontBackGround(index, rect.x, rect.y);
 };
 
 Window_BattleActorStatus.prototype.drawItem = function(index) {
@@ -1795,6 +1807,15 @@ Window_BattleActorStatus.prototype.open = function() {
 
 Window_BattleActorStatus.prototype.close = function() {
   Window_Base.prototype.close.call(this);
+};
+
+Window_BattleActorStatus.prototype.actorFrontBackGround = function(index, x, y) {
+  const actor = this.actor(index);
+  const key = "actor%1-Frontback-%2".format(actor.actorId());
+  const sprite = this.createInnerSprite(key, Sprite);
+  sprite.bitmap = loadNormalPicture(param.ActorFrontBackground);
+  sprite.move(x, y);
+  sprite.show();
 };
 
 //NUUN_IconSideBySide併用

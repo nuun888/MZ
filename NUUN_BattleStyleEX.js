@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.6.0
+ * @version 1.6.1
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -73,6 +73,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/3 Ver 1.6.1
+ * ステータスとアクター画像の間に背景画像を表示できる機能を追加。
  * 2021/9/29 Ver 1.6.0
  * アクター画像の表示範囲を指定できる機能を追加。
  * 2021/9/19 Ver 1.5.3
@@ -917,6 +919,14 @@
  * @type file[]
  * @default []
  * @dir img/
+ * @parent ActorStatus
+ * 
+ * @param ActorFrontBackground
+ * @desc ステータス画面背景画像ウィンドウを指定する。（アクターグラフィックとステータスの間に表示）
+ * @text ステータス画面背景画像ウィンドウ
+ * @type file[]
+ * @dir img/
+ * @default []
  * @parent ActorStatus
  * 
  * @param ActorsButlers

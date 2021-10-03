@@ -922,8 +922,8 @@
  * @parent ActorStatus
  * 
  * @param ActorFrontBackground
- * @desc ステータス画面背景画像ウィンドウを指定する。（アクターグラフィックとステータスの間に表示）
- * @text ステータス画面背景画像ウィンドウ
+ * @desc ステータス画面背景画像を指定する。（アクターグラフィックとステータスの間に表示）
+ * @text ステータス画面背景画像
  * @type file[]
  * @dir img/
  * @default []

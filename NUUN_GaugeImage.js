@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
  * @base NUUN_Base
  * 
  * @help
@@ -20,12 +20,6 @@
  * ラベル画像に関してはラベル画像で画像設定していない場合は元の処理が適用されます。
  * トリミングが指定されていない場合は画像の左上基準、画像のサイズで適用されます。
  * 
- * 画像表示幅：画像の表示範囲高さエリア
- * 画像表示高さ：画像の表示範囲高さエリア
- * 画像表示座標X：画像の表示されるX位置
- * 画像表示座標Y：画像の表示されるY位置
- * メインゲージの表示座標X：メインゲージのX座標（相対）
- * メインゲージの表示座標Y：メインゲージのY座標（相対）
  * 特定条件：HPが瀕死の時に設定した画像に切り替わります。
  *          TPBがキャストタイム中なら設定した画像に切り替わります。(別途キャストタイムを可視化できるプラグインが必要です)
  * 
@@ -41,6 +35,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/4 Ver.1.3.0
+ * 最大時の画像を設定できる機能を追加。
+ * 溺死、キャストタイム中のゲージの画像が、特定条件の画像設定をしていなかった場合反映しなかった問題を修正。
  * 2021/9/24 Ver.1.2.0
  * ラベルを画像化する機能を追加。
  * 画像を１枚にまとめなくとも表示できるように修正。
@@ -274,6 +271,51 @@
  * @type number
  * @default 0
  * 
+ * 
+ * @param MainMaxGaugeVariable
+ * @text 満タン時ゲージ画像切り替え
+ * @desc 満タン時にゲージ画像を切り替えます。
+ * @type boolean
+ * @default false
+ * 
+ * @param MainMaxGaugeImg
+ * @desc 満タン時でのメインゲージファイル名を指定します。
+ * @text 満タン時メインゲージ画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param MainMaxGaugeWidth
+ * @desc 満タン時でのメインゲージ画像のトリミング横幅
+ * @text 満タン時メインゲージ画像トリミング横幅
+ * @type number
+ * @default 0
+ * 
+ * @param MainMaxGaugeHeight
+ * @desc 満タン時メインゲージ画像のトリミング高さ
+ * @text 満タン時メインゲージ画像トリミング高さ
+ * @type number
+ * @default 0
+ * 
+ * @param MainMaxGaugeSX
+ * @desc 満タン時メインゲージ画像のトリミング座標X
+ * @text 満タン時２メインゲージ画像トリミング座標X
+ * @type number
+ * @default 0
+ * 
+ * @param MainMaxGaugeSY
+ * @desc 満タン時メインゲージ画像のトリミング座標Y
+ * @text 満タン時メインゲージ画像トリミング座標Y
+ * @type number
+ * @default 0
+ * 
+ * 
+ * @param MainGauge2Variable
+ * @text 特定条件下ゲージ画像切り替え
+ * @desc 特定条件下にゲージ画像を切り替えます。
+ * @type boolean
+ * @default false
+ * 
  * @param MainGaugeImg2
  * @desc 特定条件下でのメインゲージファイル名を指定します。
  * @text 特定条件メインゲージ画像
@@ -380,19 +422,22 @@ Imported.NUUN_GaugeImage = true;
 
   GaugeImgList.forEach(data => {
     if (data.GaugeImg && data.GaugeImg[0]) {
-      ImageManager.nuun_LoadPictures(data.GaugeImg[0])
+      ImageManager.nuun_LoadPictures(data.GaugeImg[0]);
     }
     if (data.FrontGaugeImg && data.FrontGaugeImg[0]) {
-      ImageManager.nuun_LoadPictures(data.FrontGaugeImg[0])
+      ImageManager.nuun_LoadPictures(data.FrontGaugeImg[0]);
     }
     if (data.MainGaugeImg && data.MainGaugeImg[0]) {
-      ImageManager.nuun_LoadPictures(data.MainGaugeImg[0])
+      ImageManager.nuun_LoadPictures(data.MainGaugeImg[0]);
     }
-    if (data.MainGaugeImg2 && data.MainGaugeImg2[0]) {
-      ImageManager.nuun_LoadPictures(data.MainGaugeImg2[0])
+    if (data.MainGauge2Variable && data.MainGaugeImg2 && data.MainGaugeImg2[0]) {
+      ImageManager.nuun_LoadPictures(data.MainGaugeImg2[0]);
+    }
+    if (data.MainMaxGaugeVariable && data.MainMaxGaugeImg && data.MainMaxGaugeImg[0]) {
+      ImageManager.nuun_LoadPictures(data.MainMaxGaugeImg[0]);
     }
     if (data.LabelGaugeImg && data.LabelGaugeImg[0]) {
-      ImageManager.nuun_LoadPictures(data.LabelGaugeImg[0])
+      ImageManager.nuun_LoadPictures(data.LabelGaugeImg[0]);
     }
   })
 
@@ -407,17 +452,26 @@ Imported.NUUN_GaugeImage = true;
     return data.FilteringClass.find(filterClass => filterClass === className);
   };
 
+  function getFrontImgData (imgData) {
+    return (imgData.FrontGaugeImg && imgData.FrontGaugeImg[0]) ? true : imgData.FrontGaugeWidth > 0;
+  }
+
   const _Window_StatusBase_placeGauge = Window_StatusBase.prototype.placeGauge;
   Window_StatusBase.prototype.placeGauge = function(actor, type, x, y) {
     this.placeGaugeImg(actor, type, x, y);
     _Window_StatusBase_placeGauge.call(this, actor, type, x, y);
   };
 
-  Window_StatusBase.prototype.placeGaugeImg = function(actor, type, x, y) {
+  Window_StatusBase.prototype.placeGaugeImg = function(battler, type, x, y) {
     imgSprite = null;
     const className = String(this.constructor.name);
     if (isGaugeImage(type, className)) {
-      const key = "actor%1-gaugeImg-%2".format(actor.actorId(), type);
+      let key = null;
+      if (battler.isActor()) {
+        key = "actor%1-gaugeImg-%2".format(battler.actorId(), type);
+      } else {
+        key = "enemy%1-gaugeImg-%2".format(battler.enemyId(), type);
+      }
       const sprite = this.createInnerSprite(key, Sprite_GaugeImg);
       imgSprite = sprite;
       sprite.setup(type, className);
@@ -511,9 +565,21 @@ Imported.NUUN_GaugeImage = true;
     }
   };
 
-  function getFrontImgData (imgData) {
-    return (imgData.FrontGaugeImg && imgData.FrontGaugeImg[0]) ? true : imgData.FrontGaugeWidth > 0;
-  }
+
+  const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
+  Sprite_Gauge.prototype.initMembers = function() {
+    _Sprite_Gauge_initMembers.call(this);
+    this._gaugeImgSprite = null;
+    this._baseGaugeSprite = null;
+    this._mainGaugeSprite = null;
+    this._frontGaugeSprite = null;
+    this._gaugeBitmap = null;
+    this._frontBitmap = null;
+    this._mainBitmap = null;
+    this._mainBitmap2 = null;
+    this._mainMaxBitmap = null;
+    this._labelBitmap = null;
+  };
 
   const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
   Sprite_Gauge.prototype.setup = function(battler, statusType) {
@@ -544,7 +610,12 @@ Imported.NUUN_GaugeImage = true;
       this._gaugeBitmap = bitmap;
       this._frontBitmap = data.FrontGaugeImg && data.FrontGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.FrontGaugeImg[0]) : bitmap;
       this._mainBitmap = data.MainGaugeImg && data.MainGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.MainGaugeImg[0]) : bitmap;
-      this._mainBitmap2 = data.MainGaugeImg2 && data.MainGaugeImg2[0] ? ImageManager.nuun_LoadPictures(data.MainGaugeImg2[0]) : bitmap;
+      if (data.MainGauge2Variable) {
+        this._mainBitmap2 = data.MainGaugeImg2 && data.MainGaugeImg2[0] ? ImageManager.nuun_LoadPictures(data.MainGaugeImg2[0]) : bitmap;
+      }
+      if (data.MainMaxGaugeVariable) {
+        this._mainMaxBitmap = data.MainMaxGaugeImg && data.MainMaxGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.MainMaxGaugeImg[0]) : bitmap;
+      }
       this._labelBitmap = data.LabelGaugeImg && data.LabelGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.LabelGaugeImg[0]) : null;
       if (!bitmap.isReady()) {
         bitmap.addLoadListener(this.baseGaugeSetup.bind(this, bitmap, data));
@@ -629,27 +700,27 @@ Imported.NUUN_GaugeImage = true;
     this.updateGaugeImg();
   };
 
-  Sprite_Gauge.prototype.updateGaugeImg  = function() {
+  Sprite_Gauge.prototype.updateGaugeImg  = function() {//MainGauge2Variable
     if (this._gaugeImgSprite) {
-      if (this._statusType == 'hp' && this._battler.isDying()) {
+      if (this._mainBitmap2 && this._statusType == 'hp' && this._battler.isDying()) {
         this.changeGaugeImg();
-      } else if ((this._statusType == 'time'  || this._statusType == 'cast') && this._battler.isTpbCast()) {
+      } else if (this._mainBitmap2 && (this._statusType == 'time'  || this._statusType == 'cast') && this._battler.isTpbCast()) {
         this.changeGaugeImg();
+      } else if (this.isMaxValue()) {
+        this.maxGaugeImg();
       } else {
         this.defaultGaugeImg();
       }
     }
-  };
+  };//MainMaxGaugeVariable
 
   Sprite_Gauge.prototype.changeGaugeImg  = function() {
     const data = this._gaugeImgData;
-    if (data.MainGaugeImg2 && data.MainGaugeImg2[0]) {
-      this._mainGaugeSX = data.MainGaugeSX2;
-      this._mainGaugeSY = data.MainGaugeSY2;
-      this._mainGaugeWidth = data.MainGaugeWidth2;
-      this._mainGaugeHeight = data.MainGaugeHeight2;
-      this._mainGaugeImg = this._mainBitmap2;
-    }
+    this._mainGaugeSX = data.MainGaugeSX2;
+    this._mainGaugeSY = data.MainGaugeSY2;
+    this._mainGaugeWidth = data.MainGaugeWidth2;
+    this._mainGaugeHeight = data.MainGaugeHeight2;
+    this._mainGaugeImg = this._mainBitmap2;
   };
 
   Sprite_Gauge.prototype.defaultGaugeImg  = function() {
@@ -659,6 +730,15 @@ Imported.NUUN_GaugeImage = true;
     this._mainGaugeWidth = data.MainGaugeWidth;
     this._mainGaugeHeight = data.MainGaugeHeight;
     this._mainGaugeImg = this._mainBitmap;
+  };
+
+  Sprite_Gauge.prototype.maxGaugeImg  = function() {
+    const data = this._gaugeImgData;
+    this._mainGaugeSX = data.MainMaxGaugeSX;
+    this._mainGaugeSY = data.MainMaxGaugeSY;
+    this._mainGaugeWidth = data.MainMaxGaugeWidth;
+    this._mainGaugeHeight = data.MainMaxGaugeHeight;
+    this._mainGaugeImg = this._mainMaxBitmap;
   };
 
   const _Sprite_Gauge_drawLabel = Sprite_Gauge.prototype.drawLabel;
@@ -680,9 +760,12 @@ Imported.NUUN_GaugeImage = true;
     }
   };
 
+  Sprite_Gauge.prototype.isMaxValue = function() {
+    return this._mainMaxBitmap && this.currentValue() >= this.currentMaxValue();
+  };
+
   Game_Battler.prototype.isTpbCast = function() {
     return this._tpbState === "casting" && this.tpbRequiredCastTime() > 0 || this.isActing() || this._tpbState === "ready";
   };
-
 
 })();

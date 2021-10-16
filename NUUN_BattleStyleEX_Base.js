@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.1
+ * @version 2.6.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/10/16 Ver 2.6.2
+ * エフェクトのプライマリーを変更。
  * 2021/10/3 Ver 2.6.1
  * ステータスとアクター画像の間に背景画像を表示できる機能を追加。
  * 2021/9/29 Ver 2.6.0
@@ -2815,8 +2817,9 @@ Spriteset_Battle.prototype.createStatusLayer = function() {
   this.createBattleHud();
   this.createBackgroundStatus();
   this.createHudBack();
-  this.createEffects();
+  //this.createEffects();
   this.createHudStatus();
+  this.createEffects();
   this.createFrontActors();
 };
 

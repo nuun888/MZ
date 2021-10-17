@@ -11,7 +11,8 @@
  * @target MZ
  * @plugindesc アイテム最大所持数変更
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
+ * @base NUUN_Base
  * 
  * @help
  * アイテムの最大所持数を変更します。
@@ -20,41 +21,30 @@
  * <NoItemNum> アイテムの個数を表示しません。
  * <ItemGroup:[GroupName]> アイテムのグループを割り当てます。[GroupName]:グループ名
  * アイテムのグループごとに最大所持数を変更するときに使用します。
- * <ItemGroup:medicine> このアイテムのグループはmedicineに属します。
- * ※:の後にスペースを入れると正常に取得できない場合があります。
+ * <ItemGroup:回復> このアイテムのグループは回復に属します。
  * 
  * 優先度
- * 個別に設定した最大数 ＞ 変更した最大数 ＞ グループの最大数 ＞ カテゴリー内の最大数 ＞ デフォルト最大数
+ * 個別に設定した最大数 ＞ 変更した最大数 ＞ グループの最大所持数 ＞ カテゴリー内の最大数 ＞ デフォルト最大数
  * 
  * 最大所持数を高く設定すると個数表示上、文字が潰れて読みづらくなった場合、
  * 個数の桁数の増やしてみてください。（デフォルト00)
  * 
- * 以下の機能はNUUN_Base Ver1.1.3以降、NUUN_ItemCategoryが必要です。
- * NUUN_ItemCategory（アイテムカテゴリーカスタマイズ）と併用している場合、そのカテゴリー内の
- * アイテムのデフォルトの愛大所持数を設定できます。なおアイテムのみ有効です。
+ * グループまたはカテゴリーごとに最大所持数を設定できます。なおカテゴリーは別途NUUN_ItemCategoryが必要です。
+ * 優先度はグループの最大所持数＞カテゴリーの最大所持数になります。
  * <CategoryType:[key]> に設定したカテゴリーのアイテムのデフォルトの最大所持数が変更されます。
  * 
- * 予約カテゴリーキー
+ * 予約キー
  * keyItem：大事なもの
  * HiddenItemA：隠しアイテムA
  * HiddenItemB：隠しアイテムB
- * カテゴリーキーにkeyItemと記入した場合は大事なもの（CategoryTypeタグを記入していない）のアイテムのデフォルトの最大所持数が変更されます。
- * 
- * プラグインコマンド
- * プラグインコマンドでアイテム、武器、防具の最大所持数を変更できます。なお変更後に最大所持数を超えていた場合は超えた個数分消滅します。
- * 変更対象キーの設定方法
- * [key], [mode]:[key]カテゴリー又はグループ名　[mode]Category:カテゴリー　Group:アイテムグループ　※省略可
- * 設定例　プラグインコマンド
- * item, Category アイテムカテゴリーのアイテムの最大所持数が変更されます。
- * item アイテムカテゴリーのアイテムの最大所持数が変更されます。
- * medicine, Group アイテム、武器、防具に<ItemGroup:medicine>が記入されているアイテムの最大所持数が変更されます。
- * キーを記入しない場合はすべてのアイテムが変更されます。
- * 変更できるキーは複数設定できます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/17 Ver 1.3.0
+ * アイテム個別の最大所持数を変更しても反映されない問題を修正。
+ * グループとカテゴリーの最大所持数の設定を共通化。
  * 2021/7/24 Ver 1.2.0
  * 最大所持数を変更できる機能を追加。
  * 2021/7/11 Ver 1.1.0
@@ -84,12 +74,11 @@
  * @desc 変更する最大所持数を指定します。
  * 
  * @arg ItemKey
- * @text 変更対象キー
- * @desc 最大所持数を変更する対象のキーを設定します。(アイテムが0に設定されてる場合のみ) ※複数指定可能
- * @type combo[]
- * @option 'item, Category'
- * @option 'keyItem, Category'
- * @default 'keyItem, Category'
+ * @desc 処理を行うグループまたはカテゴリーキーを設定します。（カテゴリーはNUUN_ItemCategoryが必要です）
+ * @text キー
+ * @type string
+ * @default
+ * 
  * 
  * @command ChangeMaxWeapon
  * @desc 武器の最大所持数を変更します。
@@ -109,11 +98,11 @@
  * @desc 変更する最大所持数を指定します。
  * 
  * @arg ItemKey
- * @text 対象カテゴリー
- * @desc 最大所持数を変更する対象のカテゴリーを設定します。(武器が0に設定されてる場合のみ) ※複数指定可能
- * @type combo[]
- * @option 'weapon, Category'
- * @default 'weapon, Category'
+ * @desc 処理を行うグループまたはカテゴリーキーを設定します。（カテゴリーはNUUN_ItemCategoryが必要です）
+ * @text キー
+ * @type string
+ * @default
+ * 
  * 
  * @command ChangeMaxArmor
  * @desc 防具の最大所持数を変更します。
@@ -132,13 +121,11 @@
  * @text 変更後の最大所持数
  * @desc 変更する最大所持数を指定します。
  * 
- * @arg ItemKey
- * @text 対象カテゴリー
- * @desc 最大所持数を変更する対象のカテゴリーを設定します。(防具が0に設定されてる場合のみ) ※複数指定可能
- * @type combo[]
- * @option 'Armor, Category'
- * @default 'Armor, Category'
- * 
+ * @arg Key
+ * @desc 処理を行うグループまたはカテゴリーキーを設定します。（カテゴリーはNUUN_ItemCategoryが必要です）
+ * @text キー
+ * @type string
+ * @default
  * 
  * 
  * @param DefaultMaxItem
@@ -163,15 +150,9 @@
  * @min 1
  * 
  * @param CustomDefault
- * @desc アイテムカテゴリーカスタマイズで設定したカテゴリーアイテムのデフォルト最大所持数(要NUUN_ItemCategory)
- * @text カテゴリー最大所持数
+ * @desc グループまたはカテゴリー毎の最大所持数(要NUUN_ItemCategory)
+ * @text グループカテゴリー最大所持数
  * @type struct<CustomDefaultList>[]
- * @default []
- * 
- * @param ItemGroupMaxItems
- * @desc 種類ごとのアイテム所持数を設定します。
- * @text 種類ごと最大所持数
- * @type struct<ItemGroupDefaultList>[]
  * @default []
  * 
  * @param NumberDigits
@@ -194,30 +175,14 @@
 /*~struct~CustomDefaultList:
  *
  * @param CustomDefaultKey
- * @desc カテゴリーキーを設定します。NUUN_ItemCategoryのカテゴリー設定と同じように設定してください。
- * @text カテゴリーキー
+ * @desc グループまたはカテゴリーキーを設定します。（カテゴリーはNUUN_ItemCategoryが必要です）
+ * @text グループカテゴリーキー
  * @type string
  * @default
  * 
  * @param CustomDefaultMax
- * @desc カテゴリーのデフォルト最大所持数
- * @text カテゴリー最大所持数
- * @type number
- * @default 99
- * @min 1
- *
- */
-/*~struct~ItemGroupDefaultList:
- *
- * @param ItemDefaultGroupId
- * @desc アイテムグループ名を設定します。
- * @text アイテムグループ名
- * @type string
- * @default
- * 
- * @param GroupDefaultMax
- * @desc アイテムグループのデフォルト最大所持数
- * @text アイテムグループ最大所持数
+ * @desc デフォルト最大所持数
+ * @text 最大所持数
  * @type number
  * @default 99
  * @min 1
@@ -232,7 +197,6 @@
   const numberDigits = String(parameters['NumberDigits'] || '00');
   const ItemNumMode = Number(parameters['ItemNumMode'] || 0);
   const CustomDefault = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CustomDefault'])) : null) || [];
-  const ItemGroupMaxItems = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemGroupMaxItems'])) : null) || [];
   let itemData = null;
 
   const pluginName = 'NUUN_MaxItem';
@@ -248,93 +212,13 @@
     changeMaxArmor(args);
   });
 
-  function setItemData(item) {
-    itemData = item;
-  }
-
-  function getItemData() {
-    return itemData;
-  }
-
-  function changeMaxItem(args) {
-    if (args.Item > 0) {
-      $gameParty.setMaxItem(args.Item, args.MaxNum);
-    } else {
-      const keys = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ItemKey)) : null) || [];
-      for (const item of $dataItems) {
-        if (item && item.name) {
-          const find = keys.find(key => {
-            const keyData = key.split(',');
-            if (keyData[1] && keyData[1].trim() === 'Group') {
-              return keyData[0] === $gameParty.getGroupType(item);
-            } else {
-              return keyData[0] === $gameParty.getCategoryType(item);
-            }
-          });
-          if (keys.length === 0 || find) {
-            $gameParty.setMaxItem(item.id, args.MaxNum);
-          }
-        }
-      }
-    }
-  };
-
-  function changeMaxWeapon(args) {
-    if (args.Weapon > 0) {
-      $gameParty.setWeaponMaxItem(args.Weapon, args.MaxNum);
-    } else {
-      const keys = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ItemKey)) : null) || [];
-      for(const item of $dataWeapons) {
-        if (item && item.name) {
-          const find = keys.find(key => {
-            const keyData = key.split(',');
-            if (keyData[1] && keyData[1].trim() === 'Group') {
-              return keyData[0] === $gameParty.getEquipGroupType(item);
-            } else {
-              return keyData[0] === $gameParty.getEquipCategoryType(item);
-            }
-          });
-          if (keys.length === 0 || find) {
-            $gameParty.setWeaponMaxItem(item.id, args.MaxNum);
-          }
-        }
-      }
-    }
-  };
-
-  function changeMaxArmor(args) {
-    if (args.Armor > 0) {
-      $gameParty.setArmorMaxItem(args.Armor, args.MaxNum);
-    } else {
-      const keys = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ItemKey)) : null) || [];
-      for(const item of $dataArmors) { 
-        if (item && item.name) {
-          const find = keys.find(key => {
-            const keyData = key.split(',');
-            if (keyData[1] && keyData[1].trim() === 'Group') {
-              return keyData[0] === $gameParty.getEquipGroupType(item);
-            } else {
-              return keyData[0] === $gameParty.getEquipCategoryType(item);
-            }
-          });
-          if (keys.length === 0 || find) {
-            $gameParty.setArmorMaxItem(item.id, args.MaxNum);
-          }
-        }
-      }
-    }
-  };
-
   const _Game_Party_initialize = Game_Party.prototype.initialize;
   Game_Party.prototype.initialize = function() {
     _Game_Party_initialize.call(this);
-    this.initMaxItemsList();
-  };
-
-  Game_Party.prototype.initMaxItemsList = function() {
     this._itemsMaxItem = [];
     this._weaponsMaxItem = [];
     this._armorsMaxItem = [];
+    this._categoryMaxItem = [];
   };
 
   Game_Party.prototype.setMaxItem = function(id, maxNum) {
@@ -342,7 +226,7 @@
       this._itemsMaxItem = [];
     }
     this._itemsMaxItem[id] = maxNum;
-    const item = $dataItems[id];
+    const item = $dataItems[id];console.log(maxNum)
     const nowNumber = this.numItems(item);
     if (nowNumber > this.maxItems(item)) {
       const container = this.itemContainer(item);
@@ -376,116 +260,58 @@
     }
   };
 
-
-  Game_Party.prototype.maxItems = function(item) {//再定義 
-    if (item.meta.MaxItems) {
+  Game_Party.prototype.maxItems = function(item) {//再定義
+    if (item.meta.MaxItems && item.meta.MaxItems > 0) {
       return Number(item.meta.MaxItems);
     }
-    const maxNum = this.getMaxItems(item);
+    const type = itemType(item);
+    const maxNum = this.getMaxItems(item, type);
     if (maxNum > 0) {
       return maxNum;
     }
-    return this.defaultMax(item);
+    return this.defaultMax(item, type);
   };
 
-  Game_Party.prototype.getMaxItems = function(item) {
-    if (!item) {
-      return 0;
-    } else if (this._itemsMaxItem && DataManager.isItem(item)) {
+  Game_Party.prototype.getMaxItems = function(item, type) {
+    if (type === 'item' && this._itemsMaxItem) {
       return this._itemsMaxItem[item.id] || 0;
-    } else if (this._weaponsMaxItem && DataManager.isWeapon(item)) {
+    } else if (type === 'weapon' && this._weaponsMaxItem) {
       return this._weaponsMaxItem[item.id] || 0;
-    } else if (this._armorsMaxItem && DataManager.isArmor(item)) {
+    } else if (type === 'armor' && this._armorsMaxItem) {
       return this._armorsMaxItem[item.id] || 0;
     } else {
       return 0;
     }
   };
 
-  Game_Party.prototype.defaultMax = function(item) {
-    if (!item) {
-      return null;
-    } else if (DataManager.isItem(item)) {
-      return this.defaultMaxItem(item);
-    } else if (DataManager.isWeapon(item)) {
-      return this.defaultMaxWeapon(item);
-    } else if (DataManager.isArmor(item)) {
-      return this.defaultMaxArmor(item);
+  Game_Party.prototype.defaultMax = function(item, type) {
+    return this.customDefaultMax(item, type);
+  };
+
+  Game_Party.prototype.customDefaultMax = function(item, type) {
+    const find = CustomDefault.find(data => data.CustomDefaultKey === this.getCategoryType(item, type));
+    if (find) {
+      return find.CustomDefaultMax || 99;
     } else {
-      return null;
-    }
-  };
-
-  Game_Party.prototype.defaultMaxItem = function(item) {
-    if (item.meta.ItemGroup) {
-      const groupMaxItem = this.getGroupItem(item);
-      if (groupMaxItem) {
-        return groupMaxItem;
+      if (type === 'item') {
+        return defaultMaxItem;
+      } else if (type === 'weapon') {
+        return defaultMaxWeapon;
+      } else if (type === 'armor') {
+        return defaultMaxArmor;
+      } else {
+        return 99;
       }
     }
-    if (Imported.NUUN_ItemCategory) {
-      return this.customDefaultMax(item);
-    } else {
-      return defaultMaxItem;
-    }
   };
 
-  Game_Party.prototype.defaultMaxWeapon = function(item) {
+  Game_Party.prototype.getCategoryType = function(item, type) {
     if (item.meta.ItemGroup) {
-      const groupMaxItem = this.getGroupItem(item);
-      if (groupMaxItem) {
-        return groupMaxItem;
-      }
+      return (item.meta.ItemGroup).trim();
     }
-    return defaultMaxWeapon;
+    return Imported.NUUN_ItemCategory && item.meta.CategoryType ? (item.meta.CategoryType).trim() : getCategoryKeyItem(item, type);
   };
 
-  Game_Party.prototype.defaultMaxArmor = function(item) {
-    if (item.meta.ItemGroup) {
-      const groupMaxItem = this.getGroupItem(item);
-      if (groupMaxItem) {
-        return groupMaxItem;
-      }
-    }
-    return defaultMaxArmor;
-  };
-
-  Game_Party.prototype.customDefaultMax = function(item) {
-    const find = CustomDefault.find(data => data.CustomDefaultKey === this.getCategoryType(item));
-    return find ? find.CustomDefaultMax || defaultMaxItem : defaultMaxItem;
-  };
-
-  Game_Party.prototype.getCategoryType = function(item) {
-    return item.meta.CategoryType ? (item.meta.CategoryType).trim() : this.getCategoryKeyItem(item);
-  };
-
-  Game_Party.prototype.getEquipCategoryType = function(item) {
-    return item.meta.CategoryType ? (item.meta.CategoryType).trim() : (DataManager.isWeapon(item) ? 'weapon' : 'armor');
-  };
-
-  Game_Party.prototype.getGroupType = function(item) {
-    return item.meta.ItemGroup ? (item.meta.ItemGroup).trim() : this.getCategoryKeyItem(item);
-  };
-
-  Game_Party.prototype.getEquipGroupType = function(item) {
-    return item.meta.ItemGroup ? (item.meta.ItemGroup).trim() : (DataManager.isWeapon(item) ? 'weapon' : 'armor');
-  };
-
-  Game_Party.prototype.getCategoryKeyItem = function(item) {
-    if (item.itypeId === 2) {
-      return "keyItem";
-    } else if (item.itypeId === 3) {
-      return "HiddenItemA";
-    } else if (item.itypeId === 4) {
-      return "HiddenItemB";
-    }
-    return "item";
-  };
-
-  Game_Party.prototype.getGroupItem = function(item) {
-    const find = ItemGroupMaxItems.find(key => key.ItemDefaultGroupId === item.meta.ItemGroup);
-    return find ? find.GroupDefaultMax: null;
-  };
 
   Window_ItemList.prototype.numberWidth = function() {//再定義
     return getItemData().meta.NoItemNum ? 0 : this.textWidth(numberDigits + '0');
@@ -495,7 +321,7 @@
   Window_ItemList.prototype.drawItem = function(index) {
     setItemData(this.itemAt(index));
     _Window_ItemList_drawItem.call(this, index);
-};
+  };
 
   Window_ItemList.prototype.drawItemNumber = function(item, x, y, width) {//再定義
     if (this.needsNumber() && !item.meta.NoItemNum) {
@@ -510,4 +336,138 @@
         this.drawText(text, x + width - numberWidth, y, numberWidth, "right");
     }
   };
+
+
+  function setItemData(item) {
+    itemData = item;
+  }
+
+  function getItemData() {
+    return itemData;
+  }
+
+  function itemType(item) {
+    if (DataManager.isItem(item)) {
+      return 'item';
+    } else if (DataManager.isWeapon(item)) {
+      return 'weapon'
+    } else if (DataManager.isArmor(item)) {
+      return 'armor'
+    } else {
+      return null;
+    }
+  };
+
+  function getCategoryKeyItem(item, type) {
+    if (type === 'item') {
+      if (item.itypeId === 2) {
+        return "keyItem";
+      } else if (item.itypeId === 3) {
+        return "HiddenItemA";
+      } else if (item.itypeId === 4) {
+        return "HiddenItemB";
+      }
+    }
+    return null;
+  };
+
+  function changeMaxItem(args) {
+    if (Number(args.Item) > 0) {
+      $gameParty.setMaxItem(Number(args.Item), Number(args.MaxNum));
+    } else {
+      for (const item of $dataItems) {
+        if (item && item.name) {
+          if (args.ItemKey) {
+            if (args.ItemKey === $gameParty.getCategoryType(item, 'item')) {
+              $gameParty.setMaxItem(item.id, Number(args.MaxNum));
+            }
+          } else {
+            $gameParty.setMaxItem(item.id, Number(args.MaxNum));
+          }
+        }
+      }
+    }
+  };
+
+  function changeMaxWeapon(args) {
+    if (Number(args.Weapon) > 0) {
+      $gameParty.setWeaponMaxItem(Number(args.Weapon), Number(args.MaxNum));
+    } else {
+      for (const item of $dataWeapons) {
+        if (item && item.name) {
+          if (args.ItemKey) {
+            if (args.ItemKey === $gameParty.getCategoryType(item, 'weapon')) {
+              $gameParty.setWeaponMaxItem(item.id, Number(args.MaxNum));
+            }
+          } else {
+            $gameParty.setWeaponMaxItem(item.id, Number(args.MaxNum));
+          }
+        }
+      }
+    }
+  };
+
+  function changeMaxArmor(args) {
+    if (Number(args.Armor) > 0) {
+      $gameParty.setArmorMaxItem(Number(args.Armor), Number(args.MaxNum));
+    } else {
+      for (const item of $dataArmors) {
+        if (item && item.name) {
+          if (args.ItemKey) {
+            if (args.ItemKey === $gameParty.getCategoryType(item, 'armor')) {
+              $gameParty.setArmorMaxItem(item.id, Number(args.MaxNum));
+            }
+          } else {
+            $gameParty.setArmorMaxItem(item.id, Number(args.MaxNum));
+          }
+        }
+      }
+    }
+  };
+
+  function changeCategoryMaxItem(args) {
+    const keys = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ItemKey)) : null) || [];
+    for (const item of $dataItems) {
+      if (item && item.name) {
+        const find = keys.find(key => {
+          return key === $gameParty.getCategoryType(item, 'item');
+        });
+        if (find) {
+          $gameParty.setMaxItem(item.id, Number(args.MaxNum));
+          $gameParty._categoryMaxItem[index] = Number(args.MaxNum);
+        }
+      }
+    }
+  };
+
+  function changeCategoryMaxWeapon(args) {
+    const keys = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ItemKey)) : null) || [];
+    for (const item of $dataWeapons) {
+      if (item && item.name) {
+        const index = keys.findIndex(key => {
+          return key === $gameParty.getCategoryType(item, 'weapon');
+        });
+        if (index >= 0) {
+          $gameParty.setWeaponMaxItem(item.id, Number(args.MaxNum));
+          $gameParty._categoryMaxItem[index] = Number(args.MaxNum);
+        }
+      }
+    }
+  };
+
+  function changeMaxArmor(args) {
+    const keys = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ItemKey)) : null) || [];
+    for (const item of $dataArmors) {
+      if (item && item.name) {
+        const find = keys.find(key => {
+          return key === $gameParty.getCategoryType(item, 'armor');
+        });
+        if (find) {
+          $gameParty.setArmorMaxItem(item.id, Number(args.MaxNum));
+          $gameParty._categoryMaxItem[index] = Number(args.MaxNum);
+        }
+      }
+    }
+  };
+
 })();

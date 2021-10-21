@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム最大所持数変更
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * 
  * @help
@@ -42,6 +42,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/21 Ver 1.3.1
+ * 防具の最大数の変更が正常に反映されていなかった問題を修正。
  * 2021/10/17 Ver 1.3.0
  * アイテム個別の最大所持数を変更しても反映されない問題を修正。
  * グループとカテゴリーの最大所持数の設定を共通化。
@@ -218,7 +220,6 @@
     this._itemsMaxItem = [];
     this._weaponsMaxItem = [];
     this._armorsMaxItem = [];
-    this._categoryMaxItem = [];
   };
 
   Game_Party.prototype.setMaxItem = function(id, maxNum) {
@@ -420,51 +421,6 @@
           } else {
             $gameParty.setArmorMaxItem(item.id, Number(args.MaxNum));
           }
-        }
-      }
-    }
-  };
-
-  function changeCategoryMaxItem(args) {
-    const keys = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ItemKey)) : null) || [];
-    for (const item of $dataItems) {
-      if (item && item.name) {
-        const find = keys.find(key => {
-          return key === $gameParty.getCategoryType(item, 'item');
-        });
-        if (find) {
-          $gameParty.setMaxItem(item.id, Number(args.MaxNum));
-          $gameParty._categoryMaxItem[index] = Number(args.MaxNum);
-        }
-      }
-    }
-  };
-
-  function changeCategoryMaxWeapon(args) {
-    const keys = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ItemKey)) : null) || [];
-    for (const item of $dataWeapons) {
-      if (item && item.name) {
-        const index = keys.findIndex(key => {
-          return key === $gameParty.getCategoryType(item, 'weapon');
-        });
-        if (index >= 0) {
-          $gameParty.setWeaponMaxItem(item.id, Number(args.MaxNum));
-          $gameParty._categoryMaxItem[index] = Number(args.MaxNum);
-        }
-      }
-    }
-  };
-
-  function changeMaxArmor(args) {
-    const keys = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ItemKey)) : null) || [];
-    for (const item of $dataArmors) {
-      if (item && item.name) {
-        const find = keys.find(key => {
-          return key === $gameParty.getCategoryType(item, 'armor');
-        });
-        if (find) {
-          $gameParty.setArmorMaxItem(item.id, Number(args.MaxNum));
-          $gameParty._categoryMaxItem[index] = Number(args.MaxNum);
         }
       }
     }

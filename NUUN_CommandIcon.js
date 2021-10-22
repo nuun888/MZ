@@ -47,7 +47,7 @@
  * @param CommadIcon
  * @text コマンドアイコン設定
  * @desc コマンドに表示するアイコンを設定します。
- * @default []
+ * @default ["{\"CommadName\":\"アイテム\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"スキル\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"装備\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"ステータス\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"並び替え\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"オプション\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"[\\\"'Window_MenuCommand'\\\"]\"}","{\"CommadName\":\"ゲーム終了\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}"]
  * @type struct<CommadIconList>[]
  * 
  * @param CommandPosition

@@ -16,6 +16,12 @@
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
  * コマンド名の位置を左揃え、中央揃え、右揃えから選べます。
  * 
+ * コマンド名：コマンドメニューに表示される文字列をそのまま記入します。
+ * コマンドの色：コマンド名の色を変更します。
+ * アイコンインデックス：アイコンを指定します。
+ * フィルタリングクラス設定モード：下のフィルタリングを適用するか除外するか指定します。
+ * フィルタリングクラス設定：設定を適用または除外するクラスを設定します。上から一番最初に条件一致した条件が適用されます。
+ * 
  * フィルタリングクラス設定でリストにないクラスを記入する場合は必ず'または"で囲ってください。
  * フィルタリングクラス設定にないウィンドウで設定する場合は、テキストタブで直接該当クラスを''または""で囲って記入してください。
  * Window_Command.prototype.drawItem内にconsole.log(this)を記入することでクラス名が分かります。(F12)
@@ -25,6 +31,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/23 Ver 1.2.4
+ * プラグインパラメータの説明を修正及びメニューコマンド内の項目のみ初期設定に追加。
  * 2021/9/11 Ver 1.2.3
  * フィルタリングクラスにセーブ上書き確認を追加（要NUUN_SaveVerification）
  * 2021/8/23 Ver 1.2.2
@@ -46,7 +54,7 @@
  * 
  * @param CommadIcon
  * @text コマンドアイコン設定
- * @desc コマンドに表示するアイコンを設定します。
+ * @desc コマンドの色、アイコンの設定をします。
  * @default ["{\"CommadName\":\"アイテム\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"スキル\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"装備\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"ステータス\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"並び替え\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"オプション\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"[\\\"'Window_MenuCommand'\\\"]\"}","{\"CommadName\":\"ゲーム終了\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}"]
  * @type struct<CommadIconList>[]
  * 

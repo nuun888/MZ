@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc コマンド拡張
  * @author NUUN
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。

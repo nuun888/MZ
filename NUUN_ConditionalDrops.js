@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きドロップ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_ConditionsBase
  * 
  * @help
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/24 Ver.1.0.1
+ * 条件タグにスペースを入れると条件が判定されない問題を修正。
  * 2021/10/22 Ver.1.0.0
  * 初版
  * 
@@ -78,7 +80,7 @@ Imported.NUUN_ConditionalDrops = true;
   Game_Enemy.prototype.getConditionalDrops = function() {
     this._getCondDropList = [];
     conditionalDropItems.forEach(condDrop => {
-      const condTag = String(condDrop[3]) || 'CondDrop';
+      const condTag = String(condDrop[3]).trim() || 'CondDrop';
       if (actionData.subject.getTriggerConditions(this.enemy(), this.enemy(), 'Target' + condTag, condTag, 'Party' + condTag, 'Troop' + condTag, actionData.action, actionData.damage, condTag + 'Partial') && this.condDropRate(condDrop)) {
         const drop = this.getCondDropItem(condDrop);
         if (drop) {

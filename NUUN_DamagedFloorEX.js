@@ -220,7 +220,6 @@ Game_Map.prototype.getDamagedFloorListData = function() {
     const regionId = this.regionId(x, y);
     const damagedFloorData = DamagedFloorList[this._damagedFloorId].DamagedFloorRegion || [];
     const mainData = damagedFloorData.find(data => data.RegionId === regionId);
-    console.log("er")
     if (mainData && mainData.DamagedFloorSE) {
       AudioManager.playSe({"name":mainData.DamagedFloorSE,"volume":mainData.volume,"pitch":mainData.pitch,"pan":mainData.pan});
     } else if (DefaultDamagedFloorSE) {

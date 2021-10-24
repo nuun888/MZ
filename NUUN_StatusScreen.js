@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.4
+ * @version 2.2.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -145,6 +145,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/24 Ver.2.2.5
+ * 最初に表示されるページを指定できる機能を追加。
  * 2021/9/19 Ver.2.2.4
  * コアスクリプトVer.1.3.3による修正。
  * 2021/8/24 Ver.2.2.3
@@ -226,6 +228,17 @@
  * ページの切り替えをタッチ操作でも行えるように対応。
  * 2020/11/16 Ver.1.0.0
  * 初版
+ * 
+ * 
+ * @command ChangeStartPage
+ * @desc 表示させる開始ページを変更します。。
+ * @text 開始ページ変更
+ * 
+ * @arg StartPage
+ * @type number
+ * @default 0
+ * @text 開始ページ
+ * @desc 開始ページ。0でデフォルトになります。
  * 
  * @param Setting
  * @text 共通設定
@@ -331,6 +344,14 @@
  * @text 表示ページ項目５
  * @type struct<ParamListData>[]
  * @default []
+ * @parent PageSetting
+ * 
+ * @param StartPage
+ * @text 開始表示ページ
+ * @desc ステータスを開いたときに表示するページ。
+ * @type number
+ * @default 1
+ * @min 1
  * @parent PageSetting
  * 
  * @param BackGroundSetting
@@ -1103,6 +1124,7 @@ const StateRadarChartMainColor2 = Number(parameters['StateRadarChartMainColor2']
 const StateRadarChartX = Number(parameters['StateRadarChartX'] || 0);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 0);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);
+const StartPage = Number(parameters['StartPage'] || 1);
 
 const pluginName = "NUUN_StatusScreen";
 PluginManager.registerCommand(pluginName, 'ChangeStatusActorImg', args => {
@@ -1110,6 +1132,14 @@ PluginManager.registerCommand(pluginName, 'ChangeStatusActorImg', args => {
     $gameActors._data[args.actorId].setStatusActorImgId(args.ChangeActorImgId);
   }
 });
+
+PluginManager.registerCommand(pluginName, 'ChangeStartPage', args => {
+  $gameTemp._startPage = Math.min(Number(args.StartPage), PageList.length);
+});
+
+function startPages() {
+  return ($gameTemp._startPage && $gameTemp._startPage > 0 ? $gameTemp._startPage : StartPage) - 1;
+}
 
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
@@ -1145,7 +1175,7 @@ Game_Actor.prototype.setStatusActorImgId = function(changeActorImgId) {
 const _Scene_Status_initialize = Scene_Status.prototype.initialize;
 Scene_Status.prototype.initialize = function() {
   _Scene_Status_initialize.call(this);
-  this._page = 0;
+  this._page = startPages();
 };
 
 Scene_Status.prototype.create = function() {
@@ -1295,7 +1325,7 @@ const _Window_Status_initialize = Window_Status.prototype.initialize;
 Window_Status.prototype.initialize = function(rect) {
   this._userWindowSkin = StatusWindowsSkin;
   _Window_Status_initialize.call(this, rect);
-  this._page = 0;
+  this._page = startPages();
 };
 
 Window_Status.prototype.refresh = function() {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.2
+ * @version 2.6.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/10/24 Ver 2.6.3
+ * メッセージウィンドウが上に表示された場合はアクターステータスウィンドウを表示したままにするように修正。
  * 2021/10/16 Ver 2.6.2
  * エフェクトのプライマリーを変更。
  * 2021/10/3 Ver 2.6.1
@@ -825,7 +827,7 @@ Scene_Battle.prototype.start = function() {
 const _Scene_Battle_updateStatusWindowVisibility = Scene_Battle.prototype.updateStatusWindowVisibility;
 Scene_Battle.prototype.updateStatusWindowVisibility = function() {
   _Scene_Battle_updateStatusWindowVisibility.call(this);
-  if (this.shouldOpenStatusWindow()) {
+  if (this._messageWindow.y < this._statusWindow.y - this._statusWindow.height && $gameMessage.isBusy()) {
     this._statusWindow.open();
   }
 };
@@ -965,7 +967,7 @@ Scene_Battle.prototype.updateBackground = function() {
   if (this._messageWindow.isClosing() && BattleManager.getDisplayMessageType()) {
     BattleManager.displayMessageType(null);
   }
-}; 
+};
 
 Scene_Battle.prototype.activeWindow = function() {
   return this.opacityskillWindow() || this.opacityItemWindow() || this.opacityEnemyWindow() || this.opacityMessageWindow() || BattleManager.actorStatusWindowOpacity;
@@ -1447,10 +1449,12 @@ Window_BattleStatus.prototype.faceRect = function(index) {
   return rect;
 };
 
+
+
+
 Window_BattleStatus.prototype.placeGauge = function(actor, type, x, y) {
-  if (Imported.NUUN_GaugeImage) {
-    this.placeGaugeImg(actor, type, x, y);
-  }
+  battleStyleGauge = true;
+  Window_StatusBase.prototype.placeGauge.call(this, actor, type, x, y);
   const key = "actor%1-gauge-%2".format(actor.actorId(), type);
   let sprite = null;
   if (type === 'hp') {

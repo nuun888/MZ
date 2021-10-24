@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -24,6 +24,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/24 Ver.1.0.1
+ * デフォルトの床ダメージ、床ダメージ時のSEを指定できる機能を追加。
  * 2021/10/24 Ver.1.0.0
  * 初版
  * 
@@ -38,6 +40,44 @@
  * @desc ダメージ時のフラッシュを有効にする。
  * @type boolean
  * @default false
+ * 
+ * @param DefaultDamage
+ * @text デフォルトダメージ
+ * @desc デフォルト床ダメージ時のダメージ
+ * @type number
+ * @default 10
+ * 
+ * @param DefaultSE
+ * @text デフォルトのSE設定
+ * @default ------------------------------
+ * 
+ * @param DefaultDamagedFloorSE
+ * @text デフォルト床ダメージ時SE
+ * @desc デフォルトの床ダメージ時のSE
+ * @type file
+ * @dir audio/se/
+ * @parent DefaultSE
+ * 
+ * @param DefaultVolume
+ * @text 音量
+ * @desc 音量。
+ * @type number
+ * @default 90
+ * @parent DefaultSE
+ * 
+ * @param DefaultPitch
+ * @text ピッチ
+ * @desc ピッチ。
+ * @type number
+ * @default 100
+ * @parent DefaultSE
+ * 
+ * @param DefaultPan
+ * @text 位相
+ * @desc 位相。
+ * @type number
+ * @default 50
+ * @parent DefaultSE
  * 
  */
 /*~struct~DamagedFloorData:
@@ -102,6 +142,12 @@ Imported.NUUN_DamagedFloorEX = true;
 const parameters = PluginManager.parameters('NUUN_DamagedFloorEX');
 const DamagedFloorList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DamagedFloorList'])) : null) || [];
 const DamagedFloorFlash = eval(parameters['DamagedFloorFlash'] || 'false');
+const DefaultDamage = Number(parameters['DefaultDamage'] || 10);
+const DefaultDamagedFloorSE = String(parameters['DefaultDamagedFloorSE'] || '');
+const DefaultVolume = Number(parameters['DefaultVolume'] || 90);
+const DefaultPitch = Number(parameters['DefaultPitch'] || 100);
+const DefaultPan = Number(parameters['DefaultPan'] || 50);
+
 let onMapFloorDamage = false;
 let floorDamageRefresh = false;
 
@@ -129,6 +175,7 @@ Game_Actor.prototype.performMapDamage = function() {
 
 const _Game_Actor_basicFloorDamage = Game_Actor.prototype.basicFloorDamage;
 Game_Actor.prototype.basicFloorDamage = function() {
+  const coreDamage = _Game_Actor_basicFloorDamage.call(this);
   const damagedFloorId = $gameMap._damagedFloorId;
   if (damagedFloorId >= 0) {
     const x = $gamePlayer._x;
@@ -136,9 +183,9 @@ Game_Actor.prototype.basicFloorDamage = function() {
     const regionId = $gameMap.regionId(x, y);
     const damagedFloorData = DamagedFloorList[$gameMap._damagedFloorId].DamagedFloorRegion || [];
     const mainData = damagedFloorData.find(data => data.RegionId === regionId);
-    return mainData ? mainData.Damage : _Game_Actor_basicFloorDamage.call(this);
+    return mainData ? mainData.Damage : DefaultDamage || coreDamage;
   } else {
-    return _Game_Actor_basicFloorDamage.call(this);
+    return DefaultDamage || coreDamage;
   }
 };
 
@@ -173,8 +220,15 @@ Game_Map.prototype.getDamagedFloorListData = function() {
     const regionId = this.regionId(x, y);
     const damagedFloorData = DamagedFloorList[this._damagedFloorId].DamagedFloorRegion || [];
     const mainData = damagedFloorData.find(data => data.RegionId === regionId);
+    console.log("er")
     if (mainData && mainData.DamagedFloorSE) {
       AudioManager.playSe({"name":mainData.DamagedFloorSE,"volume":mainData.volume,"pitch":mainData.pitch,"pan":mainData.pan});
+    } else if (DefaultDamagedFloorSE) {
+      AudioManager.playSe({"name":DefaultDamagedFloorSE,"volume":DefaultVolume,"pitch":DefaultPitch,"pan":DefaultPan});
+    }
+  } else {
+    if (DefaultDamagedFloorSE) {
+      AudioManager.playSe({"name":DefaultDamagedFloorSE,"volume":DefaultVolume,"pitch":DefaultPitch,"pan":DefaultPan});
     }
   }
 };

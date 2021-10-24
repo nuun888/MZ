@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -19,11 +19,16 @@
  * ダメージ床のダメージ時の処理を拡張します。
  * リージョン設定を0にすることでリージョンを指定していないマップタイルで適用されます。
  * 
+ * 床ダメージ値は評価式が使用できます。
+ * a：アクター
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/24 Ver.1.0.2
+ * 床ダメージを評価式が使用できるように変更。
  * 2021/10/24 Ver.1.0.1
  * デフォルトの床ダメージ、床ダメージ時のSEを指定できる機能を追加。
  * 2021/10/24 Ver.1.0.0
@@ -33,7 +38,7 @@
  * @text ダメージ床設定
  * @desc ダメージ床設定
  * @type struct<DamagedFloorData>[]
- * @default ["{\"TileSetId\":\"1\",\"DamagedFloorRegion\":\"[\\\"{\\\\\\\"RegionId\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Damage\\\\\\\":\\\\\\\"10\\\\\\\",\\\\\\\"DamagedFloorSE\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"volume\\\\\\\":\\\\\\\"90\\\\\\\",\\\\\\\"pitch\\\\\\\":\\\\\\\"100\\\\\\\",\\\\\\\"pan\\\\\\\":\\\\\\\"50\\\\\\\"}\\\"]\"}"]
+ * @default ["{\"TileSetId\":\"4\",\"DamagedFloorRegion\":\"[\\\"{\\\\\\\"RegionId\\\\\\\":\\\\\\\"0\\\\\\\",\\\\\\\"Damage\\\\\\\":\\\\\\\"10\\\\\\\",\\\\\\\"SE\\\\\\\":\\\\\\\"------------------------------\\\\\\\",\\\\\\\"DamagedFloorSE\\\\\\\":\\\\\\\"Poison\\\\\\\",\\\\\\\"volume\\\\\\\":\\\\\\\"90\\\\\\\",\\\\\\\"pitch\\\\\\\":\\\\\\\"100\\\\\\\",\\\\\\\"pan\\\\\\\":\\\\\\\"50\\\\\\\"}\\\"]\"}"]
  * 
  * @param DamagedFloorFlash
  * @text フラッシュ有効
@@ -43,8 +48,8 @@
  * 
  * @param DefaultDamage
  * @text デフォルトダメージ
- * @desc デフォルト床ダメージ時のダメージ
- * @type number
+ * @desc デフォルト床ダメージ時のダメージ（a：アクター）
+ * @type string
  * @default 10
  * 
  * @param DefaultSE
@@ -106,33 +111,41 @@
  * 
  * @param Damage
  * @text ダメージ
- * @desc 床ダメージ時のダメージ
- * @type number
+ * @desc 床ダメージ時のダメージ（a：アクター）
+ * @type string
  * @default 10
+ * 
+ * @param SE
+ * @text SE設定
+ * @default ------------------------------
  * 
  * @param DamagedFloorSE
  * @text 床ダメージ時SE
  * @desc 床ダメージ時のSE
  * @type file
  * @dir audio/se/
+ * @parent SE
  * 
  * @param volume
  * @text 音量
  * @desc 音量。
  * @type number
  * @default 90
+ * @parent SE
  * 
  * @param pitch
  * @text ピッチ
  * @desc ピッチ。
  * @type number
  * @default 100
+ * @parent SE
  * 
  * @param pan
  * @text 位相
  * @desc 位相。
  * @type number
  * @default 50
+ * @parent SE
  * 
  */
 var Imported = Imported || {};
@@ -142,12 +155,12 @@ Imported.NUUN_DamagedFloorEX = true;
 const parameters = PluginManager.parameters('NUUN_DamagedFloorEX');
 const DamagedFloorList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DamagedFloorList'])) : null) || [];
 const DamagedFloorFlash = eval(parameters['DamagedFloorFlash'] || 'false');
-const DefaultDamage = Number(parameters['DefaultDamage'] || 10);
+const DefaultDamage = String(parameters['DefaultDamage'] || '10');
 const DefaultDamagedFloorSE = String(parameters['DefaultDamagedFloorSE'] || '');
 const DefaultVolume = Number(parameters['DefaultVolume'] || 90);
 const DefaultPitch = Number(parameters['DefaultPitch'] || 100);
 const DefaultPan = Number(parameters['DefaultPan'] || 50);
-
+//フラッシュ指定　地形タグ　床ダメージ独自処理
 let onMapFloorDamage = false;
 let floorDamageRefresh = false;
 
@@ -177,15 +190,16 @@ const _Game_Actor_basicFloorDamage = Game_Actor.prototype.basicFloorDamage;
 Game_Actor.prototype.basicFloorDamage = function() {
   const coreDamage = _Game_Actor_basicFloorDamage.call(this);
   const damagedFloorId = $gameMap._damagedFloorId;
+  const a = this;
   if (damagedFloorId >= 0) {
     const x = $gamePlayer._x;
     const y = $gamePlayer._y;
     const regionId = $gameMap.regionId(x, y);
     const damagedFloorData = DamagedFloorList[$gameMap._damagedFloorId].DamagedFloorRegion || [];
     const mainData = damagedFloorData.find(data => data.RegionId === regionId);
-    return mainData ? mainData.Damage : DefaultDamage || coreDamage;
+    return mainData && mainData.Damage ? eval(mainData.Damage) : DefaultDamage ? eval(DefaultDamage) : coreDamage;
   } else {
-    return DefaultDamage || coreDamage;
+    return DefaultDamage ? eval(DefaultDamage) : coreDamage;
   }
 };
 

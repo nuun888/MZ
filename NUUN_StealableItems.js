@@ -11,6 +11,8 @@
  * @plugindesc 盗みスキル
  * @author NUUN
  * @version 1.3.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * 敵からアイテムやお金を盗むスキルまたは、敵からアイテム、お金を盗まれるスキルを

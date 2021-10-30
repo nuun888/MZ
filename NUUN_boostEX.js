@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 行動時ブースト特徴
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 攻撃時に特定の行動によってダメージを補正する効果を得ることができます。
@@ -60,6 +60,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/10/30 Ver.1.1.1
+ * 属性ブーストの特徴を持つバトラーがスキル攻撃したときにエラーが出る問題を修正。
  * 2021/9/13 Ver.1.1.0
  * 条件付きベースに対応。
  * 2021/8/20 Ver.1.0.0
@@ -143,9 +145,9 @@ Game_Action.prototype.isBoostElement = function(id) {
     if (Imported.NUUN_MultiElement) {
       elementsList = this.getItemElements();
     } else {
-      elementsList = this.item().damage.elementId
+      elementsList = [this.item().damage.elementId];
     }
-  }
+  } 
   return elementsList.some(elementId => elementId === id);
 };
 

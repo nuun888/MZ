@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 

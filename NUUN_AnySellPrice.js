@@ -11,6 +11,8 @@
  * @plugindesc 売値任意設定
  * @author NUUN
  * @version 1.1.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  *            
  * @help
  * アイテム、武器、防具の売値を価格の半分ではなく任意の売値にします。

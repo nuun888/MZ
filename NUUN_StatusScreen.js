@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.5
+ * @version 2.2.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -145,6 +145,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/3 Ver.2.2.6
+ * 最大HP、最大MPを表示できる機能を追加。
  * 2021/10/24 Ver.2.2.5
  * 最初に表示されるページを指定できる機能を追加。
  * 2021/9/19 Ver.2.2.4
@@ -862,6 +864,10 @@
  * @value 17
  * @option ＴＰ
  * @value 19
+ * @option 最大ＨＰ
+ * @value 42
+ * @option 最大ＭＰ
+ * @value 43
  * @option 命中率
  * @value 20
  * @option 回避率
@@ -1550,6 +1556,9 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
     case 41:
       this.drawExpGaugeInfo(list, this._actor, x, y, width);
       break;
+    case 42:
+    case 43:
+      this.drawParams(list, this._actor, x, y, width, list.DateSelect);
     case 50:
       this.drawOriginalStatus(list, this._actor, x, y, width);
       break;
@@ -1655,6 +1664,10 @@ Window_Status.prototype.paramNameShow = function(list, actor, params) {
       return "床ダメージ率";
     case 29:
       return "獲得経験率";
+    case 42:
+      return TextManager.param(0);
+    case 43:
+      return TextManager.param(1);
     default:
       return null;
   }
@@ -1698,6 +1711,10 @@ Window_Status.prototype.paramShow = function(list, actor, params, detaEval) {
     case 28:
     case 29:
       return actor.sparam(params - 20) * 100;
+    case 42:
+      return actor.param(0);
+    case 43:
+      return actor.param(1);
     default:
       return null;
   }
@@ -1729,7 +1746,7 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
       this.changeTextColor(ColorManager.textColor(list.NameColor));
       this.drawText(nameText, x, y, textWidth);
       this.resetTextColor();
-      if (params >= 10) {
+      if (params >= 10 && params < 30) {
         text += list.paramUnit ? String(list.paramUnit) : " %";
       }
       this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');

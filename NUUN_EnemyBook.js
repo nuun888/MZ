@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.9.1
+ * @version 2.9.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -282,6 +282,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/3 Ver.2.9.2
+ * アナライズに成功して、別のスキルを実行しミスしたときにアナライズの失敗時のメッセージが表示される問題を修正。
  * 2021/9/27 Ver.2.9.1
  * 敵の情報に情報登録しているエネミー名に色を付けれる機能を追加。
  * 敵の情報の登録済みエネミー名の色の反映を登録タイミングに関係なく反映するように変更。
@@ -3235,32 +3237,29 @@ Game_Enemy.prototype.makeStealItems = function(rate, mode) {
   return di;
 };
 
-const _Game_Action_apply = Game_Action.prototype.apply
-Game_Action.prototype.apply = function(target) {
-  this._analyzeDate = this.item().meta.AnalyzeSkill ? param.AnalyzeSkillMode[Number(this.item().meta.AnalyzeSkill) - 1] : null;
-  if (this._analyzeDate) {
-    const text = this._analyzeDate.AnalyzeMissMessage
-    if (text) {
-      BattleManager.analyzeMissMessage = text.format(target.name(), this.subject().name())
-    }
-  }
-  _Game_Action_apply.call(this, target);
-};
-
 const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
 Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
   if (target.isEnemy()) {
+  this._analyzeDate = this.item().meta.AnalyzeSkill ? param.AnalyzeSkillMode[Number(this.item().meta.AnalyzeSkill) - 1] : null;
     if (this._analyzeDate) {
+      target.result().analyzeSkill = true;
       const rate = this.item().meta.CertainAnalyze || !target.enemy().meta.AnalyzeResist ? 100 : Number(target.enemy().meta.AnalyzeResist);
       if (Math.floor(Math.random() * 100 >= rate) || target.enemy().meta.NoBookData) {
         target.result().missed = true;
+        BattleManager.analyzeMissMessage = this._analyzeDate.AnalyzeMissMessage.format(target.name(), this.subject().name());
         return;
       }
       BattleManager.analyzeTarget = target;
       SceneManager._scene.enemyBookEnemyAnalyze(this._analyzeDate);
     }
   }
+};
+
+const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
+Game_ActionResult.prototype.clear = function() {
+  _Game_ActionResult_clear.call(this);
+  this.analyzeSkill = false;
 };
 
 //Scene_Menu
@@ -6295,11 +6294,11 @@ Window_Command.prototype.isEnemyInfo = function() {
 
 const _Window_BattleLog_displayMiss =Window_BattleLog.prototype.displayMiss;
 Window_BattleLog.prototype.displayMiss = function(target) {
-  let fmt;
-  if (BattleManager.analyzeMissMessage) {
-    fmt = BattleManager.analyzeMissMessage;
+  if (target.result().analyzeSkill) {
+    const fmt = BattleManager.analyzeMissMessage;
+    this.push("pushBaseLine");
+		this.push("addText", fmt);
     BattleManager.analyzeMissMessage = null;
-    this.push("addText", fmt);
   } else {
     _Window_BattleLog_displayMiss.call(this, target);
   }
@@ -6309,7 +6308,7 @@ const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
   _BattleManager_initMembers.call(this);
   this.analyzeMissMessage = null;
-  BattleManager.analyzeTarget = null;
+  this.analyzeTarget = null;
 };
 
 const _BattleManager_isBusy = BattleManager.isBusy;

@@ -6,14 +6,12 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/12/31 Ver.1.0.0
- * 初版
  */
 /*:
  * @target MZ
  * @plugindesc  アイテム消耗率
  * @author NUUN
+ * @version 1.1.0
  * 
  * @help
  * アイテムに一定の確率で消費するアイテムを作ることが出来ます。
@@ -22,8 +20,10 @@
  * [rate]:確率
  * <ConsumptionRate:50> アイテム使用時に50%の確率で消費します。
  * 
- * <ConsumptionMessage:[Text]]> アイテム消耗時に表示するメッセージ（ログ）を表示します。
+ * <ConsumptionMessage:[Text]> 戦闘時のアイテム消耗時に表示するメッセージ（ログ）を表示します。
  * [Text]:表示メッセージ（ログ）
+ * %1：使用者名
+ * %2：アイテム名
  * 
  * <ConsumptionSE:[name],[volume],[pitch],[pan]>アイテム消耗時に再生するSEを指定します。
  * <ConsumptionSE:Break, 90, 100, 50>アイテム消耗時に「Break」が再生されます。
@@ -32,8 +32,11 @@
  * [pitch]:ピッチ
  * [pan]:位相
  * 
- * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * 更新履歴
+ * 2021/11/3 Ver.1.1.0
+ * メッセージのフォーマットを変更。
+ * 2020/12/31 Ver.1.0.0
+ * 初版
  * 
  */
 var Imported = Imported || {};
@@ -85,8 +88,13 @@ const _Window_BattleLog_displayItemMessage = Window_BattleLog.prototype.displayI
 Window_BattleLog.prototype.displayItemMessage = function(fmt, subject, item) {
   _Window_BattleLog_displayItemMessage.call(this, fmt, subject, item)
   if (BattleManager._ConsumptionMessage) {
-      this.push("addText", item.meta.ConsumptionMessage);
-      BattleManager._ConsumptionMessage = false;
+    this.push("pushBaseLine");
+    this.displayConsumption(subject, item);
+    BattleManager._ConsumptionMessage = false;
   }
+};
+
+Window_BattleLog.prototype.displayConsumption = function(subject, item) {
+  this.push("addText", item.meta.ConsumptionMessage.format(subject.name(), item.name));
 };
 })();

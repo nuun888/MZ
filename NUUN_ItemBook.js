@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.3.0
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -148,6 +148,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2021/11/3 Ver.1.4.0
+ * インフォウィンドウの完成率（アイテム、武器、防具）、情報登録数/全アイテム、武器、防具を表示する機能を追加。
  * 2021/9/28 Ver.1.3.0
  * プラグインコマンドに図鑑完成度、情報登録済みアイテム数を変数に代入する機能を追加。
  * ナンバー表示をカテゴリー順に表示させる機能を追加。
@@ -346,7 +348,7 @@
  * 
  * @param UnknownData
  * @desc 未確認の索引名です。？1文字だけ入れると名前の文字数に応じて？に置き換えられます。
- * @text 未確認エネミー及びアイテム名
+ * @text 未確認アイテム名
  * @type string
  * @default ？
  * @parent BasicSetting
@@ -1197,8 +1199,22 @@
  * @desc 表示する
  * @text 名称、アイテム名表示位置
  * @type select
- * @option 完成度
+ * @option 図鑑完成率
  * @value 0
+ * @option 図鑑アイテム完成率
+ * @value 1
+ * @option 図鑑武器完成率
+ * @value 2
+ * @option 図鑑防具完成率
+ * @value 3
+ * @option 図鑑登録数(登録数/全アイテム、武器、防具)
+ * @value 10
+ * @option 図鑑アイテム登録数(登録数/全アイテム)
+ * @value 11
+ * @option 図鑑武器登録数(登録数/全武器)
+ * @value 12
+ * @option 図鑑防具登録数(登録数/全防具)
+ * @value 13
  * @default 0
  * @parent nameSetting
 *
@@ -2000,19 +2016,29 @@ Window_ItemBook_Percent.prototype.initialize = function(rect) {
   this._percentContentLength = this._percentContent.length;
 };
 
-Window_ItemBook_Percent.prototype.percentRefresh = function(itemList) {
-  this._itemListLength = itemList.length;
-  this.completenessPercent(itemList);
-  //this.encounteredPercent(itemList);
-  //this.registrationPercent(enemyList);
+Window_ItemBook_Percent.prototype.percentRefresh = function() {
+  this.completenessPercent();
   this.refresh();
 };
 
-Window_ItemBook_Percent.prototype.completenessPercent = function(itemList) {
-  //this._itemPercent.getNum = $gameSystem.getItemBookNum(itemList);//取得したアイテムの数
-  this._itemPercent.onData = $gameSystem.getItemBookInfoFlagsNum(itemList);//開示済みのアイテム
-  //this._itemPercent.Percent = Math.floor(this._itemPercent.getNum / this._itemListLength * 100);
-  this._itemPercent.complete = Math.floor(this._itemPercent.onData / this._itemListLength * 100);
+Window_ItemBook_Percent.prototype.completenessPercent = function() {
+  const bookAllItems = $gameSystem.getIsItemBook(getItemData('all'));
+  this._itemPercent._allItemListLength = bookAllItems.length;
+  this._itemPercent._allItemNum = $gameSystem.getItemBookInfoFlagsNum(bookAllItems);
+  const bookItems = $gameSystem.getIsItemBook(getItemData('item'));
+  this._itemPercent._itemListLength = bookItems.length;
+  this._itemPercent._itemNum = $gameSystem.getItemBookInfoFlagsNum(bookItems);
+  const bookWeapons = $gameSystem.getIsItemBook(getItemData('weapon'));
+  this._itemPercent._weaponListLength = bookWeapons.length;
+  this._itemPercent._weaponNum = $gameSystem.getItemBookInfoFlagsNum(bookWeapons);
+  const bookArmors = $gameSystem.getIsItemBook(getItemData('armor'));
+  this._itemPercent._armorListLength = bookArmors.length;
+  this._itemPercent._armorNum = $gameSystem.getItemBookInfoFlagsNum(bookArmors);
+
+  this._itemPercent.allComplete = Math.floor(this._itemPercent._allItemNum / this._itemPercent._allItemListLength * 100);
+  this._itemPercent.itemComplete = Math.floor(this._itemPercent._itemNum / this._itemPercent._itemListLength * 100);
+  this._itemPercent.weaponComplete = Math.floor(this._itemPercent._weaponNum / this._itemPercent._weaponListLength * 100);
+  this._itemPercent.armorComplete = Math.floor(this._itemPercent._armorNum / this._itemPercent._armorListLength * 100);
 };
 
 Window_ItemBook_Percent.prototype.refresh = function() {
@@ -2032,11 +2058,21 @@ Window_ItemBook_Percent.prototype.refresh = function() {
 Window_ItemBook_Percent.prototype.getParam = function(content) {
   switch (content.ContentDate) {
     case 0:
-      return content.ContentName +' : '+ this._itemPercent.complete +' %';
+      return content.ContentName +' : '+ this._itemPercent.allComplete +' %';
     case 1:
-      return content.ContentName +' : '+ this._itemPercent.getNum +'/'+ this._itemListLength;
+      return content.ContentName +' : '+ this._itemPercent.itemComplete +' %';
     case 2:
-      return content.ContentName +' : '+ this._itemPercent.onData +'/'+ this._itemListLength;
+      return content.ContentName +' : '+ this._itemPercent.weaponComplete +' %';
+    case 3:
+      return content.ContentName +' : '+ this._itemPercent.armorComplete +' %';
+    case 10:
+      return content.ContentName +' : '+ this._itemPercent._allItemNum  +'/'+ this._itemPercent._allItemListLength;
+    case 11:
+      return content.ContentName +' : '+ this._itemPercent._itemNum  +'/'+ this._itemPercent._itemListLength;
+    case 12:
+      return content.ContentName +' : '+ this._itemPercent._weaponNum  +'/'+ this._itemPercent._weaponListLength;
+    case 13:
+      return content.ContentName +' : '+ this._itemPercent._armorNum  +'/'+ this._itemPercent._armorListLength;
   }
 };
 
@@ -2111,8 +2147,8 @@ Window_ItemBook_Index.prototype.getItem = function() {
 
 Window_ItemBook_Index.prototype.updatePercent = function() {
   if (this._percentWindow) {
-    const itemList = this._itemPercentList;
-    this._percentWindow.percentRefresh(itemList);
+    //const itemList = this._itemPercentList;
+    this._percentWindow.percentRefresh();
   }
 };
 
@@ -2548,7 +2584,7 @@ Window_ItemBook.prototype.itemNumberOfPossession = function(list, item, x, y, wi
   if(this.paramMask(list.MaskMode)){
     text = list.DetaEval ? eval(list.DetaEval) : $gameParty.numItems(item);
   } else {
-    text = UnknownStatus;
+    text = UnknownItemData;
   }
   this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
 };

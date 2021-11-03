@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.2.3
+ * @version 1.3.0
  *            
  * @help
  * 戦闘でサポートするアクターを設定します。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/3 Ver.1.3.0
+ * プラグインコマンドからサポートアクターを設定できる機能を追加。
  * 2021/8/17 Ver.1.2.3
  * メンバー変更画面反映のための処理追加。
  * 2021/8/11 Ver.1.2.2
@@ -42,6 +44,24 @@
  * セーブ画面のアクター表示にサポートアクターを入れるかの可否する機能を追加。
  * 2021/8/1 Ver.1.0.0
  * 初版
+ * 
+ * @command SupportActorSetting
+ * @desc サポートアクターにするまたは、解除するアクターを設定します。
+ * @text サポートアクター設定
+ * 
+ * @arg Actor
+ * @text アクター
+ * @desc アクターを指定します。
+ * @type actor
+ * @default 0
+ * 
+ * @arg  SupportActorsSwitch
+ * @desc サポートアクターのONまたはOFF（ONでサポートアクター化）。
+ * @text サポートアクタースイッチ
+ * @type boolean
+ * @default true
+ * 
+ * 
  * 
  * @param Window_X
  * @text サポートアクターウィンドウX
@@ -93,6 +113,37 @@ Imported.NUUN_SupportActor = true;
   const Window_Width = Number(parameters['Window_Width'] || 128);
   const SupportActorSV = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SupportActorSV'])) : null) || [];
   const SupportActorMode = eval(parameters['SupportActorMode'] || 'true');
+
+  const pluginName = "NUUN_SupportActor";
+  PluginManager.registerCommand(pluginName, 'SupportActorSetting', args => {
+    const actorId = Number(args.Actor);
+    if (actorId > 0) {
+      $gameActors._data[actorId].setSupportActor(eval(args.SupportActorsSwitch));
+    }
+  });
+
+  const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
+  Game_Actor.prototype.initMembers = function() {
+    _Game_Actor_initMembers.call(this);
+    this._supportActor = false;
+  };
+
+  const _Game_Actor_setup = Game_Actor.prototype.setup;
+  Game_Actor.prototype.setup = function(actorId) {
+    _Game_Actor_setup.call(this, actorId);
+    this._supportActor = this.isSupportActor();
+  };
+
+  Game_Actor.prototype.setSupportActor = function(flag) {
+    this._supportActor = flag;
+  };
+
+  Game_Actor.prototype.getSupportActor = function() {
+    if (!this._supportActor) {
+      this._supportActor = this.isSupportActor();
+    }
+    return this._supportActor;
+  };
 
   Game_Actor.prototype.isSupportActor = function() {
     return this.actor().meta.SupportActor;
@@ -168,11 +219,11 @@ Imported.NUUN_SupportActor = true;
   };
 
   Game_Party.prototype.MainBattleMembers = function(members) {
-    return members.filter(actor => !actor.isSupportActor());
+    return members.filter(actor => !actor.getSupportActor());
   };
 
   Game_Party.prototype.supportBattleMembers = function() {
-    return this.allMembers().filter(actor => actor.isAppeared() && actor.isSupportActor());
+    return this.allMembers().filter(actor => actor.isAppeared() && actor.getSupportActor());
   };
 
   Game_Party.prototype.supportMainBattleMembers = function() {
@@ -180,10 +231,10 @@ Imported.NUUN_SupportActor = true;
     this.membersMode = true;
     const maxMembers = this.battleMembers().length;
     return this.allMembers().slice(0, maxMembers).filter(actor => {
-      if (actor.isAppeared() && !actor.isSupportActor()) {
+      if (actor.isAppeared() && !actor.getSupportActor()) {
       index++;
       }
-      if (actor.isAppeared() && actor.isSupportActor() && this.maxBattleMembers() > index) {
+      if (actor.isAppeared() && actor.getSupportActor() && this.maxBattleMembers() > index) {
         return true;
       }
     },); 
@@ -347,7 +398,7 @@ Imported.NUUN_SupportActor = true;
 
   const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
   Sprite_Actor.prototype.setActorHome = function(index) {
-    if (this._actor.isSupportActor()) {
+    if (this._actor.getSupportActor()) {
       index = this._actor.supportActorindex();
     }
     _Sprite_Actor_setActorHome.call(this, index);
@@ -355,7 +406,7 @@ Imported.NUUN_SupportActor = true;
 
   const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
   Sprite_Actor.prototype.setHome = function(x, y) {
-    if (this._actor.isSupportActor()) {
+    if (this._actor.getSupportActor()) {
       const index = this._actor.supportActorindex();
       if (!SupportActorSV[index]) {
         console.log("ERROR:サポートアクターを表示できません。");

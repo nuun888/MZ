@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.3
+ * @version 2.6.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/10/24 Ver 2.6.4
+ * ゲージの幅が正常に取得できていなかった問題を修正。
  * 2021/10/24 Ver 2.6.3
  * メッセージウィンドウが上に表示された場合はアクターステータスウィンドウを表示したままにするように修正。
  * 2021/10/16 Ver 2.6.2
@@ -250,6 +252,7 @@ param.SkillWindowBackground = param.SkillWindowBackground ? param.SkillWindowBac
 param.EnemyWindowBackground = param.EnemyWindowBackground ? param.EnemyWindowBackground[0] : null;//対象
 param.HelpWindowBackground = param.HelpWindowBackground ? param.HelpWindowBackground[0] : null;//ヘルプ
 param.MessageWindowBackground = param.MessageWindowBackground ? param.MessageWindowBackground[0] : null;//メッセージ
+let battleStyleGauge = null;
 loadNormalPicture(param.actorBackground);
 loadNormalPicture(param.windowBackground);
 loadNormalPicture(param.ActorFrontBackground);
@@ -1049,7 +1052,7 @@ const _Window_PartyCommand_refresh = Window_PartyCommand.prototype.refresh;
 Window_PartyCommand.prototype.refresh = function() {
   _Window_PartyCommand_refresh.call(this);
   const cols = Math.max(param.Default_PartyCommandMaxRow, Math.min(Math.ceil(this.maxItems() / param.PartyCommandMaxCol), param.PartyCommandMaxRow));
-  this.height = this.fittingHeight(cols)
+  this.height = this.fittingHeight(cols);
   if (param.StyleMode === "Default" || param.StyleMode === "MVStyle") {
     this.height = this.fittingHeight(param.Default_PartyCommandMaxRow);
   } else if (param.StyleMode === "XPStyle") {
@@ -1449,23 +1452,13 @@ Window_BattleStatus.prototype.faceRect = function(index) {
   return rect;
 };
 
-
-
-
 Window_BattleStatus.prototype.placeGauge = function(actor, type, x, y) {
-  battleStyleGauge = true;
-  Window_StatusBase.prototype.placeGauge.call(this, actor, type, x, y);
-  const key = "actor%1-gauge-%2".format(actor.actorId(), type);
-  let sprite = null;
-  if (type === 'hp') {
-    sprite = this.createInnerSprite(key, Sprite_BattleHpGauge);
-  } else if (type === 'mp') {
-    sprite = this.createInnerSprite(key, Sprite_BattleMpGauge);
-  } else if (type === 'tp') {
-    sprite = this.createInnerSprite(key, Sprite_BattleTpGauge);
-  } else if (type === 'time') {
-    sprite = this.createInnerSprite(key, Sprite_BattleTpbGauge);
+  battleStyleGauge = type;
+  if (Imported.NUUN_GaugeImage) {
+    this.placeGaugeImg(actor, type, x, y);
   }
+  const key = "actor%1-gauge-%2".format(actor.actorId(), type);
+  const sprite = this.createInnerSprite(key, Sprite_BattleGauge);
   sprite.setup(actor, type);
   sprite.move(x, y);
   sprite.show();
@@ -2729,53 +2722,50 @@ Sprite_BattleGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_BattleGauge.prototype.constructor = Sprite_BattleGauge;
 
 Sprite_BattleGauge.prototype.initialize = function() {
-  Sprite_Gauge.prototype.initialize.call(this);
   this._HPGaugeWidth = param.StyleMode === "MVStyle" ? (param.HPGaugeWidth || ($dataSystem.optDisplayTp ? 108 : 201)) : param.HPGaugeWidth;
   this._MPGaugeWidth = param.StyleMode === "MVStyle" ? (param.MPGaugeWidth || ($dataSystem.optDisplayTp ? 96 : 114)) : param.MPGaugeWidth;
   this._GaugeHeight = 0;
+  Sprite_Gauge.prototype.initialize.call(this);
+};
+
+const _Sprite_BattleGauge_createBitmap = Sprite_BattleGauge.prototype.createBitmap;
+Sprite_BattleGauge.prototype.createBitmap = function() {
+  this._statusType = battleStyleGauge;
+  battleStyleGauge = null;
+  _Sprite_BattleGauge_createBitmap.call(this);
 };
 
 const _Sprite_BattleGauge_setup = Sprite_BattleGauge.prototype.setup;
 Sprite_BattleGauge.prototype.setup = function(battler, statusType) {
-  this.setGaugeHeight(statusType);
+  this.setGaugeHeight();
   _Sprite_BattleGauge_setup.call(this, battler, statusType);
 };
 
 Sprite_BattleGauge.prototype.bitmapWidth = function() {
-  console.log()
-  switch (this._statusType) {
-    case "hp":
-      return this._HPGaugeWidth;
-    case "mp":
-      return this._MPGaugeWidth;
-    case "tp":
-      return param.TPGaugeWidth;
-    case "time":
-    case "cast":
-      return param.TPBGaugeWidth;
-    default:
-      return param.GaugeWidth;
+  if (this._statusType === 'hp') {
+    return this._HPGaugeWidth;
+  } else if (this._statusType === 'mp') {
+    return this._MPGaugeWidth;
+  } else if (this._statusType === 'tp') {
+    return param.TPGaugeWidth;
+  } else if (this._statusType === 'time' || this._statusType === 'cast') {
+    return param.TPBGaugeWidth;
+  } else {
+    return Sprite_Gauge.prototype.bitmapWidth.call(this);
   }
 };
 
-Sprite_BattleGauge.prototype.setGaugeHeight = function(statusType) {
-  switch (statusType) {
-    case "hp":
-      this._GaugeHeight = param.HPGaugeHeight;
-      break;
-    case "mp":
-      this._GaugeHeight = param.MPGaugeHeight;
-      break;
-    case "tp":
-      this._GaugeHeight = param.TPGaugeHeight;
-      break;
-    case "time":
-    case "cast":
-      this._GaugeHeight = param.TPBGaugeHeight;
-      break;
-    default:
-      this._GaugeHeight = 12;
-      break;
+Sprite_BattleGauge.prototype.setGaugeHeight = function() {
+  if (this._statusType === 'hp') {
+    this._GaugeHeight = param.HPGaugeHeight;
+  } else if (this._statusType === 'mp') {
+    this._GaugeHeight = param.MPGaugeHeight;
+  } else if (this._statusType === 'tp') {
+    this._GaugeHeight = param.TPGaugeHeight;
+  } else if (this._statusType === 'time' || this._statusType === 'cast') {
+    this._GaugeHeight = param.TPBGaugeHeight;
+  } else {
+    this._GaugeHeight = Sprite_Gauge.prototype.gaugeHeight.call(this);
   }
 };
 

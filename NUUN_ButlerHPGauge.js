@@ -12,7 +12,7 @@
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -24,7 +24,7 @@
  * <NoHPGauge> HPゲージを表示しません。
  * 
  * バトルイベントの注釈
- * <HPGaugeX:[Id],[x],[y]> 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）
+ * <HPGaugePosition:[Id],[x],[y]> 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）
  * [Id]：表示順番号
  * [x]：X座標
  * [y]：Y座標
@@ -49,6 +49,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/5 Ver.1.3.1
+ * 敵グループからゲージ座標するタグの名前が不自然だったのを変更。
  * 2021/11/5 Ver.1.3.0
  * 敵グループのエネミー毎にゲージの座標を調整できる機能を追加。
  * 2021/9/2 Ver.1.2.7
@@ -537,7 +539,7 @@ BattleManager.hpGaugeVisible = function() {
 function getEnemyGaugePosition(troop) {
   const pages = troop.pages[0];
   list = [];
-  const re = /<(?:HPGaugeX):\s*(.*)>/;
+  const re = /<(?:HPGaugePosition):\s*(.*)>/;
   pages.list.forEach(tag => {
     if (tag.code === 108 || tag.code === 408) {
       let match = re.exec(tag.parameters[0]);

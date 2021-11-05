@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  戦闘中アイテム、スキル選択画面MV風表示
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
@@ -20,6 +20,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/11/5 Ver.1.1.1
+ * キャンセルボタンの表示がスキル、アイテムウィンドウが開いていなくても一番上に表示されてしまう問題を修正。
  * 2021/11/5 Ver.1.1.0
  * 画面下まで表示できる機能を追加。
  * 可変モードでスキル及びアイテムが１つもない場合、１行分表示されるように修正。
@@ -96,11 +98,19 @@ Scene_Battle.prototype.itemSkillWindowMaxHeight = function(y) {
   }
 };
 
+const _Scene_Battle_createCancelButton = Scene_Battle.prototype.createCancelButton;
+Scene_Battle.prototype.createCancelButton = function() {
+  _Scene_Battle_createCancelButton.call(this);
+  this._originalCancelButtonY = this._cancelButton.y;
+};
+
 const _Scene_Battle_updateCancelButton = Scene_Battle.prototype.updateCancelButton;
 Scene_Battle.prototype.updateCancelButton = function() {
   _Scene_Battle_updateCancelButton.call(this);
-  if (this._cancelButton) {  
+  if (this._cancelButton && this._skillWindow.visible || this._itemWindow.visible) {  
     this._cancelButton.y = 0;
+  } else {
+    this._cancelButton.y = this._originalCancelButtonY;
   }
 };
 

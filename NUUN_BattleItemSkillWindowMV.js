@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  戦闘中アイテム、スキル選択画面MV風表示
  * @author NUUN
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
@@ -20,6 +20,10 @@
  * 
  * 
  * 更新履歴
+ * 2021/11/5 Ver.1.1.0
+ * 画面下まで表示できる機能を追加。
+ * 可変モードでスキル及びアイテムが１つもない場合、１行分表示されるように修正。
+ * キャンセルボタンの位置を変更。
  * 2021/2/3 Ver.1.0.2
  * マップ上でアイテム、スキル画面を表示した時、戦闘時の画面が表示されてしまう問題を修正。
  * 2021/2/1 Ver.1.0.1
@@ -34,9 +38,15 @@
  * @default 6
  * @min 1
  * 
+ * @param FullWindowHeight
+ * @text 画面下まで表示
+ * @desc ウィンドウを画面下まで表示出来るようにします。（通常はアクターウィンドウまで）
+ * @type boolean
+ * @default false
+ * 
  * @param VariableHeight
  * @text 縦幅可変
- * @desc 縦幅を可変にする。
+ * @desc 縦幅をアイテム、スキルの個数によって高さを変えます。
  * @type boolean
  * @default false
  * 
@@ -49,6 +59,7 @@ Imported.NUUN_BattleItemSkillWindowMV = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_BattleItemSkillWindowMV');
 const VariableHeight = eval(parameters['VariableHeight'] || "false");
+const FullWindowHeight = eval(parameters['FullWindowHeight'] || "false");
 const ItemMaxRow = Number(parameters['ItemMaxRow'] || 6);
 let maxHeight = 0;
 
@@ -60,51 +71,37 @@ Scene_Battle.prototype.initialize = function() {
 const _Scene_Battle_skillWindowRect = Scene_Battle.prototype.skillWindowRect;
 Scene_Battle.prototype.skillWindowRect = function() {
   const rect = _Scene_Battle_skillWindowRect.call(this);
-  rect.y = this._helpWindow.height;
-  maxHeight = Math.min(this.calcWindowHeight(ItemMaxRow, true), Graphics.boxHeight - rect.y - this.windowAreaHeight());
+  rect.y = this._helpWindow.height + this.itemSkillWindowButtonAreaHeight();
+  maxHeight = Math.min(this.calcWindowHeight(ItemMaxRow, true), this.itemSkillWindowMaxHeight());
   rect.height = maxHeight;
   return rect;
 };
 
-const _Window_ItemList_refresh = Window_ItemList.prototype.refresh;
-Window_ItemList.prototype.refresh = function() {
-  _Window_ItemList_refresh.call(this);
-  if (VariableHeight && $gameParty.inBattle()) {
-    this.height = Math.min(maxHeight, this.itemHeight() * Math.ceil(this.maxItems() / this.maxCols()) + $gameSystem.windowPadding() * 2);
-  }
+const _Scene_Battle_helpWindowRect = Scene_Battle.prototype.helpWindowRect;
+Scene_Battle.prototype.helpWindowRect = function() {
+  const rect = _Scene_Battle_helpWindowRect.call(this);
+  rect.y = this.itemSkillWindowButtonAreaHeight();
+  return rect;
 };
 
-const _Window_SkillList_refresh = Window_SkillList.prototype.refresh;
-Window_SkillList.prototype.refresh = function() {
-  _Window_SkillList_refresh.call(this);
-  if (VariableHeight && $gameParty.inBattle()) {
-    this.height = Math.min(maxHeight, this.itemHeight() * Math.ceil(this.maxItems() / this.maxCols()) + $gameSystem.windowPadding() * 2);
-  }
+Scene_Battle.prototype.itemSkillWindowButtonAreaHeight = function() {
+  return ConfigManager.touchUI ? this.buttonAreaHeight() - Math.floor((this.buttonAreaHeight() - 48) / 2) : 0;
 };
 
-const _Scene_Battle_createCancelButton = Scene_Battle.prototype.createCancelButton;
-Scene_Battle.prototype.createCancelButton = function() {
-  _Scene_Battle_createCancelButton.call(this);
-  cancelButton_y = this.buttonY();
+Scene_Battle.prototype.itemSkillWindowMaxHeight = function() {
+  if (FullWindowHeight) {
+    return Graphics.boxHeight - this._helpWindow.height - this.windowAreaHeight();
+  } else {
+    return Graphics.boxHeight - rect.y - this.windowAreaHeight();
+  }
 };
 
 const _Scene_Battle_updateCancelButton = Scene_Battle.prototype.updateCancelButton;
 Scene_Battle.prototype.updateCancelButton = function() {
   _Scene_Battle_updateCancelButton.call(this);
   if (this._cancelButton) {  
-    this._cancelButton.y = this.buttonY();
+    this._cancelButton.y = 0;
   }
-};
-
-const _Scene_Battle_buttonY = Scene_Battle.prototype.buttonY;
-Scene_Battle.prototype.buttonY = function() {
-  const y = _Scene_Battle_buttonY.call(this);
-  if (this._skillWindow.visible) {
-    return y + this._skillWindow.height;
-  } else if (this._itemWindow.visible) {
-    return y + this._itemWindow.height;
-  }
-  return y;
 };
 
 const _Scene_Battle_commandSkill = Scene_Battle.prototype.commandSkill;
@@ -113,7 +110,7 @@ Scene_Battle.prototype.commandSkill = function() {
   if (!this._statusWindow.visible) {
     this._statusWindow.show();
   }
-  if (!this._actorCommandWindow.visible && !ConfigManager.touchUI) {
+  if (!this._actorCommandWindow.visible) {
     this._actorCommandWindow.show();
   }
 };
@@ -124,8 +121,25 @@ Scene_Battle.prototype.commandItem = function() {
   if (!this._statusWindow.visible) {
     this._statusWindow.show();
   }
-  if (!this._actorCommandWindow.visible && !ConfigManager.touchUI) {
+  if (!this._actorCommandWindow.visible) {
     this._actorCommandWindow.show();
   }
 };
+
+const _Window_BattleSkill_refresh = Window_BattleSkill.prototype.refresh;
+Window_BattleSkill.prototype.refresh = function() {
+  _Window_BattleSkill_refresh.call(this);
+  if (VariableHeight) {
+    this.height = Math.min(maxHeight, this.fittingHeight(Math.max(Math.ceil(this.maxItems() / this.maxCols()), 1)));
+  }
+};
+
+const _Window_BattleItem_refresh = Window_ItemList.prototype.refresh;
+Window_BattleItem.prototype.refresh = function() {
+  _Window_BattleItem_refresh.call(this);
+  if (VariableHeight) {
+    this.height = Math.min(maxHeight, this.fittingHeight(Math.max(Math.ceil(this.maxItems() / this.maxCols()), 1)));
+  }
+};
+
 })();

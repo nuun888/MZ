@@ -90,7 +90,7 @@ Scene_Battle.prototype.itemSkillWindowButtonAreaHeight = function() {
 
 Scene_Battle.prototype.itemSkillWindowMaxHeight = function(y) {
   if (FullWindowHeight) {
-    return Graphics.boxHeight - this._helpWindow.height - this.windowAreaHeight();
+    return Graphics.boxHeight - y;
   } else {
     return Graphics.boxHeight - y - this.windowAreaHeight();
   }

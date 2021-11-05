@@ -72,7 +72,7 @@ const _Scene_Battle_skillWindowRect = Scene_Battle.prototype.skillWindowRect;
 Scene_Battle.prototype.skillWindowRect = function() {
   const rect = _Scene_Battle_skillWindowRect.call(this);
   rect.y = this._helpWindow.height + this.itemSkillWindowButtonAreaHeight();
-  maxHeight = Math.min(this.calcWindowHeight(ItemMaxRow, true), this.itemSkillWindowMaxHeight());
+  maxHeight = Math.min(this.calcWindowHeight(ItemMaxRow, true), this.itemSkillWindowMaxHeight(rect.y));
   rect.height = maxHeight;
   return rect;
 };
@@ -88,11 +88,11 @@ Scene_Battle.prototype.itemSkillWindowButtonAreaHeight = function() {
   return ConfigManager.touchUI ? this.buttonAreaHeight() - Math.floor((this.buttonAreaHeight() - 48) / 2) : 0;
 };
 
-Scene_Battle.prototype.itemSkillWindowMaxHeight = function() {
+Scene_Battle.prototype.itemSkillWindowMaxHeight = function(y) {
   if (FullWindowHeight) {
     return Graphics.boxHeight - this._helpWindow.height - this.windowAreaHeight();
   } else {
-    return Graphics.boxHeight - rect.y - this.windowAreaHeight();
+    return Graphics.boxHeight - y - this.windowAreaHeight();
   }
 };
 

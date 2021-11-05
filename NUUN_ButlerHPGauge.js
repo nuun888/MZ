@@ -12,7 +12,7 @@
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.3.1
+ * @version 1.3.2
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -49,10 +49,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/6 Ver.1.3.2
+ * 不要な処理を削除。
  * 2021/11/5 Ver.1.3.1
  * 敵グループからゲージ座標するタグの名前が不自然だったのを変更。
  * 2021/11/5 Ver.1.3.0
- * 敵グループのエネミー毎にゲージの座標を調整できる機能を追加。
+ * 敵グループのモンスター毎にゲージの座標を調整できる機能を追加。
  * 2021/9/2 Ver.1.2.7
  * 中心に表示する機能を追加。
  * 2021/8/31 Ver.1.2.6
@@ -236,9 +238,6 @@ Sprite_Enemy.prototype.initMembers = function() {
 const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
 Sprite_Enemy.prototype.updateBitmap = function() {
   _Sprite_Enemy_updateBitmap.call(this);
-  //if (this._enemy && this._enemy.showHpGauge && HPPosition >= 0) {
-  //  this.updateHpGauge();
-  //}
 };
 
 Sprite_Enemy.prototype.updateHpGauge = function() {
@@ -266,9 +265,6 @@ Sprite_Enemy.prototype.setHPGaugePosition = function(x, y) {
 Sprite_Enemy.prototype.enemyHPGauge = function() {
   const butlerGaugeBase = BattleManager.gaugeBaseSprite;
   if (this._enemy.showHpGauge) {
-    if (Imported.NUUN_GaugeImage) {
-      this.createGaugeImg(butlerGaugeBase, 'hp');
-    }
     const sprite = new Sprite_EnemyHPGauge();
     butlerGaugeBase.addChild(sprite);
     sprite.setup(this._enemy, "hp");

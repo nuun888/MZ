@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  戦闘背景変更プラグイン
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 戦闘背景をリージョン、地形タグによって変更及び、敵グループごとに設定することが出来ます。
@@ -38,6 +38,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/5 Ver.1.1.1
+ * バトル背景サイズ調整の仕様を変更。
  * 2021/6/27 Ver.1.1.0
  * 背景画像の位置を調整する機能を追加。
  * 戦闘中に戦闘背景を変更できる機能を追加。
@@ -69,10 +71,24 @@
  * @text 基本設定
  * 
  * @param BackgroundFit
- * @desc バトル背景を画面サイズに合わせる。(フロントビューのみ)
- * @text 画面サイズ調整
- * @type boolean
- * @default false
+ * @desc バトル背景を表示モードを設定します。
+ * @text バトル背景サイズ調整
+ * @type select
+ * @option 通常
+ * @value 'Normal'
+ * @option 画面に合わせる
+ * @value 'Fit'
+ * @option サイズ調整しない
+ * @value 'NoResize'
+ * @default 'Normal'
+ * @parent Setting
+ * 
+ * @param BackgroundRatio
+ * @desc NoResize選択時のバトル背景の補正倍率。
+ * @text 補正倍率(NoResize選択時のみ)
+ * @type number
+ * @default 100
+ * @min 0
  * @parent Setting
  * 
  * @param BackgroundPosition
@@ -1578,12 +1594,19 @@ Sprite_Battleback.prototype.shipBattleback2Name = function() {
 const _Sprite_Battleback_adjustPosition = Sprite_Battleback.prototype.adjustPosition;
   Sprite_Battleback.prototype.adjustPosition = function() {
     _Sprite_Battleback_adjustPosition.call(this);
-    if (param.BackgroundFit && !$gameSystem.isSideView()){
+    if (param.BackgroundFit === 'Fit') {
       this.width = this.bitmap.width;
       this.height = this.bitmap.height;
       this.x = 0;
       this.scale.x = Graphics.width / this.bitmap.width;
       this.scale.y = Graphics.height / this.bitmap.height;
+    } else if (param.BackgroundFit === 'NoResize') {
+      this.width = this.bitmap.width;
+      this.height = this.bitmap.height;
+      const scale = param.BackgroundRatio / 100;
+      this.x = (Graphics.width - this.bitmap.width * scale) / 2;
+      this.scale.x = 1.0 * scale;
+      this.scale.y = 1.0 * scale;
     }
     this.y += param.BackgroundPosition;
   };

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 複数属性
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * アイテム、スキルに複数の属性を設定できます。
@@ -24,6 +24,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/7 Ver.1.0.1
+ * 一部の処理の修正。
  * 2021/8/8 Ver.1.0.0
  * 初版
  * 
@@ -36,10 +38,18 @@ const parameters = PluginManager.parameters('NUUN_MultiElement');
 
 Game_Action.prototype.calcElementRate = function(target) {//再定義
   if (this.item().damage.elementId < 0) {
-    return this.elementsMaxRate(target, this.getAttackElements());
+    return this.getAttackElementsRate(target);
   } else {
-    return this.elementsMaxRate(target, this.getItemElements());
+    return this.getItemElementsRate(target);
   }
+};
+
+Game_Action.prototype.getAttackElementsRate = function(target) {
+  return this.elementsMaxRate(target, this.getAttackElements());
+};
+
+Game_Action.prototype.getItemElementsRate = function(target) {
+  return this.elementsMaxRate(target, this.getItemElements());
 };
 
 Game_Action.prototype.getAttackElements = function() {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/7 Ver.1.3.1
+ * 複数属性取得に関しての処理追加。
  * 2021/8/22 Ver.1.3.0
  * Window_ItemListに処理を追加。
  * 2021/7/15 Ver.1.2.0
@@ -41,7 +43,7 @@
  */
 var Imported = Imported || {};
 Imported.NUUN_Base = true;
-const NUUN_Base_Ver = 113;
+const NUUN_Base_Ver = 130;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Base');
@@ -179,6 +181,14 @@ Window_ItemList.prototype.initialize = function(rect) {
 
 Window_ItemList.prototype.isConstructor = function() {
   return false;
+};
+
+Game_Action.prototype.getAttackElementsList = function() {
+  return Imported.NUUN_MultiElement ? this.getAttackElements() : this.subject().attackElements();
+};
+
+Game_Action.prototype.getItemElementsList = function() {
+  return Imported.NUUN_MultiElement ? this.getItemElements() : [this.item().damage.elementId];
 };
 
 })();

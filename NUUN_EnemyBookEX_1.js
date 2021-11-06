@@ -10,19 +10,25 @@
  * @target MZ
  * @plugindesc 耐性無効弱点表示で受けた事のある属性、ステート、デバフのみ表示（モンスター図鑑拡張）
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_EnemyBook
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_EnemyBook
  * 
  * @help
  * モンスター図鑑の属性、ステート、デバフ耐性無効弱点の表示を、受けた事のある属性、ステート、デバフのみ表示するようにします。
  * 複数属性（NUUN_MultiElement）を導入している場合はこのプラグインを複数属性（NUUN_MultiElement）に配置してください。
  * 
  * このプラグインはモンスター図鑑（NUUN_EnemyBook）の拡張機能です。
+ * このプラグインはNUUN_Base Ver.1.3.1以降が必要です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/7 Ver.1.0.1
+ * 複数属性取得に関しての処理の変更。
  * 2021/8/13 Ver.1.0.0
  * 初版
  * 
@@ -36,23 +42,14 @@ const parameters = PluginManager.parameters('NUUN_EnemyBookEX_1');
 const _Game_Action_calcElementRate = Game_Action.prototype.calcElementRate;
 Game_Action.prototype.calcElementRate = function(target) {
   if (target.isEnemy()) {  
-    if (Imported.NUUN_MultiElement) {
-      if (this.item().damage.elementId < 0) {
-        this.enemyBookAttackElementDate(target, this.getAttackElements());
-      } else {
-        this.enemyBookAttackElementDate(target, this.getItemElements());
-      }
+    if (this.item().damage.elementId < 0) {
+      this.enemyBookAttackElementDate(target, this.getAttackElementsList());
     } else {
-      if (this.item().damage.elementId < 0) {
-        this.enemyBookAttackElementDate(target, this.subject().attackElements());
-      } else {
-        $gameSystem.setEnemyBookElementFlag(target.enemyId(), this.item().damage.elementId, true);
-      }
+      this.enemyBookAttackElementDate(target, this.getItemElementsList());
     }
   }
   return _Game_Action_calcElementRate.call(this, target);
 };
-
 
 Game_Action.prototype.enemyBookAttackElementDate = function(target, element) {
   for (const elementId of element) {

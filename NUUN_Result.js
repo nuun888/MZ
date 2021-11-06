@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.12.4
+ * @version 1.13.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -82,6 +82,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/6 Ver.1.13.0
+ * レベルアップ画面のヘルプウィンドウにレベルアップ時のテキストを表示させる機能を追加。
  * 2021/9/19 Ver.1.12.4
  * コアスクリプトVer.1.3.3による修正。
  * 2021/8/9 Ver.1.12.3
@@ -406,7 +408,22 @@
  * @value "center"
  * @option 右
  * @value "right"
- * @default center
+ * @default 'center'
+ * @parent HelpWindowSetting
+ * 
+ * @param LevelUpResultTextPosition
+ * @desc レベルアップ画面の戦闘結果の文字の表示位置を指定します。
+ * @text レベルアップ画面戦闘結果文字の位置
+ * @type select
+ * @option 制御文字使用可(左揃え)
+ * @value "TextEx"
+ * @option 左
+ * @value "left"
+ * @option 中央
+ * @value "center"
+ * @option 右
+ * @value "right"
+ * @default 'TextEx'
  * @parent HelpWindowSetting
  * 
  * @param SkinSetting
@@ -884,6 +901,13 @@
  * @desc 戦闘結果の名称を設定します。
  * @type string
  * @default 戦闘結果
+ * @parent NameSetting
+ * 
+ * @param LevelUpResultHelpName
+ * @desc レベルアップ画面表示時の戦闘結果のテキストを設定します。%1：アクター名　%2：レベル
+ * @text レベルアップ画面表示時戦闘結果テキスト
+ * @type string
+ * @default %1は\c[16]レベル\c[17]%2\c[0]に上がった！
  * @parent NameSetting
  * 
  * @param GetEXPName
@@ -1420,7 +1444,7 @@ Scene_Battle.prototype.createActorResultWindow = function() {
 
 Scene_Battle.prototype.actorResultWindowRect = function() {
   const wx = (param.ResultWindowCenter ? (param.LevelUpResultWidth > 0 ? (Graphics.boxWidth - param.LevelUpResultWidth) / 2 : 0) : (Graphics.boxWidth - Graphics.width) / 2) + param.LevelUpResultWindow_X;
-  const wy = this.resultHelpAreaTop();
+  const wy = this.resultHelpAreaTop() + this.resultHelpAreaHeight();
   const ww = param.LevelUpResultWidth > 0 ? param.LevelUpResultWidth : Graphics.boxWidth;
   const wh = (param.LevelUpResultHeight > 0 ? param.LevelUpResultHeight : Graphics.boxHeight) - wy + param.LevelUpResultWindow_Y;
   return new Rectangle(wx, wy, ww, wh);
@@ -1529,12 +1553,14 @@ Scene_Battle.prototype.onResultOk = function() {
     this.backGroundActorShow();
     BattleManager.resultPage++;
     this._resultDropItemWindow.page = 0;
-    this._resultHelpWindow.hide();
+    //this._resultHelpWindow.hide();
     this._resultWindow.hide();
     this._resultDropItemWindow.hide();
     this._resultLearnSkillWindow.show();
     this._actorResultWindow.show();
     this._actorResultWindow.refresh();
+    this._resultHelpWindow.onLevelUpText();
+    this._resultHelpWindow.setLavelUpText(this._actorResultWindow._actor);
     this._resultLearnSkillWindow.refresh();
     this._actorResultWindow.activate();
     BattleManager.resultRefresh = param.ActorPageRefreshFrame;
@@ -1554,6 +1580,7 @@ Scene_Battle.prototype.resultOpen = function() {
   this.closeStatusWindow();
   this.backGroundPartyShow();
   this._resultWindow.activate();
+  this._resultHelpWindow.setText(param.ResultName)
   this._resultHelpWindow.show();
   this._resultWindow.show();
   this._resultDropItemWindow.show();
@@ -1820,15 +1847,8 @@ Window_ResultHelp.prototype.initialize = function(rect) {
   Window_Help.prototype.initialize.call(this, rect);
   this.openness = 0;
   this.openOpacity = 0;
+  this._mode = 0;
   this.refresh();
-};
-
-Window_ResultHelp.prototype.refresh = function() {
-  if (param.ResultName) {
-    const rect = this.baseTextRect();
-    this.contents.clear();
-    this.drawText(param.ResultName, rect.x, rect.y, rect.width, param.ResultTextPosition);
-  }
 };
 
 const _Window_ResultHelp_updateOpen = Window_ResultHelp.prototype.updateOpen;
@@ -1847,6 +1867,35 @@ const _Window_ResultHelp_isOpen = Window_ResultHelp.prototype.isOpen;
 Window_ResultHelp.prototype.isOpen = function() {
   return param.ResultFadein ? this.openOpacity >= 255 : _Window_ResultHelp_isOpen.call(this);
 };
+
+Window_Help.prototype.refresh = function() {
+  const rect = this.baseTextRect();
+  this.contents.clear();
+  if (this._mode === 0) {
+    this.drawText(this._text, rect.x, rect.y, rect.width, param.ResultTextPosition);
+  } else {
+    if (param.LevelUpResultTextPosition === 'TextEx') {
+      this.drawTextEx(this._text, rect.x, rect.y, rect.width);
+    } else {
+      this.drawText(this._text, rect.x, rect.y, rect.width, param.LevelUpResultTextPosition);
+    }
+  }
+};
+
+Window_ResultHelp.prototype.setLavelUpText = function(actor) {
+  let text = '';
+  if (param.LevelUpResultHelpName) {
+    text = param.LevelUpResultHelpName.format(actor.name(), actor._level);
+  } else {
+    text = 'レベルアップ！'
+  }
+  this.setText(text);
+};
+
+Window_ResultHelp.prototype.onLevelUpText = function() {
+  this._mode = 1;
+};
+
 
 function Window_Result() {
   this.initialize(...arguments);

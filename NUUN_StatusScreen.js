@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.6
+ * @version 2.2.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -145,6 +145,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/7 Ver.2.2.7
+ * 立ち絵の切り替え機能が機能していなかった問題を修正。
  * 2021/11/3 Ver.2.2.6
  * 最大HP、最大MPを表示できる機能を追加。
  * 2021/10/24 Ver.2.2.5
@@ -233,7 +235,7 @@
  * 
  * 
  * @command ChangeStartPage
- * @desc 表示させる開始ページを変更します。。
+ * @desc 表示させる開始ページを変更します。
  * @text 開始ページ変更
  * 
  * @arg StartPage
@@ -241,6 +243,24 @@
  * @default 0
  * @text 開始ページ
  * @desc 開始ページ。0でデフォルトになります。
+ * 
+ * @command ChangeStatusActorImg
+ * @desc ステータス画面のアクター画像を変更します。
+ * @text ステータス画面アクター画像変更
+ * 
+ * @arg actorId
+ * @type actor
+ * @default 0
+ * @desc アクターを指定します。
+ * @text アクターID
+ * 
+ * @arg ChangeActorImgId
+ * @type number
+ * @default 1
+ * @min 1
+ * @desc 変更する立ち絵のIDを指定します。立ち絵設定の画像設定のリスト番号を指定します。
+ * @text 立ち絵ID
+ * 
  * 
  * @param Setting
  * @text 共通設定
@@ -675,24 +695,6 @@
  * @min -9999
  * @parent StateRadarChart
  * 
- * 
- * @command ChangeStatusActorImg
- * @desc ステータス画面のアクター画像を変更します。
- * @text ステータス画面アクター画像変更
- * 
- * @arg actorId
- * @type actor
- * @default 0
- * @desc アクターを指定します。
- * @text アクターID
- * 
- * @arg ChangeActorImgId
- * @type number
- * @default 1
- * @min 1
- * @desc 変更する立ち絵のIDを指定します。
- * @text 立ち絵ID
- * 
  */
 /*~struct~RadarChartParamList:
  * 
@@ -742,7 +744,7 @@
  * 
  * @param ActorImg
  * @text アクター画像
- * @desc アクターの画像を表示します。
+ * @desc アクターの画像を表示します。立ち絵を切り替える場合はリストに画像を設定してください。
  * @type file[]
  * @dir img/
  * @default 

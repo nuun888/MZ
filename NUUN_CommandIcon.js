@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc コマンド拡張
  * @author NUUN
- * @version 1.2.4
+ * @version 1.2.5
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -27,10 +27,14 @@
  * Window_Command.prototype.drawItem内にconsole.log(this)を記入することでクラス名が分かります。(F12)
  * 反映させられるクラスはWindow_Commandを継承しているクラスのみとなります。
  * 
+ * コマンドの色はテキストタブでカラーコードを記入できます。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/7 Ver 1.2.5
+ * カラーコードで指定できるように修正。
  * 2021/10/23 Ver 1.2.4
  * プラグインパラメータの説明を修正及びメニューコマンド内の項目のみ初期設定に追加。
  * 2021/9/11 Ver 1.2.3
@@ -93,7 +97,7 @@
  * 
  * @param CommadNameColor
  * @text コマンド名の色
- * @desc コマンド名のカラーインデックス番号。
+ * @desc コマンド名のカラーインデックス番号。テキストタブでカラーコードが入力できます。
  * @type number
  * @default 0
  * @min 0
@@ -152,6 +156,12 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
   }
 }));
 
+const _Window_Command_initialize = Window_Command.prototype.initialize;
+Window_Command.prototype.initialize = function(rect) {
+  _Window_Command_initialize.call(this, rect);
+  this._commadName = null;
+};
+
 const _Window_Command_itemTextAlign = Window_Command.prototype.itemTextAlign;
 Window_Command.prototype.itemTextAlign = function() {
   switch (param.CommandPosition) {
@@ -176,36 +186,44 @@ Window_HorzCommand.prototype.itemTextAlign = function() {
   }
 };
 
-const _Window_Command_drawItem = Window_Command.prototype.drawItem;
-Window_Command.prototype.drawItem = function(index) {
-  const commadName = this.commandName(index);
+const _Window_Command_drawText = Window_Command.prototype.drawText;
+Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
+  const commadName = this._commadName;
   const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
-  if(foundIndex >= 0) {
+  if (foundIndex >= 0) {
     const commadData = param.CommadIcon[foundIndex];
-    const rect = this.itemLineRect(index);
-    const align = this.itemTextAlign();
-    const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+    const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
     const textMargin = commadData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
     const textWidth = this.textWidth(commadName);
-    const itemWidth = Math.max(0, rect.width - textMargin);
-    const width = Math.min(itemWidth, textWidth);
+    const itemWidth = Math.max(0, maxWidth - textMargin);
+    width = Math.min(itemWidth, textWidth);
     const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;
-    this.changeTextColor(ColorManager.textColor(color));
-    this.changePaintOpacity(this.isCommandEnabled(index));
+    let colorCode = null;
+    if (color && typeof(color) === "string" && color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) !== null) {
+      colorCode = color;
+    } else {
+      colorCode = ColorManager.textColor(color);
+    }
+    this.changeTextColor(colorCode);
     if(commadData.iconId > 0) {
       if(align === 'center') {
-        this.drawIcon(commadData.iconId, rect.x + (rect.width / 2 - width / 2) - textMargin / 2, iconY);
+        this.drawIcon(commadData.iconId, x + (maxWidth / 2 - width / 2) - textMargin / 2, iconY);
       } else if (align === 'left') {
-        this.drawIcon(commadData.iconId, rect.x, iconY);
+        this.drawIcon(commadData.iconId, x, iconY);
       } else {
-        this.drawIcon(commadData.iconId, rect.x + itemWidth - width, iconY);
+        this.drawIcon(commadData.iconId, x + itemWidth - width, iconY);
       }
     }
-    this.drawText(commadName, rect.x + textMargin, rect.y, itemWidth, align);
-    this.resetTextColor();
-  } else {
-    _Window_Command_drawItem.call(this, index);
+    x += textMargin;
+    maxWidth = itemWidth;
   }
+  _Window_Command_drawText.call(this, text, x, y, maxWidth, align);
+};
+
+const _Window_Command_drawItem = Window_Command.prototype.drawItem;
+Window_Command.prototype.drawItem = function(index) {
+  this._commadName = this.commandName(index);
+  _Window_Command_drawItem.call(this, index);
 };
 
 Window_Command.prototype.isClass = function(Command, mode) {

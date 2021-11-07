@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 巨大エネミー
  * @author NUUN
- * @version 1.1.5
+ * @version 1.2.0
  *            
  * @help エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
  * エネミーのメモ欄に以下のいずれかを記入してください。
@@ -23,10 +23,20 @@
  * オプションタグ　エネミーのメモ欄
  * <BigEnemyFront> 画像を一番手前側に表示させます。
  * <BigEnemyBack> 画像を一番後ろ側に表示させます。
+ * <BigEnemyY:[y]> Y座標をシフトして表示します。
+ * 例
  * <BigEnemyY:50> Y座標を50下にシフトして表示します。
  * 
- * オプション
- * <CorrectionScale:1.1> 拡大率の補正を行います。
+ * <BigEnemyDamageX:[x]> ダメージエフェクトのX座標を調整します。
+ * <BigEnemyDamageX:[y]> ダメージエフェクトのY座標を調整します。
+ * [x]：X座標(相対)
+ * [y]：Y座標(相対)
+ * 
+ * <CorrectionScale:[scale]> 拡大率の補正を行います。
+ * [scale]：倍率
+ * 例
+ * <CorrectionScale:1.1>
+ * 
  * 
  * 仕様
  * BigEnemy及びBigEnemy:OriginalRatioは画面の横サイズに合わせて拡大されます。
@@ -37,6 +47,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/7 Ver.1.2.0
+ * ダメージエフェクトを調整できる機能を追加。
+ * 一部の計算が間違っていたため修正。
+ * 2021/6/31 Ver.1.1.6
+ * Ver.1.3.0以降で敵の画像が想定よりも大きく拡大されてしまう問題を修正。
  * 2021/5/31 Ver.1.1.5
  * モンスターが出現していないときは、拡大率のアップデートをしないように修正。
  * 2021/5/30 Ver.1.1.4
@@ -111,7 +126,7 @@ Imported.NUUN_BigEnemy = true;
     const bitmap = this.bitmap;
     const correctionScale = this._enemy.enemy().meta.CorrectionScale;
     if (this._bigEnemy === "UnderPosition") {
-      this._homeY = Graphics.height + 20;
+      this._homeY = Graphics.height - 28;
       this._originalscaleX = this.scale.x * (correctionScale || 1);
       this._originalscaleY = this.scale.y * (correctionScale || 1);
     } else {
@@ -151,10 +166,20 @@ Imported.NUUN_BigEnemy = true;
   Sprite_Enemy.prototype.updateStateSprite = function() {
     _Sprite_Enemy_updateStateSprite.call(this);
     if(this._bigEnemy && this._bigEnemy !== "UnderPosition"){
+      const correctionScale = this._enemy.enemy().meta.CorrectionScale;console.log(this.scale.x)
       this._stateIconSprite.y = (40 - this.y) / this.scale.y;
-      this._stateIconSprite.scale.x = 1 / this.scale.x;
+      this._stateIconSprite.scale.x = 1 / this.scale.x * 0.5;
       this._stateIconSprite.scale.y = 1 / this.scale.y;
     }
+  };
+
+  const _Sprite_Enemy_damageOffsetX = Sprite_Enemy.prototype.damageOffsetX;
+  Sprite_Enemy.prototype.damageOffsetX = function() {
+    let x = _Sprite_Enemy_damageOffsetX.call(this);
+    if (this._bigEnemy) {
+      x += Number(this._enemy.enemy().meta.BigEnemyDamageX) || 0;
+    }
+    return x;
   };
 
   const _Sprite_Enemy_damageOffsetY = Sprite_Enemy.prototype.damageOffsetY;
@@ -168,6 +193,7 @@ Imported.NUUN_BigEnemy = true;
       } else {
         y -= Graphics.boxHeight / 2
       }
+      y += Number(this._enemy.enemy().meta.BigEnemyDamageY) || 0;
     }
     return y;
   };

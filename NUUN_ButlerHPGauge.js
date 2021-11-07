@@ -12,7 +12,7 @@
  * @plugindesc  バトラーHPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.3.2
+ * @version 1.3.3
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -28,7 +28,7 @@
  * [Id]：表示順番号
  * [x]：X座標
  * [y]：Y座標
- * モンスターの表示順番号は上に配置してあるモンスターから0、同一の高さなら右から0,1,2と割り当てられます。
+ * [id]は敵グループ設定で配置した順番のIDで指定します。モンスター画像の左上に番号が表示されますのでその番号を記入します。
  * 
  * 特徴を有するメモ欄
  * <HPGaugeVisible> この特徴を持つアクターが存在すれば、敵のHPゲージが表示されます。
@@ -49,6 +49,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/8 Ver.1.3.3
+ * 敵グループの座標変更の設定方法を変更。
  * 2021/11/6 Ver.1.3.2
  * 不要な処理を削除。
  * 2021/11/5 Ver.1.3.1
@@ -272,8 +274,8 @@ Sprite_Enemy.prototype.enemyHPGauge = function() {
     sprite.move(0, 0);
     this._butlerHp = sprite;
     sprite.enemySpriteId = this.spriteId;
-    this.hpGaugeOffsetX = this._butlerHpPositionX + (this._enemy.enemy().meta.HPGaugeX ? Number(this._enemy.enemy().meta.HPGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
-    this.hpGaugeOffsetY = this._butlerHpPositionY + (this._enemy.enemy().meta.HPGaugeY ? Number(this._enemy.enemy().meta.HPGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    this.hpGaugeOffsetX = this._enemy.getHPGaugePositionX() + (this._enemy.enemy().meta.HPGaugeX ? Number(this._enemy.enemy().meta.HPGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
+    this.hpGaugeOffsetY = this._enemy.getHPGaugePositionY() + (this._enemy.enemy().meta.HPGaugeY ? Number(this._enemy.enemy().meta.HPGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
   }
 };
 
@@ -344,8 +346,9 @@ Spriteset_Battle.prototype.enemyHPGauge = function(sprite) {
 
 Spriteset_Battle.prototype.setHPGaugePosition = function() {
   for (const data of hpGaugePositionList) {
-    if (this._enemySprites[data[0]]) {
-      this._enemySprites[data[0]].setHPGaugePosition(data[1], data[2]);
+    const enemy = $gameTroop.members()[data[0] - 1];
+    if (enemy) {
+      enemy.setHPGaugePosition(data[1], data[2]);
     }
   }
 };
@@ -505,6 +508,8 @@ Game_Enemy.prototype.initMembers = function() {
   _Game_Enemy_initMembers.call(this);
   this._visibleHpGauge = false;
   this._HPGaugeMask = false;
+  this._butlerHpPositionX = 0;
+  this._butlerHpPositionY = 0;
 };
 
 const _Game_Enemy_setup = Game_Enemy.prototype.setup;
@@ -527,6 +532,20 @@ Game_Enemy.prototype.HpGaugeMask = function(){
     this._HPGaugeMask = eval(this.enemy().meta.HPGaugeMask);
   }
 };
+
+Game_Enemy.prototype.setHPGaugePosition = function(x, y){
+  this._butlerHpPositionX = x;
+  this._butlerHpPositionY = y;
+};
+
+Game_Enemy.prototype.getHPGaugePositionX = function(){
+  return this._butlerHpPositionX;
+};
+
+Game_Enemy.prototype.getHPGaugePositionY = function(){
+  return this._butlerHpPositionY;
+};
+
 
 BattleManager.hpGaugeVisible = function() {
   this.visibleHpGauge = $gameParty.battleMembers().some(actor => actor._visibleHpGauge);

@@ -103,7 +103,7 @@ Imported.NUUN_XPBattleCommand = true;
     return rect;
   };
 
-  Scene_Battle.prototype.partyCommandY = function() {    console.log("er")
+  Scene_Battle.prototype.partyCommandY = function() {
     if (PartyCommandPosition === 'top') {
       return 0;
     } else if (PartyCommandPosition === 'center') {

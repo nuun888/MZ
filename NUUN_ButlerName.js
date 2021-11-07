@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -35,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/7 Ver.1.2.1
+ * 一部処理を修正。
  * 2021/11/5 Ver.1.2.0
  * 敵グループのモンスター毎にモンスター名の座標を調整できる機能を追加。
  * 2021/9/2 Ver.1.1.6
@@ -190,11 +192,6 @@ Sprite_Enemy.prototype.updateEnemyName = function() {
       this._butlerNameSprite.y -= this.getButlerNameHeight();
     } else if (this.getButlerNamePosition() === 2) {
       this._butlerNameSprite.y -= Math.floor(this.getButlerNameHeight() / 2);
-    }
-    if (this._butlerNameSprite.y < 0) {
-      this._butlerNameSprite.y = 30;
-    } else if (this._butlerNameSprite.y + 40 > Graphics.height) {
-      this._butlerNameSprite.y = Graphics.height - 40;
     }
     this.butlerNameOpacity();
   }

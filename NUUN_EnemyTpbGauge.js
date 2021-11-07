@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミーTPBゲージ
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -35,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/7 Ver.1.2.1
+ * 一部処理を修正。
  * 2021/11/6 Ver.1.2.0
  * 敵グループのモンスター毎にゲージの座標を調整できる機能を追加。
  * 2021/9/2 Ver.1.1.9
@@ -159,11 +161,6 @@ Sprite_Enemy.prototype.updateTpbGauge = function() {
       this._enemyTpb.y -= this.getButlerTpbHeight();
     } else if (this.getButlerTpbPosition() === 2) {
       this._enemyTpb.y -= Math.floor(this.getButlerTpbHeight() / 2);
-    }
-    if (this._enemyTpb.y < 0) {
-        this._enemyTpb.y = 30;
-    } else if (this._enemyTpb.y + 40 > Graphics.height) {
-      this._enemyTpb.y = Graphics.height - 40;
     }
     this.tpbGaugeOpacity();
   }

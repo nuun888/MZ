@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -27,7 +27,7 @@
  * [Id]：表示順番号
  * [x]：X座標
  * [y]：Y座標
- * モンスターの表示順番号は上に配置してあるモンスターから0、同一の高さなら右から0,1,2と割り当てられます。
+ * [id]は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。
  * 
  * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
  * 
@@ -35,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/8 Ver.1.2.2
+ * 敵グループの座標変更の設定方法を変更。
  * 2021/11/7 Ver.1.2.1
  * 一部処理を修正。
  * 2021/11/5 Ver.1.2.0
@@ -134,10 +136,6 @@ Imported.NUUN_ButlerName = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_ButlerName');
-const ActorNamePosition = Number(parameters['ActorNamePosition'] || 0);
-const ActorName_X = Number(parameters['ActorName_X'] || 0);
-const ActorName_Y = Number(parameters['ActorName_Y'] || 0);
-const ActorName_FontSize = Number(parameters['ActorName_FontSize'] || -12);
 const EnemyNamePosition = Number(parameters['EnemyNamePosition'] || 0);
 const EnemyNameVisible = Number(parameters['EnemyNameVisible'] || 0);
 const Name_X = Number(parameters['Name_X'] || 0);
@@ -149,8 +147,6 @@ let namePositionList = [];
 const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
 Sprite_Enemy.prototype.initMembers = function() {
   _Sprite_Enemy_initMembers.call(this);
-  this._butlerNamePositionX = 0;
-  this._butlerNamePositionY = 0;
 };
 
 const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
@@ -162,22 +158,6 @@ Sprite_Enemy.prototype.updateBitmap = function() {
   //if (ActorNamePosition >= 0 && $gameSystem.isSideView()) {
   //  this.updateActorName();
   //}
-};
-
-Sprite_Enemy.prototype.setEnemyNamePosition = function(x, y) {
-  this._butlerNamePositionX = x;
-  this._butlerNamePositionY = y;
-};
-
-Sprite_Enemy.prototype.updateActorName = function() {
-  this._butlerNameSprite.x = this.butlerNameOffsetX + (this.x - this._butlerNameSprite.width / 2);
-  this._butlerNameSprite.y = this.butlerNameOffsetY + this.y - 40;
-  this._butlerNameSprite.y -= Math.round((this.bitmap.height + 40) * 0.9);
-  if (this._butlerNameSprite.y < 0) {
-    this._butlerNameSprite.y = 30;
-  } else if (this._butlerNameSprite.y + 40 > Graphics.height) {
-    this._butlerNameSprite.y = Graphics.height - 40;
-  }
 };
 
 Sprite_Enemy.prototype.updateEnemyName = function() {
@@ -206,8 +186,8 @@ Sprite_Enemy.prototype.enemyName = function() {
   sprite.move(0, 0);
   this._butlerNameSprite = sprite;
   sprite.enemySpriteId = this.spriteId;
-  this.butlerNameOffsetX = this._butlerNamePositionX + (this._enemy.enemy().meta.EnemyNameX ? Number(this._enemy.enemy().meta.EnemyNameX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Name_X;
-  this.butlerNameOffsetY = this._butlerNamePositionY + (this._enemy.enemy().meta.EnemyNameY ? Number(this._enemy.enemy().meta.EnemyNameY) : 0) + Name_Y + (Graphics.height - Graphics.boxHeight) / 2;
+  this.butlerNameOffsetX = this._enemy.getNamePositionX() + (this._enemy.enemy().meta.EnemyNameX ? Number(this._enemy.enemy().meta.EnemyNameX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Name_X;
+  this.butlerNameOffsetY = this._enemy.getNamePositionY() + (this._enemy.enemy().meta.EnemyNameY ? Number(this._enemy.enemy().meta.EnemyNameY) : 0) + Name_Y + (Graphics.height - Graphics.boxHeight) / 2;
 };
 
 Sprite_Enemy.prototype.getButlerNameHeight = function() {
@@ -259,17 +239,6 @@ const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowe
 Spriteset_Battle.prototype.createLowerLayer = function() {
   _Spriteset_Battle_createLowerLayer.call(this);
   this.createEnemyName();
-  //this.createActorName();
-};
-
-Spriteset_Battle.prototype.createActorName = function() {
-  if (EnemyNamePosition >= 0 && $gameSystem.isSideView()) {
-    if (!this._butlerGaugeBase) {
-      const sprite = new Sprite();
-      this.addChild(sprite);
-      this._butlerGaugeBase = sprite;
-    }
-  }
 };
 
 Spriteset_Battle.prototype.createEnemyName = function() {
@@ -282,34 +251,15 @@ Spriteset_Battle.prototype.createEnemyName = function() {
   }
 };
 
-//Spriteset_Battle.prototype.updateActors = function() {
-//  const members = $gameParty.battleMembers();
-//  for (let i = 0; i < this._actorSprites.length; i++) {
-//      this._actorSprites[i].setBattler(members[i]);
-//  }
-//};
-
-Spriteset_Battle.prototype.actorName = function(sprites) {
-  const sprite = new Sprite_ButlerName();
-  this._butlerGaugeBase.addChild(sprite);
-  sprite.setup(sprites._battler);
-  sprite.show();
-  sprite.move(0, 0);
-  sprites._butlerName = sprite;
-  sprites.butlerNameOffsetX = ActorName_X + (Graphics.width - Graphics.boxWidth) / 2;
-  sprites.butlerNameOffsetY = ActorName_Y + (Graphics.height - Graphics.boxHeight) / 2;
-  //sprites.butlerNameOffsetX = (sprites._enemy.enemy().meta.EnemyNameX ? Number(sprites._enemy.enemy().meta.EnemyNameX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Name_X;
-  //sprites.butlerNameOffsetY = (sprites._enemy.enemy().meta.EnemyNameY ? Number(sprites._enemy.enemy().meta.EnemyNameY) : 0) + Name_Y + (Graphics.height - Graphics.boxHeight) / 2;
-};
-
 Spriteset_Battle.prototype.enemyName = function(sprites) {
   sprites.enemyName();
 };
 
 Spriteset_Battle.prototype.setEnemyNamePosition = function() {
   for (const data of namePositionList) {
-    if (this._enemySprites[data[0]]) {
-      this._enemySprites[data[0]].setEnemyNamePosition(data[1], data[2]);
+    const enemy = $gameTroop.members()[data[0] - 1];
+    if (enemy) {
+      enemy.setEnemyNamePosition(data[1], data[2]);
     }
   }
 };
@@ -354,6 +304,27 @@ Sprite_ButlerName.prototype.butlerNameVisibleInSelect = function() {
     return this._battler.isSelected();
   }
   return true;
+};
+
+
+const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
+Game_Enemy.prototype.initMembers = function() {
+  _Game_Enemy_initMembers.call(this);
+  this._butlerNamePositionX = 0;
+  this._butlerNamePositionY = 0;
+};
+
+Game_Enemy.prototype.setEnemyNamePosition = function(x, y){
+  this._butlerNamePositionX = x;
+  this._butlerNamePositionY = y;
+};
+
+Game_Enemy.prototype.getNamePositionX = function(){
+  return this._butlerNamePositionX;
+};
+
+Game_Enemy.prototype.getNamePositionY = function(){
+  return this._butlerNamePositionY;
 };
 
 function getEnemyNamePosition(troop) {

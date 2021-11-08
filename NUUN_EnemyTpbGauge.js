@@ -9,14 +9,14 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  エネミーTPBゲージ
+ * @plugindesc  モンスターTPBゲージ
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
- * エネミーにもTPBゲージを表示します。
+ * 戦闘中のモンスターにTPBゲージを表示します。
  * 
  * 敵キャラのメモ欄
  * <TPBGaugeX:[position]> TPBゲージのX座標を調整します。（相対座標）
@@ -27,7 +27,7 @@
  * [Id]：表示順番号
  * [x]：X座標
  * [y]：Y座標
- * モンスターの表示順番号は上に配置してあるモンスターから0、同一の高さなら右から0,1,2と割り当てられます。
+ * [id]は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。
  * 
  * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
  * 
@@ -35,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/8 Ver.1.2.2
+ * 敵グループの座標変更の設定方法を変更。
  * 2021/11/7 Ver.1.2.1
  * 一部処理を修正。
  * 2021/11/6 Ver.1.2.0
@@ -137,8 +139,6 @@ let tpbGaugePositionList = [];
 const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
 Sprite_Enemy.prototype.initMembers = function() {
   _Sprite_Enemy_initMembers.call(this);
-  this._butlerTpbPositionX = 0;
-  this._butlerTpbPositionY = 0;
 };
 
 const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
@@ -166,11 +166,6 @@ Sprite_Enemy.prototype.updateTpbGauge = function() {
   }
 };
 
-Sprite_Enemy.prototype.setTpbGaugePosition = function(x, y) {
-  this._butlerTpbPositionX = x;
-  this._butlerTpbPositionY = y;
-};
-
 Sprite_Enemy.prototype.enemyTpbGauge = function() {
   const butlerGaugeBase = BattleManager.gaugeBaseSprite;
   const sprite = new Sprite_EnemyTPBGauge();
@@ -180,8 +175,8 @@ Sprite_Enemy.prototype.enemyTpbGauge = function() {
   sprite.move(0, 0);
   this._enemyTpb = sprite;
   sprite.enemySpriteId = this.spriteId;
-  this.tpbGaugeOffsetX = this._butlerTpbPositionX + (this._enemy.enemy().meta.TPBGaugeX ? Number(this._enemy.enemy().meta.TPBGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
-  this.tpbGaugeOffsetY = this._butlerTpbPositionY + (this._enemy.enemy().meta.TPBGaugeY ? Number(this._enemy.enemy().meta.TPBGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
+  this.tpbGaugeOffsetX = this._enemy.getTpbPositionX() + (this._enemy.enemy().meta.TPBGaugeX ? Number(this._enemy.enemy().meta.TPBGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
+  this.tpbGaugeOffsetY = this._enemy.getTpbPositionY() + (this._enemy.enemy().meta.TPBGaugeY ? Number(this._enemy.enemy().meta.TPBGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
 };
 
 
@@ -252,8 +247,9 @@ Spriteset_Battle.prototype.enemyTpbGauge = function(sprites) {
 
 Spriteset_Battle.prototype.setTpbGaugePosition = function() {
   for (const data of tpbGaugePositionList) {
-    if (this._enemySprites[data[0]]) {
-      this._enemySprites[data[0]].setTpbGaugePosition(data[1], data[2]);
+    const enemy = $gameTroop.members()[data[0] - 1];
+    if (enemy) {
+      enemy.setTpbGaugePosition(data[1], data[2]);
     }
   }
 };
@@ -275,6 +271,27 @@ Sprite_EnemyTPBGauge.prototype.bitmapWidth = function() {
 
 Sprite_EnemyTPBGauge.prototype.gaugeHeight = function() {
   return GaugeHeight > 0 ? GaugeHeight : 12;
+};
+
+
+const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
+Game_Enemy.prototype.initMembers = function() {
+  _Game_Enemy_initMembers.call(this);
+  this._butlerTpbPositionX = 0;
+  this._butlerTpbPositionY = 0;
+};
+
+Game_Enemy.prototype.setTpbGaugePosition = function(x, y){
+  this._butlerTpbPositionX = x;
+  this._butlerTpbPositionY = y;
+};
+
+Game_Enemy.prototype.getTpbPositionX = function(){
+  return this._butlerTpbPositionX;
+};
+
+Game_Enemy.prototype.getTpbPositionY = function(){
+  return this._butlerTpbPositionY;
 };
 
 function getEnemyTpbGaugePosition(troop) {

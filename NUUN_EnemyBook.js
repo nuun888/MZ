@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.9.3
+ * @version 2.9.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -282,6 +282,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/10 Ver.2.9.4
+ * 使用していないプラグインパラメータを削除。
  * 2021/11/9 Ver.2.9.3
  * カラーコードに対応。
  * 評価式でのモンスターデータの参照方法を変更。
@@ -1050,13 +1052,6 @@
  * @type file[]
  * @dir img/
  * @default []
- * @parent BackGround
- * 
- * @param BattleBackGround
- * @text 戦闘中背景画像表示
- * @desc 敵の情報、アナライズに背景画像を表示します。
- * @type boolean
- * @default false
  * @parent BackGround
  * 
  * @param EnemyInfoGroundImg
@@ -4216,7 +4211,7 @@ Window_EnemyBook.prototype.scanMode = function() {
 };
 
 Window_EnemyBook.prototype.getColorCode = function(color) {
-  if (typeof(color) === "string" && color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) !== null) {
+  if (typeof(color) === "string") {
     return color;
   }
   return ColorManager.textColor(color);

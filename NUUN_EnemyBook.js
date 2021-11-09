@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.9.2
+ * @version 2.9.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -86,11 +86,11 @@
  * 
  * 敵キャラのメモ欄
  * <[tag]:[text]> 記述欄のテキスト
- * [tag]:記述欄タグ名　デフォルト設定だとモンスターの説明を記述するタグはdesc1に設定されています。
+ * [tag]:記述欄タグ名　デフォルト設定だとモンスターの説明を記述するタグはdescに設定されています。
  * [text]:表示するテキスト。
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
- * <desc1:ああああ> desc1とタグ付けされた項目に「ああああ」が表示されます。
- * デフォルト設定では４ページ目に表示される項目にdesc1が設定されていますので、文章を表示させる場合は<desc1:[text]>と記入してください。
+ * <desc1:ああああ> descとタグ付けされた項目に「ああああ」が表示されます。
+ * デフォルト設定では４ページ目に表示される項目にdescが設定されていますので、文章を表示させる場合は<desc:[text]>と記入してください。
  * 
  * <[tag]:[img],[x],[y]> アイテム個別画像の表示
  * [tag]:アイテム個別画像タグ名（記述欄、個別指定画像タグで設定します）
@@ -265,9 +265,9 @@
  * 敵のデバフ耐性弱点未確認　　　敵のデバフ耐性弱点を未確認にします。0で全て未確認にします。(要NUUN_EnemyBookEX_1)
  * 
  * オリジナルパラメータ参照変数
- * this._enemy　データベースのモンスターデータを取得します。
+ * this._enemyまたはde　データベースのモンスターデータを取得します。
  * this._enemy.meta メタタグを取得します。
- * enemy Game_Enemyのデータを取得します。
+ * enemyまたはge Game_Enemyのデータを取得します。
  * 
  * このプラグインはYoji Ojima様及びヱビ様、TOMY (Kamesoft)様を参考にさせていただきました。
  * 
@@ -282,6 +282,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/9 Ver.2.9.3
+ * カラーコードに対応。
+ * 評価式でのモンスターデータの参照方法を変更。
+ * 敵の情報で背景を設定したときにモンスターリストの位置がズレる問題を修正。
+ * 背景の表示方法を変更。
  * 2021/11/3 Ver.2.9.2
  * アナライズに成功して、別のスキルを実行しミスしたときにアナライズの失敗時のメッセージが表示される問題を修正。
  * 2021/9/27 Ver.2.9.1
@@ -1032,6 +1037,13 @@
  * @text 背景、ウィンドウスキン設定
  * @default ------------------------------
  * 
+ * @param EnemyBookBackGround
+ * @text 背景画像表示
+ * @desc 図鑑の背景画像を表示させます。
+ * @type boolean
+ * @default false
+ * @parent BackGround
+ * 
  * @param BackGroundImg
  * @desc 背景画像ファイル名を指定します。
  * @text 背景画像
@@ -1041,8 +1053,8 @@
  * @parent BackGround
  * 
  * @param BattleBackGround
- * @text 戦闘時背景画像表示
- * @desc 戦闘時に背景画像を表示させます。図鑑、敵の情報、アナライズ全てが適用されます。
+ * @text 戦闘中背景画像表示
+ * @desc 敵の情報、アナライズに背景画像を表示します。
  * @type boolean
  * @default false
  * @parent BackGround
@@ -2118,14 +2130,14 @@
  * @parent BasicSetting
  * 
  * @param DetaEval
- * @desc パラメータ評価式を設定します。
+ * @desc パラメータ評価式を設定します。de：モンスターのデータベースデータ　ge：モンスターのゲームデータ
  * @text パラメータ評価式(1)
  * @type string
  * @default 
  * @parent BasicSetting
  * 
  * @param NameColor
- * @desc システム項目の文字色。
+ * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(2)
  * @type number
  * @default 16
@@ -2395,6 +2407,8 @@ const PercentContentLength = param.PercentWindowVisible && (param.PercentContent
 param.PageSetting = param.PageSetting || [];
 param.EnemyBookCategory = param.EnemyBookCategory || [];
 const NRP_pLoopLR = PluginManager.parameters("NRP_LoopCursor").loopLR;
+let ge = null;
+let de = null;
 
 //プラグインコマンド
 const pluginName = "NUUN_EnemyBook";
@@ -3318,7 +3332,7 @@ Scene_EnemyBook.prototype.createIndexWindow = function() {
   this._indexWindow.setPercentWindow(this._percentWindow);
   this._indexWindow.activate();
   this._indexWindow.hide();
-  if (param.BackGroundImg) {
+  if (param.EnemyBookBackGround) {
     this._indexWindow.opacity = 0;
     this._indexWindow.frameVisible = false;
   }
@@ -3328,7 +3342,7 @@ Scene_EnemyBook.prototype.createCategoryNameWindow = function() {
   const rect = this.categoryNameWindowRect();
   this._categoryNameWindow = new Window_EnemyBook_CategoryName(rect);
   this.addWindow(this._categoryNameWindow);
-  if (param.BackGroundImg) {
+  if (param.EnemyBookBackGround) {
     this._categoryNameWindow.opacity = 0;
     this._categoryNameWindow.frameVisible = false;
   }
@@ -3343,7 +3357,7 @@ Scene_EnemyBook.prototype.createCategoryWindow = function() {
   this._categoryWindow.hide();
   this._indexWindow.setCategoryWindow(this._categoryWindow);
   this._categoryNameWindow.setCategoryWindow(this._categoryWindow);
-  if (param.BackGroundImg) {
+  if (param.EnemyBookBackGround) {
     this._categoryWindow.opacity = 0;
     this._categoryWindow.frameVisible = false;
   }
@@ -3354,7 +3368,7 @@ Scene_EnemyBook.prototype.createPercentWindow = function() {
     const rect = this.percentWindowRect();
     this._percentWindow = new Window_EnemyBook_Percent(rect);
     this.addWindow(this._percentWindow);
-    if (param.BackGroundImg) {
+    if (param.EnemyBookBackGround) {
       this._percentWindow.opacity = 0;
       this._percentWindow.frameVisible = false;
     }
@@ -3368,7 +3382,7 @@ Scene_EnemyBook.prototype.createEnemyWindow = function() {
   this._indexWindow.setEnemyWindow(this._enemyWindow);
   this._enemyPageWindow.setEnemyWindow(this._enemyWindow);
   this._indexWindow.select(Window_EnemyBook_Index._lastIndex);
-  if (param.BackGroundImg) {
+  if (param.EnemyBookBackGround) {
     this._enemyWindow.opacity = 0;
     this._enemyWindow.frameVisible = false;
   }
@@ -3379,7 +3393,7 @@ Scene_EnemyBook.prototype.createEnemyPageWindow = function() {
   const rect = this.enemyWindowPageRect();
   this._enemyPageWindow = new Window_EnemyBookPageCategory(rect);
   this.addWindow(this._enemyPageWindow);
-  if (param.BackGroundImg) {
+  if (param.EnemyBookBackGround) {
     this._enemyPageWindow.opacity = 0;
     this._enemyPageWindow.frameVisible = false;
   }
@@ -3454,9 +3468,9 @@ Scene_EnemyBook.prototype.getMaxPage = function() {
 const _Scene_EnemyBook_createBackground = Scene_EnemyBook.prototype.createBackground;
 Scene_EnemyBook.prototype.createBackground = function() {
   Scene_MenuBase.prototype.createBackground.call(this);
-  if (param.BackGroundImg && param.BackGroundImg[0]) {
+  if (param.EnemyBookBackGround) {
     const sprite = new Sprite();
-    //sprite.bitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg[0]);
+    sprite.bitmap = ImageManager.nuun_LoadPictures(param.BackGroundImg[0]);
     this.addChild(sprite);
     this._backGroundImg = sprite;
     sprite.x = param.BackUiWidth ? (Graphics.width - (Graphics.boxWidth + 8)) / 2 : 0;
@@ -4201,6 +4215,13 @@ Window_EnemyBook.prototype.scanMode = function() {
   return (this._bookMode === 1 && this.analyzeCurrentStatus()) || (this._bookMode === 2 && this.infoCurrentStatus());
 };
 
+Window_EnemyBook.prototype.getColorCode = function(color) {
+  if (typeof(color) === "string" && color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) !== null) {
+    return color;
+  }
+  return ColorManager.textColor(color);
+};
+
 Window_EnemyBook.prototype.buffColor = function(params, nparams) {
   const buffColor = this._bookMode === 1 ? this._AnalyzeStatus.BuffColor : param.InfoBuffColor;
   const debuffColor = this._bookMode === 1 ? this._AnalyzeStatus.DebuffColor : param.InfoDebuffColor;
@@ -4253,6 +4274,8 @@ Window_EnemyBook.prototype.page = function(enemy) {
   if (!this.displayList || this.displayList.length <= 0) {
     return;
   }
+  ge = enemy;
+  de = this._enemy;
   const list = this.displayList[this._pageMode];
   const listContent = this.listDate(list) || [];
   const bitmap = this.getEnemyBitmap(listContent, enemy);
@@ -4598,7 +4621,7 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
       this.drawContentsBackground(list.Back, x, y, width);
       x = this.contensX(x);
       width = this.contensWidth(width);
-      this.changeTextColor(ColorManager.textColor(list.NameColor));
+      this.changeTextColor(this.getColorCode(list.NameColor));
       nameText = this.paramNameShow(list, enemy);
       textWidth = this.systemWidth(list.SystemItemWidth, width);
       this.drawText(nameText, x, y, textWidth);
@@ -4639,7 +4662,7 @@ Window_EnemyBook.prototype.enemyImg = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.enemyName = function(list, enemy, x, y, width) {
-	this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const text = enemy.name();
   const iconId = this._enemy.meta.EnemyIcon ? Number(this._enemy.meta.EnemyIcon) : 0;
   if (iconId > 0) {
@@ -4665,7 +4688,7 @@ Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : TextManager.exp;
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -4683,7 +4706,7 @@ Window_EnemyBook.prototype.enemyGold = function(list, enemy, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "獲得金額";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -4702,7 +4725,7 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "倒した数";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -4722,7 +4745,7 @@ Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
     this.drawContentsBackground(list.Back, x, y, width);
     x = this.contensX(x);
     width = this.contensWidth(width);
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     const nameText = list.paramName ? list.paramName : "ターン";
     const textWidth = this.systemWidth(list.SystemItemWidth, width);
     this.drawText(nameText, x, y, textWidth);
@@ -4740,7 +4763,7 @@ Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
 Window_EnemyBook.prototype.name = function(list, enemy, x, y, width) {
   const nameText = list.paramName;
   if (nameText) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(nameText, x, y, width, list.namePosition);
   }
 };
@@ -4749,7 +4772,7 @@ Window_EnemyBook.prototype.bookEnemyNo = function(list, enemy, x, y, width) {
   const nameText = list.paramName;
   let textWidth  = 0;
   if (nameText) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(nameText, x, y, width, list.namePosition);
     textWidth = this.textWidth(nameText) + this.itemPadding();
     this.resetTextColor();
@@ -4769,7 +4792,7 @@ Window_EnemyBook.prototype.drawEnemyBookStealRate = function(text, x, y, width,)
 Window_EnemyBook.prototype.horzLine = function(list, enemy, x, y, width) {
   const lineY = y + this.lineHeight() / 2 - 1;
   this.contents.paintOpacity = 48;
-  this.contents.fillRect(x, lineY, width, 2, ColorManager.textColor(list.NameColor));
+  this.contents.fillRect(x, lineY, width, 2, this.getColorCode(list.NameColor));
   this.contents.paintOpacity = 255;
 };
 
@@ -4778,7 +4801,7 @@ Window_EnemyBook.prototype.drawResistElement = function(list, enemy, x, y, width
     return;
   }
   let Unknown = false;
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "耐性属性";
   this.drawText(nameText, x, y);
   if(!this.resistWeakDataMask(list.MaskMode)){
@@ -4815,7 +4838,7 @@ Window_EnemyBook.prototype.drawWeakElement = function(list, enemy, x, y, width) 
     return;
   }
   let Unknown = false;
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "弱点属性";
   this.drawText(nameText, x, y);
   if(!this.resistWeakDataMask(list.MaskMode)){
@@ -4852,7 +4875,7 @@ Window_EnemyBook.prototype.drawNoEffectElement = function(list, enemy, x, y, wid
     return;
   }
   let Unknown = false;
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "無効属性";
   this.drawText(nameText, x, y);
   if(!this.resistWeakDataMask(list.MaskMode)){
@@ -4889,7 +4912,7 @@ Window_EnemyBook.prototype.drawResistStates = function(list, enemy, x, y, width)
     return;
   }
   let Unknown = false;
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "耐性ステート";
   this.drawText(nameText, x, y);
   if(!this.resistWeakDataMask(list.MaskMode)){
@@ -4930,7 +4953,7 @@ Window_EnemyBook.prototype.drawWeakStates = function(list, enemy, x, y, width) {
     return;
   }
   let Unknown = false;
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "弱点ステート";
   this.drawText(nameText, x, y);
   if(!this.resistWeakDataMask(list.MaskMode)){
@@ -4968,7 +4991,7 @@ Window_EnemyBook.prototype.drawNoEffectStates = function(list, enemy, x, y, widt
     return;
   }
   let Unknown = false;
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "無効ステート";
   this.drawText(nameText, x, y);
   if(!this.resistWeakDataMask(list.MaskMode)){
@@ -5010,7 +5033,7 @@ Window_EnemyBook.prototype.buffIconIndex = function(rate, paramId) {
 
 Window_EnemyBook.prototype.drawWeakDebuff = function(list, enemy, x, y, width) {
   let Unknown = false;
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "弱点デバフ";
   this.drawText(nameText, x, y);
   if(!this.resistWeakDataMask(list.MaskMode)){
@@ -5042,7 +5065,7 @@ Window_EnemyBook.prototype.drawWeakDebuff = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.drawResistDebuff = function(list, enemy, x, y, width) {
   let Unknown = false;
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "耐性デバフ";
   this.drawText(nameText, x, y);
   if(!this.resistWeakDataMask(list.MaskMode)){
@@ -5073,7 +5096,7 @@ Window_EnemyBook.prototype.drawResistDebuff = function(list, enemy, x, y, width)
 };
 
 Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "ドロップアイテム";
   this.drawText(nameText, x, y);
   const lineHeight = this.lineHeight();
@@ -5126,7 +5149,7 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
   if (!Imported.NUUN_StealableItems) {
     return;
   }
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "盗めるアイテム";
   this.drawText(nameText, x, y);
   const lineHeight = this.lineHeight();
@@ -5176,9 +5199,9 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.drawDesc = function(list, enemy, x, y, width) {
-  const nameText = list.paramName
+  const nameText = list.paramName;
   if (nameText) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(nameText, x, y);
     y += this.lineHeight();
   }
@@ -5203,7 +5226,7 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName;
   let textWidth = width;
   if (nameText) {
@@ -5222,7 +5245,7 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "使用スキル";
   this.drawText(nameText, x, y, width);
   const lineHeight = this.lineHeight();
@@ -5320,7 +5343,7 @@ Window_EnemyBook.prototype.enemyStateChart = function(list, enemy, x, y, width) 
   if (!Imported.NUUN_RadarChartBase) {
     return;
   }
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "ステート耐性";
   this.drawText(nameText, x, y, width);
   const lineHeight = this.lineHeight();
@@ -5654,7 +5677,7 @@ Scene_Battle.prototype.createEnemyBookWindow = function() {
 
 Scene_Battle.prototype.createEnemyBookBackGroundSprite = function() {
   this._enemyBookBackGround = null;
-  if (param.BattleBackGround && !this._enemyBookBackGround) {
+  if (param.EnemyBookBackGround && !this._enemyBookBackGround) {
     const sprite = new Sprite();
     this._enemyBookBackGround = sprite;
     this.addChild(sprite);
@@ -5780,7 +5803,7 @@ Scene_Battle.prototype.enemyBookIndexWindowRect = function() {
 };
 
 Scene_Battle.prototype.enemyBookInfoIndexWindowRect = function() {
-  const wx = this._enemyBookIndexWindow.x;
+  const wx = param.WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
   const wy = this.enemyBookMainAreaTop();
   const ww = this._enemyBookIndexWindow.width;
   const wh = this.enemyBookMainAreaHeight();

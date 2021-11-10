@@ -10,20 +10,43 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * 条件により発動する特徴、スキルなどを設定するためのプラグインです。
  * タグの記述方法は各対応のプラグインで確認してください。
- * 比較モードは全て一致といずれかが一致から指定できますが、指定のタグが未記入の場合はいずれかが一致したときに条件を満たしたときに
- * trueを返します。
- * 例：スキルに使用条件
- * <ConditionalBoost:6,8> 
- * <PartyConditionalBoost:15>
- * <PartialMatchBoost:0>
- * 条件リストの6,8,15のいずれかが一致したときに条件を満たします。
+ * 条件はプラグインパラメータの適用条件で設定します。適用条件は全ての条件付き対応プラグインで共通となります。
+ * 
+ * リストに条件を設定していきます。
+ * 識別名：何の条件かを認識しやすいようにするためのパラメータです。現バージョンでは設定しなくても問題ありません。
+ * 条件タイプ：条件を設定します。設定後に表示されている文字とパーティ、敵グループから評価式までの（）内に表示されている文字と同じ
+ * 項目を指定します。（'Battler'ならアクター、敵(Battler)）
+ * 
+ * 共通設定の各項目は、設定した項目に記載してある()内の数字の項目に記入します。
+ * (1)(3)なら共通設定の上限値、下限値または指定のIDに記入。
+ * (1)(2)はどちらかを入力します。
+ * 敵グループは戦闘中のみ有効です。
+ * 
+ * 生存しているパーティメンバーが４人以上の場合
+ * 条件タイプ　パーティ、敵グループ(Member)
+ * パーティ、敵グループ　生存メンバー数(1)(2)（(1)バトラー数、(2)バトラー数）'AliveMember'
+ * 上限値(1) 0 下限値(1) 4
+ * 上限値は指定の数値以下　下限値は指定の数字以上　指定の数値は固定値になります。(1)と(2)は両方選択することはできませんので別々にリストに設定してください。
+ * 
+ * ステート5番6番にかかっていて残りターン３ターン目の場合
+ * 条件タイプ　ステート(State)
+ * ステート　指定のステートIDにかかっている(1)(2)(3)（(1)ターン (2)ターン (3)ステートID）'AddState'
+ * 指定の数値(2) 3 または　上限値(1) 3、下限値(2) 3
+ * 指定のID(3) 5,6
+ * 
+ * ゲーム変数１０番が１０２以上１１０以下の場合
+ * 条件タイプ　ゲーム変数(Variable)
+ * ゲーム変数　指定の変数(1)(2)(3)（(1)範囲値 (2)値 (3)ゲーム変数ID）'Var'
+ * 上限値(1) 110 下限値(2) 102
+ * 指定のID(3) 10
+ * 
  * 
  * 条件
  * (1)上限下限値：上限値は判定する数値の最大値を参照します。下限値は判定する数値の最小値を参照します。
@@ -174,6 +197,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/11 Ver.1.0.2
+ * 条件ターンが適用されていなかった問題を修正。
+ * 複数属性取得処理の変更。NUUN_Base 要Ver.1.3.1以降
  * 2021/9/13 Ver.1.0.1
  * 属性時の条件が正常に判定されていなかった問題を修正。
  * 2021/9/13 Ver.1.0.0
@@ -560,6 +586,35 @@ Imported.NUUN_ConditionsBase = true;
 const parameters = PluginManager.parameters('NUUN_ConditionsBase');
 const TriggerConditions = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['TriggerConditions'])) : null) || [];
 
+const _Game_Temp_initialize = Game_Temp.prototype.initialize;
+Game_Temp.prototype.initialize = function() {
+  _Game_Temp_initialize.call(this);
+  this.actionData = {};
+  this._listCond = false;
+};
+
+Game_Temp.prototype.listCondData = function() {
+  this._listCond = true;
+};
+
+Game_Temp.prototype.getActionData = function() {
+  return this.actionData;
+};
+
+const _Game_Action_apply = Game_Action.prototype.apply;
+Game_Action.prototype.apply = function(target) {
+  //$gameTemp.actionData.subject = this.subject();
+  //$gameTemp.actionData.action = this;
+  //$gameTemp.actionData.damage = 0;
+  _Game_Action_apply.call(this, target);
+};
+
+const _Game_Action_executeDamage = Game_Action.prototype.executeDamage;
+Game_Action.prototype.executeDamage = function(target, value) {
+  //$gameTemp.actionData.damage = value;
+ _Game_Action_executeDamage.call(this, target, value);
+};
+
 Game_Action.prototype.traitTriggerConditions = function(target, tag1, tag2, tag3, tag4, damage, partialMatch) {//特徴取得
   const subject = this.subject();
   return subject.getTraitTriggerConditions(target, tag1, tag2, tag3, tag4, this, damage, partialMatch);
@@ -582,7 +637,12 @@ Game_BattlerBase.prototype.getTriggerConditions  = function(obj, target, tag1, t
 
 function getTriggerConditions(obj, subject, target, tag1, tag2, tag3, tag4, action, damage, partialMatch) {
   if (getTriggerConditionsMeta(obj, tag1, tag2, tag3, tag4)) {
-    const partialMode = Number(obj.meta[partialMatch]) || 0;
+    let partialMode = 0;
+    if ($gameTemp.listCond) {
+      partialMode = partialMatch === 'AllMatch' ? 1 : 0;
+    } else {
+      partialMode = Number(obj.meta[partialMatch]) || 0;
+    }
     const result1 = getTriggerConditionsResult(obj, subject, tag1, 'Subject', action, damage, partialMode);
     const result2 = getTriggerConditionsResult(obj, target, tag2, 'Target', action, damage, partialMode);
     const result3 = getTriggerConditionsResult(obj, null, tag3, 'Party', action, damage, partialMode);
@@ -601,7 +661,11 @@ function getTriggerConditionsResult(obj, target, tag, mode, action, damage, part
   let list = [];
   let result = partialMode === 1;
   if (tag && obj.meta[tag] && !(!$gameParty.inBattle() && mode === 'Troop')) {
-    list = obj.meta[tag].split(',').map(Number);
+    if ($gameTemp.listCond) {
+      list = tag.map(Number);console.log(list)
+    } else {
+      list = obj.meta[tag].split(',').map(Number);
+    }
     if (partialMode === 0) {
       result = isTriggerConditionsSome(list, target, mode, action, damage);
     } else {
@@ -838,9 +902,9 @@ function turnTriggerConditions(data, target, mode) {
   const unit = getUnit(target, mode);
   if (data.TurnConditionsType === 'Turn') {
     if (BattleManager.isTpb() && (mode === 'Party' || mode === 'Troop')) {
-      return unit.members().some(member => turn(data.IDList, member));
+      return unit.members().some(member => turn(data, member));
     } else {
-      return turn(data.IDList, target);
+      return turn(data, target);
     }
   }
 };
@@ -1107,18 +1171,10 @@ function turn(data, member) {
 
 function attackElement(idList, action) {
   let elementsList = [];
-  if (Imported.NUUN_MultiElement) {
-    if (action.item().damage.elementId < 0) {
-      elementsList = action.getAttackElements();
-    } else {
-      elementsList = action.getItemElements();
-    }
+  if (action.item().damage.elementId < 0) {
+    elementsList = action.getAttackElementsList();
   } else {
-    if (action.item().damage.elementId < 0) {
-      elementsList = action.subject().attackElements();
-    } else {
-      elementsList.push(action.item().damage.elementId);
-    }
+    elementsList = action.getItemElementsList();
   }
   const list = getValList(idList);
   return elementsList.some(id => elements(list, id));

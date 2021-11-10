@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -148,8 +148,11 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2021/11/11 Ver.1.4.1
+ * 背景の設定方法を少し変更。
+ * 各項目のシステム文字色をカラーコードに対応。
  * 2021/11/3 Ver.1.4.0
- * インフォウィンドウの完成率（アイテム、武器、防具）、情報登録数/全アイテム、武器、防具を表示する機能を追加。
+ * 完成率ウィンドウに完成率（アイテム、武器、防具）、情報登録数/全アイテム、武器、防具を表示する機能を追加。
  * 2021/9/28 Ver.1.3.0
  * プラグインコマンドに図鑑完成度、情報登録済みアイテム数を変数に代入する機能を追加。
  * ナンバー表示をカテゴリー順に表示させる機能を追加。
@@ -354,8 +357,8 @@
  * @parent BasicSetting
  * 
  * @param NumberMode
- * @text ナンバー表示を各カテゴリー表示順で表示します。
- * @desc ナンバーカテゴリー表示順表示
+ * @desc ナンバー表示を各カテゴリー表示順で表示します。
+ * @text ナンバーカテゴリー表示順表示
  * @type boolean
  * @default false
  * @parent 
@@ -367,20 +370,31 @@
  * @default 'pictures'
  * @parent BasicSetting
  * 
+ * @param BackGround
+ * @text 背景設定
+ * @default ------------------------------
+ * 
+ * @param ItemBookBackGround
+ * @text 背景画像表示
+ * @desc 図鑑の背景画像を表示させます。
+ * @type boolean
+ * @default false
+ * @parent BackGround
+ * 
  * @param BackGroundImg
  * @desc 背景画像ファイル名を指定します。
  * @text 背景画像
  * @type file[]
  * @dir img/
  * @default []
- * @parent BasicSetting
+ * @parent BackGround
  * 
  * @param BackUiWidth
  * @text 背景サイズをUIに合わせる
  * @desc 背景サイズをUIに合わせる。
  * @type boolean
  * @default true
- * @parent BasicSetting
+ * @parent BackGround
  * 
  * @param Category
  * @text カテゴリー設定
@@ -641,7 +655,7 @@
  * @parent BasicSetting
  * 
  * @param NameColor
- * @desc システム項目の文字色。
+ * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(2)
  * @type number
  * @default 16
@@ -847,7 +861,7 @@
  * @parent BasicSetting
  * 
  * @param NameColor
- * @desc システム項目の文字色。
+ * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(2)
  * @type number
  * @default 16
@@ -1053,7 +1067,7 @@
  * @parent BasicSetting
  * 
  * @param NameColor
- * @desc システム項目の文字色。
+ * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(2)
  * @type number
  * @default 16
@@ -1271,6 +1285,7 @@ const TraitsMultiCol = eval(parameters['TraitsMultiCol'] || "false");
 const BackGroundImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])) : null) || [];
 const ItemBookCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemBookCategory'])) : null) || [];
 const ItemBookCategoryTagName = eval(parameters['ItemBookCategoryTagName'] || 'CategoryType');
+const ItemBookBackGround = eval(parameters['ItemBookBackGround'] || "false");
 const BackUiWidth = eval(parameters['BackUiWidth'] || "false");
 
 const PercentContentLength = PercentWindowVisible && (PercentContent && PercentContent.length > 0);
@@ -1856,7 +1871,7 @@ Scene_ItemBook.prototype.itemWindowRect = function() {
 };
 
 Scene_ItemBook.prototype.backgroundOpacity = function(window) {
-  if (BackGroundImg && BackGroundImg[0]) {
+  if (ItemBookBackGround) {
     window.opacity = 0;
   }
 };
@@ -1899,7 +1914,7 @@ Scene_ItemBook.prototype.onCategoryOk = function() {
 
 Scene_ItemBook.prototype.createBackground = function() {
   Scene_MenuBase.prototype.createBackground.call(this);
-  if (BackGroundImg && BackGroundImg[0]) {
+  if (ItemBookBackGround) {
     const sprite = new Sprite();
     this.addChild(sprite);
     this._backGroundImg = sprite;
@@ -2518,7 +2533,7 @@ Window_ItemBook.prototype.dataDisplay = function(list, item, x, y, width) {
 };
 
 Window_ItemBook.prototype.itemName = function(list, item, x, y, width) {
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const text = item.name;
   const iconId = item.iconIndex;
   if (iconId > 0) {
@@ -2543,14 +2558,14 @@ Window_ItemBook.prototype.itemName = function(list, item, x, y, width) {
 Window_ItemBook.prototype.horzLine = function(list, item, x, y, width) {
   const lineY = y + this.lineHeight() / 2 - 1;
   this.contents.paintOpacity = 48;
-  this.contents.fillRect(x, lineY, width, 2, ColorManager.textColor(list.NameColor));
+  this.contents.fillRect(x, lineY, width, 2, this.getColorCode(list.NameColor));
   this.contents.paintOpacity = 255;
 };
 
 Window_ItemBook.prototype.name = function(list, item, x, y, width) {
   const nameText = list.paramName;
   if (nameText) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(nameText, x, y, width, list.namePosition);
   }
 };
@@ -2559,7 +2574,7 @@ Window_ItemBook.prototype.bookEnemyNo = function(list, item, x, y, width) {
   const nameText = list.paramName;
   let textWidth  = 0;
   if (nameText) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(nameText, x, y, width, list.namePosition);
     textWidth = this.textWidth(nameText) + this.itemPadding();
     this.resetTextColor();
@@ -2575,7 +2590,7 @@ Window_ItemBook.prototype.itemNumberOfPossession = function(list, item, x, y, wi
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "所持数";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2593,7 +2608,7 @@ Window_ItemBook.prototype.itemMaxNumberOfPossession = function(list, item, x, y,
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "最大所持数";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2611,7 +2626,7 @@ Window_ItemBook.prototype.itemPrice = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "価格";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2630,7 +2645,7 @@ Window_ItemBook.prototype.originalParams = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName;
   let textWidth = width;
   if (nameText) {
@@ -2651,7 +2666,7 @@ Window_ItemBook.prototype.originalParams = function(list, item, x, y, width) {
 Window_ItemBook.prototype.drawDesc = function(list, item, x, y, width) {
   const nameText = list.paramName;
   if (nameText) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(nameText, x, y);
     y += this.lineHeight();
   }
@@ -2676,7 +2691,7 @@ Window_ItemBook.prototype.useItemOccasion = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "使用可能時";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2694,7 +2709,7 @@ Window_ItemBook.prototype.useItemConsumable = function(list, item, x, y, width) 
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "消耗";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2712,7 +2727,7 @@ Window_ItemBook.prototype.speedCorrection = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "速度補正";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2730,7 +2745,7 @@ Window_ItemBook.prototype.successRate = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "成功率";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2748,7 +2763,7 @@ Window_ItemBook.prototype.tpGain = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "得TP";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2766,7 +2781,7 @@ Window_ItemBook.prototype.param = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : TextManager.param(list.DateSelect - 20);
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2784,7 +2799,7 @@ Window_ItemBook.prototype.weaponType = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "武器タイプ";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2802,7 +2817,7 @@ Window_ItemBook.prototype.armorType = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "防具タイプ";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2820,7 +2835,7 @@ Window_ItemBook.prototype.equipType = function(list, item, x, y, width) {
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "装備タイプ";
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
@@ -2835,7 +2850,7 @@ Window_ItemBook.prototype.equipType = function(list, item, x, y, width) {
 };
 
 Window_ItemBook.prototype.effectOfUse = function(list, item, x, y, width) {
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "使用効果";
   this.drawText(nameText, x, y, width);
   const lineHeight = this.lineHeight();
@@ -2881,7 +2896,7 @@ Window_ItemBook.prototype.effectOfUse = function(list, item, x, y, width) {
 };
 
 Window_ItemBook.prototype.feature = function(list, item, x, y, width) {
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "特徴";
   this.drawText(nameText, x, y, width);
   const lineHeight = this.lineHeight();
@@ -3365,6 +3380,13 @@ Window_ItemBook.prototype.drawContentsBackgroundRect = function(rect) {
 Window_ItemBook.prototype.contentsRect = function(x, y, width) {
   const height = this.lineHeight() - this.rowSpacing();
   return new Rectangle(x, y + 2, width, height);
+};
+
+Window_ItemBook.prototype.getColorCode = function(color) {
+  if (typeof(color) === "string") {
+    return color;
+  }
+  return ColorManager.textColor(color);
 };
 
 

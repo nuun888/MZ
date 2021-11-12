@@ -10,22 +10,22 @@
  * @target MZ
  * @plugindesc 条件付きアイテム、スキル
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.2
  * @base NUUN_ConditionsBase
  * @orderAfter NUUN_ConditionsBase
  * 
  * @help
- * スキルに使用条件
+ * スキル、アイテムに使用条件を設定できます。
  * 【属性】【攻撃】【ダメージ】【使用アイテム、スキル】【反撃、魔法反射】及び敵の対象は設定できません。
  * 敵グループ指定の場合戦闘中のみ条件判定します。
  * 
- * スキルのメモ欄
+ * スキル。アイテムのメモ欄
  * <ConditionalSkill:[id],[id],[id]...> 指定したIDの条件を全て満たしたときに使用可能です。
  * <PartyConditionalSkill:[id],[id],[id]...> パーティメンバーの指定したIDの条件を全て満たしたときに使用可能です。
  * <TroopConditionalSkill:[id],[id],[id]...> 敵グループの指定したIDの条件を全て満たしたときに使用可能です。
  * 敵グループは戦闘中のみ判定します。
  * [id]:条件付きベースの適用条件のリストID
- * <PartialMatchSkill:[modeId]> [modeId]:0 いずれかが一致　1：全て一致
+ * <MatchMode:[modeId]> [modeId]:0 いずれかが一致　1：全て一致
  * 未記入の場合はいずれかが一致の場合条件を満たしたときになります。
  * 
  * このプラグインはNUUN_ConditionsBaseが必要です。
@@ -35,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/12 Ver.1.0.1
+ * 条件付きベースの条件付きベースの定義変更による条件タグの設定方法を変更。
  * 2021/9/13 Ver.1.0.0
  * 初版
  * 
@@ -65,7 +67,8 @@ Imported.NUUN_ConditionalSkills = true;
 
   Game_BattlerBase.prototype.itemConditionsEX = function(item) {
     if (this.isActor() || EnemyUseConditional) {
-      return this.getTriggerConditions(item, null, 'ConditionalSkill', null, 'PartyConditionalSkill', 'TroopConditionalSkill', null, null, 'PartialMatchSkill');
+      const mode = Number(item.meta.MatchMode) || 0;
+      return this.getTriggerConditions(item, null, 'ConditionalSkill', null, 'PartyConditionalSkill', 'TroopConditionalSkill', null, null, mode);
     } else {
       return true;
     }

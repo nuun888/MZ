@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -34,6 +34,12 @@
  * パーティ、敵グループ　生存メンバー数(1)(2)（(1)バトラー数、(2)バトラー数）'AliveMember'
  * 上限値(1) 0 下限値(1) 4
  * 上限値は指定の数値以下　下限値は指定の数字以上　指定の数値は固定値になります。(1)と(2)は両方選択することはできませんので別々にリストに設定してください。
+ * 
+ * ステート4番にかかっている
+ * 条件タイプ　ステート(State)
+ * ステート　指定のステートIDにかかっている(1)(2)(3)（(1)ターン (2)ターン (3)ステートID）'AddState'
+ * 指定の数値(2) 無記入 または　上限値(1) 0、下限値(2) 0
+ * 指定のID(3) 4
  * 
  * ステート5番6番にかかっていて残りターン３ターン目の場合
  * 条件タイプ　ステート(State)
@@ -197,6 +203,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/12 Ver.1.0.3
+ * ターン制時に条件ターンが正常に取得できていなかった問題を修正。
+ * 一部プラグインの定義変更。
  * 2021/11/11 Ver.1.0.2
  * 条件ターンが適用されていなかった問題を修正。
  * 複数属性取得処理の変更。NUUN_Base 要Ver.1.3.1以降
@@ -590,12 +599,8 @@ const _Game_Temp_initialize = Game_Temp.prototype.initialize;
 Game_Temp.prototype.initialize = function() {
   _Game_Temp_initialize.call(this);
   this.actionData = {};
-  this._listCond = false;
 };
 
-Game_Temp.prototype.listCondData = function() {
-  this._listCond = true;
-};
 
 Game_Temp.prototype.getActionData = function() {
   return this.actionData;
@@ -603,50 +608,45 @@ Game_Temp.prototype.getActionData = function() {
 
 const _Game_Action_apply = Game_Action.prototype.apply;
 Game_Action.prototype.apply = function(target) {
-  //$gameTemp.actionData.subject = this.subject();
-  //$gameTemp.actionData.action = this;
-  //$gameTemp.actionData.damage = 0;
+  $gameTemp.actionData.subject = this.subject();
+  $gameTemp.actionData.action = this;
+  $gameTemp.actionData.damage = 0;
   _Game_Action_apply.call(this, target);
 };
 
 const _Game_Action_executeDamage = Game_Action.prototype.executeDamage;
 Game_Action.prototype.executeDamage = function(target, value) {
-  //$gameTemp.actionData.damage = value;
+  $gameTemp.actionData.damage = value;
  _Game_Action_executeDamage.call(this, target, value);
 };
 
-Game_Action.prototype.traitTriggerConditions = function(target, tag1, tag2, tag3, tag4, damage, partialMatch) {//特徴取得
+Game_Action.prototype.traitTriggerConditions = function(target, tag1, tag2, tag3, tag4, damage, partialMode) {//特徴取得
   const subject = this.subject();
-  return subject.getTraitTriggerConditions(target, tag1, tag2, tag3, tag4, this, damage, partialMatch);
+  return subject.getTraitTriggerConditions(target, tag1, tag2, tag3, tag4, this, damage, partialMode);
 };
 
-Game_Action.prototype.triggerConditions = function(obj, target, tag1, tag2, tag3, tag4, damage, partialMatch) {//単体
+Game_Action.prototype.triggerConditions = function(obj, target, tag1, tag2, tag3, tag4, damage, partialMode) {//単体
   const subject = this.subject();
-  return subject.getTriggerConditions(obj, target, tag1, tag2, tag3, tag4, this, damage, partialMatch);
+  return subject.getTriggerConditions(obj, target, tag1, tag2, tag3, tag4, this, damage, partialMode);
 };
 
-Game_BattlerBase.prototype.getTraitTriggerConditions  = function(target, tag1, tag2, tag3, tag4, action, damage, partialMatch) {//特徴取得
+Game_BattlerBase.prototype.getTraitTriggerConditions  = function(target, tag1, tag2, tag3, tag4, action, damage, partialMode) {//特徴取得
   return this.traitObjects().some(traits => {
-    return getTriggerConditions(traits, this, target, tag1, tag2, tag3, tag4, action, damage, partialMatch);
+    return getTriggerConditions(traits, this, target, tag1, tag2, tag3, tag4, action, damage, partialMode);
   });
 };
 
-Game_BattlerBase.prototype.getTriggerConditions  = function(obj, target, tag1, tag2, tag3, tag4, action, damage, partialMatch) {//単体
-  return getTriggerConditions(obj, this, target, tag1, tag2, tag3, tag4, action, damage, partialMatch);
+Game_BattlerBase.prototype.getTriggerConditions  = function(obj, target, tag1, tag2, tag3, tag4, action, damage, partialMode) {//単体
+  return getTriggerConditions(obj, this, target, tag1, tag2, tag3, tag4, action, damage, partialMode);
 };
 
-function getTriggerConditions(obj, subject, target, tag1, tag2, tag3, tag4, action, damage, partialMatch) {
+function getTriggerConditions(obj, subject, target, tag1, tag2, tag3, tag4, action, damage, partialMode) {
   if (getTriggerConditionsMeta(obj, tag1, tag2, tag3, tag4)) {
-    let partialMode = 0;
-    if ($gameTemp.listCond) {
-      partialMode = partialMatch === 'AllMatch' ? 1 : 0;
-    } else {
-      partialMode = Number(obj.meta[partialMatch]) || 0;
-    }
     const result1 = getTriggerConditionsResult(obj, subject, tag1, 'Subject', action, damage, partialMode);
     const result2 = getTriggerConditionsResult(obj, target, tag2, 'Target', action, damage, partialMode);
     const result3 = getTriggerConditionsResult(obj, null, tag3, 'Party', action, damage, partialMode);
     const result4 = getTriggerConditionsResult(obj, null, tag4, 'Troop', action, damage, partialMode);
+    
     if (partialMode === 0) {
       return result1 || result2 || result3 || result4;
     } else {
@@ -661,11 +661,7 @@ function getTriggerConditionsResult(obj, target, tag, mode, action, damage, part
   let list = [];
   let result = partialMode === 1;
   if (tag && obj.meta[tag] && !(!$gameParty.inBattle() && mode === 'Troop')) {
-    if ($gameTemp.listCond) {
-      list = tag.map(Number);console.log(list)
-    } else {
-      list = obj.meta[tag].split(',').map(Number);
-    }
+    list = obj.meta[tag].split(',').map(Number);
     if (partialMode === 0) {
       result = isTriggerConditionsSome(list, target, mode, action, damage);
     } else {
@@ -684,6 +680,7 @@ function isTriggerConditionsEvery(list, target, mode, action, damage) {
 }
 
 function triggerConditions(data, target, mode, action, damage) {
+  
   if (data.ConditionsMode === 'Member') {
     return memberTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Battler') {
@@ -1052,7 +1049,7 @@ function conditionsNum(data, num) {
   if (data.ValList) {
     return getValList(data.ValList).some(val => val === num);
   }
-  return num >= data.DwLimit && (data.UpLimit > 0 ? (num <= data.UpLimit) : true);
+  return (num >= data.DwLimit && (data.UpLimit > 0 ? (num <= data.UpLimit) : true));
 };
 
 function getUnit(target, mode) {
@@ -1166,7 +1163,15 @@ function isEquipType(typeid, list) {
 };
 
 function turn(data, member) {
-  return conditionsNum(data, member.turnCount());
+  return conditionsNum(data, condTurnCount(member));
+};
+
+function condTurnCount(member) {
+  if (BattleManager.isTpb()) {
+    return member.turnCount();
+  } else {
+    return BattleManager.nuun_battleTurn;
+  }
 };
 
 function attackElement(idList, action) {
@@ -1291,6 +1296,18 @@ Game_BattlerBase.prototype.getTraitsTriggerConditions = function(tag) {
     return data ? r.concat(data) : r;
   }, []);
   return cond.length > 0 ? cond : null;
+};
+
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+  _BattleManager_initMembers.call(this);
+  this.nuun_battleTurn = 1;
+};
+
+const _BattleManager_endAllBattlersTurn = BattleManager.endAllBattlersTurn;
+BattleManager.endAllBattlersTurn = function() {
+  _BattleManager_endAllBattlersTurn.call(this);
+  this.nuun_battleTurn++;
 };
 
 })();

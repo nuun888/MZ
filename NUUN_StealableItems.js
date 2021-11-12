@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -18,20 +18,20 @@
  * 敵からアイテムやお金を盗むスキルまたは、敵からアイテム、お金を盗まれるスキルを
  * 作ることが出来ます。
  * 
- * アイテムを盗むスキルを作るには、スキルのメモ欄に以下を記述します。
+ * アイテムを盗むスキルを作るには、スキル、アイテムのメモ欄に以下を記述します。
  * このタグはアクター、敵両方で使用できます。
  * <stealSkill:[rate]>
  * [rate]:成功率
  * 例<stealSkill:80>
  * 盗みスキルを設定します。
  * 
- * 敵からお金を盗むスキルを作るには、スキルのメモ欄に以下を記述します。
+ * 敵からお金を盗むスキルを作るには、スキル、アイテムのメモ欄に以下を記述します。
  * このタグはアクター専用です。
  * <goldStealSkill:[rate]>
  * [rate]:成功率
  * <goldStealSkill:50>
  * 
- * 敵からお金を盗まれるスキルを作るには、スキルのメモ欄に以下を記述します。
+ * 敵からお金を盗まれるスキルを作るには、スキル、アイテムのメモ欄に以下を記述します。
  * 以下のタグは敵専用です。
  * <goldStealSkill:[rate],[gold]>
  * [rate]:成功率　[gold]:盗める金額
@@ -44,7 +44,16 @@
  * <goldStealSkillRate:70, 30>
  * 70%の確率で所持金の30%が奪われます。
  * 
+ * 
  * 敵から盗めるアイテムを設定するには、敵のメモ欄に以下を記述します。
+ * <steal [itemType]:[id], [rate], [condTag], [condMode]>
+ * [itemType]：アイテムタイプ　I アイテム　W 武器　A 防具　M 金額
+ * [id]:アイテム、武器、防具のID
+ * [rate]：確率
+ * 以下の設定は条件付きベースプラグインが必要です。条件を指定しない場合は省略できます。
+ * [condTag]：条件タグ ※省略可能　条件付きベースが必要です。
+ * [condMode]：条件モード ※省略可能　条件付きベースが必要です。0:一部一致 1:全て一致
+ * 
  * <steal I:アイテムID, 確率>
  * 盗めるアイテムを設定します。
  * <steal W:武器ID, 確率>
@@ -53,6 +62,15 @@
  * 盗める防具を設定します。
  * <steal M:金額, 確率>
  * 盗める金額を設定します。
+ * 
+ * 条件付き盗めるアイテム
+ * <Steal[condTag]:[id],[id],[id]...> 盗みスキル発動者が指定したIDの条件を満たしたときに盗めます。
+ * <TargetSteal[condTag]:[id],[id],[id]...> 盗み対象が指定したIDの条件を全て満たしたときに盗めます。
+ * <PartySteal[condTag]:[id],[id],[id]...> パーティメンバーの指定したIDの条件を全て満たしたときに盗めます。
+ * <TroopSteal[condTag]:[id],[id],[id]...> 敵グループの指定したIDの条件を全て満たしたときに盗めます。
+ * [mode]：条件モード　0:一部一致 1：全て一致
+ * [id]：条件リストのID
+ * <StealCond1:0,14,15> 
  * 
  * 敵から盗まれるアイテムを設定するには、プラグインパラメータの「敵から奪われるアイテム設定」から設定します。
  * 
@@ -83,6 +101,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/11/13 Ver 1.3.1
+ * 条件付きに対応。
  * 2021/10/24 Ver 1.3.0
  * メッセージのフォーマットを変更。
  * 同じアイテムを何度でも盗める機能を追加。
@@ -161,6 +181,7 @@
  * 
  * @param SuccessSE
  * @text アイテム盗みSE設定
+ * @default ------------------------------
  * 
  * @param StealSuccessSE
  * @text 盗み成功時SE
@@ -192,6 +213,7 @@
  * 
  * @param GoldSuccessSE
  * @text お金盗み成功時のSE設定
+ * @default ------------------------------
  * 
  * @param StealGoldSuccessSE
  * @text お金盗み成功時SE
@@ -220,6 +242,16 @@
  * @type number
  * @default 50
  * @parent GoldSuccessSE
+ * 
+ * @param ConditionalSuccessSE
+ * @text 条件付き設定
+ * @default ------------------------------
+ * 
+ * @param ConditionalList
+ * @text 敵から奪われるアイテム設定
+ * @desc 敵から奪われるアイテムの設定です。
+ * @default []
+ * @type struct<ConditionalListData>[]
  * 
  */ 
 /*~struct~stolenItems:
@@ -267,7 +299,7 @@ const G_volume = Number(parameters['G_volume'] || 90);
 const G_pitch = Number(parameters['G_pitch'] || 100);
 const G_pan = Number(parameters['G_pan'] || 50);
 let StealMessage = [];
-
+//ポップアップ対応　条件付き対応
 
 function getStolenItemList(target, rate) {
 	let weightSum = 0;
@@ -541,10 +573,6 @@ Game_Actor.prototype.getStolenRate = function(rate) {
 	return Math.floor(Math.random() * 100) < (rate / this.stealItemRate() * 100);
 };
 
-Game_Action.prototype.stealConditions = function(target){
-	
-};
-
 
 const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
 Game_Enemy.prototype.initMembers = function() {
@@ -576,12 +604,23 @@ Game_Enemy.prototype.stealGoldRandomId = function() {
 	return Math.randomInt(i);
 };
 
+Game_Enemy.prototype.stealConditions = function(di){
+	if (Imported.NUUN_ConditionsBase && di.cond) {
+		const action = $gameTemp.getActionData();
+		const condTag = 'Steal' + String(di.cond).trim();
+		const mode = di.mode || 0;
+		return action.subject.getTriggerConditions(this.enemy(), this, condTag, 'Target' + condTag, 'Party' + condTag, 'Troop' + condTag, action.action, action.damage, mode);
+	} else {
+		return true;
+	}
+};
+
 Game_Enemy.prototype.makeStealItems = function(rate) {
 	$gameSystem._stealIndex = 0;
 	let i = 0;
 	const stealId = StealProcess === 1 ? this.stealRandomId() : 0;
 	for (const di of this._stealItems) {
-		if (di.kind > 0 && di.kind < 4 && randomRate(di.id, stealId) && this.getStealRate(rate, di)) {
+		if (di.kind > 0 && di.kind < 4 && this.stealConditions(di) && randomRate(di.id, stealId) && this.getStealRate(rate, di)) {
 			let r = this.stealObject(di.kind, di.dataId);
 			if (StealMode) {
 				this._stealItems[i] = {dataId: 1, denominator: 1, kind: 0};
@@ -599,7 +638,7 @@ Game_Enemy.prototype.makeStealGold = function(rate) {
 	let i = 0;
 	const stealId = StealProcess === 1 ? this.stealGoldRandomId() : 0;
 	for (const di of this._stealItems) {
-		if (di.kind === 4 && randomRate(di.id, stealId) && this.getStealRate(rate, di)) {
+		if (di.kind === 4 && this.stealConditions(di) && randomRate(di.id, stealId) && this.getStealRate(rate, di)) {
 			let r = this.stealObject(di.kind, di.dataId);
 			if (StealMode) {
 				this._stealItems[i] = {dataId: 1, denominator: 1, kind: 0};
@@ -647,23 +686,24 @@ Game_Enemy.prototype.setup = function(enemyId, x, y) {
 };
 
 Game_Enemy.prototype.stealSetup = function() {
-	const re =/<(?:steal)\s*([IWAM]):\s*(\d+(?:\s*,\s*\d+)*)>/g;
+	//const re =/<(?:steal)\s*([IWAM]):\s*(\d+(?:\s*,\s*\d+)*)>/g;
+	const re =/<(?:steal)\s*([IWAM]):\s*(.*)>/g;
 	while(true) {
 		let match = re.exec(this.enemy().note);
 		if (match) {
 			let data = match[2].split(',');
 			switch (match[1]) {
 				case 'I':
-					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:1});
+					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:1, cond: data[2], mode: parseInt(data[3])});
 					break;
 				case 'W':
-					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:2});
+					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:2, cond: data[2], mode: parseInt(data[3])});
 					break;
 				case 'A':
-					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:3});
+					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:3, cond: data[2], mode: parseInt(data[3])});
 					break;
 				case 'M':
-					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:4});
+					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:4, cond: data[2], mode: parseInt(data[3])});
 					break;
 			}
 		} else {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -60,9 +60,11 @@
  * 
  * (2)指定した数値：数値は複数設定できますが複数設定する場合は、''または""で囲む必要があります。
  * いずれかの数値が一致したときに条件を満たします。　指定した数値に入力がある場合(1)上限下限値の設定は無視されます。
+ * 2つ以上指定する場合は必ず''で囲ってください。例'6,7,17'
  * 
  * (3)指定したID：数値は複数設定できますが複数設定する場合は、''または""で囲む必要があります。
  * いずれかのIDが一致したときに条件を満たします。
+ * 2つ以上指定する場合は必ず''で囲ってください。例'6,7,17'
  * 
  * 対象がアクター、パーティなら味方、エネミー、敵グループなら敵の条件を参照します。
  * 【パーティ、敵グループ】
@@ -129,6 +131,7 @@
  * [指定のバフIDにかかっていない][指定のデバフIDにかかっていない]
  * 対象が「指定のバフID](3)にかかっていなければ条件を満たします。
  * パーティ、敵グループの場合はいずれかが一致したときに条件を満たします。
+ * 0：HP　1：MP　2:攻撃力　3：防御力　4：魔法力　5：魔法防御　6：敏捷性　7：運
  * 
  * 【武器タイプ】
  * [指定の武器装備][指定の防具装備]
@@ -203,11 +206,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/13 Ver.1.0.4
+ * ステート、バフのID指定が正常に適用されていなかった問題を修正。
+ * 一部のバフ条件が適用されなかった問題を修正。
  * 2021/11/12 Ver.1.0.3
  * ターン制時に条件ターンが正常に取得できていなかった問題を修正。
  * 一部プラグインの定義変更。
- * 2021/11/11 Ver.1.0.2
- * 条件ターンが適用されていなかった問題を修正。
  * 複数属性取得処理の変更。NUUN_Base 要Ver.1.3.1以降
  * 2021/9/13 Ver.1.0.1
  * 属性時の条件が正常に判定されていなかった問題を修正。
@@ -404,15 +408,15 @@
  * 
  * @param BuffConditionsType
  * @text バフ(Buff)
- * @desc バフの条件タイプを指定します。
+ * @desc バフの条件タイプを指定します。指定ID　0：HP　1：MP　2:攻撃力　3：防御力　4：魔法力　5：魔法防御　6：敏捷性　7：運
  * @type select
  * @option 指定のバフIDにかかっている(3)
  * @value 'AddBuff'
- * @option 指定のバフIDにかかっていない(3)（(3)で無記入の場合はすべてのステートにかかっていない時に条件を満たします）
+ * @option 指定のバフIDにかかっていない(3)（(3)で無記入の場合はすべてのバフにかかっていない時に条件を満たします）
  * @value 'NotBuff'
  * @option 指定のデバフIDにかかっている(3)
  * @value 'AddDebuff'
- * @option 指定のデバフIDにかかっていない(3)（(3)で無記入の場合はすべてのステートにかかっていない時に条件を満たします）
+ * @option 指定のデバフIDにかかっていない(3)（(3)で無記入の場合はすべてのデバフにかかっていない時に条件を満たします）
  * @value 'NotDebuff'
  * @default 
  * 
@@ -1103,9 +1107,14 @@ function conditionsAve(data, unit) {
 }
 
 function state(data, member) {
-  const stateId = member._states;
-  return stateId.some(id => id > 0 && stateTurn(data, id, member));
+  const states = member._states;
+  const list = getValList(data.IDList);
+  return list.some(id => id > 0 && stateTurn(data, getStateId(id, states), member));
 }
+
+function getStateId(id, states) {
+  return states.find(stateId => stateId > 0 && stateId === id);
+};
 
 function stateTurn(data, id, member) {
   const turn = member._stateTurns[id];
@@ -1113,30 +1122,66 @@ function stateTurn(data, id, member) {
 };
 
 function notStates(data, member) {
-  const stateId = member._states;
-  if (data.ValList) {
-    return stateId.some(id => !stateId(data, id));
+  const states = member._states;
+  if (data.IDList) {
+    const list = getValList(data.IDList);
+    return list.some(id => !getStateId(id, states))
   } else {
-    return !(stateId.some(id => id > 0));
+    return !(states.some(id => id > 0));
   }
-}
-
-function stateId(data, id) {
-  return getValList(data.ValList).some(val => val === id);
 };
 
 function buffs(data, member) {
   const buffs = member._buffs;
-  return buffs.some((id, i) => id > 0 && buffsLavel(data, i, member));
-}
-
-function buffsLavel(data, i, member) {
-  const lavel = Math.abs(member._buffs[i]);
-  return conditionsNum(data, lavel);
+  const list = getValList(data.IDList);
+  return list.some(id => buffsLavel(data, id, buffs))
 };
 
-function buffsTurn(data, i, member) {
-  const turn = member._buffTurns[i];
+function deBuffs(data, member) {
+  const buffs = member._buffs;
+  const list = getValList(data.IDList);
+  return list.some(id => deBuffsLavel(data, id, buffs))
+};
+
+function notBuffs(data, member) {
+  const buffs = member._buffs;
+  if (data.IDList) {
+    const list = getValList(data.IDList);
+    return list.some(id => !buffsLavel(data, id, buffs))
+  } else {
+    return !(buffs.some(buff => buff > 0));
+  }
+};
+
+function notDebuffs(data, member) {
+  const buffs = member._buffs;
+  if (data.IDList) {
+    const list = getValList(data.IDList);
+    return list.some(id => !deBuffsLavel(data, id, buffs))
+  } else {
+    return !(buffs.some(buff => buff < 0));
+  }
+};
+
+function buffsLavel(data, id, buffs) {
+  const lavel = buffs[id];
+  return lavel > 0;
+  //const lavel = Math.abs(buffs[id]);
+  //return conditionsNum(data, lavel);
+};
+
+function deBuffsLavel(data, id, buffs) {
+  const lavel = buffs[id];
+  return lavel < 0;
+  //if (buffs[id] < 0) {
+  //  return conditionsNum(data, lavel);
+  //} else {
+  //  return false;
+  //}
+};
+
+function buffsTurn(data, id, member) {
+  const turn = member._buffTurns[id];
   return conditionsNum(data, turn);
 };
 

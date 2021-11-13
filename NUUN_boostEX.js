@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 行動時ブースト特徴
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * 攻撃時に特定の行動によってダメージを補正する効果を得ることができます。
@@ -43,14 +43,16 @@
  * <BoostEX:MRF, [rate]>
  * 
  * 以下は条件付きベースが必要です。
- * <BoostCond:[rate]>
+ * <BoostCond:[rate],[condMode]>
  * 条件付きベースの条件が一致した時にダメージを増幅させます。
- *  <ConditionalBoost:[id],[id]....> 
- *  <TargetConditionalBoost:[id],[id]....> 
- *  <PartyConditionalBoost:[id],[id]....> 
- *  <TroopConditionalBoost:[id],[id]....> 
+ * 下記のタグがひとつもない場合はtrueを返します。
+ *  <CondBoost:[id],[id]....> 
+ *  <TargetCondBoost:[id],[id]....> 
+ *  <PartyCondBoost:[id],[id]....> 
+ *  <TroopCondBoost:[id],[id]....> 
  * 
  * [rate]:増幅率±
+ * [condMode]：条件モード（省略可）0:一部一致 1:全て一致
  * 
  * ２つ以上該当する場合は加算した合計で算出されます。
  * 魔法属性+20%と炎属性+30の場合は50%ダメージが増幅されます。
@@ -60,6 +62,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/13 Ver.1.1.2
+ * 条件付きベースの条件が正常に取得できていなかった問題を修正。
+ * 条件付きベースの定義変更による条件タグの設定方法を変更。
  * 2021/10/30 Ver.1.1.1
  * 属性ブーストの特徴を持つバトラーがスキル攻撃したときにエラーが出る問題を修正。
  * 2021/9/13 Ver.1.1.0
@@ -93,8 +98,10 @@ Game_Action.prototype.boostConditionsEX = function(target, damage) {
   }
   return this.subject().traitObjects().reduce((r, trait) => {
     if (trait.meta.BoostCond) {
-      if (this.triggerConditions(trait, target, 'ConditionalBoost', 'TargetConditionalBoost', 'PartyConditionalBoost', 'TroopConditionalBoost', this, damage, 'PartialMatchBoost')) {
-        return r + Number(trait.meta.BoostCond);
+      const cond = trait.meta.BoostCond.split(',').map(Number);
+      const mode = cond[1] || 0;
+      if (this.triggerConditions(trait, target, 'CondBoost', 'TargetCondBoost', 'PartyCondBoost', 'TroopCondBoost', damage, mode)) {
+        return r + cond[0];
       }
     }
     return r;

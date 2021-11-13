@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  戦闘中アイテム、スキル選択画面MV風表示
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
@@ -20,6 +20,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/11/14 Ver.1.1.2
+ * スキル、アイテムを選択し敵の選択画面を表示した後にキャンセルするとアクターウィンドウが表示されない問題を修正。
  * 2021/11/5 Ver.1.1.1
  * キャンセルボタンの表示がスキル、アイテムウィンドウが開いていなくても一番上に表示されてしまう問題を修正。
  * 2021/11/5 Ver.1.1.0
@@ -133,6 +135,17 @@ Scene_Battle.prototype.commandItem = function() {
   }
   if (!this._actorCommandWindow.visible) {
     this._actorCommandWindow.show();
+  }
+};
+
+const _Scene_Battle_onEnemyCancel = Scene_Battle.prototype.onEnemyCancel;
+Scene_Battle.prototype.onEnemyCancel = function() {
+  _Scene_Battle_onEnemyCancel.call(this);
+  switch (this._actorCommandWindow.currentSymbol()) {
+    case "skill":
+    case "item":
+      this._statusWindow.show();
+      break;
   }
 };
 

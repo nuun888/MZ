@@ -91,7 +91,7 @@
  * @param ClassCommandPosition
  * @text クラス毎のコマンド名表示位置
  * @desc クラス毎のコマンド名表示位置の設定をします。
- * @default 
+ * @default []
  * @type struct<ClassCommandList>[]
  * 
  */
@@ -224,6 +224,7 @@ Window_HorzCommand.prototype.itemTextAlign = function() {
 };
 
 Window_Command.prototype.itemTextAlignClass = function() {
+  param.ClassCommandPosition = param.ClassCommandPosition || [];
   const className = String(this.constructor.name);
   const result = param.ClassCommandPosition.find(_Class => _Class.CommandClass[0] === className);
   return result ? result.CommandPosition : null;

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc コマンド拡張
  * @author NUUN
- * @version 1.2.5
+ * @version 1.3.0
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -33,6 +33,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/14 Ver 1.3.0
+ * クラス毎にテキストの位置を指定できる機能を追加。
  * 2021/11/7 Ver 1.2.5
  * カラーコードで指定できるように修正。
  * 2021/10/23 Ver 1.2.4
@@ -67,24 +69,30 @@
  * @desc 縦方向コマンドのコマンド名の表示位置を指定します。（メニュー画面など）
  * @type select
  * @option 左揃え
- * @value 0
+ * @value 'left'
  * @option 中央揃え
- * @value 1
+ * @value 'center'
  * @option 右揃え
- * @value 2
- * @default 1
+ * @value 'right'
+ * @default 'center'
  * 
  * @param HorzCommandPosition
  * @text 横方向コマンドのコマンド名表示位置
  * @desc 横方向コマンドのコマンド名の表示位置を指定します。（アイテム欄など）
  * @type select
  * @option 左揃え
- * @value 0
+ * @value 'left'
  * @option 中央揃え
- * @value 1
+ * @value 'center'
  * @option 右揃え
- * @value 2
- * @default 1
+ * @value 'right'
+ * @default 'center'
+ * 
+ * @param ClassCommandPosition
+ * @text クラス毎のコマンド名表示位置
+ * @desc クラス毎のコマンド名表示位置の設定をします。
+ * @default 
+ * @type struct<ClassCommandList>[]
  * 
  */
 /*~struct~CommadIconList:
@@ -121,7 +129,7 @@
  * 
  * @param CommandClass
  * @text フィルタリングクラス設定
- * @desc 適用、除外するクラスを指定します。無指定の場合は全てのコマンドで反映されます。
+ * @desc 適用、除外するクラスを指定します。無指定の場合は全てのコマンドで反映されます。(リスト番号１のみ)
  * @type combo[]
  * @option 'Window_MenuCommand'
  * @option 'Window_ItemCategory'
@@ -137,6 +145,40 @@
  * @option 'Window_ItemBook_Category'
  * @option 'Window_SaveVerificationWindow'
  * @default
+ * 
+ */
+/*~struct~ClassCommandList:
+ * 
+ * @param CommandClass
+ * @text フィルタリングクラス設定
+ * @desc 適用するクラスを指定します。
+ * @type combo[]
+ * @option 'Window_MenuCommand'
+ * @option 'Window_ItemCategory'
+ * @option 'Window_SkillType'
+ * @option 'Window_EquipCommand'
+ * @option 'Window_ShopCommand'
+ * @option 'Window_PartyCommand'
+ * @option 'Window_ActorCommand'
+ * @option 'Window_TitleCommand'
+ * @option 'Window_GameEnd'
+ * @option 'Window_ChoiceList'
+ * @option 'Window_Options'
+ * @option 'Window_ItemBook_Category'
+ * @option 'Window_SaveVerificationWindow'
+ * @default
+ * 
+ * @param CommandPosition
+ * @text コマンド名表示位置
+ * @desc コマンド名の表示位置を指定します。
+ * @type select
+ * @option 左揃え
+ * @value 'left'
+ * @option 中央揃え
+ * @value 'center'
+ * @option 右揃え
+ * @value 'right'
+ * @default 'center'
  * 
  */
 var Imported = Imported || {};
@@ -160,30 +202,31 @@ const _Window_Command_initialize = Window_Command.prototype.initialize;
 Window_Command.prototype.initialize = function(rect) {
   _Window_Command_initialize.call(this, rect);
   this._commadName = null;
+  this._classAlign = this.itemTextAlignClass();
 };
 
 const _Window_Command_itemTextAlign = Window_Command.prototype.itemTextAlign;
 Window_Command.prototype.itemTextAlign = function() {
-  switch (param.CommandPosition) {
-    case 0:
-      return "left";
-    case 1:
-      return _Window_Command_itemTextAlign.call(this);
-    case 2:
-      return "right";
+  if (this._classAlign) {
+    return this._classAlign;
+  } else {
+    return param.CommandPosition;
   }
 };
 
 const _Window_HorzCommand_itemTextAlign = Window_HorzCommand.prototype.itemTextAlign;
 Window_HorzCommand.prototype.itemTextAlign = function() {
-  switch (param.HorzCommandPosition) {
-    case 0:
-      return "left";
-    case 1:
-      return _Window_HorzCommand_itemTextAlign.call(this);
-    case 2:
-      return "right";
+  if (this._classAlign) {
+    return this._classAlign;
+  } else {
+    return param.HorzCommandPosition;
   }
+};
+
+Window_Command.prototype.itemTextAlignClass = function() {
+  const className = String(this.constructor.name);
+  const result = param.ClassCommandPosition.find(_Class => _Class.CommandClass[0] === className);
+  return result ? result.CommandPosition : null;
 };
 
 const _Window_Command_drawText = Window_Command.prototype.drawText;

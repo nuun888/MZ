@@ -11,6 +11,8 @@
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
  * @version 1.0.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * パーティメンバー、敵グループでで共用するゲージを実装します。

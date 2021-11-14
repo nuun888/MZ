@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc XP風パーティ、アクターコマンド
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * 
  * @help
@@ -20,6 +20,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/15 Ver.1.0.2
+ * パーティコマンドの項目が最大列数を超えてた時にコマンドがずれる問題を修正。
  * 2021/11/14 Ver.1.0.1
  * パーティコマンド中央寄りがアクターコマンド中央寄りになっていたのを修正。
  * 2021/11/7 Ver.1.0.0
@@ -105,7 +107,7 @@ Imported.NUUN_XPBattleCommand = true;
     return rect;
   };
 
-  Scene_Battle.prototype.partyCommandY = function() {    console.log("er")
+  Scene_Battle.prototype.partyCommandY = function() {
     if (PartyCommandPosition === 'top') {
       return 0;
     } else if (PartyCommandPosition === 'center') {
@@ -151,7 +153,7 @@ Imported.NUUN_XPBattleCommand = true;
     _Scene_Battle_update.call(this);
   };
   
-
+  
   Window_PartyCommand.prototype.maxCols = function() {
     return PartyCommandMode ? MaxPartyCommandCols : Math.min((this._list ? this.maxItems() : MaxPartyCommandCols), MaxPartyCommandCols);
   };
@@ -160,7 +162,7 @@ Imported.NUUN_XPBattleCommand = true;
   Window_PartyCommand.prototype.itemRect = function(index) {
     const rect = _Window_PartyCommand_itemRect.call(this, index);
     if (PartyCommandMode) {
-      rect.x += this.itemWidth() / 2 * (this.maxCols() - this.maxItems());
+      rect.x += this.itemWidth() / 2 * (this.maxCols() - Math.min(this.maxItems(), this.maxCols()));
     }
     return rect;
   };

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc XP風パーティ、アクターコマンド
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * 
  * @help
@@ -20,6 +20,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/14 Ver.1.0.1
+ * パーティコマンド中央寄りがアクターコマンド中央寄りになっていたのを修正。
  * 2021/11/7 Ver.1.0.0
  * 初版
  * 
@@ -27,9 +29,9 @@
  * @text パーティコマンド設定
  * @default ------------------------------
  * 
- * @param ActorsCommandMode
- * @desc アクターコマンドの項目を中央寄りに表示させます。
- * @text アクターコマンド中央寄り
+ * @param PartyCommandMode
+ * @desc パーティコマンドの項目を中央寄りに表示させます。
+ * @text パーティコマンド中央寄り
  * @type boolean
  * @default true
  * @parent PartyCommandSetting
@@ -80,7 +82,7 @@ Imported.NUUN_XPBattleCommand = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_XPBattleCommand');
-  const ActorsCommandMode = eval(parameters['ActorsCommandMode'] || 'true');
+  const PartyCommandMode = eval(parameters['PartyCommandMode'] || 'true');
   const MaxPartyCommandCols = Number(parameters['MaxPartyCommandCols'] || 4);
   const PartyCommandPosition = eval(parameters['PartyCommandPosition'] || 'top');
   const ActorsCommandVariable = eval(parameters['ActorsCommandVariable'] || 'true');
@@ -103,7 +105,7 @@ Imported.NUUN_XPBattleCommand = true;
     return rect;
   };
 
-  Scene_Battle.prototype.partyCommandY = function() {
+  Scene_Battle.prototype.partyCommandY = function() {    console.log("er")
     if (PartyCommandPosition === 'top') {
       return 0;
     } else if (PartyCommandPosition === 'center') {
@@ -151,13 +153,13 @@ Imported.NUUN_XPBattleCommand = true;
   
 
   Window_PartyCommand.prototype.maxCols = function() {
-    return ActorsCommandMode ? MaxPartyCommandCols : Math.min((this._list ? this.maxItems() : MaxPartyCommandCols), MaxPartyCommandCols);
+    return PartyCommandMode ? MaxPartyCommandCols : Math.min((this._list ? this.maxItems() : MaxPartyCommandCols), MaxPartyCommandCols);
   };
 
   const _Window_PartyCommand_itemRect = Window_PartyCommand.prototype.itemRect;
   Window_PartyCommand.prototype.itemRect = function(index) {
     const rect = _Window_PartyCommand_itemRect.call(this, index);
-    if (ActorsCommandMode) {
+    if (PartyCommandMode) {
       rect.x += this.itemWidth() / 2 * (this.maxCols() - this.maxItems());
     }
     return rect;
@@ -202,7 +204,7 @@ Imported.NUUN_XPBattleCommand = true;
     if (this._statusWindow && this._actor || actorIndex >= 0) {
       const rect = this._statusWindow.itemRect(actorIndex);
       this.x = rect.x + (Graphics.boxWidth - this._statusWindow.width) / 2 + (rect.width - this.width) / 2 + this.itemPadding();
-      this.y = this.home_y - this.height;
+      this.y = this.home_y - this.height + rect.y;
     }
   };
 

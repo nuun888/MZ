@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  戦闘中アイテム、スキル選択画面MV風表示
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
@@ -20,6 +20,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/11/15 Ver.1.1.3
+ * キャンセルボタンの表示がおかしくなる問題を修正。
+ * 対象選択時にアイテム画面、スキル画面が表示されたままだったのを修正。
  * 2021/11/14 Ver.1.1.2
  * スキル、アイテムを選択し敵の選択画面を表示した後にキャンセルするとアクターウィンドウが表示されない問題を修正。
  * 2021/11/5 Ver.1.1.1
@@ -70,6 +73,7 @@ let maxHeight = 0;
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
 Scene_Battle.prototype.initialize = function() {
   _Scene_Battle_initialize.call(this);
+  $gameTemp.openItemSkillWindow = false;
 };
 
 const _Scene_Battle_skillWindowRect = Scene_Battle.prototype.skillWindowRect;
@@ -103,16 +107,24 @@ Scene_Battle.prototype.itemSkillWindowMaxHeight = function(y) {
 const _Scene_Battle_createCancelButton = Scene_Battle.prototype.createCancelButton;
 Scene_Battle.prototype.createCancelButton = function() {
   _Scene_Battle_createCancelButton.call(this);
-  this._originalCancelButtonY = this._cancelButton.y;
+  this._biswMV_cancelButton = new Sprite_Button("cancel");
+  this._biswMV_cancelButton.x = Graphics.boxWidth - this._biswMV_cancelButton.width - 4;
+  this._biswMV_cancelButton.y = 0;
+  this.addWindow(this._biswMV_cancelButton);
 };
 
 const _Scene_Battle_updateCancelButton = Scene_Battle.prototype.updateCancelButton;
 Scene_Battle.prototype.updateCancelButton = function() {
   _Scene_Battle_updateCancelButton.call(this);
-  if (this._cancelButton && this._skillWindow.visible || this._itemWindow.visible) {  
-    this._cancelButton.y = 0;
-  } else {
-    this._cancelButton.y = this._originalCancelButtonY;
+  this.biswMVUpdateCancelButtonPosition();
+};
+
+Scene_Battle.prototype.biswMVUpdateCancelButtonPosition = function() {
+  if (this._biswMV_cancelButton) {
+    this._biswMV_cancelButton.visible = $gameTemp.openItemSkillWindow;
+    if ($gameTemp.openItemSkillWindow) {
+      this._cancelButton.visible = false;
+    }
   }
 };
 
@@ -138,6 +150,20 @@ Scene_Battle.prototype.commandItem = function() {
   }
 };
 
+const _Scene_Battle_startActorSelection = Scene_Battle.prototype.startActorSelection;
+Scene_Battle.prototype.startActorSelection = function() {
+  _Scene_Battle_startActorSelection.call(this);
+  this._itemWindow.hide();
+  this._skillWindow.hide();
+};
+
+const _Scene_Battle_startEnemySelection = Scene_Battle.prototype.startEnemySelection;
+Scene_Battle.prototype.startEnemySelection = function() {
+  _Scene_Battle_startEnemySelection.call(this);
+  this._itemWindow.hide();
+  this._skillWindow.hide();
+};
+
 const _Scene_Battle_onEnemyCancel = Scene_Battle.prototype.onEnemyCancel;
 Scene_Battle.prototype.onEnemyCancel = function() {
   _Scene_Battle_onEnemyCancel.call(this);
@@ -149,6 +175,16 @@ Scene_Battle.prototype.onEnemyCancel = function() {
   }
 };
 
+
+const _Window_Selectable_hideHelpWindow = Window_Selectable.prototype.hideHelpWindow;
+Window_Selectable.prototype.hideHelpWindow = function() {
+  if (this._helpWindow && $gameTemp.openItemSkillWindow) {
+    $gameTemp.openItemSkillWindow = false;
+  }
+  _Window_Selectable_hideHelpWindow.call(this);
+
+};
+
 const _Window_BattleSkill_refresh = Window_BattleSkill.prototype.refresh;
 Window_BattleSkill.prototype.refresh = function() {
   _Window_BattleSkill_refresh.call(this);
@@ -157,12 +193,25 @@ Window_BattleSkill.prototype.refresh = function() {
   }
 };
 
+const _Window_BattleSkill_show = Window_BattleSkill.prototype.show;
+Window_BattleSkill.prototype.show = function() {
+  _Window_BattleSkill_show.call(this);
+  $gameTemp.openItemSkillWindow = true;
+};
+
+
 const _Window_BattleItem_refresh = Window_ItemList.prototype.refresh;
 Window_BattleItem.prototype.refresh = function() {
   _Window_BattleItem_refresh.call(this);
   if (VariableHeight) {
     this.height = Math.min(maxHeight, this.fittingHeight(Math.max(Math.ceil(this.maxItems() / this.maxCols()), 1)));
   }
+};
+
+const _Window_BattleItem_show = Window_BattleItem.prototype.show;
+Window_BattleItem.prototype.show = function() {
+  _Window_BattleItem_show.call(this);
+  $gameTemp.openItemSkillWindow = true;
 };
 
 })();

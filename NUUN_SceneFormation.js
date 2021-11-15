@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.2.5
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/15 Ver.1.3.0
+ * ウィンドウの配置を戦闘用と別々に設定できるように変更。
+ * 控えメンバーのウィンドウのX座標がある程度の座標で止まる問題を修正。
  * 2021/9/23 Ver.1.2.5
  * 固定アクターが待機メンバーの最後のキャラと入れ替えた時に入れ替えが出来てしまう問題を修正。
  * 2021/9/22 Ver.1.2.4
@@ -70,21 +73,28 @@
  * 
  * @param LavelVisible
  * @text レベル表示
- * @desc 戦闘メンバー及び待機メンバーのアクターにレベルを表示。
+ * @desc 戦闘メンバー及び待機メンバーのアクターにレベルを表示。(メニュー、戦闘共通)
  * @type boolean
  * @default false
  * @parent BasicSetting
  * 
  * @param WindowCenter
  * @text ウィンドウ中央自動調整
- * @desc ウィンドウを中央に自動調整します。待機メンバーウィンドウの横幅で調整されます。
+ * @desc ウィンドウを中央に自動調整します。待機メンバーウィンドウの横幅で調整されます。(メニュー)
  * @type boolean
  * @default true
  * @parent BasicSetting
  * 
+ * @param WindowZero
+ * @text ウィンドウ基準0
+ * @desc すべてのウィンドウの座標基準を0,0にします。独自にレイアウトを変更したい場合に使用してください。(メニュー)
+ * @type boolean
+ * @default false
+ * @parent BasicSetting
+ * 
  * @param DeadActorColor
  * @text 戦闘不能アクター背景色
- * @desc 戦闘不能アクターの背景色。
+ * @desc 戦闘不能アクターの背景色。(メニュー、戦闘共通)
  * @type number
  * @default 18
  * @min -1
@@ -92,7 +102,7 @@
  * 
  * @param DecimalMode
  * @text 端数処理四捨五入
- * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
+ * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）(メニュー、戦闘共通)
  * @type boolean
  * @default true
  * @parent Setting
@@ -103,14 +113,14 @@
  * 
  * @param BattleMemberName
  * @text 戦闘メンバー名称
- * @desc 戦闘メンバー名称
+ * @desc 戦闘メンバー名称(メニュー、戦闘共通)
  * @type string
  * @default 戦闘メンバー
  * @parent BattleMemberNameSetting
  * 
  * @param BattleMemberName_X
  * @text 戦闘メンバー名称ウィンドウX座標
- * @desc 戦闘メンバー名称ウィンドウX座標
+ * @desc 戦闘メンバー名称ウィンドウX座標(メニュー)
  * @type number
  * @default 0
  * @min -9999
@@ -118,7 +128,7 @@
  * 
  * @param BattleMemberName_Y
  * @text 戦闘メンバー名称ウィンドウY座標（相対）
- * @desc 戦闘メンバー名称ウィンドウY座標（相対）
+ * @desc 戦闘メンバー名称ウィンドウY座標（相対）(メニュー)
  * @type number
  * @default 0
  * @min -9999
@@ -130,14 +140,14 @@
  * 
  * @param MemberName
  * @text 待機メンバー名称
- * @desc 待機メンバー名称
+ * @desc 待機メンバー名称(メニュー、戦闘共通)
  * @type string
  * @default 待機メンバー
  * @parent MemberNameSetting
  * 
  * @param MemberName_X
  * @text 待機メンバー名称ウィンドウX座標
- * @desc 待機メンバー名称ウィンドウX座標
+ * @desc 待機メンバー名称ウィンドウX座標(メニュー)
  * @type number
  * @default 0
  * @min -9999
@@ -145,27 +155,27 @@
  * 
  * @param MemberName_Y
  * @text 待機メンバー名称ウィンドウY座標（相対）
- * @desc 待機メンバー名称ウィンドウY座標（相対）
+ * @desc 待機メンバー名称ウィンドウY座標（相対）(メニュー)
  * @type number
  * @default 0
  * @min -9999
  * @parent MemberNameSetting
  * 
  * @param BattleMemberSetting
- * @text バトルメンバーウィンドウ設定
+ * @text 戦闘メンバーウィンドウ設定
  * @default ------------------------------
  * 
  * @param BattleMember_X
- * @text バトルメンバーウィンドウX座標
- * @desc バトルメンバーウィンドウX座標
+ * @text 戦闘メンバーウィンドウX座標
+ * @desc 戦闘メンバーウィンドウX座標(メニュー)
  * @type number
  * @default 0
  * @min -9999
  * @parent BattleMemberSetting
  * 
  * @param BattleMember_Y
- * @text バトルメンバーウィンドウY座標（相対）
- * @desc バトルメンバーウィンドウY座標（相対）
+ * @text 戦闘メンバーウィンドウY座標（相対）
+ * @desc 戦闘メンバーウィンドウY座標（相対）(メニュー)
  * @type number
  * @default 0
  * @min -9999
@@ -177,7 +187,7 @@
  * 
  * @param Member_Cols
  * @text 待機メンバー横表示数
- * @desc 待機メンバー横表示数
+ * @desc 待機メンバー横表示数(メニュー、戦闘共通)
  * @type number
  * @default 10
  * @min 0
@@ -185,21 +195,21 @@
  * 
  * @param Member_Rows
  * @text 待機メンバー縦表示数
- * @desc 待機メンバー縦表示数
+ * @desc 待機メンバー縦表示数(メニュー、戦闘共通)
  * @type number
  * @default 1
  * @parent MemberSetting
  * 
  * @param Member_X
  * @text 待機メンバーウィンドウX座標
- * @desc 待機メンバーウィンドウX座標
+ * @desc 待機メンバーウィンドウX座標(メニュー)
  * @type number
  * @default 0
  * @min -9999
  * @parent MemberSetting
  * 
  * @param Member_Y
- * @text 待機メンバーウィンドウY座標（相対）
+ * @text 待機メンバーウィンドウY座標（相対）(メニュー)
  * @desc 待機メンバーウィンドウY座標（相対）
  * @type number
  * @default 0
@@ -212,14 +222,14 @@
  * 
  * @param ActorStatus
  * @text 表示ステータス設定
- * @desc アクターの表示ステータス設定
+ * @desc アクターの表示ステータス設定(メニュー、戦闘共通)
  * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"100\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"1\",\"X_Coordinate\":\"-50\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"144\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"10\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"20\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"60\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"4\",\"Y_Position\":\"1\",\"X_Coordinate\":\"-50\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"240\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"14\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"15\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"2\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"16\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"3\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"17\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"3\",\"Y_Position\":\"4\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"40\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"380\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"41\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"-44\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"380\",\"SystemItemWidth\":\"0\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}"]
  * @type struct<ActorStatusList>[]
  * @parent StatusSetting
  * 
  * @param EquipNameVisible
  * @text 装備部位名表示
- * @desc 表示する装備部位名を指定します。
+ * @desc 表示する装備部位名を指定します。(メニュー、戦闘共通)
  * @type select
  * @option なし
  * @value 0
@@ -235,10 +245,25 @@
  * @param EquipIcons
  * @type struct<EquipIconsData>[]
  * @text 装備アイコン
- * @desc 装備アイコンを設定します。IDは装備スロットの番号と同じです。
+ * @desc 装備アイコンを設定します。IDは装備スロットの番号と同じです。(メニュー、戦闘共通)
  * @default []
  * @parent StatusSetting
  * 
+ * @param Status_X
+ * @text ステータスウィンドウX座標
+ * @desc ステータスウィンドウX座標(メニュー)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent StatusSetting
+ * 
+ * @param Status_Y
+ * @text ステータスウィンドウY座標（相対）
+ * @desc ステータスウィンドウY座標（相対）(メニュー)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent StatusSetting
  * 
  * @param ActorFixedSetting
  * @text アクター並び替え固定設定(要Imported.NUUN_ActorFixed)
@@ -246,7 +271,7 @@
  * 
  * @param FixedActorBackColor
  * @text 固定アクター背景色
- * @desc 固定アクターの背景色。
+ * @desc 固定アクターの背景色。(メニュー、戦闘共通)
  * @type number
  * @default 3
  * @min -1
@@ -516,6 +541,9 @@ const BattleMember_X = Number(parameters['BattleMember_X'] || 0);
 const BattleMember_Y = Number(parameters['BattleMember_Y'] || 0);
 const Member_X = Number(parameters['Member_X'] || 0);
 const Member_Y = Number(parameters['Member_Y'] || 0);
+const Status_X = Number(parameters['Status_X'] || 0);
+const Status_Y = Number(parameters['Status_Y'] || 0);
+const WindowZero = eval(parameters['WindowZero'] || "false");
 const Member_Cols = Number(parameters['Member_Cols'] || 10);
 const Member_Rows = Number(parameters['Member_Rows'] || 1);
 const ActorStatus = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorStatus'])) : [];
@@ -649,7 +677,7 @@ Scene_Formation.prototype.battleMemberNameWindowRect = function() {
 
 Scene_Formation.prototype.memberNameWindowRect = function() {
   const wx = MemberName_X + (WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
-  const wy = this.memberY() + MemberName_Y;
+  const wy = MemberName_Y + (WindowZero ? 0 : this.memberY());
   const ww = this.nameWidth();
   const wh = this.calcWindowHeight(1, true);
   return new Rectangle(wx, wy, ww, wh);
@@ -657,7 +685,7 @@ Scene_Formation.prototype.memberNameWindowRect = function() {
 
 Scene_Formation.prototype.battleMemberWindowRect = function() {
   const wx = BattleMember_X + (WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
-  const wy = this.calcWindowHeight(1, true) + BattleMember_Y;
+  const wy = BattleMember_Y + (WindowZero ? 0 : this.calcWindowHeight(1, true));
   const ww = $gameSystem.windowPadding() * 2 + $gameParty.defaultMaxBattleMembers() * 56;
   const wh = 80;
   return new Rectangle(wx, wy, ww, wh);
@@ -665,16 +693,16 @@ Scene_Formation.prototype.battleMemberWindowRect = function() {
 
 Scene_Formation.prototype.memberWindowRect = function() {
   const ww = this.memberWindowWidth();
-  const wx = Member_X + WindowCenter ? (Graphics.boxWidth - ww) / 2 : 0;
-  const wy = this.memberY() + this.calcWindowHeight(1, true) + Member_Y;
+  const wx = Member_X + (WindowCenter ? (Graphics.boxWidth - ww) / 2 : 0);
+  const wy = Member_Y + (WindowZero ? 0 : this.memberY() + this.calcWindowHeight(1, true));
   const wh = 86 + (Member_Rows - 1) * 48;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Formation.prototype.memberStatusWindowRect = function() {
-  const wx = 0;
+  const wx = Status_X;
   const wh = this.calcWindowHeight(5, true);
-  const wy = Graphics.boxHeight - wh;
+  const wy = Status_Y + (WindowZero ? 0 : Graphics.boxHeight - wh);
   const ww = Graphics.boxWidth;
   return new Rectangle(wx, wy, ww, wh);
 };

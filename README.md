@@ -74,7 +74,7 @@
 | 巨大モンスター | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) |  | 1.2.0 |
 | バトラーHPゲージ | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) |  | 1.3.3 |
 | 敵に名前表示 | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) |  | 1.2.2 |
-| 敵にTPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.1.7 |
+| 敵にTPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.2.2 |
 | ゲージ画像化 | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) |  | 1.3.0 |
 | ゲージ拡張 |  |  |  |
 |  |  |  |  |

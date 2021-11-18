@@ -2,12 +2,12 @@
 # Ver.1.0.2
 
 パーティコマンド、アクターコマンドをXP風に表示します。  
-![画像](../img/XPBattleCommand2.png)
+![画像](img/XPBattleCommand2.png)
 
 # プラグインパラメータ
 ### パーティコマンド中央寄り  
 パーティコマンドの項目の表示を中央寄りに表示します。  
-![画像](../img/XPBattleCommand1.png)
+![画像](img/XPBattleCommand1.png)
 
 ### 最大パーティコマンド列数  
 表示する最大列数を指定します。  

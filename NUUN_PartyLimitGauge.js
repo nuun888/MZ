@@ -10,12 +10,12 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
- * パーティメンバー、敵グループでで共用するゲージを実装します。
+ * パーティメンバー、敵グループでそれぞれ共用するゲージを実装します。
  * ダメージを受けた時、撃破時、勝利時、敗北時、逃走時にリミットポイントがチャージします。
  * すべて評価式が使用可能です。
  * 
@@ -32,6 +32,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/24 Ver.1.0.1
+ * 戦闘勝利時、逃走時にエラーが出る問題を修正。
  * 2021/11/15 Ver.1.0.0
  * 初版
  * 
@@ -276,10 +278,11 @@ Imported.NUUN_PartyLimitGauge = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_PartyLimitGauge');
 const MaxLimitValue = Number(parameters['MaxLimitValue'] || 1000);
-const PartyGaugeVisible = eval(parameters['PartyGaugeVisible'] || 'true');
+const PartyGaugeVisible = eval(parameters['PartyGaugeVisible'] || 'true');//
 const PartyGaugeShowSwitch = Number(parameters['PartyGaugeShowSwitch'] || 0);
 const BattleStartReset = eval(parameters['BattleStartReset'] || "false");
 const PartyLimitValueVisible = eval(parameters['PartyLimitValueVisible'] || "true");
+const PartyGaugeIcon = Number(parameters['PartyGaugeIcon'] || 0);
 const PartyGaugeLabel = String(parameters['PartyGaugeLabel'] || '');
 const PartyGauge_LabelFontSize = Number(parameters['PartyGauge_LabelFontSize'] || 0);
 const PartyGauge_X = Number(parameters['PartyGauge_X'] || 0);
@@ -291,6 +294,7 @@ const PartyGauge_LabelColor = (DataManager.nuun_structureData(parameters['PartyG
 const EnemyGaugeShowSwitch = Number(parameters['EnemyGaugeShowSwitch'] || 0);
 const EnemyGaugeVisible = eval(parameters['EnemyGaugeVisible'] || 'true');
 const EnemyLimitValueVisible = eval(parameters['EnemyLimitValueVisible'] || "false");
+const EnemyGaugeIcon = Number(parameters['EnemyGaugeIcon'] || 0);
 const EnemyGaugeLabel = String(parameters['EnemyGaugeLabel'] || '');
 const EnemyGauge_LabelFontSize = Number(parameters['EnemyGauge_LabelFontSize'] || 0);
 const EnemyGauge_X = Number(parameters['EnemyGauge_X'] || 0);
@@ -322,13 +326,13 @@ BattleManager.processDefeat = function() {
 const _BattleManager_gainRewards = BattleManager.gainRewards;
 BattleManager.gainRewards = function() {
   _BattleManager_gainRewards.call(this);
-  setChargeLimitt(VictoryAmount);
+  setChargeLimit(VictoryAmount);
 };
 
 
 const _BattleManager_onEscapeSuccess = BattleManager.onEscapeSuccess;
 BattleManager.onEscapeSuccess = function() {
-  setChargeLimit(EscapeRecoveryAmount);
+  setChargeLimit(EscapeAmount);
   _BattleManager_onEscapeSuccess.call(this);
 };
 

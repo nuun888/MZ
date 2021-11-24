@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -32,6 +32,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/24 Ver.1.0.2
+ * リミットポイントのコストと残りコストが同じ時にスキルが使えない問題を修正。
  * 2021/11/24 Ver.1.0.1
  * 戦闘勝利時、逃走時にエラーが出る問題を修正。
  * 2021/11/15 Ver.1.0.0
@@ -265,8 +267,8 @@
  * @default ------------------------------
  * 
  * @param LimitCostColor
- * @desc 消費リミットゲージの文字色番号
- * @text 消費リミットゲージ文字色
+ * @desc 消費リミットゲージコストの色番号
+ * @text 消費リミットゲージコスト色
  * @type number
  * @default 16
  * @parent CostSetting
@@ -395,7 +397,7 @@ Game_Enemy.prototype.setLimitGauge = function(value) {
 Game_Actor.prototype.canPaySkillLimitCost = function(skill) {
   const cost = this.skillLimitCost(skill)
   if (cost !== null) {
-    return $gameParty.isPartyLimitValue() > cost;
+    return $gameParty.isPartyLimitValue() >= cost;
   } else {
     return true;
   }
@@ -404,7 +406,7 @@ Game_Actor.prototype.canPaySkillLimitCost = function(skill) {
 Game_Enemy.prototype.canPaySkillLimitCost = function(skill) {
   const cost = this.skillLimitCost(skill)
   if (cost !== null) {
-    return $gameTroop.isPartyLimitValue() > cost;
+    return $gameTroop.isPartyLimitValue() >= cost;
   } else {
     return true;
   }

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.9
+ * @version 2.2.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -145,7 +145,7 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2021/11/26 Ver.2.2.9
+ * 2021/11/26 Ver.2.2.8
  * カラーコードに対応。
  * 一部の項目で名称が適用されない問題を修正。
  * 2021/11/7 Ver.2.2.7

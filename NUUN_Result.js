@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.13.0
+ * @version 1.13.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -82,6 +82,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/26 Ver.1.13.1
+ * 背景画像を設定するとレベルアップ画面で操作ができなくなる問題を修正。
+ * レベルアップ画面のメインウィンドウにスキンを設定できる機能を追加。
  * 2021/11/6 Ver.1.13.0
  * レベルアップ画面のヘルプウィンドウにレベルアップ時のテキストを表示させる機能を追加。
  * 2021/9/19 Ver.1.12.4
@@ -440,8 +443,16 @@
  * @parent SkinSetting
  * 
  * @param ResultMainWindowsSkin
- * @desc リザルトメインのウィンドウのウィンドウスキンを指定します。
- * @text リザルトウィンドウのスキン
+ * @desc 最初のページのリザルトメインのウィンドウのウィンドウスキンを指定します。
+ * @text 最初ページリザルトウィンドウのスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent SkinSetting
+ * 
+ * @param ResultLevelWindowsSkin
+ * @desc レベルアップページのリザルトメインのウィンドウのウィンドウスキンを指定します。
+ * @text レベルアップリザルトウィンドウのスキン
  * @type file
  * @dir img/system
  * @default 
@@ -1232,6 +1243,8 @@ param.ActorBackGroundImg = param.ActorBackGroundImg && param.ActorBackGroundImg.
 param.PartyBackGroundImg = param.PartyBackGroundImg && param.PartyBackGroundImg.length > 0 ? param.PartyBackGroundImg[0] : null;
 const LevelUpActorSeData = param.LevelUpActorSe ? {name: param.LevelUpActorSe, volume: param.LevelUpActorVolume, pitch: param.LevelUpActorPitch, pan: param.LevelUpActorPan} : null;
 let gaugeWidth = 300;
+//ウィンドウオープン時はゲージの更新処理をしないようにする
+//フェードイン時間を指定できるようにする
 
 const pluginName = "NUUN_Result";
 
@@ -1431,11 +1444,9 @@ Scene_Battle.prototype.createActorResultWindow = function() {
   this._actorResultWindow.setHandler("cancel", this.onResultOk.bind(this));
   this._actorResultWindow.hide();
   if (this._resultBaseSprite) {
-    this._resultBaseSprite.addChild(this._resultWindow);
+    this._resultBaseSprite.addChild(this._actorResultWindow);
     this._actorResultWindow.x += (Graphics.width - Graphics.boxWidth) / 2;
     this._actorResultWindow.y += (Graphics.height - Graphics.boxHeight) / 2;
-    this._actorResultWindow.setActorImgWindow(this._resultActorImgWindow);
-    this.setResultBuckground(this._resultBaseSprite);
   } else {
     this.addWindow(this._actorResultWindow);
   }
@@ -1606,8 +1617,8 @@ Scene_Battle.prototype.backGroundActorShow = function() {
   if (this._backGroundActorSprite) {
     this._resultHelpWindow.opacity = 0;
     this._resultHelpWindow.frameVisible = false;
-    this._resultWindow.opacity = 0;
-    this._resultWindow.frameVisible = false;
+    this._actorResultWindow.opacity = 0;
+    this._actorResultWindow.frameVisible = false;
     this._backGroundActorSprite.show();
   }
   if (this._resultBaseSprite) {
@@ -1847,28 +1858,49 @@ Window_ResultHelp.prototype.initialize = function(rect) {
   Window_Help.prototype.initialize.call(this, rect);
   this.openness = 0;
   this.openOpacity = 0;
+  this.resultFadein = false;
   this._mode = 0;
   this.refresh();
 };
 
 const _Window_ResultHelp_updateOpen = Window_ResultHelp.prototype.updateOpen;
 Window_ResultHelp.prototype.updateOpen = function() {
-  if (param.ResultFadein && this._opening) {
+  if (param.ResultFadein && this.resultFadein) {
     this.openness = 255;
     this.openOpacity += 32;
     if (!param.PartyBackGroundImg && !param.ActorBackGroundImg) {
       this.opacity = this.openOpacity;
+    }
+    if (this.isResultFadein()) {
+      this.resultFadein = false;
     }
   }
   _Window_ResultHelp_updateOpen.call(this);
 };
 
 const _Window_ResultHelp_isOpen = Window_ResultHelp.prototype.isOpen;
-Window_ResultHelp.prototype.isOpen = function() {
-  return param.ResultFadein ? this.openOpacity >= 255 : _Window_ResultHelp_isOpen.call(this);
+Window_ResultHelp.prototype.isOpenAndActive = function() {
+  return this.isFadein() ? this.isResultFadein() && _Window_ResultHelp_isOpen.call(this) : 
+  _Window_ResultHelp_isOpen.call(this);
 };
 
-Window_Help.prototype.refresh = function() {
+Window_ResultHelp.prototype.isResultFadein = function() {
+  return this.openOpacity >= 255;
+};
+
+const _Window_ResultHelp_open = Window_ResultHelp.prototype.open;
+Window_ResultHelp.prototype.open = function() {
+  _Window_ResultHelp_open.call(this);
+  if (this.isFadein() && !this.resultFadein) {
+    this.resultFadein = true;
+  }
+};
+
+Window_ResultHelp.prototype.isFadein = function() {
+  return param.ResultFadein || param.PartyBackGroundImg || param.ActorBackGroundImg;
+};
+
+Window_ResultHelp.prototype.refresh = function() {
   const rect = this.baseTextRect();
   this.contents.clear();
   if (this._mode === 0) {
@@ -1912,6 +1944,7 @@ Window_Result.prototype.initialize = function(rect) {
   this._actor = null;
   this._canRepeat = false;
   this.openOpacity = 0;
+  this.resultFadein = false;
   this.loadImages();
 };
 
@@ -2262,7 +2295,7 @@ Window_Result.prototype.drawGainExp = function(date, x, y, width) {
 };
 
 Window_Result.prototype.drawPartyOriginalParam = function(date, x, y, width) {
-  const rewards = BattleManager._rewards;console.log(rewards)
+  const rewards = BattleManager._rewards;
   if (!isNaN(rewards)) {
     const result = eval(date.GainParamEval);
     this.changeTextColor(ColorManager.systemColor());
@@ -2467,7 +2500,7 @@ Window_Result.prototype.paramValue = function(params, option) {
 
 const _Window_Result_updateOpen = Window_Result.prototype.updateOpen;
 Window_Result.prototype.updateOpen = function() {
-  if ((param.PartyBackGroundImg || param.ActorBackGroundImg || param.ResultFadein) && this._opening) {
+  if ((param.PartyBackGroundImg || param.ActorBackGroundImg || param.ResultFadein) && this.resultFadein) {
     this.openness = 255;
     this.openOpacity += 32;
     if (param.PartyBackGroundImg || param.ActorBackGroundImg) {
@@ -2475,17 +2508,37 @@ Window_Result.prototype.updateOpen = function() {
     } else if (!param.PartyBackGroundImg && !param.ActorBackGroundImg) {
       this.opacity = this.openOpacity;
     }
+    if (this.isResultFadein()) {
+      this.resultFadein = false;
+    }
   }
   _Window_Result_updateOpen.call(this);
 };
 
 const _Window_Result_isOpen = Window_Result.prototype.isOpen;
 Window_Result.prototype.isOpen = function() {
-  return param.ResultFadein || param.PartyBackGroundImg || param.ActorBackGroundImg ? this.openOpacity >= 255 : _Window_Result_isOpen.call(this);
+  return this.isFadein() ? this.isResultFadein() && _Window_Result_isOpen.call(this) : _Window_Result_isOpen.call(this);
+};
+
+Window_Result.prototype.isResultFadein = function() {
+  return this.openOpacity >= 255;
 };
 
 Window_Result.prototype.setActorResultWindow = function(actorResultWindow) {
   this._actorResultWindow = actorResultWindow;
+};
+
+const _Window_Result_open = Window_Result.prototype.open;
+Window_Result.prototype.open = function() {
+  _Window_Result_open.call(this);
+  if (this.isFadein() && !this.resultFadein) {
+    this.resultFadein = true;
+  }
+  
+};
+
+Window_Result.prototype.isFadein = function() {
+  return param.ResultFadein || param.PartyBackGroundImg || param.ActorBackGroundImg;
 };
 
 function Window_ActorResult() {
@@ -2503,7 +2556,7 @@ Window_ActorResult.prototype.initialize = function(rect) {
 };
 
 Window_ActorResult.prototype.resultSkin = function() {
-  return param.ResultMainWindowsSkin;
+  return param.ResultLevelWindowsSkin;
 };
 
 Window_ActorResult.prototype.refresh = function() {
@@ -2592,6 +2645,14 @@ Window_ActorResult.prototype.changeActorSound = function() {
   } else {
     SoundManager.playOk();
   }
+};
+
+Window_ActorResult.prototype.isOpen = function() {
+  return Window_StatusBase.prototype.isOpen.call(this);
+};
+
+Window_ActorResult.prototype.updateOpen = function() {
+  Window_StatusBase.prototype.updateOpen.call(this);
 };
 
 

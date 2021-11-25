@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.7
+ * @version 2.2.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -145,6 +145,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/26 Ver.2.2.9
+ * カラーコードに対応。
+ * 一部の項目で名称が適用されない問題を修正。
  * 2021/11/7 Ver.2.2.7
  * 立ち絵の切り替え機能が機能していなかった問題を修正。
  * 2021/11/3 Ver.2.2.6
@@ -947,7 +950,7 @@
  * @default 0
  * 
  * @param NameColor
- * @desc システム項目の文字色。
+ * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色
  * @type number
  * @default 16
@@ -1186,8 +1189,9 @@ Scene_Status.prototype.initialize = function() {
   this._page = startPages();
 };
 
+const _Scene_Status_create = Scene_Status.prototype.create;
 Scene_Status.prototype.create = function() {
-  Scene_MenuBase.prototype.create.call(this);
+  _Scene_Status_create.call(this);
   this.createPageStatusWindow();
   this.createStatusWindow();
   this.createStatusButton();
@@ -1251,6 +1255,18 @@ Scene_Status.prototype.createStatusWindow = function() {
   if (BackGroundImg) {
     this._statusWindow.opacity = 0;
   }
+};
+
+Scene_Status.prototype.createProfileWindow = function() {
+
+};
+
+Scene_Status.prototype.createStatusParamsWindow = function() {
+
+};
+
+Scene_Status.prototype.createStatusEquipWindow = function() {
+
 };
 
 Scene_Status.prototype.createStatusButton = function() {
@@ -1725,7 +1741,7 @@ Window_Status.prototype.paramShow = function(list, actor, params, detaEval) {
 Window_Status.prototype.horzLine = function(list, x, y, width) {
   const lineY = y + this.lineHeight() / 2 - 1;
   this.contents.paintOpacity = 48;
-  this.contents.fillRect(x, lineY, width, 2, ColorManager.textColor(list.NameColor));
+  this.contents.fillRect(x, lineY, width, 2, this.getColorCode(list.NameColor));
   this.contents.paintOpacity = 255;
 };
 
@@ -1745,7 +1761,7 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
       text = this.statusParamDecimal(text, list.Decimal);
       let nameText = this.paramNameShow(list, actor, params);
       let textWidth = this.systemWidth(list.SystemItemWidth, width);
-      this.changeTextColor(ColorManager.textColor(list.NameColor));
+      this.changeTextColor(this.getColorCode(list.NameColor));
       this.drawText(nameText, x, y, textWidth);
       this.resetTextColor();
       if (params >= 10 && params < 30) {
@@ -1762,7 +1778,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
   const equips = this._actor.equips();
   const e1uipsLength = list.EquipNum > 0 ? list.EquipNum : equips.length;
   let y2 = y;
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   const text = list.paramName;
   if (text) {
     this.drawText(text, x, y, width);
@@ -1787,7 +1803,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
     if (EquipNameVisible === 1 || EquipNameVisible === 3) {//デフォルト
       const slotName = this.actorSlotName(actor, index);
       sw += this.systemWidth(list.SystemItemWidth, width2);
-      this.changeTextColor(ColorManager.textColor(list.NameColor));
+      this.changeTextColor(this.getColorCode(list.NameColor));
       this.drawText(slotName, x2 + iconWidth, y, sw);
     }
     sw += iconWidth;
@@ -1799,7 +1815,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
 Window_Status.prototype.drawProfile = function(list, actor, x, y, width) {
   const text = list.paramName;
   if (text) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
     y += this.lineHeight();
   }
@@ -1811,7 +1827,7 @@ Window_Status.prototype.drawProfile = function(list, actor, x, y, width) {
 Window_Status.prototype.drawDesc = function(list, actor, x, y, width) {
   const text = list.paramName;
   if (text) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
     y += this.lineHeight();
   }
@@ -1825,7 +1841,7 @@ Window_Status.prototype.drawDesc = function(list, actor, x, y, width) {
 Window_Status.prototype.drawName = function(list, x, y, width) {
   const text = list.ParamName;
   if (text) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
   }
   this.resetTextColor();
@@ -1833,14 +1849,14 @@ Window_Status.prototype.drawName = function(list, x, y, width) {
 
 Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) {
   const dactor = actor.actor();
-  const nameText = list.paramName;
+  const nameText = list.ParamName;
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
   let textWidth = 0;
   if (nameText) {
     textWidth = this.systemWidth(list.SystemItemWidth, width);
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(nameText , x, y, textWidth);
   }
   let text = eval(list.DetaEval);
@@ -1853,9 +1869,9 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
 
 Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
-  const text = list.paramName;
+  const text = list.ParamNamee;
   if (text) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
     y += this.lineHeight();
   }
@@ -1877,7 +1893,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
         if (ElementResistText || !iconId) {
           const name = $dataSystem.elements[elementId];
           textWidth += this.systemWidth(list.SystemItemWidth, width2);
-          this.changeTextColor(ColorManager.textColor(list.NameColor));
+          this.changeTextColor(this.getColorCode(list.NameColor));
           this.drawText(name, x3, y2, textWidth);
         } else if (iconId > 0) {
           this.drawIcon(iconId, x3, y2 + 2);
@@ -1895,9 +1911,9 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
 
 Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
-  const text = list.paramName;
+  const text = list.ParamName;
   if (text) {
-    this.changeTextColor(ColorManager.textColor(list.NameColor));
+    this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
     y += this.lineHeight();
   }
@@ -1919,7 +1935,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
         if (StateResistText || iconId === 0) {
           const name = $dataStates[stateId].name;
           textWidth += this.systemWidth(list.SystemItemWidth, width2);
-          this.changeTextColor(ColorManager.textColor(list.NameColor));
+          this.changeTextColor(this.getColorCode(list.NameColor));
           this.drawText(name, x3, y2, textWidth);
         } else if (iconId > 0) {
           this.drawIcon(iconId, x3, y2 + 2);
@@ -1938,7 +1954,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
 Window_Status.prototype.drawExpInfo = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
   const expTotal = TextManager.expTotal.format(TextManager.exp);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   this.drawText(expTotal, x, y, width);
   this.resetTextColor();
   this.drawText(this.expTotalValue(), x, y + lineHeight * 1, width, "right");
@@ -1947,7 +1963,7 @@ Window_Status.prototype.drawExpInfo = function(list, actor, x, y, width) {
 Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
   const expNext = TextManager.expNext.format(TextManager.level);
-  this.changeTextColor(ColorManager.textColor(list.NameColor));
+  this.changeTextColor(this.getColorCode(list.NameColor));
   this.drawText(expNext, x, y + lineHeight * 1, width);
   this.resetTextColor();
   if (EXPGaugeVisible) {
@@ -2138,6 +2154,12 @@ Window_Status.prototype.statusParamDecimal = function(val, decimal) {
   }
 };
 
+Window_Status.prototype.getColorCode = function(color) {
+  if (typeof(color) === "string") {
+    return color;
+  }
+  return ColorManager.textColor(color);
+};
 
 
 function Sprite_StatusHPGauge() {

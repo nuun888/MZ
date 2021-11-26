@@ -22,7 +22,7 @@
 [pan]:位相  
 
 #### 特徴を持つメモ欄
-<ConsumptionRatio:[ratio]> 消耗する確率を軽減します。  
+\<ConsumptionRatio:[ratio]> 消耗する確率を軽減します。  
 [ratio]：補正消耗率  
 <ConsumptionRatio:70> 消耗率が70%されます。消耗率50%のアイテムは35%の確率で消耗します。  
 このタグが有効なのはアイテムはConsumptionRateのタグが設定されたアイテムのみ適用されます。  

@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/27 Ver.1.2.0
+ * 立ち絵を表示できる機能を追加。
  * 2021/11/15 Ver.1.1.0
  * ウィンドウの配置を戦闘用と別々に設定できるように変更。
  * 控えメンバーのウィンドウのX座標がある程度の座標で止まる問題を修正。
@@ -188,6 +190,21 @@ const WindowZero = eval(parameters['WindowZero'] || "false");
 const WindowCenter = eval(parameters['WindowCenter'] || "true");
 const CommandIndex = Number(parameters['CommandIndex'] || 1);
 
+const _Scene_Battle_createWindowLayer = Scene_Battle.prototype.createWindowLayer;
+Scene_Battle.prototype.createWindowLayer = function() {
+  this.createFormationMemberActor();
+  _Scene_Battle_createWindowLayer.call(this);
+};
+
+Scene_Battle.prototype.createFormationMemberActor = function() {
+  const sprite = new Sprite_FormationActor();
+  this.addChild(sprite);
+  this._formationSpriteActor = sprite;
+  sprite.x = (Graphics.width - Graphics.boxWidth) / 2;
+  sprite.y = (Graphics.height - Graphics.boxHeight) / 2;
+  sprite.hide();
+};
+
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
   _Scene_Battle_createAllWindows.call(this);
@@ -219,6 +236,7 @@ Scene_Battle.prototype.createFormationBattleMemberWindow = function() {
   this._battleMemberFormationWindow.setHandler("cancel", this.onBattleMemberFormationCancel.bind(this));
   this._battleMemberFormationWindow.hide();
   this.addWindow(this._battleMemberFormationWindow);
+  this.setFormationSpriteActor(this._battleMemberFormationWindow);
 };
 
 Scene_Battle.prototype.createFormationMemberWindow = function() {
@@ -230,6 +248,7 @@ Scene_Battle.prototype.createFormationMemberWindow = function() {
   this._battleMemberFormationWindow.setMemberWindow(this._memberFormationWindow);
   this._memberFormationWindow.setMemberWindow(this._battleMemberFormationWindow);
   this.addWindow(this._memberFormationWindow);
+  this.setFormationSpriteActor(this._memberFormationWindow);
 };
 
 Scene_Battle.prototype.createFormationMemberStatusWindow = function() {
@@ -495,6 +514,7 @@ Scene_Battle.prototype.openFormationWindow = function() {
   this._memberFormationWindow.refresh();
   this._battleMemberFormationWindow.activate();
   this._battleMemberFormationWindow.select(0);
+  this._formationSpriteActor.show();
   this.setBattleMemberFormationCursor();
 };
 
@@ -512,6 +532,11 @@ Scene_Battle.prototype.closeFormationWindow = function() {
   this._battleMemberFormationWindow.deselect();
   this._partyCommandWindow.activate();
 };
+
+Scene_Battle.prototype.setFormationSpriteActor = function(window) {
+  window.setSpriteActor(this._formationSpriteActor);
+};
+
 
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
 Window_PartyCommand.prototype.makeCommandList = function() {

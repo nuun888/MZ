@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.3.0
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/27 Ver.1.4.0
+ * 立ち絵を表示できる機能を追加。
+ * 立ち絵を切り替えられるプラグインコマンドを追加。
+ * 顔グラが表示されない問題を修正。
+ * 一部の項目で名称が適用されない問題を修正。
+ * オリジナルパラメータにも小数点を指定できるように変更。
  * 2021/11/15 Ver.1.3.0
  * ウィンドウの配置を戦闘用と別々に設定できるように変更。
  * 控えメンバーのウィンドウのX座標がある程度の座標で止まる問題を修正。
@@ -55,6 +61,22 @@
  * 2021/8/15 Ver.1.0.0
  * 初版
  * 
+ * @command ChangeFormationActorImg
+ * @desc メンバー変更画面のアクター画像を変更します。
+ * @text メンバー変更画面アクター画像変更
+ * 
+ * @arg actorId
+ * @type actor
+ * @default 0
+ * @desc アクターを指定します。
+ * @text アクターID
+ * 
+ * @arg ChangeActorImgId
+ * @type number
+ * @default 1
+ * @min 1
+ * @desc 変更する立ち絵のIDを指定します。立ち絵設定の画像設定のリスト番号を指定します。
+ * @text 立ち絵ID
  * 
  * @command SceneFormationOpen
  * @desc メンバー変更画面を開きます。
@@ -264,6 +286,17 @@
  * @default 0
  * @min -9999
  * @parent StatusSetting
+ * 
+ * @param ActorImgSetting
+ * @text 立ち絵設定
+ * @default ------------------------------
+ *
+ * @param ActorsImgList
+ * @text 画像設定
+ * @desc アクターの画像設定
+ * @default []
+ * @type struct<actorImgList>[]
+ * @parent ActorImgSetting
  * 
  * @param ActorFixedSetting
  * @text アクター並び替え固定設定(要Imported.NUUN_ActorFixed)
@@ -484,6 +517,45 @@
  * 
  *
  */
+/*~struct~actorImgList:
+ * 
+ * @param actorId
+ * @text アクター
+ * @desc アクターを指定します。
+ * @type actor
+ * 
+ * @param ActorImg
+ * @text アクター画像
+ * @desc アクターの画像を表示します。立ち絵を切り替える場合はリストに画像を設定してください。
+ * @type file[]
+ * @dir img/
+ * @default 
+ * 
+ * @param Actor_X
+ * @desc 画像の表示位置X座標。
+ * @text 画像表示位置X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Y
+ * @desc 画像の表示位置Y座標。
+ * @text 画像表示位置Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ *  
+ */
 var Imported = Imported || {};
 Imported.NUUN_SceneFormation = true;
 
@@ -527,6 +599,14 @@ function Window_FormationStatus() {
 Window_FormationStatus.prototype = Object.create(Window_StatusBase.prototype);
 Window_FormationStatus.prototype.constructor = Window_FormationStatus;
 
+
+function Sprite_FormationActor() {
+  this.initialize(...arguments);
+}
+
+Sprite_FormationActor.prototype = Object.create(Sprite.prototype);
+Sprite_FormationActor.prototype.constructor = Sprite_FormationActor;
+
 (() => {
 const parameters = PluginManager.parameters('NUUN_SceneFormation');
 //const VariableBattleMember = eval(parameters['VariableBattleMember'] || "false");
@@ -556,6 +636,7 @@ const parameters2 = PluginManager.parameters('NUUN_SceneSupportActorFormation');
 const SupportActorColor = Number(parameters2['SupportActorColor'] || 5);
 const FixedActorBackColor = Number(parameters['FixedActorBackColor'] || 3);
 const LavelVisible = eval(parameters['LavelVisible'] || "false");
+const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const pluginName = "NUUN_SceneFormation";
 
 PluginManager.registerCommand(pluginName, 'SceneFormationOpen', args => {
@@ -565,6 +646,51 @@ PluginManager.registerCommand(pluginName, 'SceneFormationOpen', args => {
     SceneManager.push(Scene_Formation);
   }
 });
+
+PluginManager.registerCommand(pluginName, 'ChangeFormationActorImg', args => {
+  const actorId = Number(args.actorId)
+  if ($gameActors._data[actorId]) {
+    $gameActors._data[actorId].setFormationActorImgId(Number(args.ChangeActorImgId));
+  }
+});
+
+
+const _Game_Actor_setup = Game_Actor.prototype.setup;
+Game_Actor.prototype.setup = function(actorId) {
+  _Game_Actor_setup.call(this, actorId);
+  this.initStatusActorImg(actorId);
+};
+
+Game_Actor.prototype.initFormationActorImg = function() {
+  this.formationActorImgIndex = 0;
+};
+
+Game_Actor.prototype.getFormationActorImgIndex = function() {
+  if (!this.formationActorImgIndex) {
+    this.initFormationActorImg(this.actorId());
+  }
+  return this.formationActorImgIndex;
+};
+
+Game_Actor.prototype.setFormationActorImgId = function(changeActorImgId) {
+  if (!this.formationActorImgIndex) {
+    this.initFormationActorImg(this.actorId());
+  }
+  if (changeActorImgId >= 0) {
+    this.formationActorImgIndex = changeActorImgId - 1;
+  }
+};
+
+Game_Actor.prototype.getFormationActorImgData = function() {
+  const actorId = this.actorId();
+  return ActorsImgList.find(actor => actor.actorId === actorId);
+};
+
+Game_Actor.prototype.getFormationActorImg = function(data) {
+  const find = data ? data : this.getFormationActorImgData();
+  return find ? find.ActorImg[this.getFormationActorImgIndex()] : null;
+};
+
 
 const _Game_Party_initialize = Game_Party.prototype.initialize;
 Game_Party.prototype.initialize = function() {
@@ -625,6 +751,20 @@ Scene_Formation.prototype.create = function() {
   this.createMemberStatusWindow();
 };
 
+
+Scene_Formation.prototype.createWindowLayer = function() {
+  this.createBattleMemberActor();
+  Scene_MenuBase.prototype.createWindowLayer.call(this);
+};
+
+Scene_Formation.prototype.createBattleMemberActor = function() {
+  const sprite = new Sprite_FormationActor();
+  this.addChild(sprite);
+  this._spriteActor = sprite;
+  sprite.x = (Graphics.width - Graphics.boxWidth) / 2;
+  sprite.y = (Graphics.height - Graphics.boxHeight) / 2;
+};
+
 Scene_Formation.prototype.createBattleMemberNameWindow = function() {
   const rect = this.battleMemberNameWindowRect();
   this._battleMemberNameWindow = new Window_FormationBattleMemberName(rect);
@@ -642,6 +782,7 @@ Scene_Formation.prototype.createBattleMemberWindow = function() {
   this._battleMemberWindow = new Window_FormationBattleMember(rect);
   this._battleMemberWindow.setHandler("ok", this.onBattleMemberOk.bind(this));
   this._battleMemberWindow.setHandler("cancel", this.onBattleMemberCancel.bind(this));
+  this._battleMemberWindow.setSpriteActor(this._spriteActor);
   this.addWindow(this._battleMemberWindow);
   this._battleMemberWindow.activate();
 };
@@ -653,6 +794,7 @@ Scene_Formation.prototype.createMemberWindow = function() {
   this._memberWindow.setHandler("cancel", this.onMemberCancel.bind(this));
   this._battleMemberWindow.setMemberWindow(this._memberWindow);
   this._memberWindow.setMemberWindow(this._battleMemberWindow);
+  this._memberWindow.setSpriteActor(this._spriteActor);
   this.addWindow(this._memberWindow);
 };
 
@@ -879,7 +1021,6 @@ Scene_Formation.prototype.onAddActorOk = function(index1, index2, mode) {
   $gameParty.addFormationOrder(index1, dir);
   this._memberWindow.setPendingIndex(-1);
   this._battleMemberWindow.setPendingIndex(-1);
-  
 };
 
 Game_Party.prototype.addFormationOrder = function(index1, dir) {//index1にはアクター
@@ -996,6 +1137,9 @@ Window_FormationBattleMember.prototype.setActorStatus = function(index) {
   const actor = this.actor(index);
   if (this._memberStatusWindow) {
     this._memberStatusWindow.setStatus(actor);
+  }
+  if (this._spriteActor) {
+    this._spriteActor.setup(actor);
   }
 };
 
@@ -1142,6 +1286,10 @@ Window_FormationBattleMember.prototype.setPendingIndex = function(index) {
   this.redrawItem(lastPendingIndex);
 };
 
+Window_FormationBattleMember.prototype.setSpriteActor = function(sprite) {
+  this._spriteActor = sprite;
+};
+
 
 //待機メンバー
 Window_FormationMember.prototype.initialize = function(rect) {
@@ -1188,6 +1336,9 @@ Window_FormationMember.prototype.setActorStatus = function(index) {
   const actor = this.actor(index);
   if (this._memberStatusWindow) {
     this._memberStatusWindow.setStatus(actor);
+  }
+  if (this._spriteActor) {
+    this._spriteActor.setup(actor);
   }
 };
 
@@ -1329,6 +1480,9 @@ Window_FormationMember.prototype.setPendingIndex = function(index) {
   this.redrawItem(lastPendingIndex);
 };
 
+Window_FormationMember.prototype.setSpriteActor = function(sprite) {
+  this._spriteActor = sprite;
+};
 
 //ステータス
 Window_FormationStatus.prototype.initialize = function(rect) {
@@ -1347,11 +1501,19 @@ Window_FormationStatus.prototype.maxCols = function() {
 };
 
 Window_FormationStatus.prototype.refresh = function() {
-  this.contents.clear();
-  this.hideAdditionalSprites();
+  Window_StatusBase.prototype.refresh.call(this);
   if (!this._actor) {
     return;
   }
+  const bitmap = ImageManager.loadFace(this._actor.faceName());
+  if (!bitmap.isReady()) {
+    bitmap.addLoadListener(this.drawData.bind(this));
+  } else {
+    this.drawData();
+  }
+};
+
+Window_FormationStatus.prototype.drawData = function() {
   const list = ActorStatus;
   const lineHeight = this.lineHeight();
   for (const data of list) {
@@ -1575,7 +1737,7 @@ Window_FormationStatus.prototype.drawName = function(list, x, y, width) {
 };
 
 Window_FormationStatus.prototype.drawDesc = function(list, actor, x, y, width) {
-  const text = list.paramName;
+  const text = list.ParamName;
   if (text) {
     this.changeTextColor(ColorManager.textColor(list.NameColor));
     this.drawText(text, x, y, width);
@@ -1622,7 +1784,7 @@ Window_FormationStatus.prototype.drawParams = function(list, actor, x, y, width,
 
 Window_FormationStatus.prototype.drawOriginalStatus = function(list, actor, x, y, width) {
   const dactor = actor.actor();
-  const nameText = list.paramName;
+  const nameText = list.ParamName;
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
@@ -1634,6 +1796,9 @@ Window_FormationStatus.prototype.drawOriginalStatus = function(list, actor, x, y
   }
   let text = eval(list.DetaEval);
   if (text !== undefined) {
+    if (typeof(text) === 'number') {
+      text = this.statusParamDecimal(text, list.Decimal);
+    }
     text += list.paramUnit ? String(list.paramUnit) : "";
     this.resetTextColor();
     this.drawText(text, x + textWidth + 8, y, width - textWidth - 8, 'right');
@@ -1745,6 +1910,49 @@ Window_FormationStatus.prototype.contensWidth = function(width) {
 
 Window_FormationStatus.prototype.systemWidth = function(swidth, width) {
   return swidth > 0 ? swidth : Math.floor(width / 3);
+};
+
+
+Sprite_FormationActor.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+  //this.createBitmap();
+};
+
+Sprite_FormationActor.prototype.initMembers = function() {
+  this._actor = null;
+  this.anchor.x = 0.5;
+  this.anchor.y = 0.5;
+};
+
+Sprite_FormationActor.prototype.setup = function(actor) {
+  this._actor = actor;
+  if (!actor) {
+    this.bitmap = null;
+    return;
+  }
+  const data = actor.getFormationActorImgData();
+  const imges = actor.getFormationActorImg(data);
+  if (imges) {
+    this.x = data.Actor_X;
+    this.y = data.Actor_Y;
+    const scale = data.Actor_Scale / 100;
+    this.scale.x = scale;
+    this.scale.y = scale;
+    const bitmap = ImageManager.nuun_LoadPictures(imges);
+    this.bitmap = bitmap;
+    if (!bitmap.isReady()) {
+      bitmap.addLoadListener(this.refresh.bind(this));
+    } else {
+      this.refresh();
+    }
+  } else {
+    this.bitmap = null;
+  }
+};
+
+Sprite_FormationActor.prototype.refresh = function() {
+  
 };
 
 })();

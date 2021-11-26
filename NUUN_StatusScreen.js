@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.8
+ * @version 2.2.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -145,6 +145,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/27 Ver.2.2.9
+ * オリジナルパラメータにも小数点を指定できるように変更。
  * 2021/11/26 Ver.2.2.8
  * カラーコードに対応。
  * 一部の項目で名称が適用されない問題を修正。
@@ -1861,6 +1863,9 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
   }
   let text = eval(list.DetaEval);
   if (text !== undefined) {
+    if (typeof(text) === 'number') {
+      text = this.statusParamDecimal(text, list.Decimal);
+    }
     text += list.paramUnit ? String(list.paramUnit) : "";
     this.resetTextColor();
     this.drawText(text, x + textWidth + 8, y, width - textWidth - 8, 'right');

@@ -12,7 +12,7 @@
 \<NameColor:[#RRGGBB]> カラーコードで文字色を変更します。  
 \<NameColor:#00bfff>  
 
-更新履歴
+### 更新履歴
 2021/5/10 Ver.1.1.1  
 EquipScene_Extension併用時装備画面で装備を選択するとエラーが出る問題を修正。  
 2021/3/10 Ver.1.1.0  

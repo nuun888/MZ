@@ -5,7 +5,7 @@
 
 ### 最大レベルの設定
 アクターのメモ欄  
-<MaxLevel:[maxlevel]> 最大レベルを設定します。  
+\<MaxLevel:[maxlevel]> 最大レベルを設定します。  
 <MaxLevel:200> 最大レベルが200になります。  
 
 <StartLevel:[level]> 加入時の初期レベルを設定します。  

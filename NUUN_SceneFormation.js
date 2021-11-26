@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/27 Ver.1.4.1
+ * Ver.1.4.0アップデート後、ゲーム開始時にエラーが出る問題を修正。
  * 2021/11/27 Ver.1.4.0
  * 立ち絵を表示できる機能を追加。
  * 立ち絵を切り替えられるプラグインコマンドを追加。
@@ -658,7 +660,7 @@ PluginManager.registerCommand(pluginName, 'ChangeFormationActorImg', args => {
 const _Game_Actor_setup = Game_Actor.prototype.setup;
 Game_Actor.prototype.setup = function(actorId) {
   _Game_Actor_setup.call(this, actorId);
-  this.initStatusActorImg(actorId);
+  this.initFormationActorImg(actorId);
 };
 
 Game_Actor.prototype.initFormationActorImg = function() {

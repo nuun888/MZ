@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 

@@ -1,8 +1,8 @@
 # [アイテムネームカラー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js)
 # Ver.1.1.1
 
-アイテム、スキルの文字色の色を変更できます。
-![画像](img/ItemNameColor_1.png)
+アイテム、スキルの文字色の色を変更できます。  
+![画像](img/ItemNameColor_1.png)  
 ![画像](img/ItemNameColor_2.png)
 
 ### 設定方法

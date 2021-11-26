@@ -2,6 +2,8 @@
 # Ver.1.1.1
 
 アイテム、スキルの文字色の色を変更できます。
+![画像](img/ItemNameColor_1.png)
+![画像](img/ItemNameColor_2.png)
 
 ### 設定方法
 アイテム、スキルのメモ欄  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 

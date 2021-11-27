@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.0.4
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -136,6 +136,8 @@
  * 【武器タイプ】
  * [指定の武器装備][指定の防具装備]
  * 対象が「指定の装備ID](3)を装備していれば一致なら条件を満たします。
+ * 「指定の武器ID]を0に指定した場合は素手の時に条件を満たします。
+ * 「指定の防具ID]を0に指定した場合は防具を装備していない時に条件を満たします。
  * パーティの場合はいずれかが一致したときに条件を満たします。
  * 対象が敵または敵グループの場合はfalseを返します。
  * [指定の武器タイプ][指定の防具タイプ]
@@ -206,6 +208,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/27 Ver.1.0.5
+ * 装備判定が適用されていなかった問題を修正。
+ * 指定の装備に素手時、防具なしの時の条件を追加。
  * 2021/11/13 Ver.1.0.4
  * ステート、バフのID指定が正常に適用されていなかった問題を修正。
  * 一部のバフ条件が適用されなかった問題を修正。
@@ -268,7 +273,7 @@
  * @value 'Attack'
  * @option ダメージ(Damage)
  * @value 'Damage'
- * @option 反撃、反射(CounterReflection)
+ * @option 反撃、反射(CounterReflection)(未実装)
  * @value 'CounterReflection'
  * @option 乗り物(Vehicle)
  * @value 'Vehicle'
@@ -276,6 +281,8 @@
  * @value 'Variable'
  * @option スイッチ(Switch)
  * @value 'Switch'
+ * @option 所持金(Gold)(未実装)
+ * @value 'Gold'
  * @option 条件式(Eval)
  * @value 'Eval'
  * @default 
@@ -424,13 +431,13 @@
  * @text 装備(Equip)
  * @desc 装備の条件タイプを指定します。
  * @type select
- * @option 指定の武器装備(3)
+ * @option 指定の武器装備(3)（(3)武器ID）
  * @value 'Weapon'
- * @option 指定の防具装備(3)
+ * @option 指定の防具装備(3)（(3)防具ID）
  * @value 'Armor'
- * @option 指定の武器タイプ(3)
+ * @option 指定の武器タイプ(3)（(3)武器タイプ）
  * @value 'WeaponType'
- * @option 指定の防具タイプ(3)
+ * @option 指定の防具タイプ(3)（(3)防具タイプ）
  * @value 'ArmorType'
  * @default 
  * 
@@ -438,7 +445,7 @@
  * @text ターン(Turn)
  * @desc ターンの条件タイプを指定します。
  * @type select
- * @option 指定のターン(1)(2)
+ * @option 指定のターン(1)(2)（(1)(2)ターン数）
  * @value 'Turn'
  * @default 
  * 
@@ -446,7 +453,7 @@
  * @text 属性(Element)
  * @desc 属性の条件タイプを指定します。
  * @type select
- * @option 指定の属性(3)
+ * @option 指定の属性(3)（(3)属性ID）
  * @value 'Element'
  * @default 
  * 
@@ -454,9 +461,9 @@
  * @text 有効度(Validity)
  * @desc 有効度の条件タイプを指定します。
  * @type select
- * @option 属性有効度(1)(2)(3)
+ * @option 属性有効度(1)(2)(3)（(1)(2)有効度　(3)属性ID）
  * @value 'ElementValidity'
- * @option ステート有効度(1)(2)(3)
+ * @option ステート有効度(1)(2)(3)（(1)(2)有効度　(3)ステートID）
  * @value 'StateValidity'
  * @default 
  * @parent ValiditySetting
@@ -469,6 +476,14 @@
  * @value 'Item'
  * @option スキルを使用(3)（(3))のアイテムIDが未指定の場合は全てのスキルが対象）
  * @value 'Skill'
+ * @option アイテムを所持(3)（(3)アイテムID）(未実装)
+ * @value 'PossessionItem'
+ * @option 武器を所持(3)（(3)武器ID）(未実装)
+ * @value 'PossessionWeapon'
+ * @option 防具を所持(3)（(3)防具ID）(未実装)
+ * @value 'PossessionArmor'
+ * @option スキルを習得(3)（(3)スキルID）(未実装)
+ * @value 'MasterSkill'
  * @default 
  * 
  * @param AttackConditionsType
@@ -502,12 +517,12 @@
  * @default 
  * 
  * @param CntRefConditionsType
- * @text 反撃、反射（未実装）(CounterReflection)
+ * @text 反撃、反射（未実装）
  * @desc 反撃、反射の条件タイプを指定します。
  * @type select
- * @option 反撃時(3)（(3)が未指定の場合は全てのスキルが対象）
+ * @option 反撃時
  * @value 'Counter'
- * @option 魔法反射時(3)（(3)が未指定の場合は全てのスキルが対象）
+ * @option 魔法反射時
  * @value 'Reflection'
  * @default 
  * 
@@ -550,7 +565,14 @@
  * @option 指定のスイッチがOFF(3)（(3)スイッチID）
  * @value 'OFFSwitch'
  * @default 
- * @parent SwitchSetting
+ * 
+ * @param GoldConditionsType
+ * @text 金額(Gold)
+ * @desc 金額の条件タイプを指定します。
+ * @type select
+ * @option 所持金額を指定(1)(2)（範囲値 (2)値）
+ * @value 'Gold'
+ * @default 
  * 
  * @param EvalStr
  * @text 評価式(Eval)
@@ -650,7 +672,6 @@ function getTriggerConditions(obj, subject, target, tag1, tag2, tag3, tag4, acti
     const result2 = getTriggerConditionsResult(obj, target, tag2, 'Target', action, damage, partialMode);
     const result3 = getTriggerConditionsResult(obj, null, tag3, 'Party', action, damage, partialMode);
     const result4 = getTriggerConditionsResult(obj, null, tag4, 'Troop', action, damage, partialMode);
-    
     if (partialMode === 0) {
       return result1 || result2 || result3 || result4;
     } else {
@@ -684,7 +705,6 @@ function isTriggerConditionsEvery(list, target, mode, action, damage) {
 }
 
 function triggerConditions(data, target, mode, action, damage) {
-  
   if (data.ConditionsMode === 'Member') {
     return memberTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Battler') {
@@ -870,25 +890,25 @@ function buffTriggerConditions(data, target, mode) {
 //装備
 function equipTriggerConditions(data, target, mode) {
   const unit = getUnit(target, mode);
-  if (data.StateConditionsType === 'Weapon') {
+  if (data.EquipConditionsType === 'Weapon') {
     if (mode === 'Party') {
       return unit.members().some(member => equipWeapon(data.IDList, member));
     } else {
       return equipWeapon(data.IDList, target);
     }
-  } else if (data.StateConditionsType === 'Armor') {
+  } else if (data.EquipConditionsType === 'Armor') {
     if (mode === 'Party') {
       return unit.members().some(member => equipArmor(data.IDList, member));
     } else {
       return equipArmorn(data.IDList, target);
     }
-  } else if (data.StateConditionsType === 'WeaponType') {
+  } else if (data.EquipConditionsType === 'WeaponType') {
     if (mode === 'Party') {
       return unit.members().some(member => equipWeaponType(data.IDList, member));
     } else {
       return equipWeaponType(data.IDList, target);
     }
-  } else if (data.StateConditionsType === 'ArmorType') {
+  } else if (data.EquipConditionsType === 'ArmorType') {
     if (mode === 'Party') {
       return unit.members().some(member => equipArmorType(data.IDList, member));
     } else {
@@ -992,7 +1012,7 @@ function cntRefTriggerConditions(data, target, mode) {
   }
   const unit = getUnit(target, mode);
   if (data.cntRefConditionsType === 'Counter') {
-
+    
   } else if (data.cntRefConditionsType === 'Reflection') {
 
   }
@@ -1186,24 +1206,33 @@ function buffsTurn(data, id, member) {
 };
 
 function equipWeapon(idList, member) {
-  return getValList(idList).some(listId => member.hasWeapon($dataWeapons[listId]));
+  if (idList == 0) {
+    return member.weapons().length === 0;
+  } else {
+    return getValList(idList).some(listId => member.hasWeapon($dataWeapons[listId]));
+  }
 };
 
 function equipArmor(idList, member) {
-  return getValList(idList).some(listId => member.hasArmor($dataArmors[listId]));
+  if (idList == 0) {
+    return member.armors().length === 0;
+  } else {
+    return getValList(idList).some(listId => member.hasArmor($dataArmors[listId]));
+  }
 };
 
 function equipWeaponType(idList, member) {
   const list = getValList(idList);
-  return member.weapons().some(weapon => isEquipType(weapon.wtype, list));
+  return member.weapons().some(weapon => isEquipType(weapon.wtypeId, list));
 };
 
 function equipArmorType(idList, member) {
   const list = getValList(idList);
-  return member.armors().some(armor => isEquipType(armor.atype, list));
+  return member.armors().some(armor => isEquipType(armor.atypeId, list));
 };
 
 function isEquipType(typeid, list) {
+  
   return list.some(id => typeid === id);
 };
 
@@ -1343,6 +1372,23 @@ Game_BattlerBase.prototype.getTraitsTriggerConditions = function(tag) {
   return cond.length > 0 ? cond : null;
 };
 
+
+const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
+Game_Battler.prototype.initMembers = function() {
+  _Game_Battler_initMembers.call(this);
+  this._cntAction = false;
+  this._reflectionAction = false;
+};
+
+Game_Battler.prototype.getCntAction = function() {
+  return this._cntAction;
+};
+
+Game_Battler.prototype.getReflectionAction = function() {
+  return this._reflectionAction;
+};
+
+
 const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
   _BattleManager_initMembers.call(this);
@@ -1353,6 +1399,20 @@ const _BattleManager_endAllBattlersTurn = BattleManager.endAllBattlersTurn;
 BattleManager.endAllBattlersTurn = function() {
   _BattleManager_endAllBattlersTurn.call(this);
   this.nuun_battleTurn++;
+};
+
+const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
+BattleManager.invokeCounterAttack = function(subject, target) {
+  target._cntAction = true;
+  _BattleManager_invokeCounterAttack.call(this, subject, target);
+  target._cntAction = false;
+};
+
+const _BattleManager_invokeMagicReflection = BattleManager.invokeMagicReflection;
+BattleManager.invokeMagicReflection = function(subject, target) {
+  target._reflectionAction = true;
+  _BattleManager_invokeMagicReflection.call(this, subject, target);
+  target._reflectionAction = false;
 };
 
 })();

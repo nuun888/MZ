@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きドロップ
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_ConditionsBase
  * 
  * @help
@@ -21,7 +21,7 @@
  * I:アイテム W：武器 A：防具
  * [id]：アイテムID
  * [rate]：確率
- * [condNameTag]：任意の条件タグ名（省略可）省略した場合はConditionalDropが指定されます。
+ * [condNameTag]：任意の条件タグ名（省略可）省略した場合はCondが指定されます。
  * [condMode]：条件モード（省略可）0:一部一致 1:全て一致
  * 
  * <Drop[condNameTag]:[id],[id],[id]...> 攻撃して倒したアクターが指定したIDの条件を満たしたときにドロップします。
@@ -40,6 +40,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/27 Ver.1.0.3
+ * [condNameTag]を省略したときの文字列がも違っていたのを修正。
  * 2021/11/12 Ver.1.0.2
  * 条件付きベースの定義変更による条件タグの設定方法を変更。
  * ターゲットデータが取得できない問題を修正。
@@ -74,7 +76,7 @@ Imported.NUUN_ConditionalDrops = true;
     this._getCondDropList = [];
     const enemy = this.enemy()
     conditionalDropItems.forEach(condDrop => {
-      const condTag = "Drop" + String(condDrop[3]).trim() || 'DropCond';
+      const condTag = "Drop" + (String(condDrop[3]).trim() || 'Cond');
       const action = $gameTemp.getActionData();
       const mode = condDrop[4] || 0;
       if (action.subject.getTriggerConditions(enemy, this, condTag, 'Target' + condTag, 'Party' + condTag, 'Troop' + condTag, action.action, action.damage, mode) && this.condDropRate(condDrop)) {

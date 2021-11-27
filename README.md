@@ -27,7 +27,7 @@
 | 最大戦闘メンバー数変更 | [NUUN_MaxBattleMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js) |  | 1.0.0 |
 | ステート残りターン表示 | [NUUN_StateTurn](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js) |  | 1.0.2 |
 | バトルステートアイコン複数表示 | [NUUN_StateIconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js) |  | 1.1.0 |
-|  |  |  |  |
+| タイムライン |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 

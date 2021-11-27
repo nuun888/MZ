@@ -80,17 +80,37 @@
 
 ### 取得パラメータ
 アイテムを盗んだ回数。  
- $gameSystem._stealCount  
- $gameSystem.getBattleSteal()  
+$gameSystem._stealCount  
+$gameSystem.getBattleSteal()  
  
- お金を盗んだ合計金額。  
- $gameSystem._stealGoldSum  
- $gameSystem.getBattleStealGold()  
+お金を盗んだ合計金額。  
+$gameSystem._stealGoldSum  
+$gameSystem.getBattleStealGold()  
  
- アイテムを盗まれた回数。  
- $gameSystem._stolenCount  
- $gameSystem.getBattleStolen()  
+アイテムを盗まれた回数。  
+$gameSystem._stolenCount  
+$gameSystem.getBattleStolen()  
  
- お金を盗まれた合計金額。  
- $gameSystem._stolenGoldSum  
- $gameSystem.getBattleStolenGold()  
+お金を盗まれた合計金額。  
+$gameSystem._stolenGoldSum  
+$gameSystem.getBattleStolenGold()  
+ 
+### 更新履歴
+2021/11/13 Ver 1.3.1  
+条件付きに対応。  
+2021/10/24 Ver 1.3.0  
+メッセージのフォーマットを変更。  
+同じアイテムを何度でも盗める機能を追加。  
+全盗めるアイテムから抽選して盗む機能を追加。  
+2021/6/18 Ver 1.2.0  
+ブーストの計算が正常に行えていなかった問題を修正。  
+アイテム、お金を持っていない場合のメッセージを表示する機能を追加。  
+盗み成功時にSEを鳴らす機能を追加。  
+2021/2/20 Ver 1.1.1  
+盗み成功率の割合増減が正常に取得できていなかった問題を修正。  
+2021/2/5 Ver 1.1.0  
+盗みの抵抗実装。  
+2021/1/24 Ver 1.0.1  
+アイテムを盗んだ回数などのパラメータが正常に取得できない問題を修正。  
+2020/11/21 Ver 1.0.0  
+初版  

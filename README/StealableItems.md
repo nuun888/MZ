@@ -69,4 +69,28 @@
 <stealResist: [%確率]> 盗まれる確率を軽減します。  
 [%確率]:盗まれる軽減率（正数で記入）  
 
-### 敵から盗まれるアイテムを設定
+#### 敵から盗まれるアイテムを設定
+敵から盗まれるアイテムを設定するには、プラグインパラメータの「敵から奪われるアイテム設定」から設定します。
+### 盗まれるアイテムID
+盗まれるアイテムを指定します。武器、防具は設定できません。
+### 重み
+盗まれるアイテムの頻度を指定します。数値が高い程盗まれやすくなります。
+### スイッチ
+盗まれるアイテム条件のスイッチ番号を指定します。
+
+### 取得パラメータ
+アイテムを盗んだ回数。  
+ $gameSystem._stealCount  
+ $gameSystem.getBattleSteal()  
+ 
+ お金を盗んだ合計金額。  
+ $gameSystem._stealGoldSum  
+ $gameSystem.getBattleStealGold()  
+ 
+ アイテムを盗まれた回数。  
+ $gameSystem._stolenCount  
+ $gameSystem.getBattleStolen()  
+ 
+ お金を盗まれた合計金額。  
+ $gameSystem._stolenGoldSum  
+ $gameSystem.getBattleStolenGold()  

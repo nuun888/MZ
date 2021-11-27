@@ -89,7 +89,7 @@
 | 敵のドロップアイテム追加  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js) |  | 1.0.1 |
 | 条件付きドロップ | [NUUN_ConditionalDrops](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalDrops.js) |  | 1.0.2 |
 | [経験値計算式変更](https://github.com/nuun888/MZ/blob/master/NUUN_EXPFormula.md) | [NUUN_EXPFormula](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js) |  |  | 1.0.0 |
-| アイテムなどのランダム取得  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.2.2 |
+| [アイテムなどのランダム取得](https://github.com/nuun888/MZ/blob/master/README/RandomItems.md)  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.2.2 |
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
 | アクター並び替え固定 | [NUUN_ActorFixed](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js) |  | 1.1.4 |
 | パーティ、敵グループリミットゲージ | [NUUN_PartyLimitGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js) |  | 1.0.2 |

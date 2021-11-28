@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きドロップ
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_ConditionsBase
  * 
  * @help
@@ -40,6 +40,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/28 Ver.1.0.4
+ * 条件モードが機能していなかった問題を修正。
  * 2021/11/27 Ver.1.0.3
  * [condNameTag]を省略したときの文字列がも違っていたのを修正。
  * 2021/11/12 Ver.1.0.2

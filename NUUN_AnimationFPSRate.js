@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc アニメーションフレームレート個別設定
+ * @plugindesc MVアニメーション再生時のフレームレート個別設定
  * @author NUUN
  * @version 1.0.1
  * @base NUUN_Base

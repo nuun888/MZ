@@ -77,9 +77,11 @@
 | [アイテム、スキルネームカラー](https://github.com/nuun888/MZ/blob/master/README/ItemNameColor.md) | [NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js) |  | 1.1.1 |
 | レーダーチャート表示ベース | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) |  | 1.0.0 |
 | 巨大モンスター | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) |  | 1.2.0 |
-| バトラーHPゲージ | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) |  | 1.3.3 |
-| 敵に名前表示 | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) |  | 1.2.2 |
-| 敵にTPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.2.2 |
+| 敵HPゲージ | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) |  | 1.3.3 |
+| 敵MPゲージ |  |  |  |
+| 敵TPゲージ |  |  |  |
+| 敵名前表示 | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) |  | 1.2.2 |
+| 敵TPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.2.2 |
 | ゲージ画像化 | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) |  | 1.3.0 |
 | アニメーションフレームレート個別設定 | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.0.0 |
 | ゲージ拡張 |  |  |  |

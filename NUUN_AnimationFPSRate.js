@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc アニメーションフレームレート個別設定
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -22,8 +22,17 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/28 Ver.1.0.1
+ * デフォルトの再生速度を設定できる機能を追加。
  * 2021/11/28 Ver.1.0.0
  * 初版
+ * 
+ * @param DefaultAnimationRate
+ * @text 標準アニメーション再生速度
+ * @desc 標準のアニメーションの再生速度を指定します。(4標準)
+ * @type number
+ * @default 4
+ * @min 1
  * 
  * @param AnimationSetting
  * @text アニメーションFPS設定
@@ -53,6 +62,7 @@ Imported.NUUN_AnimationFPSRate = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_AnimationFPSRate');
+const DefaultAnimationRate = Number(parameters['DefaultAnimationRate'] || 4);
 const AnimationSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AnimationSetting'])) : null) || [];
 
 Sprite_AnimationMV.prototype.setupRate = function() {
@@ -62,6 +72,6 @@ Sprite_AnimationMV.prototype.setupRate = function() {
 Sprite_AnimationMV.prototype.getAnimationRate = function() {
     const id = this._animation.id;
     const find = AnimationSetting.find(data => data.AnimationID === id);
-    return find ? find.AnimationRate : 4;
+    return find ? find.AnimationRate : DefaultAnimationRate;
 };
 })();

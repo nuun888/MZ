@@ -78,7 +78,7 @@ Imported.NUUN_ConditionalDrops = true;
     conditionalDropItems.forEach(condDrop => {
       const condTag = "Drop" + (String(condDrop[3]).trim() || 'Cond');
       const action = $gameTemp.getActionData();
-      const mode = condDrop[4] || 0;
+      const mode = Number(condDrop[4]) || 0;
       if (action.subject.getTriggerConditions(enemy, this, condTag, 'Target' + condTag, 'Party' + condTag, 'Troop' + condTag, action.action, action.damage, mode) && this.condDropRate(condDrop)) {
         const drop = this.getCondDropItem(condDrop);
         if (drop) {

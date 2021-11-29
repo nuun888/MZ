@@ -12,7 +12,7 @@
 `<Stopping:100, 30>` HPが３０％以上で戦闘不能になったとき１００％の確率でダメージが１で踏み止まります。  
 
 以下の設定は条件付きベースプラグインが必要です。  
-`<Stopping:[rate], [ratio], [condMode]> ` 
+`<Stopping:[rate], [ratio], [condMode]>`  
 [condMode]：条件付きベースプラグインでの条件指定時のモード　※省略可能  
 
 `<StoppingCond:[id], [id], [id]...>` 攻撃したバトラーが指定したIDの条件を満たしたときに発動。  

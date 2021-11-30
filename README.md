@@ -82,6 +82,7 @@
 | 敵TPゲージ |  |  |  |
 | 敵名前表示 | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) |  | 1.2.2 |
 | 敵TPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.2.2 |
+| 敵ステートアイコン表示方法仕様変更 |  |  |  |
 | ゲージ画像化 | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) | 共 | 1.3.0 |
 | MVアニメーションフレームレート個別設定 | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.0.0 |
 | ゲージ拡張 |  |  |  |

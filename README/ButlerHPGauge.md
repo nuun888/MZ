@@ -1,8 +1,6 @@
 # [敵HPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
 # Ver.1.3.3
 敵のバトラー上にHPゲージを表示します。  
-敵グラフィックとゲージの表示を分けていますのでプラグイン側で敵グラフィックの色調を変更してもゲージ自体の色調は変化しません。  
-またほかのモンスターの背後に隠れることはありません。
 ![画像](img/hpGauge1.png)  
 
 ### 設定方法

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.4
+ * @version 2.6.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,9 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/12/4 Ver 2.6.5
+ * メッセージウィンドウ表示時のアクターステータスの不透明度を手動設定に変更。
+ * メッセージウィンドウ表示時にアクターステータスの表示非表示にする機能を追加。
  * 2021/10/24 Ver 2.6.4
  * ゲージの幅が正常に取得できていなかった問題を修正。
  * 2021/10/24 Ver 2.6.3
@@ -830,7 +833,7 @@ Scene_Battle.prototype.start = function() {
 const _Scene_Battle_updateStatusWindowVisibility = Scene_Battle.prototype.updateStatusWindowVisibility;
 Scene_Battle.prototype.updateStatusWindowVisibility = function() {
   _Scene_Battle_updateStatusWindowVisibility.call(this);
-  if (this._messageWindow.y < this._statusWindow.y - this._statusWindow.height && $gameMessage.isBusy()) {
+  if (!param.MessageWindowVisibleMode && $gameMessage.isBusy()) {
     this._statusWindow.open();
   }
 };
@@ -989,7 +992,7 @@ Scene_Battle.prototype.opacityEnemyWindow = function() {
 };
 
 Scene_Battle.prototype.opacityMessageWindow = function() {
-  return this.statusWindow_Top <= this._messageWindow.y && this.statusWindow_Under >= this._messageWindow.y && this._messageWindow.onMessage;
+  return !param.MessageWindowOpacity && this._messageWindow.onMessage;
 };
 
 //Window_Message

@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.6.1
+ * @version 1.6.2
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -73,6 +73,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/4 Ver 1.6.2
+ * メッセージウィンドウ表示時のアクターステータスの不透明度を手動設定に変更。
+ * メッセージウィンドウ表示時にアクターステータスの表示非表示にする機能を追加。
  * 2021/10/3 Ver 1.6.1
  * ステータスとアクター画像の間に背景画像を表示できる機能を追加。
  * 2021/9/29 Ver 1.6.0
@@ -148,6 +151,13 @@
  * @param MessageWindowPosition
  * @text エネミー出現、リザルト、敗北、逃走メッセージ等上部表示
  * @desc エネミー出現、リザルト、敗北、逃走メッセージ等を画面上側に表示させます。
+ * @type boolean
+ * @default false
+ * @parent Setting
+ * 
+ * @param MessageWindowVisibleMode
+ * @text メッセージウィンドウ表示字アクターステータス画面非表示
+ * @desc メッセージウィンドウ表示時にアクターステータス画面を非表示にします。
  * @type boolean
  * @default false
  * @parent Setting
@@ -626,6 +636,13 @@
  * @param EnemyWindowOpacity
  * @text エネミー選択画面不透明度無効
  * @desc エネミー選択ウィンドウ表示時の不透明度を無効化します。
+ * @type boolean
+ * @default false
+ * @parent Opacity
+ * 
+ * @param MessageWindowOpacity
+ * @text メッセージウィンドウ不透明度無効
+ * @desc メッセージウィンドウ表示時の不透明度を無効化します。
  * @type boolean
  * @default false
  * @parent Opacity

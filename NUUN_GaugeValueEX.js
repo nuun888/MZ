@@ -398,7 +398,9 @@ Imported.NUUN_GaugeValueEX = true;
 
   Sprite_Gauge.prototype.initGaugeData = function(statusType) {
     this._gaugeData = this.isValueVisibleType(statusType);
-    this._isGaugeData = true;
+    if (this._gaugeData) {
+      this._isGaugeData = true;
+    }
   };
 
   Sprite_Gauge.prototype.isValueVisibleType = function(statusType) {

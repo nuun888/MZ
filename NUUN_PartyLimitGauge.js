@@ -10,9 +10,10 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
+ * @orderAfter NUUN_GaugeValueEX
  * 
  * @help
  * パーティメンバー、敵グループでそれぞれ共用するゲージを実装します。
@@ -28,10 +29,17 @@
  * スキルのメモ欄
  * <limitCost:10> スキルのコストとしてリミットゲージを１０を消費します。
  * 
+ * ゲージ表示拡張プラグインと併用する場合
+ * 以下のプラグインパラメータはゲージ表示拡張プラグインで設定してください。
+ * ゲージの色1
+ * ゲージの色2
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/5 Ver.1.0.3
+ * ゲージ表示拡張プラグインとの競合対策。
  * 2021/11/24 Ver.1.0.2
  * リミットポイントのコストと残りコストが同じ時にスキルが使えない問題を修正。
  * 2021/11/24 Ver.1.0.1
@@ -593,11 +601,11 @@ Sprite_PartyGauge.prototype.labelFontSize = function() {
 };
 
 Sprite_PartyGauge.prototype.gaugeColor1 = function() {
-  return getColorCode(PartyGaugeColor1);
+  return Imported.NUUN_GaugeValueEX ? getColorCode(this.changeGaugeColor1()) : getColorCode(PartyGaugeColor1);
 };
 
 Sprite_PartyGauge.prototype.gaugeColor2 = function() {
-  return getColorCode(PartyGaugeColor2);
+  return Imported.NUUN_GaugeValueEX ? getColorCode(this.changeGaugeColor2()) : getColorCode(PartyGaugeColor2);
 };
 
 Sprite_PartyGauge.prototype.labelColor = function() {

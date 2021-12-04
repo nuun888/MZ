@@ -35,6 +35,7 @@
  * 現在値/最大値が右揃えになるように修正。
  * HP以外の特定割合以下でのゲージが適用されていなかった問題を修正。
  * 最大時、特定割合以下での数値の色が適用されていなかった問題を修正。
+ * ラベルのX座標が適用されていなかった問題を修正。
  * 一部の処理を修正。
  * 2021/12/4 Ver.1.0.0
  * 初版
@@ -612,7 +613,7 @@ Imported.NUUN_GaugeValueEX = true;
 
   Sprite_Gauge.prototype.drawLabel = function() {//再定義
     const label = this.label();
-    const x = this._gaugeData ? this.labelY() : this.labelOutlineWidth() / 2;
+    const x = this._isGaugeData ? this.labelX() : this.labelOutlineWidth() / 2;
     const y = this.labelY();
     const width = this.bitmapWidth();
     const height = this.textHeight();

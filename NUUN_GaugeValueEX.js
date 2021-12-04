@@ -8,10 +8,11 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc ゲージ拡張
+ * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * ゲージの表示を拡張します。
@@ -23,7 +24,6 @@
  * 最大時、特定の割合以下でのゲージの色変更
  * 
  * ゲージ数値表示形式の仕様
- * tpは現在値/最大値を選択しても最大値は表示されません。
  * timeは数値が表示されません。
  * 
  * 
@@ -31,6 +31,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/5 Ver.1.0.1
+ * 現在値/最大値が右揃えになるように修正。
+ * HP以外の特定割合以下でのゲージが適用されていなかった問題を修正。
+ * 最大時、特定割合以下での数値の色が適用されていなかった問題を修正。
+ * 一部の処理を修正。
  * 2021/12/4 Ver.1.0.0
  * 初版
  * 
@@ -110,6 +115,7 @@
  * @option 'mp'
  * @option 'tp'
  * @option 'time'
+ * @option 'limit'
  * @default 
  * 
  * @param ValueVisible
@@ -283,8 +289,8 @@
  * @default ------------------------------
  * 
  * @param GaugeColorMaxApply
- * @desc 最大時のゲージの色変更を適用する。
- * @text 最大時ゲージ色変更適用
+ * @desc 最大時のゲージ、数値の色変更を適用する。
+ * @text 最大時ゲージ、数値色変更適用
  * @type boolean
  * @default false
  * @parent GaugeColorMaxSetting
@@ -318,8 +324,8 @@
  * @default ------------------------------
  * 
  * @param GaugeColorRatioApply
- * @desc 変化する残り割合時のゲージの色変更を適用する。
- * @text 変化残り割合時ゲージ色変更適用
+ * @desc 変化する残り割合時のゲージ、数値の色変更を適用する。
+ * @text 変化残り割合時ゲージ、数値色変更適用
  * @type boolean
  * @default false
  * @parent GaugeColorRatioSetting
@@ -372,11 +378,24 @@ Imported.NUUN_GaugeValueEX = true;
   const ValueVisibleType = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ValueVisibleType'])) : null) || [];
   let GaugeTextColor = null;
 
+  const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
+  Sprite_Gauge.prototype.initMembers = function() {
+    _Sprite_Gauge_initMembers.call(this);
+    this._gaugeData = null;
+    this._valueTextWidth = 0;
+    this._isGaugeData = false;
+  };
+
   const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
   Sprite_Gauge.prototype.setup = function(battler, statusType) {
-    this._gaugeData = this.isValueVisibleType(statusType);
+    this.initGaugeData(statusType);
     _Sprite_Gauge_setup.call(this, battler, statusType);
-    this._valueTextWidth = this.bitmap.measureTextWidth(ValueDigits);
+    this._valueTextWidth = this.setValueTextWidth();
+  };
+
+  Sprite_Gauge.prototype.initGaugeData = function(statusType) {
+    this._gaugeData = this.isValueVisibleType(statusType);
+    this._isGaugeData = true;
   };
 
   Sprite_Gauge.prototype.isValueVisibleType = function(statusType) {
@@ -387,8 +406,22 @@ Imported.NUUN_GaugeValueEX = true;
     return DefaultGaugeHeight;
   };
 
+  Sprite_Gauge.prototype.isGaugeData = function() {
+    if (this._isGaugeData) {
+      return this._isGaugeData;
+    }
+    this.initGaugeData(this._statusType);
+    return this._isGaugeData;
+  };
+
+  Sprite_Gauge.prototype.setValueTextWidth = function() {
+    if (!this._valueTextWidth) {
+      this._valueTextWidth = this.bitmap.measureTextWidth(ValueDigits);
+    }
+  };
+
   Sprite_Gauge.prototype.gaugeVisible = function() {
-    return this._gaugeData ? this._gaugeData.GaugeVisible : DefaultGaugeVisible;
+    return this._isGaugeData ? this._gaugeData.GaugeVisible : DefaultGaugeVisible;
   };
 
   Sprite_Gauge.prototype.valueFontSize  = function() {//再定義
@@ -409,25 +442,36 @@ Imported.NUUN_GaugeValueEX = true;
 
   const _Sprite_Gauge_valueColor = Sprite_Gauge.prototype.valueColor;
   Sprite_Gauge.prototype.valueColor = function() {
-    if (this._gaugeData) {
-      GaugeTextColor = this._gaugeData.ValueColor;
+    if (this._isGaugeData) {
+      GaugeTextColor = this.changeValueColor();
     }
     const color = _Sprite_Gauge_valueColor.call(this);
     GaugeTextColor = null;
     return color;
   };
 
+  Sprite_Gauge.prototype.changeValueColor = function() {
+    if (this._gaugeData.GaugeColorMaxApply && this.currentMaxValue() === this.currentValue()) {
+      return this._gaugeData.MaximumValueColor;
+    } else if (this._gaugeData.GaugeColorRatioApply && this._statusType === 'hp' && this.getGaugeHpRatio()) {
+      return this._gaugeData.RatioValueColor;
+    } else if (this._gaugeData.GaugeColorRatioApply && this.isRatioGauge()) {
+      return this._gaugeData.RatioValueColor;
+    }
+    return this._gaugeData.ValueColor;
+  };
+
   Sprite_Gauge.prototype.maxValueColor  = function() {
-    return this._gaugeData ? getColorCode(this._gaugeData.MaxValueColor) : ColorManager.textColor(0);
+    return this._isGaugeData ? getColorCode(this._gaugeData.MaxValueColor) : ColorManager.textColor(0);
   };
 
   Sprite_Gauge.prototype.separationColor  = function() {
-    return this._gaugeData ? getColorCode(this._gaugeData.SeparationColor) : ColorManager.textColor(0);
+    return this._isGaugeData ? getColorCode(this._gaugeData.SeparationColor) : ColorManager.textColor(0);
   };
 
   const _Sprite_Gauge_labelColor = Sprite_Gauge.prototype.labelColor;
   Sprite_Gauge.prototype.labelColor = function() {
-    return this._gaugeData ? getColorCode(this._gaugeData.LabelColor) : _Sprite_Gauge_labelColor.call(this);
+    return this._isGaugeData ? getColorCode(this._gaugeData.LabelColor) : _Sprite_Gauge_labelColor.call(this);
   };
 
   Sprite_Gauge.prototype.isRatioGauge = function() {
@@ -436,7 +480,7 @@ Imported.NUUN_GaugeValueEX = true;
 
   const _Sprite_Gauge_gaugeColor1 = Sprite_Gauge.prototype.gaugeColor1;
   Sprite_Gauge.prototype.gaugeColor1 = function() {
-    if (this._gaugeData) {
+    if (this._isGaugeData) {
       return getColorCode(this.changeGaugeColor1())
     }
     return _Sprite_Gauge_gaugeColor1.call(this);
@@ -444,7 +488,7 @@ Imported.NUUN_GaugeValueEX = true;
 
   const _Sprite_Gauge_gaugeColor2 = Sprite_Gauge.prototype.gaugeColor2;
   Sprite_Gauge.prototype.gaugeColor2 = function() {
-    if (this._gaugeData) {
+    if (this._isGaugeData) {
       return getColorCode(this.changeGaugeColor2())
     }
     return _Sprite_Gauge_gaugeColor2.call(this);
@@ -463,6 +507,8 @@ Imported.NUUN_GaugeValueEX = true;
       return this._gaugeData.MaxGaugeColor1;
     } else if (this._gaugeData.GaugeColorRatioApply && this._statusType === 'hp' && this.getGaugeHpRatio()) {
       return this._gaugeData.RatioGaugeColor1;
+    } else if (this._gaugeData.GaugeColorRatioApply && this.isRatioGauge()) {
+      return this._gaugeData.RatioGaugeColor1;
     }
     return this._gaugeData.GaugeColor1;
   };
@@ -472,20 +518,22 @@ Imported.NUUN_GaugeValueEX = true;
       return this._gaugeData.MaxGaugeColor2;
     } else if (this._gaugeData.GaugeColorRatioApply && this._statusType === 'hp' && this.getGaugeHpRatio()) {
       return this._gaugeData.RatioGaugeColor2;
+    } else if (this._gaugeData.GaugeColorRatioApply && this.isRatioGauge()) {
+      return this._gaugeData.RatioGaugeColor1;
     }
     return this._gaugeData.GaugeColor2;
   };
 
   const _Sprite_Gauge_drawGauge = Sprite_Gauge.prototype.drawGauge;
   Sprite_Gauge.prototype.drawGauge = function() {
-    if (this.gaugeVisible()) {
+    if (this._isGaugeData) {
       _Sprite_Gauge_drawGauge.call(this);
     }
   };
 
   const _Sprite_Gauge_gaugeX = Sprite_Gauge.prototype.gaugeX;
   Sprite_Gauge.prototype.gaugeX = function() {
-    return this._gaugeData && this._gaugeData.GaugeX >= 0 ? this._gaugeData.GaugeX : _Sprite_Gauge_gaugeX.call(this);
+    return this._isGaugeData && this._gaugeData.GaugeX >= 0 ? this._gaugeData.GaugeX : _Sprite_Gauge_gaugeX.call(this);
   };
 
   Sprite_Gauge.prototype.gaugeY = function() {
@@ -498,7 +546,7 @@ Imported.NUUN_GaugeValueEX = true;
 
   const _Sprite_Gauge_labelY = Sprite_Gauge.prototype.labelY;
   Sprite_Gauge.prototype.labelY = function() {
-    return this._gaugeData ? this._gaugeData.LabelY : _Sprite_Gauge_labelY.call(this);
+    return this._isGaugeData ? this._gaugeData.LabelY : _Sprite_Gauge_labelY.call(this);
   };
 
   Sprite_Gauge.prototype.valueX = function() {
@@ -511,7 +559,7 @@ Imported.NUUN_GaugeValueEX = true;
 
   const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
   Sprite_Gauge.prototype.drawValue = function() {//再定義
-    if (this._gaugeData) {
+    if (this._isGaugeData) {
       if (this._gaugeData.ValueVisible === 'ValueMaxValue') {
         this.drawValueMaxValue();
       } else if (this._gaugeData.ValueVisible === 'Value') {
@@ -533,13 +581,16 @@ Imported.NUUN_GaugeValueEX = true;
   };
 
   Sprite_Gauge.prototype.drawValueMaxValue = function() {
+    this.setValueTextWidth();
     const currentValue = this.currentValue();
     const currentMaxValue = this.currentMaxValue();
-    const ValueX = this._gaugeData.ValueMargin + 6;
+    const bitmapWidth = this.bitmapWidth();
+    const ValueMarginX = this._gaugeData.ValueMargin + 6;
     const ValueY = this.valueY();
-    const width = (this.bitmapWidth() - ValueX) / 2 - 8;
+    const width = (this.bitmapWidth() - ValueMarginX) / 2 - 8;
     const height = this.textHeight();
     const textWidth = Math.min(this._valueTextWidth, width);
+    const ValueX = bitmapWidth - (textWidth * 2 + 16);
     this.setupValueFont();
     this.bitmap.fontSize = this.valueFontSize();
     this.bitmap.drawText(currentValue, ValueX, ValueY, textWidth, height, "right");

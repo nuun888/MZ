@@ -1,5 +1,5 @@
 # [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
-# Ver.1.0.1
+# Ver.1.0.2
 
 ゲージの表示を拡張します。  
 

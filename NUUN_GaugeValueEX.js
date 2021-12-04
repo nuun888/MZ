@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -31,6 +31,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/5 Ver.1.0.2
+ * ゲージの非表示が適用されていなかった問題を修正。
  * 2021/12/5 Ver.1.0.1
  * 現在値/最大値が右揃えになるように修正。
  * HP以外の特定割合以下でのゲージが適用されていなかった問題を修正。
@@ -525,13 +527,6 @@ Imported.NUUN_GaugeValueEX = true;
     return this._gaugeData.GaugeColor2;
   };
 
-  const _Sprite_Gauge_drawGauge = Sprite_Gauge.prototype.drawGauge;
-  Sprite_Gauge.prototype.drawGauge = function() {
-    if (this._isGaugeData) {
-      _Sprite_Gauge_drawGauge.call(this);
-    }
-  };
-
   const _Sprite_Gauge_gaugeX = Sprite_Gauge.prototype.gaugeX;
   Sprite_Gauge.prototype.gaugeX = function() {
     return this._isGaugeData && this._gaugeData.GaugeX >= 0 ? this._gaugeData.GaugeX : _Sprite_Gauge_gaugeX.call(this);
@@ -604,11 +599,13 @@ Imported.NUUN_GaugeValueEX = true;
   };
 
   Sprite_Gauge.prototype.drawGauge = function() {//再定義
-    const gaugeX = this.gaugeX();
-    const gaugeY = this._gaugeData ? this.gaugeY() : this.textHeight() - this.gaugeHeight();
-    const gaugewidth = this.bitmapWidth() - gaugeX;
-    const gaugeHeight = this.gaugeHeight();
-    this.drawGaugeRect(gaugeX, gaugeY, gaugewidth, gaugeHeight);
+    if (this.gaugeVisible()) {
+      const gaugeX = this.gaugeX();
+      const gaugeY = this._isGaugeData ? this.gaugeY() : this.textHeight() - this.gaugeHeight();
+      const gaugewidth = this.bitmapWidth() - gaugeX;
+      const gaugeHeight = this.gaugeHeight();
+      this.drawGaugeRect(gaugeX, gaugeY, gaugewidth, gaugeHeight);
+    }
   };
 
   Sprite_Gauge.prototype.drawLabel = function() {//再定義

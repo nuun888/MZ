@@ -4,6 +4,7 @@
 ゲージの表示を拡張します。  
 
 ![画像](img/GaugeValueEX1.png)  
+![画像](img/GaugeValueEX4.png)  
 
 ## ゲージの設定
 ### 表示対象

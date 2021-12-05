@@ -1,7 +1,9 @@
 # [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 # Ver.1.0.0
 
-スキルコストの表示を拡張します。
+スキルコストの表示を拡張します。  
+
+![画像](img/SkillCost1.png)  
 
 ## 設定方法
 スキルコストの表示順からスキルコストの表示順を設定できます。  

@@ -1,4 +1,4 @@
-# [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/SkillCostEX.js)
+# [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
 # Ver.1.0.0
 
 スキルコストにさまざまなコストを設定できます。

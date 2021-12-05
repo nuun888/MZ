@@ -106,7 +106,7 @@
 | アクター並び替え固定 | [NUUN_ActorFixed](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js) |  | 1.1.4 |
 | パーティ、敵グループリミットゲージ | [NUUN_PartyLimitGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js) |  | 1.0.3 |
 | [売値任意設定](https://github.com/nuun888/MZ/blob/master/README/AnySellPrice.md) | [NUUN_AnySellPrice](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js) | 共 | 1.1.0 |
-| 床ダメージの処理を拡張 | [NUUN_DamagedFloorEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js) | 共 | 1.0.3 |
+| [床ダメージの処理を拡張](https://github.com/nuun888/MZ/blob/master/README/DamagedFloorEX.md) | [NUUN_DamagedFloorEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js) | 共 | 1.0.3 |
 | ドロップ率百分率化 | [NUUN_DropRatePercentage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropRatePercentage.js) |  | 1.0.0 |
 | 最大戦闘メンバー数変更 | [NUUN_MaxBattleMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js) |  | 1.0.1 |
 |  |  |  |  |

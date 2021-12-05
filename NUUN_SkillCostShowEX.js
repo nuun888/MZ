@@ -38,7 +38,7 @@
  * @param CostOrderSetting
  * @text スキルコストの表示順
  * @desc スキルコストの表示順の設定を行います。上の設定ほど後ろに表示されます。
- * @default []
+ * @default ["{\"CostOrderSelect\":\"[\\\"'Exp'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'Gold'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'TP'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'MP'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'HP'\\\"]\"}"]
  * @type struct<CostOrderSettingList>[]
  * 
  * @param CostWidth

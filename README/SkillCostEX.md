@@ -30,6 +30,7 @@
 ### 評価式
 `<SkillEvalCost:[eval]>` 消費を判定するための評価式を記入します。   
 `<SkillEvalCons:[eval]>` 消費するための評価式を記入します。  
+  
 [cost]:消費コスト（固定値）  
 [rate]:割合（百分率）％  
 [itemType]:アイテムタイプ　I アイテム　W 武器　A 防具  

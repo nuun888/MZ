@@ -31,13 +31,13 @@
 `<SkillEvalCost:[eval]>` 消費を判定するための評価式を記入します。   
 `<SkillEvalCons:[eval]>` 消費するための評価式を記入します。  
   
-[cost]:消費コスト（固定値）  
-[rate]:割合（百分率）％  
-[itemType]:アイテムタイプ　I アイテム　W 武器　A 防具  
-[itemId]:アイテム、武器、防具ID  
-[num]:消費個数  
-[id]:ゲーム変数ID  
-[eval]:評価式  
+`[cost]`:消費コスト（固定値）  
+`[rate]`:割合（百分率）％  
+`[itemType]`:アイテムタイプ　I アイテム　W 武器　A 防具  
+`[itemId]`:アイテム、武器、防具ID  
+`[num]`:消費個数  
+`[id]`:ゲーム変数ID  
+`[eval]`:評価式  
 
 ### 取得パラメータ
 this.consBHp:消費前の発動者のHPを格納します。  

@@ -40,11 +40,11 @@
 `[eval]`:評価式  
 
 ### 取得パラメータ
-this.consBHp:消費前の発動者のHPを格納します。  
-this.consBMp:消費前の発動者のMPを格納します。  
-this.consBTp:消費前の発動者のTPを格納します。  
-this.consBGold:消費前の発動者の所持金を格納します。  
-this.consBExp:消費前の発動者の現レベルの獲得経験値を格納します。  
+`this.consBHp`:消費前の発動者のHPを格納します。  
+`this.consBMp`:消費前の発動者のMPを格納します。  
+`this.consBTp`:消費前の発動者のTPを格納します。  
+`this.consBGold`:消費前の発動者の所持金を格納します。  
+`this.consBExp`:消費前の発動者の現レベルの獲得経験値を格納します。  
   
 スキルのダメージの計算式にa.consBMp * 1.5 と記入することで消費前のMPの1.5倍のダメージを与えることができます。  
 

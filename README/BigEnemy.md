@@ -4,32 +4,32 @@
 エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
 
 ## 設定方法
-敵キャラのメモ欄
-以下のタグは画面の横サイズに合わせて拡大されます。
-`<BigEnemy>` 画像を画面サイズに合わせます。
-`<BigEnemy:OriginalRatio>` 比率を変更せず横幅の倍率基準で拡大します。
-以下のタグはオリジナル画像サイズのまま、ゲーム画面の下側に画像の下を合わせて表示されます。  
-`<BigEnemy:UnderPosition>` 画像を原寸倍率で画面下に合わせ表示させます。画像のサイズ調整やX座標調整はいたしません。
+敵キャラのメモ欄  
+以下のタグは画面の横サイズに合わせて拡大されます。  
+`<BigEnemy>` 画像を画面サイズに合わせます。  
+`<BigEnemy:OriginalRatio>` 比率を変更せず横幅の倍率基準で拡大します。  
+以下のタグはオリジナル画像サイズのまま、ゲーム画面の下側に画像の下を合わせて表示されます。    
+`<BigEnemy:UnderPosition>` 画像を原寸倍率で画面下に合わせ表示させます。画像のサイズ調整やX座標調整はいたしません。  
 
-`<BigEnemyFront>` 画像を一番手前側に表示させます。
-`<BigEnemyBack>` 画像を一番後ろ側に表示させます。
+`<BigEnemyFront>` 画像を一番手前側に表示させます。  
+`<BigEnemyBack>` 画像を一番後ろ側に表示させます。  
 
-`<BigEnemyY:[y]>` Y座標をシフトして表示します。
-`<BigEnemyY:50>` Y座標を50下にシフトして表示します。
+`<BigEnemyY:[y]>` Y座標をシフトして表示します。  
+`<BigEnemyY:50>` Y座標を50下にシフトして表示します。  
 
-`<BigEnemyDamageX:[x]>` ダメージエフェクトのX座標を調整します。
-`<BigEnemyDamageX:[y]>` ダメージエフェクトのY座標を調整します。
-`[x]`：X座標(相対)
-`[y]`：Y座標(相対)
+`<BigEnemyDamageX:[x]>` ダメージエフェクトのX座標を調整します。  
+`<BigEnemyDamageX:[y]>` ダメージエフェクトのY座標を調整します。  
+`[x]`：X座標(相対)  
+`[y]`：Y座標(相対)  
 
-`<CorrectionScale:[scale]>` 拡大率の補正を行います。
-`[scale]`：倍率
-`<CorrectionScale:1.1>`
+`<CorrectionScale:[scale]>` 拡大率の補正を行います。  
+`[scale]`：倍率  
+`<CorrectionScale:1.1>`  
 
 #### 仕様
-BigEnemy及びBigEnemy:OriginalRatioは画面の横サイズに合わせて拡大されます。
-BigEnemy:UnderPositionはオリジナルサイズのまま表示されX座標の調整は行われませんが、Yは画像の一番下が画面の下に表示されるように調整されます。
-BigEnemyYは表示した画像からの相対座標となります。なお巨大エネミーのみ有効です。
+BigEnemy及びBigEnemy:OriginalRatioは画面の横サイズに合わせて拡大されます。  
+BigEnemy:UnderPositionはオリジナルサイズのまま表示されX座標の調整は行われませんが、Yは画像の一番下が画面の下に表示されるように調整されます。  
+BigEnemyYは表示した画像からの相対座標となります。なお巨大エネミーのみ有効です。  
 
 ## 更新履歴
 2021/11/7 Ver.1.2.0  

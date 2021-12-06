@@ -12,7 +12,7 @@
  * @target MZ
  * @plugindesc 経験値増減アイテム、スキル
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * 経験値を増減させるアイテムやスキルを作ることが出来ます。
@@ -27,10 +27,19 @@
  * <levelUpStop>
  * このような記述をすることでレベルアップアイテムを作ることも可能です。
  * 
+ * メッセージフォーマット
+ * 経験値増加時減少時のメッセージ
+ * %1:使用者 %2：対象者 %3：経験値
+ * 効果なしの時のメッセージ
+ * %1:使用者 %2：対象者
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/6 Ver 1.2.0
+ * メッセージのフォーマットを変更。
+ * 最大レベルの時に経験値を増加させたときに経験値が減ってしまう問題を修正。
  * 2021/5/2 Ver 1.1.1
  * 効果がなかった時のメッセージログを追加。
  * 2020/12/24 Ver 1.1.0
@@ -51,6 +60,24 @@
  * @type boolean
  * @default false
  * 
+ * @param ExpMessageUp
+ * @text 経験値増加時メッセージ
+ * @desc 経験値増加時のメッセージ。%1:使用者 %2：対象者 %3：経験値
+ * @type string
+ * @default %2の経験値が%3増加した！
+ * 
+ * @param ExpMessageDown
+ * @text 経験値減少時メッセージ
+ * @desc 経験値減少時のメッセージ。%1:使用者 %2：対象者 %3：経験値
+ * @type string
+ * @default %2の経験値が%3減少した！
+ * 
+ * @param ExpMessageNoEffect
+ * @text 効果なし時メッセージ
+ * @desc 効果がなかった時のメッセージ。%1:使用者 %2：対象者
+ * @type string
+ * @default %2には効果がなかった！
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_ExpItem = true;
@@ -58,6 +85,9 @@ Imported.NUUN_ExpItem = true;
 (() => {
   const parameters = PluginManager.parameters('NUUN_ExpItem');
   const LogWindowShow = eval(parameters['LogWindowShow'] || 'false');
+  const ExpMessageUp = String(parameters['ExpMessageUp'] || '%2の経験値が%3増加した！');
+  const ExpMessageDown = String(parameters['ExpMessageDown'] || '%2の経験値が%3減少した！');
+  const ExpMessageNoEffect = String(parameters['ExpMessageNoEffect'] || '%2には効果がなかった！');
 
   const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
 Game_ActionResult.prototype.clear = function() {
@@ -70,7 +100,7 @@ Game_ActionResult.prototype.clear = function() {
   Game_Action.prototype.applyItemUserEffect = function(target) {
     _Game_Action_applyItemUserEffect.call(this, target);
     if (this.item().meta.ExpIncrease) {
-      target.expItems(target, this.item());
+      target.expItems(this.subject(), this.item());
       this.makeSuccess(target);
     }
   };
@@ -93,45 +123,60 @@ Game_ActionResult.prototype.clear = function() {
     return _Game_Action_testApply.call(this, target) || this.testExpItem(target);
   };
 
-  Game_BattlerBase.prototype.expItems = function(target, item) {
+  Game_Battler.prototype.expItems = function(subject, item) {
     if(this.isActor()) {
       let expVal = item.meta.ExpIncrease;
       const originalExp = expVal;
       let text = null;
+      expVal = this.currentExp() + expVal;
+      if (item.meta.levelUpStop && expVal > 0) {
+        expVal = Math.min(expVal, this.nextLevelExp() - this.currentExp());
+      } else if (item.meta.NolevelDown && expVal < 0) {
+        expVal = Math.max(expVal, this.currentLevelExp() - this.currentExp());
+      } else {
+        expVal = Math.min(this.expForLevel(this.maxLevel()) - this.currentExp(), expVal);
+      }
       if(item.meta.levelUpStop && expVal > 0) {
         expVal = Math.min(this.nextLevelExp() - this.currentExp(), expVal);
       } else if (item.meta.NolevelDown && expVal < 0) {
         expVal = Math.max(this.currentLevelExp() - this.currentExp(), expVal);
       }
-      expVal = Math.min(this.expForLevel(this.maxLevel()) - this.currentExp(), expVal);console.log(expVal)
+      expVal = Math.min(this.expForLevel(this.maxLevel()) - this.currentExp(), expVal);
       if(expVal) {
-        text = expVal > 0 ? '増加した' : '減少した';
-        if (LogWindowShow) {
-          $gameMessage.add(target.name() +'の'+ TextManager.basic(8) +'が'+ expVal + text + "!");
+        if (expVal > 0) {
+          text = ExpMessageUp.format(subject.name(), this.name(), expVal);        
         } else {
-          target.result().useExpItem = true;
-          target.result().useExpItemText = "%1の"+ TextManager.basic(8) +'が'+ expVal + text + "!";
+          text = ExpMessageDown.format(subject.name(), this.name(), expVal);
+        }
+        if (LogWindowShow) {
+          $gameMessage.add(text);
+        } else {
+          this.result().useExpItemText = text;
+          this.result().useExpItem = true;
         }
         this.gainExp(expVal);
       } else if (originalExp !== 0) {
         if (!LogWindowShow && expVal === 0) {
-          target.result().useExpItem = true;
-          target.result().useExpItemText = "%1には効果がなかった!";
+          this.result().useExpItemText = ExpMessageNoEffect.format(subject.name(), this.name());
+          this.result().useExpItem = true;
         }
       }
     }
   };
 
-  const _Window_BattleLog_displayDamage = Window_BattleLog.prototype.displayDamage;
-  Window_BattleLog.prototype.displayDamage = function(target) {
-    _Window_BattleLog_displayDamage.call(this, target);
-    if (!target.result().missed && !target.result().evaded && target.result().useExpItem){
-      this.displayTargetItemMessage(target)
+  const _Window_BattleLog_displayActionResults = Window_BattleLog.prototype.displayActionResults;
+  Window_BattleLog.prototype.displayActionResults = function(subject, target) {
+	  _Window_BattleLog_displayActionResults.call(this, subject, target);
+	  if (target.result().used) {
+	  	this.push("pushBaseLine");
+	  	this.displayExpItem(subject, target);
+	  }
+  };
+
+  Window_BattleLog.prototype.displayExpItem = function(subject, target) {
+    if (target.result().useExpItem) {
+      this.push("addText", target.result().useExpItemText);
     }
   };
 
-  Window_BattleLog.prototype.displayTargetItemMessage = function(target) {
-    const text = target.result().useExpItemText.format(target.name());
-    this.push("addText", text);
-  };
 })();

@@ -14,6 +14,7 @@
  * @base NUUN_ConditionsBase
  * 
  * @help
+ * 条件によりドロップするアイテムを設定できます。
  * 
  * 敵のメモ欄
  * <CondDropItem:[item],[id],[rate],[condNameTag],[CondMode]>

@@ -136,12 +136,6 @@ Game_ActionResult.prototype.clear = function() {
       } else {
         expVal = Math.min(this.expForLevel(this.maxLevel()) - this.currentExp(), expVal);
       }
-      if(item.meta.levelUpStop && expVal > 0) {
-        expVal = Math.min(this.nextLevelExp() - this.currentExp(), expVal);
-      } else if (item.meta.NolevelDown && expVal < 0) {
-        expVal = Math.max(this.currentLevelExp() - this.currentExp(), expVal);
-      }
-      expVal = Math.min(this.expForLevel(this.maxLevel()) - this.currentExp(), expVal);
       if(expVal) {
         if (expVal > 0) {
           text = ExpMessageUp.format(subject.name(), this.name(), expVal);        

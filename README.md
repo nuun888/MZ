@@ -31,7 +31,7 @@
 | 戦闘背景の変更 | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) |  | 1.1.1 |
 | 最大戦闘メンバー数変更 | [NUUN_MaxBattleMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js) |  | 1.0.0 |
 | [ステート残りターン表示](https://github.com/nuun888/MZ/blob/master/README/NUUN_StateTurn.md) | [NUUN_StateTurn](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js) |  | 1.0.2 |
-| [バトルステートアイコン複数表示](https://github.com/nuun888/MZ/blob/master/README/StateIconSideBySide.md) | [NUUN_StateIconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js) |  | 1.1.0 |
+| [ステート横並び表示](https://github.com/nuun888/MZ/blob/master/README/StateIconSideBySide.md) | [NUUN_StateIconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js) |  | 1.1.0 |
 | タイムライン |  |  |  |
 |  |  |  |  |
 |  |  |  |  |

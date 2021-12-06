@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_LevelItem.js
+ * NUUN_ExpItem.js
  * 
  * Copyright (C) 2020 NUUN
  * This software is released under the MIT License.

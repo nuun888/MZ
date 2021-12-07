@@ -6,31 +6,38 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2020/12/13 Ver.1.0.1
- * 微修正
- * 2020/12/12 Ver.1.0.0
- * 初版
- * 
  */ 
 /*:
  * @target MZ
  * @plugindesc 最大レベル変動プラグイン
  * @author NUUN
+ * @version 1.1.0
  * @orderBefore NUUN_LevelUnlimited
  * 
  * @help
  * アクターの最大レベルを任意のタイミングで変更できます。
  * 
- * プラグインコマンド
- * MaxLevelSet　アクターの最大レベルを変更。
+ * アイテム、スキルのメモ欄
+ * <ChangeMaxLevel:[lavel]> レベルの上限を変更します。
+ * <ChangeMaxLevel:80> レベルの上限を80に変更します。
+ * <ChangeMaxLevelld:[lavel±]> レベルの上限を増減します。
+ * <ChangeMaxLevelld:5> レベルの上限を５増やします。
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * 更新履歴
+ * 2021/12/7 Ver.1.1.0
+ * 最大レベルを増減させる機能を追加。
+ * 最大レベルを変更、増減させるスキル、アイテムを設定できる機能を追加。
+ * 2020/12/13 Ver.1.0.1
+ * 微修正
+ * 2020/12/12 Ver.1.0.0
+ * 初版
  * 
  * @command MaxLevelSet
- * @text 最大レベルの変更。
+ * @text 最大レベルの変更
  * @desc 最大レベルを変更します。
  * 
  * @arg changeMaxLevel
@@ -38,7 +45,26 @@
  * @min 1
  * @default 99
  * @text 最大レベル
- * @desc 最大レベルを変更します。
+ * @desc 変更する最大レベルを設定します。
+ * 
+ * @arg ActorId
+ * @type actor
+ * @default 1
+ * @text アクター
+ * @desc 変更するアクターを指定します。
+ * @min 0
+ * @max 9999
+ * 
+ * @command MaxLevelldSet
+ * @text 最大レベルの増減
+ * @desc 最大レベルを増減します。
+ * 
+ * @arg changeMaxLevel
+ * @type number
+ * @min -99999999999
+ * @default 1
+ * @text 最大レベル
+ * @desc 増減する最大レベルを設定します。
  * 
  * @arg ActorId
  * @type actor
@@ -57,7 +83,11 @@ const parameters = PluginManager.parameters('NUUN_ChangeMaxLevel');
 const pluginName = "NUUN_ChangeMaxLevel";
 
 PluginManager.registerCommand(pluginName, "MaxLevelSet", args => {
-  $gameActors.actor(args.ActorId).changeMaxLevel(Number(args.changeMaxLevel));
+  $gameActors.actor(Number(args.ActorId)).changeMaxLevel(Number(args.changeMaxLevel));
+});
+
+PluginManager.registerCommand(pluginName, "MaxLevelldSet", args => {
+  $gameActors.actor(Number(args.ActorId)).changeMaxLevelld(Number(args.changeMaxLevel));
 });
 
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
@@ -73,6 +103,13 @@ Game_Actor.prototype.changeMaxLevel = function(changeMaxLevel) {
   this._maxLevel = (this._level <= changeMaxLevel ? changeMaxLevel : this._maxLevel);
 };
 
+Game_Actor.prototype.changeMaxLevelld = function(changeMaxLevel) {
+  if (!this._maxLevel) {
+    this._maxLevel = this.maxLevel();
+  }
+  this._maxLevel = Math.max(this._maxLevel + changeMaxLevel, 1);
+};
+
 const _Game_Actor_maxLevel = Game_Actor.prototype.maxLevel;
 Game_Actor.prototype.maxLevel = function() {
   return this._maxLevel > 0 ? this._maxLevel : _Game_Actor_maxLevel.call(this);
@@ -82,5 +119,27 @@ const _Game_Actor_changeExp = Game_Actor.prototype.changeExp;
 Game_Actor.prototype.changeExp = function(exp, show) {
   exp = Math.min(this.expForLevel(this.maxLevel()), exp);
   _Game_Actor_changeExp.call(this, exp, show);
+};
+
+Game_Action.prototype.testChangeMaxLevelItem = function(target) {
+  return this.item().meta.ChangeMaxLevel || this.item().meta.ChangeMaxLevelld;
+};
+
+const _Game_Action_testApply = Game_Action.prototype.testApply;
+Game_Action.prototype.testApply = function(target) {
+  return _Game_Action_testApply.call(this, target) || this.testChangeMaxLevelItem(target);
+};
+
+const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
+  Game_Action.prototype.applyItemUserEffect = function(target) {
+    _Game_Action_applyItemUserEffect.call(this, target);
+    if (this.item().meta.ChangeMaxLevel) {
+      target.changeMaxLevel(Number(this.item().meta.ChangeMaxLevel));
+      this.makeSuccess(target);
+    }
+    if (this.item().meta.ChangeMaxLevelld) {
+      target.changeMaxLevelld(Number(this.item().meta.ChangeMaxLevelld));
+      this.makeSuccess(target);
+    }
 };
 })();

@@ -1,4 +1,4 @@
-# [敵キャラのスタータス上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
+# [敵キャラのスタータス上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js)
 # Ver.1.0.0
 
 データベース上では敵キャラの各ステータス設定には上限がかけられていて、上限を超えて数値を入力できません。  

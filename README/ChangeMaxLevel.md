@@ -1,5 +1,5 @@
 # [最大レベル変動](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js)
-# Ver.1.0.1
+# Ver.1.1.0
 
 アクターの最大レベルをゲーム途中でも変更できます。
 

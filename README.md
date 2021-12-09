@@ -86,7 +86,7 @@
 | 敵TPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.2.2 |
 | 敵ステートアイコン表示方法仕様変更 |  |  |  |
 | ゲージ画像化 | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) | 共 | 1.3.0 |
-| MVアニメーションフレームレート個別設定 | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.0.0 |
+| [MV互換アニメーションフレームレート個別設定](https://github.com/nuun888/MZ/blob/master/README/AnimationFPSRate.md) | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.0.0 |
 | [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.0.2 |
 |  |  |  |  |
 |  |  |  |  |

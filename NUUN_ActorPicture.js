@@ -87,27 +87,6 @@
  * @default 0
  * @min 0
  * 
- * @param Actor_X
- * @text アクター画像X座標
- * @desc アクター画像のX座標。
- * @type number
- * @default 0
- * @min -9999
- * 
- * @param Actor_Y
- * @text アクター画像Y座標
- * @desc アクター画像のY座標。
- * @type number
- * @default 0
- * @min -9999
- * 
- * @param Actor_Scale
- * @text アクター画像拡大率
- * @desc アクター画像の拡大率。
- * @type number
- * @default 100
- * @min 0
- * 
  * @param AllMatch
  * @text 全条件一致
  * @default ------------------------------

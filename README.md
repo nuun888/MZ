@@ -5,6 +5,7 @@
 共：要共通処理  
 条：要条件付き  
 条対：条件付き対応  
+立対：立ち絵、顔グラ表示EX対応  
 レ：レーダーチャート対応
 
 | システム　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
@@ -12,12 +13,12 @@
 | 共通処理 | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.3.1 |
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.0.5 |
 | レーダーチャート表示ベース | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) |  | 1.0.0 |
-| [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) |  | 1.2.1 |
+| [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.1 |
 |  |  |  |  |
 
 | 戦闘　　　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
-| バトルスタイル拡張ベース | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) | 共 | 2.6.5 |
+| バトルスタイル拡張ベース | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) | 共 立対 | 2.6.5 |
 | バトルスタイル拡張 | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.6.2 |
 | [XP風バトルコマンド](https://github.com/nuun888/MZ/blob/master/README/XPBattleCommand.md) | [NUUN_XPBattleComman](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js) | 共 | 1.0.2 |
 | 戦闘中アイテム、スキル選択画面MV風表示 | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js) |  | 1.1.3 |
@@ -120,7 +121,7 @@
 | [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ | 2.9.4 |
 | ┗　耐性表示マスク |  [NUUN_EnemyBookEX_1](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js) |  | 1.0.1 |
 | アイテム図鑑 | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) | 共 | 1.4.1 |
-| [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共　レ | 2.2.9 |
+| [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共 立対 レ | 2.2.9 |
 | セーブ画面拡張 | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.7.0 |
 | セーブ上書き確認 | [NUUN_SaveVerification](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveVerification.js) |  | 1.0.0 |
 | 所持金拡張 | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.0 |

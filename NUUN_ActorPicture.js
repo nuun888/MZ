@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/12 Ver 1.2.2
+ * インデックスIDに-1を設定できるように変更。（-1:デフォルトのインデックスID）
  * 2021/12/11 Ver 1.2.1
  * 顔グラのインデックスIDが正常に取得できない問題を修正。
  * 2021/12/11 Ver 1.2.0
@@ -88,8 +90,8 @@
  * @text 顔グラのインデックスID
  * @desc 顔グラのインデックスID。
  * @type number
- * @default 0
- * @min 0
+ * @default -1
+ * @min -1
  * 
  * @param AllMatch
  * @text 全条件一致

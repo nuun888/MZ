@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -31,6 +31,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/12 Ver.1.0.3
+ * 一部プラグインと関数が重複したため変更。
  * 2021/12/5 Ver.1.0.2
  * ゲージの非表示が適用されていなかった問題を修正。
  * 2021/12/5 Ver.1.0.1
@@ -425,7 +427,7 @@ Imported.NUUN_GaugeValueEX = true;
     }
   };
 
-  Sprite_Gauge.prototype.gaugeVisible = function() {
+  Sprite_Gauge.prototype.drawGaugeVisible = function() {
     return this._isGaugeData ? this._gaugeData.GaugeVisible : DefaultGaugeVisible;
   };
 
@@ -601,7 +603,7 @@ Imported.NUUN_GaugeValueEX = true;
   };
 
   Sprite_Gauge.prototype.drawGauge = function() {//再定義
-    if (this.gaugeVisible()) {
+    if (this.drawGaugeVisible()) {
       const gaugeX = this.gaugeX();
       const gaugeY = this._isGaugeData ? this.gaugeY() : this.textHeight() - this.gaugeHeight();
       const gaugewidth = this.bitmapWidth() - gaugeX;

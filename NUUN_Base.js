@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/12 Ver.1.3.2
+ * 敵ステート表示拡張を適用するための処理を追加。
  * 2021/11/7 Ver.1.3.1
  * 複数属性取得に関しての処理追加。
  * 2021/8/22 Ver.1.3.0
@@ -63,7 +65,7 @@ function structureData(params) {
 }
 
 function nuun_GausePlugins() {
-  return Imported.NUUN_ButlerHPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge;
+  return Imported.NUUN_ButlerHPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge || Imported.NUUN_EnemyStateIconEX;
 }
 
 DataManager.nuun_structureData = function(params){

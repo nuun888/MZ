@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.9.4
+ * @version 2.9.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -282,6 +282,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/11 Ver.2.9.5
+ * 追加、特殊能力値に小数点数を指定できる機能を追加。
  * 2021/11/10 Ver.2.9.4
  * 使用していないプラグインパラメータを削除。
  * 2021/11/9 Ver.2.9.3
@@ -983,6 +985,13 @@
  * @text 個別指定画像フォルダ
  * @type string
  * @default 'pictures'
+ * @parent BasicSetting
+ * 
+ * @param DecimalMode
+ * @text 端数処理四捨五入
+ * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
+ * @type boolean
+ * @default true
  * @parent BasicSetting
  * 
  * @param MonsterSetting
@@ -2029,41 +2038,41 @@
  * @value 8
  * @option TP（現在のステータスをONのときのみ）(1)～(11)
  * @value 9
- * @option 命中率(1)～(11)(16)
+ * @option 命中率(1)～(11)(16)(17)
  * @value 10
- * @option 回避率(1)～(11)(16)
+ * @option 回避率(1)～(11)(16)(17)
  * @value 11
- * @option 会心率(1)～(11)(16)
+ * @option 会心率(1)～(11)(16)(17)
  * @value 12
- * @option 会心回避率(1)～(11)(16)
+ * @option 会心回避率(1)～(11)(16)(17)
  * @value 13
- * @option 魔法回避率(1)～(11)(16)
+ * @option 魔法回避率(1)～(11)(16)(17)
  * @value 14
- * @option 魔法反射率(1)～(11)(16)
+ * @option 魔法反射率(1)～(11)(16)(17)
  * @value 15
- * @option 反撃率(1)～(11)(16)
+ * @option 反撃率(1)～(11)(16)(17)
  * @value 16
- * @option HP再生率(1)～(11)(16)
+ * @option HP再生率(1)～(11)(16)(17)
  * @value 17
- * @option MP再生率(1)～(11)(16)
+ * @option MP再生率(1)～(11)(16)(17)
  * @value 18
- * @option TP再生率(1)～(11)(16)
+ * @option TP再生率(1)～(11)(16)(17)
  * @value 19
- * @option 狙われ率(1)～(11)(16)
+ * @option 狙われ率(1)～(11)(16)(17)
  * @value 20
- * @option 防御効果率(1)～(11)(16)
+ * @option 防御効果率(1)～(11)(16)(17)
  * @value 21
- * @option 回復効果率(1)～(11)(16)
+ * @option 回復効果率(1)～(11)(16)(17)
  * @value 22
- * @option 薬の知識(1)～(11)(16)
+ * @option 薬の知識(1)～(11)(16)(17)
  * @value 23
- * @option MP消費率(1)～(11)(16)
+ * @option MP消費率(1)～(11)(16)(17)
  * @value 24
- * @option TPチャージ率(1)～(11)(16)
+ * @option TPチャージ率(1)～(11)(16)(17)
  * @value 25
- * @option 物理ダメージ率(1)～(11)(16)
+ * @option 物理ダメージ率(1)～(11)(16)(17)
  * @value 26
- * @option 魔法ダメージ率(1)～(11)(16)
+ * @option 魔法ダメージ率(1)～(11)(16)(17)
  * @value 27
  * @option 経験値(1)～(11)
  * @value 30
@@ -2213,6 +2222,15 @@
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
+ * @parent BasicSetting
+ * 
+ * @param Decimal
+ * @text 小数点桁数(17)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
  * @parent BasicSetting
  * 
  * @param nameSetting
@@ -4624,6 +4642,8 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
     this.resetTextColor();
     if(!this.paramMask(list.MaskMode)){
       text = param.UnknownStatus;
+    } else {
+      text = this.statusParamDecimal(text, list.Decimal);
     }
     if ($gameParty.inBattle() && this.gaugeVisibleMode(list.MaskMode) && list.DateSelect === 1) {
       this.placeGauge(enemy, "hp", x, y);
@@ -5553,6 +5573,15 @@ Window_EnemyBook.prototype.contensWidth = function(width) {
 
 Window_EnemyBook.prototype.numberWidthSlice = function(indexText) {
   return ($gameSystem._enemyBookLength >= 1000 ? ('0000' + indexText).slice(-4) : ('000' + indexText).slice(-3));
+};
+
+Window_EnemyBook.prototype.statusParamDecimal = function(val, decimal) {
+  decimal = decimal !== undefined ? Number(decimal) : 0;
+  if (param.DecimalMode) {
+    return Math.round(val * (decimal > 0 ? Math.pow(10, decimal) : 1)) / (decimal > 0 ? Math.pow(10, decimal) : 1);
+  } else {
+    return Math.floor(val * (decimal > 0 ? Math.pow(10, decimal) : 1)) / (decimal > 0 ? Math.pow(10, decimal) : 1);
+  }
 };
 
 

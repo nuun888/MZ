@@ -8,19 +8,19 @@
  */ 
  /*:
  * @target MZ
- * @plugindesc 立ち絵表示EX
+ * @plugindesc 立ち絵、顔グラ表示EX
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
- * 立ち絵画像を表示します。
- * 立ち絵は条件により自動的に変化させることができます。
+ * 立ち絵、顔グラ画像を表示します。
+ * 立ち絵、顔グラは条件により自動的に変化させることができます。
  * 全条件一致の条件がすべて一致したときに画像が表示されます。
  * 設定していない条件は判定されずtrueを返します。
- * 立ち絵表示の優先度は上から判定して最初に条件が一致した設定が適用されます。
- * 条件付きの立ち絵設定はリストの上のほうに設定してください。
+ * 立ち絵、顔グラ表示の優先度は上から判定して最初に条件が一致した設定が適用されます。
+ * 条件付きの立ち絵、顔グラ設定はリストの上のほうに設定してください。
  * 
  * このプラグインは「NUUN_Base」が必要です。
  * 
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/11 Ver 1.2.1
+ * 顔グラのインデックスIDが正常に取得できない問題を修正。
  * 2021/12/11 Ver 1.2.0
  * 立ち絵の設定方法を再度変更。
  * ステータス表示拡張に対応。
@@ -59,11 +61,13 @@
  * @text アクター画像名称
  * @desc アクター画像を区別するための名称。
  * @type string
+ * @default
  * 
  * @param ButlerActorImg
  * @text 画像設定
  * @desc 画像を指定します。
  * @type struct<ActorButlerImgList>[]
+ * @default []
  * 
  */
 /*~struct~ActorButlerImgList:
@@ -273,7 +277,7 @@ Game_Actor.prototype.getActorGraphicFace = function() {
 };
 
 Game_Actor.prototype.getActorGraphicFaceIndex = function() {
-  return this._actorGraphicData && this._actorGraphicData.FaceIndex || this.faceIndex();
+  return this._actorGraphicData && this._actorGraphicData.FaceIndex >= 0 ? this._actorGraphicData.FaceIndex : this.faceIndex();
 };
 
 Game_Actor.prototype.getActorGraphicX = function() {

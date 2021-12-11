@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.6
+ * @version 2.6.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,8 +19,10 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2021/12/4 Ver 2.6.6
- * 立ち絵表示EXの新仕様に対応。
+ * 2021/12/11 Ver 2.6.7
+ * 立ち絵、顔グラ表示EXで設定した勝利時の画像が戦闘終了後でも残ってしまう問題を修正。
+ * 2021/12/11 Ver 2.6.6
+ * 立ち絵、顔グラEXの新仕様に対応。
  * 2021/12/4 Ver 2.6.5
  * メッセージウィンドウ表示時のアクターステータスの不透明度を手動設定に変更。
  * メッセージウィンドウ表示時にアクターステータスの表示非表示にする機能を追加。
@@ -2015,6 +2017,7 @@ Sprite_ActorImges.prototype.setup = function(battler, data, index) {
   this._data = data;
   this._faceIndex = index;
   if (Imported.NUUN_ActorPicture) {
+    battler.resetImgId();
     this.updateActorGraphic();
   } else {
     this.updateBitmap();

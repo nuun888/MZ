@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.4.1
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/11 Ver.1.5.0
+ * 立ち絵、顔グラ表示EXに対応。
  * 2021/11/27 Ver.1.4.1
  * Ver.1.4.0アップデート後、ゲーム開始時にエラーが出る問題を修正。
  * 2021/11/27 Ver.1.4.0
@@ -300,6 +302,20 @@
  * @type struct<actorImgList>[]
  * @parent ActorImgSetting
  * 
+ * @param ActorPictureData
+ * @text 立ち絵表示EX用画像設定
+ * @desc 立ち絵表示EXでのアクターの画像設定
+ * @default []
+ * @type struct<ActorPictureDataList>[]
+ * @parent ActorImgSetting
+ * 
+ * @param ActorPictureEXApp
+ * @text 立ち絵表示EX適用
+ * @desc 立ち絵表示EXの画像変更を適用します。OFFにした場合はこのプラグインでの設定が適用されます。
+ * @type boolean
+ * @default true
+ * @parent ActorImgSetting
+ * 
  * @param ActorFixedSetting
  * @text アクター並び替え固定設定(要Imported.NUUN_ActorFixed)
  * @default ------------------------------
@@ -558,6 +574,45 @@
  * @max 999
  *  
  */
+/*~struct~actorImgList:
+ * 
+ * @param actorId
+ * @text アクター
+ * @desc アクターを指定します。
+ * @type actor
+ * 
+ * @param ActorImg
+ * @text アクター画像
+ * @desc アクターの画像を表示します。立ち絵を切り替える場合はリストに画像を設定してください。
+ * @type file[]
+ * @dir img/
+ * @default 
+ * 
+ * @param Actor_X
+ * @desc 画像の表示位置X座標。
+ * @text 画像表示位置X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Y
+ * @desc 画像の表示位置Y座標。
+ * @text 画像表示位置Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ *  
+ */
 var Imported = Imported || {};
 Imported.NUUN_SceneFormation = true;
 
@@ -639,6 +694,8 @@ const SupportActorColor = Number(parameters2['SupportActorColor'] || 5);
 const FixedActorBackColor = Number(parameters['FixedActorBackColor'] || 3);
 const LavelVisible = eval(parameters['LavelVisible'] || "false");
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
+const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];
+const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
 const pluginName = "NUUN_SceneFormation";
 
 PluginManager.registerCommand(pluginName, 'SceneFormationOpen', args => {
@@ -1504,10 +1561,12 @@ Window_FormationStatus.prototype.maxCols = function() {
 
 Window_FormationStatus.prototype.refresh = function() {
   Window_StatusBase.prototype.refresh.call(this);
-  if (!this._actor) {
+  const actor = this._actor;
+  if (!actor) {
     return;
-  }
-  const bitmap = ImageManager.loadFace(this._actor.faceName());
+  }actor.resetImgId();
+  const faceName = Imported.NUUN_ActorPicture && ActorPictureEXApp ? actor.getActorGraphicFace() : actor.faceName();
+  const bitmap = ImageManager.loadFace(faceName);
   if (!bitmap.isReady()) {
     bitmap.addLoadListener(this.drawData.bind(this));
   } else {
@@ -1729,6 +1788,14 @@ Window_FormationStatus.prototype.horzLine = function(list, x, y, width) {
   this.contents.paintOpacity = 255;
 };
 
+Window_FormationStatus.prototype.drawActorFace = function(actor, x, y, width, height) {
+  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+    this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
+  } else {
+    Window_StatusBase.prototype.drawActorFace.call(this, actor, x, y, width, height);
+  }
+};
+
 Window_FormationStatus.prototype.drawName = function(list, x, y, width) {
   const text = list.ParamName;
   if (text) {
@@ -1933,8 +2000,8 @@ Sprite_FormationActor.prototype.setup = function(actor) {
     this.bitmap = null;
     return;
   }
-  const data = actor.getFormationActorImgData();
-  const imges = actor.getFormationActorImg(data);
+  const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()): actor.getFormationActorImgData();
+  const imges = Imported.NUUN_ActorPicture && ActorPictureEXApp ? actor.getActorGraphicImg(): actor.getFormationActorImg(data);
   if (imges) {
     this.x = data.Actor_X;
     this.y = data.Actor_Y;
@@ -1944,16 +2011,25 @@ Sprite_FormationActor.prototype.setup = function(actor) {
     const bitmap = ImageManager.nuun_LoadPictures(imges);
     this.bitmap = bitmap;
     if (!bitmap.isReady()) {
-      bitmap.addLoadListener(this.refresh.bind(this));
+      bitmap.addLoadListener(this.refresh.bind(this, data));
     } else {
-      this.refresh();
+      this.refresh(data);
     }
   } else {
     this.bitmap = null;
   }
 };
 
-Sprite_FormationActor.prototype.refresh = function() {
+Sprite_FormationActor.prototype.battlreActorPicture = function(id) {//立ち絵表示EX用
+  const actors = ActorPictureData;
+  const find = actors.find(actor => actor.actorId === id);
+  if (!find) {
+    return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100};
+  }
+  return find;
+};
+
+Sprite_FormationActor.prototype.refresh = function(data) {
   
 };
 

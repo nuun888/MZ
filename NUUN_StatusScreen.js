@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.3.0
+ * @version 2.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -147,6 +147,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/11 Ver.2.3.1
+ * 立ち絵、顔グラ表示EXで設定した勝利時の画像が戦闘終了後でも残ってしまう問題を修正。
  * 2021/12/11 Ver.2.3.0
  * 立ち絵表示EXに対応。
  * 2021/11/27 Ver.2.2.9
@@ -1436,7 +1438,7 @@ Window_Status.prototype.loadFaceImages = function() {
   let bitmap = null;
   for (const actor of $gameParty.members()) {
     if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-      actor.imgRefresh();
+      actor.resetImgId();
       actor.loadActorGraphic();
       actor.loadActorFace();
     } else {

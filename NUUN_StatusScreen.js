@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.2.9
+ * @version 2.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -127,6 +127,8 @@
  * <desc1:ああああ> desc1とタグ付けされた項目に「ああああ」が表示されます。
  * 文章を表示させる場合は<desc1:ああああ>と記入してください。
  * 
+ * 立ち絵表示EXで設定した立ち絵の座標設定は立ち絵表示EX用画像設定で設定します。
+ * なお設定をしなくても表示は可能です。
  * 
  * 独自のパラメータ
  * this._actor 表示中のアクターのゲームデータ
@@ -145,6 +147,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/11 Ver.2.3.0
+ * 立ち絵表示EXに対応。
  * 2021/11/27 Ver.2.2.9
  * オリジナルパラメータにも小数点を指定できるように変更。
  * 2021/11/26 Ver.2.2.8
@@ -417,6 +421,20 @@
  * @desc アクターの画像設定
  * @default []
  * @type struct<actorImgList>[]
+ * @parent ActorImgSetting
+ * 
+ * @param ActorPictureData
+ * @text 立ち絵表示EX用画像設定
+ * @desc 立ち絵表示EXでのアクターの画像設定
+ * @default []
+ * @type struct<ActorPictureDataList>[]
+ * @parent ActorImgSetting
+ * 
+ * @param ActorPictureEXApp
+ * @text 立ち絵表示EX適用
+ * @desc 立ち絵表示EXの画像変更を適用します。OFFにした場合はこのプラグインでの設定が適用されます。
+ * @type boolean
+ * @default true
  * @parent ActorImgSetting
  * 
  * @param actorPosition
@@ -843,135 +861,135 @@
  * @type select
  * @option なし
  * @value 0
- * @option アクター名
+ * @option アクター名(4)(5)(6)(7)
  * @value 1
- * @option 二つ名
+ * @option 二つ名(4)(5)(6)(7)
  * @value 2
- * @option 職業
+ * @option 職業(4)(5)(6)(7)
  * @value 3
- * @option レベル
+ * @option レベル(4)(5)(6)(7)
  * @value 4
- * @option ステート
+ * @option ステート(4)(5)(6)(7)
  * @value 5
- * @option ＨＰ
+ * @option ＨＰ(4)(5)(6)(7)
  * @value 10
- * @option ＭＰ
+ * @option ＭＰ(4)(5)(6)(7)
  * @value 11
- * @option 攻撃力
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
  * @value 12
- * @option 防御力
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
  * @value 13
- * @option 魔力
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
  * @value 14
- * @option 魔法防御
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
  * @value 15
- * @option 敏捷性
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
  * @value 16
- * @option 運
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
  * @value 17
- * @option ＴＰ
+ * @option ＴＰ(4)(5)(6)(7)
  * @value 19
- * @option 最大ＨＰ
+ * @option 最大ＨＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
  * @value 42
- * @option 最大ＭＰ
+ * @option 最大ＭＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
  * @value 43
- * @option 命中率
+ * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 20
- * @option 回避率
+ * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 21
- * @option 会心率
+ * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 22
- * @option 会心回避率
+ * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 23
- * @option 魔法回避率
+ * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 24
- * @option 魔法反射率
+ * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 25
- * @option 反撃率
+ * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 26
- * @option HP再生率
+ * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 27
- * @option MP再生率
+ * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 28
- * @option TP再生率
+ * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 29
- * @option 狙われ率
+ * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 30
- * @option 防御効果率
+ * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 31
- * @option 回復効果率
+ * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 32
- * @option 薬の知識
+ * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 33
- * @option MP消費率
+ * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 34
- * @option TPチャージ率
+ * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 35
- * @option 物理ダメージ率
+ * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 36
- * @option 魔法ダメージ率
+ * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 37
- * @option 床ダメージ率
+ * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 38
- * @option 獲得経験値率
+ * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
  * @value 39
- * @option 現在の経験値
+ * @option 現在の経験値(1)(2)(4)(5)(6)(7)(8)
  * @value 40
- * @option 次のレベルまでの経験値
+ * @option 次のレベルまでの経験値(1)(2)(4)(5)(6)(7)(8)
  * @value 41
- * @option オリジナルパラメータ
+ * @option オリジナルパラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
  * @value 50
- * @option 名称のみ
+ * @option 名称のみ(1)(4)(5)(6)(7)(8)(10)
  * @value 51
- * @option 属性耐性
+ * @option 属性耐性(1)(4)(5)(6)(7)(8)(9)(10)(12)(14)
  * @value 60
- * @option ステート耐性
+ * @option ステート耐性(1)(4)(5)(6)(7)(8)(9)(10)(12)(14)
  * @value 61
- * @option 装備
+ * @option 装備(1)(2)(4)(5)(6)(7)(8)(9)(10)(14)
  * @value 62
- * @option 記述欄
+ * @option 記述欄(1)(2)(4)(5)(6)(7)(8)(10)(13)
  * @value 70
- * @option プロフィール
+ * @option プロフィール(1)(2)(4)(5)(6)(7)(8)(10)
  * @value 90
- * @option 顔グラフィック
+ * @option 顔グラフィック(4)(5)(6)(7)
  * @value 100
- * @option キャラチップ
+ * @option キャラチップ(4)(5)(6)(7)
  * @value 101
- * @option サイドビューアクター画像
+ * @option サイドビューアクター画像(4)(5)(6)(7)(8)(10)
  * @value 102
  * @option 画像（未実装）
  * @value 103
  * @option ステータスレーダーチャート（未実装）
  * @value 200
- * @option 属性耐性レーダーチャート
+ * @option 属性耐性レーダーチャート(4)(5)(6)(7)(8)(10)
  * @value 201
- * @option ステート耐性レーダーチャート
+ * @option ステート耐性レーダーチャート(4)(5)(6)(7)(8)(10)
  * @value 202
- * @option ライン
+ * @option ライン(1)(4)(5)(6)(7)(8)(10)
  * @value 1000
  * @default 0
  * 
  * @param NameColor
  * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
- * @text システム項目文字色
+ * @text システム項目文字色(1)
  * @type number
  * @default 16
  * @min 0
  * 
  * @param ParamName
  * @desc 項目の名称を設定します。
- * @text 名称
+ * @text 名称(2)
  * @type string
  * @default
  * 
  * @param DetaEval
  * @desc 評価式。
- * @text 評価式(javaScript)
+ * @text 評価式(javaScript)(3)
  * @type 
  * @default
  * 
  * @param X_Position
- * @text X表示列位置
+ * @text X表示列位置(4)
  * @desc X表示列位置
  * @type number
  * @default 1
@@ -980,14 +998,14 @@
  * 
  * @param Y_Position
  * @desc Y表示行位置
- * @text Y表示行位置
+ * @text Y表示行位置(5)
  * @type number
  * @default 1
  * @min 1
  * @max 99
  * 
  * @param X_Coordinate
- * @text X座標（相対）
+ * @text X座標（相対）(6)
  * @desc X座標（X表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -995,7 +1013,7 @@
  * @min -9999
  * 
  * @param Y_Coordinate
- * @text Y座標（相対）
+ * @text Y座標（相対）(7)
  * @desc Y座標（Y表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -1004,32 +1022,32 @@
  * 
  * @param ItemWidth
  * @desc 項目横幅（0でデフォルト幅）
- * @text 項目横幅
+ * @text 項目横幅(8)
  * @type number
  * @default 0
  * @min 0
  * 
  * @param SystemItemWidth
  * @desc システム項目の横幅（0でデフォルト幅）
- * @text システム項目横幅
+ * @text システム項目横幅(9)
  * @type number
  * @default 0
  * @min 0
  * 
  * @param WideMode
  * @desc ワイド表示モード
- * @text ワイド表示モード
+ * @text ワイド表示モード(10)
  * @type boolean
  * @default false
  * 
  * @param paramUnit
  * @desc 単位を設定します。
- * @text 単位
+ * @text 単位(11)
  * @type string
  * @default 
  * 
  * @param Decimal
- * @text 小数点桁数
+ * @text 小数点桁数(12)
  * @desc 表示出来る小数点桁数。
  * @type number
  * @default 0
@@ -1038,12 +1056,12 @@
  * 
  * @param textMethod
  * @desc 記述欄に紐づけするタグ名
- * @text 記述欄タグ名
+ * @text 記述欄タグ名(13)
  * @type string
  * @default 
  * 
  * @param Back
- * @text コンテンツ背景表示
+ * @text コンテンツ背景表示(14)
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
@@ -1069,6 +1087,54 @@
  * @parent EquipSetting
  * 
  *
+ */
+/*~struct~ActorPictureDataList:
+ * 
+ * @param actorId
+ * @text アクター
+ * @desc アクターを指定します。
+ * @type actor
+ * 
+ * @param Actor_X
+ * @desc 画像のX座標。
+ * @text 画像X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Y
+ * @desc 画像のY座標。
+ * @text 画像Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Img_SX
+ * @desc 画像の表示開始座標X。
+ * @text 画像表示開始座標X
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * 
+ * @param Img_SY
+ * @desc 画像の表示開始座標Y
+ * @text 画像表示開始座標Y
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * 
+ * @param Actor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ * 
  */
 
 var Imported = Imported || {};
@@ -1138,6 +1204,8 @@ const StateRadarChartX = Number(parameters['StateRadarChartX'] || 0);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 0);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);
 const StartPage = Number(parameters['StartPage'] || 1);
+const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];
+const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
 
 const pluginName = "NUUN_StatusScreen";
 PluginManager.registerCommand(pluginName, 'ChangeStatusActorImg', args => {
@@ -1365,58 +1433,47 @@ Window_Status.prototype.refresh = function() {
 const _Window_Status_loadFaceImages = Window_Status.prototype.loadFaceImages;
 Window_Status.prototype.loadFaceImages = function() {
   _Window_Status_loadFaceImages.call(this);
+  let bitmap = null;
   for (const actor of $gameParty.members()) {
-    //if (Imported.NUUN_ActorPicture) {
-    //  actor.staticButlerGraphic();
-    //  actor.setActorGraphicFaceMode(false);
-    //  const data = actor.getButlerGraphicData();
-    //  if (data && data.defaultImg) {
-    //    actor.actorGraphicUpdateBitmap();
-    //  }
-    //} else {
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+      actor.imgRefresh();
+      actor.loadActorGraphic();
+      actor.loadActorFace();
+    } else {
       if (actor.statusActorImgIndex < 0) {
         actor.initStatusActorImg(actor.actorId());
       }
       if (ActorsImgList[actor.statusActorImgIndex] && actor.statusActorImgIndex >= 0) {
-        const actorImges = ActorsImgList[actor.statusActorImgIndex].ActorImg[actor.statusImgId];
-        ImageManager.nuun_LoadPictures(actorImges);
-      }
-    //}
-  }
-};
-
-Window_Status.prototype.actorImg = function() {
-  const actor = this._actor;
-  //if (Imported.NUUN_ActorPicture) {
-  //  const data = actor.getButlerGraphicData();
-  //  if (data && data.defaultImg) {
-  //    const bitmap = actor.butlerGraphicGetImg();
-  //    if (bitmap && !bitmap.isReady()) {
-  //      bitmap.addLoadListener(this.actorImgRefresh.bind(this, actor, bitmap));
-  //    } else {
-  //      this.actorImgRefresh(actor, bitmap);
-  //    }
-  //  }
-  //} else 
-  if (ActorsImgList[actor.statusActorImgIndex] && actor.statusActorImgIndex >= 0) {
-    const actorImges = ActorsImgList[actor.statusActorImgIndex].ActorImg[actor.statusImgId];
-    if (actorImges) {
-      const bitmap = ImageManager.nuun_LoadPictures(actorImges);
-      if (bitmap && !bitmap.isReady()) {
-        bitmap.addLoadListener(this.actorImgRefresh.bind(this, actor, bitmap));
-      } else {
-        this.actorImgRefresh(actor, bitmap);
+        bitmap = ActorsImgList[actor.statusActorImgIndex].ActorImg[actor.statusImgId];
+        ImageManager.nuun_LoadPictures(bitmap);
       }
     }
   }
 };
 
+Window_Status.prototype.actorImg = function() {
+  const actor = this._actor;
+  let bitmap = null;
+  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+    bitmap = actor._actorGraphicData ? ImageManager.nuun_LoadPictures(actor.getActorGraphicImg()) : null;
+  } else if (ActorsImgList[actor.statusActorImgIndex] && actor.statusActorImgIndex >= 0) {
+    const actorImges = ActorsImgList[actor.statusActorImgIndex].ActorImg[actor.statusImgId];
+    bitmap = ImageManager.nuun_LoadPictures(actorImges);
+  } else {
+    bitmap = null;
+  }
+  if (bitmap && !bitmap.isReady()) {
+    bitmap.addLoadListener(this.actorImgRefresh.bind(this, actor, bitmap));
+  } else if (bitmap) {
+    this.actorImgRefresh(actor, bitmap);
+  }
+};
+
 Window_Status.prototype.actorImgRefresh = function(actor, bitmap) {
-  //if (Imported.NUUN_ActorPicture) {
-  //  const EXData = actor.getButlerGraphicData();
-  //}
-  const data = ActorsImgList[actor.statusActorImgIndex];
+  const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()) : ActorsImgList[actor.statusActorImgIndex];
   let x = data.Actor_X;
+  const sx = data.Img_SX || 0;
+  const sy = data.Img_SY || 0;
   const scale = (data.Actor_Scale || 100) / 100;
   if(actorPosition === 0) {
     x += 0;
@@ -1428,7 +1485,16 @@ Window_Status.prototype.actorImgRefresh = function(actor, bitmap) {
   const dw = bitmap.width * scale;
   const dh = bitmap.height * scale;
   const y = data.Actor_Y + (this.height - (bitmap.height * scale)) - 24;
-  this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
+  this.contents.blt(bitmap, sx, sy, bitmap.width, bitmap.height, x, y, dw, dh);
+};
+
+Window_Status.prototype.battlreActorPicture = function(id) {//立ち絵表示EX用
+  const actors = ActorPictureData;
+  const find = actors.find(actor => actor.actorId === id);
+  if (!find) {
+    return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100};
+  }
+  return find;
 };
 
 Window_Status.prototype.maxCols = function() {
@@ -1745,6 +1811,14 @@ Window_Status.prototype.horzLine = function(list, x, y, width) {
   this.contents.paintOpacity = 48;
   this.contents.fillRect(x, lineY, width, 2, this.getColorCode(list.NameColor));
   this.contents.paintOpacity = 255;
+};
+
+Window_Status.prototype.drawActorFace = function(actor, x, y, width, height) {
+  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+    this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
+  } else {
+    Window_StatusBase.prototype.drawActorFace.call(this, actor, x, y, width, height);
+  }
 };
 
 Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) {

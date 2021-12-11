@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.6.2
+ * @version 1.6.3
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -46,6 +46,12 @@
  *    +
  * 顔グラのインデックス番号は左上から順に0,1,2,3となっています。
  * 
+ * 
+ * 立ち絵表示EXで設定した立ち絵の座標設定は立ち絵表示EX用画像設定で設定します。
+ * 立ち絵表示EX用画像設定でアクターの設定をしない場合、立ち絵表示EXの設定は適用されませんので必ず
+ * 立ち絵表示EX用画像設定で各アクターの設定をしてください。
+ * 
+ * 
  * 各ステータスの位置を変更したい場合は、各項目の「〇〇の座標変更」をtureにしてください。
  * 
  * アクターステータスが２行以上になる場合で顔グラフィックを表示している場合は「顔グラフィックの座標変更」をtrueにしてください。
@@ -73,6 +79,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/11 Ver 1.6.3
+ * 立ち絵表示EX用の設定項目を追加。
  * 2021/12/4 Ver 1.6.2
  * メッセージウィンドウ表示時のアクターステータスの不透明度を手動設定に変更。
  * メッセージウィンドウ表示時にアクターステータスの表示非表示にする機能を追加。
@@ -958,6 +966,13 @@
  * @type struct<actorsButlerList>[]
  * @parent ActorsButlers
  * 
+ * @param ActorPictureData
+ * @text 立ち絵表示EX用画像設定
+ * @desc 立ち絵表示EXでのアクターの画像設定
+ * @default []
+ * @type struct<ActorPictureDataList>[]
+ * @parent ActorsButlers
+ * 
  * 
  * @param Img_SW
  * @desc 画像の表示横幅。
@@ -977,10 +992,9 @@
  * @max 9999
  * @parent ActorsButlers
  * 
- * 
  * @param damageImgFrame
- * @desc ダメージ時の画像変化フレーム。
- * @text ダメージ時変化フレーム
+ * @desc ダメージ、回復時の画像変化フレーム。
+ * @text ダメージ、回復時変化フレーム
  * @type number
  * @default 30
  * @min 1
@@ -1749,6 +1763,60 @@
  * @default 1
  * @min 0
  * @max 9999
+ * 
+ */
+/*~struct~ActorPictureDataList:
+ * 
+ * @param actorId
+ * @text アクター
+ * @desc アクターを指定します。
+ * @type actor
+ * 
+ * @param FaceMode
+ * @desc アクターステータスのアクター画像を顔グラで表示します。
+ * @text 顔グラ表示。
+ * @type boolean
+ * @default true
+ * 
+ * @param Actor_X
+ * @desc 画像のX座標。
+ * @text 画像X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Y
+ * @desc 画像のY座標。
+ * @text 画像Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Img_SX
+ * @desc 画像の表示開始座標X。
+ * @text 画像表示開始座標X
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * 
+ * @param Img_SY
+ * @desc 画像の表示開始座標Y
+ * @text 画像表示開始座標Y
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * 
+ * @param Actor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
  * 
  */
 /*~struct~PopUpBuffList:

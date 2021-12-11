@@ -8,8 +8,8 @@
 ## 座標の調整
 敵キャラのメモ欄
 `<EnemyStateX:[position]>` モンスターのステートアイコンのX座標を調整します。（相対座標）  
-`<EnemyStateY:[position]>` モンスターのステートアイコンのY座標を調整します。（相対座標） 
-`[position]`：座標
+`<EnemyStateY:[position]>` モンスターのステートアイコンのY座標を調整します。（相対座標）  
+`[position]`：座標  
 
 バトルイベントの注釈
 `<EnemyStatePosition:[Id],[x],[y]>` 敵グループの[Id]番目のモンスターのステートアイコンの位置を調整します。（相対座標）  

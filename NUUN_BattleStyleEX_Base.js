@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.7
+ * @version 2.6.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/12/12 Ver 2.6.8
+ * 一部関数が重複していたため修正。
  * 2021/12/11 Ver 2.6.7
  * 立ち絵、顔グラ表示EXで設定した勝利時の画像が戦闘終了後でも残ってしまう問題を修正。
  * 2021/12/11 Ver 2.6.6
@@ -2090,11 +2092,11 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
     } else {
       this.changeBitmap("normal");
     }
-  }
-  this.refreshBitmap();
-  actor._imgIndex = 0;
-  if (this._startUpdate) {
-    this._startUpdate = false;
+    this.refreshBitmap();
+    actor._imgIndex = 0;
+    if (this._startUpdate) {
+      this._startUpdate = false;
+    }
   }
 };
 
@@ -2735,7 +2737,7 @@ Sprite_ActorImges.prototype.setDeadUpdateCount = function() {
       this._updateCount = 0;
     }
   }
-  this.setDead(true);
+  this.setActorDead(true);
 };
 
 Sprite_ActorImges.prototype.setReviveUpdateCount = function(){
@@ -2745,7 +2747,7 @@ Sprite_ActorImges.prototype.setReviveUpdateCount = function(){
   } else {
     this._updateCount = 1;
   }
-  this.setDead(false);
+  this.setActorDead(false);
 };
 
 Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
@@ -2755,7 +2757,7 @@ Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
   }
 };
 
-Sprite_ActorImges.prototype.setDead = function(flag){
+Sprite_ActorImges.prototype.setActorDead = function(flag){
   this._isDead = flag;
 };
 

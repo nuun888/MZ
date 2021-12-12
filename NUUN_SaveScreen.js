@@ -11,32 +11,29 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.7.0
+ * @version 1.8.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * セーブ画面にいくつかの項目を追加します。
- * 顔グラを表示できます。
+ * 顔グラ、サイドビューアクターを表示できます。
  * キャラクター上にレベルを表示できます。
- * メイン文章（章など）を表示可能。（設定しない場合はタイトルが表示されます。何も表示させたくない場合はスペースを入れてください）
- * 現在地、所持金、任意の項目が表示可能です。
+ * 現在の章などの文字を表示可能。
+ * プレイ時間、現在地、所持金、任意、セーブ時刻の項目が表示可能です。
+ * スナップショットを表示可能。
  * 
- * 変数に文字列を入れる方法
- * イベントコマンドの変数操作でスクリプトに"又は'で括り任意の文字列を入力してください。例：'第一章　旅立ち'
- * 
- * 仕様
- * 拡大率は１００でセーブインフォ表示縦幅に関係なくデフォルトサイズで表示されます。
- * それ以外は画像の縦幅（表示縦幅ではない）がセーブインフォ表示縦幅を超えるようであればそれ以下にサイズ調整されます。
- *
- * 右側の表示項目をなしにすると左側の表示項目が広く表示されます。
- * 
- * コンテンツエリアX座標を-1にすることで右寄りに表示されます。
+ * ファイル名横の表示文字の評価式
+ * info.AnyName:
+ * info.title:
  * 
  * 背景画像の変更
  * ゲームの進行によって背景画像を変更出来ます。
  * 初期設定ではプラグインコマンド「背景画像変更」で変更したたびに背景IDが変更されます。
  * 背景IDはロード画面でIDの一番高いセーブデータの背景が表示されます。
+ * 
+ * スナップショットを表示するとセーブ容量が大きります。
+ * アツマールで公開する場合は最大セーブ数を減らすこと推奨いたします。
  * 
  * Ver.1.3.0からNUUN_Base Ver.1.1.3以降が必要となります。
  * 
@@ -45,6 +42,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/12 Ver.1.8.0
+ * コンテンツの表示設定を変更。
+ * プラグインコマンドが適用されていなかった問題を修正。
+ * ファイル名横の表示する文字の設定方法を変更。
  * 2021/7/16 Ver.1.7.0
  * セーブ日時を表示する機能を追加。
  * 2021/5/29 Ver.1.6.0
@@ -79,14 +80,69 @@
  * 2021/1/24 Ver.1.0.0
  * 初版
  * 
+ * @command ChangeBackground
+ * @desc 背景画像を変更します。
+ * @text 背景画像変更
+ * 
+ * @arg BackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @arg BackGroundId
+ * @desc 背景画像IDを設定します。IDの高いセーブデータの背景がロード画面で表示されます。背景画像ID自動設定がOFFの時有効です。
+ * @text 背景画像ID
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @command UserAutoSave
+ * @desc オートセーブをします。
+ * @text オートセーブ
+ * 
+ * @arg OnSaveSnap
+ * @text スクリーンショット許可
+ * @desc オートセーブ時のスクリーンショットを許可します。
+ * @type boolean
+ * @default true
+ * 
+ * @command SetAnyName
+ * @desc ファイル名横に表示される文字列を設定します。取得パラメータはinfo.AnyNameで取得できます。
+ * @text ファイル名横表示文字列
+ * 
+ * @arg AnyName
+ * @text 表示文字列
+ * @desc 表示文字列を記入します。現在のキャプターを表示したい時に設定します。。
+ * @type string
+ * @default 
+ * 
+ * @param BasicSetting
+ * @text 基本設定
+ * @default ------------------------------
+ * 
+ * @param NumSaveRows
+ * @desc 画面に表示するセーブ数
+ * @text 表示セーブ数
+ * @type number
+ * @default 5
+ * @parent BasicSetting
+ * 
+ * @param MaxSave
+ * @desc 最大セーブ数
+ * @text 最大セーブ数
+ * @type number
+ * @default 20
+ * @parent BasicSetting
  * 
  * @param Font
  * @text フォント設定
  * @default ------------------------------
  * 
  * @param MainFontSizeMainFontSize
- * @desc ファイルタイトル、メイン文章のフォントサイズ
- * @text ファイルタイトル、メイン文章フォントサイズ
+ * @desc ファイルタイトル、ファイル名横文字列のフォントサイズ
+ * @text ファイルタイトル、ファイル名横文字列フォントサイズ
  * @type number
  * @default 24
  * @min 0
@@ -104,17 +160,17 @@
  * @default ------------------------------
  *
  * @param AnyNameVariable
- * @desc メイン文章変数番号
- * @text メイン文章表示変数番号
+ * @desc ファイル名横文字列変数番号。プラグインコマンド「ファイル名横表示文字列」で設定している場合は表示されません。
+ * @text ファイル名横文字列表示変数番号
  * @type variable
  * @default 0
  * @parent AnyName
  * 
- * @param AnyDefaultName
- * @desc メイン文章デフォルト文字列。（スペースを入れると何も表示されません。空白の場合はタイトルが表示されます。）
- * @text メイン文章デフォルト文字列
+ * @param AnyNameEval
+ * @desc ファイル名横文字列表示評価式。
+ * @text ファイル名横文字列表示評価式
  * @type string
- * @default
+ * @default info.AnyName ? info.AnyName : info.title
  * @parent AnyName
  * 
  * @param Actor
@@ -231,32 +287,18 @@
  * @text 各コンテンツ設定
  * @default ------------------------------
  * 
- * @param NumSaveRows
- * @desc 画面に表示するセーブ数
- * @text 表示セーブ数
- * @type number
- * @default 5
- * @parent Contents
- * 
- * @param MaxSave
- * @desc 最大セーブ数
- * @text 最大セーブ数
- * @type number
- * @default 20
- * @parent Contents
- * 
- * @param ContentsRight
- * @text コンテンツエリアを右寄りに表示
- * @desc コンテンツエリア右寄り
- * @type boolean
- * @default true
+ * @param ContentsList
+ * @desc 表示する項目。
+ * @text 表示項目
+ * @type struct<ContentsListData>[]
+ * @default ["{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\"}","{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\"}"]
  * @parent Contents
  * 
  * @param ContentsX
  * @desc コンテンツエリアのX座標
  * @text コンテンツエリアX座標
  * @type number
- * @default 0
+ * @default 220
  * @min 0
  * @parent Contents
  * 
@@ -266,27 +308,6 @@
  * @type number
  * @default 0
  * @min 0
- * @parent Contents
- * 
- * @param PlaytimeName
- * @desc プレイ時間名称
- * @text プレイ時間名称
- * @type string
- * @default
- * @parent Contents
- * 
- * @param LocationName
- * @desc 現在地名称
- * @text 現在地名称
- * @type string
- * @default
- * @parent Contents
- * 
- * @param MoneyName
- * @desc 所持金名称
- * @text 所持金名称
- * @type string
- * @default
  * @parent Contents
  * 
  * @param DayTime
@@ -302,189 +323,143 @@
  * @default 
  * @parent Contents
  * 
- * @param T_Left
- * @desc 左上に表示する項目。
- * @text 左上表示項目
- * @type select
- * @option なし
- * @value 0
- * @option プレイ時間
- * @value 1
- * @option 現在値
- * @value 2
- * @option 所持金
- * @value 3
- * @option セーブ時刻
- * @value 4
- * @option 任意項目１
- * @value 10
- * @option 任意項目２
- * @value 11
- * @default 2
- * @parent Contents
- * 
- * @param T_Right
- * @desc 右上に表示する項目。
- * @text 右上表示項目
- * @type select
- * @option なし
- * @value 0
- * @option プレイ時間
- * @value 1
- * @option 現在値
- * @value 2
- * @option 所持金
- * @value 3
- * @option セーブ時刻
- * @value 4
- * @option 任意項目１
- * @value 10
- * @option 任意項目２
- * @value 11
- * @default 0
- * @parent Contents
- * 
- * @param B_Left
- * @desc 左下に表示する項目。
- * @text 左下表示項目
- * @type select
- * @option なし
- * @value 0
- * @option プレイ時間
- * @value 1
- * @option 現在値
- * @value 2
- * @option 所持金
- * @value 3
- * @option セーブ時刻
- * @value 4
- * @option 任意項目１
- * @value 10
- * @option 任意項目２
- * @value 11
- * @default 3
- * @parent Contents
- * 
- * @param B_Right
- * @desc 右下に表示する項目。
- * @text 右下表示項目
- * @type select
- * @option なし
- * @value 0
- * @option プレイ時間
- * @value 1
- * @option 現在値
- * @value 2
- * @option 所持金
- * @value 3
- * @option セーブ時刻
- * @value 4
- * @option 任意項目1
- * @value 10
- * @option 任意項目２
- * @value 11
- * @default 1
- * @parent Contents
- * 
- * @param OriginalName1
- * @desc 任意項目名１
- * @text 任意項目名１
- * @type string
- * @default
- * @parent Contents
- * 
- * @param OriginalEval1
- * @desc 評価式１
- * @text 評価式１
- * @type string
- * @default
- * @parent Contents
- * 
- * @param OriginalName2
- * @desc 任意項目名２
- * @text 任意項目名２
- * @type string
- * @default
- * @parent Contents
- * 
- * @param OriginalEval2
- * @desc 評価式２
- * @text 評価式２
- * @type string
- * @default
- * @parent Contents
- * 
  * @param SaveSnapSetting
- * @text セーブスクリーンショット設定
+ * @text セーブスナップショット設定
  * @default ------------------------------
  * 
  * @param InfoSaveSnap
- * @text スクリーンショット有効化
- * @desc スクリーンショットを有効にします。
+ * @text スナップショット有効化
+ * @desc スナップショットを有効にします。
  * @type boolean
  * @default false
  * @parent SaveSnapSetting
  * 
  * @param SaveSnapQuality
- * @desc スクリーンショットの画質。(デフォルト値0.92)
- * @text スクリーンショット画質
+ * @desc スナップショットの画質。(デフォルト値0.92)
+ * @text スナップショット画質
  * @type string
  * @default 0.92
  * @max 1
  * @parent SaveSnapSetting
  * 
  * @param SaveSnapX
- * @desc スクリーンショットのX座標
- * @text スクリーンショットX座標
+ * @desc スナップショットのX座標
+ * @text スナップショットX座標
  * @type number
- * @default 0
+ * @default 650
  * @parent SaveSnapSetting
  * 
  * @param SaveSnapY
- * @desc スクリーンショットのY座標
- * @text スクリーンショットY座標
+ * @desc スナップショットのY座標
+ * @text スナップショットY座標
  * @type number
- * @default 0
+ * @default 8
  * @parent SaveSnapSetting
  * 
  * @param SaveSnapScale
- * @desc スクリーンショットの拡大率（％）
- * @text スクリーンショット拡大率（％）
+ * @desc スナップショットの拡大率（％）
+ * @text スナップショット拡大率（％）
  * @type number
  * @default 12
  * @min 0
  * @parent SaveSnapSetting
  * 
- * @command ChangeBackground
- * @desc 背景画像を変更します。
- * @text 背景画像変更
+ */
+/*~struct~ContentsListData:
  * 
- * @arg BackGroundImg
- * @desc 背景画像ファイル名を指定します。
- * @text 背景画像
- * @type file[]
- * @dir img/
- * @default []
+ * @param DateSelect
+ * @text 表示するステータス
+ * @desc 表示するステータスを指定します。
+ * @type select
+ * @option なし
+ * @value 0
+ * @option プレイ時間(1)(2)(4)(5)(6)(7)(8)(9)(10)
+ * @value 1
+ * @option セーブ時刻(1)(2)(4)(5)(6)(7)(8)(9)(10)
+ * @value 2
+ * @option 現在地(1)(2)(4)(5)(6)(7)(8)(9)(10)
+ * @value 3
+ * @option 所持金(1)(2)(4)(5)(6)(7)(8)(9)(10)
+ * @value 4
+ * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)
+ * @value 5
+ * @option ライン(1)(4)(5)(6)(7)(8)(10)
+ * @value 100
+ * @default 0
  * 
- * @arg BackGroundId
- * @desc 背景画像IDを設定します。IDの高いセーブデータの背景がロード画面で表示されます。背景画像ID自動設定がOFFの時有効です。
- * @text 背景画像ID
+ * @param NameColor
+ * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
+ * @text システム項目文字色(1)
+ * @type number
+ * @default 16
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc 項目の名称を設定します。
+ * @text 名称(2)
+ * @type string
+ * @default
+ * 
+ * @param DetaEval
+ * @desc 評価式。
+ * @text 評価式(javaScript)(3)
+ * @type string
+ * @default
+ * 
+ * @param X_Position
+ * @text X表示列位置(4)
+ * @desc X表示列位置
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 3
+ * 
+ * @param Y_Position
+ * @desc Y表示行位置
+ * @text Y表示行位置(5)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X座標（相対）(6)
+ * @desc X座標（X表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y座標（相対）(7)
+ * @desc Y座標（Y表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc 項目横幅（0でデフォルト幅）
+ * @text 項目横幅(8)
  * @type number
  * @default 0
  * @min 0
  * 
- * @command UserAutoSave
- * @desc オートセーブをします。
- * @text オートセーブ
+ * @param SystemItemWidth
+ * @desc システム項目の横幅（0でデフォルト幅）
+ * @text システム項目横幅(9)
+ * @type number
+ * @default 0
+ * @min 0
  * 
- * @arg OnSaveSnap
- * @text スクリーンショット許可
- * @desc オートセーブ時のスクリーンショットを許可します。
+ * @param WideMode
+ * @desc ワイド表示モード
+ * @text ワイド表示モード(10)
  * @type boolean
- * @default true
- * 
- * 
+ * @default false
+ *  
  */
+
 var Imported = Imported || {};
 Imported.NUUN_SaveScreen = true;
 
@@ -509,7 +484,7 @@ Imported.NUUN_SaveScreen = true;
   const ContentsRight = eval(parameters['ContentsRight'] || "true");
   const _ContentsWidth = Number(parameters['ContentsWidth'] || 0);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
-  const AnyDefaultName = String(parameters['AnyDefaultName'] || "");
+  const AnyNameEval = String(parameters['AnyNameEval'] || "");
   const PlaytimeName = String(parameters['PlaytimeName'] || "プレイ時間");
   const LocationName = String(parameters['LocationName'] || "現在地");
   const MoneyName = String(parameters['MoneyName'] || "所持金");
@@ -527,6 +502,7 @@ Imported.NUUN_SaveScreen = true;
   const SaveSnapY = Number(parameters['SaveSnapY'] || 0);
   const SaveSnapScale = Number(parameters['SaveSnapScale'] || 15);
   const DayTime = String(parameters['DayTime']);
+  const ContentsList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsList'])) : null) || [];
   const BackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])[0]) : null;
   const ContentsBackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsBackGroundImg'])) : null;
 
@@ -541,6 +517,10 @@ Imported.NUUN_SaveScreen = true;
   PluginManager.registerCommand(pluginName, 'UserAutoSave', args => {
     SceneManager.snapSaveBitmap(eval(args.OnSaveSnap));
     SceneManager._scene.executeAutosave();
+  });
+
+  PluginManager.registerCommand(pluginName, 'SetAnyName', args => {
+    $gameSystem.saveAnyName = args.AnyName;
   });
 
   const _DataManager_loadSavefileImages = DataManager.loadSavefileImages;
@@ -560,7 +540,7 @@ Imported.NUUN_SaveScreen = true;
   DataManager.makeSavefileInfo = function() {
     const info = _DataManager_makeSavefileInfo.call(this);
     info.svActor = $gameParty.svActorForSavefile();
-    info.AnyName = $gameVariables.value(AnyNameVariable);
+    info.AnyName = $gameSystem.saveAnyName ? $gameSystem.saveAnyName : $gameVariables.value(AnyNameVariable);
     info.mapname = $gameMap.displayName();
     info.gold = $gameParty._gold;
     info.levelActor = $gameParty.actorLevelForSavefile();
@@ -726,6 +706,10 @@ Imported.NUUN_SaveScreen = true;
     this._contentsBackVisible = ContentsBackVisible;
   };
 
+  Window_SavefileList.prototype.maxContentsCols = function() {
+    return 2;
+  };
+
   const _Window_SavefileList_numVisibleRows = Window_SavefileList.prototype.numVisibleRows;
   Window_SavefileList.prototype.numVisibleRows = function() {
     return NumSaveRows ? NumSaveRows : _Window_SavefileList_numVisibleRows.call(this);
@@ -753,78 +737,95 @@ Imported.NUUN_SaveScreen = true;
     }
   };
 
-  Window_SavefileList.prototype.drawContents = function(info, rect) {
-    //キャラクター
-    if (rect.width >= 420) {
-      this._maxHeight = rect.height - 4
-      let x = ActorX + rect.x;
-      let width = 0;
-      let height = 0;
+  Window_SavefileList.prototype.drawActors = function(info, x, y, width, height) {
+    if (width >= 420) {
+      this._maxHeight = height - 4;
+      let x2 = ActorX + x;
+      let w = 0;
+      let h = 0;
       if (ActorGraphicMode === 2) {
-        let y = ActorY + rect.y + 2;
+        let y2 = ActorY + y + 2;
         const scale = FaceScale / 100;
-        width = FaceWidth > 0 ? FaceWidth : ImageManager.faceWidth;
-        height = FaceHeight > 0 ? FaceHeight : ImageManager.faceHeight;
-        const heightScale = height * scale;
-        this._scaleMode = 0;
-        if (heightScale === height) {
-          height = Math.min(height, this._maxHeight);
-          this._scaleMode = 0;
+        w = FaceWidth > 0 ? FaceWidth : ImageManager.faceWidth;
+        h = FaceHeight > 0 ? FaceHeight : ImageManager.faceHeight;
+        const heightScale = h * scale;
+        let scaleMode = 0;
+        if (heightScale === h) {
+          h = Math.min(h, this._maxHeight);
+          scaleMode = 0;
         } else if (heightScale > this._maxHeight){
-          this._scaleMode = 1;
+          scaleMode = 1;
         }
-        this.drawPartyFace(info, x, y, width, height);
+        this.drawPartyFace(info, x2, y2, w, h, scaleMode);
       } else if (ActorGraphicMode === 1) {
-        const bottom = rect.y + rect.height + ActorY;
-        this.drawPartyCharacters(info, x, bottom - 8);
+        const bottom = y + height + ActorY;
+        this.drawPartyCharacters(info, x2, bottom - 8);
       } else if (ActorGraphicMode === 3) {
-        const bottom = rect.y + rect.height + ActorY;
-        this.drawPartySvActors(info, x, bottom - 8);
+        const bottom = y + height + ActorY;
+        this.drawPartySvActors(info, x2, bottom - 8);
       }
     }
     this._FaceOn = true;
-    //任意の文字列
-    this.drawAnyName(info, rect.x + 200, rect.y + 2, rect.width - 200);
-    //フリーゾーン
-    const padding = this.itemPadding();
-    height = Math.floor(rect.height / 3);
-    const sx = !ContentsRight ? ContentsX : (_ContentsWidth > 0 ? Graphics.boxWidth - _ContentsWidth - 48 : 240);
-    let x2 = rect.x + sx;
-    let y2 = (height) + rect.y - 2;_ContentsWidth
-    width = (_ContentsWidth > 0 ? _ContentsWidth : rect.width - sx) / (T_Right === 0 ? 1 : 2);
-    this.drawSnapBitmap(info, rect.x + SaveSnapX, rect.y + SaveSnapY);
-    this.drawContentsBase(info, x2, y2, width - padding, T_Left);
-    x2 += width;
-    this.drawContentsBase(info, x2, y2, width - padding, T_Right);
-    x2 = rect.x + sx;
-    y2 += height - 2;
-    width = (_ContentsWidth > 0 ? _ContentsWidth : rect.width - sx) / (B_Right === 0 ? 1 : 2);
-    this.drawContentsBase(info, x2, y2, width - padding, B_Left);
-    x2 += width;
-    this.drawContentsBase(info, x2, y2, width - padding, B_Right);
   };
 
-  Window_SavefileList.prototype.drawContentsBase = function(info, x, y, width, value) {
-    switch (value) {
+  Window_SavefileList.prototype.drawContents = function(info, rect) {
+    const width = Math.floor(rect.width / this.maxContentsCols()) - this.colSpacing();
+    this.drawSnapBitmap(info, rect.x + SaveSnapX, rect.y + SaveSnapY);
+    this.drawActors(info, rect.x, rect.y, rect.width, rect.height);
+    this.drawContentsData(info, rect.x + ContentsX, rect.y, rect.width, rect.height);
+    this.drawAnyName(info, rect.x + 200, rect.y + 2, rect.width - 200);
+  };
+
+  Window_SavefileList.prototype.drawContentsData = function(info, x, y, width) {
+    const CWidth = (_ContentsWidth > 0 ? _ContentsWidth : width);
+    width = Math.min(CWidth, width - ContentsX);
+    const itemWidth = this.itemContentsWidth(width);
+    const list = ContentsList;
+    const lineHeight = ContentsFontSizeMainFontSize + 4;
+    const colSpacing = this.colSpacing();
+    y += MainFontSizeMainFontSize + 4;
+    for (const data of list) {
+      const x_Position = data.X_Position;
+      const position = Math.min(x_Position, this.maxContentsCols());
+      const contentsX = x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate;
+      const contentsY = y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate;
+      width2 = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : this.widthMode(data.WideMode, itemWidth);
+      this.drawContentsBase(info, contentsX, contentsY, width2 - colSpacing / 2, data);
+    }
+  };
+
+  Window_SavefileList.prototype.widthMode = function(mode, width) {
+    if (mode) {
+      width = width * 2 + this.colSpacing();
+    }
+    return width;
+  };
+
+  Window_SavefileList.prototype.itemContentsWidth = function(width) {
+    return Math.floor(width / 2) - this.colSpacing();
+};
+
+  Window_SavefileList.prototype.drawContentsBase = function(info, x, y, width, data) {
+    switch (data.DateSelect) {
       case 0:
         break;
       case 1:
-        this.drawPlaytime(info, x, y, width);
+        this.drawPlaytime(info, x, y, width, data);
         break;
       case 2:
-        this.drawMapName(info, x, y, width);
+        this.drawDayTime(info, x, y, width, data);
         break;
       case 3:
-        this.drawGold(info, x, y, width);
+        this.drawMapName(info, x, y, width, data);
         break;
       case 4:
-        this.drawDayTime(info, x, y, width);
+        this.drawGold(info, x, y, width, data);
         break;
-      case 10:
-        this.drawOriginal_1(info, x, y, width);
+      case 5:
+        this.drawOriginal(info, x, y, width, data);
         break;
-      case 11:
-        this.drawOriginal_2(info, x, y, width);
+      case 100:
+        this.horzLine(info, x, y, width, data);
         break;
     }
   };
@@ -848,12 +849,12 @@ Imported.NUUN_SaveScreen = true;
     }
   };
 
-  Window_SavefileList.prototype.drawPartyFace = function(info, x, y, width, height) {
+  Window_SavefileList.prototype.drawPartyFace = function(info, x, y, width, height, scaleMode) {
     if (info.faces) {
         let characterX = x;
         const faceWidth = this._scaleMode === 1 ? this._maxHeight : Math.floor(width * FaceScale / 100);
         for (const data of info.faces) {
-          this.drawFace(data[0], data[1], characterX, y, width, height);
+          this.drawFace(data[0], data[1], characterX, y, width, height, scaleMode);
           characterX += faceWidth;
         }
         this.drawPartyLeval(info, x + 8, y, faceWidth, height, 1);
@@ -910,29 +911,27 @@ Imported.NUUN_SaveScreen = true;
 
   Window_SavefileList.prototype.drawAnyName = function(info, x, y, width) {
     this.contents.fontSize = MainFontSizeMainFontSize;
-    let anyName = info.AnyName;
-    if (!anyName) {
-      anyName = AnyDefaultName ? AnyDefaultName : info.title;
-    }
-    if (anyName ) {
+    this.resetTextColor();
+    const anyName = eval(AnyNameEval);
+    if (anyName) {
       this.drawText(anyName , x, y, width, "left");
     }
     this.contents.fontSize = $gameSystem.mainFontSize();
   };
 
-
   const _Window_SavefileList_drawPlaytime = Window_SavefileList.prototype.drawPlaytime;
-  Window_SavefileList.prototype.drawPlaytime = function(info, x, y, width) {
-    const contentsWidth = this.textWidth(PlaytimeName);
+  Window_SavefileList.prototype.drawPlaytime = function(info, x, y, width, data) {
+    const text = data.paramName || 'プレイ時間';
+    const textWidth = this.systemWidth(data.SystemItemWidth, width);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(PlaytimeName, x, y, contentsWidth);
+    this.changeTextColor(getColorCode(data.NameColor));
+    this.drawText(text, x, y, textWidth);
     this.resetTextColor();
-    _Window_SavefileList_drawPlaytime.call(this, info, x + contentsWidth, y, width - contentsWidth);
+    _Window_SavefileList_drawPlaytime.call(this, info, x + textWidth, y, width - textWidth);
     this.contents.fontSize = $gameSystem.mainFontSize();
   };
 
-  Window_SavefileList.prototype.drawDayTime = function(info, x, y, width) {
+  Window_SavefileList.prototype.drawDayTime = function(info, x, y, width, data) {
     this.resetTextColor();
     if (info.timestamp) {
       this.contents.fontSize = ContentsFontSizeMainFontSize;
@@ -943,56 +942,49 @@ Imported.NUUN_SaveScreen = true;
     this.contents.fontSize = $gameSystem.mainFontSize();
   };
 
-  Window_SavefileList.prototype.drawMapName = function(info, x, y, width) {
-    const contentsWidth = this.textWidth(LocationName);
+  Window_SavefileList.prototype.drawMapName = function(info, x, y, width, data) {
+    const text = data.paramName || '現在地';
+    const textWidth = this.systemWidth(data.SystemItemWidth, width);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(LocationName, x, y, contentsWidth);
+    this.changeTextColor(getColorCode(data.NameColor));
+    this.drawText(text, x, y, textWidth);
     this.resetTextColor();
     if (info.mapname) {
-      this.drawText(info.mapname, x + contentsWidth, y, width - contentsWidth, "right");
+      this.drawText(info.mapname, x + textWidth, y, width - textWidth, "right");
     }
-    this.contents.fontSize = $gameSystem.mainFontSize();
   };
 
-  Window_SavefileList.prototype.drawGold = function(info, x, y, width) {
-    const contentsWidth = this.textWidth(MoneyName);
+  Window_SavefileList.prototype.drawGold = function(info, x, y, width, data) {
+    const text = data.paramName || '所持金';
+    const textWidth = this.systemWidth(data.SystemItemWidth, width);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(MoneyName, x, y, contentsWidth);
+    this.changeTextColor(getColorCode(data.NameColor));
+    this.drawText(text, x, y, textWidth);
     this.resetTextColor();
     if (info.gold !== undefined) {
       const unit = TextManager.currencyUnit;
-      this.drawCurrencyValue(info.gold, unit, x + contentsWidth, y, width - contentsWidth)
+      this.drawCurrencyValue(info.gold, unit, x + textWidth, y, width - textWidth)
     }
     this.contents.fontSize = $gameSystem.mainFontSize();
   };
 
-  Window_SavefileList.prototype.drawOriginal_1 = function(info, x, y, width) {
-    const contentsWidth = this.textWidth(OriginalName1);
-    this.contents.fontSize = ContentsFontSizeMainFontSize;
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(OriginalName1, x, y, contentsWidth);
+  Window_SavefileList.prototype.drawOriginal = function(info, x, y, width, data) {
+    const text = data.paramName;
+    let textWidth = 0;
+    if (text) {
+      textWidth = this.systemWidth(data.SystemItemWidth, width);
+      this.contents.fontSize = ContentsFontSizeMainFontSize;
+      this.changeTextColor(getColorCode(data.NameColor));
+      this.drawText(text, x, y, textWidth);
+    }
     this.resetTextColor();
-    if (info.OriginalDate1) {
-      this.drawText(info.OriginalDate1, x + contentsWidth, y, width - contentsWidth, "right");
+    if (data.DetaEval) {
+      this.drawText(eval(data.DetaEval), x + textWidth, y, width - textWidth, "right");
     }
     this.contents.fontSize = $gameSystem.mainFontSize();
   };
 
-  Window_SavefileList.prototype.drawOriginal_2 = function(info, x, y, width) {
-    const contentsWidth = this.textWidth(OriginalName2);
-    this.contents.fontSize = ContentsFontSizeMainFontSize;
-    this.changeTextColor(ColorManager.systemColor());
-    this.drawText(OriginalName2, x, y, contentsWidth);
-    this.resetTextColor();
-    if (info.OriginalDate2) {
-      this.drawText(info.OriginalDate2, x + contentsWidth, y, width - contentsWidth, "right");
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-  };
-
-  Window_SavefileList.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
+  Window_SavefileList.prototype.drawFace = function(faceName, faceIndex, x, y, width, height, scaleMode) {
     width = width || ImageManager.faceWidth;
     height = height || ImageManager.faceHeight;
     const scale = FaceScale / 100;
@@ -1005,9 +997,13 @@ Imported.NUUN_SaveScreen = true;
     const dy = Math.floor(y + Math.max(height - ph, 0) / 2);
     const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
     const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
-    const dw = this._scaleMode === 1 ? this._maxHeight : Math.floor(sw * scale);
-    const dh = this._scaleMode === 1 ? this._maxHeight : Math.floor(sh * scale);
+    const dw = scaleMode === 1 ? this._maxHeight : Math.floor(sw * scale);
+    const dh = scaleMode === 1 ? this._maxHeight : Math.floor(sh * scale);
     this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
+  };
+
+  Window_SavefileList.prototype.systemWidth = function(swidth, width) {
+    return swidth > 0 ? swidth : Math.floor(width / 2);
   };
 
   const _Game_System_initialize = Game_System.prototype.initialize;
@@ -1043,4 +1039,10 @@ Imported.NUUN_SaveScreen = true;
     ]);
   };
 
+  function getColorCode(color) {
+    if (typeof(color) === "string") {
+      return color;
+    }
+    return ColorManager.textColor(color);
+  };
 })();

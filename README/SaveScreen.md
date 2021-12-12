@@ -1,8 +1,9 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
 # Ver.1.8.0
 
-セーブ画面にいくつかの項目を追加します。
-![画像](img/NUUN_SaveScreen1.png)  
+セーブ画面にいくつかの項目を追加します。  
+
+![画像](img/NUUN_SaveScreen1.png)    
 
 ## 各設定
 ### キャラクターの表示

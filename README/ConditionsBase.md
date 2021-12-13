@@ -218,6 +218,12 @@
 上限値(1) 110 下限値(2) 102  
 指定のID(3) 10  
 
+## 対応プラグイン
+[盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md)  
+[スキル、アイテム使用条件](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalSkills.js)  
+[踏み止まり特徴](https://github.com/nuun888/MZ/blob/master/README/StoppingFeature.md)  
+[行動時ブースト特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_boostEX.js)  
+[条件付きドロップアイテム](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md)  
 
 ## 更新履歴
 2021/12/13 Ver.1.1.0  

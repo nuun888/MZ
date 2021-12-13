@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_ExpItem.js
+ * NUUN_LevelItem.js
  * 
  * Copyright (C) 2020 NUUN
  * This software is released under the MIT License.
@@ -12,7 +12,7 @@
  * @target MZ
  * @plugindesc 経験値増減アイテム、スキル
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * 経験値を増減させるアイテムやスキルを作ることが出来ます。
@@ -37,6 +37,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/13 Ver 1.2.1
+ * 経験値が正常に加算されない問題を修正。
  * 2021/12/6 Ver 1.2.0
  * メッセージのフォーマットを変更。
  * 最大レベルの時に経験値を増加させたときに経験値が減ってしまう問題を修正。
@@ -88,6 +90,7 @@ Imported.NUUN_ExpItem = true;
   const ExpMessageUp = String(parameters['ExpMessageUp'] || '%2の経験値が%3増加した！');
   const ExpMessageDown = String(parameters['ExpMessageDown'] || '%2の経験値が%3減少した！');
   const ExpMessageNoEffect = String(parameters['ExpMessageNoEffect'] || '%2には効果がなかった！');
+  let gainExpItem = false;
 
   const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
 Game_ActionResult.prototype.clear = function() {
@@ -125,16 +128,20 @@ Game_ActionResult.prototype.clear = function() {
 
   Game_Battler.prototype.expItems = function(subject, item) {
     if(this.isActor()) {
-      let expVal = item.meta.ExpIncrease;
-      const originalExp = expVal;
+      let getExp = Number(item.meta.ExpIncrease);
+      const currentExp = this.currentExp();
       let text = null;
-      expVal = this.currentExp() + expVal;
+      let expVal = Math.round(getExp * this.finalExpRate());
+      let limitExp = 0;
       if (item.meta.levelUpStop && expVal > 0) {
-        expVal = Math.min(expVal, this.nextLevelExp() - this.currentExp());
+        limitExp = this.nextLevelExp() - currentExp;
+        expVal = expVal > limitExp ? limitExp : expVal;
       } else if (item.meta.NolevelDown && expVal < 0) {
-        expVal = Math.max(expVal, this.currentLevelExp() - this.currentExp());
+        limitExp = this.currentLevelExp() - currentExp;
+        expVal = expVal < limitExp ? limitExp : expVal;
       } else {
-        expVal = Math.min(this.expForLevel(this.maxLevel()) - this.currentExp(), expVal);
+        limitExp = this.expForLevel(this.maxLevel()) - currentExp;
+        expVal = expVal > limitExp ? limitExp : expVal;
       }
       if(expVal) {
         if (expVal > 0) {
@@ -148,14 +155,21 @@ Game_ActionResult.prototype.clear = function() {
           this.result().useExpItemText = text;
           this.result().useExpItem = true;
         }
+        gainExpItem = true;
         this.gainExp(expVal);
-      } else if (originalExp !== 0) {
+        gainExpItem = false;
+      } else if (getExp !== 0) {
         if (!LogWindowShow && expVal === 0) {
           this.result().useExpItemText = ExpMessageNoEffect.format(subject.name(), this.name());
           this.result().useExpItem = true;
         }
       }
     }
+  };
+
+  const _Game_Actor_finalExpRate = Game_Actor.prototype.finalExpRate;
+  Game_Actor.prototype.finalExpRate = function() {
+    return gainExpItem ? 1 : _Game_Actor_finalExpRate.call(this);
   };
 
   const _Window_BattleLog_displayActionResults = Window_BattleLog.prototype.displayActionResults;

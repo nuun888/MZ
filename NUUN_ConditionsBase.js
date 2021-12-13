@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.0.5
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -153,18 +153,33 @@
  * 
  * 【属性】
  * [指定の属性]
- * 対象の攻撃属性が「指定した数値」(2)と一致なら条件を満たします。
+ * 対象の攻撃属性が「指定した数値」(3))と一致なら条件を満たします。
  * なお対象がパーティ、敵グループの場合は判定しません。
  * 
  * 【有効度】
  * [属性有効度][ステート有効度]
- * 対象の「指定した属性、ステートIDの有効度」(2)が「上限下限値%内」(1)または「指定した数値」(2)と一致なら条件を満たします。
+ * 対象の「指定した属性、ステートIDの有効度」(3))が「上限下限値%内」(1)または「指定した数値」(2)と一致なら条件を満たします。
  * パーティ、敵グループの場合はいずれかが一致したときに条件を満たします。
  * 
  * 【アイテム、スキル使用】
  * [アイテムを使用][スキルを使用]
  * 使用したアイテム、スキル「指定したアイテム、スキルID」(3)が一致なら条件を満たします。
  * パーティ、敵グループの場合はfalseを返します。
+ * [スキルタイプ]
+ * 対象の攻撃時のスキルタイプが「指定した数値」(3))と一致なら条件を満たします。
+ * パーティ、敵グループの場合はfalseを返します。
+ * [アイテムグループ](未実装)
+ * 対象のアイテム使用時のアイテムグループが「指定した数値」(3))と一致なら条件を満たします。
+ * パーティ、敵グループの場合はfalseを返します。
+ * 
+ * 【アイテム所持、スキル習得】
+ * [アイテム所持][武器所持][防具所持]
+ * [指定した数値](3)の所持数が「上限下限値内」(1)または「指定した数値」(2)と一致なら条件を満たします。
+ * 下限値を1、上限値を0に設定することで１つ以上所持で条件を満たすようになります。
+ * 敵、敵グループの場合はfalseを返します。
+ * [スキル習得済み]
+ * [指定した数値](3)が習得済みなら条件を満たします。
+ * 敵の場合は行動スキルに(3)のスキルが存在すれば条件を満たします。
  * 
  * 【攻撃】
  * [命中タイプが物理][命中タイプが魔法][命中タイプが必中]
@@ -181,7 +196,7 @@
  * ダメージが「上限下限値内」(1)または「指定した数値」(2)と一致なら条件を満たします。
  * パーティ、敵グループの場合はfalseを返します。
  * 
- * 【反撃、反射】（未実装）
+ * 【反撃、反射】
  * [反撃時][魔法反射時]
  * 反撃時または魔法反射時なら条件を満たします。
  * 
@@ -197,9 +212,21 @@
  * 
  * 【スイッチ】
  * [指定のスイッチがON]
- * 指定したスイッチID」(3)がONなら条件を満たします。
+ * 「指定したスイッチID」(3)がONなら条件を満たします。
  * [指定のスイッチがOFF]
  *「指定したスイッチID」(3)がOFFなら条件を満たします。
+ * 
+ * 【所持金】
+ * [所持金額]
+ * 所持金が[上限下限値内](1)または「指定した数値」(2)と一致なら条件を満たします。
+ * 対象が味方、パーティなら所持金を参照します。
+ * 対象が敵なら敵の獲得できる所持金を参照します。
+ * 対象が敵グループなら敵グループの獲得できる合計の所持金が参照されます。
+ * 
+ * 【経験値】
+ * [現レベルの経験値]
+ * 現レベルの獲得経験値が[上限下限値内](1)または「指定した数値」(2)と一致なら条件を満たします。
+ * 対象が敵、敵グループならfalseを返します。
  * 
  * 【条件式】
  * 条件式の評価がtrueなら条件を満たします。
@@ -208,6 +235,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/13 Ver.1.1.0
+ * 条件にアイテム、武器、防具の所持、スキルの習得、スキルタイプ、所持金、反撃、魔法反射を追加しました。
+ * スキル、アイテム使用が適用されていなかった問題を修正。
  * 2021/11/27 Ver.1.0.5
  * 装備判定が適用されていなかった問題を修正。
  * 指定の装備に素手時、防具なしの時の条件を追加。
@@ -247,6 +277,8 @@
  * @value 'Battler'
  * @option 職業(Class)
  * @value 'Class'
+ * @option 経験値(Exp)
+ * @value 'Exp'
  * @option 能力値(Param)
  * @value 'Param'
  * @option 追加能力値(XParam)
@@ -267,13 +299,15 @@
  * @value 'Element'
  * @option 有効度(Validity)
  * @value 'Validity'
- * @option アイテム、スキル使用(ItemSkill)
+ * @option アイテム、スキル使用(UseItemSkill)
+ * @value 'UseItemSkill'
+ * @option アイテム、スキル(ItemSkill)
  * @value 'ItemSkill'
  * @option 攻撃(Attack)
  * @value 'Attack'
  * @option ダメージ(Damage)
  * @value 'Damage'
- * @option 反撃、反射(CounterReflection)(未実装)
+ * @option 反撃、反射(CounterReflection)
  * @value 'CounterReflection'
  * @option 乗り物(Vehicle)
  * @value 'Vehicle'
@@ -281,7 +315,7 @@
  * @value 'Variable'
  * @option スイッチ(Switch)
  * @value 'Switch'
- * @option 所持金(Gold)(未実装)
+ * @option 所持金(Gold)
  * @value 'Gold'
  * @option 条件式(Eval)
  * @value 'Eval'
@@ -315,6 +349,14 @@
  * @value 'ID'
  * @option 一致したバトラーのクラスID数(1)(2)(3)（(1)バトラー数、(2)バトラー数、(3)クラスID）
  * @value 'IDNum'
+ * @default 
+ * 
+ * @param ExpConditionsType
+ * @text 経験値(Exp)
+ * @desc 経験値の条件タイプを指定します。
+ * @type select
+ * @option 現レベルの経験値(1)(2)（(1)経験値割合　(2)経験値固定値）
+ * @value 'EXP'
  * @default 
  * 
  * @param ParamConditionsType
@@ -469,20 +511,30 @@
  * @parent ValiditySetting
  * 
  * @param ItemSkillConditionsType
- * @text アイテム、スキル(ItemSkill)
- * @desc アイテム、スキルの条件タイプを指定します。
+ * @text 使用アイテム、スキル(UseItemSkill)
+ * @desc 使用アイテム、スキルの条件タイプを指定します。
  * @type select
  * @option アイテムを使用(3)（(3)のスキルIDが未指定の場合は全てのアイテムが対象）
  * @value 'Item'
- * @option スキルを使用(3)（(3))のアイテムIDが未指定の場合は全てのスキルが対象）
+ * @option スキルを使用(3)（(3)のアイテムIDが未指定の場合は全てのスキルが対象）
  * @value 'Skill'
- * @option アイテムを所持(3)（(3)アイテムID）(未実装)
+ * @option スキルタイプ(3)（(3)スキルタイプID）
+ * @value 'SkillType'
+ * @option アイテムグループ(未実装)
+ * @value 'ItemGroup'
+ * @default 
+ * 
+ * @param GetItemSkillConditionsType
+ * @text アイテム、スキル(ItemSkill)
+ * @desc アイテム、スキルの条件タイプを指定します。
+ * @type select
+ * @option アイテムを所持(1)(2)(3)（(1)(2)個数 (3)アイテムID）
  * @value 'PossessionItem'
- * @option 武器を所持(3)（(3)武器ID）(未実装)
+ * @option 武器を所持(1)(2)(3)（(1)(2)個数 (3)武器ID）
  * @value 'PossessionWeapon'
- * @option 防具を所持(3)（(3)防具ID）(未実装)
+ * @option 防具を所持v（(1)(2)個数 (3)防具ID）
  * @value 'PossessionArmor'
- * @option スキルを習得(3)（(3)スキルID）(未実装)
+ * @option スキルを習得(3)（(3)スキルID）
  * @value 'MasterSkill'
  * @default 
  * 
@@ -517,7 +569,7 @@
  * @default 
  * 
  * @param CntRefConditionsType
- * @text 反撃、反射（未実装）
+ * @text 反撃、反射
  * @desc 反撃、反射の条件タイプを指定します。
  * @type select
  * @option 反撃時
@@ -627,7 +679,6 @@ Game_Temp.prototype.initialize = function() {
   this.actionData = {};
 };
 
-
 Game_Temp.prototype.getActionData = function() {
   return this.actionData;
 };
@@ -711,6 +762,8 @@ function triggerConditions(data, target, mode, action, damage) {
     return battlerTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Class') {
     return classTriggerConditions(data, target, mode);
+  } else if (data.ConditionsMode === 'Exp') {
+    return expTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Param') {
     return paramTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Xparam') {
@@ -731,8 +784,10 @@ function triggerConditions(data, target, mode, action, damage) {
     return elementTriggerConditions(data, target, mode, action);
   } else if (data.ConditionsMode === 'Validity') {
     return validityTriggerConditions(data, target, mode);
+  } else if (data.ConditionsMode === 'UseItemSkill') {
+    return useItemSkillTriggerConditions(data, target, mode, action);
   } else if (data.ConditionsMode === 'ItemSkill') {
-    return itemSkillTriggerConditions(data, target, mode, action);
+    return itemSkillTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Attack') {
     return attackTriggerConditions(data, target, mode, action);
   } else if (data.ConditionsMode === 'Damage') {
@@ -745,10 +800,12 @@ function triggerConditions(data, target, mode, action, damage) {
     return variableTriggerConditions(data);
   } else if (data.ConditionsMode === 'Switch') {
     return switchTriggerConditions(data);
+  } else if (data.ConditionsMode === 'Gold') {
+    return goldTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Eval') {
     return evalTriggerConditions(data);
   }
-}
+};
 
 //メンバー
 function memberTriggerConditions(data, target, mode) {
@@ -792,6 +849,19 @@ function classTriggerConditions(data, target, mode) {
     }
   }
   return false;
+};
+
+//経験値
+function expTriggerConditions(data, target, mode) {
+  const unit = getUnit(target, mode);
+  if (data.ExpConditionsType === 'EXP') {
+    if (mode === 'Party') {
+      return unit.members().some(member => conditionsRate(data, member.currentExp() - member.currentLevelExp(), member.nextLevelExp() - member.currentLevelExp()));
+    } else if (target && target.isActor()) {
+      return conditionsRate(data, target.currentExp() - target.currentLevelExp(),  target.nextLevelExp() - target.currentLevelExp());
+    }
+    return false;
+  }
 };
 
 //能力値
@@ -958,15 +1028,48 @@ function validityTriggerConditions(data, target, mode) {
   }
 };
 
-//使用アイテム、スキル //Action
-function itemSkillTriggerConditions(data, target, mode, action) {
+//使用アイテム、スキル
+function useItemSkillTriggerConditions(data, target, mode, action) {
   if (!action) {
     return false;
   }
   if (data.ItemSkillConditionsType === 'Item') {
     return action.isItem() ? useItem(data.IDList, action.item().id) : false;
   } else if (data.ItemSkillConditionsType === 'Skill') {
-    return action.isSkill() ? useSkill(data.IDList, action.item().id) : false;
+    return action.isSkill() ? useItem(data.IDList, action.item().id) : false;
+  } else if (data.ItemSkillConditionsType === 'SkillType') {
+    return action.isSkill() ? useSkillType(data.IDList, action.item()) : false;
+  }
+};
+
+//アイテム所持、スキル習得
+function itemSkillTriggerConditions(data, target, mode) {
+  const unit = getUnit(target, mode);
+  if (data.GetItemSkillConditionsType === 'PossessionItem') {
+    if (mode === 'Party' || (target && target.isActor())) {
+      return possessionItems(data);
+    }
+    return false;
+  } else if (data.GetItemSkillConditionsType === 'PossessionWeapon') {
+    if (mode === 'Party' || (target && target.isActor())) {
+      return possessionWeapons(data);
+    }
+    return false;
+  } else if (data.GetItemSkillConditionsType === 'PossessionArmor') {
+    if (mode === 'Party' || (target && target.isActor())) {
+      return possessionArmors(data);
+    }
+    return false;
+  } else if (data.GetItemSkillConditionsType === 'MasterSkill') {
+    if (mode === 'Party') {
+      return unit.members().some(member => masterSkill(data, member));
+    } else if  (mode === 'Troop') {
+      return unit.members().some(member => masterEnemySkill(data, member));
+    } else if (target && target.isActor()) {
+      return masterSkill(data, target);
+    } else if (target && target.isEnemy()) {
+      return masterEnemySkill(data, target);
+    }
   }
 };
 
@@ -1005,16 +1108,15 @@ function damageTriggerConditions(data, target, mode, damage) {
   }
 };
 
-//反撃、反射 //Action
+//反撃、反射
 function cntRefTriggerConditions(data, target, mode) {
-  if (!action || mode === 'Party' || mode === 'Troop') {
+  if (mode === 'Party' || mode === 'Troop') {
     return false;
   }
-  const unit = getUnit(target, mode);
   if (data.cntRefConditionsType === 'Counter') {
-    
+    return target.getCntAction();
   } else if (data.cntRefConditionsType === 'Reflection') {
-
+    return target.getReflectionAction();
   }
 };
 
@@ -1058,6 +1160,22 @@ function switchTriggerConditions(data) {
   return false;
 };
 
+//所持金
+function goldTriggerConditions(data, target, mode) {
+  const unit = getUnit(target, mode);
+  if (data.GoldConditionsType === 'Gold') {
+    if (mode === 'Party' || (target && target.isActor())) {
+      return getPartyGold(data);
+    } else if (mode === 'Troop') {
+      const val = unit.members().reduce((r, member) => r + member.gold());
+      return conditionsNum(data, val);
+    } else if (target && target.isEnemy()) {
+      return getEnemyGold(data, target);
+    }
+    return false;
+  }
+};
+
 //条件式
 function evalTriggerConditions(data) {
   return eval(data.EvalStr);
@@ -1074,6 +1192,13 @@ function conditionsNum(data, num) {
     return getValList(data.ValList).some(val => val === num);
   }
   return (num >= data.DwLimit && (data.UpLimit > 0 ? (num <= data.UpLimit) : true));
+};
+
+function conditionsRate(data, num, paramMax) {
+  if (data.ValList) {
+    return getValList(data.ValList).some(val => val === num);
+  }
+  return num >= paramMax * data.DwLimit / 100 && (data.UpLimit > 0 ? (num <= paramMax * data.UpLimit / 100) : true);
 };
 
 function getUnit(target, mode) {
@@ -1205,6 +1330,34 @@ function buffsTurn(data, id, member) {
   return conditionsNum(data, turn);
 };
 
+function useItem(idList, item) {
+  return getValList(idList).some(listId => listId === item);
+};
+
+function useSkillType(idList, item) {
+  return getValList(idList).some(listId => listId === item.stypeId);
+};
+
+function possessionItems(data) {
+  return getValList(data.IDList).some(listId => conditionsNum(data, $gameParty.numItems($dataItems[listId])));
+};
+
+function possessionWeapons(data) {
+  return getValList(data.IDList).some(listId => conditionsNum(data, $gameParty.numItems($dataWeapons[listId])));
+};
+
+function possessionArmors(data) {
+  return getValList(data.IDList).some(listId => conditionsNum(data, $gameParty.numItems($dataArmors[listId])));
+};
+
+function masterSkill(data, member) {
+  return getValList(data.IDList).some(listId => member.isLearnedSkill(listId));
+};
+
+function masterEnemySkill(data, member) {
+  return getValList(data.IDList).some(listId => member.enemy().actions.some(action => action.skillId === listId));
+};
+
 function equipWeapon(idList, member) {
   if (idList == 0) {
     return member.weapons().length === 0;
@@ -1232,7 +1385,6 @@ function equipArmorType(idList, member) {
 };
 
 function isEquipType(typeid, list) {
-  
   return list.some(id => typeid === id);
 };
 
@@ -1262,6 +1414,14 @@ function attackElement(idList, action) {
 function elements(list, id) {
   return list.some(listid => listid === id);
 }
+
+function getPartyGold(data) {
+  return conditionsNum(data, $gameParty.gold());
+};
+
+function getEnemyGold(data, enemy) {
+  return conditionsNum(data, enemy.gold());
+};
 
 function getTriggerConditionsMeta(obj, tag1, tag2, tag3, tag4) {
   return obj.meta[tag1] || obj.meta[tag2] || obj.meta[tag3] || obj.meta[tag4];

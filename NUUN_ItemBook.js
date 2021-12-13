@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -148,6 +148,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2021/12/12 Ver.1.4.2
+ * メインウィンドウ（アイテムの情報を表示）の横幅を設定できる機能を追加。
  * 2021/11/11 Ver.1.4.1
  * 背景の設定方法を少し変更。
  * 各項目のシステム文字色をカラーコードに対応。
@@ -369,6 +371,18 @@
  * @type string
  * @default 'pictures'
  * @parent BasicSetting
+ * 
+ * @param WindowSetting
+ * @text ウィンドウ設定
+ * @default ------------------------------
+ * 
+ * @param BookWidth
+ * @desc 図鑑のメインウィンドウの横幅。(0で画面の2/3)
+ * @text 図鑑の横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent WindowSetting
  * 
  * @param BackGround
  * @text 背景設定
@@ -1260,6 +1274,7 @@ const parameters = PluginManager.parameters('NUUN_ItemBook');
 const WindowMode = Number(parameters['WindowMode'] || 0);
 const NumberType = Number(parameters['NumberType'] || 0);
 const RegistrationTiming = Number(parameters['RegistrationTiming'] || 0);
+const BookWidth = Number(parameters['BookWidth'] || 0);
 const RegistrationItemTiming = Number(parameters['RegistrationItemTiming'] || 0);
 const UnknownData = String(parameters['UnknownData'] || '？');
 const UnknownItemData = String(parameters['UnknownItemData'] || '？？？');
@@ -1840,7 +1855,7 @@ Scene_ItemBook.prototype.createItemPageWindow = function() {
 Scene_ItemBook.prototype.percentWindowRect = function() {
   const wx = WindowMode === 0 ? 0 : this.itemWindowWidth();
   const wy = this.mainAreaTop();
-  const ww = Math.floor(Graphics.boxWidth / 3);
+  const ww = this.indexWidth();
   const wh = PercentContentLength ? this.calcWindowHeight(1, true) : 0;
   return new Rectangle(wx, wy, ww, wh);
 };
@@ -1849,13 +1864,13 @@ Scene_ItemBook.prototype.indexWindowRect = function() {
   const height = this.percentWindowRect().height;
   const wx = WindowMode === 0 ? 0 : this.itemWindowWidth();
   const wy = this.mainAreaTop() + height;
-  const ww = Math.floor(Graphics.boxWidth / 3);
+  const ww = this.indexWidth();
   const wh = this.mainAreaHeight() - height;
   return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_ItemBook.prototype.itemWindowPageRect = function() {
-  const wx = WindowMode === 0 ? Math.floor(Graphics.boxWidth / 3) : 0;
+  const wx = WindowMode === 0 ? this.indexWidth() : 0;
   const wy = this.mainAreaTop();
   const ww = this.itemWindowWidth();
   const wh = this.calcWindowHeight(1, true);
@@ -1863,12 +1878,17 @@ Scene_ItemBook.prototype.itemWindowPageRect = function() {
 };
 
 Scene_ItemBook.prototype.itemWindowRect = function() {
-  const wx = WindowMode === 0 ? Math.floor(Graphics.boxWidth / 3) : 0;
+  const wx = WindowMode === 0 ? this.indexWidth() : 0;
   const wy = this.mainAreaTop() + this._itemPageWindow.height;
   const ww = this.itemWindowWidth();
   const wh = this.mainAreaHeight() - this._itemPageWindow.height;
   return new Rectangle(wx, wy, ww, wh);
 };
+
+Scene_ItemBook.prototype.indexWidth = function() {
+  return BookWidth > 0 ? Graphics.boxWidth - BookWidth : Math.floor(Graphics.boxWidth / 3);
+};
+
 
 Scene_ItemBook.prototype.backgroundOpacity = function(window) {
   if (ItemBookBackGround) {
@@ -1877,7 +1897,7 @@ Scene_ItemBook.prototype.backgroundOpacity = function(window) {
 };
 
 Scene_ItemBook.prototype.itemWindowWidth = function() {
-  return Graphics.boxWidth - Math.floor(Graphics.boxWidth / 3);
+  return Graphics.boxWidth - this.indexWidth();
 };
 
 Scene_ItemBook.prototype.setMaxPage = function(page) {

@@ -11,7 +11,7 @@
 | システム　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ----------------------------- | ----------------------------- | ----------------------------- | ----------------------------- |
 | 共通処理 | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.3.2 |
-| [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.0.5 |
+| [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.0 |
 | レーダーチャート表示ベース | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) |  | 1.0.0 |
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.2 |
 |  |  |  |  |
@@ -41,7 +41,7 @@
 
 | アイテム、スキル　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
-| [経験値増減アイテム、スキル](https://github.com/nuun888/MZ/blob/master/README/ExpItem.md) | [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js) |  | 1.2.0 |
+| [経験値増減アイテム、スキル](https://github.com/nuun888/MZ/blob/master/README/ExpItem.md) | [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js) |  | 1.2.1 |
 | [レベルアップアイテム](https://github.com/nuun888/MZ/blob/master/README/LevelUPItem.md)  | [NUUN_LevelUPItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUPItem.js) |  | 1.0.1 |
 | キャストタイム（詠唱）キャンセルスキル、アイテム  | [NUUN_CancelCastTime](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js) |  | 1.0.1 |
 | [アイテム消耗率](https://github.com/nuun888/MZ/blob/master/README/ConsumptionItem.md) | [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js) |  | 1.1.1 |
@@ -118,11 +118,11 @@
 | ---------- | ------------- | ------------- | -------- |
 | アイテムのカテゴリーカスタマイズ | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | 共 | 1.1.3 |
 | [コマンド、カテゴリー表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_CommandIcon.md)| [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js) |  | 1.3.0 |
-| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ | 2.9.4 |
+| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/NUUN_EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ | 2.9.6 |
 | ┗　耐性表示マスク |  [NUUN_EnemyBookEX_1](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js) |  | 1.0.1 |
-| アイテム図鑑 | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) | 共 | 1.4.1 |
+| アイテム図鑑 | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) | 共 | 1.4.2 |
 | [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共 立対 レ | 2.3.1 |
-| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.7.0 |
+| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.8.0 |
 | セーブ上書き確認 | [NUUN_SaveVerification](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveVerification.js) |  | 1.0.0 |
 | 所持金拡張 | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.0 |
 | メンバー変更画面 | [NUUN_SceneFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js) | 共 | 1.5.0 |

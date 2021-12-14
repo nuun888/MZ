@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/ Ver 1.2.3
+ * 一部処理の修正。
  * 2021/12/12 Ver 1.2.2
  * インデックスIDに-1を設定できるように変更。（-1:デフォルトのインデックスID）
  * 2021/12/11 Ver 1.2.1
@@ -190,9 +192,13 @@ Game_Actor.prototype.getActorGraphicIndex = function() {
   return ButlerActors.findIndex(actorImg => actorImg.actorId === this.actorId());
 };
 
-Game_Actor.prototype.getActorGraphicData = function() {
+Game_Actor.prototype.getActorGraphic = function() {
   const imgData = this.getActorGraphicList();
   return imgData ? imgData.ButlerActorImg.find(data => this.matchConditions(data)) : null;
+};
+
+Game_Actor.prototype.getActorGraphicData = function() {
+  return this._actorGraphicData;
 };
 
 Game_Actor.prototype.setActorGraphicData = function() {

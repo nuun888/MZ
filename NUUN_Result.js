@@ -795,7 +795,7 @@
  * 
  * @param DropItemNumVisible
  * @type boolean
- * @default true
+ * @default false
  * @text ドロップアイテム個数表示
  * @desc ドロップアイテムを個数表示します。OFFで個別表示
  * @parent DropItemSetting

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,10 +26,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/14 Ver.1.5.1
+ * 立ち絵、顔グラ表示EXを入れてない状態で開くとエラーが出る問題を修正。
  * 2021/12/11 Ver.1.5.0
  * 立ち絵、顔グラ表示EXに対応。
  * 2021/11/27 Ver.1.4.1
- * Ver.1.4.0アップデート後、ゲーム開始時にエラーが出る問題を修正。
+ * Ver.1.4.0（当プラグイン）アップデート後、ゲーム開始時にエラーが出る問題を修正。
  * 2021/11/27 Ver.1.4.0
  * 立ち絵を表示できる機能を追加。
  * 立ち絵を切り替えられるプラグインコマンドを追加。
@@ -1564,9 +1566,14 @@ Window_FormationStatus.prototype.refresh = function() {
   const actor = this._actor;
   if (!actor) {
     return;
-  }actor.resetImgId();
-  const faceName = Imported.NUUN_ActorPicture && ActorPictureEXApp ? actor.getActorGraphicFace() : actor.faceName();
-  const bitmap = ImageManager.loadFace(faceName);
+  }
+  let bitmap = null;
+  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+    actor.resetImgId();
+    bitmap = ImageManager.loadFace(actor.getActorGraphicFace());
+  } else {
+    bitmap = ImageManager.loadFace(actor.faceName());
+  }
   if (!bitmap.isReady()) {
     bitmap.addLoadListener(this.drawData.bind(this));
   } else {
@@ -2000,7 +2007,7 @@ Sprite_FormationActor.prototype.setup = function(actor) {
     this.bitmap = null;
     return;
   }
-  const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()): actor.getFormationActorImgData();
+  const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()) : actor.getFormationActorImgData();
   const imges = Imported.NUUN_ActorPicture && ActorPictureEXApp ? actor.getActorGraphicImg(): actor.getFormationActorImg(data);
   if (imges) {
     this.x = data.Actor_X;

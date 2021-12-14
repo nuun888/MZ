@@ -1280,7 +1280,7 @@
  * 
  * @param Img_SX
  * @desc 画像の表示開始座標X。
- * @text 画像表示開始座標X
+ * @text 画像表示開始座標X（未実装）
  * @type number
  * @default 0
  * @min 0
@@ -1288,7 +1288,7 @@
  * 
  * @param Img_SY
  * @desc 画像の表示開始座標Y
- * @text 画像表示開始座標Y
+ * @text 画像表示開始座標Y（未実装）
  * @type number
  * @default 0
  * @min 0

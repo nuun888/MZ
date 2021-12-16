@@ -1,5 +1,5 @@
 # [ゲージ画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js)
-# Ver.1.4.0
+# Ver.1.3.0
 
 ゲージを画像化します。  
 

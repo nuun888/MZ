@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.14.0
+ * @version 1.14.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -82,6 +82,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/15 Ver.1.14.1
+ * 立ち絵、顔グラEXで画像表示時の画像開始地点を設定できる機能を追加。
+ * 入手項目の設定でオリジナル項目が表示しない問題を修正。
  * 2021/12/15 Ver.1.14.0
  * ドロップアイテムを個数表示に表示できる機能を追加。
  * 立ち絵、顔グラ表示EXに対応。
@@ -1280,7 +1283,7 @@
  * 
  * @param Img_SX
  * @desc 画像の表示開始座標X。
- * @text 画像表示開始座標X（未実装）
+ * @text 画像表示開始座標X
  * @type number
  * @default 0
  * @min 0
@@ -1288,7 +1291,7 @@
  * 
  * @param Img_SY
  * @desc 画像の表示開始座標Y
- * @text 画像表示開始座標Y（未実装）
+ * @text 画像表示開始座標Y
  * @type number
  * @default 0
  * @min 0
@@ -1905,6 +1908,8 @@ Window_ResultActorImg.prototype.drawActorImg = function(actor) {
 Window_ResultActorImg.prototype.actorImgRefresh = function(bitmap, actor) {
   const data = Imported.NUUN_ActorPicture && param.ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
   let x = data.Actor_X;
+  const sx = data.Img_SX || 0;
+  const sy = data.Img_SY || 0;
   const scale = (data.Actor_Scale || 100) / 100;
   if(param.ActorPosition === 0) {
     x += 0;
@@ -1915,6 +1920,7 @@ Window_ResultActorImg.prototype.actorImgRefresh = function(bitmap, actor) {
   }
   const y = data.Actor_Y + (this.height - (bitmap.height * scale));
   this.placeResultActorImg(this._actor, x, y, bitmap, scale);
+  this._actorSprite.setFrame(sx, sy, bitmap.width, bitmap.height);
 };
 
 Window_ResultActorImg.prototype.placeResultActorImg = function(actor, x, y, bitmap, scale) {
@@ -2216,6 +2222,8 @@ Window_Result.prototype.drawActorImg = function(actor) {
 Window_Result.prototype.actorImgRefresh = function(bitmap, actor) {
   const data = Imported.NUUN_ActorPicture && param.ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
   let x = data.Actor_X;
+  const sx = data.Img_SX || 0;
+  const sy = data.Img_SY || 0;
   const scale = (data.Actor_Scale || 100) / 100;
   if(param.ActorPosition === 0) {
     x += 0;
@@ -2227,7 +2235,7 @@ Window_Result.prototype.actorImgRefresh = function(bitmap, actor) {
   const dw = bitmap.width * scale;
   const dh = bitmap.height * scale;
   const y = data.Actor_Y + (this.height - (bitmap.height * scale)) - 24;
-  this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
+  this.contents.blt(bitmap, sx, sy, bitmap.width, bitmap.height, x, y, dw, dh);
 };
 
 Window_Result.prototype.drawActorFace = function(x, y, width, height, mode) {
@@ -2371,7 +2379,7 @@ Window_Result.prototype.drawGainExp = function(date, x, y, width) {
 
 Window_Result.prototype.drawPartyOriginalParam = function(date, x, y, width) {
   const rewards = BattleManager._rewards;
-  if (!isNaN(rewards)) {
+  if (rewards) {
     const result = eval(date.GainParamEval);
     this.changeTextColor(ColorManager.systemColor());
     if (date.GainParamName) {

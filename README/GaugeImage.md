@@ -3,7 +3,7 @@
 
 ゲージを画像化します。  
 
-![画像](img/SkillCost1.png)  
+![画像](img/GaugeImage4.png)  
 
 ## 設定方法
 ### 共通設定

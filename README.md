@@ -11,7 +11,7 @@
 | システム　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ----------------------------- | ----------------------------- | ----------------------------- | ----------------------------- |
 | 共通処理 | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.3.2 |
-| [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.0 |
+| [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.2 |
 | レーダーチャート表示ベース | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) |  | 1.0.0 |
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.3 |
 |  |  |  |  |
@@ -96,7 +96,7 @@
 
 | システム拡張　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
-| エンカウント条件拡張  | [NUUN_EncounterCondition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js) |  | 1.1.0 |
+| [エンカウント条件拡張](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md) | [NUUN_EncounterCondition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js) |  | 1.1.0 |
 | [敵グループの個別ＢＧＭ設定](https://github.com/nuun888/MZ/blob/master/README/BattleBGM.md) | [NUUN_BattleBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js) |  | 1.0.1 |
 | 敵グループの個別戦闘勝利敗北ME設定  | [NUUN_BattleME](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleME.js) |  | 1.0.0 |
 | [ステート付与の仕様変更](https://github.com/nuun888/MZ/blob/master/README/AddStateDeviation.md)  | [NUUN_AddStateDeviation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js) |  | 1.0.0 |

@@ -10,8 +10,9 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.3.0
+ * @version 1.4.0
  * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * ゲージを画像化します。
@@ -26,6 +27,22 @@
  * 'result_exp'　リザルト獲得経験値ゲージ
  * 'exp' ステータス画面経験値ゲージ
  * 
+ * ゲージ幅引き伸ばし：ゲージの表示横幅の範囲で表示しゲージを引き延ばして標示します。
+ * 画像拡大率：画像の拡大率を設定します。
+ * 全ゲージ画像のオフセット座標：全画像ゲージのX座標を調整します。
+ * 傾斜率：画像を斜めに表示させます。-で右上がりになります。
+ * 表示オフセット位置X：画像の表示させるX座標を調整します。
+ * 表示オフセット位置Y：画像の表示させるY座標を調整します。
+ * 補正幅：画像の表示横幅の補正する横幅を設定します。
+ * トリミング横幅：表示させる画像横幅の表示範囲を指定します。
+ * トリミング高さ：表示させる画像高さの表示範囲を指定します。
+ * トリミング座標X：表示させる画像の左の開始表示座標を指定します。
+ * トリミング座標Y：表示させる画像の上の開始表示座標を指定します。
+ * 
+ * 後面画像：一番後ろに表示される画像です。
+ * 前面画像：一番手前に表示される装飾用の画像です。
+ * メイン画像：ゲージの画像です。
+ * 
  * ゲージの画像化を戦闘中のみ反映させる場合はフィルタリングクラス設定で'Window_BattleStatus'、'Window_BattleActor'を設定してください。
  * 
  * 仕様
@@ -35,6 +52,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/19 Ver.1.4.0
+ * ゲージプラグイン対応による処理追加。
+ * ゲージの画像設定を変更。
  * 2021/10/4 Ver.1.3.0
  * 最大時の画像を設定できる機能を追加。
  * 溺死、キャストタイム中のゲージの画像が、特定条件の画像設定をしていなかった場合反映しなかった問題を修正。
@@ -107,154 +127,40 @@
  * @default 0
  * @min -99
  * 
- * @param BackImg
- * @text 背景画像設定
- * @default ------------------------------
- * 
- * @param GaugeImg
- * @desc ゲージ画像ファイル名を指定します。各画像設定で指定がない場合はこの画像が設定されます。
- * @text ゲージ画像
- * @type file[]
- * @dir img/
- * @default []
- * 
- * @param GaugeX
- * @desc 背景画像の表示オフセット位置X
- * @text 背景画像表示オフセット位置X
- * @type number
- * @default 0
- * @min -999
- * 
- * @param GaugeY
- * @desc 背景画像の表示オフセット位置Y
- * @text 背景画像表示オフセット位置Y
- * @type number
- * @default 0
- * @min -999
- * 
- * @param GaugeCorrectionWidth
- * @desc 背景画像の補正幅（表示幅からの差）
- * @text 背景画像補正幅
- * @type number
- * @default 0
- * @min -999
- * 
- * @param GaugeWidth
- * @desc 背景ゲージ画像のトリミング横幅
- * @text 背景ゲージ画像トリミング横幅
- * @type number
- * @default 0
- * @min 0
- * 
- * @param GaugeHeight
- * @desc 背景ゲージ画像のトリミング高さ
- * @text 背景ゲージ画像トリミング高さ
- * @type number
- * @default 0
- * 
- * @param GaugeSX
- * @desc 背景ゲージ画像のトリミング座標X
- * @text 背景ゲージ画像トリミング座標X
- * @type number
- * @default 0
- * 
- * @param GaugeSY
- * @desc 背景ゲージ画像のトリミング座標Y
- * @text 背景ゲージ画像トリミング座標Y
- * @type number
- * @default 0
- * 
- * @param FrontImg
- * @text 前面画像設定
- * @default ------------------------------
- * 
- * @param FrontGaugeImg
- * @desc 前面画像ファイル名を指定します。
- * @text 前面画像
- * @type file[]
- * @dir img/
- * @default []
- * 
- * @param FrontGaugeX
- * @desc 前面画像の表示オフセット位置X
- * @text 前面画像表示オフセット位置X
- * @type number
- * @default 0
- * @min -999
- * 
- * @param FrontGaugeY
- * @desc 前面画像の表示オフセット位置Y
- * @text 前面画像表示オフセット位置Y
- * @type number
- * @default 0
- * @min -999
- * 
- * @param FrontGaugeWidth
- * @desc 前面ゲージ画像のトリミング横幅
- * @text 前面ゲージ画像トリミング横幅
- * @type number
- * @default 0
- * @min 0
- * 
- * @param FrontGaugeHeight
- * @desc 前面ゲージ画像のトリミング高さ
- * @text 前面ゲージ画像トリミング高さ
- * @type number
- * @default 0
- * 
- * @param FrontGaugeSX
- * @desc 前面ゲージ画像のトリミング座標X
- * @text 前面ゲージ画像トリミング座標X
- * @type number
- * @default 0
- * 
- * @param FrontGaugeSY
- * @desc 前面ゲージ画像のトリミング座標Y
- * @text 前面ゲージ画像トリミング座標Y
- * @type number
- * @default 0
- * 
  * @param MainImg
  * @text ゲージ画像設定
  * @default ------------------------------
  * 
  * @param MainGaugeImg
- * @desc メインゲージファイル名を指定します。
+ * @desc メインゲージファイル名を指定します。各画像設定で指定がない場合はこの画像が設定されます。
  * @text メインゲージ画像
  * @type file[]
  * @dir img/
  * @default []
  * 
  * @param MainGaugeX
- * @desc メインゲージの表示オフセット位置X
+ * @desc メインゲージのX座標を調整します。
  * @text メインゲージ表示オフセット位置X
  * @type number
  * @default 0
  * @min -999
  * 
  * @param MainGaugeY
- * @desc メインゲージの表示オフセット位置Y
+ * @desc メインゲージのY座標を調整します。
  * @text メインゲージ表示オフセット位置Y
  * @type number
  * @default 0
  * @min -999
  * 
- * @param MainGaugeCorrectionWidth
- * @desc メインゲージの補正幅（表示幅からの差）
- * @text メインゲージ補正幅
- * @type number
- * @default 0
- * @min -999
- * 
  * @param MainGaugeWidth
- * @desc メインゲージ画像のトリミング横幅
+ * @desc メインゲージ画像を表示する範囲横幅を指定します。
  * @text メインゲージ画像トリミング横幅
  * @type number
  * @default 0
  * @min 0
  * 
  * @param MainGaugeHeight
- * @desc メインゲージ画像のトリミング高さ
+ * @desc メインゲージ画像を表示する範囲高さを指定します。
  * @text メインゲージ画像トリミング高さ
  * @type number
  * @default 0
@@ -271,6 +177,12 @@
  * @type number
  * @default 0
  * 
+ * @param MainGaugeCorrectionWidth
+ * @desc メインゲージの補正幅（表示幅からの差）
+ * @text メインゲージ補正幅
+ * @type number
+ * @default 0
+ * @min -999
  * 
  * @param MainMaxGaugeVariable
  * @text 満タン時ゲージ画像切り替え
@@ -347,6 +259,125 @@
  * @type number
  * @default 0
  * 
+ * @param BackImg
+ * @text 背後画像設定
+ * @default ------------------------------
+ * 
+ * @param BackGaugeImgVariable
+ * @text 背後ゲージ画像表示
+ * @desc 背後ゲージ画像を表示します。未指定の場合はメインゲージ画像で設定した画像が参照されます。
+ * @type boolean
+ * @default true
+ * 
+ * @param GaugeImg
+ * @desc 背後ゲージ画像ファイル名を指定します。
+ * @text 背後ゲージ画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param GaugeX
+ * @desc 背後画像の表示オフセット位置X
+ * @text 背後画像表示オフセット位置X
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeY
+ * @desc 背後画像の表示オフセット位置Y
+ * @text 背後画像表示オフセット位置Y
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeCorrectionWidth
+ * @desc 背後画像の補正幅（表示幅からの差）
+ * @text 背後画像補正幅
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeWidth
+ * @desc 背後ゲージ画像のトリミング横幅
+ * @text 背後ゲージ画像トリミング横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param GaugeHeight
+ * @desc 背後ゲージ画像のトリミング高さ
+ * @text 背後ゲージ画像トリミング高さ
+ * @type number
+ * @default 0
+ * 
+ * @param GaugeSX
+ * @desc 背後ゲージ画像のトリミング座標X
+ * @text 背後ゲージ画像トリミング座標X
+ * @type number
+ * @default 0
+ * 
+ * @param GaugeSY
+ * @desc 背後ゲージ画像のトリミング座標Y
+ * @text 背後ゲージ画像トリミング座標Y
+ * @type number
+ * @default 0
+ * 
+ * @param FrontImg
+ * @text 前面画像設定
+ * @default ------------------------------
+ * 
+ * @param FrontGaugeImgVariable
+ * @text 前面ゲージ画像表示
+ * @desc 前面ゲージ画像を表示します。
+ * @type boolean
+ * @default true
+ * 
+ * @param FrontGaugeImg
+ * @desc 前面画像ファイル名を指定します。未指定の場合はメインゲージ画像で設定した画像が参照されます。
+ * @text 前面画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param FrontGaugeX
+ * @desc 前面画像の表示オフセット位置X
+ * @text 前面画像表示オフセット位置X
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param FrontGaugeY
+ * @desc 前面画像の表示オフセット位置Y
+ * @text 前面画像表示オフセット位置Y
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param FrontGaugeWidth
+ * @desc 前面ゲージ画像のトリミング横幅
+ * @text 前面ゲージ画像トリミング横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param FrontGaugeHeight
+ * @desc 前面ゲージ画像のトリミング高さ
+ * @text 前面ゲージ画像トリミング高さ
+ * @type number
+ * @default 0
+ * 
+ * @param FrontGaugeSX
+ * @desc 前面ゲージ画像のトリミング座標X
+ * @text 前面ゲージ画像トリミング座標X
+ * @type number
+ * @default 0
+ * 
+ * @param FrontGaugeSY
+ * @desc 前面ゲージ画像のトリミング座標Y
+ * @text 前面ゲージ画像トリミング座標Y
+ * @type number
+ * @default 0
+ * 
  * @param LabelImg
  * @text ラベル画像設定
  * @default ------------------------------
@@ -359,41 +390,41 @@
  * @default []
  * 
  * @param LabelGaugeX
- * @desc 背景画像の表示オフセット位置X
- * @text 背景画像表示オフセット位置X
+ * @desc ラベル画像の表示オフセット位置X
+ * @text ラベル画像表示オフセット位置X
  * @type number
  * @default 0
  * @min -999
  * 
  * @param LabelGaugeY
- * @desc 背景画像の表示オフセット位置Y
- * @text 背景画像表示オフセット位置Y
+ * @desc ラベル画像の表示オフセット位置Y
+ * @text ラベル画像表示オフセット位置Y
  * @type number
  * @default 0
  * @min -999
  * 
  * @param LabelGaugeWidth
- * @desc 背景ゲージ画像のトリミング横幅
- * @text 背景ゲージ画像トリミング横幅
+ * @desc ラベルゲージ画像のトリミング横幅
+ * @text ラベルゲージ画像トリミング横幅
  * @type number
  * @default 0
  * @min 0
  * 
  * @param LabelGaugeHeight
- * @desc 背景ゲージ画像のトリミング高さ
- * @text 背景ゲージ画像トリミング高さ
+ * @desc ラベルゲージ画像のトリミング高さ
+ * @text ラベルゲージ画像トリミング高さ
  * @type number
  * @default 0
  * 
  * @param LabelGaugeSX
- * @desc 背景ゲージ画像のトリミング座標X
- * @text 背景ゲージ画像トリミング座標X
+ * @desc ラベルゲージ画像のトリミング座標X
+ * @text ラベルゲージ画像トリミング座標X
  * @type number
  * @default 0
  * 
  * @param LabelGaugeSY
- * @desc 背景ゲージ画像のトリミング座標Y
- * @text 背景ゲージ画像トリミング座標Y
+ * @desc ラベルゲージ画像のトリミング座標Y
+ * @text ラベルゲージ画像トリミング座標Y
  * @type number
  * @default 0
  * 
@@ -409,6 +440,7 @@
  * @option 'Window_BattleActorStatus'
  * @option 'Window_Result'
  * @option 'Window_FormationStatus'
+ * @option 'Sprite_Enemy'
  * @default
  * 
  */
@@ -442,14 +474,14 @@ Imported.NUUN_GaugeImage = true;
   })
 
   function isGaugeImage(statusType, className) {
-    return GaugeImgList.find(data => data.Type[0] === statusType && data.GaugeImg && data.GaugeImg[0] && filteringClass(data, className));
+    return GaugeImgList.some(data => data.Type[0] === statusType && data.MainGaugeImg && data.MainGaugeImg[0] && filteringClass(data, className));
   };
 
   function filteringClass(data, className) {
-    if (!data.FilteringClass) {
+    if (!data.FilteringClass || data.FilteringClass.length === 0) {
       return true;
     }
-    return data.FilteringClass.find(filterClass => filterClass === className);
+    return data.FilteringClass.some(filterClass => filterClass === className);
   };
 
   function getFrontImgData (imgData) {
@@ -474,18 +506,14 @@ Imported.NUUN_GaugeImage = true;
       }
       const sprite = this.createInnerSprite(key, Sprite_GaugeImg);
       imgSprite = sprite;
-      sprite.setup(type, className);
+      sprite.setup(type);
       sprite.move(x, y);
       sprite.show();
     }
   };
 
-
-  Sprite.prototype.isGaugeImage = function(statusType) {
-    return GaugeImgList.find(data => data.Type[0] === statusType && data.GaugeImg && data.GaugeImg[0]);
-  };
-
-  Sprite.prototype.createGaugeImg = function(base, type) {
+  Sprite.prototype.createSpriteGauge = function(base, type) {
+    imgSprite = null;
     const className = String(this.constructor.name);
     if (isGaugeImage(type, className)) {
       const sprite = new Sprite_GaugeImg();
@@ -494,7 +522,12 @@ Imported.NUUN_GaugeImage = true;
       sprite.setup(type);
       sprite.move(0, 0);
       sprite.show();
+      sprite.enemySpriteId = this.spriteId;
     }
+  };
+
+  Sprite.prototype.isGaugeImage = function(statusType) {
+    return GaugeImgList.find(data => data.Type[0] === statusType && data.MainGaugeImg && data.MainGaugeImg[0]);
   };
 
 
@@ -520,7 +553,7 @@ Imported.NUUN_GaugeImage = true;
   };
 
   Sprite_GaugeImg.prototype.bitmapHeight = function() {
-    return 32;
+    return 70;
   };
 
   Sprite_GaugeImg.prototype.setup = function(statusType) {
@@ -579,6 +612,10 @@ Imported.NUUN_GaugeImage = true;
     this._mainBitmap2 = null;
     this._mainMaxBitmap = null;
     this._labelBitmap = null;
+    this._mainGaugeSX = 0;
+    this._mainGaugeSY = 0;
+    this._mainGaugeWidth = 0;
+    this._mainGaugeHeight = 0;
   };
 
   const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
@@ -586,8 +623,8 @@ Imported.NUUN_GaugeImage = true;
     this._gaugeImgData = imgSprite ? this.isGaugeImage(statusType) : null;
     if (this._gaugeImgData && !this._gaugeImgSprite) {
       this._statusType = statusType;
-      this.defaultGaugeImg();
       this.setGaugeImg();
+      this.defaultGaugeImg();
     }
     imgSprite = null;
     _Sprite_Gauge_setup.call(this, battler, statusType);
@@ -603,31 +640,34 @@ Imported.NUUN_GaugeImage = true;
     }
   };
 
-  Sprite_Gauge.prototype.createGaugeBitmap = function() {;
+  Sprite_Gauge.prototype.createGaugeBitmap = function() {
     if (this._gaugeImgSprite) {
       const data = this._gaugeImgData;
-      const bitmap = ImageManager.nuun_LoadPictures(data.GaugeImg[0]);
-      this._gaugeBitmap = bitmap;
-      this._frontBitmap = data.FrontGaugeImg && data.FrontGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.FrontGaugeImg[0]) : bitmap;
-      this._mainBitmap = data.MainGaugeImg && data.MainGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.MainGaugeImg[0]) : bitmap;
+      const mainBitmap = ImageManager.nuun_LoadPictures(data.MainGaugeImg[0]);
+      if (data.FrontGaugeImgVariable) {
+        this._frontBitmap = data.FrontGaugeImg && data.FrontGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.FrontGaugeImg[0]) : mainBitmap;
+      }
+      if (data.BackGaugeImgVariable) {
+        this._gaugeBitmap = data.GaugeImg && data.GaugeImg[0] ? ImageManager.nuun_LoadPictures(data.GaugeImg[0]) : mainBitmap;
+      }
       if (data.MainGauge2Variable) {
-        this._mainBitmap2 = data.MainGaugeImg2 && data.MainGaugeImg2[0] ? ImageManager.nuun_LoadPictures(data.MainGaugeImg2[0]) : bitmap;
+        this._mainBitmap2 = data.MainGaugeImg2 && data.MainGaugeImg2[0] ? ImageManager.nuun_LoadPictures(data.MainGaugeImg2[0]) : mainBitmap;
       }
       if (data.MainMaxGaugeVariable) {
-        this._mainMaxBitmap = data.MainMaxGaugeImg && data.MainMaxGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.MainMaxGaugeImg[0]) : bitmap;
+        this._mainMaxBitmap = data.MainMaxGaugeImg && data.MainMaxGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.MainMaxGaugeImg[0]) : mainBitmap;
       }
       this._labelBitmap = data.LabelGaugeImg && data.LabelGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.LabelGaugeImg[0]) : null;
-      if (!bitmap.isReady()) {
-        bitmap.addLoadListener(this.baseGaugeSetup.bind(this, bitmap, data));
-      } else if (!this._frontBitmap.isReady()) {
-        this._frontBitmap.addLoadListener(this.baseGaugeSetup.bind(this, bitmap, data));
-      } else {
-        this.baseGaugeSetup(bitmap, data);
+      this._mainBitmap = mainBitmap;
+      const bitmap = this._gaugeBitmap;
+      if (bitmap && !bitmap.isReady()) {
+        bitmap.addLoadListener(this.baseGaugeSetup.bind(this, data, bitmap));
+      } else if (bitmap) {
+        this.baseGaugeSetup(data, bitmap);
       }
     }
   };
 
-  Sprite_Gauge.prototype.baseGaugeSetup  = function(bitmap, data) {
+  Sprite_Gauge.prototype.baseGaugeSetup  = function(data, bitmap) {
     const scale = (data.GaugeImgScale || 100) / 100;
     const correctionWidth = data.GaugeCorrectionWidth || 0;
     const context = this._baseGaugeSprite.bitmap.context;
@@ -637,32 +677,36 @@ Imported.NUUN_GaugeImage = true;
     const sw = data.GaugeWidth || bitmap.width;
     const sh = data.GaugeHeight || bitmap.height;
     const x = this.gaugeX() + data.GaugeX + data.GaugeOffSetX;
-    const y = this.textHeight() - (sh * scale) + data.GaugeY;//Ver.1.3.3以降
+    const y = this.textHeight() - (sh * scale) + data.GaugeY;
     const gaugewidth = data.GaugeImgVariable ? this.bitmapWidth() - x + correctionWidth : Math.floor(sw * scale + correctionWidth);
     this._baseGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth, sh * scale);
-    this.mainGaugeSetup(data);
+    this.createFrontGaugeBitmap(data);
   };
 
-  Sprite_Gauge.prototype.frontGaugeSetup  = function(bitmap, data) {
+  Sprite_Gauge.prototype.frontGaugeSetup  = function(data) {
     if (this._frontGaugeSprite) {
       const scale = (data.GaugeImgScale || 100) / 100;
       const context = this._frontGaugeSprite.bitmap.context;
+      const bitmap = this._frontBitmap;
       context.setTransform(1, 0, this.gaugeInclinedRate(data), 1, 0, 0);
       const sx = data.FrontGaugeSX || 0;
       const sy = data.FrontGaugeSY || 0;
       const sw = data.FrontGaugeWidth || bitmap.width;
       const sh = data.FrontGaugeHeight || bitmap.height;
       const x = this.gaugeX() + data.FrontGaugeX + data.GaugeOffSetX;
-      const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;//Ver.1.3.3以降
+      const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;
       const gaugewidth = data.GaugeImgVariable ? this.bitmapWidth() - x : sw * scale;
       this._frontGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth ,sh * scale);
     }
   };
 
-  Sprite_Gauge.prototype.mainGaugeSetup  = function(data) {
-    const context = this._mainGaugeSprite.bitmap.context;
-    context.setTransform(1, 0, this.gaugeInclinedRate(data), 1, 0, 0);
-    this.frontGaugeSetup(this._frontBitmap, data);
+  Sprite_Gauge.prototype.createFrontGaugeBitmap  = function(data) {
+    const bitmap = this._frontBitmap;
+    if (bitmap && bitmap.isReady()) {
+      bitmap.addLoadListener(this.frontGaugeSetup.bind(this, data));
+    } else if (bitmap) {
+      this.frontGaugeSetup(data);
+    }
   };
 
   const _Sprite_Gauge_drawGaugeRect = Sprite_Gauge.prototype.drawGaugeRect;
@@ -679,11 +723,11 @@ Imported.NUUN_GaugeImage = true;
       const sw = this._mainGaugeWidth || bitmap.width;
       const sh = this._mainGaugeHeight || bitmap.height;
       const rate = this.gaugeRate();
-      const dw = Math.floor((data.GaugeWidth - sw) / 2 * rate);
+      //const dw = Math.floor((data.GaugeWidth - sw) / 2 * rate);
       const gaugeWidth = Math.floor(sw * rate);
       const x = gaugeX + data.MainGaugeX + data.GaugeOffSetX;
-      const y = this.textHeight() - (sh * scale) + data.MainGaugeY;//Ver.1.3.3以降;
-      const w = data.GaugeImgVariable ? (this.bitmapWidth() - x - dw + correctionWidth) * rate : gaugeWidth * scale + correctionWidth;
+      const y = Math.floor(this.textHeight() - (sh * scale)) + data.MainGaugeY;//Ver.1.3.3以降;
+      const w = data.GaugeImgVariable ? Math.floor((this.bitmapWidth() - x + correctionWidth) * rate) : Math.floor(gaugeWidth * scale + correctionWidth);
       this._mainGaugeSprite.bitmap.blt(bitmap, sx, sy, gaugeWidth, sh, x, y, w, sh * scale);
     } else {
       _Sprite_Gauge_drawGaugeRect.call(this, x, y, width, height);
@@ -700,7 +744,7 @@ Imported.NUUN_GaugeImage = true;
     this.updateGaugeImg();
   };
 
-  Sprite_Gauge.prototype.updateGaugeImg  = function() {//MainGauge2Variable
+  Sprite_Gauge.prototype.updateGaugeImg  = function() {
     if (this._gaugeImgSprite) {
       if (this._mainBitmap2 && this._statusType == 'hp' && this._battler.isDying()) {
         this.changeGaugeImg();
@@ -712,7 +756,7 @@ Imported.NUUN_GaugeImage = true;
         this.defaultGaugeImg();
       }
     }
-  };//MainMaxGaugeVariable
+  };
 
   Sprite_Gauge.prototype.changeGaugeImg  = function() {
     const data = this._gaugeImgData;

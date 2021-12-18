@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -38,6 +38,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/19 Ver.1.0.4
+ * ゲージ表示拡張併用時にエラーが出る問題を修正。
  * 2021/12/5 Ver.1.0.3
  * ゲージ表示拡張プラグインとの競合対策。
  * 2021/11/24 Ver.1.0.2
@@ -601,11 +603,11 @@ Sprite_PartyGauge.prototype.labelFontSize = function() {
 };
 
 Sprite_PartyGauge.prototype.gaugeColor1 = function() {
-  return Imported.NUUN_GaugeValueEX ? getColorCode(this.changeGaugeColor1()) : getColorCode(PartyGaugeColor1);
+  return this._isGaugeData ? getColorCode(this.changeGaugeColor1()) : getColorCode(PartyGaugeColor1);
 };
 
 Sprite_PartyGauge.prototype.gaugeColor2 = function() {
-  return Imported.NUUN_GaugeValueEX ? getColorCode(this.changeGaugeColor2()) : getColorCode(PartyGaugeColor2);
+  return this._isGaugeData ? getColorCode(this.changeGaugeColor2()) : getColorCode(PartyGaugeColor2);
 };
 
 Sprite_PartyGauge.prototype.labelColor = function() {

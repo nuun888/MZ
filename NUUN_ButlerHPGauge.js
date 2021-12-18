@@ -9,14 +9,14 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  バトラーHPゲージ
+ * @plugindesc  敵HPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.3.3
+ * @version 1.4.0
  * @orderAfter NUUN_Base
  * 
  * @help
- * 敵のバトラー上にHPゲージを表示します。
+ * 敵のバトラー上にHP、MP、TPゲージを表示します。
  * 
  * 敵キャラのメモ欄
  * <HPGaugeX:[position]> HPゲージのX座標を調整します。（相対座標）
@@ -43,12 +43,15 @@
  * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
  * 
  * 疑似３Dバトルを入れている場合はこのプラグインを疑似３Dバトルを下に配置してください。
+ * ゲージ表示拡張プラグインで該当のゲージを設定している場合は、フォントサイズの設定はゲージ表示拡張プラグインで設定してください。
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/19 Ver.1.4.0
+ * ゲージ画像化対応。
  * 2021/11/8 Ver.1.3.3
  * 敵グループの座標変更の設定方法を変更。
  * 2021/11/6 Ver.1.3.2
@@ -85,6 +88,10 @@
  * HPゲージを表示させない機能を追加。
  * 2021/5/24 Ver.1.0.0
  * 初版
+ * 
+ * @param CommonSetting
+ * @text 共通設定
+ * @default ------------------------------
  * 
  * @param HPPosition
  * @desc エネミーのHPゲージ位置
@@ -233,8 +240,6 @@ let hpGaugePositionList = [];
 const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
 Sprite_Enemy.prototype.initMembers = function() {
   _Sprite_Enemy_initMembers.call(this);
-  this._butlerHpPositionX = 0;
-  this._butlerHpPositionY = 0;
 };
 
 const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
@@ -256,17 +261,19 @@ Sprite_Enemy.prototype.updateHpGauge = function() {
       this._butlerHp.y -= Math.floor(this.getButlerHpHeight() / 2);
     }
     this.hpGaugeOpacity();
+    if (this._butlerHp._gaugeImgSprite) {
+      this._butlerHp._gaugeImgSprite.x = this._butlerHp.x;
+      this._butlerHp._gaugeImgSprite.y = this._butlerHp.y;
+    }
   }
-};
-
-Sprite_Enemy.prototype.setHPGaugePosition = function(x, y) {
-  this._butlerHpPositionX = x;
-  this._butlerHpPositionY = y;
 };
 
 Sprite_Enemy.prototype.enemyHPGauge = function() {
   const butlerGaugeBase = BattleManager.gaugeBaseSprite;
   if (this._enemy.showHpGauge) {
+    if (Imported.NUUN_GaugeImage) {
+      this.createSpriteGauge(butlerGaugeBase, 'hp');
+    }
     const sprite = new Sprite_EnemyHPGauge();
     butlerGaugeBase.addChild(sprite);
     sprite.setup(this._enemy, "hp");
@@ -307,6 +314,9 @@ Sprite_Enemy.prototype.getButlerHpPosition = function() {
 Sprite_Enemy.prototype.hpGaugeOpacity = function() {
   if (this._effectType !== "blink") {
     this._butlerHp.opacity = this.opacity;
+    if (this._butlerHp._gaugeImgSprite) {
+      this._butlerHp._gaugeImgSprite.opacity = this.opacity;
+    }
   }
 };
 
@@ -375,11 +385,11 @@ Sprite_EnemyHPGauge.prototype.gaugeHeight = function() {
 };
 
 Sprite_EnemyHPGauge.prototype.labelFontSize = function() {
-  return $gameSystem.mainFontSize() + LabelFontSize;
+  return this._gaugeData ? Sprite_Gauge.prototype.labelFontSize.call(this) : $gameSystem.mainFontSize() + LabelFontSize;
 };
 
 Sprite_EnemyHPGauge.prototype.valueFontSize = function() {
-  return $gameSystem.mainFontSize() + ValueFontSize;
+  return this._gaugeData ? Sprite_Gauge.prototype.valueFontSize.call(this) : $gameSystem.mainFontSize() + ValueFontSize;
 };
 
 Sprite_EnemyHPGauge.prototype.drawLabel = function() {
@@ -388,12 +398,11 @@ Sprite_EnemyHPGauge.prototype.drawLabel = function() {
   }
 };
 
-const _Sprite_EnemyHPGauge_gaugeX = Sprite_EnemyHPGauge.prototype.gaugeX ;
 Sprite_EnemyHPGauge.prototype.gaugeX = function() {
-  if (!HPLabelVisible) {
+  if (!HPLabelVisible || !this._isGaugeData) {
     return 0;
   } else {
-    return _Sprite_EnemyHPGauge_gaugeX.call(this);
+    return Sprite_Gauge.prototype.gaugeX.call(this);
   }
 };
 

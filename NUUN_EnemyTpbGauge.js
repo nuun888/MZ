@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  モンスターTPBゲージ
  * @author NUUN
- * @version 1.2.2
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -35,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/19 Ver.1.3.0
+ * ゲージ画像化に対応。
  * 2021/11/8 Ver.1.2.2
  * 敵グループの座標変更の設定方法を変更。
  * 2021/11/7 Ver.1.2.1
@@ -163,11 +165,18 @@ Sprite_Enemy.prototype.updateTpbGauge = function() {
       this._enemyTpb.y -= Math.floor(this.getButlerTpbHeight() / 2);
     }
     this.tpbGaugeOpacity();
+    if (this._enemyTpb._gaugeImgSprite) {
+      this._enemyTpb._gaugeImgSprite.x = this._enemyTpb.x;
+      this._enemyTpb._gaugeImgSprite.y = this._enemyTpb.y;
+    }
   }
 };
 
 Sprite_Enemy.prototype.enemyTpbGauge = function() {
   const butlerGaugeBase = BattleManager.gaugeBaseSprite;
+  if (Imported.NUUN_GaugeImage) {
+    this.createSpriteGauge(butlerGaugeBase, 'time');
+  }
   const sprite = new Sprite_EnemyTPBGauge();
   butlerGaugeBase.addChild(sprite);
   sprite.setup(this._enemy, "time");
@@ -208,6 +217,9 @@ Sprite_Enemy.prototype.getButlerTpbPosition = function() {
 Sprite_Enemy.prototype.tpbGaugeOpacity = function() {
   if (this._effectType !== "blink") {
     this._enemyTpb.opacity = this.opacity;
+    if (this._enemyTpb._gaugeImgSprite) {
+      this._enemyTpb._gaugeImgSprite.opacity = this.opacity;
+    }
   }
 };
 

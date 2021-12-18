@@ -13,6 +13,7 @@
  * @version 1.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
+ * @orderAfter NUUN_GaugeImage
  * 
  * @help
  * ゲージの表示を拡張します。

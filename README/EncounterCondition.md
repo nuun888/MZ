@@ -1,7 +1,7 @@
 # [ゲージ画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)
 # Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)  
-対応プラグイン
+対応プラグイン  
 [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)  
 
 敵グループに対してエンカウント条件を付けます。  

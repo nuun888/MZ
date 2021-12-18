@@ -2,7 +2,7 @@
 # Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)  
 対応プラグイン  
-[条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)  
+[条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)  
 
 敵グループに対してエンカウント条件を付けます。  
 ## 設定方法

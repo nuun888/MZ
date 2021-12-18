@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -80,6 +80,10 @@
  * 使用者、または対象のIDが「指定した数値」(3)を一致なら条件を満たします。
  * [一致したバトラーID数]
  * 「指定した数値」(3)が一致したIDの数が「上限下限値内」(1)または「指定した数値」(2)と一致なら条件を満たします。
+ * [アクターなら]
+ * 対象がアクター、パーティなら条件を満たします。
+ * [敵なら]
+ * 対象が敵、敵グループなら条件を満たします。
  * 
  * 【職業】
  * [クラスID]
@@ -235,8 +239,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/18 Ver.1.1.1
+ * 使用者、または対象がアクター、敵の条件を追加。
  * 2021/12/13 Ver.1.1.0
- * 条件にアイテム、武器、防具の所持、スキルの習得、スキルタイプ、所持金、反撃、魔法反射を追加しました。
+ * 条件にアイテム、武器、防具の所持、スキルの習得、スキルタイプ、所持金、反撃、魔法反射を追加。
  * スキル、アイテム使用が適用されていなかった問題を修正。
  * 2021/11/27 Ver.1.0.5
  * 装備判定が適用されていなかった問題を修正。
@@ -339,6 +345,10 @@
  * @value 'ID'
  * @option 一致したバトラーID数(1)(2)(3)（(1)バトラー数、(2)バトラー数、(3)バトラーID）
  * @value 'IDNum'
+ * @option アクターなら
+ * @value 'IsActor'
+ * @option 敵なら
+ * @value 'IsEnemy'
  * @default 
  * 
  * @param ClassConditionsType
@@ -829,6 +839,18 @@ function battlerTriggerConditions(data, target, mode) {
   } else if (data.BattlerConditionsType === 'IDNum') {
     sum = membersSum(data.IDList, unit);
     return conditionsNum(data, sum);
+  } else if (data.BattlerConditionsType === 'IsActor') {
+    if (mode === 'Party') {
+      return true;
+    } else {
+      return target.isActor();
+    }
+  } else if (data.BattlerConditionsType === 'IsEnemy') {
+    if (mode === 'Troop') {
+      return true;
+    } else {
+      return target.isEnemy();
+    }
   }
 };
 

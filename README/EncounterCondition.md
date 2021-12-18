@@ -1,10 +1,12 @@
 # [ゲージ画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)
 # Ver.1.2.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)  
+対応プラグイン
+[条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)  
 
 敵グループに対してエンカウント条件を付けます。  
 ## 設定方法
-敵グループの１ページ目に注釈で以下のタグを記入してください。  
+敵グループの１ページ目に注釈(comment)で以下のタグを記入してください。  
 条件が複数の場合、全ての条件に合致した場合のみエンカウント候補になります。  
 
 変数  

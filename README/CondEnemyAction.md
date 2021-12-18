@@ -1,5 +1,6 @@
 # [敵の行動パターン条件拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js)
 # Ver.1.0.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js)
 
 ### 必須プラグイン
 [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)

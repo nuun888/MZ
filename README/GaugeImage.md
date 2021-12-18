@@ -65,6 +65,17 @@
 ### 傾斜率
 
 ### フィルタリングクラス
+Window_MenuStatus：メニュー画面
+Window_Status：ステータス画面
+Window_BattleStatus：戦闘画面
+Window_MenuActor：メニュー時アクター選択画面
+Window_BattleActor：戦闘時アクター選択画面
+Window_BattleActorStatus：戦闘画面（バトルスタイル拡張EX）
+Window_Result：リザルト画面（リザルト）
+Window_FormationStatus：メンバー変更画面（メンバー変更画面）
+Sprite_Enemy：モンスター（敵HPゲージ、敵TPBゲージ）
+
+
 敵のゲージのみに画像を適用するにはフィルタリングクラス設定に'Sprite_Enemy'を指定してください。
 
 ## 更新履歴

@@ -1,4 +1,4 @@
-# [ゲージ画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)
+# [エンカウント条件](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)
 # Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)  
 対応プラグイン  

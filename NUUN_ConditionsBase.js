@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -74,6 +74,12 @@
  * [生存メンバー数]
  * 戦闘メンバーで戦闘不能になっていない該当のメンバーの数が「上限下限値内」(1)または「指定した数値」(2)と一致なら条件を満たします。
  * 敵グループは戦闘中以外の場合はfalseを返します。
+ * [戦闘不能メンバー数]
+ * 戦闘メンバーで戦闘不能になっている該当のメンバーの数が「上限下限値内」(1)または「指定した数値」(2)と一致なら条件を満たします。
+ * 敵グループは戦闘中以外の場合はfalseを返します。
+ * [サポートメンバー数]
+ *  戦闘メンバーでサポートアクター数が「上限下限値内」(1)または「指定した数値」(2)と一致なら条件を満たします。
+ * 要サポートアクタープラグイン
  * 
  * 【アクター、敵】
  * [バトラーID]
@@ -239,6 +245,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/19 Ver.1.1.2
+ * 条件に戦闘不能メンバー、サポートアクターメンバーを追加。
+ * エンカウント条件適用による処理の追加。
  * 2021/12/18 Ver.1.1.1
  * 使用者、または対象がアクター、敵の条件を追加。
  * 2021/12/13 Ver.1.1.0
@@ -335,6 +344,10 @@
  * @value 'BattleMember'
  * @option 生存メンバー数(1)(2)（(1)バトラー数、(2)バトラー数）
  * @value 'AliveMember'
+ * @option 戦闘不能メンバー数(1)(2)（(1)バトラー数、(2)バトラー数）
+ * @value 'DeadMember'
+ * @option サポートメンバー数(1)(2)（(1)バトラー数、(2)バトラー数）要サポートアクタープラグイン
+ * @value 'SupportMember'
  * @default 
  * 
  * @param BattlerConditionsType
@@ -727,6 +740,14 @@ Game_BattlerBase.prototype.getTriggerConditions  = function(obj, target, tag1, t
   return getTriggerConditions(obj, this, target, tag1, tag2, tag3, tag4, action, damage, partialMode);
 };
 
+Game_Player.prototype.getTriggerConditions  = function(list, partialMode) {
+  if (partialMode === 0) {
+    return isTriggerConditionsSome(list, null, 'Party', null, null);
+  } else {
+    return isTriggerConditionsEvery(list, null, 'Party', null, null);
+  }
+};
+
 function getTriggerConditions(obj, subject, target, tag1, tag2, tag3, tag4, action, damage, partialMode) {
   if (getTriggerConditionsMeta(obj, tag1, tag2, tag3, tag4)) {
     const result1 = getTriggerConditionsResult(obj, subject, tag1, 'Subject', action, damage, partialMode);
@@ -824,6 +845,10 @@ function memberTriggerConditions(data, target, mode) {
     return conditionsNum(data, unit.members().length);
   } else if (data.MemberConditionsType === 'AliveMember') {
     return conditionsNum(data, unit.aliveMembers().length);
+  } else if (data.MemberConditionsType === 'DeadMember') {
+    return conditionsNum(data, unit.deadMembers().length);
+  } else if (Imported.NUUN_SupportActor && data.MemberConditionsType === 'SupportMember') {
+    return conditionsNum(data, unit.supportBattleMembers().length);
   }
 };
 

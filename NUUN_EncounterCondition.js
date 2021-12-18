@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc エンカウント条件
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  * 
  * @help
  * 敵グループに対してエンカウント条件を付けます。
@@ -19,21 +19,27 @@
  * 条件が複数の場合、全ての条件に合致した場合のみエンカウント候補になります。
  * 
  * 変数
- * <Enc_Cond:[mode],[id],[val][Inequality]>
+ * <Enc_Cond:[type],[id],[val][Inequality]>
  * スイッチ
- * <Enc_Cond:[mode],[id],[flags]>
+ * <Enc_Cond:[type],[id],[flags]>
  * 乗り物
- * <Enc_Cond:[mode],[vehicle],[flags]>
+ * <Enc_Cond:[type],[vehicle],[flags]>
  * 条件式
- * <Enc_Cond:[mode],[code]>
- * [mode]:数値で指定
- * 0:変数　1:スイッチ　2:乗り物　10:評価式
+ * <Enc_Cond:[type],[code]>
+ * 条件付きベースでの条件
+ * <Enc_Cond:[type], [mode], [condid], [condid], ...>
+ * 
+ * [type]:数値で指定
+ * 0:変数　1:スイッチ　2:乗り物　10:評価式 20:条件付きベース条件
  * [id]:ゲーム変数、スイッチのID(１以上の整数)
  * [val]:比較する数値（数値)
  * [Inequality]:不等号
  * equal:等しい　greater:より大きい　less:未満　greaterEqual:以上　lessEqual:以下
  * [flags]:フラグ　trueまたはfalse
  * [vehicle]:乗り物　boat:小型船　ship:大型船　airship:飛行船　vehicle:乗り物
+ * [mode]:条件モード　0 いずれかが一致　1：全て一致　※要条件付きベース
+ * [condid]:条件付きベースで設定したリストID　※要条件付きベース
+ * 
  * 
  * <Enc_Cond:0, 3, 6, equal> 変数のID３の値が6と同じ場合、エンカウントします。
  * <Enc_Cond:0, 3, 6, greater> 変数のID３の値が6より大きい場合、エンカウントします。
@@ -45,6 +51,8 @@
  * <Enc_Cond:2, boat, true> ボートに乗っている場合のみエンカウントします。
  * <Enc_Cond:2, vehicle, false> 乗り物に乗っていない場合のみエンカウントします。
  * <Enc_Cond:10, 条件式> 条件式に合致する場合、エンカウントします。
+ * 
+ * 条件付きベースでの条件はパーティのみの判定になります。
  * 
  * 
  * 旧方式
@@ -67,6 +75,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/19 Ver.1.2.0
+ * 条件付きベースによる条件に対応。
  * 2021/8/5 Ver.1.1.0
  * エンカウント条件のタグ記述方式を変更。
  * 2021/1/4 Ver.1.0.0
@@ -126,6 +136,8 @@ Imported.NUUN_EncounterCondition = true;
       return eval(conditions.deta);
     } else if (conditions.type === 3) {
       return this.enc_vehicleConditions(conditions.deta);
+    } else if (Imported.NUUN_ConditionsBase && conditions.type === 10) {
+      return this.enc_ConditionsEx(conditions.deta, conditions.mode);
     }
     return false;
   };
@@ -143,6 +155,10 @@ Imported.NUUN_EncounterCondition = true;
       return this.isInVehicle() === booleanValue;
     }
     return false;
+  };
+
+  Game_Player.prototype.enc_ConditionsEx = function(data, mode) {
+    return this.getTriggerConditions(data, mode);
   };
 
   const _Game_Map_setup = Game_Map.prototype.setup;
@@ -196,7 +212,13 @@ Imported.NUUN_EncounterCondition = true;
       return {type: 3, deta: [encData[1], encData[2]]};
     } else if (encType === 10) {
       return {type: 2, deta: encData[1]};
+    } else if (encType === 20) {
+      return {type: 10, deta: setCondBase(encData), mode: encData[1]};
     }
     return null;
   };
+
+  function setCondBase(data) {
+    return data.slice(2);
+  }
 })();

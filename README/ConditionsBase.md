@@ -224,6 +224,7 @@
 [踏み止まり特徴](https://github.com/nuun888/MZ/blob/master/README/StoppingFeature.md)  
 [行動時ブースト特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_boostEX.js)  
 [条件付きドロップアイテム](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md)  
+[敵の行動パターン条件拡張](https://github.com/nuun888/MZ/blob/master/README/CondEnemyAction.md)  
 
 ## 更新履歴
 2021/12/13 Ver.1.1.0  

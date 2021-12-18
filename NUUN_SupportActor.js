@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  *            
  * @help
  * 戦闘でサポートするアクターを設定します。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/11/3 Ver.1.3.1
+ * 特定条件下で戦闘中に攻撃コマンドを使用するとエラーが出る問題を修正。
  * 2021/11/3 Ver.1.3.0
  * プラグインコマンドからサポートアクターを設定できる機能を追加。
  * 2021/8/17 Ver.1.2.3
@@ -146,7 +148,7 @@ Imported.NUUN_SupportActor = true;
   };
 
   Game_Actor.prototype.isSupportActor = function() {
-    return this.actor().meta.SupportActor;
+    return !!this.actor().meta.SupportActor;
   };
 
   Game_Actor.prototype.noResultSupportActor = function() {
@@ -199,8 +201,8 @@ Imported.NUUN_SupportActor = true;
   const _Game_Party_battleMembers = Game_Party.prototype.battleMembers;
   Game_Party.prototype.battleMembers = function() {
     let members = _Game_Party_battleMembers.call(this);
-    members = members.concat(this.addBattleMembers());//SupportActorMode
     if (!this.membersMode && this.inBattle()) {
+      members = members.concat(this.addBattleMembers());
       members = this.MainBattleMembers(members).slice(0,this.maxBattleMembers());//サポートメンバーを除外
       if (this.svMembersMode) {
         this.svMembersMode = false;
@@ -209,13 +211,18 @@ Imported.NUUN_SupportActor = true;
       return members;
     } else {
       this.membersMode = false;
+      return members.concat(this.addSupportMembers());
     }
-    const supportNum = this.supportBattleMembers().length;
-    return members.slice(0,this.maxBattleMembers() + supportNum);
   };
+
+
 
   Game_Party.prototype.addBattleMembers = function() {
     return this.allMembers().slice(this.maxBattleMembers());
+  };
+
+  Game_Party.prototype.addSupportMembers = function() {
+    return this.allMembers().slice(this.maxBattleMembers()).filter(actor => actor.isAppeared() && actor.getSupportActor());
   };
 
   Game_Party.prototype.MainBattleMembers = function(members) {

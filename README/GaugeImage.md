@@ -1,5 +1,5 @@
 # [ゲージ画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js)
-# Ver.1.3.0
+# Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js)
 
 ゲージを画像化します。  
@@ -64,6 +64,9 @@
 ### 傾斜率
 
 ## 更新履歴
+2021/12/19 Ver.1.4.0  
+ゲージプラグイン対応による処理追加。  
+ゲージの画像設定を変更。  
 2021/10/4 Ver.1.3.0  
 最大時の画像を設定できる機能を追加。  
 溺死、キャストタイム中のゲージの画像が、特定条件の画像設定をしていなかった場合反映しなかった問題を修正。  

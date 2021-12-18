@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -52,6 +52,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/19 Ver.1.4.1
+ * フィルタリングクラスが正常に適用されていなかった問題を修正。
  * 2021/12/19 Ver.1.4.0
  * ゲージプラグイン対応による処理追加。
  * ゲージの画像設定を変更。
@@ -474,7 +476,7 @@ Imported.NUUN_GaugeImage = true;
   })
 
   function isGaugeImage(statusType, className) {
-    return GaugeImgList.some(data => data.Type[0] === statusType && data.MainGaugeImg && data.MainGaugeImg[0] && filteringClass(data, className));
+    return GaugeImgList.find(data => data.Type[0] === statusType && data.MainGaugeImg && data.MainGaugeImg[0] && filteringClass(data, className));
   };
 
   function filteringClass(data, className) {
@@ -497,7 +499,8 @@ Imported.NUUN_GaugeImage = true;
   Window_StatusBase.prototype.placeGaugeImg = function(battler, type, x, y) {
     imgSprite = null;
     const className = String(this.constructor.name);
-    if (isGaugeImage(type, className)) {
+    const find = isGaugeImage(type, className);
+    if (find) {
       let key = null;
       if (battler.isActor()) {
         key = "actor%1-gaugeImg-%2".format(battler.actorId(), type);
@@ -506,7 +509,7 @@ Imported.NUUN_GaugeImage = true;
       }
       const sprite = this.createInnerSprite(key, Sprite_GaugeImg);
       imgSprite = sprite;
-      sprite.setup(type);
+      sprite.setup(type, find);
       sprite.move(x, y);
       sprite.show();
     }
@@ -515,11 +518,12 @@ Imported.NUUN_GaugeImage = true;
   Sprite.prototype.createSpriteGauge = function(base, type) {
     imgSprite = null;
     const className = String(this.constructor.name);
-    if (isGaugeImage(type, className)) {
+    const find = isGaugeImage(type, className);
+    if (find) {
       const sprite = new Sprite_GaugeImg();
       base.addChild(sprite);
       imgSprite = sprite;
-      sprite.setup(type);
+      sprite.setup(type, find);
       sprite.move(0, 0);
       sprite.show();
       sprite.enemySpriteId = this.spriteId;
@@ -556,9 +560,9 @@ Imported.NUUN_GaugeImage = true;
     return 70;
   };
 
-  Sprite_GaugeImg.prototype.setup = function(statusType) {
+  Sprite_GaugeImg.prototype.setup = function(statusType, data) {
     this._statusType = statusType;
-    this._gaugeImgData = this.isGaugeImage(statusType);
+    this._gaugeImgData = data;
     this.createBitmap();
     this.createGaugeBitmap();
   };
@@ -620,7 +624,7 @@ Imported.NUUN_GaugeImage = true;
 
   const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
   Sprite_Gauge.prototype.setup = function(battler, statusType) {
-    this._gaugeImgData = imgSprite ? this.isGaugeImage(statusType) : null;
+    this._gaugeImgData = imgSprite ? imgSprite._gaugeImgData : null;
     if (this._gaugeImgData && !this._gaugeImgSprite) {
       this._statusType = statusType;
       this.setGaugeImg();

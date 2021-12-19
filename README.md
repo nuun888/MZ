@@ -26,7 +26,8 @@
 | ┗  リザルト時スプライト非表示 | [NUUN_ResultSpriteHide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultSpriteHide.js) | 共 | 1.0.0 |
 | サポートアクター | [NUUN_SupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js) |  | 1.3.0 |
 | ┣  サポートアクターインジケーター | [NUUN_DisplaySupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) |  | 1.2.0 |
-| ┗  サポートアクターインジケータースプライト版 |  |  |
+| ┣  サポートアクターインジケータースプライト版 |  |  |
+| ┗  召喚アクター |  |  |
 | ダメージポップアップ画像化  | [NUUN_DamagePopUpImg](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpImg.js) |  | 1.0.0 |
 | ステート、バフポップアップ | [NUUN_popUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js) | 共 | 1.0.1 |
 | TP円形ゲージ | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js) |  | 1.0.4 |

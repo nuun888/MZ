@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,18 +26,7 @@
  * 
  * 'result_exp'　リザルト獲得経験値ゲージ
  * 'exp' ステータス画面経験値ゲージ
- * 
- * ゲージ幅引き伸ばし：ゲージの表示横幅の範囲で表示しゲージを引き延ばして標示します。
- * 画像拡大率：画像の拡大率を設定します。
- * 全ゲージ画像のオフセット座標：全画像ゲージのX座標を調整します。
- * 傾斜率：画像を斜めに表示させます。-で右上がりになります。
- * 表示オフセット位置X：画像の表示させるX座標を調整します。
- * 表示オフセット位置Y：画像の表示させるY座標を調整します。
- * 補正幅：画像の表示横幅の補正する横幅を設定します。
- * トリミング横幅：表示させる画像横幅の表示範囲を指定します。
- * トリミング高さ：表示させる画像高さの表示範囲を指定します。
- * トリミング座標X：表示させる画像の左の開始表示座標を指定します。
- * トリミング座標Y：表示させる画像の上の開始表示座標を指定します。
+ * 'limit' パーティリミットゲージ画像
  * 
  * 後面画像：一番後ろに表示される画像です。
  * 前面画像：一番手前に表示される装飾用の画像です。
@@ -52,6 +41,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/20 Ver.1.4.2
+ * パーティゲージの画像化に対応。
+ * 前面ゲージ画像を可変表示させない範囲を設定できる機能を追加。
  * 2021/12/19 Ver.1.4.1
  * フィルタリングクラスが正常に適用されていなかった問題を修正。
  * 2021/12/19 Ver.1.4.0
@@ -94,6 +86,7 @@
  * @option 'time'
  * @option 'result_exp'
  * @option 'exp'
+ * @option 'limit'
  * @default 
  * 
  * @param GaugeImgVariable
@@ -380,6 +373,18 @@
  * @type number
  * @default 0
  * 
+ * @param FrontGaugeLeftWidth
+ * @desc 前面ゲージ画像の左側の可変させない横幅。（可変モードのみ）
+ * @text 前面ゲージ画像左側非可変横幅
+ * @type number
+ * @default 0
+ * 
+ * @param FrontGaugeRightWidth
+ * @desc 前面ゲージ画像の右側の可変させない横幅。（可変モードのみ）
+ * @text 前面ゲージ画像右側非可変横幅
+ * @type number
+ * @default 0
+ * 
  * @param LabelImg
  * @text ラベル画像設定
  * @default ------------------------------
@@ -515,7 +520,7 @@ Imported.NUUN_GaugeImage = true;
     }
   };
 
-  Sprite.prototype.createSpriteGauge = function(base, type) {
+  Sprite.prototype.createSpriteGauge = function(base, type, x, y) {
     imgSprite = null;
     const className = String(this.constructor.name);
     const find = isGaugeImage(type, className);
@@ -532,6 +537,20 @@ Imported.NUUN_GaugeImage = true;
 
   Sprite.prototype.isGaugeImage = function(statusType) {
     return GaugeImgList.find(data => data.Type[0] === statusType && data.MainGaugeImg && data.MainGaugeImg[0]);
+  };
+
+  Scene_Base.prototype.createSpriteGauge = function(base, type, x, y) {
+    imgSprite = null;
+    const className = String(this.constructor.name);
+    const find = isGaugeImage(type, className);
+    if (find) {
+      const sprite = new Sprite_GaugeImg();
+      base.addChild(sprite);
+      imgSprite = sprite;
+      sprite.setup(type, find);
+      sprite.move(x, y);
+      sprite.show();
+    }
   };
 
 
@@ -553,7 +572,7 @@ Imported.NUUN_GaugeImage = true;
   };
 
   Sprite_GaugeImg.prototype.bitmapWidth = function() {
-    return this._gaugeImgData.GaugeBaseWidth || 128;
+    return this._gaugeImgData.GaugeBaseWidth;
   };
 
   Sprite_GaugeImg.prototype.bitmapHeight = function() {
@@ -689,19 +708,65 @@ Imported.NUUN_GaugeImage = true;
 
   Sprite_Gauge.prototype.frontGaugeSetup  = function(data) {
     if (this._frontGaugeSprite) {
-      const scale = (data.GaugeImgScale || 100) / 100;
       const context = this._frontGaugeSprite.bitmap.context;
       const bitmap = this._frontBitmap;
       context.setTransform(1, 0, this.gaugeInclinedRate(data), 1, 0, 0);
-      const sx = data.FrontGaugeSX || 0;
-      const sy = data.FrontGaugeSY || 0;
-      const sw = data.FrontGaugeWidth || bitmap.width;
-      const sh = data.FrontGaugeHeight || bitmap.height;
-      const x = this.gaugeX() + data.FrontGaugeX + data.GaugeOffSetX;
-      const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;
-      const gaugewidth = data.GaugeImgVariable ? this.bitmapWidth() - x : sw * scale;
-      this._frontGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth ,sh * scale);
+      if (data.GaugeImgVariable && data.FrontGaugeLeftWidth > 0) {
+        this.frontGaugeSideLeft(data, bitmap)
+      }
+      if (data.GaugeImgVariable && data.FrontGaugeRightWidth > 0) {
+        this.frontGaugeSideRight(data, bitmap)
+      }
+      if (data.GaugeImgVariable && (data.FrontGaugeLeftWidth > 0 || data.FrontGaugeRightWidth > 0)) {
+        this.frontGaugeSideCenter(data, bitmap);
+      } else {
+        const scale = (data.GaugeImgScale || 100) / 100;
+        const sx = data.FrontGaugeSX || 0;
+        const sy = data.FrontGaugeSY || 0;
+        const sw = data.FrontGaugeWidth - sx || bitmap.width;
+        const sh = data.FrontGaugeHeight || bitmap.height;
+        const x = this.gaugeX() + data.FrontGaugeX + data.GaugeOffSetX;
+        const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;
+        const gaugewidth = data.GaugeImgVariable ? this.bitmapWidth() - x : sw * scale;
+        this._frontGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth ,sh * scale);
+      }
     }
+  };
+
+  Sprite_Gauge.prototype.frontGaugeSideLeft = function(data, bitmap) {
+    const scale = (data.GaugeImgScale || 100) / 100;
+    const sx = data.FrontGaugeSX || 0;
+    const sy = data.FrontGaugeSY || 0;
+    const sw = data.FrontGaugeLeftWidth;
+    const sh = data.FrontGaugeHeight || bitmap.height;
+    const gaugewidth = sw * scale;
+    const x = this.gaugeX() + data.FrontGaugeX + data.GaugeOffSetX;
+    const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;
+    this._frontGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth ,sh * scale);
+  };
+
+  Sprite_Gauge.prototype.frontGaugeSideRight = function(data, bitmap) {
+    const scale = (data.GaugeImgScale || 100) / 100;
+    const sx = data.FrontGaugeSX + bitmap.width - data.FrontGaugeLeftWidth;
+    const sy = data.FrontGaugeSY || 0;
+    const sw = data.FrontGaugeRightWidth;
+    const sh = data.FrontGaugeHeight || bitmap.height;
+    const gaugewidth = sw * scale;
+    const x = this.bitmapWidth() - (this.gaugeX() + data.FrontGaugeX + data.GaugeOffSetX) - sw * scale;
+    const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;
+    this._frontGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth ,sh * scale);
+  };
+
+  Sprite_Gauge.prototype.frontGaugeSideCenter = function(data, bitmap) {
+    const scale = (data.GaugeImgScale || 100) / 100;
+    const sx = data.FrontGaugeSX + data.FrontGaugeLeftWidth;
+    const sy = data.FrontGaugeSY || 0;
+    const sw = (data.GaugeWidth || bitmap.width) - sx - data.FrontGaugeRightWidth;
+    const sh = data.FrontGaugeHeight || bitmap.height;
+    const gaugewidth = this.bitmapWidth() - (data.FrontGaugeLeftWidth * scale) - (data.FrontGaugeRightWidth * scale);
+    const x = this.gaugeX() + data.FrontGaugeX + data.GaugeOffSetX + data.FrontGaugeLeftWidth * scale;
+    const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;
+    this._frontGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth ,sh * scale);
   };
 
   Sprite_Gauge.prototype.createFrontGaugeBitmap  = function(data) {

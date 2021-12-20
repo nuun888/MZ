@@ -89,7 +89,7 @@
 | 敵名前表示 | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) |  | 1.2.2 |
 | 敵TPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.3.0 |
 | [敵ステート表示拡張](https://github.com/nuun888/MZ/blob/master/README/EnemyStateIconEX.md) | [NUUN_EnemyStateIconEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyStateIconEX.js) |  | 1.0.0 |
-| [ゲージ画像化](https://github.com/nuun888/MZ/blob/master/README/GaugeImage.md) | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) | 共 | 1.4.0 |
+| [ゲージ画像化](https://github.com/nuun888/MZ/blob/master/README/GaugeImage.md) | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) | 共 | 1.4.2 |
 | [MV互換アニメーションフレームレート個別設定](https://github.com/nuun888/MZ/blob/master/README/AnimationFPSRate.md) | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.0.2 |
 | [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.0.3 |
 |  |  |  |  |
@@ -108,7 +108,7 @@
 | [アイテムなどのランダム取得](https://github.com/nuun888/MZ/blob/master/README/RandomItems.md)  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.2.2 |
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
 | アクター並び替え固定 | [NUUN_ActorFixed](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js) |  | 1.1.4 |
-| パーティ、敵グループリミットゲージ | [NUUN_PartyLimitGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js) |  | 1.0.4 |
+| パーティ、敵グループリミットゲージ | [NUUN_PartyLimitGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js) |  | 1.1.0 |
 | [売値任意設定](https://github.com/nuun888/MZ/blob/master/README/AnySellPrice.md) | [NUUN_AnySellPrice](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js) | 共 | 1.1.0 |
 | [床ダメージの処理を拡張](https://github.com/nuun888/MZ/blob/master/README/DamagedFloorEX.md) | [NUUN_DamagedFloorEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js) | 共 | 1.0.3 |
 | ドロップ率百分率化 | [NUUN_DropRatePercentage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropRatePercentage.js) |  | 1.0.0 |

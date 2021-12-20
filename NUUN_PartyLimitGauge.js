@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.0.4
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -38,6 +38,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/20 Ver.1.1.0
+ * ゲージ画像化に対応。
  * 2021/12/19 Ver.1.0.4
  * ゲージ表示拡張併用時にエラーが出る問題を修正。
  * 2021/12/5 Ver.1.0.3
@@ -497,6 +499,9 @@ Scene_Battle.prototype.createSpriteset = function() {
 Scene_Battle.prototype.createPartyGauge = function() {
   const x = PartyGauge_X;
   const y = PartyGauge_Y;
+  if (Imported.NUUN_GaugeImage) {
+    this.createSpriteGauge(this, 'limit', x, y);
+  }
   const sprite = new Sprite_PartyGauge();
   this.addChild(sprite);
   sprite.setup('actor', 'limit');
@@ -508,6 +513,9 @@ Scene_Battle.prototype.createPartyGauge = function() {
 Scene_Battle.prototype.createTroopGauge = function() {
   const x = EnemyGauge_X;
   const y = EnemyGauge_Y;
+  if (Imported.NUUN_GaugeImage) {
+    this.createSpriteGauge(this, 'limit', x, y);
+  }
   const sprite = new Sprite_TroopGauge();
   this.addChild(sprite);
   sprite.setup('enemy', 'limit');

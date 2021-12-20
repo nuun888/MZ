@@ -10,12 +10,11 @@
  * @target MZ
  * @plugindesc 条件付きドロップ
  * @author NUUN
- * @version 1.0.4
+ * @version 1.0.5
  * @base NUUN_ConditionsBase
  * 
  * @help
  * 条件によりドロップするアイテムを設定できます。
- * 
  * 敵のメモ欄
  * <CondDropItem:[item],[id],[rate],[condNameTag],[CondMode]>
  * [item]:
@@ -41,6 +40,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/20 Ver.1.0.5
+ * 条件付きアイテムが正常に取得できない問題を修正。
  * 2021/11/28 Ver.1.0.4
  * 条件モードが機能していなかった問題を修正。
  * 2021/11/27 Ver.1.0.3
@@ -61,12 +62,18 @@ Imported.NUUN_ConditionalDrops = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_ConditionalDrops');
-  let conditionalDropItems = [];
+
+  const _Game_Enemy_initialize = Game_Enemy.prototype.initialize;
+  Game_Enemy.prototype.initialize = function(enemyId, x, y) {
+    this._conditionalDropItems = [];
+    this._getCondDropList = [];
+    _Game_Enemy_initialize.call(this, enemyId, x, y);
+  };
 
   const _Game_Enemy_setup = Game_Enemy.prototype.setup;
   Game_Enemy.prototype.setup = function(enemyId, x, y) {
     _Game_Enemy_setup.call(this, enemyId, x, y);
-    conditionalDropItems = this.conditionalDropsSetup();
+    this._conditionalDropItems = this.conditionalDropsSetup();
   };
 
   const _Game_Enemy_die = Game_Enemy.prototype.die;
@@ -76,9 +83,8 @@ Imported.NUUN_ConditionalDrops = true;
   };
 
   Game_Enemy.prototype.getConditionalDrops = function() {
-    this._getCondDropList = [];
-    const enemy = this.enemy()
-    conditionalDropItems.forEach(condDrop => {
+    const enemy = this.enemy();
+    this._conditionalDropItems.forEach(condDrop => {
       const condTag = "Drop" + (String(condDrop[3]).trim() || 'Cond');
       const action = $gameTemp.getActionData();
       const mode = Number(condDrop[4]) || 0;

@@ -1,6 +1,6 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 # Ver.2.10.0
-ダウンロード
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 拡張プラグイン
 
 モンスター図鑑を実装します。  

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.9.6
+ * @version 2.10.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -92,8 +92,8 @@
  * <desc1:ああああ> descとタグ付けされた項目に「ああああ」が表示されます。
  * デフォルト設定では４ページ目に表示される項目にdescが設定されていますので、文章を表示させる場合は<desc:[text]>と記入してください。
  * 
- * <[tag]:[img],[x],[y]> アイテム個別画像の表示
- * [tag]:アイテム個別画像タグ名（記述欄、個別指定画像タグで設定します）
+ * <[tag]:[img],[x],[y]> モンスター個別画像の表示
+ * [tag]:モンスター個別画像タグ名（記述欄、個別指定画像タグで設定します）
  * [img]:画像パス(拡張子なし)　
  * 個別指定画像フォルダが'pictures'ならimg/pictures直下のファイルを拡張子なしで記入してください。
  * サブフォルダーから取得する場合はサブフォルダー名も記入してください。例 items/tankobu
@@ -216,12 +216,6 @@
  * %2:使用者名
  * 「%2はアナライズに失敗した。」の時、スキル使用者がリードの場合は「リードはアナライズに失敗した。」と表示されます。
  * 
- * 
- * 対応プラグイン
- * ドロップアイテム追加
- * 盗みスキル
- * ドロップ率百分率化
- * 
  * このプラグインは「共通処理」(NUUN_Base)プラグインVer.1.1.4以降が必要となります。
  * 
  * 操作方法
@@ -277,11 +271,16 @@
  * 共通画像、モンスター個別画像は複数設定、表示可能です。
  * 戦闘中に背景画像を表示をONにした場合、図鑑、敵の情報、アナライズが背景画像表示モードになります。
  * 敵の画像、アナライズ画像が指定されてない場合は図鑑背景の１番目の背景が表示されます。
+ * 未確認ドロップアイテム、スティールアイテム名、使用スキル名を隠すをOFFにした場合、途中で設定をONにしても今までの取得、習得した
+ * アイテム、スキルは反映されません。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/22 Ver.2.10.0
+ * 未確認ドロップアイテム、スティールアイテム名、使用スキル名を隠すをOFFにした時、フラグ処理を行わないように変更。
+ * 条件付きドロップアイテムを表示する機能を追加。
  * 2021/12/12 Ver.2.9.6
  * メインウィンドウ（モンスターの情報を表示）の横幅を設定できる機能を追加。
  * 2021/12/11 Ver.2.9.5
@@ -1654,7 +1653,7 @@
  * 
  * @param ShowActionName
  * @desc 未確認の使用スキルを隠す。(ステータス情報登録をしてもスティールアイテム使用スキルを確認するまでは表示されません)
- * @text 未確認使用スキル表示(要NUUN_EnemyBookEX_1)
+ * @text 未確認使用スキル表示
  * @type boolean
  * @default false
  * @parent ActionData
@@ -1687,7 +1686,7 @@
  * 
  * @param ShowElementsIcon
  * @desc 耐性弱点未確認の属性を隠す。(ステータス情報登録をしても属性耐性弱点を確認するまでは表示されません)
- * @text 未確認属性を隠す
+ * @text 未確認属性を隠す(要NUUN_EnemyBookEX_1)
  * @type boolean
  * @default false
  * @parent ResistWeakElementData
@@ -2122,6 +2121,8 @@
  * @value 60
  * @option スティールアイテム（要盗みスキルプラグイン）(2)～(7)(9)(10)(11)
  * @value 61
+ * @option 条件付きドロップアイテム（要条件付きドロップアイテムプラグイン）(2)～(7)(9)(10)(11)
+ * @value 62
  * @option 記述欄(1)～(7)(9)(10)(13)
  * @value 70
  * @option オリジナルパラメータ(1)～(11)(16)
@@ -2626,6 +2627,7 @@ Game_System.prototype.initialize = function() {
   this._enemyBookStatusFlags = [];
   this._defeatNumber = [];
   this._itemDorps = [];
+  this._condItemDorps = [];
   this._stealItem = [];
   this._enemyBookElementFlags = [];
   this._enemyBookStateFlags = [];
@@ -2711,6 +2713,9 @@ Game_System.prototype.removeFromEnemyBook = function(enemyId) {
       this.enemyBookStateList(enemyId, 0, false, false);
       this.enemyBookDebuffList(enemyId, 0, false, false);
     }
+    if (Imported.NUUN_EnemyBookEX_2) {
+      this.condDropItemListFlag(enemyId, 0, false, false);
+    }
     if (!this._defeatNumber) {
       this.clearDefeat();
     }
@@ -2738,6 +2743,9 @@ Game_System.prototype.clearEnemyBook = function() {
     this.clearEnemyBookState();
     this.clearEnemyBookDebuff();
   }
+  if (Imported.NUUN_EnemyBookEX_2) {
+    this.clearCondDropItem();
+  }
 };
 
 Game_System.prototype.completeEnemyBook = function() {
@@ -2752,6 +2760,9 @@ Game_System.prototype.completeEnemyBook = function() {
       this.enemyBookElementList(i, 0, false, true);
       this.enemyBookStateList(i, 0, false, true);
       this.enemyBookDebuffList(i, 0, false, true);
+    }
+    if (Imported.NUUN_EnemyBookEX_2) {
+      this.condDropItemListFlag(i, 0, true, false);
     }
   }
 };
@@ -2877,6 +2888,9 @@ Game_System.prototype.clearDropItem = function() {
 };
 
 Game_System.prototype.setDropItemFlag = function(enemyId, dropId, flag) {
+  if (!param.ShowDropItemName) {
+    return;
+  }
 	if (!this._itemDorps) {
 		this.clearDropItem();
   }
@@ -2896,6 +2910,9 @@ Game_System.prototype.clearStealItem = function() {
 };
 
 Game_System.prototype.setStealItemFlag = function(enemyId, stealId, flag) {
+  if (!param.ShowStealItemName) {
+    return;
+  }
 	if (!this._stealItem) {
 		this.clearStealItem();
   }
@@ -3025,6 +3042,9 @@ Game_System.prototype.clearEnemyBookAction = function() {
 };
 
 Game_System.prototype.setEnemyBookActionFlag = function(enemyId, actionId, flag) {
+  if (!param.ShowActionName) {
+    return;
+  }
 	if (!this._enemyBookActionFlags) {
 		this.clearEnemyBookAction();
   }
@@ -4187,6 +4207,10 @@ Window_EnemyBook.prototype.stealItemFlag = function(index) {
   return param.ShowStealItemName ? $gameSystem.getStealItemFlag(this._enemy.id, index) : true;
 };
 
+Window_EnemyBook.prototype.condDropItemFlag = function(index) {
+  return Imported.NUUN_EnemyBookEX_2 && this.getShowCondDropItemName() ? $gameSystem.getCondDropItemFlag(this._enemy.id, index) : true;
+};
+
 Window_EnemyBook.prototype.showActionMask = function(MaskMode) {
   return MaskMode && !this.noUnknownStatus() ? $gameSystem.isInEnemyBookStatus(this._enemy): true;
 };
@@ -4472,6 +4496,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
       break;
     case 61:
       this.stealItems(list, enemy, x, y, width);
+      break;
+    case 62:
+      this.condDropItems(list, enemy, x, y, width);
       break;
     case 70:
       this.drawDesc(list, enemy, x, y, width);
@@ -5227,6 +5254,53 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
         this.resetTextColor();
         this.drawText(this.unknownDataLength(item.name), x3, y2, width2,'left');
         stealIndex++;
+      }
+    }
+  }
+};
+
+Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
+  if (!Imported.NUUN_ConditionalDrops && !Imported.NUUN_EnemyBookEX_2) {
+    return;
+  }
+  this.changeTextColor(this.getColorCode(list.NameColor));
+  const nameText = list.paramName ? list.paramName : "条件ドロップアイテム";
+  this.drawText(nameText, x, y);
+  const lineHeight = this.lineHeight();
+  let cols = 1;
+  if (this.getCondDropItemMultiCol()) {
+    if (list.WideMode === 2) {
+      width = (width - this.colSpacing()) / 2;
+      cols = 2;
+    } else if (list.WideMode === 3 && param.ContentCols === 3) {
+      width = (width - this.colSpacing() * 2) / 3;
+      cols = 3;
+    }
+  }
+  const dropList = enemy._conditionalDropItems;
+  let x2 = x;
+  let y2 = y;
+  let dropIndex = 0;
+  const listLength = dropList.length;
+  for(i = 0; i < listLength; i++){
+    if(dropList[i][1] > 0){
+      if (param.DropItemMultiCol) {
+        x2 = Math.floor(dropIndex % cols) * (width + this.itemPadding()) + x;
+        y2 = Math.floor(dropIndex / cols) * lineHeight + y + lineHeight;
+      } else {
+        y2 += lineHeight;
+      }
+      this.drawContentsBackground(list.Back, x2, y2, width);
+      x3 = this.contensX(x2);
+      width2 = this.contensWidth(width);
+      const item = enemy.getCondDropItem(dropList[i]);console.log(this._condItemDorps)
+      if((this.showDropItemMask(list.MaskMode, enemy) && this.condDropItemFlag(i))) {
+        this.drawItemName(item, x3, y2, width2 - this.itemPadding());
+        dropIndex++;
+      } else {
+        this.resetTextColor();
+        this.drawText(this.unknownDataLength(item.name), x3, y2, width2,'left');
+        dropIndex++;
       }
     }
   }

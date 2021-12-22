@@ -8,7 +8,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc 耐性無効弱点表示で受けた事のある属性、ステート、デバフのみ表示（モンスター図鑑拡張）
+ * @plugindesc 耐性表示マスク（モンスター図鑑拡張）
  * @author NUUN
  * @version 1.0.1
  * @base NUUN_EnemyBook

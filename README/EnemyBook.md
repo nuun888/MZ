@@ -3,7 +3,7 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 拡張プラグイン
 [耐性表示マスク](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js) Ver.1.0.1  
-[条件付きドロップアイテム図鑑適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) Ver.1.0.0  
+[条件付きドロップアイテム図鑑適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) Ver.1.0.0
 [（要条件付きドロップアイテムVer.1.0.6以降）](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md)
 
 モンスター図鑑を実装します。  

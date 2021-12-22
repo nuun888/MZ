@@ -1,9 +1,9 @@
 # [耐性表示マスク](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js)
 # Ver.1.0.1
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js)
-前提プラグイン
-[共通プラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-[モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX.js)
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js)  
+前提プラグイン  
+[共通プラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
+[モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX.js)  
 
 モンスター図鑑の属性、ステート、デバフ耐性無効弱点の表示を、受けた事のある属性、ステート、デバフのみ表示するようにします。  
 複数属性（NUUN_MultiElement）を導入している場合はこのプラグインを複数属性（NUUN_MultiElement）に配置してください。

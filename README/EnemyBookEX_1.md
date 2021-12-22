@@ -1,7 +1,7 @@
 # [耐性表示マスク](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js)
 # Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js)  
-前提プラグイン  
+### 前提プラグイン  
 [共通プラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX.js)  
 

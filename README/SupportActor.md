@@ -1,6 +1,8 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 # Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
+### 必須プラグイン
+[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
 ### 拡張プラグイン
 [サポートアクターインジケーター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) Ver.1.3.1  
 

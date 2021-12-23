@@ -5,6 +5,7 @@
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
 ### 拡張プラグイン
 [サポートアクターインジケーター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) Ver.1.3.1  
+召喚アクター
 
 戦闘でサポートするアクターを設定します。  
 サポートアクターは戦闘画面に表示されずアクターステータスウィンドウにも表示されません。また攻撃対象にされません。  

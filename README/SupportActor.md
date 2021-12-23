@@ -2,7 +2,7 @@
 # Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 ### 拡張プラグイン
-[サポートアクターインジケーター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js)
+[サポートアクターインジケーター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) Ver.1.3.1  
 
 戦闘でサポートするアクターを設定します。  
 サポートアクターは戦闘画面に表示されずアクターステータスウィンドウにも表示されません。また攻撃対象にされません。  

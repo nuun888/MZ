@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  *            
  * @help
  * 戦闘でサポートするアクターを設定します。
@@ -25,6 +25,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/24 Ver.1.3.2
+ * 特定の条件下でアクターのコマンドが表示されなくなる問題を修正。
+ * その他競合対策。
+ * 機能していないプラグインパラメータを削除。
  * 2021/12/18 Ver.1.3.1
  * 特定条件下で戦闘中に攻撃コマンドを使用するとエラーが出る問題を修正。
  * 2021/11/3 Ver.1.3.0
@@ -63,26 +67,6 @@
  * @type boolean
  * @default true
  * 
- * 
- * 
- * @param Window_X
- * @text サポートアクターウィンドウX
- * @desc サポートアクターウィンドウX
- * @type number
- * @default 0
- * 
- * @param Window_Y
- * @text サポートアクターウィンドウY
- * @desc サポートアクターウィンドウY
- * @type number
- * @default 96
- * 
- * @param Window_Width
- * @text サポートアクターウィンドウ横幅
- * @desc サポートアクターウィンドウ横幅
- * @type number
- * @default 128
- * 
  * @param SupportActorSV
  * @text サイドビューサポートアクター設定
  * @desc サイドビューサポートアクター設定。
@@ -110,11 +94,9 @@ Imported.NUUN_SupportActor = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_SupportActor');
-  const Window_X = Number(parameters['Window_X'] || 0);
-  const Window_Y = Number(parameters['Window_Y'] || 96);
-  const Window_Width = Number(parameters['Window_Width'] || 128);
   const SupportActorSV = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SupportActorSV'])) : null) || [];
-  const SupportActorMode = eval(parameters['SupportActorMode'] || 'true');
+  const SupportActorMode = eval(parameters['SupportActorMode'] || 'false');
+  let sIndex = -1;
 
   const pluginName = "NUUN_SupportActor";
   PluginManager.registerCommand(pluginName, 'SupportActorSetting', args => {
@@ -200,22 +182,22 @@ Imported.NUUN_SupportActor = true;
 
   const _Game_Party_battleMembers = Game_Party.prototype.battleMembers;
   Game_Party.prototype.battleMembers = function() {
-    let members = _Game_Party_battleMembers.call(this);
-    if (!this.membersMode && this.inBattle()) {
-      members = members.concat(this.addBattleMembers());
-      members = this.MainBattleMembers(members).slice(0,this.maxBattleMembers());//サポートメンバーを除外
-      if (this.svMembersMode) {
-        this.svMembersMode = false;
-        return members.concat(this.supportBattleMembers());
-      }
-      return members;
-    } else {
+    let members = _Game_Party_battleMembers.call(this).concat(this.addBattleMembers());
+    if (!SupportActorMode && this.membersMode) {
       this.membersMode = false;
-      return members.concat(this.addSupportMembers());
+      let i = 0;
+      return members.filter(member => {
+        if (!member.getSupportActor() && i < this.maxBattleMembers()) {
+          i++;
+          return true;
+        } else if (member.getSupportActor()) {
+          return true;
+        }
+      });
     }
+    const members2 = this.MainBattleMembers(members).slice(0,this.maxBattleMembers());
+    return SupportActorMode ? members2.concat(this.allSupportBattleMembers(members)) : members2;
   };
-
-
 
   Game_Party.prototype.addBattleMembers = function() {
     return this.allMembers().slice(this.maxBattleMembers());
@@ -227,6 +209,10 @@ Imported.NUUN_SupportActor = true;
 
   Game_Party.prototype.MainBattleMembers = function(members) {
     return members.filter(actor => !actor.getSupportActor());
+  };
+
+  Game_Party.prototype.allSupportBattleMembers = function(member) {
+    return member.filter(actor => actor.isAppeared() && actor.getSupportActor());
   };
 
   Game_Party.prototype.supportBattleMembers = function() {
@@ -307,19 +293,7 @@ Imported.NUUN_SupportActor = true;
   };
 
   Scene_Battle.prototype.createSupportActorWindow = function() {
-    const rect = this.supportActorWindowRect();
-    const supportActorWindow = new Window_SupportActor(rect);
-    this.addWindow(supportActorWindow);
-    this._supportActorWindow = supportActorWindow;
-    this._supportActorWindow.hide();
-  };
 
-  Scene_Battle.prototype.supportActorWindowRect = function() {
-    const ww = Window_Width;
-    const wh = this.calcWindowHeight(1, true);
-    const wx = Window_X;
-    const wy = Window_Y;
-    return new Rectangle(wx, wy, ww, wh);
   };
 
   const _Scene_Battle_startActorCommandSelection = Scene_Battle.prototype.startActorCommandSelection;
@@ -388,10 +362,11 @@ Imported.NUUN_SupportActor = true;
   Spriteset_Battle.prototype.createActors = function() {
     _Spriteset_Battle_createActors.call(this);
     const SupportActorSVLength = SupportActorSV.length;
-    if ($gameSystem.isSideView()) {
+    if (SupportActorSV.length > 0 && $gameSystem.isSideView()){
+      this._supportActorSprites = [];
       for (let i = 0; i < SupportActorSVLength; i++) {
         const sprite = new Sprite_Actor();
-        this._actorSprites.push(sprite);
+        this._supportActorSprites.push(sprite);
         this._battleField.addChild(sprite);
       }
     }
@@ -399,14 +374,22 @@ Imported.NUUN_SupportActor = true;
 
   const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
   Spriteset_Battle.prototype.updateActors = function() {
-    $gameParty.svMembersMode = true;
     _Spriteset_Battle_updateActors.call(this);
+    const members = $gameParty.supportBattleMembers();
+    for (let i = 0; i < this._supportActorSprites.length; i++) {
+      this._supportActorSprites[i].setBattler(members[i]);
+    }
   };
 
   const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
   Sprite_Actor.prototype.setActorHome = function(index) {
+    sIndex = -1;
     if (this._actor.getSupportActor()) {
       index = this._actor.supportActorindex();
+      if (!SupportActorSV[index]) {
+        return;
+      }
+      sIndex = index;
     }
     _Sprite_Actor_setActorHome.call(this, index);
   };
@@ -414,13 +397,8 @@ Imported.NUUN_SupportActor = true;
   const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
   Sprite_Actor.prototype.setHome = function(x, y) {
     if (this._actor.getSupportActor()) {
-      const index = this._actor.supportActorindex();
-      if (!SupportActorSV[index]) {
-        console.log("ERROR:サポートアクターを表示できません。");
-        return;
-      }
-      x += SupportActorSV[index].SupportActorSV_X;
-      y += SupportActorSV[index].SupportActorSV_Y;
+      x += SupportActorSV[sIndex].SupportActorSV_X;
+      y += SupportActorSV[sIndex].SupportActorSV_Y;
     }
     _Sprite_Actor_setHome.call(this, x, y);
   };

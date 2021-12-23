@@ -1,7 +1,8 @@
-# [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
+# [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 # Ver.1.3.2
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 ### 拡張プラグイン
+[サポートアクターインジケーター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js)
 
 戦闘でサポートするアクターを設定します。  
 サポートアクターは戦闘画面に表示されずアクターステータスウィンドウにも表示されません。また攻撃対象にされません。  
@@ -9,7 +10,7 @@
 自動戦闘、経験値の入手に関して設定はアクターの特徴から設定してください。  
 
 ## 設定方法
-アクターのメモ欄
+アクターのメモ欄  
 `<SupportActor>`　このタグがあるアクターはサポートアクターとなります。
   
  サポートアクターのサイドビューは通常アクターの背後に表示されます。

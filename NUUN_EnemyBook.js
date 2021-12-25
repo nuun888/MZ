@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.10.1
+ * @version 2.10.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -278,6 +278,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/25Ver.2.10.2
+ * 単位を空白で設定したときにnullが表示されてしまう問題を修正。
  * 2021/12/25Ver.2.10.1
  * ページカテゴリー、敵のカテゴリーをコマンド化。
  * 条件付きドロップアイテム図鑑表示併用時エラーが出る問題を修正。
@@ -4804,7 +4806,9 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
   let text;
   if(this.paramEXMask(list.MaskMode)){
     text = list.DetaEval ? eval(list.DetaEval) : $gameSystem.defeatNumber(enemy.enemyId());
-    text += list.paramUnit ? String(list.paramUnit) : null;
+    if (list.paramUnit) {
+      text += String(list.paramUnit);
+    }
   } else {
     text = param.UnknownStatus;
   }
@@ -5355,7 +5359,9 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
   let text;
   if(this.paramEXMask(list.MaskMode)){
     text = eval(list.DetaEval);
-    text += list.paramUnit ? String(list.paramUnit) : null;
+    if (list.paramUnit) {
+      text += String(list.paramUnit);
+    }
   } else {
     text = param.UnknownStatus;
   }

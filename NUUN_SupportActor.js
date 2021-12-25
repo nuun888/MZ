@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  *            
  * @help
  * 戦闘でサポートするアクターを設定します。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/25 Ver.1.3.3
+ * プラグインコマンド「サポートアクター設定」に戦闘中の呼び出しターンを指定する機能を追加。
  * 2021/12/24 Ver.1.3.2
  * 特定の条件下でアクターのコマンドが表示されなくなる問題を修正。
  * その他競合対策。
@@ -62,10 +64,23 @@
  * @default 0
  * 
  * @arg  SupportActorsSwitch
- * @desc サポートアクターのONまたはOFF（ONでサポートアクター化）。
+ * @desc サポートアクターのONまたはOFF（ONでサポートアクター化）
  * @text サポートアクタースイッチ
  * @type boolean
  * @default true
+ * 
+ * @arg SupportActorTurn
+ * @text サポートアクターターン
+ * @desc サポートアクターを呼び出しているターンを設定します。(-1で無制限、-2で戦闘終了まで)
+ * @type number
+ * @default -1
+ * 
+ * 
+ * @param SupportActorMode
+ * @desc サポートアクターを常に通常戦闘メンバーの後に表示。
+ * @text サポートアクター適用順
+ * @type boolean
+ * @default false
  * 
  * @param SupportActorSV
  * @text サイドビューサポートアクター設定
@@ -102,13 +117,16 @@ Imported.NUUN_SupportActor = true;
   PluginManager.registerCommand(pluginName, 'SupportActorSetting', args => {
     const actorId = Number(args.Actor);
     if (actorId > 0) {
-      $gameActors._data[actorId].setSupportActor(eval(args.SupportActorsSwitch));
+      $gameActors._data[actorId].setAddSupportActor(args);
     }
   });
 
   const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
   Game_Actor.prototype.initMembers = function() {
     _Game_Actor_initMembers.call(this);
+    this._supportActorTurn = -1;
+    this._supportActorCallActor = 0;
+    this._supportActorDeadCallActor = false;
     this._supportActor = false;
   };
 
@@ -116,6 +134,12 @@ Imported.NUUN_SupportActor = true;
   Game_Actor.prototype.setup = function(actorId) {
     _Game_Actor_setup.call(this, actorId);
     this._supportActor = this.isSupportActor();
+  };
+
+  Game_Actor.prototype.setAddSupportActor = function(args) {
+    const flag = eval(args.SupportActorsSwitch);
+    this.setSupportActor(flag);
+    this.setSupportActorTurn(Number(args.SupportActorTurn));
   };
 
   Game_Actor.prototype.setSupportActor = function(flag) {
@@ -150,9 +174,86 @@ Imported.NUUN_SupportActor = true;
     return $gameParty.supportBattleMembers().includes(this);
   };
 
+  Game_Actor.prototype.updateSupportActorTurn = function() {
+    if (this._supportActorTurn > 0) {
+        this._supportActorTurn--;
+    }
+  };
+
+  Game_Actor.prototype.setSupportActorTurn = function(turn) {
+    this._supportActorTurn = turn;
+  };
+
+  Game_Actor.prototype.getSupportActorTurn = function() {
+    return this._supportActorTurn;
+  };
+
+  Game_Actor.prototype.setSupportActorCallActor = function(actorId) {
+    this._supportActorCallActor = actorId;
+  };
+
+  Game_Actor.prototype.getSupportActorCallActor = function() {
+    return this._supportActorCallActor;
+  };
+
+  Game_Actor.prototype.setSupportActorDeahCall = function(flag) {
+    this._supportActorDeadCallActor = !!flag;
+  };
+
+  Game_Actor.prototype.getSupportActorDeahCall = function() {
+    return this._supportActorDeadCallActor;
+  };
+
+  Game_Actor.prototype.updateRemoveSupportActor = function() {
+    if (this._supportActorTurn === 0) {
+      this.removeSupportActor();
+    }
+  };
+
+  Game_Actor.prototype.supportActorDeathCallActor = function() {
+    if (this._supportActorDeadCallActor) {
+      if (this._supportActorCallActor > 0 && $gameActors.actor(this.getSupportActorCallActor()).isDead()) {
+        this.removeSupportActor();
+      }
+    }
+  };
+
+  const _Game_Actor_onTurnEnd = Game_Actor.prototype.onTurnEnd;
+  Game_Actor.prototype.onTurnEnd = function() {
+    _Game_Actor_onTurnEnd.call(this);
+    this.updateSupportActorTurn();
+    this.updateRemoveSupportActor();
+  };
+
+  const _Game_Actor_onBattleEnd = Game_Actor.prototype.onBattleEnd;
+  Game_Actor.prototype.onBattleEnd = function() {
+    _Game_Actor_onBattleEnd.call(this);
+    const turn = this.getSupportActorTurn();
+    if (turn === -2 || turn >= 0) {
+      this.removeSupportActor();
+    }
+  };
+
+  Game_Actor.prototype.removeSupportActor = function() {
+    $gameParty.removeActor(this.actorId());
+    this._supportActorCallActor = 0;
+    this._supportActorDeadCallActor =false;
+    if (!this.getSupportActor()) {
+      this._supportActor = false;
+    }
+  };
+
   const _BattleManager_allBattleMembers = BattleManager.allBattleMembers;
   BattleManager.allBattleMembers = function() {
     return _BattleManager_allBattleMembers.call(this).concat($gameParty.supportBattleMembers())
+  };
+
+  const _BattleManager_displayBattlerStatus = BattleManager.displayBattlerStatus;
+  BattleManager.displayBattlerStatus = function(battler, current) {
+    _BattleManager_displayBattlerStatus.call(this, battler, current);
+    if (battler.isActor()) {
+      battler.supportActorDeathCallActor();
+    }
   };
 
   const _BattleManager_makeActionOrders = BattleManager.makeActionOrders;
@@ -195,6 +296,7 @@ Imported.NUUN_SupportActor = true;
         }
       });
     }
+    this.membersMode = false;
     const members2 = this.MainBattleMembers(members).slice(0,this.maxBattleMembers());
     return SupportActorMode ? members2.concat(this.allSupportBattleMembers(members)) : members2;
   };

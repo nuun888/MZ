@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きドロップアイテム図鑑適用（モンスター図鑑拡張）
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_EnemyBook
  * @base NUUN_ConditionalDrops
  * @orderAfter NUUN_EnemyBook
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/25 Ver.1.0.1
+ * 敵の情報を登録済みにするプラグインコマンドを使用したときにエラーが出る問題を修正。
  * 2021/12/22 Ver.1.0.0
  * 初版
  * 
@@ -95,7 +97,7 @@ Game_System.prototype.condDropItemListFlag = function(enemyId, dropListId, mode,
     if(Individual){
       this.setCondDropItemFlag(enemyId, dropListId, mode);
     } else {
-      let itemList = $dataEnemies[enemyId].conditionalDropsSetup();
+      let itemList = this.getconditionalDrops($dataEnemies[enemyId]);
        for(let i = 0; itemList.length > i; i++){
         this.setCondDropItemFlag(enemyId, i, mode);
       }
@@ -108,7 +110,7 @@ Game_System.prototype.condDorpItemAcquired = function(switchId, enemyId, dropId)
     drop = this.getCondDropItemFlag(enemyId, dropId);
   } else {
     drop = false;
-    const itemList = $dataEnemies[enemyId].conditionalDropsSetup();
+    const itemList = this.getconditionalDrops($dataEnemies[enemyId]);
     if (itemList) {
       itemList.some((item, r) => {
         if (item.kind > 0) {

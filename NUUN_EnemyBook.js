@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.10.0
+ * @version 2.10.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -129,11 +129,11 @@
  * 
  * スキル、アイテムのメモ欄
  * <AnalyzeSkill:1> このスキル、アイテムはアナライズスキルとし、「アナライズスキル設定」の１番の設定で発動します。
+ * <CertainAnalyze> アナライズ耐性を無視します。
+ * <EnemyInfo> 敵の情報を表示します。
  * アイテムのメモ欄
  * <NoDropProbability>
  * このタグを記入したアイテムはドロップアイテムの確率表示を表示しません。
- * <CertainAnalyze> アナライズ耐性を無視します。
- * <EnemyInfo> 敵の情報を表示します。
  * 
  * 
  * 図鑑の登録タイミングを遭遇時、撃破時、アナライズ時、撃破またはアナライズ時から選択できます。（ステータス情報は登録されません）
@@ -261,7 +261,7 @@
  * オリジナルパラメータ参照変数
  * this._enemyまたはde　データベースのモンスターデータを取得します。
  * this._enemy.meta メタタグを取得します。
- * enemyまたはge Game_Enemyのデータを取得します。
+ * enemyまたはGame_Enemyのデータを取得します。
  * 
  * このプラグインはYoji Ojima様及びヱビ様、TOMY (Kamesoft)様を参考にさせていただきました。
  * 
@@ -278,6 +278,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/25Ver.2.10.1
+ * ページカテゴリー、敵のカテゴリーをコマンド化。
+ * 条件付きドロップアイテム図鑑表示併用時エラーが出る問題を修正。
  * 2021/12/22 Ver.2.10.0
  * 未確認ドロップアイテム、スティールアイテム名、使用スキル名を隠すをOFFにした時、フラグ処理を行わないように変更。
  * 条件付きドロップアイテムを表示する機能を追加。
@@ -3731,7 +3734,7 @@ function Window_EnemyBook_Category() {
   this.initialize(...arguments);
 }
 
-Window_EnemyBook_Category.prototype = Object.create(Window_Selectable.prototype);
+Window_EnemyBook_Category.prototype = Object.create(Window_Command.prototype);
 Window_EnemyBook_Category.prototype.constructor = Window_EnemyBook_Category;
 
 Window_EnemyBook_Category.prototype.initialize = function(rect) {
@@ -3770,7 +3773,7 @@ Window_EnemyBook_Category.prototype.maxItemsVisible = function() {
   for (let i = 0; i < categoryLength; i++) {
     const result = $gameSystem.getCategoryEnemyBook(i);
     if (result) {
-      this._newCategoryList.push({category : this._categoryList[i], categoryVisible : result});
+      this._newCategoryList.push({CategoryName : this._categoryList[i].CategoryName, CategoryKey: this._categoryList[i].CategoryKey, categoryVisible : result});
       num++;
     }
   }
@@ -3791,21 +3794,28 @@ Window_EnemyBook_Category.prototype.getDate = function(index) {
   return param.CategoryVisibleType === 1 ? this._newCategoryList[index].category : this._categoryList[index];
 };
 
-Window_EnemyBook_Category.prototype.drawItem = function(index) {
-  const rect = this.itemLineRect(index);
-  let categoryName = this.getDate(index).CategoryName;
-  const result = this.getCategoryVisible(index);
-  if (param.CategoryVisibleType === 1 && !result) {
-    return;
-  }
-  if (param.CategoryVisibleType === 2 && !result) {
-    categoryName = this.unknownDataLength(categoryName);
-  }
-  this.drawText(categoryName, rect.x, rect.y, rect.width);
+Window_EnemyBook_Category.prototype.getList = function() {
+  return param.CategoryVisibleType === 1 ? this._newCategoryList : this._categoryList;
 };
 
 Window_EnemyBook_Category.prototype.getCategoryVisible = function(index) {
   return param.CategoryVisibleType === 1 ? this._newCategoryList[index].categoryVisible : $gameSystem.getCategoryEnemyBook(index);
+};
+
+Window_EnemyBook_Category.prototype.makeCommandList = function() {
+  const list = this.getList();
+  list.forEach((command, i) => {
+    let categoryName = command.CategoryName;
+    const result = this.getCategoryVisible(i);
+    if (param.CategoryVisibleType === 2 && !result) {
+      categoryName = this.unknownDataLength(categoryName);
+    }
+    if (param.CategoryVisibleType === 1 && !result) {
+
+    } else {
+      this.addCommand(categoryName, command.CategoryKey);
+    }
+  });
 };
 
 Window_EnemyBook_Category.prototype.unknownDataLength = function(name) {
@@ -3913,7 +3923,7 @@ Window_EnemyBook_Index.prototype.setCategoryWindow = function(categoryWindow) {
 
 Window_EnemyBook_Index.prototype.setCategory = function() {
   const index = this._categoryWindow._categorySelect;
-  this._category = this._categoryWindow.getDate(index);
+  this._category = this._categoryWindow._list[index];
 };
 
 Window_EnemyBook_Index.prototype.enemyAt = function(index) {
@@ -3941,11 +3951,11 @@ Window_EnemyBook_Index.prototype.unknownEnemyVisible = function(enemy) {
 };
 
 Window_EnemyBook_Index.prototype.categoryIncludes = function(enemy) { 
-  if (!this._category || this._category.CategoryKey === "all") {
+  if (!this._category || this._category.symbol === "all") {
     return true;
   }
   const enemyCategory = enemy.meta.CategoryKey ? enemy.meta.CategoryKey.split(',') : ["all"];
-  return enemyCategory.find(category => category === this._category.CategoryKey);
+  return enemyCategory.find(category => category === this._category.symbol);
 };
 
 Window_EnemyBook_Index.prototype.drawItem = function(index) {
@@ -5293,7 +5303,7 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
       this.drawContentsBackground(list.Back, x2, y2, width);
       x3 = this.contensX(x2);
       width2 = this.contensWidth(width);
-      const item = enemy.getCondDropItem(dropList[i]);console.log(this._condItemDorps)
+      const item = enemy.getCondDropItem(dropList[i]);
       if((this.showDropItemMask(list.MaskMode, enemy) && this.condDropItemFlag(i))) {
         this.drawItemName(item, x3, y2, width2 - this.itemPadding());
         dropIndex++;
@@ -5683,7 +5693,7 @@ function Window_EnemyBookPageCategory() {
   this.initialize(...arguments);
 }
 
-Window_EnemyBookPageCategory.prototype = Object.create(Window_Selectable.prototype);
+Window_EnemyBookPageCategory.prototype = Object.create(Window_HorzCommand.prototype);
 Window_EnemyBookPageCategory.prototype.constructor = Window_EnemyBookPageCategory;
 
 Window_EnemyBookPageCategory.prototype.initialize = function(rect) {
@@ -5692,6 +5702,7 @@ Window_EnemyBookPageCategory.prototype.initialize = function(rect) {
   this._bookList = [];
   this._categorySelect = 0;
   this.maxPageCols = 4;
+  this.commandVisible = false;
   this.select(this._categorySelect);
 };
 
@@ -5711,20 +5722,23 @@ Window_EnemyBookPageCategory.prototype.setPageList = function(page, cols) {
 Window_EnemyBookPageCategory.prototype.setPage = function() {
   this._categorySelect = 0;
   this.select(this._categorySelect);
+  this.commandVisible = true;
   this.refresh();
 };
 
-Window_EnemyBookPageCategory.prototype.drawItem = function(index) {
-  const rect = this.itemLineRect(index);
-  const text = this._bookList[index].PageCategoryName ? this._bookList[index].PageCategoryName : "ページ"+ Number(index + 1);
-  this.drawText(text, rect.x, rect.y, rect.width);
-};
-
 Window_EnemyBookPageCategory.prototype.itemClear = function() {
-  if (this.contents) {
+  if (this.commandVisible && this.contents) {
+    this.scrollBy(0, this._scrollY * -1);
     this.contents.clear();
     this.contentsBack.clear();
+    this.commandVisible = false;
   }
+};
+
+Window_EnemyBookPageCategory.prototype.updateArrows = function() {
+  Window_Scrollable.prototype.updateArrows.call(this);
+  this.upArrowVisible = this.commandVisible && this.upArrowVisible;
+  this.downArrowVisible = this.commandVisible && this.downArrowVisible;
 };
 
 Window_EnemyBookPageCategory.prototype.select = function(index) {
@@ -5753,6 +5767,12 @@ Window_EnemyBookPageCategory.prototype.drawItemBackground = function(index) {
 
 Window_EnemyBookPageCategory.prototype.setEnemyWindow = function(enemyWindow) {
   this._enemyWindow = enemyWindow;
+};
+
+Window_EnemyBookPageCategory.prototype.makeCommandList = function() {
+  this._bookList.forEach((command, i) => {
+    this.addCommand(command.PageCategoryName, "page" + i);
+  })
 };
 
 Window_EnemyBookPageCategory.prototype.cursorDown = function(wrap) {

@@ -8,16 +8,16 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc コマンド拡張
+ * @plugindesc コマンド、カテゴリー表示拡張
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
  * コマンド名の位置を左揃え、中央揃え、右揃えから選べます。
  * 
  * コマンド名：コマンドメニューに表示される文字列をそのまま記入します。
- * コマンドの色：コマンド名の色を変更します。
+ * コマンドの色：コマンド名の色を変更します。（システムカラーインデックス）　テキストタブでカラーコードを記入できます。
  * アイコンインデックス：アイコンを指定します。
  * フィルタリングクラス設定モード：下のフィルタリングを適用するか除外するか指定します。
  * フィルタリングクラス設定：設定を適用または除外するクラスを設定します。上から一番最初に条件一致した条件が適用されます。
@@ -27,12 +27,18 @@
  * Window_Command.prototype.drawItem内にconsole.log(this)を記入することでクラス名が分かります。(F12)
  * 反映させられるクラスはWindow_Commandを継承しているクラスのみとなります。
  * 
- * コマンドの色はテキストタブでカラーコードを記入できます。
+ * Window_ItemBook_Category：アイテム図鑑カテゴリー
+ * Window_SaveVerificationWindow：セーブ確認上書き画面選択肢
+ * Window_EnemyBook_Category：モンスター図鑑敵カテゴリー
+ * Window_EnemyBookPageCategory：モンスター図鑑情報ページ
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/25 Ver 1.3.1
+ * モンスター図鑑敵カテゴリーコマンド化によりフィルタリングクラスに項目追加。
  * 2021/11/14 Ver 1.3.0
  * クラス毎にテキストの位置を指定できる機能を追加。
  * 2021/11/7 Ver 1.2.5
@@ -144,6 +150,8 @@
  * @option 'Window_Options'
  * @option 'Window_ItemBook_Category'
  * @option 'Window_SaveVerificationWindow'
+ * @option 'Window_EnemyBook_Category'
+ * @option 'Window_EnemyBookPageCategory'
  * @default
  * 
  */
@@ -166,6 +174,8 @@
  * @option 'Window_Options'
  * @option 'Window_ItemBook_Category'
  * @option 'Window_SaveVerificationWindow'
+ * @option 'Window_EnemyBook_Category'
+ * @option 'Window_EnemyBookPageCategory'
  * @default
  * 
  * @param CommandPosition

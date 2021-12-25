@@ -1,8 +1,10 @@
 # [条件付きドロップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalDrops.js)
 # Ver.1.0.7
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalDrops.js)
+### 必須プラグイン
+[条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)  
 
 条件によりドロップするアイテムを設定できます。  
-このプラグインは[条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)が必要です。
 
 ## 設定方法
 敵のメモ欄  

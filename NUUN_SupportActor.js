@@ -75,7 +75,8 @@
  * @text サポートアクターターン
  * @desc サポートアクターを呼び出しているターンを設定します。(-1で無制限、-2で戦闘終了まで)
  * @type number
- * @default -2
+ * @default -1
+ * @min -2
  * 
  * 
  * @param SupportActorSV

@@ -1,5 +1,5 @@
 # [条件付きドロップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalDrops.js)
-# Ver.1.0.6
+# Ver.1.0.7
 
 条件によりドロップするアイテムを設定できます。  
 このプラグインは[条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)が必要です。
@@ -24,6 +24,8 @@
 `<DropCond1:1>`上記の条件を参照するためのタグでリスト番号１番の条件を判定します。  
 
 ## 更新履歴
+2021/12/25 Ver.1.0.7  
+モンスター図鑑の不具合修正による処理を追加。  
 2021/12/22 Ver.1.0.6  
 モンスター図鑑に表示させるための処理を追加。  
 2021/12/20 Ver.1.0.5  

@@ -11,6 +11,8 @@
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
  * @version 1.3.3
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  *            
  * @help
  * 戦闘でサポートするアクターを設定します。

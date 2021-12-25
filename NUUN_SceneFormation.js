@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -22,10 +22,16 @@
  * 
  * 選択中のアクターのステータスはカスタマイズ可能です。
  * 
+ * ウィンドウ基準0をONにした場合、ウィンドウの基準座標を0,0にします。
+ * なおウィンドウ中央自動調整をONにしている場合、X座標だけ中央になるよう自動調整されてしまいますのでX座標を調整する場合はOFFにしてください。
+ * ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/26 Ver.1.5.2
+ * 立ち絵、顔グラ表示EX用の立ち絵設定が設定できなかった問題を修正。
  * 2021/12/14 Ver.1.5.1
  * 立ち絵、顔グラ表示EXを入れてない状態で開くとエラーが出る問題を修正。
  * 2021/12/11 Ver.1.5.0
@@ -134,6 +140,7 @@
  * @type boolean
  * @default true
  * @parent Setting
+ * @parent BasicSetting
  * 
  * @param BattleMemberNameSetting
  * @text 戦闘メンバー名称ウィンドウ設定
@@ -576,19 +583,12 @@
  * @max 999
  *  
  */
-/*~struct~actorImgList:
+/*~struct~ActorPictureDataList:
  * 
  * @param actorId
  * @text アクター
  * @desc アクターを指定します。
  * @type actor
- * 
- * @param ActorImg
- * @text アクター画像
- * @desc アクターの画像を表示します。立ち絵を切り替える場合はリストに画像を設定してください。
- * @type file[]
- * @dir img/
- * @default 
  * 
  * @param Actor_X
  * @desc 画像の表示位置X座標。

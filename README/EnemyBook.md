@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.10.1
+# Ver.2.10.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 拡張プラグイン
 [耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) Ver.1.0.1  
@@ -118,6 +118,8 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2021/12/25Ver.2.10.2  
+単位を空白で設定したときにnullが表示されてしまう問題を修正。  
 2021/12/25Ver.2.10.1  
 ページカテゴリー、敵のカテゴリーをコマンド化。  
 条件付きドロップアイテム図鑑表示併用時エラーが出る問題を修正。  

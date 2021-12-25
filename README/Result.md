@@ -1,13 +1,27 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
 # Ver.1.14.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
+#### 必須プラグイン
+[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
 #### 拡張プラグイン
 [耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) Ver.1.0.0
 
 戦闘終了時にリザルト画面を表示します。  
 デフォルトのリザルトはメッセージウィンドウで表示されますが、入手EXP、獲得金額、ドロップアイテムを１画面にし、レベルアップしたアクターがいない場合は決定キー（ボタン）を１回押しただけでリザルトが終了します。
 
+![画像](img/Result4.png)
+
+
 ## 設定方法
+### ヘルプウィンドウの設定
+
+### 入手項目の設定
+
+### 立ち絵の設定
+
+## 操作
+エンター　切り替え、画面を閉じる 右クリック  
+←→　ドロップアイテム、習得スキルページ切り替え  
 
 ## 更新履歴
 2021/12/15 Ver.1.14.1  

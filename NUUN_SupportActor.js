@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.3.3
+ * @version 1.3.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/26 Ver.1.3.4
+ * フロントビューで戦闘を開始するとエラーが出る問題を修正。
  * 2021/12/25 Ver.1.3.3
  * プラグインコマンド「サポートアクター設定」に戦闘中の呼び出しターンを指定する機能を追加。
  * 2021/12/24 Ver.1.3.2
@@ -78,6 +80,12 @@
  * @default -1
  * @min -2
  * 
+ * 
+ * @param SupportActorMode
+ * @desc サポートアクターを常に通常戦闘メンバーの後に表示。
+ * @text サポートアクター適用順
+ * @type boolean
+ * @default false
  * 
  * @param SupportActorSV
  * @text サイドビューサポートアクター設定
@@ -474,9 +482,11 @@ Imported.NUUN_SupportActor = true;
   const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
   Spriteset_Battle.prototype.updateActors = function() {
     _Spriteset_Battle_updateActors.call(this);
-    const members = $gameParty.supportBattleMembers();
-    for (let i = 0; i < this._supportActorSprites.length; i++) {
-      this._supportActorSprites[i].setBattler(members[i]);
+    if (this._supportActorSprites) {
+      const members = $gameParty.supportBattleMembers();
+      this._supportActorSprites.forEach((actor, i) => {
+        actor.setBattler(members[i]);
+      });
     }
   };
 

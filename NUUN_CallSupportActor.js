@@ -11,6 +11,7 @@
  * @plugindesc サポートアクター呼び出し
  * @author NUUN
  * @version 1.0.0
+ * @base NUUN_SupportActor
  * @orderAfter NUUN_SupportActor
  * 
  * @help

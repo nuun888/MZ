@@ -5,7 +5,7 @@
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
 ### 拡張プラグイン
 [サポートアクターインジケーター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) Ver.1.3.1  
-[サポートアクター呼び出し](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CallSupportActor.js) Ver.1.0.0  
+[サポートアクター呼び出し](https://github.com/nuun888/MZ/blob/master/README/CallSupportActor.md) Ver.1.0.0  
 召喚アクター
 
 戦闘でサポートするアクターを設定します。  

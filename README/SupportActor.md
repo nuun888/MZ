@@ -1,5 +1,5 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
-# Ver.1.3.3
+# Ver.1.3.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 ### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
@@ -21,6 +21,10 @@
  サイドビューサポートアクター設定で設定がない場合、表示されません。
   
 ## 更新履歴
+2021/12/26 Ver.1.3.4  
+フロントビューで戦闘を開始するとエラーが出る問題を修正。  
+2021/12/25 Ver.1.3.3  
+プラグインコマンド「サポートアクター設定」に戦闘中の呼び出しターンを指定する機能を追加。  
 2021/12/24 Ver.1.3.2  
 特定の条件下でアクターのコマンドが表示されなくなる問題を修正。  
 その他競合対策。  

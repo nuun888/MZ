@@ -2,7 +2,7 @@
 # Ver.1.6.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 #### 必須プラグイン
-[バトルスタイル拡張ベース](https://raw.githubusercontent.com/nuun888/MZ/master/BattleStyleEX_Base.js)  
+[バトルスタイル拡張ベース](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md)  
 
 戦闘レイアウト及び一部仕様を変更、拡張します。  
 このプラグインはレイアウト設定用のプラグインです。  

@@ -81,12 +81,6 @@
  * @min -2
  * 
  * 
- * @param SupportActorMode
- * @desc サポートアクターを常に通常戦闘メンバーの後に表示。
- * @text サポートアクター適用順
- * @type boolean
- * @default false
- * 
  * @param SupportActorSV
  * @text サイドビューサポートアクター設定
  * @desc サイドビューサポートアクター設定。

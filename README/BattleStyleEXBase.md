@@ -3,7 +3,7 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
-[バトルスタイル拡張設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
+[バトルスタイル拡張設定用](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md)
 
 バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
 

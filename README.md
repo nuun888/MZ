@@ -18,8 +18,8 @@
 
 | 戦闘　　　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
-| バトルスタイル拡張ベース | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) | 共 立対 | 2.6.9 |
-| バトルスタイル拡張 | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.6.3 |
+| [バトルスタイル拡張ベース](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) | 共 立対 | 2.6.9 |
+| [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md) | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.6.3 |
 | [XP風バトルコマンド](https://github.com/nuun888/MZ/blob/master/README/XPBattleCommand.md) | [NUUN_XPBattleComman](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js) | 共 | 1.0.2 |
 | 戦闘中アイテム、スキル選択画面MV風表示 | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js) |  | 1.1.3 |
 | [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 1.14.1 |

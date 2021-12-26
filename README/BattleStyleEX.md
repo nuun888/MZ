@@ -4,6 +4,7 @@
 #### 必須プラグイン
 [バトルスタイル拡張ベース](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md)  
 #### 競合パッチ
+木星ペンギン様の疑似３Dバトルと併用するときのパッチです。  
 [バトルスタイル拡張疑似３Dバトル併用パッチ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEXInMPP_Pseudo3DBattle.js) 
 
 戦闘レイアウト及び一部仕様を変更、拡張します。  

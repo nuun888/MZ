@@ -1,5 +1,6 @@
 # [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 # Ver.1.0.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 
 スキルコストの表示を拡張します。  
 

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.8
+ * @version 2.6.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,9 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/12/26 Ver 2.6.9
+ * メンバーが増減したときにステータス、エフェクトの表示位置がおかしくなる問題を修正。
+ * エフェクトの表示位置をアクターステータス背景とステータスの間に表示するように修正。
  * 2021/12/12 Ver 2.6.8
  * 一部関数が重複していたため修正。
  * 2021/12/11 Ver 2.6.7
@@ -1550,6 +1553,7 @@ Window_BattleActorImges.prototype.preparePartyRefresh = function() {
   this._bitmapsReady = 0;
   this.actorMainSprite = [];
   let bitmap = null;
+  loadNormalPicture(param.ActorFrontBackground);
   for (const actor of $gameParty.members()) {
     if (Imported.NUUN_ActorPicture) {
       actor.imgRefresh();
@@ -1593,7 +1597,7 @@ Window_BattleActorImges.prototype.performPartyRefresh = function() {
   this._bitmapsReady++;
   if (this._bitmapsReady >= $gameParty.members().length) {
     this.refresh();
-  }
+  };
 };
 
 Window_BattleActorImges.prototype.battlreActorPicture = function(id) {//立ち絵表示EX用
@@ -1676,6 +1680,28 @@ Window_BattleActorImges.prototype.loadFace = function(actor, data) {
 
 Window_BattleActorImges.prototype.drawItem = function(index) {
   this.drawItemImage(index);
+  this.drawStatusBack(index);
+};
+
+Window_BattleActorImges.prototype.drawStatusBack = function(index) {
+  if (this._bitmapsReady >= $gameParty.members().length) {
+    const bitmap = param.ActorFrontBackground ? loadNormalPicture(param.ActorFrontBackground) : null;
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.addLoadListener(this.actorFrontBackGround.bind(this, index));
+    } else {
+      this.actorFrontBackGround(index);
+    }
+  }
+};
+
+Window_BattleActorImges.prototype.actorFrontBackGround = function(index) {
+  const rect = this.itemRect(index);
+  const actor = this.actor(index);
+  const key = "actor%1-Frontback-%2".format(actor.actorId());
+  const sprite = this.createActorImgSprite(key, Sprite);
+  sprite.bitmap = loadNormalPicture(param.ActorFrontBackground);
+  sprite.move(rect.x, rect.y);
+  sprite.show();
 };
 
 Window_BattleActorImges.prototype.drawItemImage = function(index) {
@@ -1798,17 +1824,11 @@ Window_BattleActorStatus.prototype.initialize = function(rect) {
 
 Window_BattleActorStatus.prototype.preparePartyRefresh = function() {
   $gameTemp.clearBattleRefreshRequest();
-  const bitmap = param.ActorFrontBackground ? loadNormalPicture(param.ActorFrontBackground) : null;
-  if (bitmap && !bitmap.isReady()) {
-    bitmap.addLoadListener(this.refresh.bind(this));
-  } else {
-    this.refresh();
-  }
+  this.refresh();
 };
 
 Window_BattleActorStatus.prototype.drawItemBackground = function(index) {
-  const rect = this.itemRect(index);
-  this.actorFrontBackGround(index, rect.x, rect.y);
+
 };
 
 Window_BattleActorStatus.prototype.drawItem = function(index) {
@@ -1821,15 +1841,6 @@ Window_BattleActorStatus.prototype.open = function() {
 
 Window_BattleActorStatus.prototype.close = function() {
   Window_Base.prototype.close.call(this);
-};
-
-Window_BattleActorStatus.prototype.actorFrontBackGround = function(index, x, y) {
-  const actor = this.actor(index);
-  const key = "actor%1-Frontback-%2".format(actor.actorId());
-  const sprite = this.createInnerSprite(key, Sprite);
-  sprite.bitmap = loadNormalPicture(param.ActorFrontBackground);
-  sprite.move(x, y);
-  sprite.show();
 };
 
 //NUUN_IconSideBySide併用
@@ -1882,7 +1893,7 @@ const _Sprite_Actor_updateVisibility = Sprite_Actor.prototype.updateVisibility;
 Sprite_Actor.prototype.updateVisibility = function() {
   _Sprite_Actor_updateVisibility.call(this);
   if (!$gameSystem.isSideView()) {
-    this.visible = false;
+    this.visible = true;
   }
 };
 
@@ -1893,6 +1904,14 @@ Sprite_Actor.prototype.startMove = function(x, y, duration) {
   }
 };
 
+const _Sprite_Actor_update = Sprite_Actor.prototype.update;
+Sprite_Actor.prototype.update = function() {
+  _Sprite_Actor_update.call(this);
+  if (this._actor) {
+      this.updateFrontActor();
+  }
+};
+
 const _Sprite_Actor_updateMotion = Sprite_Actor.prototype.updateMotion;
 Sprite_Actor.prototype.updateMotion = function() {
   if (this.visible) {
@@ -1900,40 +1919,20 @@ Sprite_Actor.prototype.updateMotion = function() {
   }
 };
 
-Sprite_Actor.prototype.statusPosition = function(index, rect) {
-  const itemWidth = this.itemWidth();
-  const maxCols = Math.min(this.maxItems(), this.maxCols());
-  if (param.ActorStatusMode === 1) {
-    rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
-  } else if (param.ActorStatusMode === 2) {
-    rect.x += this.width - (maxCols * itemWidth) - this.itemPadding() * 2;
-  } else {
-    //x = rect.x;
+Sprite_Actor.prototype.updateFrontActor = function() {
+  if (!$gameSystem.isSideView() && $gameTemp.isBattleRefreshRequested()) {
+    this.setActorHome(this._actor.index());
   }
-  //rect.x = x + width * index;
-  return rect;
 };
 
 Sprite_Actor.prototype.actorHomeRefresh = function(index) {
+  const rect = this._statusWindow.itemRectWithPadding(index);
   let x = 0;
   let y = 0;
-  const maxCols = this._statusWindow.maxCols();
-  const w_index = index % maxCols;
-  const h_index = Math.floor(index / maxCols);
-  const width = this._statusWindow.width;
-  const itemWidth = this._statusWindow.itemWidth();
-  const itemHeight = this._statusWindow.itemHeight();
-  if (param.ActorStatusMode === 0) {
-    x = w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX() + this._statusWindow.itemPadding();
-  } else if (param.ActorStatusMode === 2) {
-    x = (width - Math.min(this._statusWindow.maxItems(), maxCols) * itemWidth) + w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX() - this._statusWindow.itemPadding();
-  } else {
-    x = (width / 2 - Math.min(this._statusWindow.maxItems(), maxCols) * itemWidth / 2) + w_index * itemWidth + Math.floor(itemWidth / 2) + this.differenceX();
-  }
-  y = (itemHeight * h_index) + (itemHeight / 2) + this.differenceY();
+  x = rect.x + Math.floor(rect.width / 2) + this._statusWindow.itemPadding();
+  y = rect.y + this._statusWindow.y + Math.floor(rect.height / 2);
   if (param.StyleMode === "MVStyle") {
-    x -= width / 2 - ImageManager.faceWidth - 12;
-    y += itemHeight + 4;
+    x -= Math.floor(ImageManager.faceWidth / 2);
   }
   this.setHome(x + param.ActorEffect_X, y + param.ActorEffect_Y);
 };
@@ -1980,6 +1979,7 @@ Sprite_Actor.prototype.damageOffsetY = function() {
 };
 
 //Sprite_ActorImges
+
 function Sprite_ActorImges() {
   this.initialize(...arguments);
 }
@@ -2949,9 +2949,9 @@ Spriteset_Battle.prototype.createStatusLayer = function() {
   this.createBattleHud();
   this.createBackgroundStatus();
   this.createHudBack();
-  //this.createEffects();
-  this.createHudStatus();
   this.createEffects();
+  this.createHudStatus();
+  //this.createEffects();
   this.createFrontActors();
 };
 
@@ -2970,7 +2970,7 @@ Spriteset_Battle.prototype.createHudBack = function() {
 Spriteset_Battle.prototype.createBackgroundStatus = function() {
   const sprite = new Sprite();
   this._battleHudBase.addChild(sprite);
-  sprite.bitmap = this.windowBackground;
+  sprite.bitmap = this.windowBackground;console.log(param.windowBackground)
   this._backgroundSprite = sprite;
 };
 

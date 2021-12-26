@@ -10,12 +10,12 @@
 
 ## 設定方法
 ### 表示モードを指定
-デフォルト
-![画像](img/SkillCost1.png)  
-MVスタイル
-![画像](img/SkillCost1.png)  
-XPスタイル
-![画像](img/SkillCost1.png)  
+デフォルト  
+![画像](img/BattleStyleEX4.png)  
+MVスタイル  
+![画像](img/BattleStyleEX3.png)  
+XPスタイル  
+![画像](img/BattleStyleEX2.png)  
 
 ### フロントビューでのエフェクト
 

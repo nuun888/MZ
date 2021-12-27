@@ -11,21 +11,30 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.1.3
+ * @version 1.2.0
  * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
- * アイテムに独自のカテゴリーを追加または必要な項目のみ表示させることが出来ます。
+ * アイテムに独自のカテゴリーを追加することが出来ます。
  * プラグインパラメータでカテゴリーキーを設定し、アイテム、武器、防具のメモ欄に<CategoryType:[typeName]>を記入します。
  * メモ欄に記入した[typeName]と同じカテゴリーキーのカテゴリーにアイテムが表示されるようになります。
  * カテゴリーキーに「allItems」を記入しますと、そのカテゴリーは隠しアイテムを除く
  * 全てのアイテムが表示されます。
+ * item:カテゴリーキーのないまたは大事なもの以外のアイテム
+ * weapon:カテゴリーキーのない武器
+ * armor:カテゴリーキーのない防具
+ * keyItem:大事なもの
+ * allItems:アイテム、武器、防具、大事なものすべて
+ * allItem:全てのアイテム
  * 
  * [typeName]:カテゴリーキー
  * ※カテゴリーキーについて
  *  item、weapon、armor、keyItemは独自カテゴリーのキーには使用できません。
- * 
+ * 例
  * <CategoryType:sozai>　このタグを記入したアイテムはsozaiカテゴリーに表示されます。
+ * 
+ * データベースのアイテムカテゴリーのチェックを外した場合、このプラグインで設定してもチェックを外したカテゴリーは表示はされません。
  * 
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
@@ -33,6 +42,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/28 Ver.1.2.0
+ * アイテムとキーアイテムを表示する機能を追加。
+ * カテゴリーキーをコンボボックスに変更。
  * 2021/8/22 Ver.1.1.3
  * アイテム図鑑の独自カテゴリー機能追加による競合対策。
  * 2021/3/15 Ver.1.1.2
@@ -60,7 +72,7 @@
  * @param ItemCategory
  * @text カテゴリー項目
  * @desc カテゴリー項目の設定。
- * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"item\"}","{\"CategoryName\":\"\",\"Categorykey\":\"weapon\"}","{\"CategoryName\":\"\",\"Categorykey\":\"armor\"}","{\"CategoryName\":\"\",\"Categorykey\":\"keyItem\"}"]
+ * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"[\\\"'item'\\\"]\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"[\\\"'weapon'\\\"]\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"[\\\"'armor'\\\"]\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"[\\\"'keyItem'\\\"]\",\"NumShow\":\"true\"}"]
  * @type struct<ItemCategoryList>[]
  * 
  */
@@ -72,8 +84,15 @@
  * 
  * @param Categorykey
  * @text カテゴリーキー
- * @desc カテゴリーキーを設定します。例:アイテムならitem
- * @type string
+ * @desc カテゴリーキーを設定します。例:アイテムならitem リストにないキーは直接記入してください。（リスト1のみ入力）
+ * @type combo[]
+ * @option 'item'
+ * @option 'weapon'
+ * @option 'armor'
+ * @option 'keyItem'
+ * @option 'allItems'
+ * @option 'allItem'
+ * @default
  * 
  * @param NumShow
  * @type boolean
@@ -87,55 +106,47 @@ Imported.NUUN_ItemCategory = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_ItemCategory');
-const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
-  try {
-    return JSON.parse(value);
-  } catch (e) {
-    try {
-      return eval(value);
-    } catch (e) {
-      return value;
-    }
-  }
-}));
-const TypeLength = param.ItemCategory.length
+const CategoryCols = Number(parameters['CategoryCols'] || 4);
+const CategoryRows = Number(parameters['CategoryRows'] || 1);
+const ItemCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemCategory'])) : null) || [];
+const TypeLength = ItemCategory.length
 
 const _Scene_Item_categoryWindowRect = Scene_Item.prototype.categoryWindowRect;
 Scene_Item.prototype.categoryWindowRect = function() {
   const rect = _Scene_Item_categoryWindowRect.call(this);
-  rect.height = this.calcWindowHeight(param.CategoryRows, true);
+  rect.height = this.calcWindowHeight(CategoryRows, true);
   return rect;
 };
 
 const _Scene_Shop_categoryWindowRect = Scene_Shop.prototype.categoryWindowRect;
 Scene_Shop.prototype.categoryWindowRect = function() {
   const rect = _Scene_Shop_categoryWindowRect.call(this);
-  rect.height = this.calcWindowHeight(param.CategoryRows, true);
+  rect.height = this.calcWindowHeight(CategoryRows, true);
   return rect;
 };
 
 Window_ItemCategory.prototype.maxCols = function() {
-  return param.CategoryCols;
+  return CategoryCols;
 };
 
 Window_ItemCategory.prototype.makeCommandList = function() {
-  const list = param.ItemCategory;
+  const list = ItemCategory;
     if(!list) {
     return;
   }
   list.forEach(names => {
-    if(this.needsCommand(names.Categorykey) && names.Categorykey === 'item') {
-      this.addCommand(TextManager.item, names.Categorykey);
-    } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'weapon') {
-      this.addCommand(TextManager.weapon, names.Categorykey);
-    } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'armor') {
-      this.addCommand(TextManager.armor, names.Categorykey);
-    } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'keyItem') {
-      this.addCommand(TextManager.keyItem, names.Categorykey);
-    } else if (this.needsCommand(names.Categorykey) && names.Categorykey === 'allItems') {
-      this.addCommand(names.CategoryName, names.Categorykey);
-    } else if(this.needsCommand(names.Categorykey) && names.CategoryName) { 
-      this.addCommand(names.CategoryName, names.Categorykey);
+    if(this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'item') {
+      this.addCommand(TextManager.item, names.Categorykey[0]);
+    } else if(this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'weapon') {
+      this.addCommand(TextManager.weapon, names.Categorykey[0]);
+    } else if(this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'armor') {
+      this.addCommand(TextManager.armor, names.Categorykey[0]);
+    } else if(this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'keyItem') {
+      this.addCommand(TextManager.keyItem, names.Categorykey[0]);
+    } else if (this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'allItems') {
+      this.addCommand(names.CategoryName, names.Categorykey[0]);
+    } else if(this.needsCommand(names.Categorykey[0]) && names.CategoryName) { 
+      this.addCommand(names.CategoryName, names.Categorykey[0]);
     }
   });
 };
@@ -147,6 +158,8 @@ Window_ItemList.prototype.includes = function(item) {
   }
   if(this._category === 'allItems' && !this.secretItem(item) && item) {
     return true;
+  } else if (this._category === 'allItem' && DataManager.isItem(item) && (item.itypeId === 1 || item.itypeId === 2)) {
+    return true;
   }
   const type = item ? item.meta.CategoryType : null;
   const category = _Window_ItemList_includes.call(this, item);
@@ -156,10 +169,6 @@ Window_ItemList.prototype.includes = function(item) {
   if (this._category === type) {
     return true;
   }
-  //switch (this._category) {
-  //  case type:
-  //    return true;
-  //}
   return false;
 };
 
@@ -189,7 +198,7 @@ Window_ItemList.prototype.allItemsNeedsNumber = function(item) {
     if (item.itypeId === 2) {
       return $dataSystem.optKeyItemsNumber;
     } else if (item.meta.CategoryType) {
-      const list = param.ItemCategory;
+      const list = ItemCategory;
       const find = list.find(date => date.Categorykey === item.meta.CategoryType);
       if (find && find.NumShow !== undefined) {
         return find.NumShow;
@@ -204,7 +213,7 @@ const _Window_ItemList_setCategory = Window_ItemList.prototype.setCategory;
 Window_ItemList.prototype.setCategory = function(category) {
   if (this._category !== category) {
     this._needsCategory = true;
-    const list = param.ItemCategory;
+    const list = ItemCategory;
     if (list) {
       const find = list.find(date => date.Categorykey === category);
       if (find) {

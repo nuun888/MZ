@@ -1,4 +1,4 @@
-# [バトルスタイル拡張ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BSEX_Animation_KK_SSBattle.js)
+# [バトルスタイル拡張スピードスターバトル併用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BSEX_Animation_KK_SSBattle.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BSEX_Animation_KK_SSBattle.js)
 

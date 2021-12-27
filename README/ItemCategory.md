@@ -4,7 +4,9 @@
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
-アイテムに独自のカテゴリーを追加することが出来ます。
+アイテムに独自のカテゴリーを追加することが出来ます。  
+
+![画像](img/ItemCategory1.png)  
 
 ## 設定方法
 プラグインパラメータでカテゴリーキーを設定し、アイテム、武器、防具のメモ欄に`<CategoryType:[typeName]>`を記入します。  

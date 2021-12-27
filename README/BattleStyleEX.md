@@ -6,6 +6,8 @@
 #### 競合パッチ
 木星ペンギン様の疑似３Dバトルと併用するときのパッチです。  
 [バトルスタイル拡張疑似３Dバトル併用パッチ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEXInMPP_Pseudo3DBattle.js) 
+ケケー様のスピードスターバトルと併用しフロントビューでアニメーションを表示するためのパッチです。  
+[バトルスタイル拡張スピードスターバトル併用](https://github.com/nuun888/MZ/blob/master/README/BSEX_Animation_KK_SSBattle.md)  
 
 戦闘レイアウト及び一部仕様を変更、拡張します。  
 このプラグインはレイアウト設定用のプラグインです。  

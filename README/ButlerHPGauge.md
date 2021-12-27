@@ -2,7 +2,6 @@
 # Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
 
-ダウンロード
 敵のバトラー上にHPゲージを表示します。  
 
 ![画像](img/hpGauge1.png)  

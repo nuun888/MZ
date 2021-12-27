@@ -1,4 +1,4 @@
-# [敵HPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)
+# [アイテムカテゴリーカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)
 # Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)
 #### 必須プラグイン

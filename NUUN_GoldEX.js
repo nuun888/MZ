@@ -6,18 +6,14 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- * 更新履歴
- * 2021/2/3 Ver.1.1.0
- * 特定のクラスのみ所持金のアイコンを表示させる機能を追加(デフォルトでは"Window_ShopNumber"、"Window_Gold")
- * 2021/1/24 Ver.1.0.1
- * 「セーブ画面拡張プラグインを使用時」、アイコン画像をセーブ画面に反映しないように修正。
- * 2021/1/13 Ver.1.0.0
- * 初版
  */ 
 /*:
  * @target MZ
  * @plugindesc  所持金拡張
  * @author NUUN
+ * @version 1.1.1
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * 所持金を拡張します。
@@ -31,6 +27,16 @@
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2021/12/30 Ver.1.1.1
+ * 所持金アイコンを表示させるクラス指定をコンボボックスに変更。
+ * 2021/2/3 Ver.1.1.0
+ * 特定のクラスのみ所持金のアイコンを表示させる機能を追加(デフォルトでは"Window_ShopNumber"、"Window_Gold")
+ * 2021/1/24 Ver.1.0.1
+ * 「セーブ画面拡張プラグインを使用時」、アイコン画像をセーブ画面に反映しないように修正。
+ * 2021/1/13 Ver.1.0.0
+ * 初版
  * 
  * @param MaxGold
  * @desc お金を所持できる最大金額を設定します。0:デフォルト -1:制限なし　1以上:任意の上限（１京まで）
@@ -53,10 +59,13 @@
  * @default true
  * 
  * @param IconShowClassData
- * @desc アイコンを表示させるクラス。
+ * @desc アイコンを表示させるクラス。(複数指定可能)
  * @text アイコン表示クラス
- * @type struct<ClassData>[]
- * @default ["{\"IconShowClass\":\"\\\"Window_ShopNumber\\\"\"}","{\"IconShowClass\":\"\\\"Window_Gold\\\"\"}"]
+ * @type combo[]
+ * @option "Window_ShopNumber"
+ * @option "Window_Gold"
+ * @option "Window_InfoMenu"
+ * @default 
  * 
  * 
  * @command GetGold
@@ -82,37 +91,17 @@
  * @default 0
  * 
  */
-/*~struct~ClassData:
- * 
- * @param IconShowClass
- * @desc アイコンを表示させるクラス。（""及び''で囲う）
- * @text アイコン表示クラス
- * @type string
- * @default 
- * 
- */
 var Imported = Imported || {};
 Imported.NUUN_GoldEX = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_GoldEX');
-const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
-  try {
-      return JSON.parse(value);
-  } catch (e) {
-      try {
-          return eval(value);
-      } catch (e) {
-          return value;
-      }
-  }
-}));
-const MaxGold = param.MaxGold || 9999999;
-const GoldSeparation = param.GoldSeparation || true;
-const GoldIcon = param.GoldIcon || 0;
-const IconShowClassData = param.IconShowClassData || ["{\"IconShowClass\":\"\\\"Window_ShopNumber\\\"\"}","{\"IconShowClass\":\"\\\"Window_Gold\\\"\"}"];
-const pluginName = "NUUN_GoldEX";
+const MaxGold = Number(parameters['MaxGold'] || -1);
+const GoldIcon = Number(parameters['GoldIcon'] || 0);
+const GoldSeparation = eval(parameters['GoldSeparation'] || "true");
+const IconShowClassData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['IconShowClassData'])) : null) || [];
 
+const pluginName = "NUUN_GoldEX";
 PluginManager.registerCommand(pluginName, "GetGold", args => {
   if (Number(args.GoldMode) === 0) {
     $gameParty.gainGold(Number(args.Gold));
@@ -136,9 +125,8 @@ Window_Base.prototype.drawCurrencyValue = function(value, unit, x, y, width) {
 };
 
 Window_Base.prototype.showGoldIconClass = function() {
-  const date = IconShowClassData;
   const thisClass = String(this.constructor.name);
-  return date.find(className => (className.IconShowClass === thisClass));
+  return IconShowClassData.some(data => data === thisClass);
 };
 
 const _Game_Party_maxGold = Game_Party.prototype.maxGold;

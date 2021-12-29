@@ -1,4 +1,4 @@
-# [ 所持金拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)
+# [所持金拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)
 # Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)
 #### 必須プラグイン

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.8.0
+ * @version 1.8.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -24,8 +24,8 @@
  * スナップショットを表示可能。
  * 
  * ファイル名横の表示文字の評価式
- * info.AnyName:
- * info.title:
+ * info.AnyName:表示文字列
+ * info.title:ゲームタイトル名
  * 
  * 背景画像の変更
  * ゲームの進行によって背景画像を変更出来ます。
@@ -42,6 +42,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/30 Ver.1.8.1
+ * コンテンツ背景を独自の画像を設定できる機能を追加。
  * 2021/12/12 Ver.1.8.0
  * コンテンツの表示設定を変更。
  * プラグインコマンドが適用されていなかった問題を修正。
@@ -283,6 +285,14 @@
  * @default false
  * @parent BackGround
  * 
+ * @param ContentsBackGroundImg
+ * @desc コンテンツ背景画像ファイル名を指定します。
+ * @text コンテンツ背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent BackGround
+ * 
  * @param Contents
  * @text 各コンテンツ設定
  * @default ------------------------------
@@ -303,7 +313,7 @@
  * @parent Contents
  * 
  * @param ContentsWidth
- * @desc コンテンツエリアの横幅（０でデフォルト幅）
+ * @desc コンテンツエリアの横幅（0でデフォルト幅）
  * @text コンテンツエリア横幅
  * @type number
  * @default 0
@@ -504,7 +514,7 @@ Imported.NUUN_SaveScreen = true;
   const DayTime = String(parameters['DayTime']);
   const ContentsList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsList'])) : null) || [];
   const BackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])[0]) : null;
-  const ContentsBackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsBackGroundImg'])) : null;
+  const ContentsBackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsBackGroundImg'])[0]) : null;
 
   const pluginName = "NUUN_SaveScreen";
   PluginManager.registerCommand(pluginName, 'ChangeBackground', args => {
@@ -715,6 +725,25 @@ Imported.NUUN_SaveScreen = true;
     return NumSaveRows ? NumSaveRows : _Window_SavefileList_numVisibleRows.call(this);
   };
 
+  const _Window_SavefileList_drawItemBackground = Window_SavefileList.prototype.drawItemBackground;
+  Window_SavefileList.prototype.drawItemBackground = function(index) {
+    if (ContentsBackGroundImg) {
+      const bitmap = ImageManager.nuun_LoadPictures(ContentsBackGroundImg);
+      if (bitmap && !bitmap.isReady()) {
+        bitmap.addLoadListener(this.drawContentsBack.bind(this, bitmap, index));
+      } else {
+        this.drawContentsBack(bitmap, index);
+      }
+    } else {
+      _Window_SavefileList_drawItemBackground.call(this, index);
+    }
+  };
+
+  Window_SavefileList.prototype.drawContentsBack = function(bitmap, index) {
+    const rect = this.itemRect(index);
+    this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+  };
+
   const _Window_SavefileList_drawItem = Window_SavefileList.prototype.drawItem;
   Window_SavefileList.prototype.drawItem = function(index) {
     this._FaceOn = false;
@@ -803,7 +832,7 @@ Imported.NUUN_SaveScreen = true;
 
   Window_SavefileList.prototype.itemContentsWidth = function(width) {
     return Math.floor(width / 2) - this.colSpacing();
-};
+  };
 
   Window_SavefileList.prototype.drawContentsBase = function(info, x, y, width, data) {
     switch (data.DateSelect) {

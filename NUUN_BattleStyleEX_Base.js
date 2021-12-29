@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.9
+ * @version 2.6.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2021/12/30 Ver 2.6.10
+ * スピードスターバトルとの併用パッチによる処理の追加。
  * 2021/12/26 Ver 2.6.9
  * メンバーが増減したときにステータス、エフェクトの表示位置がおかしくなる問題を修正。
  * エフェクトの表示位置をアクターステータス背景とステータスの間に表示するように修正。
@@ -1893,7 +1895,7 @@ const _Sprite_Actor_updateVisibility = Sprite_Actor.prototype.updateVisibility;
 Sprite_Actor.prototype.updateVisibility = function() {
   _Sprite_Actor_updateVisibility.call(this);
   if (!$gameSystem.isSideView()) {
-    this.visible = true;
+    this.visible = false;
   }
 };
 
@@ -2915,6 +2917,9 @@ Sprite_BattleGauge.prototype.gaugeHeight = function() {
 const _Spriteset_Battle_makeTargetSprites = Spriteset_Battle.prototype.makeTargetSprites;
 Spriteset_Battle.prototype.makeTargetSprites = function(targets) {
   const targetSprites = _Spriteset_Battle_makeTargetSprites.call(this, targets);
+  if (Imported.NUUN_BSEX_Animation_KK_SSBattle) {
+    this._nuun_targetSprites = targetSprites;
+  }
   this._effectsContainer = this.animationTarget(targetSprites) ? this._effectsFrontContainer : this._effectsBackContainer;
   return targetSprites;
 };
@@ -2970,7 +2975,7 @@ Spriteset_Battle.prototype.createHudBack = function() {
 Spriteset_Battle.prototype.createBackgroundStatus = function() {
   const sprite = new Sprite();
   this._battleHudBase.addChild(sprite);
-  sprite.bitmap = this.windowBackground;console.log(param.windowBackground)
+  sprite.bitmap = this.windowBackground;
   this._backgroundSprite = sprite;
 };
 

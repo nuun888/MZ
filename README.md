@@ -18,7 +18,7 @@
 
 | 戦闘　　　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
-| [バトルスタイル拡張ベース](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) | 共 立対 | 2.6.9 |
+| [バトルスタイル拡張ベース](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) | 共 立対 | 2.6.10 |
 | [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md) | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.6.3 |
 | [XP風バトルコマンド](https://github.com/nuun888/MZ/blob/master/README/XPBattleCommand.md) | [NUUN_XPBattleComman](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js) | 共 | 1.0.2 |
 | 戦闘中アイテム、スキル選択画面MV風表示 | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js) |  | 1.1.3 |
@@ -126,7 +126,7 @@
 | ┗ 条件付きドロップアイテム図鑑適用 | [NUUN_EnemyBookEX_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) |  | 1.0.1 |
 | アイテム図鑑 | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) | 共 | 1.4.2 |
 | [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共 立対 レ | 2.3.1 |
-| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.8.0 |
+| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.8.1 |
 | セーブ上書き確認 | [NUUN_SaveVerification](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveVerification.js) |  | 1.0.0 |
 | [所持金拡張](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.1 |
 | メンバー変更画面 | [NUUN_SceneFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js) | 共 立対 | 1.5.1 |

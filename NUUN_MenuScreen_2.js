@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_MenuScreen.js
+ * NUUN_MenuScreen_2.js
  * 
  * Copyright (C) 2021 NUUN
  * This software is released under the MIT License.
@@ -8,9 +8,9 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc メニュー画面タイプ１
+ * @plugindesc メニュー画面タイプ２
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -23,9 +23,8 @@
  * 
  * 顔グラの座標設定はアクターの画像設定または立ち絵表示EX用画像設定（立ち絵、顔グラ表示EX導入時）で設定してください。
  * 
+ * 
  * 更新履歴
- * 2021/12/29 Ver.1.0.1
- * メニューコマンドの説明がない場合にエラーが起こる問題を修正。
  * 2021/12/29 Ver.1.0.0
  * 初版
  * 
@@ -37,7 +36,7 @@
  * @text アクターの表示列
  * @desc アクターの表示する列。
  * @type number
- * @default 3
+ * @default 4
  * @min 1
  * @parent Setting
  * 
@@ -46,6 +45,22 @@
  * @desc アクターの表示する行。
  * @type number
  * @default 1
+ * @min 1
+ * @parent Setting
+ * 
+ * @param CommandCols
+ * @text メニューコマンドの表示列
+ * @desc メニューコマンドの表示する列。
+ * @type number
+ * @default 4
+ * @min 1
+ * @parent Setting
+ * 
+ * @param CommandRows
+ * @text メニューコマンドの表示行
+ * @desc メニューコマンドの表示する行。
+ * @type number
+ * @default 2
  * @min 1
  * @parent Setting
  * 
@@ -83,7 +98,7 @@
  * @desc ステータス項目設定
  * @text ステータス項目設定
  * @type struct<StatusListData>[]
- * @default ["{\"DateSelect\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"4\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-10\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"11\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-10\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"12\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"18\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"13\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"46\",\"ItemWidth\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"4\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"11\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"12\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"38\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"13\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"66\",\"ItemWidth\":\"0\"}"]
  * @parent StatusSetting
  * 
  * @param HPGaugeWidth
@@ -119,7 +134,7 @@
  * @desc インフォ項目設定
  * @text インフォ項目設定
  * @type struct<InfoListData>[]
- * @default 
+ * @default ["{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"現在地:\",\"DetaEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"30\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"プレイ時間:\",\"DetaEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"2\",\"X_Position\":\"3\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}"]
  * @parent InfoSetting
  * 
  * @param InfoCols
@@ -510,12 +525,14 @@
  * 
  */
 var Imported = Imported || {};
-Imported.NUUN_MenuScreen = true;
+Imported.NUUN_MenuScreen_2 = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_MenuScreen');
+const parameters = PluginManager.parameters('NUUN_MenuScreen_2');
 const MenuCols = Number(parameters['MenuCols'] || 4);
 const MenuRows = Number(parameters['MenuRows'] || 1);
+const CommandCols = Number(parameters['CommandCols'] || 4);
+const CommandRows = Number(parameters['CommandRows'] || 2);
 const InfoCols = Number(parameters['InfoCols'] || 3);
 const InfoRows = Number(parameters['InfoRows'] || 2);
 const BackGroundImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])) : null);
@@ -541,7 +558,7 @@ Scene_Menu.prototype.create = function() {
 
 Scene_Menu.prototype.commandWindowRect = function() {
     const ww = this.mainCommandWidth();
-    const wh = this.mainAreaHeight() - this.infoAreaHeight();
+    const wh = this.mainCommandAreaHeight();
     const wx = this.isRightInputMode() ? Graphics.boxWidth - ww : 0;
     const wy = this.mainAreaTop();
     return new Rectangle(wx, wy, ww, wh);
@@ -573,10 +590,10 @@ Scene_Menu.prototype.createStatusWindow = function() {
 };
 
 Scene_Menu.prototype.statusWindowRect = function() {
-    const ww = Graphics.boxWidth - this.mainCommandWidth();
-    const wh = this.mainAreaHeight() - this.infoAreaHeight();
-    const wx = this.isRightInputMode() ? 0 : Graphics.boxWidth - ww;
-    const wy = this.menuHelpAreaHeight();
+    const ww = this.mainCommandWidth();
+    const wh = this.mainAreaHeight() - this.infoAreaHeight() - this.mainCommandAreaHeight();
+    const wx = 0;
+    const wy = this.menuHelpAreaHeight() + this.mainCommandAreaHeight();
     return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -615,6 +632,14 @@ Scene_Menu.prototype.setBackGround = function(sprite) {
     }
 };
 
+Scene_Menu.prototype.mainCommandWidth = function() {
+    return Graphics.boxWidth;
+};
+
+Scene_Menu.prototype.mainCommandAreaHeight = function() {
+    return this.calcWindowHeight(CommandRows, true);
+};
+
 Scene_Menu.prototype.infoAreaHeight = function() {
     return this.calcWindowHeight(InfoRows, (InfoRows === 1));
 };
@@ -629,6 +654,15 @@ Scene_Menu.prototype.update = function() {
     const find = HelpList.find(data => data.HelpCommandName[0] === this._commandWindow.currentData().name);
     const text = find && find.HelpCommandText ? find.HelpCommandText : "";
     this._infoMenuWindow.setText(text);
+};
+
+
+Window_MenuCommand.prototype.numVisibleRows = function() {
+    return CommandRows;
+};
+
+Window_MenuCommand.prototype.maxCols = function() {
+    return CommandCols;
 };
 
 
@@ -714,8 +748,22 @@ Window_MenuStatus.prototype.drawItemImage = function(index) {
 };
 
 Window_MenuStatus.prototype.drawActorFace = function(actor, x, y, width, height) {
-    const data = this.battlreActorPicture(actor.actorId());
-    Window_StatusBase.prototype.drawActorFace.call(this, actor, x + data.Actor_X, y + data.Actor_Y, width, height)
+    let data = null;
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        data = this.battlreActorPicture(actor.actorId());
+        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x + data.Actor_X, y + data.Actor_Y, width, height);
+    } else {
+        data = this.getActorImgData(actor);
+        Window_StatusBase.prototype.drawActorFace.call(this, actor, x + data.Actor_X, y + data.Actor_Y, width, height)
+    }
+};
+
+Window_MenuStatus.prototype.drawActorFace = function(actor, x, y, width, height) {
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
+    } else {
+        _Window_StatusBase_drawActorFace.call(this, actor, x, y, width, height);
+    }
 };
 
 Window_MenuStatus.prototype.getActorImgData = function(actor) {

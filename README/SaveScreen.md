@@ -1,5 +1,6 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
 # Ver.1.8.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
 
 セーブ画面にいくつかの項目を追加します。  
 

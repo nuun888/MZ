@@ -1,5 +1,6 @@
 # [ステート横並び表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
 # Ver.1.1.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
 
 戦闘中に表示するステートを横並び表示にします。  
 総ステート数が表示できる個数を超えた場合はアイコンが切り替わります。  

@@ -14,6 +14,7 @@
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.2 |
 | レーダーチャート表示ベース | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) |  | 1.0.0 |
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.3 |
+| [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) |  | 1.0.0 |
 |  |  |  |  |
 
 | 戦闘　　　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |

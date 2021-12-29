@@ -1,5 +1,5 @@
 # [メニュー画面タイプ１](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -32,5 +32,7 @@
 ![画像](img/MenuScreen2.png) 
 
 ## 更新履歴
+2021/12/29 Ver.1.0.1  
+メニューコマンドの説明がない場合にエラーが起こる問題を修正。  
 2021/12/29 Ver.1.0.0  
 初版  

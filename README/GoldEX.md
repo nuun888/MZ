@@ -2,6 +2,7 @@
 # Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)
 #### 必須プラグイン
+[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 所持金を拡張します。  
 

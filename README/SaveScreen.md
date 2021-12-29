@@ -1,6 +1,8 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# Ver.1.8.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
+# Ver.1.8.1
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
+#### 必須プラグイン
+[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 セーブ画面にいくつかの項目を追加します。  
 
@@ -32,6 +34,8 @@
 デプロイメントに対応済みです。  
 
 ## 更新履歴
+2021/12/30 Ver.1.8.1  
+コンテンツ背景を独自の画像を設定できる機能を追加。  
 2021/12/12 Ver.1.8.0  
 コンテンツの表示設定を変更。  
 プラグインコマンドが適用されていなかった問題を修正。  

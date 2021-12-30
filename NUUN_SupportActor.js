@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.3.4
+ * @version 1.3.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/30 Ver.1.3.5
+ * ステータス画面を開くとエラーが出る問題を修正。
+ * サポートアクターをパーティに加えた時に、TPBバトルだと動作しない問題を修正。
  * 2021/12/26 Ver.1.3.4
  * フロントビューで戦闘を開始するとエラーが出る問題を修正。
  * 2021/12/25 Ver.1.3.3
@@ -80,6 +83,12 @@
  * @default -1
  * @min -2
  * 
+ * 
+ * @param SupportActorMode
+ * @desc サポートアクターを常に通常戦闘メンバーの後に表示。
+ * @text サポートアクター適用順
+ * @type boolean
+ * @default false
  * 
  * @param SupportActorSV
  * @text サイドビューサポートアクター設定
@@ -380,6 +389,20 @@ Imported.NUUN_SupportActor = true;
     _Game_Player_refresh.call(this);
   };
 
+  const _Game_Party_addActor = Game_Party.prototype.addActor;
+  Game_Party.prototype.addActor = function(actorId) {
+    const inc = !this._actors.includes(actorId);
+    _Game_Party_addActor.call(this, actorId)
+    if (inc && this._actors.includes(actorId)) {
+      if (this.inBattle()) {
+        const actor = $gameActors.actor(actorId);
+        if (this.supportBattleMembers().includes(actor)) {
+          actor.onBattleStart();
+        }
+      }
+    }
+  };
+
 
   const _Game_Follower_actor = Game_Follower.prototype.actor;
   Game_Follower.prototype.actor = function() {
@@ -499,7 +522,7 @@ Imported.NUUN_SupportActor = true;
 
   const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
   Sprite_Actor.prototype.setHome = function(x, y) {
-    if (this._actor.getSupportActor()) {
+    if (this._actor.getSupportActor() && sIndex >= 0) {
       x += SupportActorSV[sIndex].SupportActorSV_X;
       y += SupportActorSV[sIndex].SupportActorSV_Y;
     }

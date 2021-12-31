@@ -10,10 +10,9 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.0.3
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @orderAfter NUUN_GaugeImage
  * 
  * @help
  * ゲージの表示を拡張します。
@@ -27,11 +26,14 @@
  * ゲージ数値表示形式の仕様
  * timeは数値が表示されません。
  * 
+ * ダメージ時の可視化機能はTPBゲージでは設定できません。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/1 Ver.1.1.0
+ * ダメージを可視化するゲージを表示する機能を追加。
  * 2021/12/12 Ver.1.0.3
  * 一部プラグインと関数が重複したため変更。
  * 2021/12/5 Ver.1.0.2
@@ -103,11 +105,47 @@
  * @min -9999
  * @parent CommonSetting
  * 
+ * @param DamageGaugeSetting
+ * @text ダメージ量可視化ゲージ設定
+ * @default ------------------------------
+ * 
+ * @param DamageValueWait
+ * @desc ダメージ時のゲージ更新待ちのフレーム数。
+ * @text ダメージ時ゲージ更新待ちフレーム数
+ * @type number
+ * @default 60
+ * @min 0
+ * @parent DamageGaugeSetting
+ * 
+ * @param DamageDuration
+ * @desc ダメージ時のゲージ更新フレーム。
+ * @text ダメージ時ゲージ更新フレーム
+ * @type number
+ * @default 20
+ * @min 0
+ * @parent DamageGaugeSetting
+ * 
+ * @param DamageColor1
+ * @desc ゲージの色１（テキストタブからカラーコードを入力できます）
+ * @text ゲージ色１
+ * @type number
+ * @default 18
+ * @min 0
+ * @parent DamageGaugeSetting
+ * 
+ * @param DamageColor2
+ * @desc ゲージの色２（テキストタブからカラーコードを入力できます）
+ * @text ゲージ色２
+ * @type number
+ * @default 18
+ * @min 0
+ * @parent DamageGaugeSetting
+ * 
  * @param ValueVisibleType
  * @text ゲージ設定
  * @desc ゲージ設定
  * @type struct<ValueGauge>[]
- * @default ["{\"Type\":\"[\\\"'hp'\\\"]\",\"ValueVisible\":\"'ValueMaxValue'\",\"GaugeVisible\":\"true\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"ValueColor\":\"0\",\"MaxValueFontSize\":\"-6\",\"MaxValueColor\":\"0\",\"SeparationFontSize\":\"-6\",\"SeparationColor\":\"0\",\"LabelFontSize\":\"-2\",\"LabelColor\":\"16\",\"CoordinateSetting\":\"------------------------------\",\"GaugeX\":\"-1\",\"GaugeY\":\"12\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"ValueMargin\":\"32\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"20\",\"GaugeColor2\":\"21\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"MaximumValueColor\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\",\"RatioValueColor\":\"0\"}","{\"Type\":\"[\\\"'mp'\\\"]\",\"ValueVisible\":\"'ValueMaxValue'\",\"GaugeVisible\":\"true\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"ValueColor\":\"0\",\"MaxValueFontSize\":\"-6\",\"MaxValueColor\":\"0\",\"SeparationFontSize\":\"-6\",\"SeparationColor\":\"0\",\"LabelFontSize\":\"-2\",\"LabelColor\":\"16\",\"CoordinateSetting\":\"------------------------------\",\"GaugeX\":\"-1\",\"GaugeY\":\"12\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"ValueMargin\":\"32\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"22\",\"GaugeColor2\":\"23\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"-1\",\"MaxGaugeColor2\":\"-1\",\"MaximumValueColor\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\",\"RatioValueColor\":\"0\"}","{\"Type\":\"[\\\"'tp'\\\"]\",\"ValueVisible\":\"'Value'\",\"GaugeVisible\":\"true\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"ValueColor\":\"0\",\"MaxValueFontSize\":\"-6\",\"MaxValueColor\":\"0\",\"SeparationFontSize\":\"-6\",\"SeparationColor\":\"0\",\"LabelFontSize\":\"-2\",\"LabelColor\":\"16\",\"CoordinateSetting\":\"------------------------------\",\"GaugeX\":\"-1\",\"GaugeY\":\"12\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"ValueMargin\":\"0\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"28\",\"GaugeColor2\":\"29\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"-1\",\"MaxGaugeColor2\":\"-1\",\"MaximumValueColor\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\",\"RatioValueColor\":\"0\"}","{\"Type\":\"[\\\"'time'\\\"]\",\"ValueVisible\":\"'Value'\",\"GaugeVisible\":\"true\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"ValueColor\":\"0\",\"MaxValueFontSize\":\"-6\",\"MaxValueColor\":\"0\",\"SeparationFontSize\":\"-6\",\"SeparationColor\":\"0\",\"LabelFontSize\":\"-2\",\"LabelColor\":\"16\",\"CoordinateSetting\":\"------------------------------\",\"GaugeX\":\"-1\",\"GaugeY\":\"12\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"ValueMargin\":\"0\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"26\",\"GaugeColor2\":\"27\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"-1\",\"MaxGaugeColor2\":\"-1\",\"MaximumValueColor\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\",\"RatioValueColor\":\"0\"}"]
+ * @default ["{\"Type\":\"[\\\"'hp'\\\"]\",\"ValueVisible\":\"'ValueMaxValue'\",\"GaugeVisible\":\"true\",\"GaugeDamageVisualization\":\"false\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"ValueColor\":\"0\",\"MaxValueFontSize\":\"-6\",\"MaxValueColor\":\"0\",\"SeparationFontSize\":\"-6\",\"SeparationColor\":\"0\",\"LabelFontSize\":\"-2\",\"LabelColor\":\"16\",\"CoordinateSetting\":\"------------------------------\",\"GaugeX\":\"-1\",\"GaugeY\":\"12\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"ValueMargin\":\"32\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"20\",\"GaugeColor2\":\"21\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"MaximumValueColor\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\",\"RatioValueColor\":\"0\"}","{\"Type\":\"[\\\"'mp'\\\"]\",\"ValueVisible\":\"'ValueMaxValue'\",\"GaugeVisible\":\"true\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"ValueColor\":\"0\",\"MaxValueFontSize\":\"-6\",\"MaxValueColor\":\"0\",\"SeparationFontSize\":\"-6\",\"SeparationColor\":\"0\",\"LabelFontSize\":\"-2\",\"LabelColor\":\"16\",\"CoordinateSetting\":\"------------------------------\",\"GaugeX\":\"-1\",\"GaugeY\":\"12\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"ValueMargin\":\"32\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"22\",\"GaugeColor2\":\"23\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"-1\",\"MaxGaugeColor2\":\"-1\",\"MaximumValueColor\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\",\"RatioValueColor\":\"0\"}","{\"Type\":\"[\\\"'tp'\\\"]\",\"ValueVisible\":\"'Value'\",\"GaugeVisible\":\"true\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"ValueColor\":\"0\",\"MaxValueFontSize\":\"-6\",\"MaxValueColor\":\"0\",\"SeparationFontSize\":\"-6\",\"SeparationColor\":\"0\",\"LabelFontSize\":\"-2\",\"LabelColor\":\"16\",\"CoordinateSetting\":\"------------------------------\",\"GaugeX\":\"-1\",\"GaugeY\":\"12\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"ValueMargin\":\"0\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"28\",\"GaugeColor2\":\"29\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"-1\",\"MaxGaugeColor2\":\"-1\",\"MaximumValueColor\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\",\"RatioValueColor\":\"0\"}","{\"Type\":\"[\\\"'time'\\\"]\",\"ValueVisible\":\"'Value'\",\"GaugeVisible\":\"true\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"ValueColor\":\"0\",\"MaxValueFontSize\":\"-6\",\"MaxValueColor\":\"0\",\"SeparationFontSize\":\"-6\",\"SeparationColor\":\"0\",\"LabelFontSize\":\"-2\",\"LabelColor\":\"16\",\"CoordinateSetting\":\"------------------------------\",\"GaugeX\":\"-1\",\"GaugeY\":\"12\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"ValueMargin\":\"0\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"26\",\"GaugeColor2\":\"27\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"-1\",\"MaxGaugeColor2\":\"-1\",\"MaximumValueColor\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\",\"RatioValueColor\":\"0\"}"]
  * @parent CommonSetting
  * 
  */
@@ -141,6 +179,12 @@
  * @text ゲージ表示
  * @type boolean
  * @default true
+ * 
+ * @param GaugeDamageVisualization
+ * @desc ダメージ時にダメージ量を可視化するゲージを表示する。
+ * @text ダメージ量を可視化
+ * @type boolean
+ * @default false
  * 
  * @param FontSetting
  * @text フォント設定
@@ -376,6 +420,10 @@ Imported.NUUN_GaugeValueEX = true;
   const parameters = PluginManager.parameters('NUUN_GaugeValueEX');
   const ValueDigits = String(parameters['ValueDigits'] || '0000');
   const DefaultGaugeVisible = eval(parameters['DefaultGaugeVisible'] || 'true');
+  const DamageValueWait = Number(parameters['DamageValueWait'] || 60);
+  const DamageDuration = Number(parameters['DamageDuration'] || 60);
+  const DamageColor1 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DamageColor1'])) : 18);
+  const DamageColor2 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DamageColor2'])) : 18);
   const DefaultGaugeHeight = Number(parameters['DefaultLabelHeight'] || 12);
   const DefaultValueFontSize = Number(parameters['DefaultValueFontSize'] || -6);
   const DefaultMaxValueFontSize = Number(parameters['DefaultMaxValueFontSize'] || -6);
@@ -390,6 +438,10 @@ Imported.NUUN_GaugeValueEX = true;
     this._gaugeData = null;
     this._valueTextWidth = 0;
     this._isGaugeData = false;
+    this._damageValue = NaN;
+    this._damageValueWait = 0;
+    this._damageDuration = 0;
+    this._drawGaugeMode = 0;
   };
 
   const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
@@ -397,6 +449,49 @@ Imported.NUUN_GaugeValueEX = true;
     this.initGaugeData(statusType);
     _Sprite_Gauge_setup.call(this, battler, statusType);
     this._valueTextWidth = this.setValueTextWidth();
+    this._damageValue = this.currentValue();
+  };
+
+  const _Sprite_Gauge_updateBitmap = Sprite_Gauge.prototype.updateBitmap;
+  Sprite_Gauge.prototype.updateBitmap = function() {
+    const value = this.currentValue();
+    if (value !== this._targetValue) {
+      this.updateDamageValue(value);
+    }
+    _Sprite_Gauge_updateBitmap.call(this);
+  };
+
+  const _Sprite_Gauge_updateTargetValue = Sprite_Gauge.prototype.updateTargetValue;
+  Sprite_Gauge.prototype.updateTargetValue = function(value, maxValue) {
+    if (!isNaN(this._value) && this.gaugeDamageVisualization()) {
+      this._damageValueWait = DamageValueWait;
+    }
+    _Sprite_Gauge_updateTargetValue.call(this, value, maxValue);
+  };
+
+  Sprite_Gauge.prototype.updateDamageValue = function(value) {
+    if (isNaN(this._damageValue)) {
+      this._damageValue = value;
+    } else {
+      this._damageDuration = this.damageSmoothness();
+    }
+  };
+
+  Sprite_Gauge.prototype.damageSmoothness = function() {
+    return this.gaugeDamageVisualization() ? DamageDuration : 0;
+  };
+
+  const _Sprite_Gauge_updateGaugeAnimation = Sprite_Gauge.prototype.updateGaugeAnimation;
+  Sprite_Gauge.prototype.updateGaugeAnimation = function() {
+    _Sprite_Gauge_updateGaugeAnimation.call(this);
+    if (this._damageValueWait > 0) {
+      this._damageValueWait--;
+    } else if (this._damageDuration > 0) {
+      const d = this._damageDuration;
+      this._damageValue = (this._damageValue * (d - 1) + this._targetValue) / d;
+      this._damageDuration--;
+      this.redraw();
+    }
   };
 
   Sprite_Gauge.prototype.initGaugeData = function(statusType) {
@@ -408,6 +503,10 @@ Imported.NUUN_GaugeValueEX = true;
 
   Sprite_Gauge.prototype.isValueVisibleType = function(statusType) {
     return ValueVisibleType.find(type => type.Type[0] === statusType);
+  };
+
+  Sprite_Gauge.prototype.gaugeDamageVisualization = function() {
+    return this._isGaugeData && this._statusType !== "time" && this._gaugeData.GaugeDamageVisualization;
   };
 
   Sprite_Gauge.prototype.gaugeHeight = function() {//再定義
@@ -489,7 +588,7 @@ Imported.NUUN_GaugeValueEX = true;
   const _Sprite_Gauge_gaugeColor1 = Sprite_Gauge.prototype.gaugeColor1;
   Sprite_Gauge.prototype.gaugeColor1 = function() {
     if (this._isGaugeData) {
-      return getColorCode(this.changeGaugeColor1())
+      return this._drawGaugeMode === 0 ? getColorCode(this.changeGaugeColor1()) : this.gaugeDamageColor1();
     }
     return _Sprite_Gauge_gaugeColor1.call(this);
   };
@@ -497,9 +596,17 @@ Imported.NUUN_GaugeValueEX = true;
   const _Sprite_Gauge_gaugeColor2 = Sprite_Gauge.prototype.gaugeColor2;
   Sprite_Gauge.prototype.gaugeColor2 = function() {
     if (this._isGaugeData) {
-      return getColorCode(this.changeGaugeColor2())
+      return this._drawGaugeMode === 0 ? getColorCode(this.changeGaugeColor2()) : this.gaugeDamageColor2();
     }
     return _Sprite_Gauge_gaugeColor2.call(this);
+  };
+
+  Sprite_Gauge.prototype.gaugeDamageColor1 = function() {
+    return getColorCode(DamageColor1);
+  };
+
+  Sprite_Gauge.prototype.gaugeDamageColor2 = function() {
+    return getColorCode(DamageColor2);
   };
 
   Sprite_Gauge.prototype.getGaugeHpRatio = function() {
@@ -558,6 +665,21 @@ Imported.NUUN_GaugeValueEX = true;
     return this._gaugeData.ValueY;
   };
 
+  const _Sprite_Gauge_gaugeRate = Sprite_Gauge.prototype.gaugeRate;
+  Sprite_Gauge.prototype.gaugeRate = function() {
+    if (this._drawGaugeMode === 0) {//通常のゲージ
+      return _Sprite_Gauge_gaugeRate.call(this);
+    } else if (this._drawGaugeMode === 1) {//ダメージゲージ
+      if (this.isValid() && !isNaN(this._damageValue)) {
+        const value = this._damageValue;
+        const maxValue = this._maxValue;
+        return maxValue > 0 ? value / maxValue : 0;
+      } else {
+        return 0;
+      }
+    }
+  };
+
   const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
   Sprite_Gauge.prototype.drawValue = function() {//再定義
     if (this._isGaugeData) {
@@ -610,6 +732,24 @@ Imported.NUUN_GaugeValueEX = true;
       const gaugewidth = this.bitmapWidth() - gaugeX;
       const gaugeHeight = this.gaugeHeight();
       this.drawGaugeRect(gaugeX, gaugeY, gaugewidth, gaugeHeight);
+    }
+  };
+
+  const _Sprite_Gauge_drawGaugeRect = Sprite_Gauge.prototype.drawGaugeRect;
+  Sprite_Gauge.prototype.drawGaugeRect = function(x, y, width, height) {
+    if (this.gaugeDamageVisualization()) {
+      this._drawGaugeMode = 1;//ダメージゲージ
+      _Sprite_Gauge_drawGaugeRect.call(this, x, y, width, height);
+      this._drawGaugeMode = 0;//通常のゲージ
+      const rate = this.gaugeRate();
+      const fillW = Math.floor((width - 2) * rate);
+      const fillH = height - 2;
+      const color1 = this.gaugeColor1();
+      const color2 = this.gaugeColor2();
+      this.bitmap.gradientFillRect(x + 1, y + 1, fillW, fillH, color1, color2);
+    } else {
+      this._drawGaugeMode = 0;//通常のゲージ
+      _Sprite_Gauge_drawGaugeRect.call(this, x, y, width, height);
     }
   };
 

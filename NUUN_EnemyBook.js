@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.10.2
+ * @version 2.10.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -278,9 +278,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2021/12/25Ver.2.10.2
+ * 2021/12/31 Ver.2.10.3
+ * 表示していないカテゴリーを選択できてしまう問題を修正。
+ * モンスターカテゴリーを強制的に左揃えにするように修正。
+ * 2021/12/25 Ver.2.10.2
  * 単位を空白で設定したときにnullが表示されてしまう問題を修正。
- * 2021/12/25Ver.2.10.1
+ * 2021/12/25 Ver.2.10.1
  * ページカテゴリー、敵のカテゴリーをコマンド化。
  * 条件付きドロップアイテム図鑑表示併用時エラーが出る問題を修正。
  * 2021/12/22 Ver.2.10.0
@@ -3808,14 +3811,16 @@ Window_EnemyBook_Category.prototype.makeCommandList = function() {
   const list = this.getList();
   list.forEach((command, i) => {
     let categoryName = command.CategoryName;
+    let enabled = true;
     const result = this.getCategoryVisible(i);
     if (param.CategoryVisibleType === 2 && !result) {
       categoryName = this.unknownDataLength(categoryName);
+      enabled = false;
     }
     if (param.CategoryVisibleType === 1 && !result) {
 
     } else {
-      this.addCommand(categoryName, command.CategoryKey);
+      this.addCommand(categoryName, command.CategoryKey, enabled);
     }
   });
 };
@@ -3837,6 +3842,14 @@ Window_EnemyBook_Category.prototype.drawItemBackground = function(index) {
   if(!param.NoCursorBackground) {
     Window_Selectable.prototype.drawItemBackground.call(this, index);
   }
+};
+
+Window_EnemyBook_Category.prototype.isCurrentItemEnabled = function() {
+  return this.currentData() ? this.currentData().enabled : false;
+};
+
+Window_EnemyBook_Category.prototype.itemTextAlign = function() {
+  return "left";
 };
 
 //Window_EnemyBook_Index

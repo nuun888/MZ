@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * 
  * @help
@@ -65,6 +65,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/31 Ver.1.5.1
+ * 特徴で習得しているスキルからでも適用できるように変更。
  * 2021/12/31 Ver.1.5.0
  * 条件付きベースに対応。
  * 2021/12/31 Ver.1.4.1
@@ -303,8 +305,7 @@ Imported.NUUN_PassiveSkill = true;
     let value = 0;
     if (!this._passiveCalc) {
       this._passiveCalc = true;
-      this._skills.forEach(skillId => {
-        const skill = $dataSkills[skillId];
+      this.skills().forEach(skill => {
         if (this.isPassiveSkill(skill) && this.condPassiveSkill(skill)) {
           const weapon = this.getPassiveSkillWeapon(skill);
           if (weapon > 0) {
@@ -321,8 +322,7 @@ Imported.NUUN_PassiveSkill = true;
     const passiveSkills = [];
     if (!this._passiveCalc) {
       this._passiveCalc = true;
-      this._skills.forEach(skillId => {
-        const skill = $dataSkills[skillId];
+      this.skills().forEach(skill => {
         if (this.isPassiveSkill(skill) && this.condPassiveSkill(skill)) {
           const weapon = this.getPassiveSkillWeapon(skill);
           if (weapon > 0) {

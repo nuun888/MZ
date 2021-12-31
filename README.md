@@ -11,7 +11,7 @@
 | システム　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ----------------------------- | ----------------------------- | ----------------------------- | ----------------------------- |
 | 共通処理 | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.3.2 |
-| [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.2 |
+| [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.3 |
 | レーダーチャート表示ベース | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) |  | 1.0.0 |
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.3 |
 | [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) | 共 | 1.0.0 |
@@ -53,7 +53,7 @@
 | [盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md) |  [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js) | 共 条対 | 1.3.1 |
 | アイテム最大所持数変更 | [NUUN_MaxItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxItem.js) | 共 | 1.3.1 |
 | アイテムグループ別所持制限 | [NUUN_GroupMaxItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js) | 共 | 1.0.0 |
-| [パッシブスキル](https://github.com/nuun888/MZ/blob/master/README/PassiveSkill.md) | [NUUN_PassiveSkill](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js) | 共 | 1.4.1 |
+| [パッシブスキル](https://github.com/nuun888/MZ/blob/master/README/PassiveSkill.md) | [NUUN_PassiveSkill](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js) | 共 条対 | 1.5.0 |
 | スキル、アイテム使用条件 | [NUUN_ConditionalSkills](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalSkills.js) | 条 | 1.0.1 |
 | [スキルコスト拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostEX.md) | [NUUN_SkillCostEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js) |  | 1.0.0 |
 | [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md) | [NUUN_SkillCostShowEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js) | 共 | 1.0.0 |

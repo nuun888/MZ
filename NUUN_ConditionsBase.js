@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -245,6 +245,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/31 Ver.1.1.3
+ * 戦闘外の敵グループ指定の戻り値をfalseで返すように修正。
  * 2021/12/19 Ver.1.1.2
  * 条件に戦闘不能メンバー、サポートアクターメンバーを追加。
  * エンカウント条件適用による処理の追加。
@@ -767,7 +769,10 @@ function getTriggerConditions(obj, subject, target, tag1, tag2, tag3, tag4, acti
 function getTriggerConditionsResult(obj, target, tag, mode, action, damage, partialMode) {
   let list = [];
   let result = partialMode === 1;
-  if (tag && obj.meta[tag] && !(!$gameParty.inBattle() && mode === 'Troop')) {
+  if (tag && obj.meta[tag]) {
+    if (!$gameParty.inBattle() && mode === 'Troop') {
+      return false;
+    }
     list = obj.meta[tag].split(',').map(Number);
     if (partialMode === 0) {
       result = isTriggerConditionsSome(list, target, mode, action, damage);

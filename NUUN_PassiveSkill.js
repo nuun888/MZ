@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.4.1
+ * @version 1.5.0
  * @base NUUN_Base
  * 
  * @help
@@ -29,6 +29,17 @@
  * <PassiveConditions:1> 発動条件リストID1番の条件が一致したときに発動します。
  * <PassiveConditions:1,2,3> 発動条件リストID1,2,3番の条件が全て一致したときに発動します。
  * 
+ * 以下は条件付きベースで条件を設定するときのタグです。条件付きベースVer.1.1.3以降
+ * <PassiveConditions:[id],[id],[id]...> 指定したIDの条件を全て満たしたときに使用可能です。
+ * <PartyPassiveConditions:[id],[id],[id]...> パーティメンバーの指定したIDの条件を全て満たしたときに使用可能です。
+ * <TroopPassiveConditions:[id],[id],[id]...> 敵グループの指定したIDの条件を全て満たしたときに使用可能です。
+ * <PassiveMatch:[mode]> 条件判定するモードを指定します。[mode] 0:一部一致　1:全て 無記入の場合は全て一致で判定します。
+ * 
+ * 敵グループは戦闘中のみ判定します。
+ * [id]:条件付きベースの適用条件のリストID
+ * <PartialMatchPassive> 上記の条件判定をいずれかの条件が一致したときに条件を満たすようにします。未記入の場合は全ての条件を満たしたときになります。
+ * 【属性】【攻撃】【ダメージ】【使用アイテム、スキル】【反撃、魔法反射】及び敵の対象は設定できません。
+ * 敵グループ指定の場合戦闘中のみ条件判定します。
  * 
  * 発動条件
  * 上限値　指定した数値以下の値なら反映されます。
@@ -54,6 +65,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/12/31 Ver.1.5.0
+ * 条件付きベースに対応。
  * 2021/12/31 Ver.1.4.1
  * 条件タグを指定してないときに、パッシブスキルが適用されていなかった問題を修正。
  * 2021/8/13 Ver.1.4.0
@@ -78,6 +91,12 @@
  * @text 発動条件
  * @desc パッシブスキルを発動する条件を設定します。
  * @type struct<Conditions>[]
+ * 
+ * @param CondBasePassive
+ * @text 条件付きベース条件適用
+ * @desc 条件付きベースで設定した条件を適用します。このプラグインで設定した条件は適用されません。
+ * @type boolean
+ * @default false
  * 
  * @param PassiveSkillType
  * @text パッシブスキルタイプID
@@ -317,9 +336,9 @@ Imported.NUUN_PassiveSkill = true;
   };
 
   Game_Actor.prototype.condPassiveSkill = function(skill) {
-    //if (Imported.NUUN_ConditionsBase && CondBasePassive) {
-    //  return this.getCondition(skill);
-    //}
+    if (Imported.NUUN_ConditionsBase && CondBasePassive) {
+      return this.getCondition(skill);
+    }
     let result = true;
     const conditions = this.getPassiveConditions(skill);
     if (conditions.length > 0) {

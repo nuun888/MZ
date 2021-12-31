@@ -42,7 +42,7 @@ timeは数値が表示されません。
 
 ### ダメージ量ゲージ可視化
 ダメージを受ける前と受けた後のダメージ量を可視化するゲージを表示します。  
-https://user-images.githubusercontent.com/70774024/147840528-54207941-e04b-4626-9fd0-dd57f8862174.mp4  
+https://user-images.githubusercontent.com/70774024/147840902-67a4592c-0cfd-4537-8661-064a8d51b6c2.mp4  
 
 ### 更新履歴
 2022/1/1 Ver.1.1.0  

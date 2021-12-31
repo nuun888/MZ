@@ -1,5 +1,5 @@
 # [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
-# Ver.1.1.2
+# Ver.1.1.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 
 条件により発動する特徴、スキルなどを設定するためのプラグインです。  
@@ -229,6 +229,13 @@
 [エンカウント条件](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md)  
 
 ## 更新履歴
+2021/12/31 Ver.1.1.3  
+戦闘外の敵グループ指定の戻り値をfalseで返すように修正。  
+2021/12/19 Ver.1.1.2  
+条件に戦闘不能メンバー、サポートアクターメンバーを追加。  
+エンカウント条件適用による処理の追加。  
+2021/12/18 Ver.1.1.1  
+使用者、または対象がアクター、敵の条件を追加。  
 2021/12/13 Ver.1.1.0  
 条件にアイテム、武器、防具の所持、スキルの習得、スキルタイプ、所持金、反撃、魔法反射を追加しました。  
 スキル、アイテム使用が適用されていなかった問題を修正。  

@@ -1,5 +1,5 @@
 # [パッシブスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
-# Ver.1.5.0
+# Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -53,6 +53,8 @@
 パッシブスキルが適用された武器のステータス、特徴が適用されます。
 
 ## 更新履歴
+2021/12/31 Ver.1.5.1  
+特徴で習得しているスキルからでも適用できるように変更。  
 2021/12/31 Ver.1.5.0  
 条件付きベースに対応。  
 2021/12/31 Ver.1.4.1  

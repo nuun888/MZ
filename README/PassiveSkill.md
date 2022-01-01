@@ -2,7 +2,7 @@
 # Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
 #### 必須プラグイン
-[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 パッシブスキルを実装します。  
 スキルを習得していれば指定した武器のステータスが反映されます。  

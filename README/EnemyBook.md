@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.10.3
+# Ver.2.10.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 拡張プラグイン
 [耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) Ver.1.0.1  
@@ -118,6 +118,10 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2022/1/1 Ver.2.10.4  
+戦闘中に情報ページの横幅指定時に敵の情報を開くと表示がずれる問題を修正。  
+カテゴリーのナンバー表記がおかしくなる問題を修正。  
+カテゴリー名が別のカテゴリー名で表示される問題を修正。  
 2021/12/31 Ver.2.10.3  
 表示していないカテゴリーを選択できてしまう問題を修正。  
 モンスターカテゴリーを強制的に左揃えにするように修正。  

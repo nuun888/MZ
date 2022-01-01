@@ -45,7 +45,7 @@
  * @param UpdateFlameValue
  * @text ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）
  * @desc ゲージ及び数値更新フレーム設定
- * @default ["{\"StatusType\":\"hp\",\"UpdateFlame\":\"20\"}","{\"StatusType\":\"mp\",\"UpdateFlame\":\"20\"}","{\"StatusType\":\"tp\",\"UpdateFlame\":\"60\"}"]
+ * @default ["{\"StatusType\":\"[\\\"'hp'\\\"]\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"[\\\"'mp'\\\"]\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"[\\\"'tp'\\\"]\",\"UpdateFlame\":\"60\",\"OnUpdateValue\":\"true\"}"]
  * @type struct<UpdateFlameValueDate>[]
  *
  */

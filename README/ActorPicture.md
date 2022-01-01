@@ -2,7 +2,7 @@
 # Ver.1.2.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須プラグイン
-[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 立ち絵、顔グラの表示を条件により自動的に変更します。  
 スイッチがON、特定の武器を装備、特定の防具を装備、特定のステート、特定の職業、ダメージ時、攻撃時、勝利時などの時にアクターの立ち絵、顔グラを自動的に変更できます。  

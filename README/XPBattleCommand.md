@@ -1,5 +1,6 @@
 # [XP風バトルコマンド](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js)
 # Ver.1.0.2
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js)
 
 パーティコマンド、アクターコマンドをXP風に表示します。  
 ![画像](img/XPBattleCommand2.png)

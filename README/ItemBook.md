@@ -1,7 +1,7 @@
 # [アイテム図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)
 # Ver.1.4.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)  
-#### 必須プラグイン
+#### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 アイテム図鑑を実装します。

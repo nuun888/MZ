@@ -1,6 +1,8 @@
 # [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 # Ver.1.1.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
+#### 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 条件により発動する特徴、スキルなどを設定するためのプラグインです。  
 タグの記述方法は各対応のプラグインで確認してください。  

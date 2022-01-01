@@ -1,6 +1,8 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 # Ver.2.10.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
+#### 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 #### 拡張プラグイン
 [耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) Ver.1.0.1  
 [条件付きドロップアイテム図鑑適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) Ver.1.0.0

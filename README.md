@@ -82,7 +82,7 @@
 | 表現拡張　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
 | 全体、ランダム、敵味方全体攻撃でも対象選択 | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js) | 共 | 1.5.1 |
-| ゲージの数値更新アニメーション | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js) | 共 | 1.0.0 |
+| [ゲージの数値更新アニメーション](https://github.com/nuun888/MZ/blob/master/README/GaugeValueAnimation.md) | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js) | 共 | 1.0.0 |
 | [アイテム、スキルネームカラー](https://github.com/nuun888/MZ/blob/master/README/ItemNameColor.md) | [NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js) |  | 1.1.1 |
 | [巨大モンスター](https://github.com/nuun888/MZ/blob/master/README/BigEnemy.md) | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) |  | 1.2.0 |
 | [敵HPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) |  | 1.4.0 |

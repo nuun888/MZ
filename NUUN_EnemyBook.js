@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.10.3
+ * @version 2.10.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -278,6 +278,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/1 Ver.2.10.4
+ * 戦闘中に情報ページの横幅指定時に敵の情報を開くと表示がずれる問題を修正。
+ * カテゴリーのナンバー表記がおかしくなる問題を修正。
+ * カテゴリー名が別のカテゴリー名で表示される問題を修正。
  * 2021/12/31 Ver.2.10.3
  * 表示していないカテゴリーを選択できてしまう問題を修正。
  * モンスターカテゴリーを強制的に左揃えにするように修正。
@@ -2660,7 +2664,6 @@ Game_System.prototype.addStatusToEnemyBook = function(enemyId) {
 };
 
 Game_System.prototype.categoryToEnemyBook = function(enemy) {
-  this.initCategoryEnemyBook();
   if (enemy && this.isInEnemyBook(enemy)) {
     const enemyCategory = enemy.meta.CategoryKey ? enemy.meta.CategoryKey.split(',') : [];
     for (key of enemyCategory) {
@@ -2677,16 +2680,14 @@ Game_System.prototype.getCategoryEnemyBook = function(index) {
 };
 
 Game_System.prototype.initCategoryEnemyBook = function() {
-  if (!this._enemyBookCategoryFlags) {
-    this._enemyBookCategoryFlags = [];
-    const enemyBookCategoryLength = param.EnemyBookCategory.length;
-    for (let i = 0; i < enemyBookCategoryLength; i++) {
-      this._enemyBookCategoryFlags[i] = false;
-    }
-    const index = param.EnemyBookCategory.findIndex(category => category.CategoryKey === 'all');
-    if (index >= 0) {
-      this._enemyBookCategoryFlags[index] = true;
-    }
+  this._enemyBookCategoryFlags = [];
+  const enemyBookCategoryLength = param.EnemyBookCategory.length;
+  for (let i = 0; i < enemyBookCategoryLength; i++) {
+    this._enemyBookCategoryFlags[i] = false;
+  }
+  const index = param.EnemyBookCategory.findIndex(category => category.CategoryKey === 'all');
+  if (index >= 0) {
+    this._enemyBookCategoryFlags[index] = true;
   }
 };
 
@@ -3177,9 +3178,7 @@ Game_System.prototype.enemyBookDebuffList = function(enemyId, debuffId, Individu
 };
 
 Game_System.prototype.initEnemyBookNumber = function() {
-  if(!this._enemyBookNumber) {
-    this._enemyBookNumber = [];
-  }
+  this._enemyBookNumber = [];
   let index = 0;
   for (enemy of $dataEnemies) {
     if (enemy && this.isEnemyBook(enemy)) {
@@ -3718,7 +3717,7 @@ Window_EnemyBook_CategoryName.prototype.initialize = function(rect) {
 };
 
 Window_EnemyBook_CategoryName.prototype.setName = function() {
-  const name = this._categoryWindow._categoryList[this._categoryWindow._categorySelect].CategoryName;
+  const name = this._categoryWindow.getList()[this._categoryWindow._categorySelect].CategoryName;
   this._categoryName = name;
   this.refresh();
 };
@@ -3754,6 +3753,7 @@ Window_EnemyBook_Category.prototype.initialize = function(rect) {
 };
 
 Window_EnemyBook_Category.prototype.setCategoryFlags = function() {
+  $gameSystem.initCategoryEnemyBook();
   for (enemy of $dataEnemies) {
     $gameSystem.categoryToEnemyBook(enemy);
   }
@@ -6182,7 +6182,7 @@ Scene_Battle.prototype.setEenemyBookOnInterruptWindow = function(ebwindow) {
 };
 
 Scene_Battle.prototype.setEnemyBook_X = function() {
-  this._enemyBookEnemyWindow.x = (param.WindowMode === 0 ? Graphics.boxWidth / 3 : 0) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
+  this._enemyBookEnemyWindow.x = (param.WindowMode === 0 ? this.enemyBookIndexWidth() : 0) + (this._enemyBookBackGround ? (Graphics.width - Graphics.boxWidth) / 2 : 0);
 };
 
 Scene_Battle.prototype.setEnemyBook_Y = function(rect, pageLength) {

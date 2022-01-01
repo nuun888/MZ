@@ -1,5 +1,5 @@
 # [キャストタイム（詠唱）キャンセルスキル、アイテム](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js)
-# Ver.1.0.0
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js)
 
 キャスト（詠唱）中のスキルをキャンセルさせるスキル、アイテムを設定できます。  

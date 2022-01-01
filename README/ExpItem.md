@@ -1,5 +1,6 @@
 # [経験値増減アイテム、スキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)
 # Ver.1.2.1
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js)
 
 経験値を増減させるアイテムやスキルを作ることが出来ます。
 

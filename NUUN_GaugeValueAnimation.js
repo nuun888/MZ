@@ -11,11 +11,14 @@
  * @target MZ
  * @plugindesc ゲージの数値更新アニメーション
  * @author NUUN
- * @version 1.1.2
+ * @version 1.2.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_GaugeValueEX
+ * 
  * 
  * @help
- * ダメージや回復、消費などのゲージに表示されている数値が変化する時、デフォルトでは一瞬で変化後の
- * 数値に変化します。
+ * ダメージや回復、消費などのゲージに表示されている数値が変化する時、デフォルトでは一瞬で変化後の数値に変化します。
  * このプラグインではゲージの数値でアニメーションで増減させて表示させます。デフォルトでは２０フレームかけて数値を徐々に変化させます。
  * またマップ上ではゲージの変化はアニメーションをせずに変化してしまいますが、このプラグインではゲージ、数値ともに徐々に変化するようになります。
  * ゲージの数値のアニメーションをさせない場合は、該当のプラグインパラメータの「OnUpdateValue」（数値変化アニメーショ）の値をfalseに設定してください。
@@ -24,6 +27,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/1 Ver.1.2.0
+ * 適用するステータスタイプの設定をコンボボックス化。
+ * 処理のリファクタリング。
  * 2021/3/27 Ver.1.1.2
  * 数値アニメーション中に変動値が正負逆になった時、数値アニメーションが止まらなくなる問題を修正。
  * 2021/3/1 Ver.1.1.1
@@ -46,9 +52,13 @@
 /*~struct~UpdateFlameValueDate:
  * 
  * @param StatusType
- * @text ステータス
- * @desc ステータス。
- * @type string
+ * @text ステータスタイプ
+ * @desc 適用するステータスタイプ。
+ * @type combo[]
+ * @option 'hp'
+ * @option 'mp'
+ * @option 'tp'
+ * @default 
  * 
  * @param UpdateFlame
  * @desc ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）0または入力なしでデフォルト設定値となります。
@@ -69,103 +79,45 @@ Imported.NUUN_GaugeValueAnimation = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_GaugeValueAnimation');
-  const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
-    try {
-        return JSON.parse(value);
-    } catch (e) {
-        try {
-            return eval(value);
-        } catch (e) {
-            return value;
-        }
-    }
-  }));
+  const UpdateFlameValue = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['UpdateFlameValue'])) : null) || [];
 
   const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
   Sprite_Gauge.prototype.initMembers = function() {
     _Sprite_Gauge_initMembers.call(this);
+    this._smoothnessMode = null;
     this._moveMode = false;
-    this._moveDelay = 0;
-    this._moveValue = NaN;
   };
 
+  const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
   Sprite_Gauge.prototype.setup = function(battler, statusType) {
-    this._battler = battler;
-    this._statusType = statusType;
-    this._smoothnessMode = this.getFlameStatus();
-    this._value = isNaN(this._value) ? this.currentValue() : this._value;
-    this._maxValue = isNaN(this._maxValue) ? this.currentMaxValue() : this._maxValue;
-    this._moveMode = false;
-    this._moveDelay = 0;
-    this._moveValue = isNaN(this._moveValue) ? this.currentValue() : this._moveValue;
-    this.updateBitmap();
-  };
-
-  const _Sprite_Gauge_updateTargetValue = Sprite_Gauge.prototype.updateTargetValue;
-  Sprite_Gauge.prototype.updateTargetValue = function(value, maxValue) {
-    if (this._moveDelay !== 0) {
-      this._moveDelay = 0;
-    }
-    _Sprite_Gauge_updateTargetValue.call(this, value, maxValue)
-  };
-
-  const _Sprite_Gauge_updateBitmap = Sprite_Gauge.prototype.updateBitmap;
-  Sprite_Gauge.prototype.updateBitmap = function() {
-    _Sprite_Gauge_updateBitmap.call(this);
-    const value = this.currentValue();
-    if (this._moveValue !== value && this._smoothnessMode) {
-      this.valueRedraw();
+    if (!this._smoothnessMode) {
+      _Sprite_Gauge_setup.call(this, battler, statusType);
+      this._smoothnessMode = this.getFlameStatus();
     }
   };
 
-  Sprite_Gauge.prototype.valueRedraw = function() {
-    this.currentValueMove(this.currentValue());
-    Sprite_Gauge.prototype.redraw.call(this);
+  const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
+  Sprite_Gauge.prototype.drawValue = function() {
+    this._moveMode = this._smoothnessMode && this._smoothnessMode.OnUpdateValue;
+    _Sprite_Gauge_drawValue.call(this);
   };
 
   const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
   Sprite_Gauge.prototype.currentValue = function() {
     if (this._battler && this._moveMode) {
       this._moveMode = false;
-      return Math.round(this._moveValue);
+      return Math.round(this._value);
     }
     return _Sprite_Gauge_currentValue.call(this);
   };
 
-  const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
-  Sprite_Gauge.prototype.drawValue = function() {
-    this._moveMode = true;
-    _Sprite_Gauge_drawValue.call(this);
+  Sprite_Gauge.prototype.getFlameStatus = function() {
+    return UpdateFlameValue ? UpdateFlameValue.find(value => (this._statusType === value.StatusType)) : null;
   };
 
-  Sprite_Gauge.prototype.currentValueMove = function(currentValue) {
-    if (this._moveDelay === 0) {
-      this._moveDelay = (currentValue - this._moveValue) / (this._smoothnessMode && this._smoothnessMode.OnUpdateValue ? this.smoothness() : 1);
-    }
-    if (this._moveValue > currentValue) {
-      this._moveValue += this._moveDelay;
-      if (this._moveValue <= currentValue) {
-        this._moveValue = currentValue;
-        this._moveDelay = 0;
-      }
-    } else if (this._moveValue < currentValue) {
-        this._moveValue += this._moveDelay;
-      if (this._moveValue >= currentValue) {
-        this._moveValue = currentValue;
-        this._moveDelay = 0;
-      }
-    }
-  };
-  
   const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;
   Sprite_Gauge.prototype.smoothness = function() {
-    if (this._smoothnessMode && this._smoothnessMode.UpdateFlame) {
-      return this._smoothnessMode.UpdateFlame;
-    }
-    return _Sprite_Gauge_smoothness.call(this);
+    return this._smoothnessMode ? this._smoothnessMode.UpdateFlame : _Sprite_Gauge_smoothness.call(this);
   };
-
-  Sprite_Gauge.prototype.getFlameStatus = function() {
-    return param.UpdateFlameValue ? param.UpdateFlameValue.find(value => (this._statusType === value.StatusType)) : null;
-  };
+  
 })();

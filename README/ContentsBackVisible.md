@@ -2,7 +2,7 @@
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js)
 #### 必須プラグイン
-[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 コンテンツの背景を表示しないようにします。  
 コンテンツ背景クラス設定はコンテンツ背景非表示がOFFの時に適用します。  

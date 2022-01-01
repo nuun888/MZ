@@ -1,9 +1,9 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 # Ver.1.3.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
-### 必須プラグイン
+#### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)
-### 拡張プラグイン
+#### 拡張プラグイン
 [サポートアクターインジケーター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) Ver.1.3.1  
 [サポートアクター呼び出し](https://github.com/nuun888/MZ/blob/master/README/CallSupportActor.md) Ver.1.0.0  
 召喚アクター

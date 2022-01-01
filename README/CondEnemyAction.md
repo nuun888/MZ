@@ -2,7 +2,7 @@
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js)
 
-### 必須プラグイン
+### 必須、前提プラグイン
 [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)
 
 敵の行動パターンの条件を細かく設定できます。  

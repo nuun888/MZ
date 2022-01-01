@@ -3,7 +3,7 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)
 
 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
-![画像](img/ContentsBackVisible1.png)  
+![画像](img/BattleItemSkillWindowMV1.png)  
 
 ## 更新履歴
 2021/11/15 Ver.1.1.3  

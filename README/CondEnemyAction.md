@@ -3,7 +3,7 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js)
 
 ### 必須、前提プラグイン
-[条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)
+[条件付きベース](https://github.com/nuun888/MZ/blob/master/README/Base.md)
 
 敵の行動パターンの条件を細かく設定できます。  
 【属性】【攻撃】【ダメージ】【使用アイテム、スキル】【反撃、魔法反射】は設定できません。

@@ -2,7 +2,7 @@
 # Ver.2.6.10
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)
 #### 必須プラグイン
-[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 [バトルスタイル拡張設定用](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md)
 #### 競合パッチ
 木星ペンギン様の疑似３Dバトルと併用するときのパッチです。  

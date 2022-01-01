@@ -1,5 +1,6 @@
 # [戦闘メンバー数変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js)
 # Ver.1.0.1
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js)
 
 戦闘参加メンバーの人数を変更します。またゲーム途中で最大バトルメンバー数を変更できます。
 

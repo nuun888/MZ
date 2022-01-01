@@ -1,7 +1,17 @@
 # [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
 # Ver.1.1.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
+#### 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 ゲージの表示を拡張します。  
+#### 主な機能
+ラベルの色を変更できます。  
+ラベルの座標を変更できます。  
+数値の表示方法を変更できます。  
+ラベル、数値のフォントサイズを変更できます。  
+数値の座標を変更できます。  
+指定の割合以下、最大時にゲージの色を変更できます。  
 
 ![画像](img/GaugeValueEX1.png)  
 ![画像](img/GaugeValueEX4.png)  

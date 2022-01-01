@@ -1,5 +1,7 @@
 # [アイテム消耗率](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)
 # Ver.1.1.1
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js)
+
 
 アイテムに一定の確率で消費するアイテムを作ることが出来ます。
 また、消耗する確率を軽減できる特徴を設定できます。

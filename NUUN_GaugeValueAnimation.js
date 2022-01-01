@@ -112,7 +112,7 @@ Imported.NUUN_GaugeValueAnimation = true;
   };
 
   Sprite_Gauge.prototype.getFlameStatus = function() {
-    return UpdateFlameValue ? UpdateFlameValue.find(value => (this._statusType === value.StatusType)) : null;
+    return UpdateFlameValue ? UpdateFlameValue.find(value => (this._statusType === value.StatusType[0])) : null;
   };
 
   const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;

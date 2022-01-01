@@ -1,5 +1,6 @@
 # [ステート、バフ残りターン表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
 # Ver.1.0.2
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
 
 ステートアイコンに残りターンを表示します。  
 

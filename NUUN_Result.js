@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.14.1
+ * @version 1.14.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -82,6 +82,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/1 Ver.1.14.2
+ * 一部処理を修正。
  * 2021/12/17 Ver.1.14.1
  * 立ち絵、顔グラEXで画像表示時の画像開始地点を設定できる機能を追加。
  * 入手項目の設定でオリジナル項目が表示しない問題を修正。
@@ -2954,7 +2956,6 @@ Sprite_ResultExpGauge.prototype.bitmapWidth = function() {
   return gaugeWidth;
 };
 
-
 Sprite_ResultExpGauge.prototype.gaugeX = function() {
   return param.Gauge_Margin;
 };
@@ -3099,12 +3100,7 @@ Sprite_ResultExpGauge.prototype.smoothSpeed = function() {
 };
 
 Sprite_ResultExpGauge.prototype.smoothness = function() {
-  return Math.max(Math.floor(Sprite_Gauge.prototype.smoothness.call(this) * this.smoothSpeed()), 1);
-};
-
-const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;
-Sprite_Gauge.prototype.smoothness = function() {
-  return this._statusType === "result_exp" ? param.GaugeRefreshFrame : _Sprite_Gauge_smoothness.call(this);
+  return Math.max(Math.floor(param.GaugeRefreshFrame * this.smoothSpeed()), 1);
 };
 
 Sprite_ResultExpGauge.prototype.currentDecimal = function(val) {

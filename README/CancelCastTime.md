@@ -3,6 +3,7 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js)
 
 キャスト（詠唱）中のスキルをキャンセルさせるスキル、アイテムを設定できます。  
+またキャンセル時にSEを鳴らすことができます。
 
 ## 設定方法
 #### キャストタイム（詠唱）キャンセルスキルの設定

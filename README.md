@@ -65,7 +65,7 @@
 | ---------- | ------------- | ------------- | -------- |
 | 属性吸収特徴 | [NUUN_ElementAbsorb](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ElementAbsorb.js) |  | 1.0.1 |
 | 回復効果反転特徴 | [NUUN_RecoveryReversal](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RecoveryReversal.js) |  | 1.0.0 |
-| キャストタイムチャージ率特徴 | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js) |  | 1.0.0 |
+| [キャストタイムチャージ率特徴](https://github.com/nuun888/MZ/blob/master/README/CastTimeCharge.md) | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js) |  | 1.0.0 |
 | ファイナルアタック | [NUUN_FinalAttack](https://github.com/nuun888/MZ/blob/master/NUUN_FinalAttack.js) |  | 1.0.1 |
 | [マナシールド](https://github.com/nuun888/MZ/blob/master/README/ManaShield.md) | [NUUN_ManaShield](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js) |  | 1.0.1 |
 | [レベル上限限界突破](https://github.com/nuun888/MZ/blob/master/README/LevelUnlimited.md)  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js) |  | 1.1.0 |

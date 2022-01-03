@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.4.2
+ * @version 1.4.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -41,6 +41,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/3 Ver.1.4.3
+ * ゲージ表示拡張プラグインのダメージ量可視化に対応。
+ * 前面ゲージの表示がずれる問題を修正。
  * 2021/12/20 Ver.1.4.2
  * パーティゲージの画像化に対応。
  * 前面ゲージ画像を可変表示させない範囲を設定できる機能を追加。
@@ -385,6 +388,62 @@
  * @type number
  * @default 0
  * 
+ * @param DamageImg
+ * @text ダメージ量可視化画像設定
+ * @default ------------------------------
+ * 
+ * @param DamageGaugeImgVariable
+ * @text ダメージ量可視化ゲージ画像表示
+ * @desc ダメージ量可視化ゲージ画像を表示します。
+ * @type boolean
+ * @default true
+ * 
+ * @param DamageGaugeImg
+ * @desc ダメージ量可視化画像ファイル名を指定します。未指定の場合はメインゲージ画像で設定した画像が参照されます。
+ * @text ダメージ量可視化画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param DamageGaugeX
+ * @desc ダメージ量可視化画像の表示オフセット位置X
+ * @text ダメージ量可視化画像表示オフセット位置X
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param DamageGaugeY
+ * @desc ダメージ量可視化画像の表示オフセット位置Y
+ * @text ダメージ量可視化画像表示オフセット位置Y
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param DamageGaugeWidth
+ * @desc ダメージ量可視化ゲージ画像のトリミング横幅
+ * @text ダメージ量可視化ゲージ画像トリミング横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param DamageGaugeHeight
+ * @desc ダメージ量可視化ゲージ画像のトリミング高さ
+ * @text ダメージ量可視化ゲージ画像トリミング高さ
+ * @type number
+ * @default 0
+ * 
+ * @param DamageGaugeSX
+ * @desc ダメージ量可視化ゲージ画像のトリミング座標X
+ * @text ダメージ量可視化ゲージ画像トリミング座標X
+ * @type number
+ * @default 0
+ * 
+ * @param DamageGaugeSY
+ * @desc ダメージ量可視化ゲージ画像のトリミング座標Y
+ * @text ダメージ量可視化ゲージ画像トリミング座標Y
+ * @type number
+ * @default 0
+ * 
  * @param LabelImg
  * @text ラベル画像設定
  * @default ------------------------------
@@ -475,6 +534,9 @@ Imported.NUUN_GaugeImage = true;
     if (data.MainMaxGaugeVariable && data.MainMaxGaugeImg && data.MainMaxGaugeImg[0]) {
       ImageManager.nuun_LoadPictures(data.MainMaxGaugeImg[0]);
     }
+    if (data.DamageGaugeImgVariable && data.DamageGaugeImg && data.DamageGaugeImg[0]) {
+      ImageManager.nuun_LoadPictures(data.DamageGaugeImg[0]);
+    }
     if (data.LabelGaugeImg && data.LabelGaugeImg[0]) {
       ImageManager.nuun_LoadPictures(data.LabelGaugeImg[0]);
     }
@@ -493,6 +555,10 @@ Imported.NUUN_GaugeImage = true;
 
   function getFrontImgData (imgData) {
     return (imgData.FrontGaugeImg && imgData.FrontGaugeImg[0]) ? true : imgData.FrontGaugeWidth > 0;
+  }
+
+  function getDamageImgData (imgData) {
+    return (imgData.DamageGaugeImg && imgData.DamageGaugeImg[0]) ? true : imgData.DamageGaugeWidth > 0;
   }
 
   const _Window_StatusBase_placeGauge = Window_StatusBase.prototype.placeGauge;
@@ -590,6 +656,7 @@ Imported.NUUN_GaugeImage = true;
     const width = this.bitmapWidth();
     const height = this.bitmapHeight();
     this.createGaugeImges(width, height);
+    this.createDamageGaugeImges(width, height);
     this.createMainGaugeImges(width, height);
     this.createFrontGaugeImges(width, height);
   };
@@ -621,16 +688,27 @@ Imported.NUUN_GaugeImage = true;
     }
   };
 
+  Sprite_GaugeImg.prototype.createDamageGaugeImges = function(width, height) {
+    if (!this._damageGaugeSprite && getDamageImgData(this._gaugeImgData)) {
+      const sprite = new Sprite();
+      this.addChild(sprite);
+      sprite.bitmap = new Bitmap(width, height);
+      this._damageGaugeSprite = sprite;
+    }
+  };
+
 
   const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
   Sprite_Gauge.prototype.initMembers = function() {
     _Sprite_Gauge_initMembers.call(this);
     this._gaugeImgSprite = null;
     this._baseGaugeSprite = null;
+    this._damageGaugeSprite = null;
     this._mainGaugeSprite = null;
     this._frontGaugeSprite = null;
     this._gaugeBitmap = null;
     this._frontBitmap = null;
+    this._damageBitmap = null;
     this._mainBitmap = null;
     this._mainBitmap2 = null;
     this._mainMaxBitmap = null;
@@ -657,12 +735,13 @@ Imported.NUUN_GaugeImage = true;
     if (imgSprite) {
       this._gaugeImgSprite = imgSprite;
       this._baseGaugeSprite = imgSprite._baseGaugeSprite;
+      this._damageGaugeSprite = imgSprite._damageGaugeSprite;
       this._mainGaugeSprite = imgSprite._mainGaugeSprite;
       this._frontGaugeSprite = imgSprite._frontGaugeSprite;
       this.createGaugeBitmap();
     }
   };
-
+  
   Sprite_Gauge.prototype.createGaugeBitmap = function() {
     if (this._gaugeImgSprite) {
       const data = this._gaugeImgData;
@@ -678,6 +757,9 @@ Imported.NUUN_GaugeImage = true;
       }
       if (data.MainMaxGaugeVariable) {
         this._mainMaxBitmap = data.MainMaxGaugeImg && data.MainMaxGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.MainMaxGaugeImg[0]) : mainBitmap;
+      }
+      if (data.DamageGaugeImgVariable) {
+        this._damageBitmap = data.DamageGaugeImg && data.DamageGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.DamageGaugeImg[0]) : mainBitmap;
       }
       this._labelBitmap = data.LabelGaugeImg && data.LabelGaugeImg[0] ? ImageManager.nuun_LoadPictures(data.LabelGaugeImg[0]) : null;
       this._mainBitmap = mainBitmap;
@@ -752,7 +834,7 @@ Imported.NUUN_GaugeImage = true;
     const sw = data.FrontGaugeRightWidth;
     const sh = data.FrontGaugeHeight || bitmap.height;
     const gaugewidth = sw * scale;
-    const x = this.bitmapWidth() - (this.gaugeX() + data.FrontGaugeX + data.GaugeOffSetX) - sw * scale;
+    const x = this.bitmapWidth() - (data.FrontGaugeX + data.GaugeOffSetX) - sw * scale;
     const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;
     this._frontGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth ,sh * scale);
   };
@@ -763,7 +845,7 @@ Imported.NUUN_GaugeImage = true;
     const sy = data.FrontGaugeSY || 0;
     const sw = (data.GaugeWidth || bitmap.width) - sx - data.FrontGaugeRightWidth;
     const sh = data.FrontGaugeHeight || bitmap.height;
-    const gaugewidth = this.bitmapWidth() - (data.FrontGaugeLeftWidth * scale) - (data.FrontGaugeRightWidth * scale);
+    const gaugewidth = this.bitmapWidth() - this.gaugeX() - (data.FrontGaugeLeftWidth * scale) - (data.FrontGaugeRightWidth * scale);
     const x = this.gaugeX() + data.FrontGaugeX + data.GaugeOffSetX + data.FrontGaugeLeftWidth * scale;
     const y = this.textHeight() - (sh * scale) + data.FrontGaugeY;
     this._frontGaugeSprite.bitmap.blt(bitmap, sx, sy, sw, sh, x, y, gaugewidth ,sh * scale);
@@ -781,26 +863,56 @@ Imported.NUUN_GaugeImage = true;
   const _Sprite_Gauge_drawGaugeRect = Sprite_Gauge.prototype.drawGaugeRect;
   Sprite_Gauge.prototype.drawGaugeRect = function(x, y, width, height) {
     if (this._gaugeImgSprite && this._mainGaugeImg) {
-      this._mainGaugeSprite.bitmap.clear();
-      const data = this._gaugeImgData;
-      const scale = (data.GaugeImgScale || 100) / 100;
-      const bitmap = this._mainGaugeImg;
-      const correctionWidth = data.MainGaugeCorrectionWidth || 0;
-      const gaugeX = this.gaugeX();
-      const sx = this._mainGaugeSX || 0;
-      const sy = this._mainGaugeSY || 0;
-      const sw = this._mainGaugeWidth || bitmap.width;
-      const sh = this._mainGaugeHeight || bitmap.height;
-      const rate = this.gaugeRate();
-      //const dw = Math.floor((data.GaugeWidth - sw) / 2 * rate);
-      const gaugeWidth = Math.floor(sw * rate);
-      const x = gaugeX + data.MainGaugeX + data.GaugeOffSetX;
-      const y = Math.floor(this.textHeight() - (sh * scale)) + data.MainGaugeY;//Ver.1.3.3以降;
-      const w = data.GaugeImgVariable ? Math.floor((this.bitmapWidth() - x + correctionWidth) * rate) : Math.floor(gaugeWidth * scale + correctionWidth);
-      this._mainGaugeSprite.bitmap.blt(bitmap, sx, sy, gaugeWidth, sh, x, y, w, sh * scale);
+      if (Imported.NUUN_GaugeValueEX && this.gaugeDamageVisualization() && this._damageBitmap) {
+        this.drawGaugeRectImg(x, y, width, height);
+      } else {
+        this._mainGaugeSprite.bitmap.clear();
+        const data = this._gaugeImgData;
+        const scale = (data.GaugeImgScale || 100) / 100;
+        const bitmap = this._mainGaugeImg;
+        const correctionWidth = data.MainGaugeCorrectionWidth || 0;
+        const gaugeX = this.gaugeX();
+        const sx = this._mainGaugeSX || 0;
+        const sy = this._mainGaugeSY || 0;
+        const sw = this._mainGaugeWidth || bitmap.width;
+        const sh = this._mainGaugeHeight || bitmap.height;
+        const rate = this.gaugeRate();
+        const gaugeWidth = Math.floor(sw * rate);
+        x = gaugeX + data.MainGaugeX + data.GaugeOffSetX;
+        y = Math.floor(this.textHeight() - (sh * scale)) + data.MainGaugeY;//Ver.1.3.3以降;
+        const w = data.GaugeImgVariable ? Math.floor((this.bitmapWidth() - x + correctionWidth) * rate) : Math.floor(gaugeWidth * scale + correctionWidth);
+        this._mainGaugeSprite.bitmap.blt(bitmap, sx, sy, gaugeWidth, sh, x, y, w, sh * scale);
+      }
     } else {
       _Sprite_Gauge_drawGaugeRect.call(this, x, y, width, height);
     }
+  };
+
+  Sprite_Gauge.prototype.drawGaugeRectImg = function(x, y, width, height) {
+    this._drawGaugeMode = 1;//ダメージゲージ
+    this._damageGaugeSprite.bitmap.clear();
+    this._mainGaugeSprite.bitmap.clear();
+    const data = this._gaugeImgData;
+    const scale = (data.GaugeImgScale || 100) / 100;
+    let bitmap = this._damageBitmap;
+    const correctionWidth = data.MainGaugeCorrectionWidth || 0;
+    const gaugeX = this.gaugeX();
+    const sx = this._mainGaugeSX || 0;
+    const sy = this._mainGaugeSY || 0;
+    const sw = this._mainGaugeWidth || bitmap.width;
+    const sh = this._mainGaugeHeight || bitmap.height;
+    let rate = this.gaugeRate();
+    let gaugeWidth = Math.floor(sw * rate);
+    x = gaugeX + data.MainGaugeX + data.GaugeOffSetX;
+    y = Math.floor(this.textHeight() - (sh * scale)) + data.MainGaugeY;//Ver.1.3.3以降;
+    let w = data.GaugeImgVariable ? Math.floor((this.bitmapWidth() - x + correctionWidth) * rate) : Math.floor(gaugeWidth * scale + correctionWidth);
+    this._damageGaugeSprite.bitmap.blt(bitmap, sx, sy, gaugeWidth, sh, x, y, w, sh * scale);
+    this._drawGaugeMode = 0;//通常のゲージ
+    bitmap = this._mainGaugeImg;
+    rate = this.gaugeRate();
+    gaugeWidth = Math.floor(sw * rate);
+    w = data.GaugeImgVariable ? Math.floor((this.bitmapWidth() - x + correctionWidth) * rate) : Math.floor(gaugeWidth * scale + correctionWidth);
+    this._mainGaugeSprite.bitmap.blt(bitmap, sx, sy, gaugeWidth, sh, x, y, w, sh * scale);
   };
 
   Sprite_Gauge.prototype.gaugeInclinedRate  = function(data) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
  * @base NUUN_Base
  * 
  * @help
@@ -68,6 +68,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/3 Ver.1.5.2
+ * Ver.1.5.0以降でこのプラグインで設定した条件武器、防具タイプ、乗り物を条件指定するとエラーが出る問題を修正。
  * 2021/12/31 Ver.1.5.1
  * 特徴で習得しているスキルからでも適用できるように修正。
  * 2021/12/31 Ver.1.5.0
@@ -410,6 +412,26 @@ Imported.NUUN_PassiveSkill = true;
         return $gameSwitches.value(list.SwitchId);
     }
     return false;
+  };
+
+  Game_Actor.prototype.isVehicle = function(type) {
+    if (type === 'boat') {
+      return $gamePlayer.isInBoat();
+    } else if (type === 'ship') {
+      return $gamePlayer.isInShip();
+    } else if (type === 'airship') {
+      return $gamePlayer.isInAirship();
+    } else {
+      return $gamePlayer.isInVehicle();
+    }
+  };
+
+  Game_Actor.prototype.isEquippedWeaponType = function(type) {
+    return this.equips().some(equip => equip && equip.wtypeId === type);
+  };
+
+  Game_Actor.prototype.isEquippedArmorType = function(type) {
+    return this.equips().some(equip => equip && equip.atypeId === type);
   };
 
 })();

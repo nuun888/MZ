@@ -344,7 +344,7 @@ Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//ÂÜçÂÆ
             }
         } else if (type.CostOrderSelect) {
             if (skill.meta[type.CostOrderSelect]) {
-                const cost = eval(type.CostEval);console.log(cost)
+                const cost = eval(type.CostEval);
                 if (cost) {
                     x = this.drawOrderCost(skill, cost, type, x, y, width);
                     count++; 

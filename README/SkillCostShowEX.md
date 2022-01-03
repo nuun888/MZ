@@ -1,5 +1,5 @@
 # [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 
 スキルコストの表示を拡張します。  
@@ -21,5 +21,7 @@
 色の設定は通常システムカラーを記入しますが、テキストタブからカラーコードを記入できます。
 
 ## 更新履歴
+2022/1/3 Ver.1.0.1  
+コスト表示対象でリストにないタグを複数指定したときに、正常に表示されない問題を修正。  
 2021/12/5 Ver.1.0.0  
 初版

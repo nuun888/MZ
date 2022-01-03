@@ -1,5 +1,5 @@
 # [ゲージ画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js)
-# Ver.1.4.2
+# Ver.1.4.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -84,7 +84,10 @@ Sprite_Enemy：モンスター（敵HPゲージ、敵TPBゲージ）
 敵のゲージのみに画像を適用するにはフィルタリングクラス設定に'Sprite_Enemy'を指定してください。
 
 ## 更新履歴
-2021/12/20 Ver.1.4.2
+2022/1/3 Ver.1.4.3  
+ゲージ表示拡張プラグインのダメージ量可視化に対応。  
+前面ゲージの表示がずれる問題を修正。  
+2021/12/20 Ver.1.4.2  
 パーティゲージの画像化に対応。  
 前面ゲージ画像を可変表示させない範囲を設定できる機能を追加。  
 2021/12/19 Ver.1.4.1  

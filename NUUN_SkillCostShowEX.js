@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc スキルコスト表示拡張
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_Base
@@ -32,6 +32,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/3 Ver.1.0.1
+ * コスト表示対象でリストにないタグを複数指定したときに、正常に表示されない問題を修正。
  * 2021/12/5 Ver.1.0.0
  * 初版
  * 
@@ -341,10 +343,12 @@ Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//再�
                 count++;
             }
         } else if (type.CostOrderSelect) {
-            const cost = eval(type.CostEval);
-            if (cost) {
-                x = this.drawOrderCost(skill, cost, type, x, y, width);
-                count++; 
+            if (skill.meta[type.CostOrderSelect]) {
+                const cost = eval(type.CostEval);console.log(cost)
+                if (cost) {
+                    x = this.drawOrderCost(skill, cost, type, x, y, width);
+                    count++; 
+                }
             }
         }
     });
@@ -460,7 +464,7 @@ Window_SkillList.prototype.drawCostPrefix = function(prefix, x, y, width) {
 };
 
 Window_SkillList.prototype.drawCostConnection = function(x, y, width) {
-    this.resetTextColor();
+    this.resetTextColor();console.log(Connection)
     this.contents.fontSize = ConnectionFontSize;
     this.drawText(Connection, x, y + ConnectionY, width, "right");
     return this.textWidth(Connection);

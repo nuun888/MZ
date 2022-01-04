@@ -7,7 +7,7 @@
 参加しているサポートアクターを表示させます。  
 このプラグインはサポートアクター（NUUN_SupportActor）の拡張機能です。  
 
-![画像](img/SkillCost1.png)  
+![画像](img/NUUN_SupportActor2.png)  
 
 ## 更新履歴
 2022/1/4 Ver.1.3.2  

@@ -26,7 +26,7 @@
 | [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 1.14.2 |
 | ┗  リザルト時スプライト非表示 | [NUUN_ResultSpriteHide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultSpriteHide.js) | 共 | 1.0.0 |
 | [サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md) | [NUUN_SupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js) | 共 | 1.3.5 |
-| ┣  サポートアクターインジケーター | [NUUN_DisplaySupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) |  | 1.2.0 |
+| ┣  [サポートアクターインジケーター](https://github.com/nuun888/MZ/blob/master/README/DisplaySupportActor.md) | [NUUN_DisplaySupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) |  | 1.3.2 |
 | ┣  サポートアクターインジケータースプライト版 |  |  |
 | ┣  [サポートアクター呼び出し](https://github.com/nuun888/MZ/blob/master/README/CallSupportActor.md) | [NUUN_CallSupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CallSupportActor.js) |  | 1.0.0 |
 | ┗  召喚アクター |  |  |

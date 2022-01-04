@@ -8,9 +8,9 @@
  */
 /*:
  * @target MZ
- * @plugindesc サポートアクター表示（サポートアクター拡張）
+ * @plugindesc サポートアクターインジケータ（サポートアクター拡張）
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_SupportActor
  * 
  * @help
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/4 Ver.1.3.2
+ * サポートアクターがメンバーから離脱した後にエラーが出る問題を修正。
  * 2021/8/13 Ver.1.3.1
  * サポートアクターが追加されたときにサポートアクターウィンドウの動作がおかしくなる問題を修正。
  * サポートアクターが参加していない場合はコマンドに表示しないように修正。
@@ -67,8 +69,8 @@
  * @parent WindowSetting
  * 
  * @param SupporterName
- * @text サポートアクターウィンドウ間余白幅
- * @desc サポートアクターウィンドウ間の余白幅
+ * @text サポートアクター表示名
+ * @desc サポートアクター表示名
  * @type string
  * @default Supporter
  * @parent WindowSetting
@@ -115,7 +117,8 @@ const Window_X = Number(parameters['Window_X'] || 0);
 const Window_Y = Number(parameters['Window_Y'] || 96);
 const Window_Width = Number(parameters['Window_Width'] || 128);
 const Window_Margin = Number(parameters['Window_Margin'] || 24);
-const SupporterName = String(parameters['SupporterName']);
+const SupporterName = String(parameters['SupporterName'] || 'Supporter');
+const SummonName = String(parameters['SummonName'] || 'Summon');
 const SupportShowName = String(parameters['SupportShowName'] || "サポートアクター表示");
 const InitSupport = eval(parameters['InitSupport'] || 'true');
 const RightDisplay = eval(parameters['RightDisplay'] || 'false');
@@ -212,13 +215,19 @@ Window_SupportActorEX.prototype.drawName = function(x, y, width) {
 };
 
 Window_SupportActorEX.prototype.drawSupporterName = function(x, y, width) {
-  if (SupporterName) {
+  const summon = this._actor._summonActor;
+  const text = summon ? SummonName : SupporterName;
+  if (text) {
     this.contents.fontSize += -12;
-    this.changeTextColor(ColorManager.textColor(5));
+    if (summon) {
+      this.changeTextColor(ColorManager.textColor(18));
+    } else {
+      this.changeTextColor(ColorManager.textColor(5));
+    }
     this.contents.outlineColor = 'rgba(64, 32, 128, 0.6)';
     const a = RightDisplay ? 0 : 72;
     const align = RightDisplay ? 'right' : 'left';
-    this.drawText(SupporterName, x + a, y - 14, width - 72, align);
+    this.drawText(text, x + a, y - 14, width - 72, align);
     this.resetTextColor();
     this.contents.fontSize = $gameSystem.mainFontSize();
   }
@@ -353,7 +362,7 @@ Scene_Battle.prototype.supportActorHide = function() {
 const _Scene_Battle_startActorCommandSelection = Scene_Battle.prototype.startActorCommandSelection;
 Scene_Battle.prototype.startActorCommandSelection = function() {
   _Scene_Battle_startActorCommandSelection.call(this);
-  const supportActorSprite = this._supportActorWindowEX.find(sprite => sprite._actor.actorId() === BattleManager.actor().actorId());
+  const supportActorSprite = this._supportActorWindowEX.find(sprite => sprite._actor && sprite._actor.actorId() === BattleManager.actor().actorId());
     if (supportActorSprite) {
       const speed = this._commandStartActor ? 5 : 20;
       supportActorSprite.setMove(30, speed);

@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# Ver.1.8.1
+# Ver.1.8.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -33,7 +33,17 @@
 スナップショットを表示するとセーブ容量が大きります。アツマールで公開する場合は最大セーブ数を減らすこと推奨いたします。  
 デプロイメントに対応済みです。  
 
+### オリジナルパラメータ
+オリジナルパラメータを設定するにはインフォオリジナルパラメータデータで取得するデータを設定する必要があります。  
+表示項目の評価式で表示したいパラメータの配列番号（インフォオリジナルパラメータデータリスト番号）を記入します。  
+info.orgParam[id - 1]  
+例  
+リスト1番ならinfo.orgParam[0]  
+
 ## 更新履歴
+2022/1/5 Ver.1.8.2  
+名称が取得できない問題を修正。  
+オリジナルパラメータの設定方法を変更。  
 2021/12/30 Ver.1.8.1  
 コンテンツ背景を独自の画像を設定できる機能を追加。  
 2021/12/12 Ver.1.8.0  

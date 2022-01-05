@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.8.1
+ * @version 1.8.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -32,6 +32,13 @@
  * 初期設定ではプラグインコマンド「背景画像変更」で変更したたびに背景IDが変更されます。
  * 背景IDはロード画面でIDの一番高いセーブデータの背景が表示されます。
  * 
+ * オリジナルパラメータ
+ * オリジナルパラメータを設定するにはインフォオリジナルパラメータデータで取得するデータを設定する必要があります。
+ * 表示項目の評価式で表示したいパラメータの配列番号（インフォオリジナルパラメータデータリスト番号）を記入します。
+ * info.orgParam[id - 1]
+ * 例
+ * リスト1番ならinfo.orgParam[0]
+ * 
  * スナップショットを表示するとセーブ容量が大きります。
  * アツマールで公開する場合は最大セーブ数を減らすこと推奨いたします。
  * 
@@ -42,6 +49,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/5 Ver.1.8.2
+ * 名称が取得できない問題を修正。
+ * オリジナルパラメータの設定方法を変更。
  * 2021/12/30 Ver.1.8.1
  * コンテンツ背景を独自の画像を設定できる機能を追加。
  * 2021/12/12 Ver.1.8.0
@@ -120,6 +130,7 @@
  * @type string
  * @default 
  * 
+ * 
  * @param BasicSetting
  * @text 基本設定
  * @default ------------------------------
@@ -136,6 +147,20 @@
  * @text 最大セーブ数
  * @type number
  * @default 20
+ * @parent BasicSetting
+ * 
+ * @param OrgParamList
+ * @desc オリジナルパラメータをセーブインフォに格納します。（複数指定可能）info.orgParam[id - 1]で取得できます。
+ * @text インフォオリジナルパラメータデータ
+ * @type combo[]
+ * @option '$gameParty.steps();//歩数'
+ * @option '$gameSystem.battleCount();//戦闘回数'
+ * @option '$gameSystem.escapeCount();//逃走回数'
+ * @option '$gameSystem.saveCount();//セーブ回数'
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option '$gameSystem.chronus().getDateFormat(1);//ゲーム内時間の導入プラグイン日時フォーマット1'
+ * @option '$gameSystem.chronus().getDateFormat(2);//ゲーム内時間の導入プラグイン日時フォーマット2'
+ * @default 
  * @parent BasicSetting
  * 
  * @param Font
@@ -411,10 +436,12 @@
  * @default
  * 
  * @param DetaEval
- * @desc 評価式。
+ * @desc 評価式。（リスト1のみ）
  * @text 評価式(javaScript)(3)
- * @type string
- * @default
+ * @type combo[]
+ * @option 'info.orgParam[0]'
+ * @option 'info.orgParam? info.orgParam[0] : 0'
+ * @default 
  * 
  * @param X_Position
  * @text X表示列位置(4)
@@ -495,17 +522,7 @@ Imported.NUUN_SaveScreen = true;
   const _ContentsWidth = Number(parameters['ContentsWidth'] || 0);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
   const AnyNameEval = String(parameters['AnyNameEval'] || "");
-  const PlaytimeName = String(parameters['PlaytimeName'] || "プレイ時間");
-  const LocationName = String(parameters['LocationName'] || "現在地");
-  const MoneyName = String(parameters['MoneyName'] || "所持金");
-  const T_Left = Number(parameters['T_Left'] || 1);
-  const T_Right = Number(parameters['T_Right'] || 0);
-  const B_Left = Number(parameters['B_Left'] || 3);
-  const B_Right = Number(parameters['B_Right'] || 1);
-  const OriginalName1 = String(parameters['OriginalName1'] || "");
-  const OriginalName2 = String(parameters['OriginalName2'] || "");
-  const OriginalEval1 = String(parameters['OriginalEval1'] || "");
-  const OriginalEval2 = String(parameters['OriginalEval2'] || "");
+  const OrgParamList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['OrgParamList'])) : null) || [];
   const InfoSaveSnap = eval(parameters['InfoSaveSnap'] || "true");
   const SaveSnapQuality = eval(parameters['SaveSnapQuality'] || 0.92);
   const SaveSnapX = Number(parameters['SaveSnapX'] || 0);
@@ -554,9 +571,8 @@ Imported.NUUN_SaveScreen = true;
     info.mapname = $gameMap.displayName();
     info.gold = $gameParty._gold;
     info.levelActor = $gameParty.actorLevelForSavefile();
-    info.OriginalDate1 = eval(OriginalEval1);
-    info.OriginalDate2 = eval(OriginalEval2);
     info.background = $gameSystem.saveBuckgroundImg;
+    info.orgParam = this.getOrgParams();
     if ($gameSystem.onSnap) {
       DataManager.urlBitmapData();
       info.snap = this.urlBitmap;
@@ -565,6 +581,11 @@ Imported.NUUN_SaveScreen = true;
     }
     return info;
   };
+
+  DataManager.getOrgParams = function() {
+    return OrgParamList.map(data => eval(data));
+  };
+
 
   DataManager.loadBackground = function() {
     const globalInfo = this._globalInfo;
@@ -950,7 +971,7 @@ Imported.NUUN_SaveScreen = true;
 
   const _Window_SavefileList_drawPlaytime = Window_SavefileList.prototype.drawPlaytime;
   Window_SavefileList.prototype.drawPlaytime = function(info, x, y, width, data) {
-    const text = data.paramName || 'プレイ時間';
+    const text = data.ParamName || 'プレイ時間';
     const textWidth = this.systemWidth(data.SystemItemWidth, width);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
     this.changeTextColor(getColorCode(data.NameColor));
@@ -972,7 +993,7 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Window_SavefileList.prototype.drawMapName = function(info, x, y, width, data) {
-    const text = data.paramName || '現在地';
+    const text = data.ParamName || '現在地';
     const textWidth = this.systemWidth(data.SystemItemWidth, width);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
     this.changeTextColor(getColorCode(data.NameColor));
@@ -984,7 +1005,7 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Window_SavefileList.prototype.drawGold = function(info, x, y, width, data) {
-    const text = data.paramName || '所持金';
+    const text = data.ParamName || '所持金';
     const textWidth = this.systemWidth(data.SystemItemWidth, width);
     this.contents.fontSize = ContentsFontSizeMainFontSize;
     this.changeTextColor(getColorCode(data.NameColor));
@@ -998,7 +1019,7 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Window_SavefileList.prototype.drawOriginal = function(info, x, y, width, data) {
-    const text = data.paramName;
+    const text = data.ParamName;
     let textWidth = 0;
     if (text) {
       textWidth = this.systemWidth(data.SystemItemWidth, width);
@@ -1007,8 +1028,8 @@ Imported.NUUN_SaveScreen = true;
       this.drawText(text, x, y, textWidth);
     }
     this.resetTextColor();
-    if (data.DetaEval) {
-      this.drawText(eval(data.DetaEval), x + textWidth, y, width - textWidth, "right");
+    if (data.DetaEval && data.DetaEval[0]) {
+      this.drawText(eval(data.DetaEval[0]), x + textWidth, y, width - textWidth, "right");
     }
     this.contents.fontSize = $gameSystem.mainFontSize();
   };

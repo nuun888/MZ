@@ -45,8 +45,8 @@
  * @default ---------------------------------------------------------
  * 
  * @param ManaShieldSE
- * @text キャストタイムキャンセル時SE
- * @desc キャストタイム（詠唱）キャンセル時のSE
+ * @text 発動時SE
+ * @desc マナシールド発動時のSE
  * @type file
  * @dir audio/se/
  * 

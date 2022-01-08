@@ -1,6 +1,6 @@
-# [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
+# [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
 # Ver.1.4.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
 
 共通処理を行うベースプラグインです。  
 プラグインリストの上に配置してください。  

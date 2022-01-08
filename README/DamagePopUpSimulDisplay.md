@@ -9,6 +9,8 @@
 このプラグインでは両方ダメージを受けてもHP、MP同時に表示させます。  
 TPダメージのポップアップも表示できます。  
 
+![gif](img/DamagePopUpSimulDisplay1.gif)  
+
 ## 更新履歴
 2022/1/8 Ver.1.0.0  
 初版

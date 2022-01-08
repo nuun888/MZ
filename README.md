@@ -31,7 +31,7 @@
 | ┣  [サポートアクター呼び出し](https://github.com/nuun888/MZ/blob/master/README/CallSupportActor.md) | [NUUN_CallSupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CallSupportActor.js) |  | 1.0.0 |
 | ┗  召喚アクター |  |  |
 | ダメージポップアップ画像化  | [NUUN_DamagePopUpImg](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpImg.js) |  | 1.0.0 |
-| [ダメージポップアップ同時表示](https://github.com/nuun888/MZ/blob/master/README/DamagePopUpSimulDispla.md) | [NUUN_DamagePopUpSimulDisplay](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpSimulDisplay.js) |  | 1.0.0 |
+| [ダメージポップアップ同時表示](https://github.com/nuun888/MZ/blob/master/README/DamagePopUpSimulDisplay.md) | [NUUN_DamagePopUpSimulDisplay](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpSimulDisplay.js) |  | 1.0.0 |
 | ステート、バフポップアップ | [NUUN_popUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js) | 共 | 1.0.1 |
 | TP円形ゲージ | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js) |  | 1.0.4 |
 | 複数属性 | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) |  | 1.0.1 |

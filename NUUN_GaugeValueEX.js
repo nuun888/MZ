@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -19,7 +19,6 @@
  * このプラグインでは以下の機能を拡張します。
  * ゲージの非表示
  * 数値の表示方法
- * 数値、ラベルのフォント、色変更
  * 数値、ラベルの座標変更
  * 最大時、特定の割合以下でのゲージの色変更
  * 
@@ -28,10 +27,17 @@
  * 
  * ダメージ時の可視化機能はTPBゲージでは設定できません。
  * 
+ * 仕様
+ * LL_ExGaugeDrawingと併用する場合、適用されているゲージのフォント、座標、ゲージの色の設定はこのプラグインからの設定値が適用されます。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/3 Ver.1.1.1
+ * 現在値、/、最大値の座標変更をそれぞれ変更できるように変更。
+ * ダメージ可視化機能をルルの協会様LL_ExGaugeDrawingの「ゲージに立体感をつける」への対応。
+ * 現在値のフォントカラーを設定する機能を廃止。
  * 2022/1/1 Ver.1.1.0
  * ダメージを可視化するゲージを表示する機能を追加。
  * 2021/12/12 Ver.1.0.3
@@ -198,14 +204,6 @@
  * @min -9999
  * @parent FontSetting
  * 
- * @param ValueColor
- * @desc 通常時の現在数値の色。テキストタブでカラーコードを入力できます。
- * @text 現在数値色
- * @type number
- * @default 0
- * @min 0
- * @parent FontSetting
- * 
  * @param MaxValueFontSize
  * @desc 最大値のフォントサイズ。（メインフォントサイズから）
  * @text 最大値フォントサイズ
@@ -291,16 +289,48 @@
  * @parent CoordinateSetting
  * 
  * @param ValueX
- * @desc 数値のX座標。
- * @text 数値X座標
+ * @desc 現在値のX座標を調整します。
+ * @text 現在値X座標(相対)
  * @type number
  * @default 0
  * @min -9999
  * @parent CoordinateSetting
  * 
  * @param ValueY
- * @desc 数値のY座標。
- * @text 数値Y座標
+ * @desc 現在値のY座標を調整します。
+ * @text 現在値Y座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param MaxValueX
+ * @desc 最大値のX座標を調整します。
+ * @text 最大値X座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param MaxValueY
+ * @desc 最大値のY座標を調整します。
+ * @text 最大値Y座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param SeparationX
+ * @desc /のX座標を調整します。
+ * @text /X座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param SeparationY
+ * @desc /のY座標を調整します。
+ * @text /Y座標(相対)
  * @type number
  * @default 0
  * @min -9999
@@ -361,14 +391,6 @@
  * @min 0
  * @parent GaugeColorMaxSetting
  * 
- * @param MaximumValueColor
- * @desc 最大時の現在数値の色。テキストタブでカラーコードを入力できます。
- * @text 最大時現在数値色
- * @type number
- * @default 0
- * @min 0
- * @parent GaugeColorMaxSetting
- * 
  * @param GaugeColorRatioSetting
  * @text 特定割合以下時ゲージ設定
  * @default ------------------------------
@@ -404,14 +426,6 @@
  * @min 0
  * @parent GaugeColorRatioSetting
  * 
- * @param RatioValueColor
- * @desc 特定割合以下時の現在数値の色。テキストタブでカラーコードを入力できます。
- * @text 特定割合以下時現在数値色
- * @type number
- * @default 0
- * @min 0
- * @parent GaugeColorRatioSetting
- * 
  */
 var Imported = Imported || {};
 Imported.NUUN_GaugeValueEX = true;
@@ -431,6 +445,8 @@ Imported.NUUN_GaugeValueEX = true;
   const DefaultLabelFontSize = Number(parameters['DefaultLabelFontSize'] || -2);
   const ValueVisibleType = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ValueVisibleType'])) : null) || [];
   let GaugeTextColor = null;
+  const LLparameters = PluginManager._parameters['ll_exgaugedrawing'];
+  let LLSolidGradation = LLparameters ? eval(LLparameters["solidGradation"] || "true") : null;
 
   const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
   Sprite_Gauge.prototype.initMembers = function() {
@@ -547,16 +563,6 @@ Imported.NUUN_GaugeValueEX = true;
     return $gameSystem.mainFontSize() + (this._gaugeData ? this._gaugeData.LabelFontSize : DefaultLabelFontSize);
   };
 
-  const _Sprite_Gauge_valueColor = Sprite_Gauge.prototype.valueColor;
-  Sprite_Gauge.prototype.valueColor = function() {
-    if (this._isGaugeData) {
-      GaugeTextColor = this.changeValueColor();
-    }
-    const color = _Sprite_Gauge_valueColor.call(this);
-    GaugeTextColor = null;
-    return color;
-  };
-
   Sprite_Gauge.prototype.changeValueColor = function() {
     if (this._gaugeData.GaugeColorMaxApply && this.currentMaxValue() === this.currentValue()) {
       return this._gaugeData.MaximumValueColor;
@@ -582,7 +588,7 @@ Imported.NUUN_GaugeValueEX = true;
   };
 
   Sprite_Gauge.prototype.isRatioGauge = function() {
-    return this._battler.isAlive() && this._hp < this.mhp * this._gaugeData.RatioGauge / 100;
+    return this._battler.isAlive() && this.currentValue() < this.currentMaxValue() * this._gaugeData.RatioGauge / 100;
   };
 
   const _Sprite_Gauge_gaugeColor1 = Sprite_Gauge.prototype.gaugeColor1;
@@ -658,11 +664,27 @@ Imported.NUUN_GaugeValueEX = true;
   };
 
   Sprite_Gauge.prototype.valueX = function() {
-    return this._gaugeData.ValueX;
+    return this._gaugeData.ValueX || 0;
   };
 
   Sprite_Gauge.prototype.valueY = function() {
-    return this._gaugeData.ValueY;
+    return this._gaugeData.ValueY || 0;
+  };
+
+  Sprite_Gauge.prototype.maxValueX = function() {
+    return this._gaugeData.MaxValueX || 0;
+  };
+
+  Sprite_Gauge.prototype.maxValueY = function() {
+    return this._gaugeData.MaxValueY || 0;
+  };
+
+  Sprite_Gauge.prototype.separationX = function() {
+    return this._gaugeData.SeparationX || 0;
+  };
+
+  Sprite_Gauge.prototype.separationY = function() {
+    return this._gaugeData.SeparationY || 0;
   };
 
   const _Sprite_Gauge_gaugeRate = Sprite_Gauge.prototype.gaugeRate;
@@ -719,10 +741,10 @@ Imported.NUUN_GaugeValueEX = true;
     this.bitmap.drawText(currentValue, ValueX, ValueY, textWidth, height, "right");
     this.bitmap.fontSize = this.separationFontSize();
     this.bitmap.textColor = this.separationColor();
-    this.bitmap.drawText('/', ValueX + textWidth, ValueY, 16, height, "center");
+    this.bitmap.drawText('/', ValueX + this.separationX() + textWidth, this.separationY(), 16, height, "center");
     this.bitmap.fontSize = this.maxValueFontSize();
     this.bitmap.textColor = this.maxValueColor();
-    this.bitmap.drawText(currentMaxValue, ValueX + textWidth + 16, ValueY, textWidth, height, "right");
+    this.bitmap.drawText(currentMaxValue, ValueX + this.maxValueX() + textWidth + 16, this.maxValueY(), textWidth, height, "right");
   };
 
   Sprite_Gauge.prototype.drawGauge = function() {//再定義
@@ -737,7 +759,7 @@ Imported.NUUN_GaugeValueEX = true;
 
   const _Sprite_Gauge_drawGaugeRect = Sprite_Gauge.prototype.drawGaugeRect;
   Sprite_Gauge.prototype.drawGaugeRect = function(x, y, width, height) {
-    if (this.gaugeDamageVisualization()) {
+    if (this.gaugeDamageVisualization()) {//LLparameters
       this._drawGaugeMode = 1;//ダメージゲージ
       _Sprite_Gauge_drawGaugeRect.call(this, x, y, width, height);
       this._drawGaugeMode = 0;//通常のゲージ
@@ -747,6 +769,10 @@ Imported.NUUN_GaugeValueEX = true;
       const color1 = this.gaugeColor1();
       const color2 = this.gaugeColor2();
       this.bitmap.gradientFillRect(x + 1, y + 1, fillW, fillH, color1, color2);
+      if (LLparameters && LLSolidGradation) {//LL
+        this.bitmap.gradientFillRect(x + 1, y + 1, fillW, fillH / 3, "rgba(255, 255, 255, 0.1)", "rgba(255, 255, 255, 0.7)", true);//LL
+        this.bitmap.gradientFillRect(x + 1, y + fillH / 3 + 1, fillW, fillH / 2, "rgba(0, 0, 0, 0.2)", "rgba(0, 0, 0, 0)", true);//LL
+      }//LL
     } else {
       this._drawGaugeMode = 0;//通常のゲージ
       _Sprite_Gauge_drawGaugeRect.call(this, x, y, width, height);
@@ -763,11 +789,6 @@ Imported.NUUN_GaugeValueEX = true;
     this.bitmap.paintOpacity = this.labelOpacity();
     this.bitmap.drawText(label, x, y, width, height, "left");
     this.bitmap.paintOpacity = 255;
-  };
-
-  const _ColorManager_normalColor = ColorManager.normalColor;
-  ColorManager.normalColor = function() {
-    return GaugeTextColor ? getColorCode(GaugeTextColor) : _ColorManager_normalColor.call(this);
   };
 
   function getColorCode(color) {

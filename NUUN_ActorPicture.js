@@ -12,15 +12,27 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
  * 立ち絵、顔グラは条件により自動的に変化させることができます。
+ * 
+ * 全条件一致
  * 全条件一致の条件がすべて一致したときに画像が表示されます。
  * 設定していない条件は判定されずtrueを返します。
  * 立ち絵、顔グラ表示の優先度は上から判定して最初に条件が一致した設定が適用されます。
  * 条件付きの立ち絵、顔グラ設定はリストの上のほうに設定してください。
+ * 
+ * 条件設定
+ * 変化シーンでの一部の選択で設定します。
+ * 
+ * 顔グラのインデックス番号は左上から順に
+ * 0 1 2 3
+ * 4 5 6 7
+ * 8 9 10 11
+ * 12 13 14 15
+ * となります。
  * 
  * このプラグインは「NUUN_Base」が必要です。
  * 
@@ -29,6 +41,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/8 Ver 1.2.4
+ * 説明文を修正。
+ * ステートによる変化が適用されない問題を修正。
  * 2021/12/15 Ver 1.2.3
  * 一部処理の修正。
  * 2021/12/12 Ver 1.2.2
@@ -104,30 +119,35 @@
  * @desc スイッチがONの時に変化します。
  * @type switch
  * @default 0
+ * @parent AllMatch
  * 
  * @param ImgWeapon
  * @text 武器
  * @desc 武器を装備している時に条件を満たします。
  * @type weapon
  * @default 0
+ * @parent AllMatch
  * 
  * @param ImgArmor
  * @text 防具
  * @desc 防具を装備している時に条件を満たします。
  * @type armor
  * @default 0
+ * @parent AllMatch
  * 
  * @param ImgClass
  * @text 職業
  * @desc 特定の職業なら条件を満たします。
  * @type calss
  * @default 0
+ * @parent AllMatch
  * 
  * @param ImgStateAll
  * @text ステート。
  * @desc 指定したステートになっている時に条件を満たします
  * @type state
  * @default 0
+ * @parent AllMatch
  * 
  * @param ChangeGraphicScenes
  * @text 変化シーン
@@ -143,25 +163,45 @@
  * @value 'damage'
  * @option 回復時
  * @value 'recovery'
- * @option 攻撃スキル使用時
+ * @option 攻撃スキル使用時(1)
  * @value 'attack'
- * @option 回復スキル使用時
+ * @option 回復スキル使用時(1)
  * @value 'recoverySkill'
- * @option アイテム使用時
+ * @option アイテム使用時(2)
  * @value 'item'
  * @option 詠唱時
  * @value 'chant'
  * @option 勝利時
  * @value 'victory'
- * @option 被ステート(1)
+ * @option 被ステート(3)
  * @value 'state'
  * @default 'default'
+ * @parent AllMatch
+ * 
+ * @param CondSetting
+ * @text 条件設定
+ * @default ------------------------------
+ * 
+ * @param SkillId
+ * @text スキル(1)
+ * @desc スキルを選択します。0:指定なし -1:物理 -2:魔法 -3:必中
+ * @type skill
+ * @default 0
+ * @parent CondSetting
+ * 
+ * @param ItemId
+ * @text アイテム(2)
+ * @desc アイテムを選択します。
+ * @type item
+ * @default 0
+ * @parent CondSetting
  * 
  * @param stateId
- * @text 被ステート(1)
+ * @text 被ステート(3)
  * @desc ステートを選択します。
  * @type state
  * @default 0
+ * @parent CondSetting
  */
 
 var Imported = Imported || {};
@@ -224,14 +264,15 @@ Game_Actor.prototype.matchConditions = function(data) {
   if (data.ImgClass > 0 && !this.isClassImg(data.ImgClass)) {
     return false;
   }
-  if (!this.matchChangeGraphic(data.ChangeGraphicScenes)) {
+  if (!this.matchChangeGraphic(data)) {
     return false;
   }
   return true;
 };
 
 Game_Actor.prototype.matchChangeGraphic = function(data) {
-  switch (data) {
+  const changeData = data.ChangeGraphicScenes;
+  switch (changeData) {
     case 'default' :
       return true;
     case 'death' :
@@ -257,11 +298,16 @@ Game_Actor.prototype.matchChangeGraphic = function(data) {
   }
 };
 
+Game_Actor.prototype.isAtttakSkill = function() {
+  return;
+};
+
 Game_Actor.prototype.isClassImg = function(classId) {
   return this._classId === classId;
 };
 
 Game_Actor.prototype.isStateImg = function(stateId) {
+  
   return this._states.find(state => state === stateId);
 };
 

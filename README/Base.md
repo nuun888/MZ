@@ -1,11 +1,13 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
-# Ver.1.3.2
+# Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 
 共通処理を行うベースプラグインです。  
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2022/1/8 Ver.1.4.0  
+カラーインデックス取得処理を追加。  
 2021/12/12 Ver.1.3.2  
 敵ステート表示拡張を適用するための処理を追加。  
 2021/11/7 Ver.1.3.1  

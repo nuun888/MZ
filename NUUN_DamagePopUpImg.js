@@ -10,11 +10,16 @@
  * @target MZ
  * @plugindesc ダメージポップアップ画像化
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderBefore NUUN_DamagePopUpSimulDisplay
  *            
  * @help
  * ダメージポップアップをツクールMVと同じ仕様に変更します。（文字ではなく画像で表示）
- * ダメージ画像の規格はツクールMVと同じです。
+ * 素材規格は縦分割数で設定した数値で割り切れる高さにしてください。横幅は指定はありません。
+ * TP用のポップアップ（ダメージ用、回復用）を追加する場合は縦分割数を7にしてください。
+ * 画像のインデックス番号は一番上から0で始まります。
  * なおツクールMVのダメージポップアップ画像「Damage.png」を使用するにはのツクールMVのユーザ登録が必要です。
  * 
  * 
@@ -22,6 +27,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/8 Ver 1.1.0
+ * 割り当てられる画像の種類を増やせるように修正。
+ * 各ポップアップ画像のインデックス番号を指定できるように修正。
  * 2021/7/22 Ver 1.0.0
  * 初版
  * 
@@ -32,6 +40,61 @@
  * @dir img/
  * @default 
  * 
+ * @param BitmapBaseRows
+ * @desc 画像の縦の分割数
+ * @text 縦分割数
+ * @type number
+ * @default 5
+ * @min 1
+ * 
+ * @param HPDamageBaseRow
+ * @desc HPダメージのポップアップの画像インデックス
+ * @text HPダメージ画像インデックス
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param HPRecoveryBaseRow
+ * @desc HP回復のポップアップの画像インデックス
+ * @text HP回復画像インデックス
+ * @type number
+ * @default 1
+ * @min 0
+ * 
+ * @param MPDamageBaseRow
+ * @desc MPダメージのポップアップの画像インデックス
+ * @text MPダメージ画像インデックス
+ * @type number
+ * @default 2
+ * @min 0
+ * 
+ * @param MPRecoveryBaseRow
+ * @desc MP回復のポップアップの画像インデックス
+ * @text MP回復画像インデックス
+ * @type number
+ * @default 3
+ * @min 0
+ * 
+ * @param TPDamageBaseRow
+ * @desc TPダメージのポップアップの画像インデックス
+ * @text TPダメージ画像インデックス
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param TPRecoveryBaseRow
+ * @desc TP回復のポップアップの画像インデックス
+ * @text TP回復画像インデックス
+ * @type number
+ * @default 1
+ * @min 0
+ * 
+ * @param MissBaseRow
+ * @desc 失敗時のポップアップの画像インデックス
+ * @text 失敗時画像インデックス
+ * @type number
+ * @default 4
+ * @min 0
  * 
  */
 
@@ -41,6 +104,13 @@ Imported.NUUN_DamagePopUpImg = true;
 (() => {
   const parameters = PluginManager.parameters('NUUN_DamagePopUpImg');
   const PopUpDamageImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopUpDamageImg'])) : null) || [];
+  const HPDamageBaseRow = Number(parameters['HPDamageBaseRow'] || 0);
+  const HPRecoveryBaseRow = Number(parameters['HPRecoveryBaseRow'] || 1);
+  const MPDamageBaseRow = Number(parameters['MPDamageBaseRow'] || 2);
+  const MPRecoveryBaseRow = Number(parameters['MPRecoveryBaseRow'] || 3);
+  const TPDamageBaseRow = Number(parameters['TPDamageBaseRow'] || 0);
+  const TPRecoveryBaseRow = Number(parameters['TPRecoveryBaseRow'] || 1);
+  const MissBaseRow = Number(parameters['MissBaseRow'] || 4);
 
   const _Scene_Boot_loadSystemImages = Scene_Boot.prototype.loadSystemImages;
   Scene_Boot.prototype.loadSystemImages = function() {
@@ -58,6 +128,7 @@ Imported.NUUN_DamagePopUpImg = true;
       this._damageBitmap = (PopUpDamageImg && PopUpDamageImg[0]) ? ImageManager.nuun_LoadPictures(PopUpDamageImg[0]) : null;
     }
     this._baseRow = 0;
+    this._statusType = null;
   };
 
   Sprite_Damage.prototype.digitWidth = function() {
@@ -86,13 +157,29 @@ Imported.NUUN_DamagePopUpImg = true;
     Sprite.prototype.destroy.call(this, options);
   };
 
+  const _Sprite_Damage_setup = Sprite_Damage.prototype.setup;
+  Sprite_Damage.prototype.setup = function(target) {
+    const result = target.result();
+    this._statusType = null;
+    if (result.missed || result.evaded) {
+      this._statusType = 'miss';
+    } else if (result.hpAffected) {
+      this._statusType = 'hp';
+    } else if (result.mpDamage !== 0) {
+      this._statusType = 'mp';
+    } else if (result.tpDamage !== 0) {
+      this._statusType = 'tp';
+    }
+    _Sprite_Damage_setup.call(this, target);
+  };
+
   const _Sprite_Damage_createMiss = Sprite_Damage.prototype.createMiss;
   Sprite_Damage.prototype.createMiss = function() {
     if (this._damageBitmap) {
       const w = this.digitWidth();
       const h = this.digitHeight();
       const sprite = this.createChildSprite();
-      sprite.setFrame(0, 4 * h, 4 * w, h);
+      sprite.setFrame(0, MissBaseRow * h, 4 * w, h);
       sprite.dy = 0;
     } else {
       _Sprite_Damage_createMiss.call(this);
@@ -103,7 +190,7 @@ Imported.NUUN_DamagePopUpImg = true;
   Sprite_Damage.prototype.createDigits = function(value) {
     if (this._damageBitmap) {
       const string = Math.abs(value).toString();
-      const row = this._baseRow + (value < 0 ? 1 : 0);
+      const row = this.getBaseRow(value) + (value < 0 ? 1 : 0);
       const w = this.digitWidth();
       const h = this.digitHeight();
       for (var i = 0; i < string.length; i++) {
@@ -118,13 +205,16 @@ Imported.NUUN_DamagePopUpImg = true;
     }
   };
 
-  const _Sprite_Damage_setup = Sprite_Damage.prototype.setup;
-  Sprite_Damage.prototype.setup = function(target) {
-    const result = target.result();
-    if (target.isAlive() && result.mpDamage !== 0) {
-      this._baseRow = 2;
+  Sprite_Damage.prototype.getBaseRow = function(value) {
+    if (this._statusType === 'hp') {
+      return value > 0 ? HPDamageBaseRow : HPRecoveryBaseRow;
+    } if (this._statusType === 'mp') {
+      return value > 0 ? MPDamageBaseRow : MPRecoveryBaseRow;
+    } else if (this._statusType === 'tp') {
+      return value > 0 ? TPDamageBaseRow : TPRecoveryBaseRow;
+    } else {
+      return value > 0 ? 0 : 1;
     }
-    _Sprite_Damage_setup.call(this, target);
   };
 
 })();

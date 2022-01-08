@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.3.2
+ * @version 1.4.0
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/8 Ver.1.4.0
+ * カラーインデックス取得処理を追加。
  * 2021/12/12 Ver.1.3.2
  * 敵ステート表示拡張を適用するための処理を追加。
  * 2021/11/7 Ver.1.3.1
@@ -45,7 +47,11 @@
  */
 var Imported = Imported || {};
 Imported.NUUN_Base = true;
-const NUUN_Base_Ver = 130;
+const NUUN_Base_Ver = 140;
+
+function NuunManager() {
+  throw new Error("This is a static class");
+}
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Base');
@@ -67,6 +73,13 @@ function structureData(params) {
 function nuun_GausePlugins() {
   return Imported.NUUN_ButlerHPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge || Imported.NUUN_EnemyStateIconEX;
 }
+
+NuunManager.getColorCode = function(color) {
+  if (typeof(color) === "string") {
+    return color;
+  }
+  return ColorManager.textColor(color);
+};
 
 DataManager.nuun_structureData = function(params){
   return params ? structureData(params) : [];

@@ -1,8 +1,15 @@
 # [立ち絵、顔グラ表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
-# Ver.1.2.3
+# Ver.1.2.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+#### 対応プラグイン
+[バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md)  
+[ステータス表示拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md)  
+[メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)  
+[リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  
+[メニュー画面タイプ１](https://github.com/nuun888/MZ/blob/master/README/MenuScreen.md)  
+[メニュー画面タイプ２](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_2.md)  
 
 立ち絵、顔グラの表示を条件により自動的に変更します。  
 スイッチがON、特定の武器を装備、特定の防具を装備、特定のステート、特定の職業、ダメージ時、攻撃時、勝利時などの時にアクターの立ち絵、顔グラを自動的に変更できます。  
@@ -26,6 +33,11 @@
 ステータス表示拡張では立ち絵表示EX用画像設定での設定なしでも適用されます。
 
 ## 更新履歴
+2022/1/8 Ver 1.2.4  
+説明文を修正。  
+ステートによる変化が適用されない問題を修正。  
+2021/12/15 Ver 1.2.3  
+一部処理の修正。  
 2021/12/12 Ver 1.2.2  
 インデックスIDに-1を設定できるように変更。（-1:デフォルトのインデックスID）  
 2021/12/11 Ver 1.2.1  

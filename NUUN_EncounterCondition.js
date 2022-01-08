@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc エンカウント条件
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * 敵グループに対してエンカウント条件を付けます。
@@ -53,7 +53,7 @@
  * <Enc_Cond:10, 条件式> 条件式に合致する場合、エンカウントします。
  * 
  * 条件付きベースでの条件はパーティのみの判定になります。
- * 
+ * <Enc_Cond:20, 7> 条件付きベースで設定したリストの条件に合致する場合、エンカウントします。
  * 
  * 旧方式
  * <Enc_Switch:[id], [flags]>　[id]:スイッチID、[flags]true及びfalse
@@ -75,6 +75,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/8 Ver.1.2.1
+ * 新条件定義のスイッチと変数の条件が逆に定義されていた問題を修正。
  * 2021/12/19 Ver.1.2.0
  * 条件付きベースによる条件に対応。
  * 2021/8/5 Ver.1.1.0
@@ -109,12 +111,6 @@ Imported.NUUN_EncounterCondition = true;
       return false;
     }
     if(conditions.type === 0) {
-      const switchId = Number(conditions.deta[0]);
-      const flag = conditions.deta[1] ? eval(conditions.deta[1]) : true;
-      if(switchId > 0 && $gameSwitches.value(switchId) === flag) {
-        return true;
-      }
-    } else if(conditions.type === 1) {
       const valId = Number(conditions.deta[0]);
       const val = Number(conditions.deta[1]);
       const operator = conditions.deta[2] ? String(conditions.deta[2]).trim() : "greater";
@@ -131,6 +127,12 @@ Imported.NUUN_EncounterCondition = true;
           case "lessEqual": 
           return $gameVariables.value(valId) <= val;
         }
+      }
+    } else if(conditions.type === 1) {
+      const switchId = Number(conditions.deta[0]);
+      const flag = conditions.deta[1] ? eval(conditions.deta[1]) : true;
+      if(switchId > 0 && $gameSwitches.value(switchId) === flag) {
+        return true;
       }
     } else if (conditions.type === 2) {
       return eval(conditions.deta);

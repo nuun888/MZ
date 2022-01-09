@@ -5,7 +5,9 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
 
 ステータス画面を拡張します。  
-各ページの表示するステータスの項目をカスタマイズできます。  
+各ページの表示するステータスの項目をカスタマイズできます。 
+
+![画像](img/StatusScreen1.png)  
 
 ## 設定方法
 

@@ -10,12 +10,13 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ１
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
+ * メニュー画面に表示できる項目はカスタマイズすることができます。
  * 
  * 当プラグインは、立ち絵、顔グラ表示EXに対応しています。
  * 立ち絵表示EX用画像設定で設定しなくても立ち絵は表示されます。
@@ -23,7 +24,17 @@
  * 
  * 顔グラの座標設定はアクターの画像設定または立ち絵表示EX用画像設定（立ち絵、顔グラ表示EX導入時）で設定してください。
  * 
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
+ * 
+ * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
+ * 
  * 更新履歴
+ * 2022/1/9 Ver.1.1.0
+ * ステータス項目の表示の文字揃えを指定できる機能を追加。
+ * ステータス項目に経験値を追加。
+ * インフォウィンドウの文字サイズを指定できる機能を追加。
+ * インフォのプリセットが空白だったため修正。
  * 2021/12/29 Ver.1.0.1
  * メニューコマンドの説明がない場合にエラーが起こる問題を修正。
  * 2021/12/29 Ver.1.0.0
@@ -56,6 +67,21 @@
  * @default true
  * @parent Setting
  * 
+ * @param ExpDisplayMode
+ * @text 経験値の表示
+ * @desc 経験値の表示を指定します。
+ * @type select
+ * @option 表示なし
+ * @value 0
+ * @option 次のレベルまでの必要経験値
+ * @value 1
+ * @option 現在の獲得経験値
+ * @value 2
+ * @option 現在の獲得経験値の百分率表示
+ * @value 3
+ * @default 1
+ * @parent Setting
+ * 
  * @param BackGroundSetting
  * @text 背景設定
  * @default ------------------------------
@@ -83,7 +109,7 @@
  * @desc ステータス項目設定
  * @text ステータス項目設定
  * @type struct<StatusListData>[]
- * @default ["{\"DateSelect\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"4\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-10\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"11\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-10\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"12\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"18\",\"ItemWidth\":\"0\"}","{\"DateSelect\":\"13\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"46\",\"ItemWidth\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\"}","{\"DateSelect\":\"4\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"128\",\"Align\":\"'left'\",\"DetaEval\":\"\"}","{\"DateSelect\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\"}","{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-20\",\"ItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\"}","{\"DateSelect\":\"11\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"18\",\"ItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\"}","{\"DateSelect\":\"12\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"46\",\"ItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\"}","{\"DateSelect\":\"13\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"74\",\"ItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\"}"]
  * @parent StatusSetting
  * 
  * @param HPGaugeWidth
@@ -110,6 +136,49 @@
  * @min 0
  * @parent StatusSetting
  * 
+ * @param Expgauge
+ * @text 経験値ゲージ設定
+ * @default ------------------------------
+ * 
+ * @param ExpGaugeWidth
+ * @text Expゲージ横幅
+ * @desc Expゲージの横幅を指定します。
+ * @type number
+ * @default 128
+ * @min 0
+ * @parent Expgauge
+ * 
+ * @param ExpGaugeColor1
+ * @desc 経験値のゲージの色１（左）
+ * @text 経験値ゲージ色１
+ * @type number
+ * @default 17
+ * @min 0
+ * @parent Expgauge
+ * 
+ * @param ExpGaugeColor2
+ * @desc 経験値のゲージの色２（右）
+ * @text 経験値ゲージ色２
+ * @type number
+ * @default 6
+ * @min 0
+ * @parent Expgauge
+ * 
+ * @param LabelShow
+ * @text ラベル表示
+ * @desc ラベルを表示します
+ * @type boolean
+ * @default true
+ * @parent Expgauge
+ * 
+ * @param EXPDecimal
+ * @text 小数点桁数
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 2
+ * @min 0
+ * @max 99
+ * @parent Expgauge
  * 
  * @param InfoSetting
  * @text インフォ設定
@@ -119,7 +188,7 @@
  * @desc インフォ項目設定
  * @text インフォ項目設定
  * @type struct<InfoListData>[]
- * @default 
+ * @default ["{\"DateSelect\":\"2\",\"X_Position\":\"3\",\"Y_Position\":\"1\",\"X_Coordinate\":\"73\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"318\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"現在値:\",\"DetaEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"73\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"プレイ時間:\",\"DetaEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\"}"]
  * @parent InfoSetting
  * 
  * @param InfoCols
@@ -134,15 +203,23 @@
  * @text インフォの表示行
  * @desc インフォの表示する行。
  * @type number
- * @default 2
+ * @default 1
  * @min 1
+ * @parent InfoSetting
+ * 
+ * @param InfoFontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ
+ * @type number
+ * @default 0
+ * @min -99
  * @parent InfoSetting
  * 
  * @param HelpList
  * @desc ヘルプ項目設定
  * @text ヘルプ項目設定
  * @type struct<HelpListData>[]
- * @default ["{\"HelpCommandName\":\"[\\\"'アイテム'\\\"]\",\"HelpCommandText\":\"\"}","{\"HelpCommandName\":\"[\\\"'スキル'\\\"]\",\"HelpCommandText\":\"\"}","{\"HelpCommandName\":\"[\\\"'装備'\\\"]\",\"HelpCommandText\":\"\"}","{\"HelpCommandName\":\"[\\\"'ステータス'\\\"]\",\"HelpCommandText\":\"\"}","{\"HelpCommandName\":\"[\\\"'オプション'\\\"]\",\"HelpCommandText\":\"\"}","{\"HelpCommandName\":\"[\\\"'並び替え'\\\"]\",\"HelpCommandText\":\"\"}","{\"HelpCommandName\":\"[\\\"'セーブ'\\\"]\",\"HelpCommandText\":\"\"}","{\"HelpCommandName\":\"[\\\"'ゲーム終了'\\\"]\",\"HelpCommandText\":\"\"}"]
+ * @default ["{\"HelpCommandName\":\"[\\\"'アイテム'\\\"]\",\"HelpCommandText\":\"アイテムを使用します。\"}","{\"HelpCommandName\":\"[\\\"'スキル'\\\"]\",\"HelpCommandText\":\"スキルを表示します。\"}","{\"HelpCommandName\":\"[\\\"'装備'\\\"]\",\"HelpCommandText\":\"装備を変更します。\"}","{\"HelpCommandName\":\"[\\\"'ステータス'\\\"]\",\"HelpCommandText\":\"アクターのステータスを表示します。\"}","{\"HelpCommandName\":\"[\\\"'オプション'\\\"]\",\"HelpCommandText\":\"ゲームの設定を変更します。\"}","{\"HelpCommandName\":\"[\\\"'並び替え'\\\"]\",\"HelpCommandText\":\"メンバーの並び替えを行います。\"}","{\"HelpCommandName\":\"[\\\"'セーブ'\\\"]\",\"HelpCommandText\":\"データを記録します。\"}","{\"HelpCommandName\":\"[\\\"'ゲーム終了'\\\"]\",\"HelpCommandText\":\"ゲームを終了します。\"}"]
  * @parent InfoSetting
  * 
  * @param ActorSetting
@@ -202,22 +279,26 @@
  * @type select
  * @option なし
  * @value 0
- * @option アクター名(1)(2)(3)(4)(5)
+ * @option アクター名(1)(2)(3)(4)(5)(6)
  * @value 1
- * @option 二つ名(1)(2)(3)(4)(5)
+ * @option 二つ名(1)(2)(3)(4)(5)(6)
  * @value 2
- * @option 職業(1)(2)(3)(4)(5)
+ * @option 職業(1)(2)(3)(4)(5)(6)
  * @value 3
  * @option レベル(1)(2)(3)(4)(5)
  * @value 4
  * @option ステート(1)(2)(3)(4)(5)
  * @value 5
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)
+ * @value 6
  * @option ＨＰ(1)(2)(3)(4)
  * @value 11
  * @option ＭＰ(1)(2)(3)(4)
  * @value 12
  * @option ＴＰ(1)(2)(3)(4)
  * @value 13
+ * @option 経験値(1)(2)(3)(4)
+ * @value 15
  * @option ライン(1)(2)(3)(4)(5)
  * @value 1000
  * @default 0
@@ -260,6 +341,25 @@
  * @type number
  * @default 0
  * @min 0
+ * 
+ * @param Align
+ * @desc 文字揃え。
+ * @text 文字揃え(6)
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @option 中央
+ * @value 'center'
+ * @default 'left'
+ * 
+ * @param DetaEval
+ * @desc 評価式。
+ * @text 評価式(javaScript)(7)
+ * @type combo[]
+ * @option 
+ * @default 
  *
  */
 /*~struct~InfoListData:
@@ -272,7 +372,7 @@
  * @value 0
  * @option プレイ時間(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)
  * @value 1
- * @option 所持金(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)
+ * @option 所持金(1)(2)(3)(4)(5)(6)(7)(8)(11)
  * @value 2
  * @option 現在地(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)
  * @value 3
@@ -375,7 +475,6 @@
  * @default 0
  * @max 999999
  * @min 0
- * 
  *
  */
 /*~struct~actorImgList:
@@ -422,6 +521,22 @@
  * @type number
  * @default 0
  * @min -9999
+ * @max 9999
+ * 
+ * @param Img_SW
+ * @desc 画像の表示横幅。
+ * @text 画像表示横幅X
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * 
+ * @param Img_SH
+ * @desc 画像の表示高さ。
+ * @text 画像表示高さ
+ * @type number
+ * @default 0
+ * @min 0
  * @max 9999
  * 
  * @param Actor_Scale
@@ -486,6 +601,22 @@
  * @min -9999
  * @max 9999
  * 
+ * @param Img_SW
+ * @desc 画像の表示横幅。
+ * @text 画像表示横幅X
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * 
+ * @param Img_SH
+ * @desc 画像の表示高さ。
+ * @text 画像表示高さ
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * 
  * @param Actor_Scale
  * @desc 画像の拡大率。
  * @text 画像拡大率
@@ -518,13 +649,20 @@ const MenuCols = Number(parameters['MenuCols'] || 4);
 const MenuRows = Number(parameters['MenuRows'] || 1);
 const InfoCols = Number(parameters['InfoCols'] || 3);
 const InfoRows = Number(parameters['InfoRows'] || 2);
+const ExpDisplayMode = Number(parameters['ExpDisplayMode'] || 1);
 const BackGroundImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])) : null);
 const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
 const WindowVisible = eval(parameters['WindowVisible'] || "true");
 const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
+const LabelShow = eval(parameters['LabelShow'] || "true");
 const HPGaugeWidth = Number(parameters['HPGaugeWidth'] || 128);
 const MPGaugeWidth = Number(parameters['MPGaugeWidth'] || 128);
 const TPGaugeWidth = Number(parameters['TPGaugeWidth'] || 128);
+const ExpGaugeWidth = Number(parameters['ExpGaugeWidth'] || 128);
+const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
+const InfoFontSize = Number(parameters['InfoFontSize'] || 0);
+const ExpGaugeColor1 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor1'])) : 18);
+const ExpGaugeColor2 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor2'])) : 18);
 const StatusList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusList'])) : null) || [];
 const InfoList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['InfoList'])) : null) || [];
 const HelpList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['HelpList'])) : null) || [];
@@ -668,7 +806,7 @@ Window_MenuStatus.prototype.maxContentsCols = function() {
 };
 
 Window_MenuStatus.prototype.itemContentsWidth = function(width) {
-    return Math.floor(width / this.maxContentsCols()) - this.colSpacing() * 2;
+    return Math.floor(width / this.maxContentsCols()) - this.colSpacing() - 4;
 };
 
 Window_MenuStatus.prototype.drawItemBackground = function(index) {
@@ -688,7 +826,7 @@ Window_MenuStatus.prototype.drawItemBackground = function(index) {
 
 Window_MenuStatus.prototype.drawActorBack = function(bitmap, index) {
     const rect = this.itemRect(index);
-    this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x, rect.y, rect.width, rect.height);
+    this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
 };
 
 const _Window_MenuStatus_drawItemImage = Window_MenuStatus.prototype.drawItemImage;
@@ -731,7 +869,7 @@ Window_MenuStatus.prototype.drawItemStatus = function(index) {
     for (const data of StatusList) {
       const x_Position = data.X_Position;
       const position = Math.min(x_Position, this.maxContentsCols());
-      const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + this.colSpacing();
+      const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
       const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate;
       width2 = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : itemWidth;
       this.drawContentsBase(data, contentsX, contentsY, width2 - colSpacing / 2, actor);
@@ -778,19 +916,22 @@ Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor
     case 0:
         break;
     case 1:
-        this.drawActorName(x, y, width, actor);
+        this.drawActorName(data, x, y, width, actor);
         break;
     case 2:
-        this.drawActorNickname(x, y, width, actor);
+        this.drawActorNickname(data, x, y, width, actor);
         break;
     case 3:
-        this.drawActorClass( x, y, width, actor);
+        this.drawActorClass(data, x, y, width, actor);
         break;
     case 4:
-        this.drawActorLevel(x, y, width, actor);
+        this.drawActorLevel(data, x, y, width, actor);
         break;
     case 5:
         this.drawActorIcons(x, y, width, actor);
+        break;
+    case 6:
+        this.drawParam(data, x, y, width, actor);
         break;
     case 11:
         this.placeHpGauge(x, y, actor);
@@ -801,32 +942,35 @@ Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor
     case 13:
         this.placeTpGauge(x, y, actor);
         break;
+    case 15:
+        this.placeExpGauge(x, y, actor);
+        break;
     case 1000:
         this.horzLine(x, y, width, actor);
         break;
     }
 };
 
-Window_MenuStatus.prototype.drawActorName = function(x, y, width, actor) {
+Window_MenuStatus.prototype.drawActorName = function(data, x, y, width, actor) {
     this.changeTextColor(ColorManager.hpColor(actor));
-    this.drawText(actor.name(), x, y, width);
+    this.drawText(actor.name(), x, y, width, data.Align);
 };
 
-Window_MenuStatus.prototype.drawActorClass = function(x, y, width, actor) {
+Window_MenuStatus.prototype.drawActorClass = function(data, x, y, width, actor) {
     this.resetTextColor();
-    this.drawText(actor.currentClass().name, x, y, width);
+    this.drawText(actor.currentClass().name, x, y, width, data.Align);
 };
 
-Window_MenuStatus.prototype.drawActorNickname = function(x, y, width, actor) {
+Window_MenuStatus.prototype.drawActorNickname = function(data, x, y, width, actor) {
     this.resetTextColor();
-    this.drawText(actor.nickname(), x, y, width);
+    this.drawText(actor.nickname(), x, y, width, data.Align);
 };
 
-Window_MenuStatus.prototype.drawActorLevel = function(x, y, width, actor) {
+Window_MenuStatus.prototype.drawActorLevel = function(data, x, y, width, actor) {
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(TextManager.levelA, x, y, 48);
     this.resetTextColor();
-    this.drawText(actor.level, x + 84, y, 36, "right");
+    this.drawText(actor.level, x + 60, y, width - 60, "right");
 };
 
 Window_MenuStatus.prototype.drawActorIcons = function(x, y, width, actor) {
@@ -836,6 +980,17 @@ Window_MenuStatus.prototype.drawActorIcons = function(x, y, width, actor) {
     for (const icon of icons) {
         this.drawIcon(icon, iconX, y + 2);
         iconX += iconWidth;
+    }
+};
+
+Window_InfoMenu.prototype.drawParam = function(data, x, y, width, actor) {
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+    const nameText = data.ParamName ? data.ParamName : '';
+    const textWidth = data.Align === 'left' && data.SystemItemWidth === 0? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+    this.drawText(nameText, x + iconWidth, y, textWidth);
+    this.resetTextColor();
+    if (data.DetaEval[0]) {
+        this.drawText(eval(data.DetaEval[0]), x + textWidth + 8 + iconWidth, y, width - (textWidth + 8 + iconWidth), data.Align);
     }
 };
 
@@ -851,6 +1006,10 @@ Window_MenuStatus.prototype.placeTpGauge = function(x, y, actor) {
     if ($dataSystem.optDisplayTp) {
         this.placeGauge(actor, "tp", x, y);
     }
+};
+
+Window_MenuStatus.prototype.placeExpGauge = function(x, y, actor) {
+    this.placeGauge(actor, "menuexp", x, y);
 };
 
 Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
@@ -887,6 +1046,7 @@ Window_InfoMenu.prototype.refresh = function() {
     this.contents.clear();
     const list = InfoList;
     const lineHeight = this.lineHeight();
+    this.contents.fontSize = $gameSystem.mainFontSize() + InfoFontSize;
     for (const data of list) {
         const x_Position = data.X_Position;
         const position = Math.min(x_Position, this.maxCols());
@@ -896,6 +1056,7 @@ Window_InfoMenu.prototype.refresh = function() {
         const width = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : rect.width;
         this.dateDisplay(data, x, y, width);
     }
+    this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_InfoMenu.prototype.dateDisplay = function(data, x, y, width) {
@@ -931,10 +1092,10 @@ Window_InfoMenu.prototype.drawGold = function(data, x, y, width) {
         this.drawIcon(data.InfoIcon, x, y + 2);
         iconWidth = ImageManager.iconWidth + 6;
     }
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
-    const textWidth = data.Align === 'left' && data.SystemItemWidth === 0? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
-    this.drawText(nameText, x + iconWidth, y, textWidth);
+    const textWidth = data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+    this.drawText(nameText, x + iconWidth, y, textWidth);console.log(width)
     this.resetTextColor();
     this.drawCurrencyValue(this.value(), this.currencyUnit(), x + textWidth + 8 + iconWidth, y, width - (textWidth + 8 + iconWidth));
 };
@@ -945,7 +1106,7 @@ Window_InfoMenu.prototype.drawPlayTime = function(data, x, y, width) {
         this.drawIcon(data.InfoIcon, x, y + 2);
         iconWidth = ImageManager.iconWidth + 6;
     }
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x + iconWidth, y, textWidth);
@@ -959,7 +1120,7 @@ Window_InfoMenu.prototype.drawLocation = function(data, x, y, width) {
         this.drawIcon(data.InfoIcon, x, y + 2);
         iconWidth = ImageManager.iconWidth + 6;
     }
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x + iconWidth, y, textWidth);
@@ -973,7 +1134,7 @@ Window_InfoMenu.prototype.drawParam = function(data, x, y, width) {
         this.drawIcon(data.InfoIcon, x, y + 2);
         iconWidth = ImageManager.iconWidth + 6;
     }
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x + iconWidth, y, textWidth);
@@ -988,20 +1149,13 @@ Window_InfoMenu.prototype.drawCommandExplanation = function(data, x, y, width) {
 };
 
 Window_InfoMenu.prototype.drawName = function(data, x, y, width) {
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     this.drawText(nameText, x, y, width, data.Align);
 };
 
 Window_InfoMenu.prototype.systemWidth = function(swidth, width) {
     return swidth > 0 ? swidth : 120;
-};
-
-Window_InfoMenu.prototype.getColorCode = function(color) {
-    if (typeof(color) === "string") {
-      return color;
-    }
-    return ColorManager.textColor(color);
 };
 
 Window_InfoMenu.prototype.value = function() {
@@ -1037,6 +1191,80 @@ Sprite_MenuGauge.prototype.bitmapWidth = function() {
         return MPGaugeWidth;
     } else if (this._statusType === 'tp') {
         return TPGaugeWidth;
+    } else if (this._statusType === 'menuexp') {
+        return ExpGaugeWidth;
+    }
+};
+
+Sprite_MenuGauge.prototype.gaugeColor1 = function() {
+    switch (this._statusType) {
+        case "menuexp":
+            return NuunManager.getColorCode(ExpGaugeColor1);
+        default:
+            return Sprite_Gauge.prototype.gaugeColor1.call(this);
+    }
+};
+
+Sprite_MenuGauge.prototype.gaugeColor2 = function() {
+    switch (this._statusType) {
+        case "menuexp":
+            return NuunManager.getColorCode(ExpGaugeColor2);
+        default:
+            return Sprite_Gauge.prototype.gaugeColor2.call(this);
+    }
+};
+
+Sprite_MenuGauge.prototype.displyaExp = function() {
+    if (ExpDisplayMode === 1) {
+        return this.currentMaxValue() - this.currentValue();
+    } else if (ExpDisplayMode === 2) {
+        return this.currentValue();
+    } else if (ExpDisplayMode === 3) {
+        return NuunManager.numPercentage(this.currentValue() / this.currentMaxValue(), EXPDecimal, true) * 100;
+    }
+    return this._battler.currentExp() - this._battler.currentLevelExp();
+};
+
+Sprite_MenuGauge.prototype.displyaMaxExp = function() {
+    return this._battler.nextLevelExp() - this._battler.currentLevelExp();
+};
+
+const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
+Sprite_Gauge.prototype.currentValue = function() {
+    if (this._battler && this._statusType === "menuexp") {
+        return this._battler.currentExp() - this._battler.currentLevelExp();
+    }
+    return  _Sprite_Gauge_currentValue.call(this);
+};
+
+const _Sprite_Gauge_currentMaxValue = Sprite_Gauge.prototype.currentMaxValue;
+Sprite_Gauge.prototype.currentMaxValue = function() {
+    if (this._battler && this._statusType === "menuexp") {
+        return this._battler.nextLevelExp() - this._battler.currentLevelExp();
+    }
+    return _Sprite_Gauge_currentMaxValue.call(this);
+};
+
+const _Sprite_Gauge_label = Sprite_Gauge.prototype.label;
+Sprite_Gauge.prototype.label = function() {
+    if (this._statusType === "menuexp") {
+        return LabelShow ? TextManager.expA : '';
+    }
+    return _Sprite_Gauge_label.call(this);
+};
+
+Sprite_MenuGauge.prototype.drawValue = function() {
+    if (this._statusType === "menuexp" && ExpDisplayMode !== 0) {
+        let text = this.displyaExp();
+        if (ExpDisplayMode === 3) {
+            text += '%';
+        }
+        const width = this.bitmapWidth();
+        const height = this.textHeight();
+        this.setupValueFont();
+        this.bitmap.drawText(text, 0, 0, width, height, "right");
+    } else {
+        Sprite_Gauge.prototype.drawValue.call(this);
     }
 };
 

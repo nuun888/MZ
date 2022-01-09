@@ -1,10 +1,11 @@
 # [メニュー画面タイプ１](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.0.1
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 メニュー画面の表示を変更、拡張します。  
+メニュー画面に表示できる項目はカスタマイズすることができます。  
 
 ![画像](img/MenuScreen1.png)  
 
@@ -32,6 +33,11 @@
 ![画像](img/MenuScreen2.png) 
 
 ## 更新履歴
+2022/1/9 Ver.1.1.0  
+ステータス項目の表示の文字揃えを指定できる機能を追加。  
+ステータス項目に経験値を追加。  
+インフォウィンドウの文字サイズを指定できる機能を追加。  
+インフォのプリセットが空白だったため修正。  
 2021/12/29 Ver.1.0.1  
 メニューコマンドの説明がない場合にエラーが起こる問題を修正。  
 2021/12/29 Ver.1.0.0  

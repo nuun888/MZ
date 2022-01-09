@@ -134,8 +134,8 @@
 | メンバー変更画面 | [NUUN_SceneFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js) | 共 立対 | 1.5.1 |
 | ┣ メンバー変更画面戦闘時 | [NUUN_SceneBattleFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js) |  | 1.2.0 |
 | ┗ メンバー変更画面（サポートアクター対応） | [NUUN_SceneFormation_SupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation_SupportActor.js) |  | 1.0.1 |
-| [メニュー画面タイプ１](https://github.com/nuun888/MZ/blob/master/README/MenuScreen.md) | [NUUN_MenuScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js) | 共 立対 | 1.0.1 |
-| [メニュー画面タイプ２](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_2.md) | [NUUN_MenuScreen_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js) | 共 立対 | 1.0.0 |
+| [メニュー画面タイプ１](https://github.com/nuun888/MZ/blob/master/README/MenuScreen.md) | [NUUN_MenuScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js) | 共(Ver.1.4.1以降) 立対 | 1.1.0 |
+| [メニュー画面タイプ２](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_2.md) | [NUUN_MenuScreen_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js) | 共(Ver.1.4.1以降) 立対 | 1.1.0 |
 |  |  |  |  |
 |  |  |  |  |
 

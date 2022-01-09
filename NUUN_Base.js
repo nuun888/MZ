@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/8 Ver.1.4.1
+ * 小数点を丸める処理を追加。
  * 2022/1/8 Ver.1.4.0
  * カラーインデックス取得処理を追加。
  * 2021/12/12 Ver.1.3.2
@@ -80,6 +82,10 @@ NuunManager.getColorCode = function(color) {
   }
   return ColorManager.textColor(color);
 };
+
+NuunManager.numPercentage = function(num, digits, mode) {
+  return (mode ? Math.round(num * Math.pow(10, digits + 2)) : Math.floor(num * Math.pow(10, digits + 2))) / Math.pow(10, digits + 2);
+}
 
 DataManager.nuun_structureData = function(params){
   return params ? structureData(params) : [];

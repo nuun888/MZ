@@ -10,61 +10,20 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.3.1
+ * @version 2.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * ステータス画面を拡張します。
- * 以下の項目を自由に配置、設定できます。
- * アクター名
- * 二つ名
- * 職業
- * レベル
- * ステート
- * ＨＰ
- * ＭＰ
- * 攻撃力
- * 防御力
- * 魔法力
- * 魔法防御
- * 敏捷性
- * 運
- * ＴＰ
- * 命中率
- * 回避率
- * 会心率
- * 会心回避率
- * 魔法回避率
- * 魔法反射率
- * 反撃率
- * HP再生率
- * MP再生率
- * TP再生率
- * 狙われ率
- * 防御効果率
- * 回復効果率
- * 薬の知識
- * MP消費率
- * TPチャージ率
- * 物理ダメージ率
- * 魔法ダメージ率
- * 床ダメージ率
- * 獲得経験値率
- * 現在の経験値
- * 次のレベルまでの経験値
- * 独自パラメータ
- * 名称のみ
- * 属性耐性
- * ステート耐性
- * 装備
- * 記述欄
- * プロフィール
- * 顔グラフィック
- * キャラチップ
- * サイドビューアクター
- * 属性耐性レーダーチャート
- * ステート耐性レーダーチャート
+ * 各ページの表示するステータスの項目をカスタマイズできます。
+ * 
+ * 立ち絵の設定
+ * このプラグインではアクターの立ち絵の表示ができます。
+ * このプラグインは立ち絵、顔グラ表示EX対応です。
+ * 立ち絵、顔グラ表示EXで設定した立ち絵の座標設定は立ち絵表示EX用画像設定で設定します。
+ * なお設定をしなくても表示は可能です。
+ * 立ち絵、顔グラ表示EXを使用しない場合は画像設定で立ち絵を設定してください。
  * 
  * ページの各項目の設定
  * 
@@ -127,9 +86,6 @@
  * <desc1:ああああ> desc1とタグ付けされた項目に「ああああ」が表示されます。
  * 文章を表示させる場合は<desc1:ああああ>と記入してください。
  * 
- * 立ち絵表示EXで設定した立ち絵の座標設定は立ち絵表示EX用画像設定で設定します。
- * なお設定をしなくても表示は可能です。
- * 
  * 独自のパラメータ
  * this._actor 表示中のアクターのゲームデータ
  * dactor 表示中のアクターのデータベース
@@ -146,7 +102,11 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * Ver.2.3.2以降ではNUUN_Base Ver.1.4.1以降が必要となります。
+ * 
  * 更新履歴
+ * 2022/1/9 Ver.2.3.2
+ * 処理を一部修正。
  * 2021/12/11 Ver.2.3.1
  * 立ち絵、顔グラ表示EXで設定した勝利時の画像が戦闘終了後でも残ってしまう問題を修正。
  * 2021/12/11 Ver.2.3.0
@@ -1457,7 +1417,7 @@ Window_Status.prototype.actorImg = function() {
   const actor = this._actor;
   let bitmap = null;
   if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-    bitmap = actor._actorGraphicData ? ImageManager.nuun_LoadPictures(actor.getActorGraphicImg()) : null;
+    bitmap = actor.getActorGraphicData() ? ImageManager.nuun_LoadPictures(actor.getActorGraphicImg()) : null;
   } else if (ActorsImgList[actor.statusActorImgIndex] && actor.statusActorImgIndex >= 0) {
     const actorImges = ActorsImgList[actor.statusActorImgIndex].ActorImg[actor.statusImgId];
     bitmap = ImageManager.nuun_LoadPictures(actorImges);
@@ -1836,7 +1796,9 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
     width = this.contensWidth(width);
     let text = this.paramShow(list, actor, params, list.DetaEval);
     if (text !== undefined) {
-      text = this.statusParamDecimal(text, list.Decimal);
+      if (params >= 10) {
+        text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);
+      }
       let nameText = this.paramNameShow(list, actor, params);
       let textWidth = this.systemWidth(list.SystemItemWidth, width);
       this.changeTextColor(this.getColorCode(list.NameColor));
@@ -1940,7 +1902,7 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
   let text = eval(list.DetaEval);
   if (text !== undefined) {
     if (typeof(text) === 'number') {
-      text = this.statusParamDecimal(text, list.Decimal);
+      text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);
     }
     text += list.paramUnit ? String(list.paramUnit) : "";
     this.resetTextColor();
@@ -1981,7 +1943,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
           textWidth += ImageManager.iconWidth + 4;
         }
         let rate = actor.elementRate(elementId) * 100;
-        rate = this.statusParamDecimal(rate, list.Decimal);
+        rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
         rate += list.paramUnit ? String(list.paramUnit) : " %";
         this.resetTextColor();
         this.drawText(rate, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
@@ -2023,7 +1985,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
           textWidth += ImageManager.iconWidth + 4;
         }
         let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
-        rate = this.statusParamDecimal(rate, list.Decimal);
+        rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
         rate += list.paramUnit ? String(list.paramUnit) : " %";
         this.resetTextColor();
         this.drawText(rate, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
@@ -2326,7 +2288,7 @@ Sprite_StatusExpGauge.prototype.drawValue = function() {
   const height = typeof this.textHeight === 'function' ? this.textHeight() : this.bitmapHeight();
   this.setupValueFont();
   if (ExpPercent) {
-    currentValue = this._battler.isMaxLevel() ? "100%" : this.currentDecimal(this.currentPercent()) +"%";
+    currentValue = this._battler.isMaxLevel() ? "100%" : NuunManager.numPercentage(this.currentPercent(), EXPDecimal, DecimalMode) * 100 +"%";
   } else {
     currentValue = this._battler.isMaxLevel() ? "-------" : this._battler.nextRequiredExp();
   }
@@ -2334,7 +2296,7 @@ Sprite_StatusExpGauge.prototype.drawValue = function() {
 };
 
 Sprite_StatusExpGauge.prototype.currentPercent = function() {
-  return (this._battler.currentExp() - this._battler.currentLevelExp()) / (this._battler.nextLevelExp() - this._battler.currentLevelExp()) * 100;
+  return (this._battler.currentExp() - this._battler.currentLevelExp()) / (this._battler.nextLevelExp() - this._battler.currentLevelExp());
 };
 
 Sprite_StatusExpGauge.prototype.currentDecimal = function(val) {

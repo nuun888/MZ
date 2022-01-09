@@ -2,7 +2,7 @@
 # Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)    
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降    
 
 メニュー画面の表示を変更、拡張します。  
 メニュー画面に表示できる項目はカスタマイズすることができます。  

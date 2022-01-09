@@ -10,7 +10,7 @@
 
 | システム　　　　　　　　　　　　 | プラグイン　　　　　　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ----------------------------- | ----------------------------- | ----------------------------- | ----------------------------- |
-| [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.4.0 |
+| [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.4.1 |
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.3 |
 | レーダーチャート表示ベース | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) |  | 1.0.0 |
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.3 |
@@ -127,7 +127,7 @@
 | ┣　[耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) | [NUUN_EnemyBookEX_1](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js) |  | 1.0.1 |
 | ┗ 条件付きドロップアイテム図鑑適用 | [NUUN_EnemyBookEX_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) |  | 1.0.1 |
 | [アイテム図鑑](https://github.com/nuun888/MZ/blob/master/README/ItemBook.md) | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) | 共 | 1.4.2 |
-| [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共 立対 レ | 2.3.1 |
+| [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共(Ver.1.4.1) 立対 レ | 2.3.2 |
 | [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.8.1 |
 | セーブ上書き確認 | [NUUN_SaveVerification](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveVerification.js) |  | 1.0.0 |
 | [所持金拡張](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.1 |

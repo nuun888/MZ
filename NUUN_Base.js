@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,7 +21,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2022/1/8 Ver.1.4.1
+ * 2022/1/12 Ver.1.4.2
+ * 敵MPゲージ、敵TPゲージのゲージ適用するための処理の追加。
+ * 2022/1/9 Ver.1.4.1
  * 小数点を丸める処理を追加。
  * 2022/1/8 Ver.1.4.0
  * カラーインデックス取得処理を追加。
@@ -73,7 +75,7 @@ function structureData(params) {
 }
 
 function nuun_GausePlugins() {
-  return Imported.NUUN_ButlerHPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge || Imported.NUUN_EnemyStateIconEX;
+  return Imported.NUUN_ButlerHPGauge || Imported.NUUN_EnmeyMPGauge || Imported.NUUN_EnmeyTPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge || Imported.NUUN_EnemyStateIconEX;
 }
 
 NuunManager.getColorCode = function(color) {

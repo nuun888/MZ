@@ -16,7 +16,7 @@
  * @orderAfter NUUN_Base
  * 
  * @help
- * 敵のバトラー上にHP、MP、TPゲージを表示します。
+ * 敵のバトラー上にHPゲージを表示します。
  * 
  * 敵キャラのメモ欄
  * <HPGaugeX:[position]> HPゲージのX座標を調整します。（相対座標）

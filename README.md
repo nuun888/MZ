@@ -87,8 +87,8 @@
 | [アイテム、スキルネームカラー](https://github.com/nuun888/MZ/blob/master/README/ItemNameColor.md) | [NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js) |  | 1.1.1 |
 | [巨大モンスター](https://github.com/nuun888/MZ/blob/master/README/BigEnemy.md) | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) |  | 1.2.0 |
 | [敵HPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) | 共 | 1.4.0 |
-| [敵MPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyMPGauge.js) | 共(Ver.1.4.2) | 1.0.0 |
-| [敵TPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyTPGauge.md) | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js) | 共(Ver.1.4.2) | 1.0.0 |
+| [敵MPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_EnemyMPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyMPGauge.js) | 共(Ver.1.4.2) | 1.0.0 |
+| [敵TPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyTPGauge.md) | [NUUN_EnemyTPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js) | 共(Ver.1.4.2) | 1.0.0 |
 | 敵名前表示 | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) |  | 1.2.2 |
 | 敵TPBゲージ表示 | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) |  | 1.3.0 |
 | [敵ステート表示拡張](https://github.com/nuun888/MZ/blob/master/README/EnemyStateIconEX.md) | [NUUN_EnemyStateIconEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyStateIconEX.js) |  | 1.0.0 |

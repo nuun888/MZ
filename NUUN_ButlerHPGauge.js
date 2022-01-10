@@ -12,11 +12,11 @@
  * @plugindesc  敵HPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.4.0
+ * @version 1.4.1
  * @orderAfter NUUN_Base
  * 
  * @help
- * 敵のバトラー上にHPゲージを表示します。
+ * 敵のバトラー上にHP、MP、TPゲージを表示します。
  * 
  * 敵キャラのメモ欄
  * <HPGaugeX:[position]> HPゲージのX座標を調整します。（相対座標）
@@ -50,6 +50,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/10 Ver.1.4.1
+ * ゲージがラベル表示でも座標0から表示されてしまう問題を修正。
  * 2021/12/19 Ver.1.4.0
  * ゲージ画像化対応。
  * 2021/11/8 Ver.1.3.3
@@ -399,7 +401,7 @@ Sprite_EnemyHPGauge.prototype.drawLabel = function() {
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeX = function() {
-  if (!HPLabelVisible || !this._isGaugeData) {
+  if (!HPLabelVisible && !this._isGaugeData) {
     return 0;
   } else {
     return Sprite_Gauge.prototype.gaugeX.call(this);

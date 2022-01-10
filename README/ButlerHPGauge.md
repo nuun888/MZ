@@ -1,5 +1,5 @@
 # [敵HPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
-# Ver.1.4.0
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -59,6 +59,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にHPゲージを表示します。  
 
 ## 更新履歴
+2022/1/10 Ver.1.4.1  
+ゲージがラベル表示でも座標0から表示されてしまう問題を修正。  
 2021/12/19 Ver.1.4.0  
 ゲージ画像化対応。  
 2021/11/8 Ver.1.3.3  

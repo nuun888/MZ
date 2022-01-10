@@ -12,7 +12,7 @@
  * @plugindesc  敵TPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -50,6 +50,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/10 Ver.1.0.2
+ * 再修正。
  * 2022/1/10 Ver.1.0.1
  * ゲージがラベル表示でも座標0から表示されてしまう問題を修正。
  * 2022/1/12 Ver.1.0.0
@@ -365,7 +367,7 @@ Sprite_EnemyTPGauge.prototype.drawLabel = function() {
 };
 
 Sprite_EnemyTPGauge.prototype.gaugeX = function() {
-  if (!TPLabelVisible && !this._isGaugeData) {
+  if (!TPLabelVisible) {
     return 0;
   } else {
     return Sprite_Gauge.prototype.gaugeX.call(this);

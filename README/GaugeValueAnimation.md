@@ -1,8 +1,8 @@
 # [ゲージの数値更新アニメーション](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)
 # Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  
-#### 必須プラグイン
-[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
+#### 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 ダメージや回復、消費などのゲージに表示されている数値が変化する時、デフォルトでは一瞬で変化後の数値に変化します。  
 このプラグインではゲージの数値でアニメーションで増減させて表示させます。デフォルトでは20フレームかけて数値を徐々に変化させます。  

@@ -1,11 +1,13 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.4.1
+# Ver.1.4.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
 
 共通処理を行うベースプラグインです。  
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2022/1/12 Ver.1.4.2  
+敵MPゲージ、敵TPゲージのゲージ適用するための処理の追加。  
 2022/1/9 Ver.1.4.1  
 小数点を丸める処理を追加。  
 2022/1/8 Ver.1.4.0  

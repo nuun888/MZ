@@ -11,6 +11,8 @@ MPの変換後負担率が６０％の場合はMPが３００減りHPは５０�
 [rate]:肩代わりするダメージの割合  
 `<ManaShield:50>` HPダメージの50％がMPダメージに変換されます。  
 
+![gif](img/DamagePopUpSimulDisplay1.gif)  
+
 ### 更新履歴
 2021/8/1 Ver.1.0.1  
 MPダメージを受けてないのにSEが再生される問題を修正。  

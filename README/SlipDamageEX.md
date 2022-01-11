@@ -1,6 +1,6 @@
-# [スリップダメージ拡張]
+# [スリップダメージ拡張](https://github.com/nuun888/MZ/edit/master/NUUN_SlipDamageEX.js)
 # Ver.1.0.0
-[ダウンロード]  
+[ダウンロード](https://github.com/nuun888/MZ/edit/master/NUUN_SlipDamageEX.js)  
 
 スリップダメージに独自の式を定義できます。  
 式は割合値になるように指定してください。  
@@ -18,4 +18,5 @@ st:ステートのターン
 `<SlipDamageHP:Math.pow(3, st) * -1>` 毎ターンごとに3%ずつスリップダメージが倍化します。  
 
 ## 更新履歴
- 
+2022/1/11 Ver.1.0.0  
+初版  

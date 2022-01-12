@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc レーダーチャートベース
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * レーダーチャートを実装するためのベースプラグインです。
@@ -21,6 +21,8 @@
  * 
  * 
  * 更新履歴
+ * 2022/1/12 Ver.1.0.1
+ * マイナスになると表示が不自然になるため修正。
  * 2021/7/18 Ver.1.0.0
  * 初版
  * 
@@ -61,6 +63,7 @@ Sprite_NUUN_RadarChart.prototype.constructor = Sprite_NUUN_RadarChart;
   Sprite_NUUN_RadarChart.prototype.initialize = function() {
     Sprite.prototype.initialize.call(this);
     this.radarChartWidth = 100;
+    this.overMode = false;
     this.createBitmap();
   };
 
@@ -83,6 +86,10 @@ Sprite_NUUN_RadarChart.prototype.constructor = Sprite_NUUN_RadarChart;
     this._mainFrameColor = ColorManager.textColor(mainColor2);
     this._mainColor1 = "rgba("+ rgb1.red +","+ rgb1.green +","+ rgb1.blue +",0.2)";
     this._mainColor2 = "rgba("+ rgb2.red +","+ rgb2.green +","+ rgb2.blue +",0.9)";
+  };
+
+  Sprite_NUUN_RadarChart.prototype.setupOption = function(overMode) {
+    this.overMode = overMode;
   };
 
   Sprite_NUUN_RadarChart.prototype.fontSize = function() {
@@ -161,8 +168,10 @@ Sprite_NUUN_RadarChart.prototype.constructor = Sprite_NUUN_RadarChart;
   Sprite_NUUN_RadarChart.prototype.drawRadarChartMain = function(data, x, y, width, radius) {
     const dataPoint = [];
     data.forEach((a, i) => {
+      //const rate = Math.abs(a.rate);
+      const rate = Math.max(a.rate, 0);
       const angle = this.getAngle(i, data);
-      dataPoint.push(new Point(this.chartStatusPointX(x, angle, a.rate), this.chartStatusPointY(y, angle, a.rate)));
+      dataPoint.push(new Point(this.chartStatusPointX(x, angle, rate), this.chartStatusPointY(y, angle, rate)));
     });
     this.drawMainRadaChart(dataPoint, width, this._mainColor1, this._mainColor2);
   };

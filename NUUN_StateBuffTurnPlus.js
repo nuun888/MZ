@@ -10,7 +10,6 @@
  * @target MZ
  * @plugindesc ステート、バフターン数増減特徴
  * @author NUUN
- * @orderBefore NUUN_BattleStyleEX_Base
  * @version 1.0.0
  * 
  * @help

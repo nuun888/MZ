@@ -1,6 +1,6 @@
-# [スリップダメージ拡張](https://github.com/nuun888/MZ/edit/master/NUUN_SlipDamageEX.js)
+# [スリップダメージ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js)
 # Ver.1.0.0
-[ダウンロード](https://github.com/nuun888/MZ/edit/master/NUUN_SlipDamageEX.js)  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js)  
 ## 必須、前提プラグイン
 [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)  
 

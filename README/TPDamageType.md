@@ -2,7 +2,7 @@
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPDamageType.js)  
 
-ダメージタイプにTPを追加します。  
+ダメージタイプにTPダメージ、TP回復、TPを追加します。  
 
 ## 設定方法
 スキル、アイテムのメモ欄  

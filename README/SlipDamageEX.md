@@ -1,6 +1,8 @@
 # [スリップダメージ拡張](https://github.com/nuun888/MZ/edit/master/NUUN_SlipDamageEX.js)
 # Ver.1.0.0
 [ダウンロード](https://github.com/nuun888/MZ/edit/master/NUUN_SlipDamageEX.js)  
+## 必須、前提プラグイン
+[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)  
 
 スリップダメージに独自の式を定義できます。  
 式は割合値になるように指定してください。  

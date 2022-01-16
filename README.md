@@ -120,7 +120,7 @@
 | [売値任意設定](https://github.com/nuun888/MZ/blob/master/README/AnySellPrice.md) | [NUUN_AnySellPrice](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js) | 共 | 1.1.0 |
 | [床ダメージの処理を拡張](https://github.com/nuun888/MZ/blob/master/README/DamagedFloorEX.md) | [NUUN_DamagedFloorEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js) | 共 | 1.0.3 |
 | ドロップ率百分率化 | [NUUN_DropRatePercentage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropRatePercentage.js) |  | 1.0.0 |
-| ダメージタイプTP追加 |  |  |  |
+| [ダメージタイプTP追加](https://github.com/nuun888/MZ/blob/master/README/TPDamageType.md) |  |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

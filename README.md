@@ -15,7 +15,7 @@
 | ----------------------------- | ----------------------------- | ----------------------------- | ----------------------------- |
 | [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.4.2 |
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.3 |
-| [ステートターンカウントス](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md) |  |  |  |
+| [ステートターンカウントス](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md) | [NUUN_StateTurnCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js) |  | 1.0.0 |
 | [レーダーチャート表示ベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md) | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) |  | 1.0.1 |
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.3 |
 | [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) | 共 | 1.0.0 |
@@ -79,7 +79,7 @@
 | [敵キャラのスタータス上限突破](https://github.com/nuun888/MZ/blob/master/README/EnemyParamNoLimit.md) | [NUUN_EnemyParamNoLimit](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js) | 共 | 1.0.0 |
 | 行動時ブースト特徴 | [NUUN_boostEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_boostEX.js) | 条対 | 1.1.2 |
 | [踏み止まり特徴](https://github.com/nuun888/MZ/blob/master/README/StoppingFeature.md) | [NUUN_StoppingFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js) | 条対 | 1.0.0 |
-| [スリップダメージ拡張](https://github.com/nuun888/MZ/blob/master/README/SlipDamageEX.md) | [NUUN_SlipDamageEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js) | ス対 | 1.0.0 |
+| [スリップダメージ拡張](https://github.com/nuun888/MZ/blob/master/README/SlipDamageEX.md) | [NUUN_SlipDamageEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js) | ス対 | 1.0.1 |
 | [ステート、バフターン数増減特徴](https://github.com/nuun888/MZ/blob/master/README/StateBuffTurnPlus.md) | [NUUN_StateBuffTurnPlus](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnPlus.js) |  | 1.0.0 |
 | [ステート付与率増減特徴](https://github.com/nuun888/MZ/blob/master/README/AddStateRateBoost.md) | [NUUN_AddStateRateBoost](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateRateBoost.js) |  | 1.0.0 |
 |  |  |  |  |

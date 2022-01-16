@@ -10,7 +10,9 @@
  * @target MZ
  * @plugindesc スリップダメージ拡張
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
+ * @base NUUN_StateTurnCount
+ * @orderAfter NUUN_StateTurnCount
  * 
  * @help
  * スリップダメージに独自の式を定義できます。
@@ -29,15 +31,14 @@
  * <SlipDamageMP:10 * st> 毎ターンごとに10%加算した割合で回復します。
  * <SlipDamageHP:Math.pow(3, st) * -1> 毎ターンごとに3%ずつスリップダメージが倍化します。
  * 
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
+ * 
  * 更新履歴
+ * 2022/1/16 Ver.1.0.1
+ * 経過ターンの処理を別プラグイン化。
  * 2022/1/11 Ver.1.0.0
  * 初版
- * 
- * @param StateTurnReset
- * @desc ステートを再度付与際にターンをリセットする。
- * @text 付与ターンリセット
- * @type boolean
- * @default false
  * 
  */
 var Imported = Imported || {};
@@ -45,41 +46,6 @@ Imported.NUUN_SlipDamageEX = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_SlipDamageEX');
-const StateTurnReset = eval(parameters['StateTurnReset'] || "false");
-
-const _Game_BattlerBase_clearStates = Game_BattlerBase.prototype.clearStates;
-Game_BattlerBase.prototype.clearStates = function() {
-    _Game_BattlerBase_clearStates.call(this);
-    this._stateNowTurns = [];
-};
-
-const _Game_BattlerBase_eraseState = Game_BattlerBase.prototype.eraseState;
-Game_BattlerBase.prototype.eraseState = function(stateId) {
-    _Game_BattlerBase_eraseState.call(this, stateId)
-    delete this._stateNowTurns[stateId];
-};
-
-const _Game_BattlerBase_updateStateTurns = Game_BattlerBase.prototype.updateStateTurns;
-Game_BattlerBase.prototype.updateStateTurns = function() {
-    _Game_BattlerBase_updateStateTurns.call(this);
-    for (const stateId of this._states) {
-        if (stateId > 0) {
-            this._stateNowTurns[stateId]++;
-        }
-    }
-};
-
-Game_BattlerBase.prototype.isStateNowTurn = function(stateId) {
-    return this._stateNowTurns[stateId];
-};
-
-const _Game_BattlerBase_resetStateCounts = Game_BattlerBase.prototype.resetStateCounts;
-Game_BattlerBase.prototype.resetStateCounts = function(stateId) {
-    _Game_BattlerBase_resetStateCounts.call(this, stateId);
-    if (StateTurnReset || !this._stateNowTurns[stateId]) {
-        this._stateNowTurns[stateId] = 1;
-    }
-};
 
 Game_Battler.prototype.slipDamageEX = function(type) {
     let slipDamage = 0;

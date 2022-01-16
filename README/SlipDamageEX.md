@@ -21,6 +21,10 @@ st:ステートのターン
 `<SlipDamageMP:10 * st>` 毎ターンごとに10%加算した割合で回復します。  
 `<SlipDamageHP:Math.pow(3, st) * -1>` 毎ターンごとに3%ずつスリップダメージが倍化します。  
 
+ステートの経過ターンを取得するには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)が必要です。
+
 ## 更新履歴
+2022/1/16 Ver.1.0.1  
+経過ターンの処理を別プラグイン化。  
 2022/1/11 Ver.1.0.0  
 初版  

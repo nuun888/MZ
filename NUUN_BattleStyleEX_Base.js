@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.10
+ * @version 2.6.11
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/1/17 Ver 2.6.11
+ * 戦闘開始時に立ち絵画像が表示されない問題を修正。
  * 2021/12/30 Ver 2.6.10
  * スピードスターバトルとの併用パッチによる処理の追加。
  * 2021/12/26 Ver 2.6.9
@@ -2013,7 +2015,7 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._zoomScale = 1;
   this._zoomScaleTarget = 1.2;
   this._faceIndex = -1;
-  this._imgListId = 0;
+  this._imgListId = -1;
 };
 
 Sprite_ActorImges.prototype.setup = function(battler, data, index) {

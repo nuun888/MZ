@@ -38,7 +38,7 @@
 | [ダメージポップアップ同時表示](https://github.com/nuun888/MZ/blob/master/README/DamagePopUpSimulDisplay.md) | [NUUN_DamagePopUpSimulDisplay](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpSimulDisplay.js) |  | 1.0.0 |
 | ステート、バフポップアップ | [NUUN_popUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js) | 共 | 1.0.1 |
 | TP円形ゲージ | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js) |  | 1.0.4 |
-| 複数属性 | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) |  | 1.0.1 |
+| [複数属性](https://github.com/nuun888/MZ/blob/master/README/MultiElement.md) | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) |  | 1.0.1 |
 | 戦闘背景の変更 | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) |  | 1.1.1 |
 | [最大戦闘メンバー数変更](https://github.com/nuun888/MZ/blob/master/README/MaxBattleMembers.md) | [NUUN_MaxBattleMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js) |  | 1.0.1 |
 | [ステート残りターン表示](https://github.com/nuun888/MZ/blob/master/README/NUUN_StateTurn.md) | [NUUN_StateTurn](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js) |  | 1.0.2 |

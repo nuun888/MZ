@@ -11,7 +11,7 @@
 ス：要ステートターンカウント  
 ス対：ステートターンカウント対応  
 
-| コア        | プラグイン　プラグイン数5       |           | Ver   |
+| コア　　　　　　　 | プラグイン　プラグイン数5　　　 | 　　　　　　　　　 | Ver　　 |
 | ---------- | ------------- | ------------- | -------- |
 | [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.4.2 |
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.3 |
@@ -20,7 +20,7 @@
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.3 |
 |  |  |  |  |
 
-| 戦闘 | プラグイン　プラグイン数5 |  | Ver |
+| 戦闘　　　 | プラグイン　プラグイン数5　　　 | 　　　　 | Ver　　　　 |
 | ---------- | ------------- | ------------- | -------- |
 | [バトルスタイル拡張ベース](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) | 共 立対 | 2.6.11 |
 | [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md) | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.6.3 |
@@ -48,7 +48,7 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| 敵 | プラグイン　プラグイン数12 |  | Ver |
+| 敵　　　　　 | プラグイン　プラグイン数12　　　　　 | 　　　　　 | Ver　　　 |
 | ---------- | ------------- | ------------- | -------- |
 | [敵の行動パターン条件拡張](https://github.com/nuun888/MZ/blob/master/README/CondEnemyAction.md)| [NUUN_CondEnemyAction](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js) | 条 | 1.0.0 |
 | [敵キャラのスタータス上限突破](https://github.com/nuun888/MZ/blob/master/README/EnemyParamNoLimit.md) | [NUUN_EnemyParamNoLimit](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js) | 共 | 1.0.0 |

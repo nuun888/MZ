@@ -19,16 +19,18 @@
  * -1と設定することで無限（コアスクリプトの上限値）となります。
  * 
  * アクターごと、職業ごとに最大値を設定できます。
- * アクター又は職業のメモ欄（パラメータの高いほうが優先されます）
- * <MaxLimitHP:[param]>
- * <MaxLimitMP:[param]>
- * <MaxLimitTP:[param]>
- * <MaxLimitATK:[param]>
- * <MaxLimitDEF:[param]>
- * <MaxLimitMAG:[param]>
- * <MaxLimitMAT:[param]>
- * <MaxLimitAGI:[param]>
- * <MaxLimitLUK:[param]>
+ * アクター又は職業のメモ欄
+ * <MaxLimitHP:[param]> 最大HP
+ * <MaxLimitMP:[param]> 最大MP
+ * <MaxLimitTP:[param]> 最大TP
+ * <MaxLimitATK:[param]> 最大攻撃力
+ * <MaxLimitDEF:[param]> 最大防御力
+ * <MaxLimitMAG:[param]> 最大魔法力
+ * <MaxLimitMAT:[param]> 最大魔法防御
+ * <MaxLimitAGI:[param]> 最大敏捷性
+ * <MaxLimitLUK:[param]> 最大運
+ * 
+ * 複数設定されている場合は、一番最大値が高い値が適用されます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -47,6 +49,13 @@
  * @param limitMP
  * @desc アクターの上限最大MP。(-1で無制限)
  * @text 上限最大MP
+ * @type number
+ * @default -1
+ * @min -1
+ * 
+ * @param limitTP
+ * @desc アクターの上限最大TP。(-1でデフォルト値)
+ * @text 上限最大TP
  * @type number
  * @default -1
  * @min -1
@@ -101,6 +110,7 @@ Imported.NUUN_StatusParamEX = true;
   const parameters = PluginManager.parameters('NUUN_StatusParamEX');
   let limitHP = Number(parameters['limitHP'] || -1);
   let limitMP = Number(parameters['limitMP'] || -1);
+  let limitMP = Number(parameters['limitTP'] || -1);
   let limitAtk = Number(parameters['limitAtk'] || -1);
   let limitDef = Number(parameters['limitDef'] || -1);
   let limitMat = Number(parameters['limitMat'] || -1);
@@ -129,6 +139,16 @@ Imported.NUUN_StatusParamEX = true;
       param = this.lukMaxParam();
     }
     return param >= 0 ? param : _Game_Actor_paramMax.call(this, paramId);
+  };
+
+  const _Game_BattlerBase_maxTp = Game_BattlerBase.prototype.maxTp;
+  Game_BattlerBase.prototype.maxTp = function() {
+    const param = this.tpMaxParam();
+    return param >= 0 ? param : _Game_BattlerBase_maxTp.call(this);
+  };
+
+  Game_Actor.prototype.tpMaxParam = function() {
+    return Math.max(this.classMaxData('TP'), this.actorMaxData('TP'), limitTP, 0)
   };
 
   Game_Actor.prototype.hpMaxParam = function() {

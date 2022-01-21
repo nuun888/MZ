@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -18,10 +18,17 @@
  * 併用はできません。
  * Ver.1.0.3以前とプラグイン名及びプラグインパラメータが変更になっていますので再度設定してください。
  * 
+ * 表示ターンモード
+ * 'remaining'指定時のデフォルトの補正値は1です。
+ * 'elapsed'指定時はターン数補正を-1に設定してください。
+ * 経過ターンを表示させるにはステート経過ターンカウントプラグインが必要です。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/21 Ver.1.2.0
+ * ステートのターンの表示方法に経過ターンを追加。（要ステート経過ターンカウント）
  * 2021/9/23 Ver.1.1.0
  * ステートの表示切り替え反映による処理の大幅変更。
  * 敵にも横並び表示に出来る機能を追加。
@@ -39,7 +46,7 @@
  * @desc 味方の表示するステート数。
  * @text 味方の表示ステート数
  * @type number
- * @default 4
+ * @default 5
  * @min 1
  * 
  * @param EnemyStateIconShowVal
@@ -84,6 +91,16 @@
  * @param StateTurn
  * @text ターン表示設定
  * @default ------------------------------
+ * 
+ * @param TurnMode
+ * @desc 表示するターンモードを指定します。
+ * @text 表示ターンモード
+ * @type select
+ * @option 残りターン
+ * @value 'remaining'
+ * @option 経過ターン（要ステート経過ターンカウント）
+ * @value 'elapsed'
+ * @default 'remaining'
  * 
  * @param ActorStateIconVisible
  * @desc 味方のステートに残りターンの表示。
@@ -134,12 +151,13 @@ Imported.NUUN_StateIconSideBySide = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_StateIconSideBySide');
 let StateIconWidth = Number(parameters['StateIconWidth'] || 0);
-const ActorStateIconShowVal = Number(parameters['ActorStateIconShowVal'] || 4);
+const ActorStateIconShowVal = Number(parameters['ActorStateIconShowVal'] || 5);
 const EnemyStateIconShowVal = Number(parameters['EnemyStateIconShowVal'] || 1);
 const ActorStateIconAlign = eval(parameters['ActorStateIconAlign'] || 'right');
 const EnemyStateIconAlign = eval(parameters['EnemyStateIconAlign'] || 'center');
 const ActorStateIconVisible = eval(parameters['ActorStateIconVisible'] || 'true');
 const EnemyStateIconVisible = eval(parameters['EnemyStateIconVisible'] || 'true');
+const TurnMode = eval(parameters['TurnMode'] || 'remaining');
 const TurnFontSize = Number(parameters['TurnFontSize'] || -4);
 const TurnX = Number(parameters['TurnX'] || 0);
 const TurnY = Number(parameters['TurnY'] || -4);
@@ -343,7 +361,7 @@ Game_BattlerBase.prototype.allBuffTurns = function() {
 Game_BattlerBase.prototype.nuun_stateTurns = function() {
   return this.states().reduce((r, state) => {
     if (state.iconIndex > 0) {
-      return r.concat([this.nuun_isNonRemoval(state) ? 0 : this._stateTurns[state.id]  + TurnCorrection]);
+      return r.concat([this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)]);
     } 
     return r;
   }, []);
@@ -352,7 +370,7 @@ Game_BattlerBase.prototype.nuun_stateTurns = function() {
 Game_BattlerBase.prototype.nuun_buffTurns = function() {
   return this._buffs.reduce((r, buff, i) => {
     if (buff !== 0) {
-      return r.concat([this._buffTurns[i] + TurnCorrection]);
+      return r.concat([this.nuun_getBuffTurn(i)]);
     } else {
       return r;
     }
@@ -361,6 +379,14 @@ Game_BattlerBase.prototype.nuun_buffTurns = function() {
 
 Game_BattlerBase.prototype.nuun_isNonRemoval = function(state) {
   return state.autoRemovalTiming === 0;
+};
+
+Game_BattlerBase.prototype.nuun_getStateTurn = function(id) {
+  return (Imported.NUUN_StateTurnCount && TurnMode === 'elapsed' ? this.isStateNowTurn(id) : this._stateTurns[id]) + TurnCorrection;
+};
+
+Game_BattlerBase.prototype.nuun_getBuffTurn = function(id) {
+  return (Imported.NUUN_StateTurnCount && TurnMode === 'elapsed' ? this.getBuffNowTurn(id) : this._buffTurns[id]) + TurnCorrection;
 };
 
 })();

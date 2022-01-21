@@ -1,5 +1,5 @@
 # [アクターステータスの最大値設定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusParamEX.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusParamEX.js)  
 
 アクターの能力値に上限を授けます。デフォルトでは能力値の上限はInfinity（無限）となっています。  
@@ -21,6 +21,8 @@
 複数設定されている場合は、一番最大値が高い値が適用されます。
 
 ## 更新履歴
+2022/1/22 Ver.1.0.2  
+戦闘中にエラーが出る問題を修正。  
 2022/1/22 Ver.1.0.1  
 デフォルト値が正しく取得できない問題を修正。  
 ゲーム開始時にエラーが出る問題を修正。  

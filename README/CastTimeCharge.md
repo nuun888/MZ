@@ -1,6 +1,6 @@
 # [キャストタイムチャージ率特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js)
 # Ver.1.0.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js)
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js)  
 
 キャストタイム中のチャージ率を変化させる特徴を付けることが出来ます。  
 

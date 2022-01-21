@@ -20,7 +20,7 @@
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.3 |
 |  |  |  |  |
 
-| 戦闘　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver　　　　 |
+| 戦闘　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [バトルスタイル拡張ベース](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) | [NUUN_BattleStyleEX_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js) | 共 立対 | 2.6.11 |
 | [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md) | [NUUN_BattleStyleEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js) | 設定用 | 1.6.3 |

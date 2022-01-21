@@ -88,7 +88,7 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| 表現拡張　　　　　　　　　　　　 | プラグイン　プラグイン数14　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
+| 表現拡張　　　　　　　　　　　　 | プラグイン　プラグイン数15　　　　　　　| 説明　　　　　　　　　　　　　　　　　　　　　 | Ver　 |
 | ---------- | ------------- | ------------- | -------- |
 | 全体、ランダム、敵味方全体攻撃でも対象選択 | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js) | 共 | 1.5.1 |
 | [ゲージの数値更新アニメーション](https://github.com/nuun888/MZ/blob/master/README/GaugeValueAnimation.md) | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js) | 共 | 1.2.0 |

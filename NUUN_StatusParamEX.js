@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アクターパラメータの最大値設定
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  *            
  * @help 
  * アクターの能力値に上限を授けます。デフォルトでは能力値の上限はInfinity（無限）
@@ -36,6 +36,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/22 Ver.1.0.1
+ * デフォルト値が正しく取得できない問題を修正。
+ * ゲーム開始時にエラーが出る問題を修正。
  * 2022/1/22 Ver.1.0.0
  * 初版
  * 
@@ -110,7 +113,7 @@ Imported.NUUN_StatusParamEX = true;
   const parameters = PluginManager.parameters('NUUN_StatusParamEX');
   let limitHP = Number(parameters['limitHP'] || -1);
   let limitMP = Number(parameters['limitMP'] || -1);
-  let limitMP = Number(parameters['limitTP'] || -1);
+  let limitTP = Number(parameters['limitTP'] || -1);
   let limitAtk = Number(parameters['limitAtk'] || -1);
   let limitDef = Number(parameters['limitDef'] || -1);
   let limitMat = Number(parameters['limitMat'] || -1);
@@ -148,49 +151,49 @@ Imported.NUUN_StatusParamEX = true;
   };
 
   Game_Actor.prototype.tpMaxParam = function() {
-    return Math.max(this.classMaxData('TP'), this.actorMaxData('TP'), limitTP, 0)
+    return Math.max(this.classMaxData('TP'), this.actorMaxData('TP'), limitTP);
   };
 
   Game_Actor.prototype.hpMaxParam = function() {
-    return Math.max(this.classMaxData('HP'), this.actorMaxData('HP'), limitHP, 1)
+    return Math.max(this.classMaxData('HP'), this.actorMaxData('HP'), limitHP);
   };
 
   Game_Actor.prototype.mpMaxParam = function() {
-    return Math.max(this.classMaxData('MP'), this.actorMaxData('MP'), limitMP, 0)
+    return Math.max(this.classMaxData('MP'), this.actorMaxData('MP'), limitMP);
   };
 
   Game_Actor.prototype.atkMaxParam = function() {
-    return Math.max(this.classMaxData('ATK'), this.actorMaxData('ATK'), limitAtk, 0)
+    return Math.max(this.classMaxData('ATK'), this.actorMaxData('ATK'), limitAtk);
   };
 
   Game_Actor.prototype.defMaxParam = function() {
-    return Math.max(this.classMaxData('DEF'), this.actorMaxData('DEF'), limitDef, 0)
+    return Math.max(this.classMaxData('DEF'), this.actorMaxData('DEF'), limitDef);
   };
 
   Game_Actor.prototype.matMaxParam = function() {
-    return Math.max(this.classMaxData('MAT'), this.actorMaxData('MAT'), limitMat, 0)
+    return Math.max(this.classMaxData('MAT'), this.actorMaxData('MAT'), limitMat);
   };
 
   Game_Actor.prototype.mdfMaxParam = function() {
-    return Math.max(this.classMaxData('MDF'), this.actorMaxData('MDF'), limitMdf, 0)
+    return Math.max(this.classMaxData('MDF'), this.actorMaxData('MDF'), limitMdf);
   };
 
   Game_Actor.prototype.agiMaxParam = function() {
-    return Math.max(this.classMaxData('AGI'), this.actorMaxData('AGI'), limitAgi, 0)
+    return Math.max(this.classMaxData('AGI'), this.actorMaxData('AGI'), limitAgi);
   };
 
   Game_Actor.prototype.lukMaxParam = function() {
-    return Math.max(this.classMaxData('LUK'), this.actorMaxData('LUK'), limitLuk, 0)
+    return Math.max(this.classMaxData('LUK'), this.actorMaxData('LUK'), limitLuk);
   };
 
   Game_Actor.prototype.classMaxData = function(type) {
     const tag = 'MaxLimit'
-    return this.currentClass().meta[tag + type] || 0;
+    return this.currentClass().meta[tag + type] || -1;
   };
 
   Game_Actor.prototype.actorMaxData = function(type) {
     const tag = 'MaxLimit'
-    return this.actor().meta[tag + type] || 0;
+    return this.actor().meta[tag + type] || -1;
   };
 
 })();

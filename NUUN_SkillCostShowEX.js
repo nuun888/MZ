@@ -464,7 +464,7 @@ Window_SkillList.prototype.drawCostPrefix = function(prefix, x, y, width) {
 };
 
 Window_SkillList.prototype.drawCostConnection = function(x, y, width) {
-    this.resetTextColor();console.log(Connection)
+    this.resetTextColor();
     this.contents.fontSize = ConnectionFontSize;
     this.drawText(Connection, x, y + ConnectionY, width, "right");
     return this.textWidth(Connection);

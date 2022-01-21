@@ -1,4 +1,4 @@
-# [アクターパラメータの最大値設定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusParamEX.js)
+# [アクターステータスの最大値設定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusParamEX.js)
 # Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusParamEX.js)  
 

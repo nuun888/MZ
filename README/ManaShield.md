@@ -1,5 +1,6 @@
 # [マナシールド](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js)
 # Ver.1.0.1
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js)  
 
 HPダメージの代わりにMPにダメージを受けさせます。  
 1000のHPダメージを受けた時に５０％の場合はMPが５００減りHPは５００だけ減ります。    

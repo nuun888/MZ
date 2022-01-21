@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステート経過ターンカウント
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * ステートの現在の経過ターンを取得できるようにします。
@@ -19,6 +19,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/21 Ver.1.1.0
+ * バフの経過ターン処理を追加。
  * 2022/1/16 Ver.1.0.0
  * 初版
  * 
@@ -68,6 +70,61 @@ Game_BattlerBase.prototype.resetStateCounts = function(stateId) {
     if (StateTurnReset || !this._stateNowTurns[stateId]) {
         this._stateNowTurns[stateId] = 1;
     }
+};
+
+const _Game_BattlerBase_clearBuffs = Game_BattlerBase.prototype.clearBuffs;
+Game_BattlerBase.prototype.clearBuffs = function() {
+    _Game_BattlerBase_clearBuffs.call(this);
+    this._buffNowTurns = [0, 0, 0, 0, 0, 0, 0, 0];
+    this._debuffNowTurns = [0, 0, 0, 0, 0, 0, 0, 0];
+};
+
+const _Game_BattlerBase_eraseBuff = Game_BattlerBase.prototype.eraseBuff;
+Game_BattlerBase.prototype.eraseBuff = function(paramId) {
+    _Game_BattlerBase_eraseBuff.call(this, paramId)
+    this._buffNowTurns[paramId] = 0;
+    this._debuffNowTurns[paramId] = 0;
+};
+
+const _Game_BattlerBase_updateBuffTurns = Game_BattlerBase.prototype.updateBuffTurns;
+Game_BattlerBase.prototype.updateBuffTurns = function() {
+    _Game_BattlerBase_updateBuffTurns.call(this);
+    for (let i = 0; i < this._buffTurns.length; i++) {
+        if (this._buffs[i] !== 0) {
+            this.isBuffAffected(i) ? this._buffNowTurns[i]++ : this._debuffNowTurns[i]++;
+        }
+    }
+};
+
+const _Game_BattlerBase_overwriteBuffTurns = Game_BattlerBase.prototype.overwriteBuffTurns;
+Game_BattlerBase.prototype.overwriteBuffTurns = function(paramId, turns) {
+    const result = this._buffTurns[paramId] < turns;
+    _Game_BattlerBase_overwriteBuffTurns.call(this, paramId, turns);
+    if ((StateTurnReset || !this.getBuffNowTurn(paramId)) && result) {
+        this.isBuffAffected(paramId) ? this.resetBuffNowTurn(paramId) : this.resetDebuffNowTurn(paramId);
+    }
+};
+
+Game_BattlerBase.prototype.isBuffNowTurn = function(paramId) {
+    return this._buffNowTurns[paramId];
+};
+
+Game_BattlerBase.prototype.isDeBuffNowTurn = function(paramId) {
+    return this._debuffNowTurns[paramId];
+};
+
+Game_BattlerBase.prototype.resetBuffNowTurn = function(paramId) {
+    this._debuffNowTurns[paramId] = 0;
+    this._buffNowTurns[paramId] = 1;
+};
+
+Game_BattlerBase.prototype.resetDebuffNowTurn = function(paramId) {
+    this._buffNowTurns[paramId] = 0;
+    this._debuffNowTurns[paramId] = 1;
+};
+
+Game_BattlerBase.prototype.getBuffNowTurn = function(paramId) {
+    return this.isBuffAffected(paramId) ? this.isBuffNowTurn(paramId) : this.isDeBuffNowTurn(paramId);
 };
 
 })();

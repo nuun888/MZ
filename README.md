@@ -39,13 +39,17 @@
 | ステート、バフポップアップ | [NUUN_popUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js) | 共 | 1.0.1 |
 | TP円形ゲージ | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js) |  | 1.0.4 |
 | [複数属性](https://github.com/nuun888/MZ/blob/master/README/MultiElement.md) | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) |  | 1.0.1 |
-| 戦闘背景の変更 | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) |  | 1.1.1 |
 | [最大戦闘メンバー数変更](https://github.com/nuun888/MZ/blob/master/README/MaxBattleMembers.md) | [NUUN_MaxBattleMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js) |  | 1.0.1 |
 | [ステート残りターン表示](https://github.com/nuun888/MZ/blob/master/README/NUUN_StateTurn.md) | [NUUN_StateTurn](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js) |  | 1.1.0 |
 | [ステート横並び表示](https://github.com/nuun888/MZ/blob/master/README/StateIconSideBySide.md) | [NUUN_StateIconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js) |  | 1.2.0 |
 | ステートスクロール表示 |  |  |  |
 | [敵の行動パターン条件拡張](https://github.com/nuun888/MZ/blob/master/README/CondEnemyAction.md)| [NUUN_CondEnemyAction](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js) | 条 | 1.0.0 |
 | タイムライン |  |  |  |
+| 戦闘背景の変更 | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) |  | 1.1.1 |
+| 敵グループ戦闘背景個別変更 |  |  |  |
+| マップ戦闘背景変更 |  |  |  |
+| 戦闘中戦闘背景変更 |  |  |  |
+| 戦闘背景座標サイズ調整 |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -101,6 +105,7 @@
 | [ゲージ画像化](https://github.com/nuun888/MZ/blob/master/README/GaugeImage.md) | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) | 共 | 1.4.3 |
 | [MV互換アニメーションフレームレート個別設定](https://github.com/nuun888/MZ/blob/master/README/AnimationFPSRate.md) | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.0.2 |
 | [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.1.1 |
+| マルチカーソル |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 

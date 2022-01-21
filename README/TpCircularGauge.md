@@ -1,6 +1,6 @@
 # [TP円形ゲージプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)
 # Ver.1.0.4
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGaugee.js)  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)  
 
 TPゲージを円形にします。  
 バトルスタイル拡張プラグインと併用する場合はこのプラグインを「NUUN_BattleStyleEX_Base」より下に配置してください。  

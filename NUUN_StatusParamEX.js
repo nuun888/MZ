@@ -9,7 +9,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc アクターパラメータの最大値設定
+ * @plugindesc アクターステータスの最大値設定
  * @author NUUN
  * @version 1.0.1
  *            

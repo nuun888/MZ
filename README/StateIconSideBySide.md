@@ -1,5 +1,5 @@
 # [ステート横並び表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
-# Ver.1.1.0
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
 
 戦闘中に表示するステートを横並び表示にします。  
@@ -8,7 +8,15 @@
 
 ![画像](img/StateIconSideBySide1.png)  
 
+## 設定方法
+#### 表示ターンモード  
+'remaining'指定時のデフォルトの補正値は1です。  
+'elapsed'指定時はターン数補正を-1に設定してください。  
+経過ターンを表示させるには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)プラグインが必要です。  
+
 ## 更新履歴
+2022/1/21 Ver.1.1.0  
+ステートのターンの表示方法に経過ターンを追加。（要ステート経過ターンカウント）  
 2021/9/23 Ver.1.1.0  
 ステートの表示切り替え反映による処理の大幅変更。  
 敵にも横並び表示に出来る機能を追加。  

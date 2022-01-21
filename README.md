@@ -30,12 +30,12 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| バトラー | プラグイン　プラグイン数 |  | Ver |
+| バトラー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 |  |  |  |  |
 |  |  |  |  |
 
-| アクター | プラグイン　プラグイン数6 |  | Ver |
+| アクター　　　　　　　　　　　　　　　 | プラグイン　プラグイン数6 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [レベル上限限界突破](https://github.com/nuun888/MZ/blob/master/README/LevelUnlimited.md)  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js) |  | 1.1.0 |
 | [最大レベル変動](https://github.com/nuun888/MZ/blob/master/README/ChangeMaxLevel.md) | [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js) |  | 1.1.0 |
@@ -48,7 +48,7 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| 敵　　　　　 | プラグイン　プラグイン数12　　　　　 | 　　　　　 | Ver　　　 |
+| 敵　　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数12　　　　　 | 　　　　　 | Ver　　　 |
 | ---------- | ------------- | ------------- | -------- |
 | [敵の行動パターン条件拡張](https://github.com/nuun888/MZ/blob/master/README/CondEnemyAction.md)| [NUUN_CondEnemyAction](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js) | 条 | 1.0.0 |
 | [敵キャラのスタータス上限突破](https://github.com/nuun888/MZ/blob/master/README/EnemyParamNoLimit.md) | [NUUN_EnemyParamNoLimit](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js) | 共 | 1.0.0 |
@@ -65,7 +65,7 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| 能力拡張 | プラグイン　プラグイン数8 |  | Ver |
+| 能力拡張　　　　　　　　　　　　　　　 | プラグイン　プラグイン数8 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | 属性吸収特徴 | [NUUN_ElementAbsorb](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ElementAbsorb.js) |  | 1.0.1 |
 | 回復効果反転特徴 | [NUUN_RecoveryReversal](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RecoveryReversal.js) |  | 1.0.0 |
@@ -79,7 +79,7 @@
 |  |  |  |  |
 
 
-| アイテム、スキル | プラグイン　プラグイン数13 |  | Ver |
+| アイテム、スキル　　　　　　　　　　　 | プラグイン　プラグイン数13 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [アイテム、スキルネームカラー](https://github.com/nuun888/MZ/blob/master/README/ItemNameColor.md) | [NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js) |  | 1.1.1 |
 | [経験値増減アイテム、スキル](https://github.com/nuun888/MZ/blob/master/README/ExpItem.md) | [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js) |  | 1.2.1 |
@@ -97,7 +97,7 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| ステート、バフ | プラグイン　プラグイン数6 |  | Ver |
+| ステート、バフ　　　　　　　　　　　　 | プラグイン　プラグイン数6 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [ステート付与の仕様変更](https://github.com/nuun888/MZ/blob/master/README/AddStateDeviation.md) | [NUUN_AddStateDeviation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js) |  | 1.0.1 |
 | [スリップダメージ拡張](https://github.com/nuun888/MZ/blob/master/README/SlipDamageEX.md) | [NUUN_SlipDamageEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js) | ス対 | 1.0.1 |
@@ -109,13 +109,13 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| パーティ、敵グループ | プラグイン　プラグイン数1 |  | Ver |
+| パーティ、敵グループ　　　　　　　　　 | プラグイン　プラグイン数1 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | パーティ、敵グループリミットゲージ | [NUUN_PartyLimitGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js) |  | 1.1.0 |
 |  |  |  |  |
 |  |  |  |  |
 
-| パーティ | プラグイン　プラグイン数5 |  | Ver |
+| パーティ　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [最大戦闘メンバー数変更](https://github.com/nuun888/MZ/blob/master/README/MaxBattleMembers.md) | [NUUN_MaxBattleMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js) |  | 1.0.1 |
 | メンバー変更画面 | [NUUN_SceneFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js) | 共 立対 | 1.5.1 |
@@ -125,7 +125,7 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| 敵グループ | プラグイン　プラグイン数3 |  | Ver |
+| 敵グループ　　　　　　　　　　　　　　 | プラグイン　プラグイン数3 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [エンカウント条件拡張](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md) | [NUUN_EncounterCondition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js) | 条対 | 1.2.1 |
 | [敵グループの個別ＢＧＭ設定](https://github.com/nuun888/MZ/blob/master/README/BattleBGM.md) | [NUUN_BattleBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js) |  | 1.0.1 |
@@ -133,13 +133,13 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| マップ | プラグイン　プラグイン数1 |  | Ver |
+| マップ　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数1 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [床ダメージの処理を拡張](https://github.com/nuun888/MZ/blob/master/README/DamagedFloorEX.md) | [NUUN_DamagedFloorEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js) | 共 | 1.0.3 |
 |  |  |  |  |
 |  |  |  |  |
 
-| コマンド | プラグイン　プラグイン数3 |  | Ver |
+| コマンド　　　　　　　　　　　　　　　 | プラグイン　プラグイン数3 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [アイテムのカテゴリーカスタマイズ](https://github.com/nuun888/MZ/blob/master/README/ItemCategory.md) | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | 共 | 1.2.0 |
 | [コマンド、カテゴリー表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_CommandIcon.md)| [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js) |  | 1.3.1 |
@@ -148,7 +148,7 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| メニュー | プラグイン　プラグイン数10 |  | Ver |
+| メニュー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数10 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ | 2.10.4 |
 | ┣　[耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) | [NUUN_EnemyBookEX_1](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js) |  | 1.0.1 |
@@ -163,12 +163,12 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| 装備 | プラグイン　プラグイン数 |  | Ver |
+| 装備　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 |  |  |  |  |
 |  |  |  |  |
 
-| 表現 | プラグイン　プラグイン数9 |  | Ver |
+| 表現　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数9 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [ゲージの数値更新アニメーション](https://github.com/nuun888/MZ/blob/master/README/GaugeValueAnimation.md) | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js) | 共 | 1.2.0 |
 | [ゲージ画像化](https://github.com/nuun888/MZ/blob/master/README/GaugeImage.md) | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) | 共 | 1.4.3 |
@@ -183,7 +183,7 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| システム | プラグイン　プラグイン数7 |  | Ver |
+| システム　　　　　　　　　　　　　　　 | プラグイン　プラグイン数7 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [複数属性](https://github.com/nuun888/MZ/blob/master/README/MultiElement.md) | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) |  | 1.0.1 |
 | [売値任意設定](https://github.com/nuun888/MZ/blob/master/README/AnySellPrice.md) | [NUUN_AnySellPrice](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js) | 共 | 1.1.0 |
@@ -200,19 +200,19 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| イベント | プラグイン　プラグイン数 |  | Ver |
+| イベント　　　　　　　　　　　　　　　 | プラグイン　プラグイン数 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 |  |  |  |  |
 |  |  |  |  |
 
-| ユーティリティ | プラグイン　プラグイン数2 |  | Ver |
+| ユーティリティ　　　　　　　　　　　　 | プラグイン　プラグイン数2 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [アイテムなどのランダム取得](https://github.com/nuun888/MZ/blob/master/README/RandomItems.md)  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.2.2 |
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 
-| 競合対策 | プラグイン　プラグイン数3 |  | Ver |
+| 競合対策　　　　　　　　　　　　　　　 | プラグイン　プラグイン数3 |  | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | ゲージ、名前疑似３Dバトル併用パッチ | [NUUN_ButlerGaugeNameIn3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerGaugeNameIn3DBattle.js) |  | 1.0.0 |
 | バトルスタイル拡張疑似３Dバトル併用パッチ | [NUUN_BattleStyleEXInMPP_Pseudo3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEXInMPP_Pseudo3DBattle.js) |  | 1.1.0 |

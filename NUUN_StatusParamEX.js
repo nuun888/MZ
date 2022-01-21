@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アクターステータスの最大値設定
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  *            
  * @help 
  * アクターの能力値に上限を授けます。デフォルトでは能力値の上限はInfinity（無限）
@@ -36,6 +36,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/22 Ver.1.0.2
+ * 戦闘中にエラーが出る問題を修正。
  * 2022/1/22 Ver.1.0.1
  * デフォルト値が正しく取得できない問題を修正。
  * ゲーム開始時にエラーが出る問題を修正。
@@ -146,8 +148,11 @@ Imported.NUUN_StatusParamEX = true;
 
   const _Game_BattlerBase_maxTp = Game_BattlerBase.prototype.maxTp;
   Game_BattlerBase.prototype.maxTp = function() {
-    const param = this.tpMaxParam();
-    return param >= 0 ? param : _Game_BattlerBase_maxTp.call(this);
+    if (this.isActor()) {
+      const param = this.tpMaxParam();
+      return param >= 0 ? param : _Game_BattlerBase_maxTp.call(this);
+    }
+    return _Game_BattlerBase_maxTp.call(this);
   };
 
   Game_Actor.prototype.tpMaxParam = function() {

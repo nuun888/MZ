@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc 地域名
+ * @plugindesc 地域マップ名
  * @author NUUN
  * @version 1.0.0
  * @base NUUN_Base

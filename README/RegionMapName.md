@@ -1,4 +1,4 @@
-# [地域名](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapName.js)
+# [地域マップ名](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapName.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapName.js)
 #### 必須、前提プラグイン

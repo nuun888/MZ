@@ -1,4 +1,4 @@
-# [セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
+# [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
 #### 必須、前提プラグイン

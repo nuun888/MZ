@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ２
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -30,6 +30,9 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/1/23 Ver.1.1.1
+ * 立ち絵、顔グラEXを導入せず、顔グラを表示させるとエラーが出る問題を修正。
+ * 顔グラの座標設定の仕様を変更。
  * 2022/1/9 Ver.1.1.0
  * ステータス項目の表示の文字揃えを指定できる機能を追加。
  * ステータス項目に経験値を追加。
@@ -260,6 +263,22 @@
  * @type boolean
  * @default true
  * @parent ActorSetting
+ * 
+ * @param ActorFaceX
+ * @text 顔グラX座標
+ * @desc 顔グラのX座標
+ * @type number
+ * @default 0
+ * @min 9999
+ * @max -9999
+ * 
+ * @param ActorFaceY
+ * @desc 顔グラY座標
+ * @text 顔グラのY座標
+ * @type number
+ * @default 0
+ * @min 9999
+ * @max -9999
  * 
  */
 /*~struct~HelpListData:
@@ -646,6 +665,8 @@ const TPGaugeWidth = Number(parameters['TPGaugeWidth'] || 128);
 const ExpGaugeWidth = Number(parameters['ExpGaugeWidth'] || 128);
 const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
 const InfoFontSize = Number(parameters['InfoFontSize'] || 0);
+const ActorFaceX = Number(parameters['ActorFaceX'] || 0);
+const ActorFaceY = Number(parameters['ActorFaceY'] || 0);
 const ExpGaugeColor1 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor1'])) : 18);
 const ExpGaugeColor2 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor2'])) : 18);
 const StatusList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusList'])) : null) || [];
@@ -853,22 +874,11 @@ Window_MenuStatus.prototype.drawItemImage = function(index) {
     }
 };
 
-Window_MenuStatus.prototype.drawActorFace = function(actor, x, y, width, height) {
-    let data = null;
+Window_Status.prototype.drawActorFace = function(actor, x, y, width, height) {
     if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-        data = this.battlreActorPicture(actor.actorId());
-        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x + data.Actor_X, y + data.Actor_Y, width, height);
+      this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x + ActorFaceX, y + ActorFaceY, width, height);
     } else {
-        data = this.getActorImgData(actor);
-        Window_StatusBase.prototype.drawActorFace.call(this, actor, x + data.Actor_X, y + data.Actor_Y, width, height)
-    }
-};
-
-Window_MenuStatus.prototype.drawActorFace = function(actor, x, y, width, height) {
-    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
-    } else {
-        _Window_StatusBase_drawActorFace.call(this, actor, x, y, width, height);
+      Window_StatusBase.prototype.drawActorFace.call(this, actor, x + ActorFaceX, y + ActorFaceY, width, height);
     }
 };
 

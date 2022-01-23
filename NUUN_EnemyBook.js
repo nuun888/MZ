@@ -11,74 +11,18 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.10.4
+ * @version 2.11.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * モンスター図鑑を実装します。
- * このプラグインではエネミーの表示内容を自由に設定することが出来ます。
+ * このプラグインではモンスター情報の表示内容を自由に設定することが出来ます。
  * 
  * 敵の情報：現在出現している敵の情報を確認できます。
  * アナライズ：指定の敵の情報を表示します。
  * 
- * 以下の項目が表示できます。
- * 
- * HP（アナライズモードでは現在のステータスをONにしている時のみゲージが表示可能です）
- * MP（アナライズモードでは現在のステータスをONにしている時のみゲージが表示可能です）
- * TP（アナライズモードで現在のステータスをONにしている時のみ表示します）
- * 攻撃力
- * 防御力
- * 魔法力
- * 魔法防御
- * 敏捷性
- * 運
- * 命中率
- * 回避率
- * 会心率
- * 会心回避率
- * 魔法回避率
- * 魔法反射率
- * 反撃率
- * HP再生率
- * MP再生率
- * TP再生率
- * 狙われ率
- * 防御効果率
- * 回復効果率
- * 薬の知識
- * MP消費率
- * TPチャージ率
- * 物理ダメージ率
- * 魔法ダメージ率
- * 経験値
- * 獲得金額
- * 倒した数
- * ターン（TPBバトルで現在のステータスをONにしている時のみ表示します）
- * モンスター名
- * 名称のみ
- * 耐性属性
- * 弱点属性
- * 無効属性
- * 耐性ステート
- * 弱点ステート
- * 無効ステート
- * 耐性デバフ
- * 弱点デバフ
- * ドロップアイテム
- * スティールアイテム（盗みスキル導入時）
- * 記述欄（フリーテキストスペース　制御文字が使用できます）
- * オリジナルパラメータ（任意のステータス）
- * 敵の使用スキル
- * モンスター画像
- * キャラチップ
- * 共通画像
- * 画像
- * 属性耐性レーダーチャート
- * ステート耐性レーダーチャート
- * モンスターブックナンバー
- * 
- * 戦闘中にパーティコマンドからエネミー図鑑を開くことが出来ます。
+ * 戦闘中にパーティコマンドかモンスター図鑑を開くことが出来ます。
  * アナライズ機能を使う場合、TPBバトルでは開いている間TPBゲージを止める仕様にしています。
  * 
  * レーダーチャートを表示するにはNUUN_RadarChartBaseが必要です。
@@ -128,16 +72,23 @@
  * 
  * 
  * スキル、アイテムのメモ欄
+ * <AnalyzeSkill:[id]> アナライズを発動します。
+ * [id]:アナライズスキル設定のリスト番号
  * <AnalyzeSkill:1> このスキル、アイテムはアナライズスキルとし、「アナライズスキル設定」の１番の設定で発動します。
+ * 
  * <CertainAnalyze> アナライズ耐性を無視します。
+ * 
  * <EnemyInfo> 敵の情報を表示します。
+ * 
  * アイテムのメモ欄
  * <NoDropProbability>
  * このタグを記入したアイテムはドロップアイテムの確率表示を表示しません。
  * 
  * 
- * 図鑑の登録タイミングを遭遇時、撃破時、アナライズ時、撃破またはアナライズ時から選択できます。（ステータス情報は登録されません）
- * モンスターのステータス情報の登録タイミングを遭遇時、撃破時、アナライズ時、撃破またはアナライズ時から選択可能です。
+ * 図鑑の登録タイミングを遭遇時、撃破時、アナライズ時、撃破またはアナライズ時、戦闘終了時から選択できます。（ステータス情報は登録されません）
+ * モンスターのステータス情報の登録タイミングを遭遇時、撃破時、アナライズ時、撃破またはアナライズ時、戦闘終了時、から選択可能です。
+ * なお図鑑登録していないモンスターに対してステータス情報の登録を行う場合、図鑑の登録タイミングに関係なく図鑑登録を行い、情報の登録を行います。
+ * 
  * またステータス情報の未登録のモンスターのステータスを？？？で表示する機能を個別に設定できます。
  *
  * 
@@ -278,6 +229,13 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/24 Ver.2.11.0
+ * プラグインパラメータを整理。
+ * オリジナルパラメータの仕様変更。
+ * モンスター詳細ページのプリセットの変更。
+ * 項目フォントサイズを指定できる機能を追加。
+ * 戦闘終了時に登録する機能を追加。
+ * 登録時の処理を修正。
  * 2022/1/1 Ver.2.10.4
  * 戦闘中に情報ページの横幅指定時に敵の情報を開くと表示がずれる問題を修正。
  * カテゴリーのナンバー表記がおかしくなる問題を修正。
@@ -879,6 +837,9 @@
  * @value -1
  * @default -1
  * 
+ * 
+ * 
+ * 
  * パラメータ
  * @param BasicSetting
  * @text 基本設定
@@ -895,25 +856,11 @@
  * @default 0
  * @parent BasicSetting
  * 
- * @param NumberType
- * @text モンスターのナンバー表示
- * @desc モンスターのナンバーを表示します。
- * @type select
- * @option モンスターNoの表示なし
- * @value 0
- * @option モンスターNoを表示する。
- * @value 1
- * @option モンスターNoを表示し、0埋めをする。
- * @value 2
- * @desc モンスターのNo表示
- * @default 1
- * @parent BasicSetting
- * 
  * @param RegistrationTiming
  * @text 登録タイミング
  * @desc 図鑑の登録タイミング。
  * @type select
- * @option 遭遇時
+ * @option 戦闘開始時
  * @value 0
  * @option 撃破時
  * @value 1
@@ -921,6 +868,8 @@
  * @value 2
  * @option 撃破時またはアナライズ時
  * @value 3
+ * @option 戦闘終了時
+ * @value 4
  * @option 登録なし
  * @value 10
  * @desc 図鑑の登録タイミング
@@ -931,7 +880,7 @@
  * @text ステータス情報登録タイミング
  * @desc ステータス情報登録タイミング。
  * @type select
- * @option 遭遇時
+ * @option 戦闘開始時
  * @value 0
  * @option 撃破時
  * @value 1
@@ -939,37 +888,11 @@
  * @value 2
  * @option 撃破時またはアナライズ時
  * @value 3
+ * @option 戦闘終了時
+ * @value 4
  * @option 登録なし
  * @value 10
- * @default 1
- * @parent BasicSetting
- * 
- * @param UnknownVisible
- * @desc 未確認のモンスターをリストに表示しません。
- * @text 未確認モンスター表示
- * @type boolean
- * @default false
- * @parent BasicSetting
- * 
- * @param UnknownData
- * @desc 未確認の索引名です。？1文字だけ入れると名前の文字数に応じて？に置き換えられます。
- * @text 未確認エネミー及びアイテム名
- * @type string
- * @default ？
- * @parent BasicSetting
- * 
- * @param UnknownStatus
- * @desc ステータス情報未登録時のステータス表示名
- * @text ステータス情報未登録時ステータス表示名
- * @type string
- * @default ？？？
- * @parent BasicSetting
- * 
- * @param UnknownItems
- * @desc ステータス情報未登録時のアイテム、スキル表示名
- * @text ステータス情報未登録時アイテム、スキル表示名
- * @type string
- * @default ？
+ * @default 0
  * @parent BasicSetting
  * 
  * @param TransformDefeat
@@ -979,25 +902,11 @@
  * @default true
  * @parent BasicSetting
  * 
- * @param NumberMode
- * @desc ナンバー表示を各カテゴリー表示順で表示します。
- * @text ナンバーカテゴリー表示順表示
- * @type boolean
- * @default false
- * @parent BasicSetting
- * 
- * @param NoTouchUIWindow
- * @type boolean
- * @default false
- * @text 戦闘時タッチUI OFF時ウィンドウ上詰め
- * @desc 戦闘時タッチUIがOFFの時ウィンドウを上に詰めます。
- * @parent BasicSetting
- * 
- * @param ImgFolder
- * @desc 個別指定画像をフォルダ名を指定します。(img直下)
- * @text 個別指定画像フォルダ
+ * @param UnknownData
+ * @desc 未確認の索引名です。？1文字だけ入れると名前の文字数に応じて？に置き換えられます。
+ * @text 未確認モンスター及びカテゴリー名
  * @type string
- * @default 'pictures'
+ * @default ？
  * @parent BasicSetting
  * 
  * @param DecimalMode
@@ -1007,8 +916,68 @@
  * @default true
  * @parent BasicSetting
  * 
+ * @param CommandSetting
+ * @text コマンド設定
+ * @default ------------------------------
+ * 
+ * @param ShowCommand
+ * @desc メニューコマンドにモンスター図鑑を追加します。
+ * @text メニューコマンド表示
+ * @type boolean
+ * @default false
+ * @parent CommandSetting
+ * 
+ * @param enemyBookSwitch 
+ * @desc 表示させるフラグスイッチID
+ * @text メニューコマンド表示スイッチ
+ * @type switch
+ * @default 0
+ * @parent CommandSetting
+ * 
+ * @param ShowBattleCommand
+ * @desc 戦闘中のパーティコマンドにエネミー図鑑を追加します。
+ * @text パーティコマンド表示
+ * @type boolean
+ * @default false
+ * @parent CommandSetting
+ * 
+ * @param enemyBookBattleSwitch
+ * @desc 戦闘中に表示させるフラグスイッチID
+ * @text パーティコマンド表示スイッチ
+ * @type switch
+ * @default 0
+ * @parent CommandSetting
+ * 
+ * @param CommandName
+ * @desc コマンドの名称。
+ * @text コマンドの表示名
+ * @type string
+ * @default モンスター図鑑
+ * @parent CommandSetting
+ * 
+ * @param ShowEnemyInfoCommand
+ * @desc 戦闘中のパーティコマンドに敵の情報を追加します。
+ * @text 敵の情報パーティコマンド表示
+ * @type boolean
+ * @default false
+ * @parent CommandSetting
+ * 
+ * @param enemyBookInfoSwitch
+ * @desc 敵の情報を戦闘中に表示させるフラグスイッチID
+ * @text 敵の情報パーティコマンド表示スイッチ
+ * @type switch
+ * @default 0
+ * @parent CommandSetting
+ * 
+ * @param EnemyInfoCommandName
+ * @desc 敵の情報コマンドの名称。
+ * @text 敵の情報コマンド表示名
+ * @type string
+ * @default 敵の情報
+ * @parent CommandSetting
+ * 
  * @param WindowSetting
- * @text ウィンドウ設定
+ * @text 共通ウィンドウ設定
  * @default ------------------------------
  * 
  * @param BookWidth
@@ -1019,34 +988,22 @@
  * @min 0
  * @parent WindowSetting
  * 
- * @param MonsterSetting
- * @text モンスター設定
- * @default ------------------------------
- * 
- * @param UnknownEnemyIcons
- * @desc 未登録のモンスターアイコン。
- * @text 未登録モンスターアイコン
- * @type number
- * @default 0
- * @min 0
- * @parent MonsterSetting
- * 
- * @param SVEnemyMirror
+ * @param NoTouchUIWindow
  * @type boolean
- * @default true
- * @text サイドビューバトラー反転
- * @desc サイドビューバトラーを表示時、画像を反転させる。
- * @parent MonsterSetting
+ * @default false
+ * @text 戦闘時タッチUI OFF時ウィンドウ上詰め
+ * @desc 戦闘時タッチUIがOFFの時ウィンドウを上に詰めます。
+ * @parent WindowSetting
  * 
  * @param Category
- * @text カテゴリー設定
+ * @text カテゴリーウィンドウ設定
  * @default ------------------------------
  * 
  * @param CategoryOn
  * @type boolean
  * @default false
  * @text モンスターカテゴリー表示
- * @desc モンスターをカテゴリー毎に表示する。
+ * @desc モンスターをカテゴリーごとに表示する。
  * @parent Category
  * 
  * @param EnemyBookCategory
@@ -1069,70 +1026,13 @@
  * @default 0
  * @parent Category
  * 
- * @param BackGround
- * @text 背景、ウィンドウスキン設定
- * @default ------------------------------
- * 
- * @param EnemyBookBackGround
- * @text 背景画像表示
- * @desc 図鑑の背景画像を表示させます。
- * @type boolean
- * @default false
- * @parent BackGround
- * 
- * @param BackGroundImg
- * @desc 背景画像ファイル名を指定します。
- * @text 背景画像
- * @type file[]
- * @dir img/
- * @default []
- * @parent BackGround
- * 
- * @param EnemyInfoGroundImg
- * @desc 敵の情報の背景画像ファイル名を指定します。
- * @text 敵の情報背景画像
- * @type file[]
- * @dir img/
- * @default []
- * @parent BackGround
- * 
- * @param AnalyzeBackGroundImg
- * @desc アナライズの背景画像ファイル名を指定します。
- * @text アナライズ背景画像
- * @type file[]
- * @dir img/
- * @default []
- * @parent BackGround
- * 
- * @param BackUiWidth
- * @text 背景サイズをUIに合わせる
- * @desc 背景サイズをUIに合わせる。
- * @type boolean
- * @default true
- * @parent BackGround
- * 
- * @param NoCursorBackground
- * @desc エネミー選択欄の背景を表示しない。
- * @text カーソル背景無し
- * @type boolean
- * @default false
- * @parent BackGround
- * 
- * @param PercentWindowsSkin
- * @desc 完成度のウィンドウスキンを指定します。
- * @text 完成度ウィンドウスキン
- * @type file
- * @dir img/system
- * @default 
- * @parent BackGround
- * 
  * @param CategoryWindowsSkin
  * @desc カテゴリー画面のウィンドウスキンを指定します。
  * @text カテゴリーウィンドウスキン
  * @type file
  * @dir img/system
  * @default 
- * @parent BackGround
+ * @parent Category
  * 
  * @param CategoryNameWindowsSkin
  * @desc カテゴリー名画面のウィンドウスキンを指定します。
@@ -1140,39 +1040,7 @@
  * @type file
  * @dir img/system
  * @default 
- * @parent BackGround
- * 
- * @param IndexWindowsSkin
- * @desc モンスター一覧画面のウィンドウスキンを指定します。
- * @text モンスター一覧ウィンドウスキン
- * @type file
- * @dir img/system
- * @default 
- * @parent BackGround
- * 
- * @param InfoIndexWindowsSkin
- * @desc 敵の情報画面のウィンドウスキンを指定します。
- * @text 敵の情報ウィンドウスキン
- * @type file
- * @dir img/system
- * @default 
- * @parent BackGround
- * 
- * @param PageWindowsSkin
- * @desc ページ画面のウィンドウスキンを指定します。
- * @text ページウィンドウスキン
- * @type file
- * @dir img/system
- * @default 
- * @parent BackGround
- * 
- * @param ContentWindowsSkin
- * @desc モンスター情報画面のウィンドウスキンを指定します。
- * @text ウィンドウスキン
- * @type file
- * @dir img/system
- * @default 
- * @parent BackGround
+ * @parent Category
  * 
  * @param PercentWindow
  * @text 完成度ウィンドウ設定
@@ -1201,68 +1069,145 @@
  * @min 0
  * @parent PercentWindow
  * 
- * @param CommandData
- * @text コマンド設定
+ * @param PercentWindowsSkin
+ * @desc 完成度のウィンドウスキンを指定します。
+ * @text 完成度ウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent PercentWindow
+ * 
+ * @param EnemyIndexWindow
+ * @text モンスター一覧ウィンドウ設定
  * @default ------------------------------
  * 
- * @param ShowCommand
- * @desc メニューコマンドにエネミー図鑑を追加します。
- * @text メニューコマンド表示
+ * @param NumberType
+ * @text モンスターのナンバー表示
+ * @desc モンスターのナンバーを表示します。
+ * @type select
+ * @option モンスターNoの表示なし
+ * @value 0
+ * @option モンスターNoを表示する。
+ * @value 1
+ * @option モンスターNoを表示し、0埋めをする。
+ * @value 2
+ * @desc モンスターのNo表示
+ * @default 1
+ * @parent EnemyIndexWindow
+ * 
+ * @param UnknownVisible
+ * @desc 未確認のモンスターをリストに表示しません。
+ * @text 未確認モンスター表示
  * @type boolean
  * @default false
- * @parent CommandData
+ * @parent EnemyIndexWindow
  * 
- * @param enemyBookSwitch 
- * @desc 表示させるフラグスイッチID
- * @text メニューコマンド表示スイッチ
- * @type switch
- * @default 0
- * @parent CommandData
- * 
- * @param ShowBattleCommand
- * @desc 戦闘中のパーティコマンドにエネミー図鑑を追加します。
- * @text パーティコマンド表示
+ * @param NumberMode
+ * @desc ナンバー表示を各カテゴリー表示順で表示します。
+ * @text ナンバーカテゴリー表示順表示
  * @type boolean
  * @default false
- * @parent CommandData
+ * @parent EnemyIndexWindow
  * 
- * @param enemyBookBattleSwitch
- * @desc 戦闘中に表示させるフラグスイッチID
- * @text パーティコマンド表示スイッチ
- * @type switch
+ * @param UnknownEnemyIcons
+ * @desc 未登録のモンスターアイコン。
+ * @text 未登録モンスターアイコン
+ * @type number
  * @default 0
- * @parent CommandData
+ * @min 0
+ * @parent EnemyIndexWindow
  * 
- * @param CommandName
- * @desc コマンドの名称。
- * @text コマンドの表示名
+ * @param IndexWindowsSkin
+ * @desc モンスター一覧画面のウィンドウスキンを指定します。
+ * @text モンスター一覧ウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent EnemyIndexWindow
+ * 
+ * @param NoCursorBackground
+ * @desc エネミー選択欄の背景を表示しない。
+ * @text カーソル背景無し
+ * @type boolean
+ * @default false
+ * @parent EnemyIndexWindow
+ * 
+ * @param PageWindow
+ * @text ページウィンドウ設定
+ * @default ------------------------------
+ * 
+ * @param PageWindowsSkin
+ * @desc ページ画面のウィンドウスキンを指定します。
+ * @text ページウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent PageWindow
+ * 
+ * @param EnemyBookWindow
+ * @text 図鑑ウィンドウ設定
+ * @default ------------------------------
+ * 
+ * @param EnemyBookDefaultFontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ
+ * @type number
+ * @default 0
+ * @min -99
+ * @parent EnemyBookWindow
+ * 
+ * @param EnemyBookFontMargin
+ * @desc 項目の縦の文字の余白
+ * @text 項目間縦余白
+ * @type number
+ * @default 10
+ * @min 0
+ * @parent EnemyBookWindow
+ * 
+ * @param UnknownStatus
+ * @desc ステータス情報未登録時のステータス表示名
+ * @text ステータス情報未登録時ステータス表示名
  * @type string
- * @default モンスター図鑑
- * @parent CommandData
+ * @default ？？？
+ * @parent EnemyBookWindow
  * 
- * @param ShowEnemyInfoCommand
- * @desc 戦闘中のパーティコマンドに敵の情報を追加します。
- * @text 敵の情報パーティコマンド表示
+ * @param UnknownItems
+ * @desc ステータス情報未登録時のアイテム、スキル表示名
+ * @text ステータス情報未登録時アイテム、スキル表示名
+ * @type string
+ * @default ？
+ * @parent EnemyBookWindow
+ * 
+ * @param ImgFolder
+ * @desc 個別指定画像をフォルダ名を指定します。(img直下)
+ * @text 個別指定画像フォルダ
+ * @type string
+ * @default 'pictures'
+ * @parent EnemyBookWindow
+ * 
+ * @param SVEnemyMirror
+ * @type boolean
+ * @default true
+ * @text サイドビューバトラー反転
+ * @desc サイドビューバトラーを表示時、画像を反転させる。
+ * @parent EnemyBookWindow
+ * 
+ * @param EnemyBookBackGround
+ * @text 背景画像表示
+ * @desc 図鑑の背景画像を表示させます。
  * @type boolean
  * @default false
- * @parent CommandData
+ * @parent EnemyBookWindow
  * 
- * @param enemyBookInfoSwitch
- * @desc 敵の情報を戦闘中に表示させるフラグスイッチID
- * @text 敵の情報パーティコマンド表示スイッチ
- * @type switch
- * @default 0
- * @parent CommandData
+ * @param BackUiWidth
+ * @text 背景サイズをUIに合わせる
+ * @desc 背景サイズをUIに合わせる。
+ * @type boolean
+ * @default true
+ * @parent EnemyBookWindow
  * 
- * @param EnemyInfoCommandName
- * @desc 敵の情報コマンドの名称。
- * @text 敵の情報コマンド表示名
- * @type string
- * @default 敵の情報
- * @parent CommandData
- * 
- * @param PageData
- * @text 表示ページ設定
+ * @param EnemyBookSetting
+ * @text 図鑑設定
  * @default ------------------------------
  * 
  * @param PageSetting
@@ -1270,7 +1215,7 @@
  * @text ページ設定
  * @type struct<PageSettingData>[]
  * @default ["{\"ListDateSetting\":\"1\",\"PageCategoryName\":\"基本情報\"}","{\"ListDateSetting\":\"2\",\"PageCategoryName\":\"属性、ステート\"}","{\"ListDateSetting\":\"3\",\"PageCategoryName\":\"ドロップアイテム\"}","{\"ListDateSetting\":\"4\",\"PageCategoryName\":\"説明\"}"]
- * @parent PageData
+ * @parent EnemyBookSetting
  * 
  * @param PageCols
  * @desc ページの最大表示列。
@@ -1278,7 +1223,7 @@
  * @type number
  * @default 4
  * @min 1
- * @parent PageData
+ * @parent EnemyBookSetting
  * 
  * @param ContentCols
  * @text モンスター情報項目列数
@@ -1289,7 +1234,23 @@
  * @option ３列
  * @value 3
  * @default 2
- * @parent PageData
+ * @parent EnemyBookSetting
+ * 
+ * @param BackGroundImg
+ * @desc 背景画像ファイル名を指定します。
+ * @text 背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent EnemyBookSetting
+ * 
+ * @param ContentWindowsSkin
+ * @desc モンスター情報画面のウィンドウスキンを指定します。
+ * @text ウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent EnemyBookSetting
  * 
  * @param AnalyzeSetting
  * @text アナライズ設定
@@ -1323,6 +1284,21 @@
  * @default []
  * @parent AnalyzeSetting
  * 
+ * @param CommonVariableID
+ * @desc コモンイベント指定にモンスターIDを代入する変数
+ * @text モンスターID代入変数
+ * @type variable
+ * @default 0
+ * @parent AnalyzeSetting
+ * 
+ * @param AnalyzeBackGroundImg
+ * @desc アナライズの背景画像ファイル名を指定します。
+ * @text アナライズ背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent AnalyzeSetting
+ * 
  * @param EnemyInfoSetting
  * @text 敵の情報設定
  * @default ------------------------------
@@ -1343,55 +1319,6 @@
  * @text ページ設定
  * @type struct<PageSettingData>[]
  * @default ["{\"ListDateSetting\":\"1\",\"PageCategoryName\":\"基本情報\"}","{\"ListDateSetting\":\"2\",\"PageCategoryName\":\"属性、ステート\"}","{\"ListDateSetting\":\"3\",\"PageCategoryName\":\"ドロップアイテム\"}","{\"ListDateSetting\":\"4\",\"PageCategoryName\":\"説明\"}"]
- * @parent EnemyInfoSetting
- * 
- * @param InfoPageCols
- * @desc ページの最大表示列。
- * @text ページ最大表示列
- * @type number
- * @default 4
- * @min 1
- * @parent EnemyInfoSetting
- * 
- * @param InfoContentCols
- * @text モンスター情報項目列数
- * @desc モンスター情報の項目列数。
- * @type select
- * @option ２列
- * @value 2
- * @option ３列
- * @value 3
- * @default 2
- * @parent EnemyInfoSetting
- * 
- * @param InfoStatusGaugeVisible
- * @type boolean
- * @default true
- * @text ゲージを表示
- * @desc HP、MPのゲージを表示します。
- * @parent EnemyInfoSetting
- * 
- * @param InfoEnemyCurrentStatus
- * @type boolean
- * @default true
- * @text エネミーの現在ステータス表示
- * @desc エネミーの現在のステータスを表示します。
- * @parent EnemyInfoSetting
- * 
- * @param InfoBuffColor
- * @desc バフ時の文字色。
- * @text バフ時文字色
- * @type number
- * @default 0
- * @max 999999
- * @parent EnemyInfoSetting
- * 
- * @param InfoDebuffColor
- * @desc デバフ時の文字色。
- * @text デバフ時文字色
- * @type number
- * @default 0
- * @max 999999
  * @parent EnemyInfoSetting
  * 
  * @param RegistrationEnemyInfo
@@ -1424,6 +1351,102 @@
  * @default false
  * @parent EnemyInfoSetting
  * 
+ * @param InfoPageCols
+ * @desc ページの最大表示列。
+ * @text ページ最大表示列
+ * @type number
+ * @default 4
+ * @min 1
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoContentCols
+ * @text モンスター情報項目列数
+ * @desc モンスター情報の項目列数。
+ * @type select
+ * @option ２列
+ * @value 2
+ * @option ３列
+ * @value 3
+ * @default 2
+ * @parent EnemyInfoSetting
+ * 
+ * @param EnemyInfoGroundImg
+ * @desc 敵の情報の背景画像ファイル名を指定します。
+ * @text 敵の情報背景画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoIndexWindowsSkin
+ * @desc 敵の情報画面のウィンドウスキンを指定します。
+ * @text 敵の情報ウィンドウスキン
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent EnemyInfoSetting
+ * 
+ * @param BattleEnemyBookSetting
+ * @text 戦闘時図鑑設定
+ * @default ------------------------------
+ * 
+ * @param InfoStatusGaugeVisible
+ * @type boolean
+ * @default true
+ * @text ゲージを表示
+ * @desc HP、MPのゲージを表示します。
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param InfoEnemyCurrentStatus
+ * @type boolean
+ * @default true
+ * @text エネミーの現在ステータス表示
+ * @desc エネミーの現在のステータスを表示します。
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param InfoBuffColor
+ * @desc バフ時の文字色。
+ * @text バフ時文字色
+ * @type number
+ * @default 0
+ * @max 999999
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param InfoDebuffColor
+ * @desc デバフ時の文字色。
+ * @text デバフ時文字色
+ * @type number
+ * @default 0
+ * @max 999999
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param HPgaugeWidth
+ * @desc HPゲージ横幅
+ * @text HPゲージ横幅
+ * @type number
+ * @default 128
+ * @max 999
+ * @min 0
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param MPgaugeWidth
+ * @desc MPゲージ横幅
+ * @text MPゲージ横幅
+ * @type number
+ * @default 128
+ * @max 999
+ * @min 0
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param TPgaugeWidth
+ * @desc TPゲージ横幅
+ * @text TPゲージ横幅
+ * @type number
+ * @default 128
+ * @max 999
+ * @min 0
+ * @parent BattleEnemyBookSetting
+ * 
  * @param ListData
  * @text 表示項目設定
  * @default ------------------------------
@@ -1437,28 +1460,28 @@
  * @desc 表示するリスト。
  * @text 表示リスト１
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"ＨＰ\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"ＭＰ\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"30\",\"DetaEval\":\"\",\"NameColor\":\"27\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"31\",\"DetaEval\":\"\",\"NameColor\":\"27\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"32\",\"DetaEval\":\"\",\"NameColor\":\"27\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"12\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"32\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"30\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"31\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1000\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1000\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent ListData1_10
  * 
  * @param PageList2
  * @desc 表示するリスト。
  * @text 表示リスト２
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"ＨＰ\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"ＭＰ\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"40\",\"DetaEval\":\"\",\"NameColor\":\"2\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"41\",\"DetaEval\":\"\",\"NameColor\":\"2\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"45\",\"DetaEval\":\"\",\"NameColor\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"46\",\"DetaEval\":\"\",\"NameColor\":\"3\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"12\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"40\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"41\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"45\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"46\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1000\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent ListData1_10
  * 
  * @param PageList3
  * @desc 表示するリスト。
  * @text 表示リスト３
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"ＨＰ\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"ＭＰ\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"60\",\"DetaEval\":\"\",\"NameColor\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"12\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"60\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"desc\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent ListData1_10
  * 
  * @param PageList4
  * @desc 表示するリスト。
  * @text 表示リスト４
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"ＨＰ\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"ＭＰ\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"70\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"desc\",\"enemySetting\":\"\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"12\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"説明\",\"DateSelect\":\"70\",\"DetaEval\":\"[]\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"desc\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent ListData1_10
  * 
  * @param PageList5
@@ -1577,37 +1600,6 @@
  * @type struct<PageListData>[]
  * @default []
  * @parent ListData11_20
- * 
- * @param GaugeSetting
- * @text ゲージ設定
- * @default ------------------------------
- * 
- * @param HPgaugeWidth
- * @desc HPゲージ横幅
- * @text HPゲージ横幅
- * @type number
- * @default 128
- * @max 999
- * @min 0
- * @parent GaugeSetting
- * 
- * @param MPgaugeWidth
- * @desc MPゲージ横幅
- * @text MPゲージ横幅
- * @type number
- * @default 128
- * @max 999
- * @min 0
- * @parent GaugeSetting
- * 
- * @param TPgaugeWidth
- * @desc TPゲージ横幅
- * @text TPゲージ横幅
- * @type number
- * @default 128
- * @max 999
- * @min 0
- * @parent GaugeSetting
  * 
  * @param DropItemData
  * @text ドロップアイテム設定
@@ -1803,7 +1795,7 @@
  * @desc 効きやすいステート対象を有効度100%以上から反映させるか。
  * @text 効きやすい属性有効度100%反映
  * @type boolean
- * @default true
+ * @default false
  * @parent ResistWeakStateData
  * 
  * @param ResistNoEffectState
@@ -2163,7 +2155,10 @@
  * @param DetaEval
  * @desc パラメータ評価式を設定します。de：モンスターのデータベースデータ　ge：モンスターのゲームデータ
  * @text パラメータ評価式(1)
- * @type string
+ * @type combo[]
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'ge._race;//種族（要蒼竜氏バトラー種族定義）'
+ * @option 'ge.sp;//取得SP（要うなぎおおとろ氏スキルツリー）'
  * @default 
  * @parent BasicSetting
  * 
@@ -2258,6 +2253,14 @@
  * @default 0
  * @min 0
  * @max 99
+ * @parent BasicSetting
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(17)
+ * @type number
+ * @default 0
+ * @min -99
  * @parent BasicSetting
  * 
  * @param nameSetting
@@ -2776,6 +2779,10 @@ Game_System.prototype.completeEnemyBook = function() {
   }
 };
 
+Game_System.prototype.getEnemyBookFlag = function(enemyId) {
+  return this._enemyBookFlags[enemyId];
+};
+
 Game_System.prototype.isInEnemyBook = function(enemy) {
   return enemy && enemy.name && this._enemyBookFlags && this._enemyBookFlags[enemy.id];
 };
@@ -3206,24 +3213,43 @@ Game_System.prototype.getEnemyBookNumber = function(enemyId) {
 const _Game_Troop_setup = Game_Troop.prototype.setup;
 Game_Troop.prototype.setup = function(troopId) {
   _Game_Troop_setup.call(this, troopId);
-  this.members().forEach(function(enemy) {
-    if (enemy.isAppeared() && $gameSystem.registrationTiming() === 0) {
-      $gameSystem.addToEnemyBook(enemy.enemyId());
+  for (const enemy of this.members()) {
+    if (enemy.isAppeared()) {
+      const enemyId = enemy.enemyId();
       if ($gameSystem.registrationStatusTiming() === 0) {
-        $gameSystem.addStatusToEnemyBook(enemy.enemyId());
+        if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+          $gameSystem.addToEnemyBook(enemyId);
+        }
+        $gameSystem.addStatusToEnemyBook(enemyId);
+      } else if ($gameSystem.registrationTiming() === 0) {
+        $gameSystem.addToEnemyBook(enemyId);
       }
     }
-  }, this);
+  }
 };
 
 //Game_Enemy
 const _Game_Enemy_appear = Game_Enemy.prototype.appear;
 Game_Enemy.prototype.appear = function() {
   _Game_Enemy_appear.call(this);
-  if ($gameTroop.inBattle() && $gameSystem.registrationTiming() === 0) {
-    $gameSystem.addToEnemyBook(this.enemyId());
+  const enemyId = this.enemyId();
+  if ($gameTroop.inBattle()) {
     if ($gameSystem.registrationStatusTiming() === 0) {
-      $gameSystem.addStatusToEnemyBook(this.enemyId());
+      if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+        $gameSystem.addToEnemyBook(enemyId);
+      }
+      $gameSystem.addStatusToEnemyBook(enemyId);
+    } else if ($gameSystem.registrationTiming() === 0) {
+      $gameSystem.addToEnemyBook(enemyId);
+    }
+  } else {
+    if ($gameSystem.registrationStatusTiming() === 4) {
+      if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+        $gameSystem.addToEnemyBook(enemyId);
+      }
+      $gameSystem.addStatusToEnemyBook(enemyId);
+    } else if ($gameSystem.registrationTiming() === 4) {
+      $gameSystem.addToEnemyBook(enemyId);
     }
   }
 };
@@ -3231,29 +3257,38 @@ Game_Enemy.prototype.appear = function() {
 const _Game_Enemy_transform = Game_Enemy.prototype.transform;
 Game_Enemy.prototype.transform = function(enemyId) {
   if (param.TransformDefeat && !this.enemy().meta.NoTransformInData) {
-    $gameSystem.defeatCount(this.enemyId());
+    $gameSystem.defeatCount(enemyId);
     if ($gameSystem.registrationStatusTiming() !== 2) {
-      $gameSystem.addStatusToEnemyBook(this.enemyId());
+      if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+        $gameSystem.addToEnemyBook(enemyId);
+      }
+      $gameSystem.addStatusToEnemyBook(enemyId);
     }
   }
   _Game_Enemy_transform.call(this, enemyId);
-  if ($gameSystem.registrationTiming() === 0) {
-    $gameSystem.addToEnemyBook(enemyId);
-    if ($gameSystem.registrationStatusTiming() === 0) {
-      $gameSystem.addStatusToEnemyBook(enemyId);
+  if ($gameSystem.registrationStatusTiming() === 0) {
+    if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+      $gameSystem.addToEnemyBook(enemyId);
     }
+    $gameSystem.addStatusToEnemyBook(enemyId);
+  } else if ($gameSystem.registrationTiming() === 0) {
+    $gameSystem.addToEnemyBook(enemyId);
   }
 };
 
 const _Game_Enemy_die = Game_Enemy.prototype.die;
 Game_Enemy.prototype.die = function() {
   _Game_Enemy_die.call(this);
+  const enemyId = this.enemyId();
   if ($gameSystem.registrationStatusTiming() === 1 || $gameSystem.registrationStatusTiming() === 3) {
-    $gameSystem.statusToEnemyBook(this.enemyId());
+    if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+      $gameSystem.addToEnemyBook(enemyId);
+    }
+    $gameSystem.statusToEnemyBook(enemyId);
   } else if ($gameSystem.registrationTiming() === 1 || $gameSystem.registrationTiming() === 3) {
-    $gameSystem.addToEnemyBook(this.enemyId());
+    $gameSystem.addToEnemyBook(enemyId);
   }
-  $gameSystem.defeatCount(this.enemyId());
+  $gameSystem.defeatCount(enemyId);
 };
 
 Game_Enemy.prototype.dropItemFlag = function(drop) {
@@ -3308,8 +3343,51 @@ Game_Enemy.prototype.makeStealItems = function(rate, mode) {
 const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
 Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
+  this.analyzeSkill(target);
+};
+
+Game_Action.prototype.analyzeSkill = function(target) {
   if (target.isEnemy()) {
-  this._analyzeDate = this.item().meta.AnalyzeSkill ? param.AnalyzeSkillMode[Number(this.item().meta.AnalyzeSkill) - 1] : null;
+    const data = this.item().meta.AnalyzeSkill ? this.item().meta.AnalyzeSkill.split(',').map(Number) : [-1];
+    if (data[0] > 0) {//0以上ならアナライズ発動
+      this._analyzeDate = param.AnalyzeSkillMode[data[0] - 1];
+      if (this._analyzeDate) {
+        target.result().analyzeSkill = true;
+        const rate = this.item().meta.CertainAnalyze || !target.enemy().meta.AnalyzeResist ? 100 : Number(target.enemy().meta.AnalyzeResist);
+        if (Math.floor(Math.random() * 100 >= rate) || target.enemy().meta.NoBookData) {
+          target.result().missed = true;
+          BattleManager.analyzeMissMessage = this._analyzeDate.AnalyzeMissMessage.format(target.name(), this.subject().name());
+          return;
+        }
+        this.makeSuccess(target);
+        BattleManager.analyzeTarget = target;
+        SceneManager._scene.enemyBookEnemyAnalyze(this._analyzeDate);
+      }
+    } else if (data[0] === 0 && data[1] > 0) {
+      target.result().analyzeSkill = true;
+      const rate = this.item().meta.CertainAnalyze || !target.enemy().meta.AnalyzeResist ? 100 : Number(target.enemy().meta.AnalyzeResist);
+      if (Math.floor(Math.random() * 100 >= rate) || target.enemy().meta.NoBookData) {
+        target.result().missed = true;
+        BattleManager.analyzeMissMessage = this._analyzeDate.AnalyzeMissMessage.format(target.name(), this.subject().name());
+        return;
+      }
+      this.makeSuccess(target);
+      $gameVariables.setValue(param.CommonVariableID,target.enemy().id)
+      $gameTemp.reserveCommonEvent(data[1]);
+    }
+  }
+};
+
+Game_Action.prototype.c_AnalyzeSkill = function(target) {
+  if (target.isEnemy()) {
+    const id = this.item().meta.C_AnalyzeSkill ? Number(this.item().meta.AnalyzeSkill) : 0;
+    if (id > 0) {
+      target.result().analyzeSkill = true;
+    }
+  }
+
+  if (target.isEnemy()) {
+    this._analyzeDate = this.item().meta.AnalyzeSkill ? param.AnalyzeSkillMode[Number(this.item().meta.AnalyzeSkill) - 1] : null;
     if (this._analyzeDate) {
       target.result().analyzeSkill = true;
       const rate = this.item().meta.CertainAnalyze || !target.enemy().meta.AnalyzeResist ? 100 : Number(target.enemy().meta.AnalyzeResist);
@@ -4368,7 +4446,7 @@ Window_EnemyBook.prototype.page = function(enemy) {
 };
 
 Window_EnemyBook.prototype.drawPage = function(listContent, enemy) {
-  const lineHeight = this.lineHeight();
+  const lineHeight = this.contentsLineHeight();
   for (const date of listContent) {
     const x_Position = date.X_Position;
     const position = Math.min(x_Position, this.maxCols());
@@ -4625,8 +4703,8 @@ Window_EnemyBook.prototype.paramNameShow = function(list, enemy) {
 };
 
 Window_EnemyBook.prototype.paramShow = function(list, enemy) {
-  if (list.DetaEval) {
-    return eval(list.DetaEval);
+  if (list.DetaEval && list.DetaEval[0]) {
+    return eval(list.DetaEval[0]);
   }
   const params = list.DateSelect;
   switch (params) {
@@ -4671,8 +4749,8 @@ Window_EnemyBook.prototype.paramShow = function(list, enemy) {
 };
 
 Window_EnemyBook.prototype.normalParam = function(list, enemy) {
-  if (list.DetaEval) {
-    return eval(list.DetaEval);
+  if (list.DetaEval && list.DetaEval[0]) {
+    return eval(list.DetaEval[0]);
   }
   const params = list.DateSelect;
   if (params >= 10) {
@@ -4694,6 +4772,7 @@ Window_EnemyBook.prototype.normalParam = function(list, enemy) {
 };
 
 Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   let text = this.paramShow(list, enemy);
   let textWidth = width;
   if (text !== undefined) {
@@ -4748,6 +4827,7 @@ Window_EnemyBook.prototype.enemyImg = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.enemyName = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const text = enemy.name();
   const iconId = this._enemy.meta.EnemyIcon ? Number(this._enemy.meta.EnemyIcon) : 0;
@@ -4771,6 +4851,7 @@ Window_EnemyBook.prototype.enemyName = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
@@ -4781,7 +4862,7 @@ Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
   this.resetTextColor();
   let text;
   if(this.paramEXMask(list.MaskMode)) {
-    text = list.DetaEval ? eval(list.DetaEval) : enemy.exp();
+    text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : enemy.exp();
   } else {
     text = param.UnknownStatus;
   }
@@ -4789,6 +4870,7 @@ Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.enemyGold = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
@@ -4799,7 +4881,7 @@ Window_EnemyBook.prototype.enemyGold = function(list, enemy, x, y, width) {
   this.resetTextColor();
   let text;
   if(this.paramEXMask(list.MaskMode)){
-    text = list.DetaEval ? eval(list.DetaEval) : enemy.gold();
+    text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : enemy.gold();
     this.drawCurrencyValue(text, this.currencyUnit(), x + textWidth + 8, y, width - (textWidth + 8));
   } else {
     text = param.UnknownStatus;
@@ -4808,6 +4890,7 @@ Window_EnemyBook.prototype.enemyGold = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
@@ -4818,7 +4901,7 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
   this.resetTextColor();
   let text;
   if(this.paramEXMask(list.MaskMode)){
-    text = list.DetaEval ? eval(list.DetaEval) : $gameSystem.defeatNumber(enemy.enemyId());
+    text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : $gameSystem.defeatNumber(enemy.enemyId());
     if (list.paramUnit) {
       text += String(list.paramUnit);
     }
@@ -4829,6 +4912,7 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   if (BattleManager.isTpb() && this.scanMode()) {
     this.drawContentsBackground(list.Back, x, y, width);
     x = this.contensX(x);
@@ -4840,7 +4924,7 @@ Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
     this.resetTextColor();
     let text;
     if(this.paramEXMask(list.MaskMode)){
-      text = list.DetaEval ? eval(list.DetaEval) : Math.max(enemy.turnCount(), 1);
+      text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : Math.max(enemy.turnCount(), 1);
     } else {
       text = param.UnknownStatus;
     }
@@ -4849,6 +4933,7 @@ Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.name = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   const nameText = list.paramName;
   if (nameText) {
     this.changeTextColor(this.getColorCode(list.NameColor));
@@ -4857,6 +4942,7 @@ Window_EnemyBook.prototype.name = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.bookEnemyNo = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   const nameText = list.paramName;
   let textWidth  = 0;
   if (nameText) {
@@ -4889,6 +4975,7 @@ Window_EnemyBook.prototype.drawResistElement = function(list, enemy, x, y, width
     return;
   }
   let Unknown = false;
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "耐性属性";
   this.drawText(nameText, x, y);
@@ -4926,6 +5013,7 @@ Window_EnemyBook.prototype.drawWeakElement = function(list, enemy, x, y, width) 
     return;
   }
   let Unknown = false;
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "弱点属性";
   this.drawText(nameText, x, y);
@@ -4963,6 +5051,7 @@ Window_EnemyBook.prototype.drawNoEffectElement = function(list, enemy, x, y, wid
     return;
   }
   let Unknown = false;
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "無効属性";
   this.drawText(nameText, x, y);
@@ -5000,6 +5089,7 @@ Window_EnemyBook.prototype.drawResistStates = function(list, enemy, x, y, width)
     return;
   }
   let Unknown = false;
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "耐性ステート";
   this.drawText(nameText, x, y);
@@ -5041,6 +5131,7 @@ Window_EnemyBook.prototype.drawWeakStates = function(list, enemy, x, y, width) {
     return;
   }
   let Unknown = false;
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "弱点ステート";
   this.drawText(nameText, x, y);
@@ -5079,6 +5170,7 @@ Window_EnemyBook.prototype.drawNoEffectStates = function(list, enemy, x, y, widt
     return;
   }
   let Unknown = false;
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "無効ステート";
   this.drawText(nameText, x, y);
@@ -5121,6 +5213,7 @@ Window_EnemyBook.prototype.buffIconIndex = function(rate, paramId) {
 
 Window_EnemyBook.prototype.drawWeakDebuff = function(list, enemy, x, y, width) {
   let Unknown = false;
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "弱点デバフ";
   this.drawText(nameText, x, y);
@@ -5153,6 +5246,7 @@ Window_EnemyBook.prototype.drawWeakDebuff = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.drawResistDebuff = function(list, enemy, x, y, width) {
   let Unknown = false;
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "耐性デバフ";
   this.drawText(nameText, x, y);
@@ -5184,6 +5278,7 @@ Window_EnemyBook.prototype.drawResistDebuff = function(list, enemy, x, y, width)
 };
 
 Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "ドロップアイテム";
   this.drawText(nameText, x, y);
@@ -5237,6 +5332,7 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
   if (!Imported.NUUN_StealableItems) {
     return;
   }
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "盗めるアイテム";
   this.drawText(nameText, x, y);
@@ -5290,6 +5386,7 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
   if (!Imported.NUUN_ConditionalDrops && !Imported.NUUN_EnemyBookEX_2) {
     return;
   }
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "条件ドロップアイテム";
   this.drawText(nameText, x, y);
@@ -5335,6 +5432,7 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.drawDesc = function(list, enemy, x, y, width) {
   const nameText = list.paramName;
+  this.contentsFontSize(list);
   if (nameText) {
     this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(nameText, x, y);
@@ -5342,7 +5440,7 @@ Window_EnemyBook.prototype.drawDesc = function(list, enemy, x, y, width) {
   }
   this.resetTextColor();
   if(this.paramEXMask(list.MaskMode)){
-    let text = list.DetaEval;
+    let text = list.DetaEval && list.DetaEval[0] ? list.DetaEval[0] : undefined;
     if (!text) {
       const method = list.textMethod;
       if (method) {
@@ -5358,6 +5456,7 @@ Window_EnemyBook.prototype.drawDesc = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
   width = this.contensWidth(width);
@@ -5371,7 +5470,7 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
   this.resetTextColor();
   let text;
   if(this.paramEXMask(list.MaskMode)){
-    text = eval(list.DetaEval);
+    text = eval(list.DetaEval[0]);
     if (list.paramUnit) {
       text += String(list.paramUnit);
     }
@@ -5382,6 +5481,7 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "使用スキル";
   this.drawText(nameText, x, y, width);
@@ -5458,6 +5558,7 @@ Window_EnemyBook.prototype.enemyElementChart = function(list, enemy, x, y, width
   if (!Imported.NUUN_RadarChartBase) {
     return;
   }
+  this.contentsFontSize(list);
   this.changeTextColor(ColorManager.textColor(list.NameColor));
   const nameText = list.paramName ? list.paramName : "属性耐性";
   this.drawText(nameText, x, y, width);
@@ -5480,6 +5581,7 @@ Window_EnemyBook.prototype.enemyStateChart = function(list, enemy, x, y, width) 
   if (!Imported.NUUN_RadarChartBase) {
     return;
   }
+  this.contentsFontSize(list);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "ステート耐性";
   this.drawText(nameText, x, y, width);
@@ -5502,6 +5604,14 @@ Window_EnemyBook.prototype.setEnemyStateChart = function(enemy) {
 
 Window_EnemyBook.prototype.enemyCharacter = function(list, enemy, x, y, width) {
   this.enemyCharacterChip(enemy, x, y);
+};
+
+Window_EnemyBook.prototype.contentsFontSize = function(list) {
+  this.contents.fontSize = $gameSystem.mainFontSize() + param.EnemyBookDefaultFontSize + (list.FontSize || 0);
+};
+
+Window_EnemyBook.prototype.contentsLineHeight = function() {
+  return $gameSystem.mainFontSize() + param.EnemyBookDefaultFontSize + param.EnemyBookFontMargin;
 };
 
 Window_EnemyBook.prototype.nameLength = function(name) {

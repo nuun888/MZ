@@ -1,5 +1,5 @@
 # [メニュー画面タイプ１](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -33,6 +33,8 @@
 ![画像](img/MenuScreen2.png) 
 
 ## 更新履歴
+2022/1/23 Ver.1.1.1  
+顔グラの座標設定の仕様を変更。  
 2022/1/9 Ver.1.1.0  
 ステータス項目の表示の文字揃えを指定できる機能を追加。  
 ステータス項目に経験値を追加。  

@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.10.4
+# Ver.2.11.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -125,6 +125,13 @@ PgUp PgDnキー：モンスターページ送り
 戦闘終了時に登録追加  
 
 ## 更新履歴
+2022/1/24 Ver.2.11.0  
+プラグインパラメータを整理。  
+オリジナルパラメータの仕様変更。  
+モンスター詳細ページのプリセットの変更。  
+項目フォントサイズを指定できる機能を追加。  
+戦闘終了時に登録する機能を追加。  
+登録時の処理を修正。  
 2022/1/1 Ver.2.10.4  
 戦闘中に情報ページの横幅指定時に敵の情報を開くと表示がずれる問題を修正。  
 カテゴリーのナンバー表記がおかしくなる問題を修正。  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.3.2
+ * @version 2.3.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -105,6 +105,9 @@
  * Ver.2.3.2以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/1/24 Ver.2.3.3
+ * フォントサイズを指定できる機能を追加。
+ * 評価式の仕様を変更。
  * 2022/1/9 Ver.2.3.2
  * 処理を一部修正。
  * 2021/12/11 Ver.2.3.1
@@ -291,6 +294,22 @@
  * @desc TPゲージの横幅縦を指定します。
  * @type number
  * @default 12
+ * @parent Setting
+ * 
+ * @param DefaultFontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ
+ * @type number
+ * @default 0
+ * @min -99
+ * @parent Setting
+ * 
+ * @param FontMargin
+ * @desc 項目の縦の文字の余白
+ * @text 項目間縦余白
+ * @type number
+ * @default 10
+ * @min 0
  * @parent Setting
  * 
  * @param PageSetting
@@ -823,93 +842,93 @@
  * @type select
  * @option なし
  * @value 0
- * @option アクター名(4)(5)(6)(7)
+ * @option アクター名(4)(5)(6)(7)(15)
  * @value 1
- * @option 二つ名(4)(5)(6)(7)
+ * @option 二つ名(4)(5)(6)(7)(15)
  * @value 2
- * @option 職業(4)(5)(6)(7)
+ * @option 職業(4)(5)(6)(7)(15)
  * @value 3
- * @option レベル(4)(5)(6)(7)
+ * @option レベル(4)(5)(6)(7)(15)
  * @value 4
- * @option ステート(4)(5)(6)(7)
+ * @option ステート(4)(5)(6)(7)(15)
  * @value 5
  * @option ＨＰ(4)(5)(6)(7)
  * @value 10
  * @option ＭＰ(4)(5)(6)(7)
  * @value 11
- * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 12
- * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 13
- * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 14
- * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 15
- * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 16
- * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 17
  * @option ＴＰ(4)(5)(6)(7)
  * @value 19
- * @option 最大ＨＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
+ * @option 最大ＨＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 42
- * @option 最大ＭＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)
+ * @option 最大ＭＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 43
- * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 20
- * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 21
- * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 22
- * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 23
- * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 24
- * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 25
- * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 26
- * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 27
- * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 28
- * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 29
- * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 30
- * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 31
- * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 32
- * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 33
- * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 34
- * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 35
- * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 36
- * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 37
- * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 38
- * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(15)
  * @value 39
- * @option 現在の経験値(1)(2)(4)(5)(6)(7)(8)
+ * @option 現在の経験値(1)(2)(4)(5)(6)(7)(8)(15)
  * @value 40
- * @option 次のレベルまでの経験値(1)(2)(4)(5)(6)(7)(8)
+ * @option 次のレベルまでの経験値(1)(2)(4)(5)(6)(7)(8)(15)
  * @value 41
- * @option オリジナルパラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)
+ * @option オリジナルパラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 50
- * @option 名称のみ(1)(4)(5)(6)(7)(8)(10)
+ * @option 名称のみ(1)(4)(5)(6)(7)(8)(10)(15)
  * @value 51
- * @option 属性耐性(1)(4)(5)(6)(7)(8)(9)(10)(12)(14)
+ * @option 属性耐性(1)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
  * @value 60
- * @option ステート耐性(1)(4)(5)(6)(7)(8)(9)(10)(12)(14)
+ * @option ステート耐性(1)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
  * @value 61
- * @option 装備(1)(2)(4)(5)(6)(7)(8)(9)(10)(14)
+ * @option 装備(1)(2)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 62
- * @option 記述欄(1)(2)(4)(5)(6)(7)(8)(10)(13)
+ * @option 記述欄(1)(2)(4)(5)(6)(7)(8)(10)(13)(15)
  * @value 70
  * @option プロフィール(1)(2)(4)(5)(6)(7)(8)(10)
  * @value 90
@@ -923,9 +942,9 @@
  * @value 103
  * @option ステータスレーダーチャート（未実装）
  * @value 200
- * @option 属性耐性レーダーチャート(4)(5)(6)(7)(8)(10)
+ * @option 属性耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
  * @value 201
- * @option ステート耐性レーダーチャート(4)(5)(6)(7)(8)(10)
+ * @option ステート耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
  * @value 202
  * @option ライン(1)(4)(5)(6)(7)(8)(10)
  * @value 1000
@@ -945,10 +964,11 @@
  * @default
  * 
  * @param DetaEval
- * @desc 評価式。
- * @text 評価式(javaScript)(3)
- * @type 
- * @default
+ * @desc パラメータ評価式を設定します。
+ * @text パラメータ評価式(3)
+ * @type combo[]
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @default 
  * 
  * @param X_Position
  * @text X表示列位置(4)
@@ -1027,6 +1047,13 @@
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(15)
+ * @type number
+ * @default 0
+ * @min -99
  * 
  * @param EquipSetting
  * @text 装備設定
@@ -1116,6 +1143,8 @@ const EXPGaugeWidth = Number(parameters['EXPGaugeWidth'] || 300);
 const EXPGaugeHeight = Number(parameters['EXPGaugeHeight'] || 12);
 const EXPGaugeX = Number(parameters['EXPGaugeX'] || 0);
 const EXPGaugeY = Number(parameters['EXPGaugeY'] || 0);
+const DefaultFontSize = Number(parameters['DefaultFontSize'] || 0);
+const FontMargin = Number(parameters['FontMargin'] || 10);
 const PageList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList'])) : null) || [];
 const ParamList_1Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_1Page'])) : null) || [];
 const ParamList_2Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_2Page'])) : null) || [];
@@ -1506,9 +1535,17 @@ Window_Status.prototype.systemWidth = function(swidth, width) {
   return swidth > 0 ? swidth : Math.floor(width / 3);
 };
 
+Window_Status.prototype.contentsFontSize = function(list) {
+  this.contents.fontSize = $gameSystem.mainFontSize() + DefaultFontSize + (list.FontSize || 0);
+};
+
+Window_Status.prototype.contentsLineHeight = function() {
+  return $gameSystem.mainFontSize() + DefaultFontSize + FontMargin;
+};
+
 Window_Status.prototype.drawBlock = function() {
   const list = this.listDate();
-  const lineHeight = this.lineHeight();
+  const lineHeight = this.contentsLineHeight();
   for (const data of list) {
     const x_Position = data.X_Position;
     const position = Math.min(x_Position, this.maxCols());
@@ -1791,10 +1828,12 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
   } else if (params === 9) {
     this.placeGauge(actor, "tp", x, y);
   } else {
+    this.contentsFontSize(list);
     this.drawContentsBackground(list.Back, x, y, width);
     x = this.contensX(x);
     width = this.contensWidth(width);
-    let text = this.paramShow(list, actor, params, list.DetaEval);
+    const dataEval = list.DetaEval && list.DetaEval[0] ? list.DetaEval[0] : undefined;
+    let text = this.paramShow(list, actor, params, dataEval);
     if (text !== undefined) {
       if (params >= 10) {
         text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);
@@ -1814,6 +1853,7 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
 };
 
 Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
+  this.contentsFontSize(list);
   const lineHeight = this.lineHeight();
   const equips = this._actor.equips();
   const e1uipsLength = list.EquipNum > 0 ? list.EquipNum : equips.length;
@@ -1854,6 +1894,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
 
 Window_Status.prototype.drawProfile = function(list, actor, x, y, width) {
   const text = list.paramName;
+  this.contentsFontSize(list);
   if (text) {
     this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
@@ -1866,6 +1907,7 @@ Window_Status.prototype.drawProfile = function(list, actor, x, y, width) {
 
 Window_Status.prototype.drawDesc = function(list, actor, x, y, width) {
   const text = list.paramName;
+  this.contentsFontSize(list);
   if (text) {
     this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
@@ -1880,6 +1922,7 @@ Window_Status.prototype.drawDesc = function(list, actor, x, y, width) {
 
 Window_Status.prototype.drawName = function(list, x, y, width) {
   const text = list.ParamName;
+  this.contentsFontSize(list);
   if (text) {
     this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
@@ -1889,6 +1932,7 @@ Window_Status.prototype.drawName = function(list, x, y, width) {
 
 Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) {
   const dactor = actor.actor();
+  this.contentsFontSize(list);
   const nameText = list.ParamName;
   this.drawContentsBackground(list.Back, x, y, width);
   x = this.contensX(x);
@@ -1899,7 +1943,7 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
     this.changeTextColor(this.getColorCode(list.NameColor));
     this.drawText(nameText , x, y, textWidth);
   }
-  let text = eval(list.DetaEval);
+  let text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : undefined;
   if (text !== undefined) {
     if (typeof(text) === 'number') {
       text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);
@@ -1912,6 +1956,7 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
 
 Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
+  this.contentsFontSize(list);
   const text = list.ParamNamee;
   if (text) {
     this.changeTextColor(this.getColorCode(list.NameColor));
@@ -1954,6 +1999,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
 
 Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
+  this.contentsFontSize(list);
   const text = list.ParamName;
   if (text) {
     this.changeTextColor(this.getColorCode(list.NameColor));
@@ -1996,6 +2042,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
 
 Window_Status.prototype.drawExpInfo = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
+  this.contentsFontSize(list);
   const expTotal = TextManager.expTotal.format(TextManager.exp);
   this.changeTextColor(this.getColorCode(list.NameColor));
   this.drawText(expTotal, x, y, width);
@@ -2005,6 +2052,7 @@ Window_Status.prototype.drawExpInfo = function(list, actor, x, y, width) {
 
 Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
+  this.contentsFontSize(list);
   const expNext = TextManager.expNext.format(TextManager.level);
   this.changeTextColor(this.getColorCode(list.NameColor));
   this.drawText(expNext, x, y + lineHeight * 1, width);
@@ -2178,6 +2226,7 @@ Window_Status.prototype.placeGauge = function(actor, type, x, y) {
 
 Window_Status.prototype.characterSwitchingHelp = function(list, x, y, width) {
   const lineHeight = this.lineHeight();
+  this.contentsFontSize(list);
   this.changeTextColor(ColorManager.textColor(list.NameColor));
   this.contents.fontSize = 18;
   let text = ConfigManager.touchUI ? "ΛVボタン / " : "";

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.11.0
+ * @version 2.11.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -229,6 +229,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/24 Ver.2.11.1
+ * 敵の詳細ページウィンドウを表示させない機能を追加。
  * 2022/1/24 Ver.2.11.0
  * プラグインパラメータを整理。
  * オリジナルパラメータの仕様変更。
@@ -1136,6 +1138,13 @@
  * @text ページウィンドウ設定
  * @default ------------------------------
  * 
+ * @param PageWindowsShow
+ * @desc ページウィンドウを表示します。
+ * @text ページウィンドウ表示
+ * @type boolean
+ * @default true
+ * @parent PageWindow
+ * 
  * @param PageWindowsSkin
  * @desc ページ画面のウィンドウスキンを指定します。
  * @text ページウィンドウスキン
@@ -2037,105 +2046,105 @@
  * @type select
  * @option 表示なし
  * @value 0
- * @option 最大HP(1)～(11)
+ * @option 最大HP(1)～(11)(18)
  * @value 1
- * @option 最大MP(1)～(11)
+ * @option 最大MP(1)～(11)(18)
  * @value 2
- * @option 攻撃力(1)～(11)
+ * @option 攻撃力(1)～(11)(18)
  * @value 3
- * @option 防御力(1)～(11)
+ * @option 防御力(1)～(11)(18)
  * @value 4
- * @option 魔法力(1)～(11)
+ * @option 魔法力(1)～(11)(18)
  * @value 5
- * @option 魔法防御(1)～(11)
+ * @option 魔法防御(1)～(11)(18)
  * @value 6
- * @option 敏捷性(1)～(11)
+ * @option 敏捷性(1)～(11)(18)
  * @value 7
- * @option 運(1)～(11)
+ * @option 運(1)～(11)(18)
  * @value 8
- * @option TP（現在のステータスをONのときのみ）(1)～(11)
+ * @option TP（現在のステータスをONのときのみ）(1)～(11)(18)
  * @value 9
- * @option 命中率(1)～(11)(16)(17)
+ * @option 命中率(1)～(11)(16)(17)(18)
  * @value 10
- * @option 回避率(1)～(11)(16)(17)
+ * @option 回避率(1)～(11)(16)(17)(18)
  * @value 11
- * @option 会心率(1)～(11)(16)(17)
+ * @option 会心率(1)～(11)(16)(17)(18)
  * @value 12
- * @option 会心回避率(1)～(11)(16)(17)
+ * @option 会心回避率(1)～(11)(16)(17)(18)
  * @value 13
- * @option 魔法回避率(1)～(11)(16)(17)
+ * @option 魔法回避率(1)～(11)(16)(17)(18)
  * @value 14
- * @option 魔法反射率(1)～(11)(16)(17)
+ * @option 魔法反射率(1)～(11)(16)(17)(18)
  * @value 15
- * @option 反撃率(1)～(11)(16)(17)
+ * @option 反撃率(1)～(11)(16)(17)(18)
  * @value 16
- * @option HP再生率(1)～(11)(16)(17)
+ * @option HP再生率(1)～(11)(16)(17)(18)
  * @value 17
- * @option MP再生率(1)～(11)(16)(17)
+ * @option MP再生率(1)～(11)(16)(17)(18)
  * @value 18
- * @option TP再生率(1)～(11)(16)(17)
+ * @option TP再生率(1)～(11)(16)(17)(18)
  * @value 19
- * @option 狙われ率(1)～(11)(16)(17)
+ * @option 狙われ率(1)～(11)(16)(17)(18)
  * @value 20
- * @option 防御効果率(1)～(11)(16)(17)
+ * @option 防御効果率(1)～(11)(16)(17)(18)
  * @value 21
- * @option 回復効果率(1)～(11)(16)(17)
+ * @option 回復効果率(1)～(11)(16)(17)(18)
  * @value 22
- * @option 薬の知識(1)～(11)(16)(17)
+ * @option 薬の知識(1)～(11)(16)(17)(18)
  * @value 23
- * @option MP消費率(1)～(11)(16)(17)
+ * @option MP消費率(1)～(11)(16)(17)(18)
  * @value 24
- * @option TPチャージ率(1)～(11)(16)(17)
+ * @option TPチャージ率(1)～(11)(16)(17)(18)
  * @value 25
- * @option 物理ダメージ率(1)～(11)(16)(17)
+ * @option 物理ダメージ率(1)～(11)(16)(17)(18)
  * @value 26
- * @option 魔法ダメージ率(1)～(11)(16)(17)
+ * @option 魔法ダメージ率(1)～(11)(16)(17)(18)
  * @value 27
- * @option 経験値(1)～(11)
+ * @option 経験値(1)～(11)(18)
  * @value 30
- * @option 獲得金額(1)～(11)
+ * @option 獲得金額(1)～(11)(18)
  * @value 31
- * @option 倒した数(1)～(11)(16)
+ * @option 倒した数(1)～(11)(16)(18)
  * @value 32
- * @option モンスター名(2)～(7)(9)(12)
+ * @option モンスター名(2)～(7)(9)(12)(18)
  * @value 33
- * @option 名称のみ(2)～(7)(9)(12)
+ * @option 名称のみ(2)～(7)(9)(12)(18)
  * @value 35
- * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）(1)～(11)
+ * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）(1)～(11)(18)
  * @value 36
- * @option モンスターブックナンバー(2)～(7)(9)
+ * @option モンスターブックナンバー(2)～(7)(9)(18)
  * @value 37
- * @option 耐性属性(2)～(7)(9)(10)(11)
+ * @option 耐性属性(2)～(7)(9)(10)(11)(18)
  * @value 40
- * @option 弱点属性(2)～(7)(9)(10)(11)
+ * @option 弱点属性(2)～(7)(9)(10)(11)(18)
  * @value 41
- * @option 無効属性(2)～(7)(9)(10)(11)
+ * @option 無効属性(2)～(7)(9)(10)(11)(18)
  * @value 42
- * @option 耐性ステート(2)～(7)(9)(10)(11)
+ * @option 耐性ステート(2)～(7)(9)(10)(11)(18)
  * @value 45
- * @option 弱点ステート(2)～(7)(9)(10)(11)
+ * @option 弱点ステート(2)～(7)(9)(10)(11)(18)
  * @value 46
- * @option 無効ステート(2)～(7)(9)(10)(11)
+ * @option 無効ステート(2)～(7)(9)(10)(11)(18)
  * @value 47
- * @option 耐性デバフ(2)～(7)(9)(10)(11)
+ * @option 耐性デバフ(2)～(7)(9)(10)(11)(18)
  * @value 50
- * @option 弱点デバフ(2)～(7)(9)(10)(11)
+ * @option 弱点デバフ(2)～(7)(9)(10)(11)(18)
  * @value 51
- * @option ドロップアイテム(2)～(7)(9)(10)(11)
+ * @option ドロップアイテム(2)～(7)(9)(10)(11)(18)
  * @value 60
- * @option スティールアイテム（要盗みスキルプラグイン）(2)～(7)(9)(10)(11)
+ * @option スティールアイテム（要盗みスキルプラグイン）(2)～(7)(9)(10)(11)(18)
  * @value 61
- * @option 条件付きドロップアイテム（要条件付きドロップアイテムプラグイン）(2)～(7)(9)(10)(11)
+ * @option 条件付きドロップアイテム（要条件付きドロップアイテムプラグイン）(2)～(7)(9)(10)(11)(18)
  * @value 62
- * @option 記述欄(1)～(7)(9)(10)(13)
+ * @option 記述欄(1)～(7)(9)(10)(13)(18)
  * @value 70
- * @option オリジナルパラメータ(1)～(11)(16)
+ * @option オリジナルパラメータ(1)～(11)(16)(18)
  * @value 80
- * @option 敵の使用スキル(2)～(7)(9)(10)(11)
+ * @option 敵の使用スキル(2)～(7)(9)(10)(11)(18)
  * @value 100
- * @option 属性レーダーチャート(2)～(7)(9)
+ * @option 属性レーダーチャート(2)～(7)(9)(18)
  * @value 121
- * @option ステートレーダーチャート(2)～(7)(9)
+ * @option ステートレーダーチャート(2)～(7)(9)(18)
  * @value 122
  * @option モンスター画像(3)～(7)(9)(15)
  * @value 200
@@ -2145,8 +2154,8 @@
  * @value 250
  * @option モンスター個別画像(3)～(7)(9)(13)(15)
  * @value 251
- * @option 盗み抵抗（要盗みスキルプラグイン）（未実装）
- * @value 300
+ * @option ページ切り替え(2)～(7)(9)(18)
+ * @value 500
  * @option ライン(2)～(7)(9)
  * @value 1000
  * @default 0
@@ -2257,7 +2266,7 @@
  * 
  * @param FontSize
  * @desc フォントサイズ（メインフォントからの差）
- * @text フォントサイズ(17)
+ * @text フォントサイズ(18)
  * @type number
  * @default 0
  * @min -99
@@ -3533,6 +3542,8 @@ Scene_EnemyBook.prototype.createEnemyPageWindow = function() {
   if (param.PageSetting.length <= 1) {
     this._enemyPageWindow.height = 0;
     this._enemyPageWindow.hide();
+  } else if (!param.PageWindowsShow) {
+    this._enemyPageWindow.y -= (Graphics.height - Graphics.boxHeight) / 2 + this._enemyPageWindow.height + this.mainAreaTop();
   }
 };
 
@@ -3563,9 +3574,9 @@ Scene_EnemyBook.prototype.indexWindowRect = function() {
 
 Scene_EnemyBook.prototype.enemyWindowRect = function() {
   const wx = param.WindowMode === 0 ? this.indexWidth() : 0;
-  const wy = this.mainAreaTop() + this._enemyPageWindow.height;
+  const wy = this.mainAreaTop() + (param.PageWindowsShow ? this._enemyPageWindow.height : 0);
   const ww = this.enemyWindowWidth();
-  const wh = this.mainAreaHeight() - this._enemyPageWindow.height;
+  const wh = this.mainAreaHeight() - (param.PageWindowsShow ? this._enemyPageWindow.height : 0);
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -4630,8 +4641,8 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
     case 251:
       this.enemyBitmap(list, enemy, x, y, width);
       break;
-    case 300:
-    //this.enemyCharacter(list, enemy, x, y, width);
+    case 500:
+    this.enemyPageSwitching(list, enemy, x, y, width);
     break;
     case 1000:
       this.horzLine(list, enemy, x, y, width);
@@ -4958,9 +4969,11 @@ Window_EnemyBook.prototype.bookEnemyNo = function(list, enemy, x, y, width) {
   this.drawText(text, x + textWidth, y, width - textWidth, "left");
 };
 
-Window_EnemyBook.prototype.drawEnemyBookStealRate = function(text, x, y, width,) {
-  this.drawContentsBackground(list.Back, x, y, width);
-  const nameText = list.paramName;
+Window_EnemyBook.prototype.enemyPageSwitching = function(list, enemy, x, y, width) {
+  this.contentsFontSize(list);
+  const nameText = list.paramName ? list.paramName : '←→キー：ページ切り替え';
+  this.changeTextColor(this.getColorCode(list.NameColor));
+  this.drawText(nameText, x, y, width, list.namePosition);
 };
 
 Window_EnemyBook.prototype.horzLine = function(list, enemy, x, y, width) {
@@ -6298,7 +6311,7 @@ Scene_Battle.prototype.setEnemyBook_X = function() {
 Scene_Battle.prototype.setEnemyBook_Y = function(rect, pageLength) {
   const ui_y = (Graphics.height - Graphics.boxHeight) / 2;
   let y = rect.y + (this._enemyBookBackGround ? ui_y / 2 : 0);
-  if (pageLength > 1) {
+  if (pageLength > 1 && param.PageWindowsShow) {
     this._enemyBookPageWindow.y = y;
     y += this._enemyBookPageWindow.height;
   } else {
@@ -6320,7 +6333,7 @@ Scene_Battle.prototype.setEnemyBookPage_X = function() {
 };
 
 Scene_Battle.prototype.setEnemyBook_Height = function(rect, pageLength) {
-  this._enemyBookEnemyWindow.height = rect.height - (pageLength > 1 ? this._enemyBookPageWindow.height : 0);
+  this._enemyBookEnemyWindow.height = rect.height - (pageLength > 1 && param.PageWindowsShow ? this._enemyBookPageWindow.height : 0);
 };
 
 Scene_Battle.prototype.openEnemyBookPercentWindow = function(pageLength) {

@@ -2,7 +2,7 @@
 # Ver.2.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js)  
 
-ターンごとに徐々に能力値が上昇していく特徴を設定できます。
+ターンごとに徐々に通常能力値が上昇していく特徴を設定できます。
 
 ## 設定方法
 特徴を有するメモ欄  

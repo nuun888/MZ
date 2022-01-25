@@ -74,7 +74,7 @@
 | [キャストタイムチャージ率特徴](https://github.com/nuun888/MZ/blob/master/README/CastTimeCharge.md) | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js) |  | 1.0.0 |
 | ファイナルアタック | [NUUN_FinalAttack](https://github.com/nuun888/MZ/blob/master/NUUN_FinalAttack.js) |  | 1.0.1 |
 | [マナシールド](https://github.com/nuun888/MZ/blob/master/README/ManaShield.md) | [NUUN_ManaShield](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js) |  | 1.0.1 |
-| [能力値ターン毎増減特徴](https://github.com/nuun888/MZ/blob/master/README/AccelerationFeature.md) | [NUUN_AccelerationFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js) |  | 1.0.1 |
+| [能力値ターン毎増減特徴](https://github.com/nuun888/MZ/blob/master/README/AccelerationFeature.md) | [NUUN_AccelerationFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js) |  | 2.0.0 |
 | 行動時ブースト特徴 | [NUUN_boostEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_boostEX.js) | 条対 | 1.1.2 |
 | [踏み止まり特徴](https://github.com/nuun888/MZ/blob/master/README/StoppingFeature.md) | [NUUN_StoppingFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js) | 条対 | 1.0.0 |
 |  |  |  |  |
@@ -89,7 +89,7 @@
 | [キャストタイム（詠唱）キャンセルスキル、アイテム](https://github.com/nuun888/MZ/blob/master/README/CancelCastTime.md) | [NUUN_CancelCastTime](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js) |  | 1.1.0 |
 | [アイテム消耗率](https://github.com/nuun888/MZ/blob/master/README/ConsumptionItem.md) | [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js) |  | 1.1.1 |
 | [アイテム使用回数](https://github.com/nuun888/MZ/blob/master/README/ItemUseCount.md) | [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js) |  | 1.0.2 |
-| [盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md) |  [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js) | 共 条対 | 1.3.1 |
+| [盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md) |  [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js) | 共 条対 | 1.3.2 |
 | アイテム最大所持数変更 | [NUUN_MaxItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxItem.js) | 共 | 1.3.1 |
 | アイテムグループ別所持制限 | [NUUN_GroupMaxItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js) | 共 | 1.0.0 |
 | [パッシブスキル](https://github.com/nuun888/MZ/blob/master/README/PassiveSkill.md) | [NUUN_PassiveSkill](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js) | 共 条対 | 1.5.0 |

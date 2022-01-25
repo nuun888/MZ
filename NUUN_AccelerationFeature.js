@@ -11,7 +11,6 @@
  * @plugindesc 能力値ターン毎増減特徴
  * @author NUUN
  * @version 2.0.0
- * @orderAfter NUUN_StateTurnCoun
  * 
  * @help
  * ターンごとに徐々に能力値が上昇していく特徴を設定できます。

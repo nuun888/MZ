@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,7 +70,7 @@
  * <TroopSteal[condTag]:[id],[id],[id]...> 敵グループの指定したIDの条件を全て満たしたときに盗めます。
  * [mode]：条件モード　0:一部一致 1：全て一致
  * [id]：条件リストのID
- * <StealCond1:0,14,15> 
+ * <StealCond1:1,14,15> 
  * 
  * 敵から盗まれるアイテムを設定するには、プラグインパラメータの「敵から奪われるアイテム設定」から設定します。
  * 
@@ -80,6 +80,7 @@
  * 特徴を有するメモ欄に盗みの成功確率を変更します。
  * <stealResist: [%確率]>
  * 特徴を有するメモ欄に盗みの抵抗率を設定します。
+ * <stealResist: 50> 盗まれる確率が50%低下します。
  * 
  * 盗んだ回数等を参照できるように以下の変数及び関数を用意しています。
  * アイテムを盗んだ回数。
@@ -95,12 +96,18 @@
  * $gameSystem._stolenGoldSum
  * $gameSystem.getBattleStolenGold()
  * 
+ * 盗み時の確率計算
+ * スキル、アイテムの成功確率 * 成功率補正% + 成功率補正+
+ * 成功率補正%と成功率補正+を補正した確率でステータス画面に表示させる場合、スキル、アイテムの成功確率によっては
+ * 計算上と表示上の確率とは異なる確率になります。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 
  * 更新履歴
+ * 2022/1/25 Ver 1.3.2
+ * 確率、抵抗率の処理を修正。
  * 2021/11/13 Ver 1.3.1
  * 条件付きに対応。
  * 2021/10/24 Ver 1.3.0
@@ -268,7 +275,7 @@
  * @default 5
  * 
  * @param stolenSwitch
- * @text 条件
+ * @text スイッチ
  * @desc 盗まれるアイテム条件のスイッチ番号を指定します。
  * @type switch
  * @default 0
@@ -335,38 +342,6 @@ function getStolenItemList(target, rate) {
 function randomRate(id, stealId) {
 	return StealProcess === 1 ? id === stealId : true;
 }
-
-
-Game_BattlerBase.prototype.stealBoost = function(){//要修正
-	let rate = 0;
-	this.traitObjects().forEach(function(traitObject) {
-		if (traitObject.meta.steal_sr) {
-			rate += Number(traitObject.meta.steal_sr);
-		}
-	}, this);
-	return rate;
-};
-
-Game_BattlerBase.prototype.stealPercentBoost = function(){//要修正
-	let rate = 100;
-	this.traitObjects().forEach(function(traitObject) {
-		if (traitObject.meta.steal_sr_Percent) {
-			rate *= Number(traitObject.meta.steal_sr_Percent) / 100;
-		}
-	}, this);
-	return rate / 100;
-};
-
-Game_BattlerBase.prototype.stealItemRate = function() {//要修正
-	let rate = 100;
-	this.traitObjects().forEach(function(traitObject) {
-		if (traitObject.meta.stealResist) {
-			rate *= Number(traitObject.meta.stealResist) / 100;
-		}
-	}, this);
-  return rate;
-};
-
 
 const _Game_System_initialize = Game_System.prototype.initialize;
 Game_System.prototype.initialize = function() {
@@ -504,7 +479,7 @@ Game_Action.prototype.stolenItem = function(target){
 
 Game_Action.prototype.stolenGold = function(target){
 		const stolenGold = this.lostStolenGoldMode();
-		const rate = (Number(stolenGold[0]) + this.subject().stealBoost()) * this.subject().stealPercentBoost();
+		const rate = this.subject().getStealBoostRate(Number(stolenGold[0]));
 		const gold = this.lostStolenGold(target, rate, stolenGold);
 		this.subject().keepStolenGold(gold);
 	if (gold) {
@@ -559,20 +534,46 @@ Game_Action.prototype.lostStolenGoldMode = function(){
 	return stolenGold;
 };
 
-Game_Action.prototype.stealRate = function(target){
+Game_Action.prototype.stealRate = function(){
 	const rate = Number(this.item().meta.stealSkill);
-	return (rate + this.subject().stealBoost()) * this.subject().stealPercentBoost();
+	return this.subject().getStealBoostRate(rate);
 };
 
-Game_Action.prototype.stealGoldRate = function(target){
+Game_Action.prototype.stealGoldRate = function(){
 	const rate = Number(this.item().meta.goldStealSkill);
-	return (rate + this.subject().stealBoost()) * this.subject().stealPercentBoost();
+	return this.subject().getStealBoostRate(rate);
+};
+
+
+Game_BattlerBase.prototype.stealBoost = function(){
+	return this.traitObjects().reduce((r, trait) => {
+		return r + (trait.meta.steal_sr ? Number(trait.meta.steal_sr) / 100 : 0);
+	}, 1.0);
+};
+
+Game_BattlerBase.prototype.stealPercentBoost = function(){
+	return this.traitObjects().reduce((r, trait) => {
+		return r * (trait.meta.steal_sr_Percent ? Number(trait.meta.steal_sr_Percent) / 100 : 1.0);
+	}, 1.0);
+};
+
+Game_BattlerBase.prototype.stealItemRate = function() {
+	return this.traitObjects().reduce((r, trait) => {
+		return r * (trait.meta.stealResist ? Number(trait.meta.stealResist) / 100 : 1.0);
+	}, 1.0);
+};
+
+Game_BattlerBase.prototype.getStealBoostRate = function(rate) {
+	return rate * this.stealPercentBoost() + this.stealBoost();
 };
 
 Game_Actor.prototype.getStolenRate = function(rate) {
-	return Math.floor(Math.random() * 100) < (rate / this.stealItemRate() * 100);
+	return Math.floor(Math.random() * 100) < (rate * this.stealItemRate());
 };
 
+Game_BattlerBase.prototype.getStealRatePercent = function() {
+	return this.getStealBoostRate(100);
+};
 
 const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
 Game_Enemy.prototype.initMembers = function() {
@@ -659,7 +660,7 @@ Game_Enemy.prototype.isStealGold = function() {
 };
 
 Game_Enemy.prototype.getStealRate = function(rate, di) {
-	return Math.floor(Math.random() * 100) < (rate / 100) * (di.denominator * this.stealItemRate() / 100);
+	return Math.floor(Math.random() * 100) < rate * (di.denominator * this.stealItemRate() / 100);
 };
 
 Game_Enemy.prototype.keepStolenItem = function(item) {

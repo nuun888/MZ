@@ -1,5 +1,5 @@
 # [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
-# Ver.1.0.0
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -29,5 +29,7 @@
 ![画像](img/SetBonusEquip1.png)  
 
 ## 更新履歴
+2022/1/27 Ver.1.1.0  
+一定装備数によって発動する機能を追加。  
 2022/1/22 Ver.1.0.0  
 初版  

@@ -10,13 +10,13 @@
  * @target MZ
  * @plugindesc セットボーナス
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * 特定の装備と同時に装備したときにセットボーナスを発動させます。
- * 該当する全ての装備を装備している時に効果が適用されます。
+ * 該当する全ての装備または一定装備数を装備している時に効果が適用されます。
  * 
  * 適用するセットボーナスのパラメータはデータベースの武器でセットボーナス用のデータを作成します。
  * 
@@ -24,10 +24,15 @@
  * <SetBonus:[id], [id]...> セットボーナスを適用します。
  * [id]:セットボーナス設定のリスト番号
  * 
+ * セットボーナスと設定はプラグインパラメータから行います。
+ * セットボーナスを適用させる装備は必ず装備元の装備も設定してください。
+ * 
  * 仕様
- * 同じ装備のセットボーナスまたは、同じセットボーナスIDは１つまでとなっています。
+ * 同じセットボーナスIDの効果は重複して適用されません。
  * 
  * 更新履歴
+ * 2022/1/27 Ver.1.1.0
+ * 一定装備数によって発動する機能を追加。
  * 2022/1/22 Ver.1.0.0
  * 初版
  * 
@@ -47,8 +52,8 @@
  * @default
  * 
  * @param SetBonusWeaponData
- * @text セットボーナスのパラメータを設定する武器ID
- * @desc パラメータ設定用武器ID
+ * @text パラメータ設定用武器ID
+ * @desc セットボーナスのパラメータを設定する武器ID
  * @type weapon
  * @default 0
  * 
@@ -56,6 +61,12 @@
  * @text セットボーナス装備設定
  * @desc セットボーナス対象の装備を設定します。
  * @type struct<SetBonusEquipList>[]
+ * @default []
+ * 
+ * @param SetBonusNumberEquipment
+ * @text セット装備数設定
+ * @desc セット装備数を設定します。
+ * @type struct<NumberEquipment>[]
  * @default []
  * 
  */
@@ -74,6 +85,21 @@
  * @default 0
  * 
  */
+/*~struct~NumberEquipment:
+ * 
+ * @param SetNumberEquip
+ * @text セット数
+ * @desc セットの装備数
+ * @type number
+ * @default 1
+ * 
+ * @param SetNumberEquipmenWeaponData
+ * @text 適用するセットボーナスのパラメータを設定する武器ID
+ * @desc パラメータ設定用武器ID
+ * @type weapon
+ * @default 0
+ * 
+ */
 var Imported = Imported || {};
 Imported.NUUN_SetBonusEquip = true;
 
@@ -83,40 +109,47 @@ const SetBonusData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(par
 
 Game_Actor.prototype.getSetBonus = function() {
     const equips = this.equips();
+    let setBonusEquipList = [];
     let setBonusList = [];
-    let setBonusEquip = [];
     equips.forEach((equip, r) => {
         const list = this.getSetBonusData(equip);
-        setBonusEquip[r] = 0;
-        if (list && !this.isSetBonusId(setBonusEquip, equip.id)) {
+        if (list) {
             list.forEach(setBonusId => {
                 const data = SetBonusData[setBonusId - 1];
-                const result = data.SetBonusEquip.every(equip => {
-                    if (this.isSetBonusDuplicateId(setBonusList, data.SetBonusWeaponData)) {
-                      return false;
-                    } else if (this.hasWeapon($dataWeapons[equip.SetBonusWeapon])) {
-                        return true;
+                let set = 0;
+                data.SetBonusEquip.forEach(equip => {
+                    if (this.hasWeapon($dataWeapons[equip.SetBonusWeapon])) {
+                        set++;
                     } else if (this.hasArmor($dataArmors[equip.SetBonusArmor])) {
-                        return true;
+                        set++;
                     }
-                    return false;
                 });
-                if (result) {
-                    setBonusList.push($dataWeapons[data.SetBonusWeaponData]);
-                    setBonusEquip[r] = equips.id;
+                if (set === data.SetBonusEquip.length) {
+                    if (!setBonusList[setBonusId]) {
+                        setBonusList[setBonusId] = {setBonus: false, numBonus: []};
+                    }
+                    if (!setBonusList[setBonusId].setBonus) {
+                        setBonusEquipList.push($dataWeapons[data.SetBonusWeaponData]);
+                        setBonusList[setBonusId].setBonus = true;
+                    }
                 }
-            })
+                if (set > 1) {
+                    data.SetBonusNumberEquipment.forEach((list, r) => {
+                        if (list.SetNumberEquip <= set) {
+                            if (!setBonusList[setBonusId]) {
+                                setBonusList[setBonusId] = {setBonus: false, numBonus: []};
+                            }
+                            if (!setBonusList[setBonusId].numBonus[r]) {
+                                setBonusList[setBonusId].numBonus[r] = true;
+                                setBonusEquipList.push($dataWeapons[list.SetNumberEquipmenWeaponData]);
+                            }
+                        }
+                    });
+                }
+            });
         }
     });
-    return setBonusList;
-};
-
-Game_Actor.prototype.isSetBonusId = function(setBonusEquip, equipId) {
-    return setBonusEquip.some(id => id === equipId);
-};
-
-Game_Actor.prototype.isSetBonusDuplicateId = function(setBonusList, equipId) {
-  return setBonusList.some(equip => equip.id === equipId);
+    return setBonusEquipList;
 };
 
 Game_Actor.prototype.getSetBonusData = function(equip) {

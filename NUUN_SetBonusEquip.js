@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc セットボーナス
+ * @plugindesc 装備セットボーナス
  * @author NUUN
  * @version 1.1.0
  * @base NUUN_Base

@@ -1,5 +1,5 @@
 # [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -36,6 +36,9 @@
 なおこの機能はセットボーナスのタグを記入する装備をプラグインパラメータで適用させるセットボーナス装備設定に設定する必要があります。  
 
 ## 更新履歴
+2022/1/28 Ver.1.1.1  
+セットボーナスを設定するパラメータを武器以外に防具からでも適用できるように変更。  
+追加ボーナスの武器設定のパラメータ名が不自然だったのを修正。(要再設定)  
 2022/1/27 Ver.1.1.0  
 一定装備数によって発動する機能を追加。  
 2022/1/22 Ver.1.0.0  

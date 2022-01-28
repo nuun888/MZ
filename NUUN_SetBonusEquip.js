@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -18,7 +18,8 @@
  * 特定の装備と同時に装備したときにセットボーナスを発動させます。
  * 該当する全ての装備または一定装備数を装備している時に効果が適用されます。
  * 
- * 適用するセットボーナスのパラメータはデータベースの武器でセットボーナス用のデータを作成します。
+ * 適用するセットボーナスのパラメータはデータベースの武器または防具でセットボーナス用のデータを作成します。
+ * 武器で設定したデータが優先されます。武器IDが0の場合は防具が適用されます。
  * 
  * 武器、防具のメモ欄
  * <SetBonus:[id], [id]...> セットボーナスを適用します。
@@ -31,6 +32,9 @@
  * 同じセットボーナスIDの効果は重複して適用されません。
  * 
  * 更新履歴
+ * 2022/1/28 Ver.1.1.1
+ * セットボーナスを設定するパラメータを武器以外に防具からでも適用できるように変更。
+ * 追加ボーナスの武器設定のパラメータ名が不自然だったのを修正。(要再設定)
  * 2022/1/27 Ver.1.1.0
  * 一定装備数によって発動する機能を追加。
  * 2022/1/22 Ver.1.0.0
@@ -55,6 +59,12 @@
  * @text パラメータ設定用武器ID
  * @desc セットボーナスのパラメータを設定する武器ID
  * @type weapon
+ * @default 0
+ * 
+ * @param SetBonusArmorData
+ * @text パラメータ設定用防具ID
+ * @desc セットボーナスのパラメータを設定する防具ID
+ * @type armor
  * @default 0
  * 
  * @param SetBonusEquip
@@ -93,10 +103,16 @@
  * @type number
  * @default 1
  * 
- * @param SetNumberEquipmenWeaponData
- * @text 適用するセットボーナスのパラメータを設定する武器ID
- * @desc パラメータ設定用武器ID
+ * @param SetNumberEquipWeaponData
+ * @text パラメータ設定用武器ID
+ * @desc 適用するセットボーナスのパラメータを設定する武器ID
  * @type weapon
+ * @default 0
+ * 
+ * @param SetNumberEquipArmorData
+ * @text パラメータ設定用防具ID
+ * @desc 適用するセットボーナスのパラメータを設定する防具ID
+ * @type armor
  * @default 0
  * 
  */
@@ -106,6 +122,10 @@ Imported.NUUN_SetBonusEquip = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_SetBonusEquip');
 const SetBonusData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SetBonus'])) : null) || [];
+
+NuunManager.getSetBonusParams = function() {
+    return parameters;
+};
 
 Game_Actor.prototype.getSetBonus = function() {
     const equips = this.equips();
@@ -129,7 +149,7 @@ Game_Actor.prototype.getSetBonus = function() {
                         setBonusList[setBonusId] = {setBonus: false, numBonus: []};
                     }
                     if (!setBonusList[setBonusId].setBonus) {
-                        setBonusEquipList.push($dataWeapons[data.SetBonusWeaponData]);
+                        setBonusEquipList.push(this.getEquipSetBonus(data));
                         setBonusList[setBonusId].setBonus = true;
                     }
                 }
@@ -141,7 +161,7 @@ Game_Actor.prototype.getSetBonus = function() {
                             }
                             if (!setBonusList[setBonusId].numBonus[r]) {
                                 setBonusList[setBonusId].numBonus[r] = true;
-                                setBonusEquipList.push($dataWeapons[list.SetNumberEquipmenWeaponData]);
+                                setBonusEquipList.push(this.getEquipAddSetBonus(list));
                             }
                         }
                     });
@@ -150,6 +170,14 @@ Game_Actor.prototype.getSetBonus = function() {
         }
     });
     return setBonusEquipList;
+};
+
+Game_Actor.prototype.getEquipSetBonus = function(data) {
+    return data.SetBonusWeaponData > 0 ? $dataWeapons[data.SetBonusWeaponData] : $dataArmors[data.SetBonusArmorData];
+};
+
+Game_Actor.prototype.getEquipAddSetBonus = function(data) {
+    return data.SetNumberEquipWeaponData > 0 ? $dataWeapons[data.SetNumberEquipWeaponData] : $dataArmors[data.SetNumberEquipArmorData];
 };
 
 Game_Actor.prototype.getSetBonusData = function(equip) {

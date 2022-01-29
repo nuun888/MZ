@@ -29,8 +29,8 @@ const parameters = PluginManager.parameters('NUUN_DropItemRateBase');
 
 Game_Enemy.prototype.makeDropItems = function() {//再定義
     const rate = this.dropItemRate();
-    return this.enemy().dropItems.reduce((r, di) => {
-        if (di.kind > 0 && this.randomValue(di, rate) < this.rateValue(di, rate)) {
+    return this.enemy().dropItems.reduce((r, di, i) => {
+        if (di.kind > 0 && this.randomValue(di, rate, i) < this.rateValue(di, rate, i)) {
             return r.concat(this.itemObject(di.kind, di.dataId));
         } else {
             return r;
@@ -38,11 +38,11 @@ Game_Enemy.prototype.makeDropItems = function() {//再定義
     }, []);
 };
 
-Game_Enemy.prototype.randomValue = function(di, rate) {
+Game_Enemy.prototype.randomValue = function(di, rate, i) {
     return Math.random() * di.denominator;
 };
 
-Game_Enemy.prototype.rateValue = function(di, rate) {
+Game_Enemy.prototype.rateValue = function(di, rate, i) {
     return rate;
 };
 

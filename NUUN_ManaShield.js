@@ -11,21 +11,26 @@
  * @target MZ
  * @plugindesc マナシールド
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
+ * @orderAfter NUUN_StoppingFeature
  * 
  * @help
  * HPダメージの代わりにMPにダメージを受けさせます。
- * 1000のHPダメージを受けた時に５０％の場合はMPが５００減りHPは５００だけ減ります。
- * MPの変換後負担率が６０％の場合はMPが３００減りHPは５００のダメージを受けます。
+ * 最大HPが1000 最大MPが600の場合
+ * 500のHPダメージを受けた時に５０％の場合はMPが150減りHPは250だけダメージを受けます。
+ * MPの変換後負担率が６０％の場合はMPが90減りHPは250のダメージを受けます。
  * 
  * 特徴を有するメモ欄（アクター、職業、武器、防具、敵キャラ、ステート）
- * <ManaShield:[rate]>　[rate]:肩代わりするダメージの割合
- * <ManaShield:25> HPダメージの２５％がMPダメージに変換されます。
+ * <ManaShield:[rate]>　
+ * [rate]:肩代わりするダメージの割合
+ * <ManaShield:25> HPダメージの25％がMPダメージに変換されます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/29  Ver.1.1.0
+ * MPダメージの計算方法を最大HPからの割合で算出するように変更。
  * 2021/8/1 Ver.1.0.1
  * MPダメージを受けてないのにSEgaなる問題を修正。
  * MP不足だった時のHPダメージが正常に計算されていなかった問題を修正。
@@ -35,7 +40,7 @@
  * 
  * @param MPBurdenRate
  * @text MPの変換後負担率
- * @desc MPのダメージ変換後の負担率を設定します。
+ * @desc MPのダメージ変換後の負担率を設定します。(百分率)
  * @type number
  * @default 100
  * @min 1
@@ -92,7 +97,8 @@ Imported.NUUN_ManaShield = true;
       const rate = target.traitsManaShieldPi();
       let newValue = Math.floor(value * rate);
       if (newValue > 0) {
-        const mpValue = Math.floor(Math.min(newValue * (MPBurdenRate / 100), target.mp))
+        //const mpValue = Math.floor(Math.min(newValue * (MPBurdenRate / 100), target.mp))
+        const mpValue = Math.floor((target.mmp * (newValue / target.mhp)) * (MPBurdenRate / 100));
         newValue = Math.min(newValue, target.mp);
         this.executeMpDamage(target, mpValue);
         if(mpValue > 0 && ManaShieldSE) {

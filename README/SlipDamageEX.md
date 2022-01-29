@@ -1,7 +1,7 @@
 # [スリップダメージ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js)
-# Ver.1.0.0
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js)  
-#### 対応プラグイン
+#### 必須、前提プラグイン
 [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)  
 
 スリップダメージに独自の式を定義できます。  
@@ -11,6 +11,9 @@
 `<SlipDamageHP:[eval]>` HPのスリップダメージを設定します。  
 `<SlipDamageMP:[eval]>` MPのスリップダメージを設定します。  
 `<SlipDamageTP:[eval]>` TPのスリップダメージを設定します。  
+`<SlipDamageFixedHP:[eval]>` HPのスリップダメージを固定値で設定します。  
+`<SlipDamageFixedMP:[eval]>` MPのスリップダメージを固定値で設定します。  
+`<SlipDamageFixedTP:[eval]>` TPのスリップダメージを固定値で設定します。  
 `[eval]`:評価式  
 b:バトラーゲームデータ  
 db:バトラーのデータベースデータ  
@@ -20,10 +23,13 @@ st:ステートのターン
 `<SlipDamageHP:-10 * st>` 毎ターンごとに10%加算した割合のダメージを受けます。  
 `<SlipDamageMP:10 * st>` 毎ターンごとに10%加算した割合で回復します。  
 `<SlipDamageHP:Math.pow(3, st) * -1>` 毎ターンごとに3%ずつスリップダメージが倍化します。  
+`<SlipDamageFixedHP:-10>` 毎ターンごとに１０のスリップダメージを受けます。  
 
 ステートの経過ターンを取得するには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)が必要です。
 
 ## 更新履歴
+2022/1/29 Ver.1.1.0  
+スリップダメージに固定値を設定できる機能を追加。  
 2022/1/16 Ver.1.0.1  
 経過ターンの処理を別プラグイン化。  
 2022/1/11 Ver.1.0.0  

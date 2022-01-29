@@ -193,7 +193,8 @@
 | ---------- | ------------- | ------------- | -------- |
 | [複数属性](https://github.com/nuun888/MZ/blob/master/README/MultiElement.md) | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) |  | 1.0.1 |
 | [売値任意設定](https://github.com/nuun888/MZ/blob/master/README/AnySellPrice.md) | [NUUN_AnySellPrice](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js) | 共 | 1.1.0 |
-| ドロップ率百分率化 | [NUUN_DropRatePercentage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropRatePercentage.js) |  | 1.0.0 |
+| [ドロップ率百分率化](https://github.com/nuun888/MZ/blob/master/README/DropRatePercentage.md) | [NUUN_DropRatePercentage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropRatePercentage.js) |  | 1.0.1 |
+| [ドロップ率分子操作](https://github.com/nuun888/MZ/blob/master/README/DropItemMolecule.md) | [NUUN_DropItemMolecule](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemMolecule.js) |  | 1.0.0 |
 | [ダメージタイプTP追加](https://github.com/nuun888/MZ/blob/master/README/TPDamageType.md) | [NUUN_TPDamageType](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPDamageType.js) |  | 1.0.0 |
 | 全体、ランダム、敵味方全体攻撃でも対象選択 | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js) | 共 | 1.5.1 |
 | [MV互換アニメーションフレームレート個別設定](https://github.com/nuun888/MZ/blob/master/README/AnimationFPSRate.md) | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.0.2 |

@@ -1,4 +1,4 @@
-# [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemRateBase.js)
+# [ドロップ率確率操作ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemRateBase.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemRateBase.js)  
 

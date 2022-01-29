@@ -11,12 +11,18 @@
  * @target MZ
  * @plugindesc マナシールド
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @orderAfter NUUN_StoppingFeature
  * 
  * @help
  * HPダメージの代わりにMPにダメージを受けさせます。
  * 最大HPが1000 最大MPが600の場合
+ * 【HPダメージ量】
+ * 受けたダメージの肩代わりしたダメージ分、MPにダメージを受けます。
+ * 500のHPダメージを受けた時に５０％の場合はMPが250減りHPは250だけダメージを受けます。
+ * MPの変換後負担率が６０％の場合はMPが150減りHPは250のダメージを受けます。
+ * 【最大HP割合】
+ * 受けたダメージの肩代わりしたダメージ分が最大HPからの割合と最大MPに比例してMPにダメージを受けます。
  * 500のHPダメージを受けた時に５０％の場合はMPが150減りHPは250だけダメージを受けます。
  * MPの変換後負担率が６０％の場合はMPが90減りHPは250のダメージを受けます。
  * 
@@ -29,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/29  Ver.1.1.1
+ * 元の機能と選択できるように変更。
  * 2022/1/29  Ver.1.1.0
  * MPダメージの計算方法を最大HPからの割合で算出するように変更。
  * 2021/8/1 Ver.1.0.1
@@ -37,6 +45,16 @@
  * 回復時にも影響していた問題を修正。
  * 2021/8/1 Ver.1.0.0
  * 初版
+ * 
+ * @param MPShieldMode
+ * @desc 肩代わりするMPダメージのモード。
+ * @text MPダメージモード
+ * @type select
+ * @option HPダメージ量
+ * @value 'HpDamage'
+ * @option 最大HP割合比例
+ * @value 'MaxHpRate'
+ * @default 'MaxHpRate'
  * 
  * @param MPBurdenRate
  * @text MPの変換後負担率
@@ -80,6 +98,7 @@ Imported.NUUN_ManaShield = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_ManaShield');
+  const MPShieldMode = eval(parameters['MPShieldMode'] || 'HpDamage');
   const MPBurdenRate = Number(parameters['MPBurdenRate'] || 100);
   const ManaShieldSE = String(parameters['ManaShieldSE']);
   const volume = Number(parameters['volume'] || 90);
@@ -97,8 +116,7 @@ Imported.NUUN_ManaShield = true;
       const rate = target.traitsManaShieldPi();
       let newValue = Math.floor(value * rate);
       if (newValue > 0) {
-        //const mpValue = Math.floor(Math.min(newValue * (MPBurdenRate / 100), target.mp))
-        const mpValue = Math.floor((target.mmp * (newValue / target.mhp)) * (MPBurdenRate / 100));
+        const mpValue = this.getManaShieldDamage(target, newValue);
         newValue = Math.min(newValue, target.mp);
         this.executeMpDamage(target, mpValue);
         if(mpValue > 0 && ManaShieldSE) {
@@ -108,6 +126,14 @@ Imported.NUUN_ManaShield = true;
       return value - newValue;
     }
     return value;
+  };
+
+  Game_Action.prototype.getManaShieldDamage = function(target, value) {
+    if (MPShieldMode === 'HpDamage') {
+      return Math.floor(Math.min(value * (MPBurdenRate / 100), target.mp))
+    } else if (MPShieldMode === 'MaxHpRate') {
+      return Math.floor((target.mmp * (value / target.mhp)) * (MPBurdenRate / 100));
+    }
   };
 
   Game_BattlerBase.prototype.traitsManaShieldPi = function() {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.11.1
+ * @version 2.11.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -229,6 +229,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/1/29 Ver.2.11.2
+ * ドロップアイテム率の表示の仕様を変更。
  * 2022/1/24 Ver.2.11.1
  * 敵の詳細ページウィンドウを表示させない機能を追加。
  * 2022/1/24 Ver.2.11.0
@@ -1612,13 +1614,23 @@
  * 
  * @param DropItemData
  * @text ドロップアイテム設定
- * @default ------------------------------
+ * @default ------------------------------DropRateEval
  * 
  * @param DropItemProbabilityShow
  * @desc 確率を表示する。
  * @text 確率表示
  * @type boolean
  * @default true
+ * @parent DropItemData
+ * 
+ * @param DropRateEval
+ * @desc ドロップ率の評価式を定義します。rate:分母　di:ドロップ情報
+ * @text ドロップ率評価式
+ * @type combo[]
+ * @option '1/'+ rate
+ * @option ge.getDropItemsRatePercentage(di) +'%';//ドロップ率百分率化Ver.1.0.1～
+ * @option ge.dropItemMolecule(i) +'/'+ rate;//ドロップ率分子操作
+ * @default 
  * @parent DropItemData
  * 
  * @param ShowDropItemName
@@ -5310,9 +5322,8 @@ Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
   let x2 = x;
   let y2 = y;
   let dropIndex = 0;
-  const listLength = dropList.length;
-  for(i = 0; i < listLength; i++){
-    if(dropList[i].kind > 0){
+  dropList.forEach((di, i) => {
+    if(di.kind > 0){
       if (param.DropItemMultiCol) {
         x2 = Math.floor(dropIndex % cols) * (width + this.itemPadding()) + x;
         y2 = Math.floor(dropIndex / cols) * lineHeight + y + lineHeight;
@@ -5322,10 +5333,10 @@ Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
       this.drawContentsBackground(list.Back, x2, y2, width);
       x3 = this.contensX(x2);
       width2 = this.contensWidth(width);
-      let item = enemy.itemObject(dropList[i].kind, dropList[i].dataId);
+      let item = enemy.itemObject(di.kind, di.dataId);
       if((this.showDropItemMask(list.MaskMode, enemy) && this.dropItemFlag(i))) {
-        let rate = dropList[i].denominator;
-        const text = Imported.NUUN_DropRatePercentage ? rate / 10 +" %": "1/" + rate;
+        let rate = di.denominator;
+        const text = param.DropRateEval && param.DropRateEval[0] ? eval(param.DropRateEval[0]) : "1/" + rate;
         let textWidth = this.textWidth(text);
         this.drawItemName(item, x3, y2, width2 - textWidth - this.itemPadding());
         if (param.DropItemProbabilityShow && !item.meta.NoDropProbability) {
@@ -5338,7 +5349,7 @@ Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
         dropIndex++;
       }
     }
-  }
+  });
 };
 
 Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {

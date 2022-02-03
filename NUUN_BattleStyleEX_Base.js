@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.11
+ * @version 2.6.12
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/2/3 Ver 2.6.12
+ * アクターコマンドの座標をマイナスに設定したときに、座標設定が適用されないもん問題を修正。
  * 2022/1/17 Ver 2.6.11
  * 戦闘開始時に立ち絵画像が表示されない問題を修正。
  * 2021/12/30 Ver 2.6.10
@@ -1141,7 +1143,7 @@ Window_ActorCommand.prototype.refresh = function() {
         if (param.ActorCommandMode === 0) {
           //this.height = this.fittingHeight(Math.min(Math.ceil(this.maxItems() / param.ActorCommandMaxCol), param.ActorCommandMaxRow));
           this.width = param.ActorCommand_Width > 0 ? param.ActorCommand_Width : Math.min(this.width, rect.width);
-          this.x = Math.max(-this._statusWindow.UI_Difference + 4, ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + Math.max(param.ActorCommand_X, 0) + this._statusWindow.differenceX);
+          this.x = Math.max(-this._statusWindow.UI_Difference + 4, ((rect.width - this.width) / 2) + rect.x + this.itemPadding() + param.ActorCommand_X + this._statusWindow.differenceX);
           this.x = Math.min(this.x, Graphics.boxWidth + this._statusWindow.UI_Difference - this.width - 4);
           let zeroPosition = 0;
           if (param.ActorStatusWindowOnPosition) {
@@ -1181,7 +1183,6 @@ Window_ActorCommand.prototype.refresh = function() {
           if (param.ActorCommandMode === 3) {
             this.y = Graphics.boxHeight - (this.height + this._statusWindow.height) + (param.WindowFrameShow ? 0 : 6) + param.ActorCommand_Y;
           }
-
         }
       }
     }

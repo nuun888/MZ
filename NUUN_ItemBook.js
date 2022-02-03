@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.4.2
+ * @version 1.4.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -108,6 +108,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2022/2/3 Ver.1.4.3
+ * アイテムのリストの表示がおかしくなる問題を修正。
  * 2021/12/12 Ver.1.4.2
  * メインウィンドウ（アイテムの情報を表示）の横幅を設定できる機能を追加。
  * 2021/11/11 Ver.1.4.1
@@ -2161,14 +2163,14 @@ Window_ItemBook_Index.prototype.updateItemData = function() {
 
 Window_ItemBook_Index.prototype.makeItemList = function() {
   this._itemPercentList = [];
-  this._data = this.allItemData().filter(item => this.includes(item));
+  this._data = this.allItemData().filter(item => this.itemBookIncludes(item));
 };
 
 Window_ItemBook_Index.prototype.isCurrentItemEnabled = function() {
   return true;
 };
 
-Window_ItemBook_Index.prototype.includes = function(item) {
+Window_ItemBook_Index.prototype.itemBookIncludes = function(item) {
   const result = $gameSystem.isItemBook(item);
   if (result) {
     this._itemPercentList.push(item);

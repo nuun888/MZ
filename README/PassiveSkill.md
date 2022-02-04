@@ -1,5 +1,5 @@
 # [パッシブスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
-# Ver.1.5.2
+# Ver.1.5.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -65,6 +65,8 @@
 パッシブスキルが適用された武器のステータス、特徴が適用されます。  
 
 ## 更新履歴
+2022/2/4 Ver.1.1.2  
+処理の修正。  
 2022/1/3 Ver.1.5.2  
 Ver.1.5.0以降でこのプラグインで設定した条件武器、防具タイプ、乗り物を条件指定するとエラーが出る問題を修正。  
 2021/12/31 Ver.1.5.1  

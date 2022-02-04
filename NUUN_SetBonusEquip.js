@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -32,6 +32,8 @@
  * 同じセットボーナスIDの効果は重複して適用されません。
  * 
  * 更新履歴
+ * 2022/2/4 Ver.1.1.2
+ * 処理の修正。
  * 2022/1/28 Ver.1.1.1
  * セットボーナスを設定するパラメータを武器以外に防具からでも適用できるように変更。
  * 追加ボーナスの武器設定のパラメータ名が不自然だったのを修正。(要再設定)
@@ -149,7 +151,8 @@ Game_Actor.prototype.getSetBonus = function() {
                         setBonusList[setBonusId] = {setBonus: false, numBonus: []};
                     }
                     if (!setBonusList[setBonusId].setBonus) {
-                        setBonusEquipList.push(this.getEquipSetBonus(data));
+                        Array.prototype.push.apply(setBonusEquipList, [this.getEquipSetBonus(data)]);
+                        //setBonusEquipList.push(this.getEquipSetBonus(data));
                         setBonusList[setBonusId].setBonus = true;
                     }
                 }
@@ -161,7 +164,8 @@ Game_Actor.prototype.getSetBonus = function() {
                             }
                             if (!setBonusList[setBonusId].numBonus[r]) {
                                 setBonusList[setBonusId].numBonus[r] = true;
-                                setBonusEquipList.push(this.getEquipAddSetBonus(list));
+                                Array.prototype.push.apply(setBonusEquipList, [this.getEquipAddSetBonus(list)]);
+                                //setBonusEquipList.push(this.getEquipAddSetBonus(list));
                             }
                         }
                     });
@@ -193,7 +197,8 @@ Game_Actor.prototype.paramPlus = function(paramId) {
 const _Game_Actor_traitObjects = Game_Actor.prototype.traitObjects;
 Game_Actor.prototype.traitObjects = function() {
   let objects = _Game_Actor_traitObjects.call(this);
-  return objects.concat(this.setBonusObject());
+  Array.prototype.push.apply(objects, this.setBonusObject());
+  return objects;
 };
 
 Game_Actor.prototype.setBonusObject = function() {

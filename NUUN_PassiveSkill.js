@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.5.2
+ * @version 1.5.3
  * @base NUUN_Base
  * 
  * @help
@@ -68,6 +68,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/4 Ver.1.1.2
+ * 処理の修正。
  * 2022/1/3 Ver.1.5.2
  * Ver.1.5.0以降でこのプラグインで設定した条件武器、防具タイプ、乗り物を条件指定するとエラーが出る問題を修正。
  * 2021/12/31 Ver.1.5.1
@@ -294,7 +296,8 @@ Imported.NUUN_PassiveSkill = true;
   Game_Actor.prototype.traitObjects = function() {
     let objects = _Game_Actor_traitObjects.call(this);
     //パッシブスキルのオブジェクトを取得
-    objects = objects.concat(this.passiveObject());
+    Array.prototype.push.apply(objects, this.passiveObject());
+    //objects = objects.concat(this.passiveObject());
     return objects;
   };
 
@@ -331,7 +334,8 @@ Imported.NUUN_PassiveSkill = true;
         if (this.isPassiveSkill(skill) && this.condPassiveSkill(skill)) {
           const weapon = this.getPassiveSkillWeapon(skill);
           if (weapon > 0) {
-            passiveSkills.push($dataWeapons[weapon]);
+            Array.prototype.push.apply(passiveSkills, [$dataWeapons[weapon]]);
+            //passiveSkills.push($dataWeapons[weapon]);
           }
         }
       });

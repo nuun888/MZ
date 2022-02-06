@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc シームレスマップ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -30,9 +30,59 @@
  * 
  * イベントコマンドでの場所移動で、リストの2番目以降のマップに移動したときは基準となるマップに移動します。その際に座標も設定した位置に調整されます。
  * 
+ * プラグインパラメータ
+ * イベントID取得
+ * シームレスマップ内のイベントIDを変数に代入します。
+ * 
+ * イベントIDセット
+ * 結合したイベントのIDをセットします。イベントコマンドでのイベント取得で基準マップ以外のマップで設定したイベントのIDを指定したいときに設定します。
+ * 該当のイベントコマンドを設定した後にリセットします。
+ * 
  * 更新履歴
+ * 2022/2/6 Ver.1.1.0
+ * 基準マップ以外のイベントIDを指定できる機能を追加。
  * 2022/2/6 Ver.1.0.0
  * 初版
+ * 
+ * 
+ * @command SeamlessMapEventId
+ * @desc シームレスマップ内のイベントIDを取得します。
+ * @text イベントID取得
+ * 
+ * @arg MapId
+ * @type number
+ * @default 0
+ * @desc 元のマップIDを指定します。
+ * @text 元マップID
+ * 
+ * @arg EventId
+ * @type number
+ * @default 0
+ * @desc 元のマップのイベントIDを指定します。
+ * @text 元マップイベントID
+ * 
+ * @arg IDVariable
+ * @type variable
+ * @default 0
+ * @text 代入変数
+ * @desc イベントIDを代入するゲーム変数。
+ * 
+ * @command SetEventData
+ * @desc 結合したイベントのIDをセットします。
+ * @text イベントIDセット
+ * 
+ * @arg MapId
+ * @type number
+ * @default 0
+ * @desc 元のマップIDを指定します。
+ * @text 元マップID
+ * 
+ * @arg EventId
+ * @type number
+ * @default 0
+ * @desc 元のマップのイベントIDを指定します。元マップIDが0の場合は結合したマップのイベントIDで指定します。
+ * @text 元マップイベントID
+ * 
  * 
  * 
  * @param SeamlessMapSetting
@@ -84,6 +134,17 @@ let SeamlessMaps = [];
 $dataSeamlessMap = [];
 getSeamlessMapDatas();
 
+const pluginName = "NUUN_SeamlessMap";
+PluginManager.registerCommand(pluginName, 'SeamlessMapEventId', args => {
+    const index = $gameMap.getSeamlessEventId(Number(args.MapId), Number(args.EventId));
+    $gameVariables.setValue(Number(args.IDVariable), index);
+});
+
+PluginManager.registerCommand(pluginName, 'SetEventData', args => {
+    const index = $gameMap.getSeamlessEventId(Number(args.MapId), Number(args.EventId));
+    $gameTemp.seamlessEventId = index;
+});
+
 function getSeamlessMapDatas() {
     SeamlessMapSetting.forEach((data, r) => {
         const seamlessMap = data.SeamlessMapList;
@@ -127,10 +188,12 @@ function getSeamlessMapIndex(data, mapId) {
 DataManager.loadSeamlessMap = function(mapId) {
     const mapData = getSeamlessMapData(mapId);
     if (mapData) {
-        mapData.SeamlessMapList.forEach((map, r) => {
-            if (map.SeamlessMapId > 0) {
-                const filename = "Map%1.json".format(map.SeamlessMapId.padZero(3));
+        const mapList = mapData.SeamlessMapList.map(data => data.SeamlessMapId);
+        mapList.forEach((id, r) => {
+            if (id > 0) {
+                const filename = "Map%1.json".format(id.padZero(3));
                 this.loadSeamlessMapDataFile("$dataSeamlessMap", filename, r);
+                this.seamlessMapId[r] = id;
             }
         });
     }
@@ -158,6 +221,7 @@ DataManager.onXhrSeamlessMapLoad = function(xhr, name, src, url, r) {
 
 const _DataManager_loadMapData = DataManager.loadMapData;
 DataManager.loadMapData = function(mapId) {
+    this.seamlessMapId = [];
     const id = isSeamlessMapIndex(mapId);
     if (id > 0) {
         this.loadSeamlessMap(mapId);
@@ -227,6 +291,7 @@ Scene_Map.prototype.setSeamlessMapEvants = function(data) {
                             if (eventData) {
                                 eventData.seamlessId = r;
                                 eventData.orgEvantId = eventData.id;
+                                eventData.orgMapId = DataManager.seamlessMapId[r];
                                 eventData.x += (r % data.SeamlessMapXNum * ($gameMap.orgWidth || 0));
                                 eventData.y += (Math.floor(r / data.SeamlessMapYNum) * ($gameMap.orgHeight || 0));
                                 eventData.id = eventData.id + eventLength;
@@ -236,7 +301,7 @@ Scene_Map.prototype.setSeamlessMapEvants = function(data) {
                     }
                 }
             });
-            $dataMap.events = events;
+            $dataMap.events = events;console.log($dataMap.events)
         }
     }
 };
@@ -261,6 +326,18 @@ Game_Map.prototype.initialize = function() {
     _Game_Map_initialize.call(this);
     this.orgWidth = 0;
     this.orgHeight = 0;
+};
+
+Game_Map.prototype.getSeamlessEventId = function(mapId, eventId) {
+    const events = this.events();
+    for (const event of events) {
+        if (mapId === 0 && eventId === event.orgEventId) {
+            return event._eventId;
+        } else if (mapId === event.orgMapId && eventId === event.orgEventId) {
+            return event._eventId;
+        }
+    }
+    return -1;
 };
 
 
@@ -317,7 +394,19 @@ Game_Vehicle.prototype.refresh = function() {
 const _Game_Event_initialize = Game_Event.prototype.initialize;
 Game_Event.prototype.initialize = function(mapId, eventId) {
     _Game_Event_initialize.call(this, mapId, eventId);
-    this._orgEventId = this.event().orgEvantId;
+    const event = this.event();
+    this.orgEventId = event.orgEvantId || eventId;
+    this.orgMapId = event.orgMapId || mapId;
+};
+
+
+const _Game_Interpreter_character = Game_Interpreter.prototype.character;
+Game_Interpreter.prototype.character = function(param) {
+    if ($gameTemp.seamlessEventId > 0) {
+        param = $gameTemp.seamlessEventId;
+        $gameTemp.seamlessEventId = -1;
+    }
+    return _Game_Interpreter_character.call(this, param);
 };
 
 })();

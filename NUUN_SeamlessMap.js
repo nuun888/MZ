@@ -301,7 +301,7 @@ Scene_Map.prototype.setSeamlessMapEvants = function(data) {
                     }
                 }
             });
-            $dataMap.events = events;console.log($dataMap.events)
+            $dataMap.events = events;
         }
     }
 };

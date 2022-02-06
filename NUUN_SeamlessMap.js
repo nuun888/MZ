@@ -10,13 +10,14 @@
  * @target MZ
  * @plugindesc シームレスマップ
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * 複数のマップを一つのマップに結合します。
  * プラグインパラメータのシームレスマップ設定のリスト1番に設定したマップが基準となるマップとなります。
+ * 設定したマップに移動した時点で自動的にマップが結合されます。
  * マップ名、表示名、タイルセット、スクロールタイプ、敵出現歩数、BGM自動演奏、BGS自動演奏、戦闘背景、ダッシュ禁止
  * 遠景、メモはリスト1番のマップデータが適用されます。
  * エンカウントはリストで設定したマップのエンカウントが全て統合されます。
@@ -39,6 +40,8 @@
  * 該当のイベントコマンドを設定した後にリセットします。
  * 
  * 更新履歴
+ * 2022/2/6 Ver.1.1.1
+ * マップ移動時にイベントが正常に適用されない問題を修正。
  * 2022/2/6 Ver.1.1.0
  * 基準マップ以外のイベントIDを指定できる機能を追加。
  * 2022/2/6 Ver.1.0.0
@@ -238,11 +241,11 @@ Scene_Map.prototype.onMapLoaded = function() {
 };
 
 Scene_Map.prototype.setSeamlessMap = function() {
-    const mapId = $gameMap.mapId() > 0 ? $gameMap.mapId() : $gamePlayer._newMapId;
+    const mapId = $gamePlayer._newMapId > 0 ? $gamePlayer._newMapId : $gameMap.mapId();
     const data = getSeamlessMapData(mapId);
     this.seamlessMap(data);
-    this.seamlessEncounter(data)
-    this.setSeamlessMapEvants(data)
+    this.seamlessEncounter(data);
+    this.setSeamlessMapEvants(data);
 };
 
 Scene_Map.prototype.seamlessMap = function(data) {

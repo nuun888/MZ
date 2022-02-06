@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.3.3
+ * @version 2.3.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -105,6 +105,10 @@
  * Ver.2.3.2以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/2/6 Ver.2.3.4
+ * ステート無効化の有効度の色を指定できる機能を追加。
+ * カラーコードに対応。要共通処理Ver.1.4.0以降（レーダーチャートを使用している場合はレーダーチャートベースを最新版にしてください）
+ * 基本能力値に単位をつけられる機能を追加。
  * 2022/1/24 Ver.2.3.3
  * フォントサイズを指定できる機能を追加。
  * 評価式の仕様を変更。
@@ -527,7 +531,7 @@
  * @parent EXPSetting
  * 
  * @param ElementStateSetting
- * @text 表示属性、ステート設定
+ * @text 属性設定
  * @default ------------------------------
  * 
  * @param ElementResist
@@ -536,22 +540,9 @@
  * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"\"}"]
  * @parent ElementStateSetting
  * 
- * @param StateResist
- * @type struct<StateData>[]
- * @text 状態耐性
- * @default ["{\"StateNo\":\"4\"}","{\"StateNo\":\"5\"}","{\"StateNo\":\"6\"}","{\"StateNo\":\"7\"}","{\"StateNo\":\"8\"}","{\"StateNo\":\"9\"}","{\"StateNo\":\"10\"}","{\"StateNo\":\"12\"}","{\"StateNo\":\"13\"}"]
- * @parent ElementStateSetting
- * 
  * @param ElementResistText
  * @text 属性有効度名前表示
  * @desc 属性有効度の属性を名前で表示させます。
- * @type boolean
- * @default false
- * @parent ElementStateSetting
- * 
- * @param StateResistText
- * @text ステート有効度名前表示
- * @desc ステート有効度のステートを名前で表示させます。
  * @type boolean
  * @default false
  * @parent ElementStateSetting
@@ -563,12 +554,36 @@
  * @default 2
  * @parent ElementStateSetting
  * 
+ * @param StateStateSetting
+ * @text ステート設定
+ * @default ------------------------------
+ * 
+ * @param StateResist
+ * @type struct<StateData>[]
+ * @text 状態耐性
+ * @default ["{\"StateNo\":\"4\"}","{\"StateNo\":\"5\"}","{\"StateNo\":\"6\"}","{\"StateNo\":\"7\"}","{\"StateNo\":\"8\"}","{\"StateNo\":\"9\"}","{\"StateNo\":\"10\"}","{\"StateNo\":\"12\"}","{\"StateNo\":\"13\"}"]
+ * @parent StateStateSetting
+ * 
+ * @param StateResistText
+ * @text ステート有効度名前表示
+ * @desc ステート有効度のステートを名前で表示させます。
+ * @type boolean
+ * @default false
+ * @parent StateStateSetting
+ * 
  * @param StateResistCol
  * @text ステート有効度の表示列数
  * @desc ステート有効度の表示列数を設定します。
  * @type number
  * @default 2
- * @parent ElementStateSetting
+ * @parent StateStateSetting
+ * 
+ * @param StateResistColor
+ * @text ステート無効化時の色
+ * @desc ステート無効化の時の色。（テキストタブでインデックスカラー指定可）
+ * @type number
+ * @default 0
+ * @parent StateStateSetting
  * 
  * @param ElementRadarChart
  * @text 属性耐性レーダーチャート
@@ -856,23 +871,23 @@
  * @value 10
  * @option ＭＰ(4)(5)(6)(7)
  * @value 11
- * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
  * @value 12
- * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
  * @value 13
- * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
  * @value 14
- * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(10)(14)(15)
  * @value 15
- * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
  * @value 16
- * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(11)(15)
  * @value 17
  * @option ＴＰ(4)(5)(6)(7)
  * @value 19
- * @option 最大ＨＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
+ * @option 最大ＨＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
  * @value 42
- * @option 最大ＭＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(15)
+ * @option 最大ＭＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
  * @value 43
  * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
  * @value 20
@@ -1156,8 +1171,8 @@ const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
 const StatusWindowsSkin = (String(parameters['StatusWindowsSkin'])) || null;
 const EquipNameVisible = Number(parameters['EquipNameVisible'] || 1);
 const EXPGaugeVisible = eval(parameters['EXPGaugeVisible'] || "true");
-const EXPGaugeColor1 = Number(parameters['EXPGaugeColor1'] || 17);
-const EXPGaugeColor2 = Number(parameters['EXPGaugeColor2'] || 6);
+const EXPGaugeColor1 = (DataManager.nuun_structureData(parameters['EXPGaugeColor1'])) || 17;
+const EXPGaugeColor2 = (DataManager.nuun_structureData(parameters['EXPGaugeColor2'])) || 6;
 const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const actorPosition = Number(parameters['actorPosition'] || 2);
@@ -1169,6 +1184,7 @@ const StateResist = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(param
 const ElementResistCol = Number(parameters['ElementResistCol'] || 2);
 const StateResistCol = Number(parameters['StateResistCol'] || 2);
 const EquipIcons = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipIcons'])) : [];
+const StateResistColor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 0;
 const StatusRadarChartRadius = Number(parameters['StatusRadarChartRadius'] || 100);
 const StatusRadarChartFramecolor = Number(parameters['StatusResistCol'] || 15);
 const StatusRadarChartLineColor = Number(parameters['StatusRadarChartLineColor'] || 15);
@@ -1179,18 +1195,18 @@ const StatusRadarChartY = Number(parameters['StatusRadarChartY'] || 0);
 const StatusRadarChart_FontSize = Number(parameters['StatusRadarChart_FontSize'] || 0);
 const StatusRadarChartParamList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusRadarChartParamList'])) : [];
 const ElementRadarChartRadius = Number(parameters['ElementRadarChartRadius'] || 100);
-const ElementRadarChartFramecolor = Number(parameters['ElementRadarChartFramecolor'] || 15);
-const ElementRadarChartLineColor = Number(parameters['ElementRadarChartLineColor'] || 15);
-const ElementRadarChartMainColor1 = Number(parameters['ElementRadarChartMainColor1'] || 3);
-const ElementRadarChartMainColor2 = Number(parameters['ElementRadarChartMainColor2'] || 3);
+const ElementRadarChartFramecolor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 15;
+const ElementRadarChartLineColor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 15;
+const ElementRadarChartMainColor1 = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 3;
+const ElementRadarChartMainColor2 = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 3;
 const ElementRadarChartX = Number(parameters['ElementRadarChartX'] || 0);
 const ElementRadarChartY = Number(parameters['ElementRadarChartY'] || 0);
 const ElementRadarChart_FontSize = Number(parameters['ElementRadarChart_FontSize'] || 0);
 const StateRadarChartRadius = Number(parameters['StateRadarChartRadius'] || 100);
-const StateRadarChartFramecolor = Number(parameters['StateRadarChartFramecolor'] || 15);
-const StateRadarChartLineColor = Number(parameters['StateRadarChartLineColor'] || 15);
-const StateRadarChartMainColor1 = Number(parameters['StateRadarChartMainColor1'] || 3);
-const StateRadarChartMainColor2 = Number(parameters['StateRadarChartMainColor2'] || 3);
+const StateRadarChartFramecolor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 15;
+const StateRadarChartLineColor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 15;
+const StateRadarChartMainColor1 = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 3;
+const StateRadarChartMainColor2 = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 3;
 const StateRadarChartX = Number(parameters['StateRadarChartX'] || 0);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 0);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);
@@ -1699,6 +1715,7 @@ Window_Status.prototype.paramNameShow = function(list, actor, params) {
     return list.ParamName;
   }
   switch (params) {
+    case 0:
     case 1:
     case 2:
     case 3:
@@ -1763,6 +1780,7 @@ Window_Status.prototype.paramShow = function(list, actor, params, detaEval) {
     return eval(detaEval);
   }
   switch (params) {
+    case 0:
     case 1:
     case 2:
     case 3:
@@ -1808,7 +1826,7 @@ Window_Status.prototype.paramShow = function(list, actor, params, detaEval) {
 Window_Status.prototype.horzLine = function(list, x, y, width) {
   const lineY = y + this.lineHeight() / 2 - 1;
   this.contents.paintOpacity = 48;
-  this.contents.fillRect(x, lineY, width, 2, this.getColorCode(list.NameColor));
+  this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(list.NameColor));
   this.contents.paintOpacity = 255;
 };
 
@@ -1840,11 +1858,15 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
       }
       let nameText = this.paramNameShow(list, actor, params);
       let textWidth = this.systemWidth(list.SystemItemWidth, width);
-      this.changeTextColor(this.getColorCode(list.NameColor));
+      this.changeTextColor(NuunManager.getColorCode(list.NameColor));
       this.drawText(nameText, x, y, textWidth);
       this.resetTextColor();
-      if (params >= 10 && params < 30) {
+      if (params >= 2 && params < 8) {
+        text += list.paramUnit ? String(list.paramUnit) : "";
+      } else if (params >= 10 && params < 30) {
         text += list.paramUnit ? String(list.paramUnit) : " %";
+      } else if (params === 42 || params === 43) {
+        text += list.paramUnit ? String(list.paramUnit) : "";
       }
       this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
       this.resetTextColor();
@@ -1858,7 +1880,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
   const equips = this._actor.equips();
   const e1uipsLength = list.EquipNum > 0 ? list.EquipNum : equips.length;
   let y2 = y;
-  this.changeTextColor(this.getColorCode(list.NameColor));
+  this.changeTextColor(NuunManager.getColorCode(list.NameColor));
   const text = list.paramName;
   if (text) {
     this.drawText(text, x, y, width);
@@ -1883,7 +1905,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
     if (EquipNameVisible === 1 || EquipNameVisible === 3) {//デフォルト
       const slotName = this.actorSlotName(actor, index);
       sw += this.systemWidth(list.SystemItemWidth, width2);
-      this.changeTextColor(this.getColorCode(list.NameColor));
+      this.changeTextColor(NuunManager.getColorCode(list.NameColor));
       this.drawText(slotName, x2 + iconWidth, y, sw);
     }
     sw += iconWidth;
@@ -1896,7 +1918,7 @@ Window_Status.prototype.drawProfile = function(list, actor, x, y, width) {
   const text = list.paramName;
   this.contentsFontSize(list);
   if (text) {
-    this.changeTextColor(this.getColorCode(list.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
     y += this.lineHeight();
   }
@@ -1909,7 +1931,7 @@ Window_Status.prototype.drawDesc = function(list, actor, x, y, width) {
   const text = list.paramName;
   this.contentsFontSize(list);
   if (text) {
-    this.changeTextColor(this.getColorCode(list.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
     y += this.lineHeight();
   }
@@ -1924,7 +1946,7 @@ Window_Status.prototype.drawName = function(list, x, y, width) {
   const text = list.ParamName;
   this.contentsFontSize(list);
   if (text) {
-    this.changeTextColor(this.getColorCode(list.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
   }
   this.resetTextColor();
@@ -1940,7 +1962,7 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
   let textWidth = 0;
   if (nameText) {
     textWidth = this.systemWidth(list.SystemItemWidth, width);
-    this.changeTextColor(this.getColorCode(list.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(nameText , x, y, textWidth);
   }
   let text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : undefined;
@@ -1959,7 +1981,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
   this.contentsFontSize(list);
   const text = list.ParamNamee;
   if (text) {
-    this.changeTextColor(this.getColorCode(list.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
     y += this.lineHeight();
   }
@@ -1981,7 +2003,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
         if (ElementResistText || !iconId) {
           const name = $dataSystem.elements[elementId];
           textWidth += this.systemWidth(list.SystemItemWidth, width2);
-          this.changeTextColor(this.getColorCode(list.NameColor));
+          this.changeTextColor(NuunManager.getColorCode(list.NameColor));
           this.drawText(name, x3, y2, textWidth);
         } else if (iconId > 0) {
           this.drawIcon(iconId, x3, y2 + 2);
@@ -2002,7 +2024,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
   this.contentsFontSize(list);
   const text = list.ParamName;
   if (text) {
-    this.changeTextColor(this.getColorCode(list.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);
     y += this.lineHeight();
   }
@@ -2024,7 +2046,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
         if (StateResistText || iconId === 0) {
           const name = $dataStates[stateId].name;
           textWidth += this.systemWidth(list.SystemItemWidth, width2);
-          this.changeTextColor(this.getColorCode(list.NameColor));
+          this.changeTextColor(NuunManager.getColorCode(list.NameColor));
           this.drawText(name, x3, y2, textWidth);
         } else if (iconId > 0) {
           this.drawIcon(iconId, x3, y2 + 2);
@@ -2033,7 +2055,11 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
         let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
         rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
         rate += list.paramUnit ? String(list.paramUnit) : " %";
-        this.resetTextColor();
+        if (actor.isStateResist(stateId)) {
+          this.changeTextColor(NuunManager.getColorCode(StateResistColor));
+        } else {
+          this.resetTextColor();
+        }
         this.drawText(rate, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
       }
     }
@@ -2044,7 +2070,7 @@ Window_Status.prototype.drawExpInfo = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
   this.contentsFontSize(list);
   const expTotal = TextManager.expTotal.format(TextManager.exp);
-  this.changeTextColor(this.getColorCode(list.NameColor));
+  this.changeTextColor(NuunManager.getColorCode(list.NameColor));
   this.drawText(expTotal, x, y, width);
   this.resetTextColor();
   this.drawText(this.expTotalValue(), x, y + lineHeight * 1, width, "right");
@@ -2054,7 +2080,7 @@ Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
   const lineHeight = this.lineHeight();
   this.contentsFontSize(list);
   const expNext = TextManager.expNext.format(TextManager.level);
-  this.changeTextColor(this.getColorCode(list.NameColor));
+  this.changeTextColor(NuunManager.getColorCode(list.NameColor));
   this.drawText(expNext, x, y + lineHeight * 1, width);
   this.resetTextColor();
   if (EXPGaugeVisible) {
@@ -2369,11 +2395,11 @@ Sprite_StatusExpGauge.prototype.currentMaxValue = function() {
 };
 
 Sprite_StatusExpGauge.prototype.gaugeColor1 = function() {
-  return ColorManager.expGaugeColor1();
+  return NuunManager.getColorCode(EXPGaugeColor1)
 };
 
 Sprite_StatusExpGauge.prototype.gaugeColor2 = function() {
-  return ColorManager.expGaugeColor2();
+  return NuunManager.getColorCode(EXPGaugeColor2)
 };
 
 ColorManager.expGaugeColor1 = function() {

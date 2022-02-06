@@ -11,7 +11,9 @@
  * @target MZ
  * @plugindesc レーダーチャートベース
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * レーダーチャートを実装するためのベースプラグインです。
@@ -21,6 +23,8 @@
  * 
  * 
  * 更新履歴
+ * 2022/2/6 Ver.1.0.2
+ * カラーコード指定により定義追加。
  * 2022/1/12 Ver.1.0.1
  * マイナスになると表示が不自然になるため修正。
  * 2021/7/18 Ver.1.0.0
@@ -79,10 +83,10 @@ Sprite_NUUN_RadarChart.prototype.constructor = Sprite_NUUN_RadarChart;
   };
 
   Sprite_NUUN_RadarChart.prototype.setupColor = function(framecolor, lineColor, mainColor1, mainColor2) {
-    this._frameColor = ColorManager.textColor(framecolor);
-    this._lineColor = ColorManager.textColor(lineColor);
-    const rgb1 = this.getColorRGB(ColorManager.textColor(mainColor1));
-    const rgb2 = this.getColorRGB(ColorManager.textColor(mainColor2));
+    this._frameColor = NuunManager.getColorCode(framecolor);
+    this._lineColor = NuunManager.getColorCode(lineColor);
+    const rgb1 = this.getColorRGB(NuunManager.getColorCode(mainColor1));
+    const rgb2 = this.getColorRGB(NuunManager.getColorCode(mainColor2));
     this._mainFrameColor = ColorManager.textColor(mainColor2);
     this._mainColor1 = "rgba("+ rgb1.red +","+ rgb1.green +","+ rgb1.blue +",0.2)";
     this._mainColor2 = "rgba("+ rgb2.red +","+ rgb2.green +","+ rgb2.blue +",0.9)";

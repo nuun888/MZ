@@ -89,6 +89,8 @@
  * 独自のパラメータ
  * this._actor 表示中のアクターのゲームデータ
  * dactor 表示中のアクターのデータベース
+ * ステート耐性のみ
+ * rate ステート有効度
  * 
  * キーボード操作
  * QWキー　キャラ切り替え
@@ -939,7 +941,7 @@
  * @value 51
  * @option 属性耐性(1)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
  * @value 60
- * @option ステート耐性(1)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
+ * @option ステート耐性(1)(3)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
  * @value 61
  * @option 装備(1)(2)(4)(5)(6)(7)(8)(9)(10)(14)(15)
  * @value 62
@@ -983,6 +985,7 @@
  * @text パラメータ評価式(3)
  * @type combo[]
  * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option actor.isStateResist(stateId) ? "無効" : rate;//ステート耐性
  * @default 
  * 
  * @param X_Position
@@ -2055,12 +2058,13 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
         let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
         rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
         rate += list.paramUnit ? String(list.paramUnit) : " %";
+        const rateText = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : rate;
         if (actor.isStateResist(stateId)) {
           this.changeTextColor(NuunManager.getColorCode(StateResistColor));
         } else {
           this.resetTextColor();
         }
-        this.drawText(rate, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
+        this.drawText(rateText, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
       }
     }
   }

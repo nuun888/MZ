@@ -15,7 +15,8 @@
  * @orderBefore NUUN_LevelUnlimited
  * 
  * @help
- * アクターの最大レベルを任意のタイミングで変更できます。
+ * アクターの最大レベルを任意のタイミングで変更または特徴により最大レベルを変更できます。
+ * 優先順位はアイテム、スキル、プラグインコマンドで変更したレベル ＞ 特徴での最大レベル ＞ 元の最大レベル
  * 
  * アイテム、スキルのメモ欄
  * <ChangeMaxLevel:[lavel]> レベルの上限を変更します。
@@ -23,11 +24,16 @@
  * <ChangeMaxLevelld:[lavel±]> レベルの上限を増減します。
  * <ChangeMaxLevelld:5> レベルの上限を５増やします。
  * 
+ * 特徴を有するメモ欄
+ * <F_ChangeMaxLevel:[lavel]> レベルの上限を変更します。
+ * <F_ChangeMaxLevel:50> レベルの上限を50に変更します。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/7 Ver.1.2.0
+ * 特徴があれば最大レベルを変更できる機能を追加。
  * 2021/12/7 Ver.1.1.0
  * 最大レベルを増減させる機能を追加。
  * 最大レベルを変更、増減させるスキル、アイテムを設定できる機能を追加。
@@ -112,7 +118,8 @@ Game_Actor.prototype.changeMaxLevelld = function(changeMaxLevel) {
 
 const _Game_Actor_maxLevel = Game_Actor.prototype.maxLevel;
 Game_Actor.prototype.maxLevel = function() {
-  return this._maxLevel > 0 ? this._maxLevel : _Game_Actor_maxLevel.call(this);
+  const _maxLevelTrait = this.maxLevelTrait();
+  return this._maxLevel > 0 ? this._maxLevel : (_maxLevelTrait > 0 ? _maxLevelTrait : _Game_Actor_maxLevel.call(this));
 };
 
 const _Game_Actor_changeExp = Game_Actor.prototype.changeExp;
@@ -142,4 +149,15 @@ const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffe
       this.makeSuccess(target);
     }
 };
+
+Game_Actor.prototype.maxLevelTrait = function() {
+  return this.traitObjects().reduce((r, trait) => {
+    if (trait.meta.F_ChangeMaxLevel && trait.meta.F_ChangeMaxLevel > r) {
+      return r = trait.meta.F_ChangeMaxLevel;
+    } else {
+      return r;
+    }
+  }, 0);
+};
+
 })();

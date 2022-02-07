@@ -11,9 +11,9 @@
 `<ChangeMaxLevelld:[lavel±]>` レベルの上限を増減します。  
 `<ChangeMaxLevelld:5>` レベルの上限を５増やします。  
 
-特徴を持つメモ欄
-`<F_ChangeMaxLevel:[lavel]>` レベルの上限を変更します。
-`<F_ChangeMaxLevel:50>` レベルの上限を50に変更します。
+### 特徴を持つメモ欄
+`<F_ChangeMaxLevel:[lavel]>` レベルの上限を変更します。  
+`<F_ChangeMaxLevel:50>` レベルの上限を50に変更します。  
 
 ### プラグインパラメータで設定
 #### 最大レベルの変更

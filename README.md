@@ -209,7 +209,8 @@
 
 | イベント　　　　　　　　　　　　　　　 | プラグイン　プラグイン数　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| イベント復活 |  |  |  |
+| [イベント復活](https://github.com/nuun888/MZ/blob/master/README/EventRevived.md) | [NUUN_EventRevived](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRevived.js) | 共 | 1.0.0 |
+|  |  |  |  |
 |  |  |  |  |
 
 | ユーティリティ　　　　　　　　　　　　 | プラグイン　プラグイン数2　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |

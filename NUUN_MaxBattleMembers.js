@@ -10,7 +10,8 @@
  * @target MZ
  * @plugindesc 戦闘メンバー数変更プラグイン
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
+ * 
  * 
  * @help
  * 戦闘参加メンバーの人数を変更します。またゲーム途中で最大バトルメンバー数を変更できます。
@@ -19,6 +20,8 @@
  * 最大戦闘メンバー数を前の数値より高く変更した場合、セーブ後のデータでは前の最大戦闘メンバー数よりフォロワーの画像が表示されません。
  * 
  * 更新履歴
+ * 2022/2/11 Ver.1.0.2
+ * 戦闘中に最大メンバー数を変更すると表示が乱れる問題を修正。
  * 2021/9/18 Ver.1.0.1
  * 戦闘開始時にエラーが出る問題を修正。
  * 2021/8/28 Ver.1.0.0
@@ -42,6 +45,7 @@
  * @default 4
  * @min 1
  * 
+ * 
  */
 
 var Imported = Imported || {};
@@ -64,18 +68,22 @@ Game_Party.prototype.initialize = function() {
 
 Game_Party.prototype.maxBattleMembers = function() {//再定義
   if (this._maxBattleMembers === undefined) {
-    this.setMaxBattleMembers(MaxBattleMemberNum)
+    this.setMaxBattleMembers(MaxBattleMemberNum);
   }
   return this._maxBattleMembers;
 };
 
 Game_Party.prototype.setMaxBattleMembers = function(num) {
   this._maxBattleMembers = num;
+  if (this.inBattle()) {
+    $gameTemp.requestBattleRefresh();
+  }
   $gamePlayer.refresh();
 };
 
 Window_BattleStatus.prototype.maxCols = function() {//再定義
   return $gameParty._maxBattleMembers;
 };
+
 
 })();

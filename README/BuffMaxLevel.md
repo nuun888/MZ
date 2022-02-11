@@ -1,4 +1,4 @@
-# [バフ、デバフ重ね掛け上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffMaxLevel.js)
+# [バフ、デバフ重ね掛け上限変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffMaxLevel.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffMaxLevel.js)
 

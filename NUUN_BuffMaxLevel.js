@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc バフ、デバフ重ね掛け上限突破
+ * @plugindesc バフ、デバフ重ね掛け上限変更
  * @author NUUN
  * @version 1.0.0
  * 

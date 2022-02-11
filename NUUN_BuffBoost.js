@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc バフ、デバフ倍率増減特徴
+ * @plugindesc バフ、デバフ倍率効果率増減特徴
  * @author NUUN
  * @version 1.0.0
  * 

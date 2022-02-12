@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/12 Ver.1.4.3
+ * 一部変数名が間違っていた問題を修正。
  * 2022/1/12 Ver.1.4.2
  * 敵MPゲージ、敵TPゲージのゲージ適用するための処理の追加。
  * 2022/1/9 Ver.1.4.1
@@ -75,7 +77,7 @@ function structureData(params) {
 }
 
 function nuun_GausePlugins() {
-  return Imported.NUUN_ButlerHPGauge || Imported.NUUN_EnmeyMPGauge || Imported.NUUN_EnmeyTPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge || Imported.NUUN_EnemyStateIconEX;
+  return Imported.NUUN_ButlerHPGauge || Imported.NUUN_EnemyMPGauge || Imported.NUUN_EnemyTPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge || Imported.NUUN_EnemyStateIconEX;
 }
 
 NuunManager.getColorCode = function(color) {

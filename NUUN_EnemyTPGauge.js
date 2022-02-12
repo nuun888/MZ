@@ -12,7 +12,7 @@
  * @plugindesc  敵TPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -50,6 +50,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/12 Ver.1.0.3
+ * ダメージ時に表示を指定の時に戦闘開始時にゲージが表示されてしまう問題を修正。
  * 2022/1/10 Ver.1.0.2
  * 再修正。
  * 2022/1/10 Ver.1.0.1
@@ -339,9 +341,9 @@ Sprite_EnemyTPGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_EnemyTPGauge.prototype.constructor = Sprite_EnemyTPGauge;
 
 Sprite_EnemyTPGauge.prototype.initialize = function() {
-  Sprite_Gauge.prototype.initialize.call(this);
   this._gaugeDuration = 0;
-  this._startVisible = true;
+  this._startVisible = TPVisible >= 2;
+  Sprite_Gauge.prototype.initialize.call(this);
 };
 
 Sprite_EnemyTPGauge.prototype.bitmapWidth = function() {
@@ -424,14 +426,14 @@ Sprite_EnemyTPGauge.prototype.gaugeEnemyBookVisible = function() {
   return true;
 };
 
-const _Sprite_EnemyTPGauge_updateTargetValue = Sprite_EnemyTPGauge.prototype.updateTargetValue;
 Sprite_EnemyTPGauge.prototype.updateTargetValue = function(value, maxValue) {
-  if (!this._startVisible && !isNaN(this._value) && TPVisible >= 2) {
+  if (!this._startVisible && TPVisible >= 2) {
     this._gaugeDuration = 60;
-  } else if (this._startVisible) {
+  }
+  if (this._startVisible && !isNaN(this._targetValue)) {
     this._startVisible = false;
   }
-  _Sprite_EnemyTPGauge_updateTargetValue.call(this, value, maxValue);
+  Sprite_Gauge.prototype.updateTargetValue.call(this, value, maxValue);
 };
 
 const _Sprite_EnemyTPGauge_updateGaugeAnimation  = Sprite_EnemyTPGauge.prototype.updateGaugeAnimation;

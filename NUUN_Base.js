@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.4.2
+ * @version 1.4.3
  * 
  * @help
  * 共通処理を行うベースプラグインです。

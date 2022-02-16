@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.3.4
+# Ver.2.3.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -72,6 +72,9 @@ Y座標を指定します。Y表示列位置からの相対座標になります
 ### レーダーチャート設定
 
 ### 更新履歴
+2022/2/16 Ver.2.3.5  
+パラメータ評価式を属性耐性にも適用。  
+ステート耐性のアイコンをステータス用のアイコン画像にする機能を追加。  
 2022/2/6 Ver.2.3.4  
 ステート無効化の有効度の色を指定できる機能を追加。  
 カラーコードに対応。要共通処理Ver.1.4.0以降（レーダーチャートを使用している場合はレーダーチャートベースを最新版にしてください）  

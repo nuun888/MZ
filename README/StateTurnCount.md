@@ -1,5 +1,5 @@
 # [ステート経過ターンカウント](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js)  
 
 ステートの現在の経過ターンを取得できるようにします。  

@@ -15,7 +15,7 @@
 | ---------- | ------------- | ------------- | -------- |
 | [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.4.3 |
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.3 |
-| [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md) | [NUUN_StateTurnCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js) |  | 1.1.0 |
+| [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md) | [NUUN_StateTurnCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js) |  | 1.1.1 |
 | [レーダーチャート表示ベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md) | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) | 共 | 1.0.2 |
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.3 |
 | [ドロップ率確率操作ベース](https://github.com/nuun888/MZ/blob/master/README/DropItemRateBase.md) |  [NUUN_DropItemRateBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemRateBase.js) |  | 1.0.0 |
@@ -107,7 +107,7 @@
 | [スリップダメージ拡張](https://github.com/nuun888/MZ/blob/master/README/SlipDamageEX.md) | [NUUN_SlipDamageEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js) | ス | 1.1.0 |
 | [ステート、バフターン数増減特徴](https://github.com/nuun888/MZ/blob/master/README/StateBuffTurnPlus.md) | [NUUN_StateBuffTurnPlus](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnPlus.js) |  | 1.0.0 |
 | [ステート付与率増減特徴](https://github.com/nuun888/MZ/blob/master/README/AddStateRateBoost.md) | [NUUN_AddStateRateBoost](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateRateBoost.js) |  | 1.0.0 |
-| [ステート残りターン表示](https://github.com/nuun888/MZ/blob/master/README/NUUN_StateTurn.md) | [NUUN_StateTurn](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js) | ス対 | 1.1.0 |
+| [ステート残りターン表示](https://github.com/nuun888/MZ/blob/master/README/NUUN_StateTurn.md) | [NUUN_StateTurn](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js) | ス対 | 1.1.1 |
 | [ステート横並び表示](https://github.com/nuun888/MZ/blob/master/README/StateIconSideBySide.md) | [NUUN_StateIconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js) | ス対 | 1.2.0 |
 | [バフ、デバフ重ね掛け上限変更](https://github.com/nuun888/MZ/blob/master/README/BuffMaxLevel.md) | [NUUN_BuffMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffMaxLevel.js) |  | 1.0.0 |
 | [バフ、デバフ倍率効果率増減特徴](https://github.com/nuun888/MZ/blob/master/README/BuffBoost.md) | [NUUN_BuffBoost](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffBoost.js) |  | 1.0.0 |

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.3.4
+ * @version 2.3.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -107,10 +107,14 @@
  * Ver.2.3.2以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/2/16 Ver.2.3.5
+ * パラメータ評価式を属性耐性にも適用。
+ * ステート耐性のアイコンをステータス用のアイコン画像にする機能を追加。
  * 2022/2/6 Ver.2.3.4
  * ステート無効化の有効度の色を指定できる機能を追加。
  * カラーコードに対応。要共通処理Ver.1.4.0以降（レーダーチャートを使用している場合はレーダーチャートベースを最新版にしてください）
  * 基本能力値に単位をつけられる機能を追加。
+ * パラメータ評価式をステート耐性にも適用。
  * 2022/1/24 Ver.2.3.3
  * フォントサイズを指定できる機能を追加。
  * 評価式の仕様を変更。
@@ -817,6 +821,12 @@
  * @desc 表示するステートを指定します。
  * @type state
  * @default 0
+ * 
+ * @param StateIconId
+ * @text ステートアイコンID
+ * @desc アイコンのIDを指定します。0の場合はデータベースのアイコンが表示されます。
+ * @type number
+ * @default 0
  *
  */
 /*~struct~EquipIconsData:
@@ -939,7 +949,7 @@
  * @value 50
  * @option 名称のみ(1)(4)(5)(6)(7)(8)(10)(15)
  * @value 51
- * @option 属性耐性(1)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
+ * @option 属性耐性(1)(3)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
  * @value 60
  * @option ステート耐性(1)(3)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
  * @value 61
@@ -2015,8 +2025,9 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
         let rate = actor.elementRate(elementId) * 100;
         rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
         rate += list.paramUnit ? String(list.paramUnit) : " %";
+        const rateText = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : rate;
         this.resetTextColor();
-        this.drawText(rate, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
+        this.drawText(rateText, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
       }
     }
   }
@@ -2045,7 +2056,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
         this.drawContentsBackground(list.Back, x2, y2, width);
         x3 = this.contensX(x2);
         width2 = this.contensWidth(width);
-        let iconId = $dataStates[stateId].iconIndex;
+        let iconId = StateResist[i].StateIconId > 0 ? StateResist[i].StateIconId : $dataStates[stateId].iconIndex;
         if (StateResistText || iconId === 0) {
           const name = $dataStates[stateId].name;
           textWidth += this.systemWidth(list.SystemItemWidth, width2);

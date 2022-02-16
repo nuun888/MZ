@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/16 Ver.1.2.1
+ * 経過ターン表示でステート付与時にエラーが出る問題を修正。
  * 2022/1/21 Ver.1.2.0
  * ステートのターンの表示方法に経過ターンを追加。（要ステート経過ターンカウント）
  * 2021/9/23 Ver.1.1.0
@@ -382,7 +384,7 @@ Game_BattlerBase.prototype.nuun_isNonRemoval = function(state) {
 };
 
 Game_BattlerBase.prototype.nuun_getStateTurn = function(id) {
-  return (Imported.NUUN_StateTurnCount && TurnMode === 'elapsed' ? this.isStateNowTurn(id) : this._stateTurns[id]) + TurnCorrection;
+  return (Imported.NUUN_StateTurnCount && TurnMode === 'elapsed' ? this.getStateNowTurn(id) : this._stateTurns[id]) + TurnCorrection;
 };
 
 Game_BattlerBase.prototype.nuun_getBuffTurn = function(id) {

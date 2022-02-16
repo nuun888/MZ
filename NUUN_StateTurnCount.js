@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステート経過ターンカウント
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * ステートの現在の経過ターンを取得できるようにします。
@@ -19,6 +19,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/16 Ver.1.1.1
+ * ゲームをロードした後にエラーが出る問題を修正。
  * 2022/1/21 Ver.1.1.0
  * バフの経過ターン処理を追加。
  * 2022/1/16 Ver.1.0.0
@@ -44,31 +46,45 @@ Game_BattlerBase.prototype.clearStates = function() {
     this._stateNowTurns = [];
 };
 
+Game_BattlerBase.prototype.clearStateNowTurns = function() {
+    if (!this._stateNowTurns) {
+        this._stateNowTurns = [];
+    }
+};
+
 const _Game_BattlerBase_eraseState = Game_BattlerBase.prototype.eraseState;
 Game_BattlerBase.prototype.eraseState = function(stateId) {
-    _Game_BattlerBase_eraseState.call(this, stateId)
+    _Game_BattlerBase_eraseState.call(this, stateId);
+    this.clearStateNowTurns();
     delete this._stateNowTurns[stateId];
 };
 
 const _Game_BattlerBase_updateStateTurns = Game_BattlerBase.prototype.updateStateTurns;
 Game_BattlerBase.prototype.updateStateTurns = function() {
     _Game_BattlerBase_updateStateTurns.call(this);
+    this.clearStateNowTurns();
     for (const stateId of this._states) {
-        if (stateId > 0) {
+        if (stateId > 0) {  
             this._stateNowTurns[stateId]++;
         }
     }
 };
 
-Game_BattlerBase.prototype.isStateNowTurn = function(stateId) {
+Game_BattlerBase.prototype.setStateNowTurn = function(stateId, turn) {
+    this.clearStateNowTurns();
+    this._stateNowTurns[stateId] = turn;
+};
+
+Game_BattlerBase.prototype.getStateNowTurn = function(stateId) {
+    this.clearStateNowTurns();
     return this._stateNowTurns[stateId];
 };
 
 const _Game_BattlerBase_resetStateCounts = Game_BattlerBase.prototype.resetStateCounts;
 Game_BattlerBase.prototype.resetStateCounts = function(stateId) {
     _Game_BattlerBase_resetStateCounts.call(this, stateId);
-    if (StateTurnReset || !this._stateNowTurns[stateId]) {
-        this._stateNowTurns[stateId] = 1;
+    if (StateTurnReset || !this.getStateNowTurn(stateId)) {
+        this.setStateNowTurn(stateId, 1);
     }
 };
 
@@ -79,16 +95,41 @@ Game_BattlerBase.prototype.clearBuffs = function() {
     this._debuffNowTurns = [0, 0, 0, 0, 0, 0, 0, 0];
 };
 
+Game_BattlerBase.prototype.clearBuffNowTurns = function() {
+    if (!this._buffNowTurns) {
+        this._buffNowTurns = [0, 0, 0, 0, 0, 0, 0, 0];
+    }
+};
+
+Game_BattlerBase.prototype.clearDebuffNowTurns = function() {
+    if (!this._debuffNowTurns) {
+        this._debuffNowTurns = [0, 0, 0, 0, 0, 0, 0, 0];
+    }
+};
+
+Game_BattlerBase.prototype.setBuffNowTurn = function(buffId, turn) {
+    this.clearBuffNowTurns();
+    this._buffNowTurns[buffId] = turn;
+};
+
+Game_BattlerBase.prototype.setDebuffNowTurn = function(buffId, turn) {
+    this.clearDebuffNowTurns();
+    this._debuffNowTurns[buffId] = turn;
+};
+
+
 const _Game_BattlerBase_eraseBuff = Game_BattlerBase.prototype.eraseBuff;
 Game_BattlerBase.prototype.eraseBuff = function(paramId) {
-    _Game_BattlerBase_eraseBuff.call(this, paramId)
-    this._buffNowTurns[paramId] = 0;
-    this._debuffNowTurns[paramId] = 0;
+    _Game_BattlerBase_eraseBuff.call(this, paramId);
+    this.setBuffNowTurn(paramId, 0);
+    this.setDebuffNowTurn(paramId, 0);
 };
 
 const _Game_BattlerBase_updateBuffTurns = Game_BattlerBase.prototype.updateBuffTurns;
 Game_BattlerBase.prototype.updateBuffTurns = function() {
     _Game_BattlerBase_updateBuffTurns.call(this);
+    this.clearBuffNowTurns();
+    this.clearDebuffNowTurns();
     for (let i = 0; i < this._buffTurns.length; i++) {
         if (this._buffs[i] !== 0) {
             this.isBuffAffected(i) ? this._buffNowTurns[i]++ : this._debuffNowTurns[i]++;
@@ -106,21 +147,23 @@ Game_BattlerBase.prototype.overwriteBuffTurns = function(paramId, turns) {
 };
 
 Game_BattlerBase.prototype.isBuffNowTurn = function(paramId) {
+    this.clearBuffNowTurns();
     return this._buffNowTurns[paramId];
 };
 
 Game_BattlerBase.prototype.isDeBuffNowTurn = function(paramId) {
+    this.clearDebuffNowTurns();
     return this._debuffNowTurns[paramId];
 };
 
 Game_BattlerBase.prototype.resetBuffNowTurn = function(paramId) {
-    this._debuffNowTurns[paramId] = 0;
-    this._buffNowTurns[paramId] = 1;
+    this.setBuffNowTurn(paramId, 1);
+    this.setDebuffNowTurn(paramId, 0);
 };
 
 Game_BattlerBase.prototype.resetDebuffNowTurn = function(paramId) {
-    this._buffNowTurns[paramId] = 0;
-    this._debuffNowTurns[paramId] = 1;
+    this.setBuffNowTurn(paramId, 0);
+    this.setDebuffNowTurn(paramId, 1);
 };
 
 Game_BattlerBase.prototype.getBuffNowTurn = function(paramId) {

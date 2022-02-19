@@ -104,7 +104,7 @@
 | ステート、バフ　　　　　　　　　　　　 | プラグイン　プラグイン数6　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [ステート付与の仕様変更](https://github.com/nuun888/MZ/blob/master/README/AddStateDeviation.md) | [NUUN_AddStateDeviation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js) |  | 1.0.1 |
-| [スリップダメージ拡張](https://github.com/nuun888/MZ/blob/master/README/SlipDamageEX.md) | [NUUN_SlipDamageEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js) | ス | 1.1.0 |
+| [スリップダメージ拡張](https://github.com/nuun888/MZ/blob/master/README/SlipDamageEX.md) | [NUUN_SlipDamageEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js) | ス | 1.1.1 |
 | [ステート、バフターン数増減特徴](https://github.com/nuun888/MZ/blob/master/README/StateBuffTurnPlus.md) | [NUUN_StateBuffTurnPlus](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnPlus.js) |  | 1.0.0 |
 | [ステート付与率増減特徴](https://github.com/nuun888/MZ/blob/master/README/AddStateRateBoost.md) | [NUUN_AddStateRateBoost](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateRateBoost.js) |  | 1.0.0 |
 | [ステート残りターン表示](https://github.com/nuun888/MZ/blob/master/README/NUUN_StateTurn.md) | [NUUN_StateTurn](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js) | ス対 | 1.1.1 |
@@ -144,7 +144,7 @@
 | ---------- | ------------- | ------------- | -------- |
 | [床ダメージの処理を拡張](https://github.com/nuun888/MZ/blob/master/README/DamagedFloorEX.md) | [NUUN_DamagedFloorEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js) | 共 | 1.0.3 |
 | [地域マップ名](https://github.com/nuun888/MZ/blob/master/README/RegionMapName.md) | [NUUN_RegionMapName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapName.js) | 共 | 1.0.0 |
-| [シームレスマップ](https://github.com/nuun888/MZ/blob/master/README/SeamlessMap.md) | [NUUN_SeamlessMap](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js) | 共 | 1.1.1 |
+| [シームレスマップ](https://github.com/nuun888/MZ/blob/master/README/SeamlessMap.md) | [NUUN_SeamlessMap](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js) | 共 | 1.1.2 |
 |  |  |  |  |
 
 | コマンド　　　　　　　　　　　　　　　 | プラグイン　プラグイン数3　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |

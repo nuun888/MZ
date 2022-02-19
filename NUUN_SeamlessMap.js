@@ -40,6 +40,8 @@
  * 該当のイベントコマンドを設定した後にリセットします。
  * 
  * 更新履歴
+ * 2022/2/19 Ver.1.1.2
+ * マップ移動後にエラーが出る問題を修正。
  * 2022/2/6 Ver.1.1.1
  * マップ移動時にイベントが正常に適用されない問題を修正。
  * 2022/2/6 Ver.1.1.0
@@ -171,7 +173,7 @@ function getSeamlessMapData(mapId) {
 
 function seamlessMapCheck(seamlessMap, width, height) {
     return seamlessMap.every(map => map.width === width && map.height === height);
-}
+};
 
 function getSeamlessMapPosition(mapId) {
     const data = getSeamlessMapData(mapId);
@@ -231,6 +233,20 @@ DataManager.loadMapData = function(mapId) {
         mapId = id;
     }
     _DataManager_loadMapData.call(this, mapId);
+};
+
+const _DataManager_isMapLoaded = DataManager.isMapLoaded;
+DataManager.isMapLoaded = function() {
+    if (this.seamlessMapId.length > 1) {
+        return this.isSeamlessMapLoaded();
+    } else {
+        return _DataManager_isMapLoaded.call(this);
+    }
+};
+
+DataManager.isSeamlessMapLoaded = function() {
+    this.checkError();
+    return !!$dataSeamlessMap.every(map => !!map);
 };
 
 

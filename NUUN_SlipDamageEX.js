@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc スリップダメージ拡張
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_StateTurnCount
  * @orderAfter NUUN_StateTurnCount
  * 
@@ -39,6 +39,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/19 Ver.1.1.1
+ * Ver.1.0.1以降で移動中にエラーが出る問題を修正。
  * 2022/1/29 Ver.1.1.0
  * スリップダメージに固定値を設定できる機能を追加。
  * 2022/1/16 Ver.1.0.1
@@ -61,7 +63,7 @@ Game_Battler.prototype.slipDamageEX = function(type) {
     for (const stateId of this._states) {
         const data = $dataStates[stateId].meta[tag];
         if (data) {
-            const st = this.isStateNowTurn(stateId);
+            const st = this.getStateNowTurn(stateId);
             slipDamage += eval(data) / 100;
         }
     }
@@ -76,7 +78,7 @@ Game_Battler.prototype.slipDamageFixedEX = function(type) {
     for (const stateId of this._states) {
         const data = $dataStates[stateId].meta[tag];
         if (data) {
-            const st = this.isStateNowTurn(stateId);
+            const st = this.getStateNowTurn(stateId);
             slipDamage += eval(data);
         }
     }

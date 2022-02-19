@@ -1,5 +1,5 @@
 # [スリップダメージ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js)  
 #### 必須、前提プラグイン
 [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)  
@@ -28,6 +28,8 @@ st:ステートのターン
 ステートの経過ターンを取得するには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)が必要です。
 
 ## 更新履歴
+2022/2/19 Ver.1.1.1  
+Ver.1.0.1以降で移動中にエラーが出る問題を修正。  
 2022/1/29 Ver.1.1.0  
 スリップダメージに固定値を設定できる機能を追加。  
 2022/1/16 Ver.1.0.1  

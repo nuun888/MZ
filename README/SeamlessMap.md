@@ -1,5 +1,5 @@
 # [シームレスマップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,8 @@
 該当のイベントコマンドを実行後「イベントIDセット」はリセットされます。
 
 ## 更新履歴
+2022/2/19 Ver.1.1.2  
+マップ移動後にエラーが出る問題を修正。  
 2022/2/6 Ver.1.1.1  
 マップ移動時にイベントが正常に適用されない問題を修正。  
 2022/2/6 Ver.1.1.0  

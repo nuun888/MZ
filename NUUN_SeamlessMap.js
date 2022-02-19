@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc シームレスマップ
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 

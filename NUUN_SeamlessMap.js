@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc シームレスマップ
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -40,6 +40,8 @@
  * 該当のイベントコマンドを設定した後にリセットします。
  * 
  * 更新履歴
+ * 2022/2/20 Ver.1.1.3
+ * 再修正。
  * 2022/2/19 Ver.1.1.2
  * マップ移動後にエラーが出る問題を修正。
  * 2022/2/6 Ver.1.1.1
@@ -246,7 +248,7 @@ DataManager.isMapLoaded = function() {
 
 DataManager.isSeamlessMapLoaded = function() {
     this.checkError();
-    return !!$dataSeamlessMap.every(map => !!map);
+    return !!$dataMap && !!$dataSeamlessMap.every(map => !!map);
 };
 
 
@@ -268,8 +270,8 @@ Scene_Map.prototype.seamlessMap = function(data) {
     if (data) {
         const maps = [];
         const seamlessMap = $dataSeamlessMap;
-        const width = $gameMap.width();
-        const height = $gameMap.height();
+        const width = seamlessMap[0].width;
+        const height = seamlessMap[0].height;
         $gameMap.orgWidth = width;
         $gameMap.orgHeight = height;
         if (seamlessMapCheck(seamlessMap, width, height)) {

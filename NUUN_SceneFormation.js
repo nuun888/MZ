@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/23 Ver.1.6.1
+ * 固定アクター対応により処理修正。
  * 2022/2/23 Ver.1.6.0
  * 戦闘メンバー人数の可変対応。
  * 2021/12/26 Ver.1.5.2
@@ -1283,7 +1285,7 @@ Window_StatusBase.prototype.drawBackGroundActor = function(index) {
     if (actor && DeadActorColor >= 0 && actor.isDead()) {
       const deadcolor = NuunManager.getColorCode(DeadActorColor);
       this.contentsBack.fillRect(rect.x, y, rect.width, height, deadcolor);
-    } else if (Imported.NUUN_ActorFixed && actor && FixedActorBackColor >= 0 && actor.getFixed()) {
+    } else if (Imported.NUUN_ActorFixed && actor && FixedActorBackColor >= 0 && actor.isFixed()) {
       const fixedcColor = NuunManager.getColorCode(FixedActorBackColor);
       this.contentsBack.fillRect(rect.x, y, rect.width, height, fixedcColor);
     } else if (Imported.NUUN_SceneFormation_SupportActor && SupportActorColor >= 0 && actor && actor.actor().meta.SupportActor) {
@@ -1366,12 +1368,12 @@ Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
   const pendingActor = pendingMode === 'battle' ? this.actor(pendingIndex) : $gameParty.formationMember()[pendingIndex];
   if (pendingMode && (!actor && !pendingActor)) {
     return false;
-  } if (!pendingActor) {
-    return Window_StatusBase.prototype.isCurrentItemEnabled.call(this) && (pendingMode ? this.isChangeActorEnabled(actor, pendingActor, -1) : true);
   } else if (!actor) {
     return this.isChangeActorEnabled(actor, pendingActor, 1);
+  } else if (!pendingActor) {
+    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this) && (pendingMode ? this.isChangeActorEnabled(actor, pendingActor, -1) : true);
   } else if (cursorMode !== pendingMode) {
-    return Window_StatusBase.prototype.isCurrentItemEnabled.call(this) && this.isChangeActorEnabled(actor, pendingActor, 0);
+    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this) && this.isChangeActorEnabled(actor, pendingActor, 0);
   } else {
     return true;
   }
@@ -1506,12 +1508,16 @@ Window_FormationBattleMember.prototype.getPendingMode = function() {
   return pendingMode;
 };
 
-Window_FormationBattleMember.prototype.getCursorModee = function() {
+Window_FormationBattleMember.prototype.getCursorMode = function() {
   return cursorMode;
 };
 
 Window_FormationBattleMember.prototype.pendingIndex = function() {
   return this._pendingIndex;
+};
+
+Window_FormationBattleMember.prototype.formationPendingIndex = function() {
+  return pendingIndex;
 };
 
 Window_FormationBattleMember.prototype.setPendingIndex = function(index) {
@@ -1561,14 +1567,14 @@ Window_FormationMember.prototype.processOk = function() {
 Window_FormationMember.prototype.isCurrentItemEnabled = function() {
   const actor = this.actor(this.index());
   const pendingActor = pendingMode === 'battle' ? $gameParty.formationBattleMember()[pendingIndex] : this.actor(pendingIndex);
-  if (pendingMode && (!actor && !pendingActor)) {
+  if (pendingMode && (!actor && !pendingActor)) {console.log(pendingMode)
     return false;
-  } else if (!pendingActor) {
-    return Window_StatusBase.prototype.isCurrentItemEnabled.call(this);
   } else if (!actor) {
     return this.isChangeActorEnabled(pendingActor, null, -1);
+  } else if (!pendingActor) {
+    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this);
   } else if (cursorMode !== pendingMode) {
-    return Window_StatusBase.prototype.isCurrentItemEnabled.call(this) && this.isChangeActorEnabled(pendingActor, actor, 0);
+    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this) && this.isChangeActorEnabled(pendingActor, actor, 0);
   } else {
     return true;
   }
@@ -1709,6 +1715,10 @@ Window_FormationMember.prototype.setPendingIndex = function(index) {
 
 Window_FormationMember.prototype.pendingIndex = function() {
   return this._pendingIndex;
+};
+
+Window_FormationMember.prototype.formationPendingIndex = function() {
+  return pendingIndex;
 };
 
 Window_FormationMember.prototype.getPendingMode = function() {

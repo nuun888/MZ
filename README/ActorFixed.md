@@ -1,5 +1,5 @@
 # [アクター並び替え固定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js)
-# Ver.2.0.0
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js)  
 
 アクターの並び替えを固定します。  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc シームレスマップ
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -40,6 +40,8 @@
  * 該当のイベントコマンドを設定した後にリセットします。
  * 
  * 更新履歴
+ * 2022/2/25 Ver.1.1.4
+ * 同一マップでは連結マップjsonファイルを読み込まないように修正。
  * 2022/2/20 Ver.1.1.3
  * 再修正。
  * 2022/2/19 Ver.1.1.2
@@ -196,13 +198,15 @@ DataManager.loadSeamlessMap = function(mapId) {
     const mapData = getSeamlessMapData(mapId);
     if (mapData) {
         const mapList = mapData.SeamlessMapList.map(data => data.SeamlessMapId);
-        mapList.forEach((id, r) => {
-            if (id > 0) {
-                const filename = "Map%1.json".format(id.padZero(3));
-                this.loadSeamlessMapDataFile("$dataSeamlessMap", filename, r);
-                this.seamlessMapId[r] = id;
-            }
-        });
+        if (this._loadedMapId !== mapList[0]) {//ランダムマップ生成時注意
+            mapList.forEach((id, r) => {
+                if (id > 0) {
+                    const filename = "Map%1.json".format(id.padZero(3));
+                    this.loadSeamlessMapDataFile("$dataSeamlessMap", filename, r);
+                    this.seamlessMapId[r] = id;
+                }
+            });
+        }       
     }
 };
 
@@ -234,6 +238,7 @@ DataManager.loadMapData = function(mapId) {
         this.loadSeamlessMap(mapId);
         mapId = id;
     }
+    this._loadedMapId = mapId;
     _DataManager_loadMapData.call(this, mapId);
 };
 

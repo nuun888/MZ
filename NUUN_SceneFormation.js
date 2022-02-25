@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -30,6 +30,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/25 Ver.1.6.2
+ * TPBが溜まっているアクターを交換するとアクターウィンドウがアクティブになる問題を修正。
+ * 戦闘中にアクターを入れ替えて再度画面を開いてアクターを選択するとカーソルの表示がおかしくなる問題を修正。
  * 2022/2/23 Ver.1.6.1
  * 固定アクター対応により処理修正。
  * 2022/2/23 Ver.1.6.0
@@ -716,6 +719,7 @@ const LavelVisible = eval(parameters['LavelVisible'] || "false");
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];
 const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
+const CommandShowMode = eval(parameters2['CommandShowMode']) || 'Party';
 
 let cursorMode = 'battle';
 let pendingMode = null;
@@ -893,6 +897,7 @@ Scene_Formation.prototype.update = function() {
   this._formation.update();
 };
 
+
 class Nuun_Formation {
   constructor(scene, mode) {
     this._scene = scene;
@@ -958,7 +963,7 @@ class Nuun_Formation {
     }
     this._battleMemberWindow = battleMemberWindow;
     if (this._isBattle) {
-      this._battleMemberWindow.hide();
+      battleMemberWindow.openness = 0;
     }
   };
 
@@ -968,7 +973,7 @@ class Nuun_Formation {
     this._scene.addWindow(battleMemberNameWindow);
     this._battleMemberNameWindow = battleMemberNameWindow;
     if (this._isBattle) {
-      this._battleMemberNameWindow.hide();
+      battleMemberNameWindow.openness = 0;
     }
   };
 
@@ -982,7 +987,7 @@ class Nuun_Formation {
     scene.addWindow(memberWindow);
     this._memberWindow = memberWindow;
     if (this._isBattle) {
-      this._memberWindow.hide();
+      memberWindow.openness = 0;
     }
   };
   
@@ -992,7 +997,7 @@ class Nuun_Formation {
     this._scene.addWindow(memberNameWindow);
     this._memberNameWindow = memberNameWindow;
     if (this._isBattle) {
-      this._memberNameWindow.hide();
+      memberNameWindow.openness = 0;
     }
   };
   
@@ -1004,7 +1009,7 @@ class Nuun_Formation {
     this._memberStatusWindow = memberStatusWindow;
     statusWindow = memberStatusWindow;
     if (this._isBattle) {
-      this._memberStatusWindow.hide();
+      memberStatusWindow.openness = 0;
     }
   };
 
@@ -1027,7 +1032,7 @@ class Nuun_Formation {
   battleMemberWindowRect() {
     const wx = param.BattleMember_X + (param.WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
     const wy = param.BattleMember_Y + (param.WindowZero ? 0 : this._scene.calcWindowHeight(1, true));
-    const ww = $gameSystem.windowPadding() * 2 + _Game_Party_maxBattleMembers.call($gameParty) * 56;
+    const ww = $gameSystem.windowPadding() * 2 + this.battleMemberWindowWidth() * 56;
     const wh = 80;
     return new Rectangle(wx, wy, ww, wh);
   };
@@ -1050,6 +1055,9 @@ class Nuun_Formation {
 
   initSelect() {
     this._battleMemberWindow.select(0);
+    this._memberWindow.setPendingIndex(-1);
+    this._battleMemberWindow.setPendingIndex(-1);
+    cursorMode = 'battle';
     pendingMode = null;
   };
 
@@ -1098,8 +1106,10 @@ class Nuun_Formation {
       this.onFormationOk();
     } else {
       if (cursorMode === 'battle') {
+        this._memberWindow.setPendingIndex(-1);
         this._battleMemberWindow.setPendingIndex(formationIndex);
       } else {
+        this._battleMemberWindow.setPendingIndex(-1);
         this._memberWindow.setPendingIndex(formationIndex);
       }
     }
@@ -1205,7 +1215,6 @@ class Nuun_Formation {
         this.onMemberCancel();
       }
     } else {
-
       if (this._isBattle) {
         this.close();
       } else {
@@ -1240,6 +1249,10 @@ class Nuun_Formation {
     return this._battleMemberWindow.y + this._battleMemberWindow.height + 12;
   };
 
+  battleMemberWindowWidth() {
+    return _Game_Party_maxBattleMembers.call($gameParty) * (Imported.NUUN_SceneFormation_SupportActor ? $gameParty.formationSupportActor() : 1);
+  };
+
   open() {
     this._battleMemberNameWindow.open();
     this._memberNameWindow.open();
@@ -1255,15 +1268,14 @@ class Nuun_Formation {
     this._memberWindow.refresh();
     this._battleMemberWindow.activate();
     this._commandWindow.hide();
-    this._battleMemberWindow.select(0);
+    this.initSelect();
   };
 
-  close() {  
+  close() {
     $gameTemp.requestBattleRefresh();
     if (!BattleManager.isTpb()) {
       BattleManager.startInput();
     }
-    this._battleMemberNameWindow.close();
     this._memberNameWindow.close();
     this._battleMemberWindow.close();
     this._memberWindow.close();
@@ -1271,7 +1283,11 @@ class Nuun_Formation {
     this._battleMemberWindow.deselect();
     this._memberWindow.deselect();
     this._commandWindow.show();
+    this._commandWindow.open();
     this._commandWindow.activate();
+    if (this._isBattle && CommandShowMode === "Actor") {
+      this._scene.commandCancel();
+    }
   };
 };
 
@@ -1299,9 +1315,6 @@ Window_StatusBase.prototype.drawBackGroundActor = function(index) {
 //戦闘メンバー名称
 Window_FormationBattleMemberName.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
-  if ($gameParty.inBattle()) {
-    this.openness = 0;
-  }
   this.refresh();
 };
 
@@ -1317,9 +1330,6 @@ Window_FormationBattleMemberName.prototype.drawContentsName = function(x, y, wid
 //待機メンバー名称
 Window_FormationMemberName.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
-  if ($gameParty.inBattle()) {
-    this.openness = 0;
-  }
   this.refresh();
 };
 
@@ -1335,9 +1345,6 @@ Window_FormationMemberName.prototype.drawContentsName = function(x, y, width) {
 //戦闘メンバー
 Window_FormationBattleMember.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
-  if ($gameParty.inBattle()) {
-    this.openness = 0;
-  }
   this._formationMode = true;
   this.refresh();
 };
@@ -1410,7 +1417,8 @@ Window_FormationBattleMember.prototype.drawItem = function(index) {
   this.drawBackGroundActor(index);
   this.drawPendingItemBackground(index);
   if (!actor) {
-    this.drawText('-', rect.x, rect.y + 16, 48, 'center');
+    const y = rect.y + this.itemHeight() - this.rowSpacing() - 48;
+    this.drawText('-', rect.x, y + 4, 48, 'center');
   } else {
     const bitmap = ImageManager.loadCharacter(actor.characterName());
     if (!bitmap.isReady()) {
@@ -1536,9 +1544,6 @@ Window_FormationBattleMember.prototype.setSpriteActor = function(sprite) {
 //待機メンバー
 Window_FormationMember.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
-  if ($gameParty.inBattle()) {
-    this.openness = 0;
-  }
   this._formationMode = true;
   this.refresh();
 };
@@ -1567,7 +1572,7 @@ Window_FormationMember.prototype.processOk = function() {
 Window_FormationMember.prototype.isCurrentItemEnabled = function() {
   const actor = this.actor(this.index());
   const pendingActor = pendingMode === 'battle' ? $gameParty.formationBattleMember()[pendingIndex] : this.actor(pendingIndex);
-  if (pendingMode && (!actor && !pendingActor)) {console.log(pendingMode)
+  if (pendingMode && (!actor && !pendingActor)) {
     return false;
   } else if (!actor) {
     return this.isChangeActorEnabled(pendingActor, null, -1);
@@ -1611,7 +1616,8 @@ Window_FormationMember.prototype.drawItem = function(index) {
   this.drawBackGroundActor(index);
   this.drawPendingItemBackground(index);
   if (!actor) {
-    this.drawText('-', rect.x, rect.y + 16, 48, 'center');
+    const y = rect.y + this.itemHeight() - this.rowSpacing() - 48;
+    this.drawText('-', rect.x, y + 4, 48, 'center');
   } else {
     const bitmap = ImageManager.loadCharacter(actor.characterName());
     if (!bitmap.isReady()) {
@@ -1624,7 +1630,7 @@ Window_FormationMember.prototype.drawItem = function(index) {
 
 Window_FormationMember.prototype.drawContents = function(actor, x, y, width) {
   let x2 = x + Math.floor(width / 2);
-  let y2 = y +  + this.itemHeight() - this.rowSpacing();
+  let y2 = y + this.itemHeight() - this.rowSpacing();
   this.drawCharacter(actor.characterName(), actor.characterIndex(), x2, y2);
   this.drawLavel(actor, x, y, width);
 };
@@ -1648,7 +1654,7 @@ Window_FormationMember.prototype.drawLavel = function(actor, x, y, width) {
 const _Window_FormationMember_setCursorRect = Window_FormationMember.prototype.setCursorRect;
 Window_FormationMember.prototype.setCursorRect = function(x, y, width, height) {
   height = 48;
-  y +=this.itemHeight() - this.rowSpacing() - height;
+  y += this.itemHeight() - this.rowSpacing() - height;
   _Window_FormationMember_setCursorRect.call(this, x, y, width, height);
 };
 
@@ -1736,9 +1742,6 @@ Window_FormationMember.prototype.setSpriteActor = function(sprite) {
 //ステータス
 Window_FormationStatus.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
-  if ($gameParty.inBattle()) {
-    this.openness = 0;
-  }
   this._actor = null;
   this.refresh();
 };

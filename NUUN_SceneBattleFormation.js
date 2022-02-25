@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -18,10 +18,15 @@
  * 戦闘中にメンバーを変更できるようにします。
  * このプラグインはメンバー変更画面（NUUN_SceneFormation）の拡張機能です。
  * 
+ * 仕様
+ * アクターコマンドからメンバー変更を行った場合、選択終了後アクターコマンドがキャンセルされます。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/25 Ver.1.3.1
+ * TPBが溜まっているアクターを交換するとアクターウィンドウがアクティブになる問題を修正。
  * 2022/2/23 Ver.1.3.0
  * 戦闘メンバー人数の可変対応による処理の変更。
  * 2021/11/27 Ver.1.2.0
@@ -269,5 +274,25 @@ Scene_Battle.prototype.update = function() {
   this._formation.update();
 };
 
+Scene_Battle.prototype.isFormationActive = function() {
+  return this._formation._battleMemberWindow.active || this._formation._memberWindow.active;
+};
+
+const _Scene_Battle_needsInputWindowChange = Scene_Battle.prototype.needsInputWindowChange;
+Scene_Battle.prototype.needsInputWindowChange = function() {
+  return _Scene_Battle_needsInputWindowChange.call(this) && !this.isFormationActive();
+};
+
+const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWindows;
+Scene_Battle.prototype.hideSubInputWindows = function() {
+  _Scene_Battle_hideSubInputWindows.call(this);
+  this._formation._battleMemberWindow.deactivate();
+  this._formation._memberWindow.deactivate();
+  this._formation._battleMemberNameWindow.hide();
+  this._formation._memberNameWindow.hide();
+  this._formation._battleMemberWindow.hide();
+  this._formation._memberWindow.hide();
+  this._formation._memberStatusWindow.hide();
+};
 
 })();

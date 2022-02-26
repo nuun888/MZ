@@ -10,19 +10,22 @@
  * @target MZ
  * @plugindesc 装備時ステート
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 装備している時のみに適用するステートを設定できます。
  * 
- * 特徴を有するメモ欄
- * <EquipState:[id],[id],[id]...> 現在付与されているステートの残りターンを全て増減させます。
- * 
+ * 武器、防具のメモ欄
+ * <EquipState:[id],[id],[id]...> ステートを付与させます。
+ * <EquipState:4> 装備している間、ステート4番のステートが付与されます。
+ * <EquipState:4,10> 装備している間、ステート4番、10番のステートが付与されます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/27 Ver.1.0.1
+ * 装備解除時にステートが解除されない問題を修正。
  * 2022/2/26 Ver.1.0.0
  * 初版
  * 
@@ -52,11 +55,12 @@ Game_Battler.prototype.initMembers = function() {
 const _Game_Actor_refresh = Game_Actor.prototype.refresh;
 Game_Actor.prototype.refresh = function() {
     _Game_Actor_refresh.call(this);
-    this.equipsAddState();
+    this.equipAddState();
 };
 
-Game_Actor.prototype.equipsAddState = function() {
+Game_Actor.prototype.equipAddState = function() {
     const equips = this.equips();
+    const oldStates = this._equipsStateId || [];
     this._equipsStateId = [];
     for (const data of EquipsStateAppliEval) {
         const addEquips = eval(data);
@@ -71,6 +75,12 @@ Game_Actor.prototype.equipsAddState = function() {
             if (id > 0) {
                 this.addState(id);
             }
+        }
+    }
+    const removeEquipState = oldStates.filter(state => state > 0 && this._equipsStateId.indexOf(state) < 0);
+    for (const state of removeEquipState) {
+        if (this.isStateAffected(state)) {
+            this.removeState(state);
         }
     }
 };

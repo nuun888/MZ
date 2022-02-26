@@ -175,9 +175,11 @@
 
 | 装備　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
+| [装備時ステート](https://github.com/nuun888/MZ/blob/master/README/EquipsState.md) | [NUUN_EquipsState](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipsState.js) | 共 | 1.0.0 |
 | [装備セットボーナス](https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md) | [NUUN_SetBonusEquip](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js) | 共 | 1.1.2 |
 | ┗ 装備ウィンドウでのセットボーナスウィンドウ表示 |  |  |  |
 | 装備画面表示拡張(仮) |  |  |  |
+|  |  |  |  |
 |  |  |  |  |
 
 | 表現　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数9　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |

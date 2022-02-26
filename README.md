@@ -230,6 +230,11 @@
 |  |  |  |  |
 |  |  |  |  |
 
+| 不具合修正　　　　　　　　　　　　　　 | プラグイン　プラグイン数3　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
+| ---------- | ------------- | ------------- | -------- |
+|  |  |  |  |
+|  |  |  |  |
+
 | 競合対策　　　　　　　　　　　　　　　 | プラグイン　プラグイン数3　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | ゲージ、名前疑似３Dバトル併用パッチ | [NUUN_ButlerGaugeNameIn3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerGaugeNameIn3DBattle.js) |  | 1.0.0 |

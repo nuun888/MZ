@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc 装備時ステート適用
+ * @plugindesc 装備時ステート
  * @author NUUN
  * @version 1.0.0
  * 

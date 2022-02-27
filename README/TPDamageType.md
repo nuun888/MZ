@@ -1,5 +1,5 @@
 # [ダメージタイプTP追加](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPDamageType.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPDamageType.js)  
 
 ダメージタイプにTPダメージ、TP回復、TPを追加します。  
@@ -14,5 +14,7 @@
 上記のタグがある場合ダメージタイプは該当のタイプになります。（データベース上の設定は適用されません）
 
 ## 更新履歴
+2022/2/27 Ver.1.0.1  
+ダメージタイプがTP回復の時に、TPが減ってしまう問題を修正。  
 2022/1/16 Ver.1.0.0  
 初版  

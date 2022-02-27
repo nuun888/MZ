@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -30,6 +30,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/26 Ver.1.6.3
+ * 戦闘中に画面を閉じるとアクター選択コマンドがキャンセル扱いにされる問題を修正。
+ * メンバー入れ替え時のカーソルの処理を変更。
  * 2022/2/25 Ver.1.6.2
  * TPBが溜まっているアクターを交換するとアクターウィンドウがアクティブになる問題を修正。
  * 戦闘中にアクターを入れ替えて再度画面を開いてアクターを選択するとカーソルの表示がおかしくなる問題を修正。
@@ -1138,6 +1141,9 @@ class Nuun_Formation {
     this._battleMemberWindow.setPendingIndex(-1);
     this._memberWindow.setPendingIndex(-1);
     pendingMode = null;
+    if (this._isBattle && CommandShowMode === "Actor") {
+      $gameTemp.formationRefresh = true;
+    }
   };
 
   selectOrder(index) {
@@ -1276,6 +1282,7 @@ class Nuun_Formation {
     if (!BattleManager.isTpb()) {
       BattleManager.startInput();
     }
+    this._battleMemberNameWindow.close();
     this._memberNameWindow.close();
     this._battleMemberWindow.close();
     this._memberWindow.close();
@@ -1285,9 +1292,6 @@ class Nuun_Formation {
     this._commandWindow.show();
     this._commandWindow.open();
     this._commandWindow.activate();
-    if (this._isBattle && CommandShowMode === "Actor") {
-      this._scene.commandCancel();
-    }
   };
 };
 

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -25,6 +25,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/26 Ver.1.3.2
+ * 戦闘中に画面を閉じるとアクター選択コマンドがキャンセル扱いにされる問題を修正。
+ * メンバー入れ替え時のカーソルの処理を変更。
  * 2022/2/25 Ver.1.3.1
  * TPBが溜まっているアクターを交換するとアクターウィンドウがアクティブになる問題を修正。
  * 2022/2/23 Ver.1.3.0
@@ -211,6 +214,11 @@ const WindowCenter = eval(parameters['WindowCenter'] || "true");
 const CommandIndex = Number(parameters['CommandIndex'] || 1);
 const CommandShowMode = eval(parameters['CommandShowMode']) || 'Party';
 
+const _Game_Temp_initialize = Game_Temp.prototype.initialize;
+Game_Temp.prototype.initialize = function() {
+    _Game_Temp_initialize.call(this);
+    this.formationRefresh = false;
+};
 
 Window_Command.prototype.addFormationCommand = function() {
   this.addCommand(TextManager.formation, "formation", $gameParty.useFormation());
@@ -265,13 +273,22 @@ const _Scene_Battle_isAnyInputWindowActive = Scene_Battle.prototype.isAnyInputWi
 Scene_Battle.prototype.isAnyInputWindowActive = function() {
   return (_Scene_Battle_isAnyInputWindowActive.call(this) ||
   this._formation._battleMemberWindow.active ||
-  this._formation._memberWindow.active );
+  this._formation._memberWindow.active);
 };
 
 const _Scene_Battle_update = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
   _Scene_Battle_update.call(this);
   this._formation.update();
+  if (BattleManager.isTpb() && !this.isFormationActive() && $gameTemp.formationRefresh && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
+    $gameTemp.formationRefresh = false;
+    const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
+    if (index >= 0) {
+      this._statusWindow.select(index);
+    } else {
+      this.commandCancel();
+    }
+  }
 };
 
 Scene_Battle.prototype.isFormationActive = function() {

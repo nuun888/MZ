@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ダメージタイプTP追加
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * ダメージタイプにTPを追加します。
@@ -19,10 +19,15 @@
  * <DamageTypeTPR> このスキル、アイテムはダメージタイプ「TP回復」となります。
  * <DamageTypeTPA> このスキル、アイテムはダメージタイプ「TP吸収」となります。
  * 
+ * ダメージタイプはなし以外に設定してください。
+ * 上記のタグがある場合ダメージタイプは該当のタイプになります。（データベース上の設定は適用されません）
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/2/27 Ver.1.0.1
+ * ダメージタイプがTP回復の時に、TPが減ってしまう問題を修正。
  * 2022/1/16 Ver.1.0.0
  * 初版
  * 
@@ -51,6 +56,7 @@ Game_Action.prototype.executeDamage = function(target, value) {
 };
 
 Game_Action.prototype.executeTpDamage = function(target, value) {
+    value *= this.isTpRecovery();
     if (this.isDrain()) {
         value = Math.min(target.tp, value);
     }
@@ -73,6 +79,10 @@ Game_Action.prototype.gainDrainedTp = function(value) {
 
 Game_Action.prototype.isTpEffect = function() {
     return this.checkDamageType([10, 11, 12]);
+};
+
+Game_Action.prototype.isTpRecovery = function() {
+    return [11].includes(this.item().damage.type) ? -1 : 1;
 };
 
 const _Game_Action_isDamage = Game_Action.prototype.isDamage;

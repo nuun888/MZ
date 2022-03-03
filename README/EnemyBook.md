@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.11.2
+# Ver.2.12.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -128,6 +128,9 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2022/3/4 Ver.2.12.0  
+属性、ステート耐性を百分率で表示する機能を追加。  
+図鑑登録のパターンによっては戦闘開始時にエラーが起きる問題を修正。  
 2022/1/29 Ver.2.11.2  
 ドロップアイテム率の表示の仕様を変更。  
 2022/1/24 Ver.2.11.1  

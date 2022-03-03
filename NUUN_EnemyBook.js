@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.11.2
+ * @version 2.12.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -229,6 +229,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/4 Ver.2.12.0
+ * 属性、ステート耐性を百分率で表示する機能を追加。
+ * 図鑑登録のパターンによっては戦闘開始時にエラーが起きる問題を修正。
  * 2022/1/29 Ver.2.11.2
  * ドロップアイテム率の表示の仕様を変更。
  * 2022/1/24 Ver.2.11.1
@@ -1144,7 +1147,7 @@
  * @desc ページウィンドウを表示します。
  * @text ページウィンドウ表示
  * @type boolean
- * @default true
+ * @default false
  * @parent PageWindow
  * 
  * @param PageWindowsSkin
@@ -1716,19 +1719,43 @@
  * @default false
  * @parent ResistWeakElementData
  * 
- * @param ResistNoEffectElement
- * @desc 効きにくい属性に無効を反映させるか。
- * @text 効きにくい属性に無効反映
- * @type boolean
- * @default true
- * @parent ResistWeakElementData
- * 
  * @param ElementUnknownIconId
  * @desc ステータス情報未登録時に表示する属性アイコンのIDを指定します。
  * @text ステータス情報未登録時属性アイコンID
  * @type number
  * @default 0
  * @parent ResistWeakElementData
+ * 
+ * @param ElementIcon
+ * @text 属性耐性（アイコン表示）設定
+ * @default ------------------------------
+ * @parent ResistWeakElementData
+ * 
+ * @param ResistNoEffectElement
+ * @desc 効きにくい属性に無効を反映させるか。
+ * @text 効きにくい属性に無効反映
+ * @type boolean
+ * @default true
+ * @parent ElementIcon
+ * 
+ * @param ElementValue
+ * @text 属性耐性デバフ（耐性数値表示）
+ * @default ------------------------------
+ * @parent ResistWeakElementData
+ * 
+ * @param ElementIconShow
+ * @desc 属性名の表示をアイコンで表示する。
+ * @text 属性アイコン表示
+ * @type boolean
+ * @default false
+ * @parent ElementValue
+ * 
+ * @param ElementMultiCol
+ * @desc ワイドモード２列表示以上時の複数列表示。
+ * @text ワイドモード時の複数列表示
+ * @type boolean
+ * @default false
+ * @parent ElementValue
  * 
  * @param ElementRadarChart
  * @text 属性耐性レーダーチャート
@@ -1812,26 +1839,51 @@
  * @default false
  * @parent ResistWeakStateData
  * 
- * @param NormalWeakState
- * @desc 効きやすいステート対象を有効度100%以上から反映させるか。
- * @text 効きやすい属性有効度100%反映
- * @type boolean
- * @default false
- * @parent ResistWeakStateData
- * 
- * @param ResistNoEffectState
- * @desc 効きにくいステートに無効を反映させるか。
- * @text 効きにくいステートに無効反映
- * @type boolean
- * @default true
- * @parent ResistWeakStateData
- * 
  * @param StateUnknownIconId
  * @desc ステータス情報未登録時に表示するステートアイコンのIDを指定します。
  * @text ステータス情報未登録時ステートアイコンID
  * @type number
  * @default 0
  * @parent ResistWeakStateData
+ * 
+ * @param ResistWeakStateIcon
+ * @text ステート耐性（アイコン表示）設定
+ * @default ------------------------------
+ * @parent ResistWeakStateData
+ * 
+ * @param NormalWeakState
+ * @desc 効きやすいステート対象を有効度100%以上から反映させるか。
+ * @text 効きやすい属性有効度100%反映
+ * @type boolean
+ * @default false
+ * @parent ResistWeakStateIcon
+ * 
+ * @param ResistNoEffectState
+ * @desc 効きにくいステートに無効を反映させるか。
+ * @text 効きにくいステートに無効反映
+ * @type boolean
+ * @default true
+ * @parent ResistWeakStateIcon
+ * 
+ * @param ResistWeakStateValue
+ * @text 耐性ステート（耐性数値表示）設定
+ * @default ------------------------------
+ * @parent ResistWeakStateData
+ * 
+ * @param StateIconShow
+ * @desc ステート名の表示をアイコンで表示する。
+ * @text ステートアイコン表示
+ * @type boolean
+ * @default false
+ * @parent ResistWeakStateValue
+ * 
+ * @param StateMultiCol
+ * @desc ワイドモード２列表示以上時の複数列表示。
+ * @text ワイドモード時の複数列表示
+ * @type boolean
+ * @default false
+ * @parent ResistWeakStateValue
+ * 
  * 
  * @param StateRadarChart
  * @text ステート耐性レーダーチャート
@@ -1928,6 +1980,25 @@
  * @type number
  * @default 0
  * @parent ResistWeakDebuffData
+ * 
+ * @param DeBuffValue
+ * @text 耐性デバフ（耐性数値表示）設定
+ * @default ------------------------------
+ * @parent ResistWeakDebuffData
+ * 
+ * @param BuffeIconShow
+ * @desc ステート名の表示をアイコンで表示する。
+ * @text ステートアイコン表示
+ * @type boolean
+ * @default false
+ * @parent DeBuffValue
+ * 
+ * @param BuffMultiCol
+ * @desc ワイドモード２列表示以上時の複数列表示。
+ * @text ワイドモード時の複数列表示
+ * @type boolean
+ * @default false
+ * @parent DeBuffValue
  * 
  */
 /*~struct~ElementData:
@@ -2126,21 +2197,25 @@
  * @value 36
  * @option モンスターブックナンバー(2)～(7)(9)(18)
  * @value 37
- * @option 耐性属性(2)～(7)(9)(10)(11)(18)
+ * @option 耐性属性（アイコン表示）(2)～(7)(9)(10)(11)(18)
  * @value 40
- * @option 弱点属性(2)～(7)(9)(10)(11)(18)
+ * @option 弱点属性（アイコン表示）(2)～(7)(9)(10)(11)(18)
  * @value 41
- * @option 無効属性(2)～(7)(9)(10)(11)(18)
+ * @option 無効属性（アイコン表示）(2)～(7)(9)(10)(11)(18)
  * @value 42
- * @option 耐性ステート(2)～(7)(9)(10)(11)(18)
+ * @option 属性耐性（耐性数値表示）(1)～(11)(16)(17)(18)
+ * @value 43
+ * @option 耐性ステート（アイコン表示）(2)～(7)(9)(10)(11)(18)
  * @value 45
- * @option 弱点ステート(2)～(7)(9)(10)(11)(18)
+ * @option 弱点ステート（アイコン表示）(2)～(7)(9)(10)(11)(18)
  * @value 46
- * @option 無効ステート(2)～(7)(9)(10)(11)(18)
+ * @option 無効ステート（アイコン表示）(2)～(7)(9)(10)(11)(18)
  * @value 47
- * @option 耐性デバフ(2)～(7)(9)(10)(11)(18)
+ * @option 耐性ステート（耐性数値表示）(1)～(11)(16)(17)(18)
+ * @value 48
+ * @option 耐性デバフ（アイコン表示）(2)～(7)(9)(10)(11)(18)
  * @value 50
- * @option 弱点デバフ(2)～(7)(9)(10)(11)(18)
+ * @option 弱点デバフ（アイコン表示）(2)～(7)(9)(10)(11)(18)
  * @value 51
  * @option ドロップアイテム(2)～(7)(9)(10)(11)(18)
  * @value 60
@@ -2801,7 +2876,7 @@ Game_System.prototype.completeEnemyBook = function() {
 };
 
 Game_System.prototype.getEnemyBookFlag = function(enemyId) {
-  return this._enemyBookFlags[enemyId];
+  return this._enemyBookFlags ? this._enemyBookFlags[enemyId] : false;
 };
 
 Game_System.prototype.isInEnemyBook = function(enemy) {
@@ -4602,6 +4677,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
     case 42:
       this.drawNoEffectElement(list, enemy, x, y, width);
       break;
+    case 43:
+      this.drawResistValueElement(list, enemy, x, y, width);
+      break;
     case 45:
       this.drawResistStates(list, enemy, x, y, width);
       break;
@@ -4611,11 +4689,17 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
     case 47:
       this.drawNoEffectStates(list, enemy, x, y, width);
       break;
+    case 48:
+      this.drawResistValueState(list, enemy, x, y, width);
+      break;
     case 50:
       this.drawWeakDebuff(list, enemy, x, y, width);
       break;
     case 51:
       this.drawResistDebuff(list, enemy, x, y, width);
+      break;
+    case 52:
+      this.drawResistValueDebuff(list, enemy, x, y, width);
       break;
     case 60:
       this.dropItems(list, enemy, x, y, width);
@@ -5109,6 +5193,66 @@ Window_EnemyBook.prototype.drawNoEffectElement = function(list, enemy, x, y, wid
 	});
 };
 
+Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, width) {
+  if(!param.ElementList){
+    return;
+  }
+  this.contentsFontSize(list);
+  const nameText = list.paramName;
+  const lineHeight = this.lineHeight();
+  if (nameText) {
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    this.drawText(nameText, x, y, width);
+    y += lineHeight;
+  } 
+  let cols = 1;
+  let x2 = x;
+  let y2 = y;
+  if (param.ElementMultiCol) {
+    if (list.WideMode === 2) {
+      width = (width - this.colSpacing()) / 2;
+      cols = 2;
+    } else if (list.WideMode === 3 && param.ContentCols === 3) {
+      width = (width - this.colSpacing() * 2) / 3;
+      cols = 3;
+    }
+  }
+  param.ElementList.forEach((element, i) => {
+    if (param.ElementMultiCol) {
+      x2 = Math.floor(i % cols) * (width + this.itemPadding()) + x;
+      y2 = Math.floor(i / cols) * lineHeight + y;
+    } else {
+      y2 = lineHeight * i + y;
+    }
+    this.drawContentsBackground(list.Back, x2, y2, width);
+    x3 = this.contensX(x2);
+    width2 = this.contensWidth(width);
+    let textWidth = 0;
+    if (element.ElementNo && element.ElementNo > 0) {
+      if (element.ElementIconId > 0 && param.ElementIconShow) {
+        const iconId = param.ElementUnknownIconId > 0 && this.onElementsFlag(element.ElementNo) ? param.ElementUnknownIconId : element.ElementIconId;
+        this.drawIcon(iconId, x3, y2);
+      } else {
+        textWidth += this.systemWidth(list.SystemItemWidth, width2);
+        this.changeTextColor(this.getColorCode(list.NameColor));
+        const elementText = this.onElementsFlag(element.ElementNo) ? $dataSystem.elements[element.ElementNo] : param.UnknownStatus;
+        this.drawText(elementText, x3, y2, width2);
+      }
+      if (this.resistWeakDataMask(list.MaskMode)) {
+        let rate = enemy.elementRate(element.ElementNo) * 100;
+        rate = NuunManager.numPercentage(rate, list.Decimal || 0, param.DecimalMode);
+        rate += list.paramUnit ? String(list.paramUnit) : " %";
+        const rateText = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : rate;
+        this.resetTextColor();
+        this.drawText(rateText, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
+      } else {
+        this.resetTextColor();
+        this.drawText(param.UnknownStatus, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
+      }
+    }
+  });
+};
+
 Window_EnemyBook.prototype.drawResistStates = function(list, enemy, x, y, width) {
   if(!param.StateList){
     return;
@@ -5228,6 +5372,69 @@ Window_EnemyBook.prototype.drawNoEffectStates = function(list, enemy, x, y, widt
 	  this.drawIcon(icon, x, y);
 	  x += dx;
 	});
+};
+
+Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, width) {
+  if(!param.StateList){
+    return;
+  }
+  this.contentsFontSize(list);
+  const nameText = list.paramName;
+  const lineHeight = this.lineHeight();
+  if (nameText) {
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    this.drawText(nameText, x, y, width);
+    y += lineHeight;
+  } 
+  let cols = 1;
+  let x2 = x;
+  let y2 = y;
+  if (param.StateMultiCol) {
+    if (list.WideMode === 2) {
+      width = (width - this.colSpacing()) / 2;
+      cols = 2;
+    } else if (list.WideMode === 3 && param.ContentCols === 3) {
+      width = (width - this.colSpacing() * 2) / 3;
+      cols = 3;
+    }
+  }
+  param.StateList.forEach((state, i) => {
+    if (param.StateMultiCol) {
+      x2 = Math.floor(i % cols) * (width + this.itemPadding()) + x;
+      y2 = Math.floor(i / cols) * lineHeight + y;
+    } else {
+      y2 = lineHeight * i + y;
+    }
+    this.drawContentsBackground(list.Back, x2, y2, width);
+    x3 = this.contensX(x2);
+    width2 = this.contensWidth(width);
+    let textWidth = 0;
+    if (state.StateId) {
+      const stateId = state.StateId;
+      if (stateId > 0) {
+        if ($dataStates[stateId].iconIndex > 0 && param.StateIconShow) {
+          const iconId = param.StateUnknownIconId > 0 && this.onStateFlag(stateId) ? param.StateUnknownIconId : $dataStates[stateId].iconIndex;
+          this.drawIcon(iconId, x3, y2);
+        } else {
+          textWidth += this.systemWidth(list.SystemItemWidth, width2);
+          this.changeTextColor(this.getColorCode(list.NameColor));
+          const stateText = this.onStateFlag(stateId) ? $dataStates[stateId].name : param.UnknownStatus;
+          this.drawText(stateText, x3, y2, width2);
+        }
+        if (this.resistWeakDataMask(list.MaskMode)) {
+          let rate = (enemy.isStateResist(stateId) ? 0 : enemy.stateRate(stateId)) * 100;
+          rate = NuunManager.numPercentage(rate, list.Decimal || 0, param.DecimalMode);
+          rate += list.paramUnit ? String(list.paramUnit) : " %";
+          const rateText = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : rate;
+          this.resetTextColor();
+          this.drawText(rateText, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
+        } else {
+          this.resetTextColor();
+          this.drawText(param.UnknownStatus, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
+        }
+      }
+    }
+  });
 };
 
 Window_EnemyBook.prototype.buffIconIndex = function(rate, paramId) {

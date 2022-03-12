@@ -29,12 +29,12 @@
  * 
  * @param SupportActorSuccessMessage
  * @text サポートアクター呼び出し時メッセージ
- * @desc サポートアクター呼び出しに成功した時のメッセージ。%1：使用者　%2：召喚アクター
+ * @desc サポートアクター呼び出しに成功した時のメッセージ。%1：使用者　%2：呼び出しアクター
  * @default 
  * 
  * @param SupportActorMissMessage
  * @text サポートアクター呼び出し失敗時メッセージ
- * @desc サポートアクター呼び出しに失敗した時のメッセージ。%1：使用者　%2：召喚アクター
+ * @desc サポートアクター呼び出しに失敗した時のメッセージ。%1：使用者　%2：呼び出しアクター
  * @default 
  * 
  * @param SupportActorRemoveMessage

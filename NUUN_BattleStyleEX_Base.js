@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.12
+ * @version 2.6.13
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/3/12 Ver 2.6.13
+ * アクター加入、離脱時の処理を修正。
  * 2022/2/3 Ver 2.6.12
  * アクターコマンドの座標をマイナスに設定したときに、座標設定が適用されないもん問題を修正。
  * 2022/1/17 Ver 2.6.11
@@ -935,13 +937,15 @@ Scene_Battle.prototype.actorWindowResetOpacity = function() {
 const _Scene_Battle_update  = Scene_Battle.prototype.update ;
 Scene_Battle.prototype.update = function() {
   _Scene_Battle_update.call(this);
-  if(this._statusWindow._CommandRefresh) {
-    const index = this._actorCommandWindow.selectActor(this._actor);
-    if(index < 0 && this._actorCommandWindow._actor) {
+  if (this._statusWindow.isCommandRefresh() && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
+    this._statusWindow._CommandRefresh = false;
+    const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
+    if (index >= 0) {
+      this._statusWindow.select(index);
+    } else {
       this.commandCancel();
     }
     this._actorCommandWindow.refresh();
-    this._statusWindow._CommandRefresh = false;
   }
   this._statusWindow.visible = BattleManager.actorStatusWindowVisible;
   this._actorImges.visible = BattleManager.actorStatusWindowVisible;
@@ -1316,6 +1320,10 @@ Window_BattleStatus.prototype.performPartyRefresh = function() {
 
 Window_BattleStatus.prototype.commandRefresh = function() {
   this._CommandRefresh = true;
+};
+
+Window_BattleStatus.prototype.isCommandRefresh = function() {
+  return this._CommandRefresh;
 };
 
 Window_BattleStatus.prototype.battleEffectsRefresh = function() {

@@ -1,5 +1,5 @@
 # [バトルスタイル拡張ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)
-# Ver.2.6.12
+# Ver.2.6.13
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Base.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,6 +13,8 @@
 バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
 
 ## 更新履歴
+2022/3/12 Ver 2.6.13  
+アクター加入、離脱時の処理を修正。  
 2022/2/3 Ver 2.6.12  
 アクターコマンドの座標をマイナスに設定したときに、座標設定が適用されないもん問題を修正。  
 2022/1/17 Ver 2.6.11  

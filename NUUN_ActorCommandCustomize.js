@@ -8,19 +8,21 @@
  */ 
  /*:
  * @target MZ
- * @plugindesc アクターコマンドカスタマイズ
+ * @plugindesc アクターコマンド任意表示順
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
- * アクターコマンドをカスタマイズします。
+ * アクターコマンドのコマンドの表示を任意の順番で表示できます。
  * 
  * このプラグインを配置する場所により動作が異なります。
  * 下のほうに配置することにより全てのコマンドの表示順を設定できます。他プラグインによるコマンド追加を行う場合は「Commandkey」
  * に該当する文字列を記入してください。
  * 他プラグインのアクターコマンド追加をこのプラグインで設定せずに追加する場合は、このプラグインの下に配置してください。
+ * 
+ * 'default' 元のコマンドが表示されます。
  * 
  * 仕様
  * コマンドリストが設定されていない場合はデフォルトのコマンドリストが表示されます。
@@ -45,7 +47,7 @@
  * @param ActorCommandData
  * @text コマンドリスト
  * @desc コマンドの設定。
- * @default 
+ * @default ["{\"CommandName\":\"\",\"Commandkey\":\"'default'\",\"CommandEval\":\"\",\"CommandFuncEval\":\"[]\"}"]
  * @type struct<ActorCommandList>[]
  * 
  */
@@ -58,26 +60,27 @@
  * @param Commandkey
  * @text 表示コマンドキー
  * @desc 適用、除外するクラスを指定します。無指定の場合は全てのコマンドで反映されます。
- * @type combo[]
+ * @type combo
  * @option 'attack'
  * @option 'skill'
  * @option 'guard'
  * @option 'item'
  * @option 'escape'
  * @option 'formation'
- * @default
+ * @option 'default'
+ * @default 'default'
  * 
  * @param CommandEval
- * @type combo[]
+ * @type combo
  * @option $gameSwitches.value(0);//スイッチ
  * @default 
  * @text コマンド使用条件。
  * @desc コマンドが使用できる条件。スキル以外で設定できます。コマンド処理評価式で定義している場合は処理しません。
  * 
  * @param CommandFuncEval
- * @type combo[]
+ * @type combo
  * @option this.addCommand(TextManager.formation, "formation", $gameParty.useFormation());//メンバー変更画面(戦闘)
- * @default []
+ * @default 
  * @text コマンド処理評価式
  * @desc コマンドを処理する評価式を定義します。
  * 
@@ -96,55 +99,57 @@ Window_ActorCommand.prototype.makeCommandList = function() {
     const commandList = ActorCommand.find(actor => actor.ActorId === this._actor.actorId());
     if (commandList && commandList.ActorCommandData && commandList.ActorCommandData.length > 0) {
       for (const data of commandList.ActorCommandData) {
-        const key = data.Commandkey[0];
+        const key = data.Commandkey;
         let text = data.CommandName;
-        let dataFunc = data.CommandFuncEval && data.CommandFuncEval[0];
+        let dataFunc = data.CommandFuncEval;
         switch (key) {
+          case "default":
+            _Window_ActorCommand_makeCommandList.call(this);
           case "escape":
             if (dataFunc) {
-              eval(data.CommandFuncEval[0]);
+              eval(data.CommandFuncEval);
               break;
             }
             text = !text ? TextManager.escape : text;
-            this.addCommand(text, key, data.CommandEval && data.CommandEval[0] ? eval(data.CommandEval[0]) : BattleManager.canEscape());
+            this.addCommand(text, key, data.CommandEval ? eval(data.CommandEval) : BattleManager.canEscape());
             break;
           case "attack":
             if (dataFunc) {
-              eval(data.CommandFuncEval[0]);
+              eval(data.CommandFuncEval);
               break;
             }
             text = !text ? TextManager.fight : text;
-            this.addCommand(text, "attack", data.CommandEval && data.CommandEval[0] ? eval(data.CommandEval[0]) : this._actor.canAttack());
+            this.addCommand(text, "attack", data.CommandEval ? eval(data.CommandEval) : this._actor.canAttack());
             break;
           case "skill":
             if (dataFunc) {
-              eval(data.CommandFuncEval[0]);
+              eval(data.CommandFuncEval);
               break;
             }
             this.addSkillCommands();
             break;
           case "guard":
             if (dataFunc) {
-              eval(data.CommandFuncEval[0]);
+              eval(data.CommandFuncEval);
               break;
             }
             text = !text ? TextManager.guard : text;
-            this.addCommand(TextManager.guard, "guard", data.CommandEval && data.CommandEval[0] ? eval(data.CommandEval[0]) : this._actor.canGuard());
+            this.addCommand(TextManager.guard, "guard", data.CommandEval ? eval(data.CommandEval) : this._actor.canGuard());
             break;
           case "item":
             if (dataFunc) {
-              eval(data.CommandFuncEval[0]);
+              eval(data.CommandFuncEval);
               break;
             }
             text = !text ? TextManager.item : text;
-            this.addCommand(TextManager.item, "item", eval(data.CommandEval[0]));
+            this.addCommand(TextManager.item, "item", eval(data.CommandEval));
             break;
           default:
             if (dataFunc) {
-              eval(data.CommandFuncEval[0]);
+              eval(data.CommandFuncEval);
               break;
             }
-            this.addCommand(TextManager.item, key, eval(data.CommandEval[0]));
+            this.addCommand(TextManager.item, key, eval(data.CommandEval));
             break;
         }
       }

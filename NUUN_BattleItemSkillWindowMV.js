@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  戦闘中アイテム、スキル選択画面MV風表示
  * @author NUUN
- * @version 1.1.3
+ * @version 1.2.0
  * 
  * @help
  * 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
@@ -20,6 +20,8 @@
  * 
  * 
  * 更新履歴
+ * 2022/3/17 Ver.1.2.0
+ * 表示する列を指定できる機能を追加。
  * 2021/11/15 Ver.1.1.3
  * キャンセルボタンの表示がおかしくなる問題を修正。
  * 対象選択時にアイテム画面、スキル画面が表示されたままだったのを修正。
@@ -45,6 +47,13 @@
  * @default 6
  * @min 1
  * 
+ * @param Cols
+ * @desc 表示する列。
+ * @text 表示列
+ * @type number
+ * @default 2
+ * @min 1
+ * 
  * @param FullWindowHeight
  * @text 画面下まで表示
  * @desc ウィンドウを画面下まで表示出来るようにします。（通常はアクターウィンドウまで）
@@ -68,6 +77,7 @@ const parameters = PluginManager.parameters('NUUN_BattleItemSkillWindowMV');
 const VariableHeight = eval(parameters['VariableHeight'] || "false");
 const FullWindowHeight = eval(parameters['FullWindowHeight'] || "false");
 const ItemMaxRow = Number(parameters['ItemMaxRow'] || 6);
+const Cols = Number(parameters['Cols'] || 2);
 let maxHeight = 0;
 
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
@@ -193,6 +203,10 @@ Window_BattleSkill.prototype.refresh = function() {
   }
 };
 
+Window_BattleSkill.prototype.maxCols = function() {
+  return Cols;
+};
+
 const _Window_BattleSkill_show = Window_BattleSkill.prototype.show;
 Window_BattleSkill.prototype.show = function() {
   _Window_BattleSkill_show.call(this);
@@ -206,6 +220,10 @@ Window_BattleItem.prototype.refresh = function() {
   if (VariableHeight) {
     this.height = Math.min(maxHeight, this.fittingHeight(Math.max(Math.ceil(this.maxItems() / this.maxCols()), 1)));
   }
+};
+
+Window_BattleItem.prototype.maxCols = function() {
+  return Cols;
 };
 
 const _Window_BattleItem_show = Window_BattleItem.prototype.show;

@@ -1,12 +1,14 @@
 # [戦闘中アイテム、スキル選択画面MV風表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)
-# Ver.1.1.3
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)
 
 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
 ![画像](img/BattleItemSkillWindowMV1.png)  
 
 ## 更新履歴
-2021/11/15 Ver.1.1.3  
+2022/3/17 Ver.1.2.0  
+表示する列を指定できる機能を追加。  
+2021/11/15 Ver.1.2.0  
 キャンセルボタンの表示がおかしくなる問題を修正。  
 対象選択時にアイテム画面、スキル画面が表示されたままだったのを修正。  
 2021/11/14 Ver.1.1.2  

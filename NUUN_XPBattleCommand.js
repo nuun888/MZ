@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc XP風パーティ、アクターコマンド
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * 
  * @help
@@ -20,6 +20,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/17 Ver.1.0.3
+ * アクター加入、離脱時の処理を修正。
  * 2021/11/15 Ver.1.0.2
  * パーティコマンドの項目が最大列数を超えてた時にコマンドがずれる問題を修正。
  * 2021/11/14 Ver.1.0.1
@@ -142,13 +144,15 @@ Imported.NUUN_XPBattleCommand = true;
 
   const _Scene_Battle_update = Scene_Battle.prototype.update;
   Scene_Battle.prototype.update = function() {
-    if ($gameTemp.commandRefresh) {
-      const actor = this._actorCommandWindow.getSelectActor();
-      if (!actor) {
+    if ($gameTemp.commandRefresh && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
+      $gameTemp.commandRefresh = false;
+      const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
+      if (index >= 0) {
+        this._statusWindow.select(index);
+      } else {
         this.commandCancel();
       }
       this._actorCommandWindow.refresh();
-      $gameTemp.commandRefresh = false;
     }
     _Scene_Battle_update.call(this);
   };

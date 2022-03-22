@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.3.5
+ * @version 2.3.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -40,6 +40,7 @@
  * 【評価式の設定】
  * 評価式を記入します。オリジナルパラメータでは必ず記入してください。
  * 能力値、追加能力値、特殊能力値、任意ステータスで有効ですが無記入の場合は任意ステータス以外は自動的に参照されます。
+ * r:属性、ステート耐性値　全ての耐性値を乗算した数値
  * 
  * 【記述欄設定】
  * 記述欄はプラグインパラメータ「記述欄タグ名」に任意の文字列を記入してください。一部文字列は使用できない場合も
@@ -107,6 +108,8 @@
  * Ver.2.3.2以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/3/22 Ver.2.3.6
+ * 属性、ステート耐性値の取得値を変更。
  * 2022/2/16 Ver.2.3.5
  * パラメータ評価式を属性耐性にも適用。
  * ステート耐性のアイコンをステータス用のアイコン画像にする機能を追加。
@@ -995,7 +998,7 @@
  * @text パラメータ評価式(3)
  * @type combo[]
  * @option '$gameVariables.value(0);//ゲーム変数'
- * @option actor.isStateResist(stateId) ? "無効" : rate;//ステート耐性
+ * @option actor.isStateResist(stateId) ? "無効" : r;//ステート耐性
  * @default 
  * 
  * @param X_Position
@@ -2024,6 +2027,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
         }
         let rate = actor.elementRate(elementId) * 100;
         rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+        const r = rate;
         rate += list.paramUnit ? String(list.paramUnit) : " %";
         const rateText = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : rate;
         this.resetTextColor();
@@ -2068,6 +2072,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
         }
         let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
         rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+        const r = rate;
         rate += list.paramUnit ? String(list.paramUnit) : " %";
         const rateText = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : rate;
         if (actor.isStateResist(stateId)) {

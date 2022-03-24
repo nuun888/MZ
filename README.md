@@ -17,7 +17,7 @@
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.3 |
 | [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md) | [NUUN_StateTurnCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js) |  | 1.1.1 |
 | [レーダーチャート表示ベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md) | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) | 共 | 1.0.2 |
-| [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.3 |
+| [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.5 |
 | [ドロップ率確率操作ベース](https://github.com/nuun888/MZ/blob/master/README/DropItemRateBase.md) |  [NUUN_DropItemRateBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemRateBase.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |

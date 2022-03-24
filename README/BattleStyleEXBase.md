@@ -17,8 +17,9 @@
 バトルスタイル拡張XPスタイル設定用  
 ![画像](img/BattleStyleEX3.png)  
 
-#### 必須、前提プラグイン
+## 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+
 
 バトルレイアウトをXP風に変更します。  
 このプラグインでは他に以下の機能を実装します。  

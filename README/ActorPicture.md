@@ -1,5 +1,5 @@
 # [立ち絵、顔グラ表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
-# Ver.1.2.4
+# Ver.1.2.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -33,6 +33,9 @@
 ステータス表示拡張では立ち絵表示EX用画像設定での設定なしでも適用されます。
 
 ## 更新履歴
+2022/3/24 Ver 1.2.5  
+ステート条件が取得できなかった問題を修正。  
+画像指定の仕様を変更。  
 2022/1/8 Ver 1.2.4  
 説明文を修正。  
 ステートによる変化が適用されない問題を修正。  

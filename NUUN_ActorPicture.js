@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.4
+ * @version 1.2.5
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/24 Ver 1.2.5
+ * ステート条件が取得できなかった問題を修正。
+ * 画像指定の仕様を変更。
  * 2022/1/8 Ver 1.2.4
  * 説明文を修正。
  * ステートによる変化が適用されない問題を修正。
@@ -94,7 +97,7 @@
  * @param GraphicImg
  * @text アクター画像
  * @desc アクターの画像を設定します。
- * @type file[]
+ * @type file
  * @dir img/
  * 
  * @param FaceImg
@@ -211,16 +214,26 @@ Imported.NUUN_ActorPicture = true;
 const parameters = PluginManager.parameters('NUUN_ActorPicture');
 const ButlerActors = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ButlerActors'])) : null) || [];
 
+NuunManager.setupClassName = function(className) {
+  this._className = className;
+};
+
+NuunManager.getClassName = function() {
+  return this._className;
+};
+
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
-  this._actorGraphicData = {};
+  this._actorGraphicIndex = -1;
+  this._actorGraphicName = null;
+  this._actorGraphicFace = null;
   this.onImgId = 0;
 };
 
 const _Game_Actor_setup = Game_Actor.prototype.setup;
 Game_Actor.prototype.setup = function(actorId) {
-  _Game_Actor_setup.call(this, actorId)
+  _Game_Actor_setup.call(this, actorId);
   this.imgRefresh();
 };
 
@@ -238,14 +251,24 @@ Game_Actor.prototype.getActorGraphic = function() {
 };
 
 Game_Actor.prototype.getActorGraphicData = function() {
-  return this._actorGraphicData;
+  const data = this.getActorGraphicList();
+  return data ? this.getActorGraphicList().ButlerActorImg[this._actorGraphicIndex] : null;
 };
 
 Game_Actor.prototype.setActorGraphicData = function() {
   const imgData = this.getActorGraphicList();
   const index = imgData ? imgData.ButlerActorImg.findIndex(data => this.matchConditions(data)) : -1;
   this._actorGraphicIndex = index;
-  this._actorGraphicData = index >= 0 ? imgData.ButlerActorImg[index] : null;
+  if (index >= 0) {
+    const data = imgData.ButlerActorImg[index];
+    this._actorGraphicName = data.GraphicImg;
+    this._actorGraphicFace = data.FaceImg || this.faceName();
+    this._actorImgIndex = data.FaceIndex >= 0 ? data.FaceIndex : this.faceIndex();
+  } else {
+    this._actorGraphicName = null;
+    this._actorGraphicFace = this.faceName();
+    this._actorImgIndex = this.faceIndex();
+  }
 };
 
 Game_Actor.prototype.matchConditions = function(data) {
@@ -307,8 +330,13 @@ Game_Actor.prototype.isClassImg = function(classId) {
 };
 
 Game_Actor.prototype.isStateImg = function(stateId) {
-  
   return this._states.find(state => state === stateId);
+};
+
+Game_Actor.prototype.isClassNameImg = function(data) {
+  const className = NuunManager.getClassName();
+  return data.some(name => className === name);
+
 };
 
 const _Game_Actor_refresh = Game_Actor.prototype.refresh;
@@ -319,35 +347,22 @@ Game_Actor.prototype.refresh = function() {
 
 Game_Actor.prototype.imgRefresh = function() {
   this.setActorGraphicData();
-  $gameTemp.actorGraphicRefresh = true;
 };
 
 Game_Actor.prototype.getActorGraphicImg = function() {
-  return this._actorGraphicData && this._actorGraphicData.GraphicImg ? this._actorGraphicData.GraphicImg[0] : null;
+  return this._actorGraphicName;
 };
 
 Game_Actor.prototype.getActorGraphicFace = function() {
-  return this._actorGraphicData && this._actorGraphicData.FaceImg ? this._actorGraphicData.FaceImg : this.faceName();
+  return this._actorGraphicFace || this.faceName();
 };
 
 Game_Actor.prototype.getActorGraphicFaceIndex = function() {
-  return this._actorGraphicData && this._actorGraphicData.FaceIndex >= 0 ? this._actorGraphicData.FaceIndex : this.faceIndex();
-};
-
-Game_Actor.prototype.getActorGraphicX = function() {
-  return this._actorGraphicData.Actor_X;
-};
-
-Game_Actor.prototype.getActorGraphicY = function() {
-  return this._actorGraphicData.Actor_Y;
-};
-
-Game_Actor.prototype.getActorGraphicScale = function() {
-  return this._actorGraphicData.Actor_Scale / 100;
+  return this._actorImgIndex || this.faceIndex();
 };
 
 Game_Actor.prototype.getIsActorGraphicImg = function() {
-  return this._actorGraphicData && this._actorGraphicData.GraphicImg;
+  return !!this._actorGraphicName;
 };
 
 const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
@@ -405,9 +420,9 @@ Game_Actor.prototype.loadActorFace = function() {
   return ImageManager.loadFace(this.getActorGraphicFace());
 };
 
-Game_Actor.prototype.isActorGraphicDead = function() {
-  return this._actorGraphicData && ((this._actorGraphicData.stateChangeGraphicScenes === 'state' &&
-  this._actorGraphicData.stateId === this.deathStateId()) || ImgStateAll === this.deathStateId());
+Game_Actor.prototype.isActorGraphicDead = function(data) {
+  return data && ((data.stateChangeGraphicScenes === 'state' &&
+  data.stateId === this.deathStateId()) || data.ImgStateAll === this.deathStateId());
 };
 
 })();

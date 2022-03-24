@@ -1,4 +1,4 @@
-# [バトルスタイル拡張ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
+# [バトルスタイル拡張]
 # Ver.3.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 # 設定用プラグイン

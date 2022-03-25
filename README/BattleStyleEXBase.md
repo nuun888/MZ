@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.0.0
+### Ver.3.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)  
@@ -57,5 +57,9 @@
 [バトルスタイル拡張設定用](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX.js) Ver.1.6.3  
 
 ## 更新履歴
+2022/3/25 Ver.3.0.1
+立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加。  
+ダメージポップアップの表示を最前面に表示するように変更。  
+プラグインコマンド「アクターステータスウィンドウ透明化表示」の表記が逆だった問題を修正。  
 2022/3/24 Ver.3.0.0  
 リニューアル版初版  

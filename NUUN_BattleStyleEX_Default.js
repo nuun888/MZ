@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -45,6 +45,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/3/25 Ver.1.0.1
+ * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加
  * 2022/3/24 Ver.1.0.0
  * 初版
  * 
@@ -1723,6 +1725,34 @@
  * @option 被ステート(3)
  * @value 'state'
  * @default 'default'
+ * @parent AllMatch
+ * 
+ * @param ImgSwitch
+ * @text スイッチ
+ * @desc スイッチがONの時に変化します。
+ * @type switch
+ * @default 0
+ * @parent AllMatch
+ * 
+ * @param ImgWeapon
+ * @text 武器
+ * @desc 武器を装備している時に条件を満たします。
+ * @type weapon
+ * @default 0
+ * @parent AllMatch
+ * 
+ * @param ImgArmor
+ * @text 防具
+ * @desc 防具を装備している時に条件を満たします。
+ * @type armor
+ * @default 0
+ * @parent AllMatch
+ * 
+ * @param ImgClass
+ * @text 職業
+ * @desc 特定の職業なら条件を満たします。
+ * @type calss
+ * @default 0
  * @parent AllMatch
  * 
  * @param ImgStateAll

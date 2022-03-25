@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -45,6 +45,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/3/25 Ver.1.0.1
+ * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加。
  * 2022/3/24 Ver.1.0.0
  * 初版
  * 
@@ -1724,6 +1726,34 @@
  * @default 'default'
  * @parent AllMatch
  * 
+ * @param ImgSwitch
+ * @text スイッチ
+ * @desc スイッチがONの時に変化します。
+ * @type switch
+ * @default 0
+ * @parent AllMatch
+ * 
+ * @param ImgWeapon
+ * @text 武器
+ * @desc 武器を装備している時に条件を満たします。
+ * @type weapon
+ * @default 0
+ * @parent AllMatch
+ * 
+ * @param ImgArmor
+ * @text 防具
+ * @desc 防具を装備している時に条件を満たします。
+ * @type armor
+ * @default 0
+ * @parent AllMatch
+ * 
+ * @param ImgClass
+ * @text 職業
+ * @desc 特定の職業なら条件を満たします。
+ * @type calss
+ * @default 0
+ * @parent AllMatch
+ * 
  * @param ImgStateAll
  * @text ステート。
  * @desc 指定したステートになっている時に条件を満たします
@@ -1828,7 +1858,6 @@ params.ActorEffect_X = Number(parameters['ActorEffect_X'] || 0);
 params.ActorEffect_Y = Number(parameters['ActorEffect_Y'] || 0);
 params.ActorDamage_X = Number(parameters['ActorDamage_X'] || 0);
 params.ActorDamage_Y = Number(parameters['ActorDamage_Y'] || 0);
-params.AnimationY = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AnimationY'])) : null) || [];//仮
 
 params.DamageImgFrame = Number(parameters['DamageImgFrame'] || 30);
 params.ActorShakeFlame = Number(parameters['ActorShakeFlame'] || 36);

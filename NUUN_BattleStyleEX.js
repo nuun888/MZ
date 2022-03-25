@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.0.0
+ * @version 3.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,19 +19,23 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2022/3/ Ver.3.0.0
+ * 2022/3/25 Ver.3.0.1
+ * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加
+ * ダメージポップアップの表示を最前面に表示するように変更。
+ * プラグインコマンド「アクターステータスウィンドウ透明化表示」の表記が逆だった問題を修正。
+ * 2022/3/24 Ver.3.0.0
  * リニューアル版初版
  * 
  * 
  * @command ActorStatusWindowOpacity
- * @desc アクターステータスを不透明化します。
- * @text アクターステータス不透明化表示
+ * @desc アクターステータスウィンドウを透明化します。
+ * @text アクターステータスウィンドウ透明化表示
  * 
  * @arg WindowOpacity
  * @type boolean
  * @default false
  * @text 不透明度表示
- * @desc ONのアクターステータスが不透明化します。(trueで不透明化)
+ * @desc ONの時、アクターステータスウィンドウが透明化します。(ONで透明化)
  * 
  * @arg WindowOpacityValue
  * @type number
@@ -309,10 +313,22 @@ Game_Actor.prototype.getActorGraphicDead = function() {
 };
 
 Game_Actor.prototype.battleStyleMatchConditions = function(data) {
-  if (!this.battleStyleMatchChangeGraphic(data)) {
+  if (data.ImgSwitch > 0 && !$gameSwitches.value(data.ImgSwitch)) {
+    return false;
+  }
+  if (data.ImgWeapon > 0 && !this.isEquipped($dataWeapons[data.ImgWeapon])) {
+    return false;
+  }
+  if (data.ImgArmor > 0 && !this.isEquipped($dataArmors[data.ImgArmor])) {
     return false;
   }
   if (data.ImgStateAll > 0 && !this.isBattleStyleStateImg(data.ImgStateAll)) {
+    return false;
+  }
+  if (data.ImgClass > 0 && !this.isBattleStyleClassImg(data.ImgClass)) {
+    return false;
+  }
+  if (!this.battleStyleMatchChangeGraphic(data)) {
     return false;
   }
   return true;
@@ -349,6 +365,10 @@ Game_Actor.prototype.battleStyleMatchChangeGraphic = function(data) {
 
 Game_Actor.prototype.isBattleStyleStateImg = function(stateId) {
   return this._states.find(state => state === stateId);
+};
+
+Game_Actor.prototype.isBattleStyleClassImg = function(classId) {
+  return this._classId === classId;
 };
 
 const _Game_Actor_isSpriteVisible = Game_Actor.prototype.isSpriteVisible;
@@ -2193,7 +2213,8 @@ Spriteset_Battle.prototype.createFrontActors = function() {
       for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
         const sprite = new Sprite_Actor();
         this._actorSprites.push(sprite);
-        this._battleEffects.addChild(sprite);
+        this._battleHudFront.addChild(sprite);
+        //this._battleEffects.addChild(sprite);
       }
     }
 };

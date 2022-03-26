@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.0.2
+### Ver.3.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)  
@@ -68,6 +68,8 @@
 [バトルスタイル拡張設定用](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX.js) Ver.1.6.3  
 
 ## 更新履歴
+2022/3/26 Ver.3.0.3  
+アクターウィンドウステータスのアクター配置を表示範囲可変表示にする機能を追加。  
 2022/3/26 Ver.3.0.2
 敵選択ウィンドウのスキン非表示を設定する項目がなかった問題を修正。  
 逃走失敗時にエラーが出る問題を修正。  

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -45,6 +45,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/3/26 Ver.3.0.3
+ * アクターウィンドウステータスのアクター配置を表示範囲可変表示に対する処理の追加。
  * 2022/3/26 Ver.3.0.2
  * 敵選択ウィンドウのスキン非表示を設定する項目がなかった問題を修正。
  * 2022/3/25 Ver.1.0.1
@@ -339,7 +341,7 @@
  * @text 横アクター数
  * @type number
  * @default 1
- * @min 0
+ * @min 1
  * @max 99
  * @parent ActorStatus
  * 
@@ -348,7 +350,7 @@
  * @text 縦アクター数
  * @type number
  * @default 4
- * @min 0
+ * @min 1
  * @max 99
  * @parent ActorStatus
  * 
@@ -1839,6 +1841,7 @@ params.EnemyWindowBackgroundImg = String(parameters['EnemyWindowBackgroundImg'])
 params.EnemyWindowBackground_X = Number(parameters['EnemyWindowBackground_X'] || 0);
 params.EnemyWindowBackground_Y = Number(parameters['EnemyWindowBackground_Y'] || 0);
 
+params.ActorStatusVariable = false;
 params.ActorMaxCol = Number(parameters['ActorMaxCol'] || 1);
 params.ActorMaxRow = Number(parameters['ActorMaxRow'] || 4);
 params.ActorStatusMode = eval(parameters['ActorStatusMode']) || "center";

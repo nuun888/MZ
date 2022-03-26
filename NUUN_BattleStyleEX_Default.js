@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -45,6 +45,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/3/26 Ver.3.0.3
+ * アクターウィンドウステータスのアクター配置を表示範囲可変表示にする機能を追加。
  * 2022/3/26 Ver.3.0.2
  * 敵選択ウィンドウのスキン非表示を設定する項目がなかった問題を修正。
  * 2022/3/25 Ver.1.0.1
@@ -334,12 +336,19 @@
  * @text アクターステータス設定
  * @default ////////////////////////////////
  * 
+ * @param ActorStatusVariable
+ * @desc アクターの表示範囲可変表示。（メンバー数によってアクターの表示領域が変化します）
+ * @text アクター表示範囲可変表示
+ * @type boolean
+ * @default false
+ * @parent ActorStatus
+ * 
  * @param ActorMaxCol
  * @desc 横に並べるアクター数。
  * @text 横アクター数
  * @type number
  * @default 4
- * @min 0
+ * @min 1
  * @max 99
  * @parent ActorStatus
  * 
@@ -348,7 +357,7 @@
  * @text 縦アクター数
  * @type number
  * @default 1
- * @min 0
+ * @min 1
  * @max 99
  * @parent ActorStatus
  * 
@@ -1840,6 +1849,7 @@ params.EnemyWindowBackgroundImg = String(parameters['EnemyWindowBackgroundImg'])
 params.EnemyWindowBackground_X = Number(parameters['EnemyWindowBackground_X'] || 0);
 params.EnemyWindowBackground_Y = Number(parameters['EnemyWindowBackground_Y'] || 0);
 
+params.ActorStatusVariable = eval(parameters['ActorStatusVariable'] || "false");
 params.ActorMaxCol = Number(parameters['ActorMaxCol'] || 4);
 params.ActorMaxRow = Number(parameters['ActorMaxRow'] || 1);
 params.ActorStatusMode = eval(parameters['ActorStatusMode']) || "center";

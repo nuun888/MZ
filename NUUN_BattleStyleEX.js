@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.0.2
+ * @version 3.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/3/26 Ver.3.0.3
+ * アクターウィンドウステータスのアクター配置を表示範囲可変表示にする機能を追加。
  * 2022/3/26 Ver.3.0.2
  * 敵選択ウィンドウのスキン非表示を設定する項目がなかった問題を修正。
  * 逃走失敗時にエラーが出る問題を修正。
@@ -1137,18 +1139,18 @@ Window_BattleStatus.prototype.initialize = function(rect) {
 
 const _Window_BattleStatus_maxCols = Window_BattleStatus.prototype.maxCols;
 Window_BattleStatus.prototype.maxCols = function() {
-    return params.ActorMaxCol > 0 ? params.ActorMaxCol : Math.max($gameParty.maxBattleMembers(), _Window_BattleStatus_maxCols.call(this));
+  return params.ActorStatusVariable ? Math.min($gameParty.battleMembers().length, _Window_BattleStatus_maxCols.call(this), params.ActorMaxCol) : params.ActorMaxCol;
 };
 
 const _Window_BattleStatus_itemHeight = Window_BattleStatus.prototype.itemHeight;
 Window_BattleStatus.prototype.itemHeight = function() {
-  const row = params.ActorMaxRow > 0 ? params.ActorMaxRow : Math.ceil($gameParty.maxBattleMembers() / this.maxCols());
+  const row = params.ActorMaxRow > 0 ? params.ActorMaxRow : Math.ceil($gameParty.battleMembers().length / this.maxCols());
   return Math.floor(_Window_BattleStatus_itemHeight.call(this) / row);
 };
 
 const _Window_BattleStatus_rowSpacing = Window_BattleStatus.prototype.rowSpacing;
 Window_BattleStatus.prototype.rowSpacing = function() {
-  return Math.ceil($gameParty.maxBattleMembers() / this.maxCols()) > 1 ? 4 : _Window_BattleStatus_rowSpacing.call(this);
+  return Math.ceil($gameParty.battleMembers().length / this.maxCols()) > 1 ? 4 : _Window_BattleStatus_rowSpacing.call(this);
 };
 
 Window_BattleStatus.prototype.itemRect = function(index) {
@@ -1206,7 +1208,7 @@ Window_BattleStatus.prototype.refreshCursor = function() {
 };
 
 Window_BattleStatus.prototype.statusPosition = function(index, rect) {
-    const itemWidth = this.itemWidth();
+    const itemWidth = this.itemWidth();console.log(this.maxCols())
     const maxCols = Math.min(this.maxItems(), this.maxCols());
     if (params.ActorStatusMode === 'center') {
         rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();

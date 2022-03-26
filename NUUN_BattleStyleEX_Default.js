@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -45,6 +45,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/3/26 Ver.3.0.2
+ * 敵選択ウィンドウのスキン非表示を設定する項目がなかった問題を修正。
  * 2022/3/25 Ver.1.0.1
  * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加
  * 2022/3/24 Ver.1.0.0
@@ -366,6 +368,13 @@
  * @param EnemyWindow
  * @text 敵キャラ選択設定
  * @default ------------------------------
+ * 
+ * @param EnemyWindowShow
+ * @desc ウィンドウ画像を表示する。OFFにするとウィンドウスキンが表示されません。
+ * @text ウィンドウ画像表示
+ * @type boolean
+ * @default true
+ * @parent EnemyWindow
  * 
  * @param EnemyMaxRow
  * @desc 表示する行数。
@@ -854,13 +863,6 @@
  * @param EnemyAppearWindow
  * @text モンスター出現ウィンドウ
  * @default ////////////////////////////////
- * 
- * @param EnemyAppearWindowShow
- * @desc ウィンドウ画像を表示する。OFFにするとウィンドウスキンが表示されません。
- * @text ウィンドウ画像表示
- * @type boolean
- * @default true
- * @parent EnemyAppearWindow
  * 
  * @param AppearWindowVisible
  * @desc モンスターが出現したときのメッセージを表示しません。
@@ -1826,6 +1828,7 @@ params.ActorBackground_X = Number(parameters['ActorBackground_X'] || 0);
 params.ActorBackground_Y = Number(parameters['ActorBackground_Y'] || 0);
 params.WidthWithCommand = eval(parameters['WidthWithCommand'] || "true");
 
+params.EnemyWindowShow = eval(parameters['EnemyWindowShow'] || "true");
 params.EnemyMaxRow = Number(parameters['EnemyMaxRow'] || 4);
 params.EnemyMaxCol = Number(parameters['EnemyMaxCol'] || 1);
 params.EnemyWindow_X = Number(parameters['EnemyWindow_X'] || 0);
@@ -1888,7 +1891,6 @@ params.FaceHeightOnWindow = eval(parameters['FaceHeightOnWindow'] || "false");
 
 params.EnemySkillAnimation = Number(parameters['EnemySkillAnimation'] || 1);
 
-params.EnemyAppearWindowShow = eval(parameters['EnemyAppearWindowShow'] || "true");
 params.AppearWindowVisible = eval(parameters['AppearWindowVisible'] || "false");
 params.AppearWindowOpacity = Number(parameters['AppearWindowOpacity'] || 255);
 params.AppearWindowAnchorMode = eval(parameters['AppearWindowAnchorMode']) || 'under';

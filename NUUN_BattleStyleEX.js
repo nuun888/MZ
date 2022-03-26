@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.0.1
+ * @version 3.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/3/26 Ver.3.0.2
+ * 敵選択ウィンドウのスキン非表示を設定する項目がなかった問題を修正。
+ * 逃走失敗時にエラーが出る問題を修正。
+ * 敵出現、勝利、敗北、逃走時に背景画像を指定したときに、背景のY座標が正常に適用していなかった問題を修正。
  * 2022/3/25 Ver.3.0.1
  * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加
  * ダメージポップアップの表示を最前面に表示するように変更。
@@ -139,7 +143,7 @@ BattleManager.displayEscapeSuccessMessage = function() {
 const _BattleManager_displayEscapeFailureMessage = BattleManager.displayEscapeFailureMessage;
 BattleManager.displayEscapeFailureMessage = function() {
   _BattleManager_displayEscapeFailureMessage.call(this);
-  this.displayMessagePosition(params.EscapeWindowAnchorMode);
+  this.setDisplayMessagePosition(params.EscapeWindowAnchorMode);
   this.displayMessageType("EscapeFailure");
 };
 
@@ -836,23 +840,23 @@ Scene_Battle.prototype.bsMessageBackground = function() {
   if (BattleManager.getDisplayMessageType() === "Appear" && params.AppearBackgroundImg) {
     this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.AppearBackgroundImg);
     this._messageBackground.x = this._messageWindow.x + params.AppearBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.x + params.AppearBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    this._messageBackground.y = this._messageWindow.y + params.AppearBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
   } else if (BattleManager.getDisplayMessageType() === "Victory" && params.VictoryBackgroundImg) {
     this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.VictoryBackgroundImg);
     this._messageBackground.x = this._messageWindow.x + params.VictoryBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.x + params.VictoryBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    this._messageBackground.y = this._messageWindow.y + params.VictoryBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
   } else if (BattleManager.getDisplayMessageType() === "Defeat" && params.LoseBackgroundImg) {
     this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.LoseBackgroundImg);
     this._messageBackground.x = this._messageWindow.x + params.LoseBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.x + params.LoseBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    this._messageBackground.y = this._messageWindow.y + params.LoseBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
   } else if (BattleManager.getDisplayMessageType() === "Escape" && params.EscapeBackgroundImg) {
     this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.EscapeBackgroundImg);
     this._messageBackground.x = this._messageWindow.x + params.EscapeBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.x + params.EscapeBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    this._messageBackground.y = this._messageWindow.y + params.EscapeBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
   } else if (BattleManager.getDisplayMessageType() === "EscapeFailure" && params.EscapeFailureBackgroundImg) {
     this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.EscapeFailureBackgroundImg);
     this._messageBackground.x = this._messageWindow.x + params.EscapeFailureBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.x + params.EscapeFailureBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    this._messageBackground.y = this._messageWindow.y + params.EscapeFailureBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
   } else {
     this._messageBackground.bitmap = null;
     this._messageBackground.x = this._messageWindow.x;
@@ -1661,7 +1665,7 @@ const _Window_BattleEnemy_initialize = Window_BattleEnemy.prototype.initialize;
 Window_BattleEnemy.prototype.initialize = function(rect) {
   _Window_BattleEnemy_initialize.call(this, rect);
   this._bsBackground = null;
-  this.opacity = params.EnemyAppearWindowShow ? 255 : 0;
+  this.opacity = params.EnemyWindowShow ? 255 : 0;
 };
 
 Window_BattleEnemy.prototype.maxCols = function() {

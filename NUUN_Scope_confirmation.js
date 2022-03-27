@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.0
+ * @version 1.6.1
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -49,6 +49,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/27 Ver.1.6.1
+ * XP風対象選択ウィンドウのプラグイン名が間違っていたので修正。
  * 2021/3/27 Ver.1.6.0
  * XPスタイル対象選択ウィンドウに対応するための定義追加。
  * 全カーソル表示で対象のカーソル表示を判定させる評価式の仕様を変更。
@@ -225,7 +227,7 @@ Scene_Battle.prototype.setActorTargetSelectData = function(action, text) {
   if (userTargetTag && userTargetTag.TargetName) {
     text = userTargetTag.TargetName;
   }
-  if (Imported.NUUN_EnemyCommandWindow_XPStyle) {
+  if (Imported.NUUN_XPSelectWindow) {
     const window = action.isForOpponent() ? this._enemySelectWindow : this._actorSelectWindow;
     if (window) {
       if (text) {

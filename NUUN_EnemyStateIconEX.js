@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 敵ステート表示拡張
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -36,6 +36,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/27 Ver.1.0.1
+ * 戦闘開始時にエラーが起きる問題を修正。
  * 2021/12/12 Ver.1.0.0
  * 初版
  * 
@@ -210,7 +212,7 @@ Sprite_StateIcon.prototype.stateVisible = function() {
 const _Sprite_StateIcon_update = Sprite_StateIcon.prototype.update;
 Sprite_StateIcon.prototype.update = function() {
   _Sprite_StateIcon_update.call(this);
-  if (this._battler.isEnemy()) {
+  if (this._battler && this._battler.isEnemy()) {
     this.stateVisible();
   }
 };

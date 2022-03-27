@@ -1,4 +1,4 @@
-# [XPスタイル対象選択ウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)
+# [XP風対象選択ウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)  
 

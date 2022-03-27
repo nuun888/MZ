@@ -1,5 +1,5 @@
 # [全体、ランダム、敵味方全体攻撃でも対象選択](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js)
-# Ver.1.6.0
+# Ver.1.6.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -35,6 +35,8 @@
 `%2`:ランダム回数  
 
 ## 更新履歴
+2021/3/27 Ver.1.6.1  
+XP風対象選択ウィンドウのプラグイン名が間違っていたので修正。  
 2021/3/27 Ver.1.6.0  
 XPスタイル対象選択ウィンドウに対応するための定義追加。  
 全カーソル表示で対象のカーソル表示を判定させる評価式の仕様を変更。  

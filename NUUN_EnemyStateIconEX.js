@@ -37,6 +37,7 @@
  * 
  * 更新履歴
  * 2022/3/27 Ver.1.0.1
+ * ステートの表示をなしに設定してもアイコンが表示されてしまう問題を修正。
  * 戦闘開始時にエラーが起きる問題を修正。
  * 2021/12/12 Ver.1.0.0
  * 初版
@@ -162,6 +163,8 @@ Sprite_Enemy.prototype.updateStateIcon = function() {
       this._stateIconSprite.y -= this.getButlerStateHeight();
     } else if (this.getStateIconPosition() === 2) {
       this._stateIconSprite.y -= Math.floor(this.getButlerStateHeight() / 2);
+    } else if (this.getStateIconPosition() === -1) {
+      this._stateIconSprite.visible = false;
     }
     this.stateIconOpacity();
   }

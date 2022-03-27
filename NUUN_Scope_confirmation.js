@@ -12,7 +12,8 @@
  * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
  * @base NUUN_Base
- * @version 1.5.1
+ * @orderAfter NUUN_Base
+ * @version 1.6.0
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -34,6 +35,11 @@
  * <[tag]> [tag]：全カーソル表示時対象設定で設定したタグ名
  * 例：<NotUserTarget> NotUserTargetは全カーソル表示時対象設定のタグ名を変更してない限り、使用者以外のカーソルを表示します。
  * 
+ * 以下の機能はXPスタイル対象選択ウィンドウプラグインが必要です。
+ * 敵味方対象選択時の表示名
+ * %1:連続回数
+ * %2:ランダム回数
+ * 
  * デフォルト設定
  * <NotUserTarget> 使用者除外。
  * <DeathTarget> 戦闘不能者を含む。
@@ -43,6 +49,9 @@
  * 
  * 
  * 更新履歴
+ * 2021/3/27 Ver.1.6.0
+ * XPスタイル対象選択ウィンドウに対応するための定義追加。
+ * 全カーソル表示で対象のカーソル表示を判定させる評価式の仕様を変更。
  * 2021/7/18 Ver.1.5.1
  * 全カーソル表示時対象設定で設定したタグが取得できていない問題を修正。
  * スクロールしたときに選択対象になっていないアクターにカーソルが表示されてしまう問題を修正。
@@ -96,6 +105,41 @@
  * @type struct<UserSelectTasList>[]
  * @default ["{\"UserTagName\":\"NotUserTarget\",\"UserTagEval\":\"members.filter(member => member.isAlive() && member !== subject)\"}","{\"UserTagName\":\"DeathTarget\",\"UserTagEval\":\"members\"}"]
  * 
+ * 
+ * @param XPSelectSetting
+ * @text XPスタイル対象選択ウィンドウ設定(要XPスタイル対象選択ウィンドウ)
+ * @default ------------------------------
+ * 
+ * @param TargetUser
+ * @desc 対象が使用者の時の表示名。
+ * @text 表示名
+ * @type string
+ * @default 使用者
+ * 
+ * @param TargetEveryone
+ * @desc 対象が敵味方全体の時の表示名。
+ * @text 表示名
+ * @type string
+ * @default 敵味方全体
+ * 
+ * @param TargetParty
+ * @desc 対象が味方全体の時の表示名。
+ * @text 表示名
+ * @type string
+ * @default 味方全体
+ * 
+ * @param TargetTroop
+ * @desc 対象が敵全体の時の表示名。
+ * @text 表示名
+ * @type string
+ * @default 敵全体
+ * 
+ * @param TargetTroopRandom
+ * @desc 対象が敵にランダムの時の表示名。
+ * @text 表示名
+ * @type string
+ * @default 敵ランダム %2回
+ * 
  */
 /*~struct~UserSelectTasList:
  * 
@@ -108,8 +152,16 @@
  * @param UserTagEval
  * @desc 全カーソル表示で対象のカーソル表示を判定させる評価式。
  * @text 評価式
- * @type string
+ * @type combo
+ * @option members.filter(member => member.isAlive() && member !== subject);
+ * @option members;
  * @default
+ * 
+ * @param TargetName
+ * @desc 対象選択時の表示名。(要XPスタイル対象選択ウィンドウ)
+ * @text 表示名(要XPスタイル対象選択ウィンドウ)
+ * @type string
+ * @default 
  *
  */
 var Imported = Imported || {};
@@ -120,6 +172,12 @@ const parameters = PluginManager.parameters('NUUN_Scope_confirmation');
 const ForUserSelect = eval(parameters['ForUserSelect'] || 'false');
 const MultiCursorMode = eval(parameters['MultiCursorMode'] || 'true');
 const EnemyOnrySelect = eval(parameters['EnemyOnrySelect'] || 'false');
+const TargetUser = String(parameters['TargetUser'] || '使用者');
+const TargetEveryone = String(parameters['TargetEveryone'] || '敵味方全体');
+const TargetParty = String(parameters['TargetParty'] || '味方全体');
+const TargetTroop = String(parameters['TargetTroop'] || '敵全体');
+const TargetPartyRandom = String(parameters['TargetPartyRandom'] || '味方ランダム');
+const TargetTroopRandom = String(parameters['TargetTroopRandom'] || '敵ランダム');
 const UserSelectTasg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['UserSelectTasg'])) : null) || [];
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
@@ -128,31 +186,55 @@ Scene_Battle.prototype.onSelectAction = function() {
   const action = BattleManager.inputtingAction();
   const item = action.item();
   if (this.isTargetSelectForUser(action, item)) {
+    this.setActorTargetSelectData(action, TargetUser);
     this.startActorSelection();
     this._actorWindow.selectForItem(action);
   } else if (this.isTargetSelectEveryone(action, item)) {
+    this.setActorTargetSelectData(action, TargetEveryone);
     this.startEnemySelection();
     this._enemyWindow.selectForItem(action);
     this._actorWindow.selectForItem(action);
   } else if (this.isTargetSelectForRandom(action, item)) {
     if (action.isForOpponent()) {
+      this.setActorTargetSelectData(action, TargetTroopRandom);
       this.startEnemySelection();
-      this._enemyWindow.selectForItem(action); 
+      this._enemyWindow.selectForItem(action);
     } else {
+      this.setActorTargetSelectData(action, TargetPartyRandom);
       this.startActorSelection();
       this._actorWindow.selectForItem(action);
     }
   } else if (this.isTargetSelectisForAll(action, item)) {
     if (action.isForOpponent()) {
+      this.setActorTargetSelectData(action, TargetTroop);
       this.startEnemySelection();
-      this._enemyWindow.selectForItem(action); 
+      this._enemyWindow.selectForItem(action);  
     } else {
+      this.setActorTargetSelectData(action, TargetParty);
       this.startActorSelection();
       this._actorWindow.selectForItem(action);
     }
   } else {
+    this.setActorTargetSelectData(action, null);
     _Scene_Battle_onSelectAction.call(this);
   }
+};
+
+Scene_Battle.prototype.setActorTargetSelectData = function(action, text) {
+  const userTargetTag = UserSelectTasg.find(tag => action.item().meta[tag.UserTagName]);
+  if (userTargetTag && userTargetTag.TargetName) {
+    text = userTargetTag.TargetName;
+  }
+  if (Imported.NUUN_EnemyCommandWindow_XPStyle) {
+    const window = action.isForOpponent() ? this._enemySelectWindow : this._actorSelectWindow;
+    if (window) {
+      if (text) {
+        window.setForItem(text.format(action.item().repeats, action.numTargets()));
+      } else {
+        window.setForItem(null);
+      } 
+    }
+  }//%1　連続回数　%2 ランダム回数 
 };
 
 Scene_Battle.prototype.isTargetSelectForUser = function(action, item) {

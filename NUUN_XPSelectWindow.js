@@ -8,7 +8,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc XPスタイル対象選択ウィンドウ
+ * @plugindesc XP風対象選択ウィンドウ
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base

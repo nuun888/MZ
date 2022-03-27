@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ダメージポップアップ画像化
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderBefore NUUN_DamagePopUpSimulDisplay
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/27 Ver 1.1.1
+ * ダメージポップアップのイメージインデックスがずれる問題を修正。
  * 2022/1/8 Ver 1.1.0
  * 割り当てられる画像の種類を増やせるように修正。
  * 各ポップアップ画像のインデックス番号を指定できるように修正。
@@ -190,7 +192,7 @@ Imported.NUUN_DamagePopUpImg = true;
   Sprite_Damage.prototype.createDigits = function(value) {
     if (this._damageBitmap) {
       const string = Math.abs(value).toString();
-      const row = this.getBaseRow(value) + (value < 0 ? 1 : 0);
+      const row = this.getBaseRow(value);
       const w = this.digitWidth();
       const h = this.digitHeight();
       for (var i = 0; i < string.length; i++) {

@@ -1,4 +1,4 @@
-# [戦闘中アイテム、スキル選択画面MV風表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)
+# [XPスタイル対象選択ウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)  
 

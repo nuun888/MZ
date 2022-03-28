@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.0.3
+ * @version 3.0.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/3/27 Ver.3.0.4
+ * アニメーション、ダメージポップアップの表示がずれるため一時的にもとに戻す修正。
  * 2022/3/26 Ver.3.0.3
  * アクターウィンドウステータスのアクター配置を表示範囲可変表示にする機能を追加。
  * 2022/3/26 Ver.3.0.2
@@ -27,7 +29,6 @@
  * 敵出現、勝利、敗北、逃走時に背景画像を指定したときに、背景のY座標が正常に適用していなかった問題を修正。
  * 2022/3/25 Ver.3.0.1
  * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加
- * ダメージポップアップの表示を最前面に表示するように変更。
  * プラグインコマンド「アクターステータスウィンドウ透明化表示」の表記が逆だった問題を修正。
  * 2022/3/24 Ver.3.0.0
  * リニューアル版初版
@@ -1101,8 +1102,13 @@ Window_ActorCommand.prototype.refresh = function() {
       const rect = statusData.itemRect(actorIndex);
       this.setCommandHeight();
       if (params.ActorCommandPosition === 'actor') {
-        this.x = rect.x + statusData.itemPadding() + ((rect.width - this.width) / 2) + params.ActorCommand_X;
-        this.y = this.homeY - this.height + rect.y;
+        //if (Imported.NUUN_SupportActor && this._actor.getSupportActor()) {
+          //this.x = params.ActorCommand_X;//暫定
+          //this.y = params.ActorCommand_Y;//暫定
+        //} else {
+          this.x = rect.x + statusData.itemPadding() + ((rect.width - this.width) / 2) + params.ActorCommand_X;
+          this.y = this.homeY - this.height + rect.y;
+        //}
       } else if (params.ActorCommandPosition === 'svtop') {
         data = this.SvActorData[actorIndex];
         this.x = data.x - (this.width + data.width) / 2 + 32 + params.ActorCommand_X;
@@ -1208,7 +1214,7 @@ Window_BattleStatus.prototype.refreshCursor = function() {
 };
 
 Window_BattleStatus.prototype.statusPosition = function(index, rect) {
-    const itemWidth = this.itemWidth();console.log(this.maxCols())
+    const itemWidth = this.itemWidth();
     const maxCols = Math.min(this.maxItems(), this.maxCols());
     if (params.ActorStatusMode === 'center') {
         rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
@@ -2219,8 +2225,8 @@ Spriteset_Battle.prototype.createFrontActors = function() {
       for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
         const sprite = new Sprite_Actor();
         this._actorSprites.push(sprite);
-        this._battleHudFront.addChild(sprite);
-        //this._battleEffects.addChild(sprite);
+        //this._battleHudFront.addChild(sprite);
+        this._battleEffects.addChild(sprite);
       }
     }
 };

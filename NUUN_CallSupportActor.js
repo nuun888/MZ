@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクター呼び出し
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_SupportActor
  * @orderAfter NUUN_SupportActor
  * 
@@ -24,22 +24,24 @@
  * [deadCallActor]:1 呼び出し者が戦闘不能になった場合、ターン終了時に戦闘から離脱します。0 指定なし
  * 
  * 更新履歴
+ * 2022/3/28 Ver.1.0.1
+ * サポートアクター更新により定義変更。
  * 2021/12/25 Ver.1.0.0
  * 初版
  * 
  * @param SupportActorSuccessMessage
  * @text サポートアクター呼び出し時メッセージ
- * @desc サポートアクター呼び出しに成功した時のメッセージ。%1：使用者　%2：呼び出しアクター
+ * @desc サポートアクター呼び出しに成功した時のメッセージ。%1：使用者　%2：呼び出したアクター
  * @default 
  * 
  * @param SupportActorMissMessage
  * @text サポートアクター呼び出し失敗時メッセージ
- * @desc サポートアクター呼び出しに失敗した時のメッセージ。%1：使用者　%2：呼び出しアクター
+ * @desc サポートアクター呼び出しに失敗した時のメッセージ。%1：使用者　%2：呼び出したアクター
  * @default 
  * 
  * @param SupportActorRemoveMessage
  * @text サポートアクター呼び出しアクター消滅時メッセージ
- * @desc サポートアクター呼び出しアクター消滅時のメッセージ。%1：呼び出しアクター
+ * @desc サポートアクター呼び出しアクター消滅時のメッセージ。%1：呼び出したアクター
  * @default 
  * 
  */

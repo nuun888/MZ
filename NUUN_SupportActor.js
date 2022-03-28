@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.3.5
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/28 Ver.1.4.0
+ * 処理の見直しにより定義修正。
  * 2021/12/30 Ver.1.3.5
  * ステータス画面を開くとエラーが出る問題を修正。
  * サポートアクターをパーティに加えた時に、TPBバトルだと動作しない問題を修正。
@@ -83,6 +85,13 @@
  * @default -1
  * @min -2
  * 
+ * 
+ * @param SupportActorMode
+ * @desc サポートアクターを常に通常戦闘メンバーの後に表示。
+ * @text サポートアクター適用順
+ * @type boolean
+ * @default false
+ * 
  * @param SupportActorSV
  * @text サイドビューサポートアクター設定
  * @desc サイドビューサポートアクター設定。
@@ -112,13 +121,12 @@ Imported.NUUN_SupportActor = true;
   const parameters = PluginManager.parameters('NUUN_SupportActor');
   const SupportActorSV = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SupportActorSV'])) : null) || [];
   const SupportActorMode = eval(parameters['SupportActorMode'] || 'false');
-  let sIndex = -1;
 
   const pluginName = "NUUN_SupportActor";
   PluginManager.registerCommand(pluginName, 'SupportActorSetting', args => {
     const actorId = Number(args.Actor);
     if (actorId > 0) {
-      $gameActors._data[actorId].setAddSupportActor(args);
+      $gameActors.actor(actorId).setAddSupportActor(args);
     }
   });
 
@@ -143,38 +151,6 @@ Imported.NUUN_SupportActor = true;
     this.setSupportActorTurn(Number(args.SupportActorTurn));
   };
 
-  Game_Actor.prototype.setSupportActor = function(flag) {
-    this._supportActor = flag;
-  };
-
-  Game_Actor.prototype.getSupportActor = function() {
-    if (!this._supportActor) {
-      this._supportActor = this.isSupportActor();
-    }
-    return this._supportActor;
-  };
-
-  Game_Actor.prototype.isSupportActor = function() {
-    return !!this.actor().meta.SupportActor;
-  };
-
-  Game_Actor.prototype.noResultSupportActor = function() {
-    return this.actor().meta.NoResultSupportActor;
-  };
-
-  Game_Actor.prototype.supportActorindex = function() {
-    return $gameParty.supportBattleMembers().indexOf(this);
-  };
-
-  const _Game_Actor_isBattleMember = Game_Actor.prototype.isBattleMember;
-  Game_Actor.prototype.isBattleMember = function() {
-    const result = _Game_Actor_isBattleMember.call(this);
-    if (result) {
-      return result;
-    }
-    return $gameParty.supportBattleMembers().includes(this);
-  };
-
   Game_Actor.prototype.updateSupportActorTurn = function() {
     if (this._supportActorTurn > 0) {
         this._supportActorTurn--;
@@ -187,6 +163,30 @@ Imported.NUUN_SupportActor = true;
 
   Game_Actor.prototype.getSupportActorTurn = function() {
     return this._supportActorTurn;
+  };
+
+  const _Game_Actor_isBattleMember = Game_Actor.prototype.isBattleMember;
+  Game_Actor.prototype.isBattleMember = function() {
+    return _Game_Actor_isBattleMember.call(this) || $gameParty.supportActorMembers().includes(this);
+  };
+
+  Game_Actor.prototype.setSupportActor = function(flag) {
+    this._supportActor = flag;
+  };
+
+  Game_Actor.prototype.isSupportActor = function() {
+    return !!this.actor().meta.SupportActor;
+  };
+
+  Game_Actor.prototype.getSupportActor = function() {
+    if (!this._supportActor) {
+      this._supportActor = this.isSupportActor();
+    }
+    return this._supportActor;
+  };
+
+  Game_Actor.prototype.supportActorindex = function() {
+    return $gameParty.supportActorMembers().indexOf(this);
   };
 
   Game_Actor.prototype.setSupportActorCallActor = function(actorId) {
@@ -244,9 +244,158 @@ Imported.NUUN_SupportActor = true;
     }
   };
 
-  const _BattleManager_allBattleMembers = BattleManager.allBattleMembers;
-  BattleManager.allBattleMembers = function() {
-    return _BattleManager_allBattleMembers.call(this).concat($gameParty.supportBattleMembers())
+  
+  const _Game_Party_initialize = Game_Party.prototype.initialize;
+  Game_Party.prototype.initialize = function() {
+    _Game_Party_initialize.call(this);
+    this._withSuppoter =  false;
+    this._withRearSuppoter =  false;
+  };
+
+  const _Game_Party_makeActions = Game_Party.prototype.makeActions;
+  Game_Party.prototype.makeActions = function() {
+    _Game_Party_makeActions.call(this);
+    for (const member of this.supportActorMembers()) {
+        member.makeActions();
+    }
+  };
+
+  const _Game_Party_updateTpb = Game_Party.prototype.updateTpb;
+  Game_Party.prototype.updateTpb = function() {
+    _Game_Party_updateTpb.call(this);
+    for (const member of this.supportActorMembers()) {
+      member.updateTpb();  
+    }
+  };
+
+  const _Game_Party_battleMembers = Game_Party.prototype.battleMembers;
+  Game_Party.prototype.battleMembers = function() {
+    const members = _Game_Party_battleMembers.call(this);
+    if (this.isWithRearSupportActor()) {
+      this._withRearSuppoter = false;
+      return this.rearSupportActorBattleMembers(members);
+    } else if (this.isWithSupportActorMember()) {
+      this._withSuppoter = false;
+      return this.withSupportActorBattleMembers(members);
+    } else {
+      return this.normalOnlyBattleMembers(members);
+    }
+  };
+
+  Game_Party.prototype.membersInSupportActorNum = function(members) {//メンバー内のサポートアクター人数
+    return members.reduce((r, member) => r + (member.getSupportActor() ? 1 : 0), 0);
+  };
+
+  Game_Party.prototype.normalOnlyBattleMembers = function(members) {
+    const maxMember = this.maxBattleMembers();
+    let i = maxMember - this.membersInSupportActorNum(members);
+    members = members.filter(member => !member.getSupportActor());//メンバーからサポートアクターを外す
+    const concatMembers = this.allMembers().slice(this.maxBattleMembers()).filter(member => {
+      if (i < maxMember && member.isAppeared() && !member.getSupportActor()) {
+        i++;
+        return true;
+      }
+      return false;
+    });
+    Array.prototype.push.apply(members, concatMembers);
+    return members;
+  };
+
+  Game_Party.prototype.withSupportActorBattleMembers = function(members) {
+    const maxMember = this.maxBattleMembers();
+    let i = maxMember - this.membersInSupportActorNum(members);
+    const concatMembers = this.allMembers().slice(this.maxBattleMembers()).filter(member => {
+      if (i < maxMember && member.isAppeared() && !member.getSupportActor()) {
+        i++;
+        return true;
+      }
+      if (member.getSupportActor() && member.isAppeared()) {
+        return true;
+      }
+      return false;
+    });
+    Array.prototype.push.apply(members, concatMembers);
+    return members;
+  };
+
+  Game_Party.prototype.rearSupportActorBattleMembers = function(members) {
+    members = this.normalOnlyBattleMembers(members);
+    const concatMembers = this.supportActorMembers();
+    Array.prototype.push.apply(members, concatMembers);
+    return members;
+  };
+
+  Game_Party.prototype.supportActorMembers = function() {//全てのサポートアクターを取得
+    return this.allMembers().filter(member => member.isSupportActor());
+  };
+
+  Game_Party.prototype.supportActorWithinMembers = function() {//バトルメンバー内のサポートアクターを取得
+    return this.allMembers().slice(0, this.maxBattleMembers()).filter(member => member.isSupportActor());
+  };
+
+  Game_Party.prototype.setWithSupportActorMember = function() {
+    this._withSuppoter = true;
+  };
+
+  Game_Party.prototype.isWithSupportActorMember = function() {
+    return this._withSuppoter;
+  };
+
+  Game_Party.prototype.setWithRearSupportActor = function() {
+    this._withRearSuppoter = true;
+  };
+
+  Game_Party.prototype.isWithRearSupportActor = function() {
+    return this._withRearSuppoter;
+  };
+  
+  const _Game_Party_canInput = Game_Party.prototype.canInput;
+  Game_Party.prototype.canInput = function() {
+    if (this.inBattle()) {
+      this.setWithRearSupportActor();
+    }
+    return _Game_Party_canInput.call(this);
+  };
+
+  const _Game_Party_addActor = Game_Party.prototype.addActor;
+  Game_Party.prototype.addActor = function(actorId) {
+    const inc = !this._actors.includes(actorId);
+    _Game_Party_addActor.call(this, actorId)
+    if (inc && this._actors.includes(actorId)) {
+      if (this.inBattle()) {
+        const actor = $gameActors.actor(actorId);
+        if (this.supportActorMembers().includes(actor)) {
+          actor.onBattleStart();
+        }
+      }
+    }
+  };
+
+  const _Game_Follower_actor = Game_Follower.prototype.actor;
+  Game_Follower.prototype.actor = function() {
+    $gameParty.setWithSupportActorMember();
+    return _Game_Follower_actor.call(this);
+  };
+
+
+  const _BattleManager_changeCurrentActor = BattleManager.changeCurrentActor;
+  BattleManager.changeCurrentActor = function(forward) {
+    $gameParty.setWithSupportActorMember();
+    _BattleManager_changeCurrentActor.call(this, forward);
+  };
+
+  const _BattleManager_makeActionOrders = BattleManager.makeActionOrders;
+  BattleManager.makeActionOrders = function() {
+    _BattleManager_makeActionOrders.call(this);
+    const battlers = this._actionBattlers;
+    if (!this._surprise) {
+      Array.prototype.push.apply(battlers, $gameParty.supportActorMembers());
+    }
+    for (const battler of battlers) {
+      battler.makeSpeed();
+    }
+    battlers.sort((a, b) => b.speed() - a.speed());
+    this._actionBattlers = battlers;
   };
 
   const _BattleManager_displayBattlerStatus = BattleManager.displayBattlerStatus;
@@ -257,221 +406,11 @@ Imported.NUUN_SupportActor = true;
     }
   };
 
-  const _BattleManager_makeActionOrders = BattleManager.makeActionOrders;
-  BattleManager.makeActionOrders = function() {
-    _BattleManager_makeActionOrders.call(this);
-    const battlers = this._actionBattlers;
-    if (!this._surprise) {
-      battlers.push(...$gameParty.supportBattleMembers());
-    }
-    for (const battler of battlers) {
-      battler.makeSpeed();
-    }
-    battlers.sort((a, b) => b.speed() - a.speed());
-    this._actionBattlers = battlers;
-  };
-
-  const _BattleManager_changeCurrentActor = BattleManager.changeCurrentActor;
-  BattleManager.changeCurrentActor = function(forward) {
-    $gameParty.membersMode = true;
-    _BattleManager_changeCurrentActor.call(this, forward);
-  };
-
-  const _Game_Party_initialize = Game_Party.prototype.initialize;
-  Game_Party.prototype.initialize = function() {
-    _Game_Party_initialize.call(this);
-  };
-
-  const _Game_Party_battleMembers = Game_Party.prototype.battleMembers;
-  Game_Party.prototype.battleMembers = function() {
-    let members = _Game_Party_battleMembers.call(this).concat(this.addBattleMembers());
-    if (!SupportActorMode && this.membersMode) {
-      this.membersMode = false;
-      let i = 0;
-      return members.filter(member => {
-        if (!member.getSupportActor() && i < this.maxBattleMembers()) {
-          i++;
-          return true;
-        } else if (member.getSupportActor()) {
-          return true;
-        }
-      });
-    }
-    this.membersMode = false;
-    const members2 = this.MainBattleMembers(members).slice(0,this.maxBattleMembers());
-    return SupportActorMode ? members2.concat(this.allSupportBattleMembers(members)) : members2;
-  };
-
-  Game_Party.prototype.addBattleMembers = function() {
-    return this.allMembers().slice(this.maxBattleMembers());
-  };
-
-  Game_Party.prototype.addSupportMembers = function() {
-    return this.allMembers().slice(this.maxBattleMembers()).filter(actor => actor.isAppeared() && actor.getSupportActor());
-  };
-
-  Game_Party.prototype.MainBattleMembers = function(members) {
-    return members.filter(actor => !actor.getSupportActor());
-  };
-
-  Game_Party.prototype.allSupportBattleMembers = function(member) {
-    return member.filter(actor => actor.isAppeared() && actor.getSupportActor());
-  };
-
-  Game_Party.prototype.supportBattleMembers = function() {
-    return this.allMembers().filter(actor => actor.isAppeared() && actor.getSupportActor());
-  };
-
-  Game_Party.prototype.supportMainBattleMembers = function() {
-    let index = 0;
-    this.membersMode = true;
-    const maxMembers = this.battleMembers().length;
-    return this.allMembers().slice(0, maxMembers).filter(actor => {
-      if (actor.isAppeared() && !actor.getSupportActor()) {
-      index++;
-      }
-      if (actor.isAppeared() && actor.getSupportActor() && this.maxBattleMembers() > index) {
-        return true;
-      }
-    },); 
-  };
-
-  Game_Party.prototype.setSupportBattleMembersNum = function() {
-    this._supportBattleMembersNum = this.supportMainBattleMembers().length;
-  };
-
-  Game_Party.prototype.getSupportBattleMembersNum = function() {
-    return this._supportBattleMembersNum;
-  };
-
-  const _Game_Party_makeActions = Game_Party.prototype.makeActions;
-  Game_Party.prototype.makeActions = function() {
-    _Game_Party_makeActions.call(this);
-    for (const member of this.supportBattleMembers()) {
-        member.makeActions();
-    }
-  };
-
-  const _Game_Party_updateTpb = Game_Party.prototype.updateTpb;
-  Game_Party.prototype.updateTpb = function() {
-    _Game_Party_updateTpb.call(this);
-    for (const member of this.supportBattleMembers()) {
-      member.updateTpb();  
-    }
-  };
-
-  const _Game_Party_canInput = Game_Party.prototype.canInput;
-  Game_Party.prototype.canInput = function() {
-    return _Game_Party_canInput.call(this) || this.supportBattleMembers().some(actor => actor.canInput());
-  };
-
-  Game_Party.prototype.resultSupportMembers = function(reserve, support) {
-    if (support) {
-      this.membersMode = true;
-    }
-    if (reserve) {
-      return this.resultMembers();
-    } else {
-      return this.battleMembers();
-    }
-  };
-
-  const _Game_Player_refresh = Game_Player.prototype.refresh;
-  Game_Player.prototype.refresh = function() {
-    $gameParty.setSupportBattleMembersNum();
-    _Game_Player_refresh.call(this);
-  };
-
-  const _Game_Party_addActor = Game_Party.prototype.addActor;
-  Game_Party.prototype.addActor = function(actorId) {
-    const inc = !this._actors.includes(actorId);
-    _Game_Party_addActor.call(this, actorId)
-    if (inc && this._actors.includes(actorId)) {
-      if (this.inBattle()) {
-        const actor = $gameActors.actor(actorId);
-        if (this.supportBattleMembers().includes(actor)) {
-          actor.onBattleStart();
-        }
-      }
-    }
-  };
-
-
-  const _Game_Follower_actor = Game_Follower.prototype.actor;
-  Game_Follower.prototype.actor = function() {
-    $gameParty.membersMode = true;
-    return _Game_Follower_actor.call(this);
-  };
-
-  const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
-  Scene_Battle.prototype.createAllWindows = function() {
-    _Scene_Battle_createAllWindows.call(this);
-    this.createSupportActorWindow();
-  };
-
-  Scene_Battle.prototype.createSupportActorWindow = function() {
-
-  };
-
-  const _Scene_Battle_startActorCommandSelection = Scene_Battle.prototype.startActorCommandSelection;
-  Scene_Battle.prototype.startActorCommandSelection = function() {
-    _Scene_Battle_startActorCommandSelection.call(this);
-    const supportActor = $gameParty.supportBattleMembers().find(actor => actor.actorId() === BattleManager.actor().actorId());
-    if (supportActor && this._supportActorWindow) {
-      this._supportActorWindow.setActor(supportActor);
-      this._supportActorWindow.show();
-      this._supportActorWindow.open();
-    }
-  };
-
-  const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWindows;
-  Scene_Battle.prototype.hideSubInputWindows = function() {
-    _Scene_Battle_hideSubInputWindows.call(this);
-    if (this._supportActorWindow) {
-      this._supportActorWindow.close();
-    }
-  };
-
-
-  function Window_SupportActor() {
-    this.initialize(...arguments);
-  }
-
-  Window_SupportActor.prototype = Object.create(Window_Selectable.prototype);
-  Window_SupportActor.prototype.constructor = Window_SupportActor;
-
-  Window_SupportActor.prototype.initialize = function(rect) {
-    Window_Selectable.prototype.initialize.call(this, rect);
-    this.openness = 0;
-    this._actor = null;
-  };
-
-  Window_SupportActor.prototype.setActor = function(actor) {
-    this._actor = actor;
-  };
-
-  Window_SupportActor.prototype.colSpacing = function() {
-    return 0;
-  };
-
-  Window_SupportActor.prototype.refresh = function() {
-    const rect = this.itemLineRect(0);
-    this.contents.clear();
-    this.drawName(rect.x, rect.y, rect.width);
-    this.drawFace(rect.x, rect.y, rect.width);
-  };
-
-  Window_SupportActor.prototype.drawName = function(x, y, width) {
-    this.drawText(this._actor.name(), x, y, width);
-  };
-
-  Window_SupportActor.prototype.drawFace = function() {
-
-  };
-
-  Window_SupportActor.prototype.open = function() {
-    this.refresh();
-    Window_Selectable.prototype.open.call(this);
+  const _BattleManager_allBattleMembers = BattleManager.allBattleMembers;
+  BattleManager.allBattleMembers = function() {
+    const members = _BattleManager_allBattleMembers.call(this);
+    Array.prototype.push.apply(members, $gameParty.supportActorMembers());
+    return members;
   };
 
 
@@ -493,7 +432,7 @@ Imported.NUUN_SupportActor = true;
   Spriteset_Battle.prototype.updateActors = function() {
     _Spriteset_Battle_updateActors.call(this);
     if (this._supportActorSprites) {
-      const members = $gameParty.supportBattleMembers();
+      const members = $gameParty.supportActorMembers();
       this._supportActorSprites.forEach((actor, i) => {
         actor.setBattler(members[i]);
       });
@@ -502,22 +441,22 @@ Imported.NUUN_SupportActor = true;
 
   const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
   Sprite_Actor.prototype.setActorHome = function(index) {
-    sIndex = -1;
+    this._sIndex = -1;
     if (this._actor.getSupportActor()) {
       index = this._actor.supportActorindex();
       if (!SupportActorSV[index]) {
         return;
       }
-      sIndex = index;
+      this._sIndex = index;
     }
     _Sprite_Actor_setActorHome.call(this, index);
   };
 
   const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
   Sprite_Actor.prototype.setHome = function(x, y) {
-    if (this._actor.getSupportActor() && sIndex >= 0) {
-      x += SupportActorSV[sIndex].SupportActorSV_X;
-      y += SupportActorSV[sIndex].SupportActorSV_Y;
+    if (this._actor.getSupportActor() && this._sIndex >= 0) {
+      x += SupportActorSV[this._sIndex].SupportActorSV_X;
+      y += SupportActorSV[this._sIndex].SupportActorSV_Y;
     }
     _Sprite_Actor_setHome.call(this, x, y);
   };

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクターインジケータ（サポートアクター拡張）
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * @base NUUN_SupportActor
  * 
  * @help
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/28 Ver.1.3.3
+ * サポートアクター更新により定義変更。
  * 2022/1/4 Ver.1.3.2
  * サポートアクターがメンバーから離脱した後にエラーが出る問題を修正。
  * 2021/8/13 Ver.1.3.1
@@ -73,6 +75,13 @@
  * @desc サポートアクター表示名
  * @type string
  * @default Supporter
+ * @parent WindowSetting
+ * 
+ * @param SummonName
+ * @text 召喚アクター表示名
+ * @desc 召喚アクター表示名
+ * @type string
+ * @default Summon
  * @parent WindowSetting
  * 
  * @param InitSupport
@@ -131,9 +140,7 @@ Game_Temp.prototype.requestBattleRefresh = function() {
 };
 
 Game_Temp.prototype.requestSupportActorRefresh = function() {
-  if ($gameParty.inBattle()) {
-    this._needsSupportActorRefresh = true;
-  }
+  this._needsSupportActorRefresh = true;
 };
 
 Game_Temp.prototype.clearSupportActorRequest = function() {
@@ -266,7 +273,7 @@ Scene_Battle.prototype.createSupportActorBaseSprite = function() {
 };
 
 Scene_Battle.prototype.createSupportActorWindow = function() {
-  $gameParty.supportBattleMembers().forEach((actor, i) => {
+  $gameParty.supportActorMembers().forEach((actor, i) => {
     this.setSupportActorWindow(actor, i);
     if (!this._commandStartActor) {
       const a = RightDisplay ? 1 : -1;
@@ -276,7 +283,7 @@ Scene_Battle.prototype.createSupportActorWindow = function() {
 };
 
 Scene_Battle.prototype.refreshSupportActorWindow = function() {
-  $gameParty.supportBattleMembers().forEach((actor, i) => {
+  $gameParty.supportActorMembers().forEach((actor, i) => {
     this.setSupportActorWindow(actor, i);
     if (!this._commandStartActor) {
       const a = RightDisplay ? 1 : -1;
@@ -317,7 +324,7 @@ Scene_Battle.prototype.updateSupportActor = function() {
     this._supportActorWindowEX.forEach(sprite => {
       sprite._actor = null
       sprite.hide();
-    })
+    });
     this.refreshSupportActorWindow();
     $gameTemp.clearSupportActorRequest();
   }
@@ -389,7 +396,7 @@ Scene_Battle.prototype.createPartyCommandWindow = function() {
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
 Window_PartyCommand.prototype.makeCommandList = function() {
   _Window_PartyCommand_makeCommandList.call(this);
-  if (CommandShow && $gameParty.supportBattleMembers().length > 0) {
+  if (CommandShow && $gameParty.supportActorMembers().length > 0) {
     this.addCommand(SupportShowName, "startActor");
   }
 };

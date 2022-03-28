@@ -1,5 +1,5 @@
 # [サポートアクターインジケータ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js)
-# Ver.1.3.2
+# Ver.1.3.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js)
 #### 必須、前提プラグイン
 [サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md)  
@@ -10,6 +10,8 @@
 ![画像](img/NUUN_SupportActor2.png)  
 
 ## 更新履歴
+2022/3/28 Ver.1.3.3  
+サポートアクター更新により定義変更。  
 2022/1/4 Ver.1.3.2  
 サポートアクターがメンバーから離脱した後にエラーが出る問題を修正。  
 2021/8/13 Ver.1.3.1  

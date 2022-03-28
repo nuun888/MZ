@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -23,10 +23,15 @@
  * 'elapsed'指定時はターン数補正を-1に設定してください。
  * 経過ターンを表示させるにはステート経過ターンカウントプラグインが必要です。
  * 
+ * 敵キャラの画像を拡大等をするプラグインと併用する場合、画像に乱れが生じる場合があります。
+ * 気になるようでしたら敵ステート表示拡張と併用してください。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/28 Ver.1.2.1
+ * 特定のプラグインにてアイコン表示部分に線のような画像が表示されてしまう問題を修正。
  * 2022/1/21 Ver.1.2.0
  * ステートのターンの表示方法に経過ターンを追加。（要ステート経過ターンカウント）
  * 2021/9/23 Ver.1.1.0
@@ -163,8 +168,6 @@ const TurnX = Number(parameters['TurnX'] || 0);
 const TurnY = Number(parameters['TurnY'] || -4);
 const TurnCorrection = Number(parameters['TurnCorrection'] || 1);
 
-
-
 const _Sprite_StateIcon_initialize = Sprite_StateIcon.prototype.initialize;
 Sprite_StateIcon.prototype.initialize = function() {
   _Sprite_StateIcon_initialize.call(this);
@@ -210,6 +213,8 @@ Sprite_StateIcon.prototype.textTurn = function(sprite) {
 Sprite_StateIcon.prototype.setInitIcon = function(sprite, i) {
   sprite.anchor.x = 0.5;
   sprite.anchor.y = 0.5;
+  this._animationCount = 0;
+  this._animationIndex = 0;
   sprite.bitmap = ImageManager.loadSystem("IconSet");
   sprite.setFrame(0, 0, 0, 0);
 };
@@ -219,7 +224,7 @@ Sprite_StateIcon.prototype.stateIconWidth = function(iconlength) {
 };
 
 Sprite_StateIcon.prototype.stateIconDisplay = function(iconlength) {
-  if (this._battler.isActor()) {
+  if (this._battler && this._battler.isActor()) {
     return this.stateIconDisplayAlign(iconlength, ActorStateIconAlign);
   } else {
     return this.stateIconDisplayAlign(iconlength, EnemyStateIconAlign);
@@ -252,6 +257,17 @@ Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
   this.displayIconsLength = displayIcons.length;
 };
 
+const _Sprite_StateIcon_update = Sprite_StateIcon.prototype.update;
+Sprite_StateIcon.prototype.update = function() {
+  _Sprite_StateIcon_update.call(this);
+  for (const sprite of this._iconSprite) {
+    if (!sprite.visible && sprite._iconIndex > 0) {
+      this._animationCount = this.animationWait();
+    }
+    sprite.visible = !!sprite._iconIndex > 0;
+  };
+};
+
 Sprite_StateIcon.prototype.updateIcon = function() {//再定義
   const icons = [];
   let turns = [];
@@ -278,9 +294,11 @@ Sprite_StateIcon.prototype.updateFrame = function() {//再定義
   const iconsLength = this.displayIconsLength;
   this._iconSprite.forEach((sprite, r) => {
     sprite.x = r * this.iconX(iconsLength) + this.stateIconDisplay(iconsLength);
-    this.setFrameIcon(sprite);
-    this.setTurn(sprite);
-  })
+    if (sprite.visible) {
+      this.setFrameIcon(sprite);
+      this.setTurn(sprite);
+    }
+  });
 };
 
 Sprite_StateIcon.prototype.setFrameIcon = function(sprite) {

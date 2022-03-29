@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.0.4
+### Ver.3.0.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)  
@@ -68,6 +68,8 @@
 [バトルスタイル拡張設定用](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX.js) Ver.1.6.3  
 
 ## 更新履歴
+2022/3/29 Ver.3.0.5  
+アクターコマンドを各アクターの上指定時のサポートアクターのコマンド座標の処理を追加。  
 2022/3/27 Ver.3.0.4  
 アニメーション、ダメージポップアップの表示がずれるため一時的にもとに戻す修正。  
 2022/3/26 Ver.3.0.3  

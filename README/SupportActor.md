@@ -1,5 +1,5 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
-# Ver.1.4.0
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)
@@ -25,6 +25,9 @@ Ver.1.3.4
  サイドビューサポートアクター設定で設定がない場合、表示されません。
   
 ## 更新履歴
+2022/3/29 Ver.1.4.1
+サポートアクターインジケータが機能しない問題を修正。  
+パーティリーダーがサポートアクターの時に別のキャラのキャラチップが表示されてしまう問題を修正。  
 2022/3/28 Ver.1.4.0  
 処理の見直しにより定義修正。  
 2021/12/30 Ver.1.3.5  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクター呼び出し
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_SupportActor
  * @orderAfter NUUN_SupportActor
  * 
@@ -23,7 +23,11 @@
  * [turn]:呼び出してから離脱するまでのターン　-1 無制限　-2 戦闘終了まで 1以上:参加ターン
  * [deadCallActor]:1 呼び出し者が戦闘不能になった場合、ターン終了時に戦闘から離脱します。0 指定なし
  * 
+ * 範囲は使用者に設定してください。
+ * 
  * 更新履歴
+ * 2022/3/29 Ver.1.0.2
+ * 一部の関数が重複していたため修正。
  * 2022/3/28 Ver.1.0.1
  * サポートアクター更新により定義変更。
  * 2021/12/25 Ver.1.0.0
@@ -64,7 +68,7 @@ const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffe
 Game_Action.prototype.applyItemUserEffect = function(target) {
     _Game_Action_applyItemUserEffect.call(this, target);   
     if (this.item().meta.CallSupportActor) {
-        this.setSupportActor();
+        this.setCallSupportActor();
     }
 };
 
@@ -76,7 +80,7 @@ Game_Actor.prototype.removeSupportActor = function() {
     _Game_Actor_removeSupportActor.call(this);
 };
 
-Game_Action.prototype.setSupportActor = function() {
+Game_Action.prototype.setCallSupportActor = function() {
     const data = this.item().meta.CallSupportActor.split(',').map(Number);
     if (data[0] > 0) {
         const subject = this.subject();
@@ -95,7 +99,7 @@ Game_Action.prototype.setSupportActor = function() {
         actor.setSupportActorCallActor(subject.actorId());
         actor.setSupportActorDeahCall(data[2]);
         if (!actor.getSupportActor()) {
-            actor._supportActor = true;
+            actor.setSupportActor(true);
         }
         $gameParty.addActor(actor.actorId());
         subject.result().supportActorText = SupportActorSuccessMessage.format(subject.name(), actor.name());

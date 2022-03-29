@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/29 Ver.1.4.1
+ * サポートアクターインジケータが機能しない問題を修正。
+ * パーティリーダーがサポートアクターの時に別のキャラのキャラチップが表示されてしまう問題を修正。
  * 2022/3/28 Ver.1.4.0
  * 処理の見直しにより定義修正。
  * 2021/12/30 Ver.1.3.5
@@ -326,11 +329,11 @@ Imported.NUUN_SupportActor = true;
   };
 
   Game_Party.prototype.supportActorMembers = function() {//全てのサポートアクターを取得
-    return this.allMembers().filter(member => member.isSupportActor());
+    return this.allMembers().filter(member => member.getSupportActor());
   };
 
   Game_Party.prototype.supportActorWithinMembers = function() {//バトルメンバー内のサポートアクターを取得
-    return this.allMembers().slice(0, this.maxBattleMembers()).filter(member => member.isSupportActor());
+    return this.allMembers().slice(0, this.maxBattleMembers()).filter(member => member.getSupportActor());
   };
 
   Game_Party.prototype.setWithSupportActorMember = function() {
@@ -370,6 +373,14 @@ Imported.NUUN_SupportActor = true;
       }
     }
   };
+
+
+  const _Game_Player_refresh = Game_Player.prototype.refresh;
+  Game_Player.prototype.refresh = function() {
+    $gameParty.setWithSupportActorMember();
+    _Game_Player_refresh.call(this);
+  };
+
 
   const _Game_Follower_actor = Game_Follower.prototype.actor;
   Game_Follower.prototype.actor = function() {
@@ -459,6 +470,16 @@ Imported.NUUN_SupportActor = true;
       y += SupportActorSV[this._sIndex].SupportActorSV_Y;
     }
     _Sprite_Actor_setHome.call(this, x, y);
+  };
+
+  const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
+  Scene_Battle.prototype.createAllWindows = function() {
+    _Scene_Battle_createAllWindows.call(this);
+    this.createSupportActorWindow();
+  };
+
+  Scene_Battle.prototype.createSupportActorWindow = function() {
+
   };
 
 })();

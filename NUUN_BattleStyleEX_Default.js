@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -45,9 +45,12 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
- * 2022/3/26 Ver.3.0.3
+ * 2022/3/29 Ver.1.0.4
+ * アクターコマンドを各アクターの上指定時のサポートアクターのコマンド座標を設定できる機能を追加。
+ * 敵選択、アイテム、スキル、ヘルプウィンドウ画像表示の説明文を変更。
+ * 2022/3/26 Ver.1.0.3
  * アクターウィンドウステータスのアクター配置を表示範囲可変表示にする機能を追加。
- * 2022/3/26 Ver.3.0.2
+ * 2022/3/26 Ver.1.0.2
  * 敵選択ウィンドウのスキン非表示を設定する項目がなかった問題を修正。
  * 2022/3/25 Ver.1.0.1
  * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加
@@ -379,7 +382,7 @@
  * @default ------------------------------
  * 
  * @param EnemyWindowShow
- * @desc ウィンドウ画像を表示する。OFFにするとウィンドウスキンが表示されません。
+ * @desc ウィンドウ画像を表示する。OFFにするとコマンド背後のウィンドウが表示されません。
  * @text ウィンドウ画像表示
  * @type boolean
  * @default true
@@ -936,7 +939,7 @@
  * @default ////////////////////////////////
  * 
  * @param ItemWindowShow
- * @desc ウィンドウ画像を表示する。OFFにするとウィンドウスキンが表示されません。
+ * @desc ウィンドウ画像を表示する。OFFにするとコマンド背後のウィンドウが表示されません。
  * @text ウィンドウ画像表示
  * @type boolean
  * @default true
@@ -987,7 +990,7 @@
  * @default ////////////////////////////////
  * 
  * @param SkillWindowShow
- * @desc ウィンドウ画像を表示する。OFFにするとウィンドウスキンが表示されません。
+ * @desc ウィンドウ画像を表示する。OFFにするとコマンド背後のウィンドウが表示されません。
  * @text ウィンドウ画像表示
  * @type boolean
  * @default true
@@ -1038,7 +1041,7 @@
  * @default ////////////////////////////////
  * 
  * @param HelpWindowShow
- * @desc ウィンドウ画像を表示する。OFFにするとウィンドウスキンが表示されません。
+ * @desc ウィンドウ画像を表示する。OFFにするとコマンド背後のウィンドウが表示されません。
  * @text ウィンドウ画像表示
  * @type boolean
  * @default true
@@ -1278,6 +1281,28 @@
  * @max 255
  * @min 0
  * @parent MessageWindow
+ * 
+ * @param SupportActorCommand
+ * @text サポートアクター設定
+ * @default ////////////////////////////////
+ * 
+ * @param SupportActorCommand_X
+ * @desc サポートアクター用アクターコマンドX座標。（アクターコマンドが各アクターの上設定時）
+ * @text サポートアクターコマンドX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent SupportActorCommand
+ * 
+ * @param SupportActorCommand_Y
+ * @desc サポートアクター用アクターコマンドY座標。（アクターコマンドが各アクターの上設定時）
+ * @text サポートアクターコマンドY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent SupportActorCommand
  * 
  */
 /*~struct~StatusPositionData:
@@ -1947,6 +1972,9 @@ params.EscapeFailureBackground_X = Number(parameters['EscapeFailureBackground_X'
 params.EscapeFailureBackground_Y = Number(parameters['EscapeFailureBackground_Y'] || 0);
 
 params.MessageWindowOpacity = Number(parameters['MessageWindowOpacity'] || 255);
+
+params.SupportActorCommand_X = Number(parameters['ESupportActorCommand_X'] || 0);
+params.SupportActorCommand_Y = Number(parameters['SupportActorCommand_Y'] || 0);
 
 NuunManager.getBattleStyleParams = function() {
     return params;

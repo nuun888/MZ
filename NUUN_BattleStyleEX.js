@@ -1102,13 +1102,13 @@ Window_ActorCommand.prototype.refresh = function() {
       const rect = statusData.itemRect(actorIndex);
       this.setCommandHeight();
       if (params.ActorCommandPosition === 'actor') {
-        //if (Imported.NUUN_SupportActor && this._actor.getSupportActor()) {
-          //this.x = params.ActorCommand_X;//暫定
-          //this.y = params.ActorCommand_Y;//暫定
-        //} else {
+        if (Imported.NUUN_SupportActor && this._actor.getSupportActor()) {
+          this.x = params.SupportActorCommand_X;
+          this.y = params.SupportActorCommand_Y;
+        } else {
           this.x = rect.x + statusData.itemPadding() + ((rect.width - this.width) / 2) + params.ActorCommand_X;
           this.y = this.homeY - this.height + rect.y;
-        //}
+        }
       } else if (params.ActorCommandPosition === 'svtop') {
         data = this.SvActorData[actorIndex];
         this.x = data.x - (this.width + data.width) / 2 + 32 + params.ActorCommand_X;

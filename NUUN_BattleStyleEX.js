@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.0.4
+ * @version 3.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/3/29 Ver.3.0.5
+ * アクターコマンドを各アクターの上指定時のサポートアクターのコマンド座標の処理を追加。
  * 2022/3/27 Ver.3.0.4
  * アニメーション、ダメージポップアップの表示がずれるため一時的にもとに戻す修正。
  * 2022/3/26 Ver.3.0.3

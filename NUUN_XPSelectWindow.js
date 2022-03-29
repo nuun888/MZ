@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.1
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -23,9 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2022/3/30 Ver.1.0.2
+ * 2022/3/30 Ver.1.0.1
  * 敵の対象選択時にアクターステータスウィンドウを表示するように修正。
- * 2022/3/28 Ver.1.0.1
  * アクター選択時の顔グラの表示を立ち絵、顔グラ表示EX設定に対応。
  * 2022/3/27 Ver.1.0.0
  * 初版
@@ -490,7 +489,7 @@ Window_BattleSelectActor.prototype.drawActorFace = function(actor, x, y, width, 
     } else {
       Window_StatusBase.prototype.drawActorFace.call(this, actor, x, y, width, height);
     }
-  };
+};
 
 
 function Window_BattleSelectEnemy() {

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.2
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -23,6 +23,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/30 Ver.1.0.2
+ * 敵の対象選択時にアクターステータスウィンドウを表示するように修正。
+ * 2022/3/28 Ver.1.0.1
+ * アクター選択時の顔グラの表示を立ち絵、顔グラ表示EX設定に対応。
  * 2022/3/27 Ver.1.0.0
  * 初版
  * 
@@ -109,7 +113,17 @@
  * @default 0
  * @max 9999
  * @min 0
-
+ * 
+ * @param ActorPictureSetting
+ * @text 立ち絵、顔グラ表示EX設定
+ * @default ------------------------------
+ * 
+ * @param DynamicFace
+ * @desc 顔グラを条件による変化させます。（要立ち絵、顔グラ表示EX）
+ * @text 条件顔グラ変化
+ * @type boolean
+ * @default true
+ * @parent ActorPictureSetting
  * 
  */
 /*~struct~DataList:
@@ -185,6 +199,7 @@ const EnemySelect_Y = Number(parameters['EnemySelect_Y'] || 0);
 const EnemySelect_Width = Number(parameters['EnemySelect_Width'] || 0);
 const ActorData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorData'])) : null) || [];
 const EnemyData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EnemyData'])) : null) || [];
+const DynamicFace = eval(parameters['DynamicFace'] || "true");
 let contentsWidth = 0;
 
 function actorSelectWindowWidth() {
@@ -253,6 +268,9 @@ const _Scene_Battle_startEnemySelection = Scene_Battle.prototype.startEnemySelec
 Scene_Battle.prototype.startEnemySelection = function() {
     _Scene_Battle_startEnemySelection.call(this);
     if (EnemyXPSelect) {
+        this._skillWindow.hide();
+        this._itemWindow.hide();
+        this._statusWindow.show();
         this._enemySelectWindow.open();
     }
 };
@@ -297,6 +315,8 @@ Scene_Battle.prototype.onActorCancel = function() {
     }
     
 };
+
+
 
 Scene_Battle.prototype.XPActorSelectY = function() {
     switch (XPSelectPosition) {
@@ -392,6 +412,23 @@ Window_BattleSelectActor.prototype.initialize = function(rect) {
 
 Window_BattleSelectActor.prototype.refresh = function() {
     Window_StatusBase.prototype.refresh.call(this);
+    let bitmap = null;
+    if (this._battler) {
+        if (Imported.NUUN_ActorPicture && DynamicFace) {
+            this._battler.resetImgId();
+            bitmap = ImageManager.loadFace(this._battler.getActorGraphicFace());
+        } else {
+            bitmap = ImageManager.loadFace(this._battler.faceName());
+        }
+        if (!bitmap.isReady()) {
+            bitmap.addLoadListener(this.drawListData.bind(this));
+        } else {
+            this.drawListData();
+        }
+    }
+};
+
+Window_BattleSelectActor.prototype.drawListData = function() {
     const rect = this.itemLineRect(0);
     if (this._targetSelect) {
         this.drawEXTargetSelect(rect.x, rect.y, rect.width);
@@ -441,10 +478,19 @@ Window_BattleSelectActor.prototype.battlerFace = function(actor, data, x, y) {
         if (!bitmap.isReady()) {
             bitmap.addLoadListener(this.drawActorFace.bind(actor, x, y));
         } else {
-            this.drawActorFace(actor, x, y);
+            const width = ImageManager.faceWidth;
+            this.drawActorFace(actor, x, y, width);
         }
     }
 };
+
+Window_BattleSelectActor.prototype.drawActorFace = function(actor, x, y, width, height) {
+    if (Imported.NUUN_ActorPicture && DynamicFace) {
+      this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
+    } else {
+      Window_StatusBase.prototype.drawActorFace.call(this, actor, x, y, width, height);
+    }
+  };
 
 
 function Window_BattleSelectEnemy() {
@@ -527,7 +573,6 @@ Window_BattleEnemy.prototype.select = function(index) {
 Window_BattleEnemy.prototype.maxCols = function() {
     return this.maxItems();
 };
-
 
 function Sprite_BattlerName() {
     this.initialize(...arguments);

@@ -159,17 +159,6 @@
  * @max 9999
  * @parent StateTurn
  * 
- * @param MPP_Pseudo3DBattle
- * @text 疑似3Dバトル設定
- * @default ------------------------------
- * 
- * @param OnMPP_Pseudo3DBattle
- * @desc 疑似3Dバトルを使用している場合はONにしてください。
- * @text 疑似3Dバトル使用
- * @type boolean
- * @default false
- * @parent MPP_Pseudo3DBattle
- * 
  */
 
 var Imported = Imported || {};
@@ -189,7 +178,6 @@ const TurnFontSize = Number(parameters['TurnFontSize'] || -4);
 const TurnX = Number(parameters['TurnX'] || 0);
 const TurnY = Number(parameters['TurnY'] || -4);
 const TurnCorrection = Number(parameters['TurnCorrection'] || 1);
-const OnMPP_Pseudo3DBattle = eval(parameters['OnMPP_Pseudo3DBattle'] || 'false');
 
 const _Sprite_StateIcon_initialize = Sprite_StateIcon.prototype.initialize;
 Sprite_StateIcon.prototype.initialize = function() {

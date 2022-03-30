@@ -1,5 +1,5 @@
 # [ステート横並び表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
-# Ver.1.2.1
+# Ver.1.2.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
 
 戦闘中に表示するステートを横並び表示にします。  
@@ -15,6 +15,8 @@
 経過ターンを表示させるには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)プラグインが必要です。  
 
 ## 更新履歴
+2022/3/30 Ver.1.2.2  
+ステートが表示できる個数を超えて付加されている時に画像が乱れる問題を修正。  
 2022/3/28 Ver.1.2.1  
 特定のプラグインにてアイコン表示部分に線のような画像が表示されてしまう問題を修正。  
 2022/1/21 Ver.1.1.0  

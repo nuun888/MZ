@@ -110,7 +110,7 @@
 | [ステート、バフターン数増減特徴](https://github.com/nuun888/MZ/blob/master/README/StateBuffTurnPlus.md) | [NUUN_StateBuffTurnPlus](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnPlus.js) |  | 1.0.0 |
 | [ステート付与率増減特徴](https://github.com/nuun888/MZ/blob/master/README/AddStateRateBoost.md) | [NUUN_AddStateRateBoost](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateRateBoost.js) |  | 1.0.0 |
 | [ステート残りターン表示](https://github.com/nuun888/MZ/blob/master/README/NUUN_StateTurn.md) | [NUUN_StateTurn](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js) | ス対 | 1.1.1 |
-| [ステート横並び表示](https://github.com/nuun888/MZ/blob/master/README/StateIconSideBySide.md) | [NUUN_StateIconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js) | ス対 | 1.2.2 |
+| [ステート横並び表示](https://github.com/nuun888/MZ/blob/master/README/StateIconSideBySide.md) | [NUUN_StateIconSideBySide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js) | ス対 | 1.2.3 |
 | [バフ、デバフ重ね掛け上限変更](https://github.com/nuun888/MZ/blob/master/README/BuffMaxLevel.md) | [NUUN_BuffMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffMaxLevel.js) |  | 1.0.0 |
 | [バフ、デバフ倍率効果率増減特徴](https://github.com/nuun888/MZ/blob/master/README/BuffBoost.md) | [NUUN_BuffBoost](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffBoost.js) |  | 1.0.0 |
 | [ステート、バフターン操作アイテム、スキル](https://github.com/nuun888/MZ/blob/master/README/StateBuffTurnOperation.md) | [NUUN_StateBuffTurnOperation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnOperation.js) |  | 1.0.0 |

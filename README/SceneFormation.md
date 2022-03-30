@@ -9,7 +9,7 @@
 戦闘メンバー、待機メンバーの画像はキャラチップ、顔グラから選択できます。（デフォルトではキャラチップ）  
 
 ![画像](img/SceneFormation1.png)  
-![画像](img/SceneFormation2.png)  
+![画像](img/SceneFormation3.png)  
 
 戦闘不能のキャラはデフォルト設定では背景が赤く表示されます。  
 

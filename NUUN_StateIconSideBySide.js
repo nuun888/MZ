@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/30 Ver.1.2.2
+ * ステートが表示できる個数を超えて付加されている時に画像が乱れる問題を修正。
  * 2022/3/28 Ver.1.2.1
  * 特定のプラグインにてアイコン表示部分に線のような画像が表示されてしまう問題を修正。
  * 2022/1/21 Ver.1.2.0
@@ -249,23 +251,14 @@ Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
     if (displayIcons[r]) {
       sprite._iconIndex = displayIcons[r];
       sprite._stateTurn = displayTurn[r];
+      sprite.visible = true;
     } else {
       sprite._iconIndex = 0;
       sprite._stateTurn = 0;
+      sprite.visible = false;
     }
   });
   this.displayIconsLength = displayIcons.length;
-};
-
-const _Sprite_StateIcon_update = Sprite_StateIcon.prototype.update;
-Sprite_StateIcon.prototype.update = function() {
-  _Sprite_StateIcon_update.call(this);
-  for (const sprite of this._iconSprite) {
-    if (!sprite.visible && sprite._iconIndex > 0) {
-      this._animationCount = this.animationWait();
-    }
-    sprite.visible = !!sprite._iconIndex > 0;
-  };
 };
 
 Sprite_StateIcon.prototype.updateIcon = function() {//再定義

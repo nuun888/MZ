@@ -1,5 +1,5 @@
 # [XP風対象選択ウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)  
 
 ## 必須、前提プラグイン
@@ -17,6 +17,8 @@
 ![画像](img/XPSelectWindow3.png)  
 
 ## 更新履歴
+2022/3/31 Ver.1.0.2  
+敵のデフォルトのステート表示が表示されないように修正。  
 2022/3/30 Ver.1.0.1
 敵の対象選択時にアクターステータスウィンドウを表示するように修正。  
 アクター選択時の顔グラの表示を立ち絵、顔グラ表示EX設定に対応。  

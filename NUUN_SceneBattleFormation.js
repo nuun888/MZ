@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/30 Ver.1.3.3
+ * 戦闘メンバーの表示列、行数を設定できる機能を追加。
  * 2022/2/26 Ver.1.3.2
  * 戦闘中に画面を閉じるとアクター選択コマンドがキャンセル扱いにされる問題を修正。
  * メンバー入れ替え時のカーソルの処理を変更。

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/31 Ver.1.2.3
+ * 疑似3Dバトルとの併用時にアクターのステートが表示されない問題を修正。
  * 2022/3/30 Ver.1.2.2
  * ステートが表示できる個数を超えて付加されている時に画像が乱れる問題を修正。
  * 2022/3/28 Ver.1.2.1
@@ -108,18 +110,21 @@
  * @option 経過ターン（要ステート経過ターンカウント）
  * @value 'elapsed'
  * @default 'remaining'
+ * @parent StateTurn
  * 
  * @param ActorStateIconVisible
  * @desc 味方のステートに残りターンの表示。
  * @text 味方ステート残りターン表示
  * @type boolean
  * @default false
+ * @parent StateTurn
  * 
  * @param EnemyStateIconVisible
  * @desc 敵のステートに残りターンの表示。
  * @text 敵ステート残りターン表示
  * @type boolean
  * @default false
+ * @parent StateTurn
  * 
  * @param TurnX
  * @desc ターン座標X（相対）
@@ -127,6 +132,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent StateTurn
  * 
  * @param TurnY
  * @desc ターン座標Y（相対）
@@ -134,6 +140,7 @@
  * @type number
  * @default -4
  * @min -9999
+ * @parent StateTurn
  * 
  * @param TurnFontSize
  * @desc ターンのフォントサイズ。（メインフォントから）
@@ -141,6 +148,7 @@
  * @type number
  * @default -4
  * @min -9999
+ * @parent StateTurn
  * 
  * @param TurnCorrection
  * @text ターン数補正
@@ -149,6 +157,18 @@
  * @type number
  * @min -9999
  * @max 9999
+ * @parent StateTurn
+ * 
+ * @param MPP_Pseudo3DBattle
+ * @text 疑似3Dバトル設定
+ * @default ------------------------------
+ * 
+ * @param OnMPP_Pseudo3DBattle
+ * @desc 疑似3Dバトルを使用している場合はONにしてください。
+ * @text 疑似3Dバトル使用
+ * @type boolean
+ * @default false
+ * @parent MPP_Pseudo3DBattle
  * 
  */
 
@@ -169,6 +189,7 @@ const TurnFontSize = Number(parameters['TurnFontSize'] || -4);
 const TurnX = Number(parameters['TurnX'] || 0);
 const TurnY = Number(parameters['TurnY'] || -4);
 const TurnCorrection = Number(parameters['TurnCorrection'] || 1);
+const OnMPP_Pseudo3DBattle = eval(parameters['OnMPP_Pseudo3DBattle'] || 'false');
 
 const _Sprite_StateIcon_initialize = Sprite_StateIcon.prototype.initialize;
 Sprite_StateIcon.prototype.initialize = function() {
@@ -278,8 +299,12 @@ Sprite_StateIcon.prototype.updateIcon = function() {//再定義
       if (this._animationIndex >= icons.length) {
           this._animationIndex = 0;
       }
+      this._iconIndex = icons.length;
+      this.visible = true;
   } else {
       this._animationIndex = 0;
+      this._iconIndex = 0;
+      this.visible = false;
   }
 };
 

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/30 Ver.1.4.2
+ * メンバー変更画面サポートアクター適用による定義追加。
  * 2022/3/29 Ver.1.4.1
  * サポートアクターインジケータが機能しない問題を修正。
  * パーティリーダーがサポートアクターの時に別のキャラのキャラチップが表示されてしまう問題を修正。
@@ -286,7 +288,7 @@ Imported.NUUN_SupportActor = true;
   };
 
   Game_Party.prototype.membersInSupportActorNum = function(members) {//メンバー内のサポートアクター人数
-    return members.reduce((r, member) => r + (member.getSupportActor() ? 1 : 0), 0);
+    return members.reduce((r, member) => r + (member && member.getSupportActor() ? 1 : 0), 0);
   };
 
   Game_Party.prototype.normalOnlyBattleMembers = function(members) {

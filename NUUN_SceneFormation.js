@@ -10,13 +10,14 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.6.3
+ * @version 1.7.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * メンバーを並び変える画面を追加します。
  * メニューコマンドの並び替えを選択するとメンバーチェンジ画面が表示されるようになります。
+ * 戦闘メンバー、待機メンバーの画像はキャラチップ、顔グラから選択できます。（デフォルトではキャラチップ）
  * 
  * 戦闘不能のキャラはデフォルト設定では背景が赤く表示されます。
  * 
@@ -30,6 +31,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/30 Ver.1.7.0
+ * 戦闘メンバー、待機メンバーの画像に顔グラを選択できる機能を追加。
+ * Ver.1.6.0以降でのサポートアクター対応。
  * 2022/2/26 Ver.1.6.3
  * 戦闘中に画面を閉じるとアクター選択コマンドがキャンセル扱いにされる問題を修正。
  * メンバー入れ替え時のカーソルの処理を変更。
@@ -120,10 +124,18 @@
  * @desc 表示するメンバー画像の表示形式を選択します。
  * @type select
  * @option キャラチップ
- * @value chip
+ * @value 'chip'
  * @option 顔グラフィック
- * @value face
- * @default chip
+ * @value 'face'
+ * @default 'chip'
+ * @parent BasicSetting
+ * 
+ * @param MemberHeight
+ * @text メンバー表示高さ
+ * @desc メンバーの表示高さ
+ * @type number
+ * @default 48
+ * @min -9999
  * @parent BasicSetting
  * 
  * @param LavelVisible
@@ -162,6 +174,17 @@
  * @default true
  * @parent Setting
  * @parent BasicSetting
+ * 
+ * @param MemberActorPictureSetting
+ * @text 立ち絵、顔グラ表示EX設定
+ * @default ------------------------------
+ * 
+ * @param DynamicFace
+ * @desc メンバー画像が顔グラ指定時の戦闘メンバー、待機メンバーの顔グラを条件による変化させます。（要立ち絵、顔グラ表示EX）
+ * @text 条件顔グラ変化
+ * @type boolean
+ * @default false
+ * @parent MemberActorPictureSetting
  * 
  * @param BattleMemberNameSetting
  * @text 戦闘メンバー名称ウィンドウ設定
@@ -221,6 +244,22 @@
  * @text 戦闘メンバーウィンドウ設定
  * @default ------------------------------
  * 
+ * @param BattleMember_Cols
+ * @text 戦闘メンバー横表示数
+ * @desc 戦闘メンバー横表示数(メニュー) 0で最大メンバー数に応じて表示幅が変わります。
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent BattleMemberSetting
+ * 
+ * @param BattleMember_Rows
+ * @text 戦闘メンバー縦表示数
+ * @desc 戦闘メンバー縦表示数(メニュー)
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent BattleMemberSetting
+ * 
  * @param BattleMember_X
  * @text 戦闘メンバーウィンドウX座標
  * @desc 戦闘メンバーウィンドウX座標(メニュー)
@@ -243,7 +282,7 @@
  * 
  * @param Member_Cols
  * @text 待機メンバー横表示数
- * @desc 待機メンバー横表示数(メニュー、戦闘共通)
+ * @desc 待機メンバー横表示数(メニュー)
  * @type number
  * @default 10
  * @min 0
@@ -251,7 +290,7 @@
  * 
  * @param Member_Rows
  * @text 待機メンバー縦表示数
- * @desc 待機メンバー縦表示数(メニュー、戦闘共通)
+ * @desc 待機メンバー縦表示数(メニュー)
  * @type number
  * @default 1
  * @parent MemberSetting
@@ -692,15 +731,19 @@ Sprite_FormationActor.prototype.constructor = Sprite_FormationActor;
 (() => {
 const parameters = PluginManager.parameters('NUUN_SceneFormation');
 const parameters2 = PluginManager.parameters('NUUN_SceneBattleFormation');
-const parameters3 = PluginManager.parameters('NUUN_SceneSupportActorFormation');
+const parameters3 = PluginManager.parameters('NUUN_SceneFormation_SupportActor');
 const param = {};
 const VariableBattleMember = eval(parameters['VariableBattleMember'] || "true");
+const CharacterMode = eval(parameters['CharacterMode']) || 'chip';
 const BattleMemberName = String(parameters['BattleMemberName'] || "戦闘メンバー");
 const MemberName = String(parameters['MemberName'] || "待機メンバー");
+const MemberHeight = Number(parameters['MemberHeight'] || 48);
 param.BattleMemberName_X = Number(parameters['BattleMemberName_X'] || 0);
 param.BattleMemberName_Y = Number(parameters['BattleMemberName_Y'] || 0);
 param.MemberName_X = Number(parameters['MemberName_X'] || 0);
 param.MemberName_Y = Number(parameters['MemberName_Y'] || 0);
+param.BattleMember_Cols = Number(parameters['BattleMember_Cols'] || 0);
+param.BattleMember_Rows = Number(parameters['BattleMember_Rows'] || 1);
 param.BattleMember_X = Number(parameters['BattleMember_X'] || 0);
 param.BattleMember_Y = Number(parameters['BattleMember_Y'] || 0);
 param.Member_X = Number(parameters['Member_X'] || 0);
@@ -716,13 +759,14 @@ const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const EquipIcons = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipIcons'])) : [];
 const EquipNameVisible = Number(parameters['EquipNameVisible'] || 1);
 const DeadActorColor = (DataManager.nuun_structureData(parameters['DeadActorColor'])) || 18;
-const SupportActorColor = (DataManager.nuun_structureData(parameters['SupportActorColor'])) || 5;
 const FixedActorBackColor =(DataManager.nuun_structureData(parameters['FixedActorBackColor'])) || 3;
 const LavelVisible = eval(parameters['LavelVisible'] || "false");
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];
 const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
 const CommandShowMode = eval(parameters2['CommandShowMode']) || 'Party';
+const SupportActorBackColor = (DataManager.nuun_structureData(parameters3['SupportActorBackColor'])) || 5;
+const DynamicFace = eval(parameters['DynamicFace'] || "true");
 
 let cursorMode = 'battle';
 let pendingMode = null;
@@ -742,8 +786,8 @@ PluginManager.registerCommand(pluginName, 'SceneFormationOpen', args => {
 
 PluginManager.registerCommand(pluginName, 'ChangeFormationActorImg', args => {
   const actorId = Number(args.actorId)
-  if ($gameActors._data[actorId]) {
-    $gameActors._data[actorId].setFormationActorImgId(Number(args.ChangeActorImgId));
+  if ($gameActors.actor(actorId)) {
+    $gameActors.actor(actorId).setFormationActorImgId(Number(args.ChangeActorImgId));
   }
 });
 
@@ -825,7 +869,7 @@ Game_Party.prototype.formationMember = function() {
 };
 
 Game_Party.prototype.allStandByMembers = function() {
-  return this.allMembers().slice(this.maxBattleMembers());
+  return this.allMembers().filter(member => member.isAppeared()).slice(this.maxBattleMembers());
 };
 
 Game_Party.prototype.checkFormationBattleMember = function(addActor, withdrawalActor) {
@@ -844,8 +888,9 @@ Game_Party.prototype.withdrawalOrder = function(index) {
 
 Game_Party.prototype.entryOrder = function(index) {
   const entryActor = this._actors[index];
-  index += index >= this.formationBattleMember().length ? 1 : 0;
-  this._actors.splice(this.formationBattleMember().length - 1, 0, entryActor);
+  const members = this.formationBattleMember();
+  index += index >= members.length ? 1 : 0;
+  this._actors.splice(members.length - 1, 0, entryActor);
   this._actors.splice(index, 1);
   $gamePlayer.refresh();
 };
@@ -859,6 +904,10 @@ Game_Party.prototype.changeEntryBattleMember = function() {
 };
 
 Game_Party.prototype.useFormation = function() {
+  return true;
+};
+
+Game_Party.prototype.checkSwap = function(index) {
   return true;
 };
 
@@ -915,11 +964,13 @@ class Nuun_Formation {
     cursorMode = 'battle';
     pendingMode = null;
     if (mode) {
+      this.setBattleParamData();
+    } else {
       this.setParamData();
     }
   }
 
-  setParamData() {
+  setBattleParamData() {
     param.BattleMemberName_X = Number(parameters2['BattleMemberName_X'] || 0);
     param.BattleMemberName_Y = Number(parameters2['BattleMemberName_Y'] || 0);
     param.MemberName_X = Number(parameters2['MemberName_X'] || 0);
@@ -931,9 +982,30 @@ class Nuun_Formation {
     param.Status_X = Number(parameters2['Status_X'] || 0);
     param.Status_Y = Number(parameters2['Status_Y'] || 0);
     param.WindowZero = eval(parameters2['WindowZero'] || "false");
+    param.BattleMember_Cols = Number(parameters2['BattleMember_Cols'] || 4);
+    param.BattleMember_Rows = Number(parameters2['BattleMember_Rows'] || 1);
     param.Member_Cols = Number(parameters2['Member_Cols'] || 10);
     param.Member_Rows = Number(parameters2['Member_Rows'] || 1);
     param.WindowCenter = eval(parameters2['WindowCenter'] || "true");
+  };
+
+  setParamData() {
+    param.BattleMemberName_X = Number(parameters['BattleMemberName_X'] || 0);
+    param.BattleMemberName_Y = Number(parameters['BattleMemberName_Y'] || 0);
+    param.MemberName_X = Number(parameters['MemberName_X'] || 0);
+    param.MemberName_Y = Number(parameters['MemberName_Y'] || 0);
+    param.BattleMember_Cols = Number(parameters['BattleMember_Cols'] || 4);
+    param.BattleMember_Rows = Number(parameters['BattleMember_Rows'] || 1);
+    param.BattleMember_X = Number(parameters['BattleMember_X'] || 0);
+    param.BattleMember_Y = Number(parameters['BattleMember_Y'] || 0);
+    param.Member_X = Number(parameters['Member_X'] || 0);
+    param.Member_Y = Number(parameters['Member_Y'] || 0);
+    param.Status_X = Number(parameters['Status_X'] || 0);
+    param.Status_Y = Number(parameters['Status_Y'] || 0);
+    param.WindowZero = eval(parameters['WindowZero'] || "false");
+    param.Member_Cols = Number(parameters['Member_Cols'] || 10);
+    param.Member_Rows = Number(parameters['Member_Rows'] || 1);
+    param.WindowCenter = eval(parameters['WindowCenter'] || "true");
   };
 
   create() {
@@ -1033,10 +1105,10 @@ class Nuun_Formation {
   };
   
   battleMemberWindowRect() {
+    const ww = $gameSystem.windowPadding() * 2 + this.battleMemberWindowWidth();
     const wx = param.BattleMember_X + (param.WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
     const wy = param.BattleMember_Y + (param.WindowZero ? 0 : this._scene.calcWindowHeight(1, true));
-    const ww = $gameSystem.windowPadding() * 2 + this.battleMemberWindowWidth() * 56;
-    const wh = 80;
+    const wh = 32 + param.BattleMember_Rows * (MemberHeight);
     return new Rectangle(wx, wy, ww, wh);
   };
   
@@ -1044,7 +1116,7 @@ class Nuun_Formation {
     const ww = this.memberWindowWidth();
     const wx = param.Member_X + (param.WindowCenter ? (Graphics.boxWidth - ww) / 2 : 0);
     const wy = param.Member_Y + (param.WindowZero ? 0 : this.memberY() + this._scene.calcWindowHeight(1, true));
-    const wh = 86 + (param.Member_Rows - 1) * 48;
+    const wh = 32 + (param.Member_Rows) * MemberHeight;
     return new Rectangle(wx, wy, ww, wh);
   };
   
@@ -1079,7 +1151,7 @@ class Nuun_Formation {
   };
 
   onChangeBattleMemberOk() {
-    const index = Math.min(formationIndex, $gameParty.formationMember().length - 1, param.Member_Cols);
+    const index = Math.min(formationIndex % (this._battleMemberWindow.maxCols()), $gameParty.formationMember().length - 1, param.Member_Cols);
     this._battleMemberWindow.deselect();
     this._battleMemberWindow.deactivate();
     this._memberWindow.activate();
@@ -1092,7 +1164,11 @@ class Nuun_Formation {
   };
 
   onChangeMemberOk() {
-    const index = Math.min(formationIndex, $gameParty.formationBattleMember().length - 1);
+    const cols = this._battleMemberWindow.maxCols();
+    const maxItem = this._battleMemberWindow.maxItems();
+    const rows = Math.ceil(maxItem / cols);
+    const value = Math.max((rows * cols) - cols, 0) + formationIndex;
+    const index = Math.min((value >= maxItem ? (rows > 1 ? value - cols : maxItem - 1) : value), maxItem - 1);
     this._memberWindow.deselect();
     this._memberWindow.deactivate();
     this._battleMemberWindow.activate();
@@ -1131,15 +1207,13 @@ class Nuun_Formation {
       this.formationActorRefresh();
     } else if (index < 0) {
       this.selectOrder(p_Index);
-      this._battleMemberWindow.refresh();
-      this._memberWindow.refresh();
     } else if (p_Index < 0) {
       this.pendingOrder(index);
-      this._battleMemberWindow.refresh();
-      this._memberWindow.refresh();
     }
     this._battleMemberWindow.setPendingIndex(-1);
     this._memberWindow.setPendingIndex(-1);
+    this._battleMemberWindow.refresh();
+    this._memberWindow.refresh();
     pendingMode = null;
     if (this._isBattle && CommandShowMode === "Actor") {
       $gameTemp.formationRefresh = true;
@@ -1147,28 +1221,30 @@ class Nuun_Formation {
   };
 
   selectOrder(index) {
+    const check = $gameParty.checkSwap(index);
     if (cursorMode === 'battle') {
       $gameParty.entryOrder(index);
-      if (pendingMode === 'member') {
+      if (pendingMode === 'member' && check) {
         $gameParty.changeEntryBattleMember();
       }
     } else {
       $gameParty.withdrawalOrder(index);
-      if (pendingMode === 'battle') {
+      if (pendingMode === 'battle' && check) {
         $gameParty.changeWithdrawaBattleMember();
       }
     }
   };
 
   pendingOrder(index) {
+    const check = $gameParty.checkSwap(index);
     if (pendingMode === 'battle') {
       $gameParty.entryOrder(index);
-      if (cursorMode === 'member') {
+      if (cursorMode === 'member' && check) {
         $gameParty.changeEntryBattleMember();
       }
     } else {
       $gameParty.withdrawalOrder(index);
-      if (cursorMode === 'battle') {
+      if (cursorMode === 'battle' && check) {
         $gameParty.changeWithdrawaBattleMember();
       }
     }
@@ -1244,7 +1320,7 @@ class Nuun_Formation {
   };
 
   memberWindowWidth() {
-    return $gameSystem.windowPadding() * 2 + param.Member_Cols * 56;
+    return $gameSystem.windowPadding() * 2 + param.Member_Cols * (CharacterMode === 'face' ? 152 : 56);
   };
   
   nameWidth() {
@@ -1256,7 +1332,7 @@ class Nuun_Formation {
   };
 
   battleMemberWindowWidth() {
-    return _Game_Party_maxBattleMembers.call($gameParty) * (Imported.NUUN_SceneFormation_SupportActor ? $gameParty.formationSupportActor() : 1);
+    return (param.BattleMember_Cols > 0 ? param.BattleMember_Cols : _Game_Party_maxBattleMembers.call($gameParty)) * (Imported.NUUN_SceneFormation_SupportActor && param.BattleMember_Rows === 1 ? 2 : 1) * (CharacterMode === 'face' ? 152 : 56);
   };
 
   open() {
@@ -1299,7 +1375,7 @@ Window_StatusBase.prototype.drawBackGroundActor = function(index) {
   const actor = this.actor(index);
   if (index !== this._pendingIndex) {
     const rect = this.itemRect(index);
-    const height = 48;
+    const height = MemberHeight;
     const y = rect.y + (this.itemHeight() - this.rowSpacing() - height);
     this.contentsBack.paintOpacity = 128;
     if (actor && DeadActorColor >= 0 && actor.isDead()) {
@@ -1308,8 +1384,8 @@ Window_StatusBase.prototype.drawBackGroundActor = function(index) {
     } else if (Imported.NUUN_ActorFixed && actor && FixedActorBackColor >= 0 && actor.isFixed()) {
       const fixedcColor = NuunManager.getColorCode(FixedActorBackColor);
       this.contentsBack.fillRect(rect.x, y, rect.width, height, fixedcColor);
-    } else if (Imported.NUUN_SceneFormation_SupportActor && SupportActorColor >= 0 && actor && actor.actor().meta.SupportActor) {
-      const supportcolor = NuunManager.getColorCode(SupportActorColor);
+    } else if (Imported.NUUN_SceneFormation_SupportActor && SupportActorBackColor >= 0 && actor && actor.getSupportActor()) {
+      const supportcolor = NuunManager.getColorCode(SupportActorBackColor);
       this.contentsBack.fillRect(rect.x, y, rect.width, height, supportcolor);
     }
     this.contentsBack.paintOpacity = 255;
@@ -1348,25 +1424,35 @@ Window_FormationMemberName.prototype.drawContentsName = function(x, y, width) {
 
 //戦闘メンバー
 Window_FormationBattleMember.prototype.initialize = function(rect) {
+  this._members = $gameParty.formationBattleMember();
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._formationMode = true;
   this.refresh();
 };
 
+Window_FormationBattleMember.prototype.refresh = function() {
+  this._members = $gameParty.formationBattleMember();
+  Window_StatusBase.prototype.refresh.call(this);
+};
+
 Window_FormationBattleMember.prototype.maxItems = function() {
-  return Math.min($gameParty.formationBattleMember().length, this.maxCols());
+  return Math.min(this._members.length, _Game_Party_maxBattleMembers.call($gameParty) + (Imported.NUUN_SceneFormation_SupportActor ? $gameParty.membersInSupportActorNum(this._members) : 0));
 };
 
 Window_FormationBattleMember.prototype.maxCols = function() {
-  return _Game_Party_maxBattleMembers.call($gameParty);
+  return param.BattleMember_Cols > 0 ? param.BattleMember_Cols : _Game_Party_maxBattleMembers.call($gameParty);
+};
+
+Window_FormationBattleMember.prototype.getParamBattleMember_Rows = function() {
+  return param.BattleMember_Rows;
 };
 
 Window_FormationBattleMember.prototype.itemHeight = function() {
-  return Math.floor(this.innerHeight / 1);
+  return Math.floor(this.innerHeight / param.BattleMember_Rows);
 };
 
 Window_FormationBattleMember.prototype.actor = function(index) {
-  return $gameParty.formationBattleMember()[index];
+  return this._members[index];
 };
 
 Window_FormationBattleMember.prototype.processOk = function() {
@@ -1422,21 +1508,48 @@ Window_FormationBattleMember.prototype.drawItem = function(index) {
   this.drawPendingItemBackground(index);
   if (!actor) {
     const y = rect.y + this.itemHeight() - this.rowSpacing() - 48;
-    this.drawText('-', rect.x, y + 4, 48, 'center');
+    this.drawText('-', rect.x, y + 4, rect.width, "center");
   } else {
-    const bitmap = ImageManager.loadCharacter(actor.characterName());
-    if (!bitmap.isReady()) {
-      bitmap.addLoadListener(this.drawContents.bind(this, actor, rect.x, rect.y, rect.width));
+    let bitmap = null;
+    if (CharacterMode === 'chip') {
+      bitmap = ImageManager.loadCharacter(actor.characterName());
     } else {
-      this.drawContents(actor, rect.x, rect.y, rect.width);
+      if (Imported.NUUN_ActorPicture && DynamicFace) {
+        actor.resetImgId();
+        bitmap = ImageManager.loadFace(actor.getActorGraphicFace());
+      } else {
+        bitmap = ImageManager.loadFace(actor.faceName());
+      }
+    }
+    if (!bitmap.isReady()) {
+      bitmap.addLoadListener(this.drawContents.bind(this, actor, rect.x, rect.y, rect.width, rect.height));
+    } else {
+      this.drawContents(actor, rect.x, rect.y, rect.width, rect.height);
     }
   }
 };
 
-Window_FormationBattleMember.prototype.drawContents = function(actor, x, y, width) {
+Window_FormationBattleMember.prototype.drawContents = function(actor, x, y, width, height) {
+  if (CharacterMode === 'chip') {
+    this.drawFormationCharacter(actor, x, y, width);
+  } else {
+    this.drawFormationFace(actor, x, y, width, height);
+  }
+};
+
+Window_FormationBattleMember.prototype.drawFormationCharacter = function(actor, x, y, width) {
   let x2 = x + Math.floor(width / 2);
   let y2 = y +  + this.itemHeight() - this.rowSpacing();
   this.drawCharacter(actor.characterName(), actor.characterIndex(), x2, y2);
+  this.drawLavel(actor, x, y, width);
+};
+
+Window_FormationBattleMember.prototype.drawFormationFace = function(actor, x, y, width, height) {
+  if (Imported.NUUN_ActorPicture && DynamicFace) {
+    this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x + 1, y + 1, ImageManager.faceWidth - 2, height - 2);
+  } else {
+    Window_StatusBase.prototype.drawActorFace.call(this, actor, x + 1, y + 1, ImageManager.faceWidth - 2, height - 2);
+  }
   this.drawLavel(actor, x, y, width);
 };
 
@@ -1445,7 +1558,7 @@ Window_FormationBattleMember.prototype.drawLavel = function(actor, x, y, width) 
     const padding = Math.floor(this.itemPadding() / 2);
     y += this.itemHeight() - 32;
     x += padding;
-    width -= padding;
+    width = Math.min(width - padding, 60);
     const textWidth = this.textWidth(TextManager.levelA);
     this.contents.fontSize = 16;
     this.changeTextColor(ColorManager.systemColor());
@@ -1458,14 +1571,14 @@ Window_FormationBattleMember.prototype.drawLavel = function(actor, x, y, width) 
 
 const _Window_FormationBattleMember_setCursorRect = Window_FormationBattleMember.prototype.setCursorRect;
 Window_FormationBattleMember.prototype.setCursorRect = function(x, y, width, height) {
-  height = 48;
+  height = MemberHeight;
   y +=this.itemHeight() - this.rowSpacing() - height;
   _Window_FormationBattleMember_setCursorRect.call(this, x, y, width, height);
 };
 
 const _Window_FormationBattleMember_drawBackgroundRect = Window_FormationBattleMember.prototype.drawBackgroundRect;
 Window_FormationBattleMember.prototype.drawBackgroundRect = function(rect) {
-  rect.height = 48;
+  rect.height = MemberHeight;
   rect.y += this.itemHeight() - this.rowSpacing() - rect.height;
   _Window_FormationBattleMember_drawBackgroundRect.call(this, rect);
 };
@@ -1474,7 +1587,7 @@ Window_FormationBattleMember.prototype.drawPendingItemBackground = function(inde
   if (index === this._pendingIndex) {
       const rect = this.itemRect(index);
       const color = ColorManager.pendingColor();
-      const height = 48;
+      const height = MemberHeight;
       const y = rect.y + (this.itemHeight() - this.rowSpacing() - height);
       this.changePaintOpacity(false);
       this.contents.fillRect(rect.x, y, rect.width, height, color);
@@ -1485,7 +1598,9 @@ Window_FormationBattleMember.prototype.drawPendingItemBackground = function(inde
 const _Window_FormationBattleMember_cursorDown = Window_FormationBattleMember.prototype.cursorDown;
 Window_FormationBattleMember.prototype.cursorDown = function(wrap) {
   const index = this.index();
-  const rowIndex = Math.floor((this.maxItems() - 1) / this.maxCols()) * this.maxCols();
+  const cols = this.maxCols();
+  const maxItem = this.maxItems()
+  const rowIndex = Math.max(cols * (Math.ceil(maxItem / cols) - 2) + (maxItem % cols), 0);
   _Window_FormationBattleMember_cursorDown.call(this, wrap);
   if ($gameParty.formationMember().length > 0 && index >= rowIndex) {
     this.changeFormationCursor();
@@ -1547,13 +1662,19 @@ Window_FormationBattleMember.prototype.setSpriteActor = function(sprite) {
 
 //待機メンバー
 Window_FormationMember.prototype.initialize = function(rect) {
+  this._members = $gameParty.formationMember();
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._formationMode = true;
   this.refresh();
 };
 
+Window_FormationMember.prototype.refresh = function() {
+  this._members = $gameParty.formationMember();
+  Window_StatusBase.prototype.refresh.call(this);
+};
+
 Window_FormationMember.prototype.maxItems = function() {
-  return $gameParty.formationMember().length;
+  return this._members.length;
 };
 
 Window_FormationMember.prototype.maxCols = function() {
@@ -1565,7 +1686,7 @@ Window_FormationMember.prototype.itemHeight = function() {
 };
 
 Window_FormationMember.prototype.actor = function(index) {
-  return $gameParty.formationMember()[index];
+  return this._members[index];
 };
 
 Window_FormationMember.prototype.processOk = function() {
@@ -1621,21 +1742,48 @@ Window_FormationMember.prototype.drawItem = function(index) {
   this.drawPendingItemBackground(index);
   if (!actor) {
     const y = rect.y + this.itemHeight() - this.rowSpacing() - 48;
-    this.drawText('-', rect.x, y + 4, 48, 'center');
+    this.drawText('-', rect.x, y + 4, rect.width, 'center');
   } else {
-    const bitmap = ImageManager.loadCharacter(actor.characterName());
-    if (!bitmap.isReady()) {
-      bitmap.addLoadListener(this.drawContents.bind(this, actor, rect.x, rect.y, rect.width));
+    let bitmap = null;
+    if (CharacterMode === 'chip') {
+      bitmap = ImageManager.loadCharacter(actor.characterName());
     } else {
-      this.drawContents(actor, rect.x, rect.y, rect.width);
+      if (Imported.NUUN_ActorPicture && DynamicFace) {
+        actor.resetImgId();
+        bitmap = ImageManager.loadFace(actor.getActorGraphicFace());
+      } else {
+        bitmap = ImageManager.loadFace(actor.faceName());
+      }
+    }
+    if (!bitmap.isReady()) {
+      bitmap.addLoadListener(this.drawContents.bind(this, actor, rect.x, rect.y, rect.width, rect.height));
+    } else {
+      this.drawContents(actor, rect.x, rect.y, rect.width, rect.height);
     }
   }
 };
 
-Window_FormationMember.prototype.drawContents = function(actor, x, y, width) {
+Window_FormationMember.prototype.drawContents = function(actor, x, y, width, height) {
+  if (CharacterMode === 'chip') {
+    this.drawFormationCharacter(actor, x, y, width);
+  } else {
+    this.drawFormationFace(actor, x, y, width, height);
+  }
+};
+
+Window_FormationMember.prototype.drawFormationCharacter = function(actor, x, y, width) {
   let x2 = x + Math.floor(width / 2);
   let y2 = y + this.itemHeight() - this.rowSpacing();
   this.drawCharacter(actor.characterName(), actor.characterIndex(), x2, y2);
+  this.drawLavel(actor, x, y, width);
+};
+
+Window_FormationMember.prototype.drawFormationFace = function(actor, x, y, width, height) {
+  if (Imported.NUUN_ActorPicture && DynamicFace) {
+    this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x + 1, y + 1, ImageManager.faceWidth - 2, height - 2);
+  } else {
+    Window_StatusBase.prototype.drawActorFace.call(this, actor, x + 1, y + 1, ImageManager.faceWidth - 2, height - 2);
+  }
   this.drawLavel(actor, x, y, width);
 };
 
@@ -1644,7 +1792,7 @@ Window_FormationMember.prototype.drawLavel = function(actor, x, y, width) {
     const padding = Math.floor(this.itemPadding() / 2);
     y += this.itemHeight() - 32;
     x += padding;
-    width -= padding;
+    width = Math.min(width - padding, 60);
     const textWidth = this.textWidth(TextManager.levelA);
     this.contents.fontSize = 16;
     this.changeTextColor(ColorManager.systemColor());
@@ -1657,14 +1805,14 @@ Window_FormationMember.prototype.drawLavel = function(actor, x, y, width) {
 
 const _Window_FormationMember_setCursorRect = Window_FormationMember.prototype.setCursorRect;
 Window_FormationMember.prototype.setCursorRect = function(x, y, width, height) {
-  height = 48;
+  height = MemberHeight;
   y += this.itemHeight() - this.rowSpacing() - height;
   _Window_FormationMember_setCursorRect.call(this, x, y, width, height);
 };
 
 const _Window_FormationMember_drawBackgroundRect = Window_FormationMember.prototype.drawBackgroundRect;
 Window_FormationMember.prototype.drawBackgroundRect = function(rect) {
-  rect.height = 48;
+  rect.height = MemberHeight;
   rect.y += this.itemHeight() - this.rowSpacing() - rect.height;
   _Window_FormationMember_drawBackgroundRect.call(this, rect);
 };
@@ -1674,7 +1822,7 @@ Window_FormationMember.prototype.drawPendingItemBackground = function(index) {
       const rect = this.itemRect(index);
       const color = ColorManager.pendingColor();
       this.changePaintOpacity(false);
-      const height = 48;
+      const height = MemberHeight;
       const y = rect.y + (this.itemHeight() - this.rowSpacing() - height);
       this.contents.fillRect(rect.x, y, rect.width, height, color);
       this.changePaintOpacity(true);
@@ -1872,7 +2020,7 @@ Window_FormationStatus.prototype.dateDisplay = function(list, x, y, width) {
       this.drawState(list, this._actor, x, y, width);
       break;
     case 100:
-      this.drawActorFace(this._actor, x, y);
+      this.drawActorFace(this._actor, x, y, width);
       break;
     case 101:
       this.drawCharacterChip(list, this._actor, x, y);

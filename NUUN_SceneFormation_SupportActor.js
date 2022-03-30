@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(サポートアクター反映)
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * @base NUUN_SceneFormation
  * @base NUUN_SupportActor
  * @orderAfter NUUN_SceneFormation
@@ -23,6 +23,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/30 Ver.1.1.1
+ * メンバー変更プラグインの処理追加による修正。
+ * 2022/3/30 Ver.1.1.0
+ * メンバー変更画面、サポートアクター処理見直しによる定義変更。
+ * 2021/8/19 Ver.1.0.2
+ * 戦闘メンバーを全てサポートメンバーにしたときに戦闘に敗北してしまう問題を修正。
  * 2021/8/18 Ver.1.0.1
  * 戦闘メンバーが最大戦闘メンバー未満の時にエラーが起きる問題による処理の修正。
  * 2021/8/17 Ver.1.0.0
@@ -41,32 +47,55 @@ Imported.NUUN_SceneFormation_SupportActor = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_SceneFormation_SupportActor');
+const parameters2 = PluginManager.parameters('NUUN_SceneFormation');
+const VariableBattleMember = eval(parameters2['VariableBattleMember'] || "true");
+const BattleMember_Cols = Number(parameters2['BattleMember_Cols'] || 4);
+const BattleMember_Rows = Number(parameters2['BattleMember_Rows'] || 1);
+const parameters3 = PluginManager.parameters('NUUN_SceneBattleFormation');
+const BattleMember_ColsInBattle = Number(parameters3['BattleMember_Cols'] || 4);
+const BattleMember_RowsInBattle = Number(parameters3['BattleMember_Rows'] || 1);
 
-const _Game_Party_defaultMaxBattleMembers = Game_Party.prototype.defaultMaxBattleMembers;
-Game_Party.prototype.defaultMaxBattleMembers = function() {
-  const members = _Game_Party_defaultMaxBattleMembers.call(this);
-  return Imported.NUUN_SupportActor ? members * 2 : members;
+Game_Party.prototype.formationBattleMember = function() {
+  const members = this.withSupportActorInBattleMembers();
+  if (VariableBattleMember) {
+    members.push(null);
+  }
+  return members;
 };
 
-Game_Party.prototype.standbyMembers = function() {
-  return this.allMembers().slice(this.maxBattleMembers() + this.getSupportBattleMembersNum());
+Game_Party.prototype.withSupportActorInBattleMembers = function() {
+  const members = this.allBattleMembers().filter(actor => actor.isAppeared());
+  const maxMember = this.maxBattleMembers();
+  let i = maxMember - this.membersInSupportActorNum(members);
+  const concatMembers = this.allMembers().slice(this.maxBattleMembers()).filter(member => {
+    if (!member.getSupportActor()) {
+      i++;
+    }
+    if (i <= maxMember && member.isAppeared() && !member.getSupportActor()) {
+      return true;
+    }
+    if (i < maxMember && member.isAppeared() && member.getSupportActor()) {
+      return true;
+    }
+    return false;
+  });
+  Array.prototype.push.apply(members, concatMembers);
+  return members;
 };
 
-const _Game_Party_maxFormationBattleMembers = Game_Party.prototype.maxFormationBattleMembers;
-Game_Party.prototype.maxFormationBattleMembers = function() {
-  return _Game_Party_maxFormationBattleMembers.call(this) + this.getSupportBattleMembersNum();
+Game_Party.prototype.allStandByMembers = function() {
+  return this.allMembers().filter(member => member.isAppeared()).slice(this.withSupportActorInBattleMembers().length);
 };
 
-const _Window_FormationBattleMember_actor = Window_FormationBattleMember.prototype.actor;
-Window_FormationBattleMember.prototype.actor = function(index) {
-  $gameParty.membersMode = true;
-  return _Window_FormationBattleMember_actor.call(this, index);
+const _Game_Party_checkSwap = Game_Party.prototype.checkSwap;
+Game_Party.prototype.checkSwap = function(index) {
+  const actor = this.allMembers()[index];
+  return actor && !actor.getSupportActor() && _Game_Party_checkSwap.call(this);
 };
 
-const _Window_FormationBattleMember_maxItems = Window_FormationBattleMember.prototype.maxItems;
-Window_FormationBattleMember.prototype.maxItems = function() {
-  $gameParty.membersMode = true;
-  return _Window_FormationBattleMember_maxItems.call(this);
+const _Window_FormationBattleMember_maxCols = Window_FormationBattleMember.prototype.maxCols;
+Window_FormationBattleMember.prototype.maxCols = function() {
+  return _Window_FormationBattleMember_maxCols.call(this) * (this.getParamBattleMember_Rows() === 1 ? 2 : 1);
 };
 
 })();

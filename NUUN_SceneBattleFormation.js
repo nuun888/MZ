@@ -18,9 +18,6 @@
  * 戦闘中にメンバーを変更できるようにします。
  * このプラグインはメンバー変更画面（NUUN_SceneFormation）の拡張機能です。
  * 
- * 仕様
- * アクターコマンドからメンバー変更を行った場合、選択終了後アクターコマンドがキャンセルされます。
- * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
@@ -132,6 +129,22 @@
  * @text 戦闘メンバーウィンドウ設定
  * @default ------------------------------
  * 
+ * @param BattleMember_Cols
+ * @text 戦闘メンバー横表示数
+ * @desc 戦闘メンバー横表示数(戦闘) 0で最大メンバー数に応じて表示幅が変わります。
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent BattleMemberSetting
+ * 
+ * @param BattleMember_Rows
+ * @text 戦闘メンバー縦表示数
+ * @desc 戦闘メンバー縦表示数(戦闘)
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent BattleMemberSetting
+ * 
  * @param BattleMember_X
  * @text 戦闘メンバーウィンドウX座標
  * @desc 戦闘時の戦闘メンバーウィンドウX座標
@@ -151,6 +164,21 @@
  * @param MemberSetting
  * @text 待機メンバーウィンドウ設定
  * @default ------------------------------
+ * 
+ * @param Member_Cols
+ * @text 待機メンバー横表示数
+ * @desc 待機メンバー横表示数(戦闘)
+ * @type number
+ * @default 10
+ * @min 0
+ * @parent MemberSetting
+ * 
+ * @param Member_Rows
+ * @text 待機メンバー縦表示数
+ * @desc 待機メンバー縦表示数(戦闘)
+ * @type number
+ * @default 1
+ * @parent MemberSetting
  * 
  * @param Member_X
  * @text 待機メンバーウィンドウX座標

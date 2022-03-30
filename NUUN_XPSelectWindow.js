@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -23,6 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/31 Ver.1.0.2
+ * 敵のデフォルトのステート表示が表示されないように修正。
  * 2022/3/30 Ver.1.0.1
  * 敵の対象選択時にアクターステータスウィンドウを表示するように修正。
  * アクター選択時の顔グラの表示を立ち絵、顔グラ表示EX設定に対応。
@@ -620,6 +622,13 @@ Sprite_XPGauge.prototype.initialize = function() {
 
 Sprite_Gauge.prototype.bitmapWidth = function() {
     return this._gaugeWidth || 128;
+};
+
+
+const _Sprite_Enemy_updateStateSprite = Sprite_Enemy.prototype.updateStateSprite;
+Sprite_Enemy.prototype.updateStateSprite = function() {
+    _Sprite_Enemy_updateStateSprite.call(this);
+    this._stateIconSprite.visible = false;
 };
 
 })();

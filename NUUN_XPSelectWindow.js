@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -23,6 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/1 Ver.1.0.3
+ * 評価式のバトラーの取得する変数を変更。
  * 2022/3/31 Ver.1.0.2
  * 敵のデフォルトのステート表示が表示されないように修正。
  * 2022/3/30 Ver.1.0.1
@@ -181,6 +183,8 @@
  * @desc 評価式
  * @text 評価式(4)
  * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'battler.turnCount()+"ターン";//ターン'
  * @default 
  * 
  */
@@ -384,7 +388,7 @@ Window_BattleSelectBattler.prototype.battlerDataMode = function(data, x, y, widt
             this.placeStateIcon(this._battler, x, y);
             break;
         case 'original':
-            this.battlerOriginal(this._battler, data, x, y, width);
+            this.battlerOriginal(this._battler, data, x, y - 6, width);
             break;
         case 'Face':
             this.battlerFace(this._battler, data, x, y);
@@ -465,8 +469,8 @@ Window_BattleSelectActor.prototype.placeGauge = function(battler, type, x, y) {
     sprite.show();
 };
 
-Window_BattleSelectActor.prototype.battlerOriginal = function(actor, data, x, y, width) {
-    if (actor) {
+Window_BattleSelectActor.prototype.battlerOriginal = function(battler, data, x, y, width) {
+    if (battler) {
         const param = eval(data.Contents_Eval);
         this.drawText(param, x, y, width, data.Contents_Align);
     }
@@ -542,8 +546,8 @@ Window_BattleSelectEnemy.prototype.placeGauge = function(battler, type, x, y) {
     sprite.show();
 };
 
-Window_BattleSelectEnemy.prototype.battlerOriginal = function(enemy, data, x, y, width) {
-    if (enemy) {
+Window_BattleSelectEnemy.prototype.battlerOriginal = function(battler, data, x, y, width) {
+    if (battler) {
         const param = eval(data.Contents_Eval);
     this.drawText(param, x, y, width, data.Contents_Align);
     }

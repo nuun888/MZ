@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.0.4
+ * @version 1.0.5
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -45,6 +45,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/4/1 Ver.1.0.5
+ * アクターコマンドの項目の表示位置を中央寄りにする機能を追加。
  * 2022/3/29 Ver.1.0.4
  * アクターコマンドを各アクターの上指定時のサポートアクターのコマンド座標を設定できる機能を追加。
  * 敵選択、アイテム、スキル、ヘルプウィンドウ画像表示の説明文を変更。
@@ -53,7 +55,7 @@
  * 2022/3/26 Ver.1.0.2
  * 敵選択ウィンドウのスキン非表示を設定する項目がなかった問題を修正。
  * 2022/3/25 Ver.1.0.1
- * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加
+ * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加。
  * 2022/3/24 Ver.1.0.0
  * 初版
  * 
@@ -168,7 +170,7 @@
  * @default 0
  * @min -9999
  * @max 9999
- * @parent vCommandBackGround
+ * @parent PartyCommandBackGround
  * 
  * @param PartyCommandOption
  * @text パーティコマンドオプション
@@ -291,7 +293,7 @@
  * @min 0
  * @parent ActorCommandWindow
  * 
- * @param ActorCommandBackGround
+ * @param ActorCommandBackground
  * @text パーティコマンド背景設定
  * @default ------------------------------
  * @parent ActorCommand
@@ -302,7 +304,7 @@
  * @type file
  * @dir img/
  * @default 
- * @parent ActorCommandBackGround
+ * @parent ActorCommandBackground
  * 
  * @param ActorBackground_X
  * @desc アクターコマンドの背景画像X座標（相対）。
@@ -311,7 +313,7 @@
  * @default 0
  * @min -9999
  * @max 9999
- * @parent ActorCommandBackGround
+ * @parent ActorCommandBackground
  * 
  * @param ActorBackground_Y
  * @desc アクターコマンドの背景画像Y座標（相対）。
@@ -320,7 +322,7 @@
  * @default 0
  * @min -9999
  * @max 9999
- * @parent ActorCommandBackGround
+ * @parent ActorCommandBackground
  * 
  * @param ActorCommandOption
  * @text アクターコマンドオプション
@@ -330,6 +332,13 @@
  * @param ActorCommandWindowCenter
  * @text ウィンドウ座標中央表示
  * @desc ウィンドウを中央に表示させます。(上部、中間、アクターステータスの上、カスタムのみ)
+ * @type boolean
+ * @default true
+ * @parent ActorCommandOption
+ * 
+ * @param ActorCommandMode
+ * @desc アクターコマンドの項目を中央寄りに表示させます。
+ * @text コマンド表示中央寄り
  * @type boolean
  * @default true
  * @parent ActorCommandOption
@@ -638,8 +647,8 @@
  * @parent ActorSetting
  * 
  * @param ActorData
- * @text アクター設定
- * @desc アクターの設定を行います。
+ * @text アクター座標、画像設定
+ * @desc アクターの個別の座標、画像設定を行います。
  * @default []
  * @type struct<ActorDataList>[]
  * @parent ActorSetting
@@ -1853,6 +1862,7 @@ params.ActorCommandVariable = eval(parameters['ActorCommandVariable'] || "true")
 params.ActorCommandMaxRow = Number(parameters['ActorCommandMaxRow'] || 10);
 params.ActorCommandMinRow = Number(parameters['ActorCommandMinRow'] || 4);
 params.ActorCommandMaxCol = Number(parameters['ActorCommandMaxCol'] || 1);
+params.ActorCommandMode = eval(parameters['ActorCommandMode'] || "false");
 params.ActorCommand_X = Number(parameters['ActorCommand_X'] || 0);
 params.ActorCommand_Y = Number(parameters['ActorCommand_Y'] || 0);
 params.ActorCommandWindowShow = eval(parameters['ActorCommandWindowShow'] || "true");

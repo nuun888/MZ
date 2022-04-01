@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.0.5
+ * @version 3.0.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/4/1 Ver.3.0.6
+ * アクターコマンドの項目表示位置を中央にする機能の処理を追加。
  * 2022/3/29 Ver.3.0.5
  * アクターコマンドを各アクターの上指定時のサポートアクターのコマンド座標の処理を追加。
  * 2022/3/27 Ver.3.0.4
@@ -622,7 +624,7 @@ Scene_Battle.prototype.actorCommandWindowRect = function() {
 };
 
 Scene_Battle.prototype.actorCommandWidth = function() {
-  return params.ActorCommand_Width > 0 ? params.ActorCommand_Width : 192;
+  return params.ActorCommand_Width > 0 ? Math.min(params.ActorCommand_Width, Graphics.width) : 192;
 };
 
 Scene_Battle.prototype.actorCommandHeight = function() {
@@ -968,7 +970,7 @@ Scene_Battle.prototype.partyCommand_YPosition = function(mode) {
 };
 
 Scene_Battle.prototype.partyCommandWidth = function(mode) {
-  return params.PartyCommand_Width > 0 ? params.PartyCommand_Width : (mode === 0 ? Graphics.boxWidth : 192);
+  return params.PartyCommand_Width > 0 ? Math.min(params.PartyCommand_Width, Graphics.width) : (mode === 0 ? Graphics.boxWidth : 192);
 };
 
 Scene_Battle.prototype.partyWindowAreaHeight = function() {
@@ -1082,7 +1084,8 @@ Window_ActorCommand.prototype.initialize = function(rect) {
 };
 
 Window_ActorCommand.prototype.maxCols = function() {
-  return Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol);
+  return params.ActorCommandMode ? params.ActorCommandMaxCol : Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol);
+  //return Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol);
 };
 
 Window_ActorCommand.prototype.setCommandHeight = function() {
@@ -1094,6 +1097,15 @@ Window_ActorCommand.prototype.setCommandHeight = function() {
 Window_ActorCommand.prototype.selectActor = function(actor) {
   const members = $gameParty.battleMembers();
   return members.indexOf(actor);
+};
+
+const _Window_ActorCommand_itemRect = Window_ActorCommand.prototype.itemRect;
+Window_ActorCommand.prototype.itemRect = function(index) {
+  const rect = _Window_ActorCommand_itemRect.call(this, index);
+  if (params.ActorCommandMode) {
+    rect.x += this.itemWidth() / 2 * (this.maxCols() - Math.min(this.maxItems(), this.maxCols()));
+  }
+  return rect;
 };
 
 const _Window_ActorCommand_refresh = Window_ActorCommand.prototype.refresh;

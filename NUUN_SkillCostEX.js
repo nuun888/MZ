@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -40,13 +40,19 @@
  * [itemType]:アイテムタイプ　I アイテム　W 武器　A 防具
  * [itemId]:アイテム、武器、防具ID
  * [num]:消費個数
- * ゲーム変数から消費
+ * 装備品消費スキル
+ * <SkillEquipCost:[itemType],[itemId],[num]> コストとして装備中の武器、防具を消費します。
+ * [itemType]:アイテムタイプ　W 武器　A 防具
+ * [itemId]:武器、防具ID
+ * [num]:0で消費なし、1で焼失
+ * ゲーム変数消費スキル
  * <SkillVarCost:[id],[cost]> ゲーム変数に設定した数値から消費します。
  * [id]:ゲーム変数ID
- * [num]:消費コスト
+ * [cost]:消費コスト
  * 評価式
  * <SkillEvalCost:[eval]> 消費を判定するための評価式を記入します。
  * <SkillEvalCons:[eval]> 消費するための評価式を記入します。
+ * ※[]は記入しないでください。
  * 
  * 取得パラメータ
  * this.consBHp:消費前の発動者のHPを格納します。
@@ -54,7 +60,6 @@
  * this.consBTp:消費前の発動者のTPを格納します。
  * this.consBGold:消費前の発動者の所持金を格納します。
  * this.consBExp:消費前の発動者の現レベルの獲得経験値を格納します。
- * を代入します。
  * 
  * スキルのダメージの計算式に
  * a.consBMp * 1.5 と記入することで消費前のMPの1.5倍のダメージを与えることができます。
@@ -63,6 +68,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/2 Ver.1.1.0
+ * 装備中の武器、防具を消費して発動するスキルを設定できる機能を追加。
  * 2021/12/5 Ver.1.0.0
  * 初版
  * 
@@ -82,6 +89,7 @@ Game_Battler.prototype.initMembers = function() {
     this.consBTp = 0;
     this.consBGold = 0;
     this.consBExp = 0;
+    this._canCost = true;
 };
 
 Game_Battler.prototype.setBCostParam = function() {
@@ -144,6 +152,14 @@ Game_BattlerBase.prototype.skillItemCost = function(skill) {
     }
 };
 
+Game_BattlerBase.prototype.skillEquipCost = function(skill) {
+    if (this.isActor() && skill) {
+        return getCostEquip(skill);
+    } else {
+        return [];
+    }
+};
+
 const _Game_BattlerBase_canPaySkillCost = Game_BattlerBase.prototype.canPaySkillCost;
 Game_BattlerBase.prototype.canPaySkillCost = function(skill) {
     return (
@@ -152,6 +168,7 @@ Game_BattlerBase.prototype.canPaySkillCost = function(skill) {
         this.canSkillGoldCost(skill) &&
         this.canSkillExpCost(skill) &&
         this.canSkillItemCost(skill) &&
+        this.canSkillEquipCost(skill) &&
         this.canSkillVarCost(skill) && 
         this.canSkillEvalCost(skill))
 };
@@ -180,7 +197,20 @@ Game_BattlerBase.prototype.canSkillExpCost = function(skill) {
 };
 
 Game_BattlerBase.prototype.canSkillItemCost = function(skill) {
+    const items = this.skillItemCost(skill);
     return this.skillItemCost(skill).every(cost => $gameParty.numItems(cost.item) >= cost.quantity);
+};
+
+Game_BattlerBase.prototype.canSkillEquipCost = function(skill) {
+    return this.skillEquipCost(skill).every(cost => {
+        if(DataManager.isWeapon(cost.item)) {
+            return this.hasWeapon(cost.item);
+        } else if (DataManager.isArmor(cost.item)) {
+            return this.hasArmor(cost.item);
+        } else {
+            return false;
+        }
+    });
 };
 
 Game_BattlerBase.prototype.canSkillVarCost = function(skill) {
@@ -200,6 +230,7 @@ Game_BattlerBase.prototype.paySkillCost = function(skill) {
     $gameParty.loseGold(this.skillGoldCost(skill));
     this.paySkillExpCost(skill);
     this.paySkillItemCost(skill);
+    this.paySkillEquipCost(skill);
     this.paySkillVarCost(skill);
     this.paySkillEvalCost(skill);
 };
@@ -213,6 +244,14 @@ Game_BattlerBase.prototype.paySkillExpCost = function(skill) {
 Game_BattlerBase.prototype.paySkillItemCost = function(skill) {
     this.skillItemCost(skill).forEach(cost => {
         $gameParty.loseItem(cost.item, cost.quantity, false);
+    });
+};
+
+Game_BattlerBase.prototype.paySkillEquipCost = function(skill) {
+    this.skillEquipCost(skill).forEach(cost => { 
+        if (cost.quantity > 0)  {
+            this.discardEquip(cost.item);
+        }
     });
 };
 
@@ -242,6 +281,30 @@ function getCostItems(skill) {
                     case 'I':
                         list.push({item: $dataItems[parseInt(data[1])], quantity: parseInt(data[2])});
                         break;
+                    case 'W':
+                        list.push({item: $dataWeapons[parseInt(data[1])], quantity: parseInt(data[2])});
+                        break;
+                    case 'A':
+                        list.push({item: $dataArmors[parseInt(data[1])], quantity: parseInt(data[2])});
+                        break;
+                }
+            } else {
+                return list;
+            }
+        }
+    }
+    return list;
+};
+
+function getCostEquip(skill) {
+    const list = [];
+    if (skill.meta.SkillEquipCost) {
+        const re = /<(?:SkillEquipCost):\s*(.*)>/g;
+        while(true) {
+            let match = re.exec(skill.note);
+            if (match) {
+                let data = match[1].split(',');
+                switch (data[0]) {
                     case 'W':
                         list.push({item: $dataWeapons[parseInt(data[1])], quantity: parseInt(data[2])});
                         break;

@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.0.0
+# Ver.1.1.0
 
 スキルコストにさまざまなコストを設定できます。
 
@@ -24,7 +24,15 @@
 `<SkillExpCostR:[rate]>` 次のレベルの経験値までの獲得経験値の割合（百分率）％を消費します。  
 ### アイテム消費スキル
 `<SkillItemCost:[itemType],[itemId],[num]>` コストとしてアイテム、武器、防具を消費します。  
+`[itemType]`:アイテムタイプ　I アイテム　W 武器　A 防具  
+`[itemId]`:アイテム、武器、防具ID  
+`[num]`:消費個数 
+### 装備品消費スキル
 複数指定する場合はすべてのアイテムがある場合、使用することができます。  
+`<SkillEquipCost:[itemType],[itemId],[num]>` コストとして装備中の武器、防具を消費します。  
+`[itemType]`:アイテムタイプ　W 武器　A 防具  
+`[itemId]`:武器、防具ID  
+`[num]`:0で消費なし、1で消失  
 ### ゲーム変数から消費
 `<SkillVarCost:[id],[cost]>` ゲーム変数に設定した数値から消費します。
 ### 評価式

@@ -44,7 +44,7 @@
  * <SkillEquipCost:[itemType],[itemId],[num]> コストとして装備中の武器、防具を消費します。
  * [itemType]:アイテムタイプ　W 武器　A 防具
  * [itemId]:武器、防具ID
- * [num]:0で消費なし、1で焼失
+ * [num]:0で消費なし、1で消失
  * ゲーム変数消費スキル
  * <SkillVarCost:[id],[cost]> ゲーム変数に設定した数値から消費します。
  * [id]:ゲーム変数ID

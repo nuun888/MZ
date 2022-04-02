@@ -12,17 +12,25 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
  * 
  * 全体、ランダム、敵味方全体攻撃(Ver.1.6.0以降)でも対象選択と併用することで、全体、ランダム対象時の表示をすることができます。
  * 
+ * アクター、敵キャラのメモ欄
+ * <XPBattlerFace:[imgUrl], [indexId]> 表示する顔グラを指定します。アクターの場合は未指定の場合はデフォルトの顔グラまたは立ち絵、顔グラEXの顔グラが表示されます。
+ * [imgUrl]:faceインデックス内のURL(拡張子なし)
+ * [indexId]:顔グラのインデックスID
+ * ※[]は記入しないでください。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/2 Ver.1.0.4
+ * 敵に顔グラを指定できる機能を追加。
  * 2022/4/1 Ver.1.0.3
  * 評価式のバトラーの取得する変数を変更。
  * 2022/3/31 Ver.1.0.2
@@ -147,7 +155,7 @@
  * @value 'State'
  * @option 任意ステータス(1)(2)(3)(4)
  * @value 'original'
- * @option 顔グラ
+ * @option 顔グラ(1)(2)
  * @value 'Face'
  * @default 'name'
  * 
@@ -185,7 +193,7 @@
  * @type combo
  * @option '$gameVariables.value(0);//ゲーム変数'
  * @option 'battler.turnCount()+"ターン";//ターン'
- * @default 
+ * @default
  * 
  */
 var Imported = Imported || {};
@@ -214,6 +222,10 @@ function actorSelectWindowWidth() {
 function enemySelectWindowWidth() {
     return EnemySelect_Width > 0 ? Math.min(EnemySelect_Width, Graphics.width) : Graphics.boxWidth;
 };
+
+function getFace(battler) {
+    return battler.meta.XPBattlerFace ? battler.meta.XPBattlerFace.split(',') : null;
+}
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
@@ -318,9 +330,7 @@ Scene_Battle.prototype.onActorCancel = function() {
     if (ActorXPSelect) {
         this._actorSelectWindow.close();
     }
-    
 };
-
 
 
 Scene_Battle.prototype.XPActorSelectY = function() {
@@ -418,12 +428,18 @@ Window_BattleSelectActor.prototype.initialize = function(rect) {
 Window_BattleSelectActor.prototype.refresh = function() {
     Window_StatusBase.prototype.refresh.call(this);
     let bitmap = null;
-    if (this._battler) {
-        if (Imported.NUUN_ActorPicture && DynamicFace) {
-            this._battler.resetImgId();
-            bitmap = ImageManager.loadFace(this._battler.getActorGraphicFace());
+    const battler = this._battler;
+    if (battler) {
+        const faceData = getFace(battler.actor());
+        if (faceData) {
+            bitmap = ImageManager.loadFace(faceData[0]);
         } else {
-            bitmap = ImageManager.loadFace(this._battler.faceName());
+            if (Imported.NUUN_ActorPicture && DynamicFace) {
+                this._battler.resetImgId();
+                bitmap = ImageManager.loadFace(this._battler.getActorGraphicFace());
+            } else {
+                bitmap = ImageManager.loadFace(this._battler.faceName());
+            }
         }
         if (!bitmap.isReady()) {
             bitmap.addLoadListener(this.drawListData.bind(this));
@@ -462,6 +478,9 @@ Window_BattleSelectActor.prototype.placeStateIcon = function(battler, x, y) {
 };
 
 Window_BattleSelectActor.prototype.placeGauge = function(battler, type, x, y) {
+    if (Imported.NUUN_GaugeImage) {
+        this.placeGaugeImg(actor, type, x, y);
+    }
     const key = "ActorSelectGauge-%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_XPGauge);
     sprite.setup(battler, type);
@@ -478,22 +497,20 @@ Window_BattleSelectActor.prototype.battlerOriginal = function(battler, data, x, 
 
 Window_BattleSelectActor.prototype.battlerFace = function(actor, data, x, y) {
     if (actor) {
-        bitmap = ImageManager.loadFace(actor.faceName());
+        const width = ImageManager.faceWidth;
         y -= (ImageManager.faceHeight / 2) - 6;
-        if (!bitmap.isReady()) {
-            bitmap.addLoadListener(this.drawActorFace.bind(actor, x, y));
-        } else {
-            const width = ImageManager.faceWidth;
-            this.drawActorFace(actor, x, y, width);
-        }
+        this.drawActorFace(actor, x, y, width);
     }
 };
 
 Window_BattleSelectActor.prototype.drawActorFace = function(actor, x, y, width, height) {
-    if (Imported.NUUN_ActorPicture && DynamicFace) {
-      this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
+    const faceData = getFace(actor.actor());
+    if (faceData) {
+        this.drawFace(faceData[0], Math.max(faceData[1], 0), x, y, width, height);
+    } else if (Imported.NUUN_ActorPicture && DynamicFace) {
+        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
     } else {
-      Window_StatusBase.prototype.drawActorFace.call(this, actor, x, y, width, height);
+        Window_StatusBase.prototype.drawActorFace.call(this, actor, x, y, width, height);
     }
 };
 
@@ -511,6 +528,22 @@ Window_BattleSelectEnemy.prototype.initialize = function(rect) {
 
 Window_BattleSelectEnemy.prototype.refresh = function() {
     Window_StatusBase.prototype.refresh.call(this);
+    let bitmap = null;
+    const battler = this._battler;
+    if (battler) {
+        const faceData = getFace(battler.enemy());
+        if (faceData) {
+            bitmap = ImageManager.loadFace(faceData[0]);
+        }
+        if (faceData && !bitmap.isReady()) {
+            bitmap.addLoadListener(this.drawListData.bind(this));
+        } else {
+            this.drawListData();
+        }
+    }
+};
+
+Window_BattleSelectEnemy.prototype.drawListData = function() {
     const rect = this.itemLineRect(0);
     if (this._targetSelect) {
         this.drawEXTargetSelect(rect.x, rect.y, rect.width);
@@ -539,6 +572,9 @@ Window_BattleSelectEnemy.prototype.placeStateIcon = function(battler, x, y) {
 };
 
 Window_BattleSelectEnemy.prototype.placeGauge = function(battler, type, x, y) {
+    if (Imported.NUUN_GaugeImage) {
+        this.placeGaugeImg(actor, type, x, y);
+      }
     const key = "EnemySelectGauge-%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_XPGauge);
     sprite.setup(battler, type);
@@ -549,12 +585,23 @@ Window_BattleSelectEnemy.prototype.placeGauge = function(battler, type, x, y) {
 Window_BattleSelectEnemy.prototype.battlerOriginal = function(battler, data, x, y, width) {
     if (battler) {
         const param = eval(data.Contents_Eval);
-    this.drawText(param, x, y, width, data.Contents_Align);
+        this.drawText(param, x, y, width, data.Contents_Align);
     }
 };
 
 Window_BattleSelectEnemy.prototype.battlerFace = function(enemy, data, x, y) {
-    
+    if (enemy) {
+        const width = ImageManager.faceWidth;
+        y -= (ImageManager.faceHeight / 2) - 6;
+        this.drawEnemyFace(enemy, x, y, width);
+    }
+};
+
+Window_BattleSelectEnemy.prototype.drawEnemyFace = function(enemy, x, y, width, height) {
+    const faceData = getFace(enemy.enemy());
+    if (faceData) {
+        this.drawFace(faceData[0], Math.max(faceData[1], 0), x, y, width, height);
+    }
 };
 
 

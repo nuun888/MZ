@@ -6,7 +6,7 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 敵、味方の対象選択時のウィンドウをXP風に変更します。  
-対象選択時に名前、顔グラ（アクターのみ）、ステート、HP、MP、TPを表示できます。  
+対象選択時に名前、顔グラ、ステート、HP、MP、TPを表示できます。  
 
 ![画像](img/XPSelectWindow1.png)  
 ![画像](img/XPSelectWindow2.png)  

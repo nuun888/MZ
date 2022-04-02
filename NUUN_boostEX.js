@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 行動時ブースト特徴
  * @author NUUN
- * @version 1.1.2
+ * @version 1.2.0
  * 
  * @help
  * 攻撃時に特定の行動によってダメージを補正する効果を得ることができます。
@@ -41,6 +41,10 @@
  * <BoostEX:CNT, [rate]>
  * 反撃時にダメージを増幅させます。
  * <BoostEX:MRF, [rate]>
+ * 使用者のメモ欄に以下のタグがある場合にダメージを増幅させます。
+ * <BoostEX:SMeta, [tag], [rate]>
+ * 対象のメモ欄に以下のタグがある場合にダメージを増幅させます。
+ * <BoostEX:TMeta, [tag], [rate]>
  * 
  * 以下は条件付きベースが必要です。
  * <BoostCond:[rate],[condMode]>
@@ -51,17 +55,19 @@
  *  <PartyCondBoost:[id],[id]....> 
  *  <TroopCondBoost:[id],[id]....> 
  * 
- * [rate]:増幅率±
+ * [rate]:増幅率±(整数)
  * [condMode]：条件モード（省略可）0:一部一致 1:全て一致
  * 
  * ２つ以上該当する場合は加算した合計で算出されます。
  * 魔法属性+20%と炎属性+30の場合は50%ダメージが増幅されます。
- * 
+ * 数値、文字列は[]は括らずに記入してください。　例:<BoostEX:CNT, [rate]> → <BoostEX:CNT, 50>
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2021/4/2 Ver.1.2.0
+ * 条件にメモ欄に特定のタグが記入してあれば増幅する機能を追加。
  * 2021/11/13 Ver.1.1.2
  * 条件付きベースの条件が正常に取得できていなかった問題を修正。
  * 条件付きベースの定義変更による条件タグの設定方法を変更。
@@ -135,6 +141,10 @@ Game_Action.prototype.isBoostConditions = function(data, item, target, critical,
     return Number(data[1]);
   } else if (data[0] === 'MRF' && this.isBoostMrf()) {
     return Number(data[1]);
+  } else if (data[0] === 'SMeta' && this.isBoostMeta(this._suject(), String(data[1]))) {
+    return Number(data[2]);
+  } else if (data[0] === 'TMeta' && this.isBoostMeta(target, String(data[1]))) {
+    return Number(data[2]);
   } else {
     return 0;
   }
@@ -174,8 +184,17 @@ Game_Action.prototype.isBoostMrf = function() {
   return BattleManager.boostMrf;
 };
 
+Game_Action.prototype.isBoostMeta = function(target, tag) {
+  return target.traitObjects().some(trait => {
+    return trait.meta[tag.trim()]
+  });
+};
+
 Game_Battler.prototype.boostAllTraits = function() {
-  return this.traitObjects().reduce((r, traits) => r.concat(this.boostNoteData(traits)), []);
+  return this.traitObjects().reduce((r, trait) => {
+    r.push(...this.boostNoteData(trait));
+    return r;
+  }, []);
 };
 
 Game_Battler.prototype.boostNoteData = function(traits) {

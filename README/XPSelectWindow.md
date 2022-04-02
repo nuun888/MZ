@@ -1,5 +1,5 @@
 # [XP風対象選択ウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)
-# Ver.1.0.3
+# Ver.1.0.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)  
 
 ## 必須、前提プラグイン
@@ -17,6 +17,8 @@
 ![画像](img/XPSelectWindow3.png)  
 
 ## 更新履歴
+2022/4/2 Ver.1.0.4  
+敵に顔グラを指定できる機能を追加。  
 2022/4/1 Ver.1.0.3  
 評価式のバトラーの取得する変数を変更。  
 2022/3/31 Ver.1.0.2  

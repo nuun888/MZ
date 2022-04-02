@@ -28,10 +28,10 @@
 ダメージタイプがHP回復、MP回復の時ににダメージを増幅させます。  
 `<BoostEX:IT, [rate]>`  
 アイテムを仕様時ににダメージを増幅させます。  
-`<BoostEX:CNT, [rate]>`
+`<BoostEX:CNT, [rate]>`  
 反撃時にダメージを増幅させます。  
 `<BoostEX:MRF, [rate]>`  
-魔法反射時にダメージを増幅させます。    
+魔法反射時にダメージを増幅させます。   
 `<BoostEX:SMeta, [tag], [rate]>`  
 使用者のメモ欄に以下のタグがある場合にダメージを増幅させます。  
 `<BoostEX:TMeta, [tag], [rate]>`  

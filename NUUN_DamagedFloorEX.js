@@ -138,7 +138,7 @@
  * @desc 床ダメージ時のダメージ（a：アクター）
  * @type combo
  * @option '10;//デフォルト'
- * @option 'a.mhp * 0.02;//最大HPの２％'
+ * @option 'Math.max(1,a.mhp * 0.01);//最大HPの1％'
  * @default 10
  * 
  * @param DamageActor

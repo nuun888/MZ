@@ -10,6 +10,7 @@
 レ：レーダーチャート対応  
 ス：要ステートターンカウント  
 ス対：ステートターンカウント対応  
+グ：グローバル情報ベース対応
 
 | コア　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
@@ -19,6 +20,7 @@
 | [レーダーチャート表示ベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md) | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) | 共 | 1.0.2 |
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.2.5 |
 | [ドロップ率確率操作ベース](https://github.com/nuun888/MZ/blob/master/README/DropItemRateBase.md) |  [NUUN_DropItemRateBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemRateBase.js) |  | 1.0.0 |
+| [グローバル情報ベース](https://github.com/nuun888/MZ/blob/master/README/GlobalCore.md) |  [NUUN_GlobalCore](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GlobalCore.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -160,9 +162,10 @@
 
 | メニュー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数10　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ | 2.11.2 |
+| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ グ | 2.11.2 |
 | ┣　[耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) | [NUUN_EnemyBookEX_1](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js) |  | 1.0.1 |
-| ┗ 条件付きドロップアイテム図鑑適用 | [NUUN_EnemyBookEX_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) |  | 1.0.1 |
+| ┣ 条件付きドロップアイテム図鑑適用 | [NUUN_EnemyBookEX_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) |  | 1.0.1 |
+| ┗ モンスター図鑑全セーブ共通 | [NUUN_EnemyBook_Global](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook_Global.js) |  | 1.1.0 |
 | [アイテム図鑑](https://github.com/nuun888/MZ/blob/master/README/ItemBook.md) | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) | 共 | 1.4.3 |
 | [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共(Ver.1.4.1) 立対 レ | 2.3.6 |
 | [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.8.1 |

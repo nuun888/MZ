@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.0.6
+### Ver.3.0.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)  
@@ -68,6 +68,8 @@
 [バトルスタイル拡張設定用](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX.js) Ver.1.6.3  
 
 ## 更新履歴
+2022/4/4 Ver.3.0.7  
+アイコンスステート枠内表示をOFFにした場合、ステートアイコンがアクター画像の背後に表示されてしまう問題を修正。  
 2022/4/1 Ver.3.0.6  
 アクターコマンドの項目表示位置を中央にする機能の処理を追加。  
 2022/3/29 Ver.3.0.5  

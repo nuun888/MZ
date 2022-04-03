@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.0.6
+ * @version 3.0.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/4/4 Ver.3.0.7
+ * アイコンスステート枠内表示をOFFにした場合、ステートアイコンがアクター画像の背後に表示されてしまう問題を修正。
  * 2022/4/1 Ver.3.0.6
  * アクターコマンドの項目表示位置を中央にする機能の処理を追加。
  * 2022/3/29 Ver.3.0.5
@@ -1594,6 +1596,14 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
   sprite.setFrame(sx, sy, sw, sh);
   sprite._rectWidth = rect.width;
   sprite._rectHeight = rect.height;
+  sprite.show();
+};
+
+Window_BattleActorImges.prototype.placeStateIcon = function(actor, x, y) {
+  const key = "actor%1-stateIcon".format(actor.actorId());
+  const sprite = this.createActorImgSprite(key, Sprite_StateIcon);
+  sprite.setup(actor);
+  sprite.move(x, y);
   sprite.show();
 };
 

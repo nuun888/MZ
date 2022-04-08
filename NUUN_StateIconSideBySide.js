@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.2.3
+ * @version 1.3.0
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -30,6 +30,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/9 Ver.1.3.0
+ * 表示アイコンの行を指定できる機能を追加。
+ * 処理の軽量化。
  * 2022/3/31 Ver.1.2.3
  * 疑似3Dバトルとの併用時にアクターのステートが表示されない問題を修正。
  * 2022/3/30 Ver.1.2.2
@@ -51,26 +54,37 @@
  * 2021/1/2 Ver.1.0.0
  * 初版
  * 
- * @param ActorStateIconShowVal
- * @desc 味方の表示するステート数。
- * @text 味方の表示ステート数
- * @type number
- * @default 5
- * @min 1
- * 
- * @param EnemyStateIconShowVal
- * @desc 敵の表示するステート数。
- * @text 敵の表示ステート数
- * @type number
- * @default 5
- * @min 1
+ * @param Setting
+ * @text 共通設定
+ * @default ------------------------------
  * 
  * @param StateIconWidth
- * @desc ステートアイコンの表示する横幅を指定します。
+ * @desc ステートアイコンの表示する横幅を指定します。0でアイコン列数の幅になります。
  * @text 横幅
  * @type number
  * @default 0
  * @min 0
+ * @parent Setting
+ * 
+ * @param ActorStateIcon
+ * @text 味方ステートアイコン
+ * @default ------------------------------
+ * 
+ * @param ActorStateIconShowVal
+ * @desc 味方のステート列数。
+ * @text 味方ステート列数
+ * @type number
+ * @default 5
+ * @min 1
+ * @parent ActorStateIcon
+ * 
+ * @param ActorStateIconRows
+ * @desc 味方のステート行数。
+ * @text 味方ステート行数
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent ActorStateIcon
  * 
  * @param ActorStateIconAlign
  * @desc 味方のアイコンの表示揃え
@@ -83,6 +97,27 @@
  * @option 右揃え
  * @value 'right'
  * @default 'right'
+ * @parent ActorStateIcon
+ * 
+ * @param EnemyStateIcon
+ * @text 敵ステートアイコン
+ * @default ------------------------------
+ * 
+ * @param EnemyStateIconShowVal
+ * @desc 敵のステート列数。
+ * @text 敵ステート列数
+ * @type number
+ * @default 5
+ * @min 1
+ * @parent EnemyStateIcon
+ * 
+ * @param EnemyStateIconRows
+ * @desc 敵のステート行数。
+ * @text 敵ステート行数
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent EnemyStateIcon
  * 
  * @param EnemyStateIconAlign
  * @desc 敵のアイコンの表示揃え
@@ -95,7 +130,7 @@
  * @option 右揃え
  * @value 'right'
  * @default 'center'
- * 
+ * @parent EnemyStateIcon
  * 
  * @param StateTurn
  * @text ターン表示設定
@@ -168,7 +203,9 @@ Imported.NUUN_StateIconSideBySide = true;
 const parameters = PluginManager.parameters('NUUN_StateIconSideBySide');
 let StateIconWidth = Number(parameters['StateIconWidth'] || 0);
 const ActorStateIconShowVal = Number(parameters['ActorStateIconShowVal'] || 5);
+const ActorStateIconRows = Number(parameters['ActorStateIconRows'] || 1);
 const EnemyStateIconShowVal = Number(parameters['EnemyStateIconShowVal'] || 1);
+const EnemyStateIconRows = Number(parameters['EnemyStateIconRows'] || 1);
 const ActorStateIconAlign = eval(parameters['ActorStateIconAlign'] || 'right');
 const EnemyStateIconAlign = eval(parameters['EnemyStateIconAlign'] || 'center');
 const ActorStateIconVisible = eval(parameters['ActorStateIconVisible'] || 'true');
@@ -178,6 +215,14 @@ const TurnFontSize = Number(parameters['TurnFontSize'] || -4);
 const TurnX = Number(parameters['TurnX'] || 0);
 const TurnY = Number(parameters['TurnY'] || -4);
 const TurnCorrection = Number(parameters['TurnCorrection'] || 1);
+let isEnemyMode = false;
+
+const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
+Sprite_Enemy.prototype.initMembers = function() {
+  isEnemyMode = true;
+  _Sprite_Enemy_initMembers.call(this);
+};
+
 
 const _Sprite_StateIcon_initialize = Sprite_StateIcon.prototype.initialize;
 Sprite_StateIcon.prototype.initialize = function() {
@@ -194,7 +239,7 @@ Sprite_StateIcon.prototype.bitmapWidth = function() {
 };
 
 Sprite_StateIcon.prototype.bitmapHeight = function() {
-  return ImageManager.iconHeight;
+  return ImageManager.iconHeight * this.getMaxStateIconRows();
 };
 
 Sprite_StateIcon.prototype.loadBitmap = function() {//再定義
@@ -203,13 +248,14 @@ Sprite_StateIcon.prototype.loadBitmap = function() {//再定義
 };
 
 Sprite_StateIcon.prototype.createSprite = function() {
-  for (let i = 0; i < this.getMaxStateIconShowVal(); i++) {
+  for (let i = 0; i < this.getMaxStateIconShowVal() * this.getMaxStateIconRows(); i++) {
     const sprite = new Sprite();
     this.addChild(sprite);
     this._iconSprite.push(sprite);
     this.setInitIcon(sprite, i);
     this.textTurn(sprite);
   }
+  isEnemyMode = false;
 };
 
 Sprite_StateIcon.prototype.textTurn = function(sprite) {
@@ -254,8 +300,8 @@ Sprite_StateIcon.prototype.stateIconDisplayAlign = function(iconlength, align) {
 Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
   let displayIcons = [];
   let displayTurn = [];
-  displayIcons = icons.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal());
-  displayTurn = turns.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal());
+  displayIcons = icons.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
+  displayTurn = turns.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
     this._iconSprite.forEach((sprite, r) => {
     if (displayIcons[r]) {
       sprite._iconIndex = displayIcons[r];
@@ -283,7 +329,7 @@ Sprite_StateIcon.prototype.updateIcon = function() {//再定義
   }
   this.createStateIcons(icons, turns);
   if (icons.length > 0) {
-      this._animationIndex += this.getStateIconShowVal();
+      this._animationIndex += this.getStateIconShowVal() * this.getStateIconRows();
       if (this._animationIndex >= icons.length) {
           this._animationIndex = 0;
       }
@@ -298,8 +344,10 @@ Sprite_StateIcon.prototype.updateIcon = function() {//再定義
 
 Sprite_StateIcon.prototype.updateFrame = function() {//再定義
   const iconsLength = this.displayIconsLength;
+  const showLength = Math.min(iconsLength, this.getStateIconShowVal());
   this._iconSprite.forEach((sprite, r) => {
-    sprite.x = r * this.iconX(iconsLength) + this.stateIconDisplay(iconsLength);
+    sprite.x = Math.floor(r % this.getStateIconShowVal()) * this.iconX(showLength) + this.stateIconDisplay(showLength);
+    sprite.y = Math.floor(r / this.getStateIconShowVal()) * ImageManager.iconHeight;
     if (sprite.visible) {
       this.setFrameIcon(sprite);
       this.setTurn(sprite);
@@ -336,7 +384,23 @@ Sprite_StateIcon.prototype.getStateIconShowVal = function() {
 };
 
 Sprite_StateIcon.prototype.getMaxStateIconShowVal = function() {
-  return Math.max(ActorStateIconShowVal, EnemyStateIconShowVal);
+  if (this._battler) {
+    return this.getStateIconShowVal();
+  } else {
+    return isEnemyMode ? EnemyStateIconShowVal : ActorStateIconShowVal;
+  }
+};
+
+Sprite_StateIcon.prototype.getStateIconRows = function() {
+  return this._battler && this._battler.isActor() ? ActorStateIconRows : EnemyStateIconRows;
+};
+
+Sprite_StateIcon.prototype.getMaxStateIconRows = function() {
+  if (this._battler) {
+    return this.getStateIconRows();
+  } else {
+    return isEnemyMode ? EnemyStateIconRows : ActorStateIconRows;
+  }
 };
 
 Sprite_StateIcon.prototype.setupFont = function(sprite) {
@@ -375,7 +439,9 @@ Window_BattleStatus.prototype.stateIconX = function(rect) {
 };
 
 Game_BattlerBase.prototype.allStateTurns = function() {
-  return this.nuun_stateTurns().concat(this.allBuffTurns());
+  const turns = this.nuun_stateTurns();
+  Array.prototype.push.apply(turns, this.allBuffTurns());
+  return turns;
 };
 
 Game_BattlerBase.prototype.allBuffTurns = function() {
@@ -385,7 +451,8 @@ Game_BattlerBase.prototype.allBuffTurns = function() {
 Game_BattlerBase.prototype.nuun_stateTurns = function() {
   return this.states().reduce((r, state) => {
     if (state.iconIndex > 0) {
-      return r.concat([this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)]);
+      const turn = [this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)];
+      Array.prototype.push.apply(r, turn);
     } 
     return r;
   }, []);
@@ -394,10 +461,10 @@ Game_BattlerBase.prototype.nuun_stateTurns = function() {
 Game_BattlerBase.prototype.nuun_buffTurns = function() {
   return this._buffs.reduce((r, buff, i) => {
     if (buff !== 0) {
-      return r.concat([this.nuun_getBuffTurn(i)]);
-    } else {
-      return r;
+      const turn = [this.nuun_getBuffTurn(i)];
+      Array.prototype.push.apply(r, turn);
     }
+      return r;
   }, []);
 };
 

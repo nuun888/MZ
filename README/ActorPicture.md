@@ -4,7 +4,7 @@
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 #### 対応プラグイン
-[バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md)  
+[バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md)  
 [ステータス表示拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md)  
 [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)  
 [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  

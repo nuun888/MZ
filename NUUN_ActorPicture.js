@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.5
+ * @version 1.3.0
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。

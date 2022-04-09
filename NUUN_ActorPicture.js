@@ -41,6 +41,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/10 Ver 1.3.0
+ * アクター画像設定のスイッチ、武器、防具、ステートの条件に複数指定できるように変更。
+ * アクター画像設定に残りHPの条件を追加。 
+ * アクター画像設定のスキル、アイテム条件が適用されていなかった問題を修正。
  * 2022/3/24 Ver 1.2.5
  * ステート条件が取得できなかった問題を修正。
  * 画像指定の仕様を変更。
@@ -119,37 +123,44 @@
  * 
  * @param ImgSwitch
  * @text スイッチ
- * @desc スイッチがONの時に変化します。
- * @type switch
- * @default 0
+ * @desc 指定したスイッチが全てONの時に変化します。
+ * @type switch[]
+ * @default
  * @parent AllMatch
  * 
  * @param ImgWeapon
  * @text 武器
- * @desc 武器を装備している時に条件を満たします。
- * @type weapon
- * @default 0
+ * @desc 指定した武器を全て装備している時に条件を満たします。
+ * @type weapon[]
+ * @default 
  * @parent AllMatch
  * 
  * @param ImgArmor
  * @text 防具
- * @desc 防具を装備している時に条件を満たします。
- * @type armor
- * @default 0
+ * @desc 指定した防具を全て装備している時に条件を満たします。
+ * @type armor[]
+ * @default 
  * @parent AllMatch
  * 
  * @param ImgClass
  * @text 職業
  * @desc 特定の職業なら条件を満たします。
- * @type calss
+ * @type class
  * @default 0
  * @parent AllMatch
  * 
  * @param ImgStateAll
  * @text ステート。
- * @desc 指定したステートになっている時に条件を満たします
- * @type state
- * @default 0
+ * @desc 指定したステートに全てかかっている時に条件を満たします。
+ * @type state[]
+ * @default 
+ * @parent AllMatch
+ * 
+ * @param ImgHP
+ * @text 残りHP
+ * @desc 残りHPが指定の範囲内または数値の時に変化します。
+ * @type struct<CondValue>
+ * @default {"CondValid":"false","UpLimit":"0","DwLimit":"0"}
  * @parent AllMatch
  * 
  * @param ChangeGraphicScenes
@@ -185,26 +196,48 @@
  * @text 条件設定
  * @default ------------------------------
  * 
- * @param SkillId
+ * @param Skill
  * @text スキル(1)
- * @desc スキルを選択します。0:指定なし -1:物理 -2:魔法 -3:必中
- * @type skill
- * @default 0
+ * @desc スキルを選択します。いずれかのスキル使用時に適用します。空白の場合は全てのスキルが対象です。スキルID0は通常攻撃です。
+ * @type skill[]
+ * @default
  * @parent CondSetting
  * 
- * @param ItemId
+ * @param Item
  * @text アイテム(2)
- * @desc アイテムを選択します。
- * @type item
- * @default 0
+ * @desc アイテムを選択します。いずれかのアイテム使用時に適用します。空白の場合は全てのアイテムが対象です。
+ * @type item[]
+ * @default
  * @parent CondSetting
  * 
  * @param stateId
  * @text 被ステート(3)
- * @desc ステートを選択します。
- * @type state
- * @default 0
+ * @desc ステートを選択します。全てのステートにかかっている時に適用します。
+ * @type state[]
+ * @default 
  * @parent CondSetting
+ * 
+ */
+/*~struct~CondValue:
+ * 
+ * @param CondValid
+ * @desc HP条件を有効にします。
+ * @text HP条件有効
+ * @type boolean
+ * @default false
+ * 
+ * @param UpLimit
+ * @text 上限値
+ * @desc 上限値
+ * @type number
+ * @default 0
+ * 
+ * @param DwLimit
+ * @text 下限値
+ * @desc 下限値
+ * @type number
+ * @default 0
+ * 
  */
 
 var Imported = Imported || {};
@@ -225,6 +258,7 @@ NuunManager.getClassName = function() {
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
+  this.nuun_useItemId = -1;
   this._actorGraphicIndex = -1;
   this._actorGraphicName = null;
   this._actorGraphicFace = null;
@@ -272,19 +306,22 @@ Game_Actor.prototype.setActorGraphicData = function() {
 };
 
 Game_Actor.prototype.matchConditions = function(data) {
-  if (data.ImgSwitch > 0 && !$gameSwitches.value(data.ImgSwitch)) {
+  if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this.hp, this.param(0))) {
     return false;
   }
-  if (data.ImgWeapon > 0 && !this.isEquipped($dataWeapons[data.ImgWeapon])) {
+  if (data.ImgSwitch > 0 && !this.isCondSwitchIm(data)) {
     return false;
   }
-  if (data.ImgArmor > 0 && !this.isEquipped($dataArmors[data.ImgArmor])) {
+  if (data.ImgWeapon > 0 && !this.isCondWeaponImg(data)) {
     return false;
   }
-  if (data.ImgState > 0 && !this.isStateImg(data.ImgState)) {
+  if (data.ImgArmor > 0 && !this.isCondArmorImg(data)) {
     return false;
   }
-  if (data.ImgClass > 0 && !this.isClassImg(data.ImgClass)) {
+  if (data.ImgState > 0 && !this.isCondStateImg(data, data.ImgState)) {
+    return false;
+  }
+  if (data.ImgClass > 0 && !this.isCondClassImg(data)) {
     return false;
   }
   if (!this.matchChangeGraphic(data)) {
@@ -307,36 +344,47 @@ Game_Actor.prototype.matchChangeGraphic = function(data) {
     case 'recovery' :
       return this.onImgId === 2;
     case 'attack' :
-      return this.onImgId === 10;
+      return this.onImgId === 10 && this.isCondUseItemImg(data.Skill);
     case 'recoverySkill' :
-      return this.onImgId === 11;
+      return this.onImgId === 11 && this.isCondUseItemImg(data.Skill);
     case 'item' :
-      return this.onImgId === 12;
+      return this.onImgId === 12 && this.isCondUseItemImg(data.Item);
     case 'chant' :
       return this.isChanting();
     case 'victory' :
       return this.onImgId === 20;
     case 'state' :
-      return this.isStateImg(data.stateId);
+      return this.isCondStateImg(data.stateId);
   }
 };
 
-Game_Actor.prototype.isAtttakSkill = function() {
-  return;
+Game_Actor.prototype.isCondSwitchImg = function(data) {
+  return data.ImgSwitch.every(id => $gameSwitches.value(id));
 };
 
-Game_Actor.prototype.isClassImg = function(classId) {
-  return this._classId === classId;
+Game_Actor.prototype.isCondWeaponImg = function(data) {
+  return data.ImgWeapon.every(id => this.isEquipped($dataWeapons[id]));
 };
 
-Game_Actor.prototype.isStateImg = function(stateId) {
-  return this._states.find(state => state === stateId);
+Game_Actor.prototype.isCondArmorImg = function(data) {
+  return data.ImgArmor.every(id => this.isEquipped($dataArmors[id]));
+};
+
+Game_Actor.prototype.isCondStateImg = function(data, stateId) {
+  return states.every(id => this.isStateAffected(id));
+};
+
+Game_Actor.prototype.isCondClassImg = function(data) {
+  return data.ImgClass ? this._classId === data.ImgClass : true;
+};
+
+Game_Actor.prototype.isCondUseItemImg = function(data) {
+  return data ? data.includes(this.nuun_useItemId) : true;
 };
 
 Game_Actor.prototype.isClassNameImg = function(data) {
   const className = NuunManager.getClassName();
   return data.some(name => className === name);
-
 };
 
 const _Game_Actor_refresh = Game_Actor.prototype.refresh;
@@ -395,20 +443,28 @@ Game_Actor.prototype.performActionStart = function(action) {
 Game_Actor.prototype.setAttackImgId = function(action) {
   if (action.isRecover()) {
     this.onImgId = 11;
+    this.nuun_useItemId = action.item().id;
   } else if (action.isAttack()) {
     this.onImgId = 10;
+    this.nuun_useItemId = action.item().id;
   } else if (action.isMagicSkill()) {
     this.onImgId = 10;
+    this.nuun_useItemId = action.item().id;
   } else if (action.isSkill()) {
     this.onImgId = 10;
+    this.nuun_useItemId = action.item().id;
   } else if (action.isItem()) {
     this.onImgId = 12;
+    this.nuun_useItemId = action.item().id;
+  } else {
+    this.nuun_useItemId = -1;
   }
   this.imgRefresh();
 };
 
 Game_Actor.prototype.resetImgId = function() {
   this.onImgId = 0;
+  this.nuun_useItemId = -1;
   this.imgRefresh();
 };
 
@@ -423,6 +479,10 @@ Game_Actor.prototype.loadActorFace = function() {
 Game_Actor.prototype.isActorGraphicDead = function(data) {
   return data && ((data.stateChangeGraphicScenes === 'state' &&
   data.stateId === this.deathStateId()) || data.ImgStateAll === this.deathStateId());
+};
+
+function conditionsParam(data, param, maxParam) {
+  return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
 };
 
 })();

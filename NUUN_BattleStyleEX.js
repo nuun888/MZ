@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.0.7
+ * @version 3.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/4/10 Ver.3.1.0
+ * アクター画像条件拡張による処理追加。
+ * アクター画像設定のスキル、アイテム条件が適用されていなかった問題を修正。
  * 2022/4/4 Ver.3.0.7
  * アイコンステート枠内表示をOFFにした場合、ステートアイコンがアクター画像の背後に表示されてしまう問題を修正。
  * 2022/4/1 Ver.3.0.6
@@ -191,6 +194,7 @@ Game_Temp.prototype.isBattleStyleRequested = function() {
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
+  this.nuun_bsUseItemId = -1;
   this._battleStyleGraphicIndex = -1;
   this._battleStyleGraphicName = null;
   this._actionActorImg = null;
@@ -326,19 +330,22 @@ Game_Actor.prototype.getActorGraphicDead = function() {
 };
 
 Game_Actor.prototype.battleStyleMatchConditions = function(data) {
-  if (data.ImgSwitch > 0 && !$gameSwitches.value(data.ImgSwitch)) {
+  if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this.hp, this.param(0))) {
     return false;
   }
-  if (data.ImgWeapon > 0 && !this.isEquipped($dataWeapons[data.ImgWeapon])) {
+  if (data.ImgSwitch && !this.isBattleStyleSwitchImg(data)) {
     return false;
   }
-  if (data.ImgArmor > 0 && !this.isEquipped($dataArmors[data.ImgArmor])) {
+  if (data.ImgWeapon && !this.isBattleStyleWeaponImg(data)) {
     return false;
   }
-  if (data.ImgStateAll > 0 && !this.isBattleStyleStateImg(data.ImgStateAll)) {
+  if (data.ImgArmor && !this.isBattleStyleArmorImg(data)) {
     return false;
   }
-  if (data.ImgClass > 0 && !this.isBattleStyleClassImg(data.ImgClass)) {
+  if (data.ImgStateAll && !this.isBattleStyleStateImg(data, data.ImgStateAll)) {
+    return false;
+  }
+  if (data.ImgClass > 0 && !this.isBattleStyleClassImg(data)) {
     return false;
   }
   if (!this.battleStyleMatchChangeGraphic(data)) {
@@ -362,26 +369,42 @@ Game_Actor.prototype.battleStyleMatchChangeGraphic = function(data) {
     case 'recovery' :
       return this.onImgId === 2;
     case 'attack' :
-      return this.onImgId === 10;
+      return this.onImgId === 10 && this.isBattleStyleUseItemImg(data.Skill);
     case 'recoverySkill' :
-      return this.onImgId === 11;
+      return this.onImgId === 11 && this.isBattleStyleUseItemImg(data.Skill);
     case 'item' :
-      return this.onImgId === 12;
+      return this.onImgId === 12 && this.isBattleStyleUseItemImg(data.Item);
     case 'chant' :
       return this.isChanting();
     case 'victory' :
       return this.onImgId === 20;
     case 'state' :
-      return this.isBattleStyleStateImg(data.stateId);
+      return this.isBattleStyleStateImg(data, data.stateId);
   }
 };
 
-Game_Actor.prototype.isBattleStyleStateImg = function(stateId) {
-  return this._states.find(state => state === stateId);
+Game_Actor.prototype.isBattleStyleSwitchImg = function(data) {
+  return data.ImgSwitch.every(id => $gameSwitches.value(id));
 };
 
-Game_Actor.prototype.isBattleStyleClassImg = function(classId) {
-  return this._classId === classId;
+Game_Actor.prototype.isBattleStyleWeaponImg = function(data) {
+  return data.ImgWeapon.every(id => this.isEquipped($dataWeapons[id]));
+};
+
+Game_Actor.prototype.isBattleStyleArmorImg = function(data) {
+  return data.ImgArmor.every(id => this.isEquipped($dataArmors[id]));
+};
+
+Game_Actor.prototype.isBattleStyleStateImg = function(data, states) {
+  return states.every(id => this.isStateAffected(id));
+};
+
+Game_Actor.prototype.isBattleStyleClassImg = function(data) {
+  return data.ImgClass ? this._classId === data.ImgClass : true;
+};
+
+Game_Actor.prototype.isBattleStyleUseItemImg = function(data) {
+  return data ? data.includes(this.nuun_bsUseItemId) : true;
 };
 
 const _Game_Actor_isSpriteVisible = Game_Actor.prototype.isSpriteVisible;
@@ -424,33 +447,36 @@ Game_Actor.prototype.performActionStart = function(action) {
 
 Game_Actor.prototype.setBattleStyleAttackImgId = function(action) {
   if (action.isRecover()) {
-    this.setBattleImgId(11);
+    this.setBattleImgId(11, action.item().id);
     this.setBSActionActorImg("recovery");
   } else if (action.isAttack()) {
-    this.setBattleImgId(10);
+    this.setBattleImgId(10, action.item().id);
     this.setBSActionActorImg("attack");
   } else if (action.isMagicSkill()) {
-    this.setBattleImgId(10);
+    this.setBattleImgId(10, action.item().id);
     this.setBSActionActorImg("attack");
   } else if (action.isSkill()) {
-    this.setBattleImgId(10);
+    this.setBattleImgId(10, action.item().id);
     this.setBSActionActorImg("attack");
   } else if (action.isItem()) {
-    this.setBattleImgId(12);
+    this.setBattleImgId(12, action.item().id);
     this.setBSActionActorImg("item");
   } else {
-    this.setBattleImgId(0);
+    this.setBattleImgId(0, -1);
     this.setBSActionActorImg(null);
   }
   this.battleStyleImgRefresh();
 };
 
-Game_Actor.prototype.setBattleImgId = function(id) {
+Game_Actor.prototype.setBattleImgId = function(id, itemId) {
+  if (itemId !== undefined) {
+    this.nuun_bsUseItemId = itemId;
+  }
   this.onImgId = id;
 };
 
 Game_Actor.prototype.resetBattleStyleImgId = function() {
-  this.setBattleImgId(0);
+  this.setBattleImgId(0, -1);
   this.battleStyleImgRefresh();
 };
 
@@ -2259,6 +2285,10 @@ const _Spriteset_Battle_createBattleField = Spriteset_Battle.prototype.createBat
 Spriteset_Battle.prototype.createBattleField = function() {
   _Spriteset_Battle_createBattleField.call(this);
   this._effectsBackContainer = this._battleField;
+};
+
+function conditionsParam(data, param, maxParam) {
+  return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
 };
 
 })();

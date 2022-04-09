@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.0.5
+ * @version 1.1.0
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -45,6 +45,11 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/4/10 Ver.1.1.0
+ * アクター画像設定のスイッチ、武器、防具、ステートの条件に複数指定できるように変更。
+ * アクター画像設定に残りHPの条件を追加。 
+ * アクター画像設定の職業でリストが表示されなかった問題を修正。
+ * アクター画像設定のスキル、アイテム条件が適用されていなかった問題を修正。
  * 2022/4/1 Ver.1.0.5
  * アクターコマンドの項目の表示位置を中央寄りにする機能を追加。
  * 2022/3/29 Ver.1.0.4
@@ -1758,65 +1763,94 @@
  * @default 'default'
  * @parent AllMatch
  * 
+ * @param ImgHP
+ * @text 残りHP
+ * @desc 残りHPが指定の範囲内または数値の時に変化します。
+ * @type struct<CondValue>
+ * @default {"CondValid":"false","UpLimit":"0","DwLimit":"0"}
+ * @parent AllMatch
+ * 
  * @param ImgSwitch
  * @text スイッチ
- * @desc スイッチがONの時に変化します。
- * @type switch
- * @default 0
+ * @desc 指定したスイッチが全てONの時に変化します。
+ * @type switch[]
+ * @default
  * @parent AllMatch
  * 
  * @param ImgWeapon
  * @text 武器
- * @desc 武器を装備している時に条件を満たします。
- * @type weapon
- * @default 0
+ * @desc 指定した武器を全て装備している時に条件を満たします。
+ * @type weapon[]
+ * @default 
  * @parent AllMatch
  * 
  * @param ImgArmor
  * @text 防具
- * @desc 防具を装備している時に条件を満たします。
- * @type armor
- * @default 0
+ * @desc 指定した防具を全て装備している時に条件を満たします。
+ * @type armor[]
+ * @default 
  * @parent AllMatch
  * 
  * @param ImgClass
  * @text 職業
  * @desc 特定の職業なら条件を満たします。
- * @type calss
+ * @type class
  * @default 0
  * @parent AllMatch
  * 
  * @param ImgStateAll
  * @text ステート。
- * @desc 指定したステートになっている時に条件を満たします
- * @type state
- * @default 0
+ * @desc 指定したステートに全てかかっている時に条件を満たします。
+ * @type state[]
+ * @default 
  * @parent AllMatch
  * 
  * @param CondSetting
  * @text 条件設定
  * @default ------------------------------
  * 
- * @param SkillId
+ * @param Skill
  * @text スキル(1)
- * @desc スキルを選択します。0:指定なし -1:物理 -2:魔法 -3:必中
- * @type skill
- * @default 0
+ * @desc スキルを選択します。いずれかのスキル使用時に適用します。空白の場合は全てのスキルが対象です。スキルID0は通常攻撃です。
+ * @type skill[]
+ * @default
  * @parent CondSetting
  * 
- * @param ItemId
+ * @param Item
  * @text アイテム(2)
- * @desc アイテムを選択します。
- * @type item
- * @default 0
+ * @desc アイテムを選択します。いずれかのアイテム使用時に適用します。空白の場合は全てのアイテムが対象です。
+ * @type item[]
+ * @default
  * @parent CondSetting
  * 
  * @param stateId
  * @text 被ステート(3)
- * @desc ステートを選択します。
- * @type state
- * @default 0
+ * @desc ステートを選択します。全てのステートにかかっている時に適用します。
+ * @type state[]
+ * @default 
  * @parent CondSetting
+ * 
+ */
+/*~struct~CondValue:
+ * 
+ * @param CondValid
+ * @desc HP条件を有効にします。
+ * @text HP条件有効
+ * @type boolean
+ * @default false
+ * 
+ * @param UpLimit
+ * @text 上限値
+ * @desc 上限値
+ * @type number
+ * @default 0
+ * 
+ * @param DwLimit
+ * @text 下限値
+ * @desc 下限値
+ * @type number
+ * @default 0
+ * 
  */
 
 var Imported = Imported || {};

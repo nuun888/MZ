@@ -1,14 +1,14 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.0.7
+### Ver.3.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)  
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.1.0  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.1.0  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.1.0  
 
-バトルスタイル拡張デフォルト設定用  
+バトルスタイル拡張デフォルト設定用
 ![画像](img/BattleStyleEX1.png)  
 
 バトルスタイル拡張スタンダード設定用  
@@ -67,7 +67,16 @@
 [バトルスタイル拡張ベース](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX_Base.js) Ver.2.6.13  
 [バトルスタイル拡張設定用](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX.js) Ver.1.6.3  
 
+### 設定用Ver.1.0.5以前からVer.1.1.0以降にアップデートする際の注意
+画像設定のスイッチ、武器、防具、ステート、使用アイテム、使用スキルの条件の複数指定対応により仕様が変更しております。  
+再度再設定をお願いいたします。  
+
 ## 更新履歴
+2022/4/10 Ver.3.1.0
+アクター画像設定のスイッチ、武器、防具、ステートの条件に複数指定できるように変更。(設定)  
+アクター画像設定に残りHPの条件を追加。  
+アクター画像設定の職業でリストが表示されなかった問題を修正。(設定)  
+アクター画像設定のスキル、アイテム条件が適用されていなかった問題を修正。  
 2022/4/4 Ver.3.0.7  
 アイコンスステート枠内表示をOFFにした場合、ステートアイコンがアクター画像の背後に表示されてしまう問題を修正。  
 2022/4/1 Ver.3.0.6  

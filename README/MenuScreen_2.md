@@ -1,5 +1,5 @@
 # [メニュー画面タイプ２](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)
-# Ver.1.1.1
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降    
@@ -37,6 +37,8 @@
 ![画像](img/MenuScreen4.png) 
 
 ## 更新履歴 
+2022/4/10 Ver.1.2.1  
+誤字修正。  
 2022/4/10 Ver.1.2.0  
 アクター表示の項目に通常能力値、追加能力値、特殊能力値を設定できる機能を追加。  
 顔グラモードでアクター前面画像が表示されない問題を修正。  

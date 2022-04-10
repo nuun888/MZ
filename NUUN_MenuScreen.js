@@ -37,6 +37,8 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/4/10 Ver.1.2.1
+ * 誤字修正。
  * 2022/4/10 Ver.1.2.0
  * アクター表示の項目に通常能力値、追加能力値、特殊能力値を設定できる機能を追加。
  * 顔グラモードでアクター前面画像が表示されない問題を修正。
@@ -231,7 +233,7 @@
  * @desc インフォ項目設定
  * @text インフォ項目設定
  * @type struct<InfoListData>[]
- * @default ["{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"現在値\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"プレイ時間\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"6\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"現在地\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"プレイ時間\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"6\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}"]
  * @parent InfoHeaderSetting
  * 
  * @param InfoHeaderCols

@@ -183,6 +183,7 @@
 | [装備時ステート](https://github.com/nuun888/MZ/blob/master/README/EquipsState.md) | [NUUN_EquipsState](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipsState.js) | 共 | 1.0.1 |
 | [装備セットボーナス](https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md) | [NUUN_SetBonusEquip](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js) | 共 | 1.1.2 |
 | ┗ 装備ウィンドウでのセットボーナスウィンドウ表示 |  |  |  |
+| [装備能力値変化量上限突破](https://github.com/nuun888/MZ/blob/master/README/EquipParamUnlimited.md) | [NUUN_EquipParamUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipParamUnlimited.js) |  | 1.0.0 |
 | 装備画面表示拡張(仮) |  |  |  |
 |  |  |  |  |
 |  |  |  |  |

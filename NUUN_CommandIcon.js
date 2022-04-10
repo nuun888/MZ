@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc コマンド、カテゴリー表示拡張
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -37,6 +37,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/10 Ver 1.3.2
+ * クラス毎のコマンド名表示位置の設定が適用されていなかった問題を修正。
  * 2021/12/25 Ver 1.3.1
  * モンスター図鑑敵カテゴリーコマンド化によりフィルタリングクラスに項目追加。
  * 2021/11/14 Ver 1.3.0
@@ -160,7 +162,7 @@
  * @param CommandClass
  * @text フィルタリングクラス設定
  * @desc 適用するクラスを指定します。
- * @type combo[]
+ * @type combo
  * @option 'Window_MenuCommand'
  * @option 'Window_ItemCategory'
  * @option 'Window_SkillType'
@@ -210,9 +212,9 @@ const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
 
 const _Window_Command_initialize = Window_Command.prototype.initialize;
 Window_Command.prototype.initialize = function(rect) {
-  _Window_Command_initialize.call(this, rect);
-  this._commadName = null;
   this._classAlign = this.itemTextAlignClass();
+  this._commadName = null;
+  _Window_Command_initialize.call(this, rect);
 };
 
 const _Window_Command_itemTextAlign = Window_Command.prototype.itemTextAlign;
@@ -236,7 +238,7 @@ Window_HorzCommand.prototype.itemTextAlign = function() {
 Window_Command.prototype.itemTextAlignClass = function() {
   param.ClassCommandPosition = param.ClassCommandPosition || [];
   const className = String(this.constructor.name);
-  const result = param.ClassCommandPosition.find(_Class => _Class.CommandClass[0] === className);
+  const result = param.ClassCommandPosition.find(_Class => _Class.CommandClass === className);
   return result ? result.CommandPosition : null;
 };
 

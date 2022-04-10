@@ -1,6 +1,6 @@
-# [装備能力値変化量上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipParamUnlimite.js)
+# [装備能力値変化量上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipParamUnlimited.js)
 # Ver.1.0.0  
- [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipParamUnlimite.js)  
+ [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipParamUnlimited.js)  
  
  データベース上では装備の能力値変化量は0～500(最大HP、MPは5000)までしか設定できませんがこのプラグインでは上限を超えて設定する事ができます。  
  

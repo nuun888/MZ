@@ -1,5 +1,5 @@
 # [コマンド、カテゴリー表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)
-# Ver.1.3.1
+# Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)
 
 コマンドにアイコン、文字色を設定できます。  
@@ -28,6 +28,8 @@ Window_EnemyBookPageCategory：モンスター図鑑情報ページ
 
 
 ## 更新履歴
+2022/4/10 Ver 1.3.2  
+クラス毎のコマンド名表示位置の設定が適用されていなかった問題を修正。  
 2021/12/25 Ver 1.3.1  
 モンスター図鑑敵カテゴリーコマンド化によりフィルタリングクラスに項目追加。  
 2021/11/14 Ver 1.3.0  

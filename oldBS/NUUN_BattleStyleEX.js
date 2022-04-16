@@ -11,7 +11,7 @@
  * @plugindesc バトルスタイル拡張設定用
  * @author NUUN
  * @orderBefore NUUN_BattleStyleEX_Base
- * @version 1.6.3
+ * @version 1.6.4
  * 
  * @help
  * このプラグインはレイアウト設定用のプラグインです。
@@ -79,6 +79,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/17 Ver 1.6.4
+ * 立ち絵、顔グラ変化条件に残りHPを追加。
  * 2021/12/11 Ver 1.6.3
  * 立ち絵表示EX用の設定項目を追加。
  * 2021/12/4 Ver 1.6.2
@@ -1692,6 +1694,16 @@
  * @type struct<actorStateImgList>[]
  * @parent StateSetting
  * 
+ * @param HPSetting
+ * @text 残りHP画像
+ * @default ------------------------------
+ * 
+ * @param hpImg
+ * @text 残りHP画像
+ * @desc 指定の残りHPでの画像を表示します。（複数指定可能）
+ * @type struct<actorHPImgList>[]
+ * @parent HPSetting
+ * 
  */
 /*~struct~actorStateImgList:
  * 
@@ -1763,6 +1775,35 @@
  * @default 1
  * @min 0
  * @max 9999
+ * 
+ */
+/*~struct~actorHPImgList:
+ * 
+ * @param actorHpImg
+ * @text 残りHP画像
+ * @desc 残りHPの画像を表示します。
+ * @type file
+ * @dir img/pictures
+ * 
+ * @param actorHpFaceIndex
+ * @text 残りHPインデックス番号
+ * @desc 残りHPのインデックス番号。
+ * @type number
+ * @default -1
+ * @min -1
+ * @max 9999
+ * 
+ * @param UpLimit
+ * @text 上限値(%)
+ * @desc 上限値
+ * @type number
+ * @default 0
+ * 
+ * @param DwLimit
+ * @text 下限値(%)
+ * @desc 下限値
+ * @type number
+ * @default 0
  * 
  */
 /*~struct~ActorPictureDataList:

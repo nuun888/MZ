@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.13
+ * @version 2.6.14
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/4/17 Ver 2.6.14
+ * 立ち絵、顔グラ変化条件に残りHPを追加。
  * 2022/3/12 Ver 2.6.13
  * アクター加入、離脱時の処理を修正。
  * 2022/2/3 Ver 2.6.12
@@ -2013,6 +2015,7 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._durationOpacity = 0;
   this._updateCount = 0;
   this._changeStateImgId = 0;
+  this._changeHpImgId = -1;
   this._startUpdate = true;
   this._selectionEffectCount = 0;
   this._shake = 0;
@@ -2100,6 +2103,8 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
       this.changeBitmap("chant");
     } else if (actor._states.length > 0 && this.stateImgCheck(false)) {
       this.changeBitmap("abnormal");
+    } else if (this.remainingHp() && this.changeCheck("hp")) {
+      this.changeBitmap("hp");
     } else if (actor.isDying() && this.changeCheck("dying")) {
       this.changeBitmap("dying");
     } else {
@@ -2111,6 +2116,11 @@ Sprite_ActorImges.prototype.updateBitmap = function() {
       this._startUpdate = false;
     }
   }
+};
+
+Sprite_ActorImges.prototype.remainingHp = function() {
+  this._changeHpImgId = this._data.hpImg.findIndex(data => conditionsParam(data, this._battler.hp, this._battler.param(0)));
+  return this._changeHpImgId >= 0;
 };
 
 Sprite_ActorImges.prototype.updateMotion = function() {
@@ -2270,6 +2280,12 @@ Sprite_ActorImges.prototype.changeCheck = function(bitmapType){
       } else {
         return this._data.recoveryImg ? true : false;
       }
+    case "hp":
+      if (mode) {
+        return this._data.hpImg[this._changeHpImgId].actorHpFaceIndex >= 0 ? true : false;
+      } else {
+        return this._data.hpImg[this._changeHpImgId].actorHpImg ? true : false;
+      }
   }
 };
 
@@ -2289,6 +2305,11 @@ Sprite_ActorImges.prototype.changeBitmap = function(bitmapType) {
     case "dying":
       if(this._imgIndex !== 2) {
         this.setDying();
+      }
+      break;
+    case "hp":
+      if(this._imgIndex !== this._changeHpImgId + 5000) {
+        this.setrHp();
       }
       break;
     case "damage":
@@ -2408,6 +2429,13 @@ Sprite_ActorImges.prototype.refreshBitmap = function() {
     } else if (this._imgIndex === 10) { //回復した時
       if (mode) {
         faceIndex = this._data.recoveryDamageFaceIndex;
+        this.faceRefresh(faceIndex);
+      } else {
+        this.setLoadBitmap();
+      }
+    } else if (this._imgIndex >= 5000) { //残りHP
+      if (mode) {
+        faceIndex = this._data.hpImg[this._changeStateImgId].actorHpFaceIndex;
         this.faceRefresh(faceIndex);
       } else {
         this.setLoadBitmap();
@@ -2547,6 +2575,17 @@ Sprite_ActorImges.prototype.setDying = function(){
   }
 };
 
+Sprite_ActorImges.prototype.setrHp = function(){
+  const mode = this.faceMode();
+  if ((mode && this._data.hpImg[this._changeStateImgId].actorHpFaceIndex >= 0) || (!mode && this._data.hpImg[this._changeStateImgId].actorHpImg) && this._updateCount <= 0) {
+    this._updateCount = 1;
+    this._imgIndex = this._changeHpImgId + 5000;
+    if (!mode) {
+      this.loadBitmap = nuun_loadPictures(this._data.hpImg[this._changeStateImgId].actorHpImg);
+    }
+  }
+};
+
 Sprite_ActorImges.prototype.setDamage = function(){
   const mode = this.faceMode();
   if ((mode && this._data.damageFaceIndex >= 0) || (!mode && this._data.damageImg)) {
@@ -2664,7 +2703,7 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
       this.setDeadUpdateCount();
     } else if (actor.isAlive() && this.isDead()) {
       this.setReviveUpdateCount();
-    } else if (actor._actorGraphicData && this._imgListId !== actor._actorGraphicIndex) {
+    } else if (actor._actorGraphicName && this._imgListId !== actor._actorGraphicIndex) {
       if (actor.onImgId === 1 || actor.onImgId === 2) {
         this._updateCount = this.setDamageDuration();
       } else if (actor.onImgId === 20) {
@@ -2681,7 +2720,7 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
 };
 
 Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
-  if (actor && actor._actorGraphicData) {
+  if (actor && actor._actorGraphicName) {
     if (!this._changeImg && this._imgListId !== actor._actorGraphicIndex && this._updateCount > 0) {
       let bitmap = null;
       if (actor.battleActorFaceMode) {
@@ -2712,7 +2751,7 @@ Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
 };
 
 Sprite_ActorImges.prototype.getImgId = function(actor) {
-  switch (actor._actorGraphicData.ChangeGraphicScenes) {
+  switch (actor._actorGraphicName.ChangeGraphicScenes) {
     case 'default' :
       return 0;
     case 'death' :
@@ -3046,6 +3085,10 @@ const _Spriteset_Battle_createBattleField = Spriteset_Battle.prototype.createBat
 Spriteset_Battle.prototype.createBattleField = function() {
   _Spriteset_Battle_createBattleField.call(this);
   this._effectsBackContainer = this._battleField;
+};
+
+function conditionsParam(data, param, maxParam) {
+  return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
 };
 
 })();

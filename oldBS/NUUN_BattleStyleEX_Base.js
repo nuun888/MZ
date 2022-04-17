@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張ベース
  * @author NUUN
- * @version 2.6.14
+ * @version 2.6.15
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
@@ -19,6 +19,8 @@
  * @help バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/4/17 Ver 2.6.15
+ * 残りHPでリストの一番上の設定しか適用されない問題を修正。
  * 2022/4/17 Ver 2.6.14
  * 立ち絵、顔グラ変化条件に残りHPを追加。
  * 2022/3/12 Ver 2.6.13
@@ -2577,11 +2579,11 @@ Sprite_ActorImges.prototype.setDying = function(){
 
 Sprite_ActorImges.prototype.setrHp = function(){
   const mode = this.faceMode();
-  if ((mode && this._data.hpImg[this._changeStateImgId].actorHpFaceIndex >= 0) || (!mode && this._data.hpImg[this._changeStateImgId].actorHpImg) && this._updateCount <= 0) {
+  if ((mode && this._data.hpImg[this._changeHpImgId].actorHpFaceIndex >= 0) || (!mode && this._data.hpImg[this._changeHpImgId].actorHpImg) && this._updateCount <= 0) {
     this._updateCount = 1;
     this._imgIndex = this._changeHpImgId + 5000;
     if (!mode) {
-      this.loadBitmap = nuun_loadPictures(this._data.hpImg[this._changeStateImgId].actorHpImg);
+      this.loadBitmap = nuun_loadPictures(this._data.hpImg[this._changeHpImgId].actorHpImg);
     }
   }
 };

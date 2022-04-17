@@ -75,7 +75,7 @@
 [バトルスタイル拡張スピードスターバトル併用](https://github.com/nuun888/MZ/blob/master/README/BSEX_Animation_KK_SSBattle.md)Ver.2.6.10以降  
 
 ## 旧バージョン
-[バトルスタイル拡張ベース](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX_Base.js) Ver.2.6.14  
+[バトルスタイル拡張ベース](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX_Base.js) Ver.2.6.15  
 [バトルスタイル拡張設定用](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX.js) Ver.1.6.4  
 
 ### 設定用Ver.1.0.5以前からVer.1.1.0以降にアップデートする際の注意

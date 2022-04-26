@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.14.2
+ * @version 1.14.3
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -82,6 +82,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/26 Ver.1.14.3
+ * レベルアップ画面のレベルの差分表示の幅を指定できる機能を追加。
  * 2022/1/1 Ver.1.14.2
  * 一部処理を修正。
  * 2021/12/17 Ver.1.14.1
@@ -889,6 +891,13 @@
  * @default true
  * @text レベルアップ画面表示
  * @desc レベルアップ画面表示します。falseでレベルアップ後のステータス差分、習得スキル演出をカットします。
+ * @parent LevelUpPage
+ * 
+ * @param LevelUpWidth
+ * @desc レベルアップの差分表示の表示範囲幅
+ * @text レベルアップ表示範囲幅
+ * @type number
+ * @default 100
  * @parent LevelUpPage
  * 
  * @param DifferenceStatusColor
@@ -2677,11 +2686,11 @@ Window_ActorResult.prototype.drawActorStatusLevel = function(x, y) {
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(TextManager.levelA, x, y, 48);
   this.resetTextColor();
-  this.drawText(oldStatus[oldStatus.length - 1], x + 48, y, 100, "left");
+  this.drawText(oldStatus[oldStatus.length - 1], x + 48, y, param.LevelUpWidth, "left");
   this.changeTextColor(ColorManager.systemColor());
-  this.drawText("→", x + 48, y, 100, "center");
+  this.drawText("→", x + 48, y, param.LevelUpWidth, "center");
   this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
-  this.drawText(this._actor._level, x + 48, y, 100, "right");
+  this.drawText(this._actor._level, x + 48, y, param.LevelUpWidth, "right");
   this.resetTextColor();
 };
 

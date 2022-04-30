@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.1.0
+### Ver.3.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.1.0  
@@ -83,6 +83,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2022/5/1 Ver.3.1.1  
+MP、TPゲージの座標変更許可時に座標が正常に適用されてなかった問題を修正。  
 2022/4/10 Ver.3.1.0  
 アクター画像設定のスイッチ、武器、防具、ステートの条件に複数指定できるように変更。(設定)  
 アクター画像設定に残りHPの条件を追加。  

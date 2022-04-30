@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.1.0
+ * @version 3.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/1 Ver.3.1.1
+ * MP、TPゲージの座標変更許可時に座標が正常に適用されてなかった問題を修正。
  * 2022/4/10 Ver.3.1.0
  * アクター画像条件拡張による処理追加。
  * アクター画像設定のスキル、アイテム条件が適用されていなかった問題を修正。
@@ -1046,6 +1048,9 @@ Scene_Battle.prototype.selectPreviousCommand = function() {
   _Scene_Battle_selectPreviousCommand.call(this);
   this._onBSAction = false;
   this._partyCommandWindow.show();
+  //if (!BattleManager.actor()) {
+  //  this.selectNextCommand();
+  //}
 };
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
@@ -1315,11 +1320,11 @@ Window_BattleStatus.prototype.placeBasicGauges = function(actor, x, y, rect) {
     let y2 = $gameTemp.actorData.HPChangePosition ? $gameTemp.actorData.ActorHP_Y + rect.y : this.defaultGaugeY(y, 'hp');
     this.placeGauge(actor, "hp", x2, y2);
     x2 = $gameTemp.actorData.MPChangePosition ? $gameTemp.actorData.ActorMP_X + rect.x : this.defaultGaugeX(x, 'mp');
-    y2 = $gameTemp.actorData.MPChangePosition ? $gameTemp.actorData.ActorMP_Y : this.defaultGaugeY(y, 'mp');
+    y2 = $gameTemp.actorData.MPChangePosition ? $gameTemp.actorData.ActorMP_Y + rect.y : this.defaultGaugeY(y, 'mp');
     this.placeGauge(actor, "mp", x2, y2);
     if ($dataSystem.optDisplayTp) {
         x2 = $gameTemp.actorData.TPChangePosition ? $gameTemp.actorData.ActorTP_X + rect.x : this.defaultGaugeX(x, 'tp');
-        y2 = $gameTemp.actorData.TPChangePosition ? $gameTemp.actorData.ActorTP_Y : this.defaultGaugeY(y, 'tp');
+        y2 = $gameTemp.actorData.TPChangePosition ? $gameTemp.actorData.ActorTP_Y + rect.y : this.defaultGaugeY(y, 'tp');
         this.placeGauge(actor, "tp", x2, y2);
     }
 };

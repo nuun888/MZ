@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  *            
  * @help
  * ステート、バフ付加解除時にステート、バフ名をポップアップさせます。
@@ -23,52 +23,58 @@
  * <RemoveNoPopUp> 解除時のポップアップを表示しません。
  * <PopUpColor:[colorIndex]> ポップアップ時の色を指定します。[colorIndex]:カラーインデックス番号　例：<PopUpColor:17>
  * 
- * バトルスタイル拡張プラグインの互換モードを使用する場合はこのプラグインをバトルスタイル拡張プラグインの設定用プラグインの下に配置してください。
- * 初期設定ではOFFになっています。
+ * 仕様
+ * 戦闘行動結果ポップアッププラグインと併用時、このプラグインを戦闘行動結果ポップアッププラグインより下に設定した場合、ステート、バフのポップアップ
+ * はこのプラグインでの表示になります。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/30 Ver 1.1.0
+ * 一部プラグインとの競合解消。
+ * 処理の最適化。
+ * ポップアップテキストの仕様変更。
  * 2021/7/17 Ver 1.0.1
  * バトルスタイル拡張プラグインの互換モード対応。
  * 2021/7/17 Ver 1.0.0
  * 初版
+ * 
+ * @param PopUpWidth
+ * @desc ポップアップメッセージ幅を指定します。（デフォルト240）
+ * @text メッセージ幅
+ * @type number
+ * @default 240
  * 
  * @param PopUpBuff
  * @text ポップアップバフ設定
  * @desc ポップアップするバフの設定をします。
  * @default ["{\"StateType\":\"0\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"1\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"2\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"3\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"4\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"5\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"6\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"7\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"10\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"11\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"12\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"13\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"14\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"15\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"16\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"17\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}"]
  * @type struct<PopUpBuffList>[]
- * @parent PopUpSettings
  * 
  * @param StateColor
  * @desc 有利なポップアップするときのステート、バフの色
  * @text 有利ステート、バフ文字色
  * @type number
  * @default 0
- * @parent PopUpSettings
  * 
  * @param BatStateColor
  * @desc 不利なポップアップするときのステート、バフの色
  * @text 不利ステート、バフ文字色
  * @type number
  * @default 0
- * @parent PopUpSettings
  * 
  * @param PopUpReleaseOpacity
  * @desc 解除時の不透明度
  * @text 解除時不透明度
  * @type number
  * @default 128
- * @parent PopUpSettings
  * 
- * @param PopUpUpdate
+ * @param PopUpUpInterval
  * @desc ポップアップを連続で表示するときの間隔
  * @text ポップアップ間隔
  * @type number
  * @default 30
- * @parent PopUpSettings
  * 
  * @param DeadNoPopup
  * @text 戦闘不能ポップアップ表示
@@ -76,12 +82,64 @@
  * @type boolean
  * @default false
  * 
+ * @param AddStatePopUpText
+ * @desc 有利なステート付加時の共通ポップアップテキスト。(%1:ステート名)
+ * @text 有利ステート付加時ポップアップテキスト
+ * @type string
+ * @default %1
+ * 
+ * @param AddBadStatePopUpText
+ * @desc 不利なステート付加時の共通ポップアップテキスト。(%1:ステート名)
+ * @text 不利ステート付加時ポップアップテキスト
+ * @type string
+ * @default %1
+ * 
+ * @param RemovedStatePopUpText
+ * @desc 有利なステート解除時の共通ポップアップテキスト。(%1:ステート名)
+ * @text 有利ステート解除時ポップアップテキスト
+ * @type string
+ * @default %1
+ * 
+ * @param RemovedBadStatePopUpText
+ * @desc 不利なステート解除時の共通ポップアップテキスト。(%1:ステート名)
+ * @text 不利ステート解除時ポップアップテキスト
+ * @type string
+ * @default %1
+ * 
+ * @param AddBuffPopUpText
+ * @desc 有利なステート付加時の共通ポップアップテキスト。(%1:能力値名)
+ * @text 有利ステート付加時ポップアップテキスト
+ * @type string
+ * @default %1上昇
+ * 
+ * @param AddDebuffPopUpText
+ * @desc 不利なステート付加時の共通ポップアップテキスト。(%1:能力値名)
+ * @text 不利ステート付加時ポップアップテキスト
+ * @type string
+ * @default %1低下
+ * 
+ * @param RemovedBuffPopUpText
+ * @desc 有利なステート解除時の共通ポップアップテキスト。(%1:能力値名)
+ * @text 有利ステート解除時ポップアップテキスト
+ * @type string
+ * @default %1上昇
+ * 
+ * @param RemovedDebuffPopUpText
+ * @desc 不利なステート解除時の共通ポップアップテキスト。(%1:能力値名)
+ * @text 不利ステート解除時ポップアップテキスト
+ * @type string
+ * @default %1低下
+ * 
+ * @param BattleEffectPopupSetting
+ * @text 盗み設定(要盗みスキル)
+ * @default ------------------------------
+ * 
  */
 /*~struct~PopUpBuffList:
  * 
  * @param StateType
- * @text アクターステータス表示方法
- * @desc アクターステータスの表示方法を選択します。
+ * @text バフポップアップ
+ * @desc ポップアップさせるバフを指定します。
  * @type select
  * @option HP上昇
  * @value 0
@@ -118,9 +176,10 @@
  * @default 0
  * 
  * @param PopUpStateName
- * @text ポップアップステート名
- * @desc ポップアップするステート名です。記入がない場合はデフォルトのステート名が表示されます。
+ * @text ポップアップテキスト
+ * @desc ポップアップするテキストを記入します。記入がない場合は共通のテキストが表示されます。(%1:ステート名)
  * @type string
+ * @default
  * 
  * @param StatePopUpMode
  * @text ポップアップの表示
@@ -147,27 +206,33 @@ var Imported = Imported || {};
 Imported.NUUN_popUp = true;
 
 (() => {
-  let parametersEX = null;
-  if (Imported.NUUN_BattleStyleEX) {
-    parametersEX = PluginManager.parameters('NUUN_BattleStyleEX');
-    
-  }
   const parameters = PluginManager.parameters('NUUN_popUp');
-  const BattleStyleEXSettings = parametersEX ? eval(parametersEX['BattleStyleEXSettings'] || 'false') : false;
-  if (BattleStyleEXSettings) {
-    var PopUpBuff = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parametersEX['PopUpBuff'])) : null) || [];
-    var StateColor = Number(parametersEX['StateColor'] || 0);
-    var BatStateColor = Number(parametersEX['BatStateColor'] || 0);
-    var PopUpReleaseOpacity = Number(parametersEX['PopUpReleaseOpacity'] || 128);
-    var PopUpUpdate = Number(parametersEX['PopUpUpdate'] || 0);
-  } else {
-    var PopUpBuff = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopUpBuff'])) : null) || [];
-    var StateColor = Number(parameters['StateColor'] || 0);
-    var BatStateColor = Number(parameters['BatStateColor'] || 0);
-    var PopUpReleaseOpacity = Number(parameters['PopUpReleaseOpacity'] || 128);
-    var PopUpUpdate = Number(parameters['PopUpUpdate'] || 0);
-  }
+  const PopUpBuff = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopUpBuff'])) : null) || [];
+  const StateColor = Number(parameters['StateColor'] || 0);
+  const BatStateColor = Number(parameters['BatStateColor'] || 0);
+  const PopUpReleaseOpacity = Number(parameters['PopUpReleaseOpacity'] || 128);
+  const PopUpUpInterval = Number(parameters['PopUpUpInterval'] || 30);
   const DeadNoPopup = eval(parameters['DeadNoPopup'] || 'false');
+  const PopUpWidth = Number(parameters['PopUpWidth'] || 240);
+  const AddStatePopUpText = String(parameters['AddStatePopUpText'] || '%1');
+  const AddBadStatePopUpText = String(parameters['AddBadStatePopUpText'] || '%1');
+  const RemovedStatePopUpText = String(parameters['RemovedStatePopUpText'] || '%1');
+  const RemovedBadStatePopUpText = String(parameters['RemovedBadStatePopUpText'] || '%1');
+  const AddBuffPopUpText = String(parameters['AddBuffPopUpText'] || '%1上昇');
+  const AddDebuffPopUpText = String(parameters['AddDebuffPopUpText'] || '%1低下');
+  const RemovedBuffPopUpText = String(parameters['AddBuffPopUpText'] || '%1上昇');
+  const RemovedDebuffPopUpText = String(parameters['AddBuffPopUpText'] || '%1低下');
+  let nuunPopup = false;
+
+  function initPopUpData() {
+    const popupData = {};
+    popupData.name = null;
+    popupData.color = 0;
+    popupData.id = 0;
+    popupData.iconIndex = 0;
+    popupData.opacity = 255;
+    return popupData;
+  };
 
   const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
   Game_Battler.prototype.initMembers = function() {
@@ -177,64 +242,81 @@ Imported.NUUN_popUp = true;
   };
 
   Game_Battler.prototype.isStatePopupRequested = function() {
-    return this._statePopup;
+    return this._nuunStatePopup;
   };
   
   Game_Battler.prototype.clearStatePopup = function() {
-    this._statePopup = false;
+    this._nuunStatePopup = false;
   };
-  
+
   Game_Battler.prototype.startStatePopup = function() {
-    this._statePopup = true;
+    this._nuunStatePopup = true;
+  };
+
+  Game_Battler.prototype.addSetPopUpData = function(popup) {
+    this.result().popupData = popup;
   };
   
-  Game_Battler.prototype.addSetState = function(id) {
-    this.result().addState = id;
-  };
-  
-  Game_Battler.prototype.removeSetState = function(id) {
-    this.result().removeState = id;
-  };
-  
-  Game_Battler.prototype.addSetBuff = function(id) {
-    this.result().addBuff = id;
-  };
-  
-  Game_Battler.prototype.removeSetBuff = function(id) {
-    this.result().removeBuff = id;
+  Game_Battler.prototype.getPopUpData = function() {
+    return this.result().popupData;
   };
 
   Game_Battler.prototype.removeDebuff = function(paramId) {
     if (this.isAlive() && this.isBuffOrDebuffAffected(paramId)) {
       this.setBuffLavel(paramId);
       this.eraseBuff(paramId);
-      this._result.pushRemovedDebuff(paramId);
+      this.result().pushRemovedDebuff(paramId);
       this.refresh();
+    }
+  };
+
+  Game_Battler.prototype.removeBuff = function(paramId) {
+    if (this.isAlive() && this.isBuffOrDebuffAffected(paramId)) {
+        this.eraseBuff(paramId);
+        this._result.pushRemovedBuff(paramId);
+        this.refresh();
     }
   };
 
   const _Game_Battler_removeBuff = Game_Battler.prototype.removeBuff;
   Game_Battler.prototype.removeBuff = function(paramId) {
+    _Game_Battler_removeBuff.call(this, paramId);
     const buff = this._buffs[paramId];
     if (buff < 0) {
+      this.result().removedBuffs = [];
       this.removeDebuff(paramId);
-    } else {
-      this.setBuffLavel(paramId);
-      _Game_Battler_removeBuff.call(this, paramId);
     }
+    this.setBuffLavel(paramId);
   };
 
   Game_Battler.prototype.setBuffLavel = function(id) {
     this.buffsLavel[id] = this._buffs[id];
   };
 
+  Game_Battler.prototype.popupBuffIconIndex = function(id) {
+    if (id < 10) {
+      return Game_BattlerBase.ICON_BUFF_START + (this._buffs[id] - 1) * 8 + id;
+    } else {
+      return Game_BattlerBase.ICON_DEBUFF_START + (-this._buffs[id - 10] - 1) * 8 + id - 10;
+    }
+  };
+
+  Game_Battler.prototype.removePopupBuffIconIndex = function(id) {
+    if (id < 10) {
+      return Game_BattlerBase.ICON_BUFF_START + (this._buffs[id] + this.removeBuffLavle(id)) * 8 + id;
+    } else {
+      return Game_BattlerBase.ICON_DEBUFF_START + (-this._buffs[id - 10] + this.removeBuffLavle(id)) * 8 + id - 10;
+    }
+  };
+
+  Game_Battler.prototype.removePopupBuffLavle = function(id) {
+    return id < 10 ? (this.buffLavel[id] - 1) : Math.abs(this.buffLavel[id - 10] + 1);
+  };
+
   const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
   Game_ActionResult.prototype.clear = function() {
-    _Game_ActionResult_clear.call(this)
-    this.addState = 0;
-    this.addBuff = -1;
-    this.removeState = 0;
-    this.removeBuff = -1;
+    _Game_ActionResult_clear.call(this);
+    this.popupData = null;
     this.removedDebuffs = [];
   };
 
@@ -253,95 +335,219 @@ Imported.NUUN_popUp = true;
     return this.removedDebuffs.length > 0 || _Game_ActionResult_isStatusAffected.call(this);
   };
 
-  Window_BattleLog.prototype.popupState = function(target, id) {
-    target.startStatePopup();
-    target.addSetState(id);
-  };
-  
-  Window_BattleLog.prototype.removeState = function(target, id) {
-    target.startStatePopup();
-    target.removeSetState(id);
-  };
-  
-  Window_BattleLog.prototype.popupBuff = function(target, id) {
-    target.startStatePopup();
-    target.addSetBuff(id);
-  };
-  
-  Window_BattleLog.prototype.removeBuff = function(target, id) {
-    target.startStatePopup();
-    target.removeSetBuff(id);
+
+  const _Window_BattleLog_pushPopupMessage = Window_BattleLog.prototype.pushPopupMessage;
+  Window_BattleLog.prototype.pushPopupMessage = function(target, popUp) {
+    if (!nuunPopup) {
+      _Window_BattleLog_pushPopupMessage.call(this, target, popUp);
+    }
   };
 
-  const _Window_BattleLog_displayAddedStates = Window_BattleLog.prototype.displayAddedStates;
-  Window_BattleLog.prototype.displayAddedStates = function(target) {
-    _Window_BattleLog_displayAddedStates.call(this, target);
-    for (const state of target.result().addedStateObjects()) {
-      if (this.displayDeadPopup(state) && !state.meta.NoPopUp && !state.meta.AddNoPopUp) {
+  const _Window_BattleLog_displayAffectedStatus = Window_BattleLog.prototype.displayAffectedStatus;
+  Window_BattleLog.prototype.displayAffectedStatus = function(target) {
+    if (target.result().isStatusAffected()) {
+      this.displayPopUpState(target);
+    }
+    nuunPopup = true;
+    _Window_BattleLog_displayAffectedStatus.call(this, target);
+    nuunPopup = false;
+  };
+  
+  Window_BattleLog.prototype.displayPopUpState = function(target) {
+    const result = target.result();
+      this.displayAddedPopUpState(target);
+      this.displayRemovedPopUpState(target);
+      this.displayPopUpBuffs(target, result.addedBuffs, false);
+      this.displayPopUpBuffs(target, result.addedDebuffs, true);
+      this.displayRemovedPopUpBuffs(target, result.removedBuffs, false);
+      this.displayRemovedPopUpBuffs(target, result.removedDebuffs, true);
+  };
+
+  Window_BattleLog.prototype.displayAddedPopUpState = function(target) {
+    const states = target.result().addedStateObjects();
+    for (const state of states) {
+      if (this.displayDeadPopup(target, state) && !state.meta.NoPopUp && !state.meta.AddNoPopUp) {
+        const popupData = initPopUpData();
+        const text = state.meta.PopUpStateName ? state.meta.PopUpStateName : (state.meta.PositiveState ? AddStatePopUpText : AddBadStatePopUpText);
+        popupData.name = text.format(state.name);
+        popupData.color = this.setupStatePopUpColor(state);
+        popupData.id = state.id;
+        popupData.iconIndex = state.iconIndex;
+        this.push('popupState', target, popupData);
+      }
+    }
+  };
+
+  Window_BattleLog.prototype.displayRemovedPopUpState = function(target) {
+    const states = target.result().removedStateObjects();
+    for (const state of states) {
+      if (this.displayDeadPopup(target, state) && !state.meta.NoPopUp && !state.meta.RemoveNoPopUp) {
+        const popupData = initPopUpData();
+        const text = state.meta.PopUpStateName ? state.meta.PopUpStateName : (state.meta.PositiveState ? RemovedStatePopUpText : RemovedBadStatePopUpText);
+        popupData.name = text.format(state.name);
+        popupData.color = this.setupStatePopUpColor(state);
+        popupData.id = state.id;
+        popupData.iconIndex = state.iconIndex;
+        popupData.opacity = PopUpReleaseOpacity;
         this.push('popupState', target, state.id);
       }
     }
   };
 
-  const _Window_BattleLog_displayRemovedStates = Window_BattleLog.prototype.displayRemovedStates;
-  Window_BattleLog.prototype.displayRemovedStates = function(target) {
-    _Window_BattleLog_displayRemovedStates.call(this, target);
-    for (const state of target.result().removedStateObjects()) {
-      if (this.displayDeadPopup(state) && !state.meta.NoPopUp && !state.meta.RemoveNoPopUp) {
-        this.push('removeState', target, state.id);
-      }
-    }
-  };
-
-  Window_BattleLog.prototype.displayDeadPopup = function(state) {
-    return !DeadNoPopup ? state.id !== 1 : true;
-  };
-
-  const _Window_BattleLog_displayBuffs = Window_BattleLog.prototype.displayBuffs;
-  Window_BattleLog.prototype.displayBuffs = function(target, buffs, fmt) {
-    _Window_BattleLog_displayBuffs.call(this, target, buffs, fmt);
-    const result = target.result();
-    if (result.addedBuffs.length > 0 || result.addedDebuffs.length > 0) {
+  Window_BattleLog.prototype.displayPopUpBuffs = function(target, buffs, mode) {
+    if (buffs.length > 0) {
       for (const paramId of buffs) {
-        const id = this._buffMode === 'debuff' ? paramId + 10 : paramId;
+        const id = mode ? paramId + 10 : paramId;
         const find = PopUpBuff.find(buff => buff.StateType === id);
         if (find) {
+          const popupData = initPopUpData();
           if (find.StatePopUpMode === 0 || find.StatePopUpMode === 3) {
-            this.push('popupBuff', target, id);
+            const text = find.PopUpStateName ? find.PopUpStateName : (id < 10 ? AddBuffPopUpText : AddDebuffPopUpText);
+            const paramId = id < 10 ? id : id - 10;
+            popupData.name = text.format(TextManager.param(paramId));
+            popupData.color = this.setupBuffPopUpColor(id, find);
+            popupData.id = id;
+            popupData.iconIndex = target.popupBuffIconIndex(id);
+            this.push('popupState', target, popupData);
           }
-        } else {
-          this.push('popupBuff', target, id);
         }
       }
     }
   };
 
-  Window_BattleLog.prototype.displayRemovedBuffs = function(target, buffs) {
+  Window_BattleLog.prototype.displayRemovedPopUpBuffs = function(target, buffs, mode) {
     for (const paramId of buffs) {
-      const id = this._buffMode === 'debuff' ? paramId + 10 : paramId;
+      const id = mode ? paramId + 10 : paramId;
       const find = PopUpBuff.find(buff => buff.StateType === id);
       if (find) {
+        const popupData = initPopUpData();
         if (find.StatePopUpMode === 0 || find.StatePopUpMode === 2) {
-          this.push('removeBuff', target, id);
+          const text = find.PopUpStateName ? find.PopUpStateName : (id < 10 ? RemovedBuffPopUpText : RemovedDebuffPopUpText);
+          const paramId = id < 10 ? id : id - 10;
+          popupData.name = text.format(TextManager.param(paramId));
+          popupData.color = this.setupBuffPopUpColor(id, find);
+          popupData.id = id;
+          popupData.iconIndex = target.popupBuffIconIndex(id);
+          popupData.opacity = PopUpReleaseOpacity;
+          this.push('popupState', target, popupData);
         }
-      } else {
-        this.push('removeBuff', target, id);
       }
     }
   };
 
-  Window_BattleLog.prototype.displayChangedBuffs = function(target) {//再定義
-    const result = target.result();
-    this._buffMode = 'buff';
-    this.displayBuffs(target, result.addedBuffs, TextManager.buffAdd);
-    this._buffMode = 'debuff';
-    this.displayBuffs(target, result.addedDebuffs, TextManager.debuffAdd);
-    this.displayBuffs(target, result.removedBuffs, TextManager.buffRemove);
-    this._buffMode = 'buff';
-    this.displayRemovedBuffs(target, result.removedBuffs);
-    this._buffMode = 'debuff';
-    this.displayRemovedBuffs(target, result.removedDebuffs);
+  Window_BattleLog.prototype.setupStatePopUpColor = function(state) {
+    if (state.meta.PopUpColor) {
+      return state.meta.PopUpColor;
+    } else if (state.meta.PositiveState) {
+      return StateColor;
+    } else if (state.meta.BatState) {
+      return BatStateColor;
+    } else {
+      return 0;
+    }
   };
+
+  Window_BattleLog.prototype.setupBuffPopUpColor = function(id, find) {
+    if (find && find.PopUpStateColor) {
+      return find.PopUpStateColor;
+    } else if (id < 10) {
+      return StateColor;
+    } else if (id >= 10) {
+      return BatStateColor;
+    } else {
+      return 0;
+    }
+  };
+
+  Window_BattleLog.prototype.displayDeadPopup = function(target, state) {
+    return !DeadNoPopup ? state.id !== target.deathStateId() : true;
+  };
+
+  Window_BattleLog.prototype.popupState = function(target, popup) {
+    target.startStatePopup();
+    target.addSetPopUpData(popup);
+  };
+  
+  function Sprite_PopUpEX() {
+    this.initialize(...arguments);
+  }
+  
+  Sprite_PopUpEX.prototype = Object.create(Sprite_Damage.prototype);
+  Sprite_PopUpEX.prototype.constructor = Sprite_PopUpEX;
+  
+  Sprite_PopUpEX.prototype.initialize = function() {
+    Sprite_Damage.prototype.initialize.call(this);
+    //this._popupBitmap = null;
+  };
+
+  Sprite_PopUpEX.prototype.setup = function(battler) {
+    this.drawPopup(battler);
+  };
+
+  Sprite_PopUpEX.prototype.destroy = function(options) {
+    for (const child of this.children) {
+        if (child.bitmap && !child.bitmap.iconImg) {
+          child.bitmap.destroy();
+        } else {
+          child.bitmap = null;
+        }
+    }
+    Sprite.prototype.destroy.call(this, options);
+  };
+
+  Sprite_PopUpEX.prototype.damageColor = function() {
+    return ColorManager.textColor(this._colorType);
+  };
+
+  Sprite_PopUpEX.prototype.drawPopup = function(battler) {
+    const popupData = battler.getPopUpData();
+    this.drawIcon(popupData);
+    this.createPopUp(popupData);
+  };
+
+  Sprite_PopUpEX.prototype.createPopUp = function(popupData) {
+    const sprite = this.createChildSprite(PopUpWidth, this.fontSize());
+    let textMargin = 0;
+    if (popupData.iconIndex > 0) {
+      textMargin = ImageManager.iconWidth + 4;
+    }
+    this.opacity = popupData.opacity;
+    this._colorType = popupData.color;
+    this.damageColor();
+    sprite.bitmap.drawText(popupData.name, textMargin, 0, PopUpWidth - textMargin, this.fontSize(), "center");
+    sprite.dy = 0;
+  };
+
+  Sprite_PopUpEX.prototype.drawIcon = function(popupData) {
+    const iconIndex = popupData.iconIndex;
+    if (iconIndex > 0) {
+      const sprite = this.createChildSprite(ImageManager.iconWidth, this.fontSize());
+      sprite.bitmap = ImageManager.loadSystem("IconSet");
+      sprite.bitmap.fontSize = this.fontSize();
+      const textMargin = Math.min(Math.floor((sprite.bitmap.measureTextWidth(popupData.name) / 2)), Math.floor(PopUpWidth / 2) - Math.floor(ImageManager.iconWidth / 2) - 2);
+      sprite.bitmap.iconImg = true;
+      sprite.dy = 0;
+      const pw = ImageManager.iconWidth;
+      const ph = ImageManager.iconHeight;
+      const sx = (iconIndex % 16) * pw;
+      const sy = Math.floor(iconIndex / 16) * ph;
+      sprite.setFrame(sx, sy, pw, ph);
+      sprite.x -= textMargin;
+      sprite.bitmap.y = 2;
+    }
+  };
+
+  Sprite_PopUpEX.prototype.update = function() {
+    if (this.delay > 0) {
+      this.delay--;
+      if (this.delay <= 0) {
+        this.show();
+      }
+      return;
+    }
+    Sprite_Damage.prototype.update.call(this);
+  };
+
 
   const _Sprite_Battler_updateDamagePopup = Sprite_Battler.prototype.updateDamagePopup;
   Sprite_Battler.prototype.updateDamagePopup = function() {
@@ -355,17 +561,16 @@ Imported.NUUN_popUp = true;
         this.createStatePopupSprite();
       }
       this._battler.clearStatePopup();
-      this._battler.clearResult();
     }
   };
-  
+
   Sprite_Battler.prototype.createStatePopupSprite = function() {
     const last = this._damages[this._damages.length - 1];
-    const sprite = new Sprite_BattleStylePopUp();
+    const sprite = new Sprite_PopUpEX();
     sprite.x = this.x + this.damageOffsetX();
     sprite.y = this.y + this.damageOffsetY();
     if (last) {
-      sprite.delay = this._damages.length * PopUpUpdate;
+      sprite.delay = this._damages.length * PopUpUpInterval;
       sprite.hide();
     } else {
       sprite.delay = 0;
@@ -374,150 +579,6 @@ Imported.NUUN_popUp = true;
     this._damages.push(sprite);
     this.parent.addChild(sprite);
     this._popUpSprite = sprite;
-  };
-
-
-  function Sprite_BattleStylePopUp() {
-    this.initialize(...arguments);
-  }
-  
-  Sprite_BattleStylePopUp.prototype = Object.create(Sprite_Damage.prototype);
-  Sprite_BattleStylePopUp.prototype.constructor = Sprite_BattleStylePopUp;
-  
-  Sprite_BattleStylePopUp.prototype.initialize = function() {
-    Sprite_Damage.prototype.initialize.call(this);
-    this._buffs = [];
-  };
-
-  Sprite_BattleStylePopUp.prototype.destroy = function(options) {
-    for (const child of this.children) {
-        if (child.bitmap && !child.bitmap.iconImg) {
-            child.bitmap.destroy();
-        }
-    }
-    Sprite.prototype.destroy.call(this, options);
-};
-  
-  Sprite_BattleStylePopUp.prototype.setup = function(battler) {
-    const result = battler.result();
-    this._buffs = battler._buffs;
-    this._buffLavel = battler.buffsLavel;
-    if (result.addState > 0) {
-      this.popUpState(result.addState, "add");
-    } else if (result.addBuff >= 0) {
-      this.popUpBuff(result.addBuff, "add");
-    } else if (result.removeState > 0) {
-      this.popUpState(result.removeState, "remove");
-    } else if (result.removeBuff >= 0) {
-      this.popUpBuff(result.removeBuff, "remove");
-    }
-  };
-  
-  Sprite_BattleStylePopUp.prototype.popUpState = function(id, mode) {
-    const state = $dataStates[id];
-    const popUpName = state.meta.PopUpStateName ? state.meta.PopUpStateName : $dataStates[id].name;
-    if (state.meta.PopUpColor) {
-      this._colorType = state.meta.PopUpColor;
-    } else if (state.meta.PositiveState) {
-      this._colorType = StateColor;
-    } else if (state.meta.BatState) {
-      this._colorType = BatStateColor;
-    } else {
-      this._colorType = 0;
-    }
-    if (mode === "remove") {
-      this.opacity = PopUpReleaseOpacity;
-    }
-    const iconIndex = state.iconIndex;
-    this.drawIcon(popUpName, iconIndex);
-    this.createPopUp(popUpName, iconIndex);
-    this._popName = popUpName;
-  };
-  
-  Sprite_BattleStylePopUp.prototype.popUpBuff = function(id, mode) {
-    const find = PopUpBuff.find(buff => buff.StateType === id);
-    const popUpName = find.PopUpStateName ? find.PopUpStateName : (id < 10 ? TextManager.param(id) +"上昇" : TextManager.param(id - 10) +"低下");
-    if (find && find.PopUpStateColor) {
-      this._colorType = find.PopUpStateColor;
-    } else if (id < 10) {
-      this._colorType = StateColor;
-    } else if (id >= 10) {
-      this._colorType = BatStateColor;
-    } else {
-      this._colorType = 0;
-    }
-    if (mode === "remove") {
-      this.opacity = PopUpReleaseOpacity;
-    }
-    const iconIndex = this.buffIconIndex(id, mode);
-    this.drawIcon(popUpName, iconIndex);
-    this.createPopUp(popUpName, iconIndex);
-    this._popName = popUpName;
-  };
-
-  Sprite_BattleStylePopUp.prototype.buffIconIndex = function(id, mode) {
-    const direction = mode === "remove" ? this.removeBuffLavle(id) : -1;
-    if (id < 10) {
-      return Game_BattlerBase.ICON_BUFF_START + (this._buffs[id] + direction) * 8 + id;
-    } else {
-      return Game_BattlerBase.ICON_DEBUFF_START + (-this._buffs[id - 10] + direction) * 8 + id - 10;
-    }
-  };
-
-  Sprite_BattleStylePopUp.prototype.removeBuffLavle = function(id) {
-    return id < 10 ? (this._buffLavel[id] - 1) : Math.abs(this._buffLavel[id - 10] + 1);
-  };
-  
-  Sprite_BattleStylePopUp.prototype.damageColor = function() {
-    return ColorManager.textColor(this._colorType);
-  };
-  
-  Sprite_BattleStylePopUp.prototype.createPopUp = function(popUpName, iconIndex) {
-    const sprite = this.createChildSprite(240, this.fontSize());
-    let textMargin = 0;
-    let x = 0;
-    if (iconIndex > 0) {
-      textMargin = ImageManager.iconWidth + 4;
-    }
-    sprite.bitmap.drawText(popUpName, textMargin, 0, 240 - textMargin, this.fontSize(), "center");
-    sprite.dy = 0;
-  };
-
-  Sprite_BattleStylePopUp.prototype.drawIcon = function(popUpName, iconIndex) {
-    if (iconIndex > 0) {
-      const sprite = this.createChildSprite(ImageManager.iconWidth, this.fontSize());
-      sprite.bitmap = ImageManager.loadSystem("IconSet");
-      sprite.bitmap.fontSize = this.fontSize();
-      const textMargin = Math.min(Math.floor((sprite.bitmap.measureTextWidth(popUpName) / 2)), 120 - Math.floor(ImageManager.iconWidth / 2) - 2);
-      sprite.bitmap.iconImg = true;
-      sprite.dy = 0;
-      const pw = ImageManager.iconWidth;
-      const ph = ImageManager.iconHeight;
-      const sx = (iconIndex % 16) * pw;
-      const sy = Math.floor(iconIndex / 16) * ph;
-      sprite.setFrame(sx, sy, pw, ph);
-      sprite.x -= textMargin;
-      sprite.bitmap.y = 2;
-    }
-  };
-  
-  Sprite_BattleStylePopUp.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    if (this.delay > 0) {
-      this.delay--;
-      if (this.delay <= 0) {
-        this.show();
-      }
-      return;
-    }
-    if (this._duration > 0) {
-        this._duration--;
-        for (const child of this.children) {
-            this.updateChild(child);
-        }
-    }
-    this.updateFlash();
-    this.updateOpacity();
   };
 
 })();

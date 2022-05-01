@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  *            
  * @help
  * ステート、バフ付加解除時にステート、バフ名をポップアップさせます。
@@ -32,6 +32,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/1 Ver 1.1.1
+ * ステート解除時にエラーが出る問題を修正。
+ * ポップアップの表示方法を指定（デフォルト、固定）できる機能を追加。
  * 2022/4/30 Ver 1.1.0
  * 一部プラグインとの競合解消。
  * 処理の最適化。
@@ -40,6 +43,16 @@
  * バトルスタイル拡張プラグインの互換モード対応。
  * 2021/7/17 Ver 1.0.0
  * 初版
+ * 
+ * @param PopUpMode
+ * @text ポップアップ表示モード
+ * @desc ポップアップの表示モードを指定します。
+ * @type select
+ * @option デフォルト
+ * @value 'default'
+ * @option 同一位置
+ * @value 'Same'
+ * @default 'Same'
  * 
  * @param PopUpWidth
  * @desc ポップアップメッセージ幅を指定します。（デフォルト240）
@@ -208,6 +221,7 @@ Imported.NUUN_popUp = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_popUp');
+  const PopUpMode = eval(parameters['PopUpMode']) || 'default';
   const PopUpBuff = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopUpBuff'])) : null) || [];
   const StateColor = Number(parameters['StateColor'] || 0);
   const BatStateColor = Number(parameters['BatStateColor'] || 0);
@@ -390,7 +404,7 @@ Imported.NUUN_popUp = true;
         popupData.id = state.id;
         popupData.iconIndex = state.iconIndex;
         popupData.opacity = PopUpReleaseOpacity;
-        this.push('popupState', target, state.id);
+        this.push('popupState', target, popupData);
       }
     }
   };
@@ -512,7 +526,7 @@ Imported.NUUN_popUp = true;
     if (popupData.iconIndex > 0) {
       textMargin = ImageManager.iconWidth + 4;
     }
-    this.opacity = popupData.opacity;
+    this.opacity = popupData.opacity;// || 255;
     this._colorType = popupData.color;
     this.damageColor();
     sprite.bitmap.drawText(popupData.name, textMargin, 0, PopUpWidth - textMargin, this.fontSize(), "center");
@@ -568,8 +582,13 @@ Imported.NUUN_popUp = true;
   Sprite_Battler.prototype.createStatePopupSprite = function() {
     const last = this._damages[this._damages.length - 1];
     const sprite = new Sprite_PopUpEX();
-    sprite.x = this.x + this.damageOffsetX();
-    sprite.y = this.y + this.damageOffsetY();
+    if (last && PopUpMode === 'default') {
+      sprite.x = last.x + 8;
+      sprite.y = last.y - 16;
+    } else {
+      sprite.x = this.x + this.damageOffsetX();
+      sprite.y = this.y + this.damageOffsetY();
+    }
     if (last) {
       sprite.delay = this._damages.length * PopUpUpInterval;
       sprite.hide();

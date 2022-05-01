@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.14.3
+ * @version 1.14.4
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -82,6 +82,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/1 Ver.1.14.4
+ * EXP獲得ゲージの座標を調整できる機能を追加。
  * 2022/4/26 Ver.1.14.3
  * レベルアップ画面のレベルの差分表示の幅を指定できる機能を追加。
  * 2022/1/1 Ver.1.14.2
@@ -735,6 +737,22 @@
  * @min -999
  * @parent ExpSetting
  * 
+ * @param EXPGauge_X
+ * @desc 獲得経験値ゲージのX座標（デフォルト:-30）
+ * @text 獲得経験値ゲージX座標
+ * @type number
+ * @default -30
+ * @min -999
+ * @parent ExpSetting
+ * 
+ * @param EXPGauge_Y
+ * @desc 獲得経験値ゲージのY座標（デフォルト:18）
+ * @text 獲得経験値ゲージY座標
+ * @type number
+ * @default 18
+ * @min -999
+ * @parent ExpSetting
+ * 
  * @param Gauge_Margin
  * @desc EXPゲージの余白範囲
  * @text EXPゲージ余白範囲
@@ -965,7 +983,7 @@
  * @parent NameSetting
  * 
  * @param LevelUpResultHelpName
- * @desc レベルアップ画面表示時の戦闘結果のテキストを設定します。%1：アクター名　%2：レベル
+ * @desc レベルアップ画面表示時の戦闘結果のテキストを設定します。%1:アクター名　%2:レベル
  * @text レベルアップ画面表示時戦闘結果テキスト
  * @type string
  * @default %1は\c[16]レベル\c[17]%2\c[0]に上がった！
@@ -2161,7 +2179,7 @@ Window_Result.prototype.refresh = function() {
     } else if (param.LavelUpPosition === 10) {
       this.drawLevelUp(x + param.LevelUp_X , y + param.LevelUp_Y, width, param.ResultActorVisible);
     }
-    this.drawExpGauge(x + width - gaugeWidth - 30, y + param.EXP_Y + 18, param.ResultActorVisible);
+    this.drawExpGauge(x + width - gaugeWidth + param.EXPGauge_X, y + param.EXP_Y + param.EXPGauge_Y, param.ResultActorVisible);
     this.drawGetEXP(x + faceArea, y + param.EXP_Y, width, param.ResultActorVisible);
   }
   this.drawGainList(rect.x + contentWidth, rect.y, rect.width - contentWidth);

@@ -1,5 +1,9 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
 # Ver.1.14.4
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
+
+## 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 [詳細](https://forum.tkool.jp/index.php?threads/%E3%80%90%E3%83%97%E3%83%A9%E3%82%B0%E3%82%A4%E3%83%B3%E3%80%91%E3%83%AA%E3%82%B6%E3%83%AB%E3%83%88%E3%80%80ver-1-4-3.4852/)<br>
 

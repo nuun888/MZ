@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.1.1
+ * @version 3.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/2 Ver.3.1.2
+ * エフェクトのプロパティを中間（アクター画像とステータスの間）か最前面に表示する機能を追加。
  * 2022/5/1 Ver.3.1.1
  * MP、TPゲージの座標変更許可時に座標が正常に適用されてなかった問題を修正。
  * 2022/4/10 Ver.3.1.0
@@ -1048,9 +1050,6 @@ Scene_Battle.prototype.selectPreviousCommand = function() {
   _Scene_Battle_selectPreviousCommand.call(this);
   this._onBSAction = false;
   this._partyCommandWindow.show();
-  //if (!BattleManager.actor()) {
-  //  this.selectNextCommand();
-  //}
 };
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
@@ -2231,9 +2230,15 @@ Spriteset_Battle.prototype.initialize = function() {
 Spriteset_Battle.prototype.createStatusLayer = function() {
     this.createBattleHud();//ベーススプライト
     this.createHudBack();//ウィンドウ、アクターグラフィック
-    this.createEffects();
+    if (params.EffectPriority === 'middle') {
+      this.createEffects();
+    }
     this.createHudStatus();//ステータス
+    if (params.EffectPriority === 'top') {
+      this.createEffects();
+    }
     this.createFrontActors();
+    
 };
 
 Spriteset_Battle.prototype.createBattleHud = function() {

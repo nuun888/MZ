@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -45,6 +45,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/5/2 Ver.1.1.1
+ * エフェクトのプロパティを中間（アクター画像とステータスの間）か最前面に表示する機能を追加。
  * 2022/4/10 Ver.1.1.0
  * アクター画像設定のスイッチ、武器、防具、ステートの条件に複数指定できるように変更。
  * アクター画像設定に残りHPの条件を追加。 
@@ -741,6 +743,17 @@
  * @text フロントビューエフェクト表示
  * @type boolean
  * @default true
+ * @parent ActorEffect
+ * 
+ * @param EffectPriority
+ * @text エフェクト表示プロパティ
+ * @desc エフェクトの表示プロパティ。
+ * @type select
+ * @option 最前面
+ * @value 'top'
+ * @option 中間
+ * @value 'middle'
+ * @default 'top'
  * @parent ActorEffect
  * 
  * @param ActorEffect_X
@@ -1552,13 +1565,6 @@
  * @max 9999
  * @parent ActorStateChangePosition
  * 
- * @param OutsideWindowVisible
- * @desc アイコンの表示をウィンドウ枠外でも表示させます。(アクター画像の上に表示されます)
- * @text アイコンウィンドウ枠外表示
- * @type boolean
- * @default false
- * @parent ActorStateChangePosition
- * 
  * @param ActorImgChangePosition
  * @text アクター画像位置設定
  * @default ------------------------------
@@ -1927,7 +1933,7 @@ params.ActorEffect_X = Number(parameters['ActorEffect_X'] || 0);
 params.ActorEffect_Y = Number(parameters['ActorEffect_Y'] || 0);
 params.ActorDamage_X = Number(parameters['ActorDamage_X'] || 0);
 params.ActorDamage_Y = Number(parameters['ActorDamage_Y'] || 0);
-params.AnimationY = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AnimationY'])) : null) || [];//仮
+params.EffectPriority = eval(parameters['EffectPriority']) || 'middle';
 
 params.DamageImgFrame = Number(parameters['DamageImgFrame'] || 30);
 params.ActorShakeFlame = Number(parameters['ActorShakeFlame'] || 36);

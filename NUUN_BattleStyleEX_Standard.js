@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -45,6 +45,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/5/2 Ver.1.1.1
+ * エフェクトのプロパティを中間（アクター画像とステータスの間）か最前面に表示する機能を追加。
  * 2022/4/10 Ver.1.1.0
  * アクター画像設定のスイッチ、武器、防具、ステートの条件に複数指定できるように変更。
  * アクター画像設定に残りHPの条件を追加。 
@@ -747,6 +749,17 @@
  * @default false
  * @parent ActorEffect
  * 
+ * @param EffectPriority
+ * @text エフェクト表示プロパティ
+ * @desc エフェクトの表示プロパティ。
+ * @type select
+ * @option 最前面
+ * @value 'top'
+ * @option 中間
+ * @value 'middle'
+ * @default 'top'
+ * @parent ActorEffect
+ * 
  * @param ActorEffect_X
  * @desc アニメーションエフェクトのX座標（相対座標）。
  * @text アニメーションエフェクトX座標（相対座標）
@@ -1351,7 +1364,7 @@
  * @desc HPの座標変更がONの時に、HPのX座標を設定します。
  * @text HP_X座標
  * @type number
- * @default 8
+ * @default 192
  * @min -9999
  * @max 9999
  * @parent ActorHPChangePosition
@@ -1360,7 +1373,7 @@
  * @desc HPの座標変更がONの時に、HPのY座標を設定します。
  * @text HP_Y座標
  * @type number
- * @default 180
+ * @default 10
  * @min -9999
  * @max 9999
  * @parent ActorHPChangePosition
@@ -1398,7 +1411,7 @@
  * @desc MPの座標変更がONの時に、MPのX座標を設定します。
  * @text MP_X座標
  * @type number
- * @default 8
+ * @default 326
  * @min -9999
  * @max 9999
  * @parent ActorMPChangePosition
@@ -1407,7 +1420,7 @@
  * @desc MPの座標変更がONの時に、MPのY座標を設定します。
  * @text MP_Y座標
  * @type number
- * @default 314
+ * @default 10
  * @max 9999
  * @parent ActorMPChangePosition
  * 
@@ -1444,7 +1457,7 @@
  * @desc TPの座標変更がONの時に、TPのX座標を設定します。
  * @text TP_X座標
  * @type number
- * @default 8
+ * @default 460
  * @min -9999
  * @max 9999
  * @parent ActorTPChangePosition
@@ -1453,7 +1466,7 @@
  * @desc TPの座標変更がONの時に、TPのY座標を設定します。
  * @text TP_Y座標
  * @type number
- * @default 448
+ * @default 10
  * @min -9999
  * @max 9999
  * @parent ActorTPChangePosition
@@ -1532,13 +1545,6 @@
  * @default 156
  * @min -9999
  * @max 9999
- * @parent ActorStateChangePosition
- * 
- * @param OutsideWindowVisible
- * @desc アイコンの表示をウィンドウ枠外でも表示させます。(アクター画像の上に表示されます)
- * @text アイコンウィンドウ枠外表示
- * @type boolean
- * @default false
  * @parent ActorStateChangePosition
  * 
  * @param ActorImgChangePosition
@@ -1908,6 +1914,7 @@ params.ActorEffect_X = Number(parameters['ActorEffect_X'] || 0);
 params.ActorEffect_Y = Number(parameters['ActorEffect_Y'] || 0);
 params.ActorDamage_X = Number(parameters['ActorDamage_X'] || 0);
 params.ActorDamage_Y = Number(parameters['ActorDamage_Y'] || 0);
+params.EffectPriority = eval(parameters['EffectPriority']) || 'middle';
 
 params.DamageImgFrame = Number(parameters['DamageImgFrame'] || 30);
 params.ActorShakeFlame = Number(parameters['ActorShakeFlame'] || 36);

@@ -10,7 +10,9 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  *            
  * @help
  * ステート、バフ付加解除時にステート、バフ名をポップアップさせます。
@@ -22,7 +24,9 @@
  * <NoPopUp> ポップアップを表示しません。
  * <AddNoPopUp> 付与時のポップアップを表示しません。
  * <RemoveNoPopUp> 解除時のポップアップを表示しません。
- * <PopUpColor:[colorIndex]> ポップアップ時の色を指定します。[colorIndex]:カラーインデックス番号　例：<PopUpColor:17>
+ * <PopUpColor:[colorIndex]> ポップアップ時の色を指定します。[colorIndex]:カラーインデックス番号またはカラーコード　例：<PopUpColor:17>
+ * 
+ * プラグインパラメータのポップアップ色指定はテキストタブでカラーコードを記入できます。
  * 
  * 仕様
  * 戦闘行動結果ポップアッププラグインと併用時、このプラグインを戦闘行動結果ポップアッププラグインより下に設定した場合、ステート、バフのポップアップ
@@ -32,6 +36,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/2 Ver 1.1.2
+ * ポップアップ色が変わらない問題を修正。
+ * ポップアップ色にカラーコードでも指定できるように修正。
  * 2022/5/1 Ver 1.1.1
  * ステート解除時にエラーが出る問題を修正。
  * ポップアップの表示方法を指定（デフォルト、固定）できる機能を追加。
@@ -67,13 +74,13 @@
  * @type struct<PopUpBuffList>[]
  * 
  * @param StateColor
- * @desc 有利なポップアップするときのステート、バフの色
+ * @desc 有利なポップアップするときのステート、バフの色(システムカラーまたはカラーコード(テキストタブ))
  * @text 有利ステート、バフ文字色
  * @type number
  * @default 0
  * 
  * @param BatStateColor
- * @desc 不利なポップアップするときのステート、バフの色
+ * @desc 不利なポップアップするときのステート、バフの色(システムカラーまたはカラーコード(テキストタブ))
  * @text 不利ステート、バフ文字色
  * @type number
  * @default 0
@@ -210,7 +217,7 @@
  * @default 0
  * 
  * @param PopUpStateColor
- * @desc ポップアップするときのステートの色
+ * @desc ポップアップするときのステートの色(システムカラーまたはカラーコード(テキストタブ))
  * @text 文字色
  * @type number
  * @default 0
@@ -452,7 +459,7 @@ Imported.NUUN_popUp = true;
 
   Window_BattleLog.prototype.setupStatePopUpColor = function(state) {
     if (state.meta.PopUpColor) {
-      return state.meta.PopUpColor;
+      return (isNaN(Number(state.meta.PopUpColor)) ? state.meta.PopUpColor : Number(state.meta.PopUpColor));
     } else if (state.meta.PositiveState) {
       return StateColor;
     } else if (state.meta.BatState) {
@@ -511,7 +518,7 @@ Imported.NUUN_popUp = true;
   };
 
   Sprite_PopUpEX.prototype.damageColor = function() {
-    return ColorManager.textColor(this._colorType);
+    return NuunManager.getColorCode(this._colorType);
   };
 
   Sprite_PopUpEX.prototype.drawPopup = function(battler) {
@@ -526,9 +533,9 @@ Imported.NUUN_popUp = true;
     if (popupData.iconIndex > 0) {
       textMargin = ImageManager.iconWidth + 4;
     }
-    this.opacity = popupData.opacity;// || 255;
+    this.opacity = popupData.opacity;
     this._colorType = popupData.color;
-    this.damageColor();
+    sprite.bitmap.textColor = this.damageColor();
     sprite.bitmap.drawText(popupData.name, textMargin, 0, PopUpWidth - textMargin, this.fontSize(), "center");
     sprite.dy = 0;
   };

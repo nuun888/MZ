@@ -1,5 +1,5 @@
 # [ステート、バフポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -21,6 +21,9 @@
 戦闘行動結果ポップアッププラグインと併用時、このプラグインを戦闘行動結果ポップアッププラグインより下に設定した場合、ステート、バフのポップアップはこのプラグインでの表示になります。  
 
 ## 更新履歴
+2022/5/2 Ver 1.1.2  
+ポップアップ色が変わらない問題を修正。  
+ポップアップ色にカラーコードでも指定できるように修正。  
 2022/5/1 Ver 1.1.1  
 ステート解除時にエラーが出る問題を修正。  
 ポップアップの表示方法を指定（デフォルト、固定）できる機能を追加。  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 横バウンドポップアップ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @orderBefore BattleEffectPopup
  * 
  * @help
@@ -20,6 +20,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/2 Ver.1.0.2
+ * 他プラグインでの横バインド化対応による定義修正。
  * 2022/5/2 Ver.1.0.1
  * 微修正。
  * 2022/5/1 Ver.1.0.0
@@ -47,9 +49,6 @@ const _Sprite_Damage_initialize = Sprite_Damage.prototype.initialize;
 Sprite_Damage.prototype.initialize = function() {
     _Sprite_Damage_initialize.call(this);
     this._damageClass = !!(String(this.constructor.name) === 'Sprite_Damage');
-    if (this._damageClass) {
-        this._duration = 120;
-    }
     this.setRondomMoveX();
 };
 
@@ -61,8 +60,13 @@ const _Sprite_Damage_setup = Sprite_Damage.prototype.setup;
 Sprite_Damage.prototype.setup = function(target) {
     _Sprite_Damage_setup.call(this, target);
     if (this._damageClass) {
-        this.popup_dy();
+        this.setLateralBoundPopUp();
     }
+};
+
+Sprite_Damage.prototype.setLateralBoundPopUp = function() {
+    this._duration = 120;
+    this.popup_dy();
 };
 
 Sprite_Damage.prototype.popup_dy = function() {

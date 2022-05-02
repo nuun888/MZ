@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -36,6 +36,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/2 Ver 1.1.3
+ * バフ解除時の共通ポップアップのテキストが正常に適用されていなかった問題を修正。
+ * バフ解除時のポップアップが正常に表示されていなかった問題を修正。
+ * 横バウンドポップアップ適用による定義、プラグインパラメータの追加。
  * 2022/5/2 Ver 1.1.2
  * ポップアップ色が変わらない問題を修正。
  * ポップアップ色にカラーコードでも指定できるように修正。
@@ -151,6 +155,17 @@
  * @type string
  * @default %1低下
  * 
+ * @param LateralBoundPopUpSetting
+ * @text 横バウンドポップアップ設定(要横バウンドポップアップ)
+ * @default ------------------------------
+ * 
+ * @param LateralBoundPopUpValid
+ * @type boolean
+ * @default false
+ * @text 横バウンド適用
+ * @desc 横バウンドを適用します。（要横バウンドポップアップ）
+ * @parent LateralBoundPopUpSetting
+ * 
  * @param BattleEffectPopupSetting
  * @text 盗み設定(要盗みスキル)
  * @default ------------------------------
@@ -196,9 +211,15 @@
  * @value 17
  * @default 0
  * 
- * @param PopUpStateName
- * @text ポップアップテキスト
- * @desc ポップアップするテキストを記入します。記入がない場合は共通のテキストが表示されます。(%1:ステート名)
+ * @param PopUpBadBuffText
+ * @text 有利ポップアップテキスト
+ * @desc 上昇系ポップアップするテキストを記入します。記入がない場合は共通のテキストが表示されます。(%1:ステート名)
+ * @type string
+ * @default
+ * 
+ * @param PopUpBadBuffText
+ * @text 不利ポップアップテキスト
+ * @desc 低下系ポップアップするテキストを記入します。記入がない場合は共通のテキストが表示されます。(%1:ステート名)
  * @type string
  * @default
  * 
@@ -242,8 +263,9 @@ Imported.NUUN_popUp = true;
   const RemovedBadStatePopUpText = String(parameters['RemovedBadStatePopUpText'] || '%1');
   const AddBuffPopUpText = String(parameters['AddBuffPopUpText'] || '%1上昇');
   const AddDebuffPopUpText = String(parameters['AddDebuffPopUpText'] || '%1低下');
-  const RemovedBuffPopUpText = String(parameters['AddBuffPopUpText'] || '%1上昇');
-  const RemovedDebuffPopUpText = String(parameters['AddBuffPopUpText'] || '%1低下');
+  const RemovedBuffPopUpText = String(parameters['RemovedBuffPopUpText'] || '%1上昇');
+  const RemovedDebuffPopUpText = String(parameters['RemovedDebuffPopUpText'] || '%1低下');
+  const LateralBoundPopUpValid = eval(parameters['LateralBoundPopUpValid'] || 'false');
   let nuunPopup = false;
 
   function initPopUpData() {
@@ -259,8 +281,7 @@ Imported.NUUN_popUp = true;
   const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
   Game_Battler.prototype.initMembers = function() {
     _Game_Battler_initMembers.call(this);
-    this._statePopup = false;
-    this.buffsLavel = [0, 0, 0, 0, 0, 0, 0, 0];
+    this._nuunStatePopup = false;
   };
 
   Game_Battler.prototype.isStatePopupRequested = function() {
@@ -283,36 +304,17 @@ Imported.NUUN_popUp = true;
     return this.result().popupData;
   };
 
-  Game_Battler.prototype.removeDebuff = function(paramId) {
-    if (this.isAlive() && this.isBuffOrDebuffAffected(paramId)) {
-      this.setBuffLavel(paramId);
-      this.eraseBuff(paramId);
-      this.result().pushRemovedDebuff(paramId);
-      this.refresh();
-    }
-  };
-
-  Game_Battler.prototype.removeBuff = function(paramId) {
-    if (this.isAlive() && this.isBuffOrDebuffAffected(paramId)) {
-        this.eraseBuff(paramId);
-        this._result.pushRemovedBuff(paramId);
-        this.refresh();
-    }
-  };
-
   const _Game_Battler_removeBuff = Game_Battler.prototype.removeBuff;
   Game_Battler.prototype.removeBuff = function(paramId) {
-    _Game_Battler_removeBuff.call(this, paramId);
-    const buff = this._buffs[paramId];
-    if (buff < 0) {
-      this.result().removedBuffs = [];
-      this.removeDebuff(paramId);
+    this.setBuffLevel(paramId);
+    if (this.isAlive() && this.isBuffOrDebuffAffected(paramId)) {
+      this._result.pushRemovedDebuff(paramId);
     }
-    this.setBuffLavel(paramId);
+    _Game_Battler_removeBuff.call(this, paramId);
   };
 
-  Game_Battler.prototype.setBuffLavel = function(id) {
-    this.buffsLavel[id] = this._buffs[id];
+  Game_Battler.prototype.setBuffLevel = function(id) {
+    this.result().buffsLevel[id] = this._buffs[id];
   };
 
   Game_Battler.prototype.popupBuffIconIndex = function(id) {
@@ -325,36 +327,37 @@ Imported.NUUN_popUp = true;
 
   Game_Battler.prototype.removePopupBuffIconIndex = function(id) {
     if (id < 10) {
-      return Game_BattlerBase.ICON_BUFF_START + (this._buffs[id] + this.removeBuffLavle(id)) * 8 + id;
+      return Game_BattlerBase.ICON_BUFF_START + (this.removePopupBuffLevel(id) * 8) + id;
     } else {
-      return Game_BattlerBase.ICON_DEBUFF_START + (-this._buffs[id - 10] + this.removeBuffLavle(id)) * 8 + id - 10;
+      return Game_BattlerBase.ICON_DEBUFF_START + (this.removePopupBuffLevel(id) * 8) + id - 10;
     }
   };
 
-  Game_Battler.prototype.removePopupBuffLavle = function(id) {
-    return id < 10 ? (this.buffLavel[id] - 1) : Math.abs(this.buffLavel[id - 10] + 1);
+  Game_Battler.prototype.removePopupBuffLevel = function(id) {
+    return id < 10 ? (this.result().buffsLevel[id] - 1) : Math.abs(this.result().buffsLevel[id - 10]) - 1;
   };
 
   const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
   Game_ActionResult.prototype.clear = function() {
     _Game_ActionResult_clear.call(this);
     this.popupData = null;
+    this.removedPositiveBuffs = [];
     this.removedDebuffs = [];
+    this.buffsLevel = [0, 0, 0, 0, 0, 0, 0, 0];
   };
 
-  Game_ActionResult.prototype.pushRemovedDebuff = function(paramId) {
-    if (!this.isDebuffRemoved(paramId)) {
-        this.removedDebuffs.push(paramId);
+  const _Game_ActionResult_pushRemovedBuff = Game_ActionResult.prototype.pushRemovedBuff;
+  Game_ActionResult.prototype.pushRemovedBuff = function(paramId) {
+    _Game_ActionResult_pushRemovedBuff.call(this, paramId);
+    if (this.buffsLevel[paramId] > 0) {
+      this.removedPositiveBuffs.push(paramId);
     }
   };
 
-  Game_ActionResult.prototype.isDebuffRemoved = function(paramId) {
-    return this.removedDebuffs.includes(paramId);
-  };
-
-  const _Game_ActionResult_isStatusAffected = Game_ActionResult.prototype.isStatusAffected;
-  Game_ActionResult.prototype.isStatusAffected = function() {
-    return this.removedDebuffs.length > 0 || _Game_ActionResult_isStatusAffected.call(this);
+  Game_ActionResult.prototype.pushRemovedDebuff = function(paramId) {
+    if (this.buffsLevel[paramId] < 0) {
+      this.removedDebuffs.push(paramId);
+    }
   };
 
 
@@ -381,7 +384,7 @@ Imported.NUUN_popUp = true;
       this.displayRemovedPopUpState(target);
       this.displayPopUpBuffs(target, result.addedBuffs, false);
       this.displayPopUpBuffs(target, result.addedDebuffs, true);
-      this.displayRemovedPopUpBuffs(target, result.removedBuffs, false);
+      this.displayRemovedPopUpBuffs(target, result.removedPositiveBuffs, false);
       this.displayRemovedPopUpBuffs(target, result.removedDebuffs, true);
   };
 
@@ -424,7 +427,7 @@ Imported.NUUN_popUp = true;
         if (find) {
           const popupData = initPopUpData();
           if (find.StatePopUpMode === 0 || find.StatePopUpMode === 3) {
-            const text = find.PopUpStateName ? find.PopUpStateName : (id < 10 ? AddBuffPopUpText : AddDebuffPopUpText);
+            const text = find.PopUpBuffText ? find.PopUpBuffText : (id < 10 ? AddBuffPopUpText : AddDebuffPopUpText);
             const paramId = id < 10 ? id : id - 10;
             popupData.name = text.format(TextManager.param(paramId));
             popupData.color = this.setupBuffPopUpColor(id, find);
@@ -444,12 +447,12 @@ Imported.NUUN_popUp = true;
       if (find) {
         const popupData = initPopUpData();
         if (find.StatePopUpMode === 0 || find.StatePopUpMode === 2) {
-          const text = find.PopUpStateName ? find.PopUpStateName : (id < 10 ? RemovedBuffPopUpText : RemovedDebuffPopUpText);
+          const text = find.PopUpBadBuffText ? find.PopUpBadBuffText : (id < 10 ? RemovedBuffPopUpText : RemovedDebuffPopUpText);
           const paramId = id < 10 ? id : id - 10;
           popupData.name = text.format(TextManager.param(paramId));
           popupData.color = this.setupBuffPopUpColor(id, find);
           popupData.id = id;
-          popupData.iconIndex = target.popupBuffIconIndex(id);
+          popupData.iconIndex = target.removePopupBuffIconIndex(id);
           popupData.opacity = PopUpReleaseOpacity;
           this.push('popupState', target, popupData);
         }
@@ -499,11 +502,15 @@ Imported.NUUN_popUp = true;
   
   Sprite_PopUpEX.prototype.initialize = function() {
     Sprite_Damage.prototype.initialize.call(this);
+    this._damageClass = LateralBoundPopUpValid;
     //this._popupBitmap = null;
   };
 
   Sprite_PopUpEX.prototype.setup = function(battler) {
     this.drawPopup(battler);
+    if (Imported.NUUN_LateralBoundPopUp && this._damageClass) {
+      this.setLateralBoundPopUp();
+    }
   };
 
   Sprite_PopUpEX.prototype.destroy = function(options) {
@@ -565,7 +572,9 @@ Imported.NUUN_popUp = true;
       if (this.delay <= 0) {
         this.show();
       }
-      return;
+      if (PopUpUpInterval > 0) {
+        return;
+      }
     }
     Sprite_Damage.prototype.update.call(this);
   };
@@ -597,7 +606,7 @@ Imported.NUUN_popUp = true;
       sprite.y = this.y + this.damageOffsetY();
     }
     if (last) {
-      sprite.delay = this._damages.length * PopUpUpInterval;
+      sprite.delay = this._damages.length * Math.max(PopUpUpInterval, 1);
       sprite.hide();
     } else {
       sprite.delay = 0;

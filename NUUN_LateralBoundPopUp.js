@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 横バウンドポップアップ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @orderBefore BattleEffectPopup
  * 
  * @help
@@ -20,6 +20,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/2 Ver.1.0.1
+ * 微修正。
  * 2022/5/1 Ver.1.0.0
  * 初版
  * 
@@ -52,7 +54,7 @@ Sprite_Damage.prototype.initialize = function() {
 };
 
 Sprite_Damage.prototype.setRondomMoveX = function() {
-    this.MoveX = Math.random() * 2.2 - 1;
+    this.MoveX = Math.random() * 2.2 - 1.1;
 };
 
 const _Sprite_Damage_setup = Sprite_Damage.prototype.setup;

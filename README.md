@@ -28,7 +28,7 @@
 | ---------- | ------------- | ------------- | -------- |
 | [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.1.0 |
 | [XPスタイル対象選択ウィンドウ](https://github.com/nuun888/MZ/blob/master/README/XPSelectWindow.md) | [NUUN_XPSelectWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js) | 共 | 1.0.4 |
-| [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 1.14.4 |
+| [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 1.14.5 |
 | ┗  リザルト時スプライト非表示 | [NUUN_ResultSpriteHide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultSpriteHide.js) | 共 | 1.0.0 |
 | [戦闘中アイテム、スキル選択画面MV風表示](https://github.com/nuun888/MZ/blob/master/README/BattleItemSkillWindowMV.md) | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js) |  | 1.2.0 |
 | [パーティコマンド表示順任意](https://github.com/nuun888/MZ/blob/master/README/PartyCommandCustomize.md) | [NUUN_PartyCommandCustomize](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyCommandCustomize.js) | 共 | 1.0.0 |

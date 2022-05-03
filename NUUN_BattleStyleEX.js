@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.1.2
+ * @version 3.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/3 Ver.3.1.3
+ * 戦闘不能時の画像を設定しても戦闘不能時に画像が消えてしまう問題を修正。
  * 2022/5/2 Ver.3.1.2
  * エフェクトのプロパティを中間（アクター画像とステータスの間）か最前面に表示する機能を追加。
  * 2022/5/1 Ver.3.1.1
@@ -326,7 +328,7 @@ Game_Actor.prototype.getBSGraphicIndex = function() {
 };
 
 Game_Actor.prototype.isBSActorGraphicDead = function(data) {
-  return data && data.ChangeGraphicScenes === 'state' && (data.stateId === this.deathStateId() || data.ImgStateAll === this.deathStateId());
+  return data && (data.ChangeGraphicScenes === 'death' || data.ChangeGraphicScenes === 'state' && (data.stateId === this.deathStateId() || data.ImgStateAll === this.deathStateId()));
 };
 
 Game_Actor.prototype.getActorGraphicDead = function() {

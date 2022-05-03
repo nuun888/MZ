@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.14.4
+ * @version 1.14.5
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -82,6 +82,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/3 Ver.1.14.5
+ * スキル習得一覧とレベルアップ差分表示が重なってしまう問題を修正。
  * 2022/5/1 Ver.1.14.4
  * EXP獲得ゲージの座標を調整できる機能を追加。
  * 2022/4/26 Ver.1.14.3
@@ -1618,7 +1620,7 @@ Scene_Battle.prototype.createResultLearnSkillWindow = function() {
 
 Scene_Battle.prototype.resultResultLearnSkillWindowRect = function() {
   const wx = (param.ResultWindowCenter ? (Graphics.width - Graphics.boxWidth) / 2 + (param.LevelUpResultWidth > 0 ? (Graphics.boxWidth - param.LevelUpResultWidth) / 2 : 0) : 0) + param.LevelUpResultWindow_X;
-  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.resultHelpAreaTop();
+  const wy = (Graphics.height - Graphics.boxHeight) / 2 + this.resultHelpAreaTop() + this.resultHelpAreaHeight();;
   const ww = this._actorResultWindow.width;
   const wh = this._actorResultWindow.height;
   return new Rectangle(wx, wy, ww, wh);

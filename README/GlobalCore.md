@@ -3,6 +3,7 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GlobalCore.js)  
 #### 対応プラグイン
 [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md)  
+[アイテム図鑑](https://github.com/nuun888/MZ/blob/master/README/ItemBook.md)  
 
 セーブ全体で共有するためのベースプラグインです。  
 

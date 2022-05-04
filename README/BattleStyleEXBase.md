@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.1.3
+### Ver.3.1.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.1.0  
@@ -83,6 +83,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2022/5/4 Ver.3.1.4  
+攻撃時のスキルをなしに設定したときに画像が切り替わらない問題を修正。  
 2022/5/3 Ver.3.1.3  
 戦闘不能時の画像を設定しても戦闘不能時に画像が消えてしまう問題を修正。  
 2022/5/2 Ver.3.1.2  

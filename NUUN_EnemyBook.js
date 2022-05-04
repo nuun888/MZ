@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.12.0
+ * @version 2.13.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -34,7 +34,7 @@
  * [text]:表示するテキスト。
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
  * <desc1:ああああ> descとタグ付けされた項目に「ああああ」が表示されます。
- * デフォルト設定では４ページ目に表示される項目にdescが設定されていますので、文章を表示させる場合は<desc:[text]>と記入してください。
+ * デフォルト設定では2ページ目に表示される項目にdescが設定されていますので、文章を表示させる場合は<desc:[text]>と記入してください。
  * 
  * <[tag]:[img],[x],[y]> モンスター個別画像の表示
  * [tag]:モンスター個別画像タグ名（記述欄、個別指定画像タグで設定します）
@@ -214,7 +214,6 @@
  * this._enemy.meta メタタグを取得します。
  * enemyまたはGame_Enemyのデータを取得します。
  * 
- * このプラグインはYoji Ojima様及びヱビ様、TOMY (Kamesoft)様を参考にさせていただきました。
  * 
  * 仕様
  * ページ選択ウィンドウのカーソル移動は左右キーのみ動作します。
@@ -229,6 +228,13 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/5 Ver.2.13.0
+ * 盗みスキル率の表示を評価式形式に変更。
+ * ドロップアイテム、盗みアイテムで確立を表示しない場合、アイテムの表示が不自然になる問題を修正。
+ * ドロップアイテム、各項目の評価式記入の仕様を変更。
+ * 図鑑のプリセットを変更。
+ * 2022/4/2 Ver.2.12.1
+ * 図鑑データセーブ共有化による処理追加。
  * 2022/3/4 Ver.2.12.0
  * 属性、ステート耐性を百分率で表示する機能を追加。
  * 図鑑登録のパターンによっては戦闘開始時にエラーが起きる問題を修正。
@@ -1228,14 +1234,14 @@
  * @desc ページ設定。
  * @text ページ設定
  * @type struct<PageSettingData>[]
- * @default ["{\"ListDateSetting\":\"1\",\"PageCategoryName\":\"基本情報\"}","{\"ListDateSetting\":\"2\",\"PageCategoryName\":\"属性、ステート\"}","{\"ListDateSetting\":\"3\",\"PageCategoryName\":\"ドロップアイテム\"}","{\"ListDateSetting\":\"4\",\"PageCategoryName\":\"説明\"}"]
+ * @default ["{\"ListDateSetting\":\"1\",\"PageCategoryName\":\"基本情報\",\"PageBackGroundId\":\"1\"}","{\"ListDateSetting\":\"2\",\"PageCategoryName\":\"属性、ステート\"}"]
  * @parent EnemyBookSetting
  * 
  * @param PageCols
  * @desc ページの最大表示列。
  * @text ページ最大表示列
  * @type number
- * @default 4
+ * @default 2
  * @min 1
  * @parent EnemyBookSetting
  * 
@@ -1274,7 +1280,7 @@
  * @desc アナライズスキルの設定をします。0:図鑑設定と同じ　1:AnalyzePageList1　2:AnalyzePageList2　3以上は反映されません。
  * @text アナライズスキル設定
  * @type struct<AnalyzeSkill>[]
- * @default ["{\"PageCols\":\"4\",\"Mode\":\"0\",\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}","{\"PageCols\":\"1\",\"Mode\":\"1\",\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}"]
+ * @default ["{\"PageCols\":\"2\",\"Mode\":\"0\",\"ContentCols\":\"2\",\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}","{\"PageCols\":\"2\",\"Mode\":\"1\",\"ContentCols\":\"2\",\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}"]
  * @parent AnalyzeSetting
  * 
  * @param AnalyzePageList1
@@ -1332,7 +1338,7 @@
  * @desc ページ設定。（情報データが独自に設定(1)に設定している時）
  * @text ページ設定
  * @type struct<PageSettingData>[]
- * @default ["{\"ListDateSetting\":\"1\",\"PageCategoryName\":\"基本情報\"}","{\"ListDateSetting\":\"2\",\"PageCategoryName\":\"属性、ステート\"}","{\"ListDateSetting\":\"3\",\"PageCategoryName\":\"ドロップアイテム\"}","{\"ListDateSetting\":\"4\",\"PageCategoryName\":\"説明\"}"]
+ * @default ["{\"ListDateSetting\":\"1\",\"PageCategoryName\":\"\",\"PageBackGroundId\":\"1\"}","{\"ListDateSetting\":\"2\",\"PageCategoryName\":\"\",\"PageBackGroundId\":\"1\"}"]
  * @parent EnemyInfoSetting
  * 
  * @param RegistrationEnemyInfo
@@ -1369,7 +1375,7 @@
  * @desc ページの最大表示列。
  * @text ページ最大表示列
  * @type number
- * @default 4
+ * @default 2
  * @min 1
  * @parent EnemyInfoSetting
  * 
@@ -1438,7 +1444,7 @@
  * @desc HPゲージ横幅
  * @text HPゲージ横幅
  * @type number
- * @default 128
+ * @default 200
  * @max 999
  * @min 0
  * @parent BattleEnemyBookSetting
@@ -1447,7 +1453,7 @@
  * @desc MPゲージ横幅
  * @text MPゲージ横幅
  * @type number
- * @default 128
+ * @default 200
  * @max 999
  * @min 0
  * @parent BattleEnemyBookSetting
@@ -1456,7 +1462,7 @@
  * @desc TPゲージ横幅
  * @text TPゲージ横幅
  * @type number
- * @default 128
+ * @default 200
  * @max 999
  * @min 0
  * @parent BattleEnemyBookSetting
@@ -1474,28 +1480,28 @@
  * @desc 表示するリスト。
  * @text 表示リスト１
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"12\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"32\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"30\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"31\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1000\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1000\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"10\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"32\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"30\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"31\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"40\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"41\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"45\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"14\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"46\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"14\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent ListData1_10
  * 
  * @param PageList2
  * @desc 表示するリスト。
  * @text 表示リスト２
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"12\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"40\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"41\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"45\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"46\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1000\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"10\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"60\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"70\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"desc\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent ListData1_10
  * 
  * @param PageList3
  * @desc 表示するリスト。
  * @text 表示リスト３
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"12\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"60\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"desc\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default []
  * @parent ListData1_10
  * 
  * @param PageList4
  * @desc 表示するリスト。
  * @text 表示リスト４
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"12\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"説明\",\"DateSelect\":\"70\",\"DetaEval\":\"[]\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"desc\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default []
  * @parent ListData1_10
  * 
  * @param PageList5
@@ -1629,7 +1635,7 @@
  * @param DropRateEval
  * @desc ドロップ率の評価式を定義します。rate:分母　di:ドロップ情報
  * @text ドロップ率評価式
- * @type combo[]
+ * @type combo
  * @option '1/'+ rate
  * @option ge.getDropItemsRatePercentage(di) +'%';//ドロップ率百分率化Ver.1.0.1～
  * @option ge.dropItemMolecule(i) +'/'+ rate;//ドロップ率分子操作
@@ -1659,6 +1665,14 @@
  * @text 確率表示
  * @type boolean
  * @default true
+ * @parent StealItemData
+ * 
+ * @param StealRateEval
+ * @desc 盗み率の評価式を定義します。rate:盗み率(100分率)
+ * @text 盗み率評価式
+ * @type combo
+ * @option rate +'%';//盗み率
+ * @default 
  * @parent StealItemData
  * 
  * @param ShowStealItemName
@@ -2239,7 +2253,7 @@
  * @value 201
  * @option 共通画像(3)～(7)(9)(14)(15)
  * @value 250
- * @option モンスター個別画像(3)～(7)(9)(13)(15)
+ * @option 個別画像(3)～(7)(9)(13)(15)
  * @value 251
  * @option ページ切り替え(2)～(7)(9)(18)
  * @value 500
@@ -2251,7 +2265,7 @@
  * @param DetaEval
  * @desc パラメータ評価式を設定します。de：モンスターのデータベースデータ　ge：モンスターのゲームデータ
  * @text パラメータ評価式(1)
- * @type combo[]
+ * @type combo
  * @option '$gameVariables.value(0);//ゲーム変数'
  * @option 'ge._race;//種族（要蒼竜氏バトラー種族定義）'
  * @option 'ge.sp;//取得SP（要うなぎおおとろ氏スキルツリー）'
@@ -2734,16 +2748,16 @@ DataManager.extractSaveContents = function(contents) {
 const _Game_System_initialize = Game_System.prototype.initialize;
 Game_System.prototype.initialize = function() {
   _Game_System_initialize.call(this);
-  this._enemyBookFlags = [];
-  this._enemyBookStatusFlags = [];
-  this._defeatNumber = [];
-  this._itemDorps = [];
-  this._condItemDorps = [];
-  this._stealItem = [];
-  this._enemyBookElementFlags = [];
-  this._enemyBookStateFlags = [];
-  this._enemyBookDebuffFlags = [];
-  this._enemyBookActionFlags = [];
+  this._enemyBookFlags = this._enemyBookFlags || [];
+  this._enemyBookStatusFlags = this._enemyBookStatusFlags || [];
+  this._defeatNumber = this._defeatNumber || [];
+  this._itemDorps = this._itemDorps || [];
+  this._condItemDorps = this._condItemDorps || [];
+  this._stealItem = this._stealItem || [];
+  this._enemyBookElementFlags = this._enemyBookElementFlags || [];
+  this._enemyBookStateFlags = this._enemyBookStateFlags || [];
+  this._enemyBookDebuffFlags = this._enemyBookDebuffFlags || [];
+  this._enemyBookActionFlags = this._enemyBookActionFlags || [];
   this.initEnemyBookNumber();
   this.initCategoryEnemyBook();
 };
@@ -4810,8 +4824,8 @@ Window_EnemyBook.prototype.paramNameShow = function(list, enemy) {
 };
 
 Window_EnemyBook.prototype.paramShow = function(list, enemy) {
-  if (list.DetaEval && list.DetaEval[0]) {
-    return eval(list.DetaEval[0]);
+  if (list.DetaEval) {
+    return eval(list.DetaEval);
   }
   const params = list.DateSelect;
   switch (params) {
@@ -4856,8 +4870,8 @@ Window_EnemyBook.prototype.paramShow = function(list, enemy) {
 };
 
 Window_EnemyBook.prototype.normalParam = function(list, enemy) {
-  if (list.DetaEval && list.DetaEval[0]) {
-    return eval(list.DetaEval[0]);
+  if (list.DetaEval) {
+    return eval(list.DetaEval);
   }
   const params = list.DateSelect;
   if (params >= 10) {
@@ -4969,7 +4983,7 @@ Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
   this.resetTextColor();
   let text;
   if(this.paramEXMask(list.MaskMode)) {
-    text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : enemy.exp();
+    text = list.DetaEval ? eval(list.DetaEval) : enemy.exp();
   } else {
     text = param.UnknownStatus;
   }
@@ -4988,7 +5002,7 @@ Window_EnemyBook.prototype.enemyGold = function(list, enemy, x, y, width) {
   this.resetTextColor();
   let text;
   if(this.paramEXMask(list.MaskMode)){
-    text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : enemy.gold();
+    text = list.DetaEval ? eval(list.DetaEval) : enemy.gold();
     this.drawCurrencyValue(text, this.currencyUnit(), x + textWidth + 8, y, width - (textWidth + 8));
   } else {
     text = param.UnknownStatus;
@@ -5008,7 +5022,7 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
   this.resetTextColor();
   let text;
   if(this.paramEXMask(list.MaskMode)){
-    text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : $gameSystem.defeatNumber(enemy.enemyId());
+    text = list.DetaEval ? eval(list.DetaEval) : $gameSystem.defeatNumber(enemy.enemyId());
     if (list.paramUnit) {
       text += String(list.paramUnit);
     }
@@ -5031,7 +5045,7 @@ Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
     this.resetTextColor();
     let text;
     if(this.paramEXMask(list.MaskMode)){
-      text = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : Math.max(enemy.turnCount(), 1);
+      text = list.DetaEval ? eval(list.DetaEval) : Math.max(enemy.turnCount(), 1);
     } else {
       text = param.UnknownStatus;
     }
@@ -5242,7 +5256,7 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
         let rate = enemy.elementRate(element.ElementNo) * 100;
         rate = NuunManager.numPercentage(rate, list.Decimal || 0, param.DecimalMode);
         rate += list.paramUnit ? String(list.paramUnit) : " %";
-        const rateText = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : rate;
+        const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
         this.resetTextColor();
         this.drawText(rateText, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
       } else {
@@ -5425,7 +5439,7 @@ Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, wi
           let rate = (enemy.isStateResist(stateId) ? 0 : enemy.stateRate(stateId)) * 100;
           rate = NuunManager.numPercentage(rate, list.Decimal || 0, param.DecimalMode);
           rate += list.paramUnit ? String(list.paramUnit) : " %";
-          const rateText = list.DetaEval && list.DetaEval[0] ? eval(list.DetaEval[0]) : rate;
+          const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
           this.resetTextColor();
           this.drawText(rateText, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
         } else {
@@ -5542,12 +5556,14 @@ Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
       width2 = this.contensWidth(width);
       let item = enemy.itemObject(di.kind, di.dataId);
       if((this.showDropItemMask(list.MaskMode, enemy) && this.dropItemFlag(i))) {
-        let rate = di.denominator;
-        const text = param.DropRateEval && param.DropRateEval[0] ? eval(param.DropRateEval[0]) : "1/" + rate;
-        let textWidth = this.textWidth(text);
-        this.drawItemName(item, x3, y2, width2 - textWidth - this.itemPadding());
         if (param.DropItemProbabilityShow && !item.meta.NoDropProbability) {
+          let rate = di.denominator;
+          const text = param.DropRateEval ? eval(param.DropRateEval) : "1/" + rate;
+          let textWidth = this.textWidth(text);
+          this.drawItemName(item, x3, y2, width2 - textWidth - this.itemPadding());
           this.drawEnemyBookNumber(text, x3, y2, width2);
+        } else {
+          this.drawItemName(item, x3, y2, width2);
         }
         dropIndex++;
       } else {
@@ -5596,12 +5612,14 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
       width2 = this.contensWidth(width);
       let item = enemy.stealObject(stealList[i].kind, stealList[i].dataId);
       if((this.showStealItemMask(list.MaskMode, enemy) && this.stealItemFlag(i))) {
-        let rate = stealList[i].denominator;
-        const unit = list.paramUnit ? String(list.paramUnit) : " %";
-        let textWidth = this.textWidth(rate + unit);
-        this.drawItemName(item, x3, y2, width2 - textWidth - this.itemPadding());
         if (param.StealItemProbabilityShow) {
-          this.drawEnemyBookNumber(rate + unit, x3, y2, width2);
+          let rate = stealList[i].denominator;
+          const text = param.StealRateEval ? eval(param.StealRateEval) : rate;
+          let textWidth = this.textWidth(rate);
+          this.drawItemName(item, x3, y2, width2 - textWidth - this.itemPadding());
+          this.drawEnemyBookNumber(text, x3, y2, width2);
+        } else {
+          this.drawItemName(item, x3, y2, width2);
         }
         stealIndex++;
       } else {
@@ -5671,7 +5689,7 @@ Window_EnemyBook.prototype.drawDesc = function(list, enemy, x, y, width) {
   }
   this.resetTextColor();
   if(this.paramEXMask(list.MaskMode)){
-    let text = list.DetaEval && list.DetaEval[0] ? list.DetaEval[0] : undefined;
+    let text = list.DetaEval ? list.DetaEval : undefined;
     if (!text) {
       const method = list.textMethod;
       if (method) {
@@ -5701,7 +5719,7 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
   this.resetTextColor();
   let text;
   if(this.paramEXMask(list.MaskMode)){
-    text = eval(list.DetaEval[0]);
+    text = eval(list.DetaEval);
     if (list.paramUnit) {
       text += String(list.paramUnit);
     }

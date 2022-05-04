@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑全セーブ共通
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_GlobalCore
  * @base NUUN_EnemyBook
  * @orderAfter NUUN_GlobalCore
@@ -23,26 +23,33 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/4 Ver.1.0.1
+ * 処理の修正。
  * 2022/4/2 Ver.1.0.0
  * 初版
+ * 
+ * @param GlobalName
+ * @desc 出力するファイル名。(Ver.1.0.0から使用の場合はnuun_Globalと記入してください)
+ * @text 出力ファイル名
+ * @type string
+ * @default EnemyBook_Global
  * 
  */
 var Imported = Imported || {};
 Imported.NUUN_EnemyBook_Global = true;
-let bootStart = false;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_EnemyBook_Global');
+const GlobalName = String(parameters['GlobalName'] || 'EnemyBook_Global');
 
-const _Nuun_GlobalManager_loadGlobal = Nuun_GlobalManager.loadGlobal;
-Nuun_GlobalManager.loadGlobal = function(nuunGlobal) {
-    _Nuun_GlobalManager_loadGlobal.call(this, nuunGlobal)
+Nuun_GlobalManager.nuun_Global = {};
+
+Nuun_GlobalManager.loadEnemyBook = function(nuunGlobal) {
     this.applyEnemyBookData(nuunGlobal.enemyBook);
 };
 
-const _Nuun_GlobalManager_makeData = Nuun_GlobalManager.makeData;
-Nuun_GlobalManager.makeData = function() {
-    const global = _Nuun_GlobalManager_makeData.call(this);
+Nuun_GlobalManager.makeEnemyBookData = function() {
+    const global = Nuun_GlobalManager.nuun_Global || {};
     global.enemyBook = {};
     global.enemyBook.enemyBookFlags = $gameSystem._enemyBookFlags;
     global.enemyBook.enemyBookStatusFlags = $gameSystem._enemyBookStatusFlags;
@@ -70,12 +77,16 @@ Nuun_GlobalManager.applyEnemyBookData = function(data) {
     $gameSystem._enemyBookActionFlags = this.readFlag(data, "enemyBookActionFlags", []);
 };
 
-Nuun_GlobalManager.readFlag = function(data, name, defaultValue) {
-    if (name in data) {
-        return data[name];
-    } else {
-        return defaultValue;
-    }
+const _Nuun_GlobalManager_load = Nuun_GlobalManager.load;
+Nuun_GlobalManager.load = function() {
+    _Nuun_GlobalManager_load.call(this);
+    this.globalLoad(GlobalName, 'loadEnemyBook');
+};
+
+const _Nuun_GlobalManager_save = Nuun_GlobalManager.save;
+Nuun_GlobalManager.save = function() {
+    _Nuun_GlobalManager_save.call(this);
+    this.globalSave(GlobalName, 'makeEnemyBookData');
 };
 
 })();

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc グローバル情報ベース
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * セーブ全体で共有するためのベースプラグインです。
@@ -19,6 +19,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/4 Ver.1.0.1
+ * 処理の修正。
  * 2022/4/2 Ver.1.0.0
  * 初版
  * 
@@ -67,26 +69,10 @@ Scene_Save.prototype.onSaveSuccess = function() {
     Nuun_GlobalManager.save();
 };
 
-Nuun_GlobalManager.nuun_Global = {};
 Nuun_GlobalManager._isLoaded = false;
 
-Nuun_GlobalManager.load = function() {
-    StorageManager.loadObject("nuun_Global")
-        .then(nuunGlobal => this.loadGlobal(nuunGlobal || {}))
-        .catch(() => 0)
-        .then(() => {
-            this._isLoaded = true;
-            return 0;
-        })
-        .catch(() => 0);
-};
-
 Nuun_GlobalManager.loadGlobal = function(nuunGlobal) {
-    
-};
 
-Nuun_GlobalManager.save = function() {
-    StorageManager.saveObject("nuun_Global", this.makeData());
 };
 
 Nuun_GlobalManager.isLoaded = function() {
@@ -94,8 +80,7 @@ Nuun_GlobalManager.isLoaded = function() {
 };
 
 Nuun_GlobalManager.makeData = function() {
-    const global = Nuun_GlobalManager.nuun_Global || {};
-    return global;
+    return {};
 };
 
 Nuun_GlobalManager.applyData = function(data) {
@@ -108,6 +93,30 @@ Nuun_GlobalManager.readFlag = function(data, name, defaultValue) {
     } else {
         return defaultValue;
     }
+};
+
+Nuun_GlobalManager.load = function() {
+    
+};
+
+Nuun_GlobalManager.save = function() {
+    
+};
+
+Nuun_GlobalManager.globalLoad = function(globalName, method) {
+    StorageManager.loadObject(globalName)
+        .then(nuunGlobal => 
+            this[method].call(this, (nuunGlobal || {})))
+        .catch(() => 0)
+        .then(() => {
+            this._isLoaded = true;
+            return 0;
+        })
+        .catch(() => 0);
+};
+
+Nuun_GlobalManager.globalSave = function(globalName, method) {
+    StorageManager.saveObject(globalName, this[method].apply(this));
 };
 
 })();

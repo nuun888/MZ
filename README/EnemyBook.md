@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.12.1
+# Ver.2.13.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -129,6 +129,11 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2022/5/5 Ver.2.13.0  
+盗みスキル率の表示を評価式形式に変更。  
+ドロップアイテム、盗みアイテムで確立を表示しない場合、アイテムの表示が不自然になる問題を修正。  
+ドロップアイテム、各項目の評価式記入の仕様を変更。  
+図鑑のプリセットを変更。  
 2022/4/2 Ver.2.12.1  
 図鑑データセーブ共有化による処理追加。  
 2022/3/4 Ver.2.12.0  

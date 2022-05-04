@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -245,6 +245,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/4 Ver.1.1.4
+ * 一部条件によってはクリティカル時の条件が適用されない問題を修正。
+ * リストにないIDが設定されていた場合にエラーが起きる問題を修正。
  * 2021/12/31 Ver.1.1.3
  * 戦闘外の敵グループ指定の戻り値をfalseで返すように修正。
  * 2021/12/19 Ver.1.1.2
@@ -708,9 +711,16 @@ Game_Temp.prototype.getActionData = function() {
   return this.actionData;
 };
 
+const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
+Game_ActionResult.prototype.clear = function() {
+  _Game_ActionResult_clear.call(this);
+  this.criticalHit = false;
+};
+
 const _Game_Action_apply = Game_Action.prototype.apply;
 Game_Action.prototype.apply = function(target) {
-  $gameTemp.actionData.subject = this.subject();
+  //$gameTemp.actionData.subject = this.subject();
+  $gameTemp.actionData.target = target;
   $gameTemp.actionData.action = this;
   $gameTemp.actionData.damage = 0;
   _Game_Action_apply.call(this, target);
@@ -792,7 +802,9 @@ function isTriggerConditionsEvery(list, target, mode, action, damage) {
 }
 
 function triggerConditions(data, target, mode, action, damage) {
-  if (data.ConditionsMode === 'Member') {
+  if (!data) {
+    return false;//データがなければ適用しない
+  } else if (data.ConditionsMode === 'Member') {
     return memberTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Battler') {
     return battlerTriggerConditions(data, target, mode);
@@ -978,7 +990,6 @@ function stateTriggerConditions(data, target, mode) {
     }
   }
 };
-//(ここからデバック)
 //バフ
 function buffTriggerConditions(data, target, mode) {
   const unit = getUnit(target, mode);
@@ -1130,7 +1141,7 @@ function attackTriggerConditions(data, target, mode, action) {
   if (!action) {
     return false;
   }
-  const result = target.result();
+  const result = $gameTemp.actionData.target.result();
   if (data.AttackConditionsType === 'Physical') {
     return action.isPhysical();
   } else if (data.AttackConditionsType === 'Magical') {

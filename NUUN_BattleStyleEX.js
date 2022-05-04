@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.1.3
+ * @version 3.1.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/4 Ver.3.1.4
+ * 攻撃時のスキルをなしに設定したときに画像が切り替わらない問題を修正。
  * 2022/5/3 Ver.3.1.3
  * 戦闘不能時の画像を設定しても戦闘不能時に画像が消えてしまう問題を修正。
  * 2022/5/2 Ver.3.1.2
@@ -409,8 +411,8 @@ Game_Actor.prototype.isBattleStyleClassImg = function(data) {
   return data.ImgClass ? this._classId === data.ImgClass : true;
 };
 
-Game_Actor.prototype.isBattleStyleUseItemImg = function(data) {
-  return data ? data.includes(this.nuun_bsUseItemId) : true;
+Game_Actor.prototype.isBattleStyleUseItemImg = function(item) {
+  return item && item[0] > 0 ? item.includes(this.nuun_bsUseItemId) : true;
 };
 
 const _Game_Actor_isSpriteVisible = Game_Actor.prototype.isSpriteVisible;

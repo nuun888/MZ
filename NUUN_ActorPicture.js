@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/6 Ver 1.3.1
+ * スイッチで条件判定するとエラーが出る問題を修正。
  * 2022/4/10 Ver 1.3.0
  * アクター画像設定のスイッチ、武器、防具、ステートの条件に複数指定できるように変更。
  * アクター画像設定に残りHPの条件を追加。 
@@ -309,7 +311,7 @@ Game_Actor.prototype.matchConditions = function(data) {
   if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this.hp, this.param(0))) {
     return false;
   }
-  if (data.ImgSwitch > 0 && !this.isCondSwitchIm(data)) {
+  if (data.ImgSwitch > 0 && !this.isCondSwitchImg(data)) {
     return false;
   }
   if (data.ImgWeapon > 0 && !this.isCondWeaponImg(data)) {

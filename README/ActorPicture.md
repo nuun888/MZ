@@ -1,5 +1,5 @@
 # [立ち絵、顔グラ表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
-# Ver.1.3.0
+# Ver.1.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -49,6 +49,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2022/5/6 Ver 1.3.1  
+スイッチで条件判定するとエラーが出る問題を修正。  
 2022/4/10 Ver 1.3.0  
 画像設定のスイッチ、武器、防具、ステートの条件に複数指定できるように変更。  
 画像設定に残りHPの条件を追加。   

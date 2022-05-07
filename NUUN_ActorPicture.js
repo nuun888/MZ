@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/7 Ver 1.3.2
+ * 条件にステートを指定するとエラーが出る問題を修正。
  * 2022/5/6 Ver 1.3.1
  * スイッチで条件判定するとエラーが出る問題を修正。
  * 2022/4/10 Ver 1.3.0
@@ -356,7 +358,7 @@ Game_Actor.prototype.matchChangeGraphic = function(data) {
     case 'victory' :
       return this.onImgId === 20;
     case 'state' :
-      return this.isCondStateImg(data.stateId);
+      return this.isCondStateImg(data, data.stateId);
   }
 };
 
@@ -372,7 +374,7 @@ Game_Actor.prototype.isCondArmorImg = function(data) {
   return data.ImgArmor.every(id => this.isEquipped($dataArmors[id]));
 };
 
-Game_Actor.prototype.isCondStateImg = function(data, stateId) {
+Game_Actor.prototype.isCondStateImg = function(data, states) {
   return states.every(id => this.isStateAffected(id));
 };
 

@@ -2,7 +2,7 @@
 公開しているプラグインはフリー版のみMITライセンスで公開しています。  
 フリー、シェアゲーム問わずご使用いただけます。
 
-[既知の不具合](https://github.com/nuun888/MZ/blob/master/bug.md)
+[既知の不具合、更新予定](https://github.com/nuun888/MZ/blob/master/bug.md)
 
 # 公開プラグイン
 共：要共通処理  

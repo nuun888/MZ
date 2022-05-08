@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -32,7 +32,7 @@
  * ※カテゴリーキーについて
  *  item、weapon、armor、keyItemは独自カテゴリーのキーには使用できません。
  * 例
- * <CategoryType:sozai>　このタグを記入したアイテムはsozaiカテゴリーに表示されます。
+ * <CategoryType:sozai> このタグを記入したアイテムはsozaiカテゴリーに表示されます。
  * 
  * データベースのアイテムカテゴリーのチェックを外した場合、このプラグインで設定してもチェックを外したカテゴリーは表示はされません。
  * 
@@ -42,6 +42,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/8 Ver.1.3.0
+ * 表示するカテゴリーを変更する機能を追加。
+ * カテゴリーキーの設定方法変更（要再設定）
  * 2021/12/28 Ver.1.2.0
  * アイテムとキーアイテムを表示する機能を追加。
  * カテゴリーキーをコンボボックスに変更。
@@ -56,6 +59,21 @@
  * 売却画面でも表示行数を反映させるように修正。
  * 2020/11/18 Ver.1.0.0
  * 初版
+ * 
+ * @command AddCategory
+ * @desc 表示するカテゴリーを変更します。
+ * @text 表示カテゴリー変更
+ * 
+ * @arg ItemCategory
+ * @text カテゴリー項目
+ * @desc カテゴリー項目の設定。
+ * @default []
+ * @type struct<ItemCategoryList>[]
+ * 
+ * @command ResetCategory
+ * @desc 表示するカテゴリーをもとに戻します。
+ * @text 表示カテゴリーリセット
+ * 
  * 
  * @param CategoryCols
  * @desc カテゴリーの表示列数。
@@ -72,7 +90,7 @@
  * @param ItemCategory
  * @text カテゴリー項目
  * @desc カテゴリー項目の設定。
- * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"[\\\"'item'\\\"]\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"[\\\"'weapon'\\\"]\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"[\\\"'armor'\\\"]\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"[\\\"'keyItem'\\\"]\",\"NumShow\":\"true\"}"]
+ * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"'item'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'weapon'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'armor'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'keyItem'\",\"NumShow\":\"true\"}"]
  * @type struct<ItemCategoryList>[]
  * 
  */
@@ -84,8 +102,8 @@
  * 
  * @param Categorykey
  * @text カテゴリーキー
- * @desc カテゴリーキーを設定します。例:アイテムならitem リストにないキーは直接記入してください。（リスト1のみ入力）
- * @type combo[]
+ * @desc カテゴリーキーを設定します。例:アイテムならitem リストにないキーは直接記入してください。
+ * @type combo
  * @option 'item'
  * @option 'weapon'
  * @option 'armor'
@@ -109,7 +127,20 @@ const parameters = PluginManager.parameters('NUUN_ItemCategory');
 const CategoryCols = Number(parameters['CategoryCols'] || 4);
 const CategoryRows = Number(parameters['CategoryRows'] || 1);
 const ItemCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemCategory'])) : null) || [];
-const TypeLength = ItemCategory.length
+
+const pluginName = "NUUN_ItemCategory";
+PluginManager.registerCommand(pluginName, 'AddCategory', args => {
+  $gameSystem.itemCategory = DataManager.nuun_structureData(args.ItemCategory) || null;
+});
+
+PluginManager.registerCommand(pluginName, 'ResetCategory', args => {
+  $gameSystem.itemCategory = null;
+});
+
+function getItemCategory() {
+  return $gameSystem.itemCategory ? $gameSystem.itemCategory : ItemCategory;
+}
+
 
 const _Scene_Item_categoryWindowRect = Scene_Item.prototype.categoryWindowRect;
 Scene_Item.prototype.categoryWindowRect = function() {
@@ -130,23 +161,23 @@ Window_ItemCategory.prototype.maxCols = function() {
 };
 
 Window_ItemCategory.prototype.makeCommandList = function() {
-  const list = ItemCategory;
+  const list = getItemCategory();
     if(!list) {
     return;
   }
   list.forEach(names => {
-    if(this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'item') {
-      this.addCommand(TextManager.item, names.Categorykey[0]);
-    } else if(this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'weapon') {
-      this.addCommand(TextManager.weapon, names.Categorykey[0]);
-    } else if(this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'armor') {
-      this.addCommand(TextManager.armor, names.Categorykey[0]);
-    } else if(this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'keyItem') {
-      this.addCommand(TextManager.keyItem, names.Categorykey[0]);
-    } else if (this.needsCommand(names.Categorykey[0]) && names.Categorykey[0] === 'allItems') {
-      this.addCommand(names.CategoryName, names.Categorykey[0]);
-    } else if(this.needsCommand(names.Categorykey[0]) && names.CategoryName) { 
-      this.addCommand(names.CategoryName, names.Categorykey[0]);
+    if(this.needsCommand(names.Categorykey) && names.Categorykey === 'item') {
+      this.addCommand(TextManager.item, names.Categorykey);
+    } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'weapon') {
+      this.addCommand(TextManager.weapon, names.Categorykey);
+    } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'armor') {
+      this.addCommand(TextManager.armor, names.Categorykey);
+    } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'keyItem') {
+      this.addCommand(TextManager.keyItem, names.Categorykey);
+    } else if (this.needsCommand(names.Categorykey) && names.Categorykey === 'allItems') {
+      this.addCommand(names.CategoryName, names.Categorykey);
+    } else if(this.needsCommand(names.Categorykey) && names.CategoryName) { 
+      this.addCommand(names.CategoryName, names.Categorykey);
     }
   });
 };
@@ -198,7 +229,7 @@ Window_ItemList.prototype.allItemsNeedsNumber = function(item) {
     if (item.itypeId === 2) {
       return $dataSystem.optKeyItemsNumber;
     } else if (item.meta.CategoryType) {
-      const list = ItemCategory;
+      const list = getItemCategory();
       const find = list.find(date => date.Categorykey === item.meta.CategoryType);
       if (find && find.NumShow !== undefined) {
         return find.NumShow;
@@ -213,7 +244,7 @@ const _Window_ItemList_setCategory = Window_ItemList.prototype.setCategory;
 Window_ItemList.prototype.setCategory = function(category) {
   if (this._category !== category) {
     this._needsCategory = true;
-    const list = ItemCategory;
+    const list = getItemCategory();
     if (list) {
       const find = list.find(date => date.Categorykey === category);
       if (find) {
@@ -223,4 +254,5 @@ Window_ItemList.prototype.setCategory = function(category) {
   }
   _Window_ItemList_setCategory.call(this, category)
 };
+
 })();

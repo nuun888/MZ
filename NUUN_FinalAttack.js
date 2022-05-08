@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ファイナルアタック特徴
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * ファイナルアタックを実装します。
@@ -19,8 +19,15 @@
  * <FinalAttack:1> 
  * 戦闘不能になった時にファイナルアタック設定の１番で指定したスキルが発動します。
  * スキルのコストは考慮してませんのでスキルコストがある場合数値がマイナスに表示される場合があります。
+ * 設定できるスキルは複数指定できます。
+ * 
+ * 仕様
+ * ２回行動以上でファイナルアタックが割り込んだ場合その時点で行動が終了します。
  * 
  * 更新履歴
+ * 2022/5/8 Ver.1.1.0
+ * とどめを刺したバトラーに攻撃する機能の追加。
+ * スキルの設定されていないidを指定するとエラーが出る問題を修正。
  * 2021/5/3 Ver.1.0.1
  * 少し修正。
  * 2021/5/3 Ver.1.0.0
@@ -39,6 +46,16 @@
  * @text スキル設定
  * @type struct<FinalAttackSkillList>[]
  * @default []
+ * 
+ * @param FinalAttackTarget
+ * @desc ターゲットモード
+ * @text ターゲットモード
+ * @type select
+ * @option 設定スキルのターゲット
+ * @value 0
+ * @option とどめを刺したバトラー（設定スキルの範囲が敵単体）
+ * @value 1
+ * @default 0
  * 
  */
 /*~struct~FinalAttackSkillList:
@@ -79,6 +96,7 @@ BattleManager.initMembers = function() {
   _BattleManager_initMembers.call(this);
   this.finalAttackList = [];
   this._finalAttack = false;
+  this._finalAttackLastAttack = -1;
 };
 
 const _BattleManager_processForcedAction = BattleManager.processForcedAction;
@@ -109,6 +127,14 @@ BattleManager.removeFinalAttack = function() {
   this.finalAttackList.shift();
 };
 
+BattleManager.setFinalAttackLastAttack = function(mode) {
+  this._finalAttackLastAttack = mode && this._subject ? this._subject.index() : -1;
+};
+
+BattleManager.getFinalAttackLastAttack = function() {
+  return this._finalAttackLastAttack;
+};
+
 BattleManager.setFinalAttack = function(subject) {
   this.finalAttackList.push(subject);
   if (!this.finalAttackList[1]) {
@@ -120,7 +146,7 @@ BattleManager.setFinalAttack = function(subject) {
 const _Game_Actor_performCollapse = Game_Actor.prototype.performCollapse;
 Game_Actor.prototype.performCollapse = function() {
   if ($gameParty.inBattle()) {
-    if (this.finalAttackDate() && !this.finalAttackEnd) {
+    if (!this.finalAttackEnd && this.finalAttackDate()) {
       BattleManager.setFinalAttack(this);
     } else {
       this.finalAttackEnd = false;
@@ -131,7 +157,7 @@ Game_Actor.prototype.performCollapse = function() {
 
 const _Game_Enemy_performCollapse = Game_Enemy.prototype.performCollapse;
 Game_Enemy.prototype.performCollapse = function() {
-  if (this.finalAttackDate() && !this.finalAttackEnd) {
+  if (!this.finalAttackEnd && this.finalAttackDate()) {
     BattleManager.setFinalAttack(this);
   } else {
     this.finalAttackEnd = false;
@@ -141,10 +167,12 @@ Game_Enemy.prototype.performCollapse = function() {
 
 Game_BattlerBase.prototype.finalAttackDate = function(){
   let allAction = [];
+  BattleManager.setFinalAttackLastAttack(true);
 	this.traitObjects().forEach(function(traitObject) {
 		if (traitObject.meta.FinalAttack) {
 			this.makeFinalAttackActions(Number(traitObject.meta.FinalAttack));
-      allAction = allAction.concat(this._actions);
+      Array.prototype.push.apply(allAction, this._actions);
+      //allAction = allAction.concat(this._actions);
 		}
 	}, this);
   if (allAction.length > 0) {
@@ -162,19 +190,26 @@ Game_Battler.prototype.initMembers = function() {
 
 Game_Battler.prototype.makeFinalAttackActions = function(id) {
   this.clearActions();
-  this._actions = [];
   const finalAttack = param.FinalAttack[id - 1];
-  const actionTimes = finalAttack.FinalAttackSkill ? finalAttack.FinalAttackSkill.length : 0;
+  const actionTimes = finalAttack && finalAttack.FinalAttackSkill ? finalAttack.FinalAttackSkill.length : 0;
   if (actionTimes > 0) {
     const actionList = finalAttack.FinalAttackSkill;
     for (let i = 0; i < actionTimes; i++) {
-      if (this.finalAttackRate(actionList[i])) {
+      const actionData = actionList[i];
+      if (this.finalAttackRate(actionData)) {
         const action = new Game_Action(this);
-        action.setSkill(actionList[i].FinalAttackSkillId);
-        action.setSubject(this);
+        action.setSkill(actionData.FinalAttackSkillId);
+        action.setFinalAttackTarget(finalAttack);
         this._actions.push(action);
       }
     }
+  }
+};
+
+Game_Action.prototype.setFinalAttackTarget = function(action) {
+  const index = BattleManager.getFinalAttackLastAttack();
+  if (action.FinalAttackTarget === 1 && index > 0) {
+    this.setTarget(index);
   }
 };
 

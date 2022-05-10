@@ -11,9 +11,9 @@
  * @target MZ
  * @plugindesc  エネミー名前表示
  * @author NUUN
- * @version 1.2.2
- * @base NUUN_Base
- * @orderAfter NUUN_Base
+ * @version 1.3.0
+ * @base NUUN_BattlerOverlayBase
+ * @orderAfter NUUN_BattlerOverlayBase
  * 
  * @help
  * モンスターの敵名を表示します。
@@ -24,17 +24,19 @@
  * 
  * バトルイベントの注釈
  * <EnemyNamePosition:[Id],[x],[y]> 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）
- * [Id]：表示順番号
- * [x]：X座標
- * [y]：Y座標
+ * [Id]:表示順番号
+ * [x]:X座標
+ * [y]:Y座標
  * [id]は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。
  * 
- * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
+ * このプラグインはNUUN_BattlerOverlayBase(バトラーオーバーレイベース)が必要です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/10 Ver.1.3.0
+ * バトラーの表示処理の定義大幅変更に関する定義変更。
  * 2021/11/8 Ver.1.2.2
  * 敵グループの座標変更の設定方法を変更。
  * 2021/11/7 Ver.1.2.1
@@ -118,18 +120,6 @@
  * @default -12
  * @min -9999
  * 
- * @param  ConflictScale
- * @desc 敵画像の上設定時の拡大率の考慮
- * @text 拡大率の考慮
- * @type select
- * @option 元のサイズ基準
- * @value 0
- * @option 現在のサイズ基準
- * @value 1
- * @option 元のサイズ基準（MNKR_TMBattlerExMZ併用時）
- * @value 2
- * @default 0
- * 
  */
 var Imported = Imported || {};
 Imported.NUUN_ButlerName = true;
@@ -141,191 +131,7 @@ const EnemyNameVisible = Number(parameters['EnemyNameVisible'] || 0);
 const Name_X = Number(parameters['Name_X'] || 0);
 const Name_Y = Number(parameters['Name_Y'] || 0);
 const Name_FontSize = Number(parameters['Name_FontSize'] || -12);
-const ConflictScale = Number(parameters['ConflictScale'] || 0);
-let namePositionList = [];
-
-const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
-Sprite_Enemy.prototype.initMembers = function() {
-  _Sprite_Enemy_initMembers.call(this);
-};
-
-const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
-Sprite_Enemy.prototype.updateBitmap = function() {
-  _Sprite_Enemy_updateBitmap.call(this);
-  //if (this._enemy && EnemyNamePosition >= 0) {
-  //    this.updateEnemyName();
-  //}
-  //if (ActorNamePosition >= 0 && $gameSystem.isSideView()) {
-  //  this.updateActorName();
-  //}
-};
-
-Sprite_Enemy.prototype.updateEnemyName = function() {
-  if (BattleManager.gaugeBaseSprite) {
-    if (!this._butlerNameSprite) {
-      $gameTemp.enemyNameRefresh = true;
-      this.enemyName();
-    }
-    this._butlerNameSprite.x = this.butlerNameOffsetX + (this.x - this._butlerNameSprite.width / 2);
-    this._butlerNameSprite.y = this.butlerNameOffsetY + this.y - 40;
-    if (this.getButlerNamePosition() === 0) {
-      this._butlerNameSprite.y -= this.getButlerNameHeight();
-    } else if (this.getButlerNamePosition() === 2) {
-      this._butlerNameSprite.y -= Math.floor(this.getButlerNameHeight() / 2);
-    }
-    this.butlerNameOpacity();
-  }
-};
-
-Sprite_Enemy.prototype.enemyName = function() {
-  const butlerGaugeBase = BattleManager.gaugeBaseSprite;
-  const sprite = new Sprite_ButlerName();
-  butlerGaugeBase.addChild(sprite);
-  sprite.setup(this._enemy);
-  sprite.show();
-  sprite.move(0, 0);
-  this._butlerNameSprite = sprite;
-  sprite.enemySpriteId = this.spriteId;
-  this.butlerNameOffsetX = this._enemy.getNamePositionX() + (this._enemy.enemy().meta.EnemyNameX ? Number(this._enemy.enemy().meta.EnemyNameX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Name_X;
-  this.butlerNameOffsetY = this._enemy.getNamePositionY() + (this._enemy.enemy().meta.EnemyNameY ? Number(this._enemy.enemy().meta.EnemyNameY) : 0) + Name_Y + (Graphics.height - Graphics.boxHeight) / 2;
-};
-
-Sprite_Enemy.prototype.getButlerNameHeight = function() {
-  const scale = this.getButlerNameConflict();
-  if (this._SVBattlername) {
-    return Math.floor((this._mainSprite.bitmap.height / 6) * 0.9);
-  } else if (this._svBattlerSprite) {
-    return Math.floor(this.height * 0.9);
-  } else {
-    return Math.floor(((this.bitmap.height + 40) * 0.9) * scale);
-  }
-};
-
-Sprite_Enemy.prototype.getButlerNameConflict = function() {
-  if (ConflictScale === 1) {
-    return this.scale.y;
-  } else if (ConflictScale === 2) {
-    return this._baseScale.y;
-  } else {
-    return 1;
-  }
-};
-
-Sprite_Enemy.prototype.getButlerNamePosition = function() {
-  return EnemyNamePosition;
-};
-
-Sprite_Enemy.prototype.butlerNameOpacity = function() {
-  if (this._effectType !== "blink") {
-    this._butlerNameSprite.opacity = this.opacity;
-  }
-};
-
-
-const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
-Spriteset_Battle.prototype.update = function() {
-  _Spriteset_Battle_update.call(this);
-  if ($gameTemp.enemyNameRefresh) {
-    this.setEnemyNamePosition();
-    $gameTemp.enemyNameRefresh = false;
-  }
-  for (const sprite of this._enemySprites) {
-    if (sprite._enemy && EnemyNamePosition >= 0)
-    sprite.updateEnemyName();
-  }
-};
-
-const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
-Spriteset_Battle.prototype.createLowerLayer = function() {
-  _Spriteset_Battle_createLowerLayer.call(this);
-  this.createEnemyName();
-};
-
-Spriteset_Battle.prototype.createEnemyName = function() {
-  if (EnemyNamePosition >= 0) {
-    namePositionList = getEnemyNamePosition($gameTroop.troop());
-    this.setEnemyNamePosition();
-    for (const sprites of this._enemySprites) {
-      this.enemyName(sprites);
-    }
-  }
-};
-
-Spriteset_Battle.prototype.enemyName = function(sprites) {
-  sprites.enemyName();
-};
-
-Spriteset_Battle.prototype.setEnemyNamePosition = function() {
-  for (const data of namePositionList) {
-    const enemy = $gameTroop.members()[data[0] - 1];
-    if (enemy) {
-      enemy.setEnemyNamePosition(data[1], data[2]);
-    }
-  }
-};
-
-function Sprite_ButlerName() {
-  this.initialize(...arguments);
-}
-
-Sprite_ButlerName.prototype = Object.create(Sprite_Name.prototype);
-Sprite_ButlerName.prototype.constructor = Sprite_ButlerName;
-
-Sprite_ButlerName.prototype.initialize = function() {
-  Sprite_Name.prototype.initialize.call(this);
-  this.enemySpriteId = -1;
-};
-
-Sprite_ButlerName.prototype.fontSize = function() {
-  return $gameSystem.mainFontSize() + Name_FontSize;
-};
-
-Sprite_ButlerName.prototype.redraw = function() {
-  const name = this.name();
-  const width = this.bitmapWidth();
-  const height = this.bitmapHeight();
-  this.setupFont();
-  this.bitmap.clear();
-  this.bitmap.drawText(name, 0, 0, width, height, "center");
-};
-
-const _Sprite_ButlerName_updateBitmap = Sprite_ButlerName.prototype.updateBitmap;
-Sprite_ButlerName.prototype.updateBitmap = function() {
-  _Sprite_ButlerName_updateBitmap.call(this);
-  this.butlerNameVisible();
-};
-
-Sprite_ButlerName.prototype.butlerNameVisible = function() {
-  this.visible = this.butlerNameVisibleInSelect();
-};
-
-Sprite_ButlerName.prototype.butlerNameVisibleInSelect = function() {
-  if (EnemyNameVisible === 1) {
-    return this._battler.isSelected();
-  }
-  return true;
-};
-
-
-const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
-Game_Enemy.prototype.initMembers = function() {
-  _Game_Enemy_initMembers.call(this);
-  this._butlerNamePositionX = 0;
-  this._butlerNamePositionY = 0;
-};
-
-Game_Enemy.prototype.setEnemyNamePosition = function(x, y){
-  this._butlerNamePositionX = x;
-  this._butlerNamePositionY = y;
-};
-
-Game_Enemy.prototype.getNamePositionX = function(){
-  return this._butlerNamePositionX;
-};
-
-Game_Enemy.prototype.getNamePositionY = function(){
-  return this._butlerNamePositionY;
-};
+//let namePositionList = [];
 
 function getEnemyNamePosition(troop) {
   const pages = troop.pages[0];
@@ -341,4 +147,137 @@ function getEnemyNamePosition(troop) {
   });
   return list;
 };
+
+const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
+Sprite_Enemy.prototype.initMembers = function() {
+  _Sprite_Enemy_initMembers.call(this);
+};
+
+const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
+Sprite_Enemy.prototype.update = function() {
+  _Sprite_Enemy_update.call(this);
+  this.updateEnemyName();
+};
+
+Sprite_Enemy.prototype.updateEnemyName = function() {
+  if (EnemyNamePosition < 0) {
+    return;
+  }
+  if (this.battlerOverlay && !this.nameSprite) {
+    this.createEnemyName();
+  }
+  if (this.nameSprite) {
+    const enemy = this._enemy.enemy();
+    const x = (enemy.meta.EnemyNameX ? Number(enemy.meta.EnemyNameX) : 0) + Name_X + this._enemy.getNamePositionX();
+    const y = (enemy.meta.EnemyNameY ? Number(enemy.meta.EnemyNameY) : 0) + Name_Y + this._enemy.getNamePositionY();
+    this.nameSprite.x = x;
+    this.nameSprite.y = y - this.getButlerNamePosition();
+  }
+};
+
+Sprite_Enemy.prototype.getButlerNamePosition = function() {
+  const scale = this.getButlerOverlayConflict();
+  if (EnemyNamePosition === 0) {
+    return this.getButlerOverlayHeight() * scale;
+  } else if (EnemyNamePosition === 2) {
+    return Math.floor((this.getButlerOverlayHeight() * scale) / 2);
+  } else {
+    return 0;
+  }
+};
+
+Sprite_Enemy.prototype.createEnemyName = function() {
+  const sprite = new Sprite_ButlerName();
+  this.battlerOverlay.addChild(sprite);
+  this.nameSprite = sprite;
+  sprite.setup(this._enemy);
+  sprite.show();
+  sprite.move(0, 0);
+  $gameTemp.enemyNameRefresh = true;
+};
+
+
+function Sprite_ButlerName() {
+  this.initialize(...arguments);
+}
+
+Sprite_ButlerName.prototype = Object.create(Sprite_Name.prototype);
+Sprite_ButlerName.prototype.constructor = Sprite_ButlerName;
+
+Sprite_ButlerName.prototype.initialize = function() {
+  Sprite_Name.prototype.initialize.call(this);
+  this.anchor.x = 0.5;
+  this.anchor.y = 1;
+};
+
+Sprite_ButlerName.prototype.fontSize = function() {
+  return $gameSystem.mainFontSize() + Name_FontSize;
+};
+
+Sprite_ButlerName.prototype.redraw = function() {
+  const name = this.name();
+  const width = this.bitmapWidth();
+  const height = this.bitmapHeight();
+  this.setupFont();
+  this.bitmap.clear();
+  this.bitmap.drawText(name, 0, 0, width, height, "center");
+};
+
+Sprite_ButlerName.prototype.butlerNameVisible = function() {
+  this.visible = this.butlerNameVisibleInSelect();
+};
+
+Sprite_ButlerName.prototype.butlerNameVisibleInSelect = function() {
+  if (EnemyNameVisible === 1) {
+    return this._battler.isSelected();
+  }
+  return true;
+};
+
+Sprite_ButlerName.prototype.update = function() {
+  Sprite.prototype.update.call(this);
+  this.butlerNameVisible();
+};
+
+
+const _Spriteset_Battle_updateButlerOverlay = Spriteset_Battle.prototype.updateButlerOverlay;
+Spriteset_Battle.prototype.updateButlerOverlay = function() {
+  _Spriteset_Battle_updateButlerOverlay.call(this);
+  if ($gameTemp.enemyNameRefresh) {
+    this.setEnemyNamePosition();
+    $gameTemp.enemyNameRefresh = false;
+  }
+};
+
+Spriteset_Battle.prototype.setEnemyNamePosition = function() {
+  const namePositionList = getEnemyNamePosition($gameTroop.troop());
+  for (const data of namePositionList) {
+    const enemy = $gameTroop.members()[data[0] - 1];
+    if (enemy) {
+      enemy.setEnemyNamePosition(data[1], data[2]);
+    }
+  }
+};
+
+
+const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
+Game_Enemy.prototype.initMembers = function() {
+  _Game_Enemy_initMembers.call(this);
+  this._butlerNamePositionX = 0;
+  this._butlerNamePositionY = 0;
+};
+
+Game_Enemy.prototype.setEnemyNamePosition = function(x, y) {
+  this._butlerNamePositionX = x;
+  this._butlerNamePositionY = y;
+};
+
+Game_Enemy.prototype.getNamePositionX = function() {
+  return this._butlerNamePositionX;
+};
+
+Game_Enemy.prototype.getNamePositionY = function() {
+  return this._butlerNamePositionY;
+};
+
 })();

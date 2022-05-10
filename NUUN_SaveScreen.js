@@ -11,12 +11,13 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.8.2
+ * @version 1.8.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * セーブ画面にいくつかの項目を追加します。
+ * 
  * 顔グラ、サイドビューアクターを表示できます。
  * キャラクター上にレベルを表示できます。
  * 現在の章などの文字を表示可能。
@@ -39,6 +40,9 @@
  * 例
  * リスト1番ならinfo.orgParam[0]
  * 
+ * オートセーブ時のスナップショット
+ * オートセーブ時のスナップショットは戦闘開始直前のマップ、移動直前のマップが撮影されます。
+ * 
  * スナップショットを表示するとセーブ容量が大きります。
  * アツマールで公開する場合は最大セーブ数を減らすこと推奨いたします。
  * 
@@ -49,6 +53,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/11 Ver.1.8.3
+ * 戦闘終了時にオートセーブがされない問題を修正。
+ * マップ移動時、戦闘終了時に、オートセーブでのマップショットが黒い画像になる問題を修正。
  * 2022/1/5 Ver.1.8.2
  * 名称が取得できない問題を修正。
  * オリジナルパラメータの設定方法を変更。
@@ -119,6 +126,10 @@
  * @desc オートセーブ時のスクリーンショットを許可します。
  * @type boolean
  * @default true
+ * 
+ * @command SnapShot
+ * @desc 次回セーブ時のスナップショットを撮影します。
+ * @text スナップショット撮影
  * 
  * @command SetAnyName
  * @desc ファイル名横に表示される文字列を設定します。取得パラメータはinfo.AnyNameで取得できます。
@@ -532,6 +543,7 @@ Imported.NUUN_SaveScreen = true;
   const ContentsList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsList'])) : null) || [];
   const BackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])[0]) : null;
   const ContentsBackGroundImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsBackGroundImg'])[0]) : null;
+  let saveInfoSnapShot = null;
 
   const pluginName = "NUUN_SaveScreen";
   PluginManager.registerCommand(pluginName, 'ChangeBackground', args => {
@@ -545,10 +557,11 @@ Imported.NUUN_SaveScreen = true;
     SceneManager.snapSaveBitmap(eval(args.OnSaveSnap));
     SceneManager._scene.executeAutosave();
   });
-
+  
   PluginManager.registerCommand(pluginName, 'SetAnyName', args => {
     $gameSystem.saveAnyName = args.AnyName;
   });
+
 
   const _DataManager_loadSavefileImages = DataManager.loadSavefileImages;
   DataManager.loadSavefileImages = function(info) {
@@ -568,7 +581,7 @@ Imported.NUUN_SaveScreen = true;
     const info = _DataManager_makeSavefileInfo.call(this);
     info.svActor = $gameParty.svActorForSavefile();
     info.AnyName = $gameSystem.saveAnyName ? $gameSystem.saveAnyName : $gameVariables.value(AnyNameVariable);
-    info.mapname = $gameMap.displayName();
+    info.mapname = !!$dataMap ? $gameMap.displayName() : '';
     info.gold = $gameParty._gold;
     info.levelActor = $gameParty.actorLevelForSavefile();
     info.background = $gameSystem.saveBuckgroundImg;
@@ -577,6 +590,7 @@ Imported.NUUN_SaveScreen = true;
       DataManager.urlBitmapData();
       info.snap = this.urlBitmap;
     } else {
+      saveInfoSnapShot = null;
       info.snap = null;
     }
     return info;
@@ -632,7 +646,12 @@ Imported.NUUN_SaveScreen = true;
         this._snapBitmap.destroy();
       }
       this._snapBitmap = this.snap();
+      SceneManager.snapAutoSave();
     }
+  };
+
+  SceneManager.snapAutoSave = function() {
+    this._snapAutoSave = true;
   };
 
   SceneManager.getSnapBitmap = function() {
@@ -642,11 +661,25 @@ Imported.NUUN_SaveScreen = true;
   SceneManager.snapSaveBackground = function() {
     $gameSystem.onSnap = InfoSaveSnap;
     if (InfoSaveSnap) {
+      if (this._snapAutoSave) {
+        this._snapAutoSave = false;
+        return;
+      }
       if (this._snapBitmap) {
         this._snapBitmap.destroy();
       }
       this._snapBitmap = this._backgroundBitmap;
     }
+  };
+
+  const _SceneManager_push = SceneManager.push;
+  SceneManager.push = function(sceneClass) {
+    if (sceneClass.name === 'Scene_Battle') {
+      if ($gameSystem.isAutosaveEnabled()) {
+        SceneManager.snapSaveBitmap(true);
+      }
+    }
+    _SceneManager_push.call(this, sceneClass);
   };
 
   const _SceneManager_snapForBackground = SceneManager.snapForBackground;
@@ -672,6 +705,18 @@ Imported.NUUN_SaveScreen = true;
   DataManager.maxSavefiles = function() {
     return MaxSave ? MaxSave : _DataManager_maxSavefiles.call(this);
   };
+
+
+  const _Scene_Map_updateTransferPlayer = Scene_Map.prototype.updateTransferPlayer;
+  Scene_Map.prototype.updateTransferPlayer = function() {
+    if ($gamePlayer.isTransferring()) {
+      if ($gameSystem.isAutosaveEnabled()) {
+        SceneManager.snapSaveBitmap(true);
+      }
+    }
+    _Scene_Map_updateTransferPlayer.call(this);
+  };
+  
 
   const _Scene_File_create = Scene_File.prototype.create;
   Scene_File.prototype.create = function() {

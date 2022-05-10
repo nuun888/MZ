@@ -174,7 +174,7 @@ const _Spriteset_Battle_updateButlerOverlay = Spriteset_Battle.prototype.updateB
 Spriteset_Battle.prototype.updateButlerOverlay = function() {
   _Spriteset_Battle_updateButlerOverlay.call(this);
   if ($gameTemp.enemyStateRefresh) {
-    this.setEnemyNamePosition();
+    this.setStateIconPosition();
     $gameTemp.enemyStateRefresh = false;
   }
 };

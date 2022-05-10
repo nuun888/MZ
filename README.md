@@ -57,7 +57,7 @@
 | ┣  [サポートアクター呼び出し](https://github.com/nuun888/MZ/blob/master/README/CallSupportActor.md) | [NUUN_CallSupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CallSupportActor.js) |  | 1.0.2 |
 | ┗  召喚アクター |  |  |
 | [経験値計算式変更](https://github.com/nuun888/MZ/blob/master/NUUN_EXPFormula.md) | [NUUN_EXPFormula](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EXPFormula.js) |  |  | 1.0.0 |
-| [サイドビューアクターステートアイコン](https://github.com/nuun888/MZ/blob/master/README/SVActorStateIcon.md) | [NUUN_EXPFormula](https://raw.githubusercontent.com/nuun888/MZ/master/SVActorStateIcon.js) | オ | 1.0.0 |
+| [サイドビューアクターステートアイコン](https://github.com/nuun888/MZ/blob/master/README/SVActorStateIcon.md) | [NUUN_SVActorStateIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SVActorStateIcon.js) | オ | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

@@ -2,7 +2,7 @@
 # Ver.1.3.0  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)  
  
- ## 必須、前提プラグイン
+## 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
 
 敵バトラー上にモンスターの名前を表示します。

@@ -9,14 +9,14 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  エネミー名前表示
+ * @plugindesc  敵名前表示
  * @author NUUN
  * @version 1.3.0
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
  * @help
- * モンスターの敵名を表示します。
+ * 敵バトラー上にモンスターの名前を表示します。
  * 
  * 敵キャラのメモ欄
  * <EnemyNameX:[position]> モンスター名のX座標を調整します。（相対座標）

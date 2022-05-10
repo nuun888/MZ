@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.1.4
+ * @version 3.1.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/10 Ver.3.1.5
+ * アクター画像にエフェクト（アニメーション）を適用するように修正。
  * 2022/5/4 Ver.3.1.4
  * 攻撃時のスキルをなしに設定したときに画像が切り替わらない問題を修正。
  * 2022/5/3 Ver.3.1.3
@@ -123,6 +125,7 @@ BattleManager.initMembers = function() {
   _BattleManager_initMembers.call(this);
   this.actorStatusWindowOpacity = false;
   this.actorStatusWindowOpacityValue = false;
+  this.battlerSprite = [];
 };
 
 BattleManager.statusWindowOpacity = function(flag, opacity) {
@@ -1601,6 +1604,7 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor) {
       const sy = (actorImgData.Img_SY || 0) * oriScale;
       sprite.setFrame(sx, sy, sw, sh);
     }
+    BattleManager.battlerSprite[index] = sprite;
   }
 };
 
@@ -1631,6 +1635,7 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
   sprite._rectWidth = rect.width;
   sprite._rectHeight = rect.height;
   sprite.show();
+  BattleManager.battlerSprite[index] = sprite;
 };
 
 Window_BattleActorImges.prototype.placeStateIcon = function(actor, x, y) {
@@ -1795,6 +1800,7 @@ const _Sprite_Actor_initMembers = Sprite_Actor.prototype.initMembers;
   Sprite_Actor.prototype.initMembers = function() {
     _Sprite_Actor_initMembers.call(this);
     this.viewFrontActor = (!$gameSystem.isSideView() && params.ActorEffectShow);
+    this.bsSprite = null;
 };
 
 const _Sprite_Actor_updateVisibility = Sprite_Actor.prototype.updateVisibility;
@@ -1827,8 +1833,12 @@ Sprite_Actor.prototype.actorHomeRefresh = function(index) {
 const _Sprite_Actor_setBattler = Sprite_Actor.prototype.setBattler;
 Sprite_Actor.prototype.setBattler = function(battler) {
   _Sprite_Actor_setBattler.call(this, battler);
+  const index = battler ? battler.index() : -1;
   if (battler && battler === this._actor && this.viewFrontActor && $gameTemp.isBattleStyleRequested() && params.ActorEffectShow) {
-    this.setActorHome(battler.index());
+    this.setActorHome(index);
+  }
+  if (battler) {
+    this.bsSprite = BattleManager.battlerSprite[index];
   }
   $gameTemp.setBattleStyleRefresh(false);
 };
@@ -1871,6 +1881,19 @@ Sprite_Actor.prototype.damageOffsetY = function() {
   return (this.viewFrontActor ? 0 : 0) + _Sprite_Actor_damageOffsetY.call(this) + params.ActorDamage_Y;
 };
 
+
+const _Sprite_Animation_updateFlash = Sprite_Animation.prototype.updateFlash;
+Sprite_Animation.prototype.updateFlash = function() {
+  const t = this._targets;
+  if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+    this._targets = this._targets.map(sprite => sprite.bsSprite);
+  }
+  _Sprite_Animation_updateFlash.call(this);
+  this._targets = t;
+};
+
+
+
 //Sprite_ActorImges
 function Sprite_ActorImges() {
   this.initialize(...arguments);
@@ -1905,6 +1928,7 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._durationOpacity = 0;
   this._startUpdate = true;
   this._zoomEffect = false;
+  
 };
 
 Sprite_ActorImges.prototype.setup = function(battler, data, index) {

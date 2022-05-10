@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.1.5
+ * @version 3.1.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/10 Ver.3.1.6
+ * MVアニメーションを再生したときにエラーが起きる問題を修正。
  * 2022/5/10 Ver.3.1.5
  * アクター画像にエフェクト（アニメーション）を適用するように修正。
  * 2022/5/4 Ver.3.1.4
@@ -1892,13 +1894,13 @@ Sprite_Animation.prototype.updateFlash = function() {
   this._targets = t;
 };
 
-const _Sprite_Animation_updateFlashMV = Sprite_Animation.prototype.updateFlashMV;
+const _Sprite_AnimationMV_updateFlashMV = Sprite_AnimationMV.prototype.updateFlash;
 Sprite_AnimationMV.prototype.updateFlash = function() {
   const t = this._targets;
   if (!$gameSystem.isSideView() && params.ActorEffectShow) {
     this._targets = this._targets.map(sprite => sprite._actor ? sprite.bsSprite : sprite);
   }
-  _Sprite_Animation_updateFlashMV.call(this);
+  _Sprite_AnimationMV_updateFlashMV.call(this);
   this._targets = t;
 };
 

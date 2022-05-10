@@ -1,10 +1,14 @@
 # [敵ステート表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyStateIconEX.js)
-# Ver.1.0.1
+# Ver.1.1.0
+ [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyStateIconEX.js)  
+ 
+ ## 必須、前提プラグイン
+[バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
+
 
 敵のステートの表示を拡張、変更します。  
 一部のプラグイン上で敵グラフィックの色調を変更したときにステートアイコンの色調も変わることを防ぎます。  
 またモンスターと重なっても表示が他のモンスターの背後に表示されることはありません。  
-※このプラグインは共通処理Ver.1.3.2以降が必要です。
 
 ![画像](img/NUUN_EnemyStateIconEX1.png)  
 
@@ -22,6 +26,8 @@
 [id]は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。  
 
 ## 更新履歴
+022/5/10 Ver.1.1.0  
+バトラーの表示処理の定義大幅変更に関する定義変更。  
 2022/3/27 Ver.1.0.1  
 ステートの表示をなしに設定してもアイコンが表示されてしまう問題を修正。  
 戦闘開始時にエラーが起きる問題を修正。  

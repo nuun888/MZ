@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# Ver.1.8.2
+# Ver.1.8.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -41,6 +41,9 @@ info.orgParam[id - 1]
 リスト1番ならinfo.orgParam[0]  
 
 ## 更新履歴
+2022/5/11 Ver.1.8.3  
+戦闘終了時にオートセーブがされない問題を修正。  
+マップ移動時、戦闘終了時に、オートセーブでのマップショットが黒い画像になる問題を修正。  
 2022/1/5 Ver.1.8.2  
 名称が取得できない問題を修正。  
 オリジナルパラメータの設定方法を変更。  

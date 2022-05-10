@@ -958,7 +958,7 @@ Scene_Menu.prototype.isRightInputMode = function() {
 Scene_Menu.prototype.commandWindowRect = function() {
     const headerHeight = !CommandTop && InfoHeaderShow ? this.infoAreaHeight(InfoHeaderRows) : 0;
     const ww = this.mainCommandWidth();
-    const wh = (!CommandTop && InfoSideShow ? Math.min(this.mainAreaHeight(), this.mainAreaHeight() - this.infoAreaHeight(InfoSideRows)) : this.mainAreaHeight()) - headerHeight;
+    const wh = (InfoSideShow ? Math.min(this.mainAreaHeight(), this.mainAreaHeight() - this.infoAreaHeight(InfoSideRows)) : this.mainAreaHeight()) - headerHeight;
     const wx = this.isRightInputMode() ? Graphics.boxWidth - ww : 0;
     const wy = this.mainAreaTop() + headerHeight;
     return new Rectangle(wx, wy, ww, wh);

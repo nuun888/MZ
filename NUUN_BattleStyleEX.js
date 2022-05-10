@@ -1886,12 +1886,21 @@ const _Sprite_Animation_updateFlash = Sprite_Animation.prototype.updateFlash;
 Sprite_Animation.prototype.updateFlash = function() {
   const t = this._targets;
   if (!$gameSystem.isSideView() && params.ActorEffectShow) {
-    this._targets = this._targets.map(sprite => sprite.bsSprite);
+    this._targets = this._targets.map(sprite => sprite._actor ? sprite.bsSprite : sprite);
   }
   _Sprite_Animation_updateFlash.call(this);
   this._targets = t;
 };
 
+const _Sprite_Animation_updateFlashMV = Sprite_Animation.prototype.updateFlashMV;
+Sprite_AnimationMV.prototype.updateFlash = function() {
+  const t = this._targets;
+  if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+    this._targets = this._targets.map(sprite => sprite._actor ? sprite.bsSprite : sprite);
+  }
+  _Sprite_Animation_updateFlashMV.call(this);
+  this._targets = t;
+};
 
 
 //Sprite_ActorImges

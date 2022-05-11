@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.2.0
+### Ver.3.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.1.0  
@@ -83,6 +83,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2022/5/11 Ver.3.2.1  
+フロントビュー時のアクターのアニメーションをOFF、サイドビューバトル時でもステートアニメーションが適用してしまう問題を修正。  
 2022/5/11 Ver.3.2.0  
 アクター画像にステート画像を表示する機能を追加。  
 パーティ、アクターコマンドの表示位置を指定できる機能を追加。  

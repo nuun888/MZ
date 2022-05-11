@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ１
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/5/11 Ver.1.3.1
+ * インフォウィンドウにフリーテキストを追加。
  * 2022/5/11 Ver.1.3.0
  * メニューコマンドの位置を指定できる機能を追加。
  * メニューコマンドの上にフッターを挟むかを選択できる機能を追加。
@@ -633,6 +635,8 @@
  * @value 5
  * @option メニューコマンド説明(1)(2)(3)(4)(5)(7)(8)
  * @value 6
+ * @option フリーテキスト(1)(2)(3)(4)(12)
+ * @value 10
  * @default 0
  * 
  * @param X_Position
@@ -726,6 +730,12 @@
  * @default 0
  * @max 999999
  * @min 0
+ * 
+ * @param Text
+ * @desc フリーテキストのテキストを記入します。(制御文字使用可能)
+ * @text フリーテキストのテキスト(12)
+ * @type multiline_string
+ * @default
  *
  */
 /*~struct~actorImgList:
@@ -1665,6 +1675,9 @@ Window_InfoMenu.prototype.dateDisplay = function(data, x, y, width) {
     case 6:
         this.drawCommandExplanation(data, x, y, width);
         break;
+    case 10:
+        this.drawFreeText(data, x, y, width);
+        break;
       default:
         break;
     }
@@ -1731,6 +1744,10 @@ Window_InfoMenu.prototype.drawParam = function(data, x, y, width) {
 
 Window_InfoMenu.prototype.drawCommandExplanation = function(data, x, y, width) {
     this.drawTextEx(this._text, x, y, width);
+};
+
+Window_InfoMenu.prototype.drawFreeText = function(data, x, y, width) {
+    this.drawTextEx(data.Text, x, y, width);
 };
 
 Window_InfoMenu.prototype.drawName = function(data, x, y, width) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ２
  * @author NUUN
- * @version 1.2.1
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,9 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/5/11 Ver.1.3.0
+ * ステータス欄の各項目にフォントサイズを設定できる機能を追加。
+ * インフォウィンドウにフリーテキストを追加。
  * 2022/4/10 Ver.1.2.1
  * 誤字修正。
  * 2022/4/10 Ver.1.2.0
@@ -463,17 +466,17 @@
  * @type select
  * @option なし
  * @value 0
- * @option アクター名(1)(3)(4)(5)(6)(7)(9)
+ * @option アクター名(1)(3)(4)(5)(6)(7)(9)(13)
  * @value 1
- * @option 二つ名(1)(3)(4)(5)(6)(7)(9)
+ * @option 二つ名(1)(3)(4)(5)(6)(7)(9)(13)
  * @value 2
- * @option 職業(1)(3)(4)(5)(6)(7)(9)
+ * @option 職業(1)(3)(4)(5)(6)(7)(9)(13)
  * @value 3
- * @option レベル(1)(3)(4)(5)(6)(7)
+ * @option レベル(1)(3)(4)(5)(6)(7)(13)
  * @value 4
  * @option ステート(3)(4)(5)(6)(7)
  * @value 5
- * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 6
  * @option ＨＰ(3)(4)(5)(6)
  * @value 11
@@ -481,59 +484,59 @@
  * @value 12
  * @option ＴＰ(3)(4)(5)(6)
  * @value 13
- * @option 経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @option 経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 15
- * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 22
- * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 23
- * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 24
- * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 25
- * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 26
- * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 27
- * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 30
- * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 31
- * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 32
- * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 33
- * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 34
- * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 35
- * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 36
- * @option HP再生率(1)(2)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option HP再生率(1)(2)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 37
- * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 38
- * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 39
- * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 40
- * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 41
- * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 42
- * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 43
- * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 44
- * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 45
- * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 46
- * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 47
- * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 48
- * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)
+ * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 49
  * @option ライン(1)(2)(3)(4)(5)(6)(7)
  * @value 1000
@@ -632,6 +635,13 @@
  * @default 0
  * @min 0
  * @max 99
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(13)
+ * @type number
+ * @default 0
+ * @min -99
  *
  */
 /*~struct~InfoListData:
@@ -654,6 +664,8 @@
  * @value 5
  * @option メニューコマンド説明(1)(2)(3)(4)(5)(7)(8)
  * @value 6
+ * @option フリーテキスト(1)(2)(3)(4)(12)
+ * @value 10
  * @default 0
  * 
  * @param X_Position
@@ -748,6 +760,11 @@
  * @max 999999
  * @min 0
  * 
+ * @param Text
+ * @desc フリーテキストのテキストを記入します。(制御文字使用可能)
+ * @text フリーテキストのテキスト(12)
+ * @type multiline_string
+ * @default
  *
  */
 /*~struct~actorImgList:
@@ -1543,16 +1560,19 @@ Window_MenuStatus.prototype.paramNameData = function(data, actor, params) {
 Window_MenuStatus.prototype.drawParams = function(data, param, x, y, width, actor) {
     this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = this.paramNameData(data, actor, param - 20);
+    this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x, y, textWidth);
     this.resetTextColor();
     const textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20)) + (data.paramUnit ? String(data.paramUnit) : "");
     this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+    this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_MenuStatus.prototype.drawXParams = function(data, param, x, y, width, actor) {
     this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = this.paramNameData(data, actor, param - 20);
+    this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x, y, textWidth);
     this.resetTextColor();
@@ -1560,11 +1580,13 @@ Window_MenuStatus.prototype.drawXParams = function(data, param, x, y, width, act
     textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, DecimalMode);
     textParam += (data.paramUnit ? String(data.paramUnit) : "");
     this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+    this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_MenuStatus.prototype.drawSParams = function(data, param, x, y, width, actor) {
     this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = this.paramNameData(data, actor, param - 20);
+    this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x, y, textWidth);
     this.resetTextColor();
@@ -1572,28 +1594,37 @@ Window_MenuStatus.prototype.drawSParams = function(data, param, x, y, width, act
     textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, DecimalMode);
     textParam += (data.paramUnit ? String(data.paramUnit) : "");
     this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+    this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_MenuStatus.prototype.drawActorName = function(data, x, y, width, actor) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
     this.changeTextColor(ColorManager.hpColor(actor));
     this.drawText(actor.name(), x, y, width, data.Align);
+    this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_MenuStatus.prototype.drawActorClass = function(data, x, y, width, actor) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
     this.resetTextColor();
     this.drawText(actor.currentClass().name, x, y, width, data.Align);
+    this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_MenuStatus.prototype.drawActorNickname = function(data, x, y, width, actor) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
     this.resetTextColor();
     this.drawText(actor.nickname(), x, y, width, data.Align);
+    this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_MenuStatus.prototype.drawActorLevel = function(data, x, y, width, actor) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(TextManager.levelA, x, y, 48);
     this.resetTextColor();
     this.drawText(actor.level, x + 60, y, width - 60, "right");
+    this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_MenuStatus.prototype.drawActorIcons = function(x, y, width, actor) {
@@ -1607,6 +1638,7 @@ Window_MenuStatus.prototype.drawActorIcons = function(x, y, width, actor) {
 };
 
 Window_InfoMenu.prototype.drawParam = function(data, x, y, width, actor) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
     this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
@@ -1615,6 +1647,7 @@ Window_InfoMenu.prototype.drawParam = function(data, x, y, width, actor) {
     if (data.DetaEval) {
         this.drawText(eval(data.DetaEval), x + textWidth + 8, y, width - (textWidth + 8), data.Align);
     }
+    this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
 Window_MenuStatus.prototype.systemWidth = function(swidth, width) {
@@ -1704,6 +1737,9 @@ Window_InfoMenu.prototype.dateDisplay = function(data, x, y, width) {
     case 6:
         this.drawCommandExplanation(data, x, y, width);
         break;
+    case 10:
+        this.drawFreeText(data, x, y, width);
+        break;
       default:
         break;
     }
@@ -1770,6 +1806,10 @@ Window_InfoMenu.prototype.drawParam = function(data, x, y, width) {
 
 Window_InfoMenu.prototype.drawCommandExplanation = function(data, x, y, width) {
     this.drawTextEx(this._text, x, y, width);
+};
+
+Window_InfoMenu.prototype.drawFreeText = function(data, x, y, width) {
+    this.drawTextEx(data.Text, x, y, width);
 };
 
 Window_InfoMenu.prototype.drawName = function(data, x, y, width) {

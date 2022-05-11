@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -45,6 +45,9 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/5/11 Ver.1.2.0
+ * アクター画像にステート画像を表示する機能を追加。
+ * パーティ、アクターコマンドの表示位置を指定できる機能を追加。
  * 2022/5/2 Ver.1.1.1
  * エフェクトのプロパティを中間（アクター画像とステータスの間）か最前面に表示する機能を追加。
  * 2022/4/10 Ver.1.1.0
@@ -872,6 +875,28 @@
  * @type boolean
  * @default true
  * @parent ActorImgEffect
+ * 
+ * @param ActorStateAnimation
+ * @text アクターグラフィックステートアニメーション設定
+ * @default ////////////////////////////////
+ * 
+ * @param ActorState_X
+ * @desc アクター画像のステートアニメーションのX座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text ステートアニメーションX座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorStateAnimation
+ * 
+ * @param ActorState_Y
+ * @desc アクター画像のステートアニメーションのY座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text ステートアニメーションY座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorStateAnimation
  * 
  * @param EnemyAnimation
  * @text 敵キャラアニメーション設定
@@ -1934,6 +1959,8 @@ params.ActorEffect_Y = Number(parameters['ActorEffect_Y'] || 0);
 params.ActorDamage_X = Number(parameters['ActorDamage_X'] || 0);
 params.ActorDamage_Y = Number(parameters['ActorDamage_Y'] || 0);
 params.EffectPriority = eval(parameters['EffectPriority']) || 'middle';
+params.ActorState_X = Number(parameters['ActorState_X'] || 0);
+params.ActorState_Y = Number(parameters['ActorState_Y'] || 0);
 
 params.DamageImgFrame = Number(parameters['DamageImgFrame'] || 30);
 params.ActorShakeFlame = Number(parameters['ActorShakeFlame'] || 36);

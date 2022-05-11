@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.1.6
+ * @version 3.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/11 Ver.3.2.0
+ * アクター画像にステート画像を表示する機能を追加。
+ * パーティ、アクターコマンドの表示位置を指定できる機能を追加。
  * 2022/5/10 Ver.3.1.6
  * MVアニメーションを再生したときにエラーが起きる問題を修正。
  * 2022/5/10 Ver.3.1.5
@@ -597,6 +600,12 @@ Scene_Base.prototype.createWindowLayer = function() {
   _Scene_Base_createWindowLayer.call(this);
 };
 
+if (params.CommandPosition !== 'default') {
+  Scene_Battle.prototype.isRightInputMode = function() {
+    return params.CommandPosition === 'right';
+  };
+}
+
 Scene_Battle.prototype.createHud = function() {
     const rect = this.statusWindowRect();
     this._statusWindow = new Window_BattleStatus(rect);
@@ -765,7 +774,7 @@ Scene_Battle.prototype.createMessageWindow = function() {
 };
 
 Scene_Battle.prototype.enemyWindowRect = function() {//再定義
-  const wx = params.EnemyWindow_X + (params.EnemyWindowMode ? 0 : (this._statusWindow.x - Graphics.height) / 2);
+  const wx = params.EnemyWindow_X + (params.EnemyWindowMode ? this._statusWindow.x : (this._statusWindow.x - Graphics.width) / 2);
   const ww = this.enemyWindowWidth();
   const wh = this.enemyWindowAreaHeight();
   const wy = (params.EnemyWindowMode ? Graphics.boxHeight - wh : 0) + params.EnemyWindow_Y;
@@ -811,7 +820,7 @@ Scene_Battle.prototype.partyCommandWindowRect = function() {
 Scene_Battle.prototype.statusWindowRect = function() {
     let ww = this.getActorWindowWidth();
     let wh = this.getActorWindowHeight();
-    let wx = this.getActorWindowX();
+    let wx = this.getActorWindowX() + (this.isRightInputMode() ? 0 : Graphics.boxWidth - ww);
     let wy = this.getActorWindowY();
     return new Rectangle(wx, wy, ww, wh);
 };
@@ -950,7 +959,7 @@ Scene_Battle.prototype.statusWindowX = function() {//再定義
     if (this.isAnyInputWindowActive()) {
         return this.statusWindowRect().x;
     } else {
-        return this.statusWindowRect().x + this._partyCommandWindow.width / 2;
+        return this._partyCommandWindow.width / 2;
     }
 };
 
@@ -1939,7 +1948,12 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._durationOpacity = 0;
   this._startUpdate = true;
   this._zoomEffect = false;
-  
+  this.createStateSprite();
+};
+
+Sprite_ActorImges.prototype.createStateSprite = function() {
+  this._stateSprite = new Sprite_StateOverlay();
+  this.addChild(this._stateSprite);
 };
 
 Sprite_ActorImges.prototype.setup = function(battler, data, index) {
@@ -1948,6 +1962,8 @@ Sprite_ActorImges.prototype.setup = function(battler, data, index) {
   this._imgIndex = index;
   battler.resetBattleStyleImgId();
   this.updateActorGraphic();
+  this._stateSprite.setup(battler);
+  this._stateSprite.move(params.ActorState_X, params.ActorState_Y);
 };
 
 Sprite_ActorImges.prototype.setHome = function(x, y) {

@@ -11,11 +11,11 @@
  * @target MZ
  * @plugindesc  バトラーゲージ及びネーム表示疑似3Dバトル併用パッチ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 疑似3Dバトル併用時にモンスターに表示するゲージ及び名前を追従するようにします。
- * このプラグインは疑似3Dバトル（木星ペンギン様）とバトラーHPゲージ、エネミーTPBゲージ、バトラー名前表示併用時に
+ * このプラグインは疑似3Dバトル（木星ペンギン様）とバトラーHPゲージ、エネミーTPBゲージ併用時に
  * ゲージ、エネミー名を追従させるためのプラグインです。
  * 
  * 仕様
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/11 Ver.1.0.2
+ * 敵名前表示の仕様変更に関する定義変更。
  * 2021/6/15 Ver.1.0.1
  * 疑似3DバトルVer.1.1に対応。
  * 2021/6/15 Ver.1.0.0
@@ -45,6 +47,9 @@ Spriteset_Battle.prototype.convertSprite3dPlacement = function(sprite) {
   sprite.Pseudo3DBattleY = sprite.y;
   sprite.Pseudo3DScaleX = sprite.scale.x;
   sprite.Pseudo3DScaleY = sprite.scale.y;
+  if (sprite.battlerOverlay) {
+    sprite.battlerOverlay.updatePosition();
+  }
 };
 
 
@@ -68,18 +73,6 @@ Sprite_Enemy.prototype.updateTpbGauge = function() {
   this.x = this.Pseudo3DBattleX;
   this.y = this.Pseudo3DBattleY + (this.getButlerTpbPosition() === 0 ? (height - height * this.Pseudo3DScaleY) : 0);
   _Sprite_Enemy_updateTpbGauge.call(this);
-  this.x = x;
-  this.y = y;
-};
-
-const _Sprite_Enemy_updateEnemyName = Sprite_Enemy.prototype.updateEnemyName;
-Sprite_Enemy.prototype.updateEnemyName = function() {
-  const height = this.sv_EnemyHeight();
-  const x = this.x;
-  const y = this.y;
-  this.x = this.Pseudo3DBattleX;
-  this.y = this.Pseudo3DBattleY + (this.getButlerNamePosition() === 0 ? (height - height * this.Pseudo3DScaleY) : 0);
-  _Sprite_Enemy_updateEnemyName.call(this);
   this.x = x;
   this.y = y;
 };

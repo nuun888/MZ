@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.1.14.5
+# Ver.1.14.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 
 ## 必須、前提プラグイン
@@ -36,6 +36,8 @@
 
 ## 更新履歴
 更新履歴
+2022/5/12 Ver.1.14.6  
+レベルアップ画面表示時戦闘結果テキストを空白指定しなときに何も表示しないように変更。  
 2022/5/3 Ver.1.14.5  
 スキル習得一覧とレベルアップ差分表示が重なってしまう問題を修正。  
 2022/5/1 Ver.1.14.4  

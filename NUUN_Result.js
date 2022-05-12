@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.14.5
+ * @version 1.14.6
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -25,10 +25,6 @@
  * レベルアップ画面はレベルアップしたアクターのみ表示されます。
  * 
  * 戦闘勝利後に任意のBGMを再生できます。MEが指定してある場合はME再生終了後に再生されます。
- * 
- * 戦闘終了後に表示されるリザルト画面を遅らせて表示させることが出来ます。
- * BattleManager.processVictory内の処理を分割しているため一部のプラグインで競合を起こす場合があります。
- * 「勝利後リザルト画面遅延フレーム数」の設定値0で機能無効（コアスクリプトと同じ処理）になります。
  * 
  * 仕様
  * ウィンドウ画面のX座標は画面の中央になるよう設定されていますが、Y座標は上よりに表示されるようになっています。Y座標を変更するには「ウィンドウY座標」で設定してください。
@@ -82,6 +78,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/12 Ver.1.14.6
+ * レベルアップ画面表示時戦闘結果テキストを空白指定しなときに何も表示しないように変更。
  * 2022/5/3 Ver.1.14.5
  * スキル習得一覧とレベルアップ差分表示が重なってしまう問題を修正。
  * 2022/5/1 Ver.1.14.4
@@ -440,7 +438,7 @@
  * @value "center"
  * @option 右
  * @value "right"
- * @default 'TextEx'
+ * @default "TextEx"
  * @parent HelpWindowSetting
  * 
  * @param SkinSetting
@@ -1517,7 +1515,7 @@ Scene_Battle.prototype.resultActorImgWindowRect = function() {
   return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_Battle.prototype.createResultHelpWindow = function() {
+Scene_Battle.prototype.createResultHelpWindow = function() {//ResultVisible
   const rect = this.resultHelpWindowRect();
   this._resultHelpWindow = new Window_ResultHelp(rect);
   this._resultHelpWindow.hide();
@@ -2050,7 +2048,7 @@ Window_ResultHelp.prototype.setLavelUpText = function(actor) {
   if (param.LevelUpResultHelpName) {
     text = param.LevelUpResultHelpName.format(actor.name(), actor._level);
   } else {
-    text = 'レベルアップ！'
+    text = ''
   }
   this.setText(text);
 };

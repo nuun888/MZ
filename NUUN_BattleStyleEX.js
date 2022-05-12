@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.2.1
+ * @version 3.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/12 Ver.3.2.2
+ * ステートアニメーションを表示させない機能を追加。
  * 2022/5/11 Ver.3.2.1
  * フロントビュー時のアクターのアニメーションをOFF、サイドビューバトル時でもステートアニメーションが適用してしまう問題を修正。
  * 2022/5/11 Ver.3.2.0
@@ -126,6 +128,11 @@ function loadBackground(img) {
     ImageManager.nuun_LoadPictures(img);
   }
 }
+
+function getStateAnimationShow() {
+  return !$gameSystem.isSideView() && params.ActorEffectShow && params.StateAnimationShow;
+}
+
 
 const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
@@ -1954,7 +1961,7 @@ Sprite_ActorImges.prototype.initMembers = function() {
 };
 
 Sprite_ActorImges.prototype.createStateSprite = function() {
-  if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+  if (getStateAnimationShow()) {
     this._stateSprite = new Sprite_StateOverlay();
     this.addChild(this._stateSprite);
   }
@@ -1966,7 +1973,7 @@ Sprite_ActorImges.prototype.setup = function(battler, data, index) {
   this._imgIndex = index;
   battler.resetBattleStyleImgId();
   this.updateActorGraphic();
-  if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+  if (getStateAnimationShow()) {
     this._stateSprite.setup(battler);
     this._stateSprite.move(params.ActorState_X, params.ActorState_Y);
   }

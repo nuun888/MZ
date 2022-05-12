@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -45,6 +45,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/5/12 Ver.1.2.1
+ * ステートアニメーションを表示させない機能を追加。
  * 2022/5/11 Ver.1.2.0
  * アクター画像にステート画像を表示する機能を追加。
  * パーティ、アクターコマンドの表示位置を指定できる機能を追加。
@@ -819,6 +821,35 @@
  * @default true
  * @parent ActorEffect
  * 
+ * @param ActorStateAnimation
+ * @text アクターグラフィックステートアニメーション設定
+ * @default ////////////////////////////////
+ * 
+ * @param StateAnimationShow
+ * @desc アクター画像のステートアニメーションを表示します。フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text アクター画像ステートアニメーション表示
+ * @type boolean
+ * @default true
+ * @parent ActorStateAnimation
+ * 
+ * @param ActorState_X
+ * @desc アクター画像のステートアニメーションのX座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text ステートアニメーションX座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorStateAnimation
+ * 
+ * @param ActorState_Y
+ * @desc アクター画像のステートアニメーションのY座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text ステートアニメーションY座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorStateAnimation
+ * 
  * @param ActorImgEffect
  * @text アクターグラフィックエフェクト設定
  * @default ////////////////////////////////
@@ -892,27 +923,6 @@
  * @default true
  * @parent ActorImgEffect
  * 
- * @param ActorStateAnimation
- * @text アクターグラフィックステートアニメーション設定
- * @default ////////////////////////////////
- * 
- * @param ActorState_X
- * @desc アクター画像のステートアニメーションのX座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
- * @text ステートアニメーションX座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimation
- * 
- * @param ActorState_Y
- * @desc アクター画像のステートアニメーションのY座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
- * @text ステートアニメーションY座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimation
  * 
  * @param EnemyAnimation
  * @text 敵キャラアニメーション設定
@@ -1954,6 +1964,7 @@ params.ActorEffect_Y = Number(parameters['ActorEffect_Y'] || 0);
 params.ActorDamage_X = Number(parameters['ActorDamage_X'] || 0);
 params.ActorDamage_Y = Number(parameters['ActorDamage_Y'] || 0);
 params.EffectPriority = eval(parameters['EffectPriority']) || 'middle';
+params.StateAnimationShow = eval(parameters['StateAnimationShow'] || "true");
 params.ActorState_X = Number(parameters['ActorState_X'] || 0);
 params.ActorState_Y = Number(parameters['ActorState_Y'] || 0);
 

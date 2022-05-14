@@ -35,6 +35,12 @@
  * @type boolean
  * @default true
  * 
+ * @param ItemHeightAdjust
+ * @text 縦表示間隔調整
+ * @desc コンテンツ背景非表示に項目ごとの立幅を調整します。
+ * @type boolean
+ * @default true
+ * 
  * @param BackVisibleClass
  * @text コンテンツ背景クラス設定
  * @desc コンテンツ背景の表示をさせない(コンテンツ背景非表示ON)、させる(コンテンツ背景非表示OFF)クラスを指定します。リストにないクラスの場合、直接記入してください。(複数指定可)
@@ -79,6 +85,7 @@ Imported.NUUN_ContentsBackVisible = true;
 const parameters = PluginManager.parameters('NUUN_ContentsBackVisible');
 const BackVisibleClass = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackVisibleClass'])) : null) || [];
 const BackVisible = eval(parameters['BackVisible'] || 'true');
+const ItemHeightAdjust = eval(parameters['ItemHeightAdjust'] || 'true');
 
 
 function getContentsBackClass(thisClass) {
@@ -102,13 +109,13 @@ Window_Selectable.prototype.isContentsBack = function() {
 
 const _Window_Selectable_itemHeight = Window_Selectable.prototype.itemHeight;
 Window_Selectable.prototype.itemHeight = function() {
-    return this.isContentsBack() ? Window_Scrollable.prototype.itemHeight.call(this) : _Window_Selectable_itemHeight.call(this);
+    return ItemHeightAdjust && this.isContentsBack() ? Window_Scrollable.prototype.itemHeight.call(this) : _Window_Selectable_itemHeight.call(this);
 };
 
 const _Window_Selectable_itemRect = Window_Selectable.prototype.itemRect;
 Window_Selectable.prototype.itemRect = function(index) {
     const rect = _Window_Selectable_itemRect.call(this, index);
-    if (this.isContentsBack()) {
+    if (ItemHeightAdjust && this.isContentsBack()) {
         const maxCols = this.maxCols();
         const row = Math.floor(index / maxCols);
         rect.y = row * this.itemHeight() - this.scrollBaseY();
@@ -120,7 +127,7 @@ Window_Selectable.prototype.itemRect = function(index) {
 const _Window_NameInput_itemRect = Window_NameInput.prototype.itemRect;
 Window_NameInput.prototype.itemRect = function(index) {
     const rect = _Window_NameInput_itemRect.call(this, index);
-    if (this.isContentsBack()) {
+    if (ItemHeightAdjust && this.isContentsBack()) {
         rect.y = Math.floor(index / 10) * this.itemHeight();
         rect.height += this.rowSpacing();
     }

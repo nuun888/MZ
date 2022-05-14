@@ -174,7 +174,7 @@
 | [アイテム図鑑](https://github.com/nuun888/MZ/blob/master/README/ItemBook.md) | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) | 共 | 1.4.3 |
 | ┗ [アイテム図鑑全セーブ共通](https://github.com/nuun888/MZ/blob/master/README/ItemBook_Global.md) | [NUUN_ItemBook_Global](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook_Global.js) |  | 1.0.0 |
 | [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共(Ver.1.4.1) 立対 レ | 2.3.6 |
-| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.8.1 |
+| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.8.4 |
 | セーブ上書き確認 | [NUUN_SaveVerification](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveVerification.js) |  | 1.0.0 |
 | セーブ削除 |  |  |  |
 | [所持金拡張](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.1 |

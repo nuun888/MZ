@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# Ver.1.8.3
+# Ver.1.8.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -43,6 +43,9 @@ info.orgParam[id - 1]
 リスト1番ならinfo.orgParam[0]  
 
 ## 更新履歴
+2022/5/14 Ver.1.8.4  
+コンテンツ背景画像非表示をOFFに設定しても背景画像が適用しない問題を修正。  
+コンテンツ背景画像非表示をコンテンツ背景画像表示に仕様変更。  
 2022/5/11 Ver.1.8.3  
 戦闘終了時にオートセーブがされない問題を修正。  
 マップ移動時、戦闘終了時に、オートセーブでのマップショットが黒い画像になる問題を修正。  

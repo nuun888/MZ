@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  モンスターTPBゲージ
  * @author NUUN
- * @version 1.3.0
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -35,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/14 Ver.1.4.0
+ * バトラーの表示処理の定義大幅変更に関する定義変更。
  * 2021/12/19 Ver.1.3.0
  * ゲージ画像化に対応。
  * 2021/11/8 Ver.1.2.2
@@ -112,18 +114,6 @@
  * @default 0
  * @min -9999
  * 
- * @param ConflictScale
- * @desc 敵画像の上設定時の拡大率の考慮
- * @text 拡大率の考慮
- * @type select
- * @option 元のサイズ基準
- * @value 0
- * @option 現在のサイズ基準
- * @value 1
- * @option 元のサイズ基準（MNKR_TMBattlerExMZ併用時）
- * @value 2
- * @default 0
- * 
  */
 var Imported = Imported || {};
 Imported.NUUN_EnemyTpbGauge = true;
@@ -135,135 +125,68 @@ const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
 const Gauge_X = Number(parameters['Gauge_X'] || 0);
 const Gauge_Y = Number(parameters['Gauge_Y'] || 0);
-const ConflictScale = Number(parameters['ConflictScale'] || 0);
-let tpbGaugePositionList = [];
+
+function getEnemyTpbGaugePosition(troop) {
+  const pages = troop.pages[0];
+  list = [];
+  const re = /<(?:TPBGaugePosition):\s*(.*)>/;
+  pages.list.forEach(tag => {
+    if (tag.code === 108 || tag.code === 408) {
+      let match = re.exec(tag.parameters[0]);
+      if (match) {
+        list.push(match[1].split(',').map(Number));
+      }
+    }
+  });
+  return list;
+};
 
 const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
 Sprite_Enemy.prototype.initMembers = function() {
   _Sprite_Enemy_initMembers.call(this);
 };
 
-const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
-Sprite_Enemy.prototype.updateBitmap = function() {
-  _Sprite_Enemy_updateBitmap.call(this);
-  //if (this._enemy && BattleManager.isTpb()) {
-  //  this.updateTpbGauge();
-  //}
+const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
+Sprite_Enemy.prototype.update = function() {
+  _Sprite_Enemy_update.call(this);
+  this.updateTpbGauge();
 };
 
 Sprite_Enemy.prototype.updateTpbGauge = function() {
-  if (BattleManager.gaugeBaseSprite) {
-    if (!this._enemyTpb) {
-      $gameTemp.enemyTPBGaugeRefresh = true;
-      this.enemyTpbGauge();
-    }
-    this._enemyTpb.x = this.tpbGaugeOffsetX + (this.x - this._enemyTpb.width / 2);
-    this._enemyTpb.y = this.tpbGaugeOffsetY + this.y - 40;
-    if (this.getButlerTpbPosition() === 0) {
-      this._enemyTpb.y -= this.getButlerTpbHeight();
-    } else if (this.getButlerTpbPosition() === 2) {
-      this._enemyTpb.y -= Math.floor(this.getButlerTpbHeight() / 2);
-    }
-    this.tpbGaugeOpacity();
-    if (this._enemyTpb._gaugeImgSprite) {
-      this._enemyTpb._gaugeImgSprite.x = this._enemyTpb.x;
-      this._enemyTpb._gaugeImgSprite.y = this._enemyTpb.y;
-    }
+  if (!BattleManager.isTpb() || TpbPosition < 0) {
+    return;
   }
-};
-
-Sprite_Enemy.prototype.enemyTpbGauge = function() {
-  const butlerGaugeBase = BattleManager.gaugeBaseSprite;
-  if (Imported.NUUN_GaugeImage) {
-    this.createSpriteGauge(butlerGaugeBase, 'time');
+  if (this.battlerOverlay && !this._enemyTpb) {
+    this.createTpbGauge();
   }
-  const sprite = new Sprite_EnemyTPBGauge();
-  butlerGaugeBase.addChild(sprite);
-  sprite.setup(this._enemy, "time");
-  sprite.show();
-  sprite.move(0, 0);
-  this._enemyTpb = sprite;
-  sprite.enemySpriteId = this.spriteId;
-  this.tpbGaugeOffsetX = this._enemy.getTpbPositionX() + (this._enemy.enemy().meta.TPBGaugeX ? Number(this._enemy.enemy().meta.TPBGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
-  this.tpbGaugeOffsetY = this._enemy.getTpbPositionY() + (this._enemy.enemy().meta.TPBGaugeY ? Number(this._enemy.enemy().meta.TPBGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
-};
-
-
-Sprite_Enemy.prototype.getButlerTpbHeight = function() {
-  const scale = this.getButlerTpbConflict();
-  if (this._SVBattlername) {
-    return Math.floor(((this._mainSprite.bitmap.height / 6) + 30) * 0.9);
-  } else if (this._svBattlerSprite) {
-    return Math.floor((this.height + 30) * 0.9);
-  } else {
-    return Math.floor(((this.bitmap.height + 70) * 0.9) * scale);
-  }
-};
-
-Sprite_Enemy.prototype.getButlerTpbConflict = function() {
-  if (ConflictScale === 1) {
-    return this.scale.y;
-  } else if (ConflictScale === 2) {
-    return this._baseScale.y;
-  } else {
-    return 1;
+  if (this._enemyTpb) {
+    const enemy = this._enemy.enemy();
+    const x = (enemy.meta.TPBGaugeX ? Number(enemy.meta.TPBGaugeX) : 0) + Gauge_X + this._enemy.getTpbGaugePositionX();
+    const y = (enemy.meta.TPBGaugeY ? Number(enemy.meta.TPBGaugeY) : 0) + Gauge_Y + this._enemy.getTpbGaugePositionY();
+    this._enemyTpb.x = x;
+    this._enemyTpb.y = y - this.getButlerTpbPosition();
   }
 };
 
 Sprite_Enemy.prototype.getButlerTpbPosition = function() {
-  return TpbPosition;
-};
-
-Sprite_Enemy.prototype.tpbGaugeOpacity = function() {
-  if (this._effectType !== "blink") {
-    this._enemyTpb.opacity = this.opacity;
-    if (this._enemyTpb._gaugeImgSprite) {
-      this._enemyTpb._gaugeImgSprite.opacity = this.opacity;
-    }
+  const scale = this.getButlerOverlayConflict();
+  if (TpbPosition === 0) {
+    return this.getButlerOverlayHeight() * scale;
+  } else if (TpbPosition === 2) {
+    return Math.floor((this.getButlerOverlayHeight() * scale) / 2);
+  } else {
+    return 0;
   }
 };
 
-
-const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
-Spriteset_Battle.prototype.update = function() {
-  _Spriteset_Battle_update.call(this);
-  if ($gameTemp.enemyTPBGaugeRefresh) {
-    this.setTpbGaugePosition();
-    $gameTemp.enemyTPBGaugeRefresh = false;
-  }
-  for (const sprite of this._enemySprites) {
-    if (sprite._enemy && BattleManager.isTpb())
-    sprite.updateTpbGauge();
-  }
-};
-
-const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
-Spriteset_Battle.prototype.createLowerLayer = function() {
-  _Spriteset_Battle_createLowerLayer.call(this);
-  this.createEnemyTpbGauge();
-};
-
-Spriteset_Battle.prototype.createEnemyTpbGauge = function() {
-  if (BattleManager.isTpb()) {
-    tpbGaugePositionList = getEnemyTpbGaugePosition($gameTroop.troop());
-    this.setTpbGaugePosition();
-    for (const sprites of this._enemySprites) {
-      this.enemyTpbGauge(sprites);
-    }
-  }
-};
-
-Spriteset_Battle.prototype.enemyTpbGauge = function(sprites) {
-  sprites.enemyTpbGauge();
-};
-
-Spriteset_Battle.prototype.setTpbGaugePosition = function() {
-  for (const data of tpbGaugePositionList) {
-    const enemy = $gameTroop.members()[data[0] - 1];
-    if (enemy) {
-      enemy.setTpbGaugePosition(data[1], data[2]);
-    }
-  }
+Sprite_Enemy.prototype.createTpbGauge = function() {
+  const sprite = new Sprite_EnemyTPBGauge();
+  this.battlerOverlay.addChild(sprite);
+  this._enemyTpb = sprite;
+  sprite.setup(this._enemy, "time");
+  sprite.show();
+  sprite.move(0, 0);
+  $gameTemp.enemyTpbGaugeRefresh = true;
 };
 
 function Sprite_EnemyTPBGauge() {
@@ -275,6 +198,8 @@ Sprite_EnemyTPBGauge.prototype.constructor = Sprite_EnemyTPBGauge;
 
 Sprite_EnemyTPBGauge.prototype.initialize = function() {
   Sprite_Gauge.prototype.initialize.call(this);
+  this.anchor.x = 0.5;
+  this.anchor.y = 1;
 };
 
 Sprite_EnemyTPBGauge.prototype.bitmapWidth = function() {
@@ -283,6 +208,28 @@ Sprite_EnemyTPBGauge.prototype.bitmapWidth = function() {
 
 Sprite_EnemyTPBGauge.prototype.gaugeHeight = function() {
   return GaugeHeight > 0 ? GaugeHeight : 12;
+};
+
+
+const _Spriteset_Battle_updateButlerOverlay = Spriteset_Battle.prototype.updateButlerOverlay;
+Spriteset_Battle.prototype.updateButlerOverlay = function() {
+  _Spriteset_Battle_updateButlerOverlay.call(this);
+  if ($gameTemp.enemyTpbGaugeRefresh) {
+    this.setTpbGaugePosition();
+    $gameTemp.enemyTpbGaugeRefresh = false;
+  }
+};
+
+Spriteset_Battle.prototype.setTpbGaugePosition = function() {
+  if (BattleManager.isTpb()) {
+    const tpbGaugePositionList = getEnemyTpbGaugePosition($gameTroop.troop());
+    for (const data of tpbGaugePositionList) {
+      const enemy = $gameTroop.members()[data[0] - 1];
+      if (enemy) {
+        enemy.setTpbGaugePosition(data[1], data[2]);
+      }
+    }
+  }
 };
 
 
@@ -298,27 +245,12 @@ Game_Enemy.prototype.setTpbGaugePosition = function(x, y){
   this._butlerTpbPositionY = y;
 };
 
-Game_Enemy.prototype.getTpbPositionX = function(){
+Game_Enemy.prototype.getTpbGaugePositionX = function(){
   return this._butlerTpbPositionX;
 };
 
-Game_Enemy.prototype.getTpbPositionY = function(){
+Game_Enemy.prototype.getTpbGaugePositionY = function(){
   return this._butlerTpbPositionY;
-};
-
-function getEnemyTpbGaugePosition(troop) {
-  const pages = troop.pages[0];
-  list = [];
-  const re = /<(?:TPBGaugePosition):\s*(.*)>/;
-  pages.list.forEach(tag => {
-    if (tag.code === 108 || tag.code === 408) {
-      let match = re.exec(tag.parameters[0]);
-      if (match) {
-        list.push(match[1].split(',').map(Number));
-      }
-    }
-  });
-  return list;
 };
 
 })();

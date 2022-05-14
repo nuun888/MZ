@@ -12,7 +12,7 @@
  * @plugindesc  敵MPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.0.2
+ * @version 1.1.0
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -50,6 +50,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/14 Ver.1.1.0
+ * バトラーの表示処理の定義大幅変更に関する定義変更。
  * 2022/1/10 Ver.1.0.2
  * 再修正。
  * 2022/1/10 Ver.1.0.1
@@ -171,17 +173,6 @@
  * @type string
  * @default ????
  * 
- * @param ConflictScale
- * @desc 敵画像の上設定時の拡大率の考慮
- * @text 拡大率の考慮
- * @type select
- * @option 元のサイズ基準
- * @value 0
- * @option 現在のサイズ基準
- * @value 1
- * @option 元のサイズ基準（MNKR_TMBattlerExMZ併用時）
- * @value 2
- * @default 0
  * 
  */
 var Imported = Imported || {};
@@ -201,135 +192,71 @@ const MPLabelVisible = eval(parameters['MPLabelVisible'] || 'true');
 const MPValueVisible = eval(parameters['MPValueVisible'] || 'true');
 const ValueFontSize = Number(parameters['ValueFontSize'] || -6);
 const LabelFontSize = Number(parameters['LabelFontSize'] || -2);
-const ConflictScale = Number(parameters['ConflictScale'] || 0);
 const MaskValueName = String(parameters['MaskValueName'] || '????');
-let mpGaugePositionList = [];
+
+function getEnemyMpGaugePosition(troop) {
+  const pages = troop.pages[0];
+  list = [];
+  const re = /<(?:MPGaugePosition):\s*(.*)>/;
+  pages.list.forEach(tag => {
+    if (tag.code === 108 || tag.code === 408) {
+      let match = re.exec(tag.parameters[0]);
+      if (match) {
+        list.push(match[1].split(',').map(Number));
+      }
+    }
+  });
+  return list;
+};
 
 const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
 Sprite_Enemy.prototype.initMembers = function() {
   _Sprite_Enemy_initMembers.call(this);
 };
 
-const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
-Sprite_Enemy.prototype.updateBitmap = function() {
-  _Sprite_Enemy_updateBitmap.call(this);
+const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
+Sprite_Enemy.prototype.update = function() {
+  _Sprite_Enemy_update.call(this);
+  this.updateMpGauge();
 };
 
 Sprite_Enemy.prototype.updateMpGauge = function() {
-  if (BattleManager.gaugeBaseSprite) {
-    if (!this._butlerMp) {
-      $gameTemp.enemyMPGaugeRefresh = true;
-      this.enemyMPGauge();
-    }
-    this._butlerMp.x = this.mpGaugeOffsetX + (this.x - this._butlerMp.width / 2);
-    this._butlerMp.y = this.mpGaugeOffsetY + this.y - 40;
-    if (this.getButlerMpPosition() === 0) {
-      this._butlerMp.y -= this.getButlerMpHeight();
-    } else if (this.getButlerMpPosition() === 2) {
-      this._butlerMp.y -= Math.floor(this.getButlerMpHeight() / 2);
-    }
-    this.mpGaugeOpacity();
-    if (this._butlerMp._gaugeImgSprite) {
-      this._butlerMp._gaugeImgSprite.x = this._butlerMp.x;
-      this._butlerMp._gaugeImgSprite.y = this._butlerMp.y;
-    }
+  if (MPPosition < 0) {
+    return;
   }
-};
-
-Sprite_Enemy.prototype.enemyMPGauge = function() {
-  const butlerGaugeBase = BattleManager.gaugeBaseSprite;
-  if (this._enemy.showMpGauge) {
-    if (Imported.NUUN_GaugeImage) {
-      this.createSpriteGauge(butlerGaugeBase, 'mp');
-    }
-    const sprite = new Sprite_EnemyMPGauge();
-    butlerGaugeBase.addChild(sprite);
-    sprite.setup(this._enemy, "mp");
-    sprite.show();
-    sprite.move(0, 0);
-    this._butlerMp = sprite;
-    sprite.enemySpriteId = this.spriteId;
-    this.mpGaugeOffsetX = this._enemy.getMPGaugePositionX() + (this._enemy.enemy().meta.MPGaugeX ? Number(this._enemy.enemy().meta.MPGaugeX) : 0) + (Graphics.width - Graphics.boxWidth) / 2 + Gauge_X;
-    this.mpGaugeOffsetY = this._enemy.getMPGaugePositionY() + (this._enemy.enemy().meta.MPGaugeY ? Number(this._enemy.enemy().meta.MPGaugeY) : 0) + Gauge_Y + (Graphics.height - Graphics.boxHeight) / 2;
+  if (this.battlerOverlay && !this._butlerMp) {
+    this.createMpGauge();
   }
-};
-
-Sprite_Enemy.prototype.getButlerMpHeight = function() {
-  const scale = this.getButlerMPConflict();
-  if (this._SVBattlername) {
-    return Math.floor(((this._mainSprite.bitmap.height / 6) + 30) * 0.9);
-  } else if (this._svBattlerSprite) {
-    return Math.floor((this.height + 30) * 0.9);
-  } else {
-    return Math.floor(((this.bitmap.height + 70) * 0.9) * scale);
-  }
-};
-
-Sprite_Enemy.prototype.getButlerMPConflict = function() {
-  if (ConflictScale === 1) {
-    return this.scale.y;
-  } else if (ConflictScale === 2) {
-    return this._baseScale.y;
-  } else {
-    return 1;
+  if (this._butlerMp) {
+    const enemy = this._enemy.enemy();
+    const x = (enemy.meta.MPGaugeX ? Number(enemy.meta.MPGaugeX) : 0) + Gauge_X + this._enemy.getMpGaugePositionX();
+    const y = (enemy.meta.MPGaugeY ? Number(enemy.meta.MPGaugeY) : 0) + Gauge_Y + this._enemy.getMpGaugePositionY();
+    this._butlerMp.x = x;
+    this._butlerMp.y = y - this.getButlerMpPosition();
   }
 };
 
 Sprite_Enemy.prototype.getButlerMpPosition = function() {
-  return MPPosition;
-};
-
-Sprite_Enemy.prototype.mpGaugeOpacity = function() {
-  if (this._effectType !== "blink") {
-    this._butlerMp.opacity = this.opacity;
-    if (this._butlerMp._gaugeImgSprite) {
-      this._butlerMp._gaugeImgSprite.opacity = this.opacity;
-    }
+  const scale = this.getButlerOverlayConflict();
+  if (MPPosition === 0) {
+    return this.getButlerOverlayHeight() * scale;
+  } else if (MPPosition === 2) {
+    return Math.floor((this.getButlerOverlayHeight() * scale) / 2);
+  } else {
+    return 0;
   }
 };
 
-
-const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
-Spriteset_Battle.prototype.update = function() {
-  _Spriteset_Battle_update.call(this);
-  if ($gameTemp.enemyMPGaugeRefresh) {
-    this.setMPGaugePosition();
-    $gameTemp.enemyMPGaugeRefresh = false;
-  }
-  for (const sprite of this._enemySprites) {
-    if (sprite._enemy && sprite._enemy.showMpGauge && MPPosition >= 0)
-    sprite.updateMpGauge();
-  }
+Sprite_Enemy.prototype.createMpGauge = function() {
+  const sprite = new Sprite_EnemyMPGauge();
+  this.battlerOverlay.addChild(sprite);
+  this._butlerMp = sprite;
+  sprite.setup(this._enemy, "mp");
+  sprite.show();
+  sprite.move(0, 0);
+  $gameTemp.enemyMpGaugeRefresh = true;
 };
 
-const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
-Spriteset_Battle.prototype.createLowerLayer = function() {
-  _Spriteset_Battle_createLowerLayer.call(this);
-  this.createEnemyMpGauge();
-};
-
-Spriteset_Battle.prototype.createEnemyMpGauge = function() {
-  if (MPPosition >= 0) {
-    mpGaugePositionList = getEnemyGaugePosition($gameTroop.troop());
-    this.setMPGaugePosition();
-    for (const sprite of this._enemySprites) {
-      this.enemyMPGauge(sprite);
-    }
-  }
-};
-
-Spriteset_Battle.prototype.enemyMPGauge = function(sprite) {
-  sprite.enemyMPGauge();
-};
-
-Spriteset_Battle.prototype.setMPGaugePosition = function() {
-  for (const data of mpGaugePositionList) {
-    const enemy = $gameTroop.members()[data[0] - 1];
-    if (enemy) {
-      enemy.setMPGaugePosition(data[1], data[2]);
-    }
-  }
-};
 
 function Sprite_EnemyMPGauge() {
   this.initialize(...arguments);
@@ -342,6 +269,8 @@ Sprite_EnemyMPGauge.prototype.initialize = function() {
   Sprite_Gauge.prototype.initialize.call(this);
   this._gaugeDuration = 0;
   this._startVisible = true;
+  this.anchor.x = 0.5;
+  this.anchor.y = 1;
 };
 
 Sprite_EnemyMPGauge.prototype.bitmapWidth = function() {
@@ -460,24 +389,34 @@ Sprite_EnemyMPGauge.prototype.gaugeVisibleInSelect = function() {
   return true;
 };
 
-Game_Actor.prototype.MpGaugeVisibleTrait = function(){
-  return this.traitObjects().some(traitObject => traitObject.meta.MPGaugeVisible);
+
+const _Spriteset_Battle_updateButlerOverlay = Spriteset_Battle.prototype.updateButlerOverlay;
+Spriteset_Battle.prototype.updateButlerOverlay = function() {
+  _Spriteset_Battle_updateButlerOverlay.call(this);
+  if ($gameTemp.enemyMpGaugeRefresh) {
+    this.setMpGaugePosition();
+    $gameTemp.enemyMpGaugeRefresh = false;
+  }
 };
 
-Game_Actor.prototype.MpGaugeVisible = function(){
-  this._visibleMpGauge = this.MpGaugeVisibleTrait();
-  BattleManager.mpGaugeVisible();
+Spriteset_Battle.prototype.setMpGaugePosition = function() {
+  const mpGaugePositionList = getEnemyMpGaugePosition($gameTroop.troop());
+  for (const data of mpGaugePositionList) {
+    const enemy = $gameTroop.members()[data[0] - 1];
+    if (enemy) {
+      enemy.setMpGaugePosition(data[1], data[2]);
+    }
+  }
 };
 
-Game_Actor.prototype.MpGaugeMask = function(){
-  this._MPGaugeMask = false;
-};
 
 const _Game_Battler_refresh = Game_Battler.prototype.refresh;
 Game_Battler.prototype.refresh = function() {
   _Game_Battler_refresh.call(this);
-  this.MpGaugeVisible();
-  this.MpGaugeMask();
+  if (this.isEnemy()) {
+    this.MpGaugeVisible();
+    this.MpGaugeMask();
+  }
 };
 
 const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
@@ -510,37 +449,17 @@ Game_Enemy.prototype.MpGaugeMask = function(){
   }
 };
 
-Game_Enemy.prototype.setMPGaugePosition = function(x, y){
+Game_Enemy.prototype.setMpGaugePosition = function(x, y){
   this._butlerMpPositionX = x;
   this._butlerMpPositionY = y;
 };
 
-Game_Enemy.prototype.getMPGaugePositionX = function(){
+Game_Enemy.prototype.getMpGaugePositionX = function(){
   return this._butlerMpPositionX;
 };
 
-Game_Enemy.prototype.getMPGaugePositionY = function(){
+Game_Enemy.prototype.getMpGaugePositionY = function(){
   return this._butlerMpPositionY;
-};
-
-
-BattleManager.mpGaugeVisible = function() {
-  this.visibleMpGauge = $gameParty.battleMembers().some(actor => actor._visibleMpGauge);
-};
-
-function getEnemyGaugePosition(troop) {
-  const pages = troop.pages[0];
-  list = [];
-  const re = /<(?:MPGaugePosition):\s*(.*)>/;
-  pages.list.forEach(tag => {
-    if (tag.code === 108 || tag.code === 408) {
-      let match = re.exec(tag.parameters[0]);
-      if (match) {
-        list.push(match[1].split(',').map(Number));
-      }
-    }
-  });
-  return list;
 };
 
 })();

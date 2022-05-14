@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.8.3
+ * @version 1.8.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -53,6 +53,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/14 Ver.1.8.4
+ * コンテンツ背景画像非表示をOFFに設定しても背景画像が適用しない問題を修正。
+ * コンテンツ背景画像非表示をコンテンツ背景画像表示に仕様変更。
  * 2022/5/11 Ver.1.8.3
  * 戦闘終了時にオートセーブがされない問題を修正。
  * マップ移動時、戦闘終了時に、オートセーブでのマップショットが黒い画像になる問題を修正。
@@ -315,8 +318,8 @@
  * @parent BackGround
  * 
  * @param ContentsBackVisible
- * @text コンテンツ背景画像非表示
- * @desc コンテンツの背景画像を表示しない。(要NUUN_Base Ver.1.1.3以降)
+ * @text コンテンツ背景画像表示
+ * @desc コンテンツの背景画像を表示する。
  * @type boolean
  * @default false
  * @parent BackGround
@@ -516,7 +519,7 @@ Imported.NUUN_SaveScreen = true;
   const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
   const MainFontSizeMainFontSize = Number(parameters['MainFontSizeMainFontSize'] || 24);
   const ContentsFontSizeMainFontSize = Number(parameters['ContentsFontSizeMainFontSize'] || 22);
-  const ContentsBackVisible = eval(parameters['ContentsBackVisible'] || "true");
+  const ContentsBackVisible = eval(parameters['ContentsBackVisible'] || "false");
   const AutomaticSetting = eval(parameters['AutomaticSetting'] || "true");
   const ActorGraphicMode = Number(parameters['ActorGraphicMode'] || 1);
   const ActorX = Number(parameters['ActorX'] || 40);

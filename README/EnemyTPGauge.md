@@ -1,12 +1,12 @@
 # [敵TPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js)
-# Ver.1.0.3
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js)
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.2以降  
+[バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
 
 敵のバトラー上にTPゲージを表示します。  
 
-![準備中](img/tpGauge1.png)  
+![画像](img/tpGauge1.png)  
 
 ### 設定方法
 
@@ -59,6 +59,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にTPゲージを表示します。  
 
 ## 更新履歴
+2022/5/14 Ver.1.1.0  
+バトラーの表示処理の定義大幅変更に関する定義変更。  
 2022/2/12 Ver.1.0.3  
 ダメージ時に表示を指定の時に戦闘開始時にゲージが表示されてしまう問題を修正。  
 2022/1/10 Ver.1.0.1  

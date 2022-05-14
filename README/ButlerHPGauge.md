@@ -1,8 +1,8 @@
 # [敵HPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
-# Ver.1.4.2
+# Ver.1.5.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+[バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
 
 敵のバトラー上にHPゲージを表示します。  
 
@@ -59,6 +59,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にHPゲージを表示します。  
 
 ## 更新履歴
+2022/5/14 Ver.1.5.0  
+バトラーの表示処理の定義大幅変更に関する定義変更。  
 2022/1/10 Ver.1.4.1  
 ゲージがラベル表示でも座標0から表示されてしまう問題を修正。  
 2021/12/19 Ver.1.4.0  

@@ -52,7 +52,7 @@
 | [最大レベル変動](https://github.com/nuun888/MZ/blob/master/README/ChangeMaxLevel.md) | [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js) |  | 1.2.0 |
 | [アクターステータスの最大値設定](https://github.com/nuun888/MZ/blob/master/README/StatusParamEX.md) | [NUUN_StatusParamEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusParamEXr.js) |  | 1.0.2 |
 | [サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md) | [NUUN_SupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js) | 共 | 1.4.2 |
-| ┣  [サポートアクターインジケーター](https://github.com/nuun888/MZ/blob/master/README/DisplaySupportActor.md) | [NUUN_DisplaySupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) |  | 1.3.3 |
+| ┣  [サポートアクターインジケーター](https://github.com/nuun888/MZ/blob/master/README/DisplaySupportActor.md) | [NUUN_DisplaySupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) |  | 1.4.0 |
 | ┣  サポートアクターインジケータースプライト版 |  |  |
 | ┣  [サポートアクター呼び出し](https://github.com/nuun888/MZ/blob/master/README/CallSupportActor.md) | [NUUN_CallSupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CallSupportActor.js) |  | 1.0.2 |
 | ┗  召喚アクター |  |  |

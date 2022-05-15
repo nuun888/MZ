@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクターインジケータ（サポートアクター拡張）
  * @author NUUN
- * @version 1.3.3
+ * @version 1.4.0
  * @base NUUN_SupportActor
  * 
  * @help
@@ -21,6 +21,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/15 Ver.1.4.0
+ * 処理の改修。
+ * ターン制でコマンド選択後サポートアクターの位置が戻らない問題を修正。
  * 2022/3/28 Ver.1.3.3
  * サポートアクター更新により定義変更。
  * 2022/1/4 Ver.1.3.2
@@ -78,7 +81,7 @@
  * @parent WindowSetting
  * 
  * @param SummonName
- * @text 召喚アクター表示名
+ * @text 召喚アクター表示名(未実装)
  * @desc 召喚アクター表示名
  * @type string
  * @default Summon
@@ -133,22 +136,119 @@ const InitSupport = eval(parameters['InitSupport'] || 'true');
 const RightDisplay = eval(parameters['RightDisplay'] || 'false');
 const CommandShow = eval(parameters['CommandShow'] || 'true');
 
-const _Game_Temp_requestBattleRefresh = Game_Temp.prototype.requestBattleRefresh;
-Game_Temp.prototype.requestBattleRefresh = function() {
-  _Game_Temp_requestBattleRefresh.call(this);
-  this.requestSupportActorRefresh();
+
+const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
+Scene_Battle.prototype.initialize = function() {
+  _Scene_Battle_initialize.call(this);
+  this._supportActorWindowEX = [];
 };
 
-Game_Temp.prototype.requestSupportActorRefresh = function() {
-  this._needsSupportActorRefresh = true;
+const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
+Scene_Battle.prototype.createSpriteset = function() {
+  _Scene_Battle_createSpriteset.call(this);
+  this.createSupportActorBaseSprite();
 };
 
-Game_Temp.prototype.clearSupportActorRequest = function() {
-  this._needsSupportActorRefresh = false;
+Scene_Battle.prototype.createSupportActorBaseSprite = function() {
+  if (!this._supportActorBaseSprite) {
+    const baseSprite = new Sprite();
+    this.addChild(baseSprite);
+    this._supportActorBaseSprite = baseSprite;
+  }
 };
 
-Game_Temp.prototype.isSupportActorRefreshRequested = function() {
-  return this._needsSupportActorRefresh;
+const _Scene_Battle_update = Scene_Battle.prototype.update;
+Scene_Battle.prototype.update = function() {
+  _Scene_Battle_update.call(this);
+  this.updateSupportActor();
+};
+
+Scene_Battle.prototype.updateSupportActor = function() {
+  if ($gameTemp.isSupportActorRefreshRequested()) {
+    this._supportActorWindowEX.forEach(window => {
+      window._actor = null;
+      window.hide();
+    });
+    this.refreshSupportActorWindow();
+    $gameTemp.clearSupportActorRequest();
+  }
+};
+
+Scene_Battle.prototype.refreshSupportActorWindow = function() {
+  const members = $gameParty.supportActorMembers();
+  members.forEach((member, i) => {
+    this.setRefreshSupportActorWindow(member, i);
+  });
+};
+
+Scene_Battle.prototype.setSupportActorWindow = function(actor, index) {
+  if (!this._supportActorWindowEX[index]) {
+    const rect = this.supportActorWindowRect(index);
+    const supportActorWindow = new Window_SupportActorEX(rect);
+    this._supportActorBaseSprite.addChild(supportActorWindow);
+    this._supportActorWindowEX[index] = supportActorWindow;
+    this._supportActorWindowEX[index].initPosition(true);
+  }
+  const window = this._supportActorWindowEX[index];
+  window.setup(actor);
+  window.show();
+};
+
+Scene_Battle.prototype.setRefreshSupportActorWindow = function(actor, index) {
+  if (!this._supportActorWindowEX[index]) {
+    const rect = this.supportActorWindowRect(index);
+    const supportActorWindow = new Window_SupportActorEX(rect);
+    this._supportActorBaseSprite.addChild(supportActorWindow);
+    this._supportActorWindowEX[index] = supportActorWindow;
+    this._supportActorWindowEX[index].initPosition(false);
+  }
+  const window = this._supportActorWindowEX[index];
+  window.setup(actor);
+  if (BattleManager.displayStartSupport) {
+    window.setMove(0, 20);
+  }
+  window.show();
+};
+
+
+Scene_Battle.prototype.createSupportActorWindow = function() {
+  const members = $gameParty.supportActorMembers();
+  members.forEach((member, i) => {
+    this.setSupportActorWindow(member, i);
+  });
+  $gameTemp.clearSupportActorRequest();
+};
+
+Scene_Battle.prototype.supportActorWindowRect = function(index) {
+  const ww = Window_Width + 40;
+  const wh = this.calcWindowHeight(1, true);
+  const wx = Window_X + (RightDisplay ? Graphics.width - Window_Width : -40) ;
+  const wy = Window_Y + (wh + Window_Margin) * index;
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.commandStartActor = function() {
+  if (BattleManager.displayStartSupport) {
+    this.supportActorHide();
+    this._partyCommandWindow.activate();
+  } else {
+    this.supportActorShow();
+    this._partyCommandWindow.activate();
+  }
+};
+
+Scene_Battle.prototype.supportActorShow = function() {
+  for (const window of this._supportActorWindowEX) {
+    window.displayShow();
+  }
+  BattleManager.displayStartSupport = true;
+};
+
+Scene_Battle.prototype.supportActorHide = function() {
+  for (const window of this._supportActorWindowEX) {
+    window.displayHide();
+  }
+  BattleManager.displayStartSupport = false;
 };
 
 
@@ -168,7 +268,7 @@ Window_SupportActorEX.prototype.initialize = function(rect) {
   this._homeX = this.x;
 };
 
-Window_SupportActorEX.prototype.setActor = function(actor) {
+Window_SupportActorEX.prototype.setup = function(actor) {
   this._actor = actor;
   this.refresh();
 };
@@ -177,17 +277,50 @@ Window_SupportActorEX.prototype.colSpacing = function() {
   return 0;
 };
 
+Window_SupportActorEX.prototype.setMove = function(x, speed) {
+  const a = (RightDisplay ? -1 : 1);
+  this._move_x = x * a;
+  this._speed = (speed || 0) * a;
+  this._moveOn = true;
+};
+
+Window_SupportActorEX.prototype.initPosition = function(mode) {
+  if (mode) {
+    this.x = this._homeX + (BattleManager.displayStartSupport ? 0 : Window_Width * (RightDisplay ? 1 : -1));
+  } else {
+    this.x = this._homeX + Window_Width * (RightDisplay ? 1 : -1);
+  }
+};
+
 const _Window_SupportActorEX_update = Window_SupportActorEX.prototype.update;
 Window_SupportActorEX.prototype.update = function() {
   _Window_SupportActorEX_update.call(this);
+  this.updateSupportActor();
   this.updateMove();
+};
+
+Window_SupportActorEX.prototype.updateSupportActor = function() {
+  if (!this._moveOn && BattleManager.actor() === this._actor) {
+    if (this.x !== this._homeX + 30 * (RightDisplay ? -1 : 1)) {
+      const speed = BattleManager.displayStartSupport ? 5 : 20;
+      this.setMove(30, speed);
+    }
+  } else if (!this._moveOn && this.x !== this._homeX &&  BattleManager.actor() !== this._actor) {
+    if (!BattleManager.displayStartSupport) {
+      this.displayHide();
+    } else {
+      this.setMove(0, -5);
+    }
+  }
 };
 
 Window_SupportActorEX.prototype.updateMove = function() {
   if (this._moveOn) {
     const move_x = this._homeX + this._move_x;
     this.x += this._speed;
-    if (this._speed > 0) {
+    if (this._speed === 0) {
+      this.x = move_x;
+    } else if (this._speed > 0) {
       this.x = Math.min(this.x, move_x);
     } else if (this._speed < 0) {
       this.x = Math.max(this.x, move_x);
@@ -196,13 +329,6 @@ Window_SupportActorEX.prototype.updateMove = function() {
       this._moveOn = false;
     }
   }
-};
-
-Window_SupportActorEX.prototype.setMove = function(x, speed) {
-  const a = (RightDisplay ? -1 : 1);
-  this._move_x = x * a;
-  this._speed = (speed || 1) * a;
-  this._moveOn = true;
 };
 
 Window_SupportActorEX.prototype.refresh = function() {
@@ -251,141 +377,22 @@ Window_SupportActorEX.prototype.drawActorCharacter = function(x, y, width) {
   }
 };
 
-const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
-Scene_Battle.prototype.initialize = function() {
-  _Scene_Battle_initialize.call(this);
-  this._supportActorWindowEX = [];
-  this._commandStartActor = InitSupport;
-};
-
-const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
-Scene_Battle.prototype.createSpriteset = function() {
-  _Scene_Battle_createSpriteset.call(this);
-  this.createSupportActorBaseSprite();
-};
-
-Scene_Battle.prototype.createSupportActorBaseSprite = function() {
-  if (!this._supportActorBaseSprite) {
-    const baseSprite = new Sprite();
-    this.addChild(baseSprite);
-    this._supportActorBaseSprite = baseSprite;
-  }
-};
-
-Scene_Battle.prototype.createSupportActorWindow = function() {
-  $gameParty.supportActorMembers().forEach((actor, i) => {
-    this.setSupportActorWindow(actor, i);
-    if (!this._commandStartActor) {
-      const a = RightDisplay ? 1 : -1;
-      this._supportActorWindowEX[i].x = this._supportActorWindowEX[i]._homeX + (Window_Width * a);
-    }
-  });
-};
-
-Scene_Battle.prototype.refreshSupportActorWindow = function() {
-  $gameParty.supportActorMembers().forEach((actor, i) => {
-    this.setSupportActorWindow(actor, i);
-    if (!this._commandStartActor) {
-      const a = RightDisplay ? 1 : -1;
-      this._supportActorWindowEX[i].x = this._supportActorWindowEX[i]._homeX + (Window_Width * a);
-    }
-  });
-};
-
-Scene_Battle.prototype.setSupportActorWindow = function(actor, index) {
-  if (!this._supportActorWindowEX[index]) {
-    const rect = this.supportActorWindowRect(index);
-    const supportActorWindow = new Window_SupportActorEX(rect);
-    this._supportActorBaseSprite.addChild(supportActorWindow);
-    this._supportActorWindowEX[index] = supportActorWindow;
-  }
-  this._supportActorWindowEX[index].setActor(actor);
-  this._supportActorWindowEX[index].show();
-};
-
-Scene_Battle.prototype.supportActorWindowRect = function(index) {
-  const ww = Window_Width + 40;
-  const wh = this.calcWindowHeight(1, true);
-  const wx = Window_X + (RightDisplay ? Graphics.width - Window_Width : -40) ;
-  const wy = Window_Y + (wh + Window_Margin) * index;
-  return new Rectangle(wx, wy, ww, wh);
-};
-
-const _Scene_Battle_update = Scene_Battle.prototype.update;
-Scene_Battle.prototype.update = function() {
-  _Scene_Battle_update.call(this);
-  this.updateSupportActor();
-  this.updateSupportActorMove();
-  this.updateSupportActorButton();
-};
-
-Scene_Battle.prototype.updateSupportActor = function() {
-  if ($gameTemp.isSupportActorRefreshRequested()) {
-    this._supportActorWindowEX.forEach(sprite => {
-      sprite._actor = null
-      sprite.hide();
-    });
-    this.refreshSupportActorWindow();
-    $gameTemp.clearSupportActorRequest();
-  }
-};
-
-Scene_Battle.prototype.updateSupportActorMove = function() {
-  if (!BattleManager.actor() && this._supportActorCommand) {
-    if (this._commandStartActor) {
-      this._supportActorCommand.setMove(0, -5);
+Window_SupportActorEX.prototype.displayShow = function() {
+  if (this.visible && this._actor) {
+    if (BattleManager.actor() == this._actor) {
+      this.setMove(30, 20);
     } else {
-      this.supportActorHide();
+      this.setMove(0, 20);
     }
-    this._supportActorCommand = null;
   }
 };
 
-Scene_Battle.prototype.updateSupportActorButton = function() {
-
-};
-
-Scene_Battle.prototype.supportActorShow = function() {
-  this._supportActorWindowEX.find(sprite => {
-    if (sprite.visible && sprite._actor) {
-      const a = RightDisplay ? -1 : 1;
-      const move = (this._supportActorCommand && (this._supportActorCommand._actor.actorId() === sprite._actor.actorId())) ? 30 * a : 0;
-      sprite.setMove(move, 20 * a);
-      this._commandStartActor = true;
-    }
-  });
-};
-
-Scene_Battle.prototype.supportActorHide = function() {
-  this._supportActorWindowEX.find(sprite => {
-    if (sprite.visible && sprite._actor) {
-      const a = RightDisplay ? 1 : -1;
-      sprite.setMove(Window_Width * a, 20 * a);
-      this._commandStartActor = false;
-    }
-  });
-};
-
-const _Scene_Battle_startActorCommandSelection = Scene_Battle.prototype.startActorCommandSelection;
-Scene_Battle.prototype.startActorCommandSelection = function() {
-  _Scene_Battle_startActorCommandSelection.call(this);
-  const supportActorSprite = this._supportActorWindowEX.find(sprite => sprite._actor && sprite._actor.actorId() === BattleManager.actor().actorId());
-    if (supportActorSprite) {
-      const speed = this._commandStartActor ? 5 : 20;
-      supportActorSprite.setMove(30, speed);
-      this._supportActorCommand = supportActorSprite;
-    }
-};
-
-Scene_Battle.prototype.commandStartActor = function() {
-  if (this._commandStartActor) {
-    this.supportActorHide();
-    this._partyCommandWindow.activate();
-  } else {
-    this.supportActorShow();
-    this._partyCommandWindow.activate();
+Window_SupportActorEX.prototype.displayHide = function() {
+  if (this.visible && this._actor) {
+    this.setMove(Window_Width * -1, -20);
   }
 };
+
 
 const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
 Scene_Battle.prototype.createPartyCommandWindow = function() {
@@ -399,6 +406,33 @@ Window_PartyCommand.prototype.makeCommandList = function() {
   if (CommandShow && $gameParty.supportActorMembers().length > 0) {
     this.addCommand(SupportShowName, "startActor");
   }
+};
+
+
+
+const _Game_Temp_requestBattleRefresh = Game_Temp.prototype.requestBattleRefresh;
+Game_Temp.prototype.requestBattleRefresh = function() {
+  _Game_Temp_requestBattleRefresh.call(this);
+  this.requestSupportActorRefresh();
+};
+
+Game_Temp.prototype.requestSupportActorRefresh = function() {
+  this._needsSupportActorRefresh = true;
+};
+
+Game_Temp.prototype.clearSupportActorRequest = function() {
+  this._needsSupportActorRefresh = false;
+};
+
+Game_Temp.prototype.isSupportActorRefreshRequested = function() {
+  return this._needsSupportActorRefresh;
+};
+
+
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+  _BattleManager_initMembers.call(this);
+  this.displayStartSupport = InitSupport;
 };
 
 })();

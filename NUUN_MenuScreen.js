@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ１
  * @author NUUN
- * @version 1.3.1
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -23,7 +23,7 @@
  * 当プラグインは、立ち絵、顔グラ表示EXに対応しています。
  * 立ち絵表示EX用画像設定で設定しなくても立ち絵は表示されます。
  * 立ち絵表示EX適用をOFFにすることで立ち絵、顔グラ表示EX導入時でも、このプラグインの立ち絵設定が適用されます。
- * アクターの顔グラ、立ち絵はアクター画像基本X座標、アクター画像基本Y座標で設定できます。
+ * アクターの顔グラ、立ち絵、キャラチップはアクター画像基本X座標、アクター画像基本Y座標で設定できます。
  * また個別に設定する場合は各アクター画像設定の画像X座標、画像Y座標で設定します。
  * 画像のアクターが表示されている部分を中央に表示させたい場合は各アクター画像設定の画像表示開始座標X、画像表示開始座標Y
  * で設定します。
@@ -37,6 +37,9 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/5/17 Ver.1.4.0
+ * キャラチップを表示できる機能を追加。
+ * アクターの画像を顔グラ、キャラチップ、画像から選択する方式に変更。
  * 2022/5/11 Ver.1.3.1
  * インフォウィンドウにフリーテキストを追加。
  * 2022/5/11 Ver.1.3.0
@@ -365,6 +368,19 @@
  * @param ActorSetting
  * @text アクター設定
  * @default ------------------------------
+ * 
+ * @param GraphicMode
+ * @desc 表示するアクター画像を指定します。
+ * @text 表示アクター画像
+ * @type select
+ * @option 顔グラ
+ * @value 'face'
+ * @option 画像
+ * @value 'img'
+ * @option キャラチップ
+ * @value 'charachip'
+ * @default 'face'
+ * @parent ActorSetting
  * 
  * @param ActorsImgList
  * @text 画像設定
@@ -745,11 +761,19 @@
  * @desc アクターを指定します。
  * @type actor
  * 
- * @param FaceMode
- * @text 顔グラ表示
- * @desc 顔グラ表示を表示します
- * @type boolean
- * @default true
+ * @param GraphicMode
+ * @desc 表示するアクター画像を指定します。
+ * @text 個別表示アクター画像
+ * @type select
+ * @option 顔グラ
+ * @value 'face'
+ * @option 画像
+ * @value 'img'
+ * @option キャラチップ
+ * @value 'charachip'
+ * @option 表示アクター画像での設定
+ * @value 'default'
+ * @default 'default'
  * 
  * @param ActorImg
  * @text アクター画像
@@ -834,11 +858,19 @@
  * @desc アクターを指定します。
  * @type actor
  * 
- * @param FaceMode
- * @text 顔グラ表示
- * @desc 顔グラ表示を表示します
- * @type boolean
- * @default true
+ * @param GraphicMode
+ * @desc 表示するアクター画像を指定します。
+ * @text 個別表示アクター画像
+ * @type select
+ * @option 顔グラ
+ * @value 'face'
+ * @option 画像
+ * @value 'img'
+ * @option キャラチップ
+ * @value 'charachip'
+ * @option 表示アクター画像での設定
+ * @value 'default'
+ * @default 'default'
  * 
  * @param Actor_X
  * @desc 画像のX座標。
@@ -924,6 +956,7 @@ const StatusList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(param
 
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];
+const GraphicMode = eval(parameters['GraphicMode']) || 'face';
 
 const HelpList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['HelpList'])) : null) || [];
 const InfoHeaderShow = eval(parameters['InfoHeaderShow'] || "true");
@@ -1134,17 +1167,22 @@ Window_MenuStatus.prototype.loadActorImages = function() {
         let data = null;
         if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
             actor.resetImgId();
-            actor.loadActorGraphic();
-            actor.loadActorFace();
             data = this.battlreActorPicture(actor.actorId());
+            if (data.GraphicMode === 'img') {
+                actor.loadActorGraphic();
+            } else if (data.GraphicMode === 'charachip') {
+                ImageManager.loadCharacter(actor.characterName());
+            } else {
+                actor.loadActorFace();
+            }
         } else {
             data = this.getActorImgData(actor.actorId());
-            if (data && data.ActorImg) {
-                if (data.FaceMode) {
-                    ImageManager.loadFace(data.FaceImg);
-                } else {
-                    ImageManager.nuun_LoadPictures(data.ActorImg);
-                }
+            if (data.GraphicMode === 'img') {
+                ImageManager.nuun_LoadPictures(data.ActorImg);
+            } else if (data.GraphicMode === 'charachip') {
+                ImageManager.loadCharacter(actor.characterName());
+            } else {
+                ImageManager.loadFace(data.FaceImg);
             }
         }
         if (data && data.ActorBackImg) {
@@ -1196,7 +1234,7 @@ const _Window_MenuStatus_drawItemImage = Window_MenuStatus.prototype.drawItemIma
 Window_MenuStatus.prototype.drawItemImage = function(index) {
     const actor = this.actor(index);
     const bitmap = this.getActorLoadBitmap(actor);
-    if (!bitmap.isReady()) {
+    if (bitmap && !bitmap.isReady()) {
         bitmap.addLoadListener(this.drawActorGraphic.bind(this, actor, bitmap, index));
     } else {
         this.drawActorGraphic(actor, bitmap, index);
@@ -1244,8 +1282,10 @@ Window_MenuStatus.prototype.drawActorGraphic = function(actor, bitmap, index) {
     const data = this.getActorData(actor);
     const rect = this.itemRect(index);
     this.changePaintOpacity(actor.isBattleMember());
-    if (!data || data.FaceMode) {
+    if (!data || data.GraphicMode === 'face') {
         this.contentsDrawActorFace(actor, rect.x, rect.y, rect.width, rect.height);
+    } else if (data.GraphicMode === 'charachip') {
+        this.contentsDrawActorChip(actor, rect.x + data.Actor_X + ActorImg_X, rect.y + data.Actor_Y + ActorImg_Y, rect.width, rect.height);
     } else {
         this.contentsDrawActorGraphic(actor, data, bitmap, rect.x, rect.y, rect.width, rect.height);
     }
@@ -1280,19 +1320,33 @@ Window_MenuStatus.prototype.contentsDrawActorFace = function(actor, x, y, width,
     this.drawActorFace(actor, x, y, width, height);
 };
 
+Window_MenuStatus.prototype.contentsDrawActorChip = function(actor, x, y, width, height) {
+    this.drawActorCharacter(actor, x + 24, y + 48);
+};
+
 Window_MenuStatus.prototype.drawActorFront = function(bitmap, x, y, width, height) {
     this.contents.blt(bitmap, 0, 0, width, height, x, y);
 };
 
 Window_MenuStatus.prototype.getActorImgData = function(actorId) {
-    return ActorsImgList.find(actorImg => actorImg.actorId === actorId);
+    const actors = ActorsImgList;
+    const find = actors.find(actor => actor.actorId === actorId);
+    if (!find) {
+      return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: GraphicMode, FaceIndex : -1};
+    } if (find.GraphicMode === 'default' || !find.GraphicMode) {
+        find.GraphicMode = GraphicMode;
+    }
+    return find;
+    //return ActorsImgList.find(actorImg => actorImg.actorId === actorId);
 };
 
 Window_MenuStatus.prototype.battlreActorPicture = function(id) {
     const actors = ActorPictureData;
     const find = actors.find(actor => actor.actorId === id);
     if (!find) {
-      return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, FaceMode: true, FaceIndex : -1};
+      return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: GraphicMode, FaceIndex : -1};
+    } else if (find.GraphicMode === 'default' || !find.GraphicMode) {
+        find.GraphicMode = GraphicMode;
     }
     return find;
 };
@@ -1305,14 +1359,20 @@ Window_MenuStatus.prototype.getActorLoadBitmap = function(actor) {
     const data = this.getActorData(actor);
     if (data) {
         if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-            return data.FaceMode ? actor.loadActorFace() : actor.loadActorGraphic();
+            if (data.GraphicMode === 'face') {
+                return actor.loadActorFace();
+            } else if (data.GraphicMode === 'img') {
+                return actor.loadActorGraphic();
+            }
+            return null;
         } else {
-            if (data.FaceMode) {
+            if (data.GraphicMode === 'face') {
                 const imges = data.FaceImg ? data.FaceImg : actor.faceName();
                 return ImageManager.loadFace(imges);
-            } else {
+            } else if (data.GraphicMode === 'img') {
                 return ImageManager.nuun_LoadPictures(data.ActorImg);
-            } 
+            }
+            return null;
         }
     } else {
         return ImageManager.loadFace(actor.faceName());
@@ -1937,6 +1997,25 @@ Sprite_MenuGauge.prototype.drawValue = function() {
         this.bitmap.drawText(text, 0, 0, width, height, "right");
     } else {
         Sprite_Gauge.prototype.drawValue.call(this);
+    }
+};
+
+
+function Sprite_MenuScreenCharacter() {
+    this.initialize(...arguments);
+}
+  
+Sprite_MenuScreenCharacter.prototype = Object.create(Sprite_Character.prototype);
+Sprite_MenuScreenCharacter.prototype.constructor = Sprite_MenuScreenCharacter;
+  
+Sprite_MenuScreenCharacter.prototype.initialize = function(character) {
+    Sprite_Character.prototype.initialize.call(this, character);
+};
+  
+Sprite_MenuScreenCharacter.prototype.update = function() {
+    if (this.visible) {
+      Sprite_Character.prototype.update.call(this);
+      this._character.updateAnimation();
     }
 };
 

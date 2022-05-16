@@ -1,4 +1,4 @@
-# [アイテムグループ所持制限](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js)
+# [アイテム全体所持制限](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js)
 #### 必須、前提プラグイン

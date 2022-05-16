@@ -1272,7 +1272,7 @@ Window_MenuStatus.prototype.drawItemStatus = function(index) {
       const x_Position = data.X_Position;
       const position = Math.min(x_Position, this.maxContentsCols());
       const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
-      const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate;
+      const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate + this.itemPadding();
       const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : itemWidth;
       this.drawContentsBase(data, contentsX, contentsY, width - colSpacing / 2, actor);
     }

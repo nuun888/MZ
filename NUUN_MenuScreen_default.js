@@ -1,22 +1,21 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_MenuScreen_2.js
+ * NUUN_MenuScreen_default.js
  * 
- * Copyright (C) 2021 NUUN
+ * Copyright (C) 2022 NUUN
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */ 
 /*:
  * @target MZ
- * @plugindesc メニュー画面タイプ２
+ * @plugindesc メニュー画面デフォルトタイプ
  * @author NUUN
- * @version 1.4.0
+ * @version 1.0.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
- * メニューコマンドの表示を上部に配置しアクターの表示を横一列にします。
  * 
  * メニュー画面に表示できる項目はカスタマイズすることができます。
  * 
@@ -30,37 +29,14 @@
  * 
  * 表示ステータスの取得パラメータ
  * actor:アクターのゲームデータ
- * 
+ *  
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
- * 2022/5/17 Ver.1.4.0
- * キャラチップを表示できる機能を追加。
- * アクターの画像を顔グラ、キャラチップ、画像から選択する方式に変更。
- * 2022/5/11 Ver.1.3.0
- * ステータス欄の各項目にフォントサイズを設定できる機能を追加。
- * インフォウィンドウにフリーテキストを追加。
- * 2022/4/10 Ver.1.2.1
- * 誤字修正。
- * 2022/4/10 Ver.1.2.0
- * アクター表示の項目に通常能力値、追加能力値、特殊能力値を設定できる機能を追加。
- * 顔グラモードでアクター前面画像が表示されない問題を修正。
- * アクター表示画像表示関係の処理を修正。
- * 画面上、コマンド下にインフォウィンドウを表示できる機能を追加。
- * 各アクターの表示領域内に項目表示が収まるように修正。
- * アイテム、スキルで味方選択時の画面をメニュー画面の表示と同じになるように修正。
- * バージョンアップによりプリセットを変更。
- * 2022/1/23 Ver.1.1.1
- * 立ち絵、顔グラEXを導入せず、顔グラを表示させるとエラーが出る問題を修正。
- * 顔グラの座標設定の仕様を変更。
- * 2022/1/9 Ver.1.1.0
- * ステータス項目の表示の文字揃えを指定できる機能を追加。
- * ステータス項目に経験値を追加。
- * インフォウィンドウの文字サイズを指定できる機能を追加。
- * 2021/12/29 Ver.1.0.0
+ * 2022/5/17 Ver.1.0.0
  * 初版
  * 
  * @param Setting
@@ -71,7 +47,7 @@
  * @text アクターの表示列
  * @desc アクターの表示する列。
  * @type number
- * @default 4
+ * @default 1
  * @min 1
  * @parent Setting
  * 
@@ -79,23 +55,7 @@
  * @text アクターの表示行
  * @desc アクターの表示する行。
  * @type number
- * @default 1
- * @min 1
- * @parent Setting
- * 
- * @param CommandCols
- * @text メニューコマンドの表示列
- * @desc メニューコマンドの表示する列。
- * @type number
  * @default 4
- * @min 1
- * @parent Setting
- * 
- * @param CommandRows
- * @text メニューコマンドの表示行
- * @desc メニューコマンドの表示する行。
- * @type number
- * @default 2
  * @min 1
  * @parent Setting
  * 
@@ -128,6 +88,24 @@
  * @default true
  * @parent Setting
  * 
+ * @param CommandPosition
+ * @text メニューコマンドの位置
+ * @desc メニューコマンドの位置を指定します。
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @default 'right'
+ * @parent Setting
+ * 
+ * @param CommandTop
+ * @text トップメニューコマンド
+ * @desc メニューコマンドの上にヘッダーを挟まない。
+ * @type boolean
+ * @default true
+ * @parent Setting
+ * 
  * @param BackGroundSetting
  * @text 背景設定
  * @default ------------------------------
@@ -155,14 +133,14 @@
  * @desc ステータス項目設定
  * @text ステータス項目設定
  * @type struct<StatusListData>[]
- * @default ["{\"DateSelect\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\"}","{\"DateSelect\":\"4\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"128\",\"Align\":\"'left'\",\"DetaEval\":\"\"}","{\"DateSelect\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"10\",\"ItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"14\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-56\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-28\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"132\",\"SystemItemWidth\":\"48\",\"Align\":\"'right'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\"}"]
  * @parent StatusSetting
  * 
  * @param HPGaugeWidth
  * @text HPゲージ横幅
  * @desc HPゲージの横幅を指定します。
  * @type number
- * @default 200
+ * @default 128
  * @min 0
  * @parent StatusSetting
  * 
@@ -170,7 +148,7 @@
  * @text MPゲージ横幅
  * @desc MPゲージの横幅を指定します。
  * @type number
- * @default 200
+ * @default 128
  * @min 0
  * @parent StatusSetting
  * 
@@ -178,7 +156,7 @@
  * @text TPゲージ横幅
  * @desc TPゲージの横幅を指定します。
  * @type number
- * @default 200
+ * @default 128
  * @min 0
  * @parent StatusSetting
  * 
@@ -190,7 +168,7 @@
  * @text Expゲージ横幅
  * @desc Expゲージの横幅を指定します。
  * @type number
- * @default 200
+ * @default 128
  * @min 0
  * @parent Expgauge
  * 
@@ -226,7 +204,6 @@
  * @max 99
  * @parent Expgauge
  * 
- * 
  * @param InfoSetting
  * @text インフォ設定
  * @default ------------------------------
@@ -238,91 +215,48 @@
  * @default ["{\"HelpCommandName\":\"'アイテム'\",\"HelpCommandText\":\"所持しているアイテムを表示します。\"}","{\"HelpCommandName\":\"'スキル'\",\"HelpCommandText\":\"スキルを表示します。\"}","{\"HelpCommandName\":\"'装備'\",\"HelpCommandText\":\"装備を変更します。\"}","{\"HelpCommandName\":\"'ステータス'\",\"HelpCommandText\":\"アクターのステータスを表示します。\"}","{\"HelpCommandName\":\"'オプション'\",\"HelpCommandText\":\"ゲームの設定を変更します。\"}","{\"HelpCommandName\":\"'並び替え'\",\"HelpCommandText\":\"メンバーの並び替えを行います。\"}","{\"HelpCommandName\":\"'セーブ'\",\"HelpCommandText\":\"データを記録します。\"}","{\"HelpCommandName\":\"'ゲーム終了'\",\"HelpCommandText\":\"ゲームを終了します。\"}"]
  * @parent InfoSetting
  * 
- * @param InfoHeaderSetting1
+ * @param InfoHeaderSetting
  * @text ヘッターインフォ設定
  * @default ------------------------------
  * @parent InfoSetting
  * 
- * @param InfoHeaderShow1
+ * @param InfoHeaderShow
  * @text ヘッターインフォ表示
  * @desc 画面上にインフォウィンドウを表示します。
  * @type boolean
  * @default false
- * @parent InfoHeaderSetting1
+ * @parent InfoHeaderSetting
  * 
- * @param InfoHeaderList1
+ * @param InfoHeaderList
  * @desc インフォ項目設定
  * @text インフォ項目設定
  * @type struct<InfoListData>[]
- * @default []
- * @parent InfoHeaderSetting1
+ * @default ["{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"現在地\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"プレイ時間\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"6\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}"]
+ * @parent InfoHeaderSetting
  * 
- * @param InfoHeaderCols1
+ * @param InfoHeaderCols
  * @text インフォの表示列
  * @desc インフォの表示する列。
  * @type number
- * @default 3
+ * @default 2
  * @min 1
- * @parent InfoHeaderSetting1
+ * @parent InfoHeaderSetting
  * 
- * @param InfoHeaderRows1
+ * @param InfoHeaderRows
  * @text インフォの表示行
  * @desc インフォの表示する行。
  * @type number
- * @default 1
+ * @default 2
  * @min 1
- * @parent InfoHeaderSetting1
+ * @parent InfoHeaderSetting
  * 
- * @param InfoHeaderFontSize1
+ * @param InfoHeaderFontSize
  * @desc フォントサイズ（メインフォントからの差）
  * @text フォントサイズ
  * @type number
  * @default 0
  * @min -99
- * @parent InfoHeaderSetting1
- * 
- * @param InfoHeaderSetting2
- * @text ヘッターインフォ設定
- * @default ------------------------------
- * @parent InfoSetting
- * 
- * @param InfoHeaderShow2
- * @text ヘッターインフォ表示
- * @desc メニューコマンド下にインフォウィンドウを表示します。
- * @type boolean
- * @default false
- * @parent InfoHeaderSetting2
- * 
- * @param InfoHeaderList2
- * @desc インフォ項目設定
- * @text インフォ項目設定
- * @type struct<InfoListData>[]
- * @default []
- * @parent InfoHeaderSetting2
- * 
- * @param InfoHeaderCols2
- * @text インフォの表示列
- * @desc インフォの表示する列。
- * @type number
- * @default 3
- * @min 1
- * @parent InfoHeaderSetting2
- * 
- * @param InfoHeaderRows2
- * @text インフォの表示行
- * @desc インフォの表示する行。
- * @type number
- * @default 1
- * @min 1
- * @parent InfoHeaderSetting2
- * 
- * @param InfoHeaderFontSize2
- * @desc フォントサイズ（メインフォントからの差）
- * @text フォントサイズ
- * @type number
- * @default 0
- * @min -99
- * @parent InfoHeaderSetting2
+ * @parent InfoHeaderSetting
  * 
  * @param InfoFooterSetting
  * @text フッターインフォ設定
@@ -333,21 +267,21 @@
  * @text フッターインフォ表示
  * @desc 画面下にインフォウィンドウを表示します。
  * @type boolean
- * @default true
+ * @default false
  * @parent InfoFooterSetting
  * 
  * @param InfoList
  * @desc インフォ項目設定
  * @text インフォ項目設定
  * @type struct<InfoListData>[]
- * @default ["{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"現在地\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"プレイ時間\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"6\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}"]
+ * @default []
  * @parent InfoFooterSetting
  * 
  * @param InfoCols
  * @text インフォの表示列
  * @desc インフォの表示する列。
  * @type number
- * @default 2
+ * @default 3
  * @min 1
  * @parent InfoFooterSetting
  * 
@@ -355,7 +289,7 @@
  * @text インフォの表示行
  * @desc インフォの表示する行。
  * @type number
- * @default 2
+ * @default 1
  * @min 1
  * @parent InfoFooterSetting
  * 
@@ -363,7 +297,7 @@
  * @desc フォントサイズ（メインフォントからの差）
  * @text フォントサイズ
  * @type number
- * @default -2
+ * @default 0
  * @min -99
  * @parent InfoFooterSetting
  * 
@@ -373,8 +307,8 @@
  * @parent InfoSetting
  * 
  * @param InfoSideShow
- * @text フッターインフォ表示
- * @desc 画面下にインフォウィンドウを表示します。フッターインフォ表示時のみ表示されます。
+ * @text サイドインフォ表示
+ * @desc メニューコマンド下にインフォウィンドウを表示します。
  * @type boolean
  * @default true
  * @parent InfoSideSetting
@@ -383,7 +317,15 @@
  * @desc インフォ項目設定
  * @text インフォ項目設定
  * @type struct<InfoListData>[]
- * @default ["{\"DateSelect\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"所持金\",\"DetaEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\"}","{\"DateSelect\":\"2\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"2\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\",\"Text\":\"\"}"]
+ * @parent InfoSideSetting
+ * 
+ * @param InfoSideRows
+ * @text インフォの表示行
+ * @desc インフォの表示する行。
+ * @type number
+ * @default 1
+ * @min 1
  * @parent InfoSideSetting
  * 
  * @param InfoSideFontSize
@@ -434,7 +376,7 @@
  * 
  * @param ActorImg_X
  * @text アクター画像基本X座標
- * @desc アクター画像の基本X座標(顔グラのみ)
+ * @desc アクター画像の基本X座標
  * @type number
  * @max 9999
  * @min -9999
@@ -443,7 +385,7 @@
  * 
  * @param ActorImg_Y
  * @text アクター画像基本Y座標
- * @desc アクター画像の基本Y座標(顔グラのみ)
+ * @desc アクター画像の基本Y座標
  * @type number
  * @max 9999
  * @min -9999
@@ -465,7 +407,7 @@
  * @option '並び替え'
  * @option 'セーブ'
  * @option 'ゲーム終了'
- * @default 
+ * @default
  * 
  * @param HelpCommandText
  * @text コマンドの説明文
@@ -957,14 +899,12 @@
  * 
  */
 var Imported = Imported || {};
-Imported.NUUN_MenuScreen_2 = true;
+Imported.NUUN_MenuScreen_default = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_MenuScreen_2');
-const MenuCols = Number(parameters['MenuCols'] || 4);
-const MenuRows = Number(parameters['MenuRows'] || 1);
-const CommandCols = Number(parameters['CommandCols'] || 4);
-const CommandRows = Number(parameters['CommandRows'] || 2);
+const parameters = PluginManager.parameters('NUUN_MenuScreen_default');
+const MenuCols = Number(parameters['MenuCols'] || 1);
+const MenuRows = Number(parameters['MenuRows'] || 4);
 const ExpDisplayMode = Number(parameters['ExpDisplayMode'] || 1);
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const BackGroundImg = String(parameters['BackGroundImg']);
@@ -972,34 +912,31 @@ const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
 const WindowVisible = eval(parameters['WindowVisible'] || "true");
 const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
 const LabelShow = eval(parameters['LabelShow'] || "true");
-const OrgHPGaugeWidth = Number(parameters['HPGaugeWidth'] || 200);
-const OrgMPGaugeWidth = Number(parameters['MPGaugeWidth'] || 200);
-const OrgTPGaugeWidth = Number(parameters['TPGaugeWidth'] || 200);
-const OrgExpGaugeWidth = Number(parameters['ExpGaugeWidth'] || 200);
+const OrgHPGaugeWidth = Number(parameters['HPGaugeWidth'] || 128);
+const OrgMPGaugeWidth = Number(parameters['MPGaugeWidth'] || 128);
+const OrgTPGaugeWidth = Number(parameters['TPGaugeWidth'] || 128);
+const OrgExpGaugeWidth = Number(parameters['ExpGaugeWidth'] || 128);
 const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
 const ActorImg_X = Number(parameters['ActorImg_X'] || 0);
 const ActorImg_Y = Number(parameters['ActorImg_Y'] || 0);
+const CommandPosition = eval(parameters['CommandPosition']) || 'right';
+const CommandTop = eval(parameters['CommandTop'] || "true");
 const ExpGaugeColor1 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor1'])) : 18);
 const ExpGaugeColor2 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor2'])) : 18);
 const StatusList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusList'])) : null) || [];
+
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];
 const GraphicMode = eval(parameters['GraphicMode']) || 'face';
 
 const HelpList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['HelpList'])) : null) || [];
-const InfoHeaderShow1 = eval(parameters['InfoHeaderShow1'] || "false");
-const InfoHeaderList1 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['InfoHeaderList1'])) : null) || [];
-const InfoHeaderCols1 = Number(parameters['InfoHeaderCols1'] || 1);
-const InfoHeaderRows1 = Number(parameters['InfoHeaderRows1'] || 1);
-const InfoHeaderFontSize1 = Number(parameters['InfoHeaderFontSize1'] || 0);
+const InfoHeaderShow = eval(parameters['InfoHeaderShow'] || "false");
+const InfoHeaderList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['InfoHeaderList'])) : null) || [];
+const InfoHeaderCols = Number(parameters['InfoHeaderCols'] || 2);
+const InfoHeaderRows = Number(parameters['InfoHeaderRows'] || 2);
+const InfoHeaderFontSize = Number(parameters['InfoHeaderFontSize'] || 0);
 
-const InfoHeaderShow2 = eval(parameters['InfoHeaderShow2'] || "false");
-const InfoHeaderList2 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['InfoHeaderList2'])) : null) || [];
-const InfoHeaderCols2 = Number(parameters['InfoHeaderCols2'] || 1);
-const InfoHeaderRows2 = Number(parameters['InfoHeaderRows2'] || 1);
-const InfoHeaderFontSize2 = Number(parameters['InfoHeaderFontSize2'] || 0);
-
-const InfoFooterShow = eval(parameters['InfoFooterShow'] || "true");
+const InfoFooterShow = eval(parameters['InfoFooterShow'] || "false");
 const InfoList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['InfoList'])) : null) || [];
 const InfoCols = Number(parameters['InfoCols'] || 3);
 const InfoRows = Number(parameters['InfoRows'] || 2);
@@ -1007,13 +944,13 @@ const InfoFontSize = Number(parameters['InfoFontSize'] || 0);
 
 const InfoSideShow = eval(parameters['InfoSideShow'] || "false");
 const InfoSideList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['InfoSideList'])) : null) || [];
+const InfoSideRows = Number(parameters['InfoSideRows'] || 1);
+const InfoSideFontSize = Number(parameters['InfoSideFontSize'] || 0);
 
 let HPGaugeWidth = OrgHPGaugeWidth;
 let MPGaugeWidth = OrgMPGaugeWidth;
 let TPGaugeWidth = OrgTPGaugeWidth;
 let ExpGaugeWidth = OrgExpGaugeWidth;
-
-const InfoSideFontSize = Number(parameters['InfoSideFontSize'] || 0);
 
 let gaugeType = null;
 
@@ -1028,11 +965,16 @@ Scene_Menu.prototype.create = function() {
     this.createInfoWindow();
 };
 
+Scene_Menu.prototype.isRightInputMode = function() {
+    return CommandPosition === 'right';
+};
+
 Scene_Menu.prototype.commandWindowRect = function() {
+    const headerHeight = !CommandTop && InfoHeaderShow ? this.infoAreaHeight(InfoHeaderRows) : 0;
     const ww = this.mainCommandWidth();
-    const wh = this.mainCommandAreaHeight();
+    const wh = (InfoSideShow ? Math.min(this.mainAreaHeight(), this.mainAreaHeight() - this.infoAreaHeight(InfoSideRows)) : this.mainAreaHeight()) - headerHeight;
     const wx = this.isRightInputMode() ? Graphics.boxWidth - ww : 0;
-    const wy = this.mainAreaTop() + (InfoHeaderShow1 ? this.infoAreaHeight(InfoHeaderRows1) : 0);
+    const wy = this.mainAreaTop() + headerHeight;
     return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -1045,35 +987,23 @@ Scene_Menu.prototype.createCommandWindow = function() {
 };
 
 Scene_Menu.prototype.createInfoWindow = function() {
-    if (InfoHeaderShow1) {
-        this.createInfoHeader1Window();
-    }
-    if (InfoHeaderShow2) {
-        this.createInfoHeader2Window();
+    if (InfoHeaderShow) {
+        this.createInfoHeaderWindow();
     }
     if (InfoFooterShow) {
         this.createInfoFooterWindow();
     }
-    if (InfoFooterShow && InfoSideShow) {
+    if (InfoSideShow) {
         this.createInfoSideWindow();
     }
 };
 
-Scene_Menu.prototype.createInfoHeader1Window = function() {
-    const rect = this.infoWindowHeader1Rect();
-    this._infoHeader1MenuWindow = new Window_InfoHeader1(rect);
-    this.addWindow(this._infoHeader1MenuWindow);
+Scene_Menu.prototype.createInfoHeaderWindow = function() {
+    const rect = this.infoWindowHeaderRect();
+    this._infoHeaderMenuWindow = new Window_InfoHeader(rect);
+    this.addWindow(this._infoHeaderMenuWindow);
     if (!WindowVisible) {
-        this._infoHeader1MenuWindow.opacity = 0;
-    }
-};
-
-Scene_Menu.prototype.createInfoHeader2Window = function() {
-    const rect = this.infoWindowHeader2Rect();
-    this._infoHeader2MenuWindow = new Window_InfoHeader2(rect);
-    this.addWindow(this._infoHeader2MenuWindow);
-    if (!WindowVisible) {
-        this._infoHeader2MenuWindow.opacity = 0;
+        this._infoHeaderMenuWindow.opacity = 0;
     }
 };
 
@@ -1104,42 +1034,34 @@ Scene_Menu.prototype.createStatusWindow = function() {
 };
 
 Scene_Menu.prototype.statusWindowRect = function() {
-    const headerHeight = (InfoHeaderShow1 ? this.infoAreaHeight(InfoHeaderRows1) : 0) + (InfoHeaderShow2 ? this.infoAreaHeight(InfoHeaderRows2) : 0);
-    const ww = this.mainCommandWidth();
-    const wh = this.mainAreaHeight() - this.mainCommandAreaHeight() - headerHeight - (InfoFooterShow ? this.infoAreaHeight(InfoRows) : 0);
-    const wx = 0;
-    const wy = this.menuHelpAreaHeight() + this.mainCommandAreaHeight() + headerHeight;
+    const headerHeight = InfoHeaderShow ? this.infoAreaHeight(InfoHeaderRows) : 0;
+    const ww = Graphics.boxWidth - this.mainCommandWidth();
+    const wh = this.mainAreaHeight() - headerHeight - (InfoFooterShow ? this.infoAreaHeight(InfoRows) : 0);
+    const wx = this.isRightInputMode() ? 0 : Graphics.boxWidth - ww;
+    const wy = this.menuHelpAreaHeight() + headerHeight;
     return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_Menu.prototype.infoWindowHeader1Rect = function() {
-    const wx = 0;
+Scene_Menu.prototype.infoWindowHeaderRect = function() {
+    const ww = Graphics.boxWidth - (CommandTop ? this.mainCommandWidth() : 0);
+    const wx = (CommandTop ? this.isRightInputMode() ? 0 : Graphics.boxWidth - ww : 0);
     const wy = this.menuHelpAreaHeight();
-    const ww = Graphics.boxWidth;
-    const wh = this.infoAreaHeight(InfoHeaderRows1);
-    return new Rectangle(wx, wy, ww, wh);
-};
-
-Scene_Menu.prototype.infoWindowHeader2Rect = function() {
-    const wx = 0;
-    const wy = this.menuHelpAreaHeight() + this.mainCommandAreaHeight() + (InfoHeaderShow1 ? this._infoHeader1MenuWindow.height : 0);
-    const ww = Graphics.boxWidth;
-    const wh = this.infoAreaHeight(InfoHeaderRows2);
+    const wh = this.infoAreaHeight(InfoHeaderRows);
     return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Menu.prototype.infoWindowRect = function() {
-    const wx = 0;
     const wh = this.infoAreaHeight(InfoRows);
     const wy = Graphics.boxHeight - wh;
-    const ww = Graphics.boxWidth - (InfoSideShow ? 240 : 0);
+    const ww = Graphics.boxWidth - (InfoSideShow ? this.mainCommandWidth() : 0);
+    const wx = this.isRightInputMode() ? 0 : Graphics.boxWidth - ww;;
     return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Menu.prototype.infoWindowSideRect = function() {
-    const ww = 240;
-    const wh = this.infoAreaHeight(InfoRows);
-    const wx = Graphics.boxWidth - ww;
+    const ww = this.mainCommandWidth();
+    const wh = this.infoAreaHeight(InfoSideRows);
+    const wx = this._commandWindow.x;
     const wy = Graphics.boxHeight - wh;
     return new Rectangle(wx, wy, ww, wh);
 };
@@ -1171,14 +1093,6 @@ Scene_Menu.prototype.setBackGround = function(sprite) {
     }
 };
 
-Scene_Menu.prototype.mainCommandWidth = function() {
-    return Graphics.boxWidth;
-};
-
-Scene_Menu.prototype.mainCommandAreaHeight = function() {
-    return this.calcWindowHeight(CommandRows, true);
-};
-
 Scene_Menu.prototype.infoAreaHeight = function(rows) {
     return this.calcWindowHeight(rows, (rows === 1));
 };
@@ -1192,27 +1106,15 @@ Scene_Menu.prototype.update = function() {
 	_Scene_Menu_update.call(this);
     const find = HelpList.find(data => data.HelpCommandName === this._commandWindow.currentData().name);
     const text = find && find.HelpCommandText ? find.HelpCommandText : "";
-    if (InfoHeaderShow1) {
-        this._infoHeader1MenuWindow.setText(text)
-    }
-    if (InfoHeaderShow2) {
-        this._infoHeader2MenuWindow.setText(text)
+    if (InfoHeaderShow) {
+        this._infoHeaderMenuWindow.setText(text)
     }
     if (InfoFooterShow) {
         this._infoMenuWindow.setText(text);
     }
-    if (InfoFooterShow && InfoSideShow) {
+    if (InfoSideShow) {
         this._infoSideMenuWindow.setText(text);
     }
-};
-
-
-Window_MenuCommand.prototype.numVisibleRows = function() {
-    return CommandRows;
-};
-
-Window_MenuCommand.prototype.maxCols = function() {
-    return CommandCols;
 };
 
 
@@ -1299,6 +1201,38 @@ Window_MenuStatus.prototype.drawActorBack = function(bitmap, index) {
     this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
 };
 
+const _Window_MenuStatus_drawItemImage = Window_MenuStatus.prototype.drawItemImage;
+Window_MenuStatus.prototype.drawItemImage = function(index) {
+    const actor = this.actor(index);
+    const bitmap = this.getActorLoadBitmap(actor);
+    if (bitmap && !bitmap.isReady()) {
+        bitmap.addLoadListener(this.drawActorGraphic.bind(this, actor, bitmap, index));
+    } else {
+        this.drawActorGraphic(actor, bitmap, index);
+    }
+};
+
+Window_MenuStatus.prototype.drawActorFace = function(actor, x, y, width, height, data) {
+    x += (data ? data.Actor_X : 0) + ActorImg_X + 1;
+    y += (data ? data.Actor_Y : 0) + ActorImg_Y + 1;
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
+    } else {
+        let bitmap = null;
+        if (data && data.FaceImg) {
+            bitmap = data.FaceImg;
+        } else {
+            bitmap = actor.faceName();
+        }
+        const faceIndex = data && data.FaceIndex >= 0 ? data.FaceIndex : actor.faceIndex();
+        this.drawFace(bitmap, faceIndex, x, y, width, height);
+    }
+};
+
+Window_MenuStatus.prototype.getActorImgData = function(actor) {
+    return ActorsImgList.find(actorImg => actorImg.actorId === actor.actorId());
+};
+
 Window_MenuStatus.prototype.drawItemStatus = function(index) {
     const actor = this.actor(index);
     const rect = this.itemRect(index);
@@ -1310,19 +1244,8 @@ Window_MenuStatus.prototype.drawItemStatus = function(index) {
       const position = Math.min(x_Position, this.maxContentsCols());
       const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
       const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate + this.itemPadding();
-      width2 = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : itemWidth;
-      this.drawContentsBase(data, contentsX, contentsY, width2 - colSpacing / 2, actor);
-    }
-};
-
-const _Window_MenuStatus_drawItemImage = Window_MenuStatus.prototype.drawItemImage;
-Window_MenuStatus.prototype.drawItemImage = function(index) {
-    const actor = this.actor(index);
-    const bitmap = this.getActorLoadBitmap(actor);
-    if (bitmap && !bitmap.isReady()) {
-        bitmap.addLoadListener(this.drawActorGraphic.bind(this, actor, bitmap, index));
-    } else {
-        this.drawActorGraphic(actor, bitmap, index);
+      const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : itemWidth;
+      this.drawContentsBase(data, contentsX, contentsY, width - colSpacing / 2, actor);
     }
 };
 
@@ -1349,12 +1272,6 @@ Window_MenuStatus.prototype.drawActorGraphic = function(actor, bitmap, index) {
     }
 };
 
-Window_MenuStatus.prototype.contentsDrawActorFace = function(actor, x, y, width, height) {
-    width = Math.min(width - 2, ImageManager.faceWidth);
-    height = height - 2;
-    this.drawActorFace(actor, x, y, width, height);
-};
-
 Window_MenuStatus.prototype.contentsDrawActorGraphic = function(actor, data, bitmap, x, y, width, height) {
     width = Math.min(width - 2, bitmap.width);
     height = Math.min(height - 2, bitmap.height);
@@ -1363,35 +1280,23 @@ Window_MenuStatus.prototype.contentsDrawActorGraphic = function(actor, data, bit
     const sh = height * scale;
     const sx = data.Img_SX || 0;
     const sy = data.Img_SY || 0;
-    const x2 = data.Actor_X + ActorImg_X;
     x += 1 + data.Actor_X + ActorImg_X;
     y += 1 + data.Actor_Y + ActorImg_Y;
     this.contents.blt(bitmap, sx, sy, width + (width - sw), height + (height - sh), x, y, width, height);
 };
 
-Window_MenuStatus.prototype.drawActorFace = function(actor, x, y, width, height, data) {
-    x += (data ? data.Actor_X : 0) + ActorImg_X + 1;
-    y += (data ? data.Actor_Y : 0) + ActorImg_Y + 1;
-    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
-    } else {
-        let bitmap = null;
-        if (data && data.FaceImg) {
-            bitmap = data.FaceImg;
-        } else {
-            bitmap = actor.faceName();
-        }
-        const faceIndex = data && data.FaceIndex >= 0 ? data.FaceIndex : actor.faceIndex();
-        this.drawFace(bitmap, faceIndex, x, y, width, height);
-    }
-};
-
-Window_MenuStatus.prototype.drawActorFront = function(bitmap, x, y, width, height) {
-    this.contents.blt(bitmap, 0, 0, width, height, x, y);
+Window_MenuStatus.prototype.contentsDrawActorFace = function(actor, x, y, width, height) {
+    width = Math.min(width - 2, ImageManager.faceWidth);
+    height = height - 2;
+    this.drawActorFace(actor, x, y, width, height);
 };
 
 Window_MenuStatus.prototype.contentsDrawActorChip = function(actor, x, y, width, height) {
     this.drawActorCharacter(actor, x + 24, y + 48);
+};
+
+Window_MenuStatus.prototype.drawActorFront = function(bitmap, x, y, width, height) {
+    this.contents.blt(bitmap, 0, 0, width, height, x, y);
 };
 
 Window_MenuStatus.prototype.getActorImgData = function(actorId) {
@@ -1410,10 +1315,10 @@ Window_MenuStatus.prototype.battlreActorPicture = function(id) {
     const actors = ActorPictureData;
     const find = actors.find(actor => actor.actorId === id);
     if (!find) {
-        return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: GraphicMode, FaceIndex : -1};
-      } else if (find.GraphicMode === 'default' || !find.GraphicMode) {
-          find.GraphicMode = GraphicMode;
-      }
+      return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: GraphicMode, FaceIndex : -1};
+    } else if (find.GraphicMode === 'default' || !find.GraphicMode) {
+        find.GraphicMode = GraphicMode;
+    }
     return find;
 };
 
@@ -1510,12 +1415,6 @@ Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor
     case 48:
     case 49:
         this.drawSParams(data, data.DateSelect, x, y, width, actor);
-        break;
-    case 100:
-        break;
-    case 101:
-        break;
-    case 102:
         break;
     case 1000:
         this.horzLine(x, y, width, actor);
@@ -1764,6 +1663,10 @@ Window_InfoMenu.prototype.initialize = function(rect) {
     this.refresh();
 };
 
+Window_InfoMenu.prototype.maxCols = function() {
+    return InfoCols;
+};
+
 Window_InfoMenu.prototype.refresh = function() {
     this.contents.clear();
     const list = this.getInfoList();
@@ -1817,9 +1720,9 @@ Window_InfoMenu.prototype.drawGold = function(data, x, y, width) {
         this.drawIcon(data.InfoIcon, x, y + 2);
         iconWidth = ImageManager.iconWidth + 6;
     }
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
-    const textWidth = data.SystemItemWidth === 0? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+    const textWidth = data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x + iconWidth, y, textWidth);
     this.resetTextColor();
     this.drawCurrencyValue(this.value(), this.currencyUnit(), x + textWidth + 8 + iconWidth, y, width - (textWidth + 8 + iconWidth));
@@ -1831,7 +1734,7 @@ Window_InfoMenu.prototype.drawPlayTime = function(data, x, y, width) {
         this.drawIcon(data.InfoIcon, x, y + 2);
         iconWidth = ImageManager.iconWidth + 6;
     }
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x + iconWidth, y, textWidth);
@@ -1845,7 +1748,7 @@ Window_InfoMenu.prototype.drawLocation = function(data, x, y, width) {
         this.drawIcon(data.InfoIcon, x, y + 2);
         iconWidth = ImageManager.iconWidth + 6;
     }
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x + iconWidth, y, textWidth);
@@ -1860,7 +1763,7 @@ Window_InfoMenu.prototype.drawParam = function(data, x, y, width) {
         this.drawIcon(data.InfoIcon, x, y + 2);
         iconWidth = ImageManager.iconWidth + 6;
     }
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
     this.drawText(nameText, x + iconWidth, y, textWidth);
@@ -1879,20 +1782,13 @@ Window_InfoMenu.prototype.drawFreeText = function(data, x, y, width) {
 };
 
 Window_InfoMenu.prototype.drawName = function(data, x, y, width) {
-    this.changeTextColor(this.getColorCode(data.NameColor));
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     this.drawText(nameText, x, y, width, data.Align);
 };
 
 Window_InfoMenu.prototype.systemWidth = function(swidth, width) {
     return swidth > 0 ? swidth : 120;
-};
-
-Window_InfoMenu.prototype.getColorCode = function(color) {
-    if (typeof(color) === "string") {
-      return color;
-    }
-    return ColorManager.textColor(color);
 };
 
 Window_InfoMenu.prototype.value = function() {
@@ -1908,54 +1804,28 @@ Window_InfoMenu.prototype.setText = function(str) {
     this.refresh();
 };
 
-
-function Window_InfoHeader1() {
+function Window_InfoHeader() {
     this.initialize(...arguments);
 }
 
-Window_InfoHeader1.prototype = Object.create(Window_InfoMenu.prototype);
-Window_InfoHeader1.prototype.constructor = Window_InfoHeader1;
+Window_InfoHeader.prototype = Object.create(Window_InfoMenu.prototype);
+Window_InfoHeader.prototype.constructor = Window_InfoHeader;
 
-Window_InfoHeader1.prototype.initialize = function(rect) {
+Window_InfoHeader.prototype.initialize = function(rect) {
     Window_InfoMenu.prototype.initialize.call(this, rect);
 };
 
-Window_InfoHeader1.prototype.maxCols = function() {
-    return InfoHeaderCols1;
+Window_InfoHeader.prototype.maxCols = function() {
+    return InfoHeaderCols;
 };
 
-Window_InfoHeader1.prototype.getInfoList = function() {
-    return InfoHeaderList1;
+Window_InfoHeader.prototype.getInfoList = function() {
+    return InfoHeaderList;
 };
 
-Window_InfoHeader1.prototype.getFontSize = function() {
-    return InfoHeaderFontSize1;
+Window_InfoHeader.prototype.getFontSize = function() {
+    return InfoHeaderFontSize;
 };
-
-
-function Window_InfoHeader2() {
-    this.initialize(...arguments);
-}
-
-Window_InfoHeader2.prototype = Object.create(Window_InfoMenu.prototype);
-Window_InfoHeader2.prototype.constructor = Window_InfoHeader2;
-
-Window_InfoHeader2.prototype.initialize = function(rect) {
-    Window_InfoMenu.prototype.initialize.call(this, rect);
-};
-
-Window_InfoHeader2.prototype.maxCols = function() {
-    return InfoHeaderCols2;
-};
-
-Window_InfoHeader2.prototype.getInfoList = function() {
-    return InfoHeaderList2;
-};
-
-Window_InfoHeader2.prototype.getFontSize = function() {
-    return InfoHeaderFontSize2;
-};
-
 
 function Window_InfoFooter() {
     this.initialize(...arguments);
@@ -2008,7 +1878,7 @@ Window_InfoSide.prototype.getFontSize = function() {
 function Sprite_MenuGauge() {
     this.initialize(...arguments);
 }
-
+  
 Sprite_MenuGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_MenuGauge.prototype.constructor = Sprite_MenuGauge;
   
@@ -2098,6 +1968,25 @@ Sprite_MenuGauge.prototype.drawValue = function() {
         this.bitmap.drawText(text, 0, 0, width, height, "right");
     } else {
         Sprite_Gauge.prototype.drawValue.call(this);
+    }
+};
+
+
+function Sprite_MenuScreenCharacter() {
+    this.initialize(...arguments);
+}
+  
+Sprite_MenuScreenCharacter.prototype = Object.create(Sprite_Character.prototype);
+Sprite_MenuScreenCharacter.prototype.constructor = Sprite_MenuScreenCharacter;
+  
+Sprite_MenuScreenCharacter.prototype.initialize = function(character) {
+    Sprite_Character.prototype.initialize.call(this, character);
+};
+  
+Sprite_MenuScreenCharacter.prototype.update = function() {
+    if (this.visible) {
+      Sprite_Character.prototype.update.call(this);
+      this._character.updateAnimation();
     }
 };
 

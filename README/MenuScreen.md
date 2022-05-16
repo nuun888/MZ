@@ -1,5 +1,5 @@
 # [メニュー画面タイプ１](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.3.1
+# Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -37,6 +37,9 @@
 ![画像](img/MenuScreen2.png) 
 
 ## 更新履歴
+2022/5/17 Ver.1.4.0  
+キャラチップを表示できる機能を追加。  
+アクターの画像を顔グラ、キャラチップ、画像から選択する方式に変更。  
 2022/5/11 Ver.1.3.1  
 インフォウィンドウにフリーテキストを追加。  
 2022/5/11 Ver.1.3.0  

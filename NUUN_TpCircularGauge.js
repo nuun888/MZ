@@ -155,21 +155,31 @@ Sprite_CircularGauge.prototype.initialize = function() {
 };
 
 Sprite_CircularGauge.prototype.initMembers = function() {
-  if (!this.circularSprite && GaugeBackImg && GaugeImg) {
-    this.createGaugeBackImg();
-    this.createGaugeImg();
-  }
   Sprite_Gauge.prototype.initMembers.call(this)
   this._startAngle = this.startAngle();
   this._sweepAngle = this.sweepAngle();
   this._startTPAngle = this.startTPAngle();
   this._sweepTPAngle = this.sweepTPAngle();
+  if (!this.circularSprite && GaugeBackImg && GaugeImg) {
+    this.createGaugeBackImg();
+    this.createGaugeImg();
+  }
 };
 
 Sprite_CircularGauge.prototype.createGaugeBackImg = function() {
   const bitmap = ImageManager.nuun_LoadPictures(GaugeBackImg);
   const sprite = new Sprite(bitmap);
   this.addChild(sprite);
+};
+
+Sprite_CircularGauge.prototype.createBitmap = function() {
+  const sprite = new Sprite();
+  this.addChild(sprite);
+  this.textSprite = sprite;
+  const width = this.bitmapWidth();
+  const height = this.bitmapHeight();
+  this.textSprite.bitmap = new Bitmap(width, height);
+  this.bitmap = this.textSprite.bitmap;
 };
 
 Sprite_CircularGauge.prototype.createGaugeImg = function() {
@@ -276,7 +286,7 @@ Sprite_CircularGauge.prototype.drawGauge = function() {
     } else {
       this.arcGaugeBackRect(gaugeX, gaugeY, this.gaugeHeight(), this.gaugeBackColor());
     }
-  this.arcGaugeRect(gaugeX, gaugeY, this.gaugeHeight, this.gaugeColor1(), false);
+  this.arcGaugeRect(gaugeX, gaugeY, gaugeHeight, this.gaugeColor1(), false);
   }
 };
 

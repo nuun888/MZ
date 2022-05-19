@@ -11,13 +11,15 @@
  * @target MZ
  * @plugindesc TP円形ゲージプラグイン
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * TPゲージを円形にします。
  * バトルスタイル拡張プラグインと併用する場合はこのプラグインを「NUUN_BattleStyleEX_Base」より下に配置してください。
  * 
  * 更新履歴
+ * 2022/5/19 Ver.1.1.1
+ * ゲージ更新時に前の画像が残ってしまう問題を修正。
  * 2022/5/18 Ver.1.1.0
  * 画像対応。
  * バトルスタイル拡張Ver.3.0.0以降で座標の変更ができなかった問題を修正。
@@ -315,6 +317,7 @@ Sprite_CircularGauge.prototype.arcGaugeBackRect = function(x, y, width, color) {
 
 Sprite_CircularGauge.prototype.arcGaugeImgRect = function(option) {
   const bitmap = this.circularSprite.bitmap;
+  bitmap.clear();
   const x = this._circularBitmap.width / 2;
   const y = this._circularBitmap.height / 2;
   const context = bitmap.context;

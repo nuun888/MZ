@@ -199,7 +199,7 @@
 | ---------- | ------------- | ------------- | -------- |
 | [ゲージの数値更新アニメーション](https://github.com/nuun888/MZ/blob/master/README/GaugeValueAnimation.md) | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js) | 共 | 1.2.0 |
 | [ゲージ画像化](https://github.com/nuun888/MZ/blob/master/README/GaugeImage.md) | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) | 共 | 1.4.3 |
-| [TP円形ゲージ](https://github.com/nuun888/MZ/blob/master/README/TpCircularGauge.md) | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js) |  | 1.1.0 |
+| [TP円形ゲージ](https://github.com/nuun888/MZ/blob/master/README/TpCircularGauge.md) | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js) |  | 1.1.1 |
 | [ダメージポップアップ画像化](https://github.com/nuun888/MZ/blob/master/README/DamagePopUpImg.md) | [NUUN_DamagePopUpImg](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpImg.js) |  | 1.1.1 |
 | [ダメージポップアップ同時表示](https://github.com/nuun888/MZ/blob/master/README/DamagePopUpSimulDisplay.md) | [NUUN_DamagePopUpSimulDisplay](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpSimulDisplay.js) |  | 1.0.0 |
 | [ステート、バフポップアップ](https://github.com/nuun888/MZ/blob/master/README/popUp.md) | [NUUN_popUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js) | 共 | 1.1.3 |

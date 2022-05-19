@@ -1,5 +1,5 @@
 # [TP円形ゲージプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js)  
 
 TPゲージを円形にします。  
@@ -13,6 +13,8 @@ TPゲージを円形にします。
 画像はゲージ背景画像、ゲージ画像両方設定してください。  
 
 ## 更新履歴
+2022/5/19 Ver.1.1.1  
+ゲージ更新時に前の画像が残ってしまう問題を修正。  
 2022/5/18 Ver.1.1.0  
 画像対応。  
 バトルスタイル拡張Ver.3.0.0以降で座標の変更ができなかった問題を修正。  

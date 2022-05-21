@@ -1,5 +1,5 @@
 # [メニュー画面タイプ１](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.4.0
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -39,6 +39,9 @@
 ![画像](img/MenuScreen2.png) 
 
 ## 更新履歴
+2022/5/22 Ver.1.4.1  
+ステータスの独自パラメータが適用されない問題を修正。  
+ステータスに経験値（ゲージなし）を追加。  
 2022/5/17 Ver.1.4.0  
 キャラチップを表示できる機能を追加。  
 アクターの画像を顔グラ、キャラチップ、画像から選択する方式に変更。  

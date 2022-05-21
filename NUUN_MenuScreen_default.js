@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面デフォルトタイプ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -36,6 +36,9 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/5/22 Ver.1.0.1
+ * ステータスの独自パラメータが適用されない問題を修正。
+ * ステータスに経験値（ゲージなし）を追加。
  * 2022/5/17 Ver.1.0.0
  * 初版
  * 
@@ -443,6 +446,8 @@
  * @option ＴＰ(3)(4)(5)(6)
  * @value 13
  * @option 経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
+ * @value 14
+ * @option 経験値（ゲージあり）(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 15
  * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 22
@@ -1381,6 +1386,9 @@ Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor
     case 13:
         this.placeTpGauge(x, y, actor);
         break;
+    case 14:
+        this.drawExp(data, x, y, width, actor);
+        break;
     case 15:
         this.placeExpGauge(x, y, actor);
         break;
@@ -1602,7 +1610,7 @@ Window_MenuStatus.prototype.drawActorIcons = function(x, y, width, actor) {
     }
 };
 
-Window_InfoMenu.prototype.drawParam = function(data, x, y, width, actor) {
+Window_MenuStatus.prototype.drawParam = function(data, x, y, width, actor) {
     this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
     this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
@@ -1612,6 +1620,18 @@ Window_InfoMenu.prototype.drawParam = function(data, x, y, width, actor) {
     if (data.DetaEval) {
         this.drawText(eval(data.DetaEval), x + textWidth + 8, y, width - (textWidth + 8), data.Align);
     }
+    this.contents.fontSize = $gameSystem.mainFontSize();
+};
+
+Window_MenuStatus.prototype.drawExp = function(data, x, y, width, actor) {
+    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+    const nameText = data.ParamName ? data.ParamName : 'NextLv';
+    this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+    const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+    this.drawText(nameText, x + textWidth, y, textWidth);
+    this.resetTextColor();
+    let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.nextLevelExp() - actor.currentLevelExp());
+    this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
     this.contents.fontSize = $gameSystem.mainFontSize();
 };
 

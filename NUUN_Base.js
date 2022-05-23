@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.4.3
+ * @version 1.4.4
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/24 Ver.1.4.4
+ * スプライトのフィルタリングウィンドウを設定する処理を追加。
  * 2022/2/12 Ver.1.4.3
  * 一部変数名が間違っていた問題を修正。
  * 2022/1/12 Ver.1.4.2
@@ -142,6 +144,13 @@ BattleManager.initMembers = function() {
   this.gaugeBaseSprite = null;
 };
 
+const _Window_addInnerChild = Window.prototype.addInnerChild;
+Window.prototype.addInnerChild = function(child) {
+    child.className = String(this.constructor.name);
+    return _Window_addInnerChild.call(this, child);
+};
+
+
 const _Window_Selectable_drawItemBackground = Window_Selectable.prototype.drawItemBackground;
 Window_Selectable.prototype.drawItemBackground = function(index) {
   if (!this._contentsBackVisible) {
@@ -154,6 +163,7 @@ Window_Base.prototype.initialize = function(rect) {
   _Window_Base_initialize.call(this, rect);
   this._userWindowSkin = null;
 };
+
 
 const _Window_Base_loadWindowskin = Window_Base.prototype.loadWindowskin;
 Window_Base.prototype.loadWindowskin = function() {

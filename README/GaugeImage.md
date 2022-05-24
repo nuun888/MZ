@@ -1,5 +1,5 @@
 # [ゲージ画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js)
-# Ver.1.5.0
+# Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -28,6 +28,8 @@ TPBゲージ:TPBがキャストタイム中なら設定した画像に切り替�
 このプラグインは共通処理プラグインVer.1.4.4以降が必要になります。  
 
 ## 更新履歴
+2022/5/24 Ver.1.5.1  
+ラベルの座標が適用されない問題を修正。  
 2022/5/24 Ver.1.5.0  
 処理内容、プラグインパラメータの大幅な見直し。  
 ゲージの角度を指定できる機能を追加。  

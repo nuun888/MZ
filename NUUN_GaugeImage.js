@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -43,6 +43,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/24 Ver.1.5.1
+ * ラベルの座標が適用されない問題を修正。
  * 2022/5/24 Ver.1.5.0
  * 処理内容、プラグインパラメータの大幅な見直し。
  * ゲージの角度を指定できる機能を追加。
@@ -628,11 +630,10 @@ Sprite_Gauge.prototype.drawLabel = function() {
             this.setupDrawLabel(bitmap);
         }
     } else {
-        _Sprite_Gauge_drawLabel.call(this);
         if (this._gaugeImgData) {
             context.translate(this._gaugeImgData.LabelGaugeImg.GaugeX + this._gaugeImgData.GaugeImgX, this._gaugeImgData.LabelGaugeImg.GaugeY + this._gaugeImgData.GaugeImgY);
         }
-        
+        _Sprite_Gauge_drawLabel.call(this);
     }
     if (this._gaugeImgData) {
         context.restore();

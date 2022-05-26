@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.2.2
+ * @version 3.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/26 Ver.3.3.0
+ * アクターステータスの表示する方法に独自表示設定する機能を追加。
+ * 上記の機能に独自パラメータ、独自ゲージを表示する機能を追加。
  * 2022/5/12 Ver.3.2.2
  * ステートアニメーションを表示させない機能を追加。
  * 2022/5/11 Ver.3.2.1
@@ -546,7 +549,6 @@ Game_Enemy.prototype.bareHandsAnimationId = function() {
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
 Scene_Battle.prototype.initialize = function() {
   _Scene_Battle_initialize.call(this);
-  this._onBSAction = false;
   this.loadBackgroundImg()
 };
 
@@ -1066,29 +1068,27 @@ Scene_Battle.prototype.onEnemyCancel = function() {
 
 const _Scene_Battle_startPartyCommandSelection = Scene_Battle.prototype.startPartyCommandSelection;
 Scene_Battle.prototype.startPartyCommandSelection = function() {
-  if (this._onBSAction) {
-    this._partyCommandWindow.hide();
-  }
   _Scene_Battle_startPartyCommandSelection.call(this);
+  $gameTemp.onBSAction = false;
 };
 
 const _Scene_Battle_selectPreviousCommand = Scene_Battle.prototype.selectPreviousCommand;
 Scene_Battle.prototype.selectPreviousCommand = function() {
   _Scene_Battle_selectPreviousCommand.call(this);
-  this._onBSAction = false;
+  $gameTemp.onBSAction = false;
   this._partyCommandWindow.show();
 };
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
-  this._onBSAction = BattleManager.isTpb();
+  $gameTemp.onBSAction = BattleManager.isTpb();
   _Scene_Battle_onSelectAction.call(this);
 };
 
 const _Scene_Battle_endCommandSelection = Scene_Battle.prototype.endCommandSelection;
 Scene_Battle.prototype.endCommandSelection = function() {
   _Scene_Battle_endCommandSelection.call(this);
-  this._onBSAction = false;
+  $gameTemp.onBSAction = false;
 };
 
 const _Scene_Battle_commandSkill = Scene_Battle.prototype.commandSkill;
@@ -1132,6 +1132,15 @@ Window_PartyCommand.prototype.itemRect = function(index) {
     rect.x += this.itemWidth() / 2 * (this.maxCols() - Math.min(this.maxItems(), this.maxCols()));
   }
   return rect;
+};
+
+const _Window_PartyCommand_setup = Window_PartyCommand.prototype.setup;
+Window_PartyCommand.prototype.setup = function() {
+  if (!$gameTemp.onBSAction) {
+    _Window_PartyCommand_setup.call(this);
+  } else {
+    $gameTemp.onBSAction = false;
+  } 
 };
 
 
@@ -1318,27 +1327,112 @@ Window_BattleStatus.prototype.drawItemBackground = function(index) {
 };
 
 Window_BattleStatus.prototype.drawItemStatus = function(index) {//再定義
-    const actor = this.actor(index);
-    $gameTemp.actorData = getActorPositionData(actor.actorId());
-    const rect = this.itemRectWithPadding(index);
-    const stateIconX = this.stateIconX(rect);
-    const stateIconY = this.stateIconY(rect);
-    if (params.StateVisible && !params.OutsideWindowVisible) {
-      this.placeStateIcon(actor, stateIconX, stateIconY);
+  const actor = this.actor(index);
+  $gameTemp.actorData = getActorPositionData(actor.actorId());
+  const statusData = $gameTemp.actorData.StatusListData;
+    if (statusData && statusData.length > 0) {
+      this.drawStatusListData(actor, statusData, index);
+    } else { 
+      const rect = this.itemRectWithPadding(index);
+      const stateIconX = this.stateIconX(rect);
+      const stateIconY = this.stateIconY(rect);
+      if (params.StateVisible && !params.OutsideWindowVisible) {
+        this.placeStateIcon(actor, stateIconX, stateIconY);
+      }
+      if (params.TPBShow) {
+          const timeX = this.timeX(rect);
+          const timeY = this.timeY(rect);
+          this.placeTimeGauge(actor, timeX, timeY);
+      }
+      if (params.NameShow) {
+          const nameX = this.nameX(rect);
+          const nameY = this.nameY(rect);
+          this.placeActorName(actor, nameX, nameY);
+      }
+      const basicGaugesX = this.basicGaugesX(rect);
+      const basicGaugesY = this.basicGaugesY(rect);
+      this.placeBasicGauges(actor, basicGaugesX, basicGaugesY, rect);
     }
-    if (params.TPBShow) {
-        const timeX = this.timeX(rect);
-        const timeY = this.timeY(rect);
-        this.placeTimeGauge(actor, timeX, timeY);
+};
+
+Window_BattleStatus.prototype.drawStatusListData = function(actor, list, index) {
+  const rect = this.itemRectWithPadding(index);
+  list.forEach(data => {
+    $gameTemp.userStatusParam = data;
+    switch (data.Status) {
+      case 'hpgauge':
+        this.placeGauge(actor, "hp", rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'mpgauge':
+        this.placeGauge(actor, "mp", rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'tpgauge':
+        this.placeGauge(actor, "tp", rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'tpb':
+        this.placeTimeGauge(actor, rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'state':
+        if (!params.OutsideWindowVisible) {
+          this.placeStateIcon(actor, rect.x + data.PositionX, rect.y + data.PositionY);
+        }
+        break;
+      case 'name':
+        this.placeActorName(actor, rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'lv':
+        this.drawLevel(actor, data, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      case 'param':
+        this.drawUserParam(actor, data, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      case 'usergauge':
+        this.placeGauge(actor, data.UserParamID, rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'dparam':
+        this.placeUserParam(actor, data.UserParamID, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      default:
+        break;
     }
-    if (params.NameShow) {
-        const nameX = this.nameX(rect);
-        const nameY = this.nameY(rect);
-        this.placeActorName(actor, nameX, nameY);
-    }
-    const basicGaugesX = this.basicGaugesX(rect);
-    const basicGaugesY = this.basicGaugesY(rect);
-    this.placeBasicGauges(actor, basicGaugesX, basicGaugesY, rect);
+  });
+  $gameTemp.userStatusParam = null;
+};
+
+Window_BattleStatus.prototype.drawLevel = function(actor, data, x, y, width) {
+  this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+  this.changeTextColor(ColorManager.systemColor());
+  const nameText = data.ParamName ? data.ParamName : TextManager.levelA;
+  const textWidth = this.textWidth(nameText);
+  this.drawText(nameText, x, y, textWidth);
+  this.resetTextColor();
+  this.drawText(actor.level, x + textWidth + 8, y, width - (textWidth + 8), "right");
+  this.contents.fontSize = $gameSystem.mainFontSize();
+};
+
+Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width) {
+  this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+  const a = actor;
+  const d = actor.actor();
+  const nameText = data.ParamName ? data.ParamName : '';
+  const textWidth = Math.max(60 , this.textWidth(nameText));
+  this.changeTextColor(ColorManager.systemColor());
+  if (nameText) {
+    this.drawText(nameText, x + textWidth, y, width - textWidth);
+  }
+  this.resetTextColor();
+  if (data.DetaEval) {
+      this.drawText(eval(data.DetaEval), x + textWidth + 8, y, width - (textWidth + 8), 'right');
+  }
+  this.contents.fontSize = $gameSystem.mainFontSize();
+};
+
+Window_BattleStatus.prototype.placeUserParam = function(actor, data, x, y) {
+  const key = "actor%1-userParam%2".format(actor.actorId(), data.UserParamID || 'dparam');
+  const sprite = this.createInnerSprite(key, Sprite_NuunUserParam);
+  sprite.setup(actor);
+  sprite.move(x, y);
+  sprite.show();
 };
 
 Window_BattleStatus.prototype.placeBasicGauges = function(actor, x, y, rect) {
@@ -2221,6 +2315,7 @@ Sprite_BSGauge.prototype.constructor = Sprite_BSGauge;
 
 Sprite_BSGauge.prototype.initialize = function() {
   this._statusType = $gameTemp.bsGaugeType;
+  this.userStatusParam = $gameTemp.userStatusParam;
   this._gaugeWidth = this.getGBSGaugeWidth();
   this._gaugeHeight = this.getGBSGaugeHeight();
   Sprite_Gauge.prototype.initialize.call(this);
@@ -2237,31 +2332,193 @@ Sprite_BSGauge.prototype.gaugeHeight = function() {
 Sprite_BSGauge.prototype.getGBSGaugeWidth = function() {
   switch (this._statusType) {
     case 'hp':
-      return $gameTemp.actorData.HPGaugeWidth;
+      return this.userStatusParam ? this.userStatusParam.Width : $gameTemp.actorData.HPGaugeWidth;
     case 'mp':
-      return $gameTemp.actorData.MPGaugeWidth;
+      return this.userStatusParam ? this.userStatusParam.Width : $gameTemp.actorData.MPGaugeWidth;
     case 'tp':
-      return $gameTemp.actorData.TPGaugeWidth;
+      return this.userStatusParam ? this.userStatusParam.Width : $gameTemp.actorData.TPGaugeWidth;
     case 'time':
-      return $gameTemp.actorData.TPBGaugeWidth;
+      return this.userStatusParam ? this.userStatusParam.Width : $gameTemp.actorData.TPBGaugeWidth;
     default:
-      return 128;
+      return this.userStatusParam ? this.userStatusParam.Width : 128;
   }
 };
 
 Sprite_BSGauge.prototype.getGBSGaugeHeight = function() {
   switch (this._statusType) {
     case 'hp':
-      return $gameTemp.actorData.HPGaugeHeight;
+      return this.userStatusParam ? this.userStatusParam.Height : $gameTemp.actorData.HPGaugeHeight;
     case 'mp':
-      return $gameTemp.actorData.MPGaugeHeight;
+      return this.userStatusParam ? this.userStatusParam.Height : $gameTemp.actorData.MPGaugeHeight;
     case 'tp':
-      return $gameTemp.actorData.TPGaugeHeight;
+      return this.userStatusParam ? this.userStatusParam.Height : $gameTemp.actorData.TPGaugeHeight;
     case 'time':
-      return $gameTemp.actorData.TPBGaugeHeight;
+      return this.userStatusParam ? this.userStatusParam.Height : $gameTemp.actorData.TPBGaugeHeight;
     default:
-      return 12;
+      return this.userStatusParam ? this.userStatusParam.Height : 12;
   }
+};
+
+Sprite_BSGauge.prototype.currentValue = function() {
+  if (this._battler && this.userStatusParam) {
+    switch (this._statusType) {
+      case "hp":
+      case "mp":
+      case "tp":
+      case "time":
+        return Sprite_Gauge.prototype.currentValue.call(this);
+      default:
+        return eval(this.userStatusParam.DetaEval1);
+    }
+  } else {
+    return Sprite_Gauge.prototype.currentValue.call(this);
+  }
+};
+
+Sprite_BSGauge.prototype.currentMaxValue = function() {
+  if (this._battler && this.userStatusParam) {
+    switch (this._statusType) {
+      case "hp":
+      case "mp":
+      case "tp":
+      case "time":
+        return Sprite_Gauge.prototype.currentMaxValue.call(this);
+      default:
+        return eval(this.userStatusParam.DetaEval2);
+    }
+  } else {
+    return Sprite_Gauge.prototype.currentMaxValue.call(this);
+  }
+};
+
+Sprite_BSGauge.prototype.label = function() {
+  if (this._battler && this.userStatusParam) {
+    switch (this._statusType) {
+      case "hp":
+      case "mp":
+      case "tp":
+      case "time":
+        return Sprite_Gauge.prototype.label.call(this);
+      default:
+        return this.userStatusParam.ParamName;
+  }
+  } else {
+    return Sprite_Gauge.prototype.label.call(this);
+  }
+};
+
+Sprite_BSGauge.prototype.gaugeColor1 = function() {
+  if (this._battler && this.userStatusParam) {
+    switch (this._statusType) {
+      case "hp":
+      case "mp":
+      case "tp":
+      case "time":
+          return Sprite_Gauge.prototype.gaugeColor1.call(this);
+      default:
+        return NuunManager.getColorCode(this.userStatusParam.Color1);
+    }
+  } else {
+    return Sprite_Gauge.prototype.gaugeColor1.call(this);
+  }
+};
+
+Sprite_BSGauge.prototype.gaugeColor2 = function() {
+  if (this._battler && this.userStatusParam) {
+    switch (this._statusType) {
+      case "hp":
+      case "mp":
+      case "tp":
+      case "time":
+          return Sprite_Gauge.prototype.gaugeColor2.call(this);
+      default:
+        return NuunManager.getColorCode(this.userStatusParam.Color2);
+    }
+  } else {
+    return Sprite_Gauge.prototype.gaugeColor2.call(this);
+  }
+};
+
+//Sprite_NuunUserParam
+function Sprite_NuunUserParam() {
+  this.initialize(...arguments);
+}
+
+Sprite_NuunUserParam.prototype = Object.create(Sprite.prototype);
+Sprite_NuunUserParam.prototype.constructor = Sprite_NuunUserParam;
+
+Sprite_NuunUserParam.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+  this.createBitmap();
+};
+
+Sprite_NuunUserParam.prototype.initMembers = function() {
+  this._battler = null;
+  this._textColor = "";
+  this.userStatusParam = $gameTemp.userStatusParam;
+  this._gaugeWidth = this.userStatusParam.Width;
+  this._gaugeHeight = this.userStatusParam.Height;
+};
+
+Sprite_NuunUserParam.prototype.setup = function(battler) {
+  this._battler = battler;
+  this._paramData = null;
+  this.updateBitmap();
+};
+
+Sprite_NuunUserParam.prototype.destroy = function(options) {
+  this.bitmap.destroy();
+  Sprite.prototype.destroy.call(this, options);
+};
+
+Sprite_NuunUserParam.prototype.update = function() {
+  Sprite.prototype.update.call(this);
+  this.updateBitmap();
+};
+
+
+Sprite_NuunUserParam.prototype.createBitmap = function() {
+  const width = this.bitmapWidth();
+  const height = this.bitmapHeight();
+  this.bitmap = new Bitmap(width, height);
+};
+
+Sprite_NuunUserParam.prototype.bitmapWidth = function() {
+  return this._gaugeWidth;
+};
+
+Sprite_NuunUserParam.prototype.bitmapHeight = function() {
+  return this._gaugeHeight;
+};
+
+Sprite_NuunUserParam.prototype.updateBitmap = function() {
+  const _param = eval(this.userStatusParam.DetaEval1);
+  if (this._paramData !== _param) {
+    this._paramData = _param;
+    this.redraw();
+  }
+};
+
+Sprite_NuunUserParam.prototype.redraw = function() {
+  const paramName = this.userStatusParam.ParamName ? this.userStatusParam.ParamName : '';
+  const width = this.bitmapWidth();
+  const height = this.bitmapHeight();
+  this.setupFont();
+  this.bitmap.clear();
+  this.bitmap.textColor = ColorManager.systemColor();
+  const textWidth = Math.max(60 , this.bitmap.measureTextWidth(paramName));
+  this.bitmap.drawText(paramName, 0, 0, width - textWidth, height);
+  this.bitmap.textColor = ColorManager.normalColor();
+  this.bitmap.drawText(this._paramData, textWidth + 8, 0, width - (textWidth + 8), height, 'right');
+};
+
+Sprite_NuunUserParam.prototype.fontSize = function() {
+  return $gameSystem.mainFontSize() +  (this.userStatusParam.FontSize || 0);
+};
+
+Sprite_NuunUserParam.prototype.setupFont = function() {
+  this.bitmap.fontSize = this.fontSize();
 };
 
 //Spriteset_Base

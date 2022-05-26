@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.2.1
+ * @version 1.3.0
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -34,6 +34,13 @@
  * 
  * 各ステータスの座標位置を変更したい場合は、各項目の「〇〇の座標変更」をtureにしてください。
  * 
+ * 表示ステータス設定はアクターステータスに表示するステータスを独自に設定できます。
+ * 表示したい項目だけ設定してください。
+ * 表示ステータス設定にひとつでも設定してある場合は、こちらの設定が適用されます。
+ * 独自パラメータ、ゲージ
+ * this._battler:アクターゲームデータ
+ * this._battler.actor():アクターシステムデータ
+ * 
  * 敵キャラのメモ欄
  * <AttackAnimation:11>
  * 敵キャラの通常攻撃時、11番のアニメーションが再生されます。指定がない場合はプラグインパラメータのデフォルト値が適用されます。
@@ -45,6 +52,9 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/5/26 Ver.1.3.0
+ * アクターステータスの表示する方法に独自表示設定する機能を追加。
+ * 上記の機能に独自パラメータ、独自ゲージを表示する機能を追加。
  * 2022/5/12 Ver.1.2.1
  * ステートアニメーションを表示させない機能を追加。
  * 2022/5/11 Ver.1.2.0
@@ -1353,6 +1363,12 @@
  */
 /*~struct~StatusPositionData:
  * 
+ * @param StatusListData
+ * @text 表示ステータス設定
+ * @desc 表示するステータス情報を設定します。一つでも指定してある場合はこちらの設定が適用されます。
+ * @default 
+ * @type struct<ActorStatusList>[]
+ * 
  * @param ActorNameChangePosition
  * @text アクター名位置設定（相対座標）
  * @desc 座標はアクターステータス(0, 0)からの相対座標です。
@@ -1889,6 +1905,119 @@
  * @desc 下限値
  * @type number
  * @default 0
+ * 
+ */
+/*~struct~ActorStatusList:
+ * 
+ * @param Status
+ * @text 表示対象
+ * @desc アクターステータス画面に表示させるステータス対象を選択します。
+ * @type select
+ * @option HPゲージ(1)(2)(3)(4)
+ * @value 'hpgauge'
+ * @option MPゲージ(1)(2)(3)(4)
+ * @value 'mpgauge'
+ * @option TPゲージ(1)(2)(3)(4)
+ * @value 'tpgauge'
+ * @option TPB(1)(2)(3)(4)
+ * @value 'tpb'
+ * @option ステート(3)(4)
+ * @value 'state'
+ * @option アクター名(1)(3)(4)(5)
+ * @value 'name'
+ * @option 独自パラメータ(1)(3)(4)(5)(6)(8)
+ * @value 'param'
+ * @option 独自パラメータ(動的) (1)(3)(4)(5)(6)(7)(8)
+ * @value 'dparam'
+ * @option 独自ゲージ (1)(2)(3)(4)(5)(6)(7)(8)
+ * @value 'usergauge'
+ * @option レベル(1)(3)(4)(5)(6)
+ * @value 'lv'
+ * @default
+ * 
+ * @param Width
+ * @desc 横幅を指定します。
+ * @text 横幅(1)
+ * @type number
+ * @default 128
+ * @min 0
+ * @max 999
+ * 
+ * @param Height
+ * @desc 縦幅を指定します。
+ * @text 縦幅(2)
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
+ * 
+ * @param PositionX
+ * @desc X座標を設定します。
+ * @text X座標(3)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param PositionY
+ * @desc Y座標を設定します。
+ * @text Y座標(4)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param FontSize
+ * @desc フォントサイズを設定します。(メインフォントからの差)
+ * @text フォントサイズ(5)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param ParamName
+ * @desc ステータス名称。
+ * @text ステータス名称(6)
+ * @type string
+ * @default 
+ * 
+ * @param UserParamID
+ * @desc 独自パラメータ、ゲージ識別ID。
+ * @text 識別ID(7)
+ * @type string
+ * @default 
+ * 
+ * @param DetaEval1
+ * @desc 評価式。(独自パラメータ、独自ゲージ現在値)
+ * @text 評価式A(8)
+ * @type string
+ * @default 
+ * 
+ * @param DetaEval2
+ * @desc 評価式。(独自ゲージ最大値)
+ * @text 評価式B(9)
+ * @type string
+ * @default 
+ * 
+ * @param GaugeSetting
+ * @text ゲージ設定
+ * @default ------------------------------
+ * 
+ * @param Color1
+ * @desc ゲージカラー(左)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(左)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeSetting
+ * 
+ * @param Color2
+ * @desc ゲージカラー(右)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(右)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeSetting
  * 
  */
 

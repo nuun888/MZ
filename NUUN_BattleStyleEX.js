@@ -1684,9 +1684,17 @@ Window_BattleActorImges.prototype.drawItemImage = function(index) {
   }
   if ($gameTemp.actorData && params.StateVisible && params.OutsideWindowVisible) {
     const rect = this.itemRectWithPadding(index);
-    const stateIconX = this.stateIconX(rect);
-    const stateIconY = this.stateIconY(rect);
-    this.placeStateIcon(actor, stateIconX, stateIconY);
+    const statusData = $gameTemp.actorData.StatusListData;
+    if (statusData) {
+      const find = statusData.find(data => data.Status === 'state');
+      if (find) {
+        this.placeStateIcon(actor, rect.x + find.PositionX, rect.y + find.PositionY);
+      }
+    } else {
+      const stateIconX = this.stateIconX(rect);
+      const stateIconY = this.stateIconY(rect);
+      this.placeStateIcon(actor, stateIconX, stateIconY);
+    }
   }
 };
 

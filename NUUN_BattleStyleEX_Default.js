@@ -747,14 +747,14 @@
  * @parent ActorStatusParamOption
  * 
  * @param OutsideWindowVisible
- * @desc アイコンの表示をウィンドウ枠外でも表示させます。(アクター画像の上に表示されます)
- * @text アイコンウィンドウ枠外表示
+ * @desc ステートアイコンの表示をウィンドウ枠外でも表示させます。(アクター画像の上に表示されます)
+ * @text ステートアイコンウィンドウ枠外表示
  * @type boolean
  * @default false
  * @parent ActorStatusParamOption
  * 
  * @param StateVisible
- * @desc アイコンを表示させます。外部プラグインで別の場所にステートアイコンを表示するときに設定します。
+ * @desc ステートアイコンを表示させます。外部プラグインで別の場所にステートアイコンを表示するときに設定します。
  * @text ステートアイコン表示
  * @type boolean
  * @default true

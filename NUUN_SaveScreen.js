@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.8.4
+ * @version 1.8.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -53,6 +53,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/5/28 Ver.1.8.5
+ * ファイル名に座標時を指定できる機能を追加。
+ * ファイル名横文字列に座標、表示横幅、文字揃えを指定できる機能を追加。
  * 2022/5/14 Ver.1.8.4
  * コンテンツ背景画像非表示をOFFに設定しても背景画像が適用しない問題を修正。
  * コンテンツ背景画像非表示をコンテンツ背景画像表示に仕様変更。
@@ -196,8 +199,27 @@
  * @default 22
  * @parent Font
  * 
+ * @param FailName
+ * @text ファイル名
+ * @default ------------------------------
+ * 
+ * @param FailNameX
+ * @desc ファイル名のX座標
+ * @text ファイル名X座標
+ * @type number
+ * @default 0
+ * @parent FailName
+ * 
+ * @param FailNameY
+ * @desc ファイル名のY座標
+ * @text ファイル名Y座標
+ * @type number
+ * @default -4
+ * @min -9999
+ * @parent FailName
+ * 
  * @param AnyName
- * @text メイン文章
+ * @text ファイル名横文字列
  * @default ------------------------------
  *
  * @param AnyNameVariable
@@ -212,6 +234,42 @@
  * @text ファイル名横文字列表示評価式
  * @type string
  * @default info.AnyName ? info.AnyName : info.title
+ * @parent AnyName
+ * 
+ * @param AnyNameX
+ * @desc ファイル名横文字列のX座標
+ * @text ファイル名横文字列X座標
+ * @type number
+ * @default 200
+ * @parent AnyName
+ * 
+ * @param AnyNameY
+ * @desc ファイル名横文字列のY座標
+ * @text ファイル名横文字列Y座標
+ * @type number
+ * @default 2
+ * @min -9999
+ * @parent AnyName
+ * 
+ * @param AnyNameWidth
+ * @desc ファイル名横文字列の横幅（0でファイル名横文字列X座標から右端までの横幅）
+ * @text ファイル名横文字列横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent AnyName
+ * 
+ * @param AnyNameAlign
+ * @desc 文字揃え。
+ * @text 文字揃え
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @option 中央
+ * @value 'center'
+ * @default 'left'
  * @parent AnyName
  * 
  * @param Actor
@@ -532,10 +590,15 @@ Imported.NUUN_SaveScreen = true;
   const ContentsX = Number(parameters['ContentsX'] || 0);
   const NumSaveRows = Number(parameters['NumSaveRows'] || 5);
   const MaxSave = Number(parameters['MaxSave'] || 20);
-  const ContentsRight = eval(parameters['ContentsRight'] || "true");
   const _ContentsWidth = Number(parameters['ContentsWidth'] || 0);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
   const AnyNameEval = String(parameters['AnyNameEval'] || "");
+  const FailNameX = Number(parameters['FailNameX'] || 0);
+  const FailNameY = Number(parameters['FailNameY'] || -4);
+  const AnyNameX = Number(parameters['AnyNameX'] || 200);
+  const AnyNameY = Number(parameters['AnyNameY'] || 2);
+  const AnyNameWidth = Number(parameters['AnyNameWidth'] || 0);
+  const AnyNameAlign = eval(parameters['AnyNameAlign']) || 'left';
   const OrgParamList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['OrgParamList'])) : null) || [];
   const InfoSaveSnap = eval(parameters['InfoSaveSnap'] || "true");
   const SaveSnapQuality = eval(parameters['SaveSnapQuality'] || 0.92);
@@ -829,7 +892,7 @@ Imported.NUUN_SaveScreen = true;
   Window_SavefileList.prototype.drawTitle = function(savefileId, x, y) {
     if (this._FaceOn) {
       this.contents.fontSize = MainFontSizeMainFontSize;
-      _Window_SavefileList_drawTitle.call(this, savefileId, x, y - 4);
+      _Window_SavefileList_drawTitle.call(this, savefileId, x + FailNameX, y + FailNameY);
       this.contents.fontSize = $gameSystem.mainFontSize();
       this._FaceOn = false;
     }
@@ -871,7 +934,7 @@ Imported.NUUN_SaveScreen = true;
     this.drawSnapBitmap(info, rect.x + SaveSnapX, rect.y + SaveSnapY);
     this.drawActors(info, rect.x, rect.y, rect.width, rect.height);
     this.drawContentsData(info, rect.x + ContentsX, rect.y, rect.width, rect.height);
-    this.drawAnyName(info, rect.x + 200, rect.y + 2, rect.width - 200);
+    this.drawAnyName(info, rect.x + AnyNameX, rect.y + AnyNameY, rect.width);
   };
 
   Window_SavefileList.prototype.drawContentsData = function(info, x, y, width) {
@@ -1012,7 +1075,8 @@ Imported.NUUN_SaveScreen = true;
     this.resetTextColor();
     const anyName = eval(AnyNameEval);
     if (anyName) {
-      this.drawText(anyName , x, y, width, "left");
+      width = AnyNameWidth > 0 ? Math.min(AnyNameWidth, width - x) : width - x;
+      this.drawText(anyName , x, y, width, AnyNameAlign);
     }
     this.contents.fontSize = $gameSystem.mainFontSize();
   };

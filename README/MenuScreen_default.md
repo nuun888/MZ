@@ -1,5 +1,5 @@
 # [メニュー画面デフォルトタイプ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.0.1
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -36,6 +36,9 @@
 画像のアクターが表示されている部分を中央に表示させたい場合は各アクター画像設定の画像表示開始座標X、画像表示開始座標Yで設定します。  
 
 ## 更新履歴
+2022/5/28 Ver.1.1.0  
+表示できるステータスに独自のゲージを追加できる機能を追加。  
+メニューコマンドウィンドウの高さをコマンド数の高さで表示する(MVの表示)機能を追加。  
 2022/5/22 Ver.1.0.1  
 ステータスの独自パラメータが適用されない問題を修正。  
 ステータスに経験値（ゲージなし）を追加。  

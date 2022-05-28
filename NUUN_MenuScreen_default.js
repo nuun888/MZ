@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面デフォルトタイプ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -29,6 +29,12 @@
  * 
  * 表示ステータスの取得パラメータ
  * actor:アクターのゲームデータ
+ * 
+ * 独自ゲージ
+ * 現在値：評価式で設定
+ * 最大値：最大値評価式で設定
+ * ゲージ横幅：項目、ゲージ横幅で設定
+ * ゲージの識別IDは必ず設定してください。IDは任意の文字列を入力します。重複しないよう注意してください。
  *  
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -36,6 +42,9 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/5/28 Ver.1.1.0
+ * 表示できるステータスに独自のゲージを追加できる機能を追加。
+ * メニューコマンドウィンドウの高さをコマンド数の高さで表示する(MVの表示)機能を追加。
  * 2022/5/22 Ver.1.0.1
  * ステータスの独自パラメータが適用されない問題を修正。
  * ステータスに経験値（ゲージなし）を追加。
@@ -91,6 +100,10 @@
  * @default true
  * @parent Setting
  * 
+ * @param MenuCommandSetting
+ * @text メニューコマンド設定
+ * @default ------------------------------
+ * 
  * @param CommandPosition
  * @text メニューコマンドの位置
  * @desc メニューコマンドの位置を指定します。
@@ -100,14 +113,21 @@
  * @option 右
  * @value 'right'
  * @default 'right'
- * @parent Setting
+ * @parent MenuCommandSetting
  * 
  * @param CommandTop
  * @text トップメニューコマンド
  * @desc メニューコマンドの上にヘッダーを挟まない。
  * @type boolean
  * @default true
- * @parent Setting
+ * @parent MenuCommandSetting
+ * 
+ * @param CommandHeightMode
+ * @text ウィンドウ高さモード
+ * @desc コマンドウィンドウの高さをコマンド数に合わせます。
+ * @type boolean
+ * @default true
+ * @parent MenuCommandSetting
  * 
  * @param BackGroundSetting
  * @text 背景設定
@@ -176,7 +196,7 @@
  * @parent Expgauge
  * 
  * @param ExpGaugeColor1
- * @desc 経験値のゲージの色１（左）
+ * @desc 経験値のゲージのシステムカラーID１（左）
  * @text 経験値ゲージ色１
  * @type number
  * @default 17
@@ -184,7 +204,7 @@
  * @parent Expgauge
  * 
  * @param ExpGaugeColor2
- * @desc 経験値のゲージの色２（右）
+ * @desc 経験値のゲージのシステムカラーID２（右）
  * @text 経験値ゲージ色２
  * @type number
  * @default 6
@@ -400,7 +420,7 @@
  * 
  * @param HelpCommandName
  * @text コマンド名
- * @desc コマンド名を設定します。リストにない場合は直接記入します。（リスト1のみ）
+ * @desc コマンド名を設定します。リストにない場合は直接記入します。
  * @type combo
  * @option 'アイテム'
  * @option 'スキル'
@@ -414,7 +434,7 @@
  * 
  * @param HelpCommandText
  * @text コマンドの説明文
- * @desc コマンドの説明文を設定します。
+ * @desc コマンドの説明文を設定します。制御文字使用可能です。
  * @type string
  * @default 
  * 
@@ -439,15 +459,15 @@
  * @value 5
  * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 6
- * @option ＨＰ(3)(4)(5)(6)
+ * @option ＨＰ(3)(4)(5)(6)(7)(21)
  * @value 11
- * @option ＭＰ(3)(4)(5)(6)
+ * @option ＭＰ(3)(4)(5)(6)(7)(21)
  * @value 12
- * @option ＴＰ(3)(4)(5)(6)
+ * @option ＴＰ(3)(4)(5)(6)(7)(21)
  * @value 13
  * @option 経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 14
- * @option 経験値（ゲージあり）(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
+ * @option 経験値（ゲージあり）(1)(2)(3)(4)(5)(6)(7)(21)
  * @value 15
  * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 22
@@ -501,12 +521,14 @@
  * @value 48
  * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
  * @value 49
+ * @option 独自ゲージ(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
+ * @value 100
  * @option ライン(1)(2)(3)(4)(5)(6)(7)
  * @value 1000
  * @default 0
  * 
  * @param NameColor
- * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
+ * @desc システム項目のシステムカラーID。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(1)
  * @type number
  * @default 16
@@ -551,8 +573,8 @@
  * @min -9999
  * 
  * @param ItemWidth
- * @desc 項目横幅（0でデフォルト幅）
- * @text 項目横幅(7)
+ * @desc 項目、ゲージ横幅（0でデフォルト幅）
+ * @text 項目、ゲージ横幅(7)
  * @type number
  * @default 0
  * @min 0
@@ -605,6 +627,51 @@
  * @type number
  * @default 0
  * @min -99
+ * 
+ * @param GaugeSetting
+ * @text ゲージ設定
+ * @default ------------------------------
+ * 
+ * @param GaugeID
+ * @desc 独自ゲージ識別ID。
+ * @text 識別ID(20)
+ * @type string
+ * @default 
+ * 
+ * @param GaugeHeight
+ * @desc ゲージの縦幅を指定します。
+ * @text ゲージの縦幅(21)
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
+ * @parent GaugeSetting
+ * 
+ * @param DetaEval2
+ * @desc 最大値の評価式。
+ * @text 最大値評価式(javaScript)(22)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'actor;//アクターのゲームデータ'
+ * @option 'actor.actor();//アクターのシステムデータ'
+ * @default 
+ * @parent GaugeSetting
+ * 
+ * @param Color1
+ * @desc ゲージのシステムカラーID(左)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(左)(23)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeSetting
+ * 
+ * @param Color2
+ * @desc ゲージのシステムカラーID(右)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(右)(24)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeSetting
  *
  */
 /*~struct~InfoListData:
@@ -929,6 +996,7 @@ const CommandTop = eval(parameters['CommandTop'] || "true");
 const ExpGaugeColor1 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor1'])) : 18);
 const ExpGaugeColor2 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor2'])) : 18);
 const StatusList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusList'])) : null) || [];
+const CommandHeightMode = eval(parameters['CommandHeightMode'] || "true");
 
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];
@@ -988,6 +1056,9 @@ Scene_Menu.prototype.createCommandWindow = function() {
     _Scene_Menu_createCommandWindow.call(this);
     if (!WindowVisible) {
         this._commandWindow.opacity = 0;
+    }
+    if (CommandHeightMode) {
+        this._commandWindow.maxItemsHeight();
     }
 };
 
@@ -1120,6 +1191,12 @@ Scene_Menu.prototype.update = function() {
     if (InfoSideShow) {
         this._infoSideMenuWindow.setText(text);
     }
+};
+
+
+Window_MenuCommand.prototype.maxItemsHeight = function() {
+    const maxItems = Math.max(1, this.maxItems());
+    this.height = Math.min(this.fittingHeight(maxItems), this.height);
 };
 
 
@@ -1356,6 +1433,7 @@ Window_MenuStatus.prototype.getActorLoadBitmap = function(actor) {
 };
 
 Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor) {
+    $gameTemp.menuParam = null;
     switch (data.DateSelect) {
     case 0:
         break;
@@ -1378,18 +1456,22 @@ Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor
         this.drawParam(data, x, y, width, actor);
         break;
     case 11:
+        $gameTemp.menuParam = data;
         this.placeHpGauge(x, y, actor);
         break;
     case 12:
+        $gameTemp.menuParam = data;
         this.placeMpGauge(x, y, actor);
         break;
     case 13:
+        $gameTemp.menuParam = data;
         this.placeTpGauge(x, y, actor);
         break;
     case 14:
         this.drawExp(data, x, y, width, actor);
         break;
     case 15:
+        $gameTemp.menuParam = data;
         this.placeExpGauge(x, y, actor);
         break;
     case 22:
@@ -1423,6 +1505,10 @@ Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor
     case 48:
     case 49:
         this.drawSParams(data, data.DateSelect, x, y, width, actor);
+        break;
+    case 100:
+        $gameTemp.menuParam = data;
+        this.placeUserGauge(data, x, y, actor);
         break;
     case 1000:
         this.horzLine(x, y, width, actor);
@@ -1640,25 +1726,33 @@ Window_MenuStatus.prototype.systemWidth = function(swidth, width) {
 };
 
 Window_MenuStatus.prototype.placeHpGauge = function(x, y, actor) {
+    $gameTemp.menuGaugeType = "hp";
     this.placeGauge(actor, "hp", x, y);
 };
 
 Window_MenuStatus.prototype.placeMpGauge = function(x, y, actor) {
+    $gameTemp.menuGaugeType = "mp";
     this.placeGauge(actor, "mp", x, y);
 };
 
 Window_MenuStatus.prototype.placeTpGauge = function(x, y, actor) {
     if ($dataSystem.optDisplayTp) {
+        $gameTemp.menuGaugeType = "tp";
         this.placeGauge(actor, "tp", x, y);
     }
 };
 
 Window_MenuStatus.prototype.placeExpGauge = function(x, y, actor) {
+    $gameTemp.menuGaugeType = "menuexp";
     this.placeGauge(actor, "menuexp", x, y);
 };
 
+Window_MenuStatus.prototype.placeUserGauge = function(data, x, y, actor) {
+    $gameTemp.menuGaugeType = data.GaugeID;
+    this.placeGauge(actor, data.GaugeID, x, y);
+};
+
 Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
-    gaugeType = type;
     if (Imported.NUUN_GaugeImage) {
         this.placeGaugeImg(actor, type, x, y);
     }
@@ -1903,37 +1997,84 @@ Sprite_MenuGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_MenuGauge.prototype.constructor = Sprite_MenuGauge;
   
 Sprite_MenuGauge.prototype.initialize = function() {
+    this._statusType = $gameTemp.menuGaugeType;
+    this.menuParam = $gameTemp.menuParam;
+    this._gaugeWidth = this.getMenuGaugeWidth();
+    this._gaugeHeight = this.getMenuGaugeHeight();
     Sprite_Gauge.prototype.initialize.call(this);
 };
-  
+
 Sprite_MenuGauge.prototype.bitmapWidth = function() {
-    this._statusType = this._statusType || gaugeType;
-    if (this._statusType === 'hp') {
-        return HPGaugeWidth;
-    } else if (this._statusType === 'mp') {
-        return MPGaugeWidth;
-    } else if (this._statusType === 'tp') {
-        return TPGaugeWidth;
-    } else if (this._statusType === 'menuexp') {
-        return ExpGaugeWidth;
+    return this._gaugeWidth;
+};
+  
+Sprite_MenuGauge.prototype.gaugeHeight = function() {
+    return this._gaugeHeight;
+};
+
+Sprite_MenuGauge.prototype.getMenuGaugeWidth = function() {
+    switch (this._statusType) {
+      case 'hp':
+        return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : HPGaugeWidth;
+      case 'mp':
+        return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : MPGaugeWidth;
+      case 'tp':
+        return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : TPGaugeWidth;
+      case 'menuexp':
+        return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : ExpGaugeWidth;
+      default:
+        return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : 128;
     }
+};
+  
+Sprite_MenuGauge.prototype.getMenuGaugeHeight = function() {
+    switch (this._statusType) {
+        case 'hp':
+          return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 12;
+        case 'mp':
+          return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 12;
+        case 'tp':
+          return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 12;
+        case 'menuexp':
+          return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 12;
+        default:
+          return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 128;
+      }
 };
 
 Sprite_MenuGauge.prototype.gaugeColor1 = function() {
-    switch (this._statusType) {
+    if (this._battler && this.menuParam) {
+      switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+            return Sprite_Gauge.prototype.gaugeColor1.call(this);
         case "menuexp":
             return NuunManager.getColorCode(ExpGaugeColor1);
         default:
-            return Sprite_Gauge.prototype.gaugeColor1.call(this);
+          return NuunManager.getColorCode(this.menuParam.Color1);
+      }
+    } else {
+      return Sprite_Gauge.prototype.gaugeColor1.call(this);
     }
 };
-
+  
 Sprite_MenuGauge.prototype.gaugeColor2 = function() {
-    switch (this._statusType) {
+    if (this._battler && this.menuParam) {
+      switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+            return Sprite_Gauge.prototype.gaugeColor2.call(this);
         case "menuexp":
             return NuunManager.getColorCode(ExpGaugeColor2);
         default:
-            return Sprite_Gauge.prototype.gaugeColor2.call(this);
+          return NuunManager.getColorCode(this.menuParam.Color2);
+      }
+    } else {
+      return Sprite_Gauge.prototype.gaugeColor2.call(this);
     }
 };
 
@@ -1952,28 +2093,60 @@ Sprite_MenuGauge.prototype.displyaMaxExp = function() {
     return this._battler.nextLevelExp() - this._battler.currentLevelExp();
 };
 
-const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
-Sprite_Gauge.prototype.currentValue = function() {
-    if (this._battler && this._statusType === "menuexp") {
-        return this._battler.currentExp() - this._battler.currentLevelExp();
+Sprite_MenuGauge.prototype.currentValue = function() {
+    if (this._battler && this.menuParam) {
+    switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+            return Sprite_Gauge.prototype.currentValue.call(this);
+        case "menuexp":
+            return this._battler.currentExp() - this._battler.currentLevelExp();
+        default:
+            const actor = this._battler;
+            return eval(this.menuParam.DetaEval);
+      }
+    } else {
+      return Sprite_Gauge.prototype.currentValue.call(this);
     }
-    return  _Sprite_Gauge_currentValue.call(this);
+};
+  
+Sprite_MenuGauge.prototype.currentMaxValue = function() {
+    if (this._battler && this.menuParam) {
+    switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+            return Sprite_Gauge.prototype.currentMaxValue.call(this);
+        case "menuexp":
+            return this._battler.nextLevelExp() - this._battler.currentLevelExp();
+        default:
+            const actor = this._battler;
+            return eval(this.menuParam.DetaEval2);
+        }
+    } else {
+      return Sprite_Gauge.prototype.currentMaxValue.call(this);
+    }
 };
 
-const _Sprite_Gauge_currentMaxValue = Sprite_Gauge.prototype.currentMaxValue;
-Sprite_Gauge.prototype.currentMaxValue = function() {
-    if (this._battler && this._statusType === "menuexp") {
-        return this._battler.nextLevelExp() - this._battler.currentLevelExp();
+Sprite_MenuGauge.prototype.label = function() {
+    if (this._battler && this.menuParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+            return Sprite_Gauge.prototype.label.call(this);
+        case "menuexp":
+            return LabelShow ? TextManager.expA : '';
+        default:
+          return this.menuParam.ParamName;
+        }
+    } else {
+      return Sprite_Gauge.prototype.label.call(this);
     }
-    return _Sprite_Gauge_currentMaxValue.call(this);
-};
-
-const _Sprite_Gauge_label = Sprite_Gauge.prototype.label;
-Sprite_Gauge.prototype.label = function() {
-    if (this._statusType === "menuexp") {
-        return LabelShow ? TextManager.expA : '';
-    }
-    return _Sprite_Gauge_label.call(this);
 };
 
 Sprite_MenuGauge.prototype.drawValue = function() {

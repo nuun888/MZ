@@ -1,5 +1,5 @@
 # [メニュー画面タイプ１](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.4.1
+# Ver.1.5.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -13,7 +13,7 @@
 ### ステータス項目設定
 アクターの表示するステータスを設定します。  
 
-表示ステータスの取得パラメータ  
+表示ステータス、独自ゲージの取得パラメータ  
 `actor`:アクターのゲームデータ  
 
 ### インフォ設定
@@ -39,6 +39,8 @@
 ![画像](img/MenuScreen2.png) 
 
 ## 更新履歴
+2022/5/28 Ver.1.5.0  
+表示できるステータスに独自のゲージを追加できる機能を追加。  
 2022/5/22 Ver.1.4.1  
 ステータスの独自パラメータが適用されない問題を修正。  
 ステータスに経験値（ゲージなし）を追加。  

@@ -155,7 +155,7 @@
  * @text ウィンドウ高さモード
  * @desc コマンドウィンドウの高さをコマンド数に合わせます。
  * @type boolean
- * @default true
+ * @default false
  * @parent MenuCommandSetting
  * 
  * @param BackGroundSetting
@@ -1025,7 +1025,7 @@ const CommandTop = eval(parameters['CommandTop'] || "true");
 const ExpGaugeColor1 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor1'])) : 18);
 const ExpGaugeColor2 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor2'])) : 18);
 const StatusList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusList'])) : null) || [];
-const CommandHeightMode = eval(parameters['CommandHeightMode'] || "true");
+const CommandHeightMode = eval(parameters['CommandHeightMode'] || "false");
 
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];

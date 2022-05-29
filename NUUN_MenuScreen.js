@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ１
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -36,6 +36,20 @@
  * 最大値：最大値評価式で設定
  * ゲージ横幅：項目、ゲージ横幅で設定
  * ゲージの識別IDは必ず設定してください。IDは任意の文字列を入力します。重複しないよう注意してください。
+ * 
+ * 背景画像1
+ * IDはマップのタグまたはプラグインコマンドで設定します。
+ * マップの設定のメモ欄
+ * <MenuBackgroundId:[id]> メニュー背景を背景画像リスト[id]番の画像を表示します。
+ * <MenuBackground:[url]> メニュー背景を[url]の画像を表示します。パスはimg/[url].pngです。
+ * 例：<MenuBackground:titles1/Bigtree>
+ * なお上記のタグよりもプラグインパラメータで設定した背景が優先されます。0番指定の時はデフォルトの背景が表示されます。
+ * タグの[id]、[url]は[]ごと数値または文字列に置き換えてください。
+ * 
+ * 背景画像2
+ * 背景画像1の手前に重ねて表示されます。
+ * メニューUIの背景として使用します。
+ * ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。
  *  
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -43,6 +57,10 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/5/29 Ver.1.5.1
+ * マップごとに背景を変更できる機能を追加。
+ * 背景画像を変更するプラグインコマンドを追加。
+ * 背景画像を２層構造に変更。
  * 2022/5/28 Ver.1.5.0
  * 表示できるステータスに独自のゲージを追加できる機能を追加。
  * メニューコマンドウィンドウの高さをコマンド数の高さで表示する(MVの表示)機能を追加。
@@ -79,6 +97,17 @@
  * メニューコマンドの説明がない場合にエラーが起こる問題を修正。
  * 2021/12/29 Ver.1.0.0
  * 初版
+ * 
+ * 
+ * @command ChangeBackgroundId
+ * @desc メニュー画面の背景画像IDを変更します。0でデフォルトの背景が表示されます。
+ * @text 背景画像ID変更
+ * 
+ * @arg backgroundId
+ * @type number
+ * @default 0
+ * @text 背景画像リストID
+ * @desc 背景画像リストを指定します。0でデフォルトの画像が表示されます。
  * 
  * @param Setting
  * @text 共通設定
@@ -162,17 +191,32 @@
  * @text 背景設定
  * @default ------------------------------
  * 
- * @param BackGroundImg
+ * @param BackGroundImges
  * @desc 背景画像ファイル名を指定します。
- * @text 背景画像
+ * @text 背景画像１
+ * @type file[]
+ * @dir img/
+ * @default 
+ * @parent BackGroundSetting
+ * 
+ * @param BackUiWidth1
+ * @text 背景画像１背景サイズをUIに合わせる
+ * @desc 背景画像１の背景サイズをUIに合わせる。
+ * @type boolean
+ * @default true
+ * @parent BackGroundSetting
+ * 
+ * @param BackGroundImg
+ * @desc 背景画像１の手前に表示する背景画像ファイル名を指定します。
+ * @text 背景画像２
  * @type file
  * @dir img/
  * @default 
  * @parent BackGroundSetting
  * 
  * @param BackUiWidth
- * @text 背景サイズをUIに合わせる
- * @desc 背景サイズをUIに合わせる。
+ * @text 背景画像２背景サイズをUIに合わせる
+ * @desc 背景画像２の背景サイズをUIに合わせる。
  * @type boolean
  * @default true
  * @parent BackGroundSetting
@@ -666,6 +710,7 @@
  * @text 識別ID(20)
  * @type string
  * @default 
+ * @parent GaugeSetting
  * 
  * @param GaugeHeight
  * @desc ゲージの縦幅を指定します。
@@ -1009,6 +1054,8 @@ const MenuRows = Number(parameters['MenuRows'] || 1);
 const ExpDisplayMode = Number(parameters['ExpDisplayMode'] || 1);
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const BackGroundImg = String(parameters['BackGroundImg']);
+const BackGroundImges = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImges'])) : null) || [];
+const BackUiWidth1 = eval(parameters['BackUiWidth1'] || "true");
 const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
 const WindowVisible = eval(parameters['WindowVisible'] || "true");
 const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
@@ -1055,6 +1102,12 @@ let TPGaugeWidth = OrgTPGaugeWidth;
 let ExpGaugeWidth = OrgExpGaugeWidth;
 
 let gaugeType = null;
+
+const pluginName = "NUUN_MenuScreen";
+
+PluginManager.registerCommand(pluginName, 'ChangeBackgroundId', args => {
+    $gameSystem.menuBackgroundId = Number(args.backgroundId);
+});
 
 Scene_ItemBase.prototype.actorWindowRect = function() {//再定義
     return Scene_Menu.prototype.statusWindowRect(this);//今後のバージョンアップで独自の画面に編集可能
@@ -1173,21 +1226,37 @@ Scene_Menu.prototype.infoWindowSideRect = function() {
 
 const _Scene_Menu_createBackground = Scene_Menu.prototype.createBackground;
 Scene_Menu.prototype.createBackground = function() {
-  _Scene_Menu_createBackground.call(this);
-  if (BackGroundImg) {
-    const sprite = new Sprite();
-    sprite.bitmap = ImageManager.nuun_LoadPictures(BackGroundImg);
-    this.addChild(sprite);
-    if (sprite.bitmap && !sprite.bitmap.isReady()) {
-      sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
-    } else {
-      this.setBackGround(sprite);
+    _Scene_Menu_createBackground.call(this);
+    if (!$gameSystem.menuBackgroundId) {
+        $gameSystem.menuBackgroundId = 0;
     }
-  }
+    const data = $dataMap;
+    const backgroundId = $gameSystem.menuBackgroundId > 0 ? $gameSystem.menuBackgroundId : ($dataMap && $dataMap.meta.MenuBackgroundId ? Number(data.meta.MenuBackgroundId) : $gameSystem.menuBackgroundId);
+    const img = BackGroundImges ? BackGroundImges[backgroundId - 1] : null;
+    if (img) {
+        const sprite = new Sprite();
+        sprite.bitmap = ImageManager.nuun_LoadPictures(img);
+        this.addChild(sprite);
+        if (sprite.bitmap && !sprite.bitmap.isReady()) {
+            sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
+        } else {
+            this.setBackGround(sprite, BackUiWidth1);
+        }
+    }
+    if (BackGroundImg) {
+        const sprite = new Sprite();
+        sprite.bitmap = ImageManager.nuun_LoadPictures(BackGroundImg);
+        this.addChild(sprite);
+        if (sprite.bitmap && !sprite.bitmap.isReady()) {
+            sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
+        } else {
+            this.setBackGround(sprite, BackUiWidth);
+        }
+    }
 };
 
-Scene_Menu.prototype.setBackGround = function(sprite) {
-    if (BackUiWidth) {
+Scene_Menu.prototype.setBackGround = function(sprite, mode) {
+    if (mode) {
       sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
       sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
       sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);

@@ -16,7 +16,7 @@
 #### 敵キャラのメモ欄
 `<EnemyDamage_X:[Position]>` モンスターのダメージエフェクトX座標（相対座標）を指定します。  
 `<EnemyDamage_Y:[Position]>` モンスターのダメージエフェクトY座標（相対座標）を指定します。  
-例
+例  
 `[Position]`:座標  
 例  
 `<EnemyPosition_X:100>`  

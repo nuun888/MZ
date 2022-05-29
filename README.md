@@ -242,8 +242,9 @@
 |  |  |  |  |
 |  |  |  |  |
 
-| 不具合修正　　　　　　　　　　　　　　 | プラグイン　プラグイン数3　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
+| 不具合修正　　　　　　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
+| [メニュー画面の全体対象時のカーソル表示修正](https://github.com/nuun888/MZ/blob/master/README/MenuStatusAllSelectFix.md) | [NUUN_MenuStatusAllSelectFix](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuStatusAllSelectFix.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

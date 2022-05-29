@@ -4,7 +4,7 @@
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 #### オプション
-※アクター表示列が２列以上で表示業が２行以上の場合は、以下のプラグインが必要です。  
+※アクター表示列が２列以上でかつ表示行が２行以上の場合は、以下のプラグインが必要です。  
 [メニュー画面の全体対象時のカーソル表示修正](https://github.com/nuun888/MZ/blob/master/README/MenuStatusAllSelectFix.md)  
 
 メニュー画面の表示を拡張します。  

@@ -1,5 +1,5 @@
 # [メニュー画面タイプ２](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)
-# Ver.1.5.0
+# Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降    
@@ -38,7 +38,26 @@
 720p設定例  
 ![画像](img/MenuScreen4.png) 
 
-## 更新履歴 
+### 背景画像
+#### 背景画像1
+IDはマップのタグまたはプラグインコマンドで設定します。  
+マップの設定のメモ欄  
+`<MenuBackgroundId:[id]>` メニュー背景を背景画像リスト[id]番の画像を表示します。  
+`<MenuBackground:[url]>` メニュー背景を[url]の画像を表示します。パスはimg/[url].pngです。  
+例：`<MenuBackground:titles1/Bigtree>`  
+なお上記のタグよりもプラグインパラメータで設定した背景が優先されます。0番指定の時はデフォルトの背景が表示されます。  
+タグの[id]、[url]は[]ごと数値または文字列に置き換えてください。  
+
+#### 背景画像2
+背景画像1の手前に重ねて表示されます。  
+メニューUIの背景として使用します。  
+ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
+
+## 更新履歴
+2022/5/29 Ver.1.5.1  
+マップごとに背景を変更できる機能を追加。  
+背景画像を変更するプラグインコマンドを追加。  
+背景画像を２層構造に変更。 
 2022/5/28 Ver.1.5.0  
 表示できるステータスに独自のゲージを追加できる機能を追加。  
 2022/5/22 Ver.1.4.1  

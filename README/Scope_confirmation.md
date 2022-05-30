@@ -1,8 +1,9 @@
 # [全体、ランダム、敵味方全体攻撃でも対象選択](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js)
-# Ver.1.6.1
+# Ver.1.6.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+[メニュー画面の全体対象時のカーソル表示修正](https://github.com/nuun888/MZ/blob/master/README/MenuStatusAllSelectFix.md)  
 
 全体、ランダム、敵味方全体攻撃でも対象選択させます。
 
@@ -35,6 +36,8 @@
 `%2`:ランダム回数  
 
 ## 更新履歴
+2021/5/30 Ver.1.6.2  
+メニュー画面アクター全体選択時のカーソル不具合を別プラグイン化による定義修正。  
 2021/3/27 Ver.1.6.1  
 XP風対象選択ウィンドウのプラグイン名が間違っていたので修正。  
 2021/3/27 Ver.1.6.0  

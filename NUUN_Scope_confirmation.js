@@ -12,8 +12,10 @@
  * @plugindesc 全体、ランダム、敵味方全体攻撃でも対象選択
  * @author NUUN
  * @base NUUN_Base
+ * @base NUUN_MenuStatusAllSelectFix
  * @orderAfter NUUN_Base
- * @version 1.6.1
+ * @orderAfter NUUN_MenuStatusAllSelectFix
+ * @version 1.6.2
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -49,6 +51,8 @@
  * 
  * 
  * 更新履歴
+ * 2021/5/30 Ver.1.6.2
+ * メニュー画面アクター全体選択時のカーソル不具合を別プラグイン化による定義修正。
  * 2021/3/27 Ver.1.6.1
  * XP風対象選択ウィンドウのプラグイン名が間違っていたので修正。
  * 2021/3/27 Ver.1.6.0
@@ -459,24 +463,25 @@ Game_Unit.prototype.select = function(target) {
   this.targetSelect(activeMember);
 };
 
-Window_Selectable.prototype.refreshCursorForAll = function() {//再定義
+const _Window_Selectable_refreshCursorForAll = Window_Selectable.prototype.refreshCursorForAll;
+Window_Selectable.prototype.refreshCursorForAll = function() {
   const maxItems = this.maxItems();
-  let rect;
   if (maxItems > 0) {
     if (this._multiCursor) {
       this.setCursorRect(0, 0, 0, 0);
       for (let i = 0; maxItems > i; i++) {
         const target = this.selectTarget(i);
         if (target) {
-          rect = this.itemRect(i);
+          const rect = this.itemRect(i);
           this.setCursorRects(rect.x, rect.y, rect.width, rect.height, i);
         }
       } 
     } else {
-      const items = maxItems + (maxItems >= this.maxCols() && maxItems % this.maxCols() ? 0 : -1);
-      rect = this.itemRect(0);
-      rect.enlarge(this.itemRect(items));
-      this.setCursorRect(rect.x, rect.y, rect.width, rect.height);
+      _Window_Selectable_refreshCursorForAll.call(this);
+      //const items = maxItems + (maxItems >= this.maxCols() && maxItems % this.maxCols() ? 0 : -1);
+      //rect = this.itemRect(0);
+      //rect.enlarge(this.itemRect(items));
+      //this.setCursorRect(rect.x, rect.y, rect.width, rect.height);
     }
   } else {
       this.setCursorRect(0, 0, 0, 0);

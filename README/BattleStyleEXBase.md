@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.3.0
+### Ver.3.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.1.0  
@@ -91,6 +91,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2022/5/31 Ver.3.3.1  
+敵またはアクター対象選択をキャンセルしパーティコマンドまで戻った時に、操作を受け付けなくなる問題を修正。  
 2022/5/26 Ver.3.3.0  
 アクターステータスの表示する方法に独自表示設定する機能を追加。  
 上記の機能に独自パラメータ、独自ゲージを表示する機能を追加。  

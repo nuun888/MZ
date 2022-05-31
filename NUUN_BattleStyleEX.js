@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.3.0
+ * @version 3.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/5/31 Ver.3.3.1
+ * 敵またはアクター対象選択をキャンセルしパーティコマンドまで戻った時に、操作を受け付けなくなる問題を修正。
  * 2022/5/26 Ver.3.3.0
  * アクターステータスの表示する方法に独自表示設定する機能を追加。
  * 上記の機能に独自パラメータ、独自ゲージを表示する機能を追加。
@@ -1058,12 +1060,19 @@ Scene_Battle.prototype.startEnemySelection = function() {
 const _Scene_Battle_onEnemyCancel = Scene_Battle.prototype.onEnemyCancel;
 Scene_Battle.prototype.onEnemyCancel = function() {
   _Scene_Battle_onEnemyCancel.call(this);
+  $gameTemp.onBSAction = false;
   switch (this._actorCommandWindow.currentSymbol()) {
     case "attack":
     case "special":
       this._actorCommandWindow.show();
       break;
   }
+};
+
+const _Scene_Battle_onActorCancel = Scene_Battle.prototype.onActorCancel;
+Scene_Battle.prototype.onActorCancel = function() {
+  _Scene_Battle_onActorCancel.call(this);
+  $gameTemp.onBSAction = false;
 };
 
 const _Scene_Battle_startPartyCommandSelection = Scene_Battle.prototype.startPartyCommandSelection;

@@ -4,9 +4,9 @@
 ### Ver.3.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.1.0  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.1.0  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.1.0  
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.3.1  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.3.1  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.3.1  
 
 バトルスタイル拡張デフォルト設定用
 ![画像](img/BattleStyleEX1.png)  
@@ -61,6 +61,15 @@
 敵キャラのメモ欄  
 `<AttackAnimation:11>`
 敵キャラの通常攻撃時、11番のアニメーションが再生されます。指定がない場合はプラグインパラメータのデフォルト値が適用されます。  
+
+### アクター画像設定
+#### 画像横基準表示位置
+画像左基準：画像の左を起点に表示します。  
+画像中央基準：画像の中央を起点で、アクターステータスの中央に表示されます。  
+
+#### 画像縦基準表示位置
+画像上基準：画像の上を起点とし、アクターステータスの上から表示されます。  
+画像下基準：画像の下を起点とし、アクターステータスの下から上方向に表示します。  
 
 ### アクター画像設定の残りHPの設定方法
 上限値：指定の数値が上限値以下　上限値が0の場合は下限値以上のみの判定になります。  

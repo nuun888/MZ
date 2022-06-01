@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -52,6 +52,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/6/1 Ver.1.3.1
+ * アクター画像（顔グラ）の設定方法に画像起点を追加。
  * 2022/5/26 Ver.1.3.0
  * アクターステータスの表示する方法に独自表示設定する機能を追加。
  * 上記の機能に独自パラメータ、独自ゲージを表示する機能を追加。
@@ -678,7 +680,7 @@
  * 
  * @param Img_SH
  * @desc アクター画像の表示縦幅。
- * @text アクター画像表示横幅
+ * @text アクター画像表示縦幅
  * @type number
  * @default 0
  * @min 0
@@ -742,8 +744,8 @@
  * @parent ActorStatusParamOption
  * 
  * @param FaceHeightOnWindow
- * @desc 画像の高さ範囲をウィンドウ内に納めます。
- * @text 画像ウィンドウ内表示
+ * @desc アクター画像（顔グラ）の高さ範囲をウィンドウ内に納めます。
+ * @text アクター画像ウィンドウ内表示
  * @type boolean
  * @default false
  * @parent ActorStatusParamOption
@@ -1700,7 +1702,7 @@
  * @text 画像表示開始座標X
  * @type number
  * @default 0
- * @min 0
+ * @min -9999
  * @max 9999
  * 
  * @param Img_SY
@@ -1708,7 +1710,7 @@
  * @text 画像表示開始座標Y
  * @type number
  * @default 0
- * @min 0
+ * @min -9999
  * @max 9999
  * 
  * @param Actor_Scale
@@ -1718,6 +1720,28 @@
  * @default 100
  * @min 0
  * @max 999
+ * 
+ * @param ActorImgHPosition
+ * @text 画像横基準表示位置
+ * @desc 画像の横の基準表示位置を指定します。
+ * @type select
+ * @option 画像左基準
+ * @value 'left'
+ * @option 画像中央基準
+ * @value 'center'
+ * @default 'center'
+ * @parent ActorImgList
+ * 
+ * @param ActorImgVPosition
+ * @text 画像縦基準表示位置
+ * @desc 画像の縦の基準表示位置を指定します。
+ * @type select
+ * @option 画像上基準
+ * @value 'top'
+ * @option 画像下基準
+ * @value 'under'
+ * @default 'under'
+ * @parent ActorImgList
  * 
  */
 /*~struct~ActorDataList:

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.3.1
+ * @version 3.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/6/1 Ver.3.3.2
+ * ２行目のアクターステータスの表示で表示揃えを適用できるように修正。
+ * アクター画像（顔グラ）の設定方法に画像起点を追加。
  * 2022/5/31 Ver.3.3.1
  * 敵またはアクター対象選択をキャンセルしパーティコマンドまで戻った時に、操作を受け付けなくなる問題を修正。
  * 2022/5/26 Ver.3.3.0
@@ -1264,6 +1267,9 @@ Window_BattleStatus.prototype.faceRect = function(index) {//再定義
       height = params.FaceHeight > 0 ? Math.min(params.FaceHeight, ImageManager.faceHeight) : ImageManager.faceHeight;
       rect.height = params.FaceHeightOnWindow ? Math.min(rect.height, height) : height;
       rect.x -= Math.floor((rect.width / 2) - (ImageManager.faceWidth / 2));
+    } else if (params.bsMode === "Type4") {
+      height = params.FaceHeight > 0 ? Math.min(params.FaceHeight, ImageManager.faceHeight) : ImageManager.faceHeight;
+      rect.height = params.FaceHeightOnWindow ? Math.min(rect.height, height) : height;
     } else {
       height = params.FaceHeight > 0 ? Math.min(params.FaceHeight, ImageManager.faceHeight) : this.basicGaugesY(rect) - this.gaugeLineHeight() + this.gaugeLineHeight() / 2 - rect.y;
       rect.height = params.FaceHeightOnWindow ? Math.min(rect.height, height) : height;
@@ -1306,13 +1312,19 @@ Window_BattleStatus.prototype.refreshCursor = function() {
 
 Window_BattleStatus.prototype.statusPosition = function(index, rect) {
     const itemWidth = this.itemWidth();
-    const maxCols = Math.min(this.maxItems(), this.maxCols());
+    const maxCols = Math.min(this.maxItems() - (Math.floor(index / this.maxCols()) * this.maxCols()), this.maxCols(), this.maxItems());
     if (params.ActorStatusMode === 'center') {
         rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
     } else if (params.ActorStatusMode === 'raigt') {
         rect.x += this.width - (maxCols * itemWidth) - this.itemPadding() * 2;
     } else if (params.ActorStatusMode === 'triangle') {
-
+      //const topCol = this.maxItems() % maxCols;
+      //console.log(topCol)
+      if (index < topCol) {
+        rect.x += Math.floor((this.width / 2) - (itemWidth * topCol / 2)) - this.itemPadding();
+      } else {
+        rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
+      }
     } else if (params.ActorStatusMode === 'Inverted_triangle') {
 
     }
@@ -1718,8 +1730,9 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor) {
     const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
     const imgIndex = actor.getBSImgIndex();
     sprite.setup(actor, actorImgData, imgIndex);
-    const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
-    const y = rect.y + (positionData.ImgChangePosition ? positionData.ActorImg_Y : rect.height + this.itemPadding()) + (actorImgData ? actorImgData.Actor_Y : 0);
+    const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 4) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
+    //const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
+    const y = rect.y + (params.ActorImgVPosition === 'under' ? this.height : 0) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + this.itemPadding() + (actorImgData ? actorImgData.Actor_Y : 0);
     const scale = actorImgData.Actor_Scale / 100;
     sprite.scale.x = scale;
     sprite.scale.y = scale;
@@ -1731,7 +1744,7 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor) {
       const oriScale = 1 / scale;
       const sw = (params.Img_SW || Infinity) * oriScale;
       const sh = (params.Img_SH || Infinity) * oriScale;
-      const sx = (actorImgData.Img_SX || 0) * oriScale;
+      const sx = (actorImgData.Img_SX || 0) * oriScale + (actorImgData.ActorImgHPosition === 'center' ? (bitmap.width - sw) / 2 : 0);
       const sy = (actorImgData.Img_SY || 0) * oriScale;
       sprite.setFrame(sx, sy, sw, sh);
     }
@@ -1757,8 +1770,9 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
   const ph = ImageManager.faceHeight;
   const sw = Math.min(width, pw);
   const sh = Math.min(height, ph);
-  const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
-  const y = rect.y + (positionData.ImgChangePosition ? positionData.ActorImg_Y : sh) + (actorImgData ? actorImgData.Actor_Y : 0);
+  const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 4) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
+  //const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
+  const y = rect.y + (actorImgData.ActorImgVPosition === 'under' ? sh : 0) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + (actorImgData ? actorImgData.Actor_Y : 0);
   sprite.setHome(x, y);
   const sx = Math.floor((imgIndex % 4) * pw + (pw - sw) / 2);
   const sy = Math.floor(Math.floor(imgIndex / 4) * ph + (ph - sh) / 2);
@@ -2048,8 +2062,6 @@ Sprite_ActorImges.prototype.initialize = function() {
 };
 
 Sprite_ActorImges.prototype.initMembers = function() {
-  this.anchor.x = 0.5;
-  this.anchor.y = 1.0;
   this._battler = null;
   this._data = null;
   this._imgScenes = 'default';
@@ -2081,6 +2093,8 @@ Sprite_ActorImges.prototype.createStateSprite = function() {
 Sprite_ActorImges.prototype.setup = function(battler, data, index) {
   this._battler = battler;
   this._data = data;
+  this.anchor.x = data.ActorImgHPosition === 'center' ? 0.5 : 0.0 ;
+  this.anchor.y = data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
   this._imgIndex = index;
   battler.resetBattleStyleImgId();
   this.updateActorGraphic();

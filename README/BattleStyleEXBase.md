@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.3.1
+### Ver.3.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.1.0  
@@ -91,6 +91,9 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2022/6/1 Ver.3.3.2  
+２行目のアクターステータスの表示で表示揃えを適用できるように修正。  
+アクター画像（顔グラ）の設定方法に画像起点を追加。  
 2022/5/31 Ver.3.3.1  
 敵またはアクター対象選択をキャンセルしパーティコマンドまで戻った時に、操作を受け付けなくなる問題を修正。  
 2022/5/26 Ver.3.3.0  

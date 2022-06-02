@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_BattleStyleEX_Base.js
+ * NUUN_BattleStyleEX.js
  * 
  * Copyright (C) 2022 NUUN
  * This software is released under the MIT License.
@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.3.2
+ * @version 3.3.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/6/2 Ver.3.3.3
+ * 立ち絵の起点を下に設定したときに、画像の下部分がウィンドウの下側から表示されない問題を修正。
  * 2022/6/1 Ver.3.3.2
  * ２行目のアクターステータスの表示で表示揃えを適用できるように修正。
  * アクター画像（顔グラ）の設定方法に画像起点を追加。
@@ -88,7 +90,7 @@
  * 
  */
 var Imported = Imported || {};
-Imported.NUUN_BattleStyleEX_Base = true;
+Imported.NUUN_BattleStyleEX = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_BattleStyleEX');

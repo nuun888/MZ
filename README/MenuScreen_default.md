@@ -1,5 +1,5 @@
 # [メニュー画面デフォルトタイプ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.1.1
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -57,6 +57,8 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2022/6/4 Ver.1.2.0  
+行動目標を表示できる機能を追加。（要メニュー画面行動目標表示プラグイン）  
 2022/5/29 Ver.1.1.1  
 マップごとに背景を変更できる機能を追加。  
 背景画像を変更するプラグインコマンドを追加。  

@@ -1,0 +1,17 @@
+# [ユニークモンスター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js)
+# Ver.1.0.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js)
+#### 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+
+戦闘終了しても倒すまでステータスが維持するモンスターを設定できます。  
+逃走等で戦闘が途中終了しても再度同じモンスターと戦闘した場合、戦闘終了時のステータスで開始されます。  
+
+仕様
+同じユニークモンスターが戦闘終了時にいた場合は敵メンバーの最後のモンスターのステータスが保存されます。  
+戦闘開始時に同じユニークモンスターが出現した場合は、全てに保存されたユニークモンスターのステータスが適用されます。  
+撃破した場合はステータスがリセットされます。  
+
+## 更新履歴
+2022/6/4 Ver.1.0.0  
+初版  

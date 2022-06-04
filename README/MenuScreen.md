@@ -5,9 +5,9 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
 #### オプション
 ※アクター表示列が２列以上でかつ表示行が２行以上の場合は、以下のプラグインが必要です。  
-全体選択時カーソル修正
+全体選択時カーソル修正  
 [メニュー画面の全体対象時のカーソル表示修正](https://github.com/nuun888/MZ/blob/master/README/MenuStatusAllSelectFix.md)  
-行動目標表示
+行動目標表示  
 [メニュー画面行動目標表示](https://github.com/nuun888/MZ/blob/master/README/Destination.md)  
 
 メニュー画面の表示を変更、拡張します。  

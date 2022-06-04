@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  所持金拡張
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/4 Ver.1.1.2
+ * メニュー画面プラグイン更新に対してのアイコン表示クラス選択項目の追加。
  * 2021/12/30 Ver.1.1.1
  * 所持金アイコンを表示させるクラス指定をコンボボックスに変更。
  * 2021/2/3 Ver.1.1.0
@@ -65,7 +67,11 @@
  * @option "Window_ShopNumber"
  * @option "Window_Gold"
  * @option "Window_InfoMenu"
- * @default 
+ * @option "Window_InfoHeader1"
+ * @option "Window_InfoHeader2"
+ * @option "Window_InfoFooter"
+ * @option "Window_InfoSide"
+ * @default ["\"Window_Gold\"","\"Window_ShopNumber\"","\"Window_InfoMenu\"","\"Window_InfoHeader1\"","\"Window_InfoHeader2\"","\"Window_InfoFooter\"","\"Window_InfoSide\""]
  * 
  * 
  * @command GetGold

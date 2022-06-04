@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ２
  * @author NUUN
- * @version 1.5.1
+ * @version 1.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -57,6 +57,8 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/6/4 Ver.1.6.0
+ * 行動目標を表示できる機能を追加。（要メニュー画面行動目標表示プラグイン）
  * 2022/5/29 Ver.1.5.1
  * マップごとに背景を変更できる機能を追加。
  * 背景画像を変更するプラグインコマンドを追加。
@@ -786,6 +788,8 @@
  * @value 6
  * @option フリーテキスト(1)(2)(3)(4)(12)
  * @value 10
+ * @option 行動目標（要メニュー画面行動目標表示）(1)(2)(3)(4)(6)(7)(8)(11)
+ * @value 11
  * @default 0
  * 
  * @param X_Position
@@ -1963,6 +1967,9 @@ Window_InfoMenu.prototype.dateDisplay = function(data, x, y, width) {
     case 10:
         this.drawFreeText(data, x, y, width);
         break;
+    case 11:
+        this.drawDestination(data, x, y, width);
+        break;
       default:
         break;
     }
@@ -2033,6 +2040,29 @@ Window_InfoMenu.prototype.drawCommandExplanation = function(data, x, y, width) {
 
 Window_InfoMenu.prototype.drawFreeText = function(data, x, y, width) {
     this.drawTextEx(data.Text, x, y, width);
+};
+
+Window_InfoMenu.prototype.drawDestination = function(data, x, y, width) {
+    if (!Imported.NUUN_Destination) {
+        return;
+    }
+    let iconWidth = 0;
+    let textWidth = 0;
+    if (data.InfoIcon > 0) {
+        this.drawIcon(data.InfoIcon, x, y + 2);
+        iconWidth = ImageManager.iconWidth + 6;
+    }
+    if (data.ParamName) {
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : '';
+        this.drawText(nameText, x + iconWidth, y, textWidth);
+        textWidth = this.systemWidth(data.SystemItemWidth, width);
+    }
+    this.resetTextColor();
+    const text = this.getDestinationList();
+    if (text) {
+        this.drawTextEx(text, x + iconWidth + textWidth, y, width - textWidth - iconWidth);
+    }
 };
 
 Window_InfoMenu.prototype.drawName = function(data, x, y, width) {

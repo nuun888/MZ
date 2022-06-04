@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ユニークモンスター
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 戦闘終了しても倒すまでステータスが維持するモンスターを設定できます。
@@ -25,6 +25,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/5 Ver.1.0.1
+ * 再戦時にステート、バフが引き継がれない問題を修正。
+ * ユニークモンスターではないモンスターを倒すとエラーが出る問題を修正。
  * 2022/6/4 Ver.1.0.0
  * 初版
  * 
@@ -83,12 +86,47 @@ Imported.NUUN_UniqueEnemy = true;
 
     const _Game_BattlerBase_die = Game_BattlerBase.prototype.die;
     Game_BattlerBase.prototype.die = function() {
-        _Game_BattlerBase_die.call(this);
-        if (this.isEnemy()) {
+        if (this.isEnemy() && this.getUniqueEnemyId() >= 0) {
             $gameSystem.setDefeatUniqueEnemy(this.getUniqueEnemyId())
         }
+        _Game_BattlerBase_die.call(this);
     };
 
+    const _Game_Battler_escape = Game_Battler.prototype.escape;
+    Game_Battler.prototype.escape = function() {
+        if (this.isEnemy() && this.getUniqueEnemyId() >= 0) {
+            this.uniqueEnemyState();
+        }
+        _Game_Battler_escape.call(this);
+    };
+
+    const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
+    Game_Enemy.prototype.initMembers = function() {
+        _Game_Enemy_initMembers.call(this);
+        this.uniqueEnemyStates = null;
+        this.uniqueEnemyStateTurns = null;
+        this.uniqueEnemyBuffs = null;
+        this.uniqueEnemyBuffTurns = null;
+    };
+
+    Game_Enemy.prototype.uniqueEnemyState = function() {
+        if (!this.uniqueEnemyStates) {
+            this.uniqueEnemyStates = [];
+            this.uniqueEnemyStateTurns = {};
+            this._states.forEach(state => {
+                this.uniqueEnemyStates.push(state);
+                this.uniqueEnemyStateTurns[state] = this._stateTurns[state];
+            });
+        }
+        if (!this.uniqueEnemyBuffs) {
+            this.uniqueEnemyBuffs = [];
+            this.uniqueEnemyBuffTurns = [];
+            this._buffs.forEach((id, i) => {
+                this.uniqueEnemyBuffs[i] = id;
+                this.uniqueEnemyBuffTurns[i] = this._buffTurns[i];
+            });
+        }
+    };
 
     Game_Enemy.prototype.setUniqueEnemyId = function(id) {
         this._uniqueEnemyId = id;
@@ -96,6 +134,40 @@ Imported.NUUN_UniqueEnemy = true;
 
     Game_Enemy.prototype.getUniqueEnemyId = function() {
         return this._uniqueEnemyId;
+    };
+
+    Game_Enemy.prototype.setUniqueEnemyStates = function() {
+        if (this.uniqueEnemyStates) {
+            this._states = this.uniqueEnemyStates;
+            this._stateTurns = this.uniqueEnemyStateTurns;
+            this.uniqueEnemyStates = null;
+            this.uniqueEnemyStateTurns = null;
+        }
+        if (this.uniqueEnemyBuffs) {
+            this._buffs = this.uniqueEnemyBuffs;
+            this._buffTurns = this.uniqueEnemyBuffTurns;
+            this.uniqueEnemyBuffs = null;
+            this.uniqueEnemyBuffTurns = null;
+        }
+    };
+
+    Game_Enemy.prototype.setBattleUniqueEnemy = function() {
+        if (this.getUniqueEnemyId() >= 0) {
+            if (this.isDead()) {
+                $gameSystem.setUniqueEnemy(null, this.getUniqueEnemyId());
+            } else {
+                $gameSystem.setUniqueEnemy(this, this.getUniqueEnemyId());
+            }
+        }
+    };
+
+    const _Game_Battler_onBattleEnd = Game_Battler.prototype.onBattleEnd;
+    Game_Battler.prototype.onBattleEnd = function() {
+        if (this.isEnemy() && this.getUniqueEnemyId() >= 0) {
+            this.uniqueEnemyState();
+            this.setBattleUniqueEnemy();
+        }
+        _Game_Battler_onBattleEnd.call(this);
     };
 
 
@@ -112,26 +184,9 @@ Imported.NUUN_UniqueEnemy = true;
             const uniqueEnemy = $gameSystem.getUniqueEnemy(enemy.getUniqueEnemyId());
             if (uniqueEnemy && enemy.getUniqueEnemyId() >= 0) {
                 troop[i] = uniqueEnemy;
+                troop[i].setUniqueEnemyStates();
             }
         });
-    };
-
-    Game_Troop.prototype.setUniqueEnemy = function() {
-        return this.members().forEach(enemy => {
-            if (enemy.getUniqueEnemyId() >= 0) {
-                if (enemy.isDead()) {
-                    $gameSystem.setUniqueEnemy(null, enemy.getUniqueEnemyId());
-                } else {
-                    $gameSystem.setUniqueEnemy(enemy, enemy.getUniqueEnemyId());
-                }
-            }
-        });
-    };
-
-    const _BattleManager_endBattle = BattleManager.endBattle;
-    BattleManager.endBattle = function(result) {
-        _BattleManager_endBattle.call(this, result);
-        $gameTroop.setUniqueEnemy();
     };
 
 })();

@@ -1,5 +1,5 @@
 # [ユニークモンスター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,5 +13,8 @@
 撃破した場合はステータスがリセットされます。  
 
 ## 更新履歴
+2022/6/5 Ver.1.0.1  
+再戦時にステート、バフが引き継がれない問題を修正。  
+ユニークモンスターではないモンスターを倒すとエラーが出る問題を修正。  
 2022/6/4 Ver.1.0.0  
 初版  

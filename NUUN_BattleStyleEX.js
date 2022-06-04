@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.3.3
+ * @version 3.3.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/6/4 Ver.3.3.4
+ * アクター画像設定をなしに設定して戦闘を行うとアニメーション時にエラーが出る問題を修正。
  * 2022/6/2 Ver.3.3.3
  * 立ち絵の起点を下に設定したときに、画像の下部分がウィンドウの下側から表示されない問題を修正。
  * 2022/6/1 Ver.3.3.2
@@ -2033,7 +2035,7 @@ const _Sprite_Animation_updateFlash = Sprite_Animation.prototype.updateFlash;
 Sprite_Animation.prototype.updateFlash = function() {
   const t = this._targets;
   if (!$gameSystem.isSideView() && params.ActorEffectShow) {
-    this._targets = this._targets.map(sprite => sprite._actor ? sprite.bsSprite : sprite);
+    this._targets = this._targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
   }
   _Sprite_Animation_updateFlash.call(this);
   this._targets = t;
@@ -2043,7 +2045,7 @@ const _Sprite_AnimationMV_updateFlashMV = Sprite_AnimationMV.prototype.updateFla
 Sprite_AnimationMV.prototype.updateFlash = function() {
   const t = this._targets;
   if (!$gameSystem.isSideView() && params.ActorEffectShow) {
-    this._targets = this._targets.map(sprite => sprite._actor ? sprite.bsSprite : sprite);
+    this._targets = this._targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
   }
   _Sprite_AnimationMV_updateFlashMV.call(this);
   this._targets = t;

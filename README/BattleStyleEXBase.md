@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.3.3
+### Ver.3.3.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.3.1  
@@ -100,6 +100,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2022/6/4 Ver.3.3.4  
+アクター画像設定をなしに設定して戦闘を行うとアニメーション時にエラーが出る問題を修正。  
 2022/6/2 Ver.3.3.3  
 立ち絵の起点を下に設定したときに、画像の下部分がウィンドウの下側から表示されない問題を修正。  
 2022/6/1 Ver.3.3.2  

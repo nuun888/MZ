@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.13.0
+ * @version 2.13.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -228,6 +228,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/5 Ver.2.13.1
+ * 一部の処理を修正。
  * 2022/5/5 Ver.2.13.0
  * 盗みスキル率の表示を評価式形式に変更。
  * ドロップアイテム、盗みアイテムで確立を表示しない場合、アイテムの表示が不自然になる問題を修正。
@@ -3338,11 +3340,12 @@ Game_Troop.prototype.setup = function(troopId) {
   }
 };
 
-//Game_Enemy
-const _Game_Enemy_appear = Game_Enemy.prototype.appear;
-Game_Enemy.prototype.appear = function() {
-  _Game_Enemy_appear.call(this);
-  const enemyId = this.enemyId();
+
+const _Game_BattlerBase_appear = Game_BattlerBase.prototype.appear;
+Game_BattlerBase.prototype.appear = function() {
+  _Game_BattlerBase_appear.call(this);
+  if (this.isEnemy()) {
+    const enemyId = this.enemyId();
   if ($gameTroop.inBattle()) {
     if ($gameSystem.registrationStatusTiming() === 0) {
       if (!$gameSystem.getEnemyBookFlag(enemyId)) {
@@ -3362,8 +3365,27 @@ Game_Enemy.prototype.appear = function() {
       $gameSystem.addToEnemyBook(enemyId);
     }
   }
+  }
 };
 
+const _Game_BattlerBase_die = Game_BattlerBase.prototype.die;
+Game_BattlerBase.prototype.die = function() {
+  _Game_BattlerBase_die.call(this);
+  if (this.isEnemy()) {
+    const enemyId = this.enemyId();
+    if ($gameSystem.registrationStatusTiming() === 1 || $gameSystem.registrationStatusTiming() === 3) {
+      if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+        $gameSystem.addToEnemyBook(enemyId);
+      }
+      $gameSystem.statusToEnemyBook(enemyId);
+    } else if ($gameSystem.registrationTiming() === 1 || $gameSystem.registrationTiming() === 3) {
+      $gameSystem.addToEnemyBook(enemyId);
+    }
+    $gameSystem.defeatCount(enemyId);
+  }
+};
+
+//Game_Enemy
 const _Game_Enemy_transform = Game_Enemy.prototype.transform;
 Game_Enemy.prototype.transform = function(enemyId) {
   if (param.TransformDefeat && !this.enemy().meta.NoTransformInData) {
@@ -3384,21 +3406,6 @@ Game_Enemy.prototype.transform = function(enemyId) {
   } else if ($gameSystem.registrationTiming() === 0) {
     $gameSystem.addToEnemyBook(enemyId);
   }
-};
-
-const _Game_Enemy_die = Game_Enemy.prototype.die;
-Game_Enemy.prototype.die = function() {
-  _Game_Enemy_die.call(this);
-  const enemyId = this.enemyId();
-  if ($gameSystem.registrationStatusTiming() === 1 || $gameSystem.registrationStatusTiming() === 3) {
-    if (!$gameSystem.getEnemyBookFlag(enemyId)) {
-      $gameSystem.addToEnemyBook(enemyId);
-    }
-    $gameSystem.statusToEnemyBook(enemyId);
-  } else if ($gameSystem.registrationTiming() === 1 || $gameSystem.registrationTiming() === 3) {
-    $gameSystem.addToEnemyBook(enemyId);
-  }
-  $gameSystem.defeatCount(enemyId);
 };
 
 Game_Enemy.prototype.dropItemFlag = function(drop) {
@@ -5632,7 +5639,7 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
-  if (!Imported.NUUN_ConditionalDrops && !Imported.NUUN_EnemyBookEX_2) {
+  if (!Imported.NUUN_ConditionalDrops || !Imported.NUUN_EnemyBookEX_2) {
     return;
   }
   this.contentsFontSize(list);

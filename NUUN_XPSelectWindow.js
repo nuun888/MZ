@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.4
+ * @version 1.0.5
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/5 Ver.1.0.5
+ * 微修正。
  * 2022/4/2 Ver.1.0.4
  * 敵に顔グラを指定できる機能を追加。
  * 2022/4/1 Ver.1.0.3
@@ -574,7 +576,7 @@ Window_BattleSelectEnemy.prototype.placeStateIcon = function(battler, x, y) {
 Window_BattleSelectEnemy.prototype.placeGauge = function(battler, type, x, y) {
     if (Imported.NUUN_GaugeImage) {
         this.placeGaugeImg(actor, type, x, y);
-      }
+    }
     const key = "EnemySelectGauge-%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_XPGauge);
     sprite.setup(battler, type);
@@ -671,7 +673,7 @@ Sprite_XPGauge.prototype.initialize = function() {
     Sprite_Gauge.prototype.initialize.call(this);
 };
 
-Sprite_Gauge.prototype.bitmapWidth = function() {
+Sprite_XPGauge.prototype.bitmapWidth = function() {
     return this._gaugeWidth || 128;
 };
 

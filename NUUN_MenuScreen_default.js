@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面デフォルトタイプ
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -57,6 +57,8 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/6/5 Ver.1.2.1
+ * ステータスの独自パラメータの名称の座標が正常に適用されていなかった問題を修正。
  * 2022/6/4 Ver.1.2.0
  * 行動目標を表示できる機能を追加。（要メニュー画面行動目標表示プラグイン）
  * 2022/5/29 Ver.1.1.1
@@ -1773,7 +1775,7 @@ Window_MenuStatus.prototype.drawParam = function(data, x, y, width, actor) {
     this.changeTextColor(NuunManager.getColorCode(data.NameColor));
     const nameText = data.ParamName ? data.ParamName : '';
     const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
-    this.drawText(nameText, x + textWidth, y, textWidth);
+    this.drawText(nameText, x, y, textWidth);
     this.resetTextColor();
     if (data.DetaEval) {
         this.drawText(eval(data.DetaEval), x + textWidth + 8, y, width - (textWidth + 8), data.Align);

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  戦闘中アイテム、スキル選択画面MV風表示
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
  * 
  * @help
  * 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
@@ -20,6 +20,8 @@
  * 
  * 
  * 更新履歴
+ * 2022/6/5 Ver.1.3.0
+ * アイテム、スキル選択中にアクターコマンドを非表示にする機能を追加いたしました。
  * 2022/3/17 Ver.1.2.0
  * 表示する列を指定できる機能を追加。
  * 2021/11/15 Ver.1.1.3
@@ -66,6 +68,12 @@
  * @type boolean
  * @default false
  * 
+ * @param ActorCommandVisible
+ * @text アクターコマンド非表示
+ * @desc アイテム、スキル選択時にアクターコマンドを非表示にします。
+ * @type boolean
+ * @default false
+ * 
  * 
  */
 
@@ -78,6 +86,7 @@ const VariableHeight = eval(parameters['VariableHeight'] || "false");
 const FullWindowHeight = eval(parameters['FullWindowHeight'] || "false");
 const ItemMaxRow = Number(parameters['ItemMaxRow'] || 6);
 const Cols = Number(parameters['Cols'] || 2);
+const ActorCommandVisible = eval(parameters['ActorCommandVisible'] || "false");
 let maxHeight = 0;
 
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
@@ -144,7 +153,7 @@ Scene_Battle.prototype.commandSkill = function() {
   if (!this._statusWindow.visible) {
     this._statusWindow.show();
   }
-  if (!this._actorCommandWindow.visible) {
+  if (!ActorCommandVisible && !this._actorCommandWindow.visible) {
     this._actorCommandWindow.show();
   }
 };
@@ -155,7 +164,7 @@ Scene_Battle.prototype.commandItem = function() {
   if (!this._statusWindow.visible) {
     this._statusWindow.show();
   }
-  if (!this._actorCommandWindow.visible) {
+  if (!ActorCommandVisible && !this._actorCommandWindow.visible) {
     this._actorCommandWindow.show();
   }
 };

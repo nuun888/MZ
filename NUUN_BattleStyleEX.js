@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.3.4
+ * @version 3.3.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/6/5 Ver.3.3.5
+ * アクター行動時のエフェクトがおかしくなる問題を修正。
  * 2022/6/4 Ver.3.3.4
  * アクター画像設定をなしに設定して戦闘を行うとアニメーション時にエラーが出る問題を修正。
  * 2022/6/2 Ver.3.3.3
@@ -2168,6 +2170,7 @@ Sprite_ActorImges.prototype.updateDamage = function() {
 Sprite_ActorImges.prototype.updateZoom = function() {
   if (this._zoomDuration > 0) {
     this.anchor.y = 0.5;
+    this.anchor.x = 0.5;
     const d = this._zoomDuration;
     const t = this._zoomDuration <= params.ActionZoomDuration / 2 ? 1 : this._zoomScaleTarget;
     this._zoomScale = ((this._zoomScale * (d - 1) + t) / d);
@@ -2175,9 +2178,11 @@ Sprite_ActorImges.prototype.updateZoom = function() {
     const scale = this._zoomScale * this._baseScale;
     this.scale.x = scale;
     this.scale.y = scale;
+    if (this.x === this._homeX) {
+      this.x = this._homeX + (this._data.ActorImgHPosition === 'left' ? this._rectWidth / 2 * scale : 0);
+    }
     if (this.y === this._homeY) {
-      this.y = this._homeY - this._rectHeight / 2 * scale;
-      //this.y = Math.floor(this._homeY - this.bitmap.height / 2 * scale);
+      this.y = this._homeY - this._rectHeight / 2 * scale * (this._data.ActorImgVPosition === 'top' ? -1 : 1);
     }
   } else {
     if (this.scale.x !== this._baseScale) {
@@ -2186,7 +2191,9 @@ Sprite_ActorImges.prototype.updateZoom = function() {
     if (this._zoomEffect) {
       this._zoomEffect = false;
       this.y = this._homeY;
-      this.anchor.y = 1.0;
+      this.x = this._homeX;
+      this.anchor.x = this._data.ActorImgHPosition === 'left' ? 0.0 : 0.5;
+      this.anchor.y = this._data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
     }
   }
 };

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * 戦闘画面を拡張します。

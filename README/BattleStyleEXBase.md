@@ -1,12 +1,12 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.3.5
+### Ver.3.3.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.3.1  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.3.1  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.3.1  
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.3.2  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.3.2  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.3.2  
 
 バトルスタイル拡張デフォルト設定用
 ![画像](img/BattleStyleEX1.png)  
@@ -100,6 +100,10 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2022/6/7 Ver.3.3.6  
+アクター画像の表示幅を指定すると行動時に画像が消える問題を修正。  
+アクター行動時にステートの表示がおかしくなる問題を修正。  
+アクター毎にステートエフェクトの座標を調整できる機能を追加。  
 2022/6/5 Ver.3.3.5  
 アクター行動時のエフェクトがおかしくなる問題を修正。  
 2022/6/4 Ver.3.3.4  

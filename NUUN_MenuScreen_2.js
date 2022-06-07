@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ２
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.3.5
+ * @version 3.3.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/6/7 Ver.3.3.6
+ * アクター画像の表示幅を指定すると行動時に画像が消える問題を修正。
+ * アクター行動時にステートの表示がおかしくなる問題を修正。
+ * アクター毎にステートエフェクトの座標を調整できる機能を追加。
  * 2022/6/5 Ver.3.3.5
  * アクター行動時のエフェクトがおかしくなる問題を修正。
  * 2022/6/4 Ver.3.3.4
@@ -1742,8 +1746,8 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor) {
     const scale = actorImgData.Actor_Scale / 100;
     sprite.scale.x = scale;
     sprite.scale.y = scale;
-    sprite._rectWidth = sprite.width;
-    sprite._rectHeight = sprite.height;
+    sprite._rectWidth = bitmap.width;
+    sprite._rectHeight = bitmap.height;
     sprite.setHome(x, y);
     sprite.show();
     if (params.Img_SW > 0 || params.Img_SH > 0) {
@@ -2105,8 +2109,11 @@ Sprite_ActorImges.prototype.setup = function(battler, data, index) {
   battler.resetBattleStyleImgId();
   this.updateActorGraphic();
   if (getStateAnimationShow()) {
+    this._data.ActorState_X = this._data.ActorState_X || 0;
+    this._data.ActorState_Y = this._data.ActorState_Y || 0;
     this._stateSprite.setup(battler);
-    this._stateSprite.move(params.ActorState_X, params.ActorState_Y);
+    this._stateSprite.move(this.getStateRectX() + this.getStatePositionX(), this.getStateRectY() + this.getStatePositionY());
+    this._stateSprite.anchor.y = 0.5;
   }
 };
 
@@ -2182,7 +2189,11 @@ Sprite_ActorImges.prototype.updateZoom = function() {
       this.x = this._homeX + (this._data.ActorImgHPosition === 'left' ? this._rectWidth / 2 * scale : 0);
     }
     if (this.y === this._homeY) {
-      this.y = this._homeY - this._rectHeight / 2 * scale * (this._data.ActorImgVPosition === 'top' ? -1 : 1);
+      this.y = this._homeY - (this._rectHeight / 2) * scale * (this._data.ActorImgVPosition === 'top' ? -1 : 1);
+    }
+    if (getStateAnimationShow()) {
+      this._stateSprite.x = params.ActorState_X;
+      this._stateSprite.y = params.ActorState_Y + (this._rectHeight / 2) * (this._data.ActorImgVPosition === 'top' ? -1 : 1) + this.getStatePositionY();
     }
   } else {
     if (this.scale.x !== this._baseScale) {
@@ -2194,8 +2205,30 @@ Sprite_ActorImges.prototype.updateZoom = function() {
       this.x = this._homeX;
       this.anchor.x = this._data.ActorImgHPosition === 'left' ? 0.0 : 0.5;
       this.anchor.y = this._data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
+      if (getStateAnimationShow()) {
+        this._stateSprite.x = this.getStateRectX() + this.getStatePositionX();
+        this._stateSprite.y = this.getStateRectY() + this.getStatePositionY();
+      }
     }
   }
+};
+
+Sprite_ActorImges.prototype.getStateRectX = function() {
+  //const tag = 'BSStateA_X' + this._stateSprite._overlayIndex;
+  return params.ActorState_X + this._data.ActorState_X;// + (Number(this._battler.actor().meta[tag]) || 0);
+};
+
+Sprite_ActorImges.prototype.getStateRectY = function() {
+  //const tag = 'BSStateA_Y' + this._stateSprite._overlayIndex;console.log(tag)
+  return params.ActorState_Y + this._data.ActorState_Y;// + (Number(this._battler.actor().meta[tag]) || 0);
+};
+
+Sprite_ActorImges.prototype.getStatePositionX = function() {
+  return this._data.ActorImgHPosition === 'left' ? this.width / 2 : 0;
+};
+
+Sprite_ActorImges.prototype.getStatePositionY = function() {
+  return this._data.ActorImgVPosition === 'under' ? this._rectHeight * -1 : 0;
 };
 
 Sprite_ActorImges.prototype.resetDamage = function() {

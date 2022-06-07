@@ -52,6 +52,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/6/7 Ver.1.3.2
+ * アクター毎にステートエフェクトの座標を調整できる機能を追加。
  * 2022/6/1 Ver.1.3.1
  * アクター画像（顔グラ）の設定方法に画像起点を追加。
  * 2022/5/26 Ver.1.3.0
@@ -1772,6 +1774,28 @@
  * @value 'under'
  * @default 'under'
  * @parent ActorImgList
+ * 
+ * @param ActorStateAnimationPosition
+ * @text アクター画像位置設定
+ * @default ------------------------------
+ * 
+ * @param ActorState_X
+ * @desc アクター画像毎のステートアニメーションのX座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text ステートアニメーションX座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorStateAnimationPosition
+ * 
+ * @param ActorState_Y
+ * @desc アクター画像毎のステートアニメーションのY座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text ステートアニメーションY座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorStateAnimationPosition
  * 
  */
 /*~struct~ActorDataList:

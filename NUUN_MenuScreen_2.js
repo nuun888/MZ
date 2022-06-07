@@ -57,6 +57,8 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/6/7 Ver.1.6.2
+ * 一部プラグインでの競合対策。
  * 2022/6/5 Ver.1.6.1
  * ステータスの独自パラメータの名称の座標が正常に適用されていなかった問題を修正。
  * 2022/6/4 Ver.1.6.0
@@ -1127,7 +1129,8 @@ let ExpGaugeWidth = OrgExpGaugeWidth;
 
 const InfoSideFontSize = Number(parameters['InfoSideFontSize'] || 0);
 
-let gaugeType = null;
+let menuTextMode = null;
+let menuAlign = null;
 
 const pluginName = "NUUN_MenuScreen_2";
 
@@ -1808,9 +1811,20 @@ Window_MenuStatus.prototype.drawSParams = function(data, param, x, y, width, act
 
 Window_MenuStatus.prototype.drawActorName = function(data, x, y, width, actor) {
     this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
-    this.changeTextColor(ColorManager.hpColor(actor));
-    this.drawText(actor.name(), x, y, width, data.Align);
+    menuTextMode = 'name';
+    menuAlign = data.Align;
+    Window_StatusBase.prototype.drawActorName.call(this, actor, x, y, width);
+    //this.changeTextColor(ColorManager.hpColor(actor));
+    //this.drawText(actor.name(), x, y, width, data.Align);
     this.contents.fontSize = $gameSystem.mainFontSize();
+};
+
+Window_MenuStatus.prototype.drawText = function(text, x, y, maxWidth, align) {
+    if (menuTextMode === 'name') {
+        align = menuAlign;
+        menuTextMode = null;
+    }
+    Window_Base.prototype.drawText.call(this, text, x, y, maxWidth, align);
 };
 
 Window_MenuStatus.prototype.drawActorClass = function(data, x, y, width, actor) {

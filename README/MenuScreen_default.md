@@ -1,5 +1,5 @@
 # [メニュー画面デフォルトタイプ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.2.2
+# Ver.1.2.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -58,6 +58,8 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2022/6/10 Ver.1.2.3  
+ステータス独自パラメータで名称を無記入した場合、パラメータが右にずれる問題を修正。  
 2022/6/7 Ver.1.2.2  
 一部プラグインでの競合対策。  
 2022/6/5 Ver.1.2.1  

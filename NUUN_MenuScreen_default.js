@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面デフォルトタイプ
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -57,6 +57,8 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/6/10 Ver.1.2.3
+ * ステータス独自パラメータで名称を無記入した場合、パラメータが右にずれる問題を修正。
  * 2022/6/7 Ver.1.2.2
  * 一部プラグインでの競合対策。
  * 2022/6/5 Ver.1.2.1
@@ -1792,7 +1794,8 @@ Window_MenuStatus.prototype.drawParam = function(data, x, y, width, actor) {
     this.drawText(nameText, x, y, textWidth);
     this.resetTextColor();
     if (data.DetaEval) {
-        this.drawText(eval(data.DetaEval), x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        const padding = textWidth > 0 ? 8 : 0;
+        this.drawText(eval(data.DetaEval), x + textWidth + padding, y, width - (textWidth + padding), data.Align);
     }
     this.contents.fontSize = $gameSystem.mainFontSize();
 };

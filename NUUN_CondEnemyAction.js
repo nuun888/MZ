@@ -20,6 +20,7 @@
  * 
  * このプラグインは条件付きベースが必要です。
  * 
+ * 敵キャラのメモ欄
  * <ActionCond[SwitchId]:[CondId]...> 使用者の指定したIDの条件が一致したときのみ条件を満たします。
  * <PartyActionCond[SwitchId]:[CondId]...> パーティメンバーの指定したIDの条件が一致したときのみ条件を満たします。
  * <TroopActionCond[SwitchId]:[CondId]...> 敵グループの指定したIDの条件が一致したときのみ条件を満たします。

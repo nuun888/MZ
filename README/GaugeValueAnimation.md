@@ -1,5 +1,5 @@
 # [ゲージの数値更新アニメーション](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -10,6 +10,8 @@
 ゲージの数値のアニメーションをさせない場合は、該当のプラグインパラメータの「OnUpdateValue」（数値変化アニメーショ）の値をfalseに設定してください。  
 
 ## 更新履歴
+2022/6/12 Ver.1.2.1  
+ゲージ及び数値更新フレーム設定のデフォルト設定で正常に適用されなかった問題を修正。  
 2022/1/1 Ver.1.2.0  
 適用するステータスタイプの設定をコンボボックス化。  
 処理のリファクタリング。  

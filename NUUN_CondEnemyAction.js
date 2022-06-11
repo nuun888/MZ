@@ -29,7 +29,9 @@
  * 例
  * <ActionCond10:6> 行動パターンのアクション条件が10番のスイッチ指定時、行動リストの6番の条件が一致したときに条件を満たします。
  * 
- * <ActionMatch:[modeId]> [modeId]:0 いずれかが一致　1：全て一致
+ * <ActionMatch[SwitchId]:[modeId]> 
+ * [modeId]:0 いずれかが一致　1：全て一致
+ * [SwitchId]:行動パターンのスイッチで設定したスイッチID
  * 未記入の場合はいずれかが一致の場合条件を満たしたときになります。
  * 
  * 
@@ -39,6 +41,7 @@
  * 更新履歴
  * 2022/6/12 Ver.1.0.1
  * 説明文が情報不足だったため修正。
+ * 条件一致モードが全アクション対象だったため修正。
  * 2021/12/18 Ver.1.0.0
  * 初版
  * 
@@ -74,7 +77,8 @@ Game_Enemy.prototype.meetsSwitchCondition = function(param) {
 
 Game_Enemy.prototype.condAction = function(param) {
     const tag = 'ActionCond' + param;
-    const mode = Number(this.enemy().meta.ActionMatch) || 0;
+    const matchTag = 'ActionMatch' + param;
+    const mode = Number(this.enemy().meta[matchTag]) || 0;
     return this.getTriggerConditions(this.enemy(), null, tag, null, 'Party' + tag, 'Troop' + tag, null, null, mode);
 };
 

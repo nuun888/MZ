@@ -104,7 +104,8 @@
 | [アイテム消耗率](https://github.com/nuun888/MZ/blob/master/README/ConsumptionItem.md) | [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js) |  | 1.1.1 |
 | [アイテム使用回数](https://github.com/nuun888/MZ/blob/master/README/ItemUseCount.md) | [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js) |  | 1.0.2 |
 | [盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md) |  [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js) | 共 条対 | 1.3.2 |
-| [アイテム最大所持数変更](https://github.com/nuun888/MZ/blob/master/README/MaxItem.md) | [NUUN_MaxItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxItem.js) | 共 | 1.3.1 |
+| [アイテム最大所持数変更](https://github.com/nuun888/MZ/blob/master/README/MaxItem.md) | [NUUN_MaxItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxItem.js) | 共 | 1.4.0 |
+| [アイテム個数表示変更](https://github.com/nuun888/MZ/blob/master/README/ItemNum.md) | [NUUN_ItemNum](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNum.js) |  | 1.0.0 |
 | [アイテム全体所持制限](https://github.com/nuun888/MZ/blob/master/README/GroupMaxItems.md) | [NUUN_GroupMaxItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js) | 共 | 1.0.0 |
 | [パッシブスキル](https://github.com/nuun888/MZ/blob/master/README/PassiveSkill.md) | [NUUN_PassiveSkill](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js) | 共 条対 | 1.5.3 |
 | [スキル、アイテム使用条件](https://github.com/nuun888/MZ/blob/master/README/ConditionalSkills.md) | [NUUN_ConditionalSkills](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalSkills.js) | 条 | 1.0.2 |

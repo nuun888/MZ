@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.3.6
+ * @version 3.3.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/6/11 Ver.3.3.7
+ * ステートエフェクトが画像の拡大率に依存してしまう問題を修正。
  * 2022/6/7 Ver.3.3.6
  * アクター画像の表示幅を指定すると行動時に画像が消える問題を修正。
  * アクター行動時にステートの表示がおかしくなる問題を修正。
@@ -1735,11 +1737,16 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor) {
   const positionData = getActorPositionData(actorId);
   const actorImgData = getActorImgData(actorId);
   const rect = this.itemRect(index);
+  let stateSprite = null;
   if (bitmap) {
     const key = "actor%1-BSImg".format(actor.actorId());
     const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
     const imgIndex = actor.getBSImgIndex();
-    sprite.setup(actor, actorImgData, imgIndex);
+    if (!sprite._stateSprite && getStateAnimationShow()) {
+      stateSprite = new Sprite_StateOverlay();
+      this.addChild(stateSprite);
+    }
+    sprite.setup(actor, actorImgData, imgIndex, stateSprite);
     const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 4) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
     //const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
     const y = rect.y + (actorImgData.ActorImgVPosition === 'under' ? this.height : 0) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + this.itemPadding() + (actorImgData ? actorImgData.Actor_Y : 0);
@@ -1767,12 +1774,17 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
   const positionData = getActorPositionData(actorId);
   const actorImgData = getActorImgData(actorId);
   const rect = this.faceRect(index);
+  let stateSprite = null;
   let width = rect.width || ImageManager.faceWidth;
   let height = rect.height || ImageManager.faceHeight;
   const key = "actor%1-BSImg".format(actor.actorId());
   const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
   const imgIndex = actor.getBSImgIndex();
-  sprite.setup(actor, actorImgData, imgIndex);
+  if (!sprite._stateSprite && getStateAnimationShow()) {
+    stateSprite = new Sprite_StateOverlay();
+    this.addChild(stateSprite);
+  }
+  sprite.setup(actor, actorImgData, imgIndex, stateSprite);
   const scale = actorImgData.Actor_Scale / 100;
   sprite.scale.x = scale;
   sprite.scale.y = scale;
@@ -2090,17 +2102,9 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._durationOpacity = 0;
   this._startUpdate = true;
   this._zoomEffect = false;
-  this.createStateSprite();
 };
 
-Sprite_ActorImges.prototype.createStateSprite = function() {
-  if (getStateAnimationShow()) {
-    this._stateSprite = new Sprite_StateOverlay();
-    this.addChild(this._stateSprite);
-  }
-};
-
-Sprite_ActorImges.prototype.setup = function(battler, data, index) {
+Sprite_ActorImges.prototype.setup = function(battler, data, index, stateSprite) {
   this._battler = battler;
   this._data = data;
   this.anchor.x = data.ActorImgHPosition === 'center' ? 0.5 : 0.0 ;
@@ -2108,12 +2112,13 @@ Sprite_ActorImges.prototype.setup = function(battler, data, index) {
   this._imgIndex = index;
   battler.resetBattleStyleImgId();
   this.updateActorGraphic();
-  if (getStateAnimationShow()) {
-    this._data.ActorState_X = this._data.ActorState_X || 0;
-    this._data.ActorState_Y = this._data.ActorState_Y || 0;
+  this._stateSprite = stateSprite || this._stateSprite;
+  if (this._stateSprite && getStateAnimationShow()) {
     this._stateSprite.setup(battler);
-    this._stateSprite.move(this.getStateRectX() + this.getStatePositionX(), this.getStateRectY() + this.getStatePositionY());
     this._stateSprite.anchor.y = 0.5;
+    this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
+    this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
+    
   }
 };
 
@@ -2192,8 +2197,8 @@ Sprite_ActorImges.prototype.updateZoom = function() {
       this.y = this._homeY - (this._rectHeight / 2) * scale * (this._data.ActorImgVPosition === 'top' ? -1 : 1);
     }
     if (getStateAnimationShow()) {
-      this._stateSprite.x = params.ActorState_X;
-      this._stateSprite.y = params.ActorState_Y + (this._rectHeight / 2) * (this._data.ActorImgVPosition === 'top' ? -1 : 1) + this.getStatePositionY();
+      //this._stateSprite.x = params.ActorState_X;
+      //this._stateSprite.y = params.ActorState_Y + (this._rectHeight / 2) * (this._data.ActorImgVPosition === 'top' ? -1 : 1) + this.getStatePositionY();
     }
   } else {
     if (this.scale.x !== this._baseScale) {
@@ -2206,8 +2211,8 @@ Sprite_ActorImges.prototype.updateZoom = function() {
       this.anchor.x = this._data.ActorImgHPosition === 'left' ? 0.0 : 0.5;
       this.anchor.y = this._data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
       if (getStateAnimationShow()) {
-        this._stateSprite.x = this.getStateRectX() + this.getStatePositionX();
-        this._stateSprite.y = this.getStateRectY() + this.getStatePositionY();
+        //this._stateSprite.x = this.getStateRectX() + this.getStatePositionX();
+        //this._stateSprite.y = this.getStateRectY() + this.getStatePositionY();
       }
     }
   }

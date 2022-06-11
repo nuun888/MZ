@@ -1,5 +1,5 @@
 # [敵の行動パターン条件拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js)
 
 ### 必須、前提プラグイン
@@ -14,10 +14,11 @@
 
 ### 条件の設定
 敵のメモ欄
-`<ActionCond[id]>` 使用者の指定したIDの条件が一致したときのみ条件を満たします。  
-`<PartyActionCond[id]>` パーティメンバーの指定したIDの条件が一致したときのみ条件を満たします。  
-`<TroopActionCond[id]>` 敵グループの指定したIDの条件が一致したときのみ条件を満たします。  
-`[id]`:行動パターンのスイッチで設定したスイッチID  
+`<ActionCond[SwitchId]:[CondId]...]>` 使用者の指定したIDの条件が一致したときのみ条件を満たします。  
+`<PartyActionCond[SwitchId]:[CondId]...>` パーティメンバーの指定したIDの条件が一致したときのみ条件を満たします。  
+`<TroopActionCond[SwitchId]:[CondId]...>` 敵グループの指定したIDの条件が一致したときのみ条件を満たします。  
+`[SwitchId]`:行動パターンのスイッチで設定したスイッチID  
+`[CondId]`:条件ID(複数指定可能)  
 
 `<ActionMatch:[modeId]>`   
 `[modeId]`:0 いずれかが一致　1：全て一致  
@@ -35,5 +36,7 @@
 元のスイッチの条件は判定されません。別途スイッチの条件を指定してください。  
 
 ## 更新履歴
+2022/6/12 Ver.1.0.1  
+説明文が情報不足だったため修正。  
 2021/12/18 Ver.1.0.0  
 初版

@@ -130,7 +130,7 @@
 
 | パーティ、敵グループ　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| パーティ、敵グループリミットゲージ | [NUUN_PartyLimitGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js) |  | 1.1.0 |
+| パーティ、敵グループリミットゲージ | [NUUN_PartyLimitGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js) | 共 | 1.1.1 |
 |  |  |  |  |
 |  |  |  |  |
 

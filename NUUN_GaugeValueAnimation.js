@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc ゲージの数値更新アニメーション
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/12 Ver.1.2.1
+ * ゲージ及び数値更新フレーム設定のデフォルト設定で正常に適用されなかった問題を修正。
  * 2022/1/1 Ver.1.2.0
  * 適用するステータスタイプの設定をコンボボックス化。
  * 処理のリファクタリング。
@@ -45,7 +47,7 @@
  * @param UpdateFlameValue
  * @text ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）
  * @desc ゲージ及び数値更新フレーム設定
- * @default ["{\"StatusType\":\"[\\\"'hp'\\\"]\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"[\\\"'mp'\\\"]\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"[\\\"'tp'\\\"]\",\"UpdateFlame\":\"60\",\"OnUpdateValue\":\"true\"}"]
+ * @default ["{\"StatusType\":\"'hp'\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"'mp'\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"'tp'\",\"UpdateFlame\":\"60\",\"OnUpdateValue\":\"true\"}"]
  * @type struct<UpdateFlameValueDate>[]
  *
  */
@@ -54,7 +56,7 @@
  * @param StatusType
  * @text ステータスタイプ
  * @desc 適用するステータスタイプ。
- * @type combo[]
+ * @type combo
  * @option 'hp'
  * @option 'mp'
  * @option 'tp'
@@ -112,7 +114,7 @@ Imported.NUUN_GaugeValueAnimation = true;
   };
 
   Sprite_Gauge.prototype.getFlameStatus = function() {
-    return UpdateFlameValue ? UpdateFlameValue.find(value => (this._statusType === value.StatusType[0])) : null;
+    return UpdateFlameValue ? UpdateFlameValue.find(value => (this._statusType === value.StatusType)) : null;
   };
 
   const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;

@@ -32,7 +32,7 @@
 ![画像](img/CondEnemyAction1.png)  
 条件判定適用スイッチIDリストに設定しているスイッチなら条件付きでの条件で判定されます。    
 画像の設定だと  
-`<ActionCond10><PartyActionCond10><TroopActionCond10>`  
+`<ActionCond10:1><PartyActionCond10:1><TroopActionCond10:1>`  
 で指定してください。  
 元のスイッチの条件は判定されません。別途スイッチの条件を指定してください。  
 

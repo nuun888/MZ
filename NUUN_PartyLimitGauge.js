@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -38,6 +38,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/11 Ver.1.1.1
+ * パーティリミットが戦闘開始時にリセットされない問題を修正。
  * 2021/12/20 Ver.1.1.0
  * ゲージ画像化に対応。
  * 2021/12/19 Ver.1.0.4
@@ -328,7 +330,8 @@ const LimitCostColor = Number(parameters['LimitCostColor'] || 0);
 const _BattleManager_setup = BattleManager.setup;
 BattleManager.setup = function(troopId, canEscape, canLose) {
   _BattleManager_setup.call(this, troopId, canEscape, canLose);
-  setChargeLimit(EscapeAmount);
+  $gameParty.initPartyLimit();
+  $gameTroop.initPartyLimit();
 };
 
 const _BattleManager_processDefeat = BattleManager.processDefeat;
@@ -476,6 +479,10 @@ Game_Party.prototype.setPartyLimit = function(value) {
   if (onPartyChargeLimitGauge()) {
     this._limitGauge = value;
   }
+};
+
+Game_Troop.prototype.initPartyLimit = function() {
+  this._limitGauge = 0;
 };
 
 Game_Troop.prototype.setPartyLimit = function(value) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 敵の行動パターン条件拡張
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_ConditionsBase
  * @orderAfter NUUN_ConditionsBase
  * 
@@ -20,10 +20,13 @@
  * 
  * このプラグインは条件付きベースが必要です。
  * 
- * <ActionCond[id]> 使用者の指定したIDの条件が一致したときのみ条件を満たします。
- * <PartyActionCond[id]> パーティメンバーの指定したIDの条件が一致したときのみ条件を満たします。
- * <TroopActionCond[id]> 敵グループの指定したIDの条件が一致したときのみ条件を満たします。
- * [id]:行動パターンのスイッチで設定したスイッチID
+ * <ActionCond[SwitchId]:[CondId]...> 使用者の指定したIDの条件が一致したときのみ条件を満たします。
+ * <PartyActionCond[SwitchId]:[CondId]...> パーティメンバーの指定したIDの条件が一致したときのみ条件を満たします。
+ * <TroopActionCond[SwitchId]:[CondId]...> 敵グループの指定したIDの条件が一致したときのみ条件を満たします。
+ * [SwitchId]:行動パターンのスイッチで設定したスイッチID
+ * [CondId]:条件ID(複数指定可能)
+ * 例
+ * <ActionCond10:6> 行動パターンのアクション条件が10番のスイッチ指定時、行動リストの6番の条件が一致したときに条件を満たします。
  * 
  * <ActionMatch:[modeId]> [modeId]:0 いずれかが一致　1：全て一致
  * 未記入の場合はいずれかが一致の場合条件を満たしたときになります。
@@ -33,6 +36,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/12 Ver.1.0.1
+ * 説明文が情報不足だったため修正。
  * 2021/12/18 Ver.1.0.0
  * 初版
  * 

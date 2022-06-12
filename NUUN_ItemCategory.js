@@ -11,9 +11,10 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
+ * @orderAfter NUUN_ItemNum
  * 
  * @help
  * アイテムに独自のカテゴリーを追加することが出来ます。
@@ -42,6 +43,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/12 Ver.1.3.1
+ * 戦闘中でも個数非表示を適用する機能を追加。
  * 2022/5/8 Ver.1.3.0
  * 表示するカテゴリーを変更する機能を追加。
  * カテゴリーキーの設定方法変更（要再設定）
@@ -93,6 +96,12 @@
  * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"'item'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'weapon'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'armor'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'keyItem'\",\"NumShow\":\"true\"}"]
  * @type struct<ItemCategoryList>[]
  * 
+ * @param BattleNumVisible
+ * @text 戦闘中個数非表示
+ * @desc 戦闘中でも個数表示をOFF、大事なものの個数を表示をOFFにしたカテゴリーアイテムの個数非表示を適用させます。
+ * @type boolean
+ * @default true
+ * 
  */
 /*~struct~ItemCategoryList:
  * @param CategoryName
@@ -127,6 +136,8 @@ const parameters = PluginManager.parameters('NUUN_ItemCategory');
 const CategoryCols = Number(parameters['CategoryCols'] || 4);
 const CategoryRows = Number(parameters['CategoryRows'] || 1);
 const ItemCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemCategory'])) : null) || [];
+const BattleNumVisible = eval(parameters['BattleNumVisible'] || 'true');
+let itemData = null;
 
 const pluginName = "NUUN_ItemCategory";
 PluginManager.registerCommand(pluginName, 'AddCategory', args => {
@@ -217,8 +228,17 @@ Window_ItemList.prototype.drawItemNumber = function(item, x, y, width) {
   }
 };
 
+const _Window_ItemList_drawItem = Window_ItemList.prototype.drawItem;
+Window_ItemList.prototype.drawItem = function(index) {
+    itemData = this.itemAt(index);
+    _Window_ItemList_drawItem.call(this, index);
+};
+
 Window_ItemList.prototype.needsNumber = function() {
-  if (this._category === "keyItem") {
+  if (BattleNumVisible && itemData && $gameParty.inBattle()) {
+    this._category = itemData.meta.CategoryType ? itemData.meta.CategoryType : (itemData.itypeId === 2 ? "keyItem" : this._needsCategory);
+  }
+  if (this._category === "keyItem") {  
     return $dataSystem.optKeyItemsNumber;
   }
   return this._needsCategory === undefined || this._needsCategory === null ? true : this._needsCategory;

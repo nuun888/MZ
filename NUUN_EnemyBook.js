@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.13.1
+ * @version 2.13.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -228,6 +228,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/13 Ver.2.13.2
+ * 属性耐性一覧に物理ダメージ率と魔法ダメージ率を表示できる機能を追加。
  * 2022/6/5 Ver.2.13.1
  * 一部の処理を修正。
  * 2022/5/5 Ver.2.13.0
@@ -2020,14 +2022,16 @@
 /*~struct~ElementData:
  * 
  * @param ElementNo
- * @desc 表示する属性番号です。
+ * @desc 表示する属性番号です。(0:なし、-1:物理ダメージ率、-2:魔法ダメージ率)
  * @text 属性番号
  * @type number
+ * @min -2
  * 
  * @param ElementIconId
  * @desc アイコンのIDを指定します。
  * @text アイコンID
  * @type number
+ * @min 0
  */
 /*~struct~StateData:
  *
@@ -2739,6 +2743,14 @@ PluginManager.registerCommand(pluginName, 'EnemyBookDebuffRemove', args => {
   }
   $gameSystem.enemyBookDebuffList(Number(args.enemyId), Number(args.debuffId) - 1, Number(args.debuffId) > 0, false);
 });
+
+function getElementTextName(no) {
+  if (no < 0) {
+    return no === -1 ? '物理ダメージ率' : '魔法ダメージ率';
+  } else {
+    return $dataSystem.elements[no];
+  }
+}
 
 const _DataManager_extractSaveContents = DataManager.extractSaveContents;
 DataManager.extractSaveContents = function(contents) {
@@ -4442,7 +4454,7 @@ Window_EnemyBook.prototype.actionFlag = function(index) {
 };
 
 Window_EnemyBook.prototype.onElementsFlag = function(index) {
-  return Imported.NUUN_EnemyBookEX_1 && param.ShowElementsIcon ? $gameSystem.getEnemyBookElementFlag(this._enemy.id, index) : true;
+  return Imported.NUUN_EnemyBookEX_1 && param.ShowElementsIcon && index >= 0 ? $gameSystem.getEnemyBookElementFlag(this._enemy.id, index) : true;
 };
 
 Window_EnemyBook.prototype.onStateFlag = function(index) {
@@ -5117,9 +5129,14 @@ Window_EnemyBook.prototype.drawResistElement = function(list, enemy, x, y, width
   }
   let icons = [];
   let icon = 0;
+  let rate = 1.0;
   param.ElementList.forEach(Element => {
     if(Element.ElementNo){
-      let rate = enemy.elementRate(Element.ElementNo);
+      if (Element.ElementNo < 0) {
+        rate = Element.ElementNo === -1 ? enemy.sparam(6) : enemy.sparam(7);
+      } else if (Element.ElementNo > 0) {
+        rate = enemy.elementRate(Element.ElementNo);
+      }
       if(rate < 1 && param.ResistNoEffectElement || (rate < 1 && rate > 0 && !param.ResistNoEffectElement)){
         if (Unknown || (param.ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
           icon = param.ElementUnknownIconId;
@@ -5155,9 +5172,14 @@ Window_EnemyBook.prototype.drawWeakElement = function(list, enemy, x, y, width) 
   }
   let icons = [];
   let icon = 0;
+  let rate = 1.0;
   param.ElementList.forEach(Element => {
     if (Element.ElementNo) {
-      let rate = enemy.elementRate(Element.ElementNo);
+      if (Element.ElementNo < 0) {
+        rate = Element.ElementNo === -1 ? enemy.sparam(6) : enemy.sparam(7);
+      } else if (Element.ElementNo > 0) {
+        rate = enemy.elementRate(Element.ElementNo);
+      }
       if (rate > 1) {
         if (Unknown || (param.ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
           icon = param.ElementUnknownIconId;
@@ -5193,9 +5215,14 @@ Window_EnemyBook.prototype.drawNoEffectElement = function(list, enemy, x, y, wid
   }
   let icons = [];
   let icon = 0;
+  let rate = 1.0;
   param.ElementList.forEach(Element => {
     if (Element.ElementNo) {
-      let rate = enemy.elementRate(Element.ElementNo);
+      if (Element.ElementNo < 0) {
+        rate = Element.ElementNo === -1 ? enemy.sparam(6) : enemy.sparam(7);
+      } else if (Element.ElementNo > 0) {
+        rate = enemy.elementRate(Element.ElementNo);
+      }
       if (rate <= 0) {
         if (Unknown || (param.ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
           icon = param.ElementUnknownIconId;
@@ -5249,18 +5276,24 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
     x3 = this.contensX(x2);
     width2 = this.contensWidth(width);
     let textWidth = 0;
-    if (element.ElementNo && element.ElementNo > 0) {
+    if (element.ElementNo && element.ElementNo !== 0) {
       if (element.ElementIconId > 0 && param.ElementIconShow) {
         const iconId = param.ElementUnknownIconId > 0 && this.onElementsFlag(element.ElementNo) ? param.ElementUnknownIconId : element.ElementIconId;
         this.drawIcon(iconId, x3, y2);
       } else {
         textWidth += this.systemWidth(list.SystemItemWidth, width2);
         this.changeTextColor(this.getColorCode(list.NameColor));
-        const elementText = this.onElementsFlag(element.ElementNo) ? $dataSystem.elements[element.ElementNo] : param.UnknownStatus;
+        const elementText = this.onElementsFlag(element.ElementNo) ? getElementTextName(element.ElementNo) : param.UnknownStatus;
+        //const elementText = this.onElementsFlag(element.ElementNo) ? $dataSystem.elements[element.ElementNo] : param.UnknownStatus;
         this.drawText(elementText, x3, y2, width2);
       }
       if (this.resistWeakDataMask(list.MaskMode)) {
-        let rate = enemy.elementRate(element.ElementNo) * 100;
+        let rate = 1.0;
+        if (element.ElementNo < 0) {
+          rate = (element.ElementNo === -1 ? enemy.sparam(6) : enemy.sparam(7)) * 100;
+        } else if (element.ElementNo > 0) {
+          rate = enemy.elementRate(element.ElementNo) * 100;
+        }
         rate = NuunManager.numPercentage(rate, list.Decimal || 0, param.DecimalMode);
         rate += list.paramUnit ? String(list.paramUnit) : " %";
         const rateText = list.DetaEval ? eval(list.DetaEval) : rate;

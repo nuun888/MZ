@@ -1,10 +1,11 @@
-# [ステート、バフポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
-# Ver.1.1.3
+# [ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
-ステート、バフ付加解除時にステート、バフをポップアップさせます。
+ステート、バフ付加解除時にステート、バフ、アイテム、お金盗み時にポップアップさせます。
+アイテム、お金盗み時は別途[盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md)が必要です。
 
 ## 設定
 ステートのメモ欄  
@@ -15,12 +16,19 @@
 `<AddNoPopUp>` 付与時のポップアップを表示しません。  
 `<RemoveNoPopUp>` 解除時のポップアップを表示しません。  
 `<PopUpColor:[colorIndex]>` ポップアップ時の色を指定します。`[colorIndex]`:カラーインデックス番号　例：`<PopUpColor:17>`  
-上記のタグを記入したステートはプラググインパラメータより優先して適用されます。
+上記のタグを記入したステートはプラググインパラメータより優先して適用されます。  
+
+#### 盗み時のポップアップ設定
+別途「盗みスキル」(NUUN_StealableItems)が必要です。  
+ポップアップテキストフォーマット  
+`%1`:アイテム名、金額  
 
 仕様  
 戦闘行動結果ポップアッププラグインと併用時、このプラグインを戦闘行動結果ポップアッププラグインより下に設定した場合、ステート、バフのポップアップはこのプラグインでの表示になります。  
 
 ## 更新履歴
+2022/6/14 Ver 1.2.0  
+盗み時のポップアップに対応。(要NUUN_StealableItems)  
 2022/5/2 Ver 1.1.3  
 バフ解除時の共通ポップアップのテキストが正常に適用されていなかった問題を修正。  
 バフ解除時のポップアップが正常に表示されていなかった問題を修正。  

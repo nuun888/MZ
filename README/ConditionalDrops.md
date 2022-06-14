@@ -1,5 +1,5 @@
 # [条件付きドロップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalDrops.js)
-# Ver.1.0.7
+# Ver.1.0.8
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalDrops.js)
 ### 必須プラグイン
 [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)  
@@ -26,6 +26,8 @@
 `<DropCond1:1>`上記の条件を参照するためのタグでリスト番号１番の条件を判定します。  
 
 ## 更新履歴
+2022/6/14 Ver.1.0.8  
+競合対策。  
 2021/12/25 Ver.1.0.7  
 モンスター図鑑の不具合修正による処理を追加。  
 2021/12/22 Ver.1.0.6  

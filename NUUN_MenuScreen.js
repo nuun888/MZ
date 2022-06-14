@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ１
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -57,6 +57,8 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/6/15 Ver.1.6.4
+ * 微修正。
  * 2022/6/10 Ver.1.6.3
  * ステータス独自パラメータで名称を無記入した場合、パラメータが右にずれる問題を修正。
  * 2022/6/7 Ver.1.6.2
@@ -1169,7 +1171,7 @@ Scene_Menu.prototype.createInfoWindow = function() {
 
 Scene_Menu.prototype.createInfoHeaderWindow = function() {
     const rect = this.infoWindowHeaderRect();
-    this._infoHeaderMenuWindow = new Window_InfoHeader(rect);
+    this._infoHeaderMenuWindow = new Window_InfoHeader1(rect);
     this.addWindow(this._infoHeaderMenuWindow);
     if (!WindowVisible) {
         this._infoHeaderMenuWindow.opacity = 0;
@@ -2065,26 +2067,26 @@ Window_InfoMenu.prototype.setText = function(str) {
     this.refresh();
 };
 
-function Window_InfoHeader() {
+function Window_InfoHeader1() {
     this.initialize(...arguments);
 }
 
-Window_InfoHeader.prototype = Object.create(Window_InfoMenu.prototype);
-Window_InfoHeader.prototype.constructor = Window_InfoHeader;
+Window_InfoHeader1.prototype = Object.create(Window_InfoMenu.prototype);
+Window_InfoHeader1.prototype.constructor = Window_InfoHeader1;
 
-Window_InfoHeader.prototype.initialize = function(rect) {
+Window_InfoHeader1.prototype.initialize = function(rect) {
     Window_InfoMenu.prototype.initialize.call(this, rect);
 };
 
-Window_InfoHeader.prototype.maxCols = function() {
+Window_InfoHeader1.prototype.maxCols = function() {
     return InfoHeaderCols;
 };
 
-Window_InfoHeader.prototype.getInfoList = function() {
+Window_InfoHeader1.prototype.getInfoList = function() {
     return InfoHeaderList;
 };
 
-Window_InfoHeader.prototype.getFontSize = function() {
+Window_InfoHeader1.prototype.getFontSize = function() {
     return InfoHeaderFontSize;
 };
 

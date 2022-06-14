@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.1.3
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -26,6 +26,11 @@
  * <RemoveNoPopUp> 解除時のポップアップを表示しません。
  * <PopUpColor:[colorIndex]> ポップアップ時の色を指定します。[colorIndex]:カラーインデックス番号またはカラーコード　例：<PopUpColor:17>
  * 
+ * 盗み時のポップアップ設定
+ * 別途「盗みスキル」(NUUN_StealableItems)が必要です。
+ * ポップアップテキストフォーマット
+ * %1:アイテム名、金額
+ * 
  * プラグインパラメータのポップアップ色指定はテキストタブでカラーコードを記入できます。
  * 
  * 仕様
@@ -36,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/14 Ver 1.2.0
+ * 盗み時のポップアップに対応。(要NUUN_StealableItems)
  * 2022/5/2 Ver 1.1.3
  * バフ解除時の共通ポップアップのテキストが正常に適用されていなかった問題を修正。
  * バフ解除時のポップアップが正常に表示されていなかった問題を修正。
@@ -156,19 +163,54 @@
  * @default %1低下
  * 
  * @param LateralBoundPopUpSetting
- * @text 横バウンドポップアップ設定(要横バウンドポップアップ)
+ * @text 横バウンドポップアップ設定(要NUUN_LateralBoundPopUp)
  * @default ------------------------------
  * 
  * @param LateralBoundPopUpValid
  * @type boolean
  * @default false
  * @text 横バウンド適用
- * @desc 横バウンドを適用します。（要横バウンドポップアップ）
+ * @desc 横バウンドを適用します。（要NUUN_LateralBoundPopUp）
  * @parent LateralBoundPopUpSetting
  * 
- * @param BattleEffectPopupSetting
- * @text 盗み設定(要盗みスキル)
+ * @param StealPopupSetting
+ * @text 盗み設定(要NUUN_StealableItemsル)
  * @default ------------------------------
+ * 
+ * @param StealPopUpValid
+ * @type boolean
+ * @default false
+ * @text 盗みポップアップ適用
+ * @desc 盗み時ポップアップを適用します。（要NUUN_StealableItems）
+ * @parent StealPopupSetting
+ * 
+ * @param StealPopUpText
+ * @desc アイテムを盗んだ時の共通ポップアップテキスト。(%1:アイテム名)
+ * @text アイテム盗み時ポップアップテキスト
+ * @type string
+ * @default %1Get
+ * @parent StealPopupSetting
+ * 
+ * @param StolenPopUpText
+ * @desc アイテムを盗まれた時の共通ポップアップテキスト。(%1:アイテム名)
+ * @text アイテム盗まれ時ポップアップテキスト
+ * @type string
+ * @default %1Lost
+ * @parent StealPopupSetting
+ * 
+ * @param StealGoldPopUpText
+ * @desc お金を盗んだ時の共通ポップアップテキスト。(%1:金額)
+ * @text お金盗み時ポップアップテキスト
+ * @type string
+ * @default %1Get
+ * @parent StealPopupSetting
+ * 
+ * @param StolenGoldPopUpText
+ * @desc お金を盗まれた時の共通ポップアップテキスト。(%1:金額)
+ * @text お金盗まれ時ポップアップテキスト
+ * @type string
+ * @default %1Lost
+ * @parent StealPopupSetting
  * 
  */
 /*~struct~PopUpBuffList:
@@ -266,6 +308,11 @@ Imported.NUUN_popUp = true;
   const RemovedBuffPopUpText = String(parameters['RemovedBuffPopUpText'] || '%1上昇');
   const RemovedDebuffPopUpText = String(parameters['RemovedDebuffPopUpText'] || '%1低下');
   const LateralBoundPopUpValid = eval(parameters['LateralBoundPopUpValid'] || 'false');
+  const StealPopUpValid = eval(parameters['StealPopUpValid'] || 'false');
+  const StealPopUpText = String(parameters['StealPopUpText'] || '%1Get');
+  const StolenPopUpText = String(parameters['StolenPopUpText'] || '%1Lost');
+  const StealGoldPopUpText = String(parameters['StealGoldPopUpText'] || '%1Get');
+  const StolenGoldPopUpText = String(parameters['StolenGoldPopUpText'] || '%1Lost');
   let nuunPopup = false;
 
   function initPopUpData() {
@@ -357,6 +404,19 @@ Imported.NUUN_popUp = true;
   Game_ActionResult.prototype.pushRemovedDebuff = function(paramId) {
     if (this.buffsLevel[paramId] < 0) {
       this.removedDebuffs.push(paramId);
+    }
+  };
+
+  Game_ActionResult.prototype.stealPopupText = function(type) {
+    switch (type) {
+      case 'getSteal':
+        return StealPopUpText;
+      case 'stolenName':
+        return StolenPopUpText;
+      case 'getGold':
+        return StealGoldPopUpText;
+      case 'stolenGold':
+        return StolenGoldPopUpText;
     }
   };
 
@@ -457,6 +517,17 @@ Imported.NUUN_popUp = true;
           this.push('popupState', target, popupData);
         }
       }
+    }
+  };
+
+  Window_BattleLog.prototype.stealPopup = function(target, item) {
+    if (StealPopUpValid) {
+      const popupData = initPopUpData();
+      popupData.name = item.popupText.format(item.name);
+      popupData.color = 0;
+      popupData.id = item.id;
+      popupData.iconIndex = item.iconIndex;
+      this.push('popupState', target, popupData);
     }
   };
 

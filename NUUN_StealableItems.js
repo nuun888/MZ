@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル
  * @author NUUN
- * @version 1.3.2
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -106,6 +106,9 @@
  * 
  * 
  * 更新履歴
+ * 2022/6/14 Ver 1.4.0
+ * ポップアップに対応。(要NUUN_popUp)
+ * 使用していなかったプラグインパラメータを削除。
  * 2022/1/25 Ver 1.3.2
  * 確率、抵抗率の処理を修正。
  * 2021/11/13 Ver 1.3.1
@@ -250,15 +253,6 @@
  * @default 50
  * @parent GoldSuccessSE
  * 
- * @param ConditionalSuccessSE
- * @text 条件付き設定
- * @default ------------------------------
- * 
- * @param ConditionalList
- * @text 敵から奪われるアイテム設定
- * @desc 敵から奪われるアイテムの設定です。
- * @default []
- * @type struct<ConditionalListData>[]
  * 
  */ 
 /*~struct~stolenItems:
@@ -305,8 +299,6 @@ const StealGoldSuccessSE = String(parameters['StealGoldSuccessSE'] || '');
 const G_volume = Number(parameters['G_volume'] || 90);
 const G_pitch = Number(parameters['G_pitch'] || 100);
 const G_pan = Number(parameters['G_pan'] || 50);
-let StealMessage = [];
-//ポップアップ対応　条件付き対応
 
 function getStolenItemList(target, rate) {
 	let weightSum = 0;
@@ -341,6 +333,25 @@ function getStolenItemList(target, rate) {
 
 function randomRate(id, stealId) {
 	return StealProcess === 1 ? id === stealId : true;
+}
+
+function stealMode(type) {
+	switch (type) {
+		case 'notSteal':
+			return NotStealName;
+		case 'nonSteal':
+			return NonStealName;
+		case 'nonStealGold':
+			return NonStealGoldName
+		case 'getSteal':
+			return GetStealName;
+		case 'getGold':
+		return GetStealName;
+		case 'stolenName':
+			return StolenName;
+		case 'stolenGold':
+			return StolenName;
+	}
 }
 
 const _Game_System_initialize = Game_System.prototype.initialize;
@@ -400,7 +411,6 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
 };
 
 Game_Action.prototype.getSteal = function(target){
-	StealMessage = [];
 	if (target.result().isHit()) {
 		if (target.isEnemy()) {
 			if(this.item().meta.stealSkill){
@@ -426,9 +436,9 @@ Game_Action.prototype.stealItems = function(target){
 		this.getStealItems(target, stealItem);
 	} else {
 		if (!target.isStealItems()) {
-			StealMessage.push({text:NonStealName, item:null});
+			this.subject().result().pushSteal(null, 'nonSteal');
 		} else {
-			StealMessage.push({text:NotStealName, item:null});
+			this.subject().result().pushSteal(null, 'notSteal');
 		}
 	}
 	this.makeSuccess(target);
@@ -440,9 +450,9 @@ Game_Action.prototype.stealGold = function(target){
 		this.getStealGold(target, stealItem);
 	} else {
 		if (!target.isStealGold()) {
-			StealMessage.push({text:NonStealGoldName, item:null});
+			this.subject().result().pushGoldSteal(null, 'nonStealGold');
 		} else {
-			StealMessage.push({text:NotStealName, item:null});
+			this.subject().result().pushGoldSteal(null, 'notSteal');
 		}
 	}
 	this.makeSuccess(target);
@@ -450,11 +460,10 @@ Game_Action.prototype.stealGold = function(target){
 
 Game_Action.prototype.getStealItems = function(target, stealItem){
 	$gameParty.gainItem(stealItem, 1);
-	const itemName = stealItem.name;
 	if(StealSuccessSE) {
 		AudioManager.playSe({"name":StealSuccessSE,"volume":volume,"pitch":pitch,"pan":pan});
 	}
-	StealMessage.push({text:GetStealName, item:itemName});
+	this.subject().result().pushSteal(stealItem, 'getSteal');
 };
 
 Game_Action.prototype.getStealGold = function(target, stealItem){
@@ -463,7 +472,7 @@ Game_Action.prototype.getStealGold = function(target, stealItem){
 	if(StealGoldSuccessSE) {
 		AudioManager.playSe({"name":StealGoldSuccessSE,"volume":G_volume,"pitch":G_pitch,"pan":G_pan});
 	}
-	StealMessage.push({text:GetStealName, item:itemName});
+	this.subject().result().pushGoldSteal(itemName, 'getGold');
 };
 
 Game_Action.prototype.stolenItem = function(target){
@@ -472,7 +481,7 @@ Game_Action.prototype.stolenItem = function(target){
 	if (item) {
 		this.lostItem(target, item);
 	} else {
-		StealMessage.push({text:NotStealName, item:null});
+		this.subject().result().pushSteal(null, 'notSteal');
 	}
 	this.makeSuccess(target);
 };
@@ -485,7 +494,7 @@ Game_Action.prototype.stolenGold = function(target){
 	if (gold) {
 		this.lostGold(target, gold);
 	} else {
-		StealMessage.push({text:NotStealName, item:null});
+		this.subject().result().pushGoldSteal(null, 'notSteal');
 	}
 	this.makeSuccess(target);
 };
@@ -505,11 +514,10 @@ Game_Action.prototype.lostStolenGold = function(target, rate, stolenGold){
 
 Game_Action.prototype.lostItem = function(target, item){
 	$gameParty.loseItem(item, 1)
-	const itemName = item.name;
 	if(StealSuccessSE) {
 		AudioManager.playSe({"name":StealSuccessSE,"volume":volume,"pitch":pitch,"pan":pan});
 	}
-	StealMessage.push({text:StolenName, item:itemName});
+	this.subject().result().pushSteal(item, 'stolenName');
 };
 
 Game_Action.prototype.lostGold = function(target, gold){
@@ -518,7 +526,7 @@ Game_Action.prototype.lostGold = function(target, gold){
 	if(StealGoldSuccessSE) {
 		AudioManager.playSe({"name":StealGoldSuccessSE,"volume":G_volume,"pitch":G_pitch,"pan":G_pan});
 	}
-	StealMessage.push({text:StolenName, item:itemName});
+	this.subject().result().pushGoldSteal(itemName, 'stolenGold');
 };
 
 Game_Action.prototype.lostStolenGoldMode = function(){
@@ -542,6 +550,48 @@ Game_Action.prototype.stealRate = function(){
 Game_Action.prototype.stealGoldRate = function(){
 	const rate = Number(this.item().meta.goldStealSkill);
 	return this.subject().getStealBoostRate(rate);
+};
+
+
+const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
+  Game_ActionResult.prototype.clear = function() {
+    _Game_ActionResult_clear.call(this);
+    this.stealResult = [];
+};
+
+Game_ActionResult.prototype.pushSteal = function(item, type) {
+    const result = {};
+	if (item) {
+		result.name = item.name;
+		result.id = item.id;
+		result.iconIndex = item.iconIndex;
+		if (Imported.NUUN_popUp) {
+			result.popupText = this.stealPopupText(type);//ポップアッププラグイン
+		}
+	} else {
+		result.name = null;
+		result.id = 0;
+		result.iconIndex = 0;
+	}
+	result.text = stealMode(type);
+	this.stealResult.push(result);
+};
+
+Game_ActionResult.prototype.pushGoldSteal = function(gold, type) {
+    const result = {};
+	if (gold) {
+		result.name = gold;
+		result.iconIndex = 0;
+		if (Imported.NUUN_popUp) {
+			result.popupText = this.stealPopupText(type);//ポップアッププラグイン
+		}
+	} else {
+		result.name = gold;
+		result.iconIndex = 0;
+	}
+	result.id = 0;
+	result.text = stealMode(type);
+	this.stealResult.push(result);
 };
 
 
@@ -749,10 +799,14 @@ Window_BattleLog.prototype.displayActionResults = function(subject, target) {
 };
 
 Window_BattleLog.prototype.displaySteal = function(subject, target) {
-	StealMessage.forEach(message => {
-		this.push("addText", message.text.format(subject.name(), target.name(), message.item));
+	const result = subject.result();
+	result.stealResult.forEach(steal => {
+		this.push("addText", steal.text.format(subject.name(), target.name(), steal.name));
+		if (Imported.NUUN_popUp && steal.name) {
+			this.stealPopup(target, steal);
+		}
+		this.push("pushBaseLine");
 	});
-	StealMessage = [];
 };
 
 })();

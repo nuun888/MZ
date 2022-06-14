@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.3.7
+### Ver.3.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.3.2  
@@ -100,6 +100,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2022/6/15 Ver.3.4.0  
+パーティコマンド、アクターコマンド、アクターステータスウィンドウに任意のウィンドウスキンを設定できる機能を追加。  
 2022/6/11 Ver.3.3.7  
 ステートエフェクトが画像の拡大率に依存してしまう問題を修正。  
 2022/6/7 Ver.3.3.6  

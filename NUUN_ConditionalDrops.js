@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きドロップ
  * @author NUUN
- * @version 1.0.7
+ * @version 1.0.8
  * @base NUUN_ConditionsBase
  * 
  * @help
@@ -40,6 +40,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/14 Ver.1.0.8
+ * 競合対策。
  * 2021/12/25 Ver.1.0.7
  * モンスター図鑑の不具合修正による処理を追加。
  * 2021/12/22 Ver.1.0.6
@@ -80,10 +82,12 @@ Imported.NUUN_ConditionalDrops = true;
     this._conditionalDropItems = this.conditionalDropsSetup();
   };
 
-  const _Game_Enemy_die = Game_Enemy.prototype.die;
-  Game_Enemy.prototype.die = function() {
-    this.getConditionalDrops();
-    _Game_Enemy_die.call(this);
+  const _Game_BattlerBase_die = Game_BattlerBase.prototype.die;
+  Game_BattlerBase.prototype.die = function() {
+    if (this.isEnemy()) {
+      this.getConditionalDrops();
+    }
+    _Game_BattlerBase_die.call(this);
   };
 
   Game_Enemy.prototype.getConditionalDrops = function() {

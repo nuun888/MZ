@@ -12,8 +12,9 @@
 レ：レーダーチャート対応  
 ス：要ステートターンカウント  
 ス対：ステートターンカウント対応  
-グ：グローバル情報ベース対応
-オ：要バトラーオーバーレイベース
+グ：グローバル情報ベース対応  
+オ：要バトラーオーバーレイベース  
+ポ：ポップアップ対応  
 
 | コア　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
@@ -103,7 +104,7 @@
 | [キャストタイム（詠唱）キャンセルスキル、アイテム](https://github.com/nuun888/MZ/blob/master/README/CancelCastTime.md) | [NUUN_CancelCastTime](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js) |  | 1.1.0 |
 | [アイテム消耗率](https://github.com/nuun888/MZ/blob/master/README/ConsumptionItem.md) | [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js) |  | 1.1.1 |
 | [アイテム使用回数](https://github.com/nuun888/MZ/blob/master/README/ItemUseCount.md) | [NUUN_ItemUseCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemUseCount.js) |  | 1.0.2 |
-| [盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md) |  [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js) | 共 条対 | 1.3.2 |
+| [盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md) |  [NUUN_StealableItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js) | 共 条対 ポ | 1.4.0 |
 | [アイテム最大所持数変更](https://github.com/nuun888/MZ/blob/master/README/MaxItem.md) | [NUUN_MaxItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxItem.js) | 共 | 1.4.0 |
 | [アイテム個数表示変更](https://github.com/nuun888/MZ/blob/master/README/ItemNum.md) | [NUUN_ItemNum](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNum.js) |  | 1.0.0 |
 | [アイテム全体所持制限](https://github.com/nuun888/MZ/blob/master/README/GroupMaxItems.md) | [NUUN_GroupMaxItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js) | 共 | 1.0.0 |
@@ -207,7 +208,7 @@
 | [TP円形ゲージ](https://github.com/nuun888/MZ/blob/master/README/TpCircularGauge.md) | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js) |  | 1.1.1 |
 | [ダメージポップアップ画像化](https://github.com/nuun888/MZ/blob/master/README/DamagePopUpImg.md) | [NUUN_DamagePopUpImg](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpImg.js) |  | 1.1.1 |
 | [ダメージポップアップ同時表示](https://github.com/nuun888/MZ/blob/master/README/DamagePopUpSimulDisplay.md) | [NUUN_DamagePopUpSimulDisplay](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpSimulDisplay.js) |  | 1.0.0 |
-| [ステート、バフポップアップ](https://github.com/nuun888/MZ/blob/master/README/popUp.md) | [NUUN_popUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js) | 共 | 1.1.3 |
+| [ポップアップ](https://github.com/nuun888/MZ/blob/master/README/popUp.md) | [NUUN_popUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js) | 共 | 1.2.0 |
 | [横バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md) | [NUUN_LateralBoundPopUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LateralBoundPopUp.js) | | 1.0.2 |
 | [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.1.1 |
 | [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) | 共 | 1.0.0 |

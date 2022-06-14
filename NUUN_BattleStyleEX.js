@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.3.7
+ * @version 3.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/6/15 Ver.3.4.0
+ * パーティコマンド、アクターコマンド、アクターステータスウィンドウに任意のウィンドウスキンを設定できる機能を追加。
  * 2022/6/11 Ver.3.3.7
  * ステートエフェクトが画像の拡大率に依存してしまう問題を修正。
  * 2022/6/7 Ver.3.3.6
@@ -1142,7 +1144,26 @@ Window_Base.prototype.bsUpdateBackground = function() {
 const _Window_PartyCommand_initialize = Window_PartyCommand.prototype.initialize;
 Window_PartyCommand.prototype.initialize = function(rect) {
   _Window_PartyCommand_initialize.call(this, rect);
+  this.windowColor = null;
   this.opacity = params.PartyCommandWindowShow ? 255 : 0;
+};
+
+Window_PartyCommand.prototype.loadWindowskin = function() {
+  if (params.PartyCommandWindowSkin) {
+    this.windowskin = ImageManager.loadSystem(params.PartyCommandWindowSkin);
+    this.windowColor = params.ActorStatusWindowColor;
+  } else {
+    Window_Base.prototype.loadWindowskin.call(this);
+  }
+};
+
+Window_PartyCommand.prototype.updateTone = function() {
+  if (params.PartyCommandWindowColor) {
+    const tone = params.PartyCommandWindowColor;
+    this.setTone(tone.red, tone.green, tone.bule);
+  } else {
+    Window_Base.prototype.updateTone.call(this);
+  }
 };
 
 Window_PartyCommand.prototype.maxCols = function() {;
@@ -1175,6 +1196,33 @@ Window_ActorCommand.prototype.initialize = function(rect) {
   this.opacity = params.ActorCommandWindowShow ? 255 : 0;
 };
 
+Window_ActorCommand.prototype.loadWindowskin = function() {
+  if (params.ActorCommandWindowSkin) {
+    this.windowskin = ImageManager.loadSystem(params.ActorCommandWindowSkin);
+  } else {
+    Window_Base.prototype.loadWindowskin.call(this);
+  }
+};
+
+Window_ActorCommand.prototype.setWindowSkin = function(data) {
+  if (data.WindowSkin) {
+    this.windowskin = ImageManager.loadSystem(data.WindowSkin);
+    this.windowColor = data.WindowColor;
+  } else {
+    this.loadWindowskin();
+    this.windowColor = null;
+  }
+};
+
+Window_ActorCommand.prototype.updateTone = function() {
+  if (this.windowColor) {
+    const tone = this.windowColor;
+    this.setTone(tone.red, tone.green, tone.bule);
+  } else {
+    Window_Base.prototype.updateTone.call(this);
+  }
+};
+
 Window_ActorCommand.prototype.maxCols = function() {
   return params.ActorCommandMode ? params.ActorCommandMaxCol : Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol);
   //return Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol);
@@ -1205,6 +1253,8 @@ Window_ActorCommand.prototype.refresh = function() {
     _Window_ActorCommand_refresh.call(this);
     const actorIndex = this.selectActor(this._actor);
     if (statusData && this._actor || actorIndex >= 0) {
+      const data = getActorPositionData( this._actor.actorId());
+      this.setWindowSkin(data);
       const rect = statusData.itemRect(actorIndex);
       this.setCommandHeight();
       if (params.ActorCommandPosition === 'actor') {
@@ -1247,6 +1297,23 @@ Window_BattleStatus.prototype.initialize = function(rect) {
   this._opening = true;
   this.visible = true;
   $gameTemp.actorData = null;
+};
+
+Window_BattleStatus.prototype.loadWindowskin = function() {
+  if (params.ActorStatusWindowSkin) {
+    this.windowskin = ImageManager.loadSystem(params.ActorStatusWindowSkin);
+  } else {
+    Window_Base.prototype.loadWindowskin.call(this);
+  }
+};
+
+Window_BattleStatus.prototype.updateTone = function() {
+  if (params.ActorStatusWindowColor) {
+    const tone = params.ActorStatusWindowColor;
+    this.setTone(tone.red, tone.green, tone.bule);
+  } else {
+    Window_Base.prototype.updateTone.call(this);
+  }
 };
 
 const _Window_BattleStatus_maxCols = Window_BattleStatus.prototype.maxCols;

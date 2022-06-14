@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.3.2
+ * @version 1.4.0
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -52,6 +52,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/6/15 Ver.1.4.0
+ * パーティコマンド、アクターコマンド、アクターステータスウィンドウに任意のウィンドウスキンを設定できる機能を追加。
  * 2022/6/7 Ver.1.3.2
  * アクター毎にステートエフェクトの座標を調整できる機能を追加。
  * 2022/6/1 Ver.1.3.1
@@ -137,6 +139,21 @@
  * @text ウィンドウ画像表示
  * @type boolean
  * @default true
+ * @parent PartyCommandWindow
+ * 
+ * @param PartyCommandWindowSkin
+ * @desc ウィンドウスキンを指定します。
+ * @text ウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default
+ * @parent PartyCommandWindow
+ * 
+ * @param PartyCommandWindowColor
+ * @text ウィンドウカラー
+ * @desc ウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
  * @parent PartyCommandWindow
  * 
  * @param PartyCommand_X
@@ -225,6 +242,21 @@
  * @text ウィンドウ画像表示
  * @type boolean
  * @default true
+ * @parent ActorCommand
+ * 
+ * @param ActorCommandWindowSkin
+ * @desc ウィンドウスキンを指定します。
+ * @text ウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default
+ * @parent ActorCommand
+ * 
+ * @param ActorCommandWindowColor
+ * @text ウィンドウカラー
+ * @desc ウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
  * @parent ActorCommand
  * 
  * @param ActorCommandPosition
@@ -372,6 +404,21 @@
  * @param ActorStatus
  * @text アクターステータス設定
  * @default ////////////////////////////////
+ * 
+ * @param ActorStatusWindowSkin
+ * @desc ウィンドウスキンを指定します。
+ * @text ウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default
+ * @parent ActorStatus
+ * 
+ * @param ActorStatusWindowColor
+ * @text ウィンドウカラー
+ * @desc ウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent ActorStatus
  * 
  * @param ActorStatusVariable
  * @desc アクターの表示範囲可変表示。（メンバー数によってアクターの表示領域が変化します）
@@ -1373,6 +1420,78 @@
  * @default 
  * @type struct<ActorStatusList>[]
  * 
+ * @param ActorImgChangePosition
+ * @text アクター画像位置設定
+ * @default ------------------------------
+ * 
+ * @param ImgChangePosition
+ * @desc 顔グラフィック及びアクター画像の座標変更を許可します。
+ * @text 画像座標変更
+ * @type boolean
+ * @default false
+ * @parent ActorImgChangePosition
+ * 
+ * @param ActorImg_X
+ * @desc 顔グラフィック及びアクター画像のX座標を設定します。
+ * @text 画像X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorImgChangePosition
+ * 
+ * @param ActorImg_Y
+ * @desc 顔グラフィック及びアクター画像のY座標を設定します。
+ * @text 画像Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorImgChangePosition
+ * 
+ * @param ActorCommandSkin
+ * @text アクターコマンドスキン設定
+ * @default ------------------------------
+ * 
+ * @param WindowSkin
+ * @desc ウィンドウスキンを指定します。
+ * @text ウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent ActorCommandSkin
+ * 
+ * @param WindowColor
+ * @text ウィンドウカラー
+ * @desc ウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent ActorCommandSkin
+ * 
+ * @param Background
+ * @text アクター画像設定
+ * @default ------------------------------
+ * 
+ * @param ActorBackground
+ * @desc アクターの背景画像を指定します。
+ * @text アクター背景画像
+ * @type file
+ * @default 
+ * @dir img/
+ * @parent Background
+ * 
+ * @param ActorFrontBackground
+ * @desc ステータス背後の背景画像を指定する。（アクターグラフィックとステータスの間に表示）
+ * @text ステータス背後背景画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent Background
+ * 
+ * @param OldSetting
+ * @text 旧設定
+ * @default ------------------------------
+ * 
  * @param ActorNameChangePosition
  * @text アクター名位置設定（相対座標）
  * @desc 座標はアクターステータス(0, 0)からの相対座標です。
@@ -1617,55 +1736,6 @@
  * @min -9999
  * @max 9999
  * @parent ActorStateChangePosition
- * 
- * @param ActorImgChangePosition
- * @text アクター画像位置設定
- * @default ------------------------------
- * 
- * @param ImgChangePosition
- * @desc 顔グラフィック及びアクター画像の座標変更を許可します。
- * @text 画像座標変更
- * @type boolean
- * @default false
- * @parent ActorImgChangePosition
- * 
- * @param ActorImg_X
- * @desc 顔グラフィック及びアクター画像のX座標を設定します。
- * @text 画像X座標
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgChangePosition
- * 
- * @param ActorImg_Y
- * @desc 顔グラフィック及びアクター画像のY座標を設定します。
- * @text 画像Y座標
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgChangePosition
- * 
- * @param Background
- * @text アクター画像位置設定
- * @default ------------------------------
- * 
- * @param ActorBackground
- * @desc アクターの背景画像を指定します。
- * @text アクター背景画像
- * @type file
- * @default 
- * @dir img/
- * @parent Background
- * 
- * @param ActorFrontBackground
- * @desc ステータス背後の背景画像を指定する。（アクターグラフィックとステータスの間に表示）
- * @text ステータス背後背景画像
- * @type file
- * @dir img/
- * @default 
- * @parent Background
  * 
  */
 /*~struct~ActorImgList:
@@ -2069,6 +2139,33 @@
  * @parent GaugeSetting
  * 
  */
+/*~struct~WindowTone:
+ * 
+ * @param red
+ * @desc 赤
+ * @text 赤
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ * @param green
+ * @text 緑
+ * @desc 緑
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ * @param bule
+ * @text 青
+ * @desc 青
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_BattleStyleEX_XP = true;
@@ -2081,6 +2178,8 @@ const params = {};
 params.bsMode = 'XP';
 
 params.PartyCommandPosition = eval(parameters['PartyCommandPosition']) || 'top';
+params.PartyCommandWindowSkin = String(parameters['PartyCommandWindowSkin']);
+params.PartyCommandWindowColor = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PartyCommandWindowColor'])) : null) || {"red":"0","green":"0","bule":"0"};
 params.PartyCommandMaxCol = Number(parameters['PartyCommandMaxCol'] || 4);
 params.PartyCommandMaxRow = Number(parameters['PartyCommandMaxRow'] || 1);
 params.PartyCommand_X = Number(parameters['PartyCommand_X'] || 0);
@@ -2094,6 +2193,8 @@ params.PartyBackground_X = Number(parameters['PartyBackground_X'] || 0);
 params.PartyBackground_Y = Number(parameters['PartyBackground_Y'] || 0);
 
 params.ActorCommandPosition = eval(parameters['ActorCommandPosition']) || "actor";
+params.ActorCommandWindowSkin = String(parameters['ActorCommandWindowSkin']);
+params.ActorCommandWindowColor = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorCommandWindowColor'])) : null) || {"red":"0","green":"0","bule":"0"};
 params.ActorCommand_Width = Number(parameters['ActorCommand_Width'] || 192);
 params.ActorCommandVariable = eval(parameters['ActorCommandVariable'] || "true");
 params.ActorCommandMaxRow = Number(parameters['ActorCommandMaxRow'] || 10);
@@ -2121,6 +2222,8 @@ params.EnemyWindowBackgroundImg = String(parameters['EnemyWindowBackgroundImg'])
 params.EnemyWindowBackground_X = Number(parameters['EnemyWindowBackground_X'] || 0);
 params.EnemyWindowBackground_Y = Number(parameters['EnemyWindowBackground_Y'] || 0);
 
+params.ActorStatusWindowSkin = String(parameters['ActorStatusWindowSkin']);
+params.ActorStatusWindowColor = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorStatusWindowColor'])) : null) || {"red":"0","green":"0","bule":"0"};
 params.ActorStatusVariable = eval(parameters['ActorStatusVariable'] || "false");
 params.ActorMaxCol = Number(parameters['ActorMaxCol'] || 4);
 params.ActorMaxRow = Number(parameters['ActorMaxRow'] || 1);

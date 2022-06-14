@@ -1,5 +1,5 @@
 # [盗みスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)
-# Ver.1.3.2
+# Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -109,6 +109,9 @@
 %1使用者　%2対象　%3盗んだアイテムまたは金額  
  
 ## 更新履歴
+2022/6/14 Ver 1.4.0  
+ポップアップに対応。(要NUUN_popUp)  
+使用していなかったプラグインパラメータを削除。  
 2022/1/25 Ver 1.3.2  
 確率、抵抗率の処理を修正。  
 2021/11/13 Ver 1.3.1  

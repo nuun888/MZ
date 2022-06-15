@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.3.6
+ * @version 2.3.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -108,6 +108,8 @@
  * Ver.2.3.2以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/6/15 Ver.2.3.7
+ * 評価式に文字列を記入したときにNaNと表示されてしまう問題を修正。
  * 2022/3/22 Ver.2.3.6
  * 属性、ステート耐性値の取得値を変更。
  * 2022/2/16 Ver.2.3.5
@@ -2284,6 +2286,7 @@ Window_Status.prototype.characterSwitchingHelp = function(list, x, y, width) {
 };
 
 Window_Status.prototype.statusParamDecimal = function(val, decimal) {
+  if (isNaN(val)) { return val }
   decimal = decimal !== undefined ? Number(decimal) : 0;
   if (DecimalMode) {
     return Math.round(val * (decimal > 0 ? Math.pow(10, decimal) : 1)) / (decimal > 0 ? Math.pow(10, decimal) : 1);

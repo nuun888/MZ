@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.4.4
+ * @version 1.4.5
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/15 Ver.1.4.5
+ * 文字列を記入したときにNaNと表示されてしまう問題を修正。
  * 2022/5/24 Ver.1.4.4
  * スプライトのフィルタリングウィンドウを設定する処理を追加。
  * 2022/2/12 Ver.1.4.3
@@ -90,6 +92,7 @@ NuunManager.getColorCode = function(color) {
 };
 
 NuunManager.numPercentage = function(num, digits, mode) {
+  if (isNaN(num)) { return num }
   return (mode ? Math.round(num * Math.pow(10, digits + 2)) : Math.floor(num * Math.pow(10, digits + 2))) / Math.pow(10, digits + 2);
 }
 

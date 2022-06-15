@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.13.2
+ * @version 2.13.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -228,6 +228,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/15 Ver.2.13.3
+ * 評価式に文字列を記入したときにNaNと表示されてしまう問題を修正。
  * 2022/6/13 Ver.2.13.2
  * 属性耐性一覧に物理ダメージ率と魔法ダメージ率を表示できる機能を追加。
  * 2022/6/5 Ver.2.13.1
@@ -6097,6 +6099,7 @@ Window_EnemyBook.prototype.numberWidthSlice = function(indexText) {
 };
 
 Window_EnemyBook.prototype.statusParamDecimal = function(val, decimal) {
+  if (isNaN(val)) { return val }
   decimal = decimal !== undefined ? Number(decimal) : 0;
   if (param.DecimalMode) {
     return Math.round(val * (decimal > 0 ? Math.pow(10, decimal) : 1)) / (decimal > 0 ? Math.pow(10, decimal) : 1);

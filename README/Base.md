@@ -1,11 +1,13 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.4.4
+# Ver.1.4.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
 
 共通処理を行うベースプラグインです。  
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2022/6/15 Ver.1.4.5  
+文字列を記入したときにNaNと表示されてしまう問題を修正。  
 2022/5/24 Ver.1.4.4  
 スプライトのフィルタリングウィンドウを設定する処理を追加。  
 2022/2/12 Ver.1.4.3  

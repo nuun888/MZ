@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.7.0
+ * @version 1.7.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -31,6 +31,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/15 Ver.1.7.1
+ * 微修正。
  * 2022/3/30 Ver.1.7.0
  * 戦闘メンバー、待機メンバーの画像に顔グラを選択できる機能を追加。
  * 戦闘メンバーの表示列、行数を設定できる機能を追加。
@@ -617,7 +619,7 @@
  * @param ActorImg
  * @text アクター画像
  * @desc アクターの画像を表示します。立ち絵を切り替える場合はリストに画像を設定してください。
- * @type file[]
+ * @type file
  * @dir img/
  * @default 
  * 
@@ -2318,7 +2320,8 @@ Window_FormationStatus.prototype.expPercent = function() {
   return (this._actor.currentExp() - this._actor.currentLevelExp()) / (this._actor.nextLevelExp() - this._actor.currentLevelExp());
 };
 
-Window_FormationStatus.prototype.statusParamDecimal = function(val, decimal) {//カエル
+Window_FormationStatus.prototype.statusParamDecimal = function(val, decimal) {
+  if (isNaN(val)) { return val }
   decimal = decimal !== undefined ? Number(decimal) : 0;
   if (DecimalMode) {
     return Math.round(val * (decimal > 0 ? Math.pow(10, decimal) : 1)) / (decimal > 0 ? Math.pow(10, decimal) : 1);

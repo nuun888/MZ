@@ -85,7 +85,7 @@
 | 能力拡張　　　　　　　　　　　　　　　 | プラグイン　プラグイン数8　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | 属性吸収特徴 | [NUUN_ElementAbsorb](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ElementAbsorb.js) |  | 1.0.1 |
-| 回復効果反転特徴 | [NUUN_RecoveryReversal](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RecoveryReversal.js) |  | 1.0.0 |
+| [回復効果反転特徴](https://github.com/nuun888/MZ/blob/master/README/RecoveryReversal.md) | [NUUN_RecoveryReversal](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RecoveryReversal.js) |  | 1.0.0 |
 | [キャストタイムチャージ率特徴](https://github.com/nuun888/MZ/blob/master/README/CastTimeCharge.md) | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js) |  | 1.0.0 |
 | [ファイナルアタック特徴](https://github.com/nuun888/MZ/blob/master/README/FinalAttack.md) | [NUUN_FinalAttack](https://github.com/nuun888/MZ/blob/master/NUUN_FinalAttack.js) |  | 1.1.0 |
 | [マナシールド](https://github.com/nuun888/MZ/blob/master/README/ManaShield.md) | [NUUN_ManaShield](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js) |  | 1.1.1 |

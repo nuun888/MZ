@@ -14,6 +14,9 @@
 'elapsed'指定時はターン数補正を-1に設定してください。  
 経過ターンを表示させるには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)プラグインが必要です。  
 
+## 競合情報
+MOG_BattleHudと併用した場合、当プラグインの機能が適用されません。  
+
 ## 更新履歴
 2022/4/9 Ver.1.3.0  
 表示アイコンの行を指定できる機能を追加。  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/18 Ver 1.2.1
+ * 微修正。
  * 2022/6/14 Ver 1.2.0
  * 盗み時のポップアップに対応。(要NUUN_StealableItems)
  * 2022/5/2 Ver 1.1.3
@@ -458,7 +460,7 @@ Imported.NUUN_popUp = true;
         popupData.color = this.setupStatePopUpColor(state);
         popupData.id = state.id;
         popupData.iconIndex = state.iconIndex;
-        this.push('popupState', target, popupData);
+        this.push('nuun_popupState', target, popupData);
       }
     }
   };
@@ -474,7 +476,7 @@ Imported.NUUN_popUp = true;
         popupData.id = state.id;
         popupData.iconIndex = state.iconIndex;
         popupData.opacity = PopUpReleaseOpacity;
-        this.push('popupState', target, popupData);
+        this.push('nuun_popupState', target, popupData);
       }
     }
   };
@@ -493,7 +495,7 @@ Imported.NUUN_popUp = true;
             popupData.color = this.setupBuffPopUpColor(id, find);
             popupData.id = id;
             popupData.iconIndex = target.popupBuffIconIndex(id);
-            this.push('popupState', target, popupData);
+            this.push('nuun_popupState', target, popupData);
           }
         }
       }
@@ -514,7 +516,7 @@ Imported.NUUN_popUp = true;
           popupData.id = id;
           popupData.iconIndex = target.removePopupBuffIconIndex(id);
           popupData.opacity = PopUpReleaseOpacity;
-          this.push('popupState', target, popupData);
+          this.push('nuun_popupState', target, popupData);
         }
       }
     }
@@ -527,7 +529,7 @@ Imported.NUUN_popUp = true;
       popupData.color = 0;
       popupData.id = item.id;
       popupData.iconIndex = item.iconIndex;
-      this.push('popupState', target, popupData);
+      this.push('nuun_popupState', target, popupData);
     }
   };
 
@@ -559,7 +561,7 @@ Imported.NUUN_popUp = true;
     return !DeadNoPopup ? state.id !== target.deathStateId() : true;
   };
 
-  Window_BattleLog.prototype.popupState = function(target, popup) {
+  Window_BattleLog.prototype.nuun_popupState = function(target, popup) {
     target.startStatePopup();
     target.addSetPopUpData(popup);
   };
@@ -601,8 +603,10 @@ Imported.NUUN_popUp = true;
 
   Sprite_PopUpEX.prototype.drawPopup = function(battler) {
     const popupData = battler.getPopUpData();
-    this.drawIcon(popupData);
-    this.createPopUp(popupData);
+    if (popupData) {
+      this.drawIcon(popupData);
+      this.createPopUp(popupData);
+    }
   };
 
   Sprite_PopUpEX.prototype.createPopUp = function(popupData) {

@@ -53,6 +53,8 @@
  * 別途バトルスタイル拡張スピードスターバトル併用を導入してください。
  * 
  * 更新履歴
+ * 2022/6/18 Ver.1.4.1
+ * アニメーションの表示をステータスの背後、ダメージポップアップをステータスの前面に表示するように変更。
  * 2022/6/15 Ver.1.4.0
  * パーティコマンド、アクターコマンド、アクターステータスウィンドウに任意のウィンドウスキンを設定できる機能を追加。
  * 2022/6/7 Ver.1.3.2
@@ -827,17 +829,6 @@
  * @text フロントビューエフェクト表示
  * @type boolean
  * @default false
- * @parent ActorEffect
- * 
- * @param EffectPriority
- * @text エフェクト表示プロパティ
- * @desc エフェクトの表示プロパティ。
- * @type select
- * @option 最前面
- * @value 'top'
- * @option 中間
- * @value 'middle'
- * @default 'top'
  * @parent ActorEffect
  * 
  * @param ActorEffect_X

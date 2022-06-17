@@ -2668,25 +2668,7 @@ Sprite_NuunUserParam.prototype.setupFont = function() {
   this.bitmap.fontSize = this.fontSize();
 };
 
-//Spriteset_Base
-const _Spriteset_Battle_makeTargetSprites = Spriteset_Battle.prototype.makeTargetSprites;
-Spriteset_Battle.prototype.makeTargetSprites = function(targets) {
-  const targetSprites = _Spriteset_Battle_makeTargetSprites.call(this, targets);
-  if (Imported.NUUN_BSEX_Animation_KK_SSBattle) {
-    this._nuun_targetSprites = targetSprites;
-  }
-  this._effectsContainer = this.animationTarget(targetSprites) ? this._effectsFrontContainer : this._effectsBackContainer;
-  return targetSprites;
-};
-
-Spriteset_Base.prototype.animationTarget = function(targetSprites){
-    if(!$gameSystem.isSideView()) {
-      const target = targetSprites.find(targets => (targets.constructor === Sprite_Actor));
-      return target && target.viewFrontActor ? true : false;
-    }
-    return false;
-};
-  
+//Spriteset_Base 
 const _Spriteset_Base_animationShouldMirror = Spriteset_Base.prototype.animationShouldMirror;
 Spriteset_Base.prototype.animationShouldMirror = function(target) {
     return params.ActorsMirror ? _Spriteset_Base_animationShouldMirror.call(this, target) : false;
@@ -2699,24 +2681,38 @@ Spriteset_Battle.prototype.initialize = function() {
   
 };
 
+const _Spriteset_Battle_findTargetSprite = Spriteset_Battle.prototype.findTargetSprite;
+Spriteset_Battle.prototype.findTargetSprite = function(target) {
+  const targetSprite = _Spriteset_Battle_findTargetSprite.call(this, target);
+  this._effectsContainer = this.animationTarget(targetSprite) ? this._effectsFrontContainer : this._effectsBackContainer;
+  return targetSprite;
+};
+
+Spriteset_Battle.prototype.animationTarget = function(targetSprites){
+  if(!$gameSystem.isSideView() && targetSprites.viewFrontActor) {
+    return !!targetSprites._battler.isActor();
+  }
+  return false;
+};
+
 Spriteset_Battle.prototype.createStatusLayer = function() {
     this.createBattleHud();//ベーススプライト
     this.createHudBack();//ウィンドウ、アクターグラフィック
-    if (params.EffectPriority === 'middle') {
-      this.createEffects();
-    }
+    this.createEffects();//アニメーション
     this.createHudStatus();//ステータス
-    if (params.EffectPriority === 'top') {
-      this.createEffects();
-    }
     this.createFrontActors();
-    
 };
 
 Spriteset_Battle.prototype.createBattleHud = function() {
     const sprite = new Sprite();
     this.addChild(sprite);
     this._battleHudBase = sprite;
+};
+
+const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
+Spriteset_Battle.prototype.update = function() {
+  _Spriteset_Battle_update.call(this);
+  this.updateEffects();
 };
 
 Spriteset_Battle.prototype.createHudBack = function() {
@@ -2738,6 +2734,17 @@ Spriteset_Battle.prototype.createEffects = function() {
     this._effectsFrontContainer = sprite;
 };
 
+Spriteset_Battle.prototype.createDamege = function() {
+  const sprite = this.setBattleBase();
+  this._battleHudBase.addChild(sprite);
+  this._battleDamege = sprite;
+};
+
+Spriteset_Battle.prototype.updateEffects = function() {
+  this._battleDamege.x = this._battleEffects.x;
+  this._battleDamege.y = this._battleEffects.y;
+};
+
 Spriteset_Battle.prototype.setBattleBase = function() {
     const width = (params.ActorStatusWindow_Width > 0 ? params.ActorStatusWindow_Width : Graphics.boxWidth);
     const height = Graphics.boxHeight;
@@ -2752,13 +2759,13 @@ Spriteset_Battle.prototype.setBattleBase = function() {
 };
 
 Spriteset_Battle.prototype.createFrontActors = function() {
+  this.createDamege();
     if (!$gameSystem.isSideView() && params.ActorEffectShow) {
       this._actorSprites = [];
       for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
         const sprite = new Sprite_Actor();
         this._actorSprites.push(sprite);
-        //this._battleHudFront.addChild(sprite);
-        this._battleEffects.addChild(sprite);
+        this._battleDamege.addChild(sprite);
       }
     }
 };

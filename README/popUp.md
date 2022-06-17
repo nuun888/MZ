@@ -1,5 +1,5 @@
 # [ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -27,6 +27,8 @@
 戦闘行動結果ポップアッププラグインと併用時、このプラグインを戦闘行動結果ポップアッププラグインより下に設定した場合、ステート、バフのポップアップはこのプラグインでの表示になります。  
 
 ## 更新履歴
+2022/6/18 Ver 1.2.1  
+微修正。  
 2022/6/14 Ver 1.2.0  
 盗み時のポップアップに対応。(要NUUN_StealableItems)  
 2022/5/2 Ver 1.1.3  

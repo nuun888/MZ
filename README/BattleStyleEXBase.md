@@ -107,10 +107,6 @@
 木星ペンギン様の疑似３Dバトルと併用するときのパッチです。  
 [バトルスタイル拡張疑似３Dバトル併用パッチ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEXInMPP_Pseudo3DBattle.js)  
 
-ケケー氏作スピードスターバトルプラグインと併用して、フロントビューで味方にアニメーションを表示させる場合は別途バトルスタイル拡張スピードスターバトル併用を導入してください。  
-ケケー様のスピードスターバトルと併用しフロントビューでアニメーションを表示するためのパッチです。  
-[バトルスタイル拡張スピードスターバトル併用](https://github.com/nuun888/MZ/blob/master/README/BSEX_Animation_KK_SSBattle.md)Ver.2.6.10以降  
-
 ## 旧バージョン
 [バトルスタイル拡張ベース](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX_Base.js) Ver.2.6.15  
 [バトルスタイル拡張設定用](https://raw.githubusercontent.com/nuun888/MZ/master/oldBS/NUUN_BattleStyleEX.js) Ver.1.6.4  

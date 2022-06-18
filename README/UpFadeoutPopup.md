@@ -6,6 +6,8 @@
 
 ポップアップの動作を上に上昇してフェードアウトするように変更します。  
 
+https://github.com/nuun888/MZ/blob/master/README/img/UpFadeoutPopup.mp4
+
 ※初期設定ではクラス指定していません。適用するクラスを選択し設定してください。  
 Sprite_Damage:ダメージポップアップ  
 Sprite_PopUpEX:ポップアッププラグイン  

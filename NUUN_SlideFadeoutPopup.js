@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_UpFadeoutPopup.js
+ * NUUN_SlideFadeoutPopup.js
  * 
  * Copyright (C) 2022 NUUN
  * This software is released under the MIT License.
@@ -8,48 +8,50 @@
  */
 /*:
  * @target MZ
- * @plugindesc アップフェードアウトポップアップ
+ * @plugindesc スライドフェードアウトポップアップ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_popUp
  * 
  * @help
- * ポップアップの動作を上に上昇してフェードアウトするように変更します。
- * 
- * ※初期設定ではクラス指定していません。適用するクラスを選択し設定してください。
- * Sprite_Damage:ダメージポップアップ
- * Sprite_PopUpEX:ポップアッププラグイン
- * Sprite_PopupMessage:戦闘行動結果ポップアッププラグイン
- * 上記にないクラスはテキストタブで直接記入してください。
+ * ポップアップの動作を横にスライドしてフェードアウトするように変更します。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2022/6/19 Ver.1.0.1
- * 表示フレーム数、フェードアウトフレーム数を指定できる機能を追加。
- * 2022/6/18 Ver.1.0.0
+ * 2022/6/19 Ver.1.0.0
  * 初版
  * 
  * @param PopupClass
- * @text 適用クラス
- * @desc 適用させるクラスを設定をします。
+ * @text クラス毎ウィンドウスキン
+ * @desc クラス毎のウィンドウスキンの設定をします。
  * @default []
  * @type struct<ClassList>[]
  * 
  * @param PopUpDuration 
- * @desc ポップアップ表示フレーム数(デフォルト90)
+ * @desc ポップアップ表示フレーム数(デフォルト120)
  * @text ポップアップ表示フレーム数
  * @type number
- * @default 90
+ * @default 120
  * 
  * @param FadeoutFlame
  * @desc フェードアウト表示フレーム数(デフォルト20)
  * @text フェードアウト表示フレーム数
  * @type number
  * @default 20
+ * 
+ * @param SlideDirection
+ * @desc 戦闘結果の文字の表示位置を指定します。
+ * @text 戦闘結果文字の位置
+ * @type select
+ * @option 左方向
+ * @value "left"
+ * @option 右方向
+ * @value "right"
+ * @default "right"
  * 
  */
 /*~struct~ClassList:
@@ -67,55 +69,45 @@
  */
 
 var Imported = Imported || {};
-Imported.NUUN_UpFadeoutPopup = true;
+Imported.NUUN_SlideFadeoutPopup = true;
 
 (() => {
-    const parameters = PluginManager.parameters('NUUN_UpFadeoutPopup');
+    const parameters = PluginManager.parameters('NUUN_SlideFadeoutPopup');
     const PopupClass = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopupClass'])) : null) || [];
-    const PopUpDuration = Number(parameters['PopUpDuration'] || 90);
+    const SlideDirection = eval(parameters['SlideDirection']) || 'right';
+    const PopUpDuration = Number(parameters['PopUpDuration'] || 120);
     const FadeoutFlame = Number(parameters['FadeoutFlame'] || 20);
 
-    function upFadeoutPopupSprite(className) {
+    function SlideFadeoutPupupSprite(className) {
         return PopupClass.find(_class => _class.ClassName === className);
     }
 
     const _Sprite_Damage_initialize = Sprite_Damage.prototype.initialize;
     Sprite_Damage.prototype.initialize = function() {
         _Sprite_Damage_initialize.call(this);
-        this._upFadeoutPopupClass = !!upFadeoutPopupSprite(String(this.constructor.name));
-        if (this._upFadeoutPopupClass) {
+        this._slideFadeoutPopupClass = SlideFadeoutPupupSprite(String(this.constructor.name));
+        if (this._slideFadeoutPopupClass) {
             this._duration = PopUpDuration;
-        }
-    };
-
-    const _Sprite_Damage_updateChild = Sprite_Damage.prototype.updateChild;
-    Sprite_Damage.prototype.updateChild = function(sprite) {
-        if (this._upFadeoutPopupClass) {
-            sprite.dy = -1;
-            sprite.ry += sprite.dy;
-            sprite.y = Math.round(sprite.ry);
-            sprite.setBlendColor(this._flashColor);
-        } else {
-            _Sprite_Damage_updateChild.call(this, sprite);
         }
     };
 
     const _Sprite_Damage_updateOpacity = Sprite_Damage.prototype.updateOpacity;
     Sprite_Damage.prototype.updateOpacity = function() {
-        if (this._upFadeoutPopupClass) {
+        if (this._slideFadeoutPopupClass) {
             if (this._duration < FadeoutFlame) {
-                this.opacity = (this.getUpFadeoutOpacity() * this._duration) / FadeoutFlame;
+                this.opacity = (this.getSlideFadeoutOpacity() * this._duration) / FadeoutFlame;
+                this.x += (SlideDirection === 'right' ? 1 : -1);
             }
         } else {
             _Sprite_Damage_updateOpacity.call(this);
         }
     };
 
-    Sprite_Damage.prototype.getUpFadeoutOpacity = function() {
-        if (!this._upFadeoutOpacity) {
-            this._upFadeoutOpacity = this.opacity;
+    Sprite_Damage.prototype.getSlideFadeoutOpacity = function() {
+        if (!this._slideFadeoutOpacity) {
+            this._slideFadeoutOpacity = this.opacity;
         }
-        return this._upFadeoutOpacity;
+        return this._slideFadeoutOpacity;
     };
 
 })();

@@ -18,6 +18,11 @@
  * @help
  * ポップアップの動作を横にスライドしてフェードアウトするように変更します。
  * 
+ * Sprite_Damage:ダメージポップアップ
+ * Sprite_PopUpEX:ポップアッププラグイン
+ * Sprite_PopupMessage:戦闘行動結果ポップアッププラグイン
+ * 上記にないクラスはテキストタブで直接記入してください。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
@@ -28,7 +33,7 @@
  * @param PopupClass
  * @text クラス毎ウィンドウスキン
  * @desc クラス毎のウィンドウスキンの設定をします。
- * @default []
+ * @default ["{\"ClassName\":\"'Sprite_Damage'\"}"]
  * @type struct<ClassList>[]
  * 
  * @param PopUpDuration 

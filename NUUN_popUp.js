@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/18 Ver 1.2.2
+ * 横バウンドポップアップクラス毎適用機能実装のための定義変更。
  * 2022/6/18 Ver 1.2.1
  * 微修正。
  * 2022/6/14 Ver 1.2.0
@@ -163,17 +165,6 @@
  * @text 不利ステート解除時ポップアップテキスト
  * @type string
  * @default %1低下
- * 
- * @param LateralBoundPopUpSetting
- * @text 横バウンドポップアップ設定(要NUUN_LateralBoundPopUp)
- * @default ------------------------------
- * 
- * @param LateralBoundPopUpValid
- * @type boolean
- * @default false
- * @text 横バウンド適用
- * @desc 横バウンドを適用します。（要NUUN_LateralBoundPopUp）
- * @parent LateralBoundPopUpSetting
  * 
  * @param StealPopupSetting
  * @text 盗み設定(要NUUN_StealableItemsル)
@@ -309,7 +300,6 @@ Imported.NUUN_popUp = true;
   const AddDebuffPopUpText = String(parameters['AddDebuffPopUpText'] || '%1低下');
   const RemovedBuffPopUpText = String(parameters['RemovedBuffPopUpText'] || '%1上昇');
   const RemovedDebuffPopUpText = String(parameters['RemovedDebuffPopUpText'] || '%1低下');
-  const LateralBoundPopUpValid = eval(parameters['LateralBoundPopUpValid'] || 'false');
   const StealPopUpValid = eval(parameters['StealPopUpValid'] || 'false');
   const StealPopUpText = String(parameters['StealPopUpText'] || '%1Get');
   const StolenPopUpText = String(parameters['StolenPopUpText'] || '%1Lost');
@@ -575,15 +565,11 @@ Imported.NUUN_popUp = true;
   
   Sprite_PopUpEX.prototype.initialize = function() {
     Sprite_Damage.prototype.initialize.call(this);
-    this._damageClass = LateralBoundPopUpValid;
     //this._popupBitmap = null;
   };
 
   Sprite_PopUpEX.prototype.setup = function(battler) {
     this.drawPopup(battler);
-    if (Imported.NUUN_LateralBoundPopUp && this._damageClass) {
-      this.setLateralBoundPopUp();
-    }
   };
 
   Sprite_PopUpEX.prototype.destroy = function(options) {
@@ -616,6 +602,7 @@ Imported.NUUN_popUp = true;
       textMargin = ImageManager.iconWidth + 4;
     }
     this.opacity = popupData.opacity;
+    this.setDefaultOpacity();
     this._colorType = popupData.color;
     sprite.bitmap.textColor = this.damageColor();
     sprite.bitmap.drawText(popupData.name, textMargin, 0, PopUpWidth - textMargin, this.fontSize(), "center");
@@ -652,6 +639,25 @@ Imported.NUUN_popUp = true;
       }
     }
     Sprite_Damage.prototype.update.call(this);
+  };
+
+  const _Sprite_Damage_updateOpacity = Sprite_Damage.prototype.updateOpacity;
+  Sprite_Damage.prototype.updateOpacity = function() {
+    if (this._setOpacity !== undefined) {
+      if (this._duration < 10) {
+        this.opacity = (this.getOpacity() * this._duration) / 10;
+      }
+    } else {
+      _Sprite_Damage_updateOpacity.call(this);
+    }
+  };
+
+  Sprite_Damage.prototype.setDefaultOpacity = function() {
+    this._setOpacity = this.opacity;
+  };
+
+  Sprite_Damage.prototype.getOpacity = function() {
+    return this._setOpacity || 255;
   };
 
 

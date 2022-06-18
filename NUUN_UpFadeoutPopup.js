@@ -84,8 +84,8 @@ Imported.NUUN_UpFadeoutPopup = true;
     const _Sprite_Damage_updateOpacity = Sprite_Damage.prototype.updateOpacity;
     Sprite_Damage.prototype.updateOpacity = function() {
         if (this._upFadeoutPopupClass) {
-            if (this._duration < 10) {
-                this.opacity = (this.getUpFadeoutOpacity() * this._duration) / 10;
+            if (this._duration < 20) {
+                this.opacity = (this.getUpFadeoutOpacity() * this._duration) / 20;
             }
         } else {
             _Sprite_Damage_updateOpacity.call(this);

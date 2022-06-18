@@ -8,7 +8,6 @@
 
 ![gif](img/SlideFadeoutPopup.gif)  
 
-※初期設定ではクラス指定していません。適用するクラスを選択し設定してください。  
 Sprite_Damage:ダメージポップアップ  
 Sprite_PopUpEX:ポップアッププラグイン  
 Sprite_PopupMessage:戦闘行動結果ポップアッププラグイン  

@@ -49,8 +49,8 @@
  * @default 20
  * 
  * @param SlideDirection
- * @desc 戦闘結果の文字の表示位置を指定します。
- * @text 戦闘結果文字の位置
+ * @desc スライドする方向。
+ * @text スライド方向
  * @type select
  * @option 左方向
  * @value "left"

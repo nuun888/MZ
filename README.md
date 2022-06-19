@@ -22,7 +22,7 @@
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.4 |
 | [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md) | [NUUN_StateTurnCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js) |  | 1.1.1 |
 | [レーダーチャート表示ベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md) | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) | 共 | 1.0.2 |
-| [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.3.0 |
+| [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.4.0 |
 | [ドロップ率確率操作ベース](https://github.com/nuun888/MZ/blob/master/README/DropItemRateBase.md) |  [NUUN_DropItemRateBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemRateBase.js) |  | 1.0.0 |
 | [グローバル情報ベース](https://github.com/nuun888/MZ/blob/master/README/GlobalCore.md) | [NUUN_GlobalCore](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GlobalCore.js) |  | 1.0.1 |
 | [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md) | [NUUN_BattlerOverlayBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerOverlayBase.js) |  | 1.0.0
@@ -30,7 +30,7 @@
 
 | 戦闘　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.3.7 |
+| [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.5.0 |
 | [XPスタイル対象選択ウィンドウ](https://github.com/nuun888/MZ/blob/master/README/XPSelectWindow.md) | [NUUN_XPSelectWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js) | 共 | 1.0.4 |
 | [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 1.14.5 |
 | ┣ リザルトサイドビュー表示 |  |  |  |

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.4
+ * @version 1.1.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -245,6 +245,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/19 Ver.1.1.5
+ * 一部プラグインでエラーが出るため修正。
  * 2022/5/4 Ver.1.1.4
  * 一部条件によってはクリティカル時の条件が適用されない問題を修正。
  * リストにないIDが設定されていた場合にエラーが起きる問題を修正。
@@ -719,7 +721,7 @@ Game_ActionResult.prototype.clear = function() {
 
 const _Game_Action_apply = Game_Action.prototype.apply;
 Game_Action.prototype.apply = function(target) {
-  //$gameTemp.actionData.subject = this.subject();
+  $gameTemp.actionData.subject = this.subject();
   $gameTemp.actionData.target = target;
   $gameTemp.actionData.action = this;
   $gameTemp.actionData.damage = 0;

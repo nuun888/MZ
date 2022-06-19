@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.2
+ * @version 1.4.0
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/19 Ver 1.4.0
+ * アクター画像条件にコマンド選択時を追加。
+ * アクター画像条件に不透明度を指定できる機能を追加。
+ * 全条件一致ステートの条件が機能していなかった問題を修正。
  * 2022/5/7 Ver 1.3.2
  * 条件にステートを指定するとエラーが出る問題を修正。
  * 2022/5/6 Ver 1.3.1
@@ -121,6 +125,14 @@
  * @default -1
  * @min -1
  * 
+ * @param Opacity
+ * @text 画像不透明度
+ * @desc 画像の不透明度を指定します。（現バージョンではバトルスタイル拡張のみ）
+ * @type number
+ * @default 255
+ * @min 0
+ * @max 255
+ * 
  * @param AllMatch
  * @text 全条件一致
  * @default ------------------------------
@@ -193,6 +205,8 @@
  * @value 'victory'
  * @option 被ステート(3)
  * @value 'state'
+ * @option コマンド選択時
+ * @value 'command'
  * @default 'default'
  * @parent AllMatch
  * 
@@ -264,6 +278,7 @@ Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
   this.nuun_useItemId = -1;
   this._actorGraphicIndex = -1;
+  this._actorGraphicOpacity = 255;
   this._actorGraphicName = null;
   this._actorGraphicFace = null;
   this.onImgId = 0;
@@ -302,14 +317,17 @@ Game_Actor.prototype.setActorGraphicData = function() {
     this._actorGraphicName = data.GraphicImg;
     this._actorGraphicFace = data.FaceImg || this.faceName();
     this._actorImgIndex = data.FaceIndex >= 0 ? data.FaceIndex : this.faceIndex();
+    this._actorGraphicOpacity = data.Opacity || 255;
   } else {
     this._actorGraphicName = null;
     this._actorGraphicFace = this.faceName();
     this._actorImgIndex = this.faceIndex();
+    this._actorGraphicOpacity = 255;
   }
 };
 
 Game_Actor.prototype.matchConditions = function(data) {
+  
   if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this.hp, this.param(0))) {
     return false;
   }
@@ -322,7 +340,7 @@ Game_Actor.prototype.matchConditions = function(data) {
   if (data.ImgArmor > 0 && !this.isCondArmorImg(data)) {
     return false;
   }
-  if (data.ImgState > 0 && !this.isCondStateImg(data, data.ImgState)) {
+  if (data.ImgStateAll > 0 && !this.isCondStateImg(data, data.ImgStateAll)) {
     return false;
   }
   if (data.ImgClass > 0 && !this.isCondClassImg(data)) {
@@ -341,6 +359,8 @@ Game_Actor.prototype.matchChangeGraphic = function(data) {
       return true;
     case 'death' :
       return this.isDead();
+    case 'command' :
+      return this.isInputting();
     case 'dying' :
       return this.isDying();
     case 'damage' :

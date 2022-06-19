@@ -19,7 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2022/6/18 Ver.1.4.1
+ * 2022/6/19 Ver.3.5.0
+ * 画像切り替え時に座標がリセットされてしまう問題を修正。
+ * 2022/6/18 Ver.3.4.1
  * アニメーションの表示をステータスの背後、ダメージポップアップをステータスの前面に表示するように変更。
  * 2022/6/15 Ver.3.4.0
  * パーティコマンド、アクターコマンド、アクターステータスウィンドウに任意のウィンドウスキンを設定できる機能を追加。
@@ -245,6 +247,7 @@ Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
   this.nuun_bsUseItemId = -1;
   this._battleStyleGraphicIndex = -1;
+  this._battleStyleGraphicOpacity = 255;
   this._battleStyleGraphicName = null;
   this._actionActorImg = null;
   this._isEffectAction = false;
@@ -269,11 +272,6 @@ Game_Actor.prototype.battleStyleImgRefresh = function() {
   this.setBattleStyleActorGraphicData();
 };
 
-Game_Actor.prototype.resetBattleStyleImgId = function() {
-  this.onImgId = 0;
-  this.battleStyleImgRefresh();
-};
-
 Game_Actor.prototype.setBattleStyleActorGraphicData = function() {
   let imgIndex = -1;
   let index = -1;
@@ -296,6 +294,7 @@ Game_Actor.prototype.setBattleStyleActorGraphicData = function() {
       this._battleStyleGraphicName = this.getBattleStyleImg(data);
       imgIndex = this.getBattleStyleImgIndex(data);
       this._isDeadImg = this.isBSActorGraphicDead(data);
+      this._battleStyleGraphicOpacity = data.Opacity || 255;
     } else {
       this._battleStyleGraphicName = null;
     }
@@ -331,6 +330,10 @@ Game_Actor.prototype.actorPictureActorGraphicData = function(imgData) {
     this._isDeadImg = this.isBSActorGraphicDead(data);
     this._imgScenes = data.ChangeGraphicScenes;
   }
+};
+
+Game_Actor.prototype.getBattleStyleOpacity = function() {
+  return Imported.NUUN_ActorPicture && params.OnActorPictureEX ? this._actorGraphicOpacity : this._battleStyleGraphicOpacity;
 };
 
 Game_Actor.prototype.getBattleStyleImg = function(data) {
@@ -411,6 +414,8 @@ Game_Actor.prototype.battleStyleMatchChangeGraphic = function(data) {
       return true;
     case 'death' :
       return this.isDead();
+    case 'command' :
+      return this.isInputting();
     case 'dying' :
       return this.isDying();
     case 'damage' :
@@ -2187,7 +2192,6 @@ Sprite_ActorImges.prototype.setup = function(battler, data, index, stateSprite) 
     this._stateSprite.anchor.y = 0.5;
     this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
     this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
-    
   }
 };
 
@@ -2370,37 +2374,55 @@ Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
   }
   this.updateAnimation();
   if (this._imgScenes === 'chant' && !actor.isChanting()) {
-    actor.resetBattleStyleImgId();
+    this.resetBattleStyleImg(actor);
   } else if (actor.isBSActionActorImg()) {
     if (!actor.isActing()) {
       actor.setBSActionActorImg(null);
-      actor.resetBattleStyleImgId();
+      this.resetBattleStyleImg(actor);
     }
   } else if (this._updateCount === 0) {
-    actor.resetBattleStyleImgId();
+    this.resetBattleStyleImg(actor);
   }
+};
+
+Sprite_ActorImges.prototype.resetBattleStyleImg = function(actor) {
+  if (Imported.NUUN_ActorPicture && params.OnActorPictureEX) {
+    actor.imgRefresh();
+  }
+  actor.resetBattleStyleImgId();
 };
 
 Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
   this.bitmap = bitmap;
   if (actor.faceMode) {
     this.faceRefresh(actor.getBSImgIndex());
+  } else {
+    this.imgFrameRefresh()
   }
+  this.opacity = actor.getBattleStyleOpacity() || 255;
+  this._actorImgesOpacity = this.opacity;
 };
 
 Sprite_ActorImges.prototype.updateAnimation = function(){
   if (this._updateCount > 0) {
     this._updateCount--;
     if(this._durationOpacity > 0){
-      this.opacity -= 255 / this.setDeadDuration();
+      this.opacity -= this.getFadeoutOpacity() / this.setDeadDuration();
       this.opacity = Math.max(this.opacity, 0);
       this._durationOpacity = this.opacity;
     } else if (this._durationOpacity < 0) {
-      this.opacity += 255 / this.setDeadDuration();
-      this.opacity = Math.min(this.opacity, 255);
-      this._durationOpacity = this.opacity - 255;
+      this.opacity += this.getFadeoutOpacity() / this.setDeadDuration();
+      this.opacity = Math.min(this.opacity, this.getFadeoutOpacity());
+      this._durationOpacity = this.opacity - this.getFadeoutOpacity();
     }
   }
+};
+
+Sprite_ActorImges.prototype.getFadeoutOpacity = function() {
+  if (!this._actorImgesOpacity) {
+      this._actorImgesOpacity = this.opacity;
+  }
+  return this._actorImgesOpacity;
 };
 
 Sprite_ActorImges.prototype.getImgScenes = function(actor) {
@@ -2418,19 +2440,31 @@ Sprite_ActorImges.prototype.faceRefresh = function(faceIndex) {
   this._imgIndex = faceIndex;
 };
 
+Sprite_ActorImges.prototype.imgFrameRefresh = function() {//画像を切り替えるリセットされるため再設定
+  const scale = this._data.Actor_Scale / 100;
+  if (params.Img_SW > 0 || params.Img_SH > 0) {
+    const oriScale = 1 / scale;
+      const sw = (params.Img_SW || Infinity) * oriScale;
+      const sh = (params.Img_SH || Infinity) * oriScale;
+      const sx = (this._data.Img_SX || 0) * oriScale + (this._data.ActorImgHPosition === 'center' ? (this.bitmap.width - sw) / 2 : 0);
+      const sy = (this._data.Img_SY || 0) * oriScale;
+      this.setFrame(sx, sy, sw, sh);
+  }
+};
+
 Sprite_ActorImges.prototype.setDeadUpdateCount = function() {
   if (!params.ImgDeathHide || this.isActorGraphicDead()) {
     this._updateCount = 1;
   } else {
     this._updateCount = this.setDeadDuration();
-    this._durationOpacity = 255;
+    this._durationOpacity = this.getFadeoutOpacity();
   }
   this.setActorDead(true);
 };
 
 Sprite_ActorImges.prototype.setReviveUpdateCount = function(){
   this._updateCount = this.setDeadDuration();
-  this._durationOpacity = -255;
+  this._durationOpacity = this.getFadeoutOpacity() * -1;
   this.setActorDead(false);
 };
 

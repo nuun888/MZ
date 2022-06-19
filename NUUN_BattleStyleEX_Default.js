@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.4.1
+ * @version 1.5.0
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -49,6 +49,9 @@
  * 別途バトルスタイル拡張疑似３Dバトル併用パッチを導入してください。
  * 
  * 更新履歴
+ * 2022/6/19 Ver.1.5.0
+ * アクター画像条件にコマンド選択時を追加。
+ * アクター画像条件に不透明度を指定できる機能を追加。
  * 2022/6/18 Ver.1.4.1
  * アニメーションの表示をステータスの背後、ダメージポップアップをステータスの前面に表示するように変更。
  * 2022/6/15 Ver.1.4.0
@@ -1922,6 +1925,14 @@
  * @default -1
  * @min -1
  * 
+ * @param Opacity
+ * @text 画像不透明度
+ * @desc 画像の不透明度を指定します。
+ * @type number
+ * @default 255
+ * @min 0
+ * @max 255
+ * 
  * @param AllMatch
  * @text 全条件一致
  * @default ------------------------------
@@ -1952,6 +1963,8 @@
  * @value 'victory'
  * @option 被ステート(3)
  * @value 'state'
+ * @option コマンド選択時
+ * @value 'command'
  * @default 'default'
  * @parent AllMatch
  * 

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.5.0
+ * @version 1.5.1
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -49,6 +49,8 @@
  * 別途バトルスタイル拡張疑似３Dバトル併用パッチを導入してください。
  * 
  * 更新履歴
+ * 2022/6/24 Ver.1.5.1
+ * 新規、更新後にアクターの画像がおかしくなる問題を修正。
  * 2022/6/19 Ver.1.5.0
  * アクター画像条件にコマンド選択時を追加。
  * アクター画像条件に不透明度を指定できる機能を追加。
@@ -702,7 +704,7 @@
  * @param DefaultActorImgData
  * @text デフォルトアクター画像設定
  * @desc デフォルトのアクター画像の設定を行います。
- * @default {"ActorImgMode":"'face'","Actor_X":"0","Actor_Y":"0","Img_SX":"0","Img_SY":"0","Actor_Scale":"100"}
+ * @default {"ActorImgMode":"'face'","Actor_X":"0","Actor_Y":"0","Img_SX":"0","Img_SY":"0","Actor_Scale":"100","ActorImgHPosition":"'left'","ActorImgVPosition":"'top'","ActorStateAnimationPosition":"------------------------------","ActorState_X":"0","ActorState_Y":"0"}
  * @type struct<ActorImgList>
  * @parent ActorSetting
  * 
@@ -1862,7 +1864,7 @@
  * @param ActorImgSetting
  * @text アクター画像座標拡大率設定
  * @desc アクター画像の座標、拡大率の設定を行います。空白の場合はデフォルトアクター画像設定の値が設定されます。
- * @default {"ActorImgMode":"'face'","Actor_X":"0","Actor_Y":"0","Img_SX":"0","Img_SY":"0","Actor_Scale":"100"}
+ * @default {"ActorImgMode":"'face'","Actor_X":"0","Actor_Y":"0","Img_SX":"0","Img_SY":"0","Actor_Scale":"100","ActorImgHPosition":"'left'","ActorImgVPosition":"'top'","ActorStateAnimationPosition":"------------------------------","ActorState_X":"0","ActorState_Y":"0"}
  * @type struct<ActorImgList>
  * @parent ActorImges
  * 

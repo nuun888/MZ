@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.4.1
+ * @version 3.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,11 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/6/24 Ver.3.5.1
+ * 立ち絵切り替えの画像設定でデフォルトの画像を設定しなかったときにリスト0番の画像が切り替わらない問題を修正。
+ * アクターのアニメーションをOFFにして敵から攻撃を受けるとエラーが出る問題を修正。
+ * スタンダードでアクターの画像位置がおかしくなる問題を修正。
+ * 競合対策。
  * 2022/6/19 Ver.3.5.0
  * 画像切り替え時に座標がリセットされてしまう問題を修正。
  * 2022/6/18 Ver.3.4.1
@@ -135,11 +140,39 @@ function getActorPositionData(actorId) {
 function getActorImgData(actorId) {
   const find = getActorData(actorId);
   if (find) {
+      find.ActorImgSetting.ActorImgHPosition = getUndefinedHPosition(find.ActorImgSetting.ActorImgHPosition);
+      find.ActorImgSetting.ActorImgVPosition = getUndefinedHPosition(find.ActorImgSetting.ActorImgVPosition);
       return find.ActorImgSetting;
   } else {
+      params.DefaultActorImgData.ActorImgHPosition = getUndefinedHPosition(params.DefaultActorImgData.ActorImgHPosition);
+      params.DefaultActorImgData.ActorImgVPosition = getUndefinedVPosition(params.DefaultActorImgData.ActorImgVPosition);
       return params.DefaultActorImgData;
   }
 };
+
+function getUndefinedHPosition(data) {
+  if (data) {
+    return data;
+  } else if (params.bsMode = 'Default') {
+    return 'left'
+  } else if (params.bsMode = 'Standard') {
+    return 'left'
+  } else if (params.bsMode = 'XP') {
+    return 'center'
+  }
+}
+
+function getUndefinedVPosition(data) {
+  if (data) {
+    return data;
+  } else if (params.bsMode = 'Default') {
+    return 'top'
+  } else if (params.bsMode = 'Standard') {
+    return 'under'
+  } else if (params.bsMode = 'XP') {
+    return 'under'
+  }
+}
 
 function getActorWindowCenter() {
   return (Graphics.width - getActorWindowOrgWidth()) / 2;
@@ -322,7 +355,7 @@ Game_Actor.prototype.actorPictureActorGraphicData = function(imgData) {
     this._battleStyleImgIndex = -1;
   } else {
     this._battleStyleGraphicName = this.getActorGraphicFace();
-    this._battleStyleGraphicIndex = Math.max(this._actorGraphicIndex, 0);
+    this._battleStyleGraphicIndex = this._actorGraphicIndex >= 0 ? this._actorGraphicIndex : 9999;
     this._battleStyleImgIndex = this.getActorGraphicFaceIndex();
   }
   const data = this.getActorGraphicData();
@@ -1352,7 +1385,7 @@ Window_BattleStatus.prototype.faceRect = function(index) {//再定義
     if (params.bsMode === "Standard") {
       height = params.FaceHeight > 0 ? Math.min(params.FaceHeight, ImageManager.faceHeight) : ImageManager.faceHeight;
       rect.height = params.FaceHeightOnWindow ? Math.min(rect.height, height) : height;
-      rect.x -= Math.floor((rect.width / 2) - (ImageManager.faceWidth / 2));
+      //rect.x -= Math.floor((rect.width / 2) - (ImageManager.faceWidth / 2));
     } else if (params.bsMode === "Type4") {
       height = params.FaceHeight > 0 ? Math.min(params.FaceHeight, ImageManager.faceHeight) : ImageManager.faceHeight;
       rect.height = params.FaceHeightOnWindow ? Math.min(rect.height, height) : height;
@@ -2343,7 +2376,7 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
       this.setDeadUpdateCount();
     } else if (actor.isAlive() && this.isDead()) {
       this.setReviveUpdateCount();
-    } else if (actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
+    } else if (actor.isAlive() && actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
       if (actor.onImgId === 1 || actor.onImgId === 2) {
         this._updateCount = this.setDamageDuration();
       } else if (actor.onImgId === 20) {
@@ -2399,8 +2432,10 @@ Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
   } else {
     this.imgFrameRefresh()
   }
-  this.opacity = actor.getBattleStyleOpacity() || 255;
-  this._actorImgesOpacity = this.opacity;
+  if (!this.isDead() && this._updateCount === 0) {
+    this.opacity = actor.getBattleStyleOpacity() || 255;
+    this._actorImgesOpacity = this.opacity;
+  }
 };
 
 Sprite_ActorImges.prototype.updateAnimation = function(){
@@ -2725,7 +2760,7 @@ Spriteset_Battle.prototype.findTargetSprite = function(target) {
 };
 
 Spriteset_Battle.prototype.animationTarget = function(targetSprites){
-  if(!$gameSystem.isSideView() && targetSprites.viewFrontActor) {
+  if(!$gameSystem.isSideView() && params.ActorEffectShow && targetSprites.viewFrontActor) {
     return !!targetSprites._battler.isActor();
   }
   return false;

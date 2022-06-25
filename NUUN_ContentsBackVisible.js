@@ -35,12 +35,6 @@
  * @type boolean
  * @default true
  * 
- * @param ItemHeightAdjust
- * @text 縦表示間隔調整
- * @desc コンテンツ背景非表示に項目ごとの立幅を調整します。
- * @type boolean
- * @default true
- * 
  * @param BackVisibleClass
  * @text コンテンツ背景クラス設定
  * @desc コンテンツ背景の表示をさせない(コンテンツ背景非表示ON)、させる(コンテンツ背景非表示OFF)クラスを指定します。リストにないクラスの場合、直接記入してください。(複数指定可)
@@ -85,8 +79,8 @@ Imported.NUUN_ContentsBackVisible = true;
 const parameters = PluginManager.parameters('NUUN_ContentsBackVisible');
 const BackVisibleClass = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackVisibleClass'])) : null) || [];
 const BackVisible = eval(parameters['BackVisible'] || 'true');
-const ItemHeightAdjust = eval(parameters['ItemHeightAdjust'] || 'true');
-
+//const ItemHeightAdjust = eval(parameters['ItemHeightAdjust'] || 'true');
+const ItemHeightAdjust = false;
 
 function getContentsBackClass(thisClass) {
     return BackVisibleClass.some(_calss => _calss === thisClass);
@@ -132,6 +126,19 @@ Window_NameInput.prototype.itemRect = function(index) {
         rect.height += this.rowSpacing();
     }
     return rect;
+};
+
+
+const _Scene_Base_calcWindowHeight = Scene_Base.prototype.calcWindowHeight;
+Scene_Base.prototype.calcWindowHeight = function(numLines, selectable) {
+    if ()
+
+
+    if (selectable) {
+        return Window_Selectable.prototype.fittingHeight(numLines);
+    } else {
+        return Window_Base.prototype.fittingHeight(numLines);
+    }
 };
 
 })();

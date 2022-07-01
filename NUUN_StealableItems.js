@@ -8,9 +8,9 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc 盗みスキル
+ * @plugindesc 盗みスキル、アイテム
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -106,6 +106,8 @@
  * 
  * 
  * 更新履歴
+ * 2022/7/2 Ver 1.4.1
+ * リザルトに盗んだアイテムを表示するための処理を追加。
  * 2022/6/14 Ver 1.4.0
  * ポップアップに対応。(要NUUN_popUp)
  * 使用していなかったプラグインパラメータを削除。
@@ -678,6 +680,7 @@ Game_Enemy.prototype.makeStealItems = function(rate) {
 			}
 			$gameSystem._stealIndex = i;
 			$gameSystem.onBattleSteal();
+			$gameTroop.stealItems.push(r);
 			return r;
 		}
 		i++;
@@ -695,6 +698,7 @@ Game_Enemy.prototype.makeStealGold = function(rate) {
 				this._stealItems[i] = {dataId: 1, denominator: 1, kind: 0};
 			}
 			$gameSystem.onBattleStealGold();
+			$gameTroop.stealItems.push({money:r});
 			return r;
 		}
 		i++;
@@ -786,6 +790,17 @@ Game_Enemy.prototype.stealObject = function(kind, dataId) {
 	} else {
     return null;
   }
+};
+
+
+const _Game_Troop_clear = Game_Troop.prototype.clear
+Game_Troop.prototype.clear = function() {
+	_Game_Troop_clear.call(this);
+    this.stealItems = [];
+};
+
+Game_Troop.prototype.getStealItems = function() {
+    return this.stealItems;
 };
 
 

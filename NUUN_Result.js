@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.14.6
+ * @version 1.15.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -78,6 +78,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/2 Ver.1.15.0
+ * 盗んだアイテムを表示する機能を追加。
+ * EXPゲージがはみ出る問題を修正。
+ * 獲得経験値ゲージX座標の仕様変更。(下限0)
  * 2022/5/12 Ver.1.14.6
  * レベルアップ画面表示時戦闘結果テキストを空白指定しなときに何も表示しないように変更。
  * 2022/5/3 Ver.1.14.5
@@ -729,6 +733,13 @@
  * @desc 獲得経験値を表示します。
  * @parent ExpSetting
  * 
+ * @param Gauge_Width
+ * @desc EXPゲージ横幅(0で300)
+ * @text EXPゲージ横幅
+ * @type number
+ * @default 0
+ * @parent ExpSetting
+ * 
  * @param EXP_Y
  * @desc 獲得経験値のY座標（デフォルト:30）
  * @text 獲得経験値Y座標
@@ -738,11 +749,11 @@
  * @parent ExpSetting
  * 
  * @param EXPGauge_X
- * @desc 獲得経験値ゲージのX座標（デフォルト:-30）
+ * @desc 獲得経験値ゲージのX座標
  * @text 獲得経験値ゲージX座標
  * @type number
- * @default -30
- * @min -999
+ * @default 0
+ * @min 0
  * @parent ExpSetting
  * 
  * @param EXPGauge_Y
@@ -818,6 +829,13 @@
  * @default ------------------------------
  * @parent GetPage
  * 
+ * @param DropItemRows
+ * @desc ドロップアイテムの表示行（0で下まで）
+ * @text ドロップアイテム表示行
+ * @type number
+ * @default 0
+ * @parent DropItemSetting
+ * 
  * @param DropItemNumVisible
  * @type boolean
  * @default false
@@ -831,6 +849,32 @@
  * @type string
  * @default x 
  * @parent DropItemSetting
+ * 
+ * @param StealItemSetting
+ * @text 盗みアイテム設定（要NUUN_StealableItems）
+ * @default ------------------------------
+ * @parent GetPage
+ * 
+ * @param StealItemVisible
+ * @type boolean
+ * @default false
+ * @text 盗んだアイテム表示
+ * @desc 盗んだアイテムを表示します。
+ * @parent StealItemSetting
+ * 
+ * @param StealItemNumVisible
+ * @type boolean
+ * @default false
+ * @text 盗んだアイテム個数表示
+ * @desc 盗んだアイテムを個数表示します。OFFで個別表示
+ * @parent StealItemSetting
+ * 
+ * @param StealItemNumx
+ * @desc 盗んだアイテムの個数左の文字
+ * @text 個数左の文字
+ * @type string
+ * @default x 
+ * @parent StealItemSetting
  * 
  * @param LevelUpPage
  * @text レベルアップ画面設定
@@ -1015,6 +1059,13 @@
  * @desc 習得スキルの名称を設定します。
  * @type string
  * @default 習得スキル
+ * @parent NameSetting
+ * 
+ * @param GetStealItemName
+ * @text 盗んだアイテムの名称
+ * @desc 盗んだアイテムの名称を設定します。（要NUUN_StealableItems）
+ * @type string
+ * @default 盗んだアイテム
  * @parent NameSetting
  * 
  * @param SESetting
@@ -1358,9 +1409,8 @@ param.ButlerActors = param.ButlerActors || [];
 param.ActorBackGroundImg = param.ActorBackGroundImg && param.ActorBackGroundImg.length > 0 ? param.ActorBackGroundImg[0] : null;
 param.PartyBackGroundImg = param.PartyBackGroundImg && param.PartyBackGroundImg.length > 0 ? param.PartyBackGroundImg[0] : null;
 const LevelUpActorSeData = param.LevelUpActorSe ? {name: param.LevelUpActorSe, volume: param.LevelUpActorVolume, pitch: param.LevelUpActorPitch, pan: param.LevelUpActorPan} : null;
-let gaugeWidth = 300;
-//ウィンドウオープン時はゲージの更新処理をしないようにする
-//フェードイン時間を指定できるようにする
+let gaugeWidth = param.Gauge_Width > 0 ? param.Gauge_Width : 300;
+param.EXPGauge_X = Math.max(param.EXPGauge_X, 0);
 
 const pluginName = "NUUN_Result";
 
@@ -1515,7 +1565,7 @@ Scene_Battle.prototype.resultActorImgWindowRect = function() {
   return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_Battle.prototype.createResultHelpWindow = function() {//ResultVisible
+Scene_Battle.prototype.createResultHelpWindow = function() {
   const rect = this.resultHelpWindowRect();
   this._resultHelpWindow = new Window_ResultHelp(rect);
   this._resultHelpWindow.hide();
@@ -2158,7 +2208,7 @@ Window_Result.prototype.refresh = function() {
   const width = Math.floor(contentWidth / param.ActorCols);
   const faceArea = rect.x + this.actorAreaWidth(scale);
   const x2 = rect.x + width;
-  gaugeWidth = width - faceArea - 30;
+  gaugeWidth = Math.min(gaugeWidth, width - (faceArea + param.EXPGauge_X + 30));
   for (let i = 0; this.actorMembers() > i; i++) {
     this._actor = this.actor(i);
     this._actor._learnSkill = [];
@@ -2179,7 +2229,7 @@ Window_Result.prototype.refresh = function() {
     } else if (param.LavelUpPosition === 10) {
       this.drawLevelUp(x + param.LevelUp_X , y + param.LevelUp_Y, width, param.ResultActorVisible);
     }
-    this.drawExpGauge(x + width - gaugeWidth + param.EXPGauge_X, y + param.EXP_Y + param.EXPGauge_Y, param.ResultActorVisible);
+    this.drawExpGauge(x + faceArea + param.EXPGauge_X, y + param.EXP_Y + param.EXPGauge_Y, param.ResultActorVisible);
     this.drawGetEXP(x + faceArea, y + param.EXP_Y, width, param.ResultActorVisible);
   }
   this.drawGainList(rect.x + contentWidth, rect.y, rect.width - contentWidth);
@@ -2371,6 +2421,18 @@ Window_Result.prototype.drawLevelUp = function(x, y, width, mode) {
 
 Window_Result.prototype.drawGetItems = function(x, y, width) {
   const items = BattleManager._rewards.items;
+  const lineHeight = this.lineHeight();
+  this.drawText(param.GetItemName, x, y, width, "left");
+  if (items) {
+    for (let i = 0; items.length > i; i++) {
+      let y2 = y + lineHeight * (i + 1);
+      this.drawItemName(items[i], x, y2, width);
+    }
+  }
+};
+
+Window_Result.prototype.drawGetStealItems = function(x, y, width) {
+  const items = BattleManager._rewards.stealItems;
   const lineHeight = this.lineHeight();
   this.drawText(param.GetItemName, x, y, width, "left");
   if (items) {
@@ -2780,10 +2842,16 @@ Window_ResultDropItem.prototype.initialize = function(rect) {
   this.openness = 0;
   this.page = 0;
   this.maxPage = 0;
-  this.dropItemRows = Math.floor((this.innerHeight - this.lineHeight() * (this.gainParamLength() + 1)) / this.lineHeight());
+  this.dropItemRows = param.DropItemRows > 0 ? param.DropItemRows : this.getDropItemRows();
+  this.dropStealItemRows = this.getDropItemRows() - this.dropItemRows - 1;
   this.opacity = 0;
   this.frameVisible = false;
   this.dropList = [];
+  this.stealList = [];
+};
+
+Window_ResultDropItem.prototype.getDropItemRows = function() {
+  return Math.floor((this.innerHeight - this.lineHeight() * (this.gainParamLength() + 1)) / this.lineHeight());
 };
 
 Window_ResultDropItem.prototype.actorContentWidth = function(rect) {
@@ -2799,7 +2867,19 @@ Window_ResultDropItem.prototype.setWindowResult = function(windowResult) {
 };
 
 Window_ResultDropItem.prototype.maxPages = function() {
+  if (param.StealItemVisible && Imported.NUUN_StealableItems) {
+    return Math.max(this.maxDropPages(), this.maxStealPages());
+  } else {
+    return this.maxDropPages();
+  }
+};
+
+Window_ResultDropItem.prototype.maxDropPages = function() {
   return Math.ceil(this.dropList.length / this.dropItemRows);
+};
+
+Window_ResultDropItem.prototype.maxStealPages = function() {
+  return Math.ceil(this.stealList.length / this.dropStealItemRows);
 };
 
 Window_ResultDropItem.prototype.refresh = function() {
@@ -2810,18 +2890,22 @@ Window_ResultDropItem.prototype.refresh = function() {
   const itemPadding = this.itemPadding();
   const width = this.actorContentWidth(rect);
   this.drawGetItems(rect.x + width, rect.y, rect.width - width - rect.x);
+  if (param.StealItemVisible && Imported.NUUN_StealableItems) {
+    this.getItemStealList();
+    this.drawGetStealItems(rect.x + width, rect.y + lineHeight * (this.dropItemRows + 1), rect.width - width - rect.x);
+  }
 };
 
 Window_ResultDropItem.prototype.drawGetItems = function(x, y, width) {
   const items = this.dropList;
   const lineHeight = this.lineHeight();
-  const maxPage = this.maxPages();
+  const maxPage = this.maxDropPages();
   y += this.gainParamLength() * lineHeight + param.DropItem_Y;
   this.changeTextColor(ColorManager.systemColor());
   this.drawText(param.GetItemName, x, y, width - 48, "left");
   this.resetTextColor();
-  if (items) {
-    const index = this.dropItemRows * this.page;
+  if (items.length > 0) {
+    const index = this.dropItemRows * Math.min(this.page, maxPage - 1);
     const maxItems = Math.min(this.dropItemRows, items.length - index);
     if (maxPage > 1) {
       this.drawText(this.page + 1 +"/"+maxPage, x, y, width, "right");
@@ -2833,9 +2917,46 @@ Window_ResultDropItem.prototype.drawGetItems = function(x, y, width) {
         const num = String(param.DropItemNumx + items[i + index].num);
         const textWidth = this.textWidth(num) + this.itemPadding();
         this.drawItemName(items[i + index].item, x, y2, width - textWidth);
-        this.drawText(String(param.DropItemNumx + items[i + index].num), x + textWidth, y2, width - textWidth, 'right');
+        this.drawText(num, x + textWidth, y2, width - textWidth, 'right');
       } else {
         this.drawItemName(items[i + index].item, x, y2, width);
+      }
+    }
+  }
+};
+
+Window_ResultDropItem.prototype.drawGetStealItems = function(x, y, width) {
+  const items = this.stealList;
+  const lineHeight = this.lineHeight();
+  const maxPage = this.maxStealPages();
+  y += this.gainParamLength() * lineHeight + param.DropItem_Y;
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(param.GetStealItemName, x, y, width - 48, "left");
+  this.resetTextColor();
+  if (items.length > 0) {
+    const index = this.dropStealItemRows * Math.min(this.page, maxPage - 1);
+    const maxItems = Math.min(this.dropStealItemRows, items.length - index);
+    if (maxPage > 1) {
+      this.drawText(this.page + 1 +"/"+maxPage, x, y, width, "right");
+    }
+    for (let i = 0; maxItems > i; i++) {
+      let y2 = y + lineHeight * (i + 1);
+      this.resetTextColor();
+      if (param.StealItemNumVisible) {
+        if (items[i + index].type === 'gold') {
+          this.drawCurrencyValue(items[i + index].item, TextManager.currencyUnit, x, y2, width);
+        } else {
+          const num = String(param.StealItemNumx + items[i + index].num);
+          const textWidth = this.textWidth(num) + this.itemPadding();
+          this.drawItemName(items[i + index].item, x, y2, width - textWidth);
+          this.drawText(num, x + textWidth, y2, width - textWidth, 'right');
+        }
+      } else {
+        if (items[i + index].type === 'gold') {
+          this.drawCurrencyValue(items[i + index].item, TextManager.currencyUnit, x, y2, width);
+        } else {
+          this.drawItemName(items[i + index].item, x, y2, width);
+        }
       }
     }
   }
@@ -2855,11 +2976,43 @@ Window_ResultDropItem.prototype.getItemDropList = function() {
   this.dropList = dropList;
 };
 
+Window_ResultDropItem.prototype.getItemStealList = function() {
+  const steal = BattleManager._rewards.stealItems;
+  const stealList = [];
+  steal.forEach(item => {
+    if (item.money) {
+      const index = stealList.findIndex(sitem => sitem.type === 'gold');
+      if (param.StealItemNumVisible && index >= 0) {
+        stealList[index].item += item.money;
+      } else {
+        stealList.push({item: item.money, type:'gold'});
+      }
+    } else {
+      const index = stealList.findIndex(sitem => item.id === sitem.item.id);
+      if (param.StealItemNumVisible && index >= 0) {
+        stealList[index].num++;
+      } else {
+        stealList.push({item: item, num: 1, type:'item'});
+      }
+    }
+  });
+  this.stealList = stealList;
+};
+
 Window_ResultDropItem.prototype.drawItemName = function(item, x, y, width) {
   if (Imported.NUUN_ItemNameColor && item.meta.ResultItemColor) {
     this.nameColor = ColorManager.textColor(Number(item.meta.ResultItemColor))
   }
   Window_Base.prototype.drawItemName.call(this, item, x, y, width);
+};
+
+Window_ResultDropItem.prototype.drawCurrencyValue = function(value, unit, x, y, width) {
+  const unitWidth = Math.min(80, this.textWidth(unit));
+  const valueWidth = this.textWidth(value);
+  this.resetTextColor();
+  this.drawText(value, x, y, width - unitWidth - 6, "left");
+  this.changeTextColor(ColorManager.systemColor());
+  this.drawText(unit, x + valueWidth, y, unitWidth, "left");
 };
 
 
@@ -3258,6 +3411,9 @@ const _BattleManager_makeRewards = BattleManager.makeRewards;
 BattleManager.makeRewards = function() {
   if (!this._victoryStart) {
     _BattleManager_makeRewards.call(this);
+    if (param.StealItemVisible && Imported.NUUN_StealableItems) {
+      this._rewards.stealItems = $gameTroop.getStealItems();
+    }
   }
 };
 

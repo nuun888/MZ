@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.1.14.6
+# Ver.1.15.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 
 ## 必須、前提プラグイン
@@ -35,6 +35,10 @@
 ←→　ドロップアイテム、習得スキルページ切り替え  
 
 ## 更新履歴
+2022/7/2 Ver.1.15.0  
+盗んだアイテムを表示する機能を追加。  
+EXPゲージがはみ出る問題を修正。  
+獲得経験値ゲージX座標の仕様変更。(下限0)  
 2022/5/12 Ver.1.14.6  
 レベルアップ画面表示時戦闘結果テキストを空白指定しなときに何も表示しないように変更。  
 2022/5/3 Ver.1.14.5  

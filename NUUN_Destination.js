@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面行動目標表示
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/2 Ver.1.0.1
+ * プラグインパラメータの説明が異なる説明のため修正。
  * 2022/6/4 Ver.1.0.0
  * 初版
  * 
@@ -39,8 +41,8 @@
  * 
  * 
  * @param DestinationList
- * @text デフォルトステータス座標表示設定
- * @desc デフォルトのステータスの座標、表示設定の設定を行います。
+ * @text 行動目標テキスト設定
+ * @desc 行動目標テキストの設定を行います。
  * @default []
  * @type struct<Destination>[]
  * 

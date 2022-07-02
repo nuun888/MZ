@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/2 Ver.1.3.1
+ * メンバー交代後ステートアイコンが残ってしまう問題を修正。
  * 2022/4/9 Ver.1.3.0
  * 表示アイコンの行を指定できる機能を追加。
  * 処理の軽量化。
@@ -300,9 +302,11 @@ Sprite_StateIcon.prototype.stateIconDisplayAlign = function(iconlength, align) {
 Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
   let displayIcons = [];
   let displayTurn = [];
-  displayIcons = icons.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
-  displayTurn = turns.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
-    this._iconSprite.forEach((sprite, r) => {
+  if (icons.length > 0) {
+    displayIcons = icons.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
+    displayTurn = turns.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
+  }
+  this._iconSprite.forEach((sprite, r) => {
     if (displayIcons[r]) {
       sprite._iconIndex = displayIcons[r];
       sprite._stateTurn = displayTurn[r];
@@ -310,6 +314,9 @@ Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
     } else {
       sprite._iconIndex = 0;
       sprite._stateTurn = 0;
+      if (sprite.visible) {
+        this.setFrameIcon(sprite);
+      }
       sprite.visible = false;
     }
   });
@@ -334,11 +341,11 @@ Sprite_StateIcon.prototype.updateIcon = function() {//再定義
           this._animationIndex = 0;
       }
       this._iconIndex = icons.length;
-      this.visible = true;
+      this.visible = this._battler.isBattleMember();
   } else {
       this._animationIndex = 0;
       this._iconIndex = 0;
-      this.visible = false;
+      this.visible = false;//疑似3Dバトル競合対策
   }
 };
 
@@ -453,7 +460,7 @@ Game_BattlerBase.prototype.nuun_stateTurns = function() {
     if (state.iconIndex > 0) {
       const turn = [this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)];
       Array.prototype.push.apply(r, turn);
-    } 
+    }
     return r;
   }, []);
 };

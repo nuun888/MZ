@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.5.1
+ * @version 3.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/7/2 Ver.3.5.2
+ * TPBバトルでパーティコマンドが表示されず進行不能になる問題を修正。
+ * 顔グラの行動時エフェクト時に座標がずれる問題を修正。
+ * メンバー交代時にステートエフェクトが残ってしまう問題を修正。
  * 2022/6/24 Ver.3.5.1
  * 立ち絵切り替えの画像設定でデフォルトの画像を設定しなかったときにリスト0番の画像が切り替わらない問題を修正。
  * アクターのアニメーションをOFFにして敵から攻撃を受けるとエラーが出る問題を修正。
@@ -266,6 +270,13 @@ BattleManager.getDisplayMessageType = function() {
 };
 
 //Game_Temp
+const _Game_Temp_initialize = Game_Temp.prototype.initialize;
+Game_Temp.prototype.initialize = function() {
+  _Game_Temp_initialize.call(this);
+  this._battleStyleRefresh = false;
+  this.onBSAction = false;
+};
+
 Game_Temp.prototype.setBattleStyleRefresh = function(flag) {
     this._battleStyleRefresh = flag;
 };
@@ -1169,6 +1180,13 @@ Scene_Battle.prototype.commandItem = function() {
   this._statusWindow.show();
 };
 
+const _Scene_Battle_selectNextCommand = Scene_Battle.prototype.selectNextCommand;
+Scene_Battle.prototype.selectNextCommand = function() {
+  _Scene_Battle_selectNextCommand.call(this);
+  $gameTemp.onBSAction = false;
+};
+
+
 //Window_Base
 Window_Base.prototype.setBSBackground = function(background) {
   this._bsBackground = background;
@@ -1906,7 +1924,7 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
   const sx = Math.floor((imgIndex % 4) * pw + (pw - sw) / 2);
   const sy = Math.floor(Math.floor(imgIndex / 4) * ph + (ph - sh) / 2);
   sprite.setFrame(sx, sy, sw, sh);
-  sprite._rectWidth = rect.width;
+  sprite._rectWidth = pw;//rect.width;
   sprite._rectHeight = rect.height;
   sprite.show();
   BattleManager.battlerSprite[index] = sprite;
@@ -2242,14 +2260,24 @@ Sprite_ActorImges.prototype.update = function() {
     this.updateMotion();
     this.updateSelectionEffect();
   } else {
+    this._stateSprite = null;
     this.bitmap = null;
   }
 };
 
+Sprite_ActorImges.prototype.refreshStateOverlay = function() {
+  if (this._stateSprite && getStateAnimationShow()) {
+    this._stateSprite.visible = this.visible;
+    this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
+    this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
+  }
+};
+
 Sprite_ActorImges.prototype.updateMotion = function() {
+  this.refreshStateOverlay();
   this.setupEffect();
   this.updateDamage();
-  this.updateZoom()
+  this.updateZoom();
 };
 
 Sprite_ActorImges.prototype.setupEffect = function() {
@@ -2749,7 +2777,6 @@ Spriteset_Base.prototype.animationShouldMirror = function(target) {
 const _Spriteset_Battle_initialize = Spriteset_Battle.prototype.initialize;
 Spriteset_Battle.prototype.initialize = function() {
   _Spriteset_Battle_initialize.call(this);
-  
 };
 
 const _Spriteset_Battle_findTargetSprite = Spriteset_Battle.prototype.findTargetSprite;

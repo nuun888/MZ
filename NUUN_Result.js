@@ -9,11 +9,11 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  リザルト
+ * @plugindesc リザルト
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.15.0
+ * @version 1.15.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -47,7 +47,7 @@
  * 
  * アクターの参照変数（レベルアップ画面の独自パラメータ）
  * actor アクターのデータベースデータ　メタデータを取得する場合はこちらから
- * this._actor アクターのゲームデータ
+ * this._actorまたはdactor アクターのゲームデータ
  * 
  * アイテム、スキルのメモ欄
  * <ResultItemColor:[カラーインデックス]> 取得したアイテム、習得したスキルの文字色に色を付けることが出来ます。
@@ -78,6 +78,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/3 Ver.1.15.1
+ * レベルアップ時の差分処理を修正。
+ * レベルアップ差分ステータスに装備補正等なしのパラメータを指定できる機能を追加。
  * 2022/7/2 Ver.1.15.0
  * 盗んだアイテムを表示する機能を追加。
  * EXPゲージがはみ出る問題を修正。
@@ -1315,6 +1318,22 @@
  * @value 6
  * @option 運
  * @value 7
+ * @option HP(装備補正等なし)
+ * @value 10
+ * @option MP(装備補正等なし)
+ * @value 11
+ * @option 攻撃力(装備補正等なし)
+ * @value 12
+ * @option 防御力(装備補正等なし)
+ * @value 13
+ * @option 魔法力(装備補正等なし)
+ * @value 14
+ * @option 魔法防御(装備補正等なし)
+ * @value 15
+ * @option 敏捷性(装備補正等なし)
+ * @value 16
+ * @option 運(装備補正等なし)
+ * @value 17
  * @option オリジナルパラメータ
  * @value 20
  * @default 0
@@ -1323,7 +1342,7 @@
  * @type boolean
  * @default true
  * @text 差分表示
- * @desc 差分を表示します。オリジナルパラメータは表示しません。
+ * @desc 差分を表示します。
  * 
  * @param OriginalParamName
  * @text オリジナルパラメータ名称
@@ -1333,7 +1352,7 @@
  * 
  * @param OriginalParamEval
  * @text オリジナルパラメータ評価式
- * @desc オリジナルパラメータの評価式を記入します。
+ * @desc オリジナルパラメータの評価式を記入します。actor:アクターのゲームデータ dactor:アクターのシステムデータ
  * @default
  * @type string
  *  
@@ -2380,8 +2399,8 @@ Window_Result.prototype.drawActorLevel = function(x, y, mode) {
     if (level > actor._level) {
       this._levelUp = true;
       BattleManager._levelUpPageEnable = BattleManager._levelUpPageEnable === undefined || BattleManager._levelUpPageEnable === null ? param.LavelUpWindowShow : BattleManager._levelUpPageEnable;
-      for (let i = 0; i < 8; i++) {
-        oldStatus[i] = actor.param(i);
+      for (const data of param.VisibleStatus) {
+        oldStatus.push(this.getVisibleStatus(actor, data, true));
       }
       oldStatus.push(actor._level);
       this._actorResultWindow.actorOldStatus.push(oldStatus);
@@ -2630,6 +2649,15 @@ Window_Result.prototype.paramName = function(params, option) {
     case 6:
     case 7:
       return TextManager.param(params);
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+      return TextManager.param(params - 10);
     case 20:
       return option;
     default:
@@ -2637,20 +2665,8 @@ Window_Result.prototype.paramName = function(params, option) {
   }
 };
 
-Window_Result.prototype.paramOld = function(params, oldStatus) {
-  switch (params) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-      return oldStatus[params];
-    default:
-      return null;
-  }
+Window_Result.prototype.paramOld = function(i, oldStatus) {
+  return oldStatus[i];
 };
 
 Window_Result.prototype.paramValue = function(params, option) {
@@ -2669,6 +2685,37 @@ Window_Result.prototype.paramValue = function(params, option) {
       return eval(option)
     default:
       return null;
+  }
+};
+
+Window_Result.prototype.getVisibleStatus = function(actor, data, mode) {
+  if (mode && !data.DifferenceVisible) {
+    return 0;
+  }
+  switch (data.StatusParamDate) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+      return actor.param(data.StatusParamDate);
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+      return actor.paramBase(data.StatusParamDate - 10);
+    case 20:
+      const dactor = actor.actor();
+      return eval(data.OriginalParamEval);
+    default:
+      return 0;
   }
 };
 
@@ -2708,7 +2755,6 @@ Window_Result.prototype.open = function() {
   if (this.isFadein() && !this.resultFadein) {
     this.resultFadein = true;
   }
-  
 };
 
 Window_Result.prototype.isFadein = function() {
@@ -2780,17 +2826,17 @@ Window_ActorResult.prototype.drawActorStatus = function(x, y, width) {
   const lineHeight = this.lineHeight() + param.StatusFontSize;
   this.contents.fontSize = $gameSystem.mainFontSize() + param.StatusFontSize;
   const oldStatus = this.actorOldStatus[BattleManager.resultPage - 1];
-  visibleStatus.forEach(status => {
+  visibleStatus.forEach((status, i) => {
     const name = this.paramName(status.StatusParamDate, status.OriginalParamName);
-    const oldValue = this.paramOld(status.StatusParamDate, oldStatus);
-    const value = this.paramValue(status.StatusParamDate, status.OriginalParamEval);
+    const oldValue = this.paramOld(i, oldStatus);
+    const value = this.getVisibleStatus(this._actor, status, false);
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(name, x, y2, width - 200);
     this.resetTextColor();
-    if (status.DifferenceVisible && oldValue) {
+    if (status.DifferenceVisible && oldValue !== 0) {
       this.drawText(oldValue, x + (width - 200), y2, 60, "left");
       this.changeTextColor(ColorManager.systemColor());
-      this.drawText("→", x + (width - 110), y2, width - 160, "left");
+      this.drawText("\u2192", x + (width - 110), y2, width - 160, "left");
       if (oldValue < value) {
         this.changeTextColor(ColorManager.textColor(param.DifferenceStatusColor));
       } else {

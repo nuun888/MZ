@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.1.15.0
+# Ver.1.15.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 
 ## 必須、前提プラグイン
@@ -35,6 +35,9 @@
 ←→　ドロップアイテム、習得スキルページ切り替え  
 
 ## 更新履歴
+2022/7/3 Ver.1.15.1  
+レベルアップ時の差分処理を修正。  
+レベルアップ差分ステータスに装備補正等なしのパラメータを指定できる機能を追加。  
 2022/7/2 Ver.1.15.0  
 盗んだアイテムを表示する機能を追加。  
 EXPゲージがはみ出る問題を修正。  

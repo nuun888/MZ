@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面デフォルトタイプ
  * @author NUUN
- * @version 1.2.3
+ * @version 1.2.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -57,6 +57,9 @@
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/7/4 Ver.1.2.4
+ * インフォのフォントサイズを各項目毎に設定できるように修正。
+ * チャプターテキストプラグイン対応による処理追加。
  * 2022/6/10 Ver.1.2.3
  * ステータス独自パラメータで名称を無記入した場合、パラメータが右にずれる問題を修正。
  * 2022/6/7 Ver.1.2.2
@@ -751,6 +754,8 @@
  * @value 10
  * @option 行動目標（要メニュー画面行動目標表示）(1)(2)(3)(4)(6)(7)(8)(11)
  * @value 11
+ * @option キャプター（要チャプターテキスト）(1)(2)(3)(4)(6)(7)(8)(11)
+ * @value 12
  * @default 0
  * 
  * @param X_Position
@@ -850,6 +855,13 @@
  * @text フリーテキストのテキスト(12)
  * @type multiline_string
  * @default
+ * 
+ * @param ContentsFontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(13)
+ * @type number
+ * @default 0
+ * @min -99
  *
  */
 /*~struct~actorImgList:
@@ -1876,8 +1888,8 @@ Window_InfoMenu.prototype.refresh = function() {
     this.contents.clear();
     const list = this.getInfoList();
     const lineHeight = this.lineHeight();
-    this.contents.fontSize = $gameSystem.mainFontSize() + this.getFontSize();
     for (const data of list) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + this.getFontSize() + (data.ContentsFontSize || 0);
         const x_Position = data.X_Position;
         const position = Math.min(x_Position, this.maxCols());
         const rect = this.itemRect(position - 1);
@@ -1916,6 +1928,9 @@ Window_InfoMenu.prototype.dateDisplay = function(data, x, y, width) {
         break;
     case 11:
         this.drawDestination(data, x, y, width);
+        break;
+    case 12:
+        this.drawChapter(data, x, y, width);
         break;
     default:
         break;
@@ -2007,6 +2022,29 @@ Window_InfoMenu.prototype.drawDestination = function(data, x, y, width) {
     }
     this.resetTextColor();
     const text = this.getDestinationList();
+    if (text) {
+        this.drawTextEx(text, x + iconWidth + textWidth, y, width - textWidth - iconWidth);
+    }
+};
+
+Window_InfoMenu.prototype.drawChapter = function(data, x, y, width) {
+    if (!Imported.NUUN_Chapter) {
+        return;
+    }
+    let iconWidth = 0;
+    let textWidth = 0;
+    if (data.InfoIcon > 0) {
+        this.drawIcon(data.InfoIcon, x, y + 2);
+        iconWidth = ImageManager.iconWidth + 6;
+    }
+    if (data.ParamName) {
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : '';
+        this.drawText(nameText, x + iconWidth, y, textWidth);
+        textWidth = this.systemWidth(data.SystemItemWidth, width);
+    }
+    this.resetTextColor();
+    const text = this.getChapter();
     if (text) {
         this.drawTextEx(text, x + iconWidth + textWidth, y, width - textWidth - iconWidth);
     }

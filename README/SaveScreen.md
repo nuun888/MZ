@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# Ver.1.8.5
+# Ver.1.9.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -43,6 +43,10 @@ info.orgParam[id - 1]
 リスト1番ならinfo.orgParam[0]  
 
 ## 更新履歴
+2022/7/4 Ver.1.9.0  
+チャプターテキスト、メニュー画面行動目標表示プラグインでのテキスト表示の処理追加。  
+コンテンツ背景をゲーム途中で変更できる機能を追加。  
+オリジナルパラメータの一部のテキストのフォントが適用されない問題を修正。  
 2022/5/28 Ver.1.8.5  
 ファイル名に座標時を指定できる機能を追加。  
 ファイル名横文字列に座標、表示横幅、文字揃えを指定できる機能を追加。  

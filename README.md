@@ -179,15 +179,17 @@
 | [アイテム図鑑](https://github.com/nuun888/MZ/blob/master/README/ItemBook.md) | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) | 共 | 1.4.3 |
 | ┗ [アイテム図鑑全セーブ共通](https://github.com/nuun888/MZ/blob/master/README/ItemBook_Global.md) | [NUUN_ItemBook_Global](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook_Global.js) |  | 1.0.0 |
 | [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共(Ver.1.4.1) 立対 レ | 2.3.7 |
-| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.8.4 |
+| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 1.9.0 |
 | セーブ上書き確認 | [NUUN_SaveVerification](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveVerification.js) |  | 1.0.0 |
 | セーブ削除 |  |  |  |
 | [所持金拡張](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.2 |
 | [メニュー画面デフォルトタイプ](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md) | [NUUN_MenuScreen_default](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js) | 共 立対 | 1.2.2 |
 | [メニュー画面タイプ１](https://github.com/nuun888/MZ/blob/master/README/MenuScreen.md) | [NUUN_MenuScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js) | 共(Ver.1.4.1以降) 立対 | 1.6.2 |
 | [メニュー画面タイプ２](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_2.md) | [NUUN_MenuScreen_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js) | 共(Ver.1.4.1以降) 立対 | 1.6.2 |
-| ┗  [メニュー画面行動目標表示](https://github.com/nuun888/MZ/blob/master/README/Destination.md) | [NUUN_Destination](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Destination.js) | 共 | 1.0.0 |
+| [メニュー画面行動目標表示](https://github.com/nuun888/MZ/blob/master/README/Destination.md) | [NUUN_Destination](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Destination.js) | 共 | 1.0.0 |
+| [チャプターテキスト](https://github.com/nuun888/MZ/blob/master/README/Chapter.md) | [NUUN_Chaptern](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Chapter.js) | 共 | 1.0.0 |
 | [ウィンドウスキン個別設定](https://github.com/nuun888/MZ/blob/master/README/WindowSkinIndividual.md) | [NUUN_WindowSkinIndividual](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_WindowSkinIndividual.js) | 共 | 1.0.0 |
+| [マルチカーソル]((https://github.com/nuun888/MZ/blob/master/README/MultiCursor.md) | [NUUN_MultiCursor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiCursor.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -233,7 +235,6 @@
 | マップ戦闘背景変更 |  |  |  |
 | 戦闘中戦闘背景変更 |  |  |  |
 | 戦闘背景座標サイズ調整 |  |  |  |
-| マルチカーソル |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 

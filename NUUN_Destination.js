@@ -8,20 +8,22 @@
  */
 /*:
  * @target MZ
- * @plugindesc メニュー画面行動目標表示
+ * @plugindesc 行動目標表示
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
- * メニュー画面に行動目標を表示します。
+ * セーブ、メニュー画面に行動目標を表示します。
  * このプラグインはメニュー画面デフォルトタイプ(NUUN_MenuScreen_default)、メニュー画面タイプ１(NUUN_MenuScreen)、メニュー画面タイプ２(NUUN_MenuScreen_2)が必要です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/4 Ver.1.0.2
+ * セーブ画面拡張の表示への処理追加。
  * 2022/7/2 Ver.1.0.1
  * プラグインパラメータの説明が異なる説明のため修正。
  * 2022/6/4 Ver.1.0.0
@@ -80,6 +82,11 @@ Imported.NUUN_Destination = true;
 
     Game_System.prototype.setDestinationId = function(index) {
         this._destinationId = index;
+    };
+
+    Game_System.prototype.getDestinationList = function() {
+        const data = DestinationList[$gameSystem.getDestinationId() - 1];
+        return data ? data.DestinationText : null;
     };
 
 })();

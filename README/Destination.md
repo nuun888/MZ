@@ -7,7 +7,7 @@
 [メニュー画面タイプ1](https://github.com/nuun888/MZ/blob/master/README/MenuScreen.md)Ver.1.6.0以降  
 [メニュー画面タイプ2](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_2.md)Ver.1.6.0以降  
 [メニュー画面デフォルトタイプ](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)Ver.1.2.0以降  
-[セーブ画面](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.9.0以降  
+[セーブ画面](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md)Ver.1.9.0以降  
 
 メニュー画面に行動目標を表示します。  
 このプラグインはメニュー画面デフォルトタイプ(NUUN_MenuScreen_default)、メニュー画面タイプ１(NUUN_MenuScreen)、メニュー画面タイプ２(NUUN_MenuScreen_2)が必要です。  

@@ -1,5 +1,5 @@
 # [マルチカーソル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiCursor.js)
-# Ver.1.1.0  
+# Ver.1.0.0  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiCursor.js)  
  
  アクターの対象選択時、複数対象のアイテム、スキルのカーソル表示を個別に表示させます。  

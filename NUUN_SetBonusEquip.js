@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
- * @version 1.1.2
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -27,11 +27,18 @@
  * 
  * セットボーナスと設定はプラグインパラメータから行います。
  * セットボーナスを適用させる装備は必ず装備元の装備も設定してください。
+ * またSetBonusタグはセットボーナスを適用する全ての武器、防具に記入してください。
+ * 
+ * 表示テキスト及び表示ボーナスパラメータテキストは別途NUUN_SetBonusWindowが必要となります。
+ * 表示テキスト例:BONUS(2SET)
+ * 表示ボーナスパラメータテキスト例：身代わり30％　※通常能力値は自動で表示されます。
  * 
  * 仕様
  * 同じセットボーナスIDの効果は重複して適用されません。
  * 
  * 更新履歴
+ * 2022/7/7 Ver.1.2.0
+ * ツールチップウィンドウ表示のための処理、プラグインパラメータ追加。
  * 2022/2/4 Ver.1.1.2
  * 処理の修正。
  * 2022/1/28 Ver.1.1.1
@@ -53,21 +60,33 @@
  * 
  * @param SetBonusName
  * @text セットボーナス名称
- * @desc セットボーナスを区別するための名称。
+ * @desc セットボーナスの名称。
  * @type string
  * @default
  * 
  * @param SetBonusWeaponData
  * @text パラメータ設定用武器ID
- * @desc セットボーナスのパラメータを設定する武器ID
+ * @desc 全て装備時のセットボーナスのパラメータを設定する武器ID
  * @type weapon
  * @default 0
  * 
  * @param SetBonusArmorData
  * @text パラメータ設定用防具ID
- * @desc セットボーナスのパラメータを設定する防具ID
+ * @desc 全て装備時のセットボーナスのパラメータを設定する防具ID
  * @type armor
  * @default 0
+ * 
+ * @param SetBonusText
+ * @text 全装備時表示テキスト
+ * @desc 全て装備時の表示するテキスト(別途表示するプラグインが必要です)
+ * @type string
+ * @default 
+ * 
+ * @param SetBonusParamText
+ * @text 全装備時表示ボーナスパラメータテキスト
+ * @desc 全て装備時の表示するボーナスパラメータテキスト(別途表示するプラグインが必要です)
+ * @type string
+ * @default 
  * 
  * @param SetBonusEquip
  * @text セットボーナス装備設定
@@ -117,6 +136,18 @@
  * @type armor
  * @default 0
  * 
+ * @param SetBonusText
+ * @text 表示テキスト
+ * @desc 表示するテキスト(別途表示するプラグインが必要です)
+ * @type string
+ * @default 
+ * 
+ * @param SetBonusParamText
+ * @text 表示ボーナスパラメータテキスト
+ * @desc 表示するボーナスパラメータテキスト(別途表示するプラグインが必要です)
+ * @type string
+ * @default 
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_SetBonusEquip = true;
@@ -127,6 +158,22 @@ const SetBonusData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(par
 
 NuunManager.getSetBonusParams = function() {
     return parameters;
+};
+
+NuunManager.getSetBonusData = function(id) {
+    return SetBonusData[id- 1];
+};
+
+Game_Actor.prototype.getTotalSetBonus = function(data) {
+    let set = 0;
+    data.SetBonusEquip.forEach(equip => {
+        if (this.hasWeapon($dataWeapons[equip.SetBonusWeapon])) {
+            set++;
+        } else if (this.hasArmor($dataArmors[equip.SetBonusArmor])) {
+            set++;
+        }
+    });
+    return set;
 };
 
 Game_Actor.prototype.getSetBonus = function() {
@@ -152,7 +199,6 @@ Game_Actor.prototype.getSetBonus = function() {
                     }
                     if (!setBonusList[setBonusId].setBonus) {
                         Array.prototype.push.apply(setBonusEquipList, [this.getEquipSetBonus(data)]);
-                        //setBonusEquipList.push(this.getEquipSetBonus(data));
                         setBonusList[setBonusId].setBonus = true;
                     }
                 }
@@ -165,7 +211,6 @@ Game_Actor.prototype.getSetBonus = function() {
                             if (!setBonusList[setBonusId].numBonus[r]) {
                                 setBonusList[setBonusId].numBonus[r] = true;
                                 Array.prototype.push.apply(setBonusEquipList, [this.getEquipAddSetBonus(list)]);
-                                //setBonusEquipList.push(this.getEquipAddSetBonus(list));
                             }
                         }
                     });

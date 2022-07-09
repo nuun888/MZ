@@ -126,7 +126,6 @@
 | [バフ、デバフ重ね掛け上限変更](https://github.com/nuun888/MZ/blob/master/README/BuffMaxLevel.md) | [NUUN_BuffMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffMaxLevel.js) |  | 1.0.0 |
 | [バフ、デバフ倍率効果率増減特徴](https://github.com/nuun888/MZ/blob/master/README/BuffBoost.md) | [NUUN_BuffBoost](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffBoost.js) |  | 1.0.0 |
 | [ステート、バフターン操作アイテム、スキル](https://github.com/nuun888/MZ/blob/master/README/StateBuffTurnOperation.md) | [NUUN_StateBuffTurnOperation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnOperation.js) |  | 1.0.0 |
-| ステートスクロール表示 |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -217,7 +216,7 @@
 | [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.1.1 |
 | [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) | 共 | 1.0.0 |
 | [再生率バトルログ表示](https://github.com/nuun888/MZ/blob/master/README/PlaybackRateBattleLog.md) | [NUUN_PlaybackRateBattleLog](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PlaybackRateBattleLog.js) |  | 1.0.0 |
-| タイムライン |  |  |  |
+| [タイムライン] (https://github.com/nuun888/MZ/blob/master/README/TPBTimeLine.md) | [NUUN_TPBTimeLine](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPBTimeLine.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

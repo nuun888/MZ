@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,12 +30,15 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/10 Ver.1.0.1
+ * 敵の画像設定を画像に指定すると戦闘開始時にエラーが出る問題を修正。
+ * タイムラインの画面上の基本位置を設定する機能を追加。
  * 2022/7/9 Ver.1.0.0
  * 初版
  * 
  * 
  * @param Setting
- * @text 共通設定
+ * @text 基本設定
  * @default ////////////////////////////////
  * 
  * @param TPBTimeLineImg
@@ -97,6 +100,19 @@
  * @min 0
  * @parent Setting
  * 
+ * @param TimeLinePosition
+ * @text タイムライン基本位置
+ * @desc タイムラインの画面上に表示する基本位置を指定します。
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @option 中央
+ * @value 'center'
+ * @default 'left'
+ * @parent Setting
+ * 
  * @param ActionDuration
  * @desc アクション時の指定座標に移動するフレーム数。
  * @text アクション移動フレーム数
@@ -104,13 +120,6 @@
  * @default 0
  * @max 9999
  * @min 0
- * @parent Setting
- * 
- * @param BattlerStatusShow
- * @text バトラーステータス非表示
- * @desc バトラーステータスの元のTPBゲージを表示しません。
- * @type boolean
- * @default true
  * @parent Setting
  * 
  * @param TPBTimeLineActionImg
@@ -137,6 +146,13 @@
  * @default 0
  * @max 9999
  * @min -9999
+ * @parent Setting
+ * 
+ * @param BattlerStatusShow
+ * @text バトラーステータス非表示
+ * @desc バトラーステータスの元のTPBゲージを表示しません。
+ * @type boolean
+ * @default true
  * @parent Setting
  * 
  * @param CastIconSetting
@@ -321,7 +337,12 @@ const TPBTimeLineEnemy_X= Number(parameters['TPBTimeLineEnemy_X'] || 30);
 const TPBTimeLineEnemy_Y = Number(parameters['TPBTimeLineEnemy_Y'] || 0);
 const TPBTimeLineActionEnemy_X = Number(parameters['TPBTimeLineActionEnemy_X'] || 0);
 const TPBTimeLineActionEnemy_Y = Number(parameters['TPBTimeLineActionEnemy_Y'] || 0);
+const TimeLinePosition = eval(parameters['TimeLinePosition']) || 'left';
 const BattlerStatusShow = eval(parameters['BattlerStatusShow'] || "true");
+
+function isDirectionUpDown() {
+    return TimeLineDirection === 'up' || TimeLineDirection === 'down';
+};
 
 const _Game_Temp_requestBattleRefresh = Game_Temp.prototype.requestBattleRefresh;
 Game_Temp.prototype.requestBattleRefresh = function() {
@@ -371,7 +392,7 @@ Spriteset_Battle.prototype.createLowerLayer = function() {
 Spriteset_Battle.prototype.createTimeLineImg = function() {
     const bitmap = ImageManager.nuun_LoadPictures(TPBTimeLineImg);
     const sprite = new Sprite(bitmap);
-    sprite.x = TPBTimeLine_X;
+    sprite.x = TPBTimeLine_X + this.getTimeLinePosition();
     sprite.y = TPBTimeLine_Y;
     sprite.anchor.x = 0.5;
     sprite.anchor.y = 0;
@@ -515,6 +536,15 @@ Spriteset_Battle.prototype.updateTpbTimeLine = function() {
     this.updateTimeLineZ();
 };
 
+Spriteset_Battle.prototype.getTimeLinePosition = function() {
+    if (TimeLinePosition === 'left') {
+        return 0;
+    } else if (TimeLinePosition === 'right') {
+        return Graphics.width;
+    } else if (TimeLinePosition === 'center') {
+        return Math.floor(Graphics.width / 2 - (isDirectionUpDown() ? 0 : TPBTimeLineLength / 2));
+    }
+};
 
 function Sprite_TimeLine() {
     this.initialize(...arguments);
@@ -759,10 +789,6 @@ Sprite_TimeLine.prototype.getCastTime = function() {
     return this._battler._tpbCastTime || 0;
 };
 
-Sprite_TimeLine.prototype.isDirectionUpDown = function() {
-    return TimeLineDirection === 'up' || TimeLineDirection === 'down';
-};
-
 Sprite_TimeLine.prototype.initVisibility = function() {
     this._appeared = this._battler.isAlive();
     if (!this._appeared) {
@@ -979,7 +1005,7 @@ Sprite_TimeLineEnemy.prototype.getEnemyBitmap = function(name) {
 };
 
 Sprite_TimeLineEnemy.prototype.getEnemyImgBitmap = function(name) {
-    const img = this._battler.actor().meta.TimeLineImg;
+    const img = this._battler.enemy().meta.TimeLineImg;
     if (img) {
         this._imgMode = 'img';
         const url = EnemyImgDirekutoriy + '/' + img;

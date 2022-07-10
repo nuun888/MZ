@@ -239,6 +239,7 @@
 
 | イベント　　　　　　　　　　　　　　　 | プラグイン　プラグイン数　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
+| [イベント接触判定拡張](https://github.com/nuun888/MZ/blob/master/README/EventRange.md) | [NUUN_EventRange](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js) | 共 | 1.0.0 |
 | [イベント復活](https://github.com/nuun888/MZ/blob/master/README/EventRevived.md) | [NUUN_EventRevived](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRevived.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |

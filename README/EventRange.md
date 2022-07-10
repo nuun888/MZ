@@ -40,3 +40,5 @@
 ![画像](img/NUUN_EventRange4.png)  
 
 ## 更新履歴
+2022/7/11 Ver.1.0.0  
+初版  

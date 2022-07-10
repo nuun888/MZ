@@ -41,6 +41,10 @@
 例:`<EventRange:circle,2,90>`  
 ![画像](img/NUUN_EventRange4.png)  
 
+接触判定を三角形にする。(正面からの角度)  
+Ver.1.1.0実装予定  
+![画像](img/NUUN_EventRange5.png)  
+
 ## 更新履歴
 2022/7/11 Ver.1.0.0  
 初版  

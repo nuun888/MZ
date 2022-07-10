@@ -11,6 +11,8 @@
  * @plugindesc イベント接触判定拡張
  * @author NUUN
  * @version 1.0.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * イベントの接触判定を拡張します。

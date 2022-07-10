@@ -8,9 +8,9 @@
 イベントのメモ欄  
 
 `<EventRange:range,[x],[y]>` 指定した範囲を中心に接触判定を拡大します。  
-`[x]`:イベントの接触横範囲  
-`[y]`:イベントの接触盾範囲  
-例:`<EventRange:range,2,2>`  
+`[x]`:イベントの接触横範囲(偶数)  
+`[y]`:イベントの接触盾範囲(偶数)  
+例:`<EventRange:range,4,4>`  
 ![画像](img/NUUN_EventRange1.png)  
 
 `<EventRange:rangeEX,[x1],[y1],[x2],[y2],[x3],[y3],[x4],[y4]>` イベントから指定した範囲内の接触判定を拡大します。  

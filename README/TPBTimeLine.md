@@ -1,5 +1,5 @@
 # [TPBタイムライン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPBTimeLine.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPBTimeLine.js)  
 
 戦闘画面にTPBタイムラインを表示します。  
@@ -21,5 +21,8 @@
 タイムライン上に表示するバトラー画像の最大高さを指定します。  
 
 ## 更新履歴
+2022/7/10 Ver.1.0.1  
+敵の画像設定を画像に指定すると戦闘開始時にエラーが出る問題を修正。  
+タイムラインの画面上の基本位置を設定する機能を追加。  
 2022/7/9 Ver.1.0.0  
 初版  

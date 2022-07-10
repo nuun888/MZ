@@ -216,7 +216,7 @@
 | [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.1.1 |
 | [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) | 共 | 1.0.0 |
 | [再生率バトルログ表示](https://github.com/nuun888/MZ/blob/master/README/PlaybackRateBattleLog.md) | [NUUN_PlaybackRateBattleLog](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PlaybackRateBattleLog.js) |  | 1.0.0 |
-| [タイムライン](https://github.com/nuun888/MZ/blob/master/README/TPBTimeLine.md) | [NUUN_TPBTimeLine](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPBTimeLine.js) |  | 1.0.1 |
+| [TPBタイムライン](https://github.com/nuun888/MZ/blob/master/README/TPBTimeLine.md) | [NUUN_TPBTimeLine](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPBTimeLine.js) |  | 1.0.1 |
 |  |  |  |  |
 |  |  |  |  |
 

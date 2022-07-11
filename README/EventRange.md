@@ -45,7 +45,7 @@
 `[h]`:正面からの認識範囲  
 `[rad]`:角度(0～180°)  
 接触判定を三角形にする。(正面からの角度)   
-例:`<EventRange:triangle,2,90>`  
+例:`<EventRange:triangle,3,90>`  
 ![画像](img/NUUN_EventRange5.png)  
 
 ## 更新履歴

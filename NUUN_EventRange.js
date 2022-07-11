@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -33,17 +33,32 @@
  * [x4]:イベントの接触範囲点DX座標
  * [y4]:イベントの接触範囲点DY座標
  * 
- * <EventRange:circle,[r],[rad]> 指定した半径からの接触判定を拡大します。角度を指定することで正面から角度に応じて接触判定を拡大します。
- * [r]:半径
+ * <EventRange:circle,[h],[rad]> 指定した半径からの接触判定を拡大します。角度を指定することで正面から角度に応じて接触判定を拡大します。
+ * [h]:認識範囲
  * [rad]:角度(0～180°)※省略可　省略時は360°
+ * 
+ * <EventRange:triangle,[h],[rad]> 指定した認識範囲に対して、正面からの角度に応じて接触判定を拡大します。
+ * [h]:正面からの認識範囲
+ * [rad]:角度(0～180°)
+ * 
+ * <EventRecognition:[range]> 指定の範囲以上から離れている場合はイベント接触判定を行いません。
+ * <EventRecognition:20> プレイヤーからイベントまでの距離が20マス以上なら接触判定処理を行いません。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/11 Ver.1.1.0
+ * 接触判定を行う範囲を設定する機能を追加。
+ * 接触範囲モードに三角形型を追加。
  * 2022/7/11 Ver.1.0.0
  * 初版
  * 
+ * @param EventRecognitionRange
+ * @text 接触判定処理範囲
+ * @desc 接触判定を行う範囲を指定します。イベントのメモ欄に<EventRecognition:[range]>がある場合は、そちらが優先されます。
+ * @type number
+ * @default 30
  * 
  */
 
@@ -53,6 +68,7 @@ Imported.NUUN_EventRange = true;
 
 (() => {
     const parameters = PluginManager.parameters('NUUN_EventRange');
+    const EventRecognitionRange = Number(parameters['EventRecognitionRange'] || 30);
 
     const _Game_Player_startMapEvent = Game_Player.prototype.startMapEvent;
     Game_Player.prototype.startMapEvent = function(x, y, triggers, normal) {
@@ -79,7 +95,13 @@ Imported.NUUN_EventRange = true;
     };
 
     Game_Event.prototype.range = function(x, y) {
+        const sx = Math.abs(this.deltaXFrom(x));
+        const sy = Math.abs(this.deltaYFrom(y));
         const data = this.event().meta.EventRange;
+        const recognition = this.event().meta.EventRecognition ? Number(this.event().meta.EventRecognition) : EventRecognitionRange;
+        if (recognition > 0 && (sx >= recognition || sy >= recognition)) {
+            return false;
+        }
         if (data) {
             const arr = data.split(',');
             const mode = arr[0].trim();
@@ -89,6 +111,8 @@ Imported.NUUN_EventRange = true;
                 return this.rangeEX(x, y, Number(arr[1]), Number(arr[2]), Number(arr[3]), Number(arr[4]),Number(arr[5]), Number(arr[6]), Number(arr[7]), Number(arr[8]));
             } else if (mode === 'circle') {
                 return this.circleRange(x, y, Number(arr[1]), Number(arr[2]));
+            } else if (mode === 'triangle') {
+                return this.triangleRange(x, y, Number(arr[1]), Number(arr[2]));
             } else if (mode === 'donut') {
                 return this.donutRange(x, y, Number(arr[1]));
             }
@@ -134,6 +158,28 @@ Imported.NUUN_EventRange = true;
                 return h <= r && ry >= b && sx >= 0;
             case 8:
                 return h <= r && ry >= b && sx <= 0;
+        }
+        return false;
+    };
+
+    Game_Event.prototype.triangleRange = function(x, y, r, rad) {
+        const sx = this.deltaXFrom(x);
+        const sy = this.deltaYFrom(y);
+        const a = Math.abs(sx);
+        const b = Math.abs(sy);
+        rad = Math.min(rad, 180);
+        const radian = (rad / 2) * (Math.PI / 180);
+        const ry = NuunManager.numPercentage(Math.abs(Math.tan(radian) * a), 6, true);
+        const rx = NuunManager.numPercentage(Math.abs(Math.tan(radian) * b), 6, true);
+        switch (this.direction()) {
+            case 2:
+                return b <= r && rx >= a && sy <= 0;
+            case 6:
+                return b <= r && rx >= a && sy >= 0;
+            case 4:
+                return a <= r && ry >= b && sx >= 0;
+            case 8:
+                return a <= r && ry >= b && sx <= 0;
         }
         return false;
     };

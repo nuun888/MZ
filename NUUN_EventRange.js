@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -18,9 +18,10 @@
  * イベントの接触判定を拡張します。
  * 
  * イベントのメモ欄
- * <EventRange:range,[x],[y]> 指定した範囲を中心に接触判定を拡大します。
+ * <EventRange:range,[x],[y]> 指定した範囲を中心に接触判定を拡大します。4と記入した場合はイベントを中心に4マスの
+ * 範囲(９マス)でトリガーが起動します。
  * [x]:イベントの接触横範囲
- * [y]:イベントの接触盾範囲
+ * [y]:イベントの接触縦範囲
  * 
  * <EventRange:rangeEX,[x1],[y1],[x2],[y2],[x3],[y3],[x4],[y4]> イベントから指定した範囲内の接触判定を拡大します。
  * イベント座標より左、上を指定する場合はそのまま負の数で記入してください。
@@ -48,6 +49,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/14 Ver.1.1.1
+ * 円形、三角型の接触判定が正常に機能していなかった問題を修正。
  * 2022/7/11 Ver.1.1.0
  * 接触判定を行う範囲を設定する機能を追加。
  * 接触範囲モードに三角形型を追加。
@@ -69,13 +72,31 @@ Imported.NUUN_EventRange = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_EventRange');
     const EventRecognitionRange = Number(parameters['EventRecognitionRange'] || 30);
+    const DistanceFromXVar = Number(parameters['DistanceFromXVar'] || 0);
+    const DistanceFromYVar = Number(parameters['DistanceFromYVar'] || 0);
+
+    const _Game_Player_initMembers = Game_Player.prototype.initMembers;
+    Game_Player.prototype.initMembers = function() {
+        _Game_Player_initMembers.call(this);
+        this._distanceFromX = 0;
+        this._distanceFromY = 0;
+    };
+
+    Game_Player.prototype.setDistanceFrom = function(x, y) {
+        this._distanceFromX = x;
+        this._distanceFromY = y;
+        $gameVariables.setValue(DistanceFromXVar, x);
+        $gameVariables.setValue(DistanceFromYVar, y);
+    };
 
     const _Game_Player_startMapEvent = Game_Player.prototype.startMapEvent;
     Game_Player.prototype.startMapEvent = function(x, y, triggers, normal) {
+        this.setDistanceFrom(0, 0);
         _Game_Player_startMapEvent.call(this, x, y, triggers, normal);
         if (!$gameMap.isEventRunning()) {
             for (const event of $gameMap.eventsRangeXy(x, y)) {
                 if (event.isTriggerIn(triggers)) {
+                    this.setDistanceFrom(event.deltaXFrom(x) * -1, event.deltaYFrom(y) * -1);
                     event.start();
                 }
             }
@@ -107,6 +128,10 @@ Imported.NUUN_EventRange = true;
             const mode = arr[0].trim();
             if (mode === 'range') {
                 return (this.rangeX(x, Number(arr[1])) && this.rangeY(y, Number(arr[2])));
+            //} else if (mode === 'besideRange') {
+            //    return this.besideRange(x, y, Number(arr[1]), Number(arr[2]));
+            //} else if (mode === 'verticalRange') {
+            //    return this.verticalRange(x, y, Number(arr[1]), Number(arr[2]));
             } else if (mode === 'rangeEX') {
                 return this.rangeEX(x, y, Number(arr[1]), Number(arr[2]), Number(arr[3]), Number(arr[4]),Number(arr[5]), Number(arr[6]), Number(arr[7]), Number(arr[8]));
             } else if (mode === 'circle') {
@@ -151,13 +176,13 @@ Imported.NUUN_EventRange = true;
         const rx = NuunManager.numPercentage(Math.abs(Math.tan(radian) * b), 6, true);
         switch (this.direction()) {
             case 2:
-                return h <= r && rx >= a && sy <= 0;
-            case 6:
-                return h <= r && rx >= a && sy >= 0;
+                return b <= r && rx >= a && sy <= 0;
             case 4:
-                return h <= r && ry >= b && sx >= 0;
+                return b <= r && ry >= b && sx >= 0;
+            case 6:
+                return b <= r && ry >= b && sx <= 0;
             case 8:
-                return h <= r && ry >= b && sx <= 0;
+                return b <= r && rx >= a && sy >= 0;
         }
         return false;
     };
@@ -174,12 +199,12 @@ Imported.NUUN_EventRange = true;
         switch (this.direction()) {
             case 2:
                 return b <= r && rx >= a && sy <= 0;
-            case 6:
-                return b <= r && rx >= a && sy >= 0;
             case 4:
-                return a <= r && ry >= b && sx >= 0;
+                return b <= r && ry >= b && sx >= 0;
+            case 6:
+                return b <= r && ry >= b && sx <= 0;
             case 8:
-                return a <= r && ry >= b && sx <= 0;
+                return b <= r && rx >= a && sy >= 0;
         }
         return false;
     };

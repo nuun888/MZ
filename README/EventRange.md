@@ -1,5 +1,5 @@
 # [イベント接触判定拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -49,6 +49,8 @@
 ![画像](img/NUUN_EventRange5.png)  
 
 ## 更新履歴
+2022/7/14 Ver.1.1.1  
+円形、三角型の接触判定が正常に機能していなかった問題を修正。  
 2022/7/11 Ver.1.1.0  
 接触判定を行う範囲を設定する機能を追加。  
 接触範囲モードに三角形型を追加。  

@@ -6,6 +6,7 @@
 #### 拡張プラグイン
 [場所範囲移動](https://github.com/nuun888/MZ/blob/master/README/RangeTransfer.md)    
 
+
 イベントの接触判定を拡張します。  
 
 ## 設定

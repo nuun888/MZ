@@ -9,6 +9,18 @@
 ## 設定
 イベントのメモ欄  
 
+`<EventRange:besideRange,[lx],[rx]>`  
+`[lx]`:イベントの接触左側範囲  
+`[ry]`:イベントの接触右側範囲  
+例:`<EventRange:range,3,2>`  
+![画像](img/NUUN_EventRange6.png)  
+
+`<EventRange:verticalRange,[uy],[dy]>`  
+`[ux]`:イベントの接触上側範囲  
+`[dy]`:イベントの接触下側範囲  
+例:`<EventRange:range,2,2>`  
+![画像](img/NUUN_EventRange7.png)  
+
 `<EventRange:range,[x],[y]>` 指定した範囲を中心に接触判定を拡大します。4と記入した場合はイベントを中心に4マスの範囲(９マス)でトリガーが起動します。  
 `[x]`:イベントの接触横範囲(偶数)  
 `[y]`:イベントの接触盾範囲(偶数)  

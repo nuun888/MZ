@@ -1,5 +1,5 @@
 # [イベント接触判定拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)
-# Ver.1.1.1
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -61,6 +61,9 @@
 ![画像](img/NUUN_EventRange5.png)  
 
 ## 更新履歴
+2022/7/14 Ver.1.2.0  
+接触判定に横長、縦長を追加。  
+プレイヤーからイベントまでの距離を代入する変数を指定できる機能を追加。  
 2022/7/14 Ver.1.1.1  
 円形、三角型の接触判定が正常に機能していなかった問題を修正。  
 2022/7/11 Ver.1.1.0  

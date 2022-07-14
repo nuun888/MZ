@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -18,6 +18,14 @@
  * イベントの接触判定を拡張します。
  * 
  * イベントのメモ欄
+ * <EventRange:besideRange,[lx],[rx]>
+ * [lx]:イベントの接触左側範囲
+ * [ry]:イベントの接触右側範囲
+ * 
+ * <EventRange:verticalRange,[uy],[dy]>
+ * [ux]:イベントの接触上側範囲
+ * [dy]:イベントの接触下側範囲
+ * 
  * <EventRange:range,[x],[y]> 指定した範囲を中心に接触判定を拡大します。4と記入した場合はイベントを中心に4マスの
  * 範囲(９マス)でトリガーが起動します。
  * [x]:イベントの接触横範囲
@@ -45,10 +53,17 @@
  * <EventRecognition:[range]> 指定の範囲以上から離れている場合はイベント接触判定を行いません。
  * <EventRecognition:20> プレイヤーからイベントまでの距離が20マス以上なら接触判定処理を行いません。
  * 
+ * イベントプレイヤー距離X変数ID、イベントプレイヤー距離Y変数ID
+ * 接触拡張を持つイベント実行時にイベントからプレイヤーまでの距離を代入する変数を指定します。
+ * プレイヤーがイベントより左、上にいる場合はマイナス座標が代入されます。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/14 Ver.1.2.0
+ * 接触判定に横長、縦長を追加。
+ * ペレイヤーからイベントまでの距離を代入する変数を指定できる機能を追加。
  * 2022/7/14 Ver.1.1.1
  * 円形、三角型の接触判定が正常に機能していなかった問題を修正。
  * 2022/7/11 Ver.1.1.0
@@ -62,6 +77,18 @@
  * @desc 接触判定を行う範囲を指定します。イベントのメモ欄に<EventRecognition:[range]>がある場合は、そちらが優先されます。
  * @type number
  * @default 30
+ * 
+ * @param DistanceFromXVar
+ * @text イベントプレイヤー距離X変数ID
+ * @desc イベントからプレイヤーまでの差(X座標)を代入するゲーム変数を設定します。
+ * @type variable
+ * @default 0
+ * 
+ * @param DistanceFromYVar
+ * @text イベントプレイヤー距離Y変数ID
+ * @desc イベントからプレイヤーまでの差(Y座標)を代入するゲーム変数を設定します。
+ * @type variable
+ * @default 0
  * 
  */
 
@@ -111,7 +138,7 @@ Imported.NUUN_EventRange = true;
 
     const _Game_Map_eventsXy = Game_Map.prototype.eventsXy;
     Game_Map.prototype.eventsXy = function(x, y) {
-        const events = _Game_Map_eventsXy.call(this, x, y)
+        const events = _Game_Map_eventsXy.call(this, x, y);
         return events.filter(event => !event.event().meta.EventRange);
     };
 
@@ -128,10 +155,10 @@ Imported.NUUN_EventRange = true;
             const mode = arr[0].trim();
             if (mode === 'range') {
                 return (this.rangeX(x, Number(arr[1])) && this.rangeY(y, Number(arr[2])));
-            //} else if (mode === 'besideRange') {
-            //    return this.besideRange(x, y, Number(arr[1]), Number(arr[2]));
-            //} else if (mode === 'verticalRange') {
-            //    return this.verticalRange(x, y, Number(arr[1]), Number(arr[2]));
+            } else if (mode === 'besideRange') {
+                return this.besideRange(this.deltaXFrom(x), y, Number(arr[1]), Number(arr[2]));
+            } else if (mode === 'verticalRange') {
+                return this.verticalRange(x, this.deltaYFrom(y), Number(arr[1]), Number(arr[2]));
             } else if (mode === 'rangeEX') {
                 return this.rangeEX(x, y, Number(arr[1]), Number(arr[2]), Number(arr[3]), Number(arr[4]),Number(arr[5]), Number(arr[6]), Number(arr[7]), Number(arr[8]));
             } else if (mode === 'circle') {
@@ -151,6 +178,14 @@ Imported.NUUN_EventRange = true;
         this.rangeCp(this.x + x2, this.y + y2, this.x + x3, this.y + y3, x, y) &&
         this.rangeCp(this.x + x3, this.y + y3, this.x + x4, this.y + y4, x, y) &&
         this.rangeCp(this.x + x4, this.y + y4, this.x + x1, this.y + y1, x, y));
+    };
+
+    Game_Event.prototype.besideRange = function(x, y, lx, rx) {
+        return x <= lx && x >= rx * -1 && this.y === y;
+    };
+
+    Game_Event.prototype.verticalRange = function(x, y, uy, dy) {
+        return y <= uy && y >= dy * -1 && this.x === x;
     };
 
     Game_Event.prototype.rangeCp = function(ax, ay, bx, by, x, y) {

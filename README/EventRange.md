@@ -1,5 +1,5 @@
 # [イベント接触判定拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)
-# Ver.1.2.0
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  

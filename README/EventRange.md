@@ -26,7 +26,7 @@
 ![画像](img/NUUN_EventRange7.png)  
 
 `<EventRange:frontRange,[range]>`指定したイベントからの真正面の範囲までの接触判定を拡大します。  
-[range]:接触範囲(整数)  
+[range]:接触範囲(正の数の整数)  
 例:`<EventRange:frontRange,3>`  
 ![画像](img/NUUN_EventRange8.png)  
 

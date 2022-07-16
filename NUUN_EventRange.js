@@ -10,48 +10,57 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
- * イベントの接触判定を拡張します。
+ * イベントの接触範囲判定を拡張します。
  * 
- * イベントのメモ欄
- * <EventRange:besideRange,[lx],[rx]>
- * [lx]:イベントの接触左側範囲
- * [ry]:イベントの接触右側範囲
+ * イベントのメモ欄またはイベントの実行内容の注釈(Comment)
+ * ※前者は全EVページに適用されます。後者は記入したページの時に適用します。
  * 
- * <EventRange:verticalRange,[uy],[dy]>
- * [ux]:イベントの接触上側範囲
- * [dy]:イベントの接触下側範囲
+ * <EventRange:besideRange,[lx],[rx]> 指定した横方向の範囲内の接触判定を拡大します。
+ * [lx]:イベントの接触左側範囲(正の数の整数)
+ * [ry]:イベントの接触右側範囲(正の数の整数)
+ * 
+ * <EventRange:verticalRange,[uy],[dy]> 指定した縦方向の範囲内の接触判定を拡大します。
+ * [ux]:イベントの接触上側範囲(正の数の整数)
+ * [dy]:イベントの接触下側範囲(正の数の整数)
+ * 
+ * <EventRange:frontRange,[range]> 指定したイベントからの真正面の範囲までの接触判定を拡大します。
+ * [range]:接触範囲(整数)
  * 
  * <EventRange:range,[x],[y]> 指定した範囲を中心に接触判定を拡大します。4と記入した場合はイベントを中心に4マスの
  * 範囲(９マス)でトリガーが起動します。
- * [x]:イベントの接触横範囲
- * [y]:イベントの接触縦範囲
+ * [x]:イベントの接触横範囲(偶数の正の数の整数)
+ * [y]:イベントの接触縦範囲(偶数の正の数の整数)
  * 
  * <EventRange:rangeEX,[x1],[y1],[x2],[y2],[x3],[y3],[x4],[y4]> イベントから指定した範囲内の接触判定を拡大します。
  * イベント座標より左、上を指定する場合はそのまま負の数で記入してください。
- * [x1]:イベントの接触範囲点AX座標
- * [y1]:イベントの接触範囲点AY座標
- * [x2]:イベントの接触範囲点BX座標
- * [y2]:イベントの接触範囲点BY座標
- * [x3]:イベントの接触範囲点CX座標
- * [y3]:イベントの接触範囲点CY座標
- * [x4]:イベントの接触範囲点DX座標
- * [y4]:イベントの接触範囲点DY座標
+ * [x1]:イベントの接触範囲点AX座標(整数)
+ * [y1]:イベントの接触範囲点AY座標(整数)
+ * [x2]:イベントの接触範囲点BX座標(整数)
+ * [y2]:イベントの接触範囲点BY座標(整数)
+ * [x3]:イベントの接触範囲点CX座標(整数)
+ * [y3]:イベントの接触範囲点CY座標(整数)
+ * [x4]:イベントの接触範囲点DX座標(整数)
+ * [y4]:イベントの接触範囲点DY座標(整数)
  * 
- * <EventRange:circle,[h],[rad]> 指定した半径からの接触判定を拡大します。角度を指定することで正面から角度に応じて接触判定を拡大します。
- * [h]:認識範囲
+ * <EventRange:circle,[range],[rad]> 指定した半径からの接触判定を拡大します。角度を指定することで正面から角度に応じて接触判定を拡大します。
+ * [range]:接触範囲(整数)
  * [rad]:角度(0～180°)※省略可　省略時は360°
  * 
- * <EventRange:triangle,[h],[rad]> 指定した認識範囲に対して、正面からの角度に応じて接触判定を拡大します。
- * [h]:正面からの認識範囲
+ * <EventRange:triangle,[range],[rad]> 指定した認識範囲に対して、正面からの角度に応じて接触判定を拡大します。
+ * [range]:正面からの接触範囲(整数)
  * [rad]:角度(0～180°)
  * 
  * <EventRecognition:[range]> 指定の範囲以上から離れている場合はイベント接触判定を行いません。
+ * [range]:接触判定最大距離数(正の数の整数)
  * <EventRecognition:20> プレイヤーからイベントまでの距離が20マス以上なら接触判定処理を行いません。
+ * 
+ * 実行内容に注釈(Comment)は、ページ毎の接触範囲となります。現在の条件になっているページの接触範囲となります。
+ * イベントのメモ欄と注釈(Comment)に同時に記入がある場合、注釈のタグが優先されます。
  * 
  * イベントプレイヤー距離X変数ID、イベントプレイヤー距離Y変数ID
  * 接触拡張を持つイベント実行時にイベントからプレイヤーまでの距離を代入する変数を指定します。
@@ -61,9 +70,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/16 Ver.1.3.0
+ * イベントページ毎に範囲を指定できる機能を追加。
+ * 接触範囲にイベントの真正面からの範囲内を追加。
  * 2022/7/14 Ver.1.2.0
  * 接触判定に横長、縦長を追加。
- * ペレイヤーからイベントまでの距離を代入する変数を指定できる機能を追加。
+ * プレイヤーからイベントまでの距離を代入する変数を指定できる機能を追加。
  * 2022/7/14 Ver.1.1.1
  * 円形、三角型の接触判定が正常に機能していなかった問題を修正。
  * 2022/7/11 Ver.1.1.0
@@ -139,13 +151,19 @@ Imported.NUUN_EventRange = true;
     const _Game_Map_eventsXy = Game_Map.prototype.eventsXy;
     Game_Map.prototype.eventsXy = function(x, y) {
         const events = _Game_Map_eventsXy.call(this, x, y);
-        return events.filter(event => !event.event().meta.EventRange);
+        return events.filter(event => !event.getEventRangeTag());
+    };
+
+
+    const _Game_Event_initialize = Game_Event.prototype.initialize;
+    Game_Event.prototype.initialize = function(mapId, eventId) {
+        _Game_Event_initialize.call(this, mapId, eventId);
     };
 
     Game_Event.prototype.range = function(x, y) {
         const sx = Math.abs(this.deltaXFrom(x));
         const sy = Math.abs(this.deltaYFrom(y));
-        const data = this.event().meta.EventRange;
+        const data = this.getEventRangeTag();
         const recognition = this.event().meta.EventRecognition ? Number(this.event().meta.EventRecognition) : EventRecognitionRange;
         if (recognition > 0 && (sx >= recognition || sy >= recognition)) {
             return false;
@@ -165,6 +183,8 @@ Imported.NUUN_EventRange = true;
                 return this.circleRange(x, y, Number(arr[1]), Number(arr[2]));
             } else if (mode === 'triangle') {
                 return this.triangleRange(x, y, Number(arr[1]), Number(arr[2]));
+            } else if (mode === 'frontRange') {
+                return this.frontRange(x, y, Number(arr[1]));
             } else if (mode === 'donut') {
                 return this.donutRange(x, y, Number(arr[1]));
             }
@@ -186,6 +206,20 @@ Imported.NUUN_EventRange = true;
 
     Game_Event.prototype.verticalRange = function(x, y, uy, dy) {
         return y <= uy && y >= dy * -1 && this.x === x;
+    };
+
+    Game_Event.prototype.frontRange = function(x, y, h) {
+        switch (this.direction()) {
+            case 2:
+                return this.deltaYFrom(y) >= h * -1 && this.x === x;
+            case 4:
+                return this.deltaXFrom(x) <= h && this.y === y;
+            case 6:
+                return this.deltaXFrom(x) >= h * -1 && this.y === y;
+            case 8:
+                return this.deltaYFrom(y) <= h && this.x === x;
+        }
+        return false;
     };
 
     Game_Event.prototype.rangeCp = function(ax, ay, bx, by, x, y) {
@@ -257,6 +291,38 @@ Imported.NUUN_EventRange = true;
 
     Game_Event.prototype.rangeY = function(y, y2) {
         return this.y >= y - Math.floor(y2 / 2) && this.y <= y + Math.floor(y2 / 2);
+    };
+
+    Game_Event.prototype.getEventRangeTag = function() {
+        return this._eventRangeTag;
+    };
+
+    const _Game_Event_setupPageSettings = Game_Event.prototype.setupPageSettings;
+    Game_Event.prototype.setupPageSettings = function() {
+        _Game_Event_setupPageSettings.call(this);
+        this.setRangeCommentTag();
+    };
+
+    const _Game_Event_clearPageSettings = Game_Event.prototype.clearPageSettings;
+    Game_Event.prototype.clearPageSettings = function() {
+        _Game_Event_clearPageSettings.call(this);
+        this._eventRangeTag = null;
+    };
+
+    Game_Event.prototype.setRangeCommentTag = function() {
+        const re = /<(?:EventRange):\s*(.*)>/;
+        this._eventRangeTag = null;
+        this.list().forEach(tag => {
+            if (tag.code === 108 || tag.code === 408) {
+                let match = re.exec(tag.parameters[0]);
+                if (match) {
+                    this._eventRangeTag = match[1];
+                }
+            }
+        });
+        if (!this._eventRangeTag && this.event().meta.EventRange) {
+            this._eventRangeTag = this.event().meta.EventRange;
+        }
     };
 
 })();

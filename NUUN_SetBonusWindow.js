@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc セットボーナスツールチップウィンドウ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -19,6 +19,8 @@
  * 装備画面で装備スロット選択中の装備で現在適用しているセットボーナスを表示します。
  * 
  * 更新履歴
+ * 2022/7/16 Ver.1.0.1
+ * セットボーナスがない装備をマウスオーバーするとツールチップが表示されてしまう問題を修正。
  * 2022/7/7 Ver.1.0.0
  * 初版
  * 
@@ -217,6 +219,10 @@ Window_SetBounsEquip.prototype.clearOnRefresh = function() {
 
 Window_SetBounsEquip.prototype.update = function() {
     Window_Selectable.prototype.update.call(this);
+    if (!this._equip || !this._equip.meta.SetBonus) {
+        this.hide();
+        return;
+    }
     if (this._duration > 0) {
         this._duration--;
         if (this._duration === 0) {

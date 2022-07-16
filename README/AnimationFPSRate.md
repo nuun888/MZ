@@ -1,8 +1,9 @@
-# [MV互換アニメーション再生時のフレームレート個別設定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js)
+# [MV互換アニメーション再生時のフレームレート変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js)
 # Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js)
 
-MVのアニメーションを再生するときのフレームレートをアニメーションごとに設定します。  
+MVのアニメーションを再生するときのフレームレートを変更します。  
+またアニメーションごとにフレームレートを変更できます。  
 ※4フレームで15FPS、2フレームで30FPS、1フレームで60FPS
 
 ## 更新履歴

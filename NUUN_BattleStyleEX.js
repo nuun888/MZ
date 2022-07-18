@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.5.2
+ * @version 3.5.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/7/18 Ver.3.5.3
+ * キャンセルボタンの表示位置を左か右か指定できる機能を追加。
  * 2022/7/2 Ver.3.5.2
  * TPBバトルでパーティコマンドが表示されず進行不能になる問題を修正。
  * 顔グラの行動時エフェクト時に座標がずれる問題を修正。
@@ -1034,6 +1036,14 @@ Scene_Battle.prototype.actorStatusWindowOpacity = function() {
 Scene_Battle.prototype.setActorStatusWindowOpacity = function(opacity) {
   this._battleHudBack.opacity = opacity;
   this._battleHudFront.opacity = opacity;
+};
+
+const _Scene_Battle_createCancelButton = Scene_Battle.prototype.createCancelButton;
+Scene_Battle.prototype.createCancelButton = function() {
+  _Scene_Battle_createCancelButton.call(this);
+  if (params.ButtonMode === 'left') {
+    this._cancelButton.x = 4;
+  }
 };
 
 Scene_Battle.prototype.statusWindowX = function() {//再定義

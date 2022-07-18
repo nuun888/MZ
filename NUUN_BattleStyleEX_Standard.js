@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.5.1
+ * @version 1.5.2
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -50,6 +50,8 @@
  * 別途バトルスタイル拡張疑似３Dバトル併用パッチを導入してください。
  * 
  * 更新履歴
+ * 2022/7/18 Ver.1.5.2
+ * キャンセルボタンの表示位置を左か右か指定できる機能を追加。
  * 2022/6/24 Ver.1.5.1
  * 新規、更新後にアクターの画像がおかしくなる問題を修正。
  * 2022/6/19 Ver.1.5.0
@@ -416,6 +418,20 @@
  * @default true
  * @parent ActorCommandOption
  * 
+ * @param ButtonSetting
+ * @text ボタン設定
+ * @default ////////////////////////////////
+ * 
+ * @param ButtonMode
+ * @text キャンセルボタン表示位置
+ * @desc キャンセルボタンの表示位置。
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @default 'right'
+ * @parent ButtonSetting
  * 
  * @param ActorStatus
  * @text アクターステータス設定
@@ -2222,6 +2238,8 @@ params.EnemyWindowOpacity = Number(parameters['EnemyWindowOpacity'] || 255);
 params.EnemyWindowBackgroundImg = String(parameters['EnemyWindowBackgroundImg']);
 params.EnemyWindowBackground_X = Number(parameters['EnemyWindowBackground_X'] || 0);
 params.EnemyWindowBackground_Y = Number(parameters['EnemyWindowBackground_Y'] || 0);
+
+params.ButtonMode = eval(parameters['ButtonMode']) || 'right';
 
 params.ActorStatusWindowSkin = String(parameters['ActorStatusWindowSkin']);
 params.ActorStatusWindowColor = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorStatusWindowColor'])) : null) || {"red":"0","green":"0","bule":"0"};

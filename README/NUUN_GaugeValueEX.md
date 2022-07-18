@@ -31,7 +31,7 @@ timeは数値が表示されません。
 数値の位置を指定します。 
 左揃え  
 ![画像](img/GaugeValueEX6.png)  
-中央揃え
+中央揃え  
 ![画像](img/GaugeValueEX8.png)  
 右揃え  
 ![画像](img/GaugeValueEX7.png)  

@@ -1,5 +1,5 @@
 # [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,8 @@ timeは数値が表示されません。
 数値の位置を指定します。 
 左揃え  
 ![画像](img/GaugeValueEX6.png)  
+中央揃え
+![画像](img/GaugeValueEX8.png)  
 右揃え  
 ![画像](img/GaugeValueEX7.png)  
 
@@ -43,6 +45,8 @@ Ver.1.2.0より別プラグイン化いたしました。
 [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  
 
 ### 更新履歴
+2022/7/19 Ver.1.2.1  
+数値の位置を中央揃えにする機能を追加。  
 2022/7/18 Ver.1.2.0  
 表示するクラスを指定できる機能を追加。  
 フォントサイズの仕様を変更。  

@@ -1,4 +1,4 @@
-# [ダメージ量可視化ゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamageGauge.js)
+# [ダメージ量ゲージ可視化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamageGauge.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamageGauge.js)
 #### 必須、前提プラグイン

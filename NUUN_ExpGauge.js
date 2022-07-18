@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 経験値ゲージ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/18 Ver.1.0.1
+ * ゲージ表示拡張で現在値の座標を調整できるように修正。
  * 2022/7/17 Ver.1.0.0
  * 初版
  * 
@@ -125,6 +127,7 @@ Imported.NUUN_ExpGauge = true;
 
     Sprite_NuunExpGauge.prototype.initialize = function() {
         Sprite_Gauge.prototype.initialize.call(this);
+        this._expValueMode = false;
     };
       
     Sprite_NuunExpGauge.prototype.bitmapWidth = function() {
@@ -134,18 +137,18 @@ Imported.NUUN_ExpGauge = true;
     Sprite_NuunExpGauge.prototype.gaugeHeight = function() {
         return EXPGaugeHeight;
     };
-      
-    Sprite_NuunExpGauge.prototype.drawValue = function() {
-        let currentValue = 0;
-        const width = this.bitmapWidth();
-        const height = typeof this.textHeight === 'function' ? this.textHeight() : this.bitmapHeight();
-        this.setupValueFont();
+
+    Sprite_NuunExpGauge.prototype.currentExpValue = function() {
         if (ExpPercent) {
-          currentValue = this._battler.isMaxLevel() ? "100%" : this.numPercentage(this.currentPercent(), EXPDecimal, DecimalMode) +"%";
+            return this._battler.isMaxLevel() ? "100%" : this.numPercentage(this.currentPercent(), EXPDecimal, DecimalMode) +"%";
         } else {
-          currentValue = this._battler.isMaxLevel() ? "-------" : this._battler.nextRequiredExp();
+            return this._battler.isMaxLevel() ? "-------" : this._battler.nextRequiredExp();
         }
-        this.bitmap.drawText(currentValue, 0, 0, width, height, "right");
+    };
+
+    Sprite_NuunExpGauge.prototype.drawValue = function() {
+        this._expValueMode = true;
+        Sprite_Gauge.prototype.drawValue.call(this);
     };
 
     Sprite_NuunExpGauge.prototype.numPercentage = function(num, digits, mode) {
@@ -159,7 +162,12 @@ Imported.NUUN_ExpGauge = true;
       
     Sprite_NuunExpGauge.prototype.currentValue = function() {
         if (this._battler) {
-            return this._battler.isMaxLevel() ? this.currentMaxValue() : this._battler.currentExp() - this._battler.currentLevelExp();
+            if (this._expValueMode) {
+                this._expValueMode = false;
+                return this.currentExpValue();
+            } else {
+                return this._battler.isMaxLevel() ? this.currentMaxValue() : this._battler.currentExp() - this._battler.currentLevelExp();
+            }
         }
     };
       

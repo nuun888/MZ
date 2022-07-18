@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -43,6 +43,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/19 Ver.1.5.2
+ * ダメージ量ゲージ可視化別プラグイン化による処理変更。
  * 2022/5/24 Ver.1.5.1
  * ラベルの座標が適用されない問題を修正。
  * 2022/5/24 Ver.1.5.0
@@ -580,7 +582,7 @@ Sprite_Gauge.prototype.drawGaugeImgRect = function() {
     const context = bitmap.context;
     const inclined = this._gaugeImgData.GaugeInclined !== 0 ? Math.abs((bitmap.height * this.gaugeInclinedRate()) * 2) : 0;
     context.clearRect(-inclined, 0, bitmap.width + inclined * 2, bitmap.height);
-    if (Imported.NUUN_GaugeValueEX && this.gaugeDamageVisualization() && this._gaugeImgData.GaugeDamageImg.Gaugeimage) {
+    if (!!this.gaugeDamageVisualization && this.gaugeDamageVisualization() && this._gaugeImgData.GaugeDamageImg.Gaugeimage) {
         this.drawGaugeDamageImgRect(bitmap);
     }
     const correctionWidth = this._gaugeImgData.GaugeImgVariable ? this._gaugeImgData.GaugeCorrectionWidth : 0;

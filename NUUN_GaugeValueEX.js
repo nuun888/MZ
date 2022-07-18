@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -39,6 +39,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/19 Ver.1.2.1
+ * 数値の位置を中央揃えにする機能を追加。
  * 2022/7/18 Ver.1.2.0
  * 表示するクラスを指定できる機能を追加。
  * フォントサイズの仕様を変更。
@@ -81,6 +83,8 @@
  * @type select
  * @option 左揃え
  * @value 'left'
+ * @option 中央
+ * @value 'center'
  * @option 右揃え
  * @value 'right'
  * @default 'right'
@@ -132,6 +136,8 @@
  * @type select
  * @option 左揃え
  * @value 'left'
+ * @option 中央
+ * @value 'center'
  * @option 右揃え
  * @value 'right'
  * @option デフォルト
@@ -679,7 +685,7 @@ Imported.NUUN_GaugeValueEX = true;
             case 'left':
                 return x;
             case 'center':
-                return x;
+                return x + width / 2 - (6 + valueWidth + valueMarginX);
             case 'right':
                 return x + width - (maxValueWidth + (valueMarginX * 2) + valueWidth + 12);
             default:
@@ -695,7 +701,7 @@ Imported.NUUN_GaugeValueEX = true;
             case 'left':
                 return x + (valueMarginX * 2) + valueWidth + 12;
             case 'center':
-                return x;
+                return x + width / 2 + (6 + valueMarginX);
             case 'right':
                 return x + (width - maxValueWidth);
             default:
@@ -711,7 +717,7 @@ Imported.NUUN_GaugeValueEX = true;
             case 'left':
                 return x + valueWidth + valueMarginX;
             case 'center':
-                return x;
+                return x + width / 2 - 6;
             case 'right':
                 return x + width - maxValueWidth - valueMarginX - 12;
             default:

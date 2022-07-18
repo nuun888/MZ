@@ -213,7 +213,7 @@
 | [アップフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/UpFadeoutPopup.md) | [NUUN_UpFadeoutPopup](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UpFadeoutPopup.js) | 共 | 1.0.1 |
 | [スライドフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/SlideFadeoutPopup.md) | [NUUN_SlideFadeoutPopup](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlideFadeoutPopup.js) | 共 | 1.0.0 |
 | [横バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md) | [NUUN_LateralBoundPopUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LateralBoundPopUp.js) | | 1.0.3 |
-| [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.2.0 |
+| [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.2.1 |
 | [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md) | [NUUN_DamageGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamageGaugeX.js) | 共 | 1.0.0 |
 | [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) | 共 | 1.0.0 |
 | [再生率バトルログ表示](https://github.com/nuun888/MZ/blob/master/README/PlaybackRateBattleLog.md) | [NUUN_PlaybackRateBattleLog](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PlaybackRateBattleLog.js) |  | 1.0.0 |

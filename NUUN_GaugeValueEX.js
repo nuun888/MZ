@@ -145,7 +145,7 @@
  * @default true
  * 
  * @param ValueDigits
- * @desc ゲージ数値表示形式が現在値/最大値の数値の表示幅。
+ * @desc ゲージ数値表示形式が現在値/最大値の数値の表示幅。数値のみで指定する場合は''で囲ってください。
  * @text 数値の表示幅
  * @type string
  * @default 

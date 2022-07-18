@@ -29,7 +29,7 @@ timeは数値が表示されません。
 
 ### ダメージ量ゲージ可視化
 Ver.1.2.0より別プラグイン化いたしました。
-(https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  
+[ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  
 
 ### 更新履歴
 2022/7/18 Ver.1.2.0  

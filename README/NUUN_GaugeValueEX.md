@@ -27,6 +27,17 @@ TP:'tp'
 ゲージの数値の表示形式を選択します。  
 timeは数値が表示されません。  
 
+### 数値位置
+数値の位置を指定します。 
+左揃え  
+![画像](img/GaugeValueEX6.png)  
+右揃え  
+![画像](img/GaugeValueEX7.png)  
+
+### 数値の表示幅
+空白にすることで数値を詰めて表示することができます。(現在値/最大値のみ)  
+![画像](img/GaugeValueEX5.png)  
+
 ### ダメージ量ゲージ可視化
 Ver.1.2.0より別プラグイン化いたしました。
 [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  

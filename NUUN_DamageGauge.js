@@ -8,7 +8,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc ダメージ量可視化ゲージ
+ * @plugindesc ダメージ量ゲージ可視化
  * @author NUUN
  * @version 1.0.0
  * @base NUUN_Base

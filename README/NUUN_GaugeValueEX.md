@@ -1,5 +1,5 @@
 # [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
-# Ver.1.1.1
+# Ver.1.2,0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -51,10 +51,16 @@ timeは数値が表示されません。
 ゲージの右側の色
 
 ### ダメージ量ゲージ可視化
-ダメージを受ける前と受けた後のダメージ量を可視化するゲージを表示します。  
-https://user-images.githubusercontent.com/70774024/147840902-67a4592c-0cfd-4537-8661-064a8d51b6c2.mp4  
+Ver.1.2.0より別プラグイン化いたしました。
+(https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  
 
 ### 更新履歴
+2022/7/18 Ver.1.2.0  
+表示するクラスを指定できる機能を追加。  
+フォントサイズの仕様を変更。  
+数値表示の処理の変更。  
+数値の左揃え、右揃えを指定できる機能を追加。  
+ダメージ可視化機能は別プラグイン化。  
 2022/1/3 Ver.1.1.1  
 現在値、/、最大値の座標変更をそれぞれ変更できるように変更。  
 ダメージ可視化機能をルルの協会様LL_ExGaugeDrawingの「ゲージに立体感をつける」への対応。  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.5.3
+ * @version 3.5.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/7/23 Ver.3.5.4
+ * キャンセルボタンのX座標を調整できる処理の追加。
+ * 処理の修正。
  * 2022/7/18 Ver.3.5.3
  * キャンセルボタンの表示位置を左か右か指定できる機能を追加。
  * 2022/7/2 Ver.3.5.2
@@ -1042,7 +1045,9 @@ const _Scene_Battle_createCancelButton = Scene_Battle.prototype.createCancelButt
 Scene_Battle.prototype.createCancelButton = function() {
   _Scene_Battle_createCancelButton.call(this);
   if (params.ButtonMode === 'left') {
-    this._cancelButton.x = 4;
+    this._cancelButton.x = 4 + params.CancelButtonX;
+  } else {
+    this._cancelButton.x += params.CancelButtonX;
   }
 };
 
@@ -2797,7 +2802,7 @@ Spriteset_Battle.prototype.findTargetSprite = function(target) {
 };
 
 Spriteset_Battle.prototype.animationTarget = function(targetSprites){
-  if(!$gameSystem.isSideView() && params.ActorEffectShow && targetSprites.viewFrontActor) {
+  if(!$gameSystem.isSideView() && params.ActorEffectShow && targetSprites && targetSprites.viewFrontActor) {
     return !!targetSprites._battler.isActor();
   }
   return false;

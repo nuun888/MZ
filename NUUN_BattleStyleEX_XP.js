@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.5.2
+ * @version 1.5.3
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -49,6 +49,8 @@
  * 別途バトルスタイル拡張疑似３Dバトル併用パッチを導入してください。
  * 
  * 更新履歴
+ * 2022/7/23 Ver.1.5.3
+ * キャンセルボタンのX座標を調整できる機能を追加。
  * 2022/7/18 Ver.1.5.2
  * キャンセルボタンの表示位置を左か右か指定できる機能を追加。
  * 2022/6/24 Ver.1.5.1
@@ -419,6 +421,15 @@
  * @option 右
  * @value 'right'
  * @default 'right'
+ * @parent ButtonSetting
+ * 
+ * @param CancelButtonX
+ * @desc キャンセルボタンX座標（相対）。
+ * @text キャンセルボタンX座標（相対）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
  * @parent ButtonSetting
  * 
  * @param ActorStatus
@@ -2242,6 +2253,7 @@ params.EnemyWindowBackground_X = Number(parameters['EnemyWindowBackground_X'] ||
 params.EnemyWindowBackground_Y = Number(parameters['EnemyWindowBackground_Y'] || 0);
 
 params.ButtonMode = eval(parameters['ButtonMode']) || 'right';
+params.CancelButtonX = Number(parameters['CancelButtonX'] || 0);
 
 params.ActorStatusWindowSkin = String(parameters['ActorStatusWindowSkin']);
 params.ActorStatusWindowColor = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorStatusWindowColor'])) : null) || {"red":"0","green":"0","bule":"0"};

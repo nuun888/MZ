@@ -1,5 +1,5 @@
 # [メニュー画面タイプ２](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)
-# Ver.1.7.0
+# Ver.1.7.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -64,6 +64,8 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2022/7/23 Ver.1.7.1
+ステートの表示ステートを範囲指定する機能を追加。  
 2022/7/23 Ver.1.7.0  
 ステートのアイコンを表示したいステートのみ表示する機能を追加。  
 バトルステータスに表示されるステートの表示をメニュー画面上に表示できる機能を追加。  

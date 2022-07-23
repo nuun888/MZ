@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.3.7
+# Ver.2.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -72,6 +72,11 @@ Y座標を指定します。Y表示列位置からの相対座標になります
 ### レーダーチャート設定
 
 ### 更新履歴
+2022/7/23 Ver.2.4.0  
+評価式の仕様を変更。  
+ステートのアイコンを表示したいステートのみ表示する機能を追加。  
+バトルステータスに表示されるステートの表示をメニュー画面上に表示できる機能を追加。  
+経験値の%表示時に小数点が指定した小数点数を無視して表示されてしまう問題を修正。  
 2022/6/15 Ver.2.3.7  
 評価式に文字列を記入したときにNaNと表示されてしまう問題を修正。  
 2022/3/22 Ver.2.3.6  

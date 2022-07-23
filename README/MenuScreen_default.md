@@ -2,7 +2,7 @@
 # Ver.1.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.0以降  
 #### オプション
 全体選択時カーソル修正  
 ※アクター表示列が２列以上でかつ表示行が２行以上の場合は、以下のプラグインが必要です。  

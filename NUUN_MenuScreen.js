@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ１
  * @author NUUN
- * @version 1.7.0
+ * @version 1.7.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -54,14 +54,17 @@
  * 備考
  * ※1
  * アクターステータス表示項目のステートの評価式には表示したいステートを指定できます。(直接記入)
- * 表示したいステートを,区切りで指定します。例 "1,5,11" 必ず''または""で囲む
+ * 表示したいステートIDを,区切りで指定します。
+ * 例 "1,5,11" 必ず''または""で囲む
+ * "1-10" ステートID1～10番まで表示
+ * "3-11,15"ステートID3～11,15番を表示
  *  
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
- * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
- * 
  * 更新履歴
+ * 2022/7/23 Ver.1.3.1
+ * ステートの表示ステートを範囲指定する機能を追加。
  * 2022/7/23 Ver.1.7.0
  * ステートのアイコンを表示したいステートのみ表示する機能を追加。
  * バトルステータスに表示されるステートの表示をメニュー画面上に表示できる機能を追加。
@@ -1834,19 +1837,24 @@ Window_MenuStatus.prototype.drawActorLevel = function(data, x, y, width, actor) 
     this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
-Window_MenuStatus.prototype.drawActorIcons = function(x, y, width, actor) {
+Window_MenuStatus.prototype.drawActorIcons = function(data, x, y, width, actor) {
     let icons = [];
+    let states = [];
     const iconWidth = ImageManager.iconWidth;
-    if (data.DetaEval) {
-        const iconsEX = data.DetaEval.split(',').map(Number);
-        icons = actor.allIcons().filter(icon => iconsEX.some(i => $dataStates[i].iconIndex === icon)).slice(0, Math.floor(width / iconWidth));
+    const dataEval = data.DetaEval;
+    if (dataEval) {
+        const stateList = dataEval.split(',');
+        for (const id of stateList) {
+            Array.prototype.push.apply(states, this.nuun_getListIdData(id));
+        }
+        icons = actor.allIcons().filter(icon => states.some(i => $dataStates[i].iconIndex === icon)).slice(0, Math.floor(width / iconWidth));
+        let iconX = x;
+        for (const icon of icons) {
+            this.drawIcon(icon, iconX, y + 2);
+            iconX += iconWidth;
+        }
     } else {
-        icons = actor.allIcons().slice(0, Math.floor(width / iconWidth));
-    }
-    let iconX = x;
-    for (const icon of icons) {
-        this.drawIcon(icon, iconX, y + 2);
-        iconX += iconWidth;
+        Window_StatusBase.prototype.drawActorIcons.call(this, actor, x, y, width);
     }
 };
 

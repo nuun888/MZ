@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面デフォルトタイプ
  * @author NUUN
- * @version 1.2.4
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -50,13 +50,21 @@
  * メニューUIの背景として使用します。
  * ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。
  * 
- *  
+ * 備考
+ * ※1
+ * アクターステータス表示項目のステートの評価式には表示したいステートを指定できます。(直接記入)
+ * 表示したいステートを,区切りで指定します。例 "1,5,11" 必ず''または""で囲む
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * Ver.1.1.0以降ではNUUN_Base Ver.1.4.1以降が必要となります。
  * 
  * 更新履歴
+ * 2022/7/23 Ver.1.3.0
+ * ステートのアイコンを表示したいステートのみ表示する機能を追加。
+ * バトルステータスに表示されるステートの表示をメニュー画面上に表示できる機能を追加。
+ * 経験値の%表示時に小数点が指定した小数点数を無視して表示されてしまう問題を修正。
  * 2022/7/4 Ver.1.2.4
  * インフォのフォントサイズを各項目毎に設定できるように修正。
  * チャプターテキストプラグイン対応による処理追加。
@@ -510,8 +518,10 @@
  * @value 3
  * @option レベル(1)(3)(4)(5)(6)(7)(13)
  * @value 4
- * @option ステート(3)(4)(5)(6)(7)
+ * @option ステート(3)(4)(5)(6)(7)(10※1)
  * @value 5
+ * @option ステート(戦闘用と同じ表示)(3)(4)(5)(6)
+ * @value 7
  * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
  * @value 6
  * @option ＨＰ(3)(4)(5)(6)(7)(21)
@@ -654,8 +664,8 @@
  * @default 'left'
  * 
  * @param DetaEval
- * @desc 評価式。
- * @text 評価式(javaScript)(10)
+ * @desc 評価式または文字列を記入します。
+ * @text 評価式or文字列(javaScript)(10)
  * @type combo
  * @option '$gameVariables.value(0);//ゲーム変数'
  * @option 'actor;//アクターのゲームデータ'
@@ -1541,10 +1551,13 @@ Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor
         this.drawActorLevel(data, x, y, width, actor);
         break;
     case 5:
-        this.drawActorIcons(x, y, width, actor);
+        this.drawActorIcons(data, x, y, width, actor);
         break;
     case 6:
         this.drawParam(data, x, y, width, actor);
+        break;
+    case 7:
+        this.drawPlaceStateIcon(x, y, actor);
         break;
     case 11:
         $gameTemp.menuParam = data;
@@ -1789,8 +1802,14 @@ Window_MenuStatus.prototype.drawActorLevel = function(data, x, y, width, actor) 
 };
 
 Window_MenuStatus.prototype.drawActorIcons = function(x, y, width, actor) {
+    let icons = [];
     const iconWidth = ImageManager.iconWidth;
-    const icons = actor.allIcons().slice(0, Math.floor(width / iconWidth));
+    if (data.DetaEval) {
+        const iconsEX = data.DetaEval.split(',').map(Number);
+        icons = actor.allIcons().filter(icon => iconsEX.some(i => $dataStates[i].iconIndex === icon)).slice(0, Math.floor(width / iconWidth));
+    } else {
+        icons = actor.allIcons().slice(0, Math.floor(width / iconWidth));
+    }
     let iconX = x;
     for (const icon of icons) {
         this.drawIcon(icon, iconX, y + 2);
@@ -1848,6 +1867,11 @@ Window_MenuStatus.prototype.placeTpGauge = function(x, y, actor) {
 Window_MenuStatus.prototype.placeExpGauge = function(x, y, actor) {
     $gameTemp.menuGaugeType = "menuexp";
     this.placeGauge(actor, "menuexp", x, y);
+};
+
+Window_MenuStatus.prototype.drawPlaceStateIcon = function(x, y, actor) {
+    const hw = Math.floor(ImageManager.iconWidth / 2);
+    this.placeStateIcon(actor, x + hw, y + hw);
 };
 
 Window_MenuStatus.prototype.placeUserGauge = function(data, x, y, actor) {
@@ -2239,7 +2263,7 @@ Sprite_MenuGauge.prototype.displyaExp = function() {
     } else if (ExpDisplayMode === 2) {
         return this.currentValue();
     } else if (ExpDisplayMode === 3) {
-        return NuunManager.numPercentage(this.currentValue() / this.currentMaxValue(), EXPDecimal, DecimalMode) * 100;
+        return NuunManager.numPercentage(this.currentValue() / this.currentMaxValue() * 100, EXPDecimal, DecimalMode);
     }
     return this._battler.currentExp() - this._battler.currentLevelExp();
 };

@@ -4,7 +4,7 @@
 
 [既知の不具合、更新予定](https://github.com/nuun888/MZ/blob/master/bug.md)  
 
-[よくある質問](https://github.com/nuun888/MZ/blob/master/q&a.md)
+[よくある質問](https://github.com/nuun888/MZ/blob/master/README/q&a.md)
 
 # 公開プラグイン
 共：要共通処理  

@@ -76,7 +76,7 @@
 
 
 var Imported = Imported || {};
-Imported.NUUN_ExpGauge = true;
+Imported.NUUN_EventPlayerDirection = true;
 
 (() => {
     const parameters = PluginManager.parameters('NUUN_EventPlayerDirection');

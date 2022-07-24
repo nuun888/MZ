@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -18,7 +18,7 @@
  * イベントの接触範囲判定を拡張します。
  * 
  * イベントのメモ欄またはイベントの実行内容の注釈(Comment)
- * ※前者は全EVページに適用されます。後者は記入したページの時に適用します。
+ * ※前者は全イベントページに適用されます。後者は記入したページの時に適用します。
  * 
  * <EventRange:besideRange,[lx],[rx]> 指定した横方向の範囲内の接触判定を拡大します。
  * [lx]:イベントの接触左側範囲(正の数の整数)
@@ -70,6 +70,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/24 Ver.1.3.1
+ * 複数イベント起動した場合、イベントプレイヤー距離が正常に取得できない問題を修正。
  * 2022/7/16 Ver.1.3.0
  * イベントページ毎に範囲を指定できる機能を追加。
  * 接触範囲にイベントの真正面からの範囲内を追加。
@@ -114,6 +116,15 @@ Imported.NUUN_EventRange = true;
     const DistanceFromXVar = Number(parameters['DistanceFromXVar'] || 0);
     const DistanceFromYVar = Number(parameters['DistanceFromYVar'] || 0);
 
+    const _Game_Interpreter_setup = Game_Interpreter.prototype.setup;
+    Game_Interpreter.prototype.setup = function(list, eventId) {
+        _Game_Interpreter_setup.call(this, list, eventId);
+        if (eventId > 0) {
+            const event = this.character(0);
+            $gamePlayer.setDistanceFrom(event.deltaXFrom($gamePlayer.x) * -1, event.deltaYFrom($gamePlayer.y) * -1);
+        }
+    };
+
     const _Game_Player_initMembers = Game_Player.prototype.initMembers;
     Game_Player.prototype.initMembers = function() {
         _Game_Player_initMembers.call(this);
@@ -135,7 +146,6 @@ Imported.NUUN_EventRange = true;
         if (!$gameMap.isEventRunning()) {
             for (const event of $gameMap.eventsRangeXy(x, y)) {
                 if (event.isTriggerIn(triggers)) {
-                    this.setDistanceFrom(event.deltaXFrom(x) * -1, event.deltaYFrom(y) * -1);
                     event.start();
                 }
             }

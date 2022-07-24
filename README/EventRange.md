@@ -1,5 +1,5 @@
 # [イベント接触判定拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)
-# Ver.1.3.0
+# Ver.1.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -79,6 +79,8 @@
 ※画像の色付けしている部分は、画像表示用に接触範囲を視覚化するために表示しているためなので、エディタ、ゲーム上では表示されません。  
 
 ## 更新履歴
+2022/7/24 Ver.1.3.1  
+複数イベント起動した場合、イベントプレイヤー距離が正常に取得できない問題を修正。  
 2022/7/16 Ver.1.3.0
 イベントページ毎に範囲を指定できる機能を追加。  
 接触範囲にイベントの真正面からの範囲内を追加。  

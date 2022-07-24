@@ -8,10 +8,9 @@
  */
 /*:
  * @target MZ
- * @plugindesc プレイヤーとイベントの向き取得
+ * @plugindesc トリガー起動時のプレイヤーとイベントの向き状況取得
  * @author NUUN
  * @version 1.0.0
- * @base NUUN_EventRange
  * 
  * @help
  * トリガー起動時のプレイヤーとイベントとの向き状況を取得します。

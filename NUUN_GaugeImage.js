@@ -133,7 +133,7 @@
  * 
  * @param GaugeImgAngle
  * @text 画像回転角度
- * @desc 画像を回転角度を指定。正の数で時計回りに回転します。
+ * @desc 画像を回転角度を指定。正の数でゲージの左側基準で時計回りに回転します。
  * @type number
  * @min -999
  * @default 0

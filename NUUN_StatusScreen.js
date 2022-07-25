@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.4.0
+ * @version 2.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -115,6 +115,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/26 Ver.2.4.1
+ * オリジナルパラメータの評価式が適用されていなかった問題を修正。
  * 2022/7/23 Ver.2.4.0
  * 評価式の仕様を変更。
  * ステートのアイコンを表示したいステートのみ表示する機能を追加。
@@ -2025,7 +2027,7 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(nameText , x, y, textWidth);
   }
-  let text = list.DetaEval;
+  let text = list.DetaEval ? eval(list.DetaEval) : undefined;
   if (text !== undefined) {
     if (typeof(text) === 'number') {
       text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);

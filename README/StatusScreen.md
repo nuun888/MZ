@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.4.0
+# Ver.2.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -83,6 +83,8 @@ Y座標を指定します。Y表示列位置からの相対座標になります
 ### レーダーチャート設定
 
 ### 更新履歴
+2022/7/26 Ver.2.4.1  
+オリジナルパラメータの評価式が適用されていなかった問題を修正。  
 2022/7/23 Ver.2.4.0  
 評価式の仕様を変更。  
 ステートのアイコンを表示したいステートのみ表示する機能を追加。  

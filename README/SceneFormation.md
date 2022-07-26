@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.1.7.0
+# Ver.1.7.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -20,6 +20,11 @@
 ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）  
 
 ## 更新履歴
+2022/7/26 Ver.1.7.2  
+最大メンバー増減が正常に機能しない場合がある問題を修正。  
+最大メンバー増減後にフォロワーの表示が正常に表示されない問題を修正。  
+2022/6/15 Ver.1.7.1  
+微修正。  
 2022/3/30 Ver.1.7.0  
 戦闘メンバー、待機メンバーの画像に顔グラを選択できる機能を追加。  
 戦闘メンバーの表示列、行数を設定できる機能を追加。  

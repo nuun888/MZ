@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.7.1
+ * @version 1.7.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -31,6 +31,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/26 Ver.1.7.2
+ * 最大メンバー増減が正常に機能しない場合がある問題を修正。
+ * 最大メンバー増減後にフォロワーの表示が正常に表示されない問題を修正。
  * 2022/6/15 Ver.1.7.1
  * 微修正。
  * 2022/3/30 Ver.1.7.0
@@ -886,7 +889,6 @@ Game_Party.prototype.checkFormationBattleMember = function(addActor, withdrawalA
 Game_Party.prototype.withdrawalOrder = function(index) {
   const withdrawalActor = this._actors.splice(index, 1);
   Array.prototype.push.apply(this._actors, [withdrawalActor]);
-  $gamePlayer.refresh();
 };
 
 Game_Party.prototype.entryOrder = function(index) {
@@ -895,15 +897,16 @@ Game_Party.prototype.entryOrder = function(index) {
   index += index >= members.length ? 1 : 0;
   this._actors.splice(members.length - 1, 0, entryActor);
   this._actors.splice(index, 1);
-  $gamePlayer.refresh();
 };
 
 Game_Party.prototype.changeWithdrawaBattleMember = function() {
-  this._formationBattleMembers = Math.max(this._formationBattleMembers - 1, 1);
+  const members = this._formationBattleMembers - 1;
+  this._formationBattleMembers = members.clamp(1, this.battleMembers().length - 1);
 };
 
 Game_Party.prototype.changeEntryBattleMember = function() {
-  this._formationBattleMembers++;
+  const members = this._formationBattleMembers + (this.battleMembers().length === this._formationBattleMembers ? 1 : 0);
+  this._formationBattleMembers = members.clamp(1, _Game_Party_maxBattleMembers.call(this));
 };
 
 Game_Party.prototype.useFormation = function() {
@@ -1230,11 +1233,13 @@ class Nuun_Formation {
       if (pendingMode === 'member' && check) {
         $gameParty.changeEntryBattleMember();
       }
+      $gamePlayer.refresh();
     } else {
       $gameParty.withdrawalOrder(index);
       if (pendingMode === 'battle' && check) {
         $gameParty.changeWithdrawaBattleMember();
       }
+      $gamePlayer.refresh();
     }
   };
 
@@ -1245,11 +1250,13 @@ class Nuun_Formation {
       if (cursorMode === 'member' && check) {
         $gameParty.changeEntryBattleMember();
       }
+      $gamePlayer.refresh();
     } else {
       $gameParty.withdrawalOrder(index);
       if (cursorMode === 'battle' && check) {
         $gameParty.changeWithdrawaBattleMember();
       }
+      $gamePlayer.refresh();
     }
   };
 

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/29 Ver.1.5.1
+ * -を元に配列を返す処理をNuunManagerでも定義。
  * 2022/7/23 Ver.1.5.0
  * -を元に配列を返す処理を追加。
  * 2022/6/15 Ver.1.4.5
@@ -96,6 +98,19 @@ NuunManager.getColorCode = function(color) {
 NuunManager.numPercentage = function(num, digits, mode) {
   if (isNaN(num)) { return num }
   return (mode ? Math.round(num * Math.pow(10, digits + 2)) : Math.floor(num * Math.pow(10, digits + 2))) / Math.pow(10, digits + 2);
+};
+
+NuunManager.nuun_getListIdData = function(id) {
+  let newId = [];
+  if (id.includes('-')) {
+    const data = id.split('-').map(Number);
+    for (let i = data[0]; i <= data[1]; i++) {
+      Array.prototype.push.apply(newId, [i]);
+    }
+    return newId;
+  } else {
+    return [Number(id)];
+  }
 };
 
 DataManager.nuun_structureData = function(params){

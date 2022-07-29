@@ -1,6 +1,8 @@
 # [ステート、バフターン数増減特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnPlus.js)
 # Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnPlus.js)  
+#### 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.1以上  
 
 ステート、バフ付加時の効果ターンが増加、減少する特徴を設定できます。
 

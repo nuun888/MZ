@@ -1,11 +1,13 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.5.0
+# Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
 
 共通処理を行うベースプラグインです。  
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2022/7/29 Ver.1.5.1  
+-を元に配列を返す処理をNuunManagerでも定義。  
 2022/7/23 Ver.1.5.0  
 -を元に配列を返す処理を追加。  
 2022/6/15 Ver.1.4.5  

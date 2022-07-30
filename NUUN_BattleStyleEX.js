@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.5.4
+ * @version 3.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,12 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/7/30 Ver.3.6.0
+ * ステータスが表示されるウィンドウに表示するステータスをウィンドウ外にも表示できるように変更。
+ * 表示ステータスに画像を表示できる機能を追加。
+ * 表示ステータスにメニューで表示されるタイプのステートを表示する機能を追加。
+ * 敵選択ウィンドウの表示がずれる問題を修正。
+ * バトルステータスウィンドウの表示がおかしくなる問題を修正。
  * 2022/7/23 Ver.3.5.4
  * キャンセルボタンのX座標を調整できる処理の追加。
  * 処理の修正。
@@ -624,7 +630,8 @@ Game_Enemy.prototype.bareHandsAnimationId = function() {
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
 Scene_Battle.prototype.initialize = function() {
   _Scene_Battle_initialize.call(this);
-  this.loadBackgroundImg()
+  this.loadBackgroundImg();
+  this.loadBattleStatusImg();
 };
 
 Scene_Battle.prototype.loadBackgroundImg = function() {
@@ -633,6 +640,12 @@ Scene_Battle.prototype.loadBackgroundImg = function() {
   loadBackground(params.LoseBackgroundImg);
   loadBackground(params.EscapeBackgroundImg);
   loadBackground(params.EscapeFailureBackgroundImg);
+};
+
+Scene_Battle.prototype.loadBattleStatusImg = function() {
+
+  //$gameTemp.actorData = getActorPositionData(actor.actorId());
+  //const statusData = $gameTemp.actorData.StatusListData;
 };
 
 const _Scene_Battle_start = Scene_Battle.prototype.start;
@@ -713,8 +726,11 @@ Scene_Battle.prototype.createActorSelectWindow = function() {
 
 Scene_Battle.prototype.createStatusWindow = function() {
     const rect = this.statusWindowRect();
+    const rect2 = this.actorStatusWindowRect();//
     this._actorImges = new Window_BattleActorImges(rect);
     this._actorStatus = new Window_BattleActorStatus(rect);
+    this._actorStatus.sx = rect.x - rect2.x;//
+    this._actorStatus.sy = rect.y - rect2.y;//
     this._battleHudBack.addChild(this._actorImges);
     this._battleHudFront.addChild(this._actorStatus);
     this._statusWindow.setActorWindow(this._actorImges, this._actorStatus);
@@ -860,10 +876,10 @@ Scene_Battle.prototype.createMessageWindow = function() {
 };
 
 Scene_Battle.prototype.enemyWindowRect = function() {//再定義
-  const wx = params.EnemyWindow_X + (params.EnemyWindowMode ? this._statusWindow.x : (this._statusWindow.x - Graphics.width) / 2);
+  const wx = params.EnemyWindow_X + (params.EnemyWindowMode ? 0 : (Graphics.boxWidth - Graphics.width) / 2);
   const ww = this.enemyWindowWidth();
   const wh = this.enemyWindowAreaHeight();
-  const wy = (params.EnemyWindowMode ? Graphics.boxHeight - wh : 0) + params.EnemyWindow_Y;
+  const wy = params.EnemyWindow_Y + (params.EnemyWindowMode ? Graphics.boxHeight - wh : (Graphics.boxHeight - Graphics.height) / 2);
   return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -909,6 +925,14 @@ Scene_Battle.prototype.statusWindowRect = function() {
     let wx = this.getActorWindowX() + (this.isRightInputMode() ? 0 : Graphics.boxWidth - ww);
     let wy = this.getActorWindowY();
     return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.actorStatusWindowRect = function() {
+  let ww = Graphics.width + 40;
+  let wh = Graphics.height + 40;
+  let wx = -20;
+  let wy = -20;
+  return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.setBackgroundWindow = function(background, x, y) {
@@ -1055,7 +1079,7 @@ Scene_Battle.prototype.statusWindowX = function() {//再定義
     if (this.isAnyInputWindowActive()) {
         return this.statusWindowRect().x;
     } else {
-        return this._partyCommandWindow.width / 2;
+        return this._partyCommandWindow.width / 2 + (Graphics.width - Graphics.boxWidth) / 2;
     }
 };
 
@@ -1137,7 +1161,9 @@ Scene_Battle.prototype.startEnemySelection = function() {
   this._statusWindow.show();
   this._skillWindow.hide();
   this._itemWindow.hide();
-  this._actorCommandWindow.hide();
+  if (!this.commandDefaultMode()) {
+    this._actorCommandWindow.hide();
+  }
 };
 
 const _Scene_Battle_onEnemyCancel = Scene_Battle.prototype.onEnemyCancel;
@@ -1173,7 +1199,7 @@ Scene_Battle.prototype.selectPreviousCommand = function() {
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
-  $gameTemp.onBSAction = BattleManager.isTpb();
+  $gameTemp.onBSAction = BattleManager.isTpb() && !this.commandDefaultMode();
   _Scene_Battle_onSelectAction.call(this);
 };
 
@@ -1199,6 +1225,10 @@ const _Scene_Battle_selectNextCommand = Scene_Battle.prototype.selectNextCommand
 Scene_Battle.prototype.selectNextCommand = function() {
   _Scene_Battle_selectNextCommand.call(this);
   $gameTemp.onBSAction = false;
+};
+
+Scene_Battle.prototype.commandDefaultMode = function() {
+  return params.bsMode === 'Default' || params.bsMode === 'Standard';
 };
 
 
@@ -1507,6 +1537,8 @@ Window_BattleStatus.prototype.drawItemStatus = function(index) {//再定義
       this.drawStatusListData(actor, statusData, index);
     } else { 
       const rect = this.itemRectWithPadding(index);
+      //rect.x += 24;
+      //rect.y -= 24;
       const stateIconX = this.stateIconX(rect);
       const stateIconY = this.stateIconY(rect);
       if (params.StateVisible && !params.OutsideWindowVisible) {
@@ -1550,8 +1582,11 @@ Window_BattleStatus.prototype.drawStatusListData = function(actor, list, index) 
           this.placeStateIcon(actor, rect.x + data.PositionX, rect.y + data.PositionY);
         }
         break;
+      case 'state2':
+        this.drawActorIcons(actor, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width), data);
+        break;
       case 'name':
-        this.placeActorName(actor, rect.x + data.PositionX, rect.y + data.PositionY);
+        this.bs_PlaceActorName(actor, rect.x + data.PositionX, rect.y + data.PositionY);
         break;
       case 'lv':
         this.drawLevel(actor, data, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
@@ -1564,6 +1599,9 @@ Window_BattleStatus.prototype.drawStatusListData = function(actor, list, index) 
         break;
       case 'dparam':
         this.placeUserParam(actor, data.UserParamID, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      case 'imges':
+        this.drawActorImges(actor, data, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
         break;
       default:
         break;
@@ -1600,9 +1638,52 @@ Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width)
   this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
+Window_BattleStatus.prototype.drawActorIcons = function(actor, x, y, width, data) {
+  let icons = [];
+  let states = [];
+  const iconWidth = ImageManager.iconWidth;
+  const dataEval = data.DetaEval1;
+  if (dataEval) {
+      const stateList = dataEval.split(',');
+      for (const id of stateList) {
+          Array.prototype.push.apply(states, NuunManager.nuun_getListIdData(id));
+      }
+      icons = actor.allIcons().filter(icon => states.some(i => $dataStates[i].iconIndex === icon)).slice(0, Math.floor(width / iconWidth));
+      let iconX = x;
+      for (const icon of icons) {
+          this.drawIcon(icon, iconX, y + 2);
+          iconX += iconWidth;
+      }
+  } else {
+      Window_StatusBase.prototype.drawActorIcons.call(this, actor, x, y, width);
+  }
+};
+
+Window_BattleStatus.prototype.drawActorImges = function(actor, data, x, y, width) {
+  if (data.ContentsImges) {
+    const key = "actor%1-imges%2".format(actor.actorId(), data.UserParamID || '_img');
+    const bitmap = ImageManager.nuun_LoadPictures(data.ContentsImges);
+    const sprite = this.createInnerSprite(key, Sprite);
+    sprite.bitmap = bitmap;
+    sprite.x = x;
+    sprite.y = y;
+    sprite.anchor.x = 0.5;
+    sprite.anchor.y = 0.5;
+    sprite.show();
+  }
+};
+
 Window_BattleStatus.prototype.placeUserParam = function(actor, data, x, y) {
   const key = "actor%1-userParam%2".format(actor.actorId(), data.UserParamID || 'dparam');
   const sprite = this.createInnerSprite(key, Sprite_NuunUserParam);
+  sprite.setup(actor);
+  sprite.move(x, y);
+  sprite.show();
+};
+
+Window_StatusBase.prototype.bs_PlaceActorName = function(actor, x, y) {
+  const key = "actor%1-name".format(actor.actorId());
+  const sprite = this.createInnerSprite(key, Sprite_BSName);
   sprite.setup(actor);
   sprite.move(x, y);
   sprite.show();
@@ -1674,7 +1755,7 @@ Window_BattleStatus.prototype.nameY = function(rect) {
   if (params.bsMode === 'Standard') {
     return $gameTemp.actorData.NameChangePosition ? $gameTemp.actorData.ActorName_Y + rect.y : rect.y + 10;
   } else {
-    return $gameTemp.actorData.NameChangePosition ? $gameTemp.actorData.ActorName_Y + rect.y : _Window_BattleStatus_nameY.call(this, rect);;
+    return $gameTemp.actorData.NameChangePosition ? $gameTemp.actorData.ActorName_Y + rect.y : _Window_BattleStatus_nameY.call(this, rect);
   }
 };
 
@@ -1797,6 +1878,43 @@ Window_BattleActorImges.prototype.setActorBaseSprite = function() {
 Window_BattleActorImges.prototype.drawItem = function(index) {
   this.drawItemImage(index);
   this.drawStatusBack(index);
+  //this.drawItemStatus(index);
+};
+
+Window_BattleActorImges.prototype.drawStatusListData = function(actor, list, index) {
+  const rect = this.itemRectWithPadding(index);
+  list.forEach(data => {
+    switch (data.Status) {
+      case 'imges':
+        this.drawActorImges(actor, data, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      default:
+        break;
+    }
+  });
+};
+
+Window_BattleActorImges.prototype.drawItemStatus = function(index) {//再定義
+  const actor = this.actor(index);
+  const actorData = getActorPositionData(actor.actorId());
+  const statusData = actorData.StatusListData;
+    if (statusData && statusData.length > 0) {
+      this.drawStatusListData(actor, statusData, index);
+    }
+};
+
+Window_BattleActorImges.prototype.drawActorImges = function(actor, data, x, y, width) {
+  if (data.ContentsImges) {
+    const key = "actor%1-imges%2".format(actor.actorId(), data.UserParamID || '_img');
+    const bitmap = ImageManager.nuun_LoadPictures(data.ContentsImges);
+    const sprite = this.createActorImgSprite(key, Sprite);
+    sprite.bitmap = bitmap;
+    sprite.x = x;
+    sprite.y = y;
+    sprite.anchor.x = 0.5;
+    sprite.anchor.y = 0.5;
+    sprite.show();
+  }
 };
 
 Window_BattleActorImges.prototype.drawStatusBack = function(index) {
@@ -1887,7 +2005,7 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor) {
       this.addChild(stateSprite);
     }
     sprite.setup(actor, actorImgData, imgIndex, stateSprite);
-    const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 4) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
+    const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 8) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
     //const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
     const y = rect.y + (actorImgData.ActorImgVPosition === 'under' ? this.height : 0) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + this.itemPadding() + (actorImgData ? actorImgData.Actor_Y : 0);
     const scale = actorImgData.Actor_Scale / 100;
@@ -1932,9 +2050,9 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
   const ph = ImageManager.faceHeight;
   const sw = Math.min(width, pw);
   const sh = Math.min(height, ph);
-  const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 4) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
+  const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 8) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
   //const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
-  const y = rect.y + (actorImgData.ActorImgVPosition === 'under' ? sh : 0) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + (actorImgData ? actorImgData.Actor_Y : 0);
+  const y = rect.y + (actorImgData.ActorImgVPosition === 'under' ? sh : 1) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + (actorImgData ? actorImgData.Actor_Y : 0);
   sprite.setHome(x, y);
   const sx = Math.floor((imgIndex % 4) * pw + (pw - sw) / 2);
   const sy = Math.floor(Math.floor(imgIndex / 4) * ph + (ph - sh) / 2);
@@ -1986,11 +2104,21 @@ Window_BattleActorStatus.prototype.constructor = Window_BattleActorStatus;
 
 Window_BattleActorStatus.prototype.initialize = function(rect) {
     Window_StatusBase.prototype.initialize.call(this, rect);
+    const filterArea = this._clientArea.filterArea;
     this.openness = 0;
     this.opacity = 0;
     this._opening = true;
     this.visible = true;
     this.preparePartyRefresh();
+};
+
+Window_BattleActorStatus.prototype._updateFilterArea = function() {
+  const pos = this._clientArea.worldTransform.apply(new Point(0, 0));
+  const filterArea = this._clientArea.filterArea;
+  filterArea.x = 0;
+  filterArea.y = 0;
+  filterArea.width = Graphics.width;
+  filterArea.height = Graphics.height;
 };
 
 Window_BattleActorStatus.prototype.preparePartyRefresh = function() {
@@ -2259,6 +2387,7 @@ Sprite_ActorImges.prototype.setup = function(battler, data, index, stateSprite) 
     this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
     this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
   }
+  this.setBlendColor([0, 0, 0, 0]);
 };
 
 Sprite_ActorImges.prototype.setHome = function(x, y) {
@@ -2781,6 +2910,34 @@ Sprite_NuunUserParam.prototype.fontSize = function() {
 Sprite_NuunUserParam.prototype.setupFont = function() {
   this.bitmap.fontSize = this.fontSize();
 };
+
+
+function Sprite_BSName() {
+  this.initialize(...arguments);
+}
+
+Sprite_BSName.prototype = Object.create(Sprite_Name.prototype);
+Sprite_BSName.prototype.constructor = Sprite_BSName;
+
+Sprite_BSName.prototype.initialize = function() {
+  this.userStatusParam = $gameTemp.userStatusParam;
+  this._nameWidth = this.userStatusParam.Width > 0 ? this.userStatusParam.Width : 128;
+  this._nameHeight = this.userStatusParam.Height > 24 ? this.userStatusParam.Height : 24;
+  Sprite_Name.prototype.initialize.call(this);
+};
+
+Sprite_BSName.prototype.bitmapWidth = function() {
+  return this._nameWidth;
+};
+
+Sprite_BSName.prototype.bitmapHeight = function() {
+  return this._nameHeight;
+};
+
+Sprite_BSName.prototype.fontSize = function() {
+  return $gameSystem.mainFontSize() +  (this.userStatusParam.FontSize || 0);
+};
+
 
 //Spriteset_Base 
 const _Spriteset_Base_animationShouldMirror = Spriteset_Base.prototype.animationShouldMirror;

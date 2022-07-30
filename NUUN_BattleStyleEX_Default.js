@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.5.3
+ * @version 1.6.0
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -48,7 +48,17 @@
  * 木星ペンギン氏作疑似３Dバトルプラグインと併用して、フロントビューで味方にアニメーションを表示させる場合は
  * 別途バトルスタイル拡張疑似３Dバトル併用パッチを導入してください。
  * 
+ * Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステータス設定での設定に変更しております。
+ * 旧設定で設定している場合でアクター座標、画像設定で追加する場合は、表示ステータス設定を空欄にしてください。
+ * 
  * 更新履歴
+ * 2022/7/30 Ver.1.6.0
+ * 敵対象選択中にアクターコマンドが出るように修正。
+ * 表示ステータスにメニューで表示されるタイプのステートを表示する機能を追加。
+ * 表示ステータスに画像を追加。
+ * メンバー交代後にアクターの画像が変色してしまう問題を修正。
+ * 一部プラグインパラメータのデフォルト値の修正。
+ * アクター名に幅、フォントサイズが適用されていなかった問題を修正。
  * 2022/7/23 Ver.1.5.3
  * キャンセルボタンのX座標を調整できる機能を追加。
  * 2022/7/18 Ver.1.5.2
@@ -752,8 +762,8 @@
  * @param DefaultStatusPositionData
  * @text デフォルトステータス座標表示設定
  * @desc デフォルトのステータスの座標、表示設定の設定を行います。
- * @default {"ActorNameChangePosition":"","NameChangePosition":"false","ActorName_X":"0","ActorName_Y":"88","ActorHPChangePosition":"------------------------------","HPGaugeWidth":"128","HPGaugeHeight":"12","HPChangePosition":"false","ActorHP_X":"0","ActorHP_Y":"112","ActorMPChangePosition":"------------------------------","MPGaugeWidth":"128","MPGaugeHeight":"12","MPChangePosition":"false","ActorMP_X":"0","ActorMP_Y":"136","ActorTPChangePosition":"------------------------------","TPGaugeWidth":"128","TPGaugeHeight":"12","TPChangePosition":"false","ActorTP_X":"0","ActorTP_Y":"160","ActorTPBChangePosition":"------------------------------","TPBGaugeWidth":"128","TPBGaugeHeight":"12","TPBChangePosition":"false","ActorTPB_X":"0","ActorTPB_Y":"88","ActorStateChangePosition":"------------------------------","StateChangePosition":"false","ActorState_X":"4","ActorState_Y":"20","OutsideWindowVisible":"false","ActorImgChangePosition":"------------------------------","ImgChangePosition":"false","ActorImg_X":"0","ActorImg_Y":"0","Background":"------------------------------","ActorBackground":"","ActorFrontBackground":""}
- * @type struct<StatusPositionData>
+ * @default {"StatusListData":"[\"{\\\"Status\\\":\\\"'tpb'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"88\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'name'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"88\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'hpgauge'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"112\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'mpgauge'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"136\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'tpgauge'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"160\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'state'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"114\\\",\\\"PositionY\\\":\\\"20\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\"]","ActorImgChangePosition":"------------------------------","ImgChangePosition":"false","ActorImg_X":"0","ActorImg_Y":"0","ActorCommandSkin":"------------------------------","WindowSkin":"","WindowColor":"{\"red\":\"0\",\"green\":\"0\",\"bule\":\"0\"}","Background":"------------------------------","ActorBackground":"","ActorFrontBackground":"","OldSetting":"------------------------------","ActorNameChangePosition":"","NameChangePosition":"false","ActorName_X":"0","ActorName_Y":"88","ActorHPChangePosition":"------------------------------","HPGaugeWidth":"128","HPGaugeHeight":"12","HPChangePosition":"false","ActorHP_X":"0","ActorHP_Y":"112","ActorMPChangePosition":"------------------------------","MPGaugeWidth":"128","MPGaugeHeight":"12","MPChangePosition":"false","ActorMP_X":"0","ActorMP_Y":"136","ActorTPChangePosition":"------------------------------","TPGaugeWidth":"128","TPGaugeHeight":"12","TPChangePosition":"false","ActorTP_X":"0","ActorTP_Y":"160","ActorTPBChangePosition":"------------------------------","TPBGaugeWidth":"128","TPBGaugeHeight":"12","TPBChangePosition":"false","ActorTPB_X":"0","ActorTPB_Y":"88","ActorStateChangePosition":"------------------------------","StateChangePosition":"false","ActorState_X":"4","ActorState_Y":"20"}
+ * @type struct<StatusPositionDataList>
  * @parent ActorSetting
  * 
  * @param DefaultActorImgData
@@ -960,7 +970,7 @@
  * @desc ダメージ時のシェイクを有効にする。
  * @text ダメージシェイク有効
  * @type boolean
- * @default true
+ * @default false
  * @parent ActorImgEffect
  * 
  * @param ActorShakeFlame
@@ -991,7 +1001,7 @@
  * @desc 行動時のエフェクトを有効にする。
  * @text 行動時エフェクト有効
  * @type boolean
- * @default true
+ * @default false
  * @parent ActorImgEffect
  * 
  * @param ActionZoomDuration
@@ -1317,7 +1327,7 @@
  * @param LoseWindowBackGround
  * @text 背景画像ウィンドウ背景設定
  * @default ------------------------------
- * @parent LoseyWindow
+ * @parent LoseWindow
  * 
  * @param LoseBackgroundImg
  * @desc 背景画像ウィンドウを指定する。
@@ -1462,12 +1472,12 @@
  * @parent SupportActorCommand
  * 
  */
-/*~struct~StatusPositionData:
+/*~struct~StatusPositionDataList:
  * 
  * @param StatusListData
  * @text 表示ステータス設定
  * @desc 表示するステータス情報を設定します。一つでも指定してある場合はこちらの設定が適用されます。
- * @default 
+ * @default ["{\"Status\":\"'tpb'\",\"Width\":\"128\",\"Height\":\"12\",\"PositionX\":\"0\",\"PositionY\":\"88\",\"FontSize\":\"0\",\"ParamName\":\"\",\"UserParamID\":\"\",\"DetaEval1\":\"\",\"DetaEval2\":\"\",\"GaugeSetting\":\"------------------------------\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgesSetting\":\"------------------------------\",\"ContentsImges\":\"\"}","{\"Status\":\"'name'\",\"Width\":\"128\",\"Height\":\"12\",\"PositionX\":\"0\",\"PositionY\":\"88\",\"FontSize\":\"0\",\"ParamName\":\"\",\"UserParamID\":\"\",\"DetaEval1\":\"\",\"DetaEval2\":\"\",\"GaugeSetting\":\"------------------------------\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgesSetting\":\"------------------------------\",\"ContentsImges\":\"\"}","{\"Status\":\"'hpgauge'\",\"Width\":\"128\",\"Height\":\"12\",\"PositionX\":\"0\",\"PositionY\":\"112\",\"FontSize\":\"0\",\"ParamName\":\"\",\"UserParamID\":\"\",\"DetaEval1\":\"\",\"DetaEval2\":\"\",\"GaugeSetting\":\"------------------------------\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgesSetting\":\"------------------------------\",\"ContentsImges\":\"\"}","{\"Status\":\"'mpgauge'\",\"Width\":\"128\",\"Height\":\"12\",\"PositionX\":\"0\",\"PositionY\":\"136\",\"FontSize\":\"0\",\"ParamName\":\"\",\"UserParamID\":\"\",\"DetaEval1\":\"\",\"DetaEval2\":\"\",\"GaugeSetting\":\"------------------------------\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgesSetting\":\"------------------------------\",\"ContentsImges\":\"\"}","{\"Status\":\"'tpgauge'\",\"Width\":\"128\",\"Height\":\"12\",\"PositionX\":\"0\",\"PositionY\":\"160\",\"FontSize\":\"0\",\"ParamName\":\"\",\"UserParamID\":\"\",\"DetaEval1\":\"\",\"DetaEval2\":\"\",\"GaugeSetting\":\"------------------------------\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgesSetting\":\"------------------------------\",\"ContentsImges\":\"\"}","{\"Status\":\"'state'\",\"Width\":\"128\",\"Height\":\"12\",\"PositionX\":\"114\",\"PositionY\":\"20\",\"FontSize\":\"0\",\"ParamName\":\"\",\"UserParamID\":\"\",\"DetaEval1\":\"\",\"DetaEval2\":\"\",\"GaugeSetting\":\"------------------------------\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgesSetting\":\"------------------------------\",\"ContentsImges\":\"\"}"]
  * @type struct<ActorStatusList>[]
  * 
  * @param ActorImgChangePosition
@@ -1911,7 +1921,7 @@
  * @text ステータス座標表示設定
  * @desc ステータスの座標、表示設定の設定を行います。
  * @default {"ActorNameChangePosition":"","NameChangePosition":"false","ActorName_X":"0","ActorName_Y":"88","ActorHPChangePosition":"------------------------------","HPGaugeWidth":"128","HPGaugeHeight":"12","HPChangePosition":"false","ActorHP_X":"0","ActorHP_Y":"112","ActorMPChangePosition":"------------------------------","MPGaugeWidth":"128","MPGaugeHeight":"12","MPChangePosition":"false","ActorMP_X":"0","ActorMP_Y":"136","ActorTPChangePosition":"------------------------------","TPGaugeWidth":"128","TPGaugeHeight":"12","TPChangePosition":"false","ActorTP_X":"0","ActorTP_Y":"160","ActorTPBChangePosition":"------------------------------","TPBGaugeWidth":"128","TPBGaugeHeight":"12","TPBChangePosition":"false","ActorTPB_X":"0","ActorTPB_Y":"88","ActorStateChangePosition":"------------------------------","StateChangePosition":"false","ActorState_X":"4","ActorState_Y":"20","OutsideWindowVisible":"false","ActorImgChangePosition":"------------------------------","ImgChangePosition":"false","ActorImg_X":"0","ActorImg_Y":"0","Background":"------------------------------","ActorBackground":"","ActorFrontBackground":""}
- * @type struct<StatusPositionData>
+ * @type struct<StatusPositionDataList>
  * @parent ActorPosition
  * 
  * @param ActorImges
@@ -2101,16 +2111,20 @@
  * @value 'tpb'
  * @option ステート(3)(4)
  * @value 'state'
- * @option アクター名(1)(3)(4)(5)
+ * @option ステート(メニュータイプ)(1)(3)(4)(8)
+ * @value 'state2'
+ * @option アクター名(1)(2)(3)(4)(5)
  * @value 'name'
  * @option 独自パラメータ(1)(3)(4)(5)(6)(8)
  * @value 'param'
- * @option 独自パラメータ(動的) (1)(3)(4)(5)(6)(7)(8)
+ * @option 独自パラメータ(動的) (1)(2)(3)(4)(5)(6)(7)(8)
  * @value 'dparam'
  * @option 独自ゲージ (1)(2)(3)(4)(5)(6)(7)(8)
  * @value 'usergauge'
  * @option レベル(1)(3)(4)(5)(6)
  * @value 'lv'
+ * @option 画像(3)(4)(7)(12)
+ * @value 'imges'
  * @default
  * 
  * @param Width
@@ -2160,13 +2174,13 @@
  * @default 
  * 
  * @param UserParamID
- * @desc 独自パラメータ、ゲージ識別ID。
+ * @desc 独自パラメータ、ゲージ、画像識別ID。
  * @text 識別ID(7)
  * @type string
  * @default 
  * 
  * @param DetaEval1
- * @desc 評価式。(独自パラメータ、独自ゲージ現在値)
+ * @desc 評価式または文字列。(独自パラメータ、独自ゲージ現在値、ステート(メニュータイプ))
  * @text 評価式A(8)
  * @type string
  * @default 
@@ -2196,6 +2210,18 @@
  * @default 0
  * @min 0
  * @parent GaugeSetting
+ * 
+ * @param ImgesSetting
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ContentsImges
+ * @desc 画像を指定する。
+ * @text 画像設定(12)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgesSetting
  * 
  */
 /*~struct~WindowTone:
@@ -2321,8 +2347,8 @@ params.ActorShakePower = Number(parameters['ActorShakePower'] || 2);
 params.ActorShakeSpeed = Number(parameters['ActorShakeSpeed'] || 20);
 params.ActionZoomDuration = Number(parameters['ActionZoomDuration'] || 60);
 params.ActorFlash = eval(parameters['ActorFlash'] || "true");
-params.OnActionZoom = eval(parameters['OnActionZoom'] || "true");
-params.OnActorShake = eval(parameters['OnActorShake'] || "true");
+params.OnActionZoom = eval(parameters['OnActionZoom'] || "false");
+params.OnActorShake = eval(parameters['OnActorShake'] || "flase");
 
 params.DefaultStatusPositionData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DefaultStatusPositionData'])) : null) || {};
 params.DefaultActorImgData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DefaultActorImgData'])) : null) || {};

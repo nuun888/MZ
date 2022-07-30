@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.7.2
+ * @version 1.7.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -31,6 +31,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/30 Ver.1.7.3
+ * 戦闘中に無限ループを起こしゲームが停止してしまう問題を修正。
  * 2022/7/26 Ver.1.7.2
  * 最大メンバー増減が正常に機能しない場合がある問題を修正。
  * 最大メンバー増減後にフォロワーの表示が正常に表示されない問題を修正。
@@ -1437,6 +1439,7 @@ Window_FormationBattleMember.prototype.initialize = function(rect) {
   this._members = $gameParty.formationBattleMember();
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._formationMode = true;
+  this._oldActor = null;
   this.refresh();
 };
 
@@ -1497,11 +1500,12 @@ Window_FormationBattleMember.prototype.select = function(index) {
 
 Window_FormationBattleMember.prototype.setActorStatus = function(index) {
   const actor = this.actor(index);
-  if (statusWindow) {
+  if (statusWindow && actor !== this._oldActor) {
     statusWindow.setStatus(actor);
-  }
-  if (this._spriteActor) {
-    this._spriteActor.setup(actor);
+    if (this._spriteActor) {
+      this._spriteActor.setup(actor);
+    }
+    this._oldActor = actor;
   }
 };
 
@@ -1675,6 +1679,7 @@ Window_FormationMember.prototype.initialize = function(rect) {
   this._members = $gameParty.formationMember();
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._formationMode = true;
+  this._oldActor = null;
   this.refresh();
 };
 
@@ -1731,11 +1736,12 @@ Window_FormationMember.prototype.select = function(index) {
 
 Window_FormationMember.prototype.setActorStatus = function(index) {
   const actor = this.actor(index);
-  if (statusWindow) {
+  if (statusWindow && actor !== this._oldActor) {
     statusWindow.setStatus(actor);
-  }
-  if (this._spriteActor) {
-    this._spriteActor.setup(actor);
+    if (this._spriteActor) {
+      this._spriteActor.setup(actor);
+    }
+    this._oldActor = actor;
   }
 };
 

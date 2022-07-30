@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
- * @version 2.13.3
+ * @version 2.13.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -228,6 +228,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/30 Ver.2.13.4
+ * 図鑑に表示しない名前を指定できる機能を追加。
+ * コンテンツ背景の表示なしの時に、項目の表示がわずかにずれて表示される問題を修正。
  * 2022/6/15 Ver.2.13.3
  * 評価式に文字列を記入したときにNaNと表示されてしまう問題を修正。
  * 2022/6/13 Ver.2.13.2
@@ -928,6 +931,13 @@
  * @default ？
  * @parent BasicSetting
  * 
+ * @param NoDataName
+ * @desc 図鑑に登録しない名前を指定します。名前空欄はデフォルトで登録されません。
+ * @text 登録しない名前
+ * @type string
+ * @default 
+ * @parent BasicSetting
+ * 
  * @param DecimalMode
  * @text 端数処理四捨五入
  * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
@@ -1486,21 +1496,21 @@
  * @desc 表示するリスト。
  * @text 表示リスト１
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"7\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"32\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"30\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"31\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"40\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"41\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"45\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"46\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"false\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"32\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"false\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"30\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"31\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"40\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"41\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"45\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"46\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent ListData1_10
  * 
  * @param PageList2
  * @desc 表示するリスト。
  * @text 表示リスト２
  * @type struct<PageListData>[]
- * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"7\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"60\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"70\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"desc\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"false\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"60\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"70\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"desc\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent ListData1_10
  * 
  * @param PageList3
  * @desc 表示するリスト。
  * @text 表示リスト３
  * @type struct<PageListData>[]
- * @default []
+ * @default ["{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"200\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"33\",\"DetaEval\":\"\",\"NameColor\":\"0\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"MaskMode\":\"false\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"32\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"false\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"1\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"2\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"3\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"4\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"128\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"5\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"6\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"128\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"7\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"8\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"128\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"30\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"31\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"40\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"41\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"45\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}","{\"BasicSetting\":\"\",\"paramName\":\"\",\"DateSelect\":\"46\",\"DetaEval\":\"\",\"NameColor\":\"16\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"MaskMode\":\"true\",\"Back\":\"false\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"nameSetting\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textSetting\":\"\",\"textMethod\":\"\",\"ImgSetting\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\",\"UnitSetting\":\"\",\"paramUnit\":\"\"}"]
  * @parent ListData1_10
  * 
  * @param PageList4
@@ -2910,11 +2920,11 @@ Game_System.prototype.getEnemyBookFlag = function(enemyId) {
 };
 
 Game_System.prototype.isInEnemyBook = function(enemy) {
-  return enemy && enemy.name && this._enemyBookFlags && this._enemyBookFlags[enemy.id];
+  return enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && this._enemyBookFlags && this._enemyBookFlags[enemy.id];
 };
 
 Game_System.prototype.isInEnemyBookStatus = function(enemy) {
-  return enemy && enemy.name && this._enemyBookStatusFlags && this._enemyBookStatusFlags[enemy.id];
+  return enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && this._enemyBookStatusFlags && this._enemyBookStatusFlags[enemy.id];
 };
 
 Game_System.prototype.completeRateVariables = function(val) {
@@ -2927,7 +2937,7 @@ Game_System.prototype.completeRate = function() {
 };
 
 Game_System.prototype.isEnemyBook = function(enemy) {//データベース
-  return enemy && enemy.name && !enemy.meta.NoBook && !enemy.meta.NoBookData;
+  return enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && !enemy.meta.NoBook && !enemy.meta.NoBookData;
 };
 
 Game_System.prototype.bookEnemyDate = function() {
@@ -2965,8 +2975,12 @@ Game_System.prototype.defeatNumber = function(enemyId) {
 Game_System.prototype.setDefeatEnemy = function(enemyList) {
   const enemy = enemyList ? enemyList : $dataEnemies;
   this._defeatEnemy = enemy.reduce((r, enemy) => {
-    return r + (enemy && enemy.name && (this.defeatNumber(enemy.id) > 0 || enemy.meta.ShowDataBook && !enemy.meta.NoBook && !enemy.meta.NoBookData) ? 1 : 0);
+    return r + (enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && (this.defeatNumber(enemy.id) > 0 || enemy.meta.ShowDataBook && !enemy.meta.NoBook && !enemy.meta.NoBookData) ? 1 : 0);
   }, 0);
+};
+
+Game_System.prototype.noEnemyBookEnemyName = function(enemy) {
+  return param.NoDataName ? param.NoDataName !== enemy.name : true;
 };
 
 Game_System.prototype.defeatEnemy = function(enemyList) {
@@ -4923,8 +4937,10 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
       if (list.DateSelect === 9 && !this.scanMode()) {
         return;
       }
-      this.drawContentsBackground(list.Back, x, y, width);
-      x = this.contensX(x);
+      if (list.Back) {
+        this.drawContentsBackground(list.Back, x, y, width);
+        x = this.contensX(x);
+      }
       width = this.contensWidth(width);
       this.changeTextColor(this.getColorCode(list.NameColor));
       nameText = this.paramNameShow(list, enemy);
@@ -4994,8 +5010,10 @@ Window_EnemyBook.prototype.enemyName = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
   this.contentsFontSize(list);
-  this.drawContentsBackground(list.Back, x, y, width);
-  x = this.contensX(x);
+  if (list.Back) {
+    this.drawContentsBackground(list.Back, x, y, width);
+    x = this.contensX(x);
+  }
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : TextManager.exp;
@@ -5013,8 +5031,10 @@ Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.enemyGold = function(list, enemy, x, y, width) {
   this.contentsFontSize(list);
-  this.drawContentsBackground(list.Back, x, y, width);
-  x = this.contensX(x);
+  if (list.Back) {
+    this.drawContentsBackground(list.Back, x, y, width);
+    x = this.contensX(x);
+  }
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "獲得金額";
@@ -5033,8 +5053,10 @@ Window_EnemyBook.prototype.enemyGold = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
   this.contentsFontSize(list);
-  this.drawContentsBackground(list.Back, x, y, width);
-  x = this.contensX(x);
+  if (list.Back) {
+    this.drawContentsBackground(list.Back, x, y, width);
+    x = this.contensX(x);
+  }
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName ? list.paramName : "倒した数";
@@ -5056,8 +5078,10 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
 Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
   this.contentsFontSize(list);
   if (BattleManager.isTpb() && this.scanMode()) {
-    this.drawContentsBackground(list.Back, x, y, width);
-    x = this.contensX(x);
+    if (list.Back) {
+      this.drawContentsBackground(list.Back, x, y, width);
+      x = this.contensX(x);
+    }
     width = this.contensWidth(width);
     this.changeTextColor(this.getColorCode(list.NameColor));
     const nameText = list.paramName ? list.paramName : "ターン";
@@ -5274,8 +5298,12 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
     } else {
       y2 = lineHeight * i + y;
     }
-    this.drawContentsBackground(list.Back, x2, y2, width);
-    x3 = this.contensX(x2);
+    if (list.Back) {
+      this.drawContentsBackground(list.Back, x2, y2, width);
+      x3 = this.contensX(x2);
+    } else {
+      x3 = x2;
+    }
     width2 = this.contensWidth(width);
     let textWidth = 0;
     if (element.ElementNo && element.ElementNo !== 0) {
@@ -5461,8 +5489,12 @@ Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, wi
     } else {
       y2 = lineHeight * i + y;
     }
-    this.drawContentsBackground(list.Back, x2, y2, width);
-    x3 = this.contensX(x2);
+    if (list.Back) {
+      this.drawContentsBackground(list.Back, x2, y2, width);
+      x3 = this.contensX(x2);
+    } else {
+      x3 = x2;
+    }
     width2 = this.contensWidth(width);
     let textWidth = 0;
     if (state.StateId) {
@@ -5593,8 +5625,12 @@ Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
       } else {
         y2 += lineHeight;
       }
-      this.drawContentsBackground(list.Back, x2, y2, width);
-      x3 = this.contensX(x2);
+      if (list.Back) {
+        this.drawContentsBackground(list.Back, x2, y2, width);
+        x3 = this.contensX(x2);
+      } else {
+        x3 = x2;
+      }
       width2 = this.contensWidth(width);
       let item = enemy.itemObject(di.kind, di.dataId);
       if((this.showDropItemMask(list.MaskMode, enemy) && this.dropItemFlag(i))) {
@@ -5649,8 +5685,12 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
       } else {
         y2 += lineHeight;
       }
-      this.drawContentsBackground(list.Back, x2, y2, width);
-      x3 = this.contensX(x2);
+      if (list.Back) {
+        this.drawContentsBackground(list.Back, x2, y2, width);
+        x3 = this.contensX(x2);
+      } else {
+        x3 = x2;
+      }
       width2 = this.contensWidth(width);
       let item = enemy.stealObject(stealList[i].kind, stealList[i].dataId);
       if((this.showStealItemMask(list.MaskMode, enemy) && this.stealItemFlag(i))) {
@@ -5705,8 +5745,12 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
       } else {
         y2 += lineHeight;
       }
-      this.drawContentsBackground(list.Back, x2, y2, width);
-      x3 = this.contensX(x2);
+      if (list.Back) {
+        this.drawContentsBackground(list.Back, x2, y2, width);
+        x3 = this.contensX(x2);
+      } else {
+        x3 = x2;
+      }
       width2 = this.contensWidth(width);
       const item = enemy.getCondDropItem(dropList[i]);
       if((this.showDropItemMask(list.MaskMode, enemy) && this.condDropItemFlag(i))) {
@@ -5748,8 +5792,10 @@ Window_EnemyBook.prototype.drawDesc = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
   this.contentsFontSize(list);
-  this.drawContentsBackground(list.Back, x, y, width);
-  x = this.contensX(x);
+  if (list.Back) {
+    this.drawContentsBackground(list.Back, x, y, width);
+    x = this.contensX(x);
+  }
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
   const nameText = list.paramName;
@@ -5799,8 +5845,12 @@ Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
     } else {
       y2 += lineHeight;
     }
-    this.drawContentsBackground(list.Back, x2, y2, width);
-    x3 = this.contensX(x2);
+    if (list.Back) {
+      this.drawContentsBackground(list.Back, x2, y2, width);
+      x3 = this.contensX(x2);
+    } else {
+      x3 = x2;
+    }
     width2 = this.contensWidth(width);
     const skillDate = $dataSkills[action[i].skillId];
     if(this.showActionMask(list.MaskMode, enemy) && this.actionFlag(i)){

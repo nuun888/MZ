@@ -32,7 +32,7 @@
 
 | 戦闘　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.6.0 |
+| [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.6.1 |
 | [XPスタイル対象選択ウィンドウ](https://github.com/nuun888/MZ/blob/master/README/XPSelectWindow.md) | [NUUN_XPSelectWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js) | 共 | 1.0.4 |
 | [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 1.15.1|
 | ┣ リザルトサイドビュー表示 |  |  |  |
@@ -139,7 +139,7 @@
 
 | パーティ　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [最大戦闘メンバー数変更](https://github.com/nuun888/MZ/blob/master/README/MaxBattleMembers.md) | [NUUN_MaxBattleMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js) |  | 1.0.3 |
+| [最大戦闘メンバー数変更](https://github.com/nuun888/MZ/blob/master/README/MaxBattleMembers.md) | [NUUN_MaxBattleMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js) |  | 1.0.4 |
 | [メンバー変更画面](https://github.com/nuun888/MZ/blob/master/README/SceneFormation.md) | [NUUN_SceneFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js) | 共 立 対 | 1.7.3 |
 | ┣ [メンバー変更画面(戦闘)](https://github.com/nuun888/MZ/blob/master/README/SceneBattleFormation.md) | [NUUN_SceneBattleFormation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js) | 共 | 1.3.3 |
 | ┗ [メンバー変更画面（サポートアクター対応）](https://github.com/nuun888/MZ/blob/master/README/SceneFormation_SupportActor.md) | [NUUN_SceneFormation_SupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation_SupportActor.js) |  | 1.1.0 |

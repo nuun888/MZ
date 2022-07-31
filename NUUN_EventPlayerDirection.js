@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc トリガー起動時のプレイヤーとイベントの向き状況取得
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * トリガー起動時のプレイヤーとイベントとの向き状況を取得します。
@@ -19,6 +19,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/7/31 Ver.1.0.1
+ * 外部プラグインから背後の変数を取得するための処理を追加。
  * 2022/7/24 Ver.1.0.0
  * 初版
  * 
@@ -103,6 +105,14 @@ Imported.NUUN_EventPlayerDirection = true;
             $gameSwitches.setValue(PlayerLeftDirectionSwitch, event.getPlayerLeftDirection());
             $gameSwitches.setValue(EventLeftDirectionSwitch, event.getEventLeftDirection());
         }
+    };
+
+    BattleManager.getEventBackDirection = function() {
+        return $gameSwitches.value(EventBackDirectionSwitch);
+    };
+
+    BattleManager.getPlayerBackDirection = function() {
+        return $gameSwitches.value(PlayerBackDirectionSwitch);
     };
 
     const _Game_Event_initialize = Game_Event.prototype.initialize;

@@ -22,12 +22,13 @@
  * [id]:先制不意打ちのリストID
  * [name]:先制不意打ちリストの指定の名称
  * 
- * 上記のタグがない敵グループは通常の判定になります。
- * 
  * 評価式の取得変数
  * members:パーティメンバー
  * troop:敵グループ
  * this:BattleManager
+ * 
+ * ランダムエンカウントの場合上記のタグがない敵グループはデフォルト設定の判定になります。  
+ * イベント判定では通常の処理になります。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -47,6 +48,7 @@
  * @desc ランダムエンカウント時のデフォルトの先制条件を記入します。空白で先制攻撃は発生しません。
  * @type combo
  * @option 'Math.random() < this.ratePreemptive();//デフォルト'
+ * @option '$gameSwitches.value(0);//スイッチ'
  * @default 'Math.random() < this.ratePreemptive();'
  * 
  * @param DefaultSurprise
@@ -55,6 +57,7 @@
  * @type combo
  * @option 'Math.random() < this.rateSurprise() && !this._preemptive;//デフォルト'
  * @option 'Math.random() < this.rateSurprise();//不意打ち無効なし'
+ * @option '$gameSwitches.value(0);//スイッチ'
  * @default 'Math.random() < this.rateSurprise() && !this._preemptive;'
  * 
  */
@@ -98,6 +101,7 @@
  * @desc 評価式
  * @type combo
  * @option 'Math.random() < this.ratePreemptive();//デフォルト'
+ * @option '$gameSwitches.value(0);//スイッチ'
  * @option 'this.getEventBackDirection();//イベント背後接触 要NUUN_EventPlayerDirection'
  * @default
  * 
@@ -110,6 +114,7 @@
  * @type combo
  * @option 'Math.random() < this.rateSurprise() && !this._preemptive;//デフォルト'
  * @option 'Math.random() < this.rateSurprise();//不意打ち無効なし'
+ * @option '$gameSwitches.value(0);//スイッチ'
  * @option 'this.getPlayerBackDirection() && !this._preemptive;//プレイヤー背後接触 要NUUN_EventPlayerDirection'
  * @default
  * 

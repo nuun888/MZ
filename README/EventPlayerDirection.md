@@ -1,5 +1,5 @@
 # [トリガー起動時のプレイヤーとイベントの向き状況取得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventPlayerDirection.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventPlayerDirection.js)  
 
 ## 概要
@@ -32,5 +32,7 @@
 イベントから見てプレイヤーが右方向時にON。  
 
 ## 更新履歴
+2022/7/31 Ver.1.0.1  
+外部プラグインから背後の変数を取得するための処理を追加。  
 2022/7/24 Ver.1.0.0  
 初版  

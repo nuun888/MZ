@@ -1,5 +1,5 @@
 # [ステート、バフターン数増減特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnPlus.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnPlus.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.1以上  
@@ -33,6 +33,8 @@
 3-8:モンスターID3～8までのモンスター  
 
 ## 更新履歴
+2022/8/1 Ver.1.1.1  
+敵のステート付加時にエラーが出る問題を修正。  
 2022/7/29 Ver.1.1.0  
 パーティ、敵グループの誰かが特徴を持っていればターンが増減する機能を追加。  
 2022/1/15 Ver.1.0.0  

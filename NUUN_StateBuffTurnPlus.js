@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステート、バフターン数増減特徴
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -44,6 +44,8 @@
  * 3-8:モンスターID3～8までのモンスター
  * 
  * 更新履歴
+ * 2022/8/1 Ver.1.1.1
+ * 敵のステート付加時にエラーが出る問題を修正。
  * 2022/7/29 Ver.1.1.0
  * パーティ、敵グループの誰かが特徴を持っていればターンが増減する機能を追加。
  * 2022/1/15 Ver.1.0.0
@@ -128,7 +130,7 @@ Game_Actor.prototype.getMembersTurnPlus = function(stateId) {
 
 Game_Enemy.prototype.getMembersTurnPlus = function(stateId) {
     const index = this.index();
-    return $gameTroop.battleMembers().reduce((r, member) => {
+    return $gameTroop.members().reduce((r, member) => {
         return r + member.getStateTurnPlus(stateId, this.enemyId(), index);
     }, 0);
 };
@@ -147,7 +149,7 @@ Game_Actor.prototype.getMembersDebuffTurnPlus = function(paramId) {
 
 Game_Enemy.prototype.getMembersBuffTurnPlus = function(paramId) {
     const index = this.index();
-    return $gameParty.battleMembers().reduce((r, member) => {
+    return $gameTroop.members().reduce((r, member) => {
         return r + member.getBuffTurnPlus(paramId, this.enemyId(), index);
     }, 0);
 };

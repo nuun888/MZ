@@ -9,7 +9,7 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  リザルト時ウィンドウスプライト非表示
+ * @plugindesc リザルト時ウィンドウスプライト非表示
  * @author NUUN
  * @base NUUN_Base
  * @base NUUN_Result
@@ -21,6 +21,9 @@
  * 指定できるメソッドはScene_Battleのウィンドウまたはスプライトのオブジェクト変数になります。
  * プラグインによってはこのプラグインを該当プラグインより下に配置する必要がある場合があります。
  * 
+ * _statusWindow:バトルウィンドウ
+ * _statusWindow、_actorImges、_actorStatus:バトルスタイル拡張バトルウィンドウ
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -31,9 +34,11 @@
  * 
  * @param SptiteHideObj
  * @text リザルト時非表示ウィンドウスプライト
- * @desc リザルト時に非表示にするウィンドウまたはスプライトのメソッドを指定します。
+ * @desc リザルト時に非表示にするシーンバトル内のウィンドウまたはスプライトのメソッドを指定します。(複数指定可)
  * @type combo[]
- * @option 
+ * @option '_statusWindow'
+ * @option '_actorImges'
+ * @option '_actorStatus'
  * @default 
  * @parent CommonSetting
  * 

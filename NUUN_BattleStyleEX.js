@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.6.1
+ * @version 3.6.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/8/ Ver.3.6.2
+ * ステート2が正常に表示されない問題を修正。
+ * スピードスターバトルと併用するとアニメーションの座標が正しく表示されない問題を修正。
  * 2022/7/31 Ver.3.6.1
  * アクター表示範囲可変表示の時にゲージ、名前が表示範囲内に収まるように修正。
  * 2022/7/30 Ver.3.6.0
@@ -216,6 +219,29 @@ BattleManager.initMembers = function() {
   this.actorStatusWindowOpacity = false;
   this.actorStatusWindowOpacityValue = false;
   this.battlerSprite = [];
+  this.visibleStateIcons = [];
+  this.notIconList = this.getNotVisibleIcons();
+  Array.prototype.push.apply(this.notIconList , this.getNotVisibleBuffIcons());
+};
+
+BattleManager.getNotVisibleIcons = function() {
+  return params.NotVisibleStateIcons.filter(stateId => $dataStates[stateId]).map(stateId => $dataStates[stateId].iconIndex).filter(id => id > 0);
+};
+
+BattleManager.getNotVisibleBuffIcons = function() {
+  return this.getVisibleBuffIcons(params.NotVisibleBuffIcons);
+};
+
+BattleManager.getVisibleBuffIcons = function(list) {
+  const icons = [];
+  for (const buff of list) {
+    if (buff >= 0 && buff < 8) {
+      icons.push(Game_BattlerBase.ICON_BUFF_START + buff);
+    } else if (buff >= 10 && buff < 18) {
+      icons.push(Game_BattlerBase.ICON_DEBUFF_START + buff - 10);
+    }
+  }
+  return icons;
 };
 
 BattleManager.statusWindowOpacity = function(flag, opacity) {
@@ -297,6 +323,21 @@ Game_Temp.prototype.setBattleStyleRefresh = function(flag) {
 Game_Temp.prototype.isBattleStyleRequested = function() {
     return this._battleStyleRefresh || false;
 };
+
+
+const _Game_BattlerBase_allIcons = Game_BattlerBase.prototype.allIcons;
+Game_BattlerBase.prototype.allIcons = function() {
+  let icons = _Game_BattlerBase_allIcons.call(this);
+  if (BattleManager.visibleStateIcons && BattleManager.visibleStateIcons.length > 0) {
+    icons = icons.filter(icon => BattleManager.visibleStateIcons.indexOf(icon) > 0);
+    BattleManager.visibleStateIcons = [];
+  }
+  if (BattleManager.notIconList.length > 0) {
+    icons = icons.filter(id => BattleManager.notIconList.indexOf(id) < 0);
+  }
+  return icons;
+};
+
 
 //Game_Actor
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
@@ -1581,7 +1622,7 @@ Window_BattleStatus.prototype.drawStatusListData = function(actor, list, index) 
         break;
       case 'state':
         if (!params.OutsideWindowVisible) {
-          this.placeStateIcon(actor, rect.x + data.PositionX, rect.y + data.PositionY);
+          this.placeStateIcon(actor, rect.x + data.PositionX, rect.y + data.PositionY, data);
         }
         break;
       case 'state2':
@@ -1641,24 +1682,12 @@ Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width)
 };
 
 Window_BattleStatus.prototype.drawActorIcons = function(actor, x, y, width, data) {
-  let icons = [];
-  let states = [];
-  const iconWidth = ImageManager.iconWidth;
-  const dataEval = data.DetaEval1;
-  if (dataEval) {
-      const stateList = dataEval.split(',');
-      for (const id of stateList) {
-          Array.prototype.push.apply(states, NuunManager.nuun_getListIdData(id));
-      }
-      icons = actor.allIcons().filter(icon => states.some(i => $dataStates[i].iconIndex === icon)).slice(0, Math.floor(width / iconWidth));
-      let iconX = x;
-      for (const icon of icons) {
-          this.drawIcon(icon, iconX, y + 2);
-          iconX += iconWidth;
-      }
-  } else {
-      Window_StatusBase.prototype.drawActorIcons.call(this, actor, x, y, width);
-  }
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), data.UserParamID || '_state2');
+  const sprite = this.createInnerSprite(key, Sprite_BSStateIcon);
+  sprite.setup(actor, data);
+  sprite.move(x, y);
+  sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval1), this.getVisibleIcons(data.detaEval2));
+  sprite.show();
 };
 
 Window_BattleStatus.prototype.drawActorImges = function(actor, data, x, y, width) {
@@ -1691,6 +1720,15 @@ Window_StatusBase.prototype.bs_PlaceActorName = function(actor, x, y) {
   sprite.show();
 };
 
+Window_StatusBase.prototype.placeStateIcon = function(actor, x, y, data) {
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), data.UserParamID || 'dparam');
+  const sprite = this.createInnerSprite(key, Sprite_StateIcon);
+  sprite.setup(actor);
+  sprite.move(x, y);
+  sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval1), this.getVisibleIcons(data.detaEval2));
+  sprite.show();
+};
+
 Window_BattleStatus.prototype.placeBasicGauges = function(actor, x, y, rect) {
     let x2 = $gameTemp.actorData.HPChangePosition ? $gameTemp.actorData.ActorHP_X + rect.x : this.defaultGaugeX(x, 'hp');
     let y2 = $gameTemp.actorData.HPChangePosition ? $gameTemp.actorData.ActorHP_Y + rect.y : this.defaultGaugeY(y, 'hp');
@@ -1703,6 +1741,18 @@ Window_BattleStatus.prototype.placeBasicGauges = function(actor, x, y, rect) {
         y2 = $gameTemp.actorData.TPChangePosition ? $gameTemp.actorData.ActorTP_Y + rect.y : this.defaultGaugeY(y, 'tp');
         this.placeGauge(actor, "tp", x2, y2);
     }
+};
+
+Window_BattleStatus.prototype.getVisibleIcons = function(str) {
+  let states = [];
+  const dataEval = str;
+  if (dataEval) {
+    const stateList = dataEval.split(',');
+     for (const id of stateList) {
+        Array.prototype.push.apply(states, NuunManager.nuun_getListIdData(id));
+    }
+  }
+  return states;
 };
 
 Window_BattleStatus.prototype.defaultGaugeX = function(x, type) {
@@ -2065,11 +2115,12 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
   BattleManager.battlerSprite[index] = sprite;
 };
 
-Window_BattleActorImges.prototype.placeStateIcon = function(actor, x, y) {
-  const key = "actor%1-stateIcon".format(actor.actorId());
+Window_BattleActorImges.prototype.placeStateIcon = function(actor, x, y, data) {
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), data.UserParamID || 'dparam');
   const sprite = this.createActorImgSprite(key, Sprite_StateIcon);
   sprite.setup(actor);
   sprite.move(x, y);
+  sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval1), this.getVisibleIcons(data.detaEval2));
   sprite.show();
 };
 
@@ -2244,6 +2295,8 @@ const _Sprite_Actor_initMembers = Sprite_Actor.prototype.initMembers;
     _Sprite_Actor_initMembers.call(this);
     this.viewFrontActor = (!$gameSystem.isSideView() && params.ActorEffectShow);
     this.bsSprite = null;
+    this._bsHomeX = 0;
+    this._bsHomeY = 0;
 };
 
 const _Sprite_Actor_updateVisibility = Sprite_Actor.prototype.updateVisibility;
@@ -2271,6 +2324,8 @@ Sprite_Actor.prototype.actorHomeRefresh = function(index) {
       x -= Math.floor(ImageManager.faceWidth / 2);
     }
     this.setHome(x + params.ActorEffect_X, y + params.ActorEffect_Y);
+    this._bsHomeX = x;
+    this._bsHomeY = y;
 };
 
 const _Sprite_Actor_setBattler = Sprite_Actor.prototype.setBattler;
@@ -2305,6 +2360,7 @@ Sprite_Actor.prototype.update = function() {
   _Sprite_Actor_update.call(this);
   if (this._actor) {
       this.updateFrontActor();
+      this.updateBsPosition();
   }
 };
 
@@ -2313,6 +2369,16 @@ Sprite_Actor.prototype.updateFrontActor = function() {
       this.setActorHome(this._actor.index());
     }
 };
+
+Sprite_Actor.prototype.updateBsPosition = function() {
+  if (this._bsHomeX !== this._homeX) {
+    this._homeX = this._bsHomeX;
+  }
+  if (this._bsHomeY !== this._homeY) {
+    this._homeY = this._bsHomeY;
+  }
+};
+
 
 const _Sprite_Actor_damageOffsetX = Sprite_Actor.prototype.damageOffsetX;
 Sprite_Actor.prototype.damageOffsetX = function() {
@@ -2945,10 +3011,10 @@ Sprite_BSName.prototype.initialize = function() {
 
 Sprite_BSName.prototype.setup = function(battler) {
   const width = BattleManager.rectMaxWidth;
-    if (params.ActorStatusVariable && this.bitmapWidth() !== width) {
-      this._nameWidth = width;
-      this.redraw();
-    }
+  if (params.ActorStatusVariable && this.bitmapWidth() !== width) {
+    this._nameWidth = width;
+    this.redraw();
+  }
   Sprite_Name.prototype.setup.call(this, battler);
 };
 
@@ -2962,6 +3028,132 @@ Sprite_BSName.prototype.bitmapHeight = function() {
 
 Sprite_BSName.prototype.fontSize = function() {
   return $gameSystem.mainFontSize() +  (this.userStatusParam.FontSize || 0);
+};
+
+
+const _Sprite_StateIcon_initMembers = Sprite_StateIcon.prototype.initMembers;
+Sprite_StateIcon.prototype.initMembers = function() {
+  _Sprite_StateIcon_initMembers.call(this);
+  this._visibleStateIcons = [];
+};
+
+Sprite_StateIcon.prototype.setupVisibleIcons = function(list1, list2) {
+  this._visibleStateIcons = [];
+  this._visibleStateIcons = list1;
+  Array.prototype.push.apply(this._visibleStateIcons , BattleManager.getVisibleBuffIcons(list2));
+};
+
+const _Sprite_StateIcon_shouldDisplay = Sprite_StateIcon.prototype.shouldDisplay;
+Sprite_StateIcon.prototype.shouldDisplay = function() {
+  const result = _Sprite_StateIcon_shouldDisplay.call(this);
+  if (result && this._battler.isActor()) {
+    BattleManager.visibleStateIcons = this._visibleStateIcons;
+  }
+  return result
+};
+
+
+function Sprite_BSStateIcon() {
+  this.initialize(...arguments);
+}
+
+Sprite_BSStateIcon.prototype = Object.create(Sprite_StateIcon.prototype);
+Sprite_BSStateIcon.prototype.constructor = Sprite_BSStateIcon;
+
+Sprite_BSStateIcon.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+  this.createBitmap();
+  this.loadBitmap();
+};
+
+Sprite_BSStateIcon.prototype.initMembers = function() {
+  //this.userStatusParam = $gameTemp.userStatusParam;
+  this._battler = null;
+  this._animationCount = 0;
+  this.anchor.x = 0;
+  this.anchor.y = 0;
+  this._visibleIcons = [];
+};
+
+Sprite_BSStateIcon.prototype.bitmapWidth = function() {
+  return this._iconWidth ? this._iconWidth : BattleManager.gaugeMaxWidth;
+};
+
+Sprite_BSStateIcon.prototype.bitmapHeight = function() {
+  return 36;
+};
+
+Sprite_BSStateIcon.prototype.createBitmap = function() {
+  const width = this.bitmapWidth();
+  const height = this.bitmapHeight();
+  this.bitmap = new Bitmap(width, height);
+};
+
+Sprite_BSStateIcon.prototype.loadBitmap = function() {
+  this.iconBitmap = ImageManager.loadSystem("IconSet");
+};
+
+Sprite_BSStateIcon.prototype.setupVisibleIcons = function(list1, list2) {
+  this._visibleIcons = [];
+  this._visibleIcons = list1;
+  Array.prototype.push.apply(this._visibleIcons , BattleManager.getVisibleBuffIcons(list2));
+};
+
+Sprite_BSStateIcon.prototype.setup = function(battler, data) {
+  if (this._battler !== battler) {
+      this._battler = battler;
+      this._animationCount = this.updateWait();
+  }
+  const width = BattleManager.rectMaxWidth;
+  if (this._iconWidth !== width) {
+    this._iconWidth = width;
+    this.updateIcon();
+  }
+};
+
+Sprite_BSStateIcon.prototype.update = function() {
+  Sprite.prototype.update.call(this);
+  this._animationCount++;
+  if (this._animationCount >= this.updateWait()) {
+      this.updateIcon();
+      this._animationCount = 0;
+  }
+};
+
+Sprite_BSStateIcon.prototype.updateWait = function() {
+  return 1;
+};
+
+Sprite_BSStateIcon.prototype.updateIcon = function() {
+  this.bitmap.clear();
+  let icons = [];
+  const iconWidth = ImageManager.iconWidth;
+  const actor = this._battler;
+  if (this.shouldDisplay()) {
+      if (this._visibleIcons.length > 0) {
+        icons = actor.stateIcons().filter(icon => this._visibleIcons.some(i => $dataStates[i].iconIndex === icon)).slice(0, Math.floor(this.bitmapWidth() / iconWidth));
+      } else {
+        icons = actor.stateIcons().slice(0, Math.floor(this.bitmapWidth() / iconWidth));
+      }
+  }
+  if (icons.length > 0) {
+    let iconX = 0;
+    const y = 0;
+    for (const icon of icons) {
+        this.drawIcon(icon, iconX, y);
+        iconX += iconWidth;
+    }
+  }
+};
+
+Sprite_BSStateIcon.prototype.drawIcon = function(iconIndex, x, y) {
+  const bitmap = ImageManager.loadSystem("IconSet");
+  const pw = ImageManager.iconWidth;
+  const ph = ImageManager.iconHeight;
+  const sx = (iconIndex % 16) * pw;
+  const sy = Math.floor(iconIndex / 16) * ph;
+  this.bitmap.blt(bitmap, sx, sy, pw, ph, x, y);
 };
 
 

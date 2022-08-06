@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.6.0
+ * @version 1.6.1
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -52,7 +52,14 @@
  * Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステータス設定での設定に変更しております。
  * 旧設定で設定している場合でアクター座標、画像設定で追加する場合は、表示ステータス設定を空欄にしてください。
  * 
+ * ※1
+ * 0:HP上昇 1:MP上昇 2:攻撃力上昇 3:防御力上昇 4:魔法力上昇 5:魔法防御上昇 6:敏捷性上昇 7:運上昇
+ * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
+ * 
  * 更新履歴
+ * 2022/8/ Ver.1.6.1
+ * ステート、ステート2に表示できるステート、バフのアイコンを指定および非表示にできる機能を追加。
+ * Ver.1.6.0での仕様変更によりステートの枠外表示を廃止。
  * 2022/7/30 Ver.1.6.0
  * 敵対象選択中にアクターコマンドが出るように修正。
  * 表示ステータスにメニューで表示されるタイプのステートを表示する機能を追加。
@@ -829,13 +836,6 @@
  * @default true
  * @parent ActorStatusParamOption
  * 
- * @param OutsideWindowVisible
- * @desc ステートアイコンの表示をウィンドウ枠外でも表示させます。(アクター画像の上に表示されます)
- * @text ステートアイコンウィンドウ枠外表示
- * @type boolean
- * @default false
- * @parent ActorStatusParamOption
- * 
  * @param StateVisible
  * @desc ステートアイコンを表示させます。外部プラグインで別の場所にステートアイコンを表示するときに設定します。
  * @text ステートアイコン表示
@@ -857,6 +857,52 @@
  * @text アクター画像ウィンドウ内表示
  * @type boolean
  * @default true
+ * @parent ActorStatusParamOption
+ * 
+ * @param NotVisibleStateIcons
+ * @type state[]
+ * @default []
+ * @text 表示しないステート
+ * @desc 表示しないステートアイコン。(ステート2には適用されません)
+ * @parent ActorStatusParamOption
+ * 
+ * @param NotVisibleBuffIcons
+ * @text 表示しないバフ、デバフ
+ * @desc 表示しないバフ、デバフアイコン。(ステート2には適用されません)
+ * @type select[]
+ * @option HP上昇
+ * @value 0
+ * @option MP上昇
+ * @value 1
+ * @option 攻撃力上昇
+ * @value 2
+ * @option 防御力上昇
+ * @value 3
+ * @option 魔法力上昇
+ * @value 4
+ * @option 魔法防御上昇
+ * @value 5
+ * @option 敏捷性上昇
+ * @value 6
+ * @option 運上昇
+ * @value 7
+ * @option HP低下
+ * @value 10
+ * @option MP低下
+ * @value 11
+ * @option 攻撃力低下
+ * @value 12
+ * @option 防御力低下
+ * @value 13
+ * @option 魔法力低下
+ * @value 14
+ * @option 魔法防御低下
+ * @value 15
+ * @option 敏捷性低下
+ * @value 16
+ * @option 運低下
+ * @value 17
+ * @default []
  * @parent ActorStatusParamOption
  * 
  * @param ActorEffect
@@ -2069,29 +2115,29 @@
  * @text 表示対象
  * @desc アクターステータス画面に表示させるステータス対象を選択します。
  * @type select
- * @option HPゲージ(1)(2)(3)(4)
+ * @option HPゲージ(1)(2)(3)(4)(13)
  * @value 'hpgauge'
- * @option MPゲージ(1)(2)(3)(4)
+ * @option MPゲージ(1)(2)(3)(4)(13)
  * @value 'mpgauge'
- * @option TPゲージ(1)(2)(3)(4)
+ * @option TPゲージ(1)(2)(3)(4)(13)
  * @value 'tpgauge'
- * @option TPB(1)(2)(3)(4)
+ * @option TPB(1)(2)(3)(4)(13)
  * @value 'tpb'
- * @option ステート(3)(4)
+ * @option ステート(3)(4)(8)(9)(13)
  * @value 'state'
- * @option ステート(メニュータイプ)(1)(3)(4)(8)
+ * @option ステート2(1)(3)(4)(8)(9)(13)
  * @value 'state2'
- * @option アクター名(1)(2)(3)(4)(5)
+ * @option アクター名(1)(2)(3)(4)(5)(13)
  * @value 'name'
- * @option 独自パラメータ(1)(3)(4)(5)(6)(8)
+ * @option 独自パラメータ(1)(3)(4)(5)(6)(8)(13)
  * @value 'param'
- * @option 独自パラメータ(動的) (1)(2)(3)(4)(5)(6)(7)(8)
+ * @option 独自パラメータ(動的) (1)(2)(3)(4)(5)(6)(7)(8)(13)
  * @value 'dparam'
- * @option 独自ゲージ (1)(2)(3)(4)(5)(6)(7)(8)
+ * @option 独自ゲージ (1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)
  * @value 'usergauge'
- * @option レベル(1)(3)(4)(5)(6)
+ * @option レベル(1)(3)(4)(5)(6)(13)
  * @value 'lv'
- * @option 画像(3)(4)(7)(12)
+ * @option 画像(3)(4)(7)(12)(13)
  * @value 'imges'
  * @default
  * 
@@ -2148,14 +2194,14 @@
  * @default 
  * 
  * @param DetaEval1
- * @desc 評価式または文字列。(独自パラメータ、独自ゲージ現在値、ステート(メニュータイプ))
- * @text 評価式A(8)
+ * @desc 評価式または文字列。(独自パラメータ、独自ゲージ現在値、ステートID(ステート、ステート2))
+ * @text 評価式or文字列A(8)
  * @type string
  * @default 
  * 
  * @param DetaEval2
- * @desc 評価式。(独自ゲージ最大値)
- * @text 評価式B(9)
+ * @desc 評価式or文字列。(独自ゲージ最大値、バフ(ステート、ステート2)※1)
+ * @text 評価式or文字列B(9)
  * @type string
  * @default 
  * 
@@ -2165,7 +2211,7 @@
  * 
  * @param Color1
  * @desc ゲージカラー(左)。テキストタブでカラーコードを入力できます。
- * @text ゲージカラー(左)
+ * @text ゲージカラー(左)(!0)
  * @type number
  * @default 0
  * @min 0
@@ -2173,7 +2219,7 @@
  * 
  * @param Color2
  * @desc ゲージカラー(右)。テキストタブでカラーコードを入力できます。
- * @text ゲージカラー(右)
+ * @text ゲージカラー(右)(!1)
  * @type number
  * @default 0
  * @min 0
@@ -2328,11 +2374,13 @@ params.FaceHeight = Number(parameters['FaceHeight'] || 0);
 params.NameShow = eval(parameters['NameShow'] || "true");
 params.TPBShow = eval(parameters['TPBShow'] || "true");
 params.StateVisible = eval(parameters['StateVisible'] || "true");
-params.OutsideWindowVisible = eval(parameters['OutsideWindowVisible'] || "false");
+params.OutsideWindowVisible = false;
 params.SelectBackShow = eval(parameters['SelectBackShow'] || "true");
 params.ActorSelectBackShow = eval(parameters['ActorSelectBackShow'] || "true");
 params.ImgDeathHide = eval(parameters['ImgDeathHide'] || "true");
 params.FaceHeightOnWindow = eval(parameters['FaceHeightOnWindow'] || "true");
+params.NotVisibleStateIcons = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['NotVisibleStateIcons'])) : null) || [];
+params.NotVisibleBuffIcons = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['NotVisibleBuffIcons'])) : null) || [];
 
 params.EnemySkillAnimation = Number(parameters['EnemySkillAnimation'] || 1);
 

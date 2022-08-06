@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.6.2
+ * @version 3.6.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,7 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2022/8/ Ver.3.6.2
+ * 2022/8/6 Ver.3.6.3
+ * 表示するステートアイコン指定時にアイコンが正常に表示されない問題を修正。
+ * 2022/8/6 Ver.3.6.2
  * ステート2が正常に表示されない問題を修正。
  * スピードスターバトルと併用するとアニメーションの座標が正しく表示されない問題を修正。
  * 2022/7/31 Ver.3.6.1
@@ -329,7 +331,7 @@ const _Game_BattlerBase_allIcons = Game_BattlerBase.prototype.allIcons;
 Game_BattlerBase.prototype.allIcons = function() {
   let icons = _Game_BattlerBase_allIcons.call(this);
   if (BattleManager.visibleStateIcons && BattleManager.visibleStateIcons.length > 0) {
-    icons = icons.filter(icon => BattleManager.visibleStateIcons.indexOf(icon) > 0);
+    icons = icons.filter(icon => BattleManager.visibleStateIcons.indexOf(icon) >= 0);
     BattleManager.visibleStateIcons = [];
   }
   if (BattleManager.notIconList.length > 0) {
@@ -1686,7 +1688,7 @@ Window_BattleStatus.prototype.drawActorIcons = function(actor, x, y, width, data
   const sprite = this.createInnerSprite(key, Sprite_BSStateIcon);
   sprite.setup(actor, data);
   sprite.move(x, y);
-  sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval1), this.getVisibleIcons(data.detaEval2));
+  sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval2), this.getVisibleIcons(data.DetaEval2));
   sprite.show();
 };
 
@@ -1725,7 +1727,7 @@ Window_StatusBase.prototype.placeStateIcon = function(actor, x, y, data) {
   const sprite = this.createInnerSprite(key, Sprite_StateIcon);
   sprite.setup(actor);
   sprite.move(x, y);
-  sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval1), this.getVisibleIcons(data.detaEval2));
+  sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval1), this.getVisibleIcons(data.DetaEval2));
   sprite.show();
 };
 
@@ -3039,7 +3041,7 @@ Sprite_StateIcon.prototype.initMembers = function() {
 
 Sprite_StateIcon.prototype.setupVisibleIcons = function(list1, list2) {
   this._visibleStateIcons = [];
-  this._visibleStateIcons = list1;
+  this._visibleStateIcons = list1.filter(stateId => stateId > 0 && $dataStates[stateId].iconIndex > 0).map(stateId => $dataStates[stateId].iconIndex);
   Array.prototype.push.apply(this._visibleStateIcons , BattleManager.getVisibleBuffIcons(list2));
 };
 
@@ -3096,8 +3098,8 @@ Sprite_BSStateIcon.prototype.loadBitmap = function() {
 
 Sprite_BSStateIcon.prototype.setupVisibleIcons = function(list1, list2) {
   this._visibleIcons = [];
-  this._visibleIcons = list1;
-  Array.prototype.push.apply(this._visibleIcons , BattleManager.getVisibleBuffIcons(list2));
+  this._visibleIcons = list1.filter(stateId => stateId > 0 && $dataStates[stateId].iconIndex > 0).map(stateId => $dataStates[stateId].iconIndex);
+  Array.prototype.push.apply(this._visibleIcons , BattleManager.getVisibleBuffIcons(list2)); 
 };
 
 Sprite_BSStateIcon.prototype.setup = function(battler, data) {

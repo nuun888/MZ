@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.6.6
+ * @version 3.6.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/8/7 Ver.3.6.7
+ * アニメーションの座標が適用されない問題を修正。
+ * 戦闘終了時にチラつく問題を修正。
  * 2022/8/6 Ver.3.6.6
  * 旧方式で戦闘を開始するとエラーが出る問題を修正。
  * サイドビューでアクターが表示されなくなる問題を修正。
@@ -711,12 +714,27 @@ Scene_Battle.prototype.start = function() {
   this._actorStatus.refresh();
 };
 
+const _Scene_Battle_stop = Scene_Battle.prototype.stop;
+Scene_Battle.prototype.stop = function() {
+  _Scene_Battle_stop.call(this);
+  if (!params.BattleEndActorStatusClose) {
+    this._statusWindow.open();
+  }
+};
+
 const _Scene_Battle_updateStatusWindowVisibility = Scene_Battle.prototype.updateStatusWindowVisibility;
 Scene_Battle.prototype.updateStatusWindowVisibility = function() {
   _Scene_Battle_updateStatusWindowVisibility.call(this);
-  this._statusWindow.open();
+  if (params.BattleEndActorStatusClose) {
+    if (BattleManager.isBattleEnd()) {
+      this._statusWindow.close();
+    } else if (this.isActive()) {
+      this._statusWindow.open();
+    }
+  } else {
+    this._statusWindow.open();
+  }
 };
-
 
 const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
 Scene_Battle.prototype.createSpriteset = function() {
@@ -2341,8 +2359,8 @@ Sprite_Actor.prototype.actorHomeRefresh = function(index) {
       x -= Math.floor(ImageManager.faceWidth / 2);
     }
     this.setHome(x + params.ActorEffect_X, y + params.ActorEffect_Y);
-    this._bsHomeX = x;
-    this._bsHomeY = y;
+    this._bsHomeX = x + params.ActorEffect_X;
+    this._bsHomeY = y + params.ActorEffect_Y;
 };
 
 const _Sprite_Actor_setBattler = Sprite_Actor.prototype.setBattler;

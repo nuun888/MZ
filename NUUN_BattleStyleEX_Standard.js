@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.6.1
+ * @version 1.6.2
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -57,7 +57,9 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
- * 2022/8/ Ver.1.6.1
+ * 2022/8/7 Ver.1.6.2
+ * 戦闘終了時にアクターウィンドウを閉じる機能(コアスクリプトと同じ仕様)を追加。
+ * 2022/8/6 Ver.1.6.1
  * ステート、ステート2に表示できるステート、バフのアイコンを指定および非表示にできる機能を追加。
  * Ver.1.6.0での仕様変更によりステートの枠外表示を廃止。
  * 2022/7/30 Ver.1.6.0
@@ -750,6 +752,13 @@
  * @desc ウィンドウを中央に表示させます。
  * @type boolean
  * @default true
+ * @parent ActorStatusOption
+ * 
+ * @param BattleEndActorStatusClose
+ * @desc 戦闘終了時にアクターステータスウィンドウを閉じます。
+ * @text 戦闘終了時ウィンドウ閉め
+ * @type boolean
+ * @default false
  * @parent ActorStatusOption
  * 
  * 
@@ -2381,6 +2390,7 @@ params.ImgDeathHide = eval(parameters['ImgDeathHide'] || "true");
 params.FaceHeightOnWindow = eval(parameters['FaceHeightOnWindow'] || "true");
 params.NotVisibleStateIcons = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['NotVisibleStateIcons'])) : null) || [];
 params.NotVisibleBuffIcons = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['NotVisibleBuffIcons'])) : null) || [];
+params.BattleEndActorStatusClose = eval(parameters['BattleEndActorStatusClose'] || "false");
 
 params.EnemySkillAnimation = Number(parameters['EnemySkillAnimation'] || 1);
 

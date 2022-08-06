@@ -238,9 +238,11 @@ BattleManager.getVisibleBuffIcons = function(list) {
   const icons = [];
   for (const buff of list) {
     if (buff >= 0 && buff < 8) {
-      icons.push(Game_BattlerBase.ICON_BUFF_START + buff);
+      for (const i = 0; i < 2; i++) {
+        icons.push(Game_BattlerBase.ICON_BUFF_START + i * 8 + buff);
+      }
     } else if (buff >= 10 && buff < 18) {
-      icons.push(Game_BattlerBase.ICON_DEBUFF_START + buff - 10);
+      icons.push(Game_BattlerBase.ICON_DEBUFF_START + -i * 8 + buff - 10);
     }
   }
   return icons;

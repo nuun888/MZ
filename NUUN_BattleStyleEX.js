@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.6.3
+ * @version 3.6.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/8/6 Ver.3.6.4
+ * バフアイコン表示指定時のバフアイコンの２段階目のアイコンが表示されてしまう問題を修正。(現状２段階まで)
+ * 旧モードで設定した状態で戦闘を行うとエラーが出る問題を修正。
  * 2022/8/6 Ver.3.6.3
  * 表示するステートアイコン指定時にアイコンが正常に表示されない問題を修正。
  * 2022/8/6 Ver.3.6.2
@@ -1716,7 +1719,7 @@ Window_BattleStatus.prototype.placeUserParam = function(actor, data, x, y) {
   sprite.show();
 };
 
-Window_StatusBase.prototype.bs_PlaceActorName = function(actor, x, y) {
+Window_BattleStatus.prototype.bs_PlaceActorName = function(actor, x, y) {
   const key = "actor%1-name".format(actor.actorId());
   const sprite = this.createInnerSprite(key, Sprite_BSName);
   sprite.setup(actor);
@@ -1724,12 +1727,14 @@ Window_StatusBase.prototype.bs_PlaceActorName = function(actor, x, y) {
   sprite.show();
 };
 
-Window_StatusBase.prototype.placeStateIcon = function(actor, x, y, data) {
-  const key = "actor%1-stateIcon%2".format(actor.actorId(), data.UserParamID || 'dparam');
+Window_BattleStatus.prototype.placeStateIcon = function(actor, x, y, data) {
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), (data && data.UserParamID ? data.UserParamID : '_state'));
   const sprite = this.createInnerSprite(key, Sprite_StateIcon);
   sprite.setup(actor);
   sprite.move(x, y);
-  sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval1), this.getVisibleIcons(data.DetaEval2));
+  if (data) {
+    sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval1), this.getVisibleIcons(data.DetaEval2));
+  }
   sprite.show();
 };
 
@@ -2120,11 +2125,13 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
 };
 
 Window_BattleActorImges.prototype.placeStateIcon = function(actor, x, y, data) {
-  const key = "actor%1-stateIcon%2".format(actor.actorId(), data.UserParamID || 'dparam');
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), data ? data.UserParamID || 'dparam' : 'dparam');
   const sprite = this.createActorImgSprite(key, Sprite_StateIcon);
   sprite.setup(actor);
   sprite.move(x, y);
-  sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval1), this.getVisibleIcons(data.detaEval2));
+  if (data) {
+    sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval1), this.getVisibleIcons(data.detaEval2));
+  }
   sprite.show();
 };
 
@@ -3101,7 +3108,7 @@ Sprite_BSStateIcon.prototype.loadBitmap = function() {
 Sprite_BSStateIcon.prototype.setupVisibleIcons = function(list1, list2) {
   this._visibleIcons = [];
   this._visibleIcons = list1.filter(stateId => stateId > 0 && $dataStates[stateId].iconIndex > 0).map(stateId => $dataStates[stateId].iconIndex);
-  Array.prototype.push.apply(this._visibleIcons , BattleManager.getVisibleBuffIcons(list2)); 
+  Array.prototype.push.apply(this._visibleIcons , BattleManager.getVisibleBuffIcons(list2));
 };
 
 Sprite_BSStateIcon.prototype.setup = function(battler, data) {

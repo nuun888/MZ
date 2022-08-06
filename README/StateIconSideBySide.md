@@ -15,7 +15,7 @@
 経過ターンを表示させるには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)プラグインが必要です。  
 
 ## 競合情報
-MOG_BattleHudと併用した場合、当プラグインの機能が適用されません。  
+MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
 2022/7/2 Ver.1.3.1  

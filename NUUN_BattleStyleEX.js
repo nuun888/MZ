@@ -2830,7 +2830,7 @@ Sprite_BSGauge.prototype.getGBSGaugeWidth = function() {
     case 'mp':
       return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.MPGaugeWidth;
     case 'tp':
-      return this.userStatusParam ? BattleManager.rectMaxWidth : this._dataa.TPGaugeWidth;
+      return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.TPGaugeWidth;
     case 'time':
       return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.TPBGaugeWidth;
     default:
@@ -2843,7 +2843,7 @@ Sprite_BSGauge.prototype.getGBSGaugeHeight = function() {
     case 'hp':
       return this.userStatusParam ? this.userStatusParam.Height : this._data.HPGaugeHeight;
     case 'mp':
-      return this.userStatusParam ? this.userStatusParam.Height : this._dataa.MPGaugeHeight;
+      return this.userStatusParam ? this.userStatusParam.Height : this._data.MPGaugeHeight;
     case 'tp':
       return this.userStatusParam ? this.userStatusParam.Height : this._data.TPGaugeHeight;
     case 'time':

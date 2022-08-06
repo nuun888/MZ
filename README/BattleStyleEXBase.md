@@ -1,20 +1,20 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.6.1
+### Ver.3.6.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.6.0  
 [バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.6.0  
 [バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.6.0  
 
-バトルスタイル拡張デフォルト設定用 Ver.1.6.0  
+バトルスタイル拡張デフォルト設定用 Ver.1.6.1  
 ![画像](img/BattleStyleEX1.png)  
 
-バトルスタイル拡張スタンダード設定用 Ver.1.6.0  
+バトルスタイル拡張スタンダード設定用 Ver.1.6.1  
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.6.0  
+バトルスタイル拡張XPスタイル設定用 Ver.1.6.1  
 ![画像](img/BattleStyleEX3.png)  
 
 ## 必須、前提プラグイン
@@ -123,6 +123,11 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 メニュー型のステート表示、画像、アクター名の表示幅は表示ステータス設定でのみ設定できます。  
 
 ## 更新履歴
+2022/8/6 Ver.3.6.2  
+ステート2が正常に表示されない問題を修正。  
+スピードスターバトルと併用するとアニメーションの座標が正しく表示されない問題を修正。  
+ステート、ステート2に表示できるステート、バフのアイコンを指定および非表示にできる機能を追加。  
+Ver.1.6.0での仕様変更によりステートの枠外表示を廃止。(設定用)  
 2022/7/31 Ver.3.6.1  
 アクター表示範囲可変表示の時にゲージ、名前が表示範囲内に収まるように修正。  
 2022/7/30 Ver.3.6.0  

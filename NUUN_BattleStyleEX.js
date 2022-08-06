@@ -3134,7 +3134,7 @@ Sprite_BSStateIcon.prototype.updateIcon = function() {
   const actor = this._battler;
   if (this.shouldDisplay()) {
       if (this._visibleIcons.length > 0) {
-        icons = actor.stateIcons().filter(icon => this._visibleIcons.some(i => $dataStates[i].iconIndex === icon)).slice(0, Math.floor(this.bitmapWidth() / iconWidth));
+        icons = actor.stateIcons().filter(icon => this._visibleIcons.some(i => i === icon)).slice(0, Math.floor(this.bitmapWidth() / iconWidth));
       } else {
         icons = actor.stateIcons().slice(0, Math.floor(this.bitmapWidth() / iconWidth));
       }

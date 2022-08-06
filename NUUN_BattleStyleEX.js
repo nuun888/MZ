@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.6.5
+ * @version 3.6.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/8/6 Ver.3.6.6
+ * 旧方式で戦闘を開始するとエラーが出る問題を修正。
+ * サイドビューでアクターが表示されなくなる問題を修正。
  * 2022/8/6 Ver.3.6.5
  * 戦闘以外でステートアイコンを表示する処理を行うとエラーが出る問題を修正。
  * 可変表示をOFFにするとゲージの長さが適用されない問題を修正。
@@ -2385,11 +2388,13 @@ Sprite_Actor.prototype.updateFrontActor = function() {
 };
 
 Sprite_Actor.prototype.updateBsPosition = function() {
-  if (this._bsHomeX !== this._homeX) {
-    this._homeX = this._bsHomeX;
-  }
-  if (this._bsHomeY !== this._homeY) {
-    this._homeY = this._bsHomeY;
+  if (this.viewFrontActor) {
+    if (this._bsHomeX !== this._homeX) {
+      this._homeX = this._bsHomeX;
+    }
+    if (this._bsHomeY !== this._homeY) {
+      this._homeY = this._bsHomeY;
+    }
   }
 };
 

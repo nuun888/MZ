@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 戦闘メンバー数変更プラグイン
  * @author NUUN
- * @version 1.0.4
+ * @version 1.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -21,6 +21,8 @@
  * 最大戦闘メンバー数を前の数値より高く変更した場合、セーブ後のデータでは前の最大戦闘メンバー数よりフォロワーの画像が表示されません。
  * 
  * 更新履歴
+ * 2022/8/6 Ver.1.0.5
+ * 競合対策
  * 2022/7/31 Ver.1.0.4
  * 戦闘メンバーが５人以上の時にゲージがはみ出さないように修正。
  * 2022/2/27 Ver.1.0.3
@@ -127,7 +129,6 @@ Sprite.prototype.gaugeFixWidthClass = function() {
 const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
 Sprite_Gauge.prototype.initMembers = function() {
   _Sprite_Gauge_initMembers.call(this);
-  this._gaugeWidth = null;
 };
 
 const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
@@ -151,7 +152,6 @@ Sprite_Gauge.prototype.bitmapWidth = function() {
 const _Sprite_Name_initMembers = Sprite_Name.prototype.initMembers;
 Sprite_Name.prototype.initMembers = function() {
   _Sprite_Name_initMembers.call(this);
-  this._nameWidth = null;
 };
 
 const _Sprite_Name_setup = Sprite_Name.prototype.setup;

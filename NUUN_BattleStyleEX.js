@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.6.4
+ * @version 3.6.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/8/6 Ver.3.6.5
+ * 戦闘以外でステートアイコンを表示する処理を行うとエラーが出る問題を修正。
+ * 可変表示をOFFにするとゲージの長さが適用されない問題を修正。
  * 2022/8/6 Ver.3.6.4
  * バフアイコン表示指定時のバフアイコンの２段階目のアイコンが表示されてしまう問題を修正。(現状２段階まで)
  * 旧モードで設定した状態で戦闘を行うとエラーが出る問題を修正。
@@ -339,7 +342,7 @@ Game_BattlerBase.prototype.allIcons = function() {
     icons = icons.filter(icon => BattleManager.visibleStateIcons.indexOf(icon) >= 0);
     BattleManager.visibleStateIcons = [];
   }
-  if (BattleManager.notIconList.length > 0) {
+  if (BattleManager.notIconList && BattleManager.notIconList.length > 0) {
     icons = icons.filter(id => BattleManager.notIconList.indexOf(id) < 0);
   }
   return icons;
@@ -2791,8 +2794,11 @@ Sprite_BSGauge.prototype.constructor = Sprite_BSGauge;
 Sprite_BSGauge.prototype.initialize = function() {
   this._statusType = $gameTemp.bsGaugeType;
   this.userStatusParam = $gameTemp.userStatusParam;
+  this._data = $gameTemp.actorData;
   this._gaugeHeight = this.getGBSGaugeHeight();
-  this._gaugeWidth = null;
+  if (!params.ActorStatusVariable) {
+    this._gaugeWidth = this.getGBSGaugeWidth();
+  }
   Sprite_Gauge.prototype.initialize.call(this);
 };
 
@@ -2806,23 +2812,27 @@ Sprite_BSGauge.prototype.setup = function(battler, statusType) {
 };
 
 Sprite_BSGauge.prototype.bitmapWidth = function() {
-  return this._gaugeWidth ? this._gaugeWidth : BattleManager.gaugeMaxWidth;
+  return this._gaugeWidth ? this._gaugeWidth : this.bitmapBaseWidth();
 };
 
 Sprite_BSGauge.prototype.gaugeHeight = function() {
   return this._gaugeHeight;
 };
 
+Sprite_BSGauge.prototype.bitmapBaseWidth = function() {
+  return params.ActorStatusVariable ? BattleManager.gaugeMaxWidth : Math.min(BattleManager.gaugeMaxWidth, BattleManager.rectMaxWidth);
+};
+
 Sprite_BSGauge.prototype.getGBSGaugeWidth = function() {
   switch (this._statusType) {
     case 'hp':
-      return this.userStatusParam ? BattleManager.rectMaxWidth : $gameTemp.actorData.HPGaugeWidth;
+      return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.HPGaugeWidth;
     case 'mp':
-      return this.userStatusParam ? BattleManager.rectMaxWidth : $gameTemp.actorData.MPGaugeWidth;
+      return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.MPGaugeWidth;
     case 'tp':
-      return this.userStatusParam ? BattleManager.rectMaxWidth : $gameTemp.actorData.TPGaugeWidth;
+      return this.userStatusParam ? BattleManager.rectMaxWidth : this._dataa.TPGaugeWidth;
     case 'time':
-      return this.userStatusParam ? BattleManager.rectMaxWidth : $gameTemp.actorData.TPBGaugeWidth;
+      return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.TPBGaugeWidth;
     default:
       return this.userStatusParam ? BattleManager.rectMaxWidth : 128;
   }
@@ -2831,13 +2841,13 @@ Sprite_BSGauge.prototype.getGBSGaugeWidth = function() {
 Sprite_BSGauge.prototype.getGBSGaugeHeight = function() {
   switch (this._statusType) {
     case 'hp':
-      return this.userStatusParam ? this.userStatusParam.Height : $gameTemp.actorData.HPGaugeHeight;
+      return this.userStatusParam ? this.userStatusParam.Height : this._data.HPGaugeHeight;
     case 'mp':
-      return this.userStatusParam ? this.userStatusParam.Height : $gameTemp.actorData.MPGaugeHeight;
+      return this.userStatusParam ? this.userStatusParam.Height : this._dataa.MPGaugeHeight;
     case 'tp':
-      return this.userStatusParam ? this.userStatusParam.Height : $gameTemp.actorData.TPGaugeHeight;
+      return this.userStatusParam ? this.userStatusParam.Height : this._data.TPGaugeHeight;
     case 'time':
-      return this.userStatusParam ? this.userStatusParam.Height : $gameTemp.actorData.TPBGaugeHeight;
+      return this.userStatusParam ? this.userStatusParam.Height : this._data.TPBGaugeHeight;
     default:
       return this.userStatusParam ? this.userStatusParam.Height : 12;
   }
@@ -3030,11 +3040,15 @@ Sprite_BSName.prototype.setup = function(battler) {
 };
 
 Sprite_BSName.prototype.bitmapWidth = function() {
-  return this._nameWidth ? this._nameWidth : BattleManager.gaugeMaxWidth;
+  return this._nameWidth ? this._nameWidth : this.bitmapBaseWidth();
 };
 
 Sprite_BSName.prototype.bitmapHeight = function() {
   return this._nameHeight;
+};
+
+Sprite_BSName.prototype.bitmapBaseWidth = function() {
+  return params.ActorStatusVariable ? BattleManager.gaugeMaxWidth : Math.min(BattleManager.gaugeMaxWidth, BattleManager.rectMaxWidth);
 };
 
 Sprite_BSName.prototype.fontSize = function() {

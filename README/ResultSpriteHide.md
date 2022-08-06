@@ -10,6 +10,10 @@
 
 _statusWindow:バトルウィンドウ  
 _statusWindow、_actorImges、_actorStatus:バトルスタイル拡張バトルウィンドウ  
+_partyGauge:パーティリミットゲージ  
+_troopGauge:パーティリミットゲージ  
+timeLineSprite:TPBタイムライン  
+他のプラグインで難読化したプラグインでのサポートは致しかねます。  
 
 ## 更新履歴
 2021/9/18 Ver.1.1.0  

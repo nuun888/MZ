@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.6.7
+ * @version 3.6.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/8/7 Ver.3.6.8
+ * ステート2の表示ステートアイコンが適用されなかった問題を修正。
  * 2022/8/7 Ver.3.6.7
  * アニメーションの座標が適用されない問題を修正。
  * 戦闘終了時にチラつく問題を修正。
@@ -577,7 +579,7 @@ Game_Actor.prototype.isBattleStyleUseItemImg = function(item) {
 
 const _Game_Actor_isSpriteVisible = Game_Actor.prototype.isSpriteVisible;
 Game_Actor.prototype.isSpriteVisible = function() {
-    return !$gameSystem.isSideView() && params.ActorEffectShow && $gameParty.inBattle() ? true : _Game_Actor_isSpriteVisible.call(this);
+    return !$gameSystem.isSideView() && params.ActorEffectShow && ($gameParty.inBattle() ? true : _Game_Actor_isSpriteVisible.call(this));
 };
 
 const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
@@ -1713,11 +1715,11 @@ Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width)
 };
 
 Window_BattleStatus.prototype.drawActorIcons = function(actor, x, y, width, data) {
-  const key = "actor%1-stateIcon%2".format(actor.actorId(), data.UserParamID || '_state2');
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), (data.UserParamID || '_state2'));
   const sprite = this.createInnerSprite(key, Sprite_BSStateIcon);
   sprite.setup(actor, data);
   sprite.move(x, y);
-  sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval2), this.getVisibleIcons(data.DetaEval2));
+  sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval1), this.getVisibleIcons(data.DetaEval2));
   sprite.show();
 };
 

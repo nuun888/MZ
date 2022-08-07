@@ -42,7 +42,6 @@
 | [パーティコマンド表示順任意](https://github.com/nuun888/MZ/blob/master/README/PartyCommandCustomize.md) | [NUUN_PartyCommandCustomize](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyCommandCustomize.js) | 共 | 1.0.0 |
 | [アクターコマンド表示順任意](https://github.com/nuun888/MZ/blob/master/README/ActorCommandCustomize.md) | [NUUN_ActorCommandCustomize](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorCommandCustomize.js) | 共 | 1.0.1 |
 | [スキップパーティコマンド](https://github.com/nuun888/MZ/blob/master/README/SkipPartyCommand.md) | [NUUN_SkipPartyCommand](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkipPartyCommand.js) |  | 1.0.1 |
-| [行動制限TPB初期化無効ステート](https://github.com/nuun888/MZ/blob/master/README/KeepRestrictedTPB.md) | [NUUN_KeepRestrictedTPB](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_KeepRestrictedTPB.js) |  | 1.0.0 |
 | 戦闘ターン表示 |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
@@ -129,6 +128,7 @@
 | [バフ、デバフ重ね掛け上限変更](https://github.com/nuun888/MZ/blob/master/README/BuffMaxLevel.md) | [NUUN_BuffMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffMaxLevel.js) |  | 1.0.0 |
 | [バフ、デバフ倍率効果率増減特徴](https://github.com/nuun888/MZ/blob/master/README/BuffBoost.md) | [NUUN_BuffBoost](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffBoost.js) |  | 1.0.0 |
 | [ステート、バフターン操作アイテム、スキル](https://github.com/nuun888/MZ/blob/master/README/StateBuffTurnOperation.md) | [NUUN_StateBuffTurnOperation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnOperation.js) |  | 1.0.0 |
+| [行動制限TPB初期化無効ステート](https://github.com/nuun888/MZ/blob/master/README/KeepRestrictedTPB.md) | [NUUN_KeepRestrictedTPB](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_KeepRestrictedTPB.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

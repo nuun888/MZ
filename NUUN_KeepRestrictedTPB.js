@@ -49,8 +49,10 @@ Imported.NUUN_KeepRestrictedTPB = true;
         const state = $dataStates[stateId];
         const restricted = this.isStateRestrictedKeepTpb(state);
         if (!!state.meta.RestrictedKeepTpb && restricted) {
-            this._keepTpb = this.getRestrictedKeepTpb(state.meta.RestrictedKeepTpb);
-            this._keepTpbState = this._keepTpb < 1 && this._tpbState !== "charging" ? "charging" : this._tpbState;
+            if (this._tpbState !== "casting" && this._tpbState !== "acting") {
+                this._keepTpb = this.getRestrictedKeepTpb(state.meta.RestrictedKeepTpb);
+                this._keepTpbState = this._keepTpb < 1 && this._tpbState !== "charging" ? "charging" : this._tpbState;
+            }
         }
         _Game_BattlerBase_addNewState.call(this, stateId);
         if (!!state.meta.RestrictedKeepTpb && restricted && (this._keepTpb !== 0 || this._keepTpbState)) {

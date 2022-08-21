@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -26,10 +26,14 @@
  * 敵キャラの画像を拡大等をするプラグインと併用する場合、画像に乱れが生じる場合があります。
  * 気になるようでしたら敵ステート表示拡張と併用してください。
  * 
+ * ステートアイコンの座標を変更するプラグインを使用している場合は、味方アイコン表示位置座標の設定をデフォルトにしてください。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/8/22 Ver.1.3.2
+ * アイコンの表示位置とアイコンの表示揃えの設定を分割。
  * 2022/7/2 Ver.1.3.1
  * メンバー交代後ステートアイコンが残ってしまう問題を修正。
  * 2022/4/9 Ver.1.3.0
@@ -100,6 +104,24 @@
  * @value 'right'
  * @default 'right'
  * @parent ActorStateIcon
+ * 
+ * @param ActorStateIconPosition
+ * @desc 味方のアイコンの表示位置座標
+ * @text 味方アイコン表示位置座標
+ * @type select
+ * @option 味方アイコン表示揃え基準
+ * @value 'auto'
+ * @option 左
+ * @value 'left'
+ * @option 中央
+ * @value 'center'
+ * @option 右
+ * @value 'right'
+ * @option デフォルト(従来の処理)
+ * @value 'default'
+ * @default 'auto'
+ * @parent ActorStateIcon
+ * 
  * 
  * @param EnemyStateIcon
  * @text 敵ステートアイコン
@@ -208,8 +230,9 @@ const ActorStateIconShowVal = Number(parameters['ActorStateIconShowVal'] || 5);
 const ActorStateIconRows = Number(parameters['ActorStateIconRows'] || 1);
 const EnemyStateIconShowVal = Number(parameters['EnemyStateIconShowVal'] || 1);
 const EnemyStateIconRows = Number(parameters['EnemyStateIconRows'] || 1);
-const ActorStateIconAlign = eval(parameters['ActorStateIconAlign'] || 'right');
-const EnemyStateIconAlign = eval(parameters['EnemyStateIconAlign'] || 'center');
+const ActorStateIconAlign = eval(parameters['ActorStateIconAlign']) || 'right';
+const EnemyStateIconAlign = eval(parameters['EnemyStateIconAlign']) || 'center';
+const ActorStateIconPosition = eval(parameters['ActorStateIconPosition']) || 'auto';
 const ActorStateIconVisible = eval(parameters['ActorStateIconVisible'] || 'true');
 const EnemyStateIconVisible = eval(parameters['EnemyStateIconVisible'] || 'true');
 const TurnMode = eval(parameters['TurnMode'] || 'remaining');
@@ -436,11 +459,15 @@ Sprite_StateIcon.prototype.nuun_fontSize = function() {
 
 const _Window_BattleStatus_stateIconX = Window_BattleStatus.prototype.stateIconX;
 Window_BattleStatus.prototype.stateIconX = function(rect) {
-  if (ActorStateIconAlign === 'center') {
+  let mode = ActorStateIconPosition;
+  if (ActorStateIconPosition === 'auto') {
+    mode = ActorStateIconAlign;
+  }
+  if (mode=== 'center') {
     return rect.x + rect.width / 2;
-  } else if (ActorStateIconAlign === 'left') {
+  } else if (mode === 'left') {
     return rect.x + ImageManager.iconWidth / 2 - 4;
-  } else {
+  } else if (mode === 'right' || mode === 'default') {
     return _Window_BattleStatus_stateIconX.call(this, rect);
   }
 };

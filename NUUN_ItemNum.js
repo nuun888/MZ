@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc アイテム個数表示変更
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * アイテムの個数表示をカスタマイズします。
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/8/22 Ver.1.0.1
+ * ''で囲うと評価式が評価しない問題を修正。
  * 2022/6/11 Ver.1.0.0
  * 初版
  * 
@@ -46,7 +48,7 @@
  * 
  * @param ItemNumEval
  * @text 所持数の形式
- * @desc 所持数の表示形式を評価式で指定します。
+ * @desc 所持数の表示形式を評価式で指定します。(''または""で囲む)
  * @type combo
  * @option 'num'
  * @option 'num +"/"+ maxNum'
@@ -61,7 +63,7 @@ Imported.NUUN_ItemNum = true;
     const parameters = PluginManager.parameters('NUUN_ItemNum');
     const numberDigits = String(parameters['NumberDigits'] || '00');
     const ItemNumPrefix = String(parameters['ItemNumPrefix'] || ':');
-    const ItemNumEval = String(parameters['ItemNumEval'] || 'num');
+    const ItemNumEval = eval(parameters['ItemNumEval']) || 'num';
     let itemData = null;
 
     const _Window_ItemList_drawItem = Window_ItemList.prototype.drawItem;

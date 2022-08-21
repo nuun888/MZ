@@ -1,5 +1,5 @@
 # [ステート横並び表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
-# Ver.1.3.1
+# Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
 
 戦闘中に表示するステートを横並び表示にします。  
@@ -14,10 +14,14 @@
 'elapsed'指定時はターン数補正を-1に設定してください。  
 経過ターンを表示させるには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)プラグインが必要です。  
 
+ステートアイコンの座標を変更するプラグインを使用している場合は、味方アイコン表示位置座標の設定をデフォルトにしてください。  
+
 ## 競合情報
 MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
+2022/8/22 Ver.1.3.2  
+アイコンの表示位置とアイコンの表示揃えの設定を分割。  
 2022/7/2 Ver.1.3.1  
 メンバー交代後ステートアイコンが残ってしまう問題を修正。  
 2022/4/9 Ver.1.3.0  

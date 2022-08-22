@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.4.1
+ * @version 2.4.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -115,6 +115,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/8/22 Ver.2.4.2
+ * 制御文字でフォントサイズ変更をした後に、項目のフォントのサイズが変化してしまう問題を修正。
  * 2022/7/26 Ver.2.4.1
  * オリジナルパラメータの評価式が適用されていなかった問題を修正。
  * 2022/7/23 Ver.2.4.0
@@ -1329,15 +1331,6 @@ Scene_Status.prototype.setBackGround = function(sprite) {
   }
 };
 
-Scene_Status.prototype.statusWindowRect = function() {
-  const wx = 0;
-  //const wy = this.mainAreaTop() + this.isPage() ? this._statusPageWindow.height : 0;
-  const wy = this.mainAreaTop() + this.isPage() ? 0 : 0;
-  const ww = Graphics.boxWidth;
-  const wh = Graphics.boxHeight - wy;
-  return new Rectangle(wx, wy, ww, wh);
-};
-
 Scene_Status.prototype.createPageStatusWindow = function() {
   if (this.isPage()) {
     //const rect = this.statusPageWindowRect();
@@ -1348,6 +1341,7 @@ Scene_Status.prototype.createPageStatusWindow = function() {
 
 Scene_Status.prototype.statusWindowRect = function() {
   const wx = 0;
+  //const wy = this.mainAreaTop() + this.isPage() ? this._statusPageWindow.height : 0;
   const wy = this.mainAreaTop();
   const ww = Graphics.boxWidth;
   const wh = Graphics.boxHeight - wy;
@@ -1987,6 +1981,7 @@ Window_Status.prototype.drawProfile = function(list, actor, x, y, width) {
   const profileText = actor.profile();
   this.resetTextColor();
   this.drawTextEx(profileText, x, y, width);
+  this.resetFontSettings();
 };
 
 Window_Status.prototype.drawDesc = function(list, actor, x, y, width) {
@@ -2002,6 +1997,7 @@ Window_Status.prototype.drawDesc = function(list, actor, x, y, width) {
   if (actor.actor().meta[method]) {
     this.drawTextEx(actor.actor().meta[method], x, y, width);
   }
+  this.resetFontSettings();
 };
 
 Window_Status.prototype.drawName = function(list, x, y, width) {

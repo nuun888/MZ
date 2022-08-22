@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面デフォルトタイプ
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -62,6 +62,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/8/22 Ver.1.3.2
+ * 制御文字でフォントサイズ変更をした後に、項目のフォントのサイズが変化してしまう問題を修正。
  * 2022/7/23 Ver.1.3.1
  * ステートの表示ステートを範囲指定する機能を追加。
  * 2022/7/23 Ver.1.3.0
@@ -2030,10 +2032,12 @@ Window_InfoMenu.prototype.drawParam = function(data, x, y, width) {
 
 Window_InfoMenu.prototype.drawCommandExplanation = function(data, x, y, width) {
     this.drawTextEx(this._text, x, y, width);
+    this.resetFontSettings();
 };
 
 Window_InfoMenu.prototype.drawFreeText = function(data, x, y, width) {   
     this.drawTextEx(data.Text, x, y, width);
+    this.resetFontSettings();
 };
 
 Window_InfoMenu.prototype.drawDestination = function(data, x, y, width) {
@@ -2057,6 +2061,7 @@ Window_InfoMenu.prototype.drawDestination = function(data, x, y, width) {
     if (text) {
         this.drawTextEx(text, x + iconWidth + textWidth, y, width - textWidth - iconWidth);
     }
+    this.resetFontSettings();
 };
 
 Window_InfoMenu.prototype.drawChapter = function(data, x, y, width) {
@@ -2080,6 +2085,7 @@ Window_InfoMenu.prototype.drawChapter = function(data, x, y, width) {
     if (text) {
         this.drawTextEx(text, x + iconWidth + textWidth, y, width - textWidth - iconWidth);
     }
+    this.resetFontSettings();
 };
 
 Window_InfoMenu.prototype.drawName = function(data, x, y, width) {

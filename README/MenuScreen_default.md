@@ -1,5 +1,5 @@
 # [メニュー画面デフォルトタイプ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)
-# Ver.1.3.1
+# Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.0以降  
@@ -64,6 +64,8 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2022/8/22 Ver.1.3.2  
+制御文字でフォントサイズ変更をした後に、項目のフォントのサイズが変化してしまう問題を修正。  
 2022/7/23 Ver.1.3.1  
 ステートの表示ステートを範囲指定する機能を追加。  
 2022/7/23 Ver.1.3.0

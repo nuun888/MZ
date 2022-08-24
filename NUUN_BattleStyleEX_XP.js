@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.6.2
+ * @version 1.6.3
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -56,6 +56,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/8/24 Ver.1.6.3
+ * 敵出現、アイテムウィンドウのXY座標が適用されていなかった問題を修正。
  * 2022/8/7 Ver.1.6.2
  * 戦闘終了時にアクターウィンドウを閉じる機能(コアスクリプトと同じ仕様)を追加。
  * 2022/8/6 Ver.1.6.1
@@ -2399,14 +2401,14 @@ params.AppearWindowVisible = eval(parameters['AppearWindowVisible'] || "false");
 params.AppearWindowOpacity = Number(parameters['AppearWindowOpacity'] || 255);
 params.AppearWindowAnchorMode = eval(parameters['AppearWindowAnchorMode']) || 'under';
 params.AppearBackgroundImg = String(parameters['AppearBackgroundImg']);
-params.AppearBackground_X = Number(parameters['AppearBackground_X'] || 0);
-params.AppearBackground_Y = Number(parameters['AppearBackground_Y'] || 0);
+params.AppearBackground_X = Number(parameters['AppearWindowBackground_X'] || 0);
+params.AppearBackground_Y = Number(parameters['AppearWindowBackground_Y'] || 0);
 
 params.ItemWindowShow = eval(parameters['ItemWindowShow'] || "true");
 params.ItemWindowOpacity = Number(parameters['ItemWindowOpacity'] || 255);
 params.ItemWindowBackgroundImg = String(parameters['ItemWindowBackgroundImg']);
-params.ItemBackground_X = Number(parameters['ItemBackground_X'] || 0);
-params.ItemBackground_Y = Number(parameters['ItemBackground_Y'] || 0);
+params.ItemBackground_X = Number(parameters['ItemWindowBackground_X'] || 0);
+params.ItemBackground_Y = Number(parameters['ItemWindowBackground_Y'] || 0);
 
 params.SkillWindowShow = eval(parameters['SkillWindowShow'] || "true");
 params.SkillWindowOpacity = Number(parameters['SkillWindowOpacity'] || 255);

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.6.8
+ * @version 3.6.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/8/24 Ver.3.6.9
+ * アクターウィンドウのX座標を変更したときに、アクターコマンドがアクターの上指定時にコマンドウィンドウがずれて表示されてしまう問題を修正。
+ * アクターウィンドウの横幅指定時にアクターウィンドウが表示されない問題を修正。
+ * サイドビューアクターが表示されない問題を修正。
  * 2022/8/7 Ver.3.6.8
  * ステート2の表示ステートアイコンが適用されなかった問題を修正。
  * 2022/8/7 Ver.3.6.7
@@ -144,6 +148,7 @@
  * @default 0
  * @text 不透明度
  * @desc 不透明度を指定します。0で非表示
+ * 
  * 
  */
 var Imported = Imported || {};
@@ -579,7 +584,7 @@ Game_Actor.prototype.isBattleStyleUseItemImg = function(item) {
 
 const _Game_Actor_isSpriteVisible = Game_Actor.prototype.isSpriteVisible;
 Game_Actor.prototype.isSpriteVisible = function() {
-    return !$gameSystem.isSideView() && params.ActorEffectShow && ($gameParty.inBattle() ? true : _Game_Actor_isSpriteVisible.call(this));
+  return params.ActorEffectShow && !$gameSystem.isSideView() ? ($gameParty.inBattle() ? true : _Game_Actor_isSpriteVisible.call(this)) : _Game_Actor_isSpriteVisible.call(this);
 };
 
 const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
@@ -995,10 +1000,14 @@ Scene_Battle.prototype.partyCommandWindowRect = function() {
   return rect;
 };
 
+Scene_Battle.prototype.getDefaultPartyCommandPositionMode = function() {
+  return params.PartyCommandPosition === 'default' || params.ActorCommandPosition === 'default';
+};
+
 Scene_Battle.prototype.statusWindowRect = function() {
     let ww = this.getActorWindowWidth();
     let wh = this.getActorWindowHeight();
-    let wx = this.getActorWindowX() + (this.isRightInputMode() ? 0 : Graphics.boxWidth - ww);
+    let wx = this.getActorWindowX() + (this.getDefaultPartyCommandPositionMode() ? (this.isRightInputMode() ? 0 : Graphics.boxWidth - ww) : 0);
     let wy = this.getActorWindowY();
     return new Rectangle(wx, wy, ww, wh);
 };
@@ -1441,7 +1450,7 @@ Window_ActorCommand.prototype.refresh = function() {
           this.x = params.SupportActorCommand_X;
           this.y = params.SupportActorCommand_Y;
         } else {
-          this.x = rect.x + statusData.itemPadding() + ((rect.width - this.width) / 2) + params.ActorCommand_X;
+          this.x = rect.x + statusData.x + (statusData.itemPadding() / 2) + ((rect.width - this.width) / 2) + params.ActorCommand_X;
           this.y = this.homeY - this.height + rect.y;
         }
       } else if (params.ActorCommandPosition === 'svtop') {
@@ -1715,7 +1724,7 @@ Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width)
 };
 
 Window_BattleStatus.prototype.drawActorIcons = function(actor, x, y, width, data) {
-  const key = "actor%1-stateIcon%2".format(actor.actorId(), (data.UserParamID || '_state2'));
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), (data.UserParamID || '_bsStateIcon2'));
   const sprite = this.createInnerSprite(key, Sprite_BSStateIcon);
   sprite.setup(actor, data);
   sprite.move(x, y);
@@ -1754,7 +1763,7 @@ Window_BattleStatus.prototype.bs_PlaceActorName = function(actor, x, y) {
 };
 
 Window_BattleStatus.prototype.placeStateIcon = function(actor, x, y, data) {
-  const key = "actor%1-stateIcon%2".format(actor.actorId(), (data && data.UserParamID ? data.UserParamID : '_state'));
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), (data && data.UserParamID ? data.UserParamID : '_bsStateIcon'));
   const sprite = this.createInnerSprite(key, Sprite_StateIcon);
   sprite.setup(actor);
   sprite.move(x, y);
@@ -2340,7 +2349,8 @@ const _Sprite_Actor_updateVisibility = Sprite_Actor.prototype.updateVisibility;
 Sprite_Actor.prototype.updateVisibility = function() {
     _Sprite_Actor_updateVisibility.call(this);
     if (this.viewFrontActor) {
-        this.visible = false;
+      //this.visible = true;
+      this.visible = false;
     }
 };
 

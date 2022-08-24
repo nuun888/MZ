@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.5
+ * @version 1.1.0
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/8/24 Ver.1.1.0
+ * 敵対象選択時にスクロール選択出来る機能を追加。
  * 2022/6/5 Ver.1.0.5
  * 微修正。
  * 2022/4/2 Ver.1.0.4
@@ -626,6 +628,25 @@ Window_BattleEnemy.prototype.select = function(index) {
 
 Window_BattleEnemy.prototype.maxCols = function() {
     return this.maxItems();
+};
+
+Window_BattleEnemy.prototype.processWheelScroll = function() {
+    if (this.isWheelScrollEnabled()) {
+        const threshold = 20;
+        const oldIndex = this.index();
+        if (TouchInput.wheelY >= threshold) {
+            this.cursorRight(Input.isTriggered("right"));
+            if (this.index() !== oldIndex) {
+                this.playCursorSound();
+            }
+        }
+        if (TouchInput.wheelY <= -threshold) {
+            this.cursorLeft(Input.isTriggered("left"));
+            if (this.index() !== oldIndex) {
+                this.playCursorSound();
+            }
+        }
+    }
 };
 
 function Sprite_BattlerName() {

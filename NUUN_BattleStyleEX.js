@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.6.9
+ * @version 3.7.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/8/25 Ver.3.7.0
+ * アクター画像変化条件に防御時、反撃時、魔法反射時を追加。
+ * アクターコマンド可変表示時にアクターコマンドの表示がおかしくなる問題を修正。
  * 2022/8/24 Ver.3.6.9
  * アクターウィンドウのX座標を変更したときに、アクターコマンドがアクターの上指定時にコマンドウィンドウがずれて表示されてしまう問題を修正。
  * アクターウィンドウの横幅指定時にアクターウィンドウが表示されない問題を修正。
@@ -331,6 +334,32 @@ BattleManager.getDisplayMessageType = function() {
   return $gameMessage._messageType;
 };
 
+const _BattleManager_startActorInput = BattleManager.startActorInput;
+BattleManager.startActorInput = function() {
+  _BattleManager_startActorInput.call(this);
+  if (this._currentActor && this._currentActor.isInputting()) {
+      this._currentActor.battleStyleImgRefresh();
+  }
+};
+
+const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
+BattleManager.invokeCounterAttack = function(subject, target) {
+  if (target.isActor()) {
+    target.setBattleImgId(30);
+    target.battleStyleImgRefresh();
+  }
+  _BattleManager_invokeCounterAttack.call(this, subject, target);
+};
+
+const _BattleManager_invokeMagicReflection = BattleManager.invokeMagicReflection;
+BattleManager.invokeMagicReflection = function(subject, target) {
+  if (target.isActor()) {
+    target.setBattleImgId(31);
+    target.battleStyleImgRefresh();
+  }
+  _BattleManager_invokeMagicReflection.call(this, subject, target);
+};
+
 //Game_Temp
 const _Game_Temp_initialize = Game_Temp.prototype.initialize;
 Game_Temp.prototype.initialize = function() {
@@ -555,6 +584,14 @@ Game_Actor.prototype.battleStyleMatchChangeGraphic = function(data) {
       return this.onImgId === 20;
     case 'state' :
       return this.isBattleStyleStateImg(data, data.stateId);
+    case 'counter' :
+      return this.onImgId === 30;
+    case 'reflection' :
+      return this.onImgId === 31;
+    case 'counterEX' :
+      return this.onImgId === 32 && this.isBattleStyleUseItemImg(data.Item);
+    case 'guard' :
+      return this.onImgId === 15;
   }
 };
 
@@ -593,8 +630,14 @@ Game_Actor.prototype.performDamage = function() {
   if (params.OnActorShake) {
     this._onDamageEffect = true;
   }
-  this.setBattleImgId(1);
-  this.battleStyleImgRefresh();
+  if (this.isGuard()) {
+    this.setBattleImgId(15);
+    this.battleStyleImgRefresh();
+  }
+  if (this._imgScenes !== 'guard') {
+    this.setBattleImgId(1);
+    this.battleStyleImgRefresh();
+  }
 };
 
 const _Game_Actor_performRecovery = Game_Actor.prototype.performRecovery;
@@ -1328,6 +1371,16 @@ Window_Base.prototype.bsUpdateBackground = function() {
   }
 };
 
+
+const _Window_Selectable_paint = Window_Selectable.prototype.paint;
+Window_Selectable.prototype.paint = function() {
+  const className = String(this.constructor.name);
+  if (className === 'Window_ActorCommand') {
+    this.setCommandHeight();
+  }
+  _Window_Selectable_paint.call(this);
+};
+
 //Window_PartyCommand
 const _Window_PartyCommand_initialize = Window_PartyCommand.prototype.initialize;
 Window_PartyCommand.prototype.initialize = function(rect) {
@@ -1436,6 +1489,7 @@ Window_ActorCommand.prototype.itemRect = function(index) {
   return rect;
 };
 
+
 const _Window_ActorCommand_refresh = Window_ActorCommand.prototype.refresh;
 Window_ActorCommand.prototype.refresh = function() {
     _Window_ActorCommand_refresh.call(this);
@@ -1444,7 +1498,7 @@ Window_ActorCommand.prototype.refresh = function() {
       const data = getActorPositionData( this._actor.actorId());
       this.setWindowSkin(data);
       const rect = statusData.itemRect(actorIndex);
-      this.setCommandHeight();
+      //this.setCommandHeight();
       if (params.ActorCommandPosition === 'actor') {
         if (Imported.NUUN_SupportActor && this._actor.getSupportActor()) {
           this.x = params.SupportActorCommand_X;
@@ -2672,8 +2726,10 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
     } else if (actor.isAlive() && this.isDead()) {
       this.setReviveUpdateCount();
     } else if (actor.isAlive() && actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
-      if (actor.onImgId === 1 || actor.onImgId === 2) {
+      if (actor.onImgId === 1 || actor.onImgId === 2 || actor.onImgId === 15) {
         this._updateCount = this.setDamageDuration();
+      } else if (actor.onImgId === 30 || actor.onImgId === 31) {
+        this._updateCount = this.setCounterDuration();
       } else if (actor.onImgId === 20) {
         this._updateCount = Infinity;
       } else {
@@ -2808,6 +2864,10 @@ Sprite_ActorImges.prototype.setDeadDuration = function(){
 
 Sprite_ActorImges.prototype.setDamageDuration = function(){
   return params.DamageImgFrame;
+};
+
+Sprite_ActorImges.prototype.setCounterDuration = function(){
+  return params.CounterImgFrame;
 };
 
 Sprite_ActorImges.prototype.setActorDead = function(flag){

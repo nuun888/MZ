@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.6.3
+ * @version 1.7.0
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -56,6 +56,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/8/25 Ver.1.7.0
+ * アクター画像変化条件に防御時、反撃時、魔法反射時を追加。
  * 2022/8/24 Ver.1.6.3
  * 敵出現、アイテムウィンドウのXY座標が適用されていなかった問題を修正。
  * 2022/8/7 Ver.1.6.2
@@ -984,10 +986,19 @@
  * @default ////////////////////////////////
  * 
  * @param DamageImgFrame
- * @desc ダメージ、回復時の画像変化フレーム。
- * @text ダメージ、回復時変化フレーム
+ * @desc アクター画像のダメージ、回復時、防御の画像変化フレーム。
+ * @text ダメージ、回復、防御時変化フレーム
  * @type number
  * @default 30
+ * @min 1
+ * @max 9999
+ * @parent ActorImgEffect
+ * 
+ * @param CounterImgFrame
+ * @desc アクター画像の反撃、魔法反射時の画像変化フレーム。
+ * @text 反撃、魔法反射画像変化フレーム
+ * @type number
+ * @default 60
  * @min 1
  * @max 9999
  * @parent ActorImgEffect
@@ -2022,6 +2033,12 @@
  * @value 'recoverySkill'
  * @option アイテム使用時(2)
  * @value 'item'
+ * @option 反撃時
+ * @value 'counter'
+ * @option 魔法反射時
+ * @value 'reflection'
+ * @option 防御時
+ * @value 'guard'
  * @option 詠唱時
  * @value 'chant'
  * @option 勝利時
@@ -2128,29 +2145,29 @@
  * @text 表示対象
  * @desc アクターステータス画面に表示させるステータス対象を選択します。
  * @type select
- * @option HPゲージ(1)(2)(3)(4)(13)
+ * @option HPゲージ(1)(2)(3)(4)
  * @value 'hpgauge'
- * @option MPゲージ(1)(2)(3)(4)(13)
+ * @option MPゲージ(1)(2)(3)(4)
  * @value 'mpgauge'
- * @option TPゲージ(1)(2)(3)(4)(13)
+ * @option TPゲージ(1)(2)(3)(4)
  * @value 'tpgauge'
- * @option TPB(1)(2)(3)(4)(13)
+ * @option TPB(1)(2)(3)(4)
  * @value 'tpb'
- * @option ステート(3)(4)(8)(9)(13)
+ * @option ステート(3)(4)(8)(9)
  * @value 'state'
- * @option ステート2(1)(3)(4)(8)(9)(13)
+ * @option ステート2(1)(3)(4)(8)(9)
  * @value 'state2'
- * @option アクター名(1)(2)(3)(4)(5)(13)
+ * @option アクター名(1)(2)(3)(4)(5)
  * @value 'name'
- * @option 独自パラメータ(1)(3)(4)(5)(6)(8)(13)
+ * @option 独自パラメータ(1)(3)(4)(5)(6)(8)
  * @value 'param'
- * @option 独自パラメータ(動的) (1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @option 独自パラメータ(動的) (1)(2)(3)(4)(5)(6)(7)(8)
  * @value 'dparam'
- * @option 独自ゲージ (1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)
+ * @option 独自ゲージ (1)(2)(3)(4)(5)(6)(7)(8)(10)(11)
  * @value 'usergauge'
- * @option レベル(1)(3)(4)(5)(6)(13)
+ * @option レベル(1)(3)(4)(5)(6)
  * @value 'lv'
- * @option 画像(3)(4)(7)(12)(13)
+ * @option 画像(3)(4)(7)(12)
  * @value 'imges'
  * @default
  * 
@@ -2368,6 +2385,7 @@ params.ActorState_X = Number(parameters['ActorState_X'] || 0);
 params.ActorState_Y = Number(parameters['ActorState_Y'] || 0);
 
 params.DamageImgFrame = Number(parameters['DamageImgFrame'] || 30);
+params.CounterImgFrame = Number(parameters['CounterImgFrame'] || 60);
 params.ActorShakeFlame = Number(parameters['ActorShakeFlame'] || 36);
 params.ActorShakePower = Number(parameters['ActorShakePower'] || 2);
 params.ActorShakeSpeed = Number(parameters['ActorShakeSpeed'] || 20);

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.0
+ * @version 1.5.0
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/8/26 Ver 1.5.0
+ * アクター画像変化条件に防御時、反撃時、魔法反射時を追加。
  * 2022/6/19 Ver 1.4.0
  * アクター画像条件にコマンド選択時を追加。
  * アクター画像条件に不透明度を指定できる機能を追加。
@@ -199,6 +201,12 @@
  * @value 'recoverySkill'
  * @option アイテム使用時(2)
  * @value 'item'
+ * @option 反撃時
+ * @value 'counter'
+ * @option 魔法反射時
+ * @value 'reflection'
+ * @option 防御時
+ * @value 'guard'
  * @option 詠唱時
  * @value 'chant'
  * @option 勝利時
@@ -273,6 +281,33 @@ NuunManager.getClassName = function() {
   return this._className;
 };
 
+
+const _BattleManager_startActorInput = BattleManager.startActorInput;
+BattleManager.startActorInput = function() {
+  _BattleManager_startActorInput.call(this);
+  if (this._currentActor && this._currentActor.isInputting()) {
+      this._currentActor.imgRefresh();
+  }
+};
+
+const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
+BattleManager.invokeCounterAttack = function(subject, target) {
+  if (target.isActor()) {
+    target.onImgId = 30;
+    target.imgRefresh();
+  }
+  _BattleManager_invokeCounterAttack.call(this, subject, target);
+};
+
+const _BattleManager_invokeMagicReflection = BattleManager.invokeMagicReflection;
+BattleManager.invokeMagicReflection = function(subject, target) {
+  if (target.isActor()) {
+    target.onImgId = 31;
+    target.imgRefresh();
+  }
+  _BattleManager_invokeMagicReflection.call(this, subject, target);
+};
+
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
@@ -282,6 +317,7 @@ Game_Actor.prototype.initMembers = function() {
   this._actorGraphicName = null;
   this._actorGraphicFace = null;
   this.onImgId = 0;
+  this._imgScenes = 'default';
 };
 
 const _Game_Actor_setup = Game_Actor.prototype.setup;
@@ -327,7 +363,6 @@ Game_Actor.prototype.setActorGraphicData = function() {
 };
 
 Game_Actor.prototype.matchConditions = function(data) {
-  
   if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this.hp, this.param(0))) {
     return false;
   }
@@ -354,6 +389,7 @@ Game_Actor.prototype.matchConditions = function(data) {
 
 Game_Actor.prototype.matchChangeGraphic = function(data) {
   const changeData = data.ChangeGraphicScenes;
+  this._imgScenes = changeData;
   switch (changeData) {
     case 'default' :
       return true;
@@ -379,6 +415,14 @@ Game_Actor.prototype.matchChangeGraphic = function(data) {
       return this.onImgId === 20;
     case 'state' :
       return this.isCondStateImg(data, data.stateId);
+    case 'counter' :
+      return this.onImgId === 30;
+    case 'reflection' :
+      return this.onImgId === 31;
+    case 'counterEX' :
+      return this.onImgId === 32 && this.isUseItemImg(data.Item);
+    case 'guard' :
+      return this.onImgId === 15;
   }
 };
 
@@ -440,8 +484,14 @@ Game_Actor.prototype.getIsActorGraphicImg = function() {
 const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
 Game_Actor.prototype.performDamage = function() {
   _Game_Actor_performDamage.call(this);
-  this.onImgId = 1;
-  this.imgRefresh();
+  if (this.isGuard()) {
+    this.onImgId = 15;
+    this.imgRefresh();
+  }
+  if (this._imgScenes !== 'guard') {
+    this.onImgId = 1;
+    this.imgRefresh();
+  }
 };
 
 const _Game_Actor_performRecovery = Game_Actor.prototype.performRecovery;

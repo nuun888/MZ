@@ -1,12 +1,12 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.6.9
+### Ver.3.7.0  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.6.1  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.6.1  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.6.1  
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.7.0  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.7.0  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.7.0   
 
 バトルスタイル拡張デフォルト設定用 Ver.1.6.1  
 ![画像](img/BattleStyleEX1.png)  
@@ -74,15 +74,16 @@
 画像上基準：画像の上を起点とし、アクターステータスの上から表示されます。  
 画像下基準：画像の下を起点とし、アクターステータスの下から上方向に表示します。  
 
-### 立ち絵切り替え機能の推奨プロパティ
+### 立ち絵切り替え機能
 戦闘不能  
+反撃、魔法反射  
+攻撃、回復スキル、アイテム使用時、コマンド選択時  
 ステート(1)  
 瀕死  
-ダメージ、回復時  
-攻撃、回復スキル、アイテム使用時、コマンド選択時  
+ダメージ、回復時、防御  
 詠唱時  
 勝利時  
-ステート(2)    
+ステート(2)  
 デフォルト  
 
 (1)石化など  
@@ -124,6 +125,9 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2022/8/25 Ver.3.7.0  
+アクター画像変化条件に防御時、反撃時、魔法反射時を追加。  
+アクターコマンド可変表示時にアクターコマンドの表示がおかしくなる問題を修正。  
 2022/8/24 Ver.1.6.3  
 敵出現、アイテムウィンドウのXY座標が適用されていなかった問題を修正。 
 アクターウィンドウのX座標を変更したときに、アクターコマンドがアクターの上指定時にコマンドウィンドウがずれて表示されてしまう問題を修正。  

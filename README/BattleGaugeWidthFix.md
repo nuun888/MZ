@@ -1,4 +1,4 @@
-# [戦闘メンバー数変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleGaugeWidthFix.js)
+# [バトルステータスゲージ幅修正](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleGaugeWidthFix.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleGaugeWidthFix.js)  
 

@@ -1,5 +1,5 @@
 # [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
-# Ver.1.1.5
+# Ver.1.1.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -90,6 +90,9 @@
 パーティ、敵グループの場合はいずれかが一致したときに条件を満たします。  
 #### [指定のステートIDにかかっていない]
 対象が「指定のステートID](3)にかかっていなければ条件を満たします。  
+パーティ、敵グループの場合はいずれかが一致したときに条件を満たします。  
+#### [指定のステートIDにかかっている(経過ターン)] 要ステート経過ターンカウント  
+対象が「指定のステートID](3)にかかっていて経過ターンが「上限下限値内」(1)または「指定した数値」(2)と一致なら条件を満たします。  
 パーティ、敵グループの場合はいずれかが一致したときに条件を満たします。  
 
 ### 【バフ】
@@ -231,6 +234,8 @@
 [エンカウント条件](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md)  
 
 ## 更新履歴
+2022/8/28 Ver.1.1.6  
+ステートのターン条件に経過ターンで指定できる機能を追加。  
 2022/6/19 Ver.1.1.5  
 一部プラグインでエラーが出るため修正。  
 2022/5/4 Ver.1.1.4  

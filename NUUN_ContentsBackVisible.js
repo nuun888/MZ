@@ -37,12 +37,6 @@
  * @type boolean
  * @default true
  * 
- * @param ItemHeightAdjust
- * @text 縦表示間隔調整
- * @desc コンテンツ背景非表示に項目ごとの縦幅を調整します。
- * @type boolean
- * @default false
- * 
  * @param BackVisibleClass
  * @text コンテンツ背景クラス設定
  * @desc コンテンツ背景の表示をさせない(コンテンツ背景非表示ON)、させる(コンテンツ背景非表示OFF)クラスを指定します。リストにないクラスの場合、直接記入してください。(複数指定可)
@@ -87,7 +81,8 @@ Imported.NUUN_ContentsBackVisible = true;
 const parameters = PluginManager.parameters('NUUN_ContentsBackVisible');
 const BackVisibleClass = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackVisibleClass'])) : null) || [];
 const BackVisible = eval(parameters['BackVisible'] || 'true');
-const ItemHeightAdjust = eval(parameters['ItemHeightAdjust'] || 'false');
+//const ItemHeightAdjust = eval(parameters['ItemHeightAdjust'] || 'false');
+const ItemHeightAdjust = false;
 
 function getContentsBackClass(thisClass) {
     return BackVisibleClass.some(_calss => _calss === thisClass);

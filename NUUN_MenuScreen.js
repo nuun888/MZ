@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ１
  * @author NUUN
- * @version 1.7.2
+ * @version 1.8.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -63,6 +63,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/8/27 Ver.1.8.0
+ * アクターステータスに任意の画像を表示できる機能を追加。
+ * ゲージがアクターの表示範囲内に収まるように修正。
  * 2022/8/22 Ver.1.7.2
  * 制御文字でフォントサイズ変更をした後に、項目のフォントのサイズが変化してしまう問題を修正。
  * 2022/7/23 Ver.1.3.1
@@ -625,6 +628,8 @@
  * @value 49
  * @option 独自ゲージ(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
  * @value 100
+ * @option 画像(3)(4)(5)(6)(25)
+ * @value 200
  * @option ライン(1)(2)(3)(4)(5)(6)(7)
  * @value 1000
  * @default 0
@@ -735,7 +740,7 @@
  * @default ------------------------------
  * 
  * @param GaugeID
- * @desc 独自ゲージ識別ID。
+ * @desc 識別ID。
  * @text 識別ID(20)
  * @type string
  * @default 
@@ -775,6 +780,18 @@
  * @default 0
  * @min 0
  * @parent GaugeSetting
+ * 
+ * @param ImgSetting
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc 表示する画像を指定します。
+ * @text 画像(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
  *
  */
 /*~struct~InfoListData:
@@ -1136,6 +1153,7 @@ const InfoSideList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(par
 const InfoSideRows = Number(parameters['InfoSideRows'] || 1);
 const InfoSideFontSize = Number(parameters['InfoSideFontSize'] || 0);
 
+let maxGaugeWidth = 128;
 let HPGaugeWidth = OrgHPGaugeWidth;
 let MPGaugeWidth = OrgMPGaugeWidth;
 let TPGaugeWidth = OrgTPGaugeWidth;
@@ -1309,7 +1327,7 @@ Scene_Menu.prototype.setBackGround = function(sprite, mode) {
 };
 
 Scene_Menu.prototype.infoAreaHeight = function(rows) {
-    return this.calcWindowHeight(rows, (rows === 1));
+    return this.calcWindowHeight(rows, false);
 };
 
 Scene_Menu.prototype.menuHelpAreaHeight = function() {
@@ -1460,6 +1478,7 @@ Window_MenuStatus.prototype.drawItemStatus = function(index) {
     const itemWidth = this.itemContentsWidth(rect.width);
     const lineHeight = this.lineHeight();
     const colSpacing = this.colSpacing();
+    maxGaugeWidth = itemWidth;
     for (const data of StatusList) {
       const x_Position = data.X_Position;
       const position = Math.min(x_Position, this.maxContentsCols());
@@ -1651,6 +1670,9 @@ Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor
     case 100:
         $gameTemp.menuParam = data;
         this.placeUserGauge(data, x, y, actor);
+        break;
+    case 200:
+        this.drawMenuStatusImg(data, x, y, actor);
         break;
     case 1000:
         this.horzLine(x, y, width, actor);
@@ -1931,6 +1953,14 @@ Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
     sprite.setup(actor, type);
     sprite.move(x, y);
     sprite.show();
+};
+
+Window_MenuStatus.prototype.drawMenuStatusImg = function(data, x, y, actor) {
+    if (data.ImgData) {
+        const rect = this.itemRect(0);
+        const bitmap = ImageManager.nuun_LoadPictures(data.ImgData);
+        this.contents.blt(bitmap, 0, 0, rect.width, rect.height, x - this.colSpacing(), y - this.itemPadding());
+    }
 };
 
 
@@ -2225,7 +2255,7 @@ Sprite_MenuGauge.prototype.constructor = Sprite_MenuGauge;
 Sprite_MenuGauge.prototype.initialize = function() {
     this._statusType = $gameTemp.menuGaugeType;
     this.menuParam = $gameTemp.menuParam;
-    this._gaugeWidth = this.getMenuGaugeWidth();
+    this._gaugeWidth = Math.min(this.getMenuGaugeWidth(), maxGaugeWidth);
     this._gaugeHeight = this.getMenuGaugeHeight();
     Sprite_Gauge.prototype.initialize.call(this);
 };

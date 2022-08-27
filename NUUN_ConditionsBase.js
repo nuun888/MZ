@@ -133,6 +133,10 @@
  * [指定のステートIDにかかっていない]
  * 対象が「指定のステートID](3)にかかっていなければ条件を満たします。
  * パーティ、敵グループの場合はいずれかが一致したときに条件を満たします。
+ * [指定のステートIDにかかっている(経過ターン)要ステート経過ターンカウント]
+ * 対象が「指定のステートID](3)にかかっていて経過ターンが「上限下限値内」(1)または「指定した数値」(2)と一致なら条件を満たします。
+ * ステートごとに残りターン条件を指定したい場合は条件リストを別途追加してください。
+ * パーティ、敵グループの場合はいずれかが一致したときに条件を満たします。
  * 
  * 【バフ】
  * [指定のバフIDにかかっている][指定のデバフIDにかかっている]
@@ -245,8 +249,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2022/6/19 Ver.1.1.5
- * 一部プラグインでエラーが出るため修正。
+ * 2022/8/28 Ver.1.1.5
+ * ステートのターン条件に経過ターンで指定できる機能を追加。
  * 2022/5/4 Ver.1.1.4
  * 一部条件によってはクリティカル時の条件が適用されない問題を修正。
  * リストにないIDが設定されていた場合にエラーが起きる問題を修正。
@@ -363,7 +367,7 @@
  * @type select
  * @option バトラーID(3)（(3)バトラーID）
  * @value 'ID'
- * @option 一致したバトラーID数(1)(2)(3)（(1)バトラー数、(2)バトラー数、(3)バトラーID）
+ * @option 一致したバトラーID数(1)(2)(3)（(1)バトラー数、(2)バトラー数、(3)バトラーID)
  * @value 'IDNum'
  * @option アクターなら
  * @value 'IsActor'
@@ -479,8 +483,10 @@
  * @text ステート(State)
  * @desc ステートの条件タイプを指定します。
  * @type select
- * @option 指定のステートIDにかかっている(1)(2)(3)（(1)ターン (2)ターン (3)ステートID）
+ * @option 指定のステートIDにかかっている(1)(2)(3)（(1)残りターン (2)残りターン (3)ステートID）
  * @value 'AddState'
+ * @option 指定のステートIDにかかっている(1)(2)(3)（(1)経過ターン (2)経過ターン (3)ステートID）
+ * @value 'AddStateCount'
  * @option 指定のステートIDにかかっていない(3)（(3)ステートID）
  * @value 'NotState'
  * @default 
@@ -721,7 +727,7 @@ Game_ActionResult.prototype.clear = function() {
 
 const _Game_Action_apply = Game_Action.prototype.apply;
 Game_Action.prototype.apply = function(target) {
-  $gameTemp.actionData.subject = this.subject();
+  //$gameTemp.actionData.subject = this.subject();
   $gameTemp.actionData.target = target;
   $gameTemp.actionData.action = this;
   $gameTemp.actionData.damage = 0;
@@ -983,6 +989,12 @@ function stateTriggerConditions(data, target, mode) {
       return unit.members().some(member => state(data, member));
     } else {
       return state(data, target);
+    }
+  } else if (data.StateConditionsType === 'AddStateCount') {
+    if (mode === 'Party' || mode === 'Troop') {
+      return unit.members().some(member => stateTurnCount(data, member));
+    } else {
+      return stateTurnCount(data, target);
     }
   } else if (data.StateConditionsType === 'NotState') {
     if (mode === 'Party' || mode === 'Troop') {
@@ -1322,12 +1334,23 @@ function state(data, member) {
   return list.some(id => id > 0 && stateTurn(data, getStateId(id, states), member));
 }
 
+function stateTurnCount(data, member) {
+  const states = member._states;
+  const list = getValList(data.IDList);
+  return list.some(id => id > 0 && getStateTurnCount(data, getStateId(id, states), member));
+}
+
 function getStateId(id, states) {
   return states.find(stateId => stateId > 0 && stateId === id);
 };
 
 function stateTurn(data, id, member) {
   const turn = member._stateTurns[id];
+  return conditionsNum(data, turn);
+};
+
+function getStateTurnCount(data, id, member) {
+  const turn = member.getStateNowTurn(id) - 1;
   return conditionsNum(data, turn);
 };
 

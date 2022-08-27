@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  戦闘中アイテム、スキル選択画面MV風表示
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
@@ -20,6 +20,8 @@
  * 
  * 
  * 更新履歴
+ * 2022/8/27 Ver.1.3.1
+ * 処理の修正。
  * 2022/6/5 Ver.1.3.0
  * アイテム、スキル選択中にアクターコマンドを非表示にする機能を追加いたしました。
  * 2022/3/17 Ver.1.2.0
@@ -99,8 +101,8 @@ const _Scene_Battle_skillWindowRect = Scene_Battle.prototype.skillWindowRect;
 Scene_Battle.prototype.skillWindowRect = function() {
   const rect = _Scene_Battle_skillWindowRect.call(this);
   rect.y = this._helpWindow.height + this.itemSkillWindowButtonAreaHeight();
-  maxHeight = Math.min(this.calcWindowHeight(ItemMaxRow, true), this.itemSkillWindowMaxHeight(rect.y));
-  rect.height = maxHeight;
+  maxHeight = this.itemSkillWindowMaxHeight(rect.y)
+  rect.height = Math.min(this.calcWindowHeight(ItemMaxRow, true), maxHeight);
   return rect;
 };
 
@@ -204,13 +206,24 @@ Window_Selectable.prototype.hideHelpWindow = function() {
 
 };
 
-const _Window_BattleSkill_refresh = Window_BattleSkill.prototype.refresh;
-Window_BattleSkill.prototype.refresh = function() {
-  _Window_BattleSkill_refresh.call(this);
+const _Window_Selectable_paint = Window_Selectable.prototype.paint;
+Window_Selectable.prototype.paint = function() {
+  const className = String(this.constructor.name);
+  if (className === 'Window_BattleSkill') {
+    this.setItemHeight();
+  } else if (className === 'Window_BattleItem') {
+    this.setItemHeight();
+  }
+  _Window_Selectable_paint.call(this);
+};
+
+Window_Selectable.prototype.setItemHeight = function() {
   if (VariableHeight) {
-    this.height = Math.min(maxHeight, this.fittingHeight(Math.max(Math.ceil(this.maxItems() / this.maxCols()), 1)));
+    const row = Math.max(Math.ceil(this.maxItems() / this.maxCols()), 1);
+    this.height = Math.min(maxHeight, this.fittingHeight(row));
   }
 };
+
 
 Window_BattleSkill.prototype.maxCols = function() {
   return Cols;
@@ -220,15 +233,6 @@ const _Window_BattleSkill_show = Window_BattleSkill.prototype.show;
 Window_BattleSkill.prototype.show = function() {
   _Window_BattleSkill_show.call(this);
   $gameTemp.openItemSkillWindow = true;
-};
-
-
-const _Window_BattleItem_refresh = Window_ItemList.prototype.refresh;
-Window_BattleItem.prototype.refresh = function() {
-  _Window_BattleItem_refresh.call(this);
-  if (VariableHeight) {
-    this.height = Math.min(maxHeight, this.fittingHeight(Math.max(Math.ceil(this.maxItems() / this.maxCols()), 1)));
-  }
 };
 
 Window_BattleItem.prototype.maxCols = function() {

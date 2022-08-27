@@ -1,5 +1,5 @@
 # [コンテンツ背景非表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js)
-# Ver.1.1.1
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -14,8 +14,6 @@ ONの時は適用しないクラスを指定します。
 ![画像](img/ContentsBackVisible1.png)  
 
 ## 更新履歴
-2022/8/27 Ver.1.1.1  
-コンテンツ背景非表示に項目ごとの縦幅を調整する機能を追加。  
 2022/5/15 Ver.1.1.0  
 適用クラスの指定の仕様を変更。  
 コンテンツ背景非表示の時に行の高さを詰めるように変更。  

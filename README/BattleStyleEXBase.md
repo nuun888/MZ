@@ -1,20 +1,20 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.7.0  
+### Ver.3.7.1  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.7.0  
 [バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.7.0  
 [バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.7.0   
 
-バトルスタイル拡張デフォルト設定用 Ver.1.6.1  
+バトルスタイル拡張デフォルト設定用 Ver.1.7.0  
 ![画像](img/BattleStyleEX1.png)  
 
-バトルスタイル拡張スタンダード設定用 Ver.1.6.1  
+バトルスタイル拡張スタンダード設定用 Ver.1.7.0  
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.6.1  
+バトルスタイル拡張XPスタイル設定用 Ver.1.7.0  
 ![画像](img/BattleStyleEX3.png)  
 
 ## 必須、前提プラグイン
@@ -125,6 +125,8 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2022/9/3 Ver.3.7.1  
+外部プラグインでサイドビューアクターが表示すると正常に表示されない問題を修正。  
 2022/8/25 Ver.3.7.0  
 アクター画像変化条件に防御時、反撃時、魔法反射時を追加。  
 アクターコマンド可変表示時にアクターコマンドの表示がおかしくなる問題を修正。  

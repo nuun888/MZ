@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/4 Ver.1.1.2
+ * 特定の場面でウィンドウが表示さてたままになってしまう問題を修正。
  * 2022/8/26 Ver.1.1.1
  * スクロール時のSEを再生しない機能を追加。
  * アクターコマンドを開くと対象選択時のカーソルSEが再生しまう問題を修正。
@@ -346,6 +348,14 @@ Scene_Battle.prototype.onActorCancel = function() {
     }
 };
 
+const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWindows;
+Scene_Battle.prototype.hideSubInputWindows = function() {
+    _Scene_Battle_hideSubInputWindows.call(this);
+    this._actorSelectWindow.deactivate();
+    this._enemySelectWindow.deactivate();
+    this._actorSelectWindow.hide();
+    this._enemySelectWindow.hide();
+};
 
 Scene_Battle.prototype.XPActorSelectY = function() {
     switch (XPSelectPosition) {

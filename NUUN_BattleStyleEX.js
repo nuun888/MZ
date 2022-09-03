@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.0
+ * @version 3.7.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/9/3 Ver.3.7.1
+ * 外部プラグインでサイドビューアクターが表示すると正常に表示されない問題を修正。
  * 2022/8/25 Ver.3.7.0
  * アクター画像変化条件に防御時、反撃時、魔法反射時を追加。
  * アクターコマンド可変表示時にアクターコマンドの表示がおかしくなる問題を修正。
@@ -2390,34 +2392,40 @@ Window_Message.prototype.updateBackground = function() {
 };
 
 //Sprite_Actor
-const _Sprite_Actor_initMembers = Sprite_Actor.prototype.initMembers;
-  Sprite_Actor.prototype.initMembers = function() {
-    _Sprite_Actor_initMembers.call(this);
+function Sprite_BSFrontActor() {
+  this.initialize(...arguments);
+}
+
+Sprite_BSFrontActor.prototype = Object.create(Sprite_Actor.prototype);
+Sprite_BSFrontActor.prototype.constructor = Sprite_BSFrontActor;
+
+Sprite_BSFrontActor.prototype.initialize = function(battler) {
+  Sprite_Actor.prototype.initialize.call(this, battler);
+};
+
+Sprite_BSFrontActor.prototype.initMembers = function() {
+    Sprite_Actor.prototype.initMembers.call(this);
     this.viewFrontActor = (!$gameSystem.isSideView() && params.ActorEffectShow);
     this.bsSprite = null;
     this._bsHomeX = 0;
     this._bsHomeY = 0;
 };
 
-const _Sprite_Actor_updateVisibility = Sprite_Actor.prototype.updateVisibility;
-Sprite_Actor.prototype.updateVisibility = function() {
-    _Sprite_Actor_updateVisibility.call(this);
+Sprite_BSFrontActor.prototype.updateVisibility = function() {
+  Sprite_Actor.prototype.updateVisibility .call(this);
     if (this.viewFrontActor) {
       //this.visible = true;
       this.visible = false;
     }
 };
 
-const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
-Sprite_Actor.prototype.setActorHome = function(index) {
-    if(this.viewFrontActor){
-        this.actorHomeRefresh(index);
-    } else {
-        _Sprite_Actor_setActorHome.call(this, index);  
-    }
+Sprite_BSFrontActor.prototype.setActorHome = function(index) {
+  if (this.viewFrontActor) {
+    this.actorHomeRefresh(index);
+  }
 };
 
-Sprite_Actor.prototype.actorHomeRefresh = function(index) {
+Sprite_BSFrontActor.prototype.actorHomeRefresh = function(index) {
     const rect = statusData.itemRectWithPadding(index);
     let x = rect.x + Math.floor(rect.width / 2) + statusData.itemPadding();
     let y = rect.y + statusData.y + Math.floor(rect.height / 2);
@@ -2429,9 +2437,8 @@ Sprite_Actor.prototype.actorHomeRefresh = function(index) {
     this._bsHomeY = y + params.ActorEffect_Y;
 };
 
-const _Sprite_Actor_setBattler = Sprite_Actor.prototype.setBattler;
-Sprite_Actor.prototype.setBattler = function(battler) {
-  _Sprite_Actor_setBattler.call(this, battler);
+Sprite_BSFrontActor.prototype.setBattler = function(battler) {
+  Sprite_Actor.prototype.setBattler.call(this, battler);
   const index = battler ? battler.index() : -1;
   if (battler && battler === this._actor && this.viewFrontActor && $gameTemp.isBattleStyleRequested() && params.ActorEffectShow) {
     this.setActorHome(index);
@@ -2442,36 +2449,29 @@ Sprite_Actor.prototype.setBattler = function(battler) {
   $gameTemp.setBattleStyleRefresh(false);
 };
 
-const _Sprite_Battler_startMove = Sprite_Battler.prototype.startMove;
-Sprite_Battler.prototype.startMove = function(x, y, duration) {
-    if (!this.viewFrontActor) {
-       _Sprite_Battler_startMove.call(this, x, y, duration);
-    }
+Sprite_BSFrontActor.prototype.startMove = function(x, y, duration) {
+
 };
 
-const _Sprite_Actor_updateMotion = Sprite_Actor.prototype.updateMotion;
-Sprite_Actor.prototype.updateMotion = function() {
-    if (!this.viewFrontActor) {
-       _Sprite_Actor_updateMotion.call(this);
-    }
+Sprite_BSFrontActor.prototype.updateMotion = function() {
+
 };
 
-const _Sprite_Actor_update = Sprite_Actor.prototype.update;
-Sprite_Actor.prototype.update = function() {
-  _Sprite_Actor_update.call(this);
+Sprite_BSFrontActor.prototype.update = function() {
+  Sprite_Actor.prototype.update.call(this);
   if (this._actor) {
       this.updateFrontActor();
       this.updateBsPosition();
   }
 };
 
-Sprite_Actor.prototype.updateFrontActor = function() {
+Sprite_BSFrontActor.prototype.updateFrontActor = function() {
     if (this.viewFrontActor && $gameTemp.isBattleStyleRequested()) {
       this.setActorHome(this._actor.index());
     }
 };
 
-Sprite_Actor.prototype.updateBsPosition = function() {
+Sprite_BSFrontActor.prototype.updateBsPosition = function() {
   if (this.viewFrontActor) {
     if (this._bsHomeX !== this._homeX) {
       this._homeX = this._bsHomeX;
@@ -2482,15 +2482,12 @@ Sprite_Actor.prototype.updateBsPosition = function() {
   }
 };
 
-
-const _Sprite_Actor_damageOffsetX = Sprite_Actor.prototype.damageOffsetX;
-Sprite_Actor.prototype.damageOffsetX = function() {
-  return (this.viewFrontActor ? Sprite_Battler.prototype.damageOffsetX.call(this) : _Sprite_Actor_damageOffsetX.call(this)) + params.ActorDamage_X;
+Sprite_BSFrontActor.prototype.damageOffsetX = function() {
+  return (this.viewFrontActor ? 0 : Sprite_Actor.prototype.damageOffsetX.call(this)) + params.ActorDamage_X;
 };
 
-const _Sprite_Actor_damageOffsetY = Sprite_Actor.prototype.damageOffsetY;
-Sprite_Actor.prototype.damageOffsetY = function() {
-  return (this.viewFrontActor ? 0 : 0) + _Sprite_Actor_damageOffsetY.call(this) + params.ActorDamage_Y;
+Sprite_BSFrontActor.prototype.damageOffsetY = function() {
+  return (this.viewFrontActor ? 0 : Sprite_Actor.prototype.damageOffsetY.call(this)) + params.ActorDamage_Y;
 };
 
 
@@ -3172,6 +3169,17 @@ Sprite_StateIcon.prototype.shouldDisplay = function() {
   return result
 };
 
+const _Sprite_StateIcon_updateFrame = Sprite_StateIcon.prototype.updateFrame;
+Sprite_StateIcon.prototype.updateFrame = function() {
+  this._index = params.NoneStateIcon > 0 ? params.NoneStateIcon : this._index;
+  _Sprite_StateIcon_updateFrame.call(this);
+};
+
+const _Sprite_StateIcon_setFrameIcon = Sprite_StateIcon.prototype.setFrameIcon;
+Sprite_StateIcon.prototype.setFrameIcon = function(sprite) {
+  sprite._iconIndex = params.NoneStateIcon > 0 ? params.NoneStateIcon : sprite._iconIndex;
+  _Sprite_StateIcon_setFrameIcon.call(this, sprite);
+};
 
 function Sprite_BSStateIcon() {
   this.initialize(...arguments);
@@ -3371,7 +3379,7 @@ Spriteset_Battle.prototype.createFrontActors = function() {
     if (!$gameSystem.isSideView() && params.ActorEffectShow) {
       this._actorSprites = [];
       for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
-        const sprite = new Sprite_Actor();
+        const sprite = new Sprite_BSFrontActor();
         this._actorSprites.push(sprite);
         this._battleDamege.addChild(sprite);
       }

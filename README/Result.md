@@ -4,7 +4,7 @@
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
 #### 拡張プラグイン
-[耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) Ver.1.0.0
+[リザルト時ウィンドウスプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) Ver.1.0.0
 
 
 戦闘終了時にリザルト画面を表示します。  

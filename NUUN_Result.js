@@ -3668,7 +3668,7 @@ Window_ResultLevelUpMain.prototype.setupBitmap = function(actor, data) {
   if (bitmap) {
     bitmap = ImageManager.nuun_LoadPictures(bitmap);
     if (bitmap && !bitmap.isReady()) {
-      bitmap.addLoadListener(this.setBitmaph.bind(this, bitmap, data));
+      bitmap.addLoadListener(this.setBitmap.bind(this, bitmap, data));
     } else if (bitmap) {
       this.setBitmap(bitmap, data);
     }

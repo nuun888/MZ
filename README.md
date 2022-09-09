@@ -34,7 +34,7 @@
 | ---------- | ------------- | ------------- | -------- |
 | [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.7.0 |
 | [XPスタイル対象選択ウィンドウ](https://github.com/nuun888/MZ/blob/master/README/XPSelectWindow.md) | [NUUN_XPSelectWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js) | 共 | 1.1.0 |
-| [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 2.0.0|
+| [リザルト](https://github.com/nuun888/MZ/blob/master/README/Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 2.0.0|
 | ┣ リザルトサイドビュー表示 |  |  |  |
 | ┣ MVP |  |  |  |
 | ┗ [リザルト時スプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) | [NUUN_ResultSpriteHide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultSpriteHide.js) | 共 | 1.0.0 |

@@ -14,9 +14,9 @@
 戦闘終了後、勝利MEが流れた後に任意のBGMを再生できます。  
 
 
-![画像](img/Result4.png)<br>
-![画像](img/Result2.png)<br>
-![画像](img/Result18.png)<br>
+![画像](img/Result30.png)<br>
+![画像](img/Result31.png)<br>
+![画像](img/Result29.png)<br>
 
 ## 設定
 #### 各項目の設定の評価式

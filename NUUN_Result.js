@@ -1129,7 +1129,7 @@
  * @option 画面内
  * @value 'screen'
  * @default 'window'
- * @parent LevelUpWindowSetting
+ * @parent ActorImg
  * 
  * @param ActorPosition
  * @text 立ち絵表示位置
@@ -1142,7 +1142,7 @@
  * @option 右
  * @value 'right'
  * @default 'right'
- * @parent LevelUpWindowSetting
+ * @parent ActorImg
  * 
  * @param SESetting
  * @text レベルアップSE設定

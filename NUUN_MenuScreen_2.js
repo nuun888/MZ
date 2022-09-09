@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メニュー画面タイプ２
  * @author NUUN
- * @version 1.8.0
+ * @version 1.8.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -63,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/10 Ver.1.8.1
+ * インフォウィンドウの行を1行に指定したときに、スクロールしてしまう問題を修正。
  * 2022/8/27 Ver.1.8.0
  * アクターステータスに任意の画像を表示できる機能を追加。
  * ゲージがアクターの表示範囲内に収まるように修正。
@@ -2015,6 +2017,10 @@ Window_InfoMenu.prototype.initialize = function(rect) {
     Window_Selectable.prototype.initialize.call(this, rect);
     this._text = '';
     this.refresh();
+};
+
+Window_InfoMenu.prototype.itemHeight = function() {
+    return this.lineHeight();
 };
 
 Window_InfoMenu.prototype.refresh = function() {

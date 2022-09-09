@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.1
+ * @version 3.7.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,8 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/9/10 Ver.3.7.2
+ * 画面サイズとUIサイズが異なるときにアクターコマンドの表示位置をactorに設定したときに、コマンドの表示がずれる問題を修正。
  * 2022/9/3 Ver.3.7.1
- * 外部プラグインでサイドビューアクターが表示すると正常に表示されない問題を修正。
+ * 外部プラグインでサイドビューアクターを表示すると正常に表示されない問題を修正。
  * 2022/8/25 Ver.3.7.0
  * アクター画像変化条件に防御時、反撃時、魔法反射時を追加。
  * アクターコマンド可変表示時にアクターコマンドの表示がおかしくなる問題を修正。
@@ -1506,7 +1508,7 @@ Window_ActorCommand.prototype.refresh = function() {
           this.x = params.SupportActorCommand_X;
           this.y = params.SupportActorCommand_Y;
         } else {
-          this.x = rect.x + statusData.x + (statusData.itemPadding() / 2) + ((rect.width - this.width) / 2) + params.ActorCommand_X;
+          this.x = rect.x + (statusData.x - ((Graphics.width - Graphics.boxWidth) / 2)) + statusData.itemPadding() + ((rect.width - this.width) / 2) + params.ActorCommand_X;
           this.y = this.homeY - this.height + rect.y;
         }
       } else if (params.ActorCommandPosition === 'svtop') {
@@ -1698,6 +1700,7 @@ Window_BattleStatus.prototype.drawItemStatus = function(index) {//再定義
       const basicGaugesY = this.basicGaugesY(rect);
       this.placeBasicGauges(actor, basicGaugesX, basicGaugesY, rect);
     }
+    $gameTemp.actorData = null;
 };
 
 Window_BattleStatus.prototype.drawStatusListData = function(actor, list, index) {
@@ -1812,7 +1815,7 @@ Window_BattleStatus.prototype.placeUserParam = function(actor, data, x, y) {
 
 Window_BattleStatus.prototype.bs_PlaceActorName = function(actor, x, y) {
   const key = "actor%1-name".format(actor.actorId());
-  const sprite = this.createInnerSprite(key, Sprite_BSName);
+  const sprite = $gameTemp.userStatusParam ? this.createInnerSprite(key, Sprite_BSName) : this.createInnerSprite(key, Sprite_Name);
   sprite.setup(actor);
   sprite.move(x, y);
   sprite.show();
@@ -1887,7 +1890,7 @@ Window_BattleStatus.prototype.placeGauge = function(actor, type, x, y) {
     this.placeGaugeImg(actor, type, x, y);
   }
   const key = "actor%1-gauge-%2".format(actor.actorId(), type);
-  const sprite = this.createInnerSprite(key, Sprite_BSGauge);
+  const sprite = $gameTemp.userStatusParam || $gameTemp.actorData ? this.createInnerSprite(key, Sprite_BSGauge) : this.createInnerSprite(key, Sprite_Gauge);
   sprite.setup(actor, type);
   sprite.move(x, y);
   sprite.show();
@@ -2889,7 +2892,7 @@ Sprite_BSGauge.prototype.initialize = function() {
   this._data = $gameTemp.actorData;
   this._gaugeHeight = this.getGBSGaugeHeight();
   if (!params.ActorStatusVariable) {
-    this._gaugeWidth = this.getGBSGaugeWidth();
+    this._gaugeWidth = Math.min(BattleManager.rectMaxWidth, this.getGBSGaugeWidth());
   }
   Sprite_Gauge.prototype.initialize.call(this);
 };
@@ -2897,10 +2900,10 @@ Sprite_BSGauge.prototype.initialize = function() {
 Sprite_BSGauge.prototype.setup = function(battler, statusType) {
   Sprite_Gauge.prototype.setup.call(this, battler, statusType);
   const width = BattleManager.rectMaxWidth;
-    if (params.ActorStatusVariable && this.bitmapWidth() !== width) {
-      this._gaugeWidth = this.getGBSGaugeWidth();
-      this.redraw();
-    }
+  if (params.ActorStatusVariable && this.bitmapWidth() !== width) {
+    this._gaugeWidth = Math.min(BattleManager.rectMaxWidth, this.getGBSGaugeWidth());
+    this.redraw();
+  }
 };
 
 Sprite_BSGauge.prototype.bitmapWidth = function() {
@@ -2918,15 +2921,15 @@ Sprite_BSGauge.prototype.bitmapBaseWidth = function() {
 Sprite_BSGauge.prototype.getGBSGaugeWidth = function() {
   switch (this._statusType) {
     case 'hp':
-      return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.HPGaugeWidth;
+      return this.userStatusParam ? this.userStatusParam.Width : this._data.HPGaugeWidth;
     case 'mp':
-      return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.MPGaugeWidth;
+      return this.userStatusParam ? this.userStatusParam.Width : this._data.MPGaugeWidth;
     case 'tp':
-      return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.TPGaugeWidth;
+      return this.userStatusParam ? this.userStatusParam.Width : this._data.TPGaugeWidth;
     case 'time':
-      return this.userStatusParam ? BattleManager.rectMaxWidth : this._data.TPBGaugeWidth;
+      return this.userStatusParam ? this.userStatusParam.Width : this._data.TPBGaugeWidth;
     default:
-      return this.userStatusParam ? BattleManager.rectMaxWidth : 128;
+      return this.userStatusParam ? this.userStatusParam.Width : 128;
   }
 };
 
@@ -3117,18 +3120,20 @@ Sprite_BSName.prototype.constructor = Sprite_BSName;
 
 Sprite_BSName.prototype.initialize = function() {
   this.userStatusParam = $gameTemp.userStatusParam;
-  this._nameWidth = null;
   this._nameHeight = this.userStatusParam.Height > 24 ? this.userStatusParam.Height : 24;
+  if (!params.ActorStatusVariable) {
+    this._nameWidth = Math.min(BattleManager.rectMaxWidth, this.getGBSNameWidth());
+  }
   Sprite_Name.prototype.initialize.call(this);
 };
 
 Sprite_BSName.prototype.setup = function(battler) {
+  Sprite_Name.prototype.setup.call(this, battler);
   const width = BattleManager.rectMaxWidth;
   if (params.ActorStatusVariable && this.bitmapWidth() !== width) {
-    this._nameWidth = width;
+    this._nameWidth = Math.min(BattleManager.rectMaxWidth, this.getGBSNameWidth());
     this.redraw();
   }
-  Sprite_Name.prototype.setup.call(this, battler);
 };
 
 Sprite_BSName.prototype.bitmapWidth = function() {
@@ -3141,6 +3146,10 @@ Sprite_BSName.prototype.bitmapHeight = function() {
 
 Sprite_BSName.prototype.bitmapBaseWidth = function() {
   return params.ActorStatusVariable ? BattleManager.gaugeMaxWidth : Math.min(BattleManager.gaugeMaxWidth, BattleManager.rectMaxWidth);
+};
+
+Sprite_BSName.prototype.getGBSNameWidth = function() {
+  return this.userStatusParam ? this.userStatusParam.Width : 128;
 };
 
 Sprite_BSName.prototype.fontSize = function() {

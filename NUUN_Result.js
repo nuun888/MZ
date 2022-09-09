@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -52,6 +52,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/10 Ver.2.0.1
+ * 戦闘終了時にエラーが出る問題を修正。
+ * レベルアップアクターステータスウィンドウの項目の初期設定にアクター名を追加。
+ * サポートアクターが表示されない問題を修正。
  * 2022/9/9 Ver.2.0.0
  * 全面改修。
  * 
@@ -946,7 +950,7 @@
  * @desc レベルアップステータスのX座標。
  * @text レベルアップステータスX座標
  * @type number
- * @default 404
+ * @default 0
  * @min -9999
  * @parent LevelUpActorStatus
  * 
@@ -954,7 +958,7 @@
  * @desc レベルアップステータスのY座標。
  * @text レベルアップステータスY座標
  * @type number
- * @default 144
+ * @default 0
  * @min -9999
  * @parent LevelUpActorStatus
  * 
@@ -1042,7 +1046,7 @@
  * @desc 習得スキルのY座標。
  * @text 習得スキルY座標
  * @type number
- * @default 0
+ * @default 144
  * @min -9999
  * @parent LearnSkillWindow
  * 
@@ -2905,7 +2909,7 @@ Window_ResultActorExp.prototype.itemHeight = function() {
 };
 
 Window_ResultActorExp.prototype.maxItems = function() {
-  return $gameParty.battleMembers().length;
+  return this.members().length;
 };
 
 Window_ResultActorExp.prototype.contentsHeight = function() {
@@ -2925,7 +2929,7 @@ Window_ResultActorExp.prototype.members = function() {
     return $gameParty.allMembers();
   } else {
     if (Imported.NUUN_SupportActor && ShowSupportActor) {
-      $gameParty.membersMode = true;
+      $gameParty.setWithSupportActorMember();
     }
     return $gameParty.battleMembers();
   }
@@ -3772,7 +3776,7 @@ Window_ResultActorStatus.prototype.drawActorStatus = function() {
     const rect = this.itemRect(position - 1);
     const x = rect.x + (data.X_Coordinate + data.X_Position);
     const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
-    const width = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : rect.width;
+    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : rect.width - x);
     this.dateDisplay(data, actor, x, y, width);
   }
 };

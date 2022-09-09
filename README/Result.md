@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.0.0
+# Ver.2.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -24,6 +24,10 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2022/9/10 Ver.2.0.1  
+戦闘終了時にエラーが出る問題を修正。  
+レベルアップアクターステータスウィンドウの項目の初期設定にアクター名を追加。  
+サポートアクターが表示されない問題を修正。  
 2022/9/9 Ver.2.0.0  
 全面改修。  
 2022/7/3 Ver.1.15.1  

@@ -1,5 +1,5 @@
 # [メニュー画面タイプ１](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)
-# Ver.1.8.0
+# Ver.1.8.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.0以降  
@@ -67,6 +67,8 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2022/9/10 Ver.1.8.1  
+インフォウィンドウの行を1行に指定したときに、スクロールしてしまう問題を修正。  
 2022/8/27 Ver.1.8.0  
 アクターステータスに任意の画像を表示できる機能を追加。  
 ゲージがアクターの表示範囲内に収まるように修正。  

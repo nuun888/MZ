@@ -20,7 +20,7 @@
  * アクター毎に勝利ME、勝利BGMを指定する場合は、リザルトプラグインの表示アクター設定または立ち絵表示EX用画像設定
  * から勝利時ME、勝利時BGMから設定します。
  * 
- * このプラグインはリザルト(NUUN_Result)Ver.2.0.2以降の拡張プラグインです。
+ * このプラグインはリザルト(NUUN_Result)Ver.2.0.3以降の拡張プラグインです。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -99,7 +99,7 @@ Imported.NUUN_ResultMVPActor = true;
     };
 
     Window_StatusBase.prototype.mvpActorRefresh = function() {
-        if (MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch)) {
+        if (MVPVisibleSwitch === 0 || MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch)) {
             const actor = $gameParty.getMvpActor();
             this.resultRefresh(actor);
         }
@@ -107,7 +107,7 @@ Imported.NUUN_ResultMVPActor = true;
 
 
     BattleManager.resultMVPActorMe = function() {
-        if (MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch)) {
+        if (MVPVisibleSwitch === 0 || MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch)) {
             const actor = $gameParty.getMvpActor();
             let victoryMe = null;
             if (actor) {
@@ -120,7 +120,7 @@ Imported.NUUN_ResultMVPActor = true;
     };
 
     BattleManager.resultMVPActorBgm = function() {
-        if (MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch)) {
+        if (MVPVisibleSwitch === 0 || MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch)) {
             const actor = $gameParty.getMvpActor();
             let victoryBgm = null;
             if (actor) {

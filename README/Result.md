@@ -5,6 +5,7 @@
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
 #### 拡張プラグイン
 [リザルト時ウィンドウスプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) Ver.1.0.0
+[MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) Ver.1.0.0
 
 
 戦闘終了時にリザルト画面を表示します。  

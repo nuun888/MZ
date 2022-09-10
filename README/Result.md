@@ -4,10 +4,10 @@
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
 #### 拡張プラグイン
-[リザルト時ウィンドウスプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) Ver.1.0.0
-[MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) Ver.1.0.0
+[リザルト時ウィンドウスプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) Ver.1.0.0  
+[MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) Ver.1.0.0  
 
-
+## 概要
 戦闘終了時にリザルト画面を表示します。  
 デフォルトのリザルトはメッセージウィンドウで表示されますが、入手EXP、獲得金額、ドロップアイテムを１画面にし、レベルアップしたアクターがいない場合は決定キー（ボタン）を１回押しただけでリザルトが終了します。  
 

@@ -1,6 +1,6 @@
-# [MVPアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
+# [MVPアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js)
 # Ver.1.0.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js)  
 #### 必須プラグイン
 [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)Ver.2.0.3以降  
 

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.2
+ * @version 2.0.3
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -52,6 +52,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/11 Ver.2.0.3
+ * MVPアクアー対応への定義修正。
  * 2022/9/10 Ver.2.0.2
  * 経験値ブーストの色が黒い色で表示されてしまう問題を修正。
  * 2022/9/10 Ver.2.0.1
@@ -1844,6 +1846,24 @@
  * @type file
  * @dir img/
  * @default 
+ * 
+ * @param MVPActorSetting
+ * @text MVPアクター設定(要NUUN_ResultMVPActor)
+ * @default ------------------------------
+ * 
+ * @param MVPActorVictoryMe
+ * @text 勝利時ME
+ * @desc 勝利時のMEを指定します。
+ * @type struct<VictoryMe>
+ * @dir audio/me
+ * @parent MVPActorSetting
+ * 
+ * @param MVPActorVictoryBGM
+ * @text 勝利時BGM
+ * @desc 勝利時のBGMを指定します。
+ * @type struct<VictoryBgm>
+ * @dir audio/me
+ * @parent MVPActorSetting
  *  
  */
 /*~struct~ActorPictureDataList:
@@ -1884,7 +1904,77 @@
  * @dir img/
  * @default 
  * 
+ * @param MVPActorSetting
+ * @text MVPアクター設定(要NUUN_ResultMVPActor)
+ * @default ------------------------------
+ * 
+ * @param MVPActorVictoryMe
+ * @text 勝利時ME
+ * @desc 勝利時のMEを指定します。
+ * @type struct<VictoryMe>
+ * @dir audio/me
+ * @parent MVPActorSetting
+ * 
+ * @param MVPActorVictoryBGM
+ * @text 勝利時BGM
+ * @desc 勝利時のBGMを指定します。
+ * @type struct<VictoryBgm>
+ * @dir audio/me
+ * @parent MVPActorSetting
+ * 
+ * 
  */
+/*~struct~VictoryMe:
+ * 
+ * @param name
+ * @text MEファイル
+ * @desc MEを指定します。
+ * @type file
+ * @dir audio/me
+ * 
+ * @param volume
+ * @text MEの音量
+ * @desc MEを音量を設定します。
+ * @default 90
+ * @min 0
+ * 
+ * @param pitch
+ * @text MEのピッチ
+ * @desc MEをピッチを設定します。
+ * @default 100
+ * 
+ * @param pan
+ * @text MEの位相
+ * @desc MEを位相を設定します。
+ * @default 0
+ * 
+ */
+/*~struct~VictoryBgm:
+ * 
+ * @param name
+ * @text BGMファイル
+ * @desc BGMを指定します。
+ * @type file
+ * @dir audio/bgm
+ * 
+ * @param volume
+ * @text BGMの音量
+ * @desc BGMを音量を設定します。
+ * @default 90
+ * @min 0
+ * 
+ * @param pitch
+ * @text BGMのピッチ
+ * @desc BGMをピッチを設定します。
+ * @default 100
+ * 
+ * @param pan
+ * @text BGMの位相
+ * @desc BGMを位相を設定します。
+ * @default 0
+ * 
+ */
+
 var Imported = Imported || {};
 Imported.NUUN_Result = true;
 
@@ -2122,6 +2212,11 @@ const _Game_Actor_shouldDisplayLevelUp = Game_Actor.prototype.shouldDisplayLevel
 Game_Actor.prototype.shouldDisplayLevelUp = function() {
   return BattleManager.resultMode ? false : _Game_Actor_shouldDisplayLevelUp.call(this);
 };
+
+Game_Actor.prototype.getResultActorData = function() {
+  return Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(this.actorId()) : this.getResultActorData(this.actorId());
+};
+
 
 const _Game_Party_performVictory = Game_Party.prototype.performVictory;
 Game_Party.prototype.performVictory = function() {
@@ -2653,6 +2748,77 @@ Window_Base.prototype.setResultWindowMode = function(mode) {
   }
 };
 
+Window_StatusBase.prototype.setResultBaseActorSprite = function() {
+  const sprite = new Sprite_ResultActor();
+  this.addChild(sprite);
+  this._actorSprite = sprite;
+  sprite.hide();
+};
+
+Window_StatusBase.prototype.setupResultBitmap = function(actor, data) {
+  let bitmap = null;
+  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+    bitmap = actor.getActorGraphicImg();
+  } else {
+    bitmap = actor.getResultActorImg(actor.actorId());
+  }
+  if (bitmap) {
+    bitmap = ImageManager.nuun_LoadPictures(bitmap);
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.addLoadListener(this.setResultBitmap.bind(this, bitmap, data));
+    } else if (bitmap) {
+      this.setResultBitmap(bitmap, data);
+    }
+  }
+};
+
+Window_StatusBase.prototype.setResultBitmap = function(bitmap, data) {
+  let x = data.Actor_X;
+  const scale = (data.Actor_Scale || 100) / 100;
+  if(ActorPosition === 'left') {
+    x += 0;
+  } else if (ActorPosition === 'center') {
+    x += Math.floor(this.width / 2 - ((bitmap.width * scale) / 2));
+  } else {
+    x += this.width - (bitmap.width * scale) - 24;
+  }
+  const dw = bitmap.width * scale;
+  const dh = bitmap.height * scale;
+  const y = data.Actor_Y + (this.height - (bitmap.height * scale)) - 24;
+  this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
+};
+
+Window_StatusBase.prototype.windowResultFilteX = function() {
+  switch (LevelUpActorArea) {
+    case 'ui':
+      return 0;
+    case 'screen':
+      return 0 + (Graphics.boxWidth - Graphics.width) / 2;
+  }
+};
+
+Window_StatusBase.prototype.windowResultFilterWidthArea = function() {
+  switch (LevelUpActorArea) {
+    case 'window':
+      return this.innerWidth;
+    case 'ui':
+      return this.width;
+    case 'screen':
+      return Graphics.width;
+  }
+};
+
+Window_StatusBase.prototype.windowResultFilterHeightArea = function() {
+  switch (LevelUpActorArea) {
+    case 'window':
+      return this.innerHeight;
+    case 'ui':
+      return this.height;
+    case 'screen':
+      return Graphics.height - this.y;
+  }
+};
+
 
 function Window_ResultHelp() {
   this.initialize(...arguments);
@@ -2831,6 +2997,24 @@ Window_Result.prototype.processCancel = function() {
   this.updateInputData();
   this.deactivate();
   this.callCancelHandler();
+};
+
+Window_Result.prototype.resultRefresh = function(actor) {
+  this.contents.clear();
+  if (actor) {
+    const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
+    if (LevelUpActorArea === 'window') {
+      this.setupResultBitmap(actor, data);
+    } else {
+      if (data) {
+        this._actorSprite.setup(actor, data, this.windowResultFilterWidthArea());
+        this._actorSprite.move(this.windowResultFilteX(), this.windowResultFilterHeightArea());
+        this._actorSprite.show();
+      } else {
+        this._actorSprite.setup(null, null, this.windowResultFilterWidthArea());
+      }
+    }
+  }
 };
 
 function Window_ResultActorExp() {
@@ -3568,7 +3752,7 @@ Window_ResultLevelUpMain.prototype.initialize = function(rect) {
   this._canRepeat = false;
   this.resultBackgroundSprite = null;
   this.setResultWindowMode(ResultLevelUpWindowVisible);
-  this.setBaseActorSprite();
+  this.setResultBaseActorSprite();
   this.loadBitmap();
 };
 
@@ -3582,13 +3766,6 @@ Window_ResultLevelUpMain.prototype.loadWindowskin = function() {
 
 Window_ResultLevelUpMain.prototype.setResultBackground = function(sprite) {
   this.resultBackgroundSprite = sprite;
-};
-
-Window_ResultLevelUpMain.prototype.setBaseActorSprite = function() {
-  const sprite = new Sprite_ResultActor();
-  this.addChild(sprite);
-  this._actorSprite = sprite;
-  sprite.hide();
 };
 
 Window_ResultLevelUpMain.prototype.loadBitmap = function() {
@@ -3652,79 +3829,15 @@ Window_ResultLevelUpMain.prototype.refresh = function() {
   const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
   this.resultBackgroundRefresh(data);
   if (LevelUpActorArea === 'window') {
-    this.setupBitmap(actor, data);
+    this.setupResultBitmap(actor, data);
   } else {
     if (data) {
-      this._actorSprite.setup(actor, data, this.windowFilterWidthArea());
-      this._actorSprite.move(this.windowFilteX(), this.windowFilterHeightArea());
+      this._actorSprite.setup(actor, data, this.windowResultFilterWidthArea());
+      this._actorSprite.move(this.windowResultFilteX(), this.windowResultFilterHeightArea());
       this._actorSprite.show();
     } else {
-      this._actorSprite.setup(null, null, this.windowFilterWidthArea());
+      this._actorSprite.setup(null, null, this.windowResultFilterWidthArea());
     }
-  }
-};
-
-Window_ResultLevelUpMain.prototype.setupBitmap = function(actor, data) {
-  let bitmap = null;
-  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-    bitmap = actor.getActorGraphicImg();
-  } else {
-    bitmap = actor.getResultActorImg(actor.actorId());
-  }
-  if (bitmap) {
-    bitmap = ImageManager.nuun_LoadPictures(bitmap);
-    if (bitmap && !bitmap.isReady()) {
-      bitmap.addLoadListener(this.setBitmap.bind(this, bitmap, data));
-    } else if (bitmap) {
-      this.setBitmap(bitmap, data);
-    }
-  }
-};
-
-Window_ResultLevelUpMain.prototype.setBitmap = function(bitmap, data) {
-  let x = data.Actor_X;
-  const scale = (data.Actor_Scale || 100) / 100;
-  if(ActorPosition === 'left') {
-    x += 0;
-  } else if (ActorPosition === 'center') {
-    x += Math.floor(this.width / 2 - ((bitmap.width * scale) / 2));
-  } else {
-    x += this.width - (bitmap.width * scale) - 24;
-  }
-  const dw = bitmap.width * scale;
-  const dh = bitmap.height * scale;
-  const y = data.Actor_Y + (this.height - (bitmap.height * scale)) - 24;
-  this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
-};
-
-Window_ResultLevelUpMain.prototype.windowFilteX = function() {
-  switch (LevelUpActorArea) {
-    case 'ui':
-      return 0;
-    case 'screen':
-      return 0 + (Graphics.boxWidth - Graphics.width) / 2;
-  }
-};
-
-Window_ResultLevelUpMain.prototype.windowFilterWidthArea = function() {
-  switch (LevelUpActorArea) {
-    case 'window':
-      return this.innerWidth;
-    case 'ui':
-      return this.width;
-    case 'screen':
-      return Graphics.width;
-  }
-};
-
-Window_ResultLevelUpMain.prototype.windowFilterHeightArea = function() {
-  switch (LevelUpActorArea) {
-    case 'window':
-      return this.innerHeight;
-    case 'ui':
-      return this.height;
-    case 'screen':
-      return Graphics.height - this.y;
   }
 };
 
@@ -4390,8 +4503,16 @@ BattleManager.replayBgmAndBgs = function() {
   }
   this._victoryBGMEnable = (this._victoryBGMEnable === undefined || this._victoryBGMEnable === null) ? true : this._victoryBGMEnable;
   if (this._victoryBGMEnable && this._resultOn) {
+    let playVictoryBgm = null;
+    if (Imported.NUUN_ResultMVPActor) {
+      playVictoryBgm = this.resultMVPActorBgm();
+    }
     if (this._victoryBgmDate && this._victoryBgmDate.name) {
       AudioManager.playBgm(this._victoryBgmDate);
+      this._victoryBGMOn = true;
+      return;
+    } else if (playVictoryBgm) {
+      AudioManager.playBgm(playVictoryBgm);
       this._victoryBGMOn = true;
       return;
     } else if (VictoryBGM) {
@@ -4444,7 +4565,15 @@ BattleManager.playVictoryMe = function() {
     return;
   }
   if (!this._noVictoryME) {
-    _BattleManager_playVictoryMe.call(this);
+    let victoryMe = null;
+    if (Imported.NUUN_ResultMVPActor) {
+      victoryMe = this.resultMVPActorMe()
+    }
+    if (victoryMe) {
+      AudioManager.playMe(victoryMe);
+    } else {
+      _BattleManager_playVictoryMe.call(this);
+    }
   }
 };
 

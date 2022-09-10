@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.1
+ * @version 2.0.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -52,6 +52,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/10 Ver.2.0.2
+ * 経験値ブーストの色が黒い色で表示されてしまう問題を修正。
  * 2022/9/10 Ver.2.0.1
  * 戦闘終了時にエラーが出る問題を修正。
  * レベルアップアクターステータスウィンドウの項目の初期設定にアクター名を追加。
@@ -4837,9 +4839,9 @@ Sprite_ResultExpValue.prototype.createBitmap = function() {
 
 Sprite_ResultExpValue.prototype.setTextColorMode = function(exp) {
   if (exp > this._exp && this._exp > 0) {
-    NuunManager.getColorCode(EXPResistValueColor)
+    return NuunManager.getColorCode(EXPResistValueColor)
   } else if (exp < this._exp) {
-    NuunManager.getColorCode(EXPBoostValueColor)
+    return NuunManager.getColorCode(EXPBoostValueColor)
   } else {
     return ColorManager.normalColor();
   }

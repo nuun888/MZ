@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.2
+ * @version 3.7.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/9/10 Ver.3.7.3
+ * TPBバトルでサポートアクターが最初にコマンド選択するときにパーティコマンドが２回表示されてしまう問題を修正。
  * 2022/9/10 Ver.3.7.2
  * 画面サイズとUIサイズが異なるときにアクターコマンドの表示位置をactorに設定したときに、コマンドの表示がずれる問題を修正。
  * 2022/9/3 Ver.3.7.1
@@ -1108,12 +1110,18 @@ Scene_Battle.prototype.updateStatusWindowPosition = function() {
 
 const _Scene_Battle_update  = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
-  _Scene_Battle_update.call(this);
-  if (this._statusWindow.isCommandRefresh() && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
+  _Scene_Battle_update.call(this);//サポートアクターは暫定処置
+  const actor = this._actorCommandWindow.actor();
+  if (this._statusWindow.isCommandRefresh() && !$gameTemp.isBattleRefreshRequested() && actor) {
     this._statusWindow.commandRefresh(false);
-    const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
+    if (Imported.NUUN_SupportActor) {
+      $gameParty.setWithSupportActorMember();
+    }
+    const index = $gameParty.battleMembers().indexOf(actor);
     if (index >= 0) {
-      this._statusWindow.select(index);
+      if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
+        this._statusWindow.select(index);
+      }
     } else {
       this.commandCancel();
     }

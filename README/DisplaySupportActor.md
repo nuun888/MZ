@@ -1,5 +1,5 @@
 # [サポートアクターインジケータ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js)
-# Ver.1.4.0
+# Ver.1.5.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js)
 #### 必須、前提プラグイン
 [サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md)  
@@ -10,6 +10,9 @@
 ![画像](img/NUUN_SupportActor2.png)  
 
 ## 更新履歴
+2022/9/10 Ver.1.5.0  
+ウィンドウの代わりに背景画像を指定できる機能を追加。  
+プラグインコマンドからインジケータ表示非表示にする機能を追加。  
 2022/5/15 Ver.1.4.0  
 処理の改修。  
 ターン制でコマンド選択後サポートアクターの位置が戻らない問題を修正。  

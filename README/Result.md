@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.0.2
+# Ver.2.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -25,6 +25,8 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2022/9/11 Ver.2.0.3  
+MVPアクアー対応への定義修正。  
 2022/9/10 Ver.2.0.2  
 経験値ブーストの色が黒い色で表示されてしまう問題を修正。  
 2022/9/10 Ver.2.0.1  

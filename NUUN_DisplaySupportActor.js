@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクターインジケータ（サポートアクター拡張）
  * @author NUUN
- * @version 1.4.0
+ * @version 1.5.0
  * @base NUUN_SupportActor
  * 
  * @help
@@ -21,6 +21,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/10 Ver.1.5.0
+ * ウィンドウの代わりに背景画像を指定できる機能を追加。
+ * プラグインコマンドからインジケータ表示非表示にする機能を追加。
  * 2022/5/15 Ver.1.4.0
  * 処理の改修。
  * ターン制でコマンド選択後サポートアクターの位置が戻らない問題を修正。
@@ -101,6 +104,32 @@
  * @default false
  * @parent WindowSetting
  * 
+ * @param BackImgSetting
+ * @text 背景画像設定
+ * @default ------------------------------
+ * 
+ * @param GroundImg
+ * @desc 背景画像ファイル名を指定します。指定した場合ウィンドウ画像は非表示になります。
+ * @text 背景画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent BackImgSetting
+ * 
+ * @param GroundImg_X
+ * @text 背景画像X座標
+ * @desc 背景画像のX座標
+ * @type number
+ * @default 0
+ * @parent BackImgSetting
+ * 
+ * @param GroundImg_Y
+ * @text 背景画像Y座標
+ * @desc 背景画像のY座標
+ * @type number
+ * @default 0
+ * @parent BackImgSetting
+ * 
  * @param CommandSetting
  * @text コマンド設定
  * @default ------------------------------
@@ -119,6 +148,17 @@
  * @default サポートアクター表示
  * @parent CommandSetting
  * 
+ * 
+ * @command DisplaySupporter
+ * @desc サポートアクターインジケータの表示を変更します。
+ * @text サポートアクターインジケータ表示
+ * 
+ * @arg  DisplaySupportActorsSwitch
+ * @desc サポートアクターの表示(OFFで非表示)
+ * @text サポートアクター表示
+ * @type boolean
+ * @default true
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_DisplaySupportActor = true;
@@ -135,6 +175,20 @@ const SupportShowName = String(parameters['SupportShowName'] || "サポートア
 const InitSupport = eval(parameters['InitSupport'] || 'true');
 const RightDisplay = eval(parameters['RightDisplay'] || 'false');
 const CommandShow = eval(parameters['CommandShow'] || 'true');
+const GroundImg = String(parameters['GroundImg']);
+const GroundImg_X = Number(parameters['GroundImg_X'] || 0);
+const GroundImg_Y = Number(parameters['GroundImg_Y'] || 0);
+
+const pluginName = "NUUN_DisplaySupportActor";
+PluginManager.registerCommand(pluginName, 'DisplaySupporter', args => {
+  if ($gameParty.inBattle()) {
+    if (args.DisplaySupportActorsSwitch && BattleManager.displayStartSupport) {
+      SceneManager._scene.supportActorHide();
+    } else if (!args.DisplaySupportActorsSwitch && !BattleManager.displayStartSupport) {
+      SceneManager._scene.supportActorShow();
+    }
+  }
+});
 
 
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
@@ -210,7 +264,6 @@ Scene_Battle.prototype.setRefreshSupportActorWindow = function(actor, index) {
   window.show();
 };
 
-
 Scene_Battle.prototype.createSupportActorWindow = function() {
   const members = $gameParty.supportActorMembers();
   members.forEach((member, i) => {
@@ -266,6 +319,19 @@ Window_SupportActorEX.prototype.initialize = function(rect) {
   this._move_x = 0;
   this._moveOn = false;
   this._homeX = this.x;
+  this.opacity = GroundImg ? 0 : 255;
+  this.setBackground();
+};
+
+Window_SupportActorEX.prototype.setBackground = function() {
+  if (GroundImg) {
+    const bitmap = ImageManager.nuun_LoadPictures(GroundImg);
+    const sprite = new Sprite(bitmap);
+    this.addChildToBack(sprite);
+    sprite.x = GroundImg_X + (RightDisplay ? this.width : 0);
+    sprite.y = GroundImg_Y;
+    sprite.anchor.x = RightDisplay ? 1.0 : 0.0;
+  }
 };
 
 Window_SupportActorEX.prototype.setup = function(actor) {

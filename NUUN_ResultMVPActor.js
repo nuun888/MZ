@@ -125,11 +125,11 @@ Imported.NUUN_ResultMVPActor = true;
     };
 
     function isMVPActor() {
-        return MVPVisibleSwitch === 0 || MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch);
+        return MVPVisibleSwitch === 0 || (MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch));
     }
 
     function isMVPBattleVoice() {
-        return isMVPActor() && OnMVPBattleVoice && battleVoiceParam;
+        return isMVPActor() && OnMVPBattleVoice && battleVoiceParam && $gameSwitches.value(playSwitchId);
     }
 
     Window_StatusBase.prototype.mvpActorRefresh = function() {OnMVPBattleVoice

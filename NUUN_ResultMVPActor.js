@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Result
  * @orderAfter NUUN_Result
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 勝利後に表示されるリザルトにこの戦闘でのMVPアクターを表示します。
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/11 Ver.1.0.1
+ * リザルトプラグイン修正による処理修正。
  * 2022/9/11 Ver.1.0.0
  * 初版。
  * 
@@ -111,7 +113,7 @@ Imported.NUUN_ResultMVPActor = true;
             const actor = $gameParty.getMvpActor();
             let victoryMe = null;
             if (actor) {
-                const data = actor.getResultActorData();
+                const data = actor.getResultActor();
                 victoryMe = data && data.MVPActorVictoryMe ? data.MVPActorVictoryMe : null;
             }
             return victoryMe;
@@ -124,7 +126,7 @@ Imported.NUUN_ResultMVPActor = true;
             const actor = $gameParty.getMvpActor();
             let victoryBgm = null;
             if (actor) {
-                const data = actor.getResultActorData();
+                const data = actor.getResultActor();
                 victoryBgm = data && data.MVPActorVictoryBGM ? data.MVPActorVictoryBGM : null;
             }
             return victoryBgm;

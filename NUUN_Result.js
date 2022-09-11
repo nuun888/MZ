@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.3
+ * @version 2.0.4
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -52,6 +52,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/11 Ver.2.0.4
+ * 戦闘開始時にエラーが出る問題を修正。
+ * 端数処理四捨五入が機能しない問題を修正。
  * 2022/9/11 Ver.2.0.3
  * MVPアクアー対応への定義修正。
  * 2022/9/10 Ver.2.0.2
@@ -1981,7 +1984,7 @@ Imported.NUUN_Result = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_Result');
 const Decimal = Number(parameters['Decimal'] || 0);
-const DecimalMode = Number(parameters['DecimalMode'] || 0);
+const DecimalMode = eval(parameters['DecimalMode'] || 'true');
 const ResultVisibleFrame = Number(parameters['ResultVisibleFrame'] || 0);
 const ResultFadein = eval(parameters['ResultFadein'] || 'false');
 const PartyPageRefreshFrame = Number(parameters['PartyPageRefreshFrame'] || 0);
@@ -2213,7 +2216,7 @@ Game_Actor.prototype.shouldDisplayLevelUp = function() {
   return BattleManager.resultMode ? false : _Game_Actor_shouldDisplayLevelUp.call(this);
 };
 
-Game_Actor.prototype.getResultActorData = function() {
+Game_Actor.prototype.getResultActor = function() {
   return Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(this.actorId()) : this.getResultActorData(this.actorId());
 };
 

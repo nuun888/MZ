@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.3.1
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -19,6 +19,9 @@
  * 
  * イベントのメモ欄またはイベントの実行内容の注釈(Comment)
  * ※前者は全イベントページに適用されます。後者は記入したページの時に適用します。
+ * 
+ * <EventRangeCollided>
+ * イベントの範囲衝突判定を有効にします。トリガーが通常キャラと同じで適用されます。
  * 
  * <EventRange:besideRange,[lx],[rx]> 指定した横方向の範囲内の接触判定を拡大します。
  * [lx]:イベントの接触左側範囲(正の数の整数)
@@ -70,6 +73,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/11 Ver.1.4.0
+ * 範囲衝突判定機能を追加。
  * 2022/7/24 Ver.1.3.1
  * 複数イベント起動した場合、イベントプレイヤー距離が正常に取得できない問題を修正。
  * 2022/7/16 Ver.1.3.0
@@ -164,6 +169,14 @@ Imported.NUUN_EventRange = true;
         return events.filter(event => !event.getEventRangeTag());
     };
 
+    const _Game_Map_eventsXyNt = Game_Map.prototype.eventsXyNt;
+    Game_Map.prototype.eventsXyNt = function(x, y) {
+        const events = _Game_Map_eventsXyNt.call(this, x, y);
+        const rangeEvents = this.events().filter(event => event.getEventRangeCollidedTag() && event.range(x, y));
+        Array.prototype.push.apply(events, rangeEvents);
+        return events;
+    };
+
 
     const _Game_Event_initialize = Game_Event.prototype.initialize;
     Game_Event.prototype.initialize = function(mapId, eventId) {
@@ -171,12 +184,13 @@ Imported.NUUN_EventRange = true;
     };
 
     Game_Event.prototype.range = function(x, y) {
+        let result = false;
         const sx = Math.abs(this.deltaXFrom(x));
         const sy = Math.abs(this.deltaYFrom(y));
         const data = this.getEventRangeTag();
         const recognition = this.event().meta.EventRecognition ? Number(this.event().meta.EventRecognition) : EventRecognitionRange;
         if (recognition > 0 && (sx >= recognition || sy >= recognition)) {
-            return false;
+            return result;
         }
         if (data) {
             const arr = data.split(',');
@@ -307,6 +321,10 @@ Imported.NUUN_EventRange = true;
         return this._eventRangeTag;
     };
 
+    Game_Event.prototype.getEventRangeCollidedTag = function() {
+        return this._eventRangeCollidedTag;
+    };
+
     const _Game_Event_setupPageSettings = Game_Event.prototype.setupPageSettings;
     Game_Event.prototype.setupPageSettings = function() {
         _Game_Event_setupPageSettings.call(this);
@@ -317,21 +335,31 @@ Imported.NUUN_EventRange = true;
     Game_Event.prototype.clearPageSettings = function() {
         _Game_Event_clearPageSettings.call(this);
         this._eventRangeTag = null;
+        this._eventRangeCollidedTag = null;
     };
 
     Game_Event.prototype.setRangeCommentTag = function() {
+        const event = this.event();
         const re = /<(?:EventRange):\s*(.*)>/;
+        const re2 = /<(?:EventRangeCollided)>/;
         this._eventRangeTag = null;
+        this._eventRangeCollidedTag = null;
         this.list().forEach(tag => {
             if (tag.code === 108 || tag.code === 408) {
                 let match = re.exec(tag.parameters[0]);
+                let match2 = re2.exec(tag.parameters[0]);
                 if (match) {
                     this._eventRangeTag = match[1];
+                } else if (match2) {
+                    this._eventRangeCollidedTag = !!match2[0];
                 }
             }
         });
-        if (!this._eventRangeTag && this.event().meta.EventRange) {
-            this._eventRangeTag = this.event().meta.EventRange;
+        if (!this._eventRangeTag && event.meta.EventRange) {
+            this._eventRangeTag = event.meta.EventRange;
+        }
+        if (!this._eventRangeCollidedTag  && event.meta.EventRangeCollided) {
+            this._eventRangeCollidedTag  = !!event.meta.EventRangeCollided;
         }
     };
 

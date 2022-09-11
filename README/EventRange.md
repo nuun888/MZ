@@ -1,5 +1,5 @@
 # [イベント接触判定拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)
-# Ver.1.3.1
+# Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,13 +13,15 @@
 #### メモ欄またはイベントの実行内容の注釈(Comment)  
 ※前者は全イベントのページに適用されます。後者は記入したページの時に適用します。  
 
-`<EventRange:besideRange,[lx],[rx]>`指定した横方向の範囲内の接触判定を拡大します。  
+`<EventRangeCollided>` イベントの範囲衝突判定を有効にします。トリガーが通常キャラと同じで適用されます。  
+
+`<EventRange:besideRange,[lx],[rx]>`指定した横方向の範囲内の接触判定を拡大します。向きは無視されます。  
 `[lx]`:イベントの接触左側範囲(正の数の整数)  
 `[ry]`:イベントの接触右側範囲(正の数の整数)  
 例:`<EventRange:range,3,2>`  
 ![画像](img/NUUN_EventRange6.png)  
 
-`<EventRange:verticalRange,[uy],[dy]>`指定した縦方向の範囲内の接触判定を拡大します。  
+`<EventRange:verticalRange,[uy],[dy]>`指定した縦方向の範囲内の接触判定を拡大します。向きは無視されます。  
 `[ux]`:イベントの接触上側範囲(正の数の整数)  
 `[dy]`:イベントの接触下側範囲(正の数の整数)  
 例:`<EventRange:range,2,2>`  

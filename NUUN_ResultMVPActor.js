@@ -12,13 +12,16 @@
  * @author NUUN
  * @base NUUN_Result
  * @orderAfter NUUN_Result
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * 勝利後に表示されるリザルトにこの戦闘でのMVPアクターを表示します。
  * MVPアクターは与ダメージが一番高いアクターが選ばれます。
  * アクター毎に勝利ME、勝利BGMを指定する場合は、リザルトプラグインの表示アクター設定または立ち絵表示EX用画像設定
  * から勝利時ME、勝利時BGMから設定します。
+ * バトルボイス再生機能は別途BattleVoiceMZ(神無月サスケ氏)が必要となります。
+ * 
+ * ※アクター画像を設定しなくてもSE,BGM,バトルボイスを再生できます。
  * 
  * このプラグインはリザルト(NUUN_Result)Ver.2.0.3以降の拡張プラグインです。
  * 
@@ -26,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/11 Ver.1.1.0
+ * BattleVoiceMZによるMVPアクターのみボイスを再生する機能を追加。(要BattleVoiceMZ)
  * 2022/9/11 Ver.1.0.1
  * リザルトプラグイン修正による処理修正。
  * 2022/9/11 Ver.1.0.0
@@ -37,6 +42,17 @@
  * @type switch
  * @default 0
  * 
+ * @param ExternalPluginSetting
+ * @text 外部プラグイン設定
+ * @default ------------------------------
+ * 
+ * @param OnMVPBattleVoice
+ * @text MVPアクターボイス再生(要BattleVoiceMZ)
+ * @desc BattleVoiceMZでの戦闘処理時のボイス再生をMVPアクターのみ再生するようにします。
+ * @type boolean
+ * @default true
+ * @parent ExternalPluginSetting
+ * 
  */
 
 
@@ -46,6 +62,14 @@ Imported.NUUN_ResultMVPActor = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_ResultMVPActor');
     const MVPVisibleSwitch = Number(parameters['MVPVisibleSwitch'] || 0);
+    const OnMVPBattleVoice = eval(parameters['OnMVPBattleVoice'] || 'true');
+    const battleVoiceParameters = PluginManager.parameters('BattleVoiceMZ');
+    const battleVoiceParam = !!battleVoiceParameters["Battle Voice Name at Option"];
+    const playSwitchId = battleVoiceParam ? Number(battleVoiceParameters['ON switch ID'] || 1) : 0;
+    const pitch = battleVoiceParam ? Number(battleVoiceParameters['pitch'] || 100) : 100;
+    const volume = battleVoiceParam ? Number(battleVoiceParameters['volume'] || 90) : 90;
+    const pan = battleVoiceParam ? Number(battleVoiceParameters['pan'] || 0) : 0;
+    let battleVoiceSwitch = false;
     
     const _Game_Action_executeHpDamage = Game_Action.prototype.executeHpDamage;
     Game_Action.prototype.executeHpDamage = function(target, value) {
@@ -100,16 +124,41 @@ Imported.NUUN_ResultMVPActor = true;
         }
     };
 
-    Window_StatusBase.prototype.mvpActorRefresh = function() {
-        if (MVPVisibleSwitch === 0 || MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch)) {
+    function isMVPActor() {
+        return MVPVisibleSwitch === 0 || MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch);
+    }
+
+    function isMVPBattleVoice() {
+        return isMVPActor() && OnMVPBattleVoice && battleVoiceParam;
+    }
+
+    Window_StatusBase.prototype.mvpActorRefresh = function() {OnMVPBattleVoice
+        if (isMVPActor()) {
             const actor = $gameParty.getMvpActor();
             this.resultRefresh(actor);
         }
     };
 
+    const _BattleManager_resultUserData = BattleManager.resultUserData;
+    BattleManager.resultUserData = function() {
+        _BattleManager_resultUserData.call(this);
+        if (isMVPBattleVoice()) {
+            battleVoiceSwitch = $gameSwitches.value(playSwitchId);
+            $gameSwitches.setValue(playSwitchId, false);
+            this.resultMVPActorBatteleVoice();
+        }
+    };
+
+    const _BattleManager_resultEndUserData = BattleManager.resultEndUserData;
+    BattleManager.resultEndUserData = function() {
+        _BattleManager_resultEndUserData.call(this);
+        if (playSwitchId > 0) {
+            $gameSwitches.setValue(playSwitchId, battleVoiceSwitch);
+        }
+    };
 
     BattleManager.resultMVPActorMe = function() {
-        if (MVPVisibleSwitch === 0 || MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch)) {
+        if (isMVPActor()) {
             const actor = $gameParty.getMvpActor();
             let victoryMe = null;
             if (actor) {
@@ -122,7 +171,7 @@ Imported.NUUN_ResultMVPActor = true;
     };
 
     BattleManager.resultMVPActorBgm = function() {
-        if (MVPVisibleSwitch === 0 || MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch)) {
+        if (isMVPActor()) {
             const actor = $gameParty.getMvpActor();
             let victoryBgm = null;
             if (actor) {
@@ -134,5 +183,19 @@ Imported.NUUN_ResultMVPActor = true;
         return null;
     };
 
+    BattleManager.resultMVPActorBatteleVoice = function() {//以下は神無月サスケ氏から
+        const actor = $gameParty.getMvpActor();
+        if (actor.actor().meta.victoryVoice || (actor.battleVoices && actor.battleVoices.victory)) {
+            const data = (actor.battleVoices ? actor.battleVoices.victory : null) || actor.actor().meta.victoryVoice;
+            if (data) {
+                const names = data.split(',');
+                const name = names[Math.randomInt(names.length)];
+                if (name && name !== "$") {
+                    const audio = {name:name, pitch:pitch, volume:volume, pan:pan};
+                    AudioManager.playSe(audio);
+                }
+            }
+        }
+    };
 
 })();

@@ -12,7 +12,8 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.4
+ * @orderAfter BattleVoiceMZ
+ * @version 2.0.5
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -52,6 +53,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/11 Ver.2.0.5
+ * MVPアクターのBattleVoiceMZ対応に対する定義修正。
  * 2022/9/11 Ver.2.0.4
  * 戦闘開始時にエラーが出る問題を修正。
  * 端数処理四捨五入が機能しない問題を修正。
@@ -4377,8 +4380,10 @@ const _BattleManager_processVictory = BattleManager.processVictory;
 BattleManager.processVictory = function() {
   if (this.startResultBusy()) {
     this._resultOn = true;
+    this.resultUserData();
     if (this.resultBusy === 0) {
       _BattleManager_processVictory.call(this);
+      this.resultEndUserData();
       return;
     }
     this.displayVictoryNoBusy();
@@ -4389,7 +4394,16 @@ BattleManager.processVictory = function() {
   if (this.resultBusy === 0) {
     _BattleManager_processVictory.call(this);
     this.displayVictoryOnBusy();
+    this.resultEndUserData();
   }
+};
+
+BattleManager.resultUserData = function() {
+  
+};
+
+BattleManager.resultEndUserData = function() {
+  
 };
 
 BattleManager.displayVictoryNoBusy = function() {

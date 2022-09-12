@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Result
  * @orderAfter NUUN_Result
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 勝利後に表示されるリザルトにこの戦闘でのMVPアクターを表示します。
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/12 Ver.1.1.1
+ * 外部プラグインパラメータ取得に関する定義変更。
  * 2022/9/11 Ver.1.1.0
  * BattleVoiceMZによるMVPアクターのみボイスを再生する機能を追加。(要BattleVoiceMZ)
  * 2022/9/11 Ver.1.0.1
@@ -63,12 +65,12 @@ Imported.NUUN_ResultMVPActor = true;
     const parameters = PluginManager.parameters('NUUN_ResultMVPActor');
     const MVPVisibleSwitch = Number(parameters['MVPVisibleSwitch'] || 0);
     const OnMVPBattleVoice = eval(parameters['OnMVPBattleVoice'] || 'true');
+
     const battleVoiceParameters = PluginManager.parameters('BattleVoiceMZ');
-    const battleVoiceParam = !!battleVoiceParameters["Battle Voice Name at Option"];
-    const playSwitchId = battleVoiceParam ? Number(battleVoiceParameters['ON switch ID'] || 1) : 0;
-    const pitch = battleVoiceParam ? Number(battleVoiceParameters['pitch'] || 100) : 100;
-    const volume = battleVoiceParam ? Number(battleVoiceParameters['volume'] || 90) : 90;
-    const pan = battleVoiceParam ? Number(battleVoiceParameters['pan'] || 0) : 0;
+    const playSwitchId = battleVoiceParameters['ON switch ID'] || 0;
+    const pitch = battleVoiceParameters['pitch'] || 100;
+    const volume = battleVoiceParameters['volume'] || 90;
+    const pan = battleVoiceParameters['pan'] || 0;
     let battleVoiceSwitch = false;
     
     const _Game_Action_executeHpDamage = Game_Action.prototype.executeHpDamage;

@@ -1,5 +1,5 @@
 # [MVPアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js)  
 #### 必須プラグイン
 [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)Ver.2.0.5以降  
@@ -13,6 +13,8 @@ MVPアクターは与ダメージが一番高いアクターが選ばれます�
 ![画像](img/ResultMVPActor.png)  
 
 ## 更新履歴
+2022/9/12 Ver.1.1.1  
+外部プラグインパラメータ取得に関する定義変更。  
 2022/9/11 Ver.1.1.0  
 BattleVoiceMZによるMVPアクターのみボイスを再生する機能を追加。(要BattleVoiceMZ)  
 2022/9/11 Ver.1.0.1  

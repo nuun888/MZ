@@ -1,5 +1,5 @@
 # [イベント接触判定拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)
-# Ver.1.4.0
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -81,6 +81,10 @@
 ※画像の色付けしている部分は、画像表示用に接触範囲を視覚化するために表示しているためなので、エディタ、ゲーム上では表示されません。  
 
 ## 更新履歴
+2022/9/14 Ver.1.4.1  
+イベントからの衝突範囲判定を適用できるように修正。  
+衝突判定を持つイベントが一部方向に行かなくなる問題を修正。  
+rangeの説明が間違っていたので修正。  
 2022/9/11 Ver.1.4.0  
 範囲衝突判定機能を追加。  
 2022/7/24 Ver.1.3.1  

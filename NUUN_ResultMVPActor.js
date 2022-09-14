@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Result
  * @orderAfter NUUN_Result
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * 勝利後に表示されるリザルトにこの戦闘でのMVPアクターを表示します。
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/14 Ver.1.1.2
+ * 戦闘終了時にエラーが出る問題を修正。
  * 2022/9/12 Ver.1.1.1
  * 外部プラグインパラメータ取得に関する定義変更。
  * 2022/9/11 Ver.1.1.0
@@ -128,13 +130,13 @@ Imported.NUUN_ResultMVPActor = true;
 
     function isMVPActor() {
         return MVPVisibleSwitch === 0 || (MVPVisibleSwitch > 0 && $gameSwitches.value(MVPVisibleSwitch));
-    }
+    };
 
     function isMVPBattleVoice() {
-        return isMVPActor() && OnMVPBattleVoice && battleVoiceParam && $gameSwitches.value(playSwitchId);
-    }
+        return isMVPActor() && OnMVPBattleVoice && playSwitchId > 0 && $gameSwitches.value(playSwitchId);
+    };
 
-    Window_StatusBase.prototype.mvpActorRefresh = function() {OnMVPBattleVoice
+    Window_StatusBase.prototype.mvpActorRefresh = function() {
         if (isMVPActor()) {
             const actor = $gameParty.getMvpActor();
             this.resultRefresh(actor);

@@ -1,5 +1,5 @@
 # [メンバー変更画面(戦闘)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
-# Ver.1.3.3
+# Ver.1.3.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -11,6 +11,8 @@
 ![画像](img/SceneFormation2.png)  
 
 ## 更新履歴
+2022/9/14 Ver.1.3.4  
+サポートアクターを呼び出した際にゲームが進行しなくなる問題を修正。  
 2022/3/30 Ver.1.3.3  
 戦闘メンバーの表示列、行数を設定できる機能を追加。  
 2022/2/26 Ver.1.3.2  

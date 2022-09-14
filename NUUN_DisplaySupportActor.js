@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクターインジケータ（サポートアクター拡張）
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_SupportActor
  * 
  * @help
@@ -21,6 +21,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/14 Ver.1.5.1
+ * プラグインコマンドが正常に機能していなかった問題を修正。
  * 2022/9/10 Ver.1.5.0
  * ウィンドウの代わりに背景画像を指定できる機能を追加。
  * プラグインコマンドからインジケータ表示非表示にする機能を追加。
@@ -182,10 +184,11 @@ const GroundImg_Y = Number(parameters['GroundImg_Y'] || 0);
 const pluginName = "NUUN_DisplaySupportActor";
 PluginManager.registerCommand(pluginName, 'DisplaySupporter', args => {
   if ($gameParty.inBattle()) {
-    if (args.DisplaySupportActorsSwitch && BattleManager.displayStartSupport) {
-      SceneManager._scene.supportActorHide();
-    } else if (!args.DisplaySupportActorsSwitch && !BattleManager.displayStartSupport) {
+    const mode = eval(args.DisplaySupportActorsSwitch);
+    if (mode && !BattleManager.displayStartSupport) {
       SceneManager._scene.supportActorShow();
+    } else if (!mode && BattleManager.displayStartSupport) {
+      SceneManager._scene.supportActorHide();
     }
   }
 });

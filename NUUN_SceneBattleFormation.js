@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.3
+ * @version 1.3.4
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/14 Ver.1.3.4
+ * サポートアクターを呼び出した際にゲームが進行しなくなる問題を修正。
  * 2022/3/30 Ver.1.3.3
  * 戦闘メンバーの表示列、行数を設定できる機能を追加。
  * 2022/2/26 Ver.1.3.2
@@ -312,9 +314,14 @@ Scene_Battle.prototype.update = function() {
   this._formation.update();
   if (BattleManager.isTpb() && !this.isFormationActive() && $gameTemp.formationRefresh && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
     $gameTemp.formationRefresh = false;
+    if (Imported.NUUN_SupportActor) {
+      $gameParty.setWithSupportActorMember();
+    }
     const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
     if (index >= 0) {
-      this._statusWindow.select(index);
+      if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
+        this._statusWindow.select(index);
+      }
     } else {
       this.commandCancel();
     }

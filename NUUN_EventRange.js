@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -34,8 +34,8 @@
  * <EventRange:frontRange,[range]> 指定したイベントからの真正面の範囲までの接触判定を拡大します。
  * [range]:接触範囲(整数)
  * 
- * <EventRange:range,[x],[y]> 指定した範囲を中心に接触判定を拡大します。4と記入した場合はイベントを中心に4マスの
- * 範囲(９マス)でトリガーが起動します。
+ * <EventRange:range,[x],[y]> 指定した範囲を中心に接触判定を拡大します。4と記入した場合はイベントを中心に±2マスの
+ * 範囲(5マス)でトリガーが起動します。
  * [x]:イベントの接触横範囲(偶数の正の数の整数)
  * [y]:イベントの接触縦範囲(偶数の正の数の整数)
  * 
@@ -63,7 +63,7 @@
  * <EventRecognition:20> プレイヤーからイベントまでの距離が20マス以上なら接触判定処理を行いません。
  * 
  * 実行内容に注釈(Comment)は、ページ毎の接触範囲となります。現在の条件になっているページの接触範囲となります。
- * イベントのメモ欄と注釈(Comment)に同時に記入がある場合、注釈のタグが優先されます。
+ * イベントのメモ欄と注釈(Comment)に同時に記入がある場合、注釈(Comment)のタグが優先されます。
  * 
  * イベントプレイヤー距離X変数ID、イベントプレイヤー距離Y変数ID
  * 接触拡張を持つイベント実行時にイベントからプレイヤーまでの距離を代入する変数を指定します。
@@ -73,6 +73,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/14 Ver.1.4.1
+ * イベントからの衝突範囲判定を適用できるように修正。
+ * 衝突判定を持つイベントが一部方向に行かなくなる問題を修正。
+ * rangeの説明が間違っていたので修正。
  * 2022/9/11 Ver.1.4.0
  * 範囲衝突判定機能を追加。
  * 2022/7/24 Ver.1.3.1
@@ -169,28 +173,48 @@ Imported.NUUN_EventRange = true;
         return events.filter(event => !event.getEventRangeTag());
     };
 
-    const _Game_Map_eventsXyNt = Game_Map.prototype.eventsXyNt;
-    Game_Map.prototype.eventsXyNt = function(x, y) {
-        const events = _Game_Map_eventsXyNt.call(this, x, y);
-        const rangeEvents = this.events().filter(event => event.getEventRangeCollidedTag() && event.range(x, y));
-        Array.prototype.push.apply(events, rangeEvents);
-        return events;
+    Game_Map.prototype.eventsRangeXyNt = function(e, x, y) {
+        return this.events().filter(event => event.eventsRangeXyNt(x, y) && e !== event);
     };
-
 
     const _Game_Event_initialize = Game_Event.prototype.initialize;
     Game_Event.prototype.initialize = function(mapId, eventId) {
         _Game_Event_initialize.call(this, mapId, eventId);
     };
 
-    Game_Event.prototype.range = function(x, y) {
-        let result = false;
+    const _Game_Event_isCollidedWithEvents = Game_Event.prototype.isCollidedWithEvents;
+    Game_Event.prototype.isCollidedWithEvents = function(x, y) {
+        const events = $gameMap.eventsRangeXyNt(this, x, y);
+        return _Game_Event_isCollidedWithEvents.call(this) || events.length > 0;
+    };
+
+    const _Game_Event_isCollidedWithPlayerCharacters = Game_Event.prototype.isCollidedWithPlayerCharacters;
+    Game_Event.prototype.isCollidedWithPlayerCharacters = function(x, y) {
+        return _Game_Event_isCollidedWithPlayerCharacters.call(this, x, y) || (this.isNormalPriority() && this.isCollidedWithPlayerCharacters(x, y))
+    };
+
+    Game_Event.prototype.isCollidedWithPlayerCharacters = function(x, y) {
+        return this.getEventRangeCollidedTag() && ($gamePlayer.range(x, y, this) || $gamePlayer.rangeFollower(x, y, this));
+    };
+
+    Game_Event.prototype.eventsRangeXyNt = function(x, y) {
+        return !this.posNt(x, y) && !!this.getEventRangeCollidedTag() && this.range(x, y);
+    };
+
+    const _Game_CharacterBase_isCollidedWithEvents = Game_CharacterBase.prototype.isCollidedWithEvents;
+    Game_CharacterBase.prototype.isCollidedWithEvents = function(x, y) {
+        const events = $gameMap.eventsRangeXyNt(this, x, y);
+        return _Game_CharacterBase_isCollidedWithEvents.call(this, x, y) || events.some(event => event.isNormalPriority());
+    };
+
+    Game_Character.prototype.range = function(x, y, e) {
+        const event = e ? e : this;
         const sx = Math.abs(this.deltaXFrom(x));
         const sy = Math.abs(this.deltaYFrom(y));
-        const data = this.getEventRangeTag();
-        const recognition = this.event().meta.EventRecognition ? Number(this.event().meta.EventRecognition) : EventRecognitionRange;
+        const data = event.getEventRangeTag();
+        const recognition = event.event().meta.EventRecognition ? Number(event.event().meta.EventRecognition) : EventRecognitionRange;
         if (recognition > 0 && (sx >= recognition || sy >= recognition)) {
-            return result;
+            return false;
         }
         if (data) {
             const arr = data.split(',');
@@ -217,22 +241,22 @@ Imported.NUUN_EventRange = true;
         }
     };
 
-    Game_Event.prototype.rangeEX = function(x, y, x1, y1, x2, y2, x3, y3, x4, y4) {
+    Game_Character.prototype.rangeEX = function(x, y, x1, y1, x2, y2, x3, y3, x4, y4) {
         return (this.rangeCp(this.x + x1, this.y + y1, this.x + x2, this.y + y2, x, y) &&
         this.rangeCp(this.x + x2, this.y + y2, this.x + x3, this.y + y3, x, y) &&
         this.rangeCp(this.x + x3, this.y + y3, this.x + x4, this.y + y4, x, y) &&
         this.rangeCp(this.x + x4, this.y + y4, this.x + x1, this.y + y1, x, y));
     };
 
-    Game_Event.prototype.besideRange = function(x, y, lx, rx) {
+    Game_Character.prototype.besideRange = function(x, y, lx, rx) {
         return x <= lx && x >= rx * -1 && this.y === y;
     };
 
-    Game_Event.prototype.verticalRange = function(x, y, uy, dy) {
+    Game_Character.prototype.verticalRange = function(x, y, uy, dy) {
         return y <= uy && y >= dy * -1 && this.x === x;
     };
 
-    Game_Event.prototype.frontRange = function(x, y, h) {
+    Game_Character.prototype.frontRange = function(x, y, h) {
         switch (this.direction()) {
             case 2:
                 return this.deltaYFrom(y) >= h * -1 && this.x === x;
@@ -246,7 +270,7 @@ Imported.NUUN_EventRange = true;
         return false;
     };
 
-    Game_Event.prototype.rangeCp = function(ax, ay, bx, by, x, y) {
+    Game_Character.prototype.rangeCp = function(ax, ay, bx, by, x, y) {
         const x2 = ax - bx;
         const y2 = ay - by;
         const a = bx - x;
@@ -254,7 +278,7 @@ Imported.NUUN_EventRange = true;
         return (x2 * b - y2 * a) >= 0;
     };
 
-    Game_Event.prototype.circleRange = function(x, y, r, rad) {
+    Game_Character.prototype.circleRange = function(x, y, r, rad) {
         const sx = this.deltaXFrom(x);
         const sy = this.deltaYFrom(y);
         const a = Math.abs(sx);
@@ -280,7 +304,7 @@ Imported.NUUN_EventRange = true;
         return false;
     };
 
-    Game_Event.prototype.triangleRange = function(x, y, r, rad) {
+    Game_Character.prototype.triangleRange = function(x, y, r, rad) {
         const sx = this.deltaXFrom(x);
         const sy = this.deltaYFrom(y);
         const a = Math.abs(sx);
@@ -302,26 +326,26 @@ Imported.NUUN_EventRange = true;
         return false;
     };
 
-    Game_Event.prototype.donutRange = function(x, y, r1, r2) {
+    Game_Character.prototype.donutRange = function(x, y, r1, r2) {
         const a = Math.abs(this.deltaXFrom(x));
         const b = Math.abs(this.deltaYFrom(y));
         const h = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
         return h <= r1 && h <= r2;
     };
 
-    Game_Event.prototype.rangeX = function(x, x2) {
-        return this.x >= x - Math.floor(x2 / 2) && this.x <= x + Math.floor(x2 / 2);
+    Game_Character.prototype.rangeX = function(x, x2) {
+       return this.x >= x - Math.floor(x2 / 2) && this.x <= x + Math.floor(x2 / 2);
     };
 
-    Game_Event.prototype.rangeY = function(y, y2) {
+    Game_Character.prototype.rangeY = function(y, y2) {
         return this.y >= y - Math.floor(y2 / 2) && this.y <= y + Math.floor(y2 / 2);
     };
 
-    Game_Event.prototype.getEventRangeTag = function() {
+    Game_Character.prototype.getEventRangeTag = function() {
         return this._eventRangeTag;
     };
 
-    Game_Event.prototype.getEventRangeCollidedTag = function() {
+    Game_Character.prototype.getEventRangeCollidedTag = function() {
         return this._eventRangeCollidedTag;
     };
 
@@ -361,6 +385,18 @@ Imported.NUUN_EventRange = true;
         if (!this._eventRangeCollidedTag  && event.meta.EventRangeCollided) {
             this._eventRangeCollidedTag  = !!event.meta.EventRangeCollided;
         }
+    };
+
+    Game_Player.prototype.rangeFollower = function(x, y, e) {
+        if (this.isThrough()) {
+            return false;
+        } else {
+            return this._followers.isSomeoneRangeCollided(x, y, e);
+        }
+    };
+
+    Game_Followers.prototype.isSomeoneRangeCollided = function(x, y, e) {
+        return this.visibleFollowers().some(follower => follower.range(x, y, e));
     };
 
 })();

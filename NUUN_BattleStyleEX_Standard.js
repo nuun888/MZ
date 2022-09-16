@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.7.0
+ * @version 1.7.1
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -57,6 +57,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/9/17 Ver.1.7.1
+ * 敵対象選択画面のモンスター名の表示をアクター名と同じ仕様にする機能を追加。
  * 2022/8/25 Ver.1.7.0
  * アクター画像変化条件に防御時、反撃時、魔法反射時を追加。
  * 2022/8/24 Ver.1.6.3
@@ -590,6 +592,13 @@
  * @param EnemyWindowMode
  * @desc 敵キャラウィンドウの設定座標モード。(ON：デフォルトの表示位置からの相対座標 OFF:画面左上からの絶対座標)
  * @text 設定座標モード
+ * @type boolean
+ * @default true
+ * @parent EnemyWindowOption
+ * 
+ * @param EnemyNameDyingColor
+ * @desc 敵キャラ名を瀕死時に色を変化させます。
+ * @text 敵ネーム瀕死カラー適用
  * @type boolean
  * @default true
  * @parent EnemyWindowOption
@@ -2345,6 +2354,7 @@ params.EnemyWindow_X = Number(parameters['EnemyWindow_X'] || 0);
 params.EnemyWindow_Y = Number(parameters['EnemyWindow_Y'] || 0);
 params.EnemyWindow_Width = Number(parameters['EnemyWindow_Width'] || 0);
 params.EnemyWindowMode = eval(parameters['EnemyWindowMode'] || "true");
+params.EnemyNameDyingColor = eval(parameters['EnemyNameDyingColor'] || "true");
 params.EnemyWindowOpacity = Number(parameters['EnemyWindowOpacity'] || 255);
 params.EnemyWindowBackgroundImg = String(parameters['EnemyWindowBackgroundImg']);
 params.EnemyWindowBackground_X = Number(parameters['EnemyWindowBackground_X'] || 0);

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.3
+ * @version 3.7.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/9/17 Ver.1.7.4
+ * 敵対象選択画面のモンスター名の表示をアクター名と同じ仕様にする機能を追加。
  * 2022/9/10 Ver.3.7.3
  * TPBバトルでサポートアクターが最初にコマンド選択するときにパーティコマンドが２回表示されてしまう問題を修正。
  * 2022/9/10 Ver.3.7.2
@@ -2349,6 +2351,17 @@ Window_BattleEnemy.prototype.initialize = function(rect) {
 Window_BattleEnemy.prototype.maxCols = function() {
   return params.EnemyMaxCol;
 };
+
+console.log(params.EnemyNameDyingColor)
+if (params.EnemyNameDyingColor) {
+  Window_BattleEnemy.prototype.drawItem = function(index) {//再定義
+    const enemy = this._enemies[index];
+    this.changeTextColor(ColorManager.hpColor(enemy));
+    const name = enemy.name();
+    const rect = this.itemLineRect(index);
+    this.drawText(name, rect.x, rect.y, rect.width);
+  };
+}
 
 //Window_BattleSkill
 const _Window_BattleSkill_initialize = Window_BattleSkill.prototype.initialize;

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.0.5
+ * @version 2.0.6
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -53,6 +53,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/17 Ver.2.0.6
+ * EXPゲージの色を指定できる機能を追加。
+ * 入手ウィンドウ設定のウィンドウ表示をOFFにすると背景画像が表示されなくなる問題を修正。
  * 2022/9/11 Ver.2.0.5
  * MVPアクターのBattleVoiceMZ対応に対する定義修正。
  * 2022/9/11 Ver.2.0.4
@@ -454,8 +457,8 @@
  * @parent GetActorExp
  * 
  * @param DefaultActorVisible
- * @desc 経験値獲得時アクターのデフォルト表示数
- * @text デフォルトアクター表示数
+ * @desc 経験値獲得時アクターのデフォルト表示行数
+ * @text デフォルトアクター表示行数
  * @type number
  * @default 4
  * @min 0
@@ -599,6 +602,20 @@
  * @default 100
  * @min 0
  * @parent ExpSetting
+ * 
+ * @param GaugeColor1
+ * @desc ゲージの色(左側)(システムカラーまたはカラーコード)
+ * @text ゲージ色(左側)
+ * @type number
+ * @default 17
+ * @parent GetActorExp
+ * 
+ * @param GaugeColor2
+ * @desc ゲージの色(右側)(システムカラーまたはカラーコード)
+ * @text ゲージの色(右側)
+ * @type number
+ * @default 6
+ * @parent GetActorExp
  * 
  * @param GaugeValueFontSize
  * @desc ゲージ現在値数値のフォントサイズ。（メインフォントサイズからの差）
@@ -1426,11 +1443,11 @@
  * @type select
  * @option 表示なし
  * @value 0
- * @option 獲得金額
+ * @option 獲得金額(1)(2)(3)(4)(5)(6)(7)(9)
  * @value 1
- * @option 獲得経験値
+ * @option 獲得経験値(1)(2)(3)(4)(5)(6)(7)(9)
  * @value 2
- * @option 任意パラメータ
+ * @option 任意パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)
  * @value 10
  * @option ライン
  * @value 1000
@@ -1853,6 +1870,37 @@
  * @dir img/
  * @default 
  * 
+ * @param EXPActorSetting
+ * @text EXPアクターウィンドウに表示するアクター画像設定(未実装)
+ * @default ------------------------------
+ * 
+ * @param EXPActor_X
+ * @desc 画像の表示位置X座標。
+ * @text 画像表示位置X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EXPActorSetting
+ * 
+ * @param EXPActor_Y
+ * @desc 画像の表示位置Y座標。
+ * @text 画像表示位置Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EXPActorSetting
+ * 
+ * @param EXPActor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ * @parent EXPActorSetting
+ * 
  * @param MVPActorSetting
  * @text MVPアクター設定(要NUUN_ResultMVPActor)
  * @default ------------------------------
@@ -1909,6 +1957,37 @@
  * @type file
  * @dir img/
  * @default 
+ * 
+ * @param EXPActorSetting
+ * @text EXPアクターウィンドウに表示するアクター画像設定(未実装)
+ * @default ------------------------------
+ * 
+ * @param EXPActor_X
+ * @desc 画像の表示位置X座標。
+ * @text 画像表示位置X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EXPActorSetting
+ * 
+ * @param EXPActor_Y
+ * @desc 画像の表示位置Y座標。
+ * @text 画像表示位置Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EXPActorSetting
+ * 
+ * @param EXPActor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ * @parent EXPActorSetting
  * 
  * @param MVPActorSetting
  * @text MVPアクター設定(要NUUN_ResultMVPActor)
@@ -2043,6 +2122,8 @@ const LevelUpNameColor = (DataManager.nuun_structureData(parameters['LevelUpName
 const LevelUpValueColor = (DataManager.nuun_structureData(parameters['LevelUpValueColor'])) || 17;
 const EXPBoostValueColor = (DataManager.nuun_structureData(parameters['EXPBoostValueColor'])) || 0;
 const EXPResistValueColor = (DataManager.nuun_structureData(parameters['EXPResistValueColor'])) || 0;
+const GaugeColor1 = (DataManager.nuun_structureData(parameters['GaugeColor1'])) || 17;
+const GaugeColor2 = (DataManager.nuun_structureData(parameters['GaugeColor2'])) || 6;
 const GaugeValueShow = eval(parameters['GaugeValueShow']) || 1;
 const Gauge_Width = Number(parameters['Gauge_Width'] || 300);
 const Gauge_Height = Number(parameters['Gauge_Height'] || 12);
@@ -2721,6 +2802,14 @@ Window_Selectable.prototype.resultLearnSkillFittingHeight = function(numLines) {
   return numLines * (LearnSkillContentsHeight || 36) + $gameSystem.windowPadding() * 2 + this.rowSpacing() / 2;
 };
 
+Window_Base.prototype.setResultFadein = function() {
+  if (this.isFadein()) {
+    this.openOpacity = 0;
+  } else {
+    this.openOpacity = 255;
+  }
+};
+
 Window_Base.prototype.updateResultFadein = function() {
   if (this.isFadein() && this.resultFadein) {
     this.openness = 255;
@@ -2917,7 +3006,7 @@ Window_Result.prototype.constructor = Window_Result;
 Window_Result.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
   this.openness = 0;
-  this.openOpacity = 0;
+  this.setResultFadein();
   this.resultFadein = false;
   this._canRepeat = false;
   this.resultBackgroundSprite = null;
@@ -2994,7 +3083,7 @@ Window_Result.prototype.open = function() {
 
 Window_Result.prototype.updateResultBackgrounfFadein = function() {
   if (this.resultBackgroundSprite) {
-    this.resultBackgroundSprite.opacity = this.opacity;
+    this.resultBackgroundSprite.opacity = this.openOpacity;
   }
 };
 
@@ -3138,12 +3227,12 @@ Window_ResultActorExp.prototype.drawActorExp = function(index) {
     this.resetFontSettings();
     const x = rect.x + data.X_Coordinate;
     const y = rect.y + data.Y_Coordinate;
-    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : rect.width - x);
-    this.dateDisplay(data, actor, x, y, width);
+    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
+    this.dateDisplay(data, actor, x, y, width, rect.height);
   }
 };
 
-Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width) {
+Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width, height) {
   switch (data.DateSelect) {
     case 0:
       break;
@@ -3151,7 +3240,7 @@ Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width)
       this.drawActorCharacter(actor, x, y);
       break;
     case 2:
-      this.drawActorFace(data, actor, x, y);
+      this.drawActorFace(data, actor, x, y, height);
       break;
     case 3:
       this.drawSvActor(data, actor, x, y, width);
@@ -3174,8 +3263,8 @@ Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width)
     case 30:
       this.drawLevelUp(data, actor, x, y, width);
       break;
-    case 31:
-      //this.drawActorImg(data, actor, x, y, width);
+    case 40:
+      this.drawActorImg(data, actor, x, y, width, height);
       break;
     case 1000:
       this.horzLine(data, x, y, width);
@@ -3185,9 +3274,8 @@ Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width)
   }
 };
 
-Window_ResultActorExp.prototype.drawActorFace = function(data, actor, x, y) {
-  const rect = this.itemRect(0);
-  const height = Math.min(ActorFaceHeight, rect.height, ImageManager.faceHeight);
+Window_ResultActorExp.prototype.drawActorFace = function(data, actor, x, y, height) {
+  height = Math.min(ActorFaceHeight, height, ImageManager.faceHeight);
   if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
     this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, ImageManager.faceWidth, height);
   } else {
@@ -3200,10 +3288,26 @@ Window_ResultActorExp.prototype.drawSvActor = function(data, actor, x, y, width)
   this.drawSvActorImg(actor, x, y);
 };
 
-Window_ResultActorExp.prototype.drawActorImg = function(data, actor, x, y, width) {
-  const tag = actor.actor().meta[data.textMethod];
-  const bitmap = ImageManager.nuun_LoadPictures(tag);
+Window_ResultActorExp.prototype.drawActorImg = function(data, actor, x, y, width, height) {
+  let bitmap = null;
+  const actorData = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
+  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+    bitmap = actor.getActorGraphicImg();
+  } else {
+    bitmap = actor.getResultActorImg(actor.actorId());
+  }
+  if (bitmap) {
+    bitmap = ImageManager.nuun_LoadPictures(bitmap);
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.addLoadListener(this.setResultBitmap.bind(this, bitmap, actorData, x, y, width, height));
+    } else if (bitmap) {
+      this.setResultBitmap(bitmap, actorData, x, y, width, height);
+    }
+  }
+};
 
+Window_ResultActorExp.prototype.setResultBitmap = function(bitmap, data, x, y, width, height) {
+  
 };
 
 Window_ResultActorExp.prototype.drawActorName = function(data, actor, x, y, width) {
@@ -4842,19 +4946,11 @@ Sprite_ResultExpGauge.prototype.smoothness = function() {
 };
 
 Sprite_ResultExpGauge.prototype.gaugeColor1 = function() {
-  return ColorManager.resultExpGaugeColor1();
+  return NuunManager.getColorCode(GaugeColor1);
 };
 
 Sprite_ResultExpGauge.prototype.gaugeColor2 = function() {
-  return ColorManager.resultExpGaugeColor2();
-};
-
-ColorManager.resultExpGaugeColor1 = function() {
-  return this.textColor(17);
-};
-
-ColorManager.resultExpGaugeColor2 = function() {
-  return this.textColor(6);
+  return NuunManager.getColorCode(GaugeColor2);
 };
 
 

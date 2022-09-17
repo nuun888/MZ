@@ -32,10 +32,10 @@
 
 | 戦闘　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.7.0 |
+| [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.7.1 |
 | [XPスタイル対象選択ウィンドウ](https://github.com/nuun888/MZ/blob/master/README/XPSelectWindow.md) | [NUUN_XPSelectWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js) | 共 | 1.1.0 |
 | ┗ アクター対象選択画面 |  |  |  |
-| [リザルト](https://github.com/nuun888/MZ/blob/master/README/Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 2.0.5|
+| [リザルト](https://github.com/nuun888/MZ/blob/master/README/Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 2.0.6|
 | ┣  [MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) | [NUUN_ResultMVPActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js) |  | 1.1.2 |
 | ┗ [リザルト時スプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) | [NUUN_ResultSpriteHide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultSpriteHide.js) | 共 | 1.0.0 |
 | [戦闘中アイテム、スキル選択画面MV風表示](https://github.com/nuun888/MZ/blob/master/README/BattleItemSkillWindowMV.md) | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js) |  | 1.3.0 |
@@ -70,7 +70,7 @@
 | [敵の行動パターン条件拡張](https://github.com/nuun888/MZ/blob/master/README/CondEnemyAction.md)| [NUUN_CondEnemyAction](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js) | 条 | 1.0.1 |
 | [敵キャラのスタータス上限突破](https://github.com/nuun888/MZ/blob/master/README/EnemyParamNoLimit.md) | [NUUN_EnemyParamNoLimit](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js) | 共 | 1.0.0 |
 | [巨大モンスター](https://github.com/nuun888/MZ/blob/master/README/BigEnemy.md) | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) |  | 1.2.0 |
-| [敵HPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) | オ | 1.5.0 |
+| [敵HPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) | オ | 1.6.0 |
 | [敵MPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_EnemyMPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyMPGauge.js) | オ | 1.1.0 |
 | [敵TPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyTPGauge.md) | [NUUN_EnemyTPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js) | オ | 1.1.0 |
 | [敵名前表示](https://github.com/nuun888/MZ/blob/master/README/ButlerName.md) | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) | オ | 1.3.0 |

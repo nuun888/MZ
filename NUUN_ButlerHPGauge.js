@@ -12,7 +12,7 @@
  * @plugindesc  敵HPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.5.0
+ * @version 1.6.0
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -22,6 +22,10 @@
  * <HPGaugeX:[position]> HPゲージのX座標を調整します。（相対座標）
  * <HPGaugeY:[position]> HPゲージのY座標を調整します。（相対座標）
  * <NoHPGauge> HPゲージを表示しません。
+ * <HPGaugeLength:[width], [height]> HPゲージの幅を指定します。
+ * [position]:座標
+ * [width]:ゲージ横幅
+ * [height]:ゲージ縦幅
  * 
  * バトルイベントの注釈
  * <HPGaugePosition:[Id],[x],[y]> 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）
@@ -50,6 +54,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/17 Ver.1.6.0
+ * 敵キャラ毎にHPゲージの横幅、縦幅を指定できる機能を追加。
  * 2022/5/14 Ver.1.5.0
  * バトラーの表示処理の定義大幅変更に関する定義変更。
  * 2022/1/10 Ver.1.4.2
@@ -229,6 +235,7 @@ const HPValueVisible = eval(parameters['HPValueVisible'] || 'true');
 const ValueFontSize = Number(parameters['ValueFontSize'] || -6);
 const LabelFontSize = Number(parameters['LabelFontSize'] || -2);
 const MaskValueName = String(parameters['MaskValueName'] || '????');
+let enemyHPGaugeLength = null;
 
 function getEnemyGaugePosition(troop) {
   const pages = troop.pages[0];
@@ -285,6 +292,7 @@ Sprite_Enemy.prototype.getButlerHpPosition = function() {
 };
 
 Sprite_Enemy.prototype.createHPGauge = function() {
+  enemyHPGaugeLength = getSplit(this._enemy.enemy().meta.HPGaugeLength);
   const sprite = new Sprite_EnemyHPGauge();
   this.battlerOverlay.addChild(sprite);
   this._butlerHp = sprite;
@@ -303,6 +311,8 @@ Sprite_EnemyHPGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_EnemyHPGauge.prototype.constructor = Sprite_EnemyHPGauge;
 
 Sprite_EnemyHPGauge.prototype.initialize = function() {
+  this._enemyGaugeWidth = enemyHPGaugeLength ? (Number(enemyHPGaugeLength[0]) || 0) : 0;
+  this._enemyGaugeHeight = enemyHPGaugeLength ? (Number(enemyHPGaugeLength[1]) || 0) : 0;
   Sprite_Gauge.prototype.initialize.call(this);
   this._gaugeDuration = 0;
   this._startVisible = true;
@@ -311,11 +321,11 @@ Sprite_EnemyHPGauge.prototype.initialize = function() {
 };
 
 Sprite_EnemyHPGauge.prototype.bitmapWidth = function() {
-  return GaugeWidth > 0 ? GaugeWidth : 128;
+  return this._enemyGaugeWidth > 0 ? this._enemyGaugeWidth : (GaugeWidth > 0 ? GaugeWidth : 128);
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeHeight = function() {
-  return GaugeHeight > 0 ? GaugeHeight : 12;
+  return this._enemyGaugeHeight > 0 ? this._enemyGaugeHeight : (GaugeHeight > 0 ? GaugeHeight : 12);
 };
 
 Sprite_EnemyHPGauge.prototype.labelFontSize = function() {
@@ -515,5 +525,9 @@ Game_Enemy.prototype.getHPGaugePositionY = function(){
 BattleManager.hpGaugeVisible = function() {
   this.visibleHpGauge = $gameParty.battleMembers().some(actor => actor._visibleHpGauge);
 };
+
+function getSplit(tag) {
+  return tag ? tag.split(',') : null;
+}
 
 })();

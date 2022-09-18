@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.0.6
+# Ver.2.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -25,6 +25,9 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2022/9/18 Ver.2.1.0  
+獲得経験値ウィンドウに立ち絵を指定できる機能を追加。  
+レベルアップ後再戦闘時にレベルアップしていないアクターにレベルアップが表示されてしまう問題を修正。  
 2022/9/17 Ver.2.0.6  
 EXPゲージの色を指定できる機能を追加。  
 入手ウィンドウ設定のウィンドウ表示をOFFにすると背景画像が表示されなくなる問題を修正。  

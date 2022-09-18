@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.0.6
+ * @version 2.1.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -53,6 +53,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/18 Ver.2.1.0
+ * 獲得経験値ウィンドウに立ち絵を指定できる機能を追加。
+ * レベルアップ後再戦闘時にレベルアップしていないアクターにレベルアップが表示されてしまう問題を修正。
  * 2022/9/17 Ver.2.0.6
  * EXPゲージの色を指定できる機能を追加。
  * 入手ウィンドウ設定のウィンドウ表示をOFFにすると背景画像が表示されなくなる問題を修正。
@@ -457,8 +460,8 @@
  * @parent GetActorExp
  * 
  * @param DefaultActorVisible
- * @desc 経験値獲得時アクターのデフォルト表示行数
- * @text デフォルトアクター表示行数
+ * @desc 経験値獲得時アクターの表示行数
+ * @text アクター表示行数
  * @type number
  * @default 4
  * @min 0
@@ -1356,6 +1359,8 @@
  * @value 2
  * @option SVアクター(1)(2)
  * @value 3
+ * @option アクター画像(1)(2)
+ * @value 4
  * @option アクター名(1)(2)(3)(8)
  * @value 10
  * @option レベル(1)(2)(3)(4)(5)(6)(8)
@@ -1871,12 +1876,12 @@
  * @default 
  * 
  * @param EXPActorSetting
- * @text EXPアクターウィンドウに表示するアクター画像設定(未実装)
+ * @text EXPアクターウィンドウに表示するアクター画像設定
  * @default ------------------------------
  * 
  * @param EXPActor_X
- * @desc 画像の表示位置X座標。
- * @text 画像表示位置X座標
+ * @desc 画像の表示開始座標X。
+ * @text 画像表示開始X座標
  * @type number
  * @default 0
  * @min -9999
@@ -1884,8 +1889,8 @@
  * @parent EXPActorSetting
  * 
  * @param EXPActor_Y
- * @desc 画像の表示位置Y座標。
- * @text 画像表示位置Y座標
+ * @desc 画像の表示開始座標Y。
+ * @text 画像表示開始Y座標
  * @type number
  * @default 0
  * @min -9999
@@ -1959,12 +1964,12 @@
  * @default 
  * 
  * @param EXPActorSetting
- * @text EXPアクターウィンドウに表示するアクター画像設定(未実装)
+ * @text EXPアクターウィンドウに表示するアクター画像設定
  * @default ------------------------------
  * 
  * @param EXPActor_X
- * @desc 画像の表示位置X座標。
- * @text 画像表示位置X座標
+ * @desc 画像の表示開始座標X。
+ * @text 画像表示開始X座標
  * @type number
  * @default 0
  * @min -9999
@@ -1972,8 +1977,8 @@
  * @parent EXPActorSetting
  * 
  * @param EXPActor_Y
- * @desc 画像の表示位置Y座標。
- * @text 画像表示位置Y座標
+ * @desc 画像の表示開始座標Y。
+ * @text 画像表示開始Y座標
  * @type number
  * @default 0
  * @min -9999
@@ -2232,7 +2237,7 @@ PluginManager.registerCommand(pluginName, 'ChangeActorImg', args => {
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
   _Game_Actor_initMembers.call(this);
-  this.resultLevelUp = false;
+  this._resultLevelUp = false;
   this._learnSkill = [];
 };
 
@@ -2641,21 +2646,24 @@ Scene_Battle.prototype.closeStatusWindow = function() {
 
 Scene_Battle.prototype.resultOpen = function() {
   this.closeStatusWindow();
-  this._resultWindow.activate();
-  if (this._resultHelpWindow) {
-    this._resultHelpWindow.show();
-    this._resultHelpWindow.open();
+  this._victoryImgCount = 0;//暫定
+  if (this._victoryImgCount === 0) {
+    this._resultWindow.activate();
+    if (this._resultHelpWindow) {
+      this._resultHelpWindow.show();
+      this._resultHelpWindow.open();
+    }
+    this._resultWindow.show();
+    this._resultActorExpWindow.show();
+    this._resultGetInfoWindow.show();
+    this._resultGetItemWindow.show();
+    this._resultWindow.open();
+    this._resultGetInfoWindow.open();
+    this._resultGetItemWindow.open();
+    this._resultActorExpWindow.open();
+    this.resultRefresh();
+    BattleManager.resultRefresh = PartyPageRefreshFrame;
   }
-  this._resultWindow.show();
-  this._resultActorExpWindow.show();
-  this._resultGetInfoWindow.show();
-  this._resultGetItemWindow.show();
-  this._resultWindow.open();
-  this._resultGetInfoWindow.open();
-  this._resultGetItemWindow.open();
-  this._resultActorExpWindow.open();
-  this.resultRefresh();
-  BattleManager.resultRefresh = PartyPageRefreshFrame;
 };
 
 Scene_Battle.prototype.resultRefresh = function() {
@@ -3245,6 +3253,9 @@ Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width,
     case 3:
       this.drawSvActor(data, actor, x, y, width);
       break;
+    case 4:
+      this.drawActorImg(data, actor, x, y, width, height);
+      break;
     case 10:
       this.drawActorName(data, actor, x, y, width);
       break;
@@ -3262,9 +3273,6 @@ Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width,
       break;
     case 30:
       this.drawLevelUp(data, actor, x, y, width);
-      break;
-    case 40:
-      this.drawActorImg(data, actor, x, y, width, height);
       break;
     case 1000:
       this.horzLine(data, x, y, width);
@@ -3307,7 +3315,14 @@ Window_ResultActorExp.prototype.drawActorImg = function(data, actor, x, y, width
 };
 
 Window_ResultActorExp.prototype.setResultBitmap = function(bitmap, data, x, y, width, height) {
-  
+  const scale = (data.EXPActor_Scale || 100) / 100;
+  width = Math.min(width - 2, bitmap.width);
+  height = Math.min(height - 2);
+  const sw = width * scale;
+  const sh = height * scale;
+  const sx = 0;
+  const sy = 0;
+  this.contents.blt(bitmap, sx + (data.EXPActor_X || 0), sy + (data.EXPActor_Y || 0), width + (width - sw), height + (height - sh), x + 1, y + 1, width, height);
 };
 
 Window_ResultActorExp.prototype.drawActorName = function(data, actor, x, y, width) {
@@ -3326,7 +3341,7 @@ Window_ResultActorExp.prototype.drawActorLevel = function(data, actor, x, y, wid
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
     this.drawText(TextManager.levelA, x, y, systemWidth);
-    if (actor.resultLevelUp) {
+    if (actor._resultLevelUp) {
       this.changeTextColor(NuunManager.getColorCode(LevelUpValueColor));
     } else {
       this.resetTextColor();
@@ -3370,7 +3385,7 @@ Window_ResultActorExp.prototype.drawExpGauge = function(data, actor, x, y, width
 };
 
 Window_ResultActorExp.prototype.drawLevelUp = function(data, actor, x, y, width) {
-  if (actor.resultLevelUp) {
+  if (actor._resultLevelUp) {
     this.changeTextColor(NuunManager.getColorCode(LevelUpNameColor));
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     const text = data.ParamName || 'LEVEL UP!';
@@ -4537,9 +4552,10 @@ BattleManager.makeRewards = function() {
 BattleManager.actorLevelUpStatus = function() {
   const exp = BattleManager._rewards.exp;
   for (const actor of $gameParty.resultMembers()) {
+    actor._resultLevelUp = false;
     const level = actor.resultGainExp(exp);
     if (level > actor._level) {
-      actor.resultLevelUp = true;
+      actor._resultLevelUp = true;
       this._levelUpPageEnable = this._levelUpPageEnable === undefined || this._levelUpPageEnable === null ? LevelUpWindowShow : this._levelUpPageEnable;
       this.resultLevelUpActors.push(actor);
       this.resultOldStatusActors.push(this.getResultOldStatus(actor));

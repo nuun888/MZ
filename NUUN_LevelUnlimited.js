@@ -11,27 +11,36 @@
  * @target MZ
  * @plugindesc レベル上限限界突破プラグイン
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  * 
  * @help
  * 最大レベルを１００以上に設定できます。
- * アクターのメモ欄に<MaxLevel:[最大レベル]>を記入してください。
+ * 
+ * アクターのメモ欄
+ * <MaxLevel:[level]>  最大レベルを変更します。
+ * <StartLevel:[level]>　パーティ加入時の初期レベルを設定します。
+ * <TestMaxLevel:[level]> テスト戦闘でのレベルを設定します。
+ * 
+ * 例
  * <MaxLevel:200> アクターの最大レベルは２００になります。
  * <StartLevel:120> 初期レベルを設定します。設定例では初期レベルが１２０になります。
+ * <TestMaxLevel:130> テスト戦闘でのレベルを130に設定します。
  * 
- * レベル１００以上でスキルを習得させる場合は職業の習得スキルのメモ欄に
- * <LearnSkill:[習得レベル]>を記入します。デフォルトの習得レベルは
- * 無視されます。
- * <LearnSkill:105> レベル１０５にレベルアップした時にスキルを習得します。
+ * 
+ * レベル100以上でスキルを習得させる場合は職業の習得スキルのメモ欄に
+ * <LearnSkill:[習得レベル]>を記入します。デフォルトの習得レベルは無視されます。
+ * <LearnSkill:105> レベル105にレベルアップした時にスキルを習得します。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/18 Ver 1.2.0
+ * テストプレイ時のレベルにレベル100以上できる機能を追加。
  * 2021/6/27 Ver 1.1.0
- * 初期レベルをレベル１００以上に設定できる機能を追加。
+ * 初期レベルをレベル100以上に設定できる機能を追加。
  * 2020/12/12 Ver 1.0.1
- * レベル１００以上のステータスの計算が間違っていたのを修正。
+ * レベル100以上のステータスの計算が間違っていたのを修正。
  * 2020/12/12 Ver 1.0.0
  * 初版
  * 
@@ -114,4 +123,22 @@ Game_Actor.prototype.learnSkillNote = function(learn) {
   }
   return val;
 };
+
+const _Game_Party_setupBattleTestMembers = Game_Party.prototype.setupBattleTestMembers;
+Game_Party.prototype.setupBattleTestMembers = function() {
+  _Game_Party_setupBattleTestMembers.call(this);
+  for (const battler of $dataSystem.testBattlers) {
+      const actor = $gameActors.actor(battler.actorId);
+      if (actor) {
+          const testLevel = actor.actor().meta.TestMaxLevel;
+          if (testLevel) {
+            actor.changeLevel(Number(testLevel), false);
+            actor.recoverAll();
+          }
+      }
+  }
+};
+
+
+
 })();

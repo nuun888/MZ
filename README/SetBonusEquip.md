@@ -1,5 +1,5 @@
 # [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
-# Ver.1.2.0
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -38,6 +38,8 @@ SetBonusタグはセットボーナスを適用する全ての武器、防具に
 表示ボーナスパラメータテキスト例：身代わり30％　※通常能力値は自動で表示されます。  
 
 ## 更新履歴
+2022/9/23 Ver.1.3.0  
+指定のセットボーナスが適用済みか判定する機能を追加。  
 2022/7/7 Ver.1.2.0  
 ツールチップウィンドウ表示のための処理、プラグインパラメータ追加。  
 2022/2/4 Ver.1.1.2  

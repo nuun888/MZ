@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * 同じセットボーナスIDの効果は重複して適用されません。
  * 
  * 更新履歴
+ * 2022/9/23 Ver.1.3.0
+ * 指定のセットボーナスが適用済みか判定する機能を追加。
  * 2022/7/7 Ver.1.2.0
  * ツールチップウィンドウ表示のための処理、プラグインパラメータ追加。
  * 2022/2/4 Ver.1.1.2
@@ -54,6 +56,35 @@
  * @desc セットボーナスの設定を行います。
  * @type struct<SetBonusList>[]
  * @default []
+ * 
+ * 
+ * @command IsSetBonus
+ * @desc 指定のセットボーナスが適用済みかを指定のスイッチに代入します。
+ * @text セットボーナス適用判定
+ * 
+ * @arg ActorId
+ * @text アクターID
+ * @desc 対象のアクターを指定します。
+ * @type actor
+ * @default 0
+ * 
+ * @arg SwitchId
+ * @text 結果代入スイッチ
+ * @desc 判定結果を格納するためのスイッチIDを指定します。
+ * @type switch
+ * @default 0
+ * 
+ * @arg Id
+ * @text 指定セットボーナスID
+ * @desc 適用されているか判定するセットボーナスID。
+ * @type number
+ * @default 0
+ * 
+ * @arg Name
+ * @text 指定セットボーナス名
+ * @desc 適用されているか判定するセットボーナス名。記入されている場合はこちらが優先されます。
+ * @type string
+ * @default 
  * 
  */
 /*~struct~SetBonusList:
@@ -156,12 +187,45 @@ Imported.NUUN_SetBonusEquip = true;
 const parameters = PluginManager.parameters('NUUN_SetBonusEquip');
 const SetBonusData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SetBonus'])) : null) || [];
 
+const pluginName = "NUUN_SetBonusEquip";
+
+PluginManager.registerCommand(pluginName, 'IsSetBonus', args => {
+    const actor = $gameActors.actor(Number(args.ActorId));
+    const data = !!args.Name ? NuunManager.getSetBonusDataName(args.Name) : NuunManager.getSetBonusData(Number(args.Id));
+    let result = false;
+    if (actor && data) {
+        result = actor.isSetBonus(data);
+    }
+    $gameSwitches.setValue(Number(args.SwitchId), result);
+});
+
 NuunManager.getSetBonusParams = function() {
     return parameters;
 };
 
 NuunManager.getSetBonusData = function(id) {
     return SetBonusData[id- 1];
+};
+
+NuunManager.getSetBonusDataName = function(name) {
+    return SetBonusData.find(data => data.SetBonusName === name);
+};
+
+Game_Actor.prototype.isSetBonus = function(data) {
+    const setSum = this.getTotalSetBonus(data);
+    if (setSum === data.SetBonusEquip.length) {
+        return true;
+    } else if (setSum > 1) {
+        return data.SetBonusNumberEquipment.some(list => {
+            if (setSum >= list.SetNumberEquip) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+    } else {
+        return false;
+    }
 };
 
 Game_Actor.prototype.getTotalSetBonus = function(data) {

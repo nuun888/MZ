@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.1.7.3
+# Ver.1.7.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -20,6 +20,8 @@
 ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）  
 
 ## 更新履歴
+2022/9/22 Ver.1.7.4  
+アクターステータスウィンドウのコンテンツ背景をONにするとエラーが出る問題を修正。  
 2022/7/30 Ver.1.7.3  
 戦闘中に無限ループを起こしゲームが停止してしまう問題を修正。  
 2022/7/26 Ver.1.7.2  

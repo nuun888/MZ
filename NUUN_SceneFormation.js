@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.7.3
+ * @version 1.7.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -31,6 +31,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/22 Ver.1.7.4
+ * アクターステータスウィンドウのコンテンツ背景をONにするとエラーが出る問題を修正。
  * 2022/7/30 Ver.1.7.3
  * 戦闘中に無限ループを起こしゲームが停止してしまう問題を修正。
  * 2022/7/26 Ver.1.7.2
@@ -2348,6 +2350,11 @@ Window_FormationStatus.prototype.drawContentsBackground = function(back, x, y, w
     const rect = this.contentsRect(x, y, width);
     this.drawContentsBackgroundRect(rect);
   }
+};
+
+Window_FormationStatus.prototype.contentsRect = function(x, y, width) {
+  const height = this.lineHeight() - this.rowSpacing();
+  return new Rectangle(x, y + 2, width, height);
 };
   
 Window_FormationStatus.prototype.drawContentsBackgroundRect = function(rect) {

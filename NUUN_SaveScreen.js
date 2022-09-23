@@ -11,26 +11,51 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 1.9.0
+ * @version 2.0.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * セーブ画面にいくつかの項目を追加します。
+ * このプラグインでは通常のキャラチップ、プレイ時間の他顔グラ、サイドビューアクター、セーブ時の現在値、セーブ日時、所持金、
+ * レベル、独自のパラメータ、スナップショット等が表示可能です。
  * 
- * 顔グラ、サイドビューアクターを表示できます。
- * キャラクター上にレベルを表示できます。
- * 現在の章などの文字を表示可能。
- * プレイ時間、現在地、所持金、任意、セーブ時刻の項目が表示可能です。
- * スナップショットを表示可能。
+ * 設定
+ * セーブ画面に表示する項目を設定するにはプラグインパラメータの表示項目から設定します。
  * 
- * ファイル名横の表示文字の評価式
- * info.AnyName:表示文字列
- * info.title:ゲームタイトル名
- * info.destinationName:行動目標(要)
+ * X表示列位置
+ * 表示する列番号を指定します。最大列は3です。
  * 
- * NUUN_Chapterと併用した場合、プラグインパラメータで設定したファイル名横文字列表示変数番号及び、
- * プラグインコマンドのファイル名横表示文字列で設定している場合は、後者の設定が適用されます。
+ * Y表示行位置
+ * 表示する行番号を指定します。
+ * 
+ * X座標（相対）
+ * X表示列位置からのX方向の座標を指定します。
+ * 
+ * Y座標（相対）
+ * Y表示列位置からのY方向の座標を指定します。
+ * 
+ * 項目横幅
+ * 表示項目全体の横幅を指定します。サイドビューアクター、レベル、アクター名、クラス名、二つ名は１キャラ毎の横幅を指定します。
+ * 
+ * システム項目横幅
+ * システム文字の横幅を指定します。
+ * 
+ * システム項目文字色
+ * システム文字の文字色をシステムカラーまたはカラーコードで記入します。
+ * 
+ * フォントサイズ
+ * フォントサイズをメインフォントからの差で変更します。
+ * 
+ * 名称
+ * 項目の名称を設定します。
+ * 
+ * 評価式
+ * 評価式を記入します。
+ * 
+ * 文字揃え
+ * 文字揃えを指定します。TextExはタイトル、章、行動目標でのみ指定できます。
+ * 
  * 
  * drawTextEx表示はプラグインパラメータのフォントサイズが適用されません。
  * テキストに\FS[x]で設定してください。
@@ -41,11 +66,7 @@
  * 背景IDはロード画面でIDの一番高いセーブデータの背景が表示されます。
  * 
  * オリジナルパラメータ
- * オリジナルパラメータを設定するにはインフォオリジナルパラメータデータで取得するデータを設定する必要があります。
- * 表示項目の評価式で表示したいパラメータの配列番号（インフォオリジナルパラメータデータリスト番号）を記入します。
- * info.orgParam[id - 1]
- * 例
- * リスト1番ならinfo.orgParam[0]
+ * 
  * 
  * オートセーブ時のスナップショット
  * オートセーブ時のスナップショットは戦闘開始直前のマップ、移動直前のマップが撮影されます。
@@ -56,11 +77,13 @@
  * 
  * Ver.1.3.0からNUUN_Base Ver.1.1.3以降が必要となります。
  * 
- * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/24 Ver.2.0.0
+ * 全ての項目の配置の自由化。
+ * 一部不具合修正。
  * 2022/7/4 Ver.1.9.0
  * チャプターテキスト、メニュー画面行動目標表示プラグインでのテキスト表示の処理追加。
  * コンテンツ背景をゲーム途中で変更できる機能を追加。
@@ -149,8 +172,8 @@
  * 
  * 
  * @command UserAutoSave
- * @desc オートセーブをします。
- * @text オートセーブ
+ * @desc オートセーブ時のスナップショットを許可します。OFFで無効にします。
+ * @text オートセーブ時SS許可
  * 
  * @arg OnSaveSnap
  * @text スクリーンショット許可
@@ -163,8 +186,8 @@
  * @text スナップショット撮影
  * 
  * @command SetAnyName
- * @desc ファイル名横に表示される文字列を設定します。取得パラメータはinfo.AnyNameで取得できます。
- * @text ファイル名横表示文字列
+ * @desc 章の名称を記入します。
+ * @text 章
  * 
  * @arg AnyName
  * @text 表示文字列
@@ -172,81 +195,154 @@
  * @type string
  * @default 
  * 
+ * @command SpecifyActor
+ * @desc 指定のアクターのみ表示させるアクターを設定します。
+ * @text 指定のアクター変更
+ * 
+ * @arg ActorId
+ * @text アクター
+ * @desc アクターを指定します。0の場合はリーダーが表示されます。
+ * @type actor
+ * @default 0
+ * 
  * 
  * @param BasicSetting
  * @text 基本設定
  * @default ------------------------------
+ * 
+ * @param PartyActorMode
+ * @desc 表示するアクター
+ * @text 表示アクター
+ * @type select
+ * @option バトルメンバー
+ * @value 1
+ * @option パーティメンバー(控え含む)
+ * @value 2
+ * @default 1
+ * @parent BasicSetting
+ * 
+ * @param SaveFileWindow
+ * @text セーブファイルウィンドウ設定
+ * @default ------------------------------
+ * 
+ * @param ContentsList
+ * @desc 表示する項目。
+ * @text 表示項目
+ * @type struct<ContentsListData>[]
+ * @default ["{\"DateSelect\":\"50\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"23\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"60\",\"ItemWidth\":\"48\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-12\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"right\\\"\"}","{\"DateSelect\":\"10\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"2\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-4\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"12\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"230\",\"Y_Coordinate\":\"2\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"TextEx\\\"\"}","{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"230\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"520\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"現在地\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"230\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"プレイ時間\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"4\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"500\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"所持金\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}"]
+ * @parent SaveFileWindow
  * 
  * @param NumSaveRows
  * @desc 画面に表示するセーブ数
  * @text 表示セーブ数
  * @type number
  * @default 5
- * @parent BasicSetting
+ * @parent SaveFileWindow
  * 
  * @param MaxSave
  * @desc 最大セーブ数
  * @text 最大セーブ数
  * @type number
  * @default 20
- * @parent BasicSetting
+ * @parent SaveFileWindow
  * 
- * @param OrgParamList
- * @desc オリジナルパラメータをセーブインフォに格納します。（複数指定可能）info.orgParam[id - 1]で取得できます。
- * @text インフォオリジナルパラメータデータ
- * @type combo[]
- * @option '$gameParty.steps();//歩数'
- * @option '$gameSystem.battleCount();//戦闘回数'
- * @option '$gameSystem.escapeCount();//逃走回数'
- * @option '$gameSystem.saveCount();//セーブ回数'
- * @option '$gameVariables.value(0);//ゲーム変数'
- * @option '$gameSystem.chronus().getDateFormat(1);//ゲーム内時間の導入プラグイン日時フォーマット1'
- * @option '$gameSystem.chronus().getDateFormat(2);//ゲーム内時間の導入プラグイン日時フォーマット2'
+ * @param Contents
+ * @text 各コンテンツ設定
+ * @default ------------------------------
+ * 
+ * @param DayTime
+ * @desc 表示する日時フォーマット
+ * @text 日時フォーマット
+ * @type select
+ * @option 標準（年/月/日 時：分：秒）
+ * @value 
+ * @option 英表記（日/月/年 時：分：秒）
+ * @value 'en-GB'
+ * @option 元号表記（日表記）
+ * @value 'ja-JP-u-ca-japanese'
  * @default 
- * @parent BasicSetting
+ * @parent Contents
  * 
- * @param Font
- * @text フォント設定
+ * @param CharacterSpecifyActorOnry
+ * @desc キャラクターを指定アクターのみ表示します。指定アクターが0の場合はリーダーのみ表示されます。
+ * @text キャラクター指定アクター表示
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param FaceSpecifyActorOnry
+ * @desc 顔グラを指定アクターのみ表示します。指定アクターが0の場合はリーダーのみ表示されます。
+ * @text 顔グラ指定アクター表示
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param SvSpecifyActorOnry
+ * @desc サイドビューアクターを指定アクターのみ表示します。指定アクターが0の場合はリーダーのみ表示されます。
+ * @text SVアクター指定アクター表示
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param NameSpecifyActorOnry
+ * @desc アクター名を指定アクターのみ表示します。指定アクターが0の場合はリーダーのみ表示されます。
+ * @text アクター名指定アクター表示
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param ClassSpecifyActorOnry
+ * @desc クラス名を指定アクターのみ表示します。指定アクターが0の場合はリーダーのみ表示されます。
+ * @text クラス名指定アクター表示
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param NickNameSpecifyActorOnry
+ * @desc 二つ名(ニックネーム)を指定アクターのみ表示します。指定アクターが0の場合はリーダーのみ表示されます。
+ * @text 二つ名指定アクター表示
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param LevelSpecifyActorOnry
+ * @desc レベルを指定アクターのみ表示します。指定アクターが0の場合はリーダーのみ表示されます。
+ * @text レベル指定アクター表示
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param SaveSnapSetting
+ * @text セーブスナップショット設定
  * @default ------------------------------
  * 
- * @param MainFontSizeMainFontSize
- * @desc ファイルタイトル、ファイル名横文字列のフォントサイズ
- * @text ファイルタイトル、ファイル名横文字列フォントサイズ
+ * @param InfoSaveSnap
+ * @text スナップショット有効化
+ * @desc スナップショットを有効にします。
+ * @type boolean
+ * @default false
+ * @parent SaveSnapSetting
+ * 
+ * @param SaveSnapQuality
+ * @desc スナップショットの画質。(デフォルト値0.92)
+ * @text スナップショット画質
+ * @type string
+ * @default 0.92
+ * @max 1
+ * @parent SaveSnapSetting
+ * 
+ * @param SaveSnapScale
+ * @desc スナップショットの拡大率（％）
+ * @text スナップショット拡大率（％）
  * @type number
- * @default 24
+ * @default 12
  * @min 0
- * @parent Font
- * 
- * @param ContentsFontSizeMainFontSize
- * @desc 各コンテンツのフォントサイズ
- * @text 各コンテンツフォントサイズ
- * @type number
- * @default 22
- * @parent Font
- * 
- * @param FailName
- * @text ファイル名
- * @default ------------------------------
- * 
- * @param FailNameX
- * @desc ファイル名のX座標
- * @text ファイル名X座標
- * @type number
- * @default 0
- * @parent FailName
- * 
- * @param FailNameY
- * @desc ファイル名のY座標
- * @text ファイル名Y座標
- * @type number
- * @default -4
- * @min -9999
- * @parent FailName
+ * @parent SaveSnapSetting
  * 
  * @param AnyName
- * @text ファイル名横文字列
+ * @text 章設定
  * @default ------------------------------
- *
+ * 
  * @param AnyNameVariable
  * @desc ファイル名横文字列変数番号。プラグインコマンド「ファイル名横表示文字列」で設定している場合は表示されません。
  * @text ファイル名横文字列表示変数番号
@@ -254,91 +350,9 @@
  * @default 0
  * @parent AnyName
  * 
- * @param AnyNameMode
- * @text drawTextEx表示
- * @desc テキストをdrawTextEx(制御文字使用可能)で表示します。OFFでdrawText(制御文字不可)で表示。
- * @type boolean
- * @default false
- * @parent AnyName
- * 
- * @param AnyNameEval
- * @desc ファイル名横文字列表示評価式。
- * @text ファイル名横文字列表示評価式
- * @type combo
- * @option info.AnyName ? info.AnyName : info.title
- * @option info.destinationName;//要NUUN_Destination 行動目標
- * @default info.AnyName ? info.AnyName : info.title
- * @parent AnyName
- * 
- * @param AnyNameX
- * @desc ファイル名横文字列のX座標
- * @text ファイル名横文字列X座標
- * @type number
- * @default 200
- * @parent AnyName
- * 
- * @param AnyNameY
- * @desc ファイル名横文字列のY座標
- * @text ファイル名横文字列Y座標
- * @type number
- * @default 2
- * @min -9999
- * @parent AnyName
- * 
- * @param AnyNameWidth
- * @desc ファイル名横文字列の横幅（0でファイル名横文字列X座標から右端までの横幅）
- * @text ファイル名横文字列横幅
- * @type number
- * @default 0
- * @min 0
- * @parent AnyName
- * 
- * @param AnyNameAlign
- * @desc 文字揃え。
- * @text 文字揃え
- * @type select
- * @option 左
- * @value 'left'
- * @option 右
- * @value 'right'
- * @option 中央
- * @value 'center'
- * @default 'left'
- * @parent AnyName
- * 
  * @param Actor
  * @text アクター設定
  * @default ------------------------------
- * 
- * @param ActorGraphicMode
- * @desc アクター画像の表示モード
- * @text 表示モード
- * @type select
- * @option 表示しない
- * @value 0
- * @option キャラチップ
- * @value 1
- * @option 顔グラ
- * @value 2
- * @option サイドビューアクター
- * @value 3
- * @default 1
- * @parent Actor
- * 
- * @param ActorX
- * @desc アクターのX座標（相対座標）デフォルト:40
- * @text アクターX座標
- * @type number
- * @default 40
- * @parent Actor
- * 
- * @param ActorY
- * @desc アクターのY座標（相対座標）
- * @text アクターY座標
- * @type number
- * @default 0
- * @min -9999
- * @parent Actor
  * 
  * @param FaceWidth
  * @desc 顔グラの横幅
@@ -362,27 +376,6 @@
  * @default 100
  * @parent Actor
  * 
- * @param LevelPosition
- * @desc レベルの表示位置。
- * @text レベル表示位置
- * @type select
- * @option 表示しない
- * @value 0
- * @option 下
- * @value 1
- * @option 上
- * @value 2
- * @default 1
- * @parent Actor
- * 
- * @param LevalY
- * @desc レベルのY座標（相対座標）
- * @text レベルY座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @parent Actor
- * 
  * @param BackGround
  * @text 背景、ウィンドウスキン設定
  * @default ------------------------------
@@ -396,10 +389,17 @@
  * @parent BackGround
  * 
  * @param BackUiWidth
- * @text 背景サイズをウィンドウサイズに合わせる
- * @desc 背景サイズをウィンドウサイズに合わせる。
+ * @text 背景画像ウィンドウUIサイズ
+ * @desc 背景画像をウィンドウUIサイズに合わせる。
  * @type boolean
  * @default true
+ * @parent BackGround
+ * 
+ * @param BackFitWidth
+ * @text 背景画像拡大
+ * @desc 背景画像をウィンドウサイズまたは画面に合わせ拡大します。
+ * @type boolean
+ * @default false
  * @parent BackGround
  * 
  * @param AutomaticSetting
@@ -410,8 +410,8 @@
  * @parent BackGround
  * 
  * @param ContentsBackVisible
- * @text コンテンツ背景画像表示
- * @desc コンテンツの背景画像を表示する。
+ * @text コンテンツ背景画像非表示
+ * @desc コンテンツの背景画像を表示しません。
  * @type boolean
  * @default false
  * @parent BackGround
@@ -424,87 +424,6 @@
  * @default 
  * @parent BackGround
  * 
- * @param Contents
- * @text 各コンテンツ設定
- * @default ------------------------------
- * 
- * @param ContentsList
- * @desc 表示する項目。
- * @text 表示項目
- * @type struct<ContentsListData>[]
- * @default ["{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\"}","{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\"}"]
- * @parent Contents
- * 
- * @param ContentsX
- * @desc コンテンツエリアのX座標
- * @text コンテンツエリアX座標
- * @type number
- * @default 220
- * @min 0
- * @parent Contents
- * 
- * @param ContentsWidth
- * @desc コンテンツエリアの横幅（0でデフォルト幅）
- * @text コンテンツエリア横幅
- * @type number
- * @default 0
- * @min 0
- * @parent Contents
- * 
- * @param DayTime
- * @desc 表示する日時フォーマット
- * @text 日時フォーマット
- * @type select
- * @option 標準（年/月/日 時：分：秒）
- * @value 
- * @option 英表記（日/月/年 時：分：秒）
- * @value 'en-GB'
- * @option 元号表記（日表記）
- * @value 'ja-JP-u-ca-japanese'
- * @default 
- * @parent Contents
- * 
- * @param SaveSnapSetting
- * @text セーブスナップショット設定
- * @default ------------------------------
- * 
- * @param InfoSaveSnap
- * @text スナップショット有効化
- * @desc スナップショットを有効にします。
- * @type boolean
- * @default false
- * @parent SaveSnapSetting
- * 
- * @param SaveSnapQuality
- * @desc スナップショットの画質。(デフォルト値0.92)
- * @text スナップショット画質
- * @type string
- * @default 0.92
- * @max 1
- * @parent SaveSnapSetting
- * 
- * @param SaveSnapX
- * @desc スナップショットのX座標
- * @text スナップショットX座標
- * @type number
- * @default 650
- * @parent SaveSnapSetting
- * 
- * @param SaveSnapY
- * @desc スナップショットのY座標
- * @text スナップショットY座標
- * @type number
- * @default 8
- * @parent SaveSnapSetting
- * 
- * @param SaveSnapScale
- * @desc スナップショットの拡大率（％）
- * @text スナップショット拡大率（％）
- * @type number
- * @default 12
- * @min 0
- * @parent SaveSnapSetting
- * 
  */
 /*~struct~ContentsListData:
  * 
@@ -514,44 +433,46 @@
  * @type select
  * @option なし
  * @value 0
- * @option プレイ時間(1)(2)(4)(5)(6)(7)(8)(9)(10)
+ * @option プレイ時間(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value 1
- * @option セーブ時刻(1)(2)(4)(5)(6)(7)(8)(9)(10)
+ * @option セーブ時刻(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value 2
- * @option 現在地(1)(2)(4)(5)(6)(7)(8)(9)(10)
+ * @option 現在地(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value 3
- * @option 所持金(1)(2)(4)(5)(6)(7)(8)(9)(10)
+ * @option 所持金(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value 4
- * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)
+ * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
  * @value 5
- * @option ライン(1)(4)(5)(6)(7)(8)(10)
+ * @option ファイル名(1)(2)(3)(4)(5)(8)
+ * @value 10
+ * @option タイトル(1)(2)(3)(4)(5)(8)(11)
+ * @value 11
+ * @option 章(1)(2)(3)(4)(5)(8)(11)
+ * @value 12
+ * @option 行動目標(1)(2)(3)(4)(5)(8)(11)
+ * @value 13
+ * @option アクター名(1)(2)(3)(4)(5)(8)
+ * @value 20
+ * @option クラス(1)(2)(3)(4)(5)(8)
+ * @value 21
+ * @option 二つ名(Nickname)(1)(2)(3)(4)(5)(8)
+ * @value 22
+ * @option レベル(1)(2)(3)(4)(5)(8)(11)
+ * @value 23
+ * @option キャラチップ(1)(2)(3)(4)(5)
+ * @value 50
+ * @option 顔グラ(1)(2)(3)(4)
+ * @value 51
+ * @option SVアクター(1)(2)(3)(4)(5)
+ * @value 52
+ * @option スナップショット(1)(2)(3)(4)
+ * @value 90
+ * @option ライン(1)(2)(3)(4)(5)(7)
  * @value 100
  * @default 0
  * 
- * @param NameColor
- * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
- * @text システム項目文字色(1)
- * @type number
- * @default 16
- * @min 0
- * 
- * @param ParamName
- * @desc 項目の名称を設定します。
- * @text 名称(2)
- * @type string
- * @default
- * 
- * @param DetaEval
- * @desc 評価式。
- * @text 評価式(javaScript)(3)
- * @type combo
- * @option 'info.orgParam[0]'
- * @option 'info.orgParam? info.orgParam[0] : 0'//数値表示など
- * @option info.destinationName;//要NUUN_Destination 行動目標
- * @default 
- * 
  * @param X_Position
- * @text X表示列位置(4)
+ * @text X表示列位置(1)
  * @desc X表示列位置
  * @type number
  * @default 1
@@ -560,14 +481,14 @@
  * 
  * @param Y_Position
  * @desc Y表示行位置
- * @text Y表示行位置(5)
+ * @text Y表示行位置(2)
  * @type number
  * @default 1
  * @min 1
  * @max 99
  * 
  * @param X_Coordinate
- * @text X座標（相対）(6)
+ * @text X座標（相対）(3)
  * @desc X座標（X表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -575,7 +496,7 @@
  * @min -9999
  * 
  * @param Y_Coordinate
- * @text Y座標（相対）(7)
+ * @text Y座標（相対）(4)
  * @desc Y座標（Y表示列位置からの相対座標）
  * @type number
  * @default 0
@@ -584,24 +505,65 @@
  * 
  * @param ItemWidth
  * @desc 項目横幅（0でデフォルト幅）
- * @text 項目横幅(8)
+ * @text 項目横幅(5)
  * @type number
  * @default 0
  * @min 0
  * 
  * @param SystemItemWidth
  * @desc システム項目の横幅（0でデフォルト幅）
- * @text システム項目横幅(9)
+ * @text システム項目横幅(6)
  * @type number
  * @default 0
  * @min 0
  * 
- * @param WideMode
- * @desc ワイド表示モード
- * @text ワイド表示モード(10)
- * @type boolean
- * @default false
- *  
+ * @param SystemNameColor
+ * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
+ * @text システム項目文字色(7)
+ * @type number
+ * @default 16
+ * @min 0
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(8)
+ * @type number
+ * @default -6
+ * @min -99
+ * 
+ * @param ParamName
+ * @desc 項目の名称を設定します。
+ * @text 名称(9)
+ * @type string
+ * @default
+ * 
+ * @param DetaEval
+ * @desc 評価式。
+ * @text 評価式(javaScript)(10)
+ * @type combo
+ * @option '$gameParty.steps();//歩数'
+ * @option '$gameSystem.battleCount();//戦闘回数'
+ * @option '$gameSystem.escapeCount();//逃走回数'
+ * @option '$gameSystem.saveCount();//セーブ回数'
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option '$gameSystem.chronus().getDateFormat(1);//ゲーム内時間の導入プラグイン日時フォーマット1'
+ * @option '$gameSystem.chronus().getDateFormat(2);//ゲーム内時間の導入プラグイン日時フォーマット2'
+ * @default 
+ * 
+ * @param Align
+ * @desc 文字揃え。
+ * @text 文字揃え(11)
+ * @type select
+ * @option 制御文字使用可(左揃え)
+ * @value "TextEx"
+ * @option 左
+ * @value "left"
+ * @option 中央
+ * @value "center"
+ * @option 右
+ * @value "right"
+ * @default "left"
+ * 
  */
 
 var Imported = Imported || {};
@@ -609,42 +571,32 @@ Imported.NUUN_SaveScreen = true;
 
 (() => {
   const parameters = PluginManager.parameters('NUUN_SaveScreen');
-  const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
-  const MainFontSizeMainFontSize = Number(parameters['MainFontSizeMainFontSize'] || 24);
-  const ContentsFontSizeMainFontSize = Number(parameters['ContentsFontSizeMainFontSize'] || 22);
+  const BackUiWidth = eval(parameters['BackUiWidth'] || 'true');
+  const BackFitWidth = eval(parameters['BackFitWidth'] || 'false');
   const ContentsBackVisible = eval(parameters['ContentsBackVisible'] || "false");
   const AutomaticSetting = eval(parameters['AutomaticSetting'] || "true");
-  const AnyNameMode = eval(parameters['AnyNameMode'] || "false");
-  const ActorGraphicMode = Number(parameters['ActorGraphicMode'] || 1);
-  const ActorX = Number(parameters['ActorX'] || 40);
-  const ActorY = Number(parameters['ActorY'] || 0);
-  const LevalY = Number(parameters['LevalY'] || 0);
+  const PartyActorMode = Number(parameters['PartyActorMode'] || 1);
   const FaceWidth = Number(parameters['FaceWidth'] || 144);
   const FaceHeight = Number(parameters['FaceHeight'] || 144);
   const FaceScale = Number(parameters['FaceScale'] || 100);
-  const LevelPosition = Number(parameters['LevelPosition'] || 1);
-  const ContentsX = Number(parameters['ContentsX'] || 0);
   const NumSaveRows = Number(parameters['NumSaveRows'] || 5);
   const MaxSave = Number(parameters['MaxSave'] || 20);
-  const _ContentsWidth = Number(parameters['ContentsWidth'] || 0);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
-  const AnyNameEval = String(parameters['AnyNameEval'] || "");
-  const FailNameX = Number(parameters['FailNameX'] || 0);
-  const FailNameY = Number(parameters['FailNameY'] || -4);
-  const AnyNameX = Number(parameters['AnyNameX'] || 200);
-  const AnyNameY = Number(parameters['AnyNameY'] || 2);
-  const AnyNameWidth = Number(parameters['AnyNameWidth'] || 0);
-  const AnyNameAlign = eval(parameters['AnyNameAlign']) || 'left';
-  const OrgParamList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['OrgParamList'])) : null) || [];
   const InfoSaveSnap = eval(parameters['InfoSaveSnap'] || "true");
   const SaveSnapQuality = eval(parameters['SaveSnapQuality'] || 0.92);
-  const SaveSnapX = Number(parameters['SaveSnapX'] || 0);
-  const SaveSnapY = Number(parameters['SaveSnapY'] || 0);
   const SaveSnapScale = Number(parameters['SaveSnapScale'] || 15);
   const DayTime = String(parameters['DayTime']);
   const BackGroundImg = String(parameters['BackGroundImg']);
   const ContentsBackGroundImg = String(parameters['ContentsBackGroundImg'])
   const ContentsList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsList'])) : null) || [];
+  const CharacterSpecifyActorOnry = eval(parameters['CharacterSpecifyActorOnry'] || "false");
+  const FaceSpecifyActorOnry = eval(parameters['FaceSpecifyActorOnry'] || "false");
+  const SvSpecifyActorOnry = eval(parameters['SvSpecifyActorOnry'] || "false");
+  const NameSpecifyActorOnry = eval(parameters['NameSpecifyActorOnry'] || "false");
+  const ClassSpecifyActorOnry = eval(parameters['ClassSpecifyActorOnry'] || "false");
+  const NickNameSpecifyActorOnry = eval(parameters['NickNameSpecifyActorOnry'] || "false");
+  const LevelSpecifyActorOnry = eval(parameters['LevelSpecifyActorOnry'] || "false");
+
   let saveInfoSnapShot = null;
 
   const pluginName = "NUUN_SaveScreen";
@@ -671,6 +623,10 @@ Imported.NUUN_SaveScreen = true;
     $gameSystem.saveAnyName = args.AnyName;
   });
 
+  PluginManager.registerCommand(pluginName, 'SpecifyActor', args => {
+    $gameParty.setSaveFileSpecifyActorOnry(Number(args.ActorId));
+  });
+
 
   const _DataManager_loadSavefileImages = DataManager.loadSavefileImages;
   DataManager.loadSavefileImages = function(info) {
@@ -685,27 +641,7 @@ Imported.NUUN_SaveScreen = true;
     }
   };
 
-  const _DataManager_makeSavefileInfo  = DataManager.makeSavefileInfo ;
-  DataManager.makeSavefileInfo = function() {
-    const info = _DataManager_makeSavefileInfo.call(this);
-    info.svActor = $gameParty.svActorForSavefile();
-    info.mapname = !!$dataMap ? $gameMap.displayName() : '';
-    info.gold = $gameParty._gold;
-    info.levelActor = $gameParty.actorLevelForSavefile();
-    info.background = $gameSystem.saveBuckgroundImg;
-    info.contentsBuck = $gameSystem.saveContentsBuckgroundImg;
-    info.orgParam = this.getOrgParams();
-    const anyName = $gameSystem.saveAnyName ? $gameSystem.saveAnyName : $gameVariables.value(AnyNameVariable);
-    if (anyName) {
-      info.AnyName = anyName;
-    } else if (Imported.NUUN_Chapter) {
-      info.AnyName = $gameSystem.getChapter();
-    } else {
-      info.AnyName = null;
-    }
-    if (Imported.NUUN_Destination) {
-      info.destinationName = $gameSystem.getDestinationList();
-    }
+  DataManager.loadSnap = function(info) {
     if ($gameSystem.onSnap) {
       DataManager.urlBitmapData();
       info.snap = this.urlBitmap;
@@ -713,13 +649,53 @@ Imported.NUUN_SaveScreen = true;
       saveInfoSnapShot = null;
       info.snap = null;
     }
+  };
+
+  const _DataManager_makeSavefileInfo = DataManager.makeSavefileInfo ;
+  DataManager.makeSavefileInfo = function() {
+    const info = _DataManager_makeSavefileInfo.call(this);
+    this.setPartyData(info);
+    info.background = $gameSystem.saveBuckgroundImg;
+    info.contentsBuck = $gameSystem.saveContentsBuckgroundImg;
+    info.mapname = !!$dataMap ? $gameMap.displayName() : '';
+    info.gold = $gameParty._gold;
+    if (Imported.NUUN_Chapter) {
+      info.AnyName = $gameSystem.getChapter();
+    } else {
+      info.AnyName = $gameSystem.saveAnyName ? $gameSystem.saveAnyName : $gameVariables.value(AnyNameVariable);
+    }
+    if (Imported.NUUN_Destination) {
+      info.destinationName = $gameSystem.getDestinationList();
+    }
+    this.setOrgParams(info);
+    this.loadSnap(info);
+    console.log(info)
     return info;
   };
 
-  DataManager.getOrgParams = function() {
-    return OrgParamList.map(data => eval(data));
+  DataManager.setOrgParams = function(info) {
+    ContentsList.forEach((data, index)=> {
+      if (data.DateSelect === 5 && data.DetaEval) {
+        info["orgParam_"+ String(index)] = eval(data.DetaEval);
+      }
+    });
   };
 
+  DataManager.setPartyData = function(info, data) {
+    const actorId = $gameParty.getSaveFileSpecifyActorOnry();
+    const actor = actorId > 0 ? $gameActors.actor(actorId) : $gameParty.leader();
+    if (CharacterSpecifyActorOnry) {
+      info.characters = [actor.characterName(), actor.characterIndex()];
+    }
+    if (FaceSpecifyActorOnry) {
+      info.faces = [actor.faceName(), actor.faceIndex()];
+    }
+    info.svActor = SvSpecifyActorOnry ? [actor.battlerName()] : $gameParty.svActorForSavefile();
+    info.actorName = NameSpecifyActorOnry ? [actor.name()] : $gameParty.actorNameForSavefile();
+    info.actorClass = ClassSpecifyActorOnry ? [actor.currentClass().name] : $gameParty.actorClassForSavefile();
+    info.actorNickName = NickNameSpecifyActorOnry ? [actor.nickname()] : $gameParty.actorNickNameForSavefile();
+    info.levelActor = LevelSpecifyActorOnry ? [actor._level] : $gameParty.actorLevelForSavefile();
+  };
 
   DataManager.loadBackground = function() {
     const globalInfo = this._globalInfo;
@@ -886,13 +862,20 @@ Imported.NUUN_SaveScreen = true;
 
   Scene_File.prototype.setBackGround = function(sprite) {
     if (BackUiWidth) {
-      sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
-      sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
-      sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
-      sprite.scale.y = (Graphics.boxHeight + 8 !== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+      sprite.x = (Graphics.width - Graphics.boxWidth) / 2 - 4;
+      sprite.y = (Graphics.height - Graphics.boxHeight) / 2 - 4;
     } else {
-      sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
-      sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+      sprite.x = 0;
+      sprite.y = 0;
+    }
+    if (BackFitWidth) {
+      if(BackUiWidth) {
+        sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
+        sprite.scale.y = (Graphics.boxHeight + 8 !== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+      } else {
+        sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
+        sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+      }
     }
   };
 
@@ -904,6 +887,10 @@ Imported.NUUN_SaveScreen = true;
 
   Window_SavefileList.prototype.maxContentsCols = function() {
     return 2;
+  };
+
+  Window_SavefileList.prototype.lineHeight = function() {
+    return 30;
   };
 
   const _Window_SavefileList_numVisibleRows = Window_SavefileList.prototype.numVisibleRows;
@@ -933,83 +920,32 @@ Imported.NUUN_SaveScreen = true;
     this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
   };
 
-  const _Window_SavefileList_drawItem = Window_SavefileList.prototype.drawItem;
   Window_SavefileList.prototype.drawItem = function(index) {
-    this._FaceOn = false;
-    _Window_SavefileList_drawItem.call(this, index);
     const savefileId = this.indexToSavefileId(index);
-    if (!DataManager.savefileInfo(savefileId)) {
-      this._FaceOn = true;
-    }
+    const info = DataManager.savefileInfo(savefileId);
     const rect = this.itemRectWithPadding(index);
-    this.drawTitle(savefileId, rect.x, rect.y + 4);
+    this.resetTextColor();
+    this.changePaintOpacity(this.isEnabled(savefileId));
+    this.drawContents(info, rect, savefileId);
   };
 
-  const _Window_SavefileList_drawTitle = Window_SavefileList.prototype.drawTitle;
-  Window_SavefileList.prototype.drawTitle = function(savefileId, x, y) {
-    if (this._FaceOn) {
-      this.contents.fontSize = MainFontSizeMainFontSize;
-      _Window_SavefileList_drawTitle.call(this, savefileId, x + FailNameX, y + FailNameY);
-      this.contents.fontSize = $gameSystem.mainFontSize();
-      this._FaceOn = false;
-    }
-  };
-
-  Window_SavefileList.prototype.drawActors = function(info, x, y, width, height) {
-    if (width >= 420) {
-      this._maxHeight = height - 4;
-      let x2 = ActorX + x;
-      let w = 0;
-      let h = 0;
-      if (ActorGraphicMode === 2) {
-        let y2 = ActorY + y + 2;
-        const scale = FaceScale / 100;
-        w = FaceWidth > 0 ? FaceWidth : ImageManager.faceWidth;
-        h = FaceHeight > 0 ? FaceHeight : ImageManager.faceHeight;
-        const heightScale = h * scale;
-        let scaleMode = 0;
-        if (heightScale === h) {
-          h = Math.min(h, this._maxHeight);
-          scaleMode = 0;
-        } else if (heightScale > this._maxHeight){
-          scaleMode = 1;
-        }
-        this.drawPartyFace(info, x2, y2, w, h, scaleMode);
-      } else if (ActorGraphicMode === 1) {
-        const bottom = y + height + ActorY;
-        this.drawPartyCharacters(info, x2, bottom - 8);
-      } else if (ActorGraphicMode === 3) {
-        const bottom = y + height + ActorY;
-        this.drawPartySvActors(info, x2, bottom - 8);
-      }
-    }
-    this._FaceOn = true;
-  };
-
-  Window_SavefileList.prototype.drawContents = function(info, rect) {
-    const width = Math.floor(rect.width / this.maxContentsCols()) - this.colSpacing();
-    this.drawSnapBitmap(info, rect.x + SaveSnapX, rect.y + SaveSnapY);
-    this.drawActors(info, rect.x, rect.y, rect.width, rect.height);
-    this.drawContentsData(info, rect.x + ContentsX, rect.y, rect.width, rect.height);
-    this.drawAnyName(info, rect.x + AnyNameX, rect.y + AnyNameY, rect.width);
-  };
-
-  Window_SavefileList.prototype.drawContentsData = function(info, x, y, width) {
-    const CWidth = (_ContentsWidth > 0 ? _ContentsWidth : width);
-    width = Math.min(CWidth, width - ContentsX);
-    const itemWidth = this.itemContentsWidth(width);
-    const list = ContentsList;
-    const lineHeight = ContentsFontSizeMainFontSize + 4;
+  Window_SavefileList.prototype.drawContents = function(info, rect, savefileId) {
+    const lineHeight = this.lineHeight();
     const colSpacing = this.colSpacing();
-    y += MainFontSizeMainFontSize + 4;
-    for (const data of list) {
-      const x_Position = data.X_Position;
-      const position = Math.min(x_Position, this.maxContentsCols());
-      const contentsX = x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate;
-      const contentsY = y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate;
-      width2 = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : this.widthMode(data.WideMode, itemWidth);
-      this.drawContentsBase(info, contentsX, contentsY, width2 - colSpacing / 2, data);
-    }
+    const itemWidth = this.itemContentsWidth(rect.width);
+    ContentsList.forEach((data, r) => {
+      this.resetFontSettings();
+      const position = Math.min(data.X_Position, this.maxContentsCols());
+      const x = rect.x + data.X_Coordinate + (itemWidth + colSpacing) * (position - 1);
+      const y = rect.y + data.Y_Coordinate + lineHeight * (data.Y_Position - 1);
+      const width = Math.min((data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : this.widthMode(data.WideMode, itemWidth)) - colSpacing / 2, rect.width - x);
+      if (info) {
+        this.drawContentsBase(info, x, y, width, data, savefileId, r);
+      } else {
+        this.drawContentsNotData(info, x, y, width, data, savefileId, r);
+      }
+      
+    });
   };
 
   Window_SavefileList.prototype.widthMode = function(mode, width) {
@@ -1020,10 +956,10 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Window_SavefileList.prototype.itemContentsWidth = function(width) {
-    return Math.floor(width / 2) - this.colSpacing();
+    return Math.floor(width / this.maxContentsCols()) - this.colSpacing();
   };
 
-  Window_SavefileList.prototype.drawContentsBase = function(info, x, y, width, data) {
+  Window_SavefileList.prototype.drawContentsBase = function(info, x, y, width, data, savefileId, r) {
     switch (data.DateSelect) {
       case 0:
         break;
@@ -1040,42 +976,217 @@ Imported.NUUN_SaveScreen = true;
         this.drawGold(info, x, y, width, data);
         break;
       case 5:
-        this.drawOriginal(info, x, y, width, data);
+        this.drawOriginal(info, x, y, width, data, r);
+        break;
+      case 10:
+        this.drawTitle(info, x, y, width, data, savefileId);
+        break;
+      case 11:
+        this.drawTitleName(info, x, y, width, data);
+        break;
+      case 12:
+        this.drawAnyName(info, x, y, width, data);
+        break;
+      case 13:
+        this.drawDestination(info, x, y, width, data);
+        break;
+      case 20:
+        this.drawActorName(info, x, y, width, data);
+        break;
+      case 21:
+        this.drawActorClass(info, x, y, width, data);
+        break;
+      case 22:
+        this.drawActorNickName(info, x, y, width, data);
+        break;
+      case 23:
+        this.drawActorLeval(info, x, y, width, data);
+        break;
+      case 50:
+        this.drawCharacters(info, x, y, width, data);
+        break;
+      case 51:
+        this.drawFaceActors(info, x, y, width, data);
+        break;
+      case 52:
+        this.drawSvActors(info, x, y, width, data);
+        break;
+      case 90:
+        this.drawSnapBitmap(info, x, y, width, data);
         break;
       case 100:
-        this.horzLine(info, x, y, width, data);
+        this.horzLine(info, x, y, width, data);;
         break;
     }
   };
 
-  const _Window_SavefileList_drawPartyCharacters = Window_SavefileList.prototype.drawPartyCharacters;
-  Window_SavefileList.prototype.drawPartyCharacters = function(info, x, y) {
-    _Window_SavefileList_drawPartyCharacters.call(this, info, x, y);
-    if (info.characters) {
-      this.drawPartyLeval(info, x - 21, y, 48, 0, 0);
+  Window_SavefileList.prototype.drawContentsNotData = function(info, x, y, width, data, savefileId, r) {
+    switch (data.DateSelect) {
+      case 10:
+        this.drawTitle(info, x, y, width, data, savefileId);
+        break;
+      case 14:
+        this.drawNotFileText(info, x, y, width, data, savefileId);
+        break;
     }
   };
 
-  Window_SavefileList.prototype.drawPartySvActors = function(info, x, y) {
-    if (info.svActor) {
-      let characterX = x;
-      for (const data of info.svActor) {
-          this.drawSvActor(data[0], characterX, y);
-          characterX += 64;
+  Window_SavefileList.prototype.drawNotFileText = function(info, x, y, width, data) {
+    if (savefileId <= 0) {
+      this.drawTextEx(info.AnyName, x, y, width);
+    }
+  };
+
+  Window_SavefileList.prototype.drawPlaytime = function(info, x, y, width, data) {
+    const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
+    const padding = this.itemPadding();
+    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+    this.drawSystemText(x, y , systemWidth, data);
+    if (info.playtime) {
+      this.drawText(info.playtime, x + systemWidth + padding, y, width - (systemWidth + padding), data.Align);
+    }
+  };
+
+  Window_SavefileList.prototype.drawDayTime = function(info, x, y, width, data) {
+    const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
+    const padding = this.itemPadding();
+    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+    this.drawSystemText(x, y , systemWidth, data);
+    if (info.timestamp) {
+      const _dayTime = new Date(info.timestamp);
+      const format = _dayTime.toLocaleString(eval(DayTime));
+      this.drawText(format, x + systemWidth + padding, y, width - (systemWidth + padding), data.Align);
+    }
+  };
+
+  Window_SavefileList.prototype.drawMapName = function(info, x, y, width, data) {
+    const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
+    const padding = this.itemPadding();
+    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+    this.drawSystemText(x, y , systemWidth, data);
+    if (info.mapname) {
+      this.drawText(info.mapname, x + systemWidth + padding, y, width - (systemWidth + padding), data.Align);
+    }
+  };
+
+  Window_SavefileList.prototype.drawGold = function(info, x, y, width, data) {
+    const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
+    const padding = this.itemPadding();
+    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+    this.drawSystemText(x, y , systemWidth, data);
+    if (info.gold !== undefined) {
+      const unit = TextManager.currencyUnit;
+      this.drawCurrencyValue(info.gold, unit, x, y, width)
+    }
+  };
+
+  Window_SavefileList.prototype.drawOriginal = function(info, x, y, width, data, index) {
+    const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
+    const padding = this.itemPadding();
+    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+    this.drawSystemText(x, y , systemWidth, data);
+    const text = info["orgParam_"+ String(index)];
+    if (text) {
+      this.drawText(text, x + systemWidth + padding, y, width - (systemWidth + padding), data.Align);
+    }
+  };
+
+  const _Window_SavefileList_drawTitle = Window_SavefileList.prototype.drawTitle;
+  Window_SavefileList.prototype.drawTitle = function(info, x, y, width, data, savefileId) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+    _Window_SavefileList_drawTitle.call(this, savefileId, x, y);
+  };
+
+  Window_SavefileList.prototype.drawTitleName = function(info, x, y, width, data) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+    this.drawText(info.title, x, y, width);
+  };
+
+  Window_SavefileList.prototype.drawAnyName = function(info, x, y, width, data) {
+    if (info.AnyName) {
+      this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+      this.resetTextColor();
+      if (data.Align === 'TextEx') {
+        this.drawTextEx(info.AnyName, x, y, width);
+      } else {
+        this.drawText(info.AnyName , x, y, width, data.Align);
       }
-      this.drawPartyLeval(info, x, y, 64, 0, 0);
     }
   };
 
-  Window_SavefileList.prototype.drawPartyFace = function(info, x, y, width, height, scaleMode) {
+  Window_SavefileList.prototype.drawDestination = function(info, x, y, width, data) {
+    if (info.destinationName) {
+      this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+      this.resetTextColor();
+      if (data.Align === 'TextEx') {
+        this.drawTextEx(info.destinationName, x, y, width);
+      } else {
+        this.drawText(info.destinationName , x, y, width, data.Align);
+      }
+    }
+  };
+
+  Window_SavefileList.prototype.drawCharacters = function(info, x, y, width, data) {
+    const rect = this.itemRectWithPadding(0);
+    const bottom = y + rect.height;
+    if (CharacterSpecifyActorOnry) {
+      this.drawSpecifyActorOnryCharacter(info, x + 24, bottom - 8);
+    } else {
+      this.drawPartyCharacters(info, x + 24, bottom - 8);
+    }
+  };
+
+  Window_SavefileList.prototype.drawFaceActors = function(info, x, y, width, data) {
     if (info.faces) {
-        let characterX = x;
-        const faceWidth = this._scaleMode === 1 ? this._maxHeight : Math.floor(width * FaceScale / 100);
+      const colSpacing = this.colSpacing();
+      width += colSpacing / 2;
+      if (FaceSpecifyActorOnry) {
+        const data = info.faces[0];
+        this.drawFace(data[0], data[1], x, y, FaceWidth, FaceHeight);
+      } else {
+        let faceX = x;
         for (const data of info.faces) {
-          this.drawFace(data[0], data[1], characterX, y, width, height, scaleMode);
-          characterX += faceWidth;
+          this.drawFace(data[0], data[1], faceX, y, FaceWidth, FaceHeight);
+          faceX += FaceWidth;
         }
-        this.drawPartyLeval(info, x + 8, y, faceWidth, height, 1);
+      }
+    }
+  };
+
+  Window_SavefileList.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
+    const rect = this.itemRectWithPadding(0);
+    const scale = FaceScale / 100;
+    const scale2 = 100 / (100 * scale);
+    width = width || ImageManager.faceWidth;
+    height = Math.min((height || ImageManager.faceHeight), (rect.height - 2) * scale2);
+    const bitmap = ImageManager.loadFace(faceName);
+    const pw = ImageManager.faceWidth;
+    const ph = ImageManager.faceHeight;
+    const sw = Math.min(width, pw);
+    const sh = Math.min(height, ph);
+    const dx = Math.floor(x + Math.max(width - pw, 0) / 2);
+    const dy = Math.floor(y + Math.max(height - ph, 0) / 2);
+    const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+    const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+    const dw = Math.floor(sw * scale);
+    const dh = Math.floor(sh * scale);
+    this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
+  };
+
+  Window_SavefileList.prototype.drawSvActors = function(info, x, y, width) {
+    if (info.svActor) {
+      const colSpacing = this.colSpacing();
+      width += colSpacing / 2;
+      if (SvSpecifyActorOnry) {
+        const data = info.svActor[0];
+        this.drawSvActor(data, characterX, y);
+      } else {
+        let svX = x;
+        for (const data of info.svActor) {
+          this.drawSvActor(data[0], svX, y);
+          svX += width;
+        }
+      }
     }
   };
 
@@ -1087,142 +1198,114 @@ Imported.NUUN_SaveScreen = true;
       const ph = Math.floor(bitmap.height / 6);
       const sx = Math.floor(motionIndex / 6) * 3;
       const sy = motionIndex % 6;
-      this.contents.blt(bitmap, sx, sy, pw, ph, x, y - ph);
+      this.contents.blt(bitmap, sx, sy, pw, ph, x, y);
     }
   };
 
-  Window_SavefileList.prototype.drawPartyLeval = function(info, x, y, width, height, mode) {
-    this.contents.fontSize = mode === 0 ? 16 : ContentsFontSizeMainFontSize;
-    if (info.levelActor && LevelPosition > 0) {
-      let levelActorX = x;
-      let textWidth = width;
-      let y2 = y;
-      if (mode === 0) {
-        y2 = y2 - (LevelPosition === 2 ? Math.min(84 - MainFontSizeMainFontSize, 60) : 24);
-        textWidth -= 6;
+  Window_SavefileList.prototype.drawActorName = function(info, x, y, width, data) {
+    if (info.actorName) {
+      const colSpacing = this.colSpacing();
+      width += colSpacing / 2;
+      this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+      this.resetTextColor();
+      if (NameSpecifyActorOnry) {
+        const name = info.actorName[0];
+        this.drawText(name , x, y, width, data.Align);
       } else {
-        if (LevelPosition === 2) {
-          y2 += Math.max(MainFontSizeMainFontSize - ActorY, 0) - 4;
-        } else {
-          y2 += this._maxHeight - ContentsFontSizeMainFontSize - 12 - ActorY;
+        let nameX = x;
+        for (const name of info.actorName) {
+          this.drawText(name , nameX, y, width, data.Align);
+          nameX += width;
         }
-        textWidth = Math.max(width / 2, 72) - 8;
-      }
-      y2 += LevalY;
-      for (const data of info.levelActor) {
-        this.changeTextColor(ColorManager.systemColor());
-        this.drawText(TextManager.levelA, levelActorX, y2, textWidth);
-        this.resetTextColor();
-        this.drawText(data, levelActorX, y2, textWidth, "right");
-        levelActorX += width;
       }
     }
-    this.resetFontSettings();
   };
 
-  Window_SavefileList.prototype.drawSnapBitmap = function(info, x, y) {
+  Window_SavefileList.prototype.drawActorClass = function(info, x, y, width, data) {
+    if (info.actorClass) {
+      const colSpacing = this.colSpacing();
+      width += colSpacing / 2;
+      this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+      this.resetTextColor();
+      if (ClassSpecifyActorOnry) {
+        const name = info.actorClasse[0];
+        this.drawText(name , x, y, width, data.Align);
+      } else {
+        let nameX = x;
+        for (const name of info.actorClass) {
+          this.drawText(name , nameX, y, width, data.Align);
+          nameX += width;
+        }
+      }
+    }
+  };
+
+  Window_SavefileList.prototype.drawActorNickName = function(info, x, y, width, data) {
+    if (info.actorNickName) {
+      const colSpacing = this.colSpacing();
+      width += colSpacing / 2;
+      this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+      this.resetTextColor();
+      if (NickNameSpecifyActorOnry) {
+        const name = info.actorNickName[0];
+        this.drawText(name , x, y, width, data.Align);
+      } else {
+        let nameX = x;
+        for (const name of info.actorNickName) {
+          this.drawText(name , nameX, y, width, data.Align);
+          nameX += width;
+        }
+      }
+    }
+  };
+
+  Window_SavefileList.prototype.drawActorLeval = function(info, x, y, width, data) {
+    if (info.levelActor) {
+      this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+      const textWidth = this.textWidth(TextManager.levelA);
+      const padding = this.itemPadding();
+      const colSpacing = this.colSpacing();
+      width += colSpacing / 2;
+      if (LevelSpecifyActorOnry) {
+        this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+        this.drawText(TextManager.levelA, x, y, textWidth);
+        this.resetTextColor();
+        this.resetTextColor();
+        this.drawText(data, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+      } else {
+        let levelActorX = x;
+        for (const name of info.levelActor) {
+          this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+          this.drawText(TextManager.levelA, levelActorX + padding / 4, y, textWidth);
+          this.resetTextColor();
+          this.resetTextColor();
+          this.drawText(name, levelActorX + textWidth + padding , y, width - (textWidth + padding), data.Align);
+          levelActorX += width;
+        }
+      }
+    }
+  };
+
+  Window_SavefileList.prototype.drawSpecifyActorOnryCharacter = function(info, x, y) {
+    if (info.characters) {
+      const data = info.characters[0];
+      this.drawCharacter(data[0], data[1], x, y);
+    }
+  };
+
+  Window_SavefileList.prototype.drawSnapBitmap = function(info, x, y, width, data) {
     if (info.snap) {
       const bitmap = ImageManager.loadSaveSnapBitmap(info.snap);
       this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y);
     }
   };
 
-  Window_SavefileList.prototype.drawAnyName = function(info, x, y, width) {
-    this.contents.fontSize = MainFontSizeMainFontSize;
-    this.resetTextColor();
-    const anyName = eval(AnyNameEval);
-    if (anyName) {
-      width = AnyNameWidth > 0 ? Math.min(AnyNameWidth, width - x) : width - x;
-      if (AnyNameMode) {
-        this.drawTextEx(anyName, x, y, width);
-      } else {
-        this.drawText(anyName , x, y, width, AnyNameAlign);
-      }
+  Window_SavefileList.prototype.drawSystemText = function(x, y, width, data) {
+    if (data.ParamName) {
+      this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+      this.drawText(data.ParamName || '', x, y, width);
+      this.resetTextColor();
     }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-  };
-
-  const _Window_SavefileList_drawPlaytime = Window_SavefileList.prototype.drawPlaytime;
-  Window_SavefileList.prototype.drawPlaytime = function(info, x, y, width, data) {
-    const text = data.ParamName || 'プレイ時間';
-    const textWidth = this.systemWidth(data.SystemItemWidth, width);
-    this.contents.fontSize = ContentsFontSizeMainFontSize;
-    this.changeTextColor(getColorCode(data.NameColor));
-    this.drawText(text, x, y, textWidth);
-    this.resetTextColor();
-    _Window_SavefileList_drawPlaytime.call(this, info, x + textWidth, y, width - textWidth);
-    this.contents.fontSize = $gameSystem.mainFontSize();
-  };
-
-  Window_SavefileList.prototype.drawDayTime = function(info, x, y, width, data) {
-    this.resetTextColor();
-    if (info.timestamp) {
-      this.contents.fontSize = ContentsFontSizeMainFontSize;
-      const _dayTime = new Date(info.timestamp);
-      const format = _dayTime.toLocaleString(eval(DayTime));
-      this.drawText(format, x, y, width, "right");
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-  };
-
-  Window_SavefileList.prototype.drawMapName = function(info, x, y, width, data) {
-    const text = data.ParamName || '現在地';
-    const textWidth = this.systemWidth(data.SystemItemWidth, width);
-    this.contents.fontSize = ContentsFontSizeMainFontSize;
-    this.changeTextColor(getColorCode(data.NameColor));
-    this.drawText(text, x, y, textWidth);
-    this.resetTextColor();
-    if (info.mapname) {
-      this.drawText(info.mapname, x + textWidth, y, width - textWidth, "right");
-    }
-  };
-
-  Window_SavefileList.prototype.drawGold = function(info, x, y, width, data) {
-    const text = data.ParamName || '所持金';
-    const textWidth = this.systemWidth(data.SystemItemWidth, width);
-    this.contents.fontSize = ContentsFontSizeMainFontSize;
-    this.changeTextColor(getColorCode(data.NameColor));
-    this.drawText(text, x, y, textWidth);
-    this.resetTextColor();
-    if (info.gold !== undefined) {
-      const unit = TextManager.currencyUnit;
-      this.drawCurrencyValue(info.gold, unit, x + textWidth, y, width - textWidth)
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-  };
-
-  Window_SavefileList.prototype.drawOriginal = function(info, x, y, width, data) {
-    const text = data.ParamName;
-    let textWidth = 0;
-    this.contents.fontSize = ContentsFontSizeMainFontSize;
-    if (text) {
-      textWidth = this.systemWidth(data.SystemItemWidth, width);
-      this.changeTextColor(getColorCode(data.NameColor));
-      this.drawText(text, x, y, textWidth);
-    }
-    this.resetTextColor();
-    if (data.DetaEval) {
-      this.drawText(eval(data.DetaEval), x + textWidth, y, width - textWidth, "right");
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-  };
-
-  Window_SavefileList.prototype.drawFace = function(faceName, faceIndex, x, y, width, height, scaleMode) {
-    width = width || ImageManager.faceWidth;
-    height = height || ImageManager.faceHeight;
-    const scale = FaceScale / 100;
-    const bitmap = ImageManager.loadFace(faceName);
-    const pw = ImageManager.faceWidth;
-    const ph = ImageManager.faceHeight;
-    const sw = Math.min(width, pw);
-    const sh = Math.min(height, ph);
-    const dx = Math.floor(x + Math.max(width - pw, 0) / 2);
-    const dy = Math.floor(y + Math.max(height - ph, 0) / 2);
-    const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
-    const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
-    const dw = scaleMode === 1 ? this._maxHeight : Math.floor(sw * scale);
-    const dh = scaleMode === 1 ? this._maxHeight : Math.floor(sh * scale);
-    this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
   };
 
   Window_SavefileList.prototype.systemWidth = function(swidth, width) {
@@ -1255,22 +1338,82 @@ Imported.NUUN_SaveScreen = true;
     this.saveContentsBuckgroundImg = img ? img : ContentsBackGroundImg;
   };
 
+  const _Game_Party_initialize = Game_Party.prototype.initialize;
+  Game_Party.prototype.initialize = function() {
+    _Game_Party_initialize.call(this);
+    this._saveFileSpecifyActorOnry = 0;
+  };
+
+  Game_Party.prototype.setSaveFileSpecifyActorOnry = function(id) {
+    this._saveFileSpecifyActorOnry = id;
+  };
+
+  Game_Party.prototype.getSaveFileSpecifyActorOnry = function() {
+    return this._saveFileSpecifyActorOnry;
+  };
+
+  const _Game_Party_charactersForSavefile = Game_Party.prototype.charactersForSavefile;
+  Game_Party.prototype.charactersForSavefile = function() {
+    if (PartyActorMode === 1) {
+      return _Game_Party_charactersForSavefile.call(this);
+    } else if (PartyActorMode === 2) {
+      return this.members().map(actor => [
+        actor.characterName(),
+        actor.characterIndex()
+      ]);
+    }
+  };
+
+  const _Game_Party_facesForSavefile = Game_Party.prototype.facesForSavefile;
+  Game_Party.prototype.facesForSavefile = function() {
+    if (PartyActorMode === 1) {
+      return _Game_Party_facesForSavefile.call(this);
+    } else if (PartyActorMode === 2) {
+      return this.members().map(actor => [
+        actor.faceName(),
+        actor.faceIndex()
+      ]);
+    }
+  };
+
   Game_Party.prototype.actorLevelForSavefile = function() {
-    return this.battleMembers().map(actor => [
-        actor._level
-    ]);
+    if (PartyActorMode === 1) {
+      return this.battleMembers().map(actor => actor._level);
+    } else if (PartyActorMode === 2) {
+      return this.members().map(actor => actor._level);
+    }
+  };
+
+  Game_Party.prototype.actorNameForSavefile = function() {
+    if (PartyActorMode === 1) {
+      return this.battleMembers().map(actor => actor.name());
+    } else if (PartyActorMode === 2) {
+      return this.members().map(actor => actor.name());
+    }
   };
 
   Game_Party.prototype.svActorForSavefile = function() {
-    return this.battleMembers().map(actor => [
-        actor.battlerName()
-    ]);
+    if (PartyActorMode === 1) {
+      return this.battleMembers().map(actor => [actor.battlerName()]);
+    } else if (PartyActorMode === 2) {
+      return this.members().map(actor => [actor.battlerName()]);
+    }
   };
 
-  function getColorCode(color) {
-    if (typeof(color) === "string") {
-      return color;
+  Game_Party.prototype.actorClassForSavefile = function() {
+    if (PartyActorMode === 1) {
+      return this.battleMembers().map(actor => actor.currentClass().name);
+    } else if (PartyActorMode === 2) {
+      return this.members().map(actor => actor.currentClass().name);
     }
-    return ColorManager.textColor(color);
   };
+
+  Game_Party.prototype.actorNickNameForSavefile = function() {
+    if (PartyActorMode === 1) {
+      return this.battleMembers().map(actor => actor.nickname());
+    } else if (PartyActorMode === 2) {
+      return this.members().map(actor => actor.nickname());
+    }
+  };
+
 })();

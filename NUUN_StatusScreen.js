@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.4.2
+ * @version 2.4.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -115,6 +115,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/9/23 Ver.2.4.3
+ * 一部プラグインの競合対策。
  * 2022/8/22 Ver.2.4.2
  * 制御文字でフォントサイズ変更をした後に、項目のフォントのサイズが変化してしまう問題を修正。
  * 2022/7/26 Ver.2.4.1
@@ -1371,14 +1373,19 @@ Scene_Status.prototype.createStatusEquipWindow = function() {
 Scene_Status.prototype.createStatusButton = function() {
   if(this.maxPage() > 1 && ConfigManager.touchUI) {
     this._statusupButton = new Sprite_Button("up");
-    this._statusupButton.x = this.arePageButtonsEnabled() ? 24 + this._pageupButton.width + this._pagedownButton.width : 0;
-    this._statusupButton.y = this.buttonY();
-    const statusupRight = this._statusupButton.x + this._statusupButton.width;
     this._statusdownButton = new Sprite_Button("down");
-    this._statusdownButton.x = statusupRight + 4;
-    this._statusdownButton.y = this.buttonY();
     this.addWindow(this._statusupButton);
     this.addWindow(this._statusdownButton);
+    if (this.arePageButtonsEnabled() && this._pageupButton.x > Graphics.width / 2) {
+      this._pageupButton.x -= 40 + this._pageupButton.width + this._pagedownButton.width;
+      this._pagedownButton.x -= 40 + this._pageupButton.width + this._pagedownButton.width;
+    }
+    const y = this.buttonY();
+    this._statusupButton.x = this._pageupButton.x + (this.arePageButtonsEnabled() ? 24 + this._pageupButton.width + this._pagedownButton.width : 0);
+    const statusupRight = this._statusupButton.x + this._statusupButton.width;
+    this._statusdownButton.x = statusupRight + 4;
+    this._statusupButton.y = y;
+    this._statusdownButton.y = y;
     this._statusupButton.setClickHandler(this.updateStatusPageup.bind(this));
     this._statusdownButton.setClickHandler(this.updateStatusPagedown.bind(this));
   }

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  キャストタイム（詠唱）キャンセルスキル、アイテム
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * キャスト（詠唱）中のスキルをキャンセルさせるスキル、アイテムを設定できます。
@@ -31,8 +31,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/1 Ver.1.1.1
+ * キャンセル成功時にポップアップが表示されない問題を修正。
  * 2021/1/16 Ver.1.1.0
- * キャンセル時のチャージタイムを０からチャージするか、キャンセル時のキャストタイムの割合から溜めさせるかチャージを指定できる機能を追加。
+ * キャンセル時のチャージタイムを0からチャージするか、キャンセル時のキャストタイムの割合から溜めさせるかチャージを指定できる機能を追加。
  * 2021/1/11 Ver.1.0.0
  * 初版
  * 
@@ -100,7 +102,7 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
     if (rate > 0) {
       if (this.cancelCastTimeRate(rate, target) && target._tpbState === "casting") {
         const tpb_rate = target._tpbCastTime / target.tpbRequiredCastTime();
-        BattleManager.endBattlerActions(target);
+        target.clearTpbChargeTime();
         target.clearActions();
         if (CancelTpbChargeRate) {
           target.setTpbChargeTime_CancelCastTime(tpb_rate);

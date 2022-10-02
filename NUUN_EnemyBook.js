@@ -156,10 +156,10 @@
  * this._enemy.meta メタタグを取得します。
  * enemyまたはGame_Enemyのデータを取得します。
  * 
- * スティールアイテムを有効にするには
- * 条件付きアイテムを有効にするには
- * レーダーチャートを有効にするには
- * ステート、属性、バフ耐性マスク機能を有効にするには
+ * スティールアイテムを有効にするにはNUUN_StealableItemsが必要です。
+ * 条件付きアイテムを有効にするにはNUUN_EnemyBookEX_2及びNUUN_ConditionalDropsがが必要です。
+ * レーダーチャートを有効にするにはNUUN_RadarChartBaseが必要です。
+ * ステート、属性、バフ耐性マスク機能を有効にするにはNUUN_EnemyBookEX_1が必要です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -2187,7 +2187,7 @@
  * @parent BasicSetting
  * 
  * @param WideMode
- * @desc 項目表示モード。複数行にまたがって表示されます。
+ * @desc 項目表示モード。複数列にまたがって表示されます。
  * @text 項目表示モード(7)
  * @type select
  * @option １列表示
@@ -2215,7 +2215,7 @@
  * @parent BasicSetting
  * 
  * @param DetaEval
- * @desc パラメータ評価式または文字列を設定します。de：モンスターのデータベースデータ　ge：モンスターのゲームデータ
+ * @desc パラメータ評価式または文字列を設定します。
  * @text パラメータ評価式or文字列(10)
  * @type combo
  * @option '$gameVariables.value(0);//ゲーム変数'

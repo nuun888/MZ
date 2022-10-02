@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.14.0
+# Ver.2.14.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -220,6 +220,10 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2022/10/2 Ver.2.14.1  
+項目横幅指定時に図鑑を開くとエラーが出る問題を修正。  
+文字揃えのrightが間違っていたので修正。  
+プリセット再修正  
 2022/10/2 Ver.2.14.0  
 図鑑登録時の設定の仕様を変更。  
 ドロップアイテム、スティールアイテム、条件付きアイテム、敵のスキル、属性耐性、ステート耐性の列指定の仕様変更。  

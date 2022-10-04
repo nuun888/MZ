@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.14.1
+ * @version 2.14.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -59,10 +59,12 @@
  * モンスター個別画像はモンスター毎に異なる任意の画像を表示させるための機能です。モンスター画像を表示させる場合はモンスター画像で表示させてください。
  * 
  * モンスターの図鑑登録
- * <NoBook>
+ * <NoBook>(図鑑登録なしタグデフォルト)
  * モンスター図鑑に登録(表示)されません。
- * <NoBookData>
+ * プラグインパラメータの図鑑登録なしタグで任意のタグ名を設定できます。旧バージョンのタグ名のまま使用したい場合は図鑑登録なしタグ2とタグ名を入れ替えてください。
+ * <NoBookData>(図鑑登録なしタグ2デフォルト)
  * モンスター図鑑に登録(表示)されませんが、敵の情報、アナライズのみ表示されます。
+ * プラグインパラメータの図鑑登録なしタグ2で任意のタグ名を設定できます。
  * <ShowDataBook>
  * 未撃破でも撃破済みと判定されます。また情報がすべて表示されます。
  * <AnalyzeResist:50> アナライズの抵抗値を設定します。この場合５０％の確率でアナライズが成功します。
@@ -165,6 +167,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/4 Ver.2.14.2
+ * 図鑑に表示するタグを任意の名前に設定できる機能を追加。
  * 2022/10/2 Ver.2.14.1
  * 項目横幅指定時に図鑑を開くとエラーが出る問題を修正。
  * 文字揃えのrightが間違っていたので修正。
@@ -434,6 +438,20 @@
  * @text 登録しない名前
  * @type string
  * @default 
+ * @parent BasicSetting
+ * 
+ * @param NoBookTag
+ * @desc 図鑑に登録しないタグ名。
+ * @text 図鑑登録なしタグ
+ * @type string
+ * @default NoBook
+ * @parent BasicSetting
+ * 
+ * @param NoBookDataTag
+ * @desc 図鑑に登録しないタグ名。敵の情報、アナライズ時は表示されます。
+ * @text 図鑑登録なしタグ2
+ * @type string
+ * @default NoBookData
  * @parent BasicSetting
  * 
  * @param DecimalMode
@@ -2545,6 +2563,8 @@ const NoDataName = String(parameters['NoDataName']);
 const TransformDefeat = eval(parameters['TransformDefeat'] || 'true');
 const BackUiWidth = eval(parameters['BackUiWidth'] || 'true');
 const BackFitWidth = eval(parameters['BackFitWidth'] || 'false');
+const NoBookTag = String(parameters['NoBookTag']) || 'NoBook';
+const NoBookDataTag = String(parameters['NoBookDataTag']) || 'NoBookData';
 
 const RegistrationTiming = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['RegistrationTiming'])) : [];
 const RegistrationEnemyColor = (DataManager.nuun_structureData(parameters['RegistrationEnemyColor'])) || 0;
@@ -3040,11 +3060,11 @@ Game_System.prototype.completeRate = function() {
 };
 
 Game_System.prototype.isEnemyBook = function(enemy) {//データベース
-  return enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && !enemy.meta.NoBook && !enemy.meta.NoBookData;
+  return enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && !enemy.meta[NoBookTag] && !enemy.meta[NoBookDataTag];
 };
 
 Game_System.prototype.isEnemyBookData = function(enemy) {//データベース
-    return enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && !enemy.meta.NoBook;
+    return enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && !enemy.meta[NoBookTag];
 };
 
 Game_System.prototype.bookEnemyDate = function() {
@@ -3082,7 +3102,7 @@ Game_System.prototype.defeatNumber = function(enemyId) {
 Game_System.prototype.setDefeatEnemy = function(enemyList) {
   const enemy = enemyList ? enemyList : $dataEnemies;
   this._defeatEnemy = enemy.reduce((r, enemy) => {
-    return r + (enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && (this.defeatNumber(enemy.id) > 0 || enemy.meta.ShowDataBook && !enemy.meta.NoBook && !enemy.meta.NoBookData) ? 1 : 0);
+    return r + (enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && (this.defeatNumber(enemy.id) > 0 || enemy.meta.ShowDataBook && !enemy.meta[NoBookTag] && !enemy.meta[NoBookDataTag]) ? 1 : 0);
   }, 0);
 };
 
@@ -5073,7 +5093,7 @@ Window_EnemyBook_InfoIndex.prototype.drawItem = function(index) {
         let name = '';
         let iconId = 0;
         if (RegistrationEnemyInfo) {
-            if ($gameSystem.isInEnemyBook(enemy) || !!enemy.meta.NoBookData) {
+            if ($gameSystem.isInEnemyBook(enemy) || !!enemy.meta[NoBookDataTag]) {
                 name = enemy.name;
                 iconId = enemy.meta.EnemyIcon ? Number(enemy.meta.EnemyIcon) : 0;
             } else {
@@ -6738,7 +6758,7 @@ Window_BattleEnemyBook.prototype.statusGaugeMode = function() {
 
 Window_BattleEnemyBook.prototype.noUnknownStatus = function(enemy) {
     if (this._mode === 'info' || this._mode === 'analyze') {
-        return this._enemy.meta.ShowDataBook || this._enemy.meta.NoBookData;
+        return this._enemy.meta.ShowDataBook || this._enemy.meta[NoBookDataTag];
     } else {
         return this._enemy.meta.ShowDataBook;
     }

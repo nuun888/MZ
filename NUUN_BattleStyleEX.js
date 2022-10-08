@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.4
+ * @version 3.7.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/10/9 Ver.1.7.5
+ * タイプ4追加による処理追加。
+ * 戦闘開始時にウィンドウが移動しないように修正。
  * 2022/9/17 Ver.1.7.4
  * 敵対象選択画面のモンスター名の表示をアクター名と同じ仕様にする機能を追加。
  * 2022/9/10 Ver.3.7.3
@@ -169,6 +172,7 @@ Imported.NUUN_BattleStyleEX = true;
 const parameters = PluginManager.parameters('NUUN_BattleStyleEX');
 const params = NuunManager.getBattleStyleParams();
 let statusData = null;
+let bsRect = null
 
 const pluginName = "NUUN_BattleStyleEX";
 
@@ -253,6 +257,7 @@ BattleManager.initMembers = function() {
   this.battlerSprite = [];
   this.visibleStateIcons = [];
   this.notIconList = this.getNotVisibleIcons();
+  this.onBSStartBattle = !params.ActorStatusWindowLock;
   Array.prototype.push.apply(this.notIconList , this.getNotVisibleBuffIcons());
 };
 
@@ -1086,6 +1091,17 @@ Scene_Battle.prototype.updateStatusWindowPosition = function() {
         const statusWindowX = this._statusWindow.x;
         const targetX = this.statusWindowX();
         const battleEffects = this._battleEffects;
+        if (BattleManager.onBSStartBattle && statusWindowX === targetX) {
+          BattleManager.onBSStartBattle = false;
+        } else if (BattleManager.onBSStartBattle) {
+          this._statusWindow.x = this._partyCommandWindow.width / 2 + (Graphics.width - Graphics.boxWidth) / 2;
+          this._actorImges.x = this._statusWindow.x;
+          this._actorStatus.x = this._statusWindow.x;
+          if (this._backgroundWindow) {
+            this._backgroundWindow.x = this._statusWindow.x;
+          }
+          return;
+        }
         _Scene_Battle_updateStatusWindowPosition.call(this);
         if (statusWindowX < targetX) {
             if (!$gameSystem.isSideView() && battleEffects) {
@@ -1589,9 +1605,26 @@ Window_BattleStatus.prototype.rowSpacing = function() {
 };
 
 Window_BattleStatus.prototype.itemRect = function(index) {
-    let rect = Window_Selectable.prototype.itemRect.call(this, index);
+    let rect = params.ActorStatusMode === 'triangle' ? this.triangleRect(index) : Window_Selectable.prototype.itemRect.call(this, index);
     rect = this.statusPosition(index, rect);
     return rect;
+};
+
+Window_Selectable.prototype.triangleRect = function(index) {
+  const maxCols = this.maxCols();
+  const topCol = this.maxItems() % maxCols;
+  const itemWidth = this.itemWidth();
+  const itemHeight = this.itemHeight();
+  const colSpacing = this.colSpacing();
+  const rowSpacing = this.rowSpacing();
+  const col = (index + (topCol > index ? 0 : maxCols - topCol)) % maxCols;
+  const shiftIndex = (params.ActorMaxRow - Math.ceil(this.maxItems() / maxCols)) * (maxCols - col);
+  const row = Math.floor(((topCol > index || topCol === 0 ? 0 : maxCols - topCol) + index + shiftIndex) / maxCols);
+  const x = col * itemWidth + colSpacing / 2 - this.scrollBaseX();
+  const y = row * itemHeight + rowSpacing / 2 - this.scrollBaseY();
+  const width = itemWidth - colSpacing;
+  const height = itemHeight - rowSpacing;
+  return new Rectangle(x, y, width, height);
 };
 
 Window_BattleStatus.prototype.faceRect = function(index) {//再定義
@@ -1647,27 +1680,43 @@ Window_BattleStatus.prototype.refreshCursor = function() {
 
 Window_BattleStatus.prototype.statusPosition = function(index, rect) {
     const itemWidth = this.itemWidth();
-    const maxCols = Math.min(this.maxItems() - (Math.floor(index / this.maxCols()) * this.maxCols()), this.maxCols(), this.maxItems());
+    let cols = this.maxCols();
+    let maxCols = 0;
+    if (params.ActorStatusMode === 'triangle') {
+      const topCol = this.maxItems() % this.maxCols();
+      cols = (topCol > index ? topCol : this.maxCols());
+      index += (topCol > index || topCol === 0 ? 0 : this.maxCols() - topCol);
+      maxCols = Math.min(cols, this.maxItems());
+    } else {
+      maxCols = Math.min(this.maxItems() - (Math.floor(index / cols) * cols), cols, this.maxItems());
+    }
     if (params.ActorStatusMode === 'center') {
         rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
     } else if (params.ActorStatusMode === 'raigt') {
         rect.x += this.width - (maxCols * itemWidth) - this.itemPadding() * 2;
     } else if (params.ActorStatusMode === 'triangle') {
-      //const topCol = this.maxItems() % maxCols;
-      //console.log(topCol)
-      if (index < topCol) {
-        rect.x += Math.floor((this.width / 2) - (itemWidth * topCol / 2)) - this.itemPadding();
-      } else {
         rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
-      }
-    } else if (params.ActorStatusMode === 'Inverted_triangle') {
-
     }
     return rect;
 };
 
 Window_BattleStatus.prototype.drawItem = function(index) {
-  
+  if (params.ActorStatusActorWindowShow) {
+    this.drawActorWindow(index);
+  }
+};
+
+Window_BattleStatus.prototype.drawActorWindow = function(index) {
+  if (params.ActorStatusActorWindowShow) {
+    const actor = this.actor(index);
+    const data = getActorPositionData(actor.actorId());
+    const key = "actor%1-window".format(actor.actorId());
+    const rect = this.itemRect(index);
+    bsRect = rect;
+    const window = this.createInnerSprite(key, Window_BSActor);
+    window.setup(actor, data);
+    window.show();
+  }
 };
 
 Window_BattleStatus.prototype.drawItemBackground = function(index) {
@@ -2043,7 +2092,6 @@ Window_BattleActorImges.prototype.setActorBaseSprite = function() {
 Window_BattleActorImges.prototype.drawItem = function(index) {
   this.drawItemImage(index);
   this.drawStatusBack(index);
-  //this.drawItemStatus(index);
 };
 
 Window_BattleActorImges.prototype.drawStatusListData = function(actor, list, index) {
@@ -2352,7 +2400,6 @@ Window_BattleEnemy.prototype.maxCols = function() {
   return params.EnemyMaxCol;
 };
 
-console.log(params.EnemyNameDyingColor)
 if (params.EnemyNameDyingColor) {
   Window_BattleEnemy.prototype.drawItem = function(index) {//再定義
     const enemy = this._enemies[index];
@@ -2412,6 +2459,53 @@ Window_Message.prototype.updateBackground = function() {
     this.opacity = 0;
   } else if (BattleManager.getDisplayMessageType() === "EscapeFailure" && params.EscapeFailureBackgroundImg) {
     this.opacity = 0;
+  }
+};
+
+function Window_BSActor() {
+  this.initialize(...arguments);
+}
+
+Window_BSActor.prototype = Object.create(Window_Base.prototype);
+Window_BSActor.prototype.constructor = Window_BSActor;
+
+Window_BSActor.prototype.initialize = function() {
+  Window_Base.prototype.initialize.call(this, bsRect);
+  this._actor = null;
+  this._data = null;
+};
+
+Window_BSActor.prototype.setup = function(actor, data, rect) {
+  this._actor = actor;
+  this._data = data;
+  this.move(rect);
+  this.setWindowSkin(data)
+};
+
+Window_BSActor.prototype.move = function() {
+  const rect = bsRect;
+  this.x = rect.x;
+  this.y = rect.y;
+  this.width = rect.width;
+  this.height = rect.height;
+};
+
+Window_BSActor.prototype.setWindowSkin = function(data) {
+  if (data.ActorWindowSkin) {
+    this.ActorWindowSkin = ImageManager.loadSystem(data.ActorWindowSkin);
+    this.windowColor = data.ActorWindowColor;
+  } else {
+    this.loadWindowskin();
+    this.windowColor = null;
+  }
+};
+
+Window_BSActor.prototype.updateTone = function() {
+  if (this.windowColor) {
+    const tone = this.windowColor;
+    this.setTone(tone.red, tone.green, tone.bule);
+  } else {
+    Window_Base.prototype.updateTone.call(this);
   }
 };
 

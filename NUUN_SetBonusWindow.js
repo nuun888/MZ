@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc セットボーナスツールチップウィンドウ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -19,6 +19,8 @@
  * 装備画面で装備スロット選択中の装備で現在適用しているセットボーナスを表示します。
  * 
  * 更新履歴
+ * 2022/10/8 Ver.1.0.2
+ * セットボーナス定義変更による修正。
  * 2022/7/16 Ver.1.0.1
  * セットボーナスがない装備をマウスオーバーするとツールチップが表示されてしまう問題を修正。
  * 2022/7/7 Ver.1.0.0
@@ -242,9 +244,9 @@ Window_SetBounsEquip.prototype.refresh = function() {
     let setBonusSum = 0;
     this.contents.fontSize = this.getFontSize();
     if (this._equip && this._equip.meta.SetBonus) {
-        const list = this._equip.meta.SetBonus.split(',').map(Number);
+        const list = this._equip.meta.SetBonus.split(',');
         list.forEach(setBonusId => {
-            const data = NuunManager.getSetBonusData(setBonusId);
+            const data = isNaN(setBonusId) ? NuunManager.getSetBonusDataName(setBonusId) : NuunManager.getSetBonusData(Number(setBonusId));
             setBonusSum = this._actor.getTotalSetBonus(data);
             const name = data.SetBonusName;
             this.changeTextColor(NuunManager.getColorCode(SetBonusNameColor));
@@ -253,20 +255,24 @@ Window_SetBounsEquip.prototype.refresh = function() {
             y += lineHeight;
             this.horzLine(rect.x, y, rect.width);
             data.SetBonusNumberEquipment.forEach(numberEquip => {
-                if (setBonusSum >= numberEquip.SetNumberEquip) {
+                if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
+                    y += lineHeight;
+                    contentsRows++;
+                    this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
+                } else if (!(data.SetBonusEquip && data.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
                     y += lineHeight;
                     contentsRows++;
                     this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
                 }
             });
-            if (data.SetBonusEquip.length === setBonusSum) {
+            if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && data.SetBonusEquip.length === setBonusSum) {
                 y += lineHeight;
                 contentsRows++;
                 this.drawSetBonusParam(data, rect.x, y, rect.width);
             }
+            this.height = this.fittingHeight(contentsRows + 2);
+            this._onRefresh = true;
         });
-        this.height = this.fittingHeight(contentsRows + 2);
-        this._onRefresh = true;
     }
     this.contents.fontSize = $gameSystem.mainFontSize();
 };
@@ -276,7 +282,7 @@ Window_SetBounsEquip.prototype.horzLine = function(x, y, width) {
     this.contents.paintOpacity = 48;
     this.contents.fillRect(x, lineY, width, 2, ColorManager.normalColor());
     this.contents.paintOpacity = 255;
-  };
+};
 
 Window_SetBounsEquip.prototype.drawSetBonusName = function(name, x, y, width) {
     this.drawText(name, x, y, width);

@@ -1,5 +1,5 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
-# Ver.1.4.2
+# Ver.1.4.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)
@@ -25,6 +25,8 @@ Ver.1.3.4
  サイドビューサポートアクター設定で設定がない場合、表示されません。
   
 ## 更新履歴
+2022/10/8 Ver.1.4.3  
+競合対策。  
 2022/3/30 Ver.1.4.2  
 メンバー変更画面サポートアクター適用による定義追加。  
 2022/3/29 Ver.1.4.1  

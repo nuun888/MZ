@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.4.2
+ * @version 1.4.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/8 Ver.1.4.3
+ * 競合対策。
  * 2022/3/30 Ver.1.4.2
  * メンバー変更画面サポートアクター適用による定義追加。
  * 2022/3/29 Ver.1.4.1
@@ -455,7 +457,7 @@ Imported.NUUN_SupportActor = true;
   const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
   Sprite_Actor.prototype.setActorHome = function(index) {
     this._sIndex = -1;
-    if (this._actor.getSupportActor()) {
+    if (this._actor && this._actor.getSupportActor()) {
       index = this._actor.supportActorindex();
       if (!SupportActorSV[index]) {
         return;
@@ -467,7 +469,7 @@ Imported.NUUN_SupportActor = true;
 
   const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
   Sprite_Actor.prototype.setHome = function(x, y) {
-    if (this._actor.getSupportActor() && this._sIndex >= 0) {
+    if (this._actor && this._actor.getSupportActor() && this._sIndex >= 0) {
       x += SupportActorSV[this._sIndex].SupportActorSV_X;
       y += SupportActorSV[this._sIndex].SupportActorSV_Y;
     }

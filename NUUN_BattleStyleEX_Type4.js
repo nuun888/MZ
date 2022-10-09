@@ -448,11 +448,12 @@
  * 
  * @param ActorStatusActorWindow
  * @text アクター個別ウィンドウ設定
- * @default ////////////////////////////////
+ * @default ------------------------------
+ * @parent ActorStatus
  * 
  * @param ActorStatusActorWindowShow
  * @desc アクター別のウィンドウを表示します。
- * @text アクター別ウィンドウ
+ * @text アクター別ウィンドウ表示
  * @type boolean
  * @default true
  * @parent ActorStatusActorWindow
@@ -1507,25 +1508,25 @@
 * @max 9999
 * @parent ActorImgChangePosition
 * 
-* @param ActorWindow
-* @text アクター別個別ウィンドウ設定
-* @default ------------------------------
-* 
-* @param ActorWindowSkin
-* @desc ウィンドウスキンを指定します。
-* @text ウィンドウスキン画像
-* @type file
-* @dir img/system
-* @default 
-* @parent ActorWindow
-* 
-* @param ActorWindowColor
-* @text ウィンドウカラー
-* @desc ウィンドウの色の設定をします。
-* @default {"red":"0","green":"0","bule":"0"}
-* @type struct<WindowTone>
-* @parent ActorWindow
-* 
+ * @param ActorWindow
+ * @text アクター別個別ウィンドウ設定
+ * @default ------------------------------
+ * 
+ * @param ActorWindowSkin
+ * @desc ウィンドウスキンを指定します。
+ * @text ウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent ActorWindow
+ * 
+ * @param ActorWindowColor
+ * @text ウィンドウカラー
+ * @desc ウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent ActorWindow
+ * 
 * @param ActorCommandSkin
 * @text アクターコマンドスキン設定
 * @default ------------------------------

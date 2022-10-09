@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.7.1
+ * @version 1.7.2
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -57,6 +57,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/10/9 Ver.1.7.2
+ * アクターステータスのアクター毎にウィンドウを表示する機能を追加。
  * 2022/9/17 Ver.1.7.1
  * 敵対象選択画面のモンスター名の表示をアクター名と同じ仕様にする機能を追加。
  * 2022/8/25 Ver.1.7.0
@@ -518,6 +520,18 @@
  * @value 'right'
  * @default 'center'
  * @parent ActorStatus
+ * 
+ * @param ActorStatusActorWindow
+ * @text アクター個別ウィンドウ設定
+ * @default ------------------------------
+ * @parent ActorStatus
+ * 
+ * @param ActorStatusActorWindowShow
+ * @desc アクター別のウィンドウを表示します。
+ * @text アクター別ウィンドウ表示
+ * @type boolean
+ * @default false
+ * @parent ActorStatusActorWindow
  * 
  * @param EnemyWindow
  * @text 敵キャラ選択設定
@@ -1553,6 +1567,25 @@
  * @max 9999
  * @parent ActorImgChangePosition
  * 
+ * @param ActorWindow
+ * @text アクター別個別ウィンドウ設定
+ * @default ------------------------------
+ * 
+ * @param ActorWindowSkin
+ * @desc ウィンドウスキンを指定します。
+ * @text ウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent ActorWindow
+ * 
+ * @param ActorWindowColor
+ * @text ウィンドウカラー
+ * @desc ウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent ActorWindow
+ * 
  * @param ActorCommandSkin
  * @text アクターコマンドスキン設定
  * @default ------------------------------
@@ -2382,6 +2415,7 @@ params.ActorStatusWindowLock = eval(parameters['ActorStatusWindowLock'] || "fals
 params.WindowShow = eval(parameters['WindowShow'] || "true");
 params.WindowFrameShow = eval(parameters['WindowFrameShow'] || "false");
 params.CursorBackShow = eval(parameters['CursorBackShow'] || "true");
+params.ActorStatusActorWindowShow = eval(parameters['ActorStatusActorWindowShow'] || "false");
 
 params.ActorEffectShow = eval(parameters['ActorEffectShow'] || "false");
 params.ActorEffect_X = Number(parameters['ActorEffect_X'] || 0);

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.5
+ * @version 3.7.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/10/9 Ver.1.7.6
+ * ウィンドウスキンが適用されない問題を修正。
  * 2022/10/9 Ver.1.7.5
  * タイプ4追加による処理追加。
  * 戦闘開始時にウィンドウが移動しないように修正。
@@ -2466,11 +2468,12 @@ function Window_BSActor() {
   this.initialize(...arguments);
 }
 
-Window_BSActor.prototype = Object.create(Window_Base.prototype);
+Window_BSActor.prototype = Object.create(Window_Selectable.prototype);
 Window_BSActor.prototype.constructor = Window_BSActor;
 
 Window_BSActor.prototype.initialize = function() {
-  Window_Base.prototype.initialize.call(this, bsRect);
+  this.windowSkin = ImageManager.loadSystem(params.ActorCommandWindowSkin);
+  Window_Selectable.prototype.initialize.call(this, bsRect);
   this._actor = null;
   this._data = null;
 };
@@ -2479,7 +2482,8 @@ Window_BSActor.prototype.setup = function(actor, data, rect) {
   this._actor = actor;
   this._data = data;
   this.move(rect);
-  this.setWindowSkin(data)
+  this.loadWindowskin();
+  this.setWindowTone(data);
 };
 
 Window_BSActor.prototype.move = function() {
@@ -2490,12 +2494,18 @@ Window_BSActor.prototype.move = function() {
   this.height = rect.height;
 };
 
-Window_BSActor.prototype.setWindowSkin = function(data) {
+Window_BSActor.prototype.loadWindowskin = function() {
+  if (this._data && this._data.ActorWindowSkin) {
+    this.windowskin = ImageManager.loadSystem(this._data.ActorWindowSkin);
+  } else {
+    Window_Selectable.prototype.loadWindowskin.call(this);
+  }
+};
+
+Window_BSActor.prototype.setWindowTone = function(data) {
   if (data.ActorWindowSkin) {
-    this.ActorWindowSkin = ImageManager.loadSystem(data.ActorWindowSkin);
     this.windowColor = data.ActorWindowColor;
   } else {
-    this.loadWindowskin();
     this.windowColor = null;
   }
 };
@@ -2505,7 +2515,7 @@ Window_BSActor.prototype.updateTone = function() {
     const tone = this.windowColor;
     this.setTone(tone.red, tone.green, tone.bule);
   } else {
-    Window_Base.prototype.updateTone.call(this);
+    Window_Selectable.prototype.updateTone.call(this);
   }
 };
 

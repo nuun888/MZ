@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.14.3
+# Ver.2.15.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -243,6 +243,10 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2022/10/9 Ver.2.15.0  
+未登録のモンスターに対して表示できる項目を設定できる機能を追加。  
+敵の情報のモンスター一覧に同一モンスターがいるときに表示されるアルファベットが表示されない問題を修正。  
+機能していなかったタグの問題を修正。  
 2022/10/8 Ver.2.14.3
 撃破、図鑑データの登録を指定のモンスターに変更する機能を追加。  
 敵の情報、アナライズでのみしか表示されないモンスターのNoを表示しないように修正。  

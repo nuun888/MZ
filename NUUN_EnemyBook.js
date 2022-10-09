@@ -175,6 +175,7 @@
  * 更新履歴
  * 2022/10/9 Ver.2.15.0
  * 未登録のモンスターに対して表示できる項目を設定できる機能を追加。
+ * 敵の情報のモンスター一覧に同一モンスターがいるときに表示されるアルファベットが表示されない問題を修正。
  * 機能していなかったタグの問題を修正。
  * 2022/10/8 Ver.2.14.3
  * 撃破、図鑑データの登録を指定のモンスターに変更する機能を追加。
@@ -5206,14 +5207,14 @@ Window_EnemyBook_InfoIndex.prototype.drawItem = function(index) {
         let iconId = 0;
         if (RegistrationEnemyInfo) {
             if ($gameSystem.isInEnemyBook(enemy) || !!enemy.meta[NoBookDataTag]) {
-                name = enemy.name;
+                name = this._data[index].name();
                 iconId = enemy.meta.EnemyIcon ? Number(enemy.meta.EnemyIcon) : 0;
             } else {
                 name = this.unknownDataLength(enemy);
                 iconId = enemy.meta.EnemyIcon && enemy.meta.EnemyIcon > 0 ? UnknownEnemyIcons : 0;
             }
         } else {
-            name = enemy.name;
+            name = this._data[index].name();
             iconId = enemy.meta.EnemyIcon ? Number(enemy.meta.EnemyIcon) : 0;
         }
         const textMargin = iconId > 0 ? ImageManager.iconWidth + 4 : 0;

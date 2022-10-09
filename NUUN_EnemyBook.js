@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.14.3
+ * @version 2.15.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -173,6 +173,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/9 Ver.2.15.0
+ * 未登録のモンスターに対して表示できる項目を設定できる機能を追加。
+ * 機能していなかったタグの問題を修正。
  * 2022/10/8 Ver.2.14.3
  * 撃破、図鑑データの登録を指定のモンスターに変更する機能を追加。
  * 敵の情報、アナライズでのみしか表示されないモンスターのNoを表示しないように修正。
@@ -894,6 +897,55 @@
  * @type file
  * @dir img/
  * @default 
+ * @parent EnemyBookSetting
+ * 
+ * @param UnregisteredEnemy
+ * @desc 未登録のモンスターの表示リストを指定します。0の場合は表示されません。
+ * @text 未登録モンスターリスト指定
+ * @type select
+ * @option なし
+ * @value 0
+ * @option 表示リスト１
+ * @value 1
+ * @option 表示リスト２
+ * @value 2
+ * @option 表示リスト３
+ * @value 3
+ * @option 表示リスト４
+ * @value 4
+ * @option 表示リスト５
+ * @value 5
+ * @option 表示リスト６
+ * @value 6
+ * @option 表示リスト７
+ * @value 7
+ * @option 表示リスト８
+ * @value 8
+ * @option 表示リスト９
+ * @value 9
+ * @option 表示リスト１０
+ * @value 10
+ * @option 表示リスト１１
+ * @value 11
+ * @option 表示リスト１２
+ * @value 12
+ * @option 表示リスト１３
+ * @value 13
+ * @option 表示リスト１４
+ * @value 14
+ * @option 表示リスト１５
+ * @value 15
+ * @option 表示リスト１６
+ * @value 16
+ * @option 表示リスト１７
+ * @value 17
+ * @option 表示リスト１８
+ * @value 18
+ * @option 表示リスト１９
+ * @value 19
+ * @option 表示リスト２０
+ * @value 20 
+ * @default 0
  * @parent EnemyBookSetting
  * 
  * @param EnemyInfoSetting
@@ -2147,6 +2199,8 @@
  * @value 62
  * @option 記述欄(1)～(5)(7)(8)(9)(12)(13)(17)
  * @value 70
+ * @option 共通記述欄(1)～(5)(7)(8)(9)(12)(13)(20)
+ * @value 71
  * @option オリジナルパラメータ(1)～(16)
  * @value 80
  * @option 敵の使用スキル(1)～(15)
@@ -2315,6 +2369,13 @@
  * @default 
  * @parent textSetting
  * 
+ * @param CommonText
+ * @desc 共通テキスト(制御文字使用可能)
+ * @text 共通テキスト(20)
+ * @type multiline_string	
+ * @default 
+ * @parent textSetting
+ * 
  * @param ImgData
  * @desc 全てのモンスターページに表示される共通画像ファイル名を指定します。横幅は「項目横幅」、高さは「画像の最大縦幅」
  * @text 共通画像(18)
@@ -2338,6 +2399,8 @@
  * @desc 表示するリストを指定します。
  * @text 表示リスト指定
  * @type select
+ * @option なし
+ * @value 0
  * @option 表示リスト１
  * @value 1
  * @option 表示リスト２
@@ -2606,6 +2669,7 @@ const AnalyzeSkillMode = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(
 const AnalyzeListData = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AnalyzeListData'])) : [];
 const ContentWindowsSkin = String(parameters['ContentWindowsSkin']);
 const CommonVariableID = Number(parameters['CommonVariableID'] || 0);
+const UnregisteredEnemy = Number(parameters['UnregisteredEnemy'] || 0);
 
 const BookWidth = Number(parameters['BookWidth'] || 0);
 const NoTouchUIWindow = eval(parameters['NoTouchUIWindow'] || 'false');
@@ -3663,8 +3727,21 @@ Game_Enemy.prototype.makeStealItems = function(rate, mode) {
 const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
 Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
+  this.bookSkill(target)
   this.analyzeSkill(target);
 };
+
+Game_Action.prototype.bookSkill = function(target) {
+    this.enemyInfoSkill(target);
+    this.analyzeSkill(target);
+};
+
+Game_Action.prototype.enemyInfoSkill = function(target) {
+    if (this.item().meta.EnemyInfo) {
+        SceneManager._scene.commandEnemyBookInfo();
+    }
+};
+
 
 Game_Action.prototype.analyzeSkill = function(target) {
     if (target.isEnemy() && $gameSystem.isEnemyBookData(target.enemy())) {
@@ -5278,7 +5355,12 @@ Window_EnemyBook.prototype.getDisplayPage = function() {
 };
 
 Window_EnemyBook.prototype.listDate = function(list) {
-    const tag = 'PageList' + list.ListDateSetting;
+    let tag = 'PageList';
+    if (UnregisteredEnemy > 0) {
+        tag += $gameSystem.isInEnemyBook(this._enemy) ? list.ListDateSetting : UnregisteredEnemy;
+    } else {
+        tag += list.ListDateSetting;
+    }
     return bookContents[tag];
 };
 
@@ -5335,7 +5417,7 @@ Window_EnemyBook.prototype.noUnknownStatus = function(enemy) {
 };
 
 Window_EnemyBook.prototype.isEnemyData = function() {
-    return $gameSystem.isEnemyBook(this._enemy) && $gameSystem.isInEnemyBook(this._enemy);
+    return $gameSystem.isEnemyBook(this._enemy) && (UnregisteredEnemy === 0 && $gameSystem.isInEnemyBook(this._enemy) || UnregisteredEnemy > 0);
 };
 
 Window_EnemyBook.prototype.refresh = function() {
@@ -5508,6 +5590,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
             break;
         case 70:
             this.drawDesc(list, enemy, x, y, width);
+            break;
+        case 71:
+            this.drawCommonDesc(list, enemy, x, y, width);
             break;
         case 80:
             this.originalParams(list, enemy, x, y, width);
@@ -6543,6 +6628,21 @@ Window_EnemyBook.prototype.drawDesc = function(list, enemy, x, y, width) {
     }
 };
 
+Window_EnemyBook.prototype.drawCommonDesc = function(list, enemy, x, y, width) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    const lineHeight = this.lineHeight();
+    const nameText = list.paramName;
+    if (nameText) {
+        this.drawText(nameText, x, y, width);
+        y += lineHeight;
+    }
+    this.resetTextColor();
+    if(this.paramMask(list.MaskMode)){
+        this.drawTextEx(list.CommonText, x, y, width);
+    }
+};
+
 Window_EnemyBook.prototype.enemyCharacter = function(list, enemy, x, y, width) {
     this.enemyCharacterChip(enemy, x, y);
 };
@@ -6800,8 +6900,9 @@ Window_BattleEnemyBook.prototype.statusGaugeMode = function() {
 Window_BattleEnemyBook.prototype.isEnemyData = function() {
     switch (this._mode) {
         case 'book':
-            return $gameSystem.isEnemyBook(this._enemy) && $gameSystem.isInEnemyBook(this._enemy);
+            return $gameSystem.isEnemyBook(this._enemy) && (UnregisteredEnemy === 0 && $gameSystem.isInEnemyBook(this._enemy) || UnregisteredEnemy > 0);
         case 'info':
+            return (UnregisteredEnemy === 0 && $gameSystem.isInEnemyBook(this._enemy) || UnregisteredEnemy > 0);
         case 'analyze':
             return $gameSystem.isEnemyBookData(this._enemy);
     }

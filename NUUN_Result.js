@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.1.0
+ * @version 2.2.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -24,6 +24,11 @@
  * ブロックごとに分かれており、アクター経験値、入手インフォ、ドロップアイテム、レベルアップアクターステータス、習得スキルごとに表示する座標を指定できます。
  * アクター経験値、入手インフォ、ドロップアイテム、レベルアップアクターステータス、習得スキルは項目ごとに座標、フォントサイズ等の変更ができます。
  * 戦闘終了後、勝利MEが流れた後に任意のBGMを再生できます。
+ * 
+ * 勝利後エフェクト
+ * 画像は画像中心を起点に画面中央に表示されます。
+ * 拡大率、不透明度は元の値(拡大率は100、不透明度は255)から指定します。現在の値から相対で指定の値まで変化します。
+ * 移動座標は現在の位置からの相対で移動します。
  * 
  * 仕様
  * アクター経験値、レベルアップアクターステータスにサイドビューアクターを表示される場合、全ての項目よりも手前に表示されます。
@@ -53,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/10 Ver.2.2.0
+ * 勝利後に勝利時の画像を表示する機能を追加。
  * 2022/9/18 Ver.2.1.0
  * 獲得経験値ウィンドウに立ち絵を指定できる機能を追加。
  * レベルアップ後再戦闘時にレベルアップしていないアクターにレベルアップが表示されてしまう問題を修正。
@@ -1344,6 +1351,25 @@
  * @desc 変更する立ち絵のIDを指定します。
  * @text 立ち絵ID
  * 
+ * @param VictoryScene
+ * @text 勝利後演出
+ * @default ------------------------------
+ * 
+ * @param VictorySceneImg
+ * @desc 勝利後の画像ファイル名を指定します。
+ * @text 勝利後画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent VictoryScene
+ * 
+ * @param AfterVictoryEffect
+ * @text 勝利後演出
+ * @desc 勝利後からリザルト画面表示までの演出を設定します。
+ * @type struct<VictoryEffect>[]
+ * @default []
+ * @parent VictoryScene
+ * 
  */
 /*~struct~ActorExpList:
  * 
@@ -2064,6 +2090,52 @@
  * @default 0
  * 
  */
+/*~struct~VictoryEffect:
+ * 
+ * @param Fream
+ * @desc フレーム数。
+ * @text フレーム数
+ * @type number
+ * @default 0
+ * 
+ * @param PositionX
+ * @desc 横に移動する移動座標。現在の位置から相対で移動します。
+ * @text 横移動座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param PositionY
+ * @desc 縦に移動する移動座標。現在の位置から相対で移動します。
+ * @text 縦移動座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param ScaleX
+ * @desc 横の拡大率。現在の拡大率から指定の拡大率まで拡大(縮小)します。
+ * @text 横拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * 
+ * @param ScaleY
+ * @desc 縦の拡大率。現在の拡大率から指定の拡大率まで拡大(縮小)します。
+ * @text 縦拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * 
+ * @param Opacity
+ * @desc 不透明度。現在の不透明度から指定の不透明度まで変化します。
+ * @text 不透明度
+ * @type number
+ * @max 255
+ * @min 0
+ * @default 255
+ * 
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_Result = true;
@@ -2206,6 +2278,8 @@ const VictoryBGM = String(parameters['VictoryBGM']);
 const VictoryVolume = Number(parameters['VictoryVolume'] || 90);
 const VictoryPitch = Number(parameters['VictoryPitch'] || 100);
 const VictoryPan = Number(parameters['VictoryPan'] || 0);
+const VictorySceneImg = String(parameters['VictorySceneImg']);
+const AfterVictoryEffect = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AfterVictoryEffect'])) : [];
 
 let resultExpMaxWidth = 0;
 
@@ -2356,10 +2430,9 @@ Scene_Battle.prototype.createResultWindow = function() {
 };
 
 Scene_Battle.prototype.createResultBackgroundSprite = function() {
-  const sprite = new Sprite();
+  const sprite = new Sprite_ResultBackground();
   this.addChild(sprite);
-  this.resultBackgroundSprite = sprite;
-  sprite.hide();
+  this._resultBackgroundSprite = sprite;
 };
 
 Scene_Battle.prototype.createResultHelpWindow = function() {
@@ -2381,7 +2454,7 @@ Scene_Battle.prototype.createResultMainWindow = function() {
     this._resultWindow.setHandler("ok", this.onResultOk.bind(this));
     this._resultWindow.setHandler("cancel", this.onResultOk.bind(this));
     this._resultWindow.hide();
-    this._resultWindow.setResultBackground(this.resultBackgroundSprite);
+    this._resultWindow.setResultBackground(this._resultBackgroundSprite);
 };
 
 Scene_Battle.prototype.createResultActorExpWindow = function() {
@@ -2423,7 +2496,7 @@ Scene_Battle.prototype.createResultLevelUpMainWindow = function() {
   this._resultLevelUpMainWindow.setHandler("ok", this.onResultOk.bind(this));
   this._resultLevelUpMainWindow.setHandler("cancel", this.onResultOk.bind(this));
   this._resultLevelUpMainWindow.hide();
-  this._resultLevelUpMainWindow.setResultBackground(this.resultBackgroundSprite);
+  this._resultLevelUpMainWindow.setResultBackground(this._resultBackgroundSprite);
 };
 
 Scene_Battle.prototype.createResultActorStatusWindow = function() {
@@ -2644,26 +2717,37 @@ Scene_Battle.prototype.closeStatusWindow = function() {
   }
 };
 
-Scene_Battle.prototype.resultOpen = function() {
+Scene_Battle.prototype.setResultOpen = function() {
   this.closeStatusWindow();
-  this._victoryImgCount = 0;//暫定
-  if (this._victoryImgCount === 0) {
-    this._resultWindow.activate();
-    if (this._resultHelpWindow) {
-      this._resultHelpWindow.show();
-      this._resultHelpWindow.open();
+  this._resultBackgroundSprite.setupAfterVictoryEffect();
+};
+
+Scene_Battle.prototype.updateAfterVictoryEffect = function() {
+  const sprite = this._resultBackgroundSprite;
+  if (!sprite.onResultOpen()) {
+    sprite.updateAfterVictoryEffect();
+    if (sprite.onResultOpen()) {
+      this.resultOpen();
     }
-    this._resultWindow.show();
-    this._resultActorExpWindow.show();
-    this._resultGetInfoWindow.show();
-    this._resultGetItemWindow.show();
-    this._resultWindow.open();
-    this._resultGetInfoWindow.open();
-    this._resultGetItemWindow.open();
-    this._resultActorExpWindow.open();
-    this.resultRefresh();
-    BattleManager.resultRefresh = PartyPageRefreshFrame;
   }
+};
+
+Scene_Battle.prototype.resultOpen = function() {
+  this._resultWindow.activate();
+  if (this._resultHelpWindow) {
+    this._resultHelpWindow.show();
+    this._resultHelpWindow.open();
+  }
+  this._resultWindow.show();
+  this._resultActorExpWindow.show();
+  this._resultGetInfoWindow.show();
+  this._resultGetItemWindow.show();
+  this._resultWindow.open();
+  this._resultGetInfoWindow.open();
+  this._resultGetItemWindow.open();
+  this._resultActorExpWindow.open();
+  this.resultRefresh();
+  BattleManager.resultRefresh = PartyPageRefreshFrame;
 };
 
 Scene_Battle.prototype.resultRefresh = function() {
@@ -2674,16 +2758,16 @@ Scene_Battle.prototype.resultRefresh = function() {
 };
 
 Scene_Battle.prototype.resultLevelUpRefresh = function() {
-  this._resultLevelUpMainWindow.refresh()
+  this._resultLevelUpMainWindow.refresh();
   this._resultActorStatusWindow.refresh();
   this._resultLearnSkillWindow.refresh();
 };
 
 Scene_Battle.prototype.onResultOk = function() {
   if (BattleManager.resultLevelUpActors.length > 0 && BattleManager.resultPage < BattleManager.resultLevelUpActors.length) {
-    this.openLevelUpWindow()
+    this.openLevelUpWindow();
   } else {
-    this.closeResultWindow()
+    this.closeResultWindow();
   }
 };
 
@@ -2705,7 +2789,7 @@ Scene_Battle.prototype.openLevelUpWindow = function() {
   this._resultActorExpWindow.hide();
   this._resultGetInfoWindow.hide();
   this._resultGetItemWindow.hide();
-  this._resultLevelUpMainWindow.show()
+  this._resultLevelUpMainWindow.show();
   this._resultActorStatusWindow.show();
   this._resultLearnSkillWindow.show();
   this.resultLevelUpRefresh();
@@ -2732,6 +2816,7 @@ Scene_Battle.prototype.closeResultWindow = function() {
 const _Scene_Battle_update = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
   _Scene_Battle_update.call(this);
+  this.updateAfterVictoryEffect();
   this.updateResultPage();
 };
 
@@ -2820,9 +2905,9 @@ Window_Base.prototype.setResultFadein = function() {
 
 Window_Base.prototype.updateResultFadein = function() {
   if (this.isFadein() && this.resultFadein) {
-    this.openness = 255;
+    this.openness += 255;
     this.openOpacity += 32;
-    this.opacity = this.openOpacity;
+    this.opacity = this.openOpacity.clamp(0, 255);
     if (this.isResultFadein()) {
       this.resultFadein = false;
     }
@@ -3019,17 +3104,10 @@ Window_Result.prototype.initialize = function(rect) {
   this._canRepeat = false;
   this.resultBackgroundSprite = null;
   this.setResultWindowMode(ResultWindowVisible);
-  this.loadResultBackground();
 };
 
 Window_Result.prototype.setResultBackground = function(sprite) {
   this.resultBackgroundSprite = sprite;
-};
-
-Window_Result.prototype.loadResultBackground = function() {
-  if (GetWindowBackGroundImg) {
-    ImageManager.nuun_LoadPictures(GetWindowBackGroundImg);
-  }
 };
 
 Window_Result.prototype.loadWindowskin = function() {
@@ -3041,27 +3119,7 @@ Window_Result.prototype.loadWindowskin = function() {
 };
 
 Window_Result.prototype.refresh = function() {
-  const sprite = this.resultBackgroundSprite;
-  if (sprite) {
-    sprite.bitmap = ImageManager.nuun_LoadPictures(GetWindowBackGroundImg);
-    sprite.show();
-    if (BackUiWidth) {
-      sprite.x = (Graphics.width - Graphics.boxWidth) / 2 - 4;
-      sprite.y = (Graphics.height - Graphics.boxHeight) / 2 - 4;
-    } else {
-      sprite.x = 0;
-      sprite.y = 0;
-    }
-    if (BackFitWidth) {
-      if(BackUiWidth) {
-        sprite.scale.x = (this.width !== sprite.bitmap.width ? this.width / sprite.bitmap.width : 1);
-        sprite.scale.y = (this.height !== sprite.height ? this.height / sprite.bitmap.height : 1);
-      } else {
-        sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
-        sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
-      }
-    }
-  }
+  this.resultBackgroundSprite.setBackground(GetWindowBackGroundImg);
 };
 
 Window_Result.prototype.processOk = function() {
@@ -3091,7 +3149,7 @@ Window_Result.prototype.open = function() {
 
 Window_Result.prototype.updateResultBackgrounfFadein = function() {
   if (this.resultBackgroundSprite) {
-    this.resultBackgroundSprite.opacity = this.openOpacity;
+    this.resultBackgroundSprite.setOpacity(this.openOpacity);
   }
 };
 
@@ -3484,10 +3542,10 @@ Window_ResultGetInfo.prototype.dateDisplay = function(data, x, y, width) {
     case 0:
       break;
     case 1:
-      this.drawGainGold(data, x, y, width)
+      this.drawGainGold(data, x, y, width);
       break;
     case 2:
-      this.drawGainExp(data, x, y, width)
+      this.drawGainExp(data, x, y, width);
       break;
     case 10:
       this.drawPartyOriginalParam(data, x, y, width)
@@ -3895,7 +3953,6 @@ Window_ResultLevelUpMain.prototype.setResultBackground = function(sprite) {
 
 Window_ResultLevelUpMain.prototype.loadBitmap = function() {
   let bitmap = null;
-  ImageManager.nuun_LoadPictures(LevelUpActorBackGroundImg);
   for (const member of $gameParty.resultMembers()) {
     const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(member.actorId()) : member.getResultActorData(member.actorId());
     if (data && data.LevelUpActorBackGroundImg) {
@@ -3914,38 +3971,7 @@ Window_ResultLevelUpMain.prototype.loadBitmap = function() {
 
 Window_ResultLevelUpMain.prototype.resultBackgroundRefresh = function(data) {
   const img = data && data.LevelUpActorBackGroundImg ? data.LevelUpActorBackGroundImg : LevelUpActorBackGroundImg;
-  if (img) {
-    const bitmap = ImageManager.nuun_LoadPictures(img);
-    this.resultBackgroundSprite.bitmap = bitmap;
-    this.resultBackgroundSprite.show();
-    if (bitmap && !bitmap.isReady()) {
-      bitmap.addLoadListener(this.resultBackgroundScaleRefresh.bind(this, bitmap));
-    } else if (bitmap) {
-      this.resultBackgroundScaleRefresh(bitmap);
-    }
-  } else {
-    this.resultBackgroundSprite.bitmap = null;
-  }
-};
-
-Window_ResultLevelUpMain.prototype.resultBackgroundScaleRefresh = function() {
-  const sprite = this.resultBackgroundSprite;
-  if (BackUiWidth) {
-    sprite.x = (Graphics.width - Graphics.boxWidth) / 2 - 4;
-    sprite.y = (Graphics.height - Graphics.boxHeight) / 2 - 4;
-  } else {
-    sprite.x = 0;
-    sprite.y = 0;
-  }
-  if (BackFitWidth) {
-    if(BackUiWidth) {
-      sprite.scale.x = (this.width !== sprite.bitmap.width ? this.width / sprite.bitmap.width : 1);
-      sprite.scale.y = (this.height !== sprite.height ? this.height / sprite.bitmap.height : 1);
-    } else {
-      sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
-      sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
-    }
-  }
+  this.resultBackgroundSprite.setBackground(img);
 };
 
 Window_ResultLevelUpMain.prototype.refresh = function() {
@@ -4617,7 +4643,7 @@ BattleManager.displayVictoryMessage = function() {
 };
 
 BattleManager.displayRewards = function() {
-  SceneManager._scene.resultOpen();
+  SceneManager._scene.setResultOpen();
   this.resultMode = true;
 };
 
@@ -4630,7 +4656,7 @@ BattleManager.gainRewards = function() {
 
 const _BattleManager_isBusy = BattleManager.isBusy;
 BattleManager.isBusy = function() {
-  return SceneManager._scene.isActiveResult() || _BattleManager_isBusy.call(this);
+  return SceneManager._scene.isActiveResult() || BattleManager._resultOn || _BattleManager_isBusy.call(this);
 };
 
 const _BattleManager_replayBgmAndBgs = BattleManager.replayBgmAndBgs;
@@ -5181,6 +5207,163 @@ Sprite_ResultExpValue.prototype.outlineColor = function() {
 
 Sprite_ResultExpValue.prototype.outlineWidth = function() {
   return 3;
+};
+
+function Sprite_ResultBackground() {
+  this.initialize(...arguments);
+}
+
+Sprite_ResultBackground.prototype = Object.create(Sprite.prototype);
+Sprite_ResultBackground.prototype.constructor = Sprite_ResultBackground;
+
+Sprite_ResultBackground.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+};
+
+Sprite_ResultBackground.prototype.initMembers = function() {
+  this._backgroundMode = false;
+  this._duration = 0;
+  this._list = AfterVictoryEffect;
+  this._data = null;
+  this._easingScaleX = 1.0;
+  this._easingScaleY = 1.0;
+  this._easingOpacity = 255;
+  this._easingX = 0;
+  this._easingY = 0;
+  this.hide();
+  this.loadBitmap();
+  this.setVictorySceneImgMode();
+};
+
+Sprite_ResultBackground.prototype.loadBitmap = function() {
+  ImageManager.nuun_LoadPictures(VictorySceneImg);
+  ImageManager.nuun_LoadPictures(GetWindowBackGroundImg);
+  ImageManager.nuun_LoadPictures(LevelUpActorBackGroundImg);
+};
+
+Sprite_ResultBackground.prototype.setupAfterVictoryEffect = function() {
+  if (this._list.length > 0 && VictorySceneImg) {
+    this.setVictoryImg();
+    this.setupAfterVictoryEffectData();
+    this.show();
+  }
+};
+
+Sprite_ResultBackground.prototype.setupAfterVictoryEffectData = function() {
+  this._data = this._list[0];
+  this._duration = this._data.Fream;
+  this._easingScaleX = ((this._data.ScaleX / 100) - this.scale.x) / this._data.Fream;console.log()
+  this._easingScaleY = ((this._data.ScaleY / 100) - this.scale.y) / this._data.Fream;
+  this._easingOpacity = (this._data.Opacity - this.opacity) / this._data.Fream;
+  this._easingX = this._data.PositionX !== 0 ? this._data.PositionX / this._data.Fream : 0;
+  this._easingY = this._data.Positiony !== 0 ? this._data.PositionY / this._data.Fream : 0;
+};
+
+Sprite_ResultBackground.prototype.getDuration = function() {
+  return this._duration;
+};
+
+Sprite_ResultBackground.prototype.isSetDuration = function() {
+  return this._duration === 0 && !this._backgroundMode;
+};
+
+Sprite_ResultBackground.prototype.onResultOpen = function() {
+  return this._backgroundMode;
+};
+
+Sprite_ResultBackground.prototype.setOpacity = function(opacity) {
+  if (this._backgroundMode) {
+    this.opacity = opacity;
+  }
+};
+
+Sprite_ResultBackground.prototype.setBackground = function(img) {
+  if (img) {
+    const bitmap = ImageManager.nuun_LoadPictures(img);
+    this.bitmap = bitmap;
+    this.setBuckgroundImgMode();
+    this.show();
+    bitmap.addLoadListener(function() {
+      this.setBackgroundBitmap();
+    }.bind(this));
+  } else {
+    this.bitmap = null;
+  }
+};
+
+Sprite_ResultBackground.prototype.setBackgroundBitmap = function() {
+  if (BackUiWidth) {
+    this.x = (Graphics.width - Graphics.boxWidth) / 2 - 4;
+    this.y = (Graphics.height - Graphics.boxHeight) / 2 - 4;
+  } else {
+    this.x = 0;
+    this.y = 0;
+  }
+  if (BackFitWidth) {
+    if(BackUiWidth) {
+      this.scale.x = (this.width !== this.bitmap.width ? this.width / this.bitmap.width : 1);
+      this.scale.y = (this.height !== this.height ? this.height / this.bitmap.height : 1);
+    } else {
+      this.scale.x = (Graphics.width !== this.bitmap.width ? Graphics.width / this.bitmap.width : 1);
+      this.scale.y = (Graphics.height !== this.bitmap.height ? Graphics.height / this.bitmap.height : 1);
+    }
+  }
+};
+
+Sprite_ResultBackground.prototype.updateAfterVictoryEffect = function() {
+  if (this._duration > 0) {
+    this._duration--;
+    this.updateScale();
+    this.updateOpacity();
+    this.updatePosition();
+    if (this._duration === 0) {
+      this._list.shift();
+      if (this._list.length > 0) {
+        this.setupAfterVictoryEffectData();
+      }
+    }
+  }
+  if (this._list.length === 0) {
+    this._backgroundMode = true;
+    if (ResultFadein) {
+      this.opacity = 0;
+    }
+  }
+};
+
+Sprite_ResultBackground.prototype.updateScale = function() {
+  this.scale.x += this._easingScaleX;
+  this.scale.y += this._easingScaleY;
+};
+
+Sprite_ResultBackground.prototype.updateOpacity = function() {
+  const opacity = this.opacity + this._easingOpacity;
+  this.opacity = opacity.clamp(0, 255);
+};
+
+Sprite_ResultBackground.prototype.updatePosition = function() {
+  this.x += this._easingX;
+  this.y += this._easingY;
+};
+
+Sprite_ResultBackground.prototype.setVictoryImg = function() {
+  const bitmap = ImageManager.nuun_LoadPictures(VictorySceneImg);
+  this.bitmap = bitmap;
+};
+
+Sprite_ResultBackground.prototype.setVictorySceneImgMode = function() {
+  this.anchor.x = 0.5;
+  this.anchor.y = 0.5;
+  this.x = Graphics.width / 2;
+  this.y = Graphics.height / 2;
+};
+
+Sprite_ResultBackground.prototype.setBuckgroundImgMode = function() {
+  this.anchor.x = 0.0;
+  this.anchor.y = 0.0;
+  this.x = 0;
+  this.y = 0;
 };
 
 })();

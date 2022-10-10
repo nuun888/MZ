@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.0
+ * @version 2.2.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/11 Ver.2.2.1
+ * 勝利時の画像表示を有効にするスイッチを指定できる機能を追加。
  * 2022/10/10 Ver.2.2.0
  * 勝利後に勝利時の画像を表示する機能を追加。
  * 2022/9/18 Ver.2.1.0
@@ -1370,6 +1372,13 @@
  * @default []
  * @parent VictoryScene
  * 
+ * @param AfterVictoryEffectSwitch 
+ * @desc 画像エフェクトを有効にするフラグスイッチID
+ * @text 画像エフェクト有効スイッチ
+ * @type switch
+ * @default 0
+ * @parent VictoryScene
+ * 
  */
 /*~struct~ActorExpList:
  * 
@@ -2280,6 +2289,7 @@ const VictoryPitch = Number(parameters['VictoryPitch'] || 100);
 const VictoryPan = Number(parameters['VictoryPan'] || 0);
 const VictorySceneImg = String(parameters['VictorySceneImg']);
 const AfterVictoryEffect = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AfterVictoryEffect'])) : [];
+const AfterVictoryEffectSwitch = Number(parameters['AfterVictoryEffectSwitch'] || 100);
 
 let resultExpMaxWidth = 0;
 
@@ -3222,7 +3232,7 @@ Window_ResultActorExp.prototype.drawItemBackground = function(index) {
       this.drawContentsBack(bitmap, index);
     }
   } else {
-    Window_Selectable.prototype.drawItemBackground.call(this, index);
+    Window_StatusBase.prototype.drawItemBackground.call(this, index);
   }
 };
 
@@ -3293,7 +3303,7 @@ Window_ResultActorExp.prototype.drawActorExp = function(index) {
     this.resetFontSettings();
     const x = rect.x + data.X_Coordinate;
     const y = rect.y + data.Y_Coordinate;
-    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
+    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : rect.width - x);
     this.dateDisplay(data, actor, x, y, width, rect.height);
   }
 };
@@ -5244,6 +5254,10 @@ Sprite_ResultBackground.prototype.loadBitmap = function() {
 
 Sprite_ResultBackground.prototype.setupAfterVictoryEffect = function() {
   if (this._list.length > 0 && VictorySceneImg) {
+    if (this.isNotAfterVictoryEffect()) {
+      this._list = [];
+      return;
+    }
     this.setVictoryImg();
     this.setupAfterVictoryEffectData();
     this.show();
@@ -5258,6 +5272,14 @@ Sprite_ResultBackground.prototype.setupAfterVictoryEffectData = function() {
   this._easingOpacity = (this._data.Opacity - this.opacity) / this._data.Fream;
   this._easingX = this._data.PositionX !== 0 ? this._data.PositionX / this._data.Fream : 0;
   this._easingY = this._data.Positiony !== 0 ? this._data.PositionY / this._data.Fream : 0;
+};
+
+Sprite_ResultBackground.prototype.isAfterVictoryEffectSwitch = function() {
+  return AfterVictoryEffectSwitch === 0 || $gameSwitches.value(AfterVictoryEffectSwitch);
+};
+
+Sprite_ResultBackground.prototype.isNotAfterVictoryEffect = function() {
+  return AfterVictoryEffectSwitch > 0 && !$gameSwitches.value(AfterVictoryEffectSwitch);
 };
 
 Sprite_ResultBackground.prototype.getDuration = function() {

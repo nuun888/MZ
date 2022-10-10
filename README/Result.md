@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.2.0
+# Ver.2.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,8 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2022/10/11 Ver.2.2.1  
+勝利時の画像表示を有効にするスイッチを指定できる機能を追加。  
 2022/10/10 Ver.2.2.0  
 勝利後に勝利時の画像を表示する機能を追加。  
 2022/9/18 Ver.2.1.0  

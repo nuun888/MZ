@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトラーオーバーレイベース
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/11 Ver.1.0.1
+ * 微修正。
  * 2022/5/10 Ver.1.0.0
  * 初版
  * 
@@ -184,7 +186,7 @@ Sprite_Enemy.prototype.getButlerOverlayHeight = function() {
 };
   
 Sprite_Enemy.prototype.getButlerOverlayConflict = function() {
-    if (ConflictScale === 'Img') {
+    if (ConflictScale === 'Img' && this.battlerOverlay) {
       return this.battlerOverlay.battlerSpriteScale_y;
     } else {
       return 1.0;

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.1
+ * @version 2.2.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/ Ver.2.2.2
+ * 戦闘開始後にエラーが出る問題を修正。
+ * 勝利後画像を指定せずにエフェクトリストを設定すると戦闘勝利後に動作しなくなる問題を修正。
  * 2022/10/11 Ver.2.2.1
  * 勝利時の画像表示を有効にするスイッチを指定できる機能を追加。
  * 2022/10/10 Ver.2.2.0
@@ -2734,7 +2737,7 @@ Scene_Battle.prototype.setResultOpen = function() {
 
 Scene_Battle.prototype.updateAfterVictoryEffect = function() {
   const sprite = this._resultBackgroundSprite;
-  if (!sprite.onResultOpen()) {
+  if (BattleManager._resultOn && !sprite.onResultOpen()) {
     sprite.updateAfterVictoryEffect();
     if (sprite.onResultOpen()) {
       this.resultOpen();
@@ -5253,9 +5256,9 @@ Sprite_ResultBackground.prototype.loadBitmap = function() {
 };
 
 Sprite_ResultBackground.prototype.setupAfterVictoryEffect = function() {
-  if (this._list.length > 0 && VictorySceneImg) {
-    if (this.isNotAfterVictoryEffect()) {
-      this._list = [];
+  if (this._list.length > 0) {
+    if (this.isNotAfterVictoryEffect() || !VictorySceneImg) {
+      this._list = [];console.log("est")
       return;
     }
     this.setVictoryImg();

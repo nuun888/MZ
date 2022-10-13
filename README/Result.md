@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.2.1
+# Ver.2.2.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,9 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2022/10/13 Ver.2.2.2  
+戦闘開始後にエラーが出る問題を修正。  
+勝利後画像を指定せずにエフェクトリストを設定すると戦闘勝利後に動作しなくなる問題を修正。  
 2022/10/11 Ver.2.2.1  
 勝利時の画像表示を有効にするスイッチを指定できる機能を追加。  
 2022/10/10 Ver.2.2.0  

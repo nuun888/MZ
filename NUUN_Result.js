@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.2
+ * @version 2.2.3
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/14 Ver.2.2.3
+ * 2回目の戦闘以降で勝利後エフェクトが表示されなくなる問題を修正。
  * 2022/10/13 Ver.2.2.2
  * 戦闘開始後にエラーが出る問題を修正。
  * 勝利後画像を指定せずにエフェクトリストを設定すると戦闘勝利後に動作しなくなる問題を修正。
@@ -5237,7 +5239,7 @@ Sprite_ResultBackground.prototype.initialize = function() {
 Sprite_ResultBackground.prototype.initMembers = function() {
   this._backgroundMode = false;
   this._duration = 0;
-  this._list = AfterVictoryEffect;
+  this._list = AfterVictoryEffect.map(data => data);
   this._data = null;
   this._easingScaleX = 1.0;
   this._easingScaleY = 1.0;
@@ -5258,7 +5260,7 @@ Sprite_ResultBackground.prototype.loadBitmap = function() {
 Sprite_ResultBackground.prototype.setupAfterVictoryEffect = function() {
   if (this._list.length > 0) {
     if (this.isNotAfterVictoryEffect() || !VictorySceneImg) {
-      this._list = [];console.log("est")
+      this._list = [];
       return;
     }
     this.setVictoryImg();
@@ -5270,7 +5272,7 @@ Sprite_ResultBackground.prototype.setupAfterVictoryEffect = function() {
 Sprite_ResultBackground.prototype.setupAfterVictoryEffectData = function() {
   this._data = this._list[0];
   this._duration = this._data.Fream;
-  this._easingScaleX = ((this._data.ScaleX / 100) - this.scale.x) / this._data.Fream;console.log()
+  this._easingScaleX = ((this._data.ScaleX / 100) - this.scale.x) / this._data.Fream;
   this._easingScaleY = ((this._data.ScaleY / 100) - this.scale.y) / this._data.Fream;
   this._easingOpacity = (this._data.Opacity - this.opacity) / this._data.Fream;
   this._easingX = this._data.PositionX !== 0 ? this._data.PositionX / this._data.Fream : 0;

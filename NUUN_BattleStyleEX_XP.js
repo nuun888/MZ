@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.7.2
+ * @version 1.7.3
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -56,6 +56,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/10/15 Ver.1.7.3
+ * ステートが一つも付加されていないときに表示するアイコンを指定できる機能を追加。
  * 2022/10/9 Ver.1.7.2
  * アクターステータスのアクター毎にウィンドウを表示する機能を追加。
  * 2022/9/17 Ver.1.7.1
@@ -775,7 +777,7 @@
  * @param DefaultStatusPositionData
  * @text デフォルトステータス座標表示設定
  * @desc デフォルトのステータスの座標、表示設定の設定を行います。
- * @default {"ActorNameChangePosition":"","NameChangePosition":"false","ActorName_X":"0","ActorName_Y":"88","ActorHPChangePosition":"------------------------------","HPGaugeWidth":"128","HPGaugeHeight":"12","HPChangePosition":"false","ActorHP_X":"0","ActorHP_Y":"112","ActorMPChangePosition":"------------------------------","MPGaugeWidth":"128","MPGaugeHeight":"12","MPChangePosition":"false","ActorMP_X":"0","ActorMP_Y":"136","ActorTPChangePosition":"------------------------------","TPGaugeWidth":"128","TPGaugeHeight":"12","TPChangePosition":"false","ActorTP_X":"0","ActorTP_Y":"160","ActorTPBChangePosition":"------------------------------","TPBGaugeWidth":"128","TPBGaugeHeight":"12","TPBChangePosition":"false","ActorTPB_X":"0","ActorTPB_Y":"88","ActorStateChangePosition":"------------------------------","StateChangePosition":"false","ActorState_X":"4","ActorState_Y":"20","OutsideWindowVisible":"false","ActorImgChangePosition":"------------------------------","ImgChangePosition":"false","ActorImg_X":"0","ActorImg_Y":"0","Background":"------------------------------","ActorBackground":"","ActorFrontBackground":""}
+ * @default {"StatusListData":"[\"{\\\"Status\\\":\\\"'tpb'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"88\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'name'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"88\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'hpgauge'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"112\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'mpgauge'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"136\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'tpgauge'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"0\\\",\\\"PositionY\\\":\\\"160\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\",\"{\\\"Status\\\":\\\"'state'\\\",\\\"Width\\\":\\\"128\\\",\\\"Height\\\":\\\"12\\\",\\\"PositionX\\\":\\\"114\\\",\\\"PositionY\\\":\\\"20\\\",\\\"FontSize\\\":\\\"0\\\",\\\"ParamName\\\":\\\"\\\",\\\"UserParamID\\\":\\\"\\\",\\\"DetaEval1\\\":\\\"\\\",\\\"DetaEval2\\\":\\\"\\\",\\\"GaugeSetting\\\":\\\"------------------------------\\\",\\\"Color1\\\":\\\"0\\\",\\\"Color2\\\":\\\"0\\\",\\\"ImgesSetting\\\":\\\"------------------------------\\\",\\\"ContentsImges\\\":\\\"\\\"}\"]","ActorImgChangePosition":"------------------------------","ImgChangePosition":"false","ActorImg_X":"0","ActorImg_Y":"0","ActorCommandSkin":"------------------------------","WindowSkin":"","WindowColor":"{\"red\":\"0\",\"green\":\"0\",\"bule\":\"0\"}","Background":"------------------------------","ActorBackground":"","ActorFrontBackground":"","OldSetting":"------------------------------","ActorNameChangePosition":"","NameChangePosition":"false","ActorName_X":"0","ActorName_Y":"88","ActorHPChangePosition":"------------------------------","HPGaugeWidth":"128","HPGaugeHeight":"12","HPChangePosition":"false","ActorHP_X":"0","ActorHP_Y":"112","ActorMPChangePosition":"------------------------------","MPGaugeWidth":"128","MPGaugeHeight":"12","MPChangePosition":"false","ActorMP_X":"0","ActorMP_Y":"136","ActorTPChangePosition":"------------------------------","TPGaugeWidth":"128","TPGaugeHeight":"12","TPChangePosition":"false","ActorTP_X":"0","ActorTP_Y":"160","ActorTPBChangePosition":"------------------------------","TPBGaugeWidth":"128","TPBGaugeHeight":"12","TPBChangePosition":"false","ActorTPB_X":"0","ActorTPB_Y":"88","ActorStateChangePosition":"------------------------------","StateChangePosition":"false","ActorState_X":"4","ActorState_Y":"20"}
  * @type struct<StatusPositionDataList>
  * @parent ActorSetting
  * 
@@ -856,6 +858,13 @@
  * @text ステートアイコン表示
  * @type boolean
  * @default true
+ * @parent ActorStatusParamOption
+ * 
+ * @param NoStateIcon
+ * @desc ステートが一つも付与されていないときのアイコンインデックス。
+ * @text ステートなしアイコンインデックス
+ * @type number
+ * @default 0
  * @parent ActorStatusParamOption
  * 
  * @param FaceHeight
@@ -2448,6 +2457,7 @@ params.FaceHeight = Number(parameters['FaceHeight'] || 0);
 params.NameShow = eval(parameters['NameShow'] || "true");
 params.TPBShow = eval(parameters['TPBShow'] || "true");
 params.StateVisible = eval(parameters['StateVisible'] || "true");
+params.NoStateIcon = Number(parameters['NoStateIcon'] || 0);
 params.OutsideWindowVisible = false;
 params.SelectBackShow = eval(parameters['SelectBackShow'] || "true");
 params.ActorSelectBackShow = eval(parameters['ActorSelectBackShow'] || "true");

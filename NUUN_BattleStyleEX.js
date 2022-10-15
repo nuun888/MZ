@@ -20,7 +20,7 @@
  * 
  * 更新履歴
  * 2022/10/9 Ver.3.7.6
- * ウィンドウスキンが適用されない問題を修正。
+ * 一部のウィンドウスキンが適用されない問題を修正。
  * 2022/10/9 Ver.3.7.5
  * タイプ4追加による処理追加。
  * 戦闘開始時にウィンドウが移動しないように修正。
@@ -3314,6 +3314,16 @@ Sprite_StateIcon.prototype.setFrameIcon = function(sprite) {
   sprite._iconIndex = params.NoneStateIcon > 0 ? params.NoneStateIcon : sprite._iconIndex;
   _Sprite_StateIcon_setFrameIcon.call(this, sprite);
 };
+
+if (params.NoStateIcon > 0) {
+  const _Sprite_StateIcon_updateIcon = Sprite_StateIcon.prototype.updateIcon;
+  Sprite_StateIcon.prototype.updateIcon = function() {
+    _Sprite_StateIcon_updateIcon.call(this);
+    if (params.NoStateIcon > 0 && this._iconIndex === 0) {
+      this._iconIndex = params.NoStateIcon;
+    }
+  };
+}
 
 function Sprite_BSStateIcon() {
   this.initialize(...arguments);

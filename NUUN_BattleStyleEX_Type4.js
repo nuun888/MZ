@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -55,6 +55,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/10/15 Ver.1.0.1
+ * ステートが一つも付加されていないときに表示するアイコンを指定できる機能を追加。
  * 2022/10/9 Ver.1.0.0
  * 初版
  * 
@@ -724,308 +726,315 @@
  * @type struct<ActorImgList>
  * @parent ActorSetting
  * 
-* @param ActorData
-* @text アクター座標、画像設定
-* @desc アクターの個別の座標、画像設定を行います。
-* @default []
-* @type struct<ActorDataList>[]
-* @parent ActorSetting
-* 
-* @param OnActorPictureEX
-* @desc 立ち絵表示EXでの設定を適用します。
-* @text 立ち絵表示EX適用
-* @type boolean
-* @default false
-* @parent ActorSetting
-* 
-* @param Img_SW
-* @desc アクター画像の表示横幅。
-* @text アクター画像表示横幅
-* @type number
-* @default 0
-* @min 0
-* @max 9999
-* @parent ActorSetting
-* 
-* @param Img_SH
-* @desc アクター画像の表示縦幅。
-* @text アクター画像表示縦幅
-* @type number
-* @default 0
-* @min 0
-* @max 9999
-* @parent ActorSetting
-* 
-* @param SelectBackShow
-* @desc アクターの行動選択時に表示されるアクター背景を表示する。
-* @text アクター行動時背景表示
-* @type boolean
-* @default true
-* @parent ActorSetting
-* 
-* @param ActorSelectBackShow
-* @desc アクターの対象選択時に表示されるアクター背景を表示する。
-* @text アクターの対象選択時背景表示
-* @type boolean
-* @default true
-* @parent ActorSetting
-* 
-* @param ActorStatusParamOption
-* @text アクターステータスウィンドウステータスオプション
-* @default ------------------------------
-* @parent ActorSetting
-* 
-* @param NameShow
-* @desc 名前を表示します。
-* @text 名前表示
-* @type boolean
-* @default true
-* @parent ActorStatusParamOption
-* 
-* @param TPBShow
-* @desc TPBゲージを表示します。外部プラグインで別の場所にTPBゲージを表示するときに設定します。
-* @text TPBゲージ表示
-* @type boolean
-* @default true
-* @parent ActorStatusParamOption
-* 
-* @param StateVisible
-* @desc ステートアイコンを表示させます。外部プラグインで別の場所にステートアイコンを表示するときに設定します。
-* @text ステートアイコン表示
-* @type boolean
-* @default true
-* @parent ActorStatusParamOption
-* 
-* @param FaceHeight
-* @desc 顔グラの縦幅を指定します。（0でデフォルト）
-* @text 顔グラ縦幅
-* @type number
-* @default 82
-* @min 0
-* @max 9999
-* @parent ActorStatusParamOption
-* 
-* @param FaceHeightOnWindow
-* @desc アクター画像（顔グラ）の高さ範囲をウィンドウ内に納めます。
-* @text アクター画像ウィンドウ内表示
-* @type boolean
-* @default true
-* @parent ActorStatusParamOption
-* 
-* @param NotVisibleStateIcons
-* @type state[]
-* @default []
-* @text 表示しないステート
-* @desc 表示しないステートアイコン。(ステート2には適用されません)
-* @parent ActorStatusParamOption
-* 
-* @param NotVisibleBuffIcons
-* @text 表示しないバフ、デバフ
-* @desc 表示しないバフ、デバフアイコン。(ステート2には適用されません)
-* @type select[]
-* @option HP上昇
-* @value 0
-* @option MP上昇
-* @value 1
-* @option 攻撃力上昇
-* @value 2
-* @option 防御力上昇
-* @value 3
-* @option 魔法力上昇
-* @value 4
-* @option 魔法防御上昇
-* @value 5
-* @option 敏捷性上昇
-* @value 6
-* @option 運上昇
-* @value 7
-* @option HP低下
-* @value 10
-* @option MP低下
-* @value 11
-* @option 攻撃力低下
-* @value 12
-* @option 防御力低下
-* @value 13
-* @option 魔法力低下
-* @value 14
-* @option 魔法防御低下
-* @value 15
-* @option 敏捷性低下
-* @value 16
-* @option 運低下
-* @value 17
-* @default []
-* @parent ActorStatusParamOption
-* 
-* @param ActorEffect
-* @text アクターアニメーションエフェクト設定
-* @default ////////////////////////////////
-* 
-* @param ActorEffectShow
-* @desc フロントビューでもアニメーションエフェクトを表示。
-* @text フロントビューエフェクト表示
-* @type boolean
-* @default true
-* @parent ActorEffect
-* 
-* @param ActorEffect_X
-* @desc アニメーションエフェクトのX座標（相対座標）。
-* @text アニメーションエフェクトX座標（相対座標）
-* @type number
-* @default 0
-* @min -9999
-* @max 9999
-* @parent ActorEffect
-* 
-* @param ActorEffect_Y
-* @desc アニメーションエフェクトのY座標（相対座標）。
-* @text アニメーションエフェクトY座標（相対座標）
-* @type number
-* @default 0
-* @min -9999
-* @max 9999
-* @parent ActorEffect
-* 
-* @param ActorDamage_X
-* @desc ダメージエフェクトのX座標。（相対座標）
-* @text ダメージエフェクトX座標（相対座標）
-* @type number
-* @default 0
-* @min -9999
-* @max 9999
-* @parent ActorEffect
-* 
-* @param ActorDamage_Y
-* @desc ダメージエフェクトのY座標。（相対座標）
-* @text ダメージエフェクトY座標（相対座標）
-* @type number
-* @default 0
-* @min -9999
-* @max 9999
-* @parent ActorEffect
-* 
-* @param ActorsMirror
-* @desc アクターのアニメーションを反転します。
-* @text アクターアニメーション反転
-* @type boolean
-* @default true
-* @parent ActorEffect
-* 
-* 
-* @param ActorStateAnimation
-* @text アクターグラフィックステートアニメーション設定
-* @default ////////////////////////////////
-* 
-* @param StateAnimationShow
-* @desc アクター画像のステートアニメーションを表示します。フロントビューでアニメーションエフェクト表示有効時のみ
-* @text アクター画像ステートアニメーション表示
-* @type boolean
-* @default true
-* @parent ActorStateAnimation
-* 
-* @param ActorState_X
-* @desc アクター画像のステートアニメーションのX座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
-* @text ステートアニメーションX座標（相対座標）
-* @type number
-* @default 0
-* @min -9999
-* @max 9999
-* @parent ActorStateAnimation
-* 
-* @param ActorState_Y
-* @desc アクター画像のステートアニメーションのY座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
-* @text ステートアニメーションY座標（相対座標）
-* @type number
-* @default 0
-* @min -9999
-* @max 9999
-* @parent ActorStateAnimation
+ * @param ActorData
+ * @text アクター座標、画像設定
+ * @desc アクターの個別の座標、画像設定を行います。
+ * @default []
+ * @type struct<ActorDataList>[]
+ * @parent ActorSetting
+ * 
+ * @param OnActorPictureEX
+ * @desc 立ち絵表示EXでの設定を適用します。
+ * @text 立ち絵表示EX適用
+ * @type boolean
+ * @default false
+ * @parent ActorSetting
+ * 
+  @param Img_SW
+ * @desc アクター画像の表示横幅。
+ * @text アクター画像表示横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * @parent ActorSetting
+ * 
+ * @param Img_SH
+ * @desc アクター画像の表示縦幅。
+ * @text アクター画像表示縦幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 9999
+ * @parent ActorSetting
+ * 
+ * @param SelectBackShow
+ * @desc アクターの行動選択時に表示されるアクター背景を表示する。
+ * @text アクター行動時背景表示
+ * @type boolean
+ * @default true
+ * @parent ActorSetting
+ * 
+ * @param ActorSelectBackShow
+ * @desc アクターの対象選択時に表示されるアクター背景を表示する。
+ * @text アクターの対象選択時背景表示
+ * @type boolean
+ * @default true
+ * @parent ActorSetting
+ * 
+ * @param ActorStatusParamOption
+ * @text アクターステータスウィンドウステータスオプション
+ * @default ------------------------------
+ * @parent ActorSetting
+ * 
+ * @param NameShow
+ * @desc 名前を表示します。
+ * @text 名前表示
+ * @type boolean
+ * @default true
+ * @parent ActorStatusParamOption
+ * 
+ * @param TPBShow
+ * @desc TPBゲージを表示します。外部プラグインで別の場所にTPBゲージを表示するときに設定します。
+ * @text TPBゲージ表示
+ * @type boolean
+ * @default true
+ * @parent ActorStatusParamOption
+ * 
+ * @param StateVisible
+ * @desc ステートアイコンを表示させます。外部プラグインで別の場所にステートアイコンを表示するときに設定します。
+ * @text ステートアイコン表示
+ * @type boolean
+ * @default true
+ * @parent ActorStatusParamOption
+ * 
+ * @param NoStateIcon
+ * @desc ステートが一つも付与されていないときのアイコンインデックス。
+ * @text ステートなしアイコンインデックス
+ * @type number
+ * @default 0
+ * @parent ActorStatusParamOption
+ * 
+ * @param FaceHeight
+ * @desc 顔グラの縦幅を指定します。（0でデフォルト）
+ * @text 顔グラ縦幅
+ * @type number
+ * @default 82
+ * @min 0
+ * @max 9999
+ * @parent ActorStatusParamOption
+ * 
+ * @param FaceHeightOnWindow
+ * @desc アクター画像（顔グラ）の高さ範囲をウィンドウ内に納めます。
+ * @text アクター画像ウィンドウ内表示
+ * @type boolean
+ * @default true
+ * @parent ActorStatusParamOption
+ * 
+ * @param NotVisibleStateIcons
+ * @type state[]
+ * @default []
+ * @text 表示しないステート
+ * @desc 表示しないステートアイコン。(ステート2には適用されません)
+ * @parent ActorStatusParamOption
+ * 
+ * @param NotVisibleBuffIcons
+ * @text 表示しないバフ、デバフ
+ * @desc 表示しないバフ、デバフアイコン。(ステート2には適用されません)
+ * @type select[]
+ * @option HP上昇
+ * @value 0
+ * @option MP上昇
+ * @value 1
+ * @option 攻撃力上昇
+ * @value 2
+ * @option 防御力上昇
+ * @value 3
+ * @option 魔法力上昇
+ * @value 4
+ * @option 魔法防御上昇
+ * @value 5
+ * @option 敏捷性上昇
+ * @value 6
+ * @option 運上昇
+ * @value 7
+ * @option HP低下
+ * @value 10
+ * @option MP低下
+ * @value 11
+ * @option 攻撃力低下
+ * @value 12
+ * @option 防御力低下
+ * @value 13
+ * @option 魔法力低下
+ * @value 14
+ * @option 魔法防御低下
+ * @value 15
+ * @option 敏捷性低下
+ * @value 16
+ * @option 運低下
+ * @value 17
+ * @default []
+ * @parent ActorStatusParamOption
+ * 
+ * @param ActorEffect
+ * @text アクターアニメーションエフェクト設定
+ * @default ////////////////////////////////
+ * 
+ * @param ActorEffectShow
+ * @desc フロントビューでもアニメーションエフェクトを表示。
+ * @text フロントビューエフェクト表示
+ * @type boolean
+ * @default true
+ * @parent ActorEffect
+ * 
+ * @param ActorEffect_X
+ * @desc アニメーションエフェクトのX座標（相対座標）。
+ * @text アニメーションエフェクトX座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorEffect
+ * 
+ * @param ActorEffect_Y
+ * @desc アニメーションエフェクトのY座標（相対座標）。
+ * @text アニメーションエフェクトY座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorEffect
+ * 
+ * @param ActorDamage_X
+ * @desc ダメージエフェクトのX座標。（相対座標）
+ * @text ダメージエフェクトX座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorEffect
+ * 
+ * @param ActorDamage_Y
+ * @desc ダメージエフェクトのY座標。（相対座標）
+ * @text ダメージエフェクトY座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorEffect
+ * 
+ * @param ActorsMirror
+ * @desc アクターのアニメーションを反転します。
+ * @text アクターアニメーション反転
+ * @type boolean
+ * @default true
+ * @parent ActorEffect
 * 
 * 
-* @param ActorImgEffect
-* @text アクターグラフィックエフェクト設定
-* @default ////////////////////////////////
-* 
-* @param DamageImgFrame
-* @desc アクター画像のダメージ、回復時、防御の画像変化フレーム。
-* @text ダメージ、回復、防御時変化フレーム
-* @type number
-* @default 30
-* @min 1
-* @max 9999
-* @parent ActorImgEffect
-* 
-* @param CounterImgFrame
-* @desc アクター画像の反撃、魔法反射時の画像変化フレーム。
-* @text 反撃、魔法反射画像変化フレーム
-* @type number
-* @default 60
-* @min 1
-* @max 9999
-* @parent ActorImgEffect
-* 
-* @param OnActorShake
-* @desc ダメージ時のシェイクを有効にする。
-* @text ダメージシェイク有効
-* @type boolean
-* @default false
-* @parent ActorImgEffect
-* 
-* @param ActorShakeFlame
-* @desc ダメージ時のシェイクフレーム。（デフォルト36）
-* @text シェイクフレーム
-* @type number
-* @default 36
-* @min 0
-* @parent ActorImgEffect
-* 
-* @param ActorShakePower
-* @desc ダメージ時のシェイクの大きさ。（デフォルト2）
-* @text シェイクの大きさ
-* @type number
-* @default 2
-* @min 0
-* @parent ActorImgEffect
-* 
-* @param ActorShakeSpeed
-* @desc ダメージ時のシェイクのスピード。（デフォルト20）
-* @text シェイクスピード
-* @type number
-* @default 20
-* @min 0
-* @parent ActorImgEffect
-* 
-* @param OnActionZoom
-* @desc 行動時のエフェクトを有効にする。
-* @text 行動時エフェクト有効
-* @type boolean
-* @default false
-* @parent ActorImgEffect
-* 
-* @param ActionZoomDuration
-* @desc 行動時のエフェクトフレーム
-* @text 行動時エフェクトフレーム
-* @type number
-* @default 60
-* @min 0
-* @parent ActorImgEffect
-* 
-* @param ActorFlash
-* @desc アクター対象選択時にアクター画像を点滅させます。
-* @text 選択時アクター画像点滅
-* @type boolean
-* @default true
-* @parent ActorImgEffect
-* 
-* @param ImgDeathHide
-* @desc 戦闘不能になった場合、アクター画像（顔グラ）を非表示にします。
-* @text 戦闘不能時アクター画像非表示
-* @type boolean
-* @default true
-* @parent ActorImgEffect
-* 
-* 
+ * @param ActorStateAnimation
+ * @text アクターグラフィックステートアニメーション設定
+ * @default ////////////////////////////////
+ * 
+ * @param StateAnimationShow
+ * @desc アクター画像のステートアニメーションを表示します。フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text アクター画像ステートアニメーション表示
+ * @type boolean
+ * @default true
+ * @parent ActorStateAnimation
+ * 
+ * @param ActorState_X
+ * @desc アクター画像のステートアニメーションのX座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text ステートアニメーションX座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorStateAnimation
+ * 
+ * @param ActorState_Y
+ * @desc アクター画像のステートアニメーションのY座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
+ * @text ステートアニメーションY座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent ActorStateAnimation
+ * 
+ * 
+ * @param ActorImgEffect
+ * @text アクターグラフィックエフェクト設定
+ * @default ////////////////////////////////
+ * 
+ * @param DamageImgFrame
+ * @desc アクター画像のダメージ、回復時、防御の画像変化フレーム。
+ * @text ダメージ、回復、防御時変化フレーム
+ * @type number
+ * @default 30
+ * @min 1
+ * @max 9999
+ * @parent ActorImgEffect
+ * 
+ * @param CounterImgFrame
+ * @desc アクター画像の反撃、魔法反射時の画像変化フレーム。
+ * @text 反撃、魔法反射画像変化フレーム
+ * @type number
+ * @default 60
+ * @min 1
+ * @max 9999
+ * @parent ActorImgEffect
+ * 
+ * @param OnActorShake
+ * @desc ダメージ時のシェイクを有効にする。
+ * @text ダメージシェイク有効
+ * @type boolean
+ * @default false
+ * @parent ActorImgEffect
+ * 
+ * @param ActorShakeFlame
+ * @desc ダメージ時のシェイクフレーム。（デフォルト36）
+ * @text シェイクフレーム
+ * @type number
+ * @default 36
+ * @min 0
+ * @parent ActorImgEffect
+ * 
+ * @param ActorShakePower
+ * @desc ダメージ時のシェイクの大きさ。（デフォルト2）
+ * @text シェイクの大きさ
+ * @type number
+ * @default 2
+ * @min 0
+ * @parent ActorImgEffect
+ * 
+ * @param ActorShakeSpeed
+ * @desc ダメージ時のシェイクのスピード。（デフォルト20）
+ * @text シェイクスピード
+ * @type number
+ * @default 20
+ * @min 0
+ * @parent ActorImgEffect
+ * 
+ * @param OnActionZoom
+ * @desc 行動時のエフェクトを有効にする。
+ * @text 行動時エフェクト有効
+ * @type boolean
+ * @default false
+ * @parent ActorImgEffect
+ * 
+ * @param ActionZoomDuration
+ * @desc 行動時のエフェクトフレーム
+ * @text 行動時エフェクトフレーム
+ * @type number
+ * @default 60
+ * @min 0
+ * @parent ActorImgEffect
+ * 
+ * @param ActorFlash
+ * @desc アクター対象選択時にアクター画像を点滅させます。
+ * @text 選択時アクター画像点滅
+ * @type boolean
+ * @default true
+ * @parent ActorImgEffect
+ * 
+ * @param ImgDeathHide
+ * @desc 戦闘不能になった場合、アクター画像（顔グラ）を非表示にします。
+ * @text 戦闘不能時アクター画像非表示
+ * @type boolean
+ * @default true
+ * @parent ActorImgEffect
+ * 
+ * 
 * @param EnemyAnimation
 * @text 敵キャラアニメーション設定
 * @default ////////////////////////////////
@@ -2136,6 +2145,7 @@ params.FaceHeight = Number(parameters['FaceHeight'] || 82);
 params.NameShow = eval(parameters['NameShow'] || "true");
 params.TPBShow = eval(parameters['TPBShow'] || "true");
 params.StateVisible = eval(parameters['StateVisible'] || "true");
+params.NoStateIcon = Number(parameters['NoStateIcon'] || 0);
 params.OutsideWindowVisible = false;
 params.SelectBackShow = eval(parameters['SelectBackShow'] || "true");
 params.ActorSelectBackShow = eval(parameters['ActorSelectBackShow'] || "true");

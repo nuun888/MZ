@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.7.2
+ * @version 1.7.3
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -56,6 +56,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/10/15 Ver.1.7.3
+ * ステートが一つも付加されていないときに表示するアイコンを指定できる機能を追加。
  * 2022/10/9 Ver.1.7.2
  * アクターステータスのアクター毎にウィンドウを表示する機能を追加。
  * 2022/9/17 Ver.1.7.1
@@ -885,6 +887,13 @@
  * @text ステートアイコン表示
  * @type boolean
  * @default true
+ * @parent ActorStatusParamOption
+ * 
+ * @param NoStateIcon
+ * @desc ステートが一つも付与されていないときのアイコンインデックス。
+ * @text ステートなしアイコンインデックス
+ * @type number
+ * @default 0
  * @parent ActorStatusParamOption
  * 
  * @param FaceHeight
@@ -2478,6 +2487,7 @@ params.FaceHeight = Number(parameters['FaceHeight'] || 0);
 params.NameShow = eval(parameters['NameShow'] || "true");
 params.TPBShow = eval(parameters['TPBShow'] || "true");
 params.StateVisible = eval(parameters['StateVisible'] || "true");
+params.NoStateIcon = Number(parameters['NoStateIcon'] || 0);
 params.OutsideWindowVisible = false;
 params.SelectBackShow = eval(parameters['SelectBackShow'] || "true");
 params.ActorSelectBackShow = eval(parameters['ActorSelectBackShow'] || "true");

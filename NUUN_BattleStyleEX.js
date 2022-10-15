@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.7
+ * @version 3.7.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/10/15 Ver.3.7.8
+ * ステート無付加時のステートアイコンが敵にも適用されてしまう問題を修正。
  * 2022/10/15 Ver.3.7.7
  * ステートが一つも付加されていないときに表示するアイコンを指定できる機能を追加。
  * 2022/10/9 Ver.3.7.6
@@ -3307,13 +3309,13 @@ Sprite_StateIcon.prototype.shouldDisplay = function() {
 
 const _Sprite_StateIcon_updateFrame = Sprite_StateIcon.prototype.updateFrame;
 Sprite_StateIcon.prototype.updateFrame = function() {
-  this._index = params.NoneStateIcon > 0 ? params.NoneStateIcon : this._index;
+  this._index = this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : this._index;
   _Sprite_StateIcon_updateFrame.call(this);
 };
 
 const _Sprite_StateIcon_setFrameIcon = Sprite_StateIcon.prototype.setFrameIcon;
 Sprite_StateIcon.prototype.setFrameIcon = function(sprite) {
-  sprite._iconIndex = params.NoneStateIcon > 0 ? params.NoneStateIcon : sprite._iconIndex;
+  sprite._iconIndex = this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : sprite._iconIndex;
   _Sprite_StateIcon_setFrameIcon.call(this, sprite);
 };
 
@@ -3321,7 +3323,7 @@ if (params.NoStateIcon > 0) {
   const _Sprite_StateIcon_updateIcon = Sprite_StateIcon.prototype.updateIcon;
   Sprite_StateIcon.prototype.updateIcon = function() {
     _Sprite_StateIcon_updateIcon.call(this);
-    if (params.NoStateIcon > 0 && this._iconIndex === 0) {
+    if (this._battler.isActor() && params.NoStateIcon > 0 && this._iconIndex === 0) {
       this._iconIndex = params.NoStateIcon;
     }
   };

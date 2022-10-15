@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.8
+ * @version 3.7.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/10/16 Ver.3.7.9
+ * アクター別ウィンドウ表示時に矢印が表示されてしまう問題を修正。
  * 2022/10/15 Ver.3.7.8
  * ステート無付加時のステートアイコンが敵にも適用されてしまう問題を修正。
  * 2022/10/15 Ver.3.7.7
@@ -1849,7 +1851,7 @@ Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width)
 
 Window_BattleStatus.prototype.drawActorIcons = function(actor, x, y, width, data) {
   const key = "actor%1-stateIcon%2".format(actor.actorId(), (data.UserParamID || '_bsStateIcon2'));
-  const sprite = this.createInnerSprite(key, Sprite_BSStateIcon);
+  const sprite = this.createInnerSprite(key, Sprite_BSActorStateIcon);
   sprite.setup(actor, data);
   sprite.move(x, y);
   sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval1), this.getVisibleIcons(data.DetaEval2));
@@ -1888,7 +1890,7 @@ Window_BattleStatus.prototype.bs_PlaceActorName = function(actor, x, y) {
 
 Window_BattleStatus.prototype.placeStateIcon = function(actor, x, y, data) {
   const key = "actor%1-stateIcon%2".format(actor.actorId(), (data && data.UserParamID ? data.UserParamID : '_bsStateIcon'));
-  const sprite = this.createInnerSprite(key, Sprite_StateIcon);
+  const sprite = this.createInnerSprite(key, Sprite_BSStateIcon);
   sprite.setup(actor);
   sprite.move(x, y);
   if (data) {
@@ -2521,6 +2523,10 @@ Window_BSActor.prototype.updateTone = function() {
   } else {
     Window_Selectable.prototype.updateTone.call(this);
   }
+};
+
+Window_BSActor.prototype.updateArrows = function() {
+  
 };
 
 //Sprite_Actor
@@ -3307,27 +3313,6 @@ Sprite_StateIcon.prototype.shouldDisplay = function() {
   return result
 };
 
-const _Sprite_StateIcon_updateFrame = Sprite_StateIcon.prototype.updateFrame;
-Sprite_StateIcon.prototype.updateFrame = function() {
-  this._index = this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : this._index;
-  _Sprite_StateIcon_updateFrame.call(this);
-};
-
-const _Sprite_StateIcon_setFrameIcon = Sprite_StateIcon.prototype.setFrameIcon;
-Sprite_StateIcon.prototype.setFrameIcon = function(sprite) {
-  sprite._iconIndex = this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : sprite._iconIndex;
-  _Sprite_StateIcon_setFrameIcon.call(this, sprite);
-};
-
-if (params.NoStateIcon > 0) {
-  const _Sprite_StateIcon_updateIcon = Sprite_StateIcon.prototype.updateIcon;
-  Sprite_StateIcon.prototype.updateIcon = function() {
-    _Sprite_StateIcon_updateIcon.call(this);
-    if (this._battler.isActor() && params.NoStateIcon > 0 && this._iconIndex === 0) {
-      this._iconIndex = params.NoStateIcon;
-    }
-  };
-}
 
 function Sprite_BSStateIcon() {
   this.initialize(...arguments);
@@ -3337,13 +3322,42 @@ Sprite_BSStateIcon.prototype = Object.create(Sprite_StateIcon.prototype);
 Sprite_BSStateIcon.prototype.constructor = Sprite_BSStateIcon;
 
 Sprite_BSStateIcon.prototype.initialize = function() {
+  Sprite_StateIcon.prototype.initialize.call(this);
+};
+
+Sprite_BSStateIcon.prototype.updateFrame = function() {
+  this._index = this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : this._index;
+  Sprite_StateIcon.prototype.updateFrame.call(this);
+};
+
+Sprite_BSStateIcon.prototype.updateIcon = function() {
+  Sprite_StateIcon.prototype.updateIcon.call(this);
+  if (this._battler.isActor() && params.NoStateIcon > 0 && this._iconIndex === 0) {
+    this._iconIndex = params.NoStateIcon;
+  }
+};
+
+Sprite_BSStateIcon.prototype.setFrameIcon = function(sprite) {
+  sprite._iconIndex = this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : sprite._iconIndex;
+  Sprite_StateIcon.prototype.setFrameIcon.call(this, sprite);
+};
+
+
+function Sprite_BSActorStateIcon() {
+  this.initialize(...arguments);
+}
+
+Sprite_BSActorStateIcon.prototype = Object.create(Sprite_StateIcon.prototype);
+Sprite_BSActorStateIcon.prototype.constructor = Sprite_BSActorStateIcon;
+
+Sprite_BSActorStateIcon.prototype.initialize = function() {
   Sprite.prototype.initialize.call(this);
   this.initMembers();
   this.createBitmap();
   this.loadBitmap();
 };
 
-Sprite_BSStateIcon.prototype.initMembers = function() {
+Sprite_BSActorStateIcon.prototype.initMembers = function() {
   //this.userStatusParam = $gameTemp.userStatusParam;
   this._battler = null;
   this._animationCount = 0;
@@ -3352,31 +3366,31 @@ Sprite_BSStateIcon.prototype.initMembers = function() {
   this._visibleIcons = [];
 };
 
-Sprite_BSStateIcon.prototype.bitmapWidth = function() {
+Sprite_BSActorStateIcon.prototype.bitmapWidth = function() {
   return this._iconWidth ? this._iconWidth : BattleManager.gaugeMaxWidth;
 };
 
-Sprite_BSStateIcon.prototype.bitmapHeight = function() {
+Sprite_BSActorStateIcon.prototype.bitmapHeight = function() {
   return 36;
 };
 
-Sprite_BSStateIcon.prototype.createBitmap = function() {
+Sprite_BSActorStateIcon.prototype.createBitmap = function() {
   const width = this.bitmapWidth();
   const height = this.bitmapHeight();
   this.bitmap = new Bitmap(width, height);
 };
 
-Sprite_BSStateIcon.prototype.loadBitmap = function() {
+Sprite_BSActorStateIcon.prototype.loadBitmap = function() {
   this.iconBitmap = ImageManager.loadSystem("IconSet");
 };
 
-Sprite_BSStateIcon.prototype.setupVisibleIcons = function(list1, list2) {
+Sprite_BSActorStateIcon.prototype.setupVisibleIcons = function(list1, list2) {
   this._visibleIcons = [];
   this._visibleIcons = list1.filter(stateId => stateId > 0 && $dataStates[stateId].iconIndex > 0).map(stateId => $dataStates[stateId].iconIndex);
   Array.prototype.push.apply(this._visibleIcons , BattleManager.getVisibleBuffIcons(list2));
 };
 
-Sprite_BSStateIcon.prototype.setup = function(battler, data) {
+Sprite_BSActorStateIcon.prototype.setup = function(battler, data) {
   if (this._battler !== battler) {
       this._battler = battler;
       this._animationCount = this.updateWait();
@@ -3388,7 +3402,7 @@ Sprite_BSStateIcon.prototype.setup = function(battler, data) {
   }
 };
 
-Sprite_BSStateIcon.prototype.update = function() {
+Sprite_BSActorStateIcon.prototype.update = function() {
   Sprite.prototype.update.call(this);
   this._animationCount++;
   if (this._animationCount >= this.updateWait()) {
@@ -3397,11 +3411,11 @@ Sprite_BSStateIcon.prototype.update = function() {
   }
 };
 
-Sprite_BSStateIcon.prototype.updateWait = function() {
+Sprite_BSActorStateIcon.prototype.updateWait = function() {
   return 1;
 };
 
-Sprite_BSStateIcon.prototype.updateIcon = function() {
+Sprite_BSActorStateIcon.prototype.updateIcon = function() {
   this.bitmap.clear();
   let icons = [];
   const iconWidth = ImageManager.iconWidth;
@@ -3423,7 +3437,7 @@ Sprite_BSStateIcon.prototype.updateIcon = function() {
   }
 };
 
-Sprite_BSStateIcon.prototype.drawIcon = function(iconIndex, x, y) {
+Sprite_BSActorStateIcon.prototype.drawIcon = function(iconIndex, x, y) {
   const bitmap = ImageManager.loadSystem("IconSet");
   const pw = ImageManager.iconWidth;
   const ph = ImageManager.iconHeight;

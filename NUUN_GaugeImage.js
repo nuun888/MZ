@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -52,6 +52,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/16 Ver.1.6.1
+ * 数値画像が回転しない問題を修正。
+ * 回転を指定したときにゴミが表示される問題を修正。
  * 2022/10/15 Ver.1.6.0
  * 数値の画像化に対応
  * 2022/7/19 Ver.1.5.2
@@ -460,7 +463,7 @@ Sprite_Gauge.prototype.bitmapHeight = function() {
 };
 
 Sprite_Gauge.prototype.createGaugeSpriteBitmap = function() {
-    const inclined = this._gaugeImgData.GaugeInclined !== 0 ? Math.abs((this.bitmapHeight() * this.gaugeInclinedRate()) * 2) : 0;
+    const inclined = (this._gaugeImgData.GaugeInclined !== 0 ? Math.abs((this.bitmapHeight() * this.gaugeInclinedRate()) * 2) : 0) + 1;
     this._gaugeImgSprite.bitmap = new Bitmap(this.bitmapWidth() + inclined, this.bitmapHeight());
 };
 
@@ -607,6 +610,9 @@ Sprite_Gauge.prototype.createGaugeMainImg = function() {
 Sprite_Gauge.prototype.loadVauleImg = function() {
     const imgData = this._gaugeImgData.ValueImg;
     if (imgData && imgData.length > 0) {
+        this._digitSprite = new Sprite();
+        this.addChild(this._digitSprite);
+        this._digitSprite.bitmap = new Bitmap(this.bitmapWidth(), this.bitmapHeight());
         this._valueImgBitmap = [];
         this._valueImgBitmap[0] = ImageManager.nuun_LoadPictures(imgData[0]);
         this._valueImgBitmap[1] = imgData[1] ? ImageManager.nuun_LoadPictures(imgData[1]) : this._valueImgBitmap[0];
@@ -707,25 +713,27 @@ Sprite_Gauge.prototype.setupDrawLabel = function(bitmap) {
 const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
 Sprite_Gauge.prototype.drawValue = function() {
     const oldBitmap = this.bitmap;
-    this.bitmap = this.textSprite ? this.textSprite.bitmap : this.bitmap;
-    const context = this.bitmap.context;
-    if (this._gaugeImgData) {
-        context.beginPath();
-        context.save();
-        context.rotate(this._gaugeImgData.GaugeValueAngle * Math.PI / 180);
-    }
+    let context = null;
     if (this._valueImgBitmap) {
+        this._digitSprite.rotation = (this._gaugeImgData.GaugeValueAngle * Math.PI / 180);
         if (this._gaugeData) {
             this.drawValueEXImg();
         } else {
             this.drawValueImg();
         }
     } else {
+        this.bitmap = this.textSprite ? this.textSprite.bitmap : this.bitmap;
+        context = this.bitmap.context;
+        if (this._gaugeImgData) {
+            context.beginPath();
+            context.save();
+            context.rotate(this._gaugeImgData.GaugeValueAngle * Math.PI / 180);
+        }
         _Sprite_Gauge_drawValue.call(this);
-    }
-    if (this._gaugeImgData) {
-        context.restore();
-        this.bitmap = oldBitmap;
+        if (this._gaugeImgData) {
+            context.restore();
+            this.bitmap = oldBitmap;
+        }
     }
 };
 
@@ -811,7 +819,7 @@ Sprite_Gauge.prototype.createChildSprite = function(width, height) {
     sprite.anchor.x = this.drawValueAlignAnchorX();
     sprite.anchor.y = 0.0;
     sprite.y = 0;
-    this.addChild(sprite);
+    this._digitSprite.addChild(sprite);
     return sprite;
 };
 

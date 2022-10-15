@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.5.2
+ * @version 1.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -34,15 +34,26 @@
  * メイン画像：ゲージの画像です。
  * 
  * ゲージの画像化を戦闘中のみ反映させる場合はフィルタリングクラス設定で'Window_BattleStatus'、'Window_BattleActor'を設定してください。
+ * 画像座標X及び画像座標Yは、ラベルが画像指定してない場合でも適用されます。ラベル画像のゲージ表示オフセット位置で設定してください。
+ * 
+ * 数値画像
+ * 数値の画像のフォーマットは左から0から9までの数値が並んだ画像を指定してください。縦分割数は1固定です。
+ * リスト1:通常時
+ * リスト2:瀕死時(未指定の場合はリスト1が適用)
+ * リスト3:戦闘不能時(未指定の場合はリスト1が適用)
+ * 数値画像に拡大率の設定はありません。
  * 
  * 仕様
  * コアスクリプトの仕様でゲージを回転する場合は、座標の調整を行う必要があります。
  * このプラグインは共通処理プラグインVer.1.4.4以降が必要になります。
+ * 
  *  
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/15 Ver.1.6.0
+ * 数値の画像化に対応
  * 2022/7/19 Ver.1.5.2
  * ダメージ量ゲージ可視化別プラグイン化による処理変更。
  * 2022/5/24 Ver.1.5.1
@@ -103,13 +114,13 @@
  * 
  * @param GaugeImgX
  * @text 画像座標X
- * @desc 画像のX座標を一括で移動します。
+ * @desc 画像のX座標を一括で移動します。(ラベルは画像指定してない場合でも適用されます)
  * @type number
  * @default 0
  * 
  * @param GaugeImgY
  * @text 画像座標Y
- * @desc 画像のY座標を一括で移動します。
+ * @desc 画像のY座標を一括で移動します。(ラベルは画像指定してない場合でも適用されます)
  * @type number
  * @default 0
  * 
@@ -276,6 +287,30 @@
  * @param ValueSetting
  * @text 数値画像設定
  * @default ------------------------------
+ * 
+ * @param ValueImg
+ * @desc 数値画像ファイル名を指定します。リスト番号0:通常時 リスト番号1:瀕死時 リスト番号2:戦闘不能時
+ * @text 数値画像
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent ValueSetting
+ * 
+ * @param ValueX
+ * @desc 数値のX座標を指定します。
+ * @text 数値表示オフセット位置X
+ * @type number
+ * @default 0
+ * @min -999
+ * @parent ValueSetting
+ * 
+ * @param ValueY
+ * @desc 数値のY座標を指定します。
+ * @text 数値表示オフセット位置Y
+ * @type number
+ * @default 0
+ * @min -999
+ * @parent ValueSetting
  * 
  * @param GaugeValueAngle
  * @text 数値回転角度
@@ -468,6 +503,7 @@ Sprite_Gauge.prototype.createGaugeImg = function() {
     this.createGaugeBaukImg();
     this.createGaugeMainImg();
     this.createGaugeFrontImg();
+    this.loadVauleImg();
 };
 
 Sprite_Gauge.prototype.createGaugeBaukImg = function() {
@@ -568,6 +604,19 @@ Sprite_Gauge.prototype.createGaugeMainImg = function() {
     context.rotate(this._gaugeImgData.GaugeImgAngle * Math.PI / 180);
 };
 
+Sprite_Gauge.prototype.loadVauleImg = function() {
+    const imgData = this._gaugeImgData.ValueImg;
+    if (imgData && imgData.length > 0) {
+        this._valueImgBitmap = [];
+        this._valueImgBitmap[0] = ImageManager.nuun_LoadPictures(imgData[0]);
+        this._valueImgBitmap[1] = imgData[1] ? ImageManager.nuun_LoadPictures(imgData[1]) : this._valueImgBitmap[0];
+        this._valueImgBitmap[2] = imgData[2] ? ImageManager.nuun_LoadPictures(imgData[2]) : this._valueImgBitmap[0];
+        this._Digit = [];
+    } else {
+        this._valueImgBitmap = null;
+    }
+};
+
 const _Sprite_Gauge_drawGauge = Sprite_Gauge.prototype.drawGauge;
 Sprite_Gauge.prototype.drawGauge = function() {
     if (this._gaugeImgData) {
@@ -665,11 +714,117 @@ Sprite_Gauge.prototype.drawValue = function() {
         context.save();
         context.rotate(this._gaugeImgData.GaugeValueAngle * Math.PI / 180);
     }
-    _Sprite_Gauge_drawValue.call(this);
+    if (this._valueImgBitmap) {
+        if (this._gaugeData) {
+            this.drawValueEXImg();
+        } else {
+            this.drawValueImg();
+        }
+    } else {
+        _Sprite_Gauge_drawValue.call(this);
+    }
     if (this._gaugeImgData) {
         context.restore();
         this.bitmap = oldBitmap;
     }
+};
+
+Sprite_Gauge.prototype.drawValueEXImg = function() {
+    if (this._gaugeData.ValueVisible === 'ValueMaxValue') {
+        //this.drawValueImgMaxValue();
+        this.drawValueImg();
+    } else if (this._gaugeData.ValueVisible === 'Value') {
+        this.drawValueImg();
+    } else if (this._gaugeData.ValueVisible === 'NoValue') {
+
+    }
+};
+
+Sprite_Gauge.prototype.drawValueImg = function() {
+    const currentValue = this.currentValue();
+    this.createDigits(currentValue);
+};
+
+Sprite_Gauge.prototype.createDigits = function(value) {
+    for (const sprite of this._Digit) {
+        if (sprite) {
+            sprite.bitmap = null;
+        }
+    }
+    const string = Math.abs(value).toString();
+    const w = this.nuun_DigitWidth();
+    const h = this.nuun_DigitHeight();
+    for (let i = 0; i < string.length; i++) {
+        const n = Number(string[i]);
+        const sprite = this._Digit[i] ? this._Digit[i] : this.createChildSprite(w, h);
+        sprite.bitmap = this.getValueBitmap();
+        sprite.setFrame(n * w, 0, w, h);
+        sprite.x = this.drawValuePositionImg(w * (string.length - 1)) + i * w + (this._gaugeImgData.ValueX || 0);
+        sprite.y = (this._gaugeImgData.ValueY || 0);
+        this._Digit[i] = sprite;
+    }
+};
+
+Sprite_Gauge.prototype.drawValueAlignImg = function() {
+    if (Imported.NUUN_GaugeValueEX) {
+        return this.valueAlign();
+    } else {
+        return 'right';
+    }
+};
+
+
+Sprite_Gauge.prototype.drawValueAlignAnchorX = function() {
+    switch (this.drawValueAlignImg()) {
+        case 'left':
+            return 0.0;
+        case 'center':
+            return 1.0;
+        case 'right':
+            return 1.0;
+        default:
+            return 1.0;
+    }
+};
+
+Sprite_Gauge.prototype.drawValuePositionImg = function(width) {
+    switch (this.drawValueAlignImg()) {
+        case 'left':
+            return this.gaugeX();
+        case 'center':
+            return this.gaugeX() + (this.bitmapWidth() - width) / 2;
+        case 'right':
+            return this.bitmapWidth() - width;
+        default:
+            return this.bitmapWidth() - width;
+    }
+};
+
+Sprite_Gauge.prototype.getValueBitmap = function() {
+    const id = getBattlerStatus(this._battler);
+    return this._valueImgBitmap[id];
+};
+
+Sprite_Gauge.prototype.createChildSprite = function(width, height) {
+    const sprite = new Sprite();
+    sprite.bitmap = this.createValueBitmap(width, height);
+    sprite.anchor.x = this.drawValueAlignAnchorX();
+    sprite.anchor.y = 0.0;
+    sprite.y = 0;
+    this.addChild(sprite);
+    return sprite;
+};
+
+Sprite_Gauge.prototype.createValueBitmap = function(width, height) {
+    return new Bitmap(width, height);
+};
+
+Sprite_Gauge.prototype.nuun_DigitWidth = function() {
+    return this._valueImgBitmap[0].width / 10;
+};
+
+Sprite_Gauge.prototype.nuun_DigitHeight = function() {
+    return this._valueImgBitmap[0].height;
 };
 
 const _Sprite_Gauge_redraw = Sprite_Gauge.prototype.redraw;
@@ -724,6 +879,18 @@ Sprite_Gauge.prototype.getMainGaugeImg  = function() {
 
 Game_Battler.prototype.isTpbCast = function() {
     return this._tpbState === "casting" && this.tpbRequiredCastTime() > 0 || this.isActing() || this._tpbState === "ready";
+};
+
+function getBattlerStatus(battler) {
+    if (!battler) {
+        return 0;
+    } else if (battler.isDead()) {
+        return 2;
+    } else if (battler.isDying()) {
+        return 1;
+    } else {
+        return 0;
+    }
 };
 
 })();

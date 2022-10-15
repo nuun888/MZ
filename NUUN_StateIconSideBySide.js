@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.3.2
+ * @version 1.4.0
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -32,6 +32,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/15 Ver.1.4.0
+ * 味方のステートが付与されていないときのアイコンを指定できる機能を追加。
  * 2022/8/22 Ver.1.3.2
  * アイコンの表示位置とアイコンの表示揃えの設定を分割。
  * 2022/7/2 Ver.1.3.1
@@ -80,7 +82,7 @@
  * @desc 味方のステート列数。
  * @text 味方ステート列数
  * @type number
- * @default 5
+ * @default 4
  * @min 1
  * @parent ActorStateIcon
  * 
@@ -90,6 +92,14 @@
  * @type number
  * @default 1
  * @min 1
+ * @parent ActorStateIcon
+ * 
+ * @param NoStateIcon
+ * @desc ステートがひとつも付与されていない時のアイコンインデックス。
+ * @text ステートなし時アイコン
+ * @type number
+ * @default 0
+ * @min 0
  * @parent ActorStateIcon
  * 
  * @param ActorStateIconAlign
@@ -240,6 +250,7 @@ const TurnFontSize = Number(parameters['TurnFontSize'] || -4);
 const TurnX = Number(parameters['TurnX'] || 0);
 const TurnY = Number(parameters['TurnY'] || -4);
 const TurnCorrection = Number(parameters['TurnCorrection'] || 1);
+const NoStateIcon = Number(parameters['NoStateIcon'] || 0);
 let isEnemyMode = false;
 
 const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
@@ -335,15 +346,19 @@ Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
       sprite._stateTurn = displayTurn[r];
       sprite.visible = true;
     } else {
-      sprite._iconIndex = 0;
+      sprite._iconIndex = this._battler.isActor() ? NoStateIcon : 0;
       sprite._stateTurn = 0;
       if (sprite.visible) {
         this.setFrameIcon(sprite);
       }
-      sprite.visible = false;
+      if (sprite._iconIndex === 0) {
+        sprite.visible = false;
+      } else {
+        sprite.visible = true;
+      }
     }
   });
-  this.displayIconsLength = displayIcons.length;
+  this.displayIconsLength = this._battler.isActor() && NoStateIcon > 0 ? ActorStateIconShowVal : displayIcons.length;
 };
 
 Sprite_StateIcon.prototype.updateIcon = function() {//再定義
@@ -368,7 +383,9 @@ Sprite_StateIcon.prototype.updateIcon = function() {//再定義
   } else {
       this._animationIndex = 0;
       this._iconIndex = 0;
-      this.visible = false;//疑似3Dバトル競合対策
+      if (!(this._battler.isActor() && NoStateIcon > 0)) {
+        this.visible = false;//疑似3Dバトル競合対策
+      }
   }
 };
 
@@ -386,10 +403,11 @@ Sprite_StateIcon.prototype.updateFrame = function() {//再定義
 };
 
 Sprite_StateIcon.prototype.setFrameIcon = function(sprite) {
+  const iconId = sprite._iconIndex;
   const pw = ImageManager.iconWidth;
   const ph = ImageManager.iconHeight;
-  const sx = (sprite._iconIndex % 16) * pw;
-  const sy = Math.floor(sprite._iconIndex / 16) * ph;
+  const sx = (iconId % 16) * pw;
+  const sy = Math.floor(iconId / 16) * ph;
   sprite.setFrame(sx, sy, pw, ph);
 };
 

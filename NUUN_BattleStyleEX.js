@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.6
+ * @version 3.7.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/10/15 Ver.3.7.7
+ * ステートが一つも付加されていないときに表示するアイコンを指定できる機能を追加。
  * 2022/10/9 Ver.3.7.6
  * 一部のウィンドウスキンが適用されない問題を修正。
  * 2022/10/9 Ver.3.7.5

@@ -3309,7 +3309,7 @@ Sprite_StateIcon.prototype.setupVisibleIcons = function(list1, list2) {
 const _Sprite_StateIcon_shouldDisplay = Sprite_StateIcon.prototype.shouldDisplay;
 Sprite_StateIcon.prototype.shouldDisplay = function() {
   const result = _Sprite_StateIcon_shouldDisplay.call(this);
-  if (result && this._battler.isActor()) {
+  if (result && this._battler && this._battler.isActor()) {
     BattleManager.visibleStateIcons = this._visibleStateIcons;
   }
   return result

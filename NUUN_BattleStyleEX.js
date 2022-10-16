@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.9
+ * @version 3.7.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/10/16 Ver.3.7.10
+ * 微修正。
  * 2022/10/16 Ver.3.7.9
  * アクター別ウィンドウ表示時に矢印が表示されてしまう問題を修正。
  * 2022/10/15 Ver.3.7.8
@@ -3326,19 +3328,19 @@ Sprite_BSStateIcon.prototype.initialize = function() {
 };
 
 Sprite_BSStateIcon.prototype.updateFrame = function() {
-  this._index = this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : this._index;
+  this._index = this._battler && this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : this._index;
   Sprite_StateIcon.prototype.updateFrame.call(this);
 };
 
 Sprite_BSStateIcon.prototype.updateIcon = function() {
   Sprite_StateIcon.prototype.updateIcon.call(this);
-  if (this._battler.isActor() && params.NoStateIcon > 0 && this._iconIndex === 0) {
+  if (this._battler && this._battler.isActor() && params.NoStateIcon > 0 && this._iconIndex === 0) {
     this._iconIndex = params.NoStateIcon;
   }
 };
 
 Sprite_BSStateIcon.prototype.setFrameIcon = function(sprite) {
-  sprite._iconIndex = this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : sprite._iconIndex;
+  sprite._iconIndex = this._battler && this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : sprite._iconIndex;
   Sprite_StateIcon.prototype.setFrameIcon.call(this, sprite);
 };
 

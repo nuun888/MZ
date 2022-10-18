@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.15.0
+ * @version 2.16.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -37,13 +37,13 @@
  * アナライズ成功時に全て登録
  * リストでアナライズ時(ステータス情報登録ON)を設定します。
  * 
- * 敵キャラのメモ欄
+ * 敵キャラのメモ欄及びモンスターカテゴリー設定のメモ欄　※後者はカテゴリー表示時のみ
  * 記述欄のテキスト　制御文字が使用可能です。
  * <[tag]:[text]> 記述欄のテキスト
  * [tag]:記述欄タグ名　デフォルト設定だとモンスターの説明を記述するタグはdescに設定されています。
  * [text]:表示するテキスト。
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
- * <desc1:ああああ> descとタグ付けされた項目に「ああああ」が表示されます。
+ * <desc:ああああ> descとタグ付けされた項目に「ああああ」が表示されます。
  * デフォルト設定では2ページ目に表示される項目にdescが設定されていますので、文章を表示させる場合は<desc:[text]>と記入してください。
  * 
  * モンスター別画像の表示
@@ -100,6 +100,9 @@
  * <CategoryKey:[Key]> 表示するカテゴリーを設定します。
  * <CategoryKey:[Key],[Key]....> 表示出来るカテゴリーは複数設定可能です。
  * [Key]:カテゴリーKey([]は付けずにプラグインパラメータで設定した文字列を記入してください)
+ * 
+ * カテゴリー選択時の項目を表示できます。未設定時は表示されません。
+ * 記述欄等のタグはプラグインパラメータのモンスターカテゴリー設定のメモ欄に記入します。
  * 
  * アナライズスキル設定の失敗時のメッセージ
  * %1:ターゲット名
@@ -173,6 +176,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/18 Ver.2.16.0
+ * モンスターステータスウィンドウにカテゴリー選択時の項目を表示できる機能を追加。
+ * カテゴリーにモンスターが表示されなかった問題を修正。
  * 2022/10/9 Ver.2.15.0
  * 未登録のモンスターに対して表示できる項目を設定できる機能を追加。
  * 敵の情報のモンスター一覧に同一モンスターがいるときに表示されるアルファベットが表示されない問題を修正。
@@ -658,6 +664,13 @@
  * @text 未遭遇カテゴリー文字列
  * @type string
  * @default ？
+ * @parent SelectCategorySetting
+ * 
+ * @param CategoryListDateSetting
+ * @desc カテゴリー選択時に表示するリスト。
+ * @text カテゴリー表示リスト
+ * @type struct<CategoryPageListData>[]
+ * @default []
  * @parent SelectCategorySetting
  * 
  * @param CategoryWindowsSkin
@@ -2212,13 +2225,13 @@
  * @value 122
  * @option モンスター画像(1)(2)(3)(4)(5)(7)(19)
  * @value 200
- * @option キャラチップ
+ * @option キャラチップ(1)(2)(3)(4)
  * @value 201
- * @option 共通画像
+ * @option 共通画像(1)(2)(3)(4)(5)(7)(18)(19)
  * @value 250
- * @option 個別画像
+ * @option 個別画像(1)(2)(3)(4)(5)(7)(19)
  * @value 251
- * @option ページ切り替え
+ * @option ページ切り替え(1)～(5)(7)(8)(9)(12)(16)
  * @value 500
  * @option ライン(1)(2)(3)(4)(5)(7)(9)
  * @value 1000
@@ -2364,8 +2377,164 @@
  * @parent nameSetting
  * 
  * @param textMethod
- * @desc 記述欄に紐づけするタグ名
- * @text 記述欄タグ名(17)
+ * @desc 記述欄、個別画像に紐づけするタグ名
+ * @text 記述欄、個別画像タグ名(17)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param CommonText
+ * @desc 共通テキスト(制御文字使用可能)
+ * @text 共通テキスト(20)
+ * @type multiline_string	
+ * @default 
+ * @parent textSetting
+ * 
+ * @param ImgData
+ * @desc 全てのモンスターページに表示される共通画像ファイル名を指定します。横幅は「項目横幅」、高さは「画像の最大縦幅」
+ * @text 共通画像(18)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param ImgMaxHeight
+ * @desc 画像の最大縦幅（行数で指定）
+ * @text 画像の最大縦幅(19)
+ * @type number
+ * @default 8
+ * @min 0
+ * @parent ImgSetting
+ * 
+ */
+/*~struct~CategoryPageListData:
+ * 
+ * @param BasicSetting
+ * @text 基本設定
+ * @default
+ * 
+ * @param DateSelect
+ * @desc 表示させる項目を指定。
+ * @text 項目リスト
+ * @type select
+ * @option 表示なし
+ * @value 0
+ * @option 名称のみ(1)～(5)(7)(8)(9)(12)(16)
+ * @value 35
+ * @option 記述欄(1)～(5)(7)(8)(9)(12)(17)
+ * @value 70
+ * @option 共通記述欄(1)～(5)(7)(8)(9)(12)(20)
+ * @value 71
+ * @option 共通画像(1)(2)(3)(4)(5)(7)(18)(19)
+ * @value 250
+ * @option 個別画像(1)(2)(3)(4)(5)(7)(19)
+ * @value 251
+ * @option ライン(1)(2)(3)(4)(5)(7)(9)
+ * @value 1000
+ * @default 0
+ * @parent BasicSetting
+ * 
+ * @param X_Position
+ * @text X表示列位置(1)
+ * @desc X表示列位置
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 3
+ * @parent BasicSetting
+ * 
+ * @param Y_Position
+ * @desc Y表示行位置
+ * @text Y表示行位置(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent BasicSetting
+ * 
+ * @param X_Coordinate
+ * @text X座標（相対）(3)
+ * @desc X座標（X表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BasicSetting
+ * 
+ * @param Y_Coordinate
+ * @text Y座標（相対）(4)
+ * @desc Y座標（Y表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BasicSetting
+ * 
+ * @param ItemWidth
+ * @desc 項目横幅（0で自動）
+ * @text 項目横幅(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent BasicSetting
+ * 
+ * @param SystemItemWidth
+ * @desc システム項目の横幅（0で自動）
+ * @text システム項目横幅(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent BasicSetting
+ * 
+ * @param WideMode
+ * @desc 項目表示モード。複数列にまたがって表示されます。
+ * @text 項目表示モード(7)
+ * @type select
+ * @option １列表示
+ * @value 1
+ * @option ２列表示
+ * @value 2
+ * @option ３列表示（表示列数が３の時のみ）
+ * @value 3
+ * @default 1
+ * @parent BasicSetting
+ * 
+ * @param paramName
+ * @desc 表示する項目の名称を設定します。
+ * @text 名称(8)
+ * @type string
+ * @default
+ * @parent BasicSetting
+ * 
+ * @param NameColor
+ * @desc システム項目の文字色。(システムカラーまたはカラーコード)
+ * @text システム項目文字色(9)
+ * @type number
+ * @default 16
+ * @min 0
+ * @parent BasicSetting
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォント+デフォルトフォントからの差）
+ * @text フォントサイズ(12)
+ * @type number
+ * @default 0
+ * @min -99
+ * @parent BasicSetting
+ * 
+ * @param namePosition
+ * @desc 文字の表示位置を指定します。
+ * @text 文字の表示位置(16)
+ * @type select
+ * @option 左
+ * @value "left"
+ * @option 中央
+ * @value "center"
+ * @option 右
+ * @value "right"
+ * @default "left"
+ * @parent nameSetting
+ * 
+ * @param textMethod
+ * @desc 記述欄、個別画像に紐づけするタグ名
+ * @text 記述欄、個別画像タグ名(17)
  * @type string
  * @default 
  * @parent textSetting
@@ -2470,6 +2639,12 @@
  * @text カテゴリーKey
  * @type combo
  * @option 'all'
+ * @default
+ * 
+ * @param CategoryNote
+ * @desc メモ欄。
+ * @text メモ欄
+ * @type multiline_string
  * @default 
  * 
  */
@@ -2686,6 +2861,7 @@ const EnemyBookCategory = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData
 const CategoryVisibleType = eval(parameters['CategoryVisibleType']) || 0;
 const CategoryUnknownData = String(parameters['CategoryUnknownData'] || '？');
 const CategoryWindowsSkin = String(parameters['CategoryWindowsSkin']);
+const CategoryListDateSetting = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CategoryListDateSetting'])) : [];
 
 const NumberType = eval(parameters['NumberType']) || 0;
 const UnknownVisible = eval(parameters['UnknownVisible'] || 'false');
@@ -3914,6 +4090,7 @@ Scene_EnemyBook.prototype.createEnemyPageWindow = function() {
     const rect = this.enemyWindowPageRect();
     this._enemyPageWindow = new Window_EnemyBookPage(rect);
     this.addWindow(this._enemyPageWindow);
+    this._enemyPageWindow.deactivate();
     this._enemyPageWindow.setPageList(PageSetting, PageCols);
     this._enemyPageWindow.setIndexWindow(this._indexWindow);
     if (!AllEnemyBookWindowVisible) {
@@ -3944,6 +4121,9 @@ Scene_EnemyBook.prototype.createEnemyWindow = function() {
     this.addWindow(this._enemyWindow);
     this._indexWindow.setEnemyWindow(this._enemyWindow);
     this._enemyPageWindow.setEnemyWindow(this._enemyWindow);
+    if (this._categoryWindow) {
+        this._categoryWindow.setEnemyWindow(this._enemyWindow);
+    }
     if (!AllEnemyBookWindowVisible) {
         this._enemyWindow.opacity = 0;
     }
@@ -4017,6 +4197,8 @@ Scene_EnemyBook.prototype.setEnemyBookButton = function() {
         this._enemyBook_downButton.y = this.buttonY();
         this._enemyBook_upButton.x = this._enemyBook_downButton.x - this._enemyBook_upButton.width - 4;
         this._enemyBook_upButton.y = this.buttonY();
+        this._enemyBook_downButton.visible = !this._categoryWindow;
+        this._enemyBook_upButton.visible = !this._categoryWindow;
     }
 };
 
@@ -4089,6 +4271,20 @@ Scene_EnemyBook.prototype.updateEnemyBookPageupButton = function() {
 Scene_EnemyBook.prototype.update = function() {
     Scene_MenuBase.prototype.update.call(this);
     this.updateEnemyBookBackground();
+    this.updatePageupdownButton();
+};
+
+Scene_EnemyBook.prototype.updatePageupdownButton = function() {
+    if (this._enemyBook_downButton) {
+        this._enemyBook_downButton.visible = this._enemyPageWindow.active && this.updatePageupdownButtonBookMode();
+    }
+    if (this._enemyBook_upButton) {
+        this._enemyBook_upButton.visible = this._enemyPageWindow.active && this.updatePageupdownButtonBookMode();
+    }
+};
+
+Scene_EnemyBook.prototype.updatePageupdownButtonBookMode = function() {
+    return PageSetting.length > 1;
 };
 
 Scene_EnemyBook.prototype.getEnemyBookBackground = function() {
@@ -4205,6 +4401,9 @@ Scene_Battle.prototype.createEnemyBookStatusWindow = function() {
     this._enemyBookIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
     this._enemyBookInfoIndexWindow.setEnemyWindow(this._enemyBookEnemyWindow);
     this._enemyBookPageWindow.setEnemyWindow(this._enemyBookEnemyWindow);
+    if (this._enemyBookCategoryWindow) {
+        this._enemyBookCategoryWindow.setEnemyWindow(this._enemyBookEnemyWindow);
+    }
     BattleManager.setEnemyBookWinsow(this._enemyBookEnemyWindow);
 };
 
@@ -4861,10 +5060,22 @@ Window_EnemyBook_Category.prototype.categoryFilter = function() {
     return this._list.filter((data, i) => $gameSystem.getCategoryEnemyBook(i));
 };
 
+Window_EnemyBook_Category.prototype.select = function(index) {
+    Window_Selectable.prototype.select.call(this, index);
+    this.refreshEnemyData();
+};
+
 Window_EnemyBook_Category.prototype.setCategoryFlags = function() {
     $gameSystem.initCategoryEnemyBook();
     for (enemy of $dataEnemies) {
         $gameSystem.categoryToEnemyBook(enemy);
+    }
+};
+
+Window_EnemyBook_Category.prototype.refreshEnemyData = function() {
+    if (this._enemyWindow && this.active) {
+        const note = this.currentData() ? this.currentData().note : {};
+        this._enemyWindow.setCategoryData(note);
     }
 };
 
@@ -4878,6 +5089,7 @@ Window_EnemyBook_Category.prototype.makeCommandList = function() {
             enabled = false;
         }
         this.addCommand(categoryName, command.CategoryKey, enabled, i);
+        this._list[this._list.length - 1].note = enemyBookExtractMetadata(command);
     });
     if (CategoryVisibleType === 1) {
         this._list = this.categoryFilter();
@@ -4901,8 +5113,9 @@ Window_EnemyBook_Category.prototype.refresh = function() {
 
 Window_EnemyBook_Category.prototype.processOk = function() {
     pageIndex.category = this.index();
-    this._enemyIndexWindow.setCategoryType(this.currentExt());
-    const name = this.currentData() ? this.currentData().name : '';
+    const currentData = this.currentData();
+    this._enemyIndexWindow.setCategoryType(currentData);
+    const name = currentData ? currentData.name : '';
     this._categoryNameWindow.setCategoryName(name);
     Window_Command.prototype.processOk.call(this);
 };
@@ -4922,6 +5135,11 @@ Window_EnemyBook_Category.prototype.setEnemyIndexWindow = function(enemyIndexWin
 
 Window_EnemyBook_Category.prototype.setCategoryNameWindow = function(categoryNameWindow) {
     this._categoryNameWindow = categoryNameWindow;
+};
+
+Window_EnemyBook_Category.prototype.setEnemyWindow = function(enemyWindow) {
+    this._enemyWindow = enemyWindow;
+    this.refreshEnemyData();
 };
 
 Window_EnemyBook_Category.prototype.itemTextAlign = function() {
@@ -5313,6 +5531,8 @@ Window_EnemyBook.prototype.constructor = Window_EnemyBook;
 Window_EnemyBook.prototype.initialize = function(rect) {
     Window_StatusBase.prototype.initialize.call(this, rect);
     this._page = 0;
+    this._categoryMode = false;
+    this._categoryData = {};
     this._enemySprite = null;
     this._displayList = null;
     this._enemy = null;
@@ -5334,6 +5554,7 @@ Window_EnemyBook.prototype.maxCols = function() {
 };
 
 Window_EnemyBook.prototype.setEnemyData = function(enemy) {
+    this._categoryMode = false;
     if (this._enemy !== enemy) {
         this._enemy = enemy;
         this.refresh();
@@ -5355,9 +5576,20 @@ Window_EnemyBook.prototype.getDisplayPage = function() {
     return this._displayList;
 };
 
+
+Window_EnemyBook.prototype.setCategoryData = function(note) {
+    this._categoryMode = true;
+    if (this._categoryData !== note) {
+        this._categoryData = note;
+        this.refresh();
+    }
+};
+
 Window_EnemyBook.prototype.listDate = function(list) {
     let tag = 'PageList';
-    if (UnregisteredEnemy > 0) {
+    if (this._categoryMode) {
+        return CategoryListDateSetting; 
+    } else if (UnregisteredEnemy > 0) {
         tag += $gameSystem.isInEnemyBook(this._enemy) ? list.ListDateSetting : UnregisteredEnemy;
     } else {
         tag += list.ListDateSetting;
@@ -5424,7 +5656,9 @@ Window_EnemyBook.prototype.isEnemyData = function() {
 Window_EnemyBook.prototype.refresh = function() {
     Window_StatusBase.prototype.refresh.call(this);
     this._enemySprite.bitmap = null;
-    if (this._enemy && this.isEnemyData() && this._displayList) {
+    if (this._categoryMode && CategoryListDateSetting) {
+        this.loadBitmap();
+    } else if (this._enemy && this.isEnemyData() && this._displayList) {
         this.loadBitmap();
     }
 };
@@ -5436,7 +5670,7 @@ Window_EnemyBook.prototype.getEnemyData = function() {
 Window_EnemyBook.prototype.drawEnemyBookContents = function() {
     const lineHeight = this.lineHeight();
     const listContents = this.listDate(this._displayList);
-    const enemy = this.getEnemyData();
+    const enemy = this._categoryMode ? null : this.getEnemyData();
     for (const data of listContents) {
         this.resetFontSettings();
         const x_Position = data.X_Position;
@@ -5458,7 +5692,8 @@ Window_EnemyBook.prototype.loadBitmap = function() {
             case 250:
                 loadBitmap = ImageManager.nuun_LoadPictures(list.ImgData);
             case 251:
-                const dataImg = this._enemy.meta[list.textMethod] ? this._enemy.meta[list.textMethod].split(',') : null;
+                const meta = this._categoryMode ? this._categoryData[list.textMethod] : this._enemy.meta[list.textMethod];
+                const dataImg = meta ? meta.split(',') : null;
                 if (dataImg) {
                     loadBitmap = ImageManager.loadBitmap("img/"+ ImgFolder +"/", dataImg[0]);
                 }
@@ -6618,7 +6853,7 @@ Window_EnemyBook.prototype.drawDesc = function(list, enemy, x, y, width) {
         if (!text) {
             const method = list.textMethod;
             if (method) {
-                text = enemy.enemy().meta[method];
+                text = this._categoryMode ? this._categoryData[method] : enemy.enemy().meta[method];
             }
         } else {
             text = eval(text);
@@ -6723,7 +6958,8 @@ Window_EnemyBook.prototype.commonEnemyBitmap = function(list, enemy, x, y, width
 };
 
 Window_EnemyBook.prototype.enemyBitmap = function(list, enemy, x, y, width) {
-    const dataImg = this._enemy.meta[list.textMethod] ? this._enemy.meta[list.textMethod].split(',') : null;
+    const meta = this._categoryMode ? this._categoryData[list.textMethod] : this._enemy.meta[list.textMethod];
+    const dataImg = meta ? meta.split(',') : null;
     if (dataImg) {
         const bitmap = ImageManager.loadBitmap("img/"+ ImgFolder +"/", dataImg[0]);
         x += Number(dataImg[1]) || 0;
@@ -7290,6 +7526,27 @@ BattleManager.setEnemyBookAction = function() {
         const actionId = subject.enemy().actions.findIndex(action => action.skillId === this._action.item().id);
         $gameSystem.setEnemyBookActionFlag(subject.enemyId(), actionId, true);
     }
+};
+
+enemyBookExtractMetadata = function(data) {
+    const regExp = /<([^<>:]+)(:?)([^>]*)>/g;
+    meta = {};
+    if (!data.CategoryNote) {
+        return meta;
+    }
+    for (;;) {
+        const match = regExp.exec(data.CategoryNote);
+        if (match) {
+            if (match[2] === ":") {
+                meta[match[1]] = match[3];
+            } else {
+                meta[match[1]] = true;
+            }
+        } else {
+            break;
+        }
+    }
+    return meta;
 };
 
 

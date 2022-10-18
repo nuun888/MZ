@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.7.10
+ * @version 3.8.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/10/18 Ver.3.8.0
+ * スキル、アイテム選択画面の座標、横幅、行数、列数を設定できる機能を追加。
  * 2022/10/16 Ver.3.7.10
  * 微修正。
  * 2022/10/16 Ver.3.7.9
@@ -1020,6 +1022,22 @@ const _Scene_Battle_createMessageWindow = Scene_Battle.prototype.createMessageWi
 Scene_Battle.prototype.createMessageWindow = function() {
   _Scene_Battle_createMessageWindow.call(this);
   this.MessageWindowBackGround();
+};
+
+Scene_Battle.prototype.itemWindowRect = function() {
+  const wx = params.ItemWindow_X + (params.ItemWindowMode ? 0 : (Graphics.boxWidth - Graphics.width) / 2);
+  const ww = params.ItemWindow_Width > 0 ? Math.min(params.ItemWindow_Width, Graphics.width) : Graphics.boxWidth;
+  const wh = this.calcWindowHeight(params.ItemMaxRow, true);
+  const wy = params.ItemWindow_Y + (params.ItemWindowMode ? Graphics.boxHeight - wh : (Graphics.boxHeight - Graphics.height) / 2);
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.skillWindowRect = function() {
+  const wx = params.SkillWindow_X + (params.SkillWindowMode ? 0 : (Graphics.boxWidth - Graphics.width) / 2);
+  const ww = params.SkillWindow_Width > 0 ? Math.min(params.SkillWindow_Width, Graphics.width) : Graphics.boxWidth;
+  const wh = this.calcWindowHeight(params.SkillMaxRow, true);
+  const wy = params.SkillWindow_Y + (params.SkillWindowMode ? Graphics.boxHeight - wh : (Graphics.boxHeight - Graphics.height) / 2);
+  return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.enemyWindowRect = function() {//再定義
@@ -2428,6 +2446,12 @@ Window_BattleSkill.prototype.initialize = function(rect) {
   this.opacity = params.SkillWindowShow ? 255 : 0;
 };
 
+if (params.SkillMaxCol > 0) {
+  Window_BattleSkill.prototype.maxCols = function() {
+    return params.SkillMaxCol;
+  };
+}
+
 //Window_BattleItem
 const _Window_BattleItem_initialize =Window_BattleItem.prototype.initialize;
 Window_BattleItem.prototype.initialize = function(rect) {
@@ -2435,6 +2459,12 @@ Window_BattleItem.prototype.initialize = function(rect) {
   this._bsBackground = null;
   this.opacity = params.ItemWindowShow ? 255 : 0;
 };
+
+if (params.ItemMaxCol > 0) {
+  Window_BattleItem.prototype.maxCols = function() {
+    return params.ItemMaxCol;
+  };
+}
 
 //Window_Help
 const _Window_Help_initialize = Window_Help.prototype.initialize;

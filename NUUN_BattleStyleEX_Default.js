@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.7.3
+ * @version 1.8.0
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -56,6 +56,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/10/18 Ver.1.8.0
+ * スキル、アイテム選択画面の座標、横幅、行数、列数を設定できる機能を追加。
  * 2022/10/15 Ver.1.7.3
  * ステートが一つも付加されていないときに表示するアイコンを指定できる機能を追加。
  * 2022/10/9 Ver.1.7.2
@@ -1220,6 +1222,58 @@
  * @min 0
  * @parent ItemWindow
  * 
+ * @param ItemMaxRow
+ * @desc 表示する行数。
+ * @text アイテム行数
+ * @type number
+ * @default 4
+ * @min 1
+ * @max 99
+ * @parent ItemWindow
+ * 
+ * @param ItemMaxCol
+ * @desc 表示する列数。競合を起こす場合は0に設定してください。
+ * @text アイテム列数
+ * @type number
+ * @default 2
+ * @min 0
+ * @max 99
+ * @parent ItemWindow
+ * 
+ * @param ItemWindow_X
+ * @desc アイテムウィンドウのX座標を指定します。
+ * @text アイテムウィンドウX座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent ItemWindow
+ * 
+ * @param ItemWindow_Y
+ * @desc アイテムウィンドウのY座標を指定します。
+ * @text アイテムウィンドウY座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent ItemWindow
+ * 
+ * @param ItemWindow_Width
+ * @desc アイテムウィンドウの横幅を指定します。0でUIサイズ 画面より大きい値にすると自動的に画面の横幅になります。
+ * @text アイテムウィンドウの横幅
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min 0
+ * @parent ItemWindow
+ * 
+ * @param ItemWindowMode
+ * @desc アイテムウィンドウの設定座標モード。(ON：デフォルトの表示位置からの相対座標 OFF:画面左上からの絶対座標)
+ * @text アイテム設定座標モード
+ * @type boolean
+ * @default true
+ * @parent ItemWindow
+ * 
  * @param ItemWindowBackGround
  * @text 背景画像ウィンドウ背景設定
  * @default ------------------------------
@@ -1269,6 +1323,58 @@
  * @default 255
  * @max 255
  * @min 0
+ * @parent SkillWindow
+ * 
+ * @param SkillMaxRow
+ * @desc 表示する行数。
+ * @text スキル行数
+ * @type number
+ * @default 4
+ * @min 1
+ * @max 99
+ * @parent SkillWindow
+ * 
+ * @param SkillMaxCol
+ * @desc 表示する列数。競合を起こす場合は0に設定してください。
+ * @text スキル列数
+ * @type number
+ * @default 2
+ * @min 0
+ * @max 99
+ * @parent SkillWindow
+ * 
+ * @param SkillWindow_X
+ * @desc スキルウィンドウのX座標を指定します。
+ * @text スキルウィンドウX座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent SkillWindow
+ * 
+ * @param SkillWindow_Y
+ * @desc スキルウィンドウのY座標を指定します。
+ * @text スキルウィンドウY座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent SkillWindow
+ * 
+ * @param SkillWindow_Width
+ * @desc スキルウィンドウの横幅を指定します。0でUIサイズ 画面より大きい値にすると自動的に画面の横幅になります。
+ * @text スキルウィンドウの横幅
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min 0
+ * @parent SkillWindow
+ * 
+ * @param SkillWindowMode
+ * @desc スキルウィンドウの設定座標モード。(ON：デフォルトの表示位置からの相対座標 OFF:画面左上からの絶対座標)
+ * @text スキル設定座標モード
+ * @type boolean
+ * @default true
  * @parent SkillWindow
  * 
  * @param SkillWindowBackGround
@@ -2511,12 +2617,24 @@ params.ItemWindowOpacity = Number(parameters['ItemWindowOpacity'] || 255);
 params.ItemWindowBackgroundImg = String(parameters['ItemWindowBackgroundImg']);
 params.ItemBackground_X = Number(parameters['ItemWindowBackground_X'] || 0);
 params.ItemBackground_Y = Number(parameters['ItemWindowBackground_Y'] || 0);
+params.ItemMaxRow = Number(parameters['ItemMaxRow'] || 4);
+params.ItemMaxCol = Number(parameters['ItemMaxCol'] || 1);
+params.ItemWindow_X = Number(parameters['ItemWindow_X'] || 0);
+params.ItemWindow_Y = Number(parameters['ItemWindow_Y'] || 0);
+params.ItemWindow_Width = Number(parameters['ItemWindow_Width'] || 0);
+params.ItemWindowMode = eval(parameters['ItemWindowMode'] || "true");
 
 params.SkillWindowShow = eval(parameters['SkillWindowShow'] || "true");
 params.SkillWindowOpacity = Number(parameters['SkillWindowOpacity'] || 255);
 params.SkillWindowBackgroundImg = String(parameters['SkillWindowBackgroundImg']);
 params.SkillBackground_X = Number(parameters['SkillBackground_X'] || 0);
 params.SkillBackground_Y = Number(parameters['SkillBackground_Y'] || 0);
+params.SkillMaxRow = Number(parameters['SkillMaxRow'] || 4);
+params.SkillMaxCol = Number(parameters['SkillMaxCol'] || 1);
+params.SkillWindow_X = Number(parameters['SkillWindow_X'] || 0);
+params.SkillWindow_Y = Number(parameters['SkillWindow_Y'] || 0);
+params.SkillWindow_Width = Number(parameters['SkillWindow_Width'] || 0);
+params.SkillWindowMode = eval(parameters['SkillWindowMode'] || "true");
 
 params.HelpWindowShow = eval(parameters['HelpWindowShow'] || "true");
 params.HelpWindowBackgroundImg = String(parameters['HelpWindowBackgroundImg']);

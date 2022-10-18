@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.3
+ * @version 2.2.4
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/19 Ver.2.2.4
+ * ゲージの表示が固定された状態になる問題を修正。
  * 2022/10/14 Ver.2.2.3
  * 2回目の戦闘以降で勝利後エフェクトが表示されなくなる問題を修正。
  * 2022/10/13 Ver.2.2.2
@@ -2734,6 +2736,7 @@ Scene_Battle.prototype.closeStatusWindow = function() {
 
 Scene_Battle.prototype.setResultOpen = function() {
   this.closeStatusWindow();
+  this.resultRefresh();
   this._resultBackgroundSprite.setupAfterVictoryEffect();
 };
 
@@ -2749,6 +2752,7 @@ Scene_Battle.prototype.updateAfterVictoryEffect = function() {
 
 Scene_Battle.prototype.resultOpen = function() {
   this._resultWindow.activate();
+  BattleManager.resultOpenRefresh = true;
   if (this._resultHelpWindow) {
     this._resultHelpWindow.show();
     this._resultHelpWindow.open();
@@ -2761,7 +2765,6 @@ Scene_Battle.prototype.resultOpen = function() {
   this._resultGetInfoWindow.open();
   this._resultGetItemWindow.open();
   this._resultActorExpWindow.open();
-  this.resultRefresh();
   BattleManager.resultRefresh = PartyPageRefreshFrame;
 };
 
@@ -4515,6 +4518,7 @@ BattleManager.initMembers = function() {
   this._victoryStart = false;
   this.resultRefresh = 0;
   this.resultBusy = this.setResultBusy();
+  this.resultOpenRefresh = false;
   this.resultPage = 0;
   this.resultLevelUpActors = [];
   this.resultOldStatusActors = [];
@@ -4878,6 +4882,13 @@ Sprite_ResultExpGauge.prototype.setup = function(battler, statusType) {
   this._resultExpMoveValue = isNaN(this._resultExpMoveValue) ? this.currentValue() : this._resultExpMoveValue;
 };
 
+Sprite_Gauge.prototype.update = function() {
+  Sprite.prototype.update.call(this);
+  if (BattleManager.resultOpenRefresh) {
+    this.updateBitmap();
+  }
+};
+
 Sprite_ResultExpGauge.prototype.updateBitmap = function() {
   Sprite_Gauge.prototype.updateBitmap.call(this);
   const value = this.currentValue();
@@ -5160,7 +5171,7 @@ Sprite_ResultExpValue.prototype.bitmapHeight = function() {
 };
 
 Sprite_ResultExpValue.prototype.updateBitmap = function() {
-  if (this._exp > 0) {
+  if (BattleManager.resultOpenRefresh && this._exp > 0) {
     this._exp -= this._updateflame;
     this._exp = Math.max(this._exp, 0);
     this.redraw();

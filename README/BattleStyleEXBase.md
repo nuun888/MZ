@@ -1,24 +1,24 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.7.10   
+### Ver.3.8.0  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.7.3  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.7.3  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.7.3  
-[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.0.1
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.8.0  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.8.0  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.8.0  
+[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.1.0
 
-バトルスタイル拡張デフォルト設定用 Ver.1.7.3 
+バトルスタイル拡張デフォルト設定用 Ver.1.8.0 
 ![画像](img/BattleStyleEX1.png)  
 
-バトルスタイル拡張スタンダード設定用 Ver.1.7.3 
+バトルスタイル拡張スタンダード設定用 Ver.1.8.0 
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.7.3  
+バトルスタイル拡張XPスタイル設定用 Ver.1.8.0  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.0.1  
+バトルスタイル拡張タイプ4設定用 Ver.1.1.0  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 
@@ -136,6 +136,8 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2022/10/18 Ver.3.8.0  
+スキル、アイテム選択画面の座標、横幅、行数、列数を設定できる機能を追加。  
 2022/10/16 Ver.3.7.10  
 微修正。  
 2022/10/16 Ver.3.7.9  

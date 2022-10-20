@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.2.4
+# Ver.2.2.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,11 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2022/10/20 Ver.2.2.5  
+勝利後エフェクトの画像が消えない問題を修正。  
+レベルアップアクターステータスウィンドウでオリジナルパラメータを選択するとエラーが出る問題を修正。  
+勝利後リザルト画面遅延フレーム数を設定すると戦闘終了後動作が止まる問題を修正。  
+スペルミス修正。  
 2022/10/19 Ver.2.2.4  
 ゲージの表示が固定された状態になる問題を修正。  
 2022/10/14 Ver.2.2.3  

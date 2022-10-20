@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.4
+ * @version 2.2.5
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/20 Ver.2.2.5
+ * 勝利後エフェクトの画像が消えない問題を修正。
+ * レベルアップアクターステータスウィンドウでオリジナルパラメータを選択するとエラーが出る問題を修正。
+ * 勝利後リザルト画面遅延フレーム数を設定すると戦闘終了後動作が止まる問題を修正。
+ * スペルミス修正。
  * 2022/10/19 Ver.2.2.4
  * ゲージの表示が固定された状態になる問題を修正。
  * 2022/10/14 Ver.2.2.3
@@ -2742,7 +2747,7 @@ Scene_Battle.prototype.setResultOpen = function() {
 
 Scene_Battle.prototype.updateAfterVictoryEffect = function() {
   const sprite = this._resultBackgroundSprite;
-  if (BattleManager._resultOn && !sprite.onResultOpen()) {
+  if (BattleManager._resultOn && BattleManager.resultBusy === 0 && !sprite.onResultOpen()) {
     sprite.updateAfterVictoryEffect();
     if (sprite.onResultOpen()) {
       this.resultOpen();
@@ -2752,6 +2757,7 @@ Scene_Battle.prototype.updateAfterVictoryEffect = function() {
 
 Scene_Battle.prototype.resultOpen = function() {
   this._resultWindow.activate();
+  this._resultWindow.refresh();
   BattleManager.resultOpenRefresh = true;
   if (this._resultHelpWindow) {
     this._resultHelpWindow.show();
@@ -2769,7 +2775,6 @@ Scene_Battle.prototype.resultOpen = function() {
 };
 
 Scene_Battle.prototype.resultRefresh = function() {
-  this._resultWindow.refresh();
   this._resultActorExpWindow.refresh();
   this._resultGetInfoWindow.refresh();
   this._resultGetItemWindow.refresh();
@@ -3577,7 +3582,7 @@ Window_ResultGetInfo.prototype.dateDisplay = function(data, x, y, width) {
 Window_ResultGetInfo.prototype.drawGainGold = function(data, x, y, width) {
   const gold = BattleManager._rewards.gold;
   if (!isNaN(gold)) {
-    const gold = data.DataEval ? eval(data.DataEval) : BattleManager._rewards.gold;
+    const gold = data.DetaEval ? eval(data.DetaEval) : BattleManager._rewards.gold;
     this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     let systemWidth = 0;
@@ -3593,7 +3598,7 @@ Window_ResultGetInfo.prototype.drawGainGold = function(data, x, y, width) {
 Window_ResultGetInfo.prototype.drawGainExp = function(data, x, y, width) {
   const exp = BattleManager._rewards.exp;
   if (!isNaN(exp)) {
-    const exp = data.DataEval ? eval(data.DataEval) : BattleManager._rewards.exp;
+    const exp = data.DetaEval ? eval(data.DetaEval) : BattleManager._rewards.exp;
     this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     let systemWidth = 0;
@@ -3609,7 +3614,7 @@ Window_ResultGetInfo.prototype.drawGainExp = function(data, x, y, width) {
 Window_ResultGetInfo.prototype.drawPartyOriginalParam = function(data, x, y, width) {
   const rewards = BattleManager._rewards;
   if (rewards) {
-    const result = eval(data.DataEval);
+    const result = eval(data.DetaEval);
     this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     let systemWidth = 0;
@@ -4265,7 +4270,7 @@ Window_ResultActorStatus.prototype.drawActorLevel = function(data, actor, x, y, 
   }
 };
 
-Window_ResultActorExp.prototype.drawParams = function(data, actor, x, y, width) {
+Window_ResultActorStatus.prototype.drawParams = function(data, actor, x, y, width) {
   if (!data.DetaEval) {
     return;
   }
@@ -4280,7 +4285,7 @@ Window_ResultActorExp.prototype.drawParams = function(data, actor, x, y, width) 
   this.resetTextColor();
   x2 += systemWidth + this.itemPadding() * 2;
   if (actor) {
-    const value = eval(data.EvalData);
+    const value = eval(data.DetaEval);
     if (data.DifferenceVisible && this._oldLevelActorStatus) {
       const oldValue = this.paramOld(data.StatusParamDate);
       this.drawText(oldValue, x2, y, 48, 'right');
@@ -4512,13 +4517,13 @@ Window_ResultLearnSkill.prototype.drawHorzLine = function(data, x, y, width) {
 const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
   _BattleManager_initMembers.call(this);
-  this.resultMode = false;
-  this._resultOn = false;
+  this.resultMode = false;//差分用
+  this._resultOn = false;//戦闘終了直後判定
+  this.resultOpenRefresh = false;//ウィンドウ表示判定
   this._victoryBGMOn = false;
   this._victoryStart = false;
   this.resultRefresh = 0;
   this.resultBusy = this.setResultBusy();
-  this.resultOpenRefresh = false;
   this.resultPage = 0;
   this.resultLevelUpActors = [];
   this.resultOldStatusActors = [];
@@ -4649,7 +4654,7 @@ BattleManager.getResultOldStatus = function(actor) {
         if (data.DifferenceVisible) {
           const a = actor;
           const d = actor.actor();
-          statusData[data.StatusParamDate] = eval(data.DataEval);
+          statusData[data.StatusParamDate] = eval(data.DetaEval);
         }
         break;
     }
@@ -4675,7 +4680,7 @@ BattleManager.gainRewards = function() {
 
 const _BattleManager_isBusy = BattleManager.isBusy;
 BattleManager.isBusy = function() {
-  return SceneManager._scene.isActiveResult() || BattleManager._resultOn || _BattleManager_isBusy.call(this);
+  return SceneManager._scene.isActiveResult() || (this._resultOn && this.resultBusy === 0) || _BattleManager_isBusy.call(this);
 };
 
 const _BattleManager_replayBgmAndBgs = BattleManager.replayBgmAndBgs;
@@ -5328,6 +5333,7 @@ Sprite_ResultBackground.prototype.setBackground = function(img) {
   } else {
     this.bitmap = null;
   }
+  console.log(this.bitmap)
 };
 
 Sprite_ResultBackground.prototype.setBackgroundBitmap = function() {

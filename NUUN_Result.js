@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.5
+ * @version 2.2.6
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/21 Ver.2.2.6
+ * 一部の項目が表示されなくなる問題を修正。
  * 2022/10/20 Ver.2.2.5
  * 勝利後エフェクトの画像が消えない問題を修正。
  * レベルアップアクターステータスウィンドウでオリジナルパラメータを選択するとエラーが出る問題を修正。
@@ -3316,7 +3318,7 @@ Window_ResultActorExp.prototype.drawActorExp = function(index) {
     this.resetFontSettings();
     const x = rect.x + data.X_Coordinate;
     const y = rect.y + data.Y_Coordinate;
-    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : rect.width - x);
+    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
     this.dateDisplay(data, actor, x, y, width, rect.height);
   }
 };
@@ -4065,7 +4067,7 @@ Window_ResultActorStatus.prototype.drawActorStatus = function() {
     const rect = this.itemRect(position - 1);
     const x = rect.x + (data.X_Coordinate + data.X_Position);
     const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
-    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : rect.width - x);
+    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
     this.dateDisplay(data, actor, x, y, width);
   }
 };
@@ -5333,7 +5335,6 @@ Sprite_ResultBackground.prototype.setBackground = function(img) {
   } else {
     this.bitmap = null;
   }
-  console.log(this.bitmap)
 };
 
 Sprite_ResultBackground.prototype.setBackgroundBitmap = function() {

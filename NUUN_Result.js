@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.6
+ * @version 2.2.7
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/22 Ver.2.2.7
+ * 座標計算の修正。
  * 2022/10/21 Ver.2.2.6
  * 一部の項目が表示されなくなる問題を修正。
  * 2022/10/20 Ver.2.2.5
@@ -3730,7 +3732,7 @@ Window_ResultGetItem.prototype.drawGetItem = function(mode) {
     const x_Position = data.X_Position;
     const position = Math.min(x_Position, this.maxCols());
     const rect = this.itemRect(position - 1);
-    const x = rect.x + (data.X_Coordinate + data.X_Position);
+    const x = rect.x + data.X_Coordinate;
     const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
     const width = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : this.widthMode(rect, data);
     this.dateDisplay(data, x, y, width, mode);
@@ -4065,7 +4067,7 @@ Window_ResultActorStatus.prototype.drawActorStatus = function() {
     const x_Position = data.X_Position;
     const position = Math.min(x_Position, this.maxCols());
     const rect = this.itemRect(position - 1);
-    const x = rect.x + (data.X_Coordinate + data.X_Position);
+    const x = rect.x + data.X_Coordinate;
     const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
     const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
     this.dateDisplay(data, actor, x, y, width);
@@ -4425,7 +4427,7 @@ Window_ResultLearnSkill.prototype.drawLearnSkill = function(mode) {
     const x_Position = data.X_Position;
     const position = Math.min(x_Position, this.maxCols());
     const rect = this.itemRect(position - 1);
-    const x = rect.x + (data.X_Coordinate + data.X_Position);
+    const x = rect.x + data.X_Coordinate;
     const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
     const width = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : this.widthMode(rect, data);
     this.dateDisplay(data, actor, x, y, width, mode);

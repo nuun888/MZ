@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.2.7
+# Ver.2.2.8
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,8 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2022/10/22 Ver.2.2.8  
+獲得経験値表示を残り経験値で表示できるモードを追加。  
 2022/10/22 Ver.2.2.7  
 座標計算の修正。  
 2022/10/21 Ver.2.2.6  

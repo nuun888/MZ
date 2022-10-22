@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.8
+ * @version 2.2.9
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/23 Ver.2.2.9
+ * 旧レベルのステータスが正常に取得されなかった問題を修正。
  * 2022/10/22 Ver.2.2.8
  * 獲得経験値表示を残り経験値で表示できるモードを追加。
  * 2022/10/22 Ver.2.2.7
@@ -2309,7 +2311,7 @@ const VictoryPitch = Number(parameters['VictoryPitch'] || 100);
 const VictoryPan = Number(parameters['VictoryPan'] || 0);
 const VictorySceneImg = String(parameters['VictorySceneImg']);
 const AfterVictoryEffect = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AfterVictoryEffect'])) : [];
-const AfterVictoryEffectSwitch = Number(parameters['AfterVictoryEffectSwitch'] || 100);
+const AfterVictoryEffectSwitch = Number(parameters['AfterVictoryEffectSwitch'] || 0);
 
 let resultExpMaxWidth = 0;
 
@@ -4066,7 +4068,7 @@ Window_ResultActorStatus.prototype.drawActorStatus = function() {
   const actor = BattleManager.resultLevelUpActors[BattleManager.resultPage - 1];
   this._oldLevelActorStatus = BattleManager.resultOldStatusActors[BattleManager.resultPage - 1];
   const lineHeight = this.lineHeight();
-  for (const data of LevelUpActorParam) {
+  LevelUpActorParam.forEach((data, i) => {
     this.resetFontSettings();
     const x_Position = data.X_Position;
     const position = Math.min(x_Position, this.maxCols());
@@ -4074,11 +4076,11 @@ Window_ResultActorStatus.prototype.drawActorStatus = function() {
     const x = rect.x + data.X_Coordinate;
     const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
     const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
-    this.dateDisplay(data, actor, x, y, width);
-  }
+    this.dateDisplay(data, i, actor, x, y, width);
+  });
 };
 
-Window_ResultActorStatus.prototype.dateDisplay = function(data, actor, x, y, width) {
+Window_ResultActorStatus.prototype.dateDisplay = function(data, index, actor, x, y, width) {
   switch (data.StatusParamDate) {
     case 0:
     case 1:
@@ -4088,7 +4090,7 @@ Window_ResultActorStatus.prototype.dateDisplay = function(data, actor, x, y, wid
     case 5:
     case 6:
     case 7:
-      this.drawStatusParam(data, actor, x, y, width);
+      this.drawStatusParam(data, index, actor, x, y, width);
       break;
     case 10:
     case 11:
@@ -4098,7 +4100,7 @@ Window_ResultActorStatus.prototype.dateDisplay = function(data, actor, x, y, wid
     case 15:
     case 16:
     case 17:
-      this.drawOriginalStatusParam(data, actor, x, y, width);
+      this.drawOriginalStatusParam(data, index, actor, x, y, width);
       break;
     case 20:
       this.drawActorCharacter(actor, x, y);
@@ -4119,10 +4121,10 @@ Window_ResultActorStatus.prototype.dateDisplay = function(data, actor, x, y, wid
       this.drawActorNickname(data, actor, x, y, width);
       break;
     case 33:
-      this.drawActorLevel(data, actor, x, y, width);
+      this.drawActorLevel(data, index, actor, x, y, width);
       break;
     case 40:
-      this.drawParams(data, actor, x, y, width);
+      this.drawParams(data, index, actor, x, y, width);
       break;
     case 1000:
       this.drawHorzLine(data, x, y, width);
@@ -4188,11 +4190,11 @@ Window_ResultActorStatus.prototype.paramValue = function(actor, param) {
   }
 };
 
-Window_ResultActorStatus.prototype.paramOld = function(param) {
-  return this._oldLevelActorStatus[param];
+Window_ResultActorStatus.prototype.paramOld = function(index) {
+  return this._oldLevelActorStatus[index];
 };
 
-Window_ResultActorStatus.prototype.drawStatusParam = function(data, actor, x, y, width) {
+Window_ResultActorStatus.prototype.drawStatusParam = function(data, index, actor, x, y, width) {
   let x2 = x;
   let systemWidth = data.SystemItemWidth || 160;
   this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
@@ -4203,7 +4205,7 @@ Window_ResultActorStatus.prototype.drawStatusParam = function(data, actor, x, y,
   if (actor) {
     const value = this.paramValue(actor, data.StatusParamDate);
     if (data.DifferenceVisible && this._oldLevelActorStatus) {
-      const oldValue = this.paramOld(data.StatusParamDate);
+      const oldValue = this.paramOld(index);
       this.drawText(oldValue, x2, y, 48, 'right');
       x2 += 48;
       this.changeTextColor(ColorManager.systemColor());
@@ -4221,7 +4223,7 @@ Window_ResultActorStatus.prototype.drawStatusParam = function(data, actor, x, y,
   }
 };
 
-Window_ResultActorStatus.prototype.drawOriginalStatusParam = function(data, actor, x, y, width) {
+Window_ResultActorStatus.prototype.drawOriginalStatusParam = function(data, index, actor, x, y, width) {
   let x2 = x;
   let systemWidth = data.SystemItemWidth || 160;
   this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
@@ -4232,7 +4234,7 @@ Window_ResultActorStatus.prototype.drawOriginalStatusParam = function(data, acto
   if (actor) {
     const value = this.paramValue(actor, data.StatusParamDate);
     if (data.DifferenceVisible && this._oldLevelActorStatus) {
-      const oldValue = this.paramOld(data.StatusParamDate);
+      const oldValue = this.paramOld(index);
       this.drawText(oldValue, x2, y, 48, 'right');
       x2 += 48;
       this.changeTextColor(ColorManager.systemColor());
@@ -4250,7 +4252,7 @@ Window_ResultActorStatus.prototype.drawOriginalStatusParam = function(data, acto
   }
 };
 
-Window_ResultActorStatus.prototype.drawActorLevel = function(data, actor, x, y, width) {
+Window_ResultActorStatus.prototype.drawActorLevel = function(data, index, actor, x, y, width) {
   let x2 = x;
   let systemWidth = data.SystemItemWidth || 160;
   this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
@@ -4261,7 +4263,7 @@ Window_ResultActorStatus.prototype.drawActorLevel = function(data, actor, x, y, 
   if (actor) {
     const value = actor._level;
     if (data.DifferenceVisible && this._oldLevelActorStatus) {
-      const oldValue = this.paramOld(data.StatusParamDate);
+      const oldValue = this.paramOld(index);
       this.drawText(oldValue, x2, y, 48, 'right');
       x2 += 48;
       this.changeTextColor(ColorManager.systemColor());
@@ -4279,7 +4281,7 @@ Window_ResultActorStatus.prototype.drawActorLevel = function(data, actor, x, y, 
   }
 };
 
-Window_ResultActorStatus.prototype.drawParams = function(data, actor, x, y, width) {
+Window_ResultActorStatus.prototype.drawParams = function(data, index, actor, x, y, width) {
   if (!data.DetaEval) {
     return;
   }
@@ -4296,7 +4298,7 @@ Window_ResultActorStatus.prototype.drawParams = function(data, actor, x, y, widt
   if (actor) {
     const value = eval(data.DetaEval);
     if (data.DifferenceVisible && this._oldLevelActorStatus) {
-      const oldValue = this.paramOld(data.StatusParamDate);
+      const oldValue = this.paramOld(index);
       this.drawText(oldValue, x2, y, 48, 'right');
       x2 += 48;
       this.changeTextColor(ColorManager.systemColor());
@@ -4624,6 +4626,7 @@ BattleManager.actorLevelUpStatus = function() {
 
 BattleManager.getResultOldStatus = function(actor) {
   const statusData = [];
+  let pushData = 0;
   for (const data of LevelUpActorParam) {
     switch (data.StatusParamDate) {
       case 0:
@@ -4637,7 +4640,7 @@ BattleManager.getResultOldStatus = function(actor) {
       case 8:
       case 9:
         if (data.DifferenceVisible) {
-          statusData[data.StatusParamDate] = actor.param(data.StatusParamDate);
+          pushData = actor.param(data.StatusParamDate);
         }
         break;
       case 10:
@@ -4651,22 +4654,25 @@ BattleManager.getResultOldStatus = function(actor) {
       case 18:
       case 19:
         if (data.DifferenceVisible) {
-          statusData[data.StatusParamDate] = actor.paramBase(data.StatusParamDate - 10);
+          pushData = actor.paramBase(data.StatusParamDate - 10);
         }
         break;
       case 33:
         if (data.DifferenceVisible) {
-          statusData[data.StatusParamDate] = actor._level;
+          pushData = actor._level;
         }
         break;
       case 40:
         if (data.DifferenceVisible) {
           const a = actor;
           const d = actor.actor();
-          statusData[data.StatusParamDate] = eval(data.DetaEval);
+          pushData = eval(data.DetaEval);
         }
         break;
+      default:
+
     }
+    statusData.push(pushData);
   }
   return statusData;
 };

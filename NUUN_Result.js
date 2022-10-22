@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.7
+ * @version 2.2.8
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/22 Ver.2.2.8
+ * 獲得経験値表示を残り経験値で表示できるモードを追加。
  * 2022/10/22 Ver.2.2.7
  * 座標計算の修正。
  * 2022/10/21 Ver.2.2.6
@@ -606,6 +608,8 @@
  * @value 2
  * @option 百分率で表示
  * @value 3
+ * @option 次のレベルまでの経験値
+ * @value 4
  * @default 1
  * @parent ExpSetting
  * 
@@ -636,14 +640,14 @@
  * @text ゲージ色(左側)
  * @type number
  * @default 17
- * @parent GetActorExp
+ * @parent ExpSetting
  * 
  * @param GaugeColor2
  * @desc ゲージの色(右側)(システムカラーまたはカラーコード)
  * @text ゲージの色(右側)
  * @type number
  * @default 6
- * @parent GetActorExp
+ * @parent ExpSetting
  * 
  * @param GaugeValueFontSize
  * @desc ゲージ現在値数値のフォントサイズ。（メインフォントサイズからの差）
@@ -4940,6 +4944,9 @@ Sprite_ResultExpGauge.prototype.drawValue = function() {
       } else {
         this.bitmap.drawText("----------", 0, GaugeValueY, width, height, "right");
       }
+    } else if (GaugeValueShow === 4) {
+      expValue = this.currentMaxValue() - expValue;
+      this.bitmap.drawText(expValue, 0, GaugeValueY, width, height, "right");
     }
   }
 };

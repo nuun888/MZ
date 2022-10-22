@@ -4123,6 +4123,7 @@ Window_ResultActorStatus.prototype.dateDisplay = function(data, actor, x, y, wid
       break;
     case 40:
       this.drawParams(data, actor, x, y, width);
+      break;
     case 1000:
       this.drawHorzLine(data, x, y, width);
       break;

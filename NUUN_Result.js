@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.9
+ * @version 2.2.10
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/23 Ver.2.2.10
+ * HPゲージ等が動かなくなる問題を修正。
  * 2022/10/23 Ver.2.2.9
  * 旧レベルのステータスが正常に取得されなかった問題を修正。
  * 2022/10/22 Ver.2.2.8
@@ -4902,10 +4904,9 @@ Sprite_ResultExpGauge.prototype.setup = function(battler, statusType) {
   this._resultExpMoveValue = isNaN(this._resultExpMoveValue) ? this.currentValue() : this._resultExpMoveValue;
 };
 
-Sprite_Gauge.prototype.update = function() {
-  Sprite.prototype.update.call(this);
+Sprite_ResultExpGauge.prototype.update = function() {
   if (BattleManager.resultOpenRefresh) {
-    this.updateBitmap();
+    Sprite_Gauge.prototype.update.call(this);
   }
 };
 

@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.2.9
+# Ver.2.2.10
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,8 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2022/10/23 Ver.2.2.10  
+HPゲージ等が動かなくなる問題を修正。  
 2022/10/23 Ver.2.2.9  
 旧レベルのステータスが正常に取得されなかった問題を修正。  
 2022/10/22 Ver.2.2.8  

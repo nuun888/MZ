@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/27 Ver.1.1.0
+ * タイムラインの動作処理を修正。
  * 2022/7/10 Ver.1.0.1
  * 敵の画像設定を画像に指定すると戦闘開始時にエラーが出る問題を修正。
  * タイムラインの画面上の基本位置を設定する機能を追加。
@@ -113,26 +115,24 @@
  * @default 'left'
  * @parent Setting
  * 
- * @param ActionDuration
- * @desc アクション時の指定座標に移動するフレーム数。
- * @text アクション移動フレーム数
- * @type number
- * @default 0
- * @max 9999
- * @min 0
+ * @param BattlerStatusShow
+ * @text バトラーステータス非表示
+ * @desc バトラーステータスの元のTPBゲージを表示しません。
+ * @type boolean
+ * @default true
  * @parent Setting
  * 
  * @param TPBTimeLineActionImg
  * @desc アクション部分の画像。(手前に表示されます)
- * @text アクション部画像
+ * @text アクション画像
  * @type file
  * @dir img/
  * @default 
  * @parent Setting
  * 
  * @param TPBTimeLineActionImg_X
- * @desc アクション部画像のX座標を指定します。
- * @text アクション部画像X座標
+ * @desc アクション部分画像のX座標を指定します。
+ * @text アクション画像X座標
  * @type number
  * @default 0
  * @max 9999
@@ -140,19 +140,12 @@
  * @parent Setting
  * 
  * @param TPBTimeLineActionImg_Y
- * @desc アクション部画像のY座標を指定します。
- * @text アクション部画像Y座標
+ * @desc アクション部分画像のY座標を指定します。
+ * @text アクション画像Y座標
  * @type number
  * @default 0
  * @max 9999
  * @min -9999
- * @parent Setting
- * 
- * @param BattlerStatusShow
- * @text バトラーステータス非表示
- * @desc バトラーステータスの元のTPBゲージを表示しません。
- * @type boolean
- * @default true
  * @parent Setting
  * 
  * @param CastIconSetting
@@ -172,6 +165,38 @@
  * @type number
  * @default 50
  * @parent CastIconSetting
+ * 
+ * @param FlameSetting
+ * @text 移動フレーム設定
+ * @default ////////////////////////////////
+ * 
+ * 
+ * @param ActionDuration
+ * @desc アクションの指定座標に移動するフレーム数。
+ * @text アクション移動フレーム数
+ * @type number
+ * @default 60
+ * @max 9999
+ * @min 0
+ * @parent Setting
+ * 
+ * @param ActionReturnDuration
+ * @desc アクション終了後チャージ完了時の座標に戻る時の移動フレーム数。
+ * @text アクション終了後移動フレーム数
+ * @type number
+ * @default 3
+ * @max 9999
+ * @min 0
+ * @parent Setting
+ * 
+ * @param ActionResetDuration
+ * @desc 初期位置に戻る時またはキャスト移行時の移動フレーム数。
+ * @text 初期位置移動、キャスト移行フレーム数
+ * @type number
+ * @default 6
+ * @max 9999
+ * @min 0
+ * @parent Setting
  * 
  * @param ActorSetting
  * @text アクター設定
@@ -213,8 +238,22 @@
  * @min -9999
  * @parent ActorSetting
  * 
+ * @param ActorChargedSetting
+ * @text チャージ完了時時設定
+ * @default ////////////////////////////////
+ * @parent ActorSetting
+ * 
+ * @param ActorCharged
+ * @desc チャージ完了時の座標を指定します。
+ * @text チャージ完了時座標
+ * @type number
+ * @default 60
+ * @max 9999
+ * @min -9999
+ * @parent ActorChargedSetting
+ * 
  * @param ActorActionSetting
- * @text 行動時設定
+ * @text アクション時設定
  * @default ////////////////////////////////
  * @parent ActorSetting
  * 
@@ -279,8 +318,22 @@
  * @min -9999
  * @parent EnemySetting
  * 
+ * @param EnemyChargedSetting
+ * @text チャージ完了時時設定
+ * @default ////////////////////////////////
+ * @parent EnemySetting
+ * 
+ * @param EnemyCharged
+ * @desc チャージ完了時の座標を指定します。
+ * @text チャージ完了時座標
+ * @type number
+ * @default 60
+ * @max 9999
+ * @min -9999
+ * @parent EnemySetting
+ * 
  * @param EnemyActionSetting
- * @text 行動時設定
+ * @text アクション時設定
  * @default ////////////////////////////////
  * @parent EnemySetting
  * 
@@ -302,9 +355,6 @@
  * @min -9999
  * @parent EnemyActionSetting
  * 
- * @param GaugeSetting
- * @text ゲージ設定(未実装)
- * @default ////////////////////////////////
  * 
  */
 var Imported = Imported || {};
@@ -325,7 +375,9 @@ const TPBTimeLineLength = Number(parameters['TPBTimeLineLength'] || 300);
 const ActorImgDirekutoriy = String(parameters['ActorImgDirekutoriy'] || 'pictures');
 const EnemyImgDirekutoriy = String(parameters['EnemyImgDirekutoriy'] || 'pictures');
 const TPBTimeLineBattlerHeight = Number(parameters['TPBTimeLineBattlerHeight'] || 48);
-const ActionDuration = Number(parameters['ActionDuration'] || 30);
+const ActionDuration = Number(parameters['ActionDuration'] || 60);
+const ActionReturnDuration = Number(parameters['ActionReturnDuration'] || 3);
+const ActionResetDuration = Number(parameters['ActionResetDuration'] || 6);
 const TimeLineDirection = eval(parameters['TimeLineDirection']) || 'up';
 const TimeLineActorImgMode = eval(parameters['TimeLineActorImgMode']) || 'chip';
 const TimeLineEnemyImgMode = eval(parameters['TimeLineEnemyImgMode']) || 'enemy';
@@ -339,6 +391,8 @@ const TPBTimeLineActionEnemy_X = Number(parameters['TPBTimeLineActionEnemy_X'] |
 const TPBTimeLineActionEnemy_Y = Number(parameters['TPBTimeLineActionEnemy_Y'] || 0);
 const TimeLinePosition = eval(parameters['TimeLinePosition']) || 'left';
 const BattlerStatusShow = eval(parameters['BattlerStatusShow'] || "true");
+const ActorCharged = Number(parameters['ActorCharged'] || 0);
+const EnemyCharged = Number(parameters['EnemyCharged'] || 0);
 
 function isDirectionUpDown() {
     return TimeLineDirection === 'up' || TimeLineDirection === 'down';
@@ -383,10 +437,19 @@ Spriteset_Battle.prototype.initialize = function() {
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
     _Spriteset_Battle_createLowerLayer.call(this);
+    this.createTimeLineGauge();
     this.createTimeLineImg();
     this.createTimeLineActor();
     this.createTimeLineEnemy();
     this.createTimeLineActionImg();
+};
+
+Spriteset_Battle.prototype.createTimeLineGauge = function() {
+    return;
+    const sprite = new Sprite_TpbTimeLineGauge();
+    this.addChild(sprite);
+    sprite.setup(null, 'timeline');
+    sprite.move(TPBTimeLine_X + this.getTimeLinePosition(), TPBTimeLine_Y);
 };
 
 Spriteset_Battle.prototype.createTimeLineImg = function() {
@@ -448,7 +511,7 @@ Spriteset_Battle.prototype.updateTimeLineActor = function() {
         actor._battlerName = null;
     }
     const members = $gameParty.battleMembers();
-    this._tpbTimeLineActorMaxMembers = $gameParty.maxBattleMembers();console.log(this.timeLineActor)
+    this._tpbTimeLineActorMaxMembers = $gameParty.maxBattleMembers();
     for (let i = 0; i < this._tpbTimeLineActorMaxMembers; i++) {
         if (!this.timeLineActor[i]) {
             const sprite = new Sprite_TimeLineActor();
@@ -563,21 +626,34 @@ Sprite_TimeLine.prototype.initialize = function() {
 };
 
 Sprite_TimeLine.prototype.initMembers = function() {
-    this.anchor.x = 0.5;
-    this.anchor.y = 0.5;
-    this._homeX = 0;
-    this._homeY = 0;
+    this.anchor.x = this.isVertical() ? 0.5 : 0.0;
+    this.anchor.y = this.isVertical() ? 0.0 : 0.5;
+    this._homeX = this.getTimeLineDefaultHomeX();
+    this._homeY = this.getTimeLineDefaultHomeY();
     this._offsetX = 0;
     this._offsetY = 0;
-    this._targetOffsetX = NaN;
-    this._targetOffsetY = NaN;
+    this._oldOffsetX = 0;
+    this._oldOffsetY = 0;
+    this._battler = null;
     this._battlerName = "";
     this._battlerHue = 0;
     this._battlerSprite = null;
-    this._move = 0;
-    this._duration = 0;
     this._chipMode = false;
     this._imgMode = 'chip'
+    this._return = false;
+    this._duration = 0;
+    this._durationFlame = 0;
+    this._tpbState = '';
+    this._targetX = 0;
+    this._targetY = 0;
+};
+
+Sprite_TimeLine.prototype.isVertical = function() {
+    return TimeLineDirection === 'up' || TimeLineDirection === 'down';
+};
+
+Sprite_TimeLine.prototype.isVerticalUp = function() {
+    return TimeLineDirection === 'up';
 };
 
 Sprite_TimeLine.prototype.createBitmap = function() {
@@ -596,6 +672,23 @@ Sprite_TimeLine.prototype.bitmapHeight = function() {
 
 Sprite_TimeLine.prototype.textHeight = function() {
     return 24;
+};
+
+Sprite_TimeLine.prototype.initTpbBattlerPosition = function() {
+    if (TimeLineDirection === 'up') {
+        this.x = this._homeX + this.getOffSetX();
+        this.y = this._homeY - (TPBTimeLineLength * this.getTimeLineRatio()) + this.getOffSetY();
+    } else if (TimeLineDirection === 'down') {
+        this.x = this._homeX + this.getOffSetX();
+        this.y = this._homeY + TPBTimeLineLength * this.getTimeLineRatio() + this.getOffSetY();
+    } else if (TimeLineDirection === 'right') {
+        this.x = this._homeX + TPBTimeLineLength * this.getTimeLineRatio() + this.getOffSetY();
+        this.y = this._homeY + this.getOffSetY();
+    } else if (TimeLineDirection === 'left') {
+        this.x = this._homeX - (TPBTimeLineLength * this.getTimeLineRatio()) + this.getOffSetX();
+        this.y = this._homeY + this.getOffSetY();
+    }
+    this._tpbState = this.getTpbState();
 };
 
 Sprite_TimeLine.prototype.createText = function() {
@@ -618,15 +711,29 @@ Sprite_TimeLine.prototype.createCastIcon = function() {
 
 Sprite_TimeLine.prototype.setup = function(battler) {
     this._battler = battler;
-    this.setHome();
+    this.initTpbBattlerPosition();
+};
+
+Sprite_TimeLine.prototype.getTpbState = function() {
+    const tpbState = this._battler._tpbState;
+    if (this._return) {
+        return 'return';
+    } else if (tpbState === 'acting' && this.getTpbTime() < 1.0) {
+        return 'charging';
+    } else if (tpbState === 'casting' && this._battler.tpbRequiredCastTime() === 0) {
+        return 'charged';
+    }  else {
+       return this._battler._tpbState;
+    }
 };
 
 Sprite_TimeLine.prototype.update = function() {
     Sprite.prototype.update.call(this);
+    //console.log(this._battler._tpbState)
     if (this._battler) {
         this.updateBitmap();
+        this.updateMove();
         this.updateCastIcon();
-        this.updateTpbPosition();
         this.updatePosition();
     } else {
         this._battlerSprite.bitmap = null;
@@ -636,7 +743,7 @@ Sprite_TimeLine.prototype.update = function() {
 
 Sprite_TimeLine.prototype.updateCastIcon = function() {
     const action = this._battler.currentAction();
-    if (action && this._battler.tpbRequiredCastTime() > 0 && this._battler._tpbState === "casting") {
+    if (action && this._battler.tpbRequiredCastTime() > 0 && this.isCasting()) {
         if (CastIconId > 0) {
             this._castIconSprite.setIcon(CastIconId);
         } else {
@@ -652,116 +759,261 @@ Sprite_TimeLine.prototype.updateCastIcon = function() {
     }
 };
 
-Sprite_TimeLine.prototype.updateTpbPosition = function() {
-    this.updateMove();
+Sprite_TimeLine.prototype.updateTpbState = function() {
+    if (!this._tpbState) {
+        this.initTpbBattlerPosition();
+    }
+    const state = this.getTpbState();
+    if (state !== this._tpbState) {
+        if (this._tpbState === 'acting' && state !== 'acting') {
+            this._duration = ActionResetDuration;
+            this._durationFlame = ActionResetDuration;
+            this._targetX = this.getOffSetX() + (this.isVertical() ? 0 : (this.getTimeLineDirection() > 0 ? TPBTimeLineLength : 0) + this.getChargedOffSet());
+            this._targetY = this.getOffSetY() + (this.isVertical() ? (this.getTimeLineDirection() > 0 ? TPBTimeLineLength : 0) + this.getChargedOffSet() : 0);
+            this._return = true;
+        } else if (state === 'casting') {
+            this._duration = ActionReturnDuration;
+            this._durationFlame = ActionReturnDuration;
+            this._targetX = this.getOffSetX() + this._homeX;
+            this._targetY = this.getOffSetY() + this._homeY;
+            this._return = false;
+        } else if (state === 'return') {
+            this._duration = ActionReturnDuration;
+            this._durationFlame = ActionReturnDuration;
+            this._targetX = this.getOffSetX() + this._homeX;
+            this._targetY = this.getOffSetY() + this._homeY;
+            this._return = false;
+        } else if (state === 'acting') {
+            this._duration = ActionDuration;
+            this._durationFlame = ActionDuration;
+            this._targetX = this.getOffSetX() + this.getActionOffSetX() + (!this.isVertical() && this.getTimeLineDirection() > 0 ? TPBTimeLineLength + this.getChargedOffSet() : 0);
+            this._targetY = this.getOffSetY() + Math.floor(TPBTimeLineBattlerHeight / 2) + this.getActionOffSetY() + (this.isVertical() && this.getTimeLineDirection() > 0 ? TPBTimeLineLength + this.getChargedOffSet() : 0);
+            this._return = false;
+        } else {
+            this._targetX = this.getOffSetX() + this._homeX;
+            this._targetY = this.getOffSetY() + this._homeY;
+        }
+        this._tpbState = this.getTpbState();
+        this._oldOffsetX = this.x;
+        this._oldOffsetY = this.y;
+    }
 };
 
 Sprite_TimeLine.prototype.updateMove = function() {
-    const state = this._battler.getTimeLineTpbState();
-    const x = this.getOffSetX();
-    const y = this.getOffSetY();
-    if (state !== 'action') {
-        this.targetOffsetReset();
+    this.updateTpbState();
+    switch (this._tpbState) {
+        case 'charging':
+        case 'charged':
+        case 'ready':
+            this.updateCharge();
+            break;
+        case 'casting':
+            this.updateCasting();
+            break;
+        case 'acting':
+            this.updateAction();
+            break;
+        case 'return':
+            this.updateActionReturn();
+            break;
     }
-    if (state === 'action') {
-        if (this.getActionOffSetX() === 0 && this.getActionOffSetY() === 0) {
-            this.updateCharged(x, y);
-        } else {
-            this.updateAction(x, y);
-        }
-    } else if (state === 'charged') {
-        this.updateCharged(x, y);
-    } else if (state === 'charge') {
-        this.updateCharge(x, y);
-    } else if (state === 'casting') {
-        this.updateCasting(x, y);
-    } else {
-        
+};
+
+Sprite_TimeLine.prototype.getReturnActionFlame = function() {
+    return Math.max(Math.floor(ActionReturnDuration / (TPBTimeLineLength / Math.max(this.getActionOffSetX(), this.getActionOffSetY()))), 1)
+};
+
+Sprite_TimeLine.prototype.getTimeLineRatio = function() {
+    return this.isCasting() || this.isTpbReady() ? this.getCastTime() / this._battler.tpbRequiredCastTime() : this.getTpbTime();
+};
+
+Sprite_TimeLine.prototype.getTimeLineDirection = function() {
+    return TimeLineDirection === 'up' || TimeLineDirection === 'left' ? -1 : 1;
+};
+
+Sprite_TimeLine.prototype.isCharging = function() {
+    return this.getTpbState() === 'charging';
+};
+
+Sprite_TimeLine.prototype.isCharged = function() {
+    return this._battler.isTpbCharged();
+};
+
+Sprite_TimeLine.prototype.isCasting = function() {
+    return this.getTpbState() === 'casting';
+};
+
+Sprite_TimeLine.prototype.isAction = function() {
+    return this.getTpbState() === 'acting';
+};
+
+Sprite_TimeLine.prototype.isTpbReady = function() {
+    return this._battler.isTpbReady();
+};
+
+Sprite_TimeLine.prototype.getTimeLineDefaultHomeX = function() {
+    switch (TimeLineDirection) {
+        case 'up':
+        case 'down':
+        case 'right':
+            return 0;
+        case 'left':
+            return TPBTimeLineLength + this.getChargedOffSet();
     }
+};
+
+Sprite_TimeLine.prototype.getTimeLineDefaultHomeY = function() {
+    switch (TimeLineDirection) {
+        case 'up':
+            return TPBTimeLineLength + Math.floor(TPBTimeLineBattlerHeight / 2) + this.getChargedOffSet();
+        case 'down':
+            return Math.floor(TPBTimeLineBattlerHeight / 2);
+        case 'right':
+        case 'left':
+            return Math.floor(TPBTimeLineBattlerHeight / 2);
+    }
+};
+
+Sprite_TimeLine.prototype.isReturnPosition = function() {
+    if (TimeLineDirection === 'up') {
+        return this.y < this._offsetY;
+    } else if (TimeLineDirection === 'down') {
+        return this.y > this._offsetY;
+    } else if (TimeLineDirection === 'right') {
+        return this.x > this._offsetX;
+    } else if (TimeLineDirection === 'left') {
+        return this.x < this._offsetX;
+    }
+};
+
+Sprite_TimeLine.prototype.updateCharge = function() {
+    let x = this.getOffSetX() + this._homeX;
+    let y = this.getOffSetY() + this._homeY;
+    if (TimeLineDirection === 'up') {
+        x += 0;
+        y += TPBTimeLineLength * this.getTimeLineRatio() * this.getTimeLineDirection();  
+    } else if (TimeLineDirection === 'down') {
+        x += 0;
+        y += TPBTimeLineLength * this.getTpbTime() * this.getTimeLineDirection();
+    } else if (TimeLineDirection === 'right') {
+        x += TPBTimeLineLength * this.getTpbTime() * this.getTimeLineDirection();
+        y += 0;
+    } else if (TimeLineDirection === 'left') {
+        x += TPBTimeLineLength * this.getTpbTime() * this.getTimeLineDirection();
+        y += 0;
+    }
+    this._offsetX = x;
+    this._offsetY = y;
+    if (this.isReturnPosition() && this._duration === 0) {
+        this._duration = ActionReturnDuration;
+        this._durationFlame = ActionReturnDuration;
+        this._targetX = this.getOffSetX() + this._homeX;
+        this._targetY = this.getOffSetY() + this._homeY;
+        this._oldOffsetX = this.x;
+        this._oldOffsetY = this.y;
+    }
+};
+
+Sprite_TimeLine.prototype.updateCasting = function() {
+    let x = this.getOffSetX() + this._homeX;
+    let y = this.getOffSetY() + this._homeY;
+    const requiredCastTime = this._battler.tpbRequiredCastTime();
+    const cast = requiredCastTime > 0 ? TPBTimeLineLength * (this.getCastTime() / requiredCastTime) : (TPBTimeLineLength * this.getTpbTime());
+    if (TimeLineDirection === 'up') {
+        x += 0;
+        y += cast * this.getTimeLineDirection();
+    } else if (TimeLineDirection === 'down') {
+        x += 0;
+        y += cast * this.getTimeLineDirection();
+    } else if (TimeLineDirection === 'right') {
+        x += cast * this.getTimeLineDirection();
+        y += 0;
+    } else if (TimeLineDirection === 'left') {
+        x += cast * this.getTimeLineDirection();
+        y += 0;
+    }
+    this._offsetX = x;
+    this._offsetY = y;
+    if (this.isReturnPosition() && this._duration === 0) {
+        this._duration = ActionReturnDuration;
+        this._durationFlame = ActionReturnDuration;
+        this._targetX = this.getOffSetX() + this._homeX;
+        this._targetY = this.getOffSetY() + this._homeY;
+        this._oldOffsetX = this.x;
+        this._oldOffsetY = this.y;
+    }
+};
+
+Sprite_TimeLine.prototype.updateAction = function() {
+    let x = this.getOffSetX();
+    let y = this.getOffSetY() + Math.floor(TPBTimeLineBattlerHeight / 2);
+    if (TimeLineDirection === 'up') {
+        x += this.getActionOffSetX();
+        y += this.getActionOffSetY();
+    } else if (TimeLineDirection === 'down') {
+        x += this.getActionOffSetX();
+        y += this.getActionOffSetY() + TPBTimeLineLength + this.getChargedOffSet();
+    } else if (TimeLineDirection === 'right') {
+        x += this.getActionOffSetX() + TPBTimeLineLength + this.getChargedOffSet();
+        y += this.getActionOffSetY();
+    } else if (TimeLineDirection === 'left') {
+        x += this.getActionOffSetX();
+        y += this.getActionOffSetY();
+    }
+    this._offsetX = x;
+    this._offsetY = y;
+};
+
+Sprite_TimeLine.prototype.updateActionReturn = function() {
+    let x = 0;
+    let y = 0;
+    if (TimeLineDirection === 'up') {
+        x = 0;
+        y = TPBTimeLineLength * this.getTimeLineDirection();
+    } else if (TimeLineDirection === 'down') {
+        x = 0;
+        y = TPBTimeLineLength * this.getTimeLineDirection();
+    } else if (TimeLineDirection === 'right') {
+        x = TPBTimeLineLength  * this.getTimeLineDirection();
+        y = 0;
+    } else if (TimeLineDirection === 'left') {
+        x = TPBTimeLineLength * this.getTimeLineDirection();
+        y = 0;
+    }
+    this._offsetX = x + this.getOffSetX() + this._homeX;
+    this._offsetY = y + this.getOffSetY() + this._homeY;
 };
 
 Sprite_TimeLine.prototype.updatePosition = function() {
-    this.x = this._homeX + this._offsetX;
-    this.y = this._homeY + this._offsetY;
-};
-
-Sprite_TimeLine.prototype.updateCharged = function(x, y) {
-    if (TimeLineDirection === 'up') {
-        this._offsetY = y;
-        this._offsetX = x;
-    } else if (TimeLineDirection === 'down') {
-        this._offsetY = y + (TPBTimeLineLength * 1);
-        this._offsetX = x;
-    } else if (TimeLineDirection === 'right') {
-        this._offsetX = x + (TPBTimeLineLength * 1);
-        this._offsetY = y;
-    } else if (TimeLineDirection === 'left') {
-        this._offsetX = x;
-        this._offsetY = y;
-    }
-};
-
-Sprite_TimeLine.prototype.updateCharge = function(x, y) {
-    if (TimeLineDirection === 'up') {
-        this._offsetX = x;
-        this._offsetY = TPBTimeLineLength - (TPBTimeLineLength * this.getTpbTime()) + y;
-    } else if (TimeLineDirection === 'down') {
-        this._offsetX = x;
-        this._offsetY = TPBTimeLineLength * this.getTpbTime() + y;
-    } else if (TimeLineDirection === 'right') {
-        this._offsetX = TPBTimeLineLength * this.getTpbTime() + x;
-        this._offsetY = y;
-    } else if (TimeLineDirection === 'left') {
-        this._offsetX = TPBTimeLineLength - (TPBTimeLineLength * this.getTpbTime()) + x;
-        this._offsetY = y;
-    }
-};
-
-Sprite_TimeLine.prototype.updateCasting = function(x, y) {
-    const requiredCastTime = this._battler.tpbRequiredCastTime();
-    const cast = requiredCastTime > 0 ? TPBTimeLineLength * (this.getCastTime() / requiredCastTime) : (TPBTimeLineLength * 1);
-    if (TimeLineDirection === 'up') {
-        this._offsetX = x;
-        this._offsetY = TPBTimeLineLength - cast + y;
-    } else if (TimeLineDirection === 'down') {
-        this._offsetX = x;
-        this._offsetY = cast + y;
-    } else if (TimeLineDirection === 'right') {
-        this._offsetX = cast + x;
-        this._offsetY = y;
-    } else if (TimeLineDirection === 'left') {
-        this._offsetX = TPBTimeLineLength - cast + x;
-        this._offsetY = y;
-    }
-};
-
-Sprite_TimeLine.prototype.updateAction = function(x, y) {
-    if (isNaN(this._targetOffsetX) && isNaN(this._targetOffsetY)) {
-        this._duration = ActionDuration;
-        this._targetOffsetX = this.getActionOffSetX();
-        this._targetOffsetY = this.getActionOffSetY();
-    } else if (this._duration > 0) {
-        this._duration--;
-        const d = ActionDuration - this._duration;
-        this._offsetX = (this._targetOffsetX / ActionDuration) * d + x;
-        this._offsetY = (this._targetOffsetY / ActionDuration) * d + y;
-        if (TimeLineDirection === 'down') {
-            this._offsetY += (TPBTimeLineLength * 1);
-        } else if (TimeLineDirection === 'right') {
-            this._offsetX += (TPBTimeLineLength * 1);
-        } else if (TimeLineDirection === 'left') {
-            
-        }
-    }
-};
-
-Sprite_TimeLine.prototype.targetOffsetReset = function() {
-    if (!isNaN(this._targetOffsetX) || !isNaN(this._targetOffsetY)) {
-        this._targetOffsetX = NaN;
-        this._targetOffsetY = NaN;
-    }
     if (this._duration > 0) {
-        this._duration = 0;
+        this.x += (this._targetX - this._oldOffsetX) / this._durationFlame;
+        this.y += (this._targetY - this._oldOffsetY) / this._durationFlame;
+        this.positionX();
+        this.positionY();
+        this._duration--;
+        if (this._duration === 0) {
+            this._return = false;
+        }
+    } else {
+        this.x = this._offsetX;
+        this.y = this._offsetY;
+    }
+};
+
+Sprite_TimeLine.prototype.positionX = function() {
+    if (this._oldOffsetX > this._targetX) {
+        this.x = Math.max(this.x, this._offsetX);
+    } else {
+        this.x = Math.min(this.x, this._offsetX);
+    }
+};
+
+Sprite_TimeLine.prototype.positionY = function() {
+    if (this._oldOffsetY > this._targetY) {
+        this.y = Math.max(this.y, this._offsetY);
+    } else {
+        this.y = Math.min(this.y, this._offsetY);
+
     }
 };
 
@@ -835,6 +1087,10 @@ Sprite_TimeLineActor.prototype.getActionOffSetX = function() {
 
 Sprite_TimeLineActor.prototype.getActionOffSetY = function() {
     return TPBTimeLineActionActor_Y;
+};
+
+Sprite_TimeLineActor.prototype.getChargedOffSet = function() {
+    return ActorCharged;
 };
 
 Sprite_TimeLineActor.prototype.setBattlerSprite = function() {
@@ -954,6 +1210,10 @@ Sprite_TimeLineEnemy.prototype.getActionOffSetX = function() {
 
 Sprite_TimeLineEnemy.prototype.getActionOffSetY = function() {
     return TPBTimeLineActionEnemy_Y;
+};
+
+Sprite_TimeLineEnemy.prototype.getChargedOffSet = function() {
+    return EnemyCharged;
 };
 
 Sprite_TimeLineEnemy.prototype.setBattlerSprite = function() {

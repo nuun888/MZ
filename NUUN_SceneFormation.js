@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.7.4
+ * @version 1.7.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -24,13 +24,16 @@
  * 選択中のアクターのステータスはカスタマイズ可能です。
  * 
  * ウィンドウ基準0をONにした場合、ウィンドウの基準座標を0,0にします。
- * なおウィンドウ中央自動調整をONにしている場合、X座標だけ中央になるよう自動調整されてしまいますのでX座標を調整する場合はOFFにしてください。
+ * なおウィンドウ中央自動調整をONにしている場合、X座標だけ中央になるよう自動調整され
+ * てしまいますのでX座標を調整する場合はOFFにしてください。
  * ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/28 Ver.1.7.5
+ * アクター固定化プラグインの固定アクター戦闘メンバーへの移動可をOFFにしたときに固定アクターが移動できてしまう問題を修正。
  * 2022/9/22 Ver.1.7.4
  * アクターステータスウィンドウのコンテンツ背景をONにするとエラーが出る問題を修正。
  * 2022/7/30 Ver.1.7.3
@@ -1487,7 +1490,7 @@ Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
   } else if (cursorMode !== pendingMode) {
     return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this) && this.isChangeActorEnabled(actor, pendingActor, 0);
   } else {
-    return true;
+    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this);
   }
 };
 

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/28 Ver.1.1.1
+ * 対象選択時のアクターまたは敵のアイコンをフラッシュするように修正。
  * 2022/10/27 Ver.1.1.0
  * タイムラインの動作処理を修正。
  * 2022/7/10 Ver.1.0.1
@@ -646,6 +648,7 @@ Sprite_TimeLine.prototype.initMembers = function() {
     this._tpbState = '';
     this._targetX = 0;
     this._targetY = 0;
+    this._selectionEffectCount = 0;
 };
 
 Sprite_TimeLine.prototype.isVertical = function() {
@@ -735,6 +738,7 @@ Sprite_TimeLine.prototype.update = function() {
         this.updateMove();
         this.updateCastIcon();
         this.updatePosition();
+        this.updateSelectionEffect();
     } else {
         this._battlerSprite.bitmap = null;
         this._castIconSprite.setIcon(0);
@@ -1047,6 +1051,20 @@ Sprite_TimeLine.prototype.initVisibility = function() {
         this.opacity = 0;
     } else {
         this.opacity = 255;
+    }
+};
+
+Sprite_TimeLine.prototype.updateSelectionEffect = function() {
+    if (this._battler.isSelected()) {
+        this._selectionEffectCount++;
+        if (this._selectionEffectCount % 30 < 15) {
+            this.setBlendColor([255, 255, 255, 64]);
+        } else {
+            this.setBlendColor([0, 0, 0, 0]);
+        }
+    } else if (this._selectionEffectCount > 0) {
+        this._selectionEffectCount = 0;
+        this.setBlendColor([0, 0, 0, 0]);
     }
 };
 

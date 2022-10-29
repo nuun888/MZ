@@ -1,5 +1,5 @@
 # [ステート、バフ残りターン表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
 
 ステートアイコンに残りターンを表示します。  
@@ -16,6 +16,8 @@
 MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
+2022/10/29 Ver.1.1.1  
+不利、ステート、バフのターン数の文字色を変更できる機能を追加。  
 2022/1/21 Ver.1.1.0  
 ステートのターンの表示方法に経過ターンを追加。（要ステート経過ターンカウント）  
 2021/9/16 Ver.1.0.2  

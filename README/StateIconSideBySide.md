@@ -1,5 +1,5 @@
 # [ステート横並び表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
-# Ver.1.4.0
+# Ver.1.5.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
 
 戦闘中に表示するステートを横並び表示にします。  
@@ -20,6 +20,9 @@
 MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
+2022/10/29 Ver.1.5.0  
+ターン数に文字色を指定できる機能を追加。  
+疑似3Dバトル併用時でステートにかかってないときのアイコンが表示されなくなる問題を修正。  
 2022/10/15 Ver.1.4.0  
 味方のステートが付与されていないときのアイコンを指定できる機能を追加。  
 2022/8/22 Ver.1.3.2  

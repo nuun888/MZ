@@ -24,6 +24,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/29 Ver.1.1.1
+ * 不利、ステート、バフのターン数の文字色を変更できる機能を追加。
  * 2022/1/21 Ver.1.1.0
  * ステートのターンの表示方法に経過ターンを追加。（要ステート経過ターンカウント）
  * 2021/9/16 Ver.1.0.2
@@ -86,6 +88,18 @@
  * @min -9999
  * @max 9999
  * 
+ * @param TurnColor
+ * @text 有利ステート、バフターンの色
+ * @desc 有利なステート、デバフのターンのシステムカラー番号。(テキストタブからカラーコード入力可能)
+ * @type number
+ * @default 0
+ * 
+ * @param BadTurnColor
+ * @text 不利ステート、デバフターンの色
+ * @desc 不利なステート、デバフのターンのシステムカラー番号。(テキストタブからカラーコード入力可能)
+ * @type number
+ * @default 0
+ * 
  */
 
 var Imported = Imported || {};
@@ -100,6 +114,8 @@ Imported.NUUN_StateTurn = true;
   const TurnY = Number(parameters['TurnY'] || -4);
   const TurnCorrection = Number(parameters['TurnCorrection'] || 1);
   const TurnMode = eval(parameters['TurnMode'] || 'remaining');
+  const TurnColor = (DataManager.nuun_structureData(parameters['TurnColor'])) || 0;
+  const BadTurnColor = (DataManager.nuun_structureData(parameters['BadTurnColor'])) || 0;
 
   const _Sprite_StateIcon_initialize = Sprite_StateIcon.prototype.initialize;
   Sprite_StateIcon.prototype.initialize = function() {
@@ -132,7 +148,9 @@ Imported.NUUN_StateTurn = true;
   };
 
   Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
-    this._stateBuffTurns = turns[this._animationIndex] || 0;
+    const state = turns[this._animationIndex];
+    this._stateBuffTurns = state && state.turn > 0 ? turns[this._animationIndex].turn : 0;
+    this._trunTextColor = state && state.bad ? BadTurnColor : TurnColor;
   };
 
   const _Sprite_StateIcon_updateFrame = Sprite_StateIcon.prototype.updateFrame;
@@ -144,9 +162,11 @@ Imported.NUUN_StateTurn = true;
       this.textSprite.bitmap.drawText(this._stateBuffTurns, 0, 0, ImageManager.iconWidth, ImageManager.iconHeight);
     }
   };
-  
+
   Game_BattlerBase.prototype.allStateTurns = function() {
-    return this.nuun_stateTurns().concat(this.allBuffTurns());
+    const turns = this.nuun_stateTurns();
+    Array.prototype.push.apply(turns, this.allBuffTurns());
+    return turns;
   };
   
   Game_BattlerBase.prototype.allBuffTurns = function() {
@@ -156,8 +176,9 @@ Imported.NUUN_StateTurn = true;
   Game_BattlerBase.prototype.nuun_stateTurns = function() {
     return this.states().reduce((r, state) => {
       if (state.iconIndex > 0) {
-        return r.concat([this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)]);
-      } 
+        const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)), bad: !!state.meta.BatState}];
+        Array.prototype.push.apply(r, turn);
+      }
       return r;
     }, []);
   };
@@ -165,10 +186,10 @@ Imported.NUUN_StateTurn = true;
   Game_BattlerBase.prototype.nuun_buffTurns = function() {
     return this._buffs.reduce((r, buff, i) => {
       if (buff !== 0) {
-        return r.concat([this.nuun_getBuffTurn(i)]);
-      } else {
-        return r;
+        const turn = [{turn: this.nuun_getBuffTurn(i), bad: buff < 0}];
+        Array.prototype.push.apply(r, turn);
       }
+        return r;
     }, []);
   };
 
@@ -192,7 +213,7 @@ Imported.NUUN_StateTurn = true;
   };
 
   Sprite_StateIcon.prototype.nuun_textColor = function() {
-    return ColorManager.normalColor();
+    return NuunManager.getColorCode(this._trunTextColor);
   };
 
   Sprite_StateIcon.prototype.nuun_outlineColor = function() {

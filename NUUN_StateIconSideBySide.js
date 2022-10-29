@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.4.0
+ * @version 1.5.0
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -32,6 +32,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/10/29 Ver.1.5.0
+ * ターン数に文字色を指定できる機能を追加。
+ * 疑似3Dバトル併用時でステートにかかってないときのアイコンが表示されなくなる問題を修正。
  * 2022/10/15 Ver.1.4.0
  * 味方のステートが付与されていないときのアイコンを指定できる機能を追加。
  * 2022/8/22 Ver.1.3.2
@@ -228,6 +231,21 @@
  * @max 9999
  * @parent StateTurn
  * 
+ * @param TurnColor
+ * @text 有利ステート、バフターンの色
+ * @desc 有利なステート、デバフのターンのシステムカラー番号。(テキストタブからカラーコード入力可能)
+ * @type number
+ * @default 0
+ * @parent StateTurn
+ * 
+ * @param BadTurnColor
+ * @text 不利ステート、デバフターンの色
+ * @desc 不利なステート、デバフのターンのシステムカラー番号。(テキストタブからカラーコード入力可能)
+ * @type number
+ * @default 0
+ * @parent StateTurn
+ * 
+ * 
  */
 
 var Imported = Imported || {};
@@ -251,6 +269,9 @@ const TurnX = Number(parameters['TurnX'] || 0);
 const TurnY = Number(parameters['TurnY'] || -4);
 const TurnCorrection = Number(parameters['TurnCorrection'] || 1);
 const NoStateIcon = Number(parameters['NoStateIcon'] || 0);
+const TurnColor = (DataManager.nuun_structureData(parameters['TurnColor'])) || 0;
+const BadTurnColor = (DataManager.nuun_structureData(parameters['BadTurnColor'])) || 0;
+
 let isEnemyMode = false;
 
 const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
@@ -343,11 +364,13 @@ Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
   this._iconSprite.forEach((sprite, r) => {
     if (displayIcons[r]) {
       sprite._iconIndex = displayIcons[r];
-      sprite._stateTurn = displayTurn[r];
+      sprite._stateTurn = displayTurn[r].turn || 0;
+      sprite._trunTextColor = displayTurn[r].bad ? BadTurnColor : TurnColor;
       sprite.visible = true;
     } else {
       sprite._iconIndex = this._battler.isActor() ? NoStateIcon : 0;
       sprite._stateTurn = 0;
+      sprite._trunTextColor = 0;
       if (sprite.visible) {
         this.setFrameIcon(sprite);
       }
@@ -382,7 +405,10 @@ Sprite_StateIcon.prototype.updateIcon = function() {//再定義
       this.visible = this._battler.isBattleMember();
   } else {
       this._animationIndex = 0;
-      this._iconIndex = 0;
+      this._iconIndex = NoStateIcon;
+      if (NoStateIcon > 0) {
+        this.visible = true;//疑似3Dバトル競合対策
+      }
       if (!(this._battler.isActor() && NoStateIcon > 0)) {
         this.visible = false;//疑似3Dバトル競合対策
       }
@@ -415,7 +441,7 @@ Sprite_StateIcon.prototype.setTurn = function(sprite) {
   sprite.turnSprite.bitmap.clear();
   if (sprite._stateTurn > 0) {
     const textSprite = sprite.turnSprite;
-    this.setupFont(textSprite);
+    this.setupFont(textSprite, sprite._trunTextColor);
     textSprite.bitmap.drawText(sprite._stateTurn, 0, 0, ImageManager.iconWidth, ImageManager.iconHeight);
   }
 };
@@ -451,15 +477,15 @@ Sprite_StateIcon.prototype.getMaxStateIconRows = function() {
   }
 };
 
-Sprite_StateIcon.prototype.setupFont = function(sprite) {
+Sprite_StateIcon.prototype.setupFont = function(sprite, trunTextColor) {
   sprite.bitmap.fontSize = this.nuun_fontSize() + TurnFontSize;
-  sprite.bitmap.textColor = this.nuun_textColor();
+  sprite.bitmap.textColor = this.nuun_textColor(trunTextColor);
   sprite.bitmap.outlineColor = this.nuun_outlineColor();
   sprite.bitmap.outlineWidth = this.nuun_outlineWidth();
 };
 
-Sprite_StateIcon.prototype.nuun_textColor = function() {
-  return ColorManager.normalColor();
+Sprite_StateIcon.prototype.nuun_textColor = function(trunTextColor) {
+  return NuunManager.getColorCode(trunTextColor);
 };
 
 Sprite_StateIcon.prototype.nuun_outlineColor = function() {
@@ -503,7 +529,7 @@ Game_BattlerBase.prototype.allBuffTurns = function() {
 Game_BattlerBase.prototype.nuun_stateTurns = function() {
   return this.states().reduce((r, state) => {
     if (state.iconIndex > 0) {
-      const turn = [this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)];
+      const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)), bad: !!state.meta.BatState}];
       Array.prototype.push.apply(r, turn);
     }
     return r;
@@ -513,7 +539,7 @@ Game_BattlerBase.prototype.nuun_stateTurns = function() {
 Game_BattlerBase.prototype.nuun_buffTurns = function() {
   return this._buffs.reduce((r, buff, i) => {
     if (buff !== 0) {
-      const turn = [this.nuun_getBuffTurn(i)];
+      const turn = [{turn: this.nuun_getBuffTurn(i), bad: buff < 0}];
       Array.prototype.push.apply(r, turn);
     }
       return r;

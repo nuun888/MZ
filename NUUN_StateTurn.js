@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステート、バフ残りターン表示
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * ステートアイコンに残りターンを表示します。

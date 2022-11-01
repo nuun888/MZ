@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/2 Ver.1.1.2
+ * 同一敵が複数いるときに表示されるアルファベットの表示をON、OFFする機能を追加。
  * 2022/10/28 Ver.1.1.1
  * 対象選択時のアクターまたは敵のアイコンをフラッシュするように修正。
  * 2022/10/27 Ver.1.1.0
@@ -320,6 +322,13 @@
  * @min -9999
  * @parent EnemySetting
  * 
+ * @param EnemyLetterShow
+ * @text 敵アルファベット表示
+ * @desc 同一敵が複数いるときに表示されるアルファベットを表示します。
+ * @type boolean
+ * @default true
+ * @parent EnemySetting
+ * 
  * @param EnemyChargedSetting
  * @text チャージ完了時時設定
  * @default ////////////////////////////////
@@ -393,6 +402,7 @@ const TPBTimeLineActionEnemy_X = Number(parameters['TPBTimeLineActionEnemy_X'] |
 const TPBTimeLineActionEnemy_Y = Number(parameters['TPBTimeLineActionEnemy_Y'] || 0);
 const TimeLinePosition = eval(parameters['TimeLinePosition']) || 'left';
 const BattlerStatusShow = eval(parameters['BattlerStatusShow'] || "true");
+const EnemyLetterShow = eval(parameters['EnemyLetterShow'] || "true");
 const ActorCharged = Number(parameters['ActorCharged'] || 0);
 const EnemyCharged = Number(parameters['EnemyCharged'] || 0);
 
@@ -1331,10 +1341,12 @@ Sprite_TimeLineEnemy.prototype.setBitmap = function(bitmap) {
 };
 
 Sprite_TimeLineEnemy.prototype.drawLetter = function() {
-    const text = this.getEnemyLetter();
-    const width = this.bitmapWidth();
-    const height = this.textHeight();
-    this._textSprite.bitmap.drawText(text, 0, 0, width, height, "left");
+    if (EnemyLetterShow) {
+        const text = this.getEnemyLetter();
+        const width = this.bitmapWidth();
+        const height = this.textHeight();
+        this._textSprite.bitmap.drawText(text, 0, 0, width, height, "left");
+    }
 };
 
 Sprite_TimeLineEnemy.prototype.getEnemyLetter = function() {

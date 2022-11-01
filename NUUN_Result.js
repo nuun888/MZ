@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.10
+ * @version 2.2.11
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/1 Ver.2.2.11
+ * レベルアップ時に表示される文字を画像で表示する機能を追加。
  * 2022/10/23 Ver.2.2.10
  * HPゲージ等が動かなくなる問題を修正。
  * 2022/10/23 Ver.2.2.9
@@ -544,49 +546,6 @@
  * @desc デフォルト表示数より大きいの時にアクター表示縦幅を自動調整します。
  * @parent GetActorExp
  * 
- * @param LevelUpNameColor
- * @desc レベルアップの文字色(システムカラーまたはカラーコード)
- * @text レベルアップ文字色
- * @type number
- * @default 17
- * @parent GetActorExp
- * 
- * @param LevelUpValueColor
- * @desc レベルアップした時のレベルの数値の色(システムカラーまたはカラーコード)
- * @text レベルアップ時の数値色
- * @type number
- * @default 17
- * @parent GetActorExp
- * 
- * @param EXPBoostValueColor
- * @desc 獲得経験値が通常より多い時の数値の色(システムカラーまたはカラーコード)
- * @text 獲得経験値ブースト時数値色
- * @type number
- * @default 0
- * @parent GetActorExp
- * 
- * @param EXPResistValueColor
- * @desc 獲得経験値が通常よりも少ない時の数値の色(システムカラーまたはカラーコード)
- * @text 獲得経験値レジスト時数値色
- * @type number
- * @default 0
- * @parent GetActorExp
- * 
- * @param EXPResistContentsBackVisible
- * @type boolean
- * @default true
- * @text コンテンツ背景表示
- * @desc コンテンツ背景を表示します。
- * @parent GetActorExp
- * 
- * @param EXPResistContentsBackGroundImg
- * @desc コンテンツ背景画像ファイル名を指定します。コンテンツ背景表示がONの時に有効
- * @text コンテンツ背景画像
- * @type file
- * @dir img/
- * @default 
- * @parent GetActorExp
- * 
  * @param EXPResistWindowsSkin
  * @desc アクター獲得経験値ウィンドウのウィンドウスキンを指定します。
  * @text アクター獲得経験値ウィンドウのスキン
@@ -594,6 +553,72 @@
  * @dir img/system
  * @default 
  * @parent GetActorExp
+ * 
+ * @param LevelUpSetting
+ * @text レベルアップ設定
+ * @default ------------------------------
+ * @parent GetActorExp
+ * 
+ * @param LevelUpImg
+ * @desc レベルアップ文字の画像ファイル名を指定します。座標はアクター獲得経験値表示項目で指定します。(レベルアップ表示選択時)
+ * @text レベルアップ画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent LevelUpSetting
+ * 
+ * @param LevelUpNameColor
+ * @desc レベルアップの文字色(システムカラーまたはカラーコード)画像設定時場合は適用されません。(レベルアップ表示選択時)
+ * @text レベルアップ文字色
+ * @type number
+ * @default 17
+ * @parent LevelUpSetting
+ * 
+ * @param LevelUpValueColor
+ * @desc レベルアップした時のレベルの数値の色(システムカラーまたはカラーコード)(レベル表示選択時)
+ * @text レベルアップ時の数値色
+ * @type number
+ * @default 17
+ * @parent LevelUpSetting
+ * 
+ * @param EXPSetting
+ * @text 経験値表示設定
+ * @default ------------------------------
+ * @parent GetActorExp
+ * 
+ * @param EXPBoostValueColor
+ * @desc 獲得経験値が通常より多い時の数値の色(システムカラーまたはカラーコード)
+ * @text 獲得経験値ブースト時数値色
+ * @type number
+ * @default 0
+ * @parent EXPSetting
+ * 
+ * @param EXPResistValueColor
+ * @desc 獲得経験値が通常よりも少ない時の数値の色(システムカラーまたはカラーコード)
+ * @text 獲得経験値レジスト時数値色
+ * @type number
+ * @default 0
+ * @parent EXPSetting
+ * 
+ * @param ContentsBackSetting
+ * @text コンテンツ背景設定
+ * @default ------------------------------
+ * @parent GetActorExp
+ * 
+ * @param EXPResistContentsBackVisible
+ * @type boolean
+ * @default true
+ * @text コンテンツ背景表示
+ * @desc コンテンツ背景を表示します。
+ * @parent ContentsBackSetting
+ * 
+ * @param EXPResistContentsBackGroundImg
+ * @desc コンテンツ背景画像ファイル名を指定します。コンテンツ背景表示がONの時に有効
+ * @text コンテンツ背景画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ContentsBackSetting
  * 
  * @param ExpSetting
  * @text EXPゲージ設定
@@ -2228,6 +2253,7 @@ const EXPResistWindowsSkin = String(parameters['EXPResistWindowsSkin']);
 const ActorExpDataList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorExpDataList'])) : [];
 const ActorFaceHeight = Number(parameters['ActorFaceHeight'] || 144);
 const LevelUpActorFaceHeight = Number(parameters['LevelUpActorFaceHeight'] || 144);
+const LevelUpImg = String(parameters['LevelUpImg']);
 const LevelUpNameColor = (DataManager.nuun_structureData(parameters['LevelUpNameColor'])) || 17;
 const LevelUpValueColor = (DataManager.nuun_structureData(parameters['LevelUpValueColor'])) || 17;
 const EXPBoostValueColor = (DataManager.nuun_structureData(parameters['EXPBoostValueColor'])) || 0;
@@ -3479,12 +3505,23 @@ Window_ResultActorExp.prototype.drawExpGauge = function(data, actor, x, y, width
 
 Window_ResultActorExp.prototype.drawLevelUp = function(data, actor, x, y, width) {
   if (actor._resultLevelUp) {
-    this.changeTextColor(NuunManager.getColorCode(LevelUpNameColor));
-    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
-    const text = data.ParamName || 'LEVEL UP!';
-    const textWidth = this.textWidth(text);
-    this.drawText(text, x, y, textWidth, 'center');
+    if (!!LevelUpImg) {
+      const bitmap = ImageManager.nuun_LoadPictures(LevelUpImg);
+      bitmap.addLoadListener(function() {
+        this.setLevelUpBitmap(bitmap, x, y, width);
+      }.bind(this));
+    } else {
+      this.changeTextColor(NuunManager.getColorCode(LevelUpNameColor));
+      this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+      const text = data.ParamName || 'LEVEL UP!';
+      const textWidth = this.textWidth(text);
+      this.drawText(text, x, y, textWidth, 'center');
+    }
   }
+};
+
+Window_ResultActorExp.prototype.setLevelUpBitmap = function(bitmap, x, y, width) {
+  this.contents.blt(bitmap, 0, 0, width, this.height, x, y);
 };
 
 Window_ResultActorExp.prototype.placeExpGauge = function(actor, x, y) {
@@ -5290,6 +5327,9 @@ Sprite_ResultBackground.prototype.loadBitmap = function() {
   ImageManager.nuun_LoadPictures(VictorySceneImg);
   ImageManager.nuun_LoadPictures(GetWindowBackGroundImg);
   ImageManager.nuun_LoadPictures(LevelUpActorBackGroundImg);
+  if (!!LevelUpImg) {
+    ImageManager.nuun_LoadPictures(LevelUpImg);
+  }
 };
 
 Sprite_ResultBackground.prototype.setupAfterVictoryEffect = function() {

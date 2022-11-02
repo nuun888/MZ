@@ -2,6 +2,8 @@
 公開しているプラグインはフリー版のみMITライセンスで公開しています。  
 フリー、シェアゲーム問わずご使用いただけます。
 
+RPGツクールMVへの対応は行いません。  
+
 [既知の不具合、更新予定](https://github.com/nuun888/MZ/blob/master/bug.md)  
 
 [よくある質問](https://github.com/nuun888/MZ/blob/master/README/q&a.md)

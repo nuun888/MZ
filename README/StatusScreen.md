@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.4.3
+# Ver.2.4.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -83,6 +83,8 @@ Y座標を指定します。Y表示列位置からの相対座標になります
 ### レーダーチャート設定
 
 ### 更新履歴
+2022/11/3 Ver.2.4.4  
+特定の場面でエラーが出る問題を修正。  
 2022/9/23 Ver.2.4.3  
 一部プラグインの競合対策。  
 2022/8/22 Ver.2.4.2  

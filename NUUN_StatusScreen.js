@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.4.3
+ * @version 2.4.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -115,6 +115,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/3 Ver.2.4.4
+ * 特定の場面でエラーが出る問題を修正。
  * 2022/9/23 Ver.2.4.3
  * 一部プラグインの競合対策。
  * 2022/8/22 Ver.2.4.2
@@ -1426,7 +1428,7 @@ Scene_Status.prototype.updateStatusPagedown = function() {
 Scene_Status.prototype.updateStatusPageup = function() {
 	const maxPage = this.maxPage();
   if (maxPage > 1) {
-    this._page = (this._page + (maxPage - 1)) % maxPage;
+    this._page = (this._page + maxPage - 1) % maxPage;
     SoundManager.playCursor();
     this.updatePage();
   }
@@ -2045,7 +2047,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
   const dactor = actor.actor();
   const lineHeight = this.lineHeight();
   this.contentsFontSize(list);
-  const text = list.ParamNamee;
+  const text = list.ParamName;
   if (text) {
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(text, x, y, width);

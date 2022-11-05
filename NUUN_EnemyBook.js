@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.16.2
+ * @version 2.16.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -181,6 +181,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/5 Ver.2.16.3
+ * ApngPictureが導入されていないとエラーが出る問題を修正。
  * 2022/11/5 Ver.2.16.2
  * APNGで表示したモンスターが２重に表示されてしまう問題を修正。
  * 2022/11/5 Ver.2.16.1
@@ -7337,7 +7339,7 @@ Sprite_BookEnemy.prototype.refresh = function() {
         } else {
             bitmap = ImageManager.loadEnemy(name);
         }
-        if (this.loadApngSprite(name)) {
+        if (this.loadApngSprite && this.loadApngSprite(name)) {
             this.addApngChild(name);
             this._apngMode = true;
         } else {

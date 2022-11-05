@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.16.0
+ * @version 2.16.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -172,10 +172,17 @@
  * レーダーチャートを有効にするにはNUUN_RadarChartBaseが必要です。
  * ステート、属性、バフ耐性マスク機能を有効にするにはNUUN_EnemyBookEX_1が必要です。
  * 
+ * Apng画像の表示
+ * 別途トリアコンタン様のApngPicture.js及び以下のライブラリが必要です。
+ * https://github.com/sbfkcel/pixi-apngAndGif
+ * ダウンロード先はApngPicture.js(APNGピクチャプラグイン)をご確認ください。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/5 Ver.2.16.1
+ * Apng対応。(トリアコンタン様のApngPicture.jsが必要となります)
  * 2022/10/18 Ver.2.16.0
  * モンスターステータスウィンドウにカテゴリー選択時の項目を表示できる機能を追加。
  * カテゴリーにモンスターが表示されなかった問題を修正。
@@ -7311,6 +7318,7 @@ Sprite_BookEnemy.prototype.refresh = function() {
         } else {
             bitmap = ImageManager.loadEnemy(name);
         }
+        this.addApngChild(name);
     }
     this.bitmap = bitmap;
     if (bitmap && !bitmap.isReady()) {
@@ -7396,6 +7404,23 @@ Sprite_BookEnemy.prototype.setMaxWidth = function(width) {
   
 Sprite_BookEnemy.prototype.setMaxHeight = function(height) {
     this.maxHeight = height;
+};
+
+//ApngPicture トリアコンタン氏
+Sprite_BookEnemy.prototype.loadApngSprite = function(name) {
+    if ($gameSystem.isSideView()) {
+        return SceneManager.tryLoadApngSideEnemy(name);
+    } else {
+        return SceneManager.tryLoadApngEnemy(name);
+    }
+};
+
+Sprite_BookEnemy.prototype.loadStaticImage = function(name) {
+    if ($gameSystem.isSideView()) {
+        return ImageManager.loadSvEnemy(name);
+    } else {
+        return ImageManager.loadEnemy(name);
+    }
 };
 
 

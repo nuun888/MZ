@@ -102,7 +102,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | アイテム、スキル　　　　　　　　　　　 | プラグイン　プラグイン数13　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [アイテム、スキルネームカラー](https://github.com/nuun888/MZ/blob/master/README/ItemNameColor.md) | [NUUN_ItemNameColor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js) |  | 1.1.1 |
-| [経験値増減アイテム、スキル](https://github.com/nuun888/MZ/blob/master/README/ExpItem.md) | [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js) |  | 1.2.1 |
+| [経験値増減アイテム、スキル](https://github.com/nuun888/MZ/blob/master/README/ExpItem.md) | [NUUN_ExpItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpItem.js) |  | 1.2.2 |
 | [レベルアップアイテム](https://github.com/nuun888/MZ/blob/master/README/LevelUPItem.md) | [NUUN_LevelUPItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUPItem.js) |  | 1.0.1 |
 | [キャストタイム（詠唱）キャンセルスキル、アイテム](https://github.com/nuun888/MZ/blob/master/README/CancelCastTime.md) | [NUUN_CancelCastTime](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CancelCastTime.js) |  | 1.1.0 |
 | [アイテム消耗率](https://github.com/nuun888/MZ/blob/master/README/ConsumptionItem.md) | [NUUN_ConsumptionItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConsumptionItem.js) |  | 1.1.1 |
@@ -177,14 +177,14 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | メニュー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数10　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ グ A | 2.16.1 |
+| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md)  | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ グ A | 2.16.3 |
 | ┣　[耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) | [NUUN_EnemyBookEX_1](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js) |  | 1.0.1 |
 | ┣ 条件付きドロップアイテム図鑑適用 | [NUUN_EnemyBookEX_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) |  | 1.0.1 |
 | ┗ [モンスター図鑑全セーブ共通](https://github.com/nuun888/MZ/blob/master/README/EnemyBook_Global.md) | [NUUN_EnemyBook_Global](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook_Global.js) |  | 1.0.1 |
 | [アイテム図鑑](https://github.com/nuun888/MZ/blob/master/README/ItemBook.md) | [NUUN_ItemBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js) | 共 | 1.4.4 |
 | ┗ [アイテム図鑑全セーブ共通](https://github.com/nuun888/MZ/blob/master/README/ItemBook_Global.md) | [NUUN_ItemBook_Global](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook_Global.js) |  | 1.0.0 |
 | [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共 立対 レ | 2.4.2 |
-| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 2.0.0 || [所持金拡張](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.2 |
+| [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 2.0.1 || [所持金拡張](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | 1.1.2 |
 | [メニュー画面デフォルトタイプ](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md) | [NUUN_MenuScreen_default](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js) | 共 立対 | 1.4.1 |
 | [メニュー画面タイプ１](https://github.com/nuun888/MZ/blob/master/README/MenuScreen.md) | [NUUN_MenuScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js) | 共(Ver.1.4.1以降) 立対 | 1.8.1 |
 | [メニュー画面タイプ２](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_2.md) | [NUUN_MenuScreen_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js) | 共(Ver.1.4.1以降) 立対 | 1.8.1 |

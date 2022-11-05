@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.16.1
+ * @version 2.16.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -181,6 +181,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/5 Ver.2.16.2
+ * APNGで表示したモンスターが２重に表示されてしまう問題を修正。
  * 2022/11/5 Ver.2.16.1
  * Apng対応。(トリアコンタン様のApngPicture.jsが必要となります)
  * 2022/10/18 Ver.2.16.0
@@ -5560,6 +5562,11 @@ Window_EnemyBook.prototype.maxCols = function() {
     return ContentCols;
 };
 
+Window_EnemyBook.prototype.close = function() {
+    Window_Base.prototype.close.call(this);
+    this._enemySprite.resetEnemy();
+};
+
 Window_EnemyBook.prototype.setEnemyData = function(enemy) {
     this._categoryMode = false;
     if (this._enemy !== enemy) {
@@ -5678,6 +5685,7 @@ Window_EnemyBook.prototype.drawEnemyBookContents = function() {
     const lineHeight = this.lineHeight();
     const listContents = this.listDate(this._displayList);
     const enemy = this._categoryMode ? null : this.getEnemyData();
+    this._enemySprite.resetEnemy();
     for (const data of listContents) {
         this.resetFontSettings();
         const x_Position = data.X_Position;
@@ -5712,8 +5720,9 @@ Window_EnemyBook.prototype.loadBitmap = function() {
     if (bitmap && !bitmap.isReady()) {
         bitmap.addLoadListener(this.drawEnemyBookContents.bind(this))
         return;
+    } else {
+        this.drawEnemyBookContents();
     }
-    this.drawEnemyBookContents();
 };
 
 Window_EnemyBook.prototype.widthMode = function(list, rect) {
@@ -7296,6 +7305,7 @@ Sprite_BookEnemy.prototype.initMembers = function() {
     this._battler = null;
     this._svEnemy = false;
     this.maxWidth = 0;
+    this._apngMode = null;
 };
 
 Sprite_BookEnemy.prototype.setup = function(battler,x, y) {
@@ -7306,11 +7316,20 @@ Sprite_BookEnemy.prototype.setup = function(battler,x, y) {
     this.refresh();
 };
 
+Sprite_BookEnemy.prototype.resetEnemy = function() {
+    this._battler = null;
+    if (this._apngMode) {
+        this.destroyApngIfNeed();
+        this._apngMode = null;
+    }
+};
+
 Sprite_BookEnemy.prototype.refresh = function() {
     let bitmap = null;
     if (this._svEnemy) {
         const sv_name = this.enemySVBattlerName();
         bitmap = ImageManager.loadSvActor(sv_name);
+        this.bitmap = bitmap;
     } else {
         const name = this.enemyBattlerName();
         if ($gameSystem.isSideView()) {
@@ -7318,9 +7337,14 @@ Sprite_BookEnemy.prototype.refresh = function() {
         } else {
             bitmap = ImageManager.loadEnemy(name);
         }
-        this.addApngChild(name);
+        if (this.loadApngSprite(name)) {
+            this.addApngChild(name);
+            this._apngMode = true;
+        } else {
+            this.bitmap = bitmap;
+        }
+        
     }
-    this.bitmap = bitmap;
     if (bitmap && !bitmap.isReady()) {
         bitmap.addLoadListener(this.drawEnemy.bind(this));
     } else {

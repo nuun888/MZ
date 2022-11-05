@@ -12,7 +12,7 @@
  * @target MZ
  * @plugindesc 経験値増減アイテム、スキル
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * 経験値を増減させるアイテムやスキルを作ることが出来ます。
@@ -37,6 +37,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/6 Ver 1.2.2
+ * 処理を修正。
  * 2021/12/13 Ver 1.2.1
  * 経験値が正常に加算されない問題を修正。
  * 2021/12/6 Ver 1.2.0
@@ -132,16 +134,12 @@ Game_ActionResult.prototype.clear = function() {
       const currentExp = this.currentExp();
       let text = null;
       let expVal = Math.round(getExp * this.finalExpRate());
-      let limitExp = 0;
       if (item.meta.levelUpStop && expVal > 0) {
-        limitExp = this.nextLevelExp() - currentExp;
-        expVal = expVal > limitExp ? limitExp : expVal;
+        expVal = this.limitLevelUp(expVal);
       } else if (item.meta.NolevelDown && expVal < 0) {
-        limitExp = this.currentLevelExp() - currentExp;
-        expVal = expVal < limitExp ? limitExp : expVal;
+        expVal = this.limitLevelDown(expVal);
       } else {
-        limitExp = this.expForLevel(this.maxLevel()) - currentExp;
-        expVal = expVal > limitExp ? limitExp : expVal;
+        expVal = this.limitLevelMax(expVal);
       }
       if(expVal) {
         if (expVal > 0) {
@@ -170,6 +168,26 @@ Game_ActionResult.prototype.clear = function() {
   const _Game_Actor_finalExpRate = Game_Actor.prototype.finalExpRate;
   Game_Actor.prototype.finalExpRate = function() {
     return gainExpItem ? 1 : _Game_Actor_finalExpRate.call(this);
+  };
+
+  Game_Actor.prototype.limitLevelUp = function(exp) {
+    const currentExp = this.currentExp();
+    const nextLevelExp = this.nextLevelExp();
+    const limitExp = nextLevelExp - currentExp;
+    return Math.min(exp, limitExp);
+  };
+
+  Game_Actor.prototype.limitLevelDown = function(exp) {
+    const currentExp = this.currentExp();
+    const currentLevelExp = this.currentLevelExp();
+    const limitExp = currentLevelExp - currentExp;
+    return Math.max(exp, limitExp);
+  };
+
+  Game_Actor.prototype.limitLevelMax = function(exp) {
+    const currentExp = this.currentExp();
+    const limitExp = this.expForLevel(this.maxLevel()) - currentExp;
+    return Math.min(exp, limitExp);
   };
 
   const _Window_BattleLog_displayActionResults = Window_BattleLog.prototype.displayActionResults;

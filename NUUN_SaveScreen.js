@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -81,6 +81,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/5 Ver.2.0.1
+ * 顔グラの拡大率を変更したときに各顔グラの間に余白ができてしまう問題を修正。
  * 2022/9/24 Ver.2.0.0
  * 全ての項目の配置の自由化。
  * 一部不具合修正。
@@ -1138,16 +1140,19 @@ Imported.NUUN_SaveScreen = true;
 
   Window_SavefileList.prototype.drawFaceActors = function(info, x, y, width, data) {
     if (info.faces) {
+      const rect = this.itemRect(0);
       const colSpacing = this.colSpacing();
       width += colSpacing / 2;
+      const height = Math.min(FaceHeight, rect.height) - 4;
+      const height2 = height * (height / (height * FaceScale / 100));
       if (FaceSpecifyActorOnry) {
         const data = info.faces[0];
-        this.drawFace(data[0], data[1], x, y, FaceWidth, FaceHeight);
+        this.drawFace(data[0], data[1], x, y + 2, FaceWidth, height2);
       } else {
         let faceX = x;
         for (const data of info.faces) {
-          this.drawFace(data[0], data[1], faceX, y, FaceWidth, FaceHeight);
-          faceX += FaceWidth;
+          this.drawFace(data[0], data[1], faceX, y + 2, FaceWidth, height2);
+          faceX += FaceWidth * FaceScale / 100;
         }
       }
     }

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.16.3
+ * @version 2.16.4
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -181,6 +181,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/6 Ver.2.16.4
+ * APNG関連の修正。
  * 2022/11/5 Ver.2.16.3
  * ApngPictureが導入されていないとエラーが出る問題を修正。
  * 2022/11/5 Ver.2.16.2
@@ -7430,6 +7432,11 @@ Sprite_BookEnemy.prototype.setMaxWidth = function(width) {
   
 Sprite_BookEnemy.prototype.setMaxHeight = function(height) {
     this.maxHeight = height;
+};
+
+Sprite_BookEnemy.prototype.destroy = function() {
+    this.resetEnemy();
+    Sprite.prototype.destroy.call(this);
 };
 
 //ApngPicture トリアコンタン氏

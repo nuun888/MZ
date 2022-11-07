@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.0
+ * @version 3.8.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/11/7 Ver.3.8.1
+ * アクター画像をAPNGに対応。
  * 2022/10/18 Ver.3.8.0
  * スキル、アイテム選択画面の座標、横幅、行数、列数を設定できる機能を追加。
  * 2022/10/16 Ver.3.7.10
@@ -2714,6 +2716,7 @@ Sprite_ActorImges.prototype.initMembers = function() {
   this._durationOpacity = 0;
   this._startUpdate = true;
   this._zoomEffect = false;
+  this._apngMode = false;
 };
 
 Sprite_ActorImges.prototype.setup = function(battler, data, index, stateSprite) {
@@ -2944,15 +2947,23 @@ Sprite_ActorImges.prototype.resetBattleStyleImg = function(actor) {
 };
 
 Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
-  this.bitmap = bitmap;
-  if (actor.faceMode) {
-    this.faceRefresh(actor.getBSImgIndex());
+  const pass = Imported.NUUN_ActorPicture && params.ActorPictureEXApp ? actor.getActorGraphicImg() : actor.getBSImgName();
+  const name = pass ? pass.split('pictures/')[1] : null;
+  if (name && this.addApngChild && this.loadApngSprite(name)) {
+    this.addApngChild(name);
+    this._apngMode = true;
   } else {
-    this.imgFrameRefresh()
-  }
-  if (!this.isDead() && this._updateCount === 0) {
-    this.opacity = actor.getBattleStyleOpacity() || 255;
-    this._actorImgesOpacity = this.opacity;
+    this.resetActorImg();
+    this.bitmap = bitmap;
+    if (actor.faceMode) {
+      this.faceRefresh(actor.getBSImgIndex());
+    } else {
+      this.imgFrameRefresh()
+    }
+    if (!this.isDead() && this._updateCount === 0) {
+      this.opacity = actor.getBattleStyleOpacity() || 255;
+      this._actorImgesOpacity = this.opacity;
+    }
   }
 };
 
@@ -2997,11 +3008,11 @@ Sprite_ActorImges.prototype.imgFrameRefresh = function() {//画像を切り替�
   const scale = this._data.Actor_Scale / 100;
   if (params.Img_SW > 0 || params.Img_SH > 0) {
     const oriScale = 1 / scale;
-      const sw = (params.Img_SW || Infinity) * oriScale;
-      const sh = (params.Img_SH || Infinity) * oriScale;
-      const sx = (this._data.Img_SX || 0) * oriScale + (this._data.ActorImgHPosition === 'center' ? (this.bitmap.width - sw) / 2 : 0);
-      const sy = (this._data.Img_SY || 0) * oriScale;
-      this.setFrame(sx, sy, sw, sh);
+    const sw = (params.Img_SW || Infinity) * oriScale;
+    const sh = (params.Img_SH || Infinity) * oriScale;
+    const sx = (this._data.Img_SX || 0) * oriScale + (this._data.ActorImgHPosition === 'center' ? (this.bitmap.width - sw) / 2 : 0);
+    const sy = (this._data.Img_SY || 0) * oriScale;
+    this.setFrame(sx, sy, sw, sh);
   }
 };
 
@@ -3043,6 +3054,23 @@ Sprite_ActorImges.prototype.setActorDead = function(flag){
 
 Sprite_ActorImges.prototype.isDead = function(){
   return this._isDead;
+};
+
+Sprite_ActorImges.prototype.resetActorImg = function() {
+  this._battler = null;
+  if (this._apngMode) {
+      this.destroyApngIfNeed();
+      this._apngMode = null;
+  }
+};
+
+Sprite_ActorImges.prototype.destroy = function() {
+  this.resetActorImg();
+  Sprite.prototype.destroy.call(this);
+};
+
+Sprite_ActorImges.prototype.loadApngSprite = function(name) {
+  return Sprite_Picture.prototype.loadApngSprite.call(this, name);
 };
 
 //Sprite_BSGauge

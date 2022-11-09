@@ -1,6 +1,8 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
 # Ver.1.5.2
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
+
+English available  
 
 共通処理を行うベースプラグインです。  
 プラグインリストの上に配置してください。  

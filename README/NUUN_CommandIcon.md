@@ -1,6 +1,9 @@
 # [コマンド、カテゴリー表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)
 # Ver.1.4.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  
+
+#### 必須プラグイン
+[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 コマンドにアイコン、文字色を設定できます。  
 ウィンドウごとに左揃え、中央揃え、右揃えに表示させることができます。  

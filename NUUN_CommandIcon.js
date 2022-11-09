@@ -10,7 +10,9 @@
  * @target MZ
  * @plugindesc コマンド、カテゴリー表示拡張
  * @author NUUN
- * @version 1.3.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @version 1.4.0
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -37,6 +39,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/10 Ver 1.4.0
+ * コマンドのコンテンツ背景に任意の画像を表示できる機能を追加。
  * 2022/4/10 Ver 1.3.2
  * クラス毎のコマンド名表示位置の設定が適用されていなかった問題を修正。
  * 2021/12/25 Ver 1.3.1
@@ -124,6 +128,13 @@
  * @type number
  * @default 0
  * @min 0
+ * 
+ * @param ContentsBuckImg
+ * @desc コンテンツ背景画像ファイル名を指定します。
+ * @text コンテンツ背景画像
+ * @type file
+ * @dir img/
+ * @default 
  * 
  * @param CommandClassMode
  * @text フィルタリングクラス設定モード
@@ -254,13 +265,7 @@ Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
     const itemWidth = Math.max(0, maxWidth - textMargin);
     width = Math.min(itemWidth, textWidth);
     const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;
-    let colorCode = null;
-    if (color && typeof(color) === "string" && color.match(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/) !== null) {
-      colorCode = color;
-    } else {
-      colorCode = ColorManager.textColor(color);
-    }
-    this.changeTextColor(colorCode);
+    this.changeTextColor(NuunManager.getColorCode(color));
     if(commadData.iconId > 0) {
       if(align === 'center') {
         this.drawIcon(commadData.iconId, x + (maxWidth / 2 - width / 2) - textMargin / 2, iconY);
@@ -294,4 +299,24 @@ Window_Command.prototype.isClass = function(Command, mode) {
   }
   return true;
 };
+
+const _Window_Command_drawItemBackground = Window_Command.prototype.drawItemBackground;
+Window_Command.prototype.drawItemBackground = function(index) {
+  const commadName = this._commadName;
+  const find = param.CommadIcon ? param.CommadIcon.find(Commad => (Commad.CommadName === commadName) && this.isClass(Commad.CommandClass, Commad.CommandClassMode) && !!Commad.ContentsBuckImg) : null;
+  if (find) {
+    const bitmap = ImageManager.nuun_LoadPictures(find.ContentsBuckImg);
+    bitmap.addLoadListener(function() {
+      this.drawContentsBack(bitmap, index);
+    }.bind(this));
+  } else {
+    _Window_Command_drawItemBackground.call(this, index);
+  }
+};
+
+Window_Command.prototype.drawContentsBack = function(bitmap, index) {
+  const rect = this.itemRect(index);
+  this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+};
+
 })();

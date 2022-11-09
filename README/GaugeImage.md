@@ -4,8 +4,9 @@
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
-ゲージを画像化します。  
 English available  
+
+ゲージを画像化します。  
 
 ![画像](img/GaugeImage4.png)  
 

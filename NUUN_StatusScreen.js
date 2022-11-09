@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.4.4
+ * @version 2.4.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -115,6 +115,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/9 Ver.2.4.5
+ * フォントサイズがおかしくなる問題を修正。
  * 2022/11/3 Ver.2.4.4
  * 特定の場面でエラーが出る問題を修正。
  * 2022/9/23 Ver.2.4.3
@@ -1456,6 +1458,7 @@ Scene_Status.prototype.update = function() {
 const _Window_Status_initialize = Window_Status.prototype.initialize;
 Window_Status.prototype.initialize = function(rect) {
   this._userWindowSkin = StatusWindowsSkin;
+  this.language_Jp = $gameSystem.isJapanese();
   _Window_Status_initialize.call(this, rect);
   this._page = startPages();
 };
@@ -1594,6 +1597,7 @@ Window_Status.prototype.drawBlock = function() {
   const list = this.listDate();
   const lineHeight = this.contentsLineHeight();
   for (const data of list) {
+    this.resetFontSettings();
     const x_Position = data.X_Position;
     const position = Math.min(x_Position, this.maxCols());
     const rect = this.itemRect(position - 1);
@@ -1765,41 +1769,41 @@ Window_Status.prototype.paramNameShow = function(list, actor, params) {
     case 11:
       return TextManager.param(params - 2);
     case 12:
-      return "会心率";
+      return this.language_Jp ? "会心率" : 'Critcal Rate';
     case 13:
-      return "会心回避率";
+      return this.language_Jp ? "会心回避率" : 'Critical Evade';
     case 14:
-      return "魔法回避率";
+      return this.language_Jp ? "魔法回避率" : 'Magic Evade';
     case 15:
-      return "魔法反射率";
+      return this.language_Jp ? "魔法反射率" : 'Magic Reflect';
     case 16:
-      return "反撃率";
+      return this.language_Jp ? "反撃率" : 'Counter';
     case 17:
-      return "HP再生率";
+      return this.language_Jp ? "HP再生率" : 'HP Regen';
     case 18:
-      return "MP再生率";
+      return this.language_Jp ? "MP再生率" : 'MP Regen';
     case 19:
-      return "TP再生率";
+      return this.language_Jp ? "TP再生率" : 'TP Regen';
     case 20:
-      return "狙われ率";
+      return this.language_Jp ? "狙われ率" : 'Aggro';
     case 21:
-      return "防御効果率";
+      return this.language_Jp ? "防御効果率" : 'Guard';
     case 22:
-      return "回復効果率";
+      return this.language_Jp ? "回復効果率" : 'Recovery';
     case 23:
-      return "薬の知識";
+      return this.language_Jp ? "薬の知識" : 'Item Effect';
     case 24:
-      return "MP消費率";
+      return this.language_Jp ? "MP消費率" : 'MP Cost';
     case 25:
-      return "TPチャージ率";
+      return this.language_Jp ? "TPチャージ率" : 'TP Charge';
     case 26:
-      return "物理ダメージ率";
+      return this.language_Jp ? "物理ダメージ率" : 'Physical Damage';
     case 27:
-      return "魔法ダメージ率";
+      return this.language_Jp ? "魔法ダメージ率" : 'Magical Damage';
     case 28:
-      return "床ダメージ率";
+      return this.language_Jp ? "床ダメージ率" : 'Floor Damage';
     case 29:
-      return "獲得経験率";
+      return this.language_Jp ? "獲得経験率" : 'EXP Gain';
     case 42:
       return TextManager.param(0);
     case 43:

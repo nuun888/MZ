@@ -1,5 +1,5 @@
 # [MV互換アニメーション再生時のフレームレート変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js)
 
 MVのアニメーションを再生するときのフレームレートを変更します。  
@@ -16,6 +16,8 @@ FPSモード：15FPSで4フレーム、30FPSで2フレーム、60FPSで1フレ�
 
 
 ## 更新履歴
+2022/11/9 Ver.1.1.1  
+日本語以外での表示を英語表示に変更。  
 2021/11/5 Ver.1.1.0  
 フレーム値をFPS指定に変更。  
 2021/12/9 Ver.1.0.2  

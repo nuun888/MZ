@@ -9,6 +9,61 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc  NuuNBasePlugin
+ * @author NUUN
+ * @version 1.5.2
+ * 
+ * @help
+ * This is a base plugin that performs common processing.
+ * Place it above the plugin list.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * This plugin can be used for free or for a fee.
+ * 
+ * Log
+ * 11/9/2022 Ver.1.5.2
+ * Changed the display in languages other than Japanese to English.
+ * 7/29/2022 Ver.1.5.1 
+ * Added processing to specify the range.
+ * 7/23/2022 Ver.1.5.0
+ * 'NuunManager' also defines the process for specifying the range.
+ * 6/15/2022 Ver.1.4.5
+ * Fixed the problem that 'NaN' is displayed when entering a string.
+ * 5/24/2022 Ver.1.4.4
+ * Added processing to set sprite filtering window.
+ * 2/12/2022 Ver.1.4.3
+ * Fixed an issue where some variable names were wrong.
+ * 1/12/2022 Ver.1.4.2
+ * Added processing to apply enemy MP gauge and enemy TP gauge.
+ * 1/9/2022 Ver.1.4.1
+ * Added processing to round the decimal point.
+ * 1/8/2022 Ver.1.4.0
+ * Added color index acquisition process.
+ * 12/12/2021 Ver.1.3.2
+ * Added processing for applying enemy state display enhancements.
+ * 11/7/2021 Ver.1.3.1
+ * Added processing related to multiple attribute acquisition.
+ * 8/22/2021 Ver.1.3.0
+ * Added processing to 'Window_ItemList'.
+ * 7/15/2021 Ver.1.2.0
+ * Added common processing for gauges and name display plug-ins.
+ * 5/15/2021 Ver.1.1.4
+ * Added a process that can set the window skin for each window.
+ * 5/8/2021 Ver.1.1.3
+ * Fixed some processing.
+ * 5/7/2021 Ver.1.1.2
+ * Added structure acquisition processing.
+ * 4/23/2021 Ver.1.1.1
+ * Added processing for specifying a folder for images.
+ * 3/14/2021 Ver.1.1.0
+ * Added processing for specifying a folder for images.
+ * 12/31/2020 Ver.1.0.0
+ * first edition
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
  * @version 1.5.1
@@ -21,21 +76,23 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/9 Ver.1.5.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/7/29 Ver.1.5.1
  * -を元に配列を返す処理をNuunManagerでも定義。
  * 2022/7/23 Ver.1.5.0
  * -を元に配列を返す処理を追加。
- * 2022/6/15 Ver.1.4.5
+ * 2022/7/23 Ver.1.4.5 2022/6/15 Ver.1.4.5
  * 文字列を記入したときにNaNと表示されてしまう問題を修正。
- * 2022/5/24 Ver.1.4.4
+ * 2022/7/23 Ver.1.4.4 2022/5/24 Ver.1.4.4
  * スプライトのフィルタリングウィンドウを設定する処理を追加。
- * 2022/2/12 Ver.1.4.3
+ * 2022/7/2 Ver.1.4.3 2022/2/12 Ver.1.4.3
  * 一部変数名が間違っていた問題を修正。
- * 2022/1/12 Ver.1.4.2
+ * 2022/7/1 Ver.1.4.2 2022/1/12 Ver.1.4.2
  * 敵MPゲージ、敵TPゲージのゲージ適用するための処理の追加。
- * 2022/1/9 Ver.1.4.1
+ * 2022/7/1 Ver.1.4.1 2022/1/9 Ver.1.4.1
  * 小数点を丸める処理を追加。
- * 2022/1/8 Ver.1.4.0
+ * 2022/8/1 Ver.1.4.0 2022/1/8 Ver.1.4.0
  * カラーインデックス取得処理を追加。
  * 2021/12/12 Ver.1.3.2
  * 敵ステート表示拡張を適用するための処理を追加。

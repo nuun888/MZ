@@ -169,7 +169,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | コマンド　　　　　　　　　　　　　　　 | プラグイン　プラグイン数3　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [アイテムのカテゴリーカスタマイズ](https://github.com/nuun888/MZ/blob/master/README/ItemCategory.md) | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | 共 | 1.3.1 |
-| [コマンド、カテゴリー表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_CommandIcon.md)| [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js) |  | 1.3.2 |
+| [コマンド、カテゴリー表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_CommandIcon.md)| [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js) |  | 1.4.0 |
 | [XP風バトルコマンド](https://github.com/nuun888/MZ/blob/master/README/XPBattleCommand.md) | [NUUN_XPBattleComman](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js) | 共 | 1.0.3 |
 |  |  |  |  |
 |  |  |  |  |
@@ -232,7 +232,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [ドロップ率分子操作](https://github.com/nuun888/MZ/blob/master/README/DropItemMolecule.md) | [NUUN_DropItemMolecule](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemMolecule.js) |  | 1.0.0 |
 | [ダメージタイプTP追加](https://github.com/nuun888/MZ/blob/master/README/TPDamageType.md) | [NUUN_TPDamageType](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPDamageType.js) |  | 1.0.1 |
 | [全体、ランダム、敵味方全体攻撃でも対象選択](https://github.com/nuun888/MZ/blob/master/README/Scope_confirmation.md) | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js) | 共 | 1.6.0 |
-| [MV互換アニメーションフレームレート変更](https://github.com/nuun888/MZ/blob/master/README/AnimationFPSRate.md) | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.0.2 |
+| [MV互換アニメーションフレームレート変更](https://github.com/nuun888/MZ/blob/master/README/AnimationFPSRate.md) | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.1.1 |
 | 戦闘背景の変更 | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) |  | 1.1.1 |
 | 敵グループ戦闘背景個別変更 |  |  |  |
 | マップ戦闘背景変更 |  |  |  |

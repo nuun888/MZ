@@ -413,7 +413,7 @@
  * @min 0
  * 
  */
-/*:
+/*:ja
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
@@ -520,7 +520,7 @@
  * 
  * 
  */
-/*~struct~GaugeImg:
+/*~struct~GaugeImg:ja
  * 
  * @param Type
  * @text 表示対象
@@ -768,7 +768,7 @@
  * @default
  * 
  */
-/*~struct~GaugeSetting:
+/*~struct~GaugeSetting:ja
  * 
  * @param Gaugeimage
  * @desc 画像を指定します。

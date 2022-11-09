@@ -8,9 +8,416 @@
  */
 /*:
  * @target MZ
+ * @plugindesc GaugeImaging
+ * @author NUUN
+ * @version 1.6.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * Image the game.
+ * 
+ * Specific conditions
+ * HP gauge
+ * It will switch to the image set when HP is dying.
+ * TPB gauge
+ * If TPB is during cast time, it will switch to the set image. (You need a separate plug-in that can visualize the cast time)
+ * 
+ * Image application at the time of damage requires a separate gauge display extension plug-in.
+ * 
+ * 'result_exp'　Result Acquisition EXP Gauge
+ * 'exp' Status screen EXP gauge
+ * 'limit' Party limit gauge image
+ * 
+ * Background image：This is the image displayed at the back.
+ * Front image：A decorative image displayed in the foreground.
+ * Main image：An image of the game.
+ * 
+ * Set 'Window_BattleStatus' and 'Window_BattleActor' in the filtering class settings if you want the image of the gauge to be reflected only during battle.
+ * Image coordinate X and image coordinate Y are applied even if the label does not specify an image. Set the gauge display offset position of the label image.
+ * 
+ * GaugeImgAngle
+ * Rotate the gauge to the left. Positive numbers rotate clockwise. Base height, XY coordinates need to be adjusted.
+ * With the core script default, the display height range of the gauge is 36, so if you don't change the base height, the image will be cut off.
+ * 
+ * GaugeInclined
+ * Tilt the gauge diagonally. A positive number tilts to the left.
+ * 
+ * GaugeImgVariable
+ * Extends the display of the gauge except for the range specified by the width of the front gauge image left side non-variable width and the front gauge image right side non-variable width.
+ * 
+ * Numeric image.
+ * For the numerical image format, specify an image in which numbers from 0 to 9 are arranged from the left.
+ * The number of vertical divisions is fixed at 1.
+ * List 1: Normal
+ * List 2: Dying (list 1 applies if not specified)
+ * List 3: Incapacitated (list 1 applies if not specified)
+ * There is no magnification setting for numerical images.
+ * 
+ * Specification
+ * Coordinates need to be adjusted if the gauge is rotated using the core script specifications.
+ * 
+ *  
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * This plugin can be used for free or for a fee.
+ * 
+ * Log
+ * 11/9/2022 Ver.1.6.2
+ * Changed the display in languages other than Japanese to English.
+ * 10/16/2022 Ver.1.6.1
+ * Fixed an issue where numeric images were not rotated.
+ * Fixed the problem that garbage is displayed when specifying rotation.
+ * 10/15/2022 Ver.1.6.0
+ * Supports numerical imaging.
+ * 7/19/2022 Ver.1.5.2
+ * Changed processing by plugging in damage amount gauge visualization.
+ * 5/24/2022 Ver.1.5.1
+ * Fixed an issue where label coordinates were not applied.
+ * 5/24/2022 Ver.1.5.0
+ * Significant review of processing contents and plug-in parameters.
+ * Added a function that can specify the angle of the gauge.
+ * 1/3/2022 Ver.1.4.3
+ * Corresponds to the damage amount visualization of the gauge display extension plug-in.
+ * Fixed the problem that the display of the front gauge is shifted.
+ * 12/20/2021 Ver.1.4.2
+ * Corresponds to the image of the party gauge.
+ * Added a function to set the range in which the front gauge image is not displayed variably.
+ * 12/19/2021 Ver.1.4.1
+ * Fixed an issue where filtering classes were not being applied correctly.
+ * 2/19/2021 Ver.1.4.0
+ * Added processing by supporting gauge plug-ins.
+ * Change image setting of gauge.
+ * 10/4/2021 Ver.1.3.0
+ * Added a function that can set the maximum image.
+ * Fixed the problem that the image of the gauge during drowning and casting time did not reflect if the image setting of specific conditions was not set.
+ * 9/24/2021 Ver.1.2.0
+ * Added a function to image labels.
+ * Fixed so that images can be displayed without combining them into one image.
+ * Fixed the problem that the image is displayed duplicated.
+ * 9/22/2021 Ver.1.1.1
+ * Fixed an issue where the main gauge would not display properly.
+ * 9/20/2021 Ver.1.1.0
+ * Added filtering function.
+ * Added a function that can display an image in front of the gauge.
+ * 9/20/2021 Ver.1.0.1
+ * Fixed the problem that the gauge is not displayed with the gauge that does not support this plug-in.
+ * 9/20/2021 Ver.1.0.0
+ * first edition
+ * 
+ * @param GaugeImgList
+ * @text Gauge image setting
+ * @desc Gauge image setting
+ * @type struct<GaugeImg>[]
+ * @default []
+ * 
+ * 
+ */
+/*~struct~GaugeImg:
+ * 
+ * @param Type
+ * @text Display target
+ * @desc Display target
+ * @type combo
+ * @option 'hp'
+ * @option 'mp'
+ * @option 'tp'
+ * @option 'time'
+ * @option 'result_exp'
+ * @option 'exp'
+ * @option 'limit'
+ * @default 
+ * 
+ * @param GaugeImgX
+ * @text Image coordinate X
+ * @desc Move the X coordinate of the image all at once. (The label is applied even if the image is not specified)
+ * @type number
+ * @default 0
+ * 
+ * @param GaugeImgY
+ * @text Image coordinate Y
+ * @desc Move the Y coordinates of the image all at once. (The label is applied even if the image is not specified)
+ * @type number
+ * @default 0
+ * 
+ * @param GaugeImgWidth
+ * @text Base width
+ * @desc pecifies the width of the display range.
+ * @type number
+ * @default 160
+ * 
+ * @param GaugeImgHeight
+ * @text Base height
+ * @desc Specifies the height of the height range.
+ * @type number
+ * @default 160
+ * 
+ * @param GaugeImgScale
+ * @text Image magnification
+ * @desc Specify the magnification ratio for the image. (percentage)
+ * @type number
+ * @default 100
+ * 
+ * @param GaugeImgAngle
+ * @text Image rotation angle
+ * @desc Specify the rotation angle of the image. A positive number rotates clockwise about the left side of the gauge.
+ * @type number
+ * @min -999
+ * @default 0
+ * 
+ * @param GaugeInclined
+ * @desc Specify the tilt rate of the image. A positive number tilts to the left.
+ * @text Slope rate
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeImgVariable
+ * @text Gauge width stretch
+ * @desc Scales the gauge to fit the width.
+ * @type boolean
+ * @default false
+ * 
+ * @param BackGauge
+ * @text Rear gauge image setting
+ * @default ------------------------------
+ * 
+ * @param GaugeBaukImg
+ * @text Rear gauge image setting
+ * @desc Rear gauge image setting.
+ * @type struct<GaugeSetting>
+ * @default {"Gaugeimage":"","GaugeX":"0","GaugeY":"0","GaugeSX":"0","GaugeSY":"0","GaugeSW":"0","GaugeSH":"0"}
+ * @parent BackGauge
+ * 
+ * @param MainGauge
+ * @text Gauge image setting
+ * @default ------------------------------
+ * 
+ * @param Default
+ * @text Default configuration
+ * @default ------------------------------
+ * @parent MainGauge
+ * 
+ * @param MainGaugeImg
+ * @text Gauge image setting
+ * @desc Gauge image setting.
+ * @type struct<GaugeSetting>
+ * @default {"Gaugeimage":"","GaugeX":"0","GaugeY":"0","GaugeSX":"0","GaugeSY":"0","GaugeSW":"0","GaugeSH":"0"}
+ * @parent Default
+ * 
+ * @param Max
+ * @text Gauge MAX image setting
+ * @default ------------------------------
+ * @parent MainGauge
+ * 
+ * @param GaugeMaxImg
+ * @text Gauge MAX image setting
+ * @desc Gauge MAX image setting.
+ * @type struct<GaugeSetting>
+ * @default {"Gaugeimage":"","GaugeX":"0","GaugeY":"0","GaugeSX":"0","GaugeSY":"0","GaugeSW":"0","GaugeSH":"0"}
+ * @parent Max
+ * 
+ * @param Cond
+ * @text Image settings under specific conditions
+ * @default ------------------------------
+ * @parent MainGauge
+ * 
+ * @param GaugeCondImg
+ * @text Image settings under specific conditions
+ * @desc Image settings under specific conditions.
+ * @type struct<GaugeSetting>
+ * @default {"Gaugeimage":"","GaugeX":"0","GaugeY":"0","GaugeSX":"0","GaugeSY":"0","GaugeSW":"0","GaugeSH":"0"}
+ * @parent Cond
+ * 
+ * @param FrontGauge
+ * @text Front gauge image setting
+ * @default ------------------------------
+ * 
+ * @param GaugeFrontImg
+ * @text Front gauge image setting
+ * @desc Front gauge image setting.
+ * @type struct<GaugeSetting>
+ * @default {"Gaugeimage":"","GaugeX":"0","GaugeY":"0","GaugeSX":"0","GaugeSY":"0","GaugeSW":"0","GaugeSH":"0"}
+ * @parent FrontGauge
+ * 
+ * @param Damage
+ * @text Damage amount visualization image setting
+ * @default ------------------------------
+ * 
+ * @param GaugeDamageImg
+ * @text Damage image settings
+ * @desc Image setting at the time of damage. (NUUN_DamageGauge plug-in required)
+ * @type struct<GaugeSetting>
+ * @default {"Gaugeimage":"","GaugeX":"0","GaugeY":"0","GaugeSX":"0","GaugeSY":"0","GaugeSW":"0","GaugeSH":"0"}
+ * @parent Damage
+ * 
+ * @param VariableSetting
+ * @text Setting when applying variable display
+ * @default ------------------------------
+ * 
+ * @param GaugeLeftWidth
+ * @desc The non-variable width of the left side of the front gauge image. (Variable mode only)
+ * @text Front gauge image left side non-variable width
+ * @type number
+ * @default 0
+ * 
+ * @param GaugeRightWidth
+ * @desc he non-variable width of the right side of the front gauge image. (Variable mode only)
+ * @text Front gauge image right side non-variable width
+ * @type number
+ * @default 0
+ * 
+ * @param GaugeBackCorrectionWidth
+ * @desc Rear image correction width (difference from display width)
+ * @text Rear image correction width
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeCorrectionWidth
+ * @desc Gauge image correction width (difference from display width)
+ * @text Gauge back image correction width
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param LabelImg
+ * @text Label image setting
+ * @default ------------------------------
+ * 
+ * @param LabelGaugeImg
+ * @desc Specifies the label image file name.
+ * @text label image
+ * @type struct<GaugeSetting>
+ * @default {"Gaugeimage":"","GaugeX":"0","GaugeY":"0","GaugeSX":"0","GaugeSY":"0","GaugeSW":"0","GaugeSH":"0"}
+ * @parent LabelImg
+ * 
+ * @param GaugeLabelAngle
+ * @text label rotation angle
+ * @desc Specifies the rotation angle of the label. Positive numbers rotate clockwise.
+ * @type number
+ * @min -999
+ * @default 0
+ * @parent LabelImg
+ * 
+ * @param ValueSetting
+ * @text Numeric image settings
+ * @default ------------------------------
+ * 
+ * @param ValueImg
+ * @desc pecifies the numeric image file name. List No. 0: Normal List No. 1: Dying List No. 2: Dead
+ * @text Numeric image
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent ValueSetting
+ * 
+ * @param ValueX
+ * @desc Specifies a numeric X coordinate.
+ * @text Numeric display offset position X
+ * @type number
+ * @default 0
+ * @min -999
+ * @parent ValueSetting
+ * 
+ * @param ValueY
+ * @desc Specifies a numeric Y coordinate.
+ * @text Numeric display offset position Y
+ * @type number
+ * @default 0
+ * @min -999
+ * @parent ValueSetting
+ * 
+ * @param GaugeValueAngle
+ * @text numeric rotation angle
+ * @desc Specifies the rotation angle of the number. Positive numbers rotate clockwise.
+ * @type number
+ * @min -999
+ * @default 0
+ * @parent ValueSetting
+ * 
+ * @param FilteringSetting
+ * @text Application window setting
+ * @default ------------------------------
+ * 
+ * @param FilteringClass
+ * @text Filtering class setting
+ * @desc Specifies the window class to apply. If not specified, it will be reflected in all windows. (multiple selection possible)
+ * @type combo[]
+ * @option 'Window_MenuStatus'
+ * @option 'Window_MenuActor'
+ * @option 'Window_Status'
+ * @option 'Window_BattleStatus'
+ * @option 'Window_BattleActor'
+ * @option 'Window_BattleActorStatus'
+ * @option 'Window_Result'
+ * @option 'Window_FormationStatus'
+ * @option 'Sprite_EnemyTPGauge'
+ * @option 'Sprite_EnemyHPGauge'
+ * @option 'Sprite_EnemyMPGauge'
+ * @option 'Sprite_EnemyTPBGauge'
+ * @option 'Window_EnemyBook'
+ * @option 'Sprite_ExtraGauge'
+ * @default
+ * 
+ */
+/*~struct~GaugeSetting:
+ * 
+ * @param Gaugeimage
+ * @desc Specifies an image.
+ * @text Image
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * @param GaugeX
+ * @desc Specifies the x-coordinate of the gauge.
+ * @text Gauge display offset position X
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeY
+ * @desc Specifies the Y coordinate of the gauge.
+ * @text Gauge display offset position Y
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeSX
+ * @desc Specify the X origin coordinates for drawing the gauge image.
+ * @text Gauge image origin position X
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeSY
+ * @desc Specify the Y starting point coordinates for drawing the gauge image.
+ * @text Gauge image origin position Y
+ * @type number
+ * @default 0
+ * @min -999
+ * 
+ * @param GaugeSW
+ * @desc Specify the width to draw the gauge image.
+ * @text Gauge image width
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param GaugeSH
+ * @desc Specifies the height to draw the gauge image.
+ * @text Gauge image height
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ */
+/*:
+ * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -36,6 +443,17 @@
  * ゲージの画像化を戦闘中のみ反映させる場合はフィルタリングクラス設定で'Window_BattleStatus'、'Window_BattleActor'を設定してください。
  * 画像座標X及び画像座標Yは、ラベルが画像指定してない場合でも適用されます。ラベル画像のゲージ表示オフセット位置で設定してください。
  * 
+ * 
+ * 画像回転角度
+ * ゲージを左基準に回転させます。正の数で時計回りに回転します。 ベース高さ、XY座標を調整する必要があります。
+ * コアスクリプトデフォルトだとゲージの表示高さ範囲は36になっていますので、ベース高さを変更しないと画像が途切れてしまいます。
+ * 
+ * 傾斜率
+ * ゲージを斜めに傾かせます。正の数で左に傾きます。
+ * 
+ * 可変表示
+ * 前面ゲージ横幅から前面ゲージ画像左側非可変横幅と前面ゲージ画像右側非可変横幅で指定した範囲を除くゲージの表示を引き延ばします。
+ * 
  * 数値画像
  * 数値の画像のフォーマットは左から0から9までの数値が並んだ画像を指定してください。縦分割数は1固定です。
  * リスト1:通常時
@@ -52,6 +470,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/9 Ver.1.6.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/10/16 Ver.1.6.1
  * 数値画像が回転しない問題を修正。
  * 回転を指定したときにゴミが表示される問題を修正。

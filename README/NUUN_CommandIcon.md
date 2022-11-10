@@ -1,5 +1,5 @@
 # [コマンド、カテゴリー表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)
-# Ver.1.4.0
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  
 
 #### 必須プラグイン
@@ -31,6 +31,9 @@ Window_EnemyBookPageCategory：モンスター図鑑情報ページ
 
 
 ## 更新履歴
+2022/11/10 Ver 1.4.1  
+画像全体を表示内に収めるように修正。  
+日本語以外での表示を英語表示に変更。  
 2022/11/10 Ver 1.4.0  
 コマンドのコンテンツ背景に任意の画像を表示できる機能を追加。  
 2022/4/10 Ver 1.3.2  

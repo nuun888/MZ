@@ -5,14 +5,216 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Command and category Ex
+ * @author NUUN
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @version 1.4.1
+ * 
+ * @help
+ * You can display icons in the command menu and change the text color of command names.
+ * You can choose to align the command name left, center, or right.
+ * 
+ * Command name: Enter the character string displayed in the command menu as it is.
+ * Command Color: Change the color of the command name. (System color index) You can enter the color code on the text tab.
+ * Icon index: Specifies the icon.
+ * Filtering class setting mode: Specify whether to apply or exclude the filtering below.
+ * Filtering class settings: Set the classes to apply or exclude settings. The first matching condition from the top is applied.
+ * 
+ * When entering a class not listed in the filtering class setting, be sure to enclose it with '' or "".
+ * If you want to set in a window that is not in the filtering class setting, enter the relevant class directly in the text tab by enclosing it with '' or ''.
+ * You can find the class name by writing 'console.log(this)' inside 'Window_Command.prototype.drawItem'. (F12)
+ * Only classes that inherit 'Window_Command' can be reflected.
+ * 
+ * Window_ItemBook_Category：Item Catalog Category
+ * Window_SaveVerificationWindow：Save confirmation overwrite screen options
+ * Window_EnemyBook_Category：Monster Encyclopedia Enemy Category
+ * Window_EnemyBookPageCategory：Monster picture book information page
+ * 
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * This plugin can be used for free or for a fee.
+ * 
+ * Log
+ * 11/10/2022 Ver 1.4.1
+ * Corrected to fit the entire image within the display.
+ * Changed the display in languages other than Japanese to English.
+ * 11/10/2022 Ver 1.4.0
+ * Added a function that can display any image as the content background of the command.
+ * 4/10/2022 Ver 1.3.2
+ * Fixed an issue where the command name display position setting for each class was not applied.
+ * 12/25/2021 Ver 1.3.1
+ * Items added to the filtering class by changing the monster picture book enemy category command.
+ * 11/14/2021 Ver 1.3.0
+ * Added the ability to specify the text position for each class.
+ * 11/7/2021 Ver 1.2.5
+ * Fixed so that it can be specified by color code.
+ * 10/23/2021 Ver 1.2.4
+ * Modified description of plug-in parameters and added only items in menu commands to initial setting.
+ * 9/11/2021 Ver 1.2.3
+ * Add save overwrite confirmation to filtering class (requires NUUN_SaveVerification)
+ * 8/23/2021 Ver 1.2.2
+ * Added item book category to exemption class setting. (requires NUUN_ItemBook)
+ * 5/22/2021 Ver 1.2.1
+ * Added a function to select the apply mode or exclude mode for the window that reflects the settings.
+ * 5/21/2021 Ver 1.2.0
+ * Added a function that can specify the window to reflect the setting.
+ * 11/22/2020 Ver 1.1.1
+ * Added a function to select command names from left alignment, center alignment, and right alignment.
+ * 11/21/2020 Ver 1.1.0
+ * Added the ability to color command names.
+ * 11/20/2020 Ver 1.0.2
+ * Fixed an issue where help and plugin parameters were displayed only in Japanese.
+ * 11/20/2020 Ver 1.0.1
+ * Fixed the problem that an error occurs when the plugin parameter CommadIcon is blank.
+ * 11/19/2020 Ver 1.0.0
+ * first edition.
+ * 
+ * @param CommadIcon
+ * @text Command icon setting
+ * @desc Set command colors and icons.
+ * @default ["{\"CommadName\":\"Item\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Skill\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Equip\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Status\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Formation\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Options\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"[\\\"'Window_MenuCommand'\\\"]\"}","{\"CommadName\":\"Save\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"End Game\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}"]
+ * @type struct<CommadIconList>[]
+ * 
+ * @param CommandPosition
+ * @text Command name display position for vertical commands
+ * @desc Specifies the display position of the command name of the vertical direction command. (menu screen, etc.)
+ * @type select
+ * @option Align Left
+ * @value 'left'
+ * @option Align Center
+ * @value 'center'
+ * @option Align Right
+ * @value 'right'
+ * @default 'center'
+ * 
+ * @param HorzCommandPosition
+ * @text Command name display position for horizontal commands
+ * @desc Specifies the display position of the command name of the horizontal command. (item column, etc.)
+ * @type select
+ * @option Align Left
+ * @value 'left'
+ * @option Align Center
+ * @value 'center'
+ * @option Align Right
+ * @value 'right'
+ * @default 'center'
+ * 
+ * @param ClassCommandPosition
+ * @text Command name display position for each class
+ * @desc Set the command name display position for each class.
+ * @default []
+ * @type struct<ClassCommandList>[]
+ * 
+ */
+/*~struct~CommadIconList:
+ * 
+ * @param CommadName
+ * @text Command name
+ * @desc Command name to display icon (must be the same name as the command name to display)
+ * @type string
+ * @default 
+ * 
+ * @param CommadNameColor
+ * @text Command Color
+ * @desc Color index number in command name. You can enter a color code in the text tab.
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param iconId
+ * @text Icon index
+ * @desc Icon index.
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ContentsBuckImg
+ * @desc Specifies the content background image file name.
+ * @text content background image
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * @param CommandClassMode
+ * @text Filtering class setting mode
+ * @desc Specifies the mode of exemption class settings.
+ * @type select
+ * @option Apply
+ * @value 0
+ * @option Exclusion
+ * @value 1
+ * @default 0
+ * 
+ * @param CommandClass
+ * @text Filtering class settings
+ * @desc Specify classes to apply or exclude. If not specified, it will be reflected in all commands. (list number 1 only)
+ * @type combo[]
+ * @option 'Window_MenuCommand'
+ * @option 'Window_ItemCategory'
+ * @option 'Window_SkillType'
+ * @option 'Window_EquipCommand'
+ * @option 'Window_ShopCommand'
+ * @option 'Window_PartyCommand'
+ * @option 'Window_ActorCommand'
+ * @option 'Window_TitleCommand'
+ * @option 'Window_GameEnd'
+ * @option 'Window_ChoiceList'
+ * @option 'Window_Options'
+ * @option 'Window_ItemBook_Category'
+ * @option 'Window_SaveVerificationWindow'
+ * @option 'Window_EnemyBook_Category'
+ * @option 'Window_EnemyBookPageCategory'
+ * @default
+ * 
+ */
+/*~struct~ClassCommandList:
+ * 
+ * @param CommandClass
+ * @text Filtering class setting
+ * @desc Specifies the class to apply.
+ * @type combo
+ * @option 'Window_MenuCommand'
+ * @option 'Window_ItemCategory'
+ * @option 'Window_SkillType'
+ * @option 'Window_EquipCommand'
+ * @option 'Window_ShopCommand'
+ * @option 'Window_PartyCommand'
+ * @option 'Window_ActorCommand'
+ * @option 'Window_TitleCommand'
+ * @option 'Window_GameEnd'
+ * @option 'Window_ChoiceList'
+ * @option 'Window_Options'
+ * @option 'Window_ItemBook_Category'
+ * @option 'Window_SaveVerificationWindow'
+ * @option 'Window_EnemyBook_Category'
+ * @option 'Window_EnemyBookPageCategory'
+ * @default
+ * 
+ * @param CommandPosition
+ * @text Command name display position
+ * @desc Specifies the display position of the command name.
+ * @type select
+ * @option Align Left
+ * @value 'left'
+ * @option Align Center
+ * @value 'center'
+ * @option Align Right
+ * @value 'right'
+ * @default 'center'
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc コマンド、カテゴリー表示拡張
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.0
+ * @version 1.4.1
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -39,6 +241,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/10 Ver 1.4.1
+ * 画像全体を表示内に収めるように修正。
+ * 日本語以外での表示を英語表示に変更。
  * 2022/11/10 Ver 1.4.0
  * コマンドのコンテンツ背景に任意の画像を表示できる機能を追加。
  * 2022/4/10 Ver 1.3.2
@@ -73,7 +278,7 @@
  * @param CommadIcon
  * @text コマンドアイコン設定
  * @desc コマンドの色、アイコンの設定をします。
- * @default ["{\"CommadName\":\"アイテム\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"スキル\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"装備\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"ステータス\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"並び替え\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"オプション\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"[\\\"'Window_MenuCommand'\\\"]\"}","{\"CommadName\":\"ゲーム終了\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}"]
+ * @default ["{\"CommadName\":\"アイテム\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"スキル\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"装備\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"ステータス\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"並び替え\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"オプション\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"[\\\"'Window_MenuCommand'\\\"]\"}","{\"CommadName\":\"セーブ\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"ゲーム終了\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}"]
  * @type struct<CommadIconList>[]
  * 
  * @param CommandPosition
@@ -107,7 +312,7 @@
  * @type struct<ClassCommandList>[]
  * 
  */
-/*~struct~CommadIconList:
+/*~struct~CommadIconList:ja
  * 
  * @param CommadName
  * @text コマンド名
@@ -168,7 +373,7 @@
  * @default
  * 
  */
-/*~struct~ClassCommandList:
+/*~struct~ClassCommandList:ja
  * 
  * @param CommandClass
  * @text フィルタリングクラス設定
@@ -316,7 +521,9 @@ Window_Command.prototype.drawItemBackground = function(index) {
 
 Window_Command.prototype.drawContentsBack = function(bitmap, index) {
   const rect = this.itemRect(index);
-  this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+  const width = Math.min(bitmap.width, rect.width);console.log(width)
+  const height = Math.min(bitmap.height, rect.height);
+  this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x + 1, rect.y + 1, width, height);
 };
 
 })();

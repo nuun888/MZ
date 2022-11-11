@@ -8,9 +8,56 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Unique Enemy
+ * @author NUUN
+ * @version 1.0.2
+ * 
+ * @help
+ * You can set a monster whose status will be maintained until it is defeated even after the battle ends.
+ * If you fight the same monster again even if the battle ends halfway due to escape, etc., you will start with the status at the end of the battle.
+ * 
+ * Specification
+ * If the same unique monster exists at the end of the battle, the stats of the enemy member's last monster will be saved.
+ * If the same unique monster appears at the start of battle, the saved unique monster status will be applied to all.
+ * If defeated, the status will be reset.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/12/2022 Ver.1.0.2
+ * Changed the display in languages other than Japanese to English.
+ * 6/5/2022 Ver.1.0.1
+ * Fixed an issue where states and buffs were not carried over when rematching.
+ * Fixed an issue where an error would occur when defeating non-unique monsters.
+ * 6/4/2022 Ver.1.0.0
+ * first edition.
+ * 
+ * @param UniqueEnemy
+ * @text Unique Enemy
+ * @desc Set unique enemies.
+ * @default []
+ * @type struct<UniqueEnemyList>[]
+ * 
+ */
+/*~struct~UniqueEnemyList:
+ * 
+ * @param EnemyId
+ * @text Enemy
+ * @desc Specifies a enemy.
+ * @type enemy
+ * 
+ * @param DefeatSwitch
+ * @text Defeated determination switch ID
+ * @desc Switch ID to determine after defeating.
+ * @type switch
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc ユニークモンスター
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 戦闘終了しても倒すまでステータスが維持するモンスターを設定できます。
@@ -25,6 +72,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/12 Ver.1.0.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/6/5 Ver.1.0.1
  * 再戦時にステート、バフが引き継がれない問題を修正。
  * ユニークモンスターではないモンスターを倒すとエラーが出る問題を修正。
@@ -38,7 +87,7 @@
  * @type struct<UniqueEnemyList>[]
  * 
  */
-/*~struct~UniqueEnemyList:
+/*~struct~UniqueEnemyList:ja
  * 
  * @param EnemyId
  * @text モンスター

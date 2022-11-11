@@ -1,4 +1,4 @@
-# [シームレスマップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js)
+# [複数マップ結合](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js)
 # Ver.1.1.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js)
 #### 必須、前提プラグイン

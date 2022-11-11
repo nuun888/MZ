@@ -5,8 +5,79 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Hide content background
+ * @author NUUN
+ * @version 1.1.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * I want to hide the content background (black background).
+ * 
+ * "Content background class setting" sets only the applicable window when "Hide content background" is OFF.
+ * Specifies the class name of the window that is not applied when ON.
+ * 
+ * When specifying an arbitrary image for the content background with other plug-ins, do not apply the content background hide of the corresponding class.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/12/2022 Ver.1.1.1
+ * Changed the display in languages other than Japanese to English.
+ * 5/15/2022 Ver.1.1.0
+ * Changed specification of applicable class.
+ * Changed to reduce the line height when the content background is hidden.
+ * 12/30/2021 Ver.1.0.0
+ * first edition.
+ * 
+ * @param BackVisible
+ * @text Hide content background
+ * @desc Do not display the content background.
+ * @type boolean
+ * @default true
+ * 
+ * @param BackVisibleClass
+ * @text Content background class setting
+ * @desc Specify the class that does not display the content background (hide content background ON) or enables (hide content background OFF). If your class is not on the list, please fill it in directly. (multiple selection possible)
+ * @type combo[]
+ * @option 'Window_TitleCommand'
+ * @option 'Window_Options'
+ * @option 'Window_SavefileList'
+ * @option 'Window_MenuCommand'
+ * @option 'Window_MenuStatus'
+ * @option 'Window_MenuActor'
+ * @option 'Window_ItemCategory'
+ * @option 'Window_ItemList'
+ * @option 'Window_SkillType'
+ * @option 'Window_SkillList'
+ * @option 'Window_EquipCommand'
+ * @option 'Window_EquipSlot'
+ * @option 'Window_EquipItem'
+ * @option 'Window_GameEnd'
+ * @option 'Window_ShopCommand'
+ * @option 'Window_ShopBuy'
+ * @option 'Window_ShopSell'
+ * @option 'Window_NumberInput'
+ * @option 'Window_EventItem'
+ * @option 'Window_ChoiceList'
+ * @option 'Window_NameInput'
+ * @option 'Window_BattleStatus'
+ * @option 'Window_PartyCommand'
+ * @option 'Window_ActorCommand'
+ * @option 'Window_BattleSkill'
+ * @option 'Window_BattleItem'
+ * @option 'Window_BattleActor'
+ * @option 'Window_BattleEnemy'
+ * @option 'Window_BattleActorImges'
+ * @option 'Window_BattleActorStatus'
+ * @default ["'Window_SavefileList'","'Window_BattleStatus'","'Window_BattleActorImges'","'Window_BattleActorStatus'"]
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc コンテンツ背景非表示
  * @author NUUN
@@ -17,12 +88,14 @@
  * @help
  * コンテンツの背景（黒い背景）を表示しないようにします。
  * 
- * コンテンツ背景クラス設定はコンテンツ背景非表示がOFFの時は適用するクラスのみ設定します。
- * ONの時は適用しないクラスを指定します。
+ * コンテンツ背景クラス設定はコンテンツ背景非表示がOFFの時は適用するウィンドウのみ設定します。
+ * ONの時は適用しないウィンドウのクラス名を指定します。
  * 
  * 他のプラグインでコンテンツ背景に任意の画像を指定する場合、該当のクラスのコンテンツ背景非表示を適用しないようにしてください。
  * 
  * 更新履歴
+ * 2022/11/12 Ver.1.1.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/5/15 Ver.1.1.0
  * 適用クラスの指定の仕様を変更。
  * コンテンツ背景非表示の時に行の高さを詰めるように変更。

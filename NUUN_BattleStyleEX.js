@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.1
+ * @version 3.8.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/11/12 Ver.3.8.2
+ * 立ち絵が切り替わると表示が消えてしまう問題を修正。
  * 2022/11/7 Ver.3.8.1
  * アクター画像をAPNGに対応。
  * 2022/10/18 Ver.3.8.0
@@ -2953,7 +2955,7 @@ Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
     this.addApngChild(name);
     this._apngMode = true;
   } else {
-    this.resetActorImg();
+    this.resetApngActorImg();
     this.bitmap = bitmap;
     if (actor.faceMode) {
       this.faceRefresh(actor.getBSImgIndex());
@@ -3056,8 +3058,7 @@ Sprite_ActorImges.prototype.isDead = function(){
   return this._isDead;
 };
 
-Sprite_ActorImges.prototype.resetActorImg = function() {
-  this._battler = null;
+Sprite_ActorImges.prototype.resetApngActorImg = function() {
   if (this._apngMode) {
       this.destroyApngIfNeed();
       this._apngMode = null;
@@ -3065,7 +3066,7 @@ Sprite_ActorImges.prototype.resetActorImg = function() {
 };
 
 Sprite_ActorImges.prototype.destroy = function() {
-  this.resetActorImg();
+  this.resetApngActorImg();
   Sprite.prototype.destroy.call(this);
 };
 

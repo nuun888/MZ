@@ -5,26 +5,161 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
  * @target MZ
- * @plugindesc シームレスマップ
+ * @plugindesc Combine multiple maps
  * @author NUUN
- * @version 1.1.4
+ * @version 1.1.5
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * Combine multiple maps into one map.
+ * The map set as the first map in the list of combined map settings in the plug-in parameter will be the standard map.
+ * Maps are automatically combined when you move to the set map.
+ * Map name, display name, tileset, scroll type, enemy appearance step count, BGM automatic play, BGS automatic play, battle background, dash prohibition, distant view, and memo are applied to the map data of the list No. 1.
+ * Encounters will be integrated with all map encounters set in the list.
+ * The event ID after combination is the number added to the number of map events before it, so if you want to get the event ID, use the plug-in command "Get event ID". please.
+ * 
+ * Make sure all maps that you combine are the same size.
+ * 
+ * If the setting of the combined map setting is 3, 5, 6, 7 and the horizontal size of the map is 2 and the vertical size is 2
+ * 3,5
+ * 6,7
+ * joined by .
+ * 
+ * When moving to the second or later map in the list by moving to a place with an event command, it will move to the base map. At that time, the coordinates are also adjusted to the set position.
+ * 
+ * plugin command
+ * Get event ID
+ * Assign the event ID in the binding map to a variable.
+ * 
+ * Event ID set
+ * Sets the id of the bound event. Set this when you want to specify the ID of an event set in a map other than the base map when acquiring events using the event command.
+ * Reset after setting the corresponding event command.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/12/2022 Ver.1.1.5
+ * Changed the display in languages other than Japanese to English.
+ * 2/25/2022 Ver.1.1.4
+ * Fixed not to load concatenated map json file in the same map.
+ * 2/20/2022 Ver.1.1.3
+ * Re-correction.
+ * 2/19/2022 Ver.1.1.2
+ * Fixed an issue where an error would appear after moving the map.
+ * 2/6/2022 Ver.1.1.1
+ * Fixed an issue where events were not applied properly when moving maps.
+ * 2/6/2022 Ver.1.1.0
+ * Added a function that can specify an event ID other than the reference map.
+ * 2/6/2022 Ver.1.0.0
+ * first edition.
+ * 
+ * 
+ * @command SeamlessMapEventId
+ * @desc Get the event id in the binding map.
+ * @text Get event ID
+ * 
+ * @arg MapId
+ * @type number
+ * @default 0
+ * @desc Specifies the original map ID.
+ * @text Original map ID
+ * 
+ * @arg EventId
+ * @type number
+ * @default 0
+ * @desc Specifies the event ID of the original map.
+ * @text Original map event ID
+ * 
+ * @arg IDVariable
+ * @type variable
+ * @default 0
+ * @text Assignment variable
+ * @desc A game variable that assigns the event ID.
+ * 
+ * @command SetEventData
+ * @desc Sets the id of the bound event.
+ * @text Event ID set
+ * 
+ * @arg MapId
+ * @type number
+ * @default 0
+ * @desc Specifies the original map ID.
+ * @text Original map ID
+ * 
+ * @arg EventId
+ * @type number
+ * @default 0
+ * @desc Specifies the event ID of the original map. If the original map ID is 0, specify the event ID of the combined map.
+ * @text Original map event ID
+ * 
+ * 
+ * 
+ * @param SeamlessMapSetting
+ * @text Combined map settings
+ * @desc Configure the binding map.
+ * @type struct<SeamlessMapData>[]
+ * @default []
+ * 
+ */
+/*~struct~SeamlessMapData:
+ * 
+ *@param SeamlessMapList
+ * @text Combined map settings
+ * @desc Sets the combined smap. The map ID set at the top will be the base map.
+ * @type struct<SeamlessMapIdList>[]
+ * @default []
+ * 
+ * @param SeamlessMapXNum
+ * @text Number of horizontal maps to connect
+ * @desc The number of horizontal maps to concatenate.
+ * @type number
+ * @default 1
+ * @min 1
+ * 
+ * @param SeamlessMapYNum
+ * @text Number of vertical maps to be connected
+ * @desc The number of vertical maps to concatenate.
+ * @type number
+ * @default 1
+ * @min 1
+ * 
+ */
+/*~struct~SeamlessMapIdList:
+ * 
+ * @param SeamlessMapId
+ * @text Combined map id
+ * @desc Set map id. The map ID set at the top will be the base map.
+ * @type number
+ * @default 0
+ * 
+ */
+/*:ja
+ * @target MZ
+ * @plugindesc 複数マップ結合
+ * @author NUUN
+ * @version 1.1.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * 複数のマップを一つのマップに結合します。
- * プラグインパラメータのシームレスマップ設定のリスト1番に設定したマップが基準となるマップとなります。
+ * プラグインパラメータの結合マップ設定のリスト1番に設定したマップが基準となるマップとなります。
  * 設定したマップに移動した時点で自動的にマップが結合されます。
  * マップ名、表示名、タイルセット、スクロールタイプ、敵出現歩数、BGM自動演奏、BGS自動演奏、戦闘背景、ダッシュ禁止
  * 遠景、メモはリスト1番のマップデータが適用されます。
  * エンカウントはリストで設定したマップのエンカウントが全て統合されます。
  * 
+ * 結合後のイベントIDはリストの2番目以降のIDは、その前のマップイベント数に加算された数値になりますので、
+ * イベントIDを取得したい場合はプラグインコマンドのイベントID取得から取得してください。
+ * 
  * 結合させるマップはすべて同じサイズにしてください。
  * 
- * シームレスマップ設定の設定が3,5,6,7でマップの横サイズが2、縦サイズが2の場合は
+ * 結合マップ設定の設定が3,5,6,7でマップの横サイズが2、縦サイズが2の場合は
  * 3,5
  * 6,7
  * で結合されます。
@@ -33,13 +168,15 @@
  * 
  * プラグインコマンド
  * イベントID取得
- * シームレスマップ内のイベントIDを変数に代入します。
+ * 結合マップ内のイベントIDを変数に代入します。
  * 
  * イベントIDセット
  * 結合したイベントのIDをセットします。イベントコマンドでのイベント取得で基準マップ以外のマップで設定したイベントのIDを指定したいときに設定します。
  * 該当のイベントコマンドを設定した後にリセットします。
  * 
  * 更新履歴
+ * 2022/11/12 Ver.1.1.5
+ * 日本語以外での表示を英語表示に変更。
  * 2022/2/25 Ver.1.1.4
  * 同一マップでは連結マップjsonファイルを読み込まないように修正。
  * 2022/2/20 Ver.1.1.3
@@ -55,7 +192,7 @@
  * 
  * 
  * @command SeamlessMapEventId
- * @desc シームレスマップ内のイベントIDを取得します。
+ * @desc 結合マップ内のイベントIDを取得します。
  * @text イベントID取得
  * 
  * @arg MapId
@@ -95,17 +232,17 @@
  * 
  * 
  * @param SeamlessMapSetting
- * @text シームレスマップ設定
- * @desc シームレスマップの設定します。
+ * @text 結合マップ設定
+ * @desc 結合マップの設定します。
  * @type struct<SeamlessMapData>[]
  * @default []
  * 
  */
-/*~struct~SeamlessMapData:
+/*~struct~SeamlessMapData:ja
  * 
  *@param SeamlessMapList
- * @text シームレスマップ設定
- * @desc シームレスマップの設定します。一番上に設定したマップIDが基準となるマップになります。
+ * @text 結合マップ設定
+ * @desc 結合マップの設定します。一番上に設定したマップIDが基準となるマップになります。
  * @type struct<SeamlessMapIdList>[]
  * @default []
  * 
@@ -124,10 +261,10 @@
  * @min 1
  * 
  */
-/*~struct~SeamlessMapIdList:
+/*~struct~SeamlessMapIdList:ja
  * 
  * @param SeamlessMapId
- * @text シームレスマップID
+ * @text 結合マップID
  * @desc マップIDを設定します。一番上に設定したマップIDが基準となるマップになります。
  * @type number
  * @default 0

@@ -1,5 +1,5 @@
 # [ユニークモンスター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -16,6 +16,8 @@
 ユニークモンスターの設定はプラグインパラメータで設定します。  
 
 ## 更新履歴
+2022/11/12 Ver.1.0.2  
+日本語以外での表示を英語表示に変更。  
 2022/6/5 Ver.1.0.1  
 再戦時にステート、バフが引き継がれない問題を修正。  
 ユニークモンスターではないモンスターを倒すとエラーが出る問題を修正。  

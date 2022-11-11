@@ -1,5 +1,5 @@
 # [シームレスマップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js)
-# Ver.1.1.4
+# Ver.1.1.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,8 @@
 該当のイベントコマンドを実行後「イベントIDセット」はリセットされます。
 
 ## 更新履歴
+2022/11/12 Ver.1.1.5  
+日本語以外での表示を英語表示に変更。  
 2022/2/25 Ver.1.1.4  
 同一マップでは連結マップjsonファイルを読み込まないように修正。  
 2022/2/20 Ver.1.1.3  

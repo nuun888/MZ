@@ -6,12 +6,52 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Actor Level Unlimited
+ * @author NUUN
+ * @version 1.2.1
+ * 
+ * @help
+ * You can set the maximum level to 100 or more.
+ * 
+ * Actor Note
+ * <MaxLevel:[level]> Sets the maximum level.
+ * <StartLevel:[level]> Sets the initial level when joining a party.
+ * <TestMaxLevel:[level]> Set your level in test battles.
+ * 
+ * Example
+ * <MaxLevel:200> The maximum level of an actor is 200.
+ * <StartLevel:120> Set the initial level. In the setting example, the initial level is 120.
+ * <TestMaxLevel:130> Set your level in test battles to 130.
+ * 
+ * 
+ * If you want to learn skills at level 100 or higher, enter <LearnSkill:[learned level]> in the Note field of the acquired skill of the class.
+ * <LearnSkill:105> You learn the skill when you level up to level 105.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/12/2022 Ver.1.2.1
+ * Changed the display in languages other than Japanese to English.
+ * 9/18//2022 Ver 1.2.0
+ * Added a function that can be over level 100 to the level at the time of test play.
+ * 6/27/2021 Ver 1.1.0
+ * Added a function that allows you to set the initial level to level 100 or higher.
+ * 12/12/2020 Ver 1.0.1
+ * Fixed incorrect calculation of stats above level 100.
+ * 12/12/2020 Ver 1.0.0
+ * first edition.
+ * 
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc レベル上限限界突破プラグイン
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * 最大レベルを１００以上に設定できます。
@@ -35,6 +75,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/12 Ver.1.2.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/9/18 Ver 1.2.0
  * テストプレイ時のレベルにレベル100以上できる機能を追加。
  * 2021/6/27 Ver 1.1.0

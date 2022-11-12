@@ -1,5 +1,5 @@
 # [マナシールド](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js)  
 
 HPダメージの代わりにMPにダメージを受けさせます。  
@@ -22,6 +22,8 @@ MPの変換後負担率が６０％の場合はMPが90減りHPは250のダメー
 ![gif](img/DamagePopUpSimulDisplay1.gif)  
 
 ### 更新履歴
+2022/11/12 Ver.1.1.2  
+日本語以外での表示を英語表示に変更。  
 2022/1/29  Ver.1.1.1  
 元の機能と選択できるように変更。  
 2022/1/29  Ver.1.1.0  

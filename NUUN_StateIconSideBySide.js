@@ -535,7 +535,7 @@ Game_BattlerBase.prototype.allBuffTurns = function() {
   return this.nuun_buffTurns();
 };
 
-Game_BattlerBase.prototype.nuun_stateTurns = function() {console.log(this.states())
+Game_BattlerBase.prototype.nuun_stateTurns = function() {
   return this.states().reduce((r, state) => {
     if (state.iconIndex > 0) {
       const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)), bad: !!state.meta.BatState}];

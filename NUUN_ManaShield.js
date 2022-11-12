@@ -6,12 +6,99 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Mana shield
+ * @author NUUN
+ * @version 1.1.2
+ * @orderAfter NUUN_StoppingFeature
+ * 
+ * @help
+ * Makes MP take damage instead of HP damage.
+ * When max HP is 1000 and max MP is 600
+ * [HP damage amount]
+ * MP will be damaged by the amount of damage taken instead of the damage received.
+ * If you take 500 HP damage and it is 50%, MP will be reduced by 250 and HP will be damaged by 250.
+ * If the burden rate after MP conversion is 60%, MP will be reduced by 150 and HP will be damaged by 250.
+ * [Maximum HP ratio proportional]
+ * The amount of damage received is taken as damage to MP in proportion to the ratio from maximum HP and maximum MP.
+ * If you take 500 HP damage and it is 50%, MP will be reduced by 150 and HP will be damaged by 250.
+ * If the burden rate after MP conversion is 60%, MP will be reduced by 90 and HP will be damaged by 250.
+ * 
+ * Notes with features (actors, occupations, weapons, armor, enemy characters, states)
+ * <ManaShield:[rate]>　
+ * [rate]:Percentage of damage taken over
+ * <ManaShield:25> 25% of HP damage is converted to MP damage.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/12/2022 Ver.1.1.2
+ * Changed the display in languages other than Japanese to English.
+ * 1/29/2022  Ver.1.1.1
+ * Changed to be selectable with the original function.
+ * 1/29/2022  Ver.1.1.0
+ * Changed the calculation method of MP damage to be calculated as a percentage from the maximum HP.
+ * 8/1/2021 Ver.1.0.1
+ * Fixed SEga even though no MP damage was taken.
+ * Fixed an issue where HP damage was not calculated correctly when MP was insufficient.
+ * Fixed an issue that also affected recovery.
+ * 8/1/2021 Ver.1.0.0
+ * first edition.
+ * 
+ * @param MPShieldMode
+ * @desc Mode of MP damage that takes over.
+ * @text MP damage mode
+ * @type select
+ * @option HP damage amount
+ * @value 'HpDamage'
+ * @option Max HP percentage proportional
+ * @value 'MaxHpRate'
+ * @default 'MaxHpRate'
+ * 
+ * @param MPBurdenRate
+ * @text Post-conversion burden ratio of MP
+ * @desc Set the burden rate after MP damage conversion. (percentage)
+ * @type number
+ * @default 100
+ * @min 1
+ * 
+ * @param SE
+ * @text SE settings
+ * @default ---------------------------------------------------------
+ * 
+ * @param ManaShieldSE
+ * @text SE when activated
+ * @desc SE when mana shield is activated.
+ * @type file
+ * @dir audio/se/
+ * 
+ * @param volume
+ * @text Volume
+ * @desc Volume.
+ * @type number
+ * @default 90
+ * 
+ * @param pitch
+ * @text Pitch
+ * @desc Pitch.
+ * @type number
+ * @default 100
+ * 
+ * @param pan
+ * @text Phase
+ * @desc Phase.
+ * @type number
+ * @default 50
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc マナシールド
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @orderAfter NUUN_StoppingFeature
  * 
  * @help
@@ -35,6 +122,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/12 Ver.1.1.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/1/29  Ver.1.1.1
  * 元の機能と選択できるように変更。
  * 2022/1/29  Ver.1.1.0

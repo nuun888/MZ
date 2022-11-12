@@ -376,11 +376,11 @@ Imported.NUUN_RandomItems = true;
     let text = '';
     if(GetItemMessage) {
       if(itemDeta.itemType === "money") {
-        text = itemDeta.text ? itemDeta.text : GetGoldMessage;
-        text = text.format(itemDeta.deta, TextManager.currencyUnit);
+        text = itemDeta.text ? itemDeta.text : GetGoldMessage;console.log(itemDeta)
+        text = text.format(itemDeta.deta, itemDeta.iconId, TextManager.currencyUnit);
       } else {
         text = itemDeta.text ? itemDeta.text : GetTextMessage;
-        text = text.format(itemDeta.deta.name, itemDeta.MoneyIconID, itemDeta.deta.iconIndex);
+        text = text.format(itemDeta.deta.name, itemDeta.deta.iconIndex);
       }
       $gameMessage.newPage();
       $gameMessage.add(text);
@@ -422,7 +422,7 @@ Imported.NUUN_RandomItems = true;
           $gameVariables.setValue(CommonListIdVar, i + 1);
           break;
         } else if (list[i].itemType === 3 && list[i].GainMoney){
-          getItem = {itemType: "money", deta: list[i].GainMoney, text: list[i].GetText};
+          getItem = {itemType: "money", deta: list[i].GainMoney, text: list[i].GetText, iconId: list[i].MoneyIconID};
           setRandomItemData(ItemNameVar, list[i].GainMoney);
           setRandomItemData(ItemIconIDVar, list[i].MoneyIconID);
           setRandomItemData(WeightVar, list[i].weight);

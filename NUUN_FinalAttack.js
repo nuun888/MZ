@@ -5,12 +5,81 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
- /*:
+ */
+/*:
+ * @target MZ
+ * @plugindesc Final Attack Features
+ * @author NUUN
+ * @version 1.1.1
+ * 
+ * @help
+ * Implement final attack.
+ * 
+ * Note with features
+ * <FinalAttack:1> 
+ * When you become incapacitated, the skill specified in #1 of the final attack settings will be activated.
+ * Skill costs are not taken into consideration, so if there is a skill cost, the number may be displayed as a negative number.
+ * You can specify multiple skills that can be set.
+ * 
+ * Specification
+ * If the final attack interrupts with two or more actions, the action ends at that point.
+ * 
+ * Log
+ * 11/12/2022 Ver.1.1.1
+ * Changed the display in languages other than Japanese to English.
+ * 5/8/2022 Ver.1.1.0
+ * Added a function to attack the battler who stabbed the finisher.
+ * Fixed the problem that an error occurs when specifying an id with no skill set.
+ * 5/3/2021 Ver.1.0.1
+ * A little fix.
+ * 5/3/2021 Ver.1.0.0
+ * first edition.
+ * 
+ * @param FinalAttack
+ * @desc Sets the skill for final attack.
+ * @text Final attack settings
+ * @type struct<FinalAttackList>[]
+ * @default []
+ */
+/*~struct~FinalAttackList:
+ * 
+ * @param FinalAttackSkill
+ * @desc Skill settings.
+ * @text Skill settings
+ * @type struct<FinalAttackSkillList>[]
+ * @default []
+ * 
+ * @param FinalAttackTarget
+ * @desc Target mode
+ * @text Target mode
+ * @type select
+ * @option Setting Skill Target
+ * @value 0
+ * @option Butler who stabbed the end (range of set skill is single enemy)
+ * @value 1
+ * @default 0
+ * 
+ */
+/*~struct~FinalAttackSkillList:
+ *  
+ * @param FinalAttackSkillId
+ * @desc A skill that performs a final attack.
+ * @text Final attack skill
+ * @default 0
+ * @type skill
+ * 
+ * @param FinalAttackSkillRate
+ * @desc Chance to perform this skill.
+ * @text Execution probability
+ * @default 100
+ * @type number
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc ファイナルアタック特徴
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * ファイナルアタックを実装します。
@@ -25,6 +94,8 @@
  * ２回行動以上でファイナルアタックが割り込んだ場合その時点で行動が終了します。
  * 
  * 更新履歴
+ * 2022/11/12 Ver.1.1.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/5/8 Ver.1.1.0
  * とどめを刺したバトラーに攻撃する機能の追加。
  * スキルの設定されていないidを指定するとエラーが出る問題を修正。
@@ -39,7 +110,7 @@
  * @type struct<FinalAttackList>[]
  * @default []
  */
-/*~struct~FinalAttackList:
+/*~struct~FinalAttackList:ja
  * 
  * @param FinalAttackSkill
  * @desc スキル設定。
@@ -58,7 +129,7 @@
  * @default 0
  * 
  */
-/*~struct~FinalAttackSkillList:
+/*~struct~FinalAttackSkillList:ja
  *  
  * @param FinalAttackSkillId
  * @desc ファイナルアタックを行うスキル。

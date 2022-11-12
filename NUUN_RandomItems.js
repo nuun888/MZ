@@ -9,8 +9,10 @@
  */
 /*:
  * @target MZ
- * @plugindesc Random gat item
+ * @plugindesc Random get items and money
  * @author NUUN
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * @version 1.3.0
  * 
  * @help
@@ -165,6 +167,8 @@
  * @target MZ
  * @plugindesc アイテム、お金のランダム入手
  * @author NUUN
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * @version 1.3.0
  * 
  * @help

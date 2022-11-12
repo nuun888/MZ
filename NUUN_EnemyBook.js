@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.16.4
+ * @version 2.16.5
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -121,6 +121,8 @@
  * [id]:キャラチップのインデックス番号。3×4のキャラチップは0になります。
  * [direction]:方向を指定します。2正面（一番上） 4左（２番目） 6右（３番目） 8後向き（一番下）　※省略可能
  * 
+ * ターン、レベル、HPなどのゲージは戦闘中のみ表示されます。
+ * 
  * 
  * 操作方法
  * 上下（↑ ↓）キー：モンスター選択
@@ -181,6 +183,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/12 Ver.2.16.5
+ * 敵のレベルを表示する機能を追加。
+ * APNG関連の修正。
  * 2022/11/6 Ver.2.16.4
  * APNG関連の修正。
  * 2022/11/5 Ver.2.16.3
@@ -2192,6 +2197,8 @@
  * @value 32
  * @option モンスター名(1)～(5)(7)(8)(9)(12)(16)
  * @value 33
+ * @option レベル(戦闘時のみ)(1)～(12)(16)
+ * @value 34
  * @option 名称のみ(1)～(5)(7)(8)(9)(12)(16)
  * @value 35
  * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）(1)～(14)(16)
@@ -5793,6 +5800,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
         case 33:
             this.enemyName(list, enemy, x, y, width);
             break;
+        case 34:
+            this.enemyLevel(list, enemy, x, y, width);
+            break;
         case 35:
             this.name(list, enemy, x, y, width);
             break;
@@ -6210,6 +6220,10 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
         text = UnknownStatus;
     }
     this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
+};
+
+Window_EnemyBook.prototype.enemyLevel = function(list, enemy, x, y, width) {
+    
 };
 
 Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
@@ -7234,6 +7248,23 @@ Window_BattleEnemyBook.prototype.turn = function(list, enemy, x, y, width) {
     }
 };
 
+Window_BattleEnemyBook.prototype.enemyLevel = function(list, enemy, x, y, width) {
+    const de = this._enemy;
+    this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    if (list.Back) {
+        this.drawContentsBackground(list.Back, x, y, width);
+        x = this.contensX(x);
+        width = this.contensWidth(width);
+    }
+    const nameText = list.paramName ? list.paramName : (this.language_Jp ? "レベル" : 'Level');
+    const systemWidth = list.SystemItemWidth || 100;
+    this.drawText(nameText, x, y, systemWidth);
+    this.resetTextColor();
+    const text = list.DetaEval ? eval(list.DetaEval) : enemy._level;
+    this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
+};
+
 Window_BattleEnemyBook.prototype.placeGauge = function(enemy, type, x, y, width) {
     const key = "enemyBook-gauge-%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_EnemyBookGauge);
@@ -7341,7 +7372,7 @@ Sprite_BookEnemy.prototype.refresh = function() {
         } else {
             bitmap = ImageManager.loadEnemy(name);
         }
-        if (this.loadApngSprite && this.loadApngSprite(name)) {
+        if (this.addApngChild && this.loadApngSprite(name)) {
             this.addApngChild(name);
             this._apngMode = true;
         } else {

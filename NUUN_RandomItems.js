@@ -27,7 +27,8 @@
  * %2: Item icon
  * Message when getting money
  * %1: money
- * %2: currency unit
+ * %2: MoneyIconID
+ * %3: currency unit
  * 
  * If you are using a plugin that retrieves items or displays messages with plugin parameters, set the retrieval list ID variable and make various settings such as branch conditions.
  * 
@@ -66,7 +67,7 @@
  * @text Default message when getting money
  * @desc Default message when getting money.
  * @type string
- * @default Got %1%2!
+ * @default Got %1%3!
  * 
  * @param GetItemMessage
  * @desc Show message window when fetching.
@@ -156,7 +157,7 @@
  * 
  * @param MoneyIconID
  * @desc Icon ID when getting money.
- * @text Icon ID variable when getting money
+ * @text Money acquisition icon ID.
  * @type number
  * @default 0
  */
@@ -180,7 +181,8 @@
  * %2:アイテムアイコン
  * お金取得時のメッセージ
  * %1:金額
- * %2:通貨単位
+ * %2:お金取得時アイコンID
+ * %3:通貨単位
  * 
  * プラグインパラメータでアイテムを取得やメッセージを表示するプラグインをご使用の場合は、
  * 取得リストID変数を設定して分岐条件などで各種設定をしてください。
@@ -221,7 +223,7 @@
  * @text お金取得時のデフォルトメッセージ
  * @desc お金時のデフォルトメッセージ。
  * @type string
- * @default %1%2を手に入れた！
+ * @default %1%3を手に入れた！
  * 
  * @param GetItemMessage
  * @desc 取得時にメッセージウィンドウを表示する。
@@ -311,7 +313,7 @@
  * 
  * @param MoneyIconID
  * @desc お金取得時のアイコンID。
- * @text お金取得時アイコンID変数
+ * @text お金取得時アイコンID
  * @type number
  * @default 0
  */
@@ -378,7 +380,7 @@ Imported.NUUN_RandomItems = true;
         text = text.format(itemDeta.deta, TextManager.currencyUnit);
       } else {
         text = itemDeta.text ? itemDeta.text : GetTextMessage;
-        text = text.format(itemDeta.deta.name, itemDeta.deta.iconIndex);
+        text = text.format(itemDeta.deta.name, itemDeta.MoneyIconID, itemDeta.deta.iconIndex);
       }
       $gameMessage.newPage();
       $gameMessage.add(text);

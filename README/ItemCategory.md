@@ -1,5 +1,5 @@
 # [アイテムカテゴリーカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)
-# Ver.1.3.1
+# Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -29,6 +29,8 @@
 データベースのアイテムカテゴリーのチェックを外した場合、このプラグインで設定してもチェックを外したカテゴリーは表示はされません。  
 
 ## 更新履歴
+2022/11/12 Ver.1.3.2  
+日本語以外での表示を英語表示に変更。  
 2022/6/12 Ver.1.3.1  
 戦闘中でも個数非表示を適用する機能を追加。  
 2022/5/8 Ver.1.3.0  

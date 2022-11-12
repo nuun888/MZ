@@ -9,9 +9,132 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Item category customization
+ * @author NUUN
+ * @version 1.3.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_ItemNum
+ * 
+ * @help
+ * You can add your own categories to your items.
+ * Set the category key in the plugin parameters and enter <CategoryType:[typeName]> in the memo field for items, weapons and armor.
+ * Items will be displayed in the category with the same category key as the [typeName] entered in the memo field.
+ * If you enter "allItems" in the category key, the category excludes hidden items
+ * All items are displayed.
+ * item:Items without category keys or non-essential items.
+ * weapon:Weapons with no category key.
+ * armor:Armor with no category key.
+ * keyItem:something important.
+ * allItems:Items, Weapons, Armor, and all that matters.
+ * allItem:all items.
+ * 
+ * [typeName]:Category key
+ * About category keys
+ *  item, weapon, armor, and keyItem cannot be used as keys for custom categories.
+ * Example
+ * <CategoryType:sozai> Items with this tag will appear in the "sozai" category.
+ * 
+ * If you uncheck the database item category, even if you set it with this plugin, the unchecked category will not be displayed.
+ * 
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/12/2022 Ver.1.3.2
+ * Changed the display in languages other than Japanese to English.
+ * 6/12/2021 Ver.1.3.1
+ * Added a function to apply the number hiding even in battle.
+ * 5/8/2021 Ver.1.3.0
+ * Added a function to change the category to be displayed.
+ * Changed the setting method of the category key.
+ * 12/28/2021 Ver.1.2.0
+ * Added ability to view items and key items.
+ * Change category key to combo box.
+ * 8/22/2021 Ver.1.1.3
+ * Competitive measures by adding a unique category function to the item picture book.
+ * 3/15/2021 Ver.1.1.2
+ * Fixed an issue where item counts were not displayed during combat.
+ * 3/8/2021 Ver.1.1.1
+ * Fixed to reflect the display of the number of items other than keyItem in all item display.
+ * 3/7/2021 Ver.1.1.0
+ * Added a function that allows you to select whether to display the number of items in each category.
+ * Fixed to reflect the number of display lines even on the sale screen.
+ * 11/18/2020 Ver.1.0.0
+ * first edition.
+ * 
+ * @command AddCategory
+ * @desc Change the category to display.
+ * @text Display category change
+ * 
+ * @arg ItemCategory
+ * @text Category item
+ * @desc Category item settings.
+ * @default []
+ * @type struct<ItemCategoryList>[]
+ * 
+ * @command ResetCategory
+ * @desc Returns the category to be displayed.
+ * @text Display category reset
+ * 
+ * 
+ * @param CategoryCols
+ * @desc The number of display columns for categories.
+ * @text Number of categorical columns
+ * @type number
+ * @default 4
+ * 
+ * @param CategoryRows
+ * @desc The number of rows displayed for categories.
+ * @text Number of category rows
+ * @type number
+ * @default 1
+ * 
+ * @param ItemCategory
+ * @text Category item
+ * @desc Category item settings.
+ * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"'item'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'weapon'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'armor'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'keyItem'\",\"NumShow\":\"true\"}"]
+ * @type struct<ItemCategoryList>[]
+ * 
+ * @param BattleNumVisible
+ * @text Hide number during battle
+ * @desc Turn off the number display even during battle, and apply the number non-display of category items with the display of the number of important items turned off.
+ * @type boolean
+ * @default true
+ * 
+ */
+/*~struct~ItemCategoryList:
+ * 
+ * @param CategoryName
+ * @text Category name
+ * @desc Set the category name.
+ * @type string
+ * 
+ * @param Categorykey
+ * @text Category key
+ * @desc Set the category key. Example: If it is an item, enter the key that is not in the item list directly.
+ * @type combo
+ * @option 'item'
+ * @option 'weapon'
+ * @option 'armor'
+ * @option 'keyItem'
+ * @option 'allItems'
+ * @option 'allItem'
+ * @default
+ * 
+ * @param NumShow
+ * @type boolean
+ * @default true
+ * @text Number display
+ * @desc Display the number.
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -43,6 +166,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/12 Ver.1.3.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/6/12 Ver.1.3.1
  * 戦闘中でも個数非表示を適用する機能を追加。
  * 2022/5/8 Ver.1.3.0
@@ -103,7 +228,7 @@
  * @default true
  * 
  */
-/*~struct~ItemCategoryList:
+/*~struct~ItemCategoryList:ja
  * @param CategoryName
  * @text カテゴリー名
  * @desc カテゴリー名を設定します。

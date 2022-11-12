@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -37,6 +37,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/13 Ver.1.5.1
+ * ターンを表示しない場合、ステート、バフ付加時にエラーが出る問題を修正。
  * 2022/10/29 Ver.1.5.0
  * ターン数に文字色を指定できる機能を追加。
  * 疑似3Dバトル併用時でステートにかかってないときのアイコンが表示されなくなる問題を修正。
@@ -369,8 +371,10 @@ Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
   this._iconSprite.forEach((sprite, r) => {
     if (displayIcons[r]) {
       sprite._iconIndex = displayIcons[r];
-      sprite._stateTurn = displayTurn[r].turn || 0;
-      sprite._trunTextColor = displayTurn[r].bad ? BadTurnColor : TurnColor;
+      if (!!displayTurn[r]) {
+        sprite._stateTurn = displayTurn[r].turn || 0;
+        sprite._trunTextColor = displayTurn[r].bad ? BadTurnColor : TurnColor;
+      }
       sprite.visible = true;
     } else {
       sprite._iconIndex = this._battler.isActor() ? NoStateIcon : 0;
@@ -531,7 +535,7 @@ Game_BattlerBase.prototype.allBuffTurns = function() {
   return this.nuun_buffTurns();
 };
 
-Game_BattlerBase.prototype.nuun_stateTurns = function() {
+Game_BattlerBase.prototype.nuun_stateTurns = function() {console.log(this.states())
   return this.states().reduce((r, state) => {
     if (state.iconIndex > 0) {
       const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)), bad: !!state.meta.BatState}];

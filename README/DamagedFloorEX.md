@@ -1,5 +1,5 @@
 # [ダメージ床拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -26,7 +26,9 @@
 ### フラッシュ設定  
 フラッシュ設定はフレーム数の数値を0と入力することでフラッシュされません。
 
-## 更新履歴  
+## 更新履歴
+2022/11/14 Ver.1.1.1  
+日本語以外での表示を英語表示に変更。  
 2022/4/2 Ver.1.1.0
 特定のアクターのみダメージを受ける機能を追加。  
 フラッシュの設定方法を変更。  

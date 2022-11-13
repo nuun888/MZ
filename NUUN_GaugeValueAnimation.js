@@ -6,12 +6,83 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Gauge numerical update animation
+ * @author NUUN
+ * @version 1.2.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_GaugeValueEX
+ * 
+ * 
+ * @help
+ * When the numbers displayed in gauges such as damage, recovery, and consumption change, by default they change to the numbers after the change in an instant.
+ * In this plug-in, the numerical value of the gauge is displayed by increasing or decreasing with animation. By default, the value is gradually changed over 20 frames.
+ * Also, on the map, the gauge will change without animation, but with this plug-in, both the gauge and the numerical value will change gradually.
+ * If you do not want to animate the numerical value of the gauge, set the value of "OnUpdateValue" (numerical change animation) of the corresponding plug-in parameter to false.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/13/2022 Ver.1.2.2
+ * Fixed an issue where gauges would not switch with some plugins.
+ * Changed the display in languages other than Japanese to English.
+ * 6/12/2022 Ver.1.2.1
+ * Fixed an issue where the default settings for Gauge and Numerical Update Frame Settings were not applied correctly.
+ * 1/1/2022 Ver.1.2.0
+ * Combo box for setting of status type to apply.
+ * Processing refactoring.
+ * 3/27/2021 Ver.1.1.2
+ * Fixed the problem that the numerical animation does not stop when the change value is reversed during the numerical animation.
+ * 3/1/2021 Ver.1.1.1
+ * Fixed update processing of gauge numbers.
+ * 2/19/2021 Ver.1.1.0
+ * Added a feature that does not animate certain gauge values.
+ * 1/26/2021 Ver.1.0.1
+ * Changed the method of plug-in parameters.
+ * Added a function that allows you to set the animation time of the gauge and numerical value separately.
+ * 1/26/2021 Ver.1.0.0
+ * first edition.
+ * 
+ * @param UpdateFlameValue
+ * @text Gauge and numerical update frame settings
+ * @desc Specifies the number of update frames for gauges and numerical changes. (1 second at 60)
+ * @default ["{\"StatusType\":\"'hp'\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"'mp'\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"'tp'\",\"UpdateFlame\":\"60\",\"OnUpdateValue\":\"true\"}"]
+ * @type struct<UpdateFlameValueDate>[]
+ *
+ */
+/*~struct~UpdateFlameValueDate:
+ * 
+ * @param StatusType
+ * @text Status type
+ * @desc Status type to apply.
+ * @type combo
+ * @option 'hp'
+ * @option 'mp'
+ * @option 'tp'
+ * @default 
+ * 
+ * @param UpdateFlame
+ * @desc Specifies the number of update frames for gauges and numerical changes. (1 second for 60 frames) 0 or no input will be the default setting value.
+ * @text Gauge and numerical update frame
+ * @type number
+ * @default 20
+ * 
+ * @param OnUpdateValue
+ * @desc Enable animation of numeric change.
+ * @text Numeric change animation
+ * @type boolean
+ * @default true
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc ゲージの数値更新アニメーション
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -27,6 +98,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/13 Ver.1.2.2
+ * 一部のプラグインでゲージが切り替わらない問題を修正。
+ * 日本語以外での表示を英語表示に変更。
  * 2022/6/12 Ver.1.2.1
  * ゲージ及び数値更新フレーム設定のデフォルト設定で正常に適用されなかった問題を修正。
  * 2022/1/1 Ver.1.2.0
@@ -45,13 +119,13 @@
  * 初版
  * 
  * @param UpdateFlameValue
- * @text ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）
- * @desc ゲージ及び数値更新フレーム設定
+ * @desc ゲージ及び数値変化の更新フレーム数を指定します。（60で１秒）
+ * @text ゲージ及び数値更新フレーム設定
  * @default ["{\"StatusType\":\"'hp'\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"'mp'\",\"UpdateFlame\":\"20\",\"OnUpdateValue\":\"true\"}","{\"StatusType\":\"'tp'\",\"UpdateFlame\":\"60\",\"OnUpdateValue\":\"true\"}"]
  * @type struct<UpdateFlameValueDate>[]
  *
  */
-/*~struct~UpdateFlameValueDate:
+/*~struct~UpdateFlameValueDate:ja
  * 
  * @param StatusType
  * @text ステータスタイプ
@@ -92,7 +166,8 @@ Imported.NUUN_GaugeValueAnimation = true;
 
   const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
   Sprite_Gauge.prototype.setup = function(battler, statusType) {
-    if (!this._smoothnessMode) {
+    if (!this._smoothnessMode || this._battler !== battler) {
+      this._smoothnessMode = false;
       _Sprite_Gauge_setup.call(this, battler, statusType);
       this._smoothnessMode = this.getFlameStatus();
     }

@@ -1,5 +1,5 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.5.2
+# Ver.1.6.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 English available  
@@ -8,6 +8,8 @@ English available
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2022/11/13 Ver.1.6.0  
+APNGを表示するための処理を追加。  
 2022/11/9 Ver.1.5.2  
 日本語以外での表示を英語表示に変更。  
 2022/7/29 Ver.1.5.1  

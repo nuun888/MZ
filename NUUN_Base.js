@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.5.2
+ * @version 1.6.0
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -19,9 +19,10 @@
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
- * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 11/13/2022 Ver.1.6.0
+ * Added processing to display APNG.
  * 11/9/2022 Ver.1.5.2
  * Changed the display in languages other than Japanese to English.
  * 7/29/2022 Ver.1.5.1 
@@ -66,7 +67,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.5.1
+ * @version 1.6.0
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -76,6 +77,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/13 Ver.1.6.0
+ * APNGを表示するための処理を追加。
  * 2022/11/9 Ver.1.5.2
  * 日本語以外での表示を英語表示に変更。
  * 2022/7/29 Ver.1.5.1
@@ -123,6 +126,13 @@ const NUUN_Base_Ver = 140;
 function NuunManager() {
   throw new Error("This is a static class");
 }
+
+function Sprite_NuunAPngImg() {
+  this.initialize(...arguments);
+}
+
+Sprite_NuunAPngImg.prototype = Object.create(Sprite.prototype);
+Sprite_NuunAPngImg.prototype.constructor = Sprite_NuunAPngImg;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Base');
@@ -264,6 +274,7 @@ Window_Base.prototype.nuun_getListIdData = function(id) {
   }
 };
 
+
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
   _Spriteset_Battle_createLowerLayer.call(this);
@@ -314,6 +325,51 @@ Game_Action.prototype.getAttackElementsList = function() {
 
 Game_Action.prototype.getItemElementsList = function() {
   return Imported.NUUN_MultiElement ? this.getItemElements() : [this.item().damage.elementId];
+};
+
+
+
+Sprite_NuunAPngImg.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+};
+
+Sprite_NuunAPngImg.prototype.initMembers = function() {
+  this._battler = null;
+  this._apngMode = null;
+  this._data = null;
+  this._pictureName = null;
+};
+
+Sprite_NuunAPngImg.prototype.setup = function(battler, data, name) {
+  this._battler = battler;
+  this._data = data;
+  this._pictureName = name.split('pictures/')[1];
+  this.refresh();
+};
+
+Sprite_NuunAPngImg.prototype.refresh = function() {
+  if (this.addApngChild && this.loadApngSprite(this._pictureName)) {
+      this.addApngChild(this._pictureName);
+      this._apngMode = true;
+  }
+};
+
+Sprite_NuunAPngImg.prototype.destroy = function() {
+  this.resetApngImg();
+  Sprite.prototype.destroy.call(this);
+};
+
+Sprite_NuunAPngImg.prototype.resetApngImg = function() {
+  this._battler = null;
+  if (this._apngMode) {
+      this.destroyApngIfNeed();
+      this._apngMode = null;
+  }
+};
+
+Sprite_NuunAPngImg.prototype.loadApngSprite = function(name) {
+  return Sprite_Picture.prototype.loadApngSprite.call(this, name);
 };
 
 })();

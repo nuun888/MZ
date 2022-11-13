@@ -201,7 +201,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [装備セットボーナス](https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md) | [NUUN_SetBonusEquip](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js) | 共 | 1.3.1 |
 | ┗ [セットボーナスツールチップウィンドウ](https://github.com/nuun888/MZ/blob/master/README/SetBonusWindow.md) | [NUUN_SetBonusWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusWindow.js) | 共 | 1.0.2 |
 | [装備能力値変化量上限突破](https://github.com/nuun888/MZ/blob/master/README/EquipParamUnlimited.md) | [NUUN_EquipParamUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipParamUnlimited.js) |  | 1.0.0 |
-| 装備画面表示拡張(仮) |  |  |  |
+| [装備ステータス表示拡張](https://github.com/nuun888/MZ/blob/master/README/EquipStatusEX.md) |  [NUUN_EquipStatusEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

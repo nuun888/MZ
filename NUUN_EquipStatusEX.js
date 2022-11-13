@@ -502,8 +502,8 @@
  * @text Eval(javaScript)(9)
  * @type combo
  * @option '$gameVariables.value(0);//game variable'
- * @option 'actor;//Actor game data'
- * @option 'actor.actor();//Actor system data'
+ * @option 'a;//Actor game data'
+ * @option 'a.actor();//Actor system data'
  * @default 
  * 
  * @param paramUnit
@@ -1213,8 +1213,8 @@
  * @text 評価式(javaScript)(9)
  * @type combo
  * @option '$gameVariables.value(0);//ゲーム変数'
- * @option 'actor;//アクターのゲームデータ'
- * @option 'actor.actor();//アクターのシステムデータ'
+ * @option 'a;//アクターのゲームデータ'
+ * @option 'a.actor();//アクターのシステムデータ'
  * @default 
  * 
  * @param paramUnit

@@ -9,9 +9,251 @@
  */
 /*:
  * @target MZ
+ * @plugindesc  Famage floor EX
+ * @author NUUN
+ * @version 1.1.1
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * Expands the handling of damage on the damage floor.
+ * By setting the region setting to 0, it will be applied to map tiles that do not specify a region.
+ * If both region and terrain tag are specified, it will be applied when either one matches.
+ * The priority of floor damage settings is determined from the settings above the list and the matching conditions are applied.
+ * Please set the conditions for which the region and terrain tags are set in the upper part.
+ * The flash setting will not flash by entering 0 for the number of frames.
+ * 
+ * The floor damage value can use the evaluation formula.
+ * a：Actor game data
+ * 
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/14/2022 Ver.1.1.1
+ * Changed the display in languages other than Japanese to English.
+ * 4/2/2022 Ver.1.1.0
+ * Added the ability to receive damage only to a specific actor.
+ * Changed how to set flash.
+ * 10/31/2021 Ver.1.0.3
+ * Added a function that can set terrain tags and flash.
+ * 10/24/2021 Ver.1.0.2
+ * Changed the floor damage to be able to use the evaluation formula.
+ * 10/24/2021 Ver.1.0.1
+ * Added a function to specify the default floor damage and SE at the time of floor damage.
+ * 10/24/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * @param DamagedFloorList
+ * @text Damage floor setting
+ * @desc Damage floor setting
+ * @type struct<DamagedFloorData>[]
+ * @default []
+ * 
+ * @param DefaultDamage
+ * @text Default damage
+ * @desc Damage at default floor damage (a: actor game data)
+ * @type combo
+ * @option '10;//default'
+ * @option 'a.mhp * 0.02;//2% of maximum HP'
+ * @default 10
+ * 
+ * @param DefaultSE
+ * @text Default SE settings
+ * @default ------------------------------
+ * 
+ * @param DefaultDamagedFloorSE
+ * @text Default floor damage SE
+ * @desc SE during floor damage.
+ * @type file
+ * @dir audio/se/
+ * @parent DefaultSE
+ * 
+ * @param DefaultVolume
+ * @text Volume
+ * @desc Volume.
+ * @type number
+ * @default 90
+ * @parent DefaultSE
+ * 
+ * @param DefaultPitch
+ * @text Pitch
+ * @desc Pitch.
+ * @type number
+ * @default 100
+ * @parent DefaultSE
+ * 
+ * @param DefaultPan
+ * @text Pan
+ * @desc Pan.
+ * @type number
+ * @default 50
+ * @parent DefaultSE
+ * 
+ * @param Flash
+ * @text Flash settings
+ * @default ------------------------------
+ * 
+ * @param DefaultFlashColor
+ * @text Flash color
+ * @desc Flash color. Do not flash by setting the number of frames to 0.
+ * @type struct<FlashColorSetting>
+ * @default {"red":"255","green":"0","blue":"0","gray":"128","flame":"8"}
+ * @parent Flash
+ * 
+ */
+/*~struct~DamagedFloorData:
+ * 
+ * @param TileSetId
+ * @text Tileset ID
+ * @desc Tileset ID
+ * @type tileset
+ * @default 0
+ * 
+ * @param DamagedFloorRegion
+ * @text Damage floor application setting
+ * @desc Sets the damage floor to apply.
+ * @type struct<DamagedFloorRegionData>[]
+ * @default ["{\"RegionId\":\"0\",\"TerrainId\":\"-1\",\"Damage\":\"10\",\"DamageActor\":\"[]\",\"SE\":\"------------------------------\",\"DamagedFloorSE\":\"\",\"volume\":\"90\",\"pitch\":\"100\",\"pan\":\"50\",\"Flash\":\"------------------------------\",\"FlashColor\":\"{\\\"red\\\":\\\"255\\\",\\\"green\\\":\\\"0\\\",\\\"blue\\\":\\\"0\\\",\\\"gray\\\":\\\"128\\\",\\\"flame\\\":\\\"8\\\"}\"}"]
+ * 
+ * 
+ */
+/*~struct~DamagedFloorRegionData:
+ * 
+ * @param RegionId
+ * @text RegionID
+ * @desc RegionID.
+ * @type number
+ * @default 0
+ * 
+ * @param TerrainId
+ * @text Terrain tag ID
+ * @desc Terrain tag ID
+ * @type number
+ * @default -1
+ * @min -1
+ * @max 7
+ * 
+ * @param Damage
+ * @text Damage
+ * @desc Damage at default floor damage (a: actor game data)
+ * @type combo
+ * @option '10;//default'
+ * @option 'a.mhp * 0.02;//2% of maximum HP'
+ * @default 10
+ * 
+ * @param DamageActor
+ * @text Applicable actor
+ * @desc The actor that applies floor damage. For all actors without specifying
+ * @type struct<DamageFloorActor>[]
+ * @default []
+ * 
+ * @param SE
+ * @text SE settings
+ * @default ------------------------------
+ * 
+ * @param DamagedFloorSE
+ * @text SE during floor damage
+ * @desc SE during floor damage.
+ * @type file
+ * @dir audio/se/
+ * @parent SE
+ * 
+ * @param volume
+ * @text Volume
+ * @desc Volume.
+ * @type number
+ * @default 90
+ * @parent SE
+ * @min 0
+ * @max 9999
+ * 
+ * @param pitch
+ * @text Pitch
+ * @desc Pitch.
+ * @type number
+ * @default 100
+ * @parent SE
+ * 
+ * @param pan
+ * @text Pan
+ * @desc Pan。
+ * @type number
+ * @default 50
+ * @parent SE
+ * 
+ * @param Flash
+ * @text Flash settings
+ * @default ------------------------------
+ * 
+ * @param FlashColor
+ * @text Flash color
+ * @desc flash color. Setting the number of frames to 0 will not flash.
+ * @type struct<FlashColorSetting>
+ * @default {"red":"255","green":"0","blue":"0","gray":"128","flame":"8"}
+ * @parent Flash
+ * 
+ */
+/*~struct~FlashColorSetting:
+ * 
+ * @param red
+ * @text Red
+ * @desc Red
+ * @type number
+ * @min 0
+ * @max 255
+ * @default 255
+ * 
+ * @param green
+ * @text Green
+ * @desc Green
+ * @type number
+ * @min 0
+ * @max 255
+ * @default 0
+ * 
+ * @param blue
+ * @text Blue
+ * @desc Blue
+ * @type number
+ * @min 0
+ * @max 255
+ * @default 0
+ * 
+ * @param gray
+ * @text Gray
+ * @desc Gray
+ * @type number
+ * @min 0
+ * @max 255
+ * @default 128
+ * 
+ * @param flame
+ * @text Number of frames
+ * @desc Number of frames
+ * @type number
+ * @min 0
+ * @max 9999
+ * @default 8
+ * 
+ * 
+ */
+/*~struct~DamageFloorActor:
+ * 
+ * @param Actor
+ * @text Actor
+ * @desc Actor
+ * @type actor
+ * @default 0
+ * 
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -24,13 +266,15 @@
  * フラッシュ設定はフレーム数の数値を0と入力することでフラッシュされません。
  * 
  * 床ダメージ値は評価式が使用できます。
- * a：アクター
+ * a：アクターのゲームデータ
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/14 Ver.1.1.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/4/2 Ver.1.1.0
  * 特定のアクターのみダメージを受ける機能を追加。
  * フラッシュの設定方法を変更。
@@ -51,7 +295,7 @@
  * 
  * @param DefaultDamage
  * @text デフォルトダメージ
- * @desc デフォルト床ダメージ時のダメージ（a：アクター）
+ * @desc デフォルト床ダメージ時のダメージ（a：アクターのゲームデータ）
  * @type combo
  * @option '10;//デフォルト'
  * @option 'a.mhp * 0.02;//最大HPの２％'
@@ -101,7 +345,7 @@
  * @parent Flash
  * 
  */
-/*~struct~DamagedFloorData:
+/*~struct~DamagedFloorData:ja
  * 
  * @param TileSetId
  * @text タイルセットID
@@ -117,7 +361,7 @@
  * 
  * 
  */
-/*~struct~DamagedFloorRegionData:
+/*~struct~DamagedFloorRegionData:ja
  * 
  * @param RegionId
  * @text リージョンID
@@ -193,7 +437,7 @@
  * @parent Flash
  * 
  */
-/*~struct~FlashColorSetting:
+/*~struct~FlashColorSetting:ja
  * 
  * @param red
  * @text 赤
@@ -237,7 +481,7 @@
  * 
  * 
  */
-/*~struct~DamageFloorActor:
+/*~struct~DamageFloorActor:ja
  * 
  * @param Actor
  * @text アクター

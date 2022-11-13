@@ -35,10 +35,10 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | 戦闘　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.7.9 |
+| [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.8.2 |
 | [XPスタイル対象選択ウィンドウ](https://github.com/nuun888/MZ/blob/master/README/XPSelectWindow.md) | [NUUN_XPSelectWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js) | 共 | 1.1.0 |
 | ┗ アクター対象選択画面 |  |  |  |
-| [リザルト](https://github.com/nuun888/MZ/blob/master/README/Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 2.2.10|
+| [リザルト](https://github.com/nuun888/MZ/blob/master/README/Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 | 2.2.11|
 | ┣  [MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) | [NUUN_ResultMVPActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js) |  | 1.1.2 |
 | ┗ [リザルト時スプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) | [NUUN_ResultSpriteHide](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultSpriteHide.js) | 共 | 1.0.0 |
 | [戦闘中アイテム、スキル選択画面MV風表示](https://github.com/nuun888/MZ/blob/master/README/BattleItemSkillWindowMV.md) | [NUUN_BattleItemSkillWindowMV](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js) |  | 1.3.0 |
@@ -56,7 +56,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | アクター　　　　　　　　　　　　　　　 | プラグイン　プラグイン数6　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [レベル上限限界突破](https://github.com/nuun888/MZ/blob/master/README/LevelUnlimited.md)  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js) |  | 1.2.0 |
+| [レベル上限限界突破](https://github.com/nuun888/MZ/blob/master/README/LevelUnlimited.md)  | [NUUN_LevelUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js) |  | 1.2.1 |
 | [最大レベル変動](https://github.com/nuun888/MZ/blob/master/README/ChangeMaxLevel.md) | [NUUN_ChangeMaxLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeMaxLevel.js) |  | 1.2.0 |
 | [アクターステータスの最大値設定](https://github.com/nuun888/MZ/blob/master/README/StatusParamEX.md) | [NUUN_StatusParamEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusParamEXr.js) |  | 1.0.2 |
 | [サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md) | [NUUN_SupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js) | 共 | 1.4.2 |
@@ -81,7 +81,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [エネミー個別座標](https://github.com/nuun888/MZ/edit/master/README/EnemyPosition.md)  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js) |  | 1.1.0 |
 | [敵のドロップアイテム追加](https://github.com/nuun888/MZ/blob/master/README/AddDropItems.md)  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js) |  | 1.0.1 |
 | [条件付きドロップアイテム](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md) | [NUUN_ConditionalDrops](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalDrops.js) | 条 | 1.0.8 |
-| [ユニークモンスター](https://github.com/nuun888/MZ/blob/master/README/UniqueEnemy.md) | [NUUN_UniqueEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js) | 共 | 1.0.1 |
+| [ユニークモンスター](https://github.com/nuun888/MZ/blob/master/README/UniqueEnemy.md) | [NUUN_UniqueEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js) | 共 | 1.0.2 |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -90,8 +90,8 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | 属性吸収特徴 | [NUUN_ElementAbsorb](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ElementAbsorb.js) |  | 1.0.1 |
 | [回復効果反転特徴](https://github.com/nuun888/MZ/blob/master/README/RecoveryReversal.md) | [NUUN_RecoveryReversal](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RecoveryReversal.js) |  | 1.0.0 |
 | [キャストタイムチャージ率特徴](https://github.com/nuun888/MZ/blob/master/README/CastTimeCharge.md) | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js) |  | 1.0.0 |
-| [ファイナルアタック特徴](https://github.com/nuun888/MZ/blob/master/README/FinalAttack.md) | [NUUN_FinalAttack](https://github.com/nuun888/MZ/blob/master/NUUN_FinalAttack.js) |  | 1.1.0 |
-| [マナシールド](https://github.com/nuun888/MZ/blob/master/README/ManaShield.md) | [NUUN_ManaShield](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js) |  | 1.1.1 |
+| [ファイナルアタック特徴](https://github.com/nuun888/MZ/blob/master/README/FinalAttack.md) | [NUUN_FinalAttack](https://github.com/nuun888/MZ/blob/master/NUUN_FinalAttack.js) |  | 1.1.1 |
+| [マナシールド](https://github.com/nuun888/MZ/blob/master/README/ManaShield.md) | [NUUN_ManaShield](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js) |  | 1.1.2 |
 | [能力値ターン毎増減特徴](https://github.com/nuun888/MZ/blob/master/README/AccelerationFeature.md) | [NUUN_AccelerationFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js) |  | 2.0.0 |
 | [行動時ブースト特徴](https://github.com/nuun888/MZ/blob/master/README/NUUN_boostEX.md) | [NUUN_boostEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_boostEX.js) | 条対 | 1.2.0 |
 | [踏み止まり特徴](https://github.com/nuun888/MZ/blob/master/README/StoppingFeature.md) | [NUUN_StoppingFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js) | 条対 | 1.0.0 |
@@ -163,13 +163,13 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | ---------- | ------------- | ------------- | -------- |
 | [床ダメージの処理を拡張](https://github.com/nuun888/MZ/blob/master/README/DamagedFloorEX.md) | [NUUN_DamagedFloorEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js) | 共 | 1.1.0 |
 | [地域マップ名](https://github.com/nuun888/MZ/blob/master/README/RegionMapName.md) | [NUUN_RegionMapName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapName.js) | 共 | 1.0.0 |
-| [複数マップ結合](https://github.com/nuun888/MZ/blob/master/README/SeamlessMap.md) | [NUUN_SeamlessMap](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js) | 共 | 1.1.4 |
+| [複数マップ結合](https://github.com/nuun888/MZ/blob/master/README/SeamlessMap.md) | [NUUN_SeamlessMap](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js) | 共 | 1.1.5 |
 |  |  |  |  |
 
 | コマンド　　　　　　　　　　　　　　　 | プラグイン　プラグイン数3　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [アイテムのカテゴリーカスタマイズ](https://github.com/nuun888/MZ/blob/master/README/ItemCategory.md) | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | 共 | 1.3.1 |
-| [コマンド、カテゴリー表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_CommandIcon.md)| [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js) |  | 1.4.0 |
+| [アイテムのカテゴリーカスタマイズ](https://github.com/nuun888/MZ/blob/master/README/ItemCategory.md) | [NUUN_ItemCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js) | 共 | 1.3.2 |
+| [コマンド、カテゴリー表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_CommandIcon.md)| [NUUN_CommandIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js) | 共 | 1.4.1 |
 | [XP風バトルコマンド](https://github.com/nuun888/MZ/blob/master/README/XPBattleCommand.md) | [NUUN_XPBattleComman](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js) | 共 | 1.0.3 |
 |  |  |  |  |
 |  |  |  |  |
@@ -208,8 +208,8 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | 表現　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数9　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [ゲージの数値更新アニメーション](https://github.com/nuun888/MZ/blob/master/README/GaugeValueAnimation.md) | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js) | 共 | 1.2.0 |
-| [ゲージ画像化](https://github.com/nuun888/MZ/blob/master/README/GaugeImage.md) | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) | 共 | 1.6.1 |
+| [ゲージの数値更新アニメーション](https://github.com/nuun888/MZ/blob/master/README/GaugeValueAnimation.md) | [NUUN_GaugeValueAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueAnimation.js) | 共 | 1.2.2 |
+| [ゲージ画像化](https://github.com/nuun888/MZ/blob/master/README/GaugeImage.md) | [NUUN_GaugeImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js) | 共 | 1.6.2 |
 | [TP円形ゲージ](https://github.com/nuun888/MZ/blob/master/README/TpCircularGauge.md) | [NUUN_TpCircularGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TpCircularGauge.js) |  | 1.1.1 |
 | [ダメージポップアップ画像化](https://github.com/nuun888/MZ/blob/master/README/DamagePopUpImg.md) | [NUUN_DamagePopUpImg](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpImg.js) |  | 1.1.1 |
 | [ダメージポップアップ同時表示](https://github.com/nuun888/MZ/blob/master/README/DamagePopUpSimulDisplay.md) | [NUUN_DamagePopUpSimulDisplay](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpSimulDisplay.js) |  | 1.0.0 |
@@ -219,9 +219,9 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [横バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md) | [NUUN_LateralBoundPopUp](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LateralBoundPopUp.js) | | 1.0.3 |
 | [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.2.1 |
 | [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md) | [NUUN_DamageGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamageGaugeX.js) | 共 | 1.0.0 |
-| [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) | 共 | 1.0.0 |
+| [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) | 共 | 1.1.1 |
 | [再生率バトルログ表示](https://github.com/nuun888/MZ/blob/master/README/PlaybackRateBattleLog.md) | [NUUN_PlaybackRateBattleLog](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PlaybackRateBattleLog.js) |  | 1.0.0 |
-| [TPBタイムライン](https://github.com/nuun888/MZ/blob/master/README/TPBTimeLine.md) | [NUUN_TPBTimeLine](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPBTimeLine.js) |  | 1.0.1 |
+| [TPBタイムライン](https://github.com/nuun888/MZ/blob/master/README/TPBTimeLine.md) | [NUUN_TPBTimeLine](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPBTimeLine.js) |  | 1.1.2 |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -254,7 +254,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | ユーティリティ　　　　　　　　　　　　 | プラグイン　プラグイン数2　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [アイテムなどのランダム取得](https://github.com/nuun888/MZ/blob/master/README/RandomItems.md)  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.2.2 |
+| [アイテムなどのランダム取得](https://github.com/nuun888/MZ/blob/master/README/RandomItems.md)  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.3.0 |
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |

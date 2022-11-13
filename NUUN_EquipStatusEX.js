@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Expands the display of equipment status.
@@ -30,6 +30,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/14/2022 Ver.1.0.1
+ * Fixed an issue where the actor image was displayed in front.
  * 11/13/2022 Ver.1.0.0
  * first edition.
  * 
@@ -612,7 +614,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 装備ステータスの表示を拡張します。
@@ -631,6 +633,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/14 Ver.1.0.1
+ * アクター画像が手前に表示されてしまう問題を修正。
  * 2022/11/13 Ver.1.0.0
  * 初版
  * 
@@ -1299,6 +1303,7 @@ Imported.NUUN_EquipStatusEX = true;
         _Window_EquipStatus_initialize.call(this, rect);
         this._page = 0;
         this.language_Jp = $gameSystem.isJapanese();
+        this.loadImages();
     };
     
     Window_EquipStatus.prototype.lineHeight = function() {
@@ -1329,6 +1334,30 @@ Imported.NUUN_EquipStatusEX = true;
     Window_EquipStatus.prototype.refresh = function() {
         Window_StatusBase.prototype.refresh.call(this);
         _Window_EquipStatus_refresh.call(this);
+    };
+
+    Window_EquipStatus.prototype.loadImages = function() {
+        for (const actor of $gameParty.allMembers()) {
+            let data = null;
+            if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+                actor.resetImgId();
+                data = this.getActorData(actor);
+                const mode = data.GraphicMode;
+                if (mode === 'face') {
+                    actor.loadActorFace()
+                } else if (mode === 'img') {
+                    actor.loadActorGraphic();
+                }
+            } else {
+                data = this.getActorData(actor);
+                const mode = data.GraphicMode;
+                if (mode === 'face') {
+                    ImageManager.loadFace(data.FaceImg);
+                } else if (mode === 'img') {
+                    ImageManager.nuun_LoadPictures(data.ActorImg);
+                }
+            }
+        }
     };
 
     const _Window_EquipStatus_drawActorFace = Window_EquipStatus.prototype.drawActorFace;

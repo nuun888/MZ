@@ -20,6 +20,11 @@
 
 APNGを表示するにはNUUN_Base Ver.1.6.0とトリアコンタン様のAPNGピクチャプラグインが必要です。  
 
+## 操作
+QWキー:ページ切り替え  
+装備コマンドが選択中の時は、アクターが切り替わります。  
+装備スロット、アイテム選択中はステータスのページが切り替わります。  
+
 ![画像](img/EquipStatusEX1.png)  
 ![画像](img/EquipStatusEX2.png)  
 ![画像](img/EquipStatusEX3.png)  

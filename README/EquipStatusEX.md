@@ -18,6 +18,8 @@
 
 ![画像](img/EquipStatusEX1.png)  
 ![画像](img/EquipStatusEX2.png)  
+![画像](img/EquipStatusEX3.png)  
+
 
 ## 更新履歴
 2022/11/13 Ver.1.0.0  

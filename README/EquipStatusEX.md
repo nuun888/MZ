@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,5 +31,7 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
+2022/11/14 Ver.1.0.1  
+アクター画像が手前に表示されてしまう問題を修正。  
 2022/11/13 Ver.1.0.0  
 初版  

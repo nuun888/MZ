@@ -18,6 +18,8 @@
 個別に設定する場合は各アクター画像設定の画像X座標、画像Y座標で設定します。  
 画像のアクターが表示されている部分を中央に表示させたい場合は各アクター画像設定の画像表示開始座標X、画像表示開始座標Yで設定します。  
 
+APNGを表示するにはNUUN_Base Ver.1.6.0とトリアコンタン様のAPNGピクチャプラグインが必要です。  
+
 ![画像](img/EquipStatusEX1.png)  
 ![画像](img/EquipStatusEX2.png)  
 ![画像](img/EquipStatusEX3.png)  

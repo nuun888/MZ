@@ -2036,81 +2036,10 @@ Imported.NUUN_EquipStatusEX = true;
     };
 
     Window_EquipStatus.prototype.drawSetBonus = function(data, actor, x, y, width) {
-        const lineHeight = this.lineHeight();
-        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
-        let setBonusSum = 0;
-        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-        const name = data.ParamName ? data.ParamName : null;
-        if (name) {
-            this.drawText(name, x, y, data.SystemItemWidth);
-            y += lineHeight;
-        }
-        const a = actor;
-        const list = a.getSetBonusIds().filter(bonus => !!bonus);
-        list.forEach(setBonusId => {
-            const setData = NuunManager.getSetBonusData(setBonusId.id);
-            console.log(setBonusId)
-            this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-            const name = setData.SetBonusName;
-            this.drawSetBonusName(name, x, y, width);
-            this.resetTextColor();
-            y += lineHeight;
-            this.horzLine(data, x, y, width, actor);
-            setData.SetBonusNumberEquipment.forEach(numberEquip => {
-                if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
-                    y += lineHeight;
-                    //this.drawSetBonusNumberEquipment(data, numberEquip, x, y, width);
-                } else if (!(setData.SetBonusEquip && setData.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
-                    y += lineHeight;
-                    //this.drawSetBonusNumberEquipment(data, numberEquip, x, y, width);
-                }
-            });
-            if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && setData.SetBonusEquip.length === setBonusSum) {
-                y += lineHeight;
-                //this.drawSetBonusParam(setData, x, y, width);
-            }
-        });
+        
     };
 
-    Window_EquipStatus.prototype.drawSetBonusName = function(name, x, y, width) {
-        this.drawText(name, x, y, width);
-    };
     
-    Window_EquipStatus.prototype.drawSetBonusParam = function(data, numberEquip, x, y, width) {
-        const equip = this.getSetBonusEquip(numberEquip.SetBonusWeaponData, numberEquip.SetBonusArmorData);
-        if (equip) {
-            if (numberEquip.SetBonusText) {
-                this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-                this.drawText(numberEquip.SetBonusText, x, y, width);
-                const textWidth = this.textWidth(numberEquip.SetBonusText);
-                x += textWidth  + this.itemPadding();
-            }
-            let text = this.getSetBonusParam(equip);
-            if (numberEquip.SetBonusParamText) {
-                text += text ? ','+ numberEquip.SetBonusParamText : numberEquip.SetBonusParamText;
-            }
-            this.resetTextColor();
-            this.drawText(text, x, y, width);
-        }
-    };
-    
-    Window_EquipStatus.prototype.drawSetBonusNumberEquipment = function(data, numberEquip, x, y, width) {
-        const equip = this.getSetBonusEquip(numberEquip.SetNumberEquipWeaponData, numberEquip.SetNumberEquipArmorData);
-        if (equip) {
-            if (numberEquip.SetBonusText) {
-                this.changeTextColor(this.systemColor());
-                this.drawText(numberEquip.SetBonusText, x, y, width);
-                const textWidth = this.textWidth(numberEquip.SetBonusText);
-                x += textWidth  + this.itemPadding();
-            }
-            let text = this.getSetBonusParam(equip);
-            if (numberEquip.SetBonusParamText) {
-                text += text ? ','+ numberEquip.SetBonusParamText : numberEquip.SetBonusParamText;
-            }
-            this.resetTextColor();
-            this.drawText(text, x, y, width);
-        }
-    };
 
     Window_EquipStatus.prototype.drawElement = function(data, actor, x, y, width) {
         const lineHeight = this.lineHeight();

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * Expands the display of equipment status.
@@ -35,6 +35,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/14/2022 Ver.1.1.1
+ * Fixed an issue that caused an error when opening the equip screen.
  * 11/14/2022 Ver.1.1.0
  * Changed the setting method of setting items.
  * Added character chips and SV actors to display items
@@ -722,10 +724,10 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
- * 装備ステータスの表示を拡張します。
+ * 装備ステータス１の表示を拡張します。
  * 
  * 各項目の設定はページ表示設定で設定します。
  * 装備ステータス設定でページ表示設定で設定したリスト番号を指定してください。
@@ -746,6 +748,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/14 Ver.1.1.1
+ * 装備画面を開くとエラーが出る問題を修正。
  * 2022/11/14 Ver.1.1.0
  * 設定項目の設定方法を変更。
  * 表示項目にキャラチップとSVアクターを追加
@@ -1679,7 +1683,7 @@ Imported.NUUN_EquipStatusEX = true;
     const _Window_EquipStatus_drawAllParams = Window_EquipStatus.prototype.drawAllParams;
     Window_EquipStatus.prototype.drawAllParams = function() {
         if (!!this._equipBitmap) {
-            this.bitmap.addLoadListener(function() {
+            this._equipBitmap.addLoadListener(function() {
                 this.drawEquipStatusContents();
             }.bind(this));
         } else {
@@ -2041,31 +2045,70 @@ Imported.NUUN_EquipStatusEX = true;
             this.drawText(name, x, y, data.SystemItemWidth);
             y += lineHeight;
         }
-        if (this._equip && this._equip.meta.SetBonus) {
-            const list = this._equip.meta.SetBonus.split(',');
-            list.forEach(setBonusId => {
-                const setData = isNaN(setBonusId) ? NuunManager.getSetBonusDataName(setBonusId) : NuunManager.getSetBonusData(Number(setBonusId));
-                setBonusSum = this._actor.getTotalSetBonus(setData);
-                const name = setData.SetBonusName;
-                this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-                this.drawSetBonusName(name, x, y, width);
-                this.resetTextColor();
-                y += lineHeight;
-                this.horzLine(x, y, width);
-                setData.SetBonusNumberEquipment.forEach(numberEquip => {
-                    if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
-                        y += lineHeight;
-                        this.drawSetBonusNumberEquipment(numberEquip, x, y, width);
-                    } else if (!(setData.SetBonusEquip && setData.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
-                        y += lineHeight;
-                        this.drawSetBonusNumberEquipment(numberEquip, x, y, width);
-                    }
-                });
-                if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && setData.SetBonusEquip.length === setBonusSum) {
+        const a = actor;
+        const list = a.getSetBonusIds().filter(bonus => !!bonus);
+        list.forEach(setBonusId => {
+            const setData = NuunManager.getSetBonusData(setBonusId.id);
+            console.log(setBonusId)
+            this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const name = setData.SetBonusName;
+            this.drawSetBonusName(name, x, y, width);
+            this.resetTextColor();
+            y += lineHeight;
+            this.horzLine(data, x, y, width, actor);
+            setData.SetBonusNumberEquipment.forEach(numberEquip => {
+                if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
                     y += lineHeight;
-                    this.drawSetBonusParam(setData, x, y, width);
+                    //this.drawSetBonusNumberEquipment(data, numberEquip, x, y, width);
+                } else if (!(setData.SetBonusEquip && setData.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
+                    y += lineHeight;
+                    //this.drawSetBonusNumberEquipment(data, numberEquip, x, y, width);
                 }
             });
+            if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && setData.SetBonusEquip.length === setBonusSum) {
+                y += lineHeight;
+                //this.drawSetBonusParam(setData, x, y, width);
+            }
+        });
+    };
+
+    Window_EquipStatus.prototype.drawSetBonusName = function(name, x, y, width) {
+        this.drawText(name, x, y, width);
+    };
+    
+    Window_EquipStatus.prototype.drawSetBonusParam = function(data, numberEquip, x, y, width) {
+        const equip = this.getSetBonusEquip(numberEquip.SetBonusWeaponData, numberEquip.SetBonusArmorData);
+        if (equip) {
+            if (numberEquip.SetBonusText) {
+                this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+                this.drawText(numberEquip.SetBonusText, x, y, width);
+                const textWidth = this.textWidth(numberEquip.SetBonusText);
+                x += textWidth  + this.itemPadding();
+            }
+            let text = this.getSetBonusParam(equip);
+            if (numberEquip.SetBonusParamText) {
+                text += text ? ','+ numberEquip.SetBonusParamText : numberEquip.SetBonusParamText;
+            }
+            this.resetTextColor();
+            this.drawText(text, x, y, width);
+        }
+    };
+    
+    Window_EquipStatus.prototype.drawSetBonusNumberEquipment = function(data, numberEquip, x, y, width) {
+        const equip = this.getSetBonusEquip(numberEquip.SetNumberEquipWeaponData, numberEquip.SetNumberEquipArmorData);
+        if (equip) {
+            if (numberEquip.SetBonusText) {
+                this.changeTextColor(this.systemColor());
+                this.drawText(numberEquip.SetBonusText, x, y, width);
+                const textWidth = this.textWidth(numberEquip.SetBonusText);
+                x += textWidth  + this.itemPadding();
+            }
+            let text = this.getSetBonusParam(equip);
+            if (numberEquip.SetBonusParamText) {
+                text += text ? ','+ numberEquip.SetBonusParamText : numberEquip.SetBonusParamText;
+            }
+            this.resetTextColor();
+            this.drawText(text, x, y, width);
         }
     };
 
@@ -2263,6 +2306,27 @@ Imported.NUUN_EquipStatusEX = true;
             const name = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battler.getActorGraphicImg() : data.ActorImg;
             this._actorBitmap.setup(actor, data, name);
             this._actorBitmap.move(rect.x + data.Actor_X + ActorImg_X, rect.y + data.Actor_Y + ActorImg_Y, rect.width, rect.height);
+        }
+    };
+
+    Window_EquipStatus.prototype.getParamText = function(paramId) {
+        switch (paramId) {
+            case 0:
+                return SetBonusParamText.HPName;
+            case 1:
+                return SetBonusParamText.MPName;
+            case 2:
+                return SetBonusParamText.ATKName;
+            case 3:
+                return SetBonusParamText.DEFName;
+            case 4:
+                return SetBonusParamText.MATName;
+            case 5:
+                return SetBonusParamText.MDFName;
+            case 6:
+                return SetBonusParamText.AGIName;
+            case 7:
+                return SetBonusParamText.LUKName;
         }
     };
 

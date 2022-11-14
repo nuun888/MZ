@@ -5,12 +5,226 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
+/*:
+ * @target MZ
+ * @plugindesc Equip set bonus
+ * @author NUUN
+ * @version 1.3.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * Activates a set bonus when equipped with specific equipment.
+ * 
+ * The set bonus parameter to apply creates the data for the set bonus in the weapon or armor in the database.
+ * If you set both weapons and armor, the data set for the weapon will take precedence. Armor is applied if the weapon ID is 0.
+ * 
+ * Set the set bonus in the set bonus setting in the plugin parameters.
+ * Set the equipment to be applied in the set bonus equipment setting
+ * Specify the equipment to which this ID's bonus applies in the set bonus equipment settings. 
+ * In this case, it will be applied if the specified equipment is equipped and the conditions are met.
+ * Please fill in the "SetBonus" tag in all memo fields of the specified equipment items.
+ * 
+ * Set bonus equipment setting is blank.
+ * Applies if equipment with the "SetBonus" tag is equipped and the conditions are met.
+ * 
+ * Weapon and armor notes
+ * <SetBonus:[id], [id]...> Apply set bonuses.
+ * [id]:Set bonus setting list number or set bonus name.
+ * The set bonus will be applied if the set bonus with the same ID is equipped for the number of bonus applications.
+ * Multiple set bonuses can be specified for one piece of equipment.
+ * 
+ * Partial set bonus
+ * You can set the set bonus to apply if the number of sets of the corresponding equipment meets the conditions.
+ * If you have 4 pieces of equipment that require set bonuses, you can set the bonuses to apply to 2 or more of them, and 3 or more of them.
+ * Weapons and armor for parameters to apply are specified separately.
+ * 
+ * 
+ * "NUUN_SetBonusWindow" is required separately for display text and display bonus parameter text.
+ * Display text example:BONUS(2SET)
+ * Display bonus parameter text example: Substitution 30%　*Normal ability values are displayed automatically.
+ * 
+ * Explanation
+ * https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md
+ * 
+ * Log
+ * 11/14/2022 Ver.1.3.2
+ * Fixed an issue where partial set bonuses were not applying properly.
+ * Changed the display in languages other than Japanese to English.
+ * 10/8/2022 Ver.1.3.1
+ * Fixed the set bonus setting so that it can only be set from the memo tag of weapons and armor.
+ * 9/23/2022 Ver.1.3.0
+ * Added a function to determine whether the specified set bonus has been applied.
+ * 7/7/2022 Ver.1.2.0
+ * Processing for tool tip window display, plug-in parameter added.
+ * 2/4/2022 Ver.1.1.2
+ * Correction of processing.
+ * 1/28/2022 Ver.1.1.1
+ * Changed the parameter that sets the set bonus so that it can be applied not only from weapons but also from armor.
+ * Fixed incorrect parameter names in additional bonus weapon settings.
+ * 1/27/2022 Ver.1.1.0
+ * Added a function that activates with a certain number of equipment.
+ * 1/22/2022 Ver.1.0.0
+ * first edition.
+ * 
+ * @param SetBonus
+ * @text set bonus settings
+ * @desc Set the set bonus.
+ * @type struct<SetBonusList>[]
+ * @default []
+ * 
+ * 
+ * @command IsSetBonus
+ * @desc Assigns whether the specified set bonus has been applied to the specified switch.
+ * @text Set bonus application judgment
+ * 
+ * @arg ActorId
+ * @text Actor ID
+ * @desc Specifies the target actor.
+ * @type actor
+ * @default 0
+ * 
+ * @arg SwitchId
+ * @text Result assignment switch
+ * @desc Specifies the switch ID for storing judgment results.
+ * @type switch
+ * @default 0
+ * 
+ * @arg Id
+ * @text Specified set bonus ID
+ * @desc Set bonus ID to determine whether it is applied.
+ * @type number
+ * @default 0
+ * 
+ * @arg Name
+ * @text Specified set bonus name
+ * @desc Set bonus name to determine if it is applied. This will take precedence if it is entered.
+ * @type string
+ * @default 
+ * 
+ */
+/*~struct~SetBonusList:
+ * 
+ * @param SetBonusName
+ * @text Set bonus name
+ * @desc Name of set bonus.
+ * @type string
+ * @default
+ * 
+ * @param SameItemDuplication
+ * @desc Disables duplicate application of the same equipment.
+ * @text No duplication of the same equipment
+ * @type boolean
+ * @default true
+ * 
+ * @param SetBonusEquip
+ * @text Set bonus equipment settings
+ * @desc Specifies the equipment for the set bonus.
+ * @type struct<SetBonusEquips>[]
+ * @default []
+ * 
+ * @param AllSetBonusSetting
+ * @text Set bonus setting for all equipment
+ * @default ------------------------------
+ * 
+ * @param SetBonusWeaponData
+ * @text Weapon ID for parameter setting when all equipped
+ * @desc Weapon ID to set parameters for set bonus when set bonus is max number
+ * @type weapon
+ * @default 0
+ * @parent AllSetBonusSetting
+ * 
+ * @param SetBonusArmorData
+ * @text Armor ID for parameter setting when all equipped
+ * @desc The armor ID that sets the parameters for the set bonus when the set bonus is max.
+ * @type armor
+ * @default 0
+ * @parent AllSetBonusSetting
+ * 
+ * @param SetBonusSetting
+ * @text Partial set bonus settings
+ * @default ------------------------------
+ * 
+ * @param SetBonusNumberEquipment
+ * @text Setting the number of partial sets equipped
+ * @desc Set partial set equipment.
+ * @type struct<NumberEquipment>[]
+ * @default []
+ * @parent SetBonusSetting
+ * 
+ * @param SetBonusDisplaySetting
+ * @text Set bonus display settings
+ * @default ------------------------------
+ * 
+ * @param SetBonusText
+ * @text Display text when fully equipped
+ * @desc The text to display when the set bonus is at its maximum. (Requires a separate display plug-in)
+ * @type string
+ * @default
+ * @parent SetBonusDisplaySetting
+ * 
+ * @param SetBonusParamText
+ * @text Bonus parameter text displayed when fully equipped
+ * @desc The bonus parameter text to display when equipped when the set bonus is at its maximum. (Requires a separate display plug-in)
+ * @type string
+ * @default
+ * @parent SetBonusDisplaySetting
+ * 
+ */
+/*~struct~NumberEquipment:
+ * 
+ * @param SetNumberEquip
+ * @text Set Count
+ * @desc The number of equipment in the set.
+ * @type number
+ * @default 1
+ * 
+ * @param SetNumberEquipWeaponData
+ * @text Weapon ID for setting parameters
+ * @desc Weapon ID that sets the parameters of the set bonus to apply.
+ * @type weapon
+ * @default 0
+ * 
+ * @param SetNumberEquipArmorData
+ * @text Armor ID for setting parameters
+ * @desc An armor ID that sets parameters for the set bonus to apply.
+ * @type armor
+ * @default 0
+ * 
+ * @param SetBonusText
+ * @text Display text
+ * @desc Text to display. (Requires a separate display plug-in)
+ * @type string
+ * @default 
+ * 
+ * @param SetBonusParamText
+ * @text Display bonus parameter text
+ * @desc Bonus parameter text to display. (Requires a separate display plug-in)
+ * @type string
+ * @default 
+ * 
+ */
+/*~struct~SetBonusEquips:
+ * 
+ * @param SetBonusWeapon
+ * @text Weapon
+ * @desc Weapon.
+ * @type weapon
+ * @default 0
+ * 
+ * @param SetBonusArmor
+ * @text Armor
+ * @desc Armor.
+ * @type armor
+ * @default 0
+ * 
+ */
 /*:
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -48,6 +262,9 @@
  * https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md
  * 
  * 更新履歴
+ * 2022/11/14 Ver.1.3.2
+ * 部分セットボーナスが正常に適用されていなかった問題を修正。
+ * 日本語以外での表示を英語表示に変更。
  * 2022/10/8 Ver.1.3.1
  * セットボーナスの設定を武器、防具のメモタグからのみ設定できるように修正。
  * 2022/9/23 Ver.1.3.0
@@ -283,10 +500,9 @@ Game_Actor.prototype.getTotalSetBonus = function(setBonus) {
     }, 0);
 };
 
-Game_Actor.prototype.getSetBonus = function() {
+Game_Actor.prototype.getSetBonusIds = function() {
     const equips = this.equips();
     const setBonusIds = [];
-    let setBonusEquipList = [];
     equips.forEach((equip, r) => {
         const list = this.getSetBonusData(equip);
         if (list) {
@@ -294,7 +510,7 @@ Game_Actor.prototype.getSetBonus = function() {
                 const id = isNaN(data) ? SetBonusData.findIndex(bonusData => bonusData.SetBonusName === data) : Number(data) - 1;
                 if (id >= 0 && this.isEquipInSetBonus(SetBonusData[id], equip.id)) {
                     if (!setBonusIds[id]) {
-                        setBonusIds[id] = {sum:id, equipId:[]};
+                        setBonusIds[id] = {id: id + 1, sum:0, equipId:[]};
                     }
                     if (!SetBonusData[id].SameItemDuplication || (SetBonusData[id].SameItemDuplication && setBonusIds[id].equipId.indexOf(equip.id) < 0)) {
                         setBonusIds[id].sum++;
@@ -304,6 +520,12 @@ Game_Actor.prototype.getSetBonus = function() {
             });
         }
     });
+    return setBonusIds;
+};
+
+Game_Actor.prototype.getSetBonus = function() {
+    let setBonusEquipList = [];
+    const setBonusIds = this.getSetBonusIds();
     setBonusIds.forEach((bonus, i) => {
         if (!!bonus) {
             if (bonus.sum > 1) {

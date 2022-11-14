@@ -220,7 +220,7 @@
  * @default 0
  * 
  */
-/*:
+/*:ja
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
@@ -317,7 +317,7 @@
  * @default 
  * 
  */
-/*~struct~SetBonusList:
+/*~struct~SetBonusList:ja
  * 
  * @param SetBonusName
  * @text セットボーナス名称
@@ -385,7 +385,7 @@
  * @parent SetBonusDisplaySetting
  * 
  */
-/*~struct~NumberEquipment:
+/*~struct~NumberEquipment:ja
  * 
  * @param SetNumberEquip
  * @text セット数
@@ -418,7 +418,7 @@
  * @default 
  * 
  */
-/*~struct~SetBonusEquips:
+/*~struct~SetBonusEquips:ja
  * 
  * @param SetBonusWeapon
  * @text 武器

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Equip set bonus
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -49,6 +49,8 @@
  * https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md
  * 
  * Log
+ * 11/15/2022 Ver.1.3.3
+ * Fixed an issue where non-overlapping equipment referenced weapons and armor without distinguishing between them.
  * 11/14/2022 Ver.1.3.2
  * Fixed an issue where partial set bonuses were not applying properly.
  * Changed the display in languages other than Japanese to English.
@@ -224,7 +226,7 @@
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -262,6 +264,8 @@
  * https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md
  * 
  * 更新履歴
+ * 2022/11/15 Ver.1.3.3
+ * 重複しない装備が武器、防具を区別せずに参照していた問題を修正。
  * 2022/11/14 Ver.1.3.2
  * 部分セットボーナスが正常に適用されていなかった問題を修正。
  * 日本語以外での表示を英語表示に変更。
@@ -510,11 +514,18 @@ Game_Actor.prototype.getSetBonusIds = function() {
                 const id = isNaN(data) ? SetBonusData.findIndex(bonusData => bonusData.SetBonusName === data) : Number(data) - 1;
                 if (id >= 0 && this.isEquipInSetBonus(SetBonusData[id], equip.id)) {
                     if (!setBonusIds[id]) {
-                        setBonusIds[id] = {id: id + 1, sum:0, equipId:[]};
+                        setBonusIds[id] = {id: id + 1, sum:0, wequipId:[], aequipId:[]};
                     }
-                    if (!SetBonusData[id].SameItemDuplication || (SetBonusData[id].SameItemDuplication && setBonusIds[id].equipId.indexOf(equip.id) < 0)) {
-                        setBonusIds[id].sum++;
-                        setBonusIds[id].equipId.push(equip.id);
+                    if (DataManager.isWeapon(equip)) {
+                        if (!SetBonusData[id].SameItemDuplication || (SetBonusData[id].SameItemDuplication && setBonusIds[id].wequipId.indexOf(equip.id) < 0)) {
+                            setBonusIds[id].sum++;
+                            setBonusIds[id].wequipId.push(equip.id);
+                        }
+                    } else if (DataManager.isArmor(equip)) {
+                        if (!SetBonusData[id].SameItemDuplication || (SetBonusData[id].SameItemDuplication && setBonusIds[id].aequipId.indexOf(equip.id) < 0)) {
+                            setBonusIds[id].sum++;
+                            setBonusIds[id].aequipId.push(equip.id);
+                        }
                     }
                 }
             });

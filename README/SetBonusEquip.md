@@ -1,5 +1,5 @@
 # [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
-# Ver.1.3.2
+# Ver.1.3.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -46,6 +46,8 @@ SetBonusタグがある装備が装備されており、条件を満たしてい
 ![画像](img/SetBonusEquip1.png)  
 
 ## 更新履歴
+2022/11/15 Ver.1.3.3  
+重複しない装備が武器、防具を区別せずに参照していた問題を修正。  
 2022/11/14 Ver.1.3.2  
 部分セットボーナスが正常に適用されていなかった問題を修正。  
 日本語以外での表示を英語表示に変更。  

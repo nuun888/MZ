@@ -1,5 +1,5 @@
 # [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
-# Ver.1.3.3
+# Ver.1.3.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -39,13 +39,17 @@ SetBonusタグがある装備が装備されており、条件を満たしてい
 適用するパラメータ用の武器、防具は別々に指定します。  
 
 ### その他
-表示テキスト及び表示ボーナスパラメータテキストは別途NUUN_SetBonusWindowが必要となります。  
+セットボーナス表示設定  
+表示テキスト及び表示ボーナスパラメータテキストは別途NUUN_SetBonusWindow及びNUUN_EquipStatusEX(Coming Soon)が必要となります。  
 表示テキスト例:BONUS(2SET)  
-表示ボーナスパラメータテキスト例：身代わり30％　※通常能力値は自動で表示されます。  
+表示ボーナスパラメータテキスト例：身代わり30％。リストに複数設定できます。  
+![画像](img/SetBonusEquip2.png)  
 
 ![画像](img/SetBonusEquip1.png)  
 
 ## 更新履歴
+2022/11/17 Ver.1.3.4  
+セットボーナスの表示パラメータテキストの仕様を変更。(要再設定)  
 2022/11/15 Ver.1.3.3  
 重複しない装備が武器、防具を区別せずに参照していた問題を修正。  
 2022/11/14 Ver.1.3.2  

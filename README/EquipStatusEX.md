@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.1.1
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -38,6 +38,8 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
+2022/11/17 Ver.1.2.0  
+適用している装備セットボーナスを表示できる機能を追加。(要NUUN_SetBonusEquip)  
 2022/11/14 Ver.1.1.1  
 装備画面を開くとエラーが出る問題を修正。  
 2022/11/14 Ver.1.1.0  

@@ -40,7 +40,7 @@ SetBonusタグがある装備が装備されており、条件を満たしてい
 
 ### その他
 セットボーナス表示設定  
-表示テキスト及び表示ボーナスパラメータテキストは別途NUUN_SetBonusWindow及びNUUN_EquipStatusEX(Coming Soon)が必要となります。  
+表示テキスト及び表示ボーナスパラメータテキストは別途NUUN_SetBonusWindow及びNUUN_EquipStatusEXが必要となります。  
 表示テキスト例:BONUS(2SET)  
 表示ボーナスパラメータテキスト例：身代わり30％。リストに複数設定できます。  
 ![画像](img/SetBonusEquip2.png)  

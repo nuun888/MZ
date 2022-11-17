@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Equip set bonus
  * @author NUUN
- * @version 1.3.3
+ * @version 1.3.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -40,15 +40,20 @@
  * If you have 4 pieces of equipment that require set bonuses, you can set the bonuses to apply to 2 or more of them, and 3 or more of them.
  * Weapons and armor for parameters to apply are specified separately.
  * 
- * 
- * "NUUN_SetBonusWindow" is required separately for display text and display bonus parameter text.
+ * Set bonus display settings
+ * Display text and display bonus parameter text require "NUUN_SetBonusWindow" and "NUUN_EquipStatusEX" separately.
  * Display text example:BONUS(2SET)
- * Display bonus parameter text example: Substitution 30%　*Normal ability values are displayed automatically.
+ * Display bonus parameter text example: scapegoat 30%. You can set more than one in the list.
  * 
  * Explanation
  * https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md
  * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
  * Log
+ * 11/17/2022 Ver.1.3.4
+ * Changed the specification of the display parameter text of the set bonus. (Reset required)
  * 11/15/2022 Ver.1.3.3
  * Fixed an issue where non-overlapping equipment referenced weapons and armor without distinguishing between them.
  * 11/14/2022 Ver.1.3.2
@@ -161,16 +166,16 @@
  * 
  * @param SetBonusText
  * @text Display text when fully equipped
- * @desc The text to display when the set bonus is at its maximum. (Requires a separate display plug-in)
+ * @desc The text to display when the set bonus is at its maximum. 
  * @type string
  * @default
  * @parent SetBonusDisplaySetting
  * 
  * @param SetBonusParamText
  * @text Bonus parameter text displayed when fully equipped
- * @desc The bonus parameter text to display when equipped when the set bonus is at its maximum. (Requires a separate display plug-in)
+ * @desc Bonus parameter text to display when equipped when set bonus is max. Please add it to the applicable effect list.
  * @type string
- * @default
+ * @default []
  * @parent SetBonusDisplaySetting
  * 
  */
@@ -194,17 +199,23 @@
  * @type armor
  * @default 0
  * 
+ * @param PartialSetBonusDisplaySetting
+ * @text Set bonus display settings
+ * @default ------------------------------
+ * 
  * @param SetBonusText
  * @text Display text
- * @desc Text to display. (Requires a separate display plug-in)
+ * @desc Text to display.
  * @type string
  * @default 
+ * @parent PartialSetBonusDisplaySetting
  * 
  * @param SetBonusParamText
  * @text Display bonus parameter text
- * @desc Bonus parameter text to display. (Requires a separate display plug-in)
- * @type string
+ * @desc Bonus parameter text to display. Please add it to the applicable effect list.
+ * @type string []
  * @default 
+ * @parent PartialSetBonusDisplaySetting
  * 
  */
 /*~struct~SetBonusEquips:
@@ -226,7 +237,7 @@
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
- * @version 1.3.3
+ * @version 1.3.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -255,15 +266,17 @@
  * セットボーナスが必要な装備が４つなら、そのうち2つ以上、3つ以上なら適用するボーナスをそれぞれ設定できます。
  * 適用するパラメータ用の武器、防具は別々に指定します。
  * 
- * 
- * 表示テキスト及び表示ボーナスパラメータテキストは別途NUUN_SetBonusWindowが必要となります。
+ * セットボーナス表示設定
+ * 表示テキスト及び表示ボーナスパラメータテキストは別途NUUN_SetBonusWindow及びNUUN_EquipStatusEXが必要となります。
  * 表示テキスト例:BONUS(2SET)
- * 表示ボーナスパラメータテキスト例：身代わり30％　※通常能力値は自動で表示されます。
+ * 表示ボーナスパラメータテキスト例：身代わり30％。リストに複数設定できます。
  * 
  * 説明
  * https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md
  * 
  * 更新履歴
+ * 2022/11/17 Ver.1.3.4
+ * セットボーナスの表示パラメータテキストの仕様を変更。(要再設定)
  * 2022/11/15 Ver.1.3.3
  * 重複しない装備が武器、防具を区別せずに参照していた問題を修正。
  * 2022/11/14 Ver.1.3.2
@@ -376,15 +389,15 @@
  * 
  * @param SetBonusText
  * @text 全装備時表示テキスト
- * @desc セットボーナスが最大数時の表示するテキスト(別途表示するプラグインが必要です)
+ * @desc セットボーナスが最大数時の表示するテキスト。
  * @type string
  * @default
  * @parent SetBonusDisplaySetting
  * 
  * @param SetBonusParamText
  * @text 全装備時表示ボーナスパラメータテキスト
- * @desc セットボーナスが最大数時の装備時の表示するボーナスパラメータテキスト(別途表示するプラグインが必要です)
- * @type string
+ * @desc セットボーナスが最大数時の装備時の表示するボーナスパラメータテキスト。適用効果分リストに追加してください。
+ * @type string[]
  * @default
  * @parent SetBonusDisplaySetting
  * 
@@ -409,17 +422,23 @@
  * @type armor
  * @default 0
  * 
+ * @param PartialSetBonusDisplaySetting
+ * @text セットボーナス表示設定
+ * @default ------------------------------
+ * 
  * @param SetBonusText
  * @text 表示テキスト
- * @desc 表示するテキスト(別途表示するプラグインが必要です)
+ * @desc 表示するテキスト。
  * @type string
  * @default 
+ * @parent PartialSetBonusDisplaySetting
  * 
  * @param SetBonusParamText
  * @text 表示ボーナスパラメータテキスト
- * @desc 表示するボーナスパラメータテキスト(別途表示するプラグインが必要です)
- * @type string
+ * @desc 表示するボーナスパラメータテキスト。適用効果分リストに追加してください。
+ * @type string[]
  * @default 
+ * @parent PartialSetBonusDisplaySetting
  * 
  */
 /*~struct~SetBonusEquips:ja

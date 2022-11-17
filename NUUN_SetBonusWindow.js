@@ -5,12 +5,72 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Set bonus tooltip window
+ * @author NUUN
+ * @version 1.0.3
+ * @base NUUN_Base
+ * @base NUUN_SetBonusEquip
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * Displays the set bonus currently applied to the equipment currently selected in the equipment slot on the equipment screen.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/17/2022 Ver.1.0.3
+ * Applied equipment set bonus Modified by changing the display setting method of the set bonus.
+ * 10/8/2022 Ver.1.0.2
+ * Fixed by changing set bonus definition.
+ * 7/16/2022 Ver.1.0.1
+ * Fixed tooltips appearing when hovering over gear without set bonuses.
+ * 7/7/2022 Ver.1.0.0
+ * first edition.
+ * 
+ * @param SetBonusFontSize
+ * @text FontSize
+ * @desc Font size (difference from main font)
+ * @type number
+ * @min -99
+ * @default 0
+ * 
+ * @param SetBonusNameColor
+ * @desc Text color for the set bonus name. You can enter the color code in the text tab.
+ * @text Set bonus name text color
+ * @type number
+ * @default 16
+ * @min 0
+ * 
+ * @param WindowDuration
+ * @desc Number of frames to display.
+ * @text Number of display waiting frames
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param WindowWidth
+ * @desc WindowWidth.
+ * @text WindowWidth
+ * @type number
+ * @default 400
+ * @min 0
+ * 
+ * @param HelpOver
+ * @desc Allows tooltip windows to be displayed on top of help windows.
+ * @text Help window top display
+ * @type boolean
+ * @default false
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc セットボーナスツールチップウィンドウ
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -19,6 +79,8 @@
  * 装備画面で装備スロット選択中の装備で現在適用しているセットボーナスを表示します。
  * 
  * 更新履歴
+ * 2022/11/17 Ver.1.0.3
+ * 装備セットボーナスの適用セットボーナスの表示設定方法の仕様変更による修正。
  * 2022/10/8 Ver.1.0.2
  * セットボーナス定義変更による修正。
  * 2022/7/16 Ver.1.0.1
@@ -39,12 +101,6 @@
  * @type number
  * @default 16
  * @min 0
- * 
- * @param SetBonusParamText
- * @text パラメータテキスト設定
- * @desc パラメータテキストの設定を行います。
- * @type struct<textsList>
- * @default {"HPName":"HP","MPName":"MP","ATKName":"ATK","DEFName":"DEF","MATName":"MAT","MDFName":"MDF","AGIName":"AGI","LukName":"LUK"}
  * 
  * @param WindowDuration
  * @desc 表示までのフレーム数。
@@ -67,63 +123,12 @@
  * @default false
  * 
  */
-/*~struct~textsList:
- * 
- * @param HPName
- * @text セットボーナス名称
- * @desc セットボーナスを区別するための名称。
- * @type string
- * @default HP
- * 
- * @param MPName
- * @text セットボーナス名称
- * @desc セットボーナスを区別するための名称。
- * @type string
- * @default MP
- * 
- * @param ATKName
- * @text セットボーナス名称
- * @desc セットボーナスを区別するための名称。
- * @type string
- * @default ATK
- * 
- * @param DEFName
- * @text セットボーナス名称
- * @desc セットボーナスを区別するための名称。
- * @type string
- * @default DEF
- * 
- * @param MATName
- * @text セットボーナス名称
- * @desc セットボーナスを区別するための名称。
- * @type string
- * @default MAT
- * 
- * @param MDFName
- * @text セットボーナス名称
- * @desc セットボーナスを区別するための名称。
- * @type string
- * @default MDF
- * 
- * @param AGIName
- * @text セットボーナス名称
- * @desc セットボーナスを区別するための名称。
- * @type string
- * @default AGI
- * 
- * @param LukName
- * @text セットボーナス名称
- * @desc セットボーナスを区別するための名称。
- * @type string
- * @default LUK
- * 
- */
+
 var Imported = Imported || {};
 Imported.NUUN_SetBonusWindow = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_SetBonusWindow');
-const SetBonusParamText = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SetBonusParamText'])) : null) || [];
 const SetBonusFontSize = Number(parameters['SetBonusFontSize'] || 0);
 const SetBonusNameColor = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SetBonusNameColor'])) : 16);
 const WindowDuration = Number(parameters['WindowDuration'] || 0);
@@ -254,21 +259,19 @@ Window_SetBounsEquip.prototype.refresh = function() {
             this.resetTextColor();
             y += lineHeight;
             this.horzLine(rect.x, y, rect.width);
+            y += lineHeight;
             data.SetBonusNumberEquipment.forEach(numberEquip => {
                 if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
-                    y += lineHeight;
+                    y += lineHeight * this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
                     contentsRows++;
-                    this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
                 } else if (!(data.SetBonusEquip && data.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
-                    y += lineHeight;
+                    y += lineHeight * this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
                     contentsRows++;
-                    this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
                 }
             });
             if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && data.SetBonusEquip.length === setBonusSum) {
-                y += lineHeight;
+                y += lineHeight * this.drawSetBonusParam(data, rect.x, y, rect.width);
                 contentsRows++;
-                this.drawSetBonusParam(data, rect.x, y, rect.width);
             }
             this.height = this.fittingHeight(contentsRows + 2);
             this._onRefresh = true;
@@ -291,62 +294,53 @@ Window_SetBounsEquip.prototype.drawSetBonusName = function(name, x, y, width) {
 Window_SetBounsEquip.prototype.drawSetBonusParam = function(data, x, y, width) {
     const equip = this.getSetBonusEquip(data.SetBonusWeaponData, data.SetBonusArmorData);
     if (equip) {
+        let text = '';
+        let textWidth = 0;
         if (data.SetBonusText) {
             this.changeTextColor(this.systemColor());
             this.drawText(data.SetBonusText, x, y, width);
-            const textWidth = this.textWidth(data.SetBonusText);
-            x += textWidth  + this.itemPadding();
-        }
-        let text = this.getSetBonusParam(equip);
-        if (data.SetBonusParamText) {
-            text += text ? ','+ data.SetBonusParamText : data.SetBonusParamText;
+            textWidth = this.textWidth(data.SetBonusText) + this.itemPadding();
         }
         this.resetTextColor();
-        this.drawText(text, x, y, width);
+        const setBonusParamText = data.SetBonusParamText || [];
+        setBonusParamText.forEach(textData => {
+            if (textData) {
+                text += text ? ','+ textData : textData;
+            }
+            if (!!text) {
+                this.drawText(text, x + textWidth, y, width - textWidth);
+            }
+        });
     }
+    return 1;
 };
 
 Window_SetBounsEquip.prototype.drawSetBonusNumberEquipment = function(data, x, y, width) {
     const equip = this.getSetBonusEquip(data.SetNumberEquipWeaponData, data.SetNumberEquipArmorData);
     if (equip) {
+        let text = '';
+        let textWidth = 0;
         if (data.SetBonusText) {
             this.changeTextColor(this.systemColor());
             this.drawText(data.SetBonusText, x, y, width);
-            const textWidth = this.textWidth(data.SetBonusText);
-            x += textWidth  + this.itemPadding();
-        }
-        let text = this.getSetBonusParam(equip);
-        if (data.SetBonusParamText) {
-            text += text ? ','+ data.SetBonusParamText : data.SetBonusParamText;
+            textWidth = this.textWidth(data.SetBonusText) + this.itemPadding();
         }
         this.resetTextColor();
-        this.drawText(text, x, y, width);
+        const setBonusParamText = data.SetBonusParamText || [];
+        setBonusParamText.forEach(textData => {
+            if (textData) {
+                text += text ? ','+ textData : textData;
+            }
+            if (!!text) {
+                this.drawText(text, x + textWidth, y, width - textWidth);
+            }
+        });
     }
+    return 1;
 };
 
 Window_SetBounsEquip.prototype.fittingHeight = function(numLines) {
     return numLines * this.getFontSize() + $gameSystem.windowPadding() * 2 + (this.itemHeight() - this.getFontSize());
-};
-
-Window_SetBounsEquip.prototype.getParamText = function(paramId) {
-    switch (paramId) {
-        case 0:
-            return SetBonusParamText.HPName;
-        case 1:
-            return SetBonusParamText.MPName;
-        case 2:
-            return SetBonusParamText.ATKName;
-        case 3:
-            return SetBonusParamText.DEFName;
-        case 4:
-            return SetBonusParamText.MATName;
-        case 5:
-            return SetBonusParamText.MDFName;
-        case 6:
-            return SetBonusParamText.AGIName;
-        case 7:
-            return SetBonusParamText.LUKName;
-    }
 };
 
 Window_SetBounsEquip.prototype.getSetBonusEquip = function(weaponId, armorId) {
@@ -357,20 +351,6 @@ Window_SetBounsEquip.prototype.getSetBonusEquip = function(weaponId, armorId) {
     } else {
         return null;
     }
-};
-
-Window_SetBounsEquip.prototype.getSetBonusParam = function(equip) {
-    let text = '';
-    for (i = 0; i < 8; i++) {
-        const param = equip.params[i];
-        if (param !== 0) {
-            if (text) {
-                text += ',';
-            }
-            text += this.getParamText(i) + (param > 0 ? '+' : '-') + param;
-        }
-    }
-    return text;
 };
 
 Window_SetBounsEquip.prototype.getFontSize = function() {

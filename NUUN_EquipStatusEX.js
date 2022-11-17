@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * Expands the display of equipment status.
@@ -35,6 +35,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/17/2022 Ver.1.2.0
+ * Added the ability to view the gear set bonuses you have applied. (Requires "NUUN_SetBonusEquip")
  * 11/14/2022 Ver.1.1.1
  * Fixed an issue that caused an error when opening the equip screen.
  * 11/14/2022 Ver.1.1.0
@@ -281,6 +283,16 @@
  * @min 0
  * @parent GaugeSetting
  * 
+ * @param EquipSetBonusSetting
+ * @text Equip set bonus settings
+ * @default ------------------------------
+ * 
+ * @param SetBonusLineHeight
+ * @desc Item height.
+ * @text Item height
+ * @type number
+ * @default 36
+ * 
  */
  /*~struct~ElementData:
  *
@@ -432,6 +444,8 @@
  * @value 101
  * @option Text(1)(2)(3)(4)(5)(6)(8)(13)(14)
  * @value 150
+ * @option Equip set bonus(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @value 180
  * @option Character chip(1)(2)(3)(4)
  * @value 200
  * @option SV Actor(1)(2)(3)(4)
@@ -724,7 +738,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -748,6 +762,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/17 Ver.1.2.0
+ * 適用している装備セットボーナスを表示できる機能を追加。(要NUUN_SetBonusEquip)
  * 2022/11/14 Ver.1.1.1
  * 装備画面を開くとエラーが出る問題を修正。
  * 2022/11/14 Ver.1.1.0
@@ -994,6 +1010,17 @@
  * @min 0
  * @parent GaugeSetting
  * 
+ * @param EquipSetBonusSetting
+ * @text 装備セットボーナス設定
+ * @default ------------------------------
+ * 
+ * @param SetBonusLineHeight
+ * @desc 項目高さ。
+ * @text 項目高さ
+ * @type number
+ * @default 36
+ * 
+ * 
  */
 /*~struct~ElementData:ja
  *
@@ -1145,6 +1172,8 @@
  * @value 101
  * @option 記述欄(1)(2)(3)(4)(5)(6)(8)(13)(14)
  * @value 150
+ * @option 装備セットボーナス(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @value 180
  * @option キャラチップ(1)(2)(3)(4)
  * @value 200
  * @option SVアクター(1)(2)(3)(4)
@@ -1454,6 +1483,7 @@ Imported.NUUN_EquipStatusEX = true;
     const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
     const ActorImg_X = Number(parameters['ActorImg_X'] || 0);
     const ActorImg_Y = Number(parameters['ActorImg_Y'] || 0);
+    const SetBonusLineHeight = Number(parameters['SetBonusLineHeight'] || 36);
 
     const equipContents = {};
     equipContents.PageList1 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipPageList1'])) : [];
@@ -1790,11 +1820,14 @@ Imported.NUUN_EquipStatusEX = true;
             break;
         case 102:
             break;
-        case 111:
-            this.drawSetBonus(data, actor, x, y, width);
-            break;
         case 150:
             this.drawDesc(data, actor, x, y, width);
+            break;
+        case 160:
+            this.drawSpecialStatus(data, actor, x, y, width);
+            break;
+        case 180:
+            this.drawSetBonus(data, actor, x, y, width);
             break;
         case 200:
             this.contentsDrawActorChip(data, x, y, width, actor);
@@ -2035,11 +2068,55 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawSetBonus = function(data, actor, x, y, width) {
-        
+    Window_EquipStatus.prototype.drawSpecialStatus = function(data, actor, x, y, width) {
+        const lineHeight = SetBonusLineHeight;
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const name = data.ParamName ? data.ParamName : null;
+        if (name) {
+            this.drawText(name, x, y, data.SystemItemWidth);
+            y += lineHeight;
+        }
+        const a = this._tempActor ? this._tempActor : actor;
+        const equips = a.equips();
+        for (const equip of equips) {
+            
+        }
     };
 
-    
+    Window_EquipStatus.prototype.drawSetBonus = function(data, actor, x, y, width) {
+        const lineHeight = SetBonusLineHeight;
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const name = data.ParamName ? data.ParamName : null;
+        if (name) {
+            this.drawText(name, x, y, data.SystemItemWidth);
+            y += lineHeight;
+        }
+        const a = this._tempActor ? this._tempActor : actor;
+        const list = a.getSetBonusIds().filter(bonus => !!bonus);
+        list.forEach(setBonusId => {
+            const setData = NuunManager.getSetBonusData(setBonusId.id);
+            const setBonusSum = setBonusId.sum;
+            this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const name = setData.SetBonusName;
+            this.drawSetBonusName(name, x, y, width);
+            this.resetTextColor();
+            y += lineHeight;
+            this.horzLine(data, x, y, width, actor);
+            y += lineHeight;
+            setData.SetBonusNumberEquipment.forEach(numberEquip => {
+                if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
+                    y += lineHeight * this.drawSetBonusNumberEquipment(data, numberEquip, x, y, width);
+                } else if (!(setData.SetBonusEquip && setData.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
+                    y += lineHeight * this.drawSetBonusNumberEquipment(data, numberEquip, x, y, width);
+                }
+            });
+            if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && setData.SetBonusEquip.length === setBonusSum) {
+                y += lineHeight * this.drawSetBonusParam(data, setData, x, y, width);
+            }
+        });
+    };
 
     Window_EquipStatus.prototype.drawElement = function(data, actor, x, y, width) {
         const lineHeight = this.lineHeight();
@@ -2238,25 +2315,76 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.getParamText = function(paramId) {
-        switch (paramId) {
-            case 0:
-                return SetBonusParamText.HPName;
-            case 1:
-                return SetBonusParamText.MPName;
-            case 2:
-                return SetBonusParamText.ATKName;
-            case 3:
-                return SetBonusParamText.DEFName;
-            case 4:
-                return SetBonusParamText.MATName;
-            case 5:
-                return SetBonusParamText.MDFName;
-            case 6:
-                return SetBonusParamText.AGIName;
-            case 7:
-                return SetBonusParamText.LUKName;
+    Window_EquipStatus.prototype.drawSetBonusName = function(name, x, y, width) {
+        this.drawText(name, x, y, width);
+    };
+    
+    Window_EquipStatus.prototype.drawSetBonusParam = function(data, numberEquip, x, y, width) {
+        const equip = getSetBonusEquip(numberEquip.SetBonusWeaponData, numberEquip.SetBonusArmorData);
+        let rows = 0;
+        if (equip) {
+            let text = '';
+            let textWidth = 0;
+            if (numberEquip.SetBonusText) {
+                this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+                this.drawText(numberEquip.SetBonusText, x, y, width);
+                textWidth = this.textWidth(numberEquip.SetBonusText) + this.itemPadding();
+            }
+            this.resetTextColor();
+            const setBonusParamText = numberEquip.SetBonusParamText || [];
+            setBonusParamText.forEach(textData => {
+                const statusWidth = this.textWidth(textData) + textWidth;
+                if (statusWidth > width && !!text) {
+                    this.drawText(text, x + textWidth, y, width - textWidth);
+                    text = '';
+                    textWidth = 0;
+                    y += SetBonusLineHeight;
+                    rows++;
+                }
+                if (!!textData) {
+                    text += text ? ','+ textData : textData;
+                }
+            });
+            if (!!text) {
+                this.drawText(text, x + textWidth, y, width - textWidth);
+                rows++;
+            }
         }
+        return rows;
+    };
+    
+    Window_EquipStatus.prototype.drawSetBonusNumberEquipment = function(data, numberEquip, x, y, width) {
+        const equip = getSetBonusEquip(numberEquip.SetNumberEquipWeaponData, numberEquip.SetNumberEquipArmorData);
+        let rows = 0;
+        if (equip) {
+            let text = '';
+            let textWidth = 0;
+            if (numberEquip.SetBonusText) {
+                this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+                this.drawText(numberEquip.SetBonusText, x, y, width);
+                textWidth = this.textWidth(numberEquip.SetBonusText) + this.itemPadding();
+            }
+            this.resetTextColor();
+            const setBonusParamText = numberEquip.SetBonusParamText || [];
+            setBonusParamText.forEach(textData => {
+                const statusWidth = this.textWidth(textData) + textWidth;
+                if (statusWidth > width && !!text) {
+                    this.drawText(text, x + textWidth, y, width - textWidth);
+                    text = '';
+                    textWidth = 0;
+                    y += SetBonusLineHeight;
+                    rows++;
+                }
+                if (!!textData) {
+                    text += text ? ','+ textData : textData;
+                }
+            });
+            if (!!text) {
+                this.drawText(text, x + textWidth, y, width - textWidth);
+                rows++;
+            }
+        }
+        return rows;
     };
 
 
@@ -2383,6 +2511,17 @@ Imported.NUUN_EquipStatusEX = true;
       
     Sprite_EquipSvActor.prototype.setupWeaponAnimation = function() {
         
+    };
+
+
+    function getSetBonusEquip(weaponId, armorId) {
+        if (weaponId > 0) {
+            return $dataWeapons[weaponId];
+        } else if (armorId > 0) {
+            return $dataArmors[armorId];
+        } else {
+            return null;
+        }
     };
       
 

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.0
+ * @version 2.17.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -183,6 +183,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/19 Ver.2.17.1
+ * 撃破時に図鑑に登録及び、ステータス登録が行われない問題を修正。
+ * アナライズ時に図鑑に登録及び、ステータス登録が行われない問題を修正。
  * 2022/11/19 Ver.2.17.0
  * 項目名称の横にアイコンを表示できる機能を追加。
  * 2022/11/12 Ver.2.16.5
@@ -3844,16 +3847,16 @@ Game_BattlerBase.prototype.die = function() {
     _Game_BattlerBase_die.call(this);
     if (this.isEnemy()) {
         const enemyId = this.enemyId();
-        if ($gameSystem.registrationTiming(3)) {
+        if ($gameSystem.registrationTiming(1)) {
             $gameSystem.addToEnemyBook(enemyId);
         }
-        if ($gameSystem.registrationStatusTiming(3)) {
+        if ($gameSystem.registrationStatusTiming(1)) {
             if (!$gameSystem.getEnemyBookFlag(enemyId)) {
                 $gameSystem.addToEnemyBook(enemyId);
             }
             $gameSystem.addStatusToEnemyBook(enemyId);
         }
-    $gameSystem.defeatCount(enemyId);
+        $gameSystem.defeatCount(enemyId);
     }
 };
 
@@ -3940,7 +3943,6 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
 
 Game_Action.prototype.bookSkill = function(target) {
     this.enemyInfoSkill(target);
-    this.analyzeSkill(target);
 };
 
 Game_Action.prototype.enemyInfoSkill = function(target) {
@@ -3967,6 +3969,7 @@ Game_Action.prototype.analyzeSkill = function(target) {
                 if (data[0] === 0 && data[1] > 0) {
                     $gameVariables.setValue(CommonVariableID, target.enemy().id);
                     $gameTemp.reserveCommonEvent(data[1]);
+                    SceneManager._scene.addEnemyDataEnemyBook(target);
                 } else {
                     SceneManager._scene.setEnemyBookEnemyAnalyze(target, analyzeSkill);
                 }
@@ -4724,6 +4727,7 @@ Scene_Battle.prototype.setEnemyBookInfo = function() {
 };
 
 Scene_Battle.prototype.setEnemyBookEnemyAnalyze = function(target, analyzeDate) {
+    this.addEnemyDataEnemyBook(target);
     const rect = this.enemyBookAnalyzeWindowRect();
     const pageRect = this.enemyBookPageWindowRect();
     const id = analyzeDate.ListNumber;
@@ -4913,6 +4917,19 @@ Scene_Battle.prototype.updateCancelButton = function() {
         this._cancelButton.visible = !BattleManager.enemyBook_Open;
     }
   }
+};
+
+Scene_Battle.prototype.addEnemyDataEnemyBook = function(enemy) {
+    const enemyId = enemy.enemyId();console.log(enemy)
+    if ($gameSystem.registrationTiming(2)) {
+        $gameSystem.addToEnemyBook(enemyId);
+    }
+    if ($gameSystem.registrationStatusTiming(2)) {
+        if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+            $gameSystem.addToEnemyBook(enemyId);
+        }
+        $gameSystem.addStatusToEnemyBook(enemyId);
+    }
 };
 
 const _Window_Selectable_isOpenAndActive = Window_Selectable.prototype.isOpenAndActive;

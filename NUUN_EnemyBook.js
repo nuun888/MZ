@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.16.5
+ * @version 2.17.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -183,6 +183,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/19 Ver.2.17.0
+ * 項目名称の横にアイコンを表示できる機能を追加。
  * 2022/11/12 Ver.2.16.5
  * 敵のレベルを表示する機能を追加。
  * APNG関連の修正。
@@ -2135,113 +2137,113 @@
  * @type select
  * @option 表示なし
  * @value 0
- * @option 最大HP(1)～(14)(16)
+ * @option 最大HP(1)～(14)(16)(20)(21)
  * @value 1
- * @option 最大MP(1)～(14)(16)
+ * @option 最大MP(1)～(14)(16)(20)(21)
  * @value 2
- * @option 攻撃力(1)～(14)(16)
+ * @option 攻撃力(1)～(14)(16)(20)(21)
  * @value 3
- * @option 防御力(1)～(14)(16)
+ * @option 防御力(1)～(14)(16)(20)(21)
  * @value 4
- * @option 魔法力(1)～(14)(16)
+ * @option 魔法力(1)～(14)(16)(20)(21)
  * @value 5
- * @option 魔法防御(1)～(14)(16)
+ * @option 魔法防御(1)～(14)(16)(20)(21)
  * @value 6
- * @option 敏捷性(1)～(14)(16)
+ * @option 敏捷性(1)～(14)(16)(20)(21)
  * @value 7
- * @option 運(1)～(14)(16)
+ * @option 運(1)～(14)(16)(20)(21)
  * @value 8
- * @option TP（現在のステータスをONのときのみ）(1)～(16)
+ * @option TP（現在のステータスをONのときのみ）(1)～(16)(20)(21)
  * @value 9
- * @option 命中率(1)～(16)
+ * @option 命中率(1)～(16)(20)(21)
  * @value 10
- * @option 回避率(1)～(16)
+ * @option 回避率(1)～(16)(20)(21)
  * @value 11
- * @option 会心率(1)～(16)
+ * @option 会心率(1)～(16)(20)(21)
  * @value 12
- * @option 会心回避率(1)～(16)
+ * @option 会心回避率(1)～(16)(20)(21)
  * @value 13
- * @option 魔法回避率(1)～(16)
+ * @option 魔法回避率(1)～(16)(20)(21)
  * @value 14
- * @option 魔法反射率(1)～(16)
+ * @option 魔法反射率(1)～(16)(20)(21)
  * @value 15
- * @option 反撃率(1)～(16)
+ * @option 反撃率(1)～(16)(20)(21)
  * @value 16
- * @option HP再生率(1)～(16)
+ * @option HP再生率(1)～(16)(20)(21)
  * @value 17
- * @option MP再生率(1)～(16)
+ * @option MP再生率(1)～(16)(20)(21)
  * @value 18
- * @option TP再生率(1)～(16)
+ * @option TP再生率(1)～(16)(20)(21)
  * @value 19
- * @option 狙われ率(1)～(16)
+ * @option 狙われ率(1)～(16)(20)(21)
  * @value 20
- * @option 防御効果率(1)～(16)
+ * @option 防御効果率(1)～(16)(20)(21)
  * @value 21
- * @option 回復効果率(1)～(16)
+ * @option 回復効果率(1)～(16)(20)(21)
  * @value 22
- * @option 薬の知識(1)～(16)
+ * @option 薬の知識(1)～(16)(20)(21)
  * @value 23
- * @option MP消費率(1)～(16)
+ * @option MP消費率(1)～(16)(20)(21)
  * @value 24
- * @option TPチャージ率(1)～(16)
+ * @option TPチャージ率(1)～(16)(20)(21)
  * @value 25
- * @option 物理ダメージ率(1)～(16)
+ * @option 物理ダメージ率(1)～(16)(20)(21)
  * @value 26
- * @option 魔法ダメージ率(1)～(16)
+ * @option 魔法ダメージ率(1)～(16)(20)(21)
  * @value 27
- * @option 経験値(1)～(14)(16)
+ * @option 経験値(1)～(14)(16)(20)(21)
  * @value 30
- * @option 獲得金額(1)～(14)(16)
+ * @option 獲得金額(1)～(14)(16)(20)(21)
  * @value 31
- * @option 倒した数(1)～(14)(16)
+ * @option 倒した数(1)～(14)(16)(20)(21)
  * @value 32
- * @option モンスター名(1)～(5)(7)(8)(9)(12)(16)
+ * @option モンスター名(1)～(5)(7)(8)(9)(12)(16)(20)(21)
  * @value 33
- * @option レベル(戦闘時のみ)(1)～(12)(16)
+ * @option レベル(戦闘時のみ)(1)～(12)(16)(20)(21)
  * @value 34
- * @option 名称のみ(1)～(5)(7)(8)(9)(12)(16)
+ * @option 名称のみ(1)～(5)(7)(8)(9)(12)(16)(20)(21)
  * @value 35
- * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）(1)～(14)(16)
+ * @option ターン（TPBバトルで現在のステータスをONにしている時のみ表示）(1)～(14)(16)(20)(21)
  * @value 36
  * @option モンスターブックナンバー(1)～(5)(7)(8)(9)(12)(16)
  * @value 37
- * @option 耐性属性（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)
+ * @option 耐性属性（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 40
- * @option 弱点属性（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)
+ * @option 弱点属性（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 41
- * @option 無効属性（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)
+ * @option 無効属性（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 42
- * @option 属性耐性（耐性数値表示）(1)～(16)
+ * @option 属性耐性（耐性数値表示）(1)～(16)(20)(21)
  * @value 43
- * @option 耐性ステート（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)
+ * @option 耐性ステート（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 45
- * @option 弱点ステート（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)
+ * @option 弱点ステート（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 46
- * @option 無効ステート（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)
+ * @option 無効ステート（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 47
- * @option 耐性ステート（耐性数値表示）(1)～(16)
+ * @option 耐性ステート（耐性数値表示）(1)～(16)(20)(21)
  * @value 48
- * @option 耐性デバフ（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)
+ * @option 耐性デバフ（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 50
- * @option 弱点デバフ（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)
+ * @option 弱点デバフ（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 51
- * @option ドロップアイテム(1)～(15)
+ * @option ドロップアイテム(1)～(15)(20)(21)
  * @value 60
- * @option スティールアイテム(1)～(15)
+ * @option スティールアイテム(1)～(15)(20)(21)
  * @value 61
- * @option 条件付きドロップアイテム(1)～(15)
+ * @option 条件付きドロップアイテム(1)～(15)(20)(21)
  * @value 62
- * @option 記述欄(1)～(5)(7)(8)(9)(12)(13)(17)
+ * @option 記述欄(1)～(5)(7)(8)(9)(12)(13)(17)(20)(21)
  * @value 70
- * @option 共通記述欄(1)～(5)(7)(8)(9)(12)(13)(20)
+ * @option 共通記述欄(1)～(5)(7)(8)(9)(12)(13)(20)(20)(21)
  * @value 71
- * @option オリジナルパラメータ(1)～(16)
+ * @option オリジナルパラメータ(1)～(16)(20)(21)
  * @value 80
- * @option 敵の使用スキル(1)～(15)
+ * @option 敵の使用スキル(1)～(15)(20)(21)
  * @value 100
- * @option 属性レーダーチャート
+ * @option 属性レーダーチャート(1)～(5)(8)(9)(12)(20)(21)
  * @value 121
- * @option ステートレーダーチャート
+ * @option ステートレーダーチャート(1)～(5)(8)(9)(12)(20)(21)
  * @value 122
  * @option モンスター画像(1)(2)(3)(4)(5)(7)(19)
  * @value 200
@@ -2300,8 +2302,8 @@
  * @parent BasicSetting
  * 
  * @param SystemItemWidth
- * @desc システム項目の横幅（0で自動）
- * @text システム項目横幅(6)
+ * @desc 項目名称の横幅（0で自動）
+ * @text 項目名称横幅(6)
  * @type number
  * @default 0
  * @min 0
@@ -2328,8 +2330,8 @@
  * @parent BasicSetting
  * 
  * @param NameColor
- * @desc システム項目の文字色。(システムカラーまたはカラーコード)
- * @text システム項目文字色(9)
+ * @desc 項目名称の文字色。(システムカラーまたはカラーコード)
+ * @text 項目名称文字色(9)
  * @type number
  * @default 16
  * @min 0
@@ -2426,6 +2428,18 @@
  * @min 0
  * @parent ImgSetting
  * 
+ * @param IconId
+ * @text アイコンID(20)
+ * @desc 項目名称の左にアイコンを表示します。アイコンのIDを指定します。
+ * @type number
+ * @default 0
+ * 
+ * @param IconY
+ * @text アイコン補正Y値(21)
+ * @desc アイコンの補正Y値を指定します。
+ * @type number
+ * @default 2
+ * 
  */
 /*~struct~CategoryPageListData:
  * 
@@ -2452,7 +2466,6 @@
  * @option ライン(1)(2)(3)(4)(5)(7)(9)
  * @value 1000
  * @default 0
- * @parent BasicSetting
  * 
  * @param X_Position
  * @text X表示列位置(1)
@@ -2461,7 +2474,6 @@
  * @default 1
  * @min 1
  * @max 3
- * @parent BasicSetting
  * 
  * @param Y_Position
  * @desc Y表示行位置
@@ -2469,7 +2481,6 @@
  * @type number
  * @default 1
  * @min 1
- * @parent BasicSetting
  * 
  * @param X_Coordinate
  * @text X座標（相対）(3)
@@ -2477,7 +2488,6 @@
  * @type number
  * @default 0
  * @min -9999
- * @parent BasicSetting
  * 
  * @param Y_Coordinate
  * @text Y座標（相対）(4)
@@ -2485,7 +2495,6 @@
  * @type number
  * @default 0
  * @min -9999
- * @parent BasicSetting
  * 
  * @param ItemWidth
  * @desc 項目横幅（0で自動）
@@ -2493,15 +2502,13 @@
  * @type number
  * @default 0
  * @min 0
- * @parent BasicSetting
  * 
  * @param SystemItemWidth
- * @desc システム項目の横幅（0で自動）
- * @text システム項目横幅(6)
+ * @desc 項目名称の横幅（0で自動）
+ * @text 項目名称横幅(6)
  * @type number
  * @default 0
  * @min 0
- * @parent BasicSetting
  * 
  * @param WideMode
  * @desc 項目表示モード。複数列にまたがって表示されます。
@@ -2514,22 +2521,19 @@
  * @option ３列表示（表示列数が３の時のみ）
  * @value 3
  * @default 1
- * @parent BasicSetting
  * 
  * @param paramName
  * @desc 表示する項目の名称を設定します。
  * @text 名称(8)
  * @type string
  * @default
- * @parent BasicSetting
  * 
  * @param NameColor
- * @desc システム項目の文字色。(システムカラーまたはカラーコード)
- * @text システム項目文字色(9)
+ * @desc 項目名称の文字色。(システムカラーまたはカラーコード)
+ * @text 項目名称文字色(9)
  * @type number
  * @default 16
  * @min 0
- * @parent BasicSetting
  * 
  * @param FontSize
  * @desc フォントサイズ（メインフォント+デフォルトフォントからの差）
@@ -2537,7 +2541,6 @@
  * @type number
  * @default 0
  * @min -99
- * @parent BasicSetting
  * 
  * @param namePosition
  * @desc 文字の表示位置を指定します。
@@ -2550,21 +2553,18 @@
  * @option 右
  * @value "right"
  * @default "left"
- * @parent nameSetting
  * 
  * @param textMethod
  * @desc 記述欄、個別画像に紐づけするタグ名
  * @text 記述欄、個別画像タグ名(17)
  * @type string
  * @default 
- * @parent textSetting
  * 
  * @param CommonText
  * @desc 共通テキスト(制御文字使用可能)
  * @text 共通テキスト(20)
  * @type multiline_string	
  * @default 
- * @parent textSetting
  * 
  * @param ImgData
  * @desc 全てのモンスターページに表示される共通画像ファイル名を指定します。横幅は「項目横幅」、高さは「画像の最大縦幅」
@@ -2572,7 +2572,6 @@
  * @type file
  * @dir img/
  * @default 
- * @parent ImgSetting
  * 
  * @param ImgMaxHeight
  * @desc 画像の最大縦幅（行数で指定）
@@ -2580,7 +2579,18 @@
  * @type number
  * @default 8
  * @min 0
- * @parent ImgSetting
+ * 
+ * @param IconId
+ * @text アイコンID(20)
+ * @desc 項目名称の左にアイコンを表示します。アイコンのIDを指定します。
+ * @type number
+ * @default 0
+ * 
+ * @param IconY
+ * @text アイコン補正Y値(21)
+ * @desc アイコンの補正Y値を指定します。
+ * @type number
+ * @default 2
  * 
  */
 /*~struct~PageSettingData:
@@ -6076,8 +6086,13 @@ Window_EnemyBook.prototype.name = function(list, enemy, x, y, width) {
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     const nameText = list.paramName;
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     if (nameText) {
-      this.drawText(nameText, x, y, width, list.namePosition);
+      this.drawText(nameText, x + margin, y, width - margin, list.namePosition);
     }
 };
 
@@ -6088,14 +6103,19 @@ Window_EnemyBook.prototype.enemyGauge = function(list, enemy, x, y, width) {
 Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
     if (list.Back) {
-        this.drawContentsBackground(list.Back, x, y, width);
+        this.drawContentsBackground(list, x, y, width);
         x = this.contensX(x);
         width = this.contensWidth(width);
     }
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     const nameText = this.paramNameShow(list, enemy);
     const systemWidth = list.SystemItemWidth || 100;
-    this.drawText(nameText, x, y, systemWidth);
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
     let text = this.paramShow(list, enemy);
     if (!this.paramMask(list.MaskMode)){
@@ -6109,14 +6129,19 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
 Window_EnemyBook.prototype.enemyXParams = function(list, enemy, x, y, width) {
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
     if (list.Back) {
-        this.drawContentsBackground(list.Back, x, y, width);
+        this.drawContentsBackground(list, x, y, width);
         x = this.contensX(x);
         width = this.contensWidth(width);
     }
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     const nameText = this.paramNameShow(list, enemy);
     const systemWidth = list.SystemItemWidth || 100;
-    this.drawText(nameText, x, y, systemWidth);
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
     let text = this.paramShow(list, enemy);
     if (!this.paramMask(list.MaskMode)){
@@ -6132,14 +6157,19 @@ Window_EnemyBook.prototype.enemyXParams = function(list, enemy, x, y, width) {
 Window_EnemyBook.prototype.enemySParams = function(list, enemy, x, y, width) {
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
     if (list.Back) {
-        this.drawContentsBackground(list.Back, x, y, width);
+        this.drawContentsBackground(list, x, y, width);
         x = this.contensX(x);
         width = this.contensWidth(width);
     }
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     const nameText = this.paramNameShow(list, enemy);
     const systemWidth = list.SystemItemWidth || 100;
-    this.drawText(nameText, x, y, systemWidth);
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
     let text = this.paramShow(list, enemy);
     if (!this.paramMask(list.MaskMode)){
@@ -6156,14 +6186,19 @@ Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
     const de = this._enemy;
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
     if (list.Back) {
-        this.drawContentsBackground(list.Back, x, y, width);
+        this.drawContentsBackground(list, x, y, width);
         x = this.contensX(x);
         width = this.contensWidth(width);
     }
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     const nameText = list.paramName ? list.paramName : TextManager.exp;
     const systemWidth = list.SystemItemWidth || 100;
-    this.drawText(nameText, x, y, systemWidth);
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
     let text;
     if(this.paramMask(list.MaskMode)) {
@@ -6178,14 +6213,19 @@ Window_EnemyBook.prototype.enemyGold = function(list, enemy, x, y, width) {
     const de = this._enemy;
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
     if (list.Back) {
-        this.drawContentsBackground(list.Back, x, y, width);
+        this.drawContentsBackground(list, x, y, width);
         x = this.contensX(x);
         width = this.contensWidth(width);
     }
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "獲得金額" : 'Gold Gain');
     const systemWidth = list.SystemItemWidth || 100;
-    this.drawText(nameText, x, y, systemWidth);
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
     let text;
     if(this.paramMask(list.MaskMode)) {
@@ -6201,14 +6241,19 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
     const de = this._enemy;
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
     if (list.Back) {
-        this.drawContentsBackground(list.Back, x, y, width);
+        this.drawContentsBackground(list, x, y, width);
         x = this.contensX(x);
         width = this.contensWidth(width);
     }
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "倒した数" : 'Eefeat Enemy');
     const systemWidth = list.SystemItemWidth || 100;
-    this.drawText(nameText, x, y, systemWidth);
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
     let text = null;
     if(this.paramMask(list.MaskMode)) {
@@ -6230,15 +6275,20 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
     const de = this._enemy;
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
     if (list.Back) {
-        this.drawContentsBackground(list.Back, x, y, width);
+        this.drawContentsBackground(list, x, y, width);
         x = this.contensX(x);
         width = this.contensWidth(width);
     }
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     const nameText = list.paramName;
-    const systemWidth = nameText ? (list.SystemItemWidth || 100) : 0;
+    const systemWidth = nameText ? (list.SystemItemWidth || 100) : margin;
     if (nameText) {
-        this.drawText(nameText, x, y, systemWidth);
+        this.drawText(nameText, x + margin, y, systemWidth - margin);
     }
     let text = null;
     if(this.paramMask(list.MaskMode)) {
@@ -6277,6 +6327,7 @@ Window_EnemyBook.prototype.turn = function(list, enemy, x, y, width) {
 Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
     const dropList = this._enemy.dropItems;
     const lineHeight = this.lineHeight();
     let x2 = 0;
@@ -6284,8 +6335,12 @@ Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
     let dropIndex = 0;
     width = Math.floor((width - this.colSpacing()) / DropItemMultiCols);
     const nameText = list.paramName;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     this.resetTextColor();
@@ -6295,7 +6350,7 @@ Window_EnemyBook.prototype.dropItems = function(list, enemy, x, y, width) {
             y2 = Math.floor(dropIndex / DropItemMultiCols) * lineHeight + y;
             let width2 = width;
             if (list.Back) {
-                this.drawContentsBackground(list.Back, x2, y2, width);
+                this.drawContentsBackground(list, x2, y2, width);
                 x2 = this.contensX(x2);
                 width2 = this.contensWidth(width);
             }
@@ -6331,7 +6386,12 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
         width = Math.floor((width - this.colSpacing()) / StealItemCols);
         const nameText = list.paramName;
         if (nameText) {
-            this.drawText(nameText, x, y, width);
+            let margin = 0;
+            if (list.IconId > 0) {
+                this.drawIcon(list.IconId, x, y + list.IconY);
+                margin = ImageManager.iconWidth + 4;
+            }
+            this.drawText(nameText, x + margin, y, width - margin);
             y += lineHeight;
         }
         this.resetTextColor();
@@ -6341,7 +6401,7 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
                 y2 = Math.floor(stealIndex / StealItemCols) * lineHeight + y;
                 let width2 = width;
                 if (list.Back) {
-                    this.drawContentsBackground(list.Back, x2, y2, width);
+                    this.drawContentsBackground(list, x2, y2, width);
                     x2 = this.contensX(x2);
                     width2 = this.contensWidth(width);
                 }
@@ -6380,7 +6440,12 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
         width = Math.floor((width - this.colSpacing()) / CondDropItemCols);
         const nameText = list.paramName;
         if (nameText) {
-            this.drawText(nameText, x, y, width);
+            let margin = 0;
+            if (list.IconId > 0) {
+                this.drawIcon(list.IconId, x, y + list.IconY);
+                margin = ImageManager.iconWidth + 4;
+            }
+            this.drawText(nameText, x + margin, y, width - margin);
             y += lineHeight;
         }
         this.resetTextColor();
@@ -6390,7 +6455,7 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
                 y2 = Math.floor(dropIndex / CondDropItemCols) * lineHeight + y;
                 let width2 = width;
                 if (list.Back) {
-                    this.drawContentsBackground(list.Back, x2, y2, width);
+                    this.drawContentsBackground(list, x2, y2, width);
                     x2 = this.contensX(x2);
                     width2 = this.contensWidth(width);
                 }
@@ -6419,7 +6484,12 @@ Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
     width = Math.floor((width - this.colSpacing()) / ActionCols);
     const nameText = list.paramName;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     this.resetTextColor();
@@ -6429,7 +6499,7 @@ Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
         y2 = Math.floor(i / ActionCols) * lineHeight + y;
         let width2 = width;
         if (list.Back) {
-            this.drawContentsBackground(list.Back, x2, y2, width);
+            this.drawContentsBackground(list, x2, y2, width);
             x2 = this.contensX(x2);
             width2 = this.contensWidth(width);
         }
@@ -6452,7 +6522,12 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
     width = Math.floor((width - this.colSpacing()) / ElementCol);
     const nameText = list.paramName;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     this.resetTextColor();
@@ -6461,7 +6536,7 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
         y2 = Math.floor(i / ElementCol) * lineHeight + y;
         let width2 = width;
         if (list.Back) {
-            this.drawContentsBackground(list.Back, x2, y2, width);
+            this.drawContentsBackground(list, x2, y2, width);
             x2 = this.contensX(x2);
             width2 = this.contensWidth(width);
         }
@@ -6509,7 +6584,12 @@ Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, wi
     width = Math.floor((width - this.colSpacing()) / StateCol);
     const nameText = list.paramName;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     this.resetTextColor();
@@ -6518,7 +6598,7 @@ Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, wi
         y2 = Math.floor(i / StateCol) * lineHeight + y;
         let width2 = width;
         if (list.Back) {
-            this.drawContentsBackground(list.Back, x2, y2, width);
+            this.drawContentsBackground(list, x2, y2, width);
             x2 = this.contensX(x2);
             width2 = this.contensWidth(width);
         }
@@ -6561,7 +6641,12 @@ Window_EnemyBook.prototype.drawResistElement = function(list, enemy, x, y, width
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "耐性属性" : 'Resist Element');
     let Unknown = false;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     if(!this.resistWeakDataMask(list.MaskMode)){
@@ -6602,7 +6687,12 @@ Window_EnemyBook.prototype.drawWeakElement = function(list, enemy, x, y, width) 
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "弱点属性" : 'Weak Element');
     let Unknown = false;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     if(!this.resistWeakDataMask(list.MaskMode)){
@@ -6643,7 +6733,12 @@ Window_EnemyBook.prototype.drawNoEffectElement = function(list, enemy, x, y, wid
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "無効属性" : 'Invalid Element');
     let Unknown = false;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     if(!this.resistWeakDataMask(list.MaskMode)){
@@ -6684,7 +6779,12 @@ Window_EnemyBook.prototype.drawResistStates = function(list, enemy, x, y, width)
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "耐性ステート" : 'Resist State');
     let Unknown = false;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     if(!this.resistWeakDataMask(list.MaskMode)){
@@ -6727,7 +6827,12 @@ Window_EnemyBook.prototype.drawWeakStates = function(list, enemy, x, y, width) {
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "弱点ステート" : 'Weak State');
     let Unknown = false;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     if(!this.resistWeakDataMask(list.MaskMode)){
@@ -6767,7 +6872,12 @@ Window_EnemyBook.prototype.drawNoEffectStates = function(list, enemy, x, y, widt
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "無効ステート" : 'Invalid State');
     let Unknown = false;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     if(!this.resistWeakDataMask(list.MaskMode)){
@@ -6807,7 +6917,12 @@ Window_EnemyBook.prototype.drawWeakDebuff = function(list, enemy, x, y, width) {
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "弱点デバフ" : 'Weak Debuff');
     let Unknown = false;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     if(!this.resistWeakDataMask(list.MaskMode)){
@@ -6843,7 +6958,12 @@ Window_EnemyBook.prototype.drawResistDebuff = function(list, enemy, x, y, width)
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "耐性デバフ" : 'Resist Debuff');
     let Unknown = false;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     if(!this.resistWeakDataMask(list.MaskMode)){
@@ -6878,7 +6998,12 @@ Window_EnemyBook.prototype.drawDesc = function(list, enemy, x, y, width) {
     const lineHeight = this.lineHeight();
     const nameText = list.paramName;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     this.resetTextColor();
@@ -6904,7 +7029,12 @@ Window_EnemyBook.prototype.drawCommonDesc = function(list, enemy, x, y, width) {
     const lineHeight = this.lineHeight();
     const nameText = list.paramName;
     if (nameText) {
-        this.drawText(nameText, x, y, width);
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
         y += lineHeight;
     }
     this.resetTextColor();
@@ -6924,7 +7054,12 @@ Window_EnemyBook.prototype.enemyElementChart = function(list, enemy, x, y, width
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "耐性属性" : 'Resist Element');
-    this.drawText(nameText, x, y, width);
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
+    this.drawText(nameText, x + margin, y, width - margin);
     const lineHeight = this.lineHeight();
     this.enemyElementRadarChart(this.setEnemyElementChart(enemy), enemy, x, y + lineHeight ,'element');
 };
@@ -6936,7 +7071,12 @@ Window_EnemyBook.prototype.enemyStateChart = function(list, enemy, x, y, width) 
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "耐性ステート" : 'Resist State');
-    this.drawText(nameText, x, y, width);
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
+    this.drawText(nameText, x + margin, y, width - margin);
     const lineHeight = this.lineHeight();
     this.enemyStateRadarChart(this.setEnemyStateChart(enemy), enemy, x, y + lineHeight ,'state');
 };
@@ -7015,11 +7155,35 @@ Window_EnemyBook.prototype.drawImg = function(bitmap, list, x, y, width) {
     this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
 };
 
-Window_EnemyBook.prototype.drawContentsBackground = function(back, x, y, width) {
-    if (back) {
+Window_EnemyBook.prototype.drawContentsBackground = function(list, x, y, width) {
+    if (list.back) {
         const rect = this.contentsRect(x, y, width);
-        this.drawContentsBackgroundRect(rect);
+        if(list.BackContentsImg) {
+            const bitmap = ImageManager.nuun_LoadPictures(list.BackContentsImg);
+            bitmap.addLoadListener(function() {
+                this.drawContentsBackgroundImg(bitmap, rect);
+            }.bind(this));
+        } else {
+            this.drawContentsBackgroundRect(rect);
+        }
     }
+};
+
+Window_EnemyBook.prototype.drawContentsBackgroundImg = function(bitmap, rect) {
+    const width = Math.min(bitmap.width, rect.width);
+    const height = Math.min(bitmap.height, rect.height);
+    this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x + 1, rect.y + 1, width, height);
+};
+
+Window_EnemyBook.prototype.drawContentsBackgroundRect = function(rect) {
+    const c1 = ColorManager.itemBackColor1();
+    const c2 = ColorManager.itemBackColor2();
+    const x = rect.x;
+    const y = rect.y;
+    const w = rect.width;
+    const h = rect.height;
+    this.contents.gradientFillRect(x, y, w, h, c1, c2, true);
+    this.contents.strokeRect(x, y, w, h, c1);
 };
   
 Window_EnemyBook.prototype.drawContentsBackgroundRect = function(rect) {
@@ -7229,14 +7393,19 @@ Window_BattleEnemyBook.prototype.turn = function(list, enemy, x, y, width) {
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     if (BattleManager.isTpb() && this.statusMode()) {
+        let margin = 0;
         if (list.Back) {
-            this.drawContentsBackground(list.Back, x, y, width);
+            this.drawContentsBackground(list, x, y, width);
             x = this.contensX(x);
             width = this.contensWidth(width);
         }
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
         const nameText = list.paramName ? list.paramName : (this.language_Jp ? "ターン" : 'Turn');
         const systemWidth = nameText ? (list.SystemItemWidth || 100) : 0;
-        this.drawText(nameText, x, y, systemWidth);
+        this.drawText(nameText, x + margin, y, systemWidth - margin);
         this.resetTextColor();
         let text;
         if(this.paramMask(list.MaskMode)){
@@ -7252,14 +7421,19 @@ Window_BattleEnemyBook.prototype.enemyLevel = function(list, enemy, x, y, width)
     const de = this._enemy;
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
     if (list.Back) {
-        this.drawContentsBackground(list.Back, x, y, width);
+        this.drawContentsBackground(list, x, y, width);
         x = this.contensX(x);
         width = this.contensWidth(width);
     }
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     const nameText = list.paramName ? list.paramName : (this.language_Jp ? "レベル" : 'Level');
     const systemWidth = list.SystemItemWidth || 100;
-    this.drawText(nameText, x, y, systemWidth);
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
     const text = list.DetaEval ? eval(list.DetaEval) : enemy._level;
     this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);

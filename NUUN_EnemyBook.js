@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.1
+ * @version 2.17.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -183,6 +183,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/20 Ver.2.17.2
+ * 敵の情報で同じモンスターの情報の切り替えが行われない問題を修正。
  * 2022/11/19 Ver.2.17.1
  * 撃破時に図鑑に登録及び、ステータス登録が行われない問題を修正。
  * アナライズ時に図鑑に登録及び、ステータス登録が行われない問題を修正。
@@ -5434,7 +5436,7 @@ Window_EnemyBook_InfoIndex.prototype.refreshEnemyData = function() {
         if (enemy) {
             this._enemyWindow.selectEnemy = this._data[this.index()];
         }
-        this._enemyWindow.setEnemyData(enemy);
+        this._enemyWindow.setEnemyInfoData(enemy);
     }
 };
 
@@ -5611,6 +5613,11 @@ Window_EnemyBook.prototype.setEnemyData = function(enemy) {
         this._enemy = enemy;
         this.refresh();
     }
+};
+
+Window_EnemyBook.prototype.setEnemyInfoData = function(enemy) {
+    this._enemy = enemy;
+    this.refresh();
 };
 
 Window_EnemyBook.prototype.setEnemySprite = function() {

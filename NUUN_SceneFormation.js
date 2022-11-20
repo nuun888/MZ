@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.7.5
+ * @version 1.7.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -32,6 +32,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/20 Ver.1.7.6
+ * 初回表示時にアクターのステータスが表示されない問題を修正。
+ * デフォルトの立ち絵切り替えが機能していなかった問題を修正。
  * 2022/10/28 Ver.1.7.5
  * アクター固定化プラグインの固定アクター戦闘メンバーへの移動可をOFFにしたときに固定アクターが移動できてしまう問題を修正。
  * 2022/9/22 Ver.1.7.4
@@ -143,21 +146,6 @@
  * @default 'chip'
  * @parent BasicSetting
  * 
- * @param MemberHeight
- * @text メンバー表示高さ
- * @desc メンバーの表示高さ
- * @type number
- * @default 48
- * @min -9999
- * @parent BasicSetting
- * 
- * @param LavelVisible
- * @text レベル表示
- * @desc 戦闘メンバー及び待機メンバーのアクターにレベルを表示。(メニュー、戦闘共通)
- * @type boolean
- * @default false
- * @parent BasicSetting
- * 
  * @param WindowCenter
  * @text ウィンドウ中央自動調整
  * @desc ウィンドウを中央に自動調整します。待機メンバーウィンドウの横幅で調整されます。(メニュー)
@@ -188,16 +176,28 @@
  * @parent Setting
  * @parent BasicSetting
  * 
- * @param MemberActorPictureSetting
- * @text 立ち絵、顔グラ表示EX設定
- * @default ------------------------------
+ * @param MemberHeight
+ * @text メンバー表示高さ
+ * @desc メンバーの表示高さ。
+ * @type number
+ * @default 48
+ * @min -9999
+ * @parent BasicSetting
  * 
- * @param DynamicFace
- * @desc メンバー画像が顔グラ指定時の戦闘メンバー、待機メンバーの顔グラを条件による変化させます。（要立ち絵、顔グラ表示EX）
- * @text 条件顔グラ変化
+ * @param LavelVisible
+ * @text レベル表示
+ * @desc 戦闘メンバー及び待機メンバーのアクターにレベルを表示。(メニュー、戦闘共通)
  * @type boolean
  * @default false
- * @parent MemberActorPictureSetting
+ * @parent BasicSetting
+ * 
+ * @param LevelFontSize
+ * @desc レベルのフォントサイズ。(メインフォントからの差)
+ * @text レベルフォントサイズ
+ * @type number
+ * @default -10
+ * @min 99
+ * @parent BasicSetting
  * 
  * @param BattleMemberNameSetting
  * @text 戦闘メンバー名称ウィンドウ設定
@@ -396,6 +396,20 @@
  * @desc 立ち絵表示EXの画像変更を適用します。OFFにした場合はこのプラグインでの設定が適用されます。
  * @type boolean
  * @default true
+ * @parent ActorImgSetting
+ * 
+ * @param DynamicFace
+ * @desc メンバー画像が顔グラまたは立ち絵指定時の戦闘メンバー、待機メンバーの顔グラを条件による変化させます。（要立ち絵、顔グラ表示EX）
+ * @text 条件顔グラ、立ち絵変化
+ * @type boolean
+ * @default false
+ * @parent ActorImgSetting
+ * 
+ * @param BackActorPicture
+ * @desc 背後に表示されるアクター立ち絵を表示させません。メンバーウィンドウは表示されます。(メンバー表示が立ち絵の時などに)
+ * @text 背後立ち絵非表示
+ * @type boolean
+ * @default false
  * @parent ActorImgSetting
  * 
  * @param ActorFixedSetting
@@ -629,9 +643,13 @@
  * @param ActorImg
  * @text アクター画像
  * @desc アクターの画像を表示します。立ち絵を切り替える場合はリストに画像を設定してください。
- * @type file
+ * @type file[]
  * @dir img/
- * @default 
+ * @default []
+ * 
+ * @param BackActorImgSetting
+ * @text 背後画像設定
+ * @default ------------------------------
  * 
  * @param Actor_X
  * @desc 画像の表示位置X座標。
@@ -640,6 +658,7 @@
  * @default 0
  * @min -9999
  * @max 9999
+ * @parent BackActorImgSetting
  * 
  * @param Actor_Y
  * @desc 画像の表示位置Y座標。
@@ -648,6 +667,7 @@
  * @default 0
  * @min -9999
  * @max 9999
+ * @parent BackActorImgSetting
  * 
  * @param Actor_Scale
  * @desc 画像の拡大率。
@@ -656,6 +676,56 @@
  * @default 100
  * @min 0
  * @max 999
+ * @parent BackActorImgSetting
+ * 
+ * @param WindowSetting
+ * @text メンバーウィンドウ画像設定
+ * @default ------------------------------
+ * 
+ * @param wActor_X
+ * @desc 画像の表示位置X座標。
+ * @text 画像表示位置X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent WindowSetting
+ * 
+ * @param wActor_Y
+ * @desc 画像の表示位置Y座標。
+ * @text 画像表示位置Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent WindowSetting
+ * 
+ * @param wImg_SX
+ * @desc 画像の表示開始座標X。
+ * @text 画像表示開始座標X
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent WindowSetting
+ * 
+ * @param wImg_SY
+ * @desc 画像の表示開始座標Y
+ * @text 画像表示開始座標Y
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent WindowSetting
+ * 
+ * @param wActor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ * @parent WindowSetting
  *  
  */
 /*~struct~ActorPictureDataList:
@@ -665,6 +735,10 @@
  * @desc アクターを指定します。
  * @type actor
  * 
+ * @param BackActorImgSetting
+ * @text 背後画像設定
+ * @default ------------------------------
+ * 
  * @param Actor_X
  * @desc 画像の表示位置X座標。
  * @text 画像表示位置X座標
@@ -672,6 +746,7 @@
  * @default 0
  * @min -9999
  * @max 9999
+ * @parent BackActorImgSetting
  * 
  * @param Actor_Y
  * @desc 画像の表示位置Y座標。
@@ -680,6 +755,7 @@
  * @default 0
  * @min -9999
  * @max 9999
+ * @parent BackActorImgSetting
  * 
  * @param Actor_Scale
  * @desc 画像の拡大率。
@@ -688,6 +764,56 @@
  * @default 100
  * @min 0
  * @max 999
+ * @parent BackActorImgSetting
+ * 
+ * @param WindowSetting
+ * @text メンバーウィンドウ画像設定
+ * @default ------------------------------
+ * 
+ * @param wActor_X
+ * @desc 画像の表示位置X座標。
+ * @text 画像表示位置X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent WindowSetting
+ * 
+ * @param wActor_Y
+ * @desc 画像の表示位置Y座標。
+ * @text 画像表示位置Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent WindowSetting
+ * 
+ * @param wImg_SX
+ * @desc 画像の表示開始座標X。
+ * @text 画像表示開始座標X
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent WindowSetting
+ * 
+ * @param wImg_SY
+ * @desc 画像の表示開始座標Y
+ * @text 画像表示開始座標Y
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent WindowSetting
+ * 
+ * @param wActor_Scale
+ * @desc 画像の拡大率。
+ * @text 画像拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ * @parent WindowSetting
  *  
  */
 var Imported = Imported || {};
@@ -750,7 +876,8 @@ const VariableBattleMember = eval(parameters['VariableBattleMember'] || "true");
 const CharacterMode = eval(parameters['CharacterMode']) || 'chip';
 const BattleMemberName = String(parameters['BattleMemberName'] || "戦闘メンバー");
 const MemberName = String(parameters['MemberName'] || "待機メンバー");
-const MemberHeight = Number(parameters['MemberHeight'] || 48);
+param.LevelFontSize = Number(parameters['LevelFontSize'] || -10);
+param.MemberHeight = Number(parameters['MemberHeight'] || 48);
 param.BattleMemberName_X = Number(parameters['BattleMemberName_X'] || 0);
 param.BattleMemberName_Y = Number(parameters['BattleMemberName_Y'] || 0);
 param.MemberName_X = Number(parameters['MemberName_X'] || 0);
@@ -761,6 +888,10 @@ param.BattleMember_X = Number(parameters['BattleMember_X'] || 0);
 param.BattleMember_Y = Number(parameters['BattleMember_Y'] || 0);
 param.Member_X = Number(parameters['Member_X'] || 0);
 param.Member_Y = Number(parameters['Member_Y'] || 0);
+param.BattleMemberWindowWidth = Number(parameters['BattleMemberWindowWidth'] || 0);
+param.BattleMemberWindowHeight = Number(parameters['BattleMemberWindowHeight'] || 0);
+param.MemberWindowWidth = Number(parameters['MemberWindowWidth'] || 0);
+param.MemberWindowHeight = Number(parameters['MemberWindowHeight'] || 0);
 param.Status_X = Number(parameters['Status_X'] || 0);
 param.Status_Y = Number(parameters['Status_Y'] || 0);
 param.WindowZero = eval(parameters['WindowZero'] || "false");
@@ -780,12 +911,14 @@ const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
 const CommandShowMode = eval(parameters2['CommandShowMode']) || 'Party';
 const SupportActorBackColor = (DataManager.nuun_structureData(parameters3['SupportActorBackColor'])) || 5;
 const DynamicFace = eval(parameters['DynamicFace'] || "true");
+const BackActorPicture = eval(parameters['BackActorPicture'] || "true");
 
 let cursorMode = 'battle';
 let pendingMode = null;
 let formationIndex = -1;
 let pendingIndex = -1;
 let statusWindow = null;
+let formationOldActor = null;
 
 const pluginName = "NUUN_SceneFormation";
 
@@ -1000,6 +1133,12 @@ class Nuun_Formation {
     param.Member_Cols = Number(parameters2['Member_Cols'] || 10);
     param.Member_Rows = Number(parameters2['Member_Rows'] || 1);
     param.WindowCenter = eval(parameters2['WindowCenter'] || "true");
+    param.BattleMemberWindowWidth = Number(parameters['BattleMemberWindowWidth'] || 0);//一時
+    param.BattleMemberWindowHeight = Number(parameters['BattleMemberWindowHeight'] || 0);//一時
+    param.MemberWindowWidth = Number(parameters['MemberWindowWidth'] || 0);//一時
+    param.MemberWindowHeight = Number(parameters['MemberWindowHeight'] || 0);//一時
+    param.MemberHeight = Number(parameters['MemberHeight'] || 48);//一時
+    param.LevelFontSize = Number(parameters['LevelFontSize'] || -10);//一時
   };
 
   setParamData() {
@@ -1019,6 +1158,12 @@ class Nuun_Formation {
     param.Member_Cols = Number(parameters['Member_Cols'] || 10);
     param.Member_Rows = Number(parameters['Member_Rows'] || 1);
     param.WindowCenter = eval(parameters['WindowCenter'] || "true");
+    param.BattleMemberWindowWidth = Number(parameters['BattleMemberWindowWidth'] || 0);
+    param.BattleMemberWindowHeight = Number(parameters['BattleMemberWindowHeight'] || 0);
+    param.MemberWindowWidth = Number(parameters['MemberWindowWidth'] || 0);
+    param.MemberWindowHeight = Number(parameters['MemberWindowHeight'] || 0);
+    param.MemberHeight = Number(parameters['MemberHeight'] || 48);
+    param.LevelFontSize = Number(parameters['LevelFontSize'] || -10);
   };
 
   create() {
@@ -1118,18 +1263,18 @@ class Nuun_Formation {
   };
   
   battleMemberWindowRect() {
-    const ww = $gameSystem.windowPadding() * 2 + this.battleMemberWindowWidth();
+    const ww = param.BattleMemberWindowWidth > 0 ? param.BattleMemberWindowWidth : ($gameSystem.windowPadding() * 2 + this.battleMemberWindowWidth());
     const wx = param.BattleMember_X + (param.WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
     const wy = param.BattleMember_Y + (param.WindowZero ? 0 : this._scene.calcWindowHeight(1, true));
-    const wh = 32 + param.BattleMember_Rows * (MemberHeight);
+    const wh = param.BattleMemberWindowHeight > 0 ? param.BattleMemberWindowHeight : (32 + param.BattleMember_Rows * (param.MemberHeight));
     return new Rectangle(wx, wy, ww, wh);
   };
   
   memberWindowRect() {
-    const ww = this.memberWindowWidth();
+    const ww = param.MemberWindowWidth > 0 ? param.MemberWindowWidth : this.memberWindowWidth();
     const wx = param.Member_X + (param.WindowCenter ? (Graphics.boxWidth - ww) / 2 : 0);
     const wy = param.Member_Y + (param.WindowZero ? 0 : this.memberY() + this._scene.calcWindowHeight(1, true));
-    const wh = 32 + (param.Member_Rows) * MemberHeight;
+    const wh = param.MemberWindowHeight > 0 ? param.MemberWindowHeight : (32 + (param.Member_Rows) * param.MemberHeight);
     return new Rectangle(wx, wy, ww, wh);
   };
   
@@ -1392,7 +1537,7 @@ Window_StatusBase.prototype.drawBackGroundActor = function(index) {
   const actor = this.actor(index);
   if (index !== this._pendingIndex) {
     const rect = this.itemRect(index);
-    const height = MemberHeight;
+    const height = param.MemberHeight;
     const y = rect.y + (this.itemHeight() - this.rowSpacing() - height);
     this.contentsBack.paintOpacity = 128;
     if (actor && DeadActorColor >= 0 && actor.isDead()) {
@@ -1406,6 +1551,42 @@ Window_StatusBase.prototype.drawBackGroundActor = function(index) {
       this.contentsBack.fillRect(rect.x, y, rect.width, height, supportcolor);
     }
     this.contentsBack.paintOpacity = 255;
+  }
+};
+
+Window_StatusBase.prototype.battlreFormationPicture = function(id) {
+  const actors = ActorPictureData;
+  const find = actors.find(actor => actor.actorId === id);
+  if (!find) {
+    return {wActor_X: 0, wActor_Y: 0, wImg_SX: 0, wImg_SY: 0, wActor_Scale: 100};
+  }
+  return find;
+};
+
+Window_StatusBase.prototype.drawFormationImg = function(data, actor, bitmap, x, y, width, height) {
+  if (data) {
+    width = Math.min(width - 2, bitmap.width);
+    height = Math.min(height - 2, bitmap.height);
+    const scale = (data.wActor_Scale || 100) / 100;
+    const sw = width * scale;
+    const sh = height * scale;
+    const sx = data.wImg_SX || 0;
+    const sy = data.wImg_SY || 0;
+    const x2 = x + 1 + (data.wActor_X || 0);// + ActorImg_X;
+    const y2 = y + 1 + (data.wActor_Y || 0);// + ActorImg_Y;
+    this.contents.blt(bitmap, sx, sy, width + (width - sw), height + (height - sh), x2, y2, width, height);
+  }
+  this.drawLavel(actor, x, y, width);
+};
+
+Window_StatusBase.prototype.setActorFormationStatus = function(index) {
+  const actor = this.actor(index);
+  if (statusWindow && actor !== formationOldActor) {
+    statusWindow.setStatus(actor);
+    if (this._spriteActor) {
+      this._spriteActor.setup(actor);
+    }
+    formationOldActor = actor;
   }
 };
 
@@ -1500,19 +1681,9 @@ Window_FormationBattleMember.prototype.isChangeActorEnabled = function(w_actor, 
 
 Window_FormationBattleMember.prototype.select = function(index) {
   Window_Selectable.prototype.select.call(this, index);
-  this.setActorStatus(index);
+  this.setActorFormationStatus(index);
 };
 
-Window_FormationBattleMember.prototype.setActorStatus = function(index) {
-  const actor = this.actor(index);
-  if (statusWindow && actor !== this._oldActor) {
-    statusWindow.setStatus(actor);
-    if (this._spriteActor) {
-      this._spriteActor.setup(actor);
-    }
-    this._oldActor = actor;
-  }
-};
 
 const _Window_FormationBattleMember_processTouch = Window_FormationBattleMember.prototype.processTouch;
 Window_FormationBattleMember.prototype.processTouch = function() {
@@ -1525,12 +1696,22 @@ Window_FormationBattleMember.prototype.drawItem = function(index) {
   const actor = this.actor(index);
   this.drawBackGroundActor(index);
   this.drawPendingItemBackground(index);
+  let data = null;
   if (!actor) {
     const y = rect.y + this.itemHeight() - this.rowSpacing() - 48;
     this.drawText('-', rect.x, y + 4, rect.width, "center");
   } else {
     let bitmap = null;
-    if (CharacterMode === 'chip') {
+    if (CharacterMode === 'img') {
+      if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        actor.resetImgId();
+        data = this.battlreFormationPicture(actor.actorId());
+      } else {
+        data = actor.getFormationActorImgData();
+      }
+      const imges = Imported.NUUN_ActorPicture && ActorPictureEXApp ? actor.getActorGraphicImg() : actor.getFormationActorImg(data);
+      bitmap = ImageManager.nuun_LoadPictures(imges);
+    } else if (CharacterMode === 'chip') {
       bitmap = ImageManager.loadCharacter(actor.characterName());
     } else {
       if (Imported.NUUN_ActorPicture && DynamicFace) {
@@ -1540,10 +1721,14 @@ Window_FormationBattleMember.prototype.drawItem = function(index) {
         bitmap = ImageManager.loadFace(actor.faceName());
       }
     }
-    if (!bitmap.isReady()) {
-      bitmap.addLoadListener(this.drawContents.bind(this, actor, rect.x, rect.y, rect.width, rect.height));
+    if (CharacterMode === 'img') {
+      bitmap.addLoadListener(function() {
+        this.drawFormationImg(data, actor, bitmap, rect.x, rect.y, rect.width, rect.height);
+      }.bind(this));
     } else {
-      this.drawContents(actor, rect.x, rect.y, rect.width, rect.height);
+      bitmap.addLoadListener(function() {
+        this.drawContents(actor, rect.x, rect.y, rect.width, rect.height);
+      }.bind(this));
     }
   }
 };
@@ -1579,7 +1764,7 @@ Window_FormationBattleMember.prototype.drawLavel = function(actor, x, y, width) 
     x += padding;
     width = Math.min(width - padding, 60);
     const textWidth = this.textWidth(TextManager.levelA);
-    this.contents.fontSize = 16;
+    this.contents.fontSize = $gameSystem.mainFontSize() + param.LevelFontSize;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(TextManager.levelA, x, y, width);
     this.resetTextColor();
@@ -1590,14 +1775,14 @@ Window_FormationBattleMember.prototype.drawLavel = function(actor, x, y, width) 
 
 const _Window_FormationBattleMember_setCursorRect = Window_FormationBattleMember.prototype.setCursorRect;
 Window_FormationBattleMember.prototype.setCursorRect = function(x, y, width, height) {
-  height = MemberHeight;
+  height = Math.min(param.MemberHeight, height);
   y +=this.itemHeight() - this.rowSpacing() - height;
   _Window_FormationBattleMember_setCursorRect.call(this, x, y, width, height);
 };
 
 const _Window_FormationBattleMember_drawBackgroundRect = Window_FormationBattleMember.prototype.drawBackgroundRect;
 Window_FormationBattleMember.prototype.drawBackgroundRect = function(rect) {
-  rect.height = MemberHeight;
+  rect.height = param.MemberHeight;
   rect.y += this.itemHeight() - this.rowSpacing() - rect.height;
   _Window_FormationBattleMember_drawBackgroundRect.call(this, rect);
 };
@@ -1606,7 +1791,7 @@ Window_FormationBattleMember.prototype.drawPendingItemBackground = function(inde
   if (index === this._pendingIndex) {
       const rect = this.itemRect(index);
       const color = ColorManager.pendingColor();
-      const height = MemberHeight;
+      const height = param.MemberHeight;
       const y = rect.y + (this.itemHeight() - this.rowSpacing() - height);
       this.changePaintOpacity(false);
       this.contents.fillRect(rect.x, y, rect.width, height, color);
@@ -1736,18 +1921,7 @@ Window_FormationMember.prototype.isChangeActorEnabled = function(w_actor, a_acto
 
 Window_FormationMember.prototype.select = function(index) {
   Window_Selectable.prototype.select.call(this, index);
-  this.setActorStatus(index);
-};
-
-Window_FormationMember.prototype.setActorStatus = function(index) {
-  const actor = this.actor(index);
-  if (statusWindow && actor !== this._oldActor) {
-    statusWindow.setStatus(actor);
-    if (this._spriteActor) {
-      this._spriteActor.setup(actor);
-    }
-    this._oldActor = actor;
-  }
+  this.setActorFormationStatus(index);
 };
 
 const _Window_FormationMember_processTouch = Window_FormationMember.prototype.processTouch;
@@ -1761,12 +1935,18 @@ Window_FormationMember.prototype.drawItem = function(index) {
   const actor = this.actor(index);
   this.drawBackGroundActor(index);
   this.drawPendingItemBackground(index);
+  let data = null;
   if (!actor) {
     const y = rect.y + this.itemHeight() - this.rowSpacing() - 48;
     this.drawText('-', rect.x, y + 4, rect.width, 'center');
   } else {
     let bitmap = null;
-    if (CharacterMode === 'chip') {
+    if (CharacterMode === 'img') {
+      data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreFormationPicture(actor.actorId()) : actor.getFormationActorImgData();
+      const imges = Imported.NUUN_ActorPicture && ActorPictureEXApp ? actor.getActorGraphicImg() : actor.getFormationActorImg(data);
+      console.log(imges)
+      bitmap = ImageManager.nuun_LoadPictures(imges);
+    } else if (CharacterMode === 'chip') {
       bitmap = ImageManager.loadCharacter(actor.characterName());
     } else {
       if (Imported.NUUN_ActorPicture && DynamicFace) {
@@ -1776,10 +1956,14 @@ Window_FormationMember.prototype.drawItem = function(index) {
         bitmap = ImageManager.loadFace(actor.faceName());
       }
     }
-    if (!bitmap.isReady()) {
-      bitmap.addLoadListener(this.drawContents.bind(this, actor, rect.x, rect.y, rect.width, rect.height));
+    if (CharacterMode === 'img') {
+      bitmap.addLoadListener(function() {
+        this.drawFormationImg(data, actor, bitmap, rect.x, rect.y, rect.width, rect.height);
+      }.bind(this));
     } else {
-      this.drawContents(actor, rect.x, rect.y, rect.width, rect.height);
+      bitmap.addLoadListener(function() {
+        this.drawContents(actor, rect.x, rect.y, rect.width, rect.height);
+      }.bind(this));
     }
   }
 };
@@ -1815,7 +1999,7 @@ Window_FormationMember.prototype.drawLavel = function(actor, x, y, width) {
     x += padding;
     width = Math.min(width - padding, 60);
     const textWidth = this.textWidth(TextManager.levelA);
-    this.contents.fontSize = 16;
+    this.contents.fontSize = $gameSystem.mainFontSize() + param.LevelFontSize;
     this.changeTextColor(ColorManager.systemColor());
     this.drawText(TextManager.levelA, x, y, width);
     this.resetTextColor();
@@ -1826,14 +2010,14 @@ Window_FormationMember.prototype.drawLavel = function(actor, x, y, width) {
 
 const _Window_FormationMember_setCursorRect = Window_FormationMember.prototype.setCursorRect;
 Window_FormationMember.prototype.setCursorRect = function(x, y, width, height) {
-  height = MemberHeight;
+  height = Math.min(param.MemberHeight, height);
   y += this.itemHeight() - this.rowSpacing() - height;
   _Window_FormationMember_setCursorRect.call(this, x, y, width, height);
 };
 
 const _Window_FormationMember_drawBackgroundRect = Window_FormationMember.prototype.drawBackgroundRect;
 Window_FormationMember.prototype.drawBackgroundRect = function(rect) {
-  rect.height = MemberHeight;
+  rect.height = param.MemberHeight;
   rect.y += this.itemHeight() - this.rowSpacing() - rect.height;
   _Window_FormationMember_drawBackgroundRect.call(this, rect);
 };
@@ -1843,7 +2027,7 @@ Window_FormationMember.prototype.drawPendingItemBackground = function(index) {
       const rect = this.itemRect(index);
       const color = ColorManager.pendingColor();
       this.changePaintOpacity(false);
-      const height = MemberHeight;
+      const height = param.MemberHeight;
       const y = rect.y + (this.itemHeight() - this.rowSpacing() - height);
       this.contents.fillRect(rect.x, y, rect.width, height, color);
       this.changePaintOpacity(true);
@@ -2398,12 +2582,12 @@ Sprite_FormationActor.prototype.initMembers = function() {
 
 Sprite_FormationActor.prototype.setup = function(actor) {
   this._actor = actor;
-  if (!actor) {
+  if (!actor || BackActorPicture) {
     this.bitmap = null;
     return;
   }
   const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()) : actor.getFormationActorImgData();
-  const imges = Imported.NUUN_ActorPicture && ActorPictureEXApp ? actor.getActorGraphicImg(): actor.getFormationActorImg(data);
+  const imges = Imported.NUUN_ActorPicture && ActorPictureEXApp ? actor.getActorGraphicImg() : actor.getFormationActorImg(data);
   if (imges) {
     this.x = data.Actor_X;
     this.y = data.Actor_Y;

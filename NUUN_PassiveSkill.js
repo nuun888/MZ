@@ -5,12 +5,276 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Passive skill
+ * @author NUUN
+ * @version 1.5.4
+ * @base NUUN_Base
+ * 
+ * @help
+ * Implement passive skills.
+ * If you have learned the skill, the status of the specified weapon will be reflected.
+ * By specifying the activation conditions, you can create a passive skill that activates only under specific conditions.
+ * The conditions are set by plug-in parameters and judged by specifying the list ID. Multiple conditions can be specified.
+ * If the activation condition does not have a "PassiveMatch" tag, the passive skill will be applied when all conditions are met.
+ * 
+ * skill Note
+ * Applying Passive Skills
+ * <PassiveSkill:[id]> [id]:Weapon ID to apply
+ * <PassiveSkill:10> The status of the weapon with weapon ID 10 is reflected.
+ * 
+ * Passive skill application conditions (always applied if blank)
+ * <PassiveMatch:[mode]> Specifies the condition judgment mode. [mode] 0: Partial match 1: All If nothing is entered, all matches will be judged.
+ * <PassiveMatch:1> Reflected when any of the conditions are met.
+ * <PassiveMatch:0> Applies when all conditions are met.
+ * <PassiveConditions:[id],[id],....> [id]:List number set in the trigger condition
+ * <PassiveConditions:1> It will be activated when the condition of the activation condition list ID number 1 is met.
+ * <PassiveConditions:1,2,3> Triggered when all the conditions of the trigger condition list ID 1, 2, 3 are matched.
+ * 
+ * Below are the tags when setting conditions on a conditional basis. Conditional base Ver.1.1.3 or later
+ * <PassiveConditions:[id],[id],[id]...> It can be used when all the specified ID conditions are met.
+ * <PartyPassiveConditions:[id],[id],[id]...> Can be used when all the conditions for the ID specified by the party member are met.
+ * <TroopPassiveConditions:[id],[id],[id]...> Can be used when all the conditions for the specified ID of the enemy group are met.
+ * <PassiveMatch:[mode]> Specifies the condition judgment mode. [mode] 0: Partial match 1: All If nothing is entered, all matches will be judged.
+ * 
+ * If the enemy group is specified, the condition will be judged only during battle.
+ * 
+ * [id]:List ID of conditional base apply condition
+ * <PassiveMatch:[mode]> Sets the condition mode.
+ * <PassiveMatch:1> Reflected when any of the conditions are met.
+ * <PassiveMatch:0> Applies when all conditions are met.
+ * If not entered, it will be when all the conditions are met.
+ * 
+ * trigger condition
+ * Upper limit: Reflected if the value is less than or equal to the specified value.
+ * Lower limit: Any value greater than or equal to the specified value will be reflected.
+ * Example
+ * Target: HP Upper limit: 30
+ * Lower limit: 0 Reflects when HP is 30% or less.
+ * Target: HP Upper limit: 80
+ * Lower limit: 30 Reflects when HP is 30% to 80%.
+ * Target: MP Upper limit: 0
+ * Lower limit: 80 Reflects when MP is 80% or more.
+ * Target: TP Upper limit: 0　
+ * Lower limit: 100 Reflected when TP is 100%.
+ * Target: State State ID: 6
+ * It will be reflected when it is in the state of state number 6.
+ * Target: StateR State ID: 5
+ * It will be reflected when the state of state 5 is not applied.
+ * Target: Turn Upper limit: 0 Lower limit: 10
+ * It will be reflected after the 10th turn.
+ * Target: Turn Upper limit: 3 Lower limit: 0
+ * It will be reflected until the 3rd turn.
+ * Target: GVal Game variable: 5 Upper limit: 30 Lower limit: 10
+ * Reflected when game variable number 5 is between 10 and 30.
+ * Target: GSwc Game Variable Switch: 5
+ * Reflected when the game switch is true.
+ * Target: Equip Weapon Type: 10
+ * It will be reflected if you are equipped with a weapon of type 10. Armor type setting is ignored if weapon type is set.
+ * Target: Equip Armor Type: 8
+ * Applies to armor type 8 weapons equipped.
+ * 
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/20/2022 Ver.1.5.4
+ * Fixed an issue where performance would drop significantly when used with certain plugins.
+ * Changed the display in languages other than Japanese to English.
+ * 2/4/2022 Ver.1.5.3
+ * Correction of processing.
+ * 1/3/2022 Ver.1.5.2
+ * Fixed the problem that an error occurs when specifying conditional weapons, armor types, and vehicles set with this plug-in in Ver.1.5.0 or later.
+ * 12/31/2021 Ver.1.5.1
+ * Fixed so that it can be applied even from skills that have been acquired in the feature.
+ * 12/31/2021 Ver.1.5.0
+ * Supports conditional bases.
+ * 12/31/2021 Ver.1.4.1
+ * Fixed an issue where passive skills were not applied when no conditional tag was specified.
+ * 8/13/2021 Ver.1.4.0
+ * Add a vehicle to the conditions.
+ * 8/6/2021 Ver.1.3.0
+ * Added buffs and debuffs to conditions.
+ * 8/1/2021 Ver.1.2.1
+ * Changed the specification of passive skill application conditions.
+ * 7/31/2021 Ver.1.2.0
+ * Added a function that allows you to specify how to determine if conditions match.
+ * Fixed the problem that processing becomes heavy during battle when acquiring skills that determine HP and MP under certain conditions.
+ * 7/29/2021 Ver.1.1.1
+ * Correction of processing.
+ * 7/28/2021 Ver.1.1.0
+ * Added a function to reflect when the state is not applied.
+ * Added a function to reflect only when a specific weapon or armor type is equipped.
+ * Fixed an issue where the status was not displayed in certain situations.
+ * 7/27/2021 Ver.1.0.0
+ * first edition.
+ * 
+ * @param PassiveSkillConditions
+ * @text Trigger condition
+ * @desc Set the conditions for activating passive skills.
+ * @type struct<Conditions>[]
+ * 
+ * @param CondBasePassive
+ * @text Conditional base condition application
+ * @desc Applies the conditions set in Conditional Base. Conditions set by this plugin are not applied.
+ * @type boolean
+ * @default false
+ * 
+ * @param PassiveSkillType
+ * @text Passive skill type ID
+ * @desc Skill type ID of the passive skill. Makes it invisible to actor commands in combat.
+ * @type number
+ * @default 0
+ * 
+ * 
+ */
+/*~struct~Conditions:
+ * 
+ * @param NameStr
+ * @text Name
+ * @desc Name
+ * @type string
+ * @default
+ * 
+ * @param ParamConditions
+ * @text Param
+ * @desc Specifies the target of the parameter. [Upper limit] [Lower limit] Lower limit 0 is more than [Upper limit]
+ * @type select
+ * @option HP
+ * @value 'HP'
+ * @option MP
+ * @value 'MP'
+ * @option TP
+ * @value 'TP'
+ * @option Apply state
+ * @value 'State'
+ * @option State exclusion
+ * @value 'StateR'
+ * @option Apply buff
+ * @value 'Buff'
+ * @option Buff Exclusion
+ * @value 'BuffR'
+ * @option Apply debuff
+ * @value 'Debuff'
+ * @option Debuff exclusion
+ * @value 'DebuffR'
+ * @option Equipment type
+ * @value 'Equip'
+ * @option Vehicle
+ * @value 'Vehicle'
+ * @option Turn
+ * @value 'Turn'
+ * @option Game variable
+ * @value 'GVal'
+ * @option Switch
+ * @value 'GSwc'
+ * @default 'HP'
+ * 
+ * @param UpLimit
+ * @text Upper limit
+ * @desc Upper limit
+ * @type number
+ * @default 100
+ * 
+ * @param DwLimit
+ * @text Lower limit
+ * @desc Lower limit
+ * @type number
+ * @default 0
+ * 
+ * @param EquipWeapon
+ * @text weapon type
+ * @desc Specifies the weapon type. Reflected when equipped with the specified weapon type. (weapon)
+ * @type number
+ * @default 0
+ * 
+ * @param EquipArmor
+ * @text Armor type
+ * @desc Specifies the armor type. Reflected when equipped with the specified armor type. (weapon)
+ * @type number
+ * @default 0
+ * 
+ * @param StateId
+ * @text State ID
+ * @desc Specifies the state ID. Applies when the specified state is applied.
+ * @type state
+ * @default 0
+ * 
+ * @param BuffType
+ * @text Buff
+ * @desc Specifies a buff.
+ * @type select
+ * @option Increased HP
+ * @value 0
+ * @option Increase MP
+ * @value 1
+ * @option Increase atk
+ * @value 2
+ * @option Increase def
+ * @value 3
+ * @option Increase mat
+ * @value 4
+ * @option Increase mdf
+ * @value 5
+ * @option Increase agi
+ * @value 6
+ * @option Increase luk
+ * @value 7
+ * @default 0
+ * 
+ * @param DebuffType
+ * @text Debuff
+ * @desc Specifies a debuff.
+ * @type select
+ * @option Decreased HP
+ * @value 0
+ * @option Decreased MP
+ * @value 1
+ * @option Decreased atk
+ * @value 2
+ * @option Decreased def
+ * @value 3
+ * @option Decreased mat
+ * @value 4
+ * @option Decreased mdf
+ * @value 5
+ * @option Decreased agi
+ * @value 6
+ * @option Decreased luk
+ * @value 7
+ * @default 0
+ * 
+ * @param Vehicle
+ * @text Vehicle
+ * @desc Specifies a debuff. (Only the first list is reflected)
+ * @type combo[]
+ * @option 'vehicle'
+ * @option 'boat'
+ * @option 'ship'
+ * @option 'airship'
+ * @default 'vehicle'
+ * 
+ * @param VariableId
+ * @text Game variable
+ * @desc Specifies a game variable. [Upper limit] [Lower limit] Lower limit of 0 and more than [Upper limit] (game variable)
+ * @type variable
+ * @default 0
+ * 
+ * @param SwitchId
+ * @text Game switch
+ * @desc Specifies the game switch. Reflected when true. (switch)
+ * @type switch
+ * @default 0
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.5.3
+ * @version 1.5.4
  * @base NUUN_Base
  * 
  * @help
@@ -21,8 +285,11 @@
  * 発動条件はPassiveMatchタグがない場合は、すべての条件が一致したときにパッシブスキルが適用されます。
  * 
  * スキルのメモ欄
+ * パッシブスキルの適用
  * <PassiveSkill:[id]> [id]:適用する武器ID
  * <PassiveSkill:10> 武器ID10番の武器のステータスが反映されます。
+ * 
+ * パッシブスキル適用条件(無記入の場合は常時適用されます)
  * <PassiveMatch:[mode]> 条件判定するモードを指定します。[mode] 0:一部一致　1:全て 無記入の場合は全て一致で判定します。
  * <PassiveMatch:1> いずれかの条件が一致したときに反映します。
  * <PassiveMatch:0> 全ての条件が一致したときに反映します。
@@ -68,7 +335,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2022/2/4 Ver.1.1.2
+ * 2022/11/20 Ver.1.5.4
+ * 特定のプラグインとの併用で、著しくパフォーマンスが低下する問題を修正。
+ * 日本語以外での表示を英語表示に変更。
+ * 2022/2/4 Ver.1.5.3
  * 処理の修正。
  * 2022/1/3 Ver.1.5.2
  * Ver.1.5.0以降でこのプラグインで設定した条件武器、防具タイプ、乗り物を条件指定するとエラーが出る問題を修正。
@@ -115,7 +385,7 @@
  * 
  * 
  */
-/*~struct~Conditions:
+/*~struct~Conditions:ja
  * 
  * @param NameStr
  * @text 識別名
@@ -267,6 +537,7 @@ Imported.NUUN_PassiveSkill = true;
   Game_Actor.prototype.initMembers = function() {
     _Game_Actor_initMembers.call(this);
     this._passiveSkillList = [];
+    //this._passiveCalc = false;
   };
 
   Game_Actor.prototype.isPassiveSkill = function(item) {
@@ -301,6 +572,11 @@ Imported.NUUN_PassiveSkill = true;
     return objects;
   };
 
+  Game_Actor.prototype.resetRassiveParam = function() {
+    this._pmhp = null;
+    this._pmmp = null;
+  };
+
   Game_Actor.prototype.passiveParam = function(paramId) {
     return this.getPassiveSkill(paramId);
   };
@@ -323,6 +599,7 @@ Imported.NUUN_PassiveSkill = true;
       });
       this._passiveCalc = false;
     }
+    this.resetRassiveParam();
     return value;
   };
 
@@ -386,9 +663,17 @@ Imported.NUUN_PassiveSkill = true;
     }
     switch (list.ParamConditions) {
       case 'HP':
-        return this.hp >= this.mhp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.hp <= this.mhp * list.UpLimit / 100) : true);
+        if (!this._pmhp) {
+          const _mhp = this.mhp;
+          this._pmhp = _mhp;
+        }
+        return this.hp >= this._pmhp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.hp <= this._pmhp * list.UpLimit / 100) : true);
       case 'MP':
-        return this.mp >= this.mmp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.mp <= this.mmp * list.UpLimit / 100) : true);
+        if (!this._pmmp) {
+          const _mmp = this.mmp;
+          this._pmmp = _mmp;
+        }
+        return this.mp >= this._pmmp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.mp <= this._pmmp * list.UpLimit / 100) : true);
       case 'TP':
         return this.tp >= this.maxTp() * list.DwLimit / 100 && (list.UpLimit > 0 ? this.tp <= this.maxTp() * list.UpLimit / 100 : true);
       case 'State':

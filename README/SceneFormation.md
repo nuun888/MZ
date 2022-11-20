@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.1.7.5
+# Ver.1.7.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -20,6 +20,9 @@
 ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）  
 
 ## 更新履歴
+2022/11/20 Ver.1.7.6  
+初回表示時にアクターのステータスが表示されない問題を修正。  
+デフォルトの立ち絵切り替えが機能していなかった問題を修正。  
 2022/10/28 Ver.1.7.5  
 アクター固定化プラグインの固定アクター戦闘メンバーへの移動可をOFFにしたときに固定アクターが移動できてしまう問題を修正。  
 2022/9/22 Ver.1.7.4  

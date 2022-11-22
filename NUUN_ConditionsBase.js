@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.6
+ * @version 1.1.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -249,6 +249,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/23 Ver.1.1.7
+ * 条件に能力値、追加能力値、特殊能力値を指定した場合、パフォーマンスが著しく低下する問題を修正。
  * 2022/8/28 Ver.1.1.6
  * ステートのターン条件に経過ターンで指定できる機能を追加。
  * 2022/6/19 Ver.1.1.5
@@ -1519,6 +1521,9 @@ function getTriggerConditionsMeta(obj, tag1, tag2, tag3, tag4) {
 };
 
 Game_BattlerBase.prototype.triggerParamConditions = function(data) {
+  if (!this._cParam) {
+    this._cParam = [];
+  }
   switch (data.ParamConditionsType) {
     case 'HP':
       return this.conditionsParam(data, 0);
@@ -1583,16 +1588,27 @@ Game_BattlerBase.prototype.triggerParamConditions = function(data) {
 
 Game_BattlerBase.prototype.conditionsParam = function(data, paramId) {
   let paramVal = 0;
+  let paramMaxVal = 0;
   if (paramId === 0) {
     paramVal = this._hp;
-    paramMaxVal = this.mhp;
+    if (!this._cParam[paramId]) {
+      paramMaxVal = this.mhp;
+      this._cParam[paramId] = paramMaxVal;
+    }
   } else if (paramId === 1) {
     paramVal = this._mp;
-    paramMaxVal = this.mmp;
+    if (!this._cParam[paramId]) {
+      paramMaxVal = this.mmp;
+      this._cParam[paramId] = paramMaxVal;
+    }
   } else if (paramId === 10) {
     paramVal = this._tp;
-    paramMaxVal = this.maxTp();
+    if (!this._cParam[paramId]) {
+      paramMaxVal = this.maxTp();
+      this._cParam[paramId] = paramMaxVal;
+    }
   }
+  paramMaxVal = this._cParam[paramId];
   if (data.ValList) {
     const valList = data.ValList.split(',').map(Number);
     return valList.some(val => val === paramVal);
@@ -1601,17 +1617,34 @@ Game_BattlerBase.prototype.conditionsParam = function(data, paramId) {
 };
 
 Game_BattlerBase.prototype.conditionsStatus = function(data, paramId) {
-  const paramVal = this.param(paramId);
+  let paramVal = 0;
+  if (!this._cParam[paramId]) {
+    paramVal = this.param(paramId);
+    this._cParam[paramId] = paramVal;
+  }
+  paramVal = this._cParam[paramId];
   return conditionsNum(data, paramVal);
 };
 
 Game_BattlerBase.prototype.conditionsXparam = function(data, paramId) {
-  const paramVal = this.xparam(paramId);
+  let paramVal = 0;
+  const id = paramId + 10;
+  if (!this._cParam[id]) {
+    paramVal = this.xparam(paramId);
+    this._cParam[id] = paramVal;
+  }
+  paramVal = this._cParam[id];
   return conditionsNum(data, paramVal);
 };
 
 Game_BattlerBase.prototype.conditionsSparam = function(data, paramId) {
-  let paramVal = this.sparam(paramId);
+  let paramVal = 0;
+  const id = paramId + 20;
+  if (!this._cParam[id]) {
+    paramVal = this.sparam(paramId);
+    this._cParam[id] = paramVal;
+  }
+  paramVal = this._cParam[id];
   return conditionsNum(data, paramVal);
 };
 
@@ -1623,12 +1656,16 @@ Game_BattlerBase.prototype.getTraitsTriggerConditions = function(tag) {
   return cond.length > 0 ? cond : null;
 };
 
+Game_BattlerBase.prototype.resetConditionsParam = function() {
+  this._cParam = [];
+};
 
 const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
 Game_Battler.prototype.initMembers = function() {
   _Game_Battler_initMembers.call(this);
   this._cntAction = false;
   this._reflectionAction = false;
+  this._cParam = [];
 };
 
 Game_Battler.prototype.getCntAction = function() {
@@ -1637,6 +1674,12 @@ Game_Battler.prototype.getCntAction = function() {
 
 Game_Battler.prototype.getReflectionAction = function() {
   return this._reflectionAction;
+};
+
+const _Game_Battler_refresh = Game_Battler.prototype.refresh;
+Game_Battler.prototype.refresh = function() {
+  _Game_Battler_refresh.call(this);
+  this.resetConditionsParam();
 };
 
 

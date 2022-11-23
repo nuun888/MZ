@@ -1,5 +1,5 @@
 # [所持金拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)
-# Ver.1.1.2
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -17,6 +17,8 @@
 所持金を表示するときに左側にアイコンを表示させます。表示させるウィンドウをアイコン表示クラスで指定できます。
 
 ## 更新履歴
+2022/11/23 Ver.1.2.0  
+所持金の最大数をゲーム変数で指定する機能を追加。  
 2022/6/4 Ver.1.1.2  
 メニュー画面プラグイン更新に対してのアイコン表示クラス選択項目の追加。  
 2021/12/30 Ver.1.1.1  

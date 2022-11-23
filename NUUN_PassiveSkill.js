@@ -576,11 +576,6 @@ Imported.NUUN_PassiveSkill = true;
     return objects;
   };
 
-  Game_Actor.prototype.resetRassiveParam = function() {
-    this._pmhp = null;
-    this._pmmp = null;
-  };
-
   Game_Actor.prototype.passiveParam = function(paramId) {
     return this.getPassiveSkill(paramId);
   };
@@ -731,6 +726,11 @@ Imported.NUUN_PassiveSkill = true;
   Game_Battler.prototype.refresh = function() {
     _Game_Battler_refresh.call(this);
     this.resetRassiveParam();
+  };
+
+  Game_Battler.prototype.resetRassiveParam = function() {
+    this._pmhp = null;
+    this._pmmp = null;
   };
 
 })();

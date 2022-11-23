@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.5.4
+ * @version 1.5.5
  * @base NUUN_Base
  * 
  * @help
@@ -81,6 +81,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/23/2022 Ver.1.5.5
+ * Re-correction.
  * 11/20/2022 Ver.1.5.4
  * Fixed an issue where performance would drop significantly when used with certain plugins.
  * Changed the display in languages other than Japanese to English.
@@ -274,7 +276,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.5.4
+ * @version 1.5.5
  * @base NUUN_Base
  * 
  * @help
@@ -335,6 +337,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/23 Ver.1.5.5
+ * 再修正。
  * 2022/11/20 Ver.1.5.4
  * 特定のプラグインとの併用で、著しくパフォーマンスが低下する問題を修正。
  * 日本語以外での表示を英語表示に変更。
@@ -599,7 +603,6 @@ Imported.NUUN_PassiveSkill = true;
       });
       this._passiveCalc = false;
     }
-    this.resetRassiveParam();
     return value;
   };
 
@@ -641,6 +644,7 @@ Imported.NUUN_PassiveSkill = true;
   Game_Actor.prototype.getCondition = function(skill) {
     const condTag = "PassiveConditions";
     const action = $gameTemp.getActionData();
+    
     return this.getTriggerConditions(skill, this, condTag , null, 'Party'+ condTag, 'Troop'+ condTag, action.action, action.damage, this.getPassiveMode(skill));
   };
 
@@ -721,6 +725,12 @@ Imported.NUUN_PassiveSkill = true;
 
   Game_Actor.prototype.isEquippedArmorType = function(type) {
     return this.equips().some(equip => equip && equip.atypeId === type);
+  };
+
+  const _Game_Battler_refresh = Game_Battler.prototype.refresh;
+  Game_Battler.prototype.refresh = function() {
+    _Game_Battler_refresh.call(this);
+    this.resetRassiveParam();
   };
 
 })();

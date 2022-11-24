@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.1
+ * @version 1.4.2
  * 
  * @help
  * You can display icons in the command menu and change the text color of command names.
@@ -34,12 +34,14 @@
  * Window_EnemyBook_Category：Monster Encyclopedia Enemy Category
  * Window_EnemyBookPageCategory：Monster picture book information page
  * 
+ * If it is not in the combo box, please enter it directly.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
- * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 11/25/2022 Ver 1.4.2
+ * Added a function that can specify the command to be applied with a symbol.
  * 11/10/2022 Ver 1.4.1
  * Corrected to fit the entire image within the display.
  * Changed the display in languages other than Japanese to English.
@@ -115,8 +117,32 @@
  * 
  * @param CommadName
  * @text Command name
- * @desc Command name to display icon (must be the same name as the command name to display)
+ * @desc Command name to apply (must be the same name as the command name to display)
  * @type string
+ * @default 
+ * 
+ * @param CommadSymbol
+ * @text Symbol name
+ * @desc Enter the symbolic name of the command to apply. If not entered, it will be referenced by the command name. ("item" for items)
+ * @type combo
+ * @option "item"
+ * @option "skill"
+ * @option "equip"
+ * @option "status"
+ * @option "formation"
+ * @option "options"
+ * @option "save"
+ * @option "gameEnd"
+ * @option "newGame"
+ * @option "continue"
+ * @option "toTitle"
+ * @option "cancel"
+ * @option "fight"
+ * @option "escape"
+ * @option "attack"
+ * @option "guard"
+ * @option "enemyBook"
+ * @option "enemyBookInfo"
  * @default 
  * 
  * @param CommadNameColor
@@ -214,7 +240,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.1
+ * @version 1.4.2
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -236,11 +262,15 @@
  * Window_EnemyBook_Category：モンスター図鑑敵カテゴリー
  * Window_EnemyBookPageCategory：モンスター図鑑情報ページ
  * 
+ * ※コンボボックスにない場合、直接記入してください。
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/25 Ver 1.4.2
+ * 適用するコマンドをシンボルで指定できる機能を追加。
  * 2022/11/10 Ver 1.4.1
  * 画像全体を表示内に収めるように修正。
  * 日本語以外での表示を英語表示に変更。
@@ -316,8 +346,32 @@
  * 
  * @param CommadName
  * @text コマンド名
- * @desc アイコンを表示するコマンド名（表示するコマンド名と同じ名前にしてください）
+ * @desc 適用するコマンド名（表示するコマンド名と同じ名前にしてください）
  * @type string
+ * @default 
+ * 
+ * @param CommadSymbol
+ * @text シンボル名
+ * @desc 適用するコマンドのシンボル名を記入します。無記入の場合はコマンド名で参照されます。(アイテムならitem)
+ * @type combo
+ * @option "item"
+ * @option "skill"
+ * @option "equip"
+ * @option "status"
+ * @option "formation"
+ * @option "options"
+ * @option "save"
+ * @option "gameEnd"
+ * @option "newGame"
+ * @option "continue"
+ * @option "toTitle"
+ * @option "cancel"
+ * @option "fight"
+ * @option "escape"
+ * @option "attack"
+ * @option "guard"
+ * @option "enemyBook"
+ * @option "enemyBookInfo"
  * @default 
  * 
  * @param CommadNameColor
@@ -430,6 +484,7 @@ const _Window_Command_initialize = Window_Command.prototype.initialize;
 Window_Command.prototype.initialize = function(rect) {
   this._classAlign = this.itemTextAlignClass();
   this._commadName = null;
+  this._commadSymbol = null;
   _Window_Command_initialize.call(this, rect);
 };
 
@@ -458,10 +513,18 @@ Window_Command.prototype.itemTextAlignClass = function() {
   return result ? result.CommandPosition : null;
 };
 
+Window_Command.prototype.getFindCommand = function(commad, commadName) {
+  if (!!commad.CommadSymbol) {
+    return commad.CommadSymbol === this._commadSymbol;
+  } else {
+    return commad.CommadName === this._commadName;
+  }
+};
+
 const _Window_Command_drawText = Window_Command.prototype.drawText;
 Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
   const commadName = this._commadName;
-  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => (Commad.CommadName === commadName) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
+  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => this.getFindCommand(Commad) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
   if (foundIndex >= 0) {
     const commadData = param.CommadIcon[foundIndex];
     const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
@@ -489,6 +552,7 @@ Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
   this._commadName = this.commandName(index);
+  this._commadSymbol = this.commandSymbol(index);
   _Window_Command_drawItem.call(this, index);
 };
 
@@ -507,8 +571,7 @@ Window_Command.prototype.isClass = function(Command, mode) {
 
 const _Window_Command_drawItemBackground = Window_Command.prototype.drawItemBackground;
 Window_Command.prototype.drawItemBackground = function(index) {
-  const commadName = this._commadName;
-  const find = param.CommadIcon ? param.CommadIcon.find(Commad => (Commad.CommadName === commadName) && this.isClass(Commad.CommandClass, Commad.CommandClassMode) && !!Commad.ContentsBuckImg) : null;
+  const find = param.CommadIcon ? param.CommadIcon.find(Commad => this.getFindCommand(Commad) && this.isClass(Commad.CommandClass, Commad.CommandClassMode) && !!Commad.ContentsBuckImg) : null;
   if (find) {
     const bitmap = ImageManager.nuun_LoadPictures(find.ContentsBuckImg);
     bitmap.addLoadListener(function() {
@@ -521,7 +584,7 @@ Window_Command.prototype.drawItemBackground = function(index) {
 
 Window_Command.prototype.drawContentsBack = function(bitmap, index) {
   const rect = this.itemRect(index);
-  const width = Math.min(bitmap.width, rect.width);console.log(width)
+  const width = Math.min(bitmap.width, rect.width);
   const height = Math.min(bitmap.height, rect.height);
   this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x + 1, rect.y + 1, width, height);
 };

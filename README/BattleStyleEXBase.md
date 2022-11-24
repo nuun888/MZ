@@ -18,7 +18,7 @@
 バトルスタイル拡張XPスタイル設定用 Ver.1.8.0  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.1.0  
+バトルスタイル拡張タイプ4設定用 Ver.1.1.1  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 

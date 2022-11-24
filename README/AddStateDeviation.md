@@ -1,6 +1,7 @@
 # [ステート付与の仕様変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js)
 # Ver.1.0.2
-
+ [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js)  
+ 
 必中攻撃ではステートを付与する際に有効度、運を無視して付与されてしまいます。  
 このプラグインでは必中攻撃でも有効度、運を考慮するように変更します。  
 

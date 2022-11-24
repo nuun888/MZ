@@ -8,9 +8,44 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Ability value increase/decrease feature per turn
+ * @author NUUN
+ * @version 2.0.2
+ * 
+ * @help
+ * You can set the feature that the ability value gradually increases for each turn.
+ * 
+ * Note field with features
+ * <AbilityIncrease:[param],[rate]> At the end of the turn, ability value ID[param] increases agility by [rate]% each turn.
+ * [param]:Ability ID
+ * 0:MaxHP 1:MaxMP 2:ATK 3:DEF 4:MAT 5:MDF 6：AGI 7:LUK
+ * [rate]:Increase rate　Increase rate is added every turn.
+ * <Acceleration:6, 10> Agility increases by 10% each turn.
+ * It is reset if there are no growth rate values to retrieve.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * 
+ * Log
+ * 11/25/2022 Ver.2.0.2
+ * Changed the display in languages other than Japanese to English.
+ * 1/26/2022 Ver.2.0.1
+ * Fixed an issue where an error would occur when starting the game from the middle of a save.
+ * 1/25/2022 Ver.2.0.0
+ * Compatible with all abilities.
+ * A separate plug-in for processing elapsed turns.
+ * 8/10/2021 Ver.1.0.1
+ * Fixed Actor TPB not progressing.
+ * 8/9/2021 Ver.1.0.0
+ * First edition.
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc 能力値ターン毎増減特徴
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.2
  * 
  * @help
  * ターンごとに徐々に能力値が上昇していく特徴を設定できます。
@@ -26,6 +61,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/25 Ver.2.0.2
+ * 日本語以外での表示を英語表示に変更。
+ * 2022/1/26 Ver.2.0.1
+ * セーブ途中からゲームを開始するとエラーが出る問題を修正。
  * 2022/1/25 Ver.2.0.0
  * 全ての能力値に対応。
  * 経過ターンの処理を別プラグイン化。
@@ -55,15 +94,24 @@ Game_BattlerBase.prototype.clearAccelerationbRate = function() {
 };
 
 Game_BattlerBase.prototype.resetAccelerationbRate = function(paramId) {
+  if (!this._abilityRate) {
+    this.clearAccelerationbRate();
+  }
   this._abilityRate[paramId] = -1;
 };
 
 Game_BattlerBase.prototype.setAccelerationbRate = function(paramId, rate) {
+  if (!this._abilityRate) {
+    this.clearAccelerationbRate();
+  }
   const param = this._abilityRate[paramId];
   this._abilityRate[paramId] = param < 0 ? 1.0 + rate : Math.max(param + rate, 0);
 };
 
 Game_BattlerBase.prototype.getAccelerationbRate = function(paramId) {
+  if (!this._abilityRate) {
+    this.clearAccelerationbRate();
+  }
   return this._abilityRate[paramId] >= 0 ? this._abilityRate[paramId] : 1.0;
 };
 

@@ -1,5 +1,5 @@
 # [地域マップ名](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapName.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapName.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -20,5 +20,7 @@
 地域名は設定したリージョンID内のみマップ名が変更します。指定のリージョンIDから外れた場合は元のマップ名または別の地域名が表示されます。  
 
 ## 更新履歴
+2022/11/24 Ver.1.0.1  
+日本語以外での表示を英語表示に変更。  
 2022/1/22 Ver.1.0.0  
 初版  

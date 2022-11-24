@@ -8,9 +8,74 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc Region map name
+ * @author NUUN
+ * @version 1.0.1
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * Displays the region name where the map name changes depending on the location.
+ * The map name changes depending on the region ID.
+ * 
+ * The setting method is set in the Note field of the map setting or from the plug-in parameter.
+ * If both are set, the map setting will be applied.
+ * 
+ * Map settings Note field
+ * <RegionMapName[regionId]:[MapName]> Sets the region name within the specified region ID.
+ * [regionId]:Region ID
+ * [MapName]:Map name
+ * <RegionMapName6:'Jungle'> Change the map name to Jungle when the player enters Region ID 6.
+ * The map name will change only within the set region ID. If it deviates from the specified region ID, the original map name or another region name will be displayed.
+ * 
+ * Log
+ * 11/24/2022 Ver.1.0.1
+ * Changed the display in languages other than Japanese to English.
+ * 1/22/2022 Ver.1.0.0
+ * First edition.
+ * 
+ * @param RegionMapNames
+ * @text Region map name setting
+ * @desc Set the area map name.
+ * @type struct<RegionMapNamesList>[]
+ * @default []
+ * 
+ */
+/*~struct~RegionMapNamesList:
+ * 
+ * @param MapId
+ * @text Map id
+ * @desc Map id
+ * @type number
+ * @default 0
+ * 
+ * @param RegionMapName
+ * @text In-map area map name setting
+ * @desc Set the area map name in the map.
+ * @type struct<RegionMapNameList>[]
+ * @default []
+ * 
+ */
+/*~struct~RegionMapNameList:
+ * 
+ * @param RegionId
+ * @text Region id
+ * @desc Region id
+ * @type number
+ * @default 0
+ * 
+ * @param mapName
+ * @text Region map name
+ * @desc Region map name
+ * @type string
+ * @default
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc 地域マップ名
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -29,6 +94,8 @@
  * 地域名は設定したリージョンID内のみマップ名が変更します。指定のリージョンIDから外れた場合は元のマップ名または別の地域名が表示されます。
  * 
  * 更新履歴
+ * 2022/11/24 Ver.1.0.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/1/22 Ver.1.0.0
  * 初版
  * 
@@ -39,7 +106,7 @@
  * @default []
  * 
  */
-/*~struct~RegionMapNamesList:
+/*~struct~RegionMapNamesList:ja
  * 
  * @param MapId
  * @text マップID
@@ -54,7 +121,7 @@
  * @default []
  * 
  */
-/*~struct~RegionMapNameList:
+/*~struct~RegionMapNameList:ja
  * 
  * @param RegionId
  * @text リージョンID

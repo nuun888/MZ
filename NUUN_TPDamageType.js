@@ -5,12 +5,41 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Damage type TP added
+ * @author NUUN
+ * @version 1.0.2
+ * 
+ * @help
+ * Adds TP to damage types.
+ * Skill and item Notes
+ * <DamageTypeTP> This skill and item are damage type "TP damage".
+ * <DamageTypeTPR> This skill and item are damage type "TP recovery".
+ * <DamageTypeTPA> This skill and item have the damage type "TP absorption".
+ * 
+ * Set the damage type to something other than None.
+ * If there is the above tag, the damage type will be the corresponding type. (Settings on the database are not applied)
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/24/2022 Ver.1.0.2
+ * Changed the display in languages other than Japanese to English.
+ * 2/27/2022 Ver.1.0.1
+ * Fixed an issue where TP would decrease when the damage type was TP recovery.
+ * 1/16/2022 Ver.1.0.0
+ * First edition.
+ * 
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc ダメージタイプTP追加
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * ダメージタイプにTPを追加します。
@@ -26,6 +55,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/24 Ver.1.0.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/2/27 Ver.1.0.1
  * ダメージタイプがTP回復の時に、TPが減ってしまう問題を修正。
  * 2022/1/16 Ver.1.0.0

@@ -1,5 +1,5 @@
 # [能力値ターン毎増減特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js)
-# Ver.2.0.0
+# Ver.2.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js)  
 
 ターンごとに徐々に通常能力値が上昇していく特徴を設定できます。
@@ -19,6 +19,10 @@
 3ターンの加算率は1.5倍  
 
 ## 更新履歴
+2022/11/25 Ver.2.0.2  
+日本語以外での表示を英語表示に変更。  
+2022/1/26 Ver.2.0.1  
+セーブ途中からゲームを開始するとエラーが出る問題を修正。  
 2022/1/25 Ver.2.0.0  
 全ての能力値に対応。  
 経過ターンの処理を別プラグイン化。  

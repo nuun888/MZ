@@ -6,12 +6,49 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Specification change of state assignment
+ * @author NUUN
+ * @version 1.0.2
+ * 
+ * @help
+ * In the sure hit attack, when giving a state, it will be given without ignoring effectiveness and luck.
+ * This plug-in will be changed to consider the effectiveness and luck even for hit hits.
+ * Also, by writing <NoLukStateSkill> in the skill/item Notes, this skill will not be affected by luck when granting states.
+ * By writing <NoLukState> in the memo field of the state, this state will not be affected by luck.
+ * 
+ * <NoLukStateSkill> The state granted by this skill ignores luck.
+ * <NoLukState> This state is not affected by luck.
+ * 
+ * By entering <CertainStateSkill> in the memo field of the skill, the state granted by this skill will be granted regardless of effectiveness and luck.
+ * By entering <CertainState:[id]> in the memo field of the skill, the state of state [id] to be given to this skill will be given regardless of effectiveness and luck.
+ * [id]: State ID
+ * 
+ * <CertainStateSkill>  The state received by this skill ignores the effectiveness and luck.
+ * <CertainState:4,6> State 4 and 6 received by this skill are granted regardless of effectiveness and luck.
+ * 
+ * When giving a state to an ally, luck is taken into account even if it is absolutely necessary, so you can ignore luck by entering <NoLukState> in the Note field of the state.
+ * If the state invalidation is set, the state will be invalidated even if the attack ignores the effectiveness.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/25/2022 Ver.1.0.2
+ * Changed the display in languages other than Japanese to English.
+ * 1/16/2022 Ver.1.0.1
+ * Fixed an issue where attack state chances for ignoring resistances were not being applied.
+ * 12/17/2020 Ver.1.0.0
+ * First edition.
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc ステート付与の仕様変更
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 必中攻撃ではステートを付与する際に有効度、運を無視して付与されてしまいます。
@@ -38,6 +75,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/25 Ver.1.0.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/1/16 Ver.1.0.1
  * 耐性無視時の攻撃時ステートの確率が適用されていなかった問題を修正。
  * 2020/12/17 Ver.1.0.0

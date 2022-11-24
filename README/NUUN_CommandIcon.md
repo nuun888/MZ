@@ -1,5 +1,5 @@
 # [コマンド、カテゴリー表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)
-# Ver.1.4.1
+# Ver.1.4.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  
 
 #### 必須プラグイン
@@ -29,8 +29,13 @@ Window_SaveVerificationWindow：セーブ確認上書き画面選択肢
 Window_EnemyBook_Category：モンスター図鑑敵カテゴリー  
 Window_EnemyBookPageCategory：モンスター図鑑情報ページ  
 
+※コンボボックスにない場合、直接記入してください。
+
+コマンドスキルプラグイン(トリアコンタン様)シンボル名:"special"  
 
 ## 更新履歴
+2022/11/25 Ver 1.4.2  
+適用するコマンドをシンボルで指定できる機能を追加。  
 2022/11/10 Ver 1.4.1  
 画像全体を表示内に収めるように修正。  
 日本語以外での表示を英語表示に変更。  

@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)  
 [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md)  
 
@@ -12,6 +12,7 @@
 `<SkillHPCostR:[rate]>` コストとして残りHPの割合（百分率）％を消費します。  
 `<HPCostDead>` 消費による戦闘不能を許可します。  
 ### MP消費スキル
+`<SkillMPCost:[cost]>` コストとしてMPを消費します。  
 `<SkillMPCostMR:[rate]>` コストとして最大MPの割合（百分率）％を消費します。  
 `<SkillMPCostR:[rate]>` コストとして残りMPの割合（百分率）％を消費します。  
 `<MPCostNoMcr>` ＭＰ消費率の効果を適用しません。  
@@ -59,7 +60,10 @@
   
 スキルのダメージの計算式にa.consBMp * 1.5 と記入することで消費前のMPの1.5倍のダメージを与えることができます。  
 
-## 更新履歴  
+## 更新履歴 
+2022/11/25 Ver.1.1.1  
+MPのスキルコストを追加。(コストを10000以上設定できます)  
+日本語以外での表示を英語表示に変更。  
 2022/4/2 Ver.1.1.0  
 装備中の武器、防具を消費して発動するスキルを設定できる機能を追加。  
 2021/12/5 Ver.1.0.0  

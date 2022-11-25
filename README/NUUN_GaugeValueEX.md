@@ -1,5 +1,5 @@
 # [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
-# Ver.1.2.1
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -12,6 +12,7 @@
 ラベル、数値のフォントサイズを変更できます。  
 数値の座標を変更できます。  
 指定の割合以下、最大時にゲージの色を変更できます。  
+ラベルのアイコン表示。  
 
 ![画像](img/GaugeValueEX1.png)  
 ![画像](img/GaugeValueEX4.png)  
@@ -45,6 +46,9 @@ Ver.1.2.0より別プラグイン化いたしました。
 [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  
 
 ### 更新履歴
+2022/11/25 Ver.1.3.0  
+ラベルにアイコンを指定できる機能を追加。  
+日本語以外での表示を英語表示に変更。  
 2022/7/19 Ver.1.2.1  
 数値の位置を中央揃えにする機能を追加。  
 2022/7/18 Ver.1.2.0  

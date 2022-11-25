@@ -1,5 +1,5 @@
 # [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -19,11 +19,14 @@
 パーティリミットゲージのコスト表示をこのプラグインで設定する場合は、このプラグインをパーティリミットゲージより下に配置してください。  
 
 `skill`:発動するスキルデータ  
-`this._actor`:アクターデータ  
+`this._actor`または`actor`:アクターデータ  
 
 色の設定は通常システムカラーを記入しますが、テキストタブからカラーコードを記入できます。
 
 ## 更新履歴
+2022/11/25 Ver.1.0.2  
+アクターのゲームデータの取得パラメータをactorで取得できるように修正。  
+日本語以外での表示を英語表示に変更。  
 2022/1/3 Ver.1.0.1  
 コスト表示対象でリストにないタグを複数指定したときに、正常に表示されない問題を修正。  
 2021/12/5 Ver.1.0.0  

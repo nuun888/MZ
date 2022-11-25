@@ -17,6 +17,9 @@
 メニューコマンド、メニューステータス、インフォウィンドウの座標、サイズを設定できます。  
 メニューステータス、インフォウィンドウは表示したい項目をカスタマイズできます。  
 
+Ver.2.0.0から以下のプラグインが必要になります。  
+[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.0  
+
 ![画像](img/MenuScreen_default.png)  
 
 ## 設定方法

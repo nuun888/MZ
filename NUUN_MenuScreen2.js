@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_MenuScreen.js
+ * NUUN_MenuScreen2.js
  * 
  * Copyright (C) 2022 NUUN
  * This software is released under the MIT License.
@@ -74,7 +74,7 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 11/25s/2022 Ver.2.0.0
+ * 11/25/2022 Ver.2.0.0
  * Separate files for configuration and processing.
  * Added the ability to specify the coordinates and size of the menu command window, menu status window, and menu info window.
  * Changed the specification of how to set the menu info window.
@@ -91,11 +91,9 @@
  * Added a function to display only the states for which you want to display state icons.
  * Added a function to display the state displayed in the battle status on the menu screen.
  * Fixed the problem that the decimal point was ignored when displaying the % of experience value.
- * 7/4/2022 Ver.1.6.5
+ * 7/4/2022 Ver.1.6.4
  * Fixed so that the font size of info can be set for each item.
  * Added processing by supporting "NUUN_Chaptern" plug-in.
- * 6/15/2022 Ver.1.6.4
- * Minor fix.
  * 6/10/2022 Ver.1.6.3
  * Fixed the problem that the parameter is shifted to the right if the name is not entered in the status unique parameter.
  * 6/7/2022 Ver.1.6.2
@@ -110,19 +108,15 @@
  * Changed the background image to a two-layer structure.
  * 5/28/2022 Ver.1.5.0
  * Added the ability to add your own gauges to the stats that can be displayed.
- * Added a function to display the height of the menu command window by the number of commands (MV display).
  * 5/22/2022 Ver.1.4.1
  * Fixed an issue where the original parameters of stats were not applied.
  * Added experience value (no gauge) to status.
  * 5/17/2022 Ver.1.4.0
  * Added a function that can display character chips.
  * Changed the method to select the actor's image from facial graphics, character chips, and images.
- * 5/11/2022 Ver.1.3.1
- * Add free text to info window.
  * 5/11/2022 Ver.1.3.0
- * Added a function that can specify the position of the menu command.
- * Added a function that allows you to choose whether to insert a footer above the menu commands.
  * Added a function to set the font size for each item in the status column.
+ * Add free text to info window.
  * 4/10/2022 Ver.1.2.1
  * Fixed typos.
  * 4/10/2022 Ver.1.2.0
@@ -134,15 +128,13 @@
  * Fixed the screen when selecting an ally with items and skills to be the same as the menu screen display.
  * Changed presets due to version upgrade.
  * 1/23/2022 Ver.1.1.1
+ * Fixed an issue where an error would occur if face graphics were displayed without installing standing pictures and face graphics EX.
  * Changed the specification of face coordinate setting.
- * 1/9/2022 Ver.1.1.0
+ * 1/9/2022 Ver.1.0.1
  * Added a function that can specify the character alignment of the display of status items.
  * Added experience points to status items.
  * Added a function that can specify the font size of the info window.
- * Fixed because info preset was blank.
  * 12/29/2021 Ver.1.0.1
- * Fixed an issue where an error would occur if there was no menu command description.
- * 12/29/2021 Ver.1.0.0
  * First edition.
  * 
  * @command ChangeBackgroundId
@@ -215,7 +207,7 @@
  * @text Display Col for Menu Commands
  * @desc Col to display for menu commands.
  * @type number
- * @default 1
+ * @default 4
  * @min 1
  * @parent MenuCommandSetting
  * 
@@ -223,7 +215,7 @@
  * @text Display Row for Menu Commands
  * @desc Row to display for menu commands. 0 for the number of menu commands displayed in the vertical width
  * @type number
- * @default 0
+ * @default 2
  * @min 0
  * @parent MenuCommandSetting
  * 
@@ -239,7 +231,7 @@
  * @desc Y coordinate for menu commands.
  * @text Menu command Y coordinate
  * @type number
- * @default 96
+ * @default 0
  * @min -9999
  * @parent MenuCommandSetting
  * 
@@ -247,7 +239,7 @@
  * @text Menu command width
  * @desc Width of the menu command window.
  * @type number
- * @default 240
+ * @default 0
  * @min 0
  * @parent MenuCommandSetting
  * 
@@ -255,7 +247,7 @@
  * @text Menu command vertical width
  * @desc Height of the menu command window. 0 for main area height
  * @type number
- * @default 410
+ * @default 0
  * @min 0
  * @parent MenuCommandSetting
  * 
@@ -273,14 +265,14 @@
  * @value 'top'
  * @option Bottom of screen
  * @value 'under'
- * @default 'right'
+ * @default 'top'
  * @parent MenuCommandSetting
  * 
  * @param CommandHeightMode
  * @text Window height mode
  * @desc Fits the height of the menu command window to the number of commands.
  * @type boolean
- * @default false
+ * @default true
  * @parent MenuCommandSetting
  * 
  * @param CommandWindowVisible
@@ -298,7 +290,7 @@
  * @desc Status item setting.
  * @text Status item setting
  * @type struct<StatusListData>[]
- * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"132\",\"SystemItemWidth\":\"48\",\"Align\":\"'right'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-64\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-32\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}"]
+ * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"132\",\"SystemItemWidth\":\"48\",\"Align\":\"'right'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-64\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-32\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}"]
  * @parent StatusSetting
  * 
  * @param MenuCols
@@ -329,7 +321,7 @@
  * @desc Y coordinate of menu status
  * @text Menu status Y coordinate.
  * @type number
- * @default 96
+ * @default 0
  * @min -9999
  * @parent StatusSetting
  * 
@@ -345,7 +337,7 @@
  * @desc Vertical width of the menu status.
  * @text Menu status vertical width
  * @type number
- * @default 0
+ * @default 356
  * @min 0
  * @parent StatusSetting
  * 
@@ -376,7 +368,7 @@
  * @text Width of HP gauge
  * @desc Specifies the width of the HP gauge.
  * @type number
- * @default 128
+ * @default 168
  * @min 0
  * @parent GaugeSetting
  * 
@@ -384,7 +376,7 @@
  * @text MP gauge width
  * @desc Specifies the width of the MP gauge.
  * @type number
- * @default 128
+ * @default 168
  * @min 0
  * @parent GaugeSetting
  * 
@@ -392,7 +384,7 @@
  * @text TP gauge width
  * @desc Specifies the width of the TP gauge.
  * @type number
- * @default 128
+ * @default 168
  * @min 0
  * @parent GaugeSetting
  * 
@@ -420,7 +412,7 @@
  * @text Width of Exp Gauge
  * @desc Specifies the width of the Exp gauge.
  * @type number
- * @default 128
+ * @default 168
  * @min 0
  * @parent ExpgaugeSetting
  * 
@@ -464,7 +456,7 @@
  * @desc Info item settings
  * @text Info item settings
  * @type struct<InfoWindowList>[]
- * @default ["{\"MethodName\":\"money\",\"ListDateSetting\":\"1\",\"X_Position\":\"568\",\"Y_Position\":\"504\",\"Width\":\"240\",\"Height\":\"0\",\"InfoCols\":\"1\",\"InfoRows\":\"1\",\"InfoFontSize\":\"0\",\"WindowVisible\":\"true\"}","{\"MethodName\":\"MainInfo\",\"ListDateSetting\":\"2\",\"X_Position\":\"0\",\"Y_Position\":\"0\",\"Width\":\"0\",\"Height\":\"0\",\"InfoCols\":\"2\",\"InfoRows\":\"2\",\"InfoFontSize\":\"0\",\"WindowVisible\":\"true\"}"]
+ * @default ["{\"MethodName\":\"money\",\"ListDateSetting\":\"1\",\"X_Position\":\"568\",\"Y_Position\":\"468\",\"Width\":\"240\",\"Height\":\"0\",\"InfoCols\":\"1\",\"InfoRows\":\"2\",\"InfoFontSize\":\"0\",\"WindowVisible\":\"true\"}","{\"MethodName\":\"MainInfo\",\"ListDateSetting\":\"2\",\"X_Position\":\"0\",\"Y_Position\":\"468\",\"Width\":\"568\",\"Height\":\"0\",\"InfoCols\":\"2\",\"InfoRows\":\"2\",\"InfoFontSize\":\"0\",\"WindowVisible\":\"true\"}"]
  * @parent InfoSetting
  * 
  * @param HelpList
@@ -483,14 +475,14 @@
  * @desc List to display.
  * @text Display list 1
  * @type struct<InfoListData>[]
- * @default ["{\"DateSelect\":\"2\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DataEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"Money\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}","{\"DateSelect\":\"2\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DataEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}"]
  * @parent ListData1_10
  *  
  * @param PageList2
  * @desc List to display.
  * @text Display list 2
  * @type struct<InfoListData>[]
- * @default ["{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"Location:\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"120\",\"NameColor\":\"16\",\"ParamName\":\"PlayTime:\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}","{\"DateSelect\":\"6\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"816\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DataEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"80\",\"NameColor\":\"16\",\"ParamName\":\"Location:\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"-4\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"120\",\"NameColor\":\"16\",\"ParamName\":\"PlayTime:\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"-4\"}","{\"DateSelect\":\"6\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"816\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DataEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}"]
  * @parent ListData1_10
  * 
  * @param PageList3
@@ -1378,17 +1370,15 @@
  * ゲージがアクターの表示範囲内に収まるように修正。
  * 2022/8/22 Ver.1.7.2
  * 制御文字でフォントサイズ変更をした後に、項目のフォントのサイズが変化してしまう問題を修正。
- * 2022/7/23 Ver.1.3.1
+ * 2022/7/23 Ver.1.7.1
  * ステートの表示ステートを範囲指定する機能を追加。
  * 2022/7/23 Ver.1.7.0
  * ステートのアイコンを表示したいステートのみ表示する機能を追加。
  * バトルステータスに表示されるステートの表示をメニュー画面上に表示できる機能を追加。
  * 経験値の%表示時に小数点が指定した小数点数を無視して表示されてしまう問題を修正。
- * 2022/7/4 Ver.1.6.5
+ * 2022/7/4 Ver.1.6.4
  * インフォのフォントサイズを各項目毎に設定できるように修正。
  * チャプターテキストプラグイン対応による処理追加。
- * 2022/6/15 Ver.1.6.4
- * 微修正。
  * 2022/6/10 Ver.1.6.3
  * ステータス独自パラメータで名称を無記入した場合、パラメータが右にずれる問題を修正。
  * 2022/6/7 Ver.1.6.2
@@ -1403,19 +1393,15 @@
  * 背景画像を２層構造に変更。
  * 2022/5/28 Ver.1.5.0
  * 表示できるステータスに独自のゲージを追加できる機能を追加。
- * メニューコマンドウィンドウの高さをコマンド数の高さで表示する(MVの表示)機能を追加。
  * 2022/5/22 Ver.1.4.1
  * ステータスの独自パラメータが適用されない問題を修正。
  * ステータスに経験値（ゲージなし）を追加。
  * 2022/5/17 Ver.1.4.0
  * キャラチップを表示できる機能を追加。
  * アクターの画像を顔グラ、キャラチップ、画像から選択する方式に変更。
- * 2022/5/11 Ver.1.3.1
- * インフォウィンドウにフリーテキストを追加。
  * 2022/5/11 Ver.1.3.0
- * メニューコマンドの位置を指定できる機能を追加。
- * メニューコマンドの上にフッターを挟むかを選択できる機能を追加。
  * ステータス欄の各項目にフォントサイズを設定できる機能を追加。
+ * インフォウィンドウにフリーテキストを追加。
  * 2022/4/10 Ver.1.2.1
  * 誤字修正。
  * 2022/4/10 Ver.1.2.0
@@ -1427,14 +1413,12 @@
  * アイテム、スキルで味方選択時の画面をメニュー画面の表示と同じになるように修正。
  * バージョンアップによりプリセットを変更。
  * 2022/1/23 Ver.1.1.1
+ * 立ち絵、顔グラEXを導入せず、顔グラを表示させるとエラーが出る問題を修正。
  * 顔グラの座標設定の仕様を変更。
  * 2022/1/9 Ver.1.1.0
  * ステータス項目の表示の文字揃えを指定できる機能を追加。
  * ステータス項目に経験値を追加。
  * インフォウィンドウの文字サイズを指定できる機能を追加。
- * インフォのプリセットが空白だったため修正。
- * 2021/12/29 Ver.1.0.1
- * メニューコマンドの説明がない場合にエラーが起こる問題を修正。
  * 2021/12/29 Ver.1.0.0
  * 初版
  * 
@@ -1508,7 +1492,7 @@
  * @text メニューコマンドの表示列
  * @desc メニューコマンドの表示する列。
  * @type number
- * @default 1
+ * @default 4
  * @min 1
  * @parent MenuCommandSetting
  * 
@@ -1516,7 +1500,7 @@
  * @text メニューコマンドの表示行
  * @desc メニューコマンドの表示する行。0でメニューコマンド縦幅内での表示数
  * @type number
- * @default 0
+ * @default 2
  * @min 0
  * @parent MenuCommandSetting
  * 
@@ -1532,7 +1516,7 @@
  * @desc メニューコマンドのY座標
  * @text メニューコマンドY座標
  * @type number
- * @default 96
+ * @default 0
  * @min -9999
  * @parent MenuCommandSetting
  * 
@@ -1540,7 +1524,7 @@
  * @text メニューコマンド横幅
  * @desc メニューコマンドウィンドウの横幅。
  * @type number
- * @default 240
+ * @default 0
  * @min 0
  * @parent MenuCommandSetting
  * 
@@ -1548,7 +1532,7 @@
  * @text メニューコマンド縦幅
  * @desc メニューコマンドウィンドウの縦幅。0でメインエリア高さ
  * @type number
- * @default 410
+ * @default 0
  * @min 0
  * @parent MenuCommandSetting
  * 
@@ -1566,14 +1550,14 @@
  * @value 'top'
  * @option 画面下
  * @value 'under'
- * @default 'right'
+ * @default 'top'
  * @parent MenuCommandSetting
  * 
  * @param CommandHeightMode
  * @text ウィンドウ高さモード
  * @desc メニューコマンドウィンドウの高さをコマンド数に合わせます。
  * @type boolean
- * @default false
+ * @default true
  * @parent MenuCommandSetting
  * 
  * @param CommandWindowVisible
@@ -1591,7 +1575,7 @@
  * @desc ステータス項目設定
  * @text ステータス項目設定
  * @type struct<StatusListData>[]
- * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"132\",\"SystemItemWidth\":\"48\",\"Align\":\"'right'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-64\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-32\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}"]
+ * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"132\",\"SystemItemWidth\":\"48\",\"Align\":\"'right'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-64\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"-32\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"0\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}"]
  * @parent StatusSetting
  * 
  * @param MenuCols
@@ -1622,7 +1606,7 @@
  * @desc メニューステータスのY座標
  * @text メニューステータスY座標
  * @type number
- * @default 96
+ * @default 0
  * @min -9999
  * @parent StatusSetting
  * 
@@ -1638,7 +1622,7 @@
  * @desc メニューステータスの縦幅。
  * @text メニューステータス縦幅
  * @type number
- * @default 0
+ * @default 356
  * @min 0
  * @parent StatusSetting
  * 
@@ -1669,7 +1653,7 @@
  * @text HPゲージ横幅
  * @desc HPゲージの横幅を指定します。
  * @type number
- * @default 128
+ * @default 168
  * @min 0
  * @parent GaugeSetting
  * 
@@ -1677,7 +1661,7 @@
  * @text MPゲージ横幅
  * @desc MPゲージの横幅を指定します。
  * @type number
- * @default 128
+ * @default 168
  * @min 0
  * @parent GaugeSetting
  * 
@@ -1685,7 +1669,7 @@
  * @text TPゲージ横幅
  * @desc TPゲージの横幅を指定します。
  * @type number
- * @default 128
+ * @default 168
  * @min 0
  * @parent GaugeSetting
  * 
@@ -1713,7 +1697,7 @@
  * @text Expゲージ横幅
  * @desc Expゲージの横幅を指定します。
  * @type number
- * @default 128
+ * @default 168
  * @min 0
  * @parent ExpgaugeSetting
  * 
@@ -1757,7 +1741,7 @@
  * @desc インフォ項目設定
  * @text インフォ項目設定
  * @type struct<InfoWindowList>[]
- * @default ["{\"MethodName\":\"money\",\"ListDateSetting\":\"1\",\"X_Position\":\"568\",\"Y_Position\":\"504\",\"Width\":\"240\",\"Height\":\"0\",\"InfoCols\":\"1\",\"InfoRows\":\"1\",\"InfoFontSize\":\"0\",\"WindowVisible\":\"true\"}","{\"MethodName\":\"MainInfo\",\"ListDateSetting\":\"2\",\"X_Position\":\"0\",\"Y_Position\":\"0\",\"Width\":\"0\",\"Height\":\"0\",\"InfoCols\":\"2\",\"InfoRows\":\"2\",\"InfoFontSize\":\"0\",\"WindowVisible\":\"true\"}"]
+ * @default ["{\"MethodName\":\"money\",\"ListDateSetting\":\"1\",\"X_Position\":\"568\",\"Y_Position\":\"468\",\"Width\":\"240\",\"Height\":\"0\",\"InfoCols\":\"1\",\"InfoRows\":\"2\",\"InfoFontSize\":\"0\",\"WindowVisible\":\"true\"}","{\"MethodName\":\"MainInfo\",\"ListDateSetting\":\"2\",\"X_Position\":\"0\",\"Y_Position\":\"468\",\"Width\":\"568\",\"Height\":\"0\",\"InfoCols\":\"2\",\"InfoRows\":\"2\",\"InfoFontSize\":\"0\",\"WindowVisible\":\"true\"}"]
  * @parent InfoSetting
  * 
  * @param HelpList
@@ -1776,14 +1760,14 @@
  * @desc 表示するリスト。
  * @text 表示リスト１
  * @type struct<InfoListData>[]
- * @default ["{\"DateSelect\":\"2\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DataEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"所持金\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}","{\"DateSelect\":\"2\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DataEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}"]
  * @parent ListData1_10
  *  
  * @param PageList2
  * @desc 表示するリスト。
  * @text 表示リスト２
  * @type struct<InfoListData>[]
- * @default ["{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"現在地:\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"120\",\"NameColor\":\"16\",\"ParamName\":\"プレイ時間:\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}","{\"DateSelect\":\"6\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"816\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DataEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}"]
+ * @default ["{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"80\",\"NameColor\":\"16\",\"ParamName\":\"現在地:\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"-4\"}","{\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"120\",\"NameColor\":\"16\",\"ParamName\":\"プレイ時間:\",\"DataEval\":\"\",\"Align\":\"'left'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"-4\"}","{\"DateSelect\":\"6\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"816\",\"SystemItemWidth\":\"0\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DataEval\":\"\",\"Align\":\"'right'\",\"InfoIcon\":\"0\",\"Text\":\"\",\"ContentsFontSize\":\"0\"}"]
  * @parent ListData1_10
  * 
  * @param PageList3
@@ -2593,22 +2577,22 @@
  * 
  */
 var Imported = Imported || {};
-Imported.NUUN_MenuScreen = true;
+Imported.NUUN_MenuScreen2 = true;
 
 (() => {
-    const parameters = PluginManager.parameters('NUUN_MenuScreen');
+    const parameters = PluginManager.parameters('NUUN_MenuScreen2');
 
     const params = {};
 
-    params.menuMode = 'Type1';
+    params.menuMode = 'Type2';
     params.BackGroundImg = String(parameters['BackGroundImg']);
     params.BackGroundImges = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImges'])) : null) || [];
     params.BackUiWidth1 = eval(parameters['BackUiWidth1'] || "true");
     params.BackUiWidth = eval(parameters['BackUiWidth'] || "true");
     params.WindowMargin = Number(parameters['WindowMargin'] || 4);
     params.WindowUiIgnore = eval(parameters['WindowUiIgnore'] || "false");
-    params.MenuCommandCols = Number(parameters['MenuCommandCols'] || 1);
-    params.MenuCommandRows = Number(parameters['MenuCommandRows'] || 0);
+    params.MenuCommandCols = Number(parameters['MenuCommandCols'] || 4);
+    params.MenuCommandRows = Number(parameters['MenuCommandRows'] || 2);
     params.MenuCommandX = Number(parameters['MenuCommandX'] || 0);
     params.MenuCommandY = Number(parameters['MenuCommandY'] || 0);
     params.MenuCommandWidth = Number(parameters['MenuCommandWidth'] || 0);
@@ -2619,9 +2603,9 @@ Imported.NUUN_MenuScreen = true;
     params.ExpGaugeWidth = Number(parameters['ExpGaugeWidth'] || 128);
     params.ExpGaugeColor1 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor1'])) : 18);
     params.ExpGaugeColor2 = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ExpGaugeColor2'])) : 18);
-    params.CommandHeightMode = eval(parameters['CommandHeightMode'] || "false");
+    params.CommandHeightMode = eval(parameters['CommandHeightMode'] || "true");
     params.DecimalMode = eval(parameters['DecimalMode'] || "true");
-    params.MenuCommandPosition = eval(parameters['MenuCommandPosition']) || 'right';
+    params.MenuCommandPosition = eval(parameters['MenuCommandPosition']) || 'top';
     params.ArrangementMode = eval(parameters['ArrangementMode'] || 1);
     params.ExpDisplayMode = Number(parameters['ExpDisplayMode'] || 1);
     params.LabelShow = eval(parameters['LabelShow'] || "true");

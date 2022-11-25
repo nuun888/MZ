@@ -1,0 +1,1523 @@
+/*:-----------------------------------------------------------------------------------
+ * NUUN_MenuScreenEXBase.js
+ * 
+ * Copyright (C) 2022 NUUN
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
+ * -------------------------------------------------------------------------------------
+ */
+/*:
+ * @target MZ
+ * @plugindesc Menu screen base
+ * @author NUUN
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_MenuScreen_default
+ * @orderAfter NUUN_MenuScreen
+ * @orderAfter NUUN_MenuScreen2
+ * @version 2.0.0
+ * 
+ * @help
+ * A base plugin for processing menu screens.
+ * 
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/25/2022 Ver.2.0.0
+ * Separation of menu screen setting and processing.
+ * 
+ */
+/*:ja
+ * @target MZ
+ * @plugindesc メニュー画面ベース
+ * @author NUUN
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_MenuScreenEX
+ * @version 2.0.0
+ * 
+ * @help
+ * メニュー画面を処理するためのベースプラグインです。
+ * 
+ * 
+ * 利用規約
+ * このプラグインはMITライセンスで配布しています。
+ * 
+ * 更新履歴
+ * 2022/11/25 Ver.2.0.0
+ * メニュー画面の処理を統合し、設定用のみ分割。
+ * 
+ */
+
+var Imported = Imported || {};
+Imported.NUUN_MenuScreenEXBase = true;
+
+(() => {
+    const parameters = PluginManager.parameters('NUUN_MenuScreenEXBase');
+    const params = NuunManager.getMenuStatusParams();
+
+    let maxGaugeWidth = 128;
+    let menuTextMode = null;
+    let menuAlign = null;
+    let _commandName = '';
+    let _commandText = '';
+
+    function getPluginName() {
+        if (Imported.NUUN_MenuScreen_default) {
+            return "NUUN_MenuScreen_default";
+        } else if (Imported.NUUN_MenuScreen) {
+            return "NUUN_MenuScreen";
+        } else if (Imported.NUUN_MenuScreen2) {
+            return "NUUN_MenuScreen2";
+        } else {
+            return '';
+        }
+    };
+
+
+    const pluginName = getPluginName();console.log(pluginName)
+    PluginManager.registerCommand(getPluginName(), 'ChangeBackgroundId', args => {
+        $gameSystem.menuBackgroundId = Number(args.backgroundId);
+    });
+    
+    Scene_Menu.prototype.create = function() {
+        Scene_MenuBase.prototype.create.call(this);
+        this.createCommandWindow();
+        this.createStatusWindow();
+        this.createInfoWindow();
+    };
+
+    Scene_Menu.prototype.isRightInputMode = function() {
+        return params.MenuCommandPosition === 'right';
+    };
+
+    const _Scene_Menu_createCommandWindow = Scene_Menu.prototype.createCommandWindow;
+    Scene_Menu.prototype.createCommandWindow = function() {
+        _Scene_Menu_createCommandWindow.call(this);
+        _commandName = null;
+        if (params.CommandHeightMode) {
+            this._commandWindow.maxItemsHeight();
+        }
+        if (!params.CommandWindowVisible) {
+            this._commandWindow.opacity = 0;
+        }
+    };
+
+    Scene_Menu.prototype.createInfoWindow = function() {
+        const list = params.MenuInfoWindowSetting;
+        list.forEach((data, i) => {
+            if (data.ListDateSetting > 0) {
+                const method = '_infoSideMenuWindow'+ !!params.MethodName ? params.MethodName : [i];
+                const pageMethod = 'PageList' + data.ListDateSetting;
+                const rect = this.infoWindowRect(data);
+                const window = new Window_InfoMenu(rect);
+                this[method] = window;
+                this.addWindow(window);
+                window.setup(params.infoContents[pageMethod], data.InfoCols, data.InfoFontSize);
+                if (!data.WindowVisible) {
+                    window.opacity = 0;
+                }
+            }
+        });
+    };
+
+    const _Scene_Menu_createStatusWindow = Scene_Menu.prototype.createStatusWindow;
+    Scene_Menu.prototype.createStatusWindow = function() {
+        _Scene_Menu_createStatusWindow.call(this);
+        if (!params.WindowVisible) {
+            this._statusWindow.opacity = 0;
+        }
+    };
+
+    Scene_Menu.prototype.infoWindowRect = function(data) {
+        const wx = data.X_Position + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0);
+        const ww = params.WindowUiIgnore ? (data.Width > 0 ? data.Width : Graphics.width) : (Math.min(data.Width > 0 ? data.Width : Graphics.boxWidth, Graphics.boxWidth - wx));
+        const wy = (params.WindowUiIgnore ? 0 : this.menuHelpAreaHeight()) + data.Y_Position;
+        const wh = data.InfoRows > 0 ? this.infoAreaHeight(data.InfoRows) : data.Height;
+        return new Rectangle(wx, wy, ww, Math.min(wh, (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight) - wy));
+    };
+
+    Scene_Menu.prototype.commandWindowRect = function() {
+        const wx = this.mainCommandX();
+        const wy = this.mainCommandY();
+        const ww = (Math.min(this.mainCommandWidth(), (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx));
+        const wh = this.mainCommandHeight();
+        return new Rectangle(wx, wy, ww, wh);
+    };
+
+    Scene_Menu.prototype.statusWindowRect = function() {
+        let rect = [];
+        if (params.ArrangementMode === 0) {
+            rect = this.statusWindowArrangementModeRect();
+        } else {
+            rect = this.statusWindowDefaultModeRect();
+        }
+        return new Rectangle(rect[0], rect[1], rect[2], rect[3]);
+    };
+
+    Scene_Menu.prototype.statusWindowDefaultModeRect = function() {
+        const width = (params.MenuStatusWidth > 0 ? params.MenuStatusWidth : (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - (!isBesideMenuCommand() ? this.mainCommandWidth() : 0));
+        const height = params.MenuStatusHeight > 0 ? params.MenuStatusHeight : (params.WindowUiIgnore ? Graphics.height : (Graphics.boxHeight - this.menuHelpAreaHeight()));
+        const wx = (params.MenuCommandPosition === 'left' ? this.mainCommandWidth() : 0) + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0) + params.MenuStatusX;
+        const ww = Math.min(width, (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx);
+        const wh = Math.min(height, (isBesideMenuCommand() ? (params.WindowUiIgnore ? Graphics.height - this.mainCommandHeight() : Graphics.boxHeight - this.menuHelpAreaHeight() - this.mainCommandHeight()) : (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight)));
+        const wy = (isBesideMenuCommand() ? this._commandWindow.y + (params.MenuCommandPosition === 'under' ? -wh : this.mainCommandHeight()) : (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.menuHelpAreaHeight())) + params.MenuStatusY;
+        return [wx, wy, ww, Math.min(wh, (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight) - wy)];
+    };
+
+    Scene_Menu.prototype.statusWindowArrangementModeRect = function() {
+        const width = (params.MenuStatusWidth > 0 ? params.MenuStatusWidth : (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth));
+        const height = params.MenuStatusHeight > 0 ? params.MenuStatusHeight : (params.WindowUiIgnore ? Graphics.height : (Graphics.boxHeight - this.menuHelpAreaHeight()));
+        const wx = params.MenuStatusX + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0);
+        const ww = Math.min(width, (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx);
+        const wy = (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.menuHelpAreaHeight()) + params.MenuStatusY;
+        const wh = Math.min(height, (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight) - wy);
+        return [wx, wy, ww, wh];
+    };
+
+    function isBesideMenuCommand() {
+        return params.MenuCommandPosition === 'under' || params.MenuCommandPosition === 'top';
+    };
+
+    Scene_Menu.prototype.mainCommandX = function() {
+        switch (params.MenuCommandPosition) {
+            case 'free':
+            case 'left':
+            case 'top':
+            case 'under':
+                return (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0) + params.MenuCommandX;
+            case 'right':
+                return (params.WindowUiIgnore ? Graphics.width + (Graphics.boxWidth - Graphics.width) / 2 : Graphics.boxWidth) - this.mainCommandWidth() + params.MenuCommandX;
+        }
+    };
+
+    Scene_Menu.prototype.mainCommandY = function() {
+        switch (params.MenuCommandPosition) {
+            case 'free':
+            case 'left':
+            case 'top':
+            case 'right':
+                return (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.menuHelpAreaHeight()) + params.MenuCommandY;
+            case 'under':
+                return (params.WindowUiIgnore ? Graphics.height + ((Graphics.boxHeight - Graphics.height) / 2) : Graphics.boxHeight) - this.mainCommandHeight() + params.MenuCommandY;
+        }
+    };
+
+    Scene_Menu.prototype.mainCommandWidth = function() {
+        return params.MenuCommandWidth > 0 ? params.MenuCommandWidth : (params.MenuCommandCols > 1 ? (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) : 240);
+    };
+
+    Scene_Menu.prototype.mainCommandHeight = function() {
+        return params.CommandHeightMode ? this.mainCommandAreaHeight(params.MenuCommandRows) : (params.MenuCommandHeight > 0 ? params.MenuCommandHeight : this.mainAreaHeight());
+    };
+
+    Scene_Menu.prototype.mainCommandAreaHeight = function(rows) {
+        return this.calcWindowHeight(rows, true);
+    };
+
+    Scene_Menu.prototype.infoAreaHeight = function(rows) {
+        return this.calcWindowHeight(rows, false);
+    };
+    
+    Scene_Menu.prototype.menuHelpAreaHeight = function() {
+        return this.mainAreaTop();
+    };
+
+    const _Scene_Menu_createBackground = Scene_Menu.prototype.createBackground;
+    Scene_Menu.prototype.createBackground = function() {
+        _Scene_Menu_createBackground.call(this);
+        if (!$gameSystem.menuBackgroundId) {
+            $gameSystem.menuBackgroundId = 0;
+        }
+        const data = $dataMap;
+        const backgroundId = $gameSystem.menuBackgroundId > 0 ? $gameSystem.menuBackgroundId : ($dataMap && $dataMap.meta.MenuBackgroundId ? Number(data.meta.MenuBackgroundId) : $gameSystem.menuBackgroundId);
+        const img = params.BackGroundImges ? params.BackGroundImges[backgroundId - 1] : null;
+        if (img) {
+            const sprite = new Sprite();
+            sprite.bitmap = ImageManager.nuun_LoadPictures(img);
+            this.addChild(sprite);
+            if (sprite.bitmap && !sprite.bitmap.isReady()) {
+                sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
+            } else {
+                this.setBackGround(sprite, params.BackUiWidth1);
+            }
+        }
+        if (params.BackGroundImg) {
+            const sprite = new Sprite();
+            sprite.bitmap = ImageManager.nuun_LoadPictures(params.BackGroundImg);
+            this.addChild(sprite);
+            if (sprite.bitmap && !sprite.bitmap.isReady()) {
+                sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
+            } else {
+                this.setBackGround(sprite, params.BackUiWidth);
+            }
+        }
+    };
+
+    Scene_Menu.prototype.setBackGround = function(sprite, mode) {
+        if (mode) {
+            sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
+            sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
+            sprite.scale.x = (Graphics.boxWidth + 8 !== sprite.bitmap.width ? (Graphics.boxWidth + 8) / sprite.bitmap.width : 1);
+            sprite.scale.y = (Graphics.boxHeight + 8 !== sprite.bitmap.height ? (Graphics.boxHeight + 8) / sprite.bitmap.height : 1);
+        } else {
+            sprite.scale.x = (Graphics.width !== sprite.bitmap.width ? Graphics.width / sprite.bitmap.width : 1);
+            sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
+        }
+    };
+
+    const _Scene_Menu_update = Scene_Menu.prototype.update;
+    Scene_Menu.prototype.update = function() {
+	    _Scene_Menu_update.call(this);
+        const commandName = this._commandWindow.currentData().name;
+        if (_commandName !== commandName) {
+            _commandName = commandName;
+            const find = params.HelpList.find(data => data.HelpCommandName === commandName);
+            _commandText = find && find.HelpCommandText ? find.HelpCommandText : "";
+        }
+    };
+
+
+    const _Window_MenuCommand_initialize = Window_MenuCommand.prototype.initialize;
+    Window_MenuCommand.prototype.initialize = function(rect) {
+        _Window_MenuCommand_initialize.call(this, rect);
+        this._homeHeight = this.height;
+    };
+
+    Window_MenuCommand.prototype.maxItemsHeight = function() {
+        const maxItems = Math.max(1, this.maxItems());
+        this.height = Math.min(this.fittingHeight(maxItems), this._homeHeight);
+    };
+
+    Window_MenuCommand.prototype.maxCols = function() {
+        return params.MenuCommandCols;
+    };
+
+
+    const _Window_MenuStatus_initialize = Window_MenuStatus.prototype.initialize;
+    Window_MenuStatus.prototype.initialize = function(rect) {
+        this._actorsBitmap = [];
+        this.language_Jp = $gameSystem.isJapanese();
+        _Window_MenuStatus_initialize.call(this, rect);
+        this.loadMenuImages();
+    };
+
+    Window_MenuStatus.prototype.loadMenuImages = function() {
+        for (const actor of $gameParty.allMembers()) {
+            let data = null;
+            if (Imported.NUUN_ActorPicture && params.ActorPictureEXApp) {
+                actor.resetImgId();
+                data = this.battlreActorPicture(actor.actorId());
+                actor.loadActorFace();
+                actor.loadActorGraphic();
+            } else {
+                data = this.getActorImgData(actor.actorId());
+                ImageManager.loadFace(data.FaceImg);
+                ImageManager.nuun_LoadPictures(data.ActorImg);
+            }
+            if (data && data.ActorBackImg) {
+                ImageManager.nuun_LoadPictures(data.ActorBackImg);
+            }
+            if (data && data.ActorFrontImg) {
+                ImageManager.nuun_LoadPictures(data.ActorFrontImg);
+            }
+        }
+    };
+
+    Window_MenuStatus.prototype.numVisibleRows = function() {
+        return params.MenuRows;
+    };
+
+    Window_MenuStatus.prototype.maxCols = function() {
+        return params.MenuCols;
+    };
+
+    Window_MenuStatus.prototype.maxContentsCols = function() {
+        return 1;
+    };
+
+    Window_MenuStatus.prototype.itemContentsWidth = function(width) {
+        return Math.floor(width / this.maxContentsCols()) - this.colSpacing() - 4;
+    };
+
+    Window_MenuStatus.prototype.drawItemBackground = function(index) {
+        const actor = this.actor(index);
+        const data = this.getActorData(actor);
+        if (data && data.ActorBackImg) {
+            const bitmap = ImageManager.nuun_LoadPictures(data.ActorBackImg);
+            if (bitmap && !bitmap.isReady()) {
+                bitmap.addLoadListener(this.drawActorBack.bind(this, bitmap, index));
+            } else {
+                this.drawActorBack(bitmap, index);
+            }
+        } else {
+            Window_Selectable.prototype.drawItemBackground.call(this, index);
+        }
+    };
+
+    Window_MenuStatus.prototype.drawActorBack = function(bitmap, index) {
+        const rect = this.itemRect(index);
+        this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+    };
+
+    Window_MenuStatus.prototype.createApngSprite = function(actor, index, data, rect) {
+        if (!this._actorsBitmap[index]) {
+            const rect = this.itemRect(index);
+            const sprite = new Sprite_MenuActorImg();
+            this._contentsBackSprite.addChild(sprite);
+            this._actorsBitmap[index] = sprite;
+            sprite.setup(actor, data);
+            sprite.move(rect.x + 50, rect.y, rect.width, rect.height);
+        }
+    };
+
+    Window_MenuStatus.prototype.addChildToBack2 = function(child) {
+        return this.contents.addChild(child);
+    };
+
+    Window_MenuStatus.prototype.drawItemImage = function(index) {
+        const actor = this.actor(index);
+        const rect = this.itemRect(index);
+        let bitmap = null;
+        const data = this.getActorData(actor);
+        if (data && data.GraphicMode !== 'none') {
+            if (data.GraphicMode === 'imgApng') {
+                this.createApngSprite(actor, index, data, rect);
+            } else if (Imported.NUUN_ActorPicture && params.ActorPictureEXApp) {
+                bitmap = data.GraphicMode === 'face' ? actor.loadActorFace() : this.loadActorImg(actor);
+            } else {
+                bitmap = data.GraphicMode === 'face' ? ImageManager.nuun_LoadPictures(data.FaceImg) : ImageManager.nuun_LoadPictures(data.ActorImg);
+            }
+        }
+        if (bitmap) {
+            bitmap.addLoadListener(function() {
+                this.drawActorGraphic(data, bitmap, rect.x, rect.y, rect.width, rect.height, actor);
+            }.bind(this));
+        } else {
+            this.drawActorFront(data, rect.x, rect.y, rect.width, rect.height);
+        }
+        
+    };
+
+    Window_MenuStatus.prototype.drawActorGraphic = function(data, bitmap, x, y, width, height, actor) {
+        this.changePaintOpacity(actor.isBattleMember());
+        if (data.GraphicMode === 'face') {
+            this.contentsDrawActorFace(actor, data, x, y, width, height);
+        } else {
+            this.contentsDrawActorGraphic(actor, data, bitmap, x, y, width, height);
+        }
+        this.changePaintOpacity(true);
+        this.drawActorFront(data, x, y, width, height);
+    };
+
+    Window_MenuStatus.prototype.drawActorFront = function(data, x, y, width, height) {
+        const frontBitmapImg = data ? data.ActorFrontImg : null;
+        if (frontBitmapImg) {
+            const frontBitmap = ImageManager.nuun_LoadPictures(frontBitmapImg);
+            frontBitmap.addLoadListener(function() {
+                if (bitmap)
+                this.drawContentsActorFront(frontBitmap, rect.x, rect.y, rect.width, rect.height);
+            }.bind(this));
+        }
+    };
+
+    Window_MenuStatus.prototype.contentsDrawActorFace = function(actor, data, x, y, width, height) {
+        width = Math.min(width, ImageManager.faceWidth);
+        height = height - 2;
+        this.drawActorFace(actor, x, y, width, height, data);
+    };
+
+    Window_MenuStatus.prototype.drawContentsActorFront = function(bitmap, x, y, width, height) {
+        this.contents.blt(bitmap, 0, 0, width, height, x, y);
+    };
+
+    Window_MenuStatus.prototype.drawItemStatus = function(index) {
+        let bitmap = null;
+        let loadBitmap = null;
+        for (const data of params.StatusList) {
+            switch (data.DateSelect) {
+                case 200:
+                    loadBitmap = this.loadContentsImg();
+                    break;
+            }
+            if (loadBitmap && !loadBitmap.isReady()) {
+                bitmap = loadBitmap;
+            }
+            if (bitmap && !bitmap.isReady()) {
+                bitmap.addLoadListener(this.drawItemContentsStatus.bind(this, index))
+                return;
+            } else {
+                this.drawItemContentsStatus(index);
+            }
+        }
+    };
+
+    Window_MenuStatus.prototype.loadContentsImg = function() {
+        return ImageManager.nuun_LoadPictures(data.ImgData);
+    };
+
+    Window_MenuStatus.prototype.getActorImgData = function(actor) {
+        return params.ActorsImgList.find(actorImg => actorImg.actorId === actor.actorId());
+    };
+
+    Window_MenuStatus.prototype.drawItemContentsStatus = function(index) {
+        const actor = this.actor(index);
+        const rect = this.itemRect(index);
+        const itemWidth = this.itemContentsWidth(rect.width);
+        const lineHeight = this.lineHeight();
+        const colSpacing = this.colSpacing();
+        maxGaugeWidth = itemWidth;
+        for (const data of params.StatusList) {
+        const x_Position = data.X_Position;
+        const position = Math.min(x_Position, this.maxContentsCols());
+        const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
+        const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate + this.itemPadding();
+        const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : itemWidth;
+        this.drawContentsBase(data, contentsX, contentsY, width - colSpacing / 2, actor);
+        }
+    };
+
+    Window_MenuStatus.prototype.getActorImgData = function(actorId) {
+        const actors = params.ActorsImgList;
+        const find = actors.find(actor => actor.actorId === actorId);
+        if (!find) {
+        return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: params.GraphicMode, FaceIndex : -1};
+        } if (find.GraphicMode === 'default' || !find.GraphicMode) {
+            find.GraphicMode = params.GraphicMode;
+        }
+        return find;
+    };
+
+    Window_MenuStatus.prototype.battlreActorPicture = function(id) {
+        const actors = params.ActorPictureData;
+        const find = actors.find(actor => actor.actorId === id);
+        if (!find) {
+        return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: params.GraphicMode, FaceIndex : -1};
+        } else if (find.GraphicMode === 'default' || !find.GraphicMode) {
+            find.GraphicMode = params.GraphicMode;
+        }
+        return find;
+    };
+
+    Window_MenuStatus.prototype.getActorData = function(actor) {
+        return Imported.NUUN_ActorPicture && params.ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()) : this.getActorImgData(actor.actorId());
+    };
+
+    Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor) {
+        $gameTemp.menuParam = null;
+        switch (data.DateSelect) {
+        case 0:
+            break;
+        case 1:
+            this.drawActorName(data, x, y, width, actor);
+            break;
+        case 2:
+            this.drawActorNickname(data, x, y, width, actor);
+            break;
+        case 3:
+            this.drawActorClass(data, x, y, width, actor);
+            break;
+        case 4:
+            this.drawActorLevel(data, x, y, width, actor);
+            break;
+        case 5:
+            this.drawActorIcons(data, x, y, width, actor);
+            break;
+        case 6:
+            this.drawParam(data, x, y, width, actor);
+            break;
+        case 7:
+            this.drawPlaceStateIcon(x, y, actor);
+            break;
+        case 11:
+            $gameTemp.menuParam = data;
+            this.placeHpGauge(x, y, actor);
+            break;
+        case 12:
+            $gameTemp.menuParam = data;
+            this.placeMpGauge(x, y, actor);
+            break;
+        case 13:
+            $gameTemp.menuParam = data;
+            this.placeTpGauge(x, y, actor);
+            break;
+        case 14:
+            this.drawExp(data, x, y, width, actor);
+            break;
+        case 15:
+            $gameTemp.menuParam = data;
+            this.placeExpGauge(x, y, actor);
+            break;
+        case 22:
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+            this.drawParams(data, data.DateSelect, x, y, width, actor);
+            break;
+        case 30:
+        case 31:
+        case 32:
+        case 33:
+        case 34:
+        case 35:
+        case 36:
+        case 37:
+        case 38:
+        case 39:
+            this.drawXParams(data, data.DateSelect, x, y, width, actor);
+            break;
+        case 40:
+        case 41:
+        case 42:
+        case 43:
+        case 44:
+        case 45:
+        case 46:
+        case 47:
+        case 48:
+        case 49:
+            this.drawSParams(data, data.DateSelect, x, y, width, actor);
+            break;
+        case 100:
+            $gameTemp.menuParam = data;
+            this.placeUserGauge(data, x, y, actor);
+            break;
+        case 200:
+            this.drawMenuStatusImg(data, x, y, actor);
+            break;
+        case 300:
+            this.contentsDrawActorChip(data, x, y, width, actor);
+            break;
+        case 301:
+            this.drawSvActorImg(data, x, y, width, actor);
+            break;
+        case 1000:
+            this.horzLine(x, y, width, actor);
+            break;
+        }
+    };
+
+    Window_MenuStatus.prototype.paramNameData = function(data, actor, param) {
+        if (data.ParamName) {
+        return data.ParamName;
+        }
+        switch (param) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            return TextManager.param(param);
+        case 10:
+        case 11:
+        case 12:
+            return this.language_Jp ? "会心率" : 'Critcal Rate';
+        case 13:
+            return this.language_Jp ? "会心回避率" : 'Critical Evade';
+        case 14:
+            return this.language_Jp ? "魔法回避率" : 'Magic Evade';
+        case 15:
+            return this.language_Jp ? "魔法反射率" : 'Magic Reflect';
+        case 16:
+            return this.language_Jp ? "反撃率" : 'Counter';
+        case 17:
+            return this.language_Jp ? "HP再生率" : 'HP Regen';
+        case 18:
+            return this.language_Jp ? "MP再生率" : 'MP Regen';
+        case 19:
+            return this.language_Jp ? "TP再生率" : 'TP Regen';
+        case 20:
+            return this.language_Jp ? "狙われ率" : 'Aggro';
+        case 21:
+            return this.language_Jp ? "防御効果率" : 'Guard';
+        case 22:
+            return this.language_Jp ? "回復効果率" : 'Recovery';
+        case 23:
+            return this.language_Jp ? "薬の知識" : 'Item Effect';
+        case 24:
+            return this.language_Jp ? "MP消費率" : 'MP Cost';
+        case 25:
+            return this.language_Jp ? "TPチャージ率" : 'TP Charge';
+        case 26:
+            return this.language_Jp ? "物理ダメージ率" : 'Physical Damage';
+        case 27:
+            return this.language_Jp ? "魔法ダメージ率" : 'Magical Damage';
+        case 28:
+            return this.language_Jp ? "床ダメージ率" : 'Floor Damage';
+        case 29:
+            return this.language_Jp ? "獲得経験率" : 'EXP Gain';
+        case 42:
+            return TextManager.param(0);
+        case 43:
+            return TextManager.param(1);
+        default:
+            return null;
+        }
+    };
+    
+    Window_MenuStatus.prototype.paramData = function(data, actor, param) {
+        switch (param) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+            return actor.param(param);
+        case 10:
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+        case 18:
+        case 19:
+            return actor.xparam(param - 10) * 100;
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+        case 28:
+        case 29:
+            return actor.sparam(param - 20) * 100;
+        default:
+            return null;
+        }
+    };
+
+    
+    Window_MenuStatus.prototype.contentsDrawActorChip = function(data, x, y, width, actor) {
+        this.actorCharacterChip(actor, data, x + 24, y + 48);
+    };
+
+    
+
+    Window_MenuStatus.prototype.drawActorGraphicApng = function(data, x, y, width, actor) {
+        const rect = this.itemRect(0);
+        const imgData = this.getActorData(actor);
+        if (imgData) {
+            const sprite = new Sprite_MenuActorImg();
+            this.addChildToBack(sprite);
+            const bitmap = this.loadActorImg(actor);
+            const battleMemberOpacity = data.BattleMemberOpacity !== undefined ? data.BattleMemberOpacity : true;
+            if (battleMemberOpacity) {
+                this.changePaintOpacity(actor.isBattleMember());
+            }
+            this.contentsDrawActorGraphic(actor, imgData, bitmap, x, y, width, rect.height);
+            this.changePaintOpacity(true);
+        }
+    };
+
+    Window_MenuStatus.prototype.drawParams = function(data, param, x, y, width, actor) {
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = this.paramNameData(data, actor, param - 20);
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        this.drawText(nameText, x, y, textWidth);
+        this.resetTextColor();
+        const textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20)) + (data.paramUnit ? String(data.paramUnit) : "");
+        this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.contents.fontSize = $gameSystem.mainFontSize();
+    };
+
+    Window_MenuStatus.prototype.drawXParams = function(data, param, x, y, width, actor) {
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = this.paramNameData(data, actor, param - 20);
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        this.drawText(nameText, x, y, textWidth);
+        this.resetTextColor();
+        let textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20));
+        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, params.DecimalMode);
+        textParam += (data.paramUnit ? String(data.paramUnit) : "");
+        this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.contents.fontSize = $gameSystem.mainFontSize();
+    };
+
+    Window_MenuStatus.prototype.drawSParams = function(data, param, x, y, width, actor) {
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = this.paramNameData(data, actor, param - 20);
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        this.drawText(nameText, x, y, textWidth);
+        this.resetTextColor();
+        let textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20));
+        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, params.DecimalMode);
+        textParam += (data.paramUnit ? String(data.paramUnit) : "");
+        this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.contents.fontSize = $gameSystem.mainFontSize();
+    };
+
+    Window_MenuStatus.prototype.drawActorName = function(data, x, y, width, actor) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        menuTextMode = 'name';
+        menuAlign = data.Align;
+        Window_StatusBase.prototype.drawActorName.call(this, actor, x, y, width);
+        this.contents.fontSize = $gameSystem.mainFontSize();
+    };
+
+    Window_MenuStatus.prototype.drawText = function(text, x, y, maxWidth, align) {
+        if (menuTextMode === 'name') {
+            align = menuAlign;
+            menuTextMode = null;
+        }
+        Window_Base.prototype.drawText.call(this, text, x, y, maxWidth, align);
+    };
+
+    Window_MenuStatus.prototype.drawActorClass = function(data, x, y, width, actor) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.resetTextColor();
+        this.drawText(actor.currentClass().name, x, y, width, data.Align);
+        this.contents.fontSize = $gameSystem.mainFontSize();
+    };
+
+    Window_MenuStatus.prototype.drawActorNickname = function(data, x, y, width, actor) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.resetTextColor();
+        this.drawText(actor.nickname(), x, y, width, data.Align);
+        this.contents.fontSize = $gameSystem.mainFontSize();
+    };
+
+    Window_MenuStatus.prototype.drawActorLevel = function(data, x, y, width, actor) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.changeTextColor(ColorManager.systemColor());
+        this.drawText(TextManager.levelA, x, y, 48);
+        this.resetTextColor();
+        this.drawText(actor.level, x + 60, y, width - 60, "right");
+        this.contents.fontSize = $gameSystem.mainFontSize();
+    };
+
+    Window_MenuStatus.prototype.drawActorIcons = function(data, x, y, width, actor) {
+        let icons = [];
+        let states = [];
+        const iconWidth = ImageManager.iconWidth;
+        const dataEval = data.DetaEval;
+        if (dataEval) {
+            const stateList = dataEval.split(',');
+            for (const id of stateList) {
+                Array.prototype.push.apply(states, this.nuun_getListIdData(id));
+            }
+            icons = actor.allIcons().filter(icon => states.some(i => $dataStates[i].iconIndex === icon)).slice(0, Math.floor(width / iconWidth));
+            let iconX = x;
+            for (const icon of icons) {
+                this.drawIcon(icon, iconX, y + 2);
+                iconX += iconWidth;
+            }
+        } else {
+            Window_StatusBase.prototype.drawActorIcons.call(this, actor, x, y, width);
+        }
+    };
+
+    Window_MenuStatus.prototype.drawParam = function(data, x, y, width, actor) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : '';
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        this.drawText(nameText, x, y, textWidth);
+        this.resetTextColor();
+        if (data.DetaEval) {
+            const padding = textWidth > 0 ? 8 : 0;
+            this.drawText(eval(data.DetaEval), x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize();
+    };
+
+    Window_MenuStatus.prototype.systemWidth = function(swidth, width) {
+        return swidth > 0 ? swidth : Math.floor(width / 3);
+    };
+
+    Window_MenuStatus.prototype.placeHpGauge = function(x, y, actor) {
+        $gameTemp.menuGaugeType = "hp";
+        this.placeGauge(actor, "hp", x, y);
+    };
+
+    Window_MenuStatus.prototype.placeMpGauge = function(x, y, actor) {
+        $gameTemp.menuGaugeType = "mp";
+        this.placeGauge(actor, "mp", x, y);
+    };
+
+    Window_MenuStatus.prototype.placeTpGauge = function(x, y, actor) {
+        if ($dataSystem.optDisplayTp) {
+            $gameTemp.menuGaugeType = "tp";
+            this.placeGauge(actor, "tp", x, y);
+        }
+    };
+
+    Window_MenuStatus.prototype.placeExpGauge = function(x, y, actor) {
+        $gameTemp.menuGaugeType = "menuexp";
+        this.placeGauge(actor, "menuexp", x, y);
+    };
+
+    Window_MenuStatus.prototype.drawPlaceStateIcon = function(x, y, actor) {
+        const hw = Math.floor(ImageManager.iconWidth / 2);
+        this.placeStateIcon(actor, x + hw, y + hw);
+    };
+
+    Window_MenuStatus.prototype.placeUserGauge = function(data, x, y, actor) {
+        $gameTemp.menuGaugeType = data.GaugeID;
+        this.placeGauge(actor, data.GaugeID, x, y);
+    };
+
+    Window_MenuStatus.prototype.drawExp = function(data, x, y, width, actor) {
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : 'NextLv';
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        this.drawText(nameText, x + textWidth, y, textWidth);
+        this.resetTextColor();
+        let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.nextLevelExp() - actor.currentLevelExp());
+        this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.contents.fontSize = $gameSystem.mainFontSize();
+    };
+
+    Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
+        if (Imported.NUUN_GaugeImage) {
+            this.placeGaugeImg(actor, type, x, y);
+        }
+        const key = "actor%1-gauge-%2".format(actor.actorId(), type);
+        const sprite = this.createInnerSprite(key, Sprite_MenuGauge);
+        sprite.setup(actor, type);
+        sprite.move(x, y);
+        sprite.show();
+    };
+
+    Window_MenuStatus.prototype.actorCharacterChip = function(actor, data, x, y) { 
+        const key = "actor%1-menuStatusCharacter".format(actor.actorId());
+        const sprite = this.createInnerSprite(key, Sprite_MenuScreenCharacter);
+        sprite.setup(actor, data);
+        sprite._character.setPosition(0, 0);
+        sprite.move(x, y);
+        sprite.show();
+    };
+
+    Window_MenuStatus.prototype.drawSvActorImg = function(data, x, y, width, actor) {
+        const key = "menuSvActor%1".format(actor.actorId());
+        const sprite = this.createInnerSprite(key, Sprite_MenuSvActor);
+        sprite.setup(actor, data);
+        sprite.show();
+        sprite.setHome(x + 64, y + 64);
+        sprite.startMotion();
+    };
+
+    Window_MenuStatus.prototype.drawMenuStatusImg = function(data, x, y, actor) {
+        if (data.ImgData) {
+            const rect = this.itemRect(0);
+            const bitmap = ImageManager.nuun_LoadPictures(data.ImgData);
+            this.contents.blt(bitmap, 0, 0, rect.width, rect.height, x - this.colSpacing(), y - this.itemPadding());
+        }
+    };
+
+    Window_MenuStatus.prototype.drawActorFace = function(actor, x, y, width, height, data) {
+        x += (data ? data.Actor_X : 0) + params.ActorImg_X + 1;
+        y += (data ? data.Actor_Y : 0) + params.ActorImg_Y + 1;
+        if (Imported.NUUN_ActorPicture && params.ActorPictureEXApp) {
+            this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
+        } else {
+            let bitmap = null;
+            if (data && data.FaceImg) {
+                bitmap = data.FaceImg;
+            } else {
+                bitmap = actor.faceName();
+            }
+            const faceIndex = data && data.FaceIndex >= 0 ? data.FaceIndex : actor.faceIndex();
+            this.drawFace(bitmap, faceIndex, x, y, width, height);
+        }
+    };
+
+    Window_MenuStatus.prototype.contentsDrawActorGraphic = function(actor, data, bitmap, x, y, width, height) {
+        width = Math.min(width - 2, bitmap.width);
+        height = Math.min(height - 2, bitmap.height);
+        const scale = (data.Actor_Scale || 100) / 100;
+        const sw = width * scale;
+        const sh = height * scale;
+        const sx = data.Img_SX || 0;
+        const sy = data.Img_SY || 0;
+        x += 1 + data.Actor_X + params.ActorImg_X;
+        y += 1 + data.Actor_Y + params.ActorImg_Y;
+        this.contents.blt(bitmap, sx, sy, width + (width - sw), height + (height - sh), x, y, width, height);
+    };
+
+    function Window_InfoMenu() {
+        this.initialize(...arguments);
+    }
+    
+    Window_InfoMenu.prototype = Object.create(Window_Selectable.prototype);
+    Window_InfoMenu.prototype.constructor = Window_InfoMenu;
+    
+    Window_InfoMenu.prototype.initialize = function(rect) {
+        Window_Selectable.prototype.initialize.call(this, rect);
+        this._text = '';
+        this._commandName = _commandName;
+        this._data = null;
+        this._infoFontSize = 0;
+        this._onPlayTime = false;
+        this._onRefresh = false;
+    };
+
+    Window_InfoMenu.prototype.setup = function(data, cols, fontsize) {
+        this._data = data;
+        this._maxCols = cols;
+        this._infoFontSize = fontsize;
+        this.refresh();
+    };
+
+    Window_InfoMenu.prototype.maxCols = function() {
+        return this._maxCols ? this._maxCols : 1;
+    };
+    
+    Window_InfoMenu.prototype.itemHeight = function() {
+        return this.lineHeight();
+    };
+
+    Window_InfoMenu.prototype.getInfoList = function() {
+        return this._data || [];
+    };
+
+    Window_InfoMenu.prototype.refresh = function() {
+        this.contents.clear();
+        const listData = this.getInfoList();
+        const lineHeight = this.lineHeight();
+        for (const data of listData) {
+            this.resetFontSettings();
+            const x_Position = data.X_Position;
+            const position = Math.min(x_Position, this.maxCols());
+            const rect = this.itemRect(position - 1);
+            const x = rect.x + (data.X_Coordinate || 0);
+            const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
+            const width = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : rect.width;
+            this.dateDisplay(data, x, y, width);
+        }
+    };
+    
+    Window_InfoMenu.prototype.dateDisplay = function(data, x, y, width) {
+        switch (data.DateSelect) {
+        case 0:
+            break;
+        case 1:
+            this.drawPlayTime(data, x, y, width);
+            break;
+        case 2:
+            this.drawGold(data, x, y, width);
+            break;
+        case 3:
+            this.drawLocation(data, x, y, width);
+            break;
+        case 4:
+            this.drawParam(data, x, y, width);
+            break;
+        case 5:
+            this.drawName(data, x, y, width);
+            break;
+        case 6:
+            this.drawCommandExplanation(data, x, y, width);
+            break;
+        case 10:
+            this.drawFreeText(data, x, y, width);
+            break;
+        case 11:
+            this.drawDestination(data, x, y, width);
+            break;
+        case 12:
+            this.drawChapter(data, x, y, width);
+            break;
+        default:
+            break;
+        }
+    };
+    
+    Window_InfoMenu.prototype.drawGold = function(data, x, y, width) {
+        let iconWidth = 0;
+        if (data.InfoIcon > 0) {
+            this.drawIcon(data.InfoIcon, x, y + 2);
+            iconWidth = ImageManager.iconWidth + 6;
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : '';
+        const systemWidth = data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        this.drawText(nameText, x + iconWidth, y, systemWidth);
+        this.resetTextColor();
+        this.drawCurrencyValue(this.value(), this.currencyUnit(), x + systemWidth + 8 + iconWidth, y, width - (systemWidth + 8 + iconWidth));
+    };
+    
+    Window_InfoMenu.prototype.drawPlayTime = function(data, x, y, width) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : '';
+        const systemWidth = !!nameText ? (data.SystemItemWidth || 160) : 0;
+        let iconWidth = 0;
+        if (data.InfoIcon > 0) {
+            this.drawIcon(data.InfoIcon, x, y + 2);
+            iconWidth = ImageManager.iconWidth + 6;
+        }
+        this.drawText(nameText, x + iconWidth, y, systemWidth);
+        this.resetTextColor();
+        this.drawText($gameSystem.playtimeText(), x + systemWidth + iconWidth + this.itemPadding(), y, width - (systemWidth + 8 + iconWidth), data.Align);
+        this._onPlayTime = true;
+    };
+    
+    Window_InfoMenu.prototype.drawLocation = function(data, x, y, width) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : '';
+        const systemWidth = !!nameText ? (data.SystemItemWidth || 160) : 0;
+        let iconWidth = 0;
+        if (data.InfoIcon > 0) {
+            this.drawIcon(data.InfoIcon, x, y + 2);
+            iconWidth = ImageManager.iconWidth + 6;
+        }
+        this.drawText(nameText, x + iconWidth, y, systemWidth);
+        this.resetTextColor();
+        const text = $gameMap.mapId() > 0 ? $gameMap.displayName() : '';
+        this.drawText(text, x + systemWidth + iconWidth + this.itemPadding(), y, width - (systemWidth + 8 + iconWidth), data.Align);
+    };
+    
+    Window_InfoMenu.prototype.drawParam = function(data, x, y, width) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : '';
+        const systemWidth = !!nameText ? (data.SystemItemWidth || 160) : 0;
+        let iconWidth = 0;
+        if (data.InfoIcon > 0) {
+            this.drawIcon(data.InfoIcon, x, y + 2);
+            iconWidth = ImageManager.iconWidth + 6;
+        }
+        this.drawText(nameText, x + iconWidth, y, systemWidth);
+        this.resetTextColor();
+        if (data.DetaEval) {
+            this.drawText(eval(data.DataEval), x + systemWidth + 8 + iconWidth, y, width - (systemWidth + 8 + iconWidth), data.Align);
+        }
+    };
+    
+    Window_InfoMenu.prototype.drawCommandExplanation = function(data, x, y, width) {
+        this.drawTextEx(this._text, x, y, width);
+    };
+    
+    Window_InfoMenu.prototype.drawFreeText = function(data, x, y, width) {   
+        this.drawTextEx(data.Text, x, y, width);
+    };
+    
+    Window_InfoMenu.prototype.drawDestination = function(data, x, y, width) {
+        if (!Imported.NUUN_Destination) {
+            return;
+        }
+        let iconWidth = 0;
+        let textWidth = 0;
+        if (data.InfoIcon > 0) {
+            this.drawIcon(data.InfoIcon, x, y + 2);
+            iconWidth = ImageManager.iconWidth + 6;
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
+        if (data.ParamName) {
+            this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : '';
+            this.drawText(nameText, x + iconWidth, y, textWidth);
+            textWidth = this.systemWidth(data.SystemItemWidth, width);
+        }
+        this.resetTextColor();
+        const text = this.getDestinationList();
+        if (text) {
+            this.drawTextEx(text, x + iconWidth + textWidth, y, width - textWidth - iconWidth);
+        }
+        this.resetFontSettings();
+    };
+    
+    Window_InfoMenu.prototype.drawChapter = function(data, x, y, width) {
+        if (!Imported.NUUN_Chapter) {
+            return;
+        }
+        let iconWidth = 0;
+        let textWidth = 0;
+        if (data.InfoIcon > 0) {
+            this.drawIcon(data.InfoIcon, x, y + 2);
+            iconWidth = ImageManager.iconWidth + 6;
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
+        if (data.ParamName) {
+            this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : '';
+            this.drawText(nameText, x + iconWidth, y, textWidth);
+            textWidth = this.systemWidth(data.SystemItemWidth, width);
+        }
+        this.resetTextColor();
+        const text = this.getChapter();
+        if (text) {
+            this.drawTextEx(text, x + iconWidth + textWidth, y, width - textWidth - iconWidth);
+        }
+        this.resetFontSettings();
+    };
+    
+    Window_InfoMenu.prototype.drawName = function(data, x, y, width) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : '';
+        this.drawText(nameText, x, y, width, data.Align);
+    };
+    
+    Window_InfoMenu.prototype.systemWidth = function(swidth, width) {
+        return swidth > 0 ? swidth : 120;
+    };
+    
+    Window_InfoMenu.prototype.value = function() {
+        return $gameParty.gold();
+    };
+    
+    Window_InfoMenu.prototype.currencyUnit = function() {
+        return TextManager.currencyUnit;
+    };
+    
+    Window_InfoMenu.prototype.setText = function(str) {
+        this._text = str;
+        this._onRefresh = true;
+    };
+
+    Window_InfoMenu.prototype.update = function() {
+        Window_Selectable.prototype.update.call(this);
+        if (this._commandName !== _commandName) {
+            this.setText(_commandText);
+            this._commandName = _commandName;
+        }
+        if (this._onPlayTime || this._onRefresh) {
+            this.refresh();
+        }
+    };
+
+    function Sprite_MenuGauge() {
+        this.initialize(...arguments);
+    }
+      
+    Sprite_MenuGauge.prototype = Object.create(Sprite_Gauge.prototype);
+    Sprite_MenuGauge.prototype.constructor = Sprite_MenuGauge;
+      
+    Sprite_MenuGauge.prototype.initialize = function() {
+        this._statusType = $gameTemp.menuGaugeType;
+        this.menuParam = $gameTemp.menuParam;
+        this._gaugeWidth = Math.min(this.getMenuGaugeWidth(), maxGaugeWidth);
+        this._gaugeHeight = this.getMenuGaugeHeight();
+        Sprite_Gauge.prototype.initialize.call(this);
+    };
+    
+    Sprite_MenuGauge.prototype.bitmapWidth = function() {
+        return this._gaugeWidth;
+    };
+      
+    Sprite_MenuGauge.prototype.gaugeHeight = function() {
+        return this._gaugeHeight;
+    };
+
+    Sprite_MenuGauge.prototype.getMenuGaugeWidth = function() {
+        switch (this._statusType) {
+          case 'hp':
+            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : params.HPGaugeWidth;
+          case 'mp':
+            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : params.MPGaugeWidth;
+          case 'tp':
+            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : params.TPGaugeWidth;
+          case 'menuexp':
+            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : params.ExpGaugeWidth;
+          default:
+            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : 128;
+        }
+    };
+      
+    Sprite_MenuGauge.prototype.getMenuGaugeHeight = function() {
+        switch (this._statusType) {
+            case 'hp':
+              return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 12;
+            case 'mp':
+              return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 12;
+            case 'tp':
+              return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 12;
+            case 'menuexp':
+              return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 12;
+            default:
+              return this.menuParam.GaugeHeight > 0 ? this.menuParam.GaugeHeight : 128;
+          }
+    };
+    
+    Sprite_MenuGauge.prototype.gaugeColor1 = function() {
+        if (this._battler && this.menuParam) {
+          switch (this._statusType) {
+            case "hp":
+            case "mp":
+            case "tp":
+            case "time":
+                return Sprite_Gauge.prototype.gaugeColor1.call(this);
+            case "menuexp":
+                return NuunManager.getColorCode(params.ExpGaugeColor1);
+            default:
+              return NuunManager.getColorCode(this.menuParam.Color1);
+          }
+        } else {
+          return Sprite_Gauge.prototype.gaugeColor1.call(this);
+        }
+    };
+      
+    Sprite_MenuGauge.prototype.gaugeColor2 = function() {
+        if (this._battler && this.menuParam) {
+          switch (this._statusType) {
+            case "hp":
+            case "mp":
+            case "tp":
+            case "time":
+                return Sprite_Gauge.prototype.gaugeColor2.call(this);
+            case "menuexp":
+                return NuunManager.getColorCode(params.ExpGaugeColor2);
+            default:
+              return NuunManager.getColorCode(this.menuParam.Color2);
+          }
+        } else {
+          return Sprite_Gauge.prototype.gaugeColor2.call(this);
+        }
+    };
+    
+    Sprite_MenuGauge.prototype.displyaExp = function() {
+        if (params.ExpDisplayMode === 1) {
+            return this.currentMaxValue() - this.currentValue();
+        } else if (params.ExpDisplayMode === 2) {
+            return this.currentValue();
+        } else if (params.ExpDisplayMode === 3) {
+            return NuunManager.numPercentage(this.currentValue() / this.currentMaxValue() * 100, params.EXPDecimal, params.DecimalMode);
+        }
+        return this._battler.currentExp() - this._battler.currentLevelExp();
+    };
+    
+    Sprite_MenuGauge.prototype.displyaMaxExp = function() {
+        return this._battler.nextLevelExp() - this._battler.currentLevelExp();
+    };
+    
+    Sprite_MenuGauge.prototype.currentValue = function() {
+        if (this._battler && this.menuParam) {
+        switch (this._statusType) {
+            case "hp":
+            case "mp":
+            case "tp":
+            case "time":
+                return Sprite_Gauge.prototype.currentValue.call(this);
+            case "menuexp":
+                return this._battler.currentExp() - this._battler.currentLevelExp();
+            default:
+                const actor = this._battler;
+                return eval(this.menuParam.DetaEval);
+          }
+        } else {
+          return Sprite_Gauge.prototype.currentValue.call(this);
+        }
+    };
+      
+    Sprite_MenuGauge.prototype.currentMaxValue = function() {
+        if (this._battler && this.menuParam) {
+        switch (this._statusType) {
+            case "hp":
+            case "mp":
+            case "tp":
+            case "time":
+                return Sprite_Gauge.prototype.currentMaxValue.call(this);
+            case "menuexp":
+                return this._battler.nextLevelExp() - this._battler.currentLevelExp();
+            default:
+                const actor = this._battler;
+                return eval(this.menuParam.DetaEval2);
+            }
+        } else {
+          return Sprite_Gauge.prototype.currentMaxValue.call(this);
+        }
+    };
+    
+    Sprite_MenuGauge.prototype.label = function() {
+        if (this._battler && this.menuParam) {
+            switch (this._statusType) {
+            case "hp":
+            case "mp":
+            case "tp":
+            case "time":
+                return Sprite_Gauge.prototype.label.call(this);
+            case "menuexp":
+                return params.LabelShow ? TextManager.expA : '';
+            default:
+              return this.menuParam.ParamName;
+            }
+        } else {
+          return Sprite_Gauge.prototype.label.call(this);
+        }
+    };
+    
+    Sprite_MenuGauge.prototype.drawValue = function() {
+        if (this._statusType === "menuexp" && params.ExpDisplayMode !== 0) {
+            let text = this.displyaExp();
+            if (params.ExpDisplayMode === 3) {
+                text += '%';
+            }
+            const width = this.bitmapWidth();
+            const height = this.textHeight();
+            this.setupValueFont();
+            this.bitmap.drawText(text, 0, 0, width, height, "right");
+        } else {
+            Sprite_Gauge.prototype.drawValue.call(this);
+        }
+    };
+
+    function Sprite_MenuScreenCharacter() {
+        this.initialize(...arguments);
+    }
+      
+    Sprite_MenuScreenCharacter.prototype = Object.create(Sprite_Character.prototype);
+    Sprite_MenuScreenCharacter.prototype.constructor = Sprite_MenuScreenCharacter;
+      
+    Sprite_MenuScreenCharacter.prototype.initialize = function(character) {
+        Sprite_Character.prototype.initialize.call(this, character);
+        this._data = null;
+        this._actor = null;
+    };
+
+    Sprite_MenuScreenCharacter.prototype.setup = function(battler, data) {
+        const character = new Game_Character(battler);
+        const characterName = battler.characterName();
+        const characterIndex = battler.characterIndex();
+        character.setImage(characterName, characterIndex);
+        character.setStepAnime(true);
+        this._data = data;
+        this._actor = battler;
+        this.setCharacter(character);
+    };
+      
+    Sprite_MenuScreenCharacter.prototype.update = function() {
+        if (this.visible) {
+          Sprite_Character.prototype.update.call(this);
+          this._character.updateAnimation();
+          this.changePaintOpacity();
+        }
+    };
+
+    Sprite_MenuScreenCharacter.prototype.changePaintOpacity = function() {
+        const battleMemberOpacity = this._data.BattleMemberOpacity !== undefined ? this._data.BattleMemberOpacity : true;
+        if (battleMemberOpacity) {
+            this.opacity = this._actor.isBattleMember() ? 255 : Window_Base.prototype.translucentOpacity.call(this);
+        }
+    };
+
+    Sprite_MenuScreenCharacter.prototype.updatePosition = function() {
+
+    };
+    
+
+    function Sprite_MenuSvActor() {
+        this.initialize(...arguments);
+    }
+      
+    Sprite_MenuSvActor.prototype = Object.create(Sprite_Actor.prototype);
+    Sprite_MenuSvActor.prototype.constructor = Sprite_MenuSvActor;
+      
+    Sprite_MenuSvActor.prototype.updateVisibility = function() {
+        Sprite_Clickable.prototype.updateVisibility.call(this);
+    };
+      
+    Sprite_MenuSvActor.prototype.initialize = function(battler) {
+    Sprite_Actor.prototype.initialize.call(this, battler);
+        this._data = null;
+    };
+
+    Sprite_MenuSvActor.prototype.setup = function(battler, data) {
+        this.setBattler(battler);
+        this._data = data;
+    };
+      
+    Sprite_MenuSvActor.prototype.moveToStartPosition = function() {
+        this.startMove(0, 0, 0);
+    };
+      
+    Sprite_MenuSvActor.prototype.updateMain = function() {
+        this.updateBitmap();
+        this.updateFrame();
+        this.updateMove();
+        this.changePaintOpacity();
+    };
+
+    Sprite_MenuSvActor.prototype.changePaintOpacity = function() {
+        const battleMemberOpacity = this._data.BattleMemberOpacity !== undefined ? this._data.BattleMemberOpacity : true;
+        if (battleMemberOpacity) {
+            this.opacity = this._actor.isBattleMember() ? 255 : Window_Base.prototype.translucentOpacity.call(this);
+        }
+    };
+    
+    Sprite_MenuSvActor.prototype.startMotion = function() {
+        if (this._actor.isDead()) {
+            motionType = 'dead';
+        } else {
+            motionType = 'walk';
+        }
+        Sprite_Actor.prototype.startMotion.call(this, motionType);
+    };
+      
+    Sprite_MenuSvActor.prototype.setupWeaponAnimation = function() {
+        
+    };
+
+
+    function Sprite_MenuActorImg() {
+        this.initialize(...arguments);
+    }
+      
+    Sprite_MenuActorImg.prototype = Object.create(Sprite.prototype);
+    Sprite_MenuActorImg.prototype.constructor = Sprite_MenuActorImg;
+      
+    Sprite_MenuActorImg.prototype.initialize = function() {
+        Sprite.prototype.initialize.call(this);
+        this.initMembers();
+    };
+    
+    Sprite_MenuActorImg.prototype.initMembers = function() {
+        this._battler = null;
+        this._apngMode = null;
+        this._data = null;
+        this._pictureName = null;
+    };
+    
+    Sprite_MenuActorImg.prototype.setup = function(battler, data) {
+        this._battler = battler;
+        this._data = data;
+        const name = Imported.NUUN_ActorPicture && params.ActorPictureEXApp ? battler.getActorGraphicImg() : data.ActorImg;
+        this._pictureName = name.split('pictures/')[1];
+        this.refresh();
+    };
+
+    Sprite_MenuActorImg.prototype.refresh = function() {
+        if (this.addApngChild && this.loadApngSprite(this._pictureName)) {
+            this.addApngChild(this._pictureName);
+            this._apngMode = true;
+        }
+    };
+
+    Sprite_MenuActorImg.prototype.destroy = function() {
+        this.resetMenuActorImg();
+        Sprite.prototype.destroy.call(this);
+    };
+    
+    Sprite_MenuActorImg.prototype.resetMenuActorImg = function() {
+        this._battler = null;
+        if (this._apngMode) {
+            this.destroyApngIfNeed();
+            this._apngMode = null;
+        }
+    };
+
+    Sprite_MenuActorImg.prototype.loadApngSprite = function(name) {
+        return Sprite_Picture.prototype.loadApngSprite.call(this, name);
+    };
+
+})();

@@ -11,6 +11,7 @@
  * @plugindesc Menu screen EX Default type
  * @author NUUN
  * @base NUUN_Base
+ * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @version 2.0.0
  * 

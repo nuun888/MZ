@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.1
+ * @version 2.0.2
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/26/2022 Ver.2.0.2
+ * Minor fix.
  * 11/26/2022 Ver.2.0.1
  * Fixed an issue where the window for selecting actors from items and skills was displayed in its original size and the status display was disturbed.
  * 11/25/2022 Ver.2.0.0
@@ -38,7 +40,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.1
+ * @version 2.0.2
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -48,6 +50,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/26 Ver.2.0.2
+ * 微修正。
  * 2022/11/26 Ver.2.0.1
  * アイテム、スキルからアクターを選択するウィンドウが元のサイズで表示され、ステータスの表示が乱れる問題を修正。
  * 2022/11/25 Ver.2.0.0
@@ -73,8 +77,8 @@ Imported.NUUN_MenuScreenEXBase = true;
             return "NUUN_MenuScreen_default";
         } else if (Imported.NUUN_MenuScreen) {
             return "NUUN_MenuScreen";
-        } else if (Imported.NUUN_MenuScreen2) {
-            return "NUUN_MenuScreen2";
+        } else if (Imported.NUUN_MenuScreen_2) {
+            return "NUUN_MenuScreen_2";
         } else {
             return '';
         }

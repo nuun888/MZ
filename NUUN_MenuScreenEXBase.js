@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/26/2022 Ver.2.0.1
+ * Fixed an issue where the window for selecting actors from items and skills was displayed in its original size and the status display was disturbed.
  * 11/25/2022 Ver.2.0.0
  * Separation of menu screen setting and processing.
  * 
@@ -36,7 +38,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -46,6 +48,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/26 Ver.2.0.1
+ * アイテム、スキルからアクターを選択するウィンドウが元のサイズで表示され、ステータスの表示が乱れる問題を修正。
  * 2022/11/25 Ver.2.0.0
  * メニュー画面の処理を統合し、設定用のみ分割。
  * 
@@ -134,16 +138,16 @@ Imported.NUUN_MenuScreenEXBase = true;
     Scene_Menu.prototype.infoWindowRect = function(data) {
         const wx = data.X_Position + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0);
         const ww = params.WindowUiIgnore ? (data.Width > 0 ? data.Width : Graphics.width) : (Math.min(data.Width > 0 ? data.Width : Graphics.boxWidth, Graphics.boxWidth - wx));
-        const wy = (params.WindowUiIgnore ? 0 : this.menuHelpAreaHeight()) + data.Y_Position;
-        const wh = data.InfoRows > 0 ? this.infoAreaHeight(data.InfoRows) : data.Height;
+        const wy = (params.WindowUiIgnore ? 0 : this.nuun_menuHelpAreaHeight()) + data.Y_Position;
+        const wh = data.InfoRows > 0 ? this.nuun_infoAreaHeight(data.InfoRows) : data.Height;
         return new Rectangle(wx, wy, ww, Math.min(wh, (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight) - wy));
     };
 
     Scene_Menu.prototype.commandWindowRect = function() {
-        const wx = this.mainCommandX();
-        const wy = this.mainCommandY();
-        const ww = (Math.min(this.mainCommandWidth(), (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx));
-        const wh = this.mainCommandHeight();
+        const wx = this.nuun_mainCommandX();
+        const wy = this.nuun_mainCommandY();
+        const ww = (Math.min(this.nuun_mainCommandWidth(), (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx));
+        const wh = this.nuun_mainCommandHeight();
         return new Rectangle(wx, wy, ww, wh);
     };
 
@@ -158,21 +162,21 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
 
     Scene_Menu.prototype.statusWindowDefaultModeRect = function() {
-        const width = (params.MenuStatusWidth > 0 ? params.MenuStatusWidth : (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - (!isBesideMenuCommand() ? this.mainCommandWidth() : 0));
-        const height = params.MenuStatusHeight > 0 ? params.MenuStatusHeight : (params.WindowUiIgnore ? Graphics.height : (Graphics.boxHeight - this.menuHelpAreaHeight()));
-        const wx = (params.MenuCommandPosition === 'left' ? this.mainCommandWidth() : 0) + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0) + params.MenuStatusX;
+        const width = (params.MenuStatusWidth > 0 ? params.MenuStatusWidth : (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - (!isBesideMenuCommand() ? this.nuun_mainCommandWidth() : 0));
+        const height = params.MenuStatusHeight > 0 ? params.MenuStatusHeight : (params.WindowUiIgnore ? Graphics.height : (Graphics.boxHeight - this.nuun_menuHelpAreaHeight()));
+        const wx = (params.MenuCommandPosition === 'left' ? nuun_this.mainCommandWidth() : 0) + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0) + params.MenuStatusX;
         const ww = Math.min(width, (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx);
-        const wh = Math.min(height, (isBesideMenuCommand() ? (params.WindowUiIgnore ? Graphics.height - this.mainCommandHeight() : Graphics.boxHeight - this.menuHelpAreaHeight() - this.mainCommandHeight()) : (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight)));
-        const wy = (isBesideMenuCommand() ? this._commandWindow.y + (params.MenuCommandPosition === 'under' ? -wh : this.mainCommandHeight()) : (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.menuHelpAreaHeight())) + params.MenuStatusY;
+        const wh = Math.min(height, (isBesideMenuCommand() ? (params.WindowUiIgnore ? Graphics.height - this.nuun_mainCommandHeight() : Graphics.boxHeight - this.nuun_menuHelpAreaHeight() - this.nuun_mainCommandHeight()) : (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight)));
+        const wy = (isBesideMenuCommand() ? this._commandWindow.y + (params.MenuCommandPosition === 'under' ? -wh : this.nuun_mainCommandHeight()) : (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.nuun_menuHelpAreaHeight())) + params.MenuStatusY;
         return [wx, wy, ww, Math.min(wh, (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight) - wy)];
     };
 
     Scene_Menu.prototype.statusWindowArrangementModeRect = function() {
         const width = (params.MenuStatusWidth > 0 ? params.MenuStatusWidth : (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth));
-        const height = params.MenuStatusHeight > 0 ? params.MenuStatusHeight : (params.WindowUiIgnore ? Graphics.height : (Graphics.boxHeight - this.menuHelpAreaHeight()));
+        const height = params.MenuStatusHeight > 0 ? params.MenuStatusHeight : (params.WindowUiIgnore ? Graphics.height : (Graphics.boxHeight - this.nuun_menuHelpAreaHeight()));
         const wx = params.MenuStatusX + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0);
         const ww = Math.min(width, (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx);
-        const wy = (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.menuHelpAreaHeight()) + params.MenuStatusY;
+        const wy = (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.nuun_menuHelpAreaHeight()) + params.MenuStatusY;
         const wh = Math.min(height, (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight) - wy);
         return [wx, wy, ww, wh];
     };
@@ -181,7 +185,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         return params.MenuCommandPosition === 'under' || params.MenuCommandPosition === 'top';
     };
 
-    Scene_Menu.prototype.mainCommandX = function() {
+    Scene_MenuBase.prototype.nuun_mainCommandX = function() {
         switch (params.MenuCommandPosition) {
             case 'free':
             case 'left':
@@ -189,39 +193,39 @@ Imported.NUUN_MenuScreenEXBase = true;
             case 'under':
                 return (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0) + params.MenuCommandX;
             case 'right':
-                return (params.WindowUiIgnore ? Graphics.width + (Graphics.boxWidth - Graphics.width) / 2 : Graphics.boxWidth) - this.mainCommandWidth() + params.MenuCommandX;
+                return (params.WindowUiIgnore ? Graphics.width + (Graphics.boxWidth - Graphics.width) / 2 : Graphics.boxWidth) - this.nuun_mainCommandWidth() + params.MenuCommandX;
         }
     };
 
-    Scene_Menu.prototype.mainCommandY = function() {
+    Scene_MenuBase.prototype.nuun_mainCommandY = function() {
         switch (params.MenuCommandPosition) {
             case 'free':
             case 'left':
             case 'top':
             case 'right':
-                return (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.menuHelpAreaHeight()) + params.MenuCommandY;
+                return (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.nuun_menuHelpAreaHeight()) + params.MenuCommandY;
             case 'under':
-                return (params.WindowUiIgnore ? Graphics.height + ((Graphics.boxHeight - Graphics.height) / 2) : Graphics.boxHeight) - this.mainCommandHeight() + params.MenuCommandY;
+                return (params.WindowUiIgnore ? Graphics.height + ((Graphics.boxHeight - Graphics.height) / 2) : Graphics.boxHeight) - this.nuun_mainCommandHeight() + params.MenuCommandY;
         }
     };
 
-    Scene_Menu.prototype.mainCommandWidth = function() {
+    Scene_MenuBase.prototype.nuun_mainCommandWidth = function() {
         return params.MenuCommandWidth > 0 ? params.MenuCommandWidth : (params.MenuCommandCols > 1 ? (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) : 240);
     };
 
-    Scene_Menu.prototype.mainCommandHeight = function() {
-        return params.CommandHeightMode ? this.mainCommandAreaHeight(params.MenuCommandRows) : (params.MenuCommandHeight > 0 ? params.MenuCommandHeight : this.mainAreaHeight());
+    Scene_MenuBase.prototype.nuun_mainCommandHeight = function() {
+        return params.CommandHeightMode ? this.nuun_mainCommandAreaHeight(params.MenuCommandRows) : (params.MenuCommandHeight > 0 ? params.MenuCommandHeight : this.mainAreaHeight());
     };
 
-    Scene_Menu.prototype.mainCommandAreaHeight = function(rows) {
+    Scene_MenuBase.prototype.nuun_mainCommandAreaHeight = function(rows) {
         return this.calcWindowHeight(rows, true);
     };
 
-    Scene_Menu.prototype.infoAreaHeight = function(rows) {
+    Scene_MenuBase.prototype.nuun_infoAreaHeight = function(rows) {
         return this.calcWindowHeight(rows, false);
     };
     
-    Scene_Menu.prototype.menuHelpAreaHeight = function() {
+    Scene_MenuBase.prototype.nuun_menuHelpAreaHeight = function() {
         return this.mainAreaTop();
     };
 
@@ -279,6 +283,35 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
     };
 
+    Scene_ItemBase.prototype.actorWindowRect = function() {
+        let rect = [];
+        if (params.ArrangementMode === 0) {
+            rect = this.statusWindowArrangementModeRect();
+        } else {
+            rect = this.statusWindowDefaultModeRect();
+        }
+        return new Rectangle(rect[0], rect[1], rect[2], rect[3]);
+    };
+
+    Scene_ItemBase.prototype.statusWindowDefaultModeRect = function() {
+        const width = (params.MenuStatusWidth > 0 ? params.MenuStatusWidth : (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - (!isBesideMenuCommand() ? this.nuun_mainCommandWidth() : 0));
+        const height = params.MenuStatusHeight > 0 ? params.MenuStatusHeight : (params.WindowUiIgnore ? Graphics.height : (Graphics.boxHeight - this.nuun_menuHelpAreaHeight()));
+        const wx = (params.MenuCommandPosition === 'left' ? this.nuun_mainCommandWidth() : 0) + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0) + params.MenuStatusX;
+        const ww = Math.min(width, (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx);
+        const wh = Math.min(height, (isBesideMenuCommand() ? (params.WindowUiIgnore ? Graphics.height - this.nuun_mainCommandHeight() : Graphics.boxHeight - this.nuun_menuHelpAreaHeight() - this.nuun_mainCommandHeight()) : (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight)));
+        const wy = (isBesideMenuCommand() ? this.nuun_mainCommandY() + (params.MenuCommandPosition === 'under' ? -wh : this.nuun_mainCommandHeight()) : (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.nuun_menuHelpAreaHeight())) + params.MenuStatusY;
+        return [wx, wy, ww, Math.min(wh, (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight) - wy)];
+    };
+
+    Scene_ItemBase.prototype.statusWindowArrangementModeRect = function() {
+        const width = (params.MenuStatusWidth > 0 ? params.MenuStatusWidth : (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth));
+        const height = params.MenuStatusHeight > 0 ? params.MenuStatusHeight : (params.WindowUiIgnore ? Graphics.height : (Graphics.boxHeight - this.nuun_menuHelpAreaHeight()));
+        const wx = params.MenuStatusX + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0);
+        const ww = Math.min(width, (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx);
+        const wy = (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.nuun_menuHelpAreaHeight()) + params.MenuStatusY;
+        const wh = Math.min(height, (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight) - wy);
+        return [wx, wy, ww, wh];
+    };
 
     const _Window_MenuCommand_initialize = Window_MenuCommand.prototype.initialize;
     Window_MenuCommand.prototype.initialize = function(rect) {

@@ -8,9 +8,471 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Gauge display EX
+ * @author NUUN
+ * @version 1.3.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * Extend the display of the gauge.
+ * 
+ * This plugin extends the following functionality:
+ * Hide gauge
+ * Number display method
+ * Change the coordinates of numbers and labels
+ * Gauge color change at max and below a certain percentage
+ * Label icon display
+ * 
+ * Gauge numeric display format specifications
+ * "time" (TPB gauge) does not display a numerical value.
+ * 
+ * Numeric display width
+ * If you specify only numeric values, enclose them with ''.
+ * 
+ * The application priority of the gauge numerical value setting is given priority to the upper setting. Set the target to the bottom for the 'all' setting.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/25/2022 Ver.1.3.0
+ * Added a function that can specify an icon for the label.
+ * Changed the display in languages other than Japanese to English.
+ * 7/19/2022 Ver.1.2.1
+ * Added function to center the position of numbers.
+ * 7/18/2022 Ver.1.2.0
+ * Added a function that can specify the class to be displayed.
+ * Changed font size specifications.
+ * Changed processing of numeric display.
+ * Added a function that can specify left alignment and right alignment of numerical values.
+ * 1/3/2022 Ver.1.1.1
+ * Changed so that the current value, /, and maximum value coordinate change can be changed respectively.
+ * 12/12/2021 Ver.1.0.3
+ * Changed because some plugins and functions were duplicated.
+ * 12/5/2021 Ver.1.0.2
+ * Fixed an issue where gauge hiding was not being applied.
+ * 12/5/2021 Ver.1.0.1
+ * Corrected so that the current value/maximum value is aligned to the right.
+ * Fixed an issue where gauges below a certain percentage other than HP were not applied.
+ * Fixed an issue where the color of numbers below a certain percentage was not applied at maximum.
+ * Fixed an issue where the label's X coordinate was not applied.
+ * Fixed some processing.
+ * 12/4/2021 Ver.1.0.0
+ * First edition
+ * 
+ * @param CommonSetting
+ * @text Common setting
+ * @default ------------------------------
+ * 
+ * @param GaugeValueSetting
+ * @text Gauge value setting
+ * @desc Gauge value setting.
+ * @type struct<ValueGauge>[]
+ * @default ["{\"Type\":\"'hp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"0\",\"GaugeColor2\":\"0\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'mp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"0\",\"GaugeColor2\":\"0\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'tp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"0\",\"GaugeColor2\":\"0\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}"]
+ * @parent CommonSetting
+ * 
+ * @param ValueAlign
+ * @desc Specifies the default numeric position.
+ * @text default numeric position
+ * @type select
+ * @option Left
+ * @value 'left'
+ * @option Center
+ * @value 'center'
+ * @option Right
+ * @value 'right'
+ * @default 'right'
+ * @parent CommonSetting
+ * 
+ * @param ValueDigits
+ * @desc The display width of the numeric value when the default gauge numeric display format is current value/max value.
+ * @text default number display width
+ * @type string
+ * @default '0000'
+ * @parent CommonSetting
+ * 
+ * @param GaugeHeight
+ * @desc Gauge height range. 0 is the default value *Applied even if not specified in the gauge value setting.
+ * @text gauge height range
+ * @type number
+ * @default 0
+ * @parent CommonSetting
+ * 
+ */
+ /*~struct~ValueGauge:
+ * 
+ * @param Type
+ * @text Status type
+ * @desc Display status type.
+ * @type combo
+ * @option 'all'
+ * @option 'hp'
+ * @option 'mp'
+ * @option 'tp'
+ * @option 'time'
+ * @option 'limit'
+ * @default 
+ * 
+ * @param ValueVisible
+ * @desc Specifies the gauge numeric display format.
+ * @text Gauge numeric display format
+ * @type select
+ * @option Current value only
+ * @value 'Value'
+ * @option Current/Max
+ * @value 'ValueMaxValue'
+ * @option None
+ * @value 'NoValue'
+ * @default 'Value'
+ * 
+ * @param ValueAlign
+ * @desc Specifies the numeric position.
+ * @text Numeric position
+ * @type select
+ * @option Left
+ * @value 'left'
+ * @option Center
+ * @value 'center'
+ * @option Right
+ * @value 'right'
+ * @option Default
+ * @value 'default'
+ * @default 'default'
+ * 
+ * @param GaugeVisible
+ * @desc Show gauge.
+ * @text Show gauge
+ * @type boolean
+ * @default true
+ * 
+ * @param ValueDigits
+ * @desc The display width of the numerical value when the gauge numerical display format is the current value/max value.
+ * @text Numeric display width
+ * @type string
+ * @default 
+ * 
+ * @param LabelIcon
+ * @desc Label icon ID. 0 is displayed as a letter.
+ * @text Label icon ID
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param LabelIconScale
+ * @desc Specifies the magnification of the label icon. (percentage)
+ * @text Label icon magnification
+ * @type number
+ * @default 100
+ * @min 0
+ * 
+ * @param FilteringClass
+ * @text Filtering class setting
+ * @desc Specifies the window class to apply. If not specified, it will be reflected in all windows. (multiple selection)
+ * @type combo[]
+ * @option 'Window_MenuStatus'
+ * @option 'Window_MenuActor'
+ * @option 'Window_Status'
+ * @option 'Window_BattleStatus'
+ * @option 'Window_BattleActor'
+ * @option 'Window_BattleActorStatus'
+ * @option 'Window_Result'
+ * @option 'Window_FormationStatus'
+ * @option 'Sprite_Enemy'
+ * @option 'Window_CustomMenuDataList'
+ * @default
+ * 
+ * @param CoordinateSetting
+ * @text Coordinate setting
+ * @default ------------------------------
+ * 
+ * @param ValueWidth
+ * @desc Numeric display range
+ * @text Numeric display range
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent CoordinateSetting
+ * 
+ * @param GaugeAbsoluteCoordinates
+ * @desc Make gauge coordinates (current value, maximum value, /) absolute coordinates. (OFF relative coordinates)
+ * @text gauge coordinates absolute coordinates
+ * @type boolean
+ * @default false
+ * @parent CoordinateSetting
+ * 
+ * @param GaugeX
+ * @desc The starting X coordinate of the left edge of the gauge. (-1 shifts by label)
+ * @text Gauge start X coordinate
+ * @type number
+ * @default -1
+ * @min -1
+ * @parent CoordinateSetting
+ * 
+ * @param GaugeY
+ * @desc Y coordinate of the gauge.
+ * @text Gauge Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param ValueAbsoluteCoordinates
+ * @desc Convert numeric coordinates (current value, maximum value, /) to absolute coordinates. (OFF relative coordinates)
+ * @text Numeric coordinates absolute coordinates
+ * @type boolean
+ * @default false
+ * @parent CoordinateSetting
+ * 
+ * @param ValueX
+ * @desc Adjust the X coordinate of the current value.
+ * @text Current value X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param ValueY
+ * @desc Adjust the Y coordinate of the current value.
+ * @text Current value Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param MaxValueX
+ * @desc Adjust the X coordinate of the maximum value.
+ * @text Maximum X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param MaxValueY
+ * @desc Adjust the Y coordinate of the maximum value.
+ * @text Maximum Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param SeparationX
+ * @desc Adjust the X coordinate of "/".
+ * @text "/" X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param SeparationY
+ * @desc Adjust the Y coordinate of "/".
+ * @text "/" Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param LabelAbsoluteCoordinates
+ * @desc Make the label coordinates (current value, maximum value, /) absolute coordinates. (OFF relative coordinates)
+ * @text Label coordinates absolute coordinates
+ * @type boolean
+ * @default false
+ * @parent CoordinateSetting
+ * 
+ * @param LabelX
+ * @desc X coordinate of the label.
+ * @text Label X coordinate
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent CoordinateSetting
+ * 
+ * @param LabelY
+ * @desc Y coordinate of the label.
+ * @text Label Y coordinate
+ * @type number
+ * @default 3
+ * @min -9999
+ * @parent CoordinateSetting
+ * 
+ * @param ValueSpaceMargin
+ * @desc Specify "/" and numeric padding.
+ * @text "/" padding between numbers
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent CoordinateSetting
+ * 
+ * @param ValueMargin
+ * @desc Specifies the left margin for numbers. The display width of the gauge is deducted by the margin.
+ * @text Numeric padding
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent CoordinateSetting
+ * 
+ * @param FontSetting
+ * @text Font setting
+ * @default ------------------------------
+ * 
+ * @param ValueFontSize
+ * @desc The current numeric font size. (main font size + default current numeric font size)
+ * @text Current numeric font size
+ * @type number
+ * @default -6
+ * @min -9999
+ * @parent FontSetting
+ * 
+ * @param MaxValueFontSize
+ * @desc Maximum font size. (main font size + difference from default maximum font size)
+ * @text Max font size
+ * @type number
+ * @default -6
+ * @min -9999
+ * @parent FontSetting
+ * 
+ * @param SeparationFontSize
+ * @desc Font size for "/". (main font size + difference from default/font size)
+ * @text "/"font size
+ * @type number
+ * @default -6
+ * @min -9999
+ * @parent FontSetting
+ * 
+ * @param LabelFontSize
+ * @desc Default label font size. (main font size + difference from default label font size)
+ * @text Default label font size
+ * @type number
+ * @default -2
+ * @min -9999
+ * @parent FontSetting
+ * 
+ * @param ColorSetting
+ * @text Color setting
+ * @default ------------------------------
+ * 
+ * @param MaxValueColor
+ * @desc Maximum value color. (system color or color index (text tab)) -1 for the same color as the current value
+ * @text Max color
+ * @type number
+ * @default 0
+ * @min -1
+ * @parent ColorSetting
+ * 
+ * @param SeparationColor
+ * @desc Color of "/". (system color or color index (text tab)) -1 for the same color as the current value
+ * @text "/" color
+ * @type number
+ * @default 0
+ * @min -1
+ * @parent ColorSetting
+ * 
+ * @param LabelColor
+ * @desc Label color. (system color or color index (text tab))
+ * @text Label color
+ * @type number
+ * @default 16
+ * @min 0
+ * @parent ColorSetting
+ * 
+ * @param GaugeColorSetting
+ * @text Gauge setting
+ * @default ------------------------------
+ * 
+ * @param GaugeColor1
+ * @desc Gauge color left (system color or color index (text tab))
+ * @text Gauge color left
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeColorSetting
+ * 
+ * @param GaugeColor2
+ * @desc Gauge Color Right (System Color or Color Index (Text tab))
+ * @text Gauge color right
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeColorSetting
+ * 
+ * @param GaugeColorMaxSetting
+ * @text Max gauge setting
+ * @default ------------------------------
+ * 
+ * @param GaugeColorMaxApply
+ * @desc Applies a color change to gauges and numbers at max.
+ * @text Max time gauge, number color change applied
+ * @type boolean
+ * @default false
+ * @parent GaugeColorMaxSetting
+ * 
+ * @param MaxGaugeColor1
+ * @desc Maximum Gauge Color Left (system color or color index (text tab))
+ * @text Max Gauge Color Left
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeColorMaxSetting
+ * 
+ * @param MaxGaugeColor2
+ * @desc Gauge color right at max (system color or color index (text tab))
+ * @text Max Gauge Color Right
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeColorMaxSetting
+ * 
+ * @param GaugeColorRatioSetting
+ * @text Gauge setting when below percentage
+ * @default ------------------------------
+ * 
+ * @param GaugeColorRatioApply
+ * @desc Applies a color change to gauges, numbers when percentage remaining changes.
+ * @text Apply when change remaining ratio
+ * @type boolean
+ * @default false
+ * @parent GaugeColorRatioSetting
+ * 
+ * @param RatioGauge
+ * @desc Specifies the remaining percentage to change.By specifying 0 for HP, it will be applied when dying.
+ * @text Remaining percentage rate changing
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeColorRatioSetting
+ * 
+ * @param RatioGaugeColor1
+ * @desc Color for the left side of the gauge below the specified percentage. (system color or color index (text tab))
+ * @text Specified percentage or less Gauge color Left
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeColorRatioSetting
+ * 
+ * @param RatioGaugeColor2
+ * @desc Color for the right side of the gauge below a specified percentage. (system color or color index (text tab))
+ * @text Specified percentage or less gauge color right
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeColorRatioSetting
+ * 
+ */
+ /*~struct~GaugeHeightList:
+ * 
+ * @param GaugeHeight
+ * @desc Gauge height range. (This is the display range, not the height of the gauge)
+ * @text Gauge height range
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.2.1
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -22,6 +484,7 @@
  * 数値の表示方法
  * 数値、ラベルの座標変更
  * 最大時、特定の割合以下でのゲージの色変更
+ * ラベルのアイコン表示
  * 
  * ゲージ数値表示形式の仕様
  * timeは数値が表示されません。
@@ -39,6 +502,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/25 Ver.1.3.0
+ * ラベルにアイコンを指定できる機能を追加。
+ * 日本語以外での表示を英語表示に変更。
  * 2022/7/19 Ver.1.2.1
  * 数値の位置を中央揃えにする機能を追加。
  * 2022/7/18 Ver.1.2.0
@@ -104,7 +570,7 @@
  * @parent CommonSetting
  * 
  */
-/*~struct~ValueGauge:
+/*~struct~ValueGauge:ja
  * 
  * @param Type
  * @text 対象
@@ -131,8 +597,8 @@
  * @default 'Value'
  * 
  * @param ValueAlign
- * @desc ゲージ数値表示形式を指定します。
- * @text ゲージ数値表示形式
+ * @desc 数値の位置を指定します。
+ * @text 数値位置
  * @type select
  * @option 左揃え
  * @value 'left'
@@ -155,6 +621,20 @@
  * @text 数値の表示幅
  * @type string
  * @default 
+ * 
+ * @param LabelIcon
+ * @desc ラベルアイコンID。0で文字で表示されます。
+ * @text ラベルアイコンID
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param LabelIconScale
+ * @desc ラベルアイコンの拡大率を指定します。(百分率)
+ * @text ラベルアイコン拡大率
+ * @type number
+ * @default 100
+ * @min 0
  * 
  * @param FilteringClass
  * @text フィルタリングクラス設定
@@ -448,7 +928,7 @@
  * @parent GaugeColorRatioSetting
  * 
  */
-/*~struct~GaugeHeightList:
+/*~struct~GaugeHeightList:ja
  * 
  * @param GaugeHeight
  * @desc ゲージの高さ範囲。(ゲージの高さではなく表示範囲です)
@@ -472,13 +952,28 @@ Imported.NUUN_GaugeValueEX = true;
     const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
     Sprite_Gauge.prototype.initMembers = function() {
         this._gaugeData = null;
+        this._LabelIconSprite = null;
         _Sprite_Gauge_initMembers.call(this);
     };
 
     const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
     Sprite_Gauge.prototype.setup = function(battler, statusType) {
         this.initGaugeData(statusType);
+        this.createIconSprite();
         _Sprite_Gauge_setup.call(this, battler, statusType);
+    };
+
+    Sprite_Gauge.prototype.createIconSprite = function() {
+        if (this._gaugeData && this._gaugeData.LabelIcon > 0) {
+            if (!this._LabelIconSprite) {
+                const sprite = new Sprite();
+                this.addChild(sprite);
+                sprite.bitmap = new Bitmap(ImageManager.iconWidth, ImageManager.iconHeight);
+                sprite.bitmap = ImageManager.loadSystem("IconSet");
+                this._LabelIconSprite = sprite;
+                sprite.setFrame(0, 0, 0, 0);
+            }
+        }
     };
 
     Sprite_Gauge.prototype.initGaugeData = function(statusType) {
@@ -791,15 +1286,24 @@ Imported.NUUN_GaugeValueEX = true;
     };
 
     Sprite_Gauge.prototype.drawLabel2 = function() {
-        const label = this.label();
-        const x = (this.labelAbsoluteCoordinates() ? 0 : this.labelOutlineWidth() / 2) + this.labelX();
-        const y = this.labelY();
-        const width = this.bitmapWidth();
-        const height = this.textHeight();
-        this.setupLabelFont();
-        this.bitmap.paintOpacity = this.labelOpacity();
-        this.bitmap.drawText(label, x, y, width, height, "left");
-        this.bitmap.paintOpacity = 255;
+        if (this._LabelIconSprite && this._gaugeData.LabelIcon > 0) {
+            const sprite = this._LabelIconSprite;
+            this.nuun_IconFrame(this._gaugeData.LabelIcon);
+            sprite.x = (this.labelAbsoluteCoordinates() ? 0 : this.labelOutlineWidth() / 2) + this.labelX();
+            sprite.y = this.labelY();
+            sprite.scale.x = (this._gaugeData.LabelIconScale || 100) / 100;
+            sprite.scale.y = (this._gaugeData.LabelIconScale || 100) / 100;
+        } else {
+            const label = this.label();
+            const x = (this.labelAbsoluteCoordinates() ? 0 : this.labelOutlineWidth() / 2) + this.labelX();
+            const y = this.labelY();
+            const width = this.bitmapWidth();
+            const height = this.textHeight();
+            this.setupLabelFont();
+            this.bitmap.paintOpacity = this.labelOpacity();
+            this.bitmap.drawText(label, x, y, width, height, "left");
+            this.bitmap.paintOpacity = 255;
+        }
     };
 
     Sprite_Gauge.prototype.isGaugeImageLabel = function() {
@@ -808,6 +1312,14 @@ Imported.NUUN_GaugeValueEX = true;
 
     Sprite_Gauge.prototype.isGaugeImageValue = function() {
         return Imported.NUUN_GaugeImage && this._gaugeImgData;
+    };
+
+    Sprite_Gauge.prototype.nuun_IconFrame = function(index) {
+        const pw = ImageManager.iconWidth;
+        const ph = ImageManager.iconHeight;
+        const sx = (index % 16) * pw;
+        const sy = Math.floor(index / 16) * ph;
+        this._LabelIconSprite.setFrame(sx, sy, pw, ph);
     };
 
 })();

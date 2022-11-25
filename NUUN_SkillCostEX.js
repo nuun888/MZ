@@ -8,9 +8,83 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc Skill cost EX
+ * @author NUUN
+ * @version 1.1.1
+ * 
+ * @help
+ * You can set various costs for skill costs.
+ * 
+ * Skill Notes
+ * HP consumption skill
+ * <SkillHPCost:150> Consumes 150 HP as a cost.
+ * <SkillHPCostMR:30> Consumes 30% of maximum HP as a cost.
+ * <SkillHPCostR:30> Consumes 30% of the remaining HP as a cost.
+ * <HPCostDead> Allows death by consumption.
+ * MP consumption skill
+ * <SkillMPCost:150> Consumes 150 MP as a cost. You can only set up to 9999 on the database, but you can set a cost of 10000 or more.
+ * <SkillMPCostMR:30> Consumes 30% of maximum MP as cost.
+ * <SkillMPCostR:30> Consumes 30% of the remaining MP as a cost.
+ * <MPCostNoMcr> Does not apply the effect of MP consumption rate.
+ * TP consumption skill
+ * <SkillTPCostR:50> Consume 50% of remaining TP as cost.
+ * Possession money consumption skill
+ * <SkillGoldCost:1000> Consume 1000G of your money as a cost.
+ * <SkillGoldCostR:30> Consume 30% of your money as a cost.
+ * EXP consumption skill
+ * <SkillExpCost:300> As a cost, you lose 300 experience points.
+ * <SkillLavelExpCost> Consume from the current level of earned experience.
+ * <SkillExpCostR:50> Consume 50% of the earned experience points up to the next level of experience points.
+ * Item consumption skill
+ * <SkillItemCost:[itemType],[itemId],[num]> Consume items, weapons, and armor as a cost.
+ * If you specify multiple items, you can use them if you have all the items.
+ * [itemType]:Item type  I Item W Weapon A Armor
+ * [itemId]:Item, Weapon, Armor ID
+ * [num]:Consumed quantity
+ * Equipment consumption skill
+ * <SkillEquipCost:[itemType],[itemId],[num]> Consumes equipped weapons and armor as a cost.
+ * [itemType]:Item type  W Weapon A Armor
+ * [itemId]:Weapon/Armor ID
+ * [num]:For no consumption, 1 for lost
+ * Game variable consumption skill
+ * <SkillVarCost:[id],[cost]> Consume from the value set in the game variable.
+ * [id]:Game variable ID
+ * [cost]:Consumption cost
+ * Evaluation formula
+ * <SkillEvalCost:[eval]> Enter the evaluation formula for judging consumption.
+ * <SkillEvalCons:[eval]> Enter the evaluation formula for consumption.
+ * 
+ * Do not enter [].
+ * 
+ * Acquisition parameter
+ * this.consBHp:Stores subject's HP before consumption.
+ * this.consBMp:Stores subject's MP before consumption.
+ * this.consBTp:Stores subject's TP before consumption.
+ * this.consBGold:Stores the subject's money before consumption.
+ * this.consBExp:Stores the subject's current level of gained experience before consumption.
+ * 
+ * Skill damage formula
+ * By entering "a.consBMp * 1.5", you can give 1.5 times the damage of MP before consumption.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/25/2022 Ver.1.1.1
+ * Added MP skill cost. (Cost can be set to 10000 or more)
+ * Changed the display in languages other than Japanese to English.
+ * 4/2/2022 Ver.1.1.0
+ * Added a function that allows you to set skills to be activated by consuming equipped weapons and armor.
+ * 12/5/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -22,6 +96,7 @@
  * <SkillHPCostR:30> コストとして残りHPの３０％を消費します。
  * <HPCostDead> 消費による戦闘不能を許可します。
  * MP消費スキル
+ * <SkillMPCost:150> コストとしてMPを１５０消費します。データベース上では9999までしか設定できませんが10000以上のコストを設定できます。
  * <SkillMPCostMR:30> コストとして最大MPの３０％を消費します。
  * <SkillMPCostR:30> コストとして残りMPの３０％を消費します。
  * <MPCostNoMcr> ＭＰ消費率の効果を適用しません。
@@ -68,6 +143,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/25 Ver.1.1.1
+ * MPのスキルコストを追加。(コストを10000以上設定できます)
+ * 日本語以外での表示を英語表示に変更。
  * 2022/4/2 Ver.1.1.0
  * 装備中の武器、防具を消費して発動するスキルを設定できる機能を追加。
  * 2021/12/5 Ver.1.0.0
@@ -104,6 +182,7 @@ Game_Battler.prototype.setBCostParam = function() {
 
 Game_BattlerBase.prototype.skillMpCost = function(skill) {//再定義
     let cost = skill.mpCost;
+    cost += skill.meta.SkillMPCost ? Number(skill.meta.SkillMPCost) : 0;
     cost += skill.meta.SkillMPCostMR ? Math.floor(this.mmp * Number(skill.meta.SkillMPCostMR) / 100) : 0;
     cost += skill.meta.SkillMPCostR ? Math.floor(this._mp * Number(skill.meta.SkillMPCostR) / 100) : 0;
     return skill.meta.MPCostNoMcr ? cost : Math.floor(cost * this.mcr);

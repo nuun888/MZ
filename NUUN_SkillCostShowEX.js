@@ -8,6 +8,283 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc Skill cost display EX
+ * @author NUUN
+ * @version 1.0.2
+ * @base NUUN_Base
+ * @base NUUN_SkillCostEX
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_SkillCostEX
+ * 
+ * @help
+ * Extends the display of skill costs.
+ * When setting costs other than HP, MP, TP, Gold, and Exp in the display order of skill costs, enter the tag name of the cost to be consumed in the cost display target, and the costs other than HP, MP, TP, Gold, and Exp Please set in individual settings.
+ * or Cost evaluation formula, enter the cost evaluation formula.
+ * To display the cost of the party limit gauge, enter 'limitCost' in the cost display target and enter "this._actor.skillLimitCost(skill)" in the cost evaluation formula.
+ * skill：Skill data to activate
+ * this._actor：this._actor or actor: actor game data
+ * 
+ * For the color setting, normally enter the system color.
+ * You can enter the color code from the text tab.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/25/2022 Ver.1.0.2
+ * Fixed so that actor's game data acquisition parameter can be acquired by actor.
+ * Changed the display in languages other than Japanese to English.
+ * 1/3/2022 Ver.1.0.1
+ * Fixed an issue where multiple tags not listed in the cost display target were not displayed correctly.
+ * 12/5/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * @param CostOrderSetting
+ * @text Display order of skill cost
+ * @desc Set the display order of skill costs. Costs set at the top are displayed later.
+ * @default ["{\"CostOrderSelect\":\"[\\\"'Exp'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'Gold'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'TP'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'MP'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'HP'\\\"]\"}"]
+ * @type struct<CostOrderSettingList>[]
+ * 
+ * @param CostWidth
+ * @text cost range
+ * @desc 1 cost range.
+ * @type string
+ * @default 000
+ * 
+ * @param Connection
+ * @text Between cost characters
+ * @desc Characters between costs.
+ * @type string
+ * @default /
+ * 
+ * @param PrefixFontSize
+ * @desc Prefix font size.
+ * @text Prefix font size
+ * @type number
+ * @default 20
+ * @min 1
+ * 
+ * @param SuffixFontSize
+ * @desc Suffix font size.
+ * @text Suffix font size
+ * @type number
+ * @default 20
+ * @min 1
+ * 
+ * @param ConnectionFontSize
+ * @desc Font size for cost between characters.
+ * @text Between-cost character font size
+ * @type number
+ * @default 26
+ * @min 1
+ * 
+ * @param CostFontSize
+ * @desc Cost font size.
+ * @text Cost font size
+ * @type number
+ * @default 26
+ * @min 1
+ * 
+ * @param PrefixY
+ * @desc Y coordinate of the prefix.
+ * @text Prefix Y coordinate
+ * @type number
+ * @default 2
+ * @min -9999
+ * 
+ * @param SuffixY
+ * @desc Y coordinate of the suffix.
+ * @text Suffix Y coordinate
+ * @type number
+ * @default 2
+ * @min -9999
+ * 
+ * @param ConnectionY
+ * @desc Y coordinate of the cost-between character.
+ * @text Y coordinate of letter between costs
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param CostY
+ * @desc Y coordinate of the cost.
+ * @text Cost Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param HPCostSetting
+ * @text HP setting
+ * @default ------------------------------
+ * 
+ * @param HPCostColor
+ * @text HP cost color
+ * @desc HP cost color.
+ * @type number
+ * @default 21
+ * @parent HPCostSetting
+ * 
+ * @param HPPrefix
+ * @text HP prefix
+ * @desc HP prefix.
+ * @type string
+ * @default HP
+ * @parent HPCostSetting
+ * 
+ * @param HPSuffix
+ * @text HP suffix
+ * @desc HP suffix.
+ * @type string
+ * @default 
+ * @parent HPCostSetting
+ * 
+ * @param MPCostSetting
+ * @text MP setting
+ * @default ------------------------------
+ * 
+ * @param MPCostColor
+ * @text MP cost color
+ * @desc MP cost color.
+ * @type number
+ * @default 23
+ * @parent MPCostSetting
+ * 
+ * @param MPPrefix
+ * @text MP prefix
+ * @desc Prefix for MP.
+ * @type string
+ * @default MP
+ * @parent MPCostSetting
+ * 
+ * @param MPSuffix
+ * @text MP suffix
+ * @desc Suffix of MP.
+ * @type string
+ * @default
+ * @parent MPCostSetting 
+ * 
+ * @param TPCostSetting
+ * @text TP setting
+ * @default ------------------------------
+ * 
+ * @param TPCostColor
+ * @text TP cost color
+ * @desc TP cost color.
+ * @type number
+ * @default 29
+ * @parent TPCostSetting
+ * 
+ * @param TPPrefix
+ * @text TP prefix
+ * @desc Prefix for TP.
+ * @type string
+ * @default TP
+ * @parent TPCostSetting
+ * 
+ * @param TPSuffix
+ * @text TP suffix
+ * @desc TP suffix.
+ * @type string
+ * @default
+ * @parent TPCostSetting 
+ * 
+ * @param GoldCostSetting
+ * @text Gold setting
+ * @default ------------------------------
+ * 
+ * @param GoldCostColor
+ * @text Money cost color
+ * @desc The color of the money cost.
+ * @type number
+ * @default 17
+ * @parent GoldCostSetting
+ * 
+ * @param GoldPrefix
+ * @text Money prefix
+ * @desc Money prefix.
+ * @type string
+ * @default 
+ * @parent GoldCostSetting
+ * 
+ * @param GoldSuffix
+ * @text Money suffix
+ * @desc Money prefix.
+ * @type string
+ * @default G
+ * @parent GoldCostSetting
+ * 
+ * @param ExpCostSetting
+ * @text EXP setting
+ * @default ------------------------------
+ * 
+ * @param ExpCostColor
+ * @text Exp cost color
+ * @desc Exp cost color.
+ * @type number
+ * @default 27
+ * @parent ExpCostSetting
+ * 
+ * @param ExpPrefix
+ * @text Exp prefix
+ * @desc Exp prefix.
+ * @type string
+ * @default EXP
+ * @parent ExpCostSetting
+ * 
+ * @param ExpSuffix
+ * @text Exp suffix
+ * @desc Exp suffix.
+ * @type string
+ * @default 
+ * @parent ExpCostSetting
+ * 
+ * 
+ */
+/*~struct~CostOrderSettingList:
+ * 
+ * @param CostOrderSelect
+ * @text Cost display target
+ * @desc Set the display target of the cost. When specifying other than HP, MP, TP, Gold, Exp, please enter the corresponding cost tag name.
+ * @type combo[]
+ * @option 'HP'
+ * @option 'MP'
+ * @option 'TP'
+ * @option 'Gold'
+ * @option 'Exp'
+ * @option 'limitCost'
+ * @default
+ * 
+ * @param CostTagSetting
+ * @text Individual cost settings other than HP, MP, TP, Gold, Exp
+ * @default ------------------------------
+ * 
+ * @param CostColor
+ * @text Cost color
+ * @desc Cost color.
+ * @type number
+ * @default 0
+ * 
+ * @param Prefix
+ * @text Prefix
+ * @desc Prefix.
+ * @type string
+ * @default 
+ * 
+ * @param Suffix
+ * @text Suffix
+ * @desc Suffix.
+ * @type string
+ * @default
+ * 
+ * @param CostEval
+ * @text Cost evaluation formula
+ * @desc An evaluation formula for calculating the cost. Specify a function to get the cost.
+ * @type string
+ * @default 
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc スキルコスト表示拡張
  * @author NUUN
  * @version 1.0.1
@@ -24,7 +301,7 @@
  * パーティリミットゲージのコストを表示する場合はコスト表示対象に'limitCost'を記入し、
  * コスト評価式にthis._actor.skillLimitCost(skill)と記入してください。
  * skill：発動するスキルデータ
- * this._actor：アクターデータ
+ * this._actorまたはactor：アクターデータ
  * 
  * 色の設定は通常システムカラーを記入しますが、テキストタブからカラーコードを記入できます。
  * 
@@ -32,6 +309,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/25 Ver.1.0.2
+ * アクターのゲームデータの取得パラメータをactorで取得できるように修正。
+ * 日本語以外での表示を英語表示に変更。
  * 2022/1/3 Ver.1.0.1
  * コスト表示対象でリストにないタグを複数指定したときに、正常に表示されない問題を修正。
  * 2021/12/5 Ver.1.0.0
@@ -238,7 +518,7 @@
  * 
  * 
  */
-/*~struct~CostOrderSettingList:
+/*~struct~CostOrderSettingList:ja
  * 
  * @param CostOrderSelect
  * @text コスト表示対象
@@ -344,6 +624,7 @@ Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//再�
             }
         } else if (type.CostOrderSelect) {
             if (skill.meta[type.CostOrderSelect]) {
+                const actor = this._actor;
                 const cost = eval(type.CostEval);
                 if (cost) {
                     x = this.drawOrderCost(skill, cost, type, x, y, width);

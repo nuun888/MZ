@@ -1,5 +1,5 @@
 # [メニュー画面デフォルトタイプ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)
-# Ver.1.4.1
+# Ver.2.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
 #### 必須、前提プラグイン
 [メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.0  

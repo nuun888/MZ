@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.3
+ * @version 2.0.4
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/27/2022 Ver.2.0.4
+ * Fixed an issue that caused an error when menu command display mode was set to left.
  * 11/26/2022 Ver.2.0.3
  * Fixed an issue where an error would occur if the actor image was set to Img with "ActorPictureEXApp" turned on.
  * Fixed the problem that APNG images remain displayed when scrolling.
@@ -43,7 +45,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.3
+ * @version 2.0.4
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -53,6 +55,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/27 Ver.2.0.4
+ * コマンドモードを左側に設定したときにエラーが出る問題を修正。
  * 2022/11/26 Ver.2.0.3
  * 立ち絵、顔グラEX適用をONにしてアクター画像をImgに設定した場合、エラーが出る問題を修正。
  * スクロールした際にAPNG画像が表示されたままになってしまう問題を修正。
@@ -174,7 +178,7 @@ Imported.NUUN_MenuScreenEXBase = true;
     Scene_Menu.prototype.statusWindowDefaultModeRect = function() {
         const width = (params.MenuStatusWidth > 0 ? params.MenuStatusWidth : (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - (!isBesideMenuCommand() ? this.nuun_mainCommandWidth() : 0));
         const height = params.MenuStatusHeight > 0 ? params.MenuStatusHeight : (params.WindowUiIgnore ? Graphics.height : (Graphics.boxHeight - this.nuun_menuHelpAreaHeight()));
-        const wx = (params.MenuCommandPosition === 'left' ? nuun_this.mainCommandWidth() : 0) + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0) + params.MenuStatusX;
+        const wx = (params.MenuCommandPosition === 'left' ? this.nuun_mainCommandWidth() : 0) + (params.WindowUiIgnore ? (Graphics.boxWidth - Graphics.width) / 2 : 0) + params.MenuStatusX;
         const ww = Math.min(width, (params.WindowUiIgnore ? Graphics.width : Graphics.boxWidth) - wx);
         const wh = Math.min(height, (isBesideMenuCommand() ? (params.WindowUiIgnore ? Graphics.height - this.nuun_mainCommandHeight() : Graphics.boxHeight - this.nuun_menuHelpAreaHeight() - this.nuun_mainCommandHeight()) : (params.WindowUiIgnore ? Graphics.height : Graphics.boxHeight)));
         const wy = (isBesideMenuCommand() ? this._commandWindow.y + (params.MenuCommandPosition === 'under' ? -wh : this.nuun_mainCommandHeight()) : (params.WindowUiIgnore ? (Graphics.boxHeight - Graphics.height) / 2 : this.nuun_menuHelpAreaHeight())) + params.MenuStatusY;

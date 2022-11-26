@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.2
+ * @version 3.8.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/11/26 Ver.3.8.3
+ * 行動時ズーム時にAPNGの画像の座標がずれてしまう問題を修正。
  * 2022/11/12 Ver.3.8.2
  * 立ち絵が切り替わると表示が消えてしまう問題を修正。
  * 2022/11/7 Ver.3.8.1
@@ -2823,6 +2825,10 @@ Sprite_ActorImges.prototype.updateZoom = function() {
     if (this.y === this._homeY) {
       this.y = this._homeY - (this._rectHeight / 2) * scale * (this._data.ActorImgVPosition === 'top' ? -1 : 1);
     }
+    if (this._apngMode) {
+      this._apngSprite.y = this.x;
+      this._apngSprite.y = this.y;
+    }
     if (getStateAnimationShow()) {
       //this._stateSprite.x = params.ActorState_X;
       //this._stateSprite.y = params.ActorState_Y + (this._rectHeight / 2) * (this._data.ActorImgVPosition === 'top' ? -1 : 1) + this.getStatePositionY();
@@ -2835,6 +2841,10 @@ Sprite_ActorImges.prototype.updateZoom = function() {
       this._zoomEffect = false;
       this.y = this._homeY;
       this.x = this._homeX;
+      if (this._apngMode) {
+        this._apngSprite.x = 0;
+        this._apngSprite.y = 0;
+      }
       this.anchor.x = this._data.ActorImgHPosition === 'left' ? 0.0 : 0.5;
       this.anchor.y = this._data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
       if (getStateAnimationShow()) {

@@ -10,14 +10,14 @@
  * @target MZ
  * @plugindesc Damage type TP added
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * Adds TP to damage types.
  * Skill and item Notes
  * <DamageTypeTP> This skill and item are damage type "TP damage".
  * <DamageTypeTPR> This skill and item are damage type "TP recovery".
- * <DamageTypeTPA> This skill and item have the damage type "TP absorption".
+ * <DamageTypeTPA> This skill and item will be damage type "TP Absorption".
  * 
  * Set the damage type to something other than None.
  * If there is the above tag, the damage type will be the corresponding type. (Settings on the database are not applied)
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/26/2022 Ver.1.0.3
+ * Minor fix.
  * 11/24/2022 Ver.1.0.2
  * Changed the display in languages other than Japanese to English.
  * 2/27/2022 Ver.1.0.1
@@ -39,7 +41,7 @@
  * @target MZ
  * @plugindesc ダメージタイプTP追加
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * ダメージタイプにTPを追加します。
@@ -55,6 +57,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/26 Ver.1.0.3
+ * 微修正。
  * 2022/11/24 Ver.1.0.2
  * 日本語以外での表示を英語表示に変更。
  * 2022/2/27 Ver.1.0.1
@@ -73,7 +77,7 @@ const parameters = PluginManager.parameters('NUUN_TPDamageType');
 const _Game_Action_apply = Game_Action.prototype.apply;
 Game_Action.prototype.apply = function(target) {
     const damageType = this.item().damage.type;
-    this.item().damage.type = this.damageTypeEX(this.item());
+    this.item().damage.type = this.damageTypeEX(this.item(), damageType);
     _Game_Action_apply.call(this, target);
     this.item().damage.type = damageType;
 };
@@ -131,7 +135,7 @@ Game_Action.prototype.isDrain = function() {
     return _Game_Action_isDrain.call(this) || this.checkDamageType([12]);
 };
 
-Game_Action.prototype.damageTypeEX = function(item) {
+Game_Action.prototype.damageTypeEX = function(item, type) {
     if (item.meta.DamageTypeTP) {
         return 10;
     } else if (item.meta.DamageTypeTPR) {
@@ -139,7 +143,7 @@ Game_Action.prototype.damageTypeEX = function(item) {
     } else if (item.meta.DamageTypeTPA) {
         return 12;
     } else {
-        return item.damage.type;
+        return type;
     }
 };
 })();

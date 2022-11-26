@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.2
+ * @version 2.0.3
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/26/2022 Ver.2.0.3
+ * Fixed an issue where an error would occur if the actor image was set to Img with "ActorPictureEXApp" turned on.
+ * Fixed the problem that APNG images remain displayed when scrolling.
  * 11/26/2022 Ver.2.0.2
  * Minor fix.
  * 11/26/2022 Ver.2.0.1
@@ -40,7 +43,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.2
+ * @version 2.0.3
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -50,6 +53,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/26 Ver.2.0.3
+ * 立ち絵、顔グラEX適用をONにしてアクター画像をImgに設定した場合、エラーが出る問題を修正。
+ * スクロールした際にAPNG画像が表示されたままになってしまう問題を修正。
  * 2022/11/26 Ver.2.0.2
  * 微修正。
  * 2022/11/26 Ver.2.0.1
@@ -85,7 +91,7 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
 
 
-    const pluginName = getPluginName();console.log(pluginName)
+    const pluginName = getPluginName();
     PluginManager.registerCommand(getPluginName(), 'ChangeBackgroundId', args => {
         $gameSystem.menuBackgroundId = Number(args.backgroundId);
     });
@@ -333,6 +339,17 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
 
 
+    const _Window_Selectable_paint =Window_Selectable.prototype.paint;
+    Window_MenuStatus.prototype.paint = function() {
+        if (String(this.constructor.name) === 'Window_MenuStatus' && this.contents && !!this._actorsBitmap) {
+            for (const sprite of this._actorsBitmap) {
+                sprite.resetMenuActorImg();
+            }
+        }
+        _Window_Selectable_paint.call(this);
+    };
+
+
     const _Window_MenuStatus_initialize = Window_MenuStatus.prototype.initialize;
     Window_MenuStatus.prototype.initialize = function(rect) {
         this._actorsBitmap = [];
@@ -405,9 +422,10 @@ Imported.NUUN_MenuScreenEXBase = true;
             const sprite = new Sprite_MenuActorImg();
             this._contentsBackSprite.addChild(sprite);
             this._actorsBitmap[index] = sprite;
-            sprite.setup(actor, data);
-            sprite.move(rect.x + 50, rect.y, rect.width, rect.height);
         }
+        const sprite = this._actorsBitmap[index];
+        sprite.setup(actor, data);
+        sprite.move(rect.x + 50, rect.y, rect.width, rect.height);
     };
 
     Window_MenuStatus.prototype.addChildToBack2 = function(child) {
@@ -423,7 +441,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             if (data.GraphicMode === 'imgApng') {
                 this.createApngSprite(actor, index, data, rect);
             } else if (Imported.NUUN_ActorPicture && params.ActorPictureEXApp) {
-                bitmap = data.GraphicMode === 'face' ? actor.loadActorFace() : this.loadActorImg(actor);
+                bitmap = data.GraphicMode === 'face' ? actor.loadActorFace() : actor.loadActorGraphic();
             } else {
                 bitmap = data.GraphicMode === 'face' ? ImageManager.nuun_LoadPictures(data.FaceImg) : ImageManager.nuun_LoadPictures(data.ActorImg);
             }
@@ -740,24 +758,6 @@ Imported.NUUN_MenuScreenEXBase = true;
     
     Window_MenuStatus.prototype.contentsDrawActorChip = function(data, x, y, width, actor) {
         this.actorCharacterChip(actor, data, x + 24, y + 48);
-    };
-
-    
-
-    Window_MenuStatus.prototype.drawActorGraphicApng = function(data, x, y, width, actor) {
-        const rect = this.itemRect(0);
-        const imgData = this.getActorData(actor);
-        if (imgData) {
-            const sprite = new Sprite_MenuActorImg();
-            this.addChildToBack(sprite);
-            const bitmap = this.loadActorImg(actor);
-            const battleMemberOpacity = data.BattleMemberOpacity !== undefined ? data.BattleMemberOpacity : true;
-            if (battleMemberOpacity) {
-                this.changePaintOpacity(actor.isBattleMember());
-            }
-            this.contentsDrawActorGraphic(actor, imgData, bitmap, x, y, width, rect.height);
-            this.changePaintOpacity(true);
-        }
     };
 
     Window_MenuStatus.prototype.drawParams = function(data, param, x, y, width, actor) {

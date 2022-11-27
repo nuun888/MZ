@@ -245,8 +245,8 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | イベント　　　　　　　　　　　　　　　 | プラグイン　プラグイン数　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [イベント接触判定拡張](https://github.com/nuun888/MZ/blob/master/README/EventRange.md) | [NUUN_EventRange](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js) | 共 | 1.4.0 |
-| ┣  [場所範囲移動](https://github.com/nuun888/MZ/blob/master/README/RangeTransfer.md) | [NUUN_RangeTransfer](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RangeTransfer.js) |  | 1.0.0 |
+| [イベント接触判定拡張](https://github.com/nuun888/MZ/blob/master/README/EventRange.md) | [NUUN_EventRange](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js) | 共 | 1.4.2 |
+| ┣  [場所範囲移動](https://github.com/nuun888/MZ/blob/master/README/RangeTransfer.md) | [NUUN_RangeTransfer](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RangeTransfer.js) |  | 1.0.1 |
 | ┗　シンボルエンカウント補助|  |  |  |
 | [トリガー起動時のプレイヤーとイベントの向き状況取得](https://github.com/nuun888/MZ/blob/master/README/EventPlayerDirection.md) | [NUUN_EventPlayerDirection](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventPlayerDirection.js) | | 1.0.1 |
 | [イベント復活](https://github.com/nuun888/MZ/blob/master/README/EventRevived.md) | [NUUN_EventRevived](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRevived.js) | 共 | 1.0.0 |

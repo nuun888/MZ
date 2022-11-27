@@ -1,5 +1,6 @@
 # [敵グループの個別ＢＧＭ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js)
-# Ver.1.0.1
+# Ver.1.1.0
+ [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js)
 
 敵グループごとに戦闘BGMを設定できます。
 
@@ -26,6 +27,10 @@
 
 条件付きのBGMはなるべく優先度の高い順に上から記入してください。  
 仕様上、一番最初に再生可能な条件が一致したときのBGMが再生されます。  
+
+#### BGM変更スイッチ
+0に設定した場合は、常時このプラグインで設定したBGMが再生されます。  
+スイッチを指定した場合は該当のスイッチがONの時にこのプラグインで設定したBGMが再生されます。  
 
 `<battleBGMN:Battle3>`  リスト内にBattle3が設定されていれば、Battle3がBGMが再生られます。  
 `<battleBGMR:1,2,3>` リストの１，２，３番目のBGMのうち一つがランダムに再生されます。  

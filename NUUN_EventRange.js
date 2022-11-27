@@ -266,6 +266,7 @@ Imported.NUUN_EventRange = true;
     Game_CharacterBase.prototype.moveStraight = function(d) {
         _Game_CharacterBase_moveStraight.call(this, d);
         if (this.isEventRangeEvent() && this.isMovementSucceeded() && !$gameMap.isEventRunning()) {
+            $gamePlayer.setDistanceFrom(0, 0);
             if (this._trigger === 2 && this.range($gamePlayer.x, $gamePlayer.y) && !$gamePlayer.pos(this.x, this.y)) {
                 if (!this.isJumping() && this.isNormalPriority()) {
                     this.start();

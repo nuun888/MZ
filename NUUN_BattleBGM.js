@@ -48,7 +48,7 @@
  * If set to 0, the BGM set by this plug-in will always be played.
  * If you specify a switch, the BGM set with this plug-in will be played when the corresponding switch is ON.
  * 
- * 例
+ * Example
  * <battleBGMN:Battle3> If Battle3 is set in the list, Battle3 BGM will be played.
  * <battleBGMR:1,2,3> One of the 1st, 2nd and 3rd BGM in the list will be played randomly.
  * <battleBGM:Battle2, 90, 100, 0> Battle2 BGM is played at volume 90, pitch 100, and pan 0.

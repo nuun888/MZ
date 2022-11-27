@@ -8,9 +8,40 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Location range move
+ * @author NUUN
+ * @version 1.0.1
+ * @base NUUN_EventRange
+ * 
+ * @help
+ * When the location is moved by the event contact judgment expansion, the map is moved according to the coordinates of the destination.
+ * Allows you to move more than 2 spaces in one event.
+ * To apply range movement when moving the map, turn on the range movement permission switch ID set in the plug-in parameter.
+ * 
+ * This plug-in is an expansion plug-in of "NUUN_EventRange" (Ver.1.2.0 or later).
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/27/2022 Ver.1.0.1
+ * Changed the display in languages other than Japanese to English.
+ * 7/14/2022 Ver.1.0.0
+ * First edition
+ * 
+ * @param RangeTransferModeSwitchId
+ * @text Range movement permission switch ID
+ * @desc Set a switch that allows range movement when you move to an event with expanded event contact judgment.
+ * @type switch
+ * @default 0
+ * 
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc 場所範囲移動
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_EventRange
  * 
  * @help
@@ -24,6 +55,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/27 Ver.1.0.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/7/14 Ver.1.0.0
  * 初版
  * 

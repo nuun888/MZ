@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Event contact detection EX
  * @author NUUN
- * @version 1.4.2
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -22,6 +22,9 @@
  * 
  * <EventRangeCollided>
  * Enable range collision detection for events. Triggers are applied in the same way as normal characters.
+ * 
+ * <EventRangeObstacle>
+ * If there is a map with a traffic judgment of "x" in the field of view in the event of the specified range, the event will not be performed.
  * 
  * <EventRange:besideRange,[lx],[rx]> Enlarges the contact judgment within the specified horizontal range. Orientation is ignored.
  * [lx]:Contact left range of the event (positive integer)
@@ -73,6 +76,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/27/2022 Ver.1.5.0
+ * Added a function that does not cause an event when there is an obstacle in sight from the player.
+ * Fixed an issue where the collision detection was not applied correctly in the range collision detection of the event.
+ * Fixed the problem that the range was not judged by contact from the event.
  * 11/27/2022 Ver.1.4.2
  * Changed the display in languages other than Japanese to English.
  * 9/14/2022 Ver.1.4.1
@@ -120,7 +127,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.4.2
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -132,6 +139,9 @@
  * 
  * <EventRangeCollided>
  * イベントの範囲衝突判定を有効にします。トリガーが通常キャラと同じで適用されます。
+ * 
+ * <EventRangeObstacle>
+ * 範囲指定のイベントで視界先に通行判定が×のマップがある場合、イベントを実行しません。
  * 
  * <EventRange:besideRange,[lx],[rx]> 指定した横方向の範囲内の接触判定を拡大します。向きは無視されます。
  * [lx]:イベントの接触左側範囲(正の数の整数)
@@ -184,6 +194,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/27 Ver.1.5.0
+ * プレイヤーから視界上に障害物がある場合、イベント発生しない機能を追加。
+ * イベントの範囲衝突判定で衝突判定が正常に適用してなかった問題を修正。
+ * イベントから接触で範囲判定しなかった問題を修正。
  * 2022/11/27 Ver.1.4.2
  * 日本語以外での表示を英語表示に変更。
  * 2022/9/14 Ver.1.4.1
@@ -247,6 +261,23 @@ Imported.NUUN_EventRange = true;
         }
     };
 
+
+    const _Game_CharacterBase_moveStraight = Game_CharacterBase.prototype.moveStraight;
+    Game_CharacterBase.prototype.moveStraight = function(d) {
+        _Game_CharacterBase_moveStraight.call(this, d);
+        if (this.isEventRangeEvent() && this.isMovementSucceeded() && !$gameMap.isEventRunning()) {
+            if (this._trigger === 2 && this.range($gamePlayer.x, $gamePlayer.y) && !$gamePlayer.pos(this.x, this.y)) {
+                if (!this.isJumping() && this.isNormalPriority()) {
+                    this.start();
+                }
+            }
+        }
+    };
+
+    Game_CharacterBase.prototype.isEventRangeEvent = function() {
+        return false;
+    };
+
     const _Game_Player_initMembers = Game_Player.prototype.initMembers;
     Game_Player.prototype.initMembers = function() {
         _Game_Player_initMembers.call(this);
@@ -295,6 +326,10 @@ Imported.NUUN_EventRange = true;
         _Game_Event_initialize.call(this, mapId, eventId);
     };
 
+    Game_Event.prototype.isEventRangeEvent = function() {
+        return true;
+    };
+
     const _Game_Event_isCollidedWithEvents = Game_Event.prototype.isCollidedWithEvents;
     Game_Event.prototype.isCollidedWithEvents = function(x, y) {
         const events = $gameMap.eventsRangeXyNt(this, x, y);
@@ -303,10 +338,10 @@ Imported.NUUN_EventRange = true;
 
     const _Game_Event_isCollidedWithPlayerCharacters = Game_Event.prototype.isCollidedWithPlayerCharacters;
     Game_Event.prototype.isCollidedWithPlayerCharacters = function(x, y) {
-        return _Game_Event_isCollidedWithPlayerCharacters.call(this, x, y) || (this.isNormalPriority() && this.isCollidedWithPlayerCharacters(x, y))
+        return _Game_Event_isCollidedWithPlayerCharacters.call(this, x, y) || (this.isNormalPriority() && this.isEventRangeCollidedWithPlayerCharacters(x, y))
     };
 
-    Game_Event.prototype.isCollidedWithPlayerCharacters = function(x, y) {
+    Game_Event.prototype.isEventRangeCollidedWithPlayerCharacters = function(x, y) {
         return this.getEventRangeCollidedTag() && ($gamePlayer.range(x, y, this) || $gamePlayer.rangeFollower(x, y, this));
     };
 
@@ -320,6 +355,26 @@ Imported.NUUN_EventRange = true;
         return _Game_CharacterBase_isCollidedWithEvents.call(this, x, y) || events.some(event => event.isNormalPriority());
     };
 
+    Game_CharacterBase.prototype.obstacleJudgment = function(x, y) {
+        if (this.event().meta.EventRangeObstacle) {
+            const sx = this.deltaXFrom(x) * -1;
+            const sy = this.deltaYFrom(y) * -1;
+            const maxDelta = Math.max(Math.abs(x), Math.abs(y));
+            for (let i = 0; i < maxDelta; i++) {
+                const x2 = Math.round((sx / maxDelta) * (i + 1)) + this.x;
+                const y2 = Math.round((sy / maxDelta) * (i + 1)) + this.y;
+                if (!$gameMap.isObstacleJudgmentPassable(x2, y2)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    Game_Map.prototype.isObstacleJudgmentPassable = function(x, y) {
+        return this.checkPassage(x, y, 0x0f);
+    };
+
     Game_Character.prototype.range = function(x, y, e) {
         const event = e ? e : this;
         const sx = Math.abs(this.deltaXFrom(x));
@@ -329,29 +384,32 @@ Imported.NUUN_EventRange = true;
         if (recognition > 0 && (sx >= recognition || sy >= recognition)) {
             return false;
         }
+        let result = false;
         if (data) {
             const arr = data.split(',');
             const mode = arr[0].trim();
             if (mode === 'range') {
-                return (this.rangeX(x, Number(arr[1])) && this.rangeY(y, Number(arr[2])));
+                result = (this.rangeX(x, Number(arr[1])) && this.rangeY(y, Number(arr[2])));
             } else if (mode === 'besideRange') {
-                return this.besideRange(this.deltaXFrom(x), y, Number(arr[1]), Number(arr[2]));
+                result = this.besideRange(this.deltaXFrom(x), y, Number(arr[1]), Number(arr[2]));
             } else if (mode === 'verticalRange') {
-                return this.verticalRange(x, this.deltaYFrom(y), Number(arr[1]), Number(arr[2]));
+                result = this.verticalRange(x, this.deltaYFrom(y), Number(arr[1]), Number(arr[2]));
             } else if (mode === 'rangeEX') {
-                return this.rangeEX(x, y, Number(arr[1]), Number(arr[2]), Number(arr[3]), Number(arr[4]),Number(arr[5]), Number(arr[6]), Number(arr[7]), Number(arr[8]));
+                result = this.rangeEX(x, y, Number(arr[1]), Number(arr[2]), Number(arr[3]), Number(arr[4]),Number(arr[5]), Number(arr[6]), Number(arr[7]), Number(arr[8]));
             } else if (mode === 'circle') {
-                return this.circleRange(x, y, Number(arr[1]), Number(arr[2]));
+                result = this.circleRange(x, y, Number(arr[1]), Number(arr[2]));
             } else if (mode === 'triangle') {
-                return this.triangleRange(x, y, Number(arr[1]), Number(arr[2]));
+                result = this.triangleRange(x, y, Number(arr[1]), Number(arr[2]));
             } else if (mode === 'frontRange') {
-                return this.frontRange(x, y, Number(arr[1]));
+                result = this.frontRange(x, y, Number(arr[1]));
             } else if (mode === 'donut') {
-                return this.donutRange(x, y, Number(arr[1]));
+                result = this.donutRange(x, y, Number(arr[1]));
             }
-        } else {
-            return false;
         }
+        if (result) {      
+            return event.obstacleJudgment(x, y);
+        }
+        return result;
     };
 
     Game_Character.prototype.rangeEX = function(x, y, x1, y1, x2, y2, x3, y3, x4, y4) {
@@ -473,22 +531,28 @@ Imported.NUUN_EventRange = true;
         _Game_Event_clearPageSettings.call(this);
         this._eventRangeTag = null;
         this._eventRangeCollidedTag = null;
+        this._eventRangeObstacleSensingTag = null;
     };
 
     Game_Event.prototype.setRangeCommentTag = function() {
         const event = this.event();
         const re = /<(?:EventRange):\s*(.*)>/;
         const re2 = /<(?:EventRangeCollided)>/;
+        const re3 = /<(?:EventRangeObstacle)>/;
         this._eventRangeTag = null;
         this._eventRangeCollidedTag = null;
+        this._eventRangeObstacleSensingTag = null;
         this.list().forEach(tag => {
             if (tag.code === 108 || tag.code === 408) {
                 let match = re.exec(tag.parameters[0]);
                 let match2 = re2.exec(tag.parameters[0]);
+                let match3 = re3.exec(tag.parameters[0]);
                 if (match) {
                     this._eventRangeTag = match[1];
                 } else if (match2) {
                     this._eventRangeCollidedTag = !!match2[0];
+                } else if (match3) {
+                    this._eventRangeObstacleSensingTag = !!match3[0];
                 }
             }
         });
@@ -497,6 +561,9 @@ Imported.NUUN_EventRange = true;
         }
         if (!this._eventRangeCollidedTag  && event.meta.EventRangeCollided) {
             this._eventRangeCollidedTag  = !!event.meta.EventRangeCollided;
+        }
+        if (!this._eventRangeObstacleSensingTag  && event.meta.EventRangeObstacle) {
+            this._eventRangeObstacleSensingTag  = !!event.meta.EventRangeObstacle;
         }
     };
 

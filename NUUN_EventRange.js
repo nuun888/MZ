@@ -8,9 +8,119 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Event contact detection EX
+ * @author NUUN
+ * @version 1.4.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * Extends contact range determination for events.
+ * 
+ * Event "Note" field or “Comment” of event execution details
+ * ※The former applies to all event pages. The latter applies when the filled page is executed.
+ * 
+ * <EventRangeCollided>
+ * Enable range collision detection for events. Triggers are applied in the same way as normal characters.
+ * 
+ * <EventRange:besideRange,[lx],[rx]> Enlarges the contact judgment within the specified horizontal range. Orientation is ignored.
+ * [lx]:Contact left range of the event (positive integer)
+ * [ry]:Contact right range of the event (positive integer)
+ * 
+ * <EventRange:verticalRange,[uy],[dy]> Enlarges the contact judgment within the specified vertical range. Orientation is ignored.
+ * [ux]:contact upper range of the event (positive integer)
+ * [dy]:contact lower extent of the event (positive integer)
+ * 
+ * <EventRange:frontRange,[range]> Expands the contact detection from the specified event to the range directly in front.
+ * [range]:Contact range (integer)
+ * 
+ * <EventRange:range,[x],[y]> Expands the contact detection around the specified range. If you enter 4, the trigger will be activated in the range of ±2 squares (5 squares) centered on the event.
+ * [x]:contact lateral extent of the event (an even positive integer)
+ * [y]:contact longitudinal extent of the event (an even positive integer)
+ * 
+ * <EventRange:rangeEX,[x1],[y1],[x2],[y2],[x3],[y3],[x4],[y4]> Enlarge the contact judgment within the specified range from the event.
+ * If you want to specify left or above the event coordinates, enter it as a negative number.
+ * [x1]:Event contact range point AX coordinate (integer)
+ * [y1]:Event contact range point AY coordinate (integer)
+ * [x2]:Event contact range point BX coordinate (integer)
+ * [y2]:Event contact range point BY coordinate (integer)
+ * [x3]:Event contact range point CX coordinate (integer)
+ * [y3]:Event contact range point CY coordinate (integer)
+ * [x4]:Event contact range point DX coordinate (integer)
+ * [y4]:Event contact range point DY coordinate (integer)
+ * 
+ * <EventRange:circle,[range],[rad]> Expand the contact judgment from the specified radius. By specifying the angle, the contact detection is expanded according to the angle from the front.
+ * [range]:contact range (integer)
+ * [rad]:Angle (0 to 180°) *Can be omitted.If omitted, 360°
+ * 
+ * <EventRange:triangle,[range],[rad]> Expands the contact detection according to the angle from the front for the specified recognition range.
+ * [range]:Contact range from the front (integer)
+ * [rad]:Angle (0 to 180°)
+ * 
+ * <EventRecognition:[range]> If you are away from the specified range or more, the event contact judgment will not be performed.
+ * [range]:Contact judgment maximum distance number (positive integer)
+ * <EventRecognition:20> If the distance from the player to the event is 20 squares or more, contact judgment processing will not be performed.
+ * Contents of <EventRecognition:[range]> take precedence over plugin parameters.
+ * 
+ * If you enter "Comment" in the execution content, it will be the contact range for each page. It will be the contact range of the page with the current conditions.
+ * If there is an entry in the event memo field and "Comment" at the same time, the "Comment" tag will take precedence.
+ * 
+ * Event Player Distance X Variable ID, Event Player Distance Y Variable ID
+ * Specifies a variable to substitute the distance from the event to the player when executing an event with contact detection extension.
+ * Negative coordinates are assigned if the player is to the left or above the event.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 11/27/2022 Ver.1.4.2
+ * Changed the display in languages other than Japanese to English.
+ * 9/14/2022 Ver.1.4.1
+ * Fixed to apply collision range judgment from event.
+ * Fixed an issue where events with collision detection would not go in some directions.
+ * Fixed the wrong description of "range".
+ * 9/11/2022 Ver.1.4.0
+ * Added range collision detection function.
+ * 7/24/2022 Ver.1.3.1
+ * Fixed an issue where the event player distance could not be acquired properly when multiple events were started.
+ * 7/16/2022 Ver.1.3.0
+ * Added a function that allows you to specify a range for each event page.
+ * Added range from directly in front of event to contact range.
+ * 7/14/2022 Ver.1.2.0
+ * Added horizontal and vertical to contact detection.
+ * Added the ability to specify a variable that substitutes the distance from the player to the event.
+ * 7/14/2022 Ver.1.1.1
+ * Fixed an issue where circular and triangular contact detection was not working properly.
+ * 7/11/2022 Ver.1.1.0
+ * Added a function to set the range for contact detection.
+ * Added triangle type to contact range mode.
+ * 7/11/2022 Ver.1.0.0
+ * First edition
+ * 
+ * @param EventRecognitionRange
+ * @text Contact judgment processing range
+ * @desc pecify the range for contact detection.
+ * @type number
+ * @default 30
+ * 
+ * @param DistanceFromXVar
+ * @text Event player distance X variable ID
+ * @desc Set a game variable that substitutes the difference (X coordinate) from the event to the player.
+ * @type variable
+ * @default 0
+ * 
+ * @param DistanceFromYVar
+ * @text Event player distance y variable ID
+ * @desc Set a game variable that substitutes the difference (Y coordinate) from the event to the player.
+ * @type variable
+ * @default 0
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -61,6 +171,7 @@
  * <EventRecognition:[range]> 指定の範囲以上から離れている場合はイベント接触判定を行いません。
  * [range]:接触判定最大距離数(正の数の整数)
  * <EventRecognition:20> プレイヤーからイベントまでの距離が20マス以上なら接触判定処理を行いません。
+ * プラグインパラメータよりも<EventRecognition:[range]>の内容が優先されます。
  * 
  * 実行内容に注釈(Comment)は、ページ毎の接触範囲となります。現在の条件になっているページの接触範囲となります。
  * イベントのメモ欄と注釈(Comment)に同時に記入がある場合、注釈(Comment)のタグが優先されます。
@@ -73,6 +184,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/11/27 Ver.1.4.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/9/14 Ver.1.4.1
  * イベントからの衝突範囲判定を適用できるように修正。
  * 衝突判定を持つイベントが一部方向に行かなくなる問題を修正。

@@ -33,8 +33,8 @@
 スクリプトは複数設定できます。  
 通常のエンカウント時、先制攻撃時、不意打ち時で別々のエンカウントエフェクトなどを設定できます。  
 コンボボックスの  
-'EncounterEffect.setType(1);//MPP_EncounterEffectタイプ変更'  
-'EncounterEffect.setColor(255,255,255);//MPP_EncounterEffectカラー変更'  
+`EncounterEffect.setType(1);//MPP_EncounterEffectタイプ変更`  
+`EncounterEffect.setColor(255,255,255);//MPP_EncounterEffectカラー変更`  
 は木星ペンギン様のエンカウント特殊演出(MPP_EncounterEffect Ver.4.0以降)が必要です。  
 
 ## 更新履歴

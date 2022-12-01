@@ -2,7 +2,7 @@
 # Ver.2.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 #### 必須、前提プラグイン
-[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.2  
+[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.5  
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.0以降  
 #### オプション
 全体選択時カーソル修正  
@@ -18,7 +18,7 @@
 メニューステータス、インフォウィンドウは表示したい項目をカスタマイズできます。  
 
 Ver.2.0.0から以下のプラグインが必要になります。  
-[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.2  
+[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.5  
 
 ![画像](img/MenuScreen3.png)  
 

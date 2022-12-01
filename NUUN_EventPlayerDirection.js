@@ -8,9 +8,80 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Get status for player event at trigger activation
+ * @author NUUN
+ * @version 1.0.2
+ * 
+ * @help
+ * Gets the orientation status of the player and the event when the trigger is activated.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * 更新履歴
+ * 12/1/2022 Ver.1.0.2
+ * Changed the display in languages other than Japanese to English.
+ * 7/31/2022 Ver.1.0.1
+ * Added processing to get backing variables from external plugins.
+ * 7/24/2022 Ver.1.0.0
+ * First edition.
+ * 
+ * 
+ * @param PlayerBackDirectionSwitch
+ * @text Player behind switch ID
+ * @desc The switch ID to turn ON when the event is triggered from behind as seen from the player.
+ * @type switch
+ * @default 0
+ * 
+ * @param EventBackDirectionSwitch
+ * @text Event behind switch ID
+ * @desc The switch ID to turn ON when the trigger is activated from behind by the player as viewed from the event.
+ * @type switch
+ * @default 0
+ * 
+ * @param PlayerFrontDirectionSwitch
+ * @text Player front switch ID
+ * @desc The switch ID to turn ON when the event is triggered from the front direction as seen from the player.
+ * @type switch
+ * @default 0
+ * 
+ * @param EventFrontDirectionSwitch
+ * @text Event front switch ID
+ * @desc The switch ID to turn ON when the trigger is activated from the front of the player as viewed from the event.
+ * @type switch
+ * @default 0
+ * 
+ * @param PlayerLeftDirectionSwitch
+ * @text Player Left Switch ID
+ * @desc The switch ID to turn ON when the event is triggered from the left side as viewed from the player.
+ * @type switch
+ * @default 0
+ * 
+ * @param EventLeftDirectionSwitch
+ * @text Event left switch ID
+ * @desc The switch ID to turn ON when the player activates the trigger from the left direction as seen from the event.
+ * @type switch
+ * @default 0
+ * 
+ * @param PlayerRightDirectionSwitch
+ * @text Player Right Switch ID
+ * @desc The switch ID to turn ON when the event is triggered from the right side as viewed from the player.
+ * @type switch
+ * @default 0
+ * 
+ * @param EventRightDirectionSwitch
+ * @text Event right switch ID
+ * @desc The switch ID to turn ON when the player activates the trigger from the right side as viewed from the event.
+ * @type switch
+ * @default 0
+ * 
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc トリガー起動時のプレイヤーとイベントの向き状況取得
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * トリガー起動時のプレイヤーとイベントとの向き状況を取得します。
@@ -19,6 +90,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/1 Ver.1.0.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/7/31 Ver.1.0.1
  * 外部プラグインから背後の変数を取得するための処理を追加。
  * 2022/7/24 Ver.1.0.0

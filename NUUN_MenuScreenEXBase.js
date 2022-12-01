@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.4
+ * @version 2.0.5
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/1/2022 Ver.2.0.5
+ * Fixed to display at the height of the main area when the number of lines is set to 0 in window height mode.
  * 11/27/2022 Ver.2.0.4
  * Fixed an issue that caused an error when menu command display mode was set to left.
  * 11/26/2022 Ver.2.0.3
@@ -45,7 +47,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.4
+ * @version 2.0.5
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -55,6 +57,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/1 Ver.2.0.5
+ * ウィンドウ高さモードで行数を0に設定している場合は、メインエリアの高さで表示するように修正。
  * 2022/11/27 Ver.2.0.4
  * コマンドモードを左側に設定したときにエラーが出る問題を修正。
  * 2022/11/26 Ver.2.0.3
@@ -228,7 +232,7 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
 
     Scene_MenuBase.prototype.nuun_mainCommandHeight = function() {
-        return params.CommandHeightMode ? this.nuun_mainCommandAreaHeight(params.MenuCommandRows) : (params.MenuCommandHeight > 0 ? params.MenuCommandHeight : this.mainAreaHeight());
+        return params.CommandHeightMode ? (params.MenuCommandRows > 0 ? this.nuun_mainCommandAreaHeight(params.MenuCommandRows) : this.mainAreaHeight()) : (params.MenuCommandHeight > 0 ? params.MenuCommandHeight : this.mainAreaHeight());
     };
 
     Scene_MenuBase.prototype.nuun_mainCommandAreaHeight = function(rows) {

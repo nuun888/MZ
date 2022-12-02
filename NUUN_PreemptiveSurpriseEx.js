@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Preemptive,Surprise EX
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * 
  * @help
@@ -34,10 +34,19 @@
  * In the case of random encounters, enemy groups without the above tags will be determined by default settings.
  * Event determination is normal processing.
  * 
+ * PreemptiveSE,SurpriseSE
+ * During normal battle, preemptive attack, surprise attack, you can play the SE at the start of any battle.
+ * If the surprise attack start SE file is not set during the preemptive surprise attack setting, the surprise attack start SE SE will be played during the default preemptive attack.
+ * In addition, during the default preemptive attack, if the file name is not specified even in the surprise battle start SE, the normal battle start SE will be played.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/2/2022 Ver.1.1.1
+ * Fixed an issue where some of the default evaluators for normal encounters were not fetchable.
+ * Added a function that allows you to set the battle start SE for normal, preemptive attack, and surprise attacks.
+ * Processing fixes.
  * 11/28/2022 Ver.1.1.0
  * Added a function that allows arbitrary scripts to be executed during normal encounters, preemptive attacks, and surprise attacks.
  * Added a switch that can always execute preemptive and surprise attacks.
@@ -68,6 +77,18 @@
  * @option 'Math.random() < this.rateSurprise();//No surprise attack disabled'
  * @option '$gameSwitches.value(0);//switch'
  * @default 'Math.random() < this.rateSurprise() && !preemptive;'
+ * 
+ * @param PreemptiveSE
+ * @text Default preemptive attack battle start SE
+ * @desc Battle start SE at the time of default preemptive attack.
+ * @type struct<BattleStartSe>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * 
+ * @param SurpriseSE
+ * @text Default surprise attack battle start SE
+ * @desc Battle start SE when receiving a default surprise attack.
+ * @type struct<BattleStartSe>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  * 
  * @param EventPreSurSwitch
  * @text Event Preemptive Surprise Apply Switch
@@ -144,6 +165,18 @@
  * @type struct<SurpriseSetting>
  * @default {"EvalData":""}
  * 
+ * @param PreemptiveSE
+ * @text Battle start SE during preemptive attack
+ * @desc Battle start SE at the time of preemptive attack.
+ * @type struct<BattleStartSe>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * 
+ * @param SurpriseSE
+ * @text Battle start SE when attacking by surprise
+ * @desc Battle start SE when receiving a surprise attack.
+ * @type struct<BattleStartSe>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * 
  */
 /*~struct~PreemptiveSetting:
  * 
@@ -160,8 +193,8 @@
 /*~struct~SurpriseSetting:
  * 
  * @param EvalData
- * @text 評価式
- * @desc 評価式
+ * @text Evaluation formula
+ * @desc Evaluation formula.
  * @type combo
  * @option 'Math.random() < this.rateSurprise() && !preemptive;//Default'
  * @option 'Math.random() < this.rateSurprise();//No surprise attack disabled'
@@ -170,11 +203,36 @@
  * @default
  * 
  */
+/*~struct~BattleStartSe:
+ * 
+ * @param name
+ * @text SE file name
+ * @desc Specify SE.
+ * @type file
+ * @dir audio/se
+ * 
+ * @param volume
+ * @text SE volume
+ * @desc Set the volume to SE.
+ * @default 90
+ * @min 0
+ * 
+ * @param pitch
+ * @text SE pitch
+ * @desc Sets the pitch to SE.
+ * @default 100
+ * 
+ * @param pan
+ * @text SE pan
+ * @desc Sets the pan to SE.
+ * @default 0
+ * 
+ */
 /*:ja
  * @target MZ
  * @plugindesc 先制、不意打ちEX
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * 
  * @help
@@ -198,10 +256,20 @@
  * ランダムエンカウントの場合上記のタグがない敵グループはデフォルト設定の判定になります。  
  * イベント判定では通常の処理になります。
  * 
+ * 先制攻撃時戦闘開始SE、不意打ち時戦闘開始SE
+ * 通常の戦闘時、先制攻撃時、不意打ち時に任意の戦闘開始時のSEを再生できます。
+ * 先制不意打ち設定の先制攻撃時、不意打ち戦闘開始SEのファイルが設定されていない場合はデフォルト先制攻撃時、不意打ち戦闘開始SE
+ * のSEが再生されます。
+ * なお、デフォルト先制攻撃時、不意打ち戦闘開始SEでもファイル名が指定されていない場合は通常の戦闘開始SEが再生されます。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/2 Ver.1.1.1
+ * 通常のエンカウント時のデフォルト評価式の一部が、取得できなかった問題を修正。
+ * 通常時、先制攻撃時、不意打ち時の戦闘開始SEを設定できる機能を追加。
+ * 処理の修正。
  * 2022/11/28 Ver.1.1.0
  * 通常エンカウント時、先制時、不意打ち時に任意のスクリプトを実行できる機能を追加。
  * 必ず先制、不意打ちを実行できるスイッチを追加。
@@ -232,6 +300,18 @@
  * @option 'Math.random() < this.rateSurprise();//不意打ち無効なし'
  * @option '$gameSwitches.value(0);//スイッチ'
  * @default 'Math.random() < this.rateSurprise() && !preemptive;'
+ * 
+ * @param PreemptiveSE
+ * @text デフォルト先制攻撃時戦闘開始SE
+ * @desc デフォルトの先制攻撃時の戦闘開始SE
+ * @type struct<BattleStartSe>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * 
+ * @param SurpriseSE
+ * @text デフォルト不意打ち時戦闘開始SE
+ * @desc デフォルトの不意打ちを受けた時の戦闘開始SE
+ * @type struct<BattleStartSe>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  * 
  * @param EventPreSurSwitch
  * @text イベント先制不意打ち適用スイッチ
@@ -308,6 +388,18 @@
  * @type struct<SurpriseSetting>
  * @default {"EvalData":""}
  * 
+ * @param PreemptiveSE
+ * @text 先制攻撃時戦闘開始SE
+ * @desc 先制攻撃時の戦闘開始SE
+ * @type struct<BattleStartSe>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * 
+ * @param SurpriseSE
+ * @text 不意打ち時戦闘開始SE
+ * @desc 不意打ちを受けた時の戦闘開始SE
+ * @type struct<BattleStartSe>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * 
  */
 /*~struct~PreemptiveSetting:ja
  * 
@@ -334,6 +426,31 @@
  * @default
  * 
  */
+/*~struct~BattleStartSe:ja
+ * 
+ * @param name
+ * @text SEファイル
+ * @desc SEを指定します。
+ * @type file
+ * @dir audio/se
+ * 
+ * @param volume
+ * @text SEの音量
+ * @desc SEを音量を設定します。
+ * @default 90
+ * @min 0
+ * 
+ * @param pitch
+ * @text SEのピッチ
+ * @desc SEをピッチを設定します。
+ * @default 100
+ * 
+ * @param pan
+ * @text SEの位相
+ * @desc SEを位相を設定します。
+ * @default 0
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NNUUN_PreemptiveSurpriseEx = true;
@@ -343,6 +460,8 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
     const PreemptiveSurpriseSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PreemptiveSurpriseSetting'])) : null) || [];
     const DefaultPreemptive = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DefaultPreemptive'])) : null);
     const DefaultSurprise = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DefaultSurprise'])) : null);
+    const PreemptiveSE = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PreemptiveSE'])) : null);
+    const SurpriseSE = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SurpriseSE'])) : null);
     const EventPreSurSwitch = Number(parameters['EventPreSurSwitch'] || 0);
     const PreemptiveSwitch = Number(parameters['PreemptiveSwitch'] || 0);
     const SurpriseSwitch = Number(parameters['SurpriseSwitch'] || 0);
@@ -352,9 +471,10 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
 
     const _BattleManager_initMembers = BattleManager.initMembers;
     BattleManager.initMembers = function() {
-        _BattleManager_initMembers.call(this);
+        this.presurSE = false;
         this._tempPreemptive = false;
         this._tempSurprise = false;
+        _BattleManager_initMembers.call(this);
     };
 
     const _BattleManager_setup = BattleManager.setup;
@@ -363,8 +483,9 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
         this.customOnEncounter();
     };
 
-    const _BattleManager_customOnEncounter = BattleManager.customOnEncounter;
     BattleManager.customOnEncounter = function() {
+        const members = $gameParty;
+        const troop = $gameTroop;
         let preemptive = false;
         let surprise = false;
         if ($gameSwitches.value(PreemptiveSwitch)) {
@@ -374,15 +495,13 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
             preemptive = false;
             surprise = true;
         }
-        if (preemptive || surprise) {
-            this._tempPreemptive = preemptive;
-            this._tempSurprise = surprise;
-        } else {
-            const tagData = $gameTroop.getPresurCommentTag();
-            if (tagData) {
-                const members = $gameParty;
-                const troop = $gameTroop;
-                const data = isNaN(tagData) ? PreemptiveSurpriseSetting.find(a => tagData === a.Name) : PreemptiveSurpriseSetting[Number(tagData) - 1];
+        const tagData = $gameTroop.getPresurCommentTag();
+        if (tagData) {
+            const data = isNaN(tagData) ? PreemptiveSurpriseSetting.find(a => tagData === a.Name) : PreemptiveSurpriseSetting[Number(tagData) - 1];
+            if (preemptive || surprise) {
+                //this._tempPreemptive = preemptive;
+                //this._tempSurprise = surprise;
+            } else {
                 if ($gameTemp.onEventEncounter) {
                     preemptive = data.EventPreemptiveSetting && data.EventPreemptiveSetting.EvalData ? eval(data.EventPreemptiveSetting.EvalData) : false;
                     surprise = !preemptive && data.EventSurpriseSetting && data.EventSurpriseSetting.EvalData ? eval(data.EventSurpriseSetting.EvalData) : false;
@@ -390,15 +509,22 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
                     preemptive = data.RandomPreemptiveSetting && data.RandomPreemptiveSetting.EvalData ? eval(data.RandomPreemptiveSetting.EvalData) : (DefaultPreemptive ? eval(DefaultPreemptive) : false);
                     surprise = !preemptive && data.RandomSurpriseSetting && data.RandomSurpriseSetting.EvalData ? eval(data.RandomSurpriseSetting.EvalData) : (DefaultSurprise ? eval(DefaultSurprise) : false);
                 }
+            }
+            this.setPresurSe(preemptive, surprise, data);
+        } else {
+            if (preemptive || surprise) {
+                //this._tempPreemptive = preemptive;
+                //this._tempSurprise = surprise;
             } else {
                 if (!$gameTemp.onEventEncounter) {
                     preemptive = DefaultPreemptive ? eval(DefaultPreemptive) : this.onDefaultPreemptive();
                     surprise = !preemptive && (DefaultSurprise ? eval(DefaultSurprise) : this.onDefaultSurprise());
                 }
             }
-            this._tempPreemptive = preemptive;
-            this._tempSurprise = surprise;
+            this.setPresurSe(preemptive, surprise);
         }
+        this._tempPreemptive = preemptive;
+        this._tempSurprise = surprise;
         this.presurEncounterSprict();
     };
 
@@ -418,13 +544,29 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
         }
     };
 
+    BattleManager.setPresurSe = function(preemptive, surprise, data) {
+        if (data) {
+            if (preemptive) {
+                this.presurSE = data.PreemptiveSE && data.PreemptiveSE.name ? data.PreemptiveSE : PreemptiveSE;
+            } else if (surprise) {
+                this.presurSE = data.SurpriseSE && data.SurpriseSE.name ? data.SurpriseSE : SurpriseSE;
+            }
+        } else {
+            if (preemptive) {
+                this.presurSE = PreemptiveSE;
+            } else if (surprise) {
+                this.presurSE = SurpriseSE;
+            }
+        }
+    };
+
     BattleManager.presurEncounterSprict = function() {
         if (this._tempPreemptive) {
-            this.presurEncounterScriptExecution(PreemptivePresurSprict, $gameParty, $gameTroop);
+            this.presurEncounterScriptExecution(PreemptivePresurSprict);
         } else if (this._tempSurprise) {
-            this.presurEncounterScriptExecution(SurprisePresurSprict, $gameParty, $gameTroop);
+            this.presurEncounterScriptExecution(SurprisePresurSprict);
         } else {
-            this.presurEncounterScriptExecution(DefaultPresurSprict, $gameParty, $gameTroop);
+            this.presurEncounterScriptExecution(DefaultPresurSprict);
         }
     };
 
@@ -458,6 +600,15 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
         }
         $gameTemp.onEventEncounter = false;
         return result;
+    };
+
+    const _SoundManager_playBattleStart = SoundManager.playBattleStart;
+    SoundManager.playBattleStart = function() {
+        if (BattleManager.presurSE && BattleManager.presurSE.name) {
+            AudioManager.playStaticSe(BattleManager.presurSE);
+        } else {
+            _SoundManager_playBattleStart.call(this);
+        }
     };
 
 })();

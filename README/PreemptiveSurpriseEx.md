@@ -1,5 +1,5 @@
 # [先制、不意打ちEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PreemptiveSurpriseEx.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PreemptiveSurpriseEx.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,10 @@
 
 
 ## 更新履歴
+2022/12/2 Ver.1.1.1  
+通常のエンカウント時のデフォルト評価式の一部が、取得できなかった問題を修正。  
+通常時、先制攻撃時、不意打ち時の戦闘開始SEを設定できる機能を追加。  
+処理の修正。  
 2022/11/28 Ver.1.1.0  
 通常エンカウント時、先制時、不意打ち時に任意のスクリプトを実行できる機能を追加。  
 必ず先制、不意打ちを実行できるスイッチを追加。  

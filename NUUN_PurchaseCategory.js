@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Display the item category on the purchase screen of the shop.
@@ -30,6 +30,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/3/2022 Ver.1.0.1
+ * Minor fix.
  * 12/3/2022 Ver.1.0.0
  * First edition.
  * 
@@ -97,7 +99,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * ショップの購入画面にアイテムカテゴリーを表示します。
@@ -116,6 +118,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/3 Ver.1.0.1
+ * 微修正。
  * 2022/12/3 Ver.1.0.0
  * 初版
  * 
@@ -351,7 +355,7 @@ Imported.NUUN_PurchaseCategory = true;
         if (this._category !== category) {
             this._category = category;
             this.refresh();
-            //this.scrollTo(0, 0);
+            this.scrollTo(0, 0);
         }
     };
 

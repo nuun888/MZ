@@ -1,5 +1,6 @@
 # [売値任意設定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js)
 # Ver.1.1.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js)  
 
 アイテム、武器、防具の売値を価格の半分ではなく任意の売値にします。
 

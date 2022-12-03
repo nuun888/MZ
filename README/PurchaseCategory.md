@@ -4,7 +4,7 @@
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)
 #### 競合対策プラグイン
-うなぎおおとろ様ショップ画面拡張競合対策プラグイン
+うなぎおおとろ様ショップ画面拡張競合対策プラグイン  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ShopPurchaseCategory_ShopScene_Extension_cm.js)  
 
 ショップの購入画面にアイテムカテゴリーを表示します。

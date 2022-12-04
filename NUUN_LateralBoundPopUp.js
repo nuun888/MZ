@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Bound popup
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @orderBefore BattleEffectPopup
  * 
  * @help
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/4/2022 Ver.1.1.1
+ * Fixed description of apply popup setting.
  * 11/26/2022 Ver.1.1.0
  * Added a function that allows you to specify the coefficient of bounce.
  * Changed the display in languages other than Japanese to English.
@@ -79,8 +81,8 @@
 /*~struct~ClassList:
  * 
  * @param ClassName
- * @text Window settings to change
- * @desc Specifies the window class to change. If the class is not on the list, please fill in the corresponding class directly.
+ * @text Apply Popup Settings
+ * @desc Specifies the popup sprite class to apply. Enter the class directly if the class is not on the list.
  * @type combo
  * @option 'Sprite_Damage'
  * @option 'Sprite_PopUpEX'
@@ -93,7 +95,7 @@
  * @target MZ
  * @plugindesc バウンドポップアップ
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @orderBefore BattleEffectPopup
  * 
  * @help
@@ -109,6 +111,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/4 Ver.1.1.1
+ * 適用ポップアップ設定の説明文を修正。
  * 2022/11/26 Ver.1.1.0
  * バウンドの係数を指定できる機能を追加。
  * 日本語以外での表示を英語表示に変更。
@@ -162,8 +166,8 @@
 /*~struct~ClassList:ja
  * 
  * @param ClassName
- * @text 変更ウィンドウ設定
- * @desc 変更するウィンドウクラスを指定します。リストにないクラスは直接該当するクラスを記入してください。
+ * @text 適用ポップアップ設定
+ * @desc 適用するポップアップスプライトクラスを指定します。リストにないクラスは直接該当するクラスを記入してください。
  * @type combo
  * @option 'Sprite_Damage'
  * @option 'Sprite_PopUpEX'
@@ -189,6 +193,8 @@ const BoundRange_c = BoundRange / 2;
 function LateralBoundPupupSprite(className) {
     return PopupClass.some(_class => _class.ClassName === className);
 }
+
+
 
 const _Sprite_Battler_createDamageSprite = Sprite_Battler.prototype.createDamageSprite;
 Sprite_Battler.prototype.createDamageSprite = function() {

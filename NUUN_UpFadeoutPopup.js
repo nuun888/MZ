@@ -8,9 +8,71 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Up Fadeout Popup
+ * @author NUUN
+ * @version 1.0.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_popUp
+ * 
+ * @help
+ * Change the behavior of the popup to rise to the top and fade out.
+ * 
+ * Applicable class setting
+ * Sprite_Damage:Default damage popup
+ * Sprite_PopUpEX:NUUN_popUp.js
+ * Sprite_PopupMessage:BattleEffectPopup.js
+ * Please fill in classes not listed above directly in the text tab.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/5/2022 Ver.1.0.2
+ * Definition correction by "NUUN_popUp" update.
+ * Fixed description of apply popup setting.
+ * 6/19/2022 Ver.1.0.1
+ * Added a function that allows you to specify the number of display frames and the number of fade-out frames.
+ * 6/18/2022 Ver.1.0.0
+ * First edition.
+ * 
+ * @param PopupClass
+ * @text Applicable class
+ * @desc Set the class to apply.
+ * @default []
+ * @type struct<ClassList>[]
+ * 
+ * @param PopUpDuration 
+ * @desc The number of popup display frames (default 90)
+ * @text Popup display frame count
+ * @type number
+ * @default 90
+ * 
+ * @param FadeoutFlame
+ * @desc Number of fade-out display frames (default 20)
+ * @text Number of fade-out display frames
+ * @type number
+ * @default 20
+ * 
+ */
+/*~struct~ClassList:
+ * 
+ * @param ClassName
+ * @text Apply Popup Settings
+ * @desc Specifies the popup sprite class to apply. Enter the class directly if the class is not on the list.
+ * @type combo
+ * @option 'Sprite_Damage'
+ * @option 'Sprite_PopUpEX'
+ * @option 'Sprite_PopupMessage'
+ * @default
+ * 
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc アップフェードアウトポップアップ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_popUp
@@ -28,6 +90,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/5 Ver.1.1.2
+ * ポップアッププラグイン更新による定義修正。
+ * 適用ポップアップ設定の説明文を修正。
  * 2022/6/19 Ver.1.0.1
  * 表示フレーム数、フェードアウトフレーム数を指定できる機能を追加。
  * 2022/6/18 Ver.1.0.0
@@ -52,11 +117,11 @@
  * @default 20
  * 
  */
-/*~struct~ClassList:
+/*~struct~ClassList:ja
  * 
  * @param ClassName
- * @text 変更ウィンドウ設定
- * @desc 変更するウィンドウクラスを指定します。リストにないクラスは直接該当するクラスを記入してください。
+ * @text 適用ポップアップ設定
+ * @desc 適用するポップアップスプライトクラスを指定します。リストにないクラスは直接該当するクラスを記入してください。
  * @type combo
  * @option 'Sprite_Damage'
  * @option 'Sprite_PopUpEX'
@@ -82,7 +147,7 @@ Imported.NUUN_UpFadeoutPopup = true;
     const _Sprite_Damage_initialize = Sprite_Damage.prototype.initialize;
     Sprite_Damage.prototype.initialize = function() {
         _Sprite_Damage_initialize.call(this);
-        this._upFadeoutPopupClass = !!upFadeoutPopupSprite(String(this.constructor.name));
+        this._upFadeoutPopupClass = !!upFadeoutPopupSprite(String(this.constructor.name)) || this._popupMode === 3;
         if (this._upFadeoutPopupClass) {
             this._duration = PopUpDuration;
         }

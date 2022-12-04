@@ -4,6 +4,8 @@
 
 隊列に控えメンバーを表示します。  
 
+![画像](img/StandbyMemberFollowers.png)  
+
 ## 更新履歴
 2022/12/4 Ver.1.0.0  
 初版  

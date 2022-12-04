@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.1.1
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)  
 [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md)  
 
@@ -38,6 +38,8 @@
 `[num]`:0で消費なし、1で消失  
 ### ゲーム変数から消費
 `<SkillVarCost:[id],[cost]>` ゲーム変数に設定した数値から消費します。
+`<SkillVarCostR:[id],[max],[rate]>` ゲーム変数に設定した数値から[max]の[rate]%を消費します。  
+[max]が0の場合は、現在の値から[rate]%を消費します。  
 ### 評価式
 `<SkillEvalCost:[eval]>` 消費を判定するための評価式を記入します。   
 `<SkillEvalCons:[eval]>` 消費するための評価式を記入します。  
@@ -49,6 +51,7 @@
 `[num]`:消費個数  
 `[id]`:ゲーム変数ID  
 `[eval]`:評価式  
+`[max]`:最大値
 ※[]は記入しないでください。
 
 ### 取得パラメータ
@@ -61,6 +64,8 @@
 スキルのダメージの計算式にa.consBMp * 1.5 と記入することで消費前のMPの1.5倍のダメージを与えることができます。  
 
 ## 更新履歴 
+2022/12/4 Ver.1.2.0  
+ゲーム変数から割合で消費できるコストを追加。  
 2022/11/25 Ver.1.1.1  
 MPのスキルコストを追加。(コストを10000以上設定できます)  
 日本語以外での表示を英語表示に変更。  

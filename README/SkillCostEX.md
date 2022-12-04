@@ -37,7 +37,7 @@
 `[itemId]`:武器、防具ID  
 `[num]`:0で消費なし、1で消失  
 ### ゲーム変数から消費
-`<SkillVarCost:[id],[cost]>` ゲーム変数に設定した数値から消費します。
+`<SkillVarCost:[id],[cost]>` ゲーム変数に設定した数値から消費します。  
 `<SkillVarCostR:[id],[max],[rate]>` ゲーム変数に設定した数値から[max]の[rate]%を消費します。  
 [max]が0の場合は、現在の値から[rate]%を消費します。  
 ### 評価式

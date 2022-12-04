@@ -1,5 +1,5 @@
 # [スライドフェードアウトポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlideFadeoutPopup.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlideFadeoutPopup.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  

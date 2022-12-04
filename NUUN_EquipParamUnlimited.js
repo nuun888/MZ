@@ -8,9 +8,41 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc Equipped ability value change amount upper limit breakthrough
+ * @author NUUN
+ * @version 1.0.1
+ * 
+ * @help
+ * On the database, you can only set the ability value change amount of equipment from 0 to 500 (maximum HP, MP is 5000), but you can set it beyond the upper limit with this plug-in.
+ * 
+ * Weapon and armor notes
+ * <EquipParamExMHP:[param]> Set the ability value change amount of max HP.
+ * <EquipParamExMMP:[param]> Set the ability value change amount of max MP.
+ * <EquipParamExATK:[param]> Set the amount of change in ability value of the attack.
+ * <EquipParamExDEF:[param]> Set the amount of change in ability value for defense.
+ * <EquipParamExMAT:[param]> Set the ability value change amount of magic.
+ * <EquipParamExMDF:[param]> Sets the ability value change amount of magic defense.
+ * <EquipParamExAGI:[param]> Set the ability value change amount of agility.
+ * <EquipParamExLUK:[param]> Set the amount of change in luck's ability value.
+ * 
+ * [param]:Amount of change (integer)
+ * For [param], enter only the numerical value without [].
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/4/2022 Ver.1.0.1
+ * Changed the display in languages other than Japanese to English.
+ * 4/10/2022 Ver.1.0.0
+ * First edition.
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc 装備能力値変化量上限突破
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * データベース上では装備の能力値変化量は0～500(最大HP、MPは5000)までしか設定できませんがこのプラグインでは上限を超えて設定する事ができます。
@@ -32,6 +64,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/4 Ver.1.0.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/4/10 Ver.1.0.0
  * 初版
  * 

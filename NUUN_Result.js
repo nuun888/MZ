@@ -8,12 +8,2202 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Result
+ * @author NUUN
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter BattleVoiceMZ
+ * @version 2.2.12
+ * 
+ * @help
+ * Display the result screen at the end of the battle.
+ * The default result is displayed in the message window, but if the acquired EXP, earned amount, and dropped items are displayed on one screen, and if there are no actors who have leveled up, the result will end with just one press of the enter key (button).
+ * 
+ * Main function
+ * It is divided into blocks, and you can specify the coordinates to display for each actor experience value, acquisition info, drop item, level up actor status, acquired skill.
+ * Coordinates, font size, etc. can be changed for each item, such as actor experience points, acquired info, drop items, level up actor status, and learned skills.
+ * After the battle ends, you can play any BGM after the Victory ME.
+ * 
+ * Post-win effect
+ * The image is displayed in the center of the screen starting from the center of the image.
+ * Specify the magnification and opacity from the original values (100 for magnification and 255 for opacity). Changes relative to the current value to the specified value.
+ * Move coordinates move relative to the current position.
+ * 
+ * Specification
+ * When the side view actor is displayed for actor experience points and level up actor status, it will be displayed in front of all items.
+ * 
+ * Parameter of evaluation formula for each item
+ * a:Actor game data
+ * d:Actor system data
+ * 
+ * Operation
+ * ←→Key:Switch pages for acquired items and acquired skills
+ * Right click: switch page
+ * left click: click
+ * 
+ * plugin command
+ * [Level up screen display permission]
+ * You can set permission to display the level up screen. (Note: After executing this plugin command, the level up screen display setting will be disabled)
+ * [Permission to play Victory BGM]
+ * You can set permission to play victory BGM.
+ * [Change of Victory BGM]
+ * You can change the victory BGM. By not specifying anything for BGM, the BGM specified by the plug-in command will not be played.
+ * [Changes to Level Up SE]
+ * You can change the level up SE. By not specifying anything for BGM, the BGM specified by the plug-in command will not be played.
+ * [Level up screen actor image change]
+ * Change the image of the standing picture. It does not apply when the setting of the standing face graphic display EX is enabled.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 2022/12/4 Ver.2.2.12
+ * Changed the display in languages other than Japanese to English.
+ * 2022/11/1 Ver.2.2.11
+ * Added a function to display the characters displayed when leveling up as an image.
+ * 2022/10/23 Ver.2.2.10
+ * Fixed an issue where the HP gauge etc. would stop working.
+ * 2022/10/23 Ver.2.2.9
+ * Fixed an issue where old level stats were not getting properly.
+ * 2022/10/22 Ver.2.2.8
+ * Added a mode that can display the acquired experience value display with the remaining experience value.
+ * 2022/10/22 Ver.2.2.7
+ * Fixed coordinate calculation.
+ * 2022/10/21 Ver.2.2.6
+ * Fixed an issue that caused some items to disappear.
+ * 2022/10/20 Ver.2.2.5
+ * Fixed an issue where post-win effect images would not disappear.
+ * Fixed an issue where selecting original parameters in the level up actor status window would cause an error.
+ * Fixed the problem that the operation stops after the battle ends when setting the number of frames to delay the result screen after winning.
+ * Fixed spelling errors.
+ * 2022/10/19 Ver.2.2.4
+ * Fixed an issue that caused the gauge display to become stuck.
+ * 2022/10/14 Ver.2.2.3
+ * Fixed an issue where post-victory effects would disappear after the second battle.
+ * 2022/10/13 Ver.2.2.2
+ * Fixed an issue where an error would appear after starting a battle.
+ * Fixed an issue where setting the effect list without specifying an image after winning would stop working after winning the battle.
+ * 2022/10/11 Ver.2.2.1
+ * Added a function that allows you to specify a switch to enable the image display at the time of victory.
+ * 2022/10/10 Ver.2.2.0
+ * Added function to display victory image after victory.
+ * 2022/9/18 Ver.2.1.0
+ * Added a function that allows you to specify a standing picture in the acquired experience value window.
+ * Fixed an issue where unleveled actors would show level up when recombat after leveling up.
+ * 2022/9/17 Ver.2.0.6
+ * Added a function that allows you to specify the color of the EXP gauge.
+ * Fixed the problem that the background image is not displayed when the window display of the acquisition window setting is turned off.
+ * 2022/9/11 Ver.2.0.5
+ * Definition fix for BattleVoiceMZ support for MVP actors.
+ * 2022/9/11 Ver.2.0.4
+ * Fixed an issue that caused an error at the start of battle.
+ * Fixed an issue where rounding rounding did not work.
+ * 2022/9/11 Ver.2.0.3
+ * Modified definitions for MVP aqua support.
+ * 2022/9/10 Ver.2.0.2
+ * Fixed an issue that caused experience boost colors to appear black.
+ * 2022/9/10 Ver.2.0.1
+ * Fixed an issue where an error would appear at the end of a battle.
+ * Added actor name to initial setting of item in level up actor status window.
+ * Fixed an issue where supporting actors were not displayed.
+ * 2022/9/9 Ver.2.0.0
+ * Complete renovation.
+ * 
+ * @param CommonSetting
+ * @text CommonSetting
+ * @default ------------------------------
+ * 
+ * @param ResultVisibleFrame
+ * @desc Number of frames until the result screen is displayed after winning.
+ * @text Result screen delay frames after victory
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent CommonSetting
+ * 
+ * @param ResultFadein
+ * @type boolean
+ * @default false
+ * @text Fade-in display
+ * @desc Display the result screen with fade-in.
+ * @parent CommonSetting
+ * 
+ * @param Decimal
+ * @text Number of decimal places
+ * @desc The number of decimal places that can be displayed. (experience value percentage, etc.)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent CommonSetting
+ * 
+ * @param DecimalMode
+ * @text Rounding off
+ * @desc Round off the non-display decimal point. (rounded down at false) (percentage of experience value, etc.)
+ * @type boolean
+ * @default true
+ * @parent CommonSetting
+ * 
+ * @param BackUiWidth
+ * @text Background image window size
+ * @desc Fit the background image to the window size.
+ * @type boolean
+ * @default true
+ * @parent CommonSetting
+ * 
+ * @param BackFitWidth
+ * @text Background image enlargement
+ * @desc Scales the background image to fit the window size or screen.
+ * @type boolean
+ * @default false
+ * @parent CommonSetting
+ * 
+ * @param WindowSetting
+ * @text Common window settings
+ * @default ------------------------------
+ * 
+ * @param ResultWindowCenter
+ * @type boolean
+ * @default true
+ * @text Center window
+ * @desc Center the window. The X coordinate of the window is relative to the window display position.
+ * @parent WindowSetting
+ * 
+ * @param CloseActorStatusWindow
+ * @type boolean
+ * @default false
+ * @text Hide actor window when displaying results
+ * @desc Hides the actor status window when the result screen is displayed.
+ * @parent WindowSetting
+ * 
+ * @param NoTouchUIWindow
+ * @type boolean
+ * @default false
+ * @text Window top alignment when Touch UI is OFF
+ * @desc When touch UI is OFF, the window is stuffed to the top.
+ * @parent WindowSetting
+ * 
+ * @param ActorFace
+ * @text Actro Face setting
+ * @default ------------------------------
+ * 
+ * @param ActorFaceHeight
+ * @desc Height of face.
+ * @text Height of face
+ * @type number
+ * @default 144
+ * @min 0
+ * @parent ActorFace
+ * 
+ * @param LevelUpActorFaceHeight
+ * @desc The height of the face graph in the level up window.
+ * @text Level up face graph height
+ * @type number
+ * @default 144
+ * @min 0
+ * @parent ActorFace
+ * 
+ * @param ActorCharacter
+ * @text Character chip setting
+ * @default ------------------------------
+ * 
+ * @param ActorSv
+ * @text Side view setting
+ * @default ------------------------------
+ * 
+ * @param ButtonSetting
+ * @text button setting
+ * @default ------------------------------
+ * 
+ * @param ButtonPosition
+ * @desc Specifies the display position of the button.
+ * @text Button position
+ * @type select
+ * @option Left
+ * @value "left"
+ * @option Right
+ * @value "right"
+ * @default "right"
+ * @parent ButtonSetting
+ * 
+ * @param ResultButton_X
+ * @desc X coordinate of the button.
+ * @text Button X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ButtonSetting
+ * 
+ * @param ResultButton_Y
+ * @desc Y coordinate of the button.
+ * @text Button Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ButtonSetting
+ * 
+ * @param HelpWindowSetting
+ * @text Battle result display window settings
+ * @default ------------------------------
+ * 
+ * @param HelpWindowVisible
+ * @text Battle result display
+ * @desc Show battle results.
+ * @type boolean
+ * @default true
+ * @parent HelpWindowSetting
+ * 
+ * @param ResultHelpWindowVisible
+ * @text Window display
+ * @desc Show the window.
+ * @type boolean
+ * @default true
+ * @parent HelpWindowSetting
+ * 
+ * @param ResultHelpWidth
+ * @desc Width of the battle results window. (0 for UI width)
+ * @text Battle result window width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent HelpWindowSetting
+ * 
+ * @param ResultHelpWindow_X
+ * @desc X coordinate of the battle results window.
+ * @text Battle result window X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent HelpWindowSetting
+ * 
+ * @param ResultHelpWindow_Y
+ * @desc Y coordinate of the battle results window.
+ * @text Battle result window Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent HelpWindowSetting
+ * 
+ * @param ResultTextPosition
+ * @desc Specifies the display position of the characters in the battle results.
+ * @text Combat result letter position
+ * @type select
+ * @option Left
+ * @value "left"
+ * @option Center
+ * @value "center"
+ * @option Right
+ * @value "right"
+ * @default 'center'
+ * @parent HelpWindowSetting
+ * 
+ * @param ResultName
+ * @text Battle result name
+ * @desc Sets the name of the battle result.
+ * @type string
+ * @default Result
+ * @parent HelpWindowSetting
+ * 
+ * @param ResultHelpWindowsSkin
+ * @desc Specifies the window skin for the battle results window (top).
+ * @text Combat results window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent HelpWindowSetting
+ * 
+ * @param LevelUpHelpWindowSetting
+ * @text Level up window settings
+ * @default ------------------------------
+ * 
+ * @param LevelUpHelpWindowVisible
+ * @text Level up display
+ * @desc Show level up.
+ * @type boolean
+ * @default true
+ * @parent LevelUpHelpWindowSetting
+ * 
+ * @param ResultLevelUpHelpWindowVisible
+ * @text window display
+ * @desc Show the window.
+ * @type boolean
+ * @default true
+ * @parent LevelUpHelpWindowSetting
+ * 
+ * @param LevelUpResultHelpWidth
+ * @desc width of the window. (0 for UI width)
+ * @text Window width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent LevelUpHelpWindowSetting
+ * 
+ * @param LevelUpResultHelpWindow_X
+ * @desc X coordinate of the window.
+ * @text Window x coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent LevelUpHelpWindowSetting
+ * 
+ * @param LevelUpResultHelpWindow_Y
+ * @desc Y coordinate of the window.
+ * @text Window Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent LevelUpHelpWindowSetting
+ * 
+ * @param LevelUpResultTextPosition
+ * @desc Specify the display position of the battle result characters on the level up screen.
+ * @text Level up screen Battle result character position
+ * @type select
+ * @option Text code can be used (left aligned)
+ * @value "TextEx"
+ * @option Left
+ * @value "left"
+ * @option Center
+ * @value "center"
+ * @option Right
+ * @value "right"
+ * @default "TextEx"
+ * @parent LevelUpHelpWindowSetting
+ * 
+ * @param LevelUpResultHelpName
+ * @desc Level up screen battle result text. %1: Actor name %2: Level (only when text code is allowed (left aligned))
+ * @text Level up screen battle result text
+ * @type string
+ * @default %1 has reached \c[16]level \c[17]%2\c[0]!
+ * @parent LevelUpHelpWindowSetting
+ * 
+ * @param LevelUpResultHelpWindowsSkin
+ * @desc Specifies the window skin for the level-up screen window (top).
+ * @text Skin for the level up screen window
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent LevelUpHelpWindowSetting
+ * 
+ * @param GetWindowSetting
+ * @text Acquisition window settings
+ * @default ------------------------------
+ * 
+ * @param ResultWindowVisible
+ * @text Window display
+ * @desc Show the window.
+ * @type boolean
+ * @default true
+ * @parent GetWindowSetting
+ * 
+ * @param ResultWindowPosition
+ * @text Window display reference position
+ * @desc Specifies the display reference position of the window.
+ * @type select
+ * @option Uunder help
+ * @value 'help'
+ * @option Under Button UI
+ * @value 'button'
+ * @option Standard on screen UI
+ * @value 'top'
+ * @default 'help'
+ * @parent GetWindowSetting
+ * 
+ * @param ResultWidth
+ * @desc width of the window. (0 for UI width)
+ * @text Wwindow width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetWindowSetting
+ * 
+ * @param ResultHeight
+ * @desc Height of the window. (0 for UI height)
+ * @text Window height
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetWindowSetting
+ * 
+ * @param ResultWindow_X
+ * @desc X coordinate of the window.
+ * @text Window x coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GetWindowSetting
+ * 
+ * @param ResultWindow_Y
+ * @desc Y coordinate of the window.
+ * @text Window Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GetWindowSetting
+ * 
+ * @param GetWindowBackGroundImg
+ * @desc Specifies the background image file name.
+ * @text Background imag
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent GetWindowSetting
+ * 
+ * @param GetWindowsSkin
+ * @desc Specifies the window skin of the main window to get.
+ * @text Get main window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent GetWindowSetting
+ * 
+ * @param GetActorExp
+ * @text Experience gain settings
+ * @default ------------------------------
+ * 
+ * @param GetActorExpSetting
+ * @text Basic Settings for Obtaining EXP Display
+ * @default ------------------------------
+ * @parent GetActorExp
+ * 
+ * @param ActorExpDataList
+ * @desc The item to display the actor acquisition experience value.
+ * @text Actor Acquired EXP Display Items
+ * @type struct<ActorExpList>[]
+ * @default ["{\"DateSelect\":\"2\",\"X_Coordinate\":\"8\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"textMethod\":\"\"}","{\"DateSelect\":\"10\",\"X_Coordinate\":\"160\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"200\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"-4\",\"textMethod\":\"\"}","{\"DateSelect\":\"11\",\"X_Coordinate\":\"370\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"100\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"-4\",\"textMethod\":\"\"}","{\"DateSelect\":\"20\",\"X_Coordinate\":\"160\",\"Y_Coordinate\":\"62\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"textMethod\":\"\"}","{\"DateSelect\":\"12\",\"X_Coordinate\":\"160\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"100\",\"ParamName\":\"Gain EXP\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"-4\",\"textMethod\":\"\"}","{\"DateSelect\":\"30\",\"X_Coordinate\":\"24\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"textMethod\":\"\"}"]
+ * @parent GetActorExp
+ * 
+ * @param ActorExpWindowVisible
+ * @text Window display
+ * @desc Show the window.
+ * @type boolean
+ * @default false
+ * @parent GetActorExp
+ * 
+ * @param ReserveMembers
+ * @type boolean
+ * @default false
+ * @text Reserve member display
+ * @desc Reserve member display.
+ * @parent GetActorExp
+ * 
+ * @param ActorCols
+ * @desc number of visible columns for actors
+ * @text Number of actor display columns
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent GetActorExp
+ * 
+ * @param DefaultActorVisible
+ * @desc Number of lines displayed for an actor when gaining experience.
+ * @text Actor display lines
+ * @type number
+ * @default 4
+ * @min 0
+ * @parent GetActorExp
+ * 
+ * @param ActorExpWidth
+ * @desc Width of experience earned by an actor. (0 for window width/2)
+ * @text Width of experience gained by actors
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetActorExp
+ * 
+ * @param ActorExpHeight
+ * @desc The vertical width of the experience earned by the actor. (0 for window height)
+ * @text Actor acquisition experience value vertical width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetActorExp
+ * 
+ * @param ActorExpWindow_X
+ * @desc The x-coordinate of the actor's experience gained.
+ * @text Actor Acquisition X Coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GetActorExp
+ * 
+ * @param ActorExpWindow_Y
+ * @desc The y-coordinate of the actor's experience gained.
+ * @text Actor acquisition experience value Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GetActorExp
+ * 
+ * @param ResultActorLessThanSize
+ * @type boolean
+ * @default false
+ * @text Number of actors vertical width automatic adjustment (less than)
+ * @desc Automatically adjusts the actor display height when less than the default display number.
+ * @parent GetActorExp
+ * 
+ * @param ResultActorAutoSize
+ * @type boolean
+ * @default false
+ * @text Number of actors vertical width automatic adjustment (larger)
+ * @desc Automatically adjusts the actor display height when it is larger than the default display number.
+ * @parent GetActorExp
+ * 
+ * @param EXPResistWindowsSkin
+ * @desc Specifies the window skin for the actor gain experience window.
+ * @text Actor experience window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent GetActorExp
+ * 
+ * @param LevelUpSetting
+ * @text Level up settings
+ * @default ------------------------------
+ * @parent GetActorExp
+ * 
+ * @param LevelUpImg
+ * @desc Level up image file. Coordinates are specified in “Actor Acquired EXP Display Items”. (When "Level up" is selected)
+ * @text level up image
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent LevelUpSetting
+ * 
+ * @param LevelUpNameColor
+ * @desc Level-up text color (system color or color code) (when level-up display is selected)
+ * @text Level up text color
+ * @type number
+ * @default 17
+ * @parent LevelUpSetting
+ * 
+ * @param LevelUpValueColor
+ * @desc Level value color for level up (system color or color code) (when level display is selected)
+ * @text Number color when leveling up
+ * @type number
+ * @default 17
+ * @parent LevelUpSetting
+ * 
+ * @param EXPSetting
+ * @text EXP display settings
+ * @default ------------------------------
+ * @parent GetActorExp
+ * 
+ * @param EXPBoostValueColor
+ * @desc Numerical color (system color or color code) when the acquired experience value is higher than normal.
+ * @text Numerical color when boosting experience gained
+ * @type number
+ * @default 0
+ * @parent EXPSetting
+ * 
+ * @param EXPResistValueColor
+ * @desc Numerical color (system color or color code) when experience gained is less than normal.
+ * @text Numeric color when resisting acquired experience value
+ * @type number
+ * @default 0
+ * @parent EXPSetting
+ * 
+ * @param ContentsBackSetting
+ * @text Content background setting
+ * @default ------------------------------
+ * @parent GetActorExp
+ * 
+ * @param EXPResistContentsBackVisible
+ * @type boolean
+ * @default true
+ * @text Content background display
+ * @desc Show content background.
+ * @parent ContentsBackSetting
+ * 
+ * @param EXPResistContentsBackGroundImg
+ * @desc Specifies the content background image file name. Effective when content background display is ON
+ * @text Content background image
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ContentsBackSetting
+ * 
+ * @param ExpSetting
+ * @text EXP gauge setting
+ * @default ------------------------------
+ * @parent GetActorExp
+ * 
+ * @param GaugeValueShow
+ * @desc Displays the value of the EXP gauge.
+ * @text EXP gauge numerical display
+ * @type select
+ * @option No displa
+ * @value 0
+ * @option Current experience
+ * @value 1
+ * @option Target EXP and Current Value
+ * @value 2
+ * @option Percentage
+ * @value 3
+ * @option EXP to next level
+ * @value 4
+ * @default 1
+ * @parent ExpSetting
+ * 
+ * @param Gauge_Width
+ * @desc EXP gauge width.
+ * @text EXP gauge width
+ * @type number
+ * @default 300
+ * @parent ExpSetting
+ * 
+ * @param Gauge_Height
+ * @desc EXP gauge vertical width.
+ * @text EXP gauge vertical width
+ * @type number
+ * @default 12
+ * @parent ExpSetting
+ * 
+ * @param GaugeRefreshFrame
+ * @desc EXP Gauge Update Frame
+ * @text EXP gauge update frame
+ * @type number
+ * @default 100
+ * @min 0
+ * @parent ExpSetting
+ * 
+ * @param GaugeColor1
+ * @desc Gauge color (left side) (system color or color code)
+ * @text Gauge color (left side)
+ * @type number
+ * @default 17
+ * @parent ExpSetting
+ * 
+ * @param GaugeColor2
+ * @desc Gauge color (right side) (system color or color code)
+ * @text Gauge color (right side)
+ * @type number
+ * @default 6
+ * @parent ExpSetting
+ * 
+ * @param GaugeValueFontSize
+ * @desc Font size for gauge current value numbers. (difference from main font size)
+ * @text Gauge current value numeric font size
+ * @type number
+ * @default -6
+ * @min -100
+ * @parent ExpSetting
+ * 
+ * @param GaugeMaxValueFontSize
+ * @desc The font size of the gauge maximum numeric value. (difference from main font size)
+ * @text Font size for gauge maximum values
+ * @type number
+ * @default -6
+ * @min -100
+ * @parent ExpSetting
+ * 
+ * @param GaugeValueY
+ * @type number
+ * @default 0
+ * @text Gauge acquisition experience value Y coordinate adjustment
+ * @desc Adjust the Y coordinate of the gauge acquisition experience value.
+ * @min -9999
+ * @parent ExpSetting
+ * 
+ * @param GaugeMaxValueY
+ * @type number
+ * @default 0
+ * @text Gauge target experience value Y coordinate adjustment
+ * @desc Y coordinate adjustment for gauge target experience. "EXP gauge numerical display" is "Target EXP and Current Value"
+ * @min -9999
+ * @parent ExpSetting
+ * 
+ * @param SeparationY
+ * @type number
+ * @default 0
+ * @text "/" Y coordinate adjustment
+ * @desc Adjust the Y coordinate of /. "EXP gauge numerical display" is "Target EXP and Current Value"
+ * @min -9999
+ * @parent ExpSetting
+ * 
+ * @param GetInfo
+ * @text Gain information display settings
+ * @default ------------------------------
+ * 
+ * @param GainParam
+ * @text Gain item settings
+ * @desc Gain item settings.
+ * @default ["{\"GainParamData\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"獲得金額\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\"}","{\"GainParamData\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"Gain EXP\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\"}","{\"GainParamData\":\"1000\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\"}"]
+ * @type struct<GainParamList>[]
+ * @parent GetInfo
+ * 
+ * @param GetInfoWindowVisible
+ * @text Window display
+ * @desc Show the window.
+ * @type boolean
+ * @default false
+ * @parent GetInfo
+ * 
+ * @param GetInfoWidth
+ * @desc Width of the item to be obtained. (0 for window width/2)
+ * @text Gain item width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetInfo
+ * 
+ * @param GetInfoHeight
+ * @desc Vertical width of gain item. (0 for window height)
+ * @text Gain item height
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetInfo
+ * 
+ * @param GetInfoWindow_X
+ * @desc X coordinate of the item to get.
+ * @text Gain item X coordinate
+ * @type number
+ * @default 484
+ * @min -9999
+ * @parent GetInfo
+ * 
+ * @param GetInfoWindow_Y
+ * @desc Y coordinate of the item to get.
+ * @text Gain item Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GetInfo
+ * 
+ * @param GetInfoContentsHeight
+ * @desc Item height of the retrieved item.
+ * @text GAin Item Item Height
+ * @type number
+ * @default 36
+ * @min 0
+ * @parent GetInfo
+ * 
+ * @param GetInfoWindowsSkin
+ * @desc Specifies the window skin for the available items window.
+ * @text Gain window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent GetInfo
+ * 
+ * @param GetItemWindow
+ * @text Gain/Stolen Item Display Settings
+ * @default ------------------------------
+ * 
+ * @param GetItemParam
+ * @text Display settings for items and stolen items
+ * @desc Item, stolen item display settings.
+ * @default ["{\"GetItemParamData\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ParamName\":\"入手アイテム\",\"SystemNameColor\":\"16\",\"FontSize\":\"0\",\"ItemCols\":\"1\",\"ItemRows\":\"0\"}"]
+ * @type struct<GetItemParamList>[]
+ * @parent GetItemWindow
+ * 
+ * @param GetItemWindowVisible
+ * @text Window display
+ * @desc Show the window.
+ * @type boolean
+ * @default false
+ * @parent GetItemWindow
+ * 
+ * @param GetItemWidth
+ * @desc Width of items and stolen items. (0 for window width/2)
+ * @text Item, stolen item width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetItemWindow
+ * 
+ * @param GetItemHeight
+ * @desc Item, vertical width of the stolen item. (0 for window height)
+ * @text Item, stolen item height
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GetItemWindow
+ * 
+ * @param GetItemWindow_X
+ * @desc Item, the X coordinate of the stolen item.
+ * @text Item, stolen item X coordinate
+ * @type number
+ * @default 484
+ * @min -9999
+ * @parent GetItemWindow
+ * 
+ * @param GetItemWindow_Y
+ * @desc Item, the Y coordinate of the stolen item.
+ * @text Item, stolen item Y coordinate
+ * @type number
+ * @default 108
+ * @min -9999
+ * @parent GetItemWindow
+ * 
+ * @param DropItemContentsHeight
+ * @desc Item, item height for stolen items.
+ * @text Item, stolen item item height
+ * @type number
+ * @default 36
+ * @min 0
+ * @parent GetItemWindow
+ * 
+ * @param DropItemMaxCols
+ * @desc Items, maximum number of columns for stolen items.
+ * @text Item, stolen item maximum number of cols
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent GetItemWindow
+ * 
+ * @param DropItemRows
+ * @desc Items, stolen items window display line (0 to bottom of window)
+ * @text Item, stolen item Row
+ * @type number
+ * @default 0
+ * @parent GetItemWindow
+ * 
+ * @param GetItemWindowsSkin
+ * @desc Specifies the window skin for the drop item window.
+ * @text Drop item window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent GetItemWindow
+ * 
+ * @param GetItem
+ * @text Gain item display setting
+ * @default ------------------------------
+ * @parent GetItemWindow
+ * 
+ * @param DropItemNumVisible
+ * @type boolean
+ * @default false
+ * @text Drop item count display
+ * @desc Displays the number of dropped items. Individual display with OFF
+ * @parent GetItem
+ * 
+ * @param DropItemNumx
+ * @desc Number of dropped items left letter.
+ * @text Character to the left of the quantity
+ * @type string
+ * @default x 
+ * @parent GetItem
+ * 
+ * @param StealItemSetting
+ * @text Stealable item settings (requires NUUN_StealableItems)
+ * @default ------------------------------
+ * @parent GetItemWindow
+ * 
+ * @param StealItemVisible
+ * @type boolean
+ * @default false
+ * @text Show stolen items
+ * @desc Show stolen items.
+ * @parent StealItemSetting
+ * 
+ * @param StealItemNumVisible
+ * @type boolean
+ * @default false
+ * @text Display number of stolen items
+ * @desc Displays the number of stolen items. Individual display with OFF
+ * @parent StealItemSetting
+ * 
+ * @param StealItemNumx
+ * @desc Number of items stolen Left letter.
+ * @text Character to the left of the quantity
+ * @type string
+ * @default x 
+ * @parent StealItemSetting
+ * 
+ * @param LevelUpActor
+ * @text Level up settings
+ * @default ------------------------------
+ * 
+ * @param LevelUpWindowShow
+ * @type boolean
+ * @default true
+ * @text Level up screen display
+ * @desc Show level up screen. Cut the level up screen with false.
+ * @parent LevelUpActor
+ * 
+ * @param PartyPageRefreshFrame
+ * @desc Wait frame before page switch.
+ * @text wait frame.
+ * @type number
+ * @default 0
+ * @parent LevelUpActor
+ * 
+ * @param LevelUpWindowSetting
+ * @text Level up main window settings
+ * @default ------------------------------
+ * 
+ * @param ResultLevelUpWindowVisible
+ * @text Window display
+ * @desc Show the window.
+ * @type boolean
+ * @default true
+ * @parent LevelUpWindowSetting
+ * 
+ * @param ResultLevelUpWindowPosition
+ * @text Window display reference position
+ * @desc Specifies the display reference position of the window.
+ * @type select
+ * @option Under help
+ * @value 'help'
+ * @option Under Button UI
+ * @value 'button'
+ * @option Standard on screen UI
+ * @value 'top'
+ * @default 'help'
+ * @parent LevelUpWindowSetting
+ * 
+ * @param ResultLevelUpWidth
+ * @desc Width of the window. (0 for UI width)
+ * @text Window width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent LevelUpWindowSetting
+ * 
+ * @param ResultLevelUpHeight
+ * @desc Height of the window. (0 for UI height)
+ * @text Window height
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent LevelUpWindowSetting
+ * 
+ * @param ResultLevelUpWindow_X
+ * @desc X coordinate of the window.
+ * @text Window x coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent LevelUpWindowSetting
+ * 
+ * @param ResultLevelUpWindow_Y
+ * @desc Y coordinate of the window.
+ * @text Window Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent LevelUpWindowSetting
+ * 
+ * @param LevelUpActorBackGroundImg
+ * @desc Specifies the background image file name.
+ * @text Background image
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent LevelUpWindowSetting
+ * 
+ * @param ResultLevelUpWindowsSkin
+ * @desc Specifies the window skin for the level-up main window.
+ * @text Level up main window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent LevelUpWindowSetting
+ * 
+ * @param LevelUpActorStatus
+ * @text Level up display settings
+ * @default ------------------------------
+ * 
+ * @param LevelUpActorParam
+ * @text Level up status display settings
+ * @desc Level up status display setting.
+ * @default ["{\"StatusParamDate\":\"21\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"DifferenceVisible\":\"true\"}","{\"StatusParamDate\":\"33\",\"X_Position\":\"1\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"DifferenceVisible\":\"true\"}","{\"StatusParamDate\":\"2\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"DifferenceVisible\":\"true\"}","{\"StatusParamDate\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"DifferenceVisible\":\"true\"}","{\"StatusParamDate\":\"4\",\"X_Position\":\"1\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"DifferenceVisible\":\"true\"}","{\"StatusParamDate\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"DifferenceVisible\":\"true\"}","{\"StatusParamDate\":\"6\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"DifferenceVisible\":\"true\"}","{\"StatusParamDate\":\"7\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"DifferenceVisible\":\"true\"}","{\"StatusParamDate\":\"30\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"160\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"SystemNameColor\":\"16\",\"DetaEval\":\"\",\"FontSize\":\"0\",\"DifferenceVisible\":\"true\"}"]
+ * @type struct<LevelUpActorParamList>[]
+ * @parent LevelUpActorStatus
+ * 
+ * @param LevelUpActorWindowVisible
+ * @text window display
+ * @desc Show the window.
+ * @type boolean
+ * @default false
+ * @parent LevelUpActorStatus
+ * 
+ * @param LevelUpActorWidth
+ * @desc Width of level up status. (0 for window width/2)
+ * @text Level up status width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent LevelUpActorStatus
+ * 
+ * @param LevelUpActorHeight
+ * @desc Vertical width of level up status. (0 for window height)
+ * @text Level up status vertical width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent LevelUpActorStatus
+ * 
+ * @param LevelUpActorWindow_X
+ * @desc X coordinate of level up status.
+ * @text Level up status X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent LevelUpActorStatus
+ * 
+ * @param LevelUpActorWindow_Y
+ * @desc Y coordinate of level up status.
+ * @text Level up status Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent LevelUpActorStatus
+ * 
+ * @param LevelUpActorCols
+ * @desc Level up status display cols.
+ * @text Level up status display column
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent LevelUpActorStatus
+ * 
+ * @param LevelUpActorContentsHeight
+ * @desc Item height for level up status.
+ * @text Level up status item height
+ * @type number
+ * @default 36
+ * @min -9999
+ * @parent LevelUpActorStatus
+ * 
+ * @param DifferenceStatusColor
+ * @desc The color of the number when the status rises after leveling up (system color or color code)
+ * @text Status number color after level up
+ * @type number
+ * @default 24
+ * @parent LevelUpActorStatus
+ * 
+ * @param DifferenceLevelColor
+ * @desc Number color after leveling up (system color or color code)
+ * @text Level number color after level up
+ * @type number
+ * @default 17
+ * @parent LevelUpActorStatus
+ * 
+ * @param LevelUpActorStatusWindowsSkin
+ * @desc Specifies the window skin for the level up status window.
+ * @text Level up status window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent LevelUpActorStatus
+ * 
+ * @param LearnSkillWindow
+ * @text Learned skill settings
+ * @default ------------------------------
+ * 
+ * @param LearnSkillParam
+ * @text Learned skill display settings
+ * @desc Learned skill display settings.
+ * @default ["{\"LearnSkillParamData\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ParamName\":\"習得スキル\",\"SystemNameColor\":\"16\",\"FontSize\":\"0\",\"ItemCols\":\"1\"}"]
+ * @type struct<LearnSkillParamList>[]
+ * @parent LearnSkillWindow
+ * 
+ * @param LearnSkillWindowVisible
+ * @text Window display
+ * @desc Show the window.
+ * @type boolean
+ * @default false
+ * @parent LearnSkillWindow
+ * 
+ * @param LearnSkillWidth
+ * @desc Width of learned skill. (0 for window width/2)
+ * @text Learned skill Width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent LearnSkillWindow
+ * 
+ * @param LearnSkillHeight
+ * @desc The vertical width of the Learned skill. (0 for window height)
+ * @text Learned skill Width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent LearnSkillWindow
+ * 
+ * @param LearnSkillWindow_X
+ * @desc X coordinate of learned skill.
+ * @text Learned skill X coordinate
+ * @type number
+ * @default 404
+ * @min -9999
+ * @parent LearnSkillWindow
+ * 
+ * @param LearnSkillWindow_Y
+ * @desc Y coordinate of learned skill.
+ * @text Learned skill Y coordinate
+ * @type number
+ * @default 144
+ * @min -9999
+ * @parent LearnSkillWindow
+ * 
+ * @param LearnSkillCols
+ * @desc Learned skill display column.
+ * @text Learned skill display cols
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent LearnSkillWindow
+ * 
+ * @param LearnSkillRows
+ * @desc Display line of learned skill window (0 to the bottom of the window)
+ * @text Learned skill Rows
+ * @type number
+ * @default 0
+ * @parent LearnSkillWindow
+ * 
+ * @param LearnSkillContentsHeight
+ * @desc The item height of the learned skill.
+ * @text Learned skill item height
+ * @type number
+ * @default 36
+ * @min 0
+ * @parent LearnSkillWindow
+ * 
+ * @param LearnSkillWindowsSkin
+ * @desc Specifies the window skin for the learned skill window.
+ * @text Learned skill window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent LearnSkillWindow
+ * 
+ * @param ActorImg
+ * @text Actor image settings
+ * @default ------------------------------
+ * 
+ * @param ButlerActors
+ * @text Display actor settings
+ * @desc Specifies the actor that displays the image.
+ * @type struct<ActorButlerList>[]
+ * @default []
+ * @parent ActorImg
+ * 
+ * @param ActorPictureData
+ * @text Image settings for "NUUN_ActorPicture"
+ * @desc Actor image setting in "NUUN_ActorPicture".
+ * @default []
+ * @type struct<ActorPictureDataList>[]
+ * @parent ActorImg
+ * 
+ * @param ActorPictureEXApp
+ * @text "NUUN_ActorPicture" application
+ * @desc Apply the image change of standing picture display EX. If OFF, the settings in this plug-in are applied.
+ * @type boolean
+ * @default true
+ * @parent ActorImg
+ * 
+ * @param ButlerActors_X
+ * @desc X coordinate of the actor image.
+ * @text Actor image X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorImg
+ * 
+ * @param ButlerActors_Y
+ * @desc Y coordinate of the actor image.
+ * @text Actor image Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorImg
+ * 
+ * @param LevelUpActorArea
+ * @desc The display range of the actor displayed when leveling up.
+ * @text Actor display range
+ * @type select
+ * @option Within window display range
+ * @value 'window'
+ * @option In the UI display
+ * @value 'ui'
+ * @option In the screen
+ * @value 'screen'
+ * @default 'window'
+ * @parent ActorImg
+ * 
+ * @param ActorPosition
+ * @text Standing picture display position
+ * @desc Specify the display position of the standing picture.
+ * @type select
+ * @option Left
+ * @value 'left'
+ * @option Center
+ * @value 'center'
+ * @option Right
+ * @value 'right'
+ * @default 'right'
+ * @parent ActorImg
+ * 
+ * @param VictoryScene
+ * @text Post-win performance
+ * @default ------------------------------
+ * 
+ * @param VictorySceneImg
+ * @desc Specify the image file name after winning.
+ * @text Post-win image
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent VictoryScene
+ * 
+ * @param AfterVictoryEffect
+ * @text Post-win performance
+ * @desc Set the production from after victory to the display of the result screen.
+ * @type struct<VictoryEffect>[]
+ * @default []
+ * @parent VictoryScene
+ * 
+ * @param AfterVictoryEffectSwitch 
+ * @desc Flag switch ID to enable image effect
+ * @text Image effect enable switch
+ * @type switch
+ * @default 0
+ * @parent VictoryScene
+ * 
+ * @param SESetting
+ * @text Level up SE settings
+ * @default ------------------------------
+ * 
+ * @param LevelUpSe
+ * @text SE when leveling up
+ * @desc Specifies the SE when leveling up.
+ * @type file
+ * @dir audio/se
+ * @parent SESetting
+ * 
+ * @param volume
+ * @text SE volume
+ * @desc Set the volume to SE.
+ * @default 90
+ * @parent SESetting
+ * @min 0
+ * 
+ * @param pitch
+ * @text SE pitch
+ * @desc Sets the pitch to SE.
+ * @default 100
+ * @parent SESetting
+ * 
+ * @param pan
+ * @text Phase of SE
+ * @desc Set the phase to SE.
+ * @default 0
+ * @parent SESetting
+ * 
+ * @param BGMSetting
+ * @text Battle victory BGM setting
+ * @default ------------------------------
+ * 
+ * @param VictoryBGM
+ * @text Battle Victory BGM
+ * @desc Specify the battle victory BGM.
+ * @type file
+ * @dir audio/bgm
+ * @parent BGMSetting
+ * 
+ * @param VictoryVolume
+ * @text BGM volume
+ * @desc Set the BGM volume.
+ * @default 90
+ * @parent BGMSetting
+ * @min 0
+ * 
+ * @param VictoryPitch
+ * @text BGM pitch
+ * @desc Set the pitch of BGM.
+ * @default 100
+ * @parent BGMSetting
+ * 
+ * @param VictoryPan
+ * @text BGM phase
+ * @desc Set the phase of BGM.
+ * @default 0
+ * @parent BGMSetting
+ * 
+ * @param ExternalPluginSetting
+ * @text External plugin settings
+ * @default ------------------------------
+ * 
+ * @param ShowSupportActor
+ * @text Show supporting actors
+ * @desc View supporting actors. (requires NUUN_SupportActor)
+ * @type boolean
+ * @default true
+ * @parent ExternalPluginSetting
+ * 
+ * 
+ * @command LevelUP_SESelect
+ * @desc Changes the SE when leveling up.
+ * @text Changes to Level Up SE
+ * 
+ * @arg LevelUP_SE
+ * @text Level up SE
+ * @desc Specifies a level-up SE. ME is initialized by not specifying anything.
+ * @type file
+ * @dir audio/se
+ * 
+ * @arg Volume
+ * @text SE volume
+ * @desc Set the volume to SE.
+ * @default 90
+ * 
+ * @arg Pitch
+ * @text SE pitch
+ * @desc Sets the pitch to SE.
+ * @default 100
+ * 
+ * @arg Pan
+ * @text Phase of SE
+ * @desc Set the phase to SE.
+ * @default 0
+ * 
+ * @command VictoryBGM
+ * @desc Change the permission to play victory BGM.
+ * @text Permission to play Victory BGM
+ * 
+ * @arg VictoryBGMEnable
+ * @type boolean
+ * @default true
+ * @desc Permission to play victory BGM.
+ * @text Permission to play victory BGM
+ * 
+ * 
+ * @command VictoryBGMSelect
+ * @desc Change victory BGM.
+ * @text Victory BGM change
+ * 
+ * @arg _BGM
+ * @text Victory BGM
+ * @desc Change victory BGM. BGM is initialized by not specifying anything.
+ * @type file
+ * @dir audio/bgm
+ * 
+ * @arg Volume
+ * @text BGM volume
+ * @desc Set the BGM volume.
+ * @default 90
+ * 
+ * @arg Pitch
+ * @text BGM pitch
+ * @desc Set the pitch of BGM.
+ * @default 100
+ * 
+ * @arg Pan
+ * @text BGM phase
+ * @desc Set the phase of BGM.
+ * @default 0
+ * 
+ * @arg NoVictoryME
+ * @type boolean
+ * @default false
+ * @text No win ME playback
+ * @desc Won't play Win ME.
+ * 
+ * @command LevelUpPage
+ * @desc Change the permission to display the level up screen.
+ * @text Permission to display level up screen
+ * 
+ * @arg LevelUpPageEnable
+ * @type boolean
+ * @default true
+ * @desc Permission to display level up screen. (After execution, the level up screen display setting will be disabled)
+ * @text Permission to display level up screen
+ * 
+ * @command ChangeActorImg
+ * @desc Change the actor image on the level up screen.
+ * @text Change the actor image on the level up screen
+ * 
+ * @arg actorId
+ * @type actor
+ * @default 0
+ * @desc Specifies an actor.
+ * @text Actor id
+ * 
+ * @arg ChangeActorImgId
+ * @type number
+ * @default 1
+ * @min 1
+ * @desc Specify the ID of the pose picture to change.
+ * @text Standing picture id
+ * 
+ * 
+ */
+/*~struct~ActorExpList:
+ * 
+ * @param DateSelect
+ * @text Status to display
+ * @desc Specifies the status to display.
+ * @type select
+ * @option None
+ * @value 0
+ * @option Character chip(1)(2)
+ * @value 1
+ * @option Actor face(1)(2)
+ * @value 2
+ * @option SV Actor(1)(2)
+ * @value 3
+ * @option Actor image(1)(2)
+ * @value 4
+ * @option Actor name(1)(2)(3)(8)
+ * @value 10
+ * @option Level(1)(2)(3)(4)(5)(6)(8)
+ * @value 11
+ * @option Gein Exp(1)(2)(3)(4)(5)(6)(8)
+ * @value 12
+ * @option Exp gauge(1)(2)(3)(5)
+ * @value 20
+ * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)
+ * @value 21
+ * @option Level up(1)(2)(5)(8)
+ * @value 30
+ * @option Line(1)(2)(3)(6)
+ * @value 1000
+ * @default 0
+ * 
+ * @param X_Coordinate
+ * @text X coordinate (relative)(1)
+ * @desc X coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y coordinate (relative)(2)
+ * @desc Y coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc Item width (default width at 0)
+ * @text Item width(3)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc System Item Width (0 is the default width)
+ * @text System Item Width(4)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc Sets the name of the item.
+ * @text Name(5)
+ * @type string
+ * @default
+ * 
+ * @param SystemNameColor
+ * @desc System Text Color. You can enter the color code in the text tab.
+ * @text System Text Color(6)
+ * @type number
+ * @default 16
+ * @min 0
+ * 
+ * @param DetaEval
+ * @desc Enter Eval or string.
+ * @text Eval or Strong(7)
+ * @type combo
+ * @default 
+ * 
+ * @param FontSize
+ * @desc Font size (difference from main font)
+ * @text font size(8)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param textMethod
+ * @desc Tag name
+ * @text Tag(9)
+ * @type string
+ * @default 
+ *  
+ */
+/*~struct~GainParamList:
+ * 
+ * @param GainParamData
+ * @text Display item
+ * @desc Specify the display item.
+ * @type select
+ * @option None
+ * @value 0
+ * @option Gain gold(1)(2)(3)(4)(5)(6)(7)(9)
+ * @value 1
+ * @option Gain exp(1)(2)(3)(4)(5)(6)(7)(9)
+ * @value 2
+ * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)(9)
+ * @value 10
+ * @option Line
+ * @value 1000
+ * @default 0
+ * 
+ * @param Y_Position
+ * @desc Y display line position
+ * @text Y display line position(1)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X coordinate (relative)(2)
+ * @desc X coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y coordinate (relative)(3)
+ * @desc Y coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc Item Width(0 for default width)
+ * @text Item Width(4)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc System Item Width(0 for default width)
+ * @text System Item Width(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc Sets the name of the item.
+ * @text Name(6)
+ * @type string
+ * @default
+ * 
+ * @param SystemNameColor
+ * @desc System Text Color. You can enter the color code in the text tab.
+ * @text System Text Color(7)
+ * @type number
+ * @default 16
+ * @min 0
+ * 
+ * @param DetaEval
+ * @desc Enter Eval or string.
+ * @text Eval or String(9)
+ * @type combo
+ * @default 
+ * 
+ * @param FontSize
+ * @desc Font size (difference from main font)
+ * @text Font size(9)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ */
+/*~struct~GetItemParamList:
+ * 
+ * @param GetItemParamData
+ * @text Display item
+ * @desc Specify the display item.
+ * @type select
+ * @option None
+ * @value 0
+ * @option Gain item(1)(2)(3)(4)(5)(6)(7)(8)(9)
+ * @value 1
+ * @option Stolen items(1)(2)(3)(4)(5)(6)(7)(8)(9)
+ * @value 2
+ * @option Gain item name(1)(2)(3)(4)(5)(6)(7)
+ * @value 10
+ * @option Stolen item name(1)(2)(3)(4)(5)(6)(7)
+ * @value 11
+ * @option Line(1)(2)(3)(4)(6)(8)
+ * @value 1000
+ * @default 0
+ * 
+ * @param X_Position
+ * @desc X Display Column Position
+ * @text X Display Column Position(1)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 2
+ * 
+ * @param Y_Position
+ * @desc Y display line position
+ * @text Y display line position(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X coordinate (relative)(3)
+ * @desc X coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y coordinate (relative)(4)
+ * @desc Y coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ParamName
+ * @desc Sets the name of the item. If blank, the name will not be displayed.
+ * @text Name(5)
+ * @type string
+ * @default
+ * 
+ * @param SystemNameColor
+ * @desc System Text Color. You can enter the color code in the text tab.
+ * @text System Text Color色(6)
+ * @type number
+ * @default 16
+ * @min 0
+ * 
+ * @param FontSize
+ * @desc Font size (difference from main font)
+ * @text Font size(7)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param ItemCols
+ * @desc Cols
+ * @text Cols(8)
+ * @type number
+ * @default 1
+ * @min 1
+ * 
+ * @param ItemRows
+ * @desc Rows
+ * @text Rows(9)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ */
+/*~struct~LevelUpActorParamList:
+ * 
+ * @param StatusParamDate
+ * @text Display item
+ * @desc Specify the display item.
+ * @type select
+ * @option HP(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 0
+ * @option MP(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 1
+ * @option Atk(1)(2)(3)(4)(6)(5)(8)(10)(11)
+ * @value 2
+ * @option Def(1)(2)(3)(4)(6)(5)(8)(10)(11)
+ * @value 3
+ * @option Mat(1)(2)(3)(4)(6)(5)(8)(10)(11)
+ * @value 4
+ * @option Mdf(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 5
+ * @option Agi(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 6
+ * @option Luk(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 7
+ * @option HP(No equip correction)(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 10
+ * @option MP(No equip correctionし)(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 11
+ * @option Atk(No equip correction)(1)(2)(3)(4)(6)(5)(8)(10)(11)
+ * @value 12
+ * @option Def(No equip correction)(1)(2)(3)(4)(6)(5)(8)(10)(11)
+ * @value 13
+ * @option Mat(No equip correction)(1)(2)(3)(4)(6)(5)(8)(10)(11)
+ * @value 14
+ * @option Mdf(No equip correction)(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 15
+ * @option Agi(No equip correction)(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 16
+ * @option Luk(No equip correction)(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 17
+ * @option Character chip(1)(2)(3)(4)
+ * @value 20
+ * @option Actor face(1)(2)(3)(4)
+ * @value 21
+ * @option SV Actor(1)(2)(3)(4)
+ * @value 22
+ * @option Actor name(1)(2)(3)(4)(5)(10)
+ * @value 30
+ * @option Class(1)(2)(3)(4)(5)(10)
+ * @value 31
+ * @option Nickname(1)(2)(3)(4)(5)(10)
+ * @value 32
+ * @option Level(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 33
+ * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @value 40
+ * @option Line(1)(2)(3)(4)(5)(8)
+ * @value 1000
+ * @default 0
+ * 
+ * @param X_Position
+ * @desc X Display Column Position
+ * @text X Display Column Position(1)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 2
+ * 
+ * @param Y_Position
+ * @desc Y display line position
+ * @text Y display line position(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X coordinate (relative)(3)
+ * @desc X coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y coordinate (relative)(4)
+ * @desc Y coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc Item width (default width at 0)
+ * @text Item width(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc System Item Width(0 for default width)
+ * @text System Item Width(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc Sets the name of the item. If blank, the name will not be displayed.
+ * @text Name(7)
+ * @type string
+ * @default
+ * 
+ * @param SystemNameColor
+ * @desc System Text Color. You can enter the color code in the text tab.
+ * @text System Text Color(8)
+ * @type number
+ * @default 16
+ * @min 0
+ * 
+ * @param DetaEval
+ * @desc Enter Eval or string.
+ * @text Eval or String(9)
+ * @type combo
+ * @default 
+ * 
+ * @param FontSize
+ * @desc Font size (difference from main font)
+ * @text Font size(10)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param DifferenceVisible
+ * @type boolean
+ * @default true
+ * @text Difference display(11)
+ * @desc Show the diff.
+ *  
+ */
+/*~struct~LearnSkillParamList:
+ * 
+ * @param LearnSkillParamData
+ * @text Display item
+ * @desc Specify the display item.
+ * @type select
+ * @option None
+ * @value 0
+ * @option Learned skills(1)(2)(3)(4)(5)(6)(7)(8)(9)
+ * @value 1
+ * @option Learned skill name(1)(2)(3)(4)(5)(6)(7)
+ * @value 10
+ * @option Line(1)(2)(3)(4)(6)(8)
+ * @value 1000
+ * @default 0
+ * 
+ * @param X_Position
+ * @desc X Display Column Position
+ * @text X Display Column Position(1)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 2
+ * 
+ * @param Y_Position
+ * @desc Y display line position
+ * @text Y display line position(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X coordinate (relative)(3)
+ * @desc X coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y coordinate (relative)(4)
+ * @desc Y coordinate (relative coordinate)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ParamName
+ * @desc Sets the name of the item. If blank, the name will not be displayed.
+ * @text Name(5)
+ * @type string
+ * @default
+ * 
+ * @param SystemNameColor
+ * @desc System Text Color. You can enter the color code in the text tab.
+ * @text System Text Color色(6)
+ * @type number
+ * @default 16
+ * @min 0
+ * 
+ * @param FontSize
+ * @desc Font size (difference from main font)
+ * @text Font size(7)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param ItemCols
+ * @desc Cols
+ * @text Cols(8)
+ * @type number
+ * @default 1
+ * @min 1
+ * 
+ * @param ItemRows
+ * @desc Rows
+ * @text Rows(9)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ */
+/*~struct~ActorButlerList:
+ * 
+ * @param actorId
+ * @text Actor
+ * @desc Specifies an actor.
+ * @type actor
+ * 
+ * @param ActorImg
+ * @text Actor image
+ * @desc Display the image of the actor.
+ * @type file[]
+ * @dir img/
+ * @default ["{\"actorId\":\"0\",\"ActorImg\":\"[\\\"pictures\\\"]\",\"Actor_X\":\"0\",\"Actor_Y\":\"0\",\"Actor_Scale\":\"100\"}"]
+ * 
+ * @param Actor_X
+ * @desc The display position X coordinate of the image.
+ * @text Image display position X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Y
+ * @desc The display position Y coordinate of the image.
+ * @text Image display position Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Scale
+ * @desc Image scale.
+ * @text Image scale
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ * 
+ * @param LevelUpActorBackGroundImg
+ * @desc Specify the background image file name for each actor when leveling up.
+ * @text Background image
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * @param EXPActorSetting
+ * @text Setting the actor image displayed in the EXP actor window
+ * @default ------------------------------
+ * 
+ * @param EXPActor_X
+ * @desc The display start coordinate X of the image.
+ * @text Image display position X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EXPActorSetting
+ * 
+ * @param EXPActor_Y
+ * @desc The display start coordinate Y of the image.
+ * @text Image display position Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EXPActorSetting
+ * 
+ * @param EXPActor_Scale
+ * @desc Image scale.
+ * @text Image scal
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ * @parent EXPActorSetting
+ * 
+ * @param MVPActorSetting
+ * @text MVP actor setting (required “NUUN_ResultMVPActor”)
+ * @default ------------------------------
+ * 
+ * @param MVPActorVictoryMe
+ * @text Victory ME
+ * @desc Specifies the ME at the time of victory.
+ * @type struct<VictoryMe>
+ * @dir audio/me
+ * @parent MVPActorSetting
+ * 
+ * @param MVPActorVictoryBGM
+ * @text Victory BGM
+ * @desc Specify the BGM at the time of victory.
+ * @type struct<VictoryBgm>
+ * @dir audio/me
+ * @parent MVPActorSetting
+ *
+ */
+/*~struct~ActorPictureDataList:
+ * 
+ * @param actorId
+ * @text Actor
+ * @desc Specifies an actor.
+ * @type actor
+ * 
+ * @param Actor_X
+ * @desc The display position X coordinate of the image.
+ * @text Image display position X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Y
+ * @desc The display position Y coordinate of the image.
+ * @text Image display position Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Actor_Scale
+ * @desc Image scale.
+ * @text Image scale
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ * 
+ * @param LevelUpActorBackGroundImg
+ * @desc Specify the background image file name for each actor when leveling up.
+ * @text Background image
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * @param EXPActorSetting
+ * @text Setting the actor image displayed in the EXP actor window
+ * @default ------------------------------
+ * 
+ * @param EXPActor_X
+ * @desc The display start coordinate X of the image.
+ * @text Image display position X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EXPActorSetting
+ * 
+ * @param EXPActor_Y
+ * @desc The display start coordinate Y of the image.
+ * @text Image display position Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EXPActorSetting
+ * 
+ * @param EXPActor_Scale
+ * @desc Image scale.
+ * @text Image scal
+ * @type number
+ * @default 100
+ * @min 0
+ * @max 999
+ * @parent EXPActorSetting
+ * 
+ * @param MVPActorSetting
+ * @text MVP actor setting (required “NUUN_ResultMVPActor”)
+ * @default ------------------------------
+ * 
+ * @param MVPActorVictoryMe
+ * @text Victory ME
+ * @desc Specifies the ME at the time of victory.
+ * @type struct<VictoryMe>
+ * @dir audio/me
+ * @parent MVPActorSetting
+ * 
+ * @param MVPActorVictoryBGM
+ * @text Victory BGM
+ * @desc Specify the BGM at the time of victory.
+ * @type struct<VictoryBgm>
+ * @dir audio/me
+ * @parent MVPActorSetting
+ * 
+ * 
+ */
+/*~struct~VictoryMe:
+ * 
+ * @param name
+ * @text ME file
+ * @desc Specify ME.
+ * @type file
+ * @dir audio/me
+ * 
+ * @param volume
+ * @text ME volume
+ * @desc Set the ME volume.
+ * @default 90
+ * @min 0
+ * 
+ * @param pitch
+ * @text ME Pitch
+ * @desc Sets the pitch of ME.
+ * @default 100
+ * 
+ * @param pan
+ * @text ME pan
+ * @desc Set the pan to ME.
+ * @default 0
+ * 
+ */
+/*~struct~VictoryBgm:
+ * 
+ * @param name
+ * @text BGM file
+ * @desc Specify BGM.
+ * @type file
+ * @dir audio/bgm
+ * 
+ * @param volume
+ * @text BGM volume
+ * @desc Set the BGM volume.
+ * @default 90
+ * @min 0
+ * 
+ * @param pitch
+ * @text BGM Pitch
+ * @desc Set the pitch of BGM.
+ * @default 100
+ * 
+ * @param pan
+ * @text BGM pan
+ * @desc Set the pan of BGM.
+ * @default 0
+ * 
+ */
+/*~struct~VictoryEffect:
+ * 
+ * @param Fream
+ * @desc Number of frames.
+ * @text Number of frames
+ * @type number
+ * @default 0
+ * 
+ * @param PositionX
+ * @desc Move coordinates to move sideways. Move relative to the current position.
+ * @text lateral movement coordinates
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param PositionY
+ * @desc Movement coordinates to move vertically. Move relative to the current position.
+ * @text longitudinal coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param ScaleX
+ * @desc Horizontal magnification. Enlarges (reduces) from the current enlargement ratio to the specified enlargement ratio.
+ * @text Horizontal magnification
+ * @type number
+ * @default 100
+ * @min 0
+ * 
+ * @param ScaleY
+ * @desc vertical magnification. Enlarges (reduces) from the current enlargement ratio to the specified enlargement ratio.
+ * @text Vertical magnification
+ * @type number
+ * @default 100
+ * @min 0
+ * 
+ * @param Opacity
+ * @desc Opacity. Changes from the current opacity to the specified opacity.
+ * @text Opacity
+ * @type number
+ * @max 255
+ * @min 0
+ * @default 255
+ * 
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc リザルト
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.11
+ * @version 2.2.12
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -58,6 +2248,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/4 Ver.2.2.12
+ * 日本語以外での表示を英語表示に変更。
  * 2022/11/1 Ver.2.2.11
  * レベルアップ時に表示される文字を画像で表示する機能を追加。
  * 2022/10/23 Ver.2.2.10
@@ -1236,6 +3428,32 @@
  * @default 'right'
  * @parent ActorImg
  * 
+ * @param VictoryScene
+ * @text 勝利後演出
+ * @default ------------------------------
+ * 
+ * @param VictorySceneImg
+ * @desc 勝利後の画像ファイル名を指定します。
+ * @text 勝利後画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent VictoryScene
+ * 
+ * @param AfterVictoryEffect
+ * @text 勝利後演出
+ * @desc 勝利後からリザルト画面表示までの演出を設定します。
+ * @type struct<VictoryEffect>[]
+ * @default []
+ * @parent VictoryScene
+ * 
+ * @param AfterVictoryEffectSwitch 
+ * @desc 画像エフェクトを有効にするフラグスイッチID
+ * @text 画像エフェクト有効スイッチ
+ * @type switch
+ * @default 0
+ * @parent VictoryScene
+ * 
  * @param SESetting
  * @text レベルアップSE設定
  * @default ------------------------------
@@ -1402,34 +3620,8 @@
  * @desc 変更する立ち絵のIDを指定します。
  * @text 立ち絵ID
  * 
- * @param VictoryScene
- * @text 勝利後演出
- * @default ------------------------------
- * 
- * @param VictorySceneImg
- * @desc 勝利後の画像ファイル名を指定します。
- * @text 勝利後画像
- * @type file
- * @dir img/
- * @default 
- * @parent VictoryScene
- * 
- * @param AfterVictoryEffect
- * @text 勝利後演出
- * @desc 勝利後からリザルト画面表示までの演出を設定します。
- * @type struct<VictoryEffect>[]
- * @default []
- * @parent VictoryScene
- * 
- * @param AfterVictoryEffectSwitch 
- * @desc 画像エフェクトを有効にするフラグスイッチID
- * @text 画像エフェクト有効スイッチ
- * @type switch
- * @default 0
- * @parent VictoryScene
- * 
  */
-/*~struct~ActorExpList:
+/*~struct~ActorExpList:ja
  * 
  * @param DateSelect
  * @text 表示するステータス
@@ -1524,7 +3716,7 @@
  * @default 
  *  
  */
-/*~struct~GainParamList:
+/*~struct~GainParamList:ja
  * 
  * @param GainParamData
  * @text 表示項目
@@ -1607,7 +3799,7 @@
  * @min -99
  * 
  */
-/*~struct~GetItemParamList:
+/*~struct~GetItemParamList:ja
  * 
  * @param GetItemParamData
  * @text 表示項目
@@ -1694,7 +3886,7 @@
  * @min 0
  * 
  */
-/*~struct~LevelUpActorParamList:
+/*~struct~LevelUpActorParamList:ja
  * 
  * @param StatusParamDate
  * @text 表示項目
@@ -1831,7 +4023,7 @@
  * @desc 差分を表示します。
  *  
  */
-/*~struct~LearnSkillParamList:
+/*~struct~LearnSkillParamList:ja
  * 
  * @param LearnSkillParamData
  * @text 表示項目
@@ -1914,7 +4106,7 @@
  * @min 0
  * 
  */
-/*~struct~ActorButlerList:
+/*~struct~ActorButlerList:ja
  * 
  * @param actorId
  * @text アクター
@@ -2009,7 +4201,7 @@
  * @parent MVPActorSetting
  *  
  */
-/*~struct~ActorPictureDataList:
+/*~struct~ActorPictureDataList:ja
  * 
  * @param actorId
  * @text アクター
@@ -2098,7 +4290,7 @@
  * 
  * 
  */
-/*~struct~VictoryMe:
+/*~struct~VictoryMe:ja
  * 
  * @param name
  * @text MEファイル
@@ -2123,7 +4315,7 @@
  * @default 0
  * 
  */
-/*~struct~VictoryBgm:
+/*~struct~VictoryBgm:ja
  * 
  * @param name
  * @text BGMファイル
@@ -2148,7 +4340,7 @@
  * @default 0
  * 
  */
-/*~struct~VictoryEffect:
+/*~struct~VictoryEffect:ja
  * 
  * @param Fream
  * @desc フレーム数。

@@ -1,5 +1,5 @@
 # [アップフェードアウトポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UpFadeoutPopup.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UpFadeoutPopup.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -17,6 +17,9 @@ Sprite_PopupMessage:戦闘行動結果ポップアッププラグイン
 ステート、バフポップアップは別途プラグインが必要になります。
 
 ## 更新履歴
+2022/12/5 Ver.1.1.2  
+ポップアッププラグイン更新による定義修正。  
+適用ポップアップ設定の説明文を修正。  
 2022/6/19 Ver.1.0.1  
 表示フレーム数、フェードアウトフレーム数を指定できる機能を追加。  
 2022/6/18 Ver.1.0.0  

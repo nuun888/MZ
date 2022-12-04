@@ -13,7 +13,7 @@
  * @version 1.0.0
  * 
  * @help
- * Also show waiting members to followers.
+ * Display waiting members to followers.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.

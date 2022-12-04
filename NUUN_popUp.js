@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.2.2
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -41,6 +41,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/4 Ver 1.3.0
+ * 撃破したときのポップアップを表示する機能を追加。
+ * カラーコードを正常に取得できない問題を修正。
  * 2022/6/18 Ver 1.2.2
  * 横バウンドポップアップクラス毎適用機能実装のための定義変更。
  * 2022/6/18 Ver 1.2.1
@@ -82,12 +85,6 @@
  * @type number
  * @default 240
  * 
- * @param PopUpBuff
- * @text ポップアップバフ設定
- * @desc ポップアップするバフの設定をします。
- * @default ["{\"StateType\":\"0\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"1\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"2\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"3\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"4\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"5\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"6\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"7\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"10\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"11\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"12\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"13\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"14\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"15\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"16\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"17\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}"]
- * @type struct<PopUpBuffList>[]
- * 
  * @param StateColor
  * @desc 有利なポップアップするときのステート、バフの色(システムカラーまたはカラーコード(テキストタブ))
  * @text 有利ステート、バフ文字色
@@ -112,62 +109,118 @@
  * @type number
  * @default 30
  * 
+ * @param StatePopUpSetting
+ * @text ステートのポップアップ
+ * @default ------------------------------
+ * 
  * @param DeadNoPopup
  * @text 戦闘不能ポップアップ表示
  * @desc 戦闘不能のポップアップを表示します。
  * @type boolean
  * @default false
+ * @parent StatePopUpSetting
  * 
  * @param AddStatePopUpText
  * @desc 有利なステート付加時の共通ポップアップテキスト。(%1:ステート名)
  * @text 有利ステート付加時ポップアップテキスト
  * @type string
  * @default %1
+ * @parent StatePopUpSetting
  * 
  * @param AddBadStatePopUpText
  * @desc 不利なステート付加時の共通ポップアップテキスト。(%1:ステート名)
  * @text 不利ステート付加時ポップアップテキスト
  * @type string
  * @default %1
+ * @parent StatePopUpSetting
  * 
  * @param RemovedStatePopUpText
  * @desc 有利なステート解除時の共通ポップアップテキスト。(%1:ステート名)
  * @text 有利ステート解除時ポップアップテキスト
  * @type string
  * @default %1
+ * @parent StatePopUpSetting
  * 
  * @param RemovedBadStatePopUpText
  * @desc 不利なステート解除時の共通ポップアップテキスト。(%1:ステート名)
  * @text 不利ステート解除時ポップアップテキスト
  * @type string
  * @default %1
+ * @parent StatePopUpSetting
  * 
  * @param AddBuffPopUpText
  * @desc 有利なステート付加時の共通ポップアップテキスト。(%1:能力値名)
  * @text 有利ステート付加時ポップアップテキスト
  * @type string
  * @default %1上昇
+ * @parent StatePopUpSetting
  * 
  * @param AddDebuffPopUpText
  * @desc 不利なステート付加時の共通ポップアップテキスト。(%1:能力値名)
  * @text 不利ステート付加時ポップアップテキスト
  * @type string
  * @default %1低下
+ * @parent StatePopUpSetting
  * 
  * @param RemovedBuffPopUpText
  * @desc 有利なステート解除時の共通ポップアップテキスト。(%1:能力値名)
  * @text 有利ステート解除時ポップアップテキスト
  * @type string
  * @default %1上昇
+ * @parent StatePopUpSetting
  * 
  * @param RemovedDebuffPopUpText
  * @desc 不利なステート解除時の共通ポップアップテキスト。(%1:能力値名)
  * @text 不利ステート解除時ポップアップテキスト
  * @type string
  * @default %1低下
+ * @parent StatePopUpSetting
+ * 
+ * @param BuffPopUpSetting
+ * @text バフ、デバフのポップアップ
+ * @default ------------------------------
+ * 
+ * @param PopUpBuff
+ * @text ポップアップバフ設定
+ * @desc ポップアップするバフの設定をします。
+ * @default ["{\"StateType\":\"0\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"1\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"2\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"3\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"4\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"5\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"6\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"7\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"10\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"11\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"12\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"13\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"14\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"15\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"16\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"17\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}"]
+ * @type struct<PopUpBuffList>[]
+ * @parent BuffPopUpSetting
+ * 
+ * @param DefeatPopUpSetting
+ * @text 撃破時のポップアップ
+ * @default ------------------------------
+ * 
+ * @param DefeatShowPopup
+ * @text 撃破時ポップアップ表示
+ * @desc 撃破時のポップアップを表示します。
+ * @type boolean
+ * @default false
+ * @parent DefeatPopUpSetting
+ * 
+ * @param DefeatPopUpText
+ * @desc 撃破時のポップアップテキスト。
+ * @text 撃破時ポップアップテキスト
+ * @type string
+ * @default 撃破！
+ * @parent DefeatPopUpSetting
+ * 
+ * @param DefeatPopupColor
+ * @desc 撃破時のポップアップカラー(システムカラーまたはカラーコード(テキストタブ))
+ * @text 撃破時ポップアップ文字色
+ * @type number
+ * @default 0
+ * @parent DefeatPopUpSetting
+ * 
+ * @param DefeatPopupIconIndex
+ * @desc 撃破時ポップアップのアイコンID
+ * @text 撃破時ポップアップアイコンID
+ * @type number
+ * @default 0
+ * @parent DefeatPopUpSetting
  * 
  * @param StealPopupSetting
- * @text 盗み設定(要NUUN_StealableItemsル)
+ * @text 盗み設定(要NUUN_StealableItems)
  * @default ------------------------------
  * 
  * @param StealPopUpValid
@@ -286,8 +339,8 @@ Imported.NUUN_popUp = true;
   const parameters = PluginManager.parameters('NUUN_popUp');
   const PopUpMode = eval(parameters['PopUpMode']) || 'default';
   const PopUpBuff = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopUpBuff'])) : null) || [];
-  const StateColor = Number(parameters['StateColor'] || 0);
-  const BatStateColor = Number(parameters['BatStateColor'] || 0);
+  const StateColor = (DataManager.nuun_structureData(parameters['StateColor'])) || 0;
+  const BatStateColor = (DataManager.nuun_structureData(parameters['BatStateColor'])) || 0;
   const PopUpReleaseOpacity = Number(parameters['PopUpReleaseOpacity'] || 128);
   const PopUpUpInterval = Number(parameters['PopUpUpInterval'] || 30);
   const DeadNoPopup = eval(parameters['DeadNoPopup'] || 'false');
@@ -300,6 +353,10 @@ Imported.NUUN_popUp = true;
   const AddDebuffPopUpText = String(parameters['AddDebuffPopUpText'] || '%1低下');
   const RemovedBuffPopUpText = String(parameters['RemovedBuffPopUpText'] || '%1上昇');
   const RemovedDebuffPopUpText = String(parameters['RemovedDebuffPopUpText'] || '%1低下');
+  const DefeatShowPopup = eval(parameters['DefeatShowPopup'] || 'false');
+  const DefeatPopUpText = String(parameters['DefeatPopUpText'] || '撃破!');
+  const DefeatPopupColor = (DataManager.nuun_structureData(parameters['DefeatPopupColor'])) || 0;
+  const DefeatPopupIconIndex = Number(parameters['DefeatPopupIconIndex'] || 0);
   const StealPopUpValid = eval(parameters['StealPopUpValid'] || 'false');
   const StealPopUpText = String(parameters['StealPopUpText'] || '%1Get');
   const StolenPopUpText = String(parameters['StolenPopUpText'] || '%1Lost');
@@ -376,6 +433,16 @@ Imported.NUUN_popUp = true;
     return id < 10 ? (this.result().buffsLevel[id] - 1) : Math.abs(this.result().buffsLevel[id - 10]) - 1;
   };
 
+  const _Game_BattlerBase_die = Game_BattlerBase.prototype.die;
+  Game_BattlerBase.prototype.die = function() {
+    _Game_BattlerBase_die.call(this);
+    this.result().defeatPopup = true;
+  };
+
+  Game_Battler.prototype.shouldPopupDefeat = function() {
+    return !!this._result.defeatPopup;
+  };
+
   const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
   Game_ActionResult.prototype.clear = function() {
     _Game_ActionResult_clear.call(this);
@@ -383,6 +450,7 @@ Imported.NUUN_popUp = true;
     this.removedPositiveBuffs = [];
     this.removedDebuffs = [];
     this.buffsLevel = [0, 0, 0, 0, 0, 0, 0, 0];
+    this.defeatPopup = false;
   };
 
   const _Game_ActionResult_pushRemovedBuff = Game_ActionResult.prototype.pushRemovedBuff;
@@ -425,9 +493,21 @@ Imported.NUUN_popUp = true;
     if (target.result().isStatusAffected()) {
       this.displayPopUpState(target);
     }
+    if (DefeatShowPopup && target.shouldPopupDefeat()) {
+      this.displayAffectedDefeat(target);
+    }
     nuunPopup = true;
     _Window_BattleLog_displayAffectedStatus.call(this, target);
     nuunPopup = false;
+  };
+
+  Window_BattleLog.prototype.displayAffectedDefeat = function(target) {
+    const popupData = initPopUpData();
+    popupData.name = DefeatPopUpText;
+    popupData.color = DefeatPopupColor;
+    popupData.id = 0;
+    popupData.iconIndex = DefeatPopupIconIndex;
+    this.push('nuun_popupState', target, popupData);
   };
   
   Window_BattleLog.prototype.displayPopUpState = function(target) {

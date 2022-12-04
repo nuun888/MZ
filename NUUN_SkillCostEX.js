@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost EX
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * You can set various costs for skill costs.
@@ -48,8 +48,16 @@
  * [num]:For no consumption, 1 for lost
  * Game variable consumption skill
  * <SkillVarCost:[id],[cost]> Consume from the value set in the game variable.
+ * <SkillVarCost:6,3> Consumes 3 from the value of game variable number 6.
  * [id]:Game variable ID
  * [cost]:Consumption cost
+ * <SkillVarCostR:[id],[max],[rate]> Consumes [rate]% of [max] from the value set in the game variable.
+ * If [max] is 0, consume [rate]% from the current value.
+ * <SkillVarCostR:5,0,30> Consumes 30% from the current value of game variable number 5.
+ * <SkillVarCostR:5,100,30> Consumes 30% of the maximum (100) from the value of game variable number 5.
+ * [id]:Game variable ID
+ * [max]:Max value
+ * [rate]:Percent Consumption Cost (%)
  * Evaluation formula
  * <SkillEvalCost:[eval]> Enter the evaluation formula for judging consumption.
  * <SkillEvalCons:[eval]> Enter the evaluation formula for consumption.
@@ -70,6 +78,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/4/2022 Ver.1.2.0
+ * Added a cost that can be consumed as a percentage from a game variable.
  * 11/25/2022 Ver.1.1.1
  * Added MP skill cost. (Cost can be set to 10000 or more)
  * Changed the display in languages other than Japanese to English.
@@ -84,7 +94,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -122,8 +132,16 @@
  * [num]:0で消費なし、1で消失
  * ゲーム変数消費スキル
  * <SkillVarCost:[id],[cost]> ゲーム変数に設定した数値から消費します。
+ * <SkillVarCost:6,3> ゲーム変数6番の値から3消費します。
  * [id]:ゲーム変数ID
  * [cost]:消費コスト
+ * <SkillVarCostR:[id],[max],[rate]> ゲーム変数に設定した数値から[max]の[rate]%を消費します。
+ * [max]が0の場合は、現在の値から[rate]%を消費します。
+ * <SkillVarCostR:5,0,30> ゲーム変数5番の現在の値から30%消費します。
+ * <SkillVarCostR:5,100,30> ゲーム変数5番の値から最大(100)の30%を消費します。
+ * [id]:ゲーム変数ID
+ * [max]:最大
+ * [rate]:割合消費コスト(%)
  * 評価式
  * <SkillEvalCost:[eval]> 消費を判定するための評価式を記入します。
  * <SkillEvalCons:[eval]> 消費するための評価式を記入します。
@@ -143,6 +161,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/4 Ver.1.2.0
+ * ゲーム変数から割合で消費できるコストを追加。
  * 2022/11/25 Ver.1.1.1
  * MPのスキルコストを追加。(コストを10000以上設定できます)
  * 日本語以外での表示を英語表示に変更。
@@ -214,6 +234,10 @@ Game_BattlerBase.prototype.skillVarCost = function(skill) {
     return skill.meta.SkillVarCost ? skill.meta.SkillVarCost.split(',').map(Number) : null;
 };
 
+Game_BattlerBase.prototype.skillVarCostR = function(skill) {
+    return skill.meta.SkillVarCostR ? skill.meta.SkillVarCostR.split(',').map(Number) : null;
+};
+
 Game_BattlerBase.prototype.skillExpCost = function(skill) {
     let cost = 0;
     if (this.isActor()) {
@@ -249,6 +273,7 @@ Game_BattlerBase.prototype.canPaySkillCost = function(skill) {
         this.canSkillItemCost(skill) &&
         this.canSkillEquipCost(skill) &&
         this.canSkillVarCost(skill) && 
+        this.canSkillVarCostR(skill) &&
         this.canSkillEvalCost(skill))
 };
 
@@ -297,6 +322,18 @@ Game_BattlerBase.prototype.canSkillVarCost = function(skill) {
     return cost ? $gameVariables.value(cost[0]) >= cost[1] : true;
 };
 
+Game_BattlerBase.prototype.canSkillVarCostR = function(skill) {
+    const cost = this.skillVarCostR(skill);
+    if (cost) {
+        if (cost[1] > 0) {
+            return $gameVariables.value(cost[0]) >= Math.floor(cost[1] * cost[2] / 100);
+        } else {
+            return $gameVariables.value(cost[0]) >= Math.floor($gameVariables.value(cost[0]) * cost[2] / 100);
+        }
+    }
+    return true;
+};
+
 Game_BattlerBase.prototype.canSkillEvalCost = function(skill) {
     return skill.meta.SkillEvalCost ? eval(skill.meta.SkillEvalCost) : true;
 };
@@ -311,6 +348,7 @@ Game_BattlerBase.prototype.paySkillCost = function(skill) {
     this.paySkillItemCost(skill);
     this.paySkillEquipCost(skill);
     this.paySkillVarCost(skill);
+    this.paySkillVarCostR(skill);
     this.paySkillEvalCost(skill);
 };
 
@@ -342,10 +380,35 @@ Game_BattlerBase.prototype.paySkillVarCost = function(skill) {
     }
 };
 
+Game_BattlerBase.prototype.paySkillVarCostR = function(skill) {
+    const cost = this.skillVarCostR(skill);
+    if (cost) {
+        const val = $gameVariables.value(cost[0]) - this.getSkillVarCostR(skill);
+        $gameVariables.setValue(cost[0], val);
+    }
+};
+
 Game_BattlerBase.prototype.paySkillEvalCost = function(skill) {
     if (skill.meta.SkillEvalCons) {
         eval(skill.meta.SkillEvalCons);
     }
+};
+
+Game_BattlerBase.prototype.getSkillVarCost = function(skill) {
+    const cost = this.skillVarCost(skill);
+    return cost ? cost[1] : 0;
+};
+
+Game_BattlerBase.prototype.getSkillVarCostR = function(skill) {
+    const cost = this.skillVarCostR(skill);
+    if (cost) {
+        if (cost[1] > 0) {
+            return Math.floor(cost[1] * cost[2] / 100);
+        } else {
+            return Math.floor($gameVariables.value(cost[0]) * cost[2] / 100);
+        }
+    }
+    return 0;
 };
 
 function getCostItems(skill) {

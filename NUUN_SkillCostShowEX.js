@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost display EX
  * @author NUUN
- * @version 1.0.2
+ * @version 1.1.0
  * @base NUUN_Base
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_Base
@@ -22,15 +22,38 @@
  * or Cost evaluation formula, enter the cost evaluation formula.
  * To display the cost of the party limit gauge, enter 'limitCost' in the cost display target and enter "this._actor.skillLimitCost(skill)" in the cost evaluation formula.
  * skill：Skill data to activate
- * this._actor：this._actor or actor: actor game data
+ * actor:Actor game data
+ * cost:Cost(Equipment consumption and evaluation formulas are returned as true/false values.)
  * 
  * For the color setting, normally enter the system color.
  * You can enter the color code from the text tab.
+ * 
+ * Individual display cost settings.
+ * skill notes
+ * <SkillCostEval:[eval]> You can define the format to display.
+ * [eval]:Evaluation formula
+ * actor:Actor game data
+ * skill:Activated skill data
+ * cost:Cost(Equipment consumption and evaluation formulas are returned as true/false values.)
+ * 
+ * Cost data reference
+ * HP, MP, TP, Gold, Exp are obtained by cost value.
+ * If the consumption MP is 50, 50 will be substituted for the cost value.
+ * Other costs are retrieved in an array.
+ * cost[id]: Get the value of the [id] number of the acquisition tag.
+ * From the : of each tag, the order is 0, 1, 2... from the left.
+ * In the case of item consumption <SkillItemCost: No.0, No.1, No.2> If you specify cost[2], you will get the number of consumption.
+ * 
+ * Prefixes and suffixes are not applied to consumption skills that have a cost evaluation formula defined.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/4/2022 Ver.1.1.0
+ * Changed the specifications of the cost evaluation formula for individual cost settings other than HP, MP, TP, Gold, and Exp.
+ * Changed the specification of the cost display target in the order of skill cost display.
+ * Applies cost evaluation formula to all consumption costs.
  * 11/25/2022 Ver.1.0.2
  * Fixed so that actor's game data acquisition parameter can be acquired by actor.
  * Changed the display in languages other than Japanese to English.
@@ -42,7 +65,7 @@
  * @param CostOrderSetting
  * @text Display order of skill cost
  * @desc Set the display order of skill costs. Costs set at the top are displayed later.
- * @default ["{\"CostOrderSelect\":\"[\\\"'Exp'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'Gold'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'TP'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'MP'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'HP'\\\"]\"}"]
+ * @default ["{\"CostOrderSelect\":\"'Exp'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'Gold'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'TP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'MP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'HP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}"]
  * @type struct<CostOrderSettingList>[]
  * 
  * @param CostWidth
@@ -245,7 +268,7 @@
  * @param CostOrderSelect
  * @text Cost display target
  * @desc Set the display target of the cost. When specifying other than HP, MP, TP, Gold, Exp, please enter the corresponding cost tag name.
- * @type combo[]
+ * @type combo
  * @option 'HP'
  * @option 'MP'
  * @option 'TP'
@@ -279,7 +302,12 @@
  * @param CostEval
  * @text Cost evaluation formula
  * @desc An evaluation formula for calculating the cost. Specify a function to get the cost.
- * @type string
+ * @type combo
+ * @option 'skill.meta.SkillItemCost.split(',')[2];//Consumed items'
+ * @option '$gameParty.numItems(actor.skillItemCost(skill)[0].item);//Possession of consumable items'
+ * @option 'actor.getSkillVarCost(skill);//Consumed number of game variables'
+ * @option 'actor.getSkillVarCostR(skill);//Percentage consumption of game variables'
+ * @option '$gameVariables.value(0)'
  * @default 
  * 
  */
@@ -287,7 +315,7 @@
  * @target MZ
  * @plugindesc スキルコスト表示拡張
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_Base
@@ -300,15 +328,37 @@
  * コスト評価式はコストの評価式を記入します。
  * パーティリミットゲージのコストを表示する場合はコスト表示対象に'limitCost'を記入し、
  * コスト評価式にthis._actor.skillLimitCost(skill)と記入してください。
+ * actor：アクターデータ
  * skill：発動するスキルデータ
- * this._actorまたはactor：アクターデータ
+ * cost:コスト　装備消費と評価式は真偽値で返します。
  * 
  * 色の設定は通常システムカラーを記入しますが、テキストタブからカラーコードを記入できます。
+ * 
+ * 表示コストの個別設定。
+ * スキルのメモ欄
+ * <SkillCostEval:[eval]> 表示するフォーマットを定義できます。
+ * [eval]:評価式
+ * actor:アクターのゲームデータ
+ * skill:発動するスキルデータ
+ * cost:コスト　装備消費と評価式は真偽値で返します。
+ * 
+ * コストのデータ参照　コスト評価式及び表示コストの個別設定共通
+ * HP、MP、TP、Gold、Expはコスト値で取得されます。
+ * 消費MPが50の場合は、costの値に50が代入されます。
+ * それ以外のコストは配列で取得されます。
+ * cost[id]:取得タグの[id]番の値を取得します。各タグの:から左から順位0,1,2...となります。
+ * アイテム消費の場合は<SkillItemCost:0番,1番,2番> cost[2]を指定した場合は消費個数を取得します。
+ * 
+ * コストの評価式が定義してある消費スキルは接頭語、接尾語が適用されません。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/29 Ver.1.1.0
+ * HP、MP、TP、Gold、Exp以外のコスト個別設定のコスト評価式の仕様を変更。
+ * スキルコスト表示順のコスト表示対象の仕様を変更。
+ * コスト評価式の適用を全ての消費コストに適用。
  * 2022/11/25 Ver.1.0.2
  * アクターのゲームデータの取得パラメータをactorで取得できるように修正。
  * 日本語以外での表示を英語表示に変更。
@@ -320,7 +370,7 @@
  * @param CostOrderSetting
  * @text スキルコストの表示順
  * @desc スキルコストの表示順の設定を行います。上の設定ほど後ろに表示されます。
- * @default ["{\"CostOrderSelect\":\"[\\\"'Exp'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'Gold'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'TP'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'MP'\\\"]\"}","{\"CostOrderSelect\":\"[\\\"'HP'\\\"]\"}"]
+ * @default ["{\"CostOrderSelect\":\"'Exp'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'Gold'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'TP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'MP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'HP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}"]
  * @type struct<CostOrderSettingList>[]
  * 
  * @param CostWidth
@@ -523,7 +573,7 @@
  * @param CostOrderSelect
  * @text コスト表示対象
  * @desc コストの表示対象を設定します。HP、MP、TP、Gold、Exp以外を指定する場合は該当のコストタグ名を記入してください。
- * @type combo[]
+ * @type combo
  * @option 'HP'
  * @option 'MP'
  * @option 'TP'
@@ -557,7 +607,12 @@
  * @param CostEval
  * @text コスト評価式
  * @desc コストを算出するための評価式。コストを取得する関数を指定してください。
- * @type string
+ * @type combo
+ * @option 'skill.meta.SkillItemCost.split(",")[2];//消費アイテム数'
+ * @option '$gameParty.numItems(actor.skillItemCost(skill)[0].item);//消費アイテムの所持数'
+ * @option 'actor.getSkillVarCost(skill);//ゲーム変数の消費数'
+ * @option 'actor.getSkillVarCostR(skill);//ゲーム変数の割合消費'
+ * @option '$gameVariables.value(0)'
  * @default 
  * 
  */
@@ -599,35 +654,37 @@ Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//再�
     CostOrderSetting.forEach(type => {
         if (type.CostOrderSelect == 'HP') {
             if (this._actor.skillHpCost(skill)) {
-                x = this.drawHpCost(skill, x, y, width);
+                x = this.drawHpCost(skill, x, y, width, type);
                 count++;
             }
         } else if (type.CostOrderSelect == 'MP') {
             if (this._actor.skillMpCost(skill)) {
-                x = this.drawMpCost(skill, x, y, width);
+                x = this.drawMpCost(skill, x, y, width, type);
                 count++;
             }
         } else if (type.CostOrderSelect == 'TP') {
             if (this._actor.skillTpCost(skill)) {
-                x = this.drawTpCost(skill, x, y, width);
+                x = this.drawTpCost(skill, x, y, width, type);
                 count++;
             }
         } else if (type.CostOrderSelect == 'Gold') {
             if (this._actor.skillGoldCost(skill)) {
-                x = this.drawGoldCost(skill, x, y, width);
+                x = this.drawGoldCost(skill, x, y, width, type);
                 count++;
             }
         } else if (type.CostOrderSelect == 'Exp') {
             if (this._actor.skillExpCost(skill)) {
-                x = this.drawExpCost(skill, x, y, width);
+                x = this.drawExpCost(skill, x, y, width, type);
                 count++;
             }
         } else if (type.CostOrderSelect) {
             if (skill.meta[type.CostOrderSelect]) {
                 const actor = this._actor;
-                const cost = eval(type.CostEval);
-                if (cost) {
-                    x = this.drawOrderCost(skill, cost, type, x, y, width);
+                const cost = this.getEvalCost(actor, String(type.CostOrderSelect), skill);
+                const evalData = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
+                const costText = eval(evalData);
+                if (costText) {
+                    x = this.drawOrderCost(skill, costText, type, x, y, width);
                     count++; 
                 }
             }
@@ -635,77 +692,132 @@ Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//再�
     });
 };
 
-Window_SkillList.prototype.drawHpCost = function(skill, x, y, width) {
+Window_SkillList.prototype.getEvalCost = function(actor, tag, skill) {
+    switch (tag) {
+        case 'SkillItemCost':
+           return actor.skillItemCost(skill);
+        case 'SkillEquipCost':
+            return actor.skillEquipCost(skill);
+        case 'SkillVarCost':
+            return actor.skillVarCost(skill);
+        case 'SkillVarCostR':
+            return actor.skillVarCostR(skill);
+        case 'SkillEvalCost':
+            return actor.canSkillEvalCost(skill);
+    }
+};
+
+Window_SkillList.prototype.drawHpCost = function(skill, x, y, width, type) {
     if (count > 0) {
         x -= this.drawCostConnection(x, y, width);
     }
     const cost = this._actor.skillHpCost(skill);
     this.setCostColor(HPCostColor);
-    x -= this.drawCostSuffix(HPSuffix, x, y, width);
-    this.contents.fontSize = CostFontSize;
-    this.drawText(cost, x, y + CostY, width, "right");
-    x -= this.textWidth(cost);
-    x -= this.drawCostPrefix(HPPrefix, x, y, width);
+    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
+    if (evalCost) {
+        const actor = this._actor;
+        const costText = eval(evalCost);
+        this.drawText(costText, x, y + CostY, width, "right");
+        x -= this.textWidth(costText);
+    } else {
+        x -= this.drawCostSuffix(HPSuffix, x, y, width);
+        this.contents.fontSize = CostFontSize;
+        this.drawText(cost, x, y + CostY, width, "right");
+        x -= this.textWidth(cost);
+        x -= this.drawCostPrefix(HPPrefix, x, y, width);
+    }
     this.contents.fontSize = $gameSystem.mainFontSize();
     return x;
 };
 
-Window_SkillList.prototype.drawMpCost = function(skill, x, y, width) {
+Window_SkillList.prototype.drawMpCost = function(skill, x, y, width, type) {
     if (count > 0) {
         x -= this.drawCostConnection(x, y, width);
     }
     const cost = this._actor.skillMpCost(skill);
     this.setCostColor(MPCostColor);
-    x -= this.drawCostSuffix(MPSuffix, x, y, width);
-    this.contents.fontSize = CostFontSize;
-    this.drawText(cost, x, y + CostY, width, "right");
-    x -= this.textWidth(cost);
-    x -= this.drawCostPrefix(MPPrefix, x, y, width);
+    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
+    if (evalCost) {
+        const actor = this._actor;
+        const costText = eval(evalCost);
+        this.drawText(costText, x, y + CostY, width, "right");
+        x -= this.textWidth(costText);
+    } else {
+        x -= this.drawCostSuffix(MPSuffix, x, y, width);
+        this.contents.fontSize = CostFontSize;
+        this.drawText(cost, x, y + CostY, width, "right");
+        x -= this.textWidth(cost);
+        x -= this.drawCostPrefix(MPPrefix, x, y, width);
+    }
     this.contents.fontSize = $gameSystem.mainFontSize();
     return x;
 };
 
-Window_SkillList.prototype.drawTpCost = function(skill, x, y, width) {
+Window_SkillList.prototype.drawTpCost = function(skill, x, y, width, type) {
     if (count > 0) {
         x -= this.drawCostConnection(x, y, width);
     }
     const cost = this._actor.skillTpCost(skill);
     this.setCostColor(TPCostColor);
-    x -= this.drawCostSuffix(TPSuffix, x, y, width);
-    this.contents.fontSize = CostFontSize;
-    this.drawText(cost, x, y + CostY, width, "right");
-    x -= this.textWidth(cost);
-    x -= this.drawCostPrefix(TPPrefix, x, y, width);
+    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
+    if (evalCost) {
+        const actor = this._actor;
+        const costText = eval(evalCost);
+        this.drawText(costText, x, y + CostY, width, "right");
+        x -= this.textWidth(costText);
+    } else {
+        x -= this.drawCostSuffix(TPSuffix, x, y, width);
+        this.contents.fontSize = CostFontSize;
+        this.drawText(cost, x, y + CostY, width, "right");
+        x -= this.textWidth(cost);
+        x -= this.drawCostPrefix(TPPrefix, x, y, width);
+    }
     this.contents.fontSize = $gameSystem.mainFontSize();
     return x;
 };
 
-Window_SkillList.prototype.drawGoldCost = function(skill, x, y, width) {
+Window_SkillList.prototype.drawGoldCost = function(skill, x, y, width, type) {
     if (count > 0) {
         x -= this.drawCostConnection(x, y, width);
     }
     const cost = this._actor.skillGoldCost(skill);
     this.setCostColor(GoldCostColor);
-    x -= this.drawCostSuffix(GoldSuffix, x, y, width);
-    this.contents.fontSize = CostFontSize;
-    this.drawText(cost, x, y + CostY, width, "right");
-    x -= this.textWidth(cost);
-    x -= this.drawCostPrefix(GoldPrefix, x, y, width);
+    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
+    if (evalCost) {
+        const actor = this._actor;
+        const costText = eval(evalCost);
+        this.drawText(costText, x, y + CostY, width, "right");
+        x -= this.textWidth(costText);
+    } else {
+        x -= this.drawCostSuffix(GoldSuffix, x, y, width);
+        this.contents.fontSize = CostFontSize;
+        this.drawText(cost, x, y + CostY, width, "right");
+        x -= this.textWidth(cost);
+        x -= this.drawCostPrefix(GoldPrefix, x, y, width);
+    }
     this.contents.fontSize = $gameSystem.mainFontSize();
     return x;
 };
 
-Window_SkillList.prototype.drawExpCost = function(skill, x, y, width) {
+Window_SkillList.prototype.drawExpCost = function(skill, x, y, width, type) {
     if (count > 0) {
         x -= this.drawCostConnection(x, y, width);
     }
     const cost = this._actor.skillExpCost(skill);
     this.setCostColor(ExpCostColor);
-    x -= this.drawCostSuffix(ExpSuffix, x, y, width);
-    this.contents.fontSize = CostFontSize;
-    this.drawText(cost, x, y + CostY, width, "right");
-    x -= this.textWidth(cost);
-    x -= this.drawCostPrefix(ExpPrefix, x, y, width);
+    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
+    if (evalCost) {
+        const actor = this._actor;
+        const costText = eval(evalCost);
+        this.drawText(costText, x, y + CostY, width, "right");
+        x -= this.textWidth(costText);
+    } else {
+        x -= this.drawCostSuffix(ExpSuffix, x, y, width);
+        this.contents.fontSize = CostFontSize;
+        this.drawText(cost, x, y + CostY, width, "right");
+        x -= this.textWidth(cost);
+        x -= this.drawCostPrefix(ExpPrefix, x, y, width);
+    }
     this.contents.fontSize = $gameSystem.mainFontSize();
     return x;
 };

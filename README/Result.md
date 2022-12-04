@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.2.11
+# Ver.2.2.12
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,8 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2022/12/4 Ver.2.2.12  
+日本語以外での表示を英語表示に変更。  
 2022/11/1 Ver.2.2.11  
 レベルアップ時に表示される文字を画像で表示する機能を追加。  
 2022/10/23 Ver.2.2.10  

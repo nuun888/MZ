@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -36,11 +36,15 @@
  * 仕様
  * 戦闘行動結果ポップアッププラグインと併用時、このプラグインを戦闘行動結果ポップアッププラグインより下に設定した場合、ステート、バフのポップアップ
  * はこのプラグインでの表示になります。
+ * 各ポップアップ毎にポップアップの種類を変えたい場合は、各ポップアッププラグインの適用クラスから'Sprite_PopUpEX'を外してください。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/6 Ver 1.3.1
+ * 指定のポップアップで表示する機能を追加。
+ * 座標、フォントサイズを設定できる機能を追加。
  * 2022/12/4 Ver 1.3.0
  * 撃破したときのポップアップを表示する機能を追加。
  * カラーコードを正常に取得できない問題を修正。
@@ -148,32 +152,35 @@
  * @default %1
  * @parent StatePopUpSetting
  * 
- * @param AddBuffPopUpText
- * @desc 有利なステート付加時の共通ポップアップテキスト。(%1:能力値名)
- * @text 有利ステート付加時ポップアップテキスト
- * @type string
- * @default %1上昇
+ * @param StatePopupMode
+ * @text 適用するポップアッププラグイン
+ * @desc 適用させるポップアッププラグインを指定をします。
+ * @default 
+ * @type struct<PopupMode>
  * @parent StatePopUpSetting
  * 
- * @param AddDebuffPopUpText
- * @desc 不利なステート付加時の共通ポップアップテキスト。(%1:能力値名)
- * @text 不利ステート付加時ポップアップテキスト
- * @type string
- * @default %1低下
+ * @param StatePopupEnemyX
+ * @desc 敵ポップアップX座標(相対)
+ * @text 敵ポップアップX座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent StatePopUpSetting
  * 
- * @param RemovedBuffPopUpText
- * @desc 有利なステート解除時の共通ポップアップテキスト。(%1:能力値名)
- * @text 有利ステート解除時ポップアップテキスト
- * @type string
- * @default %1上昇
+ * @param StatePopupEnemyY
+ * @desc 敵ポップアップY座標(相対)
+ * @text 敵ポップアップY座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent StatePopUpSetting
  * 
- * @param RemovedDebuffPopUpText
- * @desc 不利なステート解除時の共通ポップアップテキスト。(%1:能力値名)
- * @text 不利ステート解除時ポップアップテキスト
- * @type string
- * @default %1低下
+ * @param StatePopupFontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ
+ * @type number
+ * @default 4
+ * @min -99
  * @parent StatePopUpSetting
  * 
  * @param BuffPopUpSetting
@@ -185,6 +192,65 @@
  * @desc ポップアップするバフの設定をします。
  * @default ["{\"StateType\":\"0\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"1\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"2\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"3\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"4\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"5\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"6\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"7\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"10\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"11\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"12\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"13\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"14\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"15\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"16\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"17\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}"]
  * @type struct<PopUpBuffList>[]
+ * @parent BuffPopUpSetting
+ * 
+ * @param AddBuffPopUpText
+ * @desc バフ付加時の共通ポップアップテキスト。(%1:能力値名)
+ * @text バフ付加時ポップアップテキスト
+ * @type string
+ * @default %1上昇
+ * @parent BuffPopUpSetting
+ * 
+ * @param AddDebuffPopUpText
+ * @desc デバフ付加時の共通ポップアップテキスト。(%1:能力値名)
+ * @text デバフ付加時ポップアップテキスト
+ * @type string
+ * @default %1低下
+ * @parent BuffPopUpSetting
+ * 
+ * @param RemovedBuffPopUpText
+ * @desc バフ解除時の共通ポップアップテキスト。(%1:能力値名)
+ * @text バフ解除時ポップアップテキスト
+ * @type string
+ * @default %1上昇
+ * @parent BuffPopUpSetting
+ * 
+ * @param RemovedDebuffPopUpText
+ * @desc デバフ解除時の共通ポップアップテキスト。(%1:能力値名)
+ * @text デバフ解除時ポップアップテキスト
+ * @type string
+ * @default %1低下
+ * @parent BuffPopUpSetting
+ * 
+ * @param BuffDebuffPopupMode
+ * @text 適用するポップアッププラグイン
+ * @desc 適用させるポップアッププラグインを指定をします。
+ * @default 
+ * @type struct<PopupMode>
+ * @parent BuffPopUpSetting
+ * 
+ * @param BuffDebuffPopupEnemyX
+ * @desc 敵ポップアップX座標(相対)
+ * @text 敵ポップアップX座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BuffPopUpSetting
+ * 
+ * @param BuffDebuffPopupEnemyY
+ * @desc 敵ポップアップY座標(相対)
+ * @text 敵ポップアップY座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BuffPopUpSetting
+ * 
+ * @param BuffDebuffPopupFontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ
+ * @type number
+ * @default 4
+ * @min -99
  * @parent BuffPopUpSetting
  * 
  * @param DefeatPopUpSetting
@@ -217,6 +283,37 @@
  * @text 撃破時ポップアップアイコンID
  * @type number
  * @default 0
+ * @parent DefeatPopUpSetting
+ * 
+ * @param DefeatPopupMode
+ * @text 適用するポップアッププラグイン
+ * @desc 適用させるポップアッププラグインを指定をします。
+ * @default 
+ * @type struct<PopupMode>
+ * @parent DefeatPopUpSetting
+ * 
+ * @param DefeatPopupEnemyX
+ * @desc 敵ポップアップX座標(相対)
+ * @text 敵ポップアップX座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent DefeatPopUpSetting
+ * 
+ * @param DefeatPopupEnemyY
+ * @desc 敵ポップアップY座標(相対)
+ * @text 敵ポップアップY座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent DefeatPopUpSetting
+ * 
+ * @param DefeatPopupFontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ
+ * @type number
+ * @default 4
+ * @min -99
  * @parent DefeatPopUpSetting
  * 
  * @param StealPopupSetting
@@ -256,6 +353,37 @@
  * @text お金盗まれ時ポップアップテキスト
  * @type string
  * @default %1Lost
+ * @parent StealPopupSetting
+ * 
+ * @param StealPopupMode
+ * @text 適用するポップアッププラグイン
+ * @desc 適用させるポップアッププラグインを指定をします。
+ * @default 
+ * @type struct<PopupMode>
+ * @parent StealPopupSetting
+ * 
+ * @param StealPopupEnemyX
+ * @desc 敵ポップアップX座標(相対)
+ * @text 敵ポップアップX座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent StealPopupSetting
+ * 
+ * @param StealPopupEnemyY
+ * @desc 敵ポップアップY座標(相対)
+ * @text 敵ポップアップY座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent StealPopupSetting
+ * 
+ * @param StealPopupFontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ
+ * @type number
+ * @default 4
+ * @min -99
  * @parent StealPopupSetting
  * 
  */
@@ -332,6 +460,20 @@
  * @default 0
  * 
  */
+/*~struct~PopupMode:
+ * 
+ * @param Mode
+ * @text 適用ポップアップ設定
+ * @desc 適用するポップアップスプラグインを指定します。
+ * @type combo
+ * @option 'Default'
+ * @option 'LateralBoundPopUp'
+ * @option 'UpFadeoutPopup'
+ * @option 'SlideFadeoutPopup'
+ * @default 'Default'
+ * 
+ * 
+ */
 var Imported = Imported || {};
 Imported.NUUN_popUp = true;
 
@@ -362,6 +504,22 @@ Imported.NUUN_popUp = true;
   const StolenPopUpText = String(parameters['StolenPopUpText'] || '%1Lost');
   const StealGoldPopUpText = String(parameters['StealGoldPopUpText'] || '%1Get');
   const StolenGoldPopUpText = String(parameters['StolenGoldPopUpText'] || '%1Lost');
+  const StatePopupEnemyX = Number(parameters['StatePopupEnemyX'] || 0);
+  const StatePopupEnemyY = Number(parameters['StatePopupEnemyY'] || 0);
+  const BuffDebuffPopupEnemyX = Number(parameters['BuffDebuffPopupEnemyX'] || 0);
+  const BuffDebuffPopupEnemyY = Number(parameters['BuffDebuffPopupEnemyY'] || 0);
+  const DefeatPopupEnemyX = Number(parameters['DefeatPopupEnemyX'] || 0);
+  const DefeatPopupEnemyY = Number(parameters['DefeatPopupEnemyY'] || 0);
+  const StealPopupEnemyX = Number(parameters['StealPopupEnemyX'] || 0);
+  const StealPopupEnemyY = Number(parameters['StealPopupEnemyY'] || 0);
+  const StatePopupFontSize = Number(parameters['StatePopupFontSize'] || 4);
+  const BuffDebuffPopupFontSize = Number(parameters['BuffDebuffPopupFontSize'] || 4);
+  const DefeatPopupFontSize = Number(parameters['DefeatPopupFontSize'] || 4);
+  const StealPopupFontSize = Number(parameters['StealPopupFontSize'] || 4);
+  const StatePopupMode = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatePopupMode'])) : null) || [];
+  const BuffDebuffPopupMode = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BuffDebuffPopupMode'])) : null) || [];
+  const DefeatPopupMode = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DefeatPopupMode'])) : null) || [];
+  const StealPopupMode = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StealPopupMode'])) : null) || [];
   let nuunPopup = false;
 
   function initPopUpData() {
@@ -371,6 +529,10 @@ Imported.NUUN_popUp = true;
     popupData.id = 0;
     popupData.iconIndex = 0;
     popupData.opacity = 255;
+    popupData.mode = 'Default';
+    popupData.x = 0;
+    popupData.y = 0;
+    popupData.fontsize = 0;
     return popupData;
   };
 
@@ -507,6 +669,10 @@ Imported.NUUN_popUp = true;
     popupData.color = DefeatPopupColor;
     popupData.id = 0;
     popupData.iconIndex = DefeatPopupIconIndex;
+    popupData.mode = DefeatPopupMode.Mode;
+    popupData.x = DefeatPopupEnemyX;
+    popupData.y = DefeatPopupEnemyY;
+    popupData.fontsize = DefeatPopupFontSize;
     this.push('nuun_popupState', target, popupData);
   };
   
@@ -530,6 +696,10 @@ Imported.NUUN_popUp = true;
         popupData.color = this.setupStatePopUpColor(state);
         popupData.id = state.id;
         popupData.iconIndex = state.iconIndex;
+        popupData.mode = StatePopupMode.Mode;
+        popupData.x = StatePopupEnemyX;
+        popupData.y = StatePopupEnemyY;
+        popupData.fontsize = StatePopupFontSize;
         this.push('nuun_popupState', target, popupData);
       }
     }
@@ -546,6 +716,10 @@ Imported.NUUN_popUp = true;
         popupData.id = state.id;
         popupData.iconIndex = state.iconIndex;
         popupData.opacity = PopUpReleaseOpacity;
+        popupData.mode = StatePopupMode.Mode;
+        popupData.x = StatePopupEnemyX;
+        popupData.y = StatePopupEnemyY;
+        popupData.fontsize = StatePopupFontSize;
         this.push('nuun_popupState', target, popupData);
       }
     }
@@ -565,6 +739,10 @@ Imported.NUUN_popUp = true;
             popupData.color = this.setupBuffPopUpColor(id, find);
             popupData.id = id;
             popupData.iconIndex = target.popupBuffIconIndex(id);
+            popupData.mode = BuffDebuffPopupMode.Mode;
+            popupData.x = BuffDebuffPopupEnemyX;
+            popupData.y = BuffDebuffPopupEnemyY;
+            popupData.fontsize = BuffDebuffPopupFontSize;
             this.push('nuun_popupState', target, popupData);
           }
         }
@@ -586,6 +764,10 @@ Imported.NUUN_popUp = true;
           popupData.id = id;
           popupData.iconIndex = target.removePopupBuffIconIndex(id);
           popupData.opacity = PopUpReleaseOpacity;
+          popupData.mode = BuffDebuffPopupMode.Mode;
+          popupData.x = BuffDebuffPopupEnemyX;
+          popupData.y = BuffDebuffPopupEnemyY;
+          popupData.fontsize = BuffDebuffPopupFontSize;
           this.push('nuun_popupState', target, popupData);
         }
       }
@@ -599,6 +781,10 @@ Imported.NUUN_popUp = true;
       popupData.color = 0;
       popupData.id = item.id;
       popupData.iconIndex = item.iconIndex;
+      popupData.mode = StealPopupMode.Mode;
+      popupData.x = StealPopupEnemyX;
+      popupData.y = StealPopupEnemyY;
+      popupData.fontsize = StealPopupFontSize;
       this.push('nuun_popupState', target, popupData);
     }
   };
@@ -643,12 +829,15 @@ Imported.NUUN_popUp = true;
   Sprite_PopUpEX.prototype = Object.create(Sprite_Damage.prototype);
   Sprite_PopUpEX.prototype.constructor = Sprite_PopUpEX;
   
-  Sprite_PopUpEX.prototype.initialize = function() {
+  Sprite_PopUpEX.prototype.initialize = function(mode) {
+    this._popupMode = mode;
+    this.popupData = null;
     Sprite_Damage.prototype.initialize.call(this);
     //this._popupBitmap = null;
   };
 
   Sprite_PopUpEX.prototype.setup = function(battler) {
+    this.popupData = battler.getPopUpData();
     this.drawPopup(battler);
   };
 
@@ -668,7 +857,7 @@ Imported.NUUN_popUp = true;
   };
 
   Sprite_PopUpEX.prototype.drawPopup = function(battler) {
-    const popupData = battler.getPopUpData();
+    const popupData = this.popupData;
     if (popupData) {
       this.drawIcon(popupData);
       this.createPopUp(popupData);
@@ -721,6 +910,10 @@ Imported.NUUN_popUp = true;
     Sprite_Damage.prototype.update.call(this);
   };
 
+  Sprite_PopUpEX.prototype.fontSize = function() {
+    return $gameSystem.mainFontSize() + this.popupData.fontsize || 4;
+  };
+
   const _Sprite_Damage_updateOpacity = Sprite_Damage.prototype.updateOpacity;
   Sprite_Damage.prototype.updateOpacity = function() {
     if (this._setOpacity !== undefined) {
@@ -758,13 +951,15 @@ Imported.NUUN_popUp = true;
 
   Sprite_Battler.prototype.createStatePopupSprite = function() {
     const last = this._damages[this._damages.length - 1];
-    const sprite = new Sprite_PopUpEX();
+    const popupData = this._battler.getPopUpData();
+    const popupMode = getPopupClass(popupData.mode);
+    const sprite = new Sprite_PopUpEX(popupMode);
     if (last && PopUpMode === 'default') {
       sprite.x = last.x + 8;
       sprite.y = last.y - 16;
     } else {
-      sprite.x = this.x + this.damageOffsetX();
-      sprite.y = this.y + this.damageOffsetY();
+      sprite.x = this.x + this.damageOffsetX() + this.damagePopupOffsetX(popupData);
+      sprite.y = this.y + this.damageOffsetY() + this.damagePopupOffsetY(popupData);
     }
     if (last) {
       sprite.delay = this._damages.length * Math.max(PopUpUpInterval, 1);
@@ -777,5 +972,35 @@ Imported.NUUN_popUp = true;
     this.parent.addChild(sprite);
     this._popUpSprite = sprite;
   };
+
+  Sprite_Battler.prototype.damagePopupOffsetX = function() {
+    return 0;
+  };
+
+  Sprite_Battler.prototype.damagePopupOffsetY = function() {
+    return 0;
+  };
+
+  Sprite_Enemy.prototype.damagePopupOffsetX = function(data) {
+    return data.x || 0;
+  };
+
+  Sprite_Enemy.prototype.damagePopupOffsetY = function(data) {
+    return data.y || 0;
+  };
+
+  function getPopupClass(mode) {
+    switch (mode) {
+      case 'LateralBoundPopUp':
+        return 1;
+      case 'SlideFadeoutPopup':
+        return 2;
+      case 'UpFadeoutPopup':
+        return 3;
+      case 'Default':
+      default:
+        return 0;
+    }
+  }
 
 })();

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Follower standby member display
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Display waiting members to followers.
@@ -18,6 +18,9 @@
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
+ * 12/5/2022 Ver.1.0.1
+ * Changed follower collision judgment to judgment by switch.
+ * Added a switch that turns ON when all-way traffic is no longer possible and a function to call a common event.
  * 12/4/2022 Ver.1.0.0
  * First edition.
  * 
@@ -27,18 +30,30 @@
  * @type number
  * @default 10
  * 
- * @param FollowerCollided
- * @desc Perform collision detection on followers. You will no longer be able to slip through your followers.
- * @text Follower collision detection
- * @type boolean
- * @default false
+ * @param FollowerCollidedSwitch
+ * @desc Perform follower collision detection. By turning it ON, you will not be able to slip through the followers.
+ * @text Follower collision switch
+ * @type switch
+ * @default 0
+ * 
+ * @param AllCollidedSwitch
+ * @desc A switch ID that turns ON when traffic is no longer possible in all directions.
+ * @text 4-Way Impassable Switch
+ * @type switch
+ * @default 0
+ * 
+ * @param AllDirectionsCollidedOnCommonEvent
+ * @desc A common event that is called when it becomes impossible to pass in all directions.
+ * @text 4-Way Impassable Common Event
+ * @type common_event
+ * @default 0
  * 
  */
 /*:ja
  * @target MZ
  * @plugindesc 隊列控えメンバー表示
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 隊列に控えメンバーを表示します。
@@ -46,6 +61,9 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * 2022/12/5 Ver.1.0.1
+ * フォロワー衝突判定をスイッチでの判定に変更。
+ * 全方向通行できなくなったときにONにするスイッチ及び、コモンイベントを呼び出す機能を追加。
  * 2022/12/4 Ver.1.0.0
  * 初版
  * 
@@ -55,11 +73,23 @@
  * @type number
  * @default 10
  * 
- * @param FollowerCollided
- * @desc 隊列に衝突判定を行います。隊列をすり抜けることは出来なくなります。
- * @text 隊列衝突判定
- * @type boolean
- * @default false
+ * @param FollowerCollidedSwitch
+ * @desc フォロワーの衝突判定を行います。ONにすることでフォロワーをすり抜けることは出来なくなります。
+ * @text フォロワー衝突判定スイッチ
+ * @type switch
+ * @default 0
+ * 
+ * @param AllCollidedSwitch
+ * @desc 全方向通行できなくなった時にONにするスイッチID。
+ * @text 全方向通行不能スイッチ
+ * @type switch
+ * @default 0
+ * 
+ * @param AllDirectionsCollidedOnCommonEvent
+ * @desc 全方向通行できなくなった時に呼び出すコモンイベント。
+ * @text 全方向通行不能コモンイベント
+ * @type common_event
+ * @default 0
  * 
  */
 
@@ -69,7 +99,9 @@ Imported.NUUN_StandbyMemberFollowers = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_StandbyMemberFollowers');
     const MaxMembers = Number(parameters['MaxMembers'] || 10);
-    const FollowerCollided = eval(parameters['FollowerCollided'] || "false");
+    const FollowerCollidedSwitch = Number(parameters['FollowerCollidedSwitch'] || 0);
+    const AllCollidedSwitch = Number(parameters['AllCollidedSwitch'] || 0);
+    const AllDirectionsCollidedOnCommonEvent = Number(parameters['AllDirectionsCollidedOnCommonEvent'] || 0);
 
     Game_Followers.prototype.setup = function() {//再定義
         this._data = [];
@@ -99,7 +131,7 @@ Imported.NUUN_StandbyMemberFollowers = true;
     const _Game_CharacterBase_isCollidedWithCharacters = Game_CharacterBase.prototype.isCollidedWithCharacters;
     Game_CharacterBase.prototype.isCollidedWithCharacters = function(x, y) {
         const _class = String(this.constructor.name);
-        if (FollowerCollided && _class === "Game_Player") {
+        if (FollowerCollidedSwitch > 0 && $gameSwitches.value(FollowerCollidedSwitch) && _class === "Game_Player") {
             return _Game_CharacterBase_isCollidedWithCharacters.call(this, x, y) || this.isCollidedWithPlayerCharacters(x, y);
         } else {
             return _Game_CharacterBase_isCollidedWithCharacters.call(this, x, y);
@@ -108,6 +140,28 @@ Imported.NUUN_StandbyMemberFollowers = true;
 
     Game_Player.prototype.isCollidedWithPlayerCharacters = function(x, y) {
         return this.isNormalPriority() && $gamePlayer.isCollided(x, y);
+    };
+
+    Game_Player.prototype.isAllDirectionsCollided = function(x, y) {
+        return !this.canPass(x, y, 2) && !this.canPass(x, y, 4) && !this.canPass(x, y, 6) && !this.canPass(x, y, 8);
+    };
+
+    Game_Player.prototype.allDirectionsCollided = function() {
+        const result = this.isAllDirectionsCollided(this.x, this.y);
+        if (AllCollidedSwitch > 0) {
+            if (result !== $gameSwitches.value(AllCollidedSwitch)) {
+                $gameSwitches.setValue(AllCollidedSwitch, result);
+            }
+        }
+        if (result && AllDirectionsCollidedOnCommonEvent > 0) {
+            $gameTemp.reserveCommonEvent(AllDirectionsCollidedOnCommonEvent);
+        }
+    };
+
+    const _Game_Player_moveStraight = Game_Player.prototype.moveStraight;
+    Game_Player.prototype.moveStraight = function(d) {
+        _Game_Player_moveStraight.call(this, d);
+        this.allDirectionsCollided();
     };
     
 })();

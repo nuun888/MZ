@@ -3,6 +3,10 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+#### 対応ポップアッププラグイン
+[アップフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/UpFadeoutPopup.md)  
+[スライドフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/SlideFadeoutPopup.md)  
+[バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md)  
 
 ステート、バフ付加解除時にステート、バフ、アイテム、お金盗み時にポップアップさせます。
 アイテム、お金盗み時は別途[盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md)が必要です。

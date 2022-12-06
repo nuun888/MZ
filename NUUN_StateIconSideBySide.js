@@ -8,9 +8,263 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc  State side-by-side display
+ * @author NUUN
+ * @version 1.5.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * Displays the states displayed during battle side by side.
+ * Since this plugin has a function to display remaining turns, it cannot be used together with "NUUN_StateTurn".
+ * 
+ * Display turn mode
+ * 'remaining' The default correction value when specified is 1.
+ * 'elapsed' Set the number of turns correction to -1 when specifying.
+ * "NUUN_StateTurnCount" is required to display elapsed turns.
+ * 
+ * Turn text color
+ * State notes
+ * <BatState>　A state with this tag is a disadvantageous state. Therefore, the color of the disadvantageous state and debuff turn is applied.
+ * For states without the above tags, advantageous states and buff turn colors are applied.
+ * 
+ * When using a plug-in that enlarges the image of an enemy character, the image may be distorted.
+ * If you are interested, please use it together with the enemy state display expansion.
+ * 
+ * If you are using a plug-in that changes the state icon coordinates, please set the ally icon display position coordinates to default.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/6/2022 Ver.1.5.2
+ * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
+ * Changed the Type of icon specified plug-in parameter to icon. (Core script Ver.1.6.0 or later)
+ * Changed the display in languages other than Japanese to English.
+ * 11/13/2022 Ver.1.5.1
+ * Fixed the problem that an error occurs when adding a state or buff if the turn is not displayed.
+ * 10/29/2022 Ver.1.5.0
+ * Added a function that allows you to specify the text color for the number of turns.
+ * Fixed the problem that the icon is not displayed when not in the state when "MPP_Pseudo3DBattle" is used together.
+ * 10/15/2022 Ver.1.4.0
+ * Added a function that allows you to specify the icon when the ally's state is not granted.
+ * 8/22/2022 Ver.1.3.2
+ * Separate setting for icon display position and icon display alignment.
+ * 7/2/2022 Ver.1.3.1
+ * Fixed an issue where state icons would remain after changing members.
+ * 4/9/2022 Ver.1.3.0
+ * Added a function that can specify the row of the display icon.
+ * Lightening of processing.
+ * 3/31/2022 Ver.1.2.3
+ * Fixed an issue where the actor's state was not displayed when using "MPP_Pseudo3DBattle".
+ * 3/30/2022 Ver.1.2.2
+ * Fixed the problem that the image is distorted when more states are added than can be displayed.
+ * 3/28/2022 Ver.1.2.1
+ * Fixed the problem that a line-like image is displayed in the icon display part with a specific plug-in.
+ * 1/21/2022 Ver.1.2.0
+ * Added elapsed turns to how to display state turns. (requires ``NUUN_StateTurnCount'')
+ * 9/23/2021 Ver.1.1.0
+ * Significant change in processing by reflecting state display switching.
+ * Added a function that allows enemies to be displayed side by side.
+ * 1/24/2021 Ver.1.0.3
+ * Corrected the processing when using "NUUN_BattleStayleEX" together.
+ * 1/17/2021 Ver.1.0.2
+ * Fixed the problem that coordinates are not reflected when "NUUN_BattleStayleEX" is introduced and the state's coordinate permission is set to true.
+ * Supports "NUUN_BattleStayleEX" 2.0.0 or later.
+ * 1/3/2021 Ver.1.0.1
+ * Changed so that the width to be displayed can be specified.
+ * 1/2/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * @param Setting
+ * @text Common setting
+ * @default ------------------------------
+ * 
+ * @param StateIconWidth
+ * @desc Specify the width to display the state icon. 0 will be the width of the number of icon columns.
+ * @text Width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent Setting
+ * 
+ * @param ActorStateIcon
+ * @text Ally state icon
+ * @default ------------------------------
+ * 
+ * @param ActorStateIconShowVal
+ * @desc The number of allies' state cols.
+ * @text Number of allied state cols
+ * @type number
+ * @default 4
+ * @min 1
+ * @parent ActorStateIcon
+ * 
+ * @param ActorStateIconRows
+ * @desc The number of allied state rows.
+ * @text Number of allied state rows
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent ActorStateIcon
+ * 
+ * @param NoStateIcon
+ * @desc Icon index when no state is attached.
+ * @text No state icon
+ * @type icon
+ * @default 0
+ * @min 0
+ * @parent ActorStateIcon
+ * 
+ * @param ActorStateIconAlign
+ * @desc Ally icon display align.
+ * @text Ally icon display align
+ * @type select
+ * @option Left
+ * @value 'left'
+ * @option Center
+ * @value 'center'
+ * @option Right
+ * @value 'right'
+ * @default 'right'
+ * @parent ActorStateIcon
+ * 
+ * @param ActorStateIconPosition
+ * @desc Display position coordinates of friendly icon.
+ * @text Ally icon display position coordinates
+ * @type select
+ * @option Ally icon display align criteria
+ * @value 'auto'
+ * @option Left
+ * @value 'left'
+ * @option Center
+ * @value 'center'
+ * @option Right
+ * @value 'right'
+ * @option Default (traditional processing)
+ * @value 'default'
+ * @default 'auto'
+ * @parent ActorStateIcon
+ * 
+ * 
+ * @param EnemyStateIcon
+ * @text Enemy state icon
+ * @default ------------------------------
+ * 
+ * @param EnemyStateIconShowVal
+ * @desc The number of enemy state cols.
+ * @text Number of enemy state cols
+ * @type number
+ * @default 5
+ * @min 1
+ * @parent EnemyStateIcon
+ * 
+ * @param EnemyStateIconRows
+ * @desc The number of enemy state rows.
+ * @text Number of enemy state rows
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent EnemyStateIcon
+ * 
+ * @param EnemyStateIconAlign
+ * @desc Enemy icon display align.
+ * @text Enemy icon display align
+ * @type select
+ * @option Left
+ * @value 'left'
+ * @option Center
+ * @value 'center'
+ * @option Right
+ * @value 'right'
+ * @default 'center'
+ * @parent EnemyStateIcon
+ * 
+ * @param StateTurn
+ * @text Turn display setting
+ * @default ------------------------------
+ * 
+ * @param TurnMode
+ * @desc Specifies the turn mode to display.
+ * @text Display turn mode
+ * @type select
+ * @option Remaining turn
+ * @value 'remaining'
+ * @option Elapsed turns (requires ``NUUN_StateTurnCount'')
+ * @value 'elapsed'
+ * @default 'remaining'
+ * @parent StateTurn
+ * 
+ * @param ActorStateIconVisible
+ * @desc Remaining turn indication on allied state icons.
+ * @text Allied state remaining turn display
+ * @type boolean
+ * @default false
+ * @parent StateTurn
+ * 
+ * @param EnemyStateIconVisible
+ * @desc Remaining turn display on enemy state icon.
+ * @text Enemy state remaining turn display
+ * @type boolean
+ * @default false
+ * @parent StateTurn
+ * 
+ * @param TurnX
+ * @desc Turn coordinate X. (relative)
+ * @text Turn coordinate X (relative)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent StateTurn
+ * 
+ * @param TurnY
+ * @desc Turn coordinate Y. (relative)
+ * @text Turn coordinate Y (relative)
+ * @type number
+ * @default -4
+ * @min -9999
+ * @parent StateTurn
+ * 
+ * @param TurnFontSize
+ * @desc Font size for turns. (from main font)
+ * @text Turn font size
+ * @type number
+ * @default -4
+ * @min -9999
+ * @parent StateTurn
+ * 
+ * @param TurnCorrection
+ * @text Correction of the number of turns
+ * @desc Correct the display of the number of turns.
+ * @default 1
+ * @type number
+ * @min -9999
+ * @max 9999
+ * @parent StateTurn
+ * 
+ * @param TurnColor
+ * @text Advantageous state, color of buff turn
+ * @desc Advantageous state, system color number for debuff turns. (Color code can be entered from the text tab)
+ * @type color
+ * @default 0
+ * @parent StateTurn
+ * 
+ * @param BadTurnColor
+ * @text Unfavorable state, debuff turn color
+ * @desc System color number for unfavorable states and debuff turns. (Color code can be entered from the text tab)
+ * @type color
+ * @default 0
+ * @parent StateTurn
+ * 
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * 戦闘中に表示するステートを横並び表示にします。
@@ -37,6 +291,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/6 Ver.1.5.2
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(コアスクリプトVer.1.6.0以降)
+ * 日本語以外での表示を英語表示に変更。
  * 2022/11/13 Ver.1.5.1
  * ターンを表示しない場合、ステート、バフ付加時にエラーが出る問題を修正。
  * 2022/10/29 Ver.1.5.0
@@ -107,7 +365,7 @@
  * @param NoStateIcon
  * @desc ステートがひとつも付与されていない時のアイコンインデックス。
  * @text ステートなし時アイコン
- * @type number
+ * @type icon
  * @default 0
  * @min 0
  * @parent ActorStateIcon
@@ -241,14 +499,14 @@
  * @param TurnColor
  * @text 有利ステート、バフターンの色
  * @desc 有利なステート、デバフのターンのシステムカラー番号。(テキストタブからカラーコード入力可能)
- * @type number
+ * @type color
  * @default 0
  * @parent StateTurn
  * 
  * @param BadTurnColor
  * @text 不利ステート、デバフターンの色
  * @desc 不利なステート、デバフのターンのシステムカラー番号。(テキストタブからカラーコード入力可能)
- * @type number
+ * @type color
  * @default 0
  * @parent StateTurn
  * 

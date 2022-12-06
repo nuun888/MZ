@@ -1,5 +1,5 @@
 # [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -43,7 +43,9 @@ HP、MP、TP、Gold、Expはコスト値で取得されます。
 色の設定は通常システムカラーを記入しますが、テキストタブからカラーコードを記入できます。  
 
 ## 更新履歴
-2022/12/29 Ver.1.1.0  
+2022/12/6 Ver.1.1.1  
+カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)  
+2022/12/4 Ver.1.1.0  
 HP、MP、TP、Gold、Exp以外のコスト個別設定のコスト評価式の仕様を変更。  
 スキルコスト表示順のコスト表示対象の仕様を変更。  
 コスト評価式の適用を全ての消費コストに適用。  

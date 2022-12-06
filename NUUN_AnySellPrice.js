@@ -8,9 +8,83 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc Selling price arbitrary setting
+ * @author NUUN
+ * @version 1.1.1
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ *            
+ * @help
+ * Makes items, weapons, and armor sell for whatever price they want instead of half their price.
+ * Item, Weapon, and Armor Notes
+ * <SellPrice:[sell]>
+ * [sell]:Selling price
+ * <SellPrice:500> Selling price is 500.
+ * <SellPrice:0> You can buy it, but you will not be able to sell it. (if you set the database price to 1 or higher)
+ * 
+ * Please set the selling price of the plug-in command before processing the event command shop.
+ * The selling price setting is not automatically initialized. Unless you set the selling price or initialize the selling price setting list, the previously set data will remain.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/6/2022 Ver.1.1.1
+ * Changed the display in languages other than Japanese to English.
+ * 10/31/2021 Ver 1.1.0
+ * Added a function that allows you to set the selling price with a plugin command.
+ * 10/9/2021 Ver 1.0.0
+ * First edition.
+ * 
+ * @command OrderSellingPrice
+ * @desc Set the selling price.
+ * @text Setting the selling price
+ * 
+ * @arg OrderSellingPriceList
+ * @text Sell price setting
+ * @desc Sell price setting
+ * @default []
+ * @type struct<SellingPriceList>[]
+ * 
+ * @command OrderSellingPriceInitialize
+ * @desc Initialize the price list of selling prices.
+ * @text Initialize selling price setting list
+ * 
+ * 
+ */
+/*~struct~SellingPriceList:
+ * 
+ * @param ItemId
+ * @type item
+ * @default 
+ * @text Item
+ * @desc Specifies an item.
+ * 
+ * @param WeaponId
+ * @type weapon
+ * @default 
+ * @text Weapon
+ * @desc Specifies a weapon.
+ * 
+ * @param ArmorId
+ * @type armor
+ * @default 
+ * @text Armor
+ * @desc Specify armor.
+ * 
+ * @param SellPrice
+ * @type number
+ * @default 0
+ * @text Selling price
+ * @desc Specify the selling price.
+ * @min 0
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc 売値任意設定
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -30,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/6 Ver.1.1.1
+ * 日本語以外での表示を英語表示に変更。
  * 2021/10/31 Ver 1.1.0
  * プラグインコマンドで売値を設定できる機能を追加。
  * 2021/10/9 Ver 1.0.0
@@ -51,7 +127,7 @@
  * 
  * 
  */
-/*~struct~SellingPriceList:
+/*~struct~SellingPriceList:ja
  * 
  * @param ItemId
  * @type item

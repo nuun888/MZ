@@ -38,8 +38,8 @@
  * 
  * Log
  * 12/6/2022 Ver.1.5.2
- * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
- * Changed the Type of icon specified plug-in parameter to icon. (Core script Ver.1.6.0 or later)
+ * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
+ * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
  * Changed the display in languages other than Japanese to English.
  * 11/13/2022 Ver.1.5.1
  * Fixed the problem that an error occurs when adding a state or buff if the turn is not displayed.
@@ -292,8 +292,8 @@
  * 
  * 更新履歴
  * 2022/12/6 Ver.1.5.2
- * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
- * アイコン指定のプラグインパラメータのTypeをiconに変更。(コアスクリプトVer.1.6.0以降)
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
  * 日本語以外での表示を英語表示に変更。
  * 2022/11/13 Ver.1.5.1
  * ターンを表示しない場合、ステート、バフ付加時にエラーが出る問題を修正。

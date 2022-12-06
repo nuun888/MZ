@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Gauge display EX
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -36,6 +36,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/6/2022 Ver.1.3.1
+ * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
  * 11/25/2022 Ver.1.3.0
  * Added a function that can specify an icon for the label.
  * Changed the display in languages other than Japanese to English.
@@ -155,7 +157,7 @@
  * @param LabelIcon
  * @desc Label icon ID. 0 is displayed as a letter.
  * @text Label icon ID
- * @type number
+ * @type icon
  * @default 0
  * @min 0
  * 
@@ -354,7 +356,7 @@
  * @param MaxValueColor
  * @desc Maximum value color. (system color or color index (text tab)) -1 for the same color as the current value
  * @text Max color
- * @type number
+ * @type color
  * @default 0
  * @min -1
  * @parent ColorSetting
@@ -362,7 +364,7 @@
  * @param SeparationColor
  * @desc Color of "/". (system color or color index (text tab)) -1 for the same color as the current value
  * @text "/" color
- * @type number
+ * @type color
  * @default 0
  * @min -1
  * @parent ColorSetting
@@ -370,7 +372,7 @@
  * @param LabelColor
  * @desc Label color. (system color or color index (text tab))
  * @text Label color
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * @parent ColorSetting
@@ -382,7 +384,7 @@
  * @param GaugeColor1
  * @desc Gauge color left (system color or color index (text tab))
  * @text Gauge color left
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorSetting
@@ -390,7 +392,7 @@
  * @param GaugeColor2
  * @desc Gauge Color Right (System Color or Color Index (Text tab))
  * @text Gauge color right
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorSetting
@@ -409,7 +411,7 @@
  * @param MaxGaugeColor1
  * @desc Maximum Gauge Color Left (system color or color index (text tab))
  * @text Max Gauge Color Left
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorMaxSetting
@@ -417,7 +419,7 @@
  * @param MaxGaugeColor2
  * @desc Gauge color right at max (system color or color index (text tab))
  * @text Max Gauge Color Right
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorMaxSetting
@@ -444,7 +446,7 @@
  * @param RatioGaugeColor1
  * @desc Color for the left side of the gauge below the specified percentage. (system color or color index (text tab))
  * @text Specified percentage or less Gauge color Left
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorRatioSetting
@@ -452,7 +454,7 @@
  * @param RatioGaugeColor2
  * @desc Color for the right side of the gauge below a specified percentage. (system color or color index (text tab))
  * @text Specified percentage or less gauge color right
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorRatioSetting
@@ -472,7 +474,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -502,6 +504,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/6 Ver.1.3.1
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
  * 2022/11/25 Ver.1.3.0
  * ラベルにアイコンを指定できる機能を追加。
  * 日本語以外での表示を英語表示に変更。
@@ -625,7 +629,7 @@
  * @param LabelIcon
  * @desc ラベルアイコンID。0で文字で表示されます。
  * @text ラベルアイコンID
- * @type number
+ * @type icon
  * @default 0
  * @min 0
  * 
@@ -824,7 +828,7 @@
  * @param MaxValueColor
  * @desc 最大値の色。(システムカラーまたはカラーインデックス(テキストタブ)) -1で現在値と同色
  * @text 最大値色
- * @type number
+ * @type color
  * @default 0
  * @min -1
  * @parent ColorSetting
@@ -832,7 +836,7 @@
  * @param SeparationColor
  * @desc /の色。(システムカラーまたはカラーインデックス(テキストタブ)) -1で現在値と同色
  * @text /色
- * @type number
+ * @type color
  * @default 0
  * @min -1
  * @parent ColorSetting
@@ -840,7 +844,7 @@
  * @param LabelColor
  * @desc ラベルの色。(システムカラーまたはカラーインデックス(テキストタブ))
  * @text ラベル色
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * @parent ColorSetting
@@ -852,7 +856,7 @@
  * @param GaugeColor1
  * @desc ゲージの色左(システムカラーまたはカラーインデックス(テキストタブ))
  * @text ゲージ色左
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorSetting
@@ -860,7 +864,7 @@
  * @param GaugeColor2
  * @desc ゲージの色右(システムカラーまたはカラーインデックス(テキストタブ))
  * @text ゲージ色右
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorSetting
@@ -879,7 +883,7 @@
  * @param MaxGaugeColor1
  * @desc 最大時のゲージの色左(システムカラーまたはカラーインデックス(テキストタブ))
  * @text 最大時ゲージ色左
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorMaxSetting
@@ -887,7 +891,7 @@
  * @param MaxGaugeColor2
  * @desc 最大時のゲージの色右(システムカラーまたはカラーインデックス(テキストタブ))
  * @text 最大時ゲージ色右
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorMaxSetting
@@ -914,7 +918,7 @@
  * @param RatioGaugeColor1
  * @desc 特定割合以下のゲージの色左。(システムカラーまたはカラーインデックス(テキストタブ))
  * @text 特定割合以下ゲージ色左
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorRatioSetting
@@ -922,7 +926,7 @@
  * @param RatioGaugeColor2
  * @desc 特定割合以下のゲージの色右。(システムカラーまたはカラーインデックス(テキストタブ))
  * @text 特定割合以下ゲージ色右
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeColorRatioSetting

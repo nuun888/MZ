@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Frame rate change when playing MV compatible animation
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * Set the frame rate for each animation when playing MV animation.
@@ -23,6 +23,8 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 12/6/2022 Ver.1.1.2
+ * Fixed some text.
  * 11/9/2022 Ver.1.1.1
  * Changed the display in languages other than Japanese to English.
  * 11/5/2022 Ver.1.1.0
@@ -51,7 +53,7 @@
  * 
  * @param AnimationRateMode
  * @text Frame setting mode
- * @desc Set the animation specification method to FPS. Specify frame with OFF If you have updated from Ver.1.0.2 or earlier, please turn it OFF.
+ * @desc Animation FPS specification. (Frame is specified with OFF) OFF when updating from Ver.1.0.2 or earlier.
  * @type boolean
  * @default true
  * 
@@ -79,7 +81,7 @@
  * @target MZ
  * @plugindesc MV互換アニメーション再生時のフレームレート変更
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.2
  * 
  * @help
  * MVのアニメーションを再生するときのフレームレートをアニメーションごとに設定します。
@@ -91,6 +93,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/6 Ver.1.1.2
+ * 一部テキストを修正。
  * 2022/11/9 Ver.1.1.1
  * 日本語以外での表示を英語表示に変更。
  * 2021/11/5 Ver.1.1.0
@@ -119,7 +123,7 @@
  * 
  * @param AnimationRateMode
  * @text フレーム設定モード
- * @desc アニメーションの指定方法をFPS指定にします。OFFでフレーム指定 Ver.1.0.2以前からアップデートした場合はOFFにしてください。
+ * @desc アニメーションの指定方法をFPS指定にします。(OFFでフレーム指定) Ver.1.0.2以前からアップデートした場合はOFFにしてください。
  * @type boolean
  * @default true
  * 

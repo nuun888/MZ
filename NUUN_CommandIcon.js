@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.2
+ * @version 1.4.3
  * 
  * @help
  * You can display icons in the command menu and change the text color of command names.
@@ -40,6 +40,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/6/2022 Ver.1.4.3
+ * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
+ * Changed the Type of icon specified plug-in parameter to icon. (Core script Ver.1.6.0 or later)
  * 11/25/2022 Ver 1.4.2
  * Added a function that can specify the command to be applied with a symbol.
  * 11/10/2022 Ver 1.4.1
@@ -123,7 +126,7 @@
  * 
  * @param CommadSymbol
  * @text Symbol name
- * @desc Enter the symbolic name of the command to apply. If not entered, it will be referenced by the command name. ("item" for items)
+ * @desc Symbolic name of the apply command. If nothing is entered, the command name will be applied. (item for items)
  * @type combo
  * @option "item"
  * @option "skill"
@@ -148,14 +151,14 @@
  * @param CommadNameColor
  * @text Command Color
  * @desc Color index number in command name. You can enter a color code in the text tab.
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * 
  * @param iconId
  * @text Icon index
  * @desc Icon index.
- * @type number
+ * @type icon
  * @default 0
  * @min 0
  * 
@@ -240,7 +243,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.2
+ * @version 1.4.3
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -269,6 +272,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/6 Ver.1.4.3
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(コアスクリプトVer.1.6.0以降)
  * 2022/11/25 Ver 1.4.2
  * 適用するコマンドをシンボルで指定できる機能を追加。
  * 2022/11/10 Ver 1.4.1
@@ -377,14 +383,14 @@
  * @param CommadNameColor
  * @text コマンド名の色
  * @desc コマンド名のカラーインデックス番号。テキストタブでカラーコードが入力できます。
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * 
  * @param iconId
  * @text アイコンインデックス番号
  * @desc アイコンのインデックス番号。
- * @type number
+ * @type icon
  * @default 0
  * @min 0
  * 

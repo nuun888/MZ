@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost display EX
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_Base
@@ -50,6 +50,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/6/2022 Ver.1.1.1
+ * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
  * 12/4/2022 Ver.1.1.0
  * Changed the specifications of the cost evaluation formula for individual cost settings other than HP, MP, TP, Gold, and Exp.
  * Changed the specification of the cost display target in the order of skill cost display.
@@ -143,7 +145,7 @@
  * @param HPCostColor
  * @text HP cost color
  * @desc HP cost color.
- * @type number
+ * @type color
  * @default 21
  * @parent HPCostSetting
  * 
@@ -168,7 +170,7 @@
  * @param MPCostColor
  * @text MP cost color
  * @desc MP cost color.
- * @type number
+ * @type color
  * @default 23
  * @parent MPCostSetting
  * 
@@ -193,7 +195,7 @@
  * @param TPCostColor
  * @text TP cost color
  * @desc TP cost color.
- * @type number
+ * @type color
  * @default 29
  * @parent TPCostSetting
  * 
@@ -218,7 +220,7 @@
  * @param GoldCostColor
  * @text Money cost color
  * @desc The color of the money cost.
- * @type number
+ * @type color
  * @default 17
  * @parent GoldCostSetting
  * 
@@ -243,7 +245,7 @@
  * @param ExpCostColor
  * @text Exp cost color
  * @desc Exp cost color.
- * @type number
+ * @type color
  * @default 27
  * @parent ExpCostSetting
  * 
@@ -284,7 +286,7 @@
  * @param CostColor
  * @text Cost color
  * @desc Cost color.
- * @type number
+ * @type color
  * @default 0
  * 
  * @param Prefix
@@ -315,7 +317,7 @@
  * @target MZ
  * @plugindesc スキルコスト表示拡張
  * @author NUUN
- * @version 1.0.2
+ * @version 1.1.1
  * @base NUUN_Base
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_Base
@@ -355,7 +357,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2022/12/29 Ver.1.1.0
+ * 2022/12/6 Ver.1.1.1
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
+ * 2022/12/4 Ver.1.1.0
  * HP、MP、TP、Gold、Exp以外のコスト個別設定のコスト評価式の仕様を変更。
  * スキルコスト表示順のコスト表示対象の仕様を変更。
  * コスト評価式の適用を全ての消費コストに適用。
@@ -448,7 +452,7 @@
  * @param HPCostColor
  * @text HPコストの色
  * @desc HPのコストの色。
- * @type number
+ * @type color
  * @default 21
  * @parent HPCostSetting
  * 
@@ -473,7 +477,7 @@
  * @param MPCostColor
  * @text MPコストの色
  * @desc MPのコストの色。
- * @type number
+ * @type color
  * @default 23
  * @parent MPCostSetting
  * 
@@ -498,7 +502,7 @@
  * @param TPCostColor
  * @text TPコストの色
  * @desc TPのコストの色。
- * @type number
+ * @type color
  * @default 29
  * @parent TPCostSetting
  * 
@@ -523,7 +527,7 @@
  * @param GoldCostColor
  * @text 所持金コストの色
  * @desc 所持金のコストの色。
- * @type number
+ * @type color
  * @default 17
  * @parent GoldCostSetting
  * 
@@ -548,7 +552,7 @@
  * @param ExpCostColor
  * @text 経験値コストの色
  * @desc 経験値のコストの色。
- * @type number
+ * @type color
  * @default 27
  * @parent ExpCostSetting
  * 
@@ -589,7 +593,7 @@
  * @param CostColor
  * @text コストの色
  * @desc コストの色。
- * @type number
+ * @type color
  * @default 0
  * 
  * @param Prefix

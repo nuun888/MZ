@@ -1,5 +1,5 @@
 # [コマンド、カテゴリー表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)
-# Ver.1.4.2
+# Ver.1.4.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  
 
 #### 必須プラグイン
@@ -34,6 +34,9 @@ Window_EnemyBookPageCategory：モンスター図鑑情報ページ
 コマンドスキルプラグイン(トリアコンタン様)シンボル名:"special"  
 
 ## 更新履歴
+2022/12/6 Ver.1.4.3  
+カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)  
+アイコン指定のプラグインパラメータのTypeをiconに変更。(コアスクリプトVer.1.6.0以降)  
 2022/11/25 Ver 1.4.2  
 適用するコマンドをシンボルで指定できる機能を追加。  
 2022/11/10 Ver 1.4.1  

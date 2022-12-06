@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.12
+ * @version 2.2.13
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2022/12/6 Ver.2.2.13
+ * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
  * 2022/12/4 Ver.2.2.12
  * Changed the display in languages other than Japanese to English.
  * 2022/11/1 Ver.2.2.11
@@ -571,14 +573,14 @@
  * @param LevelUpNameColor
  * @desc Level-up text color (system color or color code) (when level-up display is selected)
  * @text Level up text color
- * @type number
+ * @type color
  * @default 17
  * @parent LevelUpSetting
  * 
  * @param LevelUpValueColor
  * @desc Level value color for level up (system color or color code) (when level display is selected)
  * @text Number color when leveling up
- * @type number
+ * @type color
  * @default 17
  * @parent LevelUpSetting
  * 
@@ -590,14 +592,14 @@
  * @param EXPBoostValueColor
  * @desc Numerical color (system color or color code) when the acquired experience value is higher than normal.
  * @text Numerical color when boosting experience gained
- * @type number
+ * @type color
  * @default 0
  * @parent EXPSetting
  * 
  * @param EXPResistValueColor
  * @desc Numerical color (system color or color code) when experience gained is less than normal.
  * @text Numeric color when resisting acquired experience value
- * @type number
+ * @type color
  * @default 0
  * @parent EXPSetting
  * 
@@ -668,14 +670,14 @@
  * @param GaugeColor1
  * @desc Gauge color (left side) (system color or color code)
  * @text Gauge color (left side)
- * @type number
+ * @type color
  * @default 17
  * @parent ExpSetting
  * 
  * @param GaugeColor2
  * @desc Gauge color (right side) (system color or color code)
  * @text Gauge color (right side)
- * @type number
+ * @type color
  * @default 6
  * @parent ExpSetting
  * 
@@ -1070,14 +1072,14 @@
  * @param DifferenceStatusColor
  * @desc The color of the number when the status rises after leveling up (system color or color code)
  * @text Status number color after level up
- * @type number
+ * @type color
  * @default 24
  * @parent LevelUpActorStatus
  * 
  * @param DifferenceLevelColor
  * @desc Number color after leveling up (system color or color code)
  * @text Level number color after level up
- * @type number
+ * @type color
  * @default 17
  * @parent LevelUpActorStatus
  * 
@@ -1502,7 +1504,7 @@
  * @param SystemNameColor
  * @desc System Text Color. You can enter the color code in the text tab.
  * @text System Text Color(6)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -1591,7 +1593,7 @@
  * @param SystemNameColor
  * @desc System Text Color. You can enter the color code in the text tab.
  * @text System Text Color(7)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -1669,8 +1671,8 @@
  * 
  * @param SystemNameColor
  * @desc System Text Color. You can enter the color code in the text tab.
- * @text System Text Color色(6)
- * @type number
+ * @text System Text Color(6)
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -1809,7 +1811,7 @@
  * @param SystemNameColor
  * @desc System Text Color. You can enter the color code in the text tab.
  * @text System Text Color(8)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -1889,8 +1891,8 @@
  * 
  * @param SystemNameColor
  * @desc System Text Color. You can enter the color code in the text tab.
- * @text System Text Color色(6)
- * @type number
+ * @text System Text Color(6)
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -2203,7 +2205,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.12
+ * @version 2.2.13
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2248,6 +2250,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/6 Ver.2.2.13
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
  * 2022/12/4 Ver.2.2.12
  * 日本語以外での表示を英語表示に変更。
  * 2022/11/1 Ver.2.2.11
@@ -2762,14 +2766,14 @@
  * @param LevelUpNameColor
  * @desc レベルアップの文字色(システムカラーまたはカラーコード)画像設定時場合は適用されません。(レベルアップ表示選択時)
  * @text レベルアップ文字色
- * @type number
+ * @type color
  * @default 17
  * @parent LevelUpSetting
  * 
  * @param LevelUpValueColor
  * @desc レベルアップした時のレベルの数値の色(システムカラーまたはカラーコード)(レベル表示選択時)
  * @text レベルアップ時の数値色
- * @type number
+ * @type color
  * @default 17
  * @parent LevelUpSetting
  * 
@@ -2781,14 +2785,14 @@
  * @param EXPBoostValueColor
  * @desc 獲得経験値が通常より多い時の数値の色(システムカラーまたはカラーコード)
  * @text 獲得経験値ブースト時数値色
- * @type number
+ * @type color
  * @default 0
  * @parent EXPSetting
  * 
  * @param EXPResistValueColor
  * @desc 獲得経験値が通常よりも少ない時の数値の色(システムカラーまたはカラーコード)
  * @text 獲得経験値レジスト時数値色
- * @type number
+ * @type color
  * @default 0
  * @parent EXPSetting
  * 
@@ -2859,14 +2863,14 @@
  * @param GaugeColor1
  * @desc ゲージの色(左側)(システムカラーまたはカラーコード)
  * @text ゲージ色(左側)
- * @type number
+ * @type color
  * @default 17
  * @parent ExpSetting
  * 
  * @param GaugeColor2
  * @desc ゲージの色(右側)(システムカラーまたはカラーコード)
  * @text ゲージの色(右側)
- * @type number
+ * @type color
  * @default 6
  * @parent ExpSetting
  * 
@@ -3261,14 +3265,14 @@
  * @param DifferenceStatusColor
  * @desc レベルアップした後のステータスが上昇した時の数値の色(システムカラーまたはカラーコード)
  * @text レベルアップ後ステータス数値色
- * @type number
+ * @type color
  * @default 24
  * @parent LevelUpActorStatus
  * 
  * @param DifferenceLevelColor
  * @desc レベルアップした後のレベルが上がった時の数値の色(システムカラーまたはカラーコード)
  * @text レベルアップ後レベル数値色
- * @type number
+ * @type color
  * @default 17
  * @parent LevelUpActorStatus
  * 
@@ -3692,7 +3696,7 @@
  * @param SystemNameColor
  * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(6)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -3781,7 +3785,7 @@
  * @param SystemNameColor
  * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(7)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -3860,7 +3864,7 @@
  * @param SystemNameColor
  * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(6)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -3999,7 +4003,7 @@
  * @param SystemNameColor
  * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(8)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -4080,7 +4084,7 @@
  * @param SystemNameColor
  * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(6)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 

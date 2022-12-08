@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Mana shield
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @orderAfter NUUN_StoppingFeature
  * 
  * @help
@@ -26,7 +26,7 @@
  * If you take 500 HP damage and it is 50%, MP will be reduced by 150 and HP will be damaged by 250.
  * If the burden rate after MP conversion is 60%, MP will be reduced by 90 and HP will be damaged by 250.
  * 
- * Notes with features (actors, occupations, weapons, armor, enemy characters, states)
+ * Notes with characteristics (actors, occupations, weapons, armor, enemy characters, states)
  * <ManaShield:[rate]>　
  * [rate]:Percentage of damage taken over
  * <ManaShield:25> 25% of HP damage is converted to MP damage.
@@ -35,6 +35,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/8/2022 Ver.1.1.3
+ * Correction of text. (English only)
  * 11/12/2022 Ver.1.1.2
  * Changed the display in languages other than Japanese to English.
  * 1/29/2022  Ver.1.1.1
@@ -98,7 +100,7 @@
  * @target MZ
  * @plugindesc マナシールド
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @orderAfter NUUN_StoppingFeature
  * 
  * @help
@@ -122,6 +124,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/8 Ver.1.1.3
+ * テキストの修正。(英語のみ)
  * 2022/11/12 Ver.1.1.2
  * 日本語以外での表示を英語表示に変更。
  * 2022/1/29  Ver.1.1.1

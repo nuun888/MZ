@@ -1,5 +1,5 @@
-# [XP風バトルコマンド](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js)
-# Ver.1.0.3
+# [XP風パーティ、アクターコマンド](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js)
+# Ver.1.0.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js)
 
 パーティコマンド、アクターコマンドをXP風に表示します。  
@@ -9,6 +9,8 @@
 ※このプラグインはバトルスタイル拡張プラグインからの機能分離プラグインのため併用はできません。
 
 ## 更新履歴
+2022/12/8 Ver.1.0.4  
+日本語以外での表示を英語表示に変更。  
 2022/3/17 Ver.1.0.3  
 アクター加入、離脱時の処理を修正。  
 2021/11/15 Ver.1.0.2  

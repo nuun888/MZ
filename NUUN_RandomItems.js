@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * Randomly obtain items and money.
@@ -38,6 +38,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/8/2022 Ver.1.3.1
+ * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
  * 11/12/2022 Ver.1.3.0
  * Change message format.
  * Changed the display in languages other than Japanese to English.
@@ -169,7 +171,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * アイテム、お金をランダムで入手します。
@@ -196,6 +198,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/8 Ver.1.3.1
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
  * 2022/11/12 Ver.1.3.0
  * メッセージのフォーマットを変更。
  * 日本語以外での表示を英語表示に変更。
@@ -318,7 +322,7 @@
  * @param MoneyIconID
  * @desc お金取得時のアイコンID。
  * @text お金取得時アイコンID
- * @type number
+ * @type icon
  * @default 0
  */
 var Imported = Imported || {};

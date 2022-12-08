@@ -5,17 +5,44 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Buff, debuff multiplier effect rate increase/decrease characteristics
+ * @author NUUN
+ * @version 1.0.1
+ * 
+ * @help
+ * You can set the characteristics that increase or decrease the effect rate of the buff and debuff magnification.
+ * Normal buff and debuff multipliers are 25% per stage, but the multiplier can be increased or decreased depending on the characteristics.
+ * When the multiplier is 1.2x, the buff or debuff multiplier is 30%(25%*1.2).
+ * 
+ * Notes with characteristics
+ * <BuffBoost[BuffId]:[rate]>
+ * [BuffId]:BuffID 0:HP 1:MP 2:ATK 3:DEF 4:MAT 5:MDF 6:AGI 7:LUK
+ * [rate]: Magnification (positive number) 1.0x at 100, 1.2x at buff at 120
+ * 
+ * <DebuffBoost[BuffId]:[rate]>
+ * [BuffId]:DebuffID 0:HP 1:MP 2:ATK 3:DEF 4:MAT 5:MDF 6:AGI 7:LUK
+ * [rate]: Magnification (positive number) 1.0x at 100, 0.8x at buff at 80
+ * 
+ * Log
+ * 12/8/2022 Ver.1.0.1
+ * Changed the display in languages other than Japanese to English.
+ * 2/12/2022 Ver.1.0.0
+ * First edition.
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc バフ、デバフ倍率効果率増減特徴
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * バフ、デバフの倍率の効果率を増減する特徴を設定できます。
  * 通常のバフ、デバフの倍率は1段階につき25%になっていますが、特徴によって倍率を増減させます。
- * 倍率が1.2倍の時はバフまたはデバフの倍率が30%になります。
+ * 倍率が1.2倍の時はバフまたはデバフの倍率が30%(25%*1.2)になります。
  * 
  * 特徴を有するメモ欄
  * <BuffBoost[BuffId]:[rate]>
@@ -27,6 +54,8 @@
  * [rate]:倍率(正数)　100で1.0倍 80ならバフ時に0.8倍
  * 
  * 更新履歴
+ * 2022/12/8 Ver.1.0.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/2/12 Ver.1.0.0
  * 初版
  * 

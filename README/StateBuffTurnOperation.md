@@ -1,5 +1,5 @@
 # [ステート、バフターン操作アイテム、スキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnOperation.js)
-# Ver.1.0.0
+# Ver.1.0.1  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnOperation.js)  
 
 付与されているステート、バフのターンを増減させるアイテム、スキルを設定できます。
@@ -23,5 +23,7 @@
 `<BuffTurnOperations2:3>` 攻撃力上昇時の残りターンが3ターン加算されます。  
 
 ## 更新履歴
+2022/12/8 Ver.1.0.1  
+日本語以外での表示を英語表示に変更。  
 2022/2/16 Ver.1.0.0  
 初版  

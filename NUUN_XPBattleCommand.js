@@ -5,12 +5,89 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc XP style party, actor command
+ * @author NUUN
+ * @version 1.0.4
+ * @base NUUN_Base
+ * 
+ * @help
+ * Displays party commands and actor commands like XP.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 2022/12/8 Ver.1.0.4
+ * Changed the display in languages other than Japanese to English.
+ * 2022/3/17 Ver.1.0.3
+ * Fixed processing when joining and leaving an actor.
+ * 2021/11/15 Ver.1.0.2
+ * Fixed an issue where commands were shifted when party command items exceeded the maximum number of columns.
+ * 2021/11/14 Ver.1.0.1
+ * Fixed "Party command center".
+ * 2021/11/7 Ver.1.0.0
+ * First edition.
+ * 
+ * @param PartyCommandSetting
+ * @text Party command settings
+ * @default ------------------------------
+ * 
+ * @param PartyCommandMode
+ * @desc Display the party command items near the center.
+ * @text Party command center
+ * @type boolean
+ * @default true
+ * @parent PartyCommandSetting
+ * 
+ * @param MaxPartyCommandCols
+ * @desc Maximum number of party command columns to display.
+ * @text Maximum number of party command col
+ * @type number
+ * @default 4
+ * @min 1
+ * @parent PartyCommandSetting
+ * 
+ * @param PartyCommandPosition
+ * @text Party command display position
+ * @desc Select the display position of party commands.
+ * @type select
+ * @option Top
+ * @value 'top'
+ * @option Center
+ * @value 'center'
+ * @option top of actor status
+ * @value 'statusTop'
+ * @default 'top'
+ * @parent PartyCommandSetting
+ * 
+ * @param ActorCommandSetting
+ * @text Actor command settings
+ * @default ------------------------------
+ * 
+ * @param ActorsCommandVariable
+ * @desc Makes the actor command variable display.
+ * @text Actor command variable display
+ * @type boolean
+ * @default true
+ * @parent ActorCommandSetting
+ * 
+ * @param MaxActorCommandRows
+ * @desc Maximum number of actor command row to display.
+ * @text Max qctor command row
+ * @type number
+ * @default 10
+ * @min 1
+ * @parent ActorCommandSetting
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc XP風パーティ、アクターコマンド
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_Base
  * 
  * @help
@@ -20,6 +97,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/8 Ver.1.0.4
+ * 日本語以外での表示を英語表示に変更。
  * 2022/3/17 Ver.1.0.3
  * アクター加入、離脱時の処理を修正。
  * 2021/11/15 Ver.1.0.2

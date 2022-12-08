@@ -5,12 +5,49 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
+/*:
+ * @target MZ
+ * @plugindesc State, buff turn operation item, skill
+ * @author NUUN
+ * @version 1.0.1
+ * 
+ * @help
+ * You can set the granted state, items that increase or decrease buff turns, and skills.
+ * 
+ * Item/skill Notes
+ * <StateTurnOperations:[turn]> Increases or decreases all remaining turns of the currently granted state.
+ * <StateTurnOperations[stateId]:[turn]> Increases or decreases the remaining turns of the specified state.
+ * 
+ * <BuffTurnOperations:[turn]> Increases or decreases the remaining turns of the currently granted enhancement buff.
+ * <BuffTurnOperations[BuffId]:[turn]> Increases or decreases the remaining turns of the specified strengthening buff.
+ * 
+ * <DebuffTurnOperations:[turn]> Increases or decreases all remaining turns of the currently applied debuff.
+ * <DebuffTurnOperations[BuffId]:[turn]> Increases or decreases the remaining turns of the specified debuff.
+ * [stateId]:State ID
+ * [BuffId]:BuffID 0:HP 1:MP 2:ATK 3:DEF 4:MAT 5:MDF 6:AGI 7:LUK
+ * [turn]:± turn number
+ * 
+ * <StateTurnOperations:2> All remaining turns of the granted state are added by 2 turns.
+ * <StateTurnOperations5:-2> All remaining turns of the given state ID 5 state will be subtracted by 2 turns.
+ * <BuffTurnOperations2:3> 3 turns will be added to the remaining turns when attack power is increased.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/8/2022 Ver.1.0.1
+ * Changed the display in languages other than Japanese to English.
+ * 2/16/2022 Ver.1.0.0
+ * First edition.
+ * 
+ * 
+ */
 /*:
  * @target MZ
  * @plugindesc ステート、バフターン操作アイテム、スキル
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 付与されているステート、バフのターンを増減させるアイテム、スキルを設定できます。
@@ -36,6 +73,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/8 Ver.1.0.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/2/16 Ver.1.0.0
  * 初版
  * 

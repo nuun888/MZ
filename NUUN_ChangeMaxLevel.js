@@ -9,9 +9,85 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc Max Level Fluctuation Plugin
+ * @author NUUN
+ * @version 1.2.1
+ * @orderBefore NUUN_LevelUnlimited
+ * 
+ * @help
+ * You can change the maximum level of the actor even during the game or change the maximum level by the characteristic.
+ * The order of priority is item, skill, level changed by plug-in command > maximum level in characteristics > original maximum level
+ * 
+ * Item/skill Notes
+ * <ChangeMaxLevel:[lavel]> Change the upper limit of the level.
+ * <ChangeMaxLevel:80> Change the level limit to 80.
+ * <ChangeMaxLevelld:[lavel±]> Increases or decreases the upper limit of the level.
+ * <ChangeMaxLevelld:5> Increases the maximum level by 5.
+ * 
+ * Note with characteristics
+ * <F_ChangeMaxLevel:[lavel]> Change the upper limit of the level.
+ * <F_ChangeMaxLevel:50> Change the level limit to 50.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * 更新履歴
+ * 12/8/2022 Ver.1.2.1
+ * Changed the display in languages other than Japanese to English.
+ * 2/7/2022 Ver.1.2.0
+ * Added the ability to change the maximum level with traits.
+ * 12/7/2021 Ver.1.1.0
+ * Added function to increase/decrease maximum level.
+ * Added a function that allows you to change the maximum level, increase or decrease skills, and set items.
+ * 12/13/2020 Ver.1.0.1
+ * Minor fix.
+ * 12/12/2020 Ver.1.0.0
+ * First edition.
+ * 
+ * @command MaxLevelSet
+ * @text Change max level
+ * @desc Change max level.
+ * 
+ * @arg changeMaxLevel
+ * @type number
+ * @min 1
+ * @default 99
+ * @text Max level
+ * @desc Sets the maximum level to change.
+ * 
+ * @arg ActorId
+ * @type actor
+ * @default 1
+ * @text Actor
+ * @desc Specifies the actor whose level you want to change.
+ * @min 0
+ * @max 9999
+ * 
+ * @command MaxLevelldSet
+ * @text Increase or decrease maximum level
+ * @desc Increase or decrease maximum level.
+ * 
+ * @arg changeMaxLevel
+ * @type number
+ * @min -99999999999
+ * @default 1
+ * @text Max level
+ * @desc Sets the maximum level to increase or decrease.
+ * 
+ * @arg ActorId
+ * @type actor
+ * @default 1
+ * @text Actor
+ * @desc Specifies the actor whose level you want to change.
+ * @min 0
+ * @max 9999
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc 最大レベル変動プラグイン
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.1
  * @orderBefore NUUN_LevelUnlimited
  * 
  * @help
@@ -32,6 +108,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/8 Ver.1.2.1
+ * 日本語以外での表示を英語表示に変更。
  * 2022/2/7 Ver.1.2.0
  * 特徴があれば最大レベルを変更できる機能を追加。
  * 2021/12/7 Ver.1.1.0

@@ -1,5 +1,5 @@
 # [マナシールド](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js)
-# Ver.1.1.2
+# Ver.1.1.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ManaShield.js)  
 
 HPダメージの代わりにMPにダメージを受けさせます。  

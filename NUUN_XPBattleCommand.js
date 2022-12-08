@@ -20,15 +20,15 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 2022/12/8 Ver.1.0.4
+ * 12/8/2022 Ver.1.0.4
  * Changed the display in languages other than Japanese to English.
- * 2022/3/17 Ver.1.0.3
+ * 3/17/2022 Ver.1.0.3
  * Fixed processing when joining and leaving an actor.
- * 2021/11/15 Ver.1.0.2
+ * 11/15/2021 Ver.1.0.2
  * Fixed an issue where commands were shifted when party command items exceeded the maximum number of columns.
- * 2021/11/14 Ver.1.0.1
+ * 11/14/2021 Ver.1.0.1
  * Fixed "Party command center".
- * 2021/11/7 Ver.1.0.0
+ * 11/7/2021 Ver.1.0.0
  * First edition.
  * 
  * @param PartyCommandSetting

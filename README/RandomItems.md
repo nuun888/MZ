@@ -1,5 +1,5 @@
 # [アイテム、お金のランダム入手](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)
-# Ver.1.3.0
+# Ver.1.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -49,6 +49,8 @@
 指定した金額取得時のアイコンIDをプラグインパラメータ「取得アイテムアイコンID」に代入します。
 
 ### 更新履歴  
+12/8/2022 Ver.1.3.1  
+Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)  
 2022/11/12 Ver.1.3.0
 メッセージのフォーマットを変更。  
 日本語以外での表示を英語表示に変更。  

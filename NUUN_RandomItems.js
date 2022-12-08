@@ -162,7 +162,7 @@
  * @param MoneyIconID
  * @desc Icon ID when getting money.
  * @text Money acquisition icon ID.
- * @type number
+ * @type icon
  * @default 0
  */
 /*:ja

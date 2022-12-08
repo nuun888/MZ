@@ -43,7 +43,7 @@
  * 
  * 
  */
-/*:
+/*:ja
  * @target MZ
  * @plugindesc ステート、バフターン操作アイテム、スキル
  * @author NUUN

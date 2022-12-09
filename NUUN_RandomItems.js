@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * Randomly obtain items and money.
@@ -23,6 +23,8 @@
  * The list ID, item name, icon index and weight of the acquired item can be assigned to variables.
  * Common events are assigned common event IDs instead of item names. Not assigned icon index.
  * Money is displayed by the amount obtained instead of the item name. Icon index is not assigned.
+ * The conditional expression becomes a lottery target when the specified conditions are met. 
+ * Enter the evaluation expression (java script code) for the conditional expression.
  * 
  * Message when item is acquired.
  * %1: Item name
@@ -38,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/9/2022 Ver.1.3.2
+ * Added a function that can set a conditional expression for the random acquisition target.
  * 12/8/2022 Ver.1.3.1
  * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
  * 11/12/2022 Ver.1.3.0
@@ -109,59 +113,67 @@
  * @text Acquisition item ID
  * @desc ID of the item that can be acquired.
  * @type select
- * @option Item
+ * @option Item(1)(6)(7)(8)(9)
  * @value 0
- * @option Weapon
+ * @option Weapon(2)(6)(7)(8)(9)
  * @value 1
- * @option Armor
+ * @option Armor(3)(6)(7)(8)(9)
  * @value 2
- * @option Money
+ * @option Money(4)(6)(7)(8)(9)
  * @value 3
- * @option Common event
+ * @option Common event(5)(6)(9)
  * @value 10
  * @default 0
  * 
  * @param ItemId
- * @text Acquired item
+ * @text Acquired item(1)
  * @desc Items that can be acquired.
  * @type item
  * 
  * @param WeaponId
- * @text Acquired weapons
+ * @text Acquired weapons(2)
  * @desc Weapons that can be acquired.
  * @type weapon
  * 
  * @param ArmorId
- * @text Acquired armor
+ * @text Acquired armor(3)
  * @desc Armor that can be acquired.
  * @type armor
  * 
  * @param GainMoney
- * @text Acquired money
+ * @text Acquired money(4)
  * @desc money you can get.
  * @type number
  * @min -9999999999999
  * 
  * @param Common
- * @text Common event
+ * @text Common event(5)
  * @desc Open a common event.
  * @type common_event
  * @default 0
  * 
  * @param weight
- * @text weight
+ * @text weight(6)
  * @desc weight.
  * @type number
  * @default 1
  * 
+ * @param Cond
+ * @text conditional expression(9)
+ * @desc Fill in the conditions.
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option '$gameSwitches.value(0);//スイッチ'
+ * @default 
+ * 
  * @param GetText
- * @text Acquisition message
+ * @text Acquisition message(7)
  * @desc message when retrieving.
  * @type string
  * 
  * @param MoneyIconID
  * @desc Icon ID when getting money.
- * @text Money acquisition icon ID.
+ * @text Money acquisition icon ID.(8)
  * @type icon
  * @default 0
  */
@@ -171,7 +183,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * アイテム、お金をランダムで入手します。
@@ -181,6 +193,7 @@
  * 取得したアイテムのリストID、アイテム名、アイコンインデックス、重みを変数に代入できます。
  * コモンイベントはアイテム名ではなくコモンイベントIDが代入されます。アイコンインデックスを代入されません。
  * お金はアイテム名ではなく取得した金額で表示されます。アイコンインデックスは代入されません。
+ * 条件式は、指定の条件が一致したときに抽選対象になります。条件式は評価式(java script code)を入力します。
  * 
  * アイテム取得時のメッセージ
  * %1:アイテム名
@@ -198,6 +211,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/9 Ver.1.3.2
+ * ランダム取得対象に条件式を設定できる機能を追加。
  * 2022/12/8 Ver.1.3.1
  * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
  * 2022/11/12 Ver.1.3.0
@@ -269,59 +284,67 @@
  * @text 取得アイテムのID
  * @desc 取得できるアイテムのID。
  * @type select
- * @option アイテム
+ * @option アイテム(1)(6)(7)(8)(9)
  * @value 0
- * @option 武器
+ * @option 武器(2)(6)(7)(8)(9)
  * @value 1
- * @option 防具
+ * @option 防具(3)(6)(7)(8)(9)
  * @value 2
- * @option 金額
+ * @option 金額(4)(6)(7)(8)(9)
  * @value 3
- * @option コモンイベント
+ * @option コモンイベント(5)(6)(9)
  * @value 10
  * @default 0
  * 
  * @param ItemId
- * @text 取得アイテム
+ * @text 取得アイテム(1)
  * @desc 取得できるアイテム。
  * @type item
  * 
  * @param WeaponId
- * @text 取得武器
+ * @text 取得武器(2)
  * @desc 取得できる武器。
  * @type weapon
  * 
  * @param ArmorId
- * @text 取得防具
+ * @text 取得防具(3)
  * @desc 取得できる防具。
  * @type armor
  * 
  * @param GainMoney
- * @text 取得金額
+ * @text 取得金額(4)
  * @desc 取得できるお金。
  * @type number
  * @min -9999999999999
  * 
  * @param Common
- * @text コモンイベント
+ * @text コモンイベント(5)
  * @desc コモンイベントを開きます。
  * @type common_event
  * @default 0
  * 
  * @param weight
- * @text 重み
+ * @text 重み(6)
  * @desc 重み。
  * @type number
  * @default 1
  * 
+ * @param Cond
+ * @text 条件式(9)
+ * @desc 条件を記入します。
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option '$gameSwitches.value(0);//スイッチ'
+ * @default 
+ * 
  * @param GetText
- * @text 取得時メッセージ
+ * @text 取得時メッセージ(7)
  * @desc 取得時のメッセージ。
  * @type string
  * 
  * @param MoneyIconID
  * @desc お金取得時のアイコンID。
- * @text お金取得時アイコンID
+ * @text お金取得時アイコンID(8)
  * @type icon
  * @default 0
  */
@@ -356,7 +379,7 @@ Imported.NUUN_RandomItems = true;
   Game_Party.prototype.randomItems = function(args) {
     const list = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args)) : null) || [];
     if (list) {
-      const data = list.list;
+      const data = list.list.filter(a => !a.Cond || (a.Cond && eval(a.Cond)));
       const itemData = this.randomItemList(data);
       const interpreter = new Game_Interpreter();
       interpreter.clear();
@@ -384,7 +407,7 @@ Imported.NUUN_RandomItems = true;
     let text = '';
     if(GetItemMessage) {
       if(itemDeta.itemType === "money") {
-        text = itemDeta.text ? itemDeta.text : GetGoldMessage;console.log(itemDeta)
+        text = itemDeta.text ? itemDeta.text : GetGoldMessage;
         text = text.format(itemDeta.deta, itemDeta.iconId, TextManager.currencyUnit);
       } else {
         text = itemDeta.text ? itemDeta.text : GetTextMessage;

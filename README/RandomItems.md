@@ -1,5 +1,5 @@
 # [アイテム、お金のランダム入手](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)
-# Ver.1.3.1
+# Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -35,6 +35,9 @@
 #### 重み
 取得するアイテム等の重みを指定します。
 
+#### 条件式
+指定の条件が一致したときに抽選対象になります。条件式は評価式(java script code)を入力します。  
+
 #### 取得時メッセージ
 取得時のメッセージを表示します。  
 アイテム取得時のメッセージ  
@@ -49,6 +52,8 @@
 指定した金額取得時のアイコンIDをプラグインパラメータ「取得アイテムアイコンID」に代入します。
 
 ### 更新履歴  
+2022/12/9 Ver.1.3.2  
+ランダム取得対象に条件式を設定できる機能を追加。  
 12/8/2022 Ver.1.3.1  
 Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)  
 2022/11/12 Ver.1.3.0

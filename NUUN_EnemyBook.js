@@ -8,11 +8,2696 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Enemy book
+ * @author NUUN
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @version 2.17.3
+ * 
+ * @help
+ * Implement an enemy book.
+ * With this plugin, you can freely customize the display content of enemy information.
+ * 
+ * Feature
+ * Enemy Book: Check enemy information. It can be displayed even in battle.
+ * Enemy Information: You can check the information of the enemy you are currently fighting.
+ * Analyze: Check the information of the specified enemy.
+ * 
+ * Registration of enemy information
+ * Set in the plugin parameters "Enemy book registration settings".
+ * Start of battle: Register the enemies that appear in the book at the start of battle.
+ * Defeat: Registers the enemy in the book when defeated.
+ * When analysis is successful: Register in the book when the analysis is successful.
+ * End of battle: Register the appearing enemy in the book at the end of the battle.
+ * If Status information registration is OFF and Information unregistered status display is ON in the item settings, the display will be displayed as "a" etc. unless it is registered in the picture book when Status information registration is ON.
+ * Example
+ * Register in the book at the start of battle, and register status information when defeating
+ * Set End of battle (Status information registration OFF) and Defeat (Status information registration ON) in the list.
+ * Register all when analysis is successful
+ * Set When analysis is successful (Status information registration ON) in the list.
+ * 
+ * Enemy character's memo column and enemy category setting notes *The latter is only when the category is displayed
+ * Description field text Text code is available.
+ * <[tag]:[text]> Description field text
+ * [tag]:Description field tag name　By default, the tag describing the enemy description is set to "desc".
+ * [text]:Text to display.
+ * Any number of lines can be displayed by inserting a line break, so you can add your own items.
+ * <desc:ahhh> Displays "ahhh" for items tagged "desc".
+ * By default, the item displayed on the second page is set to "desc", so enter <desc:[text]> to display text.
+ * 
+ * Displaying Images by Enemy
+ * <[tag]:[img],[x],[y]> Specify an arbitrary image to be displayed in the page.
+ * [tag]:Individual image tag name (set in Description field, Individual image tag name)
+ * [img]:Image path (no extension)
+ * If the individually specified image folder is 'pictures', enter the file directly under img/pictures without an extension.
+ * When acquiring from a subfolder, please also enter the subfolder name. Example items/tankobu
+ * [x]:x-coordinate (relative)
+ * [y]:y coordinate (relative)
+ * If you want to specify multiple images, set as many as you want to display in the item list, and set them with separate names in ”Description column, individual image tag name”.
+ * By default, the "pictures" folder is specified.
+ * ”Individual image” is a function to display a different arbitrary image for each monster page. If you want to display the monster image, please display it with "Enemy picture".
+ * 
+ * Registration in enemy book
+ * <NoBook>(tag default without enemy book registration)
+ * It is not registered (displayed) in the enemy book.
+ * You can set any tag name in the plugin parameter "Tag without enemy book registration". If you want to use the tag name of the old version as it is, please replace the tag name with "Tag without enemy book registration2".
+ * <NoBookData>(Tag 2 default without enemy book registration)
+ * It will not be registered (displayed) in the Monster Encyclopedia, but only enemy information and analysis will be displayed.
+ * Any tag name can be set in the plug-in parameter "Tag without enemy book registration2".
+ * <ShowDataBook>
+ * Even if you have not defeated it, it will be judged as already defeated. All information is also displayed.
+ * <AnalyzeResist:50> Sets the analysis resistance value. In this case, the analysis succeeds with a probability of 50%.
+ * 
+ * Registration settings when transforming
+ * <NoTransformInData> When transforming, it will not be treated as defeated and will not be registered in the picture book. (Only when "Defeat before transformation" is ON)
+ * <TransformEnemy:[enemyid]> Makes the monster with the specified ID defeated when defeated. Also, the number of defeats, acquired items, etc. will be counted for the monster with the specified ID.
+ * [enemyid]:EnemyID
+ * 
+ * Other monster settings
+ * <EnemyIcon:[iconid]>
+ * An icon can be displayed to the left of the monster name.
+ * <EnemyIcon:120> The icon with icon ID 120 is displayed.
+ * 
+ * Skill and item notes
+ * <AnalyzeSkill:[id]> Activate the analyze skill.
+ * [id]:List number of analysis skill settings
+ * <AnalyzeSkill:1> This skill and item are Analyze Skills, and will be activated with the 1st setting in the "Analyze skill setting" list.
+ * 
+ * <CertainAnalyze> Ignore analysis resistance.
+ * 
+ * <EnemyInfo> Displays enemy information.
+ * 
+ * Item notes
+ * <NoDropProbability>
+ * Items marked with this tag will not show drop item probability display.
+ * 
+ * Enemy Type Category Settings
+ * You can display enemies by type.
+ * Category key can be set with any character string except "all".
+ * If "all" is entered, all enemies registered in the enemy book will be displayed.
+ * Enemy notes
+ * <CategoryKey:[Key]> Set the categories to display.
+ * <CategoryKey:[Key],[Key]....> Multiple categories can be displayed.
+ * [Key]:Category Key (Enter the string set in the plug-in parameter without [])
+ * 
+ * You can display the items when the category is selected. Not displayed when not set.
+ * Tags such as ``Description field'' are entered in the notes of the enemy category setting in the plugin parameters.
+ * 
+ * Message when analysis skill setting fails
+ * %1:Target name
+ * %2:Subject name
+ * When "%2 failed to analyze.", if the skill user is a lead, "Lead failed to analyze." is displayed.
+ * 
+ * Side view (specified when showing side view enemies in item settings)
+ * <EB_SVBattler:[fileName]> Display the monster image as a side view image. (It is assumed that you have installed a plug-in that displays the side view actor on the enemy)
+ * [fileName]:File name Specify the side view battler image. Please specify the file name in the sv_actors folder without the extension.
+ * <EB_SVBattlerMotion:[motionId]> Display with the specified motion. If there is no entry, it will be displayed with 0 motion.
+ * [motionId]:0 to 17 motion ID (enter numerical value)
+ * 
+ * Character (Displayed when character is specified in item settings)
+ * <EnemyBookCharacter:[failName],[id],[direction]> Display character chips. It will not be displayed for enemies that are not specified.
+ * [failName]:File name Specify the file name in the "characters" folder without an extension.
+ * [id]:Character chip index number. The 3x4 character chip will be 0.
+ * [direction]:Specifies direction. 2 front (top) 4 left (second) 6 right (third) 8 rearward (bottom) * can be omitted
+ * 
+ * ”Unencountered category string”, ”unidentified enemy string”, ”Item when status information is not registered, skill display name”, "RegistrationEnemyInfo(ON)" will be replaced with "?" depending on the number of characters in the name if only one "?" is entered.
+ * 
+ * If you turn on "Unconfirmed drop item name" and "Unconfirmed stealable item name", even if you register status information, it will not be displayed until you confirm the drop item (stealable item).
+ * "Unconfirmed use skill display" will not be displayed until you confirm the skill used even if you register the status information.
+ * "Hide Unverified Attributes", "Hide unconfirmed state", and "Hide unidentified debuffs" will not be displayed until you confirm attributes, states, and debuff resistance weaknesses even if you register status information.
+ * 
+ * Page window display Mode
+ * By setting it to hidden, the page window will be displayed outside the screen and the enemy book display area will be expanded.
+ * 
+ * Element resistance (icon display) setting
+ * Disabled reflected in less effective elements
+ * When turned off, elements with 0% resistance are displayed in resistance elements.
+ * 
+ * Background image
+ * "Background image window size" aligns the upper left of the image according to the UI screen.
+ * "BackFitWidth" is expanded according to the screen size based on the mode set in the background image UI window size.
+ * If it fits in the UI window, it will be enlarged with the size of the UI.
+ * If it is specified for each page, the background set individually takes precedence.
+ * 
+ * Gauges such as turn, level, and HP are displayed only during battle.
+ * 
+ * Method of operation
+ * Up and down (↑ ↓) keys: select enemy
+ * Left and right (← →) keys: Switch pages
+ * PgUp PgDn key: monster page turn
+ * 
+ * touch operation
+ * Up/down swipe: scroll
+ * 
+ * plugin command
+ * Enemy book open                                          :Open the enemy book.
+ * Enemy information display                                :Open enemy information.
+ * Added Enemy                                              :Add an enemy to the picture book. No status information is registered.
+ * Enemy deletion                                           :Removes enemies from the enemy book.
+ * Enemy book completed                                     :Complete the enemy book.
+ * Initialize Enemy Book                                    :Clear (delete all) the enemy book.
+ * Enemy status information registration                    :Register enemy status information. At the same time, the process of "add enemy" is also performed.
+ * Removes enemy status information                         :Removes enemy status information.
+ * Enemy defeated                                           :Makes the enemy defeated.
+ * Reset number of kills                                    :Resets the number of defeated enemies.
+ * Acquired enemy drop items                                :Makes the enemy's gain item acquired.
+ * Unobtained enemy drop items                              :Makes the enemy's drop item unacquired.
+ * Acquired enemy steal item                                :Makes the enemy's steal item acquired.
+ * Enemy steal item not acquired                            : Makes the enemy's steal item unacquired.
+ * Total Killed Number of Enemies                           :Stores the number of defeated enemies in a variable.
+ * Encounter Count                                          :Stores the number of enemies encountered in a variable.
+ * Enemy book completion rate                               :Stores the completion rate of the enemy book.
+ * Total number of kills                                    :Stores the number of kills for the specified enemy in a variable.
+ * Enemy book registered judgment                           :Determines if the enemy is registered in the enemy book.
+ * Status information registered judgment                   :Determines if the enemy's status information has been registered in the enemy book.
+ * Item drop judgment                                       :Determines if the specified item has been dropped.
+ * Item stolen judgment                                     :Determine if you have stolen the specified item.
+ * Unconfirmed use skill confirmed                          :Makes the enemy's use skill "confirmed".
+ * Confirmed skill used Unconfirmed                         :Makes the enemy's use skill "unconfirmed".
+ * Unconfirmed attribute resistance information confirmed   :Makes the enemy's attribute resistance weakness "confirmed". Specify 0 to make all "confirmed". (requires NUUN_EnemyBookEX_1)
+ * Confirmed attribute resistance information unconfirmed   :Makes the enemy's attribute resistance weak point "unconfirmed". Specify 0 to make all "unconfirmed". (requires NUUN_EnemyBookEX_1)
+ * Unconfirmed state resistance information Confirmed       :Makes the enemy's state resistance weakness "confirmed". Specify 0 to make all "confirmed". (requires NUUN_EnemyBookEX_1)
+ * Confirmed state resistance information unconfirmed       :Makes the enemy's state resistance weak point "unconfirmed". Specify 0 to make all "unconfirmed". (requires NUUN_EnemyBookEX_1)
+ * Unconfirmed debuff resistance information Confirmed      :Makes the enemy's debuff resistance weak point "confirmed". Specify 0 to make all "confirmed". (requires NUUN_EnemyBookEX_1)
+ * Confirmed debuff resistance information unconfirmed      :Makes the enemy's debuff resistance weak point "unconfirmed". Specify 0 to make all "unconfirmed". (requires NUUN_EnemyBookEX_1)
+ * 
+ * Parameter reference variable
+ * this._enemy or de: Get enemy data from the database.
+ * this._enemy.meta: Get the meta tag.
+ * enemy: Get data for Game_Enemy.
+ * 
+ * Requires "NUUN_StealableItems" to enable stealable items.
+ * Requires "NUUN_EnemyBookEX_2" and "NUUN_ConditionalDrops" to enable conditional items.
+ * Requires "NUUN_RadarChartBase" to enable radar charts.
+ * Requires "NUUN_EnemyBookEX_1" to enable state, attribute, and buff resistance mask functions.
+ * 
+ * Displaying Apng images
+ * Separately, "ApngPicture.js" by "Triacontane" and the following libraries are required.
+ * https://github.com/sbfkcel/pixi-apngAndGif
+ * Please check ApngPicture.js for the download destination.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * 更新履歴
+ * 12/9/2022 Ver.2.17.3
+ * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
+ * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
+ * Changed the display in languages other than Japanese to English.
+ * 11/20/2022 Ver.2.17.2
+ * Fixed enemy information not switching between same enemy information.
+ * 11/19/2022 Ver.2.17.1
+ * Fixed an issue where registration in the enemy book and status registration were not performed when defeated.
+ * Fixed the problem that registration in the enemy book and status registration were not performed when analyzing.
+ * 11/19/2022 Ver.2.17.0
+ * Added a function that can display an icon next to the item name.
+ * 11/12/2022 Ver.2.16.5
+ * Added ability to display enemy levels.
+ * APNG related fixes.
+ * 11/6/2022 Ver.2.16.4
+ * APNG related fixes.
+ * 11/5/2022 Ver.2.16.3
+ * Fixed the problem that an error occurs when ApngPicture is not installed.
+ * 11/5/2022 Ver.2.16.2
+ * Fixed the problem that monsters displayed in APNG are displayed twice.
+ * 11/5/2022 Ver.2.16.1
+ * Apng compatible. (Requires ApngPicture.js from Triacontane)
+ * 10/18/2022 Ver.2.16.0
+ * Added a function that can display items when selecting a category in the enemy status window.
+ * Fixed an issue where enemies were not showing up in categories.
+ * /10/9/2022 Ver.2.15.0
+ * Added a function that allows you to set items that can be displayed for unregistered enemies.
+ * Fixed the problem that the alphabet displayed when there is the same enemy in the enemy list of enemy information is not displayed.
+ * Fixed an issue with non-working tags.
+ * 10/8/2022 Ver.2.14.3
+ * Added a function to change the registration of enemy book data to a specified enemy when defeated.
+ * Enemy information, fixed to not display the enemy number that is only displayed in analyze.
+ * Fixed an issue where registered text colors in the enemy selection window were not applied.
+ * Fixed an issue where the function to hide unregistered status information in enemy information was not applied.
+ * 10/4/2022 Ver.2.14.2
+ * Added a function that allows you to set any name for the tag displayed in the enemy book.
+ * 10/2/2022 Ver.2.14.1
+ * Fixed the problem that an error occurs when opening the picture book when specifying the item width.
+ * Fixed because the right of character alignment was wrong.
+ * Preset re-correction
+ * 10/2/2022 Ver.2.14.0
+ * Changed the specification of the setting when registering the enemy book.
+ * Changed specification of drop items, stealable items, conditional items, enemy skills, attribute resistance, and state resistance columns.
+ * Cleanup of plugin parameters.
+ * Fixed an issue where stealable items were not displaying properly.
+ * Changed specification of analysis setting.
+ * Specification change of <NoBook> and <NoBookData>.
+ * Changed so that the background image can be specified when selecting a category.
+ * 7/30/2022 Ver.2.13.4
+ * Added a function that allows you to specify a name that is not displayed in the enemy book.
+ * Fixed an issue that caused items to appear slightly offset when no content background was displayed.
+ * 6/15/2022 Ver.2.13.3
+ * Fixed the problem that NaN is displayed when a character string is entered in the evaluation expression.
+ * 6/13/2022 Ver.2.13.2
+ * Added a function to display the physical damage rate and magic damage rate in the element resistance list.
+ * 6/5/2022 Ver.2.13.1
+ * Fixed some processing.
+ * 5/5/2022 Ver.2.13.0
+ * Changed the stealing skill rate display to an evaluation formula format.
+ * Fixed an issue where the display of items would be unnatural if the probabilities were not displayed for drop items or stolen items.
+ * Changed specifications of drop item and evaluation formula entry for each item.
+ * Changed enemy book presets.
+ * 4/2/2022 Ver.2.12.1
+ * Added processing by saving picture book data sharing.
+ * 3/4/2022 Ver.2.12.0
+ * Added a function to display element and state resistance as a percentage.
+ * Fixed the problem that an error occurs at the start of battle depending on the pattern of enemy book registration.
+ * 1/29/2022 Ver.2.11.2
+ * Changed the specification of the drop item rate display.
+ * 1/24/2022 Ver.2.11.1
+ * Added ability to hide the enemy detail page window.
+ * 1/24/2022 Ver.2.11.0
+ * Cleaned up plugin parameters.
+ * Specification change of original parameter.
+ * Changed presets for enemy detail pages.
+ * Added a function to specify the item font size.
+ * Added ability to register at the end of battle.
+ * Fixed registration process.
+ * 1/1/2022 Ver.2.10.4
+ * Fixed the problem that the display shifts when opening enemy information when specifying the width of the information page during battle.
+ * Fixed the problem that the number notation of the category is strange.
+ * Fixed an issue where category names were displayed with different category names.
+ * 12/31/2021 Ver.2.10.3
+ * Fixed an issue that allows you to select categories that are not displayed.
+ * Fix to force enemy categories to be left aligned.
+ * 12/25/2021 Ver.2.10.2
+ * Fixed the problem that null is displayed when setting the unit with blank.
+ * 12/25/2021 Ver.2.10.1
+ * Changed the page category and enemy category to the command method.
+ * Fixed an issue where an error would occur when displaying the conditional drop item enemy book.
+ * 12/22/2021 Ver.2.10.0
+ * Changed so that flag processing is not performed when unconfirmed drop items, stealable item names, and hide used skill names are turned off.
+ * Added ability to show conditional drop items.
+ * 2/7/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * @param BasicSetting
+ * @text Basic setting
+ * @default ------------------------------
+ * 
+ * @param WindowMode
+ * @desc Specifies the display position of the selection window.
+ * @text Selection window position
+ * @type select
+ * @option Left
+ * @value 0
+ * @option Right
+ * @value 1
+ * @default 0
+ * @parent BasicSetting
+ * 
+ * @param RegistrationTiming
+ * @desc Set the registration method for the enemy book.
+ * @text Enemy book registration settings
+ * @type struct<RegistrationTimingList>[]
+ * @default ["{\"RegistrationTiming\":\"0\",\"RegisterStatus\":\"true\"}"]
+ * @parent BasicSetting
+ * 
+ * @param TransformDefeat
+ * @desc Assumes that the enemy before transformation has been defeated.
+ * @text Defeat before transformation
+ * @type boolean
+ * @default true
+ * @parent BasicSetting
+ * 
+ * @param NoDataName
+ * @desc Specify a name that is not registered in the enemy book. Name blanks are not registered by default.
+ * @text Names not registered in the enemy book
+ * @type string
+ * @default 
+ * @parent BasicSetting
+ * 
+ * @param NoBookTag
+ * @desc Tag names that will not be registered in the enemy book.
+ * @text Tag without enemy book registration
+ * @type string
+ * @default NoBook
+ * @parent BasicSetting
+ * 
+ * @param NoBookDataTag
+ * @desc Tag names that will not be registered in the enemy book.Enemy information will be displayed during analysis.
+ * @text Tag without enemy book registration2
+ * @type string
+ * @default NoBookData
+ * @parent BasicSetting
+ * 
+ * @param DecimalMode
+ * @text rounding off
+ * @desc Round off the non-display decimal point. (truncated at false)
+ * @type boolean
+ * @default true
+ * @parent BasicSetting
+ * 
+ * @param ImgFolder
+ * @desc Specify the folder name for the individually specified images. (directly under img)
+ * @text Individually specified image folder
+ * @type string
+ * @default 'pictures'
+ * @parent BasicSetting
+ * 
+ * @param SVEnemyMirror
+ * @type boolean
+ * @default true
+ * @text Side view butler reversal
+ * @desc Inverts the image when displaying Side View Battler.
+ * @parent BasicSetting
+ * 
+ * @param BackUiWidth
+ * @text Background image window size
+ * @desc Fit the background image to the UI window size.
+ * @type boolean
+ * @default true
+ * @parent BasicSetting
+ * 
+ * @param BackFitWidth
+ * @text Background image UI window size
+ * @desc Scales the background image to fit the window size or screen.
+ * @type boolean
+ * @default false
+ * @parent BasicSetting
+ * 
+ * @param CommandSetting
+ * @text Enemy Book Command Settings
+ * @default ------------------------------
+ * 
+ * @param CommandName
+ * @desc Name of the command.
+ * @text Command display name
+ * @type string
+ * @default Enemy Book
+ * @parent CommandSetting
+ * 
+ * @param ShowCommand
+ * @desc Add a enemy book to the menu command.
+ * @text Menu command display
+ * @type boolean
+ * @default false
+ * @parent CommandSetting
+ * 
+ * @param enemyBookSwitch 
+ * @desc Flag switch ID to display.
+ * @text Menu command display switch
+ * @type switch
+ * @default 0
+ * @parent CommandSetting
+ * 
+ * @param ShowBattleCommand
+ * @desc Adds an enemy book to party commands in battle.
+ * @text Party command display
+ * @type boolean
+ * @default false
+ * @parent CommandSetting
+ * 
+ * @param enemyBookBattleSwitch
+ * @desc Flag switch ID to be displayed during battle.
+ * @text Party command display switch
+ * @type switch
+ * @default 0
+ * @parent CommandSetting
+ * 
+ * @param InfoCommandSetting
+ * @text Enemy information command setting
+ * @default ------------------------------
+ * 
+ * @param EnemyInfoCommandName
+ * @desc Name of enemy information command.
+ * @text Enemy information command name
+ * @type string
+ * @default Enemy Info
+ * @parent InfoCommandSetting
+ * 
+ * @param ShowEnemyInfoCommand
+ * @desc Add enemy information to party commands during battle.
+ * @text Enemy Info Party Command Display
+ * @type boolean
+ * @default false
+ * @parent InfoCommandSetting
+ * 
+ * @param enemyBookInfoSwitch
+ * @desc A flag switch ID that displays enemy information during battle.
+ * @text Enemy information party command display switch ID.
+ * @type switch
+ * @default 0
+ * @parent InfoCommandSetting
+ * 
+ * @param WindowSetting
+ * @text Common window settings
+ * @default ------------------------------
+ * 
+ * @param BookWidth
+ * @desc Width of enemy info window. (2/3 of the screen at 0)
+ * @text Enemy info window width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent WindowSetting
+ * 
+ * @param NoTouchUIWindow
+ * @type boolean
+ * @default false
+ * @text Window top alignment when Touch UI is OFF
+ * @desc When the battle touch UI is off, the window is pushed up.
+ * @parent WindowSetting
+ * 
+ * @param AllEnemyBookWindowVisible
+ * @type boolean
+ * @default true
+ * @text Enemy book window display
+ * @desc Displays the window image of the enemy book.
+ * @parent WindowSetting
+ * 
+ * @param BattleAllEnemyBookWindowVisible
+ * @type boolean
+ * @default true
+ * @text Enemy Book window display during battle
+ * @desc Displays the enemy book, enemy information, and analysis window images during battle.
+ * @parent WindowSetting
+ * 
+ * @param BackgoundWindowMode
+ * @type boolean
+ * @default false
+ * @text Background image mode during battle
+ * @desc Sets the battle window to background image mode. Set it to ON when setting the background image.
+ * @parent WindowSetting
+ * 
+ * @param CategorySetting
+ * @text Display Category Window Setting
+ * @default ------------------------------
+ * @parent WindowSetting
+ * 
+ * @param CategoryNameWindowsSkin
+ * @desc Specifies the window skin for the display category window.
+ * @text Display category window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent CategorySetting
+ * 
+ * @param SelectCategorySetting
+ * @text Category window settings
+ * @default ------------------------------
+ * @parent WindowSetting
+ * 
+ * @param CategoryShow
+ * @type boolean
+ * @default false
+ * @text Show category window
+ * @desc Display the category window. If hidden, it will not be displayed with the View Categories window.
+ * @parent SelectCategorySetting
+ * 
+ * @param EnemyBookCategory
+ * @desc Set the enemy category.
+ * @text Enemy category setting
+ * @type struct<BookCategoryList>[]
+ * @default ["{\"CategoryName\":\"ALL\",\"CategoryKey\":\"all\",\"CategoryNote\":\"\"}","{\"CategoryName\":\"BOSS\",\"CategoryKey\":\"boss\",\"CategoryNote\":\"\"}"]
+ * @parent SelectCategorySetting
+ * 
+ * @param CategoryVisibleType
+ * @text Unencountered category display
+ * @desc Category display when you have not encountered even one.
+ * @type select
+ * @option Show
+ * @value 0
+ * @option Hide
+ * @value 1
+ * @option Hide with another string
+ * @value 2
+ * @default 0
+ * @parent SelectCategorySetting
+ * 
+ * @param CategoryUnknownData
+ * @desc A string of categories that have not yet been encountered.
+ * @text Unencountered category string
+ * @type string
+ * @default ?
+ * @parent SelectCategorySetting
+ * 
+ * @param CategoryListDateSetting
+ * @desc List to display when category is selected.
+ * @text Category display list
+ * @type struct<CategoryPageListData>[]
+ * @default []
+ * @parent SelectCategorySetting
+ * 
+ * @param CategoryWindowsSkin
+ * @desc Specifies the window skin for the category window.
+ * @text Category window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent SelectCategorySetting
+ * 
+ * @param SelectEnemySetting
+ * @text Monster selection window common settings
+ * @default ------------------------------
+ * @parent WindowSetting
+ * 
+ * @param NumberType
+ * @text Enemy number display
+ * @desc Displays enemy numbers.
+ * @type select
+ * @option No display of enemy No.
+ * @value 0
+ * @option Show enemy No.
+ * @value 1
+ * @option Display enemy No. and fill in 0.
+ * @value 2
+ * @default 1
+ * @parent SelectEnemySetting
+ * 
+ * @param UnknownVisible
+ * @desc Hides unidentified enemy from the list.
+ * @text Unidentified enemy display
+ * @type boolean
+ * @default false
+ * @parent SelectEnemySetting
+ * 
+ * @param NumberMode
+ * @desc When displayed from the category, the number display is displayed in the order of each category display.
+ * @text Number category display order display
+ * @type boolean
+ * @default false
+ * @parent SelectEnemySetting
+ * 
+ * @param UnknownEnemyIcons
+ * @desc Unregistered enemy icon.
+ * @text Unregistered enemy icon
+ * @type icon
+ * @default 0
+ * @min 0
+ * @parent SelectEnemySetting
+ * 
+ * @param UnknownData
+ * @desc A string of characters for enemies that have not been encountered.
+ * @text unidentified enemy string
+ * @type string
+ * @default ?
+ * @parent SelectEnemySetting
+ * 
+ * @param RegistrationEnemyColor
+ * @desc Color of registered enemy names.
+ * @text Registered enemy name text color
+ * @type color
+ * @default 0
+ * @max 999
+ * @parent SelectEnemySetting
+ * 
+ * @param RegistrationStatusEnemyColor
+ * @desc The color of enemy names registered in status information.
+ * @text Enemy name text color registered with status information
+ * @type color
+ * @default 0
+ * @max 999
+ * @parent SelectEnemySetting
+ * 
+ * @param SelectEnemybookSetting
+ * @text Enemy Book Selection Window Common Settings
+ * @default ------------------------------
+ * @parent SelectEnemySetting
+ * 
+ * @param IndexWindowsSkin
+ * @desc Specifies the window skin for the enemy selection window.
+ * @text Enemy selection window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent SelectEnemybookSetting
+ * 
+ * @param SelectEnemyInfoSetting
+ * @text Enemy information selection window common settings
+ * @default ------------------------------
+ * @parent SelectEnemySetting
+ * 
+ * @param InfoWindowsSkin
+ * @desc Specifies the window skin for enemy info windows.
+ * @text Enemy info window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent SelectEnemyInfoSetting
+ * 
+ * @param PercentWindow
+ * @text Enemy Book completenes Window Settings
+ * @default ------------------------------
+ * @parent WindowSetting
+ * 
+ * @param PercentWindowShow
+ * @type boolean
+ * @default true
+ * @text Enemy book completenes window display
+ * @desc Shows the enemy book completenes window. It is not displayed in enemy information and analysis.
+ * @parent PercentWindow
+ * 
+ * @param PercentContent
+ * @desc Set the display items in the enemy book completenes window.
+ * @text Display item setting
+ * @type struct<PercentContentList>[]
+ * @default ["{\"ContentName\":\"Completenes\",\"ContentDate\":\"0\"}","{\"ContentName\":\"Encountered\",\"ContentDate\":\"1\"}","{\"ContentName\":\"Destroyed\",\"ContentDate\":\"2\"}"]
+ * @parent PercentWindow
+ * 
+ * @param Interval
+ * @desc Enemy book completeness window update frame
+ * @text Update frame interval
+ * @type number
+ * @default 100
+ * @max 999999
+ * @min 0
+ * @parent PercentWindow
+ * 
+ * @param PercentWindowsSkin
+ * @desc Specifies the window skin for the enemy book perfection window.
+ * @text Enemy book completeness window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent PercentWindow
+ * 
+ * @param PageWindow
+ * @text Page window setting
+ * @default ------------------------------
+ * @parent WindowSetting
+ * 
+ * @param PageWindowsShow
+ * @desc Display the page window.
+ * @text Page window display Mode
+ * @type boolean
+ * @default false
+ * @parent PageWindow
+ * 
+ * @param PageCols
+ * @desc Maximum display col on the enemy book pages.
+ * @text Enemy book page maximum display col
+ * @type number
+ * @default 2
+ * @min 1
+ * @parent PageWindow
+ * 
+ * @param InfoPageCols
+ * @desc Maximum visible columns on enemy info pages.
+ * @text Enemy info page max display col
+ * @type number
+ * @default 2
+ * @min 1
+ * @parent PageWindow
+ * 
+ * @param PageWindowsSkin
+ * @desc Specifies the window skin for the page screen.
+ * @text Page window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent PageWindow
+ * 
+ * @param EnemyBookStatusSetting
+ * @text Enemy status settings
+ * @default ------------------------------
+ * @parent WindowSetting
+ * 
+ * @param EnemyBookDefaultFontSize
+ * @desc Default font size (difference from main font)
+ * @text Default font size
+ * @type number
+ * @min -99
+ * @default 0
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param UnknownStatus
+ * @desc Status display name when status information is not registered.
+ * @text Status display name when status information is not registered
+ * @type string
+ * @default ???
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param UnknownItems
+ * @desc Item when status information is not registered, skill display name.*1
+ * @text Item when status information is not registered, skill display name
+ * @type string
+ * @default ?
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param ContentWindowsSkin
+ * @desc Specifies the window skin for the enemy status window.
+ * @text Enemy status window skin
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param EnemyBookSetting
+ * @text Enemy book settings
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param PageSetting
+ * @desc Enemy Status Window Page Setup. Select the page to be displayed from the display list of display item settings.
+ * @text Page settings
+ * @type struct<PageSettingData>[]
+ * @default ["{\"ListDateSetting\":\"1\",\"PageCategoryName\":\"Basic Info\",\"BackGroundImg\":\"\"}","{\"ListDateSetting\":\"2\",\"PageCategoryName\":\"Element, State\",\"BackGroundImg\":\"\"}"]
+ * @parent EnemyBookSetting
+ * 
+ * @param ContentCols
+ * @text Enemy information item col
+ * @desc he number of enemy information item cols.
+ * @type number
+ * @default 2
+ * @min 1
+ * @parent EnemyBookSetting
+ * 
+ * @param CategoryBackGroundImg
+ * @desc Specify the name of the enemy book background image file when selecting a category.
+ * @text Category enemy book background image
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent EnemyBookSetting
+ * 
+ * @param DefaultBackGroundImg
+ * @desc Specify the default enemy book background image file name.
+ * @text Enemy book background image
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent EnemyBookSetting
+ * 
+ * @param UnregisteredEnemy
+ * @desc Specifies the display list of unregistered enemies. If 0, it will not be displayed.
+ * @text Unregistered enemy list designation
+ * @type select
+ * @option None
+ * @value 0
+ * @option List1
+ * @value 1
+ * @option List2
+ * @value 2
+ * @option List3
+ * @value 3
+ * @option List4
+ * @value 4
+ * @option List5
+ * @value 5
+ * @option List6
+ * @value 6
+ * @option List7
+ * @value 7
+ * @option List8
+ * @value 8
+ * @option List9
+ * @value 9
+ * @option List10
+ * @value 10
+ * @option List11
+ * @value 11
+ * @option List12
+ * @value 12
+ * @option List13
+ * @value 13
+ * @option List14
+ * @value 14
+ * @option List15
+ * @value 15
+ * @option List16
+ * @value 16
+ * @option List17
+ * @value 17
+ * @option List18
+ * @value 18
+ * @option List19
+ * @value 19
+ * @option List20
+ * @value 20 
+ * @default 0
+ * @parent EnemyBookSetting
+ * 
+ * @param EnemyInfoSetting
+ * @text Enemy information basic settings
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param InfoPageSetting
+ * @desc Enemy info page settings. Select the display page from the display list of "Display item setting".
+ * @text Page settings
+ * @type struct<PageSettingData>[]
+ * @default ["{\"ListDateSetting\":\"1\",\"PageCategoryName\":\"Basic Info\",\"BackGroundImg\":\"\"}","{\"ListDateSetting\":\"2\",\"PageCategoryName\":\"Element, State\",\"BackGroundImg\":\"\"}"]
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoContentCols
+ * @text Enemy information item col
+ * @desc The number of enemy information item columns.
+ * @type number
+ * @default 2
+ * @min 1
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoStatusGaugeVisible
+ * @type boolean
+ * @default true
+ * @text Show gauge
+ * @desc Displays gauges for HP, MP, and TP.
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoEnemyCurrentStatus
+ * @type boolean
+ * @default true
+ * @text Enemy current status display
+ * @desc Displays the enemy's current status.
+ * @parent EnemyInfoSetting
+ * 
+ * @param RegistrationEnemyInfo
+ * @desc The registration timing is also reflected in enemy information.
+ * @text Enemy information registration timing reflection
+ * @type boolean
+ * @default false
+ * @parent EnemyInfoSetting
+ * 
+ * @param InfoMaskMode
+ * @desc Hide the status if you have not registered the status information.
+ * @text Information unregistered status hidden
+ * @type boolean
+ * @default false
+ * @parent EnemyInfoSetting
+ * 
+ * @param DefaultInfoBackGroundImg
+ * @desc Specifies the default enemy information background image file name.
+ * @text Enemy information background image
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent EnemyInfoSetting
+ * 
+ * @param AnalyzeSetting
+ * @text Analysis basic settings
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param AnalyzeSkillMode
+ * @desc Configure analysis skills.
+ * @text Analyze skill setting
+ * @type struct<AnalyzeSkill>[]
+ * @default ["{\"ListNumber\":\"0\",\"PageCols\":\"2\",\"ContentCols\":\"2\",\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}","{\"ListNumber\":\"1\",\"PageCols\":\"2\",\"ContentCols\":\"2\",\"StatusGaugeVisible\":\"true\",\"EnemyCurrentStatus\":\"true\",\"AnalyzeMissMessage\":\"%2はアナライズに失敗した。\",\"BuffColor\":\"0\",\"DebuffColor\":\"0\"}"]
+ * @parent AnalyzeSetting
+ * 
+ * @param AnalyzeListData
+ * @desc Analyze settings.
+ * @text Analyze settings
+ * @type struct<AnalyzeList>[]
+ * @default ["{\"Name\":\"\",\"AnalyzePageList\":\"[\\\"{\\\\\\\"ListDateSetting\\\\\\\":\\\\\\\"11\\\\\\\",\\\\\\\"PageCategoryName\\\\\\\":\\\\\\\"\\\\\\\",\\\\\\\"BackGroundImg\\\\\\\":\\\\\\\"\\\\\\\"}\\\"]\"}"]
+ * @parent AnalyzeSetting
+ * 
+ * @param CommonVariableID
+ * @desc A variable that substitutes an enemy ID when specifying a common event.
+ * @text Enemy ID variable
+ * @type variable
+ * @default 0
+ * @parent AnalyzeSetting
+ * 
+ * @param BattleEnemyBookSetting
+ * @text Battle Enemy Book Common Settings
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param HPgaugeWidth
+ * @desc HP gauge width.
+ * @text HP gauge width
+ * @type number
+ * @default 200
+ * @max 999
+ * @min 0
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param MPgaugeWidth
+ * @desc MP gauge width.
+ * @text MP gauge width
+ * @type number
+ * @default 200
+ * @max 999
+ * @min 0
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param TPgaugeWidth
+ * @desc TP gauge width.
+ * @text TP gauge width
+ * @type number
+ * @default 200
+ * @max 999
+ * @min 0
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param BuffColor
+ * @desc Numerical color for stat parameters during stat buffs. (Enemy information, analysis)
+ * @text Status buff value color
+ * @type color
+ * @default 0
+ * @max 999999
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param DebuffColor
+ * @desc Numerical color of status parameters during status debuffs. (Enemy information, analysis)
+ * @text Status debuff value color
+ * @type color
+ * @default 0
+ * @max 999999
+ * @parent BattleEnemyBookSetting
+ * 
+ * @param ListData
+ * @text Display item setting
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param ListData1_10
+ * @text Display item setting 1-10
+ * @default ------------------------------
+ * @parent ListData
+ * 
+ * @param PageList1
+ * @desc List to display.
+ * @text display list 1
+ * @type struct<PageListData>[]
+* @default ["{\"BasicSetting\":\"\",\"DateSelect\":\"200\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"33\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"0\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"32\",\"X_Position\":\"2\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"2\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"3\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"4\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"5\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"6\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"7\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"8\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"30\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"31\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"40\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"41\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"45\",\"X_Position\":\"1\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"46\",\"X_Position\":\"2\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}"]
+* @parent ListData1_10
+*  
+* @param PageList2
+* @desc List to display.
+* @text display list 2
+* @type struct<PageListData>[]
+* @default ["{\"BasicSetting\":\"\",\"DateSelect\":\"200\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"33\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"paramName\":\"\",\"NameColor\":\"0\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"60\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"70\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"desc\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}"]
+* @parent ListData1_10
+* 
+* @param PageList3
+* @desc List to display.
+* @text display list 3
+* @type struct<PageListData>[]
+* @default ["{\"BasicSetting\":\"\",\"DateSelect\":\"200\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"33\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"paramName\":\"\",\"NameColor\":\"0\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"32\",\"X_Position\":\"2\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"1\",\"X_Position\":\"2\",\"Y_Position\":\"3\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"2\",\"X_Position\":\"2\",\"Y_Position\":\"4\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"3\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"4\",\"X_Position\":\"2\",\"Y_Position\":\"5\",\"X_Coordinate\":\"128\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"5\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"6\",\"X_Position\":\"2\",\"Y_Position\":\"6\",\"X_Coordinate\":\"128\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"7\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"8\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"128\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"50\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"30\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"31\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"40\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"41\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"45\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"46\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"[]\",\"ImgMaxHeight\":\"8\"}"]
+* @parent ListData1_10
+* 
+* @param PageList4
+* @desc List to display.
+* @text display list 4
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData1_10
+* 
+* @param PageList5
+* @desc List to display.
+* @text display list 5
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData1_10
+* 
+* @param PageList6
+* @desc List to display.
+* @text display list 6
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData1_10
+* 
+* @param PageList7
+* @desc List to display.
+* @text display list 7
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData1_10
+* 
+* @param PageList8
+* @desc List to display.
+* @text display list 8
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData1_10
+* 
+* @param PageList9
+* @desc List to display.
+* @text display list 9
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData1_10
+* 
+* @param PageList10
+* @desc List to display.
+* @text display list 10
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData1_10
+* 
+* @param ListData11_20
+* @text Display item setting 11-20
+* @default ------------------------------
+* @parent ListData
+* 
+* @param PageList11
+* @desc List to display.
+* @text display list 11
+* @type struct<PageListData>[]
+* @default ["{\"BasicSetting\":\"\",\"DateSelect\":\"33\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"paramName\":\"\",\"NameColor\":\"0\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"false\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"center\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"200\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"2\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"left\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"2\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"4\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"5\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"6\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"7\",\"X_Position\":\"1\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}","{\"BasicSetting\":\"\",\"DateSelect\":\"8\",\"X_Position\":\"2\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"220\",\"SystemItemWidth\":\"0\",\"WideMode\":\"1\",\"paramName\":\"\",\"NameColor\":\"16\",\"DetaEval\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"MaskMode\":\"true\",\"Decimal\":\"0\",\"paramUnit\":\"\",\"namePosition\":\"\\\"right\\\"\",\"textMethod\":\"\",\"ImgData\":\"\",\"ImgMaxHeight\":\"8\"}"]
+* @parent ListData11_20
+* 
+* @param PageList12
+* @desc List to display.
+* @text display list 12
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData11_20
+* 
+* @param PageList13
+* @desc List to display.
+* @text display list 13
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData11_20
+* 
+* @param PageList14
+* @desc List to display.
+* @text display list 14
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData11_20
+* 
+* @param PageList15
+* @desc List to display.
+* @text display list 15
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData11_20
+* 
+* @param PageList16
+* @desc List to display.
+* @text display list 16
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData11_20
+* 
+* @param PageList17
+* @desc List to display.
+* @text display list 17
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData11_20
+* 
+* @param PageList18
+* @desc List to display.
+* @text display list 18
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData11_20
+* 
+* @param PageList19
+* @desc List to display.
+* @text display list 19
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData11_20
+* 
+* @param PageList20
+* @desc List to display.
+* @text display list 20
+* @type struct<PageListData>[]
+* @default []
+* @parent ListData11_20
+* 
+* @param DropItemData
+* @text Drop item settings
+* @default ------------------------------
+* @parent EnemyBookStatusSetting
+* 
+* @param DropItemProbabilityShow
+* @desc Display probabilities.
+* @text Probability display
+* @type boolean
+* @default true
+* @parent DropItemData
+* 
+* @param DropRateEval
+* @desc Defines the drop rate evaluation formula.  rate:denominator  di:drop information
+* @text Drop rate evaluation formula
+* @type combo
+* @option '1/'+ rate
+* @option ge.getDropItemsRatePercentage(di) +'%';//NUUN_DropRatePercentageVer.1.0.1～
+* @option ge.dropItemMolecule(i) +'/'+ rate;//NUUN_DropItemMolecule
+* @default 
+* @parent DropItemData
+* 
+* @param ShowDropItemName
+* @desc Hide unconfirmed drop items. 
+* @text Unconfirmed drop item name
+* @type boolean
+* @default false
+* @parent DropItemData
+* 
+* @param DropItemMultiCols
+* @desc Display column for drop items.
+* @text Display col
+* @type number
+* @min 1
+* @default 1
+* @parent DropItemData
+* 
+* @param CondDropData
+* @text Conditional drop item settings
+* @default ------------------------------
+* @parent DropItemData
+* 
+* @param CondDropItemCols
+* @desc Display column for conditional drop items.
+* @text Display col
+* @type number
+* @min 1
+* @default 1
+* @parent CondDropData
+* 
+* @param StealItemData
+* @text Steel item settings
+* @default ------------------------------
+* @parent EnemyBookStatusSetting
+* 
+* @param StealItemProbabilityShow
+* @desc Display probabilities.
+* @text Probability display
+* @type boolean
+* @default true
+* @parent StealItemData
+* 
+* @param StealRateEval
+* @desc Define the steal rate evaluation formula. rate: Steal rate (percentage)
+* @text Steal rate evaluation formula
+* @type combo
+* @option rate +'%';//Steal rate
+* @default 
+* @parent StealItemData
+* 
+* @param ShowStealItemName
+* @desc Hide unidentified stealable items.
+* @text Unconfirmed stealable item name
+* @type boolean
+* @default false
+* @parent StealItemData
+* 
+* @param StealItemCols
+* @desc Display column for steel items.
+* @text Display col
+* @type number
+* @min 1
+* @default 1
+* @parent StealItemData
+* 
+* @param ActionData
+* @text Enemy use skill setting
+* @default ------------------------------
+* @parent EnemyBookStatusSetting
+* 
+* @param ShowActionName
+* @desc Hide unconfirmed use skills. 
+* @text Unconfirmed use skill display
+* @type boolean
+* @default false
+* @parent ActionData
+* 
+* @param ActionMaxItems
+* @desc Maximum number of items to display. (0 for no limit)
+* @text Maximum number of items
+* @type number
+* @default 0
+* @min 0
+* @parent ActionData
+* 
+* @param ActionCols
+* @desc Enemy skill display column.
+* @text Display col
+* @type number
+* @min 1
+* @default 1
+* @parent ActionData
+* 
+* @param ResistWeakElementData
+* @text Attribute resistance setting
+* @default ------------------------------
+* @parent EnemyBookStatusSetting
+* 
+* @param ElementList
+* @desc Element to display. (Common to attribute icons, resistance list, and radar chart)
+* @text Display element
+* @type struct<ElementData>[]
+* @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"76\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"66\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"67\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"68\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"69\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"70\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"71\"}"]
+* @parent ResistWeakElementData
+* 
+* @param ElementUnknownIconId
+* @desc Specifies the ID of the element icon to be displayed when the status information is not registered.
+* @text Element icon ID when status information is not registered
+* @type icon
+* @default 0
+* @parent ResistWeakElementData
+* 
+* @param ElementIcon
+* @text Element resistance (icon display) setting
+* @default ------------------------------
+* @parent ResistWeakElementData
+* 
+* @param ResistNoEffectElement
+* @desc Invalidity is reflected in the element which is hard to work.
+* @text Disabled reflected in less effective elements
+* @type boolean
+* @default true
+* @parent ElementIcon
+* 
+* @param ElementValue
+* @text Element resistance (resistance numerical display)
+* @default ------------------------------
+* @parent ResistWeakElementData
+* 
+* @param ResistWeakElementMode
+* @text Element resistance display mode
+* @desc Specifies the type to display.
+* @type select
+* @option element name
+* @value 0
+* @option Icon
+* @value 1
+* @option Element name and icon
+* @value 2
+* @default 2
+* @parent ElementValue
+* 
+* @param ElementCol
+* @desc Display column of element resistance.
+* @text Element resistance display column
+* @type boolean
+* @default false
+* @parent ElementValue
+* 
+* @param ElementRadarChart
+* @text Element resistance radar chart
+* @default ------------------------------
+* @parent ResistWeakElementData
+* 
+* @param ElementRadarChartRadius
+* @desc Radar chart radius.
+* @text Radar chart radius
+* @type number
+* @default 100
+* @parent ElementRadarChart
+* 
+* @param ElementRadarChartFramecolor
+* @desc Set the border color of the radar chart.
+* @text Radar chart frame color
+* @type color
+* @default 15
+* @parent ElementRadarChart
+* 
+* @param ElementRadarChartLineColor
+* @desc Sets the line color of the radar chart.
+* @text Radar chart line color
+* @type color
+* @default 15
+* @parent ElementRadarChart
+* 
+* @param ElementRadarChartMainColor1
+* @desc Sets the background color of the center of the radar chart.
+* @text Radar chart center background color
+* @type color
+* @default 3
+* @parent ElementRadarChart
+* 
+* @param ElementRadarChartMainColor2
+* @desc Sets the outer background color of the radar chart.
+* @text Radar chart outer background color
+* @type color
+* @default 3
+* @parent ElementRadarChart
+* 
+* @param ElementRadarChartX
+* @desc Radar chart X coordinate (relative).
+* @text Radar chart X coordinate
+* @type number
+* @min -9999
+* @default 48
+* @parent ElementRadarChart
+* 
+* @param ElementRadarChartY
+* @desc Radar chart Y coordinate (relative).
+* @text Radar chart Y coordinate
+* @type number
+* @min -9999
+* @default 48
+* @parent ElementRadarChart
+* 
+* @param ElementRadarChart_FontSize
+* @desc Font size. (from main font)
+* @text Font siz
+* @type number
+* @default -12
+* @min -9999
+* @parent ElementRadarChart
+* 
+* @param NUUN_EnemyBookEX_1
+* @text (要NUUN_EnemyBookEX_1)
+* @default ------------------------------
+* @parent ResistWeakElementData
+* 
+* @param ShowElementsIcon
+* @desc Hides unconfirmed resistance weakness attributes.
+* @text Hide Unverified Attributes(requires NUUN_EnemyBookEX_1)
+* @type boolean
+* @default false
+* @parent NUUN_EnemyBookEX_1
+* 
+* @param ResistWeakStateData
+* @text State resistance setting
+* @default ------------------------------
+* @parent EnemyBookStatusSetting
+* 
+* @param StateList
+* @desc State to display.
+* @text Display state
+* @type struct<StateData>[]
+* @default ["{\"StateId\":\"1\"}","{\"StateId\":\"4\"}","{\"StateId\":\"5\"}","{\"StateId\":\"6\"}","{\"StateId\":\"7\"}","{\"StateId\":\"8\"}","{\"StateId\":\"9\"}","{\"StateId\":\"10\"}","{\"StateId\":\"12\"}","{\"StateId\":\"13\"}"]
+* @parent ResistWeakStateData
+* 
+* @param StateUnknownIconId
+* @desc Specify the ID of the state icon to be displayed when the status information is not registered.
+* @text State icon ID when status information is not registered
+* @type icon
+* @default 0
+* @parent ResistWeakStateData
+* 
+* @param ResistWeakStateIcon
+* @text State resistance (icon display) setting
+* @default ------------------------------
+* @parent ResistWeakStateData
+* 
+* @param NormalWeakState
+* @desc Apply valid states with 100% or higher effectiveness. If it is OFF, it will be 101% or more.
+* @text Effective attribute effectiveness (applied at 100% or more)
+* @type boolean
+* @default false
+* @parent ResistWeakStateIcon
+* 
+* @param ResistNoEffectState
+* @desc Apply invalid to less effective state. When OFF, the state with 0% resistance is displayed in the resistance state.
+* @text Apply invalid to less effective state
+* @type boolean
+* @default true
+* @parent ResistWeakStateIcon
+* 
+* @param ResistWeakStateValue
+* @text Resistance state (resistance numerical display) setting
+* @default ------------------------------
+* @parent ResistWeakStateData
+* 
+* @param ResistWeakStateMode
+* @text State display mode
+* @desc Specifies the type to display.
+* @type select
+* @option State name
+* @value 0
+* @option Icon
+* @value 1
+* @option State name and icon
+* @value 2
+* @default 2
+* @parent ResistWeakStateValue
+* 
+* @param StateCol
+* @desc Display column for state resistance.
+* @text State resistance display col
+* @type boolean
+* @default false
+* @parent ResistWeakStateValue
+* 
+* @param StateRadarChart
+* @text State resistance radar chart
+* @default ------------------------------
+* @parent ResistWeakStateData
+* 
+* @param StateRadarChartRadius
+* @desc Radar chart radius.
+* @text Radar chart radius
+* @type number
+* @default 100
+* @parent StateRadarChart
+* 
+* @param StateRadarChartFramecolor
+* @desc Set the border color of the radar chart.
+* @text Radar chart frame color
+* @type color
+* @default 15
+* @parent StateRadarChart
+* 
+* @param StateRadarChartLineColor
+* @desc Sets the line color of the radar chart.
+* @text Radar chart line color
+* @type color
+* @default 15
+* @parent StateRadarChart
+* 
+* @param StateRadarChartMainColor1
+* @desc Sets the background color of the center of the radar chart.
+* @text Radar chart center background color
+* @type color
+* @default 3
+* @parent StateRadarChart
+* 
+* @param StateRadarChartMainColor2
+* @desc Sets the outer background color of the radar chart.
+* @text Radar chart outer background color
+* @type color
+* @default 3
+* @parent StateRadarChart
+* 
+* @param StateRadarChartX
+* @desc Radar chart X coordinate (relative).
+* @text Radar chart X coordinate
+* @type number
+* @min -9999
+* @default 48
+* @parent StateRadarChart
+* 
+* @param StateRadarChartY
+* @desc Radar chart Y coordinate (relative).
+* @text Radar chart Y coordinate
+* @min -9999
+* @type number
+* @default 48
+* @parent StateRadarChart
+* 
+* @param StateRadarChart_FontSize
+* @desc Font size. (from main font)
+* @text Font size
+* @type number
+* @default -12
+* @min -9999
+* @parent StateRadarChart
+* 
+* @param RadarChartIcon
+* @desc Display the state display as an icon. OFF is the state name
+* @text Icon display
+* @type boolean
+* @default true
+* @parent StateRadarChart
+* 
+* @param NUUN_EnemyBookEX_1_State
+* @text (requires NUUN_EnemyBookEX_1)
+* @default ------------------------------
+* @parent ResistWeakStateData
+* 
+* @param ShowStateIcon
+* @desc Hide the state of unconfirmed resistance weaknesses.
+* @text Hide unconfirmed state (requires NUUN_EnemyBookEX_1)
+* @type boolean
+* @default false
+* @parent NUUN_EnemyBookEX_1_State
+* 
+* @param ResistWeakDebuffData
+* @text Debuff resistance weak point setting
+* @default ------------------------------
+* @parent EnemyBookStatusSetting
+* 
+* @param DeBuffList
+* @desc Debuff to display.
+* @text Display debuff
+* @type struct<DebuffData>[]
+* @default ["{\"ParamId\":\"0\",\"DebuffIconId\":\"48\"}","{\"ParamId\":\"1\",\"DebuffIconId\":\"49\"}","{\"ParamId\":\"2\",\"DebuffIconId\":\"50\"}","{\"ParamId\":\"3\",\"DebuffIconId\":\"51\"}","{\"ParamId\":\"4\",\"DebuffIconId\":\"52\"}","{\"ParamId\":\"5\",\"DebuffIconId\":\"53\"}","{\"ParamId\":\"6\",\"DebuffIconId\":\"54\"}","{\"ParamId\":\"7\",\"DebuffIconId\":\"55\"}"]
+* @parent ResistWeakDebuffData
+* 
+* @param DeBuffUnknownIconId
+* @desc Specifies the ID of the debuff icon to be displayed when status information is not registered.
+* @text Debuff icon ID when status information is not registered
+* @type icon
+* @default 0
+* @parent ResistWeakDebuffData
+* 
+* @param NUUN_EnemyBookEX_1_DeBuff
+* @text (requires NUUN_EnemyBookEX_1)
+* @default ------------------------------
+* @parent ResistWeakDebuffData
+* 
+* @param ShowDebuffIcon
+* @desc Hides unconfirmed state debuffs of resistance weaknesses.
+* @text Hide unidentified debuffs (requires NUUN_EnemyBookEX_1)
+* @type boolean
+* @default false
+* @parent NUUN_EnemyBookEX_1_DeBuff
+* 
+* 
+* 
+* @command EnemyBookOpen
+* @desc Open the enemy book.
+* @text Enemy book open
+* 
+* @command EnemyInfoOpen
+* @desc Open enemy information.
+* @text Enemy information display
+* 
+* @command EnemyBookAdd
+* @desc Add an enemy to the picture book. No status information is registered.
+* @text Added enemy
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @command EnemyBookRemove
+* @desc Removes enemies from the enemy book.
+* @text Enemy deletion
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @command EnemyBookStatusAdd
+* @desc Register enemy status information. It also performs the processing of "enemy addition".
+* @text Enemy status information registration
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @command EnemyBookStatusRemove
+* @desc Removes enemy status information.
+* @text Remove enemy status information
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @command EnemyBookComplete
+* @desc Complete the enemy book.
+* @text Enemy book completed
+* 
+* @command EnemyBookClear
+* @desc Clear (delete all) the enemy book.
+* @text Initialize Enemy Book
+* 
+* @command EnemyBookAddDefeat
+* @desc Makes the enemy defeated.
+* @text Enemy defeated
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+*  
+* @command EnemyBookRemoveDefeat
+* @desc Reset the number of defeated monsters.(If 0 is specified, the number of defeats of all enemies is reset.)
+* @text Reset number of kills
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @command EnemyBookGetDropItem
+* @desc Makes the enemy's gain item acquired.
+* @text Acquired enemy drop items
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg dropListId
+* @type number
+* @default 0
+* @text Drop item list ID
+* @desc Specifies the drop item list ID. (All acquired by specifying 0)
+* 
+* @command EnemyBookRemoveDropItem
+* @desc Makes the enemy's steal item acquired.
+* @text Unobtained enemy drop items
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg dropListId
+* @type number
+* @default 0
+* @text Drop item list ID
+* @desc Specifies the drop item list ID. (If 0 is specified, all will be unacquired)
+* 
+* @command EnemyBookGetStealItem
+* @desc Makes the enemy's steal item unacquired.
+* @text Acquired enemy steal item
+*
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg stealListId
+* @type number
+* @default 0
+* @text Steel Item List ID
+* @desc Specifies the steal item list ID. (If 0 is specified, all will be acquired)
+* 
+* @command EnemyBookRemoveStealItem
+* @desc Makes the enemy's steal item unacquired.
+* @text Enemy steal item not acquired
+* @type 0
+* @default 0
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg stealListId
+* @type number
+* @default 0
+* @text Steel Item List ID
+* @desc Specifies the steal item list ID. (If 0 is specified, all will be unacquired)
+* 
+* @command EnemyBookDefeatEnemy
+* @desc Stores the number of defeated enemies in a variable.
+* @text Total Killed Number of Enemies
+* 
+* @arg DefeatEnemy
+* @type variable
+* @default 0
+* @text Variable
+* @desc Specify a variable to substitute the number of defeated enemies.
+* 
+* @command EnemyBookEncounteredEnemy
+* @desc Stores the number of enemies encountered in a variable.
+* @text Encounter Count
+* 
+* @arg EncounteredEnemy
+* @type variable
+* @default 0
+* @text Variable
+* @desc Specifies a variable to substitute the number of monsters encountered.
+* 
+* @command EnemyBookCompleteRate
+* @desc Stores the completion rate of the enemy book.
+* @text Enemy book completion rate
+* 
+* @arg CompleteRate
+* @type variable
+* @default 0
+* @text Variable
+* @desc Specify a variable to assign the completion rate of the enemy book.
+* 
+* @command EnemyBookRegistration
+* @desc Determines if the enemy is registered in the enemy book.
+* @text Enemy book registered judgment
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @text Enemy
+* @desc Specifies the enemy ID.
+* 
+* @arg registrationSwitch
+* @type switch
+* @default 0
+* @text Switch
+* @desc Specifies a switch that substitutes whether the enemy is registered in the enemy book.
+* 
+* @command EnemyBookStatusRegistration
+* @desc Determines if the enemy's status information has been registered in the enemy book.
+* @text Status information registered judgment
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @text Enemy
+* @desc Specifies the enemy ID.
+* 
+* @arg statusRegistrationSwitch
+* @type switch
+* @default 0
+* @text Switch
+* @desc Specifies a switch that substitutes whether the enemy is registered in the enemy book.
+* 
+* @command EnemyBookDefeatEnemySum
+* @desc Stores the number of kills for the specified enemy in a variable.
+* @text Total number of kills.
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @text Enemy
+* @desc Specifies the enemy ID.
+* 
+* @arg DefeatEnemySum
+* @type variable
+* @default 0
+* @text Variable
+* @desc Specify a variable to substitute the number of defeated monsters.
+* 
+* @command DorpItemAcquired
+* @desc Determines if the specified item has been dropped.
+* @text Item drop judgment
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg DorpItemAcquiredId
+* @type number
+* @default 0
+* @text Item drop list ID
+* @desc Specifies the item drop list ID.  (Judge all by specifying 0)
+* 
+* @arg DorpItemAcquiredswitch
+* @type switch
+* @default 0
+* @text Switch
+* @desc Specifies a switch that substitutes whether the item has been dropped.
+* 
+* @command StealItemAcquired
+* @desc Determine if you have stolen the specified item.
+* @text Item stolen judgment
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg stealAcquiredId
+* @type number
+* @default 0
+* @text Steel Item List ID
+* @desc Specifies the steal item list ID. (Judge all by specifying 0)
+* 
+* @arg StealAcquiredswitch
+* @type switch
+* @default 0
+* @text Switch
+* @desc Specifies the switch ID that determines whether the specified item has been steal.
+* 
+* @command EnemyBookActionAdd
+* @desc Changes the enemy's "unconfirmed" skills to "confirmed".
+* @text Unconfirmed use skill confirmed
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg actionId
+* @type number
+* @default 0
+* @text Behavior pattern ID
+* @desc Behavior pattern ID (the top is number 1) (Judge all by specifying 0)
+* 
+* @command EnemyBookActionRemove
+* @desc Changes the enemy's "confirmed" use skill to "unconfirmed".
+* @text Confirmed skill used Unconfirmed
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg actionId
+* @type number
+* @default 0
+* @text Behavior pattern ID
+* @desc Behavior pattern ID (the top is number 1) (Judge all by specifying 0)
+* 
+* @command EnemyBookElementAdd
+* @desc Changes the enemy's "unconfirmed" attribute resistance weakness information to "confirmed". (requires NUUN_EnemyBookEX_1)
+* @text Unconfirmed attribute resistance information confirmed
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg elementId
+* @type number
+* @default 0
+* @text Element ID
+* @desc Attribute ID (attribute of database type tag) (Judge all by specifying 0)
+* 
+* @command EnemyBookElementRemove
+* @desc Changes the enemy's "confirmed" attribute resistance weakness information to "unconfirmed". (requires NUUN_EnemyBookEX_1)
+* @text Confirmed attribute resistance information unconfirmed
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg elementId
+* @type number
+* @default 0
+* @text Element ID
+* @desc Attribute ID (attribute of database type tag) (Judge all by specifying 0)
+* 
+* @command EnemyBookStateAdd
+* @desc Changes the enemy's "unconfirmed" state resistance weakness information to "confirmed". (requires NUUN_EnemyBookEX_1)
+* @text Unconfirmed state resistance information Confirmed
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg stateId
+* @type state
+* @default 0
+* @text State ID
+* @desc State ID (attribute of database type tag) (Judge all by specifying 0)
+* 
+* @command EnemyBookStateRemove
+* @desc Changes the enemy's "confirmed" state resistance weakness information to "unconfirmed". (requires NUUN_EnemyBookEX_1)
+* @text Confirmed state resistance information unconfirmed
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg stateId
+* @type state
+* @default 0
+* @text State ID
+* @desc State ID (attribute of database type tag) (Judge all by specifying 0)
+* 
+* @command EnemyBookDebuffAdd
+* @desc Changes the enemy's "unconfirmed" debuff resistance weakness information to "confirmed". (requires NUUN_EnemyBookEX_1)
+* @text Unconfirmed debuff resistance information Confirmed
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg debuffId
+* @text Debuff target
+* @desc Specifies the debuff target to be confirmed.
+* @type select
+* @option HP
+* @value 0
+* @option MP
+* @value 1
+* @option ATK
+* @value 2
+* @option DEF
+* @value 3
+* @option MAT
+* @value 4
+* @option MDF
+* @value 5
+* @option AGI
+* @value 6
+* @option LUK
+* @value 7
+* @option ALL
+* @value -1
+* @default -1
+* 
+* @command EnemyBookDebuffRemove
+* @desc Changes the enemy's "confirmed" debuff resistance weakness information to "unconfirmed". (requires NUUN_EnemyBookEX_1)
+* @text Confirmed debuff resistance information unconfirmed
+* 
+* @arg enemyId
+* @type enemy
+* @default 0
+* @desc Specifies the enemy ID.
+* 
+* @arg debuffId
+* @text Debuff target
+* @desc Specifies the debuff target to be unconfirmed.
+* @type select
+* @option HP
+* @value 0
+* @option MP
+* @value 1
+* @option ATK
+* @value 2
+* @option DEF
+* @value 3
+* @option MAT
+* @value 4
+* @option MDF
+* @value 5
+* @option AGI
+* @value 6
+* @option LUK
+* @value 7
+* @option ALL
+* @value -1
+* @default -1
+* 
+*/
+/*~struct~RegistrationTimingList:
+* 
+* @param RegistrationTiming
+* @text Registration timing
+* @desc Book registration time.
+* @type select
+* @option Start of battle
+* @value 0
+* @option Defeat
+* @value 1
+* @option When analysis is successful
+* @value 2
+* @option End of battle
+* @value 4
+* @option No registration
+* @value 10
+* @default 0
+* 
+* @param RegisterStatus
+* @desc Register status information.
+* @text Status information registration
+* @type boolean
+* @default true
+* 
+*/
+/*~struct~PageListData:
+* 
+* @param BasicSetting
+* @text Basic setting
+* @default
+* 
+* @param DateSelect
+* @desc Specify the items to be displayed.
+* @text item list
+* @type select
+* @option None
+* @value 0
+* @option MaxHP(1)~(14)(16)(20)(21)
+* @value 1
+* @option MaxMP(1)~(14)(16)(20)(21)
+* @value 2
+* @option ATK(1)~(14)(16)(20)(21)
+* @value 3
+* @option DEF(1)~(14)(16)(20)(21)
+* @value 4
+* @option MAT(1)~(14)(16)(20)(21)
+* @value 5
+* @option MDF(1)~(14)(16)(20)(21)
+* @value 6
+* @option AGI(1)~(14)(16)(20)(21)
+* @value 7
+* @option LUK(1)~(14)(16)(20)(21)
+* @value 8
+* @option TP (Only when the current status is ON)(1)~(16)(20)(21)
+* @value 9
+* @option Hit(1)~(16)(20)(21)
+* @value 10
+* @option Evasion(1)~(16)(20)(21)
+* @value 11
+* @option Critcal rate(1)~(16)(20)(21)
+* @value 12
+* @option Critcal evade(1)~(16)(20)(21)
+* @value 13
+* @option Magic evade(1)~(16)(20)(21)
+* @value 14
+* @option Magic reflect(1)~(16)(20)(21)
+* @value 15
+* @option Counter(1)~(16)(20)(21)
+* @value 16
+* @option HP regen(1)~(16)(20)(21)
+* @value 17
+* @option MP regen(1)~(16)(20)(21)
+* @value 18
+* @option TP regen(1)~(16)(20)(21)
+* @value 19
+* @option Aggro(1)~(16)(20)(21)
+* @value 20
+* @option Guard(1)~(16)(20)(21)
+* @value 21
+* @option Recovery(1)~(16)(20)(21)
+* @value 22
+* @option Item effect(1)~(16)(20)(21)
+* @value 23
+* @option MP cost(1)~(16)(20)(21)
+* @value 24
+* @option TP charge(1)~(16)(20)(21)
+* @value 25
+* @option Physical damage(1)~(16)(20)(21)
+* @value 26
+* @option Magical damage(1)~(16)(20)(21)
+* @value 27
+* @option Gain exp(1)~(14)(16)(20)(21)
+* @value 30
+* @option Gain gold(1)~(14)(16)(20)(21)
+* @value 31
+* @option Knocked down number(1)~(14)(16)(20)(21)
+* @value 32
+* @option Enemy name(1)~(5)(7)(8)(9)(12)(16)(20)(21)
+* @value 33
+* @option Level (Only in battle)(1)~(12)(16)(20)(21)
+* @value 34
+* @option Name(1)~(5)(7)(8)(9)(12)(16)(20)(21)
+* @value 35
+* @option Turn (displayed only when the current status is ON in TPB battle)(1)~(14)(16)(20)(21)
+* @value 36
+* @option Enemy book number(1)~(5)(7)(8)(9)(12)(16)
+* @value 37
+* @option Resistance element (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 40
+* @option Weakness element (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 41
+* @option Disabled element (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 42
+* @option Element resistance (resistance numerical display)(1)~(16)(20)(21)
+* @value 43
+* @option Resistance state (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 45
+* @option Weakness state (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 46
+* @option Disabled state (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 47
+* @option Resistance state (resistance numerical display)(1)~(16)(20)(21)
+* @value 48
+* @option Resistance debuff (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 50
+* @option Weakness debuff (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 51
+* @option Drop item(1)~(15)(20)(21)
+* @value 60
+* @option Items to steal(1)~(15)(20)(21)
+* @value 61
+* @option Conditional drop item(1)~(15)(20)(21)
+* @value 62
+* @option Description field(1)~(5)(7)(8)(9)(12)(13)(17)(20)(21)
+* @value 70
+* @option Common description field(1)~(5)(7)(8)(9)(12)(13)(20)(20)(21)
+* @value 71
+* @option Original parameter(1)~(16)(20)(21)
+* @value 80
+* @option Enemy use skill(1)~(15)(20)(21)
+* @value 100
+* @option Element radar chart(1)~(5)(8)(9)(12)(20)(21)
+* @value 121
+* @option State radar chart(1)~(5)(8)(9)(12)(20)(21)
+* @value 122
+* @option Enemy picture(1)(2)(3)(4)(5)(7)(19)
+* @value 200
+* @option Chara chip(1)(2)(3)(4)
+* @value 201
+* @option Common image(1)(2)(3)(4)(5)(7)(18)(19)
+* @value 250
+* @option Individual image(1)(2)(3)(4)(5)(7)(19)
+* @value 251
+* @option switch page(1)~(5)(7)(8)(9)(12)(16)
+* @value 500
+* @option Line(1)(2)(3)(4)(5)(7)(9)
+* @value 1000
+* @default 0
+* @parent BasicSetting
+* 
+* @param X_Position
+* @text X display row position(1)
+* @desc X display row position
+* @type number
+* @default 1
+* @min 1
+* @max 3
+* @parent BasicSetting
+* 
+* @param Y_Position
+* @desc Y display row position
+* @text Y display row position(2)
+* @type number
+* @default 1
+* @min 1
+* @parent BasicSetting
+* 
+* @param X_Coordinate
+* @text X coordinate (relative)(3)
+* @desc X coordinate (relative coordinate from X display column position)
+* @type number
+* @default 0
+* @min -9999
+* @parent BasicSetting
+* 
+* @param Y_Coordinate
+* @text Y coordinate (relative)(4)
+* @desc Y coordinate (relative coordinate from Y display column position)
+* @type number
+* @default 0
+* @min -9999
+* @parent BasicSetting
+* 
+* @param ItemWidth
+* @desc Item width (automatically set to 0)
+* @text Item width(5)
+* @type number
+* @default 0
+* @min 0
+* @parent BasicSetting
+* 
+* @param SystemItemWidth
+* @desc Width of item name (automatically set to 0)
+* @text Item name Width(6)
+* @type number
+* @default 0
+* @min 0
+* @parent BasicSetting
+* 
+* @param WideMode
+* @desc Item display mode. Displayed across multiple columns.
+* @text Item display mode(7)
+* @type select
+* @option 1 column display
+* @value 1
+* @option 2 columns display
+* @value 2
+* @option 3 columns displa (only when the number of display columns is 3)
+* @value 3
+* @default 1
+* @parent BasicSetting
+* 
+* @param paramName
+* @desc Set the name of the item to display.
+* @text Name(8)
+* @type string
+* @default
+* @parent BasicSetting
+* 
+* @param NameColor
+* @desc Text color for item names. (system color or color code)
+* @text Item name text color(9)
+* @type color
+* @default 16
+* @min 0
+* @parent BasicSetting
+* 
+* @param DetaEval
+* @desc Set a parameter evaluation expression or string.
+* @text Parameter evaluation expression or string(10)
+* @type combo
+* @option '$gameVariables.value(0);//game variable'
+* @default 
+* @parent BasicSetting
+* 
+* @param Back
+* @text Content background display(11)
+* @desc Show content background.
+* @type boolean
+* @default false
+* @parent BasicSetting
+* 
+* @param FontSize
+* @desc Font size (main font + difference from default font)
+* @text Font size(12)
+* @type number
+* @default 0
+* @min -99
+* @parent BasicSetting
+* 
+* @param MaskMode
+* @desc When registering, hide the status if you do not register information in the Enemy book registration settings.
+* @text Information unregistered status display(13)
+* @type boolean
+* @default false
+* @parent BasicSetting
+* 
+* @param Decimal
+* @text Decimal place number(14)
+* @desc The number of decimal places that can be displayed.
+* @type number
+* @default 0
+* @min 0
+* @max 99
+* @parent BasicSetting
+* 
+* @param paramUnit
+* @desc Set the units.
+* @text Unit(15)
+* @type string
+* @default 
+* @parent UnitSetting
+* 
+* @param namePosition
+* @desc Specifies the character display position.
+* @text Text display position(16)
+* @type select
+* @option Left
+* @value "left"
+* @option Center
+* @value "center"
+* @option Right
+* @value "right"
+* @default "left"
+* @parent nameSetting
+* 
+* @param textMethod
+* @desc Description field, tag name linked to individual image.
+* @text Description field, Individual image tag name(17)
+* @type string
+* @default 
+* @parent textSetting
+* 
+* @param CommonText
+* @desc Common text (text code available)
+* @text Common text(20)
+* @type multiline_string	
+* @default 
+* @parent textSetting
+* 
+* @param ImgData
+* @desc Specify a common image file name displayed on all enemy pages. Width is "item width", height is "Max height"
+* @text Common image(18)
+* @type file
+* @dir img/
+* @default 
+* @parent ImgSetting
+* 
+* @param ImgMaxHeight
+* @desc Max height of image (specified by number of row)
+* @text Max height(19)
+* @type number
+* @default 8
+* @min 0
+* @parent ImgSetting
+* 
+* @param IconId
+* @text Icon ID(20)
+* @desc An icon is displayed to the left of the item name. Specifies the ID of the icon.
+* @type icon
+* @default 0
+* 
+* @param IconY
+* @text Icon correction Y value(21)
+* @desc Specifies the correction Y value of the icon.
+* @type number
+* @default 2
+* 
+*/
+/*~struct~CategoryPageListData:
+* 
+* @param BasicSetting
+* @text Basic setting
+* @default
+* 
+* @param DateSelect
+* @desc Specify the items to be displayed.
+* @text Item list
+* @type select
+* @option None
+* @value 0
+* @option Name(1)~(5)(7)(8)(9)(12)(16)
+* @value 35
+* @option Description field(1)~(5)(7)(8)(9)(12)(17)
+* @value 70
+* @option Common description field(1)~(5)(7)(8)(9)(12)(20)
+* @value 71
+* @option Common image(1)(2)(3)(4)(5)(7)(18)(19)
+* @value 250
+* @option Individual image(1)(2)(3)(4)(5)(7)(19)
+* @value 251
+* @option Line(1)(2)(3)(4)(5)(7)(9)
+* @value 1000
+* @default 0
+* @parent BasicSetting
+* 
+* @param X_Position
+* @text X display row position(1)
+* @desc X display row position
+* @type number
+* @default 1
+* @min 1
+* @max 3
+* @parent BasicSetting
+* 
+* @param Y_Position
+* @desc Y display row position
+* @text Y display row position(2)
+* @type number
+* @default 1
+* @min 1
+* @parent BasicSetting
+* 
+* @param X_Coordinate
+* @text X coordinate (relative)(3)
+* @desc X coordinate (relative coordinate from X display column position)
+* @type number
+* @default 0
+* @min -9999
+* @parent BasicSetting
+* 
+* @param Y_Coordinate
+* @text Y coordinate (relative)(4)
+* @desc Y coordinate (relative coordinate from Y display column position)
+* @type number
+* @default 0
+* @min -9999
+* @parent BasicSetting
+* 
+* @param ItemWidth
+* @desc Item width (automatically set to 0)
+* @text Item width(5)
+* @type number
+* @default 0
+* @min 0
+* @parent BasicSetting
+* 
+* @param SystemItemWidth
+* @desc Width of item name (automatically set to 0)
+* @text Item name Width(6)
+* @type number
+* @default 0
+* @min 0
+* @parent BasicSetting
+* 
+* @param WideMode
+* @desc Item display mode. Displayed across multiple columns.
+* @text Item display mode(7)
+* @type select
+* @option 1 column display
+* @value 1
+* @option 2 columns display
+* @value 2
+* @option 3 columns displa (only when the number of display columns is 3)
+* @value 3
+* @default 1
+* @parent BasicSetting
+* 
+* @param paramName
+* @desc Set the name of the item to display.
+* @text Name(8)
+* @type string
+* @default
+* @parent BasicSetting
+* 
+* @param NameColor
+* @desc Text color for item names. (system color or color code)
+* @text Item name text color(9)
+* @type color
+* @default 16
+* @min 0
+* @parent BasicSetting
+* 
+* @param FontSize
+* @desc Font size (main font + difference from default font)
+* @text Font size(12)
+* @type number
+* @default 0
+* @min -99
+* @parent BasicSetting
+* 
+* @param namePosition
+* @desc Specifies the character display position.
+* @text Text display position(16)
+* @type select
+* @option Left
+* @value "left"
+* @option Center
+* @value "center"
+* @option Right
+* @value "right"
+* @default "left"
+* 
+* @param textMethod
+* @desc Description field, tag name linked to individual image.
+* @text Description field, Individual image tag name(17)
+* @type string
+* @default 
+* 
+* @param CommonText
+* @desc Common text (text code available)
+* @text Common text(20)
+* @type multiline_string	
+* @default 
+* 
+* @param ImgData
+* @desc Specify a common image file name displayed on all enemy pages. Width is "item width", height is "Max height"
+* @text Common image(18)
+* @type file
+* @dir img/
+* @default 
+* 
+* @param ImgMaxHeight
+* @desc Max height of image (specified by number of row)
+* @text Max height(19)
+* @type number
+* @default 8
+* @min 0
+* 
+* @param IconId
+* @text Icon ID(20)
+* @desc An icon is displayed to the left of the item name. Specifies the ID of the icon.
+* @type icon
+* @default 0
+* 
+* @param IconY
+* @text Icon correction Y value(21)
+* @desc Specifies the correction Y value of the icon.
+* @type number
+* @default 2
+* 
+*/
+/*~struct~PageSettingData:
+* 
+* @param ListDateSetting
+* @desc Specifies the list to display.
+* @text Display list specification
+* @type select
+* @option None
+* @value 0
+* @option display list 1
+* @value 1
+* @option display list 2
+* @value 2
+* @option display list 3
+* @value 3
+* @option display list 4
+* @value 4
+* @option display list 5
+* @value 5
+* @option display list 6
+* @value 6
+* @option display list 7
+* @value 7
+* @option display list 8
+* @value 8
+* @option display list 9
+* @value 9
+* @option display list 10
+* @value 10
+* @option display list 11
+* @value 11
+* @option display list 12
+* @value 12
+* @option display list 13
+* @value 13
+* @option display list 14
+* @value 14
+* @option display list 15
+* @value 15
+* @option display list 16
+* @value 16
+* @option display list 17
+* @value 17
+* @option display list 18
+* @value 18
+* @option display list 19
+* @value 19
+* @option display list 20
+* @value 20 
+* @default 1
+* 
+* @param PageCategoryName
+* @desc Sets the name of the page.
+* @text Page name
+* @type string
+* @default
+* 
+* @param BackGroundImg
+* @desc Specifies the background image file name.
+* @text Background image
+* @type file
+* @dir img/
+* @default 
+*  
+*/
+/*~struct~BookCategoryList:
+* 
+* @param CategoryName
+* @desc Set the category name.
+* @text Category name
+* @type string
+* 
+* @param CategoryKey
+* @desc Set the key of the category. (all: display all)
+* @text CategoryKey
+* @type combo
+* @option 'all'
+* @default
+* 
+* @param CategoryNote
+* @desc Note.
+* @text Note
+* @type multiline_string
+* @default 
+* 
+*/
+/*~struct~PercentContentList:
+*
+* @param ContentName
+* @desc Name.
+* @text Name
+* @type string
+* @default 
+* 
+* @param ContentDate
+* @desc Specifies the information to display.
+* @text Display information
+* @type select
+* @option Completion rate
+* @value 0
+* @option Encountered
+* @value 1
+* @option Defeat
+* @value 2
+* @option Information registered
+* @value 3
+* @option number of encounters
+* @value 11
+* @option number of defeat
+* @value 12
+* @option Number of registered information
+* @value 13
+* @default 0
+*
+*/
+/*~struct~ElementData:
+* 
+* @param ElementNo
+* @desc Element number to display. (0: none, -1: physical damage rate, -2: magic damage rate)
+* @text Element number
+* @type number
+* @min -2
+* 
+* @param ElementIconId
+* @desc Specifies the ID of the icon.
+* @text Icon Id
+* @type icon
+* @min 0
+*/
+/*~struct~StateData:
+*
+* @param StateId
+* @desc The state to display.
+* @text display state
+* @type state
+*
+*/
+/*~struct~DebuffData:
+* 
+* @param ParamId
+* @text Debuff
+* @desc Specifies a display debuff.
+* @type select
+* @option HP
+* @value 0
+* @option MP
+* @value 1
+* @option ATK
+* @value 2
+* @option DEF
+* @value 3
+* @option MAT
+* @value 4
+* @option MDF
+* @value 5
+* @option AGI
+* @value 6
+* @option LUK
+* @value 7
+* @default 0
+* 
+* @param DebuffIconId
+* @desc Specifies the ID of the icon.
+* @text Icon Id
+* @type icon
+* @default 0
+*/
+/*~struct~AnalyzeSkill:
+* 
+* @param ListNumber
+* @desc Specifies the list number of analyzes to display. 0 is the same as the picture book display
+* @text Specify analysis item
+* @type number
+* @default 0
+* 
+* @param PageCols
+* @desc Maximum visible columns on the page.
+* @text page max display col
+* @type number
+* @default 2
+* @min 1
+* 
+* @param ContentCols
+* @text Enemy information item col
+* @desc Enemy information item column.
+* @type number
+* @default 2
+* @min 1
+* 
+* @param StatusGaugeVisible
+* @type boolean
+* @default true
+* @text Show gauge
+* @desc Displays HP and MP gauges.
+* 
+* @param EnemyCurrentStatus
+* @type boolean
+* @default true
+* @text Enemy current status display
+* @desc Displays the enemy's current status.
+* 
+* @param AnalyzeMissMessage
+* @type string
+* @default %2 failed to analyze.
+* @text Message when analysis fails
+* @desc Sets the message when analysis fails.
+* 
+* @param BuffColor
+* @desc Buff text color..
+* @text Buff text color.
+* @type color
+* @default 0
+* @max 999999
+* 
+* @param DebuffColor
+* @desc Debuff text color.
+* @text Debuff text color
+* @type color
+* @default 0
+* @max 999999
+* 
+* 
+*/
+/*~struct~AnalyzeList:
+* 
+* @param Name
+* @desc Name。
+* @text Name
+* @type string
+* @default 
+* 
+* @param AnalyzePageList
+* @desc Setting items to display.
+* @text Display item setting
+* @type struct<PageSettingData>[]
+* @default 
+* @parent AnalyzeSetting
+* 
+*/
+/*:ja
+ * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.2
+ * @version 2.17.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -121,6 +2806,27 @@
  * [id]:キャラチップのインデックス番号。3×4のキャラチップは0になります。
  * [direction]:方向を指定します。2正面（一番上） 4左（２番目） 6右（３番目） 8後向き（一番下）　※省略可能
  * 
+ * 未遭遇カテゴリー文字列、未確認モンスター文字列、ステータス情報未登録時アイテム、スキル表示名、敵の情報登録タイミング反映(ON)は、
+ * ？1文字だけ入れると名前の文字数に応じて？に置き換えられます。
+ * 
+ * 未確認ドロップアイテム名及び、未確認盗めるアイテム表示をONにした場合、
+ * ステータス情報登録をしてもドロップアイテム(盗めるアイテム)を確認するまでは表示されません。
+ * 未確認使用スキル表示はステータス情報登録をしてもスティールアイテム使用スキルを確認するまでは表示されません。
+ * 未確認属性を隠す、未確認ステートを隠す、未確認デバフを隠すは、ステータス情報登録をしても属性、ステート、デバフ耐性弱点を確認するまでは表示されません。
+ * 
+ * ページウィンドウ表示モード
+ * 非表示に設定することでページウィンドウを画面外に表示し、図鑑表示領域を拡大します。
+ * 
+ * 属性耐性（アイコン表示）設定
+ * 効きにくい属性に無効反映
+ * OFFにした場合耐性0%の属性が耐性属性に表示されます。
+ * 
+ * 背景画像
+ * 背景画像UIウィンドウサイズはUI画面に合わせて画像を左上を合わせます。
+ * 背景画像拡大は背景画像UIウィンドウサイズで設定したモードを元に画面サイズに合わせて拡大されます。
+ * UIウィンドウに合わせている場合はUIのサイズで拡大されます。
+ * ページごとに指定してある場合は個別に設定している背景が優先されます。
+ * 
  * ターン、レベル、HPなどのゲージは戦闘中のみ表示されます。
  * 
  * 
@@ -149,25 +2855,25 @@
  * モンスタースティールアイテム未取得   モンスターのスティールアイテムを未収得にさせます。
  * 総撃破数モンスター数          撃破したモンスター数を変数に格納します。
  * 遭遇数                      遭遇済みのモンスター数を変数に格納します。
- * 図鑑完成度                   現在の完成度を変数に格納します。
+ * 図鑑完成度                   現在の完成率を変数に格納します。
  * 総撃破数                    指定のモンスターの撃破数を変数に格納します。
  * 図鑑登録済み判定             指定のモンスターが図鑑登録済みが判定します。
  * ステータス情報登録済み判定    指定のモンスターのステータス情報登録済みか判定します。
  * アイテムドロップ済み判定      指定のアイテムがドロップ済みか判定します。
  * アイテム盗み済み判定         指定のアイテムが盗み済みか判定します。
- * 敵の使用スキル確認済み　　　　敵の使用スキルを確認済みにします。0で全て確認済みにします。
- * 敵の使用スキル未確認　　　　　敵の使用スキルを未確認にします。0で全て未確認にします。
+ * 未確認済み使用スキル確認　　　　敵の使用スキルを確認済みにします。0で全て確認済みにします。
+ * 確認済み使用スキル未確認　　　　　敵の使用スキルを未確認にします。0で全て未確認にします。
  * 敵の属性耐性弱点確認済み　　　敵の属性耐性弱点を確認済みにします。0で全て確認済みにします。(要NUUN_EnemyBookEX_1)
  * 敵の属性耐性弱点未確認　　　　敵の属性耐性弱点を未確認にします。0で全て未確認にします。(要NUUN_EnemyBookEX_1)
- * 敵のステート耐性弱点確認済み　敵のステート耐性弱点を確認済みにします。0で全て確認済みにします。(要NUUN_EnemyBookEX_1)
- * 敵のステート耐性弱点未確認　　敵のステート耐性弱点を未確認にします。0で全て未確認にします。(要NUUN_EnemyBookEX_1)
- * 敵のデバフ耐性弱点確認済み　　敵のデバフ耐性弱点を確認済みにします。0で全て確認済みにします。(要NUUN_EnemyBookEX_1)
- * 敵のデバフ耐性弱点未確認　　　敵のデバフ耐性弱点を未確認にします。0で全て未確認にします。(要NUUN_EnemyBookEX_1)
+ * 未確認ステート耐性弱点情報確認済み　敵のステート耐性弱点を確認済みにします。0で全て確認済みにします。(要NUUN_EnemyBookEX_1)
+ * 確認済みステート耐性弱点情報未確認　　敵のステート耐性弱点を未確認にします。0で全て未確認にします。(要NUUN_EnemyBookEX_1)
+ * 未確認デバフ耐性弱点情報確認済み　　敵のデバフ耐性弱点を確認済みにします。0で全て確認済みにします。(要NUUN_EnemyBookEX_1)
+ * 未確認デバフ耐性弱点情報確認済み　　　敵のデバフ耐性弱点を未確認にします。0で全て未確認にします。(要NUUN_EnemyBookEX_1)
  * 
  * パラメータ参照変数
- * this._enemyまたはde　データベースのモンスターデータを取得します。
- * this._enemy.meta メタタグを取得します。
- * enemyまたはGame_Enemyのデータを取得します。
+ * this._enemyまたはde:データベースのモンスターデータを取得します。
+ * this._enemy.meta:メタタグを取得します。
+ * enemy:Game_Enemyのデータを取得します。
  * 
  * スティールアイテムを有効にするにはNUUN_StealableItemsが必要です。
  * 条件付きアイテムを有効にするにはNUUN_EnemyBookEX_2及びNUUN_ConditionalDropsがが必要です。
@@ -183,6 +2889,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/9 Ver.2.17.3
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
+ * 日本語以外での表示を英語表示に変更。
  * 2022/11/20 Ver.2.17.2
  * 敵の情報で同じモンスターの情報の切り替えが行われない問題を修正。
  * 2022/11/19 Ver.2.17.1
@@ -522,8 +3232,8 @@
  * @parent BasicSetting
  * 
  * @param BackUiWidth
- * @text 背景画像ウィンドウサイズ
- * @desc 背景画像をウィンドウサイズに合わせる。
+ * @text 背景画像UIウィンドウサイズ
+ * @desc 背景画像をUIウィンドウサイズに合わせる。
  * @type boolean
  * @default true
  * @parent BasicSetting
@@ -741,7 +3451,7 @@
  * @param UnknownEnemyIcons
  * @desc 未登録のモンスターアイコン。
  * @text 未登録モンスターアイコン
- * @type number
+ * @type icon
  * @default 0
  * @min 0
  * @parent SelectEnemySetting
@@ -756,7 +3466,7 @@
  * @param RegistrationEnemyColor
  * @desc 登録済みモンスター名の色。
  * @text 登録済みモンスター名文字色
- * @type number
+ * @type color
  * @default 0
  * @max 999
  * @parent SelectEnemySetting
@@ -764,7 +3474,7 @@
  * @param RegistrationStatusEnemyColor
  * @desc ステータス情報登録済みモンスター名の色。
  * @text ステータス情報登録済みモンスター名文字色
- * @type number
+ * @type color
  * @default 0
  * @max 999
  * @parent SelectEnemySetting
@@ -838,7 +3548,7 @@
  * 
  * @param PageWindowsShow
  * @desc ページウィンドウを表示します。非表示に設定することでページウィンドウを画面外に表示し、図鑑表示領域を拡大します。
- * @text ページウィンドウ表示
+ * @text ページウィンドウ表示モード
  * @type boolean
  * @default false
  * @parent PageWindow
@@ -1104,7 +3814,7 @@
  * @param BuffColor
  * @desc ステータスバフ時のステータスパラメータの数値色。(敵の情報、アナライズ)
  * @text ステータスバフ時数値色
- * @type number
+ * @type color
  * @default 0
  * @max 999999
  * @parent BattleEnemyBookSetting
@@ -1112,7 +3822,7 @@
  * @param DebuffColor
  * @desc ステータスデバフ時のステータスパラメータの数値色。(敵の情報、アナライズ)
  * @text ステータスデバフ時数値色
- * @type number
+ * @type color
  * @default 0
  * @max 999999
  * @parent BattleEnemyBookSetting
@@ -1323,7 +4033,7 @@
  * @parent CondDropData
  * 
  * @param StealItemData
- * @text スティールアイテム設定
+ * @text 盗みアイテム設定
  * @default ------------------------------
  * @parent EnemyBookStatusSetting
  * 
@@ -1343,14 +4053,14 @@
  * @parent StealItemData
  * 
  * @param ShowStealItemName
- * @desc 未確認のスティールアイテムを隠す。(ステータス情報登録をしてもスティールアイテムを確認するまでは表示されません)
- * @text 未確認スティールアイテム表示
+ * @desc 未確認の盗めるアイテムを隠す。(ステータス情報登録をしても盗めるアイテムを確認するまでは表示されません)
+ * @text 未確認盗めるアイテム表示
  * @type boolean
  * @default false
  * @parent StealItemData
  * 
  * @param StealItemCols
- * @desc スティールアイテムの表示列。
+ * @desc 盗めるアイテムの表示列。
  * @text 表示列
  * @type number
  * @min 1
@@ -1363,7 +4073,7 @@
  * @parent EnemyBookStatusSetting
  * 
  * @param ShowActionName
- * @desc 未確認の使用スキルを隠す。(ステータス情報登録をしてもスティールアイテム使用スキルを確認するまでは表示されません)
+ * @desc 未確認の使用スキルを隠す。(ステータス情報登録をしても使用スキルを確認するまでは表示されません)
  * @text 未確認使用スキル表示
  * @type boolean
  * @default false
@@ -1400,7 +4110,7 @@
  * @param ElementUnknownIconId
  * @desc ステータス情報未登録時に表示する属性アイコンのIDを指定します。
  * @text ステータス情報未登録時属性アイコンID
- * @type number
+ * @type icon
  * @default 0
  * @parent ResistWeakElementData
  * 
@@ -1422,8 +4132,8 @@
  * @parent ResistWeakElementData
  * 
  * @param ResistWeakElementMode
- * @text 属性耐性表示列数
- * @desc 属性耐性表示列数。
+ * @text 属性耐性表示モード
+ * @desc 表示するタイプを指定します。
  * @type select
  * @option 属性名のみ
  * @value 0
@@ -1456,28 +4166,28 @@
  * @param ElementRadarChartFramecolor
  * @desc レーダチャートの枠の色を設定します。
  * @text レーダチャート枠色
- * @type number
+ * @type color
  * @default 15
  * @parent ElementRadarChart
  * 
  * @param ElementRadarChartLineColor
  * @desc レーダチャートの線の色を設定します。
  * @text レーダチャート線色
- * @type number
+ * @type color
  * @default 15
  * @parent ElementRadarChart
  * 
  * @param ElementRadarChartMainColor1
  * @desc レーダチャートの中心の背景色を設定します。
  * @text レーダチャート中心背景色
- * @type number
+ * @type color
  * @default 3
  * @parent ElementRadarChart
  * 
  * @param ElementRadarChartMainColor2
  * @desc レーダチャートの外側背景色を設定します。
  * @text レーダチャート外側背景色
- * @type number
+ * @type color
  * @default 3
  * @parent ElementRadarChart
  * 
@@ -1532,7 +4242,7 @@
  * @param StateUnknownIconId
  * @desc ステータス情報未登録時に表示するステートアイコンのIDを指定します。
  * @text ステータス情報未登録時ステートアイコンID
- * @type number
+ * @type icon
  * @default 0
  * @parent ResistWeakStateData
  * 
@@ -1561,8 +4271,8 @@
  * @parent ResistWeakStateData
  * 
  * @param ResistWeakStateMode
- * @text ステート表示列数
- * @desc ステート表示列数。
+ * @text ステート表示モード
+ * @desc 表示するタイプを指定します。
  * @type select
  * @option ステート名のみ
  * @value 0
@@ -1595,28 +4305,28 @@
  * @param StateRadarChartFramecolor
  * @desc レーダチャートの枠の色を設定します。
  * @text レーダチャート枠色
- * @type number
+ * @type color
  * @default 15
  * @parent StateRadarChart
  * 
  * @param StateRadarChartLineColor
  * @desc レーダチャートの線の色を設定します。
  * @text レーダチャート線色
- * @type number
+ * @type color
  * @default 15
  * @parent StateRadarChart
  * 
  * @param StateRadarChartMainColor1
  * @desc レーダチャートの中心の背景色を設定します。
  * @text レーダチャート中心背景色
- * @type number
+ * @type color
  * @default 3
  * @parent StateRadarChart
  * 
  * @param StateRadarChartMainColor2
  * @desc レーダチャートの外側背景色を設定します。
  * @text レーダチャート外側背景色
- * @type number
+ * @type color
  * @default 3
  * @parent StateRadarChart
  * 
@@ -1678,7 +4388,7 @@
  * @param DeBuffUnknownIconId
  * @desc ステータス情報未登録時に表示するデバフアイコンのIDを指定します。
  * @text ステータス情報未登録時デバフアイコンID
- * @type number
+ * @type icon
  * @default 0
  * @parent ResistWeakDebuffData
  * 
@@ -1768,7 +4478,7 @@
  * 
  * @command EnemyBookGetDropItem
  * @desc モンスターのドロップアイテムを取得済みにします。
- * @text モンスタードロップアイテム習得済み
+ * @text モンスタードロップアイテム取得済み
  * 
  * @arg enemyId
  * @type enemy
@@ -1849,14 +4559,14 @@
  * @desc 遭遇したモンスター数を代入する変数を指定します。
  * 
  * @command EnemyBookCompleteRate
- * @desc 図鑑の完成度を格納します。
- * @text 図鑑完成度
+ * @desc 図鑑の完成率を格納します。
+ * @text 図鑑完成率
  * 
  * @arg CompleteRate
  * @type variable
  * @default 0
  * @text 変数
- * @desc 図鑑の完成度を代入する変数を指定します。
+ * @desc 図鑑の完成率を代入する変数を指定します。
  * 
  * @command EnemyBookRegistration
  * @desc モンスターが図鑑に登録済みか判定します。
@@ -1925,7 +4635,7 @@
  * @type switch
  * @default 0
  * @text 格納スイッチ
- * @desc アイテムがドロップ済みかを代入する変数を指定します。
+ * @desc アイテムがドロップ済みかを代入するスイッチを指定します。
  * 
  * @command StealItemAcquired
  * @desc 指定のアイテムが盗み済みか判定します。
@@ -2082,7 +4792,7 @@
  * 
  * @arg debuffId
  * @text デバフ対象
- * @desc 確認済みにするデバフ対象を指定します。
+ * @desc 未確認済みにするデバフ対象を指定します。
  * @type select
  * @option ＨＰ
  * @value 0
@@ -2105,7 +4815,7 @@
  * @default -1
  * 
  */
-/*~struct~RegistrationTimingList:
+/*~struct~RegistrationTimingList:ja
  * 
  * @param RegistrationTiming
  * @text 登録タイミング
@@ -2130,7 +4840,7 @@
  * @default true
  * 
  */
-/*~struct~PageListData:
+/*~struct~PageListData:ja
  * 
  * @param BasicSetting
  * @text 基本設定
@@ -2337,7 +5047,7 @@
  * @param NameColor
  * @desc 項目名称の文字色。(システムカラーまたはカラーコード)
  * @text 項目名称文字色(9)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * @parent BasicSetting
@@ -2436,7 +5146,7 @@
  * @param IconId
  * @text アイコンID(20)
  * @desc 項目名称の左にアイコンを表示します。アイコンのIDを指定します。
- * @type number
+ * @type icon
  * @default 0
  * 
  * @param IconY
@@ -2446,7 +5156,7 @@
  * @default 2
  * 
  */
-/*~struct~CategoryPageListData:
+/*~struct~CategoryPageListData:ja
  * 
  * @param BasicSetting
  * @text 基本設定
@@ -2536,7 +5246,7 @@
  * @param NameColor
  * @desc 項目名称の文字色。(システムカラーまたはカラーコード)
  * @text 項目名称文字色(9)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -2588,7 +5298,7 @@
  * @param IconId
  * @text アイコンID(20)
  * @desc 項目名称の左にアイコンを表示します。アイコンのIDを指定します。
- * @type number
+ * @type icon
  * @default 0
  * 
  * @param IconY
@@ -2598,7 +5308,7 @@
  * @default 2
  * 
  */
-/*~struct~PageSettingData:
+/*~struct~PageSettingData:ja
  * 
  * @param ListDateSetting
  * @desc 表示するリストを指定します。
@@ -2662,7 +5372,7 @@
  * @default 
  *  
  */
-/*~struct~BookCategoryList:
+/*~struct~BookCategoryList:ja
  * 
  * @param CategoryName
  * @desc カテゴリー名を設定します。
@@ -2683,7 +5393,7 @@
  * @default 
  * 
  */
-/*~struct~PercentContentList:
+/*~struct~PercentContentList:ja
  *
  * @param ContentName
  * @desc 名称。
@@ -2712,7 +5422,7 @@
  * @default 0
 *
 */
-/*~struct~ElementData:
+/*~struct~ElementData:ja
  * 
  * @param ElementNo
  * @desc 表示する属性番号です。(0:なし、-1:物理ダメージ率、-2:魔法ダメージ率)
@@ -2723,10 +5433,10 @@
  * @param ElementIconId
  * @desc アイコンのIDを指定します。
  * @text アイコンID
- * @type number
+ * @type icon
  * @min 0
  */
-/*~struct~StateData:
+/*~struct~StateData:ja
  *
  * @param StateId
  * @desc 表示するステートです。
@@ -2734,7 +5444,7 @@
  * @type state
  *
  */
-/*~struct~DebuffData:
+/*~struct~DebuffData:ja
  * 
  * @param ParamId
  * @text デバフ対象
@@ -2761,9 +5471,10 @@
  * @param DebuffIconId
  * @desc アイコンのIDを指定します。
  * @text アイコンID
- * @type number
+ * @type icon
+ * @default 0
  */
-/*~struct~AnalyzeSkill:
+/*~struct~AnalyzeSkill:ja
  * 
  * @param ListNumber
  * @desc 表示するアナライズのリスト番号を指定します。0で図鑑表示と同じ
@@ -2806,20 +5517,20 @@
  * @param BuffColor
  * @desc バフ時の文字色。
  * @text バフ時文字色
- * @type number
+ * @type color
  * @default 0
  * @max 999999
  * 
  * @param DebuffColor
  * @desc デバフ時の文字色。
  * @text デバフ時文字色
- * @type number
+ * @type color
  * @default 0
  * @max 999999
  * 
  * 
  */
-/*~struct~AnalyzeList:
+/*~struct~AnalyzeList:ja
  * 
  * @param Name
  * @desc 識別名。

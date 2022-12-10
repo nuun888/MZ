@@ -210,7 +210,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | ショップ　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [売値任意設定](https://github.com/nuun888/MZ/blob/master/README/AnySellPrice.md) | [NUUN_AnySellPrice](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js) | 共 | 1.1.0 |
-| [ショップ購入カテゴリー表示](https://github.com/nuun888/MZ/blob/master/README/PurchaseCategory.md) | [NUUN_PurchaseCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PurchaseCategory.js) | 共 | 1.0.1 |
+| [ショップ購入カテゴリー表示](https://github.com/nuun888/MZ/blob/master/README/PurchaseCategory.md) | [NUUN_PurchaseCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PurchaseCategory.js) | 共 | 1.1.0 |
 |  |  |  |  |
 |  |  |  |  |
 

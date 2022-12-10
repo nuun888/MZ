@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.8.0
+ * @version 1.8.1
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -56,6 +56,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/12/10 Ver.1.8.1
+ * 敵のダメージポップアップの位置を指定できる機能を追加。
  * 2022/10/18 Ver.1.8.0
  * スキル、アイテム選択画面の座標、横幅、行数、列数を設定できる機能を追加。
  * 2022/10/15 Ver.1.7.3
@@ -1128,8 +1130,8 @@
  * @parent ActorImgEffect
  * 
  * 
- * @param EnemyAnimation
- * @text 敵キャラアニメーション設定
+ * @param EnemyEffect
+ * @text 敵キャラエフェクト設定
  * @default ////////////////////////////////
  * 
  * @param EnemySkillAnimation
@@ -1138,7 +1140,25 @@
  * @type animation
  * @default 1
  * @min 0
- * @parent EnemyAnimation
+ * @parent EnemyEffect
+ * 
+ * @param EnemyDamage_X
+ * @desc ダメージエフェクトのX座標。（相対座標）
+ * @text ダメージエフェクトX座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EnemyEffect
+ * 
+ * @param EnemyDamage_Y
+ * @desc ダメージエフェクトのY座標。（相対座標）
+ * @text ダメージエフェクトY座標（相対座標）
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * @parent EnemyEffect
  * 
  * @param EnemyAppearWindow
  * @text モンスター出現ウィンドウ
@@ -2428,7 +2448,7 @@
  * @param Color1
  * @desc ゲージカラー(左)。テキストタブでカラーコードを入力できます。
  * @text ゲージカラー(左)(10)
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeSetting
@@ -2436,7 +2456,7 @@
  * @param Color2
  * @desc ゲージカラー(右)。テキストタブでカラーコードを入力できます。
  * @text ゲージカラー(右)(11)
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeSetting
@@ -2572,6 +2592,8 @@ params.EffectPriority = eval(parameters['EffectPriority']) || 'middle';
 params.StateAnimationShow = eval(parameters['StateAnimationShow'] || "true");
 params.ActorState_X = Number(parameters['ActorState_X'] || 0);
 params.ActorState_Y = Number(parameters['ActorState_Y'] || 0);
+params.EnemyDamage_X = Number(parameters['EnemyDamage_X'] || 0);
+params.EnemyDamage_Y = Number(parameters['EnemyDamage_Y'] || 0);
 
 params.DamageImgFrame = Number(parameters['DamageImgFrame'] || 30);
 params.CounterImgFrame = Number(parameters['CounterImgFrame'] || 60);

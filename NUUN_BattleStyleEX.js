@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.3
+ * @version 3.8.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/12/10 Ver.3.8.4
+ * 敵のダメージポップアップの位置を指定できる機能を追加。
  * 2022/11/26 Ver.3.8.3
  * 行動時ズーム時にAPNGの画像の座標がずれてしまう問題を修正。
  * 2022/11/12 Ver.3.8.2
@@ -2664,6 +2666,16 @@ Sprite_BSFrontActor.prototype.damageOffsetX = function() {
 
 Sprite_BSFrontActor.prototype.damageOffsetY = function() {
   return (this.viewFrontActor ? 0 : Sprite_Actor.prototype.damageOffsetY.call(this)) + params.ActorDamage_Y;
+};
+
+const _Sprite_Enemy_damageOffsetX = Sprite_Enemy.prototype.damageOffsetX;
+Sprite_Enemy.prototype.damageOffsetX = function() {
+  return _Sprite_Enemy_damageOffsetX.call(this) + params.EnemyDamage_X;
+};
+
+const _Sprite_Enemy_damageOffsetY = Sprite_Enemy.prototype.damageOffsetY;
+Sprite_Enemy.prototype.damageOffsetY = function() {
+  return _Sprite_Enemy_damageOffsetY.call(this) + params.EnemyDamage_Y;
 };
 
 

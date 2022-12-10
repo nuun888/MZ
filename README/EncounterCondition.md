@@ -1,5 +1,5 @@
 # [エンカウント条件](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)
-# Ver.1.2.1
+# Ver.1.2.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js)  
 #### 対応プラグイン  
 [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)  
@@ -45,6 +45,8 @@ equal:等しい　greater:より大きい　less:未満　greaterEqual:以上　
 条件付きベースでの条件はパーティのみの判定になります。
 
 ## 更新履歴
+2022/12/11 Ver.1.2.2  
+日本語以外での表示を英語表示に変更。  
 2022/1/8 Ver.1.2.1  
 新条件定義のスイッチと変数の条件が逆に定義されていた問題を修正。  
 2021/12/19 Ver.1.2.0  

@@ -8,11 +8,64 @@
  */
 /*:
  * @target MZ
+ * @plugindesc MVP actor
+ * @author NUUN
+ * @base NUUN_Result
+ * @orderAfter NUUN_Result
+ * @version 1.1.3
+ * 
+ * @help
+ * Display the MVP actor for this battle in the results displayed after winning.
+ * The MVP actor will be the actor with the highest damage dealt.
+ * If you want to specify Victory ME and Victory BGM for each actor, set Victory ME and Victory BGM from "Display actor settings" or "Image settings for NUUN_ActorPicture" in "NUUN_Result".
+ * "BattleVoiceMZ" (by Sasuke KANNAZUKI) is required separately for the battle voice playback function.
+ * 
+ * You can play SE, BGM, and battle voices without setting an actor image.
+ * 
+ * This plugin is an extended plugin for NUUN_Result Ver.2.0.3 or later.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/11/2022 Ver.1.1.3
+ * Changed the display in languages other than Japanese to English.
+ * 9/14/2022 Ver.1.1.2
+ * Fixed an issue where an error would appear at the end of a battle.
+ * 9/12/2022 Ver.1.1.1
+ * Definition change related to external plugin parameter acquisition.
+ * 9/11/2022 Ver.1.1.0
+ * Added ability to play voice only for MVP actors by BattleVoiceMZ. (Requires BattleVoiceMZ)
+ * 9/11/2022 Ver.1.0.1
+ * Processing fix by "NUUN_Result" fix.
+ * 9/11/2022 Ver.1.0.0
+ * First edition.
+ * 
+ * @param MVPVisibleSwitch
+ * @text MVP display switch ID
+ * @desc Switch ID to display MVP. If 0 is specified, it will always be displayed.
+ * @type switch
+ * @default 0
+ * 
+ * @param ExternalPluginSetting
+ * @text External plugin settings
+ * @default ------------------------------
+ * 
+ * @param OnMVPBattleVoice
+ * @text MVP actor voice playback (Requires BattleVoiceMZ)
+ * @desc Only the MVP actor will be played during battle processing in BattleVoiceMZ.
+ * @type boolean
+ * @default true
+ * @parent ExternalPluginSetting
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc MVPアクター
  * @author NUUN
  * @base NUUN_Result
  * @orderAfter NUUN_Result
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * 勝利後に表示されるリザルトにこの戦闘でのMVPアクターを表示します。
@@ -29,6 +82,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/11 Ver.1.1.3
+ * 日本語以外での表示を英語表示に変更。
  * 2022/9/14 Ver.1.1.2
  * 戦闘終了時にエラーが出る問題を修正。
  * 2022/9/12 Ver.1.1.1

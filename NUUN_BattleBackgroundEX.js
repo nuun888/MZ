@@ -417,15 +417,15 @@
  * @default ------------------------------
  * 
  * @param BoatBattleback
- * @text 船戦闘背景
- * @desc 船の戦闘背景を設定します。
+ * @text ボート戦闘背景
+ * @desc ボートの戦闘背景を設定します。
  * @default 
  * @type struct<SetBattleBackgroundImg>
  * @parent VehicleBattleback
  * 
  * @param ShipBattleback
- * @text 帆船戦闘背景
- * @desc 帆船の戦闘背景を設定します。
+ * @text 船戦闘背景
+ * @desc 船の戦闘背景を設定します。
  * @default 
  * @type struct<SetBattleBackgroundImg>
  * @parent VehicleBattleback

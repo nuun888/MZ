@@ -6,12 +6,307 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc  Battle background change
+ * @author NUUN
+ * @version 1.2.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * You can change the battle background by region and terrain tag, and set it for each enemy group.
+ * You can change the battle background set in the field map to an arbitrary image. () is the name of the default auto tile.
+ * If no file is specified, the original battle background will be displayed.
+ * 
+ * 
+ * Enter "Comment" on the first page of the enemy group's battle event.
+ * <battleBack:[id]>
+ *  The battle background of this enemy group will be the battle background number [id] set in the list.
+ * 
+ * map Notes
+ * <regionBattleBack:[regionId],[id]>
+ *  At the time of encounter, when the region ID of the current location is [regionId], the battle background will be the battle background number [id] set in the list.
+ * <tagBattleBack:[tagId],[id]>
+ *  At the time of encounter, when the terrain tag ID of the current location is [tagId], the battle background will be the battle background number [id] set in the list.
+ * 
+ * The priority is normal battle background → terrain tag → region ID → enemy group.
+ * 
+ * If the battle background is changed using the <battleBack><regionBattleBack><tagBattleBack> tag after changing the battle background with the event command, it will be displayed with priority over the battle background changed with the event command.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/11/2022 Ver.1.2.0
+ * Changed the specification of the background setting.
+ * Changed the display in languages other than Japanese to English.
+ * 11/5/2021 Ver.1.1.1
+ * Changed the specification of battle background size adjustment.
+ * 6/27/2021 Ver.1.1.0
+ * Added a function to adjust the position of the background image.
+ * Added a function that allows you to change the battle background during battle.
+ * 12/2/2020 Ver.1.0.1
+ * Fixed a bug that caused an error in test battles.
+ * 12/2/2020 Ver.1.0.0
+ * First edition.
+ * 
+ * @command ChangeBattleBackground
+ * @desc Change the battle background image. It changes even in battle.
+ * @text Battle background change
+ * 
+ * @arg ChangeBackground
+ * @text Battle background change
+ * @desc Set the battle background to change.
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
+ * 
+ * 
+ * @param Setting
+ * @text Basic setting
+ * @default ------------------------------
+ * 
+ * @param BackgroundFit
+ * @desc Set the battle background display mode.
+ * @text Battle background size adjustment
+ * @type select
+ * @option Normal
+ * @value 'Normal'
+ * @option Fit
+ * @value 'Fit'
+ * @option NoResize
+ * @value 'NoResize'
+ * @default 'Normal'
+ * @parent Setting
+ * 
+ * @param BackgroundRatio
+ * @desc Correction magnification of the battle background when "NoResize" is selected. No enlargement at 100
+ * @text Correction magnification (only when "NoResize" is selected)
+ * @type number
+ * @default 100
+ * @min 0
+ * @parent Setting
+ * 
+ * @param BackgroundPosition
+ * @desc Move the Y coordinate of the battle background.
+ * @text Battle background Y position
+ * @type number
+ * @default 0
+ * @min -999
+ * @parent Setting
+ * 
+ * @param TagBattleBackground
+ * @text Battle backgrounds for regions, terrain tags, and enemy groups
+ * @default ------------------------------
+ * 
+ * @param BattleBackground
+ * @text Battle background setting
+ * @desc Set battle backgrounds to use for regions, terrain tags, and enemy groups.
+ * @default []
+ * @type struct<BattleBackgroundList>[]
+ * @parent TagBattleBackground
+ * 
+ * @param DefaultBattlebackSetting
+ * @text Default battle background
+ * @default ------------------------------
+ * 
+ * @param DefaultBattleback
+ * @text Default battle background
+ * @desc Set default battle background.
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
+ * @parent DefaultBattlebackSetting
+ * 
+ * @param VehicleBattleback
+ * @text vehicle combat background
+ * @default ------------------------------
+ * 
+ * @param BoatBattleback
+ * @text Boat battle background
+ * @desc Set boat battle background.
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
+ * @parent VehicleBattleback
+ * 
+ * @param ShipBattleback
+ * @text Ship battle background
+ * @desc Set ship battle background.
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
+ * @parent VehicleBattleback
+ * 
+ * @param AirshipBattleback
+ * @text Flying boat battle background
+ * @desc Set the flying boat battle background.
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
+ * @parent VehicleBattleback
+ * 
+ * @param AutotileBattlebacksSetting
+ * @text Autotile battle background setting
+ * @default ------------------------------
+ * 
+ * @param AutotileBattlebacks
+ * @text Autotile battle background
+ * @desc Set the autotile battle background.
+ * @default []
+ * @type struct<AutotileBattlebacksList>[]
+ * @parent AutotileBattlebacksSetting
+ * 
+ */
+/*~struct~SetBattleBackgroundImg:
+ * 
+ * @param Battlebacks1
+ * @text battle background 1
+ * @desc Set battle background 1.
+ * @type file
+ * @default 
+ * @dir img/battlebacks1
+ * 
+ * @param Battlebacks2
+ * @text Battle background 2
+ * @desc Set battle background 2.
+ * @type file
+ * @default 
+ * @dir img/battlebacks2
+ * 
+ */
+/*~struct~AutotileBattlebacksList:
+ * 
+ * @param BackgroundTarget
+ * @desc Select the autotile ID to set the battle background
+ * @text Autotile ID
+ * @type select
+ * @option None
+ * @value -1
+ * @option AutotileID 0 (Sea)
+ * @value 0
+ * @option AutotileID 1 (Deep Sea)
+ * @value 1
+ * @option AutotileID 2 (Rock Shoal)
+ * @value 2
+ * @option AutotileID 3 (Icebergs)
+ * @value 3
+ * @option AutotileID 4 (Poison Swamp)
+ * @value 4
+ * @option AutotileID 5 (Dead Trees)
+ * @value 5
+ * @option AutotileID 6 (Lava)
+ * @value 6
+ * @option AutotileID 7 (Lava Bubbles)
+ * @value 7
+ * @option AutotileID 8 (Pond)
+ * @value 8
+ * @option AutotileID 9 (Boulder)
+ * @value 9
+ * @option AutotileID 10 (Frozen Sea)
+ * @value 10
+ * @option AutotileID 11 (Whirlpool)
+ * @value 11
+ * @option AutotileID 12 (Land's End)
+ * @value 12
+ * @option AutotileID 13 (Endless Waterfall)
+ * @value 13
+ * @option AutotileID 14 (Cloud (Land's End))
+ * @value 14
+ * @option AutotileID 15 (Cloud)
+ * @value 15
+ * @option AutotileID 16 (Grassland A)
+ * @value 16
+ * @option AutotileID 17 (Grassland A (Dark))
+ * @value 17
+ * @option AutotileID 18 (Grassland B)
+ * @value 18
+ * @option AutotileID 19 (Grassland B (Dark))
+ * @value 19
+ * @option AutotileID 20 (Forest)
+ * @value 20
+ * @option AutotileID 21 (Forest (Conifer))
+ * @value 21
+ * @option AutotileID 22 (Mountain (Grass))
+ * @value 22
+ * @option AutotileID 23 (Mountain (Dirt))
+ * @value 23
+ * @option AutotileID 24 (Wasteland A)
+ * @value 24
+ * @option AutotileID 25 (Wasteland B)
+ * @value 25
+ * @option AutotileID 26 (Dirt Field A)
+ * @value 26
+ * @option AutotileID 27 (Dirt Field B)
+ * @value 27
+ * @option AutotileID 28 (Forest (Dead Trees))
+ * @value 28
+ * @option AutotileID 29 (Road (Dirt))
+ * @value 29
+ * @option AutotileID 30 (Hill (Dirt))
+ * @value 30
+ * @option AutotileID 31 (Mountain (Sandstone))
+ * @value 31
+ * @option AutotileID 32 (Desert A)
+ * @value 32
+ * @option AutotileID 33 (Desert B)
+ * @value 33
+ * @option AutotileID 34 (Rocky Land A)
+ * @value 34
+ * @option AutotileID 35 (Rocky Land B (Lava))
+ * @value 35
+ * @option AutotileID 36 (Forest (Palm Trees))
+ * @value 36
+ * @option AutotileID 37 (Road (Paved))
+ * @value 37
+ * @option AutotileID 38 (Mountain (Rock))
+ * @value 38
+ * @option AutotileID 39 (Mountain (Lava))
+ * @value 39
+ * @option AutotileID 40 (Snowfield)
+ * @value 40
+ * @option AutotileID 41 (Mountain (Snow))
+ * @value 41
+ * @option AutotileID 42 (Clouds)
+ * @value 42
+ * @option AutotileID 43 (Large Clouds)
+ * @value 43
+ * @option AutotileID 44 (Forest (Snow))
+ * @value 44
+ * @option AutotileID 45 (Pit)
+ * @value 45
+ * @option AutotileID 46 (Hill (Sandstone))
+ * @value 46
+ * @option AutotileID 47 (Hill (Snow))
+ * @value 47
+ * @default -1
+ * 
+ * @param AutotileBattleback
+ * @text Autotile battle background
+ * @desc Sets the battle background for the specified autotile.
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
+ * 
+ */
+/*~struct~BattleBackgroundList:
+ * 
+ * @param battlebacksName
+ * @text Name
+ * @desc You can name the battle background of any scene so that you can easily recognize it.
+ * @type string
+ * @default 
+ * 
+ * @param Battlebackground
+ * @text battle background
+ * @desc Set the battle background.
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc  戦闘背景変更プラグイン
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * 戦闘背景をリージョン、地形タグによって変更及び、敵グループごとに設定することが出来ます。
@@ -38,6 +333,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/11 Ver.1.2.0
+ * 背景設定の仕様を変更。
+ * 日本語以外での表示を英語表示に変更。
  * 2021/11/5 Ver.1.1.1
  * バトル背景サイズ調整の仕様を変更。
  * 2021/6/27 Ver.1.1.0
@@ -49,26 +347,19 @@
  * 初版
  * 
  * @command ChangeBattleBackground
- * @desc 戦闘中に背景画像を変更します。
- * @text 戦闘中戦闘背景変更
+ * @desc 戦闘の背景画像を変更します。戦闘中でも適用されます。
+ * @text 戦闘背景変更
  * 
- * @arg ChangeBackground1
- * @text 変更戦闘背景１
- * @desc 変更する戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * 
- * @arg ChangeBackground2
- * @text 変更戦闘背景２
- * @desc 変更する戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
+ * @arg ChangeBackground
+ * @text 戦闘背景変更
+ * @desc 変更する戦闘背景を設定します。
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
  * 
  * 
  * @param Setting
  * @text 基本設定
+ * @default ------------------------------
  * 
  * @param BackgroundFit
  * @desc バトル背景を表示モードを設定します。
@@ -84,7 +375,7 @@
  * @parent Setting
  * 
  * @param BackgroundRatio
- * @desc NoResize選択時のバトル背景の補正倍率。
+ * @desc NoResize選択時のバトル背景の補正倍率。100で拡大なし
  * @text 補正倍率(NoResize選択時のみ)
  * @type number
  * @default 100
@@ -101,6 +392,7 @@
  * 
  * @param TagBattleBackground
  * @text リージョン、地形タグ、敵グループで使用する戦闘背景
+ * @default ------------------------------
  * 
  * @param BattleBackground
  * @text 戦闘背景設定
@@ -109,1041 +401,185 @@
  * @type struct<BattleBackgroundList>[]
  * @parent TagBattleBackground
  * 
- * @param DefaultBattleback
+ * @param DefaultBattlebackSetting
  * @text デフォルトの戦闘背景
+ * @default ------------------------------
  * 
- * @param DefaultBattleback1
- * @text デフォルト戦闘背景１
- * @desc デフォルトの戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent DefaultBattleback
- * 
- * @param DefaultBattleback2
- * @text デフォルト戦闘背景２
- * @desc デフォルトの戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent DefaultBattleback
+ * @param DefaultBattleback
+ * @text デフォルト戦闘背景
+ * @desc デフォルトの戦闘背景を設定します。
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
+ * @parent DefaultBattlebackSetting
  * 
  * @param VehicleBattleback
  * @text 乗り物の戦闘背景
+ * @default ------------------------------
  * 
- * @param BoatBattleback1
- * @text 船戦闘背景１
- * @desc 船の戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
+ * @param BoatBattleback
+ * @text 船戦闘背景
+ * @desc 船の戦闘背景を設定します。
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
  * @parent VehicleBattleback
  * 
- * @param BoatBattleback2
- * @text 船戦闘背景２
- * @desc 船の戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
+ * @param ShipBattleback
+ * @text 帆船戦闘背景
+ * @desc 帆船の戦闘背景を設定します。
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
  * @parent VehicleBattleback
  * 
- * @param ShipBattleback1
- * @text 帆船戦闘背景１
- * @desc 帆船の戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
+ * @param AirshipBattleback
+ * @text 飛行艇戦闘背景
+ * @desc 飛行艇の戦闘背景を設定します。
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
  * @parent VehicleBattleback
  * 
- * @param ShipBattleback2
- * @text 帆船戦闘背景２
- * @desc 帆船の戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent VehicleBattleback
- * 
- * @param AirshipBattleback1
- * @text 飛行艇戦闘背景１
- * @desc 飛行艇の戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent VehicleBattleback
- * 
- * @param AirshipBattleback2
- * @text 飛行艇戦闘背景２
- * @desc 飛行艇の戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent VehicleBattleback
+ * @param AutotileBattlebacksSetting
+ * @text オートタイル戦闘背景設定
+ * @default ------------------------------
  * 
  * @param AutotileBattlebacks
- * @text オートタイル戦闘背景設定
- * 
- * @param AutotileBattlebacks0
- * @text オートタイルID 0 （海）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks0_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks0
- * 
- * @param battlebacks0_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks0
- * 
- * @param AutotileBattlebacks1
- * @text オートタイルID 1 （深い海）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks1_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks1
- * 
- * @param battlebacks1_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks1
- * 
- * @param AutotileBattlebacks2
- * @text オートタイルID 2 （岩礁）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks2_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks2
- * 
- * @param battlebacks2_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks2
- * 
- * @param AutotileBattlebacks3
- * @text オートタイルID 3 （氷山）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks3_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks3
- * 
- * @param battlebacks3_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks3
- * 
- * @param AutotileBattlebacks4
- * @text オートタイルID 4 （毒の沼）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks4_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks4
- * 
- * @param battlebacks4_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks4
- * 
- * @param AutotileBattlebacks5
- * @text オートタイルID 5 （枯れ木）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks5_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks5
- * 
- * @param battlebacks5_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks5
- * 
- * @param AutotileBattlebacks6
- * @text オートタイルID 6 （溶岩）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks6_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks6
- * 
- * @param battlebacks6_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks6
- * 
- * @param AutotileBattlebacks7
- * @text オートタイルID 7 （溶岩の泡）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks7_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks7
- * 
- * @param battlebacks7_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks7
- * 
- * @param AutotileBattlebacks8
- * @text オートタイルID 8 （池）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks8_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks8
- * 
- * @param battlebacks8_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks8
- * 
- * @param AutotileBattlebacks9
- * @text オートタイルID 9 （岩）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks9_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks9
- * 
- * @param battlebacks9_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks9
- * 
- * @param AutotileBattlebacks10
- * @text オートタイルID 10 （凍った海）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks10_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks10
- * 
- * @param battlebacks10_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks10
- * 
- * @param AutotileBattlebacks11
- * @text オートタイルID 11 （渦）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks11_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks11
- * 
- * @param battlebacks11_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks11
- * 
- * @param AutotileBattlebacks12
- * @text オートタイルID 12 （大地の境界）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks12_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks12
- * 
- * @param battlebacks12_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks12
- * 
- * @param AutotileBattlebacks13
- * @text オートタイルID 13 （下界に落ちる滝）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks13_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks13
- * 
- * @param battlebacks13_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks13
- * 
- * @param AutotileBattlebacks14
- * @text オートタイルID 14（雲（大地の境界））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks14_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks14
- * 
- * @param battlebacks14_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks14
- * 
- * @param AutotileBattlebacks15
- * @text オートタイルID 15 （雲）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks15_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks15
- * 
- * @param battlebacks15_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks15
- * 
- * @param AutotileBattlebacks16
- * @text オートタイルID 16 （草原A）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks16_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks16
- * 
- * @param battlebacks16_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks16
- * 
- * @param AutotileBattlebacks17
- * @text オートタイルID 17 （草原A（濃））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks17_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks17
- * 
- * @param battlebacks17_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks17
- * 
- * @param AutotileBattlebacks18
- * @text オートタイルID 18 （草原B）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks18_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks18
- * 
- * @param battlebacks18_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks18
- * 
- * @param AutotileBattlebacks19
- * @text オートタイルID 19 （草原B（濃））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks19_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks19
- * 
- * @param battlebacks19_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks19
- * 
- * @param AutotileBattlebacks20
- * @text オートタイルID 20 （森）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks20_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks20
- * 
- * @param battlebacks20_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks20
- * 
- * @param AutotileBattlebacks21
- * @text オートタイルID 21 （森（針葉樹））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks21_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks21
- * 
- * @param battlebacks21_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks21
- * 
- * @param AutotileBattlebacks22
- * @text オートタイルID 22 （山（草））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks22_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks22
- * 
- * @param battlebacks22_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks22
- * 
- * @param AutotileBattlebacks23
- * @text オートタイルID 23 （山（土））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks23_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks23
- * 
- * @param battlebacks23_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks23
- * 
- * @param AutotileBattlebacks24
- * @text オートタイルID 24 （荒れ地A）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks24_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks24
- * 
- * @param battlebacks24_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks24
- * 
- * @param AutotileBattlebacks25
- * @text オートタイルID 25 （荒れ地B）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks25_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks25
- * 
- * @param battlebacks25_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks25
- * 
- * @param AutotileBattlebacks26
- * @text オートタイルID 26 （土肌A）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks26_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks26
- * 
- * @param battlebacks26_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks26
- * 
- * @param AutotileBattlebacks27
- * @text オートタイルID 27 （土肌B）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks27_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks27
- * 
- * @param battlebacks27_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks27
- * 
- * @param AutotileBattlebacks28
- * @text オートタイルID 28 （森（枯れ木））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks28_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks28
- * 
- * @param battlebacks28_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks28
- * 
- * @param AutotileBattlebacks29
- * @text オートタイルID 29 （道（土））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks29_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks29
- * 
- * @param battlebacks29_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks29
- * 
- * @param AutotileBattlebacks30
- * @text オートタイルID 30 （丘（土））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks30_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks30
- * 
- * @param battlebacks30_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default Cliff
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks30
- * 
- * @param AutotileBattlebacks31
- * @text オートタイルID 31 （山（砂岩））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks31_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks31
- * 
- * @param battlebacks31_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks31
- * 
- * @param AutotileBattlebacks32
- * @text オートタイルID 32 （砂漠A）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks32_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks32
- * 
- * @param battlebacks32_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks32
- * 
- * @param AutotileBattlebacks33
- * @text オートタイルID 33 （砂漠B）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks33_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks33
- * 
- * @param battlebacks33_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks33
- * 
- * @param AutotileBattlebacks34
- * @text オートタイルID 34 （岩地A）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks34_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks34
- * 
- * @param battlebacks34_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks34
- * 
- * @param AutotileBattlebacks35
- * @text オートタイルID 35 （岩地B（溶岩））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks35_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks35
- * 
- * @param battlebacks35_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks35
- * 
- * @param AutotileBattlebacks36
- * @text オートタイルID 36 （森（ヤシの木））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks36_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks36
- * 
- * @param battlebacks36_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks36
- * 
- * @param AutotileBattlebacks37
- * @text オートタイルID 37（道（舗装））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks37_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks37
- * 
- * @param battlebacks37_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks37
- * 
- * @param AutotileBattlebacks38
- * @text オートタイルID 38（山（岩））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks38_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks38
- * 
- * @param battlebacks38_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks38
- * 
- * @param AutotileBattlebacks39
- * @text オートタイルID 39（山（溶岩））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks39_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks39
- * 
- * @param battlebacks39_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks39
- * 
- * @param AutotileBattlebacks40
- * @text オートタイルID 40（雪原）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks40_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks40
- * 
- * @param battlebacks40_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks40
- * 
- * @param AutotileBattlebacks41
- * @text オートタイルID 41（山（雪））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks41_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks41
- * 
- * @param battlebacks41_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks41
- * 
- * @param AutotileBattlebacks42
- * @text オートタイルID 42（雲）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks42_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks42
- * 
- * @param battlebacks42_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks42
- * 
- * @param AutotileBattlebacks43
- * @text オートタイルID 43（大きな雲）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks43_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks43
- * 
- * @param battlebacks43_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks43
- * 
- * @param AutotileBattlebacks44
- * @text オートタイルID 44（森（雪））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks44_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks44
- * 
- * @param battlebacks44_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks44
- * 
- * @param AutotileBattlebacks45
- * @text オートタイルID 45（穴）
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks45_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks45
- * 
- * @param battlebacks45_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks45
- * 
- * @param AutotileBattlebacks46
- * @text オートタイルID 46（丘（砂岩））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks46_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks46
- * 
- * @param battlebacks46_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks46
- * 
- * @param AutotileBattlebacks47
- * @text オートタイルID 47（丘（雪））
- * @parent AutotileBattlebacks
- * 
- * @param battlebacks47_1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks1
- * @parent AutotileBattlebacks47
- * 
- * @param battlebacks47_2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
- * @parent AutotileBattlebacks47
+ * @text オートタイル戦闘背景
+ * @desc オートタイルの戦闘背景を設定します。
+ * @default []
+ * @type struct<AutotileBattlebacksList>[]
+ * @parent AutotileBattlebacksSetting
  * 
  */
-/*~struct~BattleBackgroundList:
+/*~struct~SetBattleBackgroundImg:ja
+ * 
+ * @param Battlebacks1
+ * @text 戦闘背景１
+ * @desc 戦闘背景１を設定します。
+ * @type file
+ * @default 
+ * @dir img/battlebacks1
+ * 
+ * @param Battlebacks2
+ * @text 戦闘背景２
+ * @desc 戦闘背景２を設定します。
+ * @type file
+ * @default 
+ * @dir img/battlebacks2
+ * 
+ */
+/*~struct~AutotileBattlebacksList:ja
+ * 
+ * @param BackgroundTarget
+ * @desc 戦闘背景を設定するオートタイルIDを選択します。
+ * @text オートタイルID
+ * @type select
+ * @option なし
+ * @value -1
+ * @option オートタイルID 0 （海）
+ * @value 0
+ * @option オートタイルID 1 （深い海）
+ * @value 1
+ * @option オートタイルID 2 （岩礁）
+ * @value 2
+ * @option オートタイルID 3 （氷山）
+ * @value 3
+ * @option オートタイルID 4 （毒の沼）
+ * @value 4
+ * @option オートタイルID 5 （枯れ木）
+ * @value 5
+ * @option オートタイルID 6 （溶岩）
+ * @value 6
+ * @option オートタイルID 7 （溶岩の泡）
+ * @value 7
+ * @option オートタイルID 8 （池）
+ * @value 8
+ * @option オートタイルID 9 （岩）
+ * @value 9
+ * @option オートタイルID 10 （凍った海）
+ * @value 10
+ * @option オートタイルID 11 （渦）
+ * @value 11
+ * @option オートタイルID 12 （大地の境界）
+ * @value 12
+ * @option オートタイルID 13 （下界に落ちる滝）
+ * @value 13
+ * @option オートタイルID 14 （雲（大地の境界））
+ * @value 14
+ * @option オートタイルID 15 （雲）
+ * @value 15
+ * @option オートタイルID 16 （草原A）
+ * @value 16
+ * @option オートタイルID 17 （草原A（濃））
+ * @value 17
+ * @option オートタイルID 18 （草原B）
+ * @value 18
+ * @option オートタイルID 19 （草原B（濃））
+ * @value 19
+ * @option オートタイルID 20 （森）
+ * @value 20
+ * @option オートタイルID 21 （森（針葉樹））
+ * @value 21
+ * @option オートタイルID 22 （山（草））
+ * @value 22
+ * @option オートタイルID 23 （山（土））
+ * @value 23
+ * @option オートタイルID 24 （荒れ地A）
+ * @value 24
+ * @option オートタイルID 25 （荒れ地B）
+ * @value 25
+ * @option オートタイルID 26 （土肌A）
+ * @value 26
+ * @option オートタイルID 27 （土肌B）
+ * @value 27
+ * @option オートタイルID 28 （森（枯れ木））
+ * @value 28
+ * @option オートタイルID 29 （道（土））
+ * @value 29
+ * @option オートタイルID 30 （丘（土））
+ * @value 30
+ * @option オートタイルID 31 （山（砂岩））
+ * @value 31
+ * @option オートタイルID 32 （砂漠A）
+ * @value 32
+ * @option オートタイルID 33 （砂漠B）
+ * @value 33
+ * @option オートタイルID 34 （岩地A）
+ * @value 34
+ * @option オートタイルID 35 （岩地B（溶岩））
+ * @value 35
+ * @option オートタイルID 36 （森（ヤシの木））
+ * @value 36
+ * @option オートタイルID 37 （道（舗装））
+ * @value 37
+ * @option オートタイルID 38 （山（岩））
+ * @value 38
+ * @option オートタイルID 39 （山（溶岩））
+ * @value 39
+ * @option オートタイルID 40 （雪原）
+ * @value 40
+ * @option オートタイルID 41 （山（雪））
+ * @value 41
+ * @option オートタイルID 42 （雲）
+ * @value 42
+ * @option オートタイルID 43 （大きな雲）
+ * @value 43
+ * @option オートタイルID 44 （森（雪））
+ * @value 44
+ * @option オートタイルID 45 （穴）
+ * @value 45
+ * @option オートタイルID 46 （丘（砂岩））
+ * @value 46
+ * @option オートタイルID 47 （丘（雪））
+ * @value 47
+ * @default -1
+ * 
+ * @param AutotileBattleback
+ * @text オートタイル戦闘背景
+ * @desc 指定のオートタイルの戦闘背景を設定します。
+ * @default 
+ * @type struct<SetBattleBackgroundImg>
+ * 
+ */
+/*~struct~BattleBackgroundList:ja
  * 
  * @param battlebacksName
  * @text 名称
@@ -1151,19 +587,11 @@
  * @type string
  * @default 
  * 
- * @param battlebacks1
- * @text 戦闘背景１
- * @desc 戦闘背景１を設定します。
- * @type file
+ * @param Battlebackground
+ * @text 戦闘背景
+ * @desc 戦闘背景を設定します。
  * @default 
- * @dir img/battlebacks1
- * 
- * @param battlebacks2
- * @text 戦闘背景２
- * @desc 戦闘背景２を設定します。
- * @type file
- * @default 
- * @dir img/battlebacks2
+ * @type struct<SetBattleBackgroundImg>
  * 
  */
 var Imported = Imported || {};
@@ -1171,17 +599,15 @@ Imported.NUUN_BattleBackgroundEX = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_BattleBackgroundEX');
-const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
-  try {
-      return JSON.parse(value);
-  } catch (e) {
-      try {
-          return eval(value);
-      } catch (e) {
-          return value;
-      }
-  }
-}));
+const BackgroundFit = eval(parameters['BackgroundFit']) || 'Normal';
+const BackgroundRatio = Number(parameters['BackgroundRatio'] || 100);
+const BackgroundPosition = Number(parameters['BackgroundPosition'] || 0);
+const BattleBackground = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BattleBackground'])) : [];
+const DefaultBattleback = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DefaultBattleback'])) : null;
+const BoatBattleback = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BoatBattleback'])) :  null;
+const ShipBattleback = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ShipBattleback'])) :  null;
+const AirshipBattleback = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AirshipBattleback'])) :  null;
+const AutotileBattlebacks = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AutotileBattlebacks'])) : [];
 
 const pluginName = "NUUN_BattleBackgroundEX";
 PluginManager.registerCommand(pluginName, 'ChangeBattleBackground', args => {
@@ -1189,13 +615,22 @@ PluginManager.registerCommand(pluginName, 'ChangeBattleBackground', args => {
 });
 
 function changeBattleBackground(args) {
-  BattleManager.nuun_ChangeBattleback(args.ChangeBackground1, args.ChangeBackground2);
+  const background = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.ChangeBackground)) : [];
+  BattleManager.nuun_ChangeBattleback(getBattlebacks1(background), getBattlebacks2(background));
   $gameTemp.BattleBackgroundRefresh = true;
 };
 
 BattleManager.nuun_ChangeBattleback = function(battleback1Name, battleback2Name) {
   this._changeBattleback1Name = battleback1Name;
   this._changeBattleback2Name = battleback2Name;
+};
+
+function getBattlebacks1(method) {
+  return method ? method.Battlebacks1 : null;
+};
+
+function getBattlebacks2(method) {
+  return method ? method.Battlebacks2 : null;
 };
 
 const _Spriteset_Battle_updateBattleback = Spriteset_Battle.prototype.updateBattleback;
@@ -1218,6 +653,8 @@ Game_Troop.prototype.setup = function(troopId) {
 Game_Troop.prototype.battleBackSetup = function() {
   let battleback1Name = null;
   let battleback2Name = null;
+  let battleback1 = null;
+  let battleback2 = null;
   const battleBack = this.battleBackTroopTag();
   if(($gameMap.regionIdBattleBack.length > 0 || $gameMap.mapTagIdBattleBack.length > 0) && !battleBack) {
     const x = $gamePlayer._x;
@@ -1225,16 +662,21 @@ Game_Troop.prototype.battleBackSetup = function() {
     const regionBattleback = $gameMap.regionBattleBackSetup(x, y);
     const mapTagBattleback = $gameMap.mapTagBattleBackSetup(x, y);
     if (regionBattleback) {
-      battleback1Name = regionBattleback.battlebacks1 ? regionBattleback.battlebacks1 : battleback1Name;
-      battleback2Name = regionBattleback.battlebacks2 ? regionBattleback.battlebacks2 : battleback2Name;
+      battleback1 = getBattlebacks1(regionBattleback.Battlebackground);
+      battleback2 = getBattlebacks2(regionBattleback.Battlebackground);
     } else if (mapTagBattleback) {
-      battleback1Name = mapTagBattleback.battlebacks1 ? mapTagBattleback.battlebacks1 : battleback1Name;
-      battleback2Name = mapTagBattleback.battlebacks2 ? mapTagBattleback.battlebacks2 : battleback2Name;
+      battleback1 = getBattlebacks1(mapTagBattleback.Battlebackground);
+      battleback2 = getBattlebacks2(mapTagBattleback.Battlebackground);
+      
     }
+    battleback1Name = battleback1 ? battleback1 : battleback1Name;
+    battleback2Name = battleback2 ? battleback2 : battleback2Name;
   }
   if(battleBack) {
-    battleback1Name = battleBack.battlebacks1 ? battleBack.battlebacks1 : battleback1Name;
-    battleback2Name = battleBack.battlebacks2 ? battleBack.battlebacks2 : battleback2Name;
+    battleback1 = getBattlebacks1(battleBack.Battlebackground);
+    battleback2 = getBattlebacks2(battleBack.Battlebackground);
+    battleback1Name = battleback1 ? battleback1 : battleback1Name;
+    battleback2Name = battleback2 ? battleback2 : battleback2Name;
   }
   $gameMap.NUUN_battleback1Name = battleback1Name;
   $gameMap.NUUN_battleback2Name = battleback2Name;
@@ -1253,11 +695,11 @@ Game_Troop.prototype.battleBackTroopTag = function() {
     }
   });
   return list;
-}
+};
 
 Game_Troop.prototype.battleBackRequest = function(data) {
   const list = data.split(',').map(Number);
-  const battleback = param.BattleBackground[Number(list[0]) - 1];
+  const battleback = BattleBackground[Number(list[0]) - 1];
   return battleback;
 };
 
@@ -1287,7 +729,7 @@ Game_Map.prototype.regionBattleBack = function() {
 		if (match) {
       let data = match[1].split(',').map(Number);
       if(data[0] > 0 && data[1] > 0) {
-        const back = param.BattleBackground[Number(data[1]) - 1];
+        const back = BattleBackground[Number(data[1]) - 1];
         list.push({battlebacks1:back.battlebacks1, battlebacks2:back.battlebacks2, regionId:data[0]});
       }
     } else {
@@ -1304,7 +746,7 @@ Game_Map.prototype.mapTagBattleBack = function() {
 		if (match) {
       let data = match[1].split(',').map(Number);
       if(data[0] > 0 && data[1] > 0) {
-        const back = param.BattleBackground[Number(data[1]) - 1];
+        const back = BattleBackground[Number(data[1]) - 1];
         list.push({battlebacks1:back.battlebacks1, battlebacks2:back.battlebacks2, tagId:data[0]});
       }
     } else {
@@ -1355,259 +797,82 @@ Sprite_Battleback.prototype.battleback2Name = function() {
   }
 };
 
+const _Sprite_Battleback_terrainBattleback1Name = Sprite_Battleback.prototype.terrainBattleback1Name;
 Sprite_Battleback.prototype.terrainBattleback1Name = function(type) {
-  switch (type) {
-    case 0:
-      return param.battlebacks0_1 ? param.battlebacks0_1 : null;
-    case 1:
-      return param.battlebacks1_1 ? param.battlebacks1_1 : null;
-    case 2:
-      return param.battlebacks2_1 ? param.battlebacks2_1 : null;
-    case 3:
-      return param.battlebacks3_1 ? param.battlebacks3_1 : null;
-    case 4:
-      return param.battlebacks4_1 ? param.battlebacks4_1 : "PoisonSwamp";
-    case 5:
-      return param.battlebacks5_1 ? param.battlebacks5_1 : "PoisonSwamp";
-    case 6:
-      return param.battlebacks6_1 ? param.battlebacks6_1 : null;
-    case 7:
-      return param.battlebacks7_1 ? param.battlebacks7_1 : null;
-    case 8:
-      return param.battlebacks8_1 ? param.battlebacks8_1 : null;
-    case 9:
-      return param.battlebacks9_1 ? param.battlebacks9_1 : null;
-    case 10:
-      return param.battlebacks10_1 ? param.battlebacks10_1 : null;
-    case 11:
-      return param.battlebacks11_1 ? param.battlebacks11_1 : null;
-    case 12:
-      return param.battlebacks12_1 ? param.battlebacks12_1 : null;
-    case 13:
-      return param.battlebacks13_1 ? param.battlebacks13_1 : null;
-    case 14:
-      return param.battlebacks14_1 ? param.battlebacks14_1 : null;
-    case 15:
-      return param.battlebacks15_1 ? param.battlebacks15_1 : null;
-    case 16:
-      return param.battlebacks16_1 ? param.battlebacks16_1 : null;
-    case 17:
-      return param.battlebacks17_1 ? param.battlebacks17_1 : null;
-    case 18:
-      return param.battlebacks18_1 ? param.battlebacks18_1 : null;
-    case 19:
-      return param.battlebacks19_1 ? param.battlebacks19_1 : null;
-    case 20:
-      return param.battlebacks20_1 ? param.battlebacks20_1 : null;
-    case 21:
-      return param.battlebacks21_1 ? param.battlebacks21_1 : null;
-    case 22:
-      return param.battlebacks22_1 ? param.battlebacks22_1 : null;
-    case 23:
-      return param.battlebacks23_1 ? param.battlebacks23_1 : null;
-    case 24:
-      return param.battlebacks24_1 ? param.battlebacks24_1 : "Wasteland";
-    case 25:
-      return param.battlebacks25_1 ? param.battlebacks25_1 : "Wasteland";
-    case 26:
-      return param.battlebacks26_1 ? param.battlebacks26_1 : "DirtField";
-    case 27:
-      return param.battlebacks27_1 ? param.battlebacks27_1 : "DirtField";
-    case 28:
-      return param.battlebacks28_1 ? param.battlebacks28_1 : null;
-    case 29:
-      return param.battlebacks29_1 ? param.battlebacks29_1 : null;
-    case 30:
-      return param.battlebacks30_1 ? param.battlebacks30_1 : null;
-    case 31:
-      return param.battlebacks31_1 ? param.battlebacks31_1 : null;
-    case 32:
-      return param.battlebacks32_1 ? param.battlebacks32_1 : "Desert";
-    case 33:
-      return param.battlebacks33_1 ? param.battlebacks33_1 : "Desert";
-    case 34:
-      return param.battlebacks34_1 ? param.battlebacks34_1 : "Lava1";
-    case 35:
-      return param.battlebacks35_1 ? param.battlebacks35_1 : "Lava2";
-    case 36:
-      return param.battlebacks36_1 ? param.battlebacks36_1 : null;
-    case 37:
-      return param.battlebacks37_1 ? param.battlebacks37_1 : null;
-    case 38:
-      return param.battlebacks38_1 ? param.battlebacks38_1 : null;
-    case 39:
-      return param.battlebacks39_1 ? param.battlebacks39_1 : null;
-    case 40:
-      return param.battlebacks40_1 ? param.battlebacks40_1 : "Snowfield";
-    case 41:
-      return param.battlebacks41_1 ? param.battlebacks41_1 : "Snowfield";
-    case 42:
-      return param.battlebacks42_1 ? param.battlebacks42_1 : "Clouds";
-    case 43:
-      return param.battlebacks43_1 ? param.battlebacks43_1 : null;
-    case 44:
-      return param.battlebacks44_1 ? param.battlebacks44_1 : null;
-    case 45:
-      return param.battlebacks45_1 ? param.battlebacks45_1 : null;
-    case 46:
-      return param.battlebacks46_1 ? param.battlebacks46_1 : null;
-    case 47:
-      return param.battlebacks47_1 ? param.battlebacks47_1 : null;
+  const data = AutotileBattlebacks.find(battleback => battleback.BackgroundTarget === type);
+  if (data) {
+    return getBattlebacks1(data.AutotileBattleback);
+  } else {
+    return _Sprite_Battleback_terrainBattleback1Name.call(this, type);
   }
 };
 
+const _Sprite_Battleback_terrainBattleback2Name = Sprite_Battleback.prototype.terrainBattleback2Name;
 Sprite_Battleback.prototype.terrainBattleback2Name = function(type) {
-  switch (type) {
-    case 0:
-      return param.battlebacks0_2 ? param.battlebacks0_2 : null;
-    case 1:
-      return param.battlebacks1_2 ? param.battlebacks1_2 : null;
-    case 2:
-      return param.battlebacks2_2 ? param.battlebacks2_2 : null;
-    case 3:
-      return param.battlebacks3_2 ? param.battlebacks3_2 : null;
-    case 4:
-      return param.battlebacks4_2 ? param.battlebacks4_2 : "PoisonSwamp";
-    case 5:
-      return param.battlebacks5_2 ? param.battlebacks5_2 : "PoisonSwamp";
-    case 6:
-      return param.battlebacks6_2 ? param.battlebacks6_2 : null;
-    case 7:
-      return param.battlebacks7_2 ? param.battlebacks7_2 : null;
-    case 8:
-      return param.battlebacks8_2 ? param.battlebacks8_2 : null;
-    case 9:
-      return param.battlebacks9_2 ? param.battlebacks9_2 : null;
-    case 10:
-      return param.battlebacks10_2 ? param.battlebacks10_2 : null;
-    case 11:
-      return param.battlebacks11_2 ? param.battlebacks11_2 : null;
-    case 12:
-      return param.battlebacks12_2 ? param.battlebacks12_2 : null;
-    case 13:
-      return param.battlebacks13_2 ? param.battlebacks13_1 : null;
-    case 14:
-      return param.battlebacks14_2 ? param.battlebacks14_2 : null;
-    case 15:
-      return param.battlebacks15_2 ? param.battlebacks15_2 : null;
-    case 16:
-      return param.battlebacks16_2 ? param.battlebacks16_2 : null;
-    case 17:
-      return param.battlebacks17_2 ? param.battlebacks17_2 : null;
-    case 18:
-      return param.battlebacks18_2 ? param.battlebacks18_2 : null;
-    case 19:
-      return param.battlebacks19_2 ? param.battlebacks19_2 : null;
-    case 20:
-      return param.battlebacks20_2 ? param.battlebacks20_2 : "Forest";
-    case 21:
-      return param.battlebacks21_2 ? param.battlebacks21_2 : "Forest";
-    case 22:
-      return param.battlebacks22_2 ? param.battlebacks22_2 : "Cliff";
-    case 23:
-      return param.battlebacks23_2 ? param.battlebacks23_2 : null;
-    case 24:
-      return param.battlebacks24_2 ? param.battlebacks24_2 : "Wasteland";
-    case 25:
-      return param.battlebacks25_2 ? param.battlebacks25_2 : "Wasteland";
-    case 26:
-      return param.battlebacks26_2 ? param.battlebacks26_2 : "Wasteland";
-    case 27:
-      return param.battlebacks27_2 ? param.battlebacks27_2 : "Wasteland";
-    case 28:
-      return param.battlebacks28_2 ? param.battlebacks28_2 : null;
-    case 29:
-      return param.battlebacks29_2 ? param.battlebacks29_2 : "Cliff";
-    case 30:
-      return param.battlebacks30_2 ? param.battlebacks30_2 : null;
-    case 31:
-      return param.battlebacks31_2 ? param.battlebacks31_2 : null;
-    case 32:
-      return param.battlebacks32_2 ? param.battlebacks32_2 : "Desert";
-    case 33:
-      return param.battlebacks33_2 ? param.battlebacks33_2 : "Desert";
-    case 34:
-      return param.battlebacks34_2 ? param.battlebacks34_2 : "Lava";
-    case 35:
-      return param.battlebacks35_2 ? param.battlebacks35_2 : "Lava";
-    case 36:
-      return param.battlebacks36_2 ? param.battlebacks36_2 : null;
-    case 37:
-      return param.battlebacks37_2 ? param.battlebacks37_2 : null;
-    case 38:
-      return param.battlebacks38_2 ? param.battlebacks38_2 : "Cliff";
-    case 39:
-      return param.battlebacks39_2 ? param.battlebacks39_2 : null;
-    case 40:
-      return param.battlebacks40_2 ? param.battlebacks40_2 : "Snowfield";
-    case 41:
-      return param.battlebacks41_2 ? param.battlebacks41_2 : "Snowfield";
-    case 42:
-      return param.battlebacks42_2 ? param.battlebacks42_2 : "Clouds";
-    case 43:
-      return param.battlebacks43_2 ? param.battlebacks43_2 : null;
-    case 44:
-      return param.battlebacks44_2 ? param.battlebacks44_2 : null;
-    case 45:
-      return param.battlebacks45_2 ? param.battlebacks45_2 : null;
-    case 46:
-      return param.battlebacks46_2 ? param.battlebacks46_2 : null;
-    case 47:
-      return param.battlebacks47_2 ? param.battlebacks47_2 : null;
+  const data = AutotileBattlebacks.find(battleback => battleback.BackgroundTarget === type);
+  if (data) {
+    return getBattlebacks2(data.AutotileBattleback);
+  } else {
+    return _Sprite_Battleback_terrainBattleback2Name.call(this, type);
   }
 };
 
 const _Sprite_Battleback_defaultBattleback1Name = Sprite_Battleback.prototype.defaultBattleback1Name;
 Sprite_Battleback.prototype.defaultBattleback1Name = function() {
-  return param.DefaultBattleback1 ? param.DefaultBattleback1 : _Sprite_Battleback_defaultBattleback1Name.call(this);
+  const battleback = getBattlebacks1(DefaultBattleback);
+  return battleback ? battleback : _Sprite_Battleback_defaultBattleback1Name.call(this);
 };
 
 const _Sprite_Battleback_defaultBattleback2Name = Sprite_Battleback.prototype.defaultBattleback2Name
 Sprite_Battleback.prototype.defaultBattleback2Name = function() {
-  return param.DefaultBattleback2 ? param.DefaultBattleback2  : _Sprite_Battleback_defaultBattleback2Name.call(this);
+  const battleback = getBattlebacks2(DefaultBattleback);
+  return battleback ? battleback : _Sprite_Battleback_defaultBattleback2Name.call(this);
 };
 
 const _Sprite_Battleback_shipBattleback1Name = Sprite_Battleback.prototype.shipBattleback1Name;
 Sprite_Battleback.prototype.shipBattleback1Name = function() {
+  let battleback = null;
   if ($gamePlayer.isInBoat()) {
-    return param.BoatBattleback1 ? param.BoatBattleback1 : _Sprite_Battleback_shipBattleback1Name.call(this);
+    battleback = getBattlebacks1(BoatBattleback);
   } else if ($gamePlayer.isInShip()) {
-    return param.ShipBattleback1 ? param.ShipBattleback1 : _Sprite_Battleback_shipBattleback1Name.call(this);
+    battleback = getBattlebacks1(ShipBattleback);
   } else if ($gamePlayer.isInAirship()){
-    return param.AirshipBattleback1 ? param.AirshipBattleback1 : _Sprite_Battleback_shipBattleback1Name.call(this);
+    battleback = getBattlebacks1(AirshipBattleback);
   }
-  return _Sprite_Battleback_shipBattleback1Name.call(this);
+  return battleback ? battleback : _Sprite_Battleback_shipBattleback1Name.call(this);
 };
 
 const _Sprite_Battleback_shipBattleback2Name = Sprite_Battleback.prototype.shipBattleback2Name;
 Sprite_Battleback.prototype.shipBattleback2Name = function() {
+  let battleback = null;
   if ($gamePlayer.isInBoat()) {
-    return param.BoatBattleback2 ? param.BoatBattleback2 : _Sprite_Battleback_shipBattleback2Name.call(this);
+    battleback = getBattlebacks2(BoatBattleback);
   } else if ($gamePlayer.isInShip()) {
-    return param.ShipBattleback2 ? param.ShipBattleback2 : _Sprite_Battleback_shipBattleback2Name.call(this);
+    battleback = getBattlebacks2(ShipBattleback);
   } else if ($gamePlayer.isInAirship()){
-    return param.AirshipBattleback2 ? param.AirshipBattleback2 : _Sprite_Battleback_shipBattleback2Name.call(this);
+    battleback = getBattlebacks2(AirshipBattleback);
   }
-  return _Sprite_Battleback_shipBattleback2Name.call(this);
+  return battleback ? battleback : _Sprite_Battleback_shipBattleback2Name.call(this);
 };
 
 const _Sprite_Battleback_adjustPosition = Sprite_Battleback.prototype.adjustPosition;
-  Sprite_Battleback.prototype.adjustPosition = function() {
-    _Sprite_Battleback_adjustPosition.call(this);
-    if (param.BackgroundFit === 'Fit') {
-      this.width = this.bitmap.width;
-      this.height = this.bitmap.height;
-      this.x = 0;
-      this.scale.x = Graphics.width / this.bitmap.width;
-      this.scale.y = Graphics.height / this.bitmap.height;
-    } else if (param.BackgroundFit === 'NoResize') {
-      this.width = this.bitmap.width;
-      this.height = this.bitmap.height;
-      const scale = param.BackgroundRatio / 100;
-      this.x = (Graphics.width - this.bitmap.width * scale) / 2;
-      this.scale.x = 1.0 * scale;
-      this.scale.y = 1.0 * scale;
-    }
-    this.y += param.BackgroundPosition;
-  };
+Sprite_Battleback.prototype.adjustPosition = function() {
+  _Sprite_Battleback_adjustPosition.call(this);
+  if (BackgroundFit === 'Fit') {
+    this.width = this.bitmap.width;
+    this.height = this.bitmap.height;
+    this.x = 0;
+    this.scale.x = Graphics.width / this.bitmap.width;
+    this.scale.y = Graphics.height / this.bitmap.height;
+  } else if (BackgroundFit === 'NoResize') {
+    this.width = this.bitmap.width;
+    this.height = this.bitmap.height;
+    const scale = BackgroundRatio / 100;
+    this.x = (Graphics.width - this.bitmap.width * scale) / 2;
+    this.scale.x = 1.0 * scale;
+    this.scale.y = 1.0 * scale;
+  }
+  this.y += BackgroundPosition;
+};
+
 })();

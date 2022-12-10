@@ -241,7 +241,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [ダメージタイプTP追加](https://github.com/nuun888/MZ/blob/master/README/TPDamageType.md) | [NUUN_TPDamageType](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPDamageType.js) |  | 1.0.1 |
 | [全体、ランダム、敵味方全体攻撃でも対象選択](https://github.com/nuun888/MZ/blob/master/README/Scope_confirmation.md) | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js) | 共 | 1.6.0 |
 | [MV互換アニメーションフレームレート変更](https://github.com/nuun888/MZ/blob/master/README/AnimationFPSRate.md) | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.1.1 |
-| 戦闘背景の変更 | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) |  | 1.2.0 |
+| [戦闘背景の変更](https://github.com/nuun888/MZ/blob/master/README/BattleBackgroundEX.md) | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) | 共 | 1.2.0 |
 |  |  |  |  |
 |  |  |  |  |
 

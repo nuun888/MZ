@@ -6,12 +6,77 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Encounter conditions
+ * @author NUUN
+ * @version 1.2.2
+ * 
+ * @help
+ * Adds encounter conditions to enemy groups.
+ * Enter the following tags in 'Comment' on the first page of the enemy group.
+ * If there are multiple conditions, it will be an encounter candidate only if all conditions are met.
+ * 
+ * Variable
+ * <Enc_Cond:[type],[id],[val][Inequality]>
+ * Switch
+ * <Enc_Cond:[type],[id],[flags]>
+ * Vehicle
+ * <Enc_Cond:[type],[vehicle],[flags]>
+ * Evaluation formula
+ * <Enc_Cond:[type],[code]>
+ * Conditions in "NUUN_ConditionsBase"
+ * <Enc_Cond:[type], [mode], [condid], [condid], ...>
+ * 
+ * [type]:Specify numerically
+ * 0: Variable　1: Switch　2: Vehicle　10: Evaluation formula 20: "NUUN_ConditionsBase" conditions
+ * [id]:Game variable, ID of the switch (an integer greater than or equal to 1)
+ * [val]:Numeric value to compare (number)
+ * [Inequality]:inequality sign
+ * equal: equal  greater: Greater than  less: Less than  greaterEqual: Greater than  lessEqual: less than
+ * [flags]: flag  true or false
+ * [vehicle]: vehicle  boat: small ship  ship: large ship  airship: airship  vehicle: vehicle
+ * [mode]: Condition mode  0:Any match  1: All match  *Required "NUUN_ConditionsBase"
+ * [condid]: List ID set in the "NUUN_ConditionsBase"  *Required "NUUN_ConditionsBase"
+ * 
+ * 
+ * <Enc_Cond:0, 3, 6, equal> Encounter if the variable's ID3 value is equal to 6.
+ * <Enc_Cond:0, 3, 6, greater> Encounter if the variable's ID3 value is greater than 6.
+ * <Enc_Cond:0, 3, 6, less> Encounter if the variable's ID3 value is less than 6.
+ * <Enc_Cond:0, 3, 6, greaterEqual> If the ID3 value of the variable is 6 or more, it will be encountered.
+ * <Enc_Cond:0, 3, 6, lessEqual> Encounter if the variable's ID3 value is less than or equal to 6.
+ * If there is no inequality identification, evaluate with variable > value.
+ * <Enc_Cond:1, 3, true> Encounter when switch ID3 is true.
+ * <Enc_Cond:2, boat, true> Encounters only when on a boat.
+ * <Enc_Cond:2, vehicle, false> Encounters only when not in a vehicle.
+ * <Enc_Cond:10, Evaluation formula> Encounter if it matches the evaluation formula.
+ * 
+ * Conditions in "NUUN_ConditionsBase" will be judged only by the party.
+ * <Enc_Cond:20, 7> Encounter if it matches the list conditions set in "NUUN_ConditionsBase".
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/11/2022 Ver.1.2.2
+ * Changed the display in languages other than Japanese to English.
+ * 1/8/2022 Ver.1.2.1
+ * Fixed the problem that the switch and variable conditions of the new condition definition were defined inversely.
+ * 12/19/2021 Ver.1.2.0
+ * Support for conditions by "NUUN_ConditionsBase".
+ * 8/5/2021 Ver.1.1.0
+ * Changed the tag description method for encounter conditions.
+ * 1/4/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc エンカウント条件
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * 敵グループに対してエンカウント条件を付けます。
@@ -75,6 +140,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/11 Ver.1.2.2
+ * 日本語以外での表示を英語表示に変更。
  * 2022/1/8 Ver.1.2.1
  * 新条件定義のスイッチと変数の条件が逆に定義されていた問題を修正。
  * 2021/12/19 Ver.1.2.0

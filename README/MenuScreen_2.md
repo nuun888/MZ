@@ -1,5 +1,5 @@
 # [メニュー画面タイプ２](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)
-# Ver.2.0.0
+# Ver.2.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 #### 必須、前提プラグイン
 [メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.5  
@@ -87,6 +87,9 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2022/12/10 Ver.2.0.1  
+カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)  
+アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)  
 2022/11/25 Ver.2.0.0  
 設定用と処理用のファイルを分離。  
 メニューコマンドウィンドウ、メニューステータスウィンドウ、メニューインフォウィンドウの座標、サイズを指定できる機能を追加。  

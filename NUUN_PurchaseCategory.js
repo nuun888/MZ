@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * Display the item category on the purchase screen of the shop.
@@ -30,6 +30,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/10/2022 Ver.1.1/0
+ * Added a switch that allows you to set whether to display or hide the category display.
+ * 12/7/2022 Ver.1.0.2
+ * Added a switch to show/hide categories.
  * 12/3/2022 Ver.1.0.1
  * Minor fix.
  * 12/3/2022 Ver.1.0.0
@@ -58,6 +62,12 @@
  * @desc Key Item is displayed in the category at the time of purchase.
  * @type boolean
  * @default false
+ * 
+ * @param BuyCategorySwitch
+ * @desc A switch that applies the purchase category. A setting of 0 will always show the category.
+ * @text Purchasing category applicable switch ID
+ * @type switch
+ * @default 0
  * 
  * 
  * @command AddBuyCategory
@@ -99,7 +109,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * ショップの購入画面にアイテムカテゴリーを表示します。
@@ -118,6 +128,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/10 Ver.1.1.0
+ * カテゴリー表示の表示、非表示を設定出来るスイッチを追加。
+ * 2022/12/7 Ver.1.0.2
+ * カテゴリーを表示非表示を設定できるスイッチを追加。
  * 2022/12/3 Ver.1.0.1
  * 微修正。
  * 2022/12/3 Ver.1.0.0
@@ -146,6 +160,12 @@
  * @desc 購入時のカテゴリーに大事なものを表示します。
  * @type boolean
  * @default false
+ * 
+ * @param BuyCategorySwitch
+ * @desc 購入時のカテゴリーを適用するスイッチ。0で常にカテゴリーが表示されます。
+ * @text 購入時カテゴリー適用スイッチID
+ * @type switch
+ * @default 0
  * 
  * 
  * @command AddBuyCategory
@@ -190,6 +210,7 @@ Imported.NUUN_PurchaseCategory = true;
     const BuyCategoryRows = Number(parameters['BuyCategoryRows'] || 1);
     const BuyCategoryWidthMode = eval(parameters['BuyCategoryWidthMode'] || 'true');
     const ShowKeyItem = eval(parameters['ShowKeyItem'] || 'false');
+    const BuyCategorySwitch = Number(parameters['BuyCategorySwitch'] || 0);
 
     const pluginName = "NUUN_PurchaseCategory";
     PluginManager.registerCommand(pluginName, 'AddBuyCategory', args => {
@@ -199,6 +220,10 @@ Imported.NUUN_PurchaseCategory = true;
     PluginManager.registerCommand(pluginName, 'ResetBuyCategory', args => {
         $gameSystem.itemBuyCategory = null;
     });
+
+    function isBuyCategorySwitch() {
+        return BuyCategorySwitch === 0 || BuyCategorySwitch > 0 && $gameSwitches.value(BuyCategorySwitch);
+    };
     
     const _Scene_Shop_create = Scene_Shop.prototype.create;
     Scene_Shop.prototype.create = function() {
@@ -319,29 +344,35 @@ Imported.NUUN_PurchaseCategory = true;
 
     Window_ItemBuyCategory.prototype.makeCommandList = function() {
         const list = $gameSystem.itemBuyCategory;
-        if (list && list.length > 0) {
-            for (const command of list) {
-                if(this.needsCommand(command.Categorykey) && command.Categorykey === 'item') {
-                    this.addCommand(TextManager.item, command.Categorykey);
-                } else if(this.needsCommand(command.Categorykey) && command.Categorykey === 'weapon') {
-                    this.addCommand(TextManager.weapon, command.Categorykey);
-                } else if(this.needsCommand(command.Categorykey) && command.Categorykey === 'armor') {
-                    this.addCommand(TextManager.armor, command.Categorykey);
-                } else if(ShowKeyItem && this.needsCommand(command.Categorykey) && command.Categorykey === 'keyItem') {
-                    this.addCommand(TextManager.keyItem, command.Categorykey);
-                } else if (this.needsCommand(ncommand.Categorykey) && command.Categorykey === 'allItems') {
-                    this.addCommand(command.CategoryName, command.Categorykey);
-                } else if(this.needsCommand(names.Categorykey) && command.CategoryName) { 
-                    this.addCommand(command.CategoryName, command.Categorykey);
+        if (isBuyCategorySwitch()) {
+            if (list && list.length > 0) {
+                for (const command of list) {
+                    if(this.needsCommand(command.Categorykey) && command.Categorykey === 'item') {
+                        this.addCommand(TextManager.item, command.Categorykey);
+                    } else if(this.needsCommand(command.Categorykey) && command.Categorykey === 'weapon') {
+                        this.addCommand(TextManager.weapon, command.Categorykey);
+                    } else if(this.needsCommand(command.Categorykey) && command.Categorykey === 'armor') {
+                        this.addCommand(TextManager.armor, command.Categorykey);
+                    } else if(ShowKeyItem && this.needsCommand(command.Categorykey) && command.Categorykey === 'keyItem') {
+                        this.addCommand(TextManager.keyItem, command.Categorykey);
+                    } else if (this.needsCommand(ncommand.Categorykey) && command.Categorykey === 'allItems') {
+                        this.addCommand(command.CategoryName, command.Categorykey);
+                    } else if(this.needsCommand(names.Categorykey) && command.CategoryName) { 
+                        this.addCommand(command.CategoryName, command.Categorykey);
+                    }
+                }
+            } else {
+                Window_ItemCategory.prototype.makeCommandList.call(this);
+                if (!ShowKeyItem) {
+                    const index = this._list.findIndex(command => command.symbol === 'keyItem');
+                    this._list.splice(index, 1);
                 }
             }
-        } else {
-            Window_ItemCategory.prototype.makeCommandList.call(this);
-            if (!ShowKeyItem) {
-                const index = this._list.findIndex(command => command.symbol === 'keyItem');
-                this._list.splice(index, 1);
-            }
         }
+    };
+    
+    Window_ItemBuyCategory.prototype.needsSelection = function() {
+        return Window_ItemCategory.prototype.needsSelection.call(this) && isBuyCategorySwitch();
     };
 
 
@@ -366,7 +397,7 @@ Imported.NUUN_PurchaseCategory = true;
     };
 
     Window_ShopBuy.prototype.includes = function(item) {
-        return Window_ItemList.prototype.includes.call(this, item);
+        return isBuyCategorySwitch() ? Window_ItemList.prototype.includes.call(this, item) : true;
     };
 
     Window_ShopBuy.prototype.isConstructor = function() {

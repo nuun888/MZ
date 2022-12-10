@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Gold EX
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -34,6 +34,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/10/2022 Ver.1.2.1
+ * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
  * 11/23/2022 Ver.1.2.0
  * Added a function to specify the maximum amount of money in the game with a game variable.
  * 6/4/2022 Ver.1.1.2
@@ -64,7 +66,7 @@
  * @param GoldIcon
  * @desc Show gold icon.
  * @text Icon index
- * @type number
+ * @type icon
  * @default 0
  * 
  * @param GoldSeparation
@@ -114,7 +116,7 @@
  * @target MZ
  * @plugindesc  所持金拡張
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -137,6 +139,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/10 Ver.1.2.1
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
  * 2022/11/23 Ver.1.2.0
  * 所持金の最大数をゲーム変数で指定する機能を追加。
  * 2022/6/4 Ver.1.1.2
@@ -167,7 +171,7 @@
  * @param GoldIcon
  * @desc アイコンを表示します。
  * @text アイコンインデックス
- * @type number
+ * @type icon
  * @default 0
  * 
  * @param GoldSeparation

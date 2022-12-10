@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * Change and extend the menu screen display.
@@ -75,6 +75,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/10/2022 Ver.2.0.1
+ * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
+ * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
  * 11/25/2022 Ver.2.0.0
  * Separate files for configuration and processing.
  * Added the ability to specify the coordinates and size of the menu command window, menu status window, and menu info window.
@@ -427,7 +430,7 @@
  * @param ExpGaugeColor1
  * @desc Exp gauge system color ID 1 (left)
  * @text Exp value gauge color 1
- * @type number
+ * @type color
  * @default 17
  * @min 0
  * @parent ExpgaugeSetting
@@ -435,7 +438,7 @@
  * @param ExpGaugeColor2
  * @desc Exp gauge system color ID2 (right)
  * @text Exp value gauge color 2
- * @type number
+ * @type color
  * @default 6
  * @min 0
  * @parent ExpgaugeSetting
@@ -817,7 +820,7 @@
  * @param NameColor
  * @desc System color ID for system items. You can enter the color code in the text tab.
  * @text Name color(1)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -948,7 +951,7 @@
  * @param Color1
  * @desc Gauge system color ID (left). You can enter the color code in the text tab.
  * @text Gauge color (left)(23)
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeSetting
@@ -956,7 +959,7 @@
  * @param Color2
  * @desc Gauge system color ID (right). You can enter the color code in the text tab.
  * @text Gauge color (right)(24)
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeSetting
@@ -1058,7 +1061,7 @@
  * @param NameColor
  * @desc System color ID for system items. You can enter the color code in the text tab.
  * @text Name color(7)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -1096,7 +1099,7 @@
  * @param InfoIcon
  * @text Icon ID(11)
  * @desc Icon ID
- * @type number
+ * @type icon
  * @default 0
  * @max 999999
  * @min 0
@@ -1298,7 +1301,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1360,6 +1363,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/10 Ver.2.0.1
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
  * 2022/11/25 Ver.2.0.0
  * 設定用と処理用のファイルを分離。
  * メニューコマンドウィンドウ、メニューステータスウィンドウ、メニューインフォウィンドウの座標、サイズを指定できる機能を追加。
@@ -1712,7 +1718,7 @@
  * @param ExpGaugeColor1
  * @desc 経験値のゲージのシステムカラーID１（左）
  * @text 経験値ゲージ色１
- * @type number
+ * @type color
  * @default 17
  * @min 0
  * @parent ExpgaugeSetting
@@ -1720,7 +1726,7 @@
  * @param ExpGaugeColor2
  * @desc 経験値のゲージのシステムカラーID２（右）
  * @text 経験値ゲージ色２
- * @type number
+ * @type color
  * @default 6
  * @min 0
  * @parent ExpgaugeSetting
@@ -2102,7 +2108,7 @@
  * @param NameColor
  * @desc 項目名称のシステムカラーID。テキストタブでカラーコードを入力できます。
  * @text 項目名称文字色(1)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -2233,7 +2239,7 @@
  * @param Color1
  * @desc ゲージのシステムカラーID(左)。テキストタブでカラーコードを入力できます。
  * @text ゲージカラー(左)(23)
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeSetting
@@ -2241,7 +2247,7 @@
  * @param Color2
  * @desc ゲージのシステムカラーID(右)。テキストタブでカラーコードを入力できます。
  * @text ゲージカラー(右)(24)
- * @type number
+ * @type color
  * @default 0
  * @min 0
  * @parent GaugeSetting
@@ -2343,7 +2349,7 @@
  * @param NameColor
  * @desc 項目名称の文字色。テキストタブでカラーコードを入力できます。
  * @text 項目名称文字色(7)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -2381,7 +2387,7 @@
  * @param InfoIcon
  * @text アイコンID(11)
  * @desc アイコンID
- * @type number
+ * @type icon
  * @default 0
  * @max 999999
  * @min 0

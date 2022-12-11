@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.3.0
  * 
  * @help
  * Expands the display of equipment status.
@@ -28,6 +28,11 @@
  * f you want to set it individually, set it with the image X coordinate and image Y coordinate of each actor image setting.
  * If you want to display the part where the actor of the image is displayed in the center, set the image display start coordinate X and image display start coordinate Y of each actor image setting.
  * 
+ * Special status text settings
+ * Weapon and Armor Notes
+ * <SpecialAbilityText:[text],[text],[text]...> Enter the text for the special status.
+ * [text]: text
+ * 
  * Specification
  * Character chips and SV actors are displayed in front.
  * 
@@ -35,6 +40,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/11/2022 Ver.1.3.0
+ * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
+ * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
+ * Added a function that can display special status.
+ * Fixed differential display of gear set bonuses.
  * 11/17/2022 Ver.1.2.0
  * Added the ability to view the gear set bonuses you have applied. (Requires "NUUN_SetBonusEquip")
  * 11/14/2022 Ver.1.1.1
@@ -283,6 +293,16 @@
  * @min 0
  * @parent GaugeSetting
  * 
+ * @param SpecialAbilitySetting
+ * @text Special ability setting
+ * @default ------------------------------
+ * 
+ * @param SpecialAbilityLineHeight
+ * @desc Item height.
+ * @text Item height
+ * @type number
+ * @default 36
+ * 
  * @param EquipSetBonusSetting
  * @text Equip set bonus settings
  * @default ------------------------------
@@ -304,7 +324,7 @@
  * @param ElementIconId
  * @text IconID
  * @desc Specifies the ID of the icon.
- * @type number
+ * @type icon
  * @min 0
  * @max 99999
  * @default 0
@@ -321,7 +341,7 @@
  * @param StateIconId
  * @text State icon ID
  * @desc Specifies the ID of the icon. If 0, the database icon will be displayed.
- * @type number
+ * @type icon
  * @default 0
  *
  */
@@ -444,6 +464,8 @@
  * @value 101
  * @option Text(1)(2)(3)(4)(5)(6)(8)(13)(14)
  * @value 150
+ * @option Special status(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @value 160
  * @option Equip set bonus(1)(2)(3)(4)(5)(6)(7)(8)(13)
  * @value 180
  * @option Character chip(1)(2)(3)(4)
@@ -489,7 +511,7 @@
  * @param NameColor
  * @desc System color ID for system items. You can enter the color code in the text tab.
  * @text System color(5)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -572,7 +594,7 @@
  * @param IconId
  * @text IconID(16)
  * @desc Specifies the ID of the icon.
- * @type number
+ * @type icon
  * @default 0
  * 
  * @param IconY
@@ -738,7 +760,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.3.0
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -755,6 +777,11 @@
  * 画像のアクターが表示されている部分を中央に表示させたい場合は各アクター画像設定の画像表示開始座標X、画像表示開始座標Y
  * で設定します。
  * 
+ * 特殊ステータスのテキスト設定
+ * 武器、防具のメモ欄
+ * <SpecialAbilityText:[text],[text],[text]...> 特殊ステータスのテキストを記入します。
+ * [text]:テキスト
+ * 
  * 仕様
  * キャラチップ、SVアクターは一番手前に表示されます。
  * 
@@ -762,6 +789,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/11 Ver.1.3.0
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
+ * 特殊ステータスを表示できる機能を追加。
+ * 装備セットボーナスの差分表示を修正。
  * 2022/11/17 Ver.1.2.0
  * 適用している装備セットボーナスを表示できる機能を追加。(要NUUN_SetBonusEquip)
  * 2022/11/14 Ver.1.1.1
@@ -1010,6 +1042,16 @@
  * @min 0
  * @parent GaugeSetting
  * 
+ * @param SpecialAbilitySetting
+ * @text 特殊能力設定
+ * @default ------------------------------
+ * 
+ * @param SpecialAbilityLineHeight
+ * @desc 項目高さ。
+ * @text 項目高さ
+ * @type number
+ * @default 36
+ * 
  * @param EquipSetBonusSetting
  * @text 装備セットボーナス設定
  * @default ------------------------------
@@ -1032,7 +1074,7 @@
  * @param ElementIconId
  * @text アイコンID
  * @desc アイコンのIDを指定します。
- * @type number
+ * @type icon
  * @min 0
  * @max 99999
  * @default 0
@@ -1049,7 +1091,7 @@
  * @param StateIconId
  * @text ステートアイコンID
  * @desc アイコンのIDを指定します。0の場合はデータベースのアイコンが表示されます。
- * @type number
+ * @type icon
  * @default 0
  *
  */
@@ -1172,6 +1214,8 @@
  * @value 101
  * @option 記述欄(1)(2)(3)(4)(5)(6)(8)(13)(14)
  * @value 150
+ * @option 特殊ステータス(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @value 160
  * @option 装備セットボーナス(1)(2)(3)(4)(5)(6)(7)(8)(13)
  * @value 180
  * @option キャラチップ(1)(2)(3)(4)
@@ -1217,7 +1261,7 @@
  * @param NameColor
  * @desc システム項目のシステムカラーID。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(5)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -1300,7 +1344,7 @@
  * @param IconId
  * @text アイコンID(16)
  * @desc アイコンのIDを指定します。
- * @type number
+ * @type icon
  * @default 0
  * 
  * @param IconY
@@ -1484,6 +1528,7 @@ Imported.NUUN_EquipStatusEX = true;
     const ActorImg_X = Number(parameters['ActorImg_X'] || 0);
     const ActorImg_Y = Number(parameters['ActorImg_Y'] || 0);
     const SetBonusLineHeight = Number(parameters['SetBonusLineHeight'] || 36);
+    const SpecialAbilityLineHeight = Number(parameters['SpecialAbilityLineHeight'] || 36);
 
     const equipContents = {};
     equipContents.PageList1 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipPageList1'])) : [];
@@ -2069,7 +2114,7 @@ Imported.NUUN_EquipStatusEX = true;
     };
 
     Window_EquipStatus.prototype.drawSpecialStatus = function(data, actor, x, y, width) {
-        const lineHeight = SetBonusLineHeight;
+        const lineHeight = SpecialAbilityLineHeight;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const name = data.ParamName ? data.ParamName : null;
@@ -2077,14 +2122,15 @@ Imported.NUUN_EquipStatusEX = true;
             this.drawText(name, x, y, data.SystemItemWidth);
             y += lineHeight;
         }
-        const a = this._tempActor ? this._tempActor : actor;
-        const equips = a.equips();
-        for (const equip of equips) {
-            
-        }
+        const textList = this.getSpecialAbilityText(actor);
+        const tempList = this._tempActor ? this.getSpecialAbilityText(this._tempActor) : [];
+        this.drawTextList(textList, tempList, x, y, width);
     };
 
     Window_EquipStatus.prototype.drawSetBonus = function(data, actor, x, y, width) {
+        if (!Imported.NUUN_SetBonusEquip) {
+            return;
+        }
         const lineHeight = SetBonusLineHeight;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
@@ -2093,29 +2139,9 @@ Imported.NUUN_EquipStatusEX = true;
             this.drawText(name, x, y, data.SystemItemWidth);
             y += lineHeight;
         }
-        const a = this._tempActor ? this._tempActor : actor;
-        const list = a.getSetBonusIds().filter(bonus => !!bonus);
-        list.forEach(setBonusId => {
-            const setData = NuunManager.getSetBonusData(setBonusId.id);
-            const setBonusSum = setBonusId.sum;
-            this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-            const name = setData.SetBonusName;
-            this.drawSetBonusName(name, x, y, width);
-            this.resetTextColor();
-            y += lineHeight;
-            this.horzLine(data, x, y, width, actor);
-            y += lineHeight;
-            setData.SetBonusNumberEquipment.forEach(numberEquip => {
-                if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
-                    y += lineHeight * this.drawSetBonusNumberEquipment(data, numberEquip, x, y, width);
-                } else if (!(setData.SetBonusEquip && setData.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
-                    y += lineHeight * this.drawSetBonusNumberEquipment(data, numberEquip, x, y, width);
-                }
-            });
-            if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && setData.SetBonusEquip.length === setBonusSum) {
-                y += lineHeight * this.drawSetBonusParam(data, setData, x, y, width);
-            }
-        });
+        const textList = this.getSetBonusList(actor, data, width);
+        const tempList = this._tempActor ? this.getSetBonusList(this._tempActor, data, width) : [];
+        this.drawTextList(textList, tempList, x, y, width);
     };
 
     Window_EquipStatus.prototype.drawElement = function(data, actor, x, y, width) {
@@ -2294,6 +2320,13 @@ Imported.NUUN_EquipStatusEX = true;
         this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(data.NameColor));
         this.contents.paintOpacity = 255;
     };
+
+    Window_EquipStatus.prototype.listHorzLine = function(x, y, width) {
+        const lineY = y + this.lineHeight() / 2 - 1;
+        this.contents.paintOpacity = 48;
+        this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(0));
+        this.contents.paintOpacity = 255;
+    };
     
     Window_EquipStatus.prototype.paramX = function(width) {//再定義
         const itemPadding = this.itemPadding();
@@ -2318,73 +2351,136 @@ Imported.NUUN_EquipStatusEX = true;
     Window_EquipStatus.prototype.drawSetBonusName = function(name, x, y, width) {
         this.drawText(name, x, y, width);
     };
-    
-    Window_EquipStatus.prototype.drawSetBonusParam = function(data, numberEquip, x, y, width) {
-        const equip = getSetBonusEquip(numberEquip.SetBonusWeaponData, numberEquip.SetBonusArmorData);
-        let rows = 0;
-        if (equip) {
-            let text = '';
-            let textWidth = 0;
-            if (numberEquip.SetBonusText) {
-                this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-                this.drawText(numberEquip.SetBonusText, x, y, width);
-                textWidth = this.textWidth(numberEquip.SetBonusText) + this.itemPadding();
-            }
-            this.resetTextColor();
-            const setBonusParamText = numberEquip.SetBonusParamText || [];
-            setBonusParamText.forEach(textData => {
-                const statusWidth = this.textWidth(textData) + textWidth;
-                if (statusWidth > width && !!text) {
-                    this.drawText(text, x + textWidth, y, width - textWidth);
-                    text = '';
-                    textWidth = 0;
-                    y += SetBonusLineHeight;
-                    rows++;
+
+    Window_EquipStatus.prototype.getSpecialAbilityText = function(actor) {
+        const textList = [];
+        actor.equips().forEach(equip => {
+            if (equip && equip.meta.SpecialAbilityText) {
+                const list = equip.meta.SpecialAbilityText.split(',');
+                for (const text of list) {
+                    const tag = equip.name +"_"+ equip.id +"_"+ text;
+                    textList.push({text:text, row: 1, tag: tag});
                 }
-                if (!!textData) {
-                    text += text ? ','+ textData : textData;
-                }
-            });
-            if (!!text) {
-                this.drawText(text, x + textWidth, y, width - textWidth);
-                rows++;
             }
-        }
-        return rows;
+        })
+        return textList;
     };
-    
-    Window_EquipStatus.prototype.drawSetBonusNumberEquipment = function(data, numberEquip, x, y, width) {
+
+    Window_EquipStatus.prototype.getSetBonusList = function(actor, data, width) {
+        const textList = [];
+        const list = actor.getSetBonusIds().filter(bonus => !!bonus);
+        let tag = null;
+        list.forEach(setBonus => {
+            const setData = NuunManager.getSetBonusData(setBonus.id);
+            const setBonusSum = setBonus.sum;
+            tag = setData.SetBonusName +"_"+ setBonus.id;
+            if (setBonusSum >= 2) {
+                textList.push({text:setData.SetBonusName, color:NuunManager.getColorCode(data.NameColor), row:1, mode:"headline", tag: tag});
+                textList.push({text:"this.horzLine", row:1, tag: tag +"_Line"});
+            }
+            setData.SetBonusNumberEquipment.forEach(numberEquip => {
+                if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
+                    this.drawSetBonusNumberEquipment(textList, tag, data, numberEquip, width);
+                } else if (!(setData.SetBonusEquip && setData.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
+                    this.drawSetBonusNumberEquipment(textList, tag, data, numberEquip, width);
+                }
+            });
+            if (setData.SetBonusEquip && setData.SetBonusEquip.length > 1 && setData.SetBonusEquip.length === setBonusSum) {
+                this.drawSetBonusParam(textList, tag, data, setData, width);
+            }
+        });
+        return textList;
+    };
+
+    Window_EquipStatus.prototype.drawSetBonusNumberEquipment = function(textList, tag, data, numberEquip, width) {
         const equip = getSetBonusEquip(numberEquip.SetNumberEquipWeaponData, numberEquip.SetNumberEquipArmorData);
-        let rows = 0;
         if (equip) {
             let text = '';
             let textWidth = 0;
             if (numberEquip.SetBonusText) {
-                this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-                this.drawText(numberEquip.SetBonusText, x, y, width);
+                textList.push({text:numberEquip.SetBonusText, color:NuunManager.getColorCode(data.NameColor), row:0, mode:"headline", tag: tag + numberEquip.SetBonusText});
                 textWidth = this.textWidth(numberEquip.SetBonusText) + this.itemPadding();
             }
-            this.resetTextColor();
             const setBonusParamText = numberEquip.SetBonusParamText || [];
             setBonusParamText.forEach(textData => {
                 const statusWidth = this.textWidth(textData) + textWidth;
                 if (statusWidth > width && !!text) {
-                    this.drawText(text, x + textWidth, y, width - textWidth);
+                    textList.push({text: text, row: 1, width: textWidth, tag: tag + text});
                     text = '';
                     textWidth = 0;
-                    y += SetBonusLineHeight;
-                    rows++;
                 }
                 if (!!textData) {
                     text += text ? ','+ textData : textData;
                 }
             });
             if (!!text) {
-                this.drawText(text, x + textWidth, y, width - textWidth);
-                rows++;
+                textList.push({text: text, row: 1, width: textWidth, tag: tag + text});
             }
         }
-        return rows;
+    };
+
+    Window_EquipStatus.prototype.drawSetBonusParam = function(textList, tag, data, numberEquip, x, y, width) {
+        const equip = getSetBonusEquip(numberEquip.SetBonusWeaponData, numberEquip.SetBonusArmorData);
+        if (equip) {
+            let text = '';
+            let textWidth = 0;
+            if (numberEquip.SetBonusText) {
+                textList.push({text:numberEquip.SetBonusText, color:NuunManager.getColorCode(data.NameColor), row:0, mode:"headline", tag: tag + numberEquip.SetBonusText});
+                textWidth = this.textWidth(numberEquip.SetBonusText) + this.itemPadding();
+            }
+            const setBonusParamText = numberEquip.SetBonusParamText || [];
+            setBonusParamText.forEach(textData => {
+                const statusWidth = this.textWidth(textData) + textWidth;
+                if (statusWidth > width && !!text) {
+                    textList.push({text: text, row: 1, width: textWidth, tag: tag + text});
+                    text = '';
+                    textWidth = 0;
+                }
+                if (!!textData) {
+                    text += text ? ','+ textData : textData;
+                }
+            });
+            if (!!text) {
+                textList.push({text: text, row: 1, width: textWidth, tag: tag + text});
+            }
+        }
+    };
+
+    Window_EquipStatus.prototype.drawTextList = function(textList, tempList, x, y, width) {
+        const lineHeight = SpecialAbilityLineHeight;
+        let textWidth = 0;
+        let textX =  0;
+        for (const text of textList) {
+            if (this._tempActor) {
+                if (tempList.some(a => a.text === text.text)) {
+                    text.color ? this.changeTextColor(text.color) : this.resetTextColor();
+                } else {
+                    text.color ? this.changeTextColor(text.color) : this.changeTextColor(ColorManager.paramchangeTextColor(-1));
+                }
+            } else {
+                text.color ? this.changeTextColor(text.color) : this.resetTextColor();
+            }
+            textWidth = text.width ? text.width : width;
+            textX =  text.width && text.mode !== "headline" ? text.width : 0;
+            if (text.text === "this.horzLine") {
+                this.listHorzLine(x, y, width);
+            } else {
+                this.drawText(text.text, x + textX, y, width - textWidth);
+            }
+            y += lineHeight * text.row;
+        }
+        const newTempList = tempList.filter(text => !textList.some(a => a.tag === text.tag));
+        for (const text of newTempList) {
+            text.color? this.changeTextColor(text.color) : this.changeTextColor(ColorManager.paramchangeTextColor(1));
+            textWidth = text.width ? text.width : width;
+            textX =  text.width && text.mode !== "headline" ? text.width : 0;
+            if (text.text === "this.horzLine") {
+                this.listHorzLine(x, y, width);
+            } else {
+                this.drawText(text.text, x + textX, y, width - textWidth);
+            }
+            y += lineHeight * text.row;
+        }
     };
 
 

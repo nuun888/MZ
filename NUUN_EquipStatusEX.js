@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/11/2022 Ver.1.3.1
+ * Fixed an issue where gear set bonus item heights were not being applied.
  * 12/11/2022 Ver.1.3.0
  * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
  * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
@@ -760,7 +762,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -789,6 +791,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/11 Ver.1.3.1
+ * 装備セットボーナスの項目高さが適用されていなかった問題を修正。
  * 2022/12/11 Ver.1.3.0
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
  * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
@@ -2124,7 +2128,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
         const textList = this.getSpecialAbilityText(actor);
         const tempList = this._tempActor ? this.getSpecialAbilityText(this._tempActor) : [];
-        this.drawTextList(textList, tempList, x, y, width);
+        this.drawTextList(textList, tempList, x, y, width, lineHeight);
     };
 
     Window_EquipStatus.prototype.drawSetBonus = function(data, actor, x, y, width) {
@@ -2141,7 +2145,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
         const textList = this.getSetBonusList(actor, data, width);
         const tempList = this._tempActor ? this.getSetBonusList(this._tempActor, data, width) : [];
-        this.drawTextList(textList, tempList, x, y, width);
+        this.drawTextList(textList, tempList, x, y, width, lineHeight);
     };
 
     Window_EquipStatus.prototype.drawElement = function(data, actor, x, y, width) {
@@ -2446,8 +2450,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawTextList = function(textList, tempList, x, y, width) {
-        const lineHeight = SpecialAbilityLineHeight;
+    Window_EquipStatus.prototype.drawTextList = function(textList, tempList, x, y, width, lineHeight) {
         let textWidth = 0;
         let textX =  0;
         for (const text of textList) {

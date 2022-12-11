@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.2.0
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -42,6 +42,11 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
+2022/12/11 Ver.1.3.0  
+カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)  
+アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)  
+特殊ステータスを表示できる機能を追加。  
+装備セットボーナスの差分表示を修正。  
 2022/11/17 Ver.1.2.0  
 適用している装備セットボーナスを表示できる機能を追加。(要NUUN_SetBonusEquip)  
 2022/11/14 Ver.1.1.1  

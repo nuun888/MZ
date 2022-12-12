@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.3
+ * @version 2.17.4
  * 
  * @help
  * Implement an enemy book.
@@ -200,6 +200,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * 更新履歴
+ * 12/12/2022 Ver.2.17.4
+ * Fixed error in "Element resistance (resistance numerical display)."
  * 12/9/2022 Ver.2.17.3
  * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
  * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
@@ -1283,8 +1285,8 @@
 * @param ElementCol
 * @desc Display column of element resistance.
 * @text Element resistance display column
-* @type boolean
-* @default false
+* @type number
+* @default 1
 * @parent ElementValue
 * 
 * @param ElementRadarChart
@@ -1422,8 +1424,8 @@
 * @param StateCol
 * @desc Display column for state resistance.
 * @text State resistance display col
-* @type boolean
-* @default false
+* @type number
+* @default 1
 * @parent ResistWeakStateValue
 * 
 * @param StateRadarChart
@@ -2889,6 +2891,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/12 Ver.2.17.4
+ * 属性耐性（耐性数値表示）でエラーが出る問題を修正。
  * 2022/12/9 Ver.2.17.3
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
  * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
@@ -4147,8 +4151,8 @@
  * @param ElementCol
  * @desc 属性耐性の表示列。
  * @text 属性耐性表示列
- * @type boolean
- * @default false
+ * @type number
+ * @default 1
  * @parent ElementValue
  * 
  * @param ElementRadarChart
@@ -4286,8 +4290,8 @@
  * @param StateCol
  * @desc ステート耐性の表示列。
  * @text ステート耐性表示列
- * @type boolean
- * @default false
+ * @type number
+ * @default 1
  * @parent ResistWeakStateValue
  * 
  * @param StateRadarChart
@@ -9286,7 +9290,7 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
                 const systemWidth = nameText ? (list.SystemItemWidth || 60) : 0;
                 this.changeTextColor(NuunManager.getColorCode(list.NameColor));
                 const elementText = this.onElementsFlag(element.ElementNo) ? getElementTextName(element.ElementNo) : UnknownStatus;
-                this.drawText(elementText, x2, y2, systemWidth);
+                this.drawText(elementText, x2 + textWidth, y2, systemWidth);
                 textWidth += systemWidth;
             }
             if (this.resistWeakDataMask(list.MaskMode)) {
@@ -9350,7 +9354,7 @@ Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, wi
                     const systemWidth = nameText ? (list.SystemItemWidth || 60) : 0;
                     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
                     const stateText = this.onStateFlag(stateId) ? $dataStates[stateId].name : UnknownStatus;
-                    this.drawText(stateText, x2, y2, systemWidth);
+                    this.drawText(stateText, x2 + textWidth, y2, systemWidth);
                     textWidth += systemWidth;
                 }
                 if (this.resistWeakDataMask(list.MaskMode)) {
@@ -10523,6 +10527,14 @@ BattleManager.setEnemyBookAction = function() {
     if (subject.isEnemy() && this._action) {
         const actionId = subject.enemy().actions.findIndex(action => action.skillId === this._action.item().id);
         $gameSystem.setEnemyBookActionFlag(subject.enemyId(), actionId, true);
+    }
+};
+
+function getElementTextName(no) {
+    if (no < 0) {
+      return no === -1 ? (this.language_Jp ? '物理ダメージ率' : 'Physical Damage') : (this.language_Jp ? '魔法ダメージ率' : 'Magical Damage');
+    } else {
+      return $dataSystem.elements[no];
     }
 };
 

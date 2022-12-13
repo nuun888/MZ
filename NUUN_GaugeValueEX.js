@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Gauge display EX
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -36,8 +36,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/13/2022 Ver.1.3.2
+ * Fixed the problem that an error occurs when displaying with core script Cer.1.3.2 or earlier versions.
  * 12/6/2022 Ver.1.3.1
  * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
+ * Changed the Type of icon specified plug-in parameter to icon. (Core script Ver.1.6.0 or later)
  * 11/25/2022 Ver.1.3.0
  * Added a function that can specify an icon for the label.
  * Changed the display in languages other than Japanese to English.
@@ -474,7 +477,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -504,8 +507,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/13 Ver.1.3.2
+ * コアスクリプトCer.1.3.2以前のバージョンで表示するとエラーが出る問題を修正。
  * 2022/12/6 Ver.1.3.1
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(コアスクリプトVer.1.6.0以降)
  * 2022/11/25 Ver.1.3.0
  * ラベルにアイコンを指定できる機能を追加。
  * 日本語以外での表示を英語表示に変更。
@@ -1240,17 +1246,18 @@ Imported.NUUN_GaugeValueEX = true;
     Sprite_Gauge.prototype.drawGaugeGaugeValueEX = function() {
         if (this.drawGaugeVisible()) {
             const gaugeX = this.gaugeX();
-            const gaugeY = (this.gaugeAbsoluteCoordinates() ? 0 : this.textHeight() - this.gaugeHeight()) + this.gaugeY();
+            const gaugeY = (this.gaugeAbsoluteCoordinates() ? 0 : (this.textHeight ? this.textHeight() : 24) - this.gaugeHeight()) + this.gaugeY();
             const gaugewidth = this.bitmapWidth() - gaugeX;
             const gaugeHeight = this.gaugeHeight();
             this.drawGaugeRect(gaugeX, gaugeY, gaugewidth, gaugeHeight);
         }
     };
+    
 
     Sprite_Gauge.prototype.drawValue2 = function() {
         const currentValue = this.currentValue();
         const width = this.bitmapWidth() - this.gaugeX() - this.valueMargin();
-        const height = this.textHeight();
+        const height = (this.textHeight ? this.textHeight() : 24)
         const x = (this.valueAbsoluteCoordinates() ? 0 : this.gaugeX()) + this.valueX() + this.valueMargin();
         const y = this.valueY();
         this.setupValueFont();
@@ -1264,7 +1271,7 @@ Imported.NUUN_GaugeValueEX = true;
         const bitmapWidth = this.valueWidth();
         const ValueMarginX = this.valueSpaceMargin();
         const width = Math.floor((bitmapWidth - ValueMarginX * 2 - 12) / 2);
-        const height = this.textHeight();
+        const height = (this.textHeight ? this.textHeight() : 24)
         const x = this.gaugeX() + this.valueMargin();
         this.setupValueFont();
         const valueWidth = valueDigits ? Math.min(this.getValueTextWidth(), width) : Math.min(this.bitmap.measureTextWidth(currentValue), width);
@@ -1302,7 +1309,7 @@ Imported.NUUN_GaugeValueEX = true;
             const x = (this.labelAbsoluteCoordinates() ? 0 : this.labelOutlineWidth() / 2) + this.labelX();
             const y = this.labelY();
             const width = this.bitmapWidth();
-            const height = this.textHeight();
+            const height = (this.textHeight ? this.textHeight() : 24)
             this.setupLabelFont();
             this.bitmap.paintOpacity = this.labelOpacity();
             this.bitmap.drawText(label, x, y, width, height, "left");

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Gauge display EX
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -36,8 +36,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/15/2022 Ver.1.3.3
+ * Added a function to display the number display in the main font.
  * 12/13/2022 Ver.1.3.2
- * Fixed the problem that an error occurs when displaying with core script Cer.1.3.2 or earlier versions.
+ * Fixed the problem that an error occurs when displaying with core script Ver.1.3.2 or earlier versions.
  * 12/6/2022 Ver.1.3.1
  * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
  * Changed the Type of icon specified plug-in parameter to icon. (Core script Ver.1.6.0 or later)
@@ -352,6 +354,13 @@
  * @min -9999
  * @parent FontSetting
  * 
+ * @param ValueFontFace
+ * @desc Apply main font for numbers (turn off to use number font)
+ * @text Apply main font for numeric text
+ * @type boolean
+ * @default false
+ * @parent FontSetting
+ * 
  * @param ColorSetting
  * @text Color setting
  * @default ------------------------------
@@ -477,7 +486,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -507,8 +516,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/15 Ver.1.3.3
+ * 数値をメインフォントで表示させる機能を追加。
  * 2022/12/13 Ver.1.3.2
- * コアスクリプトCer.1.3.2以前のバージョンで表示するとエラーが出る問題を修正。
+ * コアスクリプトVer.1.3.2以前のバージョンで表示するとエラーが出る問題を修正。
  * 2022/12/6 Ver.1.3.1
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
  * アイコン指定のプラグインパラメータのTypeをiconに変更。(コアスクリプトVer.1.6.0以降)
@@ -825,6 +836,13 @@
  * @type number
  * @default -2
  * @min -9999
+ * @parent FontSetting
+ * 
+ * @param ValueFontFace
+ * @desc 数字のメインフォント適用(OFFで数字フォント)
+ * @text 数字テキスト部のメインフォント適用
+ * @type boolean
+ * @default false
  * @parent FontSetting
  * 
  * @param ColorSetting
@@ -1323,6 +1341,11 @@ Imported.NUUN_GaugeValueEX = true;
 
     Sprite_Gauge.prototype.isGaugeImageValue = function() {
         return Imported.NUUN_GaugeImage && this._gaugeImgData;
+    };
+
+    const _Sprite_Gauge_valueFontFace = Sprite_Gauge.prototype.valueFontFace;
+    Sprite_Gauge.prototype.valueFontFace = function() {
+        return this._gaugeData && this._gaugeData.ValueFontFace ? $gameSystem.mainFontFace() : _Sprite_Gauge_valueFontFace.call(this);
     };
 
     Sprite_Gauge.prototype.nuun_IconFrame = function(index) {

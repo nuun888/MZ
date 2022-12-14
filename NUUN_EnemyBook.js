@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.4
+ * @version 2.17.5
  * 
  * @help
  * Implement an enemy book.
@@ -200,6 +200,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * 更新履歴
+ * 12/14/2022 Ver.2.17.5
+ * Fixed an issue that caused an error when calling some variables in drop items and stealable items.
  * 12/12/2022 Ver.2.17.4
  * Fixed error in "Element resistance (resistance numerical display)."
  * 12/9/2022 Ver.2.17.3
@@ -1136,9 +1138,9 @@
 * @desc Defines the drop rate evaluation formula.  rate:denominator  di:drop information
 * @text Drop rate evaluation formula
 * @type combo
-* @option '1/'+ rate
-* @option ge.getDropItemsRatePercentage(di) +'%';//NUUN_DropRatePercentageVer.1.0.1～
-* @option ge.dropItemMolecule(i) +'/'+ rate;//NUUN_DropItemMolecule
+* @option "'1/'+ rate"
+* @option "ge.getDropItemsRatePercentage(di) +'%';//NUUN_DropRatePercentageVer.1.0.1～"
+* @option "ge.dropItemMolecule(i) +'/'+ rate;//NUUN_DropItemMolecule"
 * @default 
 * @parent DropItemData
 * 
@@ -1186,7 +1188,7 @@
 * @desc Define the steal rate evaluation formula. rate: Steal rate (percentage)
 * @text Steal rate evaluation formula
 * @type combo
-* @option rate +'%';//Steal rate
+* @option "rate +'%';//Steal rate"
 * @default 
 * @parent StealItemData
 * 
@@ -2699,7 +2701,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.3
+ * @version 2.17.5
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2891,6 +2893,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/14 Ver.2.17.5
+ * ドロップアイテム、盗めるアイテムで一部の変数を呼び出すとエラーが出る問題を修正。
  * 2022/12/12 Ver.2.17.4
  * 属性耐性（耐性数値表示）でエラーが出る問題を修正。
  * 2022/12/9 Ver.2.17.3
@@ -4002,9 +4006,9 @@
  * @desc ドロップ率の評価式を定義します。rate:分母　di:ドロップ情報
  * @text ドロップ率評価式
  * @type combo
- * @option '1/'+ rate
- * @option ge.getDropItemsRatePercentage(di) +'%';//ドロップ率百分率化Ver.1.0.1～
- * @option ge.dropItemMolecule(i) +'/'+ rate;//ドロップ率分子操作
+ * @option "'1/'+ rate"
+ * @option "ge.getDropItemsRatePercentage(di) +'%';//ドロップ率百分率化Ver.1.0.1～"
+ * @option "ge.dropItemMolecule(i) +'/'+ rate;//ドロップ率分子操作"
  * @default 
  * @parent DropItemData
  * 
@@ -4052,7 +4056,7 @@
  * @desc 盗み率の評価式を定義します。rate:盗み率(100分率)
  * @text 盗み率評価式
  * @type combo
- * @option rate +'%';//盗み率
+ * @option "rate +'%';//盗み率"
  * @default 
  * @parent StealItemData
  * 
@@ -5715,7 +5719,10 @@ bookContents.PageList18 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData
 bookContents.PageList19 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList19'])) : [];
 bookContents.PageList20 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList20'])) : [];
 
-const pageIndex = {category:0, index:0, page:0, infoIndex:0}
+const pageIndex = {category:0, index:0, page:0, infoIndex:0};
+const NRP_pLoopLR = PluginManager.parameters("NRP_LoopCursor").loopLR;
+let ge = null;
+let de = null;
 
 const pluginName = "NUUN_EnemyBook";
 
@@ -8303,6 +8310,8 @@ Window_EnemyBook.prototype.initialize = function(rect) {
     this._enemyData = [];
     this.setEnemySprite();
     this.language_Jp = $gameSystem.isJapanese();
+    ge = null;
+    de = null;
 };
 
 Window_EnemyBook.prototype.loadWindowskin = function() {
@@ -8445,6 +8454,8 @@ Window_EnemyBook.prototype.drawEnemyBookContents = function() {
     const lineHeight = this.lineHeight();
     const listContents = this.listDate(this._displayList);
     const enemy = this._categoryMode ? null : this.getEnemyData();
+    ge = enemy;
+    de = this._enemy;
     this._enemySprite.resetEnemy();
     for (const data of listContents) {
         this.resetFontSettings();

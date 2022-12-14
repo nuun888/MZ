@@ -1,5 +1,5 @@
 # [ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
-# Ver.1.3.1
+# Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,8 @@
 戦闘行動結果ポップアッププラグインと併用時、このプラグインを戦闘行動結果ポップアッププラグインより下に設定した場合、ステート、バフのポップアップはこのプラグインでの表示になります。  
 
 ## 更新履歴
+2022/12/15 Ver 1.3.2  
+競合対策  
 2022/12/5 Ver 1.3.1  
 指定のポップアップで表示する機能を追加。  
 座標、フォントサイズを設定できる機能を追加。  

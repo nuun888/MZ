@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -42,6 +42,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/15 Ver 1.3.2
+ * 競合対策
  * 2022/12/5 Ver 1.3.1
  * 指定のポップアップで表示する機能を追加。
  * 座標、フォントサイズを設定できる機能を追加。
@@ -952,7 +954,7 @@ Imported.NUUN_popUp = true;
   Sprite_Battler.prototype.createStatePopupSprite = function() {
     const last = this._damages[this._damages.length - 1];
     const popupData = this._battler.getPopUpData();
-    const popupMode = getPopupClass(popupData.mode);
+    const popupMode = popupData ? getPopupClass(popupData.mode) : 0;
     const sprite = new Sprite_PopUpEX(popupMode);
     if (last && PopUpMode === 'default') {
       sprite.x = last.x + 8;

@@ -1,5 +1,5 @@
 # [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
-# Ver.1.3.2
+# Ver.1.3.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -46,6 +46,8 @@ Ver.1.2.0より別プラグイン化いたしました。
 [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  
 
 ### 更新履歴
+2022/12/15 Ver.1.3.3  
+数値をメインフォントで表示させる機能を追加。  
 2022/12/13 Ver.1.3.2  
 コアスクリプトCer.1.3.2以前のバージョンで表示するとエラーが出る問題を修正。  
 2022/12/6 Ver.1.3.1  

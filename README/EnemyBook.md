@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.17.4
+# Ver.2.17.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -248,6 +248,8 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2022/12/14 Ver.2.17.5  
+ドロップアイテム、盗めるアイテムで一部の変数を呼び出すとエラーが出る問題を修正。  
 2022/12/12 Ver.2.17.4  
 属性耐性（耐性数値表示）でエラーが出る問題を修正。  
 2022/12/9 Ver.2.17.3  

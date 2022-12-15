@@ -1,4 +1,4 @@
-# [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
+# [パーティリミットゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
 # Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
 #### 必須、前提プラグイン

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Gauge display EX
  * @author NUUN
- * @version 1.3.3
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -32,10 +32,19 @@
  * 
  * The application priority of the gauge numerical value setting is given priority to the upper setting. Set the target to the bottom for the 'all' setting.
  * 
+ * Font settings
+ * Any font can be set for gauge numbers and labels.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
+ * To change the font, you need a separate plug-in to load the font.
+ * Triacontane font load plug-in recommended
+ * https://triacontane.blogspot.com/
  * 
  * Log
+ * 12/15/2022 Ver.1.4.0
+ * Added a function that can change numbers and labels to arbitrary fonts.
+ * Fixed an issue where displaying an unset gauge type would cause an error.
  * 12/15/2022 Ver.1.3.3
  * Added a function to display the number display in the main font.
  * 12/13/2022 Ver.1.3.2
@@ -318,6 +327,13 @@
  * @min 0
  * @parent CoordinateSetting
  * 
+ * @param UserLabelFontFace
+ * @desc Specifies the font for any label. (no extension)
+ * @text Font for label text
+ * @type string
+ * @default 
+ * @parent CoordinateSetting
+ * 
  * @param FontSetting
  * @text Font setting
  * @default ------------------------------
@@ -359,6 +375,13 @@
  * @text Apply main font for numeric text
  * @type boolean
  * @default false
+ * @parent FontSetting
+ * 
+ * @param UserValueFontFace
+ * @desc Specifies a font for arbitrary numbers. (no extension)
+ * @text Numeric text font
+ * @type string
+ * @default 
  * @parent FontSetting
  * 
  * @param ColorSetting
@@ -486,7 +509,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.3.3
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -505,6 +528,12 @@
  * 
  * ゲージ数値設定の適用優先度は上に設定が優先されます。対象を'all'の設定は一番下に設定してください。
  * 
+ * フォントの設定
+ * ゲージの数値、ラベルに任意のフォントを設定できます。
+ * なおフォントを変更するには別途フォントをロードするプラグインが必要です。
+ * トリアコンタン様　フォントロードプラグイン推奨
+ * https://triacontane.blogspot.com/
+ * 
  * Ver.1.2.0での変更点
  * フォントサイズをメインフォントサイズ+デフォルトフォントサイズ+個別フォントサイズに変更しました。
  * 数値の表示処理を変更しました。
@@ -516,6 +545,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/15 Ver.1.4.0
+ * 数値、ラベルを任意のフォントに変更できる機能を追加。
+ * 設定されていないゲージタイプを表示するとエラーが出る問題を修正。
  * 2022/12/15 Ver.1.3.3
  * 数値をメインフォントで表示させる機能を追加。
  * 2022/12/13 Ver.1.3.2
@@ -802,6 +834,13 @@
  * @min 0
  * @parent CoordinateSetting
  * 
+ * @param UserLabelFontFace
+ * @desc 任意のラベルのフォントを指定します。(拡張子なし)
+ * @text ラベルテキスト部のフォント
+ * @type string
+ * @default 
+ * @parent CoordinateSetting
+ * 
  * @param FontSetting
  * @text フォント設定
  * @default ------------------------------
@@ -843,6 +882,13 @@
  * @text 数字テキスト部のメインフォント適用
  * @type boolean
  * @default false
+ * @parent FontSetting
+ * 
+ * @param UserValueFontFace
+ * @desc 任意の数字のフォントを指定します。(拡張子なし)
+ * @text 数字テキスト部のフォント
+ * @type string
+ * @default 
  * @parent FontSetting
  * 
  * @param ColorSetting
@@ -1093,7 +1139,7 @@ Imported.NUUN_GaugeValueEX = true;
     };
 
     Sprite_Gauge.prototype.valueAlign = function() {
-        return this._gaugeData.ValueAlign && this._gaugeData.ValueAlign !== 'default' ? this._gaugeData.ValueAlign : ValueAlign;
+        return this._gaugeData && this._gaugeData.ValueAlign && this._gaugeData.ValueAlign !== 'default' ? this._gaugeData.ValueAlign : ValueAlign;
     };
 
     Sprite_Gauge.prototype.valueAbsoluteCoordinates = function() {
@@ -1345,7 +1391,20 @@ Imported.NUUN_GaugeValueEX = true;
 
     const _Sprite_Gauge_valueFontFace = Sprite_Gauge.prototype.valueFontFace;
     Sprite_Gauge.prototype.valueFontFace = function() {
-        return this._gaugeData && this._gaugeData.ValueFontFace ? $gameSystem.mainFontFace() : _Sprite_Gauge_valueFontFace.call(this);
+        if (this._gaugeData) {
+            return this._gaugeData.UserValueFontFace ? this._gaugeData.UserValueFontFace : (this._gaugeData.ValueFontFace ? $gameSystem.mainFontFace() : _Sprite_Gauge_valueFontFace.call(this));
+        } else {
+            return _Sprite_Gauge_valueFontFace.call(this);
+        }
+    };
+
+    const _Sprite_Gauge_labelFontFace = Sprite_Gauge.prototype.labelFontFace;
+    Sprite_Gauge.prototype.labelFontFace = function() {
+        if (this._gaugeData) {
+            return this._gaugeData.UserLabelFontFace ? this._gaugeData.UserLabelFontFace : _Sprite_Gauge_labelFontFace.call(this);
+        } else {
+            return _Sprite_Gauge_labelFontFace.call(this);
+        }
     };
 
     Sprite_Gauge.prototype.nuun_IconFrame = function(index) {

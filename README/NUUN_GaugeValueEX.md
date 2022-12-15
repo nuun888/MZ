@@ -1,5 +1,5 @@
 # [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
-# Ver.1.3.3
+# Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -41,11 +41,20 @@ timeは数値が表示されません。
 空白にすることで数値を詰めて表示することができます。(現在値/最大値のみ)  
 ![画像](img/GaugeValueEX5.png)  
 
+### フォントの設定
+ゲージの数値、ラベルに任意のフォントを設定できます。  
+なおフォントを変更するには別途フォントをロードするプラグインが必要です。  
+トリアコンタン様　フォントロードプラグイン推奨  
+https://triacontane.blogspot.com/  
+
 ### ダメージ量ゲージ可視化
 Ver.1.2.0より別プラグイン化いたしました。
 [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  
 
 ### 更新履歴
+2022/12/15 Ver.1.4.0  
+数値、ラベルを任意のフォントに変更できる機能を追加。  
+設定されていないゲージタイプを表示するとエラーが出る問題を修正。  
 2022/12/15 Ver.1.3.3  
 数値をメインフォントで表示させる機能を追加。  
 2022/12/13 Ver.1.3.2  

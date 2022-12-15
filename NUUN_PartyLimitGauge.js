@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -38,6 +38,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/15 Ver.1.1.2
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
+ * ゲージ画像化でゲージを画像化するとエラーが出る問題を修正。
  * 2022/6/11 Ver.1.1.1
  * パーティリミットが戦闘開始時にリセットされない問題を修正。
  * 2021/12/20 Ver.1.1.0
@@ -108,7 +111,7 @@
  * @param PartyGauge_LabelColor
  * @desc ラベルの文字色。（テキストタブでカラーコードを記入できます）
  * @text ラベル文字色
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * @parent GaugeSetting
@@ -140,14 +143,14 @@
  * @param PartyGaugeColor1
  * @desc ゲージの色1を指定します。（テキストタブでカラーコードを記入できます）
  * @text ゲージの色1
- * @type number
+ * @type color
  * @default 6
  * @parent GaugeSetting
  * 
  * @param PartyGaugeColor2
  * @desc ゲージの色2を指定します。（テキストタブでカラーコードを記入できます）
  * @text ゲージの色2
- * @type number
+ * @type color
  * @default 14
  * @parent GaugeSetting
  * 
@@ -194,7 +197,7 @@
  * @param EnemyGauge_LabelColor
  * @desc ラベルの文字色。（テキストタブでカラーコードを記入できます）
  * @text ラベル文字色
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * @parent EnemyGaugeSetting
@@ -226,14 +229,14 @@
  * @param EnemyGaugeColor1
  * @desc ゲージの色1を指定します。（テキストタブでカラーコードを記入できます）
  * @text ゲージの色1
- * @type number
+ * @type color
  * @default 6
  * @parent EnemyGaugeSetting
  * 
  * @param EnemyGaugeColor2
  * @desc ゲージの色2を指定します。（テキストタブでカラーコードを記入できます）
  * @text ゲージの色2
- * @type number
+ * @type color
  * @default 14
  * @parent EnemyGaugeSetting
  * 
@@ -283,7 +286,7 @@
  * @param LimitCostColor
  * @desc 消費リミットゲージコストの色番号
  * @text 消費リミットゲージコスト色
- * @type number
+ * @type color
  * @default 16
  * @parent CostSetting
  * 
@@ -506,9 +509,6 @@ Scene_Battle.prototype.createSpriteset = function() {
 Scene_Battle.prototype.createPartyGauge = function() {
   const x = PartyGauge_X;
   const y = PartyGauge_Y;
-  if (Imported.NUUN_GaugeImage) {
-    this.createSpriteGauge(this, 'limit', x, y);
-  }
   const sprite = new Sprite_PartyGauge();
   this.addChild(sprite);
   sprite.setup('actor', 'limit');
@@ -520,9 +520,6 @@ Scene_Battle.prototype.createPartyGauge = function() {
 Scene_Battle.prototype.createTroopGauge = function() {
   const x = EnemyGauge_X;
   const y = EnemyGauge_Y;
-  if (Imported.NUUN_GaugeImage) {
-    this.createSpriteGauge(this, 'limit', x, y);
-  }
   const sprite = new Sprite_TroopGauge();
   this.addChild(sprite);
   sprite.setup('enemy', 'limit');

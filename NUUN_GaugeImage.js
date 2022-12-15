@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc GaugeImaging
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -63,6 +63,8 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 12/15/2022 Ver.1.6.3
+ * Fixed an issue that caused an error when displaying images in the party limit gauge.
  * 11/9/2022 Ver.1.6.2
  * Changed the display in languages other than Japanese to English.
  * 10/16/2022 Ver.1.6.1
@@ -417,7 +419,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -470,6 +472,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/15 Ver.1.6.3
+ * パーティリミットゲージで画像表示するとエラーがでる問題を修正。
  * 2022/11/9 Ver.1.6.2
  * 日本語以外での表示を英語表示に変更。
  * 2022/10/16 Ver.1.6.1
@@ -744,7 +748,7 @@
  * @parent ValueSetting
  * 
  * @param FilteringSetting
- * @text 適用ウィンドウ設定
+ * @text 適用クラス設定
  * @default ------------------------------
  * 
  * @param FilteringClass
@@ -1310,7 +1314,7 @@ Game_Battler.prototype.isTpbCast = function() {
 };
 
 function getBattlerStatus(battler) {
-    if (!battler) {
+    if (!battler || typeof battler === 'string') {
         return 0;
     } else if (battler.isDead()) {
         return 2;

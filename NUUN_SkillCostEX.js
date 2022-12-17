@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost EX
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * You can set various costs for skill costs.
@@ -78,6 +78,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/17/2022 Ver.1.2.1
+ * Minor fix.
  * 12/4/2022 Ver.1.2.0
  * Added a cost that can be consumed as a percentage from a game variable.
  * 11/25/2022 Ver.1.1.1
@@ -94,7 +96,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -161,6 +163,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/17 Ver.1.2.1
+ * 微修正
  * 2022/12/4 Ver.1.2.0
  * ゲーム変数から割合で消費できるコストを追加。
  * 2022/11/25 Ver.1.1.1
@@ -353,8 +357,9 @@ Game_BattlerBase.prototype.paySkillCost = function(skill) {
 };
 
 Game_BattlerBase.prototype.paySkillExpCost = function(skill) {
-    if (this.isActor()) {
-        this.changeExp(this.currentExp() - this.skillExpCost(skill), this.shouldDisplayLevelUp());
+    const cost = this.skillExpCost(skill);
+    if (this.isActor() && cost !== 0) {
+        this.changeExp(this.currentExp() - cost, this.shouldDisplayLevelUp());
     }
 };
 

@@ -26,6 +26,8 @@
 `<SkillLearningCorrection:[rorrection]>`  
 `[rorrection]`:±補正率  
 
+敵が習得したスキルのレーティングは全て5で設定されます。  
+
 ## 更新履歴
 2022/12/17 Ver.1.0.0  
 初版  

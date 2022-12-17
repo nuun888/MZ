@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost display EX
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_Base
@@ -46,10 +46,16 @@
  * 
  * Prefixes and suffixes are not applied to consumption skills that have a cost evaluation formula defined.
  * 
+ * "NUUN_EquipSkillLearning" is required to set 'EquipSkillLearnSkill' for "Cost display target".
+ * https://github.com/nuun888/MZ/blob/master/README/EquipSkillLearning.md
+ * 
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/17/2022 Ver.1.1.2
+ * Added a function that can display the points of "NUUN_EquipSkillLearning".
  * 12/6/2022 Ver.1.1.1
  * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
  * 12/4/2022 Ver.1.1.0
@@ -277,6 +283,7 @@
  * @option 'Gold'
  * @option 'Exp'
  * @option 'limitCost'
+ * @option 'EquipSkillLearnSkill'
  * @default
  * 
  * @param CostTagSetting
@@ -317,7 +324,7 @@
  * @target MZ
  * @plugindesc スキルコスト表示拡張
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_Base
@@ -353,10 +360,15 @@
  * 
  * コストの評価式が定義してある消費スキルは接頭語、接尾語が適用されません。
  * 
+ * コスト表示対象の'EquipSkillLearnSkill'の設定するにはスキル習得装備プラグインが必要です。
+ * https://github.com/nuun888/MZ/blob/master/README/EquipSkillLearning.md
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/17 Ver.1.1.2
+ * スキル習得装備プラグインのポイントを表示できる機能を追加。
  * 2022/12/6 Ver.1.1.1
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
  * 2022/12/4 Ver.1.1.0
@@ -584,6 +596,7 @@
  * @option 'Gold'
  * @option 'Exp'
  * @option 'limitCost'
+ * @option 'EquipSkillLearnSkill'
  * @default
  * 
  * @param CostTagSetting
@@ -679,6 +692,11 @@ Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//再�
         } else if (type.CostOrderSelect == 'Exp') {
             if (this._actor.skillExpCost(skill)) {
                 x = this.drawExpCost(skill, x, y, width, type);
+                count++;
+            }
+        } else if (Imported.NUUN_EquipSkillLearning && type.CostOrderSelect == 'EquipSkillLearnSkill') {
+            if (this.equipSkillLearnSkill(skill) > 0) {
+                x = this.drawEquipSkillLearnSkill(skill, x, y, width, type);
                 count++;
             }
         } else if (type.CostOrderSelect) {
@@ -821,6 +839,29 @@ Window_SkillList.prototype.drawExpCost = function(skill, x, y, width, type) {
         this.drawText(cost, x, y + CostY, width, "right");
         x -= this.textWidth(cost);
         x -= this.drawCostPrefix(ExpPrefix, x, y, width);
+    }
+    this.contents.fontSize = $gameSystem.mainFontSize();
+    return x;
+};
+
+Window_SkillList.prototype.drawEquipSkillLearnSkill = function(skill, x, y, width, type) {
+    if (count > 0) {
+        x -= this.drawCostConnection(x, y, width);
+    }
+    const cost = this.equipSkillLearnSkillText(skill);
+    this.setCostColor(type.CostColor);
+    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
+    if (evalCost) {
+        const actor = this._actor;
+        const costText = eval(evalCost);
+        this.drawText(costText, x, y + CostY, width, "right");
+        x -= this.textWidth(costText);
+    } else {
+        x -= this.drawCostSuffix(type.Suffix, x, y, width);
+        this.contents.fontSize = CostFontSize;
+        this.drawText(cost, x, y + CostY, width, "right");
+        x -= this.textWidth(cost);
+        x -= this.drawCostPrefix(type.Prefix, x, y, width);
     }
     this.contents.fontSize = $gameSystem.mainFontSize();
     return x;

@@ -115,6 +115,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [スキル、アイテム使用条件](https://github.com/nuun888/MZ/blob/master/README/ConditionalSkills.md) | [NUUN_ConditionalSkills](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalSkills.js) | 条 | 1.1.0 |
 | [スキルコスト拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostEX.md) | [NUUN_SkillCostEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js) |  | 1.1.0 |
 | [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md) | [NUUN_SkillCostShowEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js) | 共 | 1.0.1 |
+| [スキルラーニング](https://github.com/nuun888/MZ/blob/master/README/SkillLearning.md) | [NUUN_SkillLearning](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

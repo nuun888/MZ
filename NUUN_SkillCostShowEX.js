@@ -695,7 +695,7 @@ Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//å†å®
                 count++;
             }
         } else if (Imported.NUUN_EquipSkillLearning && type.CostOrderSelect == 'EquipSkillLearnSkill') {
-            if (this.equipSkillLearnSkill(skill) > 0) {
+            if (!this._actor.isEquipSkillLearning(skill.id) && this.equipSkillLearnSkill(skill) > 0) {
                 x = this.drawEquipSkillLearnSkill(skill, x, y, width, type);
                 count++;
             }

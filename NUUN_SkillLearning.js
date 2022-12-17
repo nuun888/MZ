@@ -50,7 +50,7 @@
  * @default %1 learned %2!
  * 
  */
-/*:
+/*:ja
  * @target MZ
  * @plugindesc スキルラーニング
  * @author NUUN

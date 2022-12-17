@@ -1,5 +1,5 @@
 # [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -42,7 +42,13 @@ HP、MP、TP、Gold、Expはコスト値で取得されます。
 
 色の設定は通常システムカラーを記入しますが、テキストタブからカラーコードを記入できます。  
 
+### その他
+コスト表示対象の'EquipSkillLearnSkill'の設定するにはスキル習得装備プラグインが必要です。  
+(https://github.com/nuun888/MZ/blob/master/README/EquipSkillLearning.md)
+
 ## 更新履歴
+2022/12/17 Ver.1.1.2  
+スキル習得装備プラグインのポイントを表示できる機能を追加。  
 2022/12/6 Ver.1.1.1  
 カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)  
 2022/12/4 Ver.1.1.0  

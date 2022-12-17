@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.7
+ * @version 1.1.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -249,6 +249,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/18 Ver.1.1.8
+ * 属性有効度、ステート有効度を設定し、適用するとエラーが出る問題を修正。
  * 2022/11/23 Ver.1.1.7
  * 条件に能力値、追加能力値、特殊能力値を指定した場合、パフォーマンスが著しく低下する問題を修正。
  * 2022/8/28 Ver.1.1.6
@@ -1506,7 +1508,15 @@ function attackElement(idList, action) {
 
 function elements(list, id) {
   return list.some(listid => listid === id);
-}
+};
+
+function elementValidity(data, battler) {
+  return getValList(data.IDList).some(id => conditionsNum(data, battler.elementRate(id) * 100));
+};
+
+function stateValidity(data, battler) {
+  return getValList(data.IDList).some(id => conditionsNum(data, battler.stateRate(id) * 100));
+};
 
 function getPartyGold(data) {
   return conditionsNum(data, $gameParty.gold());

@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)  
 [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md)  
 
@@ -64,6 +64,8 @@
 スキルのダメージの計算式にa.consBMp * 1.5 と記入することで消費前のMPの1.5倍のダメージを与えることができます。  
 
 ## 更新履歴 
+2022/12/17 Ver.1.2.1  
+微修正  
 2022/12/4 Ver.1.2.0  
 ゲーム変数から割合で消費できるコストを追加。  
 2022/11/25 Ver.1.1.1  

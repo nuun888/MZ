@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill learning
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * You can learn the skills that your opponent used.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/17/2022 Ver.1.0.1
+ * Added definitions by applying learning skills to enemy "use skills" in the enemy book.
  * 12/17/2022 Ver.1.0.0
  * First edition.
  * 
@@ -54,7 +56,7 @@
  * @target MZ
  * @plugindesc スキルラーニング
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 相手が使用したスキルを習得することができます。
@@ -84,6 +86,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/17 Ver.1.0.1
+ * モンスター図鑑の敵の使用スキル適用による定義追加。
  * 2022/12/17 Ver.1.0.0
  * 初版
  * 
@@ -224,7 +228,8 @@ Imported.NUUN_SkillLearning = true;
     };
 
     Game_Enemy.prototype.getLearningSkillActions = function(actionList) {
-        return Array.prototype.push.apply(actionList, this._learningSkills);
+        Array.prototype.push.apply(actionList, this._learningSkills);
+        return actionList;
     };
 
     const _Game_ActionResult_clear = Game_ActionResult.prototype.clear

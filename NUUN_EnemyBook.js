@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.5
+ * @version 2.17.6
  * 
  * @help
  * Implement an enemy book.
@@ -199,7 +199,9 @@
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
- * 更新履歴
+ * Log
+ * 12/17/2022 Ver.2.17.6
+ * Added ability to display skills learned through skill learning in enemy actions.
  * 12/14/2022 Ver.2.17.5
  * Fixed an issue that caused an error when calling some variables in drop items and stealable items.
  * 12/12/2022 Ver.2.17.4
@@ -2701,7 +2703,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.5
+ * @version 2.17.6
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2893,6 +2895,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/17 Ver.2.17.6
+ * 敵の行動でスキルラーニングで習得したスキルを表示できるように対応。
  * 2022/12/14 Ver.2.17.5
  * ドロップアイテム、盗めるアイテムで一部の変数を呼び出すとエラーが出る問題を修正。
  * 2022/12/12 Ver.2.17.4
@@ -9227,7 +9231,7 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
 Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    const action = this._enemy.actions;
+    const action = Imported.NUUN_SkillLearning ? enemy.getLearningSkillActions(this._enemy.actions) : this._enemy.actions;
     const lineHeight = this.lineHeight();
     let x2 = 0;
     let y2 = 0;

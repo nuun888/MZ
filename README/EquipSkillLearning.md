@@ -1,4 +1,4 @@
-# [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSkillLearning.js)
+# [スキル習得装備](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSkillLearning.js)
 # Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSkillLearning.js)
 #### 必須、前提プラグイン

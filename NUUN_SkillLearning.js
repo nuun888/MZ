@@ -10,7 +10,9 @@
  * @target MZ
  * @plugindesc Skill learning
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * You can learn the skills that your opponent used.
@@ -40,6 +42,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/18/2022 Ver.1.0.2
+ * Added a function to play SE when acquiring skills.
  * 12/17/2022 Ver.1.0.1
  * Added definitions by applying learning skills to enemy "use skills" in the enemy book.
  * 12/17/2022 Ver.1.0.0
@@ -51,12 +55,45 @@
  * @type string
  * @default %1 learned %2!
  * 
+ * @param SkillLearningSe
+ * @text SE when learned
+ * @desc Specify the SE at the time of acquisition.
+ * @type struct<SkillLearningSE>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * 
+ */
+/*~struct~SkillLearningSE:
+ * 
+ * @param name
+ * @text SE file
+ * @desc Specify ME.
+ * @type file
+ * @dir audio/se
+ * 
+ * @param volume
+ * @text SE volume
+ * @desc Set the ME volume.
+ * @default 90
+ * @min 0
+ * 
+ * @param pitch
+ * @text SE Pitch
+ * @desc Sets the pitch of ME.
+ * @default 100
+ * 
+ * @param pan
+ * @text SE pan
+ * @desc Set the pan to ME.
+ * @default 0
+ * 
  */
 /*:ja
  * @target MZ
  * @plugindesc スキルラーニング
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * 相手が使用したスキルを習得することができます。
@@ -86,6 +123,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/18 Ver.1.0.2
+ * スキル習得時にSEを再生する機能を追加。
  * 2022/12/17 Ver.1.0.1
  * モンスター図鑑の敵の使用スキル適用による定義追加。
  * 2022/12/17 Ver.1.0.0
@@ -97,6 +136,37 @@
  * @type string
  * @default %1は %2 を習得した！
  * 
+ * @param SkillLearningSe
+ * @text 習得時SE
+ * @desc 習得時のSEを指定します。
+ * @type struct<SkillLearningSE>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * 
+ */
+/*~struct~SkillLearningSE:ja
+ * 
+ * @param name
+ * @text SEファイル
+ * @desc SEを指定します。
+ * @type file
+ * @dir audio/se
+ * 
+ * @param volume
+ * @text SEの音量
+ * @desc SEを音量を設定します。
+ * @default 90
+ * @min 0
+ * 
+ * @param pitch
+ * @text SEのピッチ
+ * @desc SEをピッチを設定します。
+ * @default 100
+ * 
+ * @param pan
+ * @text SEの位相
+ * @desc SEを位相を設定します。
+ * @default 0
+ * 
  */
 
 var Imported = Imported || {};
@@ -105,6 +175,7 @@ Imported.NUUN_SkillLearning = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_SkillLearning');
     const SkillLearningText = String(parameters['SkillLearningText']);
+    const SkillLearningSe = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SkillLearningSe'])) : null;
 
     const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
     Game_Action.prototype.applyItemUserEffect = function(target) {
@@ -244,6 +315,7 @@ Imported.NUUN_SkillLearning = true;
         const result = target.result();
         if (result.isSkillLearning) {
             this.push("addText", SkillLearningText.format(result.skillLearningTargetName, result.learningSkill));
+            this.playSkillLearningSe();
         }
     };
 
@@ -251,6 +323,12 @@ Imported.NUUN_SkillLearning = true;
     Window_BattleLog.prototype.displayFailure = function(target) {
         _Window_BattleLog_displayFailure.call(this, target);
         this.displaySkillLearning(target);
+    };
+
+    Window_BattleLog.prototype.playSkillLearningSe = function() {
+        if (SkillLearningSe && SkillLearningSe.name) {
+            AudioManager.playSe(SkillLearningSe);
+        }
     };
     
 })();

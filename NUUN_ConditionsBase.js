@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.8
+ * @version 1.1.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -249,6 +249,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/18 Ver.1.1.9
+ * ステート有効度の条件が正常に取得できていなかった問題を修正。
  * 2022/12/18 Ver.1.1.8
  * 属性有効度、ステート有効度を設定し、適用するとエラーが出る問題を修正。
  * 2022/11/23 Ver.1.1.7
@@ -1107,7 +1109,7 @@ function validityTriggerConditions(data, target, mode) {
     if (mode === 'Party' || mode === 'Troop') {
       return unit.members().some(member => stateValidity(data, member));
     } else {
-      return stateValidity(data.IDList, target)
+      return stateValidity(data, target)
     }
   }
 };

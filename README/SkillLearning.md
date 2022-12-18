@@ -1,5 +1,5 @@
 # [スキルラーニング](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js)  
 
 相手が使用したスキルを習得することができます。  
@@ -29,6 +29,8 @@
 敵が習得したスキルのレーティングは全て5で設定されます。  
 
 ## 更新履歴
+2022/12/18 Ver.1.0.2  
+スキル習得時にSEを再生する機能を追加。  
 2022/12/17 Ver.1.0.1  
 モンスター図鑑の敵の使用スキル適用による定義追加。  
 2022/12/17 Ver.1.0.0  

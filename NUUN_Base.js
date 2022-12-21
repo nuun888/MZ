@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/21/2022 Ver.1.6.1
+ * Added definition of processing to add enemy use skills.
  * 11/13/2022 Ver.1.6.0
  * Added processing to display APNG.
  * 11/9/2022 Ver.1.5.2
@@ -67,7 +69,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -77,6 +79,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/21 Ver.1.6.1
+ * 敵の使用スキルの追加する処理の定義を追加。
  * 2022/11/13 Ver.1.6.0
  * APNGを表示するための処理を追加。
  * 2022/11/9 Ver.1.5.2
@@ -370,6 +374,10 @@ Sprite_NuunAPngImg.prototype.resetApngImg = function() {
 
 Sprite_NuunAPngImg.prototype.loadApngSprite = function(name) {
   return Sprite_Picture.prototype.loadApngSprite.call(this, name);
+};
+
+Game_Enemy.prototype.allSkillActions = function(actionList) {
+  return actionList;
 };
 
 })();

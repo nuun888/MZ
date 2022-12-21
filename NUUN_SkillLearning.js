@@ -66,24 +66,24 @@
  * 
  * @param name
  * @text SE file
- * @desc Specify ME.
+ * @desc Specify SE.
  * @type file
  * @dir audio/se
  * 
  * @param volume
  * @text SE volume
- * @desc Set the ME volume.
+ * @desc Set the SE volume.
  * @default 90
  * @min 0
  * 
  * @param pitch
  * @text SE Pitch
- * @desc Sets the pitch of ME.
+ * @desc Sets the pitch of SE.
  * @default 100
  * 
  * @param pan
  * @text SE pan
- * @desc Set the pan to ME.
+ * @desc Set the pan to SE.
  * @default 0
  * 
  */
@@ -297,6 +297,13 @@ Imported.NUUN_SkillLearning = true;
     Game_Enemy.prototype.learningSkillActionValid = function() {
         return this._learningSkills.filter(a => this.isActionValid(a));
     };
+
+    const _Game_Enemy_allSkillActions = Game_Enemy.prototype.allSkillActions;
+    Game_Enemy.prototype.allSkillActions = function(actionList) {
+        actionList = _Game_Enemy_allSkillActions.call(this, actionList);
+        Array.prototype.push.apply(actionList, this._learningSkills);
+        return actionList;
+      };
 
     Game_Enemy.prototype.getLearningSkillActions = function(actionList) {
         Array.prototype.push.apply(actionList, this._learningSkills);

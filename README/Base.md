@@ -1,5 +1,5 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.6.0
+# Ver.1.6.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 English available  
@@ -8,6 +8,8 @@ English available
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2022/12/21 Ver.1.6.1  
+敵の使用スキルの追加する処理の定義を追加。  
 2022/11/13 Ver.1.6.0  
 APNGを表示するための処理を追加。  
 2022/11/9 Ver.1.5.2  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Gauge display EX
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -35,6 +35,12 @@
  * Font settings
  * Any font can be set for gauge numbers and labels.
  * 
+ * color settings
+ * All color settings can specify the color code from the text tab.
+ *
+ * Normal gauge color
+ * By entering -1 for the normal gauge color (entering -1 in the text tab for editor Ver.1.6.0 or later), the original gauge color will be applied.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * To change the font, you need a separate plug-in to load the font.
@@ -42,6 +48,8 @@
  * https://triacontane.blogspot.com/
  * 
  * Log
+ * 12/24/2022 Ver.1.4.1
+ * Fixed an issue where normal gauge color settings were not being applied.
  * 12/15/2022 Ver.1.4.0
  * Added a function that can change numbers and labels to arbitrary fonts.
  * Fixed an issue where displaying an unset gauge type would cause an error.
@@ -85,7 +93,7 @@
  * @text Gauge value setting
  * @desc Gauge value setting.
  * @type struct<ValueGauge>[]
- * @default ["{\"Type\":\"'hp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"0\",\"GaugeColor2\":\"0\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'mp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"0\",\"GaugeColor2\":\"0\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'tp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"0\",\"GaugeColor2\":\"0\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}"]
+ * @default ["{\"Type\":\"'hp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'mp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'tp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}"]
  * @parent CommonSetting
  * 
  * @param ValueAlign
@@ -417,19 +425,19 @@
  * @default ------------------------------
  * 
  * @param GaugeColor1
- * @desc Gauge color left (system color or color index (text tab))
+ * @desc Gauge color left (-1 default value)
  * @text Gauge color left
  * @type color
- * @default 0
- * @min 0
+ * @default -1
+ * @min -1
  * @parent GaugeColorSetting
  * 
  * @param GaugeColor2
- * @desc Gauge Color Right (System Color or Color Index (Text tab))
+ * @desc Gauge Color Right (-1 default value)
  * @text Gauge color right
  * @type color
- * @default 0
- * @min 0
+ * @default -1
+ * @min -1
  * @parent GaugeColorSetting
  * 
  * @param GaugeColorMaxSetting
@@ -509,7 +517,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -534,6 +542,12 @@
  * トリアコンタン様　フォントロードプラグイン推奨
  * https://triacontane.blogspot.com/
  * 
+ * 色の設定
+ * 色の設定は全てテキストタブからカラーコードを指定できます。
+ * 
+ * 通常時のゲージ色
+ * 通常時のゲージの色は-1と記入(エディタVer.1.6.0以降の場合、テキストタブで-1と記入)することにより、元のゲージの色が適用されます。
+ * 
  * Ver.1.2.0での変更点
  * フォントサイズをメインフォントサイズ+デフォルトフォントサイズ+個別フォントサイズに変更しました。
  * 数値の表示処理を変更しました。
@@ -545,6 +559,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/24 Ver.1.4.1
+ * 通常時のゲージの色の設定が適用されていなかった問題を修正。
  * 2022/12/15 Ver.1.4.0
  * 数値、ラベルを任意のフォントに変更できる機能を追加。
  * 設定されていないゲージタイプを表示するとエラーが出る問題を修正。
@@ -593,7 +609,7 @@
  * @text ゲージ数値設定
  * @desc ゲージ数値設定
  * @type struct<ValueGauge>[]
- * @default ["{\"Type\":\"'hp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"0\",\"GaugeColor2\":\"0\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'mp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"0\",\"GaugeColor2\":\"0\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'tp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"0\",\"GaugeColor2\":\"0\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}"]
+ * @default ["{\"Type\":\"'hp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'mp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'tp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}"]
  * @parent CommonSetting
  * 
  * @param ValueAlign
@@ -924,19 +940,19 @@
  * @default ------------------------------
  * 
  * @param GaugeColor1
- * @desc ゲージの色左(システムカラーまたはカラーインデックス(テキストタブ))
+ * @desc ゲージの色左(-1でデフォルト値)
  * @text ゲージ色左
  * @type color
- * @default 0
- * @min 0
+ * @default -1
+ * @min -1
  * @parent GaugeColorSetting
  * 
  * @param GaugeColor2
- * @desc ゲージの色右(システムカラーまたはカラーインデックス(テキストタブ))
+ * @desc ゲージの色右(-1でデフォルト値)
  * @text ゲージ色右
  * @type color
- * @default 0
- * @min 0
+ * @default -1
+ * @min -1
  * @parent GaugeColorSetting
  * 
  * @param GaugeColorMaxSetting
@@ -1216,6 +1232,8 @@ Imported.NUUN_GaugeValueEX = true;
             return this._gaugeData.RatioGaugeColor1 || 0;
         } else if (this._gaugeData.GaugeColorRatioApply && this.isRatioGauge()) {
             return this._gaugeData.RatioGaugeColor1 || 0;
+        } else if (this._gaugeData.GaugeColor1 >= 0) {
+            return this._gaugeData.GaugeColor1;
         }
         return _Sprite_Gauge_gaugeColor1.call(this);
     };
@@ -1227,6 +1245,8 @@ Imported.NUUN_GaugeValueEX = true;
             return this._gaugeData.RatioGaugeColor2 || 0;
         } else if (this._gaugeData.GaugeColorRatioApply && this.isRatioGauge()) {
             return this._gaugeData.RatioGaugeColor1 || 0;
+        } else if (this._gaugeData.GaugeColor2 >= 0) {
+            return this._gaugeData.GaugeColor2;
         }
         return _Sprite_Gauge_gaugeColor2.call(this);
     };

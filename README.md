@@ -136,7 +136,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | パーティ、敵グループ　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [パーティ、敵グループリミットゲージ](https://github.com/nuun888/MZ/blob/master/README/PartyLimitGauge.md) | [NUUN_PartyLimitGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js) | 共 | 1.1.2 |
+| [パーティ、敵グループリミットゲージ](https://github.com/nuun888/MZ/blob/master/README/PartyLimitGauge.md) | [NUUN_PartyLimitGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js) | 共 | 1.2.0 |
 |  |  |  |  |
 |  |  |  |  |
 

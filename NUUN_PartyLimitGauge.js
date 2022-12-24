@@ -8,9 +8,301 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc  Party limit gauge
+ * @author NUUN
+ * @version 1.2.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_GaugeValueEX
+ * 
+ * @help
+ * Implement gauges shared by party members and enemy groups.
+ * Limit points are charged when taking damage, defeating, winning, losing, and escaping.
+ * All evaluation expressions are available.
+ * 
+ * For color settings, you can enter a color code in the text tab.
+ * 
+ * Get parameters
+ * $gameParty._limitGauge　Ally's limit gauge
+ * $gameTroop._limitGauge　Enemy limit gauge
+ * 
+ * skill notes
+ * <limitCost:10> Consume 10 limit gauge as skill cost.
+ * 
+ * Skill or item notes
+ * <LimitEffect:10> Increases limit gauge by 10.
+ * <LimitEffect:-10> Reduces limit gauge by 10.
+ * If the target is an actor, the limit gauge of the ally will increase or decrease, and if it is an enemy, the limit gauge of the enemy group will increase or decrease.
+ * 
+ * When used together with ”NUUN_GaugeValueEX”
+ * Please set the following plug-in parameters with "NUUN_GaugeValueEX".
+ * Gauge color 1
+ * Gauge color 2
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/24/2022 Ver.1.2.0
+ * Added a function that allows you to set items and skills that increase or decrease the limit gauge.
+ * 12/15/2022 Ver.1.1.2
+ * Change the Type of the color specification plug-in parameter to color. (Ver.1.6.0 or later)
+ * Fixed an issue that caused an error when imaging a gauge in Gauge Imaging.
+ * 6/11/2022 Ver.1.1.1
+ * Fixed issue where Party Limit was not reset at the start of battle.
+ * 12/20/2021 Ver.1.1.0
+ * Supports gauge imaging.
+ * 12/19/2021 Ver.1.0.4
+ * Fixed the problem that an error occurs when using "NUUN_GaugeValueEX" together.
+ * 12/5/2021 Ver.1.0.3
+ * Conflict measures with "NUUN_GaugeValueEX".
+ * 11/24/2021 Ver.1.0.2
+ * Fixed an issue where skills could not be used when limit point cost and remaining cost were the same.
+ * 11/24/2021 Ver.1.0.1
+ * Fixed an issue where an error occurred when winning a battle or escaping.
+ * 11/15/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * @param MaxLimitValue
+ * @desc Max limit gauge.
+ * @text Max limit gauge
+ * @type number
+ * @default 1000
+ * 
+ * @param BattleStartReset
+ * @desc Resets the party limit gauge value at the start of battle.
+ * @text Initialize at each battle start
+ * @type boolean
+ * @default false
+ * 
+ * @param GaugeSetting
+ * @text Gauge setting
+ * @default ------------------------------
+ * 
+ * @param PartyGaugeVisible
+ * @desc Displays the party limit gauge.
+ * @text Gauge display
+ * @type boolean
+ * @default true
+ * @parent GaugeSetting
+ * 
+ * @param PartyGaugeShowSwitch
+ * @desc Specify a switch to display the party limit gauge. When hidden, the gauge will not accumulate.
+ * @text Display switch ID
+ * @type switch
+ * @default 0
+ * @parent GaugeSetting
+ * 
+ * @param PartyLimitValueVisible
+ * @desc Displays party limit points.
+ * @text Limit point display
+ * @type boolean
+ * @default true
+ * @parent GaugeSetting
+ * 
+ * @param PartyGaugeLabel
+ * @desc Party gauge label.
+ * @text Party gauge label
+ * @type string
+ * @default 
+ * @parent GaugeSetting
+ * 
+ * @param PartyGauge_LabelFontSize
+ * @desc Label font size. (difference from main font)
+ * @text Label font size
+ * @type number
+ * @default 0
+ * @min -99
+ * @parent GaugeSetting
+ * 
+ * @param PartyGauge_LabelColor
+ * @desc Label text color. (You can fill in the color code in the text tab)
+ * @text Label text color
+ * @type color
+ * @default 16
+ * @min 0
+ * @parent GaugeSetting
+ * 
+ * @param PartyGauge_X
+ * @desc Set the X coordinate.
+ * @text X-coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GaugeSetting
+ * 
+ * @param PartyGauge_Y
+ * @desc Set the Y coordinate.
+ * @text Y-coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GaugeSetting
+ * 
+ * @param PartyGauge_Width
+ * @desc Set the width.
+ * @text Gauge width
+ * @type number
+ * @default 500
+ * @min 0
+ * @parent GaugeSetting
+ * 
+ * @param PartyGaugeColor1
+ * @desc Specifies color 1 of the gauge. (You can fill in the color code in the text tab)
+ * @text Gauge color 1
+ * @type color
+ * @default 6
+ * @parent GaugeSetting
+ * 
+ * @param PartyGaugeColor2
+ * @desc Specifies color 2 of the gauge. (You can fill in the color code in the text tab)
+ * @text Gauge color 2
+ * @type color
+ * @default 14
+ * @parent GaugeSetting
+ * 
+ * @param EnemyGaugeSetting
+ * @text Enemy Gauge Settings
+ * @default ------------------------------
+ * 
+ * @param EnemyGaugeVisible
+ * @desc Displays enemy party limit gauge.
+ * @text Enemy gauge display
+ * @type boolean
+ * @default true
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyGaugeShowSwitch
+ * @desc Specify a switch to display the party limit gauge. When hidden, the gauge will not accumulate.
+ * @text Display switch ID
+ * @type switch
+ * @default 0
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyLimitValueVisible
+ * @desc Displays enemy limit points.
+ * @text Limit point display
+ * @type boolean
+ * @default false
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyGaugeLabel
+ * @desc Enemy group gauge label.
+ * @text Enemy group gauge label
+ * @type string
+ * @default 
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyGauge_LabelFontSize
+ * @desc Label font size. (difference from main font)
+ * @text Label font size
+ * @type number
+ * @default 0
+ * @min -99
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyGauge_LabelColor
+ * @desc Label text color. (You can fill in the color code in the text tab)
+ * @text Label text color
+ * @type color
+ * @default 16
+ * @min 0
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyGauge_X
+ * @desc Set the X coordinate.
+ * @text X-coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyGauge_Y
+ * @desc Set the Y coordinate.
+ * @text Y-coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyGauge_Width
+ * @desc Set the width.
+ * @text Gauge width
+ * @type number
+ * @default 500
+ * @min 0
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyGaugeColor1
+ * @desc Specifies color 1 of the gauge. (You can fill in the color code in the text tab)
+ * @text Gauge color 1
+ * @type color
+ * @default 6
+ * @parent EnemyGaugeSetting
+ * 
+ * @param EnemyGaugeColor2
+ * @desc Specifies color 2 of the gauge. (You can fill in the color code in the text tab)
+ * @text Gauge color 2
+ * @type color
+ * @default 14
+ * @parent EnemyGaugeSetting
+ * 
+ * @param ChargeSetting
+ * @text Charge setting
+ * @default ------------------------------
+ * 
+ * @param DamageAmount
+ * @desc Amount of recovery when damaged. a: Damaged battler data da: Damaged battler database damage: Damage value
+ * @text Recovery amount when damaged
+ * @type string
+ * @default Math.floor(25 * damage / a.mhp)
+ * @parent ChargeSetting
+ * 
+ * @param VictoryAmount
+ * @desc Amount recovered after winning.
+ * @text Victory Recovery Amount
+ * @type string
+ * @default 
+ * @parent ChargeSetting
+ * 
+ * @param LoseAmount
+ * @desc Recovery amount after defeat.
+ * @text Loss recovery amount
+ * @type string
+ * @default 
+ * @parent ChargeSetting
+ * 
+ * @param EscapeAmount
+ * @desc Recovery amount when running away.
+ * @text Escape Recovery Amount
+ * @type string
+ * @default 
+ * @parent ChargeSetting
+ * 
+ * @param DieAmount
+ * @desc Amount of recovery when defeated. a: defeated battler data da: defeated battler database
+ * @text Amount recovered when defeated
+ * @type string
+ * @default 
+ * @parent ChargeSetting
+ * 
+ * @param CostSetting
+ * @text Cost setting
+ * @default ------------------------------
+ * 
+ * @param LimitCostColor
+ * @desc Consumption limit gauge cost color number.
+ * @text Consumption limit gauge cost color
+ * @type color
+ * @default 16
+ * @parent CostSetting
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.1.2
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -29,6 +321,11 @@
  * スキルのメモ欄
  * <limitCost:10> スキルのコストとしてリミットゲージを１０を消費します。
  * 
+ * スキル、アイテムのメモ欄
+ * <LimitEffect:10> リミットゲージが10増加します。
+ * <LimitEffect:-10> リミットゲージが10減少します。
+ * 単体選択のスキル、アイテムの場合は対象がアクターなら味方のリミットゲージ、敵なら敵グループのリミットゲージが増減します。
+ * 
  * ゲージ表示拡張プラグインと併用する場合
  * 以下のプラグインパラメータはゲージ表示拡張プラグインで設定してください。
  * ゲージの色1
@@ -38,6 +335,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/24 Ver.1.2.0
+ * リミットゲージを増減するアイテム、スキルを設定できる機能を追加。
+ * 日本語以外での表示を英語表示に変更。
  * 2022/12/15 Ver.1.1.2
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
  * ゲージ画像化でゲージを画像化するとエラーが出る問題を修正。
@@ -356,6 +656,39 @@ BattleManager.onEscapeSuccess = function() {
   _BattleManager_onEscapeSuccess.call(this);
 };
 
+
+const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
+Game_Action.prototype.applyItemUserEffect = function(target) {
+  _Game_Action_applyItemUserEffect.call(this, target);
+  if (this.isLimitIncreaseItem()) {
+    target.limitIncreaseItem(this.subject(), this.item());
+    this.makeSuccess(target);
+  }
+};
+
+Game_Action.prototype.isLimitIncreaseItem = function() {
+  return this.item().meta.LimitEffect;
+};
+
+const _Game_Action_testApply = Game_Action.prototype.testApply;
+Game_Action.prototype.testApply = function(target) {
+  return _Game_Action_testApply.call(this, target) || this.testLimitIncreaseItem(target);
+};
+
+Game_Action.prototype.testLimitIncreaseItem = function(target) {
+  return this.isLimitIncreaseItem();
+};
+
+Game_Action.prototype.isGrow = function(target) {
+    return _Game_Action_testApply.call(this, target) || this.testLimitIncreaseItem(target);
+};
+
+Game_Battler.prototype.limitIncreaseItem = function(subject, item) {
+  const damege = Number(item.meta.LimitEffect);
+  this.chargeLimit(damege);
+};
+
+
 Game_BattlerBase.prototype.skillLimitCost = function(skill) {
   if (skill.meta.limitCost) {
     return skill.meta.limitCost;
@@ -405,11 +738,11 @@ Game_Enemy.prototype.chargeLimit = function(value) {
 };
 
 Game_Actor.prototype.setLimitGauge = function(value) {
-  $gameParty._limitGauge = Math.min(value, MaxLimitValue);
+  $gameParty._limitGauge = value.clamp(0, MaxLimitValue);
 };
 
 Game_Enemy.prototype.setLimitGauge = function(value) {
-  $gameTroop._limitGauge = Math.min(value, MaxLimitValue);
+  $gameTroop._limitGauge = value.clamp(0, MaxLimitValue);
 };
 
 Game_Actor.prototype.canPaySkillLimitCost = function(skill) {

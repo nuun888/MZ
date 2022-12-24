@@ -10,9 +10,87 @@
 /*:
  * 
  * @target MZ
+ * @plugindesc Exp value increase/decrease items, skills
+ * @author NUUN
+ * @version 1.2.3
+ * 
+ * @help
+ * You can create items and skills that increase or decrease experience points.
+ * 
+ * Enter items and skills notes.
+ * <ExpIncrease:10000> Increases EXP by 10000.
+ * <ExpIncrease:-5000> Decrease EXP value by 5000.
+ * <levelUpStop> If the level goes up by one, the experience value will not be increased. (The upper limit of the increased experience value will be the value obtained by subtracting the current experience value from the accumulated experience value required to reach the next level)
+ * <NolevelDown> Don't level down. (The lower limit of the reduced experience value will be the value obtained by subtracting the current experience value from the accumulated experience value required to reach the current level)
+ *               
+ * <ExpIncrease:1000000>
+ * <levelUpStop>
+ * It is also possible to create a level-up item by writing such a description.
+ * 
+ * Message format
+ * Message when EXP increases or decreases
+ * %1: User %2: Target %3: EXP
+ * Message when no effect
+ * %1: User %2: Target
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/24/2022 Ver 1.2.3
+ * Changed the display in languages other than Japanese to English.
+ * 11/6/2022 Ver 1.2.2
+ * Fix processing.
+ * 12/13/2021 Ver 1.2.1
+ * Fixed an issue where exp points were not adding up correctly.
+ * 12/6/2021 Ver 1.2.0
+ * Changed the format of the message.
+ * Fixed an issue where exp would decrease when increasing exp while at max level.
+ * 5/2/2021 Ver 1.1.1
+ * Added a message log when there was no effect.
+ * 12/24/2020 Ver 1.1.0
+ * Added a function to display the battle log when using it in the message window.
+ * 12/8/2020 Ver 1.0.3
+ * Fixed a bug that exceeded the total required exp of the maximum level.
+ * 11/22/2020 Ver 1.0.2
+ * Correspond to be displayed in the battle log.
+ * 11/21/2020 Ver 1.0.1
+ * Added a function that does not increase the exp value when the level rises by 1, and a function that does not level down when the experience value decreases.
+ * 11/21/2020 Ver 1.0.0
+ * First edition.
+ * 
+ * 
+ * @param LogWindowShow
+ * @text Message window display
+ * @desc Show usage log in message window.
+ * @type boolean
+ * @default false
+ * 
+ * @param ExpMessageUp
+ * @text Message when EXP is increased
+ * @desc Message when the exp value increases. %1: User %2: Target %3: EXP
+ * @type string
+ * @default Exp value of %1 increased by %2!
+ * 
+ * @param ExpMessageDown
+ * @text Message when exp value decreases
+ * @desc Message when exp value decreases. %1: User %2: Target %3: EXP
+ * @type string
+ * @default Exp value of %1 decreased by %2!
+ * 
+ * @param ExpMessageNoEffect
+ * @text message when no effect
+ * @desc message when no effect. %1: User %2: Target
+ * @type string
+ * @default "a" had no effect!
+ * 
+ */
+/*:ja
+ * 
+ * @target MZ
  * @plugindesc 経験値増減アイテム、スキル
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * 経験値を増減させるアイテムやスキルを作ることが出来ます。
@@ -37,6 +115,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/24 Ver 1.2.3
+ * 日本語以外での表示を英語表示に変更。
  * 2022/11/6 Ver 1.2.2
  * 処理を修正。
  * 2021/12/13 Ver 1.2.1

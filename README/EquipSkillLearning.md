@@ -1,5 +1,5 @@
 # [スキル習得装備](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSkillLearning.js)
-# Ver.1.0.0
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSkillLearning.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -21,6 +21,11 @@
 敵キャラのメモ欄  
 `<EquipSkillLearningPoint:「num]>` 獲得するポイントを設定します。未記入の場合はデフォルトの取得ポイントが適用されます。  
 `[num]`:取得ポイント  
+
+特徴を有するメモ欄  
+習得するポイントの増幅率を設定します。  
+`<EquipSkillLearningRate:「rate]>`  
+`<EquipSkillLearningRate:150>` 取得ポイントが4の場合、150%の効果で6ポイント取得します。  
 
 ## 更新履歴
 2022/12/17 Ver.1.0.0

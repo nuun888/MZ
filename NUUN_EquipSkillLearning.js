@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * You can set the equipment that can learn skills.
@@ -30,10 +30,18 @@
  * <EquipSkillLearningPoint:「num]> Set the points to earn. If not filled in, default acquisition points will be applied.
  * [num]:Gain point
  * 
+ * Note with features
+ * Set the amplification rate of points to be learned.
+ * <EquipSkillLearningRate:「rate]>
+ * <EquipSkillLearningRate:150>
+ * If the acquisition point is 4, acquire 6 points with 150% effect.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
+ * Log
+ * 12/24/2022 Ver.1.1.0
+ * Added a function that allows you to set the amplification factor of acquisition points.
  * 12/17/2022 Ver.1.0.0
  * First edition.
  * 
@@ -118,7 +126,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * スキルを習得できる装備を設定できます。
@@ -136,10 +144,17 @@
  * <EquipSkillLearningPoint:「num]> 獲得するポイントを設定します。未記入の場合はデフォルトの取得ポイントが適用されます。
  * [num]:取得ポイント
  * 
+ * 特徴を有するメモ欄
+ * 習得するポイントの増幅率を設定します。
+ * <EquipSkillLearningRate:「rate]>
+ * <EquipSkillLearningRate:150>の場合は取得ポイントが4の場合、150%の効果で6ポイント取得します。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * 更新履歴
+ * 2022/12/24 Ver.1.1.0
+ * 取得ポイントの増幅率を設定できる機能を追加。
  * 2022/12/17 Ver.1.0.0
  * 初版
  * 
@@ -265,12 +280,22 @@ Imported.NUUN_EquipSkillLearning = true;
         if (point < this._equipSkillLearning[id]) {
             return;
         }
-        this._equipSkillLearning[id] += num;
+        this._equipSkillLearning[id] += num * this.getEquipSkillLearningRate();
         this._equipSkillLearning[id] = this._equipSkillLearning[id].clamp(0, point);
         if (point <= this._equipSkillLearning[id]) {
             this.learnSkill(id);
             this.equipSkillLearningNewSkill.push(skill);
         }
+    };
+
+    Game_Actor.prototype.getEquipSkillLearningRate = function() {
+        return this.traitObjects().reduce((r, trait) => {
+            return trait.meta.EquipSkillLearningRate ? (Number(trait.meta.EquipSkillLearningRate) / 100) * r : r;
+        }, 1.0);
+    };
+
+    Game_Actor.prototype.getEquipSkillLearningPercentage = function() {
+        return this.getEquipSkillLearningRate() * 100;
     };
 
     Game_Actor.prototype.getEquipSkillLearningPoint = function(id) {

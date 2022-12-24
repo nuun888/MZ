@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.4
+ * @version 3.8.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2022/12/24 Ver.3.8.5
+ * アクター名に任意のフォントを指定できる機能を追加。
  * 2022/12/10 Ver.3.8.4
  * 敵のダメージポップアップの位置を指定できる機能を追加。
  * 2022/11/26 Ver.3.8.3
@@ -3372,6 +3374,10 @@ Sprite_BSName.prototype.getGBSNameWidth = function() {
 
 Sprite_BSName.prototype.fontSize = function() {
   return $gameSystem.mainFontSize() +  (this.userStatusParam.FontSize || 0);
+};
+
+Sprite_BSName.prototype.fontFace = function() {
+  return params.ActorNameFont ? params.ActorNameFont : $gameSystem.mainFontFace();
 };
 
 

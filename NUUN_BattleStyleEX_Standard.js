@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.8.1
+ * @version 1.8.2
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -57,6 +57,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2022/12/24 Ver.1.8.2
+ * アクター名に任意のフォントを指定できる機能を追加。
  * 2022/12/10 Ver.1.8.1
  * 敵のダメージポップアップの位置を指定できる機能を追加。
  * 2022/10/18 Ver.1.8.0
@@ -869,6 +871,13 @@
  * @text 名前表示
  * @type boolean
  * @default true
+ * @parent ActorStatusParamOption
+ * 
+ * @param ActorNameFont
+ * @desc アクター名のフォントを指定します。(拡張子なし)
+ * @text アクター名フォント
+ * @type string
+ * @default 
  * @parent ActorStatusParamOption
  * 
  * @param TPBShow
@@ -2582,6 +2591,7 @@ params.Img_SW = Number(parameters['Img_SW'] || 0);
 params.Img_SH = Number(parameters['Img_SH'] || 0);
 params.FaceHeight = Number(parameters['FaceHeight'] || 0);
 params.NameShow = eval(parameters['NameShow'] || "true");
+params.ActorNameFont = String(parameters['ActorNameFont']);
 params.TPBShow = eval(parameters['TPBShow'] || "true");
 params.StateVisible = eval(parameters['StateVisible'] || "true");
 params.NoStateIcon = Number(parameters['NoStateIcon'] || 0);

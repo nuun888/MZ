@@ -1,5 +1,5 @@
 # [パーティリミットゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
-# Ver.1.1.2
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -11,6 +11,12 @@
 ### 取得パラメータ
 `$gameParty._limitGauge`　味方のリミットゲージ  
 `$gameTroop._limitGauge`　敵のリミットゲージ  
+
+### リミットゲージを増減させるアイテム、スキル
+スキル、アイテムのメモ欄
+`<LimitEffect:10>` リミットゲージが10増加します。  
+`<LimitEffect:-10>` リミットゲージが10減少します。  
+単体選択のスキル、アイテムの場合は対象がアクターなら味方のリミットゲージ、敵なら敵グループのリミットゲージが増減します。  
 
 ### コストの設定
 スキルのメモ欄  
@@ -25,6 +31,9 @@
 色設定はテキストタブでカラーコードが入力できます。  
 
 ## 更新履歴
+2022/12/24 Ver.1.2.0  
+リミットゲージを増減するアイテム、スキルを設定できる機能を追加。  
+日本語以外での表示を英語表示に変更。  
 2022/12/15 Ver.1.1.2  
 カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)  
 ゲージ画像化でゲージを画像化するとエラーが出る問題を修正。  

@@ -23,7 +23,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | コア　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.6.0 |
+| [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.6.1 |
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.6 |
 | [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md) | [NUUN_StateTurnCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js) |  | 1.1.1 |
 | [レーダーチャート表示ベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md) | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) | 共 | 1.0.2 |
@@ -115,7 +115,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [スキル、アイテム使用条件](https://github.com/nuun888/MZ/blob/master/README/ConditionalSkills.md) | [NUUN_ConditionalSkills](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalSkills.js) | 条 | 1.1.0 |
 | [スキルコスト拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostEX.md) | [NUUN_SkillCostEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js) |  | 1.1.0 |
 | [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md) | [NUUN_SkillCostShowEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js) | 共 | 1.0.1 |
-| [スキルラーニング](https://github.com/nuun888/MZ/blob/master/README/SkillLearning.md) | [NUUN_SkillLearning](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js) | 共 | 1.0.2 |
+| [スキルラーニング](https://github.com/nuun888/MZ/blob/master/README/SkillLearning.md) | [NUUN_SkillLearning](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js) | 共 | 1.1.0 |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -179,7 +179,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | メニュー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数10　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [所持金拡張](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) | 共 | 1.2.0 |
-| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md) | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ グ A | 2.17.5 |
+| [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md) | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ グ A | 2.17.7 |
 | ┣　[耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) | [NUUN_EnemyBookEX_1](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js) |  | 1.0.1 |
 | ┣ 条件付きドロップアイテム図鑑適用 | [NUUN_EnemyBookEX_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) |  | 1.0.1 |
 | ┗ [モンスター図鑑全セーブ共通](https://github.com/nuun888/MZ/blob/master/README/EnemyBook_Global.md) | [NUUN_EnemyBook_Global](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook_Global.js) |  | 1.0.1 |

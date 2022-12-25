@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/25 Ver.1.1.3
+ * フレーム設定の説明を修正。
  * 2022/11/2 Ver.1.1.2
  * 同一敵が複数いるときに表示されるアルファベットの表示をON、OFFする機能を追加。
  * 2022/10/28 Ver.1.1.1
@@ -159,7 +161,7 @@
  * @param CastIconId
  * @desc キャストタイム中に表示するアイコンIDを指定します。0に指定した場合はスキル、アイテムのアイコンが表示されます。
  * @text キャストタイムアイコンID
- * @type number
+ * @type icon
  * @default 0
  * @parent CastIconSetting
  * 
@@ -185,8 +187,8 @@
  * @parent Setting
  * 
  * @param ActionReturnDuration
- * @desc アクション終了後チャージ完了時の座標に戻る時の移動フレーム数。
- * @text アクション終了後移動フレーム数
+ * @desc 初期位置の座標に戻る時の移動フレーム数。
+ * @text 初期位置移動フレーム数
  * @type number
  * @default 3
  * @max 9999
@@ -194,8 +196,8 @@
  * @parent Setting
  * 
  * @param ActionResetDuration
- * @desc 初期位置に戻る時またはキャスト移行時の移動フレーム数。
- * @text 初期位置移動、キャスト移行フレーム数
+ * @desc アクション終了後チャージ完了時の座標に戻る時の移動フレーム数。
+ * @text アクション終了後移動フレーム数
  * @type number
  * @default 6
  * @max 9999
@@ -757,7 +759,7 @@ Sprite_TimeLine.prototype.update = function() {
 
 Sprite_TimeLine.prototype.updateCastIcon = function() {
     const action = this._battler.currentAction();
-    if (action && this._battler.tpbRequiredCastTime() > 0 && this.isCasting()) {
+    if (action && (this._battler.tpbRequiredCastTime() > 0 && this.isCasting())) {
         if (CastIconId > 0) {
             this._castIconSprite.setIcon(CastIconId);
         } else {

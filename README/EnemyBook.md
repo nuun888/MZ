@@ -1,8 +1,8 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.17.6
+# Ver.2.17.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
 #### 対応プラグイン
 [盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md)  
 [レーダーチャートベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md)  
@@ -248,6 +248,8 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2022/12/25 Ver.2.17.7  
+外部プラグインで敵の行動を追加したときの処理を修正。  
 2022/12/17 Ver.2.17.6  
 敵の行動でスキルラーニングで習得したスキルを表示できるように対応。  
 2022/12/14 Ver.2.17.5  

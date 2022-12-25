@@ -58,8 +58,9 @@
  * 
  * Common setting
  * 
- * Set skill acquisition probability
- * <SkillLearningCorrection:[rorrection]> Sets the skill learning probability.
+ * Set skill acquisition correction probability
+ * Notes with features
+ * <SkillLearningCorrection:[rorrection]> Sets the skill acquisition correction probability.
  * [rorrection]:± Correction rate
  * 
  * The rating of all skills learned by the enemy is set at 5.
@@ -167,8 +168,9 @@
  * 
  * 共通設定
  * 
- * スキル習得確率を設定
- * <SkillLearningCorrection:[rorrection]> スキル習得確率を設定します。
+ * スキル習得補正確率を設定
+ * 特徴を持つメモ欄
+ * <SkillLearningCorrection:[rorrection]> スキル習得補正確率を設定します。
  * [rorrection]:±補正率
  * 
  * 敵が習得したスキルのレーティングは全て5で設定されます。

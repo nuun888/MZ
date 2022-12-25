@@ -42,9 +42,9 @@
 `[mode]`:習得対象 0:敵味方　1:味方のみ　2:敵のみ  
 
 ### 共通設定
-スキル習得確率を設定  
+スキル習得補正率を設定  
 特徴を持つメモ欄  
-`<SkillLearningCorrection:[rorrection]>` スキル習得確率を設定します。  
+`<SkillLearningCorrection:[rorrection]>` スキル習得補正率を設定します。  
 `[rorrection]`:±補正率  
 
 

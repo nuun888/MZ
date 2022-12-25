@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * You can set the equipment that can learn skills.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/24/2022 Ver.1.1.1
+ * Fixed an issue where skills could not be selected.
  * 12/24/2022 Ver.1.1.0
  * Added a function that allows you to set the amplification factor of acquisition points.
  * 12/17/2022 Ver.1.0.0
@@ -126,7 +128,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * スキルを習得できる装備を設定できます。
@@ -153,6 +155,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/25 Ver.1.1.1
+ * スキルを選択できなくなる問題を修正。
  * 2022/12/24 Ver.1.1.0
  * 取得ポイントの増幅率を設定できる機能を追加。
  * 2022/12/17 Ver.1.0.0
@@ -367,8 +371,12 @@ Imported.NUUN_EquipSkillLearning = true;
     };
 
     Window_SkillList.prototype.isUseEquipSkillLearn = function(skill) {
+        return EquipSkillLearnUseSkill ? actor.canUseEquipSkillLearn(skill) : true;
+    };
+
+    Window_SkillList.prototype.canUseEquipSkillLearn = function(skill) {
         const actor = this._actor;
-        return EquipSkillLearnUseSkill ? actor.isEquipSkillLearning(skill.id) : true;
+        return actor._equipSkillLearning && actor._equipSkillLearning[skill.id] && actor._equipSkillLearning[skill.id] > 0 && actor.isEquipSkillLearning(skill.id);
     };
 
     Window_Base.prototype.getEquipSkillLearnPoint = function() {//獲得ポイント

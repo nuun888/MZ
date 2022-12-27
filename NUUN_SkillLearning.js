@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill learning
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -53,6 +53,11 @@
  * [skill]:Learned skill　0: All skills 1: 1 random skill from all skills.
  * [mode]:learning mode 0: Hit 1: Defeat
  * 
+ * Enemy, Class notes
+ * <OnAttackSkillLearning[SkillId]> Set skills that can be learned from already learned skills or action skills when attacking.
+ * [SkillId]:SkillId
+ * <OnAttackSkillLearning13> If a skill with skill ID 13 has been acquired (if it is an enemy, it has been set) for a class or enemy action, that skill will be acquired.
+ * 
  * <OnAttackSkillLearning:[mode]> Sets the skill that can be learned when attacking.
  * [mode]:learning target 0: friend or foe 1: friend only 2: enemy only
  * 
@@ -69,6 +74,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/27/2022 Ver.1.1.1
+ * Added a function that allows you to specify the skills that can be acquired for each enemy and occupation.
+ * Fixed an issue where an error would occur when the target to acquire the skill was an ally.
  * 12/25/2022 Ver.1.1.0
  * Added a function that allows you to learn the target skill when attacking.
  * 12/18/2022 Ver.1.0.2
@@ -120,7 +128,7 @@
  * @target MZ
  * @plugindesc スキルラーニング
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -163,8 +171,14 @@
  * [skill]:習得スキル　0:全てのスキル 1:全てのスキルから１つランダム。
  * [mode]:習得モード 0:ヒット　1:撃破
  * 
+ * スキルのメモ欄
  * <OnAttackSkillLearning:[mode]> 攻撃時に習得可能にするスキルを設定します。
  * [mode]:習得対象 0:敵味方　1:味方のみ　2:敵のみ
+ * 
+ * 敵キャラ、職業のメモ欄
+ * <OnAttackSkillLearning[SkillId]> 攻撃時に習得済みのスキルまたは行動スキルから習得可能にするスキルを設定します。
+ * [SkillId]:スキルID
+ * <OnAttackSkillLearning13> 職業または敵の行動にスキルID13番のスキルが習得(敵の場合は設定済み)している場合、そのスキルを習得します。
  * 
  * 共通設定
  * 
@@ -179,6 +193,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/27 Ver.1.1.1
+ * 敵、職業毎に習得できるスキルを指定できる機能を追加。
+ * 取得対象が味方の時にエラーが出る問題を修正。
  * 2022/12/25 Ver.1.1.0
  * 攻撃時に対象のスキルを習得できる機能を追加。
  * 2022/12/18 Ver.1.0.2
@@ -301,7 +318,8 @@ Imported.NUUN_SkillLearning = true;
 
     Game_Action.prototype.setAttackSkillLearning = function(target, data) {
         const subject = this.subject();
-        const skills = target.attackSkillLearningList().filter(skillId => !this.isSkillLearningSkill(subject, skillId) && this.isOnAttackSkillLearning($dataSkills[skillId], subject));
+        const object = target.isActor() ? target.currentClass() : target.enemy();
+        const skills = target.attackSkillLearningList().filter(skillId => !this.isSkillLearningSkill(subject, skillId) && this.isOnAttackSkillLearning(skillId, subject, target, object));
         if (skills.length > 0 && Math.random() < subject.skillLearningRate(data[0])) {
             if (data[1] === 0) {
                 for (const id of skills) {
@@ -317,18 +335,25 @@ Imported.NUUN_SkillLearning = true;
         }
     };
 
-    Game_Action.prototype.isOnAttackSkillLearning = function(skill, subject) {
+    Game_Action.prototype.isOnAttackSkillLearning = function(skillId, subject, target, object) {
+        const skill = $dataSkills[skillId];
+        let result = false;
         if (skill.meta.OnAttackSkillLearning) {
             const mode = Number(skill.meta.OnAttackSkillLearning);
             if (mode === 1) {
-                return subject.isActor();
+                result = subject.isActor();
             } else if (mode === 2) {
-                return subject.isEnemy();
+                result = subject.isEnemy();
             } else {
-                return true;
+                result = true;
             }
         }
-        return false;
+        return result || this.isOnTargetAttackSkillLearning(skillId, object);
+    };
+
+    Game_Action.prototype.isOnTargetAttackSkillLearning = function(skillId, object) {
+        const tag = 'OnAttackSkillLearning' + skillId;
+        return !!object.meta[tag];
     };
 
     Game_Action.prototype.isSkillLearningSkill = function(battler, skillId) {
@@ -354,7 +379,7 @@ Imported.NUUN_SkillLearning = true;
     };
 
     Game_Actor.prototype.attackSkillLearningList = function() {
-        return this.skills();
+        return this.skills().map(skill => skill.id);
     };
     
     Game_BattlerBase.prototype.skillLearningRate = function(rate) {

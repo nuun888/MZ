@@ -1,5 +1,5 @@
 # [スキルラーニング](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -41,6 +41,11 @@
 `<OnAttackSkillLearning:[mode]>` 攻撃時に習得可能にするスキルを設定します。  
 `[mode]`:習得対象 0:敵味方　1:味方のみ　2:敵のみ  
 
+敵キャラ、職業のメモ欄  
+`<OnAttackSkillLearning[SkillId]>` 攻撃時に習得済みのスキルまたは行動スキルから習得可能にするスキルを設定します。  
+`[SkillId]`:スキルID  
+`<OnAttackSkillLearning13>` 職業または敵の行動にスキルID13番のスキルが習得(敵の場合は設定済み)している場合、そのスキルを習得します。  
+
 ### 共通設定
 スキル習得補正率を設定  
 特徴を持つメモ欄  
@@ -51,6 +56,9 @@
 敵が習得したスキルのレーティングは全て5で設定されます。  
 
 ## 更新履歴
+2022/12/27 Ver.1.1.1  
+敵、職業毎に習得できるスキルを指定できる機能を追加。  
+取得対象が味方の時にエラーが出る問題を修正。  
 2022/12/25 Ver.1.1.0  
 攻撃時に対象のスキルを習得できる機能を追加。  
 2022/12/18 Ver.1.0.2  

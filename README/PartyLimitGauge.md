@@ -1,5 +1,5 @@
 # [パーティリミットゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,8 @@
 色設定はテキストタブでカラーコードが入力できます。  
 
 ## 更新履歴
+2022/12/28 Ver.1.2.1  
+処理の修正。  
 2022/12/24 Ver.1.2.0  
 リミットゲージを増減するアイテム、スキルを設定できる機能を追加。  
 日本語以外での表示を英語表示に変更。  

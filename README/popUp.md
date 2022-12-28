@@ -9,7 +9,9 @@
 [バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md)  
 
 ステート、バフ付加解除時にステート、バフ、アイテム、お金盗み時にポップアップさせます。
-アイテム、お金盗み時は別途[盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md)が必要です。
+アイテム、お金盗み時は別途[盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md)が必要です。  
+
+Ver.2.0.0でプラグインパラメータの見直しを行いました関係で再設定が必要になります。  
 
 ## 設定
 #### ステートのポップアップ

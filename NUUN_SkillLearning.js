@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill learning
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -74,6 +74,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/28/2022 Ver.1.1.2
+ * Added definitions for popup support.
  * 12/27/2022 Ver.1.1.1
  * Added a function that allows you to specify the skills that can be acquired for each enemy and occupation.
  * Fixed an issue where an error would occur when the target to acquire the skill was an ally.
@@ -128,7 +130,7 @@
  * @target MZ
  * @plugindesc スキルラーニング
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -193,6 +195,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/28 Ver.1.1.2
+ * ポップアップ対応による定義追加。
  * 2022/12/27 Ver.1.1.1
  * 敵、職業毎に習得できるスキルを指定できる機能を追加。
  * 取得対象が味方の時にエラーが出る問題を修正。
@@ -275,7 +279,7 @@ Imported.NUUN_SkillLearning = true;
                 if ((battler === target && battler.isSkillLearningAbility()) || battler.isWatchingSkillLearningAbility()) {
                     if (!this.isSkillLearningSkill(battler, skillId) && Math.random() < battler.skillLearningRate(data[0])) {
                         battler.skillLearning(skillId);
-                        this.setSkillLearningLog(target, battler.name(), skill.name);
+                        this.setSkillLearningLog(target, battler.name(), skill);
                     }
                 }
             }
@@ -297,7 +301,7 @@ Imported.NUUN_SkillLearning = true;
                 if (battler.isAllSkillLearningAbility()) {
                     if (!this.isSkillLearningSkill(battler, skillId) && Math.random() < battler.skillLearningRate(data[0])) {
                         battler.skillLearning(skillId);
-                        this.setSkillLearningLog(target, battler.name(), skill.name);
+                        this.setSkillLearningLog(target, battler.name(), skill);
                     }
                 }
             }
@@ -324,12 +328,12 @@ Imported.NUUN_SkillLearning = true;
             if (data[1] === 0) {
                 for (const id of skills) {
                     subject.skillLearning(id);
-                    this.setSkillLearningLog(target, subject.name(), $dataSkills[id].name);
+                    this.setSkillLearningLog(target, subject.name(), $dataSkills[id]);
                 }
             } else if (data[1] === 1) {
                 const id = skills[Math.floor(Math.random() * skills.length)];
                 subject.skillLearning(id);
-                this.setSkillLearningLog(target, subject.name(), $dataSkills[id].name);
+                this.setSkillLearningLog(target, subject.name(), $dataSkills[id]);
             }
             this.makeSuccess(target);
         }
@@ -360,10 +364,10 @@ Imported.NUUN_SkillLearning = true;
         return battler.isActor() ? battler.isLearnedSkill(skillId) : battler.isEnemyLearningSkills(skillId);
     };
 
-    Game_Action.prototype.setSkillLearningLog = function(target, name, skillName) {
+    Game_Action.prototype.setSkillLearningLog = function(target, name, skill) {
         const result = target.result();
         result.isSkillLearning = true;
-        result.learningSkill.push({skillName:skillName, name:name});
+        result.learningSkill.push({id: skill.id, skillName:skill.name, name:name});
     };
 
     Game_Enemy.prototype.skillLearning = function(skillId) {
@@ -464,6 +468,17 @@ Imported.NUUN_SkillLearning = true;
     Window_BattleLog.prototype.displayFailure = function(target) {
         _Window_BattleLog_displayFailure.call(this, target);
         this.displaySkillLearning(target);
+    };
+
+    const _Window_BattleLog_displayActionResults = Window_BattleLog.prototype.displayActionResults;
+    Window_BattleLog.prototype.displayActionResults = function(subject, target) {
+        const result = target.result();
+        if (result.used && result.isSkillLearning) {
+            if (Imported.NUUN_popUp && !!target.shouldPopupSkillLearning && target.shouldPopupSkillLearning()) {
+                this.displayAffectedSkillLearning(subject, result.learningSkill);
+            }
+        }
+        _Window_BattleLog_displayActionResults.call(this, subject, target);
     };
 
     Window_BattleLog.prototype.playSkillLearningSe = function() {

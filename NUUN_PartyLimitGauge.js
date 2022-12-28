@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -43,6 +43,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/28/2022 Ver.1.2.1
+ * Processing fixes.
  * 12/24/2022 Ver.1.2.0
  * Added a function that allows you to set items and skills that increase or decrease the limit gauge.
  * 12/15/2022 Ver.1.1.2
@@ -302,7 +304,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -335,6 +337,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/28 Ver.1.2.1
+ * 処理の修正。
  * 2022/12/24 Ver.1.2.0
  * リミットゲージを増減するアイテム、スキルを設定できる機能を追加。
  * 日本語以外での表示を英語表示に変更。
@@ -763,15 +767,9 @@ Game_Enemy.prototype.canPaySkillLimitCost = function(skill) {
   }
 };
 
-const _Game_Enemy_die = Game_Enemy.prototype.die;
-Game_Enemy.prototype.die = function() {
-  _Game_Enemy_die.call(this);
-  this.chargeLimitByDie(DieAmount);
-};
-
-const _Game_Actor_die = Game_Actor.prototype.die;
-Game_Actor.prototype.die = function() {
-  _Game_Actor_die.call(this);
+const _Game_BattlerBase_die = Game_BattlerBase.prototype.die;
+Game_BattlerBase.prototype.die = function() {
+  _Game_BattlerBase_die.call(this);
   this.chargeLimitByDie(DieAmount);
 };
 

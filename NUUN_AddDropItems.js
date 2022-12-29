@@ -10,9 +10,44 @@
 /*:
  * 
  * @target MZ
+ * @plugindesc Add drop item
+ * @base NUUN_Base
+ * @version 1.0.2
+ * @orderAfter NUUN_Base
+ * @author NUUN
+ * 
+ * @help
+ * By default, you can only set up to 3 enemy drop items, but this plugin allows you to set 4 or more drop items.
+ * 
+ * 
+ * Enemy notes
+ * <DropItem I:13,20>
+ * Item ID 13 will be added to the set enemy drop items with a drop rate of 1/20.
+ * 
+ * <DropItem W:18,16>
+ * Weapon ID 18 will be added to the set enemy drop items with a drop rate of 1/16.
+ * 
+ * <DropItem A:35,32>
+ * Armor ID 35 will be added to the set enemy drop items with a drop rate of 1/32.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/29/2022 Ver.1.0.2
+ * Changed the display in languages other than Japanese to English.
+ * 10/3/2021 Ver.1.0.1
+ * Fixed the problem that the description was wrong when setting in the memo.
+ * 12/31/2020 Ver.1.0.0
+ * First edition.
+ * 
+ */ 
+/*:ja
+ * 
+ * @target MZ
  * @plugindesc ドロップアイテム追加
  * @base NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * @orderAfter NUUN_Base
  * @author NUUN
  * 
@@ -36,7 +71,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2021/10/3 Ver.1.0.0
+ * 2022/12/29 Ver.1.0.2
+ * 日本語以外での表示を英語表示に変更。
+ * 2021/10/3 Ver.1.0.1
  * メモに設定するときの説明が間違っていた問題を修正。
  * 2020/12/31 Ver.1.0.0
  * 初版

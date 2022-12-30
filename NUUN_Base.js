@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/30/2022 Ver.1.6.2
+ * Added exception handling when image could not be loaded.
+ * Added content background processing definition.
  * 12/21/2022 Ver.1.6.1
  * Added definition of processing to add enemy use skills.
  * 11/13/2022 Ver.1.6.0
@@ -79,6 +82,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/30 Ver.1.6.2
+ * 画像が読み込めなかったときの例外処理を追加。
+ * コンテンツ背景処理の定義を追加。
  * 2022/12/21 Ver.1.6.1
  * 敵の使用スキルの追加する処理の定義を追加。
  * 2022/11/13 Ver.1.6.0
@@ -226,8 +232,48 @@ ImageManager.nuun_actorPictures = function(filename) {
 };
 
 ImageManager.nuun_LoadPictures = function(filename) {
-  return this.loadBitmap("img/", filename);
+  const bitmap = this.loadBitmap("img/", filename);
+  bitmap.nuun_LoadBitmap = true;
+  return bitmap;
 };
+
+const _ImageManager_throwLoadError = ImageManager.throwLoadError;
+ImageManager.throwLoadError = function(bitmap) {
+  if (bitmap.nuun_LoadBitmap) {
+    try {
+      _ImageManager_throwLoadError.call(this, bitmap);
+    } catch (e) {
+
+    }
+  } else {
+    _ImageManager_throwLoadError.call(this, bitmap);
+  }
+};
+
+const _Bitmap_isReady = Bitmap.prototype.isReady;
+Bitmap.prototype.isReady = function() {
+  if (this.nuun_LoadBitmap && this.isError()) {
+    this._loadingState = "none";
+  }
+  return _Bitmap_isReady.call(this);
+};
+
+
+Bitmap.prototype.nuun_contentsBackBlt = function(source, sx, sy, sw, sh, dx, dy, dw, dh, pscale, mode) {
+  let scale = pscale / 100;
+  let scale2 = 100 / pscale;
+  const scaleMode = source.width * scale < dw || source.height * scale < dh;
+  if (scaleMode) {
+    scale = 1.0;
+    scale2 = Math.max(dw / source.width, dh / source.height);
+  }
+  const width = (scaleMode  ? source.width : sw * scale2);
+  const height = (scaleMode ? source.height : sh) * scale2;
+  const x = Math.floor((!mode && scaleMode ? 0 : (dw - source.width) / 2 * -1 * scale));
+  const y = Math.floor((!mode ? 0 : (scaleMode ? (dh - source.height) / 2 * -1 * scale2 : (dh - source.height) / 2 * -1 * scale)));
+  this.blt(source, x + sx, y + sy, width, height, dx, dy, dw, dh);
+};
+
 
 const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
@@ -379,5 +425,7 @@ Sprite_NuunAPngImg.prototype.loadApngSprite = function(name) {
 Game_Enemy.prototype.allSkillActions = function(actionList) {
   return actionList;
 };
+
+
 
 })();

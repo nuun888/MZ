@@ -11,51 +11,19 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.0.1
+ * @version 2.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
- * セーブ画面にいくつかの項目を追加します。
- * このプラグインでは通常のキャラチップ、プレイ時間の他顔グラ、サイドビューアクター、セーブ時の現在値、セーブ日時、所持金、
- * レベル、独自のパラメータ、スナップショット等が表示可能です。
+ * セーブ画面をカスタマイズできます。
  * 
  * 設定
+ * 設定できる項目
+ * プレイ時間、セーブ時刻、現在地、所持金、オリジナル項目、ファイル名、タイトル、章、行動目標、
+ * アクター名、クラス、二つ名、レベル、キャラチップ、顔グラ、SVアクター、スナップショット
+ * 
  * セーブ画面に表示する項目を設定するにはプラグインパラメータの表示項目から設定します。
- * 
- * X表示列位置
- * 表示する列番号を指定します。最大列は2です。
- * 
- * Y表示行位置
- * 表示する行番号を指定します。
- * 
- * X座標（相対）
- * X表示列位置からのX方向の座標を指定します。
- * 
- * Y座標（相対）
- * Y表示列位置からのY方向の座標を指定します。
- * 
- * 項目横幅
- * 表示項目全体の横幅を指定します。サイドビューアクター、レベル、アクター名、クラス名、二つ名は１キャラ毎の横幅を指定します。
- * 
- * システム項目横幅
- * システム文字の横幅を指定します。
- * 
- * システム項目文字色
- * システム文字の文字色をシステムカラーまたはカラーコードで記入します。
- * 
- * フォントサイズ
- * フォントサイズをメインフォントからの差で変更します。
- * 
- * 名称
- * 項目の名称を設定します。
- * 
- * 評価式
- * 評価式を記入します。
- * 
- * 文字揃え
- * 文字揃えを指定します。TextExはタイトル、章、行動目標でのみ指定できます。
- * 
  * 
  * drawTextEx表示はプラグインパラメータのフォントサイズが適用されません。
  * テキストに\FS[x]で設定してください。
@@ -72,8 +40,21 @@
  * オートセーブ時のスナップショットは戦闘開始直前のマップ、移動直前のマップが撮影されます。
  * 
  * スナップショットを表示するとセーブ容量が大きります。
- * アツマールで公開する場合は最大セーブ数を減らすこと推奨いたします。
  * 
+ * コンテンツ背景の設定(NUUN_Base ver.1.6.2以降)
+ * 各セーブのコンテンツ背景に画像を設定できます。
+ * 通常はリスト番号1番の背景が表示されます。
+ * 2番以降はマップ毎でコンテンツ背景を変更したい場合に使用します。
+ * プラグインコマンドでの変更は直接ファイルを指定します。
+ * 
+ * コンテンツ背景の画像の原点位置及び、拡大率はプラグインパラメータのコンテンツ背景画像設定で行います。
+ * コンテンツ背景に設定された画像を同じ名前の画像が表示されるとき、設定された原点、拡大率が適用されます。
+ * 設定されていない場合は原点0,0、拡大率100%で適用されます。
+ * 
+ * マップの設定のメモ欄
+ * <SaveContentsBackImg:[filename]> コンテンツ背景の画像を指定します。このタグが設定されているマップは、プラグインパラメータ及びプラグインコマンドで
+ * 設定された画像は適用されずマップに設定された画像が適用されます。
+ * [filename]:コンテンツ背景画像のリスト番号
  * 
  * Ver.1.3.0からNUUN_Base Ver.1.1.3以降が必要となります。
  * 
@@ -81,6 +62,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/12/30 Ver.2.1.0
+ * セーブファイルの表示に列数を設定できる機能を追加。
+ * コンテンツ背景画像をマップ毎に指定できる機能を追加。
  * 2022/11/5 Ver.2.0.1
  * 顔グラの拡大率を変更したときに各顔グラの間に余白ができてしまう問題を修正。
  * 2022/9/24 Ver.2.0.0
@@ -234,11 +218,28 @@
  * @default ["{\"DateSelect\":\"50\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"23\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"60\",\"ItemWidth\":\"48\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-12\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"right\\\"\"}","{\"DateSelect\":\"10\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"2\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-4\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"12\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"230\",\"Y_Coordinate\":\"2\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"TextEx\\\"\"}","{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"230\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"520\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"現在地\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"230\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"プレイ時間\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"4\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"500\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"所持金\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}"]
  * @parent SaveFileWindow
  * 
+ * @param NumSaveCols
+ * @desc 画面に表示するセーブ列数
+ * @text 表示セーブ列数
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent SaveFileWindow
+ * 
  * @param NumSaveRows
- * @desc 画面に表示するセーブ数
- * @text 表示セーブ数
+ * @desc 画面に表示するセーブ行数
+ * @text 表示セーブ行数
  * @type number
  * @default 5
+ * @min 1
+ * @parent SaveFileWindow
+ * 
+ * @param SaveContentsCols
+ * @desc 画面に表示するセーブの項目列数
+ * @text 表示セーブ項目列数
+ * @type number
+ * @default 2
+ * @min 1
  * @parent SaveFileWindow
  * 
  * @param MaxSave
@@ -246,6 +247,7 @@
  * @text 最大セーブ数
  * @type number
  * @default 20
+ * @min 1
  * @parent SaveFileWindow
  * 
  * @param Contents
@@ -419,12 +421,27 @@
  * @parent BackGround
  * 
  * @param ContentsBackGroundImg
- * @desc コンテンツ背景画像ファイル名を指定します。(複数指定可能)
+ * @desc コンテンツ背景画像ファイル名を指定します。
  * @text コンテンツ背景画像
- * @type file
+ * @type file[]
  * @dir img/
+ * @default []
+ * @parent BackGround
+ * 
+ * @param ContentsBackSettingsList
+ * @desc コンテンツ背景の画像設定を行います。
+ * @text コンテンツ背景画像設定
+ * @type struct<ContentsBackSettings>[]
  * @default 
  * @parent BackGround
+ * 
+ * @param ContentsBackScale
+ * @desc デフォルトのコンテンツ背景画像の拡大率(百分率)
+ * @text コンテンツ背景画像拡大率(百分率)
+ * @type number
+ * @min 0
+ * @default 100
+ * 
  * 
  */
 /*~struct~ContentsListData:
@@ -567,6 +584,40 @@
  * @default "left"
  * 
  */
+/*~struct~ContentsBackSettings:
+ * 
+ * @param ContentsBackGroundImg
+ * @desc コンテンツ背景画像ファイル名を指定します。
+ * @text コンテンツ背景画像
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * @param Img_SX
+ * @desc 画像の表示開始座標X。
+ * @text 画像表示開始座標X
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Img_SY
+ * @desc 画像の表示開始座標Y
+ * @text 画像表示開始座標Y
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Scale
+ * @desc コンテンツ背景画像の拡大率(百分率)
+ * @text コンテンツ背景画像拡大率(百分率)
+ * @type number
+ * @min 0
+ * @default 100
+ * 
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_SaveScreen = true;
@@ -581,7 +632,9 @@ Imported.NUUN_SaveScreen = true;
   const FaceWidth = Number(parameters['FaceWidth'] || 144);
   const FaceHeight = Number(parameters['FaceHeight'] || 144);
   const FaceScale = Number(parameters['FaceScale'] || 100);
+  const NumSaveCols = Number(parameters['NumSaveCols'] || 1);
   const NumSaveRows = Number(parameters['NumSaveRows'] || 5);
+  const SaveContentsCols = Number(parameters['SaveContentsCols'] || 2);
   const MaxSave = Number(parameters['MaxSave'] || 20);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
   const InfoSaveSnap = eval(parameters['InfoSaveSnap'] || "true");
@@ -589,8 +642,10 @@ Imported.NUUN_SaveScreen = true;
   const SaveSnapScale = Number(parameters['SaveSnapScale'] || 15);
   const DayTime = String(parameters['DayTime']);
   const BackGroundImg = String(parameters['BackGroundImg']);
-  const ContentsBackGroundImg = String(parameters['ContentsBackGroundImg'])
+  const ContentsBackGroundImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsBackGroundImg'])) : null) || [];
+  const ContentsBackSettingsList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsBackSettingsList'])) : null) || [];
   const ContentsList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentsList'])) : null) || [];
+  const ContentsBackScale = Number(parameters['ContentsBackScale'] || 100);
   const CharacterSpecifyActorOnry = eval(parameters['CharacterSpecifyActorOnry'] || "false");
   const FaceSpecifyActorOnry = eval(parameters['FaceSpecifyActorOnry'] || "false");
   const SvSpecifyActorOnry = eval(parameters['SvSpecifyActorOnry'] || "false");
@@ -629,6 +684,10 @@ Imported.NUUN_SaveScreen = true;
     $gameParty.setSaveFileSpecifyActorOnry(Number(args.ActorId));
   });
 
+  function getSaveContentsBuckgroundImg() {
+    return !!$dataMap && $dataMap.meta.SaveContentsBackImg ?  ContentsBackGroundImg[Number($dataMap.meta.SaveContentsBackImg) - 1] : $gameSystem.saveContentsBuckgroundImg;
+  }
+
 
   const _DataManager_loadSavefileImages = DataManager.loadSavefileImages;
   DataManager.loadSavefileImages = function(info) {
@@ -658,7 +717,7 @@ Imported.NUUN_SaveScreen = true;
     const info = _DataManager_makeSavefileInfo.call(this);
     this.setPartyData(info);
     info.background = $gameSystem.saveBuckgroundImg;
-    info.contentsBuck = $gameSystem.saveContentsBuckgroundImg;
+    info.contentsBuck = getSaveContentsBuckgroundImg();
     info.mapname = !!$dataMap ? $gameMap.displayName() : '';
     info.gold = $gameParty._gold;
     if (Imported.NUUN_Chapter) {
@@ -671,7 +730,6 @@ Imported.NUUN_SaveScreen = true;
     }
     this.setOrgParams(info);
     this.loadSnap(info);
-    console.log(info)
     return info;
   };
 
@@ -887,8 +945,12 @@ Imported.NUUN_SaveScreen = true;
     this._contentsBackVisible = ContentsBackVisible;
   };
 
+  Window_SavefileList.prototype.maxCols = function() {
+    return NumSaveCols;
+  };
+
   Window_SavefileList.prototype.maxContentsCols = function() {
-    return 2;
+    return SaveContentsCols;
   };
 
   Window_SavefileList.prototype.lineHeight = function() {
@@ -904,22 +966,36 @@ Imported.NUUN_SaveScreen = true;
   Window_SavefileList.prototype.drawItemBackground = function(index) {
     const savefileId = this.indexToSavefileId(index);
     const info = DataManager.savefileInfo(savefileId);
-    const buckgroundImg = info && !!info.contentsBuck ? info.contentsBuck : ContentsBackGroundImg;
+    const buckgroundImg = info && !!info.contentsBuck ? info.contentsBuck : null;
     if (buckgroundImg) {
       const bitmap = ImageManager.nuun_LoadPictures(buckgroundImg);
       if (bitmap && !bitmap.isReady()) {
-        bitmap.addLoadListener(this.drawContentsBack.bind(this, bitmap, index));
+        bitmap.addLoadListener(this.drawContentsBack.bind(this, bitmap, index, buckgroundImg));
       } else {
-        this.drawContentsBack(bitmap, index);
+        this.drawContentsBack(bitmap, index, buckgroundImg);
       }
     } else {
       _Window_SavefileList_drawItemBackground.call(this, index);
     }
   };
 
-  Window_SavefileList.prototype.drawContentsBack = function(bitmap, index) {
+  Window_SavefileList.prototype.drawContentsBack = function(bitmap, index , buckgroundImg) {
+    const data = ContentsBackSettingsList.find(imgData => buckgroundImg === imgData.ContentsBackGroundImg);
+    let sx = 0;
+    let sy = 0;
+    let scale = ContentsBackScale;
+    if (data) {
+      sx = data.Img_SX;
+      sy = data.Img_SY;
+      scale = data.Scale;
+    }
     const rect = this.itemRect(index);
-    this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+    try {
+      this.contentsBack.nuun_contentsBackBlt(bitmap, sx, sy, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, scale, true);
+    } catch (e) {
+      const log = $gameSystem.isJapanese() ? 'NUUN_BaseがVer.1.6.2以降ではありません。' : "'NUUN_Base' is not Ver.1.6.2 or later.";
+      throw ["LoadError", log];
+    }
   };
 
   Window_SavefileList.prototype.drawItem = function(index) {
@@ -937,16 +1013,17 @@ Imported.NUUN_SaveScreen = true;
     const itemWidth = this.itemContentsWidth(rect.width);
     ContentsList.forEach((data, r) => {
       this.resetFontSettings();
-      const position = Math.min(data.X_Position, this.maxContentsCols());
-      const x = rect.x + data.X_Coordinate + (itemWidth + colSpacing) * (position - 1);
-      const y = rect.y + data.Y_Coordinate + lineHeight * (data.Y_Position - 1);
-      const width = Math.min((data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : this.widthMode(data.WideMode, itemWidth)) - colSpacing / 2, rect.width - x);
+      const x_Position = data.X_Position;
+      const y_Position = data.Y_Position;
+      const position = Math.min(x_Position, this.maxContentsCols());
+      const x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1);
+      const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
+      const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : this.widthMode(data, itemWidth), rect.width - x);
       if (info) {
-        this.drawContentsBase(info, x, y, width, data, savefileId, r);
+        this.drawContentsBase(info, x + rect.x , y, width, data, savefileId, r);
       } else {
-        this.drawContentsNotData(info, x, y, width, data, savefileId, r);
+        this.drawContentsNotData(info, x + rect.x, y, width, data, savefileId, r);
       }
-      
     });
   };
 
@@ -1270,7 +1347,6 @@ Imported.NUUN_SaveScreen = true;
       const textWidth = this.textWidth(TextManager.levelA);
       const padding = this.itemPadding();
       const colSpacing = this.colSpacing();
-      width += colSpacing / 2;
       if (LevelSpecifyActorOnry) {
         this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
         this.drawText(TextManager.levelA, x, y, textWidth);
@@ -1284,7 +1360,7 @@ Imported.NUUN_SaveScreen = true;
           this.drawText(TextManager.levelA, levelActorX + padding / 4, y, textWidth);
           this.resetTextColor();
           this.resetTextColor();
-          this.drawText(name, levelActorX + textWidth + padding , y, width - (textWidth + padding), data.Align);
+          this.drawText(name, levelActorX + textWidth + padding / 2, y, width - (textWidth + padding), data.Align);
           levelActorX += width;
         }
       }
@@ -1321,7 +1397,7 @@ Imported.NUUN_SaveScreen = true;
   Game_System.prototype.initialize = function() {
     _Game_System_initialize.call(this);
     this.saveBuckgroundImg = [BackGroundImg, 0];
-    this.saveContentsBuckgroundImg = ContentsBackGroundImg;
+    this.saveContentsBuckgroundImg = ContentsBackGroundImg[0];
     this.onSnap = false;
   };
 
@@ -1340,7 +1416,7 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Game_System.prototype.setSaveContentsBuckGround = function(img) {
-    this.saveContentsBuckgroundImg = img ? img : ContentsBackGroundImg;
+    this.saveContentsBuckgroundImg = img ? img : ContentsBackGroundImg[0];
   };
 
   const _Game_Party_initialize = Game_Party.prototype.initialize;

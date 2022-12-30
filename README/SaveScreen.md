@@ -8,7 +8,7 @@
 セーブ画面をカスタマイズできます。　　
 
 ![画像](img/NUUN_SaveScreen1.png)  
-![画像](img/NUUN_SaveScreen2.png)  
+![画像](img/SaveScreen2.png)  
 
 ## 設定
 セーブ画面に表示する項目を設定するにはプラグインパラメータの表示項目から設定します。  

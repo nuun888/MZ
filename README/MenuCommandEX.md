@@ -1,4 +1,4 @@
-# [メニューコマンド表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEXl.js)
+# [メニューコマンド表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
 #### 必須、前提プラグイン

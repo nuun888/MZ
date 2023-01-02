@@ -14,3 +14,5 @@
 ![画像](img/MenuCommandEX1.png)   
 
 ## 更新履歴
+2023/1/3 Ver.1.0.0  
+初版。  

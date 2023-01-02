@@ -190,6 +190,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [メニュー画面デフォルトタイプ](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md) | [NUUN_MenuScreen_default](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js) | 共 立対 | 2.0.0 |
 | [メニュー画面タイプ１](https://github.com/nuun888/MZ/blob/master/README/MenuScreen.md) | [NUUN_MenuScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js) | 共(Ver.1.4.1以降) 立対 | 2.0.0 |
 | [メニュー画面タイプ２](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_2.md) | [NUUN_MenuScreen_2](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js) | 共(Ver.1.4.1以降) 立対 | 2.0.0 |
+| ┗[メニューコマンド表示拡張](https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md) |  | 共 | 1.0.0 |
 | [行動目標表示](https://github.com/nuun888/MZ/blob/master/README/Destination.md) | [NUUN_Destination](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Destination.js) | 共 | 1.0.2 |
 | [チャプターテキスト](https://github.com/nuun888/MZ/blob/master/README/Chapter.md) | [NUUN_Chaptern](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Chapter.js) | 共 | 1.0.0 |
 | [ウィンドウスキン個別設定](https://github.com/nuun888/MZ/blob/master/README/WindowSkinIndividual.md) | [NUUN_WindowSkinIndividual](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_WindowSkinIndividual.js) | 共 | 1.0.0 |

@@ -1,5 +1,5 @@
 # [メニューコマンド表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
 #### 必須、前提プラグイン
 ※[メニュー画面デフォルトタイプ](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)   
@@ -14,5 +14,7 @@
 ![画像](img/MenuCommandEX1.png)   
 
 ## 更新履歴
+2023/1/3 Ver.1.0.1  
+コマンドのソート機能を追加。  
 2023/1/3 Ver.1.0.0  
 初版。  

@@ -14,7 +14,7 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/3/2023 Ver.1.0.1
+ * Added command sort function.
  * 1/3/2023 Ver.1.0.0
  * First edition.
  * 
@@ -75,6 +77,12 @@
  * @param HideCommandName
  * @text Hide command name
  * @desc Do not display command names.
+ * @type boolean
+ * @default false
+ * 
+ * @param CommandSort
+ * @text Command sort enabled
+ * @desc Display commands in order of setting.
  * @type boolean
  * @default false
  * 
@@ -158,7 +166,7 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
@@ -169,6 +177,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/3 Ver.1.0.1
+ * コマンドのソート機能を追加。
  * 2023/1/3 Ver.1.0.0
  * 初版。
  * 
@@ -220,6 +230,12 @@
  * @param HideCommandName
  * @text コマンド名非表示
  * @desc コマンド名を表示させません。
+ * @type boolean
+ * @default false
+ * 
+ * @param CommandSort
+ * @text コマンドソート有効
+ * @desc コマンドを設定順に表示させます。
  * @type boolean
  * @default false
  * 
@@ -309,6 +325,7 @@ Imported.NUUN_MenuCommandEX = true;
     const SelectContentsDuration = Number(parameters['SelectContentsDuration'] || 30);
     const SelectOFFFlash = eval(parameters['SelectOnFlash'] || "false");
     const HideCommandName = eval(parameters['HideCommandName'] || "false");
+    const CommandSort = eval(parameters['CommandSort'] || "false");
 
     const _Window_MenuCommand_initialize = Window_MenuCommand.prototype.initialize;
     Window_MenuCommand.prototype.initialize = function(rect) {
@@ -338,35 +355,46 @@ Imported.NUUN_MenuCommandEX = true;
 
     Window_MenuCommand.prototype.select = function(index) {
         Window_Selectable.prototype.select.call(this, index);
-        this.moveCommand(index);
-        this.refresh();
-    };
-
-    Window_MenuCommand.prototype.select = function(index) {
-        Window_Selectable.prototype.select.call(this, index);
         this.refresh();
     };
 
     const _Window_MenuCommand_makeCommandList = Window_MenuCommand.prototype.makeCommandList;
         Window_MenuCommand.prototype.makeCommandList = function() {
         _Window_MenuCommand_makeCommandList.call(this);
-        this.refreshCommandList();
+        //this.refreshCommandList();
     };
 
     Window_MenuCommand.prototype.refreshCommandList = function() {
+        const newList = [];
+        const normalList = [];
         this._list.forEach((data, index) => {
             const find = MenuCommandSetting.findIndex(command => command.CommandName === data.name);
             data.commandEXId = find;
+            if (CommandSort) {
+                if (find >= 0) {
+                    newList[find] = data;
+                } else {
+                    normalList.push(data);
+                }
+            }
             if (!this._commandSprite[index]) {
-                const sprite = new Sprite_MenuCommand(this.menuCommandExData(index), data, this);
+                const sprite = new Sprite_MenuCommand(this.menuCommandExData(index));
                 this._contentsBackSprite.addChild(sprite);
                 this._commandSprite[index] = sprite;
             }
             if (this._commandSprite[index]) {
                 const rect = this.itemRect(index);
-                this._commandSprite[index].setup(rect.x, rect.y, this.menuCommandExData(index))
+                this._commandSprite[index].setup(rect.x, rect.y, this.menuCommandExData(index));
             }
         });
+        if (CommandSort) {
+            this._list = newList.concat(normalList).filter(list => !!list);
+        }
+    };
+
+    Window_MenuCommand.prototype.paint = function() {
+        this.refreshCommandList();
+        Window_Selectable.prototype.paint.call(this);
     };
 
     Window_MenuCommand.prototype.hideGaugeSprite = function() {
@@ -408,7 +436,7 @@ Imported.NUUN_MenuCommandEX = true;
     Window_MenuCommand.prototype.drawContentsItemImg = function(bitmap, data, index) {
         const rect = this.itemRect(index);
         this.changePaintOpacity(this.isCommandEnabled(index));
-        this.contents.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + data.CommandImgX || 0, rect.y + data.CommandImgY || 0);
+        this.contents.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + (data.CommandImgX || 0), rect.y + (data.CommandImgY || 0));
     };
 
     Window_MenuCommand.prototype.drawItemBackground = function(index) {
@@ -451,9 +479,9 @@ Imported.NUUN_MenuCommandEX = true;
     Sprite_MenuCommand.prototype = Object.create(Sprite.prototype);
     Sprite_MenuCommand.prototype.constructor = Sprite_MenuCommand;
     
-    Sprite_MenuCommand.prototype.initialize = function() {
+    Sprite_MenuCommand.prototype.initialize = function(data) {
         Sprite.prototype.initialize.call(this);
-        this._data = null;
+        this._data = data;
         this.backgroundImgSprite = null;
         this._duration = 0;
         this._flashColor = [0, 0, 0, 0];
@@ -468,11 +496,11 @@ Imported.NUUN_MenuCommandEX = true;
     };
     
     Sprite_MenuCommand.prototype.bitmapWidth = function() {
-        return ContentsWidth;
+        return this._data && this._data.ContentsWidth > 0 ? this._data.ContentsWidth : ContentsWidth;
     };
     
     Sprite_MenuCommand.prototype.bitmapHeight = function() {
-        return ContentsHeight;
+        return this._data && this._data.ContentsHeight > 0 ? this._data.ContentsHeight : ContentsHeight;
     };
 
     Sprite_MenuCommand.prototype.setup = function(x, y, data) {
@@ -567,32 +595,5 @@ Imported.NUUN_MenuCommandEX = true;
             }
         }
     };
-
-    return
-    Window_MenuCommand.prototype.refreshCommandList = function() {
-        const list = this._list;
-        const newList = [];
-        const normalList = [];
-        list.forEach((data, index) => {
-            const find = MenuCommandSetting.findIndex(command => command.CommandName === data.name);
-            if (find >= 0) {
-                data.commandEXId = find;
-                newList.push(data);
-            } else {
-                data.commandEXId = -1;
-                normalList.push(data);
-            }
-            if (!this._commandSprite[index]) {
-                const sprite = new Sprite_MenuCommand();
-                this._commandSprite[index] = sprite;
-            }
-            if (this._commandSprite[index]) {
-                this._commandSprite[index].setup(x, y, data)
-            }
-        })
-        this._list = newList.concat(normalList);
-    };
-
-    
     
 })();

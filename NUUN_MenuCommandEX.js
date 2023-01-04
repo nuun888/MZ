@@ -14,16 +14,17 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
- * Set below other menu plug-ins.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/4/2023 Ver.1.1.0
+ * Added a function to adjust the width, height and coordinates of each content background image for each command.
  * 1/3/2023 Ver.1.0.1
  * Added command sort function.
  * 1/3/2023 Ver.1.0.0
@@ -86,6 +87,12 @@
  * @type boolean
  * @default false
  * 
+ * @param CommandZeroPosition
+ * @text command coordinate 0
+ * @desc Makes all command coordinates from the index origin to the upper left origin of the window.
+ * @type boolean
+ * @default false
+ * 
  */
 /*~struct~MenuCommandList:
  * 
@@ -93,6 +100,12 @@
  * @text Command name
  * @desc Specifies the name of the command to apply.
  * @type string
+ * @default
+ * 
+ * @param CommandSymbol
+ * @text Symbol name
+ * @desc Specifies the command symbol name to apply.
+ * @type combo
  * @default
  * 
  * @param ContentsX
@@ -129,13 +142,39 @@
  * @default 
  * @parent ContentsBackSetting
  * 
+ * @param ContentsImgX
+ * @desc X coordinate of command background image. (relative)
+ * @text Command background image X coordinate
+ * @type number
+ * @min -9999
+ * @default 0
+ * 
+ * @param ContentsImgY
+ * @desc Y coordinate of command background image. (relative)
+ * @text Command background image Y coordinate
+ * @type number
+ * @min -9999
+ * @default 0
+ * 
+ * @param ContentsWidth
+ * @desc Content width for each command.
+ * @text Content width
+ * @type number
+ * @default 0
+ * 
+ * @param ContentsHeight
+ * @desc Content height for each command.
+ * @text Content height
+ * @type number
+ * @default 0
+ * 
  * @param CommandImgSetting
  * @text Command image setting
  * @default ------------------------------
  * 
  * @param CommandImg
  * @desc Specifies the command image file name.
- * @text Command background image
+ * @text Command image
  * @type file
  * @dir img/
  * @default 
@@ -166,17 +205,17 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
- * 他のメニュー系プラグインよりも下に設定してください。
- * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/4 Ver.1.1.0
+ * コマンド毎に横幅、高さ及び各コンテンツ背景画像の座標を調整できる機能を追加。
  * 2023/1/3 Ver.1.0.1
  * コマンドのソート機能を追加。
  * 2023/1/3 Ver.1.0.0
@@ -239,6 +278,12 @@
  * @type boolean
  * @default false
  * 
+ * @param CommandZeroPosition
+ * @text コマンド座標0
+ * @desc 全てのコマンド座標をインデックス起点からウィンドウ左上起点にします。
+ * @type boolean
+ * @default false
+ * 
  */
 /*~struct~MenuCommandList:ja
  * 
@@ -246,6 +291,12 @@
  * @text コマンド名
  * @desc 適用させるコマンド名を指定します。
  * @type string
+ * @default
+ * 
+ * @param CommandSymbol
+ * @text シンボル名
+ * @desc 適用させるコマンドシンボル名を指定します。
+ * @type combo
  * @default
  * 
  * @param ContentsX
@@ -282,13 +333,39 @@
  * @default 
  * @parent ContentsBackSetting
  * 
+ * @param ContentsImgX
+ * @desc コマンド背景画像のX座標。(相対)
+ * @text コマンド背景画像X座標
+ * @type number
+ * @min -9999
+ * @default 0
+ * 
+ * @param ContentsImgY
+ * @desc コマンド背景画像のY座標。(相対)
+ * @text コマンド背景画像Y座標
+ * @type number
+ * @min -9999
+ * @default 0
+ * 
+ * @param ContentsWidth
+ * @desc コマンド毎のコンテンツ横幅。
+ * @text 横幅
+ * @type number
+ * @default 0
+ * 
+ * @param ContentsHeight
+ * @desc コマンド毎のコンテンツ縦幅。
+ * @text 縦幅
+ * @type number
+ * @default 0
+ * 
  * @param CommandImgSetting
  * @text コマンド画像設定
  * @default ------------------------------
  * 
  * @param CommandImg
  * @desc コマンド画像ファイル名を指定します。
- * @text コマンド背景画像
+ * @text コマンド画像
  * @type file
  * @dir img/
  * @default 
@@ -326,6 +403,7 @@ Imported.NUUN_MenuCommandEX = true;
     const SelectOFFFlash = eval(parameters['SelectOnFlash'] || "false");
     const HideCommandName = eval(parameters['HideCommandName'] || "false");
     const CommandSort = eval(parameters['CommandSort'] || "false");
+    const CommandZeroPosition = eval(parameters['CommandZeroPosition'] || "false");
 
     const _Window_MenuCommand_initialize = Window_MenuCommand.prototype.initialize;
     Window_MenuCommand.prototype.initialize = function(rect) {
@@ -368,7 +446,7 @@ Imported.NUUN_MenuCommandEX = true;
         const newList = [];
         const normalList = [];
         this._list.forEach((data, index) => {
-            const find = MenuCommandSetting.findIndex(command => command.CommandName === data.name);
+            const find = MenuCommandSetting.findIndex(command => command.CommandName === data.name || command.CommandSymbol === data.symbol);
             data.commandEXId = find;
             if (CommandSort) {
                 if (find >= 0) {
@@ -392,9 +470,13 @@ Imported.NUUN_MenuCommandEX = true;
         }
     };
 
-    Window_MenuCommand.prototype.paint = function() {
-        this.refreshCommandList();
-        Window_Selectable.prototype.paint.call(this);
+    const _Window_Selectable_paint = Window_Selectable.prototype.paint;
+    Window_Selectable.prototype.paint = function() {
+        const className = String(this.constructor.name);
+        if (className === 'Window_MenuCommand') {
+            this.refreshCommandList();
+        }
+        _Window_Selectable_paint.call(this);
     };
 
     Window_MenuCommand.prototype.hideGaugeSprite = function() {
@@ -407,8 +489,10 @@ Imported.NUUN_MenuCommandEX = true;
         const rect = Window_Selectable.prototype.itemRect.call(this, index);
         const data = this.menuCommandExData(index);
         if (data) {
-            rect.x += data.ContentsX;
-            rect.y += data.ContentsY;
+            rect.x = (CommandZeroPosition ? 0 : rect.x) + data.ContentsX;
+            rect.y = (CommandZeroPosition ? 0 : rect.y) + data.ContentsY;
+            rect.width = data.ContentsWidth > 0 ? data.ContentsWidth - this.colSpacing() : rect.width;
+            rect.height = data.ContentsHeight > 0 ? data.ContentsHeight - this.rowSpacing() : rect.height;
         }
         return rect;
     };
@@ -523,6 +607,8 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     Sprite_MenuCommand.prototype.setPosition = function(x, y) {
+        x += (this._data ? this._data.ContentsImgX : 0) || 0;
+        y += (this._data ? this._data.ContentsImgY : 0) || 0;
         this._homeX = x;
         this._homeY = y;
         this.x = x;

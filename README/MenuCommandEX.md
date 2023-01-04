@@ -1,5 +1,5 @@
 # [メニューコマンド表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
-# Ver.1.0.1
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
 #### 必須、前提プラグイン
 ※[メニュー画面デフォルトタイプ](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)   
@@ -10,10 +10,12 @@
 ※は一つ選択  
 
 メニューコマンドに任意の背景画像、コマンド画像、任意の座標に表示することができます。  
-他のメニュー系プラグインよりも下に設定してください。  
+  
 ![画像](img/MenuCommandEX1.png)   
 
 ## 更新履歴
+2023/1/4 Ver.1.1.0  
+コマンド毎に横幅、高さ及び各コンテンツ背景画像の座標を調整できる機能を追加。  
 2023/1/3 Ver.1.0.1  
 コマンドのソート機能を追加。  
 2023/1/3 Ver.1.0.0  

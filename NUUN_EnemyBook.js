@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.7
+ * @version 2.17.8
  * 
  * @help
  * Implement an enemy book.
@@ -200,6 +200,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/5/2023 Ver.2.17.8
+ * Fixed an issue where monsters before transformation were not counted as defeated and monsters after transformation were double counted as defeated.
  * 12/17/2022 Ver.2.17.7
  * Fixed processing when adding enemy actions with external plugins.
  * 12/17/2022 Ver.2.17.6
@@ -2705,7 +2707,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.6
+ * @version 2.17.8
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2897,6 +2899,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/5 Ver.2.17.8
+ * 変身前のモンスターが撃破カウントされずに変身後のモンスターが2重に撃破カウントされてしまう問題を修正。
  * 2022/12/25 Ver.2.17.7
  * 外部プラグインで敵の行動を追加したときの処理を修正。
  * 2022/12/17 Ver.2.17.6
@@ -6593,8 +6597,8 @@ Game_BattlerBase.prototype.die = function() {
 };
 
 //Game_Enemy
-const _Game_Enemy_transform = Game_Enemy.prototype.transform;
-Game_Enemy.prototype.transform = function(enemyId) {
+Game_Enemy.prototype.enemybookTransform = function() {
+    const enemyId = this.enemyId();
     if (TransformDefeat && !this.enemy().meta.NoTransformInData) {
         $gameSystem.defeatCount(enemyId);
         if ($gameSystem.registrationStatusNoTransform()) {
@@ -6604,6 +6608,10 @@ Game_Enemy.prototype.transform = function(enemyId) {
             $gameSystem.addStatusToEnemyBook(enemyId);
         }
     }
+};
+
+const _Game_Enemy_transform = Game_Enemy.prototype.transform;
+Game_Enemy.prototype.transform = function(enemyId) {
     _Game_Enemy_transform.call(this, enemyId);
     if ($gameSystem.registrationTiming(0)) {
         $gameSystem.addToEnemyBook(enemyId);
@@ -6714,6 +6722,14 @@ const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
 Game_ActionResult.prototype.clear = function() {
     _Game_ActionResult_clear.call(this);
     this.analyzeSkill = false;
+};
+
+const _Game_Interpreter_command336 = Game_Interpreter.prototype.command336;
+Game_Interpreter.prototype.command336 = function(params) {
+    this.iterateEnemyIndex(params[0], enemy => {
+        enemy.enemybookTransform();
+    });
+    return _Game_Interpreter_command336.call(this, params);
 };
 
 //Scene_Menu
@@ -8409,7 +8425,7 @@ Window_EnemyBook.prototype.showStealItemMask = function(MaskMode) {
 };
   
 Window_EnemyBook.prototype.stealItemFlag = function(index) {
-    return param.ShowStealItemName ? $gameSystem.getStealItemFlag(this._enemy.id, index) : true;
+    return ShowStealItemName ? $gameSystem.getStealItemFlag(this._enemy.id, index) : true;
 };
 
 Window_EnemyBook.prototype.condDropItemFlag = function(index) {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.4.4
+ * @version 1.4.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -95,6 +95,13 @@
  * [y]:y座標(相対)
  * 複数画像を指定したい場合は項目リストで表示する分だけ設定し、記述欄、個別指定画像タグ名で別々の名前で設定してください。
  * 
+ * アイテム、武器、防具の個別画像を表示
+ * アイテム、武器、防具のメモ欄
+ * <[tag]:[FailName]> 画像を表示します。
+ * [tag]:記述欄、個別指定画像タグ名で設定したタグ名
+ * [FailName]:img/[個別指定画像フォルダで指定したフォルダ名]直下のPNGファイル(拡張子なし)
+ * (デフォルトではimg/pictures)
+ * 
  * アイテムに独自のカテゴリーを設定
  * アイテム、武器、防具のメモ欄
  * <[categorytag]:[categorykey]> 表示するアイテムのカテゴリーを記入します。
@@ -108,8 +115,11 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
- * 2022/7/24 Ver.1.4.4  
- * プリセットデータで武器、防具がデフォルトでは表示されないためプリセットデータを修正。  
+ * 2023/1/7 Ver.1.4.5
+ * 項目設定のオリジナルパラメータの仕様を変更。(要オリジナルパラメータのみ再設定)
+ * 処理の修正。
+ * 2022/7/24 Ver.1.4.4
+ * 武器、防具が表示されない問題を修正。
  * 2022/2/3 Ver.1.4.3
  * アイテムのリストの表示がおかしくなる問題を修正。
  * 2021/12/12 Ver.1.4.2
@@ -628,7 +638,8 @@
  * @param DetaEval
  * @desc パラメータ評価式を設定します。
  * @text パラメータ評価式(1)
- * @type string
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
  * @default 
  * @parent BasicSetting
  * 
@@ -834,7 +845,8 @@
  * @param DetaEval
  * @desc パラメータ評価式を設定します。
  * @text パラメータ評価式(1)
- * @type string
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
  * @default 
  * @parent BasicSetting
  * 
@@ -1040,7 +1052,8 @@
  * @param DetaEval
  * @desc パラメータ評価式を設定します。
  * @text パラメータ評価式(1)
- * @type string
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
  * @default 
  * @parent BasicSetting
  * 
@@ -2323,6 +2336,7 @@ Window_ItemBook.prototype.constructor = Window_ItemBook;
 Window_ItemBook.prototype.initialize = function(rect) {
   //this._userWindowSkin = param.ContentWindowsSkin;
   Window_Selectable.prototype.initialize.call(this, rect);
+  this.language_Jp = $gameSystem.isJapanese();
   this._additionalSprites = {};
   this._item = null;
   this._itemData = [];
@@ -2379,7 +2393,8 @@ Window_ItemBook.prototype.getItemBitmap = function(listContent, item) {
   for (const data of listContent) {
     const commonItemBitmap = data.DateSelect === 100 && data.ImgData && data.ImgData[0] ? ImageManager.nuun_LoadPictures(data.ImgData[0]) : null;
     const itemBitmapData = data.DateSelect === 101 && item.meta[data.textMethod] ? item.meta[data.textMethod].split(',') : null;
-    const itemBitmap = itemBitmapData ? ImageManager.loadBitmap("img/"+ ImgFolder +"/", itemBitmapData[0]) : null;  
+    const itemBitmap = itemBitmapData ? ImageManager.nuun_LoadPictures(ImgFolder +"/"+ itemBitmapData[0].trim()) : null;
+    //const itemBitmap = itemBitmapData ? ImageManager.nuun_LoadPictures(ImgFolder +"/", itemBitmapData[0]) : null;  
     if (commonItemBitmap && !commonItemBitmap.isReady()) {
       bitmap = commonItemBitmap;
     } else if (itemBitmap && !itemBitmap.isReady()) {
@@ -2610,7 +2625,7 @@ Window_ItemBook.prototype.itemMaxNumberOfPossession = function(list, item, x, y,
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "最大所持数";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "最大所持数" : "Max possession");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2628,7 +2643,7 @@ Window_ItemBook.prototype.itemPrice = function(list, item, x, y, width) {
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "価格";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "価格" : "Price");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2693,7 +2708,7 @@ Window_ItemBook.prototype.useItemOccasion = function(list, item, x, y, width) {
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "使用可能時";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "使用可能時" : "Occasion");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2711,7 +2726,7 @@ Window_ItemBook.prototype.useItemConsumable = function(list, item, x, y, width) 
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "消耗";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "消耗" : "Consume");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2729,7 +2744,7 @@ Window_ItemBook.prototype.speedCorrection = function(list, item, x, y, width) {
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "速度補正";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "速度補正" : "Speed");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2747,7 +2762,7 @@ Window_ItemBook.prototype.successRate = function(list, item, x, y, width) {
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "成功率";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "成功率" : "Success");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2765,7 +2780,7 @@ Window_ItemBook.prototype.tpGain = function(list, item, x, y, width) {
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "得TP";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "得TP" : "TP Gain");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2801,7 +2816,7 @@ Window_ItemBook.prototype.weaponType = function(list, item, x, y, width) {
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "武器タイプ";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "武器タイプ" : "Weapon type");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2820,7 +2835,7 @@ Window_ItemBook.prototype.armorType = function(list, item, x, y, width) {
   
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "防具タイプ";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "防具タイプ" : "Armmor type");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2838,7 +2853,7 @@ Window_ItemBook.prototype.equipType = function(list, item, x, y, width) {
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : "装備タイプ";
+  const nameText = list.paramName ? list.paramName : (this.language_Jp ? "装備タイプ" : "Equipment type");
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2863,7 +2878,8 @@ Window_ItemBook.prototype.commonItemBitmap = function(list, item, x, y, width) {
 Window_ItemBook.prototype.itemBitmap = function(list, item, x, y, width) {
   const dataImg = item.meta[list.textMethod] ? item.meta[list.textMethod].split(',') : null;
   if (dataImg) {
-    const bitmap = ImageManager.loadBitmap("img/"+ ImgFolder +"/", dataImg[0]);
+    //const bitmap = ImageManager.loadBitmap("img/"+ ImgFolder +"/", dataImg[0]);
+    const bitmap = ImageManager.nuun_LoadPictures(ImgFolder +"/"+ dataImg[0].trim());
     x += Number(dataImg[1]) || 0;
     y += Number(dataImg[2]) || 0;
     if (!bitmap.isReady()) {

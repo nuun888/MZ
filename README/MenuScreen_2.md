@@ -2,8 +2,8 @@
 # Ver.2.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 #### 必須、前提プラグイン
-[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.5  
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.0以降  
+[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.6  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.2以降  
 #### オプション
 全体選択時カーソル修正  
 ※アクター表示列が２列以上でかつ表示行が２行以上の場合は、以下のプラグインが必要です。  

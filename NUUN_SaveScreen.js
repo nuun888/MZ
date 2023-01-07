@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.1.0
+ * @version 2.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -62,6 +62,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/7 Ver.2.1.1
+ * セーブ時に背景画像が表示されない問題を修正。
  * 2022/12/30 Ver.2.1.0
  * セーブファイルの表示に列数を設定できる機能を追加。
  * コンテンツ背景画像をマップ毎に指定できる機能を追加。
@@ -259,12 +261,12 @@
  * @text 日時フォーマット
  * @type select
  * @option 標準（年/月/日 時：分：秒）
- * @value 
+ * @value 'default'
  * @option 英表記（日/月/年 時：分：秒）
  * @value 'en-GB'
  * @option 元号表記（日表記）
  * @value 'ja-JP-u-ca-japanese'
- * @default 
+ * @default 'default'
  * @parent Contents
  * 
  * @param CharacterSpecifyActorOnry
@@ -441,6 +443,7 @@
  * @type number
  * @min 0
  * @default 100
+ * @parent BackGround
  * 
  * 
  */
@@ -1407,7 +1410,7 @@ Imported.NUUN_SaveScreen = true;
   };
 
   Game_System.prototype.getSaveBuckGround = function() {
-    this.saveBuckgroundImg = this.saveBuckgroundImg || [BackGroundImg, 0];
+    this.saveBuckgroundImg = this.saveBuckgroundImg && !!this.saveBuckgroundImg[0] ? this.saveBuckgroundImg : [BackGroundImg, 0];
     return this.saveBuckgroundImg[0];
   };
 

@@ -6,12 +6,637 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Save screen EX
+ * @author NUUN
+ * @version 2.1.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * You can customize the save screen.
+ * 
+ * Items that can be set
+ * play time,save time,location,money,original param,file name,title,chapter,destination
+ * actor name,class,nickname,level,character chip,face,sv actor, snap shot
+ * 
+ * To set the items to be displayed on the save screen, set from the display items of the plug-in parameter.
+ * 
+ * The drawTextEx display does not apply the font size of the plugin parameter.
+ * Set the text with \FS[x].
+ * 
+ * Change background image
+ * You can change the background image as the game progresses.
+ * By default, the background ID will be changed each time you change it with the plug-in command "Change background image".
+ * The background ID of the save data with the highest ID is displayed on the loading screen.
+ * 
+ * original param
+ * 
+ * 
+ * Autosave snapshot
+ * When autosaving, snapshots will be taken of the map just before the start of the battle and the map just before moving.
+ * 
+ * Content background setting (NUUN_Base ver.1.6.2 or later)
+ * You can set an image as the content background for each save.
+ * Usually, the background of list number 1 is displayed.
+ * Use the second and later when you want to change the content background for each map.
+ * Specify the file directly to change with the plug-in command.
+ * 
+ * The origin position of the content background image and the enlargement rate are set by the plug-in parameter "Content background image setting".
+ * When an image with the same name as the image set in the content background is displayed, the set origin and magnification are applied.
+ * If not set, it will be applied with the origin 0,0 and the magnification rate 100%.
+ * 
+ * Map Notes
+ * <SaveContentsBackImg:[filename]> Specifies the content background image. For maps with this tag set, the image set in the map is applied instead of the image set in the plug-in parameter and plug-in command.
+ * [filename]:list number of content background image
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 2023/1/7 Ver.2.1.2
+ * Added a function that allows you to select whether to display or hide the window image.
+ * Changed the display in languages other than Japanese to English.
+ * 2023/1/7 Ver.2.1.1
+ * Fixed the problem that the background image is not displayed when saving.
+ * 2022/12/30 Ver.2.1.0
+ * Added the ability to set the number of columns to display save files.
+ * Added a function that allows you to specify the content background image for each map.
+ * 2022/11/5 Ver.2.0.1
+ * Fixed the problem that there is a margin between each face graphic when changing the enlargement ratio of the face.
+ * 2022/9/24 Ver.2.0.0
+ * Free arrangement of all items.
+ * Fixed some bugs.
+ * 2022/7/4 Ver.1.9.0
+ * Added text display processing in ``NUUN_Chapter'' and ``NUUN_Destination''.
+ * Added a function that allows you to change the content background in the middle of the game.
+ * Fixed the problem that the font of some texts in the original parameter is not applied.
+ * 2022/5/28 Ver.1.8.5
+ * Added a function that can specify the coordinate time in the file name.
+ * Added a function that can specify coordinates, display width, and character alignment in the file name horizontal string.
+ * 2022/5/14 Ver.1.8.4
+ * Fixed the problem that the background image is not applied even if the content background image is set to OFF.
+ * Changed the specification from hiding the content background image to displaying the content background image.
+ * 2022/5/11 Ver.1.8.3
+ * Fixed an issue where the autosave did not work at the end of battle.
+ * Fixed the problem that the map shot with auto save becomes a black image when moving the map and at the end of the battle.
+ * 2022/1/5 Ver.1.8.2
+ * Fixed the problem that the name can not be obtained.
+ * Changed the original parameter setting method.
+ * 2021/12/30 Ver.1.8.1
+ * Added a function that allows you to set your own image for the content background.
+ * 2021/12/12 Ver.1.8.0
+ * Change content display settings.
+ * Fixed an issue where plugin commands were not applied.
+ * Changed the setting method of the text to be displayed next to the file name.
+ * 2021/7/16 Ver.1.7.0
+ * Added a function to display the save date and time.
+ * 2021/5/29 Ver.1.6.0
+ * Added ability to show side view actor.
+ * 2021/5/27 Ver.1.5.2
+ * Fixed screenshot handling.
+ * Removed some plugin commands.
+ * 2021/5/15 Ver.1.5.1
+ * Changed how screenshots are processed.
+ * 2021/5/14 Ver.1.5.0
+ * Added function to display saved screenshots.
+ * 2021/5/11 Ver.1.4.1
+ * Fixed the problem that an error appears when opening the save screen with save data inherited from the previous version.
+ * 2021/5/11 Ver.1.4.0
+ * Added a function that allows you to change the background image according to the progress of the game.
+ * 2021/5/8 Ver.1.3.0
+ * Added a function that can display any background image.
+ * Changed how to set the display of actor images.
+ * Changed so that Y of the level can be adjusted.
+ * Changed the Y coordinate of the actor when displaying the character chip to the relative coordinate.
+ * Added the ability to specify the number of saves that can be displayed and the maximum number that can be saved.
+ * Added the ability to hide the black background image (by default) that appears behind the content of the selection screen.
+ * 2021/1/30 Ver.1.2.1
+ * Changed how to set the content area X coordinate.
+ * 2021/1/29 Ver.1.2.0
+ * Changed to be able to specify the width, height, and magnification ratio of face.
+ * Fixed the problem that the file name is not displayed for files without save info.
+ * 2021/1/26 Ver.1.1.1
+ * Fixed the problem that the file title is hidden when displaying face.
+ * 2021/1/26 Ver.1.1.0
+ * Added a function that can display face.
+ * 2021/1/24 Ver.1.0.0
+ * First edition.
+ * 
+ * @command ChangeBackground
+ * @desc Change the background image.
+ * @text Change background image
+ * 
+ * @arg BackGroundImg
+ * @desc Specifies the background image file name.
+ * @text Background image
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * @arg BackGroundId
+ * @desc Sets the background image ID."Background image ID automatic setting" is OFF.
+ * @text Background image ID
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * 
+ * @command ChangeContentsBackground
+ * @desc Change the content background image.
+ * @text Content background image change
+ * 
+ * @arg BackGroundImg
+ * @desc Specifies the background image file name.
+ * @text Background image
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * 
+ * @command UserAutoSave
+ * @desc Allow snapshots on autosave. Disable with OFF.
+ * @text Allow snapshot during autosave
+ * 
+ * @arg OnSaveSnap
+ * @text snapshot permission
+ * @desc Allow snapshots on autosave.
+ * @type boolean
+ * @default true
+ * 
+ * @command SnapShot
+ * @desc Take a snapshot of the next save.
+ * @text taking a snapshot
+ * 
+ * @command SetAnyName
+ * @desc Enter the chapter name.
+ * @text Chapter
+ * 
+ * @arg AnyName
+ * @text Chapter text
+ * @desc Enter the chapter text. Set when you want to display the current captor.
+ * @type string
+ * @default 
+ * 
+ * @command SpecifyActor
+ * @desc Set the actor to display only the specified actor on the save screen.
+ * @text Change specified actor
+ * 
+ * @arg ActorId
+ * @text Actor
+ * @desc Specifies an actor. If 0 is specified, the leader will be displayed.
+ * @type actor
+ * @default 0
+ * 
+ * 
+ * @param BasicSetting
+ * @text Basic setting
+ * @default ------------------------------
+ * 
+ * @param PartyActorMode
+ * @desc Actors to display.
+ * @text Display actor
+ * @type select
+ * @option Battle members
+ * @value 1
+ * @option Party members(including standby members)
+ * @value 2
+ * @default 1
+ * @parent BasicSetting
+ * 
+ * @param HelpWindowVisible
+ * @text Help window image display
+ * @desc Display the help window image.
+ * @type boolean
+ * @default true
+ * @parent BasicSetting
+ * 
+ * @param SaveWindowVisible
+ * @text Save window image display
+ * @desc Show save window image.
+ * @type boolean
+ * @default true
+ * @parent BasicSetting
+ * 
+ * @param SaveFileWindow
+ * @text Save file window settings
+ * @default ------------------------------
+ * 
+ * @param ContentsList
+ * @desc Items to display.
+ * @text Display item
+ * @type struct<ContentsListData>[]
+ * @default ["{\"DateSelect\":\"50\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"23\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"60\",\"ItemWidth\":\"48\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-12\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"right\\\"\"}","{\"DateSelect\":\"10\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"2\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-4\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"12\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"230\",\"Y_Coordinate\":\"2\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"\",\"DetaEval\":\"\",\"Align\":\"\\\"TextEx\\\"\"}","{\"DateSelect\":\"3\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"230\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"520\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"現在地\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"1\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"230\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"プレイ時間\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}","{\"DateSelect\":\"4\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"500\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"SystemNameColor\":\"16\",\"FontSize\":\"-6\",\"ParamName\":\"所持金\",\"DetaEval\":\"\",\"Align\":\"\\\"left\\\"\"}"]
+ * @parent SaveFileWindow
+ * 
+ * @param NumSaveCols
+ * @desc The number of save cols to display on the screen.
+ * @text Number of display save cols
+ * @type number
+ * @default 1
+ * @min 1
+ * @parent SaveFileWindow
+ * 
+ * @param NumSaveRows
+ * @desc Number of save rows displayed on the screen.
+ * @text Number of saved display rows
+ * @type number
+ * @default 5
+ * @min 1
+ * @parent SaveFileWindow
+ * 
+ * @param SaveContentsCols
+ * @desc Number of save items to display on screen.
+ * @text Number of display save items
+ * @type number
+ * @default 2
+ * @min 1
+ * @parent SaveFileWindow
+ * 
+ * @param MaxSave
+ * @desc Maximum number of saves.
+ * @text Max number of saves
+ * @type number
+ * @default 20
+ * @min 1
+ * @parent SaveFileWindow
+ * 
+ * @param Contents
+ * @text Each content setting
+ * @default ------------------------------
+ * 
+ * @param DayTime
+ * @desc Date and time format to display
+ * @text datetime format
+ * @type select
+ * @option Standard (Year/Month/Day Hour:Minute:Second)
+ * @value 'default'
+ * @option English notation (Day/Month/Year Hour:Minute:Second)
+ * @value 'en-GB'
+ * @option Japanese era notation (day notation)
+ * @value 'ja-JP-u-ca-japanese'
+ * @default 'default'
+ * @parent Contents
+ * 
+ * @param CharacterSpecifyActorOnry
+ * @desc Shows only specified actors as characters. If the specified actor is 0, only the leader is displayed.
+ * @text Character designation actor display
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param FaceSpecifyActorOnry
+ * @desc Shows only actors with specified faces. If the specified actor is 0, only the leader is displayed.
+ * @text Face specified actor display
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param SvSpecifyActorOnry
+ * @desc Shows only the specified actor in the side view actor. If the specified actor is 0, only the leader is displayed.
+ * @text SV actor specified actor display
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param NameSpecifyActorOnry
+ * @desc Shows only actors whose actor name is specified. If the specified actor is 0, only the leader is displayed.
+ * @text Actor name specified actor display
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param ClassSpecifyActorOnry
+ * @desc Show only actors with specified class name. If the specified actor is 0, only the leader is displayed.
+ * @text Class name specified actor display
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param NickNameSpecifyActorOnry
+ * @desc Shows only actors with nicknames. If the specified actor is 0, only the leader is displayed.
+ * @text Nickname specified actor display
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param LevelSpecifyActorOnry
+ * @desc Shows only actors with specified levels. If the specified actor is 0, only the leader is displayed.
+ * @text Level specified actor display
+ * @type boolean
+ * @default false
+ * @parent Contents
+ * 
+ * @param SaveSnapSetting
+ * @text Save snapshot settings
+ * @default ------------------------------
+ * 
+ * @param InfoSaveSnap
+ * @text Enable snapshot
+ * @desc Enable snapshots.
+ * @type boolean
+ * @default false
+ * @parent SaveSnapSetting
+ * 
+ * @param SaveSnapQuality
+ * @desc Snapshot quality. (default value 0.92)
+ * @text Snapshot quality
+ * @type string
+ * @default 0.92
+ * @max 1
+ * @parent SaveSnapSetting
+ * 
+ * @param SaveSnapScale
+ * @desc Snapshot enlargement rate. (percentage)
+ * @text Snapshot enlargement rate(percentage)
+ * @type number
+ * @default 12
+ * @min 0
+ * @parent SaveSnapSetting
+ * 
+ * @param AnyName
+ * @text Chapter setting
+ * @default ------------------------------
+ * 
+ * @param AnyNameVariable
+ * @desc Chapter text variable number. It is not displayed if it is set by the plugin command "Enter the chapter name".
+ * @text Chapter text display variable number
+ * @type variable
+ * @default 0
+ * @parent AnyName
+ * 
+ * @param Actor
+ * @text Actor settings
+ * @default ------------------------------
+ * 
+ * @param FaceWidth
+ * @desc Face Width.
+ * @text Face Width
+ * @type number
+ * @default 144
+ * @min 0
+ * @parent Actor
+ * 
+ * @param FaceHeight
+ * @desc Face height
+ * @text Face height.
+ * @type number
+ * @default 144
+ * @parent Actor
+ * 
+ * @param FaceScale
+ * @desc Face scale
+ * @text Scale
+ * @type number
+ * @default 100
+ * @parent Actor
+ * 
+ * @param BackGround
+ * @text Background setting
+ * @default ------------------------------
+ * 
+ * @param BackGroundImg
+ * @desc Specifies the background image file name.
+ * @text Background image
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent BackGround
+ * 
+ * @param BackUiWidth
+ * @text Background image window UI size
+ * @desc Fit the background image to the window UI size.
+ * @type boolean
+ * @default true
+ * @parent BackGround
+ * 
+ * @param BackFitWidth
+ * @text Background image enlargement
+ * @desc Scales the background image to fit the window size or screen.
+ * @type boolean
+ * @default false
+ * @parent BackGround
+ * 
+ * @param AutomaticSetting
+ * @text Background image ID automatic setting
+ * @desc Automatically sets the background image ID. The background of save data with a high ID is displayed on the loading screen.
+ * @type boolean
+ * @default true
+ * @parent BackGround
+ * 
+ * @param ContentsBackVisible
+ * @text Hide content background image
+ * @desc Hide content background image
+ * @type boolean
+ * @default false
+ * @parent BackGround
+ * 
+ * @param ContentsBackGroundImg
+ * @desc Specifies the content background image file name.
+ * @text Content background image
+ * @type file[]
+ * @dir img/
+ * @default []
+ * @parent BackGround
+ * 
+ * @param ContentsBackSettingsList
+ * @desc Set the content background image.
+ * @text Content background image setting
+ * @type struct<ContentsBackSettings>[]
+ * @default 
+ * @parent BackGround
+ * 
+ * @param ContentsBackScale
+ * @desc Default content background image scaling factor (percentage)
+ * @text Background image magnification (percentage)
+ * @type number
+ * @min 0
+ * @default 100
+ * @parent BackGround
+ * 
+ * 
+ */
+/*~struct~ContentsListData:
+ * 
+ * @param DateSelect
+ * @text status to display
+ * @desc Specifies the status to display.
+ * @type select
+ * @option None
+ * @value 0
+ * @option Play time(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @value 1
+ * @option Save time(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @value 2
+ * @option Location(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @value 3
+ * @option Money(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @value 4
+ * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
+ * @value 5
+ * @option Fail name(1)(2)(3)(4)(5)(8)
+ * @value 10
+ * @option Title(1)(2)(3)(4)(5)(8)(11)
+ * @value 11
+ * @option Chapter(1)(2)(3)(4)(5)(8)(11)
+ * @value 12
+ * @option Destination(1)(2)(3)(4)(5)(8)(11)
+ * @value 13
+ * @option Actor name(1)(2)(3)(4)(5)(8)
+ * @value 20
+ * @option Class(1)(2)(3)(4)(5)(8)
+ * @value 21
+ * @option Nickname(1)(2)(3)(4)(5)(8)
+ * @value 22
+ * @option Level(1)(2)(3)(4)(5)(8)(11)
+ * @value 23
+ * @option Character chip(1)(2)(3)(4)(5)
+ * @value 50
+ * @option Face(1)(2)(3)(4)
+ * @value 51
+ * @option SV actor(1)(2)(3)(4)(5)
+ * @value 52
+ * @option Snap shot(1)(2)(3)(4)
+ * @value 90
+ * @option Line(1)(2)(3)(4)(5)(7)
+ * @value 100
+ * @default 0
+ * 
+ * @param X_Position
+ * @text X display col position(1)
+ * @desc X display col position.
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 3
+ * 
+ * @param Y_Position
+ * @desc Y display row position.
+ * @text Y display row position(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X coordinate (relative)(3)
+ * @desc X coordinate (relative coordinate from X display col position)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y coordinate (relative)(4)
+ * @desc Y coordinate (relative coordinate from Y display row position)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc Item, gauge width(0 for default width)
+ * @text Item, gauge width(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc Width of item name (default width at 0)
+ * @text Width of item name(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemNameColor
+ * @desc System color ID for system items. You can enter the color code in the text tab.
+ * @text System Name color(7)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param FontSize
+ * @desc Font size (difference from main font)
+ * @text Font size(8)
+ * @type number
+ * @default -6
+ * @min -99
+ * 
+ * @param ParamName
+ * @desc Set the item name.
+ * @text Name(9)
+ * @type string
+ * @default
+ * 
+ * @param DetaEval
+ * @desc Enter an evaluation formula.
+ * @text Evaluation formula(javaScript)(10)
+ * @type combo
+ * @option '$gameParty.steps();//Step'
+ * @option '$gameSystem.battleCount();//Battle count'
+ * @option '$gameSystem.escapeCount();//Escapes count'
+ * @option '$gameSystem.saveCount();//Save count'
+ * @option '$gameVariables.value(0);//Game variable'
+ * @option '$gameSystem.chronus().getDateFormat(1);//”Chronus.js” datetime format 1'
+ * @option '$gameSystem.chronus().getDateFormat(2);//”Chronus.js” datetime format 2'
+ * @default 
+ * 
+ * @param Align
+ * @desc Align.
+ * @text Align(11)
+ * @type select
+ * @option Text code can be used (left)
+ * @value "TextEx"
+ * @option Left
+ * @value "left"
+ * @option Center
+ * @value "center"
+ * @option Right
+ * @value "right"
+ * @default "left"
+ * 
+ */
+/*~struct~ContentsBackSettings:
+ * 
+ * @param ContentsBackGroundImg
+ * @desc Specifies the content background image file name.
+ * @text Content background image
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * @param Img_SX
+ * @desc The display start coordinate X of the image.
+ * @text Image display start coordinate X
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Img_SY
+ * @desc The display start coordinate Y of the image.
+ * @text Image display start coordinate Y
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param Scale
+ * @desc Content background image scaling factor (percentage)
+ * @text Background image magnification (percentage)
+ * @type number
+ * @min 0
+ * @default 100
+ * 
+ * 
+ */
+/*:ja
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.1.1
+ * @version 2.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -62,6 +687,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/7 Ver.2.1.2
+ * ウィンドウ画像を表示非表示か選択できる機能を追加。
+ * 日本語以外での表示を英語表示に変更。
  * 2023/1/7 Ver.2.1.1
  * セーブ時に背景画像が表示されない問題を修正。
  * 2022/12/30 Ver.2.1.0
@@ -164,8 +792,8 @@
  * @text オートセーブ時SS許可
  * 
  * @arg OnSaveSnap
- * @text スクリーンショット許可
- * @desc オートセーブ時のスクリーンショットを許可します。
+ * @text スナップショット許可
+ * @desc オートセーブ時のスナップショットを許可します。
  * @type boolean
  * @default true
  * 
@@ -178,13 +806,13 @@
  * @text 章
  * 
  * @arg AnyName
- * @text 表示文字列
- * @desc 表示文字列を記入します。現在のキャプターを表示したい時に設定します。
+ * @text 章テキスト
+ * @desc 章テキストを記入します。現在のキャプターを表示したい時に設定します。
  * @type string
  * @default 
  * 
  * @command SpecifyActor
- * @desc 指定のアクターのみ表示させるアクターを設定します。
+ * @desc セーブ画面に表示されるアクターを指定のアクターのみ表示させるアクターを設定します。
  * @text 指定のアクター変更
  * 
  * @arg ActorId
@@ -207,6 +835,20 @@
  * @option パーティメンバー(控え含む)
  * @value 2
  * @default 1
+ * @parent BasicSetting
+ * 
+ * @param HelpWindowVisible
+ * @text ヘルプウィンドウ画像表示
+ * @desc ヘルプウィンドウ画像を表示する。
+ * @type boolean
+ * @default true
+ * @parent BasicSetting
+ * 
+ * @param SaveWindowVisible
+ * @text セーブウィンドウ画像表示
+ * @desc セーブウィンドウ画像を表示する。
+ * @type boolean
+ * @default true
  * @parent BasicSetting
  * 
  * @param SaveFileWindow
@@ -338,8 +980,8 @@
  * @parent SaveSnapSetting
  * 
  * @param SaveSnapScale
- * @desc スナップショットの拡大率（％）
- * @text スナップショット拡大率（％）
+ * @desc スナップショットの拡大率（百分率）
+ * @text スナップショット拡大率（百分率）
  * @type number
  * @default 12
  * @min 0
@@ -350,8 +992,8 @@
  * @default ------------------------------
  * 
  * @param AnyNameVariable
- * @desc ファイル名横文字列変数番号。プラグインコマンド「ファイル名横表示文字列」で設定している場合は表示されません。
- * @text ファイル名横文字列表示変数番号
+ * @desc 章テキスト変数番号。プラグインコマンド「章テキスト」で設定している場合は表示されません。
+ * @text 章テキスト表示変数番号
  * @type variable
  * @default 0
  * @parent AnyName
@@ -383,7 +1025,7 @@
  * @parent Actor
  * 
  * @param BackGround
- * @text 背景、ウィンドウスキン設定
+ * @text 背景設定
  * @default ------------------------------
  * 
  * @param BackGroundImg
@@ -447,7 +1089,7 @@
  * 
  * 
  */
-/*~struct~ContentsListData:
+/*~struct~ContentsListData:ja
  * 
  * @param DateSelect
  * @text 表示するステータス
@@ -542,7 +1184,7 @@
  * @param SystemNameColor
  * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(7)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -587,7 +1229,7 @@
  * @default "left"
  * 
  */
-/*~struct~ContentsBackSettings:
+/*~struct~ContentsBackSettings:ja
  * 
  * @param ContentsBackGroundImg
  * @desc コンテンツ背景画像ファイル名を指定します。
@@ -656,6 +1298,8 @@ Imported.NUUN_SaveScreen = true;
   const ClassSpecifyActorOnry = eval(parameters['ClassSpecifyActorOnry'] || "false");
   const NickNameSpecifyActorOnry = eval(parameters['NickNameSpecifyActorOnry'] || "false");
   const LevelSpecifyActorOnry = eval(parameters['LevelSpecifyActorOnry'] || "false");
+  const HelpWindowVisible = eval(parameters['HelpWindowVisible'] || "true");
+  const SaveWindowVisible = eval(parameters['SaveWindowVisible'] || "true");
 
   let saveInfoSnapShot = null;
 
@@ -886,7 +1530,7 @@ Imported.NUUN_SaveScreen = true;
   const _Scene_File_createListWindow = Scene_File.prototype.createListWindow;
   Scene_File.prototype.createListWindow = function() {
     _Scene_File_createListWindow.call(this);
-    if ($gameSystem.getSaveBuckGround()) {
+    if (!SaveWindowVisible) {
       this._listWindow.opacity = 0;
     }
   };
@@ -894,7 +1538,7 @@ Imported.NUUN_SaveScreen = true;
   const _Scene_File_createHelpWindow = Scene_File.prototype.createHelpWindow;
   Scene_File.prototype.createHelpWindow = function() {
     _Scene_File_createHelpWindow.call(this);
-    if ($gameSystem.getSaveBuckGround()) {
+    if (!HelpWindowVisible) {
       this._helpWindow.opacity = 0;
     }
   };

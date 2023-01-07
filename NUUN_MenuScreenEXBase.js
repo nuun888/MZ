@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.5
+ * @version 2.0.6
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/1/2022 Ver.2.0.6
+ * Fixed an issue where setting an actor front background image would cause an error.
  * 12/1/2022 Ver.2.0.5
  * Fixed to display at the height of the main area when the number of lines is set to 0 in window height mode.
  * 11/27/2022 Ver.2.0.4
@@ -47,7 +49,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.5
+ * @version 2.0.6
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -57,6 +59,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/7 Ver.2.0.6
+ * アクター前面背景画像を設定するとエラーが出る問題を修正。
  * 2022/12/1 Ver.2.0.5
  * ウィンドウ高さモードで行数を0に設定している場合は、メインエリアの高さで表示するように修正。
  * 2022/11/27 Ver.2.0.4
@@ -254,7 +258,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             $gameSystem.menuBackgroundId = 0;
         }
         const data = $dataMap;
-        const backgroundId = $gameSystem.menuBackgroundId > 0 ? $gameSystem.menuBackgroundId : ($dataMap && $dataMap.meta.MenuBackgroundId ? Number(data.meta.MenuBackgroundId) : $gameSystem.menuBackgroundId);
+        const backgroundId = ($gameSystem.menuBackgroundId > 0 ? $gameSystem.menuBackgroundId : ($dataMap && $dataMap.meta.MenuBackgroundId ? Number(data.meta.MenuBackgroundId) : $gameSystem.menuBackgroundId)) || 1;
         const img = params.BackGroundImges ? params.BackGroundImges[backgroundId - 1] : null;
         if (img) {
             const sprite = new Sprite();
@@ -421,7 +425,13 @@ Imported.NUUN_MenuScreenEXBase = true;
 
     Window_MenuStatus.prototype.drawActorBack = function(bitmap, index) {
         const rect = this.itemRect(index);
-        this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+        try {
+            this.contentsBack.nuun_contentsBackBlt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, 100, true);
+            //this.contentsBack.blt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2);
+        } catch (e) {
+            const log = $gameSystem.isJapanese() ? 'NUUN_BaseがVer.1.6.2以降ではありません。' : "'NUUN_Base' is not Ver.1.6.2 or later.";
+            throw ["LoadError", log];
+        }
     };
 
     Window_MenuStatus.prototype.createApngSprite = function(actor, index, data, rect) {
@@ -480,8 +490,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         if (frontBitmapImg) {
             const frontBitmap = ImageManager.nuun_LoadPictures(frontBitmapImg);
             frontBitmap.addLoadListener(function() {
-                if (bitmap)
-                this.drawContentsActorFront(frontBitmap, rect.x, rect.y, rect.width, rect.height);
+                this.drawContentsActorFront(frontBitmap, x, y, width, height);
             }.bind(this));
         }
     };

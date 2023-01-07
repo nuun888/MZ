@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# Ver.2.1.0
+# Ver.2.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)Ver.1.6.2以降  
@@ -75,6 +75,8 @@ drawTextEx表示はプラグインパラメータのフォントサイズが適�
 オートセーブ時のスナップショットは戦闘開始直前のマップ、移動直前のマップが撮影されます。  
 
 ## 更新履歴
+2023/1/7 Ver.2.1.1  
+セーブ時に背景画像が表示されない問題を修正。  
 2022/12/30 Ver.2.1.0  
 セーブファイルの表示に列数を設定できる機能を追加。  
 コンテンツ背景画像をマップ毎に指定できる機能を追加。  

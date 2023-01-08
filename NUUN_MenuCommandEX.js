@@ -14,7 +14,7 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
@@ -23,6 +23,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/8/2023 Ver.1.1.1
+ * Fixed the problem that command coordinates are displayed shifted when command sorting is enabled.
  * 1/4/2023 Ver.1.1.0
  * Added a function to adjust the width, height and coordinates of each content background image for each command.
  * 1/3/2023 Ver.1.0.1
@@ -205,7 +207,7 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
@@ -214,6 +216,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/8 Ver.1.1.1
+ * コマンドソート有効をONにしたときに、コマンドの座標がずれて表示される問題を修正。
  * 2023/1/4 Ver.1.1.0
  * コマンド毎に横幅、高さ及び各コンテンツ背景画像の座標を調整できる機能を追加。
  * 2023/1/3 Ver.1.0.1
@@ -239,27 +243,6 @@
  * @type number
  * @default 0
  * 
- * @param SelectContentsX
- * @desc コマンド選択時のコマンドのX座標。(相対)
- * @text コマンド選択時X座標
- * @type number
- * @min -9999
- * @default 0
- * 
- * @param SelectContentsY
- * @desc コマンド選択時のコマンドのY座標。(相対)
- * @text コマンド選択時Y座標
- * @type number
- * @min -9999
- * @default 0
- * 
- * @param SelectContentsDuration
- * @desc コマンド選択時の移動フレーム数。
- * @text 移動フレーム数
- * @type number
- * @min 1
- * @default 30
- * 
  * @param SelectOnFlash
  * @text 対象選択時カーソル非表示
  * @desc 対象選択時のカーソルを表示しません。
@@ -283,6 +266,34 @@
  * @desc 全てのコマンド座標をインデックス起点からウィンドウ左上起点にします。
  * @type boolean
  * @default false
+ * 
+ * @param CommandEffectSetting
+ * @text コマンドエフェクト設定
+ * @default ------------------------------
+ * 
+ * @param SelectContentsX
+ * @desc コマンド選択時のコマンドのX座標。(相対)
+ * @text コマンド選択時X座標
+ * @type number
+ * @min -9999
+ * @default 0
+ * @parent CommandEffectSetting
+ * 
+ * @param SelectContentsY
+ * @desc コマンド選択時のコマンドのY座標。(相対)
+ * @text コマンド選択時Y座標
+ * @type number
+ * @min -9999
+ * @default 0
+ * @parent CommandEffectSetting
+ * 
+ * @param SelectContentsDuration
+ * @desc コマンド選択時の移動フレーム数。
+ * @text 移動フレーム数
+ * @type number
+ * @min 1
+ * @default 10
+ * @parent CommandEffectSetting
  * 
  */
 /*~struct~MenuCommandList:ja
@@ -399,7 +410,7 @@ Imported.NUUN_MenuCommandEX = true;
     const ContentsHeight = Number(parameters['ContentsHeight'] || 0);
     const SelectContentsX = Number(parameters['SelectContentsX'] || 0);
     const SelectContentsY = Number(parameters['SelectContentsY'] || 0);
-    const SelectContentsDuration = Number(parameters['SelectContentsDuration'] || 30);
+    const SelectContentsDuration = Number(parameters['SelectContentsDuration'] || 10);
     const SelectOFFFlash = eval(parameters['SelectOnFlash'] || "false");
     const HideCommandName = eval(parameters['HideCommandName'] || "false");
     const CommandSort = eval(parameters['CommandSort'] || "false");
@@ -455,6 +466,15 @@ Imported.NUUN_MenuCommandEX = true;
                     normalList.push(data);
                 }
             }
+        });
+        if (CommandSort) {
+            this._list = newList.concat(normalList).filter(list => !!list);
+        }
+        this.setCommandSprite();
+    };
+
+    Window_Selectable.prototype.setCommandSprite = function() {
+        this._list.forEach((data, index) => {
             if (!this._commandSprite[index]) {
                 const sprite = new Sprite_MenuCommand(this.menuCommandExData(index));
                 this._contentsBackSprite.addChild(sprite);
@@ -465,9 +485,6 @@ Imported.NUUN_MenuCommandEX = true;
                 this._commandSprite[index].setup(rect.x, rect.y, this.menuCommandExData(index));
             }
         });
-        if (CommandSort) {
-            this._list = newList.concat(normalList).filter(list => !!list);
-        }
     };
 
     const _Window_Selectable_paint = Window_Selectable.prototype.paint;
@@ -607,7 +624,7 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     Sprite_MenuCommand.prototype.setPosition = function(x, y) {
-        x += (this._data ? this._data.ContentsImgX : 0) || 0;
+        x += (this._data ? this._data.ContentsImgX : 0) || 0;console.log(this._data)
         y += (this._data ? this._data.ContentsImgY : 0) || 0;
         this._homeX = x;
         this._homeY = y;

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/8 Ver.1.1.4
+ * 横方向のタイムラインのアンカーを修正。
  * 2022/12/25 Ver.1.1.3
  * フレーム設定の説明を修正。
  * 2022/11/2 Ver.1.1.2
@@ -471,7 +473,7 @@ Spriteset_Battle.prototype.createTimeLineImg = function() {
     const sprite = new Sprite(bitmap);
     sprite.x = TPBTimeLine_X + this.getTimeLinePosition();
     sprite.y = TPBTimeLine_Y;
-    sprite.anchor.x = 0.5;
+    sprite.anchor.x = getTimeLineAnchor();
     sprite.anchor.y = 0;
     this.addChild(sprite);
     this.timeLineSprite = sprite;
@@ -661,6 +663,7 @@ Sprite_TimeLine.prototype.initMembers = function() {
     this._targetX = 0;
     this._targetY = 0;
     this._selectionEffectCount = 0;
+    this._action = null;
 };
 
 Sprite_TimeLine.prototype.isVertical = function() {
@@ -744,7 +747,6 @@ Sprite_TimeLine.prototype.getTpbState = function() {
 
 Sprite_TimeLine.prototype.update = function() {
     Sprite.prototype.update.call(this);
-    //console.log(this._battler._tpbState)
     if (this._battler) {
         this.updateBitmap();
         this.updateMove();
@@ -759,11 +761,16 @@ Sprite_TimeLine.prototype.update = function() {
 
 Sprite_TimeLine.prototype.updateCastIcon = function() {
     const action = this._battler.currentAction();
-    if (action && (this._battler.tpbRequiredCastTime() > 0 && this.isCasting())) {
+    if (this.getTpbState() === 'charged' || this.getTpbState() === 'casting' && this._action !== action) {
+        this._action = action;
+    } else if (this.getTpbState() === 'return' && this._action !== action) {
+        this._action = action;console.log(this._action)
+    }
+    if (this._action && ((this._battler.tpbRequiredCastTime() > 0 && this.isCasting()) || this._tpbState === 'acting')) {
         if (CastIconId > 0) {
             this._castIconSprite.setIcon(CastIconId);
         } else {
-            const item = action.item();
+            const item = this._action.item();
             if (item) {
                 this._castIconSprite.setIcon(item.iconIndex);
             } else {
@@ -1430,6 +1437,18 @@ if (BattlerStatusShow) {
             }
         }
     };
+};
+
+function getTimeLineAnchor() {
+    switch (TimeLineDirection) {
+        case 'up':
+        case 'down':
+            return 0.5;
+        case 'right':
+            return 0.0;
+        case 'left': 
+        return 1.0;
+    }
 };
 
 

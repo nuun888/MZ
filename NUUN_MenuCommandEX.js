@@ -631,7 +631,7 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     Sprite_MenuCommand.prototype.setPosition = function(x, y) {
-        x += (this._data ? this._data.ContentsImgX : 0) || 0;console.log(this._data)
+        x += (this._data ? this._data.ContentsImgX : 0) || 0;
         y += (this._data ? this._data.ContentsImgY : 0) || 0;
         this._homeX = x;
         this._homeY = y;

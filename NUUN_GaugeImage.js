@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc GaugeImaging
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -63,6 +63,8 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 1/9/2023 Ver.1.6.4
+ * Fixed the problem that the gauge image shifts when the slope is specified as a negative value.
  * 12/15/2022 Ver.1.6.3
  * Fixed an issue that caused an error when displaying images in the party limit gauge.
  * 11/9/2022 Ver.1.6.2
@@ -419,7 +421,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -472,6 +474,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/9 Ver.1.6.4
+ * 傾斜率をマイナスに指定したときに、ゲージ画像がずれる問題を修正。
  * 2022/12/15 Ver.1.6.3
  * パーティリミットゲージで画像表示するとエラーがでる問題を修正。
  * 2022/11/9 Ver.1.6.2
@@ -1073,7 +1077,7 @@ Sprite_Gauge.prototype.drawGaugeImgRect = function() {
     const dy = data.GaugeY + this._gaugeImgData.GaugeImgY;
     const sx = data.GaugeSX;
     const sy = data.GaugeSY;
-    const inclinedX = this._gaugeImgData.GaugeInclined < 0 ? Math.abs((height * this.gaugeInclinedRate()) * (this.anchor.x > 0 ? 4 : 2)) : 0;
+    const inclinedX = this._gaugeImgData.GaugeInclined < 0 ? Math.abs((this.setImgBitmap.height * this.gaugeInclinedRate()) * (this.anchor.x > 0 ? 4 : 2)) : 0;
     bitmap.blt(this.setImgBitmap, sx, sy, width * rate, height, dx + inclinedX, dy, Math.floor((width * this.getVariableScale(width) + correctionWidth) * rate));  
 };
 
@@ -1087,7 +1091,7 @@ Sprite_Gauge.prototype.drawGaugeDamageImgRect = function(bitmap) {
     const dy = this._gaugeImgData.GaugeDamageImg.GaugeY + this._gaugeImgData.GaugeImgY;
     const sx = this._gaugeImgData.GaugeDamageImg.GaugeSX;
     const sy = this._gaugeImgData.GaugeDamageImg.GaugeSY;
-    const inclinedX = this._gaugeImgData.GaugeInclined < 0 ? Math.abs((height * this.gaugeInclinedRate()) * (this.anchor.x > 0 ? 4 : 2)) : 0;
+    const inclinedX = this._gaugeImgData.GaugeInclined < 0 ? Math.abs((this._GaugeImgDamageBitmap.height * this.gaugeInclinedRate()) * (this.anchor.x > 0 ? 4 : 2)) : 0;
     bitmap.blt(this._GaugeImgDamageBitmap, sx, sy, width * drate, height, dx + inclinedX, dy, Math.floor((width * this.getVariableScale(width) + correctionWidth) * drate));
     this._drawGaugeMode = 0;//
 };

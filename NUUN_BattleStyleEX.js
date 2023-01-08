@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.5
+ * @version 3.8.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/1/8 Ver.3.8.6
+ * アクター名、オリジナルパラメータ、レベルの表示文字揃えを行う処理を追加。
+ * 味方対象選択時キャンセルをすると、対象者の行動時背景が表示されない問題を修正。
  * 2022/12/24 Ver.3.8.5
  * アクター名に任意のフォントを指定できる機能を追加。
  * 2022/12/10 Ver.3.8.4
@@ -1378,6 +1381,7 @@ const _Scene_Battle_onActorCancel = Scene_Battle.prototype.onActorCancel;
 Scene_Battle.prototype.onActorCancel = function() {
   _Scene_Battle_onActorCancel.call(this);
   $gameTemp.onBSAction = false;
+  this.startActorCommandSelection();
 };
 
 const _Scene_Battle_startPartyCommandSelection = Scene_Battle.prototype.startPartyCommandSelection;
@@ -1858,7 +1862,7 @@ Window_BattleStatus.prototype.drawLevel = function(actor, data, x, y, width) {
   const textWidth = this.textWidth(nameText);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
-  this.drawText(actor.level, x + textWidth + 8, y, width - (textWidth + 8), "right");
+  this.drawText(actor.level, x + textWidth + 8, y, width - (textWidth + 8), (data.NamePosition || 'right'));
   this.contents.fontSize = $gameSystem.mainFontSize();
 };
 
@@ -1874,7 +1878,7 @@ Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width)
   }
   this.resetTextColor();
   if (data.DetaEval) {
-      this.drawText(eval(data.DetaEval), x + textWidth + 8, y, width - (textWidth + 8), 'right');
+      this.drawText(eval(data.DetaEval), x + textWidth + 8, y, width - (textWidth + 8), (data.NamePosition || 'right'));
   }
   this.contents.fontSize = $gameSystem.mainFontSize();
 };
@@ -3378,6 +3382,15 @@ Sprite_BSName.prototype.fontSize = function() {
 
 Sprite_BSName.prototype.fontFace = function() {
   return params.ActorNameFont ? params.ActorNameFont : $gameSystem.mainFontFace();
+};
+
+Sprite_BSName.prototype.redraw = function() {
+    const name = this.name();
+    const width = this.bitmapWidth();
+    const height = this.bitmapHeight();
+    this.setupFont();
+    this.bitmap.clear();
+    this.bitmap.drawText(name, 0, 0, width, height, (this.userStatusParam.NamePosition || 'left'));
 };
 
 

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.8.2
+ * @version 1.8.3
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -56,6 +56,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/1/8 Ver.1.8.3
+ * アクター名、オリジナルパラメータ、レベルの表示文字揃えを指定できる機能を追加。
  * 2022/12/24 Ver.1.8.2
  * アクター名に任意のフォントを指定できる機能を追加。
  * 2022/12/10 Ver.1.8.1
@@ -2372,15 +2374,15 @@
  * @value 'state'
  * @option ステート2(1)(3)(4)(8)(9))
  * @value 'state2'
- * @option アクター名(1)(2)(3)(4)(5)
+ * @option アクター名(1)(2)(3)(4)(5)(13)
  * @value 'name'
- * @option 独自パラメータ(1)(3)(4)(5)(6)(8)
+ * @option 独自パラメータ(1)(3)(4)(5)(6)(8)(13)
  * @value 'param'
  * @option 独自パラメータ(動的) (1)(2)(3)(4)(5)(6)(7)(8)
  * @value 'dparam'
  * @option 独自ゲージ (1)(2)(3)(4)(5)(6)(7)(8)(10)(11)
  * @value 'usergauge'
- * @option レベル(1)(3)(4)(5)(6)
+ * @option レベル(1)(3)(4)(5)(6)(13)
  * @value 'lv'
  * @option 画像(3)(4)(7)(12)
  * @value 'imges'
@@ -2449,6 +2451,18 @@
  * @text 評価式or文字列B(9)
  * @type string
  * @default 
+ * 
+ * @param NamePosition
+ * @desc 項目の表示位置を指定します
+ * @text 項目表示位置(13)
+ * @type select
+ * @option 左
+ * @value "left"
+ * @option 中央
+ * @value "center"
+ * @option 右
+ * @value "raight"
+ * @default "left"
  * 
  * @param GaugeSetting
  * @text ゲージ設定

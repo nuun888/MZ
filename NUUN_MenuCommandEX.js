@@ -50,27 +50,6 @@
  * @type number
  * @default 0
  * 
- * @param SelectContentsX
- * @desc The X coordinate of the command when the command is selected. (relative)
- * @text X coordinate when command is selected
- * @type number
- * @min -9999
- * @default 0
- * 
- * @param SelectContentsY
- * @desc The Y coordinate of the command when the command is selected. (relative)
- * @text Y coordinate when command is selected
- * @type number
- * @min -9999
- * @default 0
- * 
- * @param SelectContentsDuration
- * @desc The number of frames to move when selecting a command.
- * @text Number of moving frames
- * @type number
- * @min 1
- * @default 30
- * 
  * @param SelectOnFlash
  * @text Hide cursor when target is selected
  * @desc Does not display the cursor when selecting targets.
@@ -94,6 +73,34 @@
  * @desc Makes all command coordinates from the index origin to the upper left origin of the window.
  * @type boolean
  * @default false
+ * 
+ * @param CommandEffectSetting
+ * @text Command effect settings
+ * @default ------------------------------
+ * 
+ * @param SelectContentsX
+ * @desc The X coordinate of the command when the command is selected. (relative)
+ * @text X coordinate when command is selected
+ * @type number
+ * @min -9999
+ * @default 0
+ * @parent CommandEffectSetting
+ * 
+ * @param SelectContentsY
+ * @desc The Y coordinate of the command when the command is selected. (relative)
+ * @text Y coordinate when command is selected
+ * @type number
+ * @min -9999
+ * @default 0
+ * @parent CommandEffectSetting
+ * 
+ * @param SelectContentsDuration
+ * @desc The number of frames to move when selecting a command.
+ * @text Number of moving frames
+ * @type number
+ * @min 1
+ * @default 10
+ * @parent CommandEffectSetting
  * 
  */
 /*~struct~MenuCommandList:

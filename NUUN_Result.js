@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.13
+ * @version 2.3.0
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/1/9 Ver.2.3.0
+ * Added a function that allows you to specify a switch that does not display the result after winning.
+ * Added a function that allows you to specify a switch that does not perform motion after victory.
  * 2022/12/6 Ver.2.2.13
  * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
  * 2022/12/4 Ver.2.2.12
@@ -157,6 +160,20 @@
  * @desc Scales the background image to fit the window size or screen.
  * @type boolean
  * @default false
+ * @parent CommonSetting
+ * 
+ * @param BattleEndHideResult
+ * @text Result skip switch
+ * @desc Specifies the switch ID for which results are not displayed. Skip the result with ON.
+ * @type switch
+ * @default 0
+ * @parent CommonSetting
+ * 
+ * @param BattleEndMotionResult
+ * @text No motion switch after victory
+ * @desc Specify the switch ID that does not perform the victory motion after the battle ends.
+ * @type switch
+ * @default 0
  * @parent CommonSetting
  * 
  * @param WindowSetting
@@ -1293,6 +1310,8 @@
  * @text Phase of SE
  * @desc Set the phase to SE.
  * @default 0
+ * @max 100
+ * @min -100
  * @parent SESetting
  * 
  * @param BGMSetting
@@ -1323,6 +1342,8 @@
  * @text BGM phase
  * @desc Set the phase of BGM.
  * @default 0
+ * @max 100
+ * @min -100
  * @parent BGMSetting
  * 
  * @param ExternalPluginSetting
@@ -1361,6 +1382,8 @@
  * @text Phase of SE
  * @desc Set the phase to SE.
  * @default 0
+ * @max 100
+ * @min -100
  * 
  * @command VictoryBGM
  * @desc Change the permission to play victory BGM.
@@ -1397,6 +1420,8 @@
  * @text BGM phase
  * @desc Set the phase of BGM.
  * @default 0
+ * @max 100
+ * @min -100
  * 
  * @arg NoVictoryME
  * @type boolean
@@ -2125,6 +2150,8 @@
  * @text ME pan
  * @desc Set the pan to ME.
  * @default 0
+ * @max 100
+ * @min -100
  * 
  */
 /*~struct~VictoryBgm:
@@ -2149,6 +2176,8 @@
  * @param pan
  * @text BGM pan
  * @desc Set the pan of BGM.
+ * @max 100
+ * @min -100
  * @default 0
  * 
  */
@@ -2205,7 +2234,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.2.13
+ * @version 2.3.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2250,6 +2279,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/9 Ver.2.3.0
+ * 勝利後にリザルトを表示させないスイッチを指定できる機能を追加。
+ * 勝利後のモーションをしないスイッチを指定できる機能を追加。
  * 2022/12/6 Ver.2.2.13
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
  * 2022/12/4 Ver.2.2.12
@@ -2350,6 +2382,20 @@
  * @desc 背景画像をウィンドウサイズまたは画面に合わせ拡大します。
  * @type boolean
  * @default false
+ * @parent CommonSetting
+ * 
+ * @param BattleEndHideResult
+ * @text リザルトスキップスイッチ
+ * @desc リザルトを表示しないスイッチIDを指定します。ONでリザルトをスキップします。
+ * @type switch
+ * @default 0
+ * @parent CommonSetting
+ * 
+ * @param BattleEndMotionResult
+ * @text 勝利後モーションなしスイッチ
+ * @desc 戦闘終了後に勝利モーションを行わないスイッチIDを指定します。ONで勝利時のモーションを行いません。
+ * @type switch
+ * @default 0
  * @parent CommonSetting
  * 
  * @param WindowSetting
@@ -3486,6 +3532,8 @@
  * @text SEの位相
  * @desc SEを位相を設定します。
  * @default 0
+ * @max 100
+ * @min -100
  * @parent SESetting
  * 
  * @param BGMSetting
@@ -3516,6 +3564,8 @@
  * @text BGMの位相
  * @desc BGMを位相を設定します。
  * @default 0
+ * @max 100
+ * @min -100
  * @parent BGMSetting
  * 
  * @param ExternalPluginSetting
@@ -3554,6 +3604,8 @@
  * @text SEの位相
  * @desc SEを位相を設定します。
  * @default 0
+ * @max 100
+ * @min -100
  * 
  * @command VictoryBGM
  * @desc 勝利BGMの再生の許可を変更します。
@@ -3590,6 +3642,8 @@
  * @text BGMの位相
  * @desc BGMを位相を設定します。
  * @default 0
+ * @max 100
+ * @min -100
  * 
  * @arg NoVictoryME
  * @type boolean
@@ -4317,6 +4371,8 @@
  * @text MEの位相
  * @desc MEを位相を設定します。
  * @default 0
+ * @max 100
+ * @min -100
  * 
  */
 /*~struct~VictoryBgm:ja
@@ -4342,6 +4398,8 @@
  * @text BGMの位相
  * @desc BGMを位相を設定します。
  * @default 0
+ * @max 100
+ * @min -100
  * 
  */
 /*~struct~VictoryEffect:ja
@@ -4403,6 +4461,8 @@ const ResultFadein = eval(parameters['ResultFadein'] || 'false');
 const PartyPageRefreshFrame = Number(parameters['PartyPageRefreshFrame'] || 0);
 const ResultWindowCenter = eval(parameters['ResultWindowCenter'] || 'true');
 const CloseActorStatusWindow = eval(parameters['CloseActorStatusWindow'] || 'false');
+const BattleEndHideResult = Number(parameters['BattleEndHideResult'] || 0);
+const BattleEndMotionResult = Number(parameters['BattleEndMotionResult'] || 0);
 const NoTouchUIWindow = eval(parameters['NoTouchUIWindow'] || 'false');
 const BackUiWidth = eval(parameters['BackUiWidth'] || 'true');
 const BackFitWidth = eval(parameters['BackFitWidth'] || 'false');
@@ -4642,9 +4702,11 @@ Game_Actor.prototype.getResultActor = function() {
 
 const _Game_Party_performVictory = Game_Party.prototype.performVictory;
 Game_Party.prototype.performVictory = function() {
-  if (!BattleManager._victoryStart) {
-    _Game_Party_performVictory.call(this);
-  }
+    if (!BattleManager._victoryStart) {
+        if (BattleEndMotionResult === 0 || BattleEndMotionResult > 0 && !$gameSwitches.value(BattleEndMotionResult)) {
+            _Game_Party_performVictory.call(this);
+        }
+    }
 };
 
 Game_Party.prototype.resultMembers = function() {
@@ -4990,22 +5052,26 @@ Scene_Battle.prototype.updateAfterVictoryEffect = function() {
 };
 
 Scene_Battle.prototype.resultOpen = function() {
-  this._resultWindow.activate();
-  this._resultWindow.refresh();
-  BattleManager.resultOpenRefresh = true;
-  if (this._resultHelpWindow) {
-    this._resultHelpWindow.show();
-    this._resultHelpWindow.open();
-  }
-  this._resultWindow.show();
-  this._resultActorExpWindow.show();
-  this._resultGetInfoWindow.show();
-  this._resultGetItemWindow.show();
-  this._resultWindow.open();
-  this._resultGetInfoWindow.open();
-  this._resultGetItemWindow.open();
-  this._resultActorExpWindow.open();
-  BattleManager.resultRefresh = PartyPageRefreshFrame;
+    if (BattleEndHideResult > 0 && $gameSwitches.value(BattleEndHideResult)) {
+        BattleManager._resultOn = false;
+        return;
+    }
+    this._resultWindow.activate();
+    this._resultWindow.refresh();
+    BattleManager.resultOpenRefresh = true;
+    if (this._resultHelpWindow) {
+        this._resultHelpWindow.show();
+        this._resultHelpWindow.open();
+    }
+    this._resultWindow.show();
+    this._resultActorExpWindow.show();
+    this._resultGetInfoWindow.show();
+    this._resultGetItemWindow.show();
+    this._resultWindow.open();
+    this._resultGetInfoWindow.open();
+    this._resultGetItemWindow.open();
+    this._resultActorExpWindow.open();
+    BattleManager.resultRefresh = PartyPageRefreshFrame;
 };
 
 Scene_Battle.prototype.resultRefresh = function() {
@@ -6793,24 +6859,24 @@ BattleManager.startResultBusy = function() {
 
 const _BattleManager_processVictory = BattleManager.processVictory;
 BattleManager.processVictory = function() {
-  if (this.startResultBusy()) {
-    this._resultOn = true;
-    this.resultUserData();
-    if (this.resultBusy === 0) {
-      _BattleManager_processVictory.call(this);
-      this.resultEndUserData();
-      return;
+    if (this.startResultBusy()) {
+        this._resultOn = true;
+        this.resultUserData();
+        if (this.resultBusy === 0) {
+        _BattleManager_processVictory.call(this);
+        this.resultEndUserData();
+        return;
+        }
+        this.displayVictoryNoBusy();
     }
-    this.displayVictoryNoBusy();
-  }
-  if (this.resultBusy > 0) {
-    this.resultBusy--;
-  }
-  if (this.resultBusy === 0) {
-    _BattleManager_processVictory.call(this);
-    this.displayVictoryOnBusy();
-    this.resultEndUserData();
-  }
+    if (this.resultBusy > 0) {
+        this.resultBusy--;
+    }
+    if (this.resultBusy === 0) {
+        _BattleManager_processVictory.call(this);
+        this.displayVictoryOnBusy();
+        this.resultEndUserData();
+    }
 };
 
 BattleManager.resultUserData = function() {
@@ -6822,16 +6888,18 @@ BattleManager.resultEndUserData = function() {
 };
 
 BattleManager.displayVictoryNoBusy = function() {
-  $gameParty.removeBattleStates();
-  $gameParty.performVictory();
-  this.playVictoryMe();
-  this.replayBgmAndBgs();
-  this.makeRewards();
-  this._victoryStart = true;
+    $gameParty.removeBattleStates();
+    $gameParty.performVictory();
+    if (BattleEndHideResult === 0 || BattleEndHideResult > 0 && !$gameSwitches.value(BattleEndHideResult)) {
+        this.playVictoryMe();
+        this.replayBgmAndBgs();
+    }
+    this.makeRewards();
+    this._victoryStart = true;
 };
 
 BattleManager.displayVictoryOnBusy = function() {
-  this._victoryStart = false;
+    this._victoryStart = false;
 };
 
 const _BattleManager_makeRewards = BattleManager.makeRewards;

@@ -1,5 +1,5 @@
 # [アイテム図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)
-# Ver.1.4.5
+# Ver.1.5.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -90,6 +90,8 @@ desc1と記入した場合はアイテム、武器、防具のメモ欄に<desc1
 メモ欄のタグ記入時では付けないでください。  
 
 ## 更新履歴
+2023/1/9 Ver.1.5.0  
+アイテム、武器、防具の画像をプラグんパラメータから設定できる機能を追加。  
 2023/1/7 Ver.1.4.5  
 項目設定のオリジナルパラメータの仕様を変更。(要オリジナルパラメータのみ再設定)  
 処理の修正。  

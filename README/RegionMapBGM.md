@@ -8,13 +8,13 @@
 
 ## 設定
 マップの設定のメモ欄  
-`<RegionMapName[regionId]:[BGMFailName],[Volume],[Pitch],[Pan]>` 指定したリージョンID内の地域BGMを設定します。  
+`<RegionMapBgm[regionId]:[BGMFailName],[Volume],[Pitch],[Pan]>` 指定したリージョンID内の地域BGMを設定します。  
 `[regionId]`:リージョンID  
 `[BGMFailName]`:BGMファイル名(拡張子なし)  
 `[Volume]`:音量  
 `[Pitch]`:ピッチ  
 `[Pan]`:位相(-100～100)  
-`<RegionMapName6:Field2,90,100,0>` プレイヤーがリージョンID６番の場所に入ったときに、Field2のBGMが再生されます。  
+`<RegionMapBgm6:Field2,90,100,0>` プレイヤーがリージョンID６番の場所に入ったときに、Field2のBGMが再生されます。  
 
 ## 更新履歴
 2023/1/9 Ver.1.0.0  

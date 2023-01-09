@@ -18,13 +18,13 @@
  * Change map BGM by region.
  * 
  * Map nots
- * <RegionMapName[regionId]:[BGMFailName],[Volume],[Pitch],[Pan]> Sets the regional BGM within the specified region ID.
+ * <RegionMapBgm[regionId]:[BGMFailName],[Volume],[Pitch],[Pan]> Sets the regional BGM within the specified region ID.
  * [regionId]:region id
  * [BGMFailName]:BGM file name (no extension)
  * [Volume]:volume
  * [Pitch]:pitch
  * [Pan]:pan(-100～100)
- * <RegionMapName6:Field2,90,100,0> Field2's BGM will be played when the player enters the location with region ID 6.
+ * <RegionMapBgm6:Field2,90,100,0> Field2's BGM will be played when the player enters the location with region ID 6.
  * 
  * Log
  * 1/9/2023 Ver.1.0.0
@@ -112,13 +112,13 @@
  * リージョンによってマップBGMを変更します。
  * 
  * マップの設定のメモ欄
- * <RegionMapName[regionId]:[BGMFailName],[Volume],[Pitch],[Pan]> 指定したリージョンID内の地域BGMを設定します。
+ * <RegionMapBgm[regionId]:[BGMFailName],[Volume],[Pitch],[Pan]> 指定したリージョンID内の地域BGMを設定します。
  * [regionId]:リージョンID
  * [BGMFailName]:BGMファイル名(拡張子なし)
  * [Volume]:音量
  * [Pitch]:ピッチ
  * [Pan]:位相(-100～100)
- * <RegionMapName6:Field2,90,100,0> プレイヤーがリージョンID６番の場所に入ったときに、Field2のBGMが再生されます。
+ * <RegionMapBgm6:Field2,90,100,0> プレイヤーがリージョンID６番の場所に入ったときに、Field2のBGMが再生されます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。

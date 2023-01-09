@@ -5,14 +5,14 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
  * @target MZ
  * @plugindesc XP風対象選択ウィンドウ
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -29,6 +29,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/10 Ver.1.1.4
+ * 対象選択画面表示位置が上部しか適用されていなかった問題を修正。
  * 2023/1/9 Ver.1.1.3
  * アクター及び敵キャラのウィンドウを表示しない設定にしたときエラーが出る問題を修正。
  * 対象選択ウィンドウが表示されない問題を修正。
@@ -91,7 +93,7 @@
  * 
  * @param ActorSelect_X
  * @desc アクターコマンドウィンドウのX座標を指定します。
- * @text コマンドウィンドウX座標
+ * @text アクターコマンドウィンドウX座標
  * @type number
  * @default 0
  * @max 9999
@@ -99,7 +101,7 @@
  * 
  * @param ActorSelect_Y
  * @desc アクターコマンドウィンドウのY座標を指定します。
- * @text コマンドウィンドウY座標
+ * @text アクターコマンドウィンドウY座標
  * @type number
  * @default 0
  * @max 9999
@@ -107,7 +109,7 @@
  * 
  * @param ActorSelect_Width
  * @desc アクターコマンドウィンドウの横幅を指定します。0でUIサイズ 画面より大きい値にすると自動的に画面の横幅になります。
- * @text コマンドウィンドウの横幅
+ * @text アクターコマンドウィンドウの横幅
  * @type number
  * @default 0
  * @max 9999
@@ -115,7 +117,7 @@
  * 
  * @param EnemySelect_X
  * @desc アクターコマンドウィンドウのX座標を指定します。
- * @text コマンドウィンドウX座標
+ * @text 敵キャラコマンドウィンドウX座標
  * @type number
  * @default 0
  * @max 9999
@@ -123,7 +125,7 @@
  * 
  * @param EnemySelect_Y
  * @desc アクターコマンドウィンドウのY座標を指定します。
- * @text コマンドウィンドウY座標
+ * @text 敵キャラコマンドウィンドウY座標
  * @type number
  * @default 0
  * @max 9999
@@ -131,7 +133,7 @@
  * 
  * @param EnemySelectd_Width
  * @desc アクターコマンドウィンドウの横幅を指定します。0でUIサイズ 画面より大きい値にすると自動的に画面の横幅になります。
- * @text コマンドウィンドウの横幅
+ * @text 敵キャラコマンドウィンドウの横幅
  * @type number
  * @default 0
  * @max 9999
@@ -219,7 +221,7 @@ Imported.NUUN_XPSelectWindow = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_XPSelectWindow');
-const XPSelectPosition = eval(parameters['AcrotXPSelectPosition']) || 'top';
+const XPSelectPosition = eval(parameters['XPSelectPosition']) || 'top';
 const ActorXPSelect = eval(parameters['AcrotXPSelect'] || "true");
 const EnemyXPSelect = eval(parameters['EnemyXPSelect'] || "true");
 const ActorSelect_X = Number(parameters['ActorSelect_X'] || 0);
@@ -377,7 +379,7 @@ Scene_Battle.prototype.XPActorSelectY = function() {
     }
 };
 
-Scene_Battle.prototype.XPEnemySelectY = function() {
+Scene_Battle.prototype.XPEnemySelectY = function() {console.log(XPSelectPosition)
     switch (XPSelectPosition) {
         case 'top':
             return EnemySelect_Y;

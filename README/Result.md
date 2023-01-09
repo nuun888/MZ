@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.2.13
+# Ver.2.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,9 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2023/1/9 Ver.2.3.0  
+勝利後にリザルトを表示させないスイッチを指定できる機能を追加。  
+勝利後のモーションをしないスイッチを指定できる機能を追加。  
 2022/12/6 Ver.2.2.13  
 カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)  
 2022/12/4 Ver.2.2.12  

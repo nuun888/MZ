@@ -1,5 +1,5 @@
 # [XP風対象選択ウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)
-# Ver.1.1.2
+# Ver.1.1.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)  
 
 ## 必須、前提プラグイン
@@ -17,6 +17,11 @@
 ![画像](img/XPSelectWindow3.png)  
 
 ## 更新履歴
+2023/1/10 Ver.1.1.4  
+対象選択画面表示位置が上部しか適用されていなかった問題を修正。  
+2023/1/9 Ver.1.1.3  
+アクター及び敵キャラのウィンドウを表示しない設定にしたときエラーが出る問題を修正。  
+対象選択ウィンドウが表示されない問題を修正。  
 2022/9/4 Ver.1.1.2  
 特定の場面でウィンドウが表示さてたままになってしまう問題を修正。  
 2022/8/26 Ver.1.1.1  

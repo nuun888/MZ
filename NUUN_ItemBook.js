@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.4.5
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -86,21 +86,20 @@
  * 【画像の最大縦幅】
  * 画像の表示サイズを指定した行分のサイズに調整します。デフォルトで８行で設定されていますので８行分の高さを超えたらサイズ調整します。
  * 共通画像、アイテム個別画像で設定可能です。
+ * 
+ * アイテム、武器、防具の個別画像を表示
  * アイテム、武器、防具のメモ欄
  * <[tag]:[img],[x],[y]> アイテム個別画像の表示
- * [tag]:アイテム個別画像タグ名 [img]:画像パス(拡張子なし)
+ * [tag]:記述欄、個別指定画像タグ名で設定したタグ名 [img]:画像パス(拡張子なし)
  * 個別指定画像フォルダが'pictures'ならimg/pictures直下のファイルを拡張子なしで記入してください。
  * サブフォルダーから取得する場合はサブフォルダー名も記入してください。例 'items/tankobu'
  * [x]:x座標(相対)
  * [y]:y座標(相対)
  * 複数画像を指定したい場合は項目リストで表示する分だけ設定し、記述欄、個別指定画像タグ名で別々の名前で設定してください。
  * 
- * アイテム、武器、防具の個別画像を表示
- * アイテム、武器、防具のメモ欄
- * <[tag]:[FailName]> 画像を表示します。
- * [tag]:記述欄、個別指定画像タグ名で設定したタグ名
- * [FailName]:img/[個別指定画像フォルダで指定したフォルダ名]直下のPNGファイル(拡張子なし)
- * (デフォルトではimg/pictures)
+ * なおアイテム画像はプラグインパラメータのアイテム画像設定、武器画像設定、防具画像設定からも設定できます。
+ * その際、項目設定で個別指定画像(101)を選択していれば画像が表示されます。
+ * 上記のタグが記入されている場合は、タグが優先されます。
  * 
  * アイテムに独自のカテゴリーを設定
  * アイテム、武器、防具のメモ欄
@@ -115,6 +114,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2023/1/9 Ver.1.5.0
+ * アイテム、武器、防具の画像をプラグんパラメータから設定できる機能を追加。
  * 2023/1/7 Ver.1.4.5
  * 項目設定のオリジナルパラメータの仕様を変更。(要オリジナルパラメータのみ再設定)
  * 処理の修正。
@@ -337,6 +338,27 @@
  * @text ナンバーカテゴリー表示順表示
  * @type boolean
  * @default false
+ * @parent BasicSetting
+ * 
+ * @param ItemBookImgList
+ * @desc アイテムの設定をします。
+ * @text アイテム画像設定
+ * @type struct<ItemBookList>[]
+ * @default 
+ * @parent BasicSetting
+ * 
+ * @param WeaponItemBookImgList
+ * @desc 武器の設定をします。
+ * @text 武器画像設定
+ * @type struct<WeaponItemBookList>[]
+ * @default 
+ * @parent BasicSetting
+ * 
+ * @param ArmorItemBookImgList
+ * @desc 防具の設定をします。
+ * @text 防具画像設定
+ * @type struct<ArmorItemBookList>[]
+ * @default 
  * @parent BasicSetting
  * 
  * @param ImgFolder
@@ -577,6 +599,96 @@
  * @text 背景画像Id
  * @type number
  * @default 1
+ *  
+ */
+/*~struct~ItemBookList:
+ * 
+ * @param Item
+ * @desc アイテムを指定します。
+ * @text アイテム
+ * @type item
+ * @default
+ * 
+ * @param ItemImg
+ * @desc アイテムの画像ファイル名を指定します。
+ * @text アイテム画像
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @param ItemX
+ * @desc 画像の座標X。
+ * @text 座標X
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param ItemY
+ * @desc 画像の座標Y。
+ * @text 座標Y
+ * @type number
+ * @default 0
+ * @min -9999
+ *  
+ */
+/*~struct~WeaponItemBookList:
+ * 
+ * @param Item
+ * @desc アイテムを指定します。
+ * @text アイテム
+ * @type weapon
+ * @default
+ * 
+ * @param ItemImg
+ * @desc 武器の画像ファイル名を指定します。
+ * @text 武器画像
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @param ItemX
+ * @desc 画像の座標X。
+ * @text 座標X
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param ItemY
+ * @desc 画像の座標Y。
+ * @text 座標Y
+ * @type number
+ * @default 0
+ * @min -9999
+ *  
+ */
+/*~struct~ArmorItemBookList:
+ * 
+ * @param Item
+ * @desc 防具を指定します。
+ * @text 防具
+ * @type armor
+ * @default
+ * 
+ * @param ItemImg
+ * @desc 防具の画像ファイル名を指定します。
+ * @text 防具画像
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @param ItemX
+ * @desc 画像の座標X。
+ * @text 座標X
+ * @type number
+ * @default 0
+ * @min -9999
+ * 
+ * @param ItemY
+ * @desc 画像の座標Y。
+ * @text 座標Y
+ * @type number
+ * @default 0
+ * @min -9999
  *  
  */
 /*~struct~ItemPageListData:
@@ -1255,6 +1367,9 @@ const BookWidth = Number(parameters['BookWidth'] || 0);
 const RegistrationItemTiming = Number(parameters['RegistrationItemTiming'] || 0);
 const UnknownData = String(parameters['UnknownData'] || '？');
 const UnknownItemData = String(parameters['UnknownItemData'] || '？？？');
+const ItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemBookImgList'])) : null) || [];
+const WeaponItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['WeaponItemBookImgList'])) : null) || [];
+const ArmorItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ArmorItemBookImgList'])) : null) || [];
 const ImgFolder = eval(parameters['ImgFolder'] || 'pictures');
 let PercentWindowVisible = eval(parameters['PercentWindowVisible'] || 'true');
 const NumberMode = eval(parameters['NumberMode'] || "false");
@@ -2392,9 +2507,8 @@ Window_ItemBook.prototype.getItemBitmap = function(listContent, item) {
   let bitmap = null;
   for (const data of listContent) {
     const commonItemBitmap = data.DateSelect === 100 && data.ImgData && data.ImgData[0] ? ImageManager.nuun_LoadPictures(data.ImgData[0]) : null;
-    const itemBitmapData = data.DateSelect === 101 && item.meta[data.textMethod] ? item.meta[data.textMethod].split(',') : null;
-    const itemBitmap = itemBitmapData ? ImageManager.nuun_LoadPictures(ImgFolder +"/"+ itemBitmapData[0].trim()) : null;
-    //const itemBitmap = itemBitmapData ? ImageManager.nuun_LoadPictures(ImgFolder +"/", itemBitmapData[0]) : null;  
+    const itemBitmapData = data.DateSelect === 101 ? this.getItemImg(data, item) : null;
+    const itemBitmap = itemBitmapData ? ImageManager.nuun_LoadPictures(itemBitmapData[0]) : null;
     if (commonItemBitmap && !commonItemBitmap.isReady()) {
       bitmap = commonItemBitmap;
     } else if (itemBitmap && !itemBitmap.isReady()) {
@@ -2402,6 +2516,31 @@ Window_ItemBook.prototype.getItemBitmap = function(listContent, item) {
     }
   }
   return bitmap;
+};
+
+Window_ItemBook.prototype.getItemImg = function(data, item) {
+    if (item.meta[data.textMethod]) {
+        const arr = item.meta[data.textMethod].split(',');
+        arr[0] = ImgFolder +"/"+ arr[0].trim();
+        return arr;
+    } else {
+        let itemData = null;
+        try {
+            if (DataManager.isItem(item)) {
+                itemData = ItemBookImgList.find(a => a.Item === item.id);
+            } else if (DataManager.isWeapon(item)) {
+                itemData = WeaponItemBookImgList.find(a => a.Item === item.id);
+            } else if (DataManager.isArmor(item)) {
+                itemData = ArmorItemBookImgList.find(a => a.Item === item.id);
+            }
+            if (itemData) {
+                return [itemData.ItemImg, itemData.ItemX, itemData.ItemY];
+            }
+        } catch (e) {
+            return null;
+        }
+        return null;
+    }
 };
 
 Window_ItemBook.prototype.page = function(item) {
@@ -2876,10 +3015,10 @@ Window_ItemBook.prototype.commonItemBitmap = function(list, item, x, y, width) {
 };
 
 Window_ItemBook.prototype.itemBitmap = function(list, item, x, y, width) {
-  const dataImg = item.meta[list.textMethod] ? item.meta[list.textMethod].split(',') : null;
+  const dataImg = this.getItemImg(list, item);
   if (dataImg) {
     //const bitmap = ImageManager.loadBitmap("img/"+ ImgFolder +"/", dataImg[0]);
-    const bitmap = ImageManager.nuun_LoadPictures(ImgFolder +"/"+ dataImg[0].trim());
+    const bitmap = ImageManager.nuun_LoadPictures(dataImg[0]);
     x += Number(dataImg[1]) || 0;
     y += Number(dataImg[2]) || 0;
     if (!bitmap.isReady()) {

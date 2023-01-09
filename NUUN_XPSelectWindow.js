@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -29,6 +29,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/9 Ver.1.1.3
+ * アクター及び敵キャラのウィンドウを表示しない設定にしたときエラーが出る問題を修正。
+ * 対象選択ウィンドウが表示されない問題を修正。
  * 2022/9/4 Ver.1.1.2
  * 特定の場面でウィンドウが表示さてたままになってしまう問題を修正。
  * 2022/8/26 Ver.1.1.1
@@ -81,7 +84,7 @@
  * @type struct<DataList>[]
  * 
  * @param EnemyData
- * @text 表示エネミーデータ
+ * @text 表示敵キャラデータ
  * @desc 選択時に表示する敵キャラのデータを選択します。顔グラは選択しても表示されません。
  * @default ["{\"DataMode\":\"'name'\",\"Contents_X\":\"0\",\"Contents_Width\":\"700\",\"Contents_Align\":\"'center'\",\"Contents_Eval\":\"\"}","{\"DataMode\":\"'State'\",\"Contents_X\":\"730\",\"Contents_Width\":\"128\",\"Contents_Align\":\"'center'\",\"Contents_Eval\":\"\"}"]
  * @type struct<DataList>[]
@@ -304,6 +307,7 @@ Scene_Battle.prototype.startEnemySelection = function() {
         this._skillWindow.hide();
         this._itemWindow.hide();
         this._statusWindow.show();
+        this._enemySelectWindow.show();
         this._enemySelectWindow.open();
     }
 };
@@ -312,6 +316,7 @@ const _Scene_Battle_startActorSelection = Scene_Battle.prototype.startActorSelec
 Scene_Battle.prototype.startActorSelection = function() {
     _Scene_Battle_startActorSelection.call(this);
     if (ActorXPSelect) {
+        this._actorSelectWindow.show();
         this._actorSelectWindow.open();
     }
 };
@@ -351,10 +356,14 @@ Scene_Battle.prototype.onActorCancel = function() {
 const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWindows;
 Scene_Battle.prototype.hideSubInputWindows = function() {
     _Scene_Battle_hideSubInputWindows.call(this);
-    this._actorSelectWindow.deactivate();
-    this._enemySelectWindow.deactivate();
-    this._actorSelectWindow.hide();
-    this._enemySelectWindow.hide();
+    if (ActorXPSelect) {
+        this._actorSelectWindow.deactivate();
+        this._actorSelectWindow.hide();
+    }
+    if (EnemyXPSelect) {
+        this._enemySelectWindow.deactivate();
+        this._enemySelectWindow.hide();
+    }
 };
 
 Scene_Battle.prototype.XPActorSelectY = function() {

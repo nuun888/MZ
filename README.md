@@ -4,6 +4,8 @@
 
 RPGツクールMVへの対応は行いません。  
 
+不具合報告、質問、追加要望はツクールフォーラムの該当プラグインのスレッド（ない場合はQ&AのツクールMZ）、ツクマテの該当プラグインのスレッドまで  
+
 [既知の不具合、更新予定](https://github.com/nuun888/MZ/blob/master/bug.md)  
 
 [よくある質問](https://github.com/nuun888/MZ/blob/master/README/q&a.md)

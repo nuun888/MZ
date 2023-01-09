@@ -10,12 +10,12 @@
  * @target MZ
  * @plugindesc GaugeImaging
  * @author NUUN
- * @version 1.6.4
+ * @version 1.6.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
- * Image the game.
+ * Image the gauge.
  * 
  * Specific conditions
  * HP gauge
@@ -63,6 +63,8 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 1/10/2023 Ver.1.6.5
+ * Fixed a flickering issue when viewing the gauge.
  * 1/9/2023 Ver.1.6.4
  * Fixed the problem that the gauge image shifts when the slope is specified as a negative value.
  * 12/15/2022 Ver.1.6.3
@@ -421,7 +423,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.6.4
+ * @version 1.6.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -474,6 +476,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/10 Ver.1.6.5
+ * ゲージを表示した際にちらつく問題を修正。
  * 2023/1/9 Ver.1.6.4
  * 傾斜率をマイナスに指定したときに、ゲージ画像がずれる問題を修正。
  * 2022/12/15 Ver.1.6.3
@@ -851,12 +855,14 @@ Sprite_Gauge.prototype.initMembers = function() {
 
 const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
 Sprite_Gauge.prototype.setup = function(battler, statusType) {
-    _Sprite_Gauge_setup.call(this, battler, statusType);
+    this._statusType = statusType;
+    this._battler = battler;
     this._gaugeImgData = this.getFindGauge();
     if (!this._gaugeImgSprite && this._gaugeImgData) {
         this.createGaugeImg();
         this.createTextBitmap();
     }
+    _Sprite_Gauge_setup.call(this, battler, statusType);
 };
 
 Sprite_Gauge.prototype.filteringGaugeImgClass = function(data) {

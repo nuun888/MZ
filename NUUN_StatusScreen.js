@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.4.5
+ * @version 2.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,41 +56,6 @@
  * "1-10" ステートID1～10番まで表示
  * "3-11,15"ステートID3～11,15番を表示
  * 
- * 【記述欄設定】
- * 記述欄はプラグインパラメータ「記述欄タグ名」に任意の文字列を記入してください。一部文字列は使用できない場合も
- * ありますので注意してください。desc1と記入した場合はアクターのメモ欄に<desc1:ああああ>と記入したとき、記述欄タグ名にdesc1と
- * 記入した項目に「ああああ」と表示されます。
- * 
- * 【X表示位置】
- * 表示する列を指定します。
- * 
- * 【Y表示位置】
- * 表示する行を指定します。
- * 
- * 【X座標】
- * 【X表示位置】からの相対座標。
- * 
- * 【Y座標】
- * 【Y表示位置】からの相対座標。
- * 
- * 【項目横幅】
- * コンテンツ表示範囲を設定します。
- * 
- * 【システム項目横幅】
- * システム文字の表示幅を指定します。
- * 
- * 【ワイド表示モード】
- * 項目を複数列に跨いで表示します。
- * 
- * 【小数点桁数】
- * 能力値、追加能力値、特殊能力値、属性耐性、ステート耐性を指定した少数桁数まで表示させます。
- * 
- * 【単位】
- * 追加能力値、特殊能力値、任意ステータス、属性耐性、ステート耐性で接尾につける単位を設定します。
- * 
- * 【コンテンツ背景表示】
- * 能力値、追加能力値、特殊能力値、任意ステータス、属性耐性、ステート耐性、装備で黒い背景（デフォルトの場合）を表示、表表示かを設定します。
- * 
  * レーダーチャートを表示するにはNUUN_RadarChartBaseが必要です。
  * 
  * アクターのメモ欄
@@ -115,6 +80,14 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/14 Ver.2.5.0
+ * 各項目(一部を除く)にアイコンを指定できる機能を追加。
+ * 各項目(一部を除く)に文字揃えを指定できる機能を追加。
+ * サイドビューアクター表示に関する修正。
+ * 2022/12/15 Ver.2.4.6
+ * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
+ * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
+ * 数値部分に数値フォントを指定できる機能を追加。
  * 2022/11/9 Ver.2.4.5
  * フォントサイズがおかしくなる問題を修正。
  * 2022/11/3 Ver.2.4.4
@@ -362,21 +335,21 @@
  * @desc 表示する項目。
  * @text 表示ページ項目１
  * @type struct<ParamListData>[]
- * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"192\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"2\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"432\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"24\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"10\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"19\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"40\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"41\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"1000\",\"NameColor\":\"0\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"14\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"15\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"16\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"17\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"62\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"300\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"474\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"1000\",\"NameColor\":\"0\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"90\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"14\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}"]
+ * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"192\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"2\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"432\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"24\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"10\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"19\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"40\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"41\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"1000\",\"NameColor\":\"0\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"14\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"15\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"16\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"17\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"260\",\"SystemItemWidth\":\"100\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"62\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"300\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"474\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"1000\",\"NameColor\":\"0\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"13\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"90\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"14\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}"]
  * @parent PageSetting
  * 
  * @param ParamList_2Page
  * @desc 表示する項目。
  * @text 表示ページ項目２
  * @type struct<ParamListData>[]
- * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"192\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"2\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"432\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"24\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"10\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"19\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"40\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"41\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"1000\",\"NameColor\":\"0\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"20\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"21\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"8\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"22\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"23\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"24\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"25\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"26\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"27\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"28\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"29\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"30\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"31\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"32\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"33\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"34\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"35\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"36\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"37\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"38\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"39\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"51\",\"NameColor\":\"1\",\"ParamName\":\"追加ステータス\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"51\",\"NameColor\":\"1\",\"ParamName\":\"特殊ステータス\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}"]
+ * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"192\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"2\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"432\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"24\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"10\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"19\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"40\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"41\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"1000\",\"NameColor\":\"0\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"20\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"21\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"8\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"22\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"23\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"9\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"24\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"25\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"10\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"26\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"27\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"11\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"28\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"29\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"12\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"30\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"31\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"32\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"33\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"9\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"34\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"35\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"10\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"36\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"37\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"11\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"38\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"39\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"12\",\"X_Coordinate\":\"188\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"80\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"51\",\"NameColor\":\"1\",\"ParamName\":\"追加ステータス\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'left'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"51\",\"NameColor\":\"1\",\"ParamName\":\"特殊ステータス\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'left'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}"]
  * @parent PageSetting
  * 
  * @param ParamList_3Page
  * @desc 表示する項目。
  * @text 表示ページ項目３
  * @type struct<ParamListData>[]
- * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"192\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"2\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"432\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"24\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"10\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"19\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"40\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"41\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"1000\",\"NameColor\":\"0\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"51\",\"NameColor\":\"2\",\"ParamName\":\"属性耐性\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"51\",\"NameColor\":\"2\",\"ParamName\":\"ステート耐性\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"false\"}","{\"DateSelect\":\"60\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"368\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}","{\"DateSelect\":\"61\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"368\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"textMethod\":\"\",\"Back\":\"true\"}"]
+ * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"192\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"2\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"432\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"100\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"24\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"120\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"10\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"19\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"204\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"40\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"41\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"4\",\"X_Coordinate\":\"456\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"270\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"1000\",\"NameColor\":\"0\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"6\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"true\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"51\",\"NameColor\":\"2\",\"ParamName\":\"属性耐性\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'left'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"51\",\"NameColor\":\"2\",\"ParamName\":\"ステート耐性\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"7\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"false\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'left'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"60\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"368\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}","{\"DateSelect\":\"61\",\"NameColor\":\"16\",\"ParamName\":\"\",\"DetaEval\":\"\",\"X_Position\":\"2\",\"Y_Position\":\"8\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"368\",\"SystemItemWidth\":\"0\",\"WideMode\":\"false\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"textMethod\":\"\",\"Back\":\"true\",\"FontSize\":\"0\",\"ValueFontFace\":\"false\",\"IconId\":\"0\",\"IconY\":\"2\",\"Align\":\"'right'\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\"}"]
  * @parent PageSetting
  * 
  * @param ParamList_4Page
@@ -513,14 +486,14 @@
  * @param EXPGaugeColor1
  * @text 経験値ゲージ色１
  * @desc 経験値ゲージの色１
- * @type number
+ * @type color
  * @default 17
  * @parent EXPSetting
  * 
  * @param EXPGaugeColor2
  * @text 経験値ゲージ色２
  * @desc 経験値ゲージの色２
- * @type number
+ * @type color
  * @default 6
  * @parent EXPSetting
  * 
@@ -630,28 +603,28 @@
  * @param ElementRadarChartFramecolor
  * @desc レーダチャートの枠の色を設定します。
  * @text レーダチャート枠色
- * @type number
+ * @type color
  * @default 15
  * @parent ElementRadarChart
  * 
  * @param ElementRadarChartLineColor
  * @desc レーダチャートの線の色を設定します。
  * @text レーダチャート線色
- * @type number
+ * @type color
  * @default 15
  * @parent ElementRadarChart
  * 
  * @param ElementRadarChartMainColor1
  * @desc レーダチャートの中心の背景色を設定します。
  * @text レーダチャート中心背景色
- * @type number
+ * @type color
  * @default 3
  * @parent ElementRadarChart
  * 
  * @param ElementRadarChartMainColor2
  * @desc レーダチャートの外側背景色を設定します。
  * @text レーダチャート外側背景色
- * @type number
+ * @type color
  * @default 3
  * @parent ElementRadarChart
  * 
@@ -696,28 +669,28 @@
  * @param StateRadarChartFramecolor
  * @desc レーダチャートの枠の色を設定します。
  * @text レーダチャート枠色
- * @type number
+ * @type color
  * @default 15
  * @parent StateRadarChart
  * 
  * @param StateRadarChartLineColor
  * @desc レーダチャートの線の色を設定します。
  * @text レーダチャート線色
- * @type number
+ * @type color
  * @default 15
  * @parent StateRadarChart
  * 
  * @param StateRadarChartMainColor1
  * @desc レーダチャートの中心の背景色を設定します。
  * @text レーダチャート中心背景色
- * @type number
+ * @type color
  * @default 3
  * @parent StateRadarChart
  * 
  * @param StateRadarChartMainColor2
  * @desc レーダチャートの外側背景色を設定します。
  * @text レーダチャート外側背景色
- * @type number
+ * @type color
  * @default 3
  * @parent StateRadarChart
  * 
@@ -779,7 +752,7 @@
  * @param RadarChartIconIndex
  * @desc 項目のアイコンインデックス。0の場合は名称が表示されます。
  * @text アイコンインデックス
- * @type number
+ * @type icon
  * @default 0
  * @min 0
  * @max 99999
@@ -834,7 +807,7 @@
  * @param ElementIconId
  * @text アイコンID
  * @desc アイコンのIDを指定します。
- * @type number
+ * @type icon
  * @min 0
  * @max 99999
  * @default 0
@@ -850,7 +823,7 @@
  * @param StateIconId
  * @text ステートアイコンID
  * @desc アイコンのIDを指定します。0の場合はデータベースのアイコンが表示されます。
- * @type number
+ * @type icon
  * @default 0
  *
  */
@@ -859,9 +832,8 @@
  * @param EquipIconId
  * @text アイコンID
  * @desc 表示するステート装備アイコンを指定します。データベースの「タイプ」の「装備タイプ」のIDと同じリストIDのアイコンが表示されます。
- * @type number
+ * @type icon
  * @min 0
- * @max 99999
  * @default 0
  *
  */
@@ -900,7 +872,7 @@
  * @value 2
  * @option 職業(4)(5)(6)(7)(15)
  * @value 3
- * @option レベル(4)(5)(6)(7)(15)
+ * @option レベル(4)(5)(6)(7)(14)(15)(16)(17)(20)(21)
  * @value 4
  * @option ステート(3※1)(4)(5)(6)(7)(15)
  * @value 5
@@ -910,81 +882,85 @@
  * @value 10
  * @option ＭＰ(4)(5)(6)(7)
  * @value 11
- * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
  * @value 12
- * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
  * @value 13
- * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
  * @value 14
- * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(10)(14)(15)
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(10)(14)(15)(16)(17)(20)(21)
  * @value 15
- * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
  * @value 16
- * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(11)(15)
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(14)(11)(15)(16)(17)(20)(21)
  * @value 17
  * @option ＴＰ(4)(5)(6)(7)
  * @value 19
- * @option 最大ＨＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
+ * @option 最大ＨＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
  * @value 42
- * @option 最大ＭＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)
+ * @option 最大ＭＰ(数値のみ)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
  * @value 43
- * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option ＨＰ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
+ * @value 44
+ * @option ＭＰ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
+ * @value 45
+ * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 20
- * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 21
- * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 22
- * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 23
- * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 24
- * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 25
- * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 26
- * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 27
- * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 28
- * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 29
- * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 30
- * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 31
- * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 32
- * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 33
- * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 34
- * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 35
- * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 36
- * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 37
- * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 38
- * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(15)
+ * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(15)(16)(17)(20)(21)
  * @value 39
- * @option 現在の経験値(1)(2)(4)(5)(6)(7)(8)(15)
+ * @option 現在の経験値(1)(2)(4)(5)(6)(7)(8)(15)(16)(17)(20)
  * @value 40
- * @option 次のレベルまでの経験値(1)(2)(4)(5)(6)(7)(8)(15)
+ * @option 次のレベルまでの経験値(1)(2)(4)(5)(6)(7)(8)(15)(16)(17)(20)
  * @value 41
- * @option オリジナルパラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)
+ * @option オリジナルパラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 50
- * @option 名称のみ(1)(4)(5)(6)(7)(8)(10)(15)
+ * @option 名称のみ(1)(4)(5)(6)(7)(8)(10)(15)(16)(17)(21)
  * @value 51
- * @option 属性耐性(1)(3)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
+ * @option 属性耐性(1)(3)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)(16)(17)(20)
  * @value 60
- * @option ステート耐性(1)(3)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)
+ * @option ステート耐性(1)(3)(4)(5)(6)(7)(8)(9)(10)(12)(14)(15)(16)(17)(20)
  * @value 61
- * @option 装備(1)(2)(4)(5)(6)(7)(8)(9)(10)(14)(15)
+ * @option 装備(1)(2)(4)(5)(6)(7)(8)(9)(10)(14)(15)(18)(16)(17)(19)
  * @value 62
- * @option 記述欄(1)(2)(4)(5)(6)(7)(8)(10)(13)(15)
+ * @option 記述欄(1)(2)(4)(5)(6)(7)(8)(10)(13)(15)(16)(17)
  * @value 70
- * @option プロフィール(1)(2)(4)(5)(6)(7)(8)(10)
+ * @option プロフィール(1)(2)(4)(5)(6)(7)(8)(10)(16)(17)
  * @value 90
  * @option 顔グラフィック(4)(5)(6)(7)
  * @value 100
@@ -1003,7 +979,7 @@
  * @param NameColor
  * @desc システム項目の文字色。テキストタブでカラーコードを入力できます。
  * @text システム項目文字色(1)
- * @type number
+ * @type color
  * @default 16
  * @min 0
  * 
@@ -1018,7 +994,8 @@
  * @text 評価式or文字列(3)
  * @type combo
  * @option '$gameVariables.value(0);//ゲーム変数'
- * @option actor.isStateResist(stateId) ? "無効" : r;//ステート耐性
+ * @option "actor.isStateResist(stateId) ? '無効' : r;//ステート耐性"
+ * @option 'actor.level'
  * @default 
  * 
  * @param X_Position
@@ -1106,12 +1083,43 @@
  * @default 0
  * @min -99
  * 
+ * @param ValueFontFace
+ * @desc 数字のフォント適用(OFFでメインフォントのフォント)
+ * @text 数字テキスト部の数字フォント適用(20)
+ * @type boolean
+ * @default false
+ * @min -99
+ * 
+ * @param IconId
+ * @text アイコンID(16)
+ * @desc アイコンのIDを指定します。
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @text アイコン補正Y値(17)
+ * @desc アイコンの補正Y値を指定します。
+ * @type number
+ * @default 2
+ * 
+ * @param Align
+ * @desc 文字揃え。
+ * @text 文字揃え(21)
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @option 中央
+ * @value 'center'
+ * @default 'right'
+ * 
  * @param EquipSetting
  * @text 装備設定
  * @default ------------------------------
  * 
  * @param EquipStartIndex
- * @text 開始インデックス
+ * @text 開始インデックス(18)
  * @desc 装備欄の開始インデックスを指定します。
  * @type number
  * @default 0
@@ -1120,7 +1128,7 @@
  * @parent EquipSetting
  * 
  * @param EquipNum
- * @text 表示装備数
+ * @text 表示装備数(19)
  * @desc 装備欄の表示を指定します。(0で制限なし)
  * @type number
  * @default 0
@@ -1529,6 +1537,10 @@ Window_Status.prototype.actorImgRefresh = function(actor, bitmap) {
   this.contents.blt(bitmap, sx, sy, bitmap.width, bitmap.height, x, y, dw, dh);
 };
 
+Window_Status.prototype.actorImgRefreshApeg = function() {
+    
+};
+
 Window_Status.prototype.battlreActorPicture = function(id) {//立ち絵表示EX用
   const actors = ActorPictureData;
   const find = actors.find(actor => actor.actorId === id);
@@ -1646,7 +1658,7 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
       this.drawActorClass(this._actor, x, y, width);
       break;
     case 4:
-      this.drawActorLevel(this._actor, x, y, width);
+      this.drawActorLevel(this._actor, x, y, width, list);
       break;
     case 5:
       this.drawActorIcons(this._actor, x, y, width, list);
@@ -1697,7 +1709,10 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
       break;
     case 42:
     case 43:
+    case 44:
+    case 45:
       this.drawParams(list, this._actor, x, y, width, list.DateSelect);
+      break;
     case 50:
       this.drawOriginalStatus(list, this._actor, x, y, width);
       break;
@@ -1808,6 +1823,10 @@ Window_Status.prototype.paramNameShow = function(list, actor, params) {
       return TextManager.param(0);
     case 43:
       return TextManager.param(1);
+    case 44:
+      return TextManager.param(0);
+    case 45:
+      return TextManager.param(1);
     default:
       return null;
   }
@@ -1857,6 +1876,10 @@ Window_Status.prototype.paramShow = function(list, actor, params, detaEval) {
       return actor.param(0);
     case 43:
       return actor.param(1);
+    case 44:
+      return actor.hp;
+    case 45:
+      return actor.mp;
     default:
       return null;
   }
@@ -1877,7 +1900,28 @@ Window_Status.prototype.drawActorFace = function(actor, x, y, width, height) {
   }
 };
 
-
+Window_Status.prototype.drawActorLevel = function(actor, x, y, width, list) {
+    const dactor = actor.actor();
+    this.contentsFontSize(list);
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    let margin = 0;
+    if (list.Back) {
+        this.drawContentsBackground(list.Back, x, y, width);
+        x = this.contensX(x);
+        width = this.contensWidth(width);
+    }
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
+    let systemWidth = this.systemWidth(list.SystemItemWidth, width);
+    const nameText = list.ParamName ? list.ParamName : TextManager.levelA;
+    const text = list.DetaEval ? eval(list.DetaEval) : actor.level;
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
+    this.resetTextColor();
+    this.nuun_setContentsFontFace(list);
+    this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+};
 
 Window_Status.prototype.drawActorIcons = function(actor, x, y, width, list) {
   let icons = [];
@@ -1906,89 +1950,115 @@ Window_Status.prototype.drawPlaceStateIcon = function(x, y, actor) {
 };
 
 Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) {
-  const dactor = actor.actor();
-  if (params === 0) {
-    this.placeGauge(actor, "hp", x, y);
-  } else if (params === 1) {
-    this.placeGauge(actor, "mp", x, y);
-  } else if (params === 9) {
-    this.placeGauge(actor, "tp", x, y);
-  } else {
-    this.contentsFontSize(list);
-    this.drawContentsBackground(list.Back, x, y, width);
-    x = this.contensX(x);
-    width = this.contensWidth(width);
-    const dataEval = list.DetaEval;
-    let text = this.paramShow(list, actor, params, dataEval);
-    if (text !== undefined) {
-      if (params >= 10) {
-        text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);
-      }
-      let nameText = this.paramNameShow(list, actor, params);
-      let textWidth = this.systemWidth(list.SystemItemWidth, width);
-      this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-      this.drawText(nameText, x, y, textWidth);
-      this.resetTextColor();
-      if (params >= 2 && params < 8) {
-        text += list.paramUnit ? String(list.paramUnit) : "";
-      } else if (params >= 10 && params < 30) {
-        text += list.paramUnit ? String(list.paramUnit) : " %";
-      } else if (params === 42 || params === 43) {
-        text += list.paramUnit ? String(list.paramUnit) : "";
-      }
-      this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
-      this.resetTextColor();
+    const dactor = actor.actor();
+    if (params === 0) {
+        this.placeGauge(actor, "hp", x, y);
+    } else if (params === 1) {
+        this.placeGauge(actor, "mp", x, y);
+    } else if (params === 9) {
+        this.placeGauge(actor, "tp", x, y);
+    } else {
+        this.contentsFontSize(list);
+        this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+        let margin = 0;
+        if (list.Back) {
+            this.drawContentsBackground(list.Back, x, y, width);
+            x = this.contensX(x);
+            width = this.contensWidth(width);
+        }
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        let systemWidth = this.systemWidth(list.SystemItemWidth, width);
+        const nameText = this.paramNameShow(list, actor, params);
+        let text = this.paramShow(list, actor, params, list.DetaEval);
+        this.drawText(nameText, x + margin, y, systemWidth - margin);
+        if (params >= 10 && params < 40) {
+            text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);
+        }
+        if (params >= 2 && params < 8) {
+            text += list.paramUnit ? String(list.paramUnit) : "";
+        } else if (params >= 10 && params < 30) {
+            text += list.paramUnit ? String(list.paramUnit) : " %";
+        } else if (params === 42 || params === 43) {
+            text += list.paramUnit ? String(list.paramUnit) : "";
+        }
+        if (params === 44) {
+            this.changeTextColor(ColorManager.hpColor(actor));
+        } else if (params === 45) {
+            this.changeTextColor(ColorManager.mpColor(actor));
+        } else {
+            this.resetTextColor();
+        }
+        this.nuun_setContentsFontFace(list);
+        this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), (list.Align || 'right'));
     }
-  }
 };
 
 Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
-  const dactor = actor.actor();
-  this.contentsFontSize(list);
-  const lineHeight = this.lineHeight();
-  const equips = this._actor.equips();
-  const e1uipsLength = list.EquipNum > 0 ? list.EquipNum : equips.length;
-  let y2 = y;
-  this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-  const text = list.paramName;
-  if (text) {
-    this.drawText(text, x, y, width);
-    y2 += lineHeight;
-  }
-  for (let i = 0; i < e1uipsLength; i++) {
-    const index = i + (list.EquipStartIndex || 0);
-    y = y2 + lineHeight * i;
-    let sw = 0;
-    let iconWidth = 0;
-    const item = equips[index];
-    this.drawContentsBackground(list.Back, x, y, width);
-    x2 = this.contensX(x);
-    width2 = this.contensWidth(width);
-    if (EquipNameVisible > 1) {//アイコン表示
-      const iconId = EquipIcons[i] ? EquipIcons[i].EquipIconId : 0;
-      if (iconId > 0) {
-        this.drawIcon(iconId, x2, y + 2);
-      }
-      iconWidth = ImageManager.iconWidth + (EquipNameVisible === 2 ? 24 : 4);
+    const dactor = actor.actor();
+    this.contentsFontSize(list);
+    const lineHeight = this.lineHeight();
+    const equips = this._actor.equips();
+    const e1uipsLength = list.EquipNum > 0 ? list.EquipNum : equips.length;
+    let x2 = 0;
+    let y2 = y;
+    let width2 = width;
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    const nameText = list.ParamName;
+    if (nameText) {
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
+        y2 += lineHeight;
     }
-    if (EquipNameVisible === 1 || EquipNameVisible === 3) {//デフォルト
-      const slotName = this.actorSlotName(actor, index);
-      sw += this.systemWidth(list.SystemItemWidth, width2);
-      this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-      this.drawText(slotName, x2 + iconWidth, y, sw);
+    if (list.Back) {
+        width2 = this.contensWidth(width);
+        x2 = this.contensX(x);
     }
-    sw += iconWidth;
-    this.resetTextColor();
-    this.drawItemName(item, x2 + sw, y, width2 - sw);
-  }
+    for (let i = 0; i < e1uipsLength; i++) {
+        const index = i + (list.EquipStartIndex || 0);
+        y = y2 + lineHeight * i;
+        let sw = 0;
+        let iconWidth = 0;
+        if (list.Back) {
+            this.drawContentsBackground(list.Back, x, y, width); 
+        }
+        const item = equips[index];
+        if (EquipNameVisible > 1) {//アイコン表示
+            const iconId = EquipIcons[i] ? EquipIcons[i].EquipIconId : 0;
+            if (iconId > 0) {
+              this.drawIcon(iconId, x2, y + 2);
+            }
+            iconWidth = ImageManager.iconWidth + (EquipNameVisible === 2 ? 24 : 4);
+        }
+        if (EquipNameVisible === 1 || EquipNameVisible === 3) {//デフォルト
+            const slotName = this.actorSlotName(actor, index);
+            sw += this.systemWidth(list.SystemItemWidth, width2);
+            this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+            this.drawText(slotName, x2 + iconWidth, y, sw);
+        }
+        sw += iconWidth;
+        this.resetTextColor();
+        this.drawItemName(item, x2 + sw, y, width2 - sw);
+    }
 };
 
 Window_Status.prototype.drawProfile = function(list, actor, x, y, width) {
   const text = list.paramName;
   this.contentsFontSize(list);
   if (text) {
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    this.drawText(text, x, y, width);
+    this.drawText(text, x + margin, y, width - margin);
     y += this.lineHeight();
   }
   const profileText = actor.profile();
@@ -2001,8 +2071,13 @@ Window_Status.prototype.drawDesc = function(list, actor, x, y, width) {
   const text = list.paramName;
   this.contentsFontSize(list);
   if (text) {
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    this.drawText(text, x, y, width);
+    this.drawText(text, x + margin, y, width - margin);
     y += this.lineHeight();
   }
   this.resetTextColor();
@@ -2017,154 +2092,196 @@ Window_Status.prototype.drawName = function(list, x, y, width) {
   const text = list.ParamName;
   this.contentsFontSize(list);
   if (text) {
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    this.drawText(text, x, y, width);
+    this.drawText(text, x + margin, y, width - margin, (list.Align || 'left'));
   }
   this.resetTextColor();
 };
 
 Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) {
-  const dactor = actor.actor();
-  this.contentsFontSize(list);
-  const nameText = list.ParamName;
-  this.drawContentsBackground(list.Back, x, y, width);
-  x = this.contensX(x);
-  width = this.contensWidth(width);
-  let textWidth = 0;
-  if (nameText) {
-    textWidth = this.systemWidth(list.SystemItemWidth, width);
+    const dactor = actor.actor();
+    this.contentsFontSize(list);
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    this.drawText(nameText , x, y, textWidth);
-  }
-  let text = list.DetaEval ? eval(list.DetaEval) : undefined;
-  if (text !== undefined) {
-    if (typeof(text) === 'number') {
-      text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);
+    if (list.Back) {
+        this.drawContentsBackground(list.Back, x, y, width);
+        x = this.contensX(x);
+        width = this.contensWidth(width);
     }
-    text += list.paramUnit ? String(list.paramUnit) : "";
-    this.resetTextColor();
-    this.drawText(text, x + textWidth + 8, y, width - textWidth - 8, 'right');
-  }
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
+    const systemWidth = this.systemWidth(list.SystemItemWidth, width);
+    const nameText = list.ParamName;
+    let text = list.DetaEval ? eval(list.DetaEval) : undefined;
+    if (text !== undefined) {
+        if (typeof(text) === 'number') {
+            text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);
+        }
+        if (nameText) {
+            this.drawText(nameText, x + margin, y, systemWidth - margin);
+        }
+        this.resetTextColor();
+        this.nuun_setContentsFontFace(list);
+        text += list.paramUnit ? String(list.paramUnit) : "";
+        this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+    }
 };
 
 Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
-  const dactor = actor.actor();
-  const lineHeight = this.lineHeight();
-  this.contentsFontSize(list);
-  const text = list.ParamName;
-  if (text) {
+    const dactor = actor.actor();
+    const lineHeight = this.lineHeight();
+    this.contentsFontSize(list);
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    this.drawText(text, x, y, width);
-    y += this.lineHeight();
-  }
-  let x2 = x;
-  let y2 = y;
-  width = (width - this.colSpacing() * (ElementResistCol - 1)) / ElementResistCol;
-  if (ElementResist) {
-    const elementResistlength = ElementResist.length;
-    for (let i = 0; i < elementResistlength; i++) {
-      x2 = Math.floor(i % ElementResistCol) * (width + this.itemPadding()) + x;
-      y2 = Math.floor(i / ElementResistCol) * lineHeight + y;
-      let elementId = ElementResist[i].ElementNo;
-      let textWidth = 0;
-      if (elementId > 0) {
-        this.drawContentsBackground(list.Back, x2, y2, width);
-        x3 = this.contensX(x2);
-        width2 = this.contensWidth(width);
-        let iconId = ElementResist[i].ElementIconId;
-        if (ElementResistText || !iconId) {
-          const name = $dataSystem.elements[elementId];
-          textWidth += this.systemWidth(list.SystemItemWidth, width2);
-          this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-          this.drawText(name, x3, y2, textWidth);
-        } else if (iconId > 0) {
-          this.drawIcon(iconId, x3, y2 + 2);
-          textWidth += ImageManager.iconWidth + 4;
+    const nameText = list.ParamName;
+    let x2 = x;
+    let y2 = y;
+    let width2 = width;
+    if (nameText) {
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
         }
-        let rate = actor.elementRate(elementId) * 100;
-        rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
-        const r = rate;
-        rate += list.paramUnit ? String(list.paramUnit) : " %";
-        const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
-        this.resetTextColor();
-        this.drawText(rateText, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
-      }
+        this.drawText(nameText, x + margin, y, width - margin);
+        y2 += lineHeight;
     }
-  }
+    width = (width - this.colSpacing() * (ElementResistCol - 1)) / ElementResistCol;
+    if (ElementResist) {
+        const elementResistlength = ElementResist.length;
+        for (let i = 0; i < elementResistlength; i++) {
+            x2 = Math.floor(i % ElementResistCol) * (width + this.itemPadding()) + x;
+            y2 = Math.floor(i / ElementResistCol) * lineHeight + y;
+            let elementId = ElementResist[i].ElementNo;
+            let systemWidth = 0;
+            if (elementId > 0) {
+                if (list.Back) {
+                    this.drawContentsBackground(list.Back, x2, y2, width); 
+                    x2 = this.contensX(x2);
+                    width2 = this.contensWidth(width);
+                }
+                let iconId = ElementResist[i].ElementIconId;
+                if (ElementResistText || !iconId) {
+                    const name = $dataSystem.elements[elementId];
+                    systemWidth += this.systemWidth(list.SystemItemWidth, width2);
+                    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+                    this.drawText(name, x2, y2, systemWidth);
+                } else if (iconId > 0) {
+                    this.drawIcon(iconId, x2, y2 + 2);
+                    systemWidth += ImageManager.iconWidth + 4;
+                }
+                let rate = actor.elementRate(elementId) * 100;
+                rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+                const r = rate;
+                rate += list.paramUnit ? String(list.paramUnit) : "%";
+                const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
+                this.resetTextColor();
+                this.nuun_setContentsFontFace(list);
+                this.drawText(rateText, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+            }   
+        }
+    }
 };
 
 Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
-  const dactor = actor.actor();
-  const lineHeight = this.lineHeight();
-  this.contentsFontSize(list);
-  const text = list.ParamName;
-  if (text) {
+    const dactor = actor.actor();
+    const lineHeight = this.lineHeight();
+    this.contentsFontSize(list);
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    this.drawText(text, x, y, width);
-    y += this.lineHeight();
-  }
-  let x2 = x;
-  let y2 = y;
-  width = (width - this.colSpacing() * (StateResistCol - 1)) / StateResistCol;
-  if (StateResist) {
-    const stateResistlength = StateResist.length;
-    for (let i = 0; i < stateResistlength; i++) {
-      x2 = Math.floor(i % StateResistCol) * (width + this.itemPadding()) + x;
-      y2 = Math.floor(i / StateResistCol) * lineHeight + y;
-      let stateId = StateResist[i].StateNo;
-      let textWidth = 0;
-      if (stateId > 0) {
-        this.drawContentsBackground(list.Back, x2, y2, width);
-        x3 = this.contensX(x2);
-        width2 = this.contensWidth(width);
-        let iconId = StateResist[i].StateIconId > 0 ? StateResist[i].StateIconId : $dataStates[stateId].iconIndex;
-        if (StateResistText || iconId === 0) {
-          const name = $dataStates[stateId].name;
-          textWidth += this.systemWidth(list.SystemItemWidth, width2);
-          this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-          this.drawText(name, x3, y2, textWidth);
-        } else if (iconId > 0) {
-          this.drawIcon(iconId, x3, y2 + 2);
-          textWidth += ImageManager.iconWidth + 4;
+    const nameText = list.ParamName;
+    let x2 = x;
+    let y2 = y;
+    let width2 = width;
+    if (nameText) {
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
         }
-        let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
-        rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
-        const r = rate;
-        rate += list.paramUnit ? String(list.paramUnit) : " %";
-        const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
-        if (actor.isStateResist(stateId)) {
-          this.changeTextColor(NuunManager.getColorCode(StateResistColor));
-        } else {
-          this.resetTextColor();
-        }
-        this.drawText(rateText, x3 + textWidth + 8, y2, width2 - textWidth - 8, "right");
-      }
+        this.drawText(nameText, x + margin, y, width - margin);
+        y2 += lineHeight;
     }
-  }
+    width = (width - this.colSpacing() * (StateResistCol - 1)) / StateResistCol;
+    if (StateResist) {
+        const stateResistlength = StateResist.length;
+        for (let i = 0; i < stateResistlength; i++) {
+            x2 = Math.floor(i % StateResistCol) * (width + this.itemPadding()) + x;
+            y2 = Math.floor(i / StateResistCol) * lineHeight + y;
+            let stateId = StateResist[i].StateNo;
+            let systemWidth = 0;
+            if (stateId > 0) {
+                if (list.Back) {
+                    this.drawContentsBackground(list.Back, x2, y2, width); 
+                    x2 = this.contensX(x2);
+                    width2 = this.contensWidth(width);
+                }
+                let iconId = StateResist[i].StateIconId > 0 ? StateResist[i].StateIconId : $dataStates[stateId].iconIndex;
+                if (StateResistText || iconId === 0) {
+                    const name = $dataStates[stateId].name;
+                    systemWidth += this.systemWidth(list.SystemItemWidth, width2);
+                    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+                    this.drawText(name, x2, y2, systemWidth);
+                } else if (iconId > 0) {
+                    this.drawIcon(iconId, x2, y2 + 2);
+                    systemWidth += ImageManager.iconWidth + 4;
+                }
+                let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
+                rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+                const r = rate;
+                rate += list.paramUnit ? String(list.paramUnit) : "%";
+                const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
+                if (actor.isStateResist(stateId)) {
+                this.changeTextColor(NuunManager.getColorCode(StateResistColor));
+                } else {
+                this.resetTextColor();
+                }
+                this.nuun_setContentsFontFace(list);
+                this.drawText(rateText, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+            }
+        }
+    }
 };
 
 Window_Status.prototype.drawExpInfo = function(list, actor, x, y, width) {
-  const lineHeight = this.lineHeight();
-  this.contentsFontSize(list);
-  const expTotal = TextManager.expTotal.format(TextManager.exp);
-  this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-  this.drawText(expTotal, x, y, width);
-  this.resetTextColor();
-  this.drawText(this.expTotalValue(), x, y + lineHeight * 1, width, "right");
+    const lineHeight = this.lineHeight();
+    this.contentsFontSize(list);
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
+    const expTotal = TextManager.expTotal.format(TextManager.exp);
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    this.drawText(expTotal, x + margin, y, width - margin);
+    this.resetTextColor();
+    this.nuun_setContentsFontFace(list);
+    this.drawText(this.expTotalValue(), x, y + lineHeight * 1, width, "right");
 };
 
 Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
-  const lineHeight = this.lineHeight();
-  this.contentsFontSize(list);
-  const expNext = TextManager.expNext.format(TextManager.level);
-  this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-  this.drawText(expNext, x, y + lineHeight * 1, width);
-  this.resetTextColor();
-  if (EXPGaugeVisible) {
-    this.placeExpGauge(this._actor, x - 30 + EXPGaugeX, y + lineHeight * 2 + EXPGaugeY);
-  } else {
-    this.drawText(this.expNextValue(), x, y + lineHeight * 2, width, "right");
-  }
+    const lineHeight = this.lineHeight();
+    this.contentsFontSize(list);
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
+    const expNext = TextManager.expNext.format(TextManager.level);
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    this.drawText(expNext, x + margin, y, width - margin);
+    this.resetTextColor();
+    if (EXPGaugeVisible) {
+        this.placeExpGauge(this._actor, x - 30 + EXPGaugeX, y + lineHeight * 1 + EXPGaugeY);
+    } else {
+        this.nuun_setContentsFontFace(list);
+        this.drawText(this.expNextValue(), x, y + lineHeight * 1, width, "right");
+    }
 };
 
 Window_Status.prototype.drawCharacterChip = function(list, actor, x, y) {
@@ -2275,7 +2392,7 @@ Window_Status.prototype.characterChipSprite = function(actor, x, y) {
 Window_Status.prototype.svActoeSprite = function(actor, x, y) {
   const type = 'sv_Actor'
   const key = "menu_%1".format(type);
-  const sprite = this.createInnerSprite(key, Sprite_MenuSvActor);
+  const sprite = this.createInnerSprite(key, Sprite_StatusSvActor);
   sprite.setBattler(actor);
   sprite.setActorPosition(x + this.x, y + this.y);
   sprite.show();
@@ -2355,6 +2472,10 @@ Window_Status.prototype.getColorCode = function(color) {
   }
   return ColorManager.textColor(color);
 };
+
+Window_Status.prototype.nuun_setContentsFontFace = function(list) {
+    this.contents.fontFace = list.FontFace ? list.FontFace : (list.ValueFontFace ? $gameSystem.numberFontFace() : $gameSystem.mainFontFace());
+}
 
 
 function Sprite_StatusHPGauge() {
@@ -2539,53 +2660,112 @@ Sprite_MenuCharacter.prototype.update = function() {
   }
 };
 
-function Sprite_MenuSvActor() {
+function Sprite_StatusSvActor() {
   this.initialize(...arguments);
 }
 
-Sprite_MenuSvActor.prototype = Object.create(Sprite_Actor.prototype);
-Sprite_MenuSvActor.prototype.constructor = Sprite_MenuSvActor;
+Sprite_StatusSvActor.prototype = Object.create(Sprite_Actor.prototype);
+Sprite_StatusSvActor.prototype.constructor = Sprite_StatusSvActor;
 
-Sprite_MenuSvActor.prototype.initialize = function(battler) {
+Sprite_StatusSvActor.prototype.initialize = function(battler) {
   Sprite_Actor.prototype.initialize.call(this, battler);
 };
 
-Sprite_MenuSvActor.prototype.moveToStartPosition = function() {
+Sprite_StatusSvActor.prototype.moveToStartPosition = function() {
   
 };
 
-Sprite_MenuSvActor.prototype.setActorHome = function(index) {
+Sprite_StatusSvActor.prototype.setActorHome = function(index) {
   
 };
 
-Sprite_MenuSvActor.prototype.setActorPosition = function(x, y) {
+Sprite_StatusSvActor.prototype.setActorPosition = function(x, y) {
   this.setHome(x, y);
   this.refreshMotion();
 };
 
-Sprite_MenuSvActor.prototype.setupMotion = function() {
+Sprite_StatusSvActor.prototype.setupMotion = function() {
 };
 
-Sprite_MenuSvActor.prototype.startMotion = function(motionType) {
-  if (motionType === "wait") {
-    motionType = "walk";
-  }
-  Sprite_Actor.prototype.startMotion.call(this, motionType);
-};
-
-Sprite_MenuSvActor.prototype.updateVisibility = function() {
+Sprite_StatusSvActor.prototype.updateVisibility = function() {
   Sprite_Clickable.prototype.updateVisibility.call(this);
   if (!this._battler) {
     this.visible = false;
   }
 };
 
-Sprite_MenuSvActor.prototype.updateMain = function() {
+Sprite_StatusSvActor.prototype.updateMain = function() {
   Sprite_Battler.prototype.updateMain.call(this);
   if (!this._battler.isSpriteVisible() && this.visible) {
     this.updateBitmap();
     this.updateFrame();
   }
 };
+
+Sprite_StatusSvActor.prototype.startMotion = function() {
+    if (this._actor.isDead()) {
+        motionType = 'dead';
+    } else {
+        motionType = 'walk';
+    }
+    Sprite_Actor.prototype.startMotion.call(this, motionType);
+};
+  
+Sprite_StatusSvActor.prototype.setupWeaponAnimation = function() {
+    
+};
+
+
+function Sprite_StatusActorImg() {
+    this.initialize(...arguments);
+}
+  
+Sprite_StatusActorImg.prototype = Object.create(Sprite.prototype);
+Sprite_StatusActorImg.prototype.constructor = Sprite_StatusActorImg;
+  
+Sprite_StatusActorImg.prototype.initialize = function() {
+    Sprite.prototype.initialize.call(this);
+    this.initMembers();
+};
+
+Sprite_StatusActorImg.prototype.initMembers = function() {
+    this._battler = null;
+    this._apngMode = null;
+    this._data = null;
+    this._pictureName = null;
+};
+
+Sprite_StatusActorImg.prototype.setup = function(battler, data) {
+    this._battler = battler;
+    this._data = data;
+    const name = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battler.getActorGraphicImg() : data.ActorImg;
+    this._pictureName = name.split('pictures/')[1];
+    this.refresh();
+};
+
+Sprite_StatusActorImg.prototype.refresh = function() {
+    if (this.addApngChild && this.loadApngSprite(this._pictureName)) {
+        this.addApngChild(this._pictureName);
+        this._apngMode = true;
+    }
+};
+
+Sprite_StatusActorImg.prototype.destroy = function() {
+    this.resetMenuActorImg();
+    Sprite.prototype.destroy.call(this);
+};
+
+Sprite_StatusActorImg.prototype.resetMenuActorImg = function() {
+    this._battler = null;
+    if (this._apngMode) {
+        this.destroyApngIfNeed();
+        this._apngMode = null;
+    }
+};
+
+Sprite_StatusActorImg.prototype.loadApngSprite = function(name) {
+    return Sprite_Picture.prototype.loadApngSprite.call(this, name);
+};
+
 
 })();

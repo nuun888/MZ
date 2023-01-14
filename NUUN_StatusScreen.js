@@ -84,6 +84,7 @@
  * 各項目(一部を除く)にアイコンを指定できる機能を追加。
  * 各項目(一部を除く)に文字揃えを指定できる機能を追加。
  * サイドビューアクター表示に関する修正。
+ * 次の経験値のY座標を修正。
  * 2022/12/15 Ver.2.4.6
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
  * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
@@ -1824,9 +1825,9 @@ Window_Status.prototype.paramNameShow = function(list, actor, params) {
     case 43:
       return TextManager.param(1);
     case 44:
-      return TextManager.param(0);
+      return TextManager.basic(2);
     case 45:
-      return TextManager.param(1);
+      return TextManager.basic(4);
     default:
       return null;
   }

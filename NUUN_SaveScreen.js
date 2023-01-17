@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.1.2
+ * @version 2.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/1/17 Ver.2.1.3
+ * Corrected because the contents of the plug-in command's auto save execution were different.
+ * Fixed the problem that the maximum number of saves is displayed one less when autosave is turned off.
+ * Added a function that allows you to specify a switch that does not perform auto save when moving after battle.
  * 2023/1/7 Ver.2.1.2
  * Added a function that allows you to select whether to display or hide the window image.
  * Changed the display in languages other than Japanese to English.
@@ -157,8 +161,8 @@
  * 
  * 
  * @command UserAutoSave
- * @desc Allow snapshots on autosave. Disable with OFF.
- * @text Allow snapshot during autosave
+ * @desc Perform autosave.
+ * @text Perform autosave
  * 
  * @arg OnSaveSnap
  * @text snapshot permission
@@ -261,6 +265,13 @@
  * @type number
  * @default 20
  * @min 1
+ * @parent SaveFileWindow
+ * 
+ * @param AutoSaveEnabledSwitch
+ * @desc After battle, specify a switch that prohibits auto save execution when moving. (Enabled Autosave ON)
+ * @text Auto save execution prohibited when moving after battle
+ * @type switch
+ * @default 0
  * @parent SaveFileWindow
  * 
  * @param Contents
@@ -687,6 +698,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/17 Ver.2.1.3
+ * プラグインコマンドのオードセーブ実行の内容が異なっていたので修正。
+ * オートセーブ有効化をOFFにしたときに最大セーブ数が１つ少なく表示される問題を修正。
+ * 戦闘後、移動時のオートセーブを実行しないスイッチを指定できる機能を追加。
  * 2023/1/7 Ver.2.1.2
  * ウィンドウ画像を表示非表示か選択できる機能を追加。
  * 日本語以外での表示を英語表示に変更。
@@ -788,8 +803,8 @@
  * 
  * 
  * @command UserAutoSave
- * @desc オートセーブ時のスナップショットを許可します。OFFで無効にします。
- * @text オートセーブ時SS許可
+ * @desc オートセーブ時を行います。
+ * @text オートセーブ実行
  * 
  * @arg OnSaveSnap
  * @text スナップショット許可
@@ -892,6 +907,13 @@
  * @type number
  * @default 20
  * @min 1
+ * @parent SaveFileWindow
+ * 
+ * @param AutoSaveEnabledSwitch
+ * @desc 戦闘後、移動時のオートセーブ実行を禁止にするスイッチを指定します。(オートセーブを有効化ON)
+ * @text 戦闘後、移動時オートセーブ実行禁止
+ * @type switch
+ * @default 0
  * @parent SaveFileWindow
  * 
  * @param Contents
@@ -1279,6 +1301,7 @@ Imported.NUUN_SaveScreen = true;
   const FaceScale = Number(parameters['FaceScale'] || 100);
   const NumSaveCols = Number(parameters['NumSaveCols'] || 1);
   const NumSaveRows = Number(parameters['NumSaveRows'] || 5);
+  const AutoSaveEnabledSwitch = Number(parameters['AutoSaveEnabledSwitch'] || 0);
   const SaveContentsCols = Number(parameters['SaveContentsCols'] || 2);
   const MaxSave = Number(parameters['MaxSave'] || 20);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
@@ -1320,7 +1343,7 @@ Imported.NUUN_SaveScreen = true;
 
   PluginManager.registerCommand(pluginName, 'UserAutoSave', args => {
     SceneManager.snapSaveBitmap(eval(args.OnSaveSnap));
-    SceneManager._scene.executeAutosave();
+    SceneManager._scene.userRequestAutosave();
   });
   
   PluginManager.registerCommand(pluginName, 'SetAnyName', args => {
@@ -1508,7 +1531,20 @@ Imported.NUUN_SaveScreen = true;
   DataManager.maxSavefiles = function() {
     return MaxSave ? MaxSave : _DataManager_maxSavefiles.call(this);
   };
+  
 
+  const _Scene_Base_requestAutosave = Scene_Base.prototype.requestAutosave;
+  Scene_Base.prototype.requestAutosave = function() {
+    if (AutoSaveEnabledSwitch === 0 || !$gameSwitches.value(AutoSaveEnabledSwitch)) {
+        _Scene_Base_requestAutosave.call(this);
+    }
+  };
+
+  Scene_Base.prototype.userRequestAutosave = function() {
+    if (this.isAutosaveEnabled()) {
+        this.executeAutosave();
+    }
+  };
 
   const _Scene_Map_updateTransferPlayer = Scene_Map.prototype.updateTransferPlayer;
   Scene_Map.prototype.updateTransferPlayer = function() {
@@ -1598,6 +1634,10 @@ Imported.NUUN_SaveScreen = true;
 
   Window_SavefileList.prototype.maxContentsCols = function() {
     return SaveContentsCols;
+  };
+
+  Window_SavefileList.prototype.maxItems = function() {
+    return DataManager.maxSavefiles();
   };
 
   Window_SavefileList.prototype.lineHeight = function() {

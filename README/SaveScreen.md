@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# Ver.2.1.2
+# Ver.2.1.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)Ver.1.6.2以降  
@@ -75,6 +75,10 @@ drawTextEx表示はプラグインパラメータのフォントサイズが適�
 オートセーブ時のスナップショットは戦闘開始直前のマップ、移動直前のマップが撮影されます。  
 
 ## 更新履歴
+2023/1/17 Ver.2.1.3  
+プラグインコマンドのオードセーブ実行の内容が異なっていたので修正。  
+オートセーブ有効化をOFFにしたときに最大セーブ数が１つ少なく表示される問題を修正。  
+戦闘後、移動時のオートセーブを実行しないスイッチを指定できる機能を追加。  
 2023/1/7 Ver.2.1.2  
 ウィンドウ画像を表示非表示か選択できる機能を追加。  
 日本語以外での表示を英語表示に変更。  

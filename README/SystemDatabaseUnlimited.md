@@ -1,5 +1,5 @@
 # [データベース上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -17,5 +17,7 @@
 ![画像](img/SystemDatabaseUnlimited2.png)  
 
 ## 更新履歴 
+2023/1/21 Ver.1.0.1  
+マップを制限なく追加できる機能を追加。  
 2023/1/19 Ver.1.0.0  
 初版。  

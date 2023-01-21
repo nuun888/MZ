@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * You can set more than the maximum number of maps (default 2000) and the maximum number of animations (default 1000).
@@ -23,6 +23,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/21/2023 Ver.1.0.1
+ * Added the ability to add maps without restrictions.
  * 1/19/2023 Ver.1.0.0
  * First edition.
  * 
@@ -46,6 +48,10 @@
  * @type number
  * @default 0
  * 
+ * @command AddMap
+ * @desc Add a map to the database. Use it when adding more than 2000.
+ * @text Add map
+ * 
  */
 /*:ja
  * @target MZ
@@ -53,7 +59,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * マップの上限数(デフォルト2000)、アニメーションの上限数(デフォルト1000)を超えて設定できるようになります。
@@ -64,6 +70,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/21 Ver.1.0.1
+ * マップを制限なく追加できる機能を追加。
  * 2023/1/19 Ver.1.0.0
  * 初版。
  * 
@@ -87,6 +95,11 @@
  * @type number
  * @default 0
  * 
+ * @command AddMap
+ * @desc マップをデータベースに追加します。2000を超えて追加する場合に使用してください。
+ * @text マップ追加
+ * 
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_BankSystem = true;
@@ -100,6 +113,10 @@ Imported.NUUN_BankSystem = true;
 
     PluginManager.registerCommand(pluginName, 'DataBaseAddMaps', args => {
         NuunManager.addMapSystemData('MapInfos.json', Number(args.MaxDatabase));
+    });
+
+    PluginManager.registerCommand(pluginName, 'AddMap', args => {
+        NuunManager.addMap('MapInfos.json');
     });
 
     function getSystemData(dataPass) {
@@ -123,6 +140,28 @@ Imported.NUUN_BankSystem = true;
         return {"id":index,"expanded":false,"name":filename,"order":index,"parentId":0,"scrollX":0,"scrollY":0};
     };
 
+    NuunManager.addMap = function(dataPass) {
+        try {
+            const dataFile = getSystemData(dataPass);
+            const length = dataFile.length;
+            while (true) {
+                if (!dataFile[length]) {
+                    break;
+                }
+                length++;
+            }
+            dataFile.push(getMapSystemData(length));
+            const fs = require("fs");
+            const pass = "data/" + dataPass;
+            fs.writeFileSync(pass, JSON.stringify(dataFile));
+            const log = $gameSystem.isJapanese() ? "出力が完了しました。エディタを保存して確定してください。" : "Output completed. Save and confirm the editor.";
+            console.log(log);
+        } catch (e) {
+            const elog = $gameSystem.isJapanese() ? "エラーが発生しました。" : "An error has occurred";
+            console.log(elog);
+        }
+    };
+
     NuunManager.addMapSystemData = function(dataPass, MaxDatabase) {
         try {
             const dataFile = getSystemData(dataPass);
@@ -130,7 +169,7 @@ Imported.NUUN_BankSystem = true;
             if (MaxDatabase > 0) {
                 for (let i = 0; i <= MaxDatabase; i++) {
                     if (!dataFile[i]) {
-                        dataFile.push(getMapSystemData(i))
+                        dataFile.push(getMapSystemData(i));
                     }
                 }
             }

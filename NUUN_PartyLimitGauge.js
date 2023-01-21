@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.2.1
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -27,7 +27,13 @@
  * $gameTroop._limitGauge　Enemy limit gauge
  * 
  * skill notes
- * <limitCost:10> Consume 10 limit gauge as skill cost.
+ * <limitCost:[cost]> Set the skill cost.
+ * [cost]:cost
+ * <limitCost:50> Consume 50 limit gauge as skill cost.
+ * 
+ * <LimitCostWidth:[string]> Specify the display width of the cost as a string. The width of the specified string affects the width of the skill name.
+ * [string]:string
+ * <LimitCostWidth:00000> Let the length of 00000 be set as the display width of the cost.
  * 
  * Skill or item notes
  * <LimitEffect:10> Increases limit gauge by 10.
@@ -43,6 +49,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/21/2023 Ver.1.3.0
+ * Fixed the problem that the party limit cost overlaps when the cost of MP and TP is set.
+ * Added a function that allows you to specify the display width when the skill cost of MP and TP is set.
+ * Added a function that allows you to specify the cost display range for each skill that activates the party limit.
  * 12/28/2022 Ver.1.2.1
  * Processing fixes.
  * 12/24/2022 Ver.1.2.0
@@ -299,12 +309,19 @@
  * @default 16
  * @parent CostSetting
  * 
+ * @param CostWidth
+ * @desc Cost range for multiple costs. blank and disabled
+ * @text Cost range for multiple costs
+ * @type string
+ * @default 00000
+ * @parent CostSetting
+ * 
  */
 /*:ja
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.2.1
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -321,7 +338,13 @@
  * $gameTroop._limitGauge　敵のリミットゲージ
  * 
  * スキルのメモ欄
- * <limitCost:10> スキルのコストとしてリミットゲージを１０を消費します。
+ * <limitCost:[cost]> スキルのコストを設定します。
+ * [cost]:コスト
+ * <limitCost:50> スキルのコストとしてリミットゲージを５０を消費します。
+ * 
+ * <LimitCostWidth:[string]> コストの表示幅を文字列で指定します。指定した文字列の横幅がスキル名の横幅に影響します。
+ * [string]:文字列
+ * <LimitCostWidth:00000> コストの表示幅として00000の長さが設定させます。
  * 
  * スキル、アイテムのメモ欄
  * <LimitEffect:10> リミットゲージが10増加します。
@@ -337,6 +360,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/21 Ver.1.3.0
+ * MP、TPのコストが設定されていた場合、パーティリミットコストが重なってします問題を修正。
+ * MP、TPのスキルコストが設定されている場合、表示幅を指定できる機能を追加。
+ * パーティリミットの発動スキル毎にコストの表示幅を指定できる機能を追加。
  * 2022/12/28 Ver.1.2.1
  * 処理の修正。
  * 2022/12/24 Ver.1.2.0
@@ -594,6 +621,13 @@
  * @default 16
  * @parent CostSetting
  * 
+ * @param CostWidth
+ * @desc 複数コスト時のコスト幅。空白で無効
+ * @text 複数コスト時コスト幅
+ * @type string
+ * @default 00000
+ * @parent CostSetting
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_PartyLimitGauge = true;
@@ -632,6 +666,7 @@ const LoseAmount = String(parameters['LoseAmount'] || '');
 const EscapeAmount = String(parameters['EscapeAmount'] || '');
 const DieAmount = String(parameters['DieAmount'] || '');
 const LimitCostColor = Number(parameters['LimitCostColor'] || 0);
+const MultiCostWidth = String(parameters['CostWidth'] || '00000');
 
 
 const _BattleManager_setup = BattleManager.setup;
@@ -859,35 +894,64 @@ Scene_Battle.prototype.createTroopGauge = function() {
   this._troopGauge = sprite;
 };
 
+if (!Imported.NUUN_SkillCostShowEX) {
 
-const _Window_SkillList_drawSkillCost = Window_SkillList.prototype.drawSkillCost;
-Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {
-  const cost = this._actor.skillLimitCost(skill);
-  if (cost !== null && cost > 0) {
-    this.changeTextColor(getColorCode(LimitCostColor));
-    this.drawText(cost, x, y, width, "right");
-  }
-  _Window_SkillList_drawSkillCost.call(this, skill, x, y, width);
-};
+    const _Window_SkillList_drawItem = Window_SkillList.prototype.drawItem;
+    Window_SkillList.prototype.drawItem = function(index) {
+        const skill = this.itemAt(index);
+        if (skill) {
+            const cost = this._actor.skillLimitCost(skill);
+            this.multiCost = cost > 0 && (this._actor.skillTpCost(skill) > 0 || this._actor.skillMpCost(skill) > 0);
+            this._limitCostWidth = cost > 0 ? skill.meta.LimitCostWidth : null;
+        }
+        _Window_SkillList_drawItem.call(this, index);
+    };
 
+    const _Window_SkillList_costWidth = Window_SkillList.prototype.costWidth;
+    Window_SkillList.prototype.costWidth = function() {
+        if (this._limitCostWidth) {
+            return this.textWidth(this._limitCostWidth);
+        } else if (!!MultiCostWidth && this.multiCost) {
+            return this.textWidth(MultiCostWidth);
+        } else {
+            return _Window_SkillList_costWidth.call(this);
+        }
+    };
+    
+    const _Window_SkillList_drawSkillCost = Window_SkillList.prototype.drawSkillCost;
+    Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {
+        const cost = this._actor.skillLimitCost(skill);
+        let x2 = 0;
+        if (cost !== null && cost > 0) {
+            if (this._actor.skillTpCost(skill) > 0) {
+                x2 = this.textWidth(this._actor.skillTpCost(skill)) + this.itemPadding();
+            } else if (this._actor.skillMpCost(skill) > 0) {
+                x2 = this.textWidth(this._actor.skillMpCost(skill)) + this.itemPadding();
+            }
+            this.changeTextColor(getColorCode(LimitCostColor));
+            this.drawText(cost, x, y, width, "right");
+        }
+        _Window_SkillList_drawSkillCost.call(this, skill, x, y, width - x2);
+    };
+}
 
 function Sprite_PartyGauge() {
-  this.initialize(...arguments);
+    this.initialize(...arguments);
 }
 
 Sprite_PartyGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_PartyGauge.prototype.constructor = Sprite_PartyGauge;
 
 Sprite_PartyGauge.prototype.initialize = function() {
-  Sprite_Gauge.prototype.initialize.call(this);
+    Sprite_Gauge.prototype.initialize.call(this);
 };
 
 Sprite_PartyGauge.prototype.initMembers = function() {
-  Sprite_Gauge.prototype.initMembers.call(this);
+    Sprite_Gauge.prototype.initMembers.call(this);
 };
 
 Sprite_PartyGauge.prototype.bitmapWidth = function() {
-  return PartyGauge_Width;
+    return PartyGauge_Width;
 };
 
 Sprite_PartyGauge.prototype.setup = function(unit, statusType) {

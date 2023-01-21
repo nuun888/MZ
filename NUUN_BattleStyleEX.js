@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.6
+ * @version 3.8.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/1/21 Ver.3.8.7
+ * MVアニメーションの時にフラッシュを行うと、アクターの色が戻らない問題を修正。
  * 2023/1/8 Ver.3.8.6
  * アクター名、オリジナルパラメータ、レベルの表示文字揃えを行う処理を追加。
  * 味方対象選択時キャンセルをすると、対象者の行動時背景が表示されない問題を修正。
@@ -2685,26 +2687,61 @@ Sprite_Enemy.prototype.damageOffsetY = function() {
 };
 
 
+const _Sprite_Animation_setup = Sprite_Animation.prototype.setup;
+Sprite_Animation.prototype.setup = function(targets, animation, mirror, delay, previous) {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        this._frontTargets = targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
+    }
+    _Sprite_Animation_setup.call(this, targets, animation, mirror, delay, previous);
+};
+
 const _Sprite_Animation_updateFlash = Sprite_Animation.prototype.updateFlash;
 Sprite_Animation.prototype.updateFlash = function() {
-  const t = this._targets;
-  if (!$gameSystem.isSideView() && params.ActorEffectShow) {
-    this._targets = this._targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
-  }
-  _Sprite_Animation_updateFlash.call(this);
-  this._targets = t;
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        const t = this._targets;
+        this._targets =  this._frontTargets;
+        _Sprite_Animation_updateFlash.call(this);
+        this._targets = t;
+    } else {
+        _Sprite_Animation_updateFlash.call(this);
+    }
 };
 
-const _Sprite_AnimationMV_updateFlashMV = Sprite_AnimationMV.prototype.updateFlash;
+const _Sprite_AnimationMV_setup = Sprite_AnimationMV.prototype.setup;
+Sprite_AnimationMV.prototype.setup = function(targets, animation, mirror, delay) {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        this._frontTargets = targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
+    }
+    _Sprite_AnimationMV_setup.call(this, targets, animation, mirror, delay);
+};
+
+const _Sprite_AnimationMV_updateFlash = Sprite_AnimationMV.prototype.updateFlash;
 Sprite_AnimationMV.prototype.updateFlash = function() {
-  const t = this._targets;
-  if (!$gameSystem.isSideView() && params.ActorEffectShow) {
-    this._targets = this._targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
-  }
-  _Sprite_AnimationMV_updateFlashMV.call(this);
-  this._targets = t;
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        const t = this._targets;
+        this._targets =  this._frontTargets;
+        _Sprite_AnimationMV_updateFlash.call(this);
+        this._targets = t;
+    } else {
+        _Sprite_AnimationMV_updateFlash.call(this);
+    }
 };
 
+const _Sprite_AnimationMV_startHiding = Sprite_AnimationMV.prototype.startHiding;
+Sprite_AnimationMV.prototype.startHiding = function(duration) {
+    const t = this._targets;
+    this._targets =  this._frontTargets;
+    _Sprite_AnimationMV_startHiding.call(this);
+    this._targets = t;
+};
+
+const _Sprite_AnimationMV_onEnd = Sprite_AnimationMV.prototype.onEnd;
+Sprite_AnimationMV.prototype.onEnd = function() {
+    const t = this._targets;
+    this._targets =  this._frontTargets;
+    _Sprite_AnimationMV_onEnd.call(this);
+    this._targets = t;
+};
 
 //Sprite_ActorImges
 function Sprite_ActorImges() {

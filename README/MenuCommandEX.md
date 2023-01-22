@@ -1,5 +1,5 @@
 # [メニューコマンド表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
 #### 必須、前提プラグイン
 ※[メニュー画面デフォルトタイプ](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)   
@@ -14,6 +14,8 @@
 ![画像](img/MenuCommandEX1.png)   
 
 ## 更新履歴
+2023/1/22 Ver.1.1.2  
+画像を全てメニューコマンド表示時に読み込むように修正。  
 2023/1/8 Ver.1.1.1  
 コマンドソート有効をONにしたときに、コマンドの座標がずれて表示される問題を修正。  
 2023/1/4 Ver.1.1.0  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.7
+ * @version 3.8.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/1/22 Ver.3.8.8
+ * アクターのフラッシュを他のアクターと同期するように修正。
  * 2023/1/21 Ver.3.8.7
  * MVアニメーションの時にフラッシュを行うと、アクターの色が戻らない問題を修正。
  * 2023/1/8 Ver.3.8.6
@@ -2611,6 +2613,10 @@ Sprite_BSFrontActor.prototype.setActorHome = function(index) {
   }
 };
 
+Sprite_BSFrontActor.prototype.mainSprite = function() {
+    return this.bsSprite;
+};
+
 Sprite_BSFrontActor.prototype.actorHomeRefresh = function(index) {
     const rect = statusData.itemRectWithPadding(index);
     let x = rect.x + Math.floor(rect.width / 2) + statusData.itemPadding();
@@ -2729,18 +2735,26 @@ Sprite_AnimationMV.prototype.updateFlash = function() {
 
 const _Sprite_AnimationMV_startHiding = Sprite_AnimationMV.prototype.startHiding;
 Sprite_AnimationMV.prototype.startHiding = function(duration) {
-    const t = this._targets;
-    this._targets =  this._frontTargets;
-    _Sprite_AnimationMV_startHiding.call(this);
-    this._targets = t;
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        const t = this._targets;
+        this._targets =  this._frontTargets;
+        _Sprite_AnimationMV_startHiding.call(this, duration);
+        this._targets = t;
+    } else {
+        _Sprite_AnimationMV_startHiding.call(this, duration);
+    }
 };
 
 const _Sprite_AnimationMV_onEnd = Sprite_AnimationMV.prototype.onEnd;
 Sprite_AnimationMV.prototype.onEnd = function() {
-    const t = this._targets;
-    this._targets =  this._frontTargets;
-    _Sprite_AnimationMV_onEnd.call(this);
-    this._targets = t;
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        const t = this._targets;
+        this._targets =  this._frontTargets;
+        _Sprite_AnimationMV_onEnd.call(this);
+        this._targets = t;
+    } else {
+        _Sprite_AnimationMV_onEnd.call(this);
+    }
 };
 
 //Sprite_ActorImges
@@ -2808,7 +2822,7 @@ Sprite_ActorImges.prototype.update = function() {
   if (this._battler) {
     this.updateActorGraphic();
     this.updateMotion();
-    this.updateSelectionEffect();
+    //this.updateSelectionEffect();
   } else {
     this._stateSprite = null;
     this.bitmap = null;
@@ -3696,5 +3710,6 @@ Spriteset_Battle.prototype.createBattleField = function() {
 function conditionsParam(data, param, maxParam) {
   return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
 };
+
 
 })();

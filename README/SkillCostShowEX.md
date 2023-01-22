@@ -1,5 +1,5 @@
 # [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
-# Ver.1.1.2
+# Ver.1.1.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,10 @@
 `skill`:発動するスキルデータ  
 `cost`:コスト　装備消費と評価式は真偽値で返します。  
 
+`<SkillCostWidth:[string]>` コストの表示幅を文字列で指定します。指定した文字列の横幅がスキル名の横幅に影響します。
+`[string]`:文字列
+`<SkillCostWidth:00000>` コストの表示幅として00000の長さが設定させます。
+
 ### コストのデータ参照　コスト評価式及び表示コストの個別設定共通
 HP、MP、TP、Gold、Expはコスト値で取得されます。  
 消費MPが50の場合は、costの値に50が代入されます。  
@@ -47,6 +51,8 @@ HP、MP、TP、Gold、Expはコスト値で取得されます。
 (https://github.com/nuun888/MZ/blob/master/README/EquipSkillLearning.md)
 
 ## 更新履歴
+2023/1/22 Ver.1.1.3  
+スキル毎にコスト幅を指定できる機能を追加。  
 2022/12/17 Ver.1.1.2  
 スキル習得装備プラグインのポイントを表示できる機能を追加。  
 2022/12/6 Ver.1.1.1  

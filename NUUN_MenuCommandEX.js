@@ -14,7 +14,7 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
@@ -23,6 +23,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/22/2023 Ver.1.1.2
+ * Fixed to load all images when menu command is displayed.
  * 1/8/2023 Ver.1.1.1
  * Fixed the problem that command coordinates are displayed shifted when command sorting is enabled.
  * 1/4/2023 Ver.1.1.0
@@ -214,7 +216,7 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
@@ -223,6 +225,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/22 Ver.1.1.2
+ * 画像を全てメニューコマンド表示時に読み込むように修正。
  * 2023/1/8 Ver.1.1.1
  * コマンドソート有効をONにしたときに、コマンドの座標がずれて表示される問題を修正。
  * 2023/1/4 Ver.1.1.0
@@ -426,7 +430,22 @@ Imported.NUUN_MenuCommandEX = true;
     const _Window_MenuCommand_initialize = Window_MenuCommand.prototype.initialize;
     Window_MenuCommand.prototype.initialize = function(rect) {
         this._commandSprite = [];
+        this.loadCommandBitmap();
         _Window_MenuCommand_initialize.call(this, rect);
+    };
+
+    Window_MenuCommand.prototype.loadCommandBitmap = function() {
+        for (const data of MenuCommandSetting) {
+            if (data.ContentsBackGroundImg) {
+                ImageManager.nuun_LoadPictures(data.ContentsBackGroundImg)
+            }
+            if (data.SelectContentsBackGroundImg) {
+                ImageManager.nuun_LoadPictures(data.SelectContentsBackGroundImg)
+            }
+            if (data.CommandImg) {
+                ImageManager.nuun_LoadPictures(data.CommandImg)
+            }
+        }
     };
 
     Window_MenuCommand.prototype.getMenuCommandEX = function(index) {
@@ -455,7 +474,7 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     const _Window_MenuCommand_makeCommandList = Window_MenuCommand.prototype.makeCommandList;
-        Window_MenuCommand.prototype.makeCommandList = function() {
+    Window_MenuCommand.prototype.makeCommandList = function() {
         _Window_MenuCommand_makeCommandList.call(this);
         //this.refreshCommandList();
     };

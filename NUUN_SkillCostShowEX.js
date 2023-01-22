@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost display EX
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_Base
@@ -36,6 +36,10 @@
  * skill:Activated skill data
  * cost:Cost(Equipment consumption and evaluation formulas are returned as true/false values.)
  * 
+ * <SkillCostWidth:[string]> Specify the display width of the cost as a string. The width of the specified string affects the width of the skill name.
+ * [string]:string
+ * <SkillCostWidth:00000> Let the length of 00000 be set as the display width of the cost.
+ * 
  * Cost data reference
  * HP, MP, TP, Gold, Exp are obtained by cost value.
  * If the consumption MP is 50, 50 will be substituted for the cost value.
@@ -54,6 +58,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/22/2023 Ver.1.1.3
+ * Added a function that allows you to specify the cost range for each skill.
  * 12/17/2022 Ver.1.1.2
  * Added a function that can display the points of "NUUN_EquipSkillLearning".
  * 12/6/2022 Ver.1.1.1
@@ -324,7 +330,7 @@
  * @target MZ
  * @plugindesc スキルコスト表示拡張
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_Base
@@ -351,6 +357,10 @@
  * skill:発動するスキルデータ
  * cost:コスト　装備消費と評価式は真偽値で返します。
  * 
+ * <SkillCostWidth:[string]> コストの表示幅を文字列で指定します。指定した文字列の横幅がスキル名の横幅に影響します。
+ * [string]:文字列
+ * <SkillCostWidth:00000> コストの表示幅として00000の長さが設定させます。
+ * 
  * コストのデータ参照　コスト評価式及び表示コストの個別設定共通
  * HP、MP、TP、Gold、Expはコスト値で取得されます。
  * 消費MPが50の場合は、costの値に50が代入されます。
@@ -367,6 +377,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/22 Ver.1.1.3
+ * スキル毎にコスト幅を指定できる機能を追加。
  * 2022/12/17 Ver.1.1.2
  * スキル習得装備プラグインのポイントを表示できる機能を追加。
  * 2022/12/6 Ver.1.1.1
@@ -666,6 +678,21 @@ const ExpSuffix = String(parameters['ExpSuffix'] || '');
 const CostOrderSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CostOrderSetting'])) : null) || [];
 let count = 0;
 
+const _Window_SkillList_initialize = Window_SkillList.prototype.initialize;
+Window_SkillList.prototype.initialize = function(rect) {
+    this.skillCostWidth = null;
+    _Window_SkillList_initialize.call(this, rect);
+};
+
+const _Window_SkillList_drawItem = Window_SkillList.prototype.drawItem;
+Window_SkillList.prototype.drawItem = function(index) {
+    const skill = this.itemAt(index);
+    if (skill) {
+        this.skillCostWidth = skill.meta.SkillCostWidth;
+    }
+    _Window_SkillList_drawItem.call(this, index);
+};
+
 Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//再定義
     count = 0;
     CostOrderSetting.forEach(type => {
@@ -912,9 +939,17 @@ Window_SkillList.prototype.setCostColor = function(costColor) {
     this.changeTextColor(getColorCode(costColor));
 };
 
-Window_SkillList.prototype.costWidth = function() {//再定義
-    return this.textWidth(CostWidth);
+const _Window_SkillList_costWidth = Window_SkillList.prototype.costWidth;
+Window_SkillList.prototype.costWidth = function() {
+    if (this.skillCostWidth) {
+        return this.textWidth(this.skillCostWidth);
+    } else if (!!CostWidth) {
+        return this.textWidth(CostWidth);
+    } else {
+        return _Window_SkillList_costWidth.call(this);
+    }
 };
+
 
 function getColorCode(color) {
     if (typeof(color) === "string") {

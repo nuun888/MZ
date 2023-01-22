@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.8
+ * @version 2.17.9
  * 
  * @help
  * Implement an enemy book.
@@ -200,6 +200,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/22/2023 Ver.2.17.9
+ * Corrected so that No. is attached before the numerical value in the display of the enemy number.
+ * Changed page column to automatic setting.
+ * Fixed to be able to specify the color in the window skin. (Reset required)
+ * Modified so that the display of window images can be specified for each window.
  * 1/5/2023 Ver.2.17.8
  * Fixed an issue where monsters before transformation were not counted as defeated and monsters after transformation were double counted as defeated.
  * 12/17/2022 Ver.2.17.7
@@ -474,18 +479,11 @@
  * @desc When the battle touch UI is off, the window is pushed up.
  * @parent WindowSetting
  * 
- * @param AllEnemyBookWindowVisible
+ * @param AllWindowVisibleHide
  * @type boolean
- * @default true
- * @text Enemy book window display
- * @desc Displays the window image of the enemy book.
- * @parent WindowSetting
- * 
- * @param BattleAllEnemyBookWindowVisible
- * @type boolean
- * @default true
- * @text Enemy Book window display during battle
- * @desc Displays the enemy book, enemy information, and analysis window images during battle.
+ * @default false
+ * @text Hide all window images
+ * @desc Hide window images for all windows. This setting will take precedence even if you hide them individually.
  * @parent WindowSetting
  * 
  * @param BackgoundWindowMode
@@ -499,6 +497,13 @@
  * @text Display Category Window Setting
  * @default ------------------------------
  * @parent WindowSetting
+ * 
+ * @param CategoryNameWindowVisible
+ * @type boolean
+ * @default true
+ * @text Display category window image display
+ * @desc Display the window image of the display category.
+ * @parent CategorySetting
  * 
  * @param CategoryNameWindowsSkin
  * @desc Specifies the window skin for the display category window.
@@ -552,6 +557,13 @@
  * @text Category display list
  * @type struct<CategoryPageListData>[]
  * @default []
+ * @parent SelectCategorySetting
+ * 
+ * @param CategoryWindowVisible
+ * @type boolean
+ * @default true
+ * @text Category window image display
+ * @desc Display the window image of the category.
  * @parent SelectCategorySetting
  * 
  * @param CategoryWindowsSkin
@@ -630,6 +642,13 @@
  * @default ------------------------------
  * @parent SelectEnemySetting
  * 
+ * @param IndexWindowVisible
+ * @type boolean
+ * @default true
+ * @text Monster selection window image display
+ * @desc Displays the monster selection window image.
+ * @parent SelectEnemybookSetting
+ * 
  * @param IndexWindowsSkin
  * @desc Specifies the window skin for the enemy selection window.
  * @text Enemy selection window skin
@@ -642,6 +661,13 @@
  * @text Enemy information selection window common settings
  * @default ------------------------------
  * @parent SelectEnemySetting
+ * 
+ * @param InfoWindowVisible
+ * @type boolean
+ * @default true
+ * @text Enemy information window image display
+ * @desc Displays a window image of enemy information.
+ * @parent SelectEnemyInfoSetting
  * 
  * @param InfoWindowsSkin
  * @desc Specifies the window skin for enemy info windows.
@@ -659,8 +685,8 @@
  * @param PercentWindowShow
  * @type boolean
  * @default true
- * @text Enemy book completenes window display
- * @desc Shows the enemy book completenes window. It is not displayed in enemy information and analysis.
+ * @text Completeness display
+ * @desc Show completeness. Enemy information is not displayed in Analyze.
  * @parent PercentWindow
  * 
  * @param PercentContent
@@ -679,6 +705,13 @@
  * @min 0
  * @parent PercentWindow
  * 
+ * @param PercentWindowVisible
+ * @type boolean
+ * @default true
+ * @text Completeness window image display
+ * @desc Displays the completeness window image.
+ * @parent PercentWindow
+ * 
  * @param PercentWindowsSkin
  * @desc Specifies the window skin for the enemy book perfection window.
  * @text Enemy book completeness window skin
@@ -693,26 +726,17 @@
  * @parent WindowSetting
  * 
  * @param PageWindowsShow
- * @desc Display the page window.
- * @text Page window display Mode
+ * @desc Display the page screen.
+ * @text Page display Mode
  * @type boolean
  * @default false
  * @parent PageWindow
  * 
- * @param PageCols
- * @desc Maximum display col on the enemy book pages.
- * @text Enemy book page maximum display col
- * @type number
- * @default 2
- * @min 1
- * @parent PageWindow
- * 
- * @param InfoPageCols
- * @desc Maximum visible columns on enemy info pages.
- * @text Enemy info page max display col
- * @type number
- * @default 2
- * @min 1
+ * @param PageWindowVisible
+ * @type boolean
+ * @default true
+ * @text page window image display
+ * @desc Displays the window image of the page.
  * @parent PageWindow
  * 
  * @param PageWindowsSkin
@@ -748,6 +772,13 @@
  * @text Item when status information is not registered, skill display name
  * @type string
  * @default ?
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param ContentWindowVisible
+ * @type boolean
+ * @default true
+ * @text モンスターステータスウィンドウ画像表示
+ * @desc モンスターステータスのウィンドウ画像を表示します。
  * @parent EnemyBookStatusSetting
  * 
  * @param ContentWindowsSkin
@@ -2637,13 +2668,6 @@
 * @type number
 * @default 0
 * 
-* @param PageCols
-* @desc Maximum visible columns on the page.
-* @text page max display col
-* @type number
-* @default 2
-* @min 1
-* 
 * @param ContentCols
 * @text Enemy information item col
 * @desc Enemy information item column.
@@ -2701,13 +2725,56 @@
 * @parent AnalyzeSetting
 * 
 */
+/*~struct~WindowSkinData:
+ *
+ * @param WindowSkin
+ * @desc Specifies the window skin.
+ * @text window skin picture
+ * @type file
+ * @dir img/system
+ * @default
+ * 
+ * @param WindowSkinColor
+ * @text Window color
+ * @desc Sets the window color.
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ *
+ */
+/*~struct~WindowTone:
+ * 
+ * @param red
+ * @desc Red
+ * @text Red
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ * @param green
+ * @text Green
+ * @desc Green
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ * @param bule
+ * @text Bule
+ * @desc Bule
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ */
 /*:ja
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.8
+ * @version 2.17.9
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2899,6 +2966,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/22 Ver.2.17.9
+ * 敵ナンバーの表示で数値の前にNo.が付くように修正。
+ * ページ列を自動設定に変更。
+ * ウィンドウスキンで色を指定できるように修正。(要再設定)
+ * ウィンドウ画像の表示を各ウィンドウ毎に指定できるように修正。
  * 2023/1/5 Ver.2.17.8
  * 変身前のモンスターが撃破カウントされずに変身後のモンスターが2重に撃破カウントされてしまう問題を修正。
  * 2022/12/25 Ver.2.17.7
@@ -3105,78 +3177,6 @@
  * 背景画像の参照先を指定できるように変更。
  * 完成度を撃破数からステータス登録した数に変更。
  * プラグインコマンド「図鑑完成」を実行すると撃破数がリセットされる問題を修正。
- * 2021/4/19 Ver.1.4.5
- * 戦闘中でモンスターのカテゴリーをONにして図鑑を開いたときにスクロールしてしまう問題を修正。
- * 一部の不具合が再発していたので修正。
- * 2021/4/15 Ver.1.4.4
- * サイズによってはモンスターのサイズ調整がうまくいっていなかった問題を修正。
- * ボタン画像が表示されていない時に図鑑を開くとエラーが出る問題を修正。
- * 2021/4/13 Ver.1.4.3
- * 完成度ウィンドウを非表示にする機能が機能していなかった問題を修正。
- * 2021/4/12 Ver.1.4.2
- * 戦闘中で背景画像を表示できる機能を追加。
- * モンスターを登録した後、項目が未登録のままになる問題を修正。
- * 2021/4/11 Ver.1.4.1
- * 未登録のモンスターを選択した状態で図鑑を閉じた時にエラーが出る問題を修正。
- * 2021/4/11 Ver.1.4.0
- * サイドビューアクターを表示する機能を追加。
- * 2021/4/10 Ver.1.3.0
- * モンスターを種類毎に表示する機能を追加。
- * 2021/4/8 Ver.1.2.2
- * 耐性ステートで無効を反映した時にステート無効化が反映されない問題を修正。
- * 2021/4/1 Ver.1.2.1
- * 色相の異なるモンスターを連続で表示すると一瞬別の色相が反映されてしまう問題を修正。
- * 2021/3/31 Ver.1.2.0
- * ドロップアイテム、スティールアイテムのWideModeをtrueにしたときにアイテムの表示を２列にする機能を追加。
- * 特定のドロップアイテムの確率表示を表示しない機能を追加。
- * 2021/3/27 Ver.1.1.5
- * オリジナルパラメータが反映されていなかった問題を修正。
- * 2021/3/17 Ver.1.1.4
- * 背景画像の参照先が変更されていなかった問題を修正。
- * 2021/3/16 Ver.1.1.3
- * アナライズを使用し、ウィンドウを閉じるとき一瞬別のモンスターが表示される問題を修正。
- * アナライズを使用すると別のターゲットの情報が表示される問題を修正。
- * 2021/3/14 Ver.1.1.2
- * アナライズモードの時にバフ、デバフ以外の色指定がカラーコードになっていたので修正。
- * 2021/3/14 Ver.1.1.1
- * アナライズ設定で一部の設定が空欄の時エラーが出る問題を修正。
- * 2021/3/14 Ver.1.1.0
- * 一部プラグイン導入時、戦闘開始時にエラーが出る問題を修正。
- * アナライズでHP,MPの現在のステータス以外が取得できていなかった問題を修正。
- * アナライズでモンスターの現在のステータス表示が機能していなかった問題を修正。
- * 登録タイミングに「撃破時及びアナライズ時」を追加。
- * アナライズモードでコモンイベント経由で使用すると行動失敗時でも画面が開いてしまう問題があったため、メモ欄での指定に変更。
- * アナライズでバフ、デバフ時ステータスの文字色を指定できる機能を追加。
- * 背景画像の指定先フォルダーを変更。
- * 2021/3/10 Ver.1.0.11
- * 新規に登録されたモンスター名の文字色を付ける機能を追加。
- * 2021/3/6 Ver.1.0.10
- * タッチUIがOFFの時にウィンドウの表示範囲を上に詰める機能を追加。
- * 2021/2/28 Ver.1.0.9
- * 背景画像が反映されていなかった問題を修正。
- * 2021/2/24 Ver.1.0.8
- * バトルリザルト中にモンスター図鑑を閉じるように修正。
- * 2021/2/22 Ver.1.0.7
- * ロード後に図鑑を開いてドロップアイテムのあるページを表示するとエラーが出る問題を修正。
- * 2021/2/18 Ver.1.0.6
- * 戦闘中のモンスター図鑑の表示スイッチをメニューコマンドと別に変更。
- * プラグインコマンドに「モンスターを撃破済みにする」を追加。
- * 2021/2/16 Ver.1.0.5
- * Scene_Base.prototype.isBottomHelpMode、Scene_Base.prototype.isBottomButtonModeで設定の反映するように修正。
- * 2021/2/15 Ver.1.0.4
- * PageUp・PageDownキーでモンスターリストをページ送り出来る仕様に変更。なおモンスター情報ページの切り替えは左右（← →）キーのみになります。
- * ターン制の時に図鑑を開いたとき、裏でアクションが進行してしまう問題を修正。
- * アナライズモード以外で開くとHP,MPゲージが表示される問題を修正。
- * 2021/2/14 Ver.1.0.3
- * 戦闘中でアナライズを使用中PageUp・PageDownキーを押した後操作ができなくなる問題を修正。
- * 図鑑の登録タイミングが「撃破時」に設定している時にアナライズを使用した際、画面が空白になる問題を修正。
- * プラグインコマンドで「モンスター削除」「撃破数」「図鑑完成度」を実行するとエラーが出る問題を修正。
- * プラグインコマンドで「モンスター撃破数リセット」「遭遇数」「総撃破数」を実行しても変数が変わらない問題を修正。
- * 「モンスター撃破数リセット」が「図鑑完成度」と表示されていた問題を修正。
- * 2021/2/14 Ver.1.0.2
- * 特定の条件下で図鑑を開きドロップアイテム、スティールアイテムのあるページを開くとエラーが出る問題を修正。
- * 2021/2/14 Ver.1.0.1
- * アナライズモードをオープンした際の他のウィンドウの処理を変更。
  * 2021/2/7 Ver.1.0.0
  * 初版
  * 
@@ -3348,18 +3348,11 @@
  * @desc 戦闘時タッチUIがOFFの時ウィンドウを上に詰めます。
  * @parent WindowSetting
  * 
- * @param AllEnemyBookWindowVisible
+ * @param AllWindowVisibleHide
  * @type boolean
- * @default true
- * @text 図鑑ウィンドウ表示
- * @desc 図鑑のウィンドウ画像を表示します。
- * @parent WindowSetting
- * 
- * @param BattleAllEnemyBookWindowVisible
- * @type boolean
- * @default true
- * @text 戦闘時図鑑ウィンドウ表示
- * @desc 戦闘時の図鑑、敵の情報、アナライズのウィンドウ画像を表示します。
+ * @default false
+ * @text 全ウィンドウ画像非表示
+ * @desc 全てのウィンドウのウィンドウ画像を非表示します。個別に非表示設定を行ってもこの設定が優先されます。
  * @parent WindowSetting
  * 
  * @param BackgoundWindowMode
@@ -3374,11 +3367,17 @@
  * @default ------------------------------
  * @parent WindowSetting
  * 
+ * @param CategoryNameWindowVisible
+ * @type boolean
+ * @default true
+ * @text 表示カテゴリーウィンドウ画像表示
+ * @desc 表示カテゴリーのウィンドウ画像を表示します。
+ * @parent CategorySetting
+ * 
  * @param CategoryNameWindowsSkin
  * @desc 表示カテゴリーウィンドウのウィンドウスキンを指定します。
  * @text 表示カテゴリーウィンドウスキン
- * @type file
- * @dir img/system
+ * @type struct<WindowSkinData>
  * @default 
  * @parent CategorySetting
  * 
@@ -3390,8 +3389,8 @@
  * @param CategoryShow
  * @type boolean
  * @default false
- * @text カテゴリーウィンドウを表示
- * @desc カテゴリーウィンドウを表示します。非表示の場合は表示カテゴリーウィンドウと共に表示されません。
+ * @text カテゴリーを表示
+ * @desc カテゴリーを表示します。非表示の場合は表示カテゴリーと共に表示されません。
  * @parent SelectCategorySetting
  * 
  * @param EnemyBookCategory
@@ -3428,11 +3427,17 @@
  * @default []
  * @parent SelectCategorySetting
  * 
+ * @param CategoryWindowVisible
+ * @type boolean
+ * @default true
+ * @text カテゴリーウィンドウ画像表示
+ * @desc カテゴリーのウィンドウ画像を表示します。
+ * @parent SelectCategorySetting
+ * 
  * @param CategoryWindowsSkin
  * @desc カテゴリーウィンドウのウィンドウスキンを指定します。
  * @text カテゴリーウィンドウスキン
- * @type file
- * @dir img/system
+ * @type struct<WindowSkinData>
  * @default 
  * @parent SelectCategorySetting
  * 
@@ -3504,11 +3509,17 @@
  * @default ------------------------------
  * @parent SelectEnemySetting
  * 
+ * @param IndexWindowVisible
+ * @type boolean
+ * @default true
+ * @text モンスター選択ウィンドウ画像表示
+ * @desc モンスター選択のウィンドウ画像を表示します。
+ * @parent SelectEnemybookSetting
+ * 
  * @param IndexWindowsSkin
  * @desc モンスター選択ウィンドウのウィンドウスキンを指定します。
  * @text モンスター選択ウィンドウスキン
- * @type file
- * @dir img/system
+ * @type struct<WindowSkinData>
  * @default 
  * @parent SelectEnemybookSetting
  * 
@@ -3517,11 +3528,17 @@
  * @default ------------------------------
  * @parent SelectEnemySetting
  * 
+ * @param InfoWindowVisible
+ * @type boolean
+ * @default true
+ * @text 敵の情報ウィンドウ画像表示
+ * @desc 敵の情報のウィンドウ画像を表示します。
+ * @parent SelectEnemyInfoSetting
+ * 
  * @param InfoWindowsSkin
  * @desc 敵の情報ウィンドウのウィンドウスキンを指定します。
  * @text 敵の情報ウィンドウスキン
- * @type file
- * @dir img/system
+ * @type struct<WindowSkinData>
  * @default 
  * @parent SelectEnemyInfoSetting
  * 
@@ -3533,12 +3550,12 @@
  * @param PercentWindowShow
  * @type boolean
  * @default true
- * @text 完成度ウィンドウ表示
- * @desc 完成度ウィンドウを表示する。敵の情報、アナライズでは表示されません。
+ * @text 完成度表示
+ * @desc 完成度を表示する。敵の情報、アナライズでは表示されません。
  * @parent PercentWindow
  * 
  * @param PercentContent
- * @desc 完成度ウィンドウの表示項目を設定をします。
+ * @desc 完成度の表示項目を設定をします。
  * @text 表示項目設定
  * @type struct<PercentContentList>[]
  * @default ["{\"ContentName\":\"完成度\",\"ContentDate\":\"0\"}","{\"ContentName\":\"遭遇済み\",\"ContentDate\":\"1\"}","{\"ContentName\":\"撃破済み\",\"ContentDate\":\"2\"}"]
@@ -3553,11 +3570,17 @@
  * @min 0
  * @parent PercentWindow
  * 
+ * @param PercentWindowVisible
+ * @type boolean
+ * @default true
+ * @text 完成度ウィンドウ画像表示
+ * @desc 完成度のウィンドウ画像を表示します。
+ * @parent PercentWindow
+ * 
  * @param PercentWindowsSkin
  * @desc 完成度のウィンドウスキンを指定します。
  * @text 完成度ウィンドウスキン
- * @type file
- * @dir img/system
+ * @type struct<WindowSkinData>
  * @default 
  * @parent PercentWindow
  * 
@@ -3567,33 +3590,23 @@
  * @parent WindowSetting
  * 
  * @param PageWindowsShow
- * @desc ページウィンドウを表示します。非表示に設定することでページウィンドウを画面外に表示し、図鑑表示領域を拡大します。
- * @text ページウィンドウ表示モード
+ * @desc ページ画面を表示します。非表示に設定することでページ画面を画面外に表示し、図鑑表示領域を拡大します。
+ * @text ページ画面表示モード
  * @type boolean
  * @default false
  * @parent PageWindow
  * 
- * @param PageCols
- * @desc 図鑑ページの最大表示列。
- * @text 図鑑ページ最大表示列
- * @type number
- * @default 2
- * @min 1
- * @parent PageWindow
- * 
- * @param InfoPageCols
- * @desc 敵の情報ページの最大表示列。
- * @text 敵の情報ページ最大表示列
- * @type number
- * @default 2
- * @min 1
+ * @param PageWindowVisible
+ * @type boolean
+ * @default true
+ * @text ページウィンドウ画像表示
+ * @desc ページのウィンドウ画像を表示します。
  * @parent PageWindow
  * 
  * @param PageWindowsSkin
- * @desc ページ画面のウィンドウスキンを指定します。
+ * @desc ページウィンドウスキンを指定します。
  * @text ページウィンドウスキン
- * @type file
- * @dir img/system
+ * @type struct<WindowSkinData>
  * @default 
  * @parent PageWindow
  * 
@@ -3624,11 +3637,17 @@
  * @default ？
  * @parent EnemyBookStatusSetting
  * 
+ * @param ContentWindowVisible
+ * @type boolean
+ * @default true
+ * @text モンスターステータスウィンドウ画像表示
+ * @desc モンスターステータスのウィンドウ画像を表示します。
+ * @parent EnemyBookStatusSetting
+ * 
  * @param ContentWindowsSkin
  * @desc モンスターステータスウィンドウのウィンドウスキンを指定します。
  * @text モンスターステータスウィンドウスキン
- * @type file
- * @dir img/system
+ * @type struct<WindowSkinData>
  * @default 
  * @parent EnemyBookStatusSetting
  * 
@@ -5502,13 +5521,6 @@
  * @type number
  * @default 0
  * 
- * @param PageCols
- * @desc ページの最大表示列。
- * @text ページ最大表示列
- * @type number
- * @default 2
- * @min 1
- * 
  * @param ContentCols
  * @text モンスター情報項目列数
  * @desc モンスター情報の項目列数。
@@ -5566,6 +5578,49 @@
  * @parent AnalyzeSetting
  * 
  */
+/*~struct~WindowSkinData:ja
+ *
+ * @param WindowSkin
+ * @desc ウィンドウスキンを指定します。
+ * @text ウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default
+ * 
+ * @param WindowSkinColor
+ * @text ウィンドウカラー
+ * @desc ウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ *
+ */
+/*~struct~WindowTone:ja
+ * 
+ * @param red
+ * @desc 赤
+ * @text 赤
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ * @param green
+ * @text 緑
+ * @desc 緑
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ * @param bule
+ * @text 青
+ * @desc 青
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_EnemyBook = true;
@@ -5597,7 +5652,7 @@ const InfoMaskMode = eval(parameters['InfoMaskMode'] || 'false');
 const ShowEnemyInfoCommand = eval(parameters['ShowEnemyInfoCommand'] || 'false');
 const EnemyInfoCommandName = String(parameters['EnemyInfoCommandName']);
 const enemyBookInfoSwitch = Number(parameters['enemyBookInfoSwitch'] || 0);
-const InfoWindowsSkin = String(parameters['InfoWindowsSkin']);
+const InfoWindowsSkin = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['InfoWindowsSkin'])) : {};
 
 const PageSetting = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageSetting'])) : [];
 const PageCols = Number(parameters['PageCols'] || 2);
@@ -5609,7 +5664,7 @@ const InfoStatusGaugeVisible = eval(parameters['InfoStatusGaugeVisible'] || 'tru
 const InfoEnemyCurrentStatus = eval(parameters['InfoEnemyCurrentStatus'] || 'true');
 const AnalyzeSkillMode = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AnalyzeSkillMode'])) : [];
 const AnalyzeListData = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AnalyzeListData'])) : [];
-const ContentWindowsSkin = String(parameters['ContentWindowsSkin']);
+const ContentWindowsSkin = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ContentWindowsSkin'])) : {};
 const CommonVariableID = Number(parameters['CommonVariableID'] || 0);
 const UnregisteredEnemy = Number(parameters['UnregisteredEnemy'] || 0);
 
@@ -5618,15 +5673,15 @@ const NoTouchUIWindow = eval(parameters['NoTouchUIWindow'] || 'false');
 const PercentWindowShow = eval(parameters['PercentWindowShow'] || 'true');
 const PercentContent = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PercentContent'])) : [];
 const Interval = Number(parameters['Interval'] || 0);
-const PercentWindowsSkin = String(parameters['PercentWindowsSkin']);
+const PercentWindowsSkin = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PercentWindowsSkin'])) : {};
 
-const CategoryNameWindowsSkin = String(parameters['CategoryNameWindowsSkin']);
+const CategoryNameWindowsSkin = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CategoryNameWindowsSkin'])) : {};
 
 const CategoryShow = eval(parameters['CategoryShow'] || 'true');
 const EnemyBookCategory = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EnemyBookCategory'])) : [];
 const CategoryVisibleType = eval(parameters['CategoryVisibleType']) || 0;
 const CategoryUnknownData = String(parameters['CategoryUnknownData'] || '？');
-const CategoryWindowsSkin = String(parameters['CategoryWindowsSkin']);
+const CategoryWindowsSkin = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CategoryWindowsSkin'])) : {};
 const CategoryListDateSetting = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CategoryListDateSetting'])) : [];
 
 const NumberType = eval(parameters['NumberType']) || 0;
@@ -5634,10 +5689,10 @@ const UnknownVisible = eval(parameters['UnknownVisible'] || 'false');
 const NumberMode = eval(parameters['NumberMode'] || 'false');
 const UnknownData = String(parameters['UnknownData'] || '？');
 const UnknownEnemyIcons = Number(parameters['UnknownEnemyIcons'] || 0);
-const IndexWindowsSkin = String(parameters['IndexWindowsSkin']);
+const IndexWindowsSkin = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['IndexWindowsSkin'])) : {};
 
 const PageWindowsShow = eval(parameters['PageWindowsShow'] || 'false');
-const PageWindowsSkin = String(parameters['PageWindowsSkin']);
+const PageWindowsSkin = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageWindowsSkin'])) : {};
 
 const EnemyBookDefaultFontSize = Number(parameters['EnemyBookDefaultFontSize'] || 0);
 const UnknownStatus = String(parameters['UnknownStatus'] || '？？？');
@@ -5705,8 +5760,14 @@ const ShowDebuffIcon = eval(parameters['ShowDebuffIcon'] || 'false');
 const DefaultBackGroundImg = String(parameters['DefaultBackGroundImg']);
 const DefaultInfoBackGroundImg = String(parameters['DefaultInfoBackGroundImg']);
 const CategoryBackGroundImg = String(parameters['CategoryBackGroundImg']);
-const AllEnemyBookWindowVisible = eval(parameters['AllEnemyBookWindowVisible'] || 'true');
-const BattleAllEnemyBookWindowVisible = eval(parameters['BattleAllEnemyBookWindowVisible'] || 'true');
+const AllWindowVisibleHide = eval(parameters['AllWindowVisibleHide'] || 'false');
+const CategoryNameWindowVisible = eval(parameters['CategoryNameWindowVisible'] || 'true');
+const CategoryWindowVisible = eval(parameters['CategoryWindowVisible'] || 'true');
+const IndexWindowVisible = eval(parameters['IndexWindowVisible'] || 'true');
+const InfoWindowVisible = eval(parameters['InfoWindowVisible'] || 'true');
+const PercentWindowVisible = eval(parameters['PercentWindowVisible'] || 'true');
+const PageWindowVisible = eval(parameters['PageWindowVisible'] || 'true');
+const ContentWindowVisible = eval(parameters['ContentWindowVisible'] || 'true');
 const BackgoundWindowMode = eval(parameters['BackgoundWindowMode'] || 'false');
 
 const bookContents = {};
@@ -6829,7 +6890,7 @@ Scene_EnemyBook.prototype.createPercentWindow = function() {
         const rect = this.percentWindowRect();
         this._percentWindow = new Window_EnemyBook_Percent(rect);
         this.addWindow(this._percentWindow);
-        if (!AllEnemyBookWindowVisible) {
+        if (AllWindowVisibleHide || !PercentWindowVisible) {
           this._percentWindow.opacity = 0;
         }
     } else {
@@ -6845,7 +6906,7 @@ Scene_EnemyBook.prototype.createCategoryWindow = function() {
         this._categoryWindow.setHandler("ok", this.onCategoryOk.bind(this));
         this.addWindow(this._categoryWindow);
         this._categoryWindow.setCategoryNameWindow(this._categoryNameWindow);
-        if (!AllEnemyBookWindowVisible) {
+        if (AllWindowVisibleHide || !CategoryWindowVisible) {
           this._categoryWindow.opacity = 0;
         }
     } else {
@@ -6858,7 +6919,7 @@ Scene_EnemyBook.prototype.createCategoryNameWindow = function() {
         const rect = this.categoryNameWindowRect();
         this._categoryNameWindow = new Window_EnemyBook_CategoryName(rect);
         this.addWindow(this._categoryNameWindow);
-        if (!AllEnemyBookWindowVisible) {
+        if (AllWindowVisibleHide || !CategoryNameWindowVisible) {
           this._categoryNameWindow.opacity = 0;
         }
     } else {
@@ -6872,9 +6933,9 @@ Scene_EnemyBook.prototype.createEnemyPageWindow = function() {
     this._enemyPageWindow = new Window_EnemyBookPage(rect);
     this.addWindow(this._enemyPageWindow);
     this._enemyPageWindow.deactivate();
-    this._enemyPageWindow.setPageList(PageSetting, PageCols);
+    this._enemyPageWindow.setPageList(PageSetting, PageSetting.length);
     this._enemyPageWindow.setIndexWindow(this._indexWindow);
-    if (!AllEnemyBookWindowVisible) {
+    if (AllWindowVisibleHide || !PageWindowVisible) {
       this._enemyPageWindow.opacity = 0;
     }
 };
@@ -6891,7 +6952,7 @@ Scene_EnemyBook.prototype.createIndexEnemyWindow = function() {
     } else {
         this._indexWindow.activate();
     }
-    if (!AllEnemyBookWindowVisible) {
+    if (AllWindowVisibleHide || !IndexWindowVisible) {
         this._indexWindow.opacity = 0;
     }
 };
@@ -6905,7 +6966,7 @@ Scene_EnemyBook.prototype.createEnemyWindow = function() {
     if (this._categoryWindow) {
         this._categoryWindow.setEnemyWindow(this._enemyWindow);
     }
-    if (!AllEnemyBookWindowVisible) {
+    if (AllWindowVisibleHide || !ContentWindowVisible) {
         this._enemyWindow.opacity = 0;
     }
 };
@@ -7296,7 +7357,7 @@ Scene_Battle.prototype.createEnemyBookAddWindow = function(windowDate, openness)
     windowDate.x += this.enemyBookWindowUi_X();
     windowDate.y += this.enemyBookWindowUi_Y();
     windowDate.hide();
-    if (!BattleAllEnemyBookWindowVisible) {
+    if (AllWindowVisibleHide || !getBookWindowVisible(String(windowDate.constructor.name))) {
         windowDate.opacity = 0;
     } else {
         if (openness) {
@@ -7306,10 +7367,31 @@ Scene_Battle.prototype.createEnemyBookAddWindow = function(windowDate, openness)
 };
 
 Scene_Battle.prototype.enemyBookWindowClose = function(window) {
-    if (BattleAllEnemyBookWindowVisible) {
+    if (!AllWindowVisibleHide || getBookWindowVisible(String(window.constructor.name))) {
         window.close();
     } else {
         window.hide();
+    }
+};
+
+function getBookWindowVisible(_class) {
+    switch (_class) {
+        case "Window_EnemyBook_CategoryName":
+            return CategoryNameWindowVisible;
+        case "Window_EnemyBook_Category":
+            return CategoryWindowVisible;
+        case "Window_EnemyBook_Index":
+            return IndexWindowVisible;
+        case "Window_EnemyBook_InfoIndex":
+            return InfoWindowVisible;
+        case 'Window_EnemyBook_Percent':
+            return PercentWindowVisible;
+        case "Window_EnemyBookPage":
+            return PageWindowVisible;
+        case "Window_BattleEnemyBook":
+            return ContentWindowVisible;
+        default:
+            return true;
     }
 };
 
@@ -7449,7 +7531,7 @@ Scene_Battle.prototype.setEnemyBook = function() {
     this._enemyBookEnemyWindow.height = rect.height - (rect.y + (this.pageWindowsShowMode(PageSetting) ? this._enemyBookPageWindow.height : 0));
     this._enemyBookEnemyWindow.setMode('book');
     this._enemyBookEnemyWindow.setEnemyData(null);
-    this._enemyBookPageWindow.setPageList(PageSetting, PageCols);
+    this._enemyBookPageWindow.setPageList(PageSetting, PageSetting.length);
     this.setEnemyBookButton();
     BattleManager.enemyBook_Open = true;
     this.updateEnemyBookBackground();
@@ -7467,7 +7549,7 @@ Scene_Battle.prototype.setEnemyBookInfo = function() {
     this._enemyBookEnemyWindow.height = rect.height - (rect.y + (this.pageWindowsShowMode(InfoPageSetting) ? this._enemyBookPageWindow.height : 0));
     this._enemyBookEnemyWindow.setMode('info');
     this._enemyBookEnemyWindow.setEnemyData(null);
-    this._enemyBookPageWindow.setPageList(InfoPageSetting, InfoPageCols);
+    this._enemyBookPageWindow.setPageList(InfoPageSetting, InfoPageSetting.length);
     this.setEnemyBookButton();
     BattleManager.enemyBook_Open = true;
     this.updateEnemyBookBackground();
@@ -7483,11 +7565,11 @@ Scene_Battle.prototype.setEnemyBookEnemyAnalyze = function(target, analyzeDate) 
     let cols = 0;
     if (data = id > 0 && AnalyzeListData[id]) {
         data = AnalyzeListData[id].AnalyzePageList;
-        cols = analyzeDate.PageCols;
+        cols = data.nameLength;
         this._enemyBookEnemyWindow.setMode('analyze', analyzeDate);
     } else {
         data = PageSetting;
-        cols = PageCols;
+        cols = PageSetting.length;
         this._enemyBookEnemyWindow.setMode('analyze');
     }
     this._enemyBookPageWindow.y = pageRect.y - (this.pageWindowsShowMode(data) ? 0 : this._enemyBookPageWindow.height + pageRect.y) + this.enemyBookWindowUi_Y() - (Graphics.height - Graphics.boxHeight) / 2;
@@ -7498,7 +7580,7 @@ Scene_Battle.prototype.setEnemyBookEnemyAnalyze = function(target, analyzeDate) 
     this._enemyBookEnemyWindow.height = rect.height - (rect.y + (this.pageWindowsShowMode(data) ? this._enemyBookPageWindow.height : 0));
     this._enemyBookEnemyWindow.selectEnemy = target;
     this._enemyBookEnemyWindow.setEnemyData(target.enemy());
-    this._enemyBookPageWindow.setPageList(data, analyzeDate.PageCols);
+    this._enemyBookPageWindow.setPageList(data, cols);
     this.enemyBookEnemyAnalyze();
     this.setEnemyBookButton();
     BattleManager.enemyBook_Open = true;
@@ -7689,6 +7771,16 @@ Window_Selectable.prototype.isOpenAndActive = function() {
     }
 };
 
+const _Window_Base_updateTone = Window_Base.prototype.updateTone;
+Window_Base.prototype.updateTone = function() {
+    if (this._isEnemyBook && this.windowColor) {
+      const tone = this.windowColor;
+      this.setTone(tone.red, tone.green, tone.bule);
+    } else {
+        _Window_Base_updateTone.call(this);
+    }
+};
+
 //Window_EnemyBook_Percent
 function Window_EnemyBook_Percent() {
     this.initialize(...arguments);
@@ -7698,6 +7790,7 @@ Window_EnemyBook_Percent.prototype = Object.create(Window_Selectable.prototype);
 Window_EnemyBook_Percent.prototype.constructor = Window_EnemyBook_Percent;
   
 Window_EnemyBook_Percent.prototype.initialize = function(rect) {
+    this._isEnemyBook = true;
     Window_Selectable.prototype.initialize.call(this, rect);
     this._defeat = {};
     this._encountered = {};
@@ -7708,8 +7801,9 @@ Window_EnemyBook_Percent.prototype.initialize = function(rect) {
 };
 
 Window_EnemyBook_Percent.prototype.loadWindowskin = function() {
-    if (PercentWindowsSkin) {
-      this.windowskin = ImageManager.loadSystem(PercentWindowsSkin);
+    if (PercentWindowsSkin.WindowSkin) {
+      this.windowskin = ImageManager.loadSystem(PercentWindowsSkin.WindowSkin);
+      this.windowColor = PercentWindowsSkin.WindowSkinColor;
     } else {
       Window_Base.prototype.loadWindowskin.call(this);
     }
@@ -7801,13 +7895,15 @@ Window_EnemyBook_CategoryName.prototype = Object.create(Window_Selectable.protot
 Window_EnemyBook_CategoryName.prototype.constructor = Window_EnemyBook_CategoryName;
   
 Window_EnemyBook_CategoryName.prototype.initialize = function(rect) {
+    this._isEnemyBook = true;
     Window_Selectable.prototype.initialize.call(this, rect);
     this._categoryName = null;
 };
 
 Window_EnemyBook_CategoryName.prototype.loadWindowskin = function() {
-    if (CategoryNameWindowsSkin) {
-      this.windowskin = ImageManager.loadSystem(CategoryNameWindowsSkin);
+    if (CategoryNameWindowsSkin.WindowSkin) {
+      this.windowskin = ImageManager.loadSystem(CategoryNameWindowsSkin.WindowSkin);
+      this.windowColor = CategoryNameWindowsSkin.WindowSkinColor;
     } else {
       Window_Base.prototype.loadWindowskin.call(this);
     }
@@ -7835,13 +7931,15 @@ Window_EnemyBook_Category.prototype = Object.create(Window_Command.prototype);
 Window_EnemyBook_Category.prototype.constructor = Window_EnemyBook_Category;
   
 Window_EnemyBook_Category.prototype.initialize = function(rect) {
+    this._isEnemyBook = true;
     Window_Command.prototype.initialize.call(this, rect);
     this.interruptWindow = true;
 };
 
 Window_EnemyBook_Category.prototype.loadWindowskin = function() {
-    if (CategoryWindowsSkin) {
-      this.windowskin = ImageManager.loadSystem(CategoryWindowsSkin);
+    if (CategoryWindowsSkin.WindowSkin) {
+      this.windowskin = ImageManager.loadSystem(CategoryWindowsSkin.WindowSkin);
+      this.windowColor = CategoryWindowsSkin.WindowSkinColor;
     } else {
       Window_Base.prototype.loadWindowskin.call(this);
     }
@@ -7951,6 +8049,7 @@ Window_EnemyBook_Index.prototype = Object.create(Window_Selectable.prototype);
 Window_EnemyBook_Index.prototype.constructor = Window_EnemyBook_Index;
   
 Window_EnemyBook_Index.prototype.initialize = function(rect) {
+    this._isEnemyBook = true;
     Window_Selectable.prototype.initialize.call(this, rect);
     this._enemyList = [];
     this._category = null;
@@ -7958,8 +8057,9 @@ Window_EnemyBook_Index.prototype.initialize = function(rect) {
 };
 
 Window_EnemyBook_Index.prototype.loadWindowskin = function() {
-    if (IndexWindowsSkin) {
-      this.windowskin = ImageManager.loadSystem(IndexWindowsSkin);
+    if (IndexWindowsSkin.WindowSkin) {
+      this.windowskin = ImageManager.loadSystem(IndexWindowsSkin.WindowSkin);
+      this.windowColor = IndexWindowsSkin.WindowSkinColor;
     } else {
       Window_Base.prototype.loadWindowskin.call(this);
     }
@@ -8151,12 +8251,14 @@ Window_EnemyBook_InfoIndex.prototype = Object.create(Window_EnemyBook_Index.prot
 Window_EnemyBook_InfoIndex.prototype.constructor = Window_EnemyBook_InfoIndex;
   
 Window_EnemyBook_InfoIndex.prototype.initialize = function(rect) {
+    this._isEnemyBook = true;
     Window_EnemyBook_Index.prototype.initialize.call(this, rect);
 };
 
 Window_EnemyBook_InfoIndex.prototype.loadWindowskin = function() {
-    if (InfoWindowsSkin) {
-      this.windowskin = ImageManager.loadSystem(InfoWindowsSkin);
+    if (InfoWindowsSkin.WindowSkin) {
+      this.windowskin = ImageManager.loadSystem(InfoWindowsSkin.WindowSkin);
+      this.windowColor = InfoWindowsSkin.WindowSkinColor;
     } else {
       Window_Base.prototype.loadWindowskin.call(this);
     }
@@ -8250,14 +8352,16 @@ Window_EnemyBookPage.prototype = Object.create(Window_HorzCommand.prototype);
 Window_EnemyBookPage.prototype.constructor = Window_EnemyBookPage;
   
 Window_EnemyBookPage.prototype.initialize = function(rect) {
+    this._isEnemyBook = true;
     Window_HorzCommand.prototype.initialize.call(this, rect);
     this._data = null;
     this.interruptWindow = true;
 };
 
 Window_EnemyBookPage.prototype.loadWindowskin = function() {
-    if (PageWindowsSkin) {
-      this.windowskin = ImageManager.loadSystem(PageWindowsSkin);
+    if (PageWindowsSkin.WindowSkin) {
+      this.windowskin = ImageManager.loadSystem(PageWindowsSkin.WindowSkin);
+      this.windowColor = PageWindowsSkin.WindowSkinColor;
     } else {
       Window_Base.prototype.loadWindowskin.call(this);
     }
@@ -8324,6 +8428,7 @@ Window_EnemyBook.prototype = Object.create(Window_StatusBase.prototype);
 Window_EnemyBook.prototype.constructor = Window_EnemyBook;
   
 Window_EnemyBook.prototype.initialize = function(rect) {
+    this._isEnemyBook = true;
     Window_StatusBase.prototype.initialize.call(this, rect);
     this._page = 0;
     this._categoryMode = false;
@@ -8339,8 +8444,9 @@ Window_EnemyBook.prototype.initialize = function(rect) {
 };
 
 Window_EnemyBook.prototype.loadWindowskin = function() {
-    if (ContentWindowsSkin) {
-      this.windowskin = ImageManager.loadSystem(ContentWindowsSkin);
+    if (ContentWindowsSkin.WindowSkin) {
+      this.windowskin = ImageManager.loadSystem(ContentWindowsSkin.WindowSkin);
+      this.windowColor = ContentWindowsSkin.WindowSkinColor;
     } else {
       Window_Base.prototype.loadWindowskin.call(this);
     }
@@ -9073,6 +9179,7 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
     } else {
         text = UnknownStatus;
     }
+    this.resetTextColor();
     this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
 };
 
@@ -9086,7 +9193,7 @@ Window_EnemyBook.prototype.bookEnemyNo = function(list, enemy, x, y, width) {
             this.drawText(nameText, x, y, systemWidth, list.namePosition);
         }
         this.resetTextColor();
-        let text = $gameSystem.getEnemyBookNumber(this._enemy.id);
+        let text = 'No.'+ $gameSystem.getEnemyBookNumber(this._enemy.id);
         if (NumberType === 2) {
           text = this.numberWidthSlice(text);
         }
@@ -10333,6 +10440,7 @@ Sprite_BookEnemy.prototype.refresh = function() {
     } else {
         this.drawEnemy();
     }
+    
 };
 
 Sprite_BookEnemy.prototype.drawEnemy = function() {

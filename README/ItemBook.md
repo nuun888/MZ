@@ -1,5 +1,5 @@
 # [アイテム図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)
-# Ver.1.5.0
+# Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -90,6 +90,10 @@ desc1と記入した場合はアイテム、武器、防具のメモ欄に<desc1
 メモ欄のタグ記入時では付けないでください。  
 
 ## 更新履歴
+2023/1/25 Ver.1.5.1  
+データベースでアイテムカテゴリーを一つに設定したときにアイテム図鑑を開くとエラーが出る問題を修正。  
+アイテムカテゴリーとアイテム図鑑のカテゴリーを別々に仕様変更。  
+武器の名称のみが適用されない問題を修正。  
 2023/1/9 Ver.1.5.0  
 アイテム、武器、防具の画像をプラグんパラメータから設定できる機能を追加。  
 2023/1/7 Ver.1.4.5  

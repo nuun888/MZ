@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -114,6 +114,9 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2023/1/25 Ver.1.5.1
+ * データベースでアイテムカテゴリーを一つに設定したときにアイテム図鑑を開くとエラーが出る問題を修正。
+ * アイテムカテゴリーとアイテム図鑑のカテゴリーを別々に仕様変更。
  * 2023/1/9 Ver.1.5.0
  * アイテム、武器、防具の画像をプラグんパラメータから設定できる機能を追加。
  * 2023/1/7 Ver.1.4.5
@@ -943,6 +946,10 @@
  * @option 装備タイプ(1)～(10)
  * @value 32
  * @option 名称のみ(2)～(7)(9)
+ * @value 40
+ * @option 追加能力値(1)～(10)(15)(16)
+ * @value 41
+ * @option 特殊能力値(1)～(10)(15)(16)
  * @value 51
  * @option ライン(2)～(7)(9)
  * @value 52
@@ -1038,6 +1045,13 @@
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
+ * @parent BasicSetting
+ * 
+ * @param ParamId
+ * @desc IDを設定します。
+ * @text ID(16)
+ * @type number
+ * @default 
  * @parent BasicSetting
  * 
  * @param nameSetting
@@ -1914,13 +1928,13 @@ Scene_ItemBook.prototype.createCategoryWindow = function() {
   this._categoryWindow.setItemWindow(this._indexWindow);
   this._itemPageWindow.deselect();
   this._itemPageWindow.deactivate();
+  this._indexWindow.setCategoryWindow(this._categoryWindow);
+  this._indexWindow.setPercentWindow(this._percentWindow);
   if (!this._categoryWindow.needsSelection()) {
     this._categoryWindow.update();
     this._categoryWindow.hide();
     this.onCategoryOk();
   }
-  this._indexWindow.setCategoryWindow(this._categoryWindow);
-  this._indexWindow.setPercentWindow(this._percentWindow);
   this.backgroundOpacity(this._categoryWindow);
 };
 
@@ -2102,17 +2116,17 @@ Window_ItemBook_Category.prototype.makeCommandList = function() {
   if (list.length > 0) {
     list.forEach(names => {
       const categorykey = names.CategoryKey[0];
-      if(this.needsCommand(categorykey) && categorykey === 'item') {
+      if(categorykey === 'item') {
         this.addCommand(TextManager.item, categorykey);
-      } else if(this.needsCommand(categorykey) && categorykey === 'weapon') {
+      } else if(categorykey === 'weapon') {
         this.addCommand(TextManager.weapon, categorykey);
-      } else if(this.needsCommand(categorykey) && categorykey === 'armor') {
+      } else if(categorykey === 'armor') {
         this.addCommand(TextManager.armor, categorykey);
-      } else if(this.needsCommand(categorykey) && categorykey === 'keyItem') {
+      } else if(categorykey === 'keyItem') {
         this.addCommand(TextManager.keyItem, categorykey);
-      } else if (this.needsCommand(categorykey) && categorykey === 'allItems') {
+      } else if (categorykey === 'allItems') {
         this.addCommand(names.CategoryName, categorykey);
-      } else if(this.needsCommand(categorykey) && names.CategoryName) { 
+      } else if(names.CategoryName) { 
         this.addCommand(names.CategoryName, categorykey);
       }
     });
@@ -2558,7 +2572,7 @@ Window_ItemBook.prototype.page = function(item) {
 };
 
 Window_ItemBook.prototype.drawPage = function(listContent, item) {
-  const lineHeight = this.lineHeight();
+  const lineHeight = this.lineHeight();console.log(item)
   for (const data of listContent) {
     const x_Position = data.X_Position;
     const position = Math.min(x_Position, this.maxCols());
@@ -2660,6 +2674,12 @@ Window_ItemBook.prototype.dataDisplay = function(list, item, x, y, width) {
     case 32:
       this.equipType(list, item, x, y, width);
       break;
+    case 40:
+        this.xparam(list, item, x, y, width);
+        break;
+    case 41:
+        this.sparam(list, item, x, y, width);
+        break;
     case 51:
       this.name(list, item, x, y, width);
       break;
@@ -2811,7 +2831,7 @@ Window_ItemBook.prototype.originalParams = function(list, item, x, y, width) {
   let text;
   if(this.paramMask(list.MaskMode)){
     text = eval(list.DetaEval);
-    text += list.paramUnit ? String(list.paramUnit) : null;
+    text += list.paramUnit ? String(list.paramUnit) : '';
   } else {
     text = UnknownItemData;
   }
@@ -2944,10 +2964,57 @@ Window_ItemBook.prototype.param = function(list, item, x, y, width) {
   let text;
   if(this.paramMask(list.MaskMode)){
     text = list.DetaEval ? eval(list.DetaEval) : item.params[list.DateSelect - 20];
+    text += list.paramUnit ? String(list.paramUnit) : '';
   } else {
     text = UnknownItemData;
   }
   this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
+};
+
+Window_ItemBook.prototype.xparam = function(list, item, x, y, width) {
+    this.drawContentsBackground(list.Back, x, y, width);
+    x = this.contensX(x);
+    width = this.contensWidth(width);
+    this.changeTextColor(this.getColorCode(list.NameColor));
+    const nameText = list.paramName ? list.paramName : TextManager.xparam(list.ParamId);
+    const textWidth = this.systemWidth(list.SystemItemWidth, width);
+    this.drawText(nameText, x, y, textWidth);
+    this.resetTextColor();
+    let text;
+    if(this.paramMask(list.MaskMode)){
+      text = list.DetaEval ? eval(list.DetaEval) : this.getXparam(list, item);
+      text += list.paramUnit ? String(list.paramUnit) : '';
+    } else {
+      text = UnknownItemData;
+    }
+    this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
+};
+
+Window_ItemBook.prototype.sparam = function(list, item, x, y, width) {
+    this.drawContentsBackground(list.Back, x, y, width);
+    x = this.contensX(x);
+    width = this.contensWidth(width);
+    this.changeTextColor(this.getColorCode(list.NameColor));
+    const nameText = list.paramName ? list.paramName : TextManager.xparam(list.ParamId);
+    const textWidth = this.systemWidth(list.SystemItemWidth, width);
+    this.drawText(nameText, x, y, textWidth);
+    this.resetTextColor();
+    let text;
+    if(this.paramMask(list.MaskMode)){
+      text = list.DetaEval ? eval(list.DetaEval) : this.getSparam(list, item);
+      text += list.paramUnit ? String(list.paramUnit) : '';
+    } else {
+      text = UnknownItemData;
+    }
+    this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
+};
+
+Window_ItemBook.prototype.getXparam = function(list, item) {
+    return item.traits.reduce((r, data) => data.code === 22 && data.dataId === list.ParamId ? r + data.value : r, 0);
+};
+
+Window_ItemBook.prototype.getSparam = function(list, item) {
+    return item.traits.reduce((r, data) => data.code === 23 && data.dataId === list.ParamId ? r + data.value : r, 0);
 };
 
 Window_ItemBook.prototype.weaponType = function(list, item, x, y, width) {

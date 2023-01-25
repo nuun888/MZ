@@ -117,6 +117,7 @@
  * 2023/1/25 Ver.1.5.1
  * データベースでアイテムカテゴリーを一つに設定したときにアイテム図鑑を開くとエラーが出る問題を修正。
  * アイテムカテゴリーとアイテム図鑑のカテゴリーを別々に仕様変更。
+ * 武器の名称のみが適用されない問題を修正。
  * 2023/1/9 Ver.1.5.0
  * アイテム、武器、防具の画像をプラグんパラメータから設定できる機能を追加。
  * 2023/1/7 Ver.1.4.5
@@ -946,10 +947,6 @@
  * @option 装備タイプ(1)～(10)
  * @value 32
  * @option 名称のみ(2)～(7)(9)
- * @value 40
- * @option 追加能力値(1)～(10)(15)(16)
- * @value 41
- * @option 特殊能力値(1)～(10)(15)(16)
  * @value 51
  * @option ライン(2)～(7)(9)
  * @value 52
@@ -1259,6 +1256,13 @@
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
+ * @parent BasicSetting
+ * 
+ * @param ParamId
+ * @desc IDを設定します。
+ * @text ID(16)
+ * @type number
+ * @default 
  * @parent BasicSetting
  * 
  * @param nameSetting
@@ -2675,10 +2679,10 @@ Window_ItemBook.prototype.dataDisplay = function(list, item, x, y, width) {
       this.equipType(list, item, x, y, width);
       break;
     case 40:
-        this.xparam(list, item, x, y, width);
+        //this.xparam(list, item, x, y, width);
         break;
     case 41:
-        this.sparam(list, item, x, y, width);
+        //this.sparam(list, item, x, y, width);
         break;
     case 51:
       this.name(list, item, x, y, width);

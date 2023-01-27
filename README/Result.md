@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.3.0
+# Ver.2.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,8 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2023/1/28 Ver.2.3.1  
+勝利MEの途中でBGMを再生させる機能を追加。  
 2023/1/9 Ver.2.3.0  
 勝利後にリザルトを表示させないスイッチを指定できる機能を追加。  
 勝利後のモーションをしないスイッチを指定できる機能を追加。  

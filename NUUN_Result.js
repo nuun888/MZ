@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.0
+ * @version 2.3.1
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/1/28 Ver.2.3.1
+ * Added a function to play BGM in the middle of victory ME.
  * 2023/1/9 Ver.2.3.0
  * Added a function that allows you to specify a switch that does not display the result after winning.
  * Added a function that allows you to specify a switch that does not perform motion after victory.
@@ -1346,6 +1348,18 @@
  * @min -100
  * @parent BGMSetting
  * 
+ * @param MESetting
+ * @text Battle victory ME setting
+ * @default ------------------------------
+ * 
+ * @param BgmPlayMeRate
+ * @text ME BGM playback position (% 0-100)
+ * @desc Position of ME to play BGM when playing ME (% 0-100)
+ * @default 100
+ * @max 100
+ * @min 0
+ * @parent MESetting
+ * 
  * @param ExternalPluginSetting
  * @text External plugin settings
  * @default ------------------------------
@@ -1428,6 +1442,17 @@
  * @default false
  * @text No win ME playback
  * @desc Won't play Win ME.
+ * 
+ * @command VictoryMEBgmPlayMeRate
+ * @desc Change the position of ME to play BGM when playing ME.
+ * @text ME BGM playback position change
+ * 
+ * @arg BgmPlayMeRate
+ * @text @text ME BGM playback position (% 0-100)
+ * @desc Position of ME to play BGM when playing ME (% 0-100) -1 disables this setting
+ * @default 100
+ * @max 100
+ * @min -1
  * 
  * @command LevelUpPage
  * @desc Change the permission to display the level up screen.
@@ -2153,6 +2178,13 @@
  * @max 100
  * @min -100
  * 
+ * @param BgmPlayMeRate
+ * @text ME BGM playback position (% 0-100)
+ * @desc Position of ME to play BGM when playing ME (% 0-100) -1 disables this setting
+ * @default -1
+ * @max 100
+ * @min -1
+ * 
  */
 /*~struct~VictoryBgm:
  * 
@@ -2234,7 +2266,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.0
+ * @version 2.3.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2279,6 +2311,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/28 Ver.2.3.1
+ * 勝利MEの途中でBGMを再生させる機能を追加。
  * 2023/1/9 Ver.2.3.0
  * 勝利後にリザルトを表示させないスイッチを指定できる機能を追加。
  * 勝利後のモーションをしないスイッチを指定できる機能を追加。
@@ -3568,6 +3602,18 @@
  * @min -100
  * @parent BGMSetting
  * 
+ * @param MESetting
+ * @text 戦闘勝利ME設定
+ * @default ------------------------------
+ * 
+ * @param BgmPlayMeRate
+ * @text MEのBGM再生位置(% 0～100)
+ * @desc ME再生時のBGMを再生させるMEの位置(% 0～100)
+ * @default 100
+ * @max 100
+ * @min 0
+ * @parent MESetting
+ * 
  * @param ExternalPluginSetting
  * @text 外部プラグイン設定
  * @default ------------------------------
@@ -3650,6 +3696,17 @@
  * @default false
  * @text 勝利ME再生なし
  * @desc 勝利MEを再生しません。
+ * 
+ * @command VictoryMEBgmPlayMeRate
+ * @desc ME再生時のBGMを再生させるMEの位置を変更します。
+ * @text MEのBGM再生位置変更
+ * 
+ * @arg BgmPlayMeRate
+ * @text MEのBGM再生位置(% 0～100)
+ * @desc ME再生時のBGMを再生させるMEの位置(% 0～100) -1でこの設定を無効
+ * @default 100
+ * @max 100
+ * @min -1
  * 
  * @command LevelUpPage
  * @desc レベルアップ画面の表示を許可を変更します。
@@ -4374,6 +4431,13 @@
  * @max 100
  * @min -100
  * 
+ * @param BgmPlayMeRate
+ * @text MEのBGM再生位置(% 0～100)
+ * @desc ME再生時のBGMを再生させるMEの位置(% 0～100) -1でこの設定を無効
+ * @default -1
+ * @max 100
+ * @min -1
+ * 
  */
 /*~struct~VictoryBgm:ja
  * 
@@ -4593,6 +4657,7 @@ const VictoryBGM = String(parameters['VictoryBGM']);
 const VictoryVolume = Number(parameters['VictoryVolume'] || 90);
 const VictoryPitch = Number(parameters['VictoryPitch'] || 100);
 const VictoryPan = Number(parameters['VictoryPan'] || 0);
+const BgmPlayMeRate = Number(parameters['BgmPlayMeRate'] || 100);
 const VictorySceneImg = String(parameters['VictorySceneImg']);
 const AfterVictoryEffect = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AfterVictoryEffect'])) : [];
 const AfterVictoryEffectSwitch = Number(parameters['AfterVictoryEffectSwitch'] || 0);
@@ -4623,6 +4688,9 @@ PluginManager.registerCommand(pluginName, 'ChangeActorImg', args => {
   }
 });
 
+PluginManager.registerCommand(pluginName, 'VictoryMEBgmPlayMeRate', args => {
+    BattleManager.changeBgmPlayMeRate(Number(args.BgmPlayMeRate));
+});
     
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
 Game_Actor.prototype.initMembers = function() {
@@ -6839,6 +6907,8 @@ BattleManager.initMembers = function() {
   this.resultPage = 0;
   this.resultLevelUpActors = [];
   this.resultOldStatusActors = [];
+  this._bgmPlayMeRate = 100;
+  this._changeBgmPlayMeRate = null;
 };
 
 const _BattleManager_update = BattleManager.update;
@@ -6877,6 +6947,7 @@ BattleManager.processVictory = function() {
         this.displayVictoryOnBusy();
         this.resultEndUserData();
     }
+    AudioManager.playResultBgm(this._bgmPlayMeRate);
 };
 
 BattleManager.resultUserData = function() {
@@ -7014,14 +7085,17 @@ BattleManager.replayBgmAndBgs = function() {
     }
     if (this._victoryBgmDate && this._victoryBgmDate.name) {
       AudioManager.playBgm(this._victoryBgmDate);
+      this._bgmPlayMeRate = this.getBgmPlayMeRate();
       this._victoryBGMOn = true;
       return;
     } else if (playVictoryBgm) {
       AudioManager.playBgm(playVictoryBgm);
+      this._bgmPlayMeRate = this.getMvpBgmPlayMeRate();
       this._victoryBGMOn = true;
       return;
     } else if (VictoryBGM) {
       AudioManager.playBgm(this.playVictoryBgm());
+      this._bgmPlayMeRate = this.getBgmPlayMeRate();
       this._victoryBGMOn = true;
       return;
     }
@@ -7104,9 +7178,31 @@ BattleManager.levelUpPageEnable = function(enable) {
   this._levelUpPageEnable = enable;
 };
 
+BattleManager.changeBgmPlayMeRate = function(rate) {
+    this._changeBgmPlayMeRate = rate >= 0 ? rate : null;
+};
+
+BattleManager.getBgmPlayMeRate = function() {
+    return this._changeBgmPlayMeRate !== null && this._changeBgmPlayMeRate >= 0 ? this._changeBgmPlayMeRate : BgmPlayMeRate;
+};
+
+BattleManager.getMvpBgmPlayMeRate = function() {
+    const meData = this.resultMVPActorMe();
+    return meData && meData.BgmPlayMeRate >= 0 ? meData.BgmPlayMeRate : this.getBgmPlayMeRate();
+};
+
 const _BattleManager_isBattleEnd = BattleManager.isBattleEnd;
 BattleManager.isBattleEnd = function() {
   return _BattleManager_isBattleEnd.call(this) || this._resultOn;
+};
+
+AudioManager.playResultBgm = function(bgmPlayMeRate) {
+    if (this._meBuffer && this._meBuffer._totalTime > 0 && !this._bgmBuffer._isPlaying) {
+        const time = this._meBuffer.seek() / this._meBuffer._totalTime;
+        if (time >= bgmPlayMeRate / 100) {
+            this._bgmBuffer.play(true);
+        }
+    }
 };
 
 function battlreActorPicture(id) {//立ち絵表示EX用

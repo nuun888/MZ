@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.1
+ * @version 2.3.2
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/1/28 Ver.2.3.2
+ * Fixed the problem that ME's "BgmPlayMeRate" setting is not applied when "ResultVisibleFrame" is set below ME playback frame.
  * 2023/1/28 Ver.2.3.1
  * Added a function to play BGM in the middle of victory ME.
  * 2023/1/9 Ver.2.3.0
@@ -2266,7 +2268,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.1
+ * @version 2.3.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2311,6 +2313,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/28 Ver.2.3.2
+ * 勝利後リザルト画面遅延フレーム数がMEの再生フレーム以下の設定だとMEのBGM再生位置の設定が適用されない問題を修正。
  * 2023/1/28 Ver.2.3.1
  * 勝利MEの途中でBGMを再生させる機能を追加。
  * 2023/1/9 Ver.2.3.0
@@ -6917,6 +6921,9 @@ BattleManager.update = function(timeActive) {
   if (this.resultRefresh > 0) {
     this.resultRefresh--;
   }
+  if (this._resultOn) {
+    AudioManager.playResultBgm(this._bgmPlayMeRate);
+  }
 };
 
 BattleManager.setResultBusy = function() {
@@ -6947,7 +6954,6 @@ BattleManager.processVictory = function() {
         this.displayVictoryOnBusy();
         this.resultEndUserData();
     }
-    AudioManager.playResultBgm(this._bgmPlayMeRate);
 };
 
 BattleManager.resultUserData = function() {
@@ -7196,10 +7202,10 @@ BattleManager.isBattleEnd = function() {
   return _BattleManager_isBattleEnd.call(this) || this._resultOn;
 };
 
-AudioManager.playResultBgm = function(bgmPlayMeRate) {
+AudioManager.playResultBgm = function(rate) {
     if (this._meBuffer && this._meBuffer._totalTime > 0 && !this._bgmBuffer._isPlaying) {
         const time = this._meBuffer.seek() / this._meBuffer._totalTime;
-        if (time >= bgmPlayMeRate / 100) {
+        if (time >= rate / 100) {
             this._bgmBuffer.play(true);
         }
     }

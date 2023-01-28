@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.5.5
+ * @version 1.5.6
  * @base NUUN_Base
  * 
  * @help
@@ -43,8 +43,8 @@
  * 
  * [id]:List ID of conditional base apply condition
  * <PassiveMatch:[mode]> Sets the condition mode.
- * <PassiveMatch:1> Reflected when any of the conditions are met.
- * <PassiveMatch:0> Applies when all conditions are met.
+ * <PassiveMatch:0> Reflected when any of the conditions are met.
+ * <PassiveMatch:1> Applies when all conditions are met.
  * If not entered, it will be when all the conditions are met.
  * 
  * trigger condition
@@ -81,6 +81,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/28/2023 Ver.1.5.6
+ * Corrected because the description of some condition modes was written backwards.
  * 11/23/2022 Ver.1.5.5
  * Re-correction.
  * 11/20/2022 Ver.1.5.4
@@ -309,8 +311,8 @@
  * 
  * [id]:条件付きベースの適用条件のリストID
  * <PassiveMatch:[mode]> 条件のモードを設定します。
- * <PassiveMatch:1> いずれかの条件が一致したときに反映します。
- * <PassiveMatch:0> 全ての条件が一致したときに反映します。
+ * <PassiveMatch:0> いずれかの条件が一致したときに反映します。
+ * <PassiveMatch:1> 全ての条件が一致したときに反映します。
  * 未記入の場合は全ての条件を満たしたときになります。
  * 
  * 発動条件
@@ -337,6 +339,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/28 Ver.1.5.6
+ * 一部の条件モードの説明が逆に表記していたので修正。
  * 2022/11/23 Ver.1.5.5
  * 再修正。
  * 2022/11/20 Ver.1.5.4

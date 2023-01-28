@@ -1,5 +1,5 @@
 # [パッシブスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
-# Ver.1.5.5
+# Ver.1.5.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -46,8 +46,8 @@
 
 `[id]`:条件付きベースの適用条件のリストID  
 `<PassiveMatch:[mode]>` 条件のモードを設定します。  
-`<PassiveMatch:1>` いずれかの条件が一致したときに反映します。  
-`<PassiveMatch:0>` 全ての条件が一致したときに反映します。  
+`<PassiveMatch:0>` いずれかの条件が一致したときに反映します。  
+`<PassiveMatch:1>` 全ての条件が一致したときに反映します。  
 未記入の場合は全ての条件を満たしたときになります。  
 
 #### 発動条件
@@ -78,6 +78,8 @@
 パッシブスキルが適用された武器のステータス、特徴が適用されます。  
 
 ## 更新履歴
+2023/1/28 Ver.1.5.6  
+一部の条件モードの説明が逆に表記していたので修正。  
 2022/11/23 Ver.1.5.5  
 再修正。  
 2022/11/20 Ver.1.5.4  

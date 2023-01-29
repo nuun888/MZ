@@ -248,19 +248,6 @@
  * @min -9999
  * @parent ActorSetting
  * 
- * @param ActorCastTimeSetting
- * @text キャストタイム時設定
- * @default ////////////////////////////////
- * @parent ActorSetting
- * 
- * @param TPBTimeLineActorCastTimeImg
- * @desc キャストタイム時の画像。(アクター背後されます)
- * @text キャストタイム時画像
- * @type file
- * @dir img/
- * @default 
- * @parent ActorCastTimeSetting
- * 
  * @param ActorChargedSetting
  * @text チャージ完了時設定
  * @default ////////////////////////////////
@@ -347,19 +334,6 @@
  * @type boolean
  * @default true
  * @parent EnemySetting
- * 
- * @param EnemyCastTimeSetting
- * @text キャストタイム時設定
- * @default ////////////////////////////////
- * @parent ActorSetting
- * 
- * @param TPBTimeLineEnemyCastTimeImg
- * @desc キャストタイム時の画像。(敵キャラ画像背後されます)
- * @text キャストタイム時画像
- * @type file
- * @dir img/
- * @default 
- * @parent EnemyCastTimeSetting
  * 
  * @param EnemyChargedSetting
  * @text チャージ完了時時設定

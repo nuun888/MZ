@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/29 Ver.1.1.5
+ * 逃走に失敗するとタイムラインからに大きくはみ出る問題を修正。
  * 2023/1/8 Ver.1.1.4
  * 横方向のタイムラインのアンカーを修正。
  * 2022/12/25 Ver.1.1.3
@@ -246,8 +248,21 @@
  * @min -9999
  * @parent ActorSetting
  * 
+ * @param ActorCastTimeSetting
+ * @text キャストタイム時設定
+ * @default ////////////////////////////////
+ * @parent ActorSetting
+ * 
+ * @param TPBTimeLineActorCastTimeImg
+ * @desc キャストタイム時の画像。(アクター背後されます)
+ * @text キャストタイム時画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ActorCastTimeSetting
+ * 
  * @param ActorChargedSetting
- * @text チャージ完了時時設定
+ * @text チャージ完了時設定
  * @default ////////////////////////////////
  * @parent ActorSetting
  * 
@@ -332,6 +347,19 @@
  * @type boolean
  * @default true
  * @parent EnemySetting
+ * 
+ * @param EnemyCastTimeSetting
+ * @text キャストタイム時設定
+ * @default ////////////////////////////////
+ * @parent ActorSetting
+ * 
+ * @param TPBTimeLineEnemyCastTimeImg
+ * @desc キャストタイム時の画像。(敵キャラ画像背後されます)
+ * @text キャストタイム時画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent EnemyCastTimeSetting
  * 
  * @param EnemyChargedSetting
  * @text チャージ完了時時設定
@@ -761,11 +789,11 @@ Sprite_TimeLine.prototype.update = function() {
 
 Sprite_TimeLine.prototype.updateCastIcon = function() {
     const action = this._battler.currentAction();
-    if (this.getTpbState() === 'charged' || this.getTpbState() === 'casting' && this._action !== action) {
-        this._action = action;
-    } else if (this.getTpbState() === 'return' && this._action !== action) {
-        this._action = action;console.log(this._action)
-    }
+    //if (this.getTpbState() === 'charged' || this.getTpbState() === 'casting' && this._action !== action) {
+    //    this._action = action;
+    //} else if (this.getTpbState() === 'return' && this._action !== action) {
+    //    this._action = action;
+    //}
     if (this._action && ((this._battler.tpbRequiredCastTime() > 0 && this.isCasting()) || this._tpbState === 'acting')) {
         if (CastIconId > 0) {
             this._castIconSprite.setIcon(CastIconId);
@@ -1057,7 +1085,7 @@ Sprite_TimeLine.prototype.characterFrame = function() {
 };
 
 Sprite_TimeLine.prototype.getTpbTime = function() {
-    return this._battler.tpbChargeTime();
+    return Math.max(this._battler.tpbChargeTime(), 0);
 };
 
 Sprite_TimeLine.prototype.getCastTime = function() {

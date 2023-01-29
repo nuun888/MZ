@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Preemptive,Surprise EX
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * @base NUUN_Base
  * 
  * @help
@@ -39,10 +39,19 @@
  * If the surprise attack start SE file is not set during the preemptive surprise attack setting, the surprise attack start SE SE will be played during the default preemptive attack.
  * In addition, during the default preemptive attack, if the file name is not specified even in the surprise battle start SE, the normal battle start SE will be played.
  * 
+ * plugin command
+ * EventPresurMode
+ * Enable preemptive surprise attack if a battle is spawned from an event.
+ * Please specify the ID of "PreemptiveSurpriseSetting".
+ * The tag settings you fill in for each enemy group will take precedence.
+ * It will be initialized after the preemptive surprise attack process.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/29/2022 Ver.1.2.0
+ * Added a function to enable preemptive surprise attack from an event with a plug-in command.
  * 12/2/2022 Ver.1.1.1
  * Fixed an issue where some of the default evaluators for normal encounters were not fetchable.
  * Added a function that allows you to set the battle start SE for normal, preemptive attack, and surprise attacks.
@@ -54,6 +63,17 @@
  * Added a function that allows you to obtain the number of preemptive strikes and the number of surprise attacks.
  * 7/31/2022 Ver.1.0.0
  * First edition.
+ * 
+ * @command EventPresurMode
+ * @desc Enables first strike in combat from the event.
+ * @text Event preemptive surprise enabled
+ * 
+ * @arg SurpriseId
+ * @text Preemptive surprise setting ID
+ * @desc Specifies the list ID of the preemptive surprise setting.
+ * @type number
+ * @default 0
+ * 
  * 
  * @param PreemptiveSurpriseSetting
  * @text Preemptive Surprise Setting
@@ -122,6 +142,7 @@
  * @type combo[]
  * @option 'EncounterEffect.setType(1);//MPP_EncounterEffect Type change'
  * @option 'EncounterEffect.setColor(255,255,255);//MPP_EncounterEffect Color change'
+ * @option '$gameTemp.reserveCommonEvent(0);//Common event'
  * @default []
  * 
  * @param SurprisePresurSprict
@@ -130,6 +151,7 @@
  * @type combo[]
  * @option 'EncounterEffect.setType(1);//MPP_EncounterEffect Type change'
  * @option 'EncounterEffect.setColor(255,255,255);//MPP_EncounterEffect Color change'
+ * @option '$gameTemp.reserveCommonEvent(0);//Common event'
  * @default []
  * 
  */
@@ -232,7 +254,7 @@
  * @target MZ
  * @plugindesc 先制、不意打ちEX
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * @base NUUN_Base
  * 
  * @help
@@ -262,10 +284,19 @@
  * のSEが再生されます。
  * なお、デフォルト先制攻撃時、不意打ち戦闘開始SEでもファイル名が指定されていない場合は通常の戦闘開始SEが再生されます。
  * 
+ * プラグインコマンド
+ * イベント先制不意打ち有効
+ * イベントから戦闘を発生された場合、先制不意打ちを有効にします。
+ * 先制不意打ち設定のIDを指定してください。
+ * 各敵グループに記入したタグの設定が優先されます。
+ * 先制不意打ち処理後に初期化されます。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/29 Ver.1.2.0
+ * プラグインコマンドでイベントからの戦闘時先制不意打ちを有効にする機能を追加。
  * 2022/12/2 Ver.1.1.1
  * 通常のエンカウント時のデフォルト評価式の一部が、取得できなかった問題を修正。
  * 通常時、先制攻撃時、不意打ち時の戦闘開始SEを設定できる機能を追加。
@@ -277,6 +308,16 @@
  * 先制された回数、不意打ちされた回数を取得できる機能を追加。
  * 2022/7/31 Ver.1.0.0
  * 初版
+ * 
+ * @command EventPresurMode
+ * @desc イベントからの戦闘で先制不意打ちを有効にします。
+ * @text イベント先制不意打ち有効
+ * 
+ * @arg SurpriseId
+ * @text 先制不意打ち設定ID
+ * @desc 先制不意打ち設定のリストIDを指定します。
+ * @type number
+ * @default 0
  * 
  * @param PreemptiveSurpriseSetting
  * @text 先制不意打ち設定
@@ -337,6 +378,7 @@
  * @type combo[]
  * @option 'EncounterEffect.setType(1);//MPP_EncounterEffectタイプ変更'
  * @option 'EncounterEffect.setColor(255,255,255);//MPP_EncounterEffectカラー変更'
+ * @option '$gameTemp.reserveCommonEvent(0);//コモンイベント'
  * @default []
  * 
  * @param PreemptivePresurSprict
@@ -345,6 +387,7 @@
  * @type combo[]
  * @option 'EncounterEffect.setType(1);//MPP_EncounterEffectタイプ変更'
  * @option 'EncounterEffect.setColor(255,255,255);//MPP_EncounterEffectカラー変更'
+ * @option '$gameTemp.reserveCommonEvent(0);//コモンイベント'
  * @default []
  * 
  * @param SurprisePresurSprict
@@ -353,6 +396,7 @@
  * @type combo[]
  * @option 'EncounterEffect.setType(1);//MPP_EncounterEffectタイプ変更'
  * @option 'EncounterEffect.setColor(255,255,255);//MPP_EncounterEffectカラー変更'
+ * @option '$gameTemp.reserveCommonEvent(0);//コモンイベント'
  * @default []
  * 
  */
@@ -449,6 +493,8 @@
  * @text SEの位相
  * @desc SEを位相を設定します。
  * @default 0
+ * @max 100
+ * @min -100
  * 
  */
 
@@ -468,6 +514,13 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
     const DefaultPresurSprict = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DefaultPresurSprict'])) : null) || [];
     const PreemptivePresurSprict = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PreemptivePresurSprict'])) : null) || [];
     const SurprisePresurSprict = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SurprisePresurSprict'])) : null) || [];
+
+    const pluginName = "NUUN_PreemptiveSurpriseEx";
+    let _eventPresurMode = 0;
+
+    PluginManager.registerCommand(pluginName, 'EventPresurMode', args => {
+        _eventPresurMode = Number(args.SurpriseId);
+    });
 
     const _BattleManager_initMembers = BattleManager.initMembers;
     BattleManager.initMembers = function() {
@@ -496,18 +549,23 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
             surprise = true;
         }
         const tagData = $gameTroop.getPresurCommentTag();
-        if (tagData) {
-            const data = isNaN(tagData) ? PreemptiveSurpriseSetting.find(a => tagData === a.Name) : PreemptiveSurpriseSetting[Number(tagData) - 1];
+        if (tagData || _eventPresurMode > 0) {
+            let data = null;
+            if (tagData) {
+                data = isNaN(tagData) ? PreemptiveSurpriseSetting.find(a => tagData === a.Name) : PreemptiveSurpriseSetting[Number(tagData) - 1];
+            } else if ($gameTemp.onEventEncounter) {
+                data = PreemptiveSurpriseSetting[_eventPresurMode - 1];
+            }
             if (preemptive || surprise) {
                 //this._tempPreemptive = preemptive;
                 //this._tempSurprise = surprise;
             } else {
                 if ($gameTemp.onEventEncounter) {
-                    preemptive = data.EventPreemptiveSetting && data.EventPreemptiveSetting.EvalData ? eval(data.EventPreemptiveSetting.EvalData) : false;
-                    surprise = !preemptive && data.EventSurpriseSetting && data.EventSurpriseSetting.EvalData ? eval(data.EventSurpriseSetting.EvalData) : false;
+                    preemptive = data && data.EventPreemptiveSetting && data.EventPreemptiveSetting.EvalData ? eval(data.EventPreemptiveSetting.EvalData) : false;
+                    surprise = !preemptive && data && data.EventSurpriseSetting && data.EventSurpriseSetting.EvalData ? eval(data.EventSurpriseSetting.EvalData) : false;
                 } else {
-                    preemptive = data.RandomPreemptiveSetting && data.RandomPreemptiveSetting.EvalData ? eval(data.RandomPreemptiveSetting.EvalData) : (DefaultPreemptive ? eval(DefaultPreemptive) : false);
-                    surprise = !preemptive && data.RandomSurpriseSetting && data.RandomSurpriseSetting.EvalData ? eval(data.RandomSurpriseSetting.EvalData) : (DefaultSurprise ? eval(DefaultSurprise) : false);
+                    preemptive = data && data.RandomPreemptiveSetting && data.RandomPreemptiveSetting.EvalData ? eval(data.RandomPreemptiveSetting.EvalData) : (DefaultPreemptive ? eval(DefaultPreemptive) : false);
+                    surprise = !preemptive && data && data.RandomSurpriseSetting && data.RandomSurpriseSetting.EvalData ? eval(data.RandomSurpriseSetting.EvalData) : (DefaultSurprise ? eval(DefaultSurprise) : false);
                 }
             }
             this.setPresurSe(preemptive, surprise, data);
@@ -525,6 +583,7 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
         }
         this._tempPreemptive = preemptive;
         this._tempSurprise = surprise;
+        _eventPresurMode = 0;
         this.presurEncounterSprict();
     };
 

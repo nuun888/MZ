@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Event contact detection EX
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -76,6 +76,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/31/2023 Ver.1.5.1
+ * Fixed an issue where settings from Comment tag of <EventRangeObstacle> were not applied.
  * 11/27/2022 Ver.1.5.0
  * Added a function that does not cause an event when there is an obstacle in sight from the player.
  * Fixed an issue where the collision detection was not applied correctly in the range collision detection of the event.
@@ -127,7 +129,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -194,6 +196,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/1/31 Ver.1.5.1
+ * <EventRangeObstacle>の注釈からの設定が適用されていなかった問題を修正。
  * 2022/11/27 Ver.1.5.0
  * プレイヤーから視界上に障害物がある場合、イベント発生しない機能を追加。
  * イベントの範囲衝突判定で衝突判定が正常に適用してなかった問題を修正。
@@ -357,7 +361,7 @@ Imported.NUUN_EventRange = true;
     };
 
     Game_CharacterBase.prototype.obstacleJudgment = function(x, y) {
-        if (this.event().meta.EventRangeObstacle) {
+        if (this._eventRangeObstacleSensingTag) {
             const sx = this.deltaXFrom(x) * -1;
             const sy = this.deltaYFrom(y) * -1;
             const maxDelta = Math.max(Math.abs(x), Math.abs(y));

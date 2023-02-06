@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/7/2023 Ver.1.6.3
+ * Added processing to call events with plugin commands.
  * 12/30/2022 Ver.1.6.2
  * Added exception handling when image could not be loaded.
  * Added content background processing definition.
@@ -72,7 +74,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.3
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -82,6 +84,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/7 Ver.1.6.3
+ * プラグインコマンドでイベントを呼び出すための処理の追加。
  * 2022/12/30 Ver.1.6.2
  * 画像が読み込めなかったときの例外処理を追加。
  * コンテンツ背景処理の定義を追加。
@@ -188,6 +192,16 @@ NuunManager.nuun_getListIdData = function(id) {
   } else {
     return [Number(id)];
   }
+};
+
+const _Game_Interpreter_command357 = Game_Interpreter.prototype.command357;
+Game_Interpreter.prototype.command357 = function(params) {
+    PluginManager.setNuunEventData(this._eventId);
+    return _Game_Interpreter_command357.call(this, params);
+};
+
+PluginManager.setNuunEventData = function(eventId) {
+    this.nuunEvent = $gameMap ? $gameMap._events[eventId] : null;
 };
 
 DataManager.nuun_structureData = function(params){

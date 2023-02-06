@@ -25,7 +25,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | コア　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.6.1 |
+| [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.6.3 |
 | [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.1.6 |
 | [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md) | [NUUN_StateTurnCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js) |  | 1.1.1 |
 | [レーダーチャート表示ベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md) | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) | 共 | 1.0.2 |
@@ -256,7 +256,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | ---------- | ------------- | ------------- | -------- |
 | [イベント接触判定拡張](https://github.com/nuun888/MZ/blob/master/README/EventRange.md) | [NUUN_EventRange](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js) | 共 | 1.5.1 |
 | ┣  [場所範囲移動](https://github.com/nuun888/MZ/blob/master/README/RangeTransfer.md) | [NUUN_RangeTransfer](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RangeTransfer.js) |  | 1.0.1 |
-| ┗　シンボルエンカウント補助|  |  |  |
+| ┗　シンボルエンカウント|  | 共 |  |
 | [トリガー起動時のプレイヤーとイベントの向き状況取得](https://github.com/nuun888/MZ/blob/master/README/EventPlayerDirection.md) | [NUUN_EventPlayerDirection](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventPlayerDirection.js) | | 1.0.1 |
 | [イベント復活](https://github.com/nuun888/MZ/blob/master/README/EventRevived.md) | [NUUN_EventRevived](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRevived.js) | 共 | 1.0.0 |
 |  |  |  |  |

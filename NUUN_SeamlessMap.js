@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Combine multiple maps
  * @author NUUN
- * @version 1.1.5
+ * @version 1.1.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -43,6 +43,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/8/2023 Ver.1.1.6
+ * Fixed a conflict with the Template Events plugin.
  * 11/12/2022 Ver.1.1.5
  * Changed the display in languages other than Japanese to English.
  * 2/25/2022 Ver.1.1.4
@@ -142,7 +144,7 @@
  * @target MZ
  * @plugindesc 複数マップ結合
  * @author NUUN
- * @version 1.1.5
+ * @version 1.1.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -175,6 +177,8 @@
  * 該当のイベントコマンドを設定した後にリセットします。
  * 
  * 更新履歴
+ * 2023/2/8 Ver.1.1.6
+ * テンプレートイベントプラグインと競合を起こす問題を修正。
  * 2022/11/12 Ver.1.1.5
  * 日本語以外での表示を英語表示に変更。
  * 2022/2/25 Ver.1.1.4
@@ -381,7 +385,7 @@ DataManager.loadMapData = function(mapId) {
 
 const _DataManager_isMapLoaded = DataManager.isMapLoaded;
 DataManager.isMapLoaded = function() {
-    if (this.seamlessMapId.length > 1) {
+    if (this.seamlessMapId && this.seamlessMapId.length > 1) {
         return this.isSeamlessMapLoaded();
     } else {
         return _DataManager_isMapLoaded.call(this);

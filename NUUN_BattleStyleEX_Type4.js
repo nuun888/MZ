@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -55,6 +55,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/2/11 Ver.1.8.5
+ * アクターコンテンツを下側から表示する機能を追加。
  * 2023/1/8 Ver.1.1.4
  * アクター名、オリジナルパラメータ、レベルの表示文字揃えを指定できる機能を追加。
  * 2022/12/24 Ver.1.1.3
@@ -444,8 +446,8 @@
  * @parent ActorStatus
  * 
  * @param ActorStatusMode
- * @text アクターステータス表示方法
- * @desc アクターステータスの表示方法を選択します。
+ * @text アクターステータス表示方法1
+ * @desc アクターステータスの横方向の表示方法を選択します。
  * @type select
  * @option 左寄り
  * @value 'left'
@@ -453,9 +455,18 @@
  * @value 'center'
  * @option 右寄り
  * @value 'right'
- * @option 三角形
- * @value 'triangle'
  * @default 'center'
+ * @parent ActorStatus
+ * 
+ * @param ActorStatusRowsMode
+ * @text アクターステータス表示方法2
+ * @desc アクターステータスの縦方向の表示方法を選択します。
+ * @type select
+ * @option 上から表示
+ * @value 'top'
+ * @option 下から表示
+ * @value 'under'
+ * @default 'top'
  * @parent ActorStatus
  * 
  * @param ActorStatusActorWindow
@@ -2185,6 +2196,41 @@
 * @min -255
 * 
 */
+/*~struct~ActorContentsRect:
+ * 
+ * @param ActorContentsX
+ * @desc アクターステータスウィンドウのコンテンツ表示のX座標を指定します。(相対)
+ * @text X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param ActorContentsY
+ * @desc アクターステータスウィンドウのコンテンツ表示のY座標を指定します。(相対)
+ * @text Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @max 9999
+ * 
+ * @param ActorContentsWidth
+ * @desc アクターステータスウィンドウのコンテンツ表示の横幅を指定します。0で通常表示幅
+ * @text 横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 999
+ * 
+ * @param ActorContentsHeight
+ * @desc アクターステータスウィンドウのコンテンツ表示の縦幅を指定します。0で通常表示幅
+ * @text 縦幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 24
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_BattleStyleEX_Type4 = true;
@@ -2251,6 +2297,7 @@ params.ActorStatusVariable = false;
 params.ActorMaxCol = Number(parameters['ActorMaxCol'] || 3);
 params.ActorMaxRow = Number(parameters['ActorMaxRow'] || 2);
 params.ActorStatusMode = eval(parameters['ActorStatusMode']) || "center";
+params.ActorStatusRowsMode = eval(parameters['ActorStatusRowsMode']) || "top";
 params.ActorStatusWindowPosition = eval(parameters['ActorStatusWindowPosition']) || 'under';
 params.ActorStatusWindow_X = Number(parameters['ActorStatusWindow_X'] || 0);
 params.ActorStatusWindow_Y = Number(parameters['ActorStatusWindow_Y'] || 0);

@@ -19,8 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2023/1/23 Ver.3.8.9
- * 味方対象選択時キャンセルを押すと、スキル、アイテム画面とアクターコマンドが同時に表示される問題を修正。
+ * 2023/2/11 Ver.3.8.9
+ * アクターコンテンツを下側から表示する機能を追加。
  * 2023/1/22 Ver.3.8.8
  * アクターのフラッシュを他のアクターと同期するように修正。
  * 2023/1/21 Ver.3.8.7
@@ -1387,7 +1387,7 @@ const _Scene_Battle_onActorCancel = Scene_Battle.prototype.onActorCancel;
 Scene_Battle.prototype.onActorCancel = function() {
   _Scene_Battle_onActorCancel.call(this);
   $gameTemp.onBSAction = false;
-  this._statusWindow.selectActor(BattleManager.actor());
+  this.startActorCommandSelection();
 };
 
 const _Scene_Battle_startPartyCommandSelection = Scene_Battle.prototype.startPartyCommandSelection;
@@ -1728,6 +1728,7 @@ Window_BattleStatus.prototype.refreshCursor = function() {
 
 Window_BattleStatus.prototype.statusPosition = function(index, rect) {
     const itemWidth = this.itemWidth();
+    const padding = this.itemPadding();
     let cols = this.maxCols();
     let maxCols = 0;
     if (params.ActorStatusMode === 'triangle') {
@@ -1739,12 +1740,21 @@ Window_BattleStatus.prototype.statusPosition = function(index, rect) {
       maxCols = Math.min(this.maxItems() - (Math.floor(index / cols) * cols), cols, this.maxItems());
     }
     if (params.ActorStatusMode === 'center') {
-        rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
+        rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
     } else if (params.ActorStatusMode === 'raigt') {
-        rect.x += this.width - (maxCols * itemWidth) - this.itemPadding() * 2;
+        rect.x += this.width - (maxCols * itemWidth) - padding * 2;
     } else if (params.ActorStatusMode === 'triangle') {
-        rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - this.itemPadding();
+        rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
     }
+    if (params.ActorStatusRowsMode === 'under') {
+        rect.y = this.height - (rect.height + rect.y + padding * 2);
+    }
+    //if (data) {
+    //    rect.x += data.Actor_X || 0;
+    //    rect.y += data.Actor_Y || 0;
+    //    rect.width += data.Actor_Width > 0 ? data.Actor_Width : 0;
+    //    rect.height += data.Actor_height > 0 ? data.Actor_height : 0;
+    //}
     return rect;
 };
 

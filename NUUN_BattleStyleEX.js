@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.9
+ * @version 3.8.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,8 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2023/2/11 Ver.3.8.9
+ * 2023/2/11 Ver.3.8.10
  * アクターコンテンツを下側から表示する機能を追加。
+ * 2023/1/23 Ver.3.8.9
+ * 味方対象選択時キャンセルを押すと、スキル、アイテム画面とアクターコマンドが同時に表示される問題を修正。
  * 2023/1/22 Ver.3.8.8
  * アクターのフラッシュを他のアクターと同期するように修正。
  * 2023/1/21 Ver.3.8.7
@@ -1387,7 +1389,7 @@ const _Scene_Battle_onActorCancel = Scene_Battle.prototype.onActorCancel;
 Scene_Battle.prototype.onActorCancel = function() {
   _Scene_Battle_onActorCancel.call(this);
   $gameTemp.onBSAction = false;
-  this.startActorCommandSelection();
+  this._statusWindow.selectActor(BattleManager.actor());
 };
 
 const _Scene_Battle_startPartyCommandSelection = Scene_Battle.prototype.startPartyCommandSelection;

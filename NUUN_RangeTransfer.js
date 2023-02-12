@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Location range move
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_EventRange
  * 
  * @help
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/12/2023 Ver.1.0.2
+ * Added plugin parameter to initialize switch after move.
  * 11/27/2022 Ver.1.0.1
  * Changed the display in languages other than Japanese to English.
  * 7/14/2022 Ver.1.0.0
@@ -41,7 +43,7 @@
  * @target MZ
  * @plugindesc 場所範囲移動
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_EventRange
  * 
  * @help
@@ -55,6 +57,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/12 Ver.1.0.2
+ * 移動後にスイッチを初期化するプラグインパラメータを追加。
  * 2022/11/27 Ver.1.0.1
  * 日本語以外での表示を英語表示に変更。
  * 2022/7/14 Ver.1.0.0
@@ -66,6 +70,11 @@
  * @type switch
  * @default 0
  * 
+ * @param EndInitializeSwitchId
+ * @text 移動後スイッチ初期化
+ * @desc 移動後にスイッチを初期化します。
+ * @type boolean
+ * @default false
  * 
  */
 
@@ -76,6 +85,7 @@ Imported.NUUN_RangeTransfer = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_RangeTransfer');
     const RangeTransferModeSwitchId = Number(parameters['RangeTransferModeSwitchId'] || 0);
+    const EndInitializeSwitchId = eval(parameters['EndInitializeSwitchId'] || "false");
 
     const _Game_Player_performTransfer = Game_Player.prototype.performTransfer;
     Game_Player.prototype.performTransfer = function() {
@@ -90,6 +100,13 @@ Imported.NUUN_RangeTransfer = true;
             }
         }
         _Game_Player_performTransfer.call(this);
+        setEndInitializeSwitchId();
+    };
+
+    function setEndInitializeSwitchId() {
+        if (EndInitializeSwitchId && RangeTransferModeSwitchId > 0) {
+            $gameSwitches.setValue(RangeTransferModeSwitchId, false);
+        }
     };
 
 })();

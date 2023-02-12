@@ -120,6 +120,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/12/2023 Ver.1.0.1
+ * Fixed an issue where Surprise Strike would not execute on recombat with the same symbol.
  * 2/7/2023 Ver.1.0.0
  * First edition.
  * 
@@ -427,7 +429,7 @@
  * @target MZ
  * @plugindesc シンボルエンカウント
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @base NUUN_EventRange
  * @orderAfter NUUN_Base
@@ -537,6 +539,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/12 Ver.1.0.1
+ * 同一シンボルと再戦闘時に先制不意打ちが実行されなくなる問題を修正。
  * 2023/2/7 Ver.1.0.0
  * 初版
  * 
@@ -1010,8 +1014,8 @@ Imported.NUUN_SymbolEncounter = true;
     Game_Event.prototype.lock = function() {
         if (this.isSymbolEnc()) {
             if (!this._locked) {
-                this._prelockDirection = this.direction();
-                this._locked = true;
+                //this._prelockDirection = this.direction();
+                //this._locked = true;
             }
         } else {
             _Game_Event_lock.call(this);
@@ -1109,12 +1113,13 @@ Imported.NUUN_SymbolEncounter = true;
             } else {
                 if (this._symbolEncMode === 1) {
                     this.updateSymbolEncountFind();
+                    this.resetStopCount();
                 } else if (this._symbolEncMode === 5) {
                     this.updateSymbolEncountLose();
+                    this.resetStopCount();
                 }
             }
-        }
-        
+        }  
     };
 
     const _Game_Event_updateStop = Game_Event.prototype.updateStop;
@@ -1245,7 +1250,6 @@ Imported.NUUN_SymbolEncounter = true;
         } else {
             this.setSymbolEncMode(2);//追跡
         }
-        this.resetStopCount();
     };
 
     Game_Event.prototype.symbolEncountLost = function() {

@@ -42,10 +42,12 @@
  * [itemId]:Item, Weapon, Armor ID
  * [num]:Consumed quantity
  * Equipment consumption skill
- * <SkillEquipCost:[itemType],[itemId],[num]> Consumes equipped weapons and armor as a cost.
+ * <SkillEquipCost:[itemType],[itemId],[num],[eval]> Consumes equipped weapons and armor as a cost.
  * [itemType]:Item type  W Weapon A Armor
  * [itemId]:Weapon/Armor ID
  * [num]:For no consumption, 1 for lost
+ * [eval]:If [num] is 1, enter the conditional expression to consume. If the condition is not met, it will not be deleted. If omitted, it will always be consumed.
+ * Example:<SkillEquipCost:W,53,1,$gameParty.numItems($dataItems[1]) === 0> Disappears equipment with weapon ID 53 when there is no item with item ID 1.
  * Game variable consumption skill
  * <SkillVarCost:[id],[cost]> Consume from the value set in the game variable.
  * <SkillVarCost:6,3> Consumes 3 from the value of game variable number 6.
@@ -78,8 +80,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 12/17/2022 Ver.1.2.1
- * Minor fix.
+ * 2/15/2023 Ver.1.2.1
+ * Added a function that allows you to set the cost to disappear the equipped equipment when the conditions are met.
  * 12/4/2022 Ver.1.2.0
  * Added a cost that can be consumed as a percentage from a game variable.
  * 11/25/2022 Ver.1.1.1
@@ -96,7 +98,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.0
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -128,10 +130,12 @@
  * [itemId]:アイテム、武器、防具ID
  * [num]:消費個数
  * 装備品消費スキル
- * <SkillEquipCost:[itemType],[itemId],[num]> コストとして装備中の武器、防具を消費します。
+ * <SkillEquipCost:[itemType],[itemId],[num],[eval]> コストとして装備中の武器、防具を消費します。
  * [itemType]:アイテムタイプ　W 武器　A 防具
  * [itemId]:武器、防具ID
- * [num]:0で消費なし、1で消失
+ * [num]:0で消費なし 1で消失
+ * [eval]:[num]を1の場合、消費する条件式を記入します。条件不一致の場合は消失されません。省略時は常時消費します。
+ * 例:<SkillEquipCost:W,53,1,$gameParty.numItems($dataItems[1]) === 0> アイテムID1番のアイテムがないときに武器ID53番の装備を消失します。
  * ゲーム変数消費スキル
  * <SkillVarCost:[id],[cost]> ゲーム変数に設定した数値から消費します。
  * <SkillVarCost:6,3> ゲーム変数6番の値から3消費します。
@@ -163,8 +167,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2022/12/17 Ver.1.2.1
- * 微修正
+ * 2023/2/15 Ver.1.2.1
+ * 条件一致で装備している装備を消失するコストを設定できる機能を追加。
  * 2022/12/4 Ver.1.2.0
  * ゲーム変数から割合で消費できるコストを追加。
  * 2022/11/25 Ver.1.1.1
@@ -350,16 +354,15 @@ Game_BattlerBase.prototype.paySkillCost = function(skill) {
     $gameParty.loseGold(this.skillGoldCost(skill));
     this.paySkillExpCost(skill);
     this.paySkillItemCost(skill);
-    this.paySkillEquipCost(skill);
     this.paySkillVarCost(skill);
     this.paySkillVarCostR(skill);
+    this.paySkillEquipCost(skill);
     this.paySkillEvalCost(skill);
 };
 
 Game_BattlerBase.prototype.paySkillExpCost = function(skill) {
-    const cost = this.skillExpCost(skill);
-    if (this.isActor() && cost !== 0) {
-        this.changeExp(this.currentExp() - cost, this.shouldDisplayLevelUp());
+    if (this.isActor()) {
+        this.changeExp(this.currentExp() - this.skillExpCost(skill), this.shouldDisplayLevelUp());
     }
 };
 
@@ -372,7 +375,9 @@ Game_BattlerBase.prototype.paySkillItemCost = function(skill) {
 Game_BattlerBase.prototype.paySkillEquipCost = function(skill) {
     this.skillEquipCost(skill).forEach(cost => { 
         if (cost.quantity > 0)  {
-            this.discardEquip(cost.item);
+            if (cost.cond && eval(cost.cond)) {
+                this.discardEquip(cost.item);
+            }
         }
     });
 };
@@ -453,10 +458,10 @@ function getCostEquip(skill) {
                 let data = match[1].split(',');
                 switch (data[0]) {
                     case 'W':
-                        list.push({item: $dataWeapons[parseInt(data[1])], quantity: parseInt(data[2])});
+                        list.push({item: $dataWeapons[parseInt(data[1])], quantity: parseInt(data[2]), cond: data[3]});
                         break;
                     case 'A':
-                        list.push({item: $dataArmors[parseInt(data[1])], quantity: parseInt(data[2])});
+                        list.push({item: $dataArmors[parseInt(data[1])], quantity: parseInt(data[2]), cond: data[3]});
                         break;
                 }
             } else {

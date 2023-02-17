@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Symbol encounter
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.2
  * @base NUUN_Base
  * @base NUUN_EventRange
  * @orderAfter NUUN_Base
@@ -120,6 +120,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/17/2023 Ver.1.0.2
+ * Fixed an issue where battles would start continuously even if you set invincibility.
+ * Fixed to initialize when the page is not applicable.
+ * Added switch to hide symbol encounters.
  * 2/12/2023 Ver.1.0.1
  * Fixed an issue where Surprise Strike would not execute on recombat with the same symbol.
  * 2/7/2023 Ver.1.0.0
@@ -177,6 +181,12 @@
  * @desc Recognize your followers. At the time of contact, followers are also subject to contact.
  * @type boolean
  * @default false
+ * 
+ * @param SymbolEncountHideSwitch
+ * @desc A switch to hide symbol encounters.
+ * @text Hide symbol encounter switch
+ * @type switch
+ * @default 0
  * 
  */
 /*~struct~SymbolEncountList:
@@ -429,7 +439,7 @@
  * @target MZ
  * @plugindesc シンボルエンカウント
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @base NUUN_EventRange
  * @orderAfter NUUN_Base
@@ -539,6 +549,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/17 Ver.1.0.2
+ * 無敵状態を設定しても連続で戦闘が開始してしまう問題を修正。
+ * ページが該当しなかったときに初期化するように修正。
+ * シンボルエンカウンターを表示しないスイッチを追加。
  * 2023/2/12 Ver.1.0.1
  * 同一シンボルと再戦闘時に先制不意打ちが実行されなくなる問題を修正。
  * 2023/2/7 Ver.1.0.0
@@ -602,6 +616,12 @@
  * @desc フォロワーを認識します。接触時はフォロワーも接触対象になります。
  * @type boolean
  * @default false
+ * 
+ * @param SymbolEncountHideSwitch
+ * @desc シンボルエンカウンターを非表示にするスイッチ。
+ * @text シンボルエンカウンター非表示スイッチ
+ * @type switch
+ * @default 0
  * 
  */
 /*~struct~SymbolEncountList:ja
@@ -862,6 +882,7 @@ Imported.NUUN_SymbolEncounter = true;
     const EventFreezesFrame = Number(parameters['EventFreezesFrame'] || 200);
     const PlayerSearchLimit = Number(parameters['SearchLimit'] || 12);
     const FindFollower = eval(parameters['FindFollower'] || "false");
+    const SymbolEncountHideSwitch = Number(parameters['SymbolEncountHideSwitch'] || 0);
     const pluginName = "NUUN_SymbolEncounter";
 
     PluginManager.registerCommand(pluginName, 'SymbolEncTrackingMode', args => {
@@ -926,7 +947,7 @@ Imported.NUUN_SymbolEncounter = true;
     };
 
     Game_Player.prototype.updateSymbolEncInvincible = function() {
-        if (this._symbolEncInvincibleCount > 0) {
+        if (!$gameParty.inBattle() && this._symbolEncInvincibleCount > 0) {
             this._symbolEncInvincibleCount--;
             if (this._symbolEncInvincibleCount === 0) {
                 this.setOpacity(255);
@@ -1039,11 +1060,6 @@ Imported.NUUN_SymbolEncounter = true;
             }
             if (this.page().trigger === 4) {
                 this.symbolEncTriggerOn = true;
-            }
-            if (this._symbolEncMode === 7) {
-                $gamePlayer.setSymbolEncInvincible(EscapeInvincibleFrame);
-            } else if (this._symbolEncMode === 8) {
-                $gamePlayer.setSymbolEncInvincible(VictoryInvincibleFrame);
             }
             this._searchTarget = $gamePlayer;
             this._searchTargetIndex = 0;
@@ -1190,7 +1206,7 @@ Imported.NUUN_SymbolEncounter = true;
                 this.updateSelfMovement();
             }
         }
-        if (this.symbolEncountLost()) {
+        if (this.symbolEncountLose()) {
             this.setSymbolEncMode(5);
         }
         if (this.getSymbolEncSight() === 0) {
@@ -1207,7 +1223,7 @@ Imported.NUUN_SymbolEncounter = true;
                 this.setSymbolEncMode(0);
             }
         } else {
-            if (this.symbolEncountLost()) {
+            if (this.symbolEncountLose()) {
                 this.setSymbolEncMode(5);
             }
         }
@@ -1252,7 +1268,7 @@ Imported.NUUN_SymbolEncounter = true;
         }
     };
 
-    Game_Event.prototype.symbolEncountLost = function() {
+    Game_Event.prototype.symbolEncountLose = function() {
         if (this._symbolEncSightRange > 0 & this._searchTarget) {
             const x = Math.abs(this.deltaXFrom(this._searchTarget.x));
             const y = Math.abs(this.deltaYFrom(this._searchTarget.y));
@@ -1326,7 +1342,7 @@ Imported.NUUN_SymbolEncounter = true;
 
     const _Game_Event_start = Game_Event.prototype.start;
     Game_Event.prototype.start = function() {
-        if (this.isSymbolEnc() && this.isSymbolEncTouch()) {
+        if (this.isSymbolEnc() && !$gamePlayer.isSymbolEncInvincible() && this.isSymbolEncTouch()) {
             this.setSymbolEncMode(4);
         }
         _Game_Event_start.call(this);
@@ -1356,6 +1372,9 @@ Imported.NUUN_SymbolEncounter = true;
     };
 
     Game_Event.prototype.meetsSymbolEncPages = function(page) {
+        if (!this.meetsSymbolEncCond()) {
+            return false;
+        }
         if (this.isSymbolEnc()) {
             const symbolEncPage = this.setSymbolEncModeTag(page);
             this._symbolEncPage = (symbolEncPage === this._symbolEncMode);
@@ -1374,6 +1393,15 @@ Imported.NUUN_SymbolEncounter = true;
         } else {
             return _Game_Event_page.call(this);
         }
+    };
+
+    const _Game_Event_findProperPageIndex = Game_Event.prototype.findProperPageIndex;
+    Game_Event.prototype.findProperPageIndex = function() {
+        const page = _Game_Event_findProperPageIndex.call(this);
+        if (this.isSymbolEnc() && page < 0) {
+            this.resetSymbolEnc();
+        }
+        return page;
     };
 
     Game_Event.prototype.getSymbolEncUserData = function() {
@@ -1603,6 +1631,18 @@ Imported.NUUN_SymbolEncounter = true;
         });
     };
 
+    Game_Event.prototype.meetsSymbolEncCond = function() {
+        if (SymbolEncountHideSwitch > 0 && $gameSwitches.value(SymbolEncountHideSwitch)) {
+            return false;
+        }
+        return true;
+    };
+
+    Game_Event.prototype.resetSymbolEnc = function() {
+        this._symbolEncPage = false;
+        this._symbolEncMode = 0;
+    };
+
     Game_Character.prototype.getSymbolEncSight = function() {
         return $gameParty.hasEncounterNone() ? 0.0 : ($gamePlayer.encounterProgressValue() * ($gamePlayer.isOnBush() ? this._symbolEncSightBush / 2 : 1.0));
     };
@@ -1798,6 +1838,16 @@ Imported.NUUN_SymbolEncounter = true;
 
     Game_Interpreter.prototype.getSymbolEncDefeat = function() {
         return $gameMap._events[this.eventId()]._symbolEncMode === 6;
+    };
+
+    const _BattleManager_endBattle = BattleManager.endBattle;
+    BattleManager.endBattle = function(result) {
+        if (result === 0) {
+            $gamePlayer.setSymbolEncInvincible(VictoryInvincibleFrame);
+        } else if (this._escaped) {
+            $gamePlayer.setSymbolEncInvincible(EscapeInvincibleFrame);
+        }
+        _BattleManager_endBattle.call(this, result);
     };
 
     function getFindCommand(data) {

@@ -1,5 +1,5 @@
 # [シンボルエンカウント](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SymbolEncounter.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SymbolEncounter.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.3以降  
@@ -106,6 +106,10 @@ p:プレイヤー
 シンボルエンカウントの現在のモードが撃破時か返します。  
 
 ## 更新履歴
+2023/2/17 Ver.1.0.2  
+無敵状態を設定しても連続で戦闘が開始してしまう問題を修正。  
+ページが該当しなかったときに初期化するように修正。  
+シンボルエンカウンターを表示しないスイッチを追加。  
 2023/2/12 Ver.1.0.1  
 同一シンボルと再戦闘時に先制不意打ちが実行されなくなる問題を修正。  
 2023/2/7 Ver.1.0.0  

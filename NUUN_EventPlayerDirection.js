@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Get status for player event at trigger activation
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * Gets the orientation status of the player and the event when the trigger is activated.
@@ -18,7 +18,9 @@
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
- * 更新履歴
+ * Log
+ * 2/18/2023 Ver.1.0.3
+ * Modified to work without setting switch ID in the function referenced from "NUUN_PreemptiveSurpriseEx".
  * 12/1/2022 Ver.1.0.2
  * Changed the display in languages other than Japanese to English.
  * 7/31/2022 Ver.1.0.1
@@ -81,7 +83,7 @@
  * @target MZ
  * @plugindesc トリガー起動時のプレイヤーとイベントの向き状況取得
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * トリガー起動時のプレイヤーとイベントとの向き状況を取得します。
@@ -90,6 +92,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/18 Ver.1.0.3
+ * 先制、不意打ちEXプラグインからの参照で、スイッチIDを設定しなくても動作するように修正。
  * 2022/12/1 Ver.1.0.2
  * 日本語以外での表示を英語表示に変更。
  * 2022/7/31 Ver.1.0.1
@@ -163,14 +167,18 @@ Imported.NUUN_EventPlayerDirection = true;
     const EventRightDirectionSwitch = Number(parameters['EventRightDirectionSwitch'] || 0);
     const PlayerLeftDirectionSwitch = Number(parameters['PlayerLeftDirectionSwitch'] || 0);
     const EventLeftDirectionSwitch = Number(parameters['EventLeftDirectionSwitch'] || 0);
+    let _PreemptiveMode = false;
+    let _SurpriseMode = false;
 
     const _Game_Interpreter_setup = Game_Interpreter.prototype.setup;
     Game_Interpreter.prototype.setup = function(list, eventId) {
         _Game_Interpreter_setup.call(this, list, eventId);
         if (eventId > 0) {
             const event = this.character(0);
-            $gameSwitches.setValue(PlayerBackDirectionSwitch, event.getPlayerBackDirection());
-            $gameSwitches.setValue(EventBackDirectionSwitch, event.getEventBackDirection());
+            _PreemptiveMode = event.getEventBackDirection();
+            _SurpriseMode = event.getPlayerBackDirection();
+            $gameSwitches.setValue(PlayerBackDirectionSwitch, _SurpriseMode);
+            $gameSwitches.setValue(EventBackDirectionSwitch, _PreemptiveMode);
             $gameSwitches.setValue(PlayerFrontDirectionSwitch, event.getPlayerFrontDirection());
             $gameSwitches.setValue(EventFrontDirectionSwitch, event.getEventFrontDirection());
             $gameSwitches.setValue(PlayerRightDirectionSwitch, event.getPlayerRightDirection());
@@ -181,11 +189,13 @@ Imported.NUUN_EventPlayerDirection = true;
     };
 
     BattleManager.getEventBackDirection = function() {
-        return $gameSwitches.value(EventBackDirectionSwitch);
+        return _PreemptiveMode;
+        //return $gameSwitches.value(EventBackDirectionSwitch);
     };
 
     BattleManager.getPlayerBackDirection = function() {
-        return $gameSwitches.value(PlayerBackDirectionSwitch);
+        return _SurpriseMode;
+        //return $gameSwitches.value(PlayerBackDirectionSwitch);
     };
 
     const _Game_Event_initialize = Game_Event.prototype.initialize;

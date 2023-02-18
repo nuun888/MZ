@@ -1,5 +1,5 @@
 # [トリガー起動時のプレイヤーとイベントの向き状況取得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventPlayerDirection.js)
-# Ver.1.0.2
+# Ver.1.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventPlayerDirection.js)  
 
 ## 概要
@@ -32,6 +32,8 @@
 イベントから見てプレイヤーが右方向時にON。  
 
 ## 更新履歴
+2023/2/18 Ver.1.0.3  
+先制、不意打ちEXプラグインからの参照で、スイッチIDを設定しなくても動作するように修正。  
 2022/12/1 Ver.1.0.2  
 日本語以外での表示を英語表示に変更。  
 2022/7/31 Ver.1.0.1  

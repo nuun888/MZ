@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost EX
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * You can set various costs for skill costs.
@@ -21,26 +21,34 @@
  * <SkillHPCostMR:30> Consumes 30% of maximum HP as a cost.
  * <SkillHPCostR:30> Consumes 30% of the remaining HP as a cost.
  * <HPCostDead> Allows death by consumption.
+ * 
  * MP consumption skill
  * <SkillMPCost:150> Consumes 150 MP as a cost. You can only set up to 9999 on the database, but you can set a cost of 10000 or more.
  * <SkillMPCostMR:30> Consumes 30% of maximum MP as cost.
  * <SkillMPCostR:30> Consumes 30% of the remaining MP as a cost.
  * <MPCostNoMcr> Does not apply the effect of MP consumption rate.
+ * 
  * TP consumption skill
  * <SkillTPCostR:50> Consume 50% of remaining TP as cost.
+ * 
  * Possession money consumption skill
  * <SkillGoldCost:1000> Consume 1000G of your money as a cost.
  * <SkillGoldCostR:30> Consume 30% of your money as a cost.
+ * 
  * EXP consumption skill
  * <SkillExpCost:300> As a cost, you lose 300 experience points.
  * <SkillLavelExpCost> Consume from the current level of earned experience.
  * <SkillExpCostR:50> Consume 50% of the earned experience points up to the next level of experience points.
+ * 
  * Item consumption skill
- * <SkillItemCost:[itemType],[itemId],[num]> Consume items, weapons, and armor as a cost.
+ * <SkillItemCost:[itemType],[itemId],[num],[mode]> Consume items, weapons, and armor as a cost.
  * If you specify multiple items, you can use them if you have all the items.
  * [itemType]:Item type  I Item W Weapon A Armor
  * [itemId]:Item, Weapon, Armor ID
  * [num]:Consumed quantity
+ * [mode]:Including equipment 0: Not including 1: Including
+ * [mode] is valid when equipping equipment items. If you don't have it, it will be consumed from your equipped weapons and armor.
+ * 
  * Equipment consumption skill
  * <SkillEquipCost:[itemType],[itemId],[num],[eval]> Consumes equipped weapons and armor as a cost.
  * [itemType]:Item type  W Weapon A Armor
@@ -48,6 +56,7 @@
  * [num]:For no consumption, 1 for lost
  * [eval]:If [num] is 1, enter the conditional expression to consume. If the condition is not met, it will not be deleted. If omitted, it will always be consumed.
  * Example:<SkillEquipCost:W,53,1,$gameParty.numItems($dataItems[1]) === 0> Disappears equipment with weapon ID 53 when there is no item with item ID 1.
+ * 
  * Game variable consumption skill
  * <SkillVarCost:[id],[cost]> Consume from the value set in the game variable.
  * <SkillVarCost:6,3> Consumes 3 from the value of game variable number 6.
@@ -60,6 +69,7 @@
  * [id]:Game variable ID
  * [max]:Max value
  * [rate]:Percent Consumption Cost (%)
+ * 
  * Evaluation formula
  * <SkillEvalCost:[eval]> Enter the evaluation formula for judging consumption.
  * <SkillEvalCons:[eval]> Enter the evaluation formula for consumption.
@@ -80,6 +90,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/19/2023 Ver.1.2.3
+ * Added a function to disappear equipped weapons and armor if you don't have them by consuming items.
  * 2/15/2023 Ver.1.2.2
  * Added a function that allows you to set the cost to disappear the equipped equipment when the conditions are met.
  * 12/17/2022 Ver.1.2.1
@@ -100,7 +112,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -111,26 +123,34 @@
  * <SkillHPCostMR:30> コストとして最大HPの３０％を消費します。
  * <SkillHPCostR:30> コストとして残りHPの３０％を消費します。
  * <HPCostDead> 消費による戦闘不能を許可します。
+ * 
  * MP消費スキル
  * <SkillMPCost:150> コストとしてMPを１５０消費します。データベース上では9999までしか設定できませんが10000以上のコストを設定できます。
  * <SkillMPCostMR:30> コストとして最大MPの３０％を消費します。
  * <SkillMPCostR:30> コストとして残りMPの３０％を消費します。
  * <MPCostNoMcr> ＭＰ消費率の効果を適用しません。
+ * 
  * TP消費スキル
  * <SkillTPCostR:50> コストとして残りTPの５０％を消費します。
+ * 
  * 所持金消費スキル
  * <SkillGoldCost:1000>　コストとして所持金を１０００G消費します。
  * <SkillGoldCostR:30> コストとして所持金の３０％を消費します。
+ * 
  * 経験値消費スキル
  * <SkillExpCost:300>　コストとして経験値を３００失います。
  * <SkillLavelExpCost> 現在のレベルの獲得経験値から消費させます。
  * <SkillExpCostR:50> 次のレベルの経験値までの獲得経験値の５０％を消費します。
+ * 
  * アイテム消費スキル
- * <SkillItemCost:[itemType],[itemId],[num]> コストとしてアイテム、武器、防具を消費します。
+ * <SkillItemCost:[itemType],[itemId],[num],[mode]> コストとしてアイテム、武器、防具を消費します。
  * 複数指定する場合はすべてのアイテムがある場合、使用することができます。
  * [itemType]:アイテムタイプ　I アイテム　W 武器　A 防具
  * [itemId]:アイテム、武器、防具ID
  * [num]:消費個数
+ * [mode]:装備品を含む　0:含まない 1:含む
+ * [mode]は装備アイテムを装備する場合有効です。所持していない場合は装備している武器、防具から消費されます。
+ * 
  * 装備品消費スキル
  * <SkillEquipCost:[itemType],[itemId],[num],[eval]> コストとして装備中の武器、防具を消費します。
  * [itemType]:アイテムタイプ　W 武器　A 防具
@@ -138,6 +158,7 @@
  * [num]:0で消費なし 1で消失
  * [eval]:[num]を1の場合、消費する条件式を記入します。条件不一致の場合は消失されません。省略時は常時消費します。
  * 例:<SkillEquipCost:W,53,1,$gameParty.numItems($dataItems[1]) === 0> アイテムID1番のアイテムがないときに武器ID53番の装備を消失します。
+ * 
  * ゲーム変数消費スキル
  * <SkillVarCost:[id],[cost]> ゲーム変数に設定した数値から消費します。
  * <SkillVarCost:6,3> ゲーム変数6番の値から3消費します。
@@ -150,6 +171,7 @@
  * [id]:ゲーム変数ID
  * [max]:最大
  * [rate]:割合消費コスト(%)
+ * 
  * 評価式
  * <SkillEvalCost:[eval]> 消費を判定するための評価式を記入します。
  * <SkillEvalCons:[eval]> 消費するための評価式を記入します。
@@ -169,6 +191,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/19 Ver.1.2.3
+ * アイテム消費で所持していない場合は装備している武器、防具を消失する機能を追加。
  * 2023/2/15 Ver.1.2.2
  * 条件一致で装備している装備を消失するコストを設定できる機能を追加。
  * 2022/12/17 Ver.1.2.1
@@ -314,7 +338,10 @@ Game_BattlerBase.prototype.canSkillExpCost = function(skill) {
 
 Game_BattlerBase.prototype.canSkillItemCost = function(skill) {
     const items = this.skillItemCost(skill);
-    return this.skillItemCost(skill).every(cost => $gameParty.numItems(cost.item) >= cost.quantity);
+    return items.every(cost => {
+        const num = this.canSkillItemCostIncludeEquip(cost) ? 1 : 0;
+        return $gameParty.numItems(cost.item) + num >= cost.quantity;
+    });
 };
 
 Game_BattlerBase.prototype.canSkillEquipCost = function(skill) {
@@ -372,15 +399,22 @@ Game_BattlerBase.prototype.paySkillExpCost = function(skill) {
 };
 
 Game_BattlerBase.prototype.paySkillItemCost = function(skill) {
-    this.skillItemCost(skill).forEach(cost => {
-        $gameParty.loseItem(cost.item, cost.quantity, false);
+    const items = this.skillItemCost(skill);
+    items.forEach(cost => {
+        const itemNum = $gameParty.numItems(cost.item);
+        if (itemNum > 0) {
+            $gameParty.loseItem(cost.item, cost.quantity, false);
+        }
+        if (!!cost.mode && (itemNum - cost.quantity < 0)) {
+            this.discardEquip(cost.item);
+        }
     });
 };
 
 Game_BattlerBase.prototype.paySkillEquipCost = function(skill) {
-    this.skillEquipCost(skill).forEach(cost => { 
+    this.skillEquipCost(skill).forEach(cost => {
         if (cost.quantity > 0)  {
-            if (cost.cond && eval(cost.cond)) {
+            if (!cost.cond || (cost.cond && eval(cost.cond))) {
                 this.discardEquip(cost.item);
             }
         }
@@ -426,6 +460,18 @@ Game_BattlerBase.prototype.getSkillVarCostR = function(skill) {
     return 0;
 };
 
+Game_BattlerBase.prototype.canSkillItemCostIncludeEquip = function(cost) {
+    if (!!cost.mode) {
+        if(DataManager.isWeapon(cost.item)) {
+            return this.hasWeapon(cost.item);
+        } else if (DataManager.isArmor(cost.item)) {
+            return this.hasArmor(cost.item);
+        }
+    }
+    return false;
+};
+
+
 function getCostItems(skill) {
     const list = [];
     if (skill.meta.SkillItemCost) {
@@ -436,13 +482,13 @@ function getCostItems(skill) {
                 let data = match[1].split(',');
                 switch (data[0]) {
                     case 'I':
-                        list.push({item: $dataItems[parseInt(data[1])], quantity: parseInt(data[2])});
+                        list.push({item: $dataItems[parseInt(data[1])], quantity: parseInt(data[2]), mode:false});
                         break;
                     case 'W':
-                        list.push({item: $dataWeapons[parseInt(data[1])], quantity: parseInt(data[2])});
+                        list.push({item: $dataWeapons[parseInt(data[1])], quantity: parseInt(data[2]), mode:parseInt(data[3])});
                         break;
                     case 'A':
-                        list.push({item: $dataArmors[parseInt(data[1])], quantity: parseInt(data[2])});
+                        list.push({item: $dataArmors[parseInt(data[1])], quantity: parseInt(data[2]), mode:parseInt(data[3])});
                         break;
                 }
             } else {

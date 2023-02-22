@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.9
+ * @version 2.17.10
  * 
  * @help
  * Implement an enemy book.
@@ -200,6 +200,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/23/2023 Ver.2.17.10
+ * Added a function to display unregistered monster images as silhouettes.
  * 1/22/2023 Ver.2.17.9
  * Corrected so that No. is attached before the numerical value in the display of the enemy number.
  * Changed page column to automatic setting.
@@ -2139,7 +2141,7 @@
 * @value 122
 * @option Enemy picture(1)(2)(3)(4)(5)(7)(19)
 * @value 200
-* @option Chara chip(1)(2)(3)(4)
+* @option Chara chip(1)(2)(3)(4)(13)
 * @value 201
 * @option Common image(1)(2)(3)(4)(5)(7)(18)(19)
 * @value 250
@@ -2774,7 +2776,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.9
+ * @version 2.17.10
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2966,6 +2968,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/23 Ver.2.17.10
+ * 情報登録していないモンスター画像をシルエットで表示する機能を追加。
  * 2023/1/22 Ver.2.17.9
  * 敵ナンバーの表示で数値の前にNo.が付くように修正。
  * ページ列を自動設定に変更。
@@ -5001,7 +5005,7 @@
  * @value 122
  * @option モンスター画像(1)(2)(3)(4)(5)(7)(19)
  * @value 200
- * @option キャラチップ(1)(2)(3)(4)
+ * @option キャラチップ(1)(2)(3)(4)(13)
  * @value 201
  * @option 共通画像(1)(2)(3)(4)(5)(7)(18)(19)
  * @value 250
@@ -8935,7 +8939,7 @@ Window_EnemyBook.prototype.enemyImg = function(list, enemy, x, y, width) {
     const itemPadding = this.itemPadding();
     this._enemySprite.setMaxWidth(width);
     this._enemySprite.setMaxHeight(height - itemPadding);
-    this._enemySprite.setup(enemy, width / 2 + x + (itemPadding * 2), (y + height / 2) + (itemPadding * 2));
+    this._enemySprite.setup(enemy, width / 2 + x + (itemPadding * 2), (y + height / 2) + (itemPadding * 2), this.paramMask(list.MaskMode));
 };
 
 Window_EnemyBook.prototype.enemyName = function(list, enemy, x, y, width) {
@@ -10396,13 +10400,15 @@ Sprite_BookEnemy.prototype.initMembers = function() {
     this._svEnemy = false;
     this.maxWidth = 0;
     this._apngMode = null;
+    this._maskMode = false;
 };
 
-Sprite_BookEnemy.prototype.setup = function(battler,x, y) {
+Sprite_BookEnemy.prototype.setup = function(battler,x, y, mask) {
     this._battler = battler;
     this.x = x;
     this.y = y;
     this._svEnemy = battler.enemy().meta.EB_SVBattler ? true : false;
+    this._maskMode = mask;
     this.refresh();
 };
 
@@ -10433,14 +10439,12 @@ Sprite_BookEnemy.prototype.refresh = function() {
         } else {
             this.bitmap = bitmap;
         }
-        
     }
     if (bitmap && !bitmap.isReady()) {
         bitmap.addLoadListener(this.drawEnemy.bind(this));
     } else {
         this.drawEnemy();
     }
-    
 };
 
 Sprite_BookEnemy.prototype.drawEnemy = function() {
@@ -10470,6 +10474,11 @@ Sprite_BookEnemy.prototype.drawEnemy = function() {
         this.scale.x = scale;
         this.scale.y = scale;
         this.setFrame(0, 0, this.bitmap.width, this.bitmap.height);
+    }
+    if (!this._maskMode) {
+        this.setColorTone([-255,-255,-255,0]);
+    } else {
+        this.setColorTone([0,0,0,0]);
     }
 };
   

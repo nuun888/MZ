@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.2
+ * @version 2.3.3
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/2/23 Ver.2.3.3
+ * Fixed an issue where skipping the level up screen was not working.
  * 2023/1/28 Ver.2.3.2
  * Fixed the problem that ME's "BgmPlayMeRate" setting is not applied when "ResultVisibleFrame" is set below ME playback frame.
  * 2023/1/28 Ver.2.3.1
@@ -2268,7 +2270,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.2
+ * @version 2.3.3
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2313,6 +2315,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/23 Ver.2.3.3
+ * レベルアップ画面のスキップが機能していなかった問題を修正。
  * 2023/1/28 Ver.2.3.2
  * 勝利後リザルト画面遅延フレーム数がMEの再生フレーム以下の設定だとMEのBGM再生位置の設定が適用されない問題を修正。
  * 2023/1/28 Ver.2.3.1
@@ -6996,10 +7000,12 @@ BattleManager.actorLevelUpStatus = function() {
     actor._resultLevelUp = false;
     const level = actor.resultGainExp(exp);
     if (level > actor._level) {
-      actor._resultLevelUp = true;
-      this._levelUpPageEnable = this._levelUpPageEnable === undefined || this._levelUpPageEnable === null ? LevelUpWindowShow : this._levelUpPageEnable;
-      this.resultLevelUpActors.push(actor);
-      this.resultOldStatusActors.push(this.getResultOldStatus(actor));
+        actor._resultLevelUp = true;
+        const levelUpPageEnable = this._levelUpPageEnable === undefined || this._levelUpPageEnable === null ? LevelUpWindowShow : this._levelUpPageEnable;
+        if (levelUpPageEnable) {
+            this.resultLevelUpActors.push(actor);
+            this.resultOldStatusActors.push(this.getResultOldStatus(actor));
+        }
     }
   }
 };

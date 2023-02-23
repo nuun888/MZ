@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.8.10
+### Ver.3.8.11
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.8.4  
@@ -159,6 +159,8 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/2/23 Ver.3.8.11  
+戦闘中セリフ表示プラグインとの競合対策。  
 2023/2/11 Ver.3.8.10  
 アクターコンテンツを下側から表示する機能を追加。  
 2023/1/23 Ver.3.8.9  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.10
+ * @version 3.8.11
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/2/23 Ver.3.8.11
+ * 戦闘中セリフ表示プラグインとの競合対策。
  * 2023/2/11 Ver.3.8.10
  * アクターコンテンツを下側から表示する機能を追加。
  * 2023/1/23 Ver.3.8.9
@@ -1118,20 +1120,20 @@ Scene_Battle.prototype.statusWindowRect = function() {
 };
 
 Scene_Battle.prototype.actorStatusWindowRect = function() {
-  let ww = Graphics.width + 40;
-  let wh = Graphics.height + 40;
-  let wx = -20;
-  let wy = -20;
-  return new Rectangle(wx, wy, ww, wh);
+    let ww = Graphics.width + 40;
+    let wh = Graphics.height + 40;
+    let wx = -20;
+    let wy = -20;
+    return new Rectangle(wx, wy, ww, wh);
 };
 
 Scene_Battle.prototype.setBackgroundWindow = function(background, x, y) {
-  const bitmap = ImageManager.nuun_LoadPictures(background);
-  const sprite =  new Sprite(bitmap);
-  this._itemBSBackgorundWindow.addChild(sprite);
-  sprite.x = x;
-  sprite.y = y;
-  return sprite;
+    const bitmap = ImageManager.nuun_LoadPictures(background);
+    const sprite =  new Sprite(bitmap);
+    this._itemBSBackgorundWindow.addChild(sprite);
+    sprite.x = x;
+    sprite.y = y;
+    return sprite;
 };
 
 const _Scene_Battle_updateStatusWindowPosition = Scene_Battle.prototype.updateStatusWindowPosition;
@@ -1141,15 +1143,18 @@ Scene_Battle.prototype.updateStatusWindowPosition = function() {
         const targetX = this.statusWindowX();
         const battleEffects = this._battleEffects;
         if (BattleManager.onBSStartBattle && statusWindowX === targetX) {
-          BattleManager.onBSStartBattle = false;
+            BattleManager.onBSStartBattle = false;
         } else if (BattleManager.onBSStartBattle) {
-          this._statusWindow.x = this._partyCommandWindow.width / 2 + (Graphics.width - Graphics.boxWidth) / 2;
-          this._actorImges.x = this._statusWindow.x;
-          this._actorStatus.x = this._statusWindow.x;
-          if (this._backgroundWindow) {
-            this._backgroundWindow.x = this._statusWindow.x;
-          }
-          return;
+            this._statusWindow.x = this._partyCommandWindow.width / 2 + (Graphics.width - Graphics.boxWidth) / 2;
+            this._actorImges.x = this._statusWindow.x;
+            this._actorStatus.x = this._statusWindow.x;
+            if (!$gameSystem.isSideView() && battleEffects) {
+                battleEffects.x = this._statusWindow.x;
+            }  
+            if (this._backgroundWindow) {
+                this._backgroundWindow.x = this._statusWindow.x;
+            }
+            return;
         }
         _Scene_Battle_updateStatusWindowPosition.call(this);
         if (statusWindowX < targetX) {
@@ -1173,113 +1178,114 @@ Scene_Battle.prototype.updateStatusWindowPosition = function() {
             }
         }
     }
+    this.torigoyaBalloonConflict();
 };
 
 const _Scene_Battle_update  = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
-  _Scene_Battle_update.call(this);//サポートアクターは暫定処置
-  const actor = this._actorCommandWindow.actor();
-  if (this._statusWindow.isCommandRefresh() && !$gameTemp.isBattleRefreshRequested() && actor) {
-    this._statusWindow.commandRefresh(false);
-    if (Imported.NUUN_SupportActor) {
-      $gameParty.setWithSupportActorMember();
+    _Scene_Battle_update.call(this);//サポートアクターは暫定処置
+    const actor = this._actorCommandWindow.actor();
+    if (this._statusWindow.isCommandRefresh() && !$gameTemp.isBattleRefreshRequested() && actor) {
+        this._statusWindow.commandRefresh(false);
+        if (Imported.NUUN_SupportActor) {
+        $gameParty.setWithSupportActorMember();
+        }
+        const index = $gameParty.battleMembers().indexOf(actor);
+        if (index >= 0) {
+        if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
+            this._statusWindow.select(index);
+        }
+        } else {
+        this.commandCancel();
+        }
+        this._actorCommandWindow.refresh();
     }
-    const index = $gameParty.battleMembers().indexOf(actor);
-    if (index >= 0) {
-      if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
-        this._statusWindow.select(index);
-      }
-    } else {
-      this.commandCancel();
+    if (params.ActorCommandBackgroundImg) {
+        this._actorCommandBackgroundWindow.x = params.ActorBackground_X + this._actorCommandWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
+        this._actorCommandBackgroundWindow.y = params.ActorBackground_Y + this._actorCommandWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
+        this._actorCommandBackgroundWindow.visible = this._actorCommandWindow.visible && this._actorCommandWindow.active && this._actorCommandWindow.openness > 0;
     }
-    this._actorCommandWindow.refresh();
-  }
-  if (params.ActorCommandBackgroundImg) {
-    this._actorCommandBackgroundWindow.x = params.ActorBackground_X + this._actorCommandWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
-    this._actorCommandBackgroundWindow.y = params.ActorBackground_Y + this._actorCommandWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
-    this._actorCommandBackgroundWindow.visible = this._actorCommandWindow.visible && this._actorCommandWindow.active && this._actorCommandWindow.openness > 0;
-  }
-  if (this._partyCommandBackgroundWindow) {
-    this._partyCommandBackgroundWindow.visible = this._partyCommandWindow.visible && this._partyCommandWindow.active;
-  }
-  this._enemyWindow.bsUpdateBackground();
-  this._itemWindow.bsUpdateBackground();
-  this._skillWindow.bsUpdateBackground();
-  this._helpWindow.bsUpdateBackground();
-  this.bsMessageBackground();
-  this.actorStatusWindowOpacity();
+    if (this._partyCommandBackgroundWindow) {
+        this._partyCommandBackgroundWindow.visible = this._partyCommandWindow.visible && this._partyCommandWindow.active;
+    }
+    this._enemyWindow.bsUpdateBackground();
+    this._itemWindow.bsUpdateBackground();
+    this._skillWindow.bsUpdateBackground();
+    this._helpWindow.bsUpdateBackground();
+    this.bsMessageBackground();
+    this.actorStatusWindowOpacity();  
 };
 
 Scene_Battle.prototype.bsMessageBackground = function() {
-  if (BattleManager.getDisplayMessageType() === "Appear" && params.AppearBackgroundImg) {
-    this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.AppearBackgroundImg);
-    this._messageBackground.x = this._messageWindow.x + params.AppearBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.y + params.AppearBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
-  } else if (BattleManager.getDisplayMessageType() === "Victory" && params.VictoryBackgroundImg) {
-    this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.VictoryBackgroundImg);
-    this._messageBackground.x = this._messageWindow.x + params.VictoryBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.y + params.VictoryBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
-  } else if (BattleManager.getDisplayMessageType() === "Defeat" && params.LoseBackgroundImg) {
-    this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.LoseBackgroundImg);
-    this._messageBackground.x = this._messageWindow.x + params.LoseBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.y + params.LoseBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
-  } else if (BattleManager.getDisplayMessageType() === "Escape" && params.EscapeBackgroundImg) {
-    this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.EscapeBackgroundImg);
-    this._messageBackground.x = this._messageWindow.x + params.EscapeBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.y + params.EscapeBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
-  } else if (BattleManager.getDisplayMessageType() === "EscapeFailure" && params.EscapeFailureBackgroundImg) {
-    this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.EscapeFailureBackgroundImg);
-    this._messageBackground.x = this._messageWindow.x + params.EscapeFailureBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
-    this._messageBackground.y = this._messageWindow.y + params.EscapeFailureBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
-  } else {
-    this._messageBackground.bitmap = null;
-    this._messageBackground.x = this._messageWindow.x;
-    this._messageBackground.y = this._messageWindow.y;
-  }
+    if (BattleManager.getDisplayMessageType() === "Appear" && params.AppearBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.AppearBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.AppearBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.AppearBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else if (BattleManager.getDisplayMessageType() === "Victory" && params.VictoryBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.VictoryBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.VictoryBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.VictoryBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else if (BattleManager.getDisplayMessageType() === "Defeat" && params.LoseBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.LoseBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.LoseBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.LoseBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else if (BattleManager.getDisplayMessageType() === "Escape" && params.EscapeBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.EscapeBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.EscapeBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.EscapeBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else if (BattleManager.getDisplayMessageType() === "EscapeFailure" && params.EscapeFailureBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.EscapeFailureBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.EscapeFailureBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.EscapeFailureBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else {
+        this._messageBackground.bitmap = null;
+        this._messageBackground.x = this._messageWindow.x;
+        this._messageBackground.y = this._messageWindow.y;
+    }
 };
 
 Scene_Battle.prototype.actorStatusWindowOpacity = function() {
-  if (BattleManager.actorStatusWindowOpacity) {
-    this.setActorStatusWindowOpacity(BattleManager.actorStatusWindowOpacityValue);
-  } else if (this._skillWindow.active) {
-    this.setActorStatusWindowOpacity(params.SkillWindowOpacity);
-  } else if (this._itemWindow.active) {
-    this.setActorStatusWindowOpacity(params.ItemWindowOpacity);
-  } else if (this._enemyWindow.active) {
-    this.setActorStatusWindowOpacity(params.EnemyWindowOpacity);
-  } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Appear" && $gameMessage.positionType() === 2) {
-    this.setActorStatusWindowOpacity(params.AppearWindowOpacity);
-  } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Victory" && $gameMessage.positionType() === 2) {
-    this.setActorStatusWindowOpacity(params.VictoryWindowOpacity);
-  } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Defeat" && $gameMessage.positionType() === 2) {
-    this.setActorStatusWindowOpacity(params.LoseWindowOpacity);
-  } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Escape" && $gameMessage.positionType() === 2) {
-    this.setActorStatusWindowOpacity(params.EscapeWindowOpacity);
-  } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "EscapeFailure" && $gameMessage.positionType() === 2) {
-    this.setActorStatusWindowOpacity(params.EscapeWindowOpacity);
-  } else if ($gameMessage.isBusy() && $gameMessage.positionType() === 2) {
-    this.setActorStatusWindowOpacity(params.MessageWindowOpacity);
-  } else {
-    this.setActorStatusWindowOpacity(255);
-    if (!$gameMessage.isBusy()) {
-      BattleManager.displayMessageType(null);
+    if (BattleManager.actorStatusWindowOpacity) {
+        this.setActorStatusWindowOpacity(BattleManager.actorStatusWindowOpacityValue);
+    } else if (this._skillWindow.active) {
+        this.setActorStatusWindowOpacity(params.SkillWindowOpacity);
+    } else if (this._itemWindow.active) {
+        this.setActorStatusWindowOpacity(params.ItemWindowOpacity);
+    } else if (this._enemyWindow.active) {
+        this.setActorStatusWindowOpacity(params.EnemyWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Appear" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.AppearWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Victory" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.VictoryWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Defeat" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.LoseWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Escape" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.EscapeWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "EscapeFailure" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.EscapeWindowOpacity);
+    } else if ($gameMessage.isBusy() && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.MessageWindowOpacity);
+    } else {
+        this.setActorStatusWindowOpacity(255);
+        if (!$gameMessage.isBusy()) {
+        BattleManager.displayMessageType(null);
+        }
     }
-  }
 };
 
 Scene_Battle.prototype.setActorStatusWindowOpacity = function(opacity) {
-  this._battleHudBack.opacity = opacity;
-  this._battleHudFront.opacity = opacity;
+    this._battleHudBack.opacity = opacity;
+    this._battleHudFront.opacity = opacity;
 };
 
 const _Scene_Battle_createCancelButton = Scene_Battle.prototype.createCancelButton;
 Scene_Battle.prototype.createCancelButton = function() {
-  _Scene_Battle_createCancelButton.call(this);
-  if (params.ButtonMode === 'left') {
-    this._cancelButton.x = 4 + params.CancelButtonX;
-  } else {
-    this._cancelButton.x += params.CancelButtonX;
-  }
+    _Scene_Battle_createCancelButton.call(this);
+    if (params.ButtonMode === 'left') {
+        this._cancelButton.x = 4 + params.CancelButtonX;
+    } else {
+        this._cancelButton.x += params.CancelButtonX;
+    }
 };
 
 Scene_Battle.prototype.statusWindowX = function() {//再定義
@@ -1313,11 +1319,11 @@ Scene_Battle.prototype.setStatusWindow_Sprite = function() {
 };
 
 Scene_Battle.prototype.MessageWindowBackGround = function() {
-  this._messageBackground = this.setBackgroundWindow(null, 0, 0);
+    this._messageBackground = this.setBackgroundWindow(null, 0, 0);
 };
 
 Scene_Battle.prototype.getActorWindowWidth = function() {
-  return (params.ActorStatusWindow_Width > 0 ? params.ActorStatusWindow_Width : Graphics.boxWidth) - (params.WidthWithCommand ? this.partyCommandWidth() : 0);
+    return (params.ActorStatusWindow_Width > 0 ? params.ActorStatusWindow_Width : Graphics.boxWidth) - (params.WidthWithCommand ? this.partyCommandWidth() : 0);
 };
 
 Scene_Battle.prototype.getActorWindowHeight = function() {
@@ -1325,118 +1331,129 @@ Scene_Battle.prototype.getActorWindowHeight = function() {
 };
 
 Scene_Battle.prototype.getPartyCommandX = function() {
-  return params.PartyCommand_X + (params.PartyCommandWindowCenter ? this.partyCommandCenter() : 0);
+    return params.PartyCommand_X + (params.PartyCommandWindowCenter ? this.partyCommandCenter() : 0);
 };
 
 Scene_Battle.prototype.partyCommandCenter = function() {
-  return (Graphics.boxWidth - this.partyCommandWidth(0)) / 2;
+    return (Graphics.boxWidth - this.partyCommandWidth(0)) / 2;
 };
 
 Scene_Battle.prototype.partyCommand_YPosition = function(mode) {
-  if (mode === 0) {//デフォルト
-    return this._statusWindow.y + (Graphics.boxHeight - Graphics.height) / 2 + (params.WindowFrameShow ? 0 : 4);
-  } else if (mode === 10) {//カスタム
-    return params.PartyCommand_Y;
-  } else if (mode === 1) {//上部
-    return params.PartyCommand_Y + (Graphics.boxHeight - Graphics.height) / 2 + 4;
-  } else if (mode === 2) {//中間
-    return this._statusWindow.y / 2 - (this.partyWindowAreaHeight() / 2) + (Graphics.boxHeight - Graphics.height) / 2 + params.PartyCommand_Y;
-  } else if (mode === 3) {//アクターステータス上
-    return this._statusWindow.y - this.partyWindowAreaHeight() + (Graphics.boxHeight - Graphics.height) / 2 + params.PartyCommand_Y;
-  }
+    if (mode === 0) {//デフォルト
+        return this._statusWindow.y + (Graphics.boxHeight - Graphics.height) / 2 + (params.WindowFrameShow ? 0 : 4);
+    } else if (mode === 10) {//カスタム
+        return params.PartyCommand_Y;
+    } else if (mode === 1) {//上部
+        return params.PartyCommand_Y + (Graphics.boxHeight - Graphics.height) / 2 + 4;
+    } else if (mode === 2) {//中間
+        return this._statusWindow.y / 2 - (this.partyWindowAreaHeight() / 2) + (Graphics.boxHeight - Graphics.height) / 2 + params.PartyCommand_Y;
+    } else if (mode === 3) {//アクターステータス上
+        return this._statusWindow.y - this.partyWindowAreaHeight() + (Graphics.boxHeight - Graphics.height) / 2 + params.PartyCommand_Y;
+    }
 };
 
 Scene_Battle.prototype.partyCommandWidth = function(mode) {
-  return params.PartyCommand_Width > 0 ? Math.min(params.PartyCommand_Width, Graphics.width) : (mode === 0 ? Graphics.boxWidth : 192);
+    return params.PartyCommand_Width > 0 ? Math.min(params.PartyCommand_Width, Graphics.width) : (mode === 0 ? Graphics.boxWidth : 192);
 };
 
 Scene_Battle.prototype.partyWindowAreaHeight = function() {
-  return this.calcWindowHeight(params.PartyCommandMaxRow, true);
+    return this.calcWindowHeight(params.PartyCommandMaxRow, true);
 };
 
 const _Scene_Battle_startActorSelection = Scene_Battle.prototype.startActorSelection;
 Scene_Battle.prototype.startActorSelection = function() {
-  _Scene_Battle_startActorSelection.call(this);
-  this._skillWindow.hide();
-  this._itemWindow.hide();
-  this._statusWindow.deselect();
+    _Scene_Battle_startActorSelection.call(this);
+    this._skillWindow.hide();
+    this._itemWindow.hide();
+    this._statusWindow.deselect();
 };
 
 const _Scene_Battle_startEnemySelection = Scene_Battle.prototype.startEnemySelection;
 Scene_Battle.prototype.startEnemySelection = function() {
-  _Scene_Battle_startEnemySelection.call(this);
-  this._statusWindow.show();
-  this._skillWindow.hide();
-  this._itemWindow.hide();
-  if (!this.commandDefaultMode()) {
-    this._actorCommandWindow.hide();
-  }
+    _Scene_Battle_startEnemySelection.call(this);
+    this._statusWindow.show();
+    this._skillWindow.hide();
+    this._itemWindow.hide();
+    if (!this.commandDefaultMode()) {
+        this._actorCommandWindow.hide();
+    }
 };
 
 const _Scene_Battle_onEnemyCancel = Scene_Battle.prototype.onEnemyCancel;
 Scene_Battle.prototype.onEnemyCancel = function() {
-  _Scene_Battle_onEnemyCancel.call(this);
-  $gameTemp.onBSAction = false;
-  switch (this._actorCommandWindow.currentSymbol()) {
-    case "attack":
-    case "special":
-      this._actorCommandWindow.show();
-      break;
-  }
+    _Scene_Battle_onEnemyCancel.call(this);
+    $gameTemp.onBSAction = false;
+    switch (this._actorCommandWindow.currentSymbol()) {
+        case "attack":
+        case "special":
+        this._actorCommandWindow.show();
+        break;
+    }
 };
 
 const _Scene_Battle_onActorCancel = Scene_Battle.prototype.onActorCancel;
 Scene_Battle.prototype.onActorCancel = function() {
-  _Scene_Battle_onActorCancel.call(this);
-  $gameTemp.onBSAction = false;
-  this._statusWindow.selectActor(BattleManager.actor());
+    _Scene_Battle_onActorCancel.call(this);
+    $gameTemp.onBSAction = false;
+    this._statusWindow.selectActor(BattleManager.actor());
 };
 
 const _Scene_Battle_startPartyCommandSelection = Scene_Battle.prototype.startPartyCommandSelection;
 Scene_Battle.prototype.startPartyCommandSelection = function() {
-  _Scene_Battle_startPartyCommandSelection.call(this);
-  $gameTemp.onBSAction = false;
+    _Scene_Battle_startPartyCommandSelection.call(this);
+    $gameTemp.onBSAction = false;
 };
 
 const _Scene_Battle_selectPreviousCommand = Scene_Battle.prototype.selectPreviousCommand;
 Scene_Battle.prototype.selectPreviousCommand = function() {
-  _Scene_Battle_selectPreviousCommand.call(this);
-  $gameTemp.onBSAction = false;
-  this._partyCommandWindow.show();
+    _Scene_Battle_selectPreviousCommand.call(this);
+    $gameTemp.onBSAction = false;
+    this._partyCommandWindow.show();
 };
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
-  $gameTemp.onBSAction = BattleManager.isTpb() && !this.commandDefaultMode();
-  _Scene_Battle_onSelectAction.call(this);
+    $gameTemp.onBSAction = BattleManager.isTpb() && !this.commandDefaultMode();
+    _Scene_Battle_onSelectAction.call(this);
 };
 
 const _Scene_Battle_endCommandSelection = Scene_Battle.prototype.endCommandSelection;
 Scene_Battle.prototype.endCommandSelection = function() {
-  _Scene_Battle_endCommandSelection.call(this);
-  $gameTemp.onBSAction = false;
+    _Scene_Battle_endCommandSelection.call(this);
+    $gameTemp.onBSAction = false;
 };
 
 const _Scene_Battle_commandSkill = Scene_Battle.prototype.commandSkill;
 Scene_Battle.prototype.commandSkill = function() {
-  _Scene_Battle_commandSkill.call(this);
-  this._statusWindow.show();
+    _Scene_Battle_commandSkill.call(this);
+    this._statusWindow.show();
 };
 
 const _Scene_Battle_commandItem = Scene_Battle.prototype.commandItem;
 Scene_Battle.prototype.commandItem = function() {
-  _Scene_Battle_commandItem.call(this);
-  this._statusWindow.show();
+    _Scene_Battle_commandItem.call(this);
+    this._statusWindow.show();
 };
 
 const _Scene_Battle_selectNextCommand = Scene_Battle.prototype.selectNextCommand;
 Scene_Battle.prototype.selectNextCommand = function() {
-  _Scene_Battle_selectNextCommand.call(this);
-  $gameTemp.onBSAction = false;
+    _Scene_Battle_selectNextCommand.call(this);
+    $gameTemp.onBSAction = false;
 };
 
 Scene_Battle.prototype.commandDefaultMode = function() {
-  return params.bsMode === 'Default' || params.bsMode === 'Standard';
+    return params.bsMode === 'Default' || params.bsMode === 'Standard';
+};
+
+Scene_Battle.prototype.torigoyaBalloonConflict = function() {
+    if (this._torigoyaBalloonInBattle_actorBalloonLayer) {
+        this._torigoyaBalloonInBattle_actorBalloonLayer.visible = !this.selectWindowBisy();
+    }
+};
+
+Scene_Battle.prototype.selectWindowBisy = function() {
+    const list = ["_skillWindow", "_itemWindow", "_actorWindow", "_enemyWindow"];
+    return list.some(data => this[data] && this[data].visible);
 };
 
 

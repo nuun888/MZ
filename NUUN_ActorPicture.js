@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.0
+ * @version 1.5.1
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/24 Ver 1.5.1
+ * 戦闘アニメーションがないスキルを使用後、ステートを付加させると攻撃時の画像が瞬間表示される問題を修正。
  * 2022/8/26 Ver 1.5.0
  * アクター画像変化条件に防御時、反撃時、魔法反射時を追加。
  * 2022/6/19 Ver 1.4.0
@@ -515,25 +517,27 @@ Game_Actor.prototype.performActionStart = function(action) {
 };
 
 Game_Actor.prototype.setAttackImgId = function(action) {
-  if (action.isRecover()) {
-    this.onImgId = 11;
-    this.nuun_useItemId = action.item().id;
-  } else if (action.isAttack()) {
-    this.onImgId = 10;
-    this.nuun_useItemId = action.item().id;
-  } else if (action.isMagicSkill()) {
-    this.onImgId = 10;
-    this.nuun_useItemId = action.item().id;
-  } else if (action.isSkill()) {
-    this.onImgId = 10;
-    this.nuun_useItemId = action.item().id;
-  } else if (action.isItem()) {
-    this.onImgId = 12;
-    this.nuun_useItemId = action.item().id;
-  } else {
-    this.nuun_useItemId = -1;
-  }
-  this.imgRefresh();
+    if (action.item().animationId > 0) {
+        if (action.isRecover()) {
+            this.onImgId = 11;
+            this.nuun_useItemId = action.item().id;
+        } else if (action.isAttack() && action.isDamage()) {
+            this.onImgId = 10;
+            this.nuun_useItemId = action.item().id;
+        } else if (action.isMagicSkill()) {
+            this.onImgId = 10;
+            this.nuun_useItemId = action.item().id;
+        } else if (action.isSkill() && action.isDamage()) {
+            this.onImgId = 10;
+            this.nuun_useItemId = action.item().id;
+        } else if (action.isItem()) {
+            this.onImgId = 12;
+            this.nuun_useItemId = action.item().id;
+        } else {
+            this.nuun_useItemId = -1;
+        }
+        this.imgRefresh();
+    }
 };
 
 Game_Actor.prototype.resetImgId = function() {

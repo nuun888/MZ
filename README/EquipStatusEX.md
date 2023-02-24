@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.3.1
+# Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -51,6 +51,9 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
+2023/2/25 Ver.1.3.2  
+狙われ率、MP消費率、物理ダメージ率、魔法ダメージ率、床ダメージ率の差分の色を逆にするよう修正。(上昇で赤、減少で緑)  
+オリジナルパラメータの差分表示に差分の色を逆にする機能を追加。  
 2022/12/11 Ver.1.3.1  
 装備セットボーナスの項目高さが適用されていなかった問題を修正。  
 2022/12/11 Ver.1.3.0  

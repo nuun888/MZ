@@ -1,24 +1,24 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.8.11
+### Ver.3.9.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.8.4  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.8.4  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.8.4  
-[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.1.5
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.9.0  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.9.0  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.9.0  
+[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.2.0
 
-バトルスタイル拡張デフォルト設定用 Ver.1.8.3  
+バトルスタイル拡張デフォルト設定用 Ver.1.9.0  
 ![画像](img/BattleStyleEX1.png)  
 
-バトルスタイル拡張スタンダード設定用 Ver.1.8.3 
+バトルスタイル拡張スタンダード設定用 Ver.1.9.0 
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.8.3  
+バトルスタイル拡張XPスタイル設定用 Ver.1.9.0  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.1.4  
+バトルスタイル拡張タイプ4設定用 Ver.1.2.0  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 
@@ -137,6 +137,11 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 未指定の場合はデフォルトのスキンが表示されます。  
 ![画像](img/BattleStyleEX7.png)  
 
+### アクターステータスのコンテンツ毎の座標を設定
+リストの設定順はアクターステータスウィンドウに表示されるアクター順(戦闘キャラが1)になります。  
+戦闘メンバーの表示設定はリストID1番に設定します。2番目は2番に設定します。(アクター別には設定できません)  
+![画像](img/BattleStyleEX8.png)  
+
 ## 競合対策パッチ  
 木星ペンギン氏作疑似３Dバトルプラグインと併用して、フロントビューで味方にアニメーションを表示させる場合は別途バトルスタイル拡張疑似３Dバトル併用パッチを導入してください。  
 木星ペンギン様の疑似３Dバトルと併用するときのパッチです。  
@@ -159,6 +164,9 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/2/24 Ver.3.9.0  
+アクターステータスの各アクター表示の位置、幅を指定できる機能を追加。  
+戦闘アニメーションがないスキルを使用後、ステートを付加させると攻撃時の画像が瞬間表示される問題を修正。  
 2023/2/23 Ver.3.8.11  
 戦闘中セリフ表示プラグインとの競合対策。  
 2023/2/11 Ver.3.8.10  

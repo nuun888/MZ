@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.8.4
+ * @version 1.9.0
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -46,6 +46,10 @@
  * <AttackAnimation:11>
  * 敵キャラの通常攻撃時、11番のアニメーションが再生されます。指定がない場合はプラグインパラメータのデフォルト値が適用されます。
  * 
+ * アクターステータス表示位置設定
+ * リストの設定順はアクターステータスウィンドウに表示されるアクター順(戦闘キャラが1)になります。
+ * 戦闘メンバーの表示設定はリストID1番に設定します。2番目は2番に設定します。(アクター別には設定できません)
+ * 
  * 木星ペンギン氏作疑似３Dバトルプラグインと併用して、フロントビューで味方にアニメーションを表示させる場合は
  * 別途バトルスタイル拡張疑似３Dバトル併用パッチを導入してください。
  * 
@@ -57,6 +61,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/2/24 Ver.1.9.0
+ * アクターステータスの各アクター表示の位置、幅を指定できる機能を追加。
  * 2023/2/11 Ver.1.8.4
  * アクターコンテンツを下側から表示する機能を追加。
  * 2023/1/8 Ver.1.8.3
@@ -759,6 +765,18 @@
  * @type boolean
  * @default true
  * @parent ActorStatusWindow
+ * 
+ * @param WindowContentsRect
+ * @text アクターステータス表示位置設定
+ * @default ------------------------------
+ * @parent ActorStatusWindow
+ * 
+ * @param ActorContentsSetting
+ * @text 各アクターステータス表示位置設定
+ * @desc 各アクターステータスのコンテンツの表示位置を指定します。
+ * @default []
+ * @type struct<ActorContentsRect>[]
+ * @parent WindowContentsRect
  * 
  * @param ActorWindowBackGround
  * @text 背景画像ウィンドウ背景設定
@@ -2508,6 +2526,12 @@
  */
 /*~struct~ActorContentsRect:
  * 
+ * @param ActorContentsCoordinateMode
+ * @text 座標モード
+ * @desc 座標モードを指定します。ON:絶対座標 OFF:相対座標
+ * @type boolean
+ * @default false
+ * 
  * @param ActorContentsX
  * @desc アクターステータスウィンドウのコンテンツ表示のX座標を指定します。(相対)
  * @text X座標
@@ -2623,6 +2647,7 @@ params.WindowShow = eval(parameters['WindowShow'] || "true");
 params.WindowFrameShow = eval(parameters['WindowFrameShow'] || "false");
 params.CursorBackShow = eval(parameters['CursorBackShow'] || "true");
 params.ActorStatusActorWindowShow = eval(parameters['ActorStatusActorWindowShow'] || "false");
+params.ActorContentsSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorContentsSetting'])) : null) || [];
 
 params.ActorEffectShow = eval(parameters['ActorEffectShow'] || "false");
 params.ActorEffect_X = Number(parameters['ActorEffect_X'] || 0);

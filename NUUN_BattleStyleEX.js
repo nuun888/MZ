@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.8.11
+ * @version 3.9.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/2/24 Ver.3.9.0
+ * アクターステータスの各アクター表示の位置、幅を指定できる機能を追加。
+ * 戦闘アニメーションがないスキルを使用後、ステートを付加させると攻撃時の画像が瞬間表示される問題を修正。
  * 2023/2/23 Ver.3.8.11
  * 戦闘中セリフ表示プラグインとの競合対策。
  * 2023/2/11 Ver.3.8.10
@@ -712,26 +715,28 @@ Game_Actor.prototype.performActionStart = function(action) {
 };
 
 Game_Actor.prototype.setBattleStyleAttackImgId = function(action) {
-  if (action.isRecover()) {
-    this.setBattleImgId(11, action.item().id);
-    this.setBSActionActorImg("recovery");
-  } else if (action.isAttack()) {
-    this.setBattleImgId(10, action.item().id);
-    this.setBSActionActorImg("attack");
-  } else if (action.isMagicSkill()) {
-    this.setBattleImgId(10, action.item().id);
-    this.setBSActionActorImg("attack");
-  } else if (action.isSkill()) {
-    this.setBattleImgId(10, action.item().id);
-    this.setBSActionActorImg("attack");
-  } else if (action.isItem()) {
-    this.setBattleImgId(12, action.item().id);
-    this.setBSActionActorImg("item");
-  } else {
-    this.setBattleImgId(0, -1);
-    this.setBSActionActorImg(null);
-  }
-  this.battleStyleImgRefresh();
+    if (action.item().animationId > 0) {
+        if (action.isRecover()) {
+            this.setBattleImgId(11, action.item().id);
+            this.setBSActionActorImg("recovery");
+        } else if (action.isAttack() && action.isDamage()) {
+            this.setBattleImgId(10, action.item().id);
+            this.setBSActionActorImg("attack");
+        } else if (action.isMagicSkill()) {
+            this.setBattleImgId(10, action.item().id);
+            this.setBSActionActorImg("attack");
+        } else if (action.isSkill() && action.isDamage()) {
+            this.setBattleImgId(10, action.item().id);
+            this.setBSActionActorImg("attack");
+        } else if (action.isItem()) {
+            this.setBattleImgId(12, action.item().id);
+            this.setBSActionActorImg("item");
+        } else {
+            this.setBattleImgId(0, -1);
+            this.setBSActionActorImg(null);
+        }
+        this.battleStyleImgRefresh();
+    }
 };
 
 Game_Actor.prototype.setBattleImgId = function(id, itemId) {
@@ -1750,30 +1755,36 @@ Window_BattleStatus.prototype.statusPosition = function(index, rect) {
     const padding = this.itemPadding();
     let cols = this.maxCols();
     let maxCols = 0;
-    if (params.ActorStatusMode === 'triangle') {
-      const topCol = this.maxItems() % this.maxCols();
-      cols = (topCol > index ? topCol : this.maxCols());
-      index += (topCol > index || topCol === 0 ? 0 : this.maxCols() - topCol);
-      maxCols = Math.min(cols, this.maxItems());
+    const data = params.ActorContentsSetting ? params.ActorContentsSetting[index] : null;
+    if (data && data.ActorContentsCoordinateMode) {
+        rect.x = 0;
+        rect.y = 0;
     } else {
-      maxCols = Math.min(this.maxItems() - (Math.floor(index / cols) * cols), cols, this.maxItems());
+        if (params.ActorStatusMode === 'triangle') {
+            const topCol = this.maxItems() % this.maxCols();
+            cols = (topCol > index ? topCol : this.maxCols());
+            index += (topCol > index || topCol === 0 ? 0 : this.maxCols() - topCol);
+            maxCols = Math.min(cols, this.maxItems());
+        } else {
+            maxCols = Math.min(this.maxItems() - (Math.floor(index / cols) * cols), cols, this.maxItems());
+        }
+        if (params.ActorStatusMode === 'center') {
+            rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
+        } else if (params.ActorStatusMode === 'raigt') {
+            rect.x += this.width - (maxCols * itemWidth) - padding * 2;
+        } else if (params.ActorStatusMode === 'triangle') {
+            rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
+        }
+        if (params.ActorStatusRowsMode === 'under') {
+            rect.y = this.height - (rect.height + rect.y + padding * 2);
+        }
     }
-    if (params.ActorStatusMode === 'center') {
-        rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
-    } else if (params.ActorStatusMode === 'raigt') {
-        rect.x += this.width - (maxCols * itemWidth) - padding * 2;
-    } else if (params.ActorStatusMode === 'triangle') {
-        rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
+    if (data) {
+        rect.x += data.ActorContentsX || 0;
+        rect.y += data.ActorContentsY || 0;
+        rect.width = data.ActorContentsWidth > 0 ? data.ActorContentsWidth : rect.width;
+        rect.height = data.ActorContentsHeight > 0 ? data.ActorContentsHeight : rect.height;
     }
-    if (params.ActorStatusRowsMode === 'under') {
-        rect.y = this.height - (rect.height + rect.y + padding * 2);
-    }
-    //if (data) {
-    //    rect.x += data.Actor_X || 0;
-    //    rect.y += data.Actor_Y || 0;
-    //    rect.width += data.Actor_Width > 0 ? data.Actor_Width : 0;
-    //    rect.height += data.Actor_height > 0 ? data.Actor_height : 0;
-    //}
     return rect;
 };
 

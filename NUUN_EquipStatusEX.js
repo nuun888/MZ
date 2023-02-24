@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/25/2022 Ver.1.3.2
+ * Fixed to reverse the color of the target rate, MP consumption rate, physical damage rate, magic damage rate, and floor damage rate. (red for increasing, green for decreasing)
+ * Added a function to reverse the color of the difference in the original parameter difference display.
  * 12/11/2022 Ver.1.3.1
  * Fixed an issue where gear set bonus item heights were not being applied.
  * 12/11/2022 Ver.1.3.0
@@ -396,7 +399,7 @@
  * @value 4
  * @option State(1)(2)(3)(4)(6)
  * @value 5
- * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
+ * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(18)
  * @value 6
  * @option HP gauge(1)(2)(3)(4)(6)
  * @value 10
@@ -605,6 +608,12 @@
  * @type number
  * @default 2
  * 
+ * @param BatStatus
+ * @text Color inversion when displaying differences(18)
+ * @desc Inverts the color of numerical increase and decrease when displaying the difference.
+ * @type boolean
+ * @default false
+ * 
  */
  /*~struct~actorImgList:
  * 
@@ -762,7 +771,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -791,6 +800,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/25 Ver.1.3.2
+ * 狙われ率、MP消費率、物理ダメージ率、魔法ダメージ率、床ダメージ率の差分の色を逆にするよう修正。(上昇で赤、減少で緑)
+ * オリジナルパラメータの差分表示に差分の色を逆にする機能を追加。
  * 2022/12/11 Ver.1.3.1
  * 装備セットボーナスの項目高さが適用されていなかった問題を修正。
  * 2022/12/11 Ver.1.3.0
@@ -1148,7 +1160,7 @@
  * @value 4
  * @option ステート(1)(2)(3)(4)(6)
  * @value 5
- * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(18)
  * @value 6
  * @option ＨＰゲージ(1)(2)(3)(4)(6)
  * @value 10
@@ -1356,6 +1368,12 @@
  * @desc アイコンの補正Y値を指定します。
  * @type number
  * @default 2
+ * 
+ * @param BatStatus
+ * @text 差分表示時の色反転(18)
+ * @desc 差分表示時に数値上昇と減少の色を反転します。
+ * @type boolean
+ * @default false
  * 
  */
 /*~struct~actorImgList:ja
@@ -2070,7 +2088,7 @@ Imported.NUUN_EquipStatusEX = true;
         this.drawRightArrow(paramX + paramWidth, y);
         if (this._tempActor) {
             const newValue = NuunManager.numPercentage(this._tempActor.sparam(paramId - 40) * 100, data.Decimal - 2, DecimalMode);
-            const diffvalue = newValue - value;
+            const diffvalue = badParams(paramId) ? (value - newValue) : (newValue - value);
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth, y, paramWidth, "right");
         }
@@ -2108,7 +2126,7 @@ Imported.NUUN_EquipStatusEX = true;
             a = this._tempActor;
             const newValue = NuunManager.numPercentage(eval(data.DataEval), data.Decimal - 2, DecimalMode);
             if (!isNaN(text)) {
-                const diffvalue = newValue - text;
+                const diffvalue = data.BatStatus ? (text - newValue) : (newValue - text);
                 this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             } else {
                 this.resetTextColor();
@@ -2620,6 +2638,19 @@ Imported.NUUN_EquipStatusEX = true;
             return $dataArmors[armorId];
         } else {
             return null;
+        }
+    };
+
+    function badParams(param) {
+        switch (param) {
+            case 40:
+            case 44:
+            case 46:
+            case 47:
+            case 48:
+                return true;
+            default:
+                return false;
         }
     };
       

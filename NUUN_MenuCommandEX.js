@@ -14,7 +14,7 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
@@ -23,6 +23,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/24/2023 Ver.1.1.3
+ * Fixed an issue where commands would move after selecting an actor and pressing cancel to return to menu commands.
  * 1/22/2023 Ver.1.1.2
  * Fixed to load all images when menu command is displayed.
  * 1/8/2023 Ver.1.1.1
@@ -216,7 +218,7 @@
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
@@ -225,6 +227,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/24 Ver.1.1.3
+ * アクター選択後キャンセルを押しメニューコマンドに戻る際に、コマンドが動く問題を修正。
  * 2023/1/22 Ver.1.1.2
  * 画像を全てメニューコマンド表示時に読み込むように修正。
  * 2023/1/8 Ver.1.1.1
@@ -499,7 +503,7 @@ Imported.NUUN_MenuCommandEX = true;
         this.setCommandSprite();
     };
 
-    Window_Selectable.prototype.setCommandSprite = function() {
+    Window_MenuCommand.prototype.setCommandSprite = function() {
         this._list.forEach((data, index) => {
             if (!this._commandSprite[index]) {
                 const sprite = new Sprite_MenuCommand(this.menuCommandExData(index));
@@ -507,8 +511,9 @@ Imported.NUUN_MenuCommandEX = true;
                 this._commandSprite[index] = sprite;
             }
             if (this._commandSprite[index]) {
+                const lastSymbol = Window_MenuCommand._lastCommandSymbol;
                 const rect = this.itemRect(index);
-                this._commandSprite[index].setup(rect.x, rect.y, this.menuCommandExData(index));
+                this._commandSprite[index].setup(rect.x, rect.y, this.menuCommandExData(index), this.currentSymbol(), lastSymbol);
             }
         });
     };
@@ -630,9 +635,9 @@ Imported.NUUN_MenuCommandEX = true;
         return this._data && this._data.ContentsHeight > 0 ? this._data.ContentsHeight : ContentsHeight;
     };
 
-    Sprite_MenuCommand.prototype.setup = function(x, y, data) {
+    Sprite_MenuCommand.prototype.setup = function(x, y, data, symbol, lastSymbol) {
         this._data = data;
-        this.setPosition(x, y);
+        this.setPosition(x, y, symbol, lastSymbol);
     };
 
     Sprite_MenuCommand.prototype.setBitmap = function(bitmap) {
@@ -649,13 +654,15 @@ Imported.NUUN_MenuCommandEX = true;
         }
     };
 
-    Sprite_MenuCommand.prototype.setPosition = function(x, y) {
-        x += (this._data ? this._data.ContentsImgX : 0) || 0;
-        y += (this._data ? this._data.ContentsImgY : 0) || 0;
-        this._homeX = x;
-        this._homeY = y;
-        this.x = x;
-        this.y = y;
+    Sprite_MenuCommand.prototype.setPosition = function(x, y, symbol, lastSymbol) {
+        if (symbol !== lastSymbol) {
+            x += (this._data ? this._data.ContentsImgX : 0) || 0;
+            y += (this._data ? this._data.ContentsImgY : 0) || 0;
+            this._homeX = x;
+            this._homeY = y;
+            this.x = x;
+            this.y = y;
+        }
     };
 
     Sprite_MenuCommand.prototype.moveCommand = function() {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.5.0
+ * @version 2.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -44,11 +44,9 @@
  * this._actorまたはactor 表示中のアクターのゲームデータ
  * dactor 表示中のアクターのデータベース
  * 
- * ステート耐性
- * rate ステート有効度
- * 
- * ステート耐性、属性耐性
- * r:属性、ステート耐性値　全ての耐性値を乗算した数値
+ * 属性耐性、属性耐性
+ * rate 単位付きの属性、ステート有効度
+ * r:属性、ステート耐性値　全ての耐性値を乗算した数値 計算式で使用する場合はこちらを使用します。
  * 
  * ステート
  * 表示したいステートIDを,区切りで指定します。
@@ -80,6 +78,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/25 Ver.2.5.1
+ * APNGに対応。
  * 2023/1/14 Ver.2.5.0
  * 各項目(一部を除く)にアイコンを指定できる機能を追加。
  * 各項目(一部を除く)に文字揃えを指定できる機能を追加。
@@ -796,6 +796,12 @@
  * @default 100
  * @min 0
  * @max 999
+ * 
+ * @param IsApng
+ * @text Apng有効
+ * @desc Apngを有効にします。(要ApngPicture)
+ * @type boolean
+ * @default false
  *  
  */
 /*~struct~ElementData:
@@ -997,6 +1003,7 @@
  * @option '$gameVariables.value(0);//ゲーム変数'
  * @option "actor.isStateResist(stateId) ? '無効' : r;//ステート耐性"
  * @option 'actor.level'
+ * @option "100 - r +' %';//耐性差分表示"
  * @default 
  * 
  * @param X_Position
@@ -1183,6 +1190,12 @@
  * @default 100
  * @min 0
  * @max 999
+ * 
+ * @param IsApng
+ * @text Apng有効
+ * @desc Apngを有効にします。(要ApngPicture)
+ * @type boolean
+ * @default false
  * 
  */
 
@@ -1502,44 +1515,61 @@ Window_Status.prototype.loadFaceImages = function() {
 };
 
 Window_Status.prototype.actorImg = function() {
-  const actor = this._actor;
-  let bitmap = null;
-  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-    bitmap = actor.getActorGraphicData() ? ImageManager.nuun_LoadPictures(actor.getActorGraphicImg()) : null;
-  } else if (ActorsImgList[actor.statusActorImgIndex] && actor.statusActorImgIndex >= 0) {
-    const actorImges = ActorsImgList[actor.statusActorImgIndex].ActorImg[actor.statusImgId];
-    bitmap = ImageManager.nuun_LoadPictures(actorImges);
-  } else {
-    bitmap = null;
-  }
-  if (bitmap && !bitmap.isReady()) {
-    bitmap.addLoadListener(this.actorImgRefresh.bind(this, actor, bitmap));
-  } else if (bitmap) {
-    this.actorImgRefresh(actor, bitmap);
-  }
+    const actor = this._actor;
+    let bitmap = null;
+    if (this._actorBitmap) {
+        this._actorBitmap.resetApngImg();
+    }
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        bitmap = actor.getActorGraphicData() ? ImageManager.nuun_LoadPictures(actor.getActorGraphicImg()) : null;
+    } else if (ActorsImgList[actor.statusActorImgIndex] && actor.statusActorImgIndex >= 0) {
+        const actorImges = ActorsImgList[actor.statusActorImgIndex].ActorImg[actor.statusImgId];
+        bitmap = ImageManager.nuun_LoadPictures(actorImges);
+    } else {
+        bitmap = null;
+    }
+    if (bitmap && !bitmap.isReady()) {
+        bitmap.addLoadListener(this.actorImgRefresh.bind(this, actor, bitmap));
+    } else if (bitmap) {
+        this.actorImgRefresh(actor, bitmap);
+    }
 };
 
 Window_Status.prototype.actorImgRefresh = function(actor, bitmap) {
-  const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()) : ActorsImgList[actor.statusActorImgIndex];
-  let x = data.Actor_X;
-  const sx = data.Img_SX || 0;
-  const sy = data.Img_SY || 0;
-  const scale = (data.Actor_Scale || 100) / 100;
-  if(actorPosition === 0) {
-    x += 0;
-  } else if (actorPosition === 1) {
-    x += Math.floor(this.width / 2 - ((bitmap.width * scale) / 2));
-  } else {
-    x += this.width - (bitmap.width * scale) - 24;
-  }
-  const dw = bitmap.width * scale;
-  const dh = bitmap.height * scale;
-  const y = data.Actor_Y + (this.height - (bitmap.height * scale)) - 24;
-  this.contents.blt(bitmap, sx, sy, bitmap.width, bitmap.height, x, y, dw, dh);
+    const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()) : ActorsImgList[actor.statusActorImgIndex];
+    if (data.IsApng) {
+        const rect = this.itemRect(0);
+        this.createApngSprite(actor, data, rect);
+    } else {
+        let x = data.Actor_X;
+        const sx = data.Img_SX || 0;
+        const sy = data.Img_SY || 0;
+        const scale = (data.Actor_Scale || 100) / 100;
+        if(actorPosition === 0) {
+        x += 0;
+        } else if (actorPosition === 1) {
+        x += Math.floor(this.width / 2 - ((bitmap.width * scale) / 2));
+        } else {
+        x += this.width - (bitmap.width * scale) - 24;
+        }
+        const dw = bitmap.width * scale;
+        const dh = bitmap.height * scale;
+        const y = data.Actor_Y + (this.height - (bitmap.height * scale)) - 24;
+        this.contents.blt(bitmap, sx, sy, bitmap.width, bitmap.height, x, y, dw, dh);
+    }
 };
 
-Window_Status.prototype.actorImgRefreshApeg = function() {
-    
+Window_Status.prototype.createApngSprite = function(actor, data, rect) {
+    if (!this._actorBitmap) {
+        const sprite = new Sprite_NuunAPngImg();
+        this._contentsBackSprite.addChild(sprite);
+        this._actorBitmap = sprite;
+    }
+    if (this._actorBitmap) {
+        const name = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battler.getActorGraphicImg() : data.ActorImg[actor.statusImgId];
+        this._actorBitmap.setup(actor, data, name);
+        this._actorBitmap.move(rect.x + data.Actor_X, rect.y + data.Actor_Y, rect.width, rect.height);
+    }
 };
 
 Window_Status.prototype.battlreActorPicture = function(id) {//立ち絵表示EX用
@@ -2715,58 +2745,5 @@ Sprite_StatusSvActor.prototype.startMotion = function() {
 Sprite_StatusSvActor.prototype.setupWeaponAnimation = function() {
     
 };
-
-
-function Sprite_StatusActorImg() {
-    this.initialize(...arguments);
-}
-  
-Sprite_StatusActorImg.prototype = Object.create(Sprite.prototype);
-Sprite_StatusActorImg.prototype.constructor = Sprite_StatusActorImg;
-  
-Sprite_StatusActorImg.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-};
-
-Sprite_StatusActorImg.prototype.initMembers = function() {
-    this._battler = null;
-    this._apngMode = null;
-    this._data = null;
-    this._pictureName = null;
-};
-
-Sprite_StatusActorImg.prototype.setup = function(battler, data) {
-    this._battler = battler;
-    this._data = data;
-    const name = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battler.getActorGraphicImg() : data.ActorImg;
-    this._pictureName = name.split('pictures/')[1];
-    this.refresh();
-};
-
-Sprite_StatusActorImg.prototype.refresh = function() {
-    if (this.addApngChild && this.loadApngSprite(this._pictureName)) {
-        this.addApngChild(this._pictureName);
-        this._apngMode = true;
-    }
-};
-
-Sprite_StatusActorImg.prototype.destroy = function() {
-    this.resetMenuActorImg();
-    Sprite.prototype.destroy.call(this);
-};
-
-Sprite_StatusActorImg.prototype.resetMenuActorImg = function() {
-    this._battler = null;
-    if (this._apngMode) {
-        this.destroyApngIfNeed();
-        this._apngMode = null;
-    }
-};
-
-Sprite_StatusActorImg.prototype.loadApngSprite = function(name) {
-    return Sprite_Picture.prototype.loadApngSprite.call(this, name);
-};
-
 
 })();

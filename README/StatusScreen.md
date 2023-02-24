@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.5.0
+# Ver.2.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -85,6 +85,8 @@ Y座標を指定します。Y表示列位置からの相対座標になります
 ### レーダーチャート設定
 
 ### 更新履歴
+2023/2/25 Ver.2.5.1  
+APNGに対応。  
 2023/1/14 Ver.2.5.0
 各項目(一部を除く)にアイコンを指定できる機能を追加。  
 各項目(一部を除く)に文字揃えを指定できる機能を追加。  

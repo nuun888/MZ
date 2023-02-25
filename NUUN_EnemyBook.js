@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.11
+ * @version 2.17.12
  * 
  * @help
  * Implement an enemy book.
@@ -200,6 +200,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/26/2023 Ver.2.17.12
+ * Fixed an issue where enemies were not registered in the encyclopedia when they were added via plugins instead of appearing as enemies.
  * 2/25/2023 Ver.2.17.11
  * Fixed number display processing.
  * 2/23/2023 Ver.2.17.10
@@ -2789,7 +2791,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.11
+ * @version 2.17.12
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2981,6 +2983,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/26 Ver.2.17.12
+ * 敵の出現ではなくプラグイン等で敵を追加したときに、図鑑に登録されない問題を修正。
  * 2023/2/25 Ver.2.17.11
  * ナンバー表示の処理を修正。
  * 2023/2/23 Ver.2.17.10
@@ -6164,6 +6168,10 @@ Game_System.prototype.completeEnemyBook = function() {
 Game_System.prototype.getEnemyBookFlag = function(enemyId) {
   return this._enemyBookFlags ? this._enemyBookFlags[enemyId] : false;
 };
+
+Game_System.prototype.getEnemyBookStatusFlag = function(enemyId) {
+    return this._enemyBookStatusFlags ? this._enemyBookStatusFlags[enemyId] : false;
+  };
 
 Game_System.prototype.isInEnemyBook = function(enemy) {
   return enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && this._enemyBookFlags && this._enemyBookFlags[enemy.id];
@@ -10660,6 +10668,25 @@ Game_EnemyBookCharacter.prototype.screenX = function() {
 Game_EnemyBookCharacter.prototype.screenY = function() {
     return this._bookEnemyY;
 };
+
+
+const _Sprite_Enemy_setBattler = Sprite_Enemy.prototype.setBattler;
+Sprite_Enemy.prototype.setBattler = function(battler) {
+    _Sprite_Enemy_setBattler.call(this, battler);
+    if ($gameTroop.inBattle()) {
+        const enemyId = battler.enemyId();
+        if ($gameSystem.registrationTiming(0) && !$gameSystem.getEnemyBookFlag(enemyId)) {
+            $gameSystem.addToEnemyBook(enemyId);
+        }
+        if ($gameSystem.registrationStatusTiming(0) && !$gameSystem.getEnemyBookStatusFlag(enemyId)) {
+            if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+                $gameSystem.addToEnemyBook(enemyId);
+            }
+            $gameSystem.addStatusToEnemyBook(enemyId);
+        }
+    }
+};
+
   
 function Sprite_EnemyBookCharacter() {
     this.initialize(...arguments);

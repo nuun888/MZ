@@ -1,5 +1,5 @@
 # [アイテム図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)
-# Ver.1.5.1
+# Ver.1.6.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -90,6 +90,8 @@ desc1と記入した場合はアイテム、武器、防具のメモ欄に<desc1
 メモ欄のタグ記入時では付けないでください。  
 
 ## 更新履歴
+2023/2/25 Ver.1.6.0  
+追加能力値、特殊能力値を表示できる項目を追加。  
 2023/1/25 Ver.1.5.1  
 データベースでアイテムカテゴリーを一つに設定したときにアイテム図鑑を開くとエラーが出る問題を修正。  
 アイテムカテゴリーとアイテム図鑑のカテゴリーを別々に仕様変更。  

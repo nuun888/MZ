@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.5.1
+ * @version 1.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -114,6 +114,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2023/2/25 Ver.1.6.0
+ * 追加能力値、特殊能力値を表示できる項目を追加。
  * 2023/1/25 Ver.1.5.1
  * データベースでアイテムカテゴリーを一つに設定したときにアイテム図鑑を開くとエラーが出る問題を修正。
  * アイテムカテゴリーとアイテム図鑑のカテゴリーを別々に仕様変更。
@@ -370,6 +372,13 @@
  * @text 個別指定画像フォルダ
  * @type string
  * @default 'pictures'
+ * @parent BasicSetting
+ * 
+ * @param DecimalMode
+ * @text 端数処理四捨五入
+ * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
+ * @type boolean
+ * @default true
  * @parent BasicSetting
  * 
  * @param WindowSetting
@@ -723,7 +732,7 @@
  * @value 4
  * @option 価格(1)～(10)
  * @value 5
- * @option オリジナルパラメータ(1)～(10)(15)
+ * @option オリジナルパラメータ(1)～(10)(15)(16)
  * @value 8
  * @option 記述欄(1)～(7)(9)(12)
  * @value 9
@@ -742,9 +751,9 @@
  * @option ライン(2)～(7)(9)
  * @value 52
  * @option 取得回数(未実装)
- * @value 60
+ * @value 53
  * @option 使用回数(未実装)
- * @value 61
+ * @value 54
  * @option 画像（共通画像）(2)～(7)(9)(13)(14)
  * @value 100
  * @option 画像（個別指定画像）(2)～(7)(9)(12)(14)
@@ -835,6 +844,15 @@
  * @desc コンテンツ背景を表示させます。
  * @type boolean
  * @default false
+ * @parent BasicSetting
+ * 
+ * @param Decimal
+ * @text 小数点桁数(16)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
  * @parent BasicSetting
  * 
  * @param nameSetting
@@ -922,7 +940,7 @@
  * @value 4
  * @option 価格(1)～(10)
  * @value 5
- * @option オリジナルパラメータ(1)～(10)(15)
+ * @option オリジナルパラメータ(1)～(10)(15)(16)
  * @value 8
  * @option 記述欄(1)～(7)(9)(12)
  * @value 9
@@ -951,7 +969,47 @@
  * @option ライン(2)～(7)(9)
  * @value 52
  * @option 取得回数（未実装）
+ * @value 53
+ * @option 命中率(1)～(10)(16)
  * @value 60
+ * @option 回避率(1)～(10)(16)
+ * @value 61
+ * @option 会心率(1)～(10)(16)
+ * @value 62
+ * @option 会心回避率(1)～(10)(16)
+ * @value 63
+ * @option 魔法回避率(1)～(10)(16)
+ * @value 64
+ * @option 魔法反射率(1)～(10)(16)
+ * @value 65
+ * @option 反撃率(1)～(10)(16)
+ * @value 66
+ * @option HP再生率(1)～(10)(16)
+ * @value 67
+ * @option MP再生率(1)～(10)(16)
+ * @value 68
+ * @option TP再生率(1)～(10)(16)
+ * @value 69
+ * @option 狙われ率(1)～(10)(16)
+ * @value 70
+ * @option 防御効果率(1)～(10)(16)
+ * @value 71
+ * @option 回復効果率(1)～(10)(16)
+ * @value 72
+ * @option 薬の知識(1)～(10)(16)
+ * @value 73
+ * @option MP消費率(1)～(10)(16)
+ * @value 74
+ * @option TPチャージ率(1)～(10)(16)
+ * @value 75
+ * @option 物理ダメージ率(1)～(10)(16)
+ * @value 76
+ * @option 魔法ダメージ率(1)～(10)(16)
+ * @value 77
+ * @option 床ダメージ率(1)～(10)(16)
+ * @value 78
+ * @option 獲得経験率(1)～(10)(16)
+ * @value 79
  * @option 画像（共通画像）(2)～(7)(9)(13)(14)
  * @value 100
  * @option 画像（個別指定画像）(2)～(7)(9)(12)(14)
@@ -1044,11 +1102,13 @@
  * @default false
  * @parent BasicSetting
  * 
- * @param ParamId
- * @desc IDを設定します。
- * @text ID(16)
+ * @param Decimal
+ * @text 小数点桁数(16)
+ * @desc 表示出来る小数点桁数。
  * @type number
- * @default 
+ * @default 0
+ * @min 0
+ * @max 99
  * @parent BasicSetting
  * 
  * @param nameSetting
@@ -1136,7 +1196,7 @@
  * @value 4
  * @option 価格(1)～(10)
  * @value 5
- * @option オリジナルパラメータ(1)～(10)(15)
+ * @option オリジナルパラメータ(1)～(10)(15)(16)
  * @value 8
  * @option 記述欄(1)～(7)(9)(12)
  * @value 9
@@ -1165,7 +1225,47 @@
  * @option ライン(2)～(7)(9)
  * @value 52
  * @option 取得回数(未実装)
+ * @value 53
+ * @option 命中率(1)～(10)(16)
  * @value 60
+ * @option 回避率(1)～(10)(16)
+ * @value 61
+ * @option 会心率(1)～(10)(16)
+ * @value 62
+ * @option 会心回避率(1)～(10)(16)
+ * @value 63
+ * @option 魔法回避率(1)～(10)(16)
+ * @value 64
+ * @option 魔法反射率(1)～(10)(16)
+ * @value 65
+ * @option 反撃率(1)～(10)(16)
+ * @value 66
+ * @option HP再生率(1)～(10)(16)
+ * @value 67
+ * @option MP再生率(1)～(10)(16)
+ * @value 68
+ * @option TP再生率(1)～(10)(16)
+ * @value 69
+ * @option 狙われ率(1)～(10)(16)
+ * @value 70
+ * @option 防御効果率(1)～(10)(16)
+ * @value 71
+ * @option 回復効果率(1)～(10)(16)
+ * @value 72
+ * @option 薬の知識(1)～(10)(16)
+ * @value 73
+ * @option MP消費率(1)～(10)(16)
+ * @value 74
+ * @option TPチャージ率(1)～(10)(16)
+ * @value 75
+ * @option 物理ダメージ率(1)～(10)(16)
+ * @value 76
+ * @option 魔法ダメージ率(1)～(10)(16)
+ * @value 77
+ * @option 床ダメージ率(1)～(10)(16)
+ * @value 78
+ * @option 獲得経験率(1)～(10)(16)
+ * @value 79
  * @option 画像（共通画像）(2)～(7)(9)(13)(14)
  * @value 100
  * @option 画像（個別指定画像）(2)～(7)(9)(12)(14)
@@ -1258,11 +1358,13 @@
  * @default false
  * @parent BasicSetting
  * 
- * @param ParamId
- * @desc IDを設定します。
- * @text ID(16)
+ * @param Decimal
+ * @text 小数点桁数(16)
+ * @desc 表示出来る小数点桁数。
  * @type number
- * @default 
+ * @default 0
+ * @min 0
+ * @max 99
  * @parent BasicSetting
  * 
  * @param nameSetting
@@ -1385,6 +1487,7 @@ const BookWidth = Number(parameters['BookWidth'] || 0);
 const RegistrationItemTiming = Number(parameters['RegistrationItemTiming'] || 0);
 const UnknownData = String(parameters['UnknownData'] || '？');
 const UnknownItemData = String(parameters['UnknownItemData'] || '？？？');
+const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const ItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemBookImgList'])) : null) || [];
 const WeaponItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['WeaponItemBookImgList'])) : null) || [];
 const ArmorItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ArmorItemBookImgList'])) : null) || [];
@@ -2678,18 +2781,36 @@ Window_ItemBook.prototype.dataDisplay = function(list, item, x, y, width) {
     case 32:
       this.equipType(list, item, x, y, width);
       break;
-    case 40:
-        //this.xparam(list, item, x, y, width);
-        break;
-    case 41:
-        //this.sparam(list, item, x, y, width);
-        break;
     case 51:
       this.name(list, item, x, y, width);
       break;
     case 52:
       this.horzLine(list, item, x, y, width);
       break;
+    case 60:
+    case 61:
+    case 62:
+    case 63:
+    case 64:
+    case 65:
+    case 66:
+    case 67:
+    case 68:
+    case 69:
+        this.xparam(list, item, x, y, width);
+        break;
+    case 70:
+    case 71:
+    case 72:
+    case 73:
+    case 74:
+    case 75:
+    case 76:
+    case 77:
+    case 78:
+    case 79:
+        this.sparam(list, item, x, y, width);
+        break;
     case 100:
       this.commonItemBitmap(list, item, x, y, width);
       break;
@@ -2709,6 +2830,66 @@ Window_ItemBook.prototype.dataDisplay = function(list, item, x, y, width) {
     default:
       break;
   }
+};
+
+Window_ItemBook.prototype.paramNameShow = function(list, item) {
+    if (list.paramName) {
+      return list.paramName
+    }
+    
+    const params = list.DateSelect;
+    switch (params) {
+        case 20:
+        case 21:
+        case 22:
+        case 23:
+        case 24:
+        case 25:
+        case 26:
+        case 27:
+            return TextManager.param(params - 20);
+        case 60:
+        case 61:
+            return TextManager.param(params - 52);
+        case 62:
+            return this.language_Jp ? "会心率" : 'Critcal Rate';
+        case 63:
+            return this.language_Jp ? "会心回避率" : 'Critical Evade';
+        case 64:
+            return this.language_Jp ? "魔法回避率" : 'Magic Evade';
+        case 65:
+            return this.language_Jp ? "魔法反射率" : 'Magic Reflect';
+        case 66:
+            return this.language_Jp ? "反撃率" : 'Counter';
+        case 67:
+            return this.language_Jp ? "HP再生率" : 'HP Regen';
+        case 68:
+            return this.language_Jp ? "MP再生率" : 'MP Regen';
+        case 69:
+            return this.language_Jp ? "TP再生率" : 'TP Regen';
+        case 70:
+            return this.language_Jp ? "狙われ率" : 'Aggro';
+        case 71:
+            return this.language_Jp ? "防御効果率" : 'Guard';
+        case 72:
+            return this.language_Jp ? "回復効果率" : 'Recovery';
+        case 73:
+            return this.language_Jp ? "薬の知識" : 'Item Effect';
+        case 74:
+            return this.language_Jp ? "MP消費率" : 'MP Cost';
+        case 75:
+            return this.language_Jp ? "TPチャージ率" : 'TP Charge';
+        case 76:
+            return this.language_Jp ? "物理ダメージ率" : 'Physical Damage';
+        case 77:
+            return this.language_Jp ? "魔法ダメージ率" : 'Magical Damage';
+        case 78:
+            return this.language_Jp ? "床ダメージ率" : 'Floor Damage';
+        case 79:
+            return this.language_Jp ? "獲得経験率" : 'EXP Gain';
+        default:
+            return null;
+    }
 };
 
 Window_ItemBook.prototype.itemName = function(list, item, x, y, width) {
@@ -2835,6 +3016,9 @@ Window_ItemBook.prototype.originalParams = function(list, item, x, y, width) {
   let text;
   if(this.paramMask(list.MaskMode)){
     text = eval(list.DetaEval);
+    if (!isNaN(text)) {
+        text = NuunManager.numPercentage(text, (list.Decimal || 0) - 2, DecimalMode);
+    }
     text += list.paramUnit ? String(list.paramUnit) : '';
   } else {
     text = UnknownItemData;
@@ -2961,7 +3145,7 @@ Window_ItemBook.prototype.param = function(list, item, x, y, width) {
   x = this.contensX(x);
   width = this.contensWidth(width);
   this.changeTextColor(this.getColorCode(list.NameColor));
-  const nameText = list.paramName ? list.paramName : TextManager.param(list.DateSelect - 20);
+  const nameText = list.paramName ? list.paramName : this.paramNameShow(list);
   const textWidth = this.systemWidth(list.SystemItemWidth, width);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
@@ -2980,13 +3164,14 @@ Window_ItemBook.prototype.xparam = function(list, item, x, y, width) {
     x = this.contensX(x);
     width = this.contensWidth(width);
     this.changeTextColor(this.getColorCode(list.NameColor));
-    const nameText = list.paramName ? list.paramName : TextManager.xparam(list.ParamId);
+    const nameText = list.paramName ? list.paramName : this.paramNameShow(list);
     const textWidth = this.systemWidth(list.SystemItemWidth, width);
     this.drawText(nameText, x, y, textWidth);
     this.resetTextColor();
     let text;
     if(this.paramMask(list.MaskMode)){
-      text = list.DetaEval ? eval(list.DetaEval) : this.getXparam(list, item);
+      text = list.DetaEval ? eval(list.DetaEval) : this.getXparam(list.DateSelect - 60, item) * 100;
+      text = NuunManager.numPercentage(text, (list.Decimal || 0), DecimalMode);
       text += list.paramUnit ? String(list.paramUnit) : '';
     } else {
       text = UnknownItemData;
@@ -2999,26 +3184,27 @@ Window_ItemBook.prototype.sparam = function(list, item, x, y, width) {
     x = this.contensX(x);
     width = this.contensWidth(width);
     this.changeTextColor(this.getColorCode(list.NameColor));
-    const nameText = list.paramName ? list.paramName : TextManager.xparam(list.ParamId);
+    const nameText = list.paramName ? list.paramName : this.paramNameShow(list);
     const textWidth = this.systemWidth(list.SystemItemWidth, width);
     this.drawText(nameText, x, y, textWidth);
     this.resetTextColor();
     let text;
     if(this.paramMask(list.MaskMode)){
-      text = list.DetaEval ? eval(list.DetaEval) : this.getSparam(list, item);
-      text += list.paramUnit ? String(list.paramUnit) : '';
+        text = list.DetaEval ? eval(list.DetaEval) : this.getSparam(list.DateSelect - 70, item) * 100;
+        text = NuunManager.numPercentage(text, (list.Decimal || 0), DecimalMode);
+        text += list.paramUnit ? String(list.paramUnit) : '';
     } else {
-      text = UnknownItemData;
+        text = UnknownItemData;
     }
     this.drawText(text, x + textWidth + 8, y, width - (textWidth + 8), 'right');
 };
 
-Window_ItemBook.prototype.getXparam = function(list, item) {
-    return item.traits.reduce((r, data) => data.code === 22 && data.dataId === list.ParamId ? r + data.value : r, 0);
+Window_ItemBook.prototype.getXparam = function(param, item) {
+    return item.traits.reduce((r, data) => data.code === 22 && data.dataId === param ? r + data.value : r, 0);
 };
 
-Window_ItemBook.prototype.getSparam = function(list, item) {
-    return item.traits.reduce((r, data) => data.code === 23 && data.dataId === list.ParamId ? r + data.value : r, 0);
+Window_ItemBook.prototype.getSparam = function(param, item) {
+    return item.traits.reduce((r, data) => data.code === 23 && data.dataId === param ? r + data.value : r, 0);
 };
 
 Window_ItemBook.prototype.weaponType = function(list, item, x, y, width) {
@@ -3142,49 +3328,6 @@ Window_ItemBook.prototype.numberWidthSlice = function(indexText) {
 
 Window_ItemBook.prototype.currencyUnit = function() {
   return TextManager.currencyUnit;
-};
-
-Window_ItemBook.prototype.textParam = function(paramsId) {
-  switch (paramsId) {
-    case 0:
-      return "会心率";
-    case 1:
-      return "会心回避率";
-    case 2:
-      return "魔法回避率";
-    case 3:
-      return "魔法反射率";
-    case 4:
-      return "反撃率";
-    case 5:
-      return "HP再生率";
-    case 6:
-      return "MP再生率";
-    case 7:
-      return "TP再生率";
-    case 10:
-      return "狙われ率";
-    case 11:
-      return "防御効果率";
-    case 12:
-      return "回復効果率";
-    case 13:
-      return "薬の知識";
-    case 14:
-      return "MP消費率";
-    case 15:
-      return "TPチャージ率";
-    case 16:
-      return "物理ダメージ率";
-    case 17:
-      return "魔法ダメージ率";
-    case 18:
-      return "床ダメージ率";
-    case 19:
-      return "獲得経験率";
-    default:
-      return null;
-  }
 };
 
 Window_ItemBook.prototype.useItemOccasionName = function(item) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.1.5
+ * @version 1.1.6
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/25 Ver.1.1.6
+ * バトラーが増えた時の処理を修正。
  * 2023/1/29 Ver.1.1.5
  * 逃走に失敗するとタイムラインからに大きくはみ出る問題を修正。
  * 2023/1/8 Ver.1.1.4
@@ -248,6 +250,19 @@
  * @min -9999
  * @parent ActorSetting
  * 
+ * @param ActorCastTimeSetting
+ * @text キャストタイム時設定
+ * @default ////////////////////////////////
+ * @parent ActorSetting
+ * 
+ * @param TPBTimeLineActorCastTimeImg
+ * @desc キャストタイム時の画像。(アクター背後されます)
+ * @text キャストタイム時画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ActorCastTimeSetting
+ * 
  * @param ActorChargedSetting
  * @text チャージ完了時設定
  * @default ////////////////////////////////
@@ -335,6 +350,19 @@
  * @default true
  * @parent EnemySetting
  * 
+ * @param EnemyCastTimeSetting
+ * @text キャストタイム時設定
+ * @default ////////////////////////////////
+ * @parent ActorSetting
+ * 
+ * @param TPBTimeLineEnemyCastTimeImg
+ * @desc キャストタイム時の画像。(敵キャラ画像背後されます)
+ * @text キャストタイム時画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent EnemyCastTimeSetting
+ * 
  * @param EnemyChargedSetting
  * @text チャージ完了時時設定
  * @default ////////////////////////////////
@@ -420,8 +448,12 @@ const _Game_Temp_requestBattleRefresh = Game_Temp.prototype.requestBattleRefresh
 Game_Temp.prototype.requestBattleRefresh = function() {
     _Game_Temp_requestBattleRefresh.call(this);
     if ($gameParty.inBattle()) {
-        this._needsTpbTimeLineRefresh = true;
+        this.onTpbTimeLineRefreshRequest();
     }
+};
+
+Game_Temp.prototype.onTpbTimeLineRefreshRequest = function() {
+    this._needsTpbTimeLineRefresh = true;
 };
 
 Game_Temp.prototype.clearTpbTimeLineRefreshRequest = function() {
@@ -430,6 +462,13 @@ Game_Temp.prototype.clearTpbTimeLineRefreshRequest = function() {
 
 Game_Temp.prototype.isTpbTimeLineRefreshRequested = function() {
     return this._needsTpbTimeLineRefresh;
+};
+
+
+const _Sprite_Enemy_setBattler = Sprite_Enemy.prototype.setBattler;
+Sprite_Enemy.prototype.setBattler = function(battler) {
+    _Sprite_Enemy_setBattler.call(this, battler);
+    $gameTemp.onTpbTimeLineRefreshRequest();
 };
 
 
@@ -543,7 +582,8 @@ Spriteset_Battle.prototype.updateTimeLineActor = function() {
 
 Spriteset_Battle.prototype.updateTimeLineEnemy = function() {
     const troop = this._enemySprites;
-    for (let i = 0; i < this._tpbTimeLineEnemyMaxMembers; i++) {
+    const leng = troop > this._tpbTimeLineEnemyMaxMembers ? troop.length : this._tpbTimeLineEnemyMaxMembers;
+    for (let i = 0; i < leng; i++) {
         if (!this.timeLineEnemy[i]) {
             const sprite = new Sprite_TimeLineEnemy();
             this.timeLineEnemy.push(sprite);
@@ -695,7 +735,12 @@ Sprite_TimeLine.prototype.textHeight = function() {
 };
 
 Sprite_TimeLine.prototype.initTpbBattlerPosition = function() {
-    if (TimeLineDirection === 'up') {
+    if (!this._battler) {
+        this.x = this._homeX;
+        this.y = this._homeY;
+        this._tpbState = 'none';
+        return;
+    } else if (TimeLineDirection === 'up') {
         this.x = this._homeX + this.getOffSetX();
         this.y = this._homeY - (TPBTimeLineLength * this.getTimeLineRatio()) + this.getOffSetY();
     } else if (TimeLineDirection === 'down') {
@@ -1266,9 +1311,11 @@ Sprite_TimeLineEnemy.prototype.setBattlerSprite = function() {
 Sprite_TimeLineEnemy.prototype.updateEnemy = function() {
     const name = this._battler.battlerName();
     const hue = this._battler.battlerHue();
-    if (this._battlerName !== name || this._battlerHue !== hue) {
+    const letter = this.getEnemyLetter();
+    if (this._battlerName !== name || this._battlerHue !== hue || this._battlerLetter !== letter) {
         this._battlerName = name;
         this._battlerHue = hue;
+        this._battlerLetter = letter;
         this.loadEnemyBitmap(name);
         if (this._imgMode === 'enemy') {
             this.setHue(hue);

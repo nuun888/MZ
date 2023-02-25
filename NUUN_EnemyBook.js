@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.10
+ * @version 2.17.11
  * 
  * @help
  * Implement an enemy book.
@@ -200,6 +200,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/25/2023 Ver.2.17.11
+ * Fixed number display processing.
  * 2/23/2023 Ver.2.17.10
  * Added a function to display unregistered monster images as silhouettes.
  * 1/22/2023 Ver.2.17.9
@@ -589,9 +591,20 @@
  * @value 0
  * @option Show enemy No.
  * @value 1
- * @option Display enemy No. and fill in 0.
+ * @option Display enemy No. and fill in 0.(2 digits)
  * @value 2
+ * @option Display enemy No. and fill in 0.(3 digits)
+ * @value 3
+ * @option Display enemy No. and fill in 0.(4 digits)
+ * @value 4
  * @default 1
+ * @parent SelectEnemySetting
+ * 
+ * @param NumberWidth
+ * @desc Specify the number display range with a string. When padding with 0, it is set according to the number of digits.
+ * @text Number display range
+ * @type string
+ * @default 00
  * @parent SelectEnemySetting
  * 
  * @param UnknownVisible
@@ -2776,7 +2789,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.10
+ * @version 2.17.11
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2968,6 +2981,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/25 Ver.2.17.11
+ * ナンバー表示の処理を修正。
  * 2023/2/23 Ver.2.17.10
  * 情報登録していないモンスター画像をシルエットで表示する機能を追加。
  * 2023/1/22 Ver.2.17.9
@@ -3458,9 +3473,20 @@
  * @value 0
  * @option モンスターNoを表示する。
  * @value 1
- * @option モンスターNoを表示し、0埋めをする。
+ * @option モンスターNoを表示し、0埋めをする(2桁)。
  * @value 2
+ * @option モンスターNoを表示し、0埋めをする(3桁)。
+ * @value 3
+ * @option モンスターNoを表示し、0埋めをする(4桁)。
+ * @value 4
  * @default 1
+ * @parent SelectEnemySetting
+ * 
+ * @param NumberWidth
+ * @desc ナンバーの表示範囲を文字列で指定します。0埋めする場合は桁数に応じて設定されます。
+ * @text ナンバー表示範囲
+ * @type string
+ * @default 00
  * @parent SelectEnemySetting
  * 
  * @param UnknownVisible
@@ -5689,6 +5715,7 @@ const CategoryWindowsSkin = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureDa
 const CategoryListDateSetting = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CategoryListDateSetting'])) : [];
 
 const NumberType = eval(parameters['NumberType']) || 0;
+const NumberWidth = String(parameters['NumberWidth'] || '00');
 const UnknownVisible = eval(parameters['UnknownVisible'] || 'false');
 const NumberMode = eval(parameters['NumberMode'] || 'false');
 const UnknownData = String(parameters['UnknownData'] || '？');
@@ -8167,9 +8194,9 @@ Window_EnemyBook_Index.prototype.drawItem = function(index) {
         const itemWidth = Math.max(0, rect.width - textMargin);
         if(NumberType > 0) {
             let numberText = NumberMode ? index + 1 : $gameSystem.getEnemyBookNumber(enemy.id);
-            const textWidth = this.numberWidth(numberText);
-            if (NumberType === 2) {
-                numberText = this.numberWidthSlice(numberText);
+            const textWidth = this.numberWidth(numberText, NumberType);
+            if (NumberType >= 2) {
+                numberText = this.numberWidthSlice(numberText, NumberType);
             }
             this.drawText(numberText, rect.x, rect.y, textWidth);
             this.drawText(":", rect.x + textWidth + 6, rect.y);
@@ -8190,12 +8217,26 @@ Window_EnemyBook_Index.prototype.drawItem = function(index) {
     }
 };
 
-Window_EnemyBook_Index.prototype.numberWidth = function(numberText) {
-    return this.textWidth($gameSystem._enemyBookLength >= 1000 || NumberType === 2 ? '000' : '00');
+Window_EnemyBook_Index.prototype.numberWidth = function(numberText, id) {
+    if (id <= 1) {
+        return this.textWidth(NumberWidth);
+    } else if (id === 2) {
+        return this.textWidth('00');
+    } else if (id === 3) {
+        return this.textWidth('000');
+    } else if (id === 4) {
+        return this.textWidth('0000');
+    }
 };
   
-Window_EnemyBook_Index.prototype.numberWidthSlice = function(indexText) {
-    return ($gameSystem._enemyBookLength >= 1000 ? ('0000' + indexText).slice(-4) : ('000' + indexText).slice(-3));
+Window_EnemyBook_Index.prototype.numberWidthSlice = function(indexText, id) {
+    if (id === 2) {
+        return ('00' + indexText).slice(-2);
+    } else if (id === 3) {
+        return ('000' + indexText).slice(-3);
+    } else if (id === 4) {
+        return ('0000' + indexText).slice(-4);
+    }
 };
 
 Window_EnemyBook_Index.prototype.EnemyNameLength = function(enemy) {

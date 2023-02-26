@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.1
+ * @version 1.5.2
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/26 Ver.1.5.2
+ * 通常攻撃の画像が変化しなかった問題を修正。
  * 2023/2/24 Ver 1.5.1
  * 戦闘アニメーションがないスキルを使用後、ステートを付加させると攻撃時の画像が瞬間表示される問題を修正。
  * 2022/8/26 Ver 1.5.0
@@ -517,7 +519,7 @@ Game_Actor.prototype.performActionStart = function(action) {
 };
 
 Game_Actor.prototype.setAttackImgId = function(action) {
-    if (action.item().animationId > 0) {
+    if (action.item().animationId !== 0) {
         if (action.isRecover()) {
             this.onImgId = 11;
             this.nuun_useItemId = action.item().id;

@@ -264,9 +264,9 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | ユーティリティ　　　　　　　　　　　　 | プラグイン　プラグイン数2　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [アイテムなどのランダム取得](https://github.com/nuun888/MZ/blob/master/README/RandomItems.md)  | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.3.0 |
+| [アイテムなどのランダム取得](https://github.com/nuun888/MZ/blob/master/README/RandomItems.md) | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.3.0 |
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
-| ゲームパッド振動 |  |  |  |
+| [ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md) | [NUUN_GamePadVibration](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GamePadVibration.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

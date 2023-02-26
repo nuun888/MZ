@@ -1191,8 +1191,8 @@
 * @max 255
 * @min 0
 * @parent ItemWindow
-
-@param ItemMaxRow
+ * 
+ * @param ItemMaxRow
  * @desc 表示する行数。
  * @text アイテム行数
  * @type number
@@ -1624,6 +1624,17 @@
 * @max 255
 * @min 0
 * @parent MessageWindow
+* 
+* @param GamePadSetting
+* @text ゲームパッド設定
+* @default ////////////////////////////////
+* 
+* @param DamegeVibration
+* @desc 味方ダメージ時のゲームパッドの振動を有効にします。
+* @text 味方ダメージ時振動有効
+* @type boolean
+* @default false
+* @parent GamePadSetting
 * 
 * @param SupportActorCommand
 * @text サポートアクター設定
@@ -2441,6 +2452,8 @@ params.EscapeFailureBackground_X = Number(parameters['EscapeFailureBackground_X'
 params.EscapeFailureBackground_Y = Number(parameters['EscapeFailureBackground_Y'] || 0);
 
 params.MessageWindowOpacity = Number(parameters['MessageWindowOpacity'] || 255);
+
+params.DamegeVibration = eval(parameters['DamegeVibration'] || "false");
 
 params.SupportActorCommand_X = Number(parameters['ESupportActorCommand_X'] || 0);
 params.SupportActorCommand_Y = Number(parameters['SupportActorCommand_Y'] || 0);

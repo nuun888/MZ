@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.9.0
+ * @version 3.9.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/2/26 Ver.3.9.1
+ * 通常攻撃の画像が変化しなかった問題を修正。
+ * 試験的に味方のダメージ時にゲームパッドを振動させる機能を追加。
  * 2023/2/24 Ver.3.9.0
  * アクターステータスの各アクター表示の位置、幅を指定できる機能を追加。
  * 戦闘アニメーションがないスキルを使用後、ステートを付加させると攻撃時の画像が瞬間表示される問題を修正。
@@ -681,6 +684,9 @@ Game_Actor.prototype.performDamage = function() {
   if (params.OnActorShake) {
     this._onDamageEffect = true;
   }
+  if (params.DamegeVibration) {
+    setupDamegeVibration();
+  }
   if (this.isGuard()) {
     this.setBattleImgId(15);
     this.battleStyleImgRefresh();
@@ -715,7 +721,7 @@ Game_Actor.prototype.performActionStart = function(action) {
 };
 
 Game_Actor.prototype.setBattleStyleAttackImgId = function(action) {
-    if (action.item().animationId > 0) {
+    if (action.item().animationId !== 0) {
         if (action.isRecover()) {
             this.setBattleImgId(11, action.item().id);
             this.setBSActionActorImg("recovery");
@@ -3751,6 +3757,38 @@ Spriteset_Battle.prototype.createBattleField = function() {
 
 function conditionsParam(data, param, maxParam) {
   return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
+};
+
+function setupDamegeVibration() {
+    if (navigator.getGamepads) {
+        const gamepads = navigator.getGamepads();
+        if (gamepads) {
+            for (const gamepad of gamepads) {
+                if (gamepad && gamepad.connected) {
+                    const gamepadHapticActuator = gamepad.vibrationActuator;
+                    if (gamepadHapticActuator) {
+                        gamepadHapticActuator.playEffect('dual-rumble', {
+                            startDelay: 0,
+                            duration: 200,
+                            weakMagnitude: 1.0,
+                            strongMagnitude: 1.0,
+                        });
+                    }
+                }
+            }
+        }
+    }
+}
+
+function BsVibration(actuator, data) {
+    if (actuator) {
+        actuator.playEffect('dual-rumble', {
+            startDelay: 0,
+            duration: 200,
+            weakMagnitude: 1.0,
+            strongMagnitude: 1.0,
+        });
+    }
 };
 
 

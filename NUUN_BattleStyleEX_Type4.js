@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.2.1
+ * @version 1.3.0
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -53,12 +53,17 @@
  * 木星ペンギン氏作疑似３Dバトルプラグインと併用して、フロントビューで味方にアニメーションを表示させる場合は
  * 別途バトルスタイル拡張疑似３Dバトル併用パッチを導入してください。
  * 
+ * ゲームパッド設定の振動設定は別途NUUN_GamePadVibrationが必要です。
+ * https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md
  * 
  * ※1
  * 0:HP上昇 1:MP上昇 2:攻撃力上昇 3:防御力上昇 4:魔法力上昇 5:魔法防御上昇 6:敏捷性上昇 7:運上昇
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/2/27 Ver.1.3.0
+ * ゲームパッドを振動させる機能を正式に追加。(要NUUN_GamePadVibration)
+ * ボス消滅時にゲームパッドを振動させる機能を追加。
  * 2023/2/26 Ver.1.2.1
  * 試験的に味方のダメージ時にゲームパッドを振動させる機能を追加。
  * 2023/2/24 Ver.1.2.0
@@ -1628,7 +1633,7 @@
 * @parent MessageWindow
 * 
 * @param GamePadSetting
-* @text ゲームパッド設定
+* @text ゲームパッド設定(要NUUN_GamePadVibration)
 * @default ////////////////////////////////
 * 
 * @param DamegeVibration
@@ -1637,6 +1642,27 @@
 * @type boolean
 * @default false
 * @parent GamePadSetting
+ * 
+ * @param DamegeVibrationSetting
+ * @type struct<VibrationData>
+ * @default {"StartDelay":"0","Duration":"20","WeakMagnitude":"1.0","StrongMagnitude":"1.0"}
+ * @text ダメージ時振動設定
+ * @desc ダメージ時の振動の設定を行います。
+ * @parent GamePadSetting
+ * 
+ * @param BossCollapseVibration
+ * @desc ボス消滅エフェクト時のゲームパッドの振動を有効にします。
+ * @text ボス消滅時振動有効
+ * @type boolean
+ * @default false
+ * @parent GamePadSetting
+ * 
+ * @param BossCollapseVibrationSetting
+ * @type struct<VibrationData>
+ * @default {"StartDelay":"0","Duration":"0","WeakMagnitude":"1.0","StrongMagnitude":"1.0"}
+ * @text ボス消滅時振動設定
+ * @desc ボス消滅エフェクト時の振動の設定を行います。振動フレーム数は入力しません。
+ * @parent GamePadSetting
 * 
 * @param SupportActorCommand
 * @text サポートアクター設定
@@ -2268,6 +2294,34 @@
  * @max 24
  * 
  */
+/*~struct~VibrationData:
+ * 
+ * @param StartDelay
+ * @desc 振動を開始するまでのディレイ(ミリ秒)
+ * @text 開始ディレイ
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param Duration
+ * @desc 振動フレーム数
+ * @text 振動フレーム数
+ * @type number
+ * @default 20
+ * 
+ * @param WeakMagnitude
+ * @desc 高周波 (弱い) ランブル モーターのランブル強度。
+ * @text 高周波ランブル強度
+ * @type string
+ * @default 1.0
+ * 
+ * @param StrongMagnitude
+ * @desc 低周波 (強い) ランブル モーターのランブル強度。
+ * @text 低周波ランブル強度
+ * @type string
+ * @default 1.0
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_BattleStyleEX_Type4 = true;
@@ -2456,6 +2510,9 @@ params.EscapeFailureBackground_Y = Number(parameters['EscapeFailureBackground_Y'
 params.MessageWindowOpacity = Number(parameters['MessageWindowOpacity'] || 255);
 
 params.DamegeVibration = eval(parameters['DamegeVibration'] || "false");
+params.DamegeVibrationSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DamegeVibrationSetting'])) : null);
+params.BossCollapseVibration = eval(parameters['BossCollapseVibration'] || "false");
+params.BossCollapseVibrationSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BossCollapseVibrationSetting'])) : null);
 
 params.SupportActorCommand_X = Number(parameters['ESupportActorCommand_X'] || 0);
 params.SupportActorCommand_Y = Number(parameters['SupportActorCommand_Y'] || 0);

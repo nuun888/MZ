@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.9.1
+ * @version 3.10.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/2/27 Ver.3.10.0
+ * ゲームパッドを振動させる機能を正式に追加。(要NUUN_GamePadVibration)
  * 2023/2/26 Ver.3.9.1
  * 通常攻撃の画像が変化しなかった問題を修正。
  * 試験的に味方のダメージ時にゲームパッドを振動させる機能を追加。
@@ -684,9 +686,9 @@ Game_Actor.prototype.performDamage = function() {
   if (params.OnActorShake) {
     this._onDamageEffect = true;
   }
-  if (params.DamegeVibration) {
-    setupDamegeVibration();
-  }
+  if (Imported.NUUN_GamePadVibration && params.DamegeVibration && params.DamegeVibrationSetting) {
+    NuunManager.setupGamePadVibration(params.DamegeVibrationSetting);
+}
   if (this.isGuard()) {
     this.setBattleImgId(15);
     this.battleStyleImgRefresh();
@@ -876,9 +878,12 @@ Scene_Battle.prototype.createBackgroundWindow = function() {
 
 const _Scene_Base_createWindowLayer = Scene_Base.prototype.createWindowLayer;
 Scene_Base.prototype.createWindowLayer = function() {
-  const sprite =  new Sprite();
-  this.addChild(sprite);
-  this._itemBSBackgorundWindow = sprite;
+    const className = String(this.constructor.name);
+    if (className === "Scene_Battle") {
+        const sprite =  new Sprite();
+        this.addChild(sprite);
+        this._itemBSBackgorundWindow = sprite;
+    }
   _Scene_Base_createWindowLayer.call(this);
 };
 
@@ -1139,6 +1144,11 @@ Scene_Battle.prototype.actorStatusWindowRect = function() {
 };
 
 Scene_Battle.prototype.setBackgroundWindow = function(background, x, y) {
+    if (!this._itemBSBackgorundWindow) {
+        const sprite =  new Sprite();
+        this.addChild(sprite);
+        this._itemBSBackgorundWindow = sprite;
+    }
     const bitmap = ImageManager.nuun_LoadPictures(background);
     const sprite =  new Sprite(bitmap);
     this._itemBSBackgorundWindow.addChild(sprite);
@@ -2740,6 +2750,14 @@ Sprite_Enemy.prototype.damageOffsetY = function() {
   return _Sprite_Enemy_damageOffsetY.call(this) + params.EnemyDamage_Y;
 };
 
+const _Sprite_Enemy_startBossCollapse = Sprite_Enemy.prototype.startBossCollapse;
+Sprite_Enemy.prototype.startBossCollapse = function() {
+    _Sprite_Enemy_startBossCollapse.call(this);
+    if (Imported.NUUN_GamePadVibration && params.BossCollapseVibration && params.BossCollapseVibrationSetting) {
+        params.BossCollapseVibrationSetting.Duration = this.bitmap.height;
+        NuunManager.setupGamePadVibration(params.BossCollapseVibrationSetting);
+    }
+};
 
 const _Sprite_Animation_setup = Sprite_Animation.prototype.setup;
 Sprite_Animation.prototype.setup = function(targets, animation, mirror, delay, previous) {
@@ -3758,38 +3776,5 @@ Spriteset_Battle.prototype.createBattleField = function() {
 function conditionsParam(data, param, maxParam) {
   return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
 };
-
-function setupDamegeVibration() {
-    if (navigator.getGamepads) {
-        const gamepads = navigator.getGamepads();
-        if (gamepads) {
-            for (const gamepad of gamepads) {
-                if (gamepad && gamepad.connected) {
-                    const gamepadHapticActuator = gamepad.vibrationActuator;
-                    if (gamepadHapticActuator) {
-                        gamepadHapticActuator.playEffect('dual-rumble', {
-                            startDelay: 0,
-                            duration: 200,
-                            weakMagnitude: 1.0,
-                            strongMagnitude: 1.0,
-                        });
-                    }
-                }
-            }
-        }
-    }
-}
-
-function BsVibration(actuator, data) {
-    if (actuator) {
-        actuator.playEffect('dual-rumble', {
-            startDelay: 0,
-            duration: 200,
-            weakMagnitude: 1.0,
-            strongMagnitude: 1.0,
-        });
-    }
-};
-
 
 })();

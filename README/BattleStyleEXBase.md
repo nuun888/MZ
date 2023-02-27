@@ -143,7 +143,7 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 ![画像](img/BattleStyleEX8.png)  
 
 ### ゲームパッドの振動
-味方のHPダメージ時、ボスの消滅時にゲームパッドを振動させることができます。  
+味方のHPダメージ時、ボスの消滅時にゲームパッドを振動させることができます。(X Inputのみ対応)  
 上記の機能を使用するには別途[ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md)が必要です。  
 
 ## 競合対策パッチ  

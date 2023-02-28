@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.2
+ * @version 1.3.3
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/28/2022 Ver.1.3.3
+ * Added a function that allows you to specify key settings for switching status pages. (To change, you need a plug-in that can assign keys separately)
  * 2/25/2022 Ver.1.3.2
  * Fixed to reverse the color of the target rate, MP consumption rate, physical damage rate, magic damage rate, and floor damage rate. (red for increasing, green for decreasing)
  * Added a function to reverse the color of the difference in the original parameter difference display.
@@ -79,6 +81,20 @@
  * @desc Round off the non-display decimal point. (truncated at false)
  * @type boolean
  * @default true
+ * @parent Setting
+ * 
+ * @param KeyNextName
+ * @desc Pagination symbol name.(To change, you need a plug-in that can assign keys separately)
+ * @text Pagination symbol name
+ * @type string
+ * @default pageup
+ * @parent Setting
+ * 
+ * @param KeyPreviousName
+ * @desc Page return symbol name.(To change, you need a plug-in that can assign keys separately)
+ * @text Page return symbol name
+ * @type string
+ * @default pagedown
  * @parent Setting
  * 
  * @param EquipSetting
@@ -771,7 +787,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.2
+ * @version 1.3.3
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -800,6 +816,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/28 Ver.1.3.3
+ * ステータスのページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)
  * 2023/2/25 Ver.1.3.2
  * 狙われ率、MP消費率、物理ダメージ率、魔法ダメージ率、床ダメージ率の差分の色を逆にするよう修正。(上昇で赤、減少で緑)
  * オリジナルパラメータの差分表示に差分の色を逆にする機能を追加。
@@ -839,6 +857,20 @@
  * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
  * @type boolean
  * @default true
+ * @parent Setting
+ * 
+ * @param KeyNextName
+ * @desc ページ送りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ送りシンボル名
+ * @type string
+ * @default pageup
+ * @parent Setting
+ * 
+ * @param KeyPreviousName
+ * @desc ページ戻りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ戻りシンボル名
+ * @type string
+ * @default pagedown
  * @parent Setting
  * 
  * @param EquipSetting
@@ -1533,6 +1565,8 @@ Imported.NUUN_EquipStatusEX = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_EquipStatusEX');
     const ContentsHeight = Number(parameters['ContentsHeight'] || 36);
+    const KeyNextName = String(parameters['KeyNextName'] || "pageup");
+    const KeyPreviousName = String(parameters['KeyPreviousName'] || "pagedown");
     const EquipPageList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipPageList'])) : null) || [];
     const EquipStatusCols = Number(parameters['EquipStatusCols'] || 1);
     const ElementResist = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ElementResist'])) : null) || [];
@@ -1565,19 +1599,28 @@ Imported.NUUN_EquipStatusEX = true;
     equipContents.PageList10 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipPageList10'])) : [];
 
     let maxGaugeWidth = 128;
+
+    const _Scene_Equip_createCommandWindow = Scene_Equip.prototype.createCommandWindow;
+    Scene_Equip.prototype.createCommandWindow = function() {
+        _Scene_Equip_createCommandWindow.call(this);
+        //if (KeyNextName !== "pageup" && KeyPreviousName !== "pagedown") {
+        //    this._commandWindow.setHandler(KeyNextName, this.nextPage.bind(this));
+        //    this._commandWindow.setHandler(KeyPreviousName, this.previousPage.bind(this));
+        //}
+    };
     
     const _Scene_Equip_createSlotWindow = Scene_Equip.prototype.createSlotWindow;
     Scene_Equip.prototype.createSlotWindow = function() {
         _Scene_Equip_createSlotWindow.call(this);
-        this._slotWindow.setHandler("pagedown", this.nextPage.bind(this));
-        this._slotWindow.setHandler("pageup", this.previousPage.bind(this));
+        this._slotWindow.setHandler(KeyNextName, this.nextPage.bind(this));
+        this._slotWindow.setHandler(KeyPreviousName, this.previousPage.bind(this));
     };
 
     const _Scene_Equip_createItemWindow = Scene_Equip.prototype.createItemWindow;
     Scene_Equip.prototype.createItemWindow = function() {
         _Scene_Equip_createItemWindow.call(this);
-        this._itemWindow.setHandler("pagedown", this.nextPage.bind(this));
-        this._itemWindow.setHandler("pageup", this.previousPage.bind(this));
+        this._itemWindow.setHandler(KeyNextName, this.nextPage.bind(this));
+        this._itemWindow.setHandler(KeyPreviousName, this.previousPage.bind(this));
     };
 
     Scene_Equip.prototype.nextPage = function() {
@@ -1586,6 +1629,9 @@ Imported.NUUN_EquipStatusEX = true;
         this._statusWindow.setPage((page + 1) % maxPage);
         this._statusWindow.refresh();
         SoundManager.playCursor();
+        //if (KeyNextName !== "pageup" && KeyPreviousName !== "pagedown" && !this._slotWindow.active && !this._itemWindow.active) {
+        //    this._commandWindow.activate();
+        //} else 
         if (this._slotWindow.visible) {
             this._slotWindow.activate();
         } else if (this._itemWindow.visible) {
@@ -1599,6 +1645,9 @@ Imported.NUUN_EquipStatusEX = true;
         this._statusWindow.setPage((page + maxPage - 1) % maxPage);
         this._statusWindow.refresh();
         SoundManager.playCursor();
+        //if (KeyNextName !== "pageup" && KeyPreviousName !== "pagedown" && !this._slotWindow.active && !this._itemWindow.active) {
+        //    this._commandWindow.activate();
+        //} else 
         if (this._slotWindow.visible) {
             this._slotWindow.activate();
         } else if (this._itemWindow.visible) {

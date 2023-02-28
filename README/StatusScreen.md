@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.5.1
+# Ver.2.5.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -86,7 +86,16 @@ APNGを表示するには別途ApngPicture.js(トリアコンタン様)が必要
 
 ### レーダーチャート設定
 
+### 特定のアクター又は職業の表示させる装備を指定
+アクター又は職業のメモ欄  
+`<StatusShowEquips:[name],[name]...>`  
+`[name]`:装備部位名  
+指定した装備部位のみ表示されます。指定がない場合は全ての部位が表示されます。  
+アクターと職業両方に記入した場合はアクターの設定が優先されます。  
+
 ### 更新履歴
+2023/2/28 Ver.2.5.2  
+特定の装備部位のみ表示させる機能を追加。  
 2023/2/25 Ver.2.5.1  
 APNGに対応。  
 2023/1/14 Ver.2.5.0

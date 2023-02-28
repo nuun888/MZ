@@ -10,14 +10,14 @@
 
 
 ## ゲームパッド(XInput)  
-0:A  
-1:B  
-2:X  
-3:Y  
-4:LB  
-5:RB  
-6:LT  
-7:RT  
+0:A(OK)  
+1:B(Cancel)  
+2:X(Shift)  
+3:Y(Menu)  
+4:LB(PageUp)  
+5:RB(PageDown)  
+6:LT(PageDown2)  
+7:RT(PageUp2)  
 8:Back  
 9:Start  
 10:左スティック押し  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.5.1
+ * @version 2.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -65,6 +65,14 @@
  * 文章を表示させる場合は<desc1:ああああ>と記入してください。
  * 
  * 
+ * 特定のアクター又は職業の表示させる装備を指定する。
+ * アクター又は職業のメモ欄
+ * <StatusShowEquips:[name],[name]...>
+ * [name]:装備部位名
+ * 指定した装備部位のみ表示されます。指定がない場合は全ての部位が表示されます。
+ * アクターと職業両方に記入した場合はアクターの設定が優先されます。
+ * 
+ * 
  * キーボード操作
  * QWキー　キャラ切り替え
  * ←→キー　ページ切り替え
@@ -78,6 +86,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/2/28 Ver.2.5.2
+ * 特定の装備部位のみ表示させる機能を追加。
  * 2023/2/25 Ver.2.5.1
  * APNGに対応。
  * 2023/1/14 Ver.2.5.0
@@ -2032,6 +2042,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
     this.contentsFontSize(list);
     const lineHeight = this.lineHeight();
     const equips = this._actor.equips();
+    const showEquips = this.getShowEquipList(actor);
     const e1uipsLength = list.EquipNum > 0 ? list.EquipNum : equips.length;
     let x2 = 0;
     let y2 = y;
@@ -2051,31 +2062,34 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
         width2 = this.contensWidth(width);
         x2 = this.contensX(x);
     }
+    let contentsY = y2;
     for (let i = 0; i < e1uipsLength; i++) {
         const index = i + (list.EquipStartIndex || 0);
-        y = y2 + lineHeight * i;
-        let sw = 0;
-        let iconWidth = 0;
-        if (list.Back) {
-            this.drawContentsBackground(list.Back, x, y, width); 
-        }
-        const item = equips[index];
-        if (EquipNameVisible > 1) {//アイコン表示
-            const iconId = EquipIcons[i] ? EquipIcons[i].EquipIconId : 0;
-            if (iconId > 0) {
-              this.drawIcon(iconId, x2, y + 2);
+        const slotName = this.actorSlotName(actor, index);
+        if (!showEquips || (showEquips && showEquips.some(data => data === slotName))) {
+            let sw = 0;
+            let iconWidth = 0;
+            if (list.Back) {
+                this.drawContentsBackground(list.Back, x, contentsY, width); 
             }
-            iconWidth = ImageManager.iconWidth + (EquipNameVisible === 2 ? 24 : 4);
+            const item = equips[index];
+            if (EquipNameVisible > 1) {//アイコン表示
+                const iconId = EquipIcons[i] ? EquipIcons[i].EquipIconId : 0;
+                if (iconId > 0) {
+                  this.drawIcon(iconId, x2, contentsY + 2);
+                }
+                iconWidth = ImageManager.iconWidth + (EquipNameVisible === 2 ? 24 : 4);
+            }
+            if (EquipNameVisible === 1 || EquipNameVisible === 3) {//デフォルト
+                sw += this.systemWidth(list.SystemItemWidth, width2);
+                this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+                this.drawText(slotName, x2 + iconWidth, contentsY, sw);
+            }
+            sw += iconWidth;
+            this.resetTextColor();
+            this.drawItemName(item, x2 + sw, contentsY, width2 - sw);
+            contentsY += lineHeight;
         }
-        if (EquipNameVisible === 1 || EquipNameVisible === 3) {//デフォルト
-            const slotName = this.actorSlotName(actor, index);
-            sw += this.systemWidth(list.SystemItemWidth, width2);
-            this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-            this.drawText(slotName, x2 + iconWidth, y, sw);
-        }
-        sw += iconWidth;
-        this.resetTextColor();
-        this.drawItemName(item, x2 + sw, y, width2 - sw);
     }
 };
 
@@ -2486,6 +2500,16 @@ Window_Status.prototype.characterSwitchingHelp = function(list, x, y, width) {
 	this.drawText(text +"←→キー:項目の切替", x, y + lineHeight, width,'right');
 	this.resetTextColor();
 	this.contents.fontSize = $gameSystem.mainFontSize();
+};
+
+Window_Status.prototype.getShowEquipList = function(actor) {
+    if (actor.actor().meta.StatusShowEquips) {
+        return actor.actor().meta.StatusShowEquips.split(',');
+    } else if (actor.currentClass().meta.StatusShowEquips) {
+        return actor.currentClass().meta.StatusShowEquips.split(',');
+    } else {
+        return null;
+    }
 };
 
 Window_Status.prototype.statusParamDecimal = function(val, decimal) {

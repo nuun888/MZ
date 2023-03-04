@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.13
+ * @version 2.17.14
  * 
  * @help
  * Implement an enemy book.
@@ -200,6 +200,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/4/2023 Ver.2.17.14
+ * Conflict resolution.
  * 3/4/2023 Ver.2.17.13
  * Added a function that allows you to specify key settings for page switching on monster pages. (You need a plug-in that can assign keys separately)
  * 2/26/2023 Ver.2.17.12
@@ -2807,7 +2809,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.13
+ * @version 2.17.14
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2999,6 +3001,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/4 Ver.2.17.14
+ * 競合の解消。
  * 2023/3/4 Ver.2.17.13
  * モンスターページのページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)
  * 2023/2/26 Ver.2.17.12
@@ -7030,6 +7034,7 @@ Scene_EnemyBook.prototype.createIndexEnemyWindow = function() {
     if (this._categoryWindow) {
         this._categoryWindow.setEnemyIndexWindow(this._indexWindow);
         this._indexWindow.hide();
+        this._categoryNameWindow.hide();
     } else {
         this._indexWindow.activate();
     }
@@ -7160,6 +7165,7 @@ Scene_EnemyBook.prototype.enemyIndexSelection = function() {
       this._categoryWindow.hide();
       this._categoryWindow.deselect();
       this._categoryWindow.deactivate();
+      this._categoryNameWindow.show();
     }
     this._indexWindow.refresh();
     this._indexWindow.show();
@@ -7172,6 +7178,7 @@ Scene_EnemyBook.prototype.enemyIndexSelection = function() {
 Scene_EnemyBook.prototype.enemyCategorySelection = function() {
     this._categoryWindow.setSelect();
     this._categoryWindow.show();
+    this._categoryNameWindow.hide();
     this._indexWindow.hide();
     this._categoryWindow.activate();
     this._indexWindow.deselect();

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.5.6
+ * @version 1.5.7
  * @base NUUN_Base
  * 
  * @help
@@ -81,6 +81,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/4/2023 Ver.1.5.7
+ * Fixed to perform update processing when passive skill is acquired.
  * 1/28/2023 Ver.1.5.6
  * Corrected because the description of some condition modes was written backwards.
  * 11/23/2022 Ver.1.5.5
@@ -278,7 +280,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.5.5
+ * @version 1.5.7
  * @base NUUN_Base
  * 
  * @help
@@ -339,6 +341,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/4 Ver.1.5.7
+ * パッシブスキル習得時に更新処理を行うように修正。
  * 2023/1/28 Ver.1.5.6
  * 一部の条件モードの説明が逆に表記していたので修正。
  * 2022/11/23 Ver.1.5.5
@@ -536,205 +540,221 @@ var Imported = Imported || {};
 Imported.NUUN_PassiveSkill = true;
 
 (() => {
-  const parameters = PluginManager.parameters('NUUN_PassiveSkill');
-  const PassiveSkillConditions = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PassiveSkillConditions'])) : null) || [];
-  const PassiveSkillType = Number(parameters['PassiveSkillType'] || 0);
-  const CondBasePassive = eval(parameters['CondBasePassive'] || "false");
+                                                                                                                                                                    const parameters = PluginManager.parameters('NUUN_PassiveSkill');
+    const PassiveSkillConditions = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PassiveSkillConditions'])) : null) || [];
+    const PassiveSkillType = Number(parameters['PassiveSkillType'] || 0);
+    const CondBasePassive = eval(parameters['CondBasePassive'] || "false");
 
-  const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
-  Game_Actor.prototype.initMembers = function() {
-    _Game_Actor_initMembers.call(this);
-    this._passiveSkillList = [];
-    //this._passiveCalc = false;
-  };
+    const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
+    Game_Actor.prototype.initMembers = function() {
+        _Game_Actor_initMembers.call(this);
+        this._passiveSkillList = [];
+        //this._passiveCalc = false;
+    };
 
-  Game_Actor.prototype.isPassiveSkill = function(item) {
-    return !!item.meta.PassiveSkill;
-  };
+    Game_Actor.prototype.isPassiveSkill = function(item) {
+        return !!item.meta.PassiveSkill;
+    };
 
-  Game_Actor.prototype.getPassiveSkillId = function(item) {
-    return item.meta.PassiveSkill ? Number(item.meta.PassiveSkill) : 0;
-  };
+    Game_Actor.prototype.getPassiveSkillId = function(item) {
+        return item.meta.PassiveSkill ? Number(item.meta.PassiveSkill) : 0;
+    };
 
-  Game_Actor.prototype.getPassiveConditions = function(item) {
-    return item.meta.PassiveConditions ? item.meta.PassiveConditions.split(',').map(Number) : [];
-  };
+    Game_Actor.prototype.getPassiveConditions = function(item) {
+        return item.meta.PassiveConditions ? item.meta.PassiveConditions.split(',').map(Number) : [];
+    };
 
-  Game_Actor.prototype.getPassiveMode = function(item) {
-    return item.meta.PassiveMatch ? Number(item.meta.PassiveMatch) : 1;
-  };
+    Game_Actor.prototype.getPassiveMode = function(item) {
+        return item.meta.PassiveMatch ? Number(item.meta.PassiveMatch) : 1;
+    };
 
-  const _Game_Actor_paramPlus = Game_Actor.prototype.paramPlus;
-  Game_Actor.prototype.paramPlus = function(paramId) {
-    let value = _Game_Actor_paramPlus.call(this, paramId);
-    value += this.passiveParam(paramId);
-    return value;
-  };
+    const _Game_Actor_paramPlus = Game_Actor.prototype.paramPlus;
+    Game_Actor.prototype.paramPlus = function(paramId) {
+        let value = _Game_Actor_paramPlus.call(this, paramId);
+        value += this.passiveParam(paramId);
+        return value;
+    };
 
-  const _Game_Actor_traitObjects = Game_Actor.prototype.traitObjects;
-  Game_Actor.prototype.traitObjects = function() {
-    let objects = _Game_Actor_traitObjects.call(this);
-    //パッシブスキルのオブジェクトを取得
-    Array.prototype.push.apply(objects, this.passiveObject());
-    //objects = objects.concat(this.passiveObject());
-    return objects;
-  };
+    const _Game_Actor_traitObjects = Game_Actor.prototype.traitObjects;
+    Game_Actor.prototype.traitObjects = function() {
+        let objects = _Game_Actor_traitObjects.call(this);
+        //パッシブスキルのオブジェクトを取得
+        Array.prototype.push.apply(objects, this.passiveObject());
+        //objects = objects.concat(this.passiveObject());
+        return objects;
+    };
 
-  Game_Actor.prototype.passiveParam = function(paramId) {
-    return this.getPassiveSkill(paramId);
-  };
+    Game_Actor.prototype.passiveParam = function(paramId) {
+        return this.getPassiveSkill(paramId);
+    };
 
-  Game_Actor.prototype.passiveObject = function() {
-    return this.getPassiveObject(); 
-  };
+    Game_Actor.prototype.passiveObject = function() {
+        return this.getPassiveObject(); 
+    };
 
-  Game_Actor.prototype.getPassiveSkill = function(paramId) {
-    let value = 0;
-    if (!this._passiveCalc) {
-      this._passiveCalc = true;
-      this.skills().forEach(skill => {
-        if (this.isPassiveSkill(skill) && this.condPassiveSkill(skill)) {
-          const weapon = this.getPassiveSkillWeapon(skill);
-          if (weapon > 0) {
-            value += $dataWeapons[weapon].params[paramId];
-          }
+    Game_Actor.prototype.getPassiveSkill = function(paramId) {
+        let value = 0;
+        if (!this._passiveCalc) {
+        this._passiveCalc = true;
+        this.skills().forEach(skill => {
+            if (this.isPassiveSkill(skill) && this.condPassiveSkill(skill)) {
+            const weapon = this.getPassiveSkillWeapon(skill);
+            if (weapon > 0) {
+                value += $dataWeapons[weapon].params[paramId];
+            }
+            }
+        });
+        this._passiveCalc = false;
         }
-      });
-      this._passiveCalc = false;
-    }
-    return value;
-  };
+        return value;
+    };
 
-  Game_Actor.prototype.getPassiveObject = function() {
-    const passiveSkills = [];
-    if (!this._passiveCalc) {
-      this._passiveCalc = true;
-      this.skills().forEach(skill => {
-        if (this.isPassiveSkill(skill) && this.condPassiveSkill(skill)) {
-          const weapon = this.getPassiveSkillWeapon(skill);
-          if (weapon > 0) {
-            Array.prototype.push.apply(passiveSkills, [$dataWeapons[weapon]]);
-            //passiveSkills.push($dataWeapons[weapon]);
-          }
+    Game_Actor.prototype.getPassiveObject = function() {
+        const passiveSkills = [];
+        if (!this._passiveCalc) {
+        this._passiveCalc = true;
+        this.skills().forEach(skill => {
+            if (this.isPassiveSkill(skill) && this.condPassiveSkill(skill)) {
+            const weapon = this.getPassiveSkillWeapon(skill);
+            if (weapon > 0) {
+                Array.prototype.push.apply(passiveSkills, [$dataWeapons[weapon]]);
+                //passiveSkills.push($dataWeapons[weapon]);
+            }
+            }
+        });
+        this._passiveCalc = false;
         }
-      });
-      this._passiveCalc = false;
-    }
-    return passiveSkills;
-  };
+        return passiveSkills;
+    };
 
-  Game_Actor.prototype.condPassiveSkill = function(skill) {
-    if (Imported.NUUN_ConditionsBase && CondBasePassive) {
-      return this.getCondition(skill);
-    }
-    let result = true;
-    const conditions = this.getPassiveConditions(skill);
-    if (conditions.length > 0) {
-      const list = PassiveSkillConditions;
-      if (this.getPassiveMode(skill) === 0) {
-        result = conditions.some(id => this.skillConditions(list[id - 1]));
-      } else {
-        result = conditions.every(id => this.skillConditions(list[id - 1]));
-      }
-    }
-    return result;
-  };
+    Game_Actor.prototype.condPassiveSkill = function(skill) {
+        if (Imported.NUUN_ConditionsBase && CondBasePassive) {
+        return this.getCondition(skill);
+        }
+        let result = true;
+        const conditions = this.getPassiveConditions(skill);
+        if (conditions.length > 0) {
+        const list = PassiveSkillConditions;
+        if (this.getPassiveMode(skill) === 0) {
+            result = conditions.some(id => this.skillConditions(list[id - 1]));
+        } else {
+            result = conditions.every(id => this.skillConditions(list[id - 1]));
+        }
+        }
+        return result;
+    };
 
-  Game_Actor.prototype.getCondition = function(skill) {
-    const condTag = "PassiveConditions";
-    const action = $gameTemp.getActionData();
+    Game_Actor.prototype.getCondition = function(skill) {
+        const condTag = "PassiveConditions";
+        const action = $gameTemp.getActionData();
+        
+        return this.getTriggerConditions(skill, this, condTag , null, 'Party'+ condTag, 'Troop'+ condTag, action.action, action.damage, this.getPassiveMode(skill));
+    };
+
+    Game_Actor.prototype.getPassiveSkillWeapon = function(skill) {
+        return this.getPassiveSkillId(skill);
+    };
     
-    return this.getTriggerConditions(skill, this, condTag , null, 'Party'+ condTag, 'Troop'+ condTag, action.action, action.damage, this.getPassiveMode(skill));
-  };
-
-  Game_Actor.prototype.getPassiveSkillWeapon = function(skill) {
-    return this.getPassiveSkillId(skill);
-  };
-  
-  const _Game_Actor_addedSkillTypes = Game_Actor.prototype.addedSkillTypes;
-  Game_Actor.prototype.addedSkillTypes = function() {
-    const traits = _Game_Actor_addedSkillTypes.call(this);
-    if ($gameParty.inBattle()) {
-      return traits.filter(id => id !== PassiveSkillType);
-    }
-    return traits;
-  };
-
-  Game_Actor.prototype.skillConditions = function(list) {
-    if (!list) {
-      return true;
-    }
-    switch (list.ParamConditions) {
-      case 'HP':
-        if (!this._pmhp) {
-          const _mhp = this.mhp;
-          this._pmhp = _mhp;
+    const _Game_Actor_addedSkillTypes = Game_Actor.prototype.addedSkillTypes;
+    Game_Actor.prototype.addedSkillTypes = function() {
+        const traits = _Game_Actor_addedSkillTypes.call(this);
+        if ($gameParty.inBattle()) {
+        return traits.filter(id => id !== PassiveSkillType);
         }
-        return this.hp >= this._pmhp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.hp <= this._pmhp * list.UpLimit / 100) : true);
-      case 'MP':
-        if (!this._pmmp) {
-          const _mmp = this.mmp;
-          this._pmmp = _mmp;
+        return traits;
+    };
+
+    Game_Actor.prototype.skillConditions = function(list) {
+        if (!list) {
+        return true;
         }
-        return this.mp >= this._pmmp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.mp <= this._pmmp * list.UpLimit / 100) : true);
-      case 'TP':
-        return this.tp >= this.maxTp() * list.DwLimit / 100 && (list.UpLimit > 0 ? this.tp <= this.maxTp() * list.UpLimit / 100 : true);
-      case 'State':
-        return this._states.find(id => id === list.StateId);
-      case 'StateR':
-        return !(this._states.some(id => id === list.StateId));
-      case 'Buff':
-        return this._buffs[list.BuffType] > 0;
-      case 'BuffR':
-        return this._buffs[list.BuffType] === 0;
-      case 'Debuff':
-        return this._buffs[list.DebuffType] < 0;
-      case 'DebuffR':
-        return this._buffs[list.DebuffType] === 0;
-      case 'Vehicle':
-        return this.isVehicle(list.Vehicle[0]);
-      case 'Equip':
-        return list.EquipWeapon > 0 ? this.isEquippedWeaponType(list.EquipWeapon) : this.isEquippedArmorType(list.EquipWeapon);
-      case 'Turn':
-        return this.turnCount() >= list.DwLimit && (list.UpLimit > 0 ? this.turnCount() <= list.UpLimit : true);
-      case 'GVal':
-        return $gameVariables.value(list.VariableId) >= list.DwLimit &&
-         (list.UpLimit > 0 ? $gameVariables.value(list.VariableId) <= list.UpLimit : true);
-      case 'GSwc':
-        return $gameSwitches.value(list.SwitchId);
-    }
-    return false;
-  };
+        switch (list.ParamConditions) {
+        case 'HP':
+            if (!this._pmhp) {
+            const _mhp = this.mhp;
+            this._pmhp = _mhp;
+            }
+            return this.hp >= this._pmhp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.hp <= this._pmhp * list.UpLimit / 100) : true);
+        case 'MP':
+            if (!this._pmmp) {
+            const _mmp = this.mmp;
+            this._pmmp = _mmp;
+            }
+            return this.mp >= this._pmmp * list.DwLimit / 100 && (list.UpLimit > 0 ? (this.mp <= this._pmmp * list.UpLimit / 100) : true);
+        case 'TP':
+            return this.tp >= this.maxTp() * list.DwLimit / 100 && (list.UpLimit > 0 ? this.tp <= this.maxTp() * list.UpLimit / 100 : true);
+        case 'State':
+            return this._states.find(id => id === list.StateId);
+        case 'StateR':
+            return !(this._states.some(id => id === list.StateId));
+        case 'Buff':
+            return this._buffs[list.BuffType] > 0;
+        case 'BuffR':
+            return this._buffs[list.BuffType] === 0;
+        case 'Debuff':
+            return this._buffs[list.DebuffType] < 0;
+        case 'DebuffR':
+            return this._buffs[list.DebuffType] === 0;
+        case 'Vehicle':
+            return this.isVehicle(list.Vehicle[0]);
+        case 'Equip':
+            return list.EquipWeapon > 0 ? this.isEquippedWeaponType(list.EquipWeapon) : this.isEquippedArmorType(list.EquipWeapon);
+        case 'Turn':
+            return this.turnCount() >= list.DwLimit && (list.UpLimit > 0 ? this.turnCount() <= list.UpLimit : true);
+        case 'GVal':
+            return $gameVariables.value(list.VariableId) >= list.DwLimit &&
+            (list.UpLimit > 0 ? $gameVariables.value(list.VariableId) <= list.UpLimit : true);
+        case 'GSwc':
+            return $gameSwitches.value(list.SwitchId);
+        }
+        return false;
+    };
 
-  Game_Actor.prototype.isVehicle = function(type) {
-    if (type === 'boat') {
-      return $gamePlayer.isInBoat();
-    } else if (type === 'ship') {
-      return $gamePlayer.isInShip();
-    } else if (type === 'airship') {
-      return $gamePlayer.isInAirship();
-    } else {
-      return $gamePlayer.isInVehicle();
-    }
-  };
+    Game_Actor.prototype.isVehicle = function(type) {
+        if (type === 'boat') {
+        return $gamePlayer.isInBoat();
+        } else if (type === 'ship') {
+        return $gamePlayer.isInShip();
+        } else if (type === 'airship') {
+        return $gamePlayer.isInAirship();
+        } else {
+        return $gamePlayer.isInVehicle();
+        }
+    };
 
-  Game_Actor.prototype.isEquippedWeaponType = function(type) {
-    return this.equips().some(equip => equip && equip.wtypeId === type);
-  };
+    Game_Actor.prototype.isEquippedWeaponType = function(type) {
+        return this.equips().some(equip => equip && equip.wtypeId === type);
+    };
 
   Game_Actor.prototype.isEquippedArmorType = function(type) {
     return this.equips().some(equip => equip && equip.atypeId === type);
-  };
+                            };
 
-  const _Game_Battler_refresh = Game_Battler.prototype.refresh;
-  Game_Battler.prototype.refresh = function() {
-    _Game_Battler_refresh.call(this);
-    this.resetRassiveParam();
-  };
+    const _Game_Battler_refresh = Game_Battler.prototype.refresh;
+    Game_Battler.prototype.refresh = function() {
+        _Game_Battler_refresh.call(this);
+        this.resetRassiveParam();
+    };
 
-  Game_Battler.prototype.resetRassiveParam = function() {
-    this._pmhp = null;
-    this._pmmp = null;
-  };
+    Game_Battler.prototype.resetRassiveParam = function() {
+        this._pmhp = null;
+        this._pmmp = null;
+    };                            
+
+    const _Game_Actor_learnSkill = Game_Actor.prototype.learnSkill;
+    Game_Actor.prototype.learnSkill = function(skillId) {
+        _Game_Actor_learnSkill.call(this, skillId);
+        if ($dataSkills[skillId] && $dataSkills[skillId].meta.PassiveSkill) {
+            this.refresh();
+        }
+    };
+
+    const _Game_Actor_forgetSkill = Game_Actor.prototype.forgetSkill;
+    Game_Actor.prototype.forgetSkill = function(skillId) {
+        _Game_Actor_forgetSkill.call(this, skillId);
+        if ($dataSkills[skillId] && $dataSkills[skillId].meta.PassiveSkill) {
+            this.refresh();
+        }
+    };
 
 })();

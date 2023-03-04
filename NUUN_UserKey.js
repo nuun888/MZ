@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_BankSystem.js
+ * NUUN_UserKey.js
  * 
  * Copyright (C) 2023 NUUN
  * This software is released under the MIT License.
@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Set keyboard keys and gamepad button assignments.
@@ -41,11 +41,18 @@
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
+ * Log
+ * 3/4/2023 Ver.1.0.1
+ * Added repeat feature.
+ * Fixed so that the set keys and buttons work even in battle.
+ * 2/28/2023 Ver.1.0.0
+ * First edition.
+ * 
  * @param UserKey
  * @type struct<UserKeyList>[]
  * @text Key setting
  * @desc Key setting.
- * @default ["{\"UserKey\":\"{\\\"KeyCode\\\":\\\"65\\\",\\\"GamePadCode\\\":\\\"6\\\",\\\"KeyName\\\":\\\"\\\\\\\"pagedown2\\\\\\\"\\\",\\\"KeySprict\\\":\\\"\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"83\\\",\\\"GamePadCode\\\":\\\"7\\\",\\\"KeyName\\\":\\\"\\\\\\\"pageup2\\\\\\\"\\\",\\\"KeySprict\\\":\\\"\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"10\\\",\\\"KeyName\\\":\\\"\\\\\\\"leftstick\\\\\\\"\\\",\\\"KeySprict\\\":\\\"\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"11\\\",\\\"KeyName\\\":\\\"\\\\\\\"rightstick\\\\\\\"\\\",\\\"KeySprict\\\":\\\"\\\"}\"}"]
+ * @default ["{\"UserKey\":\"{\\\"KeyCode\\\":\\\"65\\\",\\\"GamePadCode\\\":\\\"6\\\",\\\"KeyName\\\":\\\"\\\\\\\"pagedown2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"83\\\",\\\"GamePadCode\\\":\\\"7\\\",\\\"KeyName\\\":\\\"\\\\\\\"pageup2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"10\\\",\\\"KeyName\\\":\\\"\\\\\\\"leftstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"11\\\",\\\"KeyName\\\":\\\"\\\\\\\"rightstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}"]
  * 
  * 
  */
@@ -60,12 +67,17 @@
  */
 /*~struct~UserKeyData:
  * 
+ * @param CommonSetting
+ * @text Common setting
+ * @default ------------------------------
+ * 
  * @param KeyCode
  * @desc Key code.
  * @text Key code
  * @type number
  * @default -1
  * @min -1
+ * @parent CommonSetting
  * 
  * @param GamePadCode
  * @desc Gamepad code.
@@ -73,18 +85,46 @@
  * @type number
  * @default -1
  * @min -1
+ * @parent CommonSetting
  * 
  * @param KeyName
  * @desc Any symbolic name. Enclose the string with ' or ".
  * @text Symbol name
  * @type string
  * @default
+ * @parent CommonSetting
+ * 
+ * @param Repeated
+ * @desc Repeat enabled.
+ * @text Repeat enabled
+ * @type boolean
+ * @default false
+ * @parent CommonSetting
+ * 
+ * @param SceneKeyAndButtonSetting
+ * @text On-scene key and button setting
+ * @default ------------------------------
  * 
  * @param KeySprict
- * @desc Any script.
+ * @desc Any script.(not valid from handler)
  * @text Any script
  * @type combo
  * @default
+ * @parent SceneKeyAndButtonSetting
+ * 
+ * @param MapValid
+ * @desc Valid on the map.
+ * @text Map Valid
+ * @type boolean
+ * @default true
+ * @parent SceneKeyAndButtonSetting
+ * 
+ * @param BattleValid
+ * @desc Valid in battle.
+ * @text Battle valid
+ * @type boolean
+ * @default false
+ * @parent SceneKeyAndButtonSetting
  * 
  */
 /*:ja
@@ -93,7 +133,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを設定します。
@@ -122,11 +162,18 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * 更新履歴
+ * 2023/3/4 Ver.1.0.1
+ * リピート機能を追加。
+ * 戦闘中でも設定したキー、ボタンが動作するように修正。
+ * 2023/2/28 Ver.1.0.0
+ * 初版
+ * 
  * @param UserKey
  * @type struct<UserKeyList>[]
  * @text キーの設定
  * @desc キーの設定。
- * @default ["{\"UserKey\":\"{\\\"KeyCode\\\":\\\"65\\\",\\\"GamePadCode\\\":\\\"6\\\",\\\"KeyName\\\":\\\"\\\\\\\"pagedown2\\\\\\\"\\\",\\\"KeySprict\\\":\\\"\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"83\\\",\\\"GamePadCode\\\":\\\"7\\\",\\\"KeyName\\\":\\\"\\\\\\\"pageup2\\\\\\\"\\\",\\\"KeySprict\\\":\\\"\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"10\\\",\\\"KeyName\\\":\\\"\\\\\\\"leftstick\\\\\\\"\\\",\\\"KeySprict\\\":\\\"\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"11\\\",\\\"KeyName\\\":\\\"\\\\\\\"rightstick\\\\\\\"\\\",\\\"KeySprict\\\":\\\"\\\"}\"}"]
+ * @default ["{\"UserKey\":\"{\\\"KeyCode\\\":\\\"65\\\",\\\"GamePadCode\\\":\\\"6\\\",\\\"KeyName\\\":\\\"\\\\\\\"pagedown2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"83\\\",\\\"GamePadCode\\\":\\\"7\\\",\\\"KeyName\\\":\\\"\\\\\\\"pageup2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"10\\\",\\\"KeyName\\\":\\\"\\\\\\\"leftstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"11\\\",\\\"KeyName\\\":\\\"\\\\\\\"rightstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}"]
  * 
  * 
  */
@@ -141,12 +188,17 @@
  */
 /*~struct~UserKeyData:ja
  * 
+ * @param CommonSetting
+ * @text 共通設定
+ * @default ------------------------------
+ * 
  * @param KeyCode
  * @desc キーコード
  * @text キーコード
  * @type number
  * @default -1
  * @min -1
+ * @parent CommonSetting
  * 
  * @param GamePadCode
  * @desc ゲームパッドコード
@@ -154,18 +206,46 @@
  * @type number
  * @default -1
  * @min -1
+ * @parent CommonSetting
  * 
  * @param KeyName
  * @desc 任意のシンボル名。文字列を'または"で囲ってください。
  * @text シンボル名
  * @type string
  * @default
+ * @parent CommonSetting
+ * 
+ * @param Repeated
+ * @desc リピート有効
+ * @text リピート有効
+ * @type boolean
+ * @default false
+ * @parent CommonSetting
+ * 
+ * @param SceneKeyAndButtonSetting
+ * @text シーン上キー、ボタン設定
+ * @default ------------------------------
  * 
  * @param KeySprict
- * @desc 任意のスクリプト
+ * @desc 任意のスクリプト(ハンドラからは無効)
  * @text 任意スクリプト
  * @type combo
  * @default
+ * @parent SceneKeyAndButtonSetting
+ * 
+ * @param MapValid
+ * @desc マップ上で有効
+ * @text マップ上有効
+ * @type boolean
+ * @default true
+ * @parent SceneKeyAndButtonSetting
+ * 
+ * @param BattleValid
+ * @desc バトル中で有効
+ * @text バトル中有効
+ * @type boolean
+ * @default false
+ * @parent SceneKeyAndButtonSetting
  * 
  */
 
@@ -200,7 +280,7 @@ Imported.NUUN_BankSystem = true;
             for (const data of UserKey) {
                 if (data.UserKey && data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0) {
                     const keyName = data.UserKey.KeyName;
-                    if (this.isHandled(keyName) && Input.isTriggered(keyName)) {
+                    if (this.isHandled(keyName) && isRepeated(data.UserKey.Repeated, keyName)) {
                         return this.processUserKey(keyName);
                     }
                 }
@@ -222,15 +302,23 @@ Imported.NUUN_BankSystem = true;
     Scene_Map.prototype.updateScene = function() {
         _Scene_Map_updateScene.call(this);
         if (!SceneManager.isSceneChanging()) {
-            this.updateUserKey();
+            this.updateUserKey('MapValid');
         }
     };
 
-    Scene_Map.prototype.updateUserKey = function() {
+    const _Scene_Battle_update = Scene_Battle.prototype.update;
+    Scene_Battle.prototype.update = function() {
+        _Scene_Battle_update.call(this);
+        if (this.isActive() && !this.isBusy()) {
+            this.updateUserKey('BattleValid');
+        }
+    };
+    
+    Scene_Base.prototype.updateUserKey = function(valid) {
         for (const data of UserKey) {
-            if (data.UserKey && !!data.UserKey.KeySprict && data.UserKey.KeyCode >= 0) {
+            if (data.UserKey && data.UserKey[valid] && !!data.UserKey.KeySprict && data.UserKey.KeyCode >= 0) {
                 const keyName = data.UserKey.KeyName;
-                if (Input.isTriggered(keyName)) {
+                if (isRepeated(data.UserKey.Repeated, keyName)) {
                     this._userKeyCalling = true;
                 }
                 if (this._userKeyCalling && !$gamePlayer.isMoving()) {
@@ -241,8 +329,12 @@ Imported.NUUN_BankSystem = true;
         }
     };
 
-    Scene_Map.prototype.callUserKey = function(keySprict) {
+    Scene_Base.prototype.callUserKey = function(keySprict) {
         eval(keySprict);
+    };
+
+    function isRepeated(repeat, name) {
+        return repeat ? Input.isRepeated(name) : Input.isTriggered(name);
     };
     
 })();

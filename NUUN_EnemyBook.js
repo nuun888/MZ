@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.12
+ * @version 2.17.13
  * 
  * @help
  * Implement an enemy book.
@@ -200,6 +200,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/4/2023 Ver.2.17.13
+ * Added a function that allows you to specify key settings for page switching on monster pages. (You need a plug-in that can assign keys separately)
  * 2/26/2023 Ver.2.17.12
  * Fixed an issue where enemies were not registered in the encyclopedia when they were added via plugins instead of appearing as enemies.
  * 2/25/2023 Ver.2.17.11
@@ -400,6 +402,20 @@
  * @desc Scales the background image to fit the window size or screen.
  * @type boolean
  * @default false
+ * @parent BasicSetting
+ * 
+ * @param PageNextSymbol
+ * @desc Pagination symbol name.(To change, you need a plug-in that can assign keys separately)
+ * @text Pagination symbol name
+ * @type string
+ * @default pageup
+ * @parent BasicSetting
+ * 
+ * @param PagePreviousSymbol
+ * @desc Page return symbol name.(To change, you need a plug-in that can assign keys separately)
+ * @text Page return symbol name
+ * @type string
+ * @default pagedown
  * @parent BasicSetting
  * 
  * @param CommandSetting
@@ -794,8 +810,8 @@
  * @param ContentWindowVisible
  * @type boolean
  * @default true
- * @text モンスターステータスウィンドウ画像表示
- * @desc モンスターステータスのウィンドウ画像を表示します。
+ * @text Monster status window image display
+ * @desc Displays window image of monster status.
  * @parent EnemyBookStatusSetting
  * 
  * @param ContentWindowsSkin
@@ -2791,7 +2807,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.17.12
+ * @version 2.17.13
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2983,6 +2999,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/4 Ver.2.17.13
+ * モンスターページのページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)
  * 2023/2/26 Ver.2.17.12
  * 敵の出現ではなくプラグイン等で敵を追加したときに、図鑑に登録されない問題を修正。
  * 2023/2/25 Ver.2.17.11
@@ -3286,6 +3304,24 @@
  * @desc 背景画像をウィンドウサイズまたは画面に合わせ拡大します。
  * @type boolean
  * @default false
+ * @parent BasicSetting
+ * 
+ * @param PageNextSymbol
+ * @desc ページ送りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ送りシンボル名
+ * @type combo
+ * @option 
+ * @option pageup2
+ * @default 
+ * @parent BasicSetting
+ * 
+ * @param PagePreviousSymbol
+ * @desc ページ戻りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ戻りシンボル名
+ * @type combo
+ * @option 
+ * @option pagedown2
+ * @default 
  * @parent BasicSetting
  * 
  * @param CommandSetting
@@ -5670,6 +5706,8 @@ const BackUiWidth = eval(parameters['BackUiWidth'] || 'true');
 const BackFitWidth = eval(parameters['BackFitWidth'] || 'false');
 const NoBookTag = String(parameters['NoBookTag']) || 'NoBook';
 const NoBookDataTag = String(parameters['NoBookDataTag']) || 'NoBookData';
+const PageNextSymbol = String(parameters['PageNextSymbol']);
+const PagePreviousSymbol = String(parameters['PagePreviousSymbol']);
 
 const RegistrationTiming = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['RegistrationTiming'])) : [];
 const RegistrationEnemyColor = (DataManager.nuun_structureData(parameters['RegistrationEnemyColor'])) || 0;
@@ -6970,6 +7008,10 @@ Scene_EnemyBook.prototype.createEnemyPageWindow = function() {
     pageIndex.page = 0;
     const rect = this.enemyWindowPageRect();
     this._enemyPageWindow = new Window_EnemyBookPage(rect);
+    if (!!PageNextSymbol && !!PagePreviousSymbol) {
+        this._enemyPageWindow.setHandler(PageNextSymbol, this.enemyBookPageup.bind(this));
+        this._enemyPageWindow.setHandler(PagePreviousSymbol, this.enemyBookPagedown.bind(this));
+    }
     this.addWindow(this._enemyPageWindow);
     this._enemyPageWindow.deactivate();
     this._enemyPageWindow.setPageList(PageSetting, PageSetting.length);
@@ -7139,13 +7181,28 @@ Scene_EnemyBook.prototype.enemyCategorySelection = function() {
     this._enemyPageWindow.refresh();
 };
 
-Scene_EnemyBook.prototype.updateEnemyBookPagedownButton = function() {
-    this._enemyPageWindow.cursorLeft(true);
-    SoundManager.playCursor();
+Scene_EnemyBook.prototype.enemyBookPagedown = function() {
+    this._enemyPageWindow.activate();
+    this.updateEnemyBookPagedownButton();
 };
   
+Scene_EnemyBook.prototype.enemyBookPageup = function() {
+    this._enemyPageWindow.activate();
+    this.updateEnemyBookPageupButton();
+};
+
+const _Window_Selectable_cursorRight = Window_Selectable.prototype.cursorRight;
+const _Window_Selectable_cursorLeft = Window_Selectable.prototype.cursorLeft;
+Scene_EnemyBook.prototype.updateEnemyBookPagedownButton = function() {
+    _Window_Selectable_cursorLeft.call(this._enemyPageWindow, true);
+    //this._enemyPageWindow.cursorLeft(true);
+    SoundManager.playCursor();
+};
+
+
 Scene_EnemyBook.prototype.updateEnemyBookPageupButton = function() {
-    this._enemyPageWindow.cursorRight(true);
+    _Window_Selectable_cursorRight.call(this._enemyPageWindow, true);
+    //this._enemyPageWindow.cursorRight(true);
     SoundManager.playCursor();
 };
 
@@ -7269,6 +7326,8 @@ Scene_Battle.prototype.createEnemyBookPageWindow = function() {
     const rect = this.enemyBookPageWindowRect();
     this._enemyBookPageWindow = new Window_EnemyBookPage(rect);
     this._enemyBookPageWindow.setHandler("cancel", this.onEnemyBookPageCancel.bind(this));
+    this._enemyBookPageWindow.setHandler(PageNextSymbol, this.enemyBookPageup.bind(this));
+    this._enemyBookPageWindow.setHandler(PagePreviousSymbol, this.enemyBookPagedown.bind(this));
     this.createEnemyBookAddWindow(this._enemyBookPageWindow, true);
     this._enemyBookPageWindow.setIndexWindow(this._enemyBookIndexWindow);
     this._enemyBookPageWindow.setInfoIndexWindow(this._enemyBookInfoIndexWindow);
@@ -7524,6 +7583,16 @@ Scene_Battle.prototype.updatePageupdownButton = function() {
     if (this._enemyBook_upButton) {
         this._enemyBook_upButton.visible = this._enemyBookPageWindow.active && this.updatePageupdownButtonBookMode();
     }
+};
+
+Scene_Battle.prototype.enemyBookPagedown = function() {
+    this._enemyBookPageWindow.activate();
+    this.updateEnemyBookPagedownButton();
+};
+  
+Scene_Battle.prototype.enemyBookPageup = function() {
+    this._enemyBookPageWindow.activate();
+    this.updateEnemyBookPageupButton();
 };
 
 Scene_Battle.prototype.updateEnemyBookPagedownButton = function() {
@@ -7789,7 +7858,7 @@ Scene_Battle.prototype.updateCancelButton = function() {
 };
 
 Scene_Battle.prototype.addEnemyDataEnemyBook = function(enemy) {
-    const enemyId = enemy.enemyId();console.log(enemy)
+    const enemyId = enemy.enemyId();
     if ($gameSystem.registrationTiming(2)) {
         $gameSystem.addToEnemyBook(enemyId);
     }
@@ -8472,6 +8541,15 @@ Window_EnemyBookPage.prototype.refresh = function() {
     Window_HorzCommand.prototype.refresh.call(this);
 };
 
+if (!!PageNextSymbol && !!PagePreviousSymbol) {
+    Window_EnemyBookPage.prototype.cursorRight = function(wrap) {
+    
+    };
+    
+    Window_EnemyBookPage.prototype.cursorLeft = function(wrap) {
+        
+    };
+}
 
 function Window_EnemyBook() {
     this.initialize(...arguments);

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.5.2
+ * @version 2.5.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -75,7 +75,7 @@
  * 
  * キーボード操作
  * QWキー　キャラ切り替え
- * ←→キー　ページ切り替え
+ * ←→キー　ページ切り替え(デフォルト設定)
  * 
  * タッチ操作
  * <>ボタン　キャラ切り替え
@@ -86,6 +86,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/4 Ver.2.5.3
+ * ページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)
  * 2023/2/28 Ver.2.5.2
  * 特定の装備部位のみ表示させる機能を追加。
  * 2023/2/25 Ver.2.5.1
@@ -329,6 +331,24 @@
  * @type number
  * @default 10
  * @min 0
+ * @parent Setting
+ * 
+ * @param PageNextSymbol
+ * @desc ページ送りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ送りシンボル名
+ * @type combo
+ * @option 
+ * @option pageup2
+ * @default 
+ * @parent Setting
+ * 
+ * @param PagePreviousSymbol
+ * @desc ページ戻りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ戻りシンボル名
+ * @type combo
+ * @option 
+ * @option pagedown2
+ * @default 
  * @parent Setting
  * 
  * @param PageSetting
@@ -1228,6 +1248,8 @@ const EXPGaugeX = Number(parameters['EXPGaugeX'] || 0);
 const EXPGaugeY = Number(parameters['EXPGaugeY'] || 0);
 const DefaultFontSize = Number(parameters['DefaultFontSize'] || 0);
 const FontMargin = Number(parameters['FontMargin'] || 10);
+const PageNextSymbol = String(parameters['PageNextSymbol']);
+const PagePreviousSymbol = String(parameters['PagePreviousSymbol']);
 const PageList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList'])) : null) || [];
 const ParamList_1Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_1Page'])) : null) || [];
 const ParamList_2Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_2Page'])) : null) || [];
@@ -1388,10 +1410,14 @@ Scene_Status.prototype.statusWindowRect = function() {
 
 const _Scene_Status_createStatusWindow  = Scene_Status.prototype.createStatusWindow;
 Scene_Status.prototype.createStatusWindow = function() {
-  _Scene_Status_createStatusWindow.call(this);
-  if (BackGroundImg) {
-    this._statusWindow.opacity = 0;
-  }
+    _Scene_Status_createStatusWindow.call(this);
+    if (this.maxPage() > 1 && !!PageNextSymbol && !!PagePreviousSymbol) {
+        this._statusWindow.setHandler(PageNextSymbol, this.statusPageup.bind(this));
+        this._statusWindow.setHandler(PagePreviousSymbol, this.statusPagedown.bind(this));
+    }
+    if (BackGroundImg) {
+        this._statusWindow.opacity = 0;
+    }
 };
 
 Scene_Status.prototype.createProfileWindow = function() {
@@ -1450,6 +1476,16 @@ Scene_Status.prototype.arePageButtonsEnabled = function() {
   return $gameParty.allMembers().length > 1;
 };
 
+Scene_Status.prototype.statusPagedown = function() {
+    this._statusWindow.activate();
+    this.updateStatusPagedown();
+};
+  
+Scene_Status.prototype.statusPageup = function() {
+    this._statusWindow.activate();
+    this.updateStatusPageup();
+};
+
 Scene_Status.prototype.updateStatusPagedown = function() {
 	const maxPage = this.maxPage();
   if (maxPage > 1) {
@@ -1470,7 +1506,7 @@ Scene_Status.prototype.updateStatusPageup = function() {
 
 Scene_Status.prototype.updatePage = function() {
   this.setPage(this._page);
-  this._statusWindow.refresh()
+  this._statusWindow.refresh();
 };
 
 Scene_Status.prototype.setPage = function() {
@@ -1480,11 +1516,13 @@ Scene_Status.prototype.setPage = function() {
 const _Scene_Status_update = Scene_Status.prototype.update;
 Scene_Status.prototype.update = function() {
   _Scene_Status_update.call(this);
-	if (Input.isRepeated('left') && this.maxPage() > 1) {
-		this.updateStatusPageup();
-	} else if (Input.isRepeated('right') && this.maxPage() > 1){
-		this.updateStatusPagedown();
-  }
+    if (!PageNextSymbol && !PagePreviousSymbol) {
+        if (Input.isRepeated('left') && this.maxPage() > 1) {
+            this.updateStatusPageup();
+        } else if (Input.isRepeated('right') && this.maxPage() > 1){
+            this.updateStatusPagedown();
+        }
+    }
 };
 
 const _Window_Status_initialize = Window_Status.prototype.initialize;

@@ -12,36 +12,19 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
- * Set keyboard keys and gamepad button assignments.
- * 
- * 
- * Game pad
- * XInput
- * 0:A
- * 1:B
- * 2:X
- * 3:Y
- * 4:LB
- * 5:RB
- * 6:LT
- * 7:RT
- * 8:Back
- * 9:Start
- * 10:Left stick push
- * 11:Right stick push
- * 12:↑
- * 13:↓
- * 14:←
- * 15:→
- * 16:
+ * You can change keyboard keys and gamepad button assignments or set new ones.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
+ * The button layout of the gamepad is based on the Xbox360 controller.
+ * If the keyboard or gamepad code is set to -1, the original value is set.
  * 
  * Log
+ * 3/5/2023 Ver.1.1.0
+ * Compatible with right stick.
  * 3/4/2023 Ver.1.0.1
  * Added repeat feature.
  * Fixed so that the set keys and buttons work even in battle.
@@ -67,39 +50,75 @@
  */
 /*~struct~UserKeyData:
  * 
- * @param CommonSetting
- * @text Common setting
- * @default ------------------------------
- * 
  * @param KeyCode
  * @desc Key code.
  * @text Key code
  * @type number
  * @default -1
  * @min -1
- * @parent CommonSetting
  * 
  * @param GamePadCode
  * @desc Gamepad code.
  * @text Gamepad code
- * @type number
+ * @type select
+ * @option None
+ * @value -1
+ * @option A(Down button)
+ * @value 0
+ * @option B(Right button)
+ * @value 1
+ * @option X(Left button)
+ * @value 2
+ * @option Y(Up button)
+ * @value 3
+ * @option LB
+ * @value 4
+ * @option RB
+ * @value 5
+ * @option LT
+ * @value 6
+ * @option RT
+ * @value 7
+ * @option Back
+ * @value 8
+ * @option Start
+ * @value 9
+ * @option Left stick push
+ * @value 10
+ * @option Right stick push
+ * @value 11
+ * @option Left stick ↑
+ * @value 12
+ * @option Left stick ↓
+ * @value 13
+ * @option Left stick ←
+ * @value 14
+ * @option Left stick →
+ * @value 15
+ * @option 
+ * @value 16
+ * @option Right stick ↑
+ * @value 21
+ * @option Right stick ↓
+ * @value 22
+ * @option Right stick ←
+ * @value 23
+ * @option Right stick →
+ * @value 24
  * @default -1
  * @min -1
- * @parent CommonSetting
  * 
  * @param KeyName
  * @desc Any symbolic name. Enclose the string with ' or ".
  * @text Symbol name
  * @type string
  * @default
- * @parent CommonSetting
  * 
  * @param Repeated
  * @desc Repeat enabled.
  * @text Repeat enabled
  * @type boolean
  * @default false
- * @parent CommonSetting
  * 
  * @param SceneKeyAndButtonSetting
  * @text On-scene key and button setting
@@ -133,36 +152,19 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
- * キーボードのキー及び、ゲームパッドのボタン割り当てを設定します。
- * 
- * 
- * ゲームパッド
- * XInput
- * 0:A
- * 1:B
- * 2:X
- * 3:Y
- * 4:LB
- * 5:RB
- * 6:LT
- * 7:RT
- * 8:Back
- * 9:Start
- * 10:左スティック押し
- * 11:右スティック押し
- * 12:↑
- * 13:↓
- * 14:←
- * 15:→
- * 16:
+ * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
+ * ゲームパッドのボタン配置はXbox360コントローラ基準になっております。
+ * キーボード、ゲームパッドのコードが-1に設定されている場合は元の値が設定されます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/5 Ver.1.1.0
+ * 右スティックに対応。
  * 2023/3/4 Ver.1.0.1
  * リピート機能を追加。
  * 戦闘中でも設定したキー、ボタンが動作するように修正。
@@ -188,39 +190,75 @@
  */
 /*~struct~UserKeyData:ja
  * 
- * @param CommonSetting
- * @text 共通設定
- * @default ------------------------------
- * 
  * @param KeyCode
  * @desc キーコード
  * @text キーコード
  * @type number
  * @default -1
  * @min -1
- * @parent CommonSetting
  * 
  * @param GamePadCode
  * @desc ゲームパッドコード
  * @text ゲームパッドコード
- * @type number
+ * @type select
+ * @option None
+ * @value -1
+ * @option A(下ボタン)
+ * @value 0
+ * @option B(右ボタン)
+ * @value 1
+ * @option X(左ボタン)
+ * @value 2
+ * @option Y(上ボタン)
+ * @value 3
+ * @option LB
+ * @value 4
+ * @option RB
+ * @value 5
+ * @option LT
+ * @value 6
+ * @option RT
+ * @value 7
+ * @option Back
+ * @value 8
+ * @option Start
+ * @value 9
+ * @option Left stick push
+ * @value 10
+ * @option Right stick push
+ * @value 11
+ * @option Left stick ↑
+ * @value 12
+ * @option Left stick ↓
+ * @value 13
+ * @option Left stick ←
+ * @value 14
+ * @option Left stick →
+ * @value 15
+ * @option 
+ * @value 16
+ * @option Right stick ↑
+ * @value 21
+ * @option Right stick ↓
+ * @value 22
+ * @option Right stick ←
+ * @value 23
+ * @option Right stick →
+ * @value 24
  * @default -1
  * @min -1
- * @parent CommonSetting
  * 
  * @param KeyName
  * @desc 任意のシンボル名。文字列を'または"で囲ってください。
  * @text シンボル名
  * @type string
  * @default
- * @parent CommonSetting
  * 
  * @param Repeated
  * @desc リピート有効
  * @text リピート有効
  * @type boolean
  * @default false
- * @parent CommonSetting
  * 
  * @param SceneKeyAndButtonSetting
  * @text シーン上キー、ボタン設定
@@ -333,8 +371,44 @@ Imported.NUUN_BankSystem = true;
         eval(keySprict);
     };
 
+    const _Input_updateGamepadState = Input._updateGamepadState;
+    Input._updateGamepadState = function(gamepad) {
+        const lastState = this._gamepadStates[gamepad.index] || [];
+        _Input_updateGamepadState.call(this, gamepad);
+        this._gamepadRightStick(gamepad, lastState);//test
+    };
+
+    Input._gamepadRightStick = function(gamepad, lastState) {
+        const newState = this._gamepadStates[gamepad.index];
+        const buttons = gamepad.buttons;
+        const axes = gamepad.axes;
+        const threshold = 0.5;
+        newState[21] = false;
+        newState[22] = false;
+        newState[23] = false;
+        newState[24] = false;
+        if (axes[3] < -threshold) {
+            newState[21] = true;
+        } else if (axes[3] > threshold) {
+            newState[22] = true;
+        }
+        if (axes[2] < -threshold) {
+            newState[23] = true;
+        } else if (axes[2] > threshold) {
+            newState[24] = true;
+        }
+        for (let j = 21; j < newState.length; j++) {
+            if (newState[j] !== lastState[j]) {
+                const buttonName = this.gamepadMapper[j];
+                if (buttonName) {
+                    this._currentState[buttonName] = newState[j];
+                }
+            }
+        }
+    };
+
     function isRepeated(repeat, name) {
         return repeat ? Input.isRepeated(name) : Input.isTriggered(name);
     };
-    
+
 })();

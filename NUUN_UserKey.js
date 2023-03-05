@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
@@ -23,6 +23,8 @@
  * If the keyboard or gamepad code is set to -1, the original value is set.
  * 
  * Log
+ * 3/6/2023 Ver.1.1.1
+ * Fixed an issue where the gamepad code was not recognized in the scene key and button settings.
  * 3/5/2023 Ver.1.1.0
  * Compatible with right stick.
  * 3/4/2023 Ver.1.0.1
@@ -152,7 +154,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
@@ -163,6 +165,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/6 Ver.1.1.1
+ * シーン上キー、ボタン設定でゲームパッドコードが認識しない問題を修正。
  * 2023/3/5 Ver.1.1.0
  * 右スティックに対応。
  * 2023/3/4 Ver.1.0.1
@@ -354,7 +358,7 @@ Imported.NUUN_BankSystem = true;
     
     Scene_Base.prototype.updateUserKey = function(valid) {
         for (const data of UserKey) {
-            if (data.UserKey && data.UserKey[valid] && !!data.UserKey.KeySprict && data.UserKey.KeyCode >= 0) {
+            if (data.UserKey && data.UserKey[valid] && !!data.UserKey.KeySprict && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
                 const keyName = data.UserKey.KeyName;
                 if (isRepeated(data.UserKey.Repeated, keyName)) {
                     this._userKeyCalling = true;
@@ -375,7 +379,7 @@ Imported.NUUN_BankSystem = true;
     Input._updateGamepadState = function(gamepad) {
         const lastState = this._gamepadStates[gamepad.index] || [];
         _Input_updateGamepadState.call(this, gamepad);
-        this._gamepadRightStick(gamepad, lastState);//test
+        this._gamepadRightStick(gamepad, lastState);
     };
 
     Input._gamepadRightStick = function(gamepad, lastState) {

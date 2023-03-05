@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.17.14
+# Ver.2.18.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -245,8 +245,9 @@ https://github.com/sbfkcel/pixi-apngAndGif
 ## 操作
 操作方法  
 上下（↑ ↓）キー：モンスター選択  
-左右（← →）キー ：ページ切り替え  
+左右（← →）キー ：ページ切り替え(デフォルト)  
 PgUp PgDnキー：モンスターページ送り  
+決定：モンスター画像原寸大表示  
 
 タッチ操作  
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  

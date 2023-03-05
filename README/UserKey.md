@@ -1,5 +1,5 @@
 # [キーボタン割り当て](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -36,6 +36,8 @@
 24:右スティック →  
 
 ## 更新履歴
+2023/3/6 Ver.1.1.1  
+シーン上キー、ボタン設定でゲームパッドコードが認識しない問題を修正。  
 2023/3/5 Ver.1.1.0  
 右スティックに対応。  
 2023/3/4 Ver.1.0.1  

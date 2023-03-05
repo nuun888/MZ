@@ -7852,6 +7852,7 @@ Scene_Battle.prototype.onEnemyBookInfoCancel = function() {
     } else {
         this._partyCommandWindow.activate();
     }
+    this._enemyBookActualSprite.hideActualEnemy();
 };
 
 Scene_Battle.prototype.onEnemyBookPageCancel = function() {
@@ -7862,6 +7863,7 @@ Scene_Battle.prototype.onEnemyBookPageCancel = function() {
         this._enemyBookPageWindow.deactivate();
         this._enemyBookBackgroundSprite.hide();
         BattleManager.enemyBook_Open = false;
+        this._enemyBookActualSprite.hideActualEnemy();
     }
 };
 
@@ -7892,6 +7894,7 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
     } else {
         this._partyCommandWindow.activate();
     }
+    this._enemyBookActualSprite.hideActualEnemy();
 };
 
 const _Scene_Battle_isAnyInputWindowActive  = Scene_Battle.prototype.isAnyInputWindowActive;

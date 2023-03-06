@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.0
+ * @version 2.18.1
  * 
  * @help
  * Implement an enemy book.
@@ -201,6 +201,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/6/2023 Ver.2.18.1
+ * Fixed an issue where Apng monsters would be slow when displaying them.
  * 3/5/2023 Ver.2.18.0
  * Added a function to display full-size monsters.
  * 3/4/2023 Ver.2.17.14
@@ -2750,7 +2752,7 @@
 /*~struct~AnalyzeList:
 * 
 * @param Name
-* @desc Name。
+* @desc Name.
 * @text Name
 * @type string
 * @default 
@@ -3005,6 +3007,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/6 Ver.2.18.1
+ * Apngのモンスターを表示するときに、重くなる問題を修正。
  * 2023/3/5 Ver.2.18.0
  * 原寸大のモンスターを表示する機能を追加。
  * 2023/3/4 Ver.2.17.14
@@ -5879,6 +5883,7 @@ const pageIndex = {category:0, index:0, page:0, infoIndex:0};
 const NRP_pLoopLR = PluginManager.parameters("NRP_LoopCursor").loopLR;
 let ge = null;
 let de = null;
+let apngCache = null;
 
 const pluginName = "NUUN_EnemyBook";
 
@@ -8651,6 +8656,7 @@ Window_EnemyBook.prototype.maxCols = function() {
 Window_EnemyBook.prototype.close = function() {
     Window_Base.prototype.close.call(this);
     this._enemySprite.resetEnemy();
+    this.enemyActualeResetEnemy();
 };
 
 Window_EnemyBook.prototype.setEnemyData = function(enemy) {
@@ -8709,6 +8715,12 @@ Window_EnemyBook.prototype.setEnemyActualSprite = function(sprite) {
 Window_EnemyBook.prototype.setupEnemyActuale = function(battler, mask) {
     if (this._enemyActualSprite) {
         this._enemyActualSprite.setup(battler, mask);
+    }
+};
+
+Window_EnemyBook.prototype.enemyActualeResetEnemy = function() {
+    if (this._enemyActualSprite) {
+        this._enemyActualSprite.resetEnemy();
     }
 };
 
@@ -8790,6 +8802,8 @@ Window_EnemyBook.prototype.drawEnemyBookContents = function() {
     ge = enemy;
     de = this._enemy;
     this._enemySprite.resetEnemy();
+    this.enemyActualeResetEnemy();
+    this.setupEnemyActuale(enemy, this.isActualeEnemyMask(listContents));
     for (const data of listContents) {
         this.resetFontSettings();
         const x_Position = data.X_Position;
@@ -8798,9 +8812,17 @@ Window_EnemyBook.prototype.drawEnemyBookContents = function() {
         const x = rect.x + (data.X_Coordinate || 0);
         const y = (data.Y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
         const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : this.widthMode(data, rect));
-        this.setupEnemyActuale(enemy, this.paramMask(data.MaskMode));
         this.dateDisplay(data, enemy, x, y, width);
     }
+};
+
+Window_EnemyBook.prototype.isActualeEnemyMask = function(list) {
+    for (const data of list) {
+        if (data.DateSelect === 200) {
+            return this.paramMask(data.MaskMode);
+        }
+    }
+    return false;
 };
 
 Window_EnemyBook.prototype.loadBitmap = function() {
@@ -10796,6 +10818,10 @@ Sprite_BookEnemyActualBase.prototype.setup = function(battler, mask) {
     this._mainSprite.setup(battler, mask);
 };
 
+Sprite_BookEnemyActualBase.prototype.resetEnemy = function() {
+    this._mainSprite.resetEnemy();
+};
+
 
 function Sprite_BookEnemyActual () {
     this.initialize(...arguments);
@@ -10814,8 +10840,6 @@ Sprite_BookEnemyActual.prototype.initMembers = function() {
     this.maxWidth = Graphics.width;
 };
 
-
-
 Sprite_BookEnemyActual.prototype.setup = function(battler, mask) {
     this._battler = battler;
     this.x = Graphics.width / 2;
@@ -10832,7 +10856,6 @@ Sprite_BookEnemyActual.prototype.refresh = function() {
         this.bitmap = null;
     }
 };
-
 
 function Sprite_EnemyBookGauge() {
     this.initialize(...arguments);

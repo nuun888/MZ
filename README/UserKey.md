@@ -3,6 +3,8 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+#### オプション
+[左スティック軸変化量比例移動](https://github.com/nuun888/MZ/blob/master/README/RealMoveLeftStick.md)  
 
 キーボードのキー及び、ゲームパッドのボタン割り当てを設定します。  
 

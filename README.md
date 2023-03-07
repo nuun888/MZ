@@ -268,7 +268,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
 | [ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md) | [NUUN_GamePadVibration](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GamePadVibration.js) | 共 | 1.0.0 |
 | [キーボタン割り当て](https://github.com/nuun888/MZ/blob/master/README/UserKey.md) | [NUUN_UserKey](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js) | 共 | 1.2.1 |
-| ┗ [左スティック軸変化量比例移動](https://github.com/nuun888/MZ/blob/master/README/[キーボタン割り当て](https://github.com/nuun888/MZ/blob/master/README/RealMoveLeftStick.md).md) | [NUUN_realMoveLeftStick](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStick.js) |  | 1.0.0 |
+| ┗ [左スティック軸変化量比例移動](https://github.com/nuun888/MZ/blob/master/README/RealMoveLeftStick.md).md) | [NUUN_realMoveLeftStick](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStick.js) |  | 1.0.0 |
 |  |  |  |  |
 
 | 不具合修正　　　　　　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |

@@ -12,17 +12,20 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
+ * 
  * The button layout of the gamepad is based on the Xbox360 controller.
  * If the keyboard or gamepad code is set to -1, the original value is set.
  * 
  * Log
+ * 3/7/2023 Ver.1.2.1
+ * Modified the definition by supporting the left stick axis change amount proportional movement plug-in.
  * 3/7/2023 Ver.1.2.0
  * Added the ability to dash when the left stick is pushed all the way down.
  * 3/6/2023 Ver.1.1.1
@@ -166,7 +169,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
@@ -177,6 +180,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/7 Ver.1.2.1
+ * 左スティック軸変化量比例移動プラグイン対応による定義修正。
  * 2023/3/7 Ver.1.2.0
  * 左スティックを最大に倒すとダッシュする機能を追加。
  * 2023/3/6 Ver.1.1.1
@@ -420,7 +425,6 @@ Imported.NUUN_BankSystem = true;
         const buttons = gamepad.buttons;
         const axes = gamepad.axes;
         const threshold = 0.5;
-        const thresholdDash = 1.0;
         newState[21] = false;
         newState[22] = false;
         newState[23] = false;
@@ -435,7 +439,12 @@ Imported.NUUN_BankSystem = true;
         } else if (axes[2] > threshold) {
             newState[24] = true;
         }
-        this._stickMoveing = Math.max(Math.abs(axes[0]), Math.abs(axes[1])) - 0.5;
+        const move = Math.max(Math.abs(axes[0]), Math.abs(axes[1])) - 0.5;
+        if (move > 0) {
+            this._stickMoveing = move;
+        } else if ($gamePlayer && !$gamePlayer.isMoving()) {
+            this._stickMoveing = move;
+        }
         if (GamepadLeftStickMaxDash) {
             this.gamepadLeftStickMaxDash();
         }

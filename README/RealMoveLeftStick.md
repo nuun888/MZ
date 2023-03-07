@@ -1,4 +1,4 @@
-# [キーボタン割り当て](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStic.js)
+# [左スティック軸変化量比例移動](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStic.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStic.js)
 #### 必須、前提プラグイン

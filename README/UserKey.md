@@ -1,5 +1,5 @@
 # [キーボタン割り当て](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -36,6 +36,8 @@
 24:右スティック →  
 
 ## 更新履歴
+2023/3/7 Ver.1.2.1  
+左スティック軸変化量比例移動プラグイン対応による定義修正。  
 2023/3/7 Ver.1.2.0  
 左スティックを最大に倒すとダッシュする機能を追加。  
 2023/3/6 Ver.1.1.1  

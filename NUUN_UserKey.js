@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
@@ -23,6 +23,8 @@
  * If the keyboard or gamepad code is set to -1, the original value is set.
  * 
  * Log
+ * 3/7/2023 Ver.1.2.0
+ * Added the ability to dash when the left stick is pushed all the way down.
  * 3/6/2023 Ver.1.1.1
  * Fixed an issue where the gamepad code was not recognized in the scene key and button settings.
  * 3/5/2023 Ver.1.1.0
@@ -39,6 +41,16 @@
  * @desc Key setting.
  * @default ["{\"UserKey\":\"{\\\"KeyCode\\\":\\\"65\\\",\\\"GamePadCode\\\":\\\"6\\\",\\\"KeyName\\\":\\\"\\\\\\\"pagedown2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"83\\\",\\\"GamePadCode\\\":\\\"7\\\",\\\"KeyName\\\":\\\"\\\\\\\"pageup2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"10\\\",\\\"KeyName\\\":\\\"\\\\\\\"leftstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"11\\\",\\\"KeyName\\\":\\\"\\\\\\\"rightstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}"]
  * 
+ * @param GamepadSetting
+ * @text Gamepad settings
+ * @default ------------------------------
+ * 
+ * @param GamepadLeftStickMaxDash
+ * @desc Push the left stick to the maximum axis to dash.
+ * @text Left axis maximum dash
+ * @type boolean
+ * @default true
+ * @parent GamepadSetting
  * 
  */
 /*~struct~UserKeyList:
@@ -154,7 +166,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
@@ -165,6 +177,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/7 Ver.1.2.0
+ * 左スティックを最大に倒すとダッシュする機能を追加。
  * 2023/3/6 Ver.1.1.1
  * シーン上キー、ボタン設定でゲームパッドコードが認識しない問題を修正。
  * 2023/3/5 Ver.1.1.0
@@ -181,6 +195,17 @@
  * @desc キーの設定。
  * @default ["{\"UserKey\":\"{\\\"KeyCode\\\":\\\"65\\\",\\\"GamePadCode\\\":\\\"6\\\",\\\"KeyName\\\":\\\"\\\\\\\"pagedown2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"83\\\",\\\"GamePadCode\\\":\\\"7\\\",\\\"KeyName\\\":\\\"\\\\\\\"pageup2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"10\\\",\\\"KeyName\\\":\\\"\\\\\\\"leftstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"11\\\",\\\"KeyName\\\":\\\"\\\\\\\"rightstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}"]
  * 
+ * 
+ * @param GamepadSetting
+ * @text ゲームパッド設定
+ * @default ------------------------------
+ * 
+ * @param GamepadLeftStickMaxDash
+ * @desc 左スティックの軸の最大に倒すとダッシュします。
+ * @text 左軸最大ダッシュ
+ * @type boolean
+ * @default true
+ * @parent GamepadSetting
  * 
  */
 /*~struct~UserKeyList:ja
@@ -297,7 +322,8 @@ Imported.NUUN_BankSystem = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_UserKey');
     const UserKey = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['UserKey'])) : null) || [];
-    
+    const GamepadLeftStickMaxDash = eval(parameters['GamepadLeftStickMaxDash'] || "true");
+
     const keyMapper = Input.keyMapper;
     const gamepadMapper = Input.gamepadMapper;
 
@@ -375,18 +401,26 @@ Imported.NUUN_BankSystem = true;
         eval(keySprict);
     };
 
+    const _Input_clear = Input.clear;
+    Input.clear = function() {
+        _Input_clear.call(this);
+        this._stickDashing = false;
+        this._stickMoveing = 0.0;
+    };
+
     const _Input_updateGamepadState = Input._updateGamepadState;
     Input._updateGamepadState = function(gamepad) {
         const lastState = this._gamepadStates[gamepad.index] || [];
         _Input_updateGamepadState.call(this, gamepad);
-        this._gamepadRightStick(gamepad, lastState);
+        this._gamepadAddButton(gamepad, lastState);
     };
 
-    Input._gamepadRightStick = function(gamepad, lastState) {
+    Input._gamepadAddButton = function(gamepad, lastState) {
         const newState = this._gamepadStates[gamepad.index];
         const buttons = gamepad.buttons;
         const axes = gamepad.axes;
         const threshold = 0.5;
+        const thresholdDash = 1.0;
         newState[21] = false;
         newState[22] = false;
         newState[23] = false;
@@ -401,6 +435,10 @@ Imported.NUUN_BankSystem = true;
         } else if (axes[2] > threshold) {
             newState[24] = true;
         }
+        this._stickMoveing = Math.max(Math.abs(axes[0]), Math.abs(axes[1])) - 0.5;
+        if (GamepadLeftStickMaxDash) {
+            this.gamepadLeftStickMaxDash();
+        }
         for (let j = 21; j < newState.length; j++) {
             if (newState[j] !== lastState[j]) {
                 const buttonName = this.gamepadMapper[j];
@@ -411,8 +449,24 @@ Imported.NUUN_BankSystem = true;
         }
     };
 
+    Input.gamepadLeftStickMaxDash = function() {
+        this._stickDashing = this._stickMoveing >= 0.5;
+    };
+
+    Input.isStickDashing = function() {
+        return this._stickDashing;
+    };
+
     function isRepeated(repeat, name) {
         return repeat ? Input.isRepeated(name) : Input.isTriggered(name);
+    };
+
+    const _Game_Player_isDashButtonPressed = Game_Player.prototype.isDashButtonPressed;
+    Game_Player.prototype.isDashButtonPressed = function() {
+        if (Input.isStickDashing()) {
+            return true;
+        }
+        return _Game_Player_isDashButtonPressed.call(this);
     };
 
 })();

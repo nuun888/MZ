@@ -1,5 +1,5 @@
 # [バフ、デバフ重ね掛け上限変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffMaxLevel.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuffMaxLevel.js)
 
 バフ、デバフの重ね掛けの上限値を変更します。  
@@ -14,5 +14,7 @@
 なお、他のプラグインとの競合から飛び番での設定は出来ませんので、必ず１段階目から最大までのアイコンを連続して並べてください。
 
 ## 更新履歴
+2023/3/8 Ver.1.0.1  
+プラグインパラメータのスペルが間違っていたため修正。  
 2022/2/11 Ver.1.0.0  
 初版  

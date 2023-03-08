@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Change the movement speed of the player depending on how hard the left stick of the gamepad is pushed down.
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/8/2023 Ver.1.0.1
+ * Fixed an issue where player movement speed changes were not being applied.
  * 3/7/2023 Ver.1.0.0
  * First edition.
  * 
@@ -35,7 +37,7 @@
  * @min 1
  * 
  * @param DashSpeed
- * @desc Movement speed (0.0 ~) to recognize as dash of left axis movement change.
+ * @desc Movement speed to recognize as dash of left axis movement change at standard speed. (0.0～)
  * @text Left axis movement change dash recognition movement speed
  * @type string
  * @default 4.5
@@ -47,7 +49,7 @@
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * ゲームパッドの左スティックの倒した強さによりプレイヤーの移動速度を変化させるように変更します。
@@ -59,6 +61,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/8 Ver.1.0.1
+ * プレイヤーの移動速度の変更が適用されていなかった問題を修正。
  * 2023/3/7 Ver.1.0.0
  * 初版。
  * 
@@ -70,7 +74,7 @@
  * @min 1
  * 
  * @param DashSpeed
- * @desc 左軸移動変化のダッシュと認識させる移動速度(0.0～)
+ * @desc 標準速度時の左軸移動変化のダッシュと認識させる移動速度。(0.0～)
  * @text 左軸移動変化ダッシュ認識移動速度
  * @type string
  * @default 4.5
@@ -92,7 +96,7 @@ Imported.NUUN_realMoveLeftStick = true;
     };
 
     Input._gamepadStickRealMove = function() {
-        this._stickDashing = this._stickMoveing >= (DashSpeed / GamepadLeftStickMaxSpeed) - 0.5;
+        this._stickDashing = !$gameMap.isDashDisabled() && (this._stickMoveing >= (DashSpeed / GamepadLeftStickMaxSpeed) - 0.5);
     };
 
     Input.gamepadLeftStickMaxDash = function() {
@@ -104,7 +108,7 @@ Imported.NUUN_realMoveLeftStick = true;
     };
 
     Game_Player.prototype.realMoveSpeed = function() {
-        return (Input.isStickMoveSpeed() > 0 ? Input.isStickMoveSpeed() * (!$gameMap.isDashDisabled() ? GamepadLeftStickMaxSpeed : 4) * 2 : Game_CharacterBase.prototype.realMoveSpeed.call(this));
+        return (Input.isStickMoveSpeed() > 0 ? Input.isStickMoveSpeed() * (!$gameMap.isDashDisabled() ? GamepadLeftStickMaxSpeed + (this.moveSpeed() - 4) : this.moveSpeed()) * 2 : Game_CharacterBase.prototype.realMoveSpeed.call(this));
     };
 
 })();

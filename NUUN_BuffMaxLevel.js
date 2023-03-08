@@ -184,7 +184,6 @@ Game_BattlerBase.ICON_DEBUFF_START = DebuffIconIndex;
 
 
 Game_BattlerBase.prototype.isMaxBuffAffected = function(paramId) {//再定義
-    console.log(buffParams[paramId])
     return this._buffs[paramId] === buffParams[paramId];
 };
 

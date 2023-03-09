@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.5.3
+# Ver.2.5.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.4.1以降  
@@ -94,6 +94,9 @@ APNGを表示するには別途ApngPicture.js(トリアコンタン様)が必要
 アクターと職業両方に記入した場合はアクターの設定が優先されます。  
 
 ### 更新履歴
+2023/3/9 Ver.2.5.4  
+レーダーチャートの色設定が正常に適用されていなかった問題を修正。  
+システムカラー0番が指定できない問題を修正。  
 2023/3/4 Ver.2.5.3  
 ページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)  
 2023/2/28 Ver.2.5.2  

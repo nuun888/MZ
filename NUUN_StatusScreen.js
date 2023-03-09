@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.5.3
+ * @version 2.5.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -86,6 +86,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/9 Ver.2.5.4
+ * レーダーチャートの色設定が正常に適用されていなかった問題を修正。
+ * システムカラー0番が指定できない問題を修正。
  * 2023/3/4 Ver.2.5.3
  * ページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)
  * 2023/2/28 Ver.2.5.2
@@ -1261,8 +1264,8 @@ const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
 const StatusWindowsSkin = (String(parameters['StatusWindowsSkin'])) || null;
 const EquipNameVisible = Number(parameters['EquipNameVisible'] || 1);
 const EXPGaugeVisible = eval(parameters['EXPGaugeVisible'] || "true");
-const EXPGaugeColor1 = (DataManager.nuun_structureData(parameters['EXPGaugeColor1'])) || 17;
-const EXPGaugeColor2 = (DataManager.nuun_structureData(parameters['EXPGaugeColor2'])) || 6;
+const EXPGaugeColor1 = (DataManager.nuun_structureData(parameters['EXPGaugeColor1'])) || 0;
+const EXPGaugeColor2 = (DataManager.nuun_structureData(parameters['EXPGaugeColor2'])) || 0;
 const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
 const ActorsImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorsImgList'])) : null) || [];
 const actorPosition = Number(parameters['actorPosition'] || 2);
@@ -1285,18 +1288,18 @@ const StatusRadarChartY = Number(parameters['StatusRadarChartY'] || 0);
 const StatusRadarChart_FontSize = Number(parameters['StatusRadarChart_FontSize'] || 0);
 const StatusRadarChartParamList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusRadarChartParamList'])) : [];
 const ElementRadarChartRadius = Number(parameters['ElementRadarChartRadius'] || 100);
-const ElementRadarChartFramecolor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 15;
-const ElementRadarChartLineColor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 15;
-const ElementRadarChartMainColor1 = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 3;
-const ElementRadarChartMainColor2 = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 3;
+const ElementRadarChartFramecolor = (DataManager.nuun_structureData(parameters['ElementRadarChartFramecolor'])) || 0;
+const ElementRadarChartLineColor = (DataManager.nuun_structureData(parameters['ElementRadarChartLineColor'])) || 0;
+const ElementRadarChartMainColor1 = (DataManager.nuun_structureData(parameters['ElementRadarChartMainColor1'])) || 0;
+const ElementRadarChartMainColor2 = (DataManager.nuun_structureData(parameters['ElementRadarChartMainColor2'])) || 0;
 const ElementRadarChartX = Number(parameters['ElementRadarChartX'] || 0);
 const ElementRadarChartY = Number(parameters['ElementRadarChartY'] || 0);
 const ElementRadarChart_FontSize = Number(parameters['ElementRadarChart_FontSize'] || 0);
 const StateRadarChartRadius = Number(parameters['StateRadarChartRadius'] || 100);
-const StateRadarChartFramecolor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 15;
-const StateRadarChartLineColor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 15;
-const StateRadarChartMainColor1 = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 3;
-const StateRadarChartMainColor2 = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 3;
+const StateRadarChartFramecolor = (DataManager.nuun_structureData(parameters['StateRadarChartFramecolor'])) || 0;
+const StateRadarChartLineColor = (DataManager.nuun_structureData(parameters['StateRadarChartFramecolor'])) || 0;
+const StateRadarChartMainColor1 = (DataManager.nuun_structureData(parameters['StateRadarChartMainColor1'])) || 0;
+const StateRadarChartMainColor2 = (DataManager.nuun_structureData(parameters['StateRadarChartMainColor2'])) || 0;
 const StateRadarChartX = Number(parameters['StateRadarChartX'] || 0);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 0);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);

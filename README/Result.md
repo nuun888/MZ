@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.3.3
+# Ver.2.3.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,8 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2023/2/23 Ver.2.3.4
+システムカラー0番が指定できない問題を修正。  
 2023/2/23 Ver.2.3.3  
 レベルアップ画面のスキップが機能していなかった問題を修正。  
 2023/1/28 Ver.2.3.2  

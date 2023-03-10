@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.1
+ * @version 2.18.2
  * 
  * @help
  * Implement an enemy book.
@@ -201,6 +201,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/10/2023 Ver.2.18.2
+ * Fixed the problem that system color 0 cannot be specified.
  * 3/6/2023 Ver.2.18.1
  * Fixed an issue where Apng monsters would be slow when displaying them.
  * 3/5/2023 Ver.2.18.0
@@ -2814,7 +2816,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.0
+ * @version 2.18.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3007,6 +3009,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/10 Ver.2.18.2
+ * システムカラー0番が指定できない問題を修正。
  * 2023/3/6 Ver.2.18.1
  * Apngのモンスターを表示するときに、重くなる問題を修正。
  * 2023/3/5 Ver.2.18.0
@@ -5815,10 +5819,10 @@ const ResistNoEffectElement = eval(parameters['ResistNoEffectElement'] || 'true'
 const ResistWeakElementMode = eval(parameters['ResistWeakElementMode']) || 2;
 const ElementCol = Number(parameters['ElementCol'] || 1);
 const ElementRadarChartRadius = Number(parameters['ElementRadarChartRadius'] || 100);
-const ElementRadarChartFramecolor = Number(parameters['ElementRadarChartFramecolor'] || 15);
-const ElementRadarChartLineColor = Number(parameters['ElementRadarChartLineColor'] || 15);
-const ElementRadarChartMainColor1 = Number(parameters['ElementRadarChartMainColor1'] || 3);
-const ElementRadarChartMainColor2 = Number(parameters['ElementRadarChartMainColor2'] || 3);
+const ElementRadarChartFramecolor = Number(parameters['ElementRadarChartFramecolor'] || 0);
+const ElementRadarChartLineColor = Number(parameters['ElementRadarChartLineColor'] || 0);
+const ElementRadarChartMainColor1 = Number(parameters['ElementRadarChartMainColor1'] || 0);
+const ElementRadarChartMainColor2 = Number(parameters['ElementRadarChartMainColor2'] || 0);
 const ElementRadarChartX = Number(parameters['ElementRadarChartX'] || 48);
 const ElementRadarChartY = Number(parameters['ElementRadarChartY'] || 48);
 const ElementRadarChart_FontSize = Number(parameters['ElementRadarChart_FontSize'] || 0);
@@ -5831,10 +5835,10 @@ const ResistWeakStateMode = eval(parameters['ResistWeakStateMode']) || 2;
 const StateCol = Number(parameters['StateCol'] || 1);
 const ShowStateIcon = eval(parameters['ShowStateIcon'] || 'false');
 const StateRadarChartRadius = Number(parameters['StateRadarChartRadius'] || 100);
-const StateRadarChartFramecolor = Number(parameters['StateRadarChartFramecolor'] || 15);
-const StateRadarChartLineColor = Number(parameters['StateRadarChartLineColor'] || 15);
-const StateRadarChartMainColor1 = Number(parameters['StateRadarChartMainColor1'] || 3);
-const StateRadarChartMainColor2 = Number(parameters['StateRadarChartMainColor2'] || 3);
+const StateRadarChartFramecolor = Number(parameters['StateRadarChartFramecolor'] || 0);
+const StateRadarChartLineColor = Number(parameters['StateRadarChartLineColor'] || 0);
+const StateRadarChartMainColor1 = Number(parameters['StateRadarChartMainColor1'] || 0);
+const StateRadarChartMainColor2 = Number(parameters['StateRadarChartMainColor2'] || 0);
 const StateRadarChartX = Number(parameters['StateRadarChartX'] || 48);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 48);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);

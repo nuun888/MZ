@@ -57,7 +57,7 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 2023/2/23 Ver.2.3.4
+ * 2023/3/10 Ver.2.3.4
  * Fixed the problem that system color 0 cannot be specified.
  * 2023/2/23 Ver.2.3.3
  * Fixed an issue where skipping the level up screen was not working.
@@ -2317,7 +2317,7 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2023/3/23 Ver.2.3.4
+ * 2023/3/10 Ver.2.3.4
  * システムカラー0番が指定できない問題を修正。
  * 2023/2/23 Ver.2.3.3
  * レベルアップ画面のスキップが機能していなかった問題を修正。

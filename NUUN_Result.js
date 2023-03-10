@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.3
+ * @version 2.3.4
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/2/23 Ver.2.3.4
+ * Fixed the problem that system color 0 cannot be specified.
  * 2023/2/23 Ver.2.3.3
  * Fixed an issue where skipping the level up screen was not working.
  * 2023/1/28 Ver.2.3.2
@@ -2315,6 +2317,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/23 Ver.2.3.4
+ * システムカラー0番が指定できない問題を修正。
  * 2023/2/23 Ver.2.3.3
  * レベルアップ画面のスキップが機能していなかった問題を修正。
  * 2023/1/28 Ver.2.3.2
@@ -2438,6 +2442,24 @@
  * @desc 戦闘終了後に勝利モーションを行わないスイッチIDを指定します。ONで勝利時のモーションを行いません。
  * @type switch
  * @default 0
+ * @parent CommonSetting
+ * 
+ * @param PageNextSymbol
+ * @desc ページ送りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ送りシンボル名
+ * @type combo
+ * @option 
+ * @option pageup2
+ * @default 
+ * @parent CommonSetting
+ * 
+ * @param PagePreviousSymbol
+ * @desc ページ戻りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ戻りシンボル名
+ * @type combo
+ * @option 
+ * @option pagedown2
+ * @default 
  * @parent CommonSetting
  * 
  * @param WindowSetting
@@ -4535,6 +4557,8 @@ const ResultWindowCenter = eval(parameters['ResultWindowCenter'] || 'true');
 const CloseActorStatusWindow = eval(parameters['CloseActorStatusWindow'] || 'false');
 const BattleEndHideResult = Number(parameters['BattleEndHideResult'] || 0);
 const BattleEndMotionResult = Number(parameters['BattleEndMotionResult'] || 0);
+const PageNextSymbol = String(parameters['PageNextSymbol']);
+const PagePreviousSymbol = String(parameters['PagePreviousSymbol']);
 const NoTouchUIWindow = eval(parameters['NoTouchUIWindow'] || 'false');
 const BackUiWidth = eval(parameters['BackUiWidth'] || 'true');
 const BackFitWidth = eval(parameters['BackFitWidth'] || 'false');
@@ -4582,12 +4606,12 @@ const ActorExpDataList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(
 const ActorFaceHeight = Number(parameters['ActorFaceHeight'] || 144);
 const LevelUpActorFaceHeight = Number(parameters['LevelUpActorFaceHeight'] || 144);
 const LevelUpImg = String(parameters['LevelUpImg']);
-const LevelUpNameColor = (DataManager.nuun_structureData(parameters['LevelUpNameColor'])) || 17;
-const LevelUpValueColor = (DataManager.nuun_structureData(parameters['LevelUpValueColor'])) || 17;
+const LevelUpNameColor = (DataManager.nuun_structureData(parameters['LevelUpNameColor'])) || 0;
+const LevelUpValueColor = (DataManager.nuun_structureData(parameters['LevelUpValueColor'])) || 0;
 const EXPBoostValueColor = (DataManager.nuun_structureData(parameters['EXPBoostValueColor'])) || 0;
 const EXPResistValueColor = (DataManager.nuun_structureData(parameters['EXPResistValueColor'])) || 0;
-const GaugeColor1 = (DataManager.nuun_structureData(parameters['GaugeColor1'])) || 17;
-const GaugeColor2 = (DataManager.nuun_structureData(parameters['GaugeColor2'])) || 6;
+const GaugeColor1 = (DataManager.nuun_structureData(parameters['GaugeColor1'])) || 0;
+const GaugeColor2 = (DataManager.nuun_structureData(parameters['GaugeColor2'])) || 0;
 const GaugeValueShow = eval(parameters['GaugeValueShow']) || 1;
 const Gauge_Width = Number(parameters['Gauge_Width'] || 300);
 const Gauge_Height = Number(parameters['Gauge_Height'] || 12);
@@ -4629,8 +4653,8 @@ const LevelUpActorWindow_X = Number(parameters['LevelUpActorWindow_X'] || 0);
 const LevelUpActorWindow_Y = Number(parameters['LevelUpActorWindow_Y'] || 0);
 const LevelUpActorStatusWindowsSkin = String(parameters['LevelUpActorStatusWindowsSkin']);
 const LevelUpActorCols = Number(parameters['LevelUpActorCols'] || 1);
-const DifferenceStatusColor = (DataManager.nuun_structureData(parameters['DifferenceStatusColor'])) || 24;
-const DifferenceLevelColor = (DataManager.nuun_structureData(parameters['DifferenceLevelColor'])) || 17;
+const DifferenceStatusColor = (DataManager.nuun_structureData(parameters['DifferenceStatusColor'])) || 0;
+const DifferenceLevelColor = (DataManager.nuun_structureData(parameters['DifferenceLevelColor'])) || 0;
 const LearnSkillWidth = Number(parameters['LearnSkillWidth'] || 0);
 const LearnSkillHeight = Number(parameters['LearnSkillHeight'] || 0);
 const LearnSkillWindow_X = Number(parameters['LearnSkillWindow_X'] || 0);

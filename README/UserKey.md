@@ -1,5 +1,5 @@
 # [キーボタン割り当て](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
-# Ver.1.2.2
+# Ver.1.2.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -38,6 +38,8 @@
 24:右スティック →  
 
 ## 更新履歴
+2023/3/12 Ver.1.2.3  
+シーン上でのキーボタントリガーにコモンイベントを指定できる機能を追加。  
 2023/3/11 Ver.1.2.2  
 左スティック軸変化量比例移動更新による定義追加。  
 2023/3/7 Ver.1.2.1  

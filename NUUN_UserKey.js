@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
@@ -24,6 +24,8 @@
  * If the keyboard or gamepad code is set to -1, the original value is set.
  * 
  * Log
+ * 3/12/2023 Ver.1.2.3
+ * Added a function that can specify common events for key button triggers on the scene.
  * 3/11/2023 Ver.1.2.2
  * Added definition by updating “NUUN_realMoveLeftStick”.
  * 3/7/2023 Ver.1.2.1
@@ -171,7 +173,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
@@ -182,6 +184,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/12 Ver.1.2.3
+ * シーン上でのキーボタントリガーにコモンイベントを指定できる機能を追加。
  * 2023/3/11 Ver.1.2.2
  * 左スティック軸変化量比例移動更新による定義追加。
  * 2023/3/7 Ver.1.2.1
@@ -309,6 +313,13 @@
  * @default
  * @parent SceneKeyAndButtonSetting
  * 
+ * @param KeyCommonEvent
+ * @desc 任意のコモンイベント
+ * @text 任意コモンイベント
+ * @type common_event
+ * @default 0
+ * @parent SceneKeyAndButtonSetting
+ * 
  * @param MapValid
  * @desc マップ上で有効
  * @text マップ上有効
@@ -393,13 +404,17 @@ Imported.NUUN_BankSystem = true;
     
     Scene_Base.prototype.updateUserKey = function(valid) {
         for (const data of UserKey) {
-            if (data.UserKey && data.UserKey[valid] && !!data.UserKey.KeySprict && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
+            if (data.UserKey && data.UserKey[valid] && (!!data.UserKey.KeySprict || data.UserKey.KeyCommonEvent > 0) && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
                 const keyName = data.UserKey.KeyName;
                 if (isRepeated(data.UserKey.Repeated, keyName)) {
                     this._userKeyCalling = true;
                 }
                 if (this._userKeyCalling && !$gamePlayer.isMoving()) {
-                    this.callUserKey(data.UserKey.KeySprict);
+                    if (data.UserKey.KeyCommonEvent > 0) {
+                        $gameTemp.reserveCommonEvent(data.UserKey.KeyCommonEvent);
+                    } else if (!!data.UserKey.KeySprict) {
+                        this.callUserKey(data.UserKey.KeySprict);
+                    }
                     this._userKeyCalling = false;
                 }
             }
@@ -446,7 +461,7 @@ Imported.NUUN_BankSystem = true;
         }
         const move = Math.max(Math.abs(axes[0]), Math.abs(axes[1])) - 0.5;
         if (move > 0) {
-            this._stickMoveHistory.push(this._stickMoveing);
+            this._stickMoveHistory.push(Math.abs(this._stickMoveing));
             if (this._stickMoveHistory.length > 2) {
                 this._stickMoveHistory.shift();
             }

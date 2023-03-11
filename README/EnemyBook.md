@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.18.2
+# Ver.2.18.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -253,6 +253,9 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2023/3/11 Ver.2.18.3  
+戦闘中にカーソル以外のページ切り替えができなかった問題を修正。  
+VisuMZ_0_CoreEngineと併用するとモンスター選択時にモンスターのページも切り替わってしまう問題を修正。  
 2023/3/10 Ver.2.18.2  
 システムカラー0番が指定できない問題を修正。  
 2023/3/6 Ver.2.18.1  

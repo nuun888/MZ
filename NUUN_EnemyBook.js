@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.2
+ * @version 2.18.3
  * 
  * @help
  * Implement an enemy book.
@@ -201,6 +201,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/11/2023 Ver.2.18.3
+ * Fixed an issue where it was not possible to switch pages other than the cursor during combat.
+ * Fixed the problem that when using "VisuMZ_0_CoreEngine", the monster page also changes when selecting a monster.
  * 3/10/2023 Ver.2.18.2
  * Fixed the problem that system color 0 cannot be specified.
  * 3/6/2023 Ver.2.18.1
@@ -2816,7 +2819,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.2
+ * @version 2.18.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3009,6 +3012,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/11 Ver.2.18.3
+ * 戦闘中にカーソル以外のページ切り替えができなかった問題を修正。
+ * VisuMZ_0_CoreEngineと併用するとモンスター選択時にモンスターのページも切り替わってしまう問題を修正。
  * 2023/3/10 Ver.2.18.2
  * システムカラー0番が指定できない問題を修正。
  * 2023/3/6 Ver.2.18.1
@@ -7233,18 +7239,24 @@ Scene_EnemyBook.prototype.enemyBookPageup = function() {
     this.updateEnemyBookPageupButton();
 };
 
+Scene_EnemyBook.prototype.enemyBookCursorLeft = function() {
+    
+};
+
+Scene_EnemyBook.prototype.enemyBookCursorRight = function() {
+    
+};
+
 const _Window_Selectable_cursorRight = Window_Selectable.prototype.cursorRight;
 const _Window_Selectable_cursorLeft = Window_Selectable.prototype.cursorLeft;
 Scene_EnemyBook.prototype.updateEnemyBookPagedownButton = function() {
-    _Window_Selectable_cursorLeft.call(this._enemyPageWindow, true);
-    //this._enemyPageWindow.cursorLeft(true);
+    this._enemyPageWindow.userLeft(true);
     SoundManager.playCursor();
 };
 
 
 Scene_EnemyBook.prototype.updateEnemyBookPageupButton = function() {
-    _Window_Selectable_cursorRight.call(this._enemyPageWindow, true);
-    //this._enemyPageWindow.cursorRight(true);
+    this._enemyPageWindow.userRight(true);
     SoundManager.playCursor();
 };
 
@@ -7370,8 +7382,10 @@ Scene_Battle.prototype.createEnemyBookPageWindow = function() {
     this._enemyBookPageWindow = new Window_EnemyBookPage(rect);
     this._enemyBookPageWindow.setHandler("cancel", this.onEnemyBookPageCancel.bind(this));
     this._enemyBookPageWindow.setHandler("ok", this.onEnemyActual.bind(this));
-    this._enemyBookPageWindow.setHandler(PageNextSymbol, this.enemyBookPageup.bind(this));
-    this._enemyBookPageWindow.setHandler(PagePreviousSymbol, this.enemyBookPagedown.bind(this));
+    if (!!PageNextSymbol && !!PagePreviousSymbol) {
+        this._enemyBookPageWindow.setHandler(PageNextSymbol, this.enemyBookPageup.bind(this));
+        this._enemyBookPageWindow.setHandler(PagePreviousSymbol, this.enemyBookPagedown.bind(this));
+    }
     this.createEnemyBookAddWindow(this._enemyBookPageWindow, true);
     this._enemyBookPageWindow.setIndexWindow(this._enemyBookIndexWindow);
     this._enemyBookPageWindow.setInfoIndexWindow(this._enemyBookInfoIndexWindow);
@@ -7661,12 +7675,12 @@ Scene_Battle.prototype.enemyBookPageup = function() {
 };
 
 Scene_Battle.prototype.updateEnemyBookPagedownButton = function() {
-    this._enemyBookPageWindow.cursorLeft(true);
+    this._enemyBookPageWindow.userLeft(true);
     SoundManager.playCursor();
 };
   
 Scene_Battle.prototype.updateEnemyBookPageupButton = function() {
-    this._enemyBookPageWindow.cursorRight(true);
+    this._enemyBookPageWindow.userRight(true);
     SoundManager.playCursor();
 };
 
@@ -8610,15 +8624,34 @@ Window_EnemyBookPage.prototype.refresh = function() {
     Window_HorzCommand.prototype.refresh.call(this);
 };
 
-if (!!PageNextSymbol && !!PagePreviousSymbol) {
-    Window_EnemyBookPage.prototype.cursorRight = function(wrap) {
+Window_EnemyBookPage.prototype.userRight = function(wrap) {
+    _Window_Selectable_cursorRight.call(this, wrap);
+};
+
+Window_EnemyBookPage.prototype.userLeft = function(wrap) {
+    _Window_Selectable_cursorLeft.call(this, wrap);
+};
+
+Window_EnemyBookPage.prototype.cursorRight = function(wrap) {
+    if (!PageNextSymbol && !PagePreviousSymbol) {
+        _Window_Selectable_cursorRight.call(this, wrap);
+    }
+};
     
-    };
+Window_EnemyBookPage.prototype.cursorLeft = function(wrap) {
+    if (!PageNextSymbol && !PagePreviousSymbol) {
+        _Window_Selectable_cursorLeft.call(this, wrap);
+    }
+};
+
+Window_EnemyBookPage.prototype.cursorUp = function(wrap) {
+
+};
     
-    Window_EnemyBookPage.prototype.cursorLeft = function(wrap) {
-        
-    };
-}
+Window_EnemyBookPage.prototype.cursorDown = function(wrap) {
+
+};
+
 
 function Window_EnemyBook() {
     this.initialize(...arguments);

@@ -152,6 +152,13 @@
  * @default
  * @parent SceneKeyAndButtonSetting
  * 
+ * @param KeyCommonEvent
+ * @desc Any common event.
+ * @text Any common event
+ * @type common_event
+ * @default 0
+ * @parent SceneKeyAndButtonSetting
+ * 
  * @param MapValid
  * @desc Valid on the map.
  * @text Map Valid

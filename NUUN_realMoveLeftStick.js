@@ -12,18 +12,19 @@
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Change the movement speed of the player depending on how hard the left stick of the gamepad is pushed down.
  * This plugin requires "NUUN_UserKey"(Ver.1.2.1 or later).
  * https://github.com/nuun888/MZ/blob/master/README/UserKey.md
- * *Recommended to use with a plug-in that can move in dot units.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/11/2023 Ver.1.0.2
+ * Fixed an issue where the player would slow move after releasing the stick.
  * 3/8/2023 Ver.1.0.1
  * Fixed an issue where player movement speed changes were not being applied.
  * 3/7/2023 Ver.1.0.0
@@ -49,18 +50,19 @@
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * ゲームパッドの左スティックの倒した強さによりプレイヤーの移動速度を変化させるように変更します。
  * このプラグインはキーボタン割り当てプラグイン(Ver.1.2.1以降)が必要となります。
  * https://github.com/nuun888/MZ/blob/master/README/UserKey.md
- * ※ドット単位で移動できるプラグインとの併用推奨。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/11 Ver.1.0.2
+ * スティックを離した後に、プレイヤーがスローで移動してしまう問題を修正。
  * 2023/3/8 Ver.1.0.1
  * プレイヤーの移動速度の変更が適用されていなかった問題を修正。
  * 2023/3/7 Ver.1.0.0
@@ -104,7 +106,11 @@ Imported.NUUN_realMoveLeftStick = true;
     };
 
     Input.isStickMoveSpeed = function() {
-        return this._stickMoveing;
+        return this._onStickMoveing ? this._stickMoveing : this.getStickMoveHistory();
+    };
+
+    Input.getStickMoveHistory = function() {
+        return Math.max(this._stickMoveHistory[0], (this._stickMoveHistory[1] || 0));
     };
 
     Game_Player.prototype.realMoveSpeed = function() {

@@ -3018,7 +3018,7 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2023/3/11 Ver.2.18.4
+ * 2023/3/12 Ver.2.18.4
  * VisuMZ_1_BattleCoreでの敵のサイドビューアクターに対応。
  * 2023/3/11 Ver.2.18.3
  * 戦闘中にカーソル以外のページ切り替えができなかった問題を修正。
@@ -10902,7 +10902,7 @@ Sprite_BookEnemyActual.prototype.setup = function(battler, mask) {
     this._battler = battler;
     this.x = Graphics.width / 2;
     this.y = Graphics.height / 2;
-    this._svEnemy = battler && battler.enemy().meta.EB_SVBattler ? true : false;
+    this._svEnemy = battler ? this.getSvBattler(battler) : null;
     this._maskMode = mask;
     this.refresh();
 };

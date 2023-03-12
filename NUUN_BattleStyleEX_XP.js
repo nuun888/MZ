@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.10.0
+ * @version 1.10.1
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -55,6 +55,7 @@
  * Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステータス設定での設定に変更しております。
  * 旧設定で設定している場合でアクター座標、画像設定で追加する場合は、表示ステータス設定を空欄にしてください。
  * 
+ * ゲームパッドの振動設定
  * ゲームパッド設定の振動設定は別途NUUN_GamePadVibrationが必要です。
  * https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md
  * 
@@ -63,6 +64,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/3/12 Ver.1.10.1
+ * 味方へのクリティカル時と通常ダメージ時の振動設定を別々に変更。
  * 2023/2/27 Ver.1.10.0
  * ゲームパッドを振動させる機能を正式に追加。(要NUUN_GamePadVibration)
  * ボス消滅時にゲームパッドを振動させる機能を追加。
@@ -1712,6 +1715,20 @@
  * @desc ダメージ時の振動の設定を行います。
  * @parent GamePadSetting
  * 
+ * @param CriticalVibration
+ * @desc 味方クリティカルダメージ時のゲームパッドの振動を有効にします。
+ * @text 味方クリティカルダメージ時振動有効
+ * @type boolean
+ * @default false
+ * @parent GamePadSetting
+ * 
+ * @param CriticalVibrationSetting
+ * @type struct<VibrationData>
+ * @default {"StartDelay":"0","Duration":"20","WeakMagnitude":"1.0","StrongMagnitude":"1.0"}
+ * @text ダメージ時振動設定
+ * @desc ダメージ時の振動の設定を行います。
+ * @parent GamePadSetting
+ * 
  * @param BossCollapseVibration
  * @desc ボス消滅エフェクト時のゲームパッドの振動を有効にします。
  * @text ボス消滅時振動有効
@@ -2610,8 +2627,8 @@
 /*~struct~VibrationData:
  * 
  * @param StartDelay
- * @desc 振動を開始するまでのディレイ(ミリ秒)
- * @text 開始ディレイ
+ * @desc 振動を開始するまでのディレイフレーム数
+ * @text 開始ディレイフレーム
  * @type number
  * @default 0
  * @min 0
@@ -2824,6 +2841,8 @@ params.MessageWindowOpacity = Number(parameters['MessageWindowOpacity'] || 255);
 
 params.DamegeVibration = eval(parameters['DamegeVibration'] || "false");
 params.DamegeVibrationSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DamegeVibrationSetting'])) : null);
+params.CriticalVibration = eval(parameters['CriticalVibration'] || "false");
+params.CriticalVibrationSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CriticalVibrationSetting'])) : null);
 params.BossCollapseVibration = eval(parameters['BossCollapseVibration'] || "false");
 params.BossCollapseVibrationSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BossCollapseVibrationSetting'])) : null);
 

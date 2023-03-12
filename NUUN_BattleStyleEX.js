@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.0
+ * @version 3.10.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/3/12 Ver.3.10.1
+ * 味方へのクリティカル時と通常ダメージ時の振動設定を別々に変更。
  * 2023/2/27 Ver.3.10.0
  * ゲームパッドを振動させる機能を正式に追加。(要NUUN_GamePadVibration)
  * 2023/2/26 Ver.3.9.1
@@ -446,6 +448,25 @@ Game_BattlerBase.prototype.allIcons = function() {
   return icons;
 };
 
+//test
+const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
+Game_Action.prototype.applyItemUserEffect = function(target) {
+    _Game_Action_applyItemUserEffect.call(this, target);
+    //this.gamePadVibrationEffect(target);
+};
+
+Game_Action.prototype.gamePadVibrationEffect = function(target) {
+    if (this.item().meta.VibrationEffect){
+        const data = this.item().meta.VibrationEffect.split(',');
+        const vibration = {};
+        vibration.StartDelay = Number(data[0]);
+        vibration.Duration = Number(data[1]);
+        vibration.WeakMagnitude = Number(data[2]);
+        vibration.StrongMagnitude = Number(data[3]);
+        NuunManager.setupGamePadVibration(vibration);
+    }
+};
+
 
 //Game_Actor
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
@@ -680,23 +701,44 @@ Game_Actor.prototype.isSpriteVisible = function() {
   return params.ActorEffectShow && !$gameSystem.isSideView() ? ($gameParty.inBattle() ? true : _Game_Actor_isSpriteVisible.call(this)) : _Game_Actor_isSpriteVisible.call(this);
 };
 
+const _Window_BattleLog_displayHpDamage = Window_BattleLog.prototype.displayHpDamage;
+Window_BattleLog.prototype.displayHpDamage = function(target) {
+    if (target.isActor() && target.result().hpAffected && target.result().hpDamage > 0 && !target.result().drain) {
+        this.push("performVibration", target, target.result().critical);
+    }
+    _Window_BattleLog_displayHpDamage.call(this, target);
+};
+
+Window_BattleLog.prototype.performVibration = function(target, mode) {
+    target.performVibration(mode);
+};
+
+Game_Actor.prototype.performVibration = function(critical) {
+    if (critical && params.CriticalVibration) {
+        if (params.CriticalVibrationSetting) {
+            NuunManager.setupGamePadVibration(params.CriticalVibrationSetting);
+        }
+    } else {
+        if (params.DamegeVibration && params.DamegeVibrationSetting) {
+            NuunManager.setupGamePadVibration(params.DamegeVibrationSetting);
+        }
+    }
+};
+
 const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
 Game_Actor.prototype.performDamage = function() {
-  _Game_Actor_performDamage.call(this);
-  if (params.OnActorShake) {
-    this._onDamageEffect = true;
-  }
-  if (Imported.NUUN_GamePadVibration && params.DamegeVibration && params.DamegeVibrationSetting) {
-    NuunManager.setupGamePadVibration(params.DamegeVibrationSetting);
-}
-  if (this.isGuard()) {
-    this.setBattleImgId(15);
-    this.battleStyleImgRefresh();
-  }
-  if (this._imgScenes !== 'guard') {
-    this.setBattleImgId(1);
-    this.battleStyleImgRefresh();
-  }
+    _Game_Actor_performDamage.call(this);
+    if (params.OnActorShake) {
+        this._onDamageEffect = true;
+    }
+    if (this.isGuard()) {
+        this.setBattleImgId(15);
+        this.battleStyleImgRefresh();
+    }
+    if (this._imgScenes !== 'guard') {
+        this.setBattleImgId(1);
+        this.battleStyleImgRefresh();
+    }
 };
 
 const _Game_Actor_performRecovery = Game_Actor.prototype.performRecovery;

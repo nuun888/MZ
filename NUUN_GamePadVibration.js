@@ -12,15 +12,21 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * This is a plugin for vibrating the gamepad on X Input.
+ * 
+ * Specified from script
+ * NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/12/2023 Ver.1.0.1
+ * Changed the vibration start setting from milliseconds to frames.
+ * Supported so that it can be easily specified from the script.
  * 2/26/2023 Ver.1.0.0
  * First edition.
  * 
@@ -38,8 +44,8 @@
 /*~struct~VibrationData:
  * 
  * @param StartDelay
- * @desc Delay (in milliseconds) before vibration starts.
- * @text Start delay
+ * @desc Number of delay frames before vibration starts.
+ * @text Start delay frame
  * @type number
  * @default 0
  * @min 0
@@ -69,15 +75,21 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * X Inputでのゲームパッドを振動させるためのプラグインです。
+ * 
+ * スクリプトから指定
+ * NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/12 Ver.1.0.1
+ * 振動を開始する設定をミリ秒からフレーム数に変更。
+ * スクリプトから容易に指定できるように対応。
  * 2023/2/26 Ver.1.0.0
  * 初版。
  * 
@@ -102,8 +114,8 @@
 /*~struct~VibrationData:ja
  * 
  * @param StartDelay
- * @desc 振動を開始するまでのディレイ(ミリ秒)
- * @text 開始ディレイ
+ * @desc 振動を開始するまでのディレイフレーム数
+ * @text 開始ディレイフレーム
  * @type number
  * @default 0
  * @min 0
@@ -154,6 +166,15 @@ Imported.NUUN_GamePadVibration = true;
         _Scene_Base_update.call(this);
         NuunManager.updateVibration();
     };
+
+    NuunManager.sprictGamePadVibration = function(data1, data2, data3, data4) {
+        const vibration = {};
+        vibration.StartDelay = Number(data1);
+        vibration.Duration = Number(data2);
+        vibration.WeakMagnitude = Number(data3);
+        vibration.StrongMagnitude = Number(data4);
+        this.setupGamePadVibration(vibration);
+    };
     
 
     NuunManager.setupGamePadVibration = function(data) {
@@ -167,24 +188,33 @@ Imported.NUUN_GamePadVibration = true;
     
     NuunManager.setVibration = function(data) {
         if (data.Duration > this.actuatorDuration) {
+            this.actuatorDelay = data.StartDelay;
             this._actuatorData = data;
             this.actuatorDuration = data.Duration;
         }
     };
 
     NuunManager.updateVibration = function() {
-        if (this.actuatorDuration > 0) {
+        if (this.actuatorDelay > 0) {
+            this.actuatorDelay--;
+        }
+        if (this.actuatorDelay === 0 && this.actuatorDuration > 0) {
             const gamepads = navigator.getGamepads();
             for (const gamepad of gamepads) {
                 if (gamepad && gamepad.connected) {
                     const actuator = gamepad.vibrationActuator;
                     if (actuator) {
-                        actuator.playEffect(actuator.type, {
-                            startDelay: this._actuatorData.StartDelay,
-                            duration: 20,
-                            weakMagnitude: this._actuatorData.WeakMagnitude,
-                            strongMagnitude: this._actuatorData.StrongMagnitude,
-                        });
+                        //const agent = window.navigator.userAgent.toLowerCase();
+                        //if (agent.indexOf('firefox') >= 0) {//firefox
+                            //actuator.pulse(this._actuatorData.WeakMagnitude, 20);
+                        //} else {
+                            actuator.playEffect(actuator.type, {
+                                startDelay: 0,
+                                duration: 20,
+                                weakMagnitude: this._actuatorData.WeakMagnitude,
+                                strongMagnitude: this._actuatorData.StrongMagnitude,
+                            });
+                        //}
                     }
                 }
             }

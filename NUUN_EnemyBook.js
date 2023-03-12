@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.3
+ * @version 2.18.4
  * 
  * @help
  * Implement an enemy book.
@@ -111,6 +111,8 @@
  * Side view (specified when showing side view enemies in item settings)
  * <EB_SVBattler:[fileName]> Display the monster image as a side view image. (It is assumed that you have installed a plug-in that displays the side view actor on the enemy)
  * [fileName]:File name Specify the side view battler image. Please specify the file name in the sv_actors folder without the extension.
+ * If you are displaying the side view battler in the "Visu stalle" series, you do not need to define it.
+ * 
  * <EB_SVBattlerMotion:[motionId]> Display with the specified motion. If there is no entry, it will be displayed with 0 motion.
  * [motionId]:0 to 17 motion ID (enter numerical value)
  * 
@@ -201,6 +203,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/12/2023 Ver.2.18.4
+ * Added support for enemy sideview actors in "VisuMZ_1_BattleCore".
  * 3/11/2023 Ver.2.18.3
  * Fixed an issue where it was not possible to switch pages other than the cursor during combat.
  * Fixed the problem that when using "VisuMZ_0_CoreEngine", the monster page also changes when selecting a monster.
@@ -2819,7 +2823,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.3
+ * @version 2.18.4
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2919,6 +2923,8 @@
  * サイドビュー(項目設定のサイドビューエネミー表示時に指定されます)
  * <EB_SVBattler:[fileName]> モンスター画像をサイドビュー画像で表示させます。(モンスターにサイドビューアクターを表示する系のプラグイン導入が前提としています)
  * [fileName]:ファイル名　サイドビューバトラー画像を指定します。sv_actorsフォルダ内のファイル名を拡張子なしで指定してください。
+ * Visu stalleシリーズでサイドビューバトラーを表示している場合は定義する必要はありません。
+ * 
  * <EB_SVBattlerMotion:[motionId]> 指定したモーションで表示させます。記入なしの場合は0のモーションで表示されます。
  * [motionId]:0～17モーションID(数値で入力)
  * 
@@ -3012,6 +3018,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/11 Ver.2.18.4
+ * VisuMZ_1_BattleCoreでの敵のサイドビューアクターに対応。
  * 2023/3/11 Ver.2.18.3
  * 戦闘中にカーソル以外のページ切り替えができなかった問題を修正。
  * VisuMZ_0_CoreEngineと併用するとモンスター選択時にモンスターのページも切り替わってしまう問題を修正。
@@ -10666,9 +10674,18 @@ Sprite_BookEnemy.prototype.setup = function(battler,x, y, mask) {
     this._battler = battler;
     this.x = x;
     this.y = y;
-    this._svEnemy = battler.enemy().meta.EB_SVBattler ? true : false;
+    this._svEnemy = this.getSvBattler(battler);
     this._maskMode = mask;
     this.refresh();
+};
+
+Sprite_BookEnemy.prototype.getSvBattler = function(battler) {
+    if (battler.enemy().meta.EB_SVBattler) {
+        return "EB_SVBattler";
+    } else if (battler._svBattlerData && !!battler._svBattlerData.name) {
+        return "_svBattlerData";
+    }
+    return null;
 };
 
 Sprite_BookEnemy.prototype.resetEnemy = function() {
@@ -10774,7 +10791,11 @@ Sprite_BookEnemy.prototype.enemyBattlerName = function() {
 };
   
 Sprite_BookEnemy.prototype.enemySVBattlerName = function() {
-      return this._battler.enemy().meta.EB_SVBattler;
+    if (this._svEnemy === "EB_SVBattler") {
+        return this._battler.enemy().meta.EB_SVBattler;
+    } else if (this._svEnemy === "_svBattlerData") {
+        return this._battler._svBattlerData.name;
+    }
 };
   
 Sprite_BookEnemy.prototype.resetSVEnemy = function() {

@@ -1,30 +1,32 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.10.0
+### Ver.3.10.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.0  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.10.0  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.0  
-[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.0  
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.1  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.10.1  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.1  
+[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.1  
 
-バトルスタイル拡張デフォルト設定用 Ver.1.10.0  
+バトルスタイル拡張デフォルト設定用 Ver.1.10.1  
 ![画像](img/BattleStyleEX1.png)  
 
-バトルスタイル拡張スタンダード設定用 Ver.1.10.0 
+バトルスタイル拡張スタンダード設定用 Ver.1.10.1 
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.10.0  
+バトルスタイル拡張XPスタイル設定用 Ver.1.10.1  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.3.0  
+バトルスタイル拡張タイプ4設定用 Ver.1.3.1  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 
 ## 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.1以降  
-  
+
+## オプション
+[ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md)  
   
 バトルレイアウトをXP風に変更します。  
 
@@ -168,6 +170,8 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/3/12 Ver.1.10.1  
+味方へのクリティカル時と通常ダメージ時の振動設定を別々に変更。  
 2023/2/27 Ver.3.10.0  
 ゲームパッドを振動させる機能を正式に追加。(要NUUN_GamePadVibration)  
 ボス消滅時にゲームパッドを振動させる機能を追加。  

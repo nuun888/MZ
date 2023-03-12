@@ -8,7 +8,10 @@ RPGツクールMVへの対応は行いません。
 
 [既知の不具合、更新予定](https://github.com/nuun888/MZ/blob/master/bug.md)  
 
-[よくある質問](https://github.com/nuun888/MZ/blob/master/README/q&a.md)
+[よくある質問](https://github.com/nuun888/MZ/blob/master/README/q&a.md)  
+
+来月の4月1日よりコアスクリプトVer.1.5以前に対応するプラグインのサポートを終了させていただきます。  
+今後はVer.1.6以降の対応のみにさせていただきます。  
 
 # 公開プラグイン
 共：要共通処理  

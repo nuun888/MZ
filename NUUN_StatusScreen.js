@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.5.4
+ * @version 2.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,13 +56,19 @@
  * 
  * レーダーチャートを表示するにはNUUN_RadarChartBaseが必要です。
  * 
- * アクターのメモ欄
+ * アクター、職業のメモ欄
  * <[tag]:[text]> 記述欄のテキスト
  * [tag]:記述欄タグ名
  * [text]:表示するテキスト。
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
  * <desc1:ああああ> desc1とタグ付けされた項目に「ああああ」が表示されます。
  * 文章を表示させる場合は<desc1:ああああ>と記入してください。
+ * 
+ * ステータスにアクターまたは職業別に画像を表示する。
+ * アクター、職業のメモ欄
+ * <[tag]:[Img]> 個別画像を表示します。
+ * [tag]:タグ名
+ * [text]:任意の個別画像。
  * 
  * 
  * 特定のアクター又は職業の表示させる装備を指定する。
@@ -86,6 +92,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/14 Ver.2.6.0
+ * 任意の画像を表示できる機能を追加。
+ * ページ切り替えの処理を修正。
  * 2023/3/9 Ver.2.5.4
  * レーダーチャートの色設定が正常に適用されていなかった問題を修正。
  * システムカラー0番が指定できない問題を修正。
@@ -334,6 +343,13 @@
  * @type number
  * @default 10
  * @min 0
+ * @parent Setting
+ * 
+ * @param ImgFolder
+ * @desc 個別指定画像をフォルダ名を指定します。(img直下)
+ * @text 個別指定画像フォルダ
+ * @type string
+ * @default pictures
  * @parent Setting
  * 
  * @param PageNextSymbol
@@ -1012,6 +1028,10 @@
  * @value 201
  * @option ステート耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
  * @value 202
+ * @option 画像（共通画像）(2)～(7)(9)(13)(14)
+ * @value 300
+ * @option 画像（個別指定画像）(2)～(7)(9)(12)(14)
+ * @value 301
  * @option ライン(1)(4)(5)(6)(7)(8)(10)
  * @value 1000
  * @default 0
@@ -1037,6 +1057,8 @@
  * @option "actor.isStateResist(stateId) ? '無効' : r;//ステート耐性"
  * @option 'actor.level'
  * @option "100 - r +' %';//耐性差分表示"
+ * @option "this.expTotalValue();//現在の経験値"
+ * @option "this.expNextValue();//次のレベルまで"
  * @default 
  * 
  * @param X_Position
@@ -1175,7 +1197,18 @@
  * @default 0
  * @parent EquipSetting
  * 
- *
+ * @param ImgSetting
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc 画像ファイル名を指定します。
+ * @text 画像(22)
+ * @type file
+ * @dir img/
+ * @default
+ * @parent ImgSetting
+ * 
  */
 /*~struct~ActorPictureDataList:
  * 
@@ -1239,6 +1272,7 @@ Imported.NUUN_StatusScreen = true;
 const parameters = PluginManager.parameters('NUUN_StatusScreen');
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const ExpPercent = eval(parameters['ExpPercent'] || "false");
+const ImgFolder = String(parameters['ImgFolder']);
 const HPGaugeWidth = Number(parameters['HPGaugeWidth'] || 200);
 const HPGaugeHeight = Number(parameters['HPGaugeHeight'] || 12);
 const MPGaugeWidth = Number(parameters['MPGaugeWidth'] || 200);
@@ -1490,21 +1524,21 @@ Scene_Status.prototype.statusPageup = function() {
 };
 
 Scene_Status.prototype.updateStatusPagedown = function() {
-	const maxPage = this.maxPage();
-  if (maxPage > 1) {
-    this._page = (this._page + 1) % maxPage;
-    SoundManager.playCursor();
-    this.updatePage();
-  }
+    const maxPage = this.maxPage();
+    if (maxPage > 1) {
+        this._page = (this._page + maxPage - 1) % maxPage;
+        SoundManager.playCursor();
+        this.updatePage();
+    }
 };
 
 Scene_Status.prototype.updateStatusPageup = function() {
 	const maxPage = this.maxPage();
-  if (maxPage > 1) {
-    this._page = (this._page + maxPage - 1) % maxPage;
-    SoundManager.playCursor();
-    this.updatePage();
-  }
+    if (maxPage > 1) {
+        this._page = (this._page + 1) % maxPage;
+        SoundManager.playCursor();
+        this.updatePage();
+    }
 };
 
 Scene_Status.prototype.updatePage = function() {
@@ -1520,9 +1554,9 @@ const _Scene_Status_update = Scene_Status.prototype.update;
 Scene_Status.prototype.update = function() {
   _Scene_Status_update.call(this);
     if (!PageNextSymbol && !PagePreviousSymbol) {
-        if (Input.isRepeated('left') && this.maxPage() > 1) {
+        if (Input.isRepeated('right') && this.maxPage() > 1) {
             this.updateStatusPageup();
-        } else if (Input.isRepeated('right') && this.maxPage() > 1){
+        } else if (Input.isRepeated('left') && this.maxPage() > 1){
             this.updateStatusPagedown();
         }
     }
@@ -1540,8 +1574,43 @@ Window_Status.prototype.refresh = function() {
   Window_StatusBase.prototype.refresh.call(this);
   if (this._actor) {
     this.actorImg();
-    this.drawBlock();
+    this.drawBlockImg();
   }
+};
+
+Window_Status.prototype.drawBlockImg = function() {
+    const data = this.listDate();
+    let bitmap = null;
+    let loadBitmap = null;
+    let meta = null;
+    const actor = this._actor;
+    data.forEach(list => {
+        switch (list.DateSelect) {
+            case 300:
+                loadBitmap = ImageManager.nuun_LoadPictures(list.ImgData);
+            case 301:
+                if (actor.actor().meta[list.textMethod]) {
+                    meta = this._actor.actor().meta[list.textMethod];
+                } else if (actor.currentClass().meta[list.textMethod]) {
+                    meta = actor.currentClass().meta[list.textMethod].split(',');
+                }
+                if (meta) {
+                    const dataImg = meta ? meta.split(',') : null;
+                    if (dataImg) {
+                        loadBitmap = ImageManager.loadBitmap("img/"+ ImgFolder +"/", dataImg[0]);
+                    }
+                }
+        }
+        if (loadBitmap && !loadBitmap.isReady()) {
+            bitmap = loadBitmap;
+        }
+    });
+    if (bitmap && !bitmap.isReady()) {
+        bitmap.addLoadListener(this.drawBlock.bind(this))
+        return;
+    } else {
+        this.drawBlock();
+    }
 };
 
 const _Window_Status_loadFaceImages = Window_Status.prototype.loadFaceImages;
@@ -1825,9 +1894,6 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
     case 102:
       this.drawSideViewActor(list, this._actor, x, y);
       break;
-    case 103:
-      this.drawImg(list, this._actor, x, y);
-      break;
     case 200:
       this.drawStatusRadarChart(list, this._actor, x, y);
       break;
@@ -1836,6 +1902,12 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
       break;
     case 202:
       this.drawStateRadarChart(list, this._actor, x, y);
+      break;
+    case 300:
+      this.drawStatusCommonImg(list, this._actor, x, y, width);
+      break;
+    case 301:
+      this.drawStatusImg(list, this._actor, x, y, width);
       break;
     case 1000:
       this.horzLine(list, x, y, width);
@@ -2335,14 +2407,14 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
 };
 
 Window_Status.prototype.drawExpInfo = function(list, actor, x, y, width) {
-    const lineHeight = this.lineHeight();
     this.contentsFontSize(list);
     let margin = 0;
     if (list.IconId > 0) {
         this.drawIcon(list.IconId, x, y + list.IconY);
         margin = ImageManager.iconWidth + 4;
     }
-    const expTotal = TextManager.expTotal.format(TextManager.exp);
+    const expTotal = !list.ParamName ? TextManager.expTotal.format(TextManager.exp) : list.ParamName;
+    const lineHeight = this.lineHeight();
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(expTotal, x + margin, y, width - margin);
     this.resetTextColor();
@@ -2358,7 +2430,7 @@ Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
         this.drawIcon(list.IconId, x, y + list.IconY);
         margin = ImageManager.iconWidth + 4;
     }
-    const expNext = TextManager.expNext.format(TextManager.level);
+    const expNext = !list.ParamName ? TextManager.expNext.format(TextManager.level) : list.ParamName;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(expNext, x + margin, y, width - margin);
     this.resetTextColor();
@@ -2370,16 +2442,59 @@ Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
     }
 };
 
+Window_Status.prototype.drawStatusCommonImg = function(list, actor, x, y, width) {
+    const bitmap = ImageManager.nuun_LoadPictures(list.ImgData);
+    if (bitmap && !bitmap.isReady()) {
+      bitmap.addLoadListener(this.drawImg.bind(this, bitmap, list, x, y, width));
+    } else if (bitmap) {
+      this.drawImg(bitmap, list, x, y, width);
+    }
+};
+
+Window_Status.prototype.drawStatusImg = function(list, item, x, y, width) {
+    const dataImg = this.getActorStatusImg(list, item);
+    if (dataImg) {
+      const bitmap = ImageManager.nuun_LoadPictures(dataImg[0]);
+      x += Number(dataImg[1]) || 0;
+      y += Number(dataImg[2]) || 0;
+      if (!bitmap.isReady()) {
+        bitmap.addLoadListener(this.drawImg.bind(this, bitmap, list, x, y, width));
+      } else if (bitmap) {
+        this.drawImg(bitmap, list, x, y, width);
+      }
+    }
+};
+
+Window_Status.prototype.drawImg = function(bitmap, list, x, y, width) {
+    //const height = list.ImgMaxHeight * this.lineHeight();
+    //const scalex = Math.min(1.0, width / bitmap.width);
+    //const scaley = Math.min(1.0, height / bitmap.height);
+    //const scale = scalex > scaley ? scaley : scalex;
+    const dw = Math.floor(bitmap.width);
+    const dh = Math.floor(bitmap.height);
+    x += Math.floor(width / 2 - dw / 2);
+    this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
+};
+
+Window_Status.prototype.getActorStatusImg = function(list, actor) {
+    let arr = [];
+    if (actor.actor().meta[list.textMethod]) {
+        arr = actor.actor().meta[list.textMethod].split(',');
+    } else if (actor.currentClass().meta[list.textMethod]) {
+        arr = actor.currentClass().meta[list.textMethod].split(',');
+    } else {
+        return null;
+    }
+    arr[0] = ImgFolder +"/"+ arr[0].trim();
+    return arr;
+};
+
 Window_Status.prototype.drawCharacterChip = function(list, actor, x, y) {
   this.characterChipSprite(actor, x, y);
 };
 
 Window_Status.prototype.drawSideViewActor = function(list, actor, x, y) {
   this.svActoeSprite(actor, x, y);
-};
-
-Window_Status.prototype.drawImg = function(list, actor, x, y) {
-
 };
 
 Window_Status.prototype.drawStatusRadarChart = function(list, actor, x, y) {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/15/2023 Ver.1.6.4
+ * Added error prevention processing for String input.
+ * Added error proofing for eval input.
  * 2/7/2023 Ver.1.6.3
  * Added processing to call events with plugin commands.
  * 12/30/2022 Ver.1.6.2
@@ -74,7 +77,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -84,6 +87,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/15 Ver.1.6.4
+ * string入力のエラー防止処理を追加。
+ * eval入力のエラー防止処理を追加。
  * 2023/2/7 Ver.1.6.3
  * プラグインコマンドでイベントを呼び出すための処理の追加。
  * 2022/12/30 Ver.1.6.2
@@ -156,11 +162,7 @@ function structureData(params) {
     try {
         return JSON.parse(value);
     } catch (e) {
-        try {
-            return eval(value);
-        } catch (e) {
-            return value;
-        }
+        return NuunManager.getEvalCode(value);
     }
   }));
 }
@@ -192,6 +194,35 @@ NuunManager.nuun_getListIdData = function(id) {
   } else {
     return [Number(id)];
   }
+};
+
+NuunManager.getStringCode = function(code) {
+    if (!code) {
+        return null;
+    }
+    return stringCode(code);
+};
+
+NuunManager.getEvalCode = function(code) {
+    if (isNaN(code)) {
+        if (!code) {
+            return null;
+        }
+        return stringCode(code);
+    } else {
+        return String(code);
+    }
+};
+
+function stringCode(code) {
+    try {
+        if (code.indexOf("'") === 0 || code.indexOf('"' === 0)) {
+            return eval(code);//'または"を外す。
+        }
+        return !!code ? String(code) : null;
+    } catch (e) {
+        return !!code ? String(code) : null;
+    }
 };
 
 const _Game_Interpreter_command357 = Game_Interpreter.prototype.command357;
@@ -383,6 +414,7 @@ Window_ItemList.prototype.isConstructor = function() {
   return false;
 };
 
+
 Game_Action.prototype.getAttackElementsList = function() {
   return Imported.NUUN_MultiElement ? this.getAttackElements() : this.subject().attackElements();
 };
@@ -439,7 +471,5 @@ Sprite_NuunAPngImg.prototype.loadApngSprite = function(name) {
 Game_Enemy.prototype.allSkillActions = function(actionList) {
   return actionList;
 };
-
-
 
 })();

@@ -1,5 +1,5 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.6.3
+# Ver.1.6.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 English available  
@@ -8,6 +8,9 @@ English available
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2023/3/15 Ver.1.6.4  
+string入力のエラー防止処理を追加。  
+eval入力のエラー防止処理を追加。  
 2023/2/7 Ver.1.6.3  
 プラグインコマンドでイベントを呼び出すための処理の追加。  
 2022/12/30 Ver.1.6.2  

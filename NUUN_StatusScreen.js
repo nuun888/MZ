@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.0
+ * @version 2.6.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -92,6 +92,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/15 Ver.2.6.1
+ * String入力のエラー防止処理を追加。(NUUN_Base Ver.1.6.4以降)
  * 2023/3/14 Ver.2.6.0
  * 任意の画像を表示できる機能を追加。
  * ページ切り替えの処理を修正。
@@ -1272,7 +1274,7 @@ Imported.NUUN_StatusScreen = true;
 const parameters = PluginManager.parameters('NUUN_StatusScreen');
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
 const ExpPercent = eval(parameters['ExpPercent'] || "false");
-const ImgFolder = String(parameters['ImgFolder']);
+const ImgFolder = NuunManager.getStringCode(parameters['ImgFolder']);
 const HPGaugeWidth = Number(parameters['HPGaugeWidth'] || 200);
 const HPGaugeHeight = Number(parameters['HPGaugeHeight'] || 12);
 const MPGaugeWidth = Number(parameters['MPGaugeWidth'] || 200);
@@ -1285,8 +1287,8 @@ const EXPGaugeX = Number(parameters['EXPGaugeX'] || 0);
 const EXPGaugeY = Number(parameters['EXPGaugeY'] || 0);
 const DefaultFontSize = Number(parameters['DefaultFontSize'] || 0);
 const FontMargin = Number(parameters['FontMargin'] || 10);
-const PageNextSymbol = String(parameters['PageNextSymbol']);
-const PagePreviousSymbol = String(parameters['PagePreviousSymbol']);
+const PageNextSymbol = NuunManager.getStringCode(parameters['PageNextSymbol']);
+const PagePreviousSymbol = NuunManager.getStringCode(parameters['PagePreviousSymbol']);
 const PageList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList'])) : null) || [];
 const ParamList_1Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_1Page'])) : null) || [];
 const ParamList_2Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_2Page'])) : null) || [];

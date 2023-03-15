@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * Change the movement speed of the player depending on how hard the left stick of the gamepad is pushed down.
@@ -23,6 +23,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/15/2023 Ver.1.0.3
+ * Fixed an issue that caused an error when moving maps.
  * 3/11/2023 Ver.1.0.2
  * Fixed an issue where the player would slow move after releasing the stick.
  * 3/8/2023 Ver.1.0.1
@@ -50,7 +52,7 @@
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * ゲームパッドの左スティックの倒した強さによりプレイヤーの移動速度を変化させるように変更します。
@@ -61,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/15 Ver.1.0.3
+ * マップ移動時にエラーが出る問題を修正。
  * 2023/3/11 Ver.1.0.2
  * スティックを離した後に、プレイヤーがスローで移動してしまう問題を修正。
  * 2023/3/8 Ver.1.0.1
@@ -98,7 +102,7 @@ Imported.NUUN_realMoveLeftStick = true;
     };
 
     Input._gamepadStickRealMove = function() {
-        this._stickDashing = !$gameMap.isDashDisabled() && (this._stickMoveing >= (DashSpeed / GamepadLeftStickMaxSpeed) - 0.5);
+        this._stickDashing = $dataMap && !$gameMap.isDashDisabled() && (this._stickMoveing >= (DashSpeed / GamepadLeftStickMaxSpeed) - 0.5);
     };
 
     Input.gamepadLeftStickMaxDash = function() {

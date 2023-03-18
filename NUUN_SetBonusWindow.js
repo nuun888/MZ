@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Set bonus tooltip window
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/18/2023 Ver.1.0.4
+ * Fixed not to process when invalid ID is specified.
  * 11/17/2022 Ver.1.0.3
  * Applied equipment set bonus Modified by changing the display setting method of the set bonus.
  * 10/8/2022 Ver.1.0.2
@@ -70,7 +72,7 @@
  * @target MZ
  * @plugindesc セットボーナスツールチップウィンドウ
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -79,6 +81,8 @@
  * 装備画面で装備スロット選択中の装備で現在適用しているセットボーナスを表示します。
  * 
  * 更新履歴
+ * 2023/3/18 Ver.1.0.4
+ * 無効なIDを指定したときに処理しないように修正。
  * 2022/11/17 Ver.1.0.3
  * 装備セットボーナスの適用セットボーナスの表示設定方法の仕様変更による修正。
  * 2022/10/8 Ver.1.0.2
@@ -252,28 +256,33 @@ Window_SetBounsEquip.prototype.refresh = function() {
         const list = this._equip.meta.SetBonus.split(',');
         list.forEach(setBonusId => {
             const data = isNaN(setBonusId) ? NuunManager.getSetBonusDataName(setBonusId) : NuunManager.getSetBonusData(Number(setBonusId));
-            setBonusSum = this._actor.getTotalSetBonus(data);
-            const name = data.SetBonusName;
-            this.changeTextColor(NuunManager.getColorCode(SetBonusNameColor));
-            this.drawSetBonusName(name, rect.x, rect.y, rect.width);
-            this.resetTextColor();
-            y += lineHeight;
-            this.horzLine(rect.x, y, rect.width);
-            y += lineHeight;
-            data.SetBonusNumberEquipment.forEach(numberEquip => {
-                if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
-                    y += lineHeight * this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
-                    contentsRows++;
-                } else if (!(data.SetBonusEquip && data.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
-                    y += lineHeight * this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
+            if (data) {
+                setBonusSum = this._actor.getTotalSetBonus(data);
+                const name = data.SetBonusName;
+                this.changeTextColor(NuunManager.getColorCode(SetBonusNameColor));
+                this.drawSetBonusName(name, rect.x, rect.y, rect.width);
+                this.resetTextColor();
+                y += lineHeight;
+                this.horzLine(rect.x, y, rect.width);
+                y += lineHeight;
+                data.SetBonusNumberEquipment.forEach(numberEquip => {
+                    if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
+                        y += lineHeight * this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
+                        contentsRows++;
+                    } else if (!(data.SetBonusEquip && data.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
+                        y += lineHeight * this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
+                        contentsRows++;
+                    }
+                });
+                if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && data.SetBonusEquip.length === setBonusSum) {
+                    y += lineHeight * this.drawSetBonusParam(data, rect.x, y, rect.width);
                     contentsRows++;
                 }
-            });
-            if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && data.SetBonusEquip.length === setBonusSum) {
-                y += lineHeight * this.drawSetBonusParam(data, rect.x, y, rect.width);
-                contentsRows++;
+                this.height = this.fittingHeight(contentsRows + 2);
+                
+            } else {
+                console.log("無効なIDが設定されています。");
             }
-            this.height = this.fittingHeight(contentsRows + 2);
             this._onRefresh = true;
         });
     }

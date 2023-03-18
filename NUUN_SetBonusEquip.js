@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Equip set bonus
  * @author NUUN
- * @version 1.3.4
+ * @version 1.3.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -52,6 +52,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/18/2023 Ver.1.3.5
+ * Fixed not to process when invalid ID is specified.
  * 11/17/2022 Ver.1.3.4
  * Changed the specification of the display parameter text of the set bonus. (Reset required)
  * 11/15/2022 Ver.1.3.3
@@ -237,7 +239,7 @@
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
- * @version 1.3.4
+ * @version 1.3.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -275,8 +277,11 @@
  * https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md
  * 
  * 更新履歴
+ * 2023/3/18 Ver.1.3.5
+ * 無効なIDを指定したときに処理しないように修正。
  * 2022/11/17 Ver.1.3.4
  * セットボーナスの表示パラメータテキストの仕様を変更。(要再設定)
+ * 日本語以外での表示を英語表示に変更。
  * 2022/11/15 Ver.1.3.3
  * 重複しない装備が武器、防具を区別せずに参照していた問題を修正。
  * 2022/11/14 Ver.1.3.2
@@ -506,7 +511,7 @@ Game_Actor.prototype.getTotalSetBonus = function(setBonus) {
         if (list) {
             const result = list.some(data => {
                 const id = isNaN(data) ? SetBonusData.findIndex(bonusData => bonusData.SetBonusName === data) : Number(data) - 1;
-                if (id >= 0 && SetBonusData[id] === setBonus && this.isEquipInSetBonus(SetBonusData[id], equip.id)) {
+                if (!!SetBonusData[id] && SetBonusData[id] === setBonus && this.isEquipInSetBonus(SetBonusData[id], equip.id)) {
                     if (!setBonusIds[id]) {
                         setBonusIds[id] = [];
                     }
@@ -531,7 +536,7 @@ Game_Actor.prototype.getSetBonusIds = function() {
         if (list) {
             list.forEach(data => {
                 const id = isNaN(data) ? SetBonusData.findIndex(bonusData => bonusData.SetBonusName === data) : Number(data) - 1;
-                if (id >= 0 && this.isEquipInSetBonus(SetBonusData[id], equip.id)) {
+                if (!!SetBonusData[id] && this.isEquipInSetBonus(SetBonusData[id], equip.id)) {
                     if (!setBonusIds[id]) {
                         setBonusIds[id] = {id: id + 1, sum:0, wequipId:[], aequipId:[]};
                     }

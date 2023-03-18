@@ -1,5 +1,5 @@
 # [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
-# Ver.1.3.4
+# Ver.1.3.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -50,6 +50,8 @@ SetBonusタグがある装備が装備されており、条件を満たしてい
 ![画像](img/SetBonusEquip1.png)  
 
 ## 更新履歴
+2023/3/18 Ver.1.3.5  
+無効なIDを指定したときに処理しないように修正。  
 2022/11/17 Ver.1.3.4  
 セットボーナスの表示パラメータテキストの仕様を変更。(要再設定)  
 2022/11/15 Ver.1.3.3  

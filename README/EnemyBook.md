@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.18.4
+# Ver.2.18.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -253,6 +253,9 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2023/3/20 Ver.2.18.5  
+敵のゲームデータをキャッシュするように修正。(一部のモンスター以外)  
+未登録モンスターの原寸画像を表示しないように修正。  
 2023/3/12 Ver.2.18.4  
 VisuMZ_1_BattleCoreでの敵のサイドビューアクターに対応。  
 2023/3/11 Ver.2.18.3  

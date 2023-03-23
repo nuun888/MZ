@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.2
+ * @version 1.3.3
  * 
  * @help
  * Randomly obtain items and money.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/24/2023 Ver.1.3.3
+ * Fixed the problem that an error occurs with NUUN_Base Ver.1.6.4 or later.
  * 12/9/2022 Ver.1.3.2
  * Added a function that can set a conditional expression for the random acquisition target.
  * 12/8/2022 Ver.1.3.1
@@ -183,7 +185,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.2
+ * @version 1.3.3
  * 
  * @help
  * アイテム、お金をランダムで入手します。
@@ -211,6 +213,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/23 Ver.1.3.3
+ * NUUN_Base Ver.1.6.4以降でエラーが出る問題を修正。
  * 2022/12/9 Ver.1.3.2
  * ランダム取得対象に条件式を設定できる機能を追加。
  * 2022/12/8 Ver.1.3.1
@@ -377,9 +381,9 @@ Imported.NUUN_RandomItems = true;
   };
 
   Game_Party.prototype.randomItems = function(args) {
-    const list = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args)) : null) || [];
+    const list = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(args.list)) : null) || [];
     if (list) {
-      const data = list.list.filter(a => !a.Cond || (a.Cond && eval(a.Cond)));
+      const data = list.filter(a => !a.Cond || (a.Cond && eval(a.Cond)));
       const itemData = this.randomItemList(data);
       const interpreter = new Game_Interpreter();
       interpreter.clear();

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -114,6 +114,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2023/3/25 Ver.1.6.1
+ * モンスターページのページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)
  * 2023/2/25 Ver.1.6.0
  * 追加能力値、特殊能力値を表示できる項目を追加。
  * 2023/1/25 Ver.1.5.1
@@ -379,6 +381,24 @@
  * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
  * @type boolean
  * @default true
+ * @parent BasicSetting
+ * 
+ * @param PageNextSymbol
+ * @desc ページ送りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ送りシンボル名
+ * @type combo
+ * @option 
+ * @option pageup2
+ * @default 
+ * @parent BasicSetting
+ * 
+ * @param PagePreviousSymbol
+ * @desc ページ戻りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
+ * @text ページ戻りシンボル名
+ * @type combo
+ * @option 
+ * @option pagedown2
+ * @default 
  * @parent BasicSetting
  * 
  * @param WindowSetting
@@ -1488,6 +1508,8 @@ const RegistrationItemTiming = Number(parameters['RegistrationItemTiming'] || 0)
 const UnknownData = String(parameters['UnknownData'] || '？');
 const UnknownItemData = String(parameters['UnknownItemData'] || '？？？');
 const DecimalMode = eval(parameters['DecimalMode'] || "true");
+const PageNextSymbol = NuunManager.getStringCode(parameters['PageNextSymbol']);
+const PagePreviousSymbol = NuunManager.getStringCode(parameters['PagePreviousSymbol']);
 const ItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemBookImgList'])) : null) || [];
 const WeaponItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['WeaponItemBookImgList'])) : null) || [];
 const ArmorItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ArmorItemBookImgList'])) : null) || [];
@@ -2058,16 +2080,20 @@ Scene_ItemBook.prototype.createItemWindow = function() {
 };
 
 Scene_ItemBook.prototype.createItemPageWindow = function() {
-  const rect = this.itemWindowPageRect();
-  this._itemPageWindow = new Window_ItemBookPageCategory(rect);
-  this.addWindow(this._itemPageWindow);
-  this._itemPageWindow.setIndexWindow(this._indexWindow);
-  this._indexWindow.setPageWindow(this._itemPageWindow);
-  if (PageCols <= 1) {
-    this._itemPageWindow.height = 0;
-    this._itemPageWindow.hide();
-  }
-  this.backgroundOpacity(this._itemPageWindow);
+    const rect = this.itemWindowPageRect();
+    this._itemPageWindow = new Window_ItemBookPageCategory(rect);
+    this.addWindow(this._itemPageWindow);
+    this._itemPageWindow.setIndexWindow(this._indexWindow);
+    this._indexWindow.setPageWindow(this._itemPageWindow);
+    if (!!PageNextSymbol && !!PagePreviousSymbol) {
+        this._itemPageWindow.setHandler(PageNextSymbol, this.itemBookPageup.bind(this));
+        this._itemPageWindow.setHandler(PagePreviousSymbol, this.itemBookPagedown.bind(this));
+        }
+    if (PageCols <= 1) {
+        this._itemPageWindow.height = 0;
+        this._itemPageWindow.hide();
+    }
+    this.backgroundOpacity(this._itemPageWindow);
 };
 
 Scene_ItemBook.prototype.percentWindowRect = function() {
@@ -2190,6 +2216,23 @@ Scene_ItemBook.prototype.setBackground = function(sprite, bitmap) {
     sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
   }
 };
+
+Scene_ItemBook.prototype.itemBookPagedown = function() {
+    this._itemPageWindow.activate();
+    this._itemPageWindow.cursorRight(true);
+    if (this._itemPageWindow.isCursorMovable() && this._itemPageWindow.maxCols() > 1) {
+        SoundManager.playCursor();
+    }
+};
+  
+Scene_ItemBook.prototype.itemBookPageup = function() {
+    this._itemPageWindow.activate();
+    this._itemPageWindow.cursorLeft(true);
+    if (this._itemPageWindow.isCursorMovable() && this._itemPageWindow.maxCols() > 1) {
+        SoundManager.playCursor();
+    }
+};
+
 
 function Window_ItemBook_Category() {
   this.initialize(...arguments);
@@ -2679,7 +2722,7 @@ Window_ItemBook.prototype.page = function(item) {
 };
 
 Window_ItemBook.prototype.drawPage = function(listContent, item) {
-  const lineHeight = this.lineHeight();console.log(item)
+  const lineHeight = this.lineHeight();
   for (const data of listContent) {
     const x_Position = data.X_Position;
     const position = Math.min(x_Position, this.maxCols());
@@ -3397,7 +3440,7 @@ Window_ItemBookPageCategory.prototype.initialize = function(rect) {
 };
 
 Window_ItemBookPageCategory.prototype.maxCols = function() {
-  return PageCols;
+  return this._maxPage > 0 ? this._maxPage : PageCols;
 };
 
 Window_ItemBookPageCategory.prototype.listMode = function() {
@@ -3485,4 +3528,13 @@ Window_ItemBookPageCategory.prototype.drawItem = function(index) {
     this.drawText(text, rect.x, rect.y, rect.width);
   }
 };
+
+Window_ItemBookPageCategory.prototype.cursorUp = function(wrap) {
+
+};
+    
+Window_ItemBookPageCategory.prototype.cursorDown = function(wrap) {
+
+};
+
 })();

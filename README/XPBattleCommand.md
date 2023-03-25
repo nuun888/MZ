@@ -3,7 +3,7 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPBattleCommand.js)
 
 パーティコマンド、アクターコマンドをXP風に表示します。  
-![画像](img/XPBattleCommand2.png)  
+![画像](img/MultiMessageWindows.png)  
 パーティコマンドの表示位置を画面上、中央（画面上からアクターステータスの中間）、アクターステータスの上に表示することができます。  
 
 ※このプラグインはバトルスタイル拡張プラグインからの機能分離プラグインのため併用はできません。

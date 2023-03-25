@@ -12,18 +12,24 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
  * 
- * Terms of Use
- * This plugin is distributed under the MIT license.
- * 
  * The button layout of the gamepad is based on the Xbox360 controller.
  * If the keyboard or gamepad code is set to -1, the original value is set.
  * 
+ * specification
+ * When applying key and button settings on the scene, the key or button will not respond unless a script or common event is specified.
+ * Multiple application scenes can be set. If not set, it applies to all scenes.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
  * Log
+ * 3/25/2023 Ver.1.2.4
+ * Changed the use of key button trigger apply on scene.
  * 3/12/2023 Ver.1.2.3
  * Added a function that can specify common events for key button triggers on the scene.
  * 3/11/2023 Ver.1.2.2
@@ -74,7 +80,143 @@
  * @param KeyCode
  * @desc Key code.
  * @text Key code
- * @type number
+ * @type select
+ * @option None
+ * @value -1
+ * @option BackSpace
+ * @value 8
+ * @option Tab
+ * @value 9
+ * @option Enter
+ * @value 13
+ * @option Shift
+ * @value 16
+ * @option Ctrl
+ * @value 17
+ * @option Alt
+ * @value 18
+ * @option Pause
+ * @value 19
+ * @option Space
+ * @value 32
+ * @option PageUp
+ * @value 33
+ * @option PageDown
+ * @value 34
+ * @option End
+ * @value 35
+ * @option Home
+ * @value 36
+ * @option ←
+ * @value 37
+ * @option ↑
+ * @value 38
+ * @option →
+ * @value 39
+ * @option ↓
+ * @value 40
+ * @option Insert
+ * @value 45
+ * @option Delete
+ * @value 46
+ * @option 0
+ * @value 48
+ * @option 1
+ * @value 49
+ * @option 2
+ * @value 50
+ * @option 3
+ * @value 51
+ * @option 4
+ * @value 52
+ * @option 5
+ * @value 53
+ * @option 6
+ * @value 54
+ * @option 7
+ * @value 55
+ * @option 8
+ * @value 56
+ * @option 9
+ * @value 57
+ * @option A
+ * @value 65
+ * @option B
+ * @value 66
+ * @option C
+ * @value 67
+ * @option D
+ * @value 68
+ * @option E
+ * @value 69
+ * @option F
+ * @value 70
+ * @option G
+ * @value 71
+ * @option H
+ * @value 72
+ * @option I
+ * @value 73
+ * @option J
+ * @value 74
+ * @option K
+ * @value 75
+ * @option L
+ * @value 76
+ * @option M
+ * @value 77
+ * @option N
+ * @value 78
+ * @option O
+ * @value 79
+ * @option P
+ * @value 80
+ * @option Q
+ * @value 81
+ * @option R
+ * @value 82
+ * @option S
+ * @value 83
+ * @option T
+ * @value 84
+ * @option U
+ * @value 85
+ * @option V
+ * @value 86
+ * @option W
+ * @value 87
+ * @option X
+ * @value 88
+ * @option Y
+ * @value 89
+ * @option Z
+ * @value 90
+ * @option Win
+ * @value 91
+ * @option Apps
+ * @value 92
+ * @option :*
+ * @value 186
+ * @option ;+
+ * @value 187
+ * @option ,<
+ * @value 188
+ * @option -=
+ * @value 189
+ * @option .>
+ * @value 190
+ * @option /?
+ * @value 191
+ * @option `
+ * @value 192
+ * @option [{
+ * @value 220
+ * @option |
+ * @value 221
+ * @option ]}
+ * @value 222
+ * @option Esc
+ * @value 243
  * @default -1
  * @min -1
  * 
@@ -159,20 +301,21 @@
  * @default 0
  * @parent SceneKeyAndButtonSetting
  * 
- * @param MapValid
- * @desc Valid on the map.
- * @text Map Valid
- * @type boolean
- * @default true
+ * @param ValidScene
+ * @desc The scene to apply the key, button.
+ * @text Applicable scene
+ * @type combo[]
+ * @option "Scene_Map"
+ * @option "Scene_Menu"
+ * @option "Scene_Item"
+ * @option "Scene_Skill"
+ * @option "Scene_Equip"
+ * @option "Scene_Status"
+ * @option "Scene_Options"
+ * @option "Scene_Shop"
+ * @option "Scene_Battle"
+ * @default
  * @parent SceneKeyAndButtonSetting
- * 
- * @param BattleValid
- * @desc Valid in battle.
- * @text Battle valid
- * @type boolean
- * @default false
- * @parent SceneKeyAndButtonSetting
- * 
  */
 /*:ja
  * @target MZ
@@ -180,17 +323,23 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
  * ゲームパッドのボタン配置はXbox360コントローラ基準になっております。
  * キーボード、ゲームパッドのコードが-1に設定されている場合は元の値が設定されます。
  * 
+ * 仕様
+ * シーン上でのキー、ボタン設定適用は、スクリプト又はコモンイベントが指定されてなければキーまたはボタンは反応しません。
+ * 適用シーンは複数設定可能です。設定されていない場合は全てのシーンで適用されます。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/25 Ver.1.2.4
+ * シーン上でのキーボタントリガー適用の使用を変更。
  * 2023/3/12 Ver.1.2.3
  * シーン上でのキーボタントリガーにコモンイベントを指定できる機能を追加。
  * 2023/3/11 Ver.1.2.2
@@ -242,7 +391,143 @@
  * @param KeyCode
  * @desc キーコード
  * @text キーコード
- * @type number
+ * @type select
+ * @option None
+ * @value -1
+ * @option BackSpace
+ * @value 8
+ * @option Tab
+ * @value 9
+ * @option Enter
+ * @value 13
+ * @option Shift
+ * @value 16
+ * @option Ctrl
+ * @value 17
+ * @option Alt
+ * @value 18
+ * @option Pause
+ * @value 19
+ * @option Space
+ * @value 32
+ * @option PageUp
+ * @value 33
+ * @option PageDown
+ * @value 34
+ * @option End
+ * @value 35
+ * @option Home
+ * @value 36
+ * @option ←
+ * @value 37
+ * @option ↑
+ * @value 38
+ * @option →
+ * @value 39
+ * @option ↓
+ * @value 40
+ * @option Insert
+ * @value 45
+ * @option Delete
+ * @value 46
+ * @option 0
+ * @value 48
+ * @option 1
+ * @value 49
+ * @option 2
+ * @value 50
+ * @option 3
+ * @value 51
+ * @option 4
+ * @value 52
+ * @option 5
+ * @value 53
+ * @option 6
+ * @value 54
+ * @option 7
+ * @value 55
+ * @option 8
+ * @value 56
+ * @option 9
+ * @value 57
+ * @option A
+ * @value 65
+ * @option B
+ * @value 66
+ * @option C
+ * @value 67
+ * @option D
+ * @value 68
+ * @option E
+ * @value 69
+ * @option F
+ * @value 70
+ * @option G
+ * @value 71
+ * @option H
+ * @value 72
+ * @option I
+ * @value 73
+ * @option J
+ * @value 74
+ * @option K
+ * @value 75
+ * @option L
+ * @value 76
+ * @option M
+ * @value 77
+ * @option N
+ * @value 78
+ * @option O
+ * @value 79
+ * @option P
+ * @value 80
+ * @option Q
+ * @value 81
+ * @option R
+ * @value 82
+ * @option S
+ * @value 83
+ * @option T
+ * @value 84
+ * @option U
+ * @value 85
+ * @option V
+ * @value 86
+ * @option W
+ * @value 87
+ * @option X
+ * @value 88
+ * @option Y
+ * @value 89
+ * @option Z
+ * @value 90
+ * @option Win
+ * @value 91
+ * @option Apps
+ * @value 92
+ * @option :*
+ * @value 186
+ * @option ;+
+ * @value 187
+ * @option ,<
+ * @value 188
+ * @option -=
+ * @value 189
+ * @option .>
+ * @value 190
+ * @option /?
+ * @value 191
+ * @option `
+ * @value 192
+ * @option [{
+ * @value 220
+ * @option |
+ * @value 221
+ * @option ]}
+ * @value 222
+ * @option Esc
+ * @value 243
  * @default -1
  * @min -1
  * 
@@ -327,18 +612,20 @@
  * @default 0
  * @parent SceneKeyAndButtonSetting
  * 
- * @param MapValid
- * @desc マップ上で有効
- * @text マップ上有効
- * @type boolean
- * @default true
- * @parent SceneKeyAndButtonSetting
- * 
- * @param BattleValid
- * @desc バトル中で有効
- * @text バトル中有効
- * @type boolean
- * @default false
+ * @param ValidScene
+ * @desc キー、ボタンを適用するシーン。
+ * @text 適用シーン
+ * @type combo[]
+ * @option "Scene_Map"
+ * @option "Scene_Menu"
+ * @option "Scene_Item"
+ * @option "Scene_Skill"
+ * @option "Scene_Equip"
+ * @option "Scene_Status"
+ * @option "Scene_Options"
+ * @option "Scene_Shop"
+ * @option "Scene_Battle"
+ * @default
  * @parent SceneKeyAndButtonSetting
  * 
  */
@@ -393,11 +680,19 @@ Imported.NUUN_BankSystem = true;
         }
     };
 
+    const _Scene_MenuBase_update = Scene_MenuBase.prototype.update;
+    Scene_MenuBase.prototype.update = function() {
+        _Scene_MenuBase_update.call(this);
+        if (!SceneManager.isSceneChanging()) {
+            this.updateUserKey();
+        }
+    };
+
     const _Scene_Map_updateScene = Scene_Map.prototype.updateScene;
     Scene_Map.prototype.updateScene = function() {
         _Scene_Map_updateScene.call(this);
         if (!SceneManager.isSceneChanging()) {
-            this.updateUserKey('MapValid');
+            this.updateUserKey();
         }
     };
 
@@ -405,13 +700,21 @@ Imported.NUUN_BankSystem = true;
     Scene_Battle.prototype.update = function() {
         _Scene_Battle_update.call(this);
         if (this.isActive() && !this.isBusy()) {
-            this.updateUserKey('BattleValid');
+            this.updateUserKey();
         }
     };
+
+    Scene_Base.prototype.isValidScene = function(data, _class) {
+        if (!!data.ValidScene && data.ValidScene.length > 0) {
+            return data.ValidScene.some(scene => scene === _class);
+        }
+        return true;
+    };
     
-    Scene_Base.prototype.updateUserKey = function(valid) {
+    Scene_Base.prototype.updateUserKey = function() {
+        const _className = String(this.constructor.name);
         for (const data of UserKey) {
-            if (data.UserKey && data.UserKey[valid] && (!!data.UserKey.KeySprict || data.UserKey.KeyCommonEvent > 0) && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
+            if (data.UserKey && this.isValidScene(data.UserKey, _className) && (!!data.UserKey.KeySprict || data.UserKey.KeyCommonEvent > 0) && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
                 const keyName = data.UserKey.KeyName;
                 if (isRepeated(data.UserKey.Repeated, keyName)) {
                     this._userKeyCalling = true;

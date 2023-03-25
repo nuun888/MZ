@@ -1,5 +1,5 @@
 # [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
-# Ver.1.1.9
+# Ver.1.1.10
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -234,6 +234,8 @@
 [エンカウント条件](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md)  
 
 ## 更新履歴
+2023/3/25 Ver.1.1.10  
+スキル習得条件で特徴から習得したスキルが適用されない問題を修正。  
 2022/12/18 Ver.1.1.9  
 ステート有効度の条件が正常に取得できていなかった問題を修正。  
 2022/12/18 Ver.1.1.8  

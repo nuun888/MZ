@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.9
+ * @version 1.1.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -249,6 +249,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/25 Ver.1.1.10
+ * スキル習得条件で特徴から習得したスキルが適用されない問題を修正。
  * 2022/12/18 Ver.1.1.9
  * ステート有効度の条件が正常に取得できていなかった問題を修正。
  * 2022/12/18 Ver.1.1.8
@@ -1448,7 +1450,7 @@ function possessionArmors(data) {
 };
 
 function masterSkill(data, member) {
-  return getValList(data.IDList).some(listId => member.isLearnedSkill(listId));
+  return getValList(data.IDList).some(listId => member.skills().some(skill => skill.id === listId));
 };
 
 function masterEnemySkill(data, member) {

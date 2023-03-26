@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Event contact detection EX
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -76,6 +76,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/27/2023 Ver.1.5.2
+ * Fixed an issue where the normal collision detection between events was not performed.
  * 1/31/2023 Ver.1.5.1
  * Fixed an issue where settings from Comment tag of <EventRangeObstacle> were not applied.
  * 11/27/2022 Ver.1.5.0
@@ -129,7 +131,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -196,6 +198,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/27 Ver.1.5.2
+ * イベントとイベントの通常の接触判定が行われていなかった問題を修正。
  * 2023/1/31 Ver.1.5.1
  * <EventRangeObstacle>の注釈からの設定が適用されていなかった問題を修正。
  * 2022/11/27 Ver.1.5.0
@@ -338,7 +342,7 @@ Imported.NUUN_EventRange = true;
     const _Game_Event_isCollidedWithEvents = Game_Event.prototype.isCollidedWithEvents;
     Game_Event.prototype.isCollidedWithEvents = function(x, y) {
         const events = $gameMap.eventsRangeXyNt(this, x, y);
-        return _Game_Event_isCollidedWithEvents.call(this) || events.length > 0;
+        return _Game_Event_isCollidedWithEvents.call(this, x, y) || events.length > 0;
     };
 
     const _Game_Event_isCollidedWithPlayerCharacters = Game_Event.prototype.isCollidedWithPlayerCharacters;

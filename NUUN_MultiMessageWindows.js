@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * You can now display multiple message windows.
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/26/2023 Ver.1.0.2
+ * Fixed an issue where trying to display a message window without specifying an ID would cause a crash.
  * 3/26/2023 Ver.1.0.1
  * Correction of processing.
  * 3/25/2023 Ver.1.0.0
@@ -68,7 +70,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -83,6 +85,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/26 Ver.1.0.2
+ * IDを指定せずにメッセージウィンドウを表示させようとすると、進行不能になる問題を修正。
  * 2023/3/26 Ver.1.0.1
  * 処理の修正。
  * 2023/3/25 Ver.1.0.0
@@ -118,6 +122,7 @@
  * @min -1
  * 
  * 
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_MultiMessageWindows = true;
@@ -149,6 +154,11 @@ Imported.NUUN_MultiMessageWindows = true;
         this._messageWindows = [];
         this._nameBoxWindows = [];
         _Scene_Message_initialize.call(this);
+    };
+
+    const _Scene_Base_update = Scene_Base.prototype.update;
+    Scene_Base.prototype.update = function() {
+        _Scene_Base_update.call(this);
     };
 
     Scene_Message.prototype.setMultiMessageWindow = function(args) {
@@ -237,7 +247,6 @@ Imported.NUUN_MultiMessageWindows = true;
     
     Window_MultiMessage.prototype.initialize = function(rect) {
         Window_Message.prototype.initialize.call(this, rect);
-
     };
 
     const _Window_Message_canStart = Window_Message.prototype.canStart;
@@ -246,11 +255,17 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     Window_MultiMessage.prototype.isMultiMessage = function() {
-        return this.multiMessageId === $gameTemp.activeMultiMessageId;
+        return this.multiMessageId === ($gameTemp.activeMultiMessageId || 0);
     };
 
+    const _Window_Message_doesContinue = Window_Message.prototype.doesContinue;
     Window_MultiMessage.prototype.doesContinue = function() {
-        return this.multiMessageMode && $gameMessage.hasText();
+        if (this.multiMessageMode) {
+            return this.multiMessageMode && $gameMessage.hasText();
+        } else {
+            return _Window_Message_doesContinue.call(this);
+        }
     };
+
 
 })();

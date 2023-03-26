@@ -1,5 +1,5 @@
 # [複数メッセージウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
 #### 必須、前提プラグイン
 
@@ -14,6 +14,8 @@
 他メッセージウィンドウ持続表示をONにしたメッセージウィンドウは自動ではウィンドウが閉じませんので、プラグインコマンドのメッセージウィンドウクローズでウィンドウを閉じます。  
 
 ## 更新履歴
+2023/3/26 Ver.1.0.2  
+IDを指定せずにメッセージウィンドウを表示させようとすると、進行不能になる問題を修正。  
 2023/3/26 Ver.1.0.1  
 処理の修正。  
 2023/3/25 Ver.1.0.0  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Pop up
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -68,6 +68,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/27/2023 Ver 2.0.1
+ * Fixed an issue where the icon would not display properly when adding an ability reduction to an ability increase or vice versa.
  * 12/28/2022 Ver 2.0.0
  * Major overhaul of plugin parameters.
  * Pop-up support when learning skills in skill learning.
@@ -174,7 +176,7 @@
  * @param AppliBuffPopUp
  * @text Popup buff setting
  * @desc Set the buff that pops up.
- * @default ["{\"StateType\":\"0\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"1\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"2\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"3\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"4\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"5\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"6\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"7\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"10\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"11\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"12\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"13\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"14\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"15\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"16\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"17\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}"]
+ * @default ["{\"StateType\":\"0\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"1\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"2\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"3\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"4\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"5\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"6\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"7\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"10\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"11\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"12\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"13\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"14\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"15\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"16\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"17\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}"]
  * @type struct<PopUpBuffList>[]
  * @parent BuffPopUpSetting
  * 
@@ -414,7 +416,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -472,6 +474,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/27 Ver 2.0.1
+ * 能力低下から能力上昇またはその逆で付加した場合、アイコンが正常に表示されない問題を修正。
  * 2022/12/28 Ver 2.0.0
  * プラグインパラメータの大幅な見直し。
  * スキルラーニングでのスキル習得時のポップアップ対応。
@@ -578,7 +582,7 @@
  * @param AppliBuffPopUp
  * @text ポップアップバフ設定
  * @desc ポップアップするバフの設定をします。
- * @default ["{\"StateType\":\"0\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"1\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"2\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"3\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"4\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"5\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"6\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"7\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"10\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"11\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"12\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"13\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"14\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"15\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"16\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}","{\"StateType\":\"17\",\"PopUpStateName\":\"\",\"StatePopUpMode\":\"0\",\"PopUpStateColor\":\"0\"}"]
+ * @default ["{\"StateType\":\"0\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"1\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"2\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"3\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"4\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"5\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"6\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"7\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"10\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"11\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"12\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"13\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"14\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"15\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"16\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}","{\"StateType\":\"17\",\"PopUpName\":\"\",\"PopUpBuffColor\":\"0\",\"BuffPopUpMode\":\"0\",\"PopUpBuffImg\":\"\"}"]
  * @type struct<PopUpBuffList>[]
  * @parent BuffPopUpSetting
  * 
@@ -896,9 +900,9 @@ Imported.NUUN_popUp = true;
 
   Game_Battler.prototype.popupBuffIconIndex = function(id) {
     if (id < 10) {
-      return Game_BattlerBase.ICON_BUFF_START + (this._buffs[id] - 1) * 8 + id;
+      return Game_BattlerBase.ICON_BUFF_START + Math.max((this._buffs[id] - 1), 0) * 8 + id;
     } else {
-      return Game_BattlerBase.ICON_DEBUFF_START + (-this._buffs[id - 10] - 1) * 8 + id - 10;
+      return Game_BattlerBase.ICON_DEBUFF_START + Math.max((-this._buffs[id - 10] - 1), 0) * 8 + id - 10;
     }
   };
 
@@ -1037,7 +1041,7 @@ Imported.NUUN_popUp = true;
           const data = mode ? PopUpDebuff : PopUpBuff;
           if (data && (find.BuffPopUpMode === 0 || find.BuffPopUpMode === 3)) {
             const paramId = id < 10 ? id : id - 10;
-            const color = this.setupBuffPopUpColor(id, find, data);console.log(color)
+            const color = this.setupBuffPopUpColor(id, find, data);
             const name = find.PopUpName ? find.PopUpName : TextManager.param(paramId);
             const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : target.popupBuffIconIndex(id);
             this.setupPopup(target, data, id, data.PopUpText.format(name), color, iconIndex, 255, find.PopUpBuffImg);

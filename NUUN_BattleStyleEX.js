@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.1
+ * @version 3.10.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/3/27 Ver.3.10.2
+ * 複数メッセージウィンドウと競合を起こす問題を修正。
  * 2023/3/12 Ver.3.10.1
  * 味方へのクリティカル時と通常ダメージ時の振動設定を別々に変更。
  * 2023/2/27 Ver.3.10.0
@@ -1099,10 +1101,9 @@ Scene_Battle.prototype.createHelpWindow = function() {
   }
 };
 
-const _Scene_Battle_createMessageWindow = Scene_Battle.prototype.createMessageWindow;
 Scene_Battle.prototype.createMessageWindow = function() {
-  _Scene_Battle_createMessageWindow.call(this);
-  this.MessageWindowBackGround();
+    Scene_Message.prototype.createMessageWindow.call(this);
+    this.MessageWindowBackGround();
 };
 
 Scene_Battle.prototype.itemWindowRect = function() {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  State side-by-side display
  * @author NUUN
- * @version 1.5.2
+ * @version 1.5.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/30/2022 Ver.1.5.3
+ * Fixed an issue where the number of turns was not displayed correctly when the auto release timing was at the end of the turn.
  * 12/6/2022 Ver.1.5.2
  * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
  * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
@@ -262,7 +264,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.5.2
+ * @version 1.5.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -291,6 +293,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/30 Ver.1.5.3
+ * 自動解除のタイミングがターン終了時の時にターン数が正常に表示されていなかった問題を修正。
  * 2022/12/6 Ver.1.5.2
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
  * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
@@ -796,7 +800,7 @@ Game_BattlerBase.prototype.allBuffTurns = function() {
 Game_BattlerBase.prototype.nuun_stateTurns = function() {
   return this.states().reduce((r, state) => {
     if (state.iconIndex > 0) {
-      const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)), bad: !!state.meta.BatState}];
+      const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id) + (state.autoRemovalTiming === 2 ? -1 : 0)), bad: !!state.meta.BatState}];
       Array.prototype.push.apply(r, turn);
     }
     return r;

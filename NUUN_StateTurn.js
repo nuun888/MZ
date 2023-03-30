@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * Show remaining turns on the state icon.
@@ -31,6 +31,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/30/2022 Ver.1.1.3
+ * Fixed an issue where the number of turns was not displayed correctly when the auto release timing was at the end of the turn.
  * 1/3/2023 Ver.1.1.2
  * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
  * Changed the display in languages other than Japanese to English.
@@ -117,7 +119,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * ステートアイコンに残りターンを表示します。
@@ -136,6 +138,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/3/30 Ver.1.1.3
+ * 自動解除のタイミングがターン終了時の時にターン数が正常に表示されていなかった問題を修正。
  * 2023/1/3 Ver.1.1.2
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
  * 日本語以外での表示を英語表示に変更。
@@ -291,7 +295,7 @@ Imported.NUUN_StateTurn = true;
   Game_BattlerBase.prototype.nuun_stateTurns = function() {
     return this.states().reduce((r, state) => {
       if (state.iconIndex > 0) {
-        const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id)), bad: !!state.meta.BatState}];
+        const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id) + (state.autoRemovalTiming === 2 ? -1 : 0)), bad: !!state.meta.BatState}];
         Array.prototype.push.apply(r, turn);
       }
       return r;

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * You can now display multiple message windows.
@@ -22,12 +22,21 @@
  * 
  * Since the message window with other message window persistent display turned ON does not close automatically, close the window with the plug-in command "Close message window".
  * 
+ * MultiMessage
+ * Be sure to turn it ON to display multiple message windows.
+ * 
+ * Simultaneous
+ * Displayed at the same time as the next message window.
+ * If you execute an event command that waits in between, the display timing will shift.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/1/2023 Ver.1.1.0
+ * Fixed so that the pause sign appears in all message windows while messages are displayed.
  * 3/26/2023 Ver.1.0.2
- * Fixed an issue where trying to display a message window without specifying an ID would cause a crash.
+ * Fixed an issue that caused players to become incapacitated when trying to display a message window without specifying an ID.
  * 3/26/2023 Ver.1.0.1
  * Correction of processing.
  * 3/25/2023 Ver.1.0.0
@@ -50,6 +59,12 @@
  * @type boolean
  * @default true
  * 
+ * @arg Simultaneous
+ * @desc It will be displayed together with the next message.
+ * @text Simultaneous display of next message
+ * @type boolean
+ * @default false
+ * 
  * 
  * @command MultiMessageClose
  * @desc Closes the message window with the specified ID.
@@ -70,7 +85,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -81,12 +96,22 @@
  * 他メッセージウィンドウ持続表示をONにしたメッセージウィンドウは自動ではウィンドウが閉じませんので、プラグインコマンドの
  * メッセージウィンドウクローズでウィンドウを閉じます。
  * 
+ * 他メッセージウィンドウ持続表示
+ * 複数のメッセージウィンドウを表示させるには必ずONにしてください。
+ * 
+ * 次メッセージ同時表示
+ * 次に表示されるメッセージウィンドウと同時に表示します。
+ * 間にウエイトを行うイベントコマンドを実行すると表示タイミングがずれます。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/1 Ver.1.1.0
+ * メッセージ表示中は全てのメッセージウィンドウでポーズサインが出るように修正。
+ * メッセージウィンドウを他のウィンドウと同時に表示する機能を追加。
  * 2023/3/26 Ver.1.0.2
- * IDを指定せずにメッセージウィンドウを表示させようとすると、進行不能になる問題を修正。
+ * IDを指定せずにメッセージウィンドウを表示させようとすると、行動不能になる問題を修正。
  * 2023/3/26 Ver.1.0.1
  * 処理の修正。
  * 2023/3/25 Ver.1.0.0
@@ -109,6 +134,12 @@
  * @type boolean
  * @default true
  * 
+ * @arg Simultaneous
+ * @desc 次に表示されるメッセージと同時表示させます。
+ * @text 次メッセージ同時表示
+ * @type boolean
+ * @default false
+ * 
  * 
  * @command MultiMessageClose
  * @desc 指定のIDのメッセージウィンドウを閉じます。
@@ -130,6 +161,7 @@ Imported.NUUN_MultiMessageWindows = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_MultiMessageWindows');
     const pluginName = "NUUN_MultiMessageWindows";
+    let _windowBusyThrough = false;
 
     PluginManager.registerCommand(pluginName, 'MultiMessageSetting', args => {
         setMultiMessageWindow(args);
@@ -138,7 +170,7 @@ Imported.NUUN_MultiMessageWindows = true;
     PluginManager.registerCommand(pluginName, 'MultiMessageClose', args => {
         closeMultiMessageWindow(Number(args.Id));
     });
-
+    
     function setMultiMessageWindow(args) {
         SceneManager._scene.setMultiMessageWindow(args);
     };
@@ -162,7 +194,7 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     Scene_Message.prototype.setMultiMessageWindow = function(args) {
-        this._multiMessageWindowsList[0] = {id: Number(args.Id), mode: eval(args.MultiMessage), active: false};
+        this._multiMessageWindowsList[0] = {id: Number(args.Id), mode: eval(args.MultiMessage), noBusy: false, simultaneous: eval(args.Simultaneous)};
         if (!this._messageWindows[Number(args.Id)]) {
             this.createMultiMessageWindow();
             this.createMultiMessageNameBoxWindow();
@@ -186,7 +218,11 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     Scene_Message.prototype.getActivemultiMessage = function() {
-        return this._multiMessageWindowsList[0] !== undefined? this._multiMessageWindowsList[0].active : false;
+        return this._multiMessageWindowsList[0] !== undefined ? this._multiMessageWindowsList[0].noBusy : false;
+    };
+
+    Scene_Message.prototype.getSimultaneous = function() {
+        return this._multiMessageWindowsList[0] !== undefined ? this._multiMessageWindowsList[0].simultaneous : false;
     };
 
     Scene_Message.prototype.createMessageWindow = function() {//再定義
@@ -203,6 +239,7 @@ Imported.NUUN_MultiMessageWindows = true;
         const windowId = this.getmultiMessageWindowId();
         window.multiMessageId = windowId;
         window.multiMessageMode = this.getmultiMessageMode();
+        window.simultaneousMode = this.getSimultaneous();
         this._messageWindows[windowId] = window;
         this.addWindow(window);
     };
@@ -220,10 +257,12 @@ Imported.NUUN_MultiMessageWindows = true;
         if (id >= 0 && this._messageWindows[id]) {
             this._messageWindows[id].multiMessageMode = false;
             this._messageWindows[id].terminateMessage();
+            this._messageWindows[id].pause = false;
         } else if (id === -1) {
             for (const window of this._messageWindows) {
                 window.multiMessageMode = false;
                 window.terminateMessage();
+                window.pause = false;
             }
         }
     };
@@ -232,6 +271,7 @@ Imported.NUUN_MultiMessageWindows = true;
     Scene_Message.prototype.associateWindows = function() {
         const id = this.getmultiMessageWindowId();
         this._messageWindows[id].multiMessageMode = this.getmultiMessageMode();
+        this._messageWindows[id].simultaneousMode = this.getSimultaneous();
         this._messageWindow = this._messageWindows[id];
         this._nameBoxWindow = this._nameBoxWindows[id];
         _Scene_Message_associateWindows.call(this);
@@ -267,5 +307,23 @@ Imported.NUUN_MultiMessageWindows = true;
         }
     };
 
+    const _Window_Message_startMessage = Window_Message.prototype.startMessage;
+    Window_Message.prototype.startMessage = function() {
+        const textState = this._textState;
+        _Window_Message_startMessage.call(this);
+        if (!textState && this.simultaneousMode) {
+            $gameMessage.clear();
+            this.simultaneousMode = false;
+        }
+    };
 
+    const _Window_Message_update = Window_Message.prototype.update;
+    Window_Message.prototype.update = function() {
+        _Window_Message_update.call(this);
+        if (this.multiMessageMode && !this._textState) {
+            this.pause = true;
+        }
+    };
+
+    
 })();

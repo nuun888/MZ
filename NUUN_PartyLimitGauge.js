@@ -49,9 +49,13 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/1/2023 Ver.1.4.0
+ * Added function to increase/decrease limit gauge by plug-in command.
+ * Unify the display of the gauge when setting the label name with the display of the normal gauge.
  * 1/21/2023 Ver.1.3.0
  * Fixed the problem that the party limit cost overlaps when the cost of MP and TP is set.
  * Added a function that allows you to specify the display width when the skill cost of MP and TP is set.
+ * Added a function that allows you to specify the cost display width for each skill that activates the party limit.
  * 12/28/2022 Ver.1.2.1
  * Processing fixes.
  * 12/24/2022 Ver.1.2.0

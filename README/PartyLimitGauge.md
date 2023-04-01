@@ -1,5 +1,5 @@
 # [パーティリミットゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
-# Ver.1.4.0
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -37,6 +37,8 @@
 色設定はテキストタブでカラーコードが入力できます。  
 
 ## 更新履歴
+2023/4/1 Ver.1.4.1  
+リミットゲージの処理修正。  
 2023/4/1 Ver.1.4.0  
 プラグインコマンドでリミットゲージを増減させる機能を追加。  
 ラベル名設定時のゲージの表示を通常のゲージの表示と統一。  

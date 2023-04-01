@@ -1,5 +1,5 @@
 # [複数メッセージウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
 #### 必須、前提プラグイン
 
@@ -28,6 +28,8 @@
 間にウエイトを行うイベントコマンドを実行すると表示タイミングがずれます。  
 
 ## 更新履歴
+2023/4/2 Ver.1.1.2  
+ネームウィンドウの表示位置を指定できる機能を追加。  
 2023/4/1 Ver.1.1.1  
 メッセージウィンドウ表示中に移動を許可する機能を追加。  
 2023/4/1 Ver.1.1.0  

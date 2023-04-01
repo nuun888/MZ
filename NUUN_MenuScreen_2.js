@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @version 2.0.1
+ * @version 2.0.2
  * 
  * @help
  * Change and extend the menu screen display.
@@ -75,6 +75,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/1/2023 Ver.2.0.2
+ * Added an item to display the limit gauge.
  * 12/10/2022 Ver.2.0.1
  * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
  * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
@@ -1010,6 +1012,8 @@
  * @value 11
  * @option Captor (NUUN_Chapter required)(1)(2)(3)(4)(6)(7)(8)(11)
  * @value 12
+ * @option Limit gayge（Required "NUUN_PartyLimitGauge"）(1)(2)(3)(4)(5)
+ * @value 20
  * @default 0
  * 
  * @param X_Position
@@ -1301,7 +1305,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.1
+ * @version 2.0.2
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1363,6 +1367,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/1 Ver.2.0.2
+ * リミットゲージを表示する項目を追加。
  * 2022/12/10 Ver.2.0.1
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
  * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
@@ -2298,6 +2304,8 @@
  * @value 11
  * @option キャプター（要チャプターテキスト）(1)(2)(3)(4)(6)(7)(8)(11)
  * @value 12
+ * @option リミットゲージ（要NUUN_PartyLimitGauge）(1)(2)(3)(4)(5)
+ * @value 20
  * @default 0
  * 
  * @param X_Position

@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.6
+ * @version 2.0.7
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/1/2022 Ver.2.0.7
+ * Added processing related to limit gauge display.
  * 12/1/2022 Ver.2.0.6
  * Fixed an issue where setting an actor front background image would cause an error.
  * 12/1/2022 Ver.2.0.5
@@ -49,7 +51,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.6
+ * @version 2.0.7
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -59,6 +61,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/1 Ver.2.0.7
+ * リミットゲージ表示に関する処理の追加。
  * 2023/1/7 Ver.2.0.6
  * アクター前面背景画像を設定するとエラーが出る問題を修正。
  * 2022/12/1 Ver.2.0.5
@@ -1089,9 +1093,30 @@ Imported.NUUN_MenuScreenEXBase = true;
         case 12:
             this.drawChapter(data, x, y, width);
             break;
+        case 20:
+            this.drawLimitGauge(data, x, y, width);
+            break;
         default:
             break;
         }
+    };
+
+    Window_InfoMenu.prototype.drawLimitGauge = function(data, x, y, width) {
+        let sprite = null;
+        if (this._partyGauge) {
+            sprite = this._partyGauge;
+        } else {
+            try {
+                sprite = $gameParty.getPartyLimitSprite(Math.min(data.ItemWidth, width));
+                this.addChild(sprite);
+            } catch (error) {
+                return;
+            }
+        }
+        sprite.setup('actor', 'limit');
+        sprite.move(x, y);
+        sprite.show();
+        this._partyGauge = sprite;
     };
     
     Window_InfoMenu.prototype.drawGold = function(data, x, y, width) {

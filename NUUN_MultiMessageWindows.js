@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * You can now display multiple message windows.
@@ -33,6 +33,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/1/2023 Ver.1.1.2
+ * Added a function to specify the display position of the name window.
  * 4/1/2023 Ver.1.1.1
  * Added a function to allow movement while the message window is displayed.
  * 4/1/2023 Ver.1.1.0
@@ -72,6 +74,18 @@
  * @text Simultaneous display of next message
  * @type boolean
  * @default false
+ * 
+ * @arg NameWindowPosition
+ * @desc Specifies the position of the name window to display.
+ * @text name window position
+ * @type select
+ * @option Default
+ * @value 'default'
+ * @option Left
+ * @value 'left'
+ * @option Right
+ * @value 'right'
+ * @default 'default'
  * 
  * 
  * @command MultiMessageClose
@@ -115,6 +129,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/2 Ver.1.1.2
+ * ネームウィンドウの表示位置を指定できる機能を追加。
  * 2023/4/1 Ver.1.1.1
  * メッセージウィンドウ表示中に移動を許可する機能を追加。
  * 2023/4/1 Ver.1.1.0
@@ -155,6 +171,18 @@
  * @text 次メッセージ同時表示
  * @type boolean
  * @default false
+ * 
+ * @arg NameWindowPosition
+ * @desc 表示するネームウィンドウの位置を指定します。
+ * @text ネームウィンドウ位置
+ * @type select
+ * @option デフォルト
+ * @value 'default'
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @default 'default'
  * 
  * 
  * @command MultiMessageClose
@@ -209,7 +237,7 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     Scene_Message.prototype.setMultiMessageWindow = function(args) {
-        this._multiMessageWindowsList[0] = {id: Number(args.Id), mode: eval(args.MultiMessage), noBusy: eval(args.NoBusy), simultaneous: eval(args.Simultaneous)};
+        this._multiMessageWindowsList[0] = {id: Number(args.Id), mode: eval(args.MultiMessage), noBusy: eval(args.NoBusy), simultaneous: eval(args.Simultaneous), nameBox: NuunManager.getEvalCode(String(args.NameWindowPosition))};
         if (!this._messageWindows[Number(args.Id)]) {
             this.createMultiMessageWindow();
             this.createMultiMessageNameBoxWindow();
@@ -238,6 +266,10 @@ Imported.NUUN_MultiMessageWindows = true;
 
     Scene_Message.prototype.getSimultaneous = function() {
         return this._multiMessageWindowsList[0] !== undefined ? this._multiMessageWindowsList[0].simultaneous : false;
+    };
+
+    Scene_Message.prototype.getNameBoxPosition = function() {
+        return this._multiMessageWindowsList[0] !== undefined ? this._multiMessageWindowsList[0].nameBox : 'default';
     };
 
     Scene_Message.prototype.createMessageWindow = function() {//再定義
@@ -270,15 +302,17 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     Scene_Message.prototype.closeMultiMessageWindow = function(id) {
-        if (id >= 0 && this._messageWindows[id]) {
+        if (id >= 0 && this._messageWindows[id] && this._messageWindows[id].isOpen()) {
             this._messageWindows[id].multiMessageMode = false;
             this._messageWindows[id].terminateMessage();
             this._messageWindows[id].pause = false;
         } else if (id === -1) {
             for (const window of this._messageWindows) {
-                window.multiMessageMode = false;
-                window.terminateMessage();
-                window.pause = false;
+                if (window.isOpen()) {
+                    window.multiMessageMode = false;
+                    window.terminateMessage();
+                    window.pause = false;
+                }
             }
         }
     };
@@ -291,6 +325,7 @@ Imported.NUUN_MultiMessageWindows = true;
         this._messageWindows[id].noBusy = this.getNoBusyMessage();
         this._messageWindow = this._messageWindows[id];
         this._nameBoxWindow = this._nameBoxWindows[id];
+        this._nameBoxWindow.setBoxPosition(this.getNameBoxPosition())
         _Scene_Message_associateWindows.call(this);
     };
 
@@ -345,6 +380,21 @@ Imported.NUUN_MultiMessageWindows = true;
         _Window_Message_update.call(this);
         if (this.multiMessageMode && !this._textState) {
             this.pause = true;
+        }
+    };
+
+    Window_NameBox.prototype.setBoxPosition = function(mode) {
+        this._boxPosition = mode;
+    };
+
+    const _Window_NameBox_updatePlacement = Window_NameBox.prototype.updatePlacement;
+    Window_NameBox.prototype.updatePlacement = function() {
+        _Window_NameBox_updatePlacement.call(this);
+        const messageWindow = this._messageWindow;
+        if (this._boxPosition === 'left') {
+            this.x = messageWindow.x;
+        } else if (this._boxPosition === 'right') {
+            this.x = messageWindow.x + messageWindow.width - this.width;
         }
     };
 

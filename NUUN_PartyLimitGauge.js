@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -49,6 +49,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/1/2023 Ver.1.4.1
+ * Fixed limit gauge processing.
  * 4/1/2023 Ver.1.4.0
  * Added function to increase/decrease limit gauge by plug-in command.
  * Unify the display of the gauge when setting the label name with the display of the normal gauge.
@@ -347,7 +349,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -386,6 +388,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/1 Ver.1.4.1
+ * リミットゲージの処理修正。
  * 2023/4/1 Ver.1.4.0
  * プラグインコマンドでリミットゲージを増減させる機能を追加。
  * ラベル名設定時のゲージの表示を通常のゲージの表示と統一。
@@ -925,6 +929,10 @@ Game_Troop.prototype.setPartyLimit = function(value) {
   }
 };
 
+Game_Party.prototype.getPartyLimitSprite = function(width) {
+    return new Sprite_PartyGauge(width);
+};
+
 
 const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
 Scene_Battle.prototype.createSpriteset = function() {
@@ -1007,7 +1015,8 @@ function Sprite_PartyGauge() {
 Sprite_PartyGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_PartyGauge.prototype.constructor = Sprite_PartyGauge;
 
-Sprite_PartyGauge.prototype.initialize = function() {
+Sprite_PartyGauge.prototype.initialize = function(width) {
+    this._gaugeWidth = width || 0;
     Sprite_Gauge.prototype.initialize.call(this);
 };
 
@@ -1016,7 +1025,7 @@ Sprite_PartyGauge.prototype.initMembers = function() {
 };
 
 Sprite_PartyGauge.prototype.bitmapWidth = function() {
-    return PartyGauge_Width;
+    return this._gaugeWidth > 0 ? this._gaugeWidth : PartyGauge_Width;
 };
 
 Sprite_PartyGauge.prototype.setup = function(unit, statusType) {

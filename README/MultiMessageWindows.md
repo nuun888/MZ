@@ -1,5 +1,5 @@
 # [複数メッセージウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
 #### 必須、前提プラグイン
 
@@ -21,7 +21,9 @@
 次に表示されるメッセージウィンドウと同時に表示します。  
 間にウエイトを行うイベントコマンドを実行すると表示タイミングがずれます。  
 
-## 更新履歴 
+## 更新履歴
+2023/4/1 Ver.1.1.1  
+メッセージウィンドウ表示中に移動を許可する機能を追加。  
 2023/4/1 Ver.1.1.0  
 メッセージ表示中は全てのメッセージウィンドウでポーズサインが出るように修正。  
 メッセージウィンドウを他のウィンドウと同時に表示する機能を追加。  

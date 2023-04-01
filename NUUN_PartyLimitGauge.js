@@ -52,7 +52,6 @@
  * 1/21/2023 Ver.1.3.0
  * Fixed the problem that the party limit cost overlaps when the cost of MP and TP is set.
  * Added a function that allows you to specify the display width when the skill cost of MP and TP is set.
- * Added a function that allows you to specify the cost display range for each skill that activates the party limit.
  * 12/28/2022 Ver.1.2.1
  * Processing fixes.
  * 12/24/2022 Ver.1.2.0
@@ -74,6 +73,28 @@
  * Fixed an issue where an error occurred when winning a battle or escaping.
  * 11/15/2021 Ver.1.0.0
  * First edition.
+ * 
+ * @command LimitValue
+ * @desc Increases or decreases the limit gauge.
+ * @text Increase/decrease limit gauge
+ * 
+ * @arg Target
+ * @text Target
+ * @desc Specify the target to increase or decrease the limit gauge.
+ * @type select
+ * @default 0
+ * @option Party member
+ * @value 0
+ * @option Troop (only in battle)
+ * @value 1
+ * 
+ * @arg Value
+ * @type number
+ * @default 0
+ * @text Increment/decrease value
+ * @desc Enter the value to increase or decrease the limit gauge.
+ * @min -99999999
+ * 
  * 
  * @param MaxLimitValue
  * @desc Max limit gauge.
@@ -316,6 +337,7 @@
  * @default 00000
  * @parent CostSetting
  * 
+ * 
  */
 /*:ja
  * @target MZ
@@ -360,6 +382,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/1 Ver.1.4.0
+ * プラグインコマンドでリミットゲージを増減させる機能を追加。
+ * ラベル名設定時のゲージの表示を通常のゲージの表示と統一。
  * 2023/1/21 Ver.1.3.0
  * MP、TPのコストが設定されていた場合、パーティリミットコストが重なってします問題を修正。
  * MP、TPのスキルコストが設定されている場合、表示幅を指定できる機能を追加。
@@ -386,6 +411,28 @@
  * 戦闘勝利時、逃走時にエラーが出る問題を修正。
  * 2021/11/15 Ver.1.0.0
  * 初版
+ * 
+ * @command LimitValue
+ * @desc リミットゲージを増減させます。
+ * @text リミットゲージ増減
+ * 
+ * @arg Target
+ * @text 対象
+ * @desc リミットゲージを増減させる対象を指定します。
+ * @type select
+ * @default 0
+ * @option パーティメンバー
+ * @value 0
+ * @option 敵グループ(戦闘中のみ)
+ * @value 1
+ * 
+ * @arg Value
+ * @type number
+ * @default 0
+ * @text 増減値
+ * @desc リミットゲージを増減させる値を入力します。
+ * @min -99999999
+ * 
  * 
  * @param MaxLimitValue
  * @desc リミットゲージの最大値。
@@ -634,8 +681,14 @@ Imported.NUUN_PartyLimitGauge = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_PartyLimitGauge');
+try {
+    NuunManager.getEvalCode();
+} catch (e) {
+    const log = $gameSystem.isJapanese() ? 'NUUN_BaseがVer.1.6.4以降ではありません。' : "'NUUN_Base' is not Ver.1.6.4 or later.";
+    throw ["LoadError", log];
+}
 const MaxLimitValue = Number(parameters['MaxLimitValue'] || 1000);
-const PartyGaugeVisible = eval(parameters['PartyGaugeVisible'] || 'true');//
+const PartyGaugeVisible = eval(parameters['PartyGaugeVisible'] || 'true');
 const PartyGaugeShowSwitch = Number(parameters['PartyGaugeShowSwitch'] || 0);
 const BattleStartReset = eval(parameters['BattleStartReset'] || "false");
 const PartyLimitValueVisible = eval(parameters['PartyLimitValueVisible'] || "true");
@@ -660,14 +713,22 @@ const EnemyGauge_Width = Number(parameters['EnemyGauge_Width'] || 500);
 const EnemyGaugeColor1 = (DataManager.nuun_structureData(parameters['EnemyGaugeColor1'])) || 6;
 const EnemyGaugeColor2 = (DataManager.nuun_structureData(parameters['EnemyGaugeColor2'])) || 14;
 const EnemyGauge_LabelColor = (DataManager.nuun_structureData(parameters['EnemyGauge_LabelColor'])) || 16;
-const DamageAmount = String(parameters['DamageAmount'] || 'Math.floor(25 * damage / a.mhp)');
-const VictoryAmount = String(parameters['VictoryAmount'] || '');
-const LoseAmount = String(parameters['LoseAmount'] || '');
-const EscapeAmount = String(parameters['EscapeAmount'] || '');
-const DieAmount = String(parameters['DieAmount'] || '');
+const DamageAmount = NuunManager.getEvalCode(parameters['DamageAmount']) || 'Math.floor(25 * damage / a.mhp)';
+const VictoryAmount = NuunManager.getEvalCode(parameters['VictoryAmount']) || '';
+const LoseAmount = NuunManager.getEvalCode(parameters['LoseAmount']) || '';
+const EscapeAmount = NuunManager.getEvalCode(parameters['EscapeAmount']) || '';
+const DieAmount = NuunManager.getEvalCode(parameters['DieAmount']) || '';
 const LimitCostColor = Number(parameters['LimitCostColor'] || 0);
 const MultiCostWidth = String(parameters['CostWidth'] || '00000');
 
+const pluginName = "NUUN_PartyLimitGauge";
+PluginManager.registerCommand(pluginName, 'LimitValue', args => {
+    if (args.Target == 0) {
+        $gameParty.setPartyLimit(Number(args.Value));
+    } else if ($gameParty.inBattle() && args.Target == 1) {
+        $gameTroop.setPartyLimit(Number(args.Value));
+    }
+});
 
 const _BattleManager_setup = BattleManager.setup;
 BattleManager.setup = function(troopId, canEscape, canLose) {
@@ -961,11 +1022,20 @@ Sprite_PartyGauge.prototype.setup = function(unit, statusType) {
 
 const _Sprite_Gauge_gaugeX = Sprite_Gauge.prototype.gaugeX;
 Sprite_Gauge.prototype.gaugeX = function() {
-  if (this._statusType === "limit") {
-      return 0;
-  } else {
-      return _Sprite_Gauge_gaugeX.call(this);
-  }
+    if (this._statusType === "limit") {
+        return this.limitGaugeX();
+    } else {
+        return _Sprite_Gauge_gaugeX.call(this);
+    }
+};
+
+Sprite_PartyGauge.prototype.limitGaugeX = function() {
+    return !!this.label() ? _Sprite_Gauge_gaugeX.call(this) : 0;
+};
+
+Sprite_PartyGauge.prototype.measureLabelWidth = function() {
+    this.setupLabelFont();
+    return this.bitmap.measureTextWidth(this.label());
 };
 
 const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
@@ -1003,6 +1073,11 @@ Sprite_Gauge.prototype.drawValue = function() {
 
 Sprite_PartyGauge.prototype.label = function() {
   return PartyGaugeLabel;
+};
+
+Sprite_PartyGauge.prototype.measureLabelWidth = function() {
+    this.setupLabelFont();
+    return this.bitmap.measureTextWidth(this.label());
 };
 
 Sprite_PartyGauge.prototype.labelFontSize = function() {
@@ -1049,6 +1124,10 @@ Sprite_TroopGauge.prototype.label = function() {
   return EnemyGaugeLabel;
 };
 
+Sprite_TroopGauge.prototype.limitGaugeX = function() {
+    return !!this.label() ? _Sprite_Gauge_gaugeX.call(this) : 0;
+};
+
 Sprite_TroopGauge.prototype.labelFontSize = function() {
   return $gameSystem.mainFontSize() + EnemyGauge_LabelFontSize;
 };
@@ -1071,21 +1150,21 @@ function getColorCode(color) {
     return color;
   }
   return ColorManager.textColor(color);
-}
+};
 
 function setChargeLimit(evalStr) {
   if (evalStr) {
     const val = Number(eval(evalStr));
     $gameParty._limitGauge = Math.min($gameParty.isPartyLimitValue() + val, MaxLimitValue);
   }
-}
+};
 
 function onPartyChargeLimitGauge() {
   return PartyGaugeShowSwitch === 0 || $gameSwitches.value(PartyGaugeShowSwitch);
-}
+};
 
 function onEnemyChargeLimitGauge() {
   return EnemyGaugeShowSwitch === 0 || $gameSwitches.value(EnemyGaugeShowSwitch);
-}
+};
 
 })();

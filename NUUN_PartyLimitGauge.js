@@ -692,8 +692,7 @@ const parameters = PluginManager.parameters('NUUN_PartyLimitGauge');
 try {
     NuunManager.getEvalCode();
 } catch (e) {
-    const log = $gameSystem.isJapanese() ? 'NUUN_BaseがVer.1.6.4以降ではありません。' : "'NUUN_Base' is not Ver.1.6.4 or later.";
-    throw ["LoadError", log];
+    throw ["LoadError", "'NUUN_Base' is not Ver.1.6.4 or later."];
 }
 const MaxLimitValue = Number(parameters['MaxLimitValue'] || 1000);
 const PartyGaugeVisible = eval(parameters['PartyGaugeVisible'] || 'true');

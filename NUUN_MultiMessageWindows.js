@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * You can now display multiple message windows.
@@ -33,6 +33,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/1/2023 Ver.1.1.1
+ * Added a function to allow movement while the message window is displayed.
  * 4/1/2023 Ver.1.1.0
  * Fixed so that the pause sign appears in all message windows while messages are displayed.
  * 3/26/2023 Ver.1.0.2
@@ -58,6 +60,12 @@
  * @text Other message window persistent display
  * @type boolean
  * @default true
+ * 
+ * @arg NoBusy
+ * @desc Allows player movement while the message window is displayed.
+ * @text Permission to move player
+ * @type boolean
+ * @default false
  * 
  * @arg Simultaneous
  * @desc It will be displayed together with the next message.
@@ -85,7 +93,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -107,6 +115,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/1 Ver.1.1.1
+ * メッセージウィンドウ表示中に移動を許可する機能を追加。
  * 2023/4/1 Ver.1.1.0
  * メッセージ表示中は全てのメッセージウィンドウでポーズサインが出るように修正。
  * メッセージウィンドウを他のウィンドウと同時に表示する機能を追加。
@@ -133,6 +143,12 @@
  * @text 他メッセージウィンドウ持続表示
  * @type boolean
  * @default true
+ * 
+ * @arg NoBusy
+ * @desc メッセージウィンドウ表示中のプレイヤーの移動を許可します。
+ * @text プレイヤー移動許可
+ * @type boolean
+ * @default false
  * 
  * @arg Simultaneous
  * @desc 次に表示されるメッセージと同時表示させます。
@@ -161,7 +177,6 @@ Imported.NUUN_MultiMessageWindows = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_MultiMessageWindows');
     const pluginName = "NUUN_MultiMessageWindows";
-    let _windowBusyThrough = false;
 
     PluginManager.registerCommand(pluginName, 'MultiMessageSetting', args => {
         setMultiMessageWindow(args);
@@ -194,7 +209,7 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     Scene_Message.prototype.setMultiMessageWindow = function(args) {
-        this._multiMessageWindowsList[0] = {id: Number(args.Id), mode: eval(args.MultiMessage), noBusy: false, simultaneous: eval(args.Simultaneous)};
+        this._multiMessageWindowsList[0] = {id: Number(args.Id), mode: eval(args.MultiMessage), noBusy: eval(args.NoBusy), simultaneous: eval(args.Simultaneous)};
         if (!this._messageWindows[Number(args.Id)]) {
             this.createMultiMessageWindow();
             this.createMultiMessageNameBoxWindow();
@@ -217,7 +232,7 @@ Imported.NUUN_MultiMessageWindows = true;
         return this._multiMessageWindowsList[0] !== undefined ? this._multiMessageWindowsList[0].mode : false;
     };
 
-    Scene_Message.prototype.getActivemultiMessage = function() {
+    Scene_Message.prototype.getNoBusyMessage = function() {
         return this._multiMessageWindowsList[0] !== undefined ? this._multiMessageWindowsList[0].noBusy : false;
     };
 
@@ -240,6 +255,7 @@ Imported.NUUN_MultiMessageWindows = true;
         window.multiMessageId = windowId;
         window.multiMessageMode = this.getmultiMessageMode();
         window.simultaneousMode = this.getSimultaneous();
+        window.noBusy = this.getNoBusyMessage();
         this._messageWindows[windowId] = window;
         this.addWindow(window);
     };
@@ -272,9 +288,16 @@ Imported.NUUN_MultiMessageWindows = true;
         const id = this.getmultiMessageWindowId();
         this._messageWindows[id].multiMessageMode = this.getmultiMessageMode();
         this._messageWindows[id].simultaneousMode = this.getSimultaneous();
+        this._messageWindows[id].noBusy = this.getNoBusyMessage();
         this._messageWindow = this._messageWindows[id];
         this._nameBoxWindow = this._nameBoxWindows[id];
         _Scene_Message_associateWindows.call(this);
+    };
+
+    Scene_Message.prototype.noBusyMultiMessageWindow = function() {
+        return this._messageWindows.some(window => {
+            return window.isOpen() && !window.noBusy;
+        });
     };
 
 
@@ -323,6 +346,18 @@ Imported.NUUN_MultiMessageWindows = true;
         if (this.multiMessageMode && !this._textState) {
             this.pause = true;
         }
+    };
+
+
+    const _Game_Player_canMove = Game_Player.prototype.canMove;
+    Game_Player.prototype.canMove = function() {
+        const result = _Game_Player_canMove.call(this);
+        if (!result) {
+            if ($gameMessage.isBusy() && !SceneManager._scene.noBusyMultiMessageWindow()) {
+                return true;
+            }
+        }
+        return result;
     };
 
     

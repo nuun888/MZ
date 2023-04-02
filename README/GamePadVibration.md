@@ -1,5 +1,5 @@
 # [ゲームパッド振動](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GamePadVibration.js)
-# Ver.1.0.2
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GamePadVibration.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -20,11 +20,17 @@ X Inputでのゲームパッドを振動させるためのプラグインです�
 #### 低周波ランブル強度
 低周波 (強い) ランブル モーターのランブル強度を指定します。(0.0～1.0)  
 
+#### 制御文字
+`\VG[id]`:ゲームパッドを振動させます。  
+`[id]`:プラグインパラメータの振動設定リスト番号内のIDを指定します。  
+
 #### スクリプトから指定
 `NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)`  
 バトルスタイル拡張プラグインでの開始ディレイもフレーム数指定になります。  
 
 ## 更新履歴 
+2023/4/2 Ver.1.1.0  
+制御文字からゲームパッドを振動させる機能を追加。  
 2023/3/16 Ver.1.0.2  
 ゲームパッドを認識してない場合はオプションに表示しないように修正。  
 2023/3/12 Ver.1.0.1  

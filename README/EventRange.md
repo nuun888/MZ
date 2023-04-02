@@ -1,5 +1,5 @@
 # [イベント接触判定拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)
-# Ver.1.5.2
+# Ver.1.5.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventRange.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -74,6 +74,11 @@
 例:`<EventRange:triangle,3,90>`  
 ![画像](img/NUUN_EventRange5.png)  
 
+`<EventRangeOnSelf:[Self]>` 範囲内からプレイヤーが離れた時に、指定のセルフスイッチをONにします。  
+`[Self]`: A,B,C,D  
+
+`<EventRangeUnlock>` トリガー発動時にイベントの向きを方向転換させません。  
+
 実行内容に注釈(Comment)は、ページ毎の接触範囲となります。現在の条件になっているページの接触範囲となります。  
 イベントのメモ欄と注釈(Comment)に同時に記入がある場合、注釈のタグが優先されます。  
 
@@ -84,6 +89,9 @@
 ※画像の色付けしている部分は、画像表示用に接触範囲を視覚化するために表示しているためなので、エディタ、ゲーム上では表示されません。  
 
 ## 更新履歴
+2023/4/2 Ver.1.5.3  
+プレイヤーが範囲外に離れた時に指定のセルフスイッチをONにする機能を追加。  
+プレイヤーが範囲内に入っても、イベントの方向が変わらない機能を追加。  
 2023/3/27 Ver.1.5.2  
 イベントとイベントの通常の接触判定が行われていなかった問題を修正。  
 2023/1/31 Ver.1.5.1  

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * You can now display multiple message windows.
@@ -33,6 +33,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/2/2023 Ver.1.1.4
+ * Fixed the problem that the message window is not displayed and the event command cannot be executed when trying to display the message window after switching scenes.
  * 4/2/2023 Ver.1.1.3
  * Fixed the problem that the menu etc. will not open when closing the message window under certain conditions.
  * Fixed the problem that an error occurs when batch deleting windows after specifying the jump number ID.
@@ -110,7 +112,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -132,6 +134,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/3 Ver.1.1.4
+ * シーン切り替え後にメッセージウィンドウを表示させようとすると、メッセージウィンドウが表示されずイベントコマンドが実行できなくなる問題を修正。
  * 2023/4/2 Ver.1.1.3
  * 特定の条件でメッセージウィンドウを閉じるとメニュー等が開かなくなる問題を修正。
  * 飛び番のIDを指定した後にウィンドウを一括削除するとエラーが出る問題を修正。
@@ -234,6 +238,7 @@ Imported.NUUN_MultiMessageWindows = true;
         this._multiMessageWindowsList = [];
         this._messageWindows = [];
         this._nameBoxWindows = [];
+        $gameTemp.activeMultiMessageId = 0;
         _Scene_Message_initialize.call(this);
     };
 
@@ -331,7 +336,7 @@ Imported.NUUN_MultiMessageWindows = true;
         this._messageWindows[id].noBusy = this.getNoBusyMessage();
         this._messageWindow = this._messageWindows[id];
         this._nameBoxWindow = this._nameBoxWindows[id];
-        this._nameBoxWindow.setBoxPosition(this.getNameBoxPosition())
+        this._nameBoxWindow.setBoxPosition(this.getNameBoxPosition(this._messageWindow))
         _Scene_Message_associateWindows.call(this);
     };
 
@@ -350,6 +355,10 @@ Imported.NUUN_MultiMessageWindows = true;
     Window_MultiMessage.prototype.constructor = Window_MultiMessage;
     
     Window_MultiMessage.prototype.initialize = function(rect) {
+        this.multiMessageId = 0;
+        this.multiMessageMode = false;
+        this.simultaneousMode = false;
+        this.noBusy = false;
         Window_Message.prototype.initialize.call(this, rect);
     };
 

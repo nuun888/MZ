@@ -11,6 +11,7 @@
 [条件付きドロップアイテム図鑑適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) Ver.1.0.0
 [（要条件付きドロップアイテムVer.1.0.6以降）](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md)  
 [モンスター図鑑全セーブ共通](https://github.com/nuun888/MZ/blob/master/README/EnemyBook_Global.md)  
+[モンスター図鑑マップ遭遇チェック](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEncounterCheck.md)  
 #### オプション
 [キーボタン割り当て](https://github.com/nuun888/MZ/blob/master/README/UserKey.md)  
 

@@ -12,10 +12,14 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * This is a plugin for vibrating the gamepad on X Input.
+ * 
+ * Text　code
+ * \VG[id]:Vibrate the gamepad.
+ * [id]:Specify the ID in the "VibrationSetting" list number of the plug-in parameter.
  * 
  * Specified from script
  * NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)
@@ -24,6 +28,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/2/2023 Ver.1.1.0
+ * Added function to vibrate gamepad from text code.
  * 3/16/2023 Ver.1.0.2
  * Fixed not to display in the option if the game pad is not recognized.
  * 3/12/2023 Ver.1.0.1
@@ -42,6 +48,19 @@
  * @text Vibration settings
  * @desc Set vibration.
  * 
+ * 
+ * @param OptionGamePadVibrationName
+ * @desc Set the name of the gamepad vibration enable to be displayed in the option.
+ * @text Gamepad vibration enabled
+ * @type string
+ * @default Gamepad vibration enabled
+ * 
+ * @param VibrationSetting
+ * @type struct<VibrationData>[]
+ * @default []
+ * @text Vibration settings
+ * @desc Set vibration.
+ * 
  */
 /*~struct~VibrationData:
  * 
@@ -56,7 +75,7 @@
  * @desc Number of vibration frames.
  * @text Number of vibration frames
  * @type number
- * @default 60
+ * @default 120
  * 
  * @param WeakMagnitude
  * @desc The rumble strength of the high frequency (weak) rumble motor.
@@ -77,10 +96,14 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * X Inputでのゲームパッドを振動させるためのプラグインです。
+ * 
+ * 制御文字
+ * \VG[id]:ゲームパッドを振動させます。
+ * [id]:プラグインパラメータの振動設定リスト番号内のIDを指定します。
  * 
  * スクリプトから指定
  * NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)
@@ -89,6 +112,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/2 Ver.1.1.0
+ * 制御文字からゲームパッドを振動させる機能を追加。
  * 2023/3/16 Ver.1.0.2
  * ゲームパッドを認識してない場合はオプションに表示しないように修正。
  * 2023/3/12 Ver.1.0.1
@@ -114,6 +139,11 @@
  * @type string
  * @default ゲームパッド振動
  * 
+ * @param VibrationSetting
+ * @type struct<VibrationData>[]
+ * @default []
+ * @text 振動設定
+ * @desc 振動の設定を行います。
  * 
  */
 /*~struct~VibrationData:ja
@@ -129,7 +159,7 @@
  * @desc 振動フレーム数
  * @text 振動フレーム数
  * @type number
- * @default 60
+ * @default 120
  * 
  * @param WeakMagnitude
  * @desc 高周波 (弱い) ランブル モーターのランブル強度。
@@ -151,6 +181,7 @@ Imported.NUUN_GamePadVibration = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_GamePadVibration');
     const OptionGamePadVibrationName = String(parameters['OptionGamePadVibrationName'] || "ゲームパッド振動");
+    const VibrationSetting = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['VibrationSetting'])) : [];
 
     const pluginName = "NUUN_GamePadVibration";
     let _onGamepad = false;
@@ -173,10 +204,30 @@ Imported.NUUN_GamePadVibration = true;
         _Scene_Base_update.call(this);
         NuunManager.updateVibration();
     };
+//
+    function _0x2ef6(){const _0x12f76c=['175490dinPHh','sprictGamePadVibration','465156lTqdHt','actuatorDelay','118465ksQmcy','actuatorDuration','vibrationActuator','StrongMagnitude','14031bwYvni','type','_actuatorData','connected','setupGamePadVibration','37932WakRdc','StartDelay','9896BZWoGN','611208yYgoVc','1161fmBLYK','setVibration','44hfpGEC','Duration','WeakMagnitude','getGamepads','playEffect'];_0x2ef6=function(){return _0x12f76c;};return _0x2ef6();}const _0x352c1c=_0x29d6;function _0x29d6(_0x183981,_0x1deead){const _0x2ef659=_0x2ef6();return _0x29d6=function(_0x29d6bf,_0x5bc2e1){_0x29d6bf=_0x29d6bf-0x1c9;let _0x1990e8=_0x2ef659[_0x29d6bf];return _0x1990e8;},_0x29d6(_0x183981,_0x1deead);}(function(_0xd91a6e,_0x2adbd7){const _0x3c7907=_0x29d6,_0x4d8a70=_0xd91a6e();while(!![]){try{const _0x139cfc=parseInt(_0x3c7907(0x1d0))/0x1+-parseInt(_0x3c7907(0x1d6))/0x2*(-parseInt(_0x3c7907(0x1cb))/0x3)+-parseInt(_0x3c7907(0x1d3))/0x4+parseInt(_0x3c7907(0x1df))/0x5+-parseInt(_0x3c7907(0x1dd))/0x6+parseInt(_0x3c7907(0x1db))/0x7+parseInt(_0x3c7907(0x1d2))/0x8*(parseInt(_0x3c7907(0x1d4))/0x9);if(_0x139cfc===_0x2adbd7)break;else _0x4d8a70['push'](_0x4d8a70['shift']());}catch(_0x3c33b8){_0x4d8a70['push'](_0x4d8a70['shift']());}}}(_0x2ef6,0x1d032),NuunManager[_0x352c1c(0x1dc)]=function(_0x12a53f,_0x1b20c3,_0x4a6d1b,_0x5ee595){const _0x5e38e6=_0x352c1c,_0x34f65a={};_0x34f65a[_0x5e38e6(0x1d1)]=Number(_0x12a53f),_0x34f65a[_0x5e38e6(0x1d7)]=Number(_0x1b20c3),_0x34f65a[_0x5e38e6(0x1d8)]=Number(_0x4a6d1b),_0x34f65a[_0x5e38e6(0x1ca)]=Number(_0x5ee595),this[_0x5e38e6(0x1cf)](_0x34f65a);},NuunManager[_0x352c1c(0x1cf)]=function(_0x3f9526){const _0x552194=_0x352c1c;if(navigator[_0x552194(0x1d9)]&&ConfigManager['gamePadVibration']){const _0x470f7e=navigator[_0x552194(0x1d9)]()[0x0];_0x470f7e&&_0x470f7e[_0x552194(0x1c9)]&&this[_0x552194(0x1d5)](_0x3f9526);}},NuunManager[_0x352c1c(0x1d5)]=function(_0x255783){const _0x4256fd=_0x352c1c;_0x255783[_0x4256fd(0x1d7)]>this[_0x4256fd(0x1e0)]&&(this[_0x4256fd(0x1de)]=_0x255783[_0x4256fd(0x1d1)],this[_0x4256fd(0x1cd)]=_0x255783,this[_0x4256fd(0x1e0)]=_0x255783[_0x4256fd(0x1d7)]);},NuunManager['updateVibration']=function(){const _0x53383e=_0x352c1c;this[_0x53383e(0x1de)]>0x0&&this[_0x53383e(0x1de)]--;if(this[_0x53383e(0x1de)]===0x0&&this[_0x53383e(0x1e0)]>0x0){const _0x21f172=navigator['getGamepads']();for(const _0x4de004 of _0x21f172){if(_0x4de004&&_0x4de004[_0x53383e(0x1ce)]){const _0xc48f12=_0x4de004[_0x53383e(0x1c9)];_0xc48f12&&_0xc48f12[_0x53383e(0x1da)](_0xc48f12[_0x53383e(0x1cc)],{'startDelay':0x0,'duration':0x14,'weakMagnitude':this[_0x53383e(0x1cd)][_0x53383e(0x1d8)],'strongMagnitude':this['_actuatorData'][_0x53383e(0x1ca)]});}}this['actuatorDuration']--;}});
 
-    function _0x540d(){const _0x5173d4=['WeakMagnitude','_actuatorData','12FsiOtk','updateVibration','44554sTURHo','setVibration','4188008zekfAR','505526atlfGh','sprictGamePadVibration','32383350DrfPjU','connected','566235YluxLT','11005353jyvICh','Duration','StrongMagnitude','StartDelay','42bcHFhr','vibrationActuator','35UPnIQp','setupGamePadVibration','actuatorDelay','getGamepads','443188EpDUZr','actuatorDuration'];_0x540d=function(){return _0x5173d4;};return _0x540d();}function _0x5712(_0x5c7638,_0x52463d){const _0x540dd9=_0x540d();return _0x5712=function(_0x5712e4,_0x57060f){_0x5712e4=_0x5712e4-0x148;let _0x3a214c=_0x540dd9[_0x5712e4];return _0x3a214c;},_0x5712(_0x5c7638,_0x52463d);}const _0x298a74=_0x5712;(function(_0x530941,_0x502d46){const _0x104cdb=_0x5712,_0x263558=_0x530941();while(!![]){try{const _0x4f58fe=parseInt(_0x104cdb(0x14a))/0x1+-parseInt(_0x104cdb(0x15b))/0x2*(parseInt(_0x104cdb(0x159))/0x3)+-parseInt(_0x104cdb(0x155))/0x4*(parseInt(_0x104cdb(0x151))/0x5)+-parseInt(_0x104cdb(0x14f))/0x6*(parseInt(_0x104cdb(0x15e))/0x7)+-parseInt(_0x104cdb(0x15d))/0x8+-parseInt(_0x104cdb(0x14b))/0x9+parseInt(_0x104cdb(0x148))/0xa;if(_0x4f58fe===_0x502d46)break;else _0x263558['push'](_0x263558['shift']());}catch(_0x1f4caa){_0x263558['push'](_0x263558['shift']());}}}(_0x540d,0xa7fa7),NuunManager[_0x298a74(0x15f)]=function(_0x481ea6,_0x58a439,_0x4f023e,_0x50fffc){const _0x2cad23=_0x298a74,_0x152a91={};_0x152a91[_0x2cad23(0x14e)]=Number(_0x481ea6),_0x152a91[_0x2cad23(0x14c)]=Number(_0x58a439),_0x152a91['WeakMagnitude']=Number(_0x4f023e),_0x152a91[_0x2cad23(0x14d)]=Number(_0x50fffc),this[_0x2cad23(0x152)](_0x152a91);},NuunManager[_0x298a74(0x152)]=function(_0x546cd5){const _0x30f2f0=_0x298a74;if(navigator['getGamepads']&&ConfigManager['gamePadVibration']){const _0x3c85bb=navigator[_0x30f2f0(0x154)]()[0x0];_0x3c85bb&&_0x3c85bb[_0x30f2f0(0x150)]&&this[_0x30f2f0(0x15c)](_0x546cd5);}},NuunManager[_0x298a74(0x15c)]=function(_0xa20492){const _0x37cf60=_0x298a74;_0xa20492['Duration']>this[_0x37cf60(0x156)]&&(this['actuatorDelay']=_0xa20492[_0x37cf60(0x14e)],this['_actuatorData']=_0xa20492,this[_0x37cf60(0x156)]=_0xa20492[_0x37cf60(0x14c)]);},NuunManager[_0x298a74(0x15a)]=function(){const _0x313e7e=_0x298a74;this[_0x313e7e(0x153)]>0x0&&this[_0x313e7e(0x153)]--;if(this[_0x313e7e(0x153)]===0x0&&this[_0x313e7e(0x156)]>0x0){const _0x28f36b=navigator[_0x313e7e(0x154)]();for(const _0x3cf18e of _0x28f36b){if(_0x3cf18e&&_0x3cf18e[_0x313e7e(0x149)]){const _0x21d227=_0x3cf18e[_0x313e7e(0x150)];_0x21d227&&_0x21d227['playEffect'](_0x21d227['type'],{'startDelay':0x0,'duration':0x14,'weakMagnitude':this[_0x313e7e(0x158)][_0x313e7e(0x157)],'strongMagnitude':this[_0x313e7e(0x158)][_0x313e7e(0x14d)]});}}this[_0x313e7e(0x156)]--;}});
+//
+    const _Window_Base_processEscapeCharacter = Window_Base.prototype.processEscapeCharacter;
+    Window_Base.prototype.processEscapeCharacter = function(code, textState) {
+        switch (code) {
+            case "VG":
+                this.processGamepadVibration(this.obtainEscapeParam(textState));
+                break;
+            default:
+                _Window_Base_processEscapeCharacter.call(this, code, textState);
+                break;
+        }
+    };
 
-    
+    Window_Base.prototype.processGamepadVibration = function(state) {
+        const data = VibrationSetting[state -1];
+        if (data) {
+            NuunManager.setupGamePadVibration(data);
+        }
+    };
+
+
     const _Scene_Options_initialize = Scene_Options.prototype.initialize;
     Scene_Options.prototype.initialize = function() {
         _Scene_Options_initialize.call(this);

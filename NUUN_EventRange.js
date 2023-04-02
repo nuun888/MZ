@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Event contact detection EX
  * @author NUUN
- * @version 1.5.2
+ * @version 1.5.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -65,6 +65,11 @@
  * <EventRecognition:20> If the distance from the player to the event is 20 squares or more, contact judgment processing will not be performed.
  * Contents of <EventRecognition:[range]> take precedence over plugin parameters.
  * 
+ * <EventRangeOnSelf:[Self]> When the player leaves the range, turn on the specified self switch.
+ * [Self]: A,B,C,D
+ * 
+ * <EventRangeUnlock> Does not redirect the direction of the event when the trigger fires.
+ * 
  * If you enter "Comment" in the execution content, it will be the contact range for each page. It will be the contact range of the page with the current conditions.
  * If there is an entry in the event memo field and "Comment" at the same time, the "Comment" tag will take precedence.
  * 
@@ -76,6 +81,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/2/2023 Ver.1.5.3
+ * Added a function to turn on the specified self switch when the player leaves the range.
+ * Added functionality to keep event direction unchanged when player enters range.
  * 3/27/2023 Ver.1.5.2
  * Fixed an issue where the normal collision detection between events was not performed.
  * 1/31/2023 Ver.1.5.1
@@ -131,7 +139,7 @@
  * @target MZ
  * @plugindesc イベント接触判定拡張
  * @author NUUN
- * @version 1.5.2
+ * @version 1.5.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -187,6 +195,11 @@
  * <EventRecognition:20> プレイヤーからイベントまでの距離が20マス以上なら接触判定処理を行いません。
  * プラグインパラメータよりも<EventRecognition:[range]>の内容が優先されます。
  * 
+ * <EventRangeOnSelf:[Self]> 範囲内からプレイヤーが離れた時に、指定のセルフスイッチをONにします。
+ * [Self]: A,B,C,D
+ * 
+ * <EventRangeUnlock> トリガー発動時にイベントの向きを方向転換させません。
+ * 
  * 実行内容に注釈(Comment)は、ページ毎の接触範囲となります。現在の条件になっているページの接触範囲となります。
  * イベントのメモ欄と注釈(Comment)に同時に記入がある場合、注釈(Comment)のタグが優先されます。
  * 
@@ -198,6 +211,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/2 Ver.1.5.3
+ * プレイヤーが範囲外に離れた時に指定のセルフスイッチをONにする機能を追加。
+ * プレイヤーが範囲内に入っても、イベントの方向が変わらない機能を追加。
  * 2023/3/27 Ver.1.5.2
  * イベントとイベントの通常の接触判定が行われていなかった問題を修正。
  * 2023/1/31 Ver.1.5.1
@@ -306,7 +322,7 @@ Imported.NUUN_EventRange = true;
         this.setDistanceFrom(0, 0);
         _Game_Player_startMapEvent.call(this, x, y, triggers, normal);
         if (!$gameMap.isEventRunning()) {
-            for (const event of $gameMap.eventsRangeXy(x, y)) {
+            for (const event of $gameMap.eventsRangeEventPlayerXy(x, y)) {
                 if (event.isTriggerIn(triggers)) {
                     event.start();
                 }
@@ -317,6 +333,12 @@ Imported.NUUN_EventRange = true;
     Game_Map.prototype.eventsRangeXy = function(x, y) {
         return this.events().filter(event => {
             return event.range(x, y);
+        });
+    };
+
+    Game_Map.prototype.eventsRangeEventPlayerXy = function(x, y) {
+        return this.events().filter(event => {
+            return event.rangeEventPlayer(x, y);
         });
     };
 
@@ -332,11 +354,35 @@ Imported.NUUN_EventRange = true;
 
     const _Game_Event_initialize = Game_Event.prototype.initialize;
     Game_Event.prototype.initialize = function(mapId, eventId) {
+        this._rangeOnSelf = false;
         _Game_Event_initialize.call(this, mapId, eventId);
+    };
+
+    Game_Event.prototype.setRangeOnSelf = function(result) {
+        if (this._eventRangeOnSelfTag) {
+            if (this._rangeOnSelf && !result) {
+                const key = [this._mapId, this._eventId, this._eventRangeOnSelfTag];
+                $gameSelfSwitches.setValue(key, true);
+            }
+        }
+        this._rangeOnSelf = result;
     };
 
     Game_Event.prototype.isEventRangeEvent = function() {
         return true;
+    };
+
+    Game_Event.prototype.rangeEventPlayer = function(x, y) {
+        const result = this.range(x, y);
+        this.setRangeOnSelf(result);
+        return result;
+    };
+
+    const _Game_Event_lock = Game_Event.prototype.lock;
+    Game_Event.prototype.lock = function() {
+        if (!this._eventRangeUnlockTag) {
+            _Game_Event_lock.call(this);
+        }
     };
 
     const _Game_Event_isCollidedWithEvents = Game_Event.prototype.isCollidedWithEvents;
@@ -351,7 +397,7 @@ Imported.NUUN_EventRange = true;
     };
 
     Game_Event.prototype.isEventRangeCollidedWithPlayerCharacters = function(x, y) {
-        return this.getEventRangeCollidedTag() && ($gamePlayer.range(x, y, this) || $gamePlayer.rangeFollower(x, y, this));
+        return !!this.getEventRangeCollidedTag() && ($gamePlayer.range(x, y, this) || $gamePlayer.rangeFollower(x, y, this));
     };
 
     Game_Event.prototype.eventsRangeXyNt = function(x, y) {
@@ -541,6 +587,8 @@ Imported.NUUN_EventRange = true;
         this._eventRangeTag = null;
         this._eventRangeCollidedTag = null;
         this._eventRangeObstacleSensingTag = null;
+        this._eventRangeOnSelfTag = null;
+        this._eventRangeUnlockTag = null;
     };
 
     Game_Event.prototype.setRangeCommentTag = function() {
@@ -548,20 +596,30 @@ Imported.NUUN_EventRange = true;
         const re = /<(?:EventRange):\s*(.*)>/;
         const re2 = /<(?:EventRangeCollided)>/;
         const re3 = /<(?:EventRangeObstacle)>/;
+        const re4 = /<(?:EventRangeOnSelf):\s*(.*)>/;
+        const re5 = /<(?:EventRangeUnlock)>/;
         this._eventRangeTag = null;
         this._eventRangeCollidedTag = null;
         this._eventRangeObstacleSensingTag = null;
+        this._eventRangeOnSelfTag = null;
+        this._eventRangeUnlockTag = null;
         this.list().forEach(tag => {
             if (tag.code === 108 || tag.code === 408) {
                 let match = re.exec(tag.parameters[0]);
                 let match2 = re2.exec(tag.parameters[0]);
                 let match3 = re3.exec(tag.parameters[0]);
+                let match4 = re4.exec(tag.parameters[0]);
+                let match5 = re5.exec(tag.parameters[0]);
                 if (match) {
                     this._eventRangeTag = match[1];
                 } else if (match2) {
                     this._eventRangeCollidedTag = !!match2[0];
                 } else if (match3) {
                     this._eventRangeObstacleSensingTag = !!match3[0];
+                } else if (match4) {
+                    this._eventRangeOnSelfTag = match4[1];
+                } else if (match5) {
+                    this._eventRangeUnlockTag = match5[0];
                 }
             }
         });
@@ -571,8 +629,14 @@ Imported.NUUN_EventRange = true;
         if (!this._eventRangeCollidedTag  && event.meta.EventRangeCollided) {
             this._eventRangeCollidedTag  = !!event.meta.EventRangeCollided;
         }
-        if (!this._eventRangeObstacleSensingTag  && event.meta.EventRangeObstacle) {
+        if (!this._eventRangeObstacleSensingTag && event.meta.EventRangeObstacle) {
             this._eventRangeObstacleSensingTag  = !!event.meta.EventRangeObstacle;
+        }
+        if (!this._eventRangeOnSelfTag && event.meta.EventRangeOnSelf) {
+            this._eventRangeOnSelfTag = event.meta.EventRangeOnSelf;
+        }
+        if (!this._eventRangeUnlockTag && event.meta.EventRangeUnlock) {
+            this._eventRangeUnlockTag = event.meta.EventRangeUnlock;
         }
     };
 

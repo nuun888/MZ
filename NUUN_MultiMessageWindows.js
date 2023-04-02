@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * You can now display multiple message windows.
@@ -33,7 +33,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 4/1/2023 Ver.1.1.2
+ * 4/2/2023 Ver.1.1.3
+ * Fixed the problem that the menu etc. will not open when closing the message window under certain conditions.
+ * Fixed the problem that an error occurs when batch deleting windows after specifying the jump number ID.
+ * 4/2/2023 Ver.1.1.2
  * Added a function to specify the display position of the name window.
  * 4/1/2023 Ver.1.1.1
  * Added a function to allow movement while the message window is displayed.
@@ -107,7 +110,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.1.3
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -129,6 +132,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/2 Ver.1.1.3
+ * 特定の条件でメッセージウィンドウを閉じるとメニュー等が開かなくなる問題を修正。
+ * 飛び番のIDを指定した後にウィンドウを一括削除するとエラーが出る問題を修正。
  * 2023/4/2 Ver.1.1.2
  * ネームウィンドウの表示位置を指定できる機能を追加。
  * 2023/4/1 Ver.1.1.1
@@ -308,7 +314,7 @@ Imported.NUUN_MultiMessageWindows = true;
             this._messageWindows[id].pause = false;
         } else if (id === -1) {
             for (const window of this._messageWindows) {
-                if (window.isOpen()) {
+                if (window && window.isOpen()) {
                     window.multiMessageMode = false;
                     window.terminateMessage();
                     window.pause = false;
@@ -380,6 +386,9 @@ Imported.NUUN_MultiMessageWindows = true;
         _Window_Message_update.call(this);
         if (this.multiMessageMode && !this._textState) {
             this.pause = true;
+        }
+        if (this.pause && (this.isClosing() || this.isClosed())) {
+            this.pause = false;
         }
     };
 

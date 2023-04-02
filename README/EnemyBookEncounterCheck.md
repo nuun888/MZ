@@ -9,7 +9,9 @@
 マップ上でエンカウントがない場合は-1を返します。  
 
 ## 設定
-#### 取得変数
+取得はプラグインコマンドから実行し、指定のゲーム変数に代入します。  
+
+#### スクリプト取得変数
 `NuunManager.getNotEncounterEnemies([mode], [commonEventID]);`  
 `[mode]`:  
 'Enc'    未遭遇  

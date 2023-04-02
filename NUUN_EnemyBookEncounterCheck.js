@@ -16,7 +16,7 @@
  * @version 1.0.0
  * 
  * @help
- * Get the number of monsters registered in the monster encyclopedia or information registered in the current map.
+ * Get the number of monsters that are not registered in the monster encyclopedia or whose information is not registered on the current map.
  * Returns -1 if there are no encounters on the map.
  * This plug-in is an expansion plug-in for the Monster Encyclopedia (NUUN_EnemyBook).
  * 
@@ -83,7 +83,7 @@
  * @version 1.0.0
  * 
  * @help
- * 現在のマップでモンスター図鑑に登録または、情報登録されているモンスター数を取得します。
+ * 現在のマップでモンスター図鑑に登録または、情報登録されていないモンスター数を取得します。
  * マップ上でエンカウントがない場合は-1を返します。
  * このプラグインはモンスター図鑑(NUUN_EnemyBook)の拡張プラグインです。
  * 

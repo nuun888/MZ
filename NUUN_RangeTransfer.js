@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Location range move
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_EventRange
  * 
  * @help
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/3/2023 Ver.1.0.3
+ * Fixed an issue where the coordinates of the location move destination may shift.
  * 2/12/2023 Ver.1.0.2
  * Added plugin parameter to initialize switch after move.
  * 11/27/2022 Ver.1.0.1
@@ -43,7 +45,7 @@
  * @target MZ
  * @plugindesc 場所範囲移動
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_EventRange
  * 
  * @help
@@ -57,6 +59,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/3 Ver.1.0.3
+ * 場所移動先の座標がずれる場合がある問題を修正。
  * 2023/2/12 Ver.1.0.2
  * 移動後にスイッチを初期化するプラグインパラメータを追加。
  * 2022/11/27 Ver.1.0.1
@@ -87,15 +91,29 @@ Imported.NUUN_RangeTransfer = true;
     const RangeTransferModeSwitchId = Number(parameters['RangeTransferModeSwitchId'] || 0);
     const EndInitializeSwitchId = eval(parameters['EndInitializeSwitchId'] || "false");
 
+    const _Game_Interpreter_command201 = Game_Interpreter.prototype.command201;
+    Game_Interpreter.prototype.command201 = function(params) {
+        if (this._eventId > 0) {
+            const event = this.character(0);
+            $gamePlayer.setTransferFrom(event.deltaXFrom($gamePlayer.x) * -1, event.deltaYFrom($gamePlayer.y) * -1);
+        }
+        return _Game_Interpreter_command201.call(this, params);
+    };
+
+    Game_Player.prototype.setTransferFrom = function(x, y) {
+        this._distanceTransferFromX = x;
+        this._distanceTransferFromY = y;
+    };
+
     const _Game_Player_performTransfer = Game_Player.prototype.performTransfer;
     Game_Player.prototype.performTransfer = function() {
         if (this.isTransferring() && $gameSwitches.value(RangeTransferModeSwitchId)) {
-            if (this._distanceFromX !== 0) {
-                this._newX += this._distanceFromX;
+            if (this._distanceTransferFromX !== 0) {
+                this._newX += this._distanceTransferFromX;
                 this._newX = this._newX.clamp(0, $dataMap.width);
             }
-            if (this._distanceFromY !== 0) {
-                this._newY += this._distanceFromY;
+            if (this._distanceTransferFromY !== 0) {
+                this._newY += this._distanceTransferFromY;
                 this._newY = this._newY.clamp(0, $dataMap.height);
             }
         }

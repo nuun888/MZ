@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.10
+ * @version 1.1.11
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -191,6 +191,8 @@
  * [指定した数値](3)の所持数が「上限下限値内」(1)または「指定した数値」(2)と一致なら条件を満たします。
  * 下限値を1、上限値を0に設定することで１つ以上所持で条件を満たすようになります。
  * 敵、敵グループの場合はfalseを返します。
+ * [アイテム未所持][武器未所持][防具未所持]
+ * [指定した数値](3)が所持していなければ条件を満たします。
  * [スキル習得済み]
  * [指定した数値](3)が習得済みなら条件を満たします。
  * 敵の場合は行動スキルに(3)のスキルが存在すれば条件を満たします。
@@ -249,6 +251,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/7 Ver.1.1.11
+ * アイテム、武器、防具を所持していない時の条件を追加。
  * 2023/3/25 Ver.1.1.10
  * スキル習得条件で特徴から習得したスキルが適用されない問題を修正。
  * 2022/12/18 Ver.1.1.9
@@ -578,8 +582,14 @@
  * @value 'PossessionItem'
  * @option 武器を所持(1)(2)(3)（(1)(2)個数 (3)武器ID）
  * @value 'PossessionWeapon'
- * @option 防具を所持v（(1)(2)個数 (3)防具ID）
+ * @option 防具を所持(1)(2)(3)（(1)(2)個数 (3)防具ID）
  * @value 'PossessionArmor'
+ * @option アイテムを所持していない(3)（(3)アイテムID）
+ * @value 'NotPossessionItem'
+ * @option 武器を所持していない(3)（(3)武器ID）
+ * @value 'NotPossessionWeapon'
+ * @option 防具を所持していない(3)（(3)防具ID）
+ * @value 'NotPossessionArmor'
  * @option スキルを習得(3)（(3)スキルID）
  * @value 'MasterSkill'
  * @default 
@@ -1148,6 +1158,21 @@ function itemSkillTriggerConditions(data, target, mode) {
       return possessionArmors(data);
     }
     return false;
+  } else if (data.GetItemSkillConditionsType === 'NotPossessionItem') {
+    if (mode === 'Party' || (target && target.isActor())) {
+      return notPossessionItems(data);
+    }
+    return false;
+  } else if (data.GetItemSkillConditionsType === 'NotPossessionWeapon') {
+    if (mode === 'Party' || (target && target.isActor())) {
+      return notPossessionWeapons(data);
+    }
+    return false;
+  } else if (data.GetItemSkillConditionsType === 'NotPossessionArmor') {
+    if (mode === 'Party' || (target && target.isActor())) {
+      return notPossessionArmors(data);
+    }
+    return false;
   } else if (data.GetItemSkillConditionsType === 'MasterSkill') {
     if (mode === 'Party') {
       return unit.members().some(member => masterSkill(data, member));
@@ -1447,6 +1472,18 @@ function possessionWeapons(data) {
 
 function possessionArmors(data) {
   return getValList(data.IDList).some(listId => conditionsNum(data, $gameParty.numItems($dataArmors[listId])));
+};
+
+function notPossessionItems(data) {
+    return !getValList(data.IDList).some(listId => $gameParty.hasItem($dataItems[listId]));
+};
+  
+function notPossessionWeapons(data) {
+    return !getValList(data.IDList).some(listId => $gameParty.hasItem($dataWeapons[listId]));
+};
+  
+function notPossessionArmors(data) {
+    return !getValList(data.IDList).some(listId => gameParty.hasItem($dataArmors[listId]));
 };
 
 function masterSkill(data, member) {

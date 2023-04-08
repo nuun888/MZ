@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.5
+ * @version 2.18.6
  * 
  * @help
  * Implement an enemy book.
@@ -203,6 +203,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/8/2023 Ver.2.18.6
+ * Added a function to display monster images in front view image or side view image.
+ * Fixed an issue where viewing conditional drop items would cause an error.
  * 3/20/2023 Ver.2.18.5
  * Fix to cache enemy game data. (Other than some monsters)
  * Fixed not to display the full size image of unregistered monsters.
@@ -421,6 +424,19 @@
  * @desc Scales the background image to fit the window size or screen.
  * @type boolean
  * @default false
+ * @parent BasicSetting
+ * 
+ * @param EnemyGraphicMode
+ * @desc Specifies whether to display the monster image as a front view image or a side view image.
+ * @text Enemy image type
+ * @type select
+ * @option By mode
+ * @value 0
+ * @option Image for front view
+ * @value 1
+ * @option Image for side view
+ * @value 2
+ * @default 0
  * @parent BasicSetting
  * 
  * @param PageNextSymbol
@@ -2833,7 +2849,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.5
+ * @version 2.18.6
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3028,6 +3044,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/8 Ver.2.18.6
+ * モンスター画像をフロントビュー画像かサイドビュー画像で表示する機能を追加。
+ * 条件付きドロップアイテムを表示するとエラーが出る問題を修正。
  * 2023/3/20 Ver.2.18.5
  * 敵のゲームデータをキャッシュするように修正。(一部のモンスター以外)
  * 未登録モンスターの原寸画像を表示しないように修正。
@@ -3349,6 +3368,19 @@
  * @desc 背景画像をウィンドウサイズまたは画面に合わせ拡大します。
  * @type boolean
  * @default false
+ * @parent BasicSetting
+ * 
+ * @param EnemyGraphicMode
+ * @desc モンスター画像をフロントビュー用かサイドビュー用の画像で表示するかを指定します。
+ * @text モンスター画像タイプ
+ * @type select
+ * @option モードによって
+ * @value 0
+ * @option フロントビュー用画像
+ * @value 1
+ * @option サイドビュー用画像
+ * @value 2
+ * @default 0
  * @parent BasicSetting
  * 
  * @param PageNextSymbol
@@ -5761,6 +5793,7 @@ const NoBookDataTag = NuunManager.getStringCode(parameters['NoBookDataTag']) || 
 const PageNextSymbol = NuunManager.getStringCode(parameters['PageNextSymbol']);
 const PagePreviousSymbol = NuunManager.getStringCode(parameters['PagePreviousSymbol']);
 const ActualEnemyMask = eval(parameters['BackUiWidth'] || 'ActualEnemyMask');
+const EnemyGraphicMode = Number(parameters['EnemyGraphicMode'] || 0);
 
 const RegistrationTiming = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['RegistrationTiming'])) : [];
 const RegistrationEnemyColor = (DataManager.nuun_structureData(parameters['RegistrationEnemyColor'])) || 0;
@@ -9643,10 +9676,10 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
         }
         this.resetTextColor();
         dropList.forEach((di, i) => {
+            let width2 = width;
             if(di[1] > 0){
                 x2 = Math.floor(dropIndex % CondDropItemCols) * (width + this.itemPadding()) + x;
                 y2 = Math.floor(dropIndex / CondDropItemCols) * lineHeight + y;
-                let width2 = width;
                 if (list.Back) {
                     this.drawContentsBackground(list, x2, y2, width);
                     x2 = this.contensX(x2);
@@ -10749,9 +10782,14 @@ Sprite_BookEnemy.prototype.refresh = function() {
         this.bitmap = bitmap;
     } else {
         const name = this.enemyBattlerName();
-        if ($gameSystem.isSideView()) {
+        const enemy = this._battler.enemy();
+        if (enemy.meta.EnemyBookFVEnemy) {
+            bitmap = ImageManager.loadEnemy(name);
+        } else if (enemy.meta.EnemyBookSVEnemy) {
+            bitmap = ImageManager.loadSvEnemy(name); 
+        } else if (EnemyGraphicMode === 2 || EnemyGraphicMode === 0 && $gameSystem.isSideView()) {
             bitmap = ImageManager.loadSvEnemy(name);
-        } else {
+        } else if (EnemyGraphicMode === 1 || EnemyGraphicMode === 0) {
             bitmap = ImageManager.loadEnemy(name);
         }
         if (this.addApngChild && this.loadApngSprite(name)) {

@@ -1,5 +1,5 @@
 # [キーボタン割り当て](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
-# Ver.1.2.4
+# Ver.1.2.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -38,6 +38,8 @@
 24:右スティック →  
 
 ## 更新履歴
+2023/4/9 Ver.1.2.5  
+通常のキー操作を行ったときにエラーが起きる問題を修正。  
 2023/3/25 Ver.1.2.4  
 シーン上でのキーボタントリガー適用の使用を変更。  
 2023/3/12 Ver.1.2.3  

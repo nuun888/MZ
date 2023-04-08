@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.4
+ * @version 1.2.5
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
@@ -28,6 +28,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/9/2023 Ver.1.2.5
+ * Fixed an issue that caused an error when performing normal key operations.
  * 3/25/2023 Ver.1.2.4
  * Changed the use of key button trigger apply on scene.
  * 3/12/2023 Ver.1.2.3
@@ -291,6 +293,8 @@
  * @desc Any script.(not valid from handler)
  * @text Any script
  * @type combo
+ * @option "NuunManager.getNotEncounterEnemies('Enc', 0)"
+ * @option "NuunManager.getNotEncounterEnemies('Status', 0)"
  * @default
  * @parent SceneKeyAndButtonSetting
  * 
@@ -323,7 +327,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.4
+ * @version 1.2.5
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
@@ -338,6 +342,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/9 Ver.1.2.5
+ * 通常のキー操作を行ったときにエラーが起きる問題を修正。
  * 2023/3/25 Ver.1.2.4
  * シーン上でのキーボタントリガー適用の使用を変更。
  * 2023/3/12 Ver.1.2.3
@@ -602,6 +608,8 @@
  * @desc 任意のスクリプト(ハンドラからは無効)
  * @text 任意スクリプト
  * @type combo
+ * @option "NuunManager.getNotEncounterEnemies('Enc', 0)"
+ * @option "NuunManager.getNotEncounterEnemies('Status', 0)"
  * @default
  * @parent SceneKeyAndButtonSetting
  * 
@@ -662,12 +670,23 @@ Imported.NUUN_BankSystem = true;
             for (const data of UserKey) {
                 if (data.UserKey && data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0) {
                     const keyName = data.UserKey.KeyName;
-                    if (this.isHandled(keyName) && isRepeated(data.UserKey.Repeated, keyName)) {
+                    if (!this.isDefaultProcessHandling(keyName) && this.isHandled(keyName) && isRepeated(data.UserKey.Repeated, keyName)) {
                         return this.processUserKey(keyName);
                     }
                 }
             }
         }
+    };
+
+    Window_Selectable.prototype.isDefaultProcessHandling = function(keyName) {
+        switch (keyName) {
+            case "ok":
+            case "cancel":
+            case "pagedown":
+            case "pageup":
+                return true;
+        }
+        return false;
     };
 
     Window_Selectable.prototype.processUserKey = function(name, _eval) {

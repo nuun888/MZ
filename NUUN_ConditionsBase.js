@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.11
+ * @version 1.1.12
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -251,6 +251,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/8 Ver.1.1.12
+ * 防具を所持していない条件を指定時にエラーが出る問題を修正。
  * 2023/4/7 Ver.1.1.11
  * アイテム、武器、防具を所持していない時の条件を追加。
  * 2023/3/25 Ver.1.1.10
@@ -1483,7 +1485,7 @@ function notPossessionWeapons(data) {
 };
   
 function notPossessionArmors(data) {
-    return !getValList(data.IDList).some(listId => gameParty.hasItem($dataArmors[listId]));
+    return !getValList(data.IDList).some(listId => $gameParty.hasItem($dataArmors[listId]));
 };
 
 function masterSkill(data, member) {

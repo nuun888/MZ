@@ -184,7 +184,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | メッセージ　　　　　　　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [複数メッセージウィンドウ](https://github.com/nuun888/MZ/blob/master/README/MultiMessageWindows.md) | [NUUN_MultiMessageWindows](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js) |  | 1.0.2 |
+| [複数メッセージウィンドウ](https://github.com/nuun888/MZ/blob/master/README/MultiMessageWindows.md) | [NUUN_MultiMessageWindows](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js) |  | 1.1.5 |
 
 | メニュー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数10　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |

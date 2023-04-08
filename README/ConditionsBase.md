@@ -1,5 +1,5 @@
 # [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
-# Ver.1.1.11
+# Ver.1.1.12
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -236,6 +236,8 @@
 [エンカウント条件](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md)  
 
 ## 更新履歴
+2023/4/8 Ver.1.1.12  
+防具を所持していない条件を指定時にエラーが出る問題を修正。  
 2023/4/7 Ver.1.1.11  
 アイテム、武器、防具を所持していない時の条件を追加。  
 2023/3/25 Ver.1.1.10  

@@ -50,7 +50,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [パーティコマンド表示順任意](https://github.com/nuun888/MZ/blob/master/README/PartyCommandCustomize.md) | [NUUN_PartyCommandCustomize](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyCommandCustomize.js) | 共 | 1.0.0 |
 | [アクターコマンド表示順任意](https://github.com/nuun888/MZ/blob/master/README/ActorCommandCustomize.md) | [NUUN_ActorCommandCustomize](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorCommandCustomize.js) | 共 | 1.0.1 |
 | [スキップパーティコマンド](https://github.com/nuun888/MZ/blob/master/README/SkipPartyCommand.md) | [NUUN_SkipPartyCommand](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkipPartyCommand.js) |  | 1.0.1 |
-|  |  |  |  |
+| [フロントビューサイドビュー変更](https://github.com/nuun888/MZ/blob/master/README/ChangeBattleMode.md) | [NUUN_ChangeBattleMode](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ChangeBattleMode.js) |  |  1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

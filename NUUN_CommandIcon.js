@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.3
+ * @version 1.4.4
  * 
  * @help
  * You can display icons in the command menu and change the text color of command names.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/9/2023 Ver.1.4.4
+ * Fixed an issue that was not applied to options.
  * 12/6/2022 Ver.1.4.3
  * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
  * Changed the Type of icon specified plug-in parameter to icon. (Core script Ver.1.6.0 or later)
@@ -243,7 +245,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.3
+ * @version 1.4.4
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -272,6 +274,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/9 Ver.1.4.4
+ * オプションに適用されていなかった問題を修正。
  * 2022/12/6 Ver.1.4.3
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
  * アイコン指定のプラグインパラメータのTypeをiconに変更。(コアスクリプトVer.1.6.0以降)
@@ -523,19 +527,18 @@ Window_Command.prototype.getFindCommand = function(commad, commadName) {
   if (!!commad.CommadSymbol) {
     return commad.CommadSymbol === this._commadSymbol;
   } else {
-    return commad.CommadName === this._commadName;
+    return commad.CommadName === commadName;
   }
 };
 
 const _Window_Command_drawText = Window_Command.prototype.drawText;
 Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
-  const commadName = this._commadName;
-  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => this.getFindCommand(Commad) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
+  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => this.getFindCommand(Commad, text) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
   if (foundIndex >= 0) {
     const commadData = param.CommadIcon[foundIndex];
     const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
     const textMargin = commadData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
-    const textWidth = this.textWidth(commadName);
+    const textWidth = this.textWidth(text);
     const itemWidth = Math.max(0, maxWidth - textMargin);
     width = Math.min(itemWidth, textWidth);
     const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;
@@ -562,6 +565,12 @@ Window_Command.prototype.drawItem = function(index) {
   _Window_Command_drawItem.call(this, index);
 };
 
+const _Window_Options_drawItem = Window_Options.prototype.drawItem;
+Window_Options.prototype.drawItem = function(index) {
+    this._commadName = this.commandName(index);
+    _Window_Options_drawItem.call(this, index);
+};
+
 Window_Command.prototype.isClass = function(Command, mode) {
   if (Command && Command.length > 0) {
     const className = String(this.constructor.name);
@@ -577,7 +586,7 @@ Window_Command.prototype.isClass = function(Command, mode) {
 
 const _Window_Command_drawItemBackground = Window_Command.prototype.drawItemBackground;
 Window_Command.prototype.drawItemBackground = function(index) {
-  const find = param.CommadIcon ? param.CommadIcon.find(Commad => this.getFindCommand(Commad) && this.isClass(Commad.CommandClass, Commad.CommandClassMode) && !!Commad.ContentsBuckImg) : null;
+  const find = param.CommadIcon ? param.CommadIcon.find(Commad => this.getFindCommand(Commad, this._commadName) && this.isClass(Commad.CommandClass, Commad.CommandClassMode) && !!Commad.ContentsBuckImg) : null;
   if (find) {
     const bitmap = ImageManager.nuun_LoadPictures(find.ContentsBuckImg);
     bitmap.addLoadListener(function() {

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * You can now display multiple message windows.
@@ -20,7 +20,9 @@
  * Specify the ID of the message in the message window setting of the plug-in command before the message of the event command.
  * At that time, please turn on "Other message window persistent display".
  * 
- * Since the message window with other message window persistent display turned ON does not close automatically, close the window with the plug-in command "Close message window".
+ * If you display multiple message windows with the other message window persistent display ON, the window that was opened later will be closed in order.
+ * If you want to close the specified message window, use "MultiMessageClose".
+ * If the key is disabled, please close the window with "MultiMessageClose".
  * 
  * MultiMessage
  * Be sure to turn it ON to display multiple message windows.
@@ -33,6 +35,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/8/2023 Ver.1.1.5
+ * Added function to disable key operation.
  * 4/2/2023 Ver.1.1.4
  * Fixed the problem that the message window is not displayed and the event command cannot be executed when trying to display the message window after switching scenes.
  * 4/2/2023 Ver.1.1.3
@@ -68,17 +72,24 @@
  * @type boolean
  * @default true
  * 
+ * @arg Simultaneous
+ * @desc It will be displayed together with the next message.
+ * @text Simultaneous display of next message
+ * @type boolean
+ * @default false
+ * 
  * @arg NoBusy
  * @desc Allows player movement while the message window is displayed.
  * @text Permission to move player
  * @type boolean
  * @default false
  * 
- * @arg Simultaneous
- * @desc It will be displayed together with the next message.
- * @text Simultaneous display of next message
+ * @arg KeyInvalid
+ * @desc Disable key operation when "Permission to move player" is enabled.
+ * @text Disable key operation
  * @type boolean
  * @default false
+ * 
  * 
  * @arg NameWindowPosition
  * @desc Specifies the position of the name window to display.
@@ -112,7 +123,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -120,8 +131,9 @@
  * イベントコマンドのメッセージの前にプラグインコマンドのメッセージウィンドウ設定でメッセージのIDを指定してください。
  * その際に他メッセージウィンドウ持続表示をONにしてください。
  * 
- * 他メッセージウィンドウ持続表示をONにしたメッセージウィンドウは自動ではウィンドウが閉じませんので、プラグインコマンドの
- * メッセージウィンドウクローズでウィンドウを閉じます。
+ * 他メッセージウィンドウ持続表示をONにしたメッセージウィンドウを複数表示させた場合は、後に開いたウィンドウから順に閉じます。
+ * 指定のメッセージウィンドウを閉じたい場合はメッセージウィンドウクローズを使用します。
+ * キー無効に設定している場合は、メッセージウィンドウクローズでウィンドウを閉じてください。
  * 
  * 他メッセージウィンドウ持続表示
  * 複数のメッセージウィンドウを表示させるには必ずONにしてください。
@@ -134,6 +146,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/8 Ver.1.1.5
+ * キー操作を無効にする機能を追加。
  * 2023/4/3 Ver.1.1.4
  * シーン切り替え後にメッセージウィンドウを表示させようとすると、メッセージウィンドウが表示されずイベントコマンドが実行できなくなる問題を修正。
  * 2023/4/2 Ver.1.1.3
@@ -170,15 +184,21 @@
  * @type boolean
  * @default true
  * 
+ * @arg Simultaneous
+ * @desc 次に表示されるメッセージと同時表示させます。
+ * @text 次メッセージ同時表示
+ * @type boolean
+ * @default false
+ * 
  * @arg NoBusy
  * @desc メッセージウィンドウ表示中のプレイヤーの移動を許可します。
  * @text プレイヤー移動許可
  * @type boolean
  * @default false
  * 
- * @arg Simultaneous
- * @desc 次に表示されるメッセージと同時表示させます。
- * @text 次メッセージ同時表示
+ * @arg KeyInvalid
+ * @desc プレイヤー移動許可が有効時、キー操作を無効にします。
+ * @text キー操作無効
  * @type boolean
  * @default false
  * 
@@ -248,7 +268,14 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     Scene_Message.prototype.setMultiMessageWindow = function(args) {
-        this._multiMessageWindowsList[0] = {id: Number(args.Id), mode: eval(args.MultiMessage), noBusy: eval(args.NoBusy), simultaneous: eval(args.Simultaneous), nameBox: NuunManager.getEvalCode(String(args.NameWindowPosition))};
+        this._multiMessageWindowsList[0] = 
+        {id: Number(args.Id), 
+            mode: eval(args.MultiMessage), 
+            noBusy: eval(args.NoBusy), 
+            simultaneous: eval(args.Simultaneous), 
+            nameBox: NuunManager.getEvalCode(String(args.NameWindowPosition)),
+            keyInvalid: eval(args.KeyInvalid),
+        };
         if (!this._messageWindows[Number(args.Id)]) {
             this.createMultiMessageWindow();
             this.createMultiMessageNameBoxWindow();
@@ -283,6 +310,10 @@ Imported.NUUN_MultiMessageWindows = true;
         return this._multiMessageWindowsList[0] !== undefined ? this._multiMessageWindowsList[0].nameBox : 'default';
     };
 
+    Scene_Message.prototype.getMessageKeyInvalid = function() {
+        return this._multiMessageWindowsList[0] !== undefined ? this._multiMessageWindowsList[0].keyInvalid : false;
+    };
+
     Scene_Message.prototype.createMessageWindow = function() {//再定義
         this.createMultiMessageWindow();
     };
@@ -299,6 +330,7 @@ Imported.NUUN_MultiMessageWindows = true;
         window.multiMessageMode = this.getmultiMessageMode();
         window.simultaneousMode = this.getSimultaneous();
         window.noBusy = this.getNoBusyMessage();
+        window.keyInvalid = this.getMessageKeyInvalid();
         this._messageWindows[windowId] = window;
         this.addWindow(window);
     };
@@ -331,10 +363,12 @@ Imported.NUUN_MultiMessageWindows = true;
     const _Scene_Message_associateWindows = Scene_Message.prototype.associateWindows;
     Scene_Message.prototype.associateWindows = function() {
         const id = this.getmultiMessageWindowId();
-        this._messageWindows[id].multiMessageMode = this.getmultiMessageMode();
-        this._messageWindows[id].simultaneousMode = this.getSimultaneous();
-        this._messageWindows[id].noBusy = this.getNoBusyMessage();
-        this._messageWindow = this._messageWindows[id];
+        const window = this._messageWindows[id];
+        window.multiMessageMode = this.getmultiMessageMode();
+        window.simultaneousMode = this.getSimultaneous();
+        window.noBusy = this.getNoBusyMessage();
+        window.keyInvalid = this.getMessageKeyInvalid();
+        this._messageWindow = window;
         this._nameBoxWindow = this._nameBoxWindows[id];
         this._nameBoxWindow.setBoxPosition(this.getNameBoxPosition(this._messageWindow))
         _Scene_Message_associateWindows.call(this);
@@ -359,6 +393,7 @@ Imported.NUUN_MultiMessageWindows = true;
         this.multiMessageMode = false;
         this.simultaneousMode = false;
         this.noBusy = false;
+        this.keyInvalid = false;
         Window_Message.prototype.initialize.call(this, rect);
     };
 
@@ -401,6 +436,14 @@ Imported.NUUN_MultiMessageWindows = true;
         }
     };
 
+    const _Window_Message_updateInput = Window_Message.prototype.updateInput;
+    Window_Message.prototype.updateInput = function() {
+        if (this.noBusy && this.keyInvalid) {
+            return false;
+        }
+        return _Window_Message_updateInput.call(this);
+    };
+
     Window_NameBox.prototype.setBoxPosition = function(mode) {
         this._boxPosition = mode;
     };
@@ -427,6 +470,5 @@ Imported.NUUN_MultiMessageWindows = true;
         }
         return result;
     };
-
     
 })();

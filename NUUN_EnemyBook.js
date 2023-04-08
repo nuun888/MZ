@@ -108,19 +108,26 @@
  * %2:Subject name
  * When "%2 failed to analyze.", if the skill user is a lead, "Lead failed to analyze." is displayed.
  * 
+ * Enemy notes
  * Side view (specified when showing side view enemies in item settings)
  * <EB_SVBattler:[fileName]> Display the monster image as a side view image. (It is assumed that you have installed a plug-in that displays the side view actor on the enemy)
  * [fileName]:File name Specify the side view battler image. Please specify the file name in the sv_actors folder without the extension.
  * If you are displaying the side view battler in the "Visu stalle" series, you do not need to define it.
  * 
+ * Enemy notes
  * <EB_SVBattlerMotion:[motionId]> Display with the specified motion. If there is no entry, it will be displayed with 0 motion.
  * [motionId]:0 to 17 motion ID (enter numerical value)
  * 
+ * Enemy notes
  * Character (Displayed when character is specified in item settings)
  * <EnemyBookCharacter:[failName],[id],[direction]> Display character chips. It will not be displayed for enemies that are not specified.
  * [failName]:File name Specify the file name in the "characters" folder without an extension.
  * [id]:Character chip index number. The 3x4 character chip will be 0.
  * [direction]:Specifies direction. 2 front (top) 4 left (second) 6 right (third) 8 rearward (bottom) * can be omitted
+ * 
+ * Enemy notes
+ * <EnemyBookFVEnemy> Displays the monster image to be displayed as a front view image.
+ * <EnemyBookSVEnemy> Displays the monster image to be displayed as a side view image.
  * 
  * ”Unencountered category string”, ”unidentified enemy string”, ”Item when status information is not registered, skill display name”, "RegistrationEnemyInfo(ON)" will be replaced with "?" depending on the number of characters in the name if only one "?" is entered.
  * 
@@ -2946,19 +2953,26 @@
  * %2:使用者名
  * 「%2はアナライズに失敗した。」の時、スキル使用者がリードの場合は「リードはアナライズに失敗した。」と表示されます。
  * 
+ * 敵キャラのメモ欄
  * サイドビュー(項目設定のサイドビューエネミー表示時に指定されます)
  * <EB_SVBattler:[fileName]> モンスター画像をサイドビュー画像で表示させます。(モンスターにサイドビューアクターを表示する系のプラグイン導入が前提としています)
  * [fileName]:ファイル名　サイドビューバトラー画像を指定します。sv_actorsフォルダ内のファイル名を拡張子なしで指定してください。
  * Visu stalleシリーズでサイドビューバトラーを表示している場合は定義する必要はありません。
  * 
+ * 敵キャラのメモ欄
  * <EB_SVBattlerMotion:[motionId]> 指定したモーションで表示させます。記入なしの場合は0のモーションで表示されます。
  * [motionId]:0～17モーションID(数値で入力)
  * 
+ * 敵キャラのメモ欄
  * キャラクター(項目設定のキャラクター指定時に表示されます)
  * <EnemyBookCharacter:[failName],[id],[direction]> キャラチップを表示します。指定していないモンスターには表示されません。
  * [failName]:ファイル名　charactersフォルダ内のファイル名を拡張子なしで指定してください。
  * [id]:キャラチップのインデックス番号。3×4のキャラチップは0になります。
  * [direction]:方向を指定します。2正面（一番上） 4左（２番目） 6右（３番目） 8後向き（一番下）　※省略可能
+ * 
+ * 敵キャラのメモ欄
+ * <EnemyBookFVEnemy> 表示するモンスター画像をフロントビュー用の画像で表示します。
+ * <EnemyBookSVEnemy> 表示するモンスター画像をサイドビュー用の画像で表示します。
  * 
  * 未遭遇カテゴリー文字列、未確認モンスター文字列、ステータス情報未登録時アイテム、スキル表示名、敵の情報登録タイミング反映(ON)は、
  * ？1文字だけ入れると名前の文字数に応じて？に置き換えられます。

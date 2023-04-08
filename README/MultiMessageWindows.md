@@ -1,5 +1,5 @@
 # [複数メッセージウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
-# Ver.1.1.4
+# Ver.1.1.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -29,6 +29,8 @@
 間にウエイトを行うイベントコマンドを実行すると表示タイミングがずれます。  
 
 ## 更新履歴
+2023/4/8 Ver.1.1.5  
+キー操作を無効にする機能を追加。  
 2023/4/3 Ver.1.1.4  
 シーン切り替え後にメッセージウィンドウを表示させようとすると、メッセージウィンドウが表示されずイベントコマンドが実行できなくなる問題を修正。  
 2023/4/2 Ver.1.1.3  

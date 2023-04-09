@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.4.3
+ * @version 1.4.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/9 Ver.1.4.4
+ * 処理の修正。
  * 2022/10/8 Ver.1.4.3
  * 競合対策。
  * 2022/3/30 Ver.1.4.2
@@ -79,7 +81,7 @@
  * @type actor
  * @default 0
  * 
- * @arg  SupportActorsSwitch
+ * @arg SupportActorsSwitch
  * @desc サポートアクターのONまたはOFF（ONでサポートアクター化）
  * @text サポートアクタースイッチ
  * @type boolean
@@ -133,7 +135,10 @@ Imported.NUUN_SupportActor = true;
   PluginManager.registerCommand(pluginName, 'SupportActorSetting', args => {
     const actorId = Number(args.Actor);
     if (actorId > 0) {
-      $gameActors.actor(actorId).setAddSupportActor(args);
+        const actor = $gameActors.actor(actorId);
+        if (!!actor) {
+            $gameActors.actor(actorId).setAddSupportActor(args);
+        }
     }
   });
 

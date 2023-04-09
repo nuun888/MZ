@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.7
+ * @version 2.0.8
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,7 +25,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 12/1/2022 Ver.2.0.7
+ * 4/9/2022 Ver.2.0.8
+ * Fixed so that the info window class designation in other creator's plug-ins can be applied.
+ * 4/1/2023 Ver.2.0.7
  * Added processing related to limit gauge display.
  * 12/1/2022 Ver.2.0.6
  * Fixed an issue where setting an actor front background image would cause an error.
@@ -51,7 +53,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.7
+ * @version 2.0.8
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -61,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/9 Ver.2.0.8
+ * 他制作者プラグインでのインフォウィンドウのクラス指定を適用できるように修正。
  * 2023/4/1 Ver.2.0.7
  * リミットゲージ表示に関する処理の追加。
  * 2023/1/7 Ver.2.0.6
@@ -142,10 +146,10 @@ Imported.NUUN_MenuScreenEXBase = true;
                 const method = '_infoSideMenuWindow'+ !!params.MethodName ? params.MethodName : [i];
                 const pageMethod = 'PageList' + data.ListDateSetting;
                 const rect = this.infoWindowRect(data);
-                const window = new Window_InfoMenu(rect);
+                const window = new Window_InfoMenu(rect, params.infoContents[pageMethod], data.MethodName);
                 this[method] = window;
                 this.addWindow(window);
-                window.setup(params.infoContents[pageMethod], data.InfoCols, data.InfoFontSize);
+                window.setup(data.InfoCols, data.InfoFontSize);
                 if (!data.WindowVisible) {
                     window.opacity = 0;
                 }
@@ -1017,18 +1021,19 @@ Imported.NUUN_MenuScreenEXBase = true;
     Window_InfoMenu.prototype = Object.create(Window_Selectable.prototype);
     Window_InfoMenu.prototype.constructor = Window_InfoMenu;
     
-    Window_InfoMenu.prototype.initialize = function(rect) {
+    Window_InfoMenu.prototype.initialize = function(rect, data, name) {
+        this._dataList = data;
+        this._data = {Id: name};//T氏プラグイン
+        this._classNameId = name;
         Window_Selectable.prototype.initialize.call(this, rect);
         this._text = '';
         this._commandName = _commandName;
-        this._data = null;
         this._infoFontSize = 0;
         this._onPlayTime = false;
         this._onRefresh = false;
     };
 
-    Window_InfoMenu.prototype.setup = function(data, cols, fontsize) {
-        this._data = data;
+    Window_InfoMenu.prototype.setup = function(cols, fontsize) {
         this._maxCols = cols;
         this._infoFontSize = fontsize;
         this.refresh();
@@ -1043,7 +1048,7 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
 
     Window_InfoMenu.prototype.getInfoList = function() {
-        return this._data || [];
+        return this._dataList || [];
     };
 
     Window_InfoMenu.prototype.refresh = function() {

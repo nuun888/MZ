@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.4
+ * @version 1.4.5
  * 
  * @help
  * You can display icons in the command menu and change the text color of command names.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/10/2023 Ver.1.4.5
+ * Fixed handling of filtering classes.
  * 4/9/2023 Ver.1.4.4
  * Fixed an issue that was not applied to options.
  * 12/6/2022 Ver.1.4.3
@@ -183,7 +185,7 @@
  * 
  * @param CommandClass
  * @text Filtering class settings
- * @desc Specify classes to apply or exclude. If not specified, it will be reflected in all commands. (list number 1 only)
+ * @desc Specify classes to apply or exclude, and distinguished names. If not specified, all commands are reflected. (list number 1 only)
  * @type combo[]
  * @option 'Window_MenuCommand'
  * @option 'Window_ItemCategory'
@@ -207,7 +209,7 @@
  * 
  * @param CommandClass
  * @text Filtering class setting
- * @desc Specifies the class to apply.
+ * @desc Specifies the class to apply. or distinguished name.
  * @type combo
  * @option 'Window_MenuCommand'
  * @option 'Window_ItemCategory'
@@ -274,6 +276,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/10 Ver.1.4.5
+ * フィルタリングクラスの処理修正。
  * 2023/4/9 Ver.1.4.4
  * オプションに適用されていなかった問題を修正。
  * 2022/12/6 Ver.1.4.3
@@ -417,7 +421,7 @@
  * 
  * @param CommandClass
  * @text フィルタリングクラス設定
- * @desc 適用、除外するクラスを指定します。無指定の場合は全てのコマンドで反映されます。(リスト番号１のみ)
+ * @desc 適用、除外するクラスまたは識別名を指定します。無指定の場合は全てのコマンドで反映されます。(リスト番号１のみ)
  * @type combo[]
  * @option 'Window_MenuCommand'
  * @option 'Window_ItemCategory'
@@ -441,7 +445,7 @@
  * 
  * @param CommandClass
  * @text フィルタリングクラス設定
- * @desc 適用するクラスを指定します。
+ * @desc 適用するクラスを指定します。または識別名
  * @type combo
  * @option 'Window_MenuCommand'
  * @option 'Window_ItemCategory'
@@ -518,7 +522,7 @@ Window_HorzCommand.prototype.itemTextAlign = function() {
 
 Window_Command.prototype.itemTextAlignClass = function() {
   param.ClassCommandPosition = param.ClassCommandPosition || [];
-  const className = String(this.constructor.name);
+  const className = getClass(this);
   const result = param.ClassCommandPosition.find(_Class => _Class.CommandClass === className);
   return result ? result.CommandPosition : null;
 };
@@ -573,7 +577,7 @@ Window_Options.prototype.drawItem = function(index) {
 
 Window_Command.prototype.isClass = function(Command, mode) {
   if (Command && Command.length > 0) {
-    const className = String(this.constructor.name);
+    const className = getClass(this);
     const result = Command.some(_Class => _Class === className);
     if (mode === 0 || mode === undefined) {
       return result;
@@ -603,5 +607,14 @@ Window_Command.prototype.drawContentsBack = function(bitmap, index) {
   const height = Math.min(bitmap.height, rect.height);
   this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x + 1, rect.y + 1, width, height);
 };
+
+function getClass(_class) {
+    try {
+        return NuunManager.isFilterClass(_class);
+    } catch (error) {
+        return String(_class.constructor.name);
+    }
+};
+
 
 })();

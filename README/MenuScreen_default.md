@@ -2,7 +2,7 @@
 # Ver.2.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
 #### 必須、前提プラグイン
-[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.7  
+[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.8  
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.2以降  
 #### オプション
 全体選択時カーソル修正  
@@ -84,6 +84,8 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2023/4/9 Ver.2.0.8(ベースプラグイン)  
+他制作者プラグインでのインフォウィンドウのクラス指定を適用できるように修正。  
 2023/4/1 Ver.2.0.2  
 リミットゲージを表示する項目を追加。  
 2022/12/10 Ver.2.0.1  

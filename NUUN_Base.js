@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.4
+ * @version 1.6.5
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/10/2023 Ver.1.6.5
+ * Added filtering class handling.
  * 3/15/2023 Ver.1.6.4
  * Added error prevention processing for String input.
  * Added error proofing for eval input.
@@ -77,7 +79,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.6.4
+ * @version 1.6.5
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -87,6 +89,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/10 Ver.1.6.5
+ * フィルタリングクラスの処理を追加。
  * 2023/3/15 Ver.1.6.4
  * string入力のエラー防止処理を追加。
  * eval入力のエラー防止処理を追加。
@@ -171,6 +175,10 @@ function nuun_GausePlugins() {
   return Imported.NUUN_ButlerHPGauge || Imported.NUUN_EnemyMPGauge || Imported.NUUN_EnemyTPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge || Imported.NUUN_EnemyStateIconEX;
 }
 
+NuunManager.isFilterClass = function(_class) {
+    return !!_class._classNameId ? _class._classNameId : String(_class.constructor.name);
+};
+
 NuunManager.getColorCode = function(color) {
   if (typeof(color) === "string") {
     return color;
@@ -223,6 +231,16 @@ function stringCode(code) {
     } catch (e) {
         return !!code ? String(code) : null;
     }
+};
+
+NuunManager.stringCodeSplit = function(code, mode) {
+    const list = code.split(',');
+    for (let data of list) {
+        if (code.indexOf("[") === 0) {
+            data = data.slice(1, 2);
+        }
+    }
+    return mode ? list.map(Number) : list;
 };
 
 const _Game_Interpreter_command357 = Game_Interpreter.prototype.command357;

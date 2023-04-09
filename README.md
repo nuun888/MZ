@@ -26,6 +26,9 @@ RPGツクールMVへの対応は行いません。
 ポ：ポップアップ対応  
 A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイン)が必要です)  
 
+$ curl --silent --header "Accept: application/vnd.github.v3+json" https://api.github.com/repos/nuun888/MZ/releases > result.json
+
+
 | コア　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.6.4 |

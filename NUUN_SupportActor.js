@@ -137,7 +137,7 @@ Imported.NUUN_SupportActor = true;
     if (actorId > 0) {
         const actor = $gameActors.actor(actorId);
         if (!!actor) {
-            $gameActors.actor(actorId).setAddSupportActor(args);
+            actor.setAddSupportActor(args);
         }
     }
   });

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Hide content background
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/10/2022 Ver.1.1.2
+ * Added processing of class specification by identification name specification.
  * 11/12/2022 Ver.1.1.1
  * Changed the display in languages other than Japanese to English.
  * 5/15/2022 Ver.1.1.0
@@ -42,7 +44,7 @@
  * 
  * @param BackVisibleClass
  * @text Content background class setting
- * @desc Specify the class that does not display the content background (hide content background ON) or enables (hide content background OFF). If your class is not on the list, please fill it in directly. (multiple selection possible)
+ * @desc Specifies the class (distinguished name) for applying or disabling the content background.
  * @type combo[]
  * @option 'Window_TitleCommand'
  * @option 'Window_Options'
@@ -81,7 +83,7 @@
  * @target MZ
  * @plugindesc コンテンツ背景非表示
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -94,6 +96,8 @@
  * 他のプラグインでコンテンツ背景に任意の画像を指定する場合、該当のクラスのコンテンツ背景非表示を適用しないようにしてください。
  * 
  * 更新履歴
+ * 2022/4/10 Ver.1.1.2
+ * 識別名指定によるクラス指定の処理を追加。
  * 2022/11/12 Ver.1.1.1
  * 日本語以外での表示を英語表示に変更。
  * 2022/5/15 Ver.1.1.0
@@ -110,7 +114,7 @@
  * 
  * @param BackVisibleClass
  * @text コンテンツ背景クラス設定
- * @desc コンテンツ背景の表示をさせない(コンテンツ背景非表示ON)、させる(コンテンツ背景非表示OFF)クラスを指定します。リストにないクラスの場合、直接記入してください。(複数指定可)
+ * @desc コンテンツ背景の適用または無効のクラス(識別名)の指定をします。
  * @type combo[]
  * @option 'Window_TitleCommand'
  * @option 'Window_Options'
@@ -166,7 +170,12 @@ Window_Selectable.prototype.initialize = function(rect) {
 };
 
 Window_Selectable.prototype.isContentsBack = function() {
-    const thisClass = String(this.constructor.name);
+    let thisClass = null;
+    try {
+        thisClass = NuunManager.isFilterClass(this);
+    } catch (error) {
+        thisClass = String(this.constructor.name);
+    }
     if (BackVisible) {//表示しない場合
         return !getContentsBackClass(thisClass);//除外
     } else {//表示する場合

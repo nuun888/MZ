@@ -1,5 +1,5 @@
 # [コンテンツ背景非表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -14,6 +14,8 @@ ONの時は適用しないウィンドウのクラス名を指定します。
 ![画像](img/ContentsBackVisible1.png)  
 
 ## 更新履歴
+2022/4/10 Ver.1.1.2  
+識別名指定によるクラス指定の処理を追加。  
 2022/11/12 Ver.1.1.1  
 日本語以外での表示を英語表示に変更。  
 2022/5/15 Ver.1.1.0  

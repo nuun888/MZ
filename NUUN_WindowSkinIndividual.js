@@ -10,7 +10,9 @@
  * @target MZ
  * @plugindesc ウィンドウスキン個別設定
  * @author NUUN
- * @version 1.0.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @version 1.0.1
  * 
  * @help
  * ウィンドウスキンをウィンドウ毎に設定できます。
@@ -21,6 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/4/10 Ver.1.0.1
+ * 識別名指定によるクラス指定の処理を追加。
  * 2022/6/15 Ver.1.0.0
  * 初版
  * 
@@ -30,12 +34,108 @@
  * @default []
  * @type struct<WindowSkinList>[]
  * 
+ * 
+ * @param StatusHelp
+ * @text ステータスヘルウィンドウスキン設定
+ * @default ------------------------------
+ * 
+ * @param StatusHelpWindowSkin
+ * @desc ステータスヘルプウィンドウスキンを指定します。
+ * @text ステータスヘルウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent StatusHelp
+ * 
+ * @param StatusHelpWindowColor
+ * @text ステータスヘルウィンドウカラー
+ * @desc ステータスヘルウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent StatusHelp
+ * 
+ * @param SaveHelp
+ * @text セーブヘルウィンドウスキン設定
+ * @default ------------------------------
+ * 
+ * @param SaveHelpWindowSkin
+ * @desc セーブヘルプウィンドウスキンを指定します。
+ * @text セーブヘルウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent SaveHelp
+ * 
+ * @param SaveHelpWindowColor
+ * @text セーブヘルウィンドウカラー
+ * @desc セーブヘルウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent SaveHelp
+ * 
+ * @param ItemHelp
+ * @text アイテムヘルウィンドウスキン設定
+ * @default ------------------------------
+ * 
+ * @param ItemHelpWindowSkin
+ * @desc セーブヘルプウィンドウスキンを指定します。
+ * @text セーブヘルウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent ItemHelp
+ * 
+ * @param ItemHelpWindowColor
+ * @text セーブヘルウィンドウカラー
+ * @desc セーブヘルウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent ItemHelp
+ * 
+ * @param SkillHelp
+ * @text スキルヘルウィンドウスキン設定
+ * @default ------------------------------
+ * 
+ * @param SkillHelpWindowSkin
+ * @desc セーブヘルプウィンドウスキンを指定します。
+ * @text セーブヘルウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent SkillHelp
+ * 
+ * @param SkillHelpWindowColor
+ * @text セーブヘルウィンドウカラー
+ * @desc セーブヘルウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent SkillHelp
+ * 
+ * @param EquiplHelp
+ * @text 装備ヘルウィンドウスキン設定
+ * @default ------------------------------
+ * 
+ * @param EquipHelpWindowSkin
+ * @desc 装備ヘルプウィンドウスキンを指定します。
+ * @text 装備ヘルウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent EquipHelp
+ * 
+ * @param EquipHelpWindowColor
+ * @text 装備ヘルウィンドウカラー
+ * @desc 装備ヘルウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent EquipHelp
+ * 
  */
 /*~struct~WindowSkinList:
  * 
  * @param ClassName
  * @text 変更ウィンドウ設定
- * @desc 変更するウィンドウクラスを指定します。リストにないクラスは直接該当するクラスを記入してください。
+ * @desc 変更するウィンドウクラス(識別名)を指定します。リストにないクラスは直接該当するクラスを記入してください。
  * @type combo
  * @option 'Window_TitleCommand'
  * @option 'Window_Options'
@@ -125,10 +225,16 @@ Imported.NUUN_WindowSkinIndividual = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_WindowSkinIndividual');
     const WindowSkinIndividual = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['WindowSkinIndividual'])) : null) || [];
+    let sceneSkinMode = null;
 
     const _Window_Base_initialize = Window_Base.prototype.initialize;
     Window_Base.prototype.initialize = function(rect) {
-        const className = String(this.constructor.name);
+        let className = null;
+        try {
+            className = NuunManager.isFilterClass(this);
+        } catch (error) {
+            className = String(this.constructor.name);
+        }
         this._customWindowSkin = WindowSkinIndividual.find(data => data.ClassName === className);
         _Window_Base_initialize.call(this, rect);
     };
@@ -142,13 +248,98 @@ Imported.NUUN_WindowSkinIndividual = true;
         }
     };
 
+    const _Window_Help_initialize = Window_Help.prototype.initialize;
+    Window_Help.prototype.initialize = function(rect) {
+        _Window_Help_initialize .call(this, rect);
+        this._skinTone = getTone();
+    };
+
+    Window_Help.prototype.loadWindowskin = function() {
+        if (sceneSkinMode) {
+            this.windowskin = ImageManager.loadSystem(getSkin());
+        } else {
+            Window_Base.prototype.loadWindowskin.call(this);
+        }
+    };
+
+
     const _Window_Base_updateTone = Window_Base.prototype.updateTone;
     Window_Base.prototype.updateTone = function() {
         if (this._customWindowSkin && this._customWindowSkin.windowColor) {
-            const tone = this._customWindowSkin.windowColor;
+            const tone = this._skinTone ? this._skinTone : this._customWindowSkin.windowColor;
             this.setTone(tone.red, tone.green, tone.bule);
         } else {
             _Window_Base_updateTone.call(this);
+        }
+    };
+
+
+    const _Scene_Status_createProfileWindow = Scene_Status.prototype.createProfileWindow;
+    Scene_Status.prototype.createProfileWindow = function() {
+        sceneSkinMode = 'status';
+        _Scene_Status_createProfileWindow.call(this);
+        sceneSkinMode = null;
+    };
+
+    const _Scene_File_createHelpWindow = Scene_File.prototype.createHelpWindow;
+    Scene_File.prototype.createHelpWindow = function() {
+        sceneSkinMode = 'save';
+        _Scene_File_createHelpWindow.call(this, rect);
+        sceneSkinMode = null;
+    };
+
+    const _Scene_MenuBase_createHelpWindow = Scene_MenuBase.prototype.createHelpWindow;
+    Scene_MenuBase.prototype.createHelpWindow = function() {
+        sceneSkinMode = this.getSceneSkinMode();
+        _Scene_MenuBase_createHelpWindow .call(this);
+        sceneSkinMode = null;
+    };
+
+    Scene_MenuBase.prototype.getSceneSkinMode = function() {
+        const className = String(this.constructor.name);
+        switch (className) {
+            case 'Scene_Item':
+                return 'item'
+            case 'Scene_Skill':
+                return 'skill'
+            case 'Scene_Equip':
+                return 'equip' 
+            default:
+                return null;
+        }
+    };
+
+    function getSkin() {
+        switch (sceneSkinMode) {
+            case 'status':
+                return StatusHelpWindowSkin;
+            case 'save':
+                return SaveHelpWindowSkin;
+            case 'item':
+                return ItemHelpWindowSkin;
+            case 'skill':
+                return SkillHelpWindowSkin;
+            case 'equip':
+                return EquipHelpWindowSkin;
+            default:
+                return null;
+        }
+    };
+
+    function getTone() {
+        switch (sceneSkinMode) {
+            case 'status':
+                return StatusHelpWindowColor;
+            case 'save':
+                return SaveHelpWindowColor;
+            case 'item':
+                return ItemHelpWindowColor;
+            case 'skill':
+                return SkillHelpWindowColor;
+            case 'equip':
+                return EquipHelpWindowColor;
+            default:
+                return null;
         }
     };
 

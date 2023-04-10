@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.5
+ * @version 1.6.6
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/10/2023 Ver.1.6.6
+ * Fixed filtering class handling.
  * 4/10/2023 Ver.1.6.5
  * Added filtering class handling.
  * 3/15/2023 Ver.1.6.4
@@ -79,7 +81,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.6.5
+ * @version 1.6.6
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -89,6 +91,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/10 Ver.1.6.6
+ * フィルタリングクラスの処理を修正。
  * 2023/4/10 Ver.1.6.5
  * フィルタリングクラスの処理を追加。
  * 2023/3/15 Ver.1.6.4
@@ -176,7 +180,13 @@ function nuun_GausePlugins() {
 }
 
 NuunManager.isFilterClass = function(_class) {
-    return !!_class._classNameId ? _class._classNameId : String(_class.constructor.name);
+    if (!!_class._classNameId) {
+        return _class._classNameId;
+    } else if (_class._data && _class._data.Id) {
+        return _class._data.Id;
+    } else {
+        return String(_class.constructor.name);
+    }
 };
 
 NuunManager.getColorCode = function(color) {

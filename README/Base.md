@@ -1,5 +1,5 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.6.5
+# Ver.1.6.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 English available  
@@ -8,6 +8,8 @@ English available
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2023/4/10 Ver.1.6.6  
+フィルタリングクラスの処理を修正。  
 2023/4/10 Ver.1.6.5  
 フィルタリングクラスの処理を追加。  
 2023/3/15 Ver.1.6.4  

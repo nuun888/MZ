@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.2
+ * @version 3.10.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/4/11 Ver.3.10.3
+ * CounterExtend(トリアコンタン氏)に対応。
  * 2023/3/27 Ver.3.10.2
  * 複数メッセージウィンドウと競合を起こす問題を修正。
  * 2023/3/12 Ver.3.10.1
@@ -315,6 +317,10 @@ BattleManager.getNotVisibleIcons = function() {
 BattleManager.getNotVisibleBuffIcons = function() {
   return this.getVisibleBuffIcons(params.NotVisibleBuffIcons);
 };
+
+BattleManager.isOnActorPictureEX = function() {
+    return Imported.NUUN_ActorPicture && params.OnActorPictureEX;
+}
 
 BattleManager.getVisibleBuffIcons = function(list) {
   const icons = [];
@@ -668,7 +674,7 @@ Game_Actor.prototype.battleStyleMatchChangeGraphic = function(data) {
     case 'reflection' :
       return this.onImgId === 31;
     case 'counterEX' :
-      return this.onImgId === 32 && this.isBattleStyleUseItemImg(data.Item);
+      return this.onImgId === 32 && this.isBattleStyleUseItemImg(data.Id);
     case 'guard' :
       return this.onImgId === 15;
   }
@@ -3088,7 +3094,7 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
     } else if (actor.isAlive() && actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
       if (actor.onImgId === 1 || actor.onImgId === 2 || actor.onImgId === 15) {
         this._updateCount = this.setDamageDuration();
-      } else if (actor.onImgId === 30 || actor.onImgId === 31) {
+      } else if (actor.onImgId === 30 || actor.onImgId === 31 || actor.onImgId === 32) {
         this._updateCount = this.setCounterDuration();
       } else if (actor.onImgId === 20) {
         this._updateCount = Infinity;

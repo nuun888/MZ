@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.10.1
+ * @version 1.10.2
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -63,6 +63,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/4/11 Ver.1.10.2
+ * CounterExtend(トリアコンタン氏)に対応。
  * 2023/3/12 Ver.1.10.1
  * 味方へのクリティカル時と通常ダメージ時の振動設定を別々に変更。
  * 2023/2/27 Ver.1.10.0
@@ -2342,6 +2344,8 @@
  * @value 'counter'
  * @option 魔法反射時
  * @value 'reflection'
+ * @option 反撃時(CounterExtend)(4)
+ * @value 'counterEX'
  * @option 防御時
  * @value 'guard'
  * @option 詠唱時
@@ -2419,6 +2423,13 @@
  * @text 被ステート(3)
  * @desc ステートを選択します。全てのステートにかかっている時に適用します。
  * @type state[]
+ * @default 
+ * @parent CondSetting
+ * 
+ * @param Id
+ * @text 識別タグ(4)
+ * @desc 識別タグを指定します。全ての識別タグが該当しているときに適用します。
+ * @type string[]
  * @default 
  * @parent CondSetting
  */

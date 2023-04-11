@@ -1,5 +1,5 @@
 # [立ち絵、顔グラ表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
-# Ver.1.5.2
+# Ver.1.5.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -10,7 +10,7 @@
 [リザルト](https://github.com/nuun888/MZ/blob/master/NUUN_Result.md)  
 [メニュー画面タイプ１](https://github.com/nuun888/MZ/blob/master/README/MenuScreen.md)  
 [メニュー画面タイプ２](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_2.md)  
-[XP風対象選択ウィンドウ](https://github.com/nuun888/MZ/blob/master/README/XPSelectWindow.md)
+[XP風対象選択ウィンドウ](https://github.com/nuun888/MZ/blob/master/README/XPSelectWindow.md)  
 
 立ち絵、顔グラの表示を条件により自動的に変更します。  
 スイッチがON、特定の武器を装備、特定の防具を装備、特定のステート、特定の職業、ダメージ時、攻撃時、勝利時などの時にアクターの立ち絵、顔グラを自動的に変更できます。  
@@ -49,6 +49,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2023/4/11 Ver.1.5.3  
+CounterExtend(トリアコンタン氏)に対応。  
 2023/2/26 Ver.1.5.2  
 通常攻撃の画像が変化しなかった問題を修正。  
 2023/2/24 Ver 1.5.1  

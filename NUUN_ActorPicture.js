@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.2
+ * @version 1.5.3
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/11 Ver.1.5.3
+ * CounterExtend(トリアコンタン氏)に対応。
  * 2023/2/26 Ver.1.5.2
  * 通常攻撃の画像が変化しなかった問題を修正。
  * 2023/2/24 Ver 1.5.1
@@ -209,6 +211,8 @@
  * @value 'counter'
  * @option 魔法反射時
  * @value 'reflection'
+ * @option 反撃時(CounterExtend)(4)
+ * @value 'counterEX'
  * @option 防御時
  * @value 'guard'
  * @option 詠唱時
@@ -244,6 +248,13 @@
  * @text 被ステート(3)
  * @desc ステートを選択します。全てのステートにかかっている時に適用します。
  * @type state[]
+ * @default 
+ * @parent CondSetting
+ * 
+ * @param Id
+ * @text 識別タグ(4)
+ * @desc 識別タグを指定します。全ての識別タグが該当しているときに適用します。
+ * @type string[]
  * @default 
  * @parent CondSetting
  * 
@@ -424,7 +435,7 @@ Game_Actor.prototype.matchChangeGraphic = function(data) {
     case 'reflection' :
       return this.onImgId === 31;
     case 'counterEX' :
-      return this.onImgId === 32 && this.isUseItemImg(data.Item);
+      return this.onImgId === 32 && this.isCondUseItemImg(data.Id);
     case 'guard' :
       return this.onImgId === 15;
   }

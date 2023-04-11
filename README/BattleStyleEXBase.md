@@ -1,24 +1,24 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.10.2
+### Ver.3.10.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.1  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.10.1  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.1  
-[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.1  
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.2  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.10.2  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.2  
+[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.2  
 
-バトルスタイル拡張デフォルト設定用 Ver.1.10.1  
+バトルスタイル拡張デフォルト設定用 Ver.1.10.2  
 ![画像](img/BattleStyleEX1.png)  
 
-バトルスタイル拡張スタンダード設定用 Ver.1.10.1 
+バトルスタイル拡張スタンダード設定用 Ver.1.10.2 
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.10.1  
+バトルスタイル拡張XPスタイル設定用 Ver.1.10.2  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.3.1  
+バトルスタイル拡張タイプ4設定用 Ver.1.3.2  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 
@@ -27,6 +27,7 @@
 
 ## オプション
 [ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md)  
+[条件バトラー反撃拡張プラグイン適用](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX_CounterExtend.md)  
   
 バトルレイアウトをXP風に変更します。  
 
@@ -107,6 +108,7 @@ https://triacontane.blogspot.com/
 詠唱時  
 勝利時  
 反撃時  
+反撃時CounterExtend(トリアコンタン氏)要NUUN_BattleStyleEX_CounterExtend  
 魔法反射時  
 攻撃スキル使用時(特定のスキル発動時に変化可能で複数指定できます※1)  
 回復スキル使用時(特定のスキル発動時に変化可能で複数指定できます※1)  
@@ -117,12 +119,9 @@ https://triacontane.blogspot.com/
 設定した画像の優先度はリストの上から順に条件一致したときに適用されます。通常時の画像は一番下に配置してください。  
 ![画像](img/BattleStyleEX17.png)  
 
-### APNGで表示
-別途トリアコンタン様のAPNGピクチャプラグインが必要です。  
-設定用プラグインまたは立ち絵、顔グラ表示EXのimg/pictures/にある画像ファイルを指定します。  
-APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定した画像ファイルと同じ画像を指定します。  
+反撃時CounterExtend(トリアコンタン氏)を適用するには別途要CounterExtend(トリアコンタン氏)及びNUUN_BattleStyleEX_CounterExtendが必要です。  
 
-### アクター画像設定の残りHPの設定方法
+#### アクター画像設定の残りHPの設定方法
 上限値：指定の数値が上限値以下　上限値が0の場合は下限値以上のみの判定になります。  
 下限値：指定の数値が下限値以上  
 例  
@@ -132,6 +131,12 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 残りHPが70%以上の時に適用します。  
 `上限値25 下限値0`  
 残りHPが25%以下の時に適用します。  
+
+### APNGで表示
+別途トリアコンタン様のAPNGピクチャプラグインが必要です。  
+設定用プラグインまたは立ち絵、顔グラ表示EXのimg/pictures/にある画像ファイルを指定します。  
+APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定した画像ファイルと同じ画像を指定します。  
+
 
 ### アクター毎にウィンドウを表示
 プラグインパラメータのアクター別ウィンドウ表示をONします。  
@@ -170,6 +175,8 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/4/11 Ver.3.10.3  
+CounterExtend(トリアコンタン氏)に対応。  
 2023/3/27 Ver.3.10.2   
 複数メッセージウィンドウと競合を起こす問題を修正。  
 2023/3/12 Ver.1.10.1  

@@ -27,7 +27,7 @@
 
 ## オプション
 [ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md)  
-[条件バトラー反撃拡張プラグイン適用](https://raw.githubusercontent.com/nuun888/MZ/master/BattleStyleEX_CounterExtend.js)  
+[条件バトラー反撃拡張プラグイン適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_CounterExtend.js)  
   
 バトルレイアウトをXP風に変更します。  
 

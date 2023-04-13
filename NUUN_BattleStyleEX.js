@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.3
+ * @version 3.10.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/4/13 Ver.3.10.4
+ * カウンター時のスキル発動時のアクター画像切り替えを行うように修正。
+ * カウンター時は行動時エフェクトを行わないように修正。
  * 2023/4/11 Ver.3.10.3
  * CounterExtend(トリアコンタン氏)に対応。
  * 2023/3/27 Ver.3.10.2
@@ -766,13 +769,18 @@ Game_Actor.prototype.performVictory = function() {
 const _Game_Actor_performActionStart = Game_Actor.prototype.performActionStart;
 Game_Actor.prototype.performActionStart = function(action) {
   _Game_Actor_performActionStart.call(this, action);
-  if (params.OnActionZoom) {
+  if (params.OnActionZoom && !this.isCounterSkillAction()) {
     this._isEffectAction = true;
   }
   this.setBattleStyleAttackImgId(action);
 };
 
+Game_Actor.prototype.isCounterSkillAction = function() {
+    return false;
+};
+
 Game_Actor.prototype.setBattleStyleAttackImgId = function(action) {
+    
     if (action.item().animationId !== 0) {
         if (action.isRecover()) {
             this.setBattleImgId(11, action.item().id);
@@ -3126,13 +3134,17 @@ Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
   if (this._imgScenes === 'chant' && !actor.isChanting()) {
     this.resetBattleStyleImg(actor);
   } else if (actor.isBSActionActorImg()) {
-    if (!actor.isActing()) {
+    if (!actor.isActing() && !this.isCounterSkillAction(actor)) {
       actor.setBSActionActorImg(null);
       this.resetBattleStyleImg(actor);
     }
   } else if (this._updateCount === 0) {
     this.resetBattleStyleImg(actor);
   }
+};
+
+Sprite_ActorImges.prototype.isCounterSkillAction = function(actor) {
+    return actor.isCounterSkillAction();
 };
 
 Sprite_ActorImges.prototype.resetBattleStyleImg = function(actor) {

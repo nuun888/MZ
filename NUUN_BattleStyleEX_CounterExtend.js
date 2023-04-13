@@ -13,7 +13,7 @@
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_BattleStyleEX
  * @orderAfter CounterExtend
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * トリアコンタン氏の反撃拡張プラグインで設定した反撃をバトルスタイル拡張プラグインでの条件バトラーに適用させるプラグインです。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/11 Ver.1.0.1
+ * カウンター時のスキル発動時のアクター画像切り替えを行うように修正。
  * 2023/4/11 Ver.1.0.0
  * 初版。
  * 
@@ -49,9 +51,29 @@ Imported.NUUN_BattleStyleEX_CounterExtend = true;
             } else {
                 subject.setBattleImgId(32, counter.Id);
                 subject.battleStyleImgRefresh();
-            }
+            };
         }
         _BattleManager_invokeCounterAction.call(this, subject, target, counterAction);
+        
     };
-    
+
+    const _Game_Battler_performActionStart = Game_Battler.prototype.performActionStart;
+    Game_Battler.prototype.performActionStart = function(action) {
+        if (action.isCounter()) {
+            this._counterAction = true;
+        }
+        _Game_Battler_performActionStart.call(this, action);
+    };
+
+    const _BattleManager_endBattlerActions = BattleManager.endBattlerActions;
+    BattleManager.endBattlerActions = function(battler) {
+        if (this._action && this._action.isCounter()) {
+            battler._counterAction = false;
+        }
+        _BattleManager_endBattlerActions.call(this, battler);
+    };
+
+    Game_Actor.prototype.isCounterSkillAction = function() {
+        return this._counterAction;
+    };
 })();

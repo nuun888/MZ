@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.8
+ * @version 2.0.9
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/13/2022 Ver.2.0.9
+ * Fixed display of experience points at max level.
  * 4/9/2022 Ver.2.0.8
  * Fixed so that the info window class designation in other creator's plug-ins can be applied.
  * 4/1/2023 Ver.2.0.7
@@ -53,7 +55,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.8
+ * @version 2.0.9
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -63,6 +65,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/13 Ver.2.0.9
+ * 最大レベル時の経験値の表示を修正。
  * 2023/4/9 Ver.2.0.8
  * 他制作者プラグインでのインフォウィンドウのクラス指定を適用できるように修正。
  * 2023/4/1 Ver.2.0.7
@@ -1394,7 +1398,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             case "time":
                 return Sprite_Gauge.prototype.currentValue.call(this);
             case "menuexp":
-                return this._battler.currentExp() - this._battler.currentLevelExp();
+                return this._battler.isMaxLevel() ? this.currentMaxValue() : this._battler.currentExp() - this._battler.currentLevelExp();
             default:
                 const actor = this._battler;
                 return eval(this.menuParam.DetaEval);
@@ -1445,7 +1449,9 @@ Imported.NUUN_MenuScreenEXBase = true;
         if (this._statusType === "menuexp" && params.ExpDisplayMode !== 0) {
             let text = this.displyaExp();
             if (params.ExpDisplayMode === 3) {
-                text += '%';
+                text = this._battler.isMaxLevel() ? "100%" : text +"%";
+            } else {
+                text = this._battler.isMaxLevel() ? "-------" : text;
             }
             const width = this.bitmapWidth();
             const height = this.textHeight();

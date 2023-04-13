@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.10.3
+### Ver.3.10.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.2  
@@ -175,6 +175,9 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/4/13 Ver.3.10.4  
+カウンター時のスキル発動時のアクター画像切り替えを行うように修正。  
+カウンター時は行動時エフェクトを行わないように修正。  
 2023/4/11 Ver.3.10.3  
 CounterExtend(トリアコンタン氏)に対応。  
 2023/3/27 Ver.3.10.2   

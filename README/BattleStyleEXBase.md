@@ -26,7 +26,9 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.1以降  
 
 ## オプション
+味方の被ダメージ時にゲームパッドを振動。  
 [ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md)  
+反撃拡張プラグイン(トリアコンタン氏)での立ち絵切り替えを適用。  
 [条件バトラー反撃拡張プラグイン適用](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX_CounterExtend.md)  
   
 バトルレイアウトをXP風に変更します。  

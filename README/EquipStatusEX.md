@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.3.3
+# Ver.1.3.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -53,6 +53,8 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
+2023/4/16 Ver.1.3.4  
+ステータスウィンドウの横幅を指定できる機能を追加。  
 2023/2/28 Ver.1.3.3  
 ステータスのページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)  
 2023/2/25 Ver.1.3.2  

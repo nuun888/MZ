@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.3
+ * @version 1.3.4
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/16/2022 Ver.1.3.4
+ * Added a function to specify the width of the status window.
  * 2/28/2022 Ver.1.3.3
  * Added a function that allows you to specify key settings for switching status pages. (To change, you need a plug-in that can assign keys separately)
  * 2/25/2022 Ver.1.3.2
@@ -73,6 +75,14 @@
  * @text Item height
  * @type number
  * @default 36
+ * @min 0
+ * @parent Setting
+ * 
+ * @param EquipStatusWidth
+ * @desc Set the width of the status window. 0 for default.
+ * @text Status window width
+ * @type number
+ * @default 0
  * @min 0
  * @parent Setting
  * 
@@ -787,7 +797,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.3
+ * @version 1.3.4
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -816,6 +826,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/16 Ver.1.3.4
+ * ステータスウィンドウの横幅を指定できる機能を追加。
  * 2023/2/28 Ver.1.3.3
  * ステータスのページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)
  * 2023/2/25 Ver.1.3.2
@@ -849,6 +861,14 @@
  * @text 項目高さ
  * @type number
  * @default 36
+ * @min 0
+ * @parent Setting
+ * 
+ * @param EquipStatusWidth
+ * @desc ステータスウィンドウの横幅を設定します。0でデフォルト値
+ * @text ステータスウィンドウ横幅
+ * @type number
+ * @default 0
  * @min 0
  * @parent Setting
  * 
@@ -1567,6 +1587,7 @@ Imported.NUUN_EquipStatusEX = true;
     const ContentsHeight = Number(parameters['ContentsHeight'] || 36);
     const KeyNextName = String(parameters['KeyNextName'] || "pageup");
     const KeyPreviousName = String(parameters['KeyPreviousName'] || "pagedown");
+    const EquipStatusWidth = Number(parameters['EquipStatusWidth'] || 0);
     const EquipPageList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipPageList'])) : null) || [];
     const EquipStatusCols = Number(parameters['EquipStatusCols'] || 1);
     const ElementResist = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ElementResist'])) : null) || [];
@@ -1603,10 +1624,6 @@ Imported.NUUN_EquipStatusEX = true;
     const _Scene_Equip_createCommandWindow = Scene_Equip.prototype.createCommandWindow;
     Scene_Equip.prototype.createCommandWindow = function() {
         _Scene_Equip_createCommandWindow.call(this);
-        //if (KeyNextName !== "pageup" && KeyPreviousName !== "pagedown") {
-        //    this._commandWindow.setHandler(KeyNextName, this.nextPage.bind(this));
-        //    this._commandWindow.setHandler(KeyPreviousName, this.previousPage.bind(this));
-        //}
     };
     
     const _Scene_Equip_createSlotWindow = Scene_Equip.prototype.createSlotWindow;
@@ -1629,9 +1646,6 @@ Imported.NUUN_EquipStatusEX = true;
         this._statusWindow.setPage((page + 1) % maxPage);
         this._statusWindow.refresh();
         SoundManager.playCursor();
-        //if (KeyNextName !== "pageup" && KeyPreviousName !== "pagedown" && !this._slotWindow.active && !this._itemWindow.active) {
-        //    this._commandWindow.activate();
-        //} else 
         if (this._slotWindow.visible) {
             this._slotWindow.activate();
         } else if (this._itemWindow.visible) {
@@ -1645,9 +1659,6 @@ Imported.NUUN_EquipStatusEX = true;
         this._statusWindow.setPage((page + maxPage - 1) % maxPage);
         this._statusWindow.refresh();
         SoundManager.playCursor();
-        //if (KeyNextName !== "pageup" && KeyPreviousName !== "pagedown" && !this._slotWindow.active && !this._itemWindow.active) {
-        //    this._commandWindow.activate();
-        //} else 
         if (this._slotWindow.visible) {
             this._slotWindow.activate();
         } else if (this._itemWindow.visible) {
@@ -1675,6 +1686,13 @@ Imported.NUUN_EquipStatusEX = true;
             Scene_MenuBase.prototype.previousActor.call(this);
         }
     };
+
+    if (EquipStatusWidth > 0) {
+        Scene_Equip.prototype.statusWidth = function() {
+            return EquipStatusWidth;
+        };
+    }
+
 
     const _Window_EquipStatus_initialize = Window_EquipStatus.prototype.initialize;
     Window_EquipStatus.prototype.initialize = function(rect) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.4
+ * @version 3.10.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/4/16 Ver.3.10.5
+ * 行動エフェクトと攻撃時の画像切り替えで画像の座標がずれる問題を修正。
  * 2023/4/13 Ver.3.10.4
  * カウンター時のスキル発動時のアクター画像切り替えを行うように修正。
  * カウンター時は行動時エフェクトを行わないように修正。
@@ -2894,89 +2896,98 @@ Sprite_ActorImges.prototype.initialize = function() {
 };
 
 Sprite_ActorImges.prototype.initMembers = function() {
-  this._battler = null;
-  this._data = null;
-  this._imgScenes = 'default';
-  this._imgIndex = -1;
-  this._selectionEffectCount = 0;
-  this._shake = 0;
-  this._shakePower = params.ActorShakePower;
-  this._shakeSpeed = params.ActorShakeSpeed;
-  this._shakeDuration = 0;
-  this._shakeDirection = 1;
-  this._zoomDuration = 0;
-  this._zoomScale = 1;
-  this._zoomScaleTarget = 1.2;
-  this._updateCount = 0;
-  this._imgListId = -1;
-  this._durationOpacity = 0;
-  this._startUpdate = true;
-  this._zoomEffect = false;
-  this._apngMode = false;
+    this._battler = null;
+    this._data = null;
+    this._imgScenes = 'default';
+    this._imgIndex = -1;
+    this._selectionEffectCount = 0;
+    this._shake = 0;
+    this._shakePower = params.ActorShakePower;
+    this._shakeSpeed = params.ActorShakeSpeed;
+    this._shakeDuration = 0;
+    this._shakeDirection = 1;
+    this._zoomDuration = 0;
+    this._zoomScale = 1;
+    this._zoomScaleTarget = 1.2;
+    this._updateCount = 0;
+    this._imgListId = -1;
+    this._durationOpacity = 0;
+    this._bsBitmapWidth = 0;
+    this._bsBitmapHeight = 0;
+    this._startUpdate = true;
+    this._zoomEffect = false;
+    this._apngMode = false;
+    this._loadedBitmap = false;
 };
 
 Sprite_ActorImges.prototype.setup = function(battler, data, index, stateSprite) {
-  this._battler = battler;
-  this._data = data;
-  this.anchor.x = data.ActorImgHPosition === 'center' ? 0.5 : 0.0 ;
-  this.anchor.y = data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
-  this._imgIndex = index;
-  battler.resetBattleStyleImgId();
-  this.updateActorGraphic();
-  this._stateSprite = stateSprite || this._stateSprite;
-  if (this._stateSprite && getStateAnimationShow()) {
-    this._stateSprite.setup(battler);
-    this._stateSprite.anchor.y = 0.5;
-    this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
-    this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
-  }
-  this.setBlendColor([0, 0, 0, 0]);
+    this._battler = battler;
+    this._data = data;
+    this.anchor.x = data.ActorImgHPosition === 'center' ? 0.5 : 0.0 ;
+    this.anchor.y = data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
+    this._imgIndex = index;
+    battler.resetBattleStyleImgId();
+    this.updateActorGraphic();
+    this._stateSprite = stateSprite || this._stateSprite;
+    if (this._stateSprite && getStateAnimationShow()) {
+        this._stateSprite.setup(battler);
+        this._stateSprite.anchor.y = 0.5;
+        this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
+        this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
+    }
+    this.setBlendColor([0, 0, 0, 0]);
 };
 
 Sprite_ActorImges.prototype.setHome = function(x, y) {
-  this._homeX = x;
-  this._homeY = y;
-  this._baseScale = this._data ? this._data.Actor_Scale / 100 : 1;
-  this.move(x, y);
+    this._homeX = x;
+    this._homeY = y;
+    this._baseScale = this._data ? this._data.Actor_Scale / 100 : 1;
+    this.move(x, y);
+};
+
+Sprite_ActorImges.prototype.resetBitmapData = function(width, height) {
+    this._bsBitmapWidth = width;
+    this._bsBitmapHeight = height;
+    this.y = this._homeY;//画像更新時に一旦戻す。
 };
 
 Sprite_ActorImges.prototype.update = function() {
-  Sprite.prototype.update.call(this);
-  if (this._battler) {
-    this.updateActorGraphic();
-    this.updateMotion();
-    //this.updateSelectionEffect();
-  } else {
-    this._stateSprite = null;
-    this.bitmap = null;
-  }
+    Sprite.prototype.update.call(this);
+    if (this._battler) {
+        this.updateActorGraphic();
+        this.updateMotion();
+        //this.updateSelectionEffect();
+    } else {
+        this._stateSprite = null;
+        this.bitmap = null;
+    }
 };
 
 Sprite_ActorImges.prototype.refreshStateOverlay = function() {
-  if (this._stateSprite && getStateAnimationShow()) {
-    this._stateSprite.visible = this.visible;
-    this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
-    this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
-  }
+    if (this._stateSprite && getStateAnimationShow()) {
+        this._stateSprite.visible = this.visible;
+        this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
+        this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
+    }
 };
 
 Sprite_ActorImges.prototype.updateMotion = function() {
-  this.refreshStateOverlay();
-  this.setupEffect();
-  this.updateDamage();
-  this.updateZoom();
+    this.refreshStateOverlay();
+    this.setupEffect();
+    this.updateDamage();
+    this.updateZoom();
 };
 
 Sprite_ActorImges.prototype.setupEffect = function() {
-  if (params.OnActorShake && this._battler.isBSDamageEffect()) {
-    this._shakeDuration = params.ActorShakeFlame;
-    this._battler._onDamageEffect = false;
-  }
-  if (params.OnActionZoom && this._battler.isBSEffectAction()) {
-    this._zoomDuration = params.ActionZoomDuration;
-    this._zoomEffect = true;
-    this._battler._isEffectAction = false;
-  }
+    if (params.OnActorShake && this._battler.isBSDamageEffect()) {
+        this._shakeDuration = params.ActorShakeFlame;
+        this._battler._onDamageEffect = false;
+    }
+    if (params.OnActionZoom && this._battler.isBSEffectAction()) {
+        this._zoomDuration = params.ActionZoomDuration;
+        this._zoomEffect = true;
+        this._battler._isEffectAction = false;
+    }
 };
 
 Sprite_ActorImges.prototype.updateDamage = function() {
@@ -3001,146 +3012,141 @@ Sprite_ActorImges.prototype.updateDamage = function() {
 };
 
 Sprite_ActorImges.prototype.updateZoom = function() {
-  if (this._zoomDuration > 0) {
-    this.anchor.y = 0.5;
-    this.anchor.x = 0.5;
-    const d = this._zoomDuration;
-    const t = this._zoomDuration <= params.ActionZoomDuration / 2 ? 1 : this._zoomScaleTarget;
-    this._zoomScale = ((this._zoomScale * (d - 1) + t) / d);
-    this._zoomDuration--;
-    const scale = this._zoomScale * this._baseScale;
-    this.scale.x = scale;
-    this.scale.y = scale;
-    if (this.x === this._homeX) {
-      this.x = this._homeX + (this._data.ActorImgHPosition === 'left' ? this._rectWidth / 2 * scale : 0);
+    if (this._loadedBitmap.isReady()) {
+        if (this._zoomDuration > 0) {
+            this.anchor.y = 0.5;
+            this.anchor.x = 0.5;
+            const d = this._zoomDuration;
+            const t = this._zoomDuration <= params.ActionZoomDuration / 2 ? 1 : this._zoomScaleTarget;
+            this._zoomScale = ((this._zoomScale * (d - 1) + t) / d);
+            this._zoomDuration--;
+            const scale = this._zoomScale * this._baseScale;
+            this.scale.x = scale;
+            this.scale.y = scale;
+            if (this.x === this._homeX) {
+                this.x = this._homeX + (this._data.ActorImgHPosition === 'left' ? this._bsBitmapWidth / 2 * scale : 0);
+            }
+            if (this.y === this._homeY) {
+                this.y = this._homeY - (this._bsBitmapHeight / 2) * scale * (this._data.ActorImgVPosition === 'top' ? -1 : 1);
+            }
+            if (this._apngMode) {
+                this._apngSprite.x = 0;
+                this._apngSprite.y = Math.floor(this.y * scale);
+            }
+        } else {
+            if (this.scale.x !== this._baseScale) {
+                this.resetZoom();
+            }
+            if (this._zoomEffect) {
+                this._zoomEffect = false;
+                this.x = this._homeX;
+                this.y = this._homeY;
+                this.anchor.x = this._data.ActorImgHPosition === 'left' ? 0.0 : 0.5;
+                this.anchor.y = this._data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
+                if (this._apngMode) {
+                    this._apngSprite.x = 0;
+                    this._apngSprite.y = 0;
+                }
+            }
+        }
     }
-    if (this.y === this._homeY) {
-      this.y = this._homeY - (this._rectHeight / 2) * scale * (this._data.ActorImgVPosition === 'top' ? -1 : 1);
-    }
-    if (this._apngMode) {
-      this._apngSprite.y = this.x;
-      this._apngSprite.y = this.y;
-    }
-    if (getStateAnimationShow()) {
-      //this._stateSprite.x = params.ActorState_X;
-      //this._stateSprite.y = params.ActorState_Y + (this._rectHeight / 2) * (this._data.ActorImgVPosition === 'top' ? -1 : 1) + this.getStatePositionY();
-    }
-  } else {
-    if (this.scale.x !== this._baseScale) {
-      this.resetZoom();
-    }
-    if (this._zoomEffect) {
-      this._zoomEffect = false;
-      this.y = this._homeY;
-      this.x = this._homeX;
-      if (this._apngMode) {
-        this._apngSprite.x = 0;
-        this._apngSprite.y = 0;
-      }
-      this.anchor.x = this._data.ActorImgHPosition === 'left' ? 0.0 : 0.5;
-      this.anchor.y = this._data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
-      if (getStateAnimationShow()) {
-        //this._stateSprite.x = this.getStateRectX() + this.getStatePositionX();
-        //this._stateSprite.y = this.getStateRectY() + this.getStatePositionY();
-      }
-    }
-  }
 };
 
 Sprite_ActorImges.prototype.getStateRectX = function() {
   //const tag = 'BSStateA_X' + this._stateSprite._overlayIndex;
-  return params.ActorState_X + this._data.ActorState_X;// + (Number(this._battler.actor().meta[tag]) || 0);
+    return params.ActorState_X + this._data.ActorState_X;// + (Number(this._battler.actor().meta[tag]) || 0);
 };
 
 Sprite_ActorImges.prototype.getStateRectY = function() {
   //const tag = 'BSStateA_Y' + this._stateSprite._overlayIndex;console.log(tag)
-  return params.ActorState_Y + this._data.ActorState_Y;// + (Number(this._battler.actor().meta[tag]) || 0);
+    return params.ActorState_Y + this._data.ActorState_Y;// + (Number(this._battler.actor().meta[tag]) || 0);
 };
 
 Sprite_ActorImges.prototype.getStatePositionX = function() {
-  return this._data.ActorImgHPosition === 'left' ? this.width / 2 : 0;
+    return this._data.ActorImgHPosition === 'left' ? this.width / 2 : 0;
 };
 
 Sprite_ActorImges.prototype.getStatePositionY = function() {
-  return this._data.ActorImgVPosition === 'under' ? this._rectHeight * -1 : 0;
+    return this._data.ActorImgVPosition === 'under' ? this._rectHeight * -1 : 0;
 };
 
 Sprite_ActorImges.prototype.resetDamage = function() {
-  this.x = this._homeX;
+    this.x = this._homeX;
 };
 
 Sprite_ActorImges.prototype.resetZoom = function() {
-  this.scale.x = this._baseScale;
-  this.scale.y = this._baseScale;
+    this.scale.x = this._baseScale;
+    this.scale.y = this._baseScale;
 };
 
 Sprite_ActorImges.prototype.updateSelectionEffect = function() {
-  if (!params.ActorFlash) {
-    return;
-  }
-  const target = this;
-  if (this._battler.isSelected()) {
-      this._selectionEffectCount++;
-      if (this._selectionEffectCount % 30 < 15) {
-          target.setBlendColor([255, 255, 255, 64]);
-      } else {
-          target.setBlendColor([0, 0, 0, 0]);
-      }
-  } else if (this._selectionEffectCount > 0) {
-      this._selectionEffectCount = 0;
-      target.setBlendColor([0, 0, 0, 0]);
-  }
+    if (!params.ActorFlash) {
+        return;
+    }
+    const target = this;
+    if (this._battler.isSelected()) {
+        this._selectionEffectCount++;
+        if (this._selectionEffectCount % 30 < 15) {
+            target.setBlendColor([255, 255, 255, 64]);
+        } else {
+            target.setBlendColor([0, 0, 0, 0]);
+        }
+    } else if (this._selectionEffectCount > 0) {
+        this._selectionEffectCount = 0;
+        target.setBlendColor([0, 0, 0, 0]);
+    }
 };
 
 Sprite_ActorImges.prototype.updateActorGraphic = function() {
-  const actor = this._battler;
-  if (actor) {
-    if (actor.isDead() && !this.isDead()) {
-      this.setDeadUpdateCount();
-    } else if (actor.isAlive() && this.isDead()) {
-      this.setReviveUpdateCount();
-    } else if (actor.isAlive() && actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
-      if (actor.onImgId === 1 || actor.onImgId === 2 || actor.onImgId === 15) {
-        this._updateCount = this.setDamageDuration();
-      } else if (actor.onImgId === 30 || actor.onImgId === 31 || actor.onImgId === 32) {
-        this._updateCount = this.setCounterDuration();
-      } else if (actor.onImgId === 20) {
-        this._updateCount = Infinity;
-      } else {
-        this._updateCount = 1;
-      }
+    const actor = this._battler;
+    if (actor) {
+        if (actor.isDead() && !this.isDead()) {
+            this.setDeadUpdateCount();
+        } else if (actor.isAlive() && this.isDead()) {
+            this.setReviveUpdateCount();
+        } else if (actor.isAlive() && actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
+            if (actor.onImgId === 1 || actor.onImgId === 2 || actor.onImgId === 15) {
+                this._updateCount = this.setDamageDuration();
+            } else if (actor.onImgId === 30 || actor.onImgId === 31 || actor.onImgId === 32) {
+                this._updateCount = this.setCounterDuration();
+            } else if (actor.onImgId === 20) {
+                this._updateCount = Infinity;
+            } else {
+                this._updateCount = 1;
+            }
+        }
     }
-  }
-  this.refreshActorGraphic(actor);
-  if (this._startUpdate) {
-    this._startUpdate = false;
-  }
+    this.refreshActorGraphic(actor);
+    if (this._startUpdate) {
+        this._startUpdate = false;
+    }
 };
 
 Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
-  if (actor && actor.getBSImgName()) {
-    if (this._imgListId !== actor.getBSGraphicIndex() && this._updateCount > 0) {
-      const bitmap = actor.getLoadBattleStyleImg();
-      if (bitmap && !bitmap.isReady()) {
-        bitmap.addLoadListener(this.setActorGraphic.bind(this, actor, bitmap));
-      } else if (bitmap) {
-        this.setActorGraphic(actor, bitmap);
-      }
-      this._imgScenes = this.getImgScenes(actor);
-      this._imgListId = actor.getBSGraphicIndex();
+    if (actor && actor.getBSImgName()) {
+        if (this._imgListId !== actor.getBSGraphicIndex() && this._updateCount > 0) {
+        const bitmap = actor.getLoadBattleStyleImg();
+        this._loadedBitmap = bitmap;
+        if (bitmap && !bitmap.isReady()) {
+            bitmap.addLoadListener(this.setActorGraphic.bind(this, actor, bitmap));
+        } else if (bitmap) {
+            this.setActorGraphic(actor, bitmap);
+        }
+        this._imgScenes = this.getImgScenes(actor);
+        this._imgListId = actor.getBSGraphicIndex();
+        }
     }
-  }
-  this.updateAnimation();
-  if (this._imgScenes === 'chant' && !actor.isChanting()) {
-    this.resetBattleStyleImg(actor);
-  } else if (actor.isBSActionActorImg()) {
-    if (!actor.isActing() && !this.isCounterSkillAction(actor)) {
-      actor.setBSActionActorImg(null);
-      this.resetBattleStyleImg(actor);
+    this.updateAnimation();
+    if (this._imgScenes === 'chant' && !actor.isChanting()) {
+        this.resetBattleStyleImg(actor);
+    } else if (actor.isBSActionActorImg()) {
+        if (!actor.isActing() && !this.isCounterSkillAction(actor)) {
+        actor.setBSActionActorImg(null);
+        this.resetBattleStyleImg(actor);
+        }
+    } else if (this._updateCount === 0) {
+        this.resetBattleStyleImg(actor);
     }
-  } else if (this._updateCount === 0) {
-    this.resetBattleStyleImg(actor);
-  }
 };
 
 Sprite_ActorImges.prototype.isCounterSkillAction = function(actor) {
@@ -3148,136 +3154,139 @@ Sprite_ActorImges.prototype.isCounterSkillAction = function(actor) {
 };
 
 Sprite_ActorImges.prototype.resetBattleStyleImg = function(actor) {
-  if (Imported.NUUN_ActorPicture && params.OnActorPictureEX) {
-    actor.imgRefresh();
-  }
-  actor.resetBattleStyleImgId();
+    if (Imported.NUUN_ActorPicture && params.OnActorPictureEX) {
+        actor.imgRefresh();
+    }
+    actor.resetBattleStyleImgId();
 };
 
 Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
-  const pass = Imported.NUUN_ActorPicture && params.ActorPictureEXApp ? actor.getActorGraphicImg() : actor.getBSImgName();
-  const name = pass ? pass.split('pictures/')[1] : null;
-  if (name && this.addApngChild && this.loadApngSprite(name)) {
-    this.addApngChild(name);
-    this._apngMode = true;
-  } else {
-    this.resetApngActorImg();
-    this.bitmap = bitmap;
-    if (actor.faceMode) {
-      this.faceRefresh(actor.getBSImgIndex());
+    const pass = Imported.NUUN_ActorPicture && params.ActorPictureEXApp ? actor.getActorGraphicImg() : actor.getBSImgName();
+    const name = pass ? pass.split('pictures/')[1] : null;
+    if (name && this.addApngChild && this.loadApngSprite(name)) {
+        this.addApngChild(name);
+        this._apngMode = true;
+        this.resetBitmapData(bitmap.width, bitmap.height);
     } else {
-      this.imgFrameRefresh()
+        this.resetApngActorImg();
+        this.bitmap = bitmap;
+        if (actor.faceMode) {
+            this.faceRefresh(actor.getBSImgIndex());
+            this.resetBitmapData(this._rectWidth, this._rectHeight);
+        } else {
+            this.imgFrameRefresh();
+            this.resetBitmapData(bitmap.width, bitmap.height);
+        }
+        if (!this.isDead() && this._updateCount === 0) {
+            this.opacity = actor.getBattleStyleOpacity() || 255;
+            this._actorImgesOpacity = this.opacity;
+        }
     }
-    if (!this.isDead() && this._updateCount === 0) {
-      this.opacity = actor.getBattleStyleOpacity() || 255;
-      this._actorImgesOpacity = this.opacity;
-    }
-  }
 };
 
 Sprite_ActorImges.prototype.updateAnimation = function(){
-  if (this._updateCount > 0) {
-    this._updateCount--;
-    if(this._durationOpacity > 0){
-      this.opacity -= this.getFadeoutOpacity() / this.setDeadDuration();
-      this.opacity = Math.max(this.opacity, 0);
-      this._durationOpacity = this.opacity;
-    } else if (this._durationOpacity < 0) {
-      this.opacity += this.getFadeoutOpacity() / this.setDeadDuration();
-      this.opacity = Math.min(this.opacity, this.getFadeoutOpacity());
-      this._durationOpacity = this.opacity - this.getFadeoutOpacity();
+    if (this._updateCount > 0) {
+        this._updateCount--;
+        if(this._durationOpacity > 0){
+            this.opacity -= this.getFadeoutOpacity() / this.setDeadDuration();
+            this.opacity = Math.max(this.opacity, 0);
+            this._durationOpacity = this.opacity;
+        } else if (this._durationOpacity < 0) {
+            this.opacity += this.getFadeoutOpacity() / this.setDeadDuration();
+            this.opacity = Math.min(this.opacity, this.getFadeoutOpacity());
+            this._durationOpacity = this.opacity - this.getFadeoutOpacity();
+        }
     }
-  }
 };
 
 Sprite_ActorImges.prototype.getFadeoutOpacity = function() {
-  if (!this._actorImgesOpacity) {
-      this._actorImgesOpacity = this.opacity;
-  }
-  return this._actorImgesOpacity;
+    if (!this._actorImgesOpacity) {
+        this._actorImgesOpacity = this.opacity;
+    }
+    return this._actorImgesOpacity;
 };
 
 Sprite_ActorImges.prototype.getImgScenes = function(actor) {
-  return actor._imgScenes;
+    return actor._imgScenes;
 };
 
 Sprite_ActorImges.prototype.faceRefresh = function(faceIndex) {
-  const pw = ImageManager.faceWidth;
-  const ph = ImageManager.faceHeight;
-  const sw = Math.min(this._rectWidth, pw);
-  const sh = Math.min(this._rectHeight, ph);
-  const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
-  const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
-  this.setFrame(sx, sy, sw, sh);
-  this._imgIndex = faceIndex;
+    const pw = ImageManager.faceWidth;
+    const ph = ImageManager.faceHeight;
+    const sw = Math.min(this._rectWidth, pw);
+    const sh = Math.min(this._rectHeight, ph);
+    const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+    const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+    this.setFrame(sx, sy, sw, sh);
+    this._imgIndex = faceIndex;
 };
 
 Sprite_ActorImges.prototype.imgFrameRefresh = function() {//画像を切り替えるリセットされるため再設定
-  const scale = this._data.Actor_Scale / 100;
-  if (params.Img_SW > 0 || params.Img_SH > 0) {
-    const oriScale = 1 / scale;
-    const sw = (params.Img_SW || Infinity) * oriScale;
-    const sh = (params.Img_SH || Infinity) * oriScale;
-    const sx = (this._data.Img_SX || 0) * oriScale + (this._data.ActorImgHPosition === 'center' ? (this.bitmap.width - sw) / 2 : 0);
-    const sy = (this._data.Img_SY || 0) * oriScale;
-    this.setFrame(sx, sy, sw, sh);
-  }
+    const scale = this._data.Actor_Scale / 100;
+    if (params.Img_SW > 0 || params.Img_SH > 0) {
+        const oriScale = 1 / scale;
+        const sw = (params.Img_SW || Infinity) * oriScale;
+        const sh = (params.Img_SH || Infinity) * oriScale;
+        const sx = (this._data.Img_SX || 0) * oriScale + (this._data.ActorImgHPosition === 'center' ? (this.bitmap.width - sw) / 2 : 0);
+        const sy = (this._data.Img_SY || 0) * oriScale;
+        this.setFrame(sx, sy, sw, sh);
+    }
 };
 
 Sprite_ActorImges.prototype.setDeadUpdateCount = function() {
-  if (!params.ImgDeathHide || this.isActorGraphicDead()) {
-    this._updateCount = 1;
-  } else {
-    this._updateCount = this.setDeadDuration();
-    this._durationOpacity = this.getFadeoutOpacity();
-  }
-  this.setActorDead(true);
+    if (!params.ImgDeathHide || this.isActorGraphicDead()) {
+        this._updateCount = 1;
+    } else {
+        this._updateCount = this.setDeadDuration();
+        this._durationOpacity = this.getFadeoutOpacity();
+    }
+    this.setActorDead(true);
 };
 
 Sprite_ActorImges.prototype.setReviveUpdateCount = function(){
-  this._updateCount = this.setDeadDuration();
-  this._durationOpacity = this.getFadeoutOpacity() * -1;
-  this.setActorDead(false);
+    this._updateCount = this.setDeadDuration();
+    this._durationOpacity = this.getFadeoutOpacity() * -1;
+    this.setActorDead(false);
 };
 
 Sprite_ActorImges.prototype.isActorGraphicDead = function() {
-  return this._battler.getActorGraphicDead();
+    return this._battler.getActorGraphicDead();
 };
 
 Sprite_ActorImges.prototype.setDeadDuration = function(){
-  return this._startUpdate ? 1 : 30;
+    return this._startUpdate ? 1 : 30;
 };
 
 Sprite_ActorImges.prototype.setDamageDuration = function(){
-  return params.DamageImgFrame;
+    return params.DamageImgFrame;
 };
 
 Sprite_ActorImges.prototype.setCounterDuration = function(){
-  return params.CounterImgFrame;
+    return params.CounterImgFrame;
 };
 
 Sprite_ActorImges.prototype.setActorDead = function(flag){
-  this._isDead = flag;
+    this._isDead = flag;
 };
 
 Sprite_ActorImges.prototype.isDead = function(){
-  return this._isDead;
+    return this._isDead;
 };
 
 Sprite_ActorImges.prototype.resetApngActorImg = function() {
-  if (this._apngMode) {
-      this.destroyApngIfNeed();
-      this._apngMode = null;
-  }
+    if (this._apngMode) {
+        this.destroyApngIfNeed();
+        this._apngMode = null;
+    }
 };
 
 Sprite_ActorImges.prototype.destroy = function() {
-  this.resetApngActorImg();
-  Sprite.prototype.destroy.call(this);
+    this.resetApngActorImg();
+    Sprite.prototype.destroy.call(this);
 };
 
 Sprite_ActorImges.prototype.loadApngSprite = function(name) {
-  return Sprite_Picture.prototype.loadApngSprite.call(this, name);
+    return Sprite_Picture.prototype.loadApngSprite.call(this, name);
 };
 
 //Sprite_BSGauge

@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.3.4
+# Ver.2.3.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,8 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2023/4/16 Ver.2.3.5  
+勝利BGMを設定してないと戦闘終了時にエラーが出る問題を修正。  
 2023/3/10 Ver.2.3.4
 システムカラー0番が指定できない問題を修正。  
 2023/2/23 Ver.2.3.3  

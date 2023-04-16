@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Damage amount gauge visualization
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -19,10 +19,15 @@
  * 
  * The visualization function at the time of damage cannot be set with the TPB gauge.
  * 
+ * FilteringClass
+ * Enter the applicable window class or gauge class, identification name, or identifier.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/16/2022 Ver.1.0.2
+ * Modified filtering class processing to support "ExtraGauge" and "SceneCustomMenu".
  * 12/6/2022 Ver.1.0.1
  * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
  * Changed the display in languages other than Japanese to English.
@@ -106,7 +111,7 @@
  * @target MZ
  * @plugindesc ダメージ量ゲージ可視化
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -115,10 +120,15 @@
  * 
  * ダメージ時の可視化機能はTPBゲージでは設定できません。
  * 
+ * フィルタリングクラス設定
+ * 適用させるウィンドウクラスまたはゲージクラスまたは識別名、識別子を記入します。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/16 Ver.1.0.2
+ * フィルタリングクラスの処理を汎用ゲージ追加プラグイン、カスタムメニュー作成プラグインに対応できるよう修正。
  * 2022/12/6 Ver.1.0.1
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(コアスクリプトVer.1.6.0以降)
  * 日本語以外での表示を英語表示に変更。
@@ -230,7 +240,7 @@ Imported.NUUN_DamageGauge = true;
     };
 
     Sprite_Gauge.prototype.filteringGaugeDamageDataClass = function(data) {
-        const className = this.className ? this.className : String(this.constructor.name);
+        const className = this.className ? this.className : NuunManager.isFilterClass(this);
         if (data.FilteringClass && data.FilteringClass.length > 0) {
             return data.FilteringClass.some(filterClass => filterClass === className);
         } else {

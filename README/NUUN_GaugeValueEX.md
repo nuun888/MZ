@@ -1,5 +1,5 @@
 # [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
-# Ver.1.4.1
+# Ver.1.4.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -59,6 +59,8 @@ Ver.1.2.0より別プラグイン化いたしました。
 [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  
 
 ### 更新履歴
+2023/4/16 Ver.1.4.2  
+ * フィルタリングクラスの処理を汎用ゲージ追加プラグイン、カスタムメニュー作成プラグインに対応できるよう修正。  
 2022/12/24 Ver.1.4.1  
 通常時のゲージの色の設定が適用されていなかった問題を修正。  
 2022/12/15 Ver.1.4.0  

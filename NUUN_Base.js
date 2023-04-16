@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.6
+ * @version 1.6.7
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/16/2023 Ver.1.6.7
+ * Fixed filtering class handling.
  * 4/10/2023 Ver.1.6.6
  * Fixed filtering class handling.
  * 4/10/2023 Ver.1.6.5
@@ -81,7 +83,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.6.6
+ * @version 1.6.7
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -91,6 +93,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/16 Ver.1.6.7
+ * フィルタリングクラスの処理を修正。
  * 2023/4/10 Ver.1.6.6
  * フィルタリングクラスの処理を修正。
  * 2023/4/10 Ver.1.6.5
@@ -356,7 +360,7 @@ BattleManager.initMembers = function() {
 
 const _Window_addInnerChild = Window.prototype.addInnerChild;
 Window.prototype.addInnerChild = function(child) {
-    child.className = String(this.constructor.name);
+    child.className = NuunManager.isFilterClass(this);
     return _Window_addInnerChild.call(this, child);
 };
 
@@ -435,7 +439,7 @@ Spriteset_Battle.prototype.updateButlerGauge = function() {
 const _Window_ItemList_initialize  = Window_ItemList.prototype.initialize;
 Window_ItemList.prototype.initialize = function(rect) {
   _Window_ItemList_initialize.call(this, rect);
-  this._className = String(this.constructor.name);
+  this._className = NuunManager.isFilterClass(this);
 };
 
 Window_ItemList.prototype.isConstructor = function() {

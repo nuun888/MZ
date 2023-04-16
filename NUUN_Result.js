@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.4
+ * @version 2.3.5
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/4/16 Ver.2.3.5
+ * Fixed an issue where an error would occur at the end of a battle if the victory BGM was not set.
  * 2023/3/10 Ver.2.3.4
  * Fixed the problem that system color 0 cannot be specified.
  * 2023/2/23 Ver.2.3.3
@@ -2272,7 +2274,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.3
+ * @version 2.3.5
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2317,6 +2319,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/16 Ver.2.3.5
+ * 勝利BGMを設定してないと戦闘終了時にエラーが出る問題を修正。
  * 2023/3/10 Ver.2.3.4
  * システムカラー0番が指定できない問題を修正。
  * 2023/2/23 Ver.2.3.3
@@ -2442,24 +2446,6 @@
  * @desc 戦闘終了後に勝利モーションを行わないスイッチIDを指定します。ONで勝利時のモーションを行いません。
  * @type switch
  * @default 0
- * @parent CommonSetting
- * 
- * @param PageNextSymbol
- * @desc ページ送りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
- * @text ページ送りシンボル名
- * @type combo
- * @option 
- * @option pageup2
- * @default 
- * @parent CommonSetting
- * 
- * @param PagePreviousSymbol
- * @desc ページ戻りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
- * @text ページ戻りシンボル名
- * @type combo
- * @option 
- * @option pagedown2
- * @default 
  * @parent CommonSetting
  * 
  * @param WindowSetting
@@ -7233,7 +7219,7 @@ BattleManager.isBattleEnd = function() {
 };
 
 AudioManager.playResultBgm = function(rate) {
-    if (this._meBuffer && this._meBuffer._totalTime > 0 && !this._bgmBuffer._isPlaying) {
+    if (this._meBuffer && this._meBuffer._totalTime > 0 && (this._bgmBuffer && !this._bgmBuffer._isPlaying)) {
         const time = this._meBuffer.seek() / this._meBuffer._totalTime;
         if (time >= rate / 100) {
             this._bgmBuffer.play(true);

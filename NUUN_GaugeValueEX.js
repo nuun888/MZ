@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Gauge display EX
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -41,13 +41,19 @@
  * Normal gauge color
  * By entering -1 for the normal gauge color (entering -1 in the text tab for editor Ver.1.6.0 or later), the original gauge color will be applied.
  * 
+ * FilteringClass
+ * Enter the applicable window class or gauge class, identification name, or identifier.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
+ * 
  * To change the font, you need a separate plug-in to load the font.
  * Triacontane font load plug-in recommended
  * https://triacontane.blogspot.com/
  * 
  * Log
+ * 4/16/2022 Ver.1.4.2
+ * Modified filtering class processing to support "ExtraGauge" and "SceneCustomMenu".
  * 12/24/2022 Ver.1.4.1
  * Fixed an issue where normal gauge color settings were not being applied.
  * 12/15/2022 Ver.1.4.0
@@ -517,7 +523,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -548,6 +554,9 @@
  * 通常時のゲージ色
  * 通常時のゲージの色は-1と記入(エディタVer.1.6.0以降の場合、テキストタブで-1と記入)することにより、元のゲージの色が適用されます。
  * 
+ * フィルタリングクラス設定
+ * 適用させるウィンドウクラスまたはゲージクラスまたは識別名、識別子を記入します。
+ * 
  * Ver.1.2.0での変更点
  * フォントサイズをメインフォントサイズ+デフォルトフォントサイズ+個別フォントサイズに変更しました。
  * 数値の表示処理を変更しました。
@@ -559,6 +568,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/16 Ver.1.4.2
+ * フィルタリングクラスの処理を汎用ゲージ追加プラグイン、カスタムメニュー作成プラグインに対応できるよう修正。
  * 2022/12/24 Ver.1.4.1
  * 通常時のゲージの色の設定が適用されていなかった問題を修正。
  * 2022/12/15 Ver.1.4.0
@@ -1071,7 +1082,7 @@ Imported.NUUN_GaugeValueEX = true;
     };
 
     Sprite_Gauge.prototype.filteringGaugeDataClass = function(data) {
-        const className = this.className ? this.className : String(this.constructor.name);
+        const className = this.className ? this.className : NuunManager.isFilterClass(this);
         if (data.FilteringClass && data.FilteringClass.length > 0) {
             return data.FilteringClass.some(filterClass => filterClass === className);
         } else {

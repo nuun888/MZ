@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc GaugeImaging
  * @author NUUN
- * @version 1.6.5
+ * @version 1.6.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -54,6 +54,9 @@
  * List 3: Incapacitated (list 1 applies if not specified)
  * There is no magnification setting for numerical images.
  * 
+ * FilteringClass
+ * Enter the applicable window class or gauge class, identification name, or identifier.
+ * 
  * Specification
  * Coordinates need to be adjusted if the gauge is rotated using the core script specifications.
  * 
@@ -63,6 +66,8 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 4/16/2023 Ver.1.6.6
+ * Modified filtering class processing to support "ExtraGauge" and "SceneCustomMenu".
  * 1/10/2023 Ver.1.6.5
  * Fixed a flickering issue when viewing the gauge.
  * 1/9/2023 Ver.1.6.4
@@ -423,7 +428,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.6.5
+ * @version 1.6.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -467,6 +472,9 @@
  * リスト3:戦闘不能時(未指定の場合はリスト1が適用)
  * 数値画像に拡大率の設定はありません。
  * 
+ * フィルタリングクラス設定
+ * 適用させるウィンドウクラスまたはゲージクラスまたは識別名、識別子を記入します。
+ * 
  * 仕様
  * コアスクリプトの仕様でゲージを回転する場合は、座標の調整を行う必要があります。
  * このプラグインは共通処理プラグインVer.1.4.4以降が必要になります。
@@ -476,6 +484,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/16 Ver.1.6.6
+ * フィルタリングクラスの処理を汎用ゲージ追加プラグイン、カスタムメニュー作成プラグインに対応できるよう修正。
  * 2023/1/10 Ver.1.6.5
  * ゲージを表示した際にちらつく問題を修正。
  * 2023/1/9 Ver.1.6.4
@@ -866,7 +876,7 @@ Sprite_Gauge.prototype.setup = function(battler, statusType) {
 };
 
 Sprite_Gauge.prototype.filteringGaugeImgClass = function(data) {
-    const className = this.className ? this.className : String(this.constructor.name);
+    const className = this.className ? this.className : NuunManager.isFilterClass(this);
     if (data.FilteringClass && data.FilteringClass.length > 0) {
         return data.FilteringClass.some(filterClass => filterClass === className);
     } else {

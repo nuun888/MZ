@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.4
+ * @version 1.3.5
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,11 +40,13 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 4/16/2022 Ver.1.3.4
+ * 4/22/2023 Ver.1.3.5
+ * Fixed an issue where the X coordinate specification of current and corrected stats was not applied.
+ * 4/16/2023 Ver.1.3.4
  * Added a function to specify the width of the status window.
- * 2/28/2022 Ver.1.3.3
+ * 2/28/2023 Ver.1.3.3
  * Added a function that allows you to specify key settings for switching status pages. (To change, you need a plug-in that can assign keys separately)
- * 2/25/2022 Ver.1.3.2
+ * 2/25/2023 Ver.1.3.2
  * Fixed to reverse the color of the target rate, MP consumption rate, physical damage rate, magic damage rate, and floor damage rate. (red for increasing, green for decreasing)
  * Added a function to reverse the color of the difference in the original parameter difference display.
  * 12/11/2022 Ver.1.3.1
@@ -797,7 +799,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.4
+ * @version 1.3.5
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -826,6 +828,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/22 Ver.1.3.5
+ * 現在値及び補正後能力値のX座標指定が適用されていなかった問題を修正。
  * 2023/4/16 Ver.1.3.4
  * ステータスウィンドウの横幅を指定できる機能を追加。
  * 2023/2/28 Ver.1.3.3
@@ -2088,14 +2092,14 @@ Imported.NUUN_EquipStatusEX = true;
         this.drawText(name, x + margin, y, Math.min(systemWidth, width - paramX - margin));
         this.resetTextColor();
         if (actor) {
-            this.drawText(value + (data.paramUnit ? String(data.paramUnit) : ""), paramX, y, paramWidth, "right");
+            this.drawText(value + (data.paramUnit ? String(data.paramUnit) : ""), paramX + x, y, paramWidth, "right");
         }
-        this.drawRightArrow(paramX + paramWidth, y);
+        this.drawRightArrow(paramX + paramWidth + x, y);
         if (this._tempActor) {
             const newValue = this._tempActor.param(paramId);
             const diffvalue = newValue - value;
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
-            this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth, y, paramWidth, "right");
+            this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
         }
     };
 
@@ -2119,14 +2123,14 @@ Imported.NUUN_EquipStatusEX = true;
         this.drawText(name, x + margin, y, Math.min(systemWidth, width - paramX - margin));
         this.resetTextColor();
         if (actor) {
-            this.drawText(value + (data.paramUnit ? String(data.paramUnit) : "%"), paramX, y, paramWidth, "right");
+            this.drawText(value + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + x, y, paramWidth, "right");
         }
-        this.drawRightArrow(paramX + paramWidth, y);
+        this.drawRightArrow(paramX + paramWidth + x, y);
         if (this._tempActor) {
             const newValue = NuunManager.numPercentage(this._tempActor.xparam(paramId - 30) * 100, data.Decimal || 0, DecimalMode);
             const diffvalue = newValue - value;
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
-            this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth, y, paramWidth, "right");
+            this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
         }
     };
 
@@ -2150,14 +2154,14 @@ Imported.NUUN_EquipStatusEX = true;
         this.drawText(name, x + margin, y, Math.min(systemWidth, width - paramX - margin));
         this.resetTextColor();
         if (actor) {
-            this.drawText(value + (data.paramUnit ? String(data.paramUnit) : "%"), paramX, y, paramWidth, "right");
+            this.drawText(value + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + x, y, paramWidth, "right");
         }
-        this.drawRightArrow(paramX + paramWidth, y);
+        this.drawRightArrow(paramX + paramWidth + x, y);
         if (this._tempActor) {
             const newValue = NuunManager.numPercentage(this._tempActor.sparam(paramId - 40) * 100, data.Decimal - 2, DecimalMode);
             const diffvalue = badParams(paramId) ? (value - newValue) : (newValue - value);
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
-            this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth, y, paramWidth, "right");
+            this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
         }
     };
 
@@ -2186,9 +2190,9 @@ Imported.NUUN_EquipStatusEX = true;
             text = NuunManager.numPercentage(text, data.Decimal - 2, DecimalMode);
         }
         if (actor) {
-            this.drawText(text + (data.paramUnit ? String(data.paramUnit) : ""), paramX, y, paramWidth, "right");
+            this.drawText(text + (data.paramUnit ? String(data.paramUnit) : ""), paramX + x, y, paramWidth, "right");
         }
-        this.drawRightArrow(paramX + paramWidth, y);
+        this.drawRightArrow(paramX + paramWidth + x, y);
         if (this._tempActor) {
             a = this._tempActor;
             const newValue = NuunManager.numPercentage(eval(data.DataEval), data.Decimal - 2, DecimalMode);
@@ -2198,7 +2202,7 @@ Imported.NUUN_EquipStatusEX = true;
             } else {
                 this.resetTextColor();
             }
-            this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth, y, paramWidth, "right");
+            this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
         }
     };
 
@@ -2269,14 +2273,14 @@ Imported.NUUN_EquipStatusEX = true;
                 this.resetTextColor();
                 const rate = NuunManager.numPercentage(actor.elementRate(elementId) * 100, data.Decimal - 2, DecimalMode);
                 if (actor) {
-                    this.drawText(rate + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + x2, y + y2, paramWidth, "right");
+                    this.drawText(rate + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + x2 + x, y + y2, paramWidth, "right");
                 }
-                this.drawRightArrow(paramX + paramWidth + x2, y + y2);
+                this.drawRightArrow(paramX + paramWidth + x2 + x, y + y2);
                 if (this._tempActor) {
                     const newValue = NuunManager.numPercentage(this._tempActor.elementRate(elementId) * 100, data.Decimal - 2, DecimalMode);
                     const diffvalue = rate - newValue;
                     this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
-                    this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2, y + y2, paramWidth, "right");
+                    this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2 + x, y + y2, paramWidth, "right");
                 }
                 index++;
             }
@@ -2320,15 +2324,15 @@ Imported.NUUN_EquipStatusEX = true;
                 let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
                 rate = NuunManager.numPercentage(rate, data.Decimal - 2, DecimalMode);
                 if (actor) {
-                    this.drawText(rate + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + x2, y + y2, paramWidth, "right");
+                    this.drawText(rate + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + x2 + x, y + y2, paramWidth, "right");
                 }
-                this.drawRightArrow(paramX + paramWidth + x2, y + y2);
+                this.drawRightArrow(paramX + paramWidth + x2 + x, y + y2);
                 if (this._tempActor) {
                     let newValue = this._tempActor.stateRate(stateId) * 100 * (this._tempActor.isStateResist(stateId) ? 0 : 1);
                     newValue = NuunManager.numPercentage(newValue, data.Decimal - 2, DecimalMode);
                     const diffvalue = rate - newValue;
                     this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
-                    this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2, y + y2, paramWidth, "right");
+                    this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2 + x, y + y2, paramWidth, "right");
                 }
                 index++;
             }

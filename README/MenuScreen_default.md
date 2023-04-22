@@ -2,7 +2,7 @@
 # Ver.2.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
 #### 必須、前提プラグイン
-[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.9  
+[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.10  
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.2以降  
 #### オプション
 全体選択時カーソル修正  
@@ -18,7 +18,7 @@
 メニューステータス、インフォウィンドウは表示したい項目をカスタマイズできます。  
 
 Ver.2.0.0から以下のプラグインが必要になります。  
-[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.9  
+[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.10  
 
 ![画像](img/MenuScreen_default.png)  
 
@@ -84,8 +84,10 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
-2023/4/22 Ver.2.0.9(ベースプラグイン)  
+2023/4/22 Ver.2.0.10(ベースプラグイン)  
 インフォウィンドウのオリジナルパラメータが表示されない問題を修正。  
+2023/4/13 Ver.2.0.9(ベースプラグイン)  
+最大レベルでの経験値の表示を修正。  
 2023/4/9 Ver.2.0.8(ベースプラグイン)  
 他制作者プラグインでのインフォウィンドウのクラス指定を適用できるように修正。  
 2023/4/1 Ver.2.0.2  

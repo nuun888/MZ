@@ -118,6 +118,10 @@
  * @desc Sets the id of the window. -1 clears all message windows.
  * @min -1
  * 
+ * @command ResetMultiMessage
+ * @desc Returns the settings of the message window to the initial state.
+ * @text Message window initial state
+ * 
  * 
  */
 /*:ja
@@ -235,8 +239,6 @@
  * @command ResetMultiMessage
  * @desc メッセージウィンドウの設定を初期状態に戻します。
  * @text メッセージウィンドウ初期状態
- * 
- * 
  * 
  */
 var Imported = Imported || {};

@@ -1,5 +1,5 @@
 # [アイテム図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)
-# Ver.1.6.1
+# Ver.1.6.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -90,6 +90,8 @@ desc1と記入した場合はアイテム、武器、防具のメモ欄に<desc1
 メモ欄のタグ記入時では付けないでください。  
 
 ## 更新履歴
+2023/4/23 Ver.1.6.2  
+図鑑完成率、登録数にアイテム、武器、防具を含まないトータル数を設定できる機能を追加。  
 2023/3/25 Ver.1.6.1　　
 ページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)　　
 2023/2/25 Ver.1.6.0  

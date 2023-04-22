@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.5
+ * @version 1.1.6
  * 
  * @help
  * You can now display multiple message windows.
@@ -35,6 +35,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/22/2023 Ver.1.1.6
+ * Fixed an issue that allowed players to walk when displaying normal windows.
+ * Added function to initialize window settings.
  * 4/8/2023 Ver.1.1.5
  * Added function to disable key operation.
  * 4/2/2023 Ver.1.1.4
@@ -123,7 +126,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.5
+ * @version 1.1.6
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -146,6 +149,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/22 Ver.1.1.6
+ * 通常のウィンドウを表示したときにプレイヤーが歩行できてしまう問題を修正。
+ * ウィンドウの設定を初期化する機能を追加。
  * 2023/4/8 Ver.1.1.5
  * キー操作を無効にする機能を追加。
  * 2023/4/3 Ver.1.1.4
@@ -226,6 +232,10 @@
  * @desc ウィンドウのIDを設定します。-1で全てのメッセージウインドウを消去します。
  * @min -1
  * 
+ * @command ResetMultiMessage
+ * @desc メッセージウィンドウの設定を初期状態に戻します。
+ * @text メッセージウィンドウ初期状態
+ * 
  * 
  * 
  */
@@ -242,6 +252,10 @@ Imported.NUUN_MultiMessageWindows = true;
 
     PluginManager.registerCommand(pluginName, 'MultiMessageClose', args => {
         closeMultiMessageWindow(Number(args.Id));
+    });
+
+    PluginManager.registerCommand(pluginName, 'ResetMultiMessage', args => {
+        SceneManager._scene.resetMultiMessageWindow();
     });
     
     function setMultiMessageWindow(args) {
@@ -281,6 +295,19 @@ Imported.NUUN_MultiMessageWindows = true;
             this.createMultiMessageNameBoxWindow();
         }
         $gameTemp.activeMultiMessageId = Number(args.Id);
+        this.associateWindows();
+    };
+
+    Scene_Message.prototype.resetMultiMessageWindow = function() {
+        this._multiMessageWindowsList[0] = 
+        {id: 0, 
+            mode: false, 
+            noBusy: false, 
+            simultaneous: false, 
+            nameBox: 'default',
+            keyInvalid: false,
+        };
+        $gameTemp.activeMultiMessageId = 0;
         this.associateWindows();
     };
 
@@ -376,7 +403,7 @@ Imported.NUUN_MultiMessageWindows = true;
 
     Scene_Message.prototype.noBusyMultiMessageWindow = function() {
         return this._messageWindows.some(window => {
-            return window.isOpen() && !window.noBusy;
+            return window.visible && !window.noBusy;
         });
     };
 

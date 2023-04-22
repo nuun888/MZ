@@ -1,5 +1,5 @@
 # [複数メッセージウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
-# Ver.1.1.5
+# Ver.1.1.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -29,6 +29,9 @@
 間にウエイトを行うイベントコマンドを実行すると表示タイミングがずれます。  
 
 ## 更新履歴
+2023/4/22 Ver.1.1.6  
+通常のウィンドウを表示したときにプレイヤーが歩行できてしまう問題を修正。  
+ウィンドウの設定を初期化する機能を追加。  
 2023/4/8 Ver.1.1.5  
 キー操作を無効にする機能を追加。  
 2023/4/3 Ver.1.1.4  

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -114,6 +114,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2023/4/23 Ver.1.6.2
+ * 図鑑完成率、登録数にアイテム、武器、防具を含まないトータル数を設定できる機能を追加。
  * 2023/3/25 Ver.1.6.1
  * ページ切り替えのキー設定を指定できる機能を追加。(別途キー割り当てが出来るプラグインが必要です)
  * 2023/2/25 Ver.1.6.0
@@ -481,6 +483,27 @@
  * @default 100
  * @max 999999
  * @min 0
+ * @parent PercentWindow
+ * 
+ * @param AllPercentItem
+ * @desc 図鑑完成率、図鑑登録数にアイテムを適用します。
+ * @text 完成率登録数アイテム適用
+ * @type boolean
+ * @default true
+ * @parent PercentWindow
+ * 
+ * @param AllPercentWeapon
+ * @desc 図鑑完成率、図鑑登録数に武器を適用します。
+ * @text 完成率登録数武器適用
+ * @type boolean
+ * @default true
+ * @parent PercentWindow
+ * 
+ * @param AllPercentArmor
+ * @desc 図鑑完成率、図鑑登録数に防具を適用します。
+ * @text 完成率登録数防具適用
+ * @type boolean
+ * @default true
  * @parent PercentWindow
  * 
  * @param CommandData
@@ -1453,8 +1476,8 @@
  * @default 
  * 
  * @param ContentDate
- * @desc 表示する
- * @text 名称、アイテム名表示位置
+ * @desc 表示する内容
+ * @text 表示内容
  * @type select
  * @option 図鑑完成率
  * @value 0
@@ -1518,6 +1541,9 @@ let PercentWindowVisible = eval(parameters['PercentWindowVisible'] || 'true');
 const NumberMode = eval(parameters['NumberMode'] || "false");
 const PercentContent = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PercentContent'])) : null) || [];
 const Interval = Number(parameters['Interval'] || 100);
+const AllPercentItem = eval(parameters['AllPercentItem'] || "true");
+const AllPercentWeapon = eval(parameters['AllPercentWeapon'] || "true");
+const AllPercentArmor = eval(parameters['AllPercentArmor'] || "true");
 const ShowCommand = eval(parameters['ShowCommand'] || 'false');
 const CommandName = String(parameters['CommandName'] || 'アイテム図鑑');
 const itemBookSwitch = Number(parameters['itemBookSwitch'] || 0);
@@ -1660,6 +1686,20 @@ function getAllItemData() {
   //return $dataItems.concat($dataWeapons, $dataArmors);
 };
 
+function getCategoryItemData() {
+    let list = [];
+    if (AllPercentItem) {
+        Array.prototype.push.apply(list, $dataItems);
+    }
+    if (AllPercentWeapon) {
+        Array.prototype.push.apply(list, $dataWeapons);
+    }
+    if (AllPercentArmor) {
+        Array.prototype.push.apply(list, $dataArmors);
+    }
+    return list;
+  };
+
 function getItemData(mode) {
   if (mode === 'all') {
     return getAllItemData();
@@ -1672,8 +1712,15 @@ function getItemData(mode) {
   } else {
     return [];
   }
-}
+};
 
+function getItemPercentData(mode) {
+    if (mode === 'all') {
+        return getCategoryItemData();
+    } else {
+        return getItemData(mode);
+    }
+};
 
 const _DataManager_extractSaveContents = DataManager.extractSaveContents;
 DataManager.extractSaveContents = function(contents) {
@@ -2318,7 +2365,7 @@ Window_ItemBook_Percent.prototype.percentRefresh = function() {
 };
 
 Window_ItemBook_Percent.prototype.completenessPercent = function() {
-  const bookAllItems = $gameSystem.getIsItemBook(getItemData('all'));
+  const bookAllItems = $gameSystem.getIsItemBook(getItemPercentData('all'));
   this._itemPercent._allItemListLength = bookAllItems.length;
   this._itemPercent._allItemNum = $gameSystem.getItemBookInfoFlagsNum(bookAllItems);
   const bookItems = $gameSystem.getIsItemBook(getItemData('item'));
@@ -2353,22 +2400,22 @@ Window_ItemBook_Percent.prototype.refresh = function() {
 
 Window_ItemBook_Percent.prototype.getParam = function(content) {
   switch (content.ContentDate) {
-    case 0:
-      return content.ContentName +' : '+ this._itemPercent.allComplete +' %';
-    case 1:
-      return content.ContentName +' : '+ this._itemPercent.itemComplete +' %';
-    case 2:
-      return content.ContentName +' : '+ this._itemPercent.weaponComplete +' %';
-    case 3:
-      return content.ContentName +' : '+ this._itemPercent.armorComplete +' %';
-    case 10:
-      return content.ContentName +' : '+ this._itemPercent._allItemNum  +'/'+ this._itemPercent._allItemListLength;
-    case 11:
-      return content.ContentName +' : '+ this._itemPercent._itemNum  +'/'+ this._itemPercent._itemListLength;
-    case 12:
-      return content.ContentName +' : '+ this._itemPercent._weaponNum  +'/'+ this._itemPercent._weaponListLength;
-    case 13:
-      return content.ContentName +' : '+ this._itemPercent._armorNum  +'/'+ this._itemPercent._armorListLength;
+        case 0:
+            return content.ContentName +' : '+ this._itemPercent.allComplete +' %';
+        case 1:
+            return content.ContentName +' : '+ this._itemPercent.itemComplete +' %';
+        case 2:
+            return content.ContentName +' : '+ this._itemPercent.weaponComplete +' %';
+        case 3:
+            return content.ContentName +' : '+ this._itemPercent.armorComplete +' %';
+        case 10:
+            return content.ContentName +' : '+ this._itemPercent._allItemNum  +'/'+ this._itemPercent._allItemListLength;
+        case 11:
+            return content.ContentName +' : '+ this._itemPercent._itemNum  +'/'+ this._itemPercent._itemListLength;
+        case 12:
+            return content.ContentName +' : '+ this._itemPercent._weaponNum  +'/'+ this._itemPercent._weaponListLength;
+        case 13:
+            return content.ContentName +' : '+ this._itemPercent._armorNum  +'/'+ this._itemPercent._armorListLength;
   }
 };
 

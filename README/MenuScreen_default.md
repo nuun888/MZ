@@ -1,26 +1,41 @@
-# [メニュー画面デフォルトタイプ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)
-# Ver.2.0.2
+# メニュー画面
+
+## メニュー画面ベース
+### Ver.2.0.10  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)  
+## 設定用プラグイン
+メニュー画面デフォルトタイプVer.2.0.2    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
+メニュー画面タイプ１Ver.2.0.2    
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
+メニュー画面タイプ２Ver.2.0.2    
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
+
 #### 必須、前提プラグイン
-[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.10  
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.2以降  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.7以降  
+
 #### オプション
 全体選択時カーソル修正  
 ※アクター表示列が２列以上でかつ表示行が２行以上の場合は、以下のプラグインが必要です。  
 [メニュー画面の全体対象時のカーソル表示修正](https://github.com/nuun888/MZ/blob/master/README/MenuStatusAllSelectFix.md)  
-
 行動目標表示  
 [メニュー画面行動目標表示](https://github.com/nuun888/MZ/blob/master/README/Destination.md)  
 
+## 概要
 メニュー画面の表示を拡張します。  
-このプラグインはデフォルトのメニュー画面となっております。  
-メニューコマンド、メニューステータス、インフォウィンドウの座標、サイズを設定できます。  
-メニューステータス、インフォウィンドウは表示したい項目をカスタマイズできます。  
 
-Ver.2.0.0から以下のプラグインが必要になります。  
-[メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)Ver.2.0.10  
+## 特徴
+メニュー画面の表示をカスタマイズできます。  
+アクターステータスに経験値や能力値、追加能力値、特殊能力値などを表示できます。  
+インフォウィンドウは最大10のウィンドウを生成できます。  
 
+デフォルトタイプ  
 ![画像](img/MenuScreen_default.png)  
+タイプ１  
+![画像](img/MenuScreen1.png)  
+タイプ2
+![画像](img/MenuScreen3.png)  
+
 
 ## 設定方法
 ### UIウィンドウ基準無効

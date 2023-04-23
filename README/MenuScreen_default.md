@@ -24,7 +24,7 @@
 [メニュー画面の全体対象時のカーソル表示修正](https://github.com/nuun888/MZ/blob/master/README/MenuStatusAllSelectFix.md)  
 行動目標表示  
 [メニュー画面行動目標表示](https://github.com/nuun888/MZ/blob/master/README/Destination.md)  
-チャプターテキスト
+チャプターテキスト  
 [メニュー画面チャプターテキスト](https://github.com/nuun888/MZ/blob/master/README/Chapter.md)  
 
 

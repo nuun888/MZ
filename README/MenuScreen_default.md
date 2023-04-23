@@ -33,7 +33,7 @@
 ![画像](img/MenuScreen_default.png)  
 タイプ１  
 ![画像](img/MenuScreen1.png)  
-タイプ2
+タイプ2  
 ![画像](img/MenuScreen3.png)  
 
 

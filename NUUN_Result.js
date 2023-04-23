@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.5
+ * @version 2.3.6
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/4/23 Ver.2.3.6
+ * Conflict measures with the skill tree plugin.
+ * Fixed to display 0 for the experience points gained at maximum level.
  * 2023/4/16 Ver.2.3.5
  * Fixed an issue where an error would occur at the end of a battle if the victory BGM was not set.
  * 2023/3/10 Ver.2.3.4
@@ -1659,6 +1662,7 @@
  * @desc Enter Eval or string.
  * @text Eval or String(9)
  * @type combo
+ * @option 'BattleManager._rewards.sp;//Skill tree Get Sp'
  * @default 
  * 
  * @param FontSize
@@ -2274,7 +2278,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.5
+ * @version 2.3.6
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2319,6 +2323,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/23 Ver.2.3.6
+ * スキルツリープラグインとの競合対策。
+ * 最大レベル時の獲得した経験値を0で表示するように修正。
  * 2023/4/16 Ver.2.3.5
  * 勝利BGMを設定してないと戦闘終了時にエラーが出る問題を修正。
  * 2023/3/10 Ver.2.3.4
@@ -3920,8 +3927,8 @@
  * @desc 評価式または文字列を記入します。
  * @text 評価式or文字列(9)
  * @type combo
+ * @option 'BattleManager._rewards.sp;//Skill tree Get Sp'
  * @default 
- * 
  * @param FontSize
  * @desc フォントサイズ（メインフォントからの差）
  * @text フォントサイズ(9)
@@ -7078,15 +7085,29 @@ BattleManager.displayVictoryMessage = function() {
 };
 
 BattleManager.displayRewards = function() {
-  SceneManager._scene.setResultOpen();
-  this.resultMode = true;
+  this.displayResultRewards();
+};
+
+BattleManager.displayResultRewards = function() {
+    SceneManager._scene.setResultOpen();
+    this.resultMode = true;
 };
 
 const _BattleManager_gainRewards = BattleManager.gainRewards;
 BattleManager.gainRewards = function() {
-  $gameParty.resetLearnSkill();
-  _BattleManager_gainRewards.call(this);
-  this.resultMode = false;
+    this.offResultMessage();
+    $gameParty.resetLearnSkill();
+    _BattleManager_gainRewards.call(this);
+    this.resultMode = false;
+};
+
+BattleManager.offResultMessage = function() {
+    if ($gameMessage.hasText()) {
+        $gameMessage.clear();
+    }
+    if (!this.resultMode) {
+        this.displayResultRewards();
+    }
 };
 
 const _BattleManager_isBusy = BattleManager.isBusy;
@@ -7579,6 +7600,7 @@ Sprite_ResultExpValue.prototype.setup = function(battler, data) {
     this._exp = battler ? Math.round(exp * battler.finalExpRate()) : exp;
     this._textColor = this.setTextColorMode(exp);
     this._updateflame = this._exp / GaugeRefreshFrame;
+    this._nowLevel = battler._level;
     this.redraw();
     this._updateOn = false;
   }
@@ -7590,11 +7612,15 @@ Sprite_ResultExpValue.prototype.createBitmap = function() {
   this.bitmap = new Bitmap(width, height);
 };
 
+Sprite_ResultExpValue.prototype.maxLavel = function() {
+    return this._nowLevel >= this._battler.maxLevel();
+};
+
 Sprite_ResultExpValue.prototype.setTextColorMode = function(exp) {
-  if (exp > this._exp && this._exp > 0) {
-    return NuunManager.getColorCode(EXPResistValueColor)
+  if (exp > this._exp && this._exp > 0) {   
+    return NuunManager.getColorCode(EXPResistValueColor);
   } else if (exp < this._exp) {
-    return NuunManager.getColorCode(EXPBoostValueColor)
+    return NuunManager.getColorCode(EXPBoostValueColor);
   } else {
     return ColorManager.normalColor();
   }
@@ -7627,7 +7653,7 @@ Sprite_ResultExpValue.prototype.expValue = function() {
 
 Sprite_ResultExpValue.prototype.redraw = function() {
   const data = this._data;
-  const exp = this.expValue();
+  const exp = this.maxLavel() ? 0 : this.expValue();
   const width = this.bitmapWidth();
   const height = this.bitmapHeight();
   this.setupFont();

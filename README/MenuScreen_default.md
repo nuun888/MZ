@@ -14,12 +14,19 @@
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.7以降  
 
+#### 拡張プラグイン
+メニューコマンド表示EX  
+[メニューコマンド表示EX](https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md)  
+
 #### オプション
 全体選択時カーソル修正  
 ※アクター表示列が２列以上でかつ表示行が２行以上の場合は、以下のプラグインが必要です。  
 [メニュー画面の全体対象時のカーソル表示修正](https://github.com/nuun888/MZ/blob/master/README/MenuStatusAllSelectFix.md)  
 行動目標表示  
 [メニュー画面行動目標表示](https://github.com/nuun888/MZ/blob/master/README/Destination.md)  
+チャプターテキスト
+[メニュー画面チャプターテキスト](https://github.com/nuun888/MZ/blob/master/README/Chapter.md)  
+
 
 ## 概要
 メニュー画面の表示を拡張します。  

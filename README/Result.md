@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.3.5
+# Ver.2.3.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,9 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2023/4/23 Ver.2.3.6  
+スキルツリープラグインとの競合対策。  
+最大レベル時の獲得した経験値を0で表示するように修正。  
 2023/4/16 Ver.2.3.5  
 勝利BGMを設定してないと戦闘終了時にエラーが出る問題を修正。  
 2023/3/10 Ver.2.3.4

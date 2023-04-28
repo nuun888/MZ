@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.10
+ * @version 2.0.11
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/28/2023 Ver.2.0.11
+ * Added a function to change the font. A separate plug-in is required to change the font.
  * 4/22/2023 Ver.2.0.10
  * Fixed the problem that the original parameter of the info window is not displayed.
  * 4/13/2023 Ver.2.0.9
@@ -57,7 +59,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.10
+ * @version 2.0.11
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -67,9 +69,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/28 Ver.2.0.11
+ * フォントを変更できる機能を追加。別途フォントを変更できるプラグインが必要です。
  * 2023/4/22 Ver.2.0.10
  * インフォウィンドウのオリジナルパラメータが表示されない問題を修正。
- * 2022/4/13 Ver.2.0.9
+ * 2023/4/13 Ver.2.0.9
  * 最大レベルでの経験値の表示を修正しました。
  * 2023/4/9 Ver.2.0.8
  * 他制作者プラグインでのインフォウィンドウのクラス指定を適用できるように修正。
@@ -797,48 +801,55 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = this.paramNameData(data, actor, param - 20);
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.nuun_setContentsFontFace(data);
         const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
         const textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20)) + (data.paramUnit ? String(data.paramUnit) : "");
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
-        this.contents.fontSize = $gameSystem.mainFontSize();
+        this.resetFontSettings();
     };
 
     Window_MenuStatus.prototype.drawXParams = function(data, param, x, y, width, actor) {
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = this.paramNameData(data, actor, param - 20);
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.nuun_setContentsFontFace(data);
         const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
         let textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20));
         textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, params.DecimalMode);
         textParam += (data.paramUnit ? String(data.paramUnit) : "");
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
-        this.contents.fontSize = $gameSystem.mainFontSize();
+        this.resetFontSettings();
     };
 
     Window_MenuStatus.prototype.drawSParams = function(data, param, x, y, width, actor) {
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = this.paramNameData(data, actor, param - 20);
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.nuun_setContentsFontFace(data);
         const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
         let textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20));
         textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, params.DecimalMode);
         textParam += (data.paramUnit ? String(data.paramUnit) : "");
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
-        this.contents.fontSize = $gameSystem.mainFontSize();
+        this.resetFontSettings();
     };
 
     Window_MenuStatus.prototype.drawActorName = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         menuTextMode = 'name';
         menuAlign = data.Align;
+        this.nuun_setContentsFontFace(data);
         Window_StatusBase.prototype.drawActorName.call(this, actor, x, y, width);
-        this.contents.fontSize = $gameSystem.mainFontSize();
+        this.resetFontSettings();
     };
 
     Window_MenuStatus.prototype.drawText = function(text, x, y, maxWidth, align) {
@@ -852,24 +863,28 @@ Imported.NUUN_MenuScreenEXBase = true;
     Window_MenuStatus.prototype.drawActorClass = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.resetTextColor();
+        this.nuun_setContentsFontFace(data);
         this.drawText(actor.currentClass().name, x, y, width, data.Align);
-        this.contents.fontSize = $gameSystem.mainFontSize();
+        this.resetFontSettings();
     };
 
     Window_MenuStatus.prototype.drawActorNickname = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.resetTextColor();
+        this.nuun_setContentsFontFace();
         this.drawText(actor.nickname(), x, y, width, data.Align);
-        this.contents.fontSize = $gameSystem.mainFontSize();
+        this.resetFontSettings();
     };
 
     Window_MenuStatus.prototype.drawActorLevel = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.nuun_setContentsFontFace(data);
         this.changeTextColor(ColorManager.systemColor());
         this.drawText(TextManager.levelA, x, y, 48);
         this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
         this.drawText(actor.level, x + 60, y, width - 60, "right");
-        this.contents.fontSize = $gameSystem.mainFontSize();
+        this.resetFontSettings();
     };
 
     Window_MenuStatus.prototype.drawActorIcons = function(data, x, y, width, actor) {
@@ -896,15 +911,17 @@ Imported.NUUN_MenuScreenEXBase = true;
     Window_MenuStatus.prototype.drawParam = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        this.nuun_setContentsFontFace(data);
         const nameText = data.ParamName ? data.ParamName : '';
         const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
         if (data.DetaEval) {
+            this.nuun_setContentsValueFontFace(data);
             const padding = textWidth > 0 ? 8 : 0;
             this.drawText(eval(data.DetaEval), x + textWidth + padding, y, width - (textWidth + padding), data.Align);
         }
-        this.contents.fontSize = $gameSystem.mainFontSize();
+        this.resetFontSettings();
     };
 
     Window_MenuStatus.prototype.systemWidth = function(swidth, width) {
@@ -947,12 +964,14 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = data.ParamName ? data.ParamName : 'NextLv';
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.nuun_setContentsFontFace(data);
         const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x + textWidth, y, textWidth);
         this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
         let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.nextLevelExp() - actor.currentLevelExp());
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
-        this.contents.fontSize = $gameSystem.mainFontSize();
+        this.resetFontSettings();
     };
 
     Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
@@ -1020,6 +1039,14 @@ Imported.NUUN_MenuScreenEXBase = true;
         x += 1 + data.Actor_X + params.ActorImg_X;
         y += 1 + data.Actor_Y + params.ActorImg_Y;
         this.contents.blt(bitmap, sx, sy, width + (width - sw), height + (height - sh), x, y, width, height);
+    };
+
+    Window_MenuStatus.prototype.nuun_setContentsFontFace = function(data) {
+        this.contents.fontFace = data.FontFace ? data.FontFace : $gameSystem.mainFontFace();
+    };
+
+    Window_MenuStatus.prototype.nuun_setContentsValueFontFace = function(data) {
+        this.contents.fontFace = data.ValueFontFace ? data.ValueFontFace : $gameSystem.mainFontFace();
     };
 
     function Window_InfoMenu() {
@@ -1139,17 +1166,21 @@ Imported.NUUN_MenuScreenEXBase = true;
             iconWidth = ImageManager.iconWidth + 6;
         }
         this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
+        this.nuun_setContentsFontFace(data);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = data.ParamName ? data.ParamName : '';
         const systemWidth = data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x + iconWidth, y, systemWidth);
         this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
         this.drawCurrencyValue(this.value(), this.currencyUnit(), x + systemWidth + 8 + iconWidth, y, width - (systemWidth + 8 + iconWidth));
+        this.resetFontSettings();
     };
     
     Window_InfoMenu.prototype.drawPlayTime = function(data, x, y, width) {
         this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        this.nuun_setContentsFontFace(data);
         const nameText = data.ParamName ? data.ParamName : '';
         const systemWidth = !!nameText ? (data.SystemItemWidth || 160) : 0;
         let iconWidth = 0;
@@ -1159,13 +1190,16 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
         this.drawText(nameText, x + iconWidth, y, systemWidth);
         this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
         this.drawText($gameSystem.playtimeText(), x + systemWidth + iconWidth + this.itemPadding(), y, width - (systemWidth + 8 + iconWidth), data.Align);
+        this.resetFontSettings();
         this._onPlayTime = true;
     };
     
     Window_InfoMenu.prototype.drawLocation = function(data, x, y, width) {
         this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        this.nuun_setContentsFontFace(data);
         const nameText = data.ParamName ? data.ParamName : '';
         const systemWidth = !!nameText ? (data.SystemItemWidth || 160) : 0;
         let iconWidth = 0;
@@ -1175,13 +1209,16 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
         this.drawText(nameText, x + iconWidth, y, systemWidth);
         this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
         const text = $gameMap.mapId() > 0 ? $gameMap.displayName() : '';
         this.drawText(text, x + systemWidth + iconWidth + this.itemPadding(), y, width - (systemWidth + 8 + iconWidth), data.Align);
+        this.resetFontSettings();
     };
     
     Window_InfoMenu.prototype.drawOriginalParam = function(data, x, y, width) {
         this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        this.nuun_setContentsFontFace(data);
         const nameText = data.ParamName ? data.ParamName : '';
         const systemWidth = !!nameText ? (data.SystemItemWidth || 160) : 0;
         let iconWidth = 0;
@@ -1192,8 +1229,10 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.drawText(nameText, x + iconWidth, y, systemWidth);
         this.resetTextColor();
         if (!!data.DataEval) {
+            this.nuun_setContentsValueFontFace(data);
             this.drawText(eval(data.DataEval), x + systemWidth + 8 + iconWidth, y, width - (systemWidth + 8 + iconWidth), data.Align);
         }
+        this.resetFontSettings();
     };
     
     Window_InfoMenu.prototype.drawCommandExplanation = function(data, x, y, width) {
@@ -1217,6 +1256,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
         if (data.ParamName) {
             this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            this.nuun_setContentsFontFace(data);
             const nameText = data.ParamName ? data.ParamName : '';
             this.drawText(nameText, x + iconWidth, y, textWidth);
             textWidth = this.systemWidth(data.SystemItemWidth, width);
@@ -1242,6 +1282,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
         if (data.ParamName) {
             this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            this.nuun_setContentsFontFace(data);
             const nameText = data.ParamName ? data.ParamName : '';
             this.drawText(nameText, x + iconWidth, y, textWidth);
             textWidth = this.systemWidth(data.SystemItemWidth, width);
@@ -1258,6 +1299,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = data.ParamName ? data.ParamName : '';
+        this.nuun_setContentsFontFace(data);
         this.drawText(nameText, x, y, width, data.Align);
     };
     
@@ -1288,6 +1330,15 @@ Imported.NUUN_MenuScreenEXBase = true;
             this.refresh();
         }
     };
+
+    Window_InfoMenu.prototype.nuun_setContentsFontFace = function(data) {
+        this.contents.fontFace = data.FontFace ? data.FontFace : $gameSystem.mainFontFace();
+    };
+
+    Window_InfoMenu.prototype.nuun_setContentsValueFontFace = function(data) {
+        this.contents.fontFace = data.ValueFontFace ? data.ValueFontFace : $gameSystem.mainFontFace();
+    };
+
 
     function Sprite_MenuGauge() {
         this.initialize(...arguments);

@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.11
+ * @version 2.0.12
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/29/2023 Ver.2.0.12
+ * Fixed an issue where experience values were not displaying correctly.
+ * Fixed the problem that the numerical value was displayed even when the display of the experience value was not specified.
  * 4/28/2023 Ver.2.0.11
  * Added a function to change the font. A separate plug-in is required to change the font.
  * 4/22/2023 Ver.2.0.10
@@ -59,7 +62,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.11
+ * @version 2.0.12
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -69,6 +72,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/29 Ver.2.0.12
+ * 経験値数値が正常に表示されていなかった問題を修正。
+ * 経験値の表示なし指定時でも、数値が表示されていた問題を修正。
  * 2023/4/28 Ver.2.0.11
  * フォントを変更できる機能を追加。別途フォントを変更できるプラグインが必要です。
  * 2023/4/22 Ver.2.0.10
@@ -1507,14 +1513,11 @@ Imported.NUUN_MenuScreenEXBase = true;
                 text = this._battler.isMaxLevel() ? "100%" : text +"%";
             } else {
                 text = this._battler.isMaxLevel() ? "-------" : text;
-                text += '%';
             }
             const width = this.bitmapWidth();
             const height = this.textHeight();
             this.setupValueFont();
             this.bitmap.drawText(text, 0, 0, width, height, "right");
-        } else {
-            Sprite_Gauge.prototype.drawValue.call(this);
         }
     };
 

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.0
+ * @version 1.5.1
  * 
  * @help
  * You can display icons in the command menu and change the text color of command names.
@@ -43,6 +43,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/29/2023 Ver.1.5.1
+ * Fixed an issue where the font of other commands would change.
  * 4/29/2023 Ver.1.5.0
  * Added a function to change the font. A separate plug-in is required to change the font.
  * 4/10/2023 Ver.1.4.5
@@ -290,6 +292,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/29 Ver.1.5.1
+ * 他のコマンドのフォントが変更されてしまう問題を修正。
  * 2023/4/29 Ver.1.5.0
  * フォントを変更できる機能を追加。別途フォントを変更できるプラグインが必要です。
  * 2023/4/10 Ver.1.4.5
@@ -559,30 +563,31 @@ Window_Command.prototype.getFindCommand = function(commad, commadName) {
 
 const _Window_Command_drawText = Window_Command.prototype.drawText;
 Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
-  const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => this.getFindCommand(Commad, text) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
-  if (foundIndex >= 0) {
-    const commadData = param.CommadIcon[foundIndex];
-    this.nuun_setContentsFontFace(commadData);
-    const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
-    const textMargin = commadData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
-    const textWidth = this.textWidth(text);
-    const itemWidth = Math.max(0, maxWidth - textMargin);
-    width = Math.min(itemWidth, textWidth);
-    const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;
-    this.changeTextColor(NuunManager.getColorCode(color));
-    if(commadData.iconId > 0) {
-      if(align === 'center') {
-        this.drawIcon(commadData.iconId, x + (maxWidth / 2 - width / 2) - textMargin / 2, iconY);
-      } else if (align === 'left') {
-        this.drawIcon(commadData.iconId, x, iconY);
-      } else {
-        this.drawIcon(commadData.iconId, x + itemWidth - width, iconY);
-      }
+    this.resetFontSettings();
+    const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => this.getFindCommand(Commad, text) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
+    if (foundIndex >= 0) {
+        const commadData = param.CommadIcon[foundIndex];
+        this.nuun_setContentsFontFace(commadData);
+        const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+        const textMargin = commadData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
+        const textWidth = this.textWidth(text);
+        const itemWidth = Math.max(0, maxWidth - textMargin);
+        width = Math.min(itemWidth, textWidth);
+        const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;
+        this.changeTextColor(NuunManager.getColorCode(color));
+        if(commadData.iconId > 0) {
+        if(align === 'center') {
+            this.drawIcon(commadData.iconId, x + (maxWidth / 2 - width / 2) - textMargin / 2, iconY);
+        } else if (align === 'left') {
+            this.drawIcon(commadData.iconId, x, iconY);
+        } else {
+            this.drawIcon(commadData.iconId, x + itemWidth - width, iconY);
+        }
+        }
+        x += textMargin;
+        maxWidth = itemWidth;
     }
-    x += textMargin;
-    maxWidth = itemWidth;
-  }
-  _Window_Command_drawText.call(this, text, x, y, maxWidth, align);
+    _Window_Command_drawText.call(this, text, x, y, maxWidth, align);
 };
 
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;

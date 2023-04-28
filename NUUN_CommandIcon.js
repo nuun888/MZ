@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.5
+ * @version 1.5.0
  * 
  * @help
  * You can display icons in the command menu and change the text color of command names.
@@ -36,10 +36,15 @@
  * 
  * If it is not in the combo box, please enter it directly.
  * 
+ * Change font
+ * A separate plug-in is required to change the font. (Triacontane-like FontLoad plug-in recommended)
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/29/2023 Ver.1.5.0
+ * Added a function to change the font. A separate plug-in is required to change the font.
  * 4/10/2023 Ver.1.4.5
  * Fixed handling of filtering classes.
  * 4/9/2023 Ver.1.4.4
@@ -173,6 +178,12 @@
  * @dir img/
  * @default 
  * 
+ * @param FontFace
+ * @desc Sets the command font.
+ * @text Command font
+ * @type string
+ * @default 
+ * 
  * @param CommandClassMode
  * @text Filtering class setting mode
  * @desc Specifies the mode of exemption class settings.
@@ -247,7 +258,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.4
+ * @version 1.5.0
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -271,11 +282,16 @@
  * 
  * ※コンボボックスにない場合、直接記入してください。
  * 
+ * フォントの変更
+ * 別途フォントを変更できるプラグインが必要です。(トリアコンタン様のFontLoad(フォントロードプラグイン)推奨)
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/29 Ver.1.5.0
+ * フォントを変更できる機能を追加。別途フォントを変更できるプラグインが必要です。
  * 2023/4/10 Ver.1.4.5
  * フィルタリングクラスの処理修正。
  * 2023/4/9 Ver.1.4.4
@@ -409,6 +425,12 @@
  * @dir img/
  * @default 
  * 
+ * @param FontFace
+ * @desc コマンドのフォントを設定します。
+ * @text コマンドフォント
+ * @type string
+ * @default 
+ * 
  * @param CommandClassMode
  * @text フィルタリングクラス設定モード
  * @desc 適用除外クラス設定のモードを指定します。
@@ -540,6 +562,7 @@ Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
   const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => this.getFindCommand(Commad, text) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
   if (foundIndex >= 0) {
     const commadData = param.CommadIcon[foundIndex];
+    this.nuun_setContentsFontFace(commadData);
     const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
     const textMargin = commadData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
     const textWidth = this.textWidth(text);
@@ -606,6 +629,10 @@ Window_Command.prototype.drawContentsBack = function(bitmap, index) {
   const width = Math.min(bitmap.width, rect.width);
   const height = Math.min(bitmap.height, rect.height);
   this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x + 1, rect.y + 1, width, height);
+};
+
+Window_Command.prototype.nuun_setContentsFontFace = function(data) {
+    this.contents.fontFace = data.FontFace ? data.FontFace : $gameSystem.mainFontFace();
 };
 
 function getClass(_class) {

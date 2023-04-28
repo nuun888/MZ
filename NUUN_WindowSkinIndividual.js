@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * ウィンドウスキンをウィンドウ毎に設定できます。
@@ -23,7 +23,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2022/4/10 Ver.1.0.1
+ * 2023/4/29 Ver.1.0.2
+ * ヘルプウィンドウを表示するシーンを表示する際に、エラーが出る問題を修正。
+ * 2023/4/10 Ver.1.0.1
  * 識別名指定によるクラス指定の処理を追加。
  * 2022/6/15 Ver.1.0.0
  * 初版
@@ -36,98 +38,58 @@
  * 
  * 
  * @param StatusHelp
- * @text ステータスヘルウィンドウスキン設定
+ * @text ステータスヘルプウィンドウスキン設定
  * @default ------------------------------
  * 
  * @param StatusHelpWindowSkin
- * @desc ステータスヘルプウィンドウスキンを指定します。
- * @text ステータスヘルウィンドウスキン画像
- * @type file
- * @dir img/system
- * @default 
- * @parent StatusHelp
- * 
- * @param StatusHelpWindowColor
- * @text ステータスヘルウィンドウカラー
- * @desc ステータスヘルウィンドウの色の設定をします。
- * @default {"red":"0","green":"0","bule":"0"}
- * @type struct<WindowTone>
+ * @text ステータスヘルプウィンドウスキンを指定します。
+ * @text ステータスヘルプウィンドウスキン画像
+ * @default {"WindowSkin":"","WindowColor":"{\"red\":\"0\",\"green\":\"0\",\"bule\":\"0\"}"}
+ * @type struct<HelpWindowSkinList>
  * @parent StatusHelp
  * 
  * @param SaveHelp
- * @text セーブヘルウィンドウスキン設定
+ * @text セーブヘルプウィンドウスキン設定
  * @default ------------------------------
  * 
  * @param SaveHelpWindowSkin
- * @desc セーブヘルプウィンドウスキンを指定します。
- * @text セーブヘルウィンドウスキン画像
- * @type file
- * @dir img/system
- * @default 
- * @parent SaveHelp
- * 
- * @param SaveHelpWindowColor
- * @text セーブヘルウィンドウカラー
- * @desc セーブヘルウィンドウの色の設定をします。
- * @default {"red":"0","green":"0","bule":"0"}
- * @type struct<WindowTone>
+ * @text セーブヘルプウィンドウスキンを指定します。
+ * @text セーブヘルプウィンドウスキン画像
+ * @default {"WindowSkin":"","WindowColor":"{\"red\":\"0\",\"green\":\"0\",\"bule\":\"0\"}"}
+ * @type struct<HelpWindowSkinList>
  * @parent SaveHelp
  * 
  * @param ItemHelp
- * @text アイテムヘルウィンドウスキン設定
+ * @text アイテムヘルプウィンドウスキン設定
  * @default ------------------------------
  * 
  * @param ItemHelpWindowSkin
- * @desc セーブヘルプウィンドウスキンを指定します。
- * @text セーブヘルウィンドウスキン画像
- * @type file
- * @dir img/system
- * @default 
- * @parent ItemHelp
- * 
- * @param ItemHelpWindowColor
- * @text セーブヘルウィンドウカラー
- * @desc セーブヘルウィンドウの色の設定をします。
- * @default {"red":"0","green":"0","bule":"0"}
- * @type struct<WindowTone>
+ * @text アイテムヘルプウィンドウスキンを指定します。
+ * @text アイテムヘルプウィンドウスキン画像
+ * @default {"WindowSkin":"","WindowColor":"{\"red\":\"0\",\"green\":\"0\",\"bule\":\"0\"}"}
+ * @type struct<HelpWindowSkinList>
  * @parent ItemHelp
  * 
  * @param SkillHelp
- * @text スキルヘルウィンドウスキン設定
+ * @text スキルヘルプウィンドウスキン設定
  * @default ------------------------------
  * 
  * @param SkillHelpWindowSkin
- * @desc セーブヘルプウィンドウスキンを指定します。
- * @text セーブヘルウィンドウスキン画像
- * @type file
- * @dir img/system
- * @default 
+ * @text スキルヘルプウィンドウスキンを指定します。
+ * @text スキルヘルプウィンドウスキン画像
+ * @default {"WindowSkin":"","WindowColor":"{\"red\":\"0\",\"green\":\"0\",\"bule\":\"0\"}"}
+ * @type struct<HelpWindowSkinList>
  * @parent SkillHelp
  * 
- * @param SkillHelpWindowColor
- * @text セーブヘルウィンドウカラー
- * @desc セーブヘルウィンドウの色の設定をします。
- * @default {"red":"0","green":"0","bule":"0"}
- * @type struct<WindowTone>
- * @parent SkillHelp
- * 
- * @param EquiplHelp
- * @text 装備ヘルウィンドウスキン設定
+ * @param EquipHelp
+ * @text 装備ヘルプウィンドウスキン設定
  * @default ------------------------------
  * 
  * @param EquipHelpWindowSkin
- * @desc 装備ヘルプウィンドウスキンを指定します。
- * @text 装備ヘルウィンドウスキン画像
- * @type file
- * @dir img/system
- * @default 
- * @parent EquipHelp
- * 
- * @param EquipHelpWindowColor
- * @text 装備ヘルウィンドウカラー
- * @desc 装備ヘルウィンドウの色の設定をします。
- * @default {"red":"0","green":"0","bule":"0"}
- * @type struct<WindowTone>
+ * @text 装備ヘルププウィンドウスキンを指定します。
+ * @text 装備ヘルプウィンドウスキン画像
+ * @default {"WindowSkin":"","WindowColor":"{\"red\":\"0\",\"green\":\"0\",\"bule\":\"0\"}"}
+ * @type struct<HelpWindowSkinList>
  * @parent EquipHelp
  * 
  */
@@ -191,6 +153,22 @@
  * @type struct<WindowTone>
  * 
  */
+/*~struct~HelpWindowSkinList:
+ * 
+ * @param WindowSkin
+ * @desc ウィンドウスキンを指定します。
+ * @text ウィンドウスキン画像
+ * @type file
+ * @dir img/system
+ * @default 
+ * 
+ * @param WindowColor
+ * @text ウィンドウカラー
+ * @desc ウィンドウの色の設定をします。
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * 
+ */
 /*~struct~WindowTone:
  * 
  * @param red
@@ -225,6 +203,11 @@ Imported.NUUN_WindowSkinIndividual = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_WindowSkinIndividual');
     const WindowSkinIndividual = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['WindowSkinIndividual'])) : null) || [];
+    const StatusHelpWindowSkin = DataManager.nuun_structureData(parameters['StatusHelpWindowSkin']);
+    const SaveHelpWindowSkin = DataManager.nuun_structureData(parameters['SaveHelpWindowSkin']);
+    const ItemHelpWindowSkin = DataManager.nuun_structureData(parameters['ItemHelpWindowSkin']);
+    const SkillHelpWindowSkin = DataManager.nuun_structureData(parameters['SkillHelpWindowSkin']);
+    const EquipHelpWindowSkin = DataManager.nuun_structureData(parameters['EquipHelpWindowSkin']);
     let sceneSkinMode = null;
 
     const _Window_Base_initialize = Window_Base.prototype.initialize;
@@ -256,7 +239,12 @@ Imported.NUUN_WindowSkinIndividual = true;
 
     Window_Help.prototype.loadWindowskin = function() {
         if (sceneSkinMode) {
-            this.windowskin = ImageManager.loadSystem(getSkin());
+            const skin = getSkin();
+            if (skin) {
+                this.windowskin = ImageManager.loadSystem(skin);
+            } else {
+                Window_Base.prototype.loadWindowskin.call(this);
+            }
         } else {
             Window_Base.prototype.loadWindowskin.call(this);
         }
@@ -312,15 +300,15 @@ Imported.NUUN_WindowSkinIndividual = true;
     function getSkin() {
         switch (sceneSkinMode) {
             case 'status':
-                return StatusHelpWindowSkin;
+                return StatusHelpWindowSkin && StatusHelpWindowSkin.WindowSkin ? StatusHelpWindowSkin.WindowSkin : null;
             case 'save':
-                return SaveHelpWindowSkin;
+                return SaveHelpWindowSkin && SaveHelpWindowSkin.WindowSkin ? SaveHelpWindowSkin.WindowSkin : null;
             case 'item':
-                return ItemHelpWindowSkin;
+                return ItemHelpWindowSkin && ItemHelpWindowSkin.WindowSkin ? ItemHelpWindowSkin.WindowSkin : null;
             case 'skill':
-                return SkillHelpWindowSkin;
+                return SkillHelpWindowSkin && SkillHelpWindowSkin.WindowSkin ? SkillHelpWindowSkin.WindowSkin : null;
             case 'equip':
-                return EquipHelpWindowSkin;
+                return EquipHelpWindowSkin && EquipHelpWindowSkin.WindowSkin ? EquipHelpWindowSkin.WindowSkin : null;
             default:
                 return null;
         }
@@ -329,15 +317,15 @@ Imported.NUUN_WindowSkinIndividual = true;
     function getTone() {
         switch (sceneSkinMode) {
             case 'status':
-                return StatusHelpWindowColor;
+                return StatusHelpWindowSkin && StatusHelpWindowSkin.WindowColor ? StatusHelpWindowSkin.WindowColor : null;
             case 'save':
-                return SaveHelpWindowColor;
+                return SaveHelpWindowSkin && SaveHelpWindowSkin.WindowColor ? SaveHelpWindowSkin.WindowColor : null;
             case 'item':
-                return ItemHelpWindowColor;
+                return ItemHelpWindowSkin && ItemHelpWindowSkin.WindowColor ? ItemHelpWindowSkin.WindowColor : null;
             case 'skill':
-                return SkillHelpWindowColor;
+                return SkillHelpWindowSkin && SkillHelpWindowSkin.WindowColor ? SkillHelpWindowSkin.WindowColor : null;
             case 'equip':
-                return EquipHelpWindowColor;
+                return EquipHelpWindowSkin && EquipHelpWindowSkin.WindowColor ? EquipHelpWindowSkin.WindowColor : null;
             default:
                 return null;
         }

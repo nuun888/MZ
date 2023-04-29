@@ -1,24 +1,24 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.10.5
+### Ver.3.10.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.2  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.10.2  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.2  
-[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.2  
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.3  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.10.3  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.3  
+[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.32  
 
-バトルスタイル拡張デフォルト設定用 Ver.1.10.2  
+バトルスタイル拡張デフォルト設定用 Ver.1.10.3  
 ![画像](img/BattleStyleEX1.png)  
 
-バトルスタイル拡張スタンダード設定用 Ver.1.10.2 
+バトルスタイル拡張スタンダード設定用 Ver.1.10.3 
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.10.2  
+バトルスタイル拡張XPスタイル設定用 Ver.1.10.3  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.3.2  
+バトルスタイル拡張タイプ4設定用 Ver.1.3.3  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 
@@ -56,7 +56,27 @@
 ステータス座標表示設定の表示ステータス設定で表示させる項目を設定できます。  
 ひとつでも設定している場合は、リストに設定している項目のみステータスウィンドウに表示されます。(デフォルトでは未設定です)  
 ![画像](img/BattleStyleEX11.png)  
-#### 独自パラメータ、ゲージ
+
+#### 独自パラメータ、独自パラメータ(動的) 
+評価式or文字列Aには表示する式をjavascriptで記入します。  
+`this._battler`:アクターゲームデータ  
+`this._battler.actor()`:アクターシステムデータ  
+
+#### 独自ゲージ
+評価式or文字列Aに現在の値をjavascriptで記入します。  
+評価式or文字列Bに最大値をjavascriptで記入します。  
+`this._battler`:アクターゲームデータ  
+`this._battler.actor()`:アクターシステムデータ  
+
+#### ステート,ステート2
+評価式or文字列Aに表示するステートIDを記入します。  
+評価式or文字列Bに表示するバフIDを記入します。  
+
+#### 画像
+評価式or文字列Aには表示条件をjavascriptで記入します。条件が一致しているときに表示されます。  
+無記入の場合は常に表示されます。  
+`actor`:アクターゲームデータ  
+`actor.actor()`:アクターシステムデータ  
 `this._battler`:アクターゲームデータ  
 `this._battler.actor()`:アクターシステムデータ  
 
@@ -177,6 +197,10 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/4/30 Ver.3.10.6  
+画像の表示に条件を指定できる機能を追加。  
+一部のアニメーションで残像が残る問題を修正。  
+行動エフェクト時に顔グラが消える問題を修正。  
 2023/4/16 Ver.3.10.5  
 行動エフェクトと攻撃時の画像切り替えで画像の座標がずれる問題を修正。  
 2023/4/13 Ver.3.10.4  

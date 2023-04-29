@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.10.2
+ * @version 1.10.3
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -37,7 +37,28 @@
  * 表示ステータス設定はアクターステータスに表示するステータスを独自に設定できます。
  * 表示したい項目だけ設定してください。
  * 表示ステータス設定にひとつでも設定してある場合は、こちらの設定が適用されます。
- * 独自パラメータ、ゲージ
+ * 
+ * 
+ * 独自パラメータ、独自パラメータ(動的) 
+ * 評価式or文字列Aには表示する式をjavascriptで記入します。
+ * this._battler:アクターゲームデータ
+ * this._battler.actor():アクターシステムデータ
+ * 
+ * 独自ゲージ
+ * 評価式or文字列Aに現在の値をjavascriptで記入します。
+ * 評価式or文字列Bに最大値をjavascriptで記入します。
+ * this._battler:アクターゲームデータ
+ * this._battler.actor():アクターシステムデータ
+ * 
+ * ステート,ステート2
+ * 評価式or文字列Aに表示するステートIDを記入します。
+ * 評価式or文字列Bに表示するバフIDを記入します。
+ * 
+ * 画像
+ * 評価式or文字列Aには表示条件をjavascriptで記入します。条件が一致しているときに表示されます。
+ * 無記入の場合は常に表示されます。
+ * actor:アクターゲームデータ
+ * actor.actor():アクターシステムデータ
  * this._battler:アクターゲームデータ
  * this._battler.actor():アクターシステムデータ
  * 
@@ -64,6 +85,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/4/30 Ver.1.10.3
+ * 画像に条件式を指定できる機能を追加。
  * 2023/4/11 Ver.1.10.2
  * CounterExtend(トリアコンタン氏)に対応。
  * 2023/3/12 Ver.1.10.1
@@ -2511,7 +2534,7 @@
  * @default 
  * 
  * @param DetaEval1
- * @desc 評価式または文字列。(独自パラメータ、独自ゲージ現在値、ステートID(ステート、ステート2))
+ * @desc 評価式または文字列。(独自パラメータ、独自ゲージ現在値、ステートID(ステート、ステート2)、画像)
  * @text 評価式or文字列A(8)
  * @type string
  * @default 
@@ -2533,6 +2556,12 @@
  * @option 右
  * @value "raight"
  * @default "left"
+ * 
+ * @param FontFace
+ * @desc フォントを設定します。
+ * @text フォント(15)
+ * @type string
+ * @default 
  * 
  * @param GaugeSetting
  * @text ゲージ設定

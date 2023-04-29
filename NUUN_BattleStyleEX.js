@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.5
+ * @version 3.10.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/4/30 Ver.3.10.6
+ * 画像の表示に条件を指定できる機能を追加。
+ * 一部のアニメーションで残像が残る問題を修正。
+ * 行動エフェクト時に顔グラが消える問題を修正。
  * 2023/4/16 Ver.3.10.5
  * 行動エフェクトと攻撃時の画像切り替えで画像の座標がずれる問題を修正。
  * 2023/4/13 Ver.3.10.4
@@ -1979,12 +1983,13 @@ Window_BattleStatus.prototype.drawStatusListData = function(actor, list, index) 
 Window_BattleStatus.prototype.drawLevel = function(actor, data, x, y, width) {
   this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
   this.changeTextColor(ColorManager.systemColor());
+  this.nuun_setContentsFontFace(data);
   const nameText = data.ParamName ? data.ParamName : TextManager.levelA;
   const textWidth = this.textWidth(nameText);
   this.drawText(nameText, x, y, textWidth);
   this.resetTextColor();
   this.drawText(actor.level, x + textWidth + 8, y, width - (textWidth + 8), (data.NamePosition || 'right'));
-  this.contents.fontSize = $gameSystem.mainFontSize();
+  this.resetFontSettings();
 };
 
 Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width) {
@@ -1994,6 +1999,7 @@ Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width)
   const nameText = data.ParamName ? data.ParamName : '';
   const textWidth = Math.max(60 , this.textWidth(nameText));
   this.changeTextColor(ColorManager.systemColor());
+  this.nuun_setContentsFontFace(data);
   if (nameText) {
     this.drawText(nameText, x + textWidth, y, width - textWidth);
   }
@@ -2001,7 +2007,7 @@ Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width)
   if (data.DetaEval) {
       this.drawText(eval(data.DetaEval), x + textWidth + 8, y, width - (textWidth + 8), (data.NamePosition || 'right'));
   }
-  this.contents.fontSize = $gameSystem.mainFontSize();
+  this.resetFontSettings();
 };
 
 Window_BattleStatus.prototype.drawActorIcons = function(actor, x, y, width, data) {
@@ -2017,7 +2023,8 @@ Window_BattleStatus.prototype.drawActorImges = function(actor, data, x, y, width
   if (data.ContentsImges) {
     const key = "actor%1-imges%2".format(actor.actorId(), data.UserParamID || '_img');
     const bitmap = ImageManager.nuun_LoadPictures(data.ContentsImges);
-    const sprite = this.createInnerSprite(key, Sprite);
+    const sprite = this.createInnerSprite(key, Sprite_BSSprite);
+    sprite.setup(actor, data);
     sprite.bitmap = bitmap;
     sprite.x = x;
     sprite.y = y;
@@ -2226,6 +2233,10 @@ Window_BattleStatus.prototype.hide = function() {
     }
 };
 
+Window_BattleStatus.prototype.nuun_setContentsFontFace = function(data) {
+    this.contents.fontFace = data.FontFace ? data.FontFace : $gameSystem.mainFontFace();
+};
+
 //Window_BattleActorImges
 function Window_BattleActorImges() {
     this.initialize(...arguments);
@@ -2380,15 +2391,15 @@ Window_BattleActorImges.prototype.drawItemButler = function(index, actor) {
       stateSprite = new Sprite_StateOverlay();
       this.addChild(stateSprite);
     }
+    sprite._rectWidth = bitmap.width;
+    sprite._rectHeight = bitmap.height;
     sprite.setup(actor, actorImgData, imgIndex, stateSprite);
     const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 8) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
     //const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
     const y = rect.y + (actorImgData.ActorImgVPosition === 'under' ? this.height : 0) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + this.itemPadding() + (actorImgData ? actorImgData.Actor_Y : 0);
     const scale = actorImgData.Actor_Scale / 100;
     sprite.scale.x = scale;
-    sprite.scale.y = scale;
-    sprite._rectWidth = bitmap.width;
-    sprite._rectHeight = bitmap.height;
+    sprite.scale.y = scale; 
     sprite.setHome(x, y);
     sprite.show();
     if (params.Img_SW > 0 || params.Img_SH > 0) {
@@ -2418,7 +2429,6 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
     stateSprite = new Sprite_StateOverlay();
     this.addChild(stateSprite);
   }
-  sprite.setup(actor, actorImgData, imgIndex, stateSprite);
   const scale = actorImgData.Actor_Scale / 100;
   sprite.scale.x = scale;
   sprite.scale.y = scale;
@@ -2426,6 +2436,9 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
   const ph = ImageManager.faceHeight;
   const sw = Math.min(width, pw);
   const sh = Math.min(height, ph);
+  sprite._rectWidth = Math.min(pw, rect.width);
+  sprite._rectHeight = rect.height;
+  sprite.setup(actor, actorImgData, imgIndex, stateSprite);
   const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 8) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
   //const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
   const y = rect.y + (actorImgData.ActorImgVPosition === 'under' ? sh : 1) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + (actorImgData ? actorImgData.Actor_Y : 0);
@@ -2433,8 +2446,6 @@ Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
   const sx = Math.floor((imgIndex % 4) * pw + (pw - sw) / 2);
   const sy = Math.floor(Math.floor(imgIndex / 4) * ph + (ph - sh) / 2);
   sprite.setFrame(sx, sy, sw, sh);
-  sprite._rectWidth = Math.min(pw, rect.width);
-  sprite._rectHeight = rect.height;
   sprite.show();
   BattleManager.battlerSprite[index] = sprite;
 };
@@ -3289,6 +3300,50 @@ Sprite_ActorImges.prototype.loadApngSprite = function(name) {
     return Sprite_Picture.prototype.loadApngSprite.call(this, name);
 };
 
+
+function Sprite_BSSprite() {
+    this.initialize(...arguments);
+}
+  
+Sprite_BSSprite.prototype = Object.create(Sprite.prototype);
+Sprite_BSSprite.prototype.constructor = Sprite_BSSprite;
+  
+Sprite_BSSprite.prototype.initialize = function() {
+    Sprite.prototype.initialize.call(this);
+    this.initMembers();
+};
+
+Sprite_BSSprite.prototype.initMembers = function() {
+    this._data = null;
+    this._battler = null;
+    this.hide();
+};
+
+Sprite_BSSprite.prototype.setup = function(battler, data) {
+    this._data = data;
+    this._battler = battler;
+};
+
+Sprite_BSSprite.prototype.update = function() {
+    this.updateImg();
+    Sprite.prototype.update.call(this);
+};
+
+Sprite_BSSprite.prototype.updateImg = function() {
+    if (this._data && !!this._data.DetaEval1) {
+        const actor = this._battler;
+        if (eval(this._data.DetaEval1)) {
+            if (this._hidden) {
+                this.show();
+            }
+        } else {
+            if (!this._hidden) {
+                this.hide();
+            }
+        }
+    }
+};
+
 //Sprite_BSGauge
 function Sprite_BSGauge() {
   this.initialize(...arguments);
@@ -3568,7 +3623,13 @@ Sprite_BSName.prototype.fontSize = function() {
 };
 
 Sprite_BSName.prototype.fontFace = function() {
-  return params.ActorNameFont ? params.ActorNameFont : $gameSystem.mainFontFace();
+    if (this.userStatusParam && this.userStatusParam.FontFace) {
+        return this.userStatusParam.FontFace;
+    } else if (params.ActorNameFont) {
+        return params.ActorNameFont;
+    } else {
+        return Sprite_Name.prototype.fontFace.call(this);
+    }
 };
 
 Sprite_BSName.prototype.redraw = function() {
@@ -3771,9 +3832,7 @@ Spriteset_Battle.prototype.createStatusLayer = function() {
 };
 
 Spriteset_Battle.prototype.createBattleHud = function() {
-    const sprite = new Sprite();
-    this.addChild(sprite);
-    this._battleHudBase = sprite;
+    this._battleHudBase = this._baseSprite;
 };
 
 const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;

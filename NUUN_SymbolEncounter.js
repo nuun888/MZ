@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Symbol encounter
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @base NUUN_EventRange
  * @orderAfter NUUN_Base
@@ -120,6 +120,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/29/2023 Ver.1.0.3
+ * Fixed an issue where missing a player was not working properly.
  * 2/17/2023 Ver.1.0.2
  * Fixed an issue where battles would start continuously even if you set invincibility.
  * Fixed to initialize when the page is not applicable.
@@ -439,7 +441,7 @@
  * @target MZ
  * @plugindesc シンボルエンカウント
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @base NUUN_EventRange
  * @orderAfter NUUN_Base
@@ -457,6 +459,11 @@
  * イベントのメモ欄
  * <SymbolEncEnemy:[id]> このタグがあるイベントはシンボルエンカウントとなります。
  * [id]:シンボルエンカウント設定ID
+ * 
+ * イベントの1ページ目の実行内容で注釈
+ * <SymbolEncCond:[eval]> 出現条件
+ * [eval]:条件式
+ * イベントの条件の参照がマップ移動時のみ行われます。
  * 
  * プラグインパラメータ
  * 視認範囲
@@ -549,6 +556,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/4/29 Ver.1.0.3
+ * プレイヤーを見失った時の処理が正しく行われていなかった問題を修正。
  * 2023/2/17 Ver.1.0.2
  * 無敵状態を設定しても連続で戦闘が開始してしまう問題を修正。
  * ページが該当しなかったときに初期化するように修正。
@@ -991,6 +1000,8 @@ Imported.NUUN_SymbolEncounter = true;
             this._symbolEncOnCommonEvent = false;
             this._searchTarget = null;
             this._searchTargetIndex = 0;
+            this._symbolEncCond = true;
+            this._symbolEncMoveMode = 0;
         }
     };
 
@@ -1087,6 +1098,7 @@ Imported.NUUN_SymbolEncounter = true;
         this._symbolEncPlayerSearch = data.PlayerSearch;
         this._SymbolEncEscapeMode = data.EscapeMode;
         this._commonEvent = data.CommonEvent;
+        this._symbolEncMoveMode = 0;
         if (!data.AllCharacterImg) {//画像のロード
             const pages = this.event().pages;
             for (const page of pages) {
@@ -1135,7 +1147,7 @@ Imported.NUUN_SymbolEncounter = true;
                     this.resetStopCount();
                 }
             }
-        }  
+        }
     };
 
     const _Game_Event_updateStop = Game_Event.prototype.updateStop;
@@ -1269,7 +1281,7 @@ Imported.NUUN_SymbolEncounter = true;
     };
 
     Game_Event.prototype.symbolEncountLose = function() {
-        if (this._symbolEncSightRange > 0 & this._searchTarget) {
+        if (this._symbolEncSightRange > 0 && this._searchTarget) {
             const x = Math.abs(this.deltaXFrom(this._searchTarget.x));
             const y = Math.abs(this.deltaYFrom(this._searchTarget.y));
             return x > this._symbolEncSightRange || y > this._symbolEncSightRange;
@@ -1576,7 +1588,7 @@ Imported.NUUN_SymbolEncounter = true;
         _Game_Event_updateParallel.call(this);
     };
 
-    Game_Event.prototype.setSymbolEncModeTag = function(page) {
+    Game_Event.prototype.setSymbolEncModeTag = function(page) {//SymbolEncCond
         let symbolEncPage = -1;
         const re = /<(?:SymbolEncMode):\s*(.*)>/;
         page.list.forEach(tag => {
@@ -1751,7 +1763,6 @@ Imported.NUUN_SymbolEncounter = true;
                 } else if (sx2 < -1) {
                     this.moveStraight(6);
                 }
-                
             }
         } else if (sy !== 0) {
             if (sx === 0 && Math.random() < 0.3) {

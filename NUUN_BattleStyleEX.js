@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.7
+ * @version 3.10.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,12 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2023/4/30 Ver.3.10.7
- * 一部のプラグインとの競合対応。
  * 2023/4/30 Ver.3.10.6
  * 画像の表示に条件を指定できる機能を追加。
  * 一部のアニメーションで残像が残る問題を修正。
- * 行動エフェクト時に顔グラが消える問題を修正。
  * 2023/4/16 Ver.3.10.5
  * 行動エフェクトと攻撃時の画像切り替えで画像の座標がずれる問題を修正。
  * 2023/4/13 Ver.3.10.4
@@ -3837,8 +3834,6 @@ Spriteset_Battle.prototype.createBattleHud = function() {
     const sprite = new Sprite();
     this.addChild(sprite);
     this._battleHudBase = sprite;
-    this._battleHudBase.filters = [];
-    this._battleHudBase.filters.push(this._baseColorFilter);
 };
 
 const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;

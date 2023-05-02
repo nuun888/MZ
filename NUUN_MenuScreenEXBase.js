@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.12
+ * @version 2.0.13
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/2/2023 Ver.2.0.13
+ * Fixed an issue where gauge values other than experience were not displayed.
  * 4/29/2023 Ver.2.0.12
  * Fixed an issue where experience values were not displaying correctly.
  * Fixed the problem that the numerical value was displayed even when the display of the experience value was not specified.
@@ -62,7 +64,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.12
+ * @version 2.0.13
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -72,6 +74,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/2 Ver.2.0.13
+ * 経験値以外のゲージの数値が表示されていなかった問題を修正。
  * 2023/4/29 Ver.2.0.12
  * 経験値数値が正常に表示されていなかった問題を修正。
  * 経験値の表示なし指定時でも、数値が表示されていた問題を修正。
@@ -1307,6 +1311,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         const nameText = data.ParamName ? data.ParamName : '';
         this.nuun_setContentsFontFace(data);
         this.drawText(nameText, x, y, width, data.Align);
+        this.resetFontSettings();
     };
     
     Window_InfoMenu.prototype.systemWidth = function(swidth, width) {
@@ -1507,7 +1512,10 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
     
     Sprite_MenuGauge.prototype.drawValue = function() {
-        if (this._statusType === "menuexp" && params.ExpDisplayMode !== 0) {
+        if (this._statusType === "menuexp") {
+            if (params.ExpDisplayMode === 0) {
+                return;
+            }
             let text = this.displyaExp();
             if (params.ExpDisplayMode === 3) {
                 text = this._battler.isMaxLevel() ? "100%" : text +"%";
@@ -1518,6 +1526,8 @@ Imported.NUUN_MenuScreenEXBase = true;
             const height = this.textHeight();
             this.setupValueFont();
             this.bitmap.drawText(text, 0, 0, width, height, "right");
+        } else {
+            Sprite_Gauge.prototype.drawValue.call(this);
         }
     };
 

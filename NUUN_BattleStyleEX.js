@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.6
+ * @version 3.10.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/5/2 Ver.3.10.7
+ * 一部のアニメーションで正常に表示されない問題を修正。
  * 2023/4/30 Ver.3.10.6
  * 画像の表示に条件を指定できる機能を追加。
  * 行動エフェクト時に顔グラが消える問題を修正
@@ -913,16 +915,15 @@ Scene_Battle.prototype.updateStatusWindowVisibility = function() {
 const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
 Scene_Battle.prototype.createSpriteset = function() {
   _Scene_Battle_createSpriteset.call(this);
-  this._spriteset.createStatusLayer();
-  this.addChild(this._spriteset._battleHudBase);
 };
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
-  Scene_Battle.prototype.createAllWindows = function() {
-    this._battleHudBack = this._spriteset._battleHudBack;
-    this._battleHudFront = this._spriteset._battleHudFront;
-    if (this._spriteset._battleEffects) {
-      this._battleEffects = this._spriteset._battleEffects;
+Scene_Battle.prototype.createAllWindows = function() {
+    const spriteset = this._spriteset;
+    this._battleHudBack = spriteset._battleHudBack;
+    this._battleHudFront = spriteset._battleHudFront;
+    if (spriteset._battleEffects) {
+      this._battleEffects = spriteset._battleEffects;
     }
     this.createBackgroundWindow();
     this.createHud();
@@ -3806,6 +3807,7 @@ Spriteset_Base.prototype.animationShouldMirror = function(target) {
 const _Spriteset_Battle_initialize = Spriteset_Battle.prototype.initialize;
 Spriteset_Battle.prototype.initialize = function() {
   _Spriteset_Battle_initialize.call(this);
+  this.createStatusLayer();
 };
 
 const _Spriteset_Battle_findTargetSprite = Spriteset_Battle.prototype.findTargetSprite;

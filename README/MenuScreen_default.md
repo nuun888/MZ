@@ -1,14 +1,14 @@
 # メニュー画面
 
 ## メニュー画面ベース
-### Ver.2.0.13  
+### Ver.2.0.14  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)  
 ## 設定用プラグイン
-メニュー画面デフォルトタイプVer.2.0.3    
+メニュー画面デフォルトタイプVer.2.0.4    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
-メニュー画面タイプ１Ver.2.0.3    
+メニュー画面タイプ１Ver.2.0.4    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
-メニュー画面タイプ２Ver.2.0.3    
+メニュー画面タイプ２Ver.2.0.4    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 
 #### 必須、前提プラグイン
@@ -70,6 +70,9 @@
 "1-10" ステートID1～10番まで表示  
 "3-11,15"ステートID3～11,15番を表示  
 
+ゲージ設定  
+ゲージカラー(左)ゲージカラー(右)はHP、MP、TPに関しては、テキストタブで-1を指定することでデフォルトのカラーインデックスが設定されます。  
+
 ### フォント変更
 別途フォントを変更できるプラグインが必要です。(トリアコンタン様のFontLoad(フォントロードプラグイン)推奨)  
 
@@ -108,6 +111,8 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2023/5/3 Ver.2.0.14  
+ゲージの色変更をHP、MP、TPにも適用できるように修正。  
 2023/5/2 Ver.2.0.13  
 経験値以外のゲージの数値が表示されていなかった問題を修正。  
 2023/4/29 Ver.2.0.12  

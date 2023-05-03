@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.13
+ * @version 2.0.14
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/3/2023 Ver.2.0.14
+ * Fixed so that the color change of the gauge can be applied to HP, MP, and TP.
  * 5/2/2023 Ver.2.0.13
  * Fixed an issue where gauge values other than experience were not displayed.
  * 4/29/2023 Ver.2.0.12
@@ -64,7 +66,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.13
+ * @version 2.0.14
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -74,6 +76,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/3 Ver.2.0.14
+ * ゲージの色変更をHP、MP、TPにも適用できるように修正。
  * 2023/5/2 Ver.2.0.13
  * 経験値以外のゲージの数値が表示されていなかった問題を修正。
  * 2023/4/29 Ver.2.0.12
@@ -1411,7 +1415,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             case "mp":
             case "tp":
             case "time":
-                return Sprite_Gauge.prototype.gaugeColor1.call(this);
+                return this.menuParam.Color1 >= 0 ? NuunManager.getColorCode(this.menuParam.Color1) : Sprite_Gauge.prototype.gaugeColor1.call(this);
             case "menuexp":
                 return NuunManager.getColorCode(params.ExpGaugeColor1);
             default:
@@ -1429,7 +1433,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             case "mp":
             case "tp":
             case "time":
-                return Sprite_Gauge.prototype.gaugeColor2.call(this);
+                return this.menuParam.Color2 >= 0 ? NuunManager.getColorCode(this.menuParam.Color2) : Sprite_Gauge.prototype.gaugeColor2.call(this);
             case "menuexp":
                 return NuunManager.getColorCode(params.ExpGaugeColor2);
             default:

@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.6.1
+# Ver.2.6.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.4以降  
@@ -104,6 +104,9 @@ APNGを表示するには別途ApngPicture.js(トリアコンタン様)が必要
 `[text]`:任意の個別画像。  
 
 ### 更新履歴
+2023/5/4 Ver.2.6.2  
+評価式に職業のデータを参照できるように修正。  
+記述欄を職業から参照できるように修正。  
 2023/3/15 Ver.2.6.1  
 String入力のエラー防止処理を追加。(NUUN_Base Ver.1.6.4以降)  
 2023/3/14 Ver.2.6.0  

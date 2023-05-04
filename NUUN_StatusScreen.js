@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.1
+ * @version 2.6.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -40,9 +40,11 @@
  * 【評価式or文字列の設定】
  * 評価式を記入します。オリジナルパラメータでは必ず記入してください。
  * 能力値、追加能力値、特殊能力値、任意ステータスで有効ですが無記入の場合は任意ステータス以外は自動的に参照されます。
+ * actorclassは記述欄のみ指定します。
  * 
  * this._actorまたはactor 表示中のアクターのゲームデータ
  * dactor 表示中のアクターのデータベース
+ * aclass 表示中のアクターの職業データ
  * 
  * 属性耐性、属性耐性
  * rate 単位付きの属性、ステート有効度
@@ -57,12 +59,15 @@
  * レーダーチャートを表示するにはNUUN_RadarChartBaseが必要です。
  * 
  * アクター、職業のメモ欄
+ * 評価式or文字列でactorclassを選択することで職業のメモ欄から参照されます。指定しない場合はアクターのメモ欄から参照されます。
  * <[tag]:[text]> 記述欄のテキスト
  * [tag]:タグ名
  * [text]:表示するテキスト。
  * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
  * <desc1:ああああ> desc1とタグ付けされた項目に「ああああ」が表示されます。
  * 文章を表示させる場合は<desc1:ああああ>と記入してください。
+ * 
+ * 
  * 
  * ステータスにアクターまたは職業別に画像を表示する。
  * アクター、職業のメモ欄
@@ -92,6 +97,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/4 Ver.2.6.2
+ * 評価式に職業のデータを参照できるように修正。
+ * 記述欄を職業から参照できるように修正。
  * 2023/3/15 Ver.2.6.1
  * String入力のエラー防止処理を追加。(NUUN_Base Ver.1.6.4以降)
  * 2023/3/14 Ver.2.6.0
@@ -1016,7 +1024,7 @@
  * @value 61
  * @option 装備(1)(2)(4)(5)(6)(7)(8)(9)(10)(14)(15)(18)(16)(17)(19)
  * @value 62
- * @option 記述欄(1)(2)(4)(5)(6)(7)(8)(10)(13)(15)(16)(17)
+ * @option 記述欄(1)(2)(3)(4)(5)(6)(7)(8)(10)(13)(15)(16)(17)
  * @value 70
  * @option プロフィール(1)(2)(4)(5)(6)(7)(8)(10)(16)(17)
  * @value 90
@@ -1061,6 +1069,7 @@
  * @option "100 - r +' %';//耐性差分表示"
  * @option "this.expTotalValue();//現在の経験値"
  * @option "this.expNextValue();//次のレベルまで"
+ * @option "actorclass"
  * @default 
  * 
  * @param X_Position
@@ -2058,6 +2067,7 @@ Window_Status.prototype.drawActorFace = function(actor, x, y, width, height) {
 
 Window_Status.prototype.drawActorLevel = function(actor, x, y, width, list) {
     const dactor = actor.actor();
+    const aclass = actor.currentClass();
     this.contentsFontSize(list);
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     let margin = 0;
@@ -2080,24 +2090,26 @@ Window_Status.prototype.drawActorLevel = function(actor, x, y, width, list) {
 };
 
 Window_Status.prototype.drawActorIcons = function(actor, x, y, width, list) {
-  let icons = [];
-  let states = [];
-  const iconWidth = ImageManager.iconWidth;
-  const dataEval = list.DetaEval;
-  if (dataEval) {
-    const stateList = dataEval.split(',');
-    for (const id of stateList) {
-      Array.prototype.push.apply(states, this.nuun_getListIdData(id));
+    let icons = [];
+    let states = [];
+    const dactor = actor.actor();
+    const aclass = actor.currentClass();
+    const iconWidth = ImageManager.iconWidth;
+    const dataEval = list.DetaEval;
+    if (dataEval) {
+        const stateList = dataEval.split(',');
+        for (const id of stateList) {
+        Array.prototype.push.apply(states, this.nuun_getListIdData(id));
+        }
+        icons = actor.allIcons().filter(icon => states.some(id => $dataStates[id].iconIndex === icon)).slice(0, Math.floor(width / iconWidth));
+        let iconX = x;
+        for (const icon of icons) {
+            this.drawIcon(icon, iconX, y + 2);
+            iconX += iconWidth;
+        }
+    } else {
+        Window_StatusBase.prototype.drawActorIcons.call(this, actor, x, y, width);
     }
-    icons = actor.allIcons().filter(icon => states.some(id => $dataStates[id].iconIndex === icon)).slice(0, Math.floor(width / iconWidth));
-    let iconX = x;
-    for (const icon of icons) {
-        this.drawIcon(icon, iconX, y + 2);
-        iconX += iconWidth;
-    }
-  } else {
-    Window_StatusBase.prototype.drawActorIcons.call(this, actor, x, y, width);
-  }
 };
 
 Window_Status.prototype.drawPlaceStateIcon = function(x, y, actor) {
@@ -2107,6 +2119,7 @@ Window_Status.prototype.drawPlaceStateIcon = function(x, y, actor) {
 
 Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) {
     const dactor = actor.actor();
+    const aclass = actor.currentClass();
     if (params === 0) {
         this.placeGauge(actor, "hp", x, y);
     } else if (params === 1) {
@@ -2154,6 +2167,7 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
 
 Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
     const dactor = actor.actor();
+    const aclass = actor.currentClass();
     this.contentsFontSize(list);
     const lineHeight = this.lineHeight();
     const equips = this._actor.equips();
@@ -2228,24 +2242,25 @@ Window_Status.prototype.drawProfile = function(list, actor, x, y, width) {
 };
 
 Window_Status.prototype.drawDesc = function(list, actor, x, y, width) {
-  const text = list.paramName;
-  this.contentsFontSize(list);
-  if (text) {
-    let margin = 0;
-    if (list.IconId > 0) {
-        this.drawIcon(list.IconId, x, y + list.IconY);
-        margin = ImageManager.iconWidth + 4;
+    const textName = list.paramName;
+    this.contentsFontSize(list);
+    if (textName) {
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+        this.drawText(textName, x + margin, y, width - margin);
+        y += this.lineHeight();
     }
-    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    this.drawText(text, x + margin, y, width - margin);
-    y += this.lineHeight();
-  }
-  this.resetTextColor();
-  const method = list.textMethod;
-  if (actor.actor().meta[method]) {
-    this.drawTextEx(actor.actor().meta[method], x, y, width);
-  }
-  this.resetFontSettings();
+    this.resetTextColor();
+    const method = list.textMethod;
+    const text = list.DetaEval === 'actorclass' ? actor.currentClass().meta[method] : actor.actor().meta[method];
+        if (!!text) {
+        this.drawTextEx(text, x, y, width);
+    }
+    this.resetFontSettings();
 };
 
 Window_Status.prototype.drawName = function(list, x, y, width) {
@@ -2265,6 +2280,7 @@ Window_Status.prototype.drawName = function(list, x, y, width) {
 
 Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) {
     const dactor = actor.actor();
+    const aclass = actor.currentClass();
     this.contentsFontSize(list);
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     if (list.Back) {
@@ -2296,6 +2312,7 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
 
 Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
     const dactor = actor.actor();
+    const aclass = actor.currentClass();
     const lineHeight = this.lineHeight();
     this.contentsFontSize(list);
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
@@ -2351,6 +2368,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
 
 Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
     const dactor = actor.actor();
+    const aclass = actor.currentClass();
     const lineHeight = this.lineHeight();
     this.contentsFontSize(list);
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));

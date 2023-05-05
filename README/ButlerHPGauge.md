@@ -1,5 +1,5 @@
 # [敵HPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
-# Ver.1.6.0
+# Ver.1.6.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
@@ -47,7 +47,8 @@ this.enemy() 敵のデータベースデータ
 敵選択時、敵のダメージ時に表示されます。  
 
 #### 初期HPゲージ表示
-初期状態でのHPゲージの表示を設定します。HPゲージが特徴によって表示、図鑑登録で表示する場合は非表示にします。
+`<HPGaugeVisible>`の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。  
+上記の特徴を使用する場合は初期HPゲージ表示を非表示に設定してください。 
 
 ### モンスター図鑑の情報登録を反映
 この機能を使用するには[モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)が必要です。
@@ -59,6 +60,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にHPゲージを表示します。  
 
 ## 更新履歴
+2023/5/6 Ver.1.6.1  
+HPゲージの表示をフェードアウト、フェードインさせるように修正。  
 2022/9/17 Ver.1.6.0  
 敵キャラ毎にHPゲージの横幅、縦幅を指定できる機能を追加。  
 2022/5/14 Ver.1.5.0  

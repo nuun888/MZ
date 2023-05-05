@@ -1,5 +1,5 @@
 # [敵名前表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)
-# Ver.1.3.0  
+# Ver.1.3.1  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)  
  
 ## 必須、前提プラグイン
@@ -20,6 +20,8 @@
 `[id]`は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。  
 
 ## 更新履歴
+2023/5/6 Ver.1.3.1  
+敵の名前の表示をフェードアウト、フェードインさせるように修正。  
 2022/5/10 Ver.1.3.0  
 バトラーの表示処理の定義大幅変更に関する定義変更。  
 2021/11/8 Ver.1.2.2  

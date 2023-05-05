@@ -9,6 +9,8 @@
 ※このプラグインのみでフロントビューでアクター側にポップアップを表示させることはできません。  
 ![GIF](img/BattleLogSimpleDisplayPopupBatch.gif)  
 
+ログウィンドウ指定時のバトルログウィンドウのクラスは`Window_NUUN_BattleLog`です。  
+
 ## 設定
 ### ログ設定
 #### ログメッセージ  

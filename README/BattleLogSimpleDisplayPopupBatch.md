@@ -6,12 +6,15 @@
 
 バトルログをアイテム名、スキル名のみ表示させるようにします。  
 また、このプラグインではポップアップを一括で表示させます。  
+![GIF](img/BattleLogSimpleDisplayPopupBatch.gif)
 
 ## 設定
 ### ログ設定
 #### ログメッセージ  
+![画像](img/BattleLogSimpleDisplayPopupBatch1.png)  
 
 #### ログウィンドウ  
+![画像](img/BattleLogSimpleDisplayPopupBatch2.png)  
 
 ### ログ表示位置
 #### 通常
@@ -21,6 +24,8 @@
 #### バトラー
 バトラー(アクターはサイドビューバトラー、敵キャラはモンスター画像)の位置基準に表示されます。座標設定はこの表示位置からの相対座標になり、
 ログ表示位置バトラー設定で設定した座標が加算されます。尚子のモードはログ設定でログウィンドウを選択したときに有効になります。    
+![画像](img/BattleLogSimpleDisplayPopupBatch3.png)  
+![画像](img/BattleLogSimpleDisplayPopupBatch4.png)  
 
 ログ表示位置をバトラー(ログウィンドウのみ)に設定したときに、敵キャラのモンスター毎にログを表示する位置を指定できます。  
 敵キャラのメモ欄  

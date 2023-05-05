@@ -6,7 +6,7 @@
 
 バトルログをアイテム名、スキル名のみ表示させるようにします。  
 また、このプラグインではポップアップを一括で表示させます。  
-![GIF](img/BattleLogSimpleDisplayPopupBatch.gif)
+![GIF](img/BattleLogSimpleDisplayPopupBatch.gif)  
 
 ## 設定
 ### ログ設定

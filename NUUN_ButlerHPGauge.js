@@ -12,7 +12,7 @@
  * @plugindesc  敵HPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.6.0
+ * @version 1.6.1
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -44,6 +44,10 @@
  * 例　<HPGaugeMask:this.hp < this.mhp * 0.3>
  * 敵のHPが３０％未満の時のみHP値を表示します。
  * 
+ * 初期HPゲージ表示
+ * <HPGaugeVisible>の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。
+ * 上記の特徴を使用する場合は初期HPゲージ表示を非表示に設定してください。
+ * 
  * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
  * 
  * 疑似３Dバトルを入れている場合はこのプラグインを疑似３Dバトルを下に配置してください。
@@ -54,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/6 Ver.1.6.1
+ * HPゲージの表示をフェードアウト、フェードインさせるように修正。
  * 2022/9/17 Ver.1.6.0
  * 敵キャラ毎にHPゲージの横幅、縦幅を指定できる機能を追加。
  * 2022/5/14 Ver.1.5.0
@@ -119,6 +125,10 @@
  * @value 2
  * @default 0
  * 
+ * @param VisibleSetting
+ * @text 表示設定
+ * @default ------------------------------
+ * 
  * @param HPVisible
  * @desc HPゲージの表示タイミング
  * @text HPゲージ表示タイミング
@@ -133,27 +143,9 @@
  * @value 3
  * @default 0
  * 
- * @param HPVisibleMode
- * @desc 初期状態でのHPゲージの表示。特徴によってやHPゲージの表示タイミングによって表示されるようになります。
- * @text HPゲージ表示
- * @type select
- * @option 表示
- * @value 0
- * @option 非表示
- * @value 1
- * @default 0
- * 
- * @param HPEnemyBookVisible
- * @desc HPゲージの表示タイミング（モンスター図鑑）
- * @text HPゲージ表示タイミング（モンスター図鑑）
- * @type select
- * @option 指定なし
- * @value 0
- * @option 図鑑登録後に表示
- * @value 1
- * @option 図鑑情報登録後に表示
- * @value 2
- * @default 0
+ * @param GaugeSetting
+ * @text ゲージ設定
+ * @default ------------------------------
  * 
  * @param GaugeWidth
  * @desc ゲージの横幅を指定します。
@@ -214,6 +206,38 @@
  * @text HPの数値を隠す時の文字
  * @type string
  * @default ????
+ * 
+ * @param SpecialSetting
+ * @text 特殊設定
+ * @default ------------------------------
+ * 
+ * @param HPVisibleMode
+ * @desc 初期状態でのHPゲージの表示。特徴によってやHPゲージの表示タイミングによって表示されるようになります。
+ * @text 初期HPゲージ表示
+ * @type select
+ * @option 表示
+ * @value 0
+ * @option 非表示
+ * @value 1
+ * @default 0
+ * 
+ * @param EnemyBookSetting
+ * @text 図鑑連動設定
+ * @default ------------------------------
+ * 
+ * @param HPEnemyBookVisible
+ * @desc HPゲージの表示タイミング（モンスター図鑑）
+ * @text HPゲージ表示タイミング（モンスター図鑑）
+ * @type select
+ * @option 指定なし
+ * @value 0
+ * @option 図鑑登録後に表示
+ * @value 1
+ * @option 図鑑情報登録後に表示
+ * @value 2
+ * @default 0
+ * 
+ * 
  *  
  * 
  */
@@ -342,6 +366,11 @@ Sprite_EnemyHPGauge.prototype.drawLabel = function() {
   }
 };
 
+Sprite_EnemyHPGauge.prototype.setup = function(battler, type) {
+    Sprite_Gauge.prototype.setup.call(this, battler, type);
+    this.opacity = (this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect())) ? 255 : 0;
+};
+
 Sprite_EnemyHPGauge.prototype.gaugeX = function() {
   if (!HPLabelVisible) {
     return 0;
@@ -370,7 +399,19 @@ Sprite_EnemyHPGauge.prototype.updateBitmap = function() {
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeVisible = function() {
-  this.visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+    const _visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+    if (_visible && this.opacity < 255) {
+        this.opacity += 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    } else if (!_visible && this.opacity > 0) {
+        this.opacity -= 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    }
+    if (this.opacity > 0) {
+        this.visible = true;
+    } else {
+        this.visible = false;
+    }
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeVisibleResult = function() {

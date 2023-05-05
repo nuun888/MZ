@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  敵名前表示
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -35,6 +35,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/6 Ver.1.3.1
+ * HPゲージの表示をフェードアウト、フェードインさせるように修正。
  * 2022/5/10 Ver.1.3.0
  * バトラーの表示処理の定義大幅変更に関する定義変更。
  * 2021/11/8 Ver.1.2.2
@@ -205,13 +207,14 @@ Sprite_ButlerName.prototype = Object.create(Sprite_Name.prototype);
 Sprite_ButlerName.prototype.constructor = Sprite_ButlerName;
 
 Sprite_ButlerName.prototype.initialize = function() {
-  Sprite_Name.prototype.initialize.call(this);
-  this.anchor.x = 0.5;
-  this.anchor.y = 1;
+    Sprite_Name.prototype.initialize.call(this);
+    this.anchor.x = 0.5;
+    this.anchor.y = 1;
+    this.opacity = EnemyNameVisible === 0 ? 255 : 0;
 };
 
 Sprite_ButlerName.prototype.fontSize = function() {
-  return $gameSystem.mainFontSize() + Name_FontSize;
+    return $gameSystem.mainFontSize() + Name_FontSize;
 };
 
 Sprite_ButlerName.prototype.redraw = function() {
@@ -224,7 +227,19 @@ Sprite_ButlerName.prototype.redraw = function() {
 };
 
 Sprite_ButlerName.prototype.butlerNameVisible = function() {
-  this.visible = this.butlerNameVisibleInSelect();
+    const _visible = this.butlerNameVisibleInSelect();
+    if (_visible && this.opacity < 255) {
+        this.opacity += 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    } else if (!_visible && this.opacity > 0) {
+        this.opacity -= 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    }
+    if (this.opacity > 0) {
+        this.visible = true;
+    } else {
+        this.visible = false;
+    }
 };
 
 Sprite_ButlerName.prototype.butlerNameVisibleInSelect = function() {

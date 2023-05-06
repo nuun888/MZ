@@ -1,5 +1,5 @@
 # [敵MPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyMPGauge.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyMPGauge.js)  
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
@@ -46,8 +46,9 @@ this.enemy() 敵のデータベースデータ
 `選択時、ダメージ時`  
 敵選択時、敵のダメージ時に表示されます。  
 
-#### 初期MPゲージ表示
-初期状態でのMPゲージの表示を設定します。MPゲージが特徴によって表示、図鑑登録で表示する場合は非表示にします。
+#### 初期MPゲージ表示  
+`<MPGaugeVisible>`の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。  
+上記の特徴を使用する場合は初期MPゲージ表示を非表示に設定してください。  
 
 ### モンスター図鑑の情報登録を反映
 この機能を使用するには[モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)が必要です。
@@ -59,6 +60,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にMPゲージを表示します。  
 
 ## 更新履歴
+2023/5/7 Ver.1.1.1  
+MPゲージの表示をフェードアウト、フェードインさせるように修正。  
 2022/5/14 Ver.1.1.0  
 バトラーの表示処理の定義大幅変更に関する定義変更。  
 2022/1/10 Ver.1.0.1  

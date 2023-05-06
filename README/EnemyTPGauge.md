@@ -1,5 +1,5 @@
 # [敵TPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js)
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
@@ -41,13 +41,14 @@ this.enemy() 敵のデータベースデータ
 常に表示されます。  
 `選択時`  
 敵対象選択時に表示します。  
-`ダメージ時`   
+`TP変動時`   
 敵のダメージ時に表示されます。  
-`選択時、ダメージ時`  
+`選択時、TP変動時`  
 敵選択時、敵のダメージ時に表示されます。  
 
 #### 初期TPゲージ表示
-初期状態でのTPゲージの表示を設定します。TPゲージが特徴によって表示、図鑑登録で表示する場合は非表示にします。
+`<TPGaugeVisible>`の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。  
+上記の特徴を使用する場合は初期TPゲージ表示を非表示に設定してください。  
 
 ### モンスター図鑑の情報登録を反映
 この機能を使用するには[モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)が必要です。
@@ -59,6 +60,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にTPゲージを表示します。  
 
 ## 更新履歴
+2023/5/7 Ver.1.1.1  
+TPゲージの表示をフェードアウト、フェードインさせるように修正。  
 2022/5/14 Ver.1.1.0  
 バトラーの表示処理の定義大幅変更に関する定義変更。  
 2022/2/12 Ver.1.0.3  

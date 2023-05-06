@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 敵ステート表示拡張
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -36,6 +36,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/6 Ver.1.1.1
+ * ステートの表示をフェードアウト、フェードインさせるように修正。
  * 2022/5/10 Ver.1.1.0
  * バトラーの表示処理の定義大幅変更に関する定義変更。
  * 2022/3/27 Ver.1.0.1
@@ -150,6 +152,12 @@ Sprite_Enemy.prototype.createStateIconSprite = function() {//再定義
 };
 
 
+const _Sprite_StateIcon_initMembers = Sprite_StateIcon.prototype.initMembers;
+Sprite_StateIcon.prototype.initMembers = function() {
+    _Sprite_StateIcon_initMembers.call(this);
+    this.opacity = StateVisible === 0 ? 255 : 0;
+};
+
 Sprite_StateIcon.prototype.stateVisibleInSelect = function() {
   if (StateVisible === 1) {
     return this._battler.isSelected();
@@ -158,7 +166,19 @@ Sprite_StateIcon.prototype.stateVisibleInSelect = function() {
 };
 
 Sprite_StateIcon.prototype.stateVisible = function() {
-  this.visible = this.stateVisibleInSelect();
+  const _visible = this.stateVisibleInSelect();
+  if (_visible && this.opacity < 255) {
+      this.opacity += 25;
+      this.opacity = this.opacity.clamp(0, 255);
+  } else if (!_visible && this.opacity > 0) {
+      this.opacity -= 25;
+      this.opacity = this.opacity.clamp(0, 255);
+  }
+  if (this.opacity > 0) {
+      this.visible = true;
+  } else {
+      this.visible = false;
+  }
 };
 
 const _Sprite_StateIcon_update = Sprite_StateIcon.prototype.update;

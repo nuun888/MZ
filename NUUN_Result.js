@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.6
+ * @version 2.3.7
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/5/6 Ver.2.3.7
+ * Fixed the display position of the side view actor and character chip.
  * 2023/4/23 Ver.2.3.6
  * Conflict measures with the skill tree plugin.
  * Fixed to display 0 for the experience points gained at maximum level.
@@ -1881,6 +1883,7 @@
  * @desc Enter Eval or string.
  * @text Eval or String(9)
  * @type combo
+ * @option '$skillTreeData.sp(a.actorId());//Skill tree Get Sp'
  * @default 
  * 
  * @param FontSize
@@ -2278,7 +2281,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.6
+ * @version 2.3.7
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2323,6 +2326,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/6 Ver.2.3.7
+ * サイドビューアクター、キャラチップの表示位置を修正。
  * 2023/4/23 Ver.2.3.6
  * スキルツリープラグインとの競合対策。
  * 最大レベル時の獲得した経験値を0で表示するように修正。
@@ -4145,6 +4150,7 @@
  * @desc 評価式または文字列を記入します。
  * @text 評価式or文字列(9)
  * @type combo
+ * @option '$skillTreeData.sp(a.actorId());//Skill tree Get Sp'
  * @default 
  * 
  * @param FontSize
@@ -5423,6 +5429,12 @@ Window_StatusBase.prototype.windowResultFilterHeightArea = function() {
   }
 };
 
+Window_StatusBase.prototype.drawResultActorCharacter = function(actor, x, y) {
+    x += 24;
+    y += 48;
+    this.drawActorCharacter(actor, x, y);
+};
+
 
 function Window_ResultHelp() {
   this.initialize(...arguments);
@@ -5609,6 +5621,13 @@ Window_ResultActorExp.prototype.initialize = function(rect) {
   this._isWindow = false;
   this._contentsBackVisible = !EXPResistContentsBackVisible;
   this.setResultWindowMode(ActorExpWindowVisible);
+  this.loadResultCharacter();
+};
+
+Window_ResultActorExp.prototype.loadResultCharacter = function() {
+    for (const actor of this.members()) {
+        ImageManager.loadCharacter(actor.characterName());
+    }
 };
 
 const _Window_ResultActorExp_updateOpen = Window_ResultActorExp.prototype.updateOpen;
@@ -5719,7 +5738,7 @@ Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width,
     case 0:
       break;
     case 1:
-      this.drawActorCharacter(actor, x, y);
+      this.drawResultActorCharacter(actor, x, y);
       break;
     case 2:
       this.drawActorFace(data, actor, x, y, height);
@@ -5767,7 +5786,7 @@ Window_ResultActorExp.prototype.drawActorFace = function(data, actor, x, y, heig
 
 Window_ResultActorExp.prototype.drawSvActor = function(data, actor, x, y, width) {
   const bitmap = ImageManager.loadSvActor(actor.battlerName());
-  this.drawSvActorImg(actor, x, y);
+  this.drawSvActorImg(actor, x + Math.floor(bitmap.width / 18), y);
 };
 
 Window_ResultActorExp.prototype.drawActorImg = function(data, actor, x, y, width, height) {
@@ -6497,7 +6516,7 @@ Window_ResultActorStatus.prototype.dateDisplay = function(data, index, actor, x,
       this.drawOriginalStatusParam(data, index, actor, x, y, width);
       break;
     case 20:
-      this.drawActorCharacter(actor, x, y);
+      this.drawResultActorCharacter(actor, x, y);
       break;
     case 21:
       this.drawActorFace(data, actor, x, y);
@@ -6722,7 +6741,7 @@ Window_ResultActorStatus.prototype.drawActorFace = function(data, actor, x, y) {
 
 Window_ResultActorStatus.prototype.drawSvActor = function(data, actor, x, y, width) {
   const bitmap = ImageManager.loadSvActor(actor.battlerName());
-  this.drawSvActorImg(actor, x, y);
+  this.drawSvActorImg(actor, x + Math.floor(bitmap.width / 18), y);
 };
 
 Window_ResultActorStatus.prototype.drawActorName = function(data, actor, x, y, width) {

@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.14
+ * @version 2.0.15
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/7/2023 Ver.2.0.15
+ * Fixed an issue where setting an image to an actor status would cause an error.
  * 5/3/2023 Ver.2.0.14
  * Fixed so that the color change of the gauge can be applied to HP, MP, and TP.
  * 5/2/2023 Ver.2.0.13
@@ -66,7 +68,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.14
+ * @version 2.0.15
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -76,6 +78,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/7 Ver.2.0.15
+ * アクターステータスに画像を設定するとエラーが出る問題を修正。
  * 2023/5/3 Ver.2.0.14
  * ゲージの色変更をHP、MP、TPにも適用できるように修正。
  * 2023/5/2 Ver.2.0.13
@@ -545,7 +549,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         for (const data of params.StatusList) {
             switch (data.DateSelect) {
                 case 200:
-                    loadBitmap = this.loadContentsImg();
+                    loadBitmap = this.loadContentsImg(data);
                     break;
             }
             if (loadBitmap && !loadBitmap.isReady()) {
@@ -560,7 +564,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
     };
 
-    Window_MenuStatus.prototype.loadContentsImg = function() {
+    Window_MenuStatus.prototype.loadContentsImg = function(data) {
         return ImageManager.nuun_LoadPictures(data.ImgData);
     };
 

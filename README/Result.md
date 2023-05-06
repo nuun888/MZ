@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.3.6
+# Ver.2.3.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 

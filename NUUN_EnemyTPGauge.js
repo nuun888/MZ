@@ -12,7 +12,7 @@
  * @plugindesc  敵TPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -40,6 +40,10 @@
  * 例　<TPGaugeMask:this.tp >= this.maxTp() * 0.5>
  * 敵のTPが５０％以上の時にTP値を表示します。
  * 
+ * 初期TPゲージ表示
+ * <TPGaugeVisible>の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。
+ * 上記の特徴を使用する場合は初期TPゲージ表示を非表示に設定してください。
+ * 
  * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
  * 
  * 疑似３Dバトルを入れている場合はこのプラグインを疑似３Dバトルを下に配置してください。
@@ -50,6 +54,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/7 Ver.1.1.1
+ * HPゲージの表示をフェードアウト、フェードインさせるように修正。
  * 2022/5/14 Ver.1.1.0
  * バトラーの表示処理の定義大幅変更に関する定義変更。
  * 2022/2/12 Ver.1.0.3
@@ -79,6 +85,10 @@
  * @value 2
  * @default 0
  * 
+ * @param VisibleSetting
+ * @text 表示設定
+ * @default ------------------------------
+ * 
  * @param TPVisible
  * @desc TPゲージの表示タイミング
  * @text TPゲージ表示タイミング
@@ -87,33 +97,15 @@
  * @value 0
  * @option 選択時
  * @value 1
- * @option ダメージ時
+ * @option TP変動時
  * @value 2
- * @option 選択時、ダメージ時
+ * @option 選択時、TP変動時
  * @value 3
  * @default 0
  * 
- * @param TPVisibleMode
- * @desc 初期状態でのTPゲージの表示。特徴によってやTPゲージの表示タイミングによって表示されるようになります。
- * @text TPゲージ表示
- * @type select
- * @option 表示
- * @value 0
- * @option 非表示
- * @value 1
- * @default 0
- * 
- * @param TPEnemyBookVisible
- * @desc TPゲージの表示タイミング（モンスター図鑑）
- * @text TPゲージ表示タイミング（モンスター図鑑）
- * @type select
- * @option 指定なし
- * @value 0
- * @option 図鑑登録後に表示
- * @value 1
- * @option 図鑑情報登録後に表示
- * @value 2
- * @default 0
+ * @param GaugeSetting
+ * @text ゲージ設定
+ * @default ------------------------------
  * 
  * @param GaugeWidth
  * @desc ゲージの横幅を指定します。
@@ -174,6 +166,36 @@
  * @text TPの数値を隠す時の文字
  * @type string
  * @default ????
+ * 
+ * @param SpecialSetting
+ * @text 特殊設定
+ * @default ------------------------------
+ * 
+ * @param TPVisibleMode
+ * @desc 初期状態でのTPゲージの表示。特徴によってやTPゲージの表示タイミングによって表示されるようになります。
+ * @text 初期TPゲージ表示
+ * @type select
+ * @option 表示
+ * @value 0
+ * @option 非表示
+ * @value 1
+ * @default 0
+ * 
+ * @param EnemyBookSetting
+ * @text 図鑑連動設定
+ * @default ------------------------------
+ * 
+ * @param TPEnemyBookVisible
+ * @desc TPゲージの表示タイミング（モンスター図鑑）
+ * @text TPゲージ表示タイミング（モンスター図鑑）
+ * @type select
+ * @option 指定なし
+ * @value 0
+ * @option 図鑑登録後に表示
+ * @value 1
+ * @option 図鑑情報登録後に表示
+ * @value 2
+ * @default 0
  * 
  * 
  */
@@ -275,6 +297,11 @@ Sprite_EnemyTPGauge.prototype.initialize = function() {
   this.anchor.y = 1;
 };
 
+Sprite_EnemyTPGauge.prototype.setup = function(battler, type) {
+    Sprite_Gauge.prototype.setup.call(this, battler, type);
+    this.opacity = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect()) ? 255 : 0;
+};
+
 Sprite_EnemyTPGauge.prototype.bitmapWidth = function() {
   return GaugeWidth > 0 ? GaugeWidth : 128;
 };
@@ -325,7 +352,19 @@ Sprite_EnemyTPGauge.prototype.updateBitmap = function() {
 };
 
 Sprite_EnemyTPGauge.prototype.gaugeVisible = function() {
-  this.visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+    const _visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+    if (_visible && this.opacity < 255) {
+        this.opacity += 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    } else if (!_visible && this.opacity > 0) {
+        this.opacity -= 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    }
+    if (this.opacity > 0) {
+        this.visible = true;
+    } else {
+        this.visible = false;
+    }
 };
 
 Sprite_EnemyTPGauge.prototype.gaugeVisibleResult = function() {

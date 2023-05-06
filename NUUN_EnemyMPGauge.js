@@ -12,7 +12,7 @@
  * @plugindesc  敵MPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -40,6 +40,10 @@
  * 例　<MPGaugeMask:this.mp < this.mmp * 0.3>
  * 敵のMPが３０％未満の時にMP値を表示します。
  * 
+ * 初期MPゲージ表示
+ * <MPGaugeVisible>の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。
+ * 上記の特徴を使用する場合は初期MPゲージ表示を非表示に設定してください。
+ * 
  * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
  * 
  * 疑似３Dバトルを入れている場合はこのプラグインを疑似３Dバトルを下に配置してください。
@@ -50,6 +54,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/7 Ver.1.1.1
+ * HPゲージの表示をフェードアウト、フェードインさせるように修正。
  * 2022/5/14 Ver.1.1.0
  * バトラーの表示処理の定義大幅変更に関する定義変更。
  * 2022/1/10 Ver.1.0.2
@@ -77,6 +83,10 @@
  * @value 2
  * @default 0
  * 
+ * @param VisibleSetting
+ * @text 表示設定
+ * @default ------------------------------
+ * 
  * @param MPVisible
  * @desc MPゲージの表示タイミング
  * @text MPゲージ表示タイミング
@@ -85,33 +95,15 @@
  * @value 0
  * @option 選択時
  * @value 1
- * @option ダメージ時
+ * @option MP変動時
  * @value 2
- * @option 選択時、ダメージ時
+ * @option 選択時、MP変動時
  * @value 3
  * @default 0
  * 
- * @param MPVisibleMode
- * @desc 初期状態でのMPゲージの表示。特徴によってやMPゲージの表示タイミングによって表示されるようになります。
- * @text MPゲージ表示
- * @type select
- * @option 表示
- * @value 0
- * @option 非表示
- * @value 1
- * @default 0
- * 
- * @param MPEnemyBookVisible
- * @desc MPゲージの表示タイミング（モンスター図鑑）
- * @text MPゲージ表示タイミング（モンスター図鑑）
- * @type select
- * @option 指定なし
- * @value 0
- * @option 図鑑登録後に表示
- * @value 1
- * @option 図鑑情報登録後に表示
- * @value 2
- * @default 0
+ * @param GaugeSetting
+ * @text ゲージ設定
+ * @default ------------------------------
  * 
  * @param GaugeWidth
  * @desc ゲージの横幅を指定します。
@@ -172,6 +164,36 @@
  * @text MPの数値を隠す時の文字
  * @type string
  * @default ????
+ * 
+ * @param SpecialSetting
+ * @text 特殊設定
+ * @default ------------------------------
+ * 
+ * @param MPVisibleMode
+ * @desc 初期状態でのMPゲージの表示。特徴によってやMPゲージの表示タイミングによって表示されるようになります。
+ * @text MPゲージ表示
+ * @type select
+ * @option 表示
+ * @value 0
+ * @option 非表示
+ * @value 1
+ * @default 0
+ * 
+ * @param EnemyBookSetting
+ * @text 図鑑連動設定
+ * @default ------------------------------
+ * 
+ * @param MPEnemyBookVisible
+ * @desc MPゲージの表示タイミング（モンスター図鑑）
+ * @text MPゲージ表示タイミング（モンスター図鑑）
+ * @type select
+ * @option 指定なし
+ * @value 0
+ * @option 図鑑登録後に表示
+ * @value 1
+ * @option 図鑑情報登録後に表示
+ * @value 2
+ * @default 0
  * 
  * 
  */
@@ -273,6 +295,11 @@ Sprite_EnemyMPGauge.prototype.initialize = function() {
   this.anchor.y = 1;
 };
 
+Sprite_EnemyMPGauge.prototype.setup = function(battler, type) {
+    Sprite_Gauge.prototype.setup.call(this, battler, type);
+    this.opacity = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect()) ? 255 : 0;
+};
+
 Sprite_EnemyMPGauge.prototype.bitmapWidth = function() {
   return GaugeWidth > 0 ? GaugeWidth : 128;
 };
@@ -323,7 +350,19 @@ Sprite_EnemyMPGauge.prototype.updateBitmap = function() {
 };
 
 Sprite_EnemyMPGauge.prototype.gaugeVisible = function() {
-  this.visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+    const _visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+    if (_visible && this.opacity < 255) {
+        this.opacity += 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    } else if (!_visible && this.opacity > 0) {
+        this.opacity -= 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    }
+    if (this.opacity > 0) {
+        this.visible = true;
+    } else {
+        this.visible = false;
+    }
 };
 
 Sprite_EnemyMPGauge.prototype.gaugeVisibleResult = function() {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.7
+ * @version 3.10.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/5/7 Ver.3.10.8
+ * 戦闘中のアクターへのアニメーション実行プラグイン対応による処理追加。
  * 2023/5/2 Ver.3.10.7
  * 一部のアニメーションで正常に表示されない問題を修正。
  * 2023/4/30 Ver.3.10.6
@@ -306,6 +308,11 @@ function loadBackground(img) {
 function getStateAnimationShow() {
   return !$gameSystem.isSideView() && params.ActorEffectShow && params.StateAnimationShow;
 }
+
+
+NuunManager.bsAnimationShouldMirror = function() {
+    return params.ActorsMirror;
+};
 
 
 const _BattleManager_initMembers = BattleManager.initMembers;
@@ -3802,6 +3809,7 @@ const _Spriteset_Base_animationShouldMirror = Spriteset_Base.prototype.animation
 Spriteset_Base.prototype.animationShouldMirror = function(target) {
     return params.ActorsMirror ? _Spriteset_Base_animationShouldMirror.call(this, target) : false;
 };
+
 
 //Spriteset_Battle
 const _Spriteset_Battle_initialize = Spriteset_Battle.prototype.initialize;

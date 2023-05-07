@@ -9,16 +9,16 @@
 [バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.3  
 [バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.32  
 
-バトルスタイル拡張デフォルト設定用 Ver.1.10.3  
+バトルスタイル拡張デフォルト設定用 Ver.1.10.4  
 ![画像](img/BattleStyleEX1.png)  
 
-バトルスタイル拡張スタンダード設定用 Ver.1.10.3 
+バトルスタイル拡張スタンダード設定用 Ver.1.10.4 
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.10.3  
+バトルスタイル拡張XPスタイル設定用 Ver.1.10.4  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.3.3  
+バトルスタイル拡張タイプ4設定用 Ver.1.3.4  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 

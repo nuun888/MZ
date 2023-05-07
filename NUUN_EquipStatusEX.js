@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.5
+ * @version 1.3.6
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/8/2023 Ver.1.3.6
+ * Added function to display difference parameters.
  * 4/22/2023 Ver.1.3.5
  * Fixed an issue where the X coordinate specification of current and corrected stats was not applied.
  * 4/16/2023 Ver.1.3.4
@@ -118,6 +120,13 @@
  * @text Equipment status setting
  * @type struct<EquipPageListData>[]
  * @default ["{\"ListDateSetting\":\"1\"}","{\"ListDateSetting\":\"2\"}","{\"ListDateSetting\":\"3\"}","{\"ListDateSetting\":\"4\"}","{\"ListDateSetting\":\"5\"}"]
+ * @parent EquipSetting
+ * 
+ * @param EquipStatusDifference
+ * @text Param difference display
+ * @desc Displays the difference in parameter variation values.
+ * @type boolean
+ * @default false
  * @parent EquipSetting
  * 
  * @param EquipStatusCols
@@ -799,7 +808,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.5
+ * @version 1.3.6
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -828,6 +837,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/8 Ver.1.3.6
+ * 差分パラメータを表示する機能を追加。
  * 2023/4/22 Ver.1.3.5
  * 現在値及び補正後能力値のX座標指定が適用されていなかった問題を修正。
  * 2023/4/16 Ver.1.3.4
@@ -906,6 +917,13 @@
  * @text 装備ステータス設定
  * @type struct<EquipPageListData>[]
  * @default ["{\"ListDateSetting\":\"1\"}","{\"ListDateSetting\":\"2\"}","{\"ListDateSetting\":\"3\"}","{\"ListDateSetting\":\"4\"}","{\"ListDateSetting\":\"5\"}"]
+ * @parent EquipSetting
+ * 
+ * @param EquipStatusDifference
+ * @text パラメータ差表示
+ * @desc パラメータの変動値の差を表示します。
+ * @type boolean
+ * @default false
  * @parent EquipSetting
  * 
  * @param EquipStatusCols
@@ -1610,6 +1628,7 @@ Imported.NUUN_EquipStatusEX = true;
     const ActorImg_Y = Number(parameters['ActorImg_Y'] || 0);
     const SetBonusLineHeight = Number(parameters['SetBonusLineHeight'] || 36);
     const SpecialAbilityLineHeight = Number(parameters['SpecialAbilityLineHeight'] || 36);
+    const EquipStatusDifference = eval(parameters['EquipStatusDifference'] || "false");
 
     const equipContents = {};
     equipContents.PageList1 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipPageList1'])) : [];
@@ -2076,7 +2095,7 @@ Imported.NUUN_EquipStatusEX = true;
         const paramId = data.DateSelect - 20;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-        const systemWidth = data.SystemItemWidth || 160;
+        const systemWidth = Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding()));
         const name = data.ParamName ? data.ParamName : TextManager.param(paramId);
         let margin = 0;
         if (data.IconId > 0) {
@@ -2100,6 +2119,9 @@ Imported.NUUN_EquipStatusEX = true;
             const diffvalue = newValue - value;
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
+            if (EquipStatusDifference) {
+                this.drawText("("+ diffvalue +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+            }
         }
     };
 
@@ -2107,7 +2129,7 @@ Imported.NUUN_EquipStatusEX = true;
         const paramId = data.DateSelect;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-        const systemWidth = data.SystemItemWidth || 160;
+        const systemWidth = Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding()));
         const name = this.paramNameShow(data);
         let margin = 0;
         if (data.IconId > 0) {
@@ -2131,6 +2153,9 @@ Imported.NUUN_EquipStatusEX = true;
             const diffvalue = newValue - value;
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
+            if (EquipStatusDifference) {
+                this.drawText("("+ diffvalue +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+            }
         }
     };
 
@@ -2138,7 +2163,7 @@ Imported.NUUN_EquipStatusEX = true;
         const paramId = data.DateSelect;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-        const systemWidth = data.SystemItemWidth || 160;
+        const systemWidth = Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding()));
         const name = this.paramNameShow(data);
         let margin = 0;
         if (data.IconId > 0) {
@@ -2162,6 +2187,9 @@ Imported.NUUN_EquipStatusEX = true;
             const diffvalue = badParams(paramId) ? (value - newValue) : (newValue - value);
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
+            if (EquipStatusDifference) {
+                this.drawText("("+ diffvalue +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+            }
         }
     };
 
@@ -2177,7 +2205,7 @@ Imported.NUUN_EquipStatusEX = true;
         } else {
             margin = 0;
         }
-        const systemWidth = name ? (data.SystemItemWidth || 160) : 0;
+        const systemWidth = name ? Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding())) : 0;
         const paramX = this.paramX(width);
         const rightArrowWidth = this.rightArrowWidth();
         const paramWidth = this.paramWidth();
@@ -2186,8 +2214,10 @@ Imported.NUUN_EquipStatusEX = true;
         }
         this.resetTextColor();
         let text = eval(data.DataEval);
+        let value = 0;
         if (!isNaN(text)) {
-            text = NuunManager.numPercentage(text, data.Decimal - 2, DecimalMode);
+            value = NuunManager.numPercentage(text, data.Decimal - 2, DecimalMode);
+            text = value;
         }
         if (actor) {
             this.drawText(text + (data.paramUnit ? String(data.paramUnit) : ""), paramX + x, y, paramWidth, "right");
@@ -2196,13 +2226,17 @@ Imported.NUUN_EquipStatusEX = true;
         if (this._tempActor) {
             a = this._tempActor;
             const newValue = NuunManager.numPercentage(eval(data.DataEval), data.Decimal - 2, DecimalMode);
+            let diffvalue = 0;
             if (!isNaN(text)) {
-                const diffvalue = data.BatStatus ? (text - newValue) : (newValue - text);
+                diffvalue = data.BatStatus ? (text - newValue) : (newValue - text);
                 this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             } else {
                 this.resetTextColor();
             }
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
+            if (EquipStatusDifference && !isNaN(text)) {
+                this.drawText("("+ diffvalue +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+            }
         }
     };
 
@@ -2240,7 +2274,7 @@ Imported.NUUN_EquipStatusEX = true;
     Window_EquipStatus.prototype.drawElement = function(data, actor, x, y, width) {
         const lineHeight = this.lineHeight();
         const name = data.ParamName ? data.ParamName : null;
-        const systemWidth = name ? (data.SystemItemWidth || 160) : 0;
+        const systemWidth = name ? Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding())) : 0;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         let margin = 0;
@@ -2281,6 +2315,9 @@ Imported.NUUN_EquipStatusEX = true;
                     const diffvalue = rate - newValue;
                     this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
                     this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2 + x, y + y2, paramWidth, "right");
+                    if (EquipStatusDifference) {
+                        this.drawText("("+ (diffvalue * -1) +")", paramX + (paramWidth * 2) + rightArrowWidth + x2 + x, y + y2, this.paramDifferenceWidth(), "left");
+                    }
                 }
                 index++;
             }
@@ -2290,7 +2327,7 @@ Imported.NUUN_EquipStatusEX = true;
     Window_EquipStatus.prototype.drawState = function(data, actor, x, y, width) {
         const lineHeight = this.lineHeight();
         const name = data.ParamName ? data.ParamName : null;
-        const systemWidth = name ? (data.SystemItemWidth || 160) : 0;
+        const systemWidth = name ? Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding())) : 0;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         let margin = 0;
@@ -2333,6 +2370,9 @@ Imported.NUUN_EquipStatusEX = true;
                     const diffvalue = rate - newValue;
                     this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
                     this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2 + x, y + y2, paramWidth, "right");
+                    if (EquipStatusDifference) {
+                        this.drawText("("+ (diffvalue * -1) +")", paramX + (paramWidth * 2) + rightArrowWidth + x2 + x, y + y2, this.paramDifferenceWidth(), "left");
+                    }
                 }
                 index++;
             }
@@ -2425,7 +2465,11 @@ Imported.NUUN_EquipStatusEX = true;
         const itemPadding = this.itemPadding();
         const rightArrowWidth = this.rightArrowWidth();
         const paramWidth = this.paramWidth();
-        return width - itemPadding - paramWidth * 2 - rightArrowWidth;
+        return width - itemPadding - paramWidth * 2 - rightArrowWidth - (EquipStatusDifference ? this.paramDifferenceWidth() : 0);
+    };
+
+    Window_EquipStatus.prototype.paramDifferenceWidth = function() {
+        return 48;
     };
 
     Window_EquipStatus.prototype.createApngSprite = function(actor, data, rect) {

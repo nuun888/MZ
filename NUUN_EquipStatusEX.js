@@ -2188,7 +2188,7 @@ Imported.NUUN_EquipStatusEX = true;
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
             if (EquipStatusDifference) {
-                this.drawText("("+ diffvalue +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+                this.drawText("("+ (newValue - value) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
             }
         }
     };
@@ -2235,7 +2235,7 @@ Imported.NUUN_EquipStatusEX = true;
             }
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
             if (EquipStatusDifference && !isNaN(text)) {
-                this.drawText("("+ diffvalue +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+                this.drawText("("+ (newValue - value) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
             }
         }
     };

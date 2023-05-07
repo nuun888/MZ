@@ -26,7 +26,7 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.1以降  
 
 ## 拡張プラグイン
-戦闘アニメーションをアクターにも表示。  
+「戦闘アニメーションの表示」をアクターにも表示できるようにするプラグインコマンドを追加。  
 [戦闘中のアクターへのアニメーション実行](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleAnimationEX.js)Ver.1.0.0  
 反撃拡張プラグイン(トリアコンタン氏)での立ち絵切り替えを適用。  
 [条件バトラー反撃拡張プラグイン適用](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX_CounterExtend.md)  

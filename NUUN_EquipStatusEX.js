@@ -2274,7 +2274,8 @@ Imported.NUUN_EquipStatusEX = true;
     Window_EquipStatus.prototype.drawElement = function(data, actor, x, y, width) {
         const lineHeight = this.lineHeight();
         const name = data.ParamName ? data.ParamName : null;
-        const systemWidth = name ? Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding())) : 0;
+        const systemWidth = name ? (data.SystemItemWidth || 160) : 0;
+        const leftTextWidth = Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding()))
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         let margin = 0;
@@ -2302,7 +2303,7 @@ Imported.NUUN_EquipStatusEX = true;
                 if (ElementResistMode !== 0) {
                     const name = $dataSystem.elements[elementId];
                     this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-                    this.drawText(name, x + x2 + margin, y + y2, systemWidth);
+                    this.drawText(name, x + x2 + margin, y + y2, leftTextWidth - margin);
                 }
                 this.resetTextColor();
                 const rate = NuunManager.numPercentage(actor.elementRate(elementId) * 100, data.Decimal - 2, DecimalMode);
@@ -2327,7 +2328,8 @@ Imported.NUUN_EquipStatusEX = true;
     Window_EquipStatus.prototype.drawState = function(data, actor, x, y, width) {
         const lineHeight = this.lineHeight();
         const name = data.ParamName ? data.ParamName : null;
-        const systemWidth = name ? Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding())) : 0;
+        const systemWidth = name ? (data.SystemItemWidth || 160) : 0;
+        const leftTextWidth = Math.min((data.SystemItemWidth || 160), (width - (width - this.paramX(width)) - this.itemPadding()))
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         let margin = 0;
@@ -2355,7 +2357,7 @@ Imported.NUUN_EquipStatusEX = true;
                 if (StateResistMode !== 0) {
                     const name = $dataStates[stateId].name;
                     this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-                    this.drawText(name, x + margin + x2, y + y2, systemWidth);
+                    this.drawText(name, x + margin + x2, y + y2, leftTextWidth - margin);
                 }
                 this.resetTextColor();
                 let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);

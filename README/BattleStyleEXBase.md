@@ -25,13 +25,15 @@
 ## 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.5.1以降  
 
+## 拡張プラグイン
+戦闘アニメーションをアクターにも表示。  
+[戦闘中のアクターへのアニメーション実行](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleAnimationEX.js)Ver.1.0.0  
+反撃拡張プラグイン(トリアコンタン氏)での立ち絵切り替えを適用。  
+[条件バトラー反撃拡張プラグイン適用](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX_CounterExtend.md)  
+
 ## オプション
 味方の被ダメージ時にゲームパッドを振動。  
 [ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md)  
-反撃拡張プラグイン(トリアコンタン氏)での立ち絵切り替えを適用。  
-[条件バトラー反撃拡張プラグイン適用](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX_CounterExtend.md)  
-  
-バトルレイアウトをXP風に変更します。  
 
 ## 機能
 テーマの変更（デフォルト、MV、XP）  

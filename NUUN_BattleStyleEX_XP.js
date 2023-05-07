@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.10.3
+ * @version 1.10.4
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -85,6 +85,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/5/7 Ver.1.10.4
+ * アクターへのアニメーションの反転の有無が機能していなかった問題を修正。
  * 2023/4/30 Ver.1.10.3
  * 画像に条件式を指定できる機能を追加。
  * 2023/4/11 Ver.1.10.2
@@ -2780,7 +2782,7 @@ params.ActorEffect_X = Number(parameters['ActorEffect_X'] || 0);
 params.ActorEffect_Y = Number(parameters['ActorEffect_Y'] || 0);
 params.ActorDamage_X = Number(parameters['ActorDamage_X'] || 0);
 params.ActorDamage_Y = Number(parameters['ActorDamage_Y'] || 0);
-params.EffectPriority = eval(parameters['EffectPriority']) || 'middle';
+params.ActorsMirror = eval(parameters['ActorsMirror'] || "true");
 params.StateAnimationShow = eval(parameters['StateAnimationShow'] || "true");
 params.ActorState_X = Number(parameters['ActorState_X'] || 0);
 params.ActorState_Y = Number(parameters['ActorState_Y'] || 0);

@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.15
+ * @version 2.0.16
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/8/2023 Ver.2.0.16
+ * Added a function that allows you to specify conditions for the actor status image.
  * 5/7/2023 Ver.2.0.15
  * Fixed an issue where setting an image to an actor status would cause an error.
  * 5/3/2023 Ver.2.0.14
@@ -68,7 +70,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.15
+ * @version 2.0.16
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -78,6 +80,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/8 Ver.2.0.16
+ * アクターステータスの画像に条件を指定できる機能を追加。
  * 2023/5/7 Ver.2.0.15
  * アクターステータスに画像を設定するとエラーが出る問題を修正。
  * 2023/5/3 Ver.2.0.14
@@ -1023,6 +1027,9 @@ Imported.NUUN_MenuScreenEXBase = true;
 
     Window_MenuStatus.prototype.drawMenuStatusImg = function(data, x, y, actor) {
         if (data.ImgData) {
+            if (data.DetaEval && !eval(data.DetaEval)) {
+                return;
+            }
             const rect = this.itemRect(0);
             const bitmap = ImageManager.nuun_LoadPictures(data.ImgData);
             this.contents.blt(bitmap, 0, 0, rect.width, rect.height, x - this.colSpacing(), y - this.itemPadding());

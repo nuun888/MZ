@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @version 2.0.4
+ * @version 2.0.5
  * 
  * @help
  * Change and extend the menu screen display.
@@ -48,6 +48,12 @@
  * Gauge Width: Set by Item, Gauge Width
  * Be sure to set the gauge identification ID. Enter any string for the ID. Please be careful not to duplicate.
  * 
+ * Image
+ * Enter the display conditions in javascript in the evaluation expression or string (javaScript). Appears when the conditions are met.
+ * Always displayed if left blank.
+ * actor: actor game data
+ * actor.actor(): actor system data
+ * 
  * background image
  * The ID is set in the map's tag or plugin command.
  * Map settings Note field
@@ -78,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/8/2023 Ver.2.0.5
+ * Added description of condition application of actor status image.
  * 5/3/2023 Ver.2.0.4
  * Fixed so that the color change of the gauge can be applied to HP, MP, and TP.
  * 4/28/2023 Ver.2.0.3
@@ -794,7 +802,7 @@
  * @value 49
  * @option Original gauge(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
  * @value 100
- * @option Image(3)(4)(5)(6)(25)
+ * @option Image(3)(4)(5)(6)(10)(25)
  * @value 200
  * @option Character chip(3)(4)(5)(6)(25)
  * @value 300
@@ -1314,7 +1322,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.4
+ * @version 2.0.5
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1350,6 +1358,12 @@
  * ゲージ横幅：項目、ゲージ横幅で設定
  * ゲージの識別IDは必ず設定してください。IDは任意の文字列を入力します。重複しないよう注意してください。
  * 
+ * 画像
+ * 評価式or文字列(javaScript)には表示条件をjavascriptで記入します。条件が一致しているときに表示されます。
+ * 無記入の場合は常に表示されます。
+ * actor:アクターゲームデータ
+ * actor.actor():アクターシステムデータ
+ * 
  * 背景画像1
  * IDはマップのタグまたはプラグインコマンドで設定します。
  * マップの設定のメモ欄
@@ -1379,6 +1393,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/8 Ver.2.0.5
+ * アクターステータスの画像の条件適用の説明追加。
  * 2023/5/3 Ver.2.0.4
  * ゲージの色変更をHP、MP、TPにも適用できるように修正。
  * 2023/4/28 Ver.2.0.3
@@ -2095,7 +2111,7 @@
  * @value 49
  * @option 独自ゲージ(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
  * @value 100
- * @option 画像(3)(4)(5)(6)(25)
+ * @option 画像(3)(4)(5)(6)(10)(25)
  * @value 200
  * @option キャラチップ(3)(4)(5)(6)(25)
  * @value 300

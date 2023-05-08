@@ -1,14 +1,14 @@
 # メニュー画面
 
 ## メニュー画面ベース
-### Ver.2.0.15  
+### Ver.2.0.16  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)  
 ## 設定用プラグイン
-メニュー画面デフォルトタイプVer.2.0.4    
+メニュー画面デフォルトタイプVer.2.0.5    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
-メニュー画面タイプ１Ver.2.0.4    
+メニュー画面タイプ１Ver.2.0.5    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
-メニュー画面タイプ２Ver.2.0.4    
+メニュー画面タイプ２Ver.2.0.5    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 
 #### 必須、前提プラグイン
@@ -115,6 +115,8 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2023/5/8 Ver.2.0.16  
+アクターステータスの画像に条件を指定できる機能を追加。  
 2023/5/7 Ver.2.0.15  
 アクターステータスに画像を設定するとエラーが出る問題を修正。  
 2023/5/3 Ver.2.0.14  

@@ -1,5 +1,5 @@
 # [バトルログ簡易表示及び一括ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleLogSimpleDisplayPopupBatch.js)
-# Ver.1.0.0
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleLogSimpleDisplayPopupBatch.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -18,6 +18,10 @@
 
 #### ログウィンドウ  
 ![画像](img/BattleLogSimpleDisplayPopupBatch2.png)  
+
+#### ログ表示形式
+使用時のメッセージを選択した場合、スキル、アイテム発動時のメッセージが表示されます。  
+![画像](img/BattleLogSimpleDisplayPopupBatch5.png)  
 
 ### ログ表示位置
 #### 通常
@@ -38,5 +42,7 @@
 上記のタグがある場合、敵キャラウィンドウ表示位置での設定は無視されます。  
 
 ### 更新履歴
+2023/5/9 Ver 1.1.0  
+使用時のメッセージを表示させる機能を追加。  
 2023/5/5 Ver 1.0.0  
 初版  

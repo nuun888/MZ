@@ -397,7 +397,8 @@ Imported.NUUN_BattleActionWindow = true;
     //Scene
     const _Scene_Base_createWindowLayer = Scene_Base.prototype.createWindowLayer;
     Scene_Base.prototype.createWindowLayer = function() {
-        if (!!BackGroundImg && LogWindowMode === 1) {
+        const className = String(this.constructor.name);
+        if (className === "Scene_Battle" && !!BackGroundImg && LogWindowMode === 1) {
             this.setBattleLogWindowBackground();
         }
         _Scene_Base_createWindowLayer.call(this);

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.4.1
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -40,6 +40,19 @@
  * <LimitEffect:-10> Reduces limit gauge by 10.
  * If the target is an actor, the limit gauge of the ally will increase or decrease, and if it is an enemy, the limit gauge of the enemy group will increase or decrease.
  * 
+ * Skill or item notes
+ * <LimitAttacklStr:[eval]> Increases limit gauge when attacking.
+ * <LimitCriticalStr:[eval]> Increases the limit gauge when critical.
+ * [eval]:Evaluation formula
+ * 
+ * Evaluation formula
+ * Damage received
+ * a: Damaged battler data da: Damaged battler database damage: Damage value
+ * Successful attack, critical
+ * a: Attacker's battler data da: Attacker's battler database cri: Critical success
+ * Defeat
+ * a: Defeated Battler data da: Defeated Battler database
+ * 
  * When used together with ”NUUN_GaugeValueEX”
  * Please set the following plug-in parameters with "NUUN_GaugeValueEX".
  * Gauge color 1
@@ -49,6 +62,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/13/2023 Ver.1.5.0
+ * Added time for successful attack and time for critical hit to the limit gauge recovery settings.
  * 4/1/2023 Ver.1.4.1
  * Fixed limit gauge processing.
  * 4/1/2023 Ver.1.4.0
@@ -291,10 +306,24 @@
  * @default ------------------------------
  * 
  * @param DamageAmount
- * @desc Amount of recovery when damaged. a: Damaged battler data da: Damaged battler database damage: Damage value
+ * @desc Amount of recovery when damaged.
  * @text Recovery amount when damaged
  * @type string
  * @default Math.floor(25 * damage / a.mhp)
+ * @parent ChargeSetting
+ * 
+ * @param AttackAmount
+ * @desc Amount recovered from a successful attack.
+ * @text Amount recovered after a successful attack
+ * @type string
+ * @default 
+ * @parent ChargeSetting
+ * 
+ * @param CriticalAmount
+ * @desc Critical recovery amount.
+ * @text Critical recovery amount
+ * @type string
+ * @default 
  * @parent ChargeSetting
  * 
  * @param VictoryAmount
@@ -349,7 +378,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.4.1
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -379,6 +408,19 @@
  * <LimitEffect:-10> リミットゲージが10減少します。
  * 単体選択のスキル、アイテムの場合は対象がアクターなら味方のリミットゲージ、敵なら敵グループのリミットゲージが増減します。
  * 
+ * スキル、アイテムのメモ欄
+ * <LimitAttacklStr:[eval]> 攻撃時にリミットゲージが増加します。
+ * <LimitCriticalStr:[eval]> クリティカル時にリミットゲージが増加します。
+ * [eval]:評価式
+ * 
+ * 評価式
+ * 被ダメージ時
+ * a:被ダメージバトラーデータ　da：被ダメージバトラーデータベース　damage:ダメージ値
+ * 攻撃成功時、クリティカル時
+ * a:攻撃者バトラーデータ　da：攻撃者バトラーデータベース cri:クリティカル成功
+ * 撃破時
+ * a:撃破されたバトラーデータ　da：撃破されたバトラーデータベース
+ * 
  * ゲージ表示拡張プラグインと併用する場合
  * 以下のプラグインパラメータはゲージ表示拡張プラグインで設定してください。
  * ゲージの色1
@@ -388,6 +430,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/13 Ver.1.5.0
+ * リミットゲージの回復時の設定に、攻撃時とクリティカル時を追加。
  * 2023/4/1 Ver.1.4.1
  * リミットゲージの処理修正。
  * 2023/4/1 Ver.1.4.0
@@ -637,6 +681,20 @@
  * @default Math.floor(25 * damage / a.mhp)
  * @parent ChargeSetting
  * 
+ * @param AttackAmount
+ * @desc 攻撃成功時の回復量。a:攻撃者バトラーデータ　da：攻撃者バトラーデータベース cri:クリティカル成功
+ * @text 攻撃成功時回復量
+ * @type string
+ * @default 
+ * @parent ChargeSetting
+ * 
+ * @param CriticalAmount
+ * @desc クリティカル時の回復量。a:攻撃者バトラーデータ　da：攻撃者バトラーデータベース
+ * @text クリティカル時回復量
+ * @type string
+ * @default 
+ * @parent ChargeSetting
+ * 
  * @param VictoryAmount
  * @desc 勝利時の回復量。
  * @text 勝利時回復量
@@ -725,6 +783,8 @@ const VictoryAmount = NuunManager.getEvalCode(parameters['VictoryAmount']) || ''
 const LoseAmount = NuunManager.getEvalCode(parameters['LoseAmount']) || '';
 const EscapeAmount = NuunManager.getEvalCode(parameters['EscapeAmount']) || '';
 const DieAmount = NuunManager.getEvalCode(parameters['DieAmount']) || '';
+const AttackAmount = NuunManager.getEvalCode(parameters['AttackAmount']) || '';
+const CriticalAmount = NuunManager.getEvalCode(parameters['CriticalAmount']) || '';
 const LimitCostColor = Number(parameters['LimitCostColor'] || 0);
 const MultiCostWidth = String(parameters['CostWidth'] || '00000');
 
@@ -767,8 +827,12 @@ BattleManager.onEscapeSuccess = function() {
 const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
 Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
+  const item = this.item();
+  if (item.damage.type > 0) {
+    this.subject().chargeLimitByAttack(item, target.result().critical);
+  }
   if (this.isLimitIncreaseItem()) {
-    target.limitIncreaseItem(this.subject(), this.item());
+    target.limitIncreaseItem(this.subject(), item);
     this.makeSuccess(target);
   }
 };
@@ -835,6 +899,21 @@ Game_Battler.prototype.chargeLimitByDamage = function(evalStr, damage) {
     this.chargeLimit(val);
   }
 };
+
+Game_Battler.prototype.chargeLimitByAttack = function(item, critical) {
+    if (critical) {
+        evalStr = item && item.meta.LimitCriticalStr ? String(item.meta.LimitCriticalStr) : CriticalAmount;
+    } else {
+        evalStr = item && item.meta.LimitAttackStr ? String(item.meta.LimitAttackStr) : AttackAmount;
+    }
+    if (evalStr) {
+      const a = this;
+      const da = this.isActor() ? this.actor() : this.enemy();
+      const cri = critical;
+      const val = Number(eval(evalStr));
+      this.chargeLimit(val);
+    }
+  };
 
 Game_Actor.prototype.chargeLimit = function(value) {
   this.setLimitGauge($gameParty.isPartyLimitValue() + value);

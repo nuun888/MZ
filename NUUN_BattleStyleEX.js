@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.8
+ * @version 3.10.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/5/14 Ver.3.10.9
+ * アクター画像がない場合にエラーが出る問題を修正。
  * 2023/5/7 Ver.3.10.8
  * 戦闘中のアクターへのアニメーション実行プラグイン対応による処理追加。
  * 2023/5/2 Ver.3.10.7
@@ -2935,7 +2937,7 @@ Sprite_ActorImges.prototype.initMembers = function() {
     this._startUpdate = true;
     this._zoomEffect = false;
     this._apngMode = false;
-    this._loadedBitmap = false;
+    this._loadedBitmap = null;
 };
 
 Sprite_ActorImges.prototype.setup = function(battler, data, index, stateSprite) {
@@ -3030,7 +3032,7 @@ Sprite_ActorImges.prototype.updateDamage = function() {
 };
 
 Sprite_ActorImges.prototype.updateZoom = function() {
-    if (this._loadedBitmap.isReady()) {
+    if (this._loadedBitmap && this._loadedBitmap.isReady()) {
         if (this._zoomDuration > 0) {
             this.anchor.y = 0.5;
             this.anchor.x = 0.5;

@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.3.6
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -53,7 +53,9 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
-2023/5/8 Ver.1.3.6  
+2023/5/14 Ver.1.4.1  
+差分パラメータがプラスの場合、＋を表示するように修正。  
+2023/5/8 Ver.1.4.0  
 差分パラメータを表示する機能を追加。  
 2023/4/22 Ver.1.3.5  
 現在値及び補正後能力値のX座標指定が適用されていなかった問題を修正。  

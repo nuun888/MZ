@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.6
+ * @version 1.4.1
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,7 +40,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 5/8/2023 Ver.1.3.6
+ * 5/14/2023 Ver.1.4.1
+ * Corrected to display + when the difference parameter is positive.
+ * 5/8/2023 Ver.1.4.0
  * Added function to display difference parameters.
  * 4/22/2023 Ver.1.3.5
  * Fixed an issue where the X coordinate specification of current and corrected stats was not applied.
@@ -808,7 +810,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.6
+ * @version 1.4.1
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -837,7 +839,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2023/5/8 Ver.1.3.6
+ * 2023/5/14 Ver.1.4.1
+ * 差分パラメータがプラスの場合、＋を表示するように修正。
+ * 2023/5/8 Ver.1.4.0
  * 差分パラメータを表示する機能を追加。
  * 2023/4/22 Ver.1.3.5
  * 現在値及び補正後能力値のX座標指定が適用されていなかった問題を修正。
@@ -2120,7 +2124,7 @@ Imported.NUUN_EquipStatusEX = true;
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
             if (EquipStatusDifference) {
-                this.drawText("("+ diffvalue +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+                this.drawText("("+ diffvalueText(diffvalue) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
             }
         }
     };
@@ -2154,7 +2158,7 @@ Imported.NUUN_EquipStatusEX = true;
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
             if (EquipStatusDifference) {
-                this.drawText("("+ diffvalue +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+                this.drawText("("+ diffvalueText(diffvalue) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
             }
         }
     };
@@ -2188,7 +2192,7 @@ Imported.NUUN_EquipStatusEX = true;
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
             if (EquipStatusDifference) {
-                this.drawText("("+ (newValue - value) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+                this.drawText("("+ diffvalueText(newValue - value) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
             }
         }
     };
@@ -2235,7 +2239,7 @@ Imported.NUUN_EquipStatusEX = true;
             }
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
             if (EquipStatusDifference && !isNaN(text)) {
-                this.drawText("("+ (newValue - value) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
+                this.drawText("("+ diffvalueText(newValue - value) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
             }
         }
     };
@@ -2317,7 +2321,7 @@ Imported.NUUN_EquipStatusEX = true;
                     this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
                     this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2 + x, y + y2, paramWidth, "right");
                     if (EquipStatusDifference) {
-                        this.drawText("("+ (diffvalue * -1) +")", paramX + (paramWidth * 2) + rightArrowWidth + x2 + x, y + y2, this.paramDifferenceWidth(), "left");
+                        this.drawText("("+ diffvalueText(diffvalue * -1) +")", paramX + (paramWidth * 2) + rightArrowWidth + x2 + x, y + y2, this.paramDifferenceWidth(), "left");
                     }
                 }
                 index++;
@@ -2373,7 +2377,7 @@ Imported.NUUN_EquipStatusEX = true;
                     this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
                     this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2 + x, y + y2, paramWidth, "right");
                     if (EquipStatusDifference) {
-                        this.drawText("("+ (diffvalue * -1) +")", paramX + (paramWidth * 2) + rightArrowWidth + x2 + x, y + y2, this.paramDifferenceWidth(), "left");
+                        this.drawText("("+ diffvalueText(diffvalue * -1) +")", paramX + (paramWidth * 2) + rightArrowWidth + x2 + x, y + y2, this.paramDifferenceWidth(), "left");
                     }
                 }
                 index++;
@@ -2770,6 +2774,9 @@ Imported.NUUN_EquipStatusEX = true;
                 return false;
         }
     };
-      
+    
+    function diffvalueText(value) {
+        return (value > 0 ? "+" : "") + value;
+    };
 
 })();

@@ -203,7 +203,8 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [ステータス画面拡張](https://github.com/nuun888/MZ/blob/master/README/StatusScreen.md) | [NUUN_StatusScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js) | 共 立対 レ | 2.6.1 |
 | [セーブ画面拡張](https://github.com/nuun888/MZ/blob/master/README/SaveScreen.md) | [NUUN_SaveScreen](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  | 共 | 2.0.3 |
 | [メニュー画面](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md) | | 共 立対 | 2.0.10 |
-| ┗[メニューコマンド表示拡張](https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md) | [NUUN_MenuCommandEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js) | 共 | 1.1.3 |
+| ┣ [メニューコマンド表示拡張](https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md) | [NUUN_MenuCommandEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js) | 共 | 1.1.3 |
+| ┗ [スキルステータス画面表示カスタマイズ](https://github.com/nuun888/MZ/blob/master/README/SkillStatusEX.md) | [NUUN_SkillStatusEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUNSkillStatusEX.js) | 共 | 1.0.0 |
 | [行動目標表示](https://github.com/nuun888/MZ/blob/master/README/Destination.md) | [NUUN_Destination](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Destination.js) | 共 | 1.0.2 |
 | [チャプターテキスト](https://github.com/nuun888/MZ/blob/master/README/Chapter.md) | [NUUN_Chaptern](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Chapter.js) | 共 | 1.0.0 |
 | [ウィンドウスキン個別設定](https://github.com/nuun888/MZ/blob/master/README/WindowSkinIndividual.md) | [NUUN_WindowSkinIndividual](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_WindowSkinIndividual.js) | 共 | 1.0.0 |

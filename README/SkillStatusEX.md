@@ -1,4 +1,4 @@
-# [スキルステータス画面表示カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEXn.js)
+# [スキルステータス画面表示カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEX.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEX.js)  
 #### 必須プラグイン

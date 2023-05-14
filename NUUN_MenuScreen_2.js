@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @version 2.0.5
+ * @version 2.0.6
  * 
  * @help
  * Change and extend the menu screen display.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/14/2023 Ver.2.0.6
+ * Corrected the description about applying the gauge label to the item name.
  * 5/8/2023 Ver.2.0.5
  * Added description of condition application of actor status image.
  * 5/3/2023 Ver.2.0.4
@@ -760,11 +762,11 @@
  * @value 7
  * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value 6
- * @option HP(3)(4)(5)(6)(7)(21)(23)(24)
+ * @option HP(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value 11
- * @option MP(3)(4)(5)(6)(7)(21)(23)(24)
+ * @option MP(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value 12
- * @option TP(3)(4)(5)(6)(7)(21)(23)(24)
+ * @option TP(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value 13
  * @option EXP(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value 14
@@ -822,7 +824,7 @@
  * @value 48
  * @option Gain exp rate(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
  * @value 49
- * @option Original gauge(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
+ * @option Original gauge(2)(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
  * @value 100
  * @option Image(3)(4)(5)(6)(10)(25)
  * @value 200
@@ -1415,6 +1417,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/14 Ver.2.0.6
+ * 項目名称をゲージのラベル適用に関する修正。
  * 2023/5/8 Ver.2.0.5
  * アクターステータスの画像の条件適用の説明追加。
  * 2023/5/3 Ver.2.0.4
@@ -2091,11 +2095,11 @@
  * @value 7
  * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value 6
- * @option ＨＰ(3)(4)(5)(6)(7)(21)(23)(24)
+ * @option ＨＰ(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value 11
- * @option ＭＰ(3)(4)(5)(6)(7)(21)(23)(24)
+ * @option ＭＰ(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value 12
- * @option ＴＰ(3)(4)(5)(6)(7)(21)(23)(24)
+ * @option ＴＰ(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value 13
  * @option 経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value 14
@@ -2153,7 +2157,7 @@
  * @value 48
  * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
  * @value 49
- * @option 独自ゲージ(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
+ * @option 独自ゲージ(2)(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
  * @value 100
  * @option 画像(3)(4)(5)(6)(10)(25)
  * @value 200

@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.16
+ * @version 2.0.17
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/14/2023 Ver.2.0.17
+ * Correction of processing related to skill status screen display customization.
+ * Modified to apply item names to gauge labels.
  * 5/8/2023 Ver.2.0.16
  * Added a function that allows you to specify conditions for the actor status image.
  * 5/7/2023 Ver.2.0.15
@@ -70,7 +73,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.16
+ * @version 2.0.17
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -80,6 +83,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/14 Ver.2.0.17
+ * スキルステータス画面表示カスタマイズに関する処理の修正。
+ * 項目名称をゲージのラベルにも適用するように修正。
  * 2023/5/8 Ver.2.0.16
  * アクターステータスの画像に条件を指定できる機能を追加。
  * 2023/5/7 Ver.2.0.15
@@ -409,13 +415,13 @@ Imported.NUUN_MenuScreenEXBase = true;
         this._actorsBitmap = [];
         this.language_Jp = $gameSystem.isJapanese();
         _Window_MenuStatus_initialize.call(this, rect);
-        this.loadMenuImages();
+        this.nuun_loadImages();
     };
 
-    Window_MenuStatus.prototype.loadMenuImages = function() {
+    Window_MenuStatus.prototype.nuun_loadImages = function() {
         for (const actor of $gameParty.allMembers()) {
             let data = null;
-            if (Imported.NUUN_ActorPicture && params.ActorPictureEXApp) {
+            if (this.isActorPictureEXApp()) {
                 actor.resetImgId();
                 data = this.battlreActorPicture(actor.actorId());
                 actor.loadActorFace();
@@ -434,6 +440,10 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
     };
 
+    Window_MenuStatus.prototype.isActorPictureEXApp = function() {
+        return Imported.NUUN_ActorPicture && params.ActorPictureEXApp;
+    };
+
     Window_MenuStatus.prototype.numVisibleRows = function() {
         return params.MenuRows;
     };
@@ -442,17 +452,21 @@ Imported.NUUN_MenuScreenEXBase = true;
         return params.MenuCols;
     };
 
-    Window_MenuStatus.prototype.maxContentsCols = function() {
+    Window_StatusBase.prototype.nuunMenu_maxContentsCols = function() {
         return 1;
     };
 
-    Window_MenuStatus.prototype.itemContentsWidth = function(width) {
-        return Math.floor(width / this.maxContentsCols()) - this.colSpacing() - 4;
+    Window_StatusBase.prototype.nuunMenu_itemContentsWidth = function(width) {
+        return Math.floor(width / this.nuunMenu_maxContentsCols()) - this.colSpacing() - 4;
+    };
+
+    Window_StatusBase.prototype.nuunMenu_systemWidth = function(swidth, width) {
+        return swidth > 0 ? swidth : Math.floor(width / 3);
     };
 
     Window_MenuStatus.prototype.drawItemBackground = function(index) {
         const actor = this.actor(index);
-        const data = this.getActorData(actor);
+        const data = this.nuunMenu_getActorData(actor);
         if (data && data.ActorBackImg) {
             const bitmap = ImageManager.nuun_LoadPictures(data.ActorBackImg);
             if (bitmap && !bitmap.isReady()) {
@@ -496,11 +510,11 @@ Imported.NUUN_MenuScreenEXBase = true;
         const actor = this.actor(index);
         const rect = this.itemRect(index);
         let bitmap = null;
-        const data = this.getActorData(actor);
+        const data = this.nuunMenu_getActorData(actor);
         if (data && data.GraphicMode !== 'none') {
             if (data.GraphicMode === 'imgApng') {
                 this.createApngSprite(actor, index, data, rect);
-            } else if (Imported.NUUN_ActorPicture && params.ActorPictureEXApp) {
+            } else if (this.isActorPictureEXApp()) {
                 bitmap = data.GraphicMode === 'face' ? actor.loadActorFace() : actor.loadActorGraphic();
             } else {
                 bitmap = data.GraphicMode === 'face' ? ImageManager.nuun_LoadPictures(data.FaceImg) : ImageManager.nuun_LoadPictures(data.ActorImg);
@@ -519,9 +533,9 @@ Imported.NUUN_MenuScreenEXBase = true;
     Window_MenuStatus.prototype.drawActorGraphic = function(data, bitmap, x, y, width, height, actor) {
         this.changePaintOpacity(actor.isBattleMember());
         if (data.GraphicMode === 'face') {
-            this.contentsDrawActorFace(actor, data, x, y, width, height);
+            this.nuunMenu_contentsDrawActorFace(actor, data, x, y, width, height);
         } else {
-            this.contentsDrawActorGraphic(actor, data, bitmap, x, y, width, height);
+            this.nuunMenu_contentsDrawActorGraphic(actor, data, bitmap, x, y, width, height);
         }
         this.changePaintOpacity(true);
         this.drawActorFront(data, x, y, width, height);
@@ -537,60 +551,14 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
     };
 
-    Window_MenuStatus.prototype.contentsDrawActorFace = function(actor, data, x, y, width, height) {
+    Window_StatusBase.prototype.nuunMenu_contentsDrawActorFace = function(actor, data, x, y, width, height) {
         width = Math.min(width, ImageManager.faceWidth);
         height = height - 2;
-        this.drawActorFace(actor, x, y, width, height, data);
+        this.nuunMenu_drawActorFace(actor, x, y, width, height, data);
     };
 
     Window_MenuStatus.prototype.drawContentsActorFront = function(bitmap, x, y, width, height) {
         this.contents.blt(bitmap, 0, 0, width, height, x, y);
-    };
-
-    Window_MenuStatus.prototype.drawItemStatus = function(index) {
-        let bitmap = null;
-        let loadBitmap = null;
-        for (const data of params.StatusList) {
-            switch (data.DateSelect) {
-                case 200:
-                    loadBitmap = this.loadContentsImg(data);
-                    break;
-            }
-            if (loadBitmap && !loadBitmap.isReady()) {
-                bitmap = loadBitmap;
-            }
-            if (bitmap && !bitmap.isReady()) {
-                bitmap.addLoadListener(this.drawItemContentsStatus.bind(this, index))
-                return;
-            } else {
-                this.drawItemContentsStatus(index);
-            }
-        }
-    };
-
-    Window_MenuStatus.prototype.loadContentsImg = function(data) {
-        return ImageManager.nuun_LoadPictures(data.ImgData);
-    };
-
-    Window_MenuStatus.prototype.getActorImgData = function(actor) {
-        return params.ActorsImgList.find(actorImg => actorImg.actorId === actor.actorId());
-    };
-
-    Window_MenuStatus.prototype.drawItemContentsStatus = function(index) {
-        const actor = this.actor(index);
-        const rect = this.itemRect(index);
-        const itemWidth = this.itemContentsWidth(rect.width);
-        const lineHeight = this.lineHeight();
-        const colSpacing = this.colSpacing();
-        maxGaugeWidth = itemWidth;
-        for (const data of params.StatusList) {
-        const x_Position = data.X_Position;
-        const position = Math.min(x_Position, this.maxContentsCols());
-        const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
-        const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate + this.itemPadding();
-        const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : itemWidth;
-        this.drawContentsBase(data, contentsX, contentsY, width - colSpacing / 2, actor);
-        }
     };
 
     Window_MenuStatus.prototype.getActorImgData = function(actorId) {
@@ -615,54 +583,118 @@ Imported.NUUN_MenuScreenEXBase = true;
         return find;
     };
 
-    Window_MenuStatus.prototype.getActorData = function(actor) {
-        return Imported.NUUN_ActorPicture && params.ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()) : this.getActorImgData(actor.actorId());
+    Window_StatusBase.prototype.nuunMenu_getMenuGraphicMode = function() {
+        return params.GraphicMode;
     };
 
-    Window_MenuStatus.prototype.drawContentsBase = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_getActorData = function(actor) {
+        return this.isActorPictureEXApp() ? this.battlreActorPicture(actor.actorId()) : this.getActorImgData(actor.actorId());
+    };
+
+    Window_StatusBase.prototype.nuunMenu_isMenuActorData = function() {
+        return this.isActorPictureEXApp() ? params.ActorPictureData : params.ActorsImgList;
+    };
+
+    Window_StatusBase.prototype.nuunMenu_loadContentsImg = function(data) {
+        return ImageManager.nuun_LoadPictures(data.ImgData);
+    };
+
+    Window_MenuStatus.prototype.getStatusList = function() {
+        return params.StatusList;
+    };
+
+    Window_MenuStatus.prototype.drawItemStatus = function(index) {
+        this.nuunMenu_drawItemContents(index);
+    };
+
+    Window_MenuStatus.prototype.getDecimalMode = function() {
+        return params.DecimalMode;
+    };
+
+    Window_StatusBase.prototype.nuunMenu_drawItemContents = function(index) {
+        let bitmap = null;
+        let loadBitmap = null;
+        const list = this.getStatusList();
+        for (const data of list) {
+            switch (data.DateSelect) {
+                case 200:
+                    loadBitmap = this.nuunMenu_loadContentsImg(data);
+                    break;
+            }
+            if (loadBitmap && !loadBitmap.isReady()) {
+                bitmap = loadBitmap;
+            }
+            if (bitmap && !bitmap.isReady()) {
+                bitmap.addLoadListener(this.nuunMenu_drawItemContentsStatus.bind(this, index))
+                return;
+            } else {
+                this.nuunMenu_drawItemContentsStatus(index);
+            }
+        }
+    };
+
+    Window_MenuStatus.prototype.nuunMenu_drawItemContentsStatus = function(index) {
+        const actor = this.actor(index);
+        const rect = this.itemRect(index);
+        const itemWidth = this.nuunMenu_itemContentsWidth(rect.width);
+        const lineHeight = this.lineHeight();
+        const colSpacing = this.colSpacing();
+        maxGaugeWidth = itemWidth;
+        const list = this.getStatusList();
+        for (const data of list) {
+        const x_Position = data.X_Position;
+        const position = Math.min(x_Position, this.nuunMenu_maxContentsCols());
+        const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
+        const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate + this.itemPadding();
+        const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : itemWidth;
+        this.nuunMenu_drawContentsBase(data, contentsX, contentsY, width - colSpacing / 2, actor);
+        }
+    };
+
+    Window_StatusBase.prototype.nuunMenu_drawContentsBase = function(data, x, y, width, actor) {
         $gameTemp.menuParam = null;
         switch (data.DateSelect) {
         case 0:
             break;
         case 1:
-            this.drawActorName(data, x, y, width, actor);
+            this.nuunMenu_drawActorName(data, x, y, width, actor);
             break;
         case 2:
-            this.drawActorNickname(data, x, y, width, actor);
+            this.nuunMenu_drawActorNickname(data, x, y, width, actor);
             break;
         case 3:
-            this.drawActorClass(data, x, y, width, actor);
+            this.nuunMenu_drawActorClass(data, x, y, width, actor);
             break;
         case 4:
-            this.drawActorLevel(data, x, y, width, actor);
+            this.nuunMenu_drawActorLevel(data, x, y, width, actor);
             break;
         case 5:
-            this.drawActorIcons(data, x, y, width, actor);
+            this.nuunMenu_drawActorIcons(data, x, y, width, actor);
             break;
         case 6:
-            this.drawParam(data, x, y, width, actor);
+            this.nuunMenu_drawParam(data, x, y, width, actor);
             break;
         case 7:
-            this.drawPlaceStateIcon(x, y, actor);
+            this.nuunMenu_drawPlaceStateIcon(x, y, actor);
             break;
         case 11:
             $gameTemp.menuParam = data;
-            this.placeHpGauge(x, y, actor);
+            this.nuunMenu_placeHpGauge(x, y, actor);
             break;
         case 12:
             $gameTemp.menuParam = data;
-            this.placeMpGauge(x, y, actor);
+            this.nuunMenu_placeMpGauge(x, y, actor);
             break;
         case 13:
             $gameTemp.menuParam = data;
-            this.placeTpGauge(x, y, actor);
+            this.nuunMenu_placeTpGauge(x, y, actor);
             break;
         case 14:
-            this.drawExp(data, x, y, width, actor);
+            this.nuunMenu_drawExp(data, x, y, width, actor);
             break;
         case 15:
             $gameTemp.menuParam = data;
-            this.placeExpGauge(x, y, actor);
+            this.nuunMenu_placeExpGauge(x, y, actor);
             break;
         case 22:
         case 23:
@@ -670,7 +702,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         case 25:
         case 26:
         case 27:
-            this.drawParams(data, data.DateSelect, x, y, width, actor);
+            this.nuunMenu_drawParams(data, data.DateSelect, x, y, width, actor);
             break;
         case 30:
         case 31:
@@ -682,7 +714,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         case 37:
         case 38:
         case 39:
-            this.drawXParams(data, data.DateSelect, x, y, width, actor);
+            this.nuunMenu_drawXParams(data, data.DateSelect, x, y, width, actor);
             break;
         case 40:
         case 41:
@@ -694,28 +726,28 @@ Imported.NUUN_MenuScreenEXBase = true;
         case 47:
         case 48:
         case 49:
-            this.drawSParams(data, data.DateSelect, x, y, width, actor);
+            this.nuunMenu_drawSParams(data, data.DateSelect, x, y, width, actor);
             break;
         case 100:
             $gameTemp.menuParam = data;
-            this.placeUserGauge(data, x, y, actor);
+            this.nuunMenu_placeUserGauge(data, x, y, actor);
             break;
         case 200:
-            this.drawMenuStatusImg(data, x, y, actor);
+            this.nuunMenu_drawMenuStatusImg(data, x, y, actor);
             break;
         case 300:
-            this.contentsDrawActorChip(data, x, y, width, actor);
+            this.nuunMenu_contentsDrawActorChip(data, x, y, width, actor);
             break;
         case 301:
             this.drawSvActorImg(data, x, y, width, actor);
             break;
         case 1000:
-            this.horzLine(x, y, width, actor);
+            this.nuunMenu_horzLine(x, y, width, actor);
             break;
         }
     };
 
-    Window_MenuStatus.prototype.paramNameData = function(data, actor, param) {
+    Window_StatusBase.prototype.nuunMenu_paramNameData = function(data, actor, param) {
         if (data.ParamName) {
         return data.ParamName;
         }
@@ -776,7 +808,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
     };
     
-    Window_MenuStatus.prototype.paramData = function(data, actor, param) {
+    Window_StatusBase.prototype.nuunMenu_paramData = function(data, actor, param) {
         switch (param) {
         case 0:
         case 1:
@@ -814,58 +846,57 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
     };
 
-    
-    Window_MenuStatus.prototype.contentsDrawActorChip = function(data, x, y, width, actor) {
-        this.actorCharacterChip(actor, data, x + 24, y + 48);
+    Window_MenuStatus.prototype.nuunMenu_contentsDrawActorChip = function(data, x, y, width, actor) {
+        this.nuunMenu_actorCharacterChip(actor, data, x + 24, y + 48, "actor%1-menuStatusCharacter");
     };
 
-    Window_MenuStatus.prototype.drawParams = function(data, param, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawParams = function(data, param, x, y, width, actor) {
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-        const nameText = this.paramNameData(data, actor, param - 20);
+        const nameText = this.nuunMenu_paramNameData(data, actor, param - 20);
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.nuun_setContentsFontFace(data);
-        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.nuunMenu_systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
-        const textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20)) + (data.paramUnit ? String(data.paramUnit) : "");
+        const textParam = (data.DetaEval ? eval(data.DetaEval) : this.nuunMenu_paramData(data, actor, param - 20)) + (data.paramUnit ? String(data.paramUnit) : "");
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
     };
 
-    Window_MenuStatus.prototype.drawXParams = function(data, param, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawXParams = function(data, param, x, y, width, actor) {
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-        const nameText = this.paramNameData(data, actor, param - 20);
+        const nameText = this.nuunMenu_paramNameData(data, actor, param - 20);
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.nuun_setContentsFontFace(data);
-        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.nuunMenu_systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
-        let textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20));
-        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, params.DecimalMode);
+        let textParam = (data.DetaEval ? eval(data.DetaEval) : this.nuunMenu_paramData(data, actor, param - 20));
+        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.DecimalMode());
         textParam += (data.paramUnit ? String(data.paramUnit) : "");
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
     };
 
-    Window_MenuStatus.prototype.drawSParams = function(data, param, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawSParams = function(data, param, x, y, width, actor) {
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
-        const nameText = this.paramNameData(data, actor, param - 20);
+        const nameText = this.nuunMenu_paramNameData(data, actor, param - 20);
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.nuun_setContentsFontFace(data);
-        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.nuunMenu_systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
-        let textParam = (data.DetaEval ? eval(data.DetaEval) : this.paramData(data, actor, param - 20));
-        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, params.DecimalMode);
+        let textParam = (data.DetaEval ? eval(data.DetaEval) : this.nuunMenu_paramData(data, actor, param - 20));
+        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.DecimalMode());
         textParam += (data.paramUnit ? String(data.paramUnit) : "");
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
     };
 
-    Window_MenuStatus.prototype.drawActorName = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawActorName = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         menuTextMode = 'name';
         menuAlign = data.Align;
@@ -874,7 +905,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.resetFontSettings();
     };
 
-    Window_MenuStatus.prototype.drawText = function(text, x, y, maxWidth, align) {
+    Window_StatusBase.prototype.nuunMenu_drawText = function(text, x, y, maxWidth, align) {
         if (menuTextMode === 'name') {
             align = menuAlign;
             menuTextMode = null;
@@ -882,7 +913,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         Window_Base.prototype.drawText.call(this, text, x, y, maxWidth, align);
     };
 
-    Window_MenuStatus.prototype.drawActorClass = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawActorClass = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.resetTextColor();
         this.nuun_setContentsFontFace(data);
@@ -890,7 +921,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.resetFontSettings();
     };
 
-    Window_MenuStatus.prototype.drawActorNickname = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawActorNickname = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.resetTextColor();
         this.nuun_setContentsFontFace();
@@ -898,7 +929,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.resetFontSettings();
     };
 
-    Window_MenuStatus.prototype.drawActorLevel = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawActorLevel = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.nuun_setContentsFontFace(data);
         this.changeTextColor(ColorManager.systemColor());
@@ -909,7 +940,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.resetFontSettings();
     };
 
-    Window_MenuStatus.prototype.drawActorIcons = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawActorIcons = function(data, x, y, width, actor) {
         let icons = [];
         let states = [];
         const iconWidth = ImageManager.iconWidth;
@@ -930,12 +961,12 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
     };
 
-    Window_MenuStatus.prototype.drawParam = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawParam = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         this.nuun_setContentsFontFace(data);
         const nameText = data.ParamName ? data.ParamName : '';
-        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.nuunMenu_systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
         if (data.DetaEval) {
@@ -946,48 +977,44 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.resetFontSettings();
     };
 
-    Window_MenuStatus.prototype.systemWidth = function(swidth, width) {
-        return swidth > 0 ? swidth : Math.floor(width / 3);
-    };
-
-    Window_MenuStatus.prototype.placeHpGauge = function(x, y, actor) {
+    Window_MenuStatus.prototype.nuunMenu_placeHpGauge = function(x, y, actor) {
         $gameTemp.menuGaugeType = "hp";
-        this.placeGauge(actor, "hp", x, y);
+        this.nuunMenu_placeGauge(actor, "hp", x, y, "actor%1-gauge-%2");
     };
 
-    Window_MenuStatus.prototype.placeMpGauge = function(x, y, actor) {
+    Window_MenuStatus.prototype.nuunMenu_placeMpGauge = function(x, y, actor) {
         $gameTemp.menuGaugeType = "mp";
-        this.placeGauge(actor, "mp", x, y);
+        this.nuunMenu_placeGauge(actor, "mp", x, y, "actor%1-gauge-%2");
     };
 
-    Window_MenuStatus.prototype.placeTpGauge = function(x, y, actor) {
+    Window_MenuStatus.prototype.nuunMenu_placeTpGauge = function(x, y, actor) {
         if ($dataSystem.optDisplayTp) {
             $gameTemp.menuGaugeType = "tp";
-            this.placeGauge(actor, "tp", x, y);
+            this.nuunMenu_placeGauge(actor, "tp", x, y, "actor%1-gauge-%2");
         }
     };
 
-    Window_MenuStatus.prototype.placeExpGauge = function(x, y, actor) {
+    Window_MenuStatus.prototype.nuunMenu_placeExpGauge = function(x, y, actor) {
         $gameTemp.menuGaugeType = "menuexp";
-        this.placeGauge(actor, "menuexp", x, y);
+        this.nuunMenu_placeGauge(actor, "menuexp", x, y, "menuSvActor%1");
     };
 
-    Window_MenuStatus.prototype.drawPlaceStateIcon = function(x, y, actor) {
+    Window_MenuStatus.prototype.nuunMenu_placeUserGauge = function(data, x, y, actor) {
+        $gameTemp.menuGaugeType = data.GaugeID;
+        this.nuunMenu_placeGauge(actor, data.GaugeID, x, y, "actor%1-gauge-%2");
+    };
+
+    Window_StatusBase.prototype.nuunMenu_drawPlaceStateIcon = function(x, y, actor) {
         const hw = Math.floor(ImageManager.iconWidth / 2);
         this.placeStateIcon(actor, x + hw, y + hw);
     };
 
-    Window_MenuStatus.prototype.placeUserGauge = function(data, x, y, actor) {
-        $gameTemp.menuGaugeType = data.GaugeID;
-        this.placeGauge(actor, data.GaugeID, x, y);
-    };
-
-    Window_MenuStatus.prototype.drawExp = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawExp = function(data, x, y, width, actor) {
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = data.ParamName ? data.ParamName : 'NextLv';
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.nuun_setContentsFontFace(data);
-        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.nuunMenu_systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x + textWidth, y, textWidth);
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
@@ -996,19 +1023,19 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.resetFontSettings();
     };
 
-    Window_MenuStatus.prototype.placeGauge = function(actor, type, x, y) {
+    Window_StatusBase.prototype.nuunMenu_placeGauge = function(actor, type, x, y, fmt) {
         if (Imported.NUUN_GaugeImage) {
             this.placeGaugeImg(actor, type, x, y);
         }
-        const key = "actor%1-gauge-%2".format(actor.actorId(), type);
+        const key = fmt.format(actor.actorId(), type);
         const sprite = this.createInnerSprite(key, Sprite_MenuGauge);
         sprite.setup(actor, type);
         sprite.move(x, y);
         sprite.show();
     };
 
-    Window_MenuStatus.prototype.actorCharacterChip = function(actor, data, x, y) { 
-        const key = "actor%1-menuStatusCharacter".format(actor.actorId());
+    Window_StatusBase.prototype.nuunMenu_actorCharacterChip = function(actor, data, x, y, fmt) { 
+        const key = fmt.format(actor.actorId());
         const sprite = this.createInnerSprite(key, Sprite_MenuScreenCharacter);
         sprite.setup(actor, data);
         sprite._character.setPosition(0, 0);
@@ -1016,8 +1043,8 @@ Imported.NUUN_MenuScreenEXBase = true;
         sprite.show();
     };
 
-    Window_MenuStatus.prototype.drawSvActorImg = function(data, x, y, width, actor) {
-        const key = "menuSvActor%1".format(actor.actorId());
+    Window_StatusBase.prototype.nuunMenu_drawSvActorImg = function(data, x, y, width, actor, fmt) {
+        const key = fmt.format(actor.actorId());
         const sprite = this.createInnerSprite(key, Sprite_MenuSvActor);
         sprite.setup(actor, data);
         sprite.show();
@@ -1025,7 +1052,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         sprite.startMotion();
     };
 
-    Window_MenuStatus.prototype.drawMenuStatusImg = function(data, x, y, actor) {
+    Window_StatusBase.prototype.nuunMenu_drawMenuStatusImg = function(data, x, y, actor) {
         if (data.ImgData) {
             if (data.DetaEval && !eval(data.DetaEval)) {
                 return;
@@ -1036,10 +1063,10 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
     };
 
-    Window_MenuStatus.prototype.drawActorFace = function(actor, x, y, width, height, data) {
-        x += (data ? data.Actor_X : 0) + params.ActorImg_X + 1;
-        y += (data ? data.Actor_Y : 0) + params.ActorImg_Y + 1;
-        if (Imported.NUUN_ActorPicture && params.ActorPictureEXApp) {
+    Window_StatusBase.prototype.nuunMenu_drawActorFace = function(actor, x, y, width, height, data) {
+        x += (data ? data.Actor_X : 0) + this.ActorImgX() + 1;
+        y += (data ? data.Actor_Y : 0) + this.ActorImgY() + 1;
+        if (this.isActorPictureEXApp()) {
             this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
         } else {
             let bitmap = null;
@@ -1053,7 +1080,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         }
     };
 
-    Window_MenuStatus.prototype.contentsDrawActorGraphic = function(actor, data, bitmap, x, y, width, height) {
+    Window_StatusBase.prototype.nuunMenu_contentsDrawActorGraphic = function(actor, data, bitmap, x, y, width, height) {
         width = Math.min(width - 2, bitmap.width);
         height = Math.min(height - 2, bitmap.height);
         const scale = (data.Actor_Scale || 100) / 100;
@@ -1061,17 +1088,25 @@ Imported.NUUN_MenuScreenEXBase = true;
         const sh = height * scale;
         const sx = data.Img_SX || 0;
         const sy = data.Img_SY || 0;
-        x += 1 + data.Actor_X + params.ActorImg_X;
-        y += 1 + data.Actor_Y + params.ActorImg_Y;
+        x += 1 + data.Actor_X + this.ActorImgX();
+        y += 1 + data.Actor_Y + this.ActorImgY();
         this.contents.blt(bitmap, sx, sy, width + (width - sw), height + (height - sh), x, y, width, height);
     };
 
-    Window_MenuStatus.prototype.nuun_setContentsFontFace = function(data) {
+    Window_StatusBase.prototype.nuun_setContentsFontFace = function(data) {
         this.contents.fontFace = data.FontFace ? data.FontFace : $gameSystem.mainFontFace();
     };
 
-    Window_MenuStatus.prototype.nuun_setContentsValueFontFace = function(data) {
+    Window_StatusBase.prototype.nuun_setContentsValueFontFace = function(data) {
         this.contents.fontFace = data.ValueFontFace ? data.ValueFontFace : $gameSystem.mainFontFace();
+    };
+
+    Window_MenuStatus.prototype.ActorImgX = function() {
+        return params.ActorImg_X;
+    };
+
+    Window_MenuStatus.prototype.ActorImgY = function() {
+        return params.ActorImg_Y;
     };
 
     function Window_InfoMenu() {
@@ -1372,6 +1407,7 @@ Imported.NUUN_MenuScreenEXBase = true;
       
     Sprite_MenuGauge.prototype = Object.create(Sprite_Gauge.prototype);
     Sprite_MenuGauge.prototype.constructor = Sprite_MenuGauge;
+    window.Sprite_MenuGauge = Sprite_MenuGauge
       
     Sprite_MenuGauge.prototype.initialize = function() {
         this._statusType = $gameTemp.menuGaugeType;
@@ -1390,18 +1426,26 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
 
     Sprite_MenuGauge.prototype.getMenuGaugeWidth = function() {
-        switch (this._statusType) {
-          case 'hp':
-            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : params.HPGaugeWidth;
-          case 'mp':
-            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : params.MPGaugeWidth;
-          case 'tp':
-            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : params.TPGaugeWidth;
-          case 'menuexp':
-            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : params.ExpGaugeWidth;
-          default:
-            return this.menuParam.ItemWidth > 0 ? this.menuParam.ItemWidth : 128;
+        if (this.menuParam.ItemWidth > 0) {
+            return this.menuParam.ItemWidth;
+        } else {
+            return this.getMenuGaugeWidthParams(this._statusType);
         }
+    };
+
+    Sprite_MenuGauge.prototype.getMenuGaugeWidthParams = function(type) {
+        switch (type) {
+            case 'hp':
+              return params.HPGaugeWidth;
+            case 'mp':
+              return params.MPGaugeWidth;
+            case 'tp':
+              return params.TPGaugeWidth;
+            case 'menuexp':
+              return params.ExpGaugeWidth;
+            default:
+              return 128;
+          }
     };
       
     Sprite_MenuGauge.prototype.getMenuGaugeHeight = function() {
@@ -1428,7 +1472,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             case "time":
                 return this.menuParam.Color1 >= 0 ? NuunManager.getColorCode(this.menuParam.Color1) : Sprite_Gauge.prototype.gaugeColor1.call(this);
             case "menuexp":
-                return NuunManager.getColorCode(params.ExpGaugeColor1);
+                return NuunManager.getColorCode(this.expGaugeColor1Param());
             default:
               return NuunManager.getColorCode(this.menuParam.Color1);
           }
@@ -1446,7 +1490,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             case "time":
                 return this.menuParam.Color2 >= 0 ? NuunManager.getColorCode(this.menuParam.Color2) : Sprite_Gauge.prototype.gaugeColor2.call(this);
             case "menuexp":
-                return NuunManager.getColorCode(params.ExpGaugeColor2);
+                return NuunManager.getColorCode(this.expGaugeColor2Param());
             default:
               return NuunManager.getColorCode(this.menuParam.Color2);
           }
@@ -1456,12 +1500,13 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
     
     Sprite_MenuGauge.prototype.displyaExp = function() {
-        if (params.ExpDisplayMode === 1) {
+        const mode = this.expDisplayModeParam();
+        if (mode === 1) {
             return this.currentMaxValue() - this.currentValue();
-        } else if (params.ExpDisplayMode === 2) {
+        } else if (mode === 2) {
             return this.currentValue();
-        } else if (params.ExpDisplayMode === 3) {
-            return NuunManager.numPercentage(this.currentValue() / this.currentMaxValue() * 100, params.EXPDecimal, params.DecimalMode);
+        } else if (mode === 3) {
+            return NuunManager.numPercentage(this.currentValue() / this.currentMaxValue() * 100, this.expDecimalwParam(), this.decimalModeParam());
         }
         return this._battler.currentExp() - this._battler.currentLevelExp();
     };
@@ -1515,9 +1560,9 @@ Imported.NUUN_MenuScreenEXBase = true;
             case "mp":
             case "tp":
             case "time":
-                return Sprite_Gauge.prototype.label.call(this);
+                return this.menuParam.ParamName ? this.menuParam.ParamName : Sprite_Gauge.prototype.label.call(this);
             case "menuexp":
-                return params.LabelShow ? TextManager.expA : '';
+                return this.labelShowParam() ? this.menuParam.ParamName ? this.menuParam.ParamName : TextManager.expA : '';
             default:
               return this.menuParam.ParamName;
             }
@@ -1528,11 +1573,12 @@ Imported.NUUN_MenuScreenEXBase = true;
     
     Sprite_MenuGauge.prototype.drawValue = function() {
         if (this._statusType === "menuexp") {
-            if (params.ExpDisplayMode === 0) {
+            const mode = this.expDisplayModeParam();
+            if (mode === 0) {
                 return;
             }
             let text = this.displyaExp();
-            if (params.ExpDisplayMode === 3) {
+            if (mode === 3) {
                 text = this._battler.isMaxLevel() ? "100%" : text +"%";
             } else {
                 text = this._battler.isMaxLevel() ? "-------" : text;
@@ -1544,6 +1590,30 @@ Imported.NUUN_MenuScreenEXBase = true;
         } else {
             Sprite_Gauge.prototype.drawValue.call(this);
         }
+    };
+
+    Sprite_MenuGauge.prototype.expGaugeColor1Param = function() {
+        return params.ExpGaugeColor1;
+    };
+
+    Sprite_MenuGauge.prototype.expGaugeColor2Param = function() {
+        return params.ExpGaugeColor2;
+    };
+
+    Sprite_MenuGauge.prototype.decimalModeParam = function() {
+        return params.DecimalMode;
+    };
+
+    Sprite_MenuGauge.prototype.expDecimalwParam = function() {
+        return params.EXPDecimal;
+    };
+
+    Sprite_MenuGauge.prototype.expDisplayModeParam = function() {
+        return params.ExpDisplayMode;
+    };
+
+    Sprite_MenuGauge.prototype.labelShowParam = function() {
+        return params.LabelShow;
     };
 
     function Sprite_MenuScreenCharacter() {
@@ -1693,5 +1763,6 @@ Imported.NUUN_MenuScreenEXBase = true;
     Sprite_MenuActorImg.prototype.loadApngSprite = function(name) {
         return Sprite_Picture.prototype.loadApngSprite.call(this, name);
     };
+
 
 })();

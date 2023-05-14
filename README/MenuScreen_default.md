@@ -26,6 +26,7 @@
 
 [メニュー画面チャプターテキスト](https://github.com/nuun888/MZ/blob/master/README/Chapter.md)  
 
+[スキルステータス画面表示カスタマイズ](https://github.com/nuun888/MZ/blob/master/README/SkillStatusEX.md)  
 
 ## 概要
 メニュー画面の表示を拡張します。  

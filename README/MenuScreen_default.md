@@ -17,6 +17,8 @@
 #### 拡張プラグイン
 [メニューコマンド表示EX](https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md)  
 
+[スキルステータス画面表示カスタマイズ](https://github.com/nuun888/MZ/blob/master/README/SkillStatusEX.md)  
+
 #### オプション
 全体選択時カーソル修正  
 ※アクター表示列が２列以上でかつ表示行が２行以上の場合は、以下のプラグインが必要です。  
@@ -25,8 +27,6 @@
 [メニュー画面行動目標表示](https://github.com/nuun888/MZ/blob/master/README/Destination.md)  
 
 [メニュー画面チャプターテキスト](https://github.com/nuun888/MZ/blob/master/README/Chapter.md)  
-
-[スキルステータス画面表示カスタマイズ](https://github.com/nuun888/MZ/blob/master/README/SkillStatusEX.md)  
 
 ## 概要
 メニュー画面の表示を拡張します。  

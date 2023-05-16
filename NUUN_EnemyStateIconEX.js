@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 敵ステート表示拡張
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -36,6 +36,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/16 Ver.1.1.2
+ * ステートアイコン表示位置の敵画像の下、敵画像の中心が機能していなかった問題を修正。
+ * ステートアイコン表示タイミングを選択時に指定したときにアクターのステートアイコンが表示されない問題を修正。
  * 2023/5/6 Ver.1.1.1
  * ステートの表示をフェードアウト、フェードインさせるように修正。
  * 2022/5/10 Ver.1.1.0
@@ -49,7 +52,7 @@
  * 
  * @param EnemyStatePosition
  * @desc モンスターのステートアイコンの表示位置
- * @text 名前表示位置
+ * @text ステートアイコン表示位置
  * @type select
  * @option 表示なし
  * @value -1
@@ -113,18 +116,23 @@ function getEnemyStatePosition(troop) {
 
 const _Sprite_Enemy_updateStateSprite = Sprite_Enemy.prototype.updateStateSprite;
 Sprite_Enemy.prototype.updateStateSprite = function() {
-  if (EnemyStatePosition < 0) {
-    return;
-  }
-  this.createStateIconSprite();
-  if (this._stateIconSprite) {
-    const enemy = this._enemy.enemy();
-    const x = (enemy.meta.EnemyStateX ? Number(enemy.meta.EnemyStateX) : 0) + State_X + this._enemy.getStatePositionX();
-    const y = (enemy.meta.EnemyStateY ? Number(enemy.meta.EnemyStateY) : 0) + State_Y + this._enemy.getStatePositionY();
-    this._stateIconSprite.x = x;
-    this._stateIconSprite.y = y - this.getButlerStatePosition();
-  }
-  _Sprite_Enemy_updateStateSprite.call(this);
+    if (EnemyStatePosition < 0) {
+        return;
+    }
+    _Sprite_Enemy_updateStateSprite.call(this);
+    this.createStateIconSprite();
+    if (this._stateIconSprite) {
+        const enemy = this._enemy.enemy();
+        const x = (enemy.meta.EnemyStateX ? Number(enemy.meta.EnemyStateX) : 0) + State_X + this._enemy.getStatePositionX();
+        const y = (enemy.meta.EnemyStateY ? Number(enemy.meta.EnemyStateY) : 0) + State_Y + this._enemy.getStatePositionY();
+        this._stateIconSprite.x = x;
+        this._stateIconSprite.y = y - this.getButlerStatePosition();
+
+        if (this._stateIconSprite.y < 20 - this.y) {
+            this._stateIconSprite.y = 20 - this.y;
+        }
+    }
+  
 };
 
 Sprite_Enemy.prototype.getButlerStatePosition = function() {
@@ -141,6 +149,7 @@ Sprite_Enemy.prototype.getButlerStatePosition = function() {
 Sprite_Enemy.prototype.createStateIconSprite = function() {//再定義
   if (!this._stateIconSprite) {
     const sprite = new Sprite_StateIcon();
+    sprite.StateVisible === 0 ? 255 : 0;
     this._stateIconSprite = sprite;
     sprite.show();
     sprite.move(0, 0);
@@ -155,11 +164,10 @@ Sprite_Enemy.prototype.createStateIconSprite = function() {//再定義
 const _Sprite_StateIcon_initMembers = Sprite_StateIcon.prototype.initMembers;
 Sprite_StateIcon.prototype.initMembers = function() {
     _Sprite_StateIcon_initMembers.call(this);
-    this.opacity = StateVisible === 0 ? 255 : 0;
 };
 
 Sprite_StateIcon.prototype.stateVisibleInSelect = function() {
-  if (StateVisible === 1) {
+  if (this._battler && this._battler.isEnemy() && StateVisible === 1) {
     return this._battler.isSelected();
   }
   return true;

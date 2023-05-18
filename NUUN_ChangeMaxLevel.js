@@ -87,7 +87,6 @@
  * @plugindesc 最大レベル変動プラグイン
  * @author NUUN
  * @version 1.2.1
- * @orderBefore NUUN_LevelUnlimited
  * 
  * @help
  * アクターの最大レベルをゲーム途中でも変更または特徴により最大レベルを変更できます。

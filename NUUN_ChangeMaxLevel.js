@@ -12,7 +12,6 @@
  * @plugindesc Max Level Fluctuation Plugin
  * @author NUUN
  * @version 1.2.1
- * @orderBefore NUUN_LevelUnlimited
  * 
  * @help
  * You can change the maximum level of the actor even during the game or change the maximum level by the characteristic.

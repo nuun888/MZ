@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Actor Level Unlimited
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * You can set the maximum level to 100 or more.
@@ -34,6 +34,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/18/2023 Ver.1.2.2
+ * Fixed not to affect "NUUN_ChangeMaxLevel".
  * 11/12/2022 Ver.1.2.1
  * Changed the display in languages other than Japanese to English.
  * 9/18//2022 Ver 1.2.0
@@ -51,7 +53,7 @@
  * @target MZ
  * @plugindesc レベル上限限界突破プラグイン
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * 最大レベルを１００以上に設定できます。
@@ -75,6 +77,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/18 Ver.1.2.2
+ * 最大レベル変動プラグインに影響しないように修正。
  * 2022/11/12 Ver.1.2.1
  * 日本語以外での表示を英語表示に変更。
  * 2022/9/18 Ver 1.2.0
@@ -126,7 +130,7 @@ Game_Actor.prototype.overLevelParam = function(Param1, Param2) {
 
 const _Game_Actor_maxLevel = Game_Actor.prototype.maxLevel;
 Game_Actor.prototype.maxLevel = function() {
-  return this.actor().meta.MaxLevel ? this.actor().meta.MaxLevel : _Game_Actor_maxLevel.call(this);
+  return !this._maxLevel && this.actor().meta.MaxLevel ? this.actor().meta.MaxLevel : _Game_Actor_maxLevel.call(this);
 };
 
 Game_Actor.prototype.initSkills = function() {

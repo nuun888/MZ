@@ -30,7 +30,7 @@
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
- * 更新履歴
+ * Log
  * 12/8/2022 Ver.1.2.1
  * Changed the display in languages other than Japanese to English.
  * 2/7/2022 Ver.1.2.0

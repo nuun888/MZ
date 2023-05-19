@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -62,6 +62,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/20/2023 Ver.1.5.1
+ * Fixed typos.
+ * Correction of description.
  * 5/13/2023 Ver.1.5.0
  * Added time for successful attack and time for critical hit to the limit gauge recovery settings.
  * 4/1/2023 Ver.1.4.1
@@ -378,7 +381,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -409,17 +412,23 @@
  * 単体選択のスキル、アイテムの場合は対象がアクターなら味方のリミットゲージ、敵なら敵グループのリミットゲージが増減します。
  * 
  * スキル、アイテムのメモ欄
- * <LimitAttacklStr:[eval]> 攻撃時にリミットゲージが増加します。
+ * <LimitAttackStr:[eval]> 攻撃時にリミットゲージが増加します。
  * <LimitCriticalStr:[eval]> クリティカル時にリミットゲージが増加します。
  * [eval]:評価式
  * 
- * 評価式
+ * 評価式(JavaScript)
  * 被ダメージ時
- * a:被ダメージバトラーデータ　da：被ダメージバトラーデータベース　damage:ダメージ値
+ * a:被ダメージバトラーデータ　da：被ダメージバトラーデータベース　damage:ダメージ値 cri:クリティカル
  * 攻撃成功時、クリティカル時
  * a:攻撃者バトラーデータ　da：攻撃者バトラーデータベース cri:クリティカル成功
  * 撃破時
  * a:撃破されたバトラーデータ　da：撃破されたバトラーデータベース
+ * 
+ * 設定例
+ * Math.floor(25 * damage / a.mhp) ダメージ量に応じて最大25回復
+ * Math.floor(25 * damage / a.mhp) * (cri ? 3 : 1) クリティカル時のみ３倍
+ * (a.actorId() === 6 ? 10 : 0) アクターIDが6番のアクターのした時に10回復
+ * 10 10回復
  * 
  * ゲージ表示拡張プラグインと併用する場合
  * 以下のプラグインパラメータはゲージ表示拡張プラグインで設定してください。
@@ -430,6 +439,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/20 Ver.1.5.1
+ * 誤字修正。
+ * 説明文の修正。
  * 2023/5/13 Ver.1.5.0
  * リミットゲージの回復時の設定に、攻撃時とクリティカル時を追加。
  * 2023/4/1 Ver.1.4.1
@@ -888,13 +900,14 @@ Game_BattlerBase.prototype.paySkillCost = function(skill) {
 const _Game_Battler_onDamage = Game_Battler.prototype.onDamage;
 Game_Battler.prototype.onDamage = function(value) {
   _Game_Battler_onDamage.call(this, value);
-  this.chargeLimitByDamage(DamageAmount, value);
+  this.chargeLimitByDamage(DamageAmount, value, this.result().critical);
 };
 
-Game_Battler.prototype.chargeLimitByDamage = function(evalStr, damage) {
+Game_Battler.prototype.chargeLimitByDamage = function(evalStr, damage, critical) {
   if (evalStr) {
     const a = this;
     const da = this.isActor() ? this.actor() : this.enemy();
+    const cri = critical;
     const val = Number(eval(evalStr));
     this.chargeLimit(val);
   }

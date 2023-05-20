@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.6.2
+# Ver.2.6.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.4以降  
@@ -26,6 +26,14 @@ actorclassは記述欄のみ指定します。
 `this._actor`または`actor` 表示中のアクターのゲームデータ
 `dactor` 表示中のアクターのデータベース  
 `aclass` 表示中のアクターの職業データ  
+
+共通画像、個別画像
+評価式or文字列(javaScript)には表示条件をjavascriptで記入します。条件が一致しているときに表示されます。  
+無記入の場合は常に表示されます。  
+`actor`:アクターゲームデータ  
+`dactor`:アクターシステムデータ  
+`aclass` 表示中のアクターの職業データ  
+
 ##### ステート耐性  
 `rate` ステート有効度  
 ##### ステート耐性、属性耐性
@@ -104,6 +112,9 @@ APNGを表示するには別途ApngPicture.js(トリアコンタン様)が必要
 `[text]`:任意の個別画像。  
 
 ### 更新履歴
+2023/5/21 Ver.2.6.3  
+共通画像、個別画像に表示条件を指定できる機能を追加。  
+AvPort_dsWeaponMasteryと併用できるように対応。  
 2023/5/4 Ver.2.6.2  
 評価式に職業のデータを参照できるように修正。  
 記述欄を職業から参照できるように修正。  

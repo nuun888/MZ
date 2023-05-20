@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.1
+ * @version 1.4.2
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/20/2023 Ver.1.4.2
+ * Conflict measures with "EquipScene_Extension".
+ * Fixed so that items can be displayed across two columns.
+ * Changed the X column specification to a maximum of 3.
+ * Added only the name to the items that can be set.
  * 5/14/2023 Ver.1.4.1
  * Corrected to display + when the difference parameter is positive.
  * 5/8/2023 Ver.1.4.0
@@ -428,17 +433,17 @@
  * @type select
  * @option None
  * @value 0
- * @option Actor name(1)(2)(3)(4)(6)(13)
+ * @option Actor name(1)(2)(3)(4)(6)(13)(19)
  * @value 1
- * @option Nickname(1)(2)(3)(4)(6)(12)(13)
+ * @option Nickname(1)(2)(3)(4)(6)(12)(13)(19)
  * @value 2
- * @option Class(1)(2)(3)(4)(6)(12)(13)
+ * @option Class(1)(2)(3)(4)(6)(12)(13)(19)
  * @value 3
- * @option Level(1)(2)(3)(4)(5)(6)(7)(12)(13)
+ * @option Level(1)(2)(3)(4)(5)(6)(7)(12)(13)(19)
  * @value 4
  * @option State(1)(2)(3)(4)(6)
  * @value 5
- * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(18)
+ * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(18)(19)
  * @value 6
  * @option HP gauge(1)(2)(3)(4)(6)
  * @value 10
@@ -446,77 +451,77 @@
  * @value 11
  * @option TP gaugeジ(1)(2)(3)(4)(6)
  * @value 12
- * @option HP(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option HP(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 20
- * @option MP(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option MP(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 21
- * @option ATK(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option ATK(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 22
- * @option DEF(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option DEF(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 23
- * @option MAT(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option MAT(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 24
- * @option MDF(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option MDF(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 25
- * @option AGI(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option AGI(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 26
- * @option LUK(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option LUK(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 27
- * @option Hit(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Hit(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 30
- * @option Evasion(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Evasion(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 31
- * @option Critcal rate(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Critcal rate(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 32
- * @option Critcal evade(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Critcal evade(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 33
- * @option Magic evade(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Magic evade(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 34
- * @option Magic reflect(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Magic reflect(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 35
- * @option Counter(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Counter(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 36
- * @option HP regen(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option HP regen(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 37
- * @option MP regen(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option MP regen(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 38
- * @option TP regen(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option TP regen(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 39
- * @option Aggro(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Aggro(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 40
- * @option Guard(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Guard(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 41
- * @option Recovery(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Recovery(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 42
- * @option Item effect(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Item effect(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 43
- * @option MP cost(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option MP cost(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 44
- * @option TP charge(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option TP charge(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 45
- * @option Physical damage(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Physical damage(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 46
- * @option Magical damage(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Magical damage(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 47
- * @option Floor damage(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Floor damage(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 48
- * @option Gain exp rate(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option Gain exp rate(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 49
- * @option Elemental resistance(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)(15)(17)
+ * @option Elemental resistance(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)(15)(17)(19)
  * @value 100
- * @option State resistance(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)(15)(17)
+ * @option State resistance(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)(15)(17)(19)
  * @value 101
- * @option Text(1)(2)(3)(4)(5)(6)(8)(13)(14)
+ * @option Text(1)(2)(3)(4)(5)(6)(8)(13)(14)(19)
  * @value 150
- * @option Special status(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @option Special status(1)(2)(3)(4)(5)(6)(7)(8)(13)(19)
  * @value 160
- * @option Equip set bonus(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @option Equip set bonus(1)(2)(3)(4)(5)(6)(7)(8)(13)(19)
  * @value 180
  * @option Character chip(1)(2)(3)(4)
  * @value 200
  * @option SV Actor(1)(2)(3)(4)
  * @value 201
- * @option Line(1)(2)(3)(4)(5)(6)
+ * @option Line(1)(2)(3)(4)(5)(6)(19)
  * @value 1000
  * @default 0
  * 
@@ -526,7 +531,7 @@
  * @type number
  * @default 1
  * @min 1
- * @max 1
+ * @max 3
  * 
  * @param Y_Position
  * @desc Y display line position
@@ -587,6 +592,16 @@
  * @option 'a;//Actor game data'
  * @option 'a.actor();//Actor system data'
  * @default 
+ * 
+ * @param WideMode
+ * @desc Item display mode. Displayed across multiple columns.
+ * @text Item display mode(19)
+ * @type select
+ * @option 1 column display
+ * @value 1
+ * @option 2 columns display
+ * @value 2
+ * @default 1
  * 
  * @param paramUnit
  * @desc Set the units.
@@ -810,7 +825,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.1
+ * @version 1.4.2
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -839,6 +854,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/20 Ver.1.4.2
+ * 装備シーン拡張との競合対策。
+ * 項目を2列に跨いで表示できるように修正。
+ * X列指定を最大3に変更。
+ * 設定できる項目に名称のみを追加。
  * 2023/5/14 Ver.1.4.1
  * 差分パラメータがプラスの場合、＋を表示するように修正。
  * 2023/5/8 Ver.1.4.0
@@ -1228,95 +1248,97 @@
  * @type select
  * @option なし
  * @value 0
- * @option アクター名(1)(2)(3)(4)(6)(13)
+ * @option アクター名(1)(2)(3)(4)(6)(13)(19)
  * @value 1
- * @option 二つ名(1)(2)(3)(4)(6)(12)(13)
+ * @option 二つ名(1)(2)(3)(4)(6)(12)(13)(19)
  * @value 2
- * @option 職業(1)(2)(3)(4)(6)(12)(13)
+ * @option 職業(1)(2)(3)(4)(6)(12)(13)(19)
  * @value 3
- * @option レベル(1)(2)(3)(4)(5)(6)(7)(12)(13)
+ * @option レベル(1)(2)(3)(4)(5)(6)(7)(12)(13)(19)
  * @value 4
  * @option ステート(1)(2)(3)(4)(6)
  * @value 5
- * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(18)
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(18)(19)
  * @value 6
+ * @option 名称のみ(1)(2)(3)(4)(5)(6)(8)(12)(13)(19)
+ * @value 9
  * @option ＨＰゲージ(1)(2)(3)(4)(6)
  * @value 10
  * @option ＭＰゲージ(1)(2)(3)(4)(6)
  * @value 11
  * @option ＴＰゲージ(1)(2)(3)(4)(6)
  * @value 12
- * @option ＨＰ(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option ＨＰ(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 20
- * @option ＭＰ(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option ＭＰ(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 21
- * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 22
- * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 23
- * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 24
- * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 25
- * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 26
- * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
  * @value 27
- * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 30
- * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 31
- * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 32
- * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 33
- * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 34
- * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 35
- * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 36
- * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 37
- * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 38
- * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 39
- * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 40
- * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 41
- * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 42
- * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 43
- * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 44
- * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 45
- * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 46
- * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 47
- * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 48
- * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)
+ * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
  * @value 49
- * @option 属性耐性(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)(15)(17)
+ * @option 属性耐性(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)(15)(17)(19)
  * @value 100
- * @option ステート耐性(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)(15)(17)
+ * @option ステート耐性(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)(15)(17)(19)
  * @value 101
- * @option 記述欄(1)(2)(3)(4)(5)(6)(8)(13)(14)
+ * @option 記述欄(1)(2)(3)(4)(5)(6)(8)(13)(14)(19)
  * @value 150
- * @option 特殊ステータス(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @option 特殊ステータス(1)(2)(3)(4)(5)(6)(7)(8)(13)(19)
  * @value 160
- * @option 装備セットボーナス(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @option 装備セットボーナス(1)(2)(3)(4)(5)(6)(7)(8)(13)(19)
  * @value 180
  * @option キャラチップ(1)(2)(3)(4)
  * @value 200
  * @option SVアクター(1)(2)(3)(4)
  * @value 201
- * @option ライン(1)(2)(3)(4)(5)(6)
+ * @option ライン(1)(2)(3)(4)(5)(6)(19)
  * @value 1000
  * @default 0
  * 
@@ -1326,7 +1348,7 @@
  * @type number
  * @default 1
  * @min 1
- * @max 1
+ * @max 3
  * 
  * @param Y_Position
  * @desc Y表示行位置
@@ -1386,7 +1408,17 @@
  * @option '$gameVariables.value(0);//ゲーム変数'
  * @option 'a;//アクターのゲームデータ'
  * @option 'a.actor();//アクターのシステムデータ'
- * @default 
+ * 
+ * @param WideMode
+ * @desc 項目表示モード。複数列にまたがって表示されます。
+ * @text 項目表示モード(19)
+ * @type select
+ * @option １列表示
+ * @value 1
+ * @option ２列表示
+ * @value 2
+ * @default 1
+ * @default 1
  * 
  * @param paramUnit
  * @desc 単位を設定します。
@@ -1667,16 +1699,22 @@ Imported.NUUN_EquipStatusEX = true;
         this._itemWindow.setHandler(KeyPreviousName, this.previousPage.bind(this));
     };
 
+    Scene_Equip.prototype.createStatusWindow = function() {
+        const rect = this.statusWindowRect();
+        this._statusWindow = new Window_EquipStatusEX(rect);
+        this.addWindow(this._statusWindow);
+    };
+
     Scene_Equip.prototype.nextPage = function() {
         const page = this._statusWindow.getPage();
         const maxPage = this._statusWindow.maxPage();
         this._statusWindow.setPage((page + 1) % maxPage);
         this._statusWindow.refresh();
         SoundManager.playCursor();
-        if (this._slotWindow.visible) {
-            this._slotWindow.activate();
-        } else if (this._itemWindow.visible) {
+        if (this._itemWindow.index() >= 0 && this._itemWindow.visible) {
             this._itemWindow.activate();
+        } else if (this._slotWindow.visible) {
+            this._slotWindow.activate();
         }
     };
 
@@ -1685,11 +1723,12 @@ Imported.NUUN_EquipStatusEX = true;
         const maxPage = this._statusWindow.maxPage();
         this._statusWindow.setPage((page + maxPage - 1) % maxPage);
         this._statusWindow.refresh();
+        if (this._itemWindow )
         SoundManager.playCursor();
-        if (this._slotWindow.visible) {
-            this._slotWindow.activate();
-        } else if (this._itemWindow.visible) {
+        if (this._itemWindow.index() >= 0 && this._itemWindow.visible) {
             this._itemWindow.activate();
+        } else if (this._slotWindow.visible) {
+            this._slotWindow.activate();
         }
     };
 
@@ -1721,48 +1760,58 @@ Imported.NUUN_EquipStatusEX = true;
     }
 
 
-    const _Window_EquipStatus_initialize = Window_EquipStatus.prototype.initialize;
-    Window_EquipStatus.prototype.initialize = function(rect) {
+    function Window_EquipStatusEX() {
+        this.initialize(...arguments);
+    }
+    
+    Window_EquipStatusEX.prototype = Object.create(Window_EquipStatus.prototype);
+    Window_EquipStatusEX.prototype.constructor = Window_EquipStatusEX;
+    
+    Window_EquipStatusEX.prototype.initialize = function(rect) {
         this.loadImages();
-        _Window_EquipStatus_initialize.call(this, rect);
+        Window_EquipStatus.prototype.initialize.call(this, rect);
         this._page = 0;
         this.language_Jp = $gameSystem.isJapanese();
         this._equipBitmap = null;
     };
     
-    Window_EquipStatus.prototype.lineHeight = function() {
+    Window_EquipStatusEX.prototype.lineHeight = function() {
         return ContentsHeight || 36;
     };
 
-    Window_EquipStatus.prototype.maxCols = function() {
+    Window_EquipStatusEX.prototype.maxCols = function() {
         return EquipStatusCols;
     };
 
-    Window_EquipStatus.prototype.getPage = function() {
+    Window_EquipStatusEX.prototype.getPage = function() {
         return this._page;
     };
 
-    Window_EquipStatus.prototype.setPage = function(page) {
+    Window_EquipStatusEX.prototype.setPage = function(page) {
         return this._page = page;
     };
 
-    Window_EquipStatus.prototype.maxPage = function() {
+    Window_EquipStatusEX.prototype.maxPage = function() {
         return EquipPageList.length;
     };
 
-    Window_EquipStatus.prototype.getPageList = function() {
+    Window_EquipStatusEX.prototype.getPageList = function() {
         const page = EquipPageList[this.getPage()].ListDateSetting;
         const tag = 'PageList' + page;
         return equipContents[tag]
     };
 
-    const _Window_EquipStatus_refresh = Window_EquipStatus.prototype.refresh;
-    Window_EquipStatus.prototype.refresh = function() {
-        Window_StatusBase.prototype.refresh.call(this);
-        _Window_EquipStatus_refresh.call(this);
+    Window_EquipStatusEX.prototype.refresh = function() {
+        this.contents.clear();
+        if (this._actor) {
+            const nameRect = this.itemLineRect(0);
+            this.drawActorName(this._actor, nameRect.x, 0, nameRect.width);
+            this.drawActorFace(this._actor, nameRect.x, nameRect.height);
+            this.drawAllParams();
+        }
     };
 
-    Window_EquipStatus.prototype.loadImages = function() {
+    Window_EquipStatusEX.prototype.loadImages = function() {
         for (const actor of $gameParty.allMembers()) {
             let data = null;
             if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
@@ -1786,8 +1835,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    const _Window_EquipStatus_drawActorFace = Window_EquipStatus.prototype.drawActorFace;
-    Window_EquipStatus.prototype.drawActorFace = function(actor, x, y, width, height) {
+    Window_EquipStatusEX.prototype.drawActorFace = function(actor, x, y, width, height) {
         const rect = this.itemRect(0);
         const data = this.getActorData(actor);
         const mode = data.GraphicMode;
@@ -1820,11 +1868,11 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.getActorData = function(actor) {
+    Window_EquipStatusEX.prototype.getActorData = function(actor) {
         return Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreActorPicture(actor.actorId()) : this.getActorImgData(actor.actorId());
     };
 
-    Window_EquipStatus.prototype.getActorImgData = function(actorId) {
+    Window_EquipStatusEX.prototype.getActorImgData = function(actorId) {
         const actors = ActorsImgList;
         const find = actors.find(actor => actor.actorId === actorId);
         if (!find) {
@@ -1835,7 +1883,7 @@ Imported.NUUN_EquipStatusEX = true;
         return find;
     };
 
-    Window_EquipStatus.prototype.battlreActorPicture = function(id) {
+    Window_EquipStatusEX.prototype.battlreActorPicture = function(id) {
         const actors = ActorPictureData;
         const find = actors.find(actor => actor.actorId === id);
         if (!find) {
@@ -1846,7 +1894,7 @@ Imported.NUUN_EquipStatusEX = true;
         return find;
     };
 
-    Window_EquipStatus.prototype.drawEquipActorFace = function(data, bitmap, x, y, width, height, actor) {
+    Window_EquipStatusEX.prototype.drawEquipActorFace = function(data, bitmap, x, y, width, height, actor) {
         width = Math.min(width, ImageManager.faceWidth);
         height = Math.min(height, ImageManager.faceHeight);
         x += data.Actor_X + ActorImg_X;
@@ -1858,7 +1906,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawActorGraphic = function(data, bitmap, x, y, width, height, actor) {
+    Window_EquipStatusEX.prototype.drawActorGraphic = function(data, bitmap, x, y, width, height, actor) {
         width = Math.min(width, bitmap.width);
         height = Math.min(height, bitmap.height);
         const scale = (data.Actor_Scale || 100) / 100;
@@ -1871,8 +1919,7 @@ Imported.NUUN_EquipStatusEX = true;
         this.contents.blt(bitmap, sx, sy, width + (width - sw), height + (height - sh), x, y, width, height);
     };
 
-    const _Window_EquipStatus_drawAllParams = Window_EquipStatus.prototype.drawAllParams;
-    Window_EquipStatus.prototype.drawAllParams = function() {
+    Window_EquipStatusEX.prototype.drawAllParams = function() {
         if (!!this._equipBitmap) {
             this._equipBitmap.addLoadListener(function() {
                 this.drawEquipStatusContents();
@@ -1882,7 +1929,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawEquipStatusContents = function() {
+    Window_EquipStatusEX.prototype.drawEquipStatusContents = function() {
         if (this.maxPage() > 0) {
             const list = this.getPageList();
             const lineHeight = this.lineHeight();
@@ -1893,7 +1940,7 @@ Imported.NUUN_EquipStatusEX = true;
                 const rect = this.itemRect(position - 1);
                 const x = rect.x + (data.X_Coordinate);
                 const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
-                const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width;
+                const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : this.widthMode(data, rect);
                 maxGaugeWidth = width;
                 this.dateDisplay(data, x, y, width);
             }
@@ -1902,7 +1949,14 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.dateDisplay = function(data, x, y, width) {
+    Window_EquipStatusEX.prototype.widthMode = function(data, rect) {
+        if (data.WideMode === 2) {
+          return rect.width * 2 + this.colSpacing();
+        }
+        return rect.width;
+    };
+
+    Window_EquipStatusEX.prototype.dateDisplay = function(data, x, y, width) {
         const actor = this._actor;
         switch (data.DateSelect) {
         case 0:
@@ -1924,6 +1978,9 @@ Imported.NUUN_EquipStatusEX = true;
             break;
         case 6:
             this.drawOrgParam(data, actor, x, y, width);
+            break;
+        case 9:
+            this.drawContentsName(data, actor, x, y, width);
             break;
         case 10:
             $gameTemp.equipParam = data;
@@ -2004,7 +2061,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.paramNameShow = function(data) {
+    Window_EquipStatusEX.prototype.paramNameShow = function(data) {
         if (data.ParamName) {
           return data.ParamName
         }
@@ -2054,30 +2111,36 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawActorName = function(actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawActorName = function(actor, x, y, width) {
         
     };
 
-    Window_EquipStatus.prototype.drawContentsActorName = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawContentsName = function(data, actor, x, y, width) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        this.drawText(data.ParamName, x, y, width, data.Align);
+    };
+
+    Window_EquipStatusEX.prototype.drawContentsActorName = function(data, actor, x, y, width) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         Window_StatusBase.prototype.drawActorName.call(this, actor, x, y, width);
     };
 
-    Window_EquipStatus.prototype.drawActorClass = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawActorClass = function(data, actor, x, y, width) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.resetTextColor();
         this.drawText(actor.currentClass().name, x, y, width, data.Align);
     };
     
-    Window_EquipStatus.prototype.drawActorNickname = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawActorNickname = function(data, actor, x, y, width) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.resetTextColor();
         this.drawText(actor.nickname(), x, y, width, data.Align);
     };
 
-    Window_EquipStatus.prototype.drawActorLevel = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawActorLevel = function(data, actor, x, y, width) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
-        this.changeTextColor(ColorManager.systemColor());
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const systemWidth = data.SystemItemWidth || 48;
         const x2 = x + systemWidth + this.itemPadding();
         this.drawText(TextManager.levelA, x, y, systemWidth);
@@ -2085,7 +2148,7 @@ Imported.NUUN_EquipStatusEX = true;
         this.drawText(actor.level, x2, y, width - x2, data.Align);
     };
     
-    Window_EquipStatus.prototype.drawActorIcons = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawActorIcons = function(data, actor, x, y, width) {
         const iconWidth = ImageManager.iconWidth;
         const icons = actor.allIcons().slice(0, Math.floor(width / iconWidth));
         let iconX = x;
@@ -2095,7 +2158,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawParam = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawParam = function(data, actor, x, y, width) {
         const paramId = data.DateSelect - 20;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
@@ -2129,7 +2192,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawXParam = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawXParam = function(data, actor, x, y, width) {
         const paramId = data.DateSelect;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
@@ -2163,7 +2226,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawSParam = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawSParam = function(data, actor, x, y, width) {
         const paramId = data.DateSelect;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
@@ -2197,7 +2260,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawOriginalStatusParam = function(data, index, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawOriginalStatusParam = function(data, index, actor, x, y, width) {
         let a = actor;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
@@ -2244,7 +2307,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawSpecialStatus = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawSpecialStatus = function(data, actor, x, y, width) {
         const lineHeight = SpecialAbilityLineHeight;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
@@ -2258,7 +2321,7 @@ Imported.NUUN_EquipStatusEX = true;
         this.drawTextList(textList, tempList, x, y, width, lineHeight);
     };
 
-    Window_EquipStatus.prototype.drawSetBonus = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawSetBonus = function(data, actor, x, y, width) {
         if (!Imported.NUUN_SetBonusEquip) {
             return;
         }
@@ -2275,7 +2338,7 @@ Imported.NUUN_EquipStatusEX = true;
         this.drawTextList(textList, tempList, x, y, width, lineHeight);
     };
 
-    Window_EquipStatus.prototype.drawElement = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawElement = function(data, actor, x, y, width) {
         const lineHeight = this.lineHeight();
         const name = data.ParamName ? data.ParamName : null;
         const systemWidth = name ? (data.SystemItemWidth || 160) : 0;
@@ -2329,7 +2392,7 @@ Imported.NUUN_EquipStatusEX = true;
         });
     };
 
-    Window_EquipStatus.prototype.drawState = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawState = function(data, actor, x, y, width) {
         const lineHeight = this.lineHeight();
         const name = data.ParamName ? data.ParamName : null;
         const systemWidth = name ? (data.SystemItemWidth || 160) : 0;
@@ -2385,7 +2448,7 @@ Imported.NUUN_EquipStatusEX = true;
         });
     };
 
-    Window_EquipStatus.prototype.drawDesc = function(data, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawDesc = function(data, actor, x, y, width) {
         const lineHeight = this.lineHeight();
         let text = null;
         const name = data.ParamName ? data.ParamName : null;
@@ -2405,11 +2468,11 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.contentsDrawActorChip = function(data, x, y, width, actor) {
+    Window_EquipStatusEX.prototype.contentsDrawActorChip = function(data, x, y, width, actor) {
         this.actorCharacterChip(actor, data, x + 24, y + 48);
     };
 
-    Window_EquipStatus.prototype.actorCharacterChip = function(actor, data, x, y) { 
+    Window_EquipStatusEX.prototype.actorCharacterChip = function(actor, data, x, y) { 
         const key = "actormenuStatusCharacter";
         const sprite = this.createInnerSprite(key, Sprite_EquipScreenCharacter);
         sprite.setup(actor, data);
@@ -2418,7 +2481,7 @@ Imported.NUUN_EquipStatusEX = true;
         sprite.show();
     };
 
-    Window_EquipStatus.prototype.drawSvActorImg = function(data, x, y, width, actor) {
+    Window_EquipStatusEX.prototype.drawSvActorImg = function(data, x, y, width, actor) {
         const key = "menuSvActor";
         const sprite = this.createInnerSprite(key, Sprite_EquipSvActor);
         sprite.setup(actor, data);
@@ -2427,24 +2490,24 @@ Imported.NUUN_EquipStatusEX = true;
         sprite.startMotion();
     };
 
-    Window_EquipStatus.prototype.placeHpGauge = function(x, y, actor) {
+    Window_EquipStatusEX.prototype.placeHpGauge = function(x, y, actor) {
         $gameTemp.equipGaugeType = "hp";
         this.placeGauge(actor, "hp", x, y);
     };
     
-    Window_EquipStatus.prototype.placeMpGauge = function(x, y, actor) {
+    Window_EquipStatusEX.prototype.placeMpGauge = function(x, y, actor) {
         $gameTemp.equipGaugeType = "mp";
         this.placeGauge(actor, "mp", x, y);
     };
     
-    Window_EquipStatus.prototype.placeTpGauge = function(x, y, actor) {
+    Window_EquipStatusEX.prototype.placeTpGauge = function(x, y, actor) {
         if ($dataSystem.optDisplayTp) {
             $gameTemp.equipGaugeType = "tp";
             this.placeGauge(actor, "tp", x, y);
         }
     };
 
-    Window_EquipStatus.prototype.placeGauge = function(actor, type, x, y) {
+    Window_EquipStatusEX.prototype.placeGauge = function(actor, type, x, y) {
         const key = "actorEquip-gauge-%1".format(type);
         const sprite = this.createInnerSprite(key, Sprite_EquipStatusGauge);
         sprite.setup(actor, type);
@@ -2453,32 +2516,32 @@ Imported.NUUN_EquipStatusEX = true;
     };
     
 
-    Window_EquipStatus.prototype.horzLine = function(data, x, y, width, actor) {
+    Window_EquipStatusEX.prototype.horzLine = function(data, x, y, width, actor) {
         const lineY = y + this.lineHeight() / 2 - 1;
         this.contents.paintOpacity = 48;
         this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(data.NameColor));
         this.contents.paintOpacity = 255;
     };
 
-    Window_EquipStatus.prototype.listHorzLine = function(x, y, width) {
+    Window_EquipStatusEX.prototype.listHorzLine = function(x, y, width) {
         const lineY = y + this.lineHeight() / 2 - 1;
         this.contents.paintOpacity = 48;
         this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(0));
         this.contents.paintOpacity = 255;
     };
     
-    Window_EquipStatus.prototype.paramX = function(width) {//再定義
+    Window_EquipStatusEX.prototype.paramX = function(width) {//再定義
         const itemPadding = this.itemPadding();
         const rightArrowWidth = this.rightArrowWidth();
         const paramWidth = this.paramWidth();
         return width - itemPadding - paramWidth * 2 - rightArrowWidth - (EquipStatusDifference ? this.paramDifferenceWidth() : 0);
     };
 
-    Window_EquipStatus.prototype.paramDifferenceWidth = function() {
+    Window_EquipStatusEX.prototype.paramDifferenceWidth = function() {
         return 48;
     };
 
-    Window_EquipStatus.prototype.createApngSprite = function(actor, data, rect) {
+    Window_EquipStatusEX.prototype.createApngSprite = function(actor, data, rect) {
         if (!this._actorBitmap) {
             const sprite = new Sprite_NuunAPngImg();
             this._contentsBackSprite.addChild(sprite);
@@ -2491,11 +2554,11 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawSetBonusName = function(name, x, y, width) {
+    Window_EquipStatusEX.prototype.drawSetBonusName = function(name, x, y, width) {
         this.drawText(name, x, y, width);
     };
 
-    Window_EquipStatus.prototype.getSpecialAbilityText = function(actor) {
+    Window_EquipStatusEX.prototype.getSpecialAbilityText = function(actor) {
         const textList = [];
         actor.equips().forEach(equip => {
             if (equip && equip.meta.SpecialAbilityText) {
@@ -2509,7 +2572,7 @@ Imported.NUUN_EquipStatusEX = true;
         return textList;
     };
 
-    Window_EquipStatus.prototype.getSetBonusList = function(actor, data, width) {
+    Window_EquipStatusEX.prototype.getSetBonusList = function(actor, data, width) {
         const textList = [];
         const list = actor.getSetBonusIds().filter(bonus => !!bonus);
         let tag = null;
@@ -2535,7 +2598,7 @@ Imported.NUUN_EquipStatusEX = true;
         return textList;
     };
 
-    Window_EquipStatus.prototype.drawSetBonusNumberEquipment = function(textList, tag, data, numberEquip, width) {
+    Window_EquipStatusEX.prototype.drawSetBonusNumberEquipment = function(textList, tag, data, numberEquip, width) {
         const equip = getSetBonusEquip(numberEquip.SetNumberEquipWeaponData, numberEquip.SetNumberEquipArmorData);
         if (equip) {
             let text = '';
@@ -2562,7 +2625,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawSetBonusParam = function(textList, tag, data, numberEquip, x, y, width) {
+    Window_EquipStatusEX.prototype.drawSetBonusParam = function(textList, tag, data, numberEquip, x, y, width) {
         const equip = getSetBonusEquip(numberEquip.SetBonusWeaponData, numberEquip.SetBonusArmorData);
         if (equip) {
             let text = '';
@@ -2589,7 +2652,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatus.prototype.drawTextList = function(textList, tempList, x, y, width, lineHeight) {
+    Window_EquipStatusEX.prototype.drawTextList = function(textList, tempList, x, y, width, lineHeight) {
         let textWidth = 0;
         let textX =  0;
         for (const text of textList) {

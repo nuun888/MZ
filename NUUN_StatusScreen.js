@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.2
+ * @version 2.6.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -49,6 +49,13 @@
  * 属性耐性、属性耐性
  * rate 単位付きの属性、ステート有効度
  * r:属性、ステート耐性値　全ての耐性値を乗算した数値 計算式で使用する場合はこちらを使用します。
+ * 
+ * 共通画像、個別画像
+ * 評価式or文字列(javaScript)には表示条件をjavascriptで記入します。条件が一致しているときに表示されます。
+ * 無記入の場合は常に表示されます。
+ * actor:アクターゲームデータ
+ * dactor:アクターシステムデータ
+ * aclass 表示中のアクターの職業データ
  * 
  * ステート
  * 表示したいステートIDを,区切りで指定します。
@@ -97,6 +104,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/21 Ver.2.6.3
+ * 共通画像、個別画像に表示条件を指定できる機能を追加。
+ * AvPort_dsWeaponMasteryと併用できるように対応。
  * 2023/5/4 Ver.2.6.2
  * 評価式に職業のデータを参照できるように修正。
  * 記述欄を職業から参照できるように修正。
@@ -1038,10 +1048,12 @@
  * @value 201
  * @option ステート耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
  * @value 202
- * @option 画像（共通画像）(4)～(7)(22)
+ * @option 画像（共通画像）(3)(4)～(7)(22)
  * @value 300
- * @option 画像（個別指定画像）(4)～(7)(13)
+ * @option 画像（個別指定画像）(3)(4)～(7)(13)
  * @value 301
+ * @option 武器熟練度システム　要AvPort_dsWeaponMastery.js(4)～(7)
+ * @value 900
  * @option ライン(1)(4)(5)(6)(7)(8)(10)
  * @value 1000
  * @default 0
@@ -1409,6 +1421,9 @@ Scene_Status.prototype.create = function() {
   _Scene_Status_create.call(this);
   this.createPageStatusWindow();
   this.createStatusWindow();
+  if (Imported.dsWeaponMastery) {
+    this.createStatusMasteryWindowWithStatusEx();
+  }
   this.createStatusButton();
 };
 
@@ -1502,8 +1517,11 @@ Scene_Status.prototype.createStatusButton = function() {
 };
 
 Scene_Status.prototype.refreshActor = function() {
-  const actor = this.actor();
-  this._statusWindow.setActor(actor);
+    const actor = this.actor();
+    this._statusWindow.setActor(actor);
+    if (Imported.dsWeaponMastery) {
+        this._statusMasteryWindow.setActor(actor);
+    }
 };
 
 const _Scene_Status_onActorChange = Scene_Status.prototype.onActorChange;
@@ -1583,6 +1601,9 @@ Window_Status.prototype.initialize = function(rect) {
 
 Window_Status.prototype.refresh = function() {
   Window_StatusBase.prototype.refresh.call(this);
+  if (Imported.dsWeaponMastery && SceneManager._scene._statusMasteryWindow) {
+    this.refreshMasteryHide();
+  }
   if (this._actor) {
     this.actorImg();
     this.drawBlockImg();
@@ -1920,6 +1941,9 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
     case 301:
       this.drawStatusImg(list, this._actor, x, y, width);
       break;
+    case 900:
+      this.drawMastery(list, this._actor, x, y, width);//武器熟練度システム
+    break;
     case 1000:
       this.horzLine(list, x, y, width);
       break;
@@ -2048,6 +2072,18 @@ Window_Status.prototype.paramShow = function(list, actor, params, detaEval) {
     default:
       return null;
   }
+};
+
+Window_Status.prototype.drawMastery = function(list, actor, x, y, width) {
+    try {
+        const windowMastery = SceneManager._scene._statusMasteryWindow;
+        windowMastery.x = x - 4;
+        windowMastery.y = y - 4;
+        this.refreshMastery();
+    } catch (error) {
+        const log = $gameSystem.isJapanese() ? 'AvPort_dsWeaponMastery.jsが見つかりません。' : "AvPort_dsWeaponMastery.js not found.";
+        throw ["LoadError", log];
+    }
 };
 
 Window_Status.prototype.horzLine = function(list, x, y, width) {
@@ -2490,6 +2526,12 @@ Window_Status.prototype.drawImg = function(bitmap, list, x, y, width) {
     //const scalex = Math.min(1.0, width / bitmap.width);
     //const scaley = Math.min(1.0, height / bitmap.height);
     //const scale = scalex > scaley ? scaley : scalex;
+    const actor = this._actor;
+    const dactor = actor.actor();
+    const aclass = actor.currentClass();
+    if (list.DetaEval && !eval(list.DetaEval)) {
+        return;
+    }
     const dw = Math.floor(bitmap.width);
     const dh = Math.floor(bitmap.height);
     x += Math.floor(width / 2 - dw / 2);
@@ -2945,5 +2987,29 @@ Sprite_StatusSvActor.prototype.startMotion = function() {
 Sprite_StatusSvActor.prototype.setupWeaponAnimation = function() {
     
 };
+
+if (Imported.dsWeaponMastery) {
+    const _Scene_Status_createStatusMasteryWindow = Scene_Status.prototype.createStatusMasteryWindow;
+    Scene_Status.prototype.createStatusMasteryWindow = function() {
+        
+    };
+
+    Scene_Status.prototype.createStatusMasteryWindowWithStatusEx = function() {
+        _Scene_Status_createStatusMasteryWindow.call(this);
+        this._statusMasteryWindow.hide();
+    };
+
+    Window_Status.prototype.refreshMastery = function() {
+        if (this._switchWM) {
+            SceneManager._scene._statusMasteryWindow.show();
+        } else {
+            SceneManager._scene._statusMasteryWindow.hide();
+        }
+    };
+
+    Window_Status.prototype.refreshMasteryHide = function() {
+        SceneManager._scene._statusMasteryWindow.hide();
+    };
+}
 
 })();

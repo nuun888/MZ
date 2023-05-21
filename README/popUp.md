@@ -1,5 +1,5 @@
 # [ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
-# Ver.2.0.1
+# Ver.2.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -60,6 +60,9 @@ Ver.2.0.0でプラグインパラメータの見直しを行いました関係�
 各ポップアップ毎にポップアップの種類を変えたい場合は、各ポップアッププラグインの適用クラスから'Sprite_PopUpEX'を外してください。  
 
 ## 更新履歴
+2023/5/21 Ver 2.0.2  
+イベントコマンドでのステート付加、解除でもポップアップするように修正。  
+特定のプラグインとの併用で、使用者のポップアップが表示されない問題を修正。  
 2023/3/27 Ver 2.0.1  
 能力低下から能力上昇またはその逆で付加した場合、アイコンが正常に表示されない問題を修正。  
 2022/12/28 Ver 2.0.0  

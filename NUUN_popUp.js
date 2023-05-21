@@ -68,7 +68,7 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 3/27/2023 Ver 2.0.2
+ * 5/21/2023 Ver 2.0.2
  * Fixed to pop up even when adding or canceling state with event command.
  * Fixed user popup not showing when used with certain plugins.
  * 3/27/2023 Ver 2.0.1
@@ -477,7 +477,7 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2023/3/27 Ver 2.0.2
+ * 2023/5/21 Ver 2.0.2
  * イベントコマンドでのステート付加、解除でもポップアップするように修正。
  * 特定のプラグインとの併用で、使用者のポップアップが表示されない問題を修正。
  * 2023/3/27 Ver 2.0.1

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Pop up
  * @author NUUN
- * @version 2.0.1
+ * @version 2.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -68,6 +68,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/27/2023 Ver 2.0.2
+ * Fixed to pop up even when adding or canceling state with event command.
+ * Fixed user popup not showing when used with certain plugins.
  * 3/27/2023 Ver 2.0.1
  * Fixed an issue where the icon would not display properly when adding an ability reduction to an ability increase or vice versa.
  * 12/28/2022 Ver 2.0.0
@@ -416,7 +419,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 2.0.1
+ * @version 2.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -474,6 +477,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/3/27 Ver 2.0.2
+ * イベントコマンドでのステート付加、解除でもポップアップするように修正。
+ * 特定のプラグインとの併用で、使用者のポップアップが表示されない問題を修正。
  * 2023/3/27 Ver 2.0.1
  * 能力低下から能力上昇またはその逆で付加した場合、アイコンが正常に表示されない問題を修正。
  * 2022/12/28 Ver 2.0.0
@@ -843,46 +849,81 @@ Imported.NUUN_popUp = true;
   const PopUpDefeatImg = String(parameters['PopUpDefeatImg']);
   let nuunPopup = false;
 
-  function initPopUpData() {
-    const popupData = {};
-    popupData.name = null;
-    popupData.color = 0;
-    popupData.id = 0;
-    popupData.iconIndex = 0;
-    popupData.opacity = 255;
-    popupData.mode = 'Default';
-    popupData.x = 0;
-    popupData.y = 0;
-    popupData.fontsize = 0;
-    popupData.fontFace = null;
-    popupData.image = null;
-    return popupData;
-  };
+class PopUpData {
+    constructor() {
+        this.name = null;
+        this.color = 0;
+        this.id = 0;
+        this.iconIndex = 0;
+        this.opacity = 255;
+        this.mode = 'Default';
+        this.x = 0;
+        this.y = 0;
+        this.fontsize = 0;
+        this.fontFace = null;
+        this.image = null;
+        this.popupType = "";
+    }
+
+    setup(data, id, format, color, icon, opacity, type, image) {
+        this.name = format;
+        this.color = color;
+        this.id = id;
+        this.iconIndex = icon;
+        this.mode = data.PopupMode ? data.PopupMode.Mode : 'Default';
+        this.x = data.PopupEnemyX;
+        this.x = data.PopupEnemyX;
+        this.y = data.PopupEnemyY;
+        this.fontsize = data.PopupFontSize;
+        this.fontFace = data.PopupFontFace;
+        this.image = image;
+        this.opacity = opacity;
+        this._onPopup = false;
+        this.popupType = type;
+        this.onPopup();
+    }
+
+    onPopup() {
+        this._onPopup = true;
+    }
+
+    clearPopup() {
+        this._onPopup = false;
+    }
+
+    isPopup() {
+        return this._onPopup;
+    }
+};
 
   const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
   Game_Battler.prototype.initMembers = function() {
     _Game_Battler_initMembers.call(this);
-    this._nuunStatePopup = false;
+    this.nuun_popupData = false;
   };
 
   Game_Battler.prototype.isStatePopupRequested = function() {
-    return this._nuunStatePopup;
+    return !!this.nuun_popupData && this.nuun_popupData.isPopup();
   };
   
   Game_Battler.prototype.clearStatePopup = function() {
-    this._nuunStatePopup = false;
+    this.clearPopUpData();
   };
 
   Game_Battler.prototype.startStatePopup = function() {
-    this._nuunStatePopup = true;
+    this.nuun_popupData.onPopup();
   };
 
   Game_Battler.prototype.addSetPopUpData = function(popup) {
-    this.result().popupData = popup;
+    this.nuun_popupData = popup;
+  };
+
+  Game_Battler.prototype.clearPopUpData = function() {
+    this.nuun_popupData = null;
   };
   
   Game_Battler.prototype.getPopUpData = function() {
-    return this.result().popupData;
+    return this.nuun_popupData;
   };
 
   const _Game_Battler_removeBuff = Game_Battler.prototype.removeBuff;
@@ -1010,7 +1051,7 @@ Imported.NUUN_popUp = true;
           const name = state.meta.PopUpStateName ? state.meta.PopUpStateName : state.name;
           const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : state.iconIndex;
           const img = this.isBadState(state) ? state.meta.BadStatePopupImg : state.meta.StatePopupImg;
-          this.setupPopup(target, data, state.id, data.PopUpText.format(name), color, iconIndex, 255, img);
+          this.setupPopup(target, data, state.id, data.PopUpText.format(name), color, iconIndex, 255, 'State', img);
         }
       }
     }
@@ -1026,7 +1067,7 @@ Imported.NUUN_popUp = true;
           const name = state.meta.PopUpStateName ? state.meta.PopUpStateName : state.name;
           const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : state.iconIndex;
           const img = this.isBadState(state) ? state.meta.BadStatePopupImg : state.meta.StatePopupImg;
-          this.setupPopup(target, data, state.id, data.RemovePopUpText.format(name), color, iconIndex, PopUpReleaseOpacity, img);
+          this.setupPopup(target, data, state.id, data.RemovePopUpText.format(name), color, iconIndex, PopUpReleaseOpacity, 'RState', img);
         }
       }
     }
@@ -1044,7 +1085,7 @@ Imported.NUUN_popUp = true;
             const color = this.setupBuffPopUpColor(id, find, data);
             const name = find.PopUpName ? find.PopUpName : TextManager.param(paramId);
             const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : target.popupBuffIconIndex(id);
-            this.setupPopup(target, data, id, data.PopUpText.format(name), color, iconIndex, 255, find.PopUpBuffImg);
+            this.setupPopup(target, data, id, data.PopUpText.format(name), color, iconIndex, 255, 'Buff', find.PopUpBuffImg);
           }
         }
       }
@@ -1063,7 +1104,7 @@ Imported.NUUN_popUp = true;
             const color = this.setupBuffPopUpColor(id, find, data);
             const name = find.PopUpName ? find.PopUpName : TextManager.param(paramId);
             const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : target.removePopupBuffIconIndex(id);
-            this.setupPopup(target, data, id, data.RemovePopUpText.format(name), color, iconIndex, PopUpReleaseOpacity, find.PopUpBuffImg);
+            this.setupPopup(target, data, id, data.RemovePopUpText.format(name), color, iconIndex, PopUpReleaseOpacity, 'RBuff', find.PopUpBuffImg);
           }
         }
       }
@@ -1076,7 +1117,7 @@ Imported.NUUN_popUp = true;
       if (data) {
         const name = name = item.popupText.format(item.name);
         const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : item.iconIndex;
-        this.setupPopup(target, data, item.id, name, data.PopupColor, iconIndex, 255, StealPopupImg);
+        this.setupPopup(target, data, item.id, name, data.PopupColor, iconIndex, 255, 'Steal', StealPopupImg);
       }
     }
   };
@@ -1085,7 +1126,7 @@ Imported.NUUN_popUp = true;
     const data = PopUpDefeat;
     if (data) {
       const name = data.PopUpText.format();
-      this.setupPopup(target, data, 0, name, data.PopupColor, data.PopupIconIndex, 255, PopUpDefeatImg);
+      this.setupPopup(target, data, 0, name, data.PopupColor, data.PopupIconIndex, 255, 'Defeat', PopUpDefeatImg);
     }
   };
 
@@ -1096,35 +1137,23 @@ Imported.NUUN_popUp = true;
         for (const skill of skills) {
           const name = data.PopUpText.format(skill.skillName);
           const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : $dataSkills[skill.id].iconIndex;
-          this.setupPopup(target, data, skill.id, name, data.PopupColor, iconIndex, 255);
+          this.setupPopup(target, data, skill.id, name, data.PopupColor, iconIndex, 255, 'Learn');
         }
       }
     }
   };
 
-  Window_BattleLog.prototype.setupPopup = function(target, data, id, format, color, icon, opacity, image) {
-    const popupData = initPopUpData();
-    popupData.name = format;
-    popupData.color = color;
-    popupData.id = id;
-    popupData.iconIndex = icon;
-    popupData.mode = data.PopupMode ? data.PopupMode.Mode : 'Default';
-    popupData.x = data.PopupEnemyX;
-    popupData.x = data.PopupEnemyX;
-    popupData.y = data.PopupEnemyY;
-    popupData.fontsize = data.PopupFontSize;
-    popupData.fontFace = data.PopupFontFace;
-    popupData.image = image;
-    popupData.opacity = opacity;
+  Window_BattleLog.prototype.setupPopup = function(target, data, id, format, color, icon, opacity, type, image) {
+    const popupData = setPopupData(data, id, format, color, icon, opacity, type, image);
     this.push('nuun_popupState', target, popupData);
   };
 
   Window_BattleLog.prototype.isBadState = function(state) {
-    return !!state.meta.BatState;
+    return _isBadState(state);
   };
 
   Window_BattleLog.prototype.setupStatePopUpColor = function(state, data) {
-    return state.meta.PopUpColor ? (isNaN(Number(state.meta.PopUpColor)) ? state.meta.PopUpColor : Number(state.meta.PopUpColor)) : data.PopupColor;
+    return _setupStatePopUpColor(state, data);
   };
 
   Window_BattleLog.prototype.setupBuffPopUpColor = function(id, find, data) {
@@ -1132,11 +1161,10 @@ Imported.NUUN_popUp = true;
   };
 
   Window_BattleLog.prototype.displayDeadPopup = function(target, state) {
-    return !DeadNoPopup ? state.id !== target.deathStateId() : true;
+    return _displayDeadPopup(target, state);
   };
 
   Window_BattleLog.prototype.nuun_popupState = function(target, popup) {
-    target.startStatePopup();
     target.addSetPopUpData(popup);
   };
   
@@ -1276,10 +1304,10 @@ Imported.NUUN_popUp = true;
   
   Sprite_Battler.prototype.setupStatePopup = function() {
     if (this._battler.isStatePopupRequested()) {
-      if (this._battler.isSpriteVisible()) {
-        this.createStatePopupSprite();
-      }
-      this._battler.clearStatePopup();
+        if (this._battler.isSpriteVisible()) {
+            this.createStatePopupSprite();
+        }
+        this._battler.clearStatePopup();
     }
   };
 
@@ -1316,12 +1344,111 @@ Imported.NUUN_popUp = true;
   };
 
   Sprite_Enemy.prototype.damagePopupOffsetX = function(data) {
-    return data.x || 0;
+    return data ? (data.x || 0) : 0;
   };
 
   Sprite_Enemy.prototype.damagePopupOffsetY = function(data) {
-    return data.y || 0;
+    return data ? (data.y || 0) : 0;
   };
+
+  const _Game_Battler_clearResult = Game_Battler.prototype.clearResult;
+Game_Battler.prototype.clearResult = function() {
+    if (!$gameTemp.noClearResult) {
+        _Game_Battler_clearResult.call(this);
+    }
+};
+
+const _Game_Interpreter_command313 = Game_Interpreter.prototype.command313;
+Game_Interpreter.prototype.command313 = function(params) {
+    $gameTemp.noClearResult = $gameParty.inBattle();
+    const result = _Game_Interpreter_command313.call(this, params);
+    $gameTemp.noClearResult = false;
+    if (result && $gameParty.inBattle()) {
+        this.iterateActorEx(params[0], params[1], actor => {
+            setAddedStatePopup(actor);
+            setRemovedStatePopup(actor);
+            const sprite = SceneManager._scene._spriteset.battlerSprites().find(sprite => sprite._battler === actor);
+            if (sprite) {
+                sprite.updateDamagePopup();
+            }
+            actor.clearResult();
+        });
+    }
+    return result;
+};
+
+const _Game_Interpreter_command333 = Game_Interpreter.prototype.command333;
+Game_Interpreter.prototype.command333 = function(params) {
+    $gameTemp.noClearResult = $gameParty.inBattle();
+    const result = _Game_Interpreter_command333.call(this, params);
+    $gameTemp.noClearResult = false;
+    if (result && $gameParty.inBattle()) {
+        this.iterateActorEx(params[0], params[1], enemy => {
+            setAddedStatePopup(enemy);
+            setRemovedStatePopup(enemy);
+            const sprite = SceneManager._scene._spriteset.battlerSprites().find(sprite => sprite._battler === enemy);
+            if (sprite) {
+                sprite.updateDamagePopup();
+            }
+            enemy.clearResult();
+        });
+    }
+    return result;
+};
+
+function setPopupData(data, id, format, color, icon, opacity, image) {
+    const popupData = new PopUpData();
+    popupData.setup(data, id, format, color, icon, opacity, image);
+    return popupData;
+};
+
+function setAddedStatePopup(target) {
+    const states = target.result().addedStateObjects();
+    for (const state of states) {
+        if (_displayDeadPopup(target, state) && !state.meta.NoPopUp && !state.meta.AddNoPopUp) {
+            const data = _isBadState(state) ? PopUpBadState : PopUpAdvantageousState;
+            if (data) {
+            const color = _setupStatePopUpColor(state, data);
+            const name = state.meta.PopUpStateName ? state.meta.PopUpStateName : state.name;
+            const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : state.iconIndex;
+            const img = _isBadState(state) ? state.meta.BadStatePopupImg : state.meta.StatePopupImg;
+            const popup = setPopupData(data, state.id, data.PopUpText.format(name), color, iconIndex, 255, img);
+            target.startStatePopup();
+            target.addSetPopUpData(popup);
+            }
+        }
+    }
+};
+
+function setRemovedStatePopup(target) {
+    const states = target.result().removedStateObjects();
+    for (const state of states) {
+        if (_displayDeadPopup(target, state) && !state.meta.NoPopUp && !state.meta.RemoveNoPopUp) {
+            const data = _isBadState(state) ? PopUpBadState : PopUpAdvantageousState;
+            if (data) {
+                const color = _setupStatePopUpColor(state, data);
+                const name = state.meta.PopUpStateName ? state.meta.PopUpStateName : state.name;
+                const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : state.iconIndex;
+                const img = _isBadState(state) ? state.meta.BadStatePopupImg : state.meta.StatePopupImg;
+                const popup = setupPopup(data, state.id, data.RemovePopUpText.format(name), color, iconIndex, PopUpReleaseOpacity, img);
+                target.startStatePopup();
+                target.addSetPopUpData(popup);
+            }
+        }
+    }
+};
+
+function _displayDeadPopup(target, state) {
+    return !DeadNoPopup ? state.id !== target.deathStateId() : true;
+};
+
+function _isBadState(state) {
+    return !!state.meta.BatState;
+};
+
+function _setupStatePopUpColor(state, data) {
+    return state.meta.PopUpColor ? (isNaN(Number(state.meta.PopUpColor)) ? state.meta.PopUpColor : Number(state.meta.PopUpColor)) : data.PopupColor;
+};
 
   function getPopupClass(mode) {
     switch (mode) {

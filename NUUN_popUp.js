@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Pop up
  * @author NUUN
- * @version 2.0.2
+ * @version 2.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -68,6 +68,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/21/2023 Ver 2.0.3
+ * Fixed an issue that caused an error when adding or removing states with event commands.
  * 5/21/2023 Ver 2.0.2
  * Fixed to pop up even when adding or canceling state with event command.
  * Fixed user popup not showing when used with certain plugins.
@@ -419,7 +421,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 2.0.2
+ * @version 2.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -477,6 +479,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/21 Ver 2.0.3
+ * イベントコマンドでのステート付加、解除を行う時にエラーが出る問題を修正。
  * 2023/5/21 Ver 2.0.2
  * イベントコマンドでのステート付加、解除でもポップアップするように修正。
  * 特定のプラグインとの併用で、使用者のポップアップが表示されない問題を修正。
@@ -1351,7 +1355,7 @@ class PopUpData {
     return data ? (data.y || 0) : 0;
   };
 
-  const _Game_Battler_clearResult = Game_Battler.prototype.clearResult;
+const _Game_Battler_clearResult = Game_Battler.prototype.clearResult;
 Game_Battler.prototype.clearResult = function() {
     if (!$gameTemp.noClearResult) {
         _Game_Battler_clearResult.call(this);
@@ -1413,7 +1417,6 @@ function setAddedStatePopup(target) {
             const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : state.iconIndex;
             const img = _isBadState(state) ? state.meta.BadStatePopupImg : state.meta.StatePopupImg;
             const popup = setPopupData(data, state.id, data.PopUpText.format(name), color, iconIndex, 255, img);
-            target.startStatePopup();
             target.addSetPopUpData(popup);
             }
         }
@@ -1431,7 +1434,6 @@ function setRemovedStatePopup(target) {
                 const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : state.iconIndex;
                 const img = _isBadState(state) ? state.meta.BadStatePopupImg : state.meta.StatePopupImg;
                 const popup = setupPopup(data, state.id, data.RemovePopUpText.format(name), color, iconIndex, PopUpReleaseOpacity, img);
-                target.startStatePopup();
                 target.addSetPopUpData(popup);
             }
         }

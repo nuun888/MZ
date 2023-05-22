@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.17
+ * @version 2.0.18
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/22/2023 Ver.2.0.18
+ * Conflict support with face shift of vanguard and rearguard plug-ins.
  * 5/14/2023 Ver.2.0.17
  * Correction of processing related to skill status screen display customization.
  * Modified to apply item names to gauge labels.
@@ -73,7 +75,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.17
+ * @version 2.0.18
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -83,6 +85,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/22 Ver.2.0.18
+ * 前衛後衛プラグインのフェイスシフトとの競合対応。
  * 2023/5/14 Ver.2.0.17
  * スキルステータス画面表示カスタマイズに関する処理の修正。
  * 項目名称をゲージのラベルにも適用するように修正。
@@ -1076,6 +1080,9 @@ Imported.NUUN_MenuScreenEXBase = true;
                 bitmap = actor.faceName();
             }
             const faceIndex = data && data.FaceIndex >= 0 ? data.FaceIndex : actor.faceIndex();
+            if (actor.isRearguard && actor.isRearguard()) {//VanguardAndRearguard
+                x += Window_MenuStatus.shiftWidth;
+            }
             this.drawFace(bitmap, faceIndex, x, y, width, height);
         }
     };
@@ -1407,7 +1414,7 @@ Imported.NUUN_MenuScreenEXBase = true;
       
     Sprite_MenuGauge.prototype = Object.create(Sprite_Gauge.prototype);
     Sprite_MenuGauge.prototype.constructor = Sprite_MenuGauge;
-    window.Sprite_MenuGauge = Sprite_MenuGauge
+    window.Sprite_MenuGauge = Sprite_MenuGauge;
       
     Sprite_MenuGauge.prototype.initialize = function() {
         this._statusType = $gameTemp.menuGaugeType;

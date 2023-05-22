@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.10.4
+ * @version 1.10.5
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -84,6 +84,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/5/22 Ver.1.10.5
+ * 条件アクター画像にクリティカルダメージ時の設定を追加。
  * 2023/5/7 Ver.1.10.4
  * アクターへのアニメーションの反転の有無が機能していなかった問題を修正。
  * 2023/4/30 Ver.1.10.3
@@ -2347,6 +2349,8 @@
  * @value 'dying'
  * @option ダメージ時
  * @value 'damage'
+ * @option クリティカルダメージ時
+ * @value 'cridamage'
  * @option 回復時
  * @value 'recovery'
  * @option 攻撃スキル使用時(1)

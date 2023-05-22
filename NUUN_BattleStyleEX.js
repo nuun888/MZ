@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.9
+ * @version 3.10.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/5/22 Ver.3.10.10
+ * マップ中でメッセージウィンドウスキンが表示されなくなる問題を修正。
+ * 条件付きアクター画像にクリティカルダメージ時を追加。
+ * ステートアニメーションが行動エフェクト時にずれる問題を修正。
  * 2023/5/14 Ver.3.10.9
  * アクター画像がない場合にエラーが出る問題を修正。
  * 2023/5/7 Ver.3.10.8
@@ -673,7 +677,9 @@ Game_Actor.prototype.battleStyleMatchChangeGraphic = function(data) {
     case 'dying' :
       return this.isDying();
     case 'damage' :
-    return this.onImgId === 1;
+        return this.onImgId === 1 || this.onImgId === 3;
+    case 'cridamage' :
+        return this.onImgId === 3;
     case 'recovery' :
       return this.onImgId === 2;
     case 'attack' :
@@ -736,6 +742,18 @@ Window_BattleLog.prototype.displayHpDamage = function(target) {
     _Window_BattleLog_displayHpDamage.call(this, target);
 };
 
+const _Window_BattleLog_displayCritical = Window_BattleLog.prototype.displayCritical;
+Window_BattleLog.prototype.displayCritical = function(target) {
+    _Window_BattleLog_displayCritical.call(this, target);
+    if (target.isActor() && target.result().critical) {
+        this.push("actorImgCritical", target);
+    }
+};
+
+Window_BattleLog.prototype.actorImgCritical = function(target) {
+    target.actorImgCritical = true;
+};
+
 Window_BattleLog.prototype.performVibration = function(target, mode) {
     target.performVibration(mode);
 };
@@ -763,7 +781,8 @@ Game_Actor.prototype.performDamage = function() {
         this.battleStyleImgRefresh();
     }
     if (this._imgScenes !== 'guard') {
-        this.setBattleImgId(1);
+        this.actorImgCritical ? this.setBattleImgId(3) : this.setBattleImgId(1);
+        this.actorImgCritical = false;
         this.battleStyleImgRefresh();
     }
 };
@@ -796,7 +815,7 @@ Game_Actor.prototype.isCounterSkillAction = function() {
 };
 
 Game_Actor.prototype.setBattleStyleAttackImgId = function(action) {
-    
+
     if (action.item().animationId !== 0) {
         if (action.isRecover()) {
             this.setBattleImgId(11, action.item().id);
@@ -924,6 +943,7 @@ Scene_Battle.prototype.updateStatusWindowVisibility = function() {
 const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
 Scene_Battle.prototype.createSpriteset = function() {
   _Scene_Battle_createSpriteset.call(this);
+  
 };
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
@@ -2643,18 +2663,20 @@ const _Window_BattleLog_showEnemyAttackAnimation = Window_BattleLog.prototype.sh
 //Window_Message
 const _Window_Message_updateBackground = Window_Message.prototype.updateBackground;
 Window_Message.prototype.updateBackground = function() {
-  _Window_Message_updateBackground.call(this);
-  if (BattleManager.getDisplayMessageType() === "Appear" && params.AppearBackgroundImg) {
-    this.opacity = 0;
-  } else if (BattleManager.getDisplayMessageType() === "Victory" && params.VictoryBackgroundImg) {
-    this.opacity = 0;
-  } else if (BattleManager.getDisplayMessageType() === "Defeat" && params.LoseBackgroundImg) {
-    this.opacity = 0;
-  } else if (BattleManager.getDisplayMessageType() === "Escape" && params.EscapeBackgroundImg) {
-    this.opacity = 0;
-  } else if (BattleManager.getDisplayMessageType() === "EscapeFailure" && params.EscapeFailureBackgroundImg) {
-    this.opacity = 0;
-  }
+    _Window_Message_updateBackground.call(this);
+    if ($gameParty.inBattle()) {
+        if (BattleManager.getDisplayMessageType() === "Appear" && params.AppearBackgroundImg) {
+            this.opacity = 0;
+        } else if (BattleManager.getDisplayMessageType() === "Victory" && params.VictoryBackgroundImg) {
+            this.opacity = 0;
+        } else if (BattleManager.getDisplayMessageType() === "Defeat" && params.LoseBackgroundImg) {
+            this.opacity = 0;
+        } else if (BattleManager.getDisplayMessageType() === "Escape" && params.EscapeBackgroundImg) {
+            this.opacity = 0;
+        } else if (BattleManager.getDisplayMessageType() === "EscapeFailure" && params.EscapeFailureBackgroundImg) {
+            this.opacity = 0;
+        }
+    }
 };
 
 function Window_BSActor() {
@@ -2986,8 +3008,12 @@ Sprite_ActorImges.prototype.update = function() {
 Sprite_ActorImges.prototype.refreshStateOverlay = function() {
     if (this._stateSprite && getStateAnimationShow()) {
         this._stateSprite.visible = this.visible;
-        this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
-        this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
+        if (this._loadedBitmap && this._loadedBitmap.isReady()) {
+            const scale = this._zoomScale * this._baseScale;
+            this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
+            const y = this.y + this.getStateRectY() + this.getStatePositionY();
+            this._stateSprite.y = ((this.anchor.y === 0.5 ? (this._bsBitmapHeight / 2 * scale) : 0) + y) * scale;
+        }
     }
 };
 
@@ -3049,10 +3075,6 @@ Sprite_ActorImges.prototype.updateZoom = function() {
             if (this.y === this._homeY) {
                 this.y = this._homeY - (this._bsBitmapHeight / 2) * scale * (this._data.ActorImgVPosition === 'top' ? -1 : 1);
             }
-            if (this._apngMode) {
-                this._apngSprite.x = 0;
-                this._apngSprite.y = Math.floor(this.y * scale);
-            }
         } else {
             if (this.scale.x !== this._baseScale) {
                 this.resetZoom();
@@ -3063,11 +3085,12 @@ Sprite_ActorImges.prototype.updateZoom = function() {
                 this.y = this._homeY;
                 this.anchor.x = this._data.ActorImgHPosition === 'left' ? 0.0 : 0.5;
                 this.anchor.y = this._data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
-                if (this._apngMode) {
-                    this._apngSprite.x = 0;
-                    this._apngSprite.y = 0;
-                }
             }
+        }
+        if (this._apngMode) {
+            const scale = this._zoomScale * this._baseScale;
+            this._apngSprite.x = 0;
+            this._apngSprite.y = ((this.anchor.y === 0.5 ? (this._bsBitmapHeight / 2) : 0));
         }
     }
 };
@@ -3087,7 +3110,7 @@ Sprite_ActorImges.prototype.getStatePositionX = function() {
 };
 
 Sprite_ActorImges.prototype.getStatePositionY = function() {
-    return this._data.ActorImgVPosition === 'under' ? this._rectHeight * -1 : 0;
+    return this._data.ActorImgVPosition === 'under' ? this._bsBitmapHeight * -1 : 0;
 };
 
 Sprite_ActorImges.prototype.resetDamage = function() {
@@ -3125,7 +3148,7 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
         } else if (actor.isAlive() && this.isDead()) {
             this.setReviveUpdateCount();
         } else if (actor.isAlive() && actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
-            if (actor.onImgId === 1 || actor.onImgId === 2 || actor.onImgId === 15) {
+            if (actor.onImgId === 1 || actor.onImgId === 2 || actor.onImgId === 3 ||actor.onImgId === 15) {
                 this._updateCount = this.setDamageDuration();
             } else if (actor.onImgId === 30 || actor.onImgId === 31 || actor.onImgId === 32) {
                 this._updateCount = this.setCounterDuration();
@@ -3145,15 +3168,15 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
 Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
     if (actor && actor.getBSImgName()) {
         if (this._imgListId !== actor.getBSGraphicIndex() && this._updateCount > 0) {
-        const bitmap = actor.getLoadBattleStyleImg();
-        this._loadedBitmap = bitmap;
-        if (bitmap && !bitmap.isReady()) {
-            bitmap.addLoadListener(this.setActorGraphic.bind(this, actor, bitmap));
-        } else if (bitmap) {
-            this.setActorGraphic(actor, bitmap);
-        }
-        this._imgScenes = this.getImgScenes(actor);
-        this._imgListId = actor.getBSGraphicIndex();
+            const bitmap = actor.getLoadBattleStyleImg();
+            this._loadedBitmap = bitmap;
+            if (bitmap && !bitmap.isReady()) {
+                bitmap.addLoadListener(this.setActorGraphic.bind(this, actor, bitmap));
+            } else if (bitmap) {
+                this.setActorGraphic(actor, bitmap);
+            }
+            this._imgScenes = this.getImgScenes(actor);
+            this._imgListId = actor.getBSGraphicIndex();
         }
     }
     this.updateAnimation();

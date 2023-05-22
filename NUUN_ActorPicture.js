@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.3
+ * @version 1.5.4
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/22 Ver.1.5.4
+ * 条件アクター画像にクリティカルダメージ時の設定を追加。
  * 2023/4/11 Ver.1.5.3
  * CounterExtend(トリアコンタン氏)に対応。
  * 2023/2/26 Ver.1.5.2
@@ -199,6 +201,8 @@
  * @value 'dying'
  * @option ダメージ時
  * @value 'damage'
+ * @option クリティカルダメージ時
+ * @value 'cridamage'
  * @option 回復時
  * @value 'recovery'
  * @option 攻撃スキル使用時(1)
@@ -415,7 +419,9 @@ Game_Actor.prototype.matchChangeGraphic = function(data) {
     case 'dying' :
       return this.isDying();
     case 'damage' :
-    return this.onImgId === 1;
+        return this.onImgId === 1 || this.onImgId === 3;
+    case 'cridamage' :
+        return this.onImgId === 3;
     case 'recovery' :
       return this.onImgId === 2;
     case 'attack' :
@@ -504,7 +510,7 @@ Game_Actor.prototype.performDamage = function() {
     this.imgRefresh();
   }
   if (this._imgScenes !== 'guard') {
-    this.onImgId = 1;
+    this.onImgId = this.result().critical ? 3 : 1;
     this.imgRefresh();
   }
 };

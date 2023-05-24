@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.10
+ * @version 3.10.11
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/5/24 Ver.3.10.11
+ * メッセージウィンドウのウィンドウスキン表示をOFFにすると、戦闘時以外で通常のウィンドウスキンが表示されなくなる問題を修正。
  * 2023/5/22 Ver.3.10.10
  * マップ中でメッセージウィンドウスキンが表示されなくなる問題を修正。
  * 条件付きアクター画像にクリティカルダメージ時を追加。
@@ -2645,8 +2647,10 @@ if (params.ItemMaxCol > 0) {
 const _Window_Help_initialize = Window_Help.prototype.initialize;
 Window_Help.prototype.initialize = function(rect) {
   _Window_Help_initialize.call(this, rect);
-  this._bsBackground = null;
-  this.opacity = params.HelpWindowShow ? 255 : 0;
+  if ($gameParty.inBattle()) {
+    this._bsBackground = null;
+    this.opacity = params.HelpWindowShow ? 255 : 0;
+  }
 };
 
 //Window_BattleLog

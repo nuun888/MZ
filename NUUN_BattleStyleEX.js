@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.11
+ * @version 3.10.12
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/5/27 Ver.3.10.12
+ * ヘルプウィンドウスキンが非表示にならない問題を修正。
  * 2023/5/24 Ver.3.10.11
  * メッセージウィンドウのウィンドウスキン表示をOFFにすると、戦闘時以外で通常のウィンドウスキンが表示されなくなる問題を修正。
  * 2023/5/22 Ver.3.10.10
@@ -960,6 +962,10 @@ Scene_Battle.prototype.createAllWindows = function() {
     this.createHud();
     this.createActorSelectWindow();
     _Scene_Battle_createAllWindows.call(this);
+    if ($gameParty.inBattle()) {
+        this._bsBackground = null;
+        this.opacity = params.HelpWindowShow ? 255 : 0;
+      }
 };
 
 Scene_Battle.prototype.createBackgroundWindow = function() {
@@ -1144,6 +1150,8 @@ Scene_Battle.prototype.createEnemyWindow = function() {
 const _Scene_Battle_createHelpWindow = Scene_Battle.prototype.createHelpWindow;
 Scene_Battle.prototype.createHelpWindow = function() {
   _Scene_Battle_createHelpWindow.call(this);
+  this._helpWindow._bsBackground = null;
+  this._helpWindow.opacity = params.HelpWindowShow ? 255 : 0;
   if (params.HelpWindowBackgroundImg) {
     const x = params.HelpBackground_X + this._helpWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
     const y = params.HelpBackground_Y + this._helpWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
@@ -2647,10 +2655,6 @@ if (params.ItemMaxCol > 0) {
 const _Window_Help_initialize = Window_Help.prototype.initialize;
 Window_Help.prototype.initialize = function(rect) {
   _Window_Help_initialize.call(this, rect);
-  if ($gameParty.inBattle()) {
-    this._bsBackground = null;
-    this.opacity = params.HelpWindowShow ? 255 : 0;
-  }
 };
 
 //Window_BattleLog

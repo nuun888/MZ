@@ -1,4 +1,4 @@
-# [モンスターTPBゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js)
+# [バトラーTPBゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js)
 # Ver.1.5.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js)  
 #### 必須、前提プラグイン

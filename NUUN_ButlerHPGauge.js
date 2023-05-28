@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @base NUUN_BattlerOverlayBase
- * @version 1.7.0
+ * @version 1.7.1
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -63,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/28 Ver.1.7.1
+ * 処理の修正。
  * 2023/5/28 Ver.1.7.0
  * SVアクターにゲージを表示する機能を追加。
  * 2023/5/6 Ver.1.6.1
@@ -415,14 +417,20 @@ function getEnemyGaugePosition(troop) {
   return list;
 };
 
-const _Sprite_Battler_updateMain = Sprite_Battler.prototype.updateMain;
-Sprite_Battler.prototype.updateMain = function() {
-    _Sprite_Battler_updateMain.call(this);
-    this.updateHpGauge();
+const _Sprite_Actor_update = Sprite_Actor.prototype.update;
+Sprite_Actor.prototype.update = function() {
+  _Sprite_Actor_update.call(this);
+  this.updateHpGauge();
+};
+
+const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
+Sprite_Enemy.prototype.update = function() {
+  _Sprite_Enemy_update.call(this);
+  this.updateHpGauge();
 };
 
 Sprite_Battler.prototype.updateHpGauge = function() {
-    if (this.noHpGaugePosition()) {
+    if (!this._battler || this.noHpGaugePosition()) {
         return;
     }
     if (this.battlerOverlay && !this._butlerHp) {

@@ -1,17 +1,18 @@
-# [モンスターTPBゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js)
-# Ver.1.4.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js)  
+# [モンスターTPBゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js)
+# Ver.1.5.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js)  
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
 
-戦闘中のモンスターにTPBゲージを表示します。  
+戦闘中の敵及びSVアクターにTPBゲージを表示します。  
+※Ver.1.5.0よりプラグイン名が変更になりましたので、再設定が必要になります。  
 
 ![画像](img/tpbGauge1.png)  
 
 ### 設定
 
 #### MPゲージの座標指定
-敵キャラのメモ欄  
+敵キャラまたはアクターのメモ欄  
 `<TPBGaugeX:[position]>`TPBゲージのX座標を調整します。（相対座標）  
 `<TPBGaugeY:[position]>`TPBゲージのY座標を調整します。（相対座標）  
 [position]:座標
@@ -23,6 +24,8 @@
 [y]：Y座標
 
 ## 更新履歴
+2023/5/28 Ver.1.5.0  
+TPBゲージをアクターにも表示できるように対応。  
 2022/5/14 Ver.1.4.0  
 バトラーの表示処理の定義大幅変更に関する定義変更。  
 2021/12/19 Ver.1.3.0  

@@ -9,18 +9,21 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  敵HPゲージ
+ * @plugindesc  バトラーHPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.6.1
+ * @base NUUN_BattlerOverlayBase
+ * @version 1.7.0
  * @orderAfter NUUN_Base
  * 
  * @help
- * 敵のバトラー上にHP、MP、TPゲージを表示します。
+ * 敵またはSVアクターのバトラー上にHPゲージを表示します。
  * 
- * 敵キャラのメモ欄
+ * 敵キャラまたはアクターのメモ欄
  * <HPGaugeX:[position]> HPゲージのX座標を調整します。（相対座標）
  * <HPGaugeY:[position]> HPゲージのY座標を調整します。（相対座標）
+ * 
+ * 敵キャラのメモ欄
  * <NoHPGauge> HPゲージを表示しません。
  * <HPGaugeLength:[width], [height]> HPゲージの幅を指定します。
  * [position]:座標
@@ -48,6 +51,8 @@
  * <HPGaugeVisible>の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。
  * 上記の特徴を使用する場合は初期HPゲージ表示を非表示に設定してください。
  * 
+ * バトラーオーバーレイベースは必ず最新版にしてください。
+ * 
  * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
  * 
  * 疑似３Dバトルを入れている場合はこのプラグインを疑似３Dバトルを下に配置してください。
@@ -58,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/28 Ver.1.7.0
+ * SVアクターにゲージを表示する機能を追加。
  * 2023/5/6 Ver.1.6.1
  * HPゲージの表示をフェードアウト、フェードインさせるように修正。
  * 2022/9/17 Ver.1.6.0
@@ -107,31 +114,32 @@
  * 2021/5/24 Ver.1.0.0
  * 初版
  * 
- * @param CommonSetting
- * @text 共通設定
+ * 
+ * @param ActorSetting
+ * @text アクター設定
  * @default ------------------------------
  * 
- * @param HPPosition
- * @desc エネミーのHPゲージ位置
+ * @param ActorVisibleSetting
+ * @text 表示設定
+ * @default ------------------------------
+ * @parent ActorSetting
+ * 
+ * @param ActorHPPosition
+ * @desc アクターのHPゲージ位置
  * @text HPゲージ位置
  * @type select
  * @option 表示なし
  * @value -1
- * @option 敵画像の上
+ * @option SV画像の上
  * @value 0
- * @option 敵画像の下
+ * @option SV画像の下
  * @value 1
- * @option 敵画像の中心
- * @value 2
- * @default 0
+ * @default -1
+ * @parent ActorVisibleSetting
  * 
- * @param VisibleSetting
- * @text 表示設定
- * @default ------------------------------
- * 
- * @param HPVisible
- * @desc HPゲージの表示タイミング
- * @text HPゲージ表示タイミング
+ * @param ActorHPVisible
+ * @desc アクターのHPゲージの表示タイミング
+ * @text アクターHPゲージ表示タイミング
  * @type select
  * @option 常に表示
  * @value 0
@@ -142,50 +150,165 @@
  * @option 選択時、ダメージ時
  * @value 3
  * @default 0
+ * @parent ActorVisibleSetting
  * 
- * @param GaugeSetting
- * @text ゲージ設定
+ * @param ActorGaugeSetting
+ * @text アクターゲージ設定
  * @default ------------------------------
+ * @parent ActorSetting
  * 
- * @param GaugeWidth
- * @desc ゲージの横幅を指定します。
+ * @param ActorGaugeWidth
+ * @desc アクターのゲージの横幅を指定します。
  * @text ゲージ横幅
  * @type number
  * @default 128
  * @min 0
+ * @parent ActorGaugeSetting
  * 
- * @param GaugeHeight
- * @desc ゲージの縦幅を指定します。
+ * @param ActorGaugeHeight
+ * @desc アクターのゲージの縦幅を指定します。
  * @text ゲージ縦幅
  * @type number
  * @default 12
  * @min 0
+ * @parent ActorGaugeSetting
  * 
- * @param Gauge_X
- * @desc ゲージのX座標（相対座標）指定します。
+ * @param ActorGauge_X
+ * @desc アクターのゲージのX座標（相対座標）指定します。
  * @text ゲージX座標
  * @type number
  * @default 0
  * @min -9999
+ * @parent ActorGaugeSetting
  * 
- * @param Gauge_Y
- * @desc ゲージのY座標（相対座標）指定します。
+ * @param ActorGauge_Y
+ * @desc アクターのゲージのY座標（相対座標）指定します。
  * @text ゲージY座標
  * @type number
  * @default 0
  * @min -9999
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorHPLabelVisible
+ * @text HPラベル表示
+ * @desc アクターのHPラベルを表示する。
+ * @type boolean
+ * @default true
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorHPValueVisible
+ * @text HP数値表示
+ * @desc アクターのHP数値を表示する。
+ * @type boolean
+ * @default true
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorValueFontSize
+ * @desc アクターの数値のフォントサイズ。（メインフォントサイズから）
+ * @text 数値フォントサイズ
+ * @type number
+ * @default -6
+ * @min -9999
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorLabelFontSize
+ * @desc アクターの ラベルのフォントサイズ。（メインフォントサイズから）
+ * @text ラベルフォントサイズ
+ * @type number
+ * @default -2
+ * @min -9999
+ * @parent ActorGaugeSetting
+ * 
+ * 
+ * @param EnemySetting
+ * @text 敵設定
+ * @default ------------------------------
+ * 
+ * @param EnemyVisibleSetting
+ * @text 表示設定
+ * @default ------------------------------
+ * @parent EnemySetting
+ * 
+ * @param HPPosition
+ * @desc 敵キャラのHPゲージ位置
+ * @text 敵HPゲージ位置
+ * @type select
+ * @option 表示なし
+ * @value -1
+ * @option 敵画像の上
+ * @value 0
+ * @option 敵画像の下
+ * @value 1
+ * @option 敵画像の中心
+ * @value 2
+ * @default 0
+ * @parent EnemyVisibleSetting
+ * 
+ * @param HPVisible
+ * @desc 敵のHPゲージの表示タイミング
+ * @text 敵HPゲージ表示タイミング
+ * @type select
+ * @option 常に表示
+ * @value 0
+ * @option 選択時
+ * @value 1
+ * @option ダメージ時
+ * @value 2
+ * @option 選択時、ダメージ時
+ * @value 3
+ * @default 0
+ * @parent EnemyVisibleSetting
+ * 
+ * @param GaugeSetting
+ * @text 敵ゲージ設定
+ * @default ------------------------------
+ * @parent EnemySetting
+ * 
+ * @param GaugeWidth
+ * @desc 敵のゲージの横幅を指定します。
+ * @text ゲージ横幅
+ * @type number
+ * @default 128
+ * @min 0
+ * @parent GaugeSetting
+ * 
+ * @param GaugeHeight
+ * @desc 敵のゲージの縦幅を指定します。
+ * @text ゲージ縦幅
+ * @type number
+ * @default 12
+ * @min 0
+ * @parent GaugeSetting
+ * 
+ * @param Gauge_X
+ * @desc 敵のゲージのX座標（相対座標）指定します。
+ * @text ゲージX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GaugeSetting
+ * 
+ * @param Gauge_Y
+ * @desc 敵のゲージのY座標（相対座標）指定します。
+ * @text ゲージY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent GaugeSetting
  * 
  * @param HPLabelVisible
  * @text HPラベル表示
- * @desc HPラベルを表示する。
+ * @desc 敵のHPラベルを表示する。
  * @type boolean
  * @default true
+ * @parent GaugeSetting
  * 
  * @param HPValueVisible
  * @text HP数値表示
  * @desc HP数値を表示する。
  * @type boolean
  * @default true
+ * @parent GaugeSetting
  * 
  * @param ValueFontSize
  * @desc 数値のフォントサイズ。（メインフォントサイズから）
@@ -193,6 +316,7 @@
  * @type number
  * @default -6
  * @min -9999
+ * @parent GaugeSetting
  * 
  * @param LabelFontSize
  * @desc ラベルのフォントサイズ。（メインフォントサイズから）
@@ -200,16 +324,19 @@
  * @type number
  * @default -2
  * @min -9999
+ * @parent GaugeSetting
  * 
  * @param MaskValueName
  * @desc HPの数値を隠す時の文字。
  * @text HPの数値を隠す時の文字
  * @type string
  * @default ????
+ * @parent GaugeSetting
  * 
  * @param SpecialSetting
  * @text 特殊設定
  * @default ------------------------------
+ * @parent GaugeSetting
  * 
  * @param HPVisibleMode
  * @desc 初期状態でのHPゲージの表示。特徴によってやHPゲージの表示タイミングによって表示されるようになります。
@@ -220,10 +347,12 @@
  * @option 非表示
  * @value 1
  * @default 0
+ * @parent SpecialSetting
  * 
  * @param EnemyBookSetting
  * @text 図鑑連動設定
  * @default ------------------------------
+ * @parent GaugeSetting
  * 
  * @param HPEnemyBookVisible
  * @desc HPゲージの表示タイミング（モンスター図鑑）
@@ -236,7 +365,7 @@
  * @option 図鑑情報登録後に表示
  * @value 2
  * @default 0
- * 
+ * @parent EnemyBookSetting
  * 
  *  
  * 
@@ -247,16 +376,26 @@ Imported.NUUN_ButlerHPGauge = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_ButlerHPGauge');
 const HPPosition = Number(parameters['HPPosition'] || 0);
+const ActorHPPosition = Number(parameters['ActorHPPosition'] || 0);
+const ActorHPVisible = Number(parameters['ActorHPVisible'] || -1);
 const HPVisible = Number(parameters['HPVisible'] || 0);
 const HPVisibleMode = Number(parameters['HPVisibleMode'] || 0);
 const HPEnemyBookVisible = Number(parameters['HPEnemyBookVisible'] || 0);
+const ActorGaugeWidth = Number(parameters['ActorGaugeWidth'] || 128);
+const ActorGaugeHeight = Number(parameters['ActorGaugeHeight'] || 12);
 const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
+const ActorGauge_X = Number(parameters['ActorGauge_X'] || 0);
+const ActorGauge_Y = Number(parameters['ActorGauge_Y'] || 0);
 const Gauge_X = Number(parameters['Gauge_X'] || 0);
 const Gauge_Y = Number(parameters['Gauge_Y'] || 0);
+const ActorHPLabelVisible = eval(parameters['ActorHPLabelVisible'] || 'true');
+const ActorHPValueVisible = eval(parameters['ActorHPValueVisible'] || 'true');
 const HPLabelVisible = eval(parameters['HPLabelVisible'] || 'true');
 const HPValueVisible = eval(parameters['HPValueVisible'] || 'true');
 const ValueFontSize = Number(parameters['ValueFontSize'] || -6);
+const ActorLabelFontSize = Number(parameters['ActorLabelFontSize'] || -2);
+const ActorValueFontSize = Number(parameters['ActorValueFontSize'] || -6);
 const LabelFontSize = Number(parameters['LabelFontSize'] || -2);
 const MaskValueName = String(parameters['MaskValueName'] || '????');
 let enemyHPGaugeLength = null;
@@ -276,43 +415,72 @@ function getEnemyGaugePosition(troop) {
   return list;
 };
 
-
-const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
-Sprite_Enemy.prototype.initMembers = function() {
-  _Sprite_Enemy_initMembers.call(this);
+const _Sprite_Battler_updateMain = Sprite_Battler.prototype.updateMain;
+Sprite_Battler.prototype.updateMain = function() {
+    _Sprite_Battler_updateMain.call(this);
+    this.updateHpGauge();
 };
 
-const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
-Sprite_Enemy.prototype.update = function() {
-  _Sprite_Enemy_update.call(this);
-  this.updateHpGauge();
+Sprite_Battler.prototype.updateHpGauge = function() {
+    if (this.noHpGaugePosition()) {
+        return;
+    }
+    if (this.battlerOverlay && !this._butlerHp) {
+        this.createHPGauge();
+    }
+    this.setHpGaugePosition();
 };
 
-Sprite_Enemy.prototype.updateHpGauge = function() {
-  if (HPPosition < 0) {
-    return;
-  }
-  if (this.battlerOverlay && !this._butlerHp) {
-    this.createHPGauge();
-  }
-  if (this._butlerHp) {
-    const enemy = this._enemy.enemy();
-    const x = (enemy.meta.HPGaugeX ? Number(enemy.meta.HPGaugeX) : 0) + Gauge_X + this._enemy.getHPGaugePositionX();
-    const y = (enemy.meta.HPGaugeY ? Number(enemy.meta.HPGaugeY) : 0) + Gauge_Y + this._enemy.getHPGaugePositionY();
-    this._butlerHp.x = x;
-    this._butlerHp.y = y - this.getButlerHpPosition();
-  }
+Sprite_Enemy.prototype.noHpGaugePosition = function() {
+    return HPPosition < 0;
 };
 
-Sprite_Enemy.prototype.getButlerHpPosition = function() {
-  const scale = this.getButlerOverlayConflict();
-  if (HPPosition === 0) {
-    return this.getButlerOverlayHeight() * scale;
-  } else if (HPPosition === 2) {
-    return Math.floor((this.getButlerOverlayHeight() * scale) / 2);
-  } else {
-    return 0;
-  }
+Sprite_Actor.prototype.noHpGaugePosition = function() {
+    return (this._battler.isEnemy() ? HPPosition : ActorHPPosition) < 0;
+};
+
+Sprite_Enemy.prototype.setHpGaugePosition = function() {
+    if (this._butlerHp) {
+        const enemy = this._enemy.enemy();
+        const x = (enemy.meta.HPGaugeX ? Number(enemy.meta.HPGaugeX) : 0) + Gauge_X + this._enemy.getHPGaugePositionX();
+        const y = (enemy.meta.HPGaugeY ? Number(enemy.meta.HPGaugeY) : 0) + Gauge_Y + this._enemy.getHPGaugePositionY();
+        this._butlerHp.x = x;
+        this._butlerHp.y = y - this.getButlerHpPosition();
+    }
+};
+
+Sprite_Actor.prototype.setHpGaugePosition = function() {
+    if (this._battler.isEnemy()) {
+        Sprite_Enemy.prototype.setHpGaugePosition.call(this);
+    } else if (this._butlerHp) {
+        const actor = this._actor.actor();
+        const x = (actor.meta.HPGaugeX ? Number(actor.meta.HPGaugeX) : 0) + ActorGauge_X;
+        const y = (actor.meta.HPGaugeY ? Number(actor.meta.HPGaugeY) : 0) + ActorGauge_Y;
+        this._butlerHp.x = x;
+        this._butlerHp.y = y - this.getButlerHpSVPosition();
+      }
+};
+
+Sprite_Battler.prototype.getButlerHpPosition = function() {
+    const scale = this.getButlerOverlayConflict();
+    if (HPPosition === 0) {
+        return this.getButlerOverlayHeight() * scale;
+    } else if (HPPosition === 2) {
+        return Math.floor((this.getButlerOverlayHeight() * scale) / 2);
+    } else {
+        return 0;
+    }
+};
+
+Sprite_Actor.prototype.getButlerHpSVPosition = function() {
+    const scale = this.battlerOverlay.battlerSpriteScale_y;
+    if (ActorHPPosition === 0) {
+      return this.getSVButlerHeight() * scale;
+    } else if (ActorHPPosition === 2) {
+      return Math.floor((this.getSVButlerHeight() * scale) / 2);
+    } else {
+      return 0;
+    }
 };
 
 Sprite_Enemy.prototype.createHPGauge = function() {
@@ -326,22 +494,172 @@ Sprite_Enemy.prototype.createHPGauge = function() {
   $gameTemp.enemyHPGaugeRefresh = true;
 };
 
+Sprite_Actor.prototype.createHPGauge = function() {
+    if (this._battler.isEnemy()) {
+        Sprite_Enemy.prototype.createHPGauge.call(this);
+        return;
+    }
+    enemyHPGaugeLength = null;
+    const sprite = new Sprite_BattlerHPGauge();
+    this.battlerOverlay.addChild(sprite);
+    this._butlerHp = sprite;
+    sprite.setup(this._actor, "hp");
+    sprite.show();
+    sprite.move(0, 0);
+    $gameTemp.enemyHPGaugeRefresh = true;
+};
+
+
+function Sprite_BattlerHPGauge() {
+    this.initialize(...arguments);
+}
+  
+Sprite_BattlerHPGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_BattlerHPGauge.prototype.constructor = Sprite_BattlerHPGauge;
+
+Sprite_BattlerHPGauge.prototype.initialize = function() {
+    Sprite_Gauge.prototype.initialize.call(this);
+    this._gaugeDuration = 0;
+    this._startVisible = true;
+    this.anchor.x = 0.5;
+    this.anchor.y = 1;
+};
+
+Sprite_BattlerHPGauge.prototype.bitmapWidth = function() {
+    return ActorGaugeWidth > 0 ? ActorGaugeWidth : 128;
+};
+  
+Sprite_BattlerHPGauge.prototype.gaugeHeight = function() {
+    return ActorGaugeHeight > 0 ? ActorGaugeHeight : 12;
+};
+
+Sprite_BattlerHPGauge.prototype.labelFontSize = function() {
+    return this._gaugeData ? Sprite_Gauge.prototype.labelFontSize.call(this) : $gameSystem.mainFontSize() + ActorLabelFontSize;
+};
+  
+Sprite_BattlerHPGauge.prototype.valueFontSize = function() {
+    return this._gaugeData ? Sprite_Gauge.prototype.valueFontSize.call(this) : $gameSystem.mainFontSize() + ActorValueFontSize;
+};
+
+Sprite_BattlerHPGauge.prototype.drawLabel = function() {
+    if (this.isHPLabelVisible()) {
+        Sprite_Gauge.prototype.drawLabel.call(this);
+    }
+};
+
+Sprite_BattlerHPGauge.prototype.isHPLabelVisible = function() {
+    return ActorHPLabelVisible;
+};
+
+Sprite_BattlerHPGauge.prototype.isHPValueVisible = function() {
+    return ActorHPValueVisible;
+};
+
+Sprite_BattlerHPGauge.prototype.getHPVisible = function() {
+    return ActorHPVisible;
+};
+
+Sprite_BattlerHPGauge.prototype.setup = function(battler, type) {
+    Sprite_Gauge.prototype.setup.call(this, battler, type);
+    this.opacity = (this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect())) ? 255 : 0;
+};
+
+Sprite_BattlerHPGauge.prototype.gaugeX = function() {
+    if (!this.isHPLabelVisible()) {
+      return 0;
+    } else {
+      return Sprite_Gauge.prototype.gaugeX.call(this);
+    }
+};
+
+Sprite_BattlerHPGauge.prototype.drawValue = function() {
+    if (this.isHPValueVisible()) {
+        if (this.isVisibleValue()) {
+            const width = this.bitmapWidth();
+            const height = this.bitmapHeight();
+            this.setupValueFont();
+            this.bitmap.drawText(MaskValueName, 0, 0, width, height, "right");
+        } else {
+            Sprite_Gauge.prototype.drawValue.call(this);
+        }
+    }
+};
+
+Sprite_BattlerHPGauge.prototype.isVisibleValue = function() {
+    return false;
+};
+
+Sprite_BattlerHPGauge.prototype.updateBitmap = function() {
+    Sprite_Gauge.prototype.updateBitmap.call(this);
+    this.gaugeVisible();
+};
+
+Sprite_BattlerHPGauge.prototype.gaugeVisible = function() {
+    const _visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
+    if (_visible && this.opacity < 255) {
+        this.opacity += 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    } else if (!_visible && this.opacity > 0) {
+        this.opacity -= 25;
+        this.opacity = this.opacity.clamp(0, 255);
+    }
+    if (this.opacity > 0) {
+        this.visible = true;
+    } else {
+        this.visible = false;
+    }
+};
+
+Sprite_BattlerHPGauge.prototype.gaugeVisibleResult = function() {
+    return true;
+};
+
+Sprite_BattlerHPGauge.prototype.updateTargetValue = function(value, maxValue) {
+  if (!this._startVisible && !isNaN(this._value) && this.getHPVisible() >= 2) {
+    this._gaugeDuration = 60;
+  } else if (this._startVisible) {
+    this._startVisible = false;
+  }
+  Sprite_Gauge.prototype.updateTargetValue.call(this, value, maxValue);
+};
+
+Sprite_BattlerHPGauge.prototype.updateGaugeAnimation = function() {
+  if (this._gaugeDuration > 0) {
+    this._gaugeDuration--;
+  }
+  Sprite_Gauge.prototype.updateGaugeAnimation.call(this);
+};
+
+Sprite_BattlerHPGauge.prototype.gaugeVisibleInDamage = function() {
+  if (this.getHPVisible() >= 2) {
+    return this._gaugeDuration > 0;
+  } else if (this.getHPVisible() === 1) {
+    return false;
+  }
+  return true;
+};
+
+Sprite_BattlerHPGauge.prototype.gaugeVisibleInSelect = function() {
+  if (this.getHPVisible() === 1 || this.getHPVisible() === 3) {
+    return this._battler.isSelected();
+  } else if (this.getHPVisible() === 2) {
+    return false;
+  }
+  return true;
+};
+
 
 function Sprite_EnemyHPGauge() {
   this.initialize(...arguments);
 }
 
-Sprite_EnemyHPGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_EnemyHPGauge.prototype = Object.create(Sprite_BattlerHPGauge.prototype);
 Sprite_EnemyHPGauge.prototype.constructor = Sprite_EnemyHPGauge;
 
 Sprite_EnemyHPGauge.prototype.initialize = function() {
-  this._enemyGaugeWidth = enemyHPGaugeLength ? (Number(enemyHPGaugeLength[0]) || 0) : 0;
-  this._enemyGaugeHeight = enemyHPGaugeLength ? (Number(enemyHPGaugeLength[1]) || 0) : 0;
-  Sprite_Gauge.prototype.initialize.call(this);
-  this._gaugeDuration = 0;
-  this._startVisible = true;
-  this.anchor.x = 0.5;
-  this.anchor.y = 1;
+    this._enemyGaugeWidth = enemyHPGaugeLength ? (Number(enemyHPGaugeLength[0]) || 0) : 0;
+    this._enemyGaugeHeight = enemyHPGaugeLength ? (Number(enemyHPGaugeLength[1]) || 0) : 0;
+    Sprite_BattlerHPGauge.prototype.initialize.call(this);
 };
 
 Sprite_EnemyHPGauge.prototype.bitmapWidth = function() {
@@ -360,58 +678,20 @@ Sprite_EnemyHPGauge.prototype.valueFontSize = function() {
   return this._gaugeData ? Sprite_Gauge.prototype.valueFontSize.call(this) : $gameSystem.mainFontSize() + ValueFontSize;
 };
 
-Sprite_EnemyHPGauge.prototype.drawLabel = function() {
-  if (HPLabelVisible) {
-    Sprite_Gauge.prototype.drawLabel.call(this);
-  }
+Sprite_EnemyHPGauge.prototype.isHPLabelVisible = function() {
+    return HPLabelVisible;
 };
 
-Sprite_EnemyHPGauge.prototype.setup = function(battler, type) {
-    Sprite_Gauge.prototype.setup.call(this, battler, type);
-    this.opacity = (this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect())) ? 255 : 0;
+Sprite_EnemyHPGauge.prototype.isHPValueVisible = function() {
+    return HPValueVisible;
 };
 
-Sprite_EnemyHPGauge.prototype.gaugeX = function() {
-  if (!HPLabelVisible) {
-    return 0;
-  } else {
-    return Sprite_Gauge.prototype.gaugeX.call(this);
-  }
+Sprite_EnemyHPGauge.prototype.getHPVisible = function() {
+    return HPVisible;
 };
 
-Sprite_EnemyHPGauge.prototype.drawValue = function() {
-  if (HPValueVisible) {
-    if (this._battler._HPGaugeValueVisible && !this._battler._HPGaugeMask) {
-      const width = this.bitmapWidth();
-      const height = this.bitmapHeight();
-      this.setupValueFont();
-      this.bitmap.drawText(MaskValueName, 0, 0, width, height, "right");
-    } else {
-      Sprite_Gauge.prototype.drawValue.call(this);
-    }
-  }
-};
-
-const _Sprite_EnemyHPGauge_updateBitmap = Sprite_EnemyHPGauge.prototype.updateBitmap;
-Sprite_EnemyHPGauge.prototype.updateBitmap = function() {
-  _Sprite_EnemyHPGauge_updateBitmap.call(this);
-  this.gaugeVisible();
-};
-
-Sprite_EnemyHPGauge.prototype.gaugeVisible = function() {
-    const _visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
-    if (_visible && this.opacity < 255) {
-        this.opacity += 25;
-        this.opacity = this.opacity.clamp(0, 255);
-    } else if (!_visible && this.opacity > 0) {
-        this.opacity -= 25;
-        this.opacity = this.opacity.clamp(0, 255);
-    }
-    if (this.opacity > 0) {
-        this.visible = true;
-    } else {
-        this.visible = false;
-    }
+Sprite_EnemyHPGauge.prototype.isVisibleValue = function() {
+    return this._battler._HPGaugeValueVisible && !this._battler._HPGaugeMask;
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeVisibleResult = function() {
@@ -437,42 +717,6 @@ Sprite_EnemyHPGauge.prototype.gaugeEnemyBookVisible = function() {
     } else if (HPEnemyBookVisible === 2) {
       return $gameSystem.isInEnemyBookStatus(this._battler.enemy());
     }
-  }
-  return true;
-};
-
-const _Sprite_EnemyHPGauge_updateTargetValue = Sprite_EnemyHPGauge.prototype.updateTargetValue;
-Sprite_EnemyHPGauge.prototype.updateTargetValue = function(value, maxValue) {
-  if (!this._startVisible && !isNaN(this._value) && HPVisible >= 2) {
-    this._gaugeDuration = 60;
-  } else if (this._startVisible) {
-    this._startVisible = false;
-  }
-  _Sprite_EnemyHPGauge_updateTargetValue.call(this, value, maxValue);
-};
-
-const _Sprite_EnemyHPGauge_updateGaugeAnimation  = Sprite_EnemyHPGauge.prototype.updateGaugeAnimation;
-Sprite_EnemyHPGauge.prototype.updateGaugeAnimation = function() {
-  if (this._gaugeDuration > 0) {
-    this._gaugeDuration--;
-  }
-  _Sprite_EnemyHPGauge_updateGaugeAnimation.call(this);
-};
-
-Sprite_EnemyHPGauge.prototype.gaugeVisibleInDamage = function() {
-  if (HPVisible >= 2) {
-    return this._gaugeDuration > 0;
-  } else if (HPVisible === 1) {
-    return false;
-  }
-  return true;
-};
-
-Sprite_EnemyHPGauge.prototype.gaugeVisibleInSelect = function() {
-  if (HPVisible === 1 || HPVisible === 3) {
-    return this._battler.isSelected();
-  } else if (HPVisible === 2) {
-    return false;
   }
   return true;
 };

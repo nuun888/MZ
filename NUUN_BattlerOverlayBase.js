@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトラーオーバーレイベース
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/5/28 Ver.1.0.2
+ * SVアクターのゲージ表示に関する処理の追加。
  * 2022/10/11 Ver.1.0.1
  * 微修正。
  * 2022/5/10 Ver.1.0.0
@@ -153,14 +155,16 @@ Sprite_BattlerOverlay.prototype.updatePosition = function() {
 const _Sprite_Actor_update = Sprite_Actor.prototype.update;
 Sprite_Actor.prototype.update = function() {
     _Sprite_Actor_update.call(this);
-    if (!this.battlerOverlay) {
+    if (this.battlerOverlay) {
+        this.butlerOverlayOpacity();
+    } else {
         $gameTemp.refreshOverlay = true;
     }
 };
 
 
-Sprite_Enemy.prototype.butlerOverlayOpacity = function() {
-    if (this._effectType !== "blink") {
+Sprite_Battler.prototype.butlerOverlayOpacity = function() {
+    if (this._effectType && this._effectType !== "blink") {
         this.battlerOverlay.setOpacity(this.opacity);
     }
 };
@@ -175,7 +179,7 @@ Sprite_Enemy.prototype.update = function() {
     }
 };
 
-Sprite_Enemy.prototype.getButlerOverlayHeight = function() {
+Sprite_Battler.prototype.getButlerOverlayHeight = function() {
     if (this._SVBattlername) {//SoR_EnemySVSprite_MZ
       return Math.floor((this._mainSprite.bitmap.height / 6) * 0.9);
     } else if (this._svBattlerSprite) {//Visu
@@ -185,12 +189,20 @@ Sprite_Enemy.prototype.getButlerOverlayHeight = function() {
     }
 };
   
-Sprite_Enemy.prototype.getButlerOverlayConflict = function() {
+Sprite_Battler.prototype.getButlerOverlayConflict = function() {
     if (ConflictScale === 'Img' && this.battlerOverlay) {
       return this.battlerOverlay.battlerSpriteScale_y;
     } else {
       return 1.0;
     }
+};
+
+Sprite_Actor.prototype.getButlerOverlayHeight = function() {
+    return this.getSVButlerHeight();
+};
+
+Sprite_Actor.prototype.getSVButlerHeight = function() {
+    return Math.floor((this._mainSprite.bitmap.height / 6) * 0.9);
 };
 
 })();

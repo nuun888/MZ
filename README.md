@@ -60,7 +60,8 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | バトラー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [バトラーHPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) | オ | 1.7.0 |
+| [バトラーHPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) | オ | 1.7.1 |
+| [バトラーTPBゲージ表示](https://github.com/nuun888/MZ/blob/master/README/EnemyTpbGauge.md) | [NUUN_BattlerTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js) | オ | 1.5.0 |
 |  |  |  |  |
 
 | アクター　　　　　　　　　　　　　　　 | プラグイン　プラグイン数6　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
@@ -84,7 +85,6 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [敵MPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_EnemyMPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyMPGauge.js) | オ | 1.1.0 |
 | [敵TPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyTPGauge.md) | [NUUN_EnemyTPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js) | オ | 1.1.0 |
 | [敵名前表示](https://github.com/nuun888/MZ/blob/master/README/ButlerName.md) | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) | オ | 1.3.0 |
-| [敵TPBゲージ表示](https://github.com/nuun888/MZ/blob/master/README/EnemyTpbGauge.md) | [NUUN_EnemyTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTpbGauge.js) | オ | 1.4.0 |
 | [敵ステート表示拡張](https://github.com/nuun888/MZ/blob/master/README/EnemyStateIconEX.md) | [NUUN_EnemyStateIconEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyStateIconEX.js) | オ | 1.1.0 |
 | [エネミー個別座標](https://github.com/nuun888/MZ/edit/master/README/EnemyPosition.md)  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js) |  | 1.1.0 |
 | [敵のドロップアイテム追加](https://github.com/nuun888/MZ/blob/master/README/AddDropItems.md)  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js) |  | 1.0.1 |

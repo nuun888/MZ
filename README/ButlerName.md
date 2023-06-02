@@ -1,5 +1,5 @@
 # [バトラー名前表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)
-# Ver.1.3.2  
+# Ver.1.4.0  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)  
  
 ## 必須、前提プラグイン

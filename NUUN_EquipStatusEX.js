@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.2
+ * @version 1.4.3
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/2/2023 Ver.1.4.3
+ * Fixed the problem that an error occurs when the display actor image is set to face graph.
+ * Expanded the application parameter of difference color inversion.
  * 5/20/2023 Ver.1.4.2
  * Conflict measures with "EquipScene_Extension".
  * Fixed so that items can be displayed across two columns.
@@ -825,7 +828,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.2
+ * @version 1.4.3
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -854,6 +857,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.1.4.3
+ * 表示アクター画像を顔グラに設定したときにエラーが出る問題を修正。
+ * 差分色反転の適用パラメータを拡大。
  * 2023/5/20 Ver.1.4.2
  * 装備シーン拡張との競合対策。
  * 項目を2列に跨いで表示できるように修正。
@@ -1193,6 +1199,12 @@
  * @max 99999
  * @default 0
  * 
+ * @param BatStatus
+ * @text 差分表示時の色反転
+ * @desc 差分表示時に数値上昇と減少の色を反転します。
+ * @type boolean
+ * @default false
+ * 
  */
 /*~struct~StateData:ja
  *
@@ -1207,6 +1219,12 @@
  * @desc アイコンのIDを指定します。0の場合はデータベースのアイコンが表示されます。
  * @type icon
  * @default 0
+ * 
+ * @param BatStatus
+ * @text 差分表示時の色反転
+ * @desc 差分表示時に数値上昇と減少の色を反転します。
+ * @type boolean
+ * @default false
  *
  */
 /*~struct~EquipPageListData:ja
@@ -1268,61 +1286,61 @@
  * @value 11
  * @option ＴＰゲージ(1)(2)(3)(4)(6)
  * @value 12
- * @option ＨＰ(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
+ * @option ＨＰ(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(18)(19)
  * @value 20
- * @option ＭＰ(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
+ * @option ＭＰ(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(18)(19)
  * @value 21
- * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(18)(19)
  * @value 22
- * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(18)(19)
  * @value 23
- * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(18)(19)
  * @value 24
- * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(18)(19)
  * @value 25
- * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(18)(19)
  * @value 26
- * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(19)
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(10)(12)(13)(16)(17)(18)(19)
  * @value 27
- * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 30
- * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 31
- * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 32
- * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 33
- * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 34
- * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 35
- * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 36
- * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 37
- * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 38
- * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 39
- * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 40
- * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 41
- * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 42
- * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 43
- * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 44
- * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 45
- * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 46
- * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 47
- * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)(19)
  * @value 48
- * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(19)
+ * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(12)(13)(16)(17)(18)19)
  * @value 49
  * @option 属性耐性(1)(2)(3)(4)(5)(6)(7)(8)(10)(11)(13)(15)(17)(19)
  * @value 100
@@ -1899,10 +1917,10 @@ Imported.NUUN_EquipStatusEX = true;
         height = Math.min(height, ImageManager.faceHeight);
         x += data.Actor_X + ActorImg_X;
         y += data.Actor_Y + ActorImg_Y;
-         if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
             this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, ImageManager.faceWidth, height);
         } else {
-            _Window_EquipStatus_drawActorFace.call(this, actor, x, y, width, height);
+            Window_EquipStatus.prototype.drawActorFace.call(this, actor, x, y, width, height);
         }
     };
 
@@ -2184,7 +2202,7 @@ Imported.NUUN_EquipStatusEX = true;
         if (this._tempActor) {
             const newValue = this._tempActor.param(paramId);
             const diffvalue = newValue - value;
-            this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
+            this.changeTextColor(ColorManager.paramchangeTextColor(getBatStatus(data.BatStatus, value, newValue)));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : ""), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
             if (EquipStatusDifference) {
                 this.drawText("("+ diffvalueText(diffvalue) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
@@ -2218,7 +2236,7 @@ Imported.NUUN_EquipStatusEX = true;
         if (this._tempActor) {
             const newValue = NuunManager.numPercentage(this._tempActor.xparam(paramId - 30) * 100, data.Decimal || 0, DecimalMode);
             const diffvalue = newValue - value;
-            this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
+            this.changeTextColor(ColorManager.paramchangeTextColor(getBatStatus(data.BatStatus, value, newValue)));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
             if (EquipStatusDifference) {
                 this.drawText("("+ diffvalueText(diffvalue) +")", paramX + (paramWidth * 2) + rightArrowWidth + x, y, this.paramDifferenceWidth(), "left");
@@ -2251,7 +2269,7 @@ Imported.NUUN_EquipStatusEX = true;
         this.drawRightArrow(paramX + paramWidth + x, y);
         if (this._tempActor) {
             const newValue = NuunManager.numPercentage(this._tempActor.sparam(paramId - 40) * 100, data.Decimal - 2, DecimalMode);
-            const diffvalue = badParams(paramId) ? (value - newValue) : (newValue - value);
+            const diffvalue = badParams(paramId) ? getBatStatus(data.BatStatus, newValue, value) : getBatStatus(data.BatStatus, value, newValue);
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
             if (EquipStatusDifference) {
@@ -2293,10 +2311,8 @@ Imported.NUUN_EquipStatusEX = true;
         if (this._tempActor) {
             a = this._tempActor;
             const newValue = NuunManager.numPercentage(eval(data.DataEval), data.Decimal - 2, DecimalMode);
-            let diffvalue = 0;
             if (!isNaN(text)) {
-                diffvalue = data.BatStatus ? (text - newValue) : (newValue - text);
-                this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
+                this.changeTextColor(ColorManager.paramchangeTextColor(getBatStatus(data.BatStatus, text, newValue)));
             } else {
                 this.resetTextColor();
             }
@@ -2381,7 +2397,7 @@ Imported.NUUN_EquipStatusEX = true;
                 if (this._tempActor) {
                     const newValue = NuunManager.numPercentage(this._tempActor.elementRate(elementId) * 100, data.Decimal - 2, DecimalMode);
                     const diffvalue = rate - newValue;
-                    this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
+                    this.changeTextColor(ColorManager.paramchangeTextColor(getBatStatus(element.BatStatus, newValue, rate)));
                     this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2 + x, y + y2, paramWidth, "right");
                     if (EquipStatusDifference) {
                         this.drawText("("+ diffvalueText(diffvalue * -1) +")", paramX + (paramWidth * 2) + rightArrowWidth + x2 + x, y + y2, this.paramDifferenceWidth(), "left");
@@ -2437,7 +2453,7 @@ Imported.NUUN_EquipStatusEX = true;
                     let newValue = this._tempActor.stateRate(stateId) * 100 * (this._tempActor.isStateResist(stateId) ? 0 : 1);
                     newValue = NuunManager.numPercentage(newValue, data.Decimal - 2, DecimalMode);
                     const diffvalue = rate - newValue;
-                    this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
+                    this.changeTextColor(ColorManager.paramchangeTextColor(getBatStatus(state.BatStatus, newValue, rate)));
                     this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x2 + x, y + y2, paramWidth, "right");
                     if (EquipStatusDifference) {
                         this.drawText("("+ diffvalueText(diffvalue * -1) +")", paramX + (paramWidth * 2) + rightArrowWidth + x2 + x, y + y2, this.paramDifferenceWidth(), "left");
@@ -2686,6 +2702,10 @@ Imported.NUUN_EquipStatusEX = true;
             }
             y += lineHeight * text.row;
         }
+    };
+
+    function getBatStatus(batStatus, value, newValue) {
+        return batStatus ? (value - newValue) : (newValue - value);
     };
 
 

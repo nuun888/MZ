@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * Only item names and skill names are displayed in the battle log.
@@ -31,6 +31,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/3/2023 Ver.1.1.1
+ * Correction of processing.
  * 5/9/2023 Ver.1.1.0
  * Added a function to display a message when using.
  * 5/5/2023 Ver.1.0.0
@@ -168,7 +170,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * バトルログをアイテム名、スキル名のみ表示させるようにします。
@@ -187,6 +189,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/3 Ver 1.1.1
+ * 処理の修正。
  * 2023/5/9 Ver 1.1.0
  * 使用時のメッセージを表示させる機能を追加。
  * 2023/5/5 Ver 1.0.0
@@ -572,8 +576,11 @@ Imported.NUUN_BattleActionWindow = true;
     const _Window_BattleLog_callNextMethod = Window_BattleLog.prototype.callNextMethod;
     Window_BattleLog.prototype.callNextMethod = function() {
         while (this._methods.length > 0) {
+            if (this.updateWait()) {
+                break;
+            }
             _Window_BattleLog_callNextMethod.call(this);
-            this.coercionPopup(this._methods[0]);       
+            this.coercionPopup(this._methods[0]);
         }
     };
 

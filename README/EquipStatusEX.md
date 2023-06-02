@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.4.2
+# Ver.1.4.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -53,6 +53,9 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
+2023/6/2 Ver.1.4.3  
+表示アクター画像を顔グラに設定したときにエラーが出る問題を修正。  
+差分色反転の適用パラメータを拡大。  
 2023/5/20 Ver.1.4.2  
 装備シーン拡張との競合対策。  
 項目を2列に跨いで表示できるように修正。  

@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.18
+ * @version 2.0.19
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/2/2023 Ver.2.0.19
+ * Fixed an issue that caused an error when displaying nickname.
  * 5/22/2023 Ver.2.0.18
  * Conflict support with face shift of vanguard and rearguard plug-ins.
  * 5/14/2023 Ver.2.0.17
@@ -75,7 +77,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.18
+ * @version 2.0.19
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -85,6 +87,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.2.0.19
+ * 二つ名を表示したときにエラーが出る問題を修正。
  * 2023/5/22 Ver.2.0.18
  * 前衛後衛プラグインのフェイスシフトとの競合対応。
  * 2023/5/14 Ver.2.0.17
@@ -928,7 +932,7 @@ Imported.NUUN_MenuScreenEXBase = true;
     Window_StatusBase.prototype.nuunMenu_drawActorNickname = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.resetTextColor();
-        this.nuun_setContentsFontFace();
+        this.nuun_setContentsFontFace(data);
         this.drawText(actor.nickname(), x, y, width, data.Align);
         this.resetFontSettings();
     };

@@ -16,13 +16,15 @@
  * @orderAfter NUUN_Base
  * 
  * @help
- * 敵のバトラー上にMPゲージを表示します。
+ * 敵またはSVアクターのバトラー上にMPゲージを表示します。
  * 
- * 敵キャラのメモ欄
+ * 敵キャラまたはアクターのメモ欄
  * <MPGaugeX:[position]> MPゲージのX座標を調整します。（相対座標）
  * <MPGaugeY:[position]> MPゲージのY座標を調整します。（相対座標）
+ * 
+ * 敵キャラのメモ欄
  * <NoMPGauge> MPゲージを表示しません。
- * <MPGaugeLength:[width], [height]> HPゲージの幅を指定します。
+ * <MPGaugeLength:[width], [height]> MPゲージの幅を指定します。
  * [position]:座標
  * [width]:ゲージ横幅
  * [height]:ゲージ縦幅

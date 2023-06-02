@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.7
+ * @version 1.6.8
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/2/2023 Ver.1.6.8
+ * Fixed processing related to overlay plugins.
  * 4/16/2023 Ver.1.6.7
  * Fixed filtering class handling.
  * 4/10/2023 Ver.1.6.6
@@ -83,7 +85,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.6.7
+ * @version 1.6.8
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -93,6 +95,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.1.6.8
+ * オーバレイプラグイン関連の処理の修正。
  * 2023/4/16 Ver.1.6.7
  * フィルタリングクラスの処理を修正。
  * 2023/4/10 Ver.1.6.6
@@ -180,7 +184,10 @@ function structureData(params) {
 }
 
 function nuun_GausePlugins() {
-  return Imported.NUUN_ButlerHPGauge || Imported.NUUN_EnemyMPGauge || Imported.NUUN_EnemyTPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge || Imported.NUUN_EnemyStateIconEX;
+    return (
+        Imported.NUUN_ButlerHPGauge || Imported.NUUN_EnemyMPGauge || Imported.NUUN_EnemyTPGauge || Imported.NUUN_ButlerName || Imported.NUUN_EnemyTpbGauge || Imported.NUUN_EnemyStateIconEX ||
+        Imported.NUUN_BattlerMPGauge || Imported.NUUN_BattlerTPGauge || Imported.NUUN_BattlerTpbGauge
+    )
 }
 
 NuunManager.isFilterClass = function(_class) {
@@ -327,6 +334,7 @@ ImageManager.throwLoadError = function(bitmap) {
   }
 };
 
+
 const _Bitmap_isReady = Bitmap.prototype.isReady;
 Bitmap.prototype.isReady = function() {
   if (this.nuun_LoadBitmap && this.isError()) {
@@ -411,10 +419,10 @@ Spriteset_Battle.prototype.createLowerLayer = function() {
 };
 
 Spriteset_Battle.prototype.createGaugeBase = function() {
-  if (!this._butlerGaugeBase) {
+  if (!this._battlerGaugeBase) {
     const sprite = new Sprite();
     this.addChild(sprite);
-    this._butlerGaugeBase = sprite;
+    this._battlerGaugeBase = sprite;
     BattleManager.gaugeBaseSprite = sprite;
   }
 };
@@ -422,15 +430,15 @@ Spriteset_Battle.prototype.createGaugeBase = function() {
 const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
 Spriteset_Battle.prototype.update = function() {
   _Spriteset_Battle_update.call(this);
-  this.updateButlerGauge();
+  this.updateBattlerGauge();
 };
 
-Spriteset_Battle.prototype.updateButlerGauge = function() {
-  if (this._butlerGaugeBase) {
-    for (const sprite of this._butlerGaugeBase.children) {
+Spriteset_Battle.prototype.updateBattlerGauge = function() {
+  if (this._battlerGaugeBase) {
+    for (const sprite of this._battlerGaugeBase.children) {
       const spriteData = this._enemySprites.some(enemy => enemy.spriteId === sprite.enemySpriteId);
       if (!spriteData) {
-        this._butlerGaugeBase.removeChild(sprite);
+        this._battlerGaugeBase.removeChild(sprite);
       }
     }
   }

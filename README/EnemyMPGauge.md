@@ -1,5 +1,5 @@
 # [バトラーMPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerMPGauge.js)
-# Ver.1.1.2
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerMPGauge.js)  
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  

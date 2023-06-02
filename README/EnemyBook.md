@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.18.6
+# Ver.2.19.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -11,7 +11,7 @@
 [条件付きドロップアイテム図鑑適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) Ver.1.0.0
 [（要条件付きドロップアイテムVer.1.0.6以降）](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md)  
 [モンスター図鑑全セーブ共通](https://github.com/nuun888/MZ/blob/master/README/EnemyBook_Global.md)  
-[モンスター図鑑マップ遭遇チェック](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEncounterCheck.md)  
+[モンスター図鑑マップ遭遇チェック](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEncounterCheck.md)Ver.1.0.2  
 #### オプション
 [キーボタン割り当て](https://github.com/nuun888/MZ/blob/master/README/UserKey.md)  
 
@@ -187,10 +187,27 @@ Y表示列位置からのY方向の座標を指定します。
 モンスターを種類別に表示させることが出来ます。  
 カテゴリーkeyはallを除いて任意の文字列で設定可能です。  
 allを記入の場合は図鑑に登録される全てのモンスターが表示されます。  
+mapEnemyを記入の場合は現在のマップのモンスターが表示されます。  
 敵キャラのメモ欄  
 `<CategoryKey:[Key]>` 表示するカテゴリーを設定します。  
 `<CategoryKey:[Key],[Key]....>` 表示出来るカテゴリーは複数設定可能です。  
 `[Key]`:カテゴリーKey([]は付けずにプラグインパラメータで設定した文字列を記入してください)  
+
+### マップに出現する敵のリスト設定
+以下の設定を行うことにより、現在のマップに出現するモンスターを表示することができます。  
+カテゴリーkeyを'mapEnemy'を記入することで現在のマップのモンスター一覧が表示されます。  
+
+マップのイベントにエンカウントする敵キャラのIDを記入。  
+プラグインパラメータのマップ敵エンカウントリストで指定。  
+マップ敵エンカウントリストから設定できます。  
+なお、プラグインパラメータで設定する場合は記入する必要はありませんが、以下のタグを記入した場合は、以下のタグの設定が優先されます。  
+
+マップのメモ欄  
+`<EncountEnemiesList:[id],[id]...>`  
+敵キャラIDを指定します。複数入力できます。  
+
+モンスター図鑑マップ遭遇チェックを使用している場合は、上記の設定がある場合はその設定が適用されますが、設定されていない場合は  
+現在のマップの敵グループから自動で判定されます。  
 
 ### アナライズ
 スキル、アイテムのメモ欄  
@@ -257,6 +274,8 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2023/6/2 Ver.2.19.0  
+図鑑カテゴリーに現在のマップを追加。  
 2023/4/8 Ver.2.18.6  
 モンスター画像をフロントビュー画像かサイドビュー画像で表示する機能を追加。  
 条件付きドロップアイテムを表示するとエラーが出る問題を修正。  

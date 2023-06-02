@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.6
+ * @version 2.19.0
  * 
  * @help
  * Implement an enemy book.
@@ -95,6 +95,7 @@
  * You can display enemies by type.
  * Category key can be set with any character string except "all".
  * If "all" is entered, all enemies registered in the enemy book will be displayed.
+ * If "mapEnemy" is entered, monsters in the current map will be displayed.
  * Enemy notes
  * <CategoryKey:[Key]> Set the categories to display.
  * <CategoryKey:[Key],[Key]....> Multiple categories can be displayed.
@@ -147,6 +148,22 @@
  * "BackFitWidth" is expanded according to the screen size based on the mode set in the background image UI window size.
  * If it fits in the UI window, it will be enlarged with the size of the UI.
  * If it is specified for each page, the background set individually takes precedence.
+ * 
+ * Setting the list of enemies that appear on the map
+ * You can display the monsters that appear on the current map by making the following settings.
+ * By entering 'mapEnemy' as the category key, a list of monsters on the current map will be displayed.
+ * 
+ * Fill in the ID of the enemy character that will be encountered in the event on the map.
+ * Specified in the map enemy encounter list in the plugin parameters.
+ * 
+ * You can set it from "Map enemy encounter list".
+ * It is not necessary to enter when setting with plug-in parameters, but if the following tags are entered, the settings of the following tags will take precedence.
+ * 
+ * Map Note
+ * <EncountEnemiesList:[id],[id]...>
+ * Specify the enemy character ID. Multiple entries are allowed.
+ * 
+ * If using "NUUN_EnemyBookEncounterCheck", the above setting will be applied if it is set, but if not set it will be automatically determined from the current map's enemy group.
  * 
  * Gauges such as turn, level, and HP are displayed only during battle.
  * 
@@ -210,6 +227,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/2/2023 Ver.2.19.0
+ * Added the current map to the picture book category.
  * 4/8/2023 Ver.2.18.6
  * Added a function to display monster images in front view image or side view image.
  * Fixed an issue where viewing conditional drop items would cause an error.
@@ -466,6 +485,17 @@
  * @text Full size image unregistered silhouette
  * @desc Creates a full-size silhouette of a monster whose information has not yet been registered.
  * @parent BasicSetting
+ * 
+ * @param MapEncountEnemySetting
+ * @text Map encounter enemy character setting
+ * @default ------------------------------
+ * 
+ * @param MapEncountEnemy
+ * @text Map enemy encounter list
+ * @desc Set the enemies to encounter on the specified map.
+ * @type struct<EncountList>[]
+ * @default []
+ * @parent MapEncountEnemySetting
  * 
  * @param CommandSetting
  * @text Enemy Book Command Settings
@@ -2648,10 +2678,11 @@
 * @type string
 * 
 * @param CategoryKey
-* @desc Set the key of the category. (all: display all)
+* @desc Set the key of the category. (all: display all, mapEnemy: current map)
 * @text CategoryKey
 * @type combo
 * @option 'all'
+* @option 'mapEnemy'
 * @default
 * 
 * @param CategoryNote
@@ -2850,13 +2881,28 @@
  * @min -255
  * 
  */
+/*~struct~EncountList:
+ * 
+ * @param MapId
+ * @desc Map ID (Separated if multiple specified)
+ * @text Map ID
+ * @type string
+ * @default 
+ * 
+ * @param Enemy
+ * @desc Specify the enemy character to encounter on the specified map.
+ * @text Enemy character list
+ * @type enemy[]
+ * @default 
+ * 
+ */
 /*:ja
  * @target MZ
  * @plugindesc モンスター図鑑
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.18.6
+ * @version 2.19.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -2940,6 +2986,7 @@
  * モンスターを種類別に表示させることが出来ます。
  * カテゴリーkeyはallを除いて任意の文字列で設定可能です。
  * allを記入の場合は図鑑に登録される全てのモンスターが表示されます。
+ * mapEnemyを記入の場合は現在のマップのモンスターが表示されます。
  * 敵キャラのメモ欄
  * <CategoryKey:[Key]> 表示するカテゴリーを設定します。
  * <CategoryKey:[Key],[Key]....> 表示出来るカテゴリーは複数設定可能です。
@@ -2997,6 +3044,22 @@
  * 
  * ターン、レベル、HPなどのゲージは戦闘中のみ表示されます。
  * 
+ * マップに出現する敵のリスト設定
+ * 以下の設定を行うことにより、現在のマップに出現するモンスターを表示することができます。
+ * カテゴリーkeyを'mapEnemy'を記入することで現在のマップのモンスター一覧が表示されます。
+ * 
+ * マップのイベントにエンカウントする敵キャラのIDを記入。
+ * プラグインパラメータのマップ敵エンカウントリストで指定。
+ * マップ敵エンカウントリストから設定できます。
+ * なお、プラグインパラメータで設定する場合は記入する必要はありませんが、以下のタグを記入した場合は、
+ * 以下のタグの設定が優先されます。
+ * 
+ * マップのメモ欄
+ * <EncountEnemiesList:[id],[id]...>
+ * 敵キャラIDを指定します。複数入力できます。
+ * 
+ * モンスター図鑑マップ遭遇チェックを使用している場合は、上記の設定がある場合はその設定が適用されますが、設定されていない場合は
+ * 現在のマップの敵グループから自動で判定されます。
  * 
  * 操作方法
  * 上下（↑ ↓）キー：モンスター選択
@@ -3058,6 +3121,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.2.19.0
+ * 図鑑カテゴリーに現在のマップを追加。
  * 2023/4/8 Ver.2.18.6
  * モンスター画像をフロントビュー画像かサイドビュー画像で表示する機能を追加。
  * 条件付きドロップアイテムを表示するとエラーが出る問題を修正。
@@ -3421,6 +3486,17 @@
  * @text モンスター原寸大未登録シルエット
  * @desc 情報が未登録のモンスターの原寸大表示をシルエットにします。
  * @parent BasicSetting
+ * 
+ * @param MapEncountEnemySetting
+ * @text マップエンカウント敵キャラ設定
+ * @default ------------------------------
+ * 
+ * @param MapEncountEnemy
+ * @text マップ敵エンカウントリスト
+ * @desc 指定のマップでエンカウントする敵の設定を行います。
+ * @type struct<EncountList>[]
+ * @default []
+ * @parent MapEncountEnemySetting
  * 
  * @param CommandSetting
  * @text 図鑑コマンド設定
@@ -5587,10 +5663,11 @@
  * @type string
  * 
  * @param CategoryKey
- * @desc カテゴリーのKeyを設定します。(all:全て表示)
+ * @desc カテゴリーのKeyを設定します。(all:全て表示、mapEnemy:現在のマップ)
  * @text カテゴリーKey
  * @type combo
  * @option 'all'
+ * @option 'mapEnemy'
  * @default
  * 
  * @param CategoryNote
@@ -5789,6 +5866,36 @@
  * @min -255
  * 
  */
+/*~struct~EncountList:ja
+ * 
+ * @param MapId
+ * @desc マップID(複数指定の場合は,区切り)
+ * @text マップID
+ * @type string
+ * @default 
+ * 
+ * @param Enemy
+ * @desc 指定のマップでエンカウントする敵キャラを指定します。
+ * @text 敵キャラリスト
+ * @type enemy[]
+ * @default 
+ * 
+ */
+/*~struct~SetEnemy:
+ * 
+ * @param Enemy
+ * @desc 指定のマップでエンカウントする敵キャラを指定します。
+ * @text 敵キャラ
+ * @type enemy
+ * @default 
+ * 
+ * @param EnemyEval
+ * @desc 敵キャラの適用条件をjavascriptで記入します。
+ * @text 敵キャラ適用条件
+ * @type combo
+ * @default 
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_EnemyBook = true;
@@ -5964,6 +6071,8 @@ bookContents.PageList17 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData
 bookContents.PageList18 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList18'])) : [];
 bookContents.PageList19 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList19'])) : [];
 bookContents.PageList20 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList20'])) : [];
+
+const MapEncountEnemiesList = setMapList();
 
 const pageIndex = {category:0, index:0, page:0, infoIndex:0};
 const NRP_pLoopLR = PluginManager.parameters("NRP_LoopCursor").loopLR;
@@ -6145,12 +6254,37 @@ PluginManager.registerCommand(pluginName, 'EnemyBookDebuffRemove', args => {
     $gameSystem.enemyBookDebuffList(Number(args.enemyId), Number(args.debuffId) - 1, Number(args.debuffId) > 0, false);
 });
 
+function setMapList() {
+    const MapEncountEnemy = DataManager.nuun_structureData(parameters['MapEncountEnemy']);
+    if (!MapEncountEnemy) {
+        return null;
+    }
+    const MapEncountEnemies = [];
+    MapEncountEnemy.forEach(data => {
+        if (data.MapId) {
+            const mapList = isNaN(data.MapId) ? data.MapId.split(',').map(Number) : [data.MapId];
+            mapList.forEach(mapId => {
+                MapEncountEnemies[mapId] = data;
+            });
+        }
+    });
+    return MapEncountEnemies;
+};
+
 function getTransformEnemy(enemyId) {
     if ($dataEnemies[enemyId].meta.TransformEnemy) {
         enemyId = Number($dataEnemies[enemyId].meta.TransformEnemy);
     }
-    return enemyId
-}
+    return enemyId;
+};
+
+NuunManager.getMapEncountEnemList = function() {
+    return MapEncountEnemiesList;
+};
+
+NuunManager.isMapEncountEnemList = function() {
+    return !!MapEncountEnemiesList && MapEncountEnemiesList.length > 0;
+};
 
 const _DataManager_extractSaveContents = DataManager.extractSaveContents;
 DataManager.extractSaveContents = function(contents) {
@@ -8342,6 +8476,9 @@ Window_EnemyBook_Index.prototype.maxItems = function() {
 
 Window_EnemyBook_Index.prototype.makeEnemyList = function() {
     this._enemyPercentList = [];
+    if (this._category && this._category.symbol === "mapEnemy") {
+        this._enemyEncounterList = this.getMapEncountEnemList();
+    }
     this._data = $dataEnemies.filter(enemy => this.includes(enemy));
 };
 
@@ -8359,12 +8496,22 @@ Window_EnemyBook_Index.prototype.includes = function(enemy) {
 Window_EnemyBook_Index.prototype.unknownEnemyVisible = function(enemy) {
     return !UnknownVisible || (UnknownVisible && $gameSystem.isInEnemyBook(enemy));
 };
+
+Window_EnemyBook_Index.prototype.getMapEncountEnemList = function() {
+    if ($gameMap.data.EncountEnemiesList) {
+        return $gameMap.data.EncountEnemiesList.split(',').map(Number);
+    } else if(NuunManager.isMapEncountEnemList() && MapEncountEnemiesList[$gameMap.mapId()]) {
+        return NuunManager.getMapEncountEnemList()[$gameMap.mapId()].Enemy;
+    } else {
+        return NuunManager.getEncounterEnemyList();
+    }
+};
   
-Window_EnemyBook_Index.prototype.categoryIncludes = function(enemy) { 
+Window_EnemyBook_Index.prototype.categoryIncludes = function(enemy) {
     if (!this._category || this._category.symbol === "all") {
         return true;
-    } else if (this._category.symbol === "map") {
-
+    } else if (this._enemyEncounterList && this._category.symbol === "mapEnemy") {
+        return this._enemyEncounterList.find(id => id === enemy.id);
     } else {
         const enemyCategory = enemy.meta.CategoryKey ? enemy.meta.CategoryKey.split(',') : ["all"];
         return enemyCategory.find(category => category === this._category.symbol);

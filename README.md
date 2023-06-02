@@ -259,6 +259,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [MV互換アニメーションフレームレート変更](https://github.com/nuun888/MZ/blob/master/README/AnimationFPSRate.md) | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.1.1 |
 | [戦闘背景の変更](https://github.com/nuun888/MZ/blob/master/README/BattleBackgroundEX.md) | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) | 共 | 1.2.0 |
 | [データベース上限突破](https://github.com/nuun888/MZ/blob/master/README/SystemDatabaseUnlimited.md) | [NUUN_SystemDatabaseUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js) | 共 | 1.0.1 |
+| [追加アニメーション表示](https://github.com/nuun888/MZ/blob/master/README/AddAnimation.md) | [NUUN_AddAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddAnimation.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

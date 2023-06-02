@@ -61,6 +61,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | バトラー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [バトラーHPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) | オ | 1.7.1 |
+| [バトラーMPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_EnemyMPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyMPGauge.js) | オ | 1.2.0 |
 | [バトラーTPBゲージ表示](https://github.com/nuun888/MZ/blob/master/README/EnemyTpbGauge.md) | [NUUN_BattlerTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js) | オ | 1.5.0 |
 |  |  |  |  |
 
@@ -82,7 +83,6 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [敵の行動パターン条件拡張](https://github.com/nuun888/MZ/blob/master/README/CondEnemyAction.md)| [NUUN_CondEnemyAction](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js) | 条 | 1.0.1 |
 | [敵キャラのスタータス上限突破](https://github.com/nuun888/MZ/blob/master/README/EnemyParamNoLimit.md) | [NUUN_EnemyParamNoLimit](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js) | 共 | 1.0.0 |
 | [巨大モンスター](https://github.com/nuun888/MZ/blob/master/README/BigEnemy.md) | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) |  | 1.2.0 |
-| [敵MPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_EnemyMPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyMPGauge.js) | オ | 1.1.0 |
 | [敵TPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyTPGauge.md) | [NUUN_EnemyTPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js) | オ | 1.1.0 |
 | [敵名前表示](https://github.com/nuun888/MZ/blob/master/README/ButlerName.md) | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) | オ | 1.3.0 |
 | [敵ステート表示拡張](https://github.com/nuun888/MZ/blob/master/README/EnemyStateIconEX.md) | [NUUN_EnemyStateIconEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyStateIconEX.js) | オ | 1.1.0 |

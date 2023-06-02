@@ -1,14 +1,14 @@
-# [敵名前表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)
-# Ver.1.3.1  
+# [バトラー名前表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)
+# Ver.1.3.2  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)  
  
 ## 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
 
-敵バトラー上にモンスターの名前を表示します。
+戦闘中の敵及びSVアクターにモンスターの名前を表示します。  
 
 ## 設定
-#### 敵キャラのメモ欄  
+#### 敵キャラまたはアクターのメモ欄  
 `<EnemyNameX:[position]>` モンスター名のX座標を調整します。（相対座標）  
 `<EnemyNameY:[position]>` モンスター名のY座標を調整します。（相対座標）  
 
@@ -20,6 +20,8 @@
 `[id]`は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。  
 
 ## 更新履歴
+2023/6/2 Ver.1.4.0  
+SVアクターに名前を表示する機能を追加。  
 2023/5/6 Ver.1.3.1  
 敵の名前の表示をフェードアウト、フェードインさせるように修正。  
 2022/5/10 Ver.1.3.0  

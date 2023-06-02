@@ -1,10 +1,11 @@
 # [バトラーTPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTPGauge.js)
-# Ver.1.1.2
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTPGauge.js)
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
 
 戦闘中の敵及びSVアクターにTPゲージを表示します。   
+※Ver.1.2.0よりプラグイン名が変更になりましたので、再設定が必要になります。  
 
 ![画像](img/tpGauge1.png)  
 

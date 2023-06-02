@@ -1,5 +1,5 @@
 # [敵ステート表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyStateIconEX.js)
-# Ver.1.1.2
+# Ver.1.1.3
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyStateIconEX.js)  
  
  ## 必須、前提プラグイン
@@ -26,6 +26,8 @@
 [id]は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。  
 
 ## 更新履歴
+2023/6/2 Ver.1.1.3  
+処理の修正。  
 2023/5/16 Ver.1.1.2  
 ステートアイコン表示位置の敵画像の下、敵画像の中心が機能していなかった問題を修正。  
 ステートアイコン表示タイミングを選択時に指定したときにアクターのステートアイコンが表示されない問題を修正。  

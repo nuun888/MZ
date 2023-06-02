@@ -37,7 +37,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.5.2 |
 | [ドロップ率確率操作ベース](https://github.com/nuun888/MZ/blob/master/README/DropItemRateBase.md) |  [NUUN_DropItemRateBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemRateBase.js) |  | 1.0.0 |
 | [グローバル情報ベース](https://github.com/nuun888/MZ/blob/master/README/GlobalCore.md) | [NUUN_GlobalCore](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GlobalCore.js) |  | 1.0.1 |
-| [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md) | [NUUN_BattlerOverlayBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerOverlayBase.js) |  | 1.0.0
+| [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md) | [NUUN_BattlerOverlayBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerOverlayBase.js) |  | 1.0.3 |
 |  |  |  |  |
 
 | 戦闘　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
@@ -60,9 +60,11 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | バトラー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [バトラーHPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) | オ | 1.7.1 |
-| [バトラーMPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_EnemyMPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyMPGauge.js) | オ | 1.2.0 |
-| [バトラーTPBゲージ表示](https://github.com/nuun888/MZ/blob/master/README/EnemyTpbGauge.md) | [NUUN_BattlerTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js) | オ | 1.5.0 |
+| [バトラーHPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) | オ | 1.7.2 |
+| [バトラーMPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_EnemyMPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerMPGauge.js) | オ | 1.2.1 |
+| [バトラーTPBゲージ表示](https://github.com/nuun888/MZ/blob/master/README/EnemyTpbGauge.md) | [NUUN_BattlerTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js) | オ | 1.5.1 |
+| [バトラーTPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyTPGauge.md) | [NUUN_EnemyTPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTPGauge.js) | オ | 1.2.0 |
+| [バトラー名前表示](https://github.com/nuun888/MZ/blob/master/README/ButlerName.md) | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) | オ | 1.4.0 |
 |  |  |  |  |
 
 | アクター　　　　　　　　　　　　　　　 | プラグイン　プラグイン数6　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
@@ -83,8 +85,6 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [敵の行動パターン条件拡張](https://github.com/nuun888/MZ/blob/master/README/CondEnemyAction.md)| [NUUN_CondEnemyAction](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CondEnemyAction.js) | 条 | 1.0.1 |
 | [敵キャラのスタータス上限突破](https://github.com/nuun888/MZ/blob/master/README/EnemyParamNoLimit.md) | [NUUN_EnemyParamNoLimit](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyParamNoLimit.js) | 共 | 1.0.0 |
 | [巨大モンスター](https://github.com/nuun888/MZ/blob/master/README/BigEnemy.md) | [NUUN_BigEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js) |  | 1.2.0 |
-| [敵TPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyTPGauge.md) | [NUUN_EnemyTPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js) | オ | 1.1.0 |
-| [敵名前表示](https://github.com/nuun888/MZ/blob/master/README/ButlerName.md) | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) | オ | 1.3.0 |
 | [敵ステート表示拡張](https://github.com/nuun888/MZ/blob/master/README/EnemyStateIconEX.md) | [NUUN_EnemyStateIconEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyStateIconEX.js) | オ | 1.1.0 |
 | [エネミー個別座標](https://github.com/nuun888/MZ/edit/master/README/EnemyPosition.md)  | [NUUN_BattlePosition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js) |  | 1.1.0 |
 | [敵のドロップアイテム追加](https://github.com/nuun888/MZ/blob/master/README/AddDropItems.md)  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js) |  | 1.0.1 |

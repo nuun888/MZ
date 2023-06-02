@@ -1,20 +1,26 @@
-# [敵TPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js)
-# Ver.1.1.1
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyTPGauge.js)
+# [バトラーTPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTPGauge.js)
+# Ver.1.1.2
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTPGauge.js)
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
 
-敵のバトラー上にTPゲージを表示します。  
+戦闘中の敵及びSVアクターにTPゲージを表示します。   
 
 ![画像](img/tpGauge1.png)  
 
 ### 設定方法
 
 #### TPゲージの座標指定
-敵キャラのメモ欄  
+敵キャラまたはアクターのメモ欄 
 `<TPGaugeX:[position]>`TPゲージのX座標を調整します。（相対座標）  
 `<TPGaugeY:[position]>` TPゲージのY座標を調整します。（相対座標）  
 [position]:座標
+
+敵キャラのメモ欄
+`<NoTPGauge>` TPゲージを表示しません。
+`<TPGaugeLength:[width], [height]>` TPゲージの幅を指定します。
+`[width]`:ゲージ横幅
+`[height]`:ゲージ縦幅
 
 バトルイベント1ページ目のの注釈  
 `<TPGaugePosition:[Id],[x],[y]>` 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）  
@@ -40,11 +46,11 @@ this.enemy() 敵のデータベースデータ
 `常に表示`  
 常に表示されます。  
 `選択時`  
-敵対象選択時に表示します。  
+対象選択時に表示します。  
 `TP変動時`   
-敵のダメージ時に表示されます。  
+ダメージ時に表示されます。  
 `選択時、TP変動時`  
-敵選択時、敵のダメージ時に表示されます。  
+選択時、敵のダメージ時に表示されます。  
 
 #### 初期TPゲージ表示
 `<TPGaugeVisible>`の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。  
@@ -60,6 +66,9 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にTPゲージを表示します。  
 
 ## 更新履歴
+2023/6/2 Ver.1.2.0  
+SVアクターにゲージを表示する機能を追加。  
+敵キャラ毎にHPゲージの横幅、縦幅を指定できる機能を追加。  
 2023/5/7 Ver.1.1.1  
 TPゲージの表示をフェードアウト、フェードインさせるように修正。  
 2022/5/14 Ver.1.1.0  

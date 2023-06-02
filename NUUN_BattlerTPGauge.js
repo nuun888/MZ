@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_BattlerMPGauge.js
+ * NUUN_BattlerTPGauge.js
  * 
  * Copyright (C) 2022 NUUN
  * This software is released under the MIT License.
@@ -9,46 +9,45 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  バトラーMPゲージ
+ * @plugindesc  バトラーTPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.2.1
+ * @version 1.2.0
  * @orderAfter NUUN_Base
  * 
  * @help
- * 敵またはSVアクターのバトラー上にMPゲージを表示します。
+ * 戦闘中の敵及びSVアクターにTPゲージを表示します。
  * 
  * 敵キャラまたはアクターのメモ欄
- * <MPGaugeX:[position]> MPゲージのX座標を調整します。（相対座標）
- * <MPGaugeY:[position]> MPゲージのY座標を調整します。（相対座標）
- * [position]:座標
+ * <TPGaugeX:[position]> TPゲージのX座標を調整します。（相対座標）
+ * <TPGaugeY:[position]> TPゲージのY座標を調整します。（相対座標）
  * 
  * 敵キャラのメモ欄
- * <NoMPGauge> MPゲージを表示しません。
- * <MPGaugeLength:[width], [height]> MPゲージの幅を指定します。
+ * <NoTPGauge> TPゲージを表示しません。
+ * <TPGaugeLength:[width], [height]> MPゲージの幅を指定します。
  * [width]:ゲージ横幅
  * [height]:ゲージ縦幅
  * 
  * バトルイベントの注釈
- * <MPGaugePosition:[Id],[x],[y]> 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）
+ * <TPGaugePosition:[Id],[x],[y]> 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）
  * [Id]：表示順番号
  * [x]：X座標
  * [y]：Y座標
  * [id]は敵グループ設定で配置した順番のIDで指定します。モンスター画像の左上に番号が表示されますのでその番号を記入します。
  * 
  * 特徴を有するメモ欄
- * <MPGaugeVisible> この特徴を持つアクターが存在すれば、敵のMPゲージが表示されます。
- * <EnemyMPGaugeVisible> この特徴を持つ敵はMPゲージが表示されます。
+ * <TPGaugeVisible> この特徴を持つアクターが存在すれば、敵のTPゲージが表示されます。
+ * <EnemyTPGaugeVisible> この特徴を持つ敵はTPゲージが表示されます。
  * 敵のメモ欄
- * <MPGaugeMask:[eval]> 条件に一致しなければMP値の表示を？？？にします。
+ * <TPGaugeMask:[eval]> 条件に一致しなければTP値の表示を？？？にします。
  * this 敵データ
  * this.enemy() 敵のデータベースデータ
- * 例　<MPGaugeMask:this.mp < this.mmp * 0.3>
- * 敵のMPが３０％未満の時にMP値を表示します。
+ * 例　<TPGaugeMask:this.tp >= this.maxTp() * 0.5>
+ * 敵のTPが５０％以上の時にTP値を表示します。
  * 
- * 初期MPゲージ表示
- * <MPGaugeVisible>の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。
- * 上記の特徴を使用する場合は初期MPゲージ表示を非表示に設定してください。
+ * 初期TPゲージ表示
+ * <TPGaugeVisible>の特徴を持つアクターが戦闘メンバーにいるとき、または図鑑登録と連動している際に登録済みなら表示されます。
+ * 上記の特徴を使用する場合は初期TPゲージ表示を非表示に設定してください。
  * 
  * このプラグインはNUUN_Base Ver.1.2.0以降が必要です。
  * 
@@ -60,21 +59,22 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2023/6/2 Ver.1.2.1
- * 不具合の修正。
  * 2023/6/2 Ver.1.2.0
  * SVアクターにゲージを表示する機能を追加。
  * 敵キャラ毎にHPゲージの横幅、縦幅を指定できる機能を追加。
  * 2023/5/7 Ver.1.1.1
- * MPゲージの表示をフェードアウト、フェードインさせるように修正。
+ * TPゲージの表示をフェードアウト、フェードインさせるように修正。
  * 2022/5/14 Ver.1.1.0
  * バトラーの表示処理の定義大幅変更に関する定義変更。
+ * 2022/2/12 Ver.1.0.3
+ * ダメージ時に表示を指定の時に戦闘開始時にゲージが表示されてしまう問題を修正。
  * 2022/1/10 Ver.1.0.2
  * 再修正。
  * 2022/1/10 Ver.1.0.1
  * ゲージがラベル表示でも座標0から表示されてしまう問題を修正。
  * 2022/1/12 Ver.1.0.0
  * 初版
+ * 
  * 
  * @param EnemySetting
  * @text 敵設定
@@ -85,9 +85,9 @@
  * @default ------------------------------
  * @parent EnemySetting
  * 
- * @param MPPosition
- * @desc 敵のMPゲージ位置
- * @text MPゲージ位置
+ * @param TPPosition
+ * @desc 敵のTPゲージ位置
+ * @text TPゲージ位置
  * @type select
  * @option 表示なし
  * @value -1
@@ -98,27 +98,26 @@
  * @option 敵画像の中心
  * @value 2
  * @default 0
- * @parent EnemyVisibleSetting
+ * @param EnemySetting
  * 
- * @param MPVisible
- * @desc MPゲージの表示タイミング
- * @text MPゲージ表示タイミング
+ * @param TPVisible
+ * @desc TPゲージの表示タイミング
+ * @text TPゲージ表示タイミング
  * @type select
  * @option 常に表示
  * @value 0
  * @option 選択時
  * @value 1
- * @option MP変動時
+ * @option TP変動時
  * @value 2
- * @option 選択時、MP変動時
+ * @option 選択時、TP変動時
  * @value 3
  * @default 0
- * @parent EnemyVisibleSetting
+ * @param EnemySetting
  * 
  * @param GaugeSetting
  * @text ゲージ設定
  * @default ------------------------------
- * @parent EnemySetting
  * 
  * @param GaugeWidth
  * @desc ゲージの横幅を指定します。
@@ -152,16 +151,16 @@
  * @min -9999
  * @parent GaugeSetting
  * 
- * @param MPLabelVisible
- * @text MPラベル表示
- * @desc MPラベルを表示する。
+ * @param TPLabelVisible
+ * @text TPラベル表示
+ * @desc TPラベルを表示する。
  * @type boolean
  * @default true
  * @parent GaugeSetting
  * 
- * @param MPValueVisible
- * @text MP数値表示
- * @desc MP数値を表示する。
+ * @param TPValueVisible
+ * @text TP数値表示
+ * @desc TP数値を表示する。
  * @type boolean
  * @default true
  * @parent GaugeSetting
@@ -183,8 +182,8 @@
  * @parent GaugeSetting
  * 
  * @param MaskValueName
- * @desc MPの数値を隠す時の文字。
- * @text MPの数値を隠す時の文字
+ * @desc TPの数値を隠す時の文字。
+ * @text TPの数値を隠す時の文字
  * @type string
  * @default ????
  * @parent GaugeSetting
@@ -194,9 +193,9 @@
  * @default ------------------------------
  * @parent GaugeSetting
  * 
- * @param MPVisibleMode
- * @desc 初期状態でのMPゲージの表示。特徴によってやMPゲージの表示タイミングによって表示されるようになります。
- * @text MPゲージ表示
+ * @param TPVisibleMode
+ * @desc 初期状態でのTPゲージの表示。特徴によってやTPゲージの表示タイミングによって表示されるようになります。
+ * @text 初期TPゲージ表示
  * @type select
  * @option 表示
  * @value 0
@@ -210,9 +209,9 @@
  * @default ------------------------------
  * @parent GaugeSetting
  * 
- * @param MPEnemyBookVisible
- * @desc MPゲージの表示タイミング（モンスター図鑑）
- * @text MPゲージ表示タイミング（モンスター図鑑）
+ * @param TPEnemyBookVisible
+ * @desc TPゲージの表示タイミング（モンスター図鑑）
+ * @text TPゲージ表示タイミング（モンスター図鑑）
  * @type select
  * @option 指定なし
  * @value 0
@@ -221,7 +220,8 @@
  * @option 図鑑情報登録後に表示
  * @value 2
  * @default 0
- * @parent EnemyBookSetting
+ * @parent SpecialSetting
+ * 
  * 
  * @param ActorSetting
  * @text アクター設定
@@ -232,9 +232,9 @@
  * @default ------------------------------
  * @parent ActorSetting
  * 
- * @param ActorMPPosition
- * @desc アクターのMPゲージ位置
- * @text MPゲージ位置
+ * @param ActorTPPosition
+ * @desc アクターのTPゲージ位置
+ * @text TPゲージ位置
  * @type select
  * @option 表示なし
  * @value -1
@@ -245,17 +245,17 @@
  * @default -1
  * @parent ActorVisibleSetting
  * 
- * @param ActorMPVisible
- * @desc MPゲージの表示タイミング
- * @text MPゲージ表示タイミング
+ * @param ActorTPVisible
+ * @desc TPゲージの表示タイミング
+ * @text TPゲージ表示タイミング
  * @type select
  * @option 常に表示
  * @value 0
  * @option 選択時
  * @value 1
- * @option MP変動時
+ * @option TP変動時
  * @value 2
- * @option 選択時、MP変動時
+ * @option 選択時、TP変動時
  * @value 3
  * @default 0
  * @parent ActorVisibleSetting
@@ -297,16 +297,16 @@
  * @min -9999
  * @parent ActorGaugeSetting
  * 
- * @param ActorMPLabelVisible
- * @text MPラベル表示
- * @desc アクターのMPラベルを表示する。
+ * @param ActorTPLabelVisible
+ * @text TPラベル表示
+ * @desc アクターのTPラベルを表示する。
  * @type boolean
  * @default true
  * @parent ActorGaugeSetting
  * 
- * @param ActorMPValueVisible
- * @text MP数値表示
- * @desc アクターのMP数値を表示する。
+ * @param ActorTPValueVisible
+ * @text TP数値表示
+ * @desc アクターのTP数値を表示する。
  * @type boolean
  * @default true
  * @parent ActorGaugeSetting
@@ -327,18 +327,19 @@
  * @min -9999
  * @parent ActorGaugeSetting
  * 
+ * 
  */
 var Imported = Imported || {};
-Imported.NUUN_BattlerMPGauge = true;
+Imported.NUUN_BattlerTPGauge = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_BattlerMPGauge');
-const MPPosition = Number(parameters['MPPosition'] || 0);
-const MPVisible = Number(parameters['MPVisible'] || 0);
-const ActorMPPosition = Number(parameters['ActorMPPosition'] || 0);
-const ActorMPVisible = Number(parameters['ActorMPVisible'] || -1);
-const MPVisibleMode = Number(parameters['MPVisibleMode'] || 0);
-const MPEnemyBookVisible = Number(parameters['MPEnemyBookVisible'] || 0);
+const parameters = PluginManager.parameters('NUUN_BattlerTPGauge');
+const TPPosition = Number(parameters['TPPosition'] || 0);
+const TPVisible = Number(parameters['TPVisible'] || 0);
+const TPVisibleMode = Number(parameters['TPVisibleMode'] || 0);
+const ActorTPPosition = Number(parameters['ActorTPPosition'] || 0);
+const ActorTPVisible = Number(parameters['ActorTPVisible'] || -1);
+const TPEnemyBookVisible = Number(parameters['TPEnemyBookVisible'] || 0);
 const GaugeWidth = Number(parameters['GaugeWidth'] || 128);
 const GaugeHeight = Number(parameters['GaugeHeight'] || 12);
 const Gauge_X = Number(parameters['Gauge_X'] || 0);
@@ -347,21 +348,20 @@ const ActorGaugeWidth = Number(parameters['ActorGaugeWidth'] || 128);
 const ActorGaugeHeight = Number(parameters['ActorGaugeHeight'] || 12);
 const ActorGauge_X = Number(parameters['ActorGauge_X'] || 0);
 const ActorGauge_Y = Number(parameters['ActorGauge_Y'] || 0);
-const ActorMPLabelVisible = eval(parameters['ActorMPLabelVisible'] || 'true');
-const ActorMPValueVisible = eval(parameters['ActorMPValueVisible'] || 'true');
-const MPLabelVisible = eval(parameters['MPLabelVisible'] || 'true');
-const MPValueVisible = eval(parameters['MPValueVisible'] || 'true');
+const ActorTPLabelVisible = eval(parameters['ActorTPLabelVisible'] || 'true');
+const ActorTPValueVisible = eval(parameters['ActorTPValueVisible'] || 'true');
+const TPLabelVisible = eval(parameters['TPLabelVisible'] || 'true');
+const TPValueVisible = eval(parameters['TPValueVisible'] || 'true');
 const ValueFontSize = Number(parameters['ValueFontSize'] || -6);
 const LabelFontSize = Number(parameters['LabelFontSize'] || -2);
 const ActorLabelFontSize = Number(parameters['ActorLabelFontSize'] || -2);
 const ActorValueFontSize = Number(parameters['ActorValueFontSize'] || -6);
 const MaskValueName = String(parameters['MaskValueName'] || '????');
-let enemyMPGaugeLength = null;
 
-function getEnemyMpGaugePosition(troop) {
+function getEnemyTpGaugePosition(troop) {
   const pages = troop.pages[0];
   list = [];
-  const re = /<(?:MPGaugePosition):\s*(.*)>/;
+  const re = /<(?:TPGaugePosition):\s*(.*)>/;
   pages.list.forEach(tag => {
     if (tag.code === 108 || tag.code === 408) {
       let match = re.exec(tag.parameters[0]);
@@ -376,111 +376,112 @@ function getEnemyMpGaugePosition(troop) {
 const _Sprite_Actor_update = Sprite_Actor.prototype.update;
 Sprite_Actor.prototype.update = function() {
   _Sprite_Actor_update.call(this);
-  this.updateMpGauge();
+  this.updateTpGauge();
 };
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
   _Sprite_Enemy_update.call(this);
-  this.updateMpGauge();
+  this.updateTpGauge();
 };
 
-Sprite_Enemy.prototype.noMpGaugePosition = function() {
-    return MPPosition < 0;
+Sprite_Enemy.prototype.noTpGaugePosition = function() {
+    return TPPosition < 0;
 };
 
-Sprite_Actor.prototype.noMpGaugePosition = function() {
-    return (this._battler.isEnemy() ? MPPosition : ActorMPPosition) < 0;
+Sprite_Actor.prototype.noTpGaugePosition = function() {
+    return (this._battler.isEnemy() ? TPPosition : ActorTPPosition) < 0;
 };
 
-Sprite_Battler.prototype.updateMpGauge = function() {
-    if (!this._battler || this.noMpGaugePosition()) {
+Sprite_Battler.prototype.updateTpGauge = function() {
+    if (!this._battler || this.noTpGaugePosition()) {
         return;
     }
-    if (this.battlerOverlay && !this._battlerMp) {
-        this.createMpGauge();
+    if (this.battlerOverlay && !this._battlerTp) {
+        this.createTpGauge();
     }
-    this.setMpGaugePosition();
+    this.setTpGaugePosition();
 };
 
-Sprite_Enemy.prototype.setMpGaugePosition = function() {
-    if (this._battlerMp) {
+Sprite_Enemy.prototype.setTpGaugePosition = function() {
+    if (this._battlerTp) {
         const enemy = this._enemy.enemy();
-        const x = (enemy.meta.MPGaugeX ? Number(enemy.meta.MPGaugeX) : 0) + Gauge_X + this._enemy.getMpGaugePositionX();
-        const y = (enemy.meta.MPGaugeY ? Number(enemy.meta.MPGaugeY) : 0) + Gauge_Y + this._enemy.getMpGaugePositionY();
-        this._battlerMp.x = x;
-        this._battlerMp.y = y - this.getBattlerMpPosition();
-    }
+        const x = (enemy.meta.TPGaugeX ? Number(enemy.meta.TPGaugeX) : 0) + Gauge_X + this._enemy.getTpGaugePositionX();
+        const y = (enemy.meta.TPGaugeY ? Number(enemy.meta.TPGaugeY) : 0) + Gauge_Y + this._enemy.getTpGaugePositionY();
+        this._battlerTp.x = x;
+        this._battlerTp.y = y - this.getBattlerTpPosition();
+      }
 };
 
-Sprite_Actor.prototype.setMpGaugePosition = function() {
+Sprite_Actor.prototype.setTpGaugePosition = function() {
     if (this._battler.isEnemy()) {
-        Sprite_Enemy.prototype.setMpGaugePosition.call(this);
-    } else if (this._battlerMp) {
+        Sprite_Enemy.prototype.setTpGaugePosition.call(this);
+    } else if (this._battlerTp) {
         const actor = this._actor.actor();
-        const x = (actor.meta.MPGaugeX ? Number(actor.meta.MPGaugeX) : 0) + ActorGauge_X;
-        const y = (actor.meta.MPGaugeY ? Number(actor.meta.MPGaugeY) : 0) + ActorGauge_Y;
-        this._battlerMP.x = x;
-        this._battlerMP.y = y - this.getBattlerMpSVPosition();
+        const x = (actor.meta.TPGaugeX ? Number(actor.meta.TPGaugeX) : 0) + ActorGauge_X;
+        const y = (actor.meta.TPGaugeY ? Number(actor.meta.TPGaugeY) : 0) + ActorGauge_Y;
+        this._battlerTp.x = x;
+        this._battlerTp.y = y - this.getBattlerTpSVPosition();
     }
 };
 
-Sprite_Battler.prototype.getBattlerMpPosition = function() {
+Sprite_Battler.prototype.getBattlerTpPosition = function() {
     const scale = this.getBattlerOverlayConflict();
-    if (MPPosition === 0) {
+    if (TPPosition === 0) {
         return this.getBattlerOverlayHeight() * scale;
-    } else if (MPPosition === 2) {
+    } else if (TPPosition === 2) {
         return Math.floor((this.getBattlerOverlayHeight() * scale) / 2);
     } else {
         return 0;
     }
 };
 
-Sprite_Actor.prototype.getBattlerMpSVPosition = function() {
+Sprite_Actor.prototype.getBattlerTpSVPosition = function() {
     const scale = this.battlerOverlay.battlerSpriteScale_y;
-    if (ActorMPPosition === 0) {
+    if (ActorTPPosition === 0) {
       return this.getSVBattlerHeight() * scale;
-    } else if (ActorMPPosition === 2) {
+    } else if (ActorTPPosition === 2) {
       return Math.floor((this.getSVBattlerHeight() * scale) / 2);
     } else {
       return 0;
     }
 };
 
-Sprite_Enemy.prototype.createMpGauge = function() {
-    enemyMPGaugeLength = getSplit(this._enemy.enemy().meta.MPGaugeLength);
-    const sprite = new Sprite_EnemyMPGauge();
+Sprite_Enemy.prototype.createTpGauge = function() {
+    enemyTPGaugeLength = getSplit(this._enemy.enemy().meta.TPGaugeLength);
+    const sprite = new Sprite_EnemyTPGauge();
     this.battlerOverlay.addChild(sprite);
-    this._battlerMp = sprite;
-    sprite.setup(this._enemy, "mp");
+    this._battlerTp = sprite;
+    sprite.setup(this._enemy, "tp");
     sprite.show();
     sprite.move(0, 0);
-    $gameTemp.enemyMpGaugeRefresh = true;
+    $gameTemp.enemyTpGaugeRefresh = true;
 };
   
-Sprite_Actor.prototype.createMpGauge = function() {
+Sprite_Actor.prototype.createTpGauge = function() {
     if (this._battler.isEnemy()) {
-        Sprite_Enemy.prototype.createMPGauge.call(this);
+        Sprite_Enemy.prototype.createTPGauge.call(this);
         return;
     }
-    enemyMPGaugeLength = null;
-    const sprite = new Sprite_BattlerMPGauge();
+    enemyTPGaugeLength = null;
+    const sprite = new Sprite_BattlerTPGauge();
     this.battlerOverlay.addChild(sprite);
-    this._battlerMp = sprite;
-    sprite.setup(this._actor, "mp");
+    this._battlerTp = sprite;
+    sprite.setup(this._actor, "tp");
     sprite.show();
     sprite.move(0, 0);
-    $gameTemp.enemyMpGaugeRefresh = true;
+    $gameTemp.enemyTpGaugeRefresh = true;
 };
 
-function Sprite_BattlerMPGauge() {
+
+function Sprite_BattlerTPGauge() {
     this.initialize(...arguments);
 }
   
-Sprite_BattlerMPGauge.prototype = Object.create(Sprite_Gauge.prototype);
-Sprite_BattlerMPGauge.prototype.constructor = Sprite_BattlerMPGauge;
+Sprite_BattlerTPGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_BattlerTPGauge.prototype.constructor = Sprite_BattlerTPGauge;
   
-Sprite_BattlerMPGauge.prototype.initialize = function() {
+Sprite_BattlerTPGauge.prototype.initialize = function() {
     Sprite_Gauge.prototype.initialize.call(this);
     this._gaugeDuration = 0;
     this._startVisible = true;
@@ -488,55 +489,55 @@ Sprite_BattlerMPGauge.prototype.initialize = function() {
     this.anchor.y = 1;
 };
 
-Sprite_BattlerMPGauge.prototype.bitmapWidth = function() {
+Sprite_BattlerTPGauge.prototype.bitmapWidth = function() {
     return ActorGaugeWidth > 0 ? ActorGaugeWidth : 128;
 };
   
-Sprite_BattlerMPGauge.prototype.gaugeHeight = function() {
+Sprite_BattlerTPGauge.prototype.gaugeHeight = function() {
     return ActorGaugeHeight > 0 ? ActorGaugeHeight : 12;
 };
 
-Sprite_BattlerMPGauge.prototype.labelFontSize = function() {
+Sprite_BattlerTPGauge.prototype.labelFontSize = function() {
     return this._gaugeData ? Sprite_Gauge.prototype.labelFontSize.call(this) : $gameSystem.mainFontSize() + ActorLabelFontSize;
 };
   
-Sprite_BattlerMPGauge.prototype.valueFontSize = function() {
+Sprite_BattlerTPGauge.prototype.valueFontSize = function() {
     return this._gaugeData ? Sprite_Gauge.prototype.valueFontSize.call(this) : $gameSystem.mainFontSize() + ActorValueFontSize;
 };
 
-Sprite_BattlerMPGauge.prototype.drawLabel = function() {
-    if (this.isMPLabelVisible()) {
+Sprite_BattlerTPGauge.prototype.drawLabel = function() {
+    if (this.isTPLabelVisible()) {
         Sprite_Gauge.prototype.drawLabel.call(this);
     }
 };
 
-Sprite_BattlerMPGauge.prototype.isMPLabelVisible = function() {
-    return ActorMPLabelVisible;
+Sprite_BattlerTPGauge.prototype.isTPLabelVisible = function() {
+    return ActorTPLabelVisible;
 };
 
-Sprite_BattlerMPGauge.prototype.isMPValueVisible = function() {
-    return ActorMPValueVisible;
+Sprite_BattlerTPGauge.prototype.isTPValueVisible = function() {
+    return ActorTPValueVisible;
 };
 
-Sprite_BattlerMPGauge.prototype.getMPVisible = function() {
-    return ActorMPVisible;
+Sprite_BattlerTPGauge.prototype.getTPVisible = function() {
+    return ActorTPVisible;
 };
 
-Sprite_BattlerMPGauge.prototype.setup = function(battler, type) {
+Sprite_BattlerTPGauge.prototype.setup = function(battler, type) {
     Sprite_Gauge.prototype.setup.call(this, battler, type);
     this.opacity = (this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect())) ? 255 : 0;
 };
 
-Sprite_BattlerMPGauge.prototype.gaugeX = function() {
-    if (!this.isMPLabelVisible()) {
+Sprite_BattlerTPGauge.prototype.gaugeX = function() {
+    if (!this.isTPLabelVisible()) {
       return 0;
     } else {
       return Sprite_Gauge.prototype.gaugeX.call(this);
     }
 };
 
-Sprite_BattlerMPGauge.prototype.drawValue = function() {
-    if (this.isMPValueVisible()) {
+Sprite_BattlerTPGauge.prototype.drawValue = function() {
+    if (this.isTPValueVisible()) {
         if (this.isVisibleValue()) {
             const width = this.bitmapWidth();
             const height = this.bitmapHeight();
@@ -548,16 +549,16 @@ Sprite_BattlerMPGauge.prototype.drawValue = function() {
     }
 };
 
-Sprite_BattlerMPGauge.prototype.isVisibleValue = function() {
+Sprite_BattlerTPGauge.prototype.isVisibleValue = function() {
     return false;
 };
 
-Sprite_BattlerMPGauge.prototype.updateBitmap = function() {
+Sprite_BattlerTPGauge.prototype.updateBitmap = function() {
     Sprite_Gauge.prototype.updateBitmap.call(this);
     this.gaugeVisible();
 };
 
-Sprite_BattlerMPGauge.prototype.gaugeVisible = function() {
+Sprite_BattlerTPGauge.prototype.gaugeVisible = function() {
     const _visible = this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect());
     if (_visible && this.opacity < 255) {
         this.opacity += 25;
@@ -573,12 +574,12 @@ Sprite_BattlerMPGauge.prototype.gaugeVisible = function() {
     }
 };
 
-Sprite_BattlerMPGauge.prototype.gaugeVisibleResult = function() {
+Sprite_BattlerTPGauge.prototype.gaugeVisibleResult = function() {
     return true;
 };
 
-Sprite_BattlerMPGauge.prototype.updateTargetValue = function(value, maxValue) {
-    if (!this._startVisible && !isNaN(this._value) && this.getMPVisible() >= 2) {
+Sprite_BattlerTPGauge.prototype.updateTargetValue = function(value, maxValue) {
+    if (!this._startVisible && !isNaN(this._value) && this.getTPVisible() >= 2) {
         this._gaugeDuration = 60;
     } else if (this._startVisible) {
         this._startVisible = false;
@@ -586,81 +587,81 @@ Sprite_BattlerMPGauge.prototype.updateTargetValue = function(value, maxValue) {
     Sprite_Gauge.prototype.updateTargetValue.call(this, value, maxValue);
 };
   
-Sprite_BattlerMPGauge.prototype.updateGaugeAnimation = function() {
+Sprite_BattlerTPGauge.prototype.updateGaugeAnimation = function() {
     if (this._gaugeDuration > 0) {
         this._gaugeDuration--;
     }
     Sprite_Gauge.prototype.updateGaugeAnimation.call(this);
 };
-
-
-Sprite_BattlerMPGauge.prototype.gaugeVisibleInDamage = function() {
-    if (this.getMPVisible() >= 2) {
+  
+Sprite_BattlerTPGauge.prototype.gaugeVisibleInDamage = function() {
+    if (this.getTPVisible() >= 2) {
         return this._gaugeDuration > 0;
-    } else if (this.getMPVisible() === 1) {
+    } else if (this.getTPVisible() === 1) {
         return false;
     }
     return true;
 };
   
-Sprite_BattlerMPGauge.prototype.gaugeVisibleInSelect = function() {
-    if (this.getMPVisible() === 1 || this.getMPVisible() === 3) {
-        return this._battler.isSelected();
-    } else if (this.getMPVisible() === 2) {
-        return false;
+Sprite_BattlerTPGauge.prototype.gaugeVisibleInSelect = function() {
+    if (this.getTPVisible() === 1 || this.getTPVisible() === 3) {
+      return this._battler.isSelected();
+    } else if (this.getTPVisible() === 2) {
+      return false;
     }
     return true;
 };
 
-function Sprite_EnemyMPGauge() {
+function Sprite_EnemyTPGauge() {
   this.initialize(...arguments);
 }
 
-Sprite_EnemyMPGauge.prototype = Object.create(Sprite_BattlerMPGauge.prototype);
-Sprite_EnemyMPGauge.prototype.constructor = Sprite_EnemyMPGauge;
+Sprite_EnemyTPGauge.prototype = Object.create(Sprite_BattlerTPGauge.prototype);
+Sprite_EnemyTPGauge.prototype.constructor = Sprite_EnemyTPGauge;
 
-Sprite_EnemyMPGauge.prototype.initialize = function() {
-    this._enemyGaugeWidth = enemyMPGaugeLength ? (Number(enemyMPGaugeLength[0]) || 0) : 0;
-    this._enemyGaugeHeight = enemyMPGaugeLength ? (Number(enemyMPGaugeLength[1]) || 0) : 0;
-    Sprite_BattlerMPGauge.prototype.initialize.call(this);
+Sprite_EnemyTPGauge.prototype.initialize = function() {
+    this._enemyGaugeWidth = enemyTPGaugeLength ? (Number(enemyTPGaugeLength[0]) || 0) : 0;
+    this._enemyGaugeHeight = enemyTPGaugeLength ? (Number(enemyTPGaugeLength[1]) || 0) : 0;
+    Sprite_BattlerTPGauge.prototype.initialize.call(this);
+    this._startVisible = TPVisible >= 2;
 };
 
-Sprite_EnemyMPGauge.prototype.bitmapWidth = function() {
-  return this._enemyGaugeWidth > 0 ? this._enemyGaugeWidth : (GaugeWidth > 0 ? GaugeWidth : 128);
+Sprite_EnemyTPGauge.prototype.bitmapWidth = function() {
+    return this._enemyGaugeWidth > 0 ? this._enemyGaugeWidth : (GaugeWidth > 0 ? GaugeWidth : 128);
+};
+  
+Sprite_EnemyTPGauge.prototype.gaugeHeight = function() {
+    return this._enemyGaugeHeight > 0 ? this._enemyGaugeHeight : (GaugeHeight > 0 ? GaugeHeight : 12);
+};
+  
+Sprite_EnemyTPGauge.prototype.labelFontSize = function() {
+    return this._gaugeData ? Sprite_Gauge.prototype.labelFontSize.call(this) : $gameSystem.mainFontSize() + LabelFontSize;
+};
+  
+Sprite_EnemyTPGauge.prototype.valueFontSize = function() {
+    return this._gaugeData ? Sprite_Gauge.prototype.valueFontSize.call(this) : $gameSystem.mainFontSize() + ValueFontSize;
+};
+  
+Sprite_EnemyTPGauge.prototype.isTPLabelVisible = function() {
+    return TPLabelVisible;
 };
 
-Sprite_EnemyMPGauge.prototype.gaugeHeight = function() {
-  return this._enemyGaugeHeight > 0 ? this._enemyGaugeHeight : (GaugeHeight > 0 ? GaugeHeight : 12);
+Sprite_EnemyTPGauge.prototype.isTPValueVisible = function() {
+    return TPValueVisible;
 };
 
-Sprite_EnemyMPGauge.prototype.labelFontSize = function() {
-  return this._gaugeData ? Sprite_Gauge.prototype.labelFontSize.call(this) : $gameSystem.mainFontSize() + LabelFontSize;
+Sprite_EnemyTPGauge.prototype.getTPVisible = function() {
+    return TPVisible;
+};
+  
+Sprite_EnemyTPGauge.prototype.isVisibleValue = function() {
+    return this._battler._TPGaugeValueVisible && !this._battler._TPGaugeMask;
 };
 
-Sprite_EnemyMPGauge.prototype.valueFontSize = function() {
-  return this._gaugeData ? Sprite_Gauge.prototype.valueFontSize.call(this) : $gameSystem.mainFontSize() + ValueFontSize;
-};
-
-Sprite_EnemyMPGauge.prototype.isMPLabelVisible = function() {
-    return MPLabelVisible;
-};
-
-Sprite_EnemyMPGauge.prototype.isMPValueVisible = function() {
-    return MPValueVisible;
-};
-
-Sprite_EnemyMPGauge.prototype.getMPVisible = function() {
-    return MPVisible;
-};
-
-Sprite_EnemyMPGauge.prototype.isVisibleValue = function() {
-    return this._battler._MPGaugeValueVisible && !this._battler._MPGaugeMask;
-};
-
-Sprite_EnemyMPGauge.prototype.gaugeVisibleResult = function() {
-    if (MPVisibleMode === 1) {
+Sprite_EnemyTPGauge.prototype.gaugeVisibleResult = function() {
+    if (TPVisibleMode === 1) {
         const result = this.gaugeVisibleBattler();
-        if (MPEnemyBookVisible === 0) {
+        if (TPEnemyBookVisible === 0) {
             return result;
         }
         return result || this.gaugeEnemyBookVisible();
@@ -669,15 +670,15 @@ Sprite_EnemyMPGauge.prototype.gaugeVisibleResult = function() {
     }
 };
 
-Sprite_EnemyMPGauge.prototype.gaugeVisibleBattler = function() {
-    return BattleManager.visibleMpGauge || this._battler._visibleMpGauge;
+Sprite_EnemyTPGauge.prototype.gaugeVisibleBattler = function() {
+    return BattleManager.visibleTpGauge || this._battler._visibleTpGauge;
 };
   
-Sprite_EnemyMPGauge.prototype.gaugeEnemyBookVisible = function() {
+Sprite_EnemyTPGauge.prototype.gaugeEnemyBookVisible = function() {
     if (Imported.NUUN_EnemyBook) {
-        if (MPEnemyBookVisible === 1) {
+        if (TPEnemyBookVisible === 1) {
             return $gameSystem.isInEnemyBook(this._battler.enemy());
-        } else if (MPEnemyBookVisible === 2) {
+        } else if (TPEnemyBookVisible === 2) {
             return $gameSystem.isInEnemyBookStatus(this._battler.enemy());
         }
     }
@@ -688,73 +689,72 @@ Sprite_EnemyMPGauge.prototype.gaugeEnemyBookVisible = function() {
 const _Spriteset_Battle_updateBattlerOverlay = Spriteset_Battle.prototype.updateBattlerOverlay;
 Spriteset_Battle.prototype.updateBattlerOverlay = function() {
   _Spriteset_Battle_updateBattlerOverlay.call(this);
-  if ($gameTemp.enemyMpGaugeRefresh) {
-    this.setMpGaugePosition();
-    $gameTemp.enemyMpGaugeRefresh = false;
+  if ($gameTemp.enemyTpGaugeRefresh) {
+    this.setTpGaugePosition();
+    $gameTemp.enemyTpGaugeRefresh = false;
   }
 };
 
-Spriteset_Battle.prototype.setMpGaugePosition = function() {
-  const mpGaugePositionList = getEnemyMpGaugePosition($gameTroop.troop());
-  for (const data of mpGaugePositionList) {
+Spriteset_Battle.prototype.setTpGaugePosition = function() {
+  const tpGaugePositionList = getEnemyTpGaugePosition($gameTroop.troop());
+  for (const data of tpGaugePositionList) {
     const enemy = $gameTroop.members()[data[0] - 1];
     if (enemy) {
-      enemy.setMpGaugePosition(data[1], data[2]);
+      enemy.setTpGaugePosition(data[1], data[2]);
     }
-  }
-};
-
-
-const _Game_Battler_refresh = Game_Battler.prototype.refresh;
-Game_Battler.prototype.refresh = function() {
-  _Game_Battler_refresh.call(this);
-  if (this.isEnemy()) {
-    this.MpGaugeVisible();
-    this.MpGaugeMask();
   }
 };
 
 const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
 Game_Enemy.prototype.initMembers = function() {
   _Game_Enemy_initMembers.call(this);
-  this._visibleMpGauge = false;
-  this._MPGaugeMask = false;
-  this._battlerMpPositionX = 0;
-  this._battlerMpPositionY = 0;
+  this._visibleTpGauge = false;
+  this._TPGaugeMask = false;
+  this._battlerTpPositionX = 0;
+  this._battlerTpPositionY = 0;
 };
 
 const _Game_Enemy_setup = Game_Enemy.prototype.setup;
 Game_Enemy.prototype.setup = function(enemyId, x, y) {
   _Game_Enemy_setup.call(this, enemyId, x, y);
-  this._MPGaugeValueVisible = this.enemy().meta.MPGaugeMask ? true : false;
-  this.showMpGauge = !this.enemy().meta.NoMPGauge;
+  this._TPGaugeValueVisible = this.enemy().meta.TPGaugeMask ? true : false;
+  this.showTpGauge = !this.enemy().meta.NoTPGauge;
 };
 
-Game_Enemy.prototype.MpGaugeVisibleTrait = function(){
-  return this.traitObjects().some(traitObject => traitObject.meta.EnemyMPGaugeVisible);
-};
-
-Game_Enemy.prototype.MpGaugeVisible = function(){
-  this._visibleMpGauge = this.MpGaugeVisibleTrait();
-};
-
-Game_Enemy.prototype.MpGaugeMask = function(){
-  if (this._MPGaugeValueVisible) {
-    this._MPGaugeMask = eval(this.enemy().meta.MPGaugeMask);
+const _Game_Battler_refresh = Game_Battler.prototype.refresh;
+Game_Battler.prototype.refresh = function() {
+  _Game_Battler_refresh.call(this);
+  if (this.isEnemy()) {
+    this.TpGaugeVisible();
+    this.TpGaugeMask();
   }
 };
 
-Game_Enemy.prototype.setMpGaugePosition = function(x, y){
-  this._battlerMpPositionX = x;
-  this._battlerMpPositionY = y;
+Game_Enemy.prototype.TpGaugeVisibleTrait = function(){
+  return this.traitObjects().some(traitObject => traitObject.meta.EnemyTPGaugeVisible);
 };
 
-Game_Enemy.prototype.getMpGaugePositionX = function(){
-  return this._battlerMpPositionX;
+Game_Enemy.prototype.TpGaugeVisible = function(){
+  this._visibleTpGauge = this.TpGaugeVisibleTrait();
 };
 
-Game_Enemy.prototype.getMpGaugePositionY = function(){
-  return this._battlerMpPositionY;
+Game_Enemy.prototype.TpGaugeMask = function(){
+  if (this._TPGaugeValueVisible) {
+    this._TPGaugeMask = eval(this.enemy().meta.TPGaugeMask);
+  }
+};
+
+Game_Enemy.prototype.setTpGaugePosition = function(x, y){
+  this._battlerTpPositionX = x;
+  this._battlerTpPositionY = y;
+};
+
+Game_Enemy.prototype.getTpGaugePositionX = function(){
+  return this._battlerTpPositionX;
+};
+
+Game_Enemy.prototype.getTpGaugePositionY = function(){
+  return this._battlerTpPositionY;
 };
 
 function getSplit(tag) {

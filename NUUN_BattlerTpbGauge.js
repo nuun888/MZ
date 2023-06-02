@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラーTPBゲージ
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_Base
@@ -22,6 +22,7 @@
  * 敵キャラまたはアクターのメモ欄
  * <TPBGaugeX:[position]> TPBゲージのX座標を調整します。（相対座標）
  * <TPBGaugeY:[position]> TPBゲージのY座標を調整します。（相対座標）
+ * [position]:座標
  * 
  * バトルイベントの注釈
  * <TPBGaugePosition:[Id],[x],[y]> 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）
@@ -38,6 +39,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.1.5.1
+ * 処理の修正。
  * 2023/5/28 Ver.1.5.0
  * TPBゲージをアクターにも表示できるように対応。
  * 2022/5/14 Ver.1.4.0
@@ -78,66 +81,6 @@
  * 少し修正。
  * 2021/1/16 Ver.1.0.0
  * 初版
- * 
- * 
- * @param ActorSetting
- * @text アクター設定
- * @default ------------------------------
- * 
- * @param ActorVisibleSetting
- * @text 表示設定
- * @default ------------------------------
- * @parent ActorSetting
- * 
- * @param ActorTpbPosition
- * @desc アクターのTPBゲージ位置
- * @text TPBゲージ位置
- * @type select
- * @option 表示なし
- * @value -1
- * @option SVアクター画像の上
- * @value 0
- * @option SVアクター画像の下
- * @value 1
- * @default -1
- * @parent ActorVisibleSetting
- * 
- * @param ActorGaugeSetting
- * @text アクターゲージ設定
- * @default ------------------------------
- * @parent ActorSetting
- * 
- * @param ActorGaugeWidth
- * @desc アクターのTPBゲージの横幅を指定します。
- * @text TPBゲージ横幅
- * @type number
- * @default 128
- * @min 0
- * @parent ActorGaugeSetting
- * 
- * @param ActorGaugeHeight
- * @desc アクターのTPBゲージの縦幅を指定します。
- * @text TPBゲージ縦幅
- * @type number
- * @default 12
- * @min 0
- * @parent ActorGaugeSetting
- * 
- * @param ActorGauge_X
- * @desc アクターのTPBゲージのX座標（相対座標）指定します。
- * @text TPBゲージX座標
- * @type number
- * @default 0
- * @min -9999
- * @parent ActorGaugeSetting
- * 
- * @param ActorGauge_Y
- * @desc アクターのTPBゲージのY座標（相対座標）指定します。
- * @text TPBゲージY座標
- * @type number
- * @default 0
- * @min -9999
- * @parent ActorGaugeSetting
  * 
  * @param EnemySetting
  * @text 敵設定
@@ -200,6 +143,66 @@
  * @min -9999
  * @parent GaugeSetting
  * 
+ * 
+ * @param ActorSetting
+ * @text アクター設定
+ * @default ------------------------------
+ * 
+ * @param ActorVisibleSetting
+ * @text 表示設定
+ * @default ------------------------------
+ * @parent ActorSetting
+ * 
+ * @param ActorTpbPosition
+ * @desc アクターのTPBゲージ位置
+ * @text TPBゲージ位置
+ * @type select
+ * @option 表示なし
+ * @value -1
+ * @option SVアクター画像の上
+ * @value 0
+ * @option SVアクター画像の下
+ * @value 1
+ * @default -1
+ * @parent ActorVisibleSetting
+ * 
+ * @param ActorGaugeSetting
+ * @text アクターゲージ設定
+ * @default ------------------------------
+ * @parent ActorSetting
+ * 
+ * @param ActorGaugeWidth
+ * @desc アクターのTPBゲージの横幅を指定します。
+ * @text TPBゲージ横幅
+ * @type number
+ * @default 128
+ * @min 0
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorGaugeHeight
+ * @desc アクターのTPBゲージの縦幅を指定します。
+ * @text TPBゲージ縦幅
+ * @type number
+ * @default 12
+ * @min 0
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorGauge_X
+ * @desc アクターのTPBゲージのX座標（相対座標）指定します。
+ * @text TPBゲージX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorGauge_Y
+ * @desc アクターのTPBゲージのY座標（相対座標）指定します。
+ * @text TPBゲージY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorGaugeSetting
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_BattlerTpbGauge = true;
@@ -249,7 +252,7 @@ Sprite_Battler.prototype.updateTpbGauge = function() {
     if (!this._battler || !BattleManager.isTpb() || this.noTpbGaugePosition()) {
         return;
     }
-    if (this.battlerOverlay && !this._enemyTpb) {
+    if (this.battlerOverlay && !this._battlerTpb) {
         this.createTpbGauge();
     }
     this.setTpbGaugePosition();
@@ -264,44 +267,44 @@ Sprite_Actor.prototype.noTpbGaugePosition = function() {
 };
 
 Sprite_Enemy.prototype.setTpbGaugePosition = function() {
-    if (this._enemyTpb) {
+    if (this._battlerTpb) {
         const enemy = this._enemy.enemy();
         const x = (enemy.meta.TPBGaugeX ? Number(enemy.meta.TPBGaugeX) : 0) + Gauge_X + this._enemy.getTpbGaugePositionX();
         const y = (enemy.meta.TPBGaugeY ? Number(enemy.meta.TPBGaugeY) : 0) + Gauge_Y + this._enemy.getTpbGaugePositionY();
-        this._enemyTpb.x = x;
-        this._enemyTpb.y = y - this.getButlerTpbPosition();
+        this._battlerTpb.x = x;
+        this._battlerTpb.y = y - this.getBattlerTpbPosition();
       }
 };
 
 Sprite_Actor.prototype.setTpbGaugePosition = function() {
     if (this._battler.isEnemy()) {
         Sprite_Enemy.prototype.setTpbGaugePosition.call(this);
-    } else if (this._enemyTpb) {
+    } else if (this._battlerTpb) {
         const actor = this._actor.actor();
         const x = (actor.meta.TPBGaugeX ? Number(actor.meta.TPBGaugeX) : 0) + ActorGauge_X;
         const y = (actor.meta.TPBGaugeY ? Number(actor.meta.TPBGaugeY) : 0) + ActorGauge_Y;
-        this._enemyTpb.x = x;
-        this._enemyTpb.y = y - this.getButlerTpbSVPosition();
+        this._battlerTpb.x = x;
+        this._battlerTpb.y = y - this.getBattlerTpbSVPosition();
       }
 };
 
-Sprite_Battler.prototype.getButlerTpbPosition = function() {
-    const scale = this.getButlerOverlayConflict();
+Sprite_Battler.prototype.getBattlerTpbPosition = function() {
+    const scale = this.getBattlerOverlayConflict();
     if (TpbPosition === 0) {
-        return this.getButlerOverlayHeight() * scale;
+        return this.getBattlerOverlayHeight() * scale;
     } else if (TpbPosition === 2) {
-        return Math.floor((this.getButlerOverlayHeight() * scale) / 2);
+        return Math.floor((this.getBattlerOverlayHeight() * scale) / 2);
     } else {
         return 0;
     }
 };
 
-Sprite_Actor.prototype.getButlerTpbSVPosition = function() {
+Sprite_Actor.prototype.getBattlerTpbSVPosition = function() {
     const scale = this.battlerOverlay.battlerSpriteScale_y;
     if (ActorTpbPosition === 0) {
-      return this.getSVButlerHeight() * scale;
+      return this.getSVBattlerHeight() * scale;
     } else if (ActorTpbPosition === 2) {
-      return Math.floor((this.getSVButlerHeight() * scale) / 2);
+      return Math.floor((this.getSVBattlerHeight() * scale) / 2);
     } else {
       return 0;
     }
@@ -310,11 +313,11 @@ Sprite_Actor.prototype.getButlerTpbSVPosition = function() {
 Sprite_Enemy.prototype.createTpbGauge = function() {
     const sprite = new Sprite_EnemyTPBGauge();
     this.battlerOverlay.addChild(sprite);
-    this._enemyTpb = sprite;
+    this._battlerTpb = sprite;
     sprite.setup(this._enemy, "time");
     sprite.show();
     sprite.move(0, 0);
-    $gameTemp.enemyTpbGaugeRefresh = true;
+    $gameTemp.battlerTpbGaugeRefresh = true;
 };
   
 Sprite_Actor.prototype.createTpbGauge = function() {
@@ -324,11 +327,11 @@ Sprite_Actor.prototype.createTpbGauge = function() {
     }
     const sprite = new Sprite_BattlerTPBGauge();
     this.battlerOverlay.addChild(sprite);
-    this._enemyTpb = sprite;
+    this._battlerTpb = sprite;
     sprite.setup(this._actor, "time");
     sprite.show();
     sprite.move(0, 0);
-    $gameTemp.enemyTpbGaugeRefresh = true;
+    $gameTemp.battlerTpbGaugeRefresh = true;
 };
 
 
@@ -375,12 +378,12 @@ Sprite_EnemyTPBGauge.prototype.gaugeHeight = function() {
 };
 
 
-const _Spriteset_Battle_updateButlerOverlay = Spriteset_Battle.prototype.updateButlerOverlay;
-Spriteset_Battle.prototype.updateButlerOverlay = function() {
-  _Spriteset_Battle_updateButlerOverlay.call(this);
-  if ($gameTemp.enemyTpbGaugeRefresh) {
+const _Spriteset_Battle_updateBattlerOverlay = Spriteset_Battle.prototype.updateBattlerOverlay;
+Spriteset_Battle.prototype.updateBattlerOverlay = function() {
+  _Spriteset_Battle_updateBattlerOverlay.call(this);
+  if ($gameTemp.battlerTpbGaugeRefresh) {
     this.setTpbGaugePosition();
-    $gameTemp.enemyTpbGaugeRefresh = false;
+    $gameTemp.battlerTpbGaugeRefresh = false;
   }
 };
 
@@ -400,21 +403,21 @@ Spriteset_Battle.prototype.setTpbGaugePosition = function() {
 const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
 Game_Enemy.prototype.initMembers = function() {
   _Game_Enemy_initMembers.call(this);
-  this._butlerTpbPositionX = 0;
-  this._butlerTpbPositionY = 0;
+  this._battlerTpbPositionX = 0;
+  this._battlerTpbPositionY = 0;
 };
 
 Game_Enemy.prototype.setTpbGaugePosition = function(x, y){
-  this._butlerTpbPositionX = x;
-  this._butlerTpbPositionY = y;
+  this._battlerTpbPositionX = x;
+  this._battlerTpbPositionY = y;
 };
 
 Game_Enemy.prototype.getTpbGaugePositionX = function(){
-  return this._butlerTpbPositionX;
+  return this._battlerTpbPositionX;
 };
 
 Game_Enemy.prototype.getTpbGaugePositionY = function(){
-  return this._butlerTpbPositionY;
+  return this._battlerTpbPositionY;
 };
 
 })();

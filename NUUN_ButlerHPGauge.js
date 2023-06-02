@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @base NUUN_BattlerOverlayBase
- * @version 1.7.1
+ * @version 1.7.2
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -63,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.1.7.2
+ * 処理の修正。
  * 2023/5/28 Ver.1.7.1
  * 処理の修正。
  * 2023/5/28 Ver.1.7.0
@@ -115,111 +117,6 @@
  * HPゲージを表示させない機能を追加。
  * 2021/5/24 Ver.1.0.0
  * 初版
- * 
- * 
- * @param ActorSetting
- * @text アクター設定
- * @default ------------------------------
- * 
- * @param ActorVisibleSetting
- * @text 表示設定
- * @default ------------------------------
- * @parent ActorSetting
- * 
- * @param ActorHPPosition
- * @desc アクターのHPゲージ位置
- * @text HPゲージ位置
- * @type select
- * @option 表示なし
- * @value -1
- * @option SV画像の上
- * @value 0
- * @option SV画像の下
- * @value 1
- * @default -1
- * @parent ActorVisibleSetting
- * 
- * @param ActorHPVisible
- * @desc アクターのHPゲージの表示タイミング
- * @text アクターHPゲージ表示タイミング
- * @type select
- * @option 常に表示
- * @value 0
- * @option 選択時
- * @value 1
- * @option ダメージ時
- * @value 2
- * @option 選択時、ダメージ時
- * @value 3
- * @default 0
- * @parent ActorVisibleSetting
- * 
- * @param ActorGaugeSetting
- * @text アクターゲージ設定
- * @default ------------------------------
- * @parent ActorSetting
- * 
- * @param ActorGaugeWidth
- * @desc アクターのゲージの横幅を指定します。
- * @text ゲージ横幅
- * @type number
- * @default 128
- * @min 0
- * @parent ActorGaugeSetting
- * 
- * @param ActorGaugeHeight
- * @desc アクターのゲージの縦幅を指定します。
- * @text ゲージ縦幅
- * @type number
- * @default 12
- * @min 0
- * @parent ActorGaugeSetting
- * 
- * @param ActorGauge_X
- * @desc アクターのゲージのX座標（相対座標）指定します。
- * @text ゲージX座標
- * @type number
- * @default 0
- * @min -9999
- * @parent ActorGaugeSetting
- * 
- * @param ActorGauge_Y
- * @desc アクターのゲージのY座標（相対座標）指定します。
- * @text ゲージY座標
- * @type number
- * @default 0
- * @min -9999
- * @parent ActorGaugeSetting
- * 
- * @param ActorHPLabelVisible
- * @text HPラベル表示
- * @desc アクターのHPラベルを表示する。
- * @type boolean
- * @default true
- * @parent ActorGaugeSetting
- * 
- * @param ActorHPValueVisible
- * @text HP数値表示
- * @desc アクターのHP数値を表示する。
- * @type boolean
- * @default true
- * @parent ActorGaugeSetting
- * 
- * @param ActorValueFontSize
- * @desc アクターの数値のフォントサイズ。（メインフォントサイズから）
- * @text 数値フォントサイズ
- * @type number
- * @default -6
- * @min -9999
- * @parent ActorGaugeSetting
- * 
- * @param ActorLabelFontSize
- * @desc アクターの ラベルのフォントサイズ。（メインフォントサイズから）
- * @text ラベルフォントサイズ
- * @type number
- * @default -2
- * @min -9999
- * @parent ActorGaugeSetting
  * 
  * 
  * @param EnemySetting
@@ -369,7 +266,109 @@
  * @default 0
  * @parent EnemyBookSetting
  * 
- *  
+ *  @param ActorSetting
+ * @text アクター設定
+ * @default ------------------------------
+ * 
+ * @param ActorVisibleSetting
+ * @text 表示設定
+ * @default ------------------------------
+ * @parent ActorSetting
+ * 
+ * @param ActorHPPosition
+ * @desc アクターのHPゲージ位置
+ * @text HPゲージ位置
+ * @type select
+ * @option 表示なし
+ * @value -1
+ * @option SV画像の上
+ * @value 0
+ * @option SV画像の下
+ * @value 1
+ * @default -1
+ * @parent ActorVisibleSetting
+ * 
+ * @param ActorHPVisible
+ * @desc アクターのHPゲージの表示タイミング
+ * @text アクターHPゲージ表示タイミング
+ * @type select
+ * @option 常に表示
+ * @value 0
+ * @option 選択時
+ * @value 1
+ * @option ダメージ時
+ * @value 2
+ * @option 選択時、ダメージ時
+ * @value 3
+ * @default 0
+ * @parent ActorVisibleSetting
+ * 
+ * @param ActorGaugeSetting
+ * @text アクターゲージ設定
+ * @default ------------------------------
+ * @parent ActorSetting
+ * 
+ * @param ActorGaugeWidth
+ * @desc アクターのゲージの横幅を指定します。
+ * @text ゲージ横幅
+ * @type number
+ * @default 128
+ * @min 0
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorGaugeHeight
+ * @desc アクターのゲージの縦幅を指定します。
+ * @text ゲージ縦幅
+ * @type number
+ * @default 12
+ * @min 0
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorGauge_X
+ * @desc アクターのゲージのX座標（相対座標）指定します。
+ * @text ゲージX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorGauge_Y
+ * @desc アクターのゲージのY座標（相対座標）指定します。
+ * @text ゲージY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorHPLabelVisible
+ * @text HPラベル表示
+ * @desc アクターのHPラベルを表示する。
+ * @type boolean
+ * @default true
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorHPValueVisible
+ * @text HP数値表示
+ * @desc アクターのHP数値を表示する。
+ * @type boolean
+ * @default true
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorValueFontSize
+ * @desc アクターの数値のフォントサイズ。（メインフォントサイズから）
+ * @text 数値フォントサイズ
+ * @type number
+ * @default -6
+ * @min -9999
+ * @parent ActorGaugeSetting
+ * 
+ * @param ActorLabelFontSize
+ * @desc アクターの ラベルのフォントサイズ。（メインフォントサイズから）
+ * @text ラベルフォントサイズ
+ * @type number
+ * @default -2
+ * @min -9999
+ * @parent ActorGaugeSetting
  * 
  */
 var Imported = Imported || {};
@@ -433,7 +432,7 @@ Sprite_Battler.prototype.updateHpGauge = function() {
     if (!this._battler || this.noHpGaugePosition()) {
         return;
     }
-    if (this.battlerOverlay && !this._butlerHp) {
+    if (this.battlerOverlay && !this._battlerHp) {
         this.createHPGauge();
     }
     this.setHpGaugePosition();
@@ -448,44 +447,44 @@ Sprite_Actor.prototype.noHpGaugePosition = function() {
 };
 
 Sprite_Enemy.prototype.setHpGaugePosition = function() {
-    if (this._butlerHp) {
+    if (this._battlerHp) {
         const enemy = this._enemy.enemy();
         const x = (enemy.meta.HPGaugeX ? Number(enemy.meta.HPGaugeX) : 0) + Gauge_X + this._enemy.getHPGaugePositionX();
         const y = (enemy.meta.HPGaugeY ? Number(enemy.meta.HPGaugeY) : 0) + Gauge_Y + this._enemy.getHPGaugePositionY();
-        this._butlerHp.x = x;
-        this._butlerHp.y = y - this.getButlerHpPosition();
+        this._battlerHp.x = x;
+        this._battlerHp.y = y - this.getBattlerHpPosition();
     }
 };
 
 Sprite_Actor.prototype.setHpGaugePosition = function() {
     if (this._battler.isEnemy()) {
         Sprite_Enemy.prototype.setHpGaugePosition.call(this);
-    } else if (this._butlerHp) {
+    } else if (this._battlerHp) {
         const actor = this._actor.actor();
         const x = (actor.meta.HPGaugeX ? Number(actor.meta.HPGaugeX) : 0) + ActorGauge_X;
         const y = (actor.meta.HPGaugeY ? Number(actor.meta.HPGaugeY) : 0) + ActorGauge_Y;
-        this._butlerHp.x = x;
-        this._butlerHp.y = y - this.getButlerHpSVPosition();
+        this._battlerHp.x = x;
+        this._battlerHp.y = y - this.getBattlerHpSVPosition();
       }
 };
 
-Sprite_Battler.prototype.getButlerHpPosition = function() {
-    const scale = this.getButlerOverlayConflict();
+Sprite_Battler.prototype.getBattlerHpPosition = function() {
+    const scale = this.getBattlerOverlayConflict();
     if (HPPosition === 0) {
-        return this.getButlerOverlayHeight() * scale;
+        return this.getBattlerOverlayHeight() * scale;
     } else if (HPPosition === 2) {
-        return Math.floor((this.getButlerOverlayHeight() * scale) / 2);
+        return Math.floor((this.getBattlerOverlayHeight() * scale) / 2);
     } else {
         return 0;
     }
 };
 
-Sprite_Actor.prototype.getButlerHpSVPosition = function() {
+Sprite_Actor.prototype.getBattlerHpSVPosition = function() {
     const scale = this.battlerOverlay.battlerSpriteScale_y;
     if (ActorHPPosition === 0) {
-      return this.getSVButlerHeight() * scale;
+      return this.getSVBattlerHeight() * scale;
     } else if (ActorHPPosition === 2) {
-      return Math.floor((this.getSVButlerHeight() * scale) / 2);
+      return Math.floor((this.getSVBattlerHeight() * scale) / 2);
     } else {
       return 0;
     }
@@ -495,7 +494,7 @@ Sprite_Enemy.prototype.createHPGauge = function() {
   enemyHPGaugeLength = getSplit(this._enemy.enemy().meta.HPGaugeLength);
   const sprite = new Sprite_EnemyHPGauge();
   this.battlerOverlay.addChild(sprite);
-  this._butlerHp = sprite;
+  this._battlerHp = sprite;
   sprite.setup(this._enemy, "hp");
   sprite.show();
   sprite.move(0, 0);
@@ -510,7 +509,7 @@ Sprite_Actor.prototype.createHPGauge = function() {
     enemyHPGaugeLength = null;
     const sprite = new Sprite_BattlerHPGauge();
     this.battlerOverlay.addChild(sprite);
-    this._butlerHp = sprite;
+    this._battlerHp = sprite;
     sprite.setup(this._actor, "hp");
     sprite.show();
     sprite.move(0, 0);
@@ -730,9 +729,9 @@ Sprite_EnemyHPGauge.prototype.gaugeEnemyBookVisible = function() {
 };
 
 
-const _Spriteset_Battle_updateButlerOverlay = Spriteset_Battle.prototype.updateButlerOverlay;
-Spriteset_Battle.prototype.updateButlerOverlay = function() {
-  _Spriteset_Battle_updateButlerOverlay.call(this);
+const _Spriteset_Battle_updateBattlerOverlay = Spriteset_Battle.prototype.updateBattlerOverlay;
+Spriteset_Battle.prototype.updateBattlerOverlay = function() {
+  _Spriteset_Battle_updateBattlerOverlay.call(this);
   if ($gameTemp.enemyHPGaugeRefresh) {
     this.setHPGaugePosition();
     $gameTemp.enemyHPGaugeRefresh = false;
@@ -776,8 +775,8 @@ Game_Enemy.prototype.initMembers = function() {
   _Game_Enemy_initMembers.call(this);
   this._visibleHpGauge = false;
   this._HPGaugeMask = false;
-  this._butlerHpPositionX = 0;
-  this._butlerHpPositionY = 0;
+  this._battlerHpPositionX = 0;
+  this._battlerHpPositionY = 0;
 };
 
 const _Game_Enemy_setup = Game_Enemy.prototype.setup;
@@ -802,16 +801,16 @@ Game_Enemy.prototype.HpGaugeMask = function(){
 };
 
 Game_Enemy.prototype.setHPGaugePosition = function(x, y){
-  this._butlerHpPositionX = x;
-  this._butlerHpPositionY = y;
+  this._battlerHpPositionX = x;
+  this._battlerHpPositionY = y;
 };
 
 Game_Enemy.prototype.getHPGaugePositionX = function(){
-  return this._butlerHpPositionX;
+  return this._battlerHpPositionX;
 };
 
 Game_Enemy.prototype.getHPGaugePositionY = function(){
-  return this._butlerHpPositionY;
+  return this._battlerHpPositionY;
 };
 
 

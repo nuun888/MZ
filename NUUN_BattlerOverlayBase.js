@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトラーオーバーレイベース
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.1.0.3
+ * 処理の修正。
  * 2023/5/28 Ver.1.0.2
  * SVアクターのゲージ表示に関する処理の追加。
  * 2022/10/11 Ver.1.0.1
@@ -82,10 +84,10 @@ Spriteset_Battle.prototype.setBattlerOverlaySprite = function(sprite, mode) {
 const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
 Spriteset_Battle.prototype.update = function() {
   _Spriteset_Battle_update.call(this);
-  this.updateButlerOverlay();
+  this.updateBattlerOverlay();
 };
 
-Spriteset_Battle.prototype.updateButlerOverlay = function() {
+Spriteset_Battle.prototype.updateBattlerOverlay = function() {
     if ($gameTemp.refreshOverlay) {
         for (const sprite of this._enemySprites) {
             if (!sprite.battlerOverlay) {
@@ -94,10 +96,10 @@ Spriteset_Battle.prototype.updateButlerOverlay = function() {
         }
         $gameTemp.refreshOverlay = false;
     }  
-    this.updateButlerOverlaySprite();
+    this.updateBattlerOverlaySprite();
 };
 
-Spriteset_Battle.prototype.updateButlerOverlaySprite = function() {
+Spriteset_Battle.prototype.updateBattlerOverlaySprite = function() {
     for (const sprite of this._battlerOverlaySprite) {
         let spriteData = null;
         if (sprite.battlerMode === 'actor') {
@@ -156,14 +158,14 @@ const _Sprite_Actor_update = Sprite_Actor.prototype.update;
 Sprite_Actor.prototype.update = function() {
     _Sprite_Actor_update.call(this);
     if (this.battlerOverlay) {
-        this.butlerOverlayOpacity();
+        this.battlerOverlayOpacity();
     } else {
         $gameTemp.refreshOverlay = true;
     }
 };
 
 
-Sprite_Battler.prototype.butlerOverlayOpacity = function() {
+Sprite_Battler.prototype.battlerOverlayOpacity = function() {
     if (this._effectType && this._effectType !== "blink") {
         this.battlerOverlay.setOpacity(this.opacity);
     }
@@ -173,13 +175,13 @@ const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
     _Sprite_Enemy_update.call(this);
     if (this.battlerOverlay) {
-        this.butlerOverlayOpacity();
+        this.battlerOverlayOpacity();
     } else {
         $gameTemp.refreshOverlay = true;
     }
 };
 
-Sprite_Battler.prototype.getButlerOverlayHeight = function() {
+Sprite_Battler.prototype.getBattlerOverlayHeight = function() {
     if (this._SVBattlername) {//SoR_EnemySVSprite_MZ
       return Math.floor((this._mainSprite.bitmap.height / 6) * 0.9);
     } else if (this._svBattlerSprite) {//Visu
@@ -189,7 +191,7 @@ Sprite_Battler.prototype.getButlerOverlayHeight = function() {
     }
 };
   
-Sprite_Battler.prototype.getButlerOverlayConflict = function() {
+Sprite_Battler.prototype.getBattlerOverlayConflict = function() {
     if (ConflictScale === 'Img' && this.battlerOverlay) {
       return this.battlerOverlay.battlerSpriteScale_y;
     } else {
@@ -197,12 +199,12 @@ Sprite_Battler.prototype.getButlerOverlayConflict = function() {
     }
 };
 
-Sprite_Actor.prototype.getButlerOverlayHeight = function() {
-    return this.getSVButlerHeight();
+Sprite_Actor.prototype.getBattlerOverlayHeight = function() {
+    return this.getSVBattlerHeight();
 };
 
-Sprite_Actor.prototype.getSVButlerHeight = function() {
-    return Math.floor((this._mainSprite.bitmap.height / 6) * 0.9);
+Sprite_Actor.prototype.getSVBattlerHeight = function() {
+    return this._mainSprite ? Math.floor((this._mainSprite.bitmap.height / 6) * 0.9) : 0;
 };
 
 })();

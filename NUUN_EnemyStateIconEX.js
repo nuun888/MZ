@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 敵ステート表示拡張
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -36,6 +36,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.1.1.3
+ * 処理の修正。
  * 2023/5/16 Ver.1.1.2
  * ステートアイコン表示位置の敵画像の下、敵画像の中心が機能していなかった問題を修正。
  * ステートアイコン表示タイミングを選択時に指定したときにアクターのステートアイコンが表示されない問題を修正。
@@ -126,7 +128,7 @@ Sprite_Enemy.prototype.updateStateSprite = function() {
         const x = (enemy.meta.EnemyStateX ? Number(enemy.meta.EnemyStateX) : 0) + State_X + this._enemy.getStatePositionX();
         const y = (enemy.meta.EnemyStateY ? Number(enemy.meta.EnemyStateY) : 0) + State_Y + this._enemy.getStatePositionY();
         this._stateIconSprite.x = x;
-        this._stateIconSprite.y = y - this.getButlerStatePosition();
+        this._stateIconSprite.y = y - this.getBattlerStatePosition();
 
         if (this._stateIconSprite.y < 20 - this.y) {
             this._stateIconSprite.y = 20 - this.y;
@@ -135,12 +137,12 @@ Sprite_Enemy.prototype.updateStateSprite = function() {
   
 };
 
-Sprite_Enemy.prototype.getButlerStatePosition = function() {
-  const scale = this.getButlerOverlayConflict();
+Sprite_Enemy.prototype.getBattlerStatePosition = function() {
+  const scale = this.getBattlerOverlayConflict();
   if (EnemyStatePosition === 0) {
-    return this.getButlerOverlayHeight() * scale;
+    return this.getBattlerOverlayHeight() * scale;
   } else if (EnemyStatePosition === 2) {
-    return Math.floor((this.getButlerOverlayHeight() * scale) / 2);
+    return Math.floor((this.getBattlerOverlayHeight() * scale) / 2);
   } else {
     return 0;
   }
@@ -198,9 +200,9 @@ Sprite_StateIcon.prototype.update = function() {
 };
 
 
-const _Spriteset_Battle_updateButlerOverlay = Spriteset_Battle.prototype.updateButlerOverlay;
-Spriteset_Battle.prototype.updateButlerOverlay = function() {
-  _Spriteset_Battle_updateButlerOverlay.call(this);
+const _Spriteset_Battle_updateBattlerOverlay = Spriteset_Battle.prototype.updateBattlerOverlay;
+Spriteset_Battle.prototype.updateBattlerOverlay = function() {
+  _Spriteset_Battle_updateBattlerOverlay.call(this);
   if ($gameTemp.enemyStateRefresh) {
     this.setStateIconPosition();
     $gameTemp.enemyStateRefresh = false;
@@ -221,21 +223,21 @@ Spriteset_Battle.prototype.setStateIconPosition = function() {
 const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
 Game_Enemy.prototype.initMembers = function() {
   _Game_Enemy_initMembers.call(this);
-  this._butlerStatePositionX = 0;
-  this._butlerStatePositionY = 0;
+  this._battlerStatePositionX = 0;
+  this._battlerStatePositionY = 0;
 };
 
 Game_Enemy.prototype.setStatePosition = function(x, y){
-  this._butlerStatePositionX = x;
-  this._butlerStatePositionY = y;
+  this._battlerStatePositionX = x;
+  this._battlerStatePositionY = y;
 };
 
 Game_Enemy.prototype.getStatePositionX = function(){
-  return this._butlerStatePositionX;
+  return this._battlerStatePositionX;
 };
 
 Game_Enemy.prototype.getStatePositionY = function(){
-  return this._butlerStatePositionY;
+  return this._battlerStatePositionY;
 };
 
 })();

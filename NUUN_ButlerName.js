@@ -9,16 +9,16 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc  敵名前表示
+ * @plugindesc  バトラー名前表示
  * @author NUUN
- * @version 1.3.1
+ * @version 1.4.0
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
  * @help
- * 敵バトラー上にモンスターの名前を表示します。
+ * 戦闘中の敵及びSVアクターにモンスターの名前を表示します。
  * 
- * 敵キャラのメモ欄
+ * 敵キャラまたはアクターのメモ欄
  * <EnemyNameX:[position]> モンスター名のX座標を調整します。（相対座標）
  * <EnemyNameY:[position]> モンスター名のY座標を調整します。（相対座標）
  * 
@@ -30,11 +30,14 @@
  * [id]は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。
  * 
  * このプラグインはNUUN_BattlerOverlayBase(バトラーオーバーレイベース)が必要です。
+ * バトラーオーバーレイベースは必ず最新版にしてください。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.1.4.0
+ * SVアクターに名前を表示する機能を追加。
  * 2023/5/6 Ver.1.3.1
  * 敵の名前の表示をフェードアウト、フェードインさせるように修正。
  * 2022/5/10 Ver.1.3.0
@@ -73,9 +76,15 @@
  * 2021/5/23 Ver.1.0.0
  * 初版
  * 
+ * 
  * @param EnemySetting
- * @text モンスター設定
+ * @text 敵設定
  * @default ------------------------------
+ * 
+ * @param EnemyVisibleSetting
+ * @text 表示設定
+ * @default ------------------------------
+ * @parent EnemySetting
  * 
  * @param EnemyNamePosition
  * @desc モンスターの名前表示位置
@@ -90,6 +99,7 @@
  * @option 敵画像の中心
  * @value 2
  * @default 0
+ * @parent EnemyVisibleSetting
  * 
  * @param EnemyNameVisible
  * @desc モンスターの名前の表示タイミング
@@ -100,6 +110,12 @@
  * @option 選択時
  * @value 1
  * @default 0
+ * @parent EnemyVisibleSetting
+ * 
+ * @param GaugeSetting
+ * @text 敵ゲージ設定
+ * @default ------------------------------
+ * @parent EnemySetting
  * 
  * @param Name_X
  * @desc X座標（相対座標）指定します。
@@ -107,6 +123,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent GaugeSetting
  * 
  * @param Name_Y
  * @desc Y座標（相対座標）指定します。
@@ -114,6 +131,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent GaugeSetting
  * 
  * @param Name_FontSize
  * @desc モンスター名のフォントサイズ。（メインフォントから）
@@ -121,6 +139,70 @@
  * @type number
  * @default -12
  * @min -9999
+ * @parent GaugeSetting
+ * 
+ * @param ActorSetting
+ * @text アクター設定
+ * @default ------------------------------
+ * 
+ * @param ActorVisibleSetting
+ * @text 表示設定
+ * @default ------------------------------
+ * @parent ActorSetting
+ * 
+ * @param ActorNamePosition
+ * @desc アクター名位置
+ * @text アクター名位置
+ * @type select
+ * @option 表示なし
+ * @value -1
+ * @option SV画像の上
+ * @value 0
+ * @option SV画像の下
+ * @value 1
+ * @default -1
+ * @parent ActorVisibleSetting
+ * 
+ * @param ActorNameVisible
+ * @desc アクター名の表示タイミング
+ * @text アクター名表示タイミング
+ * @type select
+ * @option 常に表示
+ * @value 0
+ * @option 選択時
+ * @value 1
+ * @default 0
+ * @parent ActorVisibleSetting
+ * 
+ * @param ActorNameSetting
+ * @text アクター名設定
+ * @default ------------------------------
+ * @parent ActorSetting
+ * 
+ * @param ActorName_X
+ * @desc アクター名のX座標（相対座標）指定します。
+ * @text アクター名X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorNameSetting
+ * 
+ * @param ActorName_Y
+ * @desc アクター名のY座標（相対座標）指定します。
+ * @text アクター名Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorNameSetting
+ * 
+ * @param ActorName_FontSize
+ * @desc アクター名のフォントサイズ。（メインフォントから）
+ * @text フォントサイズ
+ * @type number
+ * @default -12
+ * @min -9999
+ * @parent ActorNameSetting
+ * 
  * 
  */
 var Imported = Imported || {};
@@ -133,7 +215,12 @@ const EnemyNameVisible = Number(parameters['EnemyNameVisible'] || 0);
 const Name_X = Number(parameters['Name_X'] || 0);
 const Name_Y = Number(parameters['Name_Y'] || 0);
 const Name_FontSize = Number(parameters['Name_FontSize'] || -12);
-//let namePositionList = [];
+const ActorNamePosition = Number(parameters['ActorNamePosition'] || 0);
+const ActorNameVisible = Number(parameters['ActorNameVisible'] || 0);
+const ActorName_X = Number(parameters['ActorName_X'] || 0);
+const ActorName_Y = Number(parameters['ActorName_Y'] || 0);
+const ActorName_FontSize = Number(parameters['ActorName_FontSize'] || -12);
+
 
 function getEnemyNamePosition(troop) {
   const pages = troop.pages[0];
@@ -150,84 +237,141 @@ function getEnemyNamePosition(troop) {
   return list;
 };
 
-const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
-Sprite_Enemy.prototype.initMembers = function() {
-  _Sprite_Enemy_initMembers.call(this);
+
+const _Sprite_Actor_update = Sprite_Actor.prototype.update;
+Sprite_Actor.prototype.update = function() {
+  _Sprite_Actor_update.call(this);
+  this.updateBattlerName();
 };
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
   _Sprite_Enemy_update.call(this);
-  this.updateEnemyName();
+  this.updateBattlerName();
 };
 
-Sprite_Enemy.prototype.updateEnemyName = function() {
-  if (EnemyNamePosition < 0) {
-    return;
-  }
-  if (this.battlerOverlay && !this.nameSprite) {
-    this.createEnemyName();
-  }
-  if (this.nameSprite) {
-    const enemy = this._enemy.enemy();
-    const x = (enemy.meta.EnemyNameX ? Number(enemy.meta.EnemyNameX) : 0) + Name_X + this._enemy.getNamePositionX();
-    const y = (enemy.meta.EnemyNameY ? Number(enemy.meta.EnemyNameY) : 0) + Name_Y + this._enemy.getNamePositionY();
-    this.nameSprite.x = x;
-    this.nameSprite.y = y - this.getButlerNamePosition();
-  }
+Sprite_Battler.prototype.updateBattlerName = function() {
+    if (!this._battler || this.noBattlerNamePosition()) {
+        return;
+    }
+    if (this.battlerOverlay && !this.nameSprite) {
+        this.createBattlerName();
+    }
+    this.setBattlerNamePosition();
 };
 
-Sprite_Enemy.prototype.getButlerNamePosition = function() {
-  const scale = this.getButlerOverlayConflict();
-  if (EnemyNamePosition === 0) {
-    return this.getButlerOverlayHeight() * scale;
-  } else if (EnemyNamePosition === 2) {
-    return Math.floor((this.getButlerOverlayHeight() * scale) / 2);
-  } else {
-    return 0;
-  }
+Sprite_Enemy.prototype.noBattlerNamePosition = function() {
+    return EnemyNamePosition < 0;
 };
 
-Sprite_Enemy.prototype.createEnemyName = function() {
-  const sprite = new Sprite_ButlerName();
-  this.battlerOverlay.addChild(sprite);
-  this.nameSprite = sprite;
-  sprite.setup(this._enemy);
-  sprite.show();
-  sprite.move(0, 0);
-  $gameTemp.enemyNameRefresh = true;
+Sprite_Actor.prototype.noBattlerNamePosition = function() {
+    return (this._battler.isEnemy() ? EnemyNamePosition : ActorNamePosition) < 0;
+};
+
+Sprite_Enemy.prototype.setBattlerNamePosition = function() {
+    if (this.nameSprite) {
+        const enemy = this._enemy.enemy();
+        const x = (enemy.meta.EnemyNameX ? Number(enemy.meta.EnemyNameX) : 0) + Name_X + this._enemy.getNamePositionX();
+        const y = (enemy.meta.EnemyNameY ? Number(enemy.meta.EnemyNameY) : 0) + Name_Y + this._enemy.getNamePositionY();
+        this.nameSprite.x = x;
+        this.nameSprite.y = y - this.getBattlerNamePosition();
+    }
+};
+
+Sprite_Actor.prototype.setBattlerNamePosition = function() {
+    if (this._battler.isEnemy()) {
+        Sprite_Enemy.prototype.setBattlerNamePosition.call(this);
+    } else if (this.nameSprite) {
+        const actor = this._actor.actor();
+        const x = (actor.meta.ActorNameX ? Number(actor.meta.ActorNameX) : 0) + ActorName_X;
+        const y = (actor.meta.ActorNameY ? Number(actor.meta.ActorNameY) : 0) + ActorName_Y;
+        this.nameSprite.x = x;
+        this.nameSprite.y = y - this.getBattlerNameSVPosition();
+    }
+};
+
+Sprite_Battler.prototype.getBattlerNamePosition = function() {
+    const scale = this.getBattlerOverlayConflict();
+    if (EnemyNamePosition === 0) {
+        return this.getBattlerOverlayHeight() * scale;
+    } else if (EnemyNamePosition === 2) {
+        return Math.floor((this.getBattlerOverlayHeight() * scale) / 2);
+    } else {
+        return 0;
+    }
+};
+
+Sprite_Actor.prototype.getBattlerNameSVPosition = function() {
+    const scale = this.battlerOverlay.battlerSpriteScale_y;
+    if (ActorNamePosition === 0) {
+      return this.getSVBattlerHeight() * scale;
+    } else if (ActorNamePosition === 2) {
+      return Math.floor((this.getSVBattlerHeight() * scale) / 2);
+    } else {
+      return 0;
+    }
+};
+
+Sprite_Enemy.prototype.createBattlerName = function() {
+    const sprite = new Sprite_EnemyName();
+    this.battlerOverlay.addChild(sprite);
+    this.nameSprite = sprite;
+    sprite.setup(this._enemy);
+    sprite.show();
+    sprite.move(0, 0);
+    $gameTemp.enemyNameRefresh = true;
+};
+  
+Sprite_Actor.prototype.createBattlerName = function() {
+     if (this._battler.isEnemy()) {
+        Sprite_Enemy.prototype.createBattlerName.call(this);
+        return;
+    }
+    const sprite = new Sprite_BattlerName();
+    this.battlerOverlay.addChild(sprite);
+    this.nameSprite = sprite;
+    sprite.setup(this._actor);
+    sprite.show();
+    sprite.move(0, 0);
+    $gameTemp.enemyNameRefresh = true;
 };
 
 
-function Sprite_ButlerName() {
-  this.initialize(...arguments);
+function Sprite_BattlerName() {
+    this.initialize(...arguments);
 }
-
-Sprite_ButlerName.prototype = Object.create(Sprite_Name.prototype);
-Sprite_ButlerName.prototype.constructor = Sprite_ButlerName;
-
-Sprite_ButlerName.prototype.initialize = function() {
+  
+Sprite_BattlerName.prototype = Object.create(Sprite_Name.prototype);
+Sprite_BattlerName.prototype.constructor = Sprite_BattlerName;
+  
+Sprite_BattlerName.prototype.initialize = function() {
     Sprite_Name.prototype.initialize.call(this);
     this.anchor.x = 0.5;
     this.anchor.y = 1;
-    this.opacity = EnemyNameVisible === 0 ? 255 : 0;
+    this._startVisible = true;
+    this.opacity = this.getBattlerNameVisible() === 0 ? 255 : 0;
 };
 
-Sprite_ButlerName.prototype.fontSize = function() {
-    return $gameSystem.mainFontSize() + Name_FontSize;
+Sprite_BattlerName.prototype.setup = function(battler) {
+    Sprite_Name.prototype.setup.call(this, battler);
+    this.opacity = this.getBattlerNameVisible() === 0 ? 255 : 0;
 };
 
-Sprite_ButlerName.prototype.redraw = function() {
-  const name = this.name();
-  const width = this.bitmapWidth();
-  const height = this.bitmapHeight();
-  this.setupFont();
-  this.bitmap.clear();
-  this.bitmap.drawText(name, 0, 0, width, height, "center");
+Sprite_BattlerName.prototype.fontSize = function() {
+    return $gameSystem.mainFontSize() + ActorName_FontSize;
 };
 
-Sprite_ButlerName.prototype.butlerNameVisible = function() {
-    const _visible = this.butlerNameVisibleInSelect();
+Sprite_BattlerName.prototype.redraw = function() {
+    const name = this.name();
+    const width = this.bitmapWidth();
+    const height = this.bitmapHeight();
+    this.setupFont();
+    this.bitmap.clear();
+    this.bitmap.drawText(name, 0, 0, width, height, "center");
+};
+
+Sprite_BattlerName.prototype.battlerNameVisible = function() {
+    const _visible = this.battlerNameVisibleInSelect();
     if (_visible && this.opacity < 255) {
         this.opacity += 25;
         this.opacity = this.opacity.clamp(0, 255);
@@ -242,22 +386,45 @@ Sprite_ButlerName.prototype.butlerNameVisible = function() {
     }
 };
 
-Sprite_ButlerName.prototype.butlerNameVisibleInSelect = function() {
-  if (EnemyNameVisible === 1) {
-    return this._battler.isSelected();
-  }
-  return true;
+Sprite_BattlerName.prototype.battlerNameVisibleInSelect = function() {
+    if (this.getBattlerNameVisible() === 1) {
+      return this._battler.isSelected();
+    }
+    return true;
+};
+  
+Sprite_BattlerName.prototype.update = function() {
+    Sprite.prototype.update.call(this);
+    this.battlerNameVisible();
 };
 
-Sprite_ButlerName.prototype.update = function() {
-  Sprite.prototype.update.call(this);
-  this.butlerNameVisible();
+Sprite_BattlerName.prototype.getBattlerNameVisible = function() {
+    return ActorNameVisible;
+};
+
+function Sprite_EnemyName() {
+  this.initialize(...arguments);
+}
+
+Sprite_EnemyName.prototype = Object.create(Sprite_BattlerName.prototype);
+Sprite_EnemyName.prototype.constructor = Sprite_EnemyName;
+
+Sprite_EnemyName.prototype.initialize = function() {
+    Sprite_BattlerName.prototype.initialize.call(this);
+};
+
+Sprite_EnemyName.prototype.fontSize = function() {
+    return $gameSystem.mainFontSize() + Name_FontSize;
+};
+
+Sprite_EnemyName.prototype.getBattlerNameVisible = function() {
+    return EnemyNameVisible;
 };
 
 
-const _Spriteset_Battle_updateButlerOverlay = Spriteset_Battle.prototype.updateButlerOverlay;
-Spriteset_Battle.prototype.updateButlerOverlay = function() {
-  _Spriteset_Battle_updateButlerOverlay.call(this);
+const _Spriteset_Battle_updateBattlerOverlay = Spriteset_Battle.prototype.updateBattlerOverlay;
+Spriteset_Battle.prototype.updateBattlerOverlay = function() {
+  _Spriteset_Battle_updateBattlerOverlay.call(this);
   if ($gameTemp.enemyNameRefresh) {
     this.setEnemyNamePosition();
     $gameTemp.enemyNameRefresh = false;
@@ -278,21 +445,21 @@ Spriteset_Battle.prototype.setEnemyNamePosition = function() {
 const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
 Game_Enemy.prototype.initMembers = function() {
   _Game_Enemy_initMembers.call(this);
-  this._butlerNamePositionX = 0;
-  this._butlerNamePositionY = 0;
+  this._battlerNamePositionX = 0;
+  this._battlerNamePositionY = 0;
 };
 
 Game_Enemy.prototype.setEnemyNamePosition = function(x, y) {
-  this._butlerNamePositionX = x;
-  this._butlerNamePositionY = y;
+  this._battlerNamePositionX = x;
+  this._battlerNamePositionY = y;
 };
 
 Game_Enemy.prototype.getNamePositionX = function() {
-  return this._butlerNamePositionX;
+  return this._battlerNamePositionX;
 };
 
 Game_Enemy.prototype.getNamePositionY = function() {
-  return this._butlerNamePositionY;
+  return this._battlerNamePositionY;
 };
 
 })();

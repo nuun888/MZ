@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サイドビューアクターステートアイコン
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/2 Ver.1.0.1
+ * 処理の修正。
  * 2022/5/10 Ver.1.0.0
  * 初版
  * 
@@ -103,23 +105,19 @@ Sprite_Actor.prototype.updateStateSprite = function() {
       const x = (actor.meta.ActorStateX ? Number(actor.meta.ActorStateX) : 0) + State_X;
       const y = (actor.meta.ActorStateY ? Number(actor.meta.ActorStateY) : 0) + State_Y;
       this._stateIconSprite.x = x;
-      this._stateIconSprite.y = y - this.getButlerStatePosition() - 20;
+      this._stateIconSprite.y = y - this.getBattlerStatePosition() - 20;
     }
 };
 
-Sprite_Actor.prototype.getButlerStatePosition = function() {
+Sprite_Actor.prototype.getBattlerStatePosition = function() {
     const scale = this.battlerOverlay.battlerSpriteScale_y;
     if (ActorStatePosition === 'up') {
-      return this.getSVButlerHeight() * scale;
+      return this.getSVBattlerHeight() * scale;
     } else if (ActorStatePosition === 'middle') {
-      return Math.floor((this.getSVButlerHeight() * scale) / 2);
+      return Math.floor((this.getSVBattlerHeight() * scale) / 2);
     } else {
       return 0;
     }
-};
-
-Sprite_Actor.prototype.getSVButlerHeight = function() {
-    return Math.floor((this._mainSprite.bitmap.height / 6) * 0.9);
 };
 
 Sprite_Actor.prototype.createStateIconSprite = function() {

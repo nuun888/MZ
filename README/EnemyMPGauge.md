@@ -1,5 +1,5 @@
 # [バトラーMPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerMPGauge.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerMPGauge.js)  
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
@@ -68,6 +68,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にMPゲージを表示します。  
 
 ## 更新履歴
+2023/6/2 Ver.1.2.1  
+不具合の修正。  
 2023/6/2 Ver.1.2.0  
 SVアクターにゲージを表示する機能を追加。  
 敵キャラ毎にHPゲージの横幅、縦幅を指定できる機能を追加。  

@@ -1,5 +1,5 @@
 # [バトラーTPBゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js)
-# Ver.1.5.0
+# Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js)  
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
@@ -24,6 +24,8 @@
 [y]：Y座標
 
 ## 更新履歴
+2023/6/2 Ver.1.5.1  
+処理の修正。  
 2023/5/28 Ver.1.5.0  
 TPBゲージをアクターにも表示できるように対応。  
 2022/5/14 Ver.1.4.0  

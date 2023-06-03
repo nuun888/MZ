@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.1
  * 
  * @help
  * Only item names and skill names are displayed in the battle log.
@@ -20,7 +20,7 @@
  * 
  * Log display position battler setting is set only when "Log display position" is specified as battler (log window only).
  * 
- * When "Log display position" is set to Battler (log window only), you can specify the position to display the log for each enemy monster.
+ * "Log display position" butler (log window only)
  * Enemy notes
  * <BattleLogPosition:[x],[y]>
  * [x]:X-coordinate
@@ -31,6 +31,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/3/2023 Ver.1.1.1
+ * Correction of processing.
+ * 5/9/2023 Ver.1.1.0
+ * Added a function to display a message when using.
  * 5/5/2023 Ver.1.0.0
  * First edition.
  * 
@@ -47,6 +51,16 @@
  * @option Log window
  * @value 1
  * @default 1
+ * 
+ * @param LogMessageMode
+ * @text Log display format
+ * @desc Specifies the log display format.
+ * @type select
+ * @option Skill, Item name only
+ * @value 0
+ * @option Message when using
+ * @value 1
+ * @default 0
  * 
  * @param LogWindowPositionMode
  * @desc Specify the display position of the log.
@@ -156,7 +170,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.1
  * 
  * @help
  * バトルログをアイテム名、スキル名のみ表示させるようにします。
@@ -164,7 +178,7 @@
  * 
  * ログ表示位置バトラー設定はログ表示位置をバトラー(ログウィンドウのみ)指定時のみ設定します。
  * 
- * ログ表示位置をバトラー(ログウィンドウのみ)に設定したときに、敵キャラのモンスター毎にログを表示する位置を指定できます。
+ * ログ表示位置をバトラー(ログウィンドウのみ)
  * 敵のメモ欄
  * <BattleLogPosition:[x],[y]>
  * [x]:X座標
@@ -175,6 +189,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/3 Ver 1.1.1
+ * 処理の修正。
+ * 2023/5/9 Ver 1.1.0
+ * 使用時のメッセージを表示させる機能を追加。
  * 2023/5/5 Ver 1.0.0
  * 初版
  * 
@@ -191,6 +209,16 @@
  * @option ログウィンドウ
  * @value 1
  * @default 1
+ * 
+ * @param LogMessageMode
+ * @text ログ表示形式
+ * @desc ログの表示形式を指定します。
+ * @type select
+ * @option スキル、アイテム名のみ
+ * @value 0
+ * @option 使用時のメッセージ
+ * @value 1
+ * @default 0
  * 
  * @param LogWindowPositionMode
  * @desc ログの表示位置を指定します。
@@ -336,6 +364,7 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
     const parameters = PluginManager.parameters('NUUN_BattleLogSimpleDisplayPopupBatch');
     const LogWindowMode = Number(parameters['LogWindowMode'] || 1);
     const LogWindowPositionMode = Number(parameters['LogWindowPositionMode'] || 0);
+    const LogMessageMode = Number(parameters['LogMessageMode'] || 0);
     const WindowWidth = Number(parameters['WindowWidth'] || 0);
     const WindowX = Number(parameters['WindowX'] || 0);
     const WindowY = Number(parameters['WindowY'] || 0);
@@ -372,7 +401,8 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
     //Scene
     const _Scene_Base_createWindowLayer = Scene_Base.prototype.createWindowLayer;
     Scene_Base.prototype.createWindowLayer = function() {
-        if (!!BackGroundImg && LogWindowMode === 1) {
+        const className = String(this.constructor.name);
+        if (className === "Scene_Battle" && !!BackGroundImg && LogWindowMode === 1) {
             this.setBattleLogWindowBackground();
         }
         _Scene_Base_createWindowLayer.call(this);
@@ -410,7 +440,7 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
 
     Scene_Battle.prototype.battleLogWindowRect = function() {
         const ww = WindowWidth > 0 ? WindowWidth : Graphics.boxWidth;
-        const wh = this.calcWindowHeight(1, true);
+        const wh = this.calcWindowHeight((LogMessageMode === 0 ? 1 : 2), true);
         const wx = WindowX + LogWindowPosition(ww);
         const wy = WindowY;
         return new Rectangle(wx, wy, ww, wh);
@@ -431,6 +461,7 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
         }
         this._item = null;
         this._duration = 0;
+        this._battleLogMessage = [];
     };
 
     Window_NUUN_BattleLog.prototype.update = function() {
@@ -452,8 +483,20 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
     };
 
     Window_NUUN_BattleLog.prototype.drawItem = function() {
-        const rect = this.itemLineRect(0);
-        this.drawItemName(this._item, rect.x, rect.y, rect.width);
+        if (LogMessageMode === 0) {
+            const rect = this.itemLineRect(0);
+            this.drawItemName(this._item, rect.x, rect.y, rect.width);
+        } else {
+            this.drawBattleLogMessage();
+        }
+    };
+
+    Window_NUUN_BattleLog.prototype.drawBattleLogMessage = function() {
+        this._battleLogMessage.forEach((message, i) =>{
+            this.height = this.fittingHeight(this._battleLogMessage.length);
+            const rect = this.itemLineRect(i);
+            this.drawTextEx(this._battleLogMessage[i], rect.x, rect.y, rect.width);
+        })
     };
 
     Window_NUUN_BattleLog.prototype.drawItemName = function(item, x, y, width) {
@@ -468,8 +511,9 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
         }
     };
 
-    Window_NUUN_BattleLog.prototype.setItem = function(item, battler) {
+    Window_NUUN_BattleLog.prototype.setItem = function(item, battler, battleLogMessage) {
         this._item = item;
+        this._battleLogMessage = battleLogMessage;
         if (LogWindowPositionMode === 2 && !!battler) {
             const data = getBattlerPosition(battler._battler);
             const w = (Graphics.width - Graphics.boxWidth) / 2;
@@ -509,8 +553,20 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
     };
     
 
+    const _Window_BattleLog_initialize = Window_BattleLog.prototype.initialize;
+    Window_BattleLog.prototype.initialize = function(rect) {
+        this._battleLogMessage = [];
+        _Window_BattleLog_initialize.call(this, rect);
+    };
+
     Window_BattleLog.prototype.messageSpeed = function() {//再定義
         return 0;
+    };
+
+    const _Window_BattleLog_clear = Window_BattleLog.prototype.clear;
+    Window_BattleLog.prototype.clear = function() {
+        this._battleLogMessage = [];
+        _Window_BattleLog_clear.call(this);
     };
 
     Window_BattleLog.prototype.setBattleLogWindow = function(battleLogWindow) {
@@ -520,8 +576,11 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
     const _Window_BattleLog_callNextMethod = Window_BattleLog.prototype.callNextMethod;
     Window_BattleLog.prototype.callNextMethod = function() {
         while (this._methods.length > 0) {
+            if (this.updateWait()) {
+                break;
+            }
             _Window_BattleLog_callNextMethod.call(this);
-            this.coercionPopup(this._methods[0]);       
+            this.coercionPopup(this._methods[0]);
         }
     };
 
@@ -552,8 +611,14 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
         if (LogWindowMode === 0) {
             this.drawBackground();
             this.contents.clear();
-            if (this._lines.length > 0 && this._battleLogItem) {
-                this.drawLineText(0);
+            if (LogMessageMode === 0) {
+                if (this._lines.length > 0 && this._battleLogItem) {
+                    this.drawLineText(0)
+                }
+            } else {
+                if (this._lines.length > 0 && this._battleLogMessage) {
+                    this._battleLogMessage.forEach((message, i) => this.drawLineText(i))
+                }
             }
         } else {
             this.contents.clear();
@@ -563,15 +628,26 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
     Window_BattleLog.prototype.drawLineText = function(index) {//再定義
         const rect = this.lineRect(index);
         const width = WindowWidth > 0 ? WindowWidth : rect.width;
-        const x = WindowX + LogWindowPosition(width);
-        this.contents.clearRect(x, WindowY, width, rect.height);
-        Window_NUUN_BattleLog.prototype.drawItemName.call(this, this._battleLogItem, x, WindowY, width);
+        const x = WindowX + LogWindowPosition(width) + rect.x;
+        this.contents.clearRect(x, WindowY + rect.y, width, rect.height);
+        if (LogMessageMode === 0) {
+            Window_NUUN_BattleLog.prototype.drawItemName.call(this, this._battleLogItem, x, WindowY, width);
+        } else {
+            if (this._battleLogMessage[index]) {
+                this.drawTextEx(this._battleLogMessage[index], rect.x, rect.y, rect.width);
+            }
+        }
     };
 
     Window_BattleLog.prototype.backRect = function() {//再定義
-        const height = Math.min(this.numLines(), 1) * this.itemHeight();
+        const height = this.numLines() * this.itemHeight();
         const width = WindowWidth > 0 ? WindowWidth : this.innerWidth;
         return new Rectangle(WindowX + LogWindowPosition(width), WindowY, width, height);
+    };
+
+    const _Window_BattleLog_numLines = Window_BattleLog.prototype.numLines;
+    Window_BattleLog.prototype.numLines = function() {
+        return LogMessageMode === 0 ? Math.min(_Window_BattleLog_numLines.call(this), 1) : this._battleLogMessage.length;
     };
 
     const _Window_BattleLog_displayActionResults = Window_BattleLog.prototype.displayActionResults;
@@ -601,7 +677,8 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
 
     const _Window_BattleLog_displayAction = Window_BattleLog.prototype.displayAction;
     Window_BattleLog.prototype.displayAction = function(subject, item) {
-        _Window_BattleLog_displayAction.call(this, subject, item)
+        this.push("setBattleLogMessage", subject, item);
+        _Window_BattleLog_displayAction.call(this, subject, item);
         this.push("addTextBattleLog", item);
     };
 
@@ -613,9 +690,26 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
         _Window_BattleLog_displayDamage.call(this, target);
     };
 
+    Window_BattleLog.prototype.setBattleLogMessage = function(subject, item) {
+        this._battleLogMessage = [];
+        if (DataManager.isSkill(item)) {
+            this.addBattleLogMessage(item.message1, subject, item);
+            this.addBattleLogMessage(item.message2, subject, item);
+        } else {
+            this.addBattleLogMessage(TextManager.useItem, subject, item);
+        }
+    };
+
+    Window_BattleLog.prototype.addBattleLogMessage = function(fmt, subject, item) {
+        if (fmt) {
+            const message = fmt.format(subject.name(), item.name);
+            this._battleLogMessage.push(message);
+        }
+    };
+
     Window_BattleLog.prototype.showBattleLogWindow = function(item, battler) {
         if (!!item && !item.meta.NoBattleLog) {
-            this._battleLogWindow.setItem(item, battler);
+            this._battleLogWindow.setItem(item, battler, this._battleLogMessage);
             this._battleLogWindow.battleLogWindowShow();
         }
     };

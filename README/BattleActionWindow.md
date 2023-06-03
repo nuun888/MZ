@@ -1,6 +1,6 @@
-# [バトルログ簡易表示及び一括ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleActionWindow.js)
+# [バトルログ簡易表示及び一括ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleLogSimpleDisplayPopupBatch.js)
 # Ver.1.1.1
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleActionWindow.js)  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleLogSimpleDisplayPopupBatch.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 

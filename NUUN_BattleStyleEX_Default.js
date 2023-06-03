@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.10.5
+ * @version 1.10.6
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -84,6 +84,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/6/3 Ver.1.10.6
+ * バトルウィンドウの表示方式(旧処理または新処理)を指定できる機能を追加。
  * 2023/5/22 Ver.1.10.5
  * 条件アクター画像にクリティカルダメージ時の設定を追加。
  * 2023/5/7 Ver.1.10.4
@@ -1801,6 +1803,21 @@
  * @desc ボス消滅エフェクト時の振動の設定を行います。振動フレーム数は入力しません。
  * @parent GamePadSetting
  * 
+ * @param SpecialSetting
+ * @text 特殊設定
+ * @default ////////////////////////////////
+ * 
+ * @param WindowDisplayMode
+ * @text ウィンドウ表示モード
+ * @desc ウィンドウの表示モードを指定します。
+ * @type select
+ * @option Sprite
+ * @value 'Sprite'
+ * @option Scene_Battle
+ * @value 'Scene_Battle'
+ * @default 'Sprite'
+ * @parent SpecialSetting
+ * 
  * @param SupportActorCommand
  * @text サポートアクター設定
  * @default ////////////////////////////////
@@ -2923,6 +2940,8 @@ params.BossCollapseVibrationSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_
 
 params.SupportActorCommand_X = Number(parameters['ESupportActorCommand_X'] || 0);
 params.SupportActorCommand_Y = Number(parameters['SupportActorCommand_Y'] || 0);
+
+params.WindowDisplayMode = eval(parameters['WindowDisplayMode']) || 'Sprite';
 
 NuunManager.getBattleStyleParams = function() {
     return params;

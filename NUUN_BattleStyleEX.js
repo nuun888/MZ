@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.12
+ * @version 3.10.13
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/6/3 Ver.3.10.13
+ * バトルウィンドウの表示形式をVer.3.10.6以前の方式とVer.3.10.7以降の方式を選択できる機能を追加。
  * 2023/5/27 Ver.3.10.12
  * ヘルプウィンドウスキンが非表示にならない問題を修正。
  * 2023/5/24 Ver.3.10.11
@@ -947,7 +949,9 @@ Scene_Battle.prototype.updateStatusWindowVisibility = function() {
 const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
 Scene_Battle.prototype.createSpriteset = function() {
   _Scene_Battle_createSpriteset.call(this);
-  
+  if (params.WindowDisplayMode === 'Scene_Battle') {
+    this.addChild(this._spriteset._battleHudBase);
+  }
 };
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;

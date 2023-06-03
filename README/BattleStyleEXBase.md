@@ -1,24 +1,24 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.10.12
+### Ver.3.10.13
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
-[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.5  
-[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.10.5  
-[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.5  
-[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.5  
+[バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.6  
+[バトルスタイル拡張スタンダード設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Standard.js)Ver.1.10.6  
+[バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.6  
+[バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.6  
 
-バトルスタイル拡張デフォルト設定用 Ver.1.10.5  
+バトルスタイル拡張デフォルト設定用 Ver.1.10.6  
 ![画像](img/BattleStyleEX1.png)  
 
-バトルスタイル拡張スタンダード設定用 Ver.1.10.5 
+バトルスタイル拡張スタンダード設定用 Ver.1.10.6 
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.10.5  
+バトルスタイル拡張XPスタイル設定用 Ver.1.10.6  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.3.5  
+バトルスタイル拡張タイプ4設定用 Ver.1.3.6  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 
@@ -194,11 +194,18 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステータス設定での設定に変更しております。  
 旧設定で設定している場合でアクター座標、画像設定で追加する場合は、表示ステータス設定を空欄にしてください。  
 
+### ウィンドウ表示モード
+フロントビューアニメーションでアクターへの一部のアニメーションの表示がおかしくなる場合は'Sprite'を指定してください。  
+問題ない場合、サイドビュー戦闘の場合は'Scene_Battle'に指定しても問題ありません。  
+LL_StandingPictureBattleと併用する場合は、'Scene_Battle'に設定することでアクターが背後に表示されますが、フロントビューアニメーションでアクターへの一部のアニメーションの表示が正常に表示されません。  
+
 ## 仕様
 メニュー型のステート表示、画像、アクター名の表示幅は表示ステータス設定でのみ設定できます。  
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/6/3 Ver.3.10.13  
+バトルウィンドウの表示形式をVer.3.10.6以前の方式とVer.3.10.7以降の方式を選択できる機能を追加。  
 2023/5/27 Ver.3.10.12  
 ヘルプウィンドウスキンが非表示にならない問題を修正。  
 2023/5/24 Ver.3.10.11  

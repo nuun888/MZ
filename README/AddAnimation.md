@@ -18,7 +18,7 @@
 `[WaitFrame]`;遅延フレーム数 -1と記入した場合は、アニメーションが再生し終わるまで待ちます。  
 `[Number]`:識別ID(整数) 最初のタグは数字を省略します。２番目以降は2と記入します。  
 
-例
+例  
 `<AddAnimation:13>`  
 `<AddAnimation2:14>`  
 `<AddAnimationWaitFrame:30>`  

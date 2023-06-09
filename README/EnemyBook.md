@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.19.0
+# Ver.2.19.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -277,6 +277,10 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2023/6/9 Ver.2.19.1  
+耐性デバフを表示させるとエラーが出る問題を修正。  
+ステート(アイコン)耐性、無効、弱点にデバフを表示させる機能を追加。  
+表示項目に無効デバフを追加。  
 2023/6/2 Ver.2.19.0  
 図鑑カテゴリーに現在のマップを追加。  
 2023/4/8 Ver.2.18.6  

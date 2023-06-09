@@ -1687,7 +1687,7 @@
  * 
  * @param NormalWeakDebuff
  * @desc Effective debuffs are reflected from 100% or more effectiveness. If it is OFF, it will be 101% or more.
- * @text Effective attribute effectiveness 100% applied
+ * @text Easy-to-effect debuff effectiveness 100% applied
  * @type boolean
  * @default false
  * @parent ResistWeakDebuffData
@@ -4706,7 +4706,7 @@
  * 
  * @param NormalWeakDebuff
  * @desc 効きやすいデバフ対象を有効度100%以上から反映させるか。OFFの場合は101%以上になります。
- * @text 効きやすい属性有効度100%適用
+ * @text 効きやすいデバフ有効度100%適用
  * @type boolean
  * @default false
  * @parent ResistWeakDebuffData

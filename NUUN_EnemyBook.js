@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.0
+ * @version 2.19.1
  * 
  * @help
  * Implement an enemy book.
@@ -227,6 +227,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/9/2023 Ver.2.19.1
+ * Fixed an issue that caused an error when showing resistance debuffs.
+ * Added ability to display debuffs on state (icon) resistance, invalidity, and weakness.
+ * Added invalid debuffs to display items.
  * 6/2/2023 Ver.2.19.0
  * Added the current map to the picture book category.
  * 4/8/2023 Ver.2.18.6
@@ -1553,6 +1557,13 @@
 * @type boolean
 * @default true
 * @parent ResistWeakStateIcon
+ * 
+ * @param ResistDebuffInState
+ * @desc Applies debuff resistance to state resistance and immunity. The display debuff is set with "DeBuffList".
+ * @text Resistance null debuff applied
+ * @type boolean
+ * @default false
+ * @parent ResistWeakStateIcon
 * 
 * @param ResistWeakStateValue
 * @text Resistance state (resistance numerical display) setting
@@ -1673,6 +1684,20 @@
 * @type struct<DebuffData>[]
 * @default ["{\"ParamId\":\"0\",\"DebuffIconId\":\"48\"}","{\"ParamId\":\"1\",\"DebuffIconId\":\"49\"}","{\"ParamId\":\"2\",\"DebuffIconId\":\"50\"}","{\"ParamId\":\"3\",\"DebuffIconId\":\"51\"}","{\"ParamId\":\"4\",\"DebuffIconId\":\"52\"}","{\"ParamId\":\"5\",\"DebuffIconId\":\"53\"}","{\"ParamId\":\"6\",\"DebuffIconId\":\"54\"}","{\"ParamId\":\"7\",\"DebuffIconId\":\"55\"}"]
 * @parent ResistWeakDebuffData
+ * 
+ * @param NormalWeakDebuff
+ * @desc Effective debuffs are reflected from 100% or more effectiveness. If it is OFF, it will be 101% or more.
+ * @text Effective attribute effectiveness 100% applied
+ * @type boolean
+ * @default false
+ * @parent ResistWeakDebuffData
+ * 
+ * @param ResistNoEffectDebuff
+ * @desc Invalidity is reflected in debuffs that are difficult to work. When OFF, resistance 0% is displayed in the resistance debuff.
+ * @text Invalid reflection on debuffs that are difficult to work
+ * @type boolean
+ * @default true
+ * @parent ResistWeakDebuffData
 * 
 * @param DeBuffUnknownIconId
 * @desc Specifies the ID of the debuff icon to be displayed when status information is not registered.
@@ -2902,7 +2927,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.0
+ * @version 2.19.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3121,6 +3146,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/9 Ver.2.19.1
+ * 耐性デバフを表示させるとエラーが出る問題を修正。
+ * ステート(アイコン)耐性、無効、弱点にデバフを表示させる機能を追加。
+ * 表示項目に無効デバフを追加。
  * 2023/6/2 Ver.2.19.0
  * 図鑑カテゴリーに現在のマップを追加。
  * 2023/4/8 Ver.2.18.6
@@ -4548,6 +4577,13 @@
  * @default true
  * @parent ResistWeakStateIcon
  * 
+ * @param ResistDebuffInState
+ * @desc ステートの耐性及び無効にデバフの耐性を適用させます。表示デバフは表示デバフで設定します。
+ * @text 耐性無効デバフ適用
+ * @type boolean
+ * @default false
+ * @parent ResistWeakStateIcon
+ * 
  * @param ResistWeakStateValue
  * @text 耐性ステート（耐性数値表示）設定
  * @default ------------------------------
@@ -4666,6 +4702,20 @@
  * @text 表示デバフ
  * @type struct<DebuffData>[]
  * @default ["{\"ParamId\":\"0\",\"DebuffIconId\":\"48\"}","{\"ParamId\":\"1\",\"DebuffIconId\":\"49\"}","{\"ParamId\":\"2\",\"DebuffIconId\":\"50\"}","{\"ParamId\":\"3\",\"DebuffIconId\":\"51\"}","{\"ParamId\":\"4\",\"DebuffIconId\":\"52\"}","{\"ParamId\":\"5\",\"DebuffIconId\":\"53\"}","{\"ParamId\":\"6\",\"DebuffIconId\":\"54\"}","{\"ParamId\":\"7\",\"DebuffIconId\":\"55\"}"]
+ * @parent ResistWeakDebuffData
+ * 
+ * @param NormalWeakDebuff
+ * @desc 効きやすいデバフ対象を有効度100%以上から反映させるか。OFFの場合は101%以上になります。
+ * @text 効きやすい属性有効度100%適用
+ * @type boolean
+ * @default false
+ * @parent ResistWeakDebuffData
+ * 
+ * @param ResistNoEffectDebuff
+ * @desc 効きにくいデバフに無効を反映させるか。OFFにした場合耐性0%のデバフが耐性デバフに表示されます。
+ * @text 効きにくいデバフに無効反映
+ * @type boolean
+ * @default true
  * @parent ResistWeakDebuffData
  * 
  * @param DeBuffUnknownIconId
@@ -5225,6 +5275,8 @@
  * @value 50
  * @option 弱点デバフ（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 51
+ * @option 無効デバフ（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
+ * @value 52
  * @option ドロップアイテム(1)～(15)(20)(21)
  * @value 60
  * @option スティールアイテム(1)～(15)(20)(21)
@@ -6032,9 +6084,12 @@ const StateRadarChartX = Number(parameters['StateRadarChartX'] || 48);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 48);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);
 const RadarChartIcon = eval(parameters['RadarChartIcon'] || 'false');
+const ResistDebuffInState = eval(parameters['ResistDebuffInState'] || 'false');
 
 const DeBuffList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DeBuffList'])) : [];
 const DeBuffUnknownIconId = Number(parameters['DeBuffUnknownIconId'] || 1);
+const NormalWeakDebuff = eval(parameters['NormalWeakDebuff'] || 'false');
+const ResistNoEffectDebuff = eval(parameters['ResistNoEffectDebuff'] || 'true');
 const ShowDebuffIcon = eval(parameters['ShowDebuffIcon'] || 'false');
 
 const DefaultBackGroundImg = String(parameters['DefaultBackGroundImg']);
@@ -9239,6 +9294,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
             this.drawResistDebuff(list, enemy, x, y, width);
             break;
         case 52:
+            this.drawNoEffectDebuff(list, enemy, x, y, width);
+            break;
+        case 55:
             this.drawResistValueDebuff(list, enemy, x, y, width);
             break;
         case 60:
@@ -10200,6 +10258,20 @@ Window_EnemyBook.prototype.drawResistStates = function(list, enemy, x, y, width)
             }
         }
     });
+    if (ResistDebuffInState) {
+        DeBuffList.forEach(buff => {
+            let icon = 0;
+            let rate = enemy.debuffRate(buff.ParamId);
+            if (rate < 1 && (ResistNoEffectState || (!ResistNoEffectState && rate > 0))) {
+                if (Unknown || (DeBuffUnknownIconId > 0 && !this.onDebuffFlag(buff.ParamId))) {
+                    icon = DeBuffUnknownIconId;
+                } else {
+                    icon = this.onDebuffFlag(buff.ParamId) ? buff.DebuffIconId : 0;
+                }
+                if (icon && icon > 0) icons.push(icon);
+            }
+        });
+    }
     let x2 = this.iconX(icons, width);
     icons.forEach(icon => {
           this.drawIcon(icon, x, y);
@@ -10245,6 +10317,20 @@ Window_EnemyBook.prototype.drawWeakStates = function(list, enemy, x, y, width) {
             }
         }
     });
+    if (ResistDebuffInState) {
+        DeBuffList.forEach(buff => {
+            let icon = 0;
+            let rate = enemy.debuffRate(buff.ParamId);
+            if ((!NormalWeakState && rate > 1) || (NormalWeakState && rate >= 1)) {
+                if (Unknown || (DeBuffUnknownIconId > 0 && !this.onDebuffFlag(buff.ParamId))) {
+                    icon = DeBuffUnknownIconId;
+                } else {
+                    icon = this.onDebuffFlag(buff.ParamId) ? buff.DebuffIconId : 0;
+                }
+                if (icon && icon > 0) icons.push(icon);
+            }
+        });
+    }
     let x2 = this.iconX(icons, width);
     icons.forEach(icon => {
           this.drawIcon(icon, x, y);
@@ -10290,6 +10376,20 @@ Window_EnemyBook.prototype.drawNoEffectStates = function(list, enemy, x, y, widt
             }
         }
     });
+    if (ResistDebuffInState) {
+        DeBuffList.forEach(buff => {
+            let icon = 0;
+            let rate = enemy.debuffRate(buff.ParamId);
+            if (rate <= 0) {
+                if (Unknown || (DeBuffUnknownIconId > 0 && !this.onDebuffFlag(buff.ParamId))) {
+                    icon = DeBuffUnknownIconId;
+                } else {
+                    icon = this.onDebuffFlag(buff.ParamId) ? buff.DebuffIconId : 0;
+                }
+                if (icon && icon > 0) icons.push(icon);
+            }
+        });
+    }
     let x2 = this.iconX(icons, width);
     icons.forEach(icon => {
           this.drawIcon(icon, x, y);
@@ -10322,7 +10422,7 @@ Window_EnemyBook.prototype.drawWeakDebuff = function(list, enemy, x, y, width) {
     DeBuffList.forEach(buff => {
         let icon = 0;
         let rate = enemy.debuffRate(buff.ParamId);
-        if (rate > 1) {
+        if ((!NormalWeakDebuff && rate > 1) || (NormalWeakDebuff && rate >= 1)) {
             if (Unknown || (DeBuffUnknownIconId > 0 && !this.onDebuffFlag(buff.ParamId))) {
                 icon = DeBuffUnknownIconId;
             } else {
@@ -10363,11 +10463,52 @@ Window_EnemyBook.prototype.drawResistDebuff = function(list, enemy, x, y, width)
     DeBuffList.forEach(buff => {
         let icon = 0;
         let rate = enemy.debuffRate(buff.ParamId);
-        if (rate < 1) {
+        if (rate < 1 && (ResistNoEffectDebuff || (!ResistNoEffectDebuff && rate > 0))) {
             if (Unknown || (DeBuffUnknownIconId > 0 && !this.onDebuffFlag(buff.ParamId))) {
                 icon = DeBuffUnknownIconId;
             } else {
-                icon = this.onDebuffFlag(bufff.ParamId) ? buff.DebuffIconId : 0;
+                icon = this.onDebuffFlag(buff.ParamId) ? buff.DebuffIconId : 0;
+            }
+            if (icon && icon > 0) icons.push(icon);
+        }
+    });
+    let x2 = this.iconX(icons, width);
+    icons.forEach(icon => {
+          this.drawIcon(icon, x, y);
+          x += x2;
+    });
+};
+
+Window_EnemyBook.prototype.drawNoEffectDebuff = function(list, enemy, x, y, width) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    const lineHeight = this.lineHeight();
+    const nameText = list.paramName ? list.paramName : (this.language_Jp ? "無効デバフ" : 'NoEffect Debuff');
+    let Unknown = false;
+    if (nameText) {
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
+        y += lineHeight;
+    }
+    if(!this.resistWeakDataMask(list.MaskMode)){
+        if (DeBuffUnknownIconId === 0) {
+          return;
+        }
+        Unknown = true;
+    }
+    let icons = [];
+    DeBuffList.forEach(buff => {
+        let icon = 0;
+        let rate = enemy.debuffRate(buff.ParamId);
+        if (rate <= 0) {
+            if (Unknown || (DeBuffUnknownIconId > 0 && !this.onDebuffFlag(buff.ParamId))) {
+                icon = DeBuffUnknownIconId;
+            } else {
+                icon = this.onDebuffFlag(buff.ParamId) ? buff.DebuffIconId : 0;
             }
             if (icon && icon > 0) icons.push(icon);
         }

@@ -46,7 +46,7 @@
  * First edition.
  * 
  */
-/*:
+/*:ja
  * @target MZ
  * @plugindesc 追加アニメーション表示
  * @author NUUN

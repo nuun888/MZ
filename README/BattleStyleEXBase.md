@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.10.13
+### Ver.3.10.14
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.6  
@@ -204,6 +204,8 @@ LL_StandingPictureBattle等と併用する場合は、'Scene_Battle'に設定す
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/6/14 Ver.3.10.14  
+スキル発動待機時間ゲージ表示プラグインとの競合対応。  
 2023/6/3 Ver.3.10.13  
 バトルウィンドウの表示形式をVer.3.10.6以前の方式とVer.3.10.7以降の方式を選択できる機能を追加。  
 2023/5/27 Ver.3.10.12  

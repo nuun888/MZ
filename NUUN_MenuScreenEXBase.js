@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.19
+ * @version 2.0.20
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/14/2023 Ver.2.0.20
+ * Fixed face graphics processing.
  * 6/2/2023 Ver.2.0.19
  * Fixed an issue that caused an error when displaying nickname.
  * 5/22/2023 Ver.2.0.18
@@ -77,7 +79,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.19
+ * @version 2.0.20
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -87,6 +89,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/14 Ver.2.0.20
+ * 顔グラの処理を修正。
  * 2023/6/2 Ver.2.0.19
  * 二つ名を表示したときにエラーが出る問題を修正。
  * 2023/5/22 Ver.2.0.18
@@ -431,11 +435,11 @@ Imported.NUUN_MenuScreenEXBase = true;
             let data = null;
             if (this.isActorPictureEXApp()) {
                 actor.resetImgId();
-                data = this.battlreActorPicture(actor.actorId());
+                data = this.battlreActorPicture(actor);
                 actor.loadActorFace();
                 actor.loadActorGraphic();
             } else {
-                data = this.getActorImgData(actor.actorId());
+                data = this.getActorImgData(actor);
                 ImageManager.loadFace(data.FaceImg);
                 ImageManager.nuun_LoadPictures(data.ActorImg);
             }
@@ -525,7 +529,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             } else if (this.isActorPictureEXApp()) {
                 bitmap = data.GraphicMode === 'face' ? actor.loadActorFace() : actor.loadActorGraphic();
             } else {
-                bitmap = data.GraphicMode === 'face' ? ImageManager.nuun_LoadPictures(data.FaceImg) : ImageManager.nuun_LoadPictures(data.ActorImg);
+                bitmap = data.GraphicMode === 'face' ? ImageManager.loadFace(data.FaceImg) : ImageManager.nuun_LoadPictures(data.ActorImg);
             }
         }
         if (bitmap) {
@@ -569,22 +573,46 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.contents.blt(bitmap, 0, 0, width, height, x, y);
     };
 
-    Window_MenuStatus.prototype.getActorImgData = function(actorId) {
+    Window_MenuStatus.prototype.getActorImgData = function(actor) {
         const actors = params.ActorsImgList;
-        const find = actors.find(actor => actor.actorId === actorId);
+        const find = actors.find(a => a.actorId === actor.actorId());
         if (!find) {
-        return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: params.GraphicMode, FaceIndex : -1};
+        return {
+            Actor_X: 0, 
+            Actor_Y: 0, 
+            Img_SX: 0, 
+            Img_SY: 0, 
+            Actor_Scale: 100, 
+            ActorBackImg: null,
+            ActorFrontImg: null, 
+            GraphicMode: params.GraphicMode, 
+            FaceIndex : -1,
+            ActorImg: null,
+            FaceImg: actor.faceName()
+        };
         } if (find.GraphicMode === 'default' || !find.GraphicMode) {
             find.GraphicMode = params.GraphicMode;
         }
         return find;
     };
 
-    Window_MenuStatus.prototype.battlreActorPicture = function(id) {
+    Window_MenuStatus.prototype.battlreActorPicture = function(actor) {
         const actors = params.ActorPictureData;
-        const find = actors.find(actor => actor.actorId === id);
+        const find = actors.find(a => a.actorId === actor.actorId());
         if (!find) {
-        return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: params.GraphicMode, FaceIndex : -1};
+        return {
+            Actor_X: 0, 
+            Actor_Y: 0, 
+            Img_SX: 0, 
+            Img_SY: 0, 
+            Actor_Scale: 100, 
+            ActorBackImg: null,
+            ActorFrontImg: null, 
+            GraphicMode: params.GraphicMode, 
+            FaceIndex : -1,
+            ActorImg: null,
+            FaceImg: actor.faceName()
+        };
         } else if (find.GraphicMode === 'default' || !find.GraphicMode) {
             find.GraphicMode = params.GraphicMode;
         }
@@ -596,7 +624,7 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
 
     Window_StatusBase.prototype.nuunMenu_getActorData = function(actor) {
-        return this.isActorPictureEXApp() ? this.battlreActorPicture(actor.actorId()) : this.getActorImgData(actor.actorId());
+        return this.isActorPictureEXApp() ? this.battlreActorPicture(actor) : this.getActorImgData(actor);
     };
 
     Window_StatusBase.prototype.nuunMenu_isMenuActorData = function() {

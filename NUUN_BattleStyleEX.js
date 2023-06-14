@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.13
+ * @version 3.10.14
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/6/14 Ver.3.10.14
+ * スキル発動待機時間ゲージ表示プラグインとの競合対応。
  * 2023/6/3 Ver.3.10.13
  * バトルウィンドウの表示形式をVer.3.10.6以前の方式とVer.3.10.7以降の方式を選択できる機能を追加。
  * 2023/5/27 Ver.3.10.12
@@ -3437,6 +3439,7 @@ Sprite_BSGauge.prototype.getGBSGaugeWidth = function() {
     case 'tp':
       return this.userStatusParam ? this.userStatusParam.Width : this._data.TPGaugeWidth;
     case 'time':
+    case "cast":
       return this.userStatusParam ? this.userStatusParam.Width : this._data.TPBGaugeWidth;
     default:
       return this.userStatusParam ? this.userStatusParam.Width : 128;
@@ -3452,6 +3455,7 @@ Sprite_BSGauge.prototype.getGBSGaugeHeight = function() {
     case 'tp':
       return this.userStatusParam ? this.userStatusParam.Height : this._data.TPGaugeHeight;
     case 'time':
+    case "cast":
       return this.userStatusParam ? this.userStatusParam.Height : this._data.TPBGaugeHeight;
     default:
       return this.userStatusParam ? this.userStatusParam.Height : 12;
@@ -3459,83 +3463,88 @@ Sprite_BSGauge.prototype.getGBSGaugeHeight = function() {
 };
 
 Sprite_BSGauge.prototype.currentValue = function() {
-  if (this._battler && this.userStatusParam) {
-    switch (this._statusType) {
-      case "hp":
-      case "mp":
-      case "tp":
-      case "time":
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.currentValue.call(this);
+        default:
+            return eval(this.userStatusParam.DetaEval1);
+        }
+    } else {
         return Sprite_Gauge.prototype.currentValue.call(this);
-      default:
-        return eval(this.userStatusParam.DetaEval1);
     }
-  } else {
-    return Sprite_Gauge.prototype.currentValue.call(this);
-  }
 };
 
 Sprite_BSGauge.prototype.currentMaxValue = function() {
-  if (this._battler && this.userStatusParam) {
-    switch (this._statusType) {
-      case "hp":
-      case "mp":
-      case "tp":
-      case "time":
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.currentMaxValue.call(this);
+        default:
+            return this.userStatusParam.DetaEval2 ? eval(this.userStatusParam.DetaEval2) : Sprite_Gauge.prototype.currentMaxValue.call(this);
+        }
+    } else {
         return Sprite_Gauge.prototype.currentMaxValue.call(this);
-      default:
-        return eval(this.userStatusParam.DetaEval2);
     }
-  } else {
-    return Sprite_Gauge.prototype.currentMaxValue.call(this);
-  }
 };
 
 Sprite_BSGauge.prototype.label = function() {
-  if (this._battler && this.userStatusParam) {
-    switch (this._statusType) {
-      case "hp":
-      case "mp":
-      case "tp":
-      case "time":
-        return Sprite_Gauge.prototype.label.call(this);
-      default:
-        return this.userStatusParam.ParamName;
-  }
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.label.call(this);
+        default:
+            return this.userStatusParam.ParamName;
+    }
   } else {
     return Sprite_Gauge.prototype.label.call(this);
   }
 };
 
 Sprite_BSGauge.prototype.gaugeColor1 = function() {
-  if (this._battler && this.userStatusParam) {
-    switch (this._statusType) {
-      case "hp":
-      case "mp":
-      case "tp":
-      case "time":
-          return Sprite_Gauge.prototype.gaugeColor1.call(this);
-      default:
-        return NuunManager.getColorCode(this.userStatusParam.Color1);
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.gaugeColor1.call(this);
+        default:
+            return NuunManager.getColorCode(this.userStatusParam.Color1);
+        }
+    } else {
+        return Sprite_Gauge.prototype.gaugeColor1.call(this);
     }
-  } else {
-    return Sprite_Gauge.prototype.gaugeColor1.call(this);
-  }
 };
 
 Sprite_BSGauge.prototype.gaugeColor2 = function() {
-  if (this._battler && this.userStatusParam) {
-    switch (this._statusType) {
-      case "hp":
-      case "mp":
-      case "tp":
-      case "time":
-          return Sprite_Gauge.prototype.gaugeColor2.call(this);
-      default:
-        return NuunManager.getColorCode(this.userStatusParam.Color2);
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.gaugeColor2.call(this);
+        default:
+            return NuunManager.getColorCode(this.userStatusParam.Color2);
+        }
+    } else {
+        return Sprite_Gauge.prototype.gaugeColor2.call(this);
     }
-  } else {
-    return Sprite_Gauge.prototype.gaugeColor2.call(this);
-  }
 };
 
 //Sprite_NuunUserParam

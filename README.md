@@ -61,9 +61,9 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | バトラー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [バトラーHPゲージ](https://github.com/nuun888/MZ/blob/master/README/ButlerHPGauge.md) | [NUUN_ButlerHPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js) | オ | 1.7.2 |
-| [バトラーMPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_EnemyMPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerMPGauge.js) | オ | 1.2.1 |
+| [バトラーMPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyMPGauge.md) | [NUUN_BattlerMPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerMPGauge.js) | オ | 1.2.1 |
 | [バトラーTPBゲージ表示](https://github.com/nuun888/MZ/blob/master/README/EnemyTpbGauge.md) | [NUUN_BattlerTpbGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTpbGauge.js) | オ | 1.5.1 |
-| [バトラーTPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyTPGauge.md) | [NUUN_EnemyTPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTPGauge.js) | オ | 1.2.0 |
+| [バトラーTPゲージ](https://github.com/nuun888/MZ/blob/master/README/EnemyTPGauge.md) | [NUUN_BattlerTPGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTPGauge.js) | オ | 1.2.0 |
 | [バトラー名前表示](https://github.com/nuun888/MZ/blob/master/README/ButlerName.md) | [NUUN_ButlerName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js) | オ | 1.4.0 |
 |  |  |  |  |
 

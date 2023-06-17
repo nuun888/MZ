@@ -1,5 +1,5 @@
 # [モンスター図鑑マップ遭遇チェック](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEncounterCheck.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEncounterCheck.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -30,6 +30,8 @@
 優先順位は EncountEnemiesList > マップ敵エンカウントリスト > デフォルト  
 
 ## 更新履歴
+2023/6/17 Ver.1.0.2  
+処理の一部修正。  
 2023/6/2 Ver.1.0.1
 モンスター図鑑プラグインのマップ敵エンカウントリストの設定適用に関する修正。  
 敵グループの２番目以降の別モンスターが、適用されていなかった問題を修正。  

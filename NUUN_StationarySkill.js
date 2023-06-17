@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * Activate the skill for the battler who has released the state with the passage of the turn.
@@ -26,6 +26,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/17/2023 Ver.1.1.0
+ * In addition to the normal skill activation message, added a function that allows you to set the activation message that can also set the target name.
+ * Modified not to consider counters and reflections.
  * 6/15/2023 Ver.1.0.0
  * First edition.
  * 
@@ -60,6 +63,12 @@
  * @type skill
  * @default
  * 
+ * @param StationarySkillMessage
+ * @desc Message when setting type skill is activated. %1: subject name %2: target name %3: skill name
+ * @text Stationary skill message
+ * @type string
+ * @default
+ * 
  * @param CondStationary
  * @desc Enter the trigger condition with javascript. a: Actor game data
  * @text Trigger condition evaluation formula
@@ -76,7 +85,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * ステートをターン経過で解除したバトラーに対し、スキルを発動します。
@@ -90,6 +99,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/17 Ver.1.1.0
+ * 通常のスキル発動メッセージとは別に、対象名も設定できる発動時のメッセージを設定できる機能を追加。
+ * カウンター、反射を考慮しないように修正。
  * 2023/6/15 Ver.1.0.0
  * 初版。
  * 
@@ -122,6 +134,12 @@
  * @desc スキルを指定します。
  * @text スキル
  * @type skill
+ * @default
+ * 
+ * @param StationarySkillMessage
+ * @desc 設置型スキル発動時のメッセージ。%1:発動者名 %2:ターゲット名 %3:発動スキル名
+ * @text 設置型スキルメッセージ
+ * @type string
  * @default
  * 
  * @param CondStationary
@@ -223,16 +241,20 @@ Imported.NUUN_StationarySkill = true;
         const data = this.getStationarySkillList(stateId);
         const actionBattler = data.getBattler();
         const action = new Game_StationaryAction(actionBattler);
-        action.setTarget(this.index());
-        action.setSkill(this.makeStationaryActions(data));
-        actionBattler._stationaryActions.push(action);
+        const skill = this.makeStationaryActions(data);
+        if (skill) {
+            action.setTarget(this.index());
+            action.setSkill(skill.StationarySkill);
+            action.setStationaryFmt(skill.StationarySkillMessage);
+            actionBattler._stationaryActions.push(action);
+        }
     };
 
     Game_Battler.prototype.makeStationaryActions = function(data) {
         const a = this;
         const list = data.getSkills().filter(skill => (skill.CondStationary ? eval(skill.CondStationary) : true));
         const id = Math.floor(Math.random() * list.length);
-        return list[id].StationarySkill;
+        return list[id];
     };
 
     Game_Battler.prototype.currentStationaryAction = function() {
@@ -291,7 +313,7 @@ Imported.NUUN_StationarySkill = true;
         return _BattleManager_getNextSubject.call(this);
     };
 
-    const _BattleManager_processTurn =  BattleManager.processTurn;
+    const _BattleManager_processTurn = BattleManager.processTurn;
     BattleManager.processTurn = function() {
         if (this._subject.currentStationaryAction()) {
             const subject = this._subject;
@@ -306,12 +328,41 @@ Imported.NUUN_StationarySkill = true;
         }
     };
 
+    const _BattleManager_updateAction = BattleManager.updateAction;
+    BattleManager.updateAction = function() {
+        if (this._action.stationaryAction) {
+            const target = this._targets.shift();
+            if (target) {
+                this.invokeStationaryAction(this._subject, target);
+            } else {
+                this.endAction();
+            }
+        } else {
+            _BattleManager_updateAction.call(this);
+        }
+    };
+
     const _BattleManager_updateTurnEnd = BattleManager.updateTurnEnd;
     BattleManager.updateTurnEnd = function() {
         _BattleManager_updateTurnEnd.call(this);
         if (!this.isTpb() && this.isStationarActionMembers()) {
             this._phase = "turn";
         }
+    };
+
+    BattleManager.invokeStationaryAction = function(subject, target) {
+        this._logWindow.push("pushBaseLine");
+        subject.setLastTarget(target);
+        this.invokeNormalAction(subject, target);
+        this._logWindow.push("popBaseLine");
+    };
+
+    const _BattleManager_invokeNormalAction = BattleManager.invokeNormalAction;
+    BattleManager.invokeNormalAction = function(subject, target) {
+        if (this._action.stationaryAction) {
+            this._logWindow.displayActionStationary(this._action, target, subject, this._action.item());
+        }
+        _BattleManager_invokeNormalAction.call(this, subject, target);
     };
 
     BattleManager.isStationarActionMembers = function() {
@@ -342,6 +393,14 @@ Imported.NUUN_StationarySkill = true;
             _Window_BattleLog_performActionStart.call(this, subject, action);
         }
     };
+
+    Window_BattleLog.prototype.displayActionStationary = function(action, target, subject, item) {
+        const fmt = action.getStationaryFmt();
+        if (fmt) {
+            this.push("addText", fmt.format(subject.name(), target.name(), item.name));
+        }
+    };
+    
     
     class StationarySkill {
         constructor(stateId, data, battler) {
@@ -367,6 +426,15 @@ Imported.NUUN_StationarySkill = true;
         constructor(subject) {
             super(subject, false);
             this.stationaryAction = true;
+            this.stationaryFmt = '';
+        }
+
+        setStationaryFmt (fmt) {
+            this.stationaryFmt = fmt;
+        }
+
+        getStationaryFmt () {
+            return this.stationaryFmt;
         }
     };
 

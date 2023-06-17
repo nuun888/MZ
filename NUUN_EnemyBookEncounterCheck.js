@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @base NUUN_EnemyBook
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Get the number of monsters that are not registered in the monster encyclopedia or whose information is not registered on the current map.
@@ -44,6 +44,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/2/2023 Ver.1.0.2
+ * Fixed some processing.
  * 6/2/2023 Ver.1.0.1
  * Fixed application of map enemy encounter list settings for "NUUN_EnemyBook".
  * Fixed an issue where the second and subsequent monsters in the enemy group were not being applied.
@@ -91,7 +93,7 @@
  * @base NUUN_Base
  * @base NUUN_EnemyBook
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 現在のマップでモンスター図鑑に登録または、情報登録されていないモンスター数を取得します。
@@ -121,6 +123,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/17 Ver.1.0.2
+ * 処理の一部修正。
  * 2023/6/2 Ver.1.0.1
  * モンスター図鑑プラグインのマップ敵エンカウントリストの設定適用に関する修正。
  * 敵グループの２番目以降の別モンスターが、適用されていなかった問題を修正。
@@ -187,7 +191,7 @@ Imported.NUUN_EnemyBookEncounterCheck = true;
                 const enemyList = $gameMap.data.EncountEnemiesList.split(',').map(Number);
                 return this.getNotEncountEnemy(enemyList);
             } else if(NuunManager.isMapEncountEnemList() && MapEncountEnemiesList[$gameMap.mapId()]) {
-                const enemyList = NuunManager.getMapEncountEnemList()[$gameMap.mapId()].Enemy;
+                const enemyList = NuunManager.getMapEncountEnemyList()[$gameMap.mapId()].Enemy;
                 return this.getNotEncountEnemy(enemyList);
             }
         } catch (error) {

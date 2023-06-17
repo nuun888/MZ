@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.1
+ * @version 2.19.2
  * 
  * @help
  * Implement an enemy book.
@@ -227,6 +227,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/17/2023 Ver.2.19.2
+ * Fixed an issue where an error would occur if the "NUUN_EnemyBookEncounterCheck" plugin was not installed when displaying the current map.
+ * Fixed an issue where radar charts would not be displayed.
  * 6/9/2023 Ver.2.19.1
  * Fixed an issue that caused an error when showing resistance debuffs.
  * Added ability to display debuffs on state (icon) resistance, invalidity, and weakness.
@@ -3146,6 +3149,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/17 Ver.2.19.2
+ * 現在のマップを表示させる際に、モンスター図鑑マップ遭遇チェックプラグインを入れていないとエラーが出る問題を修正。
+ * レーダーチャートが表示されなくなる問題を修正。
  * 2023/6/9 Ver.2.19.1
  * 耐性デバフを表示させるとエラーが出る問題を修正。
  * ステート(アイコン)耐性、無効、弱点にデバフを表示させる機能を追加。
@@ -6333,7 +6339,7 @@ function getTransformEnemy(enemyId) {
     return enemyId;
 };
 
-NuunManager.getMapEncountEnemList = function() {
+NuunManager.getMapEncountEnemyList = function() {
     return MapEncountEnemiesList;
 };
 
@@ -8532,7 +8538,7 @@ Window_EnemyBook_Index.prototype.maxItems = function() {
 Window_EnemyBook_Index.prototype.makeEnemyList = function() {
     this._enemyPercentList = [];
     if (this._category && this._category.symbol === "mapEnemy") {
-        this._enemyEncounterList = this.getMapEncountEnemList();
+        this._enemyEncounterList = this.getMapEncountEnemyList();
     }
     this._data = $dataEnemies.filter(enemy => this.includes(enemy));
 };
@@ -8552,12 +8558,12 @@ Window_EnemyBook_Index.prototype.unknownEnemyVisible = function(enemy) {
     return !UnknownVisible || (UnknownVisible && $gameSystem.isInEnemyBook(enemy));
 };
 
-Window_EnemyBook_Index.prototype.getMapEncountEnemList = function() {
+Window_EnemyBook_Index.prototype.getMapEncountEnemyList = function() {
     if ($gameMap.data.EncountEnemiesList) {
         return $gameMap.data.EncountEnemiesList.split(',').map(Number);
     } else if(NuunManager.isMapEncountEnemList() && MapEncountEnemiesList[$gameMap.mapId()]) {
-        return NuunManager.getMapEncountEnemList()[$gameMap.mapId()].Enemy;
-    } else {
+        return NuunManager.getMapEncountEnemyList()[$gameMap.mapId()].Enemy;
+    } else if (Imported.NUUN_EnemyBookEncounterCheck) {
         return NuunManager.getEncounterEnemyList();
     }
 };
@@ -10639,6 +10645,7 @@ Window_EnemyBook.prototype.enemyElementRadarChart = function(list, enemy, x, y, 
     sprite.setupColor(ElementRadarChartFramecolor, ElementRadarChartLineColor, ElementRadarChartMainColor1, ElementRadarChartMainColor2);
     sprite.setup(enemy, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize);
     sprite.move(x, y);
+    sprite.show();
 };
 
 Window_EnemyBook.prototype.enemyStateRadarChart = function(list, enemy, x, y, type) { 
@@ -10647,6 +10654,7 @@ Window_EnemyBook.prototype.enemyStateRadarChart = function(list, enemy, x, y, ty
     sprite.setupColor(StateRadarChartFramecolor, StateRadarChartLineColor, StateRadarChartMainColor1, StateRadarChartMainColor2);
     sprite.setup(enemy, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize);
     sprite.move(x, y);
+    sprite.show();
 };
 
 Window_EnemyBook.prototype.commonEnemyBitmap = function(list, enemy, x, y, width) {

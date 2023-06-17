@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.3
+ * @version 1.4.4
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/17/2023 Ver.1.4.4
+ * Fixed an issue where attribute names and state names were not displayed correctly.
  * 6/2/2023 Ver.1.4.3
  * Fixed the problem that an error occurs when the display actor image is set to face graph.
  * Expanded the application parameter of difference color inversion.
@@ -107,14 +109,14 @@
  * @default true
  * @parent Setting
  * 
- * @param KeyNextName
+ * @param KeyNextName_r
  * @desc Pagination symbol name.(To change, you need a plug-in that can assign keys separately)
  * @text Pagination symbol name
  * @type string
  * @default pageup
  * @parent Setting
  * 
- * @param KeyPreviousName
+ * @param KeyPreviousName_r
  * @desc Page return symbol name.(To change, you need a plug-in that can assign keys separately)
  * @text Page return symbol name
  * @type string
@@ -828,7 +830,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.3
+ * @version 1.4.4
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -857,6 +859,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/17 Ver.1.4.4
+ * 属性名、ステート名が正常に表示されていなかった問題を修正。
  * 2023/6/2 Ver.1.4.3
  * 表示アクター画像を顔グラに設定したときにエラーが出る問題を修正。
  * 差分色反転の適用パラメータを拡大。
@@ -924,14 +928,14 @@
  * @default true
  * @parent Setting
  * 
- * @param KeyNextName
+ * @param KeyNextName_r
  * @desc ページ送りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
  * @text ページ送りシンボル名
  * @type string
  * @default pageup
  * @parent Setting
  * 
- * @param KeyPreviousName
+ * @param KeyPreviousName_r
  * @desc ページ戻りのシンボル名(変更するには別途キー割り当てが出来るプラグインが必要です)
  * @text ページ戻りシンボル名
  * @type string
@@ -1661,15 +1665,15 @@ Imported.NUUN_EquipStatusEX = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_EquipStatusEX');
     const ContentsHeight = Number(parameters['ContentsHeight'] || 36);
-    const KeyNextName = String(parameters['KeyNextName'] || "pageup");
-    const KeyPreviousName = String(parameters['KeyPreviousName'] || "pagedown");
+    const KeyNextName = String(parameters['KeyNextName_r'] || "pagedown");
+    const KeyPreviousName = String(parameters['KeyPreviousName_r'] || "pageup");
     const EquipStatusWidth = Number(parameters['EquipStatusWidth'] || 0);
     const EquipPageList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipPageList'])) : null) || [];
     const EquipStatusCols = Number(parameters['EquipStatusCols'] || 1);
     const ElementResist = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ElementResist'])) : null) || [];
-    const ElementResistMode = eval(parameters['ElementResistMode']) || 1;
+    const ElementResistMode = eval(parameters['ElementResistMode']);
     const StateResist = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StateResist'])) : null) || [];
-    const StateResistMode = eval(parameters['StateResistMode']) || 1;
+    const StateResistMode = eval(parameters['StateResistMode']);
     const DecimalMode = eval(parameters['DecimalMode'] || "true");
     const HPGaugeWidth = Number(parameters['HPGaugeWidth'] || 128);
     const MPGaugeWidth = Number(parameters['MPGaugeWidth'] || 128);
@@ -2377,7 +2381,7 @@ Imported.NUUN_EquipStatusEX = true;
                 const x2 = Math.floor(index % data.ContentsCols) * (width + this.itemPadding());
                 const y2 = Math.floor(index / data.ContentsCols) * lineHeight;
                 const iconId = element.ElementIconId;
-                if (!ElementResistMode !== 1 && iconId > 0) {
+                if (ElementResistMode !== 1 && iconId > 0) {
                     this.drawIcon(iconId, x + x2, y + y2 + data.IconY);
                     margin = ImageManager.iconWidth + 4;
                 } else {
@@ -2431,7 +2435,7 @@ Imported.NUUN_EquipStatusEX = true;
                 const x2 = Math.floor(index % data.ContentsCols) * (width + this.itemPadding());
                 const y2 = Math.floor(index / data.ContentsCols) * lineHeight;
                 const iconId = state.StateIconId > 0 ? state.StateIconId : $dataStates[stateId].iconIndex;
-                if (!StateResistMode !== 1 && iconId > 0) {
+                if (StateResistMode !== 1 && iconId > 0) {
                     this.drawIcon(iconId, x + x2, y + y2 + data.IconY);
                     margin = ImageManager.iconWidth + 4;
                 } else {

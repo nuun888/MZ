@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.1.3
+ * @version 2.1.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/6/18 Ver.2.1.4
+ * Fixed an issue where lines were not working.
  * 2023/1/17 Ver.2.1.3
  * Corrected because the contents of the plug-in command's auto save execution were different.
  * Fixed the problem that the maximum number of saves is displayed one less when autosave is turned off.
@@ -697,6 +699,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/18 Ver.2.1.4
+ * ラインが機能していなかった問題を修正。
  * 2023/1/17 Ver.2.1.3
  * プラグインコマンドのオードセーブ実行の内容が異なっていたので修正。
  * オートセーブ有効化をOFFにしたときに最大セーブ数が１つ少なく表示される問題を修正。
@@ -1779,10 +1783,17 @@ Imported.NUUN_SaveScreen = true;
         this.drawSnapBitmap(info, x, y, width, data);
         break;
       case 100:
-        this.horzLine(info, x, y, width, data);;
+        this.horzLine(x, y, width, data);
         break;
     }
   };
+
+    Window_SavefileList.prototype.horzLine = function(x, y, width, data) {
+        const lineY = y + this.lineHeight() / 2 - 1;
+        this.contents.paintOpacity = 48;
+        this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(data.SystemNameColor));
+        this.contents.paintOpacity = 255;
+    };
 
   Window_SavefileList.prototype.drawContentsNotData = function(info, x, y, width, data, savefileId, r) {
     switch (data.DateSelect) {

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.2
+ * @version 2.19.3
  * 
  * @help
  * Implement an enemy book.
@@ -227,6 +227,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/18/2023 Ver.2.19.3
+ * Fixed the problem that the display item setting of analyze was not applied properly.
  * 6/17/2023 Ver.2.19.2
  * Fixed an issue where an error would occur if the "NUUN_EnemyBookEncounterCheck" plugin was not installed when displaying the current map.
  * Fixed an issue where radar charts would not be displayed.
@@ -2930,7 +2932,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.1
+ * @version 2.19.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3149,6 +3151,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/18 Ver.2.19.3
+ * アナライズの表示項目設定が正常に適用されていなかった問題を修正。
  * 2023/6/17 Ver.2.19.2
  * 現在のマップを表示させる際に、モンスター図鑑マップ遭遇チェックプラグインを入れていないとエラーが出る問題を修正。
  * レーダーチャートが表示されなくなる問題を修正。
@@ -8021,8 +8025,8 @@ Scene_Battle.prototype.setEnemyBookEnemyAnalyze = function(target, analyzeDate) 
     const id = analyzeDate.ListNumber;
     let data = null;
     let cols = 0;
-    if (data = id > 0 && AnalyzeListData[id]) {
-        data = AnalyzeListData[id].AnalyzePageList;
+    if (data = id > 0 && AnalyzeListData[id - 1]) {
+        data = AnalyzeListData[id - 1].AnalyzePageList;
         cols = data.nameLength;
         this._enemyBookEnemyWindow.setMode('analyze', analyzeDate);
     } else {
@@ -9927,7 +9931,7 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
 
 Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
-    this.changeTextColor(NuunManager.getColorCode(list.NameColor));console.log(this._enemy)
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     const action = enemy.allSkillActions(this._enemy.actions);
     const lineHeight = this.lineHeight();
     let x2 = 0;
@@ -10842,7 +10846,7 @@ Window_BattleEnemyBook.prototype.getEnemyStatusList = function() {
             return InfoPageSetting;
         case 'analyze':
             const id = this._contentsData ? this._contentsData.ListNumber : -1;
-            return id > 0 && AnalyzeListData[id] ? AnalyzeListData[id].AnalyzePageList : PageSetting;
+            return id > 0 && AnalyzeListData[id - 1] ? AnalyzeListData[id - 1].AnalyzePageList : PageSetting;
     }
 };
 

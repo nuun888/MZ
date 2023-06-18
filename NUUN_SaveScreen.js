@@ -648,7 +648,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.1.2
+ * @version 2.1.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.7
+ * @version 2.3.8
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -57,6 +57,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/6/18 Ver.2.3.8
+ * Fixed an issue where lines weren't working in the Actor display on the Acquisition screen.
  * 2023/5/6 Ver.2.3.7
  * Fixed the display position of the side view actor and character chip.
  * 2023/4/23 Ver.2.3.6
@@ -2281,7 +2283,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.7
+ * @version 2.3.8
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2326,6 +2328,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/18 Ver.2.3.8
+ * 入手画面のアクター表示のラインが機能していなかった問題を修正。
  * 2023/5/6 Ver.2.3.7
  * サイドビューアクター、キャラチップの表示位置を修正。
  * 2023/4/23 Ver.2.3.6
@@ -5768,12 +5772,19 @@ Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width,
       this.drawLevelUp(data, actor, x, y, width);
       break;
     case 1000:
-      this.horzLine(data, x, y, width);
+      this.drawHorzLine(data, x, y, width);
       break;
     default:
       break;
   }
 };
+
+Window_ResultActorExp.prototype.drawHorzLine = function(data, x, y, width) {
+    const lineY = y + this.lineHeight() / 2 - 1;
+    this.contents.paintOpacity = 48;
+    this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(data.SystemNameColor));
+    this.contents.paintOpacity = 255;
+};  
 
 Window_ResultActorExp.prototype.drawActorFace = function(data, actor, x, y, height) {
   height = Math.min(ActorFaceHeight, height, ImageManager.faceHeight);

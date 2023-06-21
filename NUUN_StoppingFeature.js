@@ -10,12 +10,11 @@
  * @target MZ
  * @plugindesc 踏み止まり特徴
  * @author NUUN
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * 戦闘中のダメージで0になったときに、戦闘不能にならずHPが１で止まる特徴を設定できます。
  * 条件付きベースプラグインと併用することで、特定の条件で踏み止まる特徴を設定できます。
- * 
  * 
  * 特徴を有するメモ欄
  * <Stopping:[rate], [ratio], [condMode]>
@@ -32,6 +31,8 @@
  * <PartyStoppingCond:[id], [id], [id]...> パーティメンバーが指定したIDの条件を満たしたときに発動。
  * <TroopStoppingCond:[id], [id], [id]...> 敵グループのメンバーが指定したIDの条件を満たしたときに発動。
  * 
+ * <StoppingEraseState:[stateId]> 踏み止まり成功時に指定のステートを解除します。
+ * [stateId]:ステートID
  * 
  * スキル、アイテムのメモ欄
  * <InvalidStopping:[rate]> このタグがあるスキル、アイテムは踏み止まりを無効化します。
@@ -43,6 +44,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/21 Ver.1.1.0
+ * 踏み止まった時に指定のステートを解除する機能を追加。
  * 2021/11/18 Ver.1.0.0
  * 初版
  * 
@@ -95,6 +98,7 @@ const StoppingSE = String(parameters['StoppingSE'] || '');
 const volume = Number(parameters['volume'] || 90);
 const pitch = Number(parameters['pitch'] || 100);
 const pan = Number(parameters['pan'] || 50);
+let eraseStateId = 0;
 
 const _Game_Action_executeHpDamage = Game_Action.prototype.executeHpDamage;
 Game_Action.prototype.executeHpDamage = function(target, value) {
@@ -102,14 +106,20 @@ Game_Action.prototype.executeHpDamage = function(target, value) {
     if (hp - value <= 0 && this.stopping(target, hp) && !this.getInvalidStoppingRate()) {   
         value = hp - Math.max(hp - value, 0) - 1;
         target.result()._stopping = true;
+        target.removeState(eraseStateId);
     }
     _Game_Action_executeHpDamage.call(this, target, value);
 };
 
 Game_Action.prototype.stopping = function(target, value) {
+    eraseStateId = 0;
     return target.traitObjects().some(trait => {
         const stopping = getStoppingMeta(trait);
-        return stopping && getStoppingResult(target, value, stopping) && this.condStoppingResult(stopping, trait, target);
+        const id = this.stoppingEraseState(trait);
+        if (id > 0) {
+            eraseStateId = id;
+        }
+        return (stopping && getStoppingResult(target, value, stopping) && this.condStoppingResult(stopping, trait, target));
     })
 };
 
@@ -127,6 +137,9 @@ Game_Action.prototype.getInvalidStoppingRate = function() {
     return invalidStopping ? Math.floor(Math.random() * 100) < parseInt(invalidStopping) : false;
 };
 
+Game_Action.prototype.stoppingEraseState = function(trait) {
+    return trait.meta.StoppingEraseState ? Number(trait.meta.StoppingEraseState) : 0;
+};
 
 const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
 Game_ActionResult.prototype.clear = function() {

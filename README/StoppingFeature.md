@@ -1,5 +1,6 @@
 # [踏み止まり特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js)
 # Ver.1.1.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js)
 
 戦闘中のダメージで0になったときに、確率で戦闘不能にならずHPが１で止まる特徴を設定できます。    
 条件付きベースプラグインと併用することで、特定の条件で踏み止まる特徴を設定できます。

@@ -1,5 +1,5 @@
 # [踏み止まり特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js)
-# Ver.1.0.0
+# Ver.1.1.0
 
 戦闘中のダメージで0になったときに、確率で戦闘不能にならずHPが１で止まる特徴を設定できます。    
 条件付きベースプラグインと併用することで、特定の条件で踏み止まる特徴を設定できます。
@@ -19,6 +19,9 @@
 `<TargetStoppingCond:[id], [id], [id]...>` 撃破されたバトラーが指定したIDの条件を満たしたときに発動。  
 `<PartyStoppingCond:[id], [id], [id]...>` パーティメンバーが指定したIDの条件を満たしたときに発動。  
 `<TroopStoppingCond:[id], [id], [id]...>` 敵グループのメンバーが指定したIDの条件を満たしたときに発動。  
+
+`<StoppingEraseState:[stateId]>` 踏み止まり成功時に指定のステートを解除します。  
+[stateId]:ステートID  
  
 #### スキル、アイテムのメモ欄
 `<InvalidStopping:[rate]>` スキル、アイテムは踏み止まりを無効化します。  
@@ -26,5 +29,7 @@
 `<InvalidStopping:50>` 50％の確率で踏み止まりを無効化します。  
 
 ### 更新履歴
+2023/6/21 Ver.1.1.0  
+踏み止まった時に指定のステートを解除する機能を追加。  
 2021/11/18 Ver.1.0.0  
 初版  

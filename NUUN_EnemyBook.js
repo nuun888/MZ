@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.3
+ * @version 2.19.4
  * 
  * @help
  * Implement an enemy book.
@@ -227,6 +227,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/21/2023 Ver.2.19.4
+ * Fixed an issue where the analysis page could not be switched.
  * 6/18/2023 Ver.2.19.3
  * Fixed the problem that the display item setting of analyze was not applied properly.
  * 6/17/2023 Ver.2.19.2
@@ -2932,7 +2934,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.3
+ * @version 2.19.4
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3151,6 +3153,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/21 Ver.2.19.4
+ * アナライズのページが切り替えられない問題を修正。
  * 2023/6/18 Ver.2.19.3
  * アナライズの表示項目設定が正常に適用されていなかった問題を修正。
  * 2023/6/17 Ver.2.19.2
@@ -8027,7 +8031,7 @@ Scene_Battle.prototype.setEnemyBookEnemyAnalyze = function(target, analyzeDate) 
     let cols = 0;
     if (data = id > 0 && AnalyzeListData[id - 1]) {
         data = AnalyzeListData[id - 1].AnalyzePageList;
-        cols = data.nameLength;
+        cols = data.length;
         this._enemyBookEnemyWindow.setMode('analyze', analyzeDate);
     } else {
         data = PageSetting;

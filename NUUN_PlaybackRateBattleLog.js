@@ -10,12 +10,14 @@
  * @target MZ
  * @plugindesc 再生率バトルログ表示
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * HP、MP、TP再生率でダメージ、回復した再生量をバトルログに表示させます。
  * 
  * 更新履歴
+ * 2023/6/22 Ver.1.0.1
+ * 回復時のテキストで-が表示されてしまう問題を修正。
  * 2022/1/21 Ver.1.0.0
  * 初版
  * 
@@ -80,21 +82,21 @@ Window_BattleLog.prototype.displayPlaybackRate = function(subject) {
         const result = subject.result();
         let text = null;
         if (result.hpDamage < 0) {
-            text = PlaybackRateHPRecoveryText.format(subject.name(), result.hpDamage);
+            text = PlaybackRateHPRecoveryText.format(subject.name(), -result.hpDamage);
             this.push("addText", text);
         } else if (result.hpDamage > 0) {
             text = PlaybackRateHPDamageText.format(subject.name(), result.hpDamage);
             this.push("addText", text);
         }
         if (result.mpDamage < 0) {
-            text = PlaybackRateMPRecoveryText.format(subject.name(), result.mpDamage);
+            text = PlaybackRateMPRecoveryText.format(subject.name(), -result.mpDamage);
             this.push("addText", text);
         } else if (result.mpDamage > 0) {
             text = PlaybackRateMPDamageText.format(subject.name(), result.mpDamage);
             this.push("addText", text);
         }
         if (result.tpDamage < 0) {
-            text = PlaybackRateTPRecoveryText.format(subject.name(), result.tpDamage);
+            text = PlaybackRateTPRecoveryText.format(subject.name(), -result.tpDamage);
             this.push("addText", text);
         } else if (result.tpDamage > 0) {
             text = PlaybackRateTPDamageText.format(subject.name(), result.tpDamage);

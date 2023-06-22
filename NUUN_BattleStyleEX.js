@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.14
+ * @version 3.10.15
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/6/15 Ver.3.10.15
+ * Dynamic Motionプラグインとの競合対策。
  * 2023/6/14 Ver.3.10.14
  * スキル発動待機時間ゲージ表示プラグインとの競合対応。
  * 2023/6/3 Ver.3.10.13
@@ -2786,8 +2788,23 @@ Sprite_BSFrontActor.prototype.setActorHome = function(index) {
   }
 };
 
-Sprite_BSFrontActor.prototype.mainSprite = function() {
+Sprite_BSFrontActor.prototype.bsMainSprite = function() {
     return this.bsSprite;
+};
+
+Sprite_BSFrontActor.prototype.updateSelectionEffect = function() {
+    const target = this.bsMainSprite();
+    if (this._battler.isSelected()) {
+        this._selectionEffectCount++;
+        if (this._selectionEffectCount % 30 < 15) {
+            target.setBlendColor([255, 255, 255, 64]);
+        } else {
+            target.setBlendColor([0, 0, 0, 0]);
+        }
+    } else if (this._selectionEffectCount > 0) {
+        this._selectionEffectCount = 0;
+        target.setBlendColor([0, 0, 0, 0]);
+    }
 };
 
 Sprite_BSFrontActor.prototype.actorHomeRefresh = function(index) {

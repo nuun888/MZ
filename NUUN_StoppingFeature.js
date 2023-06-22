@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 踏み止まり特徴
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 戦闘中のダメージで0になったときに、戦闘不能にならずHPが１で止まる特徴を設定できます。
@@ -44,6 +44,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/22 Ver.1.1.1
+ * 処理の修正。
  * 2023/6/21 Ver.1.1.0
  * 踏み止まった時に指定のステートを解除する機能を追加。
  * 2021/11/18 Ver.1.0.0
@@ -102,6 +104,7 @@ let eraseStateId = 0;
 
 const _Game_Action_executeHpDamage = Game_Action.prototype.executeHpDamage;
 Game_Action.prototype.executeHpDamage = function(target, value) {
+    eraseStateId = 0;
     const hp = target.hp;
     if (hp - value <= 0 && this.stopping(target, hp) && !this.getInvalidStoppingRate()) {   
         value = hp - Math.max(hp - value, 0) - 1;
@@ -112,11 +115,10 @@ Game_Action.prototype.executeHpDamage = function(target, value) {
 };
 
 Game_Action.prototype.stopping = function(target, value) {
-    eraseStateId = 0;
     return target.traitObjects().some(trait => {
         const stopping = getStoppingMeta(trait);
         const id = this.stoppingEraseState(trait);
-        if (id > 0) {
+        if (stopping && id > 0) {
             eraseStateId = id;
         }
         return (stopping && getStoppingResult(target, value, stopping) && this.condStoppingResult(stopping, trait, target));
@@ -171,7 +173,7 @@ function stoppingSE() {
 };
 
 function getStoppingResult(target, value, stopping) {
-    return getStoppingRate(stopping[0]) && value >= target.mhp * stopping[1] / 100;
+    return getStoppingRate(stopping[0]) && value >= (target.mhp * stopping[1]) / 100;
 };
 
 function getStoppingRate(rate) {

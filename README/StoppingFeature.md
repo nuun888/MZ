@@ -1,5 +1,5 @@
 # [踏み止まり特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js)
 
 戦闘中のダメージで0になったときに、確率で戦闘不能にならずHPが１で止まる特徴を設定できます。    
@@ -30,6 +30,8 @@
 `<InvalidStopping:50>` 50％の確率で踏み止まりを無効化します。  
 
 ### 更新履歴
+2023/6/22 Ver.1.1.1  
+処理の修正。  
 2023/6/21 Ver.1.1.0  
 踏み止まった時に指定のステートを解除する機能を追加。  
 2021/11/18 Ver.1.0.0  

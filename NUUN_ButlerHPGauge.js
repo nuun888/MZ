@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @base NUUN_BattlerOverlayBase
- * @version 1.7.2
+ * @version 1.7.3
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -63,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/23 Ver.1.7.3
+ * NoHPGaugeが機能していなかった問題を修正。
  * 2023/6/2 Ver.1.7.2
  * 処理の修正。
  * 2023/5/28 Ver.1.7.1
@@ -429,7 +431,7 @@ Sprite_Enemy.prototype.update = function() {
 };
 
 Sprite_Battler.prototype.updateHpGauge = function() {
-    if (!this._battler || this.noHpGaugePosition()) {
+    if (!this._battler || this.noHpGaugePosition() || this.noHpGauge()) {
         return;
     }
     if (this.battlerOverlay && !this._battlerHp) {
@@ -440,6 +442,14 @@ Sprite_Battler.prototype.updateHpGauge = function() {
 
 Sprite_Enemy.prototype.noHpGaugePosition = function() {
     return HPPosition < 0;
+};
+
+Sprite_Actor.prototype.noHpGauge = function() {
+    return false;
+};
+
+Sprite_Enemy.prototype.noHpGauge = function() {
+    return this._enemy.enemy().meta.NoHPGauge;
 };
 
 Sprite_Actor.prototype.noHpGaugePosition = function() {
@@ -491,14 +501,14 @@ Sprite_Actor.prototype.getBattlerHpSVPosition = function() {
 };
 
 Sprite_Enemy.prototype.createHPGauge = function() {
-  enemyHPGaugeLength = getSplit(this._enemy.enemy().meta.HPGaugeLength);
-  const sprite = new Sprite_EnemyHPGauge();
-  this.battlerOverlay.addChild(sprite);
-  this._battlerHp = sprite;
-  sprite.setup(this._enemy, "hp");
-  sprite.show();
-  sprite.move(0, 0);
-  $gameTemp.enemyHPGaugeRefresh = true;
+    enemyHPGaugeLength = getSplit(this._enemy.enemy().meta.HPGaugeLength);
+    const sprite = new Sprite_EnemyHPGauge();
+    this.battlerOverlay.addChild(sprite);
+    this._battlerHp = sprite;
+    sprite.setup(this._enemy, "hp");
+    sprite.show();
+    sprite.move(0, 0);
+    $gameTemp.enemyHPGaugeRefresh = true;
 };
 
 Sprite_Actor.prototype.createHPGauge = function() {
@@ -783,7 +793,6 @@ const _Game_Enemy_setup = Game_Enemy.prototype.setup;
 Game_Enemy.prototype.setup = function(enemyId, x, y) {
   _Game_Enemy_setup.call(this, enemyId, x, y);
   this._HPGaugeValueVisible = this.enemy().meta.HPGaugeMask ? true : false;
-  this.showHpGauge = !this.enemy().meta.NoHPGauge;
 };
 
 Game_Enemy.prototype.HpGaugeVisibleTrait = function(){

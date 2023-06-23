@@ -12,7 +12,7 @@
  * @plugindesc  バトラーTPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -24,7 +24,7 @@
  * 
  * 敵キャラのメモ欄
  * <NoTPGauge> TPゲージを表示しません。
- * <TPGaugeLength:[width], [height]> MPゲージの幅を指定します。
+ * <TPGaugeLength:[width], [height]> TPゲージの幅を指定します。
  * [width]:ゲージ横幅
  * [height]:ゲージ縦幅
  * 
@@ -59,6 +59,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/23 Ver.1.2.1
+ * NoTPGaugeが機能していなかった問題を修正。
  * 2023/6/2 Ver.1.2.0
  * SVアクターにゲージを表示する機能を追加。
  * 敵キャラ毎にHPゲージの横幅、縦幅を指定できる機能を追加。
@@ -393,8 +395,16 @@ Sprite_Actor.prototype.noTpGaugePosition = function() {
     return (this._battler.isEnemy() ? TPPosition : ActorTPPosition) < 0;
 };
 
+Sprite_Actor.prototype.noTpGauge = function() {
+    return false;
+};
+
+Sprite_Enemy.prototype.noTpGauge = function() {
+    return this._enemy.enemy().meta.NoTPGauge;
+};
+
 Sprite_Battler.prototype.updateTpGauge = function() {
-    if (!this._battler || this.noTpGaugePosition()) {
+    if (!this._battler || this.noTpGaugePosition() || this.noTpGauge()) {
         return;
     }
     if (this.battlerOverlay && !this._battlerTp) {
@@ -718,7 +728,6 @@ const _Game_Enemy_setup = Game_Enemy.prototype.setup;
 Game_Enemy.prototype.setup = function(enemyId, x, y) {
   _Game_Enemy_setup.call(this, enemyId, x, y);
   this._TPGaugeValueVisible = this.enemy().meta.TPGaugeMask ? true : false;
-  this.showTpGauge = !this.enemy().meta.NoTPGauge;
 };
 
 const _Game_Battler_refresh = Game_Battler.prototype.refresh;

@@ -12,7 +12,7 @@
  * @plugindesc  バトラーMPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.2.1
+ * @version 1.2.2
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -60,6 +60,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/23 Ver.1.2.2
+ * NoMPGaugeが機能していなかった問題を修正。
  * 2023/6/2 Ver.1.2.1
  * 不具合の修正。
  * 2023/6/2 Ver.1.2.0
@@ -393,8 +395,16 @@ Sprite_Actor.prototype.noMpGaugePosition = function() {
     return (this._battler.isEnemy() ? MPPosition : ActorMPPosition) < 0;
 };
 
+Sprite_Actor.prototype.noMpGauge = function() {
+    return false;
+};
+
+Sprite_Enemy.prototype.noMpGauge = function() {
+    return this._enemy.enemy().meta.NoMPGauge;
+};
+
 Sprite_Battler.prototype.updateMpGauge = function() {
-    if (!this._battler || this.noMpGaugePosition()) {
+    if (!this._battler || this.noMpGaugePosition() || this.noMpGauge()) {
         return;
     }
     if (this.battlerOverlay && !this._battlerMp) {
@@ -727,7 +737,6 @@ const _Game_Enemy_setup = Game_Enemy.prototype.setup;
 Game_Enemy.prototype.setup = function(enemyId, x, y) {
   _Game_Enemy_setup.call(this, enemyId, x, y);
   this._MPGaugeValueVisible = this.enemy().meta.MPGaugeMask ? true : false;
-  this.showMpGauge = !this.enemy().meta.NoMPGauge;
 };
 
 Game_Enemy.prototype.MpGaugeVisibleTrait = function(){

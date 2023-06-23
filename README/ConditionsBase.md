@@ -1,5 +1,5 @@
 # [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
-# Ver.1.1.12
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -186,6 +186,12 @@
 #### [指定のスイッチがOFF]
 「指定したスイッチID」(3)がOFFなら条件を満たします。  
 
+### 【メモ欄】
+#### [アクター、敵キャラのメモ欄]
+アクター及び敵キャラのメモ欄に指定のタグが存在する場合に条件を満たします。  
+#### [特徴を有するメモ欄]
+アクター及び敵キャラの特徴を有するメモ欄に指定のタグが存在する場合に条件を満たします。  
+
 ### 【所持金】
 #### [所持金額]
 所持金が\[上限下限値内](1)または「指定した数値」(2)と一致なら条件を満たします。  
@@ -236,6 +242,9 @@
 [エンカウント条件](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md)  
 
 ## 更新履歴
+2023/6/23 Ver.1.2.0  
+条件にメモ欄を追加。  
+プラグインパラメータからの引数を処理できるように処理を追加。  
 2023/4/8 Ver.1.1.12  
 防具を所持していない条件を指定時にエラーが出る問題を修正。  
 2023/4/7 Ver.1.1.11  

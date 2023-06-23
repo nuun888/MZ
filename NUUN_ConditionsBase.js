@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.1.12
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -247,10 +247,19 @@
  * 【条件式】
  * 条件式の評価がtrueなら条件を満たします。
  * 
+ * 【メモ欄】
+ * [アクター、敵キャラのメモ欄]
+ * アクター及び敵キャラのメモ欄に指定のタグが存在する場合に条件を満たします。
+ * [特徴を有するメモ欄]
+ * アクター及び敵キャラの特徴を有するメモ欄に指定のタグが存在する場合に条件を満たします。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/23 Ver.1.2.0
+ * 条件にメモ欄を追加。
+ * プラグインパラメータからの引数を処理できるように処理を追加。
  * 2023/4/8 Ver.1.1.12
  * 防具を所持していない条件を指定時にエラーが出る問題を修正。
  * 2023/4/7 Ver.1.1.11
@@ -359,6 +368,8 @@
  * @value 'Switch'
  * @option 所持金(Gold)
  * @value 'Gold'
+ * @option メモ欄(Notes)
+ * @value 'Notes'
  * @option 条件式(Eval)
  * @value 'Eval'
  * @default 
@@ -684,6 +695,16 @@
  * @value 'Gold'
  * @default 
  * 
+ * @param NotesConditionsType
+ * @text メモ欄
+ * @desc メモ欄の条件タイプを指定します。
+ * @type select
+ * @option アクター、敵キャラのメモ欄(3)（(3)タグ名）
+ * @value 'BattlerNotes'
+ * @option 特徴を有するメモ欄(3)（(3)タグ名）
+ * @value 'Notes'
+ * @default 
+ * 
  * @param EvalStr
  * @text 評価式(Eval)
  * @desc 評価式
@@ -716,8 +737,8 @@
  * @parent CommonSetting
  * 
  * @param IDList
- * @text 指定のID(3)
- * @desc 指定のID（複数の場合は,で区切り''又は""で囲む　例'10, 11, 13'）(3)
+ * @text 指定のID、文字列(3)
+ * @desc 指定のIDまたは文字列（複数の場合は,で区切り''又は""で囲む　例'10, 11, 13'）(3)
  * @type string
  * @default
  * @parent CommonSetting
@@ -782,6 +803,10 @@ Game_BattlerBase.prototype.getTriggerConditions  = function(obj, target, tag1, t
   return getTriggerConditions(obj, this, target, tag1, tag2, tag3, tag4, action, damage, partialMode);
 };
 
+Game_BattlerBase.prototype.getTriggerConditionsParams  = function(obj, target, params, action, damage, partialMode) {//単体
+    return getTriggerConditionsParams(obj, this, target, params, action, damage, partialMode);
+};
+
 Game_Player.prototype.getTriggerConditions  = function(list, partialMode) {
   if (partialMode === 0) {
     return isTriggerConditionsSome(list, null, 'Party', null, null);
@@ -791,20 +816,36 @@ Game_Player.prototype.getTriggerConditions  = function(list, partialMode) {
 };
 
 function getTriggerConditions(obj, subject, target, tag1, tag2, tag3, tag4, action, damage, partialMode) {
-  if (getTriggerConditionsMeta(obj, tag1, tag2, tag3, tag4)) {
-    const result1 = getTriggerConditionsResult(obj, subject, tag1, 'Subject', action, damage, partialMode);
-    const result2 = getTriggerConditionsResult(obj, target, tag2, 'Target', action, damage, partialMode);
-    const result3 = getTriggerConditionsResult(obj, null, tag3, 'Party', action, damage, partialMode);
-    const result4 = getTriggerConditionsResult(obj, null, tag4, 'Troop', action, damage, partialMode);
-    if (partialMode === 0) {
-      return result1 || result2 || result3 || result4;
+    if (getTriggerConditionsMeta(obj, tag1, tag2, tag3, tag4)) {
+        const result1 = getTriggerConditionsResult(obj, subject, tag1, 'Subject', action, damage, partialMode);
+        const result2 = getTriggerConditionsResult(obj, target, tag2, 'Target', action, damage, partialMode);
+        const result3 = getTriggerConditionsResult(obj, null, tag3, 'Party', action, damage, partialMode);
+        const result4 = getTriggerConditionsResult(obj, null, tag4, 'Troop', action, damage, partialMode);
+        if (partialMode === 0) {
+        return result1 || result2 || result3 || result4;
+        } else {
+        return result1 && result2 && result3 && result4;
+        }
     } else {
-      return result1 && result2 && result3 && result4;
+        return true;
     }
-  } else {
-    return true;
-  }
 };
+
+function getTriggerConditionsParams(obj, subject, target, params, action, damage, partialMode) {
+    if (getTriggerConditionsParam(params)) {
+        const result1 = getTriggerConditionsParamsResult(obj, subject, params.SubjectCond, 'Subject', action, damage, partialMode);
+        const result2 = getTriggerConditionsParamsResult(obj, target, params.TargetCond, 'Target', action, damage, partialMode);
+        const result3 = getTriggerConditionsParamsResult(obj, null, params.PartyCond, 'Party', action, damage, partialMode);
+        const result4 = getTriggerConditionsParamsResult(obj, null, params.TroopCond, 'Troop', action, damage, partialMode);
+        if (partialMode === 0) {
+            return result1 || result2 || result3 || result4;
+        } else {
+            return result1 && result2 && result3 && result4;
+        }
+    } else {
+      return true;
+    }
+  };
 
 function getTriggerConditionsResult(obj, target, tag, mode, action, damage, partialMode) {
   let list = [];
@@ -822,6 +863,23 @@ function getTriggerConditionsResult(obj, target, tag, mode, action, damage, part
   }
   return result;
 };
+
+function getTriggerConditionsParamsResult(obj, target, param, mode, action, damage, partialMode) {
+    let list = [];
+    let result = partialMode === 1;console.log(param)
+    if (!!param) {
+      if (!$gameParty.inBattle() && mode === 'Troop') {
+        return false;
+      }
+      list = String(param).split(',').map(Number);
+      if (partialMode === 0) {
+        result = isTriggerConditionsSome(list, target, mode, action, damage);
+      } else {
+        result = isTriggerConditionsEvery(list, target, mode, action, damage);
+      }
+    }
+    return result;
+  };
 
 function isTriggerConditionsSome(list, target, mode, action, damage) {
   return list.some(id => triggerConditions(TriggerConditions[id - 1], target, mode, action, damage));
@@ -880,6 +938,8 @@ function triggerConditions(data, target, mode, action, damage) {
     return switchTriggerConditions(data);
   } else if (data.ConditionsMode === 'Gold') {
     return goldTriggerConditions(data, target, mode);
+  } else if (data.ConditionsMode === 'Notes') {
+    return noteTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Eval') {
     return evalTriggerConditions(data);
   }
@@ -1291,6 +1351,36 @@ function goldTriggerConditions(data, target, mode) {
   }
 };
 
+//メモ欄
+function noteTriggerConditions(data, target, mode) {
+    const unit = getUnit(target, mode);
+    if (data.NotesConditionsType === 'BattlerNotes') {
+        if (mode === 'Party' || mode === 'Troop') {
+            return unit.members().some(member => {
+                if (member.isActor()) {
+                    return isNoteTag(member.actor())
+                } else if (member.isEnemy()) {
+                    return isNoteTag(member.enemy())
+                }
+            });
+        } else {
+            if (target.isActor()) {
+                return isNoteTag(target.actor())
+            } else if (target.isEnemy()) {
+                return isNoteTag(target.enemy())
+            }
+        }
+    } else if (data.NotesConditionsType === 'Notes') {
+        if (mode === 'Party' || mode === 'Troop') {
+            return unit.members().some(member => {
+                return isTraitNoteTag(member);
+            });
+        } else {
+            return isTraitNoteTag(target);
+        }
+    }
+};
+
 //条件式
 function evalTriggerConditions(data) {
   return eval(data.EvalStr);
@@ -1571,6 +1661,22 @@ function getEnemyGold(data, enemy) {
 
 function getTriggerConditionsMeta(obj, tag1, tag2, tag3, tag4) {
   return obj.meta[tag1] || obj.meta[tag2] || obj.meta[tag3] || obj.meta[tag4];
+};
+
+function getTriggerConditionsParam(params) {
+    return !!params.SubjectCond || !!params.TargetCond || !!params.PartyCond || !!params.TroopCond;
+};
+
+function isTraitNoteTag(member) {
+    const data = data.IDList.split(',');
+    return member.traitObjects().some(trait => {
+        return data.some(tag => !!trait.meta[tag]);
+    });
+};
+
+function isNoteTag(dMember) {
+    const data = data.IDList.split(',');
+    return data.some(tag => !!dMember.meta[tag]);
 };
 
 Game_BattlerBase.prototype.triggerParamConditions = function(data) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 敵ステート表示拡張
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -36,6 +36,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/23 Ver.1.1.4
+ * 一部のプラグインでステートアイコンが表示されなくなる問題を修正。
  * 2023/6/2 Ver.1.1.3
  * 処理の修正。
  * 2023/5/16 Ver.1.1.2
@@ -116,12 +118,17 @@ function getEnemyStatePosition(troop) {
   return list;
 };
 
+const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
+Sprite_Enemy.prototype.update = function() {
+    _Sprite_Enemy_update.call(this);
+    this.updateStateSpriteEx();
+};
+
 const _Sprite_Enemy_updateStateSprite = Sprite_Enemy.prototype.updateStateSprite;
-Sprite_Enemy.prototype.updateStateSprite = function() {
+Sprite_Enemy.prototype.updateStateSpriteEx = function() {
     if (EnemyStatePosition < 0) {
         return;
     }
-    _Sprite_Enemy_updateStateSprite.call(this);
     this.createStateIconSprite();
     if (this._stateIconSprite) {
         const enemy = this._enemy.enemy();
@@ -134,7 +141,6 @@ Sprite_Enemy.prototype.updateStateSprite = function() {
             this._stateIconSprite.y = 20 - this.y;
         }
     }
-  
 };
 
 Sprite_Enemy.prototype.getBattlerStatePosition = function() {

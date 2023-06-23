@@ -5,9 +5,6 @@
 ### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
-### オプションプラグイン
-
-
 カウンターを拡張します。  
 
 ## 設定
@@ -33,8 +30,7 @@
 アクション終了後：アクションが終わった時に反撃します。  
 
 ### カウンター発動条件
-現在この機能は実装しておりません。  
-この機能を使うにはNUUN_ConditionsBase(Ver.1.2.0以降)が必要です。  
+この機能を使うには[NUUN_ConditionsBase(Ver.1.2.0以降)](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md)が必要です。  
 プラグインパラメータのカウンター発動条件から設定します。  
 NUUN_ConditionsBaseのプラグインパラメータのリストIDを指定します。複数指定の場合は,で区切ります。  
 

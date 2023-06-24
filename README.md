@@ -142,6 +142,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [ステート、バフターン操作アイテム、スキル](https://github.com/nuun888/MZ/blob/master/README/StateBuffTurnOperation.md) | [NUUN_StateBuffTurnOperation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateBuffTurnOperation.js) |  | 1.0.0 |
 | [行動制限TPB初期化無効ステート](https://github.com/nuun888/MZ/blob/master/README/KeepRestrictedTPB.md) | [NUUN_KeepRestrictedTPB](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_KeepRestrictedTPB.js) |  | 1.0.0 |
 | [ステートダメージ解除拡張](https://github.com/nuun888/MZ/blob/master/README/RemoveStatesByDamageEX.md) | [NUUN_RemoveStatesByDamageEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RemoveStatesByDamageEX.js) | 共 | 1.0.0 |
+| [ステート強奪献上](https://github.com/nuun888/MZ/blob/master/README/RobPresentState.md) | [NUUN_RobPresentState](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RobPresentState.js) | | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

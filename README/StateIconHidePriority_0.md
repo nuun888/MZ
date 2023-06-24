@@ -1,4 +1,4 @@
-# ステートアイコンで優先度0を非表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconHidePriority_0.js)
+# [ステートアイコンで優先度0を非表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconHidePriority_0.js)
 # Ver.1.0.0  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconHidePriority_0.js)
 

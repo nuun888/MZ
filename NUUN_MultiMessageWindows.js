@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.6
+ * @version 1.1.7
  * 
  * @help
  * You can now display multiple message windows.
@@ -35,6 +35,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/25/2023 Ver.1.1.7
+ * Conflict support with NRP_MapTravel.
+ * Fixed the problem that if you close one window after opening multiple windows, you can move regardless of the move permission setting.
  * 4/22/2023 Ver.1.1.6
  * Fixed an issue that allowed players to walk when displaying normal windows.
  * Added function to initialize window settings.
@@ -130,7 +133,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.6
+ * @version 1.1.7
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -153,6 +156,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/25 Ver.1.1.7
+ * NRP_MapTravelとの競合対応。
+ * 複数ウィンドウを開いた後に、一つのウィンドウを閉じると移動許可設定に関わらず移動できてしまう問題を修正。
  * 2023/4/22 Ver.1.1.6
  * 通常のウィンドウを表示したときにプレイヤーが歩行できてしまう問題を修正。
  * ウィンドウの設定を初期化する機能を追加。
@@ -344,11 +350,15 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     Scene_Message.prototype.createMessageWindow = function() {//再定義
-        this.createMultiMessageWindow();
+        if (this.createMultiMessageWindow) {//関数がない場合はスルー
+            this.createMultiMessageWindow();
+        }
     };
 
     Scene_Message.prototype.createNameBoxWindow = function() {//再定義
-        this.createMultiMessageNameBoxWindow();
+        if (this.createMultiMessageNameBoxWindow) {
+            this.createMultiMessageNameBoxWindow();
+        }
     };
 
     Scene_Message.prototype.createMultiMessageWindow = function() {
@@ -405,10 +415,9 @@ Imported.NUUN_MultiMessageWindows = true;
 
     Scene_Message.prototype.noBusyMultiMessageWindow = function() {
         return this._messageWindows.some(window => {
-            return window.visible && !window.noBusy;
+            return window.visible && window.isOpen() && !window.noBusy;
         });
     };
-
 
     function Window_MultiMessage() {
         this.initialize(...arguments);
@@ -493,11 +502,19 @@ Imported.NUUN_MultiMessageWindows = true;
     Game_Player.prototype.canMove = function() {
         const result = _Game_Player_canMove.call(this);
         if (!result) {
-            if ($gameMessage.isBusy() && !SceneManager._scene.noBusyMultiMessageWindow()) {
+            if ($gameMessage.isBusy() && !SceneManager._scene.isBusyMultiMessageWindow()) {
                 return true;
             }
         }
+        if (SceneManager._scene.isBusyMultiMessageWindow()) {
+            return false;
+        }
         return result;
+    };
+
+
+    Game_Message.prototype.isBusyMultiMessageWindow = function() {
+        return SceneManager._scene.isBusyMultiMessageWindow();
     };
     
 })();

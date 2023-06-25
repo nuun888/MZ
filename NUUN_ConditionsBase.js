@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -257,6 +257,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/25 Ver.1.2.1
+ * カウンターの処理を修正。
  * 2023/6/23 Ver.1.2.0
  * 条件にメモ欄を追加。
  * プラグインパラメータからの引数を処理できるように処理を追加。
@@ -866,7 +868,7 @@ function getTriggerConditionsResult(obj, target, tag, mode, action, damage, part
 
 function getTriggerConditionsParamsResult(obj, target, param, mode, action, damage, partialMode) {
     let list = [];
-    let result = partialMode === 1;console.log(param)
+    let result = partialMode === 1;
     if (!!param) {
       if (!$gameParty.inBattle() && mode === 'Troop') {
         return false;
@@ -1856,16 +1858,24 @@ BattleManager.endAllBattlersTurn = function() {
 
 const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
 BattleManager.invokeCounterAttack = function(subject, target) {
-  target._cntAction = true;
+  this.setCounterActionFlag(target, true);
   _BattleManager_invokeCounterAttack.call(this, subject, target);
-  target._cntAction = false;
+  this.setCounterActionFlag(target, false);
 };
 
 const _BattleManager_invokeMagicReflection = BattleManager.invokeMagicReflection;
 BattleManager.invokeMagicReflection = function(subject, target) {
-  target._reflectionAction = true;
+  this.setReflectionActionFlag(target, true);
   _BattleManager_invokeMagicReflection.call(this, subject, target);
-  target._reflectionAction = false;
+  this.setReflectionActionFlag(target, false);
+};
+
+BattleManager.setCounterActionFlag = function(target, flag) {
+    target._cntAction = flag;
+};
+
+BattleManager.setReflectionActionFlag = function(target, flag) {
+    target._reflectionAction = flag;
 };
 
 })();

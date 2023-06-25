@@ -33,7 +33,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | コア　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md) | [NUUN_Base](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) |  | 1.6.4 |
-| [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.2.0 |
+| [条件付きベース](https://github.com/nuun888/MZ/blob/master/README/ConditionsBase.md) | [NUUN_ConditionsBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js) | 共 | 1.2.1 |
 | [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md) | [NUUN_StateTurnCount](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurnCount.js) |  | 1.1.1 |
 | [レーダーチャート表示ベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md) | [NUUN_RadarChartBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js) | 共 | 1.0.2 |
 | [立ち絵、顔グラ表示EX](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md) | [NUUN_ActorPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js) | 共 | 1.5.2 |
@@ -105,7 +105,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [能力値ターン毎増減特徴](https://github.com/nuun888/MZ/blob/master/README/AccelerationFeature.md) | [NUUN_AccelerationFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js) |  | 2.0.0 |
 | [行動時ブースト特徴](https://github.com/nuun888/MZ/blob/master/README/NUUN_boostEX.md) | [NUUN_boostEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_boostEX.js) | 条対 | 1.2.0 |
 | [踏み止まり特徴](https://github.com/nuun888/MZ/blob/master/README/StoppingFeature.md) | [NUUN_StoppingFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js) | 条対 | 1.1.2 |
-| [カウンター拡張](https://github.com/nuun888/MZ/blob/master/README/CounterEX.md) | [NUUN_CounterEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js) | 共 条対 | 1.0.0 |
+| [カウンター拡張](https://github.com/nuun888/MZ/blob/master/README/CounterEX.md) | [NUUN_CounterEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js) | 共 条対 | 1.0.1 |
 |  |  |  |  |
 |  |  |  |  |
 

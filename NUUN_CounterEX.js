@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Extend the counter.
@@ -58,6 +58,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/25/2023 Ver.1.0.1
+ * Fixed to accommodate conditional base counter conditions.
+ * Fixed an issue where the Hit Counterattack was not working.
  * 6/23/2023 Ver.1.0.0
  * first edition.
  * 
@@ -280,7 +283,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * カウンターを拡張します。
@@ -326,6 +329,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/25 Ver.1.0.1
+ * 条件付きベースのカウンター条件に対応できるように修正。
+ * 必中の反撃が機能していなかった問題を修正。
  * 2023/6/23 Ver.1.0.0
  * 初版
  * 
@@ -782,11 +788,7 @@ Imported.NUUN_CounterEX = true;
     const _BattleManager_invokeNormalAction = BattleManager.invokeNormalAction;
     BattleManager.invokeNormalAction = function(subject, target) {
         if (this._action.isCounterSkill()) {
-            _BattleManager_invokeNormalAction.call(this, subject, target);
-            const counter = this._action.getCounterData();
-            if (counter.getCounterEraseState() > 0) {
-                subject.removeState(counter.getCounterEraseState());
-            }
+            this.invokeCounterActionEx(subject, target);
             return;
         }
         this.condCounterActions(subject, target, 0);
@@ -795,6 +797,27 @@ Imported.NUUN_CounterEX = true;
         }
         this.condCounterActions(subject, target, 1);
         this.setCounterAction();
+    };
+
+    BattleManager.invokeCounterActionEx = function(subject, target) {
+        const counter = this._action.getCounterData();
+        if (counter.isCounterReflection()) {
+            if (Imported.NUUN_ConditionsBase) {
+                this.setReflectionActionFlag(subject, true);
+            }
+        } else {
+            if (Imported.NUUN_ConditionsBase) {
+                this.setCounterActionFlag(subject, true);
+            }
+        }
+        _BattleManager_invokeNormalAction.call(this, subject, target);
+        if (counter.getCounterEraseState() > 0) {
+            subject.removeState(counter.getCounterEraseState());
+        }
+        if (Imported.NUUN_ConditionsBase) {
+            this.setCounterActionFlag(subject, false);
+            this.setReflectionActionFlag(subject, false);
+        }
     };
 
     BattleManager.isMembersCounterAction = function() {
@@ -866,7 +889,7 @@ Imported.NUUN_CounterEX = true;
                 this._counterBattlerList.push(target);
                 return;
             };
-        } else if (trigger === 'Magical' && Math.random() < this._action.itemCertainEx(target, counter)) {
+        } else if (trigger === 'Certain' && Math.random() < this._action.itemCertainEx(target, counter)) {
             if (this.isCounterAction(target, trait, subject, counter)) {
                 this._counterBattlerList.push(target);
                 return;
@@ -978,6 +1001,37 @@ Imported.NUUN_CounterEX = true;
             return this.currentCounterAction();
         }
         return _Game_Battler_currentAction.call(this);
+    };
+
+    Game_Actor.prototype.setCounterExAttackImgId = function(action) {
+        if (action.isCounterSkill()) {
+            const counter = this._action.getCounterData();
+            if (counter.isCounterReflection()) {
+                this.setReflectionImgId();
+            } else {
+                this.setCounterImgId();
+            }
+        }
+    };
+
+    Game_Actor.prototype.setCounterImgId = function() {
+        if (Imported.NUUN_BattleStyleEX && BattleManager.isOnActorPictureEX()) {
+            this.onImgId = 30;
+            this.imgRefresh();
+        } else if (Imported.NUUN_BattleStyleEX) {
+            this.setBattleImgId(30);
+            this.battleStyleImgRefresh();
+        }
+    };
+
+    Game_Actor.prototype.setReflectionImgId = function() {
+        if (Imported.NUUN_BattleStyleEX && BattleManager.isOnActorPictureEX()) {
+            this.onImgId = 31;
+            this.imgRefresh();
+        } else if (Imported.NUUN_BattleStyleEX) {
+            this.setBattleImgId(31);
+            this.battleStyleImgRefresh();
+        }
     };
 
 

@@ -1,5 +1,5 @@
 # [立ち絵、顔グラ表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
-# Ver.1.5.4
+# Ver.1.5.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -49,6 +49,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2023/6/26 Ver.1.5.5  
+カウンターの画像切り替え処理を修正。  
 2023/5/22 Ver.1.5.4  
 条件アクター画像にクリティカルダメージ時の設定を追加。  
 2023/4/11 Ver.1.5.3  

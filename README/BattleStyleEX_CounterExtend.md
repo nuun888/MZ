@@ -1,5 +1,5 @@
 # [条件バトラー反撃拡張プラグイン適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_CounterExtend.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_CounterExtend.js)
 #### 必須、前提プラグイン
 [バトルスタイル拡張](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md)  
@@ -10,6 +10,8 @@
 識別タグ(4)で反撃拡張プラグインで設定した識別子を指定してください。識別子は複数設定可能です。  
 
 ## 更新履歴
+2023/6/26 Ver.1.0.2  
+カウンターの処理を修正。  
 2023/4/11 Ver.1.0.1  
 カウンター時のスキル発動時のアクター画像切り替えを行うように修正。  
 2023/4/11 Ver.1.0.0  

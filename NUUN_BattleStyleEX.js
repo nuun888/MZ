@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.15
+ * @version 3.10.16
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,7 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2023/6/15 Ver.3.10.15
+ * 2023/6/26 Ver.3.10.16
+ * カウンターの画像切り替え処理を修正。
+ * 2023/6/22 Ver.3.10.15
  * Dynamic Motionプラグインとの競合対策。
  * 2023/6/14 Ver.3.10.14
  * スキル発動待機時間ゲージ表示プラグインとの競合対応。
@@ -443,20 +445,21 @@ BattleManager.startActorInput = function() {
 
 const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
 BattleManager.invokeCounterAttack = function(subject, target) {
-  if (target.isActor()) {
-    target.setBattleImgId(30);
-    target.battleStyleImgRefresh();
-  }
-  _BattleManager_invokeCounterAttack.call(this, subject, target);
+    target.isCouterAction = true;
+    if (target.isActor()) {
+        target.result().counterEx = true;
+    }
+    _BattleManager_invokeCounterAttack.call(this, subject, target);
 };
 
 const _BattleManager_invokeMagicReflection = BattleManager.invokeMagicReflection;
 BattleManager.invokeMagicReflection = function(subject, target) {
-  if (target.isActor()) {
-    target.setBattleImgId(31);
-    target.battleStyleImgRefresh();
-  }
-  _BattleManager_invokeMagicReflection.call(this, subject, target);
+    target.isReflectionAction = true;
+    if (target.isActor()) {
+        target.result().reflectionEx = true;
+        target.battleStyleImgRefresh();
+    }
+    _BattleManager_invokeMagicReflection.call(this, subject, target);
 };
 
 //Game_Temp
@@ -506,6 +509,14 @@ Game_Action.prototype.gamePadVibrationEffect = function(target) {
         vibration.StrongMagnitude = Number(data[3]);
         NuunManager.setupGamePadVibration(vibration);
     }
+};
+
+const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
+Game_ActionResult.prototype.clear = function() {
+    _Game_ActionResult_clear.call(this);
+    this.counterEx = false;
+    this.reflectionEx = false;
+    this.counterExtend = false;
 };
 
 
@@ -705,11 +716,11 @@ Game_Actor.prototype.battleStyleMatchChangeGraphic = function(data) {
     case 'state' :
       return this.isBattleStyleStateImg(data, data.stateId);
     case 'counter' :
-      return this.onImgId === 30;
+      return this.result().counterEx;
     case 'reflection' :
-      return this.onImgId === 31;
+      return this.result().reflectionEx;
     case 'counterEX' :
-      return this.onImgId === 32 && this.isBattleStyleUseItemImg(data.Id);
+      return this.result().counterExtend && this.isBattleStyleUseItemImg(data.Id);
     case 'guard' :
       return this.onImgId === 15;
   }
@@ -825,7 +836,6 @@ Game_Actor.prototype.isCounterSkillAction = function() {
 };
 
 Game_Actor.prototype.setBattleStyleAttackImgId = function(action) {
-
     if (action.item().animationId !== 0) {
         if (action.isRecover()) {
             this.setBattleImgId(11, action.item().id);
@@ -3181,7 +3191,7 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
         } else if (actor.isAlive() && actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
             if (actor.onImgId === 1 || actor.onImgId === 2 || actor.onImgId === 3 ||actor.onImgId === 15) {
                 this._updateCount = this.setDamageDuration();
-            } else if (actor.onImgId === 30 || actor.onImgId === 31 || actor.onImgId === 32) {
+            } else if (actor.result().counterEx || actor.result().reflectionEx || actor.result().counterExtend) {
                 this._updateCount = this.setCounterDuration();
             } else if (actor.onImgId === 20) {
                 this._updateCount = Infinity;

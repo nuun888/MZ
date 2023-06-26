@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.4
+ * @version 1.5.5
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/26 Ver.1.5.5
+ * カウンターの画像切り替え処理を修正。
  * 2023/5/22 Ver.1.5.4
  * 条件アクター画像にクリティカルダメージ時の設定を追加。
  * 2023/4/11 Ver.1.5.3
@@ -312,7 +314,7 @@ BattleManager.startActorInput = function() {
 const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
 BattleManager.invokeCounterAttack = function(subject, target) {
   if (target.isActor()) {
-    target.onImgId = 30;
+    target.result().counterEx = true;
     target.imgRefresh();
   }
   _BattleManager_invokeCounterAttack.call(this, subject, target);
@@ -320,8 +322,8 @@ BattleManager.invokeCounterAttack = function(subject, target) {
 
 const _BattleManager_invokeMagicReflection = BattleManager.invokeMagicReflection;
 BattleManager.invokeMagicReflection = function(subject, target) {
-  if (target.isActor()) {
-    target.onImgId = 31;
+  if (target.isActor(target)) {
+    target.result().reflectionEx = true;
     target.imgRefresh();
   }
   _BattleManager_invokeMagicReflection.call(this, subject, target);
@@ -437,11 +439,11 @@ Game_Actor.prototype.matchChangeGraphic = function(data) {
     case 'state' :
       return this.isCondStateImg(data, data.stateId);
     case 'counter' :
-      return this.onImgId === 30;
+      return this.result().counterEx;
     case 'reflection' :
-      return this.onImgId === 31;
+      return this.result().reflectionEx;
     case 'counterEX' :
-      return this.onImgId === 32 && this.isCondUseItemImg(data.Id);
+      return this.result().counterExtend && this.isCondUseItemImg(data.Id);
     case 'guard' :
       return this.onImgId === 15;
   }

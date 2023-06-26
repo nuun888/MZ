@@ -13,7 +13,7 @@
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_BattleStyleEX
  * @orderAfter CounterExtend
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * トリアコンタン氏の反撃拡張プラグインで設定した反撃をバトルスタイル拡張プラグインでの条件バトラーに適用させるプラグインです。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/26 Ver.1.0.2
+ * カウンターの処理を修正。
  * 2023/4/11 Ver.1.0.1
  * カウンター時のスキル発動時のアクター画像切り替えを行うように修正。
  * 2023/4/11 Ver.1.0.0
@@ -45,11 +47,13 @@ Imported.NUUN_BattleStyleEX_CounterExtend = true;
         }
         const counter = counterAction.getCounter();
         if (subject.isActor()) {
+            subject.result().counterExtend = true;
+            if (counter.Id !== undefined) {
+                this.nuun_bsUseItemId = counter.Id;
+            }
             if (BattleManager.isOnActorPictureEX()) {
-                subject.onImgId = 32;
                 subject.imgRefresh();
             } else {
-                subject.setBattleImgId(32, counter.Id);
                 subject.battleStyleImgRefresh();
             };
         }

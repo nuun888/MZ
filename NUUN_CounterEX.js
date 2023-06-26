@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Extend the counter.
@@ -58,6 +58,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/26/2023 Ver.1.0.2
+ * It corresponds to the standing picture switching in "NUUN_BattleStyleEX" and "NUUN_ActorPicture".
  * 6/25/2023 Ver.1.0.1
  * Fixed to accommodate conditional base counter conditions.
  * Fixed an issue where the Hit Counterattack was not working.
@@ -283,7 +285,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * カウンターを拡張します。
@@ -329,6 +331,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/26 Ver.1.0.2
+ * バトルスタイル拡張、立ち絵、顔グラ表示EXでの立ち絵切り替えに対応。
  * 2023/6/25 Ver.1.0.1
  * 条件付きベースのカウンター条件に対応できるように修正。
  * 必中の反撃が機能していなかった問題を修正。
@@ -772,10 +776,12 @@ Imported.NUUN_CounterEX = true;
                 action.setSubject(action.getReflectionSubject());
             }
             action.applyGlobal();
-            if (counter.isCounterSubject()) {
-                this._logWindow.displayCounterEx(subject, counter);
-            } else {
+            if (counter.isCounterReflection()) {
+                subject.result().reflectionEx = true;
                 this._logWindow.displayReflectionEx(subject, counter);
+            } else {
+                subject.result().counterEx = true;
+                this._logWindow.displayCounterEx(subject, counter);
             }
             this._logWindow.counter = counter;
             this._logWindow.startAction(subject, action, targets);
@@ -1001,37 +1007,6 @@ Imported.NUUN_CounterEX = true;
             return this.currentCounterAction();
         }
         return _Game_Battler_currentAction.call(this);
-    };
-
-    Game_Actor.prototype.setCounterExAttackImgId = function(action) {
-        if (action.isCounterSkill()) {
-            const counter = this._action.getCounterData();
-            if (counter.isCounterReflection()) {
-                this.setReflectionImgId();
-            } else {
-                this.setCounterImgId();
-            }
-        }
-    };
-
-    Game_Actor.prototype.setCounterImgId = function() {
-        if (Imported.NUUN_BattleStyleEX && BattleManager.isOnActorPictureEX()) {
-            this.onImgId = 30;
-            this.imgRefresh();
-        } else if (Imported.NUUN_BattleStyleEX) {
-            this.setBattleImgId(30);
-            this.battleStyleImgRefresh();
-        }
-    };
-
-    Game_Actor.prototype.setReflectionImgId = function() {
-        if (Imported.NUUN_BattleStyleEX && BattleManager.isOnActorPictureEX()) {
-            this.onImgId = 31;
-            this.imgRefresh();
-        } else if (Imported.NUUN_BattleStyleEX) {
-            this.setBattleImgId(31);
-            this.battleStyleImgRefresh();
-        }
     };
 
 

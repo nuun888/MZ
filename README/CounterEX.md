@@ -1,5 +1,5 @@
 # [カウンター拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js)
 
 ### 必須、前提プラグイン
@@ -46,6 +46,8 @@ NUUN_ConditionsBaseのプラグインパラメータのリストIDを指定し�
 `[rate]`:無効化する確率。  
 
 ## 更新履歴
+2023/6/26 Ver.1.0.2  
+バトルスタイル拡張、立ち絵、顔グラ表示EXでの立ち絵切り替えに対応。  
 2023/6/25 Ver.1.0.1  
 条件付きベースのカウンター条件に対応できるように修正。  
 必中の反撃が機能していなかった問題を修正。  

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.7
+ * @version 1.1.8
  * 
  * @help
  * You can now display multiple message windows.
@@ -35,6 +35,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/27/2023 Ver.1.1.8
+ * Fixed an issue where windows could be moved when opening.
+ * Fix processing.
+ * Fixed function error.
  * 6/25/2023 Ver.1.1.7
  * Conflict support with NRP_MapTravel.
  * Fixed the problem that if you close one window after opening multiple windows, you can move regardless of the move permission setting.
@@ -133,7 +137,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.7
+ * @version 1.1.8
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -156,8 +160,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/27 Ver.1.1.8
+ * ウィンドウを開くときに移動できてしまう問題を修正。
+ * 処理の修正。
+ * 関数ミス修正。
  * 2023/6/25 Ver.1.1.7
- * NRP_MapTravelとの競合対応。
  * 複数ウィンドウを開いた後に、一つのウィンドウを閉じると移動許可設定に関わらず移動できてしまう問題を修正。
  * 2023/4/22 Ver.1.1.6
  * 通常のウィンドウを表示したときにプレイヤーが歩行できてしまう問題を修正。
@@ -303,7 +310,7 @@ Imported.NUUN_MultiMessageWindows = true;
             this.createMultiMessageNameBoxWindow();
         }
         $gameTemp.activeMultiMessageId = Number(args.Id);
-        this.associateWindows();
+        this.associateMultiWindows();
     };
 
     Scene_Message.prototype.resetMultiMessageWindow = function() {
@@ -316,7 +323,7 @@ Imported.NUUN_MultiMessageWindows = true;
             keyInvalid: false,
         };
         $gameTemp.activeMultiMessageId = 0;
-        this.associateWindows();
+        this.associateMultiWindows();
     };
 
     Scene_Message.prototype.shiftMessageWindowId = function() {
@@ -349,13 +356,23 @@ Imported.NUUN_MultiMessageWindows = true;
         return this._multiMessageWindowsList[0] !== undefined ? this._multiMessageWindowsList[0].keyInvalid : false;
     };
 
-    Scene_Message.prototype.createMessageWindow = function() {//再定義
-        if (this.createMultiMessageWindow) {//関数がない場合はスルー
+    const _Scene_Message_createAllWindows = Scene_Message.prototype.createAllWindows;
+    Scene_Message.prototype.createAllWindows = function() {
+        _Scene_Message_createAllWindows.call(this);
+        this.associateMultiWindows();
+    };
+
+    const _Scene_Message_createMessageWindow = Scene_Message.prototype.createMessageWindow;
+    Scene_Message.prototype.createMessageWindow = function() {
+        _Scene_Message_createMessageWindow.call(this);
+        if (this.createMultiMessageWindow) {
             this.createMultiMessageWindow();
         }
     };
 
-    Scene_Message.prototype.createNameBoxWindow = function() {//再定義
+    const _Scene_Message_createNameBoxWindow = Scene_Message.prototype.createNameBoxWindow;
+    Scene_Message.prototype.createNameBoxWindow = function() {
+        _Scene_Message_createNameBoxWindow.call(this);
         if (this.createMultiMessageNameBoxWindow) {
             this.createMultiMessageNameBoxWindow();
         }
@@ -400,7 +417,9 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     const _Scene_Message_associateWindows = Scene_Message.prototype.associateWindows;
-    Scene_Message.prototype.associateWindows = function() {
+    Scene_Message.prototype.associateMultiWindows = function() {
+        const messageWindow = this._messageWindow;
+        const nameBoxWindow = this._nameBoxWindow;
         const id = this.getmultiMessageWindowId();
         const window = this._messageWindows[id];
         window.multiMessageMode = this.getmultiMessageMode();
@@ -411,11 +430,13 @@ Imported.NUUN_MultiMessageWindows = true;
         this._nameBoxWindow = this._nameBoxWindows[id];
         this._nameBoxWindow.setBoxPosition(this.getNameBoxPosition(this._messageWindow))
         _Scene_Message_associateWindows.call(this);
+        this._messageWindow = messageWindow;
+        this._nameBoxWindow = nameBoxWindow;
     };
 
     Scene_Message.prototype.noBusyMultiMessageWindow = function() {
         return this._messageWindows.some(window => {
-            return window.visible && window.isOpen() && !window.noBusy;
+            return window.visible && (window.isOpen() || window.isOpening()) && !window.noBusy;
         });
     };
 
@@ -438,6 +459,10 @@ Imported.NUUN_MultiMessageWindows = true;
     const _Window_Message_canStart = Window_Message.prototype.canStart;
     Window_MultiMessage.prototype.canStart = function() {
         return _Window_Message_canStart.call(this) && this.isMultiMessage();
+    };
+
+    Window_Message.prototype.canStart = function() {
+        return false;//元のウィンドウは開かない。現バージョンでは切る。
     };
 
     Window_MultiMessage.prototype.isMultiMessage = function() {
@@ -502,11 +527,11 @@ Imported.NUUN_MultiMessageWindows = true;
     Game_Player.prototype.canMove = function() {
         const result = _Game_Player_canMove.call(this);
         if (!result) {
-            if ($gameMessage.isBusy() && !SceneManager._scene.isBusyMultiMessageWindow()) {
+            if ($gameMessage.isBusy() && !SceneManager._scene.noBusyMultiMessageWindow()) {
                 return true;
             }
         }
-        if (SceneManager._scene.isBusyMultiMessageWindow()) {
+        if (SceneManager._scene.noBusyMultiMessageWindow()) {
             return false;
         }
         return result;

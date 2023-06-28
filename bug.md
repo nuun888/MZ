@@ -10,6 +10,7 @@ LL_GalgeChoiceWindowとNUUN_MultiMessageWindowsとの競合確認
 ### 現在の要望
 吸収属性分割及び項目追加。  
 表示アクターに条件適用  
+モンスターの条件付き表示変更  
 
 ### 新規プラグイン
 

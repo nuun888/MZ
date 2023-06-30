@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.4
+ * @version 2.19.5
  * 
  * @help
  * Implement an enemy book.
@@ -227,6 +227,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/30/2023 Ver.2.19.5
+ * Fixed an issue where full size silhouettes were not working.
  * 6/21/2023 Ver.2.19.4
  * Fixed an issue where the analysis page could not be switched.
  * 6/18/2023 Ver.2.19.3
@@ -3153,6 +3155,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/30 Ver.2.19.5
+ * 原寸大表示のシルエットが機能していなかった問題を修正。
  * 2023/6/21 Ver.2.19.4
  * アナライズのページが切り替えられない問題を修正。
  * 2023/6/18 Ver.2.19.3
@@ -9152,7 +9156,7 @@ Window_EnemyBook.prototype.drawEnemyBookContents = function() {
     de = this._enemy;
     this._enemySprite.resetEnemy();
     this.enemyActualeResetEnemy();
-    this.setupEnemyActual(enemy, ActualEnemyMask);
+    this.setupEnemyActual(enemy, this.paramMask(ActualEnemyMask));
     for (const data of listContents) {
         this.resetFontSettings();
         const x_Position = data.X_Position;

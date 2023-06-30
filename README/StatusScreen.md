@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.6.3
+# Ver.2.6.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.4以降  
@@ -112,6 +112,8 @@ APNGを表示するには別途ApngPicture.js(トリアコンタン様)が必要
 `[text]`:任意の個別画像。  
 
 ### 更新履歴
+2023/6/30 Ver.2.6.4  
+装備スロット名がなしまたはデータが存在しない場合は表示しないように修正。  
 2023/5/21 Ver.2.6.3  
 共通画像、個別画像に表示条件を指定できる機能を追加。  
 AvPort_dsWeaponMasteryと併用できるように対応。  

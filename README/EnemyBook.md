@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.19.4
+# Ver.2.19.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -277,6 +277,8 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2023/6/30 Ver.2.19.5  
+原寸大表示のシルエットが機能していなかった問題を修正。  
 2023/6/21 Ver.2.19.4  
 アナライズのページが切り替えられない問題を修正。  
 2023/6/18 Ver.2.19.3  

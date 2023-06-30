@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.3
+ * @version 2.6.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/6/30 Ver.2.6.4
+ * 装備スロット名がなしまたはデータが存在しない場合は表示しないように修正。
  * 2023/5/21 Ver.2.6.3
  * 共通画像、個別画像に表示条件を指定できる機能を追加。
  * AvPort_dsWeaponMasteryと併用できるように対応。
@@ -2231,7 +2233,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
     for (let i = 0; i < e1uipsLength; i++) {
         const index = i + (list.EquipStartIndex || 0);
         const slotName = this.actorSlotName(actor, index);
-        if (!showEquips || (showEquips && showEquips.some(data => data === slotName))) {
+        if (slotName && (!showEquips || (showEquips && showEquips.some(data => data === slotName)))) {
             let sw = 0;
             let iconWidth = 0;
             if (list.Back) {

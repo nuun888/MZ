@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * Extend the counter.
@@ -58,6 +58,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/1/2023 Ver.1.1.0
+ * Added a function that can specify the target of the counter.
  * 6/26/2023 Ver.1.0.2
  * It corresponds to the standing picture switching in "NUUN_BattleStyleEX" and "NUUN_ActorPicture".
  * 6/25/2023 Ver.1.0.1
@@ -163,6 +165,18 @@
  * @option Counterattack (reflection) when the attack misses
  * @value 'Miss'
  * @default 'NotDamege'
+ * 
+ * @param CounterTarget
+ * @desc Target for countering.
+ * @text Counter target
+ * @type select
+ * @option Attacker
+ * @value 'Subject'
+ * @option All attacker damage
+ * @value 'SubjectAllDamage'
+ * @option Random
+ * @value 'Random'
+ * @default 'Subject'
  * 
  * @param CounterSkillCost
  * @desc Enable skill cost.
@@ -285,7 +299,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * カウンターを拡張します。
@@ -331,6 +345,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/1 Ver.1.1.0
+ * カウンターの対象を指定できる機能を追加。
  * 2023/6/26 Ver.1.0.2
  * バトルスタイル拡張、立ち絵、顔グラ表示EXでの立ち絵切り替えに対応。
  * 2023/6/25 Ver.1.0.1
@@ -436,6 +452,18 @@
  * @option 攻撃が外れた時に反撃(反射)
  * @value 'Miss'
  * @default 'NotDamege'
+ * 
+ * @param CounterTarget
+ * @desc カウンターを行う対象。
+ * @text カウンター対象
+ * @type select
+ * @option 攻撃者
+ * @value 'Subject'
+ * @option 攻撃者全ダメージ
+ * @value 'SubjectAllDamage'
+ * @option ランダム
+ * @value 'Random'
+ * @default 'Subject'
  * 
  * @param CounterSkillCost
  * @desc スキルコストを有効にします。
@@ -561,7 +589,8 @@ Imported.NUUN_CounterEX = true;
     const CounterData = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CounterData'])) : [];
 
     class CounterActionEX {
-        constructor(subject) {
+        constructor(counterSubject, subject) {
+            this._counterSubject = subject;
             this._subject = subject;
         }
 
@@ -652,6 +681,10 @@ Imported.NUUN_CounterEX = true;
         getSubject() {
             return this._subject;
         }
+
+        getCounterSubject() {
+            return this._counterSubject;
+        }
     };
 
     class Game_CounterAction extends Game_Action {
@@ -681,6 +714,30 @@ Imported.NUUN_CounterEX = true;
         getReflectionSubject() {
             return this._reflectionSubject;
         }
+
+        numTargets() {
+            if (this.getCounterData().getCounterTarget() === "Random") {
+                return Math.max(Game_Action.prototype.numTargets.call(this), 1);
+            } else {
+                return Game_Action.prototype.numTargets.call(this);
+            }
+        }
+
+        getAllDamageCounterTarget() {
+            const target = this.getCounterData().getSubject();
+            const num = this.makeTargets().length;
+            const targets = [];
+            for (let i = 0; i < num; i++) {
+                targets.push(target);
+            }
+            return targets;
+        }
+
+        targetsRandomCounter() {
+            const unit = this.opponentsUnit();
+            return this.randomTargets(unit);
+        }
+
     };
 
     const _BattleManager_initMembers = BattleManager.initMembers;
@@ -763,11 +820,20 @@ Imported.NUUN_CounterEX = true;
         const subject = this._subject;
         const action = subject.currentAction();
         if (action.isCounterSkill()) {
-            const targets = action.makeTargets();
             const counter = action.getCounterData();
+            let targets = [];
+            if (counter.getCounterTarget() === "SubjectAllDamage") {
+                targets = action.getAllDamageCounterTarget();
+            } else {
+                if (counter.getCounterTarget() === "Random" && action.isForOpponent()) {
+                    targets = action.targetsRandomCounter();
+                } else {
+                    targets = action.makeTargets();
+                }
+            }
             this._action = action;
             this._targets = targets;
-            this._phase = "action";;
+            this._phase = "action";
             subject.cancelMotionRefresh();
             if (counter.isCounterSkillCost()) {
                 subject.useItem(action.item());
@@ -910,7 +976,7 @@ Imported.NUUN_CounterEX = true;
 
     BattleManager.isCounterAction = function(target, trait, subject, counter) {
         if (getCondCounter(counter, target, trait, subject, this._action)) {
-            const counterData = new CounterActionEX(target);
+            const counterData = new CounterActionEX(target, subject);
             counterData.setup(counter);
             if (counterData.isCounterTypeReflection()) {
                 this.invokeMagicReflection(subject, target);
@@ -958,7 +1024,9 @@ Imported.NUUN_CounterEX = true;
         if (skill >= 0) {
             const action = new Game_CounterAction(this);
             action.setup(counter);
-            action.setTarget(subject.index());
+            if (counter.CounterTarget === "Subject" || !counter.CounterTarget) {
+                action.setTarget(subject.index());
+            }
             action.setSkill(skill);
             this._counterActions.push(action);
         }

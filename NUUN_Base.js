@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.8
+ * @version 1.6.9
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/1/2023 Ver.1.6.9
+ * Added attack element processing.
  * 6/2/2023 Ver.1.6.8
  * Fixed processing related to overlay plugins.
  * 4/16/2023 Ver.1.6.7
@@ -85,7 +87,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.6.8
+ * @version 1.6.9
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -95,6 +97,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/1 Ver.1.6.9
+ * 攻撃属性の処理追加。
  * 2023/6/2 Ver.1.6.8
  * オーバレイプラグイン関連の処理の修正。
  * 2023/4/16 Ver.1.6.7
@@ -455,6 +459,12 @@ Window_ItemList.prototype.isConstructor = function() {
 };
 
 
+const _Game_Action_clear = Game_Action.prototype.clear;
+Game_Action.prototype.clear = function() {
+    _Game_Action_clear.call(this);
+    this._multiElements = [];
+};
+//以下2つは新バージョンでは必要なし。
 Game_Action.prototype.getAttackElementsList = function() {
   return Imported.NUUN_MultiElement ? this.getAttackElements() : this.subject().attackElements();
 };

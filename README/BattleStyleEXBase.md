@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.10.16
+### Ver.3.11.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.10.6  
@@ -9,16 +9,16 @@
 [バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.10.6  
 [バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.3.6  
 
-バトルスタイル拡張デフォルト設定用 Ver.1.10.6  
-![画像](img/BattleStyleEX1.png)  
+バトルスタイル拡張デフォルト設定用 Ver.1.11.0  
+![画像](img/BattleStyleEX1.png)   
 
-バトルスタイル拡張スタンダード設定用 Ver.1.10.6 
+バトルスタイル拡張スタンダード設定用 Ver.1.11.0 
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.10.6  
+バトルスタイル拡張XPスタイル設定用 Ver.1.11.0  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.3.6  
+バトルスタイル拡張タイプ4設定用 Ver.1.4.0  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 
@@ -199,11 +199,16 @@ Ver.1.6.0でバトルステータスのデフォルトの設定を表示ステ�
 問題ない場合、サイドビュー戦闘の場合は'Scene_Battle'に指定しても問題ありません。  
 LL_StandingPictureBattle等と併用する場合は、'Scene_Battle'に設定することでアクターが背後に表示されますが、フロントビューアニメーションでアクターへの一部のアニメーションの表示が正常に表示されません。  
 
+### 天候適用
+他の天候プラグインで戦闘中に天候を反映できる場合で、競合が起きる場合は当プラグインの戦闘時天候表示設定を表示なしに設定してください。  
+
 ## 仕様
 メニュー型のステート表示、画像、アクター名の表示幅は表示ステータス設定でのみ設定できます。  
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/7/2 Ver.3.11.0  
+戦闘中に天候を適用できる機能を追加。  
 2023/6/26 Ver.3.10.16   
 カウンターの画像切り替え処理を修正。  
 2023/6/22 Ver.3.10.15  

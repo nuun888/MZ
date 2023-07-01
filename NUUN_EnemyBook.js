@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.5
+ * @version 2.20.0
  * 
  * @help
  * Implement an enemy book.
@@ -227,6 +227,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/30/2023 Ver.2.20.0
+ * Added the item of absorption element (icon display).
+ * Added a function not to display absorption attributes from invalid attributes.
+ * Fixed an issue where Hide Unverified Attributes (requires NUUN_EnemyBookEX_1) was not applied.
  * 6/30/2023 Ver.2.19.5
  * Fixed an issue where full size silhouettes were not working.
  * 6/21/2023 Ver.2.19.4
@@ -1427,6 +1431,13 @@
 * @type boolean
 * @default true
 * @parent ElementIcon
+ * 
+ * @param AbsorptionNoEffectElement
+ * @desc Reflects the absorption attribute as invalid. A separate plug-in is required for absorption attributes.
+ * @text Disable reflection of absorption attributes
+ * @type boolean
+ * @default true
+ * @parent ElementIcon
 * 
 * @param ElementValue
 * @text Element resistance (resistance numerical display)
@@ -2253,6 +2264,8 @@
 * @value 42
 * @option Element resistance (resistance numerical display)(1)~(16)(20)(21)
 * @value 43
+* @option Absorp element (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 44
 * @option Resistance state (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
 * @value 45
 * @option Weakness state (icon display)(1)~(5)(7)(8)(9)(12)(13)(20)(21)
@@ -2936,7 +2949,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.19.4
+ * @version 2.20.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3155,6 +3168,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/1 Ver.2.20.0
+ * 吸収属性(アイコン表示)の項目を追加。
+ * 無効属性から吸収属性を表示しない機能を追加。
+ * 未確認属性を隠す(要NUUN_EnemyBookEX_1)が適用されていなかった問題を修正。
  * 2023/6/30 Ver.2.19.5
  * 原寸大表示のシルエットが機能していなかった問題を修正。
  * 2023/6/21 Ver.2.19.4
@@ -4456,6 +4473,13 @@
  * @default true
  * @parent ElementIcon
  * 
+ * @param AbsorptionNoEffectElement
+ * @desc 吸収属性を無効を反映させます。吸収属性は別途プラグインが必要です。
+ * @text 吸収属性を無効反映
+ * @type boolean
+ * @default true
+ * @parent ElementIcon
+ * 
  * @param ElementValue
  * @text 属性耐性（耐性数値表示）
  * @default ------------------------------
@@ -5281,6 +5305,8 @@
  * @value 42
  * @option 属性耐性（耐性数値表示）(1)～(16)(20)(21)
  * @value 43
+ * @option 吸収属性（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
+ * @value 44
  * @option 耐性ステート（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
  * @value 45
  * @option 弱点ステート（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
@@ -6072,10 +6098,11 @@ const ActionMaxItems = Number(parameters['ActionMaxItems'] || 0);
 const ActionCols = Number(parameters['ActionCols'] || 1);
 
 const ElementList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ElementList'])) : [];
-const ShowElementsIcon = eval(parameters['ShowElementsIcons'] || 'false');
+const ShowElementsIcon = eval(parameters['ShowElementsIcon'] || 'false');
 const ElementUnknownIconId = Number(parameters['ElementUnknownIconId'] || 1);
 const ResistNoEffectElement = eval(parameters['ResistNoEffectElement'] || 'true');
 const ResistWeakElementMode = eval(parameters['ResistWeakElementMode']) || 2;
+const AbsorptionNoEffectElement = eval(parameters['AbsorptionNoEffectElement'] || 'true');
 const ElementCol = Number(parameters['ElementCol'] || 1);
 const ElementRadarChartRadius = Number(parameters['ElementRadarChartRadius'] || 100);
 const ElementRadarChartFramecolor = Number(parameters['ElementRadarChartFramecolor'] || 0);
@@ -9293,6 +9320,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
         case 43:
             this.drawResistValueElement(list, enemy, x, y, width);
             break;
+        case 44:
+            this.drawAbsorpElement(list, enemy, x, y, width);
+            break;
         case 45:
             this.drawResistStates(list, enemy, x, y, width);
             break;
@@ -10121,19 +10151,21 @@ Window_EnemyBook.prototype.drawResistElement = function(list, enemy, x, y, width
     let icons = [];
     ElementList.forEach(Element => {
         let rate = 1.0;
-        let icon = 0;
         if(Element.ElementNo < 0) {
             rate = Element.ElementNo === -1 ? enemy.sparam(6) : enemy.sparam(7);
         } else if (Element.ElementNo > 0) {
-            rate = enemy.elementRate(Element.ElementNo);
+            rate = enemy.elementRate(Element.ElementNo);AbsorptionNoEffectElement
         }
-        if(rate < 1 && ResistNoEffectElement || (rate < 1 && rate > 0 && !ResistNoEffectElement)){
-            if (Unknown || (ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
-                icon = ElementUnknownIconId;
-            } else {
-                icon = this.onElementsFlag(Element.ElementNo) ? Element.ElementIconId : 0;
+        if (rate < 1) {
+            if (ResistNoEffectElement) {
+                if (AbsorptionNoEffectElement) {
+                    icons = this.isMaskElement(Element, Unknown);
+                } else if (!AbsorptionNoEffectElement && rate >= 0) {
+                    icons = this.isMaskElement(Element, Unknown);
+                }
+            } else if (rate > 0) {
+                icons = this.isMaskElement(Element, Unknown);
             }
-            if (icon && icon > 0) icons.push(icon);
         }
     });
     let x2 = this.iconX(icons, width);
@@ -10167,19 +10199,13 @@ Window_EnemyBook.prototype.drawWeakElement = function(list, enemy, x, y, width) 
     let icons = [];
     ElementList.forEach(Element => {
         let rate = 1.0;
-        let icon = 0;
         if (Element.ElementNo < 0) {
             rate = Element.ElementNo === -1 ? enemy.sparam(6) : enemy.sparam(7);
           } else if (Element.ElementNo > 0) {
             rate = enemy.elementRate(Element.ElementNo);
           }
           if (rate > 1) {
-            if (Unknown || (ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
-              icon = ElementUnknownIconId;
-            } else {
-              icon = this.onElementsFlag(Element.ElementNo) ? Element.ElementIconId : 0;
-            }
-            if (icon && icon > 0) icons.push(icon);
+            icons = this.isMaskElement(Element, Unknown);
           }
     });
     let x2 = this.iconX(icons, width);
@@ -10213,20 +10239,56 @@ Window_EnemyBook.prototype.drawNoEffectElement = function(list, enemy, x, y, wid
     let icons = [];
     ElementList.forEach(Element => {
         let rate = 1.0;
-        let icon = 0;
         if (Element.ElementNo < 0) {
             rate = Element.ElementNo === -1 ? enemy.sparam(6) : enemy.sparam(7);
-          } else if (Element.ElementNo > 0) {
+        } else if (Element.ElementNo > 0) {
             rate = enemy.elementRate(Element.ElementNo);
-          }
-          if (rate <= 0) {
-            if (Unknown || (ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
-              icon = ElementUnknownIconId;
-            } else {
-              icon = this.onElementsFlag(Element.ElementNo) ? Element.ElementIconId : 0;
+        }
+        if (rate <= 0) {
+            if ((!AbsorptionNoEffectElement && rate === 0) || AbsorptionNoEffectElement) {
+                icons = this.isMaskElement(Element, Unknown);
             }
-            if (icon && icon > 0) icons.push(icon);
-          }
+        }
+    });
+    let x2 = this.iconX(icons, width);
+    icons.forEach(icon => {
+          this.drawIcon(icon, x, y);
+          x += x2;
+    });
+};
+
+Window_EnemyBook.prototype.drawAbsorpElement = function(list, enemy, x, y, width) {
+    this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    const lineHeight = this.lineHeight();
+    const nameText = list.paramName ? list.paramName : (this.language_Jp ? "吸収属性" : 'Absorp Element');
+    let Unknown = false;
+    if (nameText) {
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
+        y += lineHeight;
+    }
+    if(!this.resistWeakDataMask(list.MaskMode)){
+        if (ElementUnknownIconId === 0) {
+          return;
+        }
+        Unknown = true;
+    }
+    let icons = [];
+    ElementList.forEach(Element => {
+        let rate = 1.0;
+        if (Element.ElementNo < 0) {
+            rate = Element.ElementNo === -1 ? enemy.sparam(6) : enemy.sparam(7);
+        } else if (Element.ElementNo > 0) {
+            rate = enemy.elementRate(Element.ElementNo);
+        }
+        if (rate < 0) {
+            icons = this.isMaskElement(Element, Unknown);
+        }
     });
     let x2 = this.iconX(icons, width);
     icons.forEach(icon => {
@@ -10775,6 +10837,18 @@ Window_EnemyBook.prototype.buffIconIndex = function(rate, paramId) {
 	if (rate > 1) {
         return Game_BattlerBase.ICON_BUFF_START + (buffLevel - 1) * 8 + paramId;
     }
+};
+
+Window_EnemyBook.prototype.isMaskElement = function(Element, Unknown) {
+    const icons = [];
+    let icon = 0;
+    if (Unknown || (ElementUnknownIconId > 0 && !this.onElementsFlag(Element.ElementNo))) {
+        icon = ElementUnknownIconId;
+    } else {
+        icon = this.onElementsFlag(Element.ElementNo) ? Element.ElementIconId : 0;
+    }
+    if (icon && icon > 0) icons.push(icon);
+    return icons;
 };
 
 Window_EnemyBook.prototype.iconX = function(icons, width) {

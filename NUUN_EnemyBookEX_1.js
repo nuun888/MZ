@@ -8,25 +8,57 @@
  */
 /*:
  * @target MZ
- * @plugindesc 耐性表示マスク（モンスター図鑑拡張）
+ * @plugindesc Resistance Display Mask (NUUN_EnemyBook Expansion)
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_EnemyBook
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_EnemyBook
+ * @orderAfter NUUN_MultiElement
+ * 
+ * @help
+ * The display of attributes, states, and debuff resistance invalid weaknesses in the monster encyclopedia will only display attributes, states, and debuffs that have been received.
+ * 
+ * This plug-in is an extended function of Monster Encyclopedia (NUUN_EnemyBook).
+ * This plugin requires "NUUN_Base" Ver.1.6.9 or later.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * Log
+ * 7/1/2023 Ver.1.0.2
+ * Correction of processing regarding the addition of multiple attribute functions.
+ * 11/17/2021 Ver.1.0.1
+ * Changed handling of getting multiple attributes.
+ * 8/13/2021 Ver.1.0.0
+ * First edition.
+ * 
+ */
+/*:
+ * @target MZ
+ * @plugindesc 耐性表示マスク（モンスター図鑑拡張）
+ * @author NUUN
+ * @version 1.0.2
+ * @base NUUN_EnemyBook
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_EnemyBook
+ * @orderAfter NUUN_MultiElement
  * 
  * @help
  * モンスター図鑑の属性、ステート、デバフ耐性無効弱点の表示を、受けた事のある属性、ステート、デバフのみ表示するようにします。
- * 複数属性（NUUN_MultiElement）を導入している場合はこのプラグインを複数属性（NUUN_MultiElement）に配置してください。
  * 
  * このプラグインはモンスター図鑑（NUUN_EnemyBook）の拡張機能です。
- * このプラグインはNUUN_Base Ver.1.3.1以降が必要です。
+ * このプラグインはNUUN_Base Ver.1.6.9以降が必要です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/1 Ver.1.0.2
+ * 複数属性機能追加に関しての処理修正。
  * 2021/11/7 Ver.1.0.1
  * 複数属性取得に関しての処理の変更。
  * 2021/8/13 Ver.1.0.0
@@ -41,14 +73,16 @@ const parameters = PluginManager.parameters('NUUN_EnemyBookEX_1');
 
 const _Game_Action_calcElementRate = Game_Action.prototype.calcElementRate;
 Game_Action.prototype.calcElementRate = function(target) {
-  if (target.isEnemy()) {  
     if (this.item().damage.elementId < 0) {
-      this.enemyBookAttackElementDate(target, this.getAttackElementsList());
+        this._multiElements = this.subject().attackElements();
     } else {
-      this.enemyBookAttackElementDate(target, this.getItemElementsList());
+        this._multiElements = [this.item().damage.elementId];
     }
-  }
-  return _Game_Action_calcElementRate.call(this, target);
+    const rate = _Game_Action_calcElementRate.call(this, target);
+    if (target.isEnemy()) {
+        this.enemyBookAttackElementDate(target, this._multiElements);
+    }
+    return rate;
 };
 
 Game_Action.prototype.enemyBookAttackElementDate = function(target, element) {

@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.19.5
+# Ver.2.20.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -7,7 +7,7 @@
 [盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md)  
 [レーダーチャートベース](https://github.com/nuun888/MZ/blob/master/README/RadarChartBase.md)  
 #### 拡張プラグイン
-[耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) Ver.1.0.1  
+[耐性表示マスク](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEX_1.md) Ver.1.0.2  
 [条件付きドロップアイテム図鑑適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js) Ver.1.0.0
 [（要条件付きドロップアイテムVer.1.0.6以降）](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md)  
 [モンスター図鑑全セーブ共通](https://github.com/nuun888/MZ/blob/master/README/EnemyBook_Global.md)  
@@ -277,6 +277,10 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2023/7/1 Ver.2.20.0  
+吸収属性(アイコン表示)の項目を追加。  
+無効属性から吸収属性を表示しない機能を追加。  
+未確認属性を隠す(要NUUN_EnemyBookEX_1)が適用されていなかった問題を修正。  
 2023/6/30 Ver.2.19.5  
 原寸大表示のシルエットが機能していなかった問題を修正。  
 2023/6/21 Ver.2.19.4  

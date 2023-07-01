@@ -11,6 +11,8 @@
  * @plugindesc Multiple Element
  * @author NUUN
  * @version 1.1.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
  * 
  * @help
  * You can set multiple element for items and skills.

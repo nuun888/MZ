@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.10.16
+ * @version 3.11.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/7/2 Ver.3.11.0
+ * 戦闘中に天候を適用できる機能を追加。
  * 2023/6/26 Ver.3.10.16
  * カウンターの画像切り替え処理を修正。
  * 2023/6/22 Ver.3.10.15
@@ -3887,8 +3889,16 @@ Spriteset_Base.prototype.animationShouldMirror = function(target) {
 //Spriteset_Battle
 const _Spriteset_Battle_initialize = Spriteset_Battle.prototype.initialize;
 Spriteset_Battle.prototype.initialize = function() {
-  _Spriteset_Battle_initialize.call(this);
-  this.createStatusLayer();
+    _Spriteset_Battle_initialize.call(this);
+    this.createStatusLayer();
+};
+
+const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
+Spriteset_Battle.prototype.createLowerLayer = function() {
+    _Spriteset_Battle_createLowerLayer.call(this);
+    if (params.BattleShowWeather === "Show") {
+        this.createWeather(this);//天候
+    }
 };
 
 const _Spriteset_Battle_findTargetSprite = Spriteset_Battle.prototype.findTargetSprite;
@@ -3909,6 +3919,9 @@ Spriteset_Battle.prototype.createStatusLayer = function() {
     this.createBattleHud();//ベーススプライト
     this.createHudBack();//ウィンドウ、アクターグラフィック
     this.createEffects();//アニメーション
+    if (params.BattleShowWeather === "ShowFront") {
+        this.createWeather(this._battleHudBase);//天候
+    }
     this.createHudStatus();//ステータス
     this.createFrontActors();
 };
@@ -3923,6 +3936,9 @@ const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
 Spriteset_Battle.prototype.update = function() {
   _Spriteset_Battle_update.call(this);
   this.updateEffects();
+  if (params.BattleShowWeather !== "None") {
+    this.updateWeather();
+  }
 };
 
 Spriteset_Battle.prototype.createHudBack = function() {
@@ -3985,6 +4001,20 @@ Spriteset_Battle.prototype.createBattleField = function() {
   _Spriteset_Battle_createBattleField.call(this);
   this._effectsBackContainer = this._battleField;
 };
+
+if (params.BattleShowWeather !== "None") {
+    Spriteset_Battle.prototype.createWeather = function(sprite) {
+        this._weather = new Weather();
+        sprite.addChild(this._weather);
+    };
+    
+    Spriteset_Battle.prototype.updateWeather = function() {
+        this._weather.type = $gameScreen.weatherType();
+        this._weather.power = $gameScreen.weatherPower();
+        this._weather.origin.x = $gameMap.displayX() * $gameMap.tileWidth();
+        this._weather.origin.y = $gameMap.displayY() * $gameMap.tileHeight();
+    };
+}
 
 function conditionsParam(data, param, maxParam) {
   return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));

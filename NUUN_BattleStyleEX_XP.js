@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.10.6
+ * @version 1.11.0
  * 
  * @help
  * バトルレイアウトをXP風に変更します。
@@ -85,6 +85,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/7/2 Ver.1.11.0
+ * 戦闘中に天候を適用できる機能を追加。
  * 2023/6/3 Ver.1.10.6
  * バトルウィンドウの表示方式(旧処理または新処理)を指定できる機能を追加。
  * 2023/5/22 Ver.1.10.5
@@ -1213,6 +1215,21 @@
  * @min -9999
  * @max 9999
  * @parent EnemyEffect
+ * 
+ * @param WeatherSetting
+ * @text 天候設定
+ * @default ////////////////////////////////
+ * 
+ * @param BattleShowWeather
+ * @text 戦闘時天候表示設定。
+ * @desc 戦闘時の天候の表示設定を行います。
+ * @type select
+ * @option 表示なし
+ * @value 'None'
+ * @option 表示
+ * @value 'Show'
+ * @default 'Show'
+ * @parent WeatherSetting
  * 
  * @param EnemyAppearWindow
  * @text モンスター出現ウィンドウ
@@ -2840,6 +2857,7 @@ params.FaceHeightOnWindow = eval(parameters['FaceHeightOnWindow'] || "false");
 params.NotVisibleStateIcons = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['NotVisibleStateIcons'])) : null) || [];
 params.NotVisibleBuffIcons = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['NotVisibleBuffIcons'])) : null) || [];
 params.BattleEndActorStatusClose = eval(parameters['BattleEndActorStatusClose'] || "false");
+params.BattleShowWeather = eval(parameters['BattleShowWeather']) || 'Show';
 
 params.EnemySkillAnimation = Number(parameters['EnemySkillAnimation'] || 1);
 

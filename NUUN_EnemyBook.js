@@ -10154,7 +10154,7 @@ Window_EnemyBook.prototype.drawResistElement = function(list, enemy, x, y, width
         if(Element.ElementNo < 0) {
             rate = Element.ElementNo === -1 ? enemy.sparam(6) : enemy.sparam(7);
         } else if (Element.ElementNo > 0) {
-            rate = enemy.elementRate(Element.ElementNo);AbsorptionNoEffectElement
+            rate = enemy.elementRate(Element.ElementNo);
         }
         if (rate < 1) {
             if (ResistNoEffectElement) {

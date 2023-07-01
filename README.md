@@ -97,7 +97,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | 能力拡張　　　　　　　　　　　　　　　 | プラグイン　プラグイン数8　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| 属性吸収特徴 | [NUUN_ElementAbsorb](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ElementAbsorb.js) |  | 1.0.1 |
+| [属性吸収特徴](https://github.com/nuun888/MZ/blob/master/README/ElementAbsorb.md) | [NUUN_ElementAbsorb](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ElementAbsorb.js) |  | 2.0.0 |
 | [回復効果反転特徴](https://github.com/nuun888/MZ/blob/master/README/RecoveryReversal.md) | [NUUN_RecoveryReversal](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RecoveryReversal.js) |  | 1.0.0 |
 | [キャストタイムチャージ率特徴](https://github.com/nuun888/MZ/blob/master/README/CastTimeCharge.md) | [NUUN_CastTimeCharge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CastTimeCharge.js) |  | 1.0.0 |
 | [ファイナルアタック特徴](https://github.com/nuun888/MZ/blob/master/README/FinalAttack.md) | [NUUN_FinalAttack](https://github.com/nuun888/MZ/blob/master/NUUN_FinalAttack.js) |  | 1.1.1 |
@@ -257,7 +257,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | システム　　　　　　　　　　　　　　　 | プラグイン　プラグイン数7　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [複数属性](https://github.com/nuun888/MZ/blob/master/README/MultiElement.md) | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) |  | 1.0.1 |
+| [複数属性](https://github.com/nuun888/MZ/blob/master/README/MultiElement.md) | [NUUN_MultiElement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiElement.js) | 共 | 1.1.0 |
 | [ドロップ率百分率化](https://github.com/nuun888/MZ/blob/master/README/DropRatePercentage.md) | [NUUN_DropRatePercentage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropRatePercentage.js) |  | 1.0.1 |
 | [ドロップ率分子操作](https://github.com/nuun888/MZ/blob/master/README/DropItemMolecule.md) | [NUUN_DropItemMolecule](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemMolecule.js) |  | 1.0.0 |
 | [ダメージタイプTP追加](https://github.com/nuun888/MZ/blob/master/README/TPDamageType.md) | [NUUN_TPDamageType](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPDamageType.js) |  | 1.0.1 |

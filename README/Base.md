@@ -1,5 +1,5 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.6.8
+# Ver.1.6.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 English available  
@@ -8,6 +8,8 @@ English available
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2023/7/1 Ver.1.6.9  
+攻撃属性の処理追加。  
 2023/6/2 Ver.1.6.8  
 オーバレイプラグイン関連の処理の修正。  
 2023/4/16 Ver.1.6.7  

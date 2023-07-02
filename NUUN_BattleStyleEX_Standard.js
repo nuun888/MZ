@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.11.0
+ * @version 1.11.1
  * 
  * @help
  * バトルレイアウトを変更します。
@@ -84,6 +84,9 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2023/7/2 Ver.1.11.1
+ * 戦闘中の天候をスイッチで切り替えられる機能を追加。
+ * 戦闘開始時及び戦闘終了時に指定のコモンイベントを指定できる機能を追加。
  * 2023/7/2 Ver.1.11.0
  * 戦闘中に天候を適用できる機能を追加。
  * 2023/6/3 Ver.1.10.6
@@ -1239,15 +1242,42 @@
  * @default ////////////////////////////////
  * 
  * @param BattleShowWeather
- * @text 戦闘時天候表示設定。
+ * @text 戦闘時天候表示設定
  * @desc 戦闘時の天候の表示設定を行います。
  * @type select
  * @option 表示なし
  * @value 'None'
  * @option 表示
  * @value 'Show'
+ * @option アクター画像上に表示
+ * @value 'ShowFront'
  * @default 'Show'
  * @parent WeatherSetting
+ * 
+ * @param BattleWeatherSwitch
+ * @desc 戦闘中の天候の表示スイッチ(ONで表示)
+ * @text 戦闘中天候スイッチ
+ * @type switch
+ * @default 0
+ * @parent WeatherSetting
+ * 
+ * @param BattleCommonEvent
+ * @text バトルコモンイベント
+ * @default ////////////////////////////////
+ * 
+ * @param BattleStartCommonEvent
+ * @desc 戦闘開始時に実行するコモンイベント。
+ * @text 戦闘開始時実行コモンイベント
+ * @type common_event
+ * @default 0
+ * @parent BattleCommonEvent
+ * 
+ * @param BattleEndCommonEvent
+ * @desc 戦闘終了時に実行するコモンイベント。
+ * @text 戦闘終了時実行コモンイベント
+ * @type common_event
+ * @default 0
+ * @parent BattleCommonEvent
  * 
  * @param EnemyAppearWindow
  * @text モンスター出現ウィンドウ
@@ -2877,6 +2907,10 @@ params.NotVisibleStateIcons = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structur
 params.NotVisibleBuffIcons = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['NotVisibleBuffIcons'])) : null) || [];
 params.BattleEndActorStatusClose = eval(parameters['BattleEndActorStatusClose'] || "false");
 params.BattleShowWeather = eval(parameters['BattleShowWeather']) || 'Show';
+params.BattleWeatherSwitch = Number(parameters['BattleWeatherSwitch'] || 0);
+
+params.BattleStartCommonEvent = Number(parameters['BattleStartCommonEvent'] || 0);
+params.BattleEndCommonEvent = Number(parameters['BattleEndCommonEvent'] || 0);
 
 params.EnemySkillAnimation = Number(parameters['EnemySkillAnimation'] || 1);
 

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.11.0
+ * @version 3.11.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/7/2 Ver.3.11.1
+ * 天候を戦闘中でも切り替えられるように修正。
+ * 戦闘中の天候をスイッチで切り替えられる機能を追加。
+ * 戦闘開始時及び戦闘終了時に指定のコモンイベントを指定できる機能を追加。
  * 2023/7/2 Ver.3.11.0
  * 戦闘中に天候を適用できる機能を追加。
  * 2023/6/26 Ver.3.10.16
@@ -337,14 +341,21 @@ NuunManager.bsAnimationShouldMirror = function() {
 
 const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
-  _BattleManager_initMembers.call(this);
-  this.actorStatusWindowOpacity = false;
-  this.actorStatusWindowOpacityValue = false;
-  this.battlerSprite = [];
-  this.visibleStateIcons = [];
-  this.notIconList = this.getNotVisibleIcons();
-  this.onBSStartBattle = !params.ActorStatusWindowLock;
-  Array.prototype.push.apply(this.notIconList , this.getNotVisibleBuffIcons());
+    _BattleManager_initMembers.call(this);
+    this.actorStatusWindowOpacity = false;
+    this.actorStatusWindowOpacityValue = false;
+    this.battlerSprite = [];
+    this.visibleStateIcons = [];
+    this.notIconList = this.getNotVisibleIcons();
+    this.onBSStartBattle = !params.ActorStatusWindowLock;
+    this._bsInterpreter = null;
+    Array.prototype.push.apply(this.notIconList , this.getNotVisibleBuffIcons());
+};
+
+const _BattleManager_update = BattleManager.update;
+BattleManager.update = function(timeActive) {
+    _BattleManager_update.call(this, timeActive);
+    this.updateBsEXCommon();
 };
 
 BattleManager.getNotVisibleIcons = function() {
@@ -462,6 +473,53 @@ BattleManager.invokeMagicReflection = function(subject, target) {
         target.battleStyleImgRefresh();
     }
     _BattleManager_invokeMagicReflection.call(this, subject, target);
+};
+
+BattleManager.battleStartCommon = function() {
+    if (params.BattleStartCommonEvent > 0) {
+        this.setupBsEXCommon(params.BattleStartCommonEvent);
+    }
+};
+
+BattleManager.battleEndCommon = function() {
+    if (params.BattleEndCommonEvent > 0) {
+        $gameTemp.reserveCommonEvent(params.BattleEndCommonEvent);
+    }
+};
+
+BattleManager.setupBsEXCommon = function(id) {
+    if (this._bsInterpreter && this._bsInterpreter.isRunning()) {
+        return;
+    }
+    const commonEvent = $dataCommonEvents[id];
+    if (commonEvent) {
+        const eventId = 0;
+        if (!this._bsInterpreter) {
+            this._bsInterpreter = new Game_Interpreter();
+        }
+        this._bsInterpreter.setup(commonEvent.list, eventId);
+        this._bsInterpreter.update();
+        this.resetBsEXCommon();
+    }
+};
+
+BattleManager.resetBsEXCommon = function() {
+    if (this._bsInterpreter && !this._bsInterpreter.isRunning()) {
+        this._bsInterpreter = null;
+    }
+};
+
+BattleManager.updateBsEXCommon = function() {
+    if (this._bsInterpreter && this._bsInterpreter.isRunning()) {
+        this._bsInterpreter.update();
+        this.resetBsEXCommon();
+    }
+};
+
+const _BattleManager_updateBattleEnd = BattleManager.updateBattleEnd;
+BattleManager.updateBattleEnd = function() {
+    this.battleEndCommon();
+    _BattleManager_updateBattleEnd.call(this);
 };
 
 //Game_Temp
@@ -914,9 +972,9 @@ Game_Enemy.prototype.bareHandsAnimationId = function() {
 //Scene_Battle
 const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
 Scene_Battle.prototype.initialize = function() {
-  _Scene_Battle_initialize.call(this);
-  this.loadBackgroundImg();
-  this.loadBattleStatusImg();
+    _Scene_Battle_initialize.call(this);
+    this.loadBackgroundImg();
+    this.loadBattleStatusImg();
 };
 
 Scene_Battle.prototype.loadBackgroundImg = function() {
@@ -935,17 +993,18 @@ Scene_Battle.prototype.loadBattleStatusImg = function() {
 
 const _Scene_Battle_start = Scene_Battle.prototype.start;
 Scene_Battle.prototype.start = function() {
-  _Scene_Battle_start.call(this);
-  this._actorImges.refresh();
-  this._actorStatus.refresh();
+    BattleManager.battleStartCommon();
+    _Scene_Battle_start.call(this);
+    this._actorImges.refresh();
+    this._actorStatus.refresh();
 };
 
 const _Scene_Battle_stop = Scene_Battle.prototype.stop;
 Scene_Battle.prototype.stop = function() {
-  _Scene_Battle_stop.call(this);
-  if (!params.BattleEndActorStatusClose) {
-    this._statusWindow.open();
-  }
+    _Scene_Battle_stop.call(this);
+    if (!params.BattleEndActorStatusClose) {
+        this._statusWindow.open();
+    }
 };
 
 const _Scene_Battle_updateStatusWindowVisibility = Scene_Battle.prototype.updateStatusWindowVisibility;
@@ -3936,7 +3995,7 @@ const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
 Spriteset_Battle.prototype.update = function() {
   _Spriteset_Battle_update.call(this);
   this.updateEffects();
-  if (params.BattleShowWeather !== "None") {
+  if (params.BattleShowWeather !== "None" && isBattleWeather()) {
     this.updateWeather();
   }
 };
@@ -4008,16 +4067,29 @@ if (params.BattleShowWeather !== "None") {
         sprite.addChild(this._weather);
     };
     
-    Spriteset_Battle.prototype.updateWeather = function() {
+    Spriteset_Battle.prototype.updateWeather = function() {    
         this._weather.type = $gameScreen.weatherType();
         this._weather.power = $gameScreen.weatherPower();
-        this._weather.origin.x = $gameMap.displayX() * $gameMap.tileWidth();
-        this._weather.origin.y = $gameMap.displayY() * $gameMap.tileHeight();
     };
 }
+
+const _Game_Interpreter_command236 = Game_Interpreter.prototype.command236;
+Game_Interpreter.prototype.command236 = function(c_params) {
+    if ($gameParty.inBattle() && params.BattleShowWeather !== "None" && isBattleWeather()) {
+        $gameScreen.changeWeather(c_params[0], c_params[1], c_params[2]);
+        if (c_params[3]) {
+            this.wait(c_params[2]);
+        }
+    }
+    return _Game_Interpreter_command236.call(this, c_params);
+};
 
 function conditionsParam(data, param, maxParam) {
   return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
 };
+
+function isBattleWeather() {
+    return params.BattleWeatherSwitch > 0 ? $gameSwitches.value(params.BattleWeatherSwitch) : true;
+}
 
 })();

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.2
  * 
  * @help
  * Extend the counter.
@@ -43,6 +43,10 @@
  * Set from the counter activation condition of the plug-in parameter.
  * Specifies the list ID of plugin parameters for "NUUN_ConditionsBase". If you specify multiple items, separate them with a comma.
  * 
+ * Action Cancellation
+ * When counterattacking (reflecting) against multiple target skills, skills that use items, or items, the damage dealt to battlers after the battler who counterattacked (reflected) will be nullified.
+ * However, it will not be executed if "Activation timing" is 'EndAction'.
+ * 
  * Setting counterattack (reflection)
  * Notes with features
  * <CounterEX:[id]>Set a counter.
@@ -58,6 +62,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/3/2023 Ver.1.1.2
+ * Fixed the problem that the counter attack (reflection) does not return to the original with the counter image switching function in "NUUN_BattleStyleEX".
+ * 7/1/2023 Ver.1.1.1
+ * Corrected so that counterattack (reflection) counterattack after action end is not invalidated.
  * 7/1/2023 Ver.1.1.0
  * Added a function that can specify the target of the counter.
  * 6/26/2023 Ver.1.0.2
@@ -158,9 +166,9 @@
  * @type select
  * @option Nullifies damage and counterattacks (reflection)
  * @value 'NotDamege'
- * @option Counterattack (reflection) after target attack
+ * @option Counterattack (Reflection) after taking damage
  * @value 'Action'
- * @option Counterattack after damage (reflection)
+ * @option Counterattack (reflection) when attacked
  * @value 'Damege'
  * @option Counterattack (reflection) when the attack misses
  * @value 'Miss'
@@ -299,7 +307,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.2
  * 
  * @help
  * カウンターを拡張します。
@@ -330,6 +338,11 @@
  * プラグインパラメータのカウンター発動条件から設定します。
  * NUUN_ConditionsBaseのプラグインパラメータのリストIDを指定します。複数指定の場合は,で区切ります。
  * 
+ * 行動打消し
+ * 複数対象スキル、アイテムを使用してきたスキル、アイテムに対し反撃(反射)を行った場合、反撃(反射)を行ったバトラー以降のバトラーに与える
+ * ダメージを無効にします。
+ * ただし、発動タイミングがアクション終了後の場合は実行されません。
+ * 
  * 反撃(反射)の設定
  * 特徴を有するメモ欄
  * <CounterEX:[id]>　カウンターを設定します。
@@ -345,6 +358,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/3 Ver.1.1.2
+ * バトルスタイル拡張プラグインでのカウンターの画像切り替え機能で反撃(反射)から元に戻らない問題を修正。
+ * 2023/7/1 Ver.1.1.1
+ * 行動打消しをアクション終了後に反撃(反射)するカウンターには無効化しないように修正。
  * 2023/7/1 Ver.1.1.0
  * カウンターの対象を指定できる機能を追加。
  * 2023/6/26 Ver.1.0.2
@@ -445,9 +462,9 @@
  * @type select
  * @option ダメージを無効にして反撃(反射)
  * @value 'NotDamege'
- * @option 対象攻撃後に反撃(反射)
+ * @option ダメージを受けた後に反撃(反射)
  * @value 'Action'
- * @option ダメージ後に反撃(反射)
+ * @option 攻撃が当たった時に反撃(反射)
  * @value 'Damege'
  * @option 攻撃が外れた時に反撃(反射)
  * @value 'Miss'
@@ -590,7 +607,7 @@ Imported.NUUN_CounterEX = true;
 
     class CounterActionEX {
         constructor(counterSubject, subject) {
-            this._counterSubject = subject;
+            this._counterSubject = counterSubject;
             this._subject = subject;
         }
 
@@ -656,6 +673,10 @@ Imported.NUUN_CounterEX = true;
 
         isCounterReflection() {
             return this._counter.CounterType === 'ReflectionFullAction' || this._counter.CounterType === 'Reflection';
+        }
+
+        isActionCancelCounter() {
+            return this.getDamageCancelCounter() && !this.isCounterTimingEndAction();
         }
 
         getCounterTarget() {
@@ -788,13 +809,17 @@ Imported.NUUN_CounterEX = true;
                 }
             }
         }
-        if (this._action.isCounterSkill() && !this._targets[0] && this._counterEvacuationAction) {
-            this._subject = this._counterEvacuationSubject;
-            this._targets = this._counterEvacuationTargets;
-            this._action = this._counterEvacuationAction;
-            this._counterEvacuationSubject = null;
-            this._counterEvacuationTargets = null;
-            this._counterEvacuationAction = null;
+        if (this._action.isCounterSkill() && !this._targets[0]) {
+            this._subject.clearResult();
+            this._subject._counterAction = false;
+            if (this._counterEvacuationAction) {
+                this._subject = this._counterEvacuationSubject;
+                this._targets = this._counterEvacuationTargets;
+                this._action = this._counterEvacuationAction;
+                this._counterEvacuationSubject = null;
+                this._counterEvacuationTargets = null;
+                this._counterEvacuationAction = null;
+            }
         }
         return null;
     };
@@ -849,6 +874,7 @@ Imported.NUUN_CounterEX = true;
                 subject.result().counterEx = true;
                 this._logWindow.displayCounterEx(subject, counter);
             }
+            subject._counterAction = true;
             this._logWindow.counter = counter;
             this._logWindow.startAction(subject, action, targets);
             subject.onStartCounter = false;
@@ -868,7 +894,7 @@ Imported.NUUN_CounterEX = true;
             _BattleManager_invokeNormalAction.call(this, subject, target);
         }
         this.condCounterActions(subject, target, 1);
-        this.setCounterAction();
+        this.setCounterAction(target);
     };
 
     BattleManager.invokeCounterActionEx = function(subject, target) {
@@ -994,12 +1020,12 @@ Imported.NUUN_CounterEX = true;
         return false;
     };
 
-    BattleManager.setCounterAction = function() {
+    BattleManager.setCounterAction = function(target) {
         this._reflectionAction = false;
         const cancelCounter = this._counterBattlerList.some(battler => {
             const action = battler.currentCounterAction();
             const counter = action.getCounterData();
-            return counter.getDamageCancelCounter();
+            return counter.isActionCancelCounter();
         });
         if (cancelCounter) {
             this._targets = [];

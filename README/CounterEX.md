@@ -1,5 +1,5 @@
 # [カウンター拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js)
-# Ver.1.1.0
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js)
 
 ### 必須、前提プラグイン
@@ -46,6 +46,10 @@ NUUN_ConditionsBaseのプラグインパラメータのリストIDを指定し�
 `[rate]`:無効化する確率。  
 
 ## 更新履歴
+2023/7/3 Ver.1.1.2  
+バトルスタイル拡張プラグインでのカウンターの画像切り替え機能で反撃(反射)から元に戻らない問題を修正。  
+2023/7/1 Ver.1.1.1  
+行動打消しをアクション終了後に反撃(反射)するカウンターには無効化しないように修正。  
 2023/7/1 Ver.1.1.0  
 カウンターの対象を指定できる機能を追加。  
 2023/6/26 Ver.1.0.2  

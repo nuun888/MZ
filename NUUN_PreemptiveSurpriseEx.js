@@ -50,7 +50,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 1/29/2022 Ver.1.2.0
+ * 7/4/2023 Ver.1.3.0
+ * Added a function that allows you to immediately execute a specified common event when encountering.
+ * 1/29/2023 Ver.1.2.0
  * Added a function to enable preemptive surprise attack from an event with a plug-in command.
  * 12/2/2022 Ver.1.1.1
  * Fixed an issue where some of the default evaluators for normal encounters were not fetchable.
@@ -154,6 +156,24 @@
  * @option '$gameTemp.reserveCommonEvent(0);//Common event'
  * @default []
  * 
+ * @param DefaultPresurCommonEvent
+ * @desc A common event that runs on normal encounters.
+ * @text Normal encounter execution common event
+ * @type common_event
+ * @default 0
+ * 
+ * @param PreemptiveCommonEvent
+ * @desc A common event that executes on a First Strike encounter.
+ * @text Execute Common Event on First Strike Encounter
+ * @type common_event
+ * @default 0
+ * 
+ * @param SurpriseCommonEvent
+ * @desc A common event that executes when you encounter a surprise attack.
+ * @text Execute common event when surprise encounter
+ * @type common_event
+ * @default 0
+ * 
  */
 /*~struct~PreemptiveSurpriseList:
  * 
@@ -248,13 +268,15 @@
  * @text SE pan
  * @desc Sets the pan to SE.
  * @default 0
+ * @max 100
+ * @min -100
  * 
  */
 /*:ja
  * @target MZ
  * @plugindesc 先制、不意打ちEX
  * @author NUUN
- * @version 1.2.0
+ * @version 1.3.0
  * @base NUUN_Base
  * 
  * @help
@@ -295,6 +317,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/4 Ver.1.3.0
+ * エンカウント時に指定のコモンイベントを即時実行できる機能を追加。
  * 2023/1/29 Ver.1.2.0
  * プラグインコマンドでイベントからの戦闘時先制不意打ちを有効にする機能を追加。
  * 2022/12/2 Ver.1.1.1
@@ -398,6 +422,24 @@
  * @option 'EncounterEffect.setColor(255,255,255);//MPP_EncounterEffectカラー変更'
  * @option '$gameTemp.reserveCommonEvent(0);//コモンイベント'
  * @default []
+ * 
+ * @param DefaultPresurCommonEvent
+ * @desc 通常エンカウント時に実行するコモンイベント。
+ * @text 通常エンカウント時実行コモンイベント
+ * @type common_event
+ * @default 0
+ * 
+ * @param PreemptiveCommonEvent
+ * @desc 先制攻撃エンカウント時に実行するコモンイベント。
+ * @text 先制攻撃エンカウント時実行コモンイベント
+ * @type common_event
+ * @default 0
+ * 
+ * @param SurpriseCommonEvent
+ * @desc 不意打ちエンカウント時に実行するコモンイベント。
+ * @text 不意打ちエンカウント時実行コモンイベント
+ * @type common_event
+ * @default 0
  * 
  */
 /*~struct~PreemptiveSurpriseList:ja
@@ -514,6 +556,9 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
     const DefaultPresurSprict = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DefaultPresurSprict'])) : null) || [];
     const PreemptivePresurSprict = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PreemptivePresurSprict'])) : null) || [];
     const SurprisePresurSprict = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SurprisePresurSprict'])) : null) || [];
+    const DefaultPresurCommonEvent = Number(parameters['DefaultPresurCommonEvent'] || 0);
+    const PreemptiveCommonEvent = Number(parameters['PreemptiveCommonEvent'] || 0);
+    const SurpriseCommonEvent = Number(parameters['SurpriseCommonEvent'] || 0);
 
     const pluginName = "NUUN_PreemptiveSurpriseEx";
     let _eventPresurMode = 0;
@@ -527,6 +572,7 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
         this.presurSE = false;
         this._tempPreemptive = false;
         this._tempSurprise = false;
+        this._presurInterpreter = null;
         _BattleManager_initMembers.call(this);
     };
 
@@ -534,6 +580,9 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
     BattleManager.setup = function(troopId, canEscape, canLose) {
         _BattleManager_setup.call(this, troopId, canEscape, canLose);
         this.customOnEncounter();
+        if (Imported.NUUN_BattleTroopBGM) {
+            $gameTroop.battleBGMSetup();
+        }
     };
 
     BattleManager.customOnEncounter = function() {
@@ -585,6 +634,7 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
         this._tempSurprise = surprise;
         _eventPresurMode = 0;
         this.presurEncounterSprict();
+        this.presurEncounterCommonEvent();
     };
 
     BattleManager.onEncounter = function() {//再定義
@@ -619,6 +669,17 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
         }
     };
 
+    BattleManager.presurEncounterCommonEvent = function() {console.log()
+        if (this._tempPreemptive) {
+            this.preemptiveEncounterCommon();
+        } else if (this._tempSurprise) {
+            this.surpriseEncounterCommon();
+        } else {
+            this.defaultEncounterCommon();
+        }
+        this._presurInterpreter = null;
+    };
+
     BattleManager.presurEncounterSprict = function() {
         if (this._tempPreemptive) {
             this.presurEncounterScriptExecution(PreemptivePresurSprict);
@@ -633,6 +694,36 @@ Imported.NNUUN_PreemptiveSurpriseEx = true;
         const members = $gameParty;
         const troop = $gameTroop;
         list.forEach(data => eval(data));
+    };
+
+    BattleManager.preemptiveEncounterCommon = function() {
+        if (PreemptiveCommonEvent > 0) {
+            this.setupBsEXCommon(PreemptiveCommonEvent);
+        }
+    };
+
+    BattleManager.surpriseEncounterCommon = function() {
+        if (SurpriseCommonEvent > 0) {
+            this.setupBsEXCommon(SurpriseCommonEvent);
+        }
+    };
+
+    BattleManager.defaultEncounterCommon = function() {
+        if (DefaultPresurCommonEvent > 0) {
+            this.setupBsEXCommon(DefaultPresurCommonEvent);
+        }
+    };
+
+    BattleManager.presurEncounterCommon = function(id) {
+        const commonEvent = $dataCommonEvents[id];
+        if (commonEvent) {
+            const eventId = 0;
+            if (!this._presurInterpreter) {
+                this._presurInterpreter = new Game_Interpreter();
+            }
+            this._presurInterpreter.setup(commonEvent.list, eventId);
+            this._presurInterpreter.update();
+        }
     };
 
     Game_Troop.prototype.getPresurCommentTag = function() {

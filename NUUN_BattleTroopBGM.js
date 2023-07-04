@@ -49,7 +49,7 @@
  * @default 0
  * 
  */ 
-/*~struct~battleBgmList:ja
+/*~struct~battleBgmList:
  * 
  * @param Name
  * @desc Fill in the identification name. A string that is referenced when specified by name.

@@ -169,7 +169,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | ---------- | ------------- | ------------- | -------- |
 | [エンカウント条件拡張](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md) | [NUUN_EncounterCondition](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EncounterCondition.js) | 条対 | 1.2.2 |
 | [先制、不意打ちEX](https://github.com/nuun888/MZ/blob/master/README/PreemptiveSurpriseEx.md) | [NUUN_PreemptiveSurpriseEx](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PreemptiveSurpriseEx.js) | | 1.2.0 |
-| [敵グループの個別ＢＧＭ設定](https://github.com/nuun888/MZ/blob/master/README/BattleBGM.md) | [NUUN_BattleBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js) |  | 1.1.0 |
+| [敵グループのBGM設定](https://github.com/nuun888/MZ/blob/master/README/BattleBGM.md) | [NUUN_BattleTroopBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleTroopBGM.js) |  | 1.1.0 |
 | [敵グループの個別戦闘勝利敗北ME設定](https://github.com/nuun888/MZ/blob/master/README/BattleME.md) | [NUUN_BattleME](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleME.js) |  | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |

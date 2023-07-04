@@ -1,5 +1,5 @@
 # [先制、不意打ちEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PreemptiveSurpriseEx.js)
-# Ver.1.2.0
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PreemptiveSurpriseEx.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -39,6 +39,8 @@
 コモンイベントは仕様上、戦闘開始直後に実行されます。  
 
 ## 更新履歴
+2023/7/4 Ver.1.3.0  
+エンカウント時に指定のコモンイベントを即時実行できる機能を追加。  
 2023/1/29 Ver.1.2.0  
 プラグインコマンドでイベントからの戦闘時先制不意打ちを有効にする機能を追加。  
 2022/12/2 Ver.1.1.1  

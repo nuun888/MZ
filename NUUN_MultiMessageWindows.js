@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.8
+ * @version 1.1.9
  * 
  * @help
  * You can now display multiple message windows.
@@ -35,6 +35,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/7/2023 Ver.1.1.9
+ * Fixed the problem that the window is not displayed when displaying the input system window.
  * 6/27/2023 Ver.1.1.8
  * Fixed an issue where windows could be moved when opening.
  * Fix processing.
@@ -137,7 +139,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.8
+ * @version 1.1.9
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -160,6 +162,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/7 Ver.1.1.9
+ * 入力系ウィンドウを表示したときにウィンドウが表示されない問題を修正。
  * 2023/6/27 Ver.1.1.8
  * ウィンドウを開くときに移動できてしまう問題を修正。
  * 処理の修正。
@@ -253,6 +257,7 @@
  * @desc メッセージウィンドウの設定を初期状態に戻します。
  * @text メッセージウィンドウ初期状態
  * 
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_MultiMessageWindows = true;
@@ -260,6 +265,7 @@ Imported.NUUN_MultiMessageWindows = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_MultiMessageWindows');
     const pluginName = "NUUN_MultiMessageWindows";
+    
 
     PluginManager.registerCommand(pluginName, 'MultiMessageSetting', args => {
         setMultiMessageWindow(args);
@@ -271,6 +277,10 @@ Imported.NUUN_MultiMessageWindows = true;
 
     PluginManager.registerCommand(pluginName, 'ResetMultiMessage', args => {
         SceneManager._scene.resetMultiMessageWindow();
+    });
+
+    PluginManager.registerCommand(pluginName, 'DefaultMessageWindow', args => {
+        $gameSystem.defaultMessageWindow = true;
     });
     
     function setMultiMessageWindow(args) {
@@ -288,6 +298,7 @@ Imported.NUUN_MultiMessageWindows = true;
         this._messageWindows = [];
         this._nameBoxWindows = [];
         $gameTemp.activeMultiMessageId = 0;
+        $gameSystem.defaultMessageWindow = false;
         _Scene_Message_initialize.call(this);
     };
 
@@ -310,6 +321,7 @@ Imported.NUUN_MultiMessageWindows = true;
             this.createMultiMessageNameBoxWindow();
         }
         $gameTemp.activeMultiMessageId = Number(args.Id);
+        $gameSystem.defaultMessageWindow = false;
         this.associateMultiWindows();
     };
 
@@ -462,7 +474,7 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     Window_Message.prototype.canStart = function() {
-        return false;//元のウィンドウは開かない。現バージョンでは切る。
+        return false;
     };
 
     Window_MultiMessage.prototype.isMultiMessage = function() {
@@ -489,14 +501,35 @@ Imported.NUUN_MultiMessageWindows = true;
     };
 
     const _Window_Message_update = Window_Message.prototype.update;
-    Window_Message.prototype.update = function() {
-        _Window_Message_update.call(this);
+    Window_MultiMessage.prototype.update = function() {
+        if (this.isMultiMessage()) {
+            _Window_Message_update.call(this);
+        } else {
+            this.checkToNotClose();
+            Window_Base.prototype.update.call(this);
+            this.synchronizeNameBox();
+        }
         if (this.multiMessageMode && !this._textState) {
             this.pause = true;
         }
         if (this.pause && (this.isClosing() || this.isClosed())) {
             this.pause = false;
         }
+    };
+
+    Window_Message.prototype.update = function() {
+        if (String(this.constructor.name) === "Window_Message") {
+            return;
+        }
+        _Window_Message_update.call(this);
+    };
+
+    const _Window_Message_updateMessage = Window_Message.prototype.updateMessage;
+    Window_MultiMessage.prototype.updateMessage = function() {
+        if (this.isMultiMessage()) {
+            return _Window_Message_updateMessage.call(this);
+        }
+        return false;
     };
 
     const _Window_Message_updateInput = Window_Message.prototype.updateInput;

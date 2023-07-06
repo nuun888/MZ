@@ -12,7 +12,7 @@
  * @plugindesc  バトラーTPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.2.1
+ * @version 1.2.2
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -59,6 +59,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/7 Ver.1.2.2
+ * 一部プラグインで表示した敵キャラにゲージを表示されるとエラーが出る問題を修正。
  * 2023/6/23 Ver.1.2.1
  * NoTPGaugeが機能していなかった問題を修正。
  * 2023/6/2 Ver.1.2.0
@@ -470,7 +472,7 @@ Sprite_Enemy.prototype.createTpGauge = function() {
   
 Sprite_Actor.prototype.createTpGauge = function() {
     if (this._battler.isEnemy()) {
-        Sprite_Enemy.prototype.createTPGauge.call(this);
+        Sprite_Enemy.prototype.createTpGauge.call(this);
         return;
     }
     enemyTPGaugeLength = null;

@@ -1,5 +1,5 @@
 # [複数メッセージウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
-# Ver.1.1.8
+# Ver.1.1.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiMessageWindows.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -29,6 +29,8 @@
 間にウエイトを行うイベントコマンドを実行すると表示タイミングがずれます。  
 
 ## 更新履歴
+2023/7/7 Ver.1.1.9  
+入力系ウィンドウを表示したときにウィンドウが表示されない問題を修正。  
 2023/6/27 Ver.1.1.8  
 ウィンドウを開くときに移動できてしまう問題を修正。  
 処理の修正。  

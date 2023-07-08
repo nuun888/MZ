@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.1.4
+ * @version 2.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/7/8 Ver.2.2.0
+ * Added a function that can display the character chip and level of actors who meet only specific conditions.
  * 2023/6/18 Ver.2.1.4
  * Fixed an issue where lines were not working.
  * 2023/1/17 Ver.2.1.3
@@ -502,9 +504,9 @@
  * @value 21
  * @option Nickname(1)(2)(3)(4)(5)(8)
  * @value 22
- * @option Level(1)(2)(3)(4)(5)(8)(11)
+ * @option Level(1)(2)(3)(4)(5)(8)(11)(12)
  * @value 23
- * @option Character chip(1)(2)(3)(4)(5)
+ * @option Character chip(1)(2)(3)(4)(5)(12)
  * @value 50
  * @option Face(1)(2)(3)(4)
  * @value 51
@@ -609,6 +611,13 @@
  * @value "right"
  * @default "left"
  * 
+ * @param ShowEval
+ * @desc Enter the display conditions in Javascript.
+ * @text Display condition (javaScript)(12)
+ * @type combo
+ * @option '$gameSwitches.value(Number(actor.actor().meta.SaveActorShowSwitch))'
+ * @default 
+ * 
  */
 /*~struct~ContentsBackSettings:
  * 
@@ -648,7 +657,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.1.4
+ * @version 2.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -699,6 +708,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/8 Ver.2.2.0
+ * 特定の条件のみ一致したアクターのキャラチップ、レベルを表示できる機能を追加。
  * 2023/6/18 Ver.2.1.4
  * ラインが機能していなかった問題を修正。
  * 2023/1/17 Ver.2.1.3
@@ -1145,9 +1156,9 @@
  * @value 21
  * @option 二つ名(Nickname)(1)(2)(3)(4)(5)(8)
  * @value 22
- * @option レベル(1)(2)(3)(4)(5)(8)(11)
+ * @option レベル(1)(2)(3)(4)(5)(8)(11)(12)
  * @value 23
- * @option キャラチップ(1)(2)(3)(4)(5)
+ * @option キャラチップ(1)(2)(3)(4)(5)(12)
  * @value 50
  * @option 顔グラ(1)(2)(3)(4)
  * @value 51
@@ -1251,6 +1262,13 @@
  * @option 右
  * @value "right"
  * @default "left"
+ * 
+ * @param ShowEval
+ * @desc 表示条件をJavascriptで記入します。
+ * @text 表示条件(javaScript)(12)
+ * @type combo
+ * @option '$gameSwitches.value(Number(actor.actor().meta.SaveActorShowSwitch))'
+ * @default 
  * 
  */
 /*~struct~ContentsBackSettings:ja
@@ -1427,6 +1445,13 @@ Imported.NUUN_SaveScreen = true;
     info.actorClass = ClassSpecifyActorOnry ? [actor.currentClass().name] : $gameParty.actorClassForSavefile();
     info.actorNickName = NickNameSpecifyActorOnry ? [actor.nickname()] : $gameParty.actorNickNameForSavefile();
     info.levelActor = LevelSpecifyActorOnry ? [actor._level] : $gameParty.actorLevelForSavefile();
+    ContentsList.forEach((data, index)=> {
+        if (data.DateSelect === 50 && !!data.ShowEval) {
+            info["characters_"+ String(index)] = $gameParty.charactersFilterForSavefile(data);
+        } else if (data.DateSelect === 23 && !!data.ShowEval) {
+            info["levelActor_"+ String(index)] = $gameParty.actorLevelFilterForSavefile(data);
+        }
+    });
   };
 
   DataManager.loadBackground = function() {
@@ -1768,10 +1793,10 @@ Imported.NUUN_SaveScreen = true;
         this.drawActorNickName(info, x, y, width, data);
         break;
       case 23:
-        this.drawActorLeval(info, x, y, width, data);
+        this.drawActorLeval(info, x, y, width, data, r);
         break;
       case 50:
-        this.drawCharacters(info, x, y, width, data);
+        this.drawCharacters(info, x, y, width, data, r);
         break;
       case 51:
         this.drawFaceActors(info, x, y, width, data);
@@ -1901,15 +1926,17 @@ Imported.NUUN_SaveScreen = true;
     }
   };
 
-  Window_SavefileList.prototype.drawCharacters = function(info, x, y, width, data) {
-    const rect = this.itemRectWithPadding(0);
-    const bottom = y + rect.height;
-    if (CharacterSpecifyActorOnry) {
-      this.drawSpecifyActorOnryCharacter(info, x + 24, bottom - 8);
-    } else {
-      this.drawPartyCharacters(info, x + 24, bottom - 8);
-    }
-  };
+    Window_SavefileList.prototype.drawCharacters = function(info, x, y, width, data, index) {
+        const rect = this.itemRectWithPadding(0);
+        const bottom = y + rect.height;
+        if (!!data.ShowEval) {
+            this.drawPartyFilterCharacters(info, x + 24, bottom - 8, index);
+        } else if (CharacterSpecifyActorOnry) {
+            this.drawSpecifyActorOnryCharacter(info, x + 24, bottom - 8);
+        } else {
+            this.drawPartyCharacters(info, x + 24, bottom - 8);
+        }
+    };
 
   Window_SavefileList.prototype.drawFaceActors = function(info, x, y, width, data) {
     if (info.faces) {
@@ -2037,38 +2064,50 @@ Imported.NUUN_SaveScreen = true;
     }
   };
 
-  Window_SavefileList.prototype.drawActorLeval = function(info, x, y, width, data) {
-    if (info.levelActor) {
-      this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
-      const textWidth = this.textWidth(TextManager.levelA);
-      const padding = this.itemPadding();
-      const colSpacing = this.colSpacing();
-      if (LevelSpecifyActorOnry) {
-        this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
-        this.drawText(TextManager.levelA, x, y, textWidth);
-        this.resetTextColor();
-        this.resetTextColor();
-        this.drawText(data, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
-      } else {
-        let levelActorX = x;
-        for (const name of info.levelActor) {
-          this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
-          this.drawText(TextManager.levelA, levelActorX + padding / 4, y, textWidth);
-          this.resetTextColor();
-          this.resetTextColor();
-          this.drawText(name, levelActorX + textWidth + padding / 2, y, width - (textWidth + padding), data.Align);
-          levelActorX += width;
+    Window_SavefileList.prototype.drawActorLeval = function(info, x, y, width, data, index) {
+        if (info.levelActor) {
+            this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+            const textWidth = this.textWidth(TextManager.levelA);
+            const padding = this.itemPadding();
+            const colSpacing = this.colSpacing();
+            if (!!data.ShowEval || (!data.ShowEval && !LevelSpecifyActorOnry)) {
+                const levelActor = !!data.ShowEval ? (info["levelActor_"+ String(index)] || []) : info.levelActor;
+                let levelActorX = x;
+                for (const name of levelActor) {
+                    this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+                    this.drawText(TextManager.levelA, levelActorX + padding / 4, y, textWidth);
+                    this.resetTextColor();
+                    this.resetTextColor();
+                    this.drawText(name, levelActorX + textWidth + padding / 2, y, width - (textWidth + padding), data.Align);
+                    levelActorX += width;
+                }
+            } else if (LevelSpecifyActorOnry) {
+                this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+                this.drawText(TextManager.levelA, x, y, textWidth);
+                this.resetTextColor();
+                this.resetTextColor();
+                this.drawText(data, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+            }
         }
-      }
-    }
-  };
+    };
 
-  Window_SavefileList.prototype.drawSpecifyActorOnryCharacter = function(info, x, y) {
-    if (info.characters) {
-      const data = info.characters[0];
-      this.drawCharacter(data[0], data[1], x, y);
-    }
-  };
+    Window_SavefileList.prototype.drawPartyFilterCharacters = function(info, x, y, index) {
+        const characters = info["characters_"+ String(index)];
+        if (characters) {
+            let characterX = x;
+            for (const data of characters) {
+                this.drawCharacter(data[0], data[1], characterX, y);
+                characterX += 48;
+            }
+        }
+    };
+
+    Window_SavefileList.prototype.drawSpecifyActorOnryCharacter = function(info, x, y) {
+        if (info.characters) {
+        const data = info.characters[0];
+        this.drawCharacter(data[0], data[1], x, y);
+        }
+    };
 
   Window_SavefileList.prototype.drawSnapBitmap = function(info, x, y, width, data) {
     if (info.snap) {
@@ -2192,5 +2231,19 @@ Imported.NUUN_SaveScreen = true;
       return this.members().map(actor => actor.nickname());
     }
   };
+
+
+    Game_Party.prototype.charactersFilterForSavefile = function(data) {
+        return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => [
+            actor.characterName(),
+            actor.characterIndex()
+        ]);
+    };
+
+    Game_Party.prototype.actorLevelFilterForSavefile = function() {
+        return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => [
+            actor._level
+        ]);
+    };
 
 })();

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey
- * @version 1.0.3
+ * @version 1.1.0
  * 
  * @help
  * Change the movement speed of the player depending on how hard the left stick of the gamepad is pushed down.
@@ -23,6 +23,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/9/2023 Ver.1.1.0
+ * Added a function to enable the dash key.
  * 3/15/2023 Ver.1.0.3
  * Fixed an issue that caused an error when moving maps.
  * 3/11/2023 Ver.1.0.2
@@ -36,8 +38,14 @@
  * @desc Maximum movement speed for left axis movement change.
  * @text Maximum movement speed for left axis movement change
  * @type number
- * @default 5
+ * @default 4
  * @min 1
+ * 
+ * @param DashKeyValid
+ * @desc Dash key valid.
+ * @text Dash key valid
+ * @type boolean
+ * @default true
  * 
  * @param DashSpeed
  * @desc Movement speed to recognize as dash of left axis movement change at standard speed. (0.0～)
@@ -52,7 +60,7 @@
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey
- * @version 1.0.3
+ * @version 1.1.0
  * 
  * @help
  * ゲームパッドの左スティックの倒した強さによりプレイヤーの移動速度を変化させるように変更します。
@@ -63,6 +71,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/9 Ver.1.1.0
+ * ダッシュキーを有効に出来る機能を追加。
  * 2023/3/15 Ver.1.0.3
  * マップ移動時にエラーが出る問題を修正。
  * 2023/3/11 Ver.1.0.2
@@ -76,8 +86,14 @@
  * @desc 左軸移動変化の最大移動速度
  * @text 左軸移動変化最大移動速度
  * @type number
- * @default 5
+ * @default 4
  * @min 1
+ * 
+ * @param DashKeyValid
+ * @desc ダッシュキー有効
+ * @text ダッシュキー有効
+ * @type boolean
+ * @default true
  * 
  * @param DashSpeed
  * @desc 標準速度時の左軸移動変化のダッシュと認識させる移動速度。(0.0～)
@@ -92,7 +108,8 @@ Imported.NUUN_realMoveLeftStick = true;
 
 (() => {
     const parameters = PluginManager.parameters('NUUN_realMoveLeftStick');
-    const GamepadLeftStickMaxSpeed = Number(parameters['GamepadLeftStickMaxSpeed'] || 5);
+    const GamepadLeftStickMaxSpeed = Number(parameters['GamepadLeftStickMaxSpeed'] || 4);
+    const DashKeyValid = eval(parameters['DashKeyValid'] || 'true');
     const DashSpeed = Number(parameters['DashSpeed'] || 4.5);
 
     const _Input_updateGamepadState = Input._updateGamepadState;
@@ -102,11 +119,15 @@ Imported.NUUN_realMoveLeftStick = true;
     };
 
     Input._gamepadStickRealMove = function() {
-        this._stickDashing = $dataMap && !$gameMap.isDashDisabled() && (this._stickMoveing >= (DashSpeed / GamepadLeftStickMaxSpeed) - 0.5);
+        this._stickDashing = $dataMap && !$gameMap.isDashDisabled() && (this._stickMoveing >= (DashSpeed / (GamepadLeftStickMaxSpeed + this.getRealMoveDashing())) - 0.5);
     };
 
     Input.gamepadLeftStickMaxDash = function() {
         //無効化
+    };
+
+    Input.getRealMoveDashing = function() {
+        return DashKeyValid ? 1 : 0;
     };
 
     Input.isStickMoveSpeed = function() {
@@ -118,7 +139,11 @@ Imported.NUUN_realMoveLeftStick = true;
     };
 
     Game_Player.prototype.realMoveSpeed = function() {
-        return (Input.isStickMoveSpeed() > 0 ? Input.isStickMoveSpeed() * (!$gameMap.isDashDisabled() ? GamepadLeftStickMaxSpeed + (this.moveSpeed() - 4) : this.moveSpeed()) * 2 : Game_CharacterBase.prototype.realMoveSpeed.call(this));
+        return (Input.isStickMoveSpeed() > 0 ? Input.isStickMoveSpeed() * (!$gameMap.isDashDisabled() ? GamepadLeftStickMaxSpeed + (this.moveSpeed() - 4) + this.getRealMoveDashing() : this.moveSpeed()) * 2 : Game_CharacterBase.prototype.realMoveSpeed.call(this));
+    };
+
+    Game_Player.prototype.getRealMoveDashing = function() {
+        return (DashKeyValid && this.isDashing() ? 1 : 0);
     };
 
 })();

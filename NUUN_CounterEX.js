@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * Extend the counter.
@@ -62,6 +62,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/9/2023 Ver.1.1.3
+ * Fixed an issue where the counter target Battler would attack even if it was incapacitated.
  * 7/3/2023 Ver.1.1.2
  * Fixed the problem that the counter attack (reflection) does not return to the original with the counter image switching function in "NUUN_BattleStyleEX".
  * 7/1/2023 Ver.1.1.1
@@ -307,7 +309,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * カウンターを拡張します。
@@ -358,6 +360,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/9 Ver.1.1.3
+ * カウンター対象のバトラーが戦闘不能になっても攻撃してしまう問題を修正。
  * 2023/7/3 Ver.1.1.2
  * バトルスタイル拡張プラグインでのカウンターの画像切り替え機能で反撃(反射)から元に戻らない問題を修正。
  * 2023/7/1 Ver.1.1.1
@@ -746,6 +750,9 @@ Imported.NUUN_CounterEX = true;
 
         getAllDamageCounterTarget() {
             const target = this.getCounterData().getSubject();
+            if (target.isDead()) {
+                return [];
+            }
             const num = this.makeTargets().length;
             const targets = [];
             for (let i = 0; i < num; i++) {

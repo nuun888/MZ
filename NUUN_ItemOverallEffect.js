@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Item Effect Overall Feature
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * You can create traits that target a single item's area of effect to the whole.
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/9/2023 Ver.1.0.1
+ * Fixed an issue where dying actors would not be targeted by the overall effect when targeted.
  * 7/8/2023 Ver.1.0.0
  * first edition.
  * 
@@ -41,7 +43,7 @@
  * @target MZ
  * @plugindesc アイテム全体化特徴
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 対象が単体のアイテムの範囲を全体化する特徴を作ることができます。
@@ -58,6 +60,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/9 Ver.1.0.1
+ * 戦闘不能のアクターが対象の時に、全体化の対象から外れてしまう問題を修正。
  * 2023/7/8 Ver.1.0.0
  * 初版
  * 
@@ -84,7 +88,13 @@ Imported.NUUN_ItemOverallEffect = true;
             if (this.isForOpponent()) {
                 targets.push(...this.targetsForOverallEffectOpponents());
             } else if (this.isForFriend()) {
-                targets.push(...this.targetsForOverallEffectFriends());
+                if (this.isForDeadFriend()) {
+                    targets.push(...this.targetsForOverallEffectFriendDead());
+                } else if (this.isForAliveFriend()) {
+                    targets.push(...this.targetsForOverallEffectFriends());
+                } else {
+                    targets.push(...this.targetsForOverallEffectDeadAndAlive());
+                }
             }
             return this.repeatTargets(targets);
         }
@@ -101,6 +111,16 @@ Imported.NUUN_ItemOverallEffect = true;
         } else {
             return false;
         }
+    };
+
+    Game_Action.prototype.targetsForOverallEffectFriendDead = function() {
+        const unit = this.friendsUnit();
+        return unit.deadMembers();
+    };
+
+    Game_Action.prototype.targetsForOverallEffectDeadAndAlive = function() {
+        const unit = this.friendsUnit();
+        return unit.members();
     };
 
     Game_Action.prototype.targetsForOverallEffectOpponents = function() {

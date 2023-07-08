@@ -79,6 +79,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | ┣  [サポートアクター呼び出し](https://github.com/nuun888/MZ/blob/master/README/CallSupportActor.md) | [NUUN_CallSupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CallSupportActor.js) |  | 1.0.2 |
 | ┗  召喚アクター |  |  |
 | [サイドビューアクターステートアイコン](https://github.com/nuun888/MZ/blob/master/README/SVActorStateIcon.md) | [NUUN_SVActorStateIcon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SVActorStateIcon.js) | オ | 1.0.0 |
+| [レベルアップ時回復](https://github.com/nuun888/MZ/blob/master/README/LevelUpRecovery.md) | [NUUN_LevelUpRecovery](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUpRecovery.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.11.2
+ * @version 3.11.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/7/8 Ver.3.11.3
+ * アクターのアニメーション、ポップアップの位置を修正。
  * 2023/7/3 Ver.3.11.2
  * マンガ的表現のバトルビューとの競合対応。
  * 画像切り替え機能で反撃(反射)から元に戻らない問題を修正。
@@ -2896,12 +2898,12 @@ Sprite_BSFrontActor.prototype.actorHomeRefresh = function(index) {
     const rect = statusData.itemRectWithPadding(index);
     let x = rect.x + Math.floor(rect.width / 2) + statusData.itemPadding();
     let y = rect.y + statusData.y + Math.floor(rect.height / 2);
-    if (params.StyleMode === "Standard") {
+    if (params.bsMode === "Standard") {
       x -= Math.floor(ImageManager.faceWidth / 2);
     }
     this.setHome(x + params.ActorEffect_X, y + params.ActorEffect_Y);
     this._bsHomeX = x + params.ActorEffect_X + (Graphics.boxWidth - Graphics.width) / 2;
-    this._bsHomeY = y + params.ActorEffect_Y;
+    this._bsHomeY = y + params.ActorEffect_Y + rect.height / 2 + this.actorEffectCorrection();
 };
 
 Sprite_BSFrontActor.prototype.setBattler = function(battler) {
@@ -2914,6 +2916,17 @@ Sprite_BSFrontActor.prototype.setBattler = function(battler) {
     this.bsSprite = BattleManager.battlerSprite[index];
   }
   $gameTemp.setBattleStyleRefresh(false);
+};
+
+Sprite_BSFrontActor.prototype.actorEffectCorrection = function() {
+    switch (params.bsMode) {
+        case "Standard":
+            return 32
+        case "Type4":
+            return 0;
+        default:
+            return -48;
+    }
 };
 
 Sprite_BSFrontActor.prototype.startMove = function(x, y, duration) {
@@ -4042,13 +4055,7 @@ Spriteset_Battle.prototype.createDamege = function() {
   this._battleDamege = sprite;
 };
 
-Spriteset_Battle.prototype.updateEffects = function() {
-    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
-        for (const actor of this._actorSprites) {
-            this.a
-        }
-    }
-    
+Spriteset_Battle.prototype.updateEffects = function() {   
   //this._battleDamege.x = this._battleEffects.x;
   //this._battleDamege.y = this._battleEffects.y;
 };

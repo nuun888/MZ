@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.20.0
+# Ver.2.20.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -277,6 +277,9 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2023/7/8 Ver.2.20.1  
+カテゴリー表示をtrueに設定してモンスター図鑑を開くとエラーが出る問題を修正。  
+属性アイコンの耐性、弱体、無効、吸収表示が正常に表示されない問題を修正。  
 2023/7/1 Ver.2.20.0  
 吸収属性(アイコン表示)の項目を追加。  
 無効属性から吸収属性を表示しない機能を追加。  

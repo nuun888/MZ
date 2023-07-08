@@ -1,5 +1,5 @@
 # [バトルログ簡易表示及び一括ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleLogSimpleDisplayPopupBatch.js)
-# Ver.1.1.1
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleLogSimpleDisplayPopupBatch.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -42,6 +42,8 @@
 上記のタグがある場合、敵キャラウィンドウ表示位置での設定は無視されます。  
 
 ### 更新履歴
+2023/7/8 Ver 1.2.0  
+スキル、アイテム名とメッセージを表示する機能を追加。  
 2023/6/3 Ver 1.1.1  
 処理の修正。  
 2023/5/9 Ver 1.1.0  

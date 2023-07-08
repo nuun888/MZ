@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_ItemOverallEffect.js
+ * NUUN_LevelUpRecovery.js
  * 
  * Copyright (C) 2023 NUUN
  * This software is released under the MIT License.
@@ -16,6 +16,9 @@
  * 
  * @help
  * Restores specified stats when leveling up.
+ * 
+ * You can recover HP, MP, TP, user parameters, and state.
+ * Please set the recovery target in the plug-in parameter. (Default is HP, MP, full state recovery)
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
@@ -75,6 +78,10 @@
  * 
  * @help
  * レベルアップ時に指定の能力値を回復します。
+ * 
+ * HP、MP、TP、ユーザーパラメータ、ステートを回復できます。  
+ * 回復する対象はプラグインパラメータで設定してください。(デフォルトはHP、MP、ステート全回復)  
+ * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。

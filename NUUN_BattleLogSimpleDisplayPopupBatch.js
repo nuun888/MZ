@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * Only item names and skill names are displayed in the battle log.
@@ -31,6 +31,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/3/2023 Ver.1.2.0
+ * Added ability to display skills, item names and messages.
  * 6/3/2023 Ver.1.1.1
  * Correction of processing.
  * 5/9/2023 Ver.1.1.0
@@ -60,6 +62,8 @@
  * @value 0
  * @option Message when using
  * @value 1
+ * @option Skill, Item name, Message when using
+ * @value 2
  * @default 0
  * 
  * @param LogWindowPositionMode
@@ -170,7 +174,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * バトルログをアイテム名、スキル名のみ表示させるようにします。
@@ -189,6 +193,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/8 Ver 1.2.0
+ * スキル、アイテム名とメッセージを表示する機能を追加。
  * 2023/6/3 Ver 1.1.1
  * 処理の修正。
  * 2023/5/9 Ver 1.1.0
@@ -218,6 +224,8 @@
  * @value 0
  * @option 使用時のメッセージ
  * @value 1
+ * @option スキル、アイテム名、使用時のメッセージ
+ * @value 2
  * @default 0
  * 
  * @param LogWindowPositionMode
@@ -692,11 +700,21 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
 
     Window_BattleLog.prototype.setBattleLogMessage = function(subject, item) {
         this._battleLogMessage = [];
+        if (LogMessageMode === 2 ) {
+            this.addBattleLogItemNameMessage(item);
+        }
         if (DataManager.isSkill(item)) {
             this.addBattleLogMessage(item.message1, subject, item);
             this.addBattleLogMessage(item.message2, subject, item);
         } else {
             this.addBattleLogMessage(TextManager.useItem, subject, item);
+        }
+    };
+
+    Window_BattleLog.prototype.addBattleLogItemNameMessage = function(item) {
+        if (item) {
+            const message = "\\I["+ item.iconIndex +"]" + item.name;
+            this._battleLogMessage.push(message);
         }
     };
 

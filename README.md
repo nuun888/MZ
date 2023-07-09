@@ -130,6 +130,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md) | [NUUN_SkillCostShowEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js) | 共 | 1.1.3 |
 | [スキルラーニング](https://github.com/nuun888/MZ/blob/master/README/SkillLearning.md) | [NUUN_SkillLearning](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js) | 共 | 1.1.2 |
 | [設置型スキル](https://github.com/nuun888/MZ/blob/master/README/StationarySkill.md) | [NUUN_StationarySkill](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StationarySkill.js) | 共 | 1.0.0 |
+| [アイテム、スキルの使用効果でコモンイベント実行で画面を閉じない](https://github.com/nuun888/MZ/blob/master/README/ContinuationItemWindowCommon.md) | [NUUN_ContinuationItemWindowCommon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContinuationItemWindowCommon.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

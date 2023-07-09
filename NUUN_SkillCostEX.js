@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost EX
  * @author NUUN
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * You can set various costs for skill costs.
@@ -90,6 +90,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/9/2023 Ver.1.2.4
+ * Fixed an issue where skills could not be selected when HP was 0.
  * 2/19/2023 Ver.1.2.3
  * Added a function to disappear equipped weapons and armor if you don't have them by consuming items.
  * 2/15/2023 Ver.1.2.2
@@ -112,7 +114,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -191,6 +193,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/9 Ver.1.2.4
+ * HPが0の時にスキルが選択できなくなる問題を修正。
  * 2023/2/19 Ver.1.2.3
  * アイテム消費で所持していない場合は装備している武器、防具を消失する機能を追加。
  * 2023/2/15 Ver.1.2.2
@@ -310,14 +314,16 @@ Game_BattlerBase.prototype.canPaySkillCost = function(skill) {
         this.canSkillEquipCost(skill) &&
         this.canSkillVarCost(skill) && 
         this.canSkillVarCostR(skill) &&
-        this.canSkillEvalCost(skill))
+        this.canSkillEvalCost(skill)
+        )
 };
 
 Game_BattlerBase.prototype.canSkillHpCost = function(skill) {
+    const cost = this.skillHpCost(skill);
     if (skill.meta.HPCostDead) {
-        return this._hp >= this.skillHpCost(skill);
+        return this._hp >= cost;
     } else {
-        return this._hp > this.skillHpCost(skill);
+        return this._hp > cost || cost === 0;
     }
 };
 

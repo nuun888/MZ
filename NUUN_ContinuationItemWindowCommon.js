@@ -72,7 +72,7 @@ Imported.NUUN_ContinuationItemWindowCommon = true;
 
 (() => {
     const parameters = PluginManager.parameters('NUUN_ContinuationItemWindowCommon');
-    const SceneContinuationCommonEvent = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['NUUN_ContinuationItemWindowCommon'])) : [];
+    const SceneContinuationCommonEvent = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SceneContinuationCommonEvent'])) : [];
 
     Game_Action.prototype.applyGlobal = function() {//再定義
         for (const effect of this.item().effects) {

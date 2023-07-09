@@ -74,18 +74,23 @@ Imported.NUUN_ContinuationItemWindowCommon = true;
     const parameters = PluginManager.parameters('NUUN_ContinuationItemWindowCommon');
     const SceneContinuationCommonEvent = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SceneContinuationCommonEvent'])) : [];
 
-    Game_Action.prototype.applyGlobal = function() {//再定義
-        for (const effect of this.item().effects) {
-            if (effect.code === Game_Action.EFFECT_COMMON_EVENT) {
-                if (isContinuationCommonEvent(effect.dataId)) {
-                    this.continuationCommonEvent(effect.dataId);
-                } else {
-                    $gameTemp.reserveCommonEvent(effect.dataId);
+    const _Game_Action_applyGlobal = Game_Action.prototype.applyGlobal;
+    Game_Action.prototype.applyGlobal = function() {
+        if ($gameParty.inBattle()) {
+            _Game_Action_applyGlobal.call(this);
+        } else {
+            for (const effect of this.item().effects) {
+                if (effect.code === Game_Action.EFFECT_COMMON_EVENT) {
+                    if (isContinuationCommonEvent(effect.dataId)) {
+                        this.continuationCommonEvent(effect.dataId);
+                    } else {
+                        $gameTemp.reserveCommonEvent(effect.dataId);
+                    }
                 }
             }
+            this.updateLastUsed();
+            this.updateLastSubject();
         }
-        this.updateLastUsed();
-        this.updateLastSubject();
     };
 
     Game_Action.prototype.continuationCommonEvent = function(commonEventId) {

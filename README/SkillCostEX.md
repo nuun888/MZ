@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.2.3
+# Ver.1.2.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)  
 [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md)  
 
@@ -66,6 +66,8 @@
 スキルのダメージの計算式にa.consBMp * 1.5 と記入することで消費前のMPの1.5倍のダメージを与えることができます。  
 
 ## 更新履歴
+2023/7/9 Ver.1.2.4  
+HPが0の時にスキルが選択できなくなる問題を修正。  
 2023/2/19 Ver.1.2.3  
 アイテム消費で所持していない場合は装備している武器、防具を消失する機能を追加。  
 装備消費で条件を指定しない場合に、装備が消費されない問題を修正。  

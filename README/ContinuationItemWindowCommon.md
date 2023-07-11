@@ -1,5 +1,5 @@
 # [アイテム、スキル使用効果コモンイベント実行時に画面を閉じない](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContinuationItemWindowCommon.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContinuationItemWindowCommon.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -15,5 +15,7 @@
 イベントコマンドのウエイトは非対応です。  
 
 ## 更新履歴
+2023/7/11 Ver.1.0.1  
+処理の修正。  
 2023/7/9 Ver.1.0.0  
 初版  

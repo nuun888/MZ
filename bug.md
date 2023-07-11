@@ -1,12 +1,6 @@
 ### 現在のバグ報告
-複数ウィンドウで選択肢と同時に開くとメッセージウィンドウが開かない。  
-モンスター図鑑のカテゴリーウィンドウ設定のカテゴリーをtrueにするとエラー  
-モンスター図鑑の属性アイコンの表示がおかしい。  
-スキルコスト拡張で不死身ステート中にHPが0になると行動できなくなる  
 
 ### 現在の競合報告
-animatedSVEnemies併用時、MPゲージとTPゲージでエラー  
-animatedSVEnemiesでステートアイコンが表示されない  
 LL_GalgeChoiceWindowとNUUN_MultiMessageWindowsとの競合確認  
 ステートアイコン複数表示とNRP_ShadowAndLevitate.jsと併用すると謎の線が出る  
 
@@ -17,4 +11,4 @@ LL_GalgeChoiceWindowとNUUN_MultiMessageWindowsとの競合確認
 メンバー変更画面でリーダのみ変更自由で他は自身のみ  
 
 ### 新規プラグイン
-
+TP無効ステート  

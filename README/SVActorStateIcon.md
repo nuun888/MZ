@@ -9,7 +9,7 @@
 
 ![画像](img/SVActorStateIcon1.png)  
 
-アクターのメモ欄
+アクターのメモ欄  
 `<ActorStateX:[position]>` アクターのステートアイコンのX座標を調整します。（相対座標）  
 `<ActorStateY:[position]>` アクターのステートアイコンのY座標を調整します。（相対座標）  
 `<HideSVStateIcon>` ステートアイコンを表示させません。  

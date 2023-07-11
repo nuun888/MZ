@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サイドビューアクターステートアイコン
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -20,6 +20,7 @@
  * アクターのメモ欄
  * <ActorStateX:[position]> アクターのステートアイコンのX座標を調整します。（相対座標）
  * <ActorStateY:[position]> アクターのステートアイコンのY座標を調整します。（相対座標）
+ * <HideSVStateIcon> ステートアイコンを表示させません。
  * 
  * このプラグインはNUUN_BattlerOverlayBase(バトラーオーバーレイベース)が必要です。
  * 
@@ -27,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/11 Ver.1.0.2
+ * 特定のアクターに対しステートアイコンを表示させない機能を追加。
  * 2023/6/2 Ver.1.0.1
  * 処理の修正。
  * 2022/5/10 Ver.1.0.0
@@ -94,7 +97,7 @@ Sprite_Actor.prototype.update = function() {
 };
 
 Sprite_Actor.prototype.updateStateSprite = function() {
-    if (!this._actor || ActorStatePosition === 'none') {
+    if (!this._actor || ActorStatePosition === 'none' || this._actor.actor().meta.HideSVStateIcon) {
       return;
     }
     if (this.battlerOverlay && !this._stateIconSprite) {

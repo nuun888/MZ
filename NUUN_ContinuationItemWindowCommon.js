@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Items that perform common events with use effects, prevent the screen from closing when using skills.
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/11/2023 Ver.1.0.1
+ * Processing fixes.
  * 7/9/2023 Ver.1.0.0
  * First edition.
  * 
@@ -42,7 +44,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 使用効果でコモンイベントを実行するアイテム、スキルを使用したときに画面を閉じないようにします。
@@ -56,6 +58,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/11 Ver.1.0.1
+ * 処理の修正。
  * 2023/7/9 Ver.1.0.0
  * 初版
  * 
@@ -74,36 +78,34 @@ Imported.NUUN_ContinuationItemWindowCommon = true;
     const parameters = PluginManager.parameters('NUUN_ContinuationItemWindowCommon');
     const SceneContinuationCommonEvent = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SceneContinuationCommonEvent'])) : [];
 
-    const _Game_Action_applyGlobal = Game_Action.prototype.applyGlobal;
-    Game_Action.prototype.applyGlobal = function() {
-        if ($gameParty.inBattle()) {
-            _Game_Action_applyGlobal.call(this);
-        } else {
-            for (const effect of this.item().effects) {
-                if (effect.code === Game_Action.EFFECT_COMMON_EVENT) {
-                    if (isContinuationCommonEvent(effect.dataId)) {
-                        this.continuationCommonEvent(effect.dataId);
-                    } else {
-                        $gameTemp.reserveCommonEvent(effect.dataId);
-                    }
+    const _Scene_ItemBase_checkCommonEvent = Scene_ItemBase.prototype.checkCommonEvent;
+    Scene_ItemBase.prototype.checkCommonEvent = function() {
+        if ($gameTemp.isCommonEventReserved()) {
+            $gameTemp._commonEventQueue.forEach((commonEventId, index) => {
+                if (isContinuationCommonEvent(commonEventId)) {
+                    this.continuationCommonEvent(commonEventId, index);
                 }
-            }
-            this.updateLastUsed();
-            this.updateLastSubject();
+            });
+            this._itemInterpreter = null;
         }
+        _Scene_ItemBase_checkCommonEvent.call(this);
     };
 
-    Game_Action.prototype.continuationCommonEvent = function(commonEventId) {
-        const interpreter = new Game_Interpreter();
+    Scene_ItemBase.prototype.continuationCommonEvent = function(commonEventId, index) {
+        if (!this._itemInterpreter) {
+            this._itemInterpreter = new Game_Interpreter();
+        }
+        $gameTemp._commonEventQueue.splice(index, 1);
         const commonEvent = $dataCommonEvents[commonEventId];
         if (commonEvent) {
-            interpreter.setup(commonEvent.list);
-            interpreter.update();
+            this._itemInterpreter.setup(commonEvent.list);
+            this._itemInterpreter.update();
         }
     };
 
     function isContinuationCommonEvent(commonEventId) {
         return SceneContinuationCommonEvent.some(id => id === commonEventId);
-    }
+    };
+   
     
 })();

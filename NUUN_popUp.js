@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Pop up
  * @author NUUN
- * @version 2.0.4
+ * @version 2.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -68,6 +68,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/13/2023 Ver 2.0.5
+ * Fixed an issue where an error popped up in "NUUN_StealableItems".
  * 5/22/2023 Ver 2.0.4
  * Fixed an issue where an error would occur when canceling a state with an event command.
  * 5/21/2023 Ver 2.0.3
@@ -423,7 +425,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 2.0.4
+ * @version 2.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -481,6 +483,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/13 Ver 2.0.5
+ * 盗みスキル、アイテムでのポップアップでエラーが出る問題を修正。
  * 2023/5/22 Ver 2.0.4
  * イベントコマンドでステートを解除するとエラーが出る問題を修正。
  * 2023/5/21 Ver 2.0.3
@@ -1123,9 +1127,9 @@ class PopUpData {
     if (StealShowPopup) {
       const data = PopUpGoldSteal;
       if (data) {
-        const name = name = item.popupText.format(item.name);
+        const name = item.popupText.format(item.name);
         const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : item.iconIndex;
-        this.setupPopup(target, data, item.id, name, data.PopupColor, iconIndex, 255, 'Steal', StealPopupImg);
+        this.setupPopup(target, data, item.id, name, data.PopupColor, iconIndex, 255, 'Steal');
       }
     }
   };

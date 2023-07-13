@@ -1,5 +1,5 @@
 # [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
-# Ver.1.2.2
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -204,6 +204,16 @@
 現レベルの獲得経験値が\[上限下限値内](1)または「指定した数値」(2)と一致なら条件を満たします。  
 対象が敵、敵グループならfalseを返します。  
 
+#### 【天候】
+[晴れ][雨][嵐][雪]  
+天候が指定した天候なら条件を満たします。  
+
+#### 【メモ欄】
+[アクター、敵キャラのメモ欄]  
+アクター及び敵キャラのメモ欄に指定のタグが存在する場合に条件を満たします。  
+[特徴を有するメモ欄]  
+アクター及び敵キャラの特徴を有するメモ欄に指定のタグが存在する場合に条件を満たします。  
+
 #### 【条件式】
 条件式の評価がtrueなら条件を満たします。
 
@@ -242,6 +252,8 @@
 [エンカウント条件](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md)  
 
 ## 更新履歴
+2023/7/13 Ver.1.3.0  
+天候による条件を追加。  
 2023/7/1 Ver.1.2.2  
 複数属性更新による処理の修正。  
 2023/6/25 Ver.1.2.1  

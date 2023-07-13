@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost EX
  * @author NUUN
- * @version 1.2.4
+ * @version 1.3.0
  * 
  * @help
  * You can set various costs for skill costs.
@@ -86,10 +86,18 @@
  * Skill damage formula
  * By entering "a.consBMp * 1.5", you can give 1.5 times the damage of MP before consumption.
  * 
+ * Notes with features
+ * <NoConsumptionCost[id]:±[rate]> Specifies the probability of not consuming.
+ * [id]:
+ * 1:MP 2:TP 3:HP 4:Gold
+ * [rate]:Consumption rate (±)　The initial value is 0.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/13/2023 Ver.1.3.0
+ * Added a function that does not consume MP, TP, HP, and Gold with a probability.
  * 7/9/2023 Ver.1.2.4
  * Fixed an issue where skills could not be selected when HP was 0.
  * 2/19/2023 Ver.1.2.3
@@ -114,7 +122,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.2.4
+ * @version 1.3.0
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -189,10 +197,18 @@
  * スキルのダメージの計算式に
  * a.consBMp * 1.5 と記入することで消費前のMPの1.5倍のダメージを与えることができます。
  * 
+ * 特徴を有するメモ欄
+ * <NoConsumptionCost[id]:±[rate]> 消費しない確率を指定します。
+ * [id]:
+ * 1:MP 2:TP 3:HP 4:Gold
+ * [rate]:消費率(±)　初期値は0です。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/13 Ver.1.3.0
+ * MP、TP、HP、Goldを確率で消費しない機能を追加。
  * 2023/7/9 Ver.1.2.4
  * HPが0の時にスキルが選択できなくなる問題を修正。
  * 2023/2/19 Ver.1.2.3
@@ -386,15 +402,41 @@ Game_BattlerBase.prototype.canSkillEvalCost = function(skill) {
 const _Game_BattlerBase_paySkillCost = Game_BattlerBase.prototype.paySkillCost;
 Game_BattlerBase.prototype.paySkillCost = function(skill) {
     this.setBCostParam();
-    _Game_BattlerBase_paySkillCost.call(this, skill);
-    this._hp -= this.skillHpCost(skill);
-    $gameParty.loseGold(this.skillGoldCost(skill));
+    this.paySkillMpTpCost(skill);
+    this.paySkillHpCost(skill);
+    this.paySkillGoldCost(skill);
     this.paySkillExpCost(skill);
     this.paySkillItemCost(skill);
     this.paySkillVarCost(skill);
     this.paySkillVarCostR(skill);
     this.paySkillEquipCost(skill);
     this.paySkillEvalCost(skill);
+};
+
+Game_BattlerBase.prototype.paySkillMpTpCost = function(skill) {
+    const mp = this._mp;
+    const tp = this._tp;
+    _Game_BattlerBase_paySkillCost.call(this, skill);
+    if (mp > this._mp && this.isNoConsumptionRate(1)) {
+        this._mp = mp;
+    }
+    if (tp > this._tp && this.isNoConsumptionRate(2)) {
+        this._tp = tp;
+    }
+};
+
+Game_BattlerBase.prototype.paySkillHpCost = function(skill) {
+    const cost = this.skillHpCost(skill);
+    if (cost > 0 && this.isNoConsumptionRate(3)) {
+        this._hp -= cost;
+    }
+};
+
+Game_BattlerBase.prototype.paySkillGoldCost = function(skill) {
+    const cost = this.skillGoldCost(skill);
+    if (cost > 0 && this.isNoConsumptionRate(4)) {
+        $gameParty.loseGold(cost);
+    }
 };
 
 Game_BattlerBase.prototype.paySkillExpCost = function(skill) {
@@ -475,6 +517,21 @@ Game_BattlerBase.prototype.canSkillItemCostIncludeEquip = function(cost) {
         }
     }
     return false;
+};
+
+
+Game_BattlerBase.prototype.getTraitNoConsumptionRate = function(id) {
+    const tag = "NoConsumptionCost" + id;
+    return this.traitObjects().reduce((r, trait) => {
+        if (trait.meta[tag]) {
+            r += Number(trait.meta[tag]);
+        }
+        return r;
+    }, 0);
+};
+
+Game_BattlerBase.prototype.isNoConsumptionRate = function(id) {
+    return Math.randomInt(100) < this.getTraitNoConsumptionRate(id);
 };
 
 

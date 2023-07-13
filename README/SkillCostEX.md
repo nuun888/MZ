@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.2.4
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)  
 [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md)  
 
@@ -65,7 +65,16 @@
   
 スキルのダメージの計算式にa.consBMp * 1.5 と記入することで消費前のMPの1.5倍のダメージを与えることができます。  
 
+### 消費しない特徴
+特徴を有するメモ欄  
+`<NoConsumptionCost[id]:±[rate]>` 消費しない確率を指定します。  
+`[id]`:  
+ 1:MP 2:TP 3:HP 4:Gold  
+`[rate]`:消費率(±)　初期値は0です。  
+
 ## 更新履歴
+2023/7/13 Ver.1.3.0  
+MP、TP、HP、Goldを確率で消費しない機能を追加。  
 2023/7/9 Ver.1.2.4  
 HPが0の時にスキルが選択できなくなる問題を修正。  
 2023/2/19 Ver.1.2.3  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.2.2
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -242,7 +242,10 @@
  * 【経験値】
  * [現レベルの経験値]
  * 現レベルの獲得経験値が[上限下限値内](1)または「指定した数値」(2)と一致なら条件を満たします。
- * 対象が敵、敵グループならfalseを返します。
+ * 
+ * 【天候】
+ * [晴れ][雨][嵐][雪]
+ * 天候が指定した天候なら条件を満たします。
  * 
  * 【条件式】
  * 条件式の評価がtrueなら条件を満たします。
@@ -257,6 +260,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/13 Ver.1.3.0
+ * 天候による条件を追加。
  * 2023/7/1 Ver.1.2.2
  * 複数属性更新による処理の修正。
  * 2023/6/25 Ver.1.2.1
@@ -374,6 +379,8 @@
  * @value 'Gold'
  * @option メモ欄(Notes)
  * @value 'Notes'
+ * @option 天候(Weather)
+ * @value 'Weather'
  * @option 条件式(Eval)
  * @value 'Eval'
  * @default 
@@ -699,6 +706,20 @@
  * @value 'Gold'
  * @default 
  * 
+ * @param WeatherConditionsType
+ * @text 天候(Weather)
+ * @desc 天候の条件タイプを指定します。
+ * @type select
+ * @option 天候が晴れ
+ * @value 'None'
+ * @option 天候が雨
+ * @value 'Rain'
+ * @option 天候が嵐
+ * @value 'Storm'
+ * @option 天候が雪
+ * @value 'Snow'
+ * @default 
+ * 
  * @param NotesConditionsType
  * @text メモ欄
  * @desc メモ欄の条件タイプを指定します。
@@ -944,6 +965,8 @@ function triggerConditions(data, target, mode, action, damage) {
     return goldTriggerConditions(data, target, mode);
   } else if (data.ConditionsMode === 'Notes') {
     return noteTriggerConditions(data, target, mode);
+  } else if (data.ConditionsMode === 'Weather') {
+    return weatherTriggerConditions(data);
   } else if (data.ConditionsMode === 'Eval') {
     return evalTriggerConditions(data);
   }
@@ -1385,6 +1408,20 @@ function noteTriggerConditions(data, target, mode) {
     }
 };
 
+//天候
+function weatherTriggerConditions(data) {
+    switch (data.WeatherConditionsType) {
+        case "None":
+            return $gameScreen._weatherType === "none";
+        case "Rain":
+            return $gameScreen._weatherType === "rain";
+        case "Storm":
+            return $gameScreen._weatherType === "storm";
+        case "Snow":
+            return $gameScreen._weatherType === "snow";
+    }
+};
+
 //条件式
 function evalTriggerConditions(data) {
   return eval(data.EvalStr);
@@ -1633,6 +1670,15 @@ function condTurnCount(member) {
 };
 
 function attackElement(idList, action) {
+
+
+
+    
+    if (action.item().damage.elementId < 0) {
+        elementsList = action.getAttackElementsList();
+      } else {
+        elementsList = action.getItemElementsList();
+      }
   let elementsList = action._multiElements;
   const list = getValList(idList);
   return elementsList.some(id => elements(list, id));

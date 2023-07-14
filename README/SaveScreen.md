@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# Ver.2.2.0
+# Ver.2.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)Ver.1.6.2以降  
@@ -75,6 +75,8 @@ drawTextEx表示はプラグインパラメータのフォントサイズが適�
 オートセーブ時のスナップショットは戦闘開始直前のマップ、移動直前のマップが撮影されます。  
 
 ## 更新履歴
+2023/7/15 Ver.2.2.1  
+特定の条件のみ一致したアクターの顔グラ、SVアクター、アクター名を表示できる機能を追加。  
 2023/7/8 Ver.2.2.0  
 特定の条件のみ一致したアクターのキャラチップ、レベルを表示できる機能を追加。  
 2023/6/18 Ver.2.1.4  

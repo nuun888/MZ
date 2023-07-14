@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.2.0
+ * @version 2.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/7/15 Ver.2.2.1
+ * Added a function that can display facial graphics, SV actors, and actor names of actors that match specific conditions.
  * 2023/7/8 Ver.2.2.0
  * Added a function that can display the character chip and level of actors who meet only specific conditions.
  * 2023/6/18 Ver.2.1.4
@@ -498,7 +500,7 @@
  * @value 12
  * @option Destination(1)(2)(3)(4)(5)(8)(11)
  * @value 13
- * @option Actor name(1)(2)(3)(4)(5)(8)
+ * @option Actor name(1)(2)(3)(4)(5)(8)(12)
  * @value 20
  * @option Class(1)(2)(3)(4)(5)(8)
  * @value 21
@@ -508,9 +510,9 @@
  * @value 23
  * @option Character chip(1)(2)(3)(4)(5)(12)
  * @value 50
- * @option Face(1)(2)(3)(4)
+ * @option Face(1)(2)(3)(4)(12)
  * @value 51
- * @option SV actor(1)(2)(3)(4)(5)
+ * @option SV actor(1)(2)(3)(4)(5)(12)
  * @value 52
  * @option Snap shot(1)(2)(3)(4)
  * @value 90
@@ -708,6 +710,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/15 Ver.2.2.1
+ * 特定の条件のみ一致したアクターの顔グラ、SVアクター、アクター名を表示できる機能を追加。
  * 2023/7/8 Ver.2.2.0
  * 特定の条件のみ一致したアクターのキャラチップ、レベルを表示できる機能を追加。
  * 2023/6/18 Ver.2.1.4
@@ -1150,7 +1154,7 @@
  * @value 12
  * @option 行動目標(1)(2)(3)(4)(5)(8)(11)
  * @value 13
- * @option アクター名(1)(2)(3)(4)(5)(8)
+ * @option アクター名(1)(2)(3)(4)(5)(8)(12)
  * @value 20
  * @option クラス(1)(2)(3)(4)(5)(8)
  * @value 21
@@ -1160,9 +1164,9 @@
  * @value 23
  * @option キャラチップ(1)(2)(3)(4)(5)(12)
  * @value 50
- * @option 顔グラ(1)(2)(3)(4)
+ * @option 顔グラ(1)(2)(3)(4)(12)
  * @value 51
- * @option SVアクター(1)(2)(3)(4)(5)
+ * @option SVアクター(1)(2)(3)(4)(5)(12)
  * @value 52
  * @option スナップショット(1)(2)(3)(4)
  * @value 90
@@ -1431,28 +1435,38 @@ Imported.NUUN_SaveScreen = true;
     });
   };
 
-  DataManager.setPartyData = function(info, data) {
-    const actorId = $gameParty.getSaveFileSpecifyActorOnry();
-    const actor = actorId > 0 ? $gameActors.actor(actorId) : $gameParty.leader();
-    if (CharacterSpecifyActorOnry) {
-      info.characters = [actor.characterName(), actor.characterIndex()];
-    }
-    if (FaceSpecifyActorOnry) {
-      info.faces = [actor.faceName(), actor.faceIndex()];
-    }
-    info.svActor = SvSpecifyActorOnry ? [actor.battlerName()] : $gameParty.svActorForSavefile();
-    info.actorName = NameSpecifyActorOnry ? [actor.name()] : $gameParty.actorNameForSavefile();
-    info.actorClass = ClassSpecifyActorOnry ? [actor.currentClass().name] : $gameParty.actorClassForSavefile();
-    info.actorNickName = NickNameSpecifyActorOnry ? [actor.nickname()] : $gameParty.actorNickNameForSavefile();
-    info.levelActor = LevelSpecifyActorOnry ? [actor._level] : $gameParty.actorLevelForSavefile();
-    ContentsList.forEach((data, index)=> {
-        if (data.DateSelect === 50 && !!data.ShowEval) {
-            info["characters_"+ String(index)] = $gameParty.charactersFilterForSavefile(data);
-        } else if (data.DateSelect === 23 && !!data.ShowEval) {
-            info["levelActor_"+ String(index)] = $gameParty.actorLevelFilterForSavefile(data);
+    DataManager.setPartyData = function(info, data) {
+        const actorId = $gameParty.getSaveFileSpecifyActorOnry();
+        const actor = actorId > 0 ? $gameActors.actor(actorId) : $gameParty.leader();
+        if (CharacterSpecifyActorOnry) {
+            info.characters = [actor.characterName(), actor.characterIndex()];
         }
-    });
-  };
+        if (FaceSpecifyActorOnry) {
+            info.faces = [actor.faceName(), actor.faceIndex()];
+        }
+        info.svActor = SvSpecifyActorOnry ? [actor.battlerName()] : $gameParty.svActorForSavefile();
+        info.actorName = NameSpecifyActorOnry ? [actor.name()] : $gameParty.actorNameForSavefile();
+        info.actorClass = ClassSpecifyActorOnry ? [actor.currentClass().name] : $gameParty.actorClassForSavefile();
+        info.actorNickName = NickNameSpecifyActorOnry ? [actor.nickname()] : $gameParty.actorNickNameForSavefile();
+        info.levelActor = LevelSpecifyActorOnry ? [actor._level] : $gameParty.actorLevelForSavefile();
+        this.setPartyCondData(info);
+    };
+
+    DataManager.setPartyCondData = function(info) {
+        ContentsList.forEach((data, index)=> {
+            if (data.DateSelect === 50 && !!data.ShowEval) {
+                info["characters_"+ String(index)] = $gameParty.charactersFilterForSavefile(data);
+            } else if (data.DateSelect === 51 && !!data.ShowEval) {
+                info["faces_"+ String(index)] = $gameParty.actorFacesFilterForSavefile(data);
+            } else if (data.DateSelect === 52 && !!data.ShowEval) {
+                info["svActor_"+ String(index)] = $gameParty.svActorFilterForSavefile(data);
+            } else if (data.DateSelect === 20 && !!data.ShowEval) {
+                info["actorName_"+ String(index)] = $gameParty.actorNameFilterForSavefile(data);
+            } else if (data.DateSelect === 23 && !!data.ShowEval) {
+                info["levelActor_"+ String(index)] = $gameParty.actorLevelFilterForSavefile(data);
+            }
+        });
+    };
 
   DataManager.loadBackground = function() {
     const globalInfo = this._globalInfo;
@@ -1693,33 +1707,33 @@ Imported.NUUN_SaveScreen = true;
     }
   };
 
-  Window_SavefileList.prototype.drawContentsBack = function(bitmap, index , buckgroundImg) {
-    const data = ContentsBackSettingsList.find(imgData => buckgroundImg === imgData.ContentsBackGroundImg);
-    let sx = 0;
-    let sy = 0;
-    let scale = ContentsBackScale;
-    if (data) {
-      sx = data.Img_SX;
-      sy = data.Img_SY;
-      scale = data.Scale;
-    }
-    const rect = this.itemRect(index);
-    try {
-      this.contentsBack.nuun_contentsBackBlt(bitmap, sx, sy, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, scale, true);
-    } catch (e) {
-      const log = $gameSystem.isJapanese() ? 'NUUN_BaseがVer.1.6.2以降ではありません。' : "'NUUN_Base' is not Ver.1.6.2 or later.";
-      throw ["LoadError", log];
-    }
-  };
+    Window_SavefileList.prototype.drawContentsBack = function(bitmap, index , buckgroundImg) {
+        const data = ContentsBackSettingsList.find(imgData => buckgroundImg === imgData.ContentsBackGroundImg);
+        let sx = 0;
+        let sy = 0;
+        let scale = ContentsBackScale;
+        if (data) {
+        sx = data.Img_SX;
+        sy = data.Img_SY;
+        scale = data.Scale;
+        }
+        const rect = this.itemRect(index);
+        try {
+        this.contentsBack.nuun_contentsBackBlt(bitmap, sx, sy, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, scale, true);
+        } catch (e) {
+        const log = $gameSystem.isJapanese() ? 'NUUN_BaseがVer.1.6.2以降ではありません。' : "'NUUN_Base' is not Ver.1.6.2 or later.";
+        throw ["LoadError", log];
+        }
+    };
 
-  Window_SavefileList.prototype.drawItem = function(index) {
-    const savefileId = this.indexToSavefileId(index);
-    const info = DataManager.savefileInfo(savefileId);
-    const rect = this.itemRectWithPadding(index);
-    this.resetTextColor();
-    this.changePaintOpacity(this.isEnabled(savefileId));
-    this.drawContents(info, rect, savefileId);
-  };
+    Window_SavefileList.prototype.drawItem = function(index) {
+        const savefileId = this.indexToSavefileId(index);
+        const info = DataManager.savefileInfo(savefileId);
+        const rect = this.itemRectWithPadding(index);
+        this.resetTextColor();
+        this.changePaintOpacity(this.isEnabled(savefileId));
+        this.drawContents(info, rect, savefileId);
+    };
 
   Window_SavefileList.prototype.drawContents = function(info, rect, savefileId) {
     const lineHeight = this.lineHeight();
@@ -1784,7 +1798,7 @@ Imported.NUUN_SaveScreen = true;
         this.drawDestination(info, x, y, width, data);
         break;
       case 20:
-        this.drawActorName(info, x, y, width, data);
+        this.drawActorName(info, x, y, width, data, r);
         break;
       case 21:
         this.drawActorClass(info, x, y, width, data);
@@ -1799,10 +1813,10 @@ Imported.NUUN_SaveScreen = true;
         this.drawCharacters(info, x, y, width, data, r);
         break;
       case 51:
-        this.drawFaceActors(info, x, y, width, data);
+        this.drawFaceActors(info, x, y, width, data, r);
         break;
       case 52:
-        this.drawSvActors(info, x, y, width, data);
+        this.drawSvActors(info, x, y, width, data, r);
         break;
       case 90:
         this.drawSnapBitmap(info, x, y, width, data);
@@ -1938,62 +1952,74 @@ Imported.NUUN_SaveScreen = true;
         }
     };
 
-  Window_SavefileList.prototype.drawFaceActors = function(info, x, y, width, data) {
-    if (info.faces) {
-      const rect = this.itemRect(0);
-      const colSpacing = this.colSpacing();
-      width += colSpacing / 2;
-      const height = Math.min(FaceHeight, rect.height) - 4;
-      const height2 = height * (height / (height * FaceScale / 100));
-      if (FaceSpecifyActorOnry) {
-        const data = info.faces[0];
-        this.drawFace(data[0], data[1], x, y + 2, FaceWidth, height2);
-      } else {
+    Window_SavefileList.prototype.drawFaceActors = function(info, x, y, width, data, index) {
+        const rect = this.itemRect(0);
+        const colSpacing = this.colSpacing();
+        width += colSpacing / 2;
+        const height = Math.min(FaceHeight, rect.height) - 4;
+        const height2 = height * (height / (height * FaceScale / 100));
         let faceX = x;
-        for (const data of info.faces) {
-          this.drawFace(data[0], data[1], faceX, y + 2, FaceWidth, height2);
-          faceX += FaceWidth * FaceScale / 100;
+        if (!!data.ShowEval) {
+            const _info = info["faces_"+ String(index)] || [];
+            for (const data of _info) {
+                this.drawFace(data[0], data[1], faceX, y + 2, FaceWidth, height2);
+                faceX += FaceWidth * FaceScale / 100;
+            }
+        } else if (info.faces) {
+            if (FaceSpecifyActorOnry) {
+                const data = _info[0];
+                this.drawFace(data[0], data[1], x, y + 2, FaceWidth, height2);
+            } else {
+                for (const data of info.faces) {
+                    this.drawFace(data[0], data[1], faceX, y + 2, FaceWidth, height2);
+                    faceX += FaceWidth * FaceScale / 100;
+                }
+            }
         }
-      }
-    }
-  };
+    };    
 
-  Window_SavefileList.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
-    const rect = this.itemRectWithPadding(0);
-    const scale = FaceScale / 100;
-    const scale2 = 100 / (100 * scale);
-    width = width || ImageManager.faceWidth;
-    height = Math.min((height || ImageManager.faceHeight), (rect.height - 2) * scale2);
-    const bitmap = ImageManager.loadFace(faceName);
-    const pw = ImageManager.faceWidth;
-    const ph = ImageManager.faceHeight;
-    const sw = Math.min(width, pw);
-    const sh = Math.min(height, ph);
-    const dx = Math.floor(x + Math.max(width - pw, 0) / 2);
-    const dy = Math.floor(y + Math.max(height - ph, 0) / 2);
-    const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
-    const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
-    const dw = Math.floor(sw * scale);
-    const dh = Math.floor(sh * scale);
-    this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
-  };
+    Window_SavefileList.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
+        const rect = this.itemRectWithPadding(0);
+        const scale = FaceScale / 100;
+        const scale2 = 100 / (100 * scale);
+        width = width || ImageManager.faceWidth;
+        height = Math.min((height || ImageManager.faceHeight), (rect.height - 2) * scale2);
+        const bitmap = ImageManager.loadFace(faceName);
+        const pw = ImageManager.faceWidth;
+        const ph = ImageManager.faceHeight;
+        const sw = Math.min(width, pw);
+        const sh = Math.min(height, ph);
+        const dx = Math.floor(x + Math.max(width - pw, 0) / 2);
+        const dy = Math.floor(y + Math.max(height - ph, 0) / 2);
+        const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+        const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+        const dw = Math.floor(sw * scale);
+        const dh = Math.floor(sh * scale);
+        this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy, dw, dh);
+    };
 
-  Window_SavefileList.prototype.drawSvActors = function(info, x, y, width) {
-    if (info.svActor) {
-      const colSpacing = this.colSpacing();
-      width += colSpacing / 2;
-      if (SvSpecifyActorOnry) {
-        const data = info.svActor[0];
-        this.drawSvActor(data, characterX, y);
-      } else {
+    Window_SavefileList.prototype.drawSvActors = function(info, x, y, width, data, index) {
+        const colSpacing = this.colSpacing();
+        width += colSpacing / 2;
         let svX = x;
-        for (const data of info.svActor) {
-          this.drawSvActor(data[0], svX, y);
-          svX += width;
+        if (!!data.ShowEval) {
+            const _info = info["svActor_"+ String(index)] || [];
+            for (const data of _info) {
+                this.drawSvActor(data[0], svX, y);
+                svX += (data.ItemWidth || 48) + colSpacing / 2;
+            }
+        } else if (info.svActor) {
+            if (SvSpecifyActorOnry) {
+                const data = _info[0];
+                this.drawSvActor(data, characterX, y);
+            } else {
+                for (const data of info.svActor) {
+                    this.drawSvActor(data[0], svX, y);
+                    svX += (data.ItemWidth || 48) + colSpacing / 2;
+                }
+            }
         }
-      }
-    }
-  };
+    };
 
   Window_SavefileList.prototype.drawSvActor = function(data, x, y) {
     if (data) {
@@ -2007,28 +2033,38 @@ Imported.NUUN_SaveScreen = true;
     }
   };
 
-  Window_SavefileList.prototype.drawActorName = function(info, x, y, width, data) {
-    if (info.actorName) {
-      const colSpacing = this.colSpacing();
-      width += colSpacing / 2;
-      this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
-      this.resetTextColor();
-      if (NameSpecifyActorOnry) {
-        const name = info.actorName[0];
-        this.drawText(name , x, y, width, data.Align);
-      } else {
-        let nameX = x;
-        for (const name of info.actorName) {
-          this.drawText(name , nameX, y, width, data.Align);
-          nameX += width;
+  Window_SavefileList.prototype.drawActorName = function(info, x, y, width, data, index) {
+    const colSpacing = this.colSpacing();
+    const padding = this.itemPadding();
+    width += colSpacing / 2;
+    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+    this.resetTextColor();
+    let nameX = x;
+    if (!!data.ShowEval) {
+        const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+        const actorName = (info["actorName_"+ String(index)] || []);
+        for (const name of actorName) {
+            this.drawText(name , nameX, y, width2 - padding, data.Align);
+            nameX += width2;
         }
-      }
+    } else if (info.actorName) {
+        if (NameSpecifyActorOnry) {
+            const name = info.actorName[0];
+            this.drawText(name , x, y, width, data.Align);
+        } else {
+            const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+            for (const name of info.actorName) {
+                this.drawText(name , nameX, y, width2 - padding, data.Align);
+                nameX += width2;
+            }
+        }
     }
   };
 
   Window_SavefileList.prototype.drawActorClass = function(info, x, y, width, data) {
     if (info.actorClass) {
       const colSpacing = this.colSpacing();
+      const padding = this.itemPadding();
       width += colSpacing / 2;
       this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
       this.resetTextColor();
@@ -2037,9 +2073,10 @@ Imported.NUUN_SaveScreen = true;
         this.drawText(name , x, y, width, data.Align);
       } else {
         let nameX = x;
+        const width2 = (data.ItemWidth || 48) + colSpacing / 2;
         for (const name of info.actorClass) {
-          this.drawText(name , nameX, y, width, data.Align);
-          nameX += width;
+          this.drawText(name , nameX, y, width2 - padding, data.Align);
+          nameX += width2;
         }
       }
     }
@@ -2048,6 +2085,7 @@ Imported.NUUN_SaveScreen = true;
   Window_SavefileList.prototype.drawActorNickName = function(info, x, y, width, data) {
     if (info.actorNickName) {
       const colSpacing = this.colSpacing();
+      const padding = this.itemPadding();
       width += colSpacing / 2;
       this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
       this.resetTextColor();
@@ -2056,37 +2094,47 @@ Imported.NUUN_SaveScreen = true;
         this.drawText(name , x, y, width, data.Align);
       } else {
         let nameX = x;
+        const width2 = (data.ItemWidth || 48) + colSpacing / 2;
         for (const name of info.actorNickName) {
-          this.drawText(name , nameX, y, width, data.Align);
-          nameX += width;
+          this.drawText(name , nameX, y, width2 - padding, data.Align);
+          nameX += width2;
         }
       }
     }
   };
 
     Window_SavefileList.prototype.drawActorLeval = function(info, x, y, width, data, index) {
-        if (info.levelActor) {
-            this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
-            const textWidth = this.textWidth(TextManager.levelA);
-            const padding = this.itemPadding();
-            const colSpacing = this.colSpacing();
-            if (!!data.ShowEval || (!data.ShowEval && !LevelSpecifyActorOnry)) {
-                const levelActor = !!data.ShowEval ? (info["levelActor_"+ String(index)] || []) : info.levelActor;
-                let levelActorX = x;
-                for (const name of levelActor) {
-                    this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
-                    this.drawText(TextManager.levelA, levelActorX + padding / 4, y, textWidth);
-                    this.resetTextColor();
-                    this.resetTextColor();
-                    this.drawText(name, levelActorX + textWidth + padding / 2, y, width - (textWidth + padding), data.Align);
-                    levelActorX += width;
-                }
-            } else if (LevelSpecifyActorOnry) {
+        this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+        const textWidth = this.textWidth(TextManager.levelA);
+        const padding = this.itemPadding();
+        const colSpacing = this.colSpacing();
+        let levelActorX = x;
+        if (!!data.ShowEval) {
+            const levelActor = (info["levelActor_"+ String(index)] || []);
+            const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+            for (const level of levelActor) {
+                this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+                this.drawText(TextManager.levelA, levelActorX + padding / 4, y, textWidth);
+                this.resetTextColor();
+                this.drawText(level, levelActorX + textWidth + padding / 2, y, width2 - (textWidth + padding), data.Align);
+                levelActorX += width2;
+            }
+        } else if (info.levelActor) {
+            if (LevelSpecifyActorOnry) {
+                const level = info.levelActor[0];
                 this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
                 this.drawText(TextManager.levelA, x, y, textWidth);
                 this.resetTextColor();
-                this.resetTextColor();
-                this.drawText(data, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+                this.drawText(level, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+            } else {
+                const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+                for (const level of info.levelActor) {
+                    this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+                    this.drawText(TextManager.levelA, levelActorX + padding / 4, y, textWidth);
+                    this.resetTextColor();
+                    this.drawText(level, levelActorX + textWidth + padding / 2, y, width2 - (textWidth + padding), data.Align);
+                    levelActorX += width2;
+                }
             }
         }
     };
@@ -2240,10 +2288,23 @@ Imported.NUUN_SaveScreen = true;
         ]);
     };
 
-    Game_Party.prototype.actorLevelFilterForSavefile = function() {
+    Game_Party.prototype.actorFacesFilterForSavefile = function(data) {
         return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => [
-            actor._level
+            actor.faceName(),
+            actor.faceIndex()
         ]);
+    };
+    
+    Game_Party.prototype.svActorFilterForSavefile = function(data) {
+        return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => [actor.battlerName()]);
+    };
+
+    Game_Party.prototype.actorLevelFilterForSavefile = function(data) {
+        return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => [actor._level]);
+    };
+    
+    Game_Party.prototype.actorNameFilterForSavefile = function(data) {
+        return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => [actor.name()]);
     };
 
 })();

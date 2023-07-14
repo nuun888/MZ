@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.9
+ * @version 1.1.10
  * 
  * @help
  * You can now display multiple message windows.
@@ -35,6 +35,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/14/2023 Ver.1.1.10
+ * Fixed the problem that there is a timing that can be moved when displaying the message window.
+ * Added a function that can specify a common event to be executed when all multiple message windows are cleared.
  * 7/7/2023 Ver.1.1.9
  * Fixed the problem that the window is not displayed when displaying the input system window.
  * 6/27/2023 Ver.1.1.8
@@ -132,6 +135,13 @@
  * @text Message window initial state
  * 
  * 
+ * @param AllMultiMessageCloseCommonEvent
+ * @desc Specifies a common event that executes when all windows are closed.
+ * @text Common event when clearing all windows
+ * @default 0
+ * @type common_event
+ * 
+ * 
  */
 /*:ja
  * @target MZ
@@ -139,7 +149,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.9
+ * @version 1.1.10
  * 
  * @help
  * メッセージウィンドウを複数表示させることが出来るようになります。
@@ -162,6 +172,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/14 Ver.1.1.10
+ * メッセージウィンドウを表示したときに移動出来てしまうタイミングがある問題を修正。
+ * 複数メッセージウィンドウが全て消去したときに実行するコモンイベントを指定できる機能を追加。
  * 2023/7/7 Ver.1.1.9
  * 入力系ウィンドウを表示したときにウィンドウが表示されない問題を修正。
  * 2023/6/27 Ver.1.1.8
@@ -258,12 +271,20 @@
  * @text メッセージウィンドウ初期状態
  * 
  * 
+ * @param AllMultiMessageCloseCommonEvent
+ * @desc 全てのウィンドウが閉じた時に実行するコモンイベントを指定します。
+ * @text 全ウィンドウ消去時コモンイベント
+ * @default 0
+ * @type common_event
+ * 
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_MultiMessageWindows = true;
 
 (() => {
     const parameters = PluginManager.parameters('NUUN_MultiMessageWindows');
+    const AllMultiMessageCloseCommonEvent = Number(parameters['AllMultiMessageCloseCommonEvent'] || 0);
     const pluginName = "NUUN_MultiMessageWindows";
     
 
@@ -327,7 +348,8 @@ Imported.NUUN_MultiMessageWindows = true;
 
     Scene_Message.prototype.resetMultiMessageWindow = function() {
         this._multiMessageWindowsList[0] = 
-        {id: 0, 
+        {
+            id: 0, 
             mode: false, 
             noBusy: false, 
             simultaneous: false, 
@@ -448,8 +470,12 @@ Imported.NUUN_MultiMessageWindows = true;
 
     Scene_Message.prototype.noBusyMultiMessageWindow = function() {
         return this._messageWindows.some(window => {
-            return window.visible && (window.isOpen() || window.isOpening()) && !window.noBusy;
+            return window.visible && (window.isOpen() || window.isOpening() || $gameMessage.hasText()) && !window.noBusy;
         });
+    };
+
+    Scene_Message.prototype.isCloseMultiMessageWindow = function() {
+        return this._messageWindows.some(window => window.isClosing() || window.isClosed());
     };
 
     function Window_MultiMessage() {
@@ -499,6 +525,14 @@ Imported.NUUN_MultiMessageWindows = true;
             this.simultaneousMode = false;
         }
     };
+
+    Window_MultiMessage.prototype.terminateMessage = function() {
+        if (AllMultiMessageCloseCommonEvent > 0 && SceneManager._scene.isCloseMultiMessageWindow()) {
+            $gameTemp.reserveCommonEvent(AllMultiMessageCloseCommonEvent);
+        }
+        Window_Message.prototype.terminateMessage.call(this);
+    };
+    
 
     const _Window_Message_update = Window_Message.prototype.update;
     Window_MultiMessage.prototype.update = function() {

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.4
+ * @version 1.4.5
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/15/2023 Ver.1.4.5
+ * Fixed the problem that an error appears when displaying the original parameter.
  * 6/17/2023 Ver.1.4.4
  * Fixed an issue where attribute names and state names were not displayed correctly.
  * 6/2/2023 Ver.1.4.3
@@ -830,7 +832,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.4
+ * @version 1.4.5
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -859,6 +861,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/15 Ver.1.4.5
+ * 独自パラメータを表示させるとエラーが出る問題を修正。
  * 2023/6/17 Ver.1.4.4
  * 属性名、ステート名が正常に表示されていなかった問題を修正。
  * 2023/6/2 Ver.1.4.3
@@ -1999,7 +2003,7 @@ Imported.NUUN_EquipStatusEX = true;
             this.drawActorIcons(data, actor, x, y, width);
             break;
         case 6:
-            this.drawOrgParam(data, actor, x, y, width);
+            this.drawOriginalStatusParam(data, actor, x, y, width);
             break;
         case 9:
             this.drawContentsName(data, actor, x, y, width);
@@ -2282,7 +2286,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatusEX.prototype.drawOriginalStatusParam = function(data, index, actor, x, y, width) {
+    Window_EquipStatusEX.prototype.drawOriginalStatusParam = function(data, actor, x, y, width) {
         let a = actor;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));

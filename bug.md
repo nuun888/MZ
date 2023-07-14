@@ -1,7 +1,6 @@
 ### 現在のバグ報告
 
 ### 現在の競合報告
-LL_GalgeChoiceWindowとNUUN_MultiMessageWindowsとの競合確認  
 ステートアイコン複数表示とNRP_ShadowAndLevitate.jsと併用すると謎の線が出る  
 
 ### 現在の要望

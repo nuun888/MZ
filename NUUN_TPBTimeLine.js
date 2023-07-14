@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.1.6
+ * @version 1.1.7
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/15 Ver.1.1.7
+ * 競合対策表示モードを追加。
  * 2023/2/25 Ver.1.1.6
  * バトラーが増えた時の処理を修正。
  * 2023/1/29 Ver.1.1.5
@@ -400,6 +402,21 @@
  * @min -9999
  * @parent EnemyActionSetting
  * 
+ * @param Anti-conflict settings
+ * @text 競合対策設定
+ * @default ////////////////////////////////
+ * 
+ * @param TimeLineDisplayMode
+ * @text タイムライン表示モード
+ * @desc タイムラインの表示モードを指定します。
+ * @type select
+ * @option Sprite
+ * @value 'Sprite'
+ * @option Scene_Battle
+ * @value 'Scene_Battle'
+ * @default 'Sprite'
+ * @parent SpecialSetting
+ * 
  * 
  */
 var Imported = Imported || {};
@@ -439,6 +456,7 @@ const BattlerStatusShow = eval(parameters['BattlerStatusShow'] || "true");
 const EnemyLetterShow = eval(parameters['EnemyLetterShow'] || "true");
 const ActorCharged = Number(parameters['ActorCharged'] || 0);
 const EnemyCharged = Number(parameters['EnemyCharged'] || 0);
+const TimeLineDisplayMode = eval(parameters['TimeLineDisplayMode']) || 'Sprite';
 
 function isDirectionUpDown() {
     return TimeLineDirection === 'up' || TimeLineDirection === 'down';
@@ -484,6 +502,14 @@ Game_Battler.prototype.getTimeLineTpbState = function() {
     }
 };
 
+const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
+Scene_Battle.prototype.createSpriteset = function() {
+    _Scene_Battle_createSpriteset.call(this);
+    if (TimeLineDisplayMode === 'Scene_Battle') {
+        this.addChild(this._spriteset.timeLineSprite);
+    }
+};
+
 const _Spriteset_Battle_initialize = Spriteset_Battle.prototype.initialize;
 Spriteset_Battle.prototype.initialize = function() {
     _Spriteset_Battle_initialize.call(this);
@@ -494,11 +520,24 @@ Spriteset_Battle.prototype.initialize = function() {
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
     _Spriteset_Battle_createLowerLayer.call(this);
+    this.createTimeLine();
+};
+
+Spriteset_Battle.prototype.createTimeLine = function() {
+    this.createTimeLineBase();
     this.createTimeLineGauge();
     this.createTimeLineImg();
     this.createTimeLineActor();
     this.createTimeLineEnemy();
     this.createTimeLineActionImg();
+};
+
+Spriteset_Battle.prototype.createTimeLineBase = function() {
+    const sprite = new Sprite();
+    this.addChild(sprite);
+    sprite.x = TPBTimeLine_X + this.getTimeLinePosition();
+    sprite.y = TPBTimeLine_Y;
+    this.timeLineSprite = sprite;
 };
 
 Spriteset_Battle.prototype.createTimeLineGauge = function() {
@@ -512,19 +551,16 @@ Spriteset_Battle.prototype.createTimeLineGauge = function() {
 Spriteset_Battle.prototype.createTimeLineImg = function() {
     const bitmap = ImageManager.nuun_LoadPictures(TPBTimeLineImg);
     const sprite = new Sprite(bitmap);
-    sprite.x = TPBTimeLine_X + this.getTimeLinePosition();
-    sprite.y = TPBTimeLine_Y;
     sprite.anchor.x = getTimeLineAnchor();
     sprite.anchor.y = 0;
-    this.addChild(sprite);
-    this.timeLineSprite = sprite;
+    this.timeLineSprite.addChild(sprite);
 };
 
 Spriteset_Battle.prototype.createTimeLineActionImg = function() {
     const bitmap = ImageManager.nuun_LoadPictures(TPBTimeLineActionImg);
     const sprite = new Sprite(bitmap);
-    this.addChild(sprite);
-    this.timeLineSprite = sprite;
+    this.timeLineSprite.addChild(sprite);
+    this.timeLineActionSprite = sprite;
     sprite.x = TPBTimeLineActionImg_X;
     sprite.y = TPBTimeLineActionImg_Y;
 };

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトラーオーバーレイベース
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/15 Ver.1.0.4
+ * バトラー画像と同期させるときの座標のモードを指定できる機能を追加。
  * 2023/6/2 Ver.1.0.3
  * 処理の修正。
  * 2023/5/28 Ver.1.0.2
@@ -46,6 +48,16 @@
  * @value 'Img'
  * @default 'Img'
  * 
+ * @param CoordinateMode
+ * @desc 座標の計算モード。
+ * @text 座標計算モード
+ * @type select
+ * @option 元の座標値
+ * @value 'Default'
+ * @option 小数切り捨て
+ * @value 'Floor'
+ * @default 'Default'
+ * 
  * 
  */
 var Imported = Imported || {};
@@ -54,6 +66,7 @@ Imported.NUUN_BattlerOverlayBase = true;
 (() => {
 const parameters = PluginManager.parameters('NUUN_BattlerOverlayBase');
 const ConflictScale = eval(parameters['ConflictScale']) || 'Img';
+const CoordinateMode = eval(parameters['CoordinateMode']) || 'Img';
 
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
@@ -147,8 +160,8 @@ Sprite_BattlerOverlay.prototype.update = function() {
 };
 
 Sprite_BattlerOverlay.prototype.updatePosition = function() {
-    this.x = this._battlerSprite.x;
-    this.y = this._battlerSprite.y;
+    this.x = CoordinateMode === 'Floor' ? Math.floor(this._battlerSprite.x) : this._battlerSprite.x;
+    this.y = CoordinateMode === 'Floor' ? Math.floor(this._battlerSprite.y) : this._battlerSprite.y;
     this.battlerSpriteScale_x = this._battlerSprite.scale.x;
     this.battlerSpriteScale_y = this._battlerSprite.scale.y;
 };

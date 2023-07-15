@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  State side-by-side display
  * @author NUUN
- * @version 1.5.3
+ * @version 1.5.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,7 +37,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 3/30/2022 Ver.1.5.3
+ * 7/15/2023 Ver.1.5.4
+ * Added a function to turn on/off the smooth scale of the icon image.
+ * 3/30/2023 Ver.1.5.3
  * Fixed an issue where the number of turns was not displayed correctly when the auto release timing was at the end of the turn.
  * 12/6/2022 Ver.1.5.2
  * Changed the Type of color specification plug-in parameter to color. (Ver.1.6.0 or later)
@@ -258,13 +260,24 @@
  * @default 0
  * @parent StateTurn
  * 
+ * @param OtherSetting
+ * @text Other setting
+ * @default ------------------------------
+ * 
+ * @param SmoothMode
+ * @desc Set smooth mode.
+ * @text Smooth mode enabled
+ * @type boolean
+ * @default true
+ * @parent OtherSetting
+ * 
  * 
  */
 /*:ja
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.5.3
+ * @version 1.5.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -293,7 +306,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2022/3/30 Ver.1.5.3
+ * 2023/3/30 Ver.1.5.4
+ * アイコン画像のスムーススケールをON、OFFに出来る機能を追加。
+ * 2023/3/30 Ver.1.5.3
  * 自動解除のタイミングがターン終了時の時にターン数が正常に表示されていなかった問題を修正。
  * 2022/12/6 Ver.1.5.2
  * カラー指定のプラグインパラメータのTypeをcolorに変更。(Ver.1.6.0以降)
@@ -514,6 +529,16 @@
  * @default 0
  * @parent StateTurn
  * 
+ * @param OtherSetting
+ * @text その他設定
+ * @default ------------------------------
+ * 
+ * @param SmoothMode
+ * @desc スムースモードの設定。
+ * @text スムースモード有効
+ * @type boolean
+ * @default true
+ * @parent OtherSetting
  * 
  */
 
@@ -540,6 +565,7 @@ const TurnCorrection = Number(parameters['TurnCorrection'] || 1);
 const NoStateIcon = Number(parameters['NoStateIcon'] || 0);
 const TurnColor = (DataManager.nuun_structureData(parameters['TurnColor'])) || 0;
 const BadTurnColor = (DataManager.nuun_structureData(parameters['BadTurnColor'])) || 0;
+const SmoothMode = eval(parameters['SmoothMode'] || 'true');
 
 let isEnemyMode = false;
 
@@ -599,6 +625,9 @@ Sprite_StateIcon.prototype.setInitIcon = function(sprite, i) {
   this._animationCount = 0;
   this._animationIndex = 0;
   sprite.bitmap = ImageManager.loadSystem("IconSet");
+  if (!SmoothMode) {
+    sprite.bitmap.smooth = false;
+  }
   sprite.setFrame(0, 0, 0, 0);
 };
 

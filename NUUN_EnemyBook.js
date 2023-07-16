@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.1
+ * @version 2.20.2
  * 
  * @help
  * Implement an enemy book.
@@ -84,6 +84,8 @@
  * <AnalyzeSkill:1> This skill and item are Analyze Skills, and will be activated with the 1st setting in the "Analyze skill setting" list.
  * 
  * <CertainAnalyze> Ignore analysis resistance.
+ * 
+ * <SeeThrough> Register the picture book without opening the analyze screen. Skill attacks, encyclopedia registration, and information registration are treated as analysis.
  * 
  * <EnemyInfo> Displays enemy information.
  * 
@@ -227,10 +229,12 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/16/2023 Ver.2.20.2
+ * Added a function to execute only the analysis registration process without opening the analyze screen.
  * 7/8/2023 Ver.2.20.1
  * Fixed an issue that caused an error when opening the Monster Book with category visibility set to true.
  * Fixed an issue where resistance, debuff, disable, and absorption display of attribute icon was not displayed properly.
- * 6/30/2023 Ver.2.20.0
+ * 7/1/2023 Ver.2.20.0
  * Added the item of absorption element (icon display).
  * Added a function not to display absorption attributes from invalid attributes.
  * Fixed an issue where Hide Unverified Attributes (requires NUUN_EnemyBookEX_1) was not applied.
@@ -3026,6 +3030,8 @@
  * 
  * <CertainAnalyze> アナライズ耐性を無視します。
  * 
+ * <SeeThrough> アナライズ画面を開かずに図鑑登録します。スキルの攻撃、図鑑登録、情報登録はアナライズ扱いとなります。
+ * 
  * <EnemyInfo> 敵の情報を表示します。
  * 
  * アイテムのメモ欄
@@ -3171,6 +3177,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/16 Ver.2.20.2
+ * アナライズ画面を開かずにアナライズの登録処理のみを実行する機能を追加。
  * 2023/7/8 Ver.2.20.1
  * カテゴリー表示をtrueに設定してモンスター図鑑を開くとエラーが出る問題を修正。
  * 属性アイコンの耐性、弱体、無効、吸収表示が正常に表示されない問題を修正。
@@ -7158,6 +7166,7 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
   _Game_Action_applyItemUserEffect.call(this, target);
   this.bookSkill(target)
   this.analyzeSkill(target);
+  this.seeThrougSkill(target);
 };
 
 Game_Action.prototype.bookSkill = function(target) {
@@ -7193,6 +7202,21 @@ Game_Action.prototype.analyzeSkill = function(target) {
                     SceneManager._scene.setEnemyBookEnemyAnalyze(target, analyzeSkill);
                 }
             }
+        }
+    }
+};
+
+Game_Action.prototype.seeThrougSkill = function(target) {
+    if (target.isEnemy() && $gameSystem.isEnemyBookData(target.enemy())) {
+        if (this.item().meta.SeeThrough) {
+            target.result().analyzeSkill = true;
+            const rate = this.item().meta.CertainAnalyze || !target.enemy().meta.AnalyzeResist ? 100 : Number(target.enemy().meta.AnalyzeResist);
+            if (Math.floor(Math.random() * 100 >= rate)) {
+                target.result().missed = true;
+                return;
+            }
+            this.makeSuccess(target);
+            SceneManager._scene.addEnemyDataEnemyBook(target);
         }
     }
 };

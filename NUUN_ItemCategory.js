@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Item category customization
  * @author NUUN
- * @version 1.3.2
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -35,6 +35,9 @@
  * Example
  * <CategoryType:sozai> Items with this tag will appear in the "sozai" category.
  * 
+ * Items, Weapons, and Armor Notes
+ * <NoItemNum> Do not display the number of items.
+ * 
  * If you uncheck the database item category, even if you set it with this plugin, the unchecked category will not be displayed.
  * 
  * 
@@ -42,6 +45,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/16/2022 Ver.1.4.0
+ * Added ability to hide the number of specific items, weapons, and armor.
  * 11/12/2022 Ver.1.3.2
  * Changed the display in languages other than Japanese to English.
  * 6/12/2021 Ver.1.3.1
@@ -134,7 +139,7 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.3.2
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -160,12 +165,17 @@
  * 
  * データベースのアイテムカテゴリーのチェックを外した場合、このプラグインで設定してもチェックを外したカテゴリーは表示はされません。
  * 
+ * アイテム、武器、防具のメモ欄
+ * <NoItemNum> アイテムの個数を表示しません。
+ * 
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/16 Ver.1.4.0
+ * 特定のアイテム、武器、防具の個数を非表示にする機能を追加。
  * 2022/11/12 Ver.1.3.2
  * 日本語以外での表示を英語表示に変更。
  * 2022/6/12 Ver.1.3.1
@@ -365,6 +375,9 @@ Window_ItemList.prototype.needsNumber = function() {
   }
   if (this._category === "keyItem") {  
     return $dataSystem.optKeyItemsNumber;
+  }
+  if (itemData.meta.NoItemNum) {
+    return false;
   }
   return this._needsCategory === undefined || this._needsCategory === null ? true : this._needsCategory;
 };

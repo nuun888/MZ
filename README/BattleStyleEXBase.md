@@ -30,6 +30,8 @@
 [戦闘中のアクターへのアニメーション実行](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleAnimationEX.js)Ver.1.0.0  
 反撃拡張プラグイン(トリアコンタン氏)での立ち絵切り替えを適用。  
 [条件バトラー反撃拡張プラグイン適用](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX_CounterExtend.md)  
+敵の条件画像変更    
+[敵の条件画像変更](https://github.com/nuun888/MZ/blob/master/README/EnemyCondPicture.md)  
 
 ## オプション
 味方の被ダメージ時にゲームパッドを振動。  

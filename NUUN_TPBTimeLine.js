@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.1.7
+ * @version 1.1.8
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/17 Ver.1.1.8
+ * キャストアイコンが表示されない問題を修正。
  * 2023/7/15 Ver.1.1.7
  * 競合対策表示モードを追加。
  * 2023/2/25 Ver.1.1.6
@@ -742,6 +744,7 @@ Sprite_TimeLine.prototype.initMembers = function() {
     this._targetY = 0;
     this._selectionEffectCount = 0;
     this._action = null;
+    this._castIcon = 0;
 };
 
 Sprite_TimeLine.prototype.isVertical = function() {
@@ -844,22 +847,18 @@ Sprite_TimeLine.prototype.update = function() {
 
 Sprite_TimeLine.prototype.updateCastIcon = function() {
     const action = this._battler.currentAction();
-    //if (this.getTpbState() === 'charged' || this.getTpbState() === 'casting' && this._action !== action) {
-    //    this._action = action;
-    //} else if (this.getTpbState() === 'return' && this._action !== action) {
-    //    this._action = action;
-    //}
-    if (this._action && ((this._battler.tpbRequiredCastTime() > 0 && this.isCasting()) || this._tpbState === 'acting')) {
+    if (action) {
+        const item = action.item();
+        this._castIcon = item ? item.iconIndex : 0;
+    }
+    if (this._battler.tpbRequiredCastTime() > 0 && this.isCasting()) {
         if (CastIconId > 0) {
             this._castIconSprite.setIcon(CastIconId);
         } else {
-            const item = this._action.item();
-            if (item) {
-                this._castIconSprite.setIcon(item.iconIndex);
-            } else {
-                this._castIconSprite.setIcon(0);
-            }
+            this._castIconSprite.setIcon(this._castIcon);
         }
+    } else if (this._tpbState === 'acting') {
+        this._castIconSprite.setIcon(this._castIcon);
     } else {
         this._castIconSprite.setIcon(0);
     }

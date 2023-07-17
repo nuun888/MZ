@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * Extend the counter.
@@ -62,8 +62,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/17/2023 Ver.1.1.4
+ * Fixed not doing corpse shooting.
  * 7/9/2023 Ver.1.1.3
- * Fixed an issue where the counter target Battler would attack even if it was incapacitated.
+ * Fixed an issue where a counter target Battler would still be attacked even if he was incapacitated.
  * 7/3/2023 Ver.1.1.2
  * Fixed the problem that the counter attack (reflection) does not return to the original with the counter image switching function in "NUUN_BattleStyleEX".
  * 7/1/2023 Ver.1.1.1
@@ -309,7 +311,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * カウンターを拡張します。
@@ -360,8 +362,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/17 Ver.1.1.4
+ * 死体打ちを行わないように修正。
  * 2023/7/9 Ver.1.1.3
- * カウンター対象のバトラーが戦闘不能になっても攻撃してしまう問題を修正。
+ * カウンター対象のバトラーが戦闘不能になっても攻撃されてしまう問題を修正。
  * 2023/7/3 Ver.1.1.2
  * バトルスタイル拡張プラグインでのカウンターの画像切り替え機能で反撃(反射)から元に戻らない問題を修正。
  * 2023/7/1 Ver.1.1.1
@@ -863,27 +867,29 @@ Imported.NUUN_CounterEX = true;
                     targets = action.makeTargets();
                 }
             }
-            this._action = action;
-            this._targets = targets;
-            this._phase = "action";
-            subject.cancelMotionRefresh();
-            if (counter.isCounterSkillCost()) {
-                subject.useItem(action.item());
+            if (targets.length > 0) {
+                this._action = action;
+                this._targets = targets;
+                this._phase = "action";
+                subject.cancelMotionRefresh();
+                if (counter.isCounterSkillCost()) {
+                    subject.useItem(action.item());
+                }
+                if (!!action.getReflectionSubject()) {
+                    action.setSubject(action.getReflectionSubject());
+                }
+                action.applyGlobal();
+                if (counter.isCounterReflection()) {
+                    subject.result().reflectionEx = true;
+                    this._logWindow.displayReflectionEx(subject, counter);
+                } else {
+                    subject.result().counterEx = true;
+                    this._logWindow.displayCounterEx(subject, counter);
+                }
+                subject._counterAction = true;
+                this._logWindow.counter = counter;
+                this._logWindow.startAction(subject, action, targets);
             }
-            if (!!action.getReflectionSubject()) {
-                action.setSubject(action.getReflectionSubject());
-            }
-            action.applyGlobal();
-            if (counter.isCounterReflection()) {
-                subject.result().reflectionEx = true;
-                this._logWindow.displayReflectionEx(subject, counter);
-            } else {
-                subject.result().counterEx = true;
-                this._logWindow.displayCounterEx(subject, counter);
-            }
-            subject._counterAction = true;
-            this._logWindow.counter = counter;
-            this._logWindow.startAction(subject, action, targets);
             subject.onStartCounter = false;
         } else {
             _BattleManager_startAction.call(this);

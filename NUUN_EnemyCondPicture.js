@@ -14,7 +14,7 @@
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 敵の画像を条件により切り替えます。
@@ -25,7 +25,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2023/10/20 Ver 1.0.0
+ * 2023/7/18 Ver 1.0.1
+ * 一部の処理を修正。
+ * 2023/7/17 Ver 1.0.0
  * 初版
  * 
  * @param EnemyCondPictureData
@@ -436,7 +438,6 @@ Imported.NUUN_EnemyCondPicture = true;
 
     Sprite_Enemy.prototype.setUpdateCount = function(count) {
         this._updateCount = count;
-        this._changeBitmap = true;
     };
 
     Sprite_Enemy.prototype.refreshEnemyGraphic = function(enemy) {
@@ -489,7 +490,7 @@ Imported.NUUN_EnemyCondPicture = true;
             this._apngMode = true;
         } else {
             this.resetApngEnemyImg();
-            this.updateBitmap();
+            this.updateEnmeyExBitmap();
             if (!this.isDead() && this._updateCount === 0) {
                 this.opacity = enemy.getBattleStyleOpacity() || 255;
                 this._enemyImgesOpacity = this.opacity;
@@ -497,6 +498,18 @@ Imported.NUUN_EnemyCondPicture = true;
         }
         if (this.isDead()) {
             this.revertToNormal();
+        }
+    };
+
+    Sprite_Enemy.prototype.updateEnmeyExBitmap = function() {
+        Sprite_Battler.prototype.updateBitmap.call(this);
+        const name = this._enemy.battlerName();
+        const hue = this._enemy.battlerHue();
+        if (this._battlerName !== name || this._battlerHue !== hue) {
+            this._battlerName = name;
+            this._battlerHue = hue;
+            this.loadBitmap(name);
+            this.setHue(hue);
         }
     };
     
@@ -513,14 +526,6 @@ Imported.NUUN_EnemyCondPicture = true;
                 this._durationOpacity = this.opacity - this.getFadeoutOpacity();
             }
         }
-    };
-
-    const _Sprite_Enemy_initVisibility = Sprite_Enemy.prototype.initVisibility;
-    Sprite_Enemy.prototype.initVisibility = function() {
-        if (!this._changeBitmap) {
-           _Sprite_Enemy_initVisibility.call(this);
-        }
-        this._changeBitmap = false;
     };
     
     Sprite_Enemy.prototype.getFadeoutOpacity = function() {

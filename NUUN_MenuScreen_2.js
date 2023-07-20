@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @version 2.0.6
+ * @version 2.1.0
  * 
  * @help
  * Change and extend the menu screen display.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/20/2023 Ver.2.1.0
+ * Added a function that can be specified by occupation ID instead of actor ID in actor image setting.
  * 5/14/2023 Ver.2.0.6
  * Corrected the description about applying the gauge label to the item name.
  * 5/8/2023 Ver.2.0.5
@@ -1169,6 +1171,13 @@
  * @text Actor
  * @desc Specifies an actor.
  * @type actor
+ * @default 0
+ * 
+ * @param ClassId
+ * @text Class ID
+ * @desc Specify your occupation. If the occupation ID is specified, this will take precedence.
+ * @type class
+ * @default 0
  * 
  * @param GraphicMode
  * @desc Specifies the actor image to display.
@@ -1346,7 +1355,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.5
+ * @version 2.1.0
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1417,6 +1426,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/20 Ver.2.1.0
+ * アクター画像設定にアクターIDではなく職業IDで指定できる機能を追加。
  * 2023/5/14 Ver.2.0.6
  * 項目名称をゲージのラベル適用に関する修正。
  * 2023/5/8 Ver.2.0.5
@@ -2502,6 +2513,13 @@
  * @text アクター
  * @desc アクターを指定します。
  * @type actor
+ * @default 0
+ * 
+ * @param ClassId
+ * @text 職業ID
+ * @desc 職業を指定します。職業のIDが指定されている場合はこちらが優先されます。
+ * @type class
+ * @default 0
  * 
  * @param GraphicMode
  * @desc 表示するアクター画像を指定します。

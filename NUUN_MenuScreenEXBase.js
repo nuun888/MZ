@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.0.20
+ * @version 2.1.0
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/20/2023 Ver.2.1.0
+ * Added a function that can be specified by occupation ID instead of actor ID in actor image setting.
+ * Fixed an issue where the actor status line was not working.
  * 6/14/2023 Ver.2.0.20
  * Fixed face graphics processing.
  * 6/2/2023 Ver.2.0.19
@@ -79,7 +82,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.0.20
+ * @version 2.1.0
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -89,6 +92,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/20 Ver.2.1.0
+ * アクター画像設定にアクターIDではなく職業IDで指定できる機能を追加。
+ * アクターステータスのラインが機能していなかった問題を修正。
  * 2023/6/14 Ver.2.0.20
  * 顔グラの処理を修正。
  * 2023/6/2 Ver.2.0.19
@@ -573,9 +579,18 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.contents.blt(bitmap, 0, 0, width, height, x, y);
     };
 
+    Window_MenuStatus.prototype.condActorImg = function(data, actor) {
+        if (data.ClassId && data.ClassId > 0 && actor._classId === data.ClassId) {
+            return true;
+        } else if (data.actorId === actor.actorId()) {
+            return true;
+        }
+        return false;
+    };
+
     Window_MenuStatus.prototype.getActorImgData = function(actor) {
-        const actors = params.ActorsImgList;
-        const find = actors.find(a => a.actorId === actor.actorId());
+        const list = params.ActorsImgList;
+        const find = list.find(data => this.condActorImg(data, actor));
         if (!find) {
         return {
             Actor_X: 0, 
@@ -778,7 +793,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             this.drawSvActorImg(data, x, y, width, actor);
             break;
         case 1000:
-            this.nuunMenu_horzLine(x, y, width, actor);
+            this.nuunMenu_horzLine(x, y, width, data);
             break;
         }
     };
@@ -880,6 +895,13 @@ Imported.NUUN_MenuScreenEXBase = true;
         default:
             return null;
         }
+    };
+
+    Window_MenuStatus.prototype.nuunMenu_horzLine = function(x, y, width, data) {
+        const lineY = y + this.lineHeight() / 2 - 1;
+        this.contents.paintOpacity = 48;
+        this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(data.NameColor));
+        this.contents.paintOpacity = 255;
     };
 
     Window_MenuStatus.prototype.nuunMenu_contentsDrawActorChip = function(data, x, y, width, actor) {
@@ -1235,9 +1257,18 @@ Imported.NUUN_MenuScreenEXBase = true;
         case 20:
             this.drawLimitGauge(data, x, y, width);
             break;
+        case 100:
+        this.nuunMenu_horzLine(x, y, width, data);
         default:
             break;
         }
+    };
+
+    Window_InfoMenu.prototype.nuunMenu_horzLine = function(x, y, width, data) {
+        const lineY = y + this.lineHeight() / 2 - 1;
+        this.contents.paintOpacity = 48;
+        this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(data.NameColor));
+        this.contents.paintOpacity = 255;
     };
 
     Window_InfoMenu.prototype.drawLimitGauge = function(data, x, y, width) {

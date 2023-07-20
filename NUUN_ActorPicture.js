@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.5
+ * @version 1.6.0
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/20 Ver.1.6.0
+ * アクターIDではなく職業IDで指定できる機能を追加。
  * 2023/6/26 Ver.1.5.5
  * カウンターの画像切り替え処理を修正。
  * 2023/5/22 Ver.1.5.4
@@ -102,6 +104,13 @@
  * @text アクターID
  * @desc アクターIDを設定します。
  * @type actor
+ * @default 0
+ * 
+ * @param ClassId
+ * @text 職業ID
+ * @desc 職業を指定します。職業のIDが指定されている場合はこちらが優先されます。
+ * @type class
+ * @default 0
  * 
  * @param ImgName
  * @text アクター画像名称
@@ -294,6 +303,15 @@ Imported.NUUN_ActorPicture = true;
 const parameters = PluginManager.parameters('NUUN_ActorPicture');
 const ButlerActors = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ButlerActors'])) : null) || [];
 
+function condActorImg(data, actor) {
+    if (data.ClassId && data.ClassId > 0 && actor._classId === data.ClassId) {
+        return true;
+    } else if (data.actorId === actor.actorId()) {
+        return true;
+    }
+    return false;
+};
+
 NuunManager.setupClassName = function(className) {
   this._className = className;
 };
@@ -348,11 +366,11 @@ Game_Actor.prototype.setup = function(actorId) {
 };
 
 Game_Actor.prototype.getActorGraphicList = function() {
-  return ButlerActors.find(actorImg => actorImg.actorId === this.actorId());
+    return ButlerActors.find(data => condActorImg(data, this));
 };
 
 Game_Actor.prototype.getActorGraphicIndex = function() {
-  return ButlerActors.findIndex(actorImg => actorImg.actorId === this.actorId());
+  return ButlerActors.findIndex(data => condActorImg(data, this));
 };
 
 Game_Actor.prototype.getActorGraphic = function() {

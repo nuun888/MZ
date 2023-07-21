@@ -14,7 +14,7 @@
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * 敵の画像を条件により切り替えます。
@@ -25,6 +25,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/21 Ver 1.1.0
+ * 共通の画像を指定できる機能を追加。
  * 2023/7/18 Ver 1.0.1
  * 一部の処理を修正。
  * 2023/7/17 Ver 1.0.0
@@ -35,6 +37,12 @@
  * @text 敵画像設定
  * @type struct<EnemyCondPictureList>[]
  * @default 
+ * 
+ * @param CommonEnemyImg
+ * @text 共通モンスター画像設定
+ * @desc 共通のモンスター画像の設定を行います。
+ * @default []
+ * @type struct<EnemyImgList>[]
  * 
  * @param DamageImgFrame
  * @desc 敵キャラのダメージ、回復時、防御の画像変化フレーム。
@@ -92,7 +100,6 @@
  * @desc モンスター画像の設定を行います。
  * @default []
  * @type struct<EnemyImgList>[]
- * @parent EnemyImges
  * 
  */
 /*~struct~EnemyImgList:
@@ -248,6 +255,7 @@ Imported.NUUN_EnemyCondPicture = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_EnemyCondPicture');
     const EnemyCondPictureData = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EnemyCondPictureData'])) : [];
+    const CommonEnemyImg = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CommonEnemyImg'])) : [];
     const OnEnemyShake = eval(parameters['OnEnemyShake'] || 'false');
     const ShakeFlame = Number(parameters['ShakeFlame'] || 36);
     const ShakePower = Number(parameters['ShakePower'] || 2);
@@ -279,6 +287,12 @@ Imported.NUUN_EnemyCondPicture = true;
         return this.isDead() && (this.endCollapse || this.collapseType() === 3);
     };
 
+    Game_Enemy.prototype.getBattleStyleMatchConditions = function(list) {
+        return list.findIndex(data => {
+            return this.battleStyleMatchConditions(data);
+        });
+    };
+
     Game_Enemy.prototype.battleStyleImgRefresh = function() {
         let imgIndex = -1;
         let index = -1;
@@ -287,13 +301,12 @@ Imported.NUUN_EnemyCondPicture = true;
         const enemyId = this.enemyId();
         const enemyData = getEnemyData(enemyId);
         this._battleStyleGraphicHue = null;
-        if (enemyData && enemyData.EnemyImg) {
-            index = enemyData.EnemyImg.findIndex(data => {
-                return this.battleStyleMatchConditions(data);
-            });
+        const list = enemyData && enemyData.EnemyImg ? enemyData.EnemyImg : CommonEnemyImg;
+        if (list) {
+            index = this.getBattleStyleMatchConditions(list);
             if (index >= 0) {
                 this.setbattleStyleGraphicId();
-                const data = enemyData.EnemyImg[index];
+                const data = list[index];
                 this._isDeadImg = this.isBSEnemyGraphicDead(data);
                 this._battleStyleGraphicName = this.getBattleStyleImg(data);
                 this._battleStyleGraphicHue = this.getBattleStyleImgHue(data);

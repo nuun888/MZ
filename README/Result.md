@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.3.8
+# Ver.2.3.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -31,6 +31,9 @@ a:アクターのゲームデータ
 d:アクターのデータベースデータ  
 
 ## 更新履歴
+2023/7/21 Ver.2.3.9  
+ドロップアイテムリストに表示させないアイテムを設定できる機能を追加。  
+隠しアイテムを表示しないように修正。  
 2023/6/18 Ver.2.3.8  
 入手画面のアクター表示のラインが機能していなかった問題を修正。  
 2023/5/6 Ver.2.3.7  

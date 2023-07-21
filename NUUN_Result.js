@@ -6245,7 +6245,7 @@ Window_ResultGetInfo.prototype.drawStealItemName = function(data, x, y, width) {
 Window_ResultGetItem.prototype.getItemDropList = function() {
   const drop = BattleManager._rewards.items;
   const dropList = [];
-  drop.forEach(item => {console.log(item)
+  drop.forEach(item => {
     if (!item.meta.NoResultDropList && item.itypeId <= 2) {
         const index = dropList.findIndex(ditem => item.id === ditem.item.id);
         if (DropItemNumVisible && index >= 0) {

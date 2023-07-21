@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.0
+ * @version 3.12.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/7/21 Ver.3.12.1
+ * 敵の攻撃時の画像切り替えが機能していなかった問題を修正。
  * 2023/7/17 Ver.3.12.0
  * 敵の画像切り替えに関する処理の変更。
  * 2023/7/8 Ver.3.11.3
@@ -613,7 +615,7 @@ Game_Actor.prototype.performActionStart = function(action) {
 const _Game_Enemy_performActionStart = Game_Enemy.prototype.performActionStart;
 Game_Enemy.prototype.performActionStart = function(action) {
     _Game_Enemy_performActionStart.call(this, action);
-    //this.setBattleStyleAttackImgId(action);
+    this.setBattleStyleAttackImgId(action);
 };
 
 Game_Battler.prototype.setBattleStyleAttackImgId = function(action) {

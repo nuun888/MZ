@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.8
+ * @version 2.3.9
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -53,10 +53,16 @@
  * [Level up screen actor image change]
  * Change the image of the standing picture. It does not apply when the setting of the standing face graphic display EX is enabled.
  * 
+ * Item notes
+ * <NoResultDropList> Doesn't show up in item drop list.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/7/21 Ver.2.3.9
+ * Added the ability to set items that are not displayed in the drop item list.
+ * Fixed to not display hidden items.
  * 2023/6/18 Ver.2.3.8
  * Fixed an issue where lines weren't working in the Actor display on the Acquisition screen.
  * 2023/5/6 Ver.2.3.7
@@ -2283,7 +2289,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.8
+ * @version 2.3.9
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2324,10 +2330,16 @@
  * 「レベルアップ画面アクター画像変更」
  * 立ち絵の画像を変更します。立ち絵顔グラ表示EXでの設定を有効にしている場合は適用されません。
  * 
+ * アイテムのメモ欄
+ * <NoResultDropList> アイテム入手のドロップリストに表示しません。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/21 Ver.2.3.9
+ * ドロップアイテムリストに表示させないアイテムを設定できる機能を追加。
+ * 隠しアイテムを表示しないように修正。
  * 2023/6/18 Ver.2.3.8
  * 入手画面のアクター表示のラインが機能していなかった問題を修正。
  * 2023/5/6 Ver.2.3.7
@@ -6233,12 +6245,14 @@ Window_ResultGetInfo.prototype.drawStealItemName = function(data, x, y, width) {
 Window_ResultGetItem.prototype.getItemDropList = function() {
   const drop = BattleManager._rewards.items;
   const dropList = [];
-  drop.forEach(item => {
-    const index = dropList.findIndex(ditem => item.id === ditem.item.id);
-    if (DropItemNumVisible && index >= 0) {
-      dropList[index].num++;
-    } else {
-      dropList.push({item: item, num: 1});
+  drop.forEach(item => {console.log(item)
+    if (!item.meta.NoResultDropList && item.itypeId <= 2) {
+        const index = dropList.findIndex(ditem => item.id === ditem.item.id);
+        if (DropItemNumVisible && index >= 0) {
+            dropList[index].num++;
+        } else {
+            dropList.push({item: item, num: 1});
+        }
     }
   });
   this.dropList = dropList;
@@ -6706,38 +6720,42 @@ Window_ResultActorStatus.prototype.drawActorLevel = function(data, index, actor,
 };
 
 Window_ResultActorStatus.prototype.drawParams = function(data, index, actor, x, y, width) {
-  if (!data.DetaEval) {
-    return;
-  }
-  const a = actor;
-  const d = actor.actor();
-  let x2 = x;
-  let systemWidth = data.SystemItemWidth || 160;
-  if (data.ParamName) {
-    this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
-    this.drawText(data.ParamName, x, y, systemWidth, "left");
-  }
-  this.resetTextColor();
-  x2 += systemWidth + this.itemPadding() * 2;
-  if (actor) {
-    const value = eval(data.DetaEval);
-    if (data.DifferenceVisible && this._oldLevelActorStatus) {
-      const oldValue = this.paramOld(index);
-      this.drawText(oldValue, x2, y, 48, 'right');
-      x2 += 48;
-      this.changeTextColor(ColorManager.systemColor());
-      this.drawText("\u2192", x2, y, 32, "center");
-      if (oldValue < value) {
-        this.changeTextColor(NuunManager.getColorCode(DifferenceStatusColor));
-      } else {
-        this.resetTextColor();
-      }
-      x2 += 32;
-    } else {
-      x2 += 80;
+    if (!data.DetaEval) {
+        return;
     }
-    this.drawText(value, x2, y, 48, "right");
-  }
+    try {
+        const a = actor;
+        const d = actor.actor();
+        let x2 = x;
+        let systemWidth = data.SystemItemWidth || 160;
+        if (data.ParamName) {
+            this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+            this.drawText(data.ParamName, x, y, systemWidth, "left");
+        }
+        this.resetTextColor();
+        x2 += systemWidth + this.itemPadding() * 2;
+        if (actor) {
+            const value = eval(data.DetaEval);
+            if (data.DifferenceVisible && this._oldLevelActorStatus) {
+            const oldValue = this.paramOld(index);
+            this.drawText(oldValue, x2, y, 48, 'right');
+            x2 += 48;
+            this.changeTextColor(ColorManager.systemColor());
+            this.drawText("\u2192", x2, y, 32, "center");
+            if (oldValue < value) {
+                this.changeTextColor(NuunManager.getColorCode(DifferenceStatusColor));
+            } else {
+                this.resetTextColor();
+            }
+            x2 += 32;
+            } else {
+            x2 += 80;
+            }
+            this.drawText(value, x2, y, 48, "right");
+        }
+    } catch (error) {
+        
+    }
 };
 
 Window_ResultActorStatus.prototype.drawActorFace = function(data, actor, x, y) {
@@ -7096,10 +7114,13 @@ BattleManager.getResultOldStatus = function(actor) {
         }
         break;
       case 40:
-        if (data.DifferenceVisible) {
-          const a = actor;
-          const d = actor.actor();
-          pushData = eval(data.DetaEval);
+        try {
+            if (data.DifferenceVisible) {
+                const a = actor;
+                const d = actor.actor();
+                pushData = eval(data.DetaEval);
+            }
+        } catch (error) {
         }
         break;
       default:

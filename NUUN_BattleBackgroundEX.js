@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Battle background change
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -39,6 +39,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/22/2023 Ver.1.2.1
+ * Added a function to synchronize the Y coordinate of the background and the Y coordinate of the monster.
  * 12/11/2022 Ver.1.2.0
  * Changed the specification of the background setting.
  * Changed the display in languages other than Japanese to English.
@@ -94,6 +96,13 @@
  * @type number
  * @default 0
  * @min -999
+ * @parent Setting
+ * 
+ * @param BackgroundEnemySynchronization
+ * @desc Move the Y coordinate of the battle background and the Y coordinate of the monster together.
+ * @text Background and monster Y coordinate synchronization
+ * @type boolean
+ * @default false
  * @parent Setting
  * 
  * @param TagBattleBackground
@@ -304,7 +313,7 @@
  * @target MZ
  * @plugindesc  戦闘背景変更プラグイン
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -333,6 +342,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/22 Ver.1.2.1
+ * 背景Y座標とモンスターのY座標を同期させる機能を追加。
  * 2022/12/11 Ver.1.2.0
  * 背景設定の仕様を変更。
  * 日本語以外での表示を英語表示に変更。
@@ -388,6 +399,13 @@
  * @type number
  * @default 0
  * @min -999
+ * @parent Setting
+ * 
+ * @param BackgroundEnemySynchronization
+ * @desc バトル背景のY座標とモンスターのY座標を共に移動します。
+ * @text 背景とモンスターのY座標同期
+ * @type boolean
+ * @default false
  * @parent Setting
  * 
  * @param TagBattleBackground
@@ -608,6 +626,7 @@ const BoatBattleback = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(pa
 const ShipBattleback = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ShipBattleback'])) :  null;
 const AirshipBattleback = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AirshipBattleback'])) :  null;
 const AutotileBattlebacks = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['AutotileBattlebacks'])) : [];
+const BackgroundEnemySynchronization = eval(parameters['BackgroundEnemySynchronization'] || 'false');
 
 const pluginName = "NUUN_BattleBackgroundEX";
 PluginManager.registerCommand(pluginName, 'ChangeBattleBackground', args => {
@@ -642,6 +661,11 @@ Spriteset_Battle.prototype.updateBattleback = function() {
     BattleManager.nuun_ChangeBattleback(null, null);
     $gameTemp.BattleBackgroundRefresh = false;
   }
+};
+
+const _Game_Enemy_screenY = Game_Enemy.prototype.screenY;
+Game_Enemy.prototype.screenY = function() {
+    return _Game_Enemy_screenY.call(this) + (BackgroundEnemySynchronization ? BackgroundPosition : 0);
 };
 
 const _Game_Troop_setup = Game_Troop.prototype.setup;

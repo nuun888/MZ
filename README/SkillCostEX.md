@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.3.0
+# Ver.1.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)  
 [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md)  
 
@@ -73,6 +73,8 @@
 `[rate]`:消費無効率(±)　初期値は0です。  
 
 ## 更新履歴
+2023/7/23 Ver.1.3.1  
+HP、Goldが消費しない問題を修正。  
 2023/7/13 Ver.1.3.0  
 MP、TP、HP、Goldを確率で消費しない機能を追加。  
 2023/7/9 Ver.1.2.4  

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.2
+ * @version 2.20.3
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/22/2023 Ver.2.20.3
+ * Corrected to color-code resistance and weakness numbers with attributes and state resistance (numbers).
  * 7/16/2023 Ver.2.20.2
  * Added a function to execute only the analysis registration process without opening the analyze screen.
  * 7/8/2023 Ver.2.20.1
@@ -3177,6 +3179,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/22 Ver.2.20.3
+ * 属性、ステート耐性(数値)で耐性、弱点の数値を色分けするように修正。
  * 2023/7/16 Ver.2.20.2
  * アナライズ画面を開かずにアナライズの登録処理のみを実行する機能を追加。
  * 2023/7/8 Ver.2.20.1
@@ -10085,9 +10089,9 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
                     rate = enemy.elementRate(element.ElementNo) * 100;
                 }
                 rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+                this.valueColor(rate);
                 rate += list.paramUnit ? String(list.paramUnit) : " %";
                 const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
-                this.resetTextColor();
                 this.drawText(rateText, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), "right");
             } else {
                 this.resetTextColor();
@@ -10144,9 +10148,9 @@ Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, wi
                 if (this.resistWeakDataMask(list.MaskMode)) {
                     let rate = (enemy.isStateResist(stateId) ? 0 : enemy.stateRate(stateId)) * 100;
                     rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+                    this.valueColor(rate);
                     rate += list.paramUnit ? String(list.paramUnit) : " %";
                     const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
-                    this.resetTextColor();
                     this.drawText(rateText, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), "right");
                   } else {
                     this.resetTextColor();
@@ -10882,6 +10886,16 @@ Window_EnemyBook.prototype.drawEnemyBookNumber = function(text, x, y, width) {
 Window_EnemyBook.prototype.buffIconIndex = function(rate, paramId) {
 	if (rate > 1) {
         return Game_BattlerBase.ICON_BUFF_START + (buffLevel - 1) * 8 + paramId;
+    }
+};
+
+Window_EnemyBook.prototype.valueColor = function(value) {
+    if (value > 100) {
+        this.changeTextColor(ColorManager.powerDownColor())
+    } else if (value < 100) {
+        this.changeTextColor(ColorManager.powerUpColor())
+    } else {
+        this.resetTextColor();
     }
 };
 

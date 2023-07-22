@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost EX
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * You can set various costs for skill costs.
@@ -96,6 +96,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/23/2023 Ver.1.3.1
+ * Fixed an issue where HP and Gold were not consumed.
  * 7/13/2023 Ver.1.3.0
  * Added a function that does not consume MP, TP, HP, and Gold with a probability.
  * 7/9/2023 Ver.1.2.4
@@ -122,7 +124,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -207,6 +209,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/23 Ver.1.3.1
+ * HP、Goldが消費しない問題を修正。
  * 2023/7/13 Ver.1.3.0
  * MP、TP、HP、Goldを確率で消費しない機能を追加。
  * 2023/7/9 Ver.1.2.4
@@ -427,14 +431,14 @@ Game_BattlerBase.prototype.paySkillMpTpCost = function(skill) {
 
 Game_BattlerBase.prototype.paySkillHpCost = function(skill) {
     const cost = this.skillHpCost(skill);
-    if (cost > 0 && this.isNoConsumptionRate(3)) {
+    if (cost > 0 && !this.isNoConsumptionRate(3)) {
         this._hp -= cost;
     }
 };
 
 Game_BattlerBase.prototype.paySkillGoldCost = function(skill) {
     const cost = this.skillGoldCost(skill);
-    if (cost > 0 && this.isNoConsumptionRate(4)) {
+    if (cost > 0 && !this.isNoConsumptionRate(4)) {
         $gameParty.loseGold(cost);
     }
 };

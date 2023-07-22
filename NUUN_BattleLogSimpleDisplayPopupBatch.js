@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * Only item names and skill names are displayed in the battle log.
@@ -31,6 +31,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/22/2023 Ver.1.2.1
+ * Added a function to specify the base position of the background image.
  * 6/3/2023 Ver.1.2.0
  * Added ability to display skills, item names and messages.
  * 6/3/2023 Ver.1.1.1
@@ -134,6 +136,16 @@
  * @dir img/
  * @default 
  * 
+ * @param LogWindowBackGroundPosition
+ * @desc Specifies the base position of the background image.
+ * @text Background image base position
+ * @type select
+ * @option Left
+ * @value left
+ * @option Center
+ * @value center
+ * @default center
+ * 
  * @param BackGroundX
  * @desc Image coordinate X.
  * @text Image coordinate X
@@ -174,7 +186,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * バトルログをアイテム名、スキル名のみ表示させるようにします。
@@ -193,6 +205,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/22 Ver 1.2.1
+ * 背景画像の基本位置を指定する機能を追加。
  * 2023/7/8 Ver 1.2.0
  * スキル、アイテム名とメッセージを表示する機能を追加。
  * 2023/6/3 Ver 1.1.1
@@ -296,6 +310,16 @@
  * @dir img/
  * @default 
  * 
+ * @param LogWindowBackGroundPosition
+ * @desc 背景画像の基本位置を指定します。
+ * @text 背景画像基本位置
+ * @type select
+ * @option 左基準
+ * @value left
+ * @option 中央基準
+ * @value center
+ * @default center
+ * 
  * @param BackGroundX
  * @desc 画像座標X。
  * @text 画像座標X
@@ -379,6 +403,7 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
     const NoAnimetionWait = Number(parameters['NoAnimetionWait'] || 30);
     const EndActionWait = Number(parameters['EndActionWait'] || 6);
     const BackGroundImg = String(parameters['BackGroundImg']);
+    const LogWindowBackGroundPosition = String(parameters['LogWindowBackGroundPosition']) || 'center';
     const BackGroundX = Number(parameters['BackGroundX'] || 0);
     const BackGroundY = Number(parameters['BackGroundY'] || 0);
     const ActorLogWindowPosition = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorLogWindowPosition'])) : null) || {};
@@ -430,6 +455,9 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
         this.addChild(sprite);
         sprite.hide();
         this._battleLogWindowBackground = sprite;
+        if (LogWindowBackGroundPosition === 'center') {
+            sprite.anchor.x = 0.5;
+        }
     };
 
     Scene_Battle.prototype.createBattleLogWindow = function() {
@@ -440,7 +468,11 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
         this._logWindow.setBattleLogWindow(this._battleLogWindow);
         if (this._battleLogWindowBackground) {
             const sprite = this._battleLogWindowBackground;
-            sprite.x = rect.x + BackGroundX + (Graphics.width - Graphics.boxWidth) / 2;
+            if (LogWindowBackGroundPosition === 'center') {
+                sprite.x = Graphics.width / 2 + BackGroundX;
+            } else {
+                sprite.x = rect.x + BackGroundX + (Graphics.width - Graphics.boxWidth) / 2;
+            }
             sprite.y = rect.y + BackGroundY + (Graphics.height - Graphics.boxHeight) / 2;
             this._battleLogWindow.setBattleLogWindowBackground(sprite);
         }
@@ -535,7 +567,11 @@ Imported.NUUN_BattleLogSimpleDisplayPopupBatch = true;
                 
             }
             if (!!this._battleLogBackground) {
-                this._battleLogBackground.x = this.x + BackGroundX + w;
+                if (LogWindowBackGroundPosition === 'center') {
+                    this._battleLogBackground.x = Graphics.width / 2 + BackGroundX;
+                } else {
+                    this._battleLogBackground.x = this.x + BackGroundX + w;
+                }
                 this._battleLogBackground.y = this.y + BackGroundX + h;
             }
         }

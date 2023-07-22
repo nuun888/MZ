@@ -1,5 +1,5 @@
 # [戦闘背景変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -36,6 +36,8 @@
 イベントコマンドで変更した戦闘背景よりも優先して表示されます。  
   
 ## 更新履歴
+2023/7/22 Ver.1.2.1  
+背景Y座標とモンスターのY座標を同期させる機能を追加。  
 2022/12/11 Ver.1.2.0  
 背景設定の仕様を変更。  
 日本語以外での表示を英語表示に変更。  

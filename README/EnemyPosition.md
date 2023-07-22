@@ -1,5 +1,5 @@
-# [エネミー座標調整](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_NUUN_EnemyPosition.js)
-# Ver.1.1.0
+# [モンスター座標調整](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_NUUN_EnemyPosition.js)
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyPosition.js)
 
 モンスターの座標、ダメージエフェクトをモンスター毎に設定できます。データベース上で設定できる範囲外でも配置可能です。  
@@ -23,6 +23,8 @@
 `<EnemyPosition_X:100>`  
 
 ## 更新履歴
+2023/7/22 Ver.1.1.1  
+敵の共通の座標をシフトさせる機能を追加。  
 2021/3/27 Ver.1.1.0  
 敵の座標をシフトさせる機能を追加。  
 2021/1/17 Ver.1.0.0  

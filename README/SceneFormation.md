@@ -4,6 +4,9 @@
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
+#### オプション
+[メンバー変更画面(戦闘)](https://github.com/nuun888/MZ/blob/master/README/SceneBattleFormation.md)  
+
 メンバーを並び変える画面を追加します。  
 メニューコマンドの並び替えを選択するとメンバー変更画面が表示されるようになります。  
 戦闘メンバー、待機メンバーの画像はキャラチップ、顔グラから選択できます。（デフォルトではキャラチップ）  

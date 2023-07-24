@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.4
+ * @version 1.3.5
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/24 Ver.1.3.5
+ * 戦闘中の並び替えのコマンド名を指定できる機能を追加。
+ * 処理の修正。
  * 2022/9/14 Ver.1.3.4
  * サポートアクターを呼び出した際にゲームが進行しなくなる問題を修正。
  * 2022/3/30 Ver.1.3.3
@@ -87,6 +90,13 @@
  * @type number
  * @default 1
  * @min 0
+ * @parent BasicSetting
+ * 
+ * @param BattleFormationCommandName
+ * @text 並び替えコマンド名
+ * @desc 並び替え(戦闘時のコマンド)のコマンド名を設定します。無記入の場合はデータベースの名称が適用されます。
+ * @type string
+ * @default 
  * @parent BasicSetting
  * 
  * @param BattleMemberNameSetting
@@ -245,6 +255,12 @@ const WindowZero = eval(parameters['WindowZero'] || "false");
 const WindowCenter = eval(parameters['WindowCenter'] || "true");
 const CommandIndex = Number(parameters['CommandIndex'] || 1);
 const CommandShowMode = eval(parameters['CommandShowMode']) || 'Party';
+const BattleFormationCommandName = String(parameters['BattleFormationCommandName'] || "");
+const ChangeLeaderMode = eval(parameters['ChangeLeaderMode'] || "true");
+
+function getBattleFormationCommandName() {
+    return BattleFormationCommandName ? BattleFormationCommandName : TextManager.formation;
+}
 
 const _Game_Temp_initialize = Game_Temp.prototype.initialize;
 Game_Temp.prototype.initialize = function() {
@@ -253,100 +269,121 @@ Game_Temp.prototype.initialize = function() {
 };
 
 Window_Command.prototype.addFormationCommand = function() {
-  this.addCommand(TextManager.formation, "formation", $gameParty.useFormation());
-  this._list.splice(CommandIndex, 0, this._list.pop());
+    this.addCommand(getBattleFormationCommandName(), "formation", $gameParty.useFormation());
+    this._list.splice(CommandIndex, 0, this._list.pop());
 };
 
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
 Window_PartyCommand.prototype.makeCommandList = function() {
-  _Window_PartyCommand_makeCommandList.call(this);
-  if (CommandShowMode === "Party")
-  this.addFormationCommand();
+    _Window_PartyCommand_makeCommandList.call(this);
+    if (CommandShowMode === "Party")
+    this.addFormationCommand();
 };
 
 const _Window_ActorCommand_makeCommandList = Window_ActorCommand.prototype.makeCommandList;
 Window_ActorCommand.prototype.makeCommandList = function() {
-  _Window_ActorCommand_makeCommandList.call(this);
-  if (this._actor && CommandShowMode === "Actor") {
-      this.addFormationCommand();
-  }
+    _Window_ActorCommand_makeCommandList.call(this);
+    if (this._actor && CommandShowMode === "Actor") {
+        this.addFormationCommand();
+    }
 };
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
-  _Scene_Battle_createAllWindows.call(this);
-  this._formation = this.setNuun_Formation(true);
-  this._formation.create();
+    _Scene_Battle_createAllWindows.call(this);
+    this._formation = this.setNuun_Formation(true);
+    this._formation.create();
 };
 
 const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
 Scene_Battle.prototype.createPartyCommandWindow = function() {
-  _Scene_Battle_createPartyCommandWindow.call(this);
-  this._partyCommandWindow.setHandler("formation", this.commandFormation.bind(this));
+    _Scene_Battle_createPartyCommandWindow.call(this);
+    this._partyCommandWindow.setHandler("formation", this.commandFormation.bind(this));
 };
 
 const _Scene_Battle_createActorCommandWindow = Scene_Battle.prototype.createActorCommandWindow;
 Scene_Battle.prototype.createActorCommandWindow = function() {
-  _Scene_Battle_createActorCommandWindow.call(this);
-  this._actorCommandWindow.setHandler("formation", this.actorCommandFormation.bind(this));
+    _Scene_Battle_createActorCommandWindow.call(this);
+    this._actorCommandWindow.setHandler("formation", this.actorCommandFormation.bind(this));
 };
 
 Scene_Battle.prototype.commandFormation = function() {
-  this._formation.setCommand(this._partyCommandWindow);
-  this._formation.open();
+    this._formation.setCommand(this._partyCommandWindow);
+    this._formation.open();
 };
 
 Scene_Battle.prototype.actorCommandFormation = function() {
-  this._formation.setCommand(this._actorCommandWindow);
-  this._formation.open();
+    this._formation.setCommand(this._actorCommandWindow);
+    this._formation.open();
 };
 
 const _Scene_Battle_isAnyInputWindowActive = Scene_Battle.prototype.isAnyInputWindowActive;
 Scene_Battle.prototype.isAnyInputWindowActive = function() {
-  return (_Scene_Battle_isAnyInputWindowActive.call(this) ||
-  this._formation._battleMemberWindow.active ||
-  this._formation._memberWindow.active);
+    return (_Scene_Battle_isAnyInputWindowActive.call(this) ||
+    this._formation._battleMemberWindow.active ||
+    this._formation._memberWindow.active);
 };
 
 const _Scene_Battle_update = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
-  _Scene_Battle_update.call(this);
-  this._formation.update();
-  if (BattleManager.isTpb() && !this.isFormationActive() && $gameTemp.formationRefresh && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
-    $gameTemp.formationRefresh = false;
-    if (Imported.NUUN_SupportActor) {
-      $gameParty.setWithSupportActorMember();
+    _Scene_Battle_update.call(this);
+    this._formation.update();
+    if (BattleManager.isTpb() && !this.isFormationActive() && $gameTemp.formationRefresh && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
+        $gameTemp.formationRefresh = false;
+        if (Imported.NUUN_SupportActor) {
+        $gameParty.setWithSupportActorMember();
+        }
+        const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
+        if (index >= 0) {
+            if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
+                this._statusWindow.select(index);
+            }
+        } else {
+        this.commandCancel();
+        }
     }
-    const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
-    if (index >= 0) {
-      if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
-        this._statusWindow.select(index);
-      }
-    } else {
-      this.commandCancel();
-    }
-  }
 };
 
 Scene_Battle.prototype.isFormationActive = function() {
-  return this._formation._battleMemberWindow.active || this._formation._memberWindow.active;
+    return this._formation._battleMemberWindow.active || this._formation._memberWindow.active;
 };
 
 const _Scene_Battle_needsInputWindowChange = Scene_Battle.prototype.needsInputWindowChange;
 Scene_Battle.prototype.needsInputWindowChange = function() {
-  return _Scene_Battle_needsInputWindowChange.call(this) && !this.isFormationActive();
+    return _Scene_Battle_needsInputWindowChange.call(this) && !this.isFormationActive();
 };
 
 const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWindows;
 Scene_Battle.prototype.hideSubInputWindows = function() {
-  _Scene_Battle_hideSubInputWindows.call(this);
-  this._formation._battleMemberWindow.deactivate();
-  this._formation._memberWindow.deactivate();
-  this._formation._battleMemberNameWindow.hide();
-  this._formation._memberNameWindow.hide();
-  this._formation._battleMemberWindow.hide();
-  this._formation._memberWindow.hide();
-  this._formation._memberStatusWindow.hide();
+    _Scene_Battle_hideSubInputWindows.call(this);
+    this._formation._battleMemberWindow.deactivate();
+    this._formation._memberWindow.deactivate();
+    this._formation._battleMemberNameWindow.hide();
+    this._formation._memberNameWindow.hide();
+    this._formation._battleMemberWindow.hide();
+    this._formation._memberWindow.hide();
+    this._formation._memberStatusWindow.hide();
+};
+
+const _Window_FormationBattleMember_isChangeActorEnabled = Window_FormationBattleMember.prototype.isChangeActorEnabled;
+Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor) {
+    return _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor);
+    //return $gameParty.inBattle() ? actor.isFormationChangeOk();
+};
+
+Window_StatusBase.prototype.isChangeActorLeader = function(actor, pendingActor) {
+    if (ChangeLeaderMode) {
+        const subject = BattleManager.actor();
+        if (subject === $gameParty.leader()) {
+            return true;
+        } else if (subject === actor || subject === pendingActor) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return true;
+    }
 };
 
 })();

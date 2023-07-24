@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc アクター並び替え固定
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * アクターの並び替えを固定します。
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/24 Ver.1.2.1
+ * 処理の修正。
  * 2022/2/23 Ver.1.2.0
  * 固定アクター設定時に指定先のメンバーインデックスに移動させる機能を追加。
  * メンバー変更画面処理変更により定義修正。
@@ -195,26 +197,36 @@ Window_StatusBase.prototype.isCurrentActorFixedEnabled = function(cursor, pendin
 
 const _Window_FormationBattleMember_isCurrentItemEnabled = Window_FormationBattleMember.prototype.isCurrentItemEnabled;
 Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
-  if (this._formationMode) {
-    onFixedMovable = ActorFixedMovable;
-    const result = _Window_FormationBattleMember_isCurrentItemEnabled.call(this);
-    onFixedMovable = false;
-    return result && this.isCurrentActorFixedEnabled(this.getCursorMode(), this.getPendingMode());
-  } else {
     return _Window_FormationBattleMember_isCurrentItemEnabled.call(this);
-  }
 };
 
 const _Window_FormationMember_isCurrentItemEnabled =Window_FormationMember.prototype.isCurrentItemEnabled;
 Window_FormationMember.prototype.isCurrentItemEnabled = function() {
-  if (this._formationMode) {
-    onFixedMovable = ActorFixedMovable;
-    const result = _Window_FormationMember_isCurrentItemEnabled.call(this);
-    onFixedMovable = false;
-    return result && this.isCurrentActorFixedEnabled(this.getCursorMode(), this.getPendingMode());
-  } else {
     return _Window_FormationMember_isCurrentItemEnabled.call(this);
-  }
+};
+
+const _Window_FormationBattleMember_isChangeActorEnabled = Window_FormationBattleMember.prototype.isChangeActorEnabled;
+Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
+    if (ActorFixedMovable && actor) {
+        if (pendingActor) {
+            return !pendingActor.isBattleMember() ? _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor) : true;
+        } else {
+            return this.getPendingMode() === 'battle' || !this.getPendingMode() ? true : _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor);
+        }
+    } else if (actor) {
+        return _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor);
+    } else {
+        return true;
+    }
+};
+
+const _Window_FormationMember_isChangeActorEnabled = Window_FormationMember.prototype.isChangeActorEnabled;
+Window_FormationMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
+    if (pendingActor && pendingActor.isBattleMember()) {
+        return _Window_FormationMember_isChangeActorEnabled.call(this, pendingActor);
+    } else {
+        return true;
+    }
 };
 
 Window_MenuStatus.prototype.getFormationActor = function() {

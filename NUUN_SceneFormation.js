@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.7.6
+ * @version 1.7.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -32,6 +32,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/24 Ver.1.7.7
+ * 処理の修正。
  * 2022/11/20 Ver.1.7.6
  * 初回表示時にアクターのステータスが表示されない問題を修正。
  * デフォルトの立ち絵切り替えが機能していなかった問題を修正。
@@ -123,6 +125,7 @@
  * @command SceneFormationOpen
  * @desc メンバー変更画面を開きます。
  * @text メンバー変更画面を開く
+ * 
  * 
  * @param BasicSetting
  * @text 基本設定
@@ -820,53 +823,6 @@ var Imported = Imported || {};
 Imported.NUUN_SceneFormation = true;
 
 
-function Window_FormationBattleMemberName() {
-  this.initialize(...arguments);
-}
-
-Window_FormationBattleMemberName.prototype = Object.create(Window_StatusBase.prototype);
-Window_FormationBattleMemberName.prototype.constructor = Window_FormationBattleMemberName;
-
-
-function Window_FormationMemberName() {
-  this.initialize(...arguments);
-}
-
-Window_FormationMemberName.prototype = Object.create(Window_StatusBase.prototype);
-Window_FormationMemberName.prototype.constructor = Window_FormationMemberName;
-
-
-function Window_FormationBattleMember() {
-  this.initialize(...arguments);
-}
-
-Window_FormationBattleMember.prototype = Object.create(Window_StatusBase.prototype);
-Window_FormationBattleMember.prototype.constructor = Window_FormationBattleMember;
-
-
-function Window_FormationMember() {
-  this.initialize(...arguments);
-}
-
-Window_FormationMember.prototype = Object.create(Window_StatusBase.prototype);
-Window_FormationMember.prototype.constructor = Window_FormationMember;
-
-
-function Window_FormationStatus() {
-  this.initialize(...arguments);
-}
-
-Window_FormationStatus.prototype = Object.create(Window_StatusBase.prototype);
-Window_FormationStatus.prototype.constructor = Window_FormationStatus;
-
-
-function Sprite_FormationActor() {
-  this.initialize(...arguments);
-}
-
-Sprite_FormationActor.prototype = Object.create(Sprite.prototype);
-Sprite_FormationActor.prototype.constructor = Sprite_FormationActor;
-
 (() => {
 const parameters = PluginManager.parameters('NUUN_SceneFormation');
 const parameters2 = PluginManager.parameters('NUUN_SceneBattleFormation');
@@ -912,6 +868,7 @@ const CommandShowMode = eval(parameters2['CommandShowMode']) || 'Party';
 const SupportActorBackColor = (DataManager.nuun_structureData(parameters3['SupportActorBackColor'])) || 5;
 const DynamicFace = eval(parameters['DynamicFace'] || "true");
 const BackActorPicture = eval(parameters['BackActorPicture'] || "true");
+const FormationCommandName = String(parameters['FormationCommandName'] || "");
 
 let cursorMode = 'battle';
 let pendingMode = null;
@@ -1591,6 +1548,13 @@ Window_StatusBase.prototype.setActorFormationStatus = function(index) {
 };
 
 //戦闘メンバー名称
+function Window_FormationBattleMemberName() {
+    this.initialize(...arguments);
+}
+  
+Window_FormationBattleMemberName.prototype = Object.create(Window_StatusBase.prototype);
+Window_FormationBattleMemberName.prototype.constructor = Window_FormationBattleMemberName;
+
 Window_FormationBattleMemberName.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
   this.refresh();
@@ -1605,7 +1569,16 @@ Window_FormationBattleMemberName.prototype.drawContentsName = function(x, y, wid
   this.drawText(BattleMemberName, x, y, width);
 };
 
+window.FormationBattleMemberName = Window_FormationBattleMemberName;
+
 //待機メンバー名称
+function Window_FormationMemberName() {
+    this.initialize(...arguments);
+}
+  
+Window_FormationMemberName.prototype = Object.create(Window_StatusBase.prototype);
+Window_FormationMemberName.prototype.constructor = Window_FormationMemberName;
+
 Window_FormationMemberName.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
   this.refresh();
@@ -1620,7 +1593,16 @@ Window_FormationMemberName.prototype.drawContentsName = function(x, y, width) {
   this.drawText(MemberName, x, y, width);
 };
 
+window.Window_FormationMemberName = Window_FormationMemberName;
+
 //戦闘メンバー
+function Window_FormationBattleMember() {
+    this.initialize(...arguments);
+}
+  
+Window_FormationBattleMember.prototype = Object.create(Window_StatusBase.prototype);
+Window_FormationBattleMember.prototype.constructor = Window_FormationBattleMember;
+
 Window_FormationBattleMember.prototype.initialize = function(rect) {
   this._members = $gameParty.formationBattleMember();
   Window_StatusBase.prototype.initialize.call(this, rect);
@@ -1660,23 +1642,34 @@ Window_FormationBattleMember.prototype.processOk = function() {
 };
 
 Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
-  const actor = this.actor(this.index());
-  const pendingActor = pendingMode === 'battle' ? this.actor(pendingIndex) : $gameParty.formationMember()[pendingIndex];
-  if (pendingMode && (!actor && !pendingActor)) {
-    return false;
-  } else if (!actor) {
-    return this.isChangeActorEnabled(actor, pendingActor, 1);
-  } else if (!pendingActor) {
-    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this) && (pendingMode ? this.isChangeActorEnabled(actor, pendingActor, -1) : true);
-  } else if (cursorMode !== pendingMode) {
-    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this) && this.isChangeActorEnabled(actor, pendingActor, 0);
-  } else {
-    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this);
-  }
+    const actor = this.actor(this.index());
+    const pendingActor = pendingMode === 'battle' ? this.actor(pendingIndex) : $gameParty.formationMember()[pendingIndex];
+    if (pendingActor) {
+        return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor);
+    } else if (actor) {
+        return this.isChangeActorEnabled(actor);
+    } else {
+        return true;
+    }
 };
 
-Window_FormationBattleMember.prototype.isChangeActorEnabled = function(w_actor, a_actor, num) {
-  return isbattleMembersDead(a_actor, w_actor) < $gameParty.maxBattleMembers() + num;
+Window_FormationBattleMember.prototype.isFormationMembersDead = function(actor, pendingActor) {
+    const battleMember = $gameParty.battleMembers();
+    const members = battleMember.filter(member => {
+        if (pendingActor.isBattleMember()) {
+            return true;
+        } else {
+            return member !== actor;
+        }
+    });
+    if (!pendingActor.isBattleMember()) {
+        Array.prototype.push.apply(members , [pendingActor]);
+    }
+    return members.every(member => member.isDead());
+};
+
+Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor) {
+  return actor.isFormationChangeOk();
 };
 
 Window_FormationBattleMember.prototype.select = function(index) {
@@ -1864,7 +1857,16 @@ Window_FormationBattleMember.prototype.setSpriteActor = function(sprite) {
   this._spriteActor = sprite;
 };
 
+window.Window_FormationBattleMember = Window_FormationBattleMember;
+
 //待機メンバー
+function Window_FormationMember() {
+    this.initialize(...arguments);
+}
+  
+Window_FormationMember.prototype = Object.create(Window_StatusBase.prototype);
+Window_FormationMember.prototype.constructor = Window_FormationMember;
+
 Window_FormationMember.prototype.initialize = function(rect) {
   this._members = $gameParty.formationMember();
   Window_StatusBase.prototype.initialize.call(this, rect);
@@ -1900,23 +1902,33 @@ Window_FormationMember.prototype.processOk = function() {
 };
 
 Window_FormationMember.prototype.isCurrentItemEnabled = function() {
-  const actor = this.actor(this.index());
-  const pendingActor = pendingMode === 'battle' ? $gameParty.formationBattleMember()[pendingIndex] : this.actor(pendingIndex);
-  if (pendingMode && (!actor && !pendingActor)) {
-    return false;
-  } else if (!actor) {
-    return this.isChangeActorEnabled(pendingActor, null, -1);
-  } else if (!pendingActor) {
-    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this);
-  } else if (cursorMode !== pendingMode) {
-    return Window_MenuStatus.prototype.isCurrentItemEnabled.call(this) && this.isChangeActorEnabled(pendingActor, actor, 0);
-  } else {
-    return true;
-  }
+    const actor = this.actor(this.index());
+    const pendingActor = pendingMode === 'battle' ? $gameParty.formationBattleMember()[pendingIndex] : this.actor(pendingIndex);
+    if (pendingActor) {
+        return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor);
+    } else if (actor) {
+        return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor);
+    } else {
+        return true;
+    }
 };
 
-Window_FormationMember.prototype.isChangeActorEnabled = function(w_actor, a_actor, num) {
-  return isbattleMembersDead(a_actor, w_actor) < $gameParty.maxBattleMembers() + num;
+Window_FormationMember.prototype.isFormationMembersDead = function(actor, pendingActor) {
+    const battleMember = $gameParty.battleMembers();
+    const members = battleMember.filter(member => {
+        if (pendingActor && pendingActor.isBattleMember() && member === pendingActor) {
+            return false;
+        }
+        return true;
+    });
+    if (actor && pendingActor && pendingActor.isBattleMember()) {
+        Array.prototype.push.apply(members, [actor]);
+    }
+    return members.every(member => member.isDead());
+};
+
+Window_FormationMember.prototype.isChangeActorEnabled = function(actor) {
+  return actor.isFormationChangeOk();
 };
 
 Window_FormationMember.prototype.select = function(index) {
@@ -1944,7 +1956,6 @@ Window_FormationMember.prototype.drawItem = function(index) {
     if (CharacterMode === 'img') {
       data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? this.battlreFormationPicture(actor.actorId()) : actor.getFormationActorImgData();
       const imges = Imported.NUUN_ActorPicture && ActorPictureEXApp ? actor.getActorGraphicImg() : actor.getFormationActorImg(data);
-      console.log(imges)
       bitmap = ImageManager.nuun_LoadPictures(imges);
     } else if (CharacterMode === 'chip') {
       bitmap = ImageManager.loadCharacter(actor.characterName());
@@ -2096,7 +2107,16 @@ Window_FormationMember.prototype.setSpriteActor = function(sprite) {
   this._spriteActor = sprite;
 };
 
+window.Window_FormationMember = Window_FormationMember;
+
 //ステータス
+function Window_FormationStatus() {
+    this.initialize(...arguments);
+}
+  
+Window_FormationStatus.prototype = Object.create(Window_StatusBase.prototype);
+Window_FormationStatus.prototype.constructor = Window_FormationStatus;
+
 Window_FormationStatus.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._actor = null;
@@ -2113,37 +2133,37 @@ Window_FormationStatus.prototype.maxCols = function() {
 };
 
 Window_FormationStatus.prototype.refresh = function() {
-  Window_StatusBase.prototype.refresh.call(this);
-  const actor = this._actor;
-  if (!actor) {
-    return;
-  }
-  let bitmap = null;
-  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-    actor.resetImgId();
-    bitmap = ImageManager.loadFace(actor.getActorGraphicFace());
-  } else {
-    bitmap = ImageManager.loadFace(actor.faceName());
-  }
-  if (!bitmap.isReady()) {
-    bitmap.addLoadListener(this.drawData.bind(this));
-  } else {
-    this.drawData();
-  }
+    Window_StatusBase.prototype.refresh.call(this);
+    const actor = this._actor;
+    if (!actor) {
+        return;
+    }
+    let bitmap = null;
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        actor.resetImgId();
+        bitmap = ImageManager.loadFace(actor.getActorGraphicFace());
+    } else {
+        bitmap = ImageManager.loadFace(actor.faceName());
+    }
+    if (!bitmap.isReady()) {
+        bitmap.addLoadListener(this.drawData.bind(this));
+    } else {
+        this.drawData();
+    }
 };
 
 Window_FormationStatus.prototype.drawData = function() {
-  const list = ActorStatus;
-  const lineHeight = this.lineHeight();
-  for (const data of list) {
-    const x_Position = data.X_Position;
-    const position = Math.min(x_Position, this.maxCols());
-    const rect = this.itemRect(position - 1);
-    const x = rect.x + (data.X_Coordinate + data.X_Position);
-    const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
-    const width = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : rect.width;
-    this.dateDisplay(data, x, y, width);
-  }
+    const list = ActorStatus;
+    const lineHeight = this.lineHeight();
+    for (const data of list) {
+        const x_Position = data.X_Position;
+        const position = Math.min(x_Position, this.maxCols());
+        const rect = this.itemRect(position - 1);
+        const x = rect.x + (data.X_Coordinate + data.X_Position);
+        const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
+        const width = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : rect.width;
+        this.dateDisplay(data, x, y, width);
+    }
 };
 
 Window_FormationStatus.prototype.dateDisplay = function(list, x, y, width) {
@@ -2567,6 +2587,12 @@ Window_FormationStatus.prototype.systemWidth = function(swidth, width) {
   return swidth > 0 ? swidth : Math.floor(width / 3);
 };
 
+function Sprite_FormationActor() {
+    this.initialize(...arguments);
+}
+  
+Sprite_FormationActor.prototype = Object.create(Sprite.prototype);
+Sprite_FormationActor.prototype.constructor = Sprite_FormationActor;
 
 Sprite_FormationActor.prototype.initialize = function() {
   Sprite.prototype.initialize.call(this);

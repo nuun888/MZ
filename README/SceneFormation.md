@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.1.7.6
+# Ver.1.7.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -20,6 +20,8 @@
 ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）  
 
 ## 更新履歴
+2023/7/24 Ver.1.7.7  
+処理の修正。  
 2022/11/20 Ver.1.7.6  
 初回表示時にアクターのステータスが表示されない問題を修正。  
 デフォルトの立ち絵切り替えが機能していなかった問題を修正。  

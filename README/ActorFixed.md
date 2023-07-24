@@ -1,5 +1,5 @@
 # [アクター並び替え固定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js)  
 
 アクターの並び替えを固定します。  
@@ -15,6 +15,8 @@
 アクターIDを0に指定している場合は指定できません。  
 
 ## 更新履歴
+2023/7/24 Ver.1.2.1  
+処理の修正。  
 2022/2/23 Ver.1.2.0  
 固定アクター設定時に指定先のメンバーインデックスに移動させる機能を追加。  
 メンバー変更画面処理変更により定義修正。  

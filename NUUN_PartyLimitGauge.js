@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -62,6 +62,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/28/2023 Ver.1.5.2
+ * Fixed the problem that display switch of display switch ID was not working.
+ * Fixed an issue where enemy limit points were not displayed.
  * 5/20/2023 Ver.1.5.1
  * Fixed typos.
  * Correction of description.
@@ -381,7 +384,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -439,6 +442,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/28 Ver.1.5.2
+ * 表示スイッチIDの表示切り替えが機能していなかった問題を修正。
+ * 敵のリミットポイントの表示がされなかった問題を修正。
  * 2023/5/20 Ver.1.5.1
  * 誤字修正。
  * 説明文の修正。
@@ -1043,7 +1049,11 @@ Scene_Battle.prototype.createPartyGauge = function() {
   this.addChild(sprite);
   sprite.setup('actor', 'limit');
   sprite.move(x, y);
-  sprite.show();
+  if (onPartyChargeLimitGauge()) {
+    sprite.show();
+  } else {
+    sprite.hide();
+  }
   this._partyGauge = sprite;
 };
 
@@ -1054,7 +1064,11 @@ Scene_Battle.prototype.createTroopGauge = function() {
   this.addChild(sprite);
   sprite.setup('enemy', 'limit');
   sprite.move(x, y);
-  sprite.show();
+  if (onEnemyChargeLimitGauge()) {
+    sprite.show();
+  } else {
+    sprite.hide();
+  }
   this._troopGauge = sprite;
 };
 
@@ -1121,7 +1135,7 @@ Sprite_PartyGauge.prototype.bitmapWidth = function() {
 
 Sprite_PartyGauge.prototype.setup = function(unit, statusType) {
   this._unit = unit;
-  Sprite_Gauge.prototype.setup.call(this, actor, statusType);
+  Sprite_Gauge.prototype.setup.call(this, unit, statusType);
 };
 
 const _Sprite_Gauge_gaugeX = Sprite_Gauge.prototype.gaugeX;
@@ -1179,6 +1193,11 @@ Sprite_PartyGauge.prototype.label = function() {
   return PartyGaugeLabel;
 };
 
+Sprite_PartyGauge.prototype.update = function() {
+    Sprite_Gauge.prototype.update.call(this);
+    this.visible = onPartyChargeLimitGauge();
+};
+
 Sprite_PartyGauge.prototype.measureLabelWidth = function() {
     this.setupLabelFont();
     return this.bitmap.measureTextWidth(this.label());
@@ -1219,9 +1238,14 @@ Sprite_TroopGauge.prototype.bitmapWidth = function() {
   return EnemyGauge_Width;
 };
 
-Sprite_PartyGauge.prototype.setup = function(unit, statusType) {
+Sprite_TroopGauge.prototype.setup = function(unit, statusType) {
   this._unit = unit;
   Sprite_Gauge.prototype.setup.call(this, unit, statusType);
+};
+
+Sprite_TroopGauge.prototype.update = function() {
+    Sprite_Gauge.prototype.update.call(this);
+    this.visible = onEnemyChargeLimitGauge();
 };
 
 Sprite_TroopGauge.prototype.label = function() {

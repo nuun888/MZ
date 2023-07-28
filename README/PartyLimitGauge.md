@@ -1,5 +1,5 @@
 # [パーティリミットゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
-# Ver.1.5.1
+# Ver.1.5.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -54,6 +54,9 @@ a:撃破されたバトラーデータ　da：撃破されたバトラーデー�
 色設定はテキストタブでカラーコードが入力できます。  
 
 ## 更新履歴
+2023/7/28 Ver.1.5.2  
+表示スイッチIDの表示切り替えが機能していなかった問題を修正。  
+敵のリミットポイントの表示がされなかった問題を修正。  
 2023/5/20 Ver.1.5.1  
 誤字修正。  
 説明文の修正。  

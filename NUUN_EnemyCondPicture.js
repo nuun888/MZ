@@ -8,13 +8,257 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Enemy state image change
+ * @author NUUN
+ * @base NUUN_Base
+ * @base NUUN_BattleStyleEX
+ * @orderAfter NUUN_Base
+ * @orderAfter NUUN_BattleStyleEX
+ * @version 1.2.0
+ * 
+ * @help
+ * Switch the image of the enemy according to the conditions.
+ * This plugin is an expansion plugin for Battle Style Expansion (Ver.3.12.0 or later).
+ * 
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 7/29/2023 Ver.1.2.0
+ * Added a function to randomly display enemy images
+ * 7/27/2023 Ver.1.1.0
+ * Added a function that can specify a common image.
+ * 7/27/2023 Ver.1.0.1
+ * Fixed some processing.
+ * 7/27/2023 Ver.1.0.0
+ * First edition.
+ * 
+ * @param EnemyCondPictureData
+ * @desc Set the enemy image.
+ * @text Enemy image settings
+ * @type struct<EnemyCondPictureList>[]
+ * @default 
+ * 
+ * @param CommonEnemyImg
+ * @text Common monster image settings
+ * @desc Set the common monster image.
+ * @default []
+ * @type struct<EnemyImgList>[]
+ * 
+ * @param DamageImgFrame
+ * @desc Image change frames for enemy character damage, recovery, and defense.
+ * @text Damage, recovery, defense change frames
+ * @type number
+ * @default 30
+ * @min 1
+ * 
+ * @param CounterImgFrame
+ * @desc Image change frames when the enemy character counterattacks or reflects magic.
+ * @text Counterattack, magic reflection image change frame
+ * @type number
+ * @default 60
+ * @min 1
+ * @max 9999
+ * 
+ * @param OnEnemyShake
+ * @desc Enable shake on damage.
+ * @text Damage shake enabled
+ * @type boolean
+ * @default false
+ * 
+ * @param ShakeFlame
+ * @desc Shake frame when damaged. (default 36)
+ * @text Shake frame
+ * @type number
+ * @default 36
+ * @min 0
+ * 
+ * @param ShakePower
+ * @desc The size of the shake when damaged. (default 2)
+ * @text Size of shake
+ * @type number
+ * @default 2
+ * @min 0
+ * 
+ * @param ShakeSpeed
+ * @desc Shake speed on damage. (default 20)
+ * @text Shake speed
+ * @type number
+ * @default 20
+ * @min 0
+ * 
+ */
+/*~struct~EnemyCondPictureList:
+ * 
+ * @param Enemy
+ * @desc Monster id.
+ * @text Monster
+ * @type enemy
+ * @default 
+ * 
+ * @param EnemyImg
+ * @text Monster image settings
+ * @desc Set the monster image.
+ * @default []
+ * @type struct<EnemyImgList>[]
+ * 
+ */
+/*~struct~EnemyImgList:
+ * 
+ * @param GraphicImg
+ * @text Enemy character image
+ * @desc Set the image of the enemy character. Random display in case of multiple designation.
+ * @type file[]
+ * @dir img/enemies/
+ * 
+ * @param SVGraphicImg
+ * @text Side view enemy character image
+ * @desc Set the image of the sv enemy character. Random display in case of multiple designation.
+ * @type file[]
+ * @dir img/sv_enemies/
+ * 
+ * @param Opacity
+ * @text Image opacity
+ * @desc Specifies the opacity of the image.
+ * @type number
+ * @default 255
+ * @min 0
+ * @max 255
+ * 
+ * @param Hue
+ * @text Hue
+ * @desc Specifies the hue of the image. -1 is the original hue.
+ * @type number
+ * @default -1
+ * @min -1
+ * @max 360
+ * 
+ * @param AllMatch
+ * @text Match all conditions
+ * @default ------------------------------
+ * 
+ * @param ChangeGraphicScenes
+ * @text Change scene
+ * @desc Select a graphic change scene.
+ * @type select
+ * @option Default
+ * @value 'default'
+ * @option Death
+ * @value 'death'
+ * @option Before Enemy Appears
+ * @value 'b_appeared'
+ * @option Dying
+ * @value 'dying'
+ * @option Damage
+ * @value 'damage'
+ * @option Cridamage
+ * @value 'cridamage'
+ * @option Recovery
+ * @value 'recovery'
+ * @option Attack(1)
+ * @value 'attack'
+ * @option RecoverySkill(1)
+ * @value 'recoverySkill'
+ * @option UseItem(2)
+ * @value 'item'
+ * @option Counter
+ * @value 'counter'
+ * @option Reflection
+ * @value 'reflection'
+ * @option CounterEX(CounterExtend)(4)
+ * @value 'counterEX'
+ * @option Guard
+ * @value 'guard'
+ * @option State(3)
+ * @value 'state'
+ * @default 'default'
+ * @parent AllMatch
+ * 
+ * @param ImgHP
+ * @text Remaining HP
+ * @desc Changes when the remaining HP is within the specified range or numerical value.
+ * @type struct<CondValue>
+ * @default {"CondValid":"false","UpLimit":"0","DwLimit":"0"}
+ * @parent AllMatch
+ * 
+ * @param ImgSwitch
+ * @text Switch
+ * @desc Changes when all the specified switches are ON.
+ * @type switch[]
+ * @default
+ * @parent AllMatch
+ * 
+ * @param ImgStateAll
+ * @text State
+ * @desc The condition is met when all of the specified states are applied.
+ * @type state[]
+ * @default 
+ * @parent AllMatch
+ * 
+ * @param CondSetting
+ * @text Condition setting
+ * @default ------------------------------
+ * 
+ * @param Skill
+ * @text Skill(1)
+ * @desc Select a skill. Applies when using any skill. Blank or none applies to all skills.
+ * @type skill[]
+ * @default
+ * @parent CondSetting
+ * 
+ * @param Item
+ * @text Item(2)
+ * @desc Select an item. Applies when using any item. Blank or None applies to all items.
+ * @type item[]
+ * @default
+ * @parent CondSetting
+ * 
+ * @param stateId
+ * @text Received state(3)
+ * @desc Select a state. Applies to all states.
+ * @type state[]
+ * @default 
+ * @parent CondSetting
+ * 
+ * @param Id
+ * @text Identification tag(4)
+ * @desc Specifies an identification tag. Applies when all identification tags are applicable.
+ * @type string[]
+ * @default 
+ * @parent CondSetting
+ * 
+ */
+/*~struct~CondValue:
+ * 
+ * @param CondValid
+ * @desc Activate the HP condition.
+ * @text HP condition valid
+ * @type boolean
+ * @default false
+ * 
+ * @param UpLimit
+ * @text Upper limit
+ * @desc Upper limit.
+ * @type number
+ * @default 0
+ * 
+ * @param DwLimit
+ * @text Lower limit
+ * @desc Lower limit.
+ * @type number
+ * @default 0
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc 敵の条件画像変更
  * @author NUUN
  * @base NUUN_Base
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
- * @version 1.1.0
+ * @version 1.2.0
  * 
  * @help
  * 敵の画像を条件により切り替えます。
@@ -25,6 +269,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/29 Ver 1.2.0
+ * 敵画像をランダムに表示させる機能を追加。
  * 2023/7/21 Ver 1.1.0
  * 共通の画像を指定できる機能を追加。
  * 2023/7/18 Ver 1.0.1
@@ -87,7 +333,7 @@
  * @min 0
  * 
  */
-/*~struct~EnemyCondPictureList:
+/*~struct~EnemyCondPictureList:ja
  * 
  * @param Enemy
  * @desc モンスター
@@ -102,18 +348,18 @@
  * @type struct<EnemyImgList>[]
  * 
  */
-/*~struct~EnemyImgList:
+/*~struct~EnemyImgList:ja
  * 
  * @param GraphicImg
  * @text 敵キャラ画像
- * @desc 敵キャラの画像を設定します。
- * @type file
+ * @desc 敵キャラの画像を設定します。複数指定の場合はランダムに表示されます。
+ * @type file[]
  * @dir img/enemies/
  * 
  * @param SVGraphicImg
  * @text サイドビュー敵キャラ画像
  * @desc サイドビューの敵キャラの画像を設定します。
- * @type file
+ * @type file[]
  * @dir img/sv_enemies/
  * 
  * @param Opacity
@@ -227,7 +473,7 @@
  * @parent CondSetting
  * 
  */
-/*~struct~CondValue:
+/*~struct~CondValue:ja
  * 
  * @param CondValid
  * @desc HP条件を有効にします。
@@ -303,12 +549,12 @@ Imported.NUUN_EnemyCondPicture = true;
         this._battleStyleGraphicHue = null;
         const list = enemyData && enemyData.EnemyImg ? enemyData.EnemyImg : CommonEnemyImg;
         if (list) {
-            index = this.getBattleStyleMatchConditions(list);
+            index = this.getBattleStyleMatchConditions(list);console.log(index)
             if (index >= 0) {
                 this.setbattleStyleGraphicId();
                 const data = list[index];
                 this._isDeadImg = this.isBSEnemyGraphicDead(data);
-                this._battleStyleGraphicName = this.getBattleStyleImg(data);
+                this._battleStyleGraphicName = index !== this._battleStyleGraphicIndex ? this.getBattleStyleImg(data) : this._battleStyleGraphicName;
                 this._battleStyleGraphicHue = this.getBattleStyleImgHue(data);
                 imgIndex = this.getBattleStyleImgIndex(data);
                 this._battleStyleGraphicOpacity = data.Opacity || 255;
@@ -327,7 +573,16 @@ Imported.NUUN_EnemyCondPicture = true;
     };
 
     Game_Enemy.prototype.enmeyGraphicName = function(data) {
-        return $gameSystem.isSideView() ? data.SVGraphicImg : data.GraphicImg;
+        const images = $gameSystem.isSideView() ? data.SVGraphicImg : data.GraphicImg;
+        if (Array.isArray(images)) {
+            if (images.length > 1) {
+                return images[Math.randomInt(images.length)];
+            } else {
+                return images[0];
+            }
+        } else {
+            return $gameSystem.isSideView() ? data.SVGraphicImg : data.GraphicImg;
+        }
     };
 
     Game_Enemy.prototype.getBattleStyleImgHue = function(data) {

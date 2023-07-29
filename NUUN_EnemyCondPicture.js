@@ -549,7 +549,7 @@ Imported.NUUN_EnemyCondPicture = true;
         this._battleStyleGraphicHue = null;
         const list = enemyData && enemyData.EnemyImg ? enemyData.EnemyImg : CommonEnemyImg;
         if (list) {
-            index = this.getBattleStyleMatchConditions(list);console.log(index)
+            index = this.getBattleStyleMatchConditions(list);
             if (index >= 0) {
                 this.setbattleStyleGraphicId();
                 const data = list[index];

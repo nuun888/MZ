@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.12.1
+### Ver.3.12.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.11.1  
@@ -9,16 +9,16 @@
 [バトルスタイル拡張XPスタイル設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_XP.js)Ver.1.11.1  
 [バトルスタイル拡張タイプ4設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Type4.js)Ver.1.4.1  
 
-バトルスタイル拡張デフォルト設定用 Ver.1.11.1  
+バトルスタイル拡張デフォルト設定用 Ver.1.11.2  
 ![画像](img/BattleStyleEX1.png)   
 
-バトルスタイル拡張スタンダード設定用 Ver.1.11.1 
+バトルスタイル拡張スタンダード設定用 Ver.1.11.2 
 ![画像](img/BattleStyleEX2.png)  
 
-バトルスタイル拡張XPスタイル設定用 Ver.1.11.1  
+バトルスタイル拡張XPスタイル設定用 Ver.1.11.2  
 ![画像](img/BattleStyleEX3.png)  
 
-バトルスタイル拡張タイプ4設定用 Ver.1.4.1  
+バトルスタイル拡張タイプ4設定用 Ver.1.4.2  
 ![画像](img/BattleStyleEX5.png)  
 ![画像](img/BattleStyleEX6.png)  
 
@@ -209,6 +209,8 @@ LL_StandingPictureBattle等と併用する場合は、'Scene_Battle'に設定す
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/7/30 Ver.3.12.2  
+味方の画像切り替えでランダムに表示できる機能を追加。  
 2023/7/21 Ver.3.12.1  
 敵の攻撃時の画像切り替えが機能していなかった問題を修正。  
 2023/7/17 Ver.3.12.0  

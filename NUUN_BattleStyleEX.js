@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.1
+ * @version 3.12.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/7/30 Ver.3.12.2
+ * 味方の画像切り替えでランダムに表示できる機能を追加。
  * 2023/7/21 Ver.3.12.1
  * 敵の攻撃時の画像切り替えが機能していなかった問題を修正。
  * 2023/7/17 Ver.3.12.0
@@ -289,7 +291,7 @@ function getActorPositionData(actorId) {
 
 function getActorImgData(actorId) {
   const find = getActorData(actorId);
-  if (find) {
+  if (find && find.ActorImgSetting) {
       find.ActorImgSetting.ActorImgHPosition = getUndefinedHPosition(find.ActorImgSetting.ActorImgHPosition);
       find.ActorImgSetting.ActorImgVPosition = getUndefinedHPosition(find.ActorImgSetting.ActorImgVPosition);
       return find.ActorImgSetting;
@@ -726,6 +728,7 @@ Game_Actor.prototype.battleStyleImgRefresh = function() {
         if (index >= 0) {
             this.setbattleStyleGraphicId();
             const data = actorData.ButlerActorImg[index];
+            //this._battleStyleGraphicName = index !== this._battleStyleGraphicIndex ? this.getBattleStyleImg(data) : this._battleStyleGraphicName;
             this._battleStyleGraphicName = this.getBattleStyleImg(data);
             imgIndex = this.getBattleStyleImgIndex(data);
             this._isDeadImg = this.isBSActorGraphicDead(data);
@@ -756,7 +759,7 @@ Game_Actor.prototype.actorPictureActorGraphicData = function(imgData) {
         this._battleStyleGraphicIndex = -1;
         this._battleStyleImgIndex = -1;
     } else if (imgData.ActorImgMode === 'imges') {
-        this._battleStyleGraphicName = this.getActorGraphicImg();
+        this._battleStyleGraphicName = this._actorGraphicIndex !== this._battleStyleGraphicIndex ? this.getActorGraphicImg(imgData) : this._battleStyleGraphicName;
         this._battleStyleGraphicIndex = this._actorGraphicIndex;
         this._battleStyleImgIndex = -1;
     } else {
@@ -902,7 +905,20 @@ Game_Actor.prototype.getBattleStyleOpacity = function() {
 };
   
 Game_Actor.prototype.getBattleStyleImg = function(data) {
-    return this.faceMode ? this.actorFaceName(data) : this.actorGraphicName(data);
+    return this.faceMode ? this.actorFaceName(data) : this.battleStyleGraphicName(data);
+};
+
+Game_Actor.prototype.battleStyleGraphicName = function(data) {
+    const images = this.actorGraphicName(data);
+    if (Array.isArray(images)) {
+        if (images.length > 1) {
+            return images[Math.randomInt(images.length)];
+        } else {
+            return images[0];
+        }
+    } else {
+        return images;
+    }
 };
   
 Game_Actor.prototype.getBattleStyleImgIndex = function(data) {
@@ -4167,6 +4183,6 @@ function conditionsParam(data, param, maxParam) {
 
 function isBattleWeather() {
     return params.BattleWeatherSwitch > 0 ? $gameSwitches.value(params.BattleWeatherSwitch) : true;
-}
+};
 
 })();

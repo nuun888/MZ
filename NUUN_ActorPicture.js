@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.0
+ * @version 1.6.1
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/30 Ver.1.6.1
+ * 味方の画像切り替えでランダムに表示できる機能を追加。
  * 2023/7/20 Ver.1.6.0
  * アクターIDではなく職業IDで指定できる機能を追加。
  * 2023/6/26 Ver.1.5.5
@@ -129,8 +131,8 @@
  * 
  * @param GraphicImg
  * @text アクター画像
- * @desc アクターの画像を設定します。
- * @type file
+ * @desc アクターの画像を設定します。複数指定の場合はランダムに表示されます。
+ * @type file[]
  * @dir img/
  * 
  * @param FaceImg
@@ -380,7 +382,7 @@ Game_Actor.prototype.getActorGraphic = function() {
 
 Game_Actor.prototype.getActorGraphicData = function() {
   const data = this.getActorGraphicList();
-  return data ? this.getActorGraphicList().ButlerActorImg[this._actorGraphicIndex] : null;
+  return data ? data.ButlerActorImg[this._actorGraphicIndex] : null;
 };
 
 Game_Actor.prototype.setActorGraphicData = function() {
@@ -389,7 +391,7 @@ Game_Actor.prototype.setActorGraphicData = function() {
   this._actorGraphicIndex = index;
   if (index >= 0) {
     const data = imgData.ButlerActorImg[index];
-    this._actorGraphicName = data.GraphicImg;
+    this._actorGraphicName = getActorGraphicName(data);
     this._actorGraphicFace = data.FaceImg || this.faceName();
     this._actorImgIndex = data.FaceIndex >= 0 ? data.FaceIndex : this.faceIndex();
     this._actorGraphicOpacity = data.Opacity || 255;
@@ -600,6 +602,19 @@ Game_Actor.prototype.isActorGraphicDead = function(data) {
 
 function conditionsParam(data, param, maxParam) {
   return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
+};
+
+function getActorGraphicName(data) {
+    const images = data.GraphicImg;
+    if (Array.isArray(images)) {
+        if (images.length > 1) {
+            return images[Math.randomInt(images.length)];
+        } else {
+            return images[0];
+        }
+    } else {
+        return images;
+    }
 };
 
 })();

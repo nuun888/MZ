@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -260,6 +260,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/7/31 Ver.1.3.1
+ * 指定の数値が数値のみで入力されたときにエラーが出る問題を修正。
  * 2023/7/13 Ver.1.3.0
  * 天候による条件を追加。
  * 2023/7/1 Ver.1.2.2
@@ -1670,18 +1672,14 @@ function condTurnCount(member) {
 };
 
 function attackElement(idList, action) {
-
-
-
-    
     if (action.item().damage.elementId < 0) {
         elementsList = action.getAttackElementsList();
       } else {
         elementsList = action.getItemElementsList();
       }
-  let elementsList = action._multiElements;
-  const list = getValList(idList);
-  return elementsList.some(id => elements(list, id));
+    let elementsList = action._multiElements;
+    const list = getValList(idList);
+    return elementsList.some(id => elements(list, id));
 };
 
 function elements(list, id) {
@@ -1814,7 +1812,12 @@ Game_BattlerBase.prototype.conditionsParam = function(data, paramId) {
   }
   paramMaxVal = this._cParam[paramId];
   if (data.ValList) {
-    const valList = data.ValList.split(',').map(Number);
+    let valList = [];
+    if (isNaN(data.ValList)) {
+        valList = data.ValList.split(',').map(Number);
+    } else {
+        valList = [data.ValList];
+    }
     return valList.some(val => val === paramVal);
   }
   return paramVal >= paramMaxVal * data.DwLimit / 100 && (data.UpLimit > 0 ? (paramVal <= paramMaxVal * data.UpLimit / 100) : true);

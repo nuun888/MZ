@@ -263,6 +263,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [ゲージ表示拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_GaugeValueEX.md) | [NUUN_GaugeValueEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js) | 共 | 1.4.1 |
 | [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md) | [NUUN_DamageGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamageGauge.js) | 共 | 1.0.0 |
 | [コンテンツ背景非表示](https://github.com/nuun888/MZ/blob/master/README/ContentsBackVisible.md) | [NUUN_ContentsBackVisible](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContentsBackVisible.js) | 共 | 1.1.1 |
+| [ボタンUI無効化](https://github.com/nuun888/MZ/blob/master/README/NotButtonUI.md) | [NUUN_NotButtonUI](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_NotButtonUI.js) | | 1.0.0 |
 | [再生率バトルログ表示](https://github.com/nuun888/MZ/blob/master/README/PlaybackRateBattleLog.md) | [NUUN_PlaybackRateBattleLog](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PlaybackRateBattleLog.js) |  | 1.0.0 |
 | [TPBタイムライン](https://github.com/nuun888/MZ/blob/master/README/TPBTimeLine.md) | [NUUN_TPBTimeLine](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TPBTimeLine.js) |  | 1.1.6 |
 |  |  |  |  |

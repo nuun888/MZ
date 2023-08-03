@@ -1,5 +1,5 @@
 # [バトラーTPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTPGauge.js)
-# Ver.1.2.2
+# Ver.1.2.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerTPGauge.js)
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
@@ -67,6 +67,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にTPゲージを表示します。  
 
 ## 更新履歴
+2023/8/3 Ver.1.2.3  
+一部のプラグインにてNoTPGaugeが機能していなかった問題を修正。  
 2023/7/7 Ver.1.2.3  
 一部プラグインで表示した敵キャラにゲージを表示されるとエラーが出る問題を修正。  
 2023/6/23 Ver.1.2.1  

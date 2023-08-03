@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @base NUUN_BattlerOverlayBase
- * @version 1.7.3
+ * @version 1.7.4
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -63,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/3 Ver.1.7.4
+ * 一部のプラグインにてNoHPGaugeが機能していなかった問題を修正。
  * 2023/6/23 Ver.1.7.3
  * NoHPGaugeが機能していなかった問題を修正。
  * 2023/6/2 Ver.1.7.2
@@ -445,7 +447,7 @@ Sprite_Enemy.prototype.noHpGaugePosition = function() {
 };
 
 Sprite_Actor.prototype.noHpGauge = function() {
-    return false;
+    return this._battler.isEnemy() ? this._battler.enemy().meta.NoHPGauge : false;
 };
 
 Sprite_Enemy.prototype.noHpGauge = function() {

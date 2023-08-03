@@ -12,7 +12,7 @@
  * @plugindesc  バトラーMPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.2.3
+ * @version 1.2.4
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -60,6 +60,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/3 Ver.1.2.4
+ * 一部のプラグインにてNoMPGaugeが機能していなかった問題を修正。
  * 2023/7/7 Ver.1.2.3
  * 一部プラグインで表示した敵キャラにゲージを表示されるとエラーが出る問題を修正。
  * 2023/6/23 Ver.1.2.2
@@ -398,7 +400,7 @@ Sprite_Actor.prototype.noMpGaugePosition = function() {
 };
 
 Sprite_Actor.prototype.noMpGauge = function() {
-    return false;
+    return this._battler.isEnemy() ? this._battler.enemy().meta.NoMPGauge : false;
 };
 
 Sprite_Enemy.prototype.noMpGauge = function() {

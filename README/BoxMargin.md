@@ -1,4 +1,4 @@
-# [ボタンUI無効化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BoxMargin.js)
+# [ウィンドウの余白なし](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BoxMargin.js)
 # Ver.1.0.0  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BoxMargin.js)  
 

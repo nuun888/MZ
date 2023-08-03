@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * You can set skills that can be activated randomly.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/3/2023 Ver.1.0.1
+ * Processing fixes.
  * 7/23/2023 Ver.1.0.0
  * First edition.
  * 
@@ -84,7 +86,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 発動するスキルがランダムに発動出来るスキルを設定できます。
@@ -97,6 +99,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/3 Ver.1.0.1
+ * 処理の修正。
  * 2023/7/23 Ver.1.0.0
  * 初版
  * 
@@ -192,7 +196,7 @@ Imported.NUUN_RandomSkill = true;
 
     Game_Battler.prototype.getRandomSkillCostItem = function(item) {
         const action = this.currentAction();
-        if (action.randomSkillId >= 0) {
+        if (action && action.randomSkillId >= 0) {
             const ramdomSkill = getRandomSkillData(action.randomSkillId);
             if (ramdomSkill) {
                 return ramdomSkill.RandomSkillCost ? item : $dataSkills[action.randomSkillId];

@@ -1,5 +1,5 @@
 # [バトラーHPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
-# Ver.1.7.3
+# Ver.1.7.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerHPGauge.js)
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)Ver.1.0.2以降  
@@ -60,6 +60,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にHPゲージを表示します。  
 
 ## 更新履歴
+2023/8/3 Ver.1.7.4  
+一部のプラグインにてNoHPGaugeが機能していなかった問題を修正。  
 2023/6/23 Ver.1.7.3  
 NoHPGaugeが機能していなかった問題を修正。  
 2023/6/2 Ver.1.7.2  

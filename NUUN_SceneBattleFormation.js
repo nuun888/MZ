@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.5
+ * @version 1.3.6
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/6 Ver.1.3.6
+ * アクターコマンドから選択できる条件を指定できる機能を追加。
  * 2023/7/24 Ver.1.3.5
  * 戦闘中の並び替えのコマンド名を指定できる機能を追加。
  * 処理の修正。
@@ -97,6 +99,14 @@
  * @desc 並び替え(戦闘時のコマンド)のコマンド名を設定します。無記入の場合はデータベースの名称が適用されます。
  * @type string
  * @default 
+ * @parent BasicSetting
+ * 
+ * @param CondFormationActor
+ * @text アクターコマンドの並び替え条件
+ * @desc アクターコマンドの並び替え画面を開ける条件を指定します。
+ * @type combo
+ * @option BattleManager.actor() === $gameParty.leader()://リーダーのみ
+ * @default
  * @parent BasicSetting
  * 
  * @param BattleMemberNameSetting
@@ -230,7 +240,6 @@
  * @min -9999
  * @parent StatusSetting
  * 
- * 
  */
 
 var Imported = Imported || {};
@@ -256,7 +265,7 @@ const WindowCenter = eval(parameters['WindowCenter'] || "true");
 const CommandIndex = Number(parameters['CommandIndex'] || 1);
 const CommandShowMode = eval(parameters['CommandShowMode']) || 'Party';
 const BattleFormationCommandName = String(parameters['BattleFormationCommandName'] || "");
-const ChangeLeaderMode = eval(parameters['ChangeLeaderMode'] || "true");
+const CondFormationActor = String(parameters['CondFormationActor']);
 
 function getBattleFormationCommandName() {
     return BattleFormationCommandName ? BattleFormationCommandName : TextManager.formation;
@@ -273,6 +282,11 @@ Window_Command.prototype.addFormationCommand = function() {
     this._list.splice(CommandIndex, 0, this._list.pop());
 };
 
+Window_Command.prototype.addFormationActorCommand = function() {
+    this.addCommand(getBattleFormationCommandName(), "formation", $gameParty.useFormationActor());
+    this._list.splice(CommandIndex, 0, this._list.pop());
+};
+
 const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeCommandList;
 Window_PartyCommand.prototype.makeCommandList = function() {
     _Window_PartyCommand_makeCommandList.call(this);
@@ -284,7 +298,7 @@ const _Window_ActorCommand_makeCommandList = Window_ActorCommand.prototype.makeC
 Window_ActorCommand.prototype.makeCommandList = function() {
     _Window_ActorCommand_makeCommandList.call(this);
     if (this._actor && CommandShowMode === "Actor") {
-        this.addFormationCommand();
+        this.addFormationActorCommand();
     }
 };
 
@@ -365,25 +379,9 @@ Scene_Battle.prototype.hideSubInputWindows = function() {
     this._formation._memberStatusWindow.hide();
 };
 
-const _Window_FormationBattleMember_isChangeActorEnabled = Window_FormationBattleMember.prototype.isChangeActorEnabled;
-Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor) {
-    return _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor);
-    //return $gameParty.inBattle() ? actor.isFormationChangeOk();
-};
 
-Window_StatusBase.prototype.isChangeActorLeader = function(actor, pendingActor) {
-    if (ChangeLeaderMode) {
-        const subject = BattleManager.actor();
-        if (subject === $gameParty.leader()) {
-            return true;
-        } else if (subject === actor || subject === pendingActor) {
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        return true;
-    }
+Game_Party.prototype.useFormationActor = function() {
+    return (CondFormationActor ? eval(CondFormationActor) : true) && this.useFormation();
 };
 
 })();

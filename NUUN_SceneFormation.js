@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.7.7
+ * @version 1.7.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -32,6 +32,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/6 Ver.1.7.8
+ * 処理の修正。
  * 2023/7/24 Ver.1.7.7
  * 処理の修正。
  * 2022/11/20 Ver.1.7.6
@@ -1455,6 +1457,7 @@ class Nuun_Formation {
   };
 
   open() {
+    BattleManager.formationCommandActor = BattleManager.actor();
     this._battleMemberNameWindow.open();
     this._memberNameWindow.open();
     this._battleMemberWindow.open();
@@ -1547,6 +1550,10 @@ Window_StatusBase.prototype.setActorFormationStatus = function(index) {
   }
 };
 
+Window_StatusBase.prototype.getFormationSelectActor = function() {
+    return $gameParty.leader();
+};
+
 //戦闘メンバー名称
 function Window_FormationBattleMemberName() {
     this.initialize(...arguments);
@@ -1608,6 +1615,7 @@ Window_FormationBattleMember.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._formationMode = true;
   this._oldActor = null;
+  this._leader = this.getFormationSelectActor();
   this.refresh();
 };
 
@@ -1645,9 +1653,11 @@ Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
     const actor = this.actor(this.index());
     const pendingActor = pendingMode === 'battle' ? this.actor(pendingIndex) : $gameParty.formationMember()[pendingIndex];
     if (pendingActor) {
-        return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor);
+        return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
     } else if (actor) {
-        return this.isChangeActorEnabled(actor);
+        return this.isChangeActorEnabled(actor) && this.isFormationChangeActorEnabled(actor, pendingActor);
+    } else if (pendingMode && !actor && !pendingActor) {
+        return false;
     } else {
         return true;
     }
@@ -1669,8 +1679,13 @@ Window_FormationBattleMember.prototype.isFormationMembersDead = function(actor, 
 };
 
 Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor) {
-  return actor.isFormationChangeOk();
+    return actor ? actor.isFormationChangeOk() : true;
 };
+
+Window_FormationBattleMember.prototype.isFormationChangeActorEnabled = function(actor, pendingActor) {
+    return true;
+};
+
 
 Window_FormationBattleMember.prototype.select = function(index) {
   Window_Selectable.prototype.select.call(this, index);
@@ -1872,6 +1887,7 @@ Window_FormationMember.prototype.initialize = function(rect) {
   Window_StatusBase.prototype.initialize.call(this, rect);
   this._formationMode = true;
   this._oldActor = null;
+  this._leader = this.getFormationSelectActor();
   this.refresh();
 };
 
@@ -1905,9 +1921,11 @@ Window_FormationMember.prototype.isCurrentItemEnabled = function() {
     const actor = this.actor(this.index());
     const pendingActor = pendingMode === 'battle' ? $gameParty.formationBattleMember()[pendingIndex] : this.actor(pendingIndex);
     if (pendingActor) {
-        return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor);
+        return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
     } else if (actor) {
-        return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor);
+        return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor) && this.isFormationChangeActorEnabled(actor, pendingActor);
+    } else if (pendingMode && !actor && !pendingActor) {
+        return false;
     } else {
         return true;
     }
@@ -1928,7 +1946,11 @@ Window_FormationMember.prototype.isFormationMembersDead = function(actor, pendin
 };
 
 Window_FormationMember.prototype.isChangeActorEnabled = function(actor) {
-  return actor.isFormationChangeOk();
+  return actor ? actor.isFormationChangeOk() : true;
+};
+
+Window_FormationMember.prototype.isFormationChangeActorEnabled = function(actor, pendingActor) {
+    return true;
 };
 
 Window_FormationMember.prototype.select = function(index) {

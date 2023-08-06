@@ -1,5 +1,5 @@
 # [メンバー変更画面(戦闘)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
-# Ver.1.3.5
+# Ver.1.3.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -10,7 +10,11 @@
 
 ![画像](img/SceneFormation2.png)  
 
+※アクターコマンドの並び替え条件は選択不可時のときは現在、暫定的に不透明に表示する仕様にしてあります。  
+
 ## 更新履歴
+2023/8/6 Ver.1.3.6  
+アクターコマンドから選択できる条件を指定できる機能を追加。  
 2023/7/24 Ver.1.3.5  
 戦闘中の並び替えのコマンド名を指定できる機能を追加。  
 処理の修正。  

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @version 2.1.0
+ * @version 2.1.1
  * 
  * @help
  * Change and extend the menu screen display.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/8/2023 Ver.2.1.1
+ * Added a function that does not make the sub member's actor image (face graphic) opaque.
  * 7/20/2023 Ver.2.1.0
  * Added a function that can be specified by occupation ID instead of actor ID in actor image setting.
  * 5/14/2023 Ver.2.0.6
@@ -380,6 +382,13 @@
  * @param WindowVisible
  * @text Menu status window display
  * @desc Show window.
+ * @type boolean
+ * @default true
+ * @parent StatusSetting
+ * 
+ * @param SubMemberOpacity
+ * @text Sub member opaque display
+ * @desc Displays sub members as opaque.
  * @type boolean
  * @default true
  * @parent StatusSetting
@@ -1355,7 +1364,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.1.0
+ * @version 2.1.1
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1426,6 +1435,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/8 Ver.2.1.1
+ * 控えメンバーのアクター画像(顔グラ)を不透明にしない機能を追加。
  * 2023/7/20 Ver.2.1.0
  * アクター画像設定にアクターIDではなく職業IDで指定できる機能を追加。
  * 2023/5/14 Ver.2.0.6
@@ -1722,6 +1733,13 @@
  * @param WindowVisible
  * @text ウィンドウ表示
  * @desc ウィンドウを表示する。
+ * @type boolean
+ * @default true
+ * @parent StatusSetting
+ * 
+ * @param SubMemberOpacity
+ * @text 控えメンバー不透明表示
+ * @desc 控えメンバーを不透明で表示します。
  * @type boolean
  * @default true
  * @parent StatusSetting
@@ -2733,6 +2751,7 @@ Imported.NUUN_MenuScreen_2 = true;
     params.MenuStatusHeight = Number(parameters['MenuStatusHeight'] || 0);
     params.CommandWindowVisible = eval(parameters['CommandWindowVisible'] || "true");
     params.WindowVisible = eval(parameters['WindowVisible'] || "true");
+    params.SubMemberOpacity = eval(parameters['SubMemberOpacity'] || "true");
     params.StatusList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusList'])) : null) || [];
 
     params.GraphicMode = eval(parameters['GraphicMode']) || 'face';

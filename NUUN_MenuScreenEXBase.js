@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.1.0
+ * @version 2.1.1
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/8/2023 Ver.2.1.1
+ * Added a function that does not make the sub member's actor image (face graphic) opaque.
  * 7/20/2023 Ver.2.1.0
  * Added a function that can be specified by occupation ID instead of actor ID in actor image setting.
  * Fixed an issue where the actor status line was not working.
@@ -482,6 +484,10 @@ Imported.NUUN_MenuScreenEXBase = true;
         return swidth > 0 ? swidth : Math.floor(width / 3);
     };
 
+    Window_MenuStatus.prototype.isSubMemberOpacity = function(actor) {
+        return params.SubMemberOpacity ? actor.isBattleMember() : true;
+    };
+
     Window_MenuStatus.prototype.drawItemBackground = function(index) {
         const actor = this.actor(index);
         const data = this.nuunMenu_getActorData(actor);
@@ -549,7 +555,7 @@ Imported.NUUN_MenuScreenEXBase = true;
     };
 
     Window_MenuStatus.prototype.drawActorGraphic = function(data, bitmap, x, y, width, height, actor) {
-        this.changePaintOpacity(actor.isBattleMember());
+        this.changePaintOpacity(this.isSubMemberOpacity(actor));
         if (data.GraphicMode === 'face') {
             this.nuunMenu_contentsDrawActorFace(actor, data, x, y, width, height);
         } else {

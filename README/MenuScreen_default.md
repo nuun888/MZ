@@ -1,14 +1,14 @@
 # メニュー画面
 
 ## メニュー画面ベース
-### Ver.2.1.0  
+### Ver.2.1.1  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)  
 ## 設定用プラグイン
-メニュー画面デフォルトタイプVer.2.1.0    
+メニュー画面デフォルトタイプVer.2.1.1    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
-メニュー画面タイプ１Ver.2.1.0    
+メニュー画面タイプ１Ver.2.1.1    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
-メニュー画面タイプ２Ver.2.1.0    
+メニュー画面タイプ２Ver.2.1.1    
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
 
 #### 必須、前提プラグイン
@@ -122,6 +122,8 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
 
 ## 更新履歴
+2023/8/8 Ver.2.1.1  
+控えメンバーのアクター画像(顔グラ)を不透明にしない機能を追加。  
 2023/7/20 Ver.2.1.0  
 アクター画像設定にアクターIDではなく職業IDで指定できる機能を追加。  
 アクターステータスのラインが機能していなかった問題を修正。  

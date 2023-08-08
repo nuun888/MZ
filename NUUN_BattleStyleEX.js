@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.2
+ * @version 3.12.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/8/8 Ver.3.12.3
+ * メンバー入れ替え時にカーソルの位置がずれて表示される問題を修正。
  * 2023/7/30 Ver.3.12.2
  * 味方の画像切り替えでランダムに表示できる機能を追加。
  * 2023/7/21 Ver.3.12.1
@@ -1198,7 +1200,7 @@ Scene_Battle.prototype.createPartyCommandWindow = function() {
 };
 
 const _Scene_Battle_createActorCommandWindow = Scene_Battle.prototype.createActorCommandWindow;
-  Scene_Battle.prototype.createActorCommandWindow = function() { 
+    Scene_Battle.prototype.createActorCommandWindow = function() { 
     _Scene_Battle_createActorCommandWindow.call(this);
     this._actorCommandWindow.homeY = this.getActorCommandY();
     this._actorCommandWindow.SvActorData = (params.ActorCommandPosition === 'svtop' || params.ActorCommandPosition === 'svleft' || params.ActorCommandPosition === 'svright') ? this._spriteset._actorSprites : null;
@@ -1464,8 +1466,14 @@ Scene_Battle.prototype.updateStatusWindowPosition = function() {
 
 const _Scene_Battle_update  = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
-    _Scene_Battle_update.call(this);//サポートアクターは暫定処置
-    const actor = this._actorCommandWindow.actor();
+    _Scene_Battle_update.call(this);
+    this.updateBSCommandRefresh();
+    this.updateBSBuckground();
+    this.actorStatusWindowOpacity();  
+};
+
+Scene_Battle.prototype.updateBSCommandRefresh = function() {
+    const actor = this._actorCommandWindow.actor();//サポートアクターは暫定処置
     if (this._statusWindow.isCommandRefresh() && !$gameTemp.isBattleRefreshRequested() && actor) {
         this._statusWindow.commandRefresh(false);
         if (Imported.NUUN_SupportActor) {
@@ -1473,14 +1481,19 @@ Scene_Battle.prototype.update = function() {
         }
         const index = $gameParty.battleMembers().indexOf(actor);
         if (index >= 0) {
-        if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
-            this._statusWindow.select(index);
-        }
+            if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
+                this._statusWindow.select(index);
+            } else {
+                this._statusWindow.select(index);
+            }
         } else {
-        this.commandCancel();
+            this.commandCancel();
         }
         this._actorCommandWindow.refresh();
     }
+};
+
+Scene_Battle.prototype.updateBSBuckground = function() {
     if (params.ActorCommandBackgroundImg) {
         this._actorCommandBackgroundWindow.x = params.ActorBackground_X + this._actorCommandWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
         this._actorCommandBackgroundWindow.y = params.ActorBackground_Y + this._actorCommandWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
@@ -1494,7 +1507,6 @@ Scene_Battle.prototype.update = function() {
     this._skillWindow.bsUpdateBackground();
     this._helpWindow.bsUpdateBackground();
     this.bsMessageBackground();
-    this.actorStatusWindowOpacity();  
 };
 
 Scene_Battle.prototype.bsMessageBackground = function() {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.6
+ * @version 1.3.7
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/8 Ver.1.3.7
+ * メンバー入れ替え時にカーソルの位置がずれて表示される問題を修正。
  * 2023/8/6 Ver.1.3.6
  * アクターコマンドから選択できる条件を指定できる機能を追加。
  * 2023/7/24 Ver.1.3.5
@@ -350,6 +352,8 @@ Scene_Battle.prototype.update = function() {
         const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
         if (index >= 0) {
             if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
+                this._statusWindow.select(index);
+            } else {
                 this._statusWindow.select(index);
             }
         } else {

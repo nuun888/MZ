@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.12.2
+### Ver.3.12.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.11.2  
@@ -209,6 +209,8 @@ LL_StandingPictureBattle等と併用する場合は、'Scene_Battle'に設定す
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/8/8 Ver.3.12.3  
+メンバー入れ替え時にカーソルの位置がずれて表示される問題を修正。  
 2023/7/30 Ver.3.12.2  
 味方の画像切り替えでランダムに表示できる機能を追加。  
 2023/7/21 Ver.3.12.1  

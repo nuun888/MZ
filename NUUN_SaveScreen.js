@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.2.1
+ * @version 2.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/8/21 Ver.2.2.2
+ * Fixed the problem that 0 is not displayed in the original parameter.
  * 2023/7/15 Ver.2.2.1
  * Added a function that can display facial graphics, SV actors, and actor names of actors that match specific conditions.
  * 2023/7/8 Ver.2.2.0
@@ -659,7 +661,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.2.0
+ * @version 2.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -710,6 +712,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/21 Ver.2.2.2
+ * オリジナルパラメータで0が表示されない問題を修正。
  * 2023/7/15 Ver.2.2.1
  * 特定の条件のみ一致したアクターの顔グラ、SVアクター、アクター名を表示できる機能を追加。
  * 2023/7/8 Ver.2.2.0
@@ -1900,7 +1904,7 @@ Imported.NUUN_SaveScreen = true;
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     this.drawSystemText(x, y , systemWidth, data);
     const text = info["orgParam_"+ String(index)];
-    if (text) {
+    if (text !== undefined) {
       this.drawText(text, x + systemWidth + padding, y, width - (systemWidth + padding), data.Align);
     }
   };

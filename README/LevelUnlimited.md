@@ -1,5 +1,5 @@
 # [レベル上限限界突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js)
-# Ver.1.2.2  
+# Ver.1.2.3  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LevelUnlimited.js)
 
 アクターのレベルの最大値を100以上にすることができます。  
@@ -22,6 +22,8 @@
 上記のタグを記入した場合、データベース上で設定している習得するスキルのレベルは無視されます。  
 
 ## 更新履歴
+2023/8/22 Ver.1.2.3  
+レベル100以上の時にステータスが小数点で取得されてしまう問題を修正。  
 2023/5/18 Ver.1.2.2  
 最大レベル変動プラグインに影響しないように修正。  
 2022/11/12 Ver.1.2.1  

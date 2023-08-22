@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Actor Level Unlimited
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * You can set the maximum level to 100 or more.
@@ -34,6 +34,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/22/2023 Ver.1.2.3
+ * Fixed an issue where stats were acquired as a decimal point when level 100 or higher.
  * 5/18/2023 Ver.1.2.2
  * Fixed not to affect "NUUN_ChangeMaxLevel".
  * 11/12/2022 Ver.1.2.1
@@ -53,14 +55,14 @@
  * @target MZ
  * @plugindesc レベル上限限界突破プラグイン
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * 最大レベルを１００以上に設定できます。
  * 
  * アクターのメモ欄
  * <MaxLevel:[level]>  最大レベルを変更します。
- * <StartLevel:[level]>　パーティ加入時の初期レベルを設定します。
+ * <StartLevel:[level]> パーティ加入時の初期レベルを設定します。
  * <TestMaxLevel:[level]> テスト戦闘でのレベルを設定します。
  * 
  * 例
@@ -77,6 +79,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/22 Ver.1.2.3
+ * レベル100以上の時にステータスが小数点で取得されてしまう問題を修正。
  * 2023/5/18 Ver.1.2.2
  * 最大レベル変動プラグインに影響しないように修正。
  * 2022/11/12 Ver.1.2.1
@@ -114,11 +118,11 @@ Game_Actor.prototype.setup = function(actorId) {
 };
 
 const _Game_Actor_paramBase = Game_Actor.prototype.paramBase;
-Game_Actor.prototype.paramBase = function(paramId) {
+Game_Actor.prototype.paramBase = function(paramId) {console.log(this.currentClass().params[3])
   if (this._level >= 100) {
     const u_levelParam = this.currentClass().params[paramId][99];
     const d_levelParam = this.currentClass().params[paramId][94];
-    return this.overLevelParam(u_levelParam, d_levelParam);
+    return Math.round(this.overLevelParam(u_levelParam, d_levelParam));
   } else {
     return _Game_Actor_paramBase.call(this, paramId);
   }

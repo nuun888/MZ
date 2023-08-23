@@ -118,7 +118,7 @@ Game_Actor.prototype.setup = function(actorId) {
 };
 
 const _Game_Actor_paramBase = Game_Actor.prototype.paramBase;
-Game_Actor.prototype.paramBase = function(paramId) {console.log(this.currentClass().params[3])
+Game_Actor.prototype.paramBase = function(paramId) {
   if (this._level >= 100) {
     const u_levelParam = this.currentClass().params[paramId][99];
     const d_levelParam = this.currentClass().params[paramId][94];

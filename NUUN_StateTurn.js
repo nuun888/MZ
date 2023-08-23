@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * Show remaining turns on the state icon.
@@ -31,6 +31,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/23/2023 Ver.1.1.4
+ * Fixed an issue where an error would occur when fighting an enemy group with monsters appearing in the middle.
  * 3/30/2022 Ver.1.1.3
  * Fixed an issue where the number of turns was not displayed correctly when the auto release timing was at the end of the turn.
  * 1/3/2023 Ver.1.1.2
@@ -119,7 +121,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * ステートアイコンに残りターンを表示します。
@@ -131,13 +133,15 @@
  * 
  * ターンの文字色
  * ステートのメモ欄  
- * <BatState>　このタグがあるステートは不利なステートになります。よって不利ステート、デバフターンの色が適用されます。  
+ * <BatState> このタグがあるステートは不利なステートになります。よって不利ステート、デバフターンの色が適用されます。  
  * 上記タグがないステートは有利ステート、バフターンの色が適用されます。  
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/23 Ver.1.1.4
+ * 途中から出現するモンスターがいる敵グループと戦闘を行うとエラーが出る問題を修正。
  * 2022/3/30 Ver.1.1.3
  * 自動解除のタイミングがターン終了時の時にターン数が正常に表示されていなかった問題を修正。
  * 2023/1/3 Ver.1.1.2
@@ -255,6 +259,7 @@ Imported.NUUN_StateTurn = true;
   Sprite_StateIcon.prototype.updateIcon = function() {
     _Sprite_StateIcon_updateIcon.call(this);
     const icons = [];
+    let turns = [];
     if (this.shouldDisplay()) {
       icons.push(...this._battler.allIcons());
       if (this._battler.isActor() && ActorStateIconVisible) {

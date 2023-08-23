@@ -2,6 +2,10 @@
 # Ver.1.1.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
 
+#### 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+
+
 ステートアイコンに残りターンを表示します。  
 
 ![画像](img/StateTurn1.png)   

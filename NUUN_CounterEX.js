@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.2.0
  * 
  * @help
  * Extend the counter.
@@ -62,6 +62,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/23/2023 Ver.1.2.0
+ * Added ability to counterattack against specific skills and items.
  * 7/17/2023 Ver.1.1.4
  * Fixed not doing corpse shooting.
  * 7/9/2023 Ver.1.1.3
@@ -107,9 +109,23 @@
  * @value 'Magical'
  * @option Sure hit
  * @value 'Certain'
- * @option Use item
+ * @option Use skill(1)
+ * @value 'Skill'
+ * @option Use item(2)
  * @value 'Item'
  * @default ["'Physical'"]
+ * 
+ * @param CounterTriggerSkills
+ * @desc Set the counter trigger skill. (Multiple settings possible)
+ * @text Counter Trigger Skill (1)
+ * @type skill[]
+ * @default []
+ * 
+ * @param CounterTriggerItems
+ * @desc Set the trigger item for the counter. (Multiple settings possible)
+ * @text Counter Trigger Item (2)
+ * @type item[]
+ * @default []
  * 
  * @param CounterSkills
  * @desc Set a skill that performs a counter. (Multiple settings possible)
@@ -311,7 +327,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.2.0
  * 
  * @help
  * カウンターを拡張します。
@@ -362,6 +378,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/23 Ver.1.2.0
+ * 特定のスキル、アイテムに反撃する機能を追加。
  * 2023/7/17 Ver.1.1.4
  * 死体打ちを行わないように修正。
  * 2023/7/9 Ver.1.1.3
@@ -407,9 +425,23 @@
  * @value 'Magical'
  * @option 必中
  * @value 'Certain'
- * @option アイテム使用
+ * @option スキル使用(1)
+ * @value 'Skill'
+ * @option アイテム使用(2)
  * @value 'Item'
  * @default ["'Physical'"]
+ * 
+ * @param CounterTriggerSkills
+ * @desc カウンターのトリガースキルを設定します。(複数設定可能)
+ * @text カウンタートリガースキル(1)
+ * @type skill[]
+ * @default []
+ * 
+ * @param CounterTriggerItems
+ * @desc カウンターのトリガーアイテムを設定します。(複数設定可能)
+ * @text カウンタートリガーアイテム(2)
+ * @type item[]
+ * @default []
  * 
  * @param CounterSkills
  * @desc カウンターを行うスキルを設定します。(複数設定可能)
@@ -1004,8 +1036,13 @@ Imported.NUUN_CounterEX = true;
             if (this.isCounterAction(target, trait, subject, counter)) {
                 this._counterBattlerList.push(target);
                 return;
+            };//CounterTriggerSkills
+        } else if (trigger === 'Skill' && isTriggerSkill(counter, this._action) && Math.random() < this._action.itemUseSkillEx(target, counter)) {
+            if (this.isCounterAction(target, trait, subject, counter)) {
+                this._counterBattlerList.push(target);
+                return;
             };
-        } else if (trigger === 'Item' && Math.random() < this._action.itemUseItemEx(target, counter)) {
+        } else if (trigger === 'Item' && isTriggerItem(this._action) && Math.random() < this._action.itemUseItemEx(target, counter)) {
             if (this.isCounterAction(target, trait, subject, counter)) {
                 this._counterBattlerList.push(target);
                 return;
@@ -1127,7 +1164,7 @@ Imported.NUUN_CounterEX = true;
 
     Game_Action.prototype.itemMrfEx = function(target, counterData) {
         if (this.isMagical() && isNotRestriction(target, counterData)) {
-            return counterData.CounterRate > 0 ? counterData.CounterRate / 100 : target.mrf;
+            return counterData.CounterRate > 0 ? counterData.CounterRate / 100 : target.cnt;
         } else {
             return 0;
         }
@@ -1135,6 +1172,14 @@ Imported.NUUN_CounterEX = true;
 
     Game_Action.prototype.itemCertainEx = function(target, counterData) {
         if (this.isCertainHit() && isNotRestriction(target, counterData)) {
+            return counterData.CounterRate > 0 ? counterData.CounterRate / 100 : target.cnt;
+        } else {
+            return 0;
+        }
+    };
+
+    Game_Action.prototype.itemUseSkillEx = function(target, counterData) {
+        if (this.isSkill() && isNotRestriction(target, counterData)) {
             return counterData.CounterRate > 0 ? counterData.CounterRate / 100 : target.cnt;
         } else {
             return 0;
@@ -1251,6 +1296,30 @@ Imported.NUUN_CounterEX = true;
 
     function isNotRestriction(target, counterData) {
         return counterData.NotRestriction ? true : target.canMove();
+    };
+
+    function isTriggerSkill(counter, action) {
+        if (action.isSkill()) {
+            if (counter.CounterTriggerSkills && counter.CounterTriggerSkills.length > 0) {
+                return counter.CounterTriggerSkills.some(skill => skill === action.item().id);
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+    };
+
+    function isTriggerItem(counter, action) {
+        if (action.isItem()) {
+            if (counter.CounterTriggerItems && counter.CounterTriggerItems.length > 0) {
+                return counter.CounterTriggerItems.some(item => item.id === action.item().id);
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     };
 
 

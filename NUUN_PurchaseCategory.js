@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * Display the item category on the purchase screen of the shop.
@@ -30,7 +30,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 12/10/2022 Ver.1.1/0
+ * 8/23/2023 Ver.1.1.1
+ * Fixed an issue that resulted in an error when opening the shop.
+ * 12/10/2022 Ver.1.1.0
  * Added a switch that allows you to set whether to display or hide the category display.
  * 12/7/2022 Ver.1.0.2
  * Added a switch to show/hide categories.
@@ -109,7 +111,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * ショップの購入画面にアイテムカテゴリーを表示します。
@@ -128,6 +130,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/23 Ver.1.1.1
+ * ショップを開くとエラーが出る問題を修正。
  * 2022/12/10 Ver.1.1.0
  * カテゴリー表示の表示、非表示を設定出来るスイッチを追加。
  * 2022/12/7 Ver.1.0.2
@@ -355,7 +359,7 @@ Imported.NUUN_PurchaseCategory = true;
                         this.addCommand(TextManager.armor, command.Categorykey);
                     } else if(ShowKeyItem && this.needsCommand(command.Categorykey) && command.Categorykey === 'keyItem') {
                         this.addCommand(TextManager.keyItem, command.Categorykey);
-                    } else if (this.needsCommand(ncommand.Categorykey) && command.Categorykey === 'allItems') {
+                    } else if (this.needsCommand(command.Categorykey) && command.Categorykey === 'allItems') {
                         this.addCommand(command.CategoryName, command.Categorykey);
                     } else if(this.needsCommand(names.Categorykey) && command.CategoryName) { 
                         this.addCommand(command.CategoryName, command.Categorykey);

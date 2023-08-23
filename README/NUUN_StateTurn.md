@@ -1,5 +1,5 @@
 # [ステート、バフ残りターン表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
-# Ver.1.1.3
+# Ver.1.1.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
 
 ステートアイコンに残りターンを表示します。  
@@ -21,6 +21,8 @@
 MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
+2023/8/23 Ver.1.1.4  
+途中から出現するモンスターがいる敵グループと戦闘を行うとエラーが出る問題を修正。  
 2022/3/30 Ver.1.1.3  
 自動解除のタイミングがターン終了時の時にターン数が正常に表示されていなかった問題を修正。  
 2023/1/3 Ver.1.1.2  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Damage type TP added
  * @author NUUN
- * @version 1.0.3
+ * @version 1.1.0
  * 
  * @help
  * Adds TP to damage types.
@@ -19,6 +19,9 @@
  * <DamageTypeTPR> This skill and item are damage type "TP recovery".
  * <DamageTypeTPA> This skill and item will be damage type "TP Absorption".
  * 
+ * <UseEffectTP:[value]> Increases or decreases TP. Negative values are also allowed.
+ * [value]:Increase/decrease value
+ * 
  * Set the damage type to something other than None.
  * If there is the above tag, the damage type will be the corresponding type. (Settings on the database are not applied)
  * 
@@ -26,6 +29,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/24/2023 Ver.1.1.0
+ * Added a function that can increase or decrease TP with the effect of use.
  * 11/26/2022 Ver.1.0.3
  * Minor fix.
  * 11/24/2022 Ver.1.0.2
@@ -41,7 +46,7 @@
  * @target MZ
  * @plugindesc ダメージタイプTP追加
  * @author NUUN
- * @version 1.0.3
+ * @version 1.1.0
  * 
  * @help
  * ダメージタイプにTPを追加します。
@@ -50,6 +55,9 @@
  * <DamageTypeTPR> このスキル、アイテムはダメージタイプ「TP回復」となります。
  * <DamageTypeTPA> このスキル、アイテムはダメージタイプ「TP吸収」となります。
  * 
+ * <UseEffectTP:[value]> TPを増減させます。マイナスの値も設定できます。
+ * [value]:増減値
+ * 
  * ダメージタイプはなし以外に設定してください。
  * 上記のタグがある場合ダメージタイプは該当のタイプになります。（データベース上の設定は適用されません）
  * 
@@ -57,6 +65,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/24 Ver.1.1.0
+ * 使用効果でTPを増減できる機能を追加。
  * 2022/11/26 Ver.1.0.3
  * 微修正。
  * 2022/11/24 Ver.1.0.2
@@ -146,4 +156,19 @@ Game_Action.prototype.damageTypeEX = function(item, type) {
         return type;
     }
 };
+
+const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
+Game_Action.prototype.applyItemUserEffect = function(target) {
+    this.itemEffectGainTpEx(target, this.item())
+    _Game_Action_applyItemUserEffect.call(this, target);
+};
+
+Game_Action.prototype.itemEffectGainTpEx = function(target, item) {
+    const value = item.meta.UseEffectTP ? Math.floor(Number(item.meta.UseEffectTP)) : 0;
+    if (value !== 0) {
+        target.gainTp(value);
+        this.makeSuccess(target);
+    }
+};
+
 })();

@@ -10,12 +10,17 @@
  * @target MZ
  * @plugindesc 再生率バトルログ表示
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.3
+ * @orderAfter BattleLogToMessage
  * 
  * @help
  * HP、MP、TP再生率でダメージ、回復した再生量をバトルログに表示させます。
  * 
  * 更新履歴
+ * 2023/8/25 Ver.1.0.3
+ * バトルログのメッセージ表示プラグインとの併用で再生ログが表示されない問題を修正。
+ * 2023/6/22 Ver.1.0.2
+ * バトルログが消去されなかった問題を修正。
  * 2023/6/22 Ver.1.0.1
  * 回復時のテキストで-が表示されてしまう問題を修正。
  * 2022/1/21 Ver.1.0.0
@@ -81,33 +86,57 @@ Window_BattleLog.prototype.displayPlaybackRate = function(subject) {
     if (subject.shouldPopupDamage()) {
         const result = subject.result();
         let text = null;
+        BattleManager.playbackRateLogOpen = false;
         if (result.hpDamage < 0) {
             text = PlaybackRateHPRecoveryText.format(subject.name(), -result.hpDamage);
             this.push("addText", text);
+            BattleManager.playbackRateLogOpen = true;
         } else if (result.hpDamage > 0) {
             text = PlaybackRateHPDamageText.format(subject.name(), result.hpDamage);
             this.push("addText", text);
+            BattleManager.playbackRateLogOpen = true;
         }
         if (result.mpDamage < 0) {
             text = PlaybackRateMPRecoveryText.format(subject.name(), -result.mpDamage);
             this.push("addText", text);
+            BattleManager.playbackRateLogOpen = true;
         } else if (result.mpDamage > 0) {
             text = PlaybackRateMPDamageText.format(subject.name(), result.mpDamage);
             this.push("addText", text);
+            BattleManager.playbackRateLogOpen = true;
         }
         if (result.tpDamage < 0) {
             text = PlaybackRateTPRecoveryText.format(subject.name(), -result.tpDamage);
             this.push("addText", text);
+            BattleManager.playbackRateLogOpen = true;
         } else if (result.tpDamage > 0) {
             text = PlaybackRateTPDamageText.format(subject.name(), result.tpDamage);
             this.push("addText", text);
+            BattleManager.playbackRateLogOpen = true;
         }
-        this.push("performPlaybackRate", subject);
+        //this.push("performPlaybackRate", subject);
+        this.push("wait");
+        this.push("clear");
     }
 };
 
 Window_BattleLog.prototype.performPlaybackRate = function(subject) {
     
 };
+
+//BattleLogToMessage競合対策
+if (BattleManager.isStarting) {
+    const _BattleManager_isStarting = BattleManager.isStarting;
+    BattleManager.isStarting = function() {
+        return _BattleManager_isStarting.call(this) && !BattleManager.playbackRateLogOpen;
+    };
+
+    const _BattleManager_setBattleLogClose = BattleManager.setBattleLogClose;
+    BattleManager.setBattleLogClose = function(value) {
+        _BattleManager_setBattleLogClose.call(this, value);
+        BattleManager.playbackRateLogOpen = false;
+    };
+}
+
 
 })();

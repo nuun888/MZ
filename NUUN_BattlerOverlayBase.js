@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトラーオーバーレイベース
  * @author NUUN
- * @version 1.0.4
+ * @version 1.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/24 Ver.1.0.5
+ * 一部のプラグインと併用するとエラーが出る問題を修正。
  * 2023/7/15 Ver.1.0.4
  * バトラー画像と同期させるときの座標のモードを指定できる機能を追加。
  * 2023/6/2 Ver.1.0.3
@@ -217,7 +219,7 @@ Sprite_Actor.prototype.getBattlerOverlayHeight = function() {
 };
 
 Sprite_Actor.prototype.getSVBattlerHeight = function() {
-    return this._mainSprite ? Math.floor((this._mainSprite.bitmap.height / 6) * 0.9) : 0;
+    return this._mainSprite && this._mainSprite.bitmap ? Math.floor((this._mainSprite.bitmap.height / 6) * 0.9) : 0;
 };
 
 })();

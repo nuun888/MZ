@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.1
+ * @version 1.6.2
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/2 Ver.1.6.2
+ * 条件を満たしていなくても画像が切り替わってしまう問題を修正。
  * 2023/7/30 Ver.1.6.1
  * 味方の画像切り替えでランダムに表示できる機能を追加。
  * 2023/7/20 Ver.1.6.0
@@ -407,16 +409,16 @@ Game_Actor.prototype.matchConditions = function(data) {
   if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this.hp, this.param(0))) {
     return false;
   }
-  if (data.ImgSwitch > 0 && !this.isCondSwitchImg(data)) {
+  if (data.ImgSwitch && !this.isCondSwitchImg(data)) {
     return false;
   }
-  if (data.ImgWeapon > 0 && !this.isCondWeaponImg(data)) {
+  if (data.ImgWeapon && !this.isCondWeaponImg(data)) {
     return false;
   }
-  if (data.ImgArmor > 0 && !this.isCondArmorImg(data)) {
+  if (data.ImgArmor && !this.isCondArmorImg(data)) {
     return false;
   }
-  if (data.ImgStateAll > 0 && !this.isCondStateImg(data, data.ImgStateAll)) {
+  if (data.ImgStateAll && !this.isCondStateImg(data, data.ImgStateAll)) {
     return false;
   }
   if (data.ImgClass > 0 && !this.isCondClassImg(data)) {

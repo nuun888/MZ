@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.3
+ * @version 3.12.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/9/2 Ver.3.12.4
+ * メンバー入れ替え時のアクター画像を一旦消去するように修正。
  * 2023/8/8 Ver.3.12.3
  * メンバー入れ替え時にカーソルの位置がずれて表示される問題を修正。
  * 2023/7/30 Ver.3.12.2
@@ -2513,6 +2515,13 @@ Window_BattleActorImges.prototype.drawActorImges = function(actor, data, x, y, w
   }
 };
 
+Window_BattleActorImges.prototype.removeActorSprite = function() {
+    this._additionalSprites = Object.values(this._additionalSprites).filter(sprite => {
+        this._actorImgBaseSprite.removeChild(sprite);
+        return false;
+    });
+};
+
 Window_BattleActorImges.prototype.drawStatusBack = function(index) {
   if (this._bitmapsReady >= $gameParty.members().length) {
     const actor = this.actor(index);
@@ -2540,19 +2549,20 @@ Window_BattleActorImges.prototype.drawItemBackground = function(index) {
 };
 
 Window_BattleActorImges.prototype.preparePartyRefresh = function() {
-  this._bitmapsReady = 0;
-  this.actorMainSprite = [];
-  let bitmap = null;
-  for (const actor of $gameParty.members()) {
-    actor.battleStyleImgRefresh();
-    bitmap = actor.getLoadBattleStyleImg();
-    this.actorMainSprite.push(bitmap);
-    if(bitmap && !bitmap.isReady()){
-      bitmap.addLoadListener(this.performPartyRefresh.bind(this, bitmap));
-    } else {
-      this.performPartyRefresh(bitmap);
+    this.removeActorSprite();
+    this._bitmapsReady = 0;
+    this.actorMainSprite = [];
+    let bitmap = null;
+    for (const actor of $gameParty.members()) {
+        actor.battleStyleImgRefresh();
+        bitmap = actor.getLoadBattleStyleImg();
+        this.actorMainSprite.push(bitmap);
+        if(bitmap && !bitmap.isReady()){
+        bitmap.addLoadListener(this.performPartyRefresh.bind(this, bitmap));
+        } else {
+        this.performPartyRefresh(bitmap);
+        }
     }
-  }
 };
 
 Window_BattleActorImges.prototype.performPartyRefresh = function() {
@@ -3062,10 +3072,14 @@ Sprite_Enemy.prototype.startBossCollapse = function() {
 
 const _Sprite_Animation_setup = Sprite_Animation.prototype.setup;
 Sprite_Animation.prototype.setup = function(targets, animation, mirror, delay, previous) {
+    this.setupFrontTargets(targets);
+    _Sprite_Animation_setup.call(this, targets, animation, mirror, delay, previous);
+};
+
+Sprite_Animation.prototype.setupFrontTargets = function(targets) {
     if (!$gameSystem.isSideView() && params.ActorEffectShow) {
         this._frontTargets = targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
     }
-    _Sprite_Animation_setup.call(this, targets, animation, mirror, delay, previous);
 };
 
 const _Sprite_Animation_updateFlash = Sprite_Animation.prototype.updateFlash;
@@ -3075,6 +3089,7 @@ Sprite_Animation.prototype.updateFlash = function() {
         this._targets =  this._frontTargets;
         _Sprite_Animation_updateFlash.call(this);
         this._targets = t;
+        //target.hide();
     } else {
         _Sprite_Animation_updateFlash.call(this);
     }
@@ -3082,15 +3097,19 @@ Sprite_Animation.prototype.updateFlash = function() {
 
 const _Sprite_AnimationMV_setup = Sprite_AnimationMV.prototype.setup;
 Sprite_AnimationMV.prototype.setup = function(targets, animation, mirror, delay) {
+    this.setupFrontTargets(targets);
+    _Sprite_AnimationMV_setup.call(this, targets, animation, mirror, delay);
+};
+
+Sprite_AnimationMV.prototype.setupFrontTargets = function(targets) {
     if (!$gameSystem.isSideView() && params.ActorEffectShow) {
         this._frontTargets = targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
     }
-    _Sprite_AnimationMV_setup.call(this, targets, animation, mirror, delay);
 };
 
 const _Sprite_AnimationMV_updateFlash = Sprite_AnimationMV.prototype.updateFlash;
 Sprite_AnimationMV.prototype.updateFlash = function() {
-    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow ) {
         const t = this._targets;
         this._targets =  this._frontTargets;
         _Sprite_AnimationMV_updateFlash.call(this);
@@ -3123,6 +3142,7 @@ Sprite_AnimationMV.prototype.onEnd = function() {
         _Sprite_AnimationMV_onEnd.call(this);
     }
 };
+
 
 //Sprite_ActorImges
 function Sprite_ActorImges() {

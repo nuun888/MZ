@@ -1,5 +1,5 @@
 # [立ち絵、顔グラ表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
-# Ver.1.6.1
+# Ver.1.6.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -49,6 +49,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2023/9/2 Ver.1.6.2  
+条件を満たしていなくても画像が切り替わってしまう問題を修正。  
 2023/7/30 Ver.1.6.1  
 味方の画像切り替えでランダムに表示できる機能を追加。  
 2023/7/20 Ver.1.6.0  

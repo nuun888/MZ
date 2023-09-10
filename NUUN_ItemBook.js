@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -114,6 +114,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2023/9/10 Ver.1.6.3
+ * 個別指定画像フォルダを設定しなかった時に、エラーが表示される問題を修正。
  * 2023/4/23 Ver.1.6.2
  * 図鑑完成率、登録数にアイテム、武器、防具を含まないトータル数を設定できる機能を追加。
  * 2023/3/25 Ver.1.6.1
@@ -1536,7 +1538,7 @@ const PagePreviousSymbol = NuunManager.getStringCode(parameters['PagePreviousSym
 const ItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemBookImgList'])) : null) || [];
 const WeaponItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['WeaponItemBookImgList'])) : null) || [];
 const ArmorItemBookImgList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ArmorItemBookImgList'])) : null) || [];
-const ImgFolder = eval(parameters['ImgFolder'] || 'pictures');
+const ImgFolder = eval(parameters['ImgFolder']) || 'pictures';
 let PercentWindowVisible = eval(parameters['PercentWindowVisible'] || 'true');
 const NumberMode = eval(parameters['NumberMode'] || "false");
 const PercentContent = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PercentContent'])) : null) || [];

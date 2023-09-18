@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.1.1
+ * @version 2.1.2
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/8/2023 Ver.2.1.2
+ * Fixed an issue where changing the font color for nicknames and occupations was not working.
  * 8/8/2023 Ver.2.1.1
  * Added a function that does not make the sub member's actor image (face graphic) opaque.
  * 7/20/2023 Ver.2.1.0
@@ -84,7 +86,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.1.0
+ * @version 2.1.2
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -94,6 +96,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/8/8 Ver.2.1.2
+ * 二つ名と職業の文字色変更が機能していなかった問題を修正。
+ * 2023/8/8 Ver.2.1.1
+ * 控えメンバーのアクター画像(顔グラ)を不透明にしない機能を追加。
  * 2023/7/20 Ver.2.1.0
  * アクター画像設定にアクターIDではなく職業IDで指定できる機能を追加。
  * アクターステータスのラインが機能していなかった問題を修正。
@@ -979,7 +985,7 @@ Imported.NUUN_MenuScreenEXBase = true;
 
     Window_StatusBase.prototype.nuunMenu_drawActorClass = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
-        this.resetTextColor();
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         this.nuun_setContentsFontFace(data);
         this.drawText(actor.currentClass().name, x, y, width, data.Align);
         this.resetFontSettings();
@@ -987,7 +993,7 @@ Imported.NUUN_MenuScreenEXBase = true;
 
     Window_StatusBase.prototype.nuunMenu_drawActorNickname = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
-        this.resetTextColor();
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         this.nuun_setContentsFontFace(data);
         this.drawText(actor.nickname(), x, y, width, data.Align);
         this.resetFontSettings();
@@ -996,7 +1002,7 @@ Imported.NUUN_MenuScreenEXBase = true;
     Window_StatusBase.prototype.nuunMenu_drawActorLevel = function(data, x, y, width, actor) {
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.nuun_setContentsFontFace(data);
-        this.changeTextColor(ColorManager.systemColor());
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         this.drawText(TextManager.levelA, x, y, 48);
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -260,6 +260,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/9/18 Ver.1.3.2
+ * 条件が攻撃条件だったときにエラーが出る問題を修正。
  * 2023/7/31 Ver.1.3.1
  * 指定の数値が数値のみで入力されたときにエラーが出る問題を修正。
  * 2023/7/13 Ver.1.3.0
@@ -1672,12 +1674,14 @@ function condTurnCount(member) {
 };
 
 function attackElement(idList, action) {
-    if (action.item().damage.elementId < 0) {
-        elementsList = action.getAttackElementsList();
-      } else {
-        elementsList = action.getItemElementsList();
-      }
     let elementsList = action._multiElements;
+    if (!elementsList) {
+        if (action.item().damage.elementId < 0) {
+            elementsList = action.getAttackElementsList();
+        } else {
+            elementsList = action.getItemElementsList();
+        }
+    }
     const list = getValList(idList);
     return elementsList.some(id => elements(list, id));
 };

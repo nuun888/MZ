@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 行動時ブースト特徴
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * 攻撃時に特定の行動によってダメージを補正する効果を得ることができます。
@@ -63,11 +63,16 @@
  * 魔法属性+20%と炎属性+30の場合は50%ダメージが増幅されます。
  * 数値、文字列は[]は括らずに記入してください。　例:<BoostEX:CNT, [rate]> → <BoostEX:CNT, 50>
  * 
+ * アイテム、スキルのメモ欄
+ * <NotItemBoostEX> 指定のIDのアイテム、スキルは増幅効果を受けません。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2021/4/2 Ver.1.2.0
+ * 2023/10/14 Ver.1.2.1
+ * 増幅効果を受けないアイテム、スキルを設定できる機能を追加。
+ * 2022/4/2 Ver.1.2.0
  * 条件にメモ欄に特定のタグが記入してあれば増幅する機能を追加。
  * 2021/11/13 Ver.1.1.2
  * 条件付きベースの条件が正常に取得できていなかった問題を修正。
@@ -90,11 +95,18 @@ const parameters = PluginManager.parameters('NUUN_boostEX');
 const _Game_Action_makeDamageValue = Game_Action.prototype.makeDamageValue;
 Game_Action.prototype.makeDamageValue = function(target, critical) {
   const value = _Game_Action_makeDamageValue.call(this, target, critical);
-  return Math.round(value * Math.max((this.boostConditions(target, critical, value) + 100) / 100), 0.0);
+  const item = this.item();
+  if (this.isNotItemBoost(item)) {
+    return value;
+  }
+  return Math.round(value * Math.max((this.boostConditions(item, target, critical, value) + 100) / 100), 0.0);
 };
 
-Game_Action.prototype.boostConditions = function(target, critical, damage) {
-  const item = this.item();
+Game_Action.prototype.isNotItemBoost = function(item) {
+    return item.meta.NotItemBoostEX; 
+};
+
+Game_Action.prototype.boostConditions = function(item, target, critical, damage) {
   const boostList = this.subject().boostAllTraits();
   return boostList.reduce((r, data) => r + this.isBoostConditions(data, item, target, critical, damage) , 0) + this.boostConditionsEX(target, damage);
 };

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Item category customization
  * @author NUUN
- * @version 1.4.0
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -45,6 +45,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 10/14/2022 Ver.1.5.0
+ * Added a function that allows you to set the category to be displayed when selling.
  * 7/16/2022 Ver.1.4.0
  * Added ability to hide the number of specific items, weapons, and armor.
  * 11/12/2022 Ver.1.3.2
@@ -102,6 +104,12 @@
  * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"'item'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'weapon'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'armor'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'keyItem'\",\"NumShow\":\"true\"}"]
  * @type struct<ItemCategoryList>[]
  * 
+ * @param SaleCategory
+ * @text Sale category item
+ * @desc Setting of sale category items. If there is no setting, the category set in the category item will be displayed.
+ * @default 
+ * @type struct<ItemCategoryList>[]
+ * 
  * @param BattleNumVisible
  * @text Hide number during battle
  * @desc Turn off the number display even during battle, and apply the number non-display of category items with the display of the number of important items turned off.
@@ -139,7 +147,7 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.4.0
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -174,6 +182,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/10/14 Ver.1.5.0
+ * 売却時の表示するカテゴリーを設定できる機能を追加。
  * 2023/7/16 Ver.1.4.0
  * 特定のアイテム、武器、防具の個数を非表示にする機能を追加。
  * 2022/11/12 Ver.1.3.2
@@ -231,6 +241,12 @@
  * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"'item'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'weapon'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'armor'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'keyItem'\",\"NumShow\":\"true\"}"]
  * @type struct<ItemCategoryList>[]
  * 
+ * @param SaleCategory
+ * @text 売却カテゴリー項目
+ * @desc 売却カテゴリー項目の設定。設定がない場合はカテゴリー項目で設定したカテゴリーが表示されます。
+ * @default 
+ * @type struct<ItemCategoryList>[]
+ * 
  * @param BattleNumVisible
  * @text 戦闘中個数非表示
  * @desc 戦闘中でも個数表示をOFF、大事なものの個数を表示をOFFにしたカテゴリーアイテムの個数非表示を適用させます。
@@ -271,6 +287,7 @@ const parameters = PluginManager.parameters('NUUN_ItemCategory');
 const CategoryCols = Number(parameters['CategoryCols'] || 4);
 const CategoryRows = Number(parameters['CategoryRows'] || 1);
 const ItemCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemCategory'])) : null) || [];
+const SaleCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SaleCategory'])) : null) || [];
 const BattleNumVisible = eval(parameters['BattleNumVisible'] || 'true');
 let itemData = null;
 
@@ -282,10 +299,6 @@ PluginManager.registerCommand(pluginName, 'AddCategory', args => {
 PluginManager.registerCommand(pluginName, 'ResetCategory', args => {
   $gameSystem.itemCategory = null;
 });
-
-function getItemCategory() {
-  return $gameSystem.itemCategory ? $gameSystem.itemCategory : ItemCategory;
-}
 
 
 const _Scene_Item_categoryWindowRect = Scene_Item.prototype.categoryWindowRect;
@@ -302,12 +315,16 @@ Scene_Shop.prototype.categoryWindowRect = function() {
   return rect;
 };
 
+Window_Selectable.prototype.getItemCategoryList = function() {
+    return $gameSystem.itemCategory ? $gameSystem.itemCategory : ItemCategory;
+};
+
 Window_ItemCategory.prototype.maxCols = function() {
   return CategoryCols;
 };
 
 Window_ItemCategory.prototype.makeCommandList = function() {
-  const list = getItemCategory();
+  const list = this.getItemCategoryList();
     if(!list) {
     return;
   }
@@ -370,16 +387,16 @@ Window_ItemList.prototype.drawItem = function(index) {
 };
 
 Window_ItemList.prototype.needsNumber = function() {
-  if (BattleNumVisible && itemData && $gameParty.inBattle()) {
-    this._category = itemData.meta.CategoryType ? itemData.meta.CategoryType : (itemData.itypeId === 2 ? "keyItem" : this._needsCategory);
-  }
-  if (this._category === "keyItem") {  
-    return $dataSystem.optKeyItemsNumber;
-  }
-  if (itemData.meta.NoItemNum) {
-    return false;
-  }
-  return this._needsCategory === undefined || this._needsCategory === null ? true : this._needsCategory;
+    if (BattleNumVisible && itemData && $gameParty.inBattle()) {
+        this._category = itemData.meta.CategoryType ? itemData.meta.CategoryType : (itemData.itypeId === 2 ? "keyItem" : this._needsCategory);
+    }
+    if (this._category === "keyItem") {  
+        return $dataSystem.optKeyItemsNumber;
+    }
+    if (itemData.meta.NoItemNum) {
+        return false;
+    }
+    return this._needsCategory === undefined || this._needsCategory === null ? true : this._needsCategory;
 };
 
 Window_ItemList.prototype.allItemsNeedsNumber = function(item) {
@@ -387,7 +404,7 @@ Window_ItemList.prototype.allItemsNeedsNumber = function(item) {
     if (item.itypeId === 2) {
       return $dataSystem.optKeyItemsNumber;
     } else if (item.meta.CategoryType) {
-      const list = getItemCategory();
+      const list = this.getItemCategoryList();
       const find = list.find(date => date.Categorykey === item.meta.CategoryType);
       if (find && find.NumShow !== undefined) {
         return find.NumShow;
@@ -402,7 +419,7 @@ const _Window_ItemList_setCategory = Window_ItemList.prototype.setCategory;
 Window_ItemList.prototype.setCategory = function(category) {
   if (this._category !== category) {
     this._needsCategory = true;
-    const list = getItemCategory();
+    const list = this.getItemCategoryList();
     if (list) {
       const find = list.find(date => date.Categorykey === category);
       if (find) {
@@ -412,5 +429,34 @@ Window_ItemList.prototype.setCategory = function(category) {
   }
   _Window_ItemList_setCategory.call(this, category)
 };
+
+if (SaleCategory && SaleCategory.length > 0) {
+    Scene_Shop.prototype.createCategoryWindow = function() {
+        const rect = this.categoryWindowRect();
+        this._categoryWindow = new Window_ItemShopCategory(rect);
+        this._categoryWindow.setHelpWindow(this._helpWindow);
+        this._categoryWindow.hide();
+        this._categoryWindow.deactivate();
+        this._categoryWindow.setHandler("ok", this.onCategoryOk.bind(this));
+        this._categoryWindow.setHandler("cancel", this.onCategoryCancel.bind(this));
+        this.addWindow(this._categoryWindow);
+    };
+
+    function Window_ItemShopCategory() {
+        this.initialize(...arguments);
+    }
+    
+    Window_ItemShopCategory.prototype = Object.create(Window_ItemCategory.prototype);
+    Window_ItemShopCategory.prototype.constructor = Window_ItemShopCategory;
+    
+    Window_ItemShopCategory.prototype.initialize = function(rect) {
+        Window_ItemCategory.prototype.initialize.call(this, rect);
+    };
+
+    Window_ItemShopCategory.prototype.getItemCategoryList = function() {
+        return SaleCategory;
+    };
+
+}
 
 })();

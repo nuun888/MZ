@@ -1,5 +1,5 @@
 # [行動時ブースト特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_boostEX.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_boostEX.js)
 
 攻撃時に特定の行動によってダメージを補正する効果を得ることができます。
@@ -53,7 +53,12 @@
 魔法属性+20%と炎属性+30の場合は50%ダメージが増幅されます。  
 数値、文字列は[]は括らずに記入してください。　例:`<BoostEX:CNT, [rate]>` → `<BoostEX:CNT, 50>`  
 
+アイテム、スキルのメモ欄
+`<NotItemBoostEX>` 指定のIDのアイテム、スキルは増幅効果を受けません。  
+
 ## 更新履歴
+2023/10/14 Ver.1.2.1  
+増幅効果を受けないアイテム、スキルを設定できる機能を追加。  
 2021/4/2 Ver.1.2.0  
 条件にメモ欄に特定のタグが記入してあれば増幅する機能を追加。  
 2021/11/13 Ver.1.1.2  

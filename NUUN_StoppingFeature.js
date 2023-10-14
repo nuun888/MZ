@@ -10,19 +10,22 @@
  * @target MZ
  * @plugindesc 踏み止まり特徴
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
- * 戦闘中のダメージで0になったときに、戦闘不能にならずHPが１で止まる特徴を設定できます。
+ * 戦闘中のダメージでHPが2以上から0になったときに、戦闘不能にならずHPが1で止まる特徴を設定できます。
+ * HPが1の時は踏み止まりが発生しません。
  * 条件付きベースプラグインと併用することで、特定の条件で踏み止まる特徴を設定できます。
  * 
  * 特徴を有するメモ欄
- * <Stopping:[rate], [ratio], [condMode]>
- * [rate]：発動確立
- * [ratio]：発動するダメージ前のHPの割合。残りHPが指定したHPの割合以上なら発動します。
- * [condMode]：条件付きベースプラグインでの条件指定時のモード　※省略可能
- * <Stopping:100, 30> HPが３０％以上で戦闘不能になったとき１００％の確率でダメージが１で踏み止まります。
- * <Stopping:50, 0> 50%の確立で戦闘不能になったときにHPが１で踏み止まります。
+ * <StoppingRatio:[rate], [ratio], [condMode]> 指定の割合HP以上で発動します。
+ * <StoppingValue:[rate], [hp oe more], [condMode]> 指定のHP以上で発動します。
+ * [rate]:発動確立
+ * [ratio]:発動するダメージ前のHPの割合。残りHPが指定したHPの割合以上なら発動します。
+ * [condMode]：条件付きベースプラグインでの条件指定時のモード ※省略可能
+ * <StoppingRatio:100, 30> HPが30％以上で戦闘不能になったとき100％の確率でダメージが1で踏み止まります。
+ * <StoppingValue:100, 10> HPが10以上の場合で戦闘不能になったとき100％の確率でダメージが1で踏み止まります。
+ * <StoppingRatio:50, 0> 50%の確立で戦闘不能になったときにHPが1で踏み止まります。
  * [condMode]は条件付きベースプラグインを導入してない場合は省略してください。
  * 
  * 以下のタグは条件付きベースプラグインが必要です。
@@ -44,6 +47,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/10/14 Ver.1.2.0
+ * 固定値以上で発動できる機能を追加。
+ * HPが2以上の時に発動するように修正。
  * 2023/6/22 Ver.1.1.1
  * 処理の修正。
  * 2023/6/21 Ver.1.1.0
@@ -101,10 +107,12 @@ const volume = Number(parameters['volume'] || 90);
 const pitch = Number(parameters['pitch'] || 100);
 const pan = Number(parameters['pan'] || 50);
 let eraseStateId = 0;
+let mode = false;
 
 const _Game_Action_executeHpDamage = Game_Action.prototype.executeHpDamage;
 Game_Action.prototype.executeHpDamage = function(target, value) {
     eraseStateId = 0;
+    mode = false;
     const hp = target.hp;
     if (hp - value <= 0 && this.stopping(target, hp) && !this.getInvalidStoppingRate()) {   
         value = hp - Math.max(hp - value, 0) - 1;
@@ -121,7 +129,7 @@ Game_Action.prototype.stopping = function(target, value) {
         if (stopping && id > 0) {
             eraseStateId = id;
         }
-        return (stopping && getStoppingResult(target, value, stopping) && this.condStoppingResult(stopping, trait, target));
+        return (stopping && isTargetHpCheck(value) && getStoppingResult(target, value, stopping) && this.condStoppingResult(stopping, trait, target));
     })
 };
 
@@ -173,15 +181,32 @@ function stoppingSE() {
 };
 
 function getStoppingResult(target, value, stopping) {
-    return getStoppingRate(stopping[0]) && value >= (target.mhp * stopping[1]) / 100;
+    if (mode) {
+        return getStoppingRate(stopping[0]) && value >= stopping[1];
+    } else {
+        return getStoppingRate(stopping[0]) && value >= (target.mhp * stopping[1]) / 100;
+    }
 };
 
 function getStoppingRate(rate) {
     return Math.floor(Math.random() * 100) < rate;
 };
 
+function isTargetHpCheck(value) {
+    return value > 1;
+};
+
 function getStoppingMeta(trait) {
-    return trait.meta.Stopping ? trait.meta.Stopping.split(',').map(Number) : null;
+    if (trait.meta.Stopping) {
+        return trait.meta.Stopping.split(',').map(Number);
+    } else if (trait.meta.StoppingRatio) {
+        return trait.meta.StoppingRatio.split(',').map(Number);
+    } else if (trait.meta.StoppingValue) {
+        mode = true;
+        return  trait.meta.StoppingValue.split(',').map(Number)
+    } else {
+        return null;
+    }
 };
 
 })();

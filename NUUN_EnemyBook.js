@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.3
+ * @version 2.20.4
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/22/2023 Ver.2.20.4
+ * Minor corrections.
  * 7/22/2023 Ver.2.20.3
  * Corrected to color-code resistance and weakness numbers with attributes and state resistance (numbers).
  * 7/16/2023 Ver.2.20.2
@@ -2958,7 +2960,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.1
+ * @version 2.20.4
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3179,6 +3181,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/11/4 Ver.2.20.4
+ * 微修正。
  * 2023/7/22 Ver.2.20.3
  * 属性、ステート耐性(数値)で耐性、弱点の数値を色分けするように修正。
  * 2023/7/16 Ver.2.20.2
@@ -7786,6 +7790,9 @@ Scene_Battle.prototype.createEnemyBookActual = function() {
 };
 
 Scene_Battle.prototype.onEnemyActual = function() {
+    if (!this._enemyBookActualSprite) {
+        this.createEnemyBookActual();//暫定
+    }
     if (this._enemyBookActualSprite.visible) {
         this._enemyBookActualSprite.hideActualEnemy();
     } else {
@@ -11445,6 +11452,7 @@ Sprite_BookEnemyActual.prototype.setup = function(battler, mask) {
     this.x = Graphics.width / 2;
     this.y = Graphics.height / 2;
     this._svEnemy = battler ? this.getSvBattler(battler) : null;
+    this._bigEnemy = battler && battler.enemy().meta.BigEnemy;
     this._maskMode = mask;
     this.refresh();
 };

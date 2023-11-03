@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @base NUUN_BattlerOverlayBase
- * @version 1.7.4
+ * @version 1.7.5
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -63,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/11/4 Ver.1.7.5
+ * <HPGaugeVisible>が機能していなかった問題を修正。
  * 2023/8/3 Ver.1.7.4
  * 一部のプラグインにてNoHPGaugeが機能していなかった問題を修正。
  * 2023/6/23 Ver.1.7.3
@@ -775,11 +777,9 @@ Game_Actor.prototype.HpGaugeMask = function(){
 
 const _Game_Battler_refresh = Game_Battler.prototype.refresh;
 Game_Battler.prototype.refresh = function() {
-  _Game_Battler_refresh.call(this);
-  if (this.isEnemy()) {
+    _Game_Battler_refresh.call(this);
     this.HpGaugeVisible();
     this.HpGaugeMask();
-  }
 };
 
 const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;

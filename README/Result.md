@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.3.9
+# Ver.2.3.10
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -35,6 +35,8 @@ d:アクターのデータベースデータ
 `<NoResultDropList>` アイテム入手のドロップリストに表示しません。  
 
 ## 更新履歴
+2023/11/4 Ver.2.3.10  
+ドロップリストに武器、防具が表示されない問題を修正。  
 2023/7/21 Ver.2.3.9  
 ドロップアイテムリストに表示させないアイテムを設定できる機能を追加。  
 隠しアイテムを表示しないように修正。  

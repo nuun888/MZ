@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.9
+ * @version 2.3.10
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -60,6 +60,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2023/11/4 Ver.2.3.10
+ * Fixed an issue where weapons and armor were not displayed in the drop list.
  * 2023/7/21 Ver.2.3.9
  * Added the ability to set items that are not displayed in the drop item list.
  * Fixed to not display hidden items.
@@ -2289,7 +2291,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.9
+ * @version 2.3.10
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2337,6 +2339,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/11/4 Ver.2.3.10
+ * ドロップリストに武器、防具が表示されない問題を修正。
  * 2023/7/21 Ver.2.3.9
  * ドロップアイテムリストに表示させないアイテムを設定できる機能を追加。
  * 隠しアイテムを表示しないように修正。
@@ -6246,7 +6250,7 @@ Window_ResultGetItem.prototype.getItemDropList = function() {
   const drop = BattleManager._rewards.items;
   const dropList = [];
   drop.forEach(item => {
-    if (!item.meta.NoResultDropList && item.itypeId <= 2) {
+    if (!item.meta.NoResultDropList && resultDropIsItem(item)) {
         const index = dropList.findIndex(ditem => item.id === ditem.item.id);
         if (DropItemNumVisible && index >= 0) {
             dropList[index].num++;
@@ -7925,6 +7929,14 @@ Sprite_ResultBackground.prototype.setBuckgroundImgMode = function() {
   this.anchor.y = 0.0;
   this.x = 0;
   this.y = 0;
+};
+
+function resultDropIsItem(item) {
+    if (DataManager.isItem(item)) {
+        return item.itypeId <= 2;
+    } else {
+        return true;
+    }
 };
 
 })();

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Selling price arbitrary setting
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -29,6 +29,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/18/2023 Ver.1.1.2
+ * Fixed an issue where an error would occur when selecting the sell screen when there were no items.
  * 12/6/2022 Ver.1.1.1
  * Changed the display in languages other than Japanese to English.
  * 10/31/2021 Ver 1.1.0
@@ -84,7 +86,7 @@
  * @target MZ
  * @plugindesc 売値任意設定
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -104,6 +106,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/11/18 Ver.1.1.2
+ * アイテムがない状態で売却画面を選択するとエラーが出る問題を修正。
  * 2022/12/6 Ver.1.1.1
  * 日本語以外での表示を英語表示に変更。
  * 2021/10/31 Ver 1.1.0
@@ -160,68 +164,68 @@ Imported.NUUN_AnySellPrice = true;
 
 (() => {
 
-  const parameters = PluginManager.parameters('NUUN_AnySellPrice');
-  let orderSellPriceList = [];
-  const pluginName = "NUUN_AnySellPrice";
+    const parameters = PluginManager.parameters('NUUN_AnySellPrice');
+    let orderSellPriceList = [];
+    const pluginName = "NUUN_AnySellPrice";
 
-  PluginManager.registerCommand(pluginName, 'OrderSellingPrice', args => {
-    const listData = (NUUN_Base_Ver >= 113 ? DataManager.nuun_structureData(args.OrderSellingPriceList) : null) || [];
-    for (const sellItem of listData) {
-      orderSellPrice(sellItem);
-    }
-  });
-
-  PluginManager.registerCommand(pluginName, 'OrderSellingPriceInitialize', args => {
-    orderSellPriceList = [];
-  });
-
-  function sellPrice(item) {
-    return item.meta.SellPrice ? Number(item.meta.SellPrice) : null;
-  };
-
-  function orderSellPrice(args) {
-    if (Number(args.ItemId) > 0) {
-      orderSellPriceList.push({id:Number(args.ItemId), sell: Number(args.SellPrice), type:'item'});
-    } else if (Number(args.WeaponId) > 0) {
-      orderSellPriceList.push({id:Number(args.WeaponId), sell: Number(args.SellPrice), type:'weapon'});
-    } else if (Number(ArmorId) > 0) {
-      orderSellPriceList.push({id:Number(args.ArmorId), sell: Number(args.SellPrice), type:'armor'});
-    }
-  };
-
-  function getOrderSellPrice(item) {
-    const find = orderSellPriceList.find(sellItem => {
-      if (DataManager.isItem(item) && sellItem.type === 'item') {
-        return sellItem.id === item.id;
-      } else if (DataManager.isWeapon(item) && sellItem.type === 'weapon') {
-        return sellItem.id === item.id;
-      } else if (DataManager.isArmor(item) && sellItem.type === 'armor') {
-        return sellItem.id === item.id;
-      }
-      return false;
+    PluginManager.registerCommand(pluginName, 'OrderSellingPrice', args => {
+        const listData = (NUUN_Base_Ver >= 113 ? DataManager.nuun_structureData(args.OrderSellingPriceList) : null) || [];
+        for (const sellItem of listData) {
+        orderSellPrice(sellItem);
+        }
     });
-    return find ? find.sell : 0;
-  };
+
+    PluginManager.registerCommand(pluginName, 'OrderSellingPriceInitialize', args => {
+        orderSellPriceList = [];
+    });
+
+    function sellPrice(item) {
+        return item && item.meta.SellPrice ? Number(item.meta.SellPrice) : null;
+    };
+
+    function orderSellPrice(args) {
+        if (Number(args.ItemId) > 0) {
+        orderSellPriceList.push({id:Number(args.ItemId), sell: Number(args.SellPrice), type:'item'});
+        } else if (Number(args.WeaponId) > 0) {
+        orderSellPriceList.push({id:Number(args.WeaponId), sell: Number(args.SellPrice), type:'weapon'});
+        } else if (Number(ArmorId) > 0) {
+        orderSellPriceList.push({id:Number(args.ArmorId), sell: Number(args.SellPrice), type:'armor'});
+        }
+    };
+
+    function getOrderSellPrice(item) {
+        const find = orderSellPriceList.find(sellItem => {
+        if (DataManager.isItem(item) && sellItem.type === 'item') {
+            return sellItem.id === item.id;
+        } else if (DataManager.isWeapon(item) && sellItem.type === 'weapon') {
+            return sellItem.id === item.id;
+        } else if (DataManager.isArmor(item) && sellItem.type === 'armor') {
+            return sellItem.id === item.id;
+        }
+        return false;
+        });
+        return find ? find.sell : 0;
+    };
 
 
-  const _Scene_Shop_sellingPrice = Scene_Shop.prototype.sellingPrice;
-  Scene_Shop.prototype.sellingPrice = function() {
-    const item = this._item;
-    const orderSellPrice = getOrderSellPrice(item);
-    const sell = orderSellPrice > 0 ? orderSellPrice : sellPrice(this._item);
-    return sell !== null ? sell : _Scene_Shop_sellingPrice.call(this);
-  };
+    const _Scene_Shop_sellingPrice = Scene_Shop.prototype.sellingPrice;
+    Scene_Shop.prototype.sellingPrice = function() {
+        const item = this._item;
+        const orderSellPrice = getOrderSellPrice(item);
+        const sell = orderSellPrice > 0 ? orderSellPrice : sellPrice(this._item);
+        return sell !== null ? sell : _Scene_Shop_sellingPrice.call(this);
+    };
 
-  Scene_Shop.prototype.orderSellingPrice = function() {
-    const item = this._item;
-    const orderSellPrice = getOrderSellPrice(item);
-    return orderSellPrice > 0 ? orderSellPrice : sellPrice(item);
-  };
+    Scene_Shop.prototype.orderSellingPrice = function() {
+        const item = this._item;
+        const orderSellPrice = getOrderSellPrice(item);
+        return orderSellPrice > 0 ? orderSellPrice : sellPrice(item);
+    };
 
-  const _Window_ShopSell_isEnabled = Window_ShopSell.prototype.isEnabled;
-  Window_ShopSell.prototype.isEnabled = function(item) {
-    const orderSellPrice = getOrderSellPrice(item);
-    const sell = orderSellPrice > 0 ? orderSellPrice : sellPrice(item);
-    return sell !== null ? sell > 0 : _Window_ShopSell_isEnabled.call(this, item);
-  };
+    const _Window_ShopSell_isEnabled = Window_ShopSell.prototype.isEnabled;
+    Window_ShopSell.prototype.isEnabled = function(item) {
+        const orderSellPrice = getOrderSellPrice(item);
+        const sell = orderSellPrice > 0 ? orderSellPrice : sellPrice(item);
+        return sell !== null ? sell > 0 : _Window_ShopSell_isEnabled.call(this, item);
+    };
 })();

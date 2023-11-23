@@ -1,5 +1,5 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
-# Ver.1.4.4
+# Ver.1.4.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)
@@ -25,6 +25,8 @@ Ver.1.3.4
  サイドビューサポートアクター設定で設定がない場合、表示されません。
   
 ## 更新履歴
+2023/11/23 Ver.1.4.5  
+通常メンバー全員が行動不能になった時にサポートアクターがアイテムを使用すると、一覧に表示されない問題を修正。  
 2023/4/9 Ver.1.4.4  
 処理の修正。  
 2022/10/8 Ver.1.4.3  

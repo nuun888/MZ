@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.4
+ * @version 2.6.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/11/23 Ver.2.6.5
+ * 職業、二つ名に色を指定できるように対応。
  * 2023/6/30 Ver.2.6.4
  * 装備スロット名がなしまたはデータが存在しない場合は表示しないように修正。
  * 2023/5/21 Ver.2.6.3
@@ -946,9 +948,9 @@
  * @value 0
  * @option アクター名(4)(5)(6)(7)(15)
  * @value 1
- * @option 二つ名(4)(5)(6)(7)(15)
+ * @option 二つ名(1)(4)(5)(6)(7)(15)
  * @value 2
- * @option 職業(4)(5)(6)(7)(15)
+ * @option 職業(1)(4)(5)(6)(7)(15)
  * @value 3
  * @option レベル(4)(5)(6)(7)(14)(15)(16)(17)(20)(21)
  * @value 4
@@ -1837,10 +1839,10 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
       this.drawActorName(this._actor, x, y, width);
       break;
     case 2:
-      this.drawActorNickname(this._actor, x, y, width);
+      this.drawActorNickname(this._actor, x, y, width, list);
       break;
     case 3:
-      this.drawActorClass(this._actor, x, y, width);
+      this.drawActorClass(this._actor, x, y, width, list);
       break;
     case 4:
       this.drawActorLevel(this._actor, x, y, width, list);
@@ -2093,6 +2095,20 @@ Window_Status.prototype.horzLine = function(list, x, y, width) {
   this.contents.paintOpacity = 48;
   this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(list.NameColor));
   this.contents.paintOpacity = 255;
+};
+
+Window_Status.prototype.drawActorClass = function(actor, x, y, width, list) {
+    width = width || 168;
+    this.contentsFontSize(list);
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    this.drawText(actor.currentClass().name, x, y, width);
+};
+
+Window_Status.prototype.drawActorNickname = function(actor, x, y, width, list) {
+    width = width || 270;
+    this.contentsFontSize(list);
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    this.drawText(actor.nickname(), x, y, width);
 };
 
 Window_Status.prototype.drawActorFace = function(actor, x, y, width, height) {

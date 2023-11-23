@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.4.4
+ * @version 1.4.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/11/23 Ver.1.4.5
+ * 通常メンバー全員が行動不能になった時にサポートアクターがアイテムを使用すると、一覧に表示されない問題を修正。
  * 2023/4/9 Ver.1.4.4
  * 処理の修正。
  * 2022/10/8 Ver.1.4.3
@@ -490,5 +492,12 @@ Imported.NUUN_SupportActor = true;
   Scene_Battle.prototype.createSupportActorWindow = function() {
 
   };
+
+    const _Game_Party_canUse = Game_Party.prototype.canUse;
+    Game_Party.prototype.canUse = function(item) {
+        this.setWithSupportActorMember();
+        return _Game_Party_canUse.call(this, item);
+    };
+
 
 })();

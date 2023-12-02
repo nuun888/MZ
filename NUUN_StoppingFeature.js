@@ -302,7 +302,7 @@ Game_Action.prototype.stopping = function(target, value) {
 
 Game_Action.prototype.getStoppingFeatureCount = function(target) {
     const maxCount = target.isActor() ? ActorMaxStopping : EnemyMaxStopping;
-    return target.traitObjects().reduce((r,trait) => {console.log(r)
+    return target.traitObjects().reduce((r,trait) => {
         if (trait.meta.MaxStoppingCount && r < Number(trait.meta.MaxStoppingCount)) {
             r = Number(trait.meta.MaxStoppingCount);
         }

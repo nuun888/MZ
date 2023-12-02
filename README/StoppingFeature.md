@@ -1,5 +1,5 @@
 # [踏み止まり特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js)
-# Ver.1.2.0
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js)
 
 戦闘中のダメージでHPが2以上から0になったときに、戦闘不能にならずHPが1で止まる特徴を設定できます。  
@@ -14,6 +14,8 @@ HPが1の時は踏み止まりが発生しません。
 `<Stopping:100, 30>` HPが３０％以上で戦闘不能になったとき１００％の確率でダメージが１で踏み止まります。  
 `<StoppingValue:[rate], [hp oe more]>` 指定のHP以上で発動します。  
 [hp oe more]：発動するHPの数値　　
+`<MaxStoppingCount:[count]>` 一回の戦闘での踏み止まる回数を指定します。複数存在する場合は最大の有限回数が適用されます。  
+[count]:回数  
 
 以下の設定は条件付きベースプラグインが必要です。  
 `<Stopping:[rate], [ratio], [condMode]>`  
@@ -34,7 +36,12 @@ HPが1の時は踏み止まりが発生しません。
 [rate]：無効にする確立  
 `<InvalidStopping:50>` 50％の確率で踏み止まりを無効化します。  
 
+`<ResetStoppingCount>` 踏み止まりの回数をリセットします。  
+
 ### 更新履歴
+2023/12/2 Ver.1.3.0  
+発動できる回数を設定できる機能を追加。  
+発動確率を評価式に設定する方式に変更。  
 2023/10/14 Ver.1.2.0  
 固定値以上で発動できる機能を追加。  
 HPが2以上の時に発動するように修正。  

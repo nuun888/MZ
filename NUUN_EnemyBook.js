@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.5
+ * @version 2.20.6
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/10/2023 Ver.2.20.6
+ * Fixed an issue where mask processing was not performed when attack persistence was not registered.
  * 12/9/2023 Ver.2.20.5
  * Added attack persistence. (Self-configuration required)
  * 11/4/2023 Ver.2.20.4
@@ -1426,17 +1428,17 @@
  * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"76\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"66\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"67\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"68\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"69\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"70\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"71\"}"]
  * @parent ElementIconSetting
  * 
+ * @param ElementUnknownIconId
+ * @desc Specifies the ID of the element icon to be displayed when the status information is not registered.
+ * @text Element icon ID when status information is not registered
+ * @type icon
+ * @default 0
+ * @parent ElementIconSetting
+ * 
 * @param ResistWeakElementData
 * @text Attribute resistance setting
 * @default ------------------------------
 * @parent EnemyBookStatusSetting
-* 
-* @param ElementUnknownIconId
-* @desc Specifies the ID of the element icon to be displayed when the status information is not registered.
-* @text Element icon ID when status information is not registered
-* @type icon
-* @default 0
-* @parent ResistWeakElementData
 * 
 * @param ElementIcon
 * @text Element resistance (icon display) setting
@@ -1570,17 +1572,17 @@
  * @default ["{\"StateId\":\"1\"}","{\"StateId\":\"4\"}","{\"StateId\":\"5\"}","{\"StateId\":\"6\"}","{\"StateId\":\"7\"}","{\"StateId\":\"8\"}","{\"StateId\":\"9\"}","{\"StateId\":\"10\"}","{\"StateId\":\"12\"}","{\"StateId\":\"13\"}"]
  * @parent StateIconSetting
  * 
+ * @param StateUnknownIconId
+ * @desc Specify the ID of the state icon to be displayed when the status information is not registered.
+ * @text State icon ID when status information is not registered
+ * @type icon
+ * @default 0
+ * @parent StateIconSetting
+ * 
 * @param ResistWeakStateData
 * @text State resistance setting
 * @default ------------------------------
 * @parent EnemyBookStatusSetting
-* 
-* @param StateUnknownIconId
-* @desc Specify the ID of the state icon to be displayed when the status information is not registered.
-* @text State icon ID when status information is not registered
-* @type icon
-* @default 0
-* @parent ResistWeakStateData
 * 
 * @param ResistWeakStateIcon
 * @text State resistance (icon display) setting
@@ -2974,7 +2976,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.5
+ * @version 2.20.6
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3195,6 +3197,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/12/10 Ver.2.20.6
+ * 攻撃持続性の未登録時のマスク処理が行われていなかった問題を修正。
  * 2023/12/9 Ver.2.20.5
  * 攻撃持続性を追加。(要自己設定)
  * 2023/11/4 Ver.2.20.4
@@ -4492,17 +4496,17 @@
  * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"76\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"66\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"67\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"68\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"69\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"70\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"71\"}"]
  * @parent ElementIconSetting
  * 
- * @param ResistWeakElementData
- * @text 属性耐性弱点設定
- * @default ------------------------------
- * @parent EnemyBookStatusSetting
- * 
  * @param ElementUnknownIconId
  * @desc ステータス情報未登録時に表示する属性アイコンのIDを指定します。
  * @text ステータス情報未登録時属性アイコンID
  * @type icon
  * @default 0
- * @parent ResistWeakElementData
+ * @parent ElementIconSetting
+ * 
+ * @param ResistWeakElementData
+ * @text 属性耐性弱点設定
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
  * 
  * @param ElementIcon
  * @text 属性耐性（アイコン表示）設定
@@ -4636,17 +4640,17 @@
  * @default ["{\"StateId\":\"1\"}","{\"StateId\":\"4\"}","{\"StateId\":\"5\"}","{\"StateId\":\"6\"}","{\"StateId\":\"7\"}","{\"StateId\":\"8\"}","{\"StateId\":\"9\"}","{\"StateId\":\"10\"}","{\"StateId\":\"12\"}","{\"StateId\":\"13\"}"]
  * @parent StateIconSetting
  * 
- * @param ResistWeakStateData
- * @text ステート耐性弱点設定
- * @default ------------------------------
- * @parent EnemyBookStatusSetting
- * 
  * @param StateUnknownIconId
  * @desc ステータス情報未登録時に表示するステートアイコンのIDを指定します。
  * @text ステータス情報未登録時ステートアイコンID
  * @type icon
  * @default 0
- * @parent ResistWeakStateData
+ * @parent StateIconSetting
+ * 
+ * @param ResistWeakStateData
+ * @text ステート耐性弱点設定
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
  * 
  * @param ResistWeakStateIcon
  * @text ステート耐性（アイコン表示）設定
@@ -10095,7 +10099,9 @@ Window_EnemyBook.prototype.attackElement = function(list, enemy, x, y, width) {
     for (const element of elements) {
         if (element > 0) {
             const e = ElementList.find(data => data.ElementNo === element);
-            if (e.ElementIconId > 0) {
+            if (this.paramMask(list.MaskMode)) {
+                icons.push(ElementUnknownIconId);
+            }else if (e.ElementIconId > 0) {
                 icons.push(e.ElementIconId);
             } 
         }

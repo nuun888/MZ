@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.4
+ * @version 2.20.5
  * 
  * @help
  * Implement an enemy book.
@@ -229,7 +229,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 7/22/2023 Ver.2.20.4
+ * 12/9/2023 Ver.2.20.5
+ * Added attack persistence. (Self-configuration required)
+ * 11/4/2023 Ver.2.20.4
  * Minor corrections.
  * 7/22/2023 Ver.2.20.3
  * Corrected to color-code resistance and weakness numbers with attributes and state resistance (numbers).
@@ -1411,18 +1413,23 @@
 * @min 1
 * @default 1
 * @parent ActionData
-* 
+ * 
+ * @param ElementIconSetting
+ * @text Display attribute icon settings
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param ElementList
+ * @desc Element to display. (Common to attribute icons, resistance list, and radar chart)
+ * @text Display element
+ * @type struct<ElementData>[]
+ * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"76\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"66\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"67\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"68\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"69\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"70\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"71\"}"]
+ * @parent ElementIconSetting
+ * 
 * @param ResistWeakElementData
 * @text Attribute resistance setting
 * @default ------------------------------
 * @parent EnemyBookStatusSetting
-* 
-* @param ElementList
-* @desc Element to display. (Common to attribute icons, resistance list, and radar chart)
-* @text Display element
-* @type struct<ElementData>[]
-* @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"76\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"66\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"67\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"68\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"69\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"70\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"71\"}"]
-* @parent ResistWeakElementData
 * 
 * @param ElementUnknownIconId
 * @desc Specifies the ID of the element icon to be displayed when the status information is not registered.
@@ -1540,7 +1547,7 @@
 * @parent ElementRadarChart
 * 
 * @param NUUN_EnemyBookEX_1
-* @text (要NUUN_EnemyBookEX_1)
+* @text (Required NUUN_EnemyBookEX_1)
 * @default ------------------------------
 * @parent ResistWeakElementData
 * 
@@ -1550,18 +1557,23 @@
 * @type boolean
 * @default false
 * @parent NUUN_EnemyBookEX_1
-* 
+ * 
+ * @param StateIconSetting
+ * @text Display attribute icon settings
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
+ * 
+ * @param StateList
+ * @desc State to display.
+ * @text Display state
+ * @type struct<StateData>[]
+ * @default ["{\"StateId\":\"1\"}","{\"StateId\":\"4\"}","{\"StateId\":\"5\"}","{\"StateId\":\"6\"}","{\"StateId\":\"7\"}","{\"StateId\":\"8\"}","{\"StateId\":\"9\"}","{\"StateId\":\"10\"}","{\"StateId\":\"12\"}","{\"StateId\":\"13\"}"]
+ * @parent StateIconSetting
+ * 
 * @param ResistWeakStateData
 * @text State resistance setting
 * @default ------------------------------
 * @parent EnemyBookStatusSetting
-* 
-* @param StateList
-* @desc State to display.
-* @text Display state
-* @type struct<StateData>[]
-* @default ["{\"StateId\":\"1\"}","{\"StateId\":\"4\"}","{\"StateId\":\"5\"}","{\"StateId\":\"6\"}","{\"StateId\":\"7\"}","{\"StateId\":\"8\"}","{\"StateId\":\"9\"}","{\"StateId\":\"10\"}","{\"StateId\":\"12\"}","{\"StateId\":\"13\"}"]
-* @parent ResistWeakStateData
 * 
 * @param StateUnknownIconId
 * @desc Specify the ID of the state icon to be displayed when the status information is not registered.
@@ -2301,6 +2313,8 @@
 * @value 71
 * @option Original parameter(1)~(16)(20)(21)
 * @value 80
+* @option AttackElement(1)～(5)(7)(8)(9)(12)(13)(20)(21)
+* @value 90
 * @option Enemy use skill(1)~(15)(20)(21)
 * @value 100
 * @option Element radar chart(1)~(5)(8)(9)(12)(20)(21)
@@ -2960,7 +2974,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.4
+ * @version 2.20.5
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3181,6 +3195,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/12/9 Ver.2.20.5
+ * 攻撃持続性を追加。(要自己設定)
  * 2023/11/4 Ver.2.20.4
  * 微修正。
  * 2023/7/22 Ver.2.20.3
@@ -4464,17 +4480,22 @@
  * @default 1
  * @parent ActionData
  * 
- * @param ResistWeakElementData
- * @text 属性耐性弱点設定
+ * @param ElementIconSetting
+ * @text 表示属性アイコン設定
  * @default ------------------------------
  * @parent EnemyBookStatusSetting
  * 
  * @param ElementList
- * @desc 表示する属性。アイコン、耐性表、レーダーチャート共通
+ * @desc 表示する属性。攻撃時属性、耐性表、レーダーチャート共通
  * @text 表示属性
  * @type struct<ElementData>[]
  * @default ["{\"ElementNo\":\"1\",\"ElementIconId\":\"76\"}","{\"ElementNo\":\"2\",\"ElementIconId\":\"64\"}","{\"ElementNo\":\"3\",\"ElementIconId\":\"65\"}","{\"ElementNo\":\"4\",\"ElementIconId\":\"66\"}","{\"ElementNo\":\"5\",\"ElementIconId\":\"67\"}","{\"ElementNo\":\"6\",\"ElementIconId\":\"68\"}","{\"ElementNo\":\"7\",\"ElementIconId\":\"69\"}","{\"ElementNo\":\"8\",\"ElementIconId\":\"70\"}","{\"ElementNo\":\"9\",\"ElementIconId\":\"71\"}"]
- * @parent ResistWeakElementData
+ * @parent ElementIconSetting
+ * 
+ * @param ResistWeakElementData
+ * @text 属性耐性弱点設定
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
  * 
  * @param ElementUnknownIconId
  * @desc ステータス情報未登録時に表示する属性アイコンのIDを指定します。
@@ -4603,8 +4624,8 @@
  * @default false
  * @parent NUUN_EnemyBookEX_1
  * 
- * @param ResistWeakStateData
- * @text ステート耐性弱点設定
+ * @param StateIconSetting
+ * @text 表示ステートアイコン設定
  * @default ------------------------------
  * @parent EnemyBookStatusSetting
  * 
@@ -4613,7 +4634,12 @@
  * @text 表示ステート
  * @type struct<StateData>[]
  * @default ["{\"StateId\":\"1\"}","{\"StateId\":\"4\"}","{\"StateId\":\"5\"}","{\"StateId\":\"6\"}","{\"StateId\":\"7\"}","{\"StateId\":\"8\"}","{\"StateId\":\"9\"}","{\"StateId\":\"10\"}","{\"StateId\":\"12\"}","{\"StateId\":\"13\"}"]
- * @parent ResistWeakStateData
+ * @parent StateIconSetting
+ * 
+ * @param ResistWeakStateData
+ * @text ステート耐性弱点設定
+ * @default ------------------------------
+ * @parent EnemyBookStatusSetting
  * 
  * @param StateUnknownIconId
  * @desc ステータス情報未登録時に表示するステートアイコンのIDを指定します。
@@ -5355,6 +5381,8 @@
  * @value 71
  * @option オリジナルパラメータ(1)～(16)(20)(21)
  * @value 80
+ * @option 攻撃時属性（アイコン表示）(1)～(5)(7)(8)(9)(12)(13)(20)(21)
+ * @value 90
  * @option 敵の使用スキル(1)～(15)(20)(21)
  * @value 100
  * @option 属性レーダーチャート(1)～(5)(8)(9)(12)(20)(21)
@@ -9406,6 +9434,9 @@ Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
         case 80:
             this.originalParams(list, enemy, x, y, width);
             break;
+        case 90:
+            this.attackElement(list, enemy, x, y, width);
+            break;
         case 100:
             this.enemyAction(list, enemy, x, y, width);
             break;
@@ -10044,6 +10075,37 @@ Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
             this.drawText(this.unknownDataLength(skillDate.name), x2, y2, width2);
         }
     }
+};
+
+Window_EnemyBook.prototype.attackElement = function(list, enemy, x, y, width) {
+    const elements = enemy.attackElements();console.log(elements)
+    this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    const lineHeight = this.lineHeight();
+    const nameText = list.paramName || "攻撃時属性";
+    if (nameText) {
+        let margin = 0;
+        if (list.IconId > 0) {
+            this.drawIcon(list.IconId, x, y + list.IconY);
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.drawText(nameText, x + margin, y, width - margin);
+    }
+    const icons = [];
+    for (const element of elements) {
+        if (element > 0) {
+            const e = ElementList.find(data => data.ElementNo === element);
+            if (e.ElementIconId > 0) {
+                icons.push(e.ElementIconId);
+            } 
+        }
+    }
+    const iconWidth = this.iconX(icons, width);
+    let x2 = x + width - iconWidth * icons.length;
+    icons.forEach(icon => {
+        this.drawIcon(icon, x2, y);
+        x2 += iconWidth;
+    });
 };
 
 Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, width) {

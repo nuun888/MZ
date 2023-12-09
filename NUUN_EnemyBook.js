@@ -10078,7 +10078,7 @@ Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
 };
 
 Window_EnemyBook.prototype.attackElement = function(list, enemy, x, y, width) {
-    const elements = enemy.attackElements();console.log(elements)
+    const elements = enemy.attackElements();
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     const lineHeight = this.lineHeight();

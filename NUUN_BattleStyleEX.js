@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.4
+ * @version 3.12.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/12/17 Ver.3.12.5
+ * コマンド選択時にアクターステータスウィンドウの位置が正常にシフトしない問題を修正。
+ * アクター画像を表示していない時にアクターを選択するとエラーが出る問題を修正。
+ * コマンドの位置をデフォルトに指定している場合のコマンドの表示位置を、アクターステータスウィンドウの横に表示されるように修正。
  * 2023/9/2 Ver.3.12.4
  * メンバー入れ替え時のアクター画像を一旦消去するように修正。
  * 2023/8/8 Ver.3.12.3
@@ -335,7 +339,11 @@ function getActorWindowCenter() {
 };
 
 function getActorWindowOrgWidth() {
-  return (params.ActorStatusWindow_Width > 0 ? params.ActorStatusWindow_Width : Graphics.boxWidth);
+    return params.ActorStatusWindow_Width > 0 ? params.ActorStatusWindow_Width : Graphics.boxWidth;
+};
+
+function actorWindowShiftWidth() {
+    return params.PartyCommand_Width > 0 ? Math.min(params.PartyCommand_Width, Graphics.width) : 192;
 };
 
 function loadBackground(img) {
@@ -1238,7 +1246,7 @@ Scene_Battle.prototype.getActorCommandX = function() {
   if (params.ActorCommandPosition === 'top' || params.ActorCommandPosition === 'middle' || params.ActorCommandPosition === 'under' || params.ActorCommandPosition === 'custom') {
     return params.ActorCommand_X + (params.ActorommandWindowCenter ? this.actorCommandCenter() : 0);
   } else if (params.ActorCommandPosition === 'default') {
-    return this.isRightInputMode() ? Graphics.boxWidth - this.actorCommandWidth() : 0;
+    return this.isRightInputMode() ? this._statusWindow.x + this._statusWindow.width - 4 : 0;
   } else {
     return params.ActorCommand_X;
   }
@@ -1364,7 +1372,7 @@ Scene_Battle.prototype.partyCommandWindowRect = function() {
   const rect = _Scene_Battle_partyCommandWindowRect.call(this);
   if (params.PartyCommandPosition === 'default') {
     rect.width = this.partyCommandWidth(1);
-    rect.x = this.isRightInputMode() ? Graphics.boxWidth - this.partyCommandWidth(1) : 0;
+    rect.x = this.isRightInputMode() ? this._statusWindow.x + this._statusWindow.width - 4 : 0;
     rect.y = this.partyCommand_YPosition(0);
   } else if (params.PartyCommandPosition === 'custom') {
     rect.width = this.partyCommandWidth(1);
@@ -1391,10 +1399,10 @@ Scene_Battle.prototype.getDefaultPartyCommandPositionMode = function() {
   return params.PartyCommandPosition === 'default' || params.ActorCommandPosition === 'default';
 };
 
-Scene_Battle.prototype.statusWindowRect = function() {
+Scene_Battle.prototype.statusWindowRect = function() {   
     let ww = this.getActorWindowWidth();
     let wh = this.getActorWindowHeight();
-    let wx = this.getActorWindowX() + (this.getDefaultPartyCommandPositionMode() ? (this.isRightInputMode() ? 0 : Graphics.boxWidth - ww) : 0);
+    let wx = this.getActorWindowX() + (this.getDefaultPartyCommandPositionMode() ? (this.isRightInputMode() ? 0 : getActorWindowOrgWidth() - ww) : 0);
     let wy = this.getActorWindowY();
     return new Rectangle(wx, wy, ww, wh);
 };
@@ -1423,31 +1431,21 @@ Scene_Battle.prototype.setBackgroundWindow = function(background, x, y) {
 
 const _Scene_Battle_updateStatusWindowPosition = Scene_Battle.prototype.updateStatusWindowPosition;
 Scene_Battle.prototype.updateStatusWindowPosition = function() {
-    if (!params.ActorStatusWindowLock) {
-        const statusWindowX = this._statusWindow.x;
-        const targetX = this.statusWindowX();
-        const battleEffects = this._battleEffects;
-        if (BattleManager.onBSStartBattle && statusWindowX === targetX) {
-            BattleManager.onBSStartBattle = false;
-        } else if (BattleManager.onBSStartBattle) {
-            this._statusWindow.x = this._partyCommandWindow.width / 2 + (Graphics.width - Graphics.boxWidth) / 2;
-            this._actorImges.x = this._statusWindow.x;
-            this._actorStatus.x = this._statusWindow.x;
-            if (!$gameSystem.isSideView() && battleEffects) {
-                battleEffects.x = this._statusWindow.x;
-            }  
-            if (this._backgroundWindow) {
-                this._backgroundWindow.x = this._statusWindow.x;
-            }
-            return;
-        }
+    if (!params.ActorStatusWindowLock) {       
         _Scene_Battle_updateStatusWindowPosition.call(this);
+        this._actorImges.x = this._statusWindow.x;
+        this._actorStatus.x = this._statusWindow.x;
+        if (this._backgroundWindow) {
+            this._backgroundWindow.x = this._statusWindow.x + params.WindowBackground_X;
+        }
+        this.torigoyaBalloonConflict();
+        return;
         if (statusWindowX < targetX) {
             if (!$gameSystem.isSideView() && battleEffects) {
                 battleEffects.x = Math.min(battleEffects.x + 16, targetX);
             }
-            this._actorImges.x = Math.min(this._actorImges.x + 16, targetX);
-            this._actorStatus.x = Math.min(this._actorStatus.x + 16, targetX);
+            this._actorImges.x = this._statusWindow.x;
+            this._actorStatus.x = this._statusWindow.x;
             if (this._backgroundWindow) {
               this._backgroundWindow.x = this._statusWindow.x + params.WindowBackground_X;
             }
@@ -1463,7 +1461,7 @@ Scene_Battle.prototype.updateStatusWindowPosition = function() {
             }
         }
     }
-    this.torigoyaBalloonConflict();
+    
 };
 
 const _Scene_Battle_update  = Scene_Battle.prototype.update;
@@ -1583,12 +1581,15 @@ Scene_Battle.prototype.createCancelButton = function() {
     }
 };
 
+const _Scene_Battle_statusWindowX = Scene_Battle.prototype.statusWindowX;
 Scene_Battle.prototype.statusWindowX = function() {//再定義
+    let wx = _Scene_Battle_statusWindowX.call(this);
     if (this.isAnyInputWindowActive()) {
-        return this.statusWindowRect().x;
+        wx += (this.getDefaultPartyCommandPositionMode() ? (this.isRightInputMode() ? 0 : getActorWindowOrgWidth() - this.getActorWindowWidth()) : 0);
     } else {
-        return this._partyCommandWindow.width / 2 + (Graphics.width - Graphics.boxWidth) / 2;
+        wx += this.getActorWindowX();
     }
+    return wx;
 };
 
 Scene_Battle.prototype.getActorWindowX = function() {
@@ -2949,7 +2950,7 @@ Sprite_BSFrontActor.prototype.initMembers = function() {
 Sprite_BSFrontActor.prototype.updateVisibility = function() {
   Sprite_Actor.prototype.updateVisibility .call(this);
     if (this.viewFrontActor) {
-      //this.visible = true;
+      this.visible = true;
       this.visible = false;
     }
 };
@@ -2966,7 +2967,7 @@ Sprite_BSFrontActor.prototype.bsMainSprite = function() {
 
 Sprite_BSFrontActor.prototype.updateSelectionEffect = function() {
     const target = this.bsMainSprite();
-    if (this._battler.isSelected()) {
+    if (target && this._battler.isSelected()) {
         this._selectionEffectCount++;
         if (this._selectionEffectCount % 30 < 15) {
             target.setBlendColor([255, 255, 255, 64]);
@@ -2981,14 +2982,12 @@ Sprite_BSFrontActor.prototype.updateSelectionEffect = function() {
 
 Sprite_BSFrontActor.prototype.actorHomeRefresh = function(index) {
     const rect = statusData.itemRectWithPadding(index);
-    let x = rect.x + Math.floor(rect.width / 2) + statusData.itemPadding();
-    let y = rect.y + statusData.y + Math.floor(rect.height / 2);
+    let x = statusData.x + rect.x + Math.floor(rect.width / 2) + statusData.itemPadding() + params.ActorEffect_X;
+    let y = statusData.y + rect.y + Math.floor(rect.height / 2) + params.ActorEffect_Y;
     if (params.bsMode === "Standard") {
-      x -= Math.floor(ImageManager.faceWidth / 2);
+        y += Math.floor(ImageManager.faceHeight / 2);
     }
-    this.setHome(x + params.ActorEffect_X, y + params.ActorEffect_Y);
-    this._bsHomeX = x + params.ActorEffect_X + (Graphics.boxWidth - Graphics.width) / 2;
-    this._bsHomeY = y + params.ActorEffect_Y + rect.height / 2 + this.actorEffectCorrection();
+    this.setHome(x, y);
 };
 
 Sprite_BSFrontActor.prototype.setBattler = function(battler) {
@@ -3038,9 +3037,13 @@ Sprite_BSFrontActor.prototype.updateFrontActor = function() {
 
 Sprite_BSFrontActor.prototype.updateBsPosition = function() {
     if (this.viewFrontActor) {
-        this._homeX = this._bsHomeX + statusData.x;
-        this._homeY = this._bsHomeY;
+        const index = this._actor.index();
+        this.actorHomeRefresh(index);
     }
+    //if (this.viewFrontActor) {
+    //   this._homeX = this._bsHomeX + statusData.x;
+    //    this._homeY = this._bsHomeY;
+    //}
 };
 
 Sprite_BSFrontActor.prototype.damageOffsetX = function() {

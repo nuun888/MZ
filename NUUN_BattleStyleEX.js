@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.5
+ * @version 3.12.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/12/18 Ver.3.12.6
+ * 立ち絵、顔グラ表示EXでの画像設定で、画像が切り替わらない問題を修正。(立ち絵、顔グラ表示EX Ver.1.6.3以降)
  * 2023/12/17 Ver.3.12.5
  * コマンド選択時にアクターステータスウィンドウの位置が正常にシフトしない問題を修正。
  * アクター画像を表示していない時にアクターを選択するとエラーが出る問題を修正。
@@ -623,7 +625,12 @@ Game_Actor.prototype.performActionStart = function(action) {
     if (params.OnActionZoom && !this.isCounterSkillAction()) {
         this._isEffectAction = true;
     }
-    this.setBattleStyleAttackImgId(action);
+    if (BattleManager.isOnActorPictureEX()) {
+        this.setAttackImgId(action);
+        this.battleStyleImgRefresh();
+    } else {
+        this.setBattleStyleAttackImgId(action);
+    }
 };
 
 const _Game_Enemy_performActionStart = Game_Enemy.prototype.performActionStart;
@@ -667,13 +674,25 @@ Game_Actor.prototype.setBattleStyleAttackImgId = function(action) {
 const _Game_Battler_performDamage = Game_Battler.prototype.performDamage;
 Game_Battler.prototype.performDamage = function() {
     _Game_Battler_performDamage.call(this);
+    const onActorPictureEX = BattleManager.isOnActorPictureEX() && this.isActor();
     this.setDamageEffect();
     if (this.isGuard()) {
-        this.setBattleImgId(15);
+        if (onActorPictureEX) {
+            this.onImgId = 15;
+        } else {
+            this.setBattleImgId(15);
+        }
     }
     if (this._imgScenes !== 'guard') {
-        this.battlerImgCritical ? this.setBattleImgId(3) : this.setBattleImgId(1);
+        if (onActorPictureEX) {
+            this.onImgId = this.battlerImgCritical ? 3 : 1;
+        } else {
+            this.battlerImgCritical ? this.setBattleImgId(3) : this.setBattleImgId(1);
+        }
         this.battlerImgCritical = false;
+    }
+    if (onActorPictureEX) {
+        this.imgRefresh();
     }
     this.battleStyleImgRefresh();
 };
@@ -690,16 +709,26 @@ Game_Enemy.prototype.setDamageEffect = function() {
 
 const _Game_Actor_performRecovery = Game_Actor.prototype.performRecovery;
 Game_Actor.prototype.performRecovery = function() {
-  _Game_Actor_performRecovery.call(this);
-  this.setBattleImgId(2);
-  this.battleStyleImgRefresh();
+    _Game_Actor_performRecovery.call(this);
+    if (BattleManager.isOnActorPictureEX() && this.isActor()) {
+        this.onImgId = 2;
+        this.imgRefresh();
+    } else {
+        this.setBattleImgId(2);
+    }
+    this.battleStyleImgRefresh();
 };
 
 const _Game_Actor_performVictory = Game_Actor.prototype.performVictory;
 Game_Actor.prototype.performVictory = function() {
-  _Game_Actor_performVictory.call(this);
-  this.setBattleImgId(20);
-  this.battleStyleImgRefresh();
+    _Game_Actor_performVictory.call(this);
+    if (BattleManager.isOnActorPictureEX() && this.isActor()) {
+        this.onImgId = 20;
+        this.imgRefresh();
+    } else {
+        this.setBattleImgId(20);
+    }
+    this.battleStyleImgRefresh();
 };
 
 const _Game_Battler_refresh = Game_Battler.prototype.refresh;
@@ -771,7 +800,7 @@ Game_Actor.prototype.actorPictureActorGraphicData = function(imgData) {
         this._battleStyleGraphicIndex = -1;
         this._battleStyleImgIndex = -1;
     } else if (imgData.ActorImgMode === 'imges') {
-        this._battleStyleGraphicName = this._actorGraphicIndex !== this._battleStyleGraphicIndex ? this.getActorGraphicImg(imgData) : this._battleStyleGraphicName;
+        this._battleStyleGraphicName = this._actorGraphicName;
         this._battleStyleGraphicIndex = this._actorGraphicIndex;
         this._battleStyleImgIndex = -1;
     } else {

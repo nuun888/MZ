@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.2
+ * @version 1.6.3
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/12/18 Ver.1.6.3
+ * 戦闘中の立ち絵で画像が切り替わらない問題を修正。
  * 2023/9/2 Ver.1.6.2
  * 条件を満たしていなくても画像が切り替わってしまう問題を修正。
  * 2023/7/30 Ver.1.6.1
@@ -392,6 +394,7 @@ Game_Actor.prototype.setActorGraphicData = function() {
   const index = imgData ? imgData.ButlerActorImg.findIndex(data => this.matchConditions(data)) : -1;
   this._actorGraphicIndex = index;
   if (index >= 0) {
+    this.setActorGraphicId();
     const data = imgData.ButlerActorImg[index];
     this._actorGraphicName = getActorGraphicName(data);
     this._actorGraphicFace = data.FaceImg || this.faceName();
@@ -403,6 +406,16 @@ Game_Actor.prototype.setActorGraphicData = function() {
     this._actorImgIndex = this.faceIndex();
     this._actorGraphicOpacity = 255;
   }
+};
+
+Game_Actor.prototype.setActorGraphicId = function() {
+    switch (this._imgScenes) {
+        case 'counter':
+        case 'reflection':
+        case 'counterEX':
+            this.onImgId = 30;
+            break;
+    }
 };
 
 Game_Actor.prototype.matchConditions = function(data) {
@@ -526,57 +539,27 @@ Game_Actor.prototype.getIsActorGraphicImg = function() {
   return !!this._actorGraphicName;
 };
 
-const _Game_Actor_performDamage = Game_Actor.prototype.performDamage;
-Game_Actor.prototype.performDamage = function() {
-  _Game_Actor_performDamage.call(this);
-  if (this.isGuard()) {
-    this.onImgId = 15;
-    this.imgRefresh();
-  }
-  if (this._imgScenes !== 'guard') {
-    this.onImgId = this.result().critical ? 3 : 1;
-    this.imgRefresh();
-  }
-};
-
-const _Game_Actor_performRecovery = Game_Actor.prototype.performRecovery;
-Game_Actor.prototype.performRecovery = function() {
-  _Game_Actor_performRecovery.call(this);
-  this.onImgId = 2;
-  this.imgRefresh();
-};
-
-const _Game_Actor_performVictory = Game_Actor.prototype.performVictory;
-Game_Actor.prototype.performVictory = function() {
-  _Game_Actor_performVictory.call(this);
-  this.onImgId = 20;
-  this.imgRefresh();
-};
-
-const _Game_Actor_performActionStart = Game_Actor.prototype.performActionStart;
-Game_Actor.prototype.performActionStart = function(action) {
-  _Game_Actor_performActionStart.call(this, action);
-  this.setAttackImgId(action);
-};
-
 Game_Actor.prototype.setAttackImgId = function(action) {
     if (action.item().animationId !== 0) {
+        this.nuun_useItemId = action.item().id;
         if (action.isRecover()) {
             this.onImgId = 11;
-            this.nuun_useItemId = action.item().id;
+            this._actionBattlerImg = "recovery";
         } else if (action.isAttack() && action.isDamage()) {
             this.onImgId = 10;
-            this.nuun_useItemId = action.item().id;
+            this._actionBattlerImg = "attack";
         } else if (action.isMagicSkill()) {
             this.onImgId = 10;
-            this.nuun_useItemId = action.item().id;
+            this._actionBattlerImg = "attack";
         } else if (action.isSkill() && action.isDamage()) {
             this.onImgId = 10;
-            this.nuun_useItemId = action.item().id;
+            this._actionBattlerImg = "attack";
         } else if (action.isItem()) {
             this.onImgId = 12;
-            this.nuun_useItemId = action.item().id;
+            this._actionBattlerImg = "item";
         } else {
+            this.onImgId = 0;
+            this._actionBattlerImg = null;
             this.nuun_useItemId = -1;
         }
         this.imgRefresh();
@@ -598,7 +581,7 @@ Game_Actor.prototype.loadActorFace = function() {
 };
 
 Game_Actor.prototype.isActorGraphicDead = function(data) {
-  return data && ((data.stateChangeGraphicScenes === 'state' &&
+  return data && ((data.stateChangeGraphicScenes === 'death' || data.stateChangeGraphicScenes === 'state' &&
   data.stateId === this.deathStateId()) || data.ImgStateAll === this.deathStateId());
 };
 

@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.12.5
+### Ver.3.12.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.11.2  
@@ -209,6 +209,8 @@ LL_StandingPictureBattle等と併用する場合は、'Scene_Battle'に設定す
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/12/18 Ver.3.12.6  
+立ち絵、顔グラ表示EXでの画像設定で、画像が切り替わらない問題を修正。(立ち絵、顔グラ表示EX Ver.1.6.3以降)  
 2023/12/17 Ver.3.12.5  
 コマンド選択時にアクターステータスウィンドウの位置が正常にシフトしない問題を修正。  
 アクター画像を表示していない時にアクターを選択するとエラーが出る問題を修正。  

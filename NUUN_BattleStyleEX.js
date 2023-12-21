@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.6
+ * @version 3.12.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/12/21 Ver.3.12.7
+ * 不透明度が適用されない問題を修正。
  * 2023/12/18 Ver.3.12.6
  * 立ち絵、顔グラ表示EXでの画像設定で、画像が切り替わらない問題を修正。(立ち絵、顔グラ表示EX Ver.1.6.3以降)
  * 2023/12/17 Ver.3.12.5
@@ -930,8 +932,12 @@ Game_Actor.prototype.resetBattleStyleImgId = function() {
 };
 
 Game_Battler.prototype.isBSActorGraphicDead = function(data) {
-    return data && (data.ChangeGraphicScenes === 'death' || data.ChangeGraphicScenes === 'state' && (data.stateId === this.deathStateId() || data.ImgStateAll === this.deathStateId()));
+    return data && (data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && ((data.stateId && this.getStateData(data.stateId)) || (data.ImgStateAll && this.getStateData(data.ImgStateAll)))));
 };
+
+Game_Battler.prototype.getStateData = function(data) {
+    return data.some(s => s === this.deathStateId());
+}
   
 Game_Battler.prototype.getActorGraphicDead = function() {
     return this._isDeadImg;
@@ -3451,6 +3457,10 @@ Sprite_ActorImges.prototype.isCounter = function() {
     return this._imgScenes === 'counter' || this._imgScenes === 'reflection' || this._imgScenes === 'counterEX';
 };
 
+Sprite_ActorImges.prototype.isChangeOpacity = function(actor) {
+    return this.opacity !== actor.getBattleStyleOpacity();
+};
+
 Sprite_ActorImges.prototype.isCounterSkillAction = function(actor) {
     return actor.isCounterSkillAction();
 };
@@ -3479,9 +3489,18 @@ Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
             this.imgFrameRefresh();
             this.resetBitmapData(bitmap.width, bitmap.height);
         }
-        if (!this.isDead() && this._updateCount === 0) {
-            this.opacity = actor.getBattleStyleOpacity() || 255;
-            this._actorImgesOpacity = this.opacity;
+        if (this.isDead()) {
+            this._actorImgesOpacity = this.isActorGraphicDead() ? (this.opacity - actor.getBattleStyleOpacity()) : (this.opacity - 0);
+            this._durationOpacity = this.getFadeoutOpacity();
+            if (this._durationOpacity !== 0) {
+                this._updateCount = this.setDeadDuration();
+            }
+        } else {
+            this._actorImgesOpacity = this.opacity - actor.getBattleStyleOpacity();
+            this._durationOpacity = this.getFadeoutOpacity();
+            if (this._durationOpacity !== 0) {
+                this._updateCount = 30;
+            }
         }
     }
 };
@@ -3494,8 +3513,8 @@ Sprite_ActorImges.prototype.updateAnimation = function(){
             this.opacity = Math.max(this.opacity, 0);
             this._durationOpacity = this.opacity;
         } else if (this._durationOpacity < 0) {
-            this.opacity += this.getFadeoutOpacity() / this.setDeadDuration();
-            this.opacity = Math.min(this.opacity, this.getFadeoutOpacity());
+            this.opacity -= this.getFadeoutOpacity() / this.setDeadDuration();
+            this.opacity = Math.min(this.opacity, 255);
             this._durationOpacity = this.opacity - this.getFadeoutOpacity();
         }
     }
@@ -3503,7 +3522,7 @@ Sprite_ActorImges.prototype.updateAnimation = function(){
 
 Sprite_ActorImges.prototype.getFadeoutOpacity = function() {
     if (!this._actorImgesOpacity) {
-        this._actorImgesOpacity = this.opacity;
+        this._actorImgesOpacity = 0;
     }
     return this._actorImgesOpacity;
 };
@@ -3539,15 +3558,21 @@ Sprite_ActorImges.prototype.setDeadUpdateCount = function() {
     if (!params.ImgDeathHide || this.isActorGraphicDead()) {
         this._updateCount = 1;
     } else {
-        this._updateCount = this.setDeadDuration();
+        this._actorImgesOpacity = this.isActorGraphicDead() ? (this.opacity - this._battler.getBattleStyleOpacity()) : (this.opacity - 0);
         this._durationOpacity = this.getFadeoutOpacity();
+        if (this._durationOpacity !== 0) {
+            this._updateCount = this.setDeadDuration();
+        }
     }
     this.setActorDead(true);
 };
 
 Sprite_ActorImges.prototype.setReviveUpdateCount = function(){
-    this._updateCount = this.setDeadDuration();
-    this._durationOpacity = this.getFadeoutOpacity() * -1;
+    this._actorImgesOpacity = this.opacity - this._battler.getBattleStyleOpacity();
+    this._durationOpacity = this.getFadeoutOpacity();
+    if (this._durationOpacity !== 0) {
+        this._updateCount = this.setDeadDuration();
+    }
     this.setActorDead(false);
 };
 

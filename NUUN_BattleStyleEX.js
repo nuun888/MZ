@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.7
+ * @version 3.12.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,9 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/12/23 Ver.3.12.8
+ * 戦闘不能ステートの判定が正常に行われていなかった問題を修正。
+ * ステート条件設定に0を指定していると他の条件も一致しなくなる問題を修正。
  * 2023/12/21 Ver.3.12.7
  * 不透明度が適用されない問題を修正。
  * 2023/12/18 Ver.3.12.6
@@ -932,7 +935,7 @@ Game_Actor.prototype.resetBattleStyleImgId = function() {
 };
 
 Game_Battler.prototype.isBSActorGraphicDead = function(data) {
-    return data && (data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && ((data.stateId && this.getStateData(data.stateId)) || (data.ImgStateAll && this.getStateData(data.ImgStateAll)))));
+    return data && (data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
 };
 
 Game_Battler.prototype.getStateData = function(data) {
@@ -1014,7 +1017,7 @@ Game_Battler.prototype.isBattleStyleArmorImg = function(data) {
 };
   
 Game_Battler.prototype.isBattleStyleStateImg = function(data, states) {
-    return states.every(id => this.isStateAffected(id));
+    return states.every(id => id > 0 ? this.isStateAffected(id) : true);
 };
   
 Game_Battler.prototype.isBattleStyleClassImg = function(data) {

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.3
+ * @version 1.6.4
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/12/23 Ver.1.6.4
+ * 戦闘不能ステートの判定が正常に行われていなかった問題を修正。
+ * ステート条件設定に0を指定していると他の条件も一致しなくなる問題を修正。
  * 2023/12/18 Ver.1.6.3
  * 戦闘中の立ち絵で画像が切り替わらない問題を修正。
  * 2023/9/2 Ver.1.6.2
@@ -497,7 +500,7 @@ Game_Actor.prototype.isCondArmorImg = function(data) {
 };
 
 Game_Actor.prototype.isCondStateImg = function(data, states) {
-  return states.every(id => this.isStateAffected(id));
+  return states.every(id => id > 0 ? this.isStateAffected(id) : true);
 };
 
 Game_Actor.prototype.isCondClassImg = function(data) {
@@ -581,8 +584,7 @@ Game_Actor.prototype.loadActorFace = function() {
 };
 
 Game_Actor.prototype.isActorGraphicDead = function(data) {
-  return data && ((data.stateChangeGraphicScenes === 'death' || data.stateChangeGraphicScenes === 'state' &&
-  data.stateId === this.deathStateId()) || data.ImgStateAll === this.deathStateId());
+    return data && (data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.stateChangeGraphicScenes === 'death' || (data.stateChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
 };
 
 function conditionsParam(data, param, maxParam) {

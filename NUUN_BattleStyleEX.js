@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.10
+ * @version 3.12.11
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/12/29 Ver.3.12.11
+ * 戦闘開始時の画像が正常に取得できない問題を修正。
  * 2023/12/28 Ver.3.12.10
  * 一定時間変化の画像が戻らなくなる問題を修正。
  * 2023/12/28 Ver.3.12.9
@@ -385,6 +387,7 @@ BattleManager.initMembers = function() {
     this.notIconList = this.getNotVisibleIcons();
     this.onBSStartBattle = !params.ActorStatusWindowLock;
     this._bsInterpreter = null;
+    this.bsInBattle = true;
     Array.prototype.push.apply(this.notIconList , this.getNotVisibleBuffIcons());
 };
 
@@ -568,7 +571,12 @@ BattleManager.updateBsEXCommon = function() {
 const _BattleManager_updateBattleEnd = BattleManager.updateBattleEnd;
 BattleManager.updateBattleEnd = function() {
     this.battleEndCommon();
+    BattleManager.bsInBattle = false;
     _BattleManager_updateBattleEnd.call(this);
+};
+
+BattleManager.isBsBattle = function() {
+    return BattleManager.bsInBattle;
 };
 
 //Game_Temp
@@ -766,15 +774,13 @@ Game_Battler.prototype.refresh = function() {
 const _Game_Actor_imgRefresh = Game_Actor.prototype.imgRefresh;
 Game_Actor.prototype.imgRefresh = function() {
     _Game_Actor_imgRefresh.call(this);
-    if ($gameParty.inBattle()) {
-        this.battleStyleImgRefresh();
-    }
+    this.battleStyleImgRefresh();
 };
 
 const _Game_Actor_setup = Game_Actor.prototype.setup;
 Game_Actor.prototype.setup = function(actorId) {
     _Game_Actor_setup.call(this, actorId);
-    if ($gameParty.inBattle() && !BattleManager.isOnActorPictureEX()) {
+    if (!BattleManager.isOnActorPictureEX()) {
         this.battleStyleImgRefresh();
     }
 };
@@ -786,6 +792,9 @@ Game_Enemy.prototype.setup = function(enemyId, x, y) {
 };
 
 Game_Actor.prototype.battleStyleImgRefresh = function() {
+    if (!BattleManager.isBsBattle()) {
+        return;
+    }
     let imgIndex = -1;
     let index = -1;
     this._isDeadImg = false;
@@ -2655,7 +2664,7 @@ Window_BattleActorImges.prototype.drawItemImage = function(index) {
   if (actor.bsImgMode !== 'none' && actor.faceMode) {
     this.drawItemFace(index, actor);
   } else if (actor.bsImgMode !== 'none') {
-    this.drawItemButler(index, actor);
+    this.drawItemBattler(index, actor);
   }
   if ($gameTemp.actorData && params.StateVisible && params.OutsideWindowVisible) {
     const rect = this.itemRectWithPadding(index);
@@ -2673,7 +2682,7 @@ Window_BattleActorImges.prototype.drawItemImage = function(index) {
   }
 };
 
-Window_BattleActorImges.prototype.drawItemButler = function(index, actor) {
+Window_BattleActorImges.prototype.drawItemBattler = function(index, actor) {
   const bitmap = this.actorMainSprite[index];
   const actorId = actor.actorId();
   const positionData = getActorPositionData(actorId);

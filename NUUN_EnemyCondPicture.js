@@ -14,7 +14,7 @@
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
- * @version 1.2.0
+ * @version 1.2.2
  * 
  * @help
  * Switch the image of the enemy according to the conditions.
@@ -25,6 +25,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/21/2023 Ver.1.2.2
+ * Opacity correction.
+ * 12/21/2023 Ver.1.2.1
+ * Fixed an issue where images would not switch.
+ * Fixed issue where opacity was not applied.
  * 7/29/2023 Ver.1.2.0
  * Added a function to randomly display enemy images
  * 7/27/2023 Ver.1.1.0
@@ -258,7 +263,7 @@
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
- * @version 1.2.0
+ * @version 1.2.2
  * 
  * @help
  * 敵の画像を条件により切り替えます。
@@ -269,6 +274,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/12/29 Ver 1.2.2
+ * 不透明度の修正。
+ * 2023/12/21 Ver.1.2.1
+ * 画像が切り替わらない問題を修正。
+ * 不透明度が適用されない問題を修正。
  * 2023/7/29 Ver 1.2.0
  * 敵画像をランダムに表示させる機能を追加。
  * 2023/7/21 Ver 1.1.0
@@ -509,6 +519,7 @@ Imported.NUUN_EnemyCondPicture = true;
     const DamageImgFrame = Number(parameters['DamageImgFrame'] || 30);
     const CounterImgFrame = Number(parameters['CounterImgFrame'] || 60);
 
+    //直後の画像が死亡時の画像か判定し、存在すれば戦闘不能エフェクトを発動しないようにする。
     function getEnemyData(enmeyId) {
         return EnemyCondPictureData.find(data => data.Enemy === enmeyId);
     };
@@ -554,7 +565,8 @@ Imported.NUUN_EnemyCondPicture = true;
                 this.setbattleStyleGraphicId();
                 const data = list[index];
                 this._isDeadImg = this.isBSEnemyGraphicDead(data);
-                this._battleStyleGraphicName = index !== this._battleStyleGraphicIndex ? this.getBattleStyleImg(data) : this._battleStyleGraphicName;
+                //this._battleStyleGraphicName = index !== this._battleStyleGraphicIndex ? this.getBattleStyleImg(data) : this._battleStyleGraphicName;
+                this._battleStyleGraphicName = this.getBattleStyleImg(data);
                 this._battleStyleGraphicHue = this.getBattleStyleImgHue(data);
                 imgIndex = this.getBattleStyleImgIndex(data);
                 this._battleStyleGraphicOpacity = data.Opacity || 255;
@@ -594,8 +606,12 @@ Imported.NUUN_EnemyCondPicture = true;
     };
 
     Game_Enemy.prototype.isBSEnemyGraphicDead = function(data) {
-        return data && (data.ChangeGraphicScenes === 'death' || data.ChangeGraphicScenes === 'state' && (data.stateId === this.deathStateId() || data.ImgStateAll === this.deathStateId()));
+        return data && (data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
     };
+    
+    Game_Enemy.prototype.getStateData = function(data) {
+        return data.some(s => s === this.deathStateId());
+    }
       
     Game_Enemy.prototype.getEnemyGraphicDead = function() {
         return this._isDeadImg;
@@ -639,13 +655,87 @@ Imported.NUUN_EnemyCondPicture = true;
         this._updateCount = 0;
         this._imgListId = -1;
         this._durationOpacity = 0;
+        this._isDead = false;
+        this._updateImg = false;
     };
+
+    const _Sprite_Enemy_updateBitmap = Sprite_Enemy.prototype.updateBitmap;
+    Sprite_Enemy.prototype.updateBitmap = function() {
+        _Sprite_Enemy_updateBitmap.call(this);
+        this.updateEnemyGraphic();
+    };
+
+    Sprite_Enemy.prototype.updateEnemyGraphic = function() {
+        const enemy = this._battler;
+        if (enemy) {
+            if (this.isEnemyGraphicDead() && enemy.isDead() && !this.isDead()) {
+                this.setDeadUpdateCount();
+            } else if (enemy.isAlive() && this.isDead()) {
+                this.setReviveUpdateCount();
+            } else if (this._imgListId !== enemy.getBSGraphicIndex()) {
+                if (enemy.onImgId === 1 || enemy.onImgId === 2 || enemy.onImgId === 3 || enemy.onImgId === 15) {
+                    this.setUpdateCount(this.setDamageDuration());
+                } else if (enemy.onImgId === 30) {
+                    this.setUpdateCount(this.setCounterDuration());
+                } else if (enemy.onImgId === 20) {
+                    this.setUpdateCount(Infinity);
+                } else {
+                    this.setUpdateCount(1);
+                }
+            }
+        }
+        this.refreshEnemyGraphic(enemy);
+        if (this._startUpdate) {
+            this._startUpdate = false;
+        }
+    };
+
+    const _Sprite_Enemy_initVisibility = Sprite_Enemy.prototype.initVisibility;
+    Sprite_Enemy.prototype.initVisibility = function() {
+        if (!this._updateImg) {
+            _Sprite_Enemy_initVisibility.call(this);
+        }
+    };
+
+    Sprite_Enemy.prototype.refreshEnemyGraphic = function(enemy) {
+        if (enemy && enemy.getBSImgName()) { 
+            if (this._imgListId !== enemy.getBSGraphicIndex() && this._updateCount > 0) {
+                const bitmap = enemy.getLoadBattleStyleImg();
+                this._loadedBitmap = bitmap;
+                if (bitmap && !bitmap.isReady()) {
+                    bitmap.addLoadListener(this.setEnemyGraphic.bind(this, enemy, bitmap));
+                } else if (bitmap) {
+                    this.setEnemyGraphic(enemy, bitmap);
+                }
+                this._imgScenes = this.getImgScenes(enemy);
+                this._imgListId = enemy.getBSGraphicIndex();
+                this._updateImg = true;
+            }
+        }
+        this.updateGraphicAnimation();
+        if (this._imgScenes === 'chant' && !enemy.isChanting()) {
+            this.resetBattleStyleImg(enemy);
+        } else if (enemy.isBSActionBattlerImg()) {
+            if (!enemy.isActing() && !this.isCounterSkillAction(enemy)) {
+                enemy.setBSActionBattlerImg(null);
+                this.resetBattleStyleImg(enemy);
+            } else if (!this.isCounterSkillAction(enemy) && this.isCounter()) {
+                enemy.setBSActionBattlerImg(null);
+                this.resetBattleStyleImg(enemy);
+            }
+        } else if (this._updateCount === 0) {
+            this.resetBattleStyleImg(enemy);
+        }
+    };
+
+
+
 
     const _Sprite_Enemy_updateEffect = Sprite_Enemy.prototype.updateEffect;
     Sprite_Enemy.prototype.updateEffect = function() {
         _Sprite_Enemy_updateEffect.call(this);
         this.updateShakeDamage();
-        this.updateEnemyGraphic();
+        //this.updateEnemyGraphic();
     };
 
     const _Sprite_Enemy_setupEffect = Sprite_Enemy.prototype.setupEffect;
@@ -679,63 +769,8 @@ Imported.NUUN_EnemyCondPicture = true;
         }
     };
 
-    Sprite_Enemy.prototype.updateEnemyGraphic = function() {
-        const enemy = this._battler;
-        if (enemy) {
-            if (this.isEnemyGraphicDead() && enemy.isDead() && !this.isDead()) {
-                this.setDeadUpdateCount();
-            } else if (enemy.isAlive() && this.isDead()) {
-                this.setReviveUpdateCount();
-            } else if (this._imgListId !== enemy.getBSGraphicIndex()) {
-                if (enemy.onImgId === 1 || enemy.onImgId === 2 || enemy.onImgId === 3 || enemy.onImgId === 15) {
-                    this.setUpdateCount(this.setDamageDuration());
-                } else if (enemy.onImgId === 30) {
-                    this.setUpdateCount(this.setCounterDuration());
-                } else if (enemy.onImgId === 20) {
-                    this.setUpdateCount(Infinity);
-                } else {
-                    this.setUpdateCount(1);
-                }
-            }
-        }
-        this.refreshEnemyGraphic(enemy);
-        if (this._startUpdate) {
-            this._startUpdate = false;
-        }
-    };
-
     Sprite_Enemy.prototype.setUpdateCount = function(count) {
         this._updateCount = count;
-    };
-
-    Sprite_Enemy.prototype.refreshEnemyGraphic = function(enemy) {
-        if (enemy && enemy.getBSImgName()) {
-            if (this._imgListId !== enemy.getBSGraphicIndex() && this._updateCount > 0) {
-                const bitmap = enemy.getLoadBattleStyleImg();
-                this._loadedBitmap = bitmap;
-                if (bitmap && !bitmap.isReady()) {
-                    bitmap.addLoadListener(this.setEnemyGraphic.bind(this, enemy, bitmap));
-                } else if (bitmap) {
-                    this.setEnemyGraphic(enemy, bitmap);
-                }
-                this._imgScenes = this.getImgScenes(enemy);
-                this._imgListId = enemy.getBSGraphicIndex();
-            }
-        }
-        this.updateGraphicAnimation();
-        if (this._imgScenes === 'chant' && !enemy.isChanting()) {
-            this.resetBattleStyleImg(enemy);
-        } else if (enemy.isBSActionBattlerImg()) {
-            if (!enemy.isActing() && !this.isCounterSkillAction(enemy)) {
-                enemy.setBSActionBattlerImg(null);
-                this.resetBattleStyleImg(enemy);
-            } else if (!this.isCounterSkillAction(enemy) && this.isCounter()) {
-                enemy.setBSActionBattlerImg(null);
-                this.resetBattleStyleImg(enemy);
-            }
-        } else if (this._updateCount === 0) {
-            this.resetBattleStyleImg(enemy);
-        }
     };
     
     Sprite_Enemy.prototype.isCounter = function() {
@@ -758,15 +793,25 @@ Imported.NUUN_EnemyCondPicture = true;
             this._apngMode = true;
         } else {
             this.resetApngEnemyImg();
-            this.updateEnmeyExBitmap();
-            if (!this.isDead() && this._updateCount === 0) {
-                this.opacity = enemy.getBattleStyleOpacity() || 255;
-                this._enemyImgesOpacity = this.opacity;
+            if (this.isDead()) {
+                this.revertToNormal();
+                this._enemyImgesOpacity = this.isEnemyGraphicDead() ? (this.opacity - enemy.getBattleStyleOpacity()) : (this.opacity - 0);
+                this._durationOpacity = this.getFadeoutOpacity();
+                if (this._durationOpacity !== 0) {
+                    this._updateCount = this.setDeadDuration();
+                }
+                this._effectDuration = 0;
+            } else {
+                this._enemyImgesOpacity = this.opacity - enemy.getBattleStyleOpacity();
+                this._durationOpacity = this.getFadeoutOpacity();
+                if (enemy.isDead()) {
+                    this._durationOpacity = 0;
+                } else if (this._durationOpacity !== 0) {
+                    this._updateCount = 30;
+                }
+                this._appeared = true;
             }
-        }
-        if (this.isDead()) {
-            this.revertToNormal();
-        }
+        } 
     };
 
     Sprite_Enemy.prototype.updateEnmeyExBitmap = function() {
@@ -796,9 +841,9 @@ Imported.NUUN_EnemyCondPicture = true;
         }
     };
     
-    Sprite_Enemy.prototype.getFadeoutOpacity = function() {
+    Sprite_Enemy.prototype.getFadeoutOpacity = function() {       
         if (!this._enemyImgesOpacity) {
-            this._enemyImgesOpacity = this.opacity;
+            this._enemyImgesOpacity = 0;
         }
         return this._enemyImgesOpacity;
     };
@@ -808,14 +853,26 @@ Imported.NUUN_EnemyCondPicture = true;
     };
 
     Sprite_Enemy.prototype.setDeadUpdateCount = function() {
-        this.setUpdateCount(1);
+        if (this.isEnemyGraphicDead()) {
+            this.setUpdateCount(1);
+            this._enemyImgesOpacity = (this.opacity - this._battler.getBattleStyleOpacity());
+        }
+        this._durationOpacity = this.getFadeoutOpacity();
+        if (this._durationOpacity !== 0) {
+            this.setUpdateCount(this.setDeadDuration());
+        }
         this.setEnemyDead(true);
     };
     
     Sprite_Enemy.prototype.setReviveUpdateCount = function(){
+        this._enemyImgesOpacity = this.opacity - this._battler.getBattleStyleOpacity();
+        this._durationOpacity = this.getFadeoutOpacity();
+        if (this._durationOpacity !== 0) {
+            this.setUpdateCount(this.setDeadDuration());
+        }
         this.setEnemyDead(false);
     };
-    
+
     Sprite_Enemy.prototype.isEnemyGraphicDead = function() {
         return this._battler.getEnemyGraphicDead();
     };

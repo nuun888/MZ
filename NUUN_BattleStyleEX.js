@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.9
+ * @version 3.12.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/12/28 Ver.3.12.10
+ * 一定時間変化の画像が戻らなくなる問題を修正。
  * 2023/12/28 Ver.3.12.9
  * 戦闘不能時の画像非表示をOFFに設定していても、画像が消えてしまう問題を修正。
  * 戦闘不能をアイテム、スキルから付加させたときに、アクターの不透明度が正常に適用されない問題を修正。
@@ -3507,11 +3509,7 @@ Sprite_ActorImges.prototype.isCounterSkillAction = function(actor) {
 };
 
 Sprite_ActorImges.prototype.resetBattleStyleImg = function(actor) {
-    if (BattleManager.isOnActorPictureEX()) {
-        actor.imgRefresh();
-    } else {
-        actor.battleStyleImgRefresh();
-    }
+    actor.resetBattleStyleImgId();
 };
 
 Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {

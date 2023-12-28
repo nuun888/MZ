@@ -1,5 +1,5 @@
 # [立ち絵、顔グラ表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
-# Ver.1.6.4
+# Ver.1.6.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -49,6 +49,9 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2023/12/28 Ver.1.6.5  
+戦闘不能時の画像設定状態が正常に取得されていなかった問題を修正。  
+一部の処理をバトルスタイル拡張側で処理するように修正。  
 2023/12/23 Ver.1.6.4  
 戦闘不能ステートの判定が正常に行われていなかった問題を修正。  
 ステート条件設定に0を指定していると他の条件も一致しなくなる問題を修正。  

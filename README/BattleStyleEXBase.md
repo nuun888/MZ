@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.12.9
+### Ver.3.12.10
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.11.2  
@@ -209,6 +209,8 @@ LL_StandingPictureBattle等と併用する場合は、'Scene_Battle'に設定す
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2023/12/28 Ver.3.12.10  
+一定時間変化の画像が戻らなくなる問題を修正。  
 2023/12/28 Ver.3.12.9  
 戦闘不能時の画像非表示をOFFに設定していても、画像が消えてしまう問題を修正。  
 戦闘不能をアイテム、スキルから付加させたときに、アクターの不透明度が正常に適用されない問題を修正。  

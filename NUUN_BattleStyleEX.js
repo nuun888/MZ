@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.8
+ * @version 3.12.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,10 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2023/12/28 Ver.3.12.9
+ * 戦闘不能時の画像非表示をOFFに設定していても、画像が消えてしまう問題を修正。
+ * 戦闘不能をアイテム、スキルから付加させたときに、アクターの不透明度が正常に適用されない問題を修正。
+ * 反撃の立ち絵切り替えが機能していない問題を修正。
  * 2023/12/23 Ver.3.12.8
  * 戦闘不能ステートの判定が正常に行われていなかった問題を修正。
  * ステート条件設定に0を指定していると他の条件も一致しなくなる問題を修正。
@@ -480,10 +484,14 @@ BattleManager.getDisplayMessageType = function() {
 
 const _BattleManager_startActorInput = BattleManager.startActorInput;
 BattleManager.startActorInput = function() {
-  _BattleManager_startActorInput.call(this);
-  if (this._currentActor && this._currentActor.isInputting()) {
-      this._currentActor.battleStyleImgRefresh();
-  }
+    _BattleManager_startActorInput.call(this);
+    if (this._currentActor && this._currentActor.isInputting()) {
+        if (this.isOnActorPictureEX()) {
+            this._currentActor.imgRefresh();
+        } else {
+            this._currentActor.battleStyleImgRefresh();
+        }
+    }
 };
 
 const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
@@ -491,6 +499,11 @@ BattleManager.invokeCounterAttack = function(subject, target) {
     target.isCouterAction = true;
     if (target.isActor()) {
         target.result().counterEx = true;
+        if (this.isOnActorPictureEX()) {
+            target.imgRefresh();
+        } else {
+            target.battleStyleImgRefresh();
+        }
     }
     _BattleManager_invokeCounterAttack.call(this, subject, target);
 };
@@ -500,7 +513,11 @@ BattleManager.invokeMagicReflection = function(subject, target) {
     target.isReflectionAction = true;
     if (target.isActor()) {
         target.result().reflectionEx = true;
-        target.battleStyleImgRefresh();
+        if (this.isOnActorPictureEX()) {
+            target.imgRefresh();
+        } else {
+            target.battleStyleImgRefresh();
+        }
     }
     _BattleManager_invokeMagicReflection.call(this, subject, target);
 };
@@ -632,7 +649,6 @@ Game_Actor.prototype.performActionStart = function(action) {
     }
     if (BattleManager.isOnActorPictureEX()) {
         this.setAttackImgId(action);
-        this.battleStyleImgRefresh();
     } else {
         this.setBattleStyleAttackImgId(action);
     }
@@ -698,8 +714,9 @@ Game_Battler.prototype.performDamage = function() {
     }
     if (onActorPictureEX) {
         this.imgRefresh();
+    } else {
+        this.battleStyleImgRefresh();
     }
-    this.battleStyleImgRefresh();
 };
 
 Game_Actor.prototype.setDamageEffect = function() {
@@ -720,8 +737,8 @@ Game_Actor.prototype.performRecovery = function() {
         this.imgRefresh();
     } else {
         this.setBattleImgId(2);
+        this.battleStyleImgRefresh();
     }
-    this.battleStyleImgRefresh();
 };
 
 const _Game_Actor_performVictory = Game_Actor.prototype.performVictory;
@@ -732,20 +749,32 @@ Game_Actor.prototype.performVictory = function() {
         this.imgRefresh();
     } else {
         this.setBattleImgId(20);
+        this.battleStyleImgRefresh();
     }
-    this.battleStyleImgRefresh();
 };
 
 const _Game_Battler_refresh = Game_Battler.prototype.refresh;
 Game_Battler.prototype.refresh = function() {
     _Game_Battler_refresh.call(this);
-    this.battleStyleImgRefresh();
+    if ($gameParty.inBattle() && !BattleManager.isOnActorPictureEX() && this.isActor()) {
+        this.battleStyleImgRefresh();
+    }
+};
+
+const _Game_Actor_imgRefresh = Game_Actor.prototype.imgRefresh;
+Game_Actor.prototype.imgRefresh = function() {
+    _Game_Actor_imgRefresh.call(this);
+    if ($gameParty.inBattle()) {
+        this.battleStyleImgRefresh();
+    }
 };
 
 const _Game_Actor_setup = Game_Actor.prototype.setup;
 Game_Actor.prototype.setup = function(actorId) {
     _Game_Actor_setup.call(this, actorId);
-    this.battleStyleImgRefresh();
+    if ($gameParty.inBattle() && !BattleManager.isOnActorPictureEX()) {
+        this.battleStyleImgRefresh();
+    }
 };
 
 const _Game_Enemy_setup = Game_Enemy.prototype.setup;
@@ -815,7 +844,7 @@ Game_Actor.prototype.actorPictureActorGraphicData = function(imgData) {
     }
     const data = this.getActorGraphicData();
     if (data) {
-        this._isDeadImg = this.isBSActorGraphicDead(data);
+        this._isDeadImg = this.isActorGraphicDead(data);
         this._imgScenes = data.ChangeGraphicScenes;
     }
 };
@@ -930,8 +959,12 @@ Game_Battler.prototype.resetBattleStyleImgId = function() {
 };
 
 Game_Actor.prototype.resetBattleStyleImgId = function() {
-    this.setBattleImgId(0, -1);
-    this.battleStyleImgRefresh();
+    if (BattleManager.isOnActorPictureEX()) {
+        this.resetImgId()
+    } else {
+        this.setBattleImgId(0, -1);
+        this.battleStyleImgRefresh();
+    }
 };
 
 Game_Battler.prototype.isBSActorGraphicDead = function(data) {
@@ -2593,7 +2626,11 @@ Window_BattleActorImges.prototype.preparePartyRefresh = function() {
     this.actorMainSprite = [];
     let bitmap = null;
     for (const actor of $gameParty.members()) {
-        actor.battleStyleImgRefresh();
+        if (BattleManager.isOnActorPictureEX()) {
+            actor.imgRefresh();
+        } else {
+            actor.battleStyleImgRefresh();
+        }
         bitmap = actor.getLoadBattleStyleImg();
         this.actorMainSprite.push(bitmap);
         if(bitmap && !bitmap.isReady()){
@@ -3426,7 +3463,7 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
     }
 };
 
-Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
+Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) { 
     if (actor && actor.getBSImgName()) {
         if (this._imgListId !== actor.getBSGraphicIndex() && this._updateCount > 0) {
             const bitmap = actor.getLoadBattleStyleImg();
@@ -3440,6 +3477,7 @@ Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
             this._imgListId = actor.getBSGraphicIndex();
         }
     }
+    const count = this._updateCount;
     this.updateAnimation();
     if (this._imgScenes === 'chant' && !actor.isChanting()) {
         this.resetBattleStyleImg(actor);
@@ -3451,7 +3489,7 @@ Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
             actor.setBSActionBattlerImg(null);
             this.resetBattleStyleImg(actor);
         }
-    } else if (this._updateCount === 0) {
+    } else if (count > 0 && this._updateCount === 0) {
         this.resetBattleStyleImg(actor);
     }
 };
@@ -3469,10 +3507,11 @@ Sprite_ActorImges.prototype.isCounterSkillAction = function(actor) {
 };
 
 Sprite_ActorImges.prototype.resetBattleStyleImg = function(actor) {
-    if (Imported.NUUN_ActorPicture && params.OnActorPictureEX) {
+    if (BattleManager.isOnActorPictureEX()) {
         actor.imgRefresh();
+    } else {
+        actor.battleStyleImgRefresh();
     }
-    actor.resetBattleStyleImgId();
 };
 
 Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
@@ -3558,14 +3597,19 @@ Sprite_ActorImges.prototype.imgFrameRefresh = function() {//画像を切り替�
 };
 
 Sprite_ActorImges.prototype.setDeadUpdateCount = function() {
-    if (!params.ImgDeathHide || this.isActorGraphicDead()) {
+    if (!params.ImgDeathHide) {
+        this._updateCount = 0;
+        this._actorImgesOpacity = 0;
+    }
+    if (this.isActorGraphicDead()) {
         this._updateCount = 1;
-    } else {
-        this._actorImgesOpacity = this.isActorGraphicDead() ? (this.opacity - this._battler.getBattleStyleOpacity()) : (this.opacity - 0);
-        this._durationOpacity = this.getFadeoutOpacity();
-        if (this._durationOpacity !== 0) {
-            this._updateCount = this.setDeadDuration();
-        }
+        this._actorImgesOpacity = (this.opacity - this._battler.getBattleStyleOpacity());
+    } else if (params.ImgDeathHide) {
+        this._actorImgesOpacity = this.opacity - 0;
+    }
+    this._durationOpacity = this.getFadeoutOpacity();
+    if (this._durationOpacity !== 0) {
+        this._updateCount = this.setDeadDuration();
     }
     this.setActorDead(true);
 };

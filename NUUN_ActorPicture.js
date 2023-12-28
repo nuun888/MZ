@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.4
+ * @version 1.6.5
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2023/12/28 Ver.1.6.5
+ * 戦闘不能時の画像設定状態が正常に取得されていなかった問題を修正。
+ * 一部の処理をバトルスタイル拡張側で処理するように修正。
  * 2023/12/23 Ver.1.6.4
  * 戦闘不能ステートの判定が正常に行われていなかった問題を修正。
  * ステート条件設定に0を指定していると他の条件も一致しなくなる問題を修正。
@@ -196,7 +199,7 @@
  * @parent AllMatch
  * 
  * @param ImgStateAll
- * @text ステート。
+ * @text ステート
  * @desc 指定したステートに全てかかっている時に条件を満たします。
  * @type state[]
  * @default 
@@ -327,33 +330,6 @@ NuunManager.setupClassName = function(className) {
 
 NuunManager.getClassName = function() {
   return this._className;
-};
-
-
-const _BattleManager_startActorInput = BattleManager.startActorInput;
-BattleManager.startActorInput = function() {
-  _BattleManager_startActorInput.call(this);
-  if (this._currentActor && this._currentActor.isInputting()) {
-      this._currentActor.imgRefresh();
-  }
-};
-
-const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
-BattleManager.invokeCounterAttack = function(subject, target) {
-  if (target.isActor()) {
-    target.result().counterEx = true;
-    target.imgRefresh();
-  }
-  _BattleManager_invokeCounterAttack.call(this, subject, target);
-};
-
-const _BattleManager_invokeMagicReflection = BattleManager.invokeMagicReflection;
-BattleManager.invokeMagicReflection = function(subject, target) {
-  if (target.isActor(target)) {
-    target.result().reflectionEx = true;
-    target.imgRefresh();
-  }
-  _BattleManager_invokeMagicReflection.call(this, subject, target);
 };
 
 const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
@@ -518,8 +494,8 @@ Game_Actor.prototype.isClassNameImg = function(data) {
 
 const _Game_Actor_refresh = Game_Actor.prototype.refresh;
 Game_Actor.prototype.refresh = function() {
-  _Game_Actor_refresh.call(this);
-  this.imgRefresh();
+    _Game_Actor_refresh.call(this);
+    this.imgRefresh();
 };
 
 Game_Actor.prototype.imgRefresh = function() {
@@ -584,7 +560,7 @@ Game_Actor.prototype.loadActorFace = function() {
 };
 
 Game_Actor.prototype.isActorGraphicDead = function(data) {
-    return data && (data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.stateChangeGraphicScenes === 'death' || (data.stateChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
+    return data && (data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
 };
 
 function conditionsParam(data, param, maxParam) {

@@ -1,5 +1,5 @@
 # [アイテム図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)
-# Ver.1.6.3
+# Ver.1.6.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -90,6 +90,8 @@ desc1と記入した場合はアイテム、武器、防具のメモ欄に<desc1
 メモ欄のタグ記入時では付けないでください。  
 
 ## 更新履歴
+2023/12/29 Ver.1.6.4  
+アイテムカテゴリー名称の未設定時の不具合修正。  
 2023/9/10 Ver.1.6.3  
 個別指定画像フォルダを設定しなかった時に、エラーが表示される問題を修正。  
 2023/4/23 Ver.1.6.2  

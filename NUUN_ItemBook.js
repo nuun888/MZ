@@ -2534,7 +2534,7 @@ Window_ItemBook_Index.prototype.categoryIncludes = function(item) {
     return true;
   } else if (this._category === 'allItem' && !this.secretItem(item) && item) {
     return DataManager.isItem(item);
-  }console.log(item.ad)
+  }
   const type = item ? item.meta[ItemBookCategoryTagName] : null;
   const category = this.includes(item);
   if(category && !type) {

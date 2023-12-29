@@ -8423,22 +8423,19 @@ Window_EnemyBook_Percent.prototype.refresh = function() {
     const rect = this.itemLineRect(0);
     let y = rect.y + (this._oy * -1);
     this.contents.clear();
-    try {
-        for (const content of this._percentContent) { 
-            const text = this.getPercentParam(content);
-            this.drawText(text, rect.x, y, rect.width, 'center');
-            y += lineHeight;
-        }
-        const text = this.getPercentParam(this._percentContent[0]);
+    for (const content of this._percentContent) { 
+        const text = this.getPercentParam(content);
         this.drawText(text, rect.x, y, rect.width, 'center');
-    } catch (error) {
-        const log = "データが不正です。 配列数" +this._percentContent.length;
-        throw ["DataError", log];
+        y += lineHeight;
     }
-    
+    const text = this.getPercentParam(this._percentContent[0]);
+    this.drawText(text, rect.x, y, rect.width, 'center');
 };
   
 Window_EnemyBook_Percent.prototype.getPercentParam = function(content) {
+    if (!content) {
+        return '完成度 : '+ (this._defeat.complete || 0) +' %';
+    }
     switch (content.ContentDate) {
       case 0:
         return content.ContentName +' : '+ (this._defeat.complete || 0) +' %';

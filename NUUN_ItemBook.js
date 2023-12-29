@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -114,6 +114,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2023/12/29 Ver.1.6.4
+ * アイテムカテゴリー名称の未設定時の不具合修正。
  * 2023/9/10 Ver.1.6.3
  * 個別指定画像フォルダを設定しなかった時に、エラーが表示される問題を修正。
  * 2023/4/23 Ver.1.6.2
@@ -456,6 +458,7 @@
  * 
  * @param ItemBookCategoryTagName
  * @desc メモ欄に記入するアイテムカテゴリー識別用タグの名称を指定します。
+ * @text アイテムカテゴリー名称
  * @type string
  * @default 'CategoryType'
  * @parent Category
@@ -1562,7 +1565,7 @@ const TraitsMaxItems = Number(parameters['TraitsMaxItems'] || 0);
 const TraitsMultiCol = eval(parameters['TraitsMultiCol'] || "false");
 const BackGroundImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImg'])) : null) || [];
 const ItemBookCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemBookCategory'])) : null) || [];
-const ItemBookCategoryTagName = eval(parameters['ItemBookCategoryTagName'] || 'CategoryType');
+const ItemBookCategoryTagName = eval(parameters['ItemBookCategoryTagName']) || 'CategoryType';
 const ItemBookBackGround = eval(parameters['ItemBookBackGround'] || "false");
 const BackUiWidth = eval(parameters['BackUiWidth'] || "false");
 
@@ -2531,7 +2534,7 @@ Window_ItemBook_Index.prototype.categoryIncludes = function(item) {
     return true;
   } else if (this._category === 'allItem' && !this.secretItem(item) && item) {
     return DataManager.isItem(item);
-  }
+  }console.log(item.ad)
   const type = item ? item.meta[ItemBookCategoryTagName] : null;
   const category = this.includes(item);
   if(category && !type) {

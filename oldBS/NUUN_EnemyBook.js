@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.8
+ * @version 2.20.9
  * 
  * @help
  * Implement an enemy book.
@@ -6237,7 +6237,7 @@ bookContents.PageList17 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData
 bookContents.PageList18 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList18'])) : [];
 bookContents.PageList19 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList19'])) : [];
 bookContents.PageList20 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList20'])) : [];
-
+console.log(parameters)
 const MapEncountEnemiesList = setMapList();
 
 const pageIndex = {category:0, index:0, page:0, infoIndex:0};
@@ -8376,13 +8376,13 @@ Window_EnemyBook_Percent.prototype.constructor = Window_EnemyBook_Percent;
   
 Window_EnemyBook_Percent.prototype.initialize = function(rect) {
     this._isEnemyBook = true;
-    Window_Selectable.prototype.initialize.call(this, rect);
     this._defeat = {};
     this._encountered = {};
-    this._duration = 0;
-    this._oy = 0;
     this._percentContent = PercentContent;
     this._percentContentLength = this._percentContent.length;
+    Window_Selectable.prototype.initialize.call(this, rect);
+    this._duration = 0;
+    this._oy = 0;
 };
 
 Window_EnemyBook_Percent.prototype.loadWindowskin = function() {
@@ -8423,21 +8423,19 @@ Window_EnemyBook_Percent.prototype.refresh = function() {
     const rect = this.itemLineRect(0);
     let y = rect.y + (this._oy * -1);
     this.contents.clear();
-    try {
-        for (const content of this._percentContent) { 
-            const text = this.getPercentParam(content);
-            this.drawText(text, rect.x, y, rect.width, 'center');
-            y += lineHeight;
-        }
-        const text = this.getPercentParam(this._percentContent[0]);
+    for (const content of this._percentContent) { 
+        const text = this.getPercentParam(content);
         this.drawText(text, rect.x, y, rect.width, 'center');
-    } catch (error) {
-        const log = "データが不正です。 配列数" +PercentContent.length;
-        throw ["DataError", log];
+        y += lineHeight;
     }
+    const text = this.getPercentParam(this._percentContent[0]);
+    this.drawText(text, rect.x, y, rect.width, 'center');
 };
   
 Window_EnemyBook_Percent.prototype.getPercentParam = function(content) {
+    if (!content) {
+        return '完成度 : '+ (this._defeat.complete || 0) +' %';
+    }
     switch (content.ContentDate) {
       case 0:
         return content.ContentName +' : '+ (this._defeat.complete || 0) +' %';

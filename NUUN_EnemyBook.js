@@ -230,7 +230,7 @@
  * 
  * Log
  * 12/29/2023 Ver.2.20.8
- * Fixed an issue where an error would occur when the completion level display setting was not set.
+ * Set error log when invalid data is set in completion level display settings.
  * 12/29/2023 Ver.2.20.7
  * Fixed an issue where an error would occur when viewing categories during battle.
  * Fixed the behavior of some windows during battle.
@@ -3204,7 +3204,7 @@
  * 
  * 更新履歴
  * 2023/12/29 Ver.2.20.8
- * 完成度の表示設定を未設定にしたときにエラーが出る問題を修正。
+ * 完成度の表示設定に不正なデータが設定されているときのエラーログを設定。
  * 2023/12/29 Ver.2.20.7
  * 戦闘中にカテゴリーを表示したときにエラーが出る問題を修正。
  * 戦闘中の一部のウィンドウの挙動を修正。
@@ -8423,21 +8423,22 @@ Window_EnemyBook_Percent.prototype.refresh = function() {
     const rect = this.itemLineRect(0);
     let y = rect.y + (this._oy * -1);
     this.contents.clear();
-    for (const content of this._percentContent) { 
-        const text = this.getPercentParam(content);
-        this.drawText(text, rect.x, y, rect.width, 'center');
-        y += lineHeight;
-    }
-    if (!!this._percentContent[0]) {
+    try {
+        for (const content of this._percentContent) { 
+            const text = this.getPercentParam(content);
+            this.drawText(text, rect.x, y, rect.width, 'center');
+            y += lineHeight;
+        }
         const text = this.getPercentParam(this._percentContent[0]);
         this.drawText(text, rect.x, y, rect.width, 'center');
+    } catch (error) {
+        const log = "データが不正です。 配列数" +this._percentContent.length;
+        throw ["DataError", log];
     }
+    
 };
   
 Window_EnemyBook_Percent.prototype.getPercentParam = function(content) {
-    if (!content) {
-        return '';
-    }
     switch (content.ContentDate) {
       case 0:
         return content.ContentName +' : '+ (this._defeat.complete || 0) +' %';

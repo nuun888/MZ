@@ -1,5 +1,5 @@
 # [サイドビューアクターステートアイコン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SVActorStateIcon.js)
-# Ver.1.0.2  
+# Ver.1.0.3  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SVActorStateIcon.js)  
  
 ## 必須、前提プラグイン

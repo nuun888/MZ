@@ -1,5 +1,5 @@
 # [ステート横並び表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
-# Ver.1.5.4
+# Ver.1.5.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
 
 戦闘中に表示するステートを横並び表示にします。  
@@ -25,6 +25,8 @@
 MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
+2024/1/3 Ver.1.5.5  
+一部プラグインでの競合対応。  
 2023/7/15 Ver.1.5.4  
 アイコン画像のスムーススケールをON、OFFに出来る機能を追加。  
 2022/3/30 Ver.1.5.3  

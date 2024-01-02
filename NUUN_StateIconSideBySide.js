@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  State side-by-side display
  * @author NUUN
- * @version 1.5.4
+ * @version 1.5.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/3/2024 Ver.1.5.5
+ * Addressing conflicts with some plugins.
  * 7/15/2023 Ver.1.5.4
  * Added a function to turn on/off the smooth scale of the icon image.
  * 3/30/2023 Ver.1.5.3
@@ -277,7 +279,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.5.4
+ * @version 1.5.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -306,6 +308,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/3 Ver.1.5.5
+ * 一部プラグインでの競合対応。
  * 2023/7/15 Ver.1.5.4
  * アイコン画像のスムーススケールをON、OFFに出来る機能を追加。
  * 2023/3/30 Ver.1.5.3
@@ -567,12 +571,11 @@ const TurnColor = (DataManager.nuun_structureData(parameters['TurnColor'])) || 0
 const BadTurnColor = (DataManager.nuun_structureData(parameters['BadTurnColor'])) || 0;
 const SmoothMode = eval(parameters['SmoothMode'] || 'true');
 
-let isEnemyMode = false;
 
 const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
 Sprite_Enemy.prototype.initMembers = function() {
-  isEnemyMode = true;
-  _Sprite_Enemy_initMembers.call(this);
+    NuunManager.isEnemyStateIconMode = true;
+    _Sprite_Enemy_initMembers.call(this);
 };
 
 
@@ -583,105 +586,106 @@ Sprite_StateIcon.prototype.initialize = function() {
 
 const _Sprite_StateIcon_initMembers = Sprite_StateIcon.prototype.initMembers;
 Sprite_StateIcon.prototype.initMembers = function() {
-  _Sprite_StateIcon_initMembers.call(this);
+    this._isEnemyMode = NuunManager.isEnemyStateIconMode;
+    _Sprite_StateIcon_initMembers.call(this);
 };
 
 Sprite_StateIcon.prototype.bitmapWidth = function() {
-  return Math.min(ImageManager.iconWidth * this.getStateIconShowVal(), StateIconWidth);
+    return Math.min(ImageManager.iconWidth * this.getStateIconShowVal(), StateIconWidth);
 };
 
 Sprite_StateIcon.prototype.bitmapHeight = function() {
-  return ImageManager.iconHeight * this.getMaxStateIconRows();
+    return ImageManager.iconHeight * this.getMaxStateIconRows();
 };
 
 Sprite_StateIcon.prototype.loadBitmap = function() {//再定義
-  this._iconSprite = [];
-  this.createSprite();
+    this._iconSprite = [];
+    this.createSprite();
 };
 
 Sprite_StateIcon.prototype.createSprite = function() {
-  for (let i = 0; i < this.getMaxStateIconShowVal() * this.getMaxStateIconRows(); i++) {
-    const sprite = new Sprite();
-    this.addChild(sprite);
-    this._iconSprite.push(sprite);
-    this.setInitIcon(sprite, i);
-    this.textTurn(sprite);
-  }
-  isEnemyMode = false;
+    for (let i = 0; i < this.getMaxStateIconShowVal() * this.getMaxStateIconRows(); i++) {
+        const sprite = new Sprite();
+        this.addChild(sprite);
+        this._iconSprite.push(sprite);
+        this.setInitIcon(sprite, i);
+        this.textTurn(sprite);
+    }
+    NuunManager.isEnemyStateIconMode = false;
 };
 
 Sprite_StateIcon.prototype.textTurn = function(sprite) {
-  const textSprite = new Sprite();
-  sprite.addChild(textSprite);
-  sprite.turnSprite = textSprite;
-  textSprite.x = TurnX;
-  textSprite.y = TurnY;
-  textSprite.bitmap = new Bitmap(ImageManager.iconWidth, ImageManager.iconHeight);
+    const textSprite = new Sprite();
+    sprite.addChild(textSprite);
+    sprite.turnSprite = textSprite;
+    textSprite.x = TurnX;
+    textSprite.y = TurnY;
+    textSprite.bitmap = new Bitmap(ImageManager.iconWidth, ImageManager.iconHeight);
 };
 
 Sprite_StateIcon.prototype.setInitIcon = function(sprite, i) {
-  sprite.anchor.x = 0.5;
-  sprite.anchor.y = 0.5;
-  this._animationCount = 0;
-  this._animationIndex = 0;
-  sprite.bitmap = ImageManager.loadSystem("IconSet");
-  if (!SmoothMode) {
-    sprite.bitmap.smooth = false;
-  }
-  sprite.setFrame(0, 0, 0, 0);
+    sprite.anchor.x = 0.5;
+    sprite.anchor.y = 0.5;
+    this._animationCount = 0;
+    this._animationIndex = 0;
+    sprite.bitmap = ImageManager.loadSystem("IconSet");
+    if (!SmoothMode) {
+        sprite.bitmap.smooth = false;
+    }
+    sprite.setFrame(0, 0, 0, 0);
 };
 
 Sprite_StateIcon.prototype.stateIconWidth = function(iconlength) {
-  return ImageManager.iconWidth * (iconlength- 1);
+    return ImageManager.iconWidth * (iconlength- 1);
 };
 
 Sprite_StateIcon.prototype.stateIconDisplay = function(iconlength) {
-  if (this._battler && this._battler.isActor()) {
-    return this.stateIconDisplayAlign(iconlength, ActorStateIconAlign);
-  } else {
-    return this.stateIconDisplayAlign(iconlength, EnemyStateIconAlign);
-  }
+    if (this._battler && this._isEnemyMode) {
+        return this.stateIconDisplayAlign(iconlength, EnemyStateIconAlign);
+    } else {
+        return this.stateIconDisplayAlign(iconlength, ActorStateIconAlign);
+    }
 };
 
 Sprite_StateIcon.prototype.stateIconDisplayAlign = function(iconlength, align) {
-  if (align === 'center') {
-    return Math.floor(this.stateIconWidth(iconlength) / 2) * -1;
-  } else if (align === 'right') {
-    return this.stateIconWidth(iconlength) * -1;
-  }
-  return 0;
+    if (align === 'center') {
+        return Math.floor(this.stateIconWidth(iconlength) / 2) * -1;
+    } else if (align === 'right') {
+        return this.stateIconWidth(iconlength) * -1;
+    }
+    return 0;
 };
 
 Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
-  let displayIcons = [];
-  let displayTurn = [];
-  if (icons.length > 0) {
-    displayIcons = icons.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
-    displayTurn = turns.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
-  }
-  this._iconSprite.forEach((sprite, r) => {
-    if (displayIcons[r]) {
-      sprite._iconIndex = displayIcons[r];
-      if (!!displayTurn[r]) {
-        sprite._stateTurn = displayTurn[r].turn || 0;
-        sprite._trunTextColor = displayTurn[r].bad ? BadTurnColor : TurnColor;
-      }
-      sprite.visible = true;
-    } else {
-      sprite._iconIndex = this._battler.isActor() ? NoStateIcon : 0;
-      sprite._stateTurn = 0;
-      sprite._trunTextColor = 0;
-      if (sprite.visible) {
-        this.setFrameIcon(sprite);
-      }
-      if (sprite._iconIndex === 0) {
-        sprite.visible = false;
-      } else {
-        sprite.visible = true;
-      }
+    let displayIcons = [];
+    let displayTurn = [];
+    if (icons.length > 0) {
+        displayIcons = icons.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
+        displayTurn = turns.slice(this._animationIndex, this._animationIndex + this.getStateIconShowVal() * this.getStateIconRows());
     }
-  });
-  this.displayIconsLength = this._battler.isActor() && NoStateIcon > 0 ? ActorStateIconShowVal : displayIcons.length;
+    this._iconSprite.forEach((sprite, r) => {
+        if (displayIcons[r]) {
+        sprite._iconIndex = displayIcons[r];
+        if (!!displayTurn[r]) {
+            sprite._stateTurn = displayTurn[r].turn || 0;
+            sprite._trunTextColor = displayTurn[r].bad ? BadTurnColor : TurnColor;
+        }
+        sprite.visible = true;
+        } else {
+        sprite._iconIndex = !this._isEnemyMode ? NoStateIcon : 0;
+        sprite._stateTurn = 0;
+        sprite._trunTextColor = 0;
+        if (sprite.visible) {
+            this.setFrameIcon(sprite);
+        }
+        if (sprite._iconIndex === 0) {
+            sprite.visible = false;
+        } else {
+            sprite.visible = true;
+        }
+        }
+    });
+    this.displayIconsLength = !this._isEnemyMode && NoStateIcon > 0 ? ActorStateIconShowVal : displayIcons.length;
 };
 
 Sprite_StateIcon.prototype.updateIcon = function() {//再定義
@@ -758,22 +762,22 @@ Sprite_StateIcon.prototype.getStateIconShowVal = function() {
 };
 
 Sprite_StateIcon.prototype.getMaxStateIconShowVal = function() {
-  if (this._battler) {
-    return this.getStateIconShowVal();
-  } else {
-    return isEnemyMode ? EnemyStateIconShowVal : ActorStateIconShowVal;
-  }
+    if (this._battler) {
+        return this.getStateIconShowVal();
+    } else {
+        return this._isEnemyMode ? EnemyStateIconShowVal : ActorStateIconShowVal;
+    }
 };
 
 Sprite_StateIcon.prototype.getStateIconRows = function() {
-  return this._battler && this._battler.isActor() ? ActorStateIconRows : EnemyStateIconRows;
+  return this._battler && !this._isEnemyMode ? ActorStateIconRows : EnemyStateIconRows;
 };
 
 Sprite_StateIcon.prototype.getMaxStateIconRows = function() {
   if (this._battler) {
     return this.getStateIconRows();
   } else {
-    return isEnemyMode ? EnemyStateIconRows : ActorStateIconRows;
+    return this._isEnemyMode ? EnemyStateIconRows : ActorStateIconRows;
   }
 };
 

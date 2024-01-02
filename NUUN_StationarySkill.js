@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.1
  * 
  * @help
  * Activate the skill for the battler who has released the state with the passage of the turn.
@@ -26,9 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 1/2/2024 Ver.1.1.2
+ * 1/2/2024 Ver.1.1.1
  * Fixed an issue where an error would occur when selecting a command when a set skill is activated.
- * 6/17/2023 Ver.1.1.1
  * Fixed an issue where end-of-turn processing could not be executed in a turn-based mode when adding a state with an installed skill.
  * Fixed an issue where the TPB gauge would be consumed when activating installed skills in the TPB system.
  * 6/17/2023 Ver.1.1.0
@@ -90,7 +89,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.1
  * 
  * @help
  * ステートをターン経過で解除したバトラーに対し、スキルを発動します。
@@ -104,9 +103,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2024/1/2 Ver.1.1.2
+ * 2024/1/2 Ver.1.1.1
  * 設置型スキルが発動したときにコマンドを選択するとエラーが出る問題を修正。
- * 2023/6/17 Ver.1.1.1
  * 設置型スキルでステートを付加させたときに、ターン制でターン終了処理を実行できない問題を修正。
  * TPB制で設置型スキル発動時にTPBゲージが消費されてしまう問題を修正。
  * 2023/6/17 Ver.1.1.0

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サイドビューアクターステートアイコン
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/3 Ver.1.0.3
+ * 処理の修正。
  * 2023/7/11 Ver.1.0.2
  * 特定のアクターに対しステートアイコンを表示させない機能を追加。
  * 2023/6/2 Ver.1.0.1
@@ -124,6 +126,7 @@ Sprite_Actor.prototype.getBattlerStatePosition = function() {
 };
 
 Sprite_Actor.prototype.createStateIconSprite = function() {
+    NuunManager.isEnemyStateIconMode = this.isEnemySpriteStateIcon();
     const sprite = new Sprite_StateIcon();
     this.battlerOverlay.addChild(sprite);
     this._stateIconSprite = sprite;
@@ -133,11 +136,21 @@ Sprite_Actor.prototype.createStateIconSprite = function() {
     sprite._svMode = true;
 };
 
+Sprite_Actor.prototype.isEnemySpriteStateIcon = function() {
+    const _class = String(this.constructor.name);
+    switch (_class) {
+        case "Sprite_EnemyRex":
+            return true;
+        default:
+            return false;
+    }
+};
 
 const _Sprite_StateIcon_initMembers = Sprite_StateIcon.prototype.initMembers;
 Sprite_StateIcon.prototype.initMembers = function() {
-  _Sprite_StateIcon_initMembers.call(this);
-  this.svMode = false;
+    this._isEnemyMode = NuunManager.isEnemyStateIconMode;
+    _Sprite_StateIcon_initMembers.call(this);
+    this.svMode = false;
 };
 
 Sprite_StateIcon.prototype.stateActorVisibleInSelect = function() {

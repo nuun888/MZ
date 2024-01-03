@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.1.2
+ * @version 2.1.3
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/3/2024 Ver.2.1.3
+ * Fixed a problem where the method name of the info window was not applied.
  * 8/8/2023 Ver.2.1.2
  * Fixed an issue where changing the font color for nicknames and occupations was not working.
  * 8/8/2023 Ver.2.1.1
@@ -86,7 +88,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.1.2
+ * @version 2.1.3
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -96,6 +98,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/3 Ver.2.1.3
+ * インフォウィンドウのメソッド名が適用されていなかった箇所があったため修正。
  * 2023/8/8 Ver.2.1.2
  * 二つ名と職業の文字色変更が機能していなかった問題を修正。
  * 2023/8/8 Ver.2.1.1
@@ -209,7 +213,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         const list = params.MenuInfoWindowSetting;
         list.forEach((data, i) => {
             if (data.ListDateSetting > 0) {
-                const method = '_infoSideMenuWindow'+ !!params.MethodName ? params.MethodName : [i];
+                const method = '_infoSideMenuWindow'+ !!data.MethodName ? data.MethodName : [i];
                 const pageMethod = 'PageList' + data.ListDateSetting;
                 const rect = this.infoWindowRect(data);
                 const window = new Window_InfoMenu(rect, params.infoContents[pageMethod], data.MethodName);

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.7
+ * @version 2.20.9
  * 
  * @help
  * Implement an enemy book.
@@ -229,8 +229,14 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 1/3/2024 Ver.2.20.7
+ * 1/3/2024 Ver.2.20.9
  * Fixed an issue where attribute icons were not displayed correctly when attacking.
+ * 12/29/2023 Ver.2.20.8
+ * Set error log when invalid data is set in completion level display settings.
+ * 12/29/2023 Ver.2.20.7
+ * Fixed an issue where an error would occur when viewing categories during battle.
+ * Fixed the behavior of some windows during battle.
+ * Fixed an issue where the "ActualEnemyMask" setting was not being applied.
  * 12/10/2023 Ver.2.20.6
  * Fixed an issue where mask processing was not performed when attack persistence was not registered.
  * 12/9/2023 Ver.2.20.5
@@ -2978,7 +2984,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.7
+ * @version 2.20.8
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3199,8 +3205,14 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2024/1/3 Ver.2.20.7
+ * 2024/1/3 Ver.2.20.9
  * 攻撃時属性のアイコンが正常に表示されなかった問題を修正。
+ * 2023/12/29 Ver.2.20.8
+ * 完成度の表示設定に不正なデータが設定されているときのエラーログを設定。
+ * 2023/12/29 Ver.2.20.7
+ * 戦闘中にカテゴリーを表示したときにエラーが出る問題を修正。
+ * 戦闘中の一部のウィンドウの挙動を修正。
+ * モンスター原寸大未登録シルエットの設定が適用されていなかった問題を修正。
  * 2023/12/10 Ver.2.20.6
  * 攻撃持続性の未登録時のマスク処理が行われていなかった問題を修正。
  * 2023/12/9 Ver.2.20.5
@@ -6055,7 +6067,7 @@ var Imported = Imported || {};
 Imported.NUUN_EnemyBook = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_EnemyBook');
+const parameters = PluginManager.parameters('NUUN_EnemyBook');console.log(PluginManager.parameters('NUUN_EnemyBook'))
 
 const WindowMode = eval(parameters['WindowMode']) || 0;
 const DecimalMode = eval(parameters['DecimalMode'] || 'true');
@@ -6067,7 +6079,7 @@ const NoBookTag = NuunManager.getStringCode(parameters['NoBookTag']) || 'NoBook'
 const NoBookDataTag = NuunManager.getStringCode(parameters['NoBookDataTag']) || 'NoBookData';
 const PageNextSymbol = NuunManager.getStringCode(parameters['PageNextSymbol']);
 const PagePreviousSymbol = NuunManager.getStringCode(parameters['PagePreviousSymbol']);
-const ActualEnemyMask = eval(parameters['BackUiWidth'] || 'ActualEnemyMask');
+const ActualEnemyMask = eval(parameters['ActualEnemyMask'] || 'true');
 const EnemyGraphicMode = Number(parameters['EnemyGraphicMode'] || 0);
 
 const RegistrationTiming = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['RegistrationTiming'])) : [];
@@ -7747,7 +7759,7 @@ Scene_Battle.prototype.createEnemyBookIndexWindow = function() {
     const rect = this.enemyBookIndexWindowRect();
     this._enemyBookIndexWindow = new Window_EnemyBook_Index(rect);
     this._enemyBookIndexWindow.setHandler("cancel", this.onEnemyBookIndexCancel.bind(this));
-    this.createEnemyBookAddWindow(this._enemyBookIndexWindow, true);
+    this.createEnemyBookAddWindow(this._enemyBookIndexWindow, !CategoryShow);
     this._enemyBookIndexWindow.setPercentWindow(this._enemyBookPercentWindow);
     if (this._enemyBookCategoryWindow) {
         this._enemyBookCategoryWindow.setEnemyIndexWindow(this._enemyBookIndexWindow);
@@ -7858,7 +7870,7 @@ Scene_Battle.prototype.enemyBookCategoryNameWindowRect = function() {
     const wx = WindowMode === 0 ? 0 : this.enemyBookWindowWidth();
     const wy = this.enemyBookMainAreaTop() + (this._enemyBookPercentWindow ? this._enemyBookPercentWindow.height : 0);
     const ww = this.enemyBookIndexWidth();
-    const wh = this.calcWindowHeight(1, true);
+    const wh = this.calcWindowHeight(1, !CategoryShow);
     return new Rectangle(wx, wy, ww, wh);
 };
 
@@ -7924,9 +7936,7 @@ Scene_Battle.prototype.createEnemyBookAddWindow = function(windowDate, openness)
     if (AllWindowVisibleHide || !getBookWindowVisible(String(windowDate.constructor.name))) {
         windowDate.opacity = 0;
     } else {
-        if (openness) {
-            windowDate.openness = 0;
-        }
+        windowDate.openness = openness ? 0 : 255;
     }
 };
 
@@ -8225,11 +8235,12 @@ Scene_Battle.prototype.onEnemyBookCategoryOk = function() {
         this._enemyBookCategoryWindow.hide();
         this._enemyBookCategoryWindow.deselect();
         this._enemyBookCategoryWindow.deactivate();
-        this._enemyBookCategoryNameWindow.show();
+
         this._enemyBookCategoryNameWindow.open();
+        this._enemyBookCategoryNameWindow.show();
     }
-    this._enemyBookIndexWindow.show();
     this._enemyBookIndexWindow.open();
+    this._enemyBookIndexWindow.show();
     this._enemyBookIndexWindow.activate();
     this._enemyBookIndexWindow.refresh();
     this._enemyBookPageWindow.activate();
@@ -8283,7 +8294,7 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
     }
     if (CategoryShow) {
         this.enemyBookWindowClose(this._enemyBookCategoryWindow);
-        this.enemyBookWindowClose(this._enemyBookCategoryNameWindow);
+        this._enemyBookCategoryNameWindow.hide();
         this._enemyBookCategoryWindow.deselect();
         this._enemyBookCategoryWindow.deactivate();
     } else {
@@ -8369,13 +8380,13 @@ Window_EnemyBook_Percent.prototype.constructor = Window_EnemyBook_Percent;
   
 Window_EnemyBook_Percent.prototype.initialize = function(rect) {
     this._isEnemyBook = true;
-    Window_Selectable.prototype.initialize.call(this, rect);
     this._defeat = {};
     this._encountered = {};
+    this._percentContent = PercentContent;
+    this._percentContentLength = this._percentContent.length;
+    Window_Selectable.prototype.initialize.call(this, rect);
     this._duration = 0;
     this._oy = 0;
-    this._percentContent = PercentContent || [];
-    this._percentContentLength = this._percentContent.length;
 };
 
 Window_EnemyBook_Percent.prototype.loadWindowskin = function() {
@@ -8416,16 +8427,19 @@ Window_EnemyBook_Percent.prototype.refresh = function() {
     const rect = this.itemLineRect(0);
     let y = rect.y + (this._oy * -1);
     this.contents.clear();
-    for (const content of this._percentContent) {
-        const text = this.getParam(content);
+    for (const content of this._percentContent) { 
+        const text = this.getPercentParam(content);
         this.drawText(text, rect.x, y, rect.width, 'center');
         y += lineHeight;
     }
-    const text = this.getParam(this._percentContent[0]);
+    const text = this.getPercentParam(this._percentContent[0]);
     this.drawText(text, rect.x, y, rect.width, 'center');
 };
   
-Window_EnemyBook_Percent.prototype.getParam = function(content) {
+Window_EnemyBook_Percent.prototype.getPercentParam = function(content) {
+    if (!content) {
+        return '完成度 : '+ (this._defeat.complete || 0) +' %';
+    }
     switch (content.ContentDate) {
       case 0:
         return content.ContentName +' : '+ (this._defeat.complete || 0) +' %';
@@ -8631,7 +8645,7 @@ Window_EnemyBook_Index.prototype.initialize = function(rect) {
     Window_Selectable.prototype.initialize.call(this, rect);
     this._enemyList = [];
     this._category = null;
-    this.interruptWindow = true;
+    this.interruptWindow = true;console.log()
 };
 
 Window_EnemyBook_Index.prototype.loadWindowskin = function() {
@@ -11095,6 +11109,9 @@ Window_BattleEnemyBook.prototype.statusGaugeMode = function() {
 };
 
 Window_BattleEnemyBook.prototype.isEnemyData = function() {
+    if (!this._enemy) {
+        return;
+    }
     switch (this._mode) {
         case 'book':
             return $gameSystem.isEnemyBook(this._enemy) && (UnregisteredEnemy === 0 && $gameSystem.isInEnemyBook(this._enemy) || UnregisteredEnemy > 0);
@@ -11106,6 +11123,9 @@ Window_BattleEnemyBook.prototype.isEnemyData = function() {
 };
 
 Window_BattleEnemyBook.prototype.noUnknownStatus = function(enemy) {
+    if (!this._enemy) {
+        return;
+    }
     switch (this._mode) {
         case 'book':
             return this._enemy.meta.ShowDataBook;

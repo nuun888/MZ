@@ -31,6 +31,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/4/2024 Ver.1.2.0
+ * Added the ability to play an animation when taking floor damage.
+ * Fixed an issue where SE during floor damage would regenerate even if you did not receive floor damage.
  * 11/14/2022 Ver.1.1.1
  * Changed the display in languages other than Japanese to English.
  * 4/2/2022 Ver.1.1.0
@@ -88,7 +91,9 @@
  * @text Pan
  * @desc Pan.
  * @type number
- * @default 50
+ * @default 0
+ * @max 100
+ * @min -100
  * @parent DefaultSE
  * 
  * @param Flash
@@ -149,6 +154,18 @@
  * @type struct<DamageFloorActor>[]
  * @default []
  * 
+ * @param DamageInclude
+ * @text Animation playback target
+ * @desc Specify the target to play the regeneration animation when floor damage occurs.
+ * @type select
+ * @option player only
+ * @value 'player'
+ * @option Including followers (delay)
+ * @value 'includefollowersDelay'
+ * @option Including followers (simultaneous playback)
+ * @value 'includefollowers'
+ * @default 'includefollowers'
+ * 
  * @param SE
  * @text SE settings
  * @default ------------------------------
@@ -180,7 +197,9 @@
  * @text Pan
  * @desc Pan。
  * @type number
- * @default 50
+ * @default 0
+ * @max 100
+ * @min -100
  * @parent SE
  * 
  * @param Flash
@@ -193,6 +212,17 @@
  * @type struct<FlashColorSetting>
  * @default {"red":"255","green":"0","blue":"0","gray":"128","flame":"8"}
  * @parent Flash
+ * 
+ * @param Animation
+ * @text Animation settings
+ * @default ------------------------------
+ * 
+ * @param DamageAnimation
+ * @text Animation when floor damage occurs
+ * @desc Animation when floor damage occurs.
+ * @type animation
+ * @default 
+ * @parent Animation
  * 
  */
 /*~struct~FlashColorSetting:
@@ -253,7 +283,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -273,6 +303,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/4 Ver.1.2.0
+ * 床ダメージ時にアニメーションを再生する機能を追加。
+ * 床ダメージを受けなくても床ダメージ時のSEが再生してしまう問題を修正。
  * 2022/11/14 Ver.1.1.1
  * 日本語以外での表示を英語表示に変更。
  * 2022/4/2 Ver.1.1.0
@@ -330,7 +363,9 @@
  * @text 位相
  * @desc 位相。
  * @type number
- * @default 50
+ * @default 0
+ * @max 100
+ * @min -100
  * @parent DefaultSE
  * 
  * @param Flash
@@ -391,6 +426,18 @@
  * @type struct<DamageFloorActor>[]
  * @default []
  * 
+ * @param DamageInclude
+ * @text アニメーション再生対象
+ * @desc 床ダメージ時の再生アニメーションを再生する対象を指定します。
+ * @type select
+ * @option プレーヤーのみ
+ * @value 'player'
+ * @option フォロワー含む(ディレイ)
+ * @value 'includefollowersDelay'
+ * @option フォロワー含む(同時再生)
+ * @value 'includefollowers'
+ * @default 'includefollowers'
+ * 
  * @param SE
  * @text SE設定
  * @default ------------------------------
@@ -422,7 +469,9 @@
  * @text 位相
  * @desc 位相。
  * @type number
- * @default 50
+ * @default 0
+ * @max 100
+ * @min -100
  * @parent SE
  * 
  * @param Flash
@@ -435,6 +484,17 @@
  * @type struct<FlashColorSetting>
  * @default {"red":"255","green":"0","blue":"0","gray":"128","flame":"8"}
  * @parent Flash
+ * 
+ * @param Animation
+ * @text アニメーション設定
+ * @default ------------------------------
+ * 
+ * @param DamageAnimation
+ * @text 床ダメージ時アニメーション
+ * @desc 床ダメージ時のアニメーション。
+ * @type animation
+ * @default 
+ * @parent Animation
  * 
  */
 /*~struct~FlashColorSetting:ja
@@ -503,121 +563,153 @@ const DefaultDamagedFloorSE = String(parameters['DefaultDamagedFloorSE'] || '');
 const DefaultVolume = Number(parameters['DefaultVolume'] || 90);
 const DefaultPitch = Number(parameters['DefaultPitch'] || 100);
 const DefaultPan = Number(parameters['DefaultPan'] || 50);
-let onMapFloorDamage = false;
+let _onMapFloorDamage = false;
+let _damagedFloorExData = {};
 let FlashColor = {};
+let _floorDamageAnimationTargets = [];
 
 const _Game_Map_initialize  = Game_Map.prototype.initialize ;
 Game_Map.prototype.initialize = function() {
-  _Game_Map_initialize.call(this);
-  this._damagedFloorId = -1;
-  this._damagedFloorSe = null;
+    _Game_Map_initialize.call(this);
+    this._damagedFloorId = -1;
+    this._damagedFloorSe = null;
+    this._damagedFloorExData = null;
 };
 
 const _Game_Map_setup = Game_Map.prototype.setup;
 Game_Map.prototype.setup = function(mapId) {
-  _Game_Map_setup.call(this, mapId);
-  this.initDamagedFloorId()
+    _Game_Map_setup.call(this, mapId);
+    this.initDamagedFloorId();
 };
 
 Game_Map.prototype.initDamagedFloorId = function() {
-  this._damagedFloorId = DamagedFloorList.findIndex(data => data.TileSetId === this._tilesetId);
+    this._damagedFloorId = DamagedFloorList.findIndex(data => data.TileSetId === this._tilesetId);
 };
 
-Game_Map.prototype.getDamagedFloor = function() {
-  return DamagedFloorList[this._damagedFloorId];
-};
-
-Game_Map.prototype.getDamagedFloorListData = function() {
-  if (this._damagedFloorSe) {
-    AudioManager.playSe(this._damagedFloorSe);
-    this._damagedFloorSe = null;
-  }
-};
-
-Game_Map.prototype.setDamagedSe = function(seData) {
-  this._damagedFloorSe = seData;
-};
-
-
-const _Game_Actor_executeFloorDamage = Game_Actor.prototype.executeFloorDamage;
-Game_Actor.prototype.executeFloorDamage = function() {
-  onMapFloorDamage = true;
-  _Game_Actor_executeFloorDamage.call(this);
-  onMapFloorDamage = false;
-};
-
-const _Game_Actor_performMapDamage = Game_Actor.prototype.performMapDamage;
-Game_Actor.prototype.performMapDamage = function() {
-  if (onMapFloorDamage) {
-    _Game_Actor_performMapDamage.call(this);
-    $gameMap.getDamagedFloorListData();
-  } else {
-    _Game_Actor_performMapDamage.call(this);
-  }
-};
-
-const _Game_Actor_basicFloorDamage = Game_Actor.prototype.basicFloorDamage;
-Game_Actor.prototype.basicFloorDamage = function() {
-  const coreDamage = _Game_Actor_basicFloorDamage.call(this);
-  const damagedFloorId = $gameMap._damagedFloorId;
-  const a = this;
-  if (damagedFloorId >= 0) {
+Game_Map.prototype.setFloorDamageData = function() {
+    const damagedFloorId = this._damagedFloorId;
     const x = $gamePlayer._x;
     const y = $gamePlayer._y;
     const regionId = $gameMap.regionId(x, y);
     const Terrain = $gameMap.terrainTag(x, y);
     const damagedFloorData = DamagedFloorList[damagedFloorId].DamagedFloorRegion || [];
-    const mainData = damagedFloorData.find(data => (data.RegionId === regionId || data.TerrainId === Terrain));
-    if (mainData) {
-      if (mainData.FlashColor) {
-        setFlashData(mainData.FlashColor);
-      } else {
-        setFlashData(DefaultFlashColor);
-      }
-      if (mainData.DamagedFloorSE && !$gameMap._damagedFloorSe) {
-        $gameMap.setDamagedSe({"name":mainData.DamagedFloorSE,"volume":mainData.volume,"pitch":mainData.pitch,"pan":mainData.pan})
-      } else if (DefaultDamagedFloorSE) {
-        $gameMap.setDamagedSe({"name":DefaultDamagedFloorSE,"volume":DefaultVolume,"pitch":DefaultPitch,"pan":DefaultPan})
-      }
-      return this.floorDamageActor(mainData.DamageActor) ? (mainData.Damage ? eval(mainData.Damage) : (DefaultDamage ? eval(DefaultDamage) : coreDamage)) : 0;
+    _damagedFloorExData = damagedFloorData.find(data => this.isDamagedFloorData(data, regionId, Terrain));
+};
+
+Game_Map.prototype.isDamagedFloorData = function(data, regionId, Terrain) {
+    if (regionId > 0) {
+        return (data.RegionId === regionId && (data.TerrainId >= 0 ? data.TerrainId === Terrain : true));
+    } else {
+        return (data.TerrainId >= 0 ? data.TerrainId === Terrain : true);
     }
-    return DefaultDamage ? eval(DefaultDamage) : coreDamage;
-  } else {
-    setFlashData(DefaultFlashColor);
-    if (DefaultDamagedFloorSE) {
-      $gameMap.setDamagedSe({"name":DefaultDamagedFloorSE,"volume":DefaultVolume,"pitch":DefaultPitch,"pan":DefaultPan})
+};
+
+
+const _Game_Actor_executeFloorDamage = Game_Actor.prototype.executeFloorDamage;
+Game_Actor.prototype.executeFloorDamage = function() {
+    _onMapFloorDamage = true;
+    _Game_Actor_executeFloorDamage.call(this);
+    _onMapFloorDamage = false;
+};
+
+const _Game_Actor_basicFloorDamage = Game_Actor.prototype.basicFloorDamage;
+Game_Actor.prototype.basicFloorDamage = function() {
+    const coreDamage = _Game_Actor_basicFloorDamage.call(this);
+    const a = this;
+    if (!!_damagedFloorExData) {
+        const mainData = _damagedFloorExData;
+        return this.floorDamageActor(mainData.DamageActor) ? (mainData.Damage ? eval(mainData.Damage) : (DefaultDamage ? eval(DefaultDamage) : coreDamage)) : 0;
+    } else {
+        return DefaultDamage ? eval(DefaultDamage) : coreDamage;
     }
-    return DefaultDamage ? eval(DefaultDamage) : coreDamage;
-  }
+};
+
+const _Game_Actor_performMapDamage = Game_Actor.prototype.performMapDamage;
+Game_Actor.prototype.performMapDamage = function() {
+    _Game_Actor_performMapDamage.call(this);
+    this.exFloorDamage();
+};
+
+Game_Actor.prototype.exFloorDamage = function() {
+    this.floorDamagePlaySe(_damagedFloorExData);
+    this.floorDamageAnimation(_damagedFloorExData);
+};
+
+Game_Actor.prototype.floorDamagePlaySe = function(data) {
+    if (data && data.DamagedFloorSE) {
+        AudioManager.playSe({"name":data.DamagedFloorSE,"volume":data.volume,"pitch":data.pitch,"pan":data.pan});
+    } else if (DefaultDamagedFloorSE) {
+        AudioManager.playSe({"name":DefaultDamagedFloorSE,"volume":DefaultVolume,"pitch":DefaultPitch,"pan":DefaultPan});
+    }
+};
+
+Game_Actor.prototype.floorDamageAnimation = function(data) {
+    const mode = !data || !data.DamageInclude ? 'includefollowers' : data.DamageInclude;
+    if (mode === 'player') {
+        $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
+    } else {
+        if ($gameParty.leader() === this) {
+            if (mode === 'includefollowers') {
+                $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
+            } else {
+                _floorDamageAnimationTargets.push($gamePlayer);
+            }
+        } else {
+            const target = this.getFloorDamageFollowerTarget();
+            if (!!target) {
+                if (mode === 'includefollowers') {
+                    $gameTemp.requestAnimation([target], data.DamageAnimation);
+                } else {
+                    _floorDamageAnimationTargets.push(target);
+                }
+            }
+        }
+    }
+};
+
+Game_Actor.prototype.getFloorDamageFollowerTarget = function() {
+    const followers = $gamePlayer.followers()._data;
+    return followers.find(follower => follower.isVisible() && follower.actor() === this);
 };
 
 Game_Actor.prototype.floorDamageActor = function(data) {
-  return data.length > 0 ?data.some(a => a.Actor === this.actorId()) : true;
+    return data.length > 0 ? data.some(a => a.Actor === this.actorId()) : true;
 };
-
 
 const _Game_Screen_startFlashForDamage = Game_Screen.prototype.startFlashForDamage;
 Game_Screen.prototype.startFlashForDamage = function() {
-  if (onMapFloorDamage && FlashColor) {
+    if (_onMapFloorDamage) {
+        this.startFlashFloorDamage();
+    } else {
+        _Game_Screen_startFlashForDamage.call(this);
+    }
+};
+
+Game_Screen.prototype.startFlashFloorDamage = function() {
+    if (!!_damagedFloorExData && _damagedFloorExData.FlashColor) {
+        setFlashData(_damagedFloorExData.FlashColor);
+    } else {
+        setFlashData(DefaultFlashColor);
+    }
     if (FlashColor.flame > 0) {
-      this.startFlash([FlashColor.red, FlashColor.green, FlashColor.blue, FlashColor.gray], FlashColor.flame);
+        this.startFlash([FlashColor.red, FlashColor.green, FlashColor.blue, FlashColor.gray], FlashColor.flame);
     }
     FlashColor = {};
-  } else {
-    _Game_Screen_startFlashForDamage.call(this);
-  }
 };
 
 
 const _Game_Party_onPlayerWalk = Game_Party.prototype.onPlayerWalk;
 Game_Party.prototype.onPlayerWalk = function() {
-  floorDamageRefresh = true;
-  _Game_Party_onPlayerWalk.call(this);
+    $gameMap.setFloorDamageData();
+    _Game_Party_onPlayerWalk.call(this);
+    if (_floorDamageAnimationTargets.length > 0) {
+        $gameTemp.requestAnimation(_floorDamageAnimationTargets, _damagedFloorExData.DamageAnimation);
+        _floorDamageAnimationTargets = [];
+    }
 };
 
-
 function setFlashData(data) {
-  FlashColor = data;
+    FlashColor = data;
 };
 
 

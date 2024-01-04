@@ -646,23 +646,25 @@ Game_Actor.prototype.floorDamagePlaySe = function(data) {
 };
 
 Game_Actor.prototype.floorDamageAnimation = function(data) {
-    const mode = !data || !data.DamageInclude ? 'includefollowers' : data.DamageInclude;
-    if (mode === 'player') {
-        $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
-    } else {
-        if ($gameParty.leader() === this) {
-            if (mode === 'includefollowers') {
-                $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
-            } else {
-                _floorDamageAnimationTargets.push($gamePlayer);
-            }
+    if (!!data) {
+        const mode = !data.DamageInclude ? 'includefollowers' : data.DamageInclude;
+        if (mode === 'player') {
+            $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
         } else {
-            const target = this.getFloorDamageFollowerTarget();
-            if (!!target) {
+            if ($gameParty.leader() === this) {
                 if (mode === 'includefollowers') {
-                    $gameTemp.requestAnimation([target], data.DamageAnimation);
+                    $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
                 } else {
-                    _floorDamageAnimationTargets.push(target);
+                    _floorDamageAnimationTargets.push($gamePlayer);
+                }
+            } else {
+                const target = this.getFloorDamageFollowerTarget();
+                if (!!target) {
+                    if (mode === 'includefollowers') {
+                        $gameTemp.requestAnimation([target], data.DamageAnimation);
+                    } else {
+                        _floorDamageAnimationTargets.push(target);
+                    }
                 }
             }
         }

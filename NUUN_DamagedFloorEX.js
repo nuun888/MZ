@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Famage floor EX
  * @author NUUN
- * @version 1.1.1
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -24,7 +24,7 @@
  * The flash setting will not flash by entering 0 for the number of frames.
  * 
  * The floor damage value can use the evaluation formula.
- * a：Actor game data
+ * a:Actor game data
  * 
  * 
  * Terms of Use
@@ -34,6 +34,7 @@
  * 1/4/2024 Ver.1.2.0
  * Added the ability to play an animation when taking floor damage.
  * Fixed an issue where SE during floor damage would regenerate even if you did not receive floor damage.
+ * Corrected phase settings.
  * 11/14/2022 Ver.1.1.1
  * Changed the display in languages other than Japanese to English.
  * 4/2/2022 Ver.1.1.0
@@ -306,6 +307,7 @@
  * 2024/1/4 Ver.1.2.0
  * 床ダメージ時にアニメーションを再生する機能を追加。
  * 床ダメージを受けなくても床ダメージ時のSEが再生してしまう問題を修正。
+ * 位相の設定を修正。
  * 2022/11/14 Ver.1.1.1
  * 日本語以外での表示を英語表示に変更。
  * 2022/4/2 Ver.1.1.0

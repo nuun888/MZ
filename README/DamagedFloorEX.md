@@ -1,5 +1,5 @@
 # [ダメージ床拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -12,6 +12,13 @@
 `a`：アクターのゲームデータ  
 例  
 `Math.max(1,a.mhp * 0.01)`　最大HPの1％のダメージを受けます。  
+
+特徴を持つメモ欄  
+`<DfrEx[tag]:[rate]>` 指定のタグ名の床ダメージ率を指定の整数で記入します。  
+`[tag]`:床ダメージタグ名で設定したタグ名  
+`[rate]`:効果率  
+`<DfrExPoison:150>` タグ名がPoisonの床ダメージの効果率が1.5倍になります。  
+`<DfrExPoison:70>` タグ名がPoisonの床ダメージの効果率が0.7倍になります。  
 
 ## ダメージ床設定
 ダメージ床設定では指定したタイルセットを指定しているマップで適用されます。
@@ -31,6 +38,8 @@
 フォロワー含むを指定している場合は表示されている床ダメージを受けたフォロワーにアニメーションが再生されます。  
 
 ## 更新履歴
+2024/1/6 Ver.1.2.1  
+特定の床ダメージに対して効果率を設定できる機能を追加。  
 2024/1/4 Ver.1.2.0  
 床ダメージ時にアニメーションを再生する機能を追加。  
 床ダメージを受けなくても床ダメージ時のSEが再生してしまう問題を修正。  

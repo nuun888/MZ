@@ -1,18 +1,8 @@
 # メニュー画面
 
 # 新版
-
-# 旧版
-## メニュー画面ベース
-### Ver.2.1.5  
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)  
-## 設定用プラグイン
-メニュー画面デフォルトタイプVer.2.1.1    
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
-メニュー画面タイプ１Ver.2.1.1    
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
-メニュー画面タイプ２Ver.2.1.1    
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
+### Ver.3.0.0  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEX.js)  
 
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.7以降  
@@ -54,22 +44,11 @@
 ## 設定方法
 ### UIウィンドウ基準無効
 ウィンドウの表示基準位置を画面基準に表示します。OFFの場合はデフォルトの表示になります。  
- 
-### メニューコマンド表示モード
-メニューコマンドの表示位置を指定します。  
-
-### 配置モード
-メニューステータスウィンドウの配置をメニューコマンド表示モードで設定したモードにより表示します。  
-メニューコマンド表示モードが'left'の場合はメニューコマンドの右側に表示。  
-'right'の場合はメニューコマンドの左側に表示。  
-'top'の場合はメニューコマンドの下側に表示。  
-'under'の場合はメニューコマンドの上側に表示。  
-'free'の場合は左上基準(UIウィンドウ基準無効基準)に表示。  
 
 ### ステータス項目設定
 アクターの表示するステータスを設定します。  
 
-表示ステータス、独自ゲージの取得パラメータ  
+表示ステータス、独自ゲージ、表示項目条件の取得パラメータ  
 `actor`:アクターのゲームデータ  
 
 ステートの評価式には表示したいステートを指定できます。(直接記入)  
@@ -123,6 +102,24 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 背景画像1の手前に重ねて表示されます。  
 メニューUIの背景として使用します。  
 ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。  
+
+## 更新履歴
+2024/1/7 Ver.3.0.0  
+スタイルを一つのプラグインに統合。  
+一部のプラグインパラメータを廃止。  
+
+# 旧版
+## メニュー画面ベース
+### Ver.2.1.5  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)  
+## 設定用プラグイン
+メニュー画面デフォルトタイプVer.2.1.1    
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
+メニュー画面タイプ１Ver.2.1.1    
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
+メニュー画面タイプ２Ver.2.1.1    
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
+
 
 ## 更新履歴
 2024/1/7 Ver.2.1.5  

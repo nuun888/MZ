@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.6.9
+ * @version 1.7.0
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/1/2023 Ver.1.7.0
+ * Added plugin parameter acquisition processing. Newly released plug-ins after 2024 will be compatible with Ver.1.7.0 or later.
  * 7/1/2023 Ver.1.6.9
  * Added attack element processing.
  * 6/2/2023 Ver.1.6.8
@@ -87,7 +89,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.6.9
+ * @version 1.7.0
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -97,6 +99,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/6 Ver.1.7.0
+ * プラグインのパラメータ取得処理の処理を追加。2024年以降の新規公開プラグインはVer.1.7.0以降の対応になります。
  * 2023/7/1 Ver.1.6.9
  * 攻撃属性の処理追加。
  * 2023/6/2 Ver.1.6.8
@@ -163,9 +167,7 @@ var Imported = Imported || {};
 Imported.NUUN_Base = true;
 const NUUN_Base_Ver = 140;
 
-function NuunManager() {
-  throw new Error("This is a static class");
-}
+
 
 function Sprite_NuunAPngImg() {
   this.initialize(...arguments);
@@ -176,6 +178,110 @@ Sprite_NuunAPngImg.prototype.constructor = Sprite_NuunAPngImg;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_Base');
+
+class Nuun_PluginParams {
+    static getPluginParams(text) {//document.currentScript
+        const name = String(Utils.extractFileName(text.src).split('.').shift());
+        const params = PluginManager.parameters(name);
+        return params ? this.getStructureData(params) : {};
+    }
+
+    static getStructureData(params) {
+        return JSON.parse(JSON.stringify(params, function(key, value) {
+            try {
+                return JSON.parse(value);
+            } catch (e) {
+                try {
+                  return Nuun_PluginParams.getEvalCode(value);
+                } catch (e) {
+                  return value;
+                }
+            }
+        }));
+    };
+
+    static getStringCode(code) {
+        if (!code) {
+            return null;
+        }
+        try {
+            if (code.indexOf("'") === 0 || code.indexOf('"' === 0)) {
+                return eval(code);//'または"を外す。
+            }
+            return !!code ? String(code) : null;
+        } catch (e) {
+            return !!code ? String(code) : null;
+        }
+    }
+
+    static getEvalCode(code) {
+        if (isNaN(code)) {
+            if (!code) {
+                return null;
+            }
+            return this.stringCode(code);
+        } else {
+            return String(code);
+        }
+    }
+
+    static getMetaTag(object, code) {
+        const data = object.meta[code];
+        let list = [];
+        if (data !== undefined) {
+            try {
+                list = data.split(',');
+            } catch (error) {
+                return this.getTextCodeMeta(data);
+            }
+            list.forEach(a => {
+                a = this.getTextCodeMeta(a);
+            });
+            return list;
+        } else {
+            return undefined;
+        }
+    }
+
+    static getTextCodeMeta(text) {
+        if (isNaN(text)) {
+            return text;
+        } else {
+            return Number(text);
+        }
+    }
+};
+
+window.Nuun_PluginParams = Nuun_PluginParams;
+
+class Nuun_TempParam {
+    constructor() {
+        this._data = null;
+    }
+
+    setGaugeData(data, type) {
+        this._data = data;
+        this._type = type;
+    }
+
+    setType(type) {
+        this._type = type;
+    }
+
+    setData(data) {
+        this._data = data;
+    }
+
+    getType() {
+        return this._type || '';
+    }
+
+    getData() {
+        return this._data;
+    }
+};
+
+window.Nuun_TempParam = Nuun_TempParam;
 
 function structureData(params) {
   return JSON.parse(JSON.stringify(params, function(key, value) {
@@ -193,6 +299,12 @@ function nuun_GausePlugins() {
         Imported.NUUN_BattlerMPGauge || Imported.NUUN_BattlerTPGauge || Imported.NUUN_BattlerTpbGauge
     )
 }
+
+function NuunManager() {
+    throw new Error("This is a static class");
+}
+
+window.NuunManager = NuunManager;
 
 NuunManager.isFilterClass = function(_class) {
     if (!!_class._classNameId) {
@@ -331,7 +443,7 @@ ImageManager.throwLoadError = function(bitmap) {
     try {
       _ImageManager_throwLoadError.call(this, bitmap);
     } catch (e) {
-
+        
     }
   } else {
     _ImageManager_throwLoadError.call(this, bitmap);
@@ -389,7 +501,6 @@ Window_Base.prototype.initialize = function(rect) {
   _Window_Base_initialize.call(this, rect);
   this._userWindowSkin = null;
 };
-
 
 const _Window_Base_loadWindowskin = Window_Base.prototype.loadWindowskin;
 Window_Base.prototype.loadWindowskin = function() {

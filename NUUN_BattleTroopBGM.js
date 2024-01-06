@@ -11,7 +11,7 @@
 /*:
  * @target MZ
  * @plugindesc Enemy group BGM settings
- * @version 1.0.0
+ * @version 1.1.0
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
@@ -19,6 +19,11 @@
  * @help
  * You can play the specified battle BGM for the enemy group.
  * 
+ * By specifying an enemy group in the plugin parameters, the set BGM will be played for that enemy group.
+ * Multiple enemy groups can be selected.
+ * If set in a battle event, the battle event tag will take precedence.
+ * 
+ * When filling out from a battle event
  * Please fill in the "comment" on page 1 of the battle event of the enemy group.
  * <BattleBGM:[id]> 
  * [id]:ID name or identification name　Specify the battle BGM list ID or identification name of the plug-in parameter.
@@ -33,6 +38,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/7/2024 Ver 1.1.0
+ * Added a function that can be set from enemy group ID.
  * 7/4/2023 Ver 1.0.0
  * First edition.
  * 
@@ -51,6 +58,12 @@
  */ 
 /*~struct~battleBgmList:
  * 
+ * @param TroopId
+ * @desc Specify enemy group. If not set, it will be referenced from the enemy group's battle event.
+ * @text Troop
+ * @type troop[]
+ * @default []
+ * 
  * @param Name
  * @desc Fill in the identification name. A string that is referenced when specified by name.
  * @text Identification name
@@ -65,6 +78,7 @@
  * 
  */
 /*~struct~battleBgmData:
+ * 
  * @param name
  * @text BGM file name
  * @desc Specify BGM.
@@ -102,7 +116,7 @@
 /*:ja
  * @target MZ
  * @plugindesc 敵グループのBGM設定
- * @version 1.0.0
+ * @version 1.1.0
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
@@ -110,9 +124,14 @@
  * @help
  * 敵グループに対し指定のバトルBGMを再生できます。
  * 
+ * プラグインパラメータに敵グループを指定することでその敵グループでは設定されたBGMが再生されます。
+ * 敵グループは複数選択できます。
+ * バトルイベントで設定されている場合は、バトルイベントのタグが優先されます。
+ * 
+ * バトルイベントから記入する場合
  * 敵グループのバトルイベントの１ページ目に注釈で記入してください。
  * <BattleBGM:[id]> 
- * [id]:ID名または識別名　プラグインパラメータの戦闘ＢＧＭのリストIDまたは、識別名を指定します。
+ * [id]:ID名または識別名 プラグインパラメータの戦闘BGMのリストIDまたは、識別名を指定します。
  * 
  * 戦闘BGM設定が複数指定されている場合はランダムに再生されますが、条件が指定されている場合で、条件を満たしている場合はそのBGMが再生されます。
  * 優先度は上から順に高くなります。
@@ -125,6 +144,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/7 Ver 1.1.0
+ * 敵グループIDから設定できる機能を追加。
  * 2023/7/4 Ver 1.0.0
  * 初版
  *  
@@ -142,6 +163,12 @@
  * 
  */
 /*~struct~battleBgmList:ja
+ * 
+ * @param TroopId
+ * @desc 敵グループを指定します。設定されていない場合は敵グループのバトルイベントから参照されます。
+ * @text 敵グループ
+ * @type troop[]
+ * @default 
  * 
  * @param Name
  * @desc 識別名を記入します。名前で指定するときに参照される文字列です。
@@ -161,7 +188,7 @@
  * @param name
  * @text BGMファイル名
  * @desc BGMを指定します。
- * @type file
+ * @type file 
  * @dir audio/bgm
  * 
  * @param volume
@@ -215,12 +242,22 @@ Imported.NUUN_BattleTroopBGM = true;
     };
 
     Game_Troop.prototype.setTroopBattleBGM = function() {
-        const bgm = this.getTagTroopBgm();
+        const bgmData = BGMList.find(data => this.isTroopBattleBGM(data));
+        const bgm = bgmData ? this.getBattleBgm(bgmData.TroopBGMList) : this.getTagTroopBgm();
         if (bgm) {
             const setBgm = {name: bgm.name, volume: bgm.volume, pitch: bgm.pitch, pan: bgm.pan};
             $gameSystem.setBattleBgm(setBgm);
         }
     };
+
+    Game_Troop.prototype.isTroopBattleBGM = function(data) {
+        try {
+            return !!data.TroopId && (data.TroopId.some(id => id === this._troopId));
+        } catch (error) {
+            const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.");
+            throw ["DataError", log];
+        }
+    }
 
     Game_Troop.prototype.getTagTroopBgm = function() {
         const re = /<(?:BattleBGM):\s*(.*)>/;

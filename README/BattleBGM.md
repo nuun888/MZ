@@ -1,5 +1,5 @@
 # [敵グループのBGM設定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleTroopBGM.js)
-# Ver.1.0.0
+# Ver.1.1.0
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleTroopBGM.js)  
  #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -7,6 +7,10 @@
 敵グループに対し指定のバトルBGMを再生できます。  
 
 ## 設定方法
+プラグインパラメータに敵グループを指定することでその敵グループでは設定されたBGMが再生されます。  
+敵グループは複数選択できます。  
+バトルイベントで設定されている場合は、バトルイベントのタグが優先されます。  
+
 敵グループのバトルイベントの１ページ目に注釈で記入してください。  
 `<BattleBGM:[id]>`  
 `[id]`:ID名または識別名　プラグインパラメータの戦闘ＢＧＭのリストIDまたは、識別名を指定します。  
@@ -22,6 +26,8 @@
 スイッチを指定した場合は該当のスイッチがONの時にこのプラグインで設定したBGMが再生されます。  
 
 ## 更新履歴
+2024/1/7 Ver 1.1.0  
+敵グループIDから設定できる機能を追加。  
 2023/7/4 Ver 1.0.0  
 初版  
 

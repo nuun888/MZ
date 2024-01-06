@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.1.4
+ * @version 2.1.5
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/7/2024 Ver.2.1.5
+ * Fixed an issue where the background image would be displayed within the UI even if Match background image to UI was turned off.
+ * Compatible with background plugins from other authors.
  * 1/6/2024 Ver.2.1.4
  * Fixed an issue where an error would occur when setting additional ability values and special ability values.
  * 1/3/2024 Ver.2.1.3
@@ -90,7 +93,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.1.4
+ * @version 2.1.5
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -100,6 +103,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/7 Ver.2.1.5
+ * 背景画像をUIに合わせるをOFFにしても背景画像がUI内に表示されてしまう問題を修正。
+ * 他作者様背景プラグインの競合対応。
  * 2024/1/6 Ver.2.1.4
  * 追加能力値、特殊能力値を設定するとエラーが出る問題を修正。
  * 2024/1/3 Ver.2.1.3
@@ -335,7 +341,7 @@ Imported.NUUN_MenuScreenEXBase = true;
 
     const _Scene_Menu_createBackground = Scene_Menu.prototype.createBackground;
     Scene_Menu.prototype.createBackground = function() {
-        _Scene_Menu_createBackground.call(this);
+        Scene_MenuBase.prototype.createBackground.call(this);
         if (!$gameSystem.menuBackgroundId) {
             $gameSystem.menuBackgroundId = 0;
         }
@@ -347,7 +353,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             sprite.bitmap = ImageManager.nuun_LoadPictures(img);
             this.addChild(sprite);
             if (sprite.bitmap && !sprite.bitmap.isReady()) {
-                sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
+                sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite, params.BackUiWidth1));
             } else {
                 this.setBackGround(sprite, params.BackUiWidth1);
             }
@@ -357,7 +363,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             sprite.bitmap = ImageManager.nuun_LoadPictures(params.BackGroundImg);
             this.addChild(sprite);
             if (sprite.bitmap && !sprite.bitmap.isReady()) {
-                sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite));
+                sprite.bitmap.addLoadListener(this.setBackGround.bind(this, sprite, params.BackUiWidth));
             } else {
                 this.setBackGround(sprite, params.BackUiWidth);
             }

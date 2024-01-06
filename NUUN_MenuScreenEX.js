@@ -8,7 +8,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc Menu screen EX Default type
+ * @plugindesc Menu screen EX
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base

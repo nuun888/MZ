@@ -15,7 +15,7 @@
  * @orderAfter NUUN_MenuScreen_default
  * @orderAfter NUUN_MenuScreen
  * @orderAfter NUUN_MenuScreen2
- * @version 2.1.3
+ * @version 2.1.4
  * 
  * @help
  * A base plugin for processing menu screens.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/6/2024 Ver.2.1.4
+ * Fixed an issue where an error would occur when setting additional ability values and special ability values.
  * 1/3/2024 Ver.2.1.3
  * Fixed a problem where the method name of the info window was not applied.
  * 8/8/2023 Ver.2.1.2
@@ -88,7 +90,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuScreenEX
- * @version 2.1.3
+ * @version 2.1.4
  * 
  * @help
  * メニュー画面を処理するためのベースプラグインです。
@@ -98,6 +100,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/6 Ver.2.1.4
+ * 追加能力値、特殊能力値を設定するとエラーが出る問題を修正。
  * 2024/1/3 Ver.2.1.3
  * インフォウィンドウのメソッド名が適用されていなかった箇所があったため修正。
  * 2023/8/8 Ver.2.1.2
@@ -453,7 +457,7 @@ Imported.NUUN_MenuScreenEXBase = true;
             let data = null;
             if (this.isActorPictureEXApp()) {
                 actor.resetImgId();
-                data = this.battlreActorPicture(actor);
+                data = this.getActorImgData(actor);
                 actor.loadActorFace();
                 actor.loadActorGraphic();
             } else {
@@ -924,6 +928,10 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.nuunMenu_actorCharacterChip(actor, data, x + 24, y + 48, "actor%1-menuStatusCharacter");
     };
 
+    Window_MenuStatus.prototype.drawSvActorImg = function(data, x, y, width, actor) {
+        this.nuunMenu_drawSvActorImg(data, x, y, width, actor, "actor%1-menuStatusSvActor");
+    };
+
     Window_StatusBase.prototype.nuunMenu_drawParams = function(data, param, x, y, width, actor) {
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = this.nuunMenu_paramNameData(data, actor, param - 20);
@@ -948,7 +956,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
         let textParam = (data.DetaEval ? eval(data.DetaEval) : this.nuunMenu_paramData(data, actor, param - 20));
-        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.DecimalMode());
+        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.getDecimalMode());
         textParam += (data.paramUnit ? String(data.paramUnit) : "");
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
@@ -964,7 +972,7 @@ Imported.NUUN_MenuScreenEXBase = true;
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
         let textParam = (data.DetaEval ? eval(data.DetaEval) : this.nuunMenu_paramData(data, actor, param - 20));
-        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.DecimalMode());
+        textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.getDecimalMode());
         textParam += (data.paramUnit ? String(data.paramUnit) : "");
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
@@ -1070,7 +1078,7 @@ Imported.NUUN_MenuScreenEXBase = true;
 
     Window_MenuStatus.prototype.nuunMenu_placeExpGauge = function(x, y, actor) {
         $gameTemp.menuGaugeType = "menuexp";
-        this.nuunMenu_placeGauge(actor, "menuexp", x, y, "menuSvActor%1");
+        this.nuunMenu_placeGauge(actor, "menuexp", x, y, "menuExp-%1");
     };
 
     Window_MenuStatus.prototype.nuunMenu_placeUserGauge = function(data, x, y, actor) {

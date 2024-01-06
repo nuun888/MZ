@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Famage floor EX
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,11 +26,19 @@
  * The floor damage value can use the evaluation formula.
  * a:Actor game data
  * 
+ * Notes with features
+ * <DfrEx[tag]:[rate]> Enter the floor damage rate of the specified tag name as a specified integer.
+ * [tag]: Tag name set in "Floor damage tag name"
+ * [rate]:Efficacy rate
+ * <DfrExPoison:150> The effectiveness rate of floor damage with the tag name Poison will be increased by 1.5 times.
+ * <DfrExPoison:70> The effectiveness rate of floor damage with the tag name Poison will be increased by 0.7 times.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/6/2024 Ver.1.2.1
+ * Added a function that allows you to set the effect rate for specific floor damage.
  * 1/4/2024 Ver.1.2.0
  * Added the ability to play an animation when taking floor damage.
  * Fixed an issue where SE during floor damage would regenerate even if you did not receive floor damage.
@@ -126,6 +134,12 @@
  * 
  */
 /*~struct~DamagedFloorRegionData:
+ * 
+ * @param DamagedFloorName
+ * @text Floor damage tag name
+ * @desc Set the tag name for floor damage.
+ * @type string
+ * @default 
  * 
  * @param RegionId
  * @text RegionID
@@ -284,7 +298,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -297,13 +311,22 @@
  * フラッシュ設定はフレーム数の数値を0と入力することでフラッシュされません。
  * 
  * 床ダメージ値は評価式が使用できます。
- * a：アクターのゲームデータ
+ * a:アクターのゲームデータ
+ * 
+ * 特徴を持つメモ欄
+ * <DfrEx[tag]:[rate]> 指定のタグ名の床ダメージ率を指定の整数で記入します。
+ * [tag]:床ダメージタグ名で設定したタグ名
+ * [rate]:効果率
+ * <DfrExPoison:150> タグ名がPoisonの床ダメージの効果率が1.5倍になります。
+ * <DfrExPoison:70> タグ名がPoisonの床ダメージの効果率が0.7倍になります。
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/6 Ver.1.2.1
+ * 特定の床ダメージに対して効果率を設定できる機能を追加。
  * 2024/1/4 Ver.1.2.0
  * 床ダメージ時にアニメーションを再生する機能を追加。
  * 床ダメージを受けなくても床ダメージ時のSEが再生してしまう問題を修正。
@@ -399,6 +422,12 @@
  * 
  */
 /*~struct~DamagedFloorRegionData:ja
+ * 
+ * @param DamagedFloorName
+ * @text 床ダメージタグ名
+ * @desc 床ダメージのタグ名を設定します。
+ * @type string
+ * @default 
  * 
  * @param RegionId
  * @text リージョンID
@@ -614,15 +643,26 @@ Game_Actor.prototype.executeFloorDamage = function() {
     _onMapFloorDamage = false;
 };
 
+Game_Actor.prototype.floorDamageRate = function() {
+    const tag = 'DfrEx'+ String(_damagedFloorExData.DamagedFloorName);
+    return this.traitObjects().reduce((r, trait) => {
+        if (!!trait.meta[tag]) {
+            return r * Number(trait.meta[tag]) / 100;
+        } else {
+            return r;
+        }
+    }, 1.0);
+};
+
 const _Game_Actor_basicFloorDamage = Game_Actor.prototype.basicFloorDamage;
 Game_Actor.prototype.basicFloorDamage = function() {
     const coreDamage = _Game_Actor_basicFloorDamage.call(this);
     const a = this;
     if (!!_damagedFloorExData) {
         const mainData = _damagedFloorExData;
-        return this.floorDamageActor(mainData.DamageActor) ? (mainData.Damage ? eval(mainData.Damage) : (DefaultDamage ? eval(DefaultDamage) : coreDamage)) : 0;
+        return this.floorDamageActor(mainData.DamageActor) ? (mainData.Damage ? eval(mainData.Damage) : (DefaultDamage ? eval(DefaultDamage) : coreDamage)) * this.floorDamageRate() : 0;
     } else {
-        return DefaultDamage ? eval(DefaultDamage) : coreDamage;
+        return (DefaultDamage ? eval(DefaultDamage) : coreDamage) * this.floorDamageRate();
     }
 };
 

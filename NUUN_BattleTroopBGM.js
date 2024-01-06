@@ -262,22 +262,24 @@ Imported.NUUN_BattleTroopBGM = true;
     const _BattleManager_initMembers = BattleManager.initMembers;
     BattleManager.initMembers = function() {
         _BattleManager_initMembers.call(this);
-        this._playBattleBGM = false;
+        this._playBattleBGM = 'step1';
     };
 
     const _BattleManager_playBattleBgm = BattleManager.playBattleBgm;
     BattleManager.playBattleBgm = function() {
-        if (!this._playBattleBGM) {
+        if (this._playBattleBGM === 'step1') {
             _BattleManager_playBattleBgm.call(this);
             $gameTroop.setupBattleBGM();
-            this._playBattleBGM = true;
+            this._playBattleBGM = 'step2';
+        } else if (this._playBattleBGM === 'step3') {
+            _BattleManager_playBattleBgm.call(this);
         }
     };
 
     const _BattleManager_startBattle = BattleManager.startBattle;
     BattleManager.startBattle = function() {
         _BattleManager_startBattle.call(this);
-        this._playBattleBGM = false;
+        this._playBattleBGM = 'step3';
     };
 
     Game_Troop.prototype.setupBattleBGM = function() {

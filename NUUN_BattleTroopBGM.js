@@ -11,7 +11,7 @@
 /*:
  * @target MZ
  * @plugindesc Enemy group BGM settings
- * @version 1.1.0
+ * @version 1.1.1
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
@@ -38,6 +38,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/7/2024 Ver 1.1.1
+ * Added a function that allows you to set the BGM during a preemptive surprise attack.
+ * Processing improvements.
  * 1/7/2024 Ver 1.1.0
  * Added a function that can be set from enemy group ID.
  * 7/4/2023 Ver 1.0.0
@@ -76,6 +79,18 @@
  * @default []
  * @type struct<battleBgmData>[]
  * 
+ * @param PreemptiveBGM
+ * @text Preemptive default bgm
+ * @desc Set the default BGM settings for pre-emptive attacks
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0","CondBgm":""}
+ * @type struct<battleBgmData>
+ * 
+ * @param SurpriseBGM
+ * @text Surprise default bgm
+ * @desc Set the default BGM settings for surprise attacks.
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0","CondBgm":""}
+ * @type struct<battleBgmData>
+ * 
  */
 /*~struct~battleBgmData:
  * 
@@ -108,15 +123,15 @@
  * @type combo
  * @option "$gameVariables.value(0);//Game variable"
  * @option "$gameSwitches.value(0);//Switch"
- * @option "BattleManager._tempPreemptive;//Preemptive　Requires NUUN_PreemptiveSurpriseEx"
- * @option "BattleManager._tempSurprise;//Surprise　Requires NUUN_PreemptiveSurpriseEx"
+ * @option "BattleManager._preemptive;//Preemptive
+ * @option "BattleManager._surprise;//Surprise
  * @default 
  *  
  */
 /*:ja
  * @target MZ
  * @plugindesc 敵グループのBGM設定
- * @version 1.1.0
+ * @version 1.1.1
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
@@ -144,6 +159,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/7 Ver 1.1.1
+ * 先制不意打ち時のBGMを設定できる機能を追加。
+ * 処理の改修。
  * 2024/1/7 Ver 1.1.0
  * 敵グループIDから設定できる機能を追加。
  * 2023/7/4 Ver 1.0.0
@@ -160,6 +178,18 @@
  * @desc このプラグインで設定したBGMの変更を許可(ON)。0で常時許可
  * @type switch
  * @default 0
+ * 
+ * @param PreemptiveBGM
+ * @text 先制攻撃時デフォルトBGM設定
+ * @desc 先制攻撃時のデフォルトBGM設定を設定します。
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0","CondBgm":""}
+ * @type struct<battleBgmData>
+ * 
+ * @param SurpriseBGM
+ * @text 不意打ち時デフォルトBGM設定
+ * @desc 不意打ち時のデフォルトBGM設定を設定します。
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0","CondBgm":""}
+ * @type struct<battleBgmData>
  * 
  */
 /*~struct~battleBgmList:ja
@@ -214,8 +244,8 @@
  * @type combo
  * @option "$gameVariables.value(0);//ゲーム変数"
  * @option "$gameSwitches.value(0);//スイッチ"
- * @option "BattleManager._tempPreemptive;//先制攻撃　要先制、不意打ちEX"
- * @option "BattleManager._tempSurprise;//不意打ち　要先制、不意打ちEX"
+ * @option "BattleManager._preemptive;//先制攻撃
+ * @option "BattleManager._surprise;//先制攻撃
  * @default 
  *  
  */
@@ -226,27 +256,64 @@ Imported.NUUN_BattleTroopBGM = true;
     const parameters = PluginManager.parameters('NUUN_BattleTroopBGM');
     const BGMList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BGMList'])) : [];
     const BattleBgmOnSwitch = Number(parameters['BattleBgmOnSwitch'] || 0);
+    const PreemptiveBGM = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PreemptiveBGM'])) : [];
+    const SurpriseBGM = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SurpriseBGM'])) : [];
 
-    const _BattleManager_setup = BattleManager.setup;
-    BattleManager.setup = function(troopId, canEscape, canLose) {
-        _BattleManager_setup.call(this, troopId, canEscape, canLose);
-        if (!Imported.NNUUN_PreemptiveSurpriseEx) {
-            $gameTroop.battleBGMSetup();
+    const _BattleManager_initMembers = BattleManager.initMembers;
+    BattleManager.initMembers = function() {
+        _BattleManager_initMembers.call(this);
+        this._playBattleBGM = false;
+    };
+
+    const _BattleManager_playBattleBgm = BattleManager.playBattleBgm;
+    BattleManager.playBattleBgm = function() {
+        if (!this._playBattleBGM) {
+            _BattleManager_playBattleBgm.call(this);
+            $gameTroop.setupBattleBGM();
+            this._playBattleBGM = true;
         }
     };
 
-    Game_Troop.prototype.battleBGMSetup = function() {
+    const _BattleManager_startBattle = BattleManager.startBattle;
+    BattleManager.startBattle = function() {
+        _BattleManager_startBattle.call(this);
+        this._playBattleBGM = false;
+    };
+
+    Game_Troop.prototype.setupBattleBGM = function() {
         if (BattleBgmOnSwitch === 0 || $gameSwitches.value(BattleBgmOnSwitch)) {
             this.setTroopBattleBGM();
         }
     };
 
+    Game_Troop.prototype.battleBGMSetup = function() {
+        //廃止
+    };
+
+    BattleManager.isPreemptiveBattleBGM = function() {
+        return !!PreemptiveBGM && !!PreemptiveBGM.name && (PreemptiveBGM.CondBgm ? eval(PreemptiveBGM.CondBgm) : true) &&  (this._preemptive || this._tempPreemptive);
+    };
+
+    BattleManager.isSurpriseBattleBGM = function() {
+        return !!SurpriseBGM && !!SurpriseBGM.name && (SurpriseBGM.CondBgm ? eval(SurpriseBGM.CondBgm) : true) && (this._surprise || this._tempSurprise);
+    };
+
     Game_Troop.prototype.setTroopBattleBGM = function() {
-        const bgmData = BGMList.find(data => this.isTroopBattleBGM(data));
-        const bgm = bgmData ? this.getBattleBgm(bgmData.TroopBGMList) : this.getTagTroopBgm();
+        if (BattleManager.isPreemptiveBattleBGM()) {
+            this.playTroopBattleBgm(PreemptiveBGM);
+        } else if (BattleManager.isSurpriseBattleBGM()) {
+            this.playTroopBattleBgm(SurpriseBGM);
+        } else {
+            const bgmData = BGMList.find(data => this.isTroopBattleBGM(data));
+            const bgm = bgmData ? this.getBattleBgm(bgmData.TroopBGMList) : this.getTagTroopBgm();
+            this.playTroopBattleBgm(bgm);
+        }
+    };
+
+    Game_Troop.prototype.playTroopBattleBgm = function(bgm) {
         if (bgm) {
             const setBgm = {name: bgm.name, volume: bgm.volume, pitch: bgm.pitch, pan: bgm.pan};
-            $gameSystem.setBattleBgm(setBgm);
+            AudioManager.playBgm(setBgm);
         }
     };
 
@@ -257,7 +324,7 @@ Imported.NUUN_BattleTroopBGM = true;
             const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.");
             throw ["DataError", log];
         }
-    }
+    };
 
     Game_Troop.prototype.getTagTroopBgm = function() {
         const re = /<(?:BattleBGM):\s*(.*)>/;

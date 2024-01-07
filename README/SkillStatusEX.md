@@ -39,7 +39,7 @@ actor.actor():アクターシステムデータ
 別途フォントを変更できるプラグインが必要です。(トリアコンタン様のFontLoad(フォントロードプラグイン)推奨)  
 
 メニュー画面旧版用
-[ダウンロード](https://github.com/nuun888/MZ/blob/master/oldVer/NUUN_SkillStatusEX.js)  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/oldVer/NUUN_SkillStatusEX.js)  
 
 ## 更新履歴
 2024/1/8 Ver.2.0.0  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.5
+ * @version 2.6.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/8 Ver.2.6.6
+ * 競合対策。
  * 2023/11/23 Ver.2.6.5
  * 職業、二つ名に色を指定できるように対応。
  * 2023/6/30 Ver.2.6.4
@@ -1585,7 +1587,7 @@ Scene_Status.prototype.setPage = function() {
 
 const _Scene_Status_update = Scene_Status.prototype.update;
 Scene_Status.prototype.update = function() {
-  _Scene_Status_update.call(this);
+    _Scene_Status_update.call(this);
     if (!PageNextSymbol && !PagePreviousSymbol) {
         if (Input.isRepeated('right') && this.maxPage() > 1) {
             this.updateStatusPageup();
@@ -1603,18 +1605,23 @@ Window_Status.prototype.initialize = function(rect) {
   this._page = startPages();
 };
 
+const _Window_Status_refresh = Window_Status.prototype.refresh;
 Window_Status.prototype.refresh = function() {
-  Window_StatusBase.prototype.refresh.call(this);
-  if (Imported.dsWeaponMastery && SceneManager._scene._statusMasteryWindow) {
-    this.refreshMasteryHide();
-  }
-  if (this._actor) {
-    this.actorImg();
-    this.drawBlockImg();
-  }
+    if (String(_class.constructor.name) === "Window_Status") {
+        Window_StatusBase.prototype.refresh.call(this);
+        if (Imported.dsWeaponMastery && SceneManager._scene._statusMasteryWindow) {
+            this.refreshMasteryHide();
+        }
+        if (this._actor) {
+            this.nuunStatusActorImg();
+            this.nuunStatusDrawBlockImg();
+        }
+    } else {
+        _Window_Status_refresh.call(this);
+    }
 };
 
-Window_Status.prototype.drawBlockImg = function() {
+Window_Status.prototype.nuunStatusDrawBlockImg = function() {
     const data = this.listDate();
     let bitmap = null;
     let loadBitmap = null;
@@ -1670,7 +1677,7 @@ Window_Status.prototype.loadFaceImages = function() {
   }
 };
 
-Window_Status.prototype.actorImg = function() {
+Window_Status.prototype.nuunStatusActorImg = function() {
     const actor = this._actor;
     let bitmap = null;
     if (this._actorBitmap) {
@@ -1792,7 +1799,7 @@ Window_Status.prototype.contentsLineHeight = function() {
   return $gameSystem.mainFontSize() + DefaultFontSize + FontMargin;
 };
 
-Window_Status.prototype.drawBlock = function() {
+Window_Status.prototype.nuunStatusDrawBlock = function() {
   const list = this.listDate();
   const lineHeight = this.contentsLineHeight();
   for (const data of list) {
@@ -1836,19 +1843,19 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
     case 0:
       break;
     case 1:
-      this.drawActorName(this._actor, x, y, width);
+      this.nuunStatusDrawActorName(this._actor, x, y, width);
       break;
     case 2:
-      this.drawActorNickname(this._actor, x, y, width, list);
+      this.nuunStatusDrawActorNickname(this._actor, x, y, width, list);
       break;
     case 3:
-      this.drawActorClass(this._actor, x, y, width, list);
+      this.nuunStatusDrawActorClass(this._actor, x, y, width, list);
       break;
     case 4:
-      this.drawActorLevel(this._actor, x, y, width, list);
+      this.nuunStatusDrawActorLevel(this._actor, x, y, width, list);
       break;
     case 5:
-      this.drawActorIcons(this._actor, x, y, width, list);
+      this.nuunStatusDrawActorIcons(this._actor, x, y, width, list);
       break;
     case 6:
       this.drawPlaceStateIcon(x, y, this._actor);
@@ -2097,21 +2104,21 @@ Window_Status.prototype.horzLine = function(list, x, y, width) {
   this.contents.paintOpacity = 255;
 };
 
-Window_Status.prototype.drawActorClass = function(actor, x, y, width, list) {
+Window_Status.prototype.nuunStatusDrawActorClass = function(actor, x, y, width, list) {
     width = width || 168;
     this.contentsFontSize(list);
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(actor.currentClass().name, x, y, width);
 };
 
-Window_Status.prototype.drawActorNickname = function(actor, x, y, width, list) {
+Window_Status.prototype.nuunStatusDrawActorNickname = function(actor, x, y, width, list) {
     width = width || 270;
     this.contentsFontSize(list);
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
     this.drawText(actor.nickname(), x, y, width);
 };
 
-Window_Status.prototype.drawActorFace = function(actor, x, y, width, height) {
+Window_Status.prototype.nuunStatusDrawActorFace = function(actor, x, y, width, height) {
   if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
     this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
   } else {
@@ -2119,7 +2126,7 @@ Window_Status.prototype.drawActorFace = function(actor, x, y, width, height) {
   }
 };
 
-Window_Status.prototype.drawActorLevel = function(actor, x, y, width, list) {
+Window_Status.prototype.nuunStatusDrawActorLevel = function(actor, x, y, width, list) {
     const dactor = actor.actor();
     const aclass = actor.currentClass();
     this.contentsFontSize(list);
@@ -2143,7 +2150,7 @@ Window_Status.prototype.drawActorLevel = function(actor, x, y, width, list) {
     this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), (list.Align || 'right'));
 };
 
-Window_Status.prototype.drawActorIcons = function(actor, x, y, width, list) {
+Window_Status.prototype.nuunStatusDrawActorIcons = function(actor, x, y, width, list) {
     let icons = [];
     let states = [];
     const dactor = actor.actor();

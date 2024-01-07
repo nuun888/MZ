@@ -6,7 +6,7 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
-/*:ja
+/*:
  * @target MZ
  * @plugindesc Skill status screen display customization
  * @author NUUN

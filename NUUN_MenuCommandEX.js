@@ -20,6 +20,7 @@
  * Prerequisite plugin
  * NUUN_MenuScreenEX or NUUN_MenuScreenEXBase
  * https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md
+ * Placed below the above plugins.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
@@ -228,6 +229,7 @@
  * 前提プラグイン
  * NUUN_MenuScreenEXまたはNUUN_MenuScreenEXBase
  * https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md
+ * 上記プラグインよりも下に配置。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
@@ -441,7 +443,9 @@ Imported.NUUN_MenuCommandEX = true;
 
     const _Window_MenuCommand_initialize = Window_MenuCommand.prototype.initialize;
     Window_MenuCommand.prototype.initialize = function(rect) {
-        if (!Imported.NUUN_MenuScreenEX || !Imported.NUUN_MenuScreenEXBase) {
+        if (Imported.NUUN_MenuScreenEX || Imported.NUUN_MenuScreenEXBase) {
+            
+        } else {
             const log = ($gameSystem.isJapanese() ? "NUUN_MenuScreenEXまたはNUUN_MenuScreenEXBaseが見つかりません。" : "NUUN_MenuScreenEX or NUUN_MenuScreenEXBase not found.");
             throw ["PluginError", log];
         }

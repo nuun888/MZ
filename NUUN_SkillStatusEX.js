@@ -11,10 +11,8 @@
  * @plugindesc Skill status screen display customization
  * @author NUUN
  * @base NUUN_Base
- * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.0.0
+ * @version 2.0.0
  * 
  * @help
  * Change the layout of the status window when selecting a skill.
@@ -26,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/8/2024 Ver.2.0.0
+ * Fixed by updating menu screen Ver.3.0.0.
  * 5/14/2023 Ver.1.0.0
  * First edition.
  * 
@@ -70,10 +70,10 @@
  * @desc Skill status item settings.
  * @text Skill status item settings
  * @type struct<StatusListData>[]
- * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"100\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}"]
+ * @default ["{\"DateSelect\":\"ActorName\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"HpGauge\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"MpGauge\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"TpGauge\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"Level\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"100\",\"SystemItemWidth\":\"0\",\"Align\":\"'right'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"State\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"144\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"Class\",\"NameColor\":\"0\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}"]
  * @parent SkillStatusSetting
  * 
-  @param SameAsMenu
+ * @param SameAsMenu
  * @text Skill status item settings
  * @desc Applied menu screen expansion settings.
  * @type boolean
@@ -222,10 +222,8 @@
  * @plugindesc スキルステータス画面表示カスタマイズ
  * @author NUUN
  * @base NUUN_Base
- * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.0.0
+ * @version 2.0.0
  * 
  * @help
  * スキル選択時のステータスウィンドウのレイアウトを変更します。
@@ -237,6 +235,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/8 Ver.2.0.0
+ * メニュー画面Ver.3.0.0更新による修正。
  * 2023/5/14 Ver.1.0.0
  * 初版。
  * 
@@ -281,7 +281,7 @@
  * @desc スキルステータス項目設定
  * @text スキルステータス項目設定
  * @type struct<StatusListData>[]
- * @default ["{\"DateSelect\":\"1\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"3\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"4\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"100\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"5\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"0\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"11\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"12\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"13\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}"]
+ * @default ["{\"DateSelect\":\"ActorName\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"HpGauge\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"MpGauge\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"24\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"TpGauge\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"48\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"Level\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"100\",\"SystemItemWidth\":\"0\",\"Align\":\"'right'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"State\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"180\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"144\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}","{\"DateSelect\":\"Class\",\"NameColor\":\"0\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"360\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"168\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\"}"]
  * @parent SkillStatusSetting
  * 
  * @param SameAsMenu
@@ -435,94 +435,94 @@
  * @desc Specifies the status to display.
  * @type select
  * @option None
- * @value 0
- * @option Actor name(1)(3)(4)(5)(6)(7)(9)(13)(15)
- * @value 1
+ * @value None
+ * @option Actor name(3)(4)(5)(6)(7)(9)(13)(15)
+ * @value ActorName
  * @option Nickname(1)(3)(4)(5)(6)(7)(9)(13)(15)
- * @value 2
- * @option Class(1)(3)(4)(5)(6)(7)(9)(13)(15)
- * @value 3
+ * @value Nickname
+ * @option Class業(1)(3)(4)(5)(6)(7)(9)(13)(15)
+ * @value Class
  * @option Level(1)(3)(4)(5)(6)(7)(13)(14)(15)
- * @value 4
+ * @value Level
  * @option State(3)(4)(5)(6)(7)(10※1)
- * @value 5
+ * @value State
  * @option State (same display as for battle)(3)(4)(5)(6)
- * @value 7
+ * @value State2
  * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 6
- * @option HP(2)(3)(4)(5)(6)(7)(21)(23)(24)
- * @value 11
- * @option MP(2)(3)(4)(5)(6)(7)(21)(23)(24)
- * @value 12
- * @option TP(2)(3)(4)(5)(6)(7)(21)(23)(24)
- * @value 13
+ * @value OrgParam
+ * @option HP Gauge(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value HpGauge
+ * @option MP Gauge(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value MpGauge
+ * @option TP Gauge(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value TpGauge
  * @option EXP(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 14
- * @option Exp (with gauge)(1)(2)(3)(4)(5)(6)(7)(21)
- * @value 15
+ * @value Exp
+ * @option EXP Gauge(1)(2)(3)(4)(5)(6)(7)(21)
+ * @value ExpGauge
  * @option ATK(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 22
- * @option DEF(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 23
- * @option MAT(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 24
- * @option MDF(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 25
- * @option AGI(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 26
- * @option LUK(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 27
+ * @value Atk
+ * @option Def(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @value Def
+ * @option Mat(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @value Mat
+ * @option Mdf(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @value Mdf
+ * @option Agi(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @value Agi
+ * @option Luk(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @value Luk
  * @option Hit(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 30
+ * @value Hit
  * @option Evasion(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 31
+ * @value Eva
  * @option Critcal rate(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 32
+ * @value Cri
  * @option Critcal evade(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 33
+ * @value CritcalEvade
  * @option Magic evade(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 34
+ * @value MagicEvade
  * @option Magic reflect(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 35
+ * @value MagicrEflect
  * @option Counter(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 36
+ * @value Counter
  * @option HP regen(1)(2)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 37
+ * @value HpRegen
  * @option MP regen(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 38
+ * @value MpRegen
  * @option TP regen(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 39
+ * @value TpRegen
  * @option Aggro(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 40
+ * @value Aggro
  * @option Guard(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 41
+ * @value Guard
  * @option Recovery(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 42
+ * @value Recovery
  * @option Item effect(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 43
+ * @value ItemEffect
  * @option MP cost(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 44
+ * @value MpCost
  * @option TP charge(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 45
+ * @value TpCharge
  * @option Physical damage(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 46
+ * @value PhysicalDamage
  * @option Magical damage(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 47
+ * @value MagicalDamage
  * @option Floor damage(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 48
+ * @value FloorDamage
  * @option Gain exp rate(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 49
+ * @value GainExpRate
  * @option Original gauge(2)(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
- * @value 100
+ * @value OrgGauge
  * @option Image(3)(4)(5)(6)(10)(25)
- * @value 200
+ * @value Imges
  * @option Character chip(3)(4)(5)(6)(25)
- * @value 300
+ * @value Charchip
  * @option SV Actor(3)(4)(5)(6)(25)
- * @value 301
+ * @value SvActor
  * @option Line(1)(2)(3)(4)(5)(6)(7)
- * @value 1000
- * @default 0
+ * @value HorzLine
+ * @default None
  * 
  * @param NameColor
  * @desc System color ID for system items. You can enter the color code in the text tab.
@@ -701,6 +701,20 @@
  * @type boolean
  * @default true
  * @parent ImgSetting
+ * 
+ * @param CondSetting
+ * @text Display condition settings
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc Specify the conditions under which the item will be displayed. (JavaScript)
+ * @text Item conditions
+ * @type combo
+ * @option '$gameVariables.value(0);//Game variable'
+ * @option 'actor;//Actor game data'
+ * @option 'actor.actor();//Actor system data'
+ * @option '$dataSystem.optDisplayTp'//TP display
+ * @default 
  *
  */
 /*~struct~StatusListData:ja
@@ -710,94 +724,94 @@
  * @desc 表示するステータスを指定します。
  * @type select
  * @option なし
- * @value 0
- * @option アクター名(1)(3)(4)(5)(6)(7)(9)(13)(15)
- * @value 1
+ * @value None
+ * @option アクター名(3)(4)(5)(6)(7)(9)(13)(15)
+ * @value ActorName
  * @option 二つ名(1)(3)(4)(5)(6)(7)(9)(13)(15)
- * @value 2
+ * @value Nickname
  * @option 職業(1)(3)(4)(5)(6)(7)(9)(13)(15)
- * @value 3
+ * @value Class
  * @option レベル(1)(3)(4)(5)(6)(7)(13)(14)(15)
- * @value 4
+ * @value Level
  * @option ステート(3)(4)(5)(6)(7)(10※1)
- * @value 5
+ * @value State
  * @option ステート(戦闘用と同じ表示)(3)(4)(5)(6)
- * @value 7
+ * @value State2
  * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 6
- * @option ＨＰ(2)(3)(4)(5)(6)(7)(21)(23)(24)
- * @value 11
- * @option ＭＰ(2)(3)(4)(5)(6)(7)(21)(23)(24)
- * @value 12
- * @option ＴＰ(2)(3)(4)(5)(6)(7)(21)(23)(24)
- * @value 13
+ * @value OrgParam
+ * @option HP(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value HpGauge
+ * @option MP(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value MpGauge
+ * @option TP(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value TpGauge
  * @option 経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 14
+ * @value Exp
  * @option 経験値（ゲージあり）(1)(2)(3)(4)(5)(6)(7)(21)
- * @value 15
+ * @value ExpGauge
  * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 22
+ * @value Atk
  * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 23
+ * @value Def
  * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 24
+ * @value Mat
  * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 25
+ * @value Mdf
  * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 26
+ * @value Agi
  * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
- * @value 27
+ * @value Luk
  * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 30
+ * @value Hit
  * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 31
+ * @value Eva
  * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 32
+ * @value Cri
  * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 33
+ * @value CritcalEvade
  * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 34
+ * @value MagicEvade
  * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 35
+ * @value MagicrEflect
  * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 36
+ * @value Counter
  * @option HP再生率(1)(2)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 37
+ * @value HpRegen
  * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 38
+ * @value MpRegen
  * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 39
+ * @value TpRegen
  * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 40
+ * @value Aggro
  * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 41
+ * @value Guard
  * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 42
+ * @value Recovery
  * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 43
+ * @value ItemEffect
  * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 44
+ * @value MpCost
  * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 45
+ * @value TpCharge
  * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 46
+ * @value PhysicalDamage
  * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 47
+ * @value MagicalDamage
  * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 48
+ * @value FloorDamage
  * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value 49
+ * @value GainExpRate
  * @option 独自ゲージ(2)(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
- * @value 100
- * @option 画像(3)(4)(5)(6)(25)
- * @value 200
+ * @value OrgGauge
+ * @option 画像(3)(4)(5)(6)(10)(25)
+ * @value Imges
  * @option キャラチップ(3)(4)(5)(6)(25)
- * @value 300
+ * @value Charchip
  * @option SVアクター(3)(4)(5)(6)(25)
- * @value 301
+ * @value SvActor
  * @option ライン(1)(2)(3)(4)(5)(6)(7)
- * @value 1000
- * @default 0
+ * @value HorzLine
+ * @default None
  * 
  * @param NameColor
  * @desc 項目名称のシステムカラーID。テキストタブでカラーコードを入力できます。
@@ -976,6 +990,20 @@
  * @type boolean
  * @default true
  * @parent ImgSetting
+ * 
+ * @param CondSetting
+ * @text 表示条件設定
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc 項目が表示される条件を指定します。(JavaScript)
+ * @text 項目条件
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'actor;//アクターのゲームデータ'
+ * @option 'actor.actor();//アクターのシステムデータ'
+ * @option '$dataSystem.optDisplayTp'//TP表示
+ * @default 
  *
  */
 /*~struct~actorImgList:
@@ -984,6 +1012,13 @@
  * @text Actor
  * @desc Specifies an actor.
  * @type actor
+ * @default 0
+ * 
+ * @param ClassId
+ * @text Class ID
+ * @desc Specify your occupation. If the occupation ID is specified, this will take precedence.
+ * @type class
+ * @default 0
  * 
  * @param GraphicMode
  * @desc Specifies the actor image to display.
@@ -1002,14 +1037,14 @@
  * @default 'default'
  * 
  * @param ActorImg
- * @text Actor image
+ * @text Actor image※1
  * @desc Display the image of the actor. If you want to switch the standing picture, please set the image in the list. 
  * @type file
  * @dir img/
  * @default 
  * 
  * @param FaceImg
- * @text Face image
+ * @text Face image※1
  * @desc Set the sprite sheet of the face graphic image.
  * @type file
  * @dir img/faces
@@ -1083,6 +1118,13 @@
  * @text アクター
  * @desc アクターを指定します。
  * @type actor
+ * @default 0
+ * 
+ * @param ClassId
+ * @text 職業ID
+ * @desc 職業を指定します。職業のIDが指定されている場合はこちらが優先されます。
+ * @type class
+ * @default 0
  * 
  * @param GraphicMode
  * @desc 表示するアクター画像を指定します。
@@ -1101,21 +1143,21 @@
  * @default 'default'
  * 
  * @param ActorImg
- * @text アクター画像
+ * @text アクター画像※1
  * @desc アクターの画像を表示します。立ち絵を切り替える場合はリストに画像を設定してください。(顔グラ表示OFF)
  * @type file
  * @dir img/
  * @default 
  * 
  * @param FaceImg
- * @text 顔グラ画像
+ * @text 顔グラ画像※1
  * @desc 顔グラ画像のスプライトシートを設定します。(顔グラ表示ON)
  * @type file
  * @dir img/faces
  * 
  * @param FaceIndex
  * @desc 顔グラのインデックスID。
- * @text 顔グラインデックスID
+ * @text 顔グラインデックスID※1
  * @type number
  * @default -1
  * @min -1
@@ -1202,7 +1244,6 @@ Imported.NUUN_SkillStatusEX = true;
     const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
     const LabelShow = eval(parameters['LabelShow'] || "true");
 
-
     Scene_Skill.prototype.skillTypeWindowRect = function() {
         const ww = SkillStatusWidth > 0 ? Graphics.boxWidth - SkillStatusWidth : this.mainCommandWidth();
         const wh = this.calcWindowHeight(SkillStatusRows, true);
@@ -1222,6 +1263,12 @@ Imported.NUUN_SkillStatusEX = true;
 
     const _Window_SkillStatus_initialize = Window_SkillStatus.prototype.initialize;DecimalMode
     Window_SkillStatus.prototype.initialize = function(rect) {
+        if (Imported.NUUN_MenuScreenEX || Imported.NUUN_MenuScreenEXBase) {
+            
+        } else {
+            const log = ($gameSystem.isJapanese() ? "NUUN_MenuScreenEXまたはNUUN_MenuScreenEXBaseが見つかりません。" : "NUUN_MenuScreenEX or NUUN_MenuScreenEXBase not found.");
+            throw ["PluginError", log];
+        }
         this._actorsBitmap = null;
         this.language_Jp = $gameSystem.isJapanese();
         _Window_SkillStatus_initialize.call(this, rect);
@@ -1263,22 +1310,23 @@ Imported.NUUN_SkillStatusEX = true;
         }
     };
 
-    Window_SkillStatus.prototype.getActorImgData = function(actorId) {
-        const actors = SameAsMenu ? this.nuunMenu_isMenuActorData() : ActorsImgList;
-        const find = actors.find(actor => actor.actorId === actorId);
+    Window_SkillStatus.prototype.getActorImgData = function(actor) {
+        const list = SameAsMenu ? this.getMenuLayoutActorsImgList() : ActorsImgList;
+        const find = list.find(data => this.condActorImg(data, actor));
         if (!find) {
-        return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: this.getGraphicMode(), FaceIndex : -1};
-        } if (find.GraphicMode === 'default' || !find.GraphicMode) {
-            find.GraphicMode = this.getGraphicMode();
-        }
-        return find;
-    };
-
-    Window_SkillStatus.prototype.battlreActorPicture = function(id) {
-        const actors = SameAsMenu ? this.nuunMenu_isMenuActorData() : ActorsImgList;
-        const find = actors.find(actor => actor.actorId === id);
-        if (!find) {
-        return {Actor_X: 0, Actor_Y: 0, Img_SX: 0, Img_SY: 0, Actor_Scale: 100, ActorBackImg: null,ActorFrontImg: null, GraphicMode: this.getGraphicMode(), FaceIndex : -1};
+            return {
+                Actor_X: 0, 
+                Actor_Y: 0, 
+                Img_SX: 0, 
+                Img_SY: 0, 
+                Actor_Scale: 100, 
+                ActorBackImg: null,
+                ActorFrontImg: null, 
+                GraphicMode:this.getGraphicMode(),
+                FaceIndex : -1,
+                ActorImg: null,
+                FaceImg: actor.faceName()
+            }
         } else if (find.GraphicMode === 'default' || !find.GraphicMode) {
             find.GraphicMode = this.getGraphicMode();
         }
@@ -1295,20 +1343,22 @@ Imported.NUUN_SkillStatusEX = true;
         const actor = this._actor;
         const rect = this.itemRect(index);
         let bitmap = null;
-        const data = this.nuunMenu_getActorData(actor);
+        const data = this.getActorImgData(actor);
         if (data && data.GraphicMode !== 'none') {
             if (data.GraphicMode === 'imgApng') {
                 this.createApngSprite(actor, index, data, rect);
             } else if (this.isActorPictureEXApp()) {
                 bitmap = data.GraphicMode === 'face' ? actor.loadActorFace() : actor.loadActorGraphic();
             } else {
-                bitmap = data.GraphicMode === 'face' ? ImageManager.nuun_LoadPictures(data.FaceImg) : ImageManager.nuun_LoadPictures(data.ActorImg);
+                bitmap = data.GraphicMode === 'face' ? ImageManager.loadFace(data.FaceImg) : ImageManager.nuun_LoadPictures(data.ActorImg);
             }
         }
         if (bitmap) {
             bitmap.addLoadListener(function() {
-                this.drawActorGraphic(data, bitmap, rect.x, rect.y, this.contentsWidth(), this.itemContentsHeight(), actor);
+                this.drawActorGraphic(data, bitmap, rect.x, rect.y, rect.width, this.innerHeight, actor);
             }.bind(this));
+        } else {
+            this.drawActorFront(data, rect.x, rect.y, rect.width, this.innerHeight);
         }
     };
 
@@ -1318,7 +1368,6 @@ Imported.NUUN_SkillStatusEX = true;
         const itemWidth = this.nuunMenu_itemContentsWidth(rect.width);
         const lineHeight = this.lineHeight();
         const colSpacing = this.colSpacing();
-        maxGaugeWidth = itemWidth;
         const list = this.getStatusList();
         for (const data of list) {
         const x_Position = data.X_Position;
@@ -1326,38 +1375,39 @@ Imported.NUUN_SkillStatusEX = true;
         const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
         const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate + this.itemPadding();
         const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : itemWidth;
+        data._width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, width) : Math.min(width, 128);
         this.nuunMenu_drawContentsBase(data, contentsX, contentsY, width - colSpacing / 2, actor);
         }
     };
 
-    Window_SkillStatus.prototype.nuunMenu_contentsDrawActorChip = function(data, x, y, width, actor) {
+    Window_SkillStatus.prototype.nuun_DrawMenuStatusContentsCharchip = function(data, x, y, width, actor) {
         this.nuunMenu_actorCharacterChip(actor, data, x + 24, y + 48, "actor%1-skillStatusCharacter");
     };
 
-    Window_SkillStatus.prototype.nuunMenu_placeHpGauge = function(x, y, actor) {
-        $gameTemp.menuGaugeType = "hp";
+    Window_SkillStatus.prototype.nuun_DrawMenuStatusContentsHpGauge = function(data, x, y, width, actor) {
+        this.setTempType('hp');
         this.nuunMenu_placeGauge(actor, "hp", x, y, "skillStatus_Actor%1-gauge-%2");
     };
 
-    Window_SkillStatus.prototype.nuunMenu_placeMpGauge = function(x, y, actor) {
-        $gameTemp.menuGaugeType = "mp";
+    Window_SkillStatus.prototype.nuun_DrawMenuStatusContentsMpGauge = function(data, x, y, width, actor) {
+        this.setTempType('mp');
         this.nuunMenu_placeGauge(actor, "mp", x, y, "skillStatus_Actor%1-gauge-%2");
     };
 
-    Window_SkillStatus.prototype.nuunMenu_placeTpGauge = function(x, y, actor) {
+    Window_SkillStatus.prototype.nuun_DrawMenuStatusContentsTpGauge = function(data, x, y, width, actor) {
         if ($dataSystem.optDisplayTp) {
-            $gameTemp.menuGaugeType = "tp";
+            this.setTempType('tp');
             this.nuunMenu_placeGauge(actor, "tp", x, y, "skillStatus_Actor%1-gauge-%2");
         }
     };
 
-    Window_SkillStatus.prototype.nuunMenu_placeExpGauge = function(x, y, actor) {
-        $gameTemp.menuGaugeType = "menuexp";
+    Window_SkillStatus.prototype.nuun_DrawMenuStatusContentsExpGauge = function(data, x, y, width, actor) {
+        this.setTempType('menuexp');
         this.nuunMenu_placeGauge(actor, "menuexp", x, y, "skillStatus_SvActor%1");
     };
 
-    Window_SkillStatus.prototype.nuunMenu_placeUserGauge = function(data, x, y, actor) {
-        $gameTemp.menuGaugeType = data.GaugeID;
+    Window_SkillStatus.prototype.nuun_DrawMenuStatusContentsOrgGauge = function(data, x, y, width, actor) {
+        this.setTempType(data.GaugeID);
         this.nuunMenu_placeGauge(actor, data.GaugeID, x, y, "skillStatus_Actor%1-gauge-%2");
     };
 

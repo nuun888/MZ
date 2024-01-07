@@ -1,6 +1,6 @@
 # [スキルステータス画面表示カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEX.js)
-# Ver.1.0.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEX.js)  
+# Ver.2.0.0
+[ダウンロード](https://github.com/nuun888/MZ/blob/master/oldVer/NUUN_SkillStatusEX.js)
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 [メニュー画面](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)Ver.2.0.17以降  
@@ -38,6 +38,11 @@ actor.actor():アクターシステムデータ
 ### フォント変更
 別途フォントを変更できるプラグインが必要です。(トリアコンタン様のFontLoad(フォントロードプラグイン)推奨)  
 
+メニュー画面旧版用
+[ダウンロード](https://github.com/nuun888/MZ/blob/master/oldVer/NUUN_SkillStatusEX.js)  
+
 ## 更新履歴
+2024/1/8 Ver.2.0.0  
+メニュー画面Ver.3.0.0更新による修正。  
 2023/5/14 Ver.1.0.0  
 初版  

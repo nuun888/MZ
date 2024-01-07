@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.0
+ * @version 3.0.1
  * 
  * @help
  * Change and extend the menu screen display.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/8/2024 Ver.3.0.1
+ * Support for "NUUN_SkillStatusEX".
  * 1/7/2024 Ver.3.0.0
  * Consolidate styles into one plugin.
  * Some plugin parameters have been abolished.
@@ -598,7 +600,7 @@
  */
 /*~struct~StatusListData:
  *
- * param DateSelect
+ * @param DateSelect
  * @text status to display
  * @desc Specifies the status to display.
  * @type select
@@ -1163,7 +1165,7 @@
  * @default 0
  * 
  * @param ClassId
- * @text Class ID※2
+ * @text Class ID
  * @desc Specify your occupation. If the occupation ID is specified, this will take precedence.
  * @type class
  * @default 0
@@ -1266,7 +1268,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.0
+ * @version 3.0.1
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1323,6 +1325,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/8 Ver.3.0.1
+ * スキルステータス画面表示カスタマイズへの対応。
  * 2024/1/7 Ver.3.0.0
  * スタイルを一つのプラグインに統合。
  * 一部のプラグインパラメータを廃止。
@@ -2538,6 +2542,10 @@ Imported.NUUN_MenuScreenEX = true;
         return MenuLayout.find(layout => layout.StyleName === MenuLayoutStyle);
     };
 
+    function setTepmData(data) {
+        _menutemp.setData(data);
+    };
+
     const _Scene_Menu_initialize = Scene_Menu.prototype.initialize;
     Scene_Menu.prototype.initialize = function() {
         this.initMenuLayout();
@@ -2903,6 +2911,10 @@ Imported.NUUN_MenuScreenEX = true;
         return SubMemberOpacity ? actor.isBattleMember() : true;
     };
 
+    Window_StatusBase.prototype.getMenuLayoutActorsImgList = function() {
+        return _menuLayout.ActorsImgList;
+    };
+
     Window_MenuStatus.prototype.drawItemBackground = function(index) {
         const actor = this.actor(index);
         const data = this.getActorImgData(actor);
@@ -2973,6 +2985,10 @@ Imported.NUUN_MenuScreenEX = true;
         this.contents.blt(bitmap, 0, 0, width, height, x, y);
     };
 
+    Window_StatusBase.prototype.nuunMenu_getMenuGraphicMode = function() {
+        return _menuLayout.GraphicMode;
+    };
+
     Window_MenuStatus.prototype.drawActorBack = function(bitmap, index) {
         const rect = this.itemRect(index);
         this.contentsBack.nuun_contentsBackBlt(bitmap, 0, 0, rect.width, rect.height, rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, 100, true);
@@ -3013,7 +3029,7 @@ Imported.NUUN_MenuScreenEX = true;
         return find;
     };
 
-    Window_MenuStatus.prototype.condActorImg = function(data, actor) {
+    Window_StatusBase.prototype.condActorImg = function(data, actor) {
         if (this.isActorPictureEXApp()) {
             return data.actorId === actor.actorId();
         } else {
@@ -3088,8 +3104,7 @@ Imported.NUUN_MenuScreenEX = true;
 
     Window_StatusBase.prototype.nuunMenu_drawContentsBase = function(data, x, y, width, battler) {
         if (this.nuunMenu_isContents(data, battler)) {
-            _menutemp.setData(data);
-            $gameTemp.menuParam = data;
+            setTepmData(data)
             const method = 'nuun_DrawMenuStatusContents' + data.DateSelect;
             try {
                 this[method](data, x, y, width, battler);
@@ -3278,6 +3293,10 @@ Imported.NUUN_MenuScreenEX = true;
     Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsExpGauge = function(data, x, y, width, actor) {
         _menutemp.setType("menuexp");
         this.nuunMenu_placeGauge(actor, "menuexp", x, y, "menuExp-%1");
+    };
+
+    Window_StatusBase.prototype.setTempType = function(type) {
+        _menutemp.setType(type);
     };
 
     Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsOrgGauge = function(data, x, y, actor) {

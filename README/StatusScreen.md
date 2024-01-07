@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.6.5
+# Ver.2.6.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.4以降  
@@ -112,6 +112,8 @@ APNGを表示するには別途ApngPicture.js(トリアコンタン様)が必要
 `[text]`:任意の個別画像。  
 
 ### 更新履歴
+2024/1/8 Ver.2.6.6  
+競合対策。  
 2023/11/23 Ver.2.6.5  
 職業、二つ名に色を指定できるように対応。  
 2023/6/30 Ver.2.6.4  

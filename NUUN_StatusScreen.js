@@ -1607,7 +1607,7 @@ Window_Status.prototype.initialize = function(rect) {
 
 const _Window_Status_refresh = Window_Status.prototype.refresh;
 Window_Status.prototype.refresh = function() {
-    if (String(_class.constructor.name) === "Window_Status") {
+    if (String(this.constructor.name) === "Window_Status") {
         Window_StatusBase.prototype.refresh.call(this);
         if (Imported.dsWeaponMastery && SceneManager._scene._statusMasteryWindow) {
             this.refreshMasteryHide();
@@ -1649,10 +1649,10 @@ Window_Status.prototype.nuunStatusDrawBlockImg = function() {
         }
     });
     if (bitmap && !bitmap.isReady()) {
-        bitmap.addLoadListener(this.drawBlock.bind(this))
+        bitmap.addLoadListener(this.nuunStatusDrawBlock.bind(this))
         return;
     } else {
-        this.drawBlock();
+        this.nuunStatusDrawBlock();
     }
 };
 
@@ -1843,7 +1843,7 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
     case 0:
       break;
     case 1:
-      this.nuunStatusDrawActorName(this._actor, x, y, width);
+      this.drawActorName(this._actor, x, y, width);
       break;
     case 2:
       this.nuunStatusDrawActorNickname(this._actor, x, y, width, list);

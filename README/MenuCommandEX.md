@@ -3,10 +3,9 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
 #### 必須、前提プラグイン
 ※[メニュー画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)   
-または
+または  
 [メニュー画面ベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)  
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
-※は一つ選択  
 
 メニューコマンドに任意の背景画像、コマンド画像、任意の座標に表示することができます。  
   

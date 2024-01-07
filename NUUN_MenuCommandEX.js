@@ -11,18 +11,22 @@
  * @plugindesc Menu command display EX
  * @author NUUN
  * @base NUUN_Base
- * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
+ * 
+ * Prerequisite plugin
+ * NUUN_MenuScreenEX or NUUN_MenuScreenEXBase
+ * https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/7/2024 Ver.1.1.4
+ * Fixed by updating menu screen Ver.3.0.0.
  * 2/24/2023 Ver.1.1.3
  * Fixed an issue where commands would move after selecting an actor and pressing cancel to return to menu commands.
  * 1/22/2023 Ver.1.1.2
@@ -215,18 +219,22 @@
  * @plugindesc メニューコマンド表示EX
  * @author NUUN
  * @base NUUN_Base
- * @base NUUN_MenuScreenEXBase
  * @orderAfter NUUN_Base
- * @orderAfter NUUN_MenuScreenEXBase
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
+ * 
+ * 前提プラグイン
+ * NUUN_MenuScreenEXまたはNUUN_MenuScreenEXBase
+ * https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/7 Ver.1.1.4
+ * メニュー画面Ver.3.0.0更新による修正。
  * 2023/2/24 Ver.1.1.3
  * アクター選択後キャンセルを押しメニューコマンドに戻る際に、コマンドが動く問題を修正。
  * 2023/1/22 Ver.1.1.2
@@ -433,6 +441,10 @@ Imported.NUUN_MenuCommandEX = true;
 
     const _Window_MenuCommand_initialize = Window_MenuCommand.prototype.initialize;
     Window_MenuCommand.prototype.initialize = function(rect) {
+        if (!Imported.NUUN_MenuScreenEX || !Imported.NUUN_MenuScreenEXBase) {
+            const log = ($gameSystem.isJapanese() ? "NUUN_MenuScreenEXまたはNUUN_MenuScreenEXBaseが見つかりません。" : "NUUN_MenuScreenEX or NUUN_MenuScreenEXBase not found.");
+            throw ["PluginError", log];
+        }
         this._commandSprite = [];
         this.loadCommandBitmap();
         _Window_MenuCommand_initialize.call(this, rect);

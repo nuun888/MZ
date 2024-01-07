@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.11
+ * @version 3.12.12
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2024/1/7 Ver.3.12.12
+ * エフェクトの位置がずれて表示される問題を修正。
  * 2023/12/29 Ver.3.12.11
  * 戦闘開始時の画像が正常に取得できない問題を修正。
  * 2023/12/28 Ver.3.12.10
@@ -3036,7 +3038,7 @@ Sprite_BSFrontActor.prototype.initMembers = function() {
 Sprite_BSFrontActor.prototype.updateVisibility = function() {
   Sprite_Actor.prototype.updateVisibility .call(this);
     if (this.viewFrontActor) {
-      this.visible = true;
+      //this.visible = true;
       this.visible = false;
     }
 };
@@ -4267,9 +4269,9 @@ Spriteset_Battle.prototype.updateEffects = function() {
 };
 
 Spriteset_Battle.prototype.setBattleBase = function() {
-    const width = (params.ActorStatusWindow_Width > 0 ? params.ActorStatusWindow_Width : Graphics.boxWidth);
+    const width = Graphics.boxWidth;
     const height = Graphics.boxHeight;
-    const x = (params.ActorStatusWindowCenter ? getActorWindowCenter() : 0) + params.ActorStatusWindow_X;
+    const x = 0;
     const y = 0;
     const sprite = new Sprite();
     sprite.setFrame(0, 0, width, height);
@@ -4282,12 +4284,12 @@ Spriteset_Battle.prototype.setBattleBase = function() {
 Spriteset_Battle.prototype.createFrontActors = function() {
   this.createDamege();
     if (!$gameSystem.isSideView() && params.ActorEffectShow) {
-      this._actorSprites = [];
-      for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
-        const sprite = new Sprite_BSFrontActor();
-        this._actorSprites.push(sprite);
-        this._battleDamege.addChild(sprite);
-      }
+        this._actorSprites = [];
+        for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
+            const sprite = new Sprite_BSFrontActor();
+            this._actorSprites.push(sprite);
+            this._battleDamege.addChild(sprite);
+        }
     }
 };
 

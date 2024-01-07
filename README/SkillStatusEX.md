@@ -1,6 +1,6 @@
 # [スキルステータス画面表示カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEX.js)
 # Ver.2.0.0
-[ダウンロード](https://github.com/nuun888/MZ/blob/master/oldVer/NUUN_SkillStatusEX.js)
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEX.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 [メニュー画面](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)Ver.2.0.17以降  

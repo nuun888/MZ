@@ -1,5 +1,5 @@
 # [敵グループのBGM設定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleTroopBGM.js)
-# Ver.1.1.1
+# Ver.1.1.2
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleTroopBGM.js)  
  #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -26,6 +26,8 @@
 スイッチを指定した場合は該当のスイッチがONの時にこのプラグインで設定したBGMが再生されます。  
 
 ## 更新履歴
+2024/1/8 Ver 1.1.2  
+処理の修正。  
 2024/1/7 Ver 1.1.1  
 先制不意打ち時のBGMを設定できる機能を追加。  
 処理の改修。  

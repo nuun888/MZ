@@ -11,7 +11,7 @@
 /*:
  * @target MZ
  * @plugindesc Enemy group BGM settings
- * @version 1.1.1
+ * @version 1.1.2
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
@@ -38,6 +38,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/8/2024 Ver 1.1.2
+ * Processing correction.
  * 1/7/2024 Ver 1.1.1
  * Added a function that allows you to set the BGM during a preemptive surprise attack.
  * Processing improvements.
@@ -131,7 +133,7 @@
 /*:ja
  * @target MZ
  * @plugindesc 敵グループのBGM設定
- * @version 1.1.1
+ * @version 1.1.2
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
@@ -159,6 +161,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/8 Ver 1.1.2
+ * 処理の修正。
  * 2024/1/7 Ver 1.1.1
  * 先制不意打ち時のBGMを設定できる機能を追加。
  * 処理の改修。
@@ -268,12 +272,16 @@ Imported.NUUN_BattleTroopBGM = true;
     const _BattleManager_playBattleBgm = BattleManager.playBattleBgm;
     BattleManager.playBattleBgm = function() {
         if (this._playBattleBGM === 'step1') {
-            _BattleManager_playBattleBgm.call(this);
-            $gameTroop.setupBattleBGM();
-            this._playBattleBGM = 'step2';
+            this.playTroopBattleBgm();
         } else if (this._playBattleBGM === 'step3') {
             _BattleManager_playBattleBgm.call(this);
         }
+    };
+
+    BattleManager.playTroopBattleBgm = function() {
+        _BattleManager_playBattleBgm.call(this);
+        $gameTroop.setupBattleBGM();
+        this._playBattleBGM = 'step2';
     };
 
     const _BattleManager_startBattle = BattleManager.startBattle;

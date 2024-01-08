@@ -34,11 +34,11 @@
 インフォウィンドウは最大10のウィンドウを生成できます。  
 
 デフォルトタイプ  
-![画像](img/MenuScreen_default.png)  
+![画像](img/MenuScreen_type2.png)  
 タイプ１  
-![画像](img/MenuScreen1.png)  
+![画像](img/MenuScreen_type3.png)  
 タイプ2  
-![画像](img/MenuScreen3.png)  
+![画像](img/MenuScreen_type4.png)  
 
 
 ## 設定方法

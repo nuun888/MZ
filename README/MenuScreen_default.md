@@ -33,11 +33,11 @@
 アクターステータスに経験値や能力値、追加能力値、特殊能力値などを表示できます。  
 インフォウィンドウは最大10のウィンドウを生成できます。  
 
-デフォルトタイプ  
+ActorBesid  
 ![画像](img/MenuScreen_type2.png)  
-タイプ１  
+CommandBeside  
 ![画像](img/MenuScreen_type3.png)  
-タイプ2  
+Type4    
 ![画像](img/MenuScreen_type4.png)  
 
 

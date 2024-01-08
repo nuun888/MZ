@@ -3,7 +3,7 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEX.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
-[メニュー画面](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)Ver.2.0.17以降  
+[メニュー画面](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)Ver.3.0.0以降  
 
 スキル選択時のステータスウィンドウのレイアウトを変更します。  
 このプラグインはメニュー画面プラグイン(Ver.2.0.17以降)が必要になります。  
@@ -38,7 +38,7 @@ actor.actor():アクターシステムデータ
 ### フォント変更
 別途フォントを変更できるプラグインが必要です。(トリアコンタン様のFontLoad(フォントロードプラグイン)推奨)  
 
-メニュー画面旧版用
+メニュー画面旧版用 メニュー画面Ver.2以前  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/oldVer/NUUN_SkillStatusEX.js)  
 
 ## 更新履歴

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost EX
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * You can set various costs for skill costs.
@@ -96,6 +96,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/13/2024 Ver.1.3.2
+ * Supported SkillCostRateCustomize so that it functions other than MP and TP.
  * 7/23/2023 Ver.1.3.1
  * Fixed an issue where HP and Gold were not consumed.
  * 7/13/2023 Ver.1.3.0
@@ -124,7 +126,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -209,6 +211,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/13 Ver.1.3.2
+ * スキルコスト倍率調整プラグインでMP、TP以外でも機能するように対応。
  * 2023/7/23 Ver.1.3.1
  * HP、Goldが消費しない問題を修正。
  * 2023/7/13 Ver.1.3.0
@@ -272,6 +276,7 @@ Game_BattlerBase.prototype.skillHpCost = function(skill) {
     let cost = skill.meta.SkillHPCost ? Number(skill.meta.SkillHPCost) : 0;
     cost += skill.meta.SkillHPCostMR ? Math.floor(this.mhp * Number(skill.meta.SkillHPCostMR) / 100) : 0;
     cost += skill.meta.SkillHPCostR ? Math.floor(this._hp * Number(skill.meta.SkillHPCostR) / 100) : 0;
+    cost = this.skillCostRateCustomizeRateTriacontane(cost, 'Hp', skill);
     return cost;
 };
 
@@ -286,16 +291,27 @@ Game_BattlerBase.prototype.skillGoldCost = function(skill) {
     if (!this.isEnemy()) {
         cost += skill.meta.SkillGoldCost ? Number(skill.meta.SkillGoldCost) : 0;
         cost += skill.meta.SkillGoldCostR ? Math.floor($gameParty.gold() * Number(skill.meta.SkillGoldCostR) / 100) : 0;
+        cost = this.skillCostRateCustomizeRateTriacontane(cost, 'Gold', skill);
     }
     return cost;
 };
 
 Game_BattlerBase.prototype.skillVarCost = function(skill) {
-    return skill.meta.SkillVarCost ? skill.meta.SkillVarCost.split(',').map(Number) : null;
+    let cost = 0;
+    if (skill.meta.SkillVarCost) {
+        cost = skill.meta.SkillVarCost.split(',').map(Number);
+        cost = this.skillCostRateCustomizeRateTriacontane(cost, 'Var', skill);
+    }
+    return cost;
 };
 
 Game_BattlerBase.prototype.skillVarCostR = function(skill) {
-    return skill.meta.SkillVarCostR ? skill.meta.SkillVarCostR.split(',').map(Number) : null;
+    let cost = 0;
+    if (skill.meta.SkillVarCostR) {
+        cost = skill.meta.SkillVarCostR.split(',').map(Number);
+        cost = this.skillCostRateCustomizeRateTriacontane(cost, 'VarR', skill);
+    }
+    return cost;
 };
 
 Game_BattlerBase.prototype.skillExpCost = function(skill) {
@@ -303,6 +319,7 @@ Game_BattlerBase.prototype.skillExpCost = function(skill) {
     if (this.isActor()) {
         cost += skill.meta.SkillExpCost ? Number(skill.meta.SkillExpCost) : 0;
         cost += skill.meta.SkillExpCostR ? (this.currentExp() - this.currentLevelExp()) * Number(skill.meta.SkillExpCostR) / 100 : 0;
+        cost = this.skillCostRateCustomizeRateTriacontane(cost, 'Exp', skill);
     }
     return cost;
 };
@@ -321,6 +338,13 @@ Game_BattlerBase.prototype.skillEquipCost = function(skill) {
     } else {
         return [];
     }
+};
+
+Game_BattlerBase.prototype.skillCostRateCustomizeRateTriacontane = function(result, type, skill) {
+    if (!!this.applyCostRateCustomize) {
+        return this.applyCostRateCustomize(result, type, skill);
+    }
+    return result;
 };
 
 const _Game_BattlerBase_canPaySkillCost = Game_BattlerBase.prototype.canPaySkillCost;

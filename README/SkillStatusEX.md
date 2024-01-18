@@ -1,5 +1,5 @@
 # [スキルステータス画面表示カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEX.js)
-# Ver.2.0.0
+# Ver.2.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillStatusEX.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -42,6 +42,8 @@ actor.actor():アクターシステムデータ
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/oldVer/NUUN_SkillStatusEX.js)  
 
 ## 更新履歴
+2024/1/18 Ver.2.0.1  
+一部項目の設定でエラーが表示される問題を修正。  
 2024/1/8 Ver.2.0.0  
 メニュー画面Ver.3.0.0更新による修正。  
 2023/5/14 Ver.1.0.0  

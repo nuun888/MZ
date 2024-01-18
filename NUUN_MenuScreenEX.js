@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.1
+ * @version 3.0.2
  * 
  * @help
  * Change and extend the menu screen display.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/18/2024 Ver.3.0.2
+ * Fixed an issue where an error was displayed when setting some items in "NUUN_SkillStatusEX".
  * 1/8/2024 Ver.3.0.1
  * Support for "NUUN_SkillStatusEX".
  * 1/7/2024 Ver.3.0.0
@@ -1268,7 +1270,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.1
+ * @version 3.0.2
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1325,6 +1327,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/18 Ver.3.0.2
+ * スキルステータスカスタマイズプラグインで一部項目の設定でエラーが表示される問題を修正。
  * 2024/1/8 Ver.3.0.1
  * スキルステータス画面表示カスタマイズへの対応。
  * 2024/1/7 Ver.3.0.0
@@ -3326,119 +3330,119 @@ Imported.NUUN_MenuScreenEX = true;
         this.nuunMenu_drawSvActorImg(data, x, y, width, actor, "actor%1-menuStatusSvActor");
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsImges = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsImges = function(data, x, y, width, actor) {
         this.nuunMenu_drawMenuStatusImg(data, x, y, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsHp = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsHp = function(data, x, y, width, actor) {
         this.nuunMenu_drawParams(data, 0, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsMp = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsMp = function(data, x, y, width, actor) {
         this.nuunMenu_drawParams(data, 1, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsAtk = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsAtk = function(data, x, y, width, actor) {
         this.nuunMenu_drawParams(data, 2, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsDef = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsDef = function(data, x, y, width, actor) {
         this.nuunMenu_drawParams(data, 3, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsMat = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsMat = function(data, x, y, width, actor) {
         this.nuunMenu_drawParams(data, 4, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsMdf = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsMdf = function(data, x, y, width, actor) {
         this.nuunMenu_drawParams(data, 5, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsAgi = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsAgi = function(data, x, y, width, actor) {
         this.nuunMenu_drawParams(data, 6, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsLuk = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsLuk = function(data, x, y, width, actor) {
         this.nuunMenu_drawParams(data, 7, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsHit = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsHit = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 0, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsEva = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsEva = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 1, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsCri = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsCri = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 2, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsCritcalEvade = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsCritcalEvade = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 3, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsMagicEvade = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsMagicEvade = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 4, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsMagicrEflect = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsMagicrEflect = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 5, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsCounter = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsCounter = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 6, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsHpRegen = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsHpRegen = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 7, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsMpRegen = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsMpRegen = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 8, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsTpRegen = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsTpRegen = function(data, x, y, width, actor) {
         this.nuunMenu_drawXParams(data, 9, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsAggro = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsAggro = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 0, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsGuard = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsGuard = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 1, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsRecovery = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsRecovery = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 2, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsItemEffect = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsItemEffect = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 3, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsMpCost = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsMpCost = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 4, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsTpCharge = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsTpCharge = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 5, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsPhysicalDamage = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsPhysicalDamage = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 6, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsMagicalDamage = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsMagicalDamage = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 7, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsFloorDamage = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsFloorDamage = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 8, x, y, width, actor);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsGainExpRate = function(data, x, y, width, actor) {
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsGainExpRate = function(data, x, y, width, actor) {
         this.nuunMenu_drawSParams(data, 9, x, y, width, actor);
     };
 

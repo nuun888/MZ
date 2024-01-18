@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * Change the layout of the status window when selecting a skill.
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/18/2024 Ver.2.0.1
+ * Fixed an issue where an error was displayed when setting some items.
  * 1/8/2024 Ver.2.0.0
  * Fixed by updating menu screen Ver.3.0.0.
  * 5/14/2023 Ver.1.0.0
@@ -223,7 +225,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * スキル選択時のステータスウィンドウのレイアウトを変更します。
@@ -235,6 +237,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/18 Ver.2.0.1
+ * 一部項目の設定でエラーが表示される問題を修正。
  * 2024/1/8 Ver.2.0.0
  * メニュー画面Ver.3.0.0更新による修正。
  * 2023/5/14 Ver.1.0.0
@@ -1409,6 +1413,14 @@ Imported.NUUN_SkillStatusEX = true;
     Window_SkillStatus.prototype.nuun_DrawMenuStatusContentsOrgGauge = function(data, x, y, width, actor) {
         this.setTempType(data.GaugeID);
         this.nuunMenu_placeGauge(actor, data.GaugeID, x, y, "skillStatus_Actor%1-gauge-%2");
+    };
+
+    Window_SkillStatus.prototype.nuun_DrawMenuStatusContentsCharchip = function(data, x, y, width, actor) {
+        this.nuunMenu_actorCharacterChip(actor, data, x + 24, y + 48, "actor%1-skillStatusCharacter");
+    };
+    
+    Window_SkillStatus.prototype.nuun_DrawMenuStatusContentsSvActor = function(data, x, y, width, actor) {
+        this.nuunMenu_drawSvActorImg(data, x, y, width, actor, "actor%1-skillStatusSvActor");
     };
 
     Window_SkillStatus.prototype.ActorImgX = function() {

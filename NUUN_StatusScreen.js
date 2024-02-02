@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.6
+ * @version 2.6.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/2/3 Ver.2.6.7
+ * 特徴で封印されている装備を表示させない機能を追加。(一部プラグインの競合対策)
  * 2024/1/8 Ver.2.6.6
  * 競合対策。
  * 2023/11/23 Ver.2.6.5
@@ -546,6 +548,13 @@
  * @text 装備アイコン
  * @desc 装備アイコンを設定します。IDは装備スロットの番号と同じです。
  * @default []
+ * @parent EquipSetting
+ * 
+ * @param InvalidSlotHide
+ * @text 封印装備非表示
+ * @desc 特徴で封印されている装備を表示しません。
+ * @type boolean
+ * @default false
  * @parent EquipSetting
  * 
  * @param EXPSetting
@@ -1340,6 +1349,7 @@ const StateResist = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(param
 const ElementResistCol = Number(parameters['ElementResistCol'] || 2);
 const StateResistCol = Number(parameters['StateResistCol'] || 2);
 const EquipIcons = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipIcons'])) : [];
+const InvalidSlotHide = eval(parameters['InvalidSlotHide'] || "false");
 const StateResistColor = (DataManager.nuun_structureData(parameters['StateResistColor'])) || 0;
 const StatusRadarChartRadius = Number(parameters['StatusRadarChartRadius'] || 100);
 const StatusRadarChartFramecolor = Number(parameters['StatusResistCol'] || 15);
@@ -2256,7 +2266,7 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
     for (let i = 0; i < e1uipsLength; i++) {
         const index = i + (list.EquipStartIndex || 0);
         const slotName = this.actorSlotName(actor, index);
-        if (slotName && (!showEquips || (showEquips && showEquips.some(data => data === slotName)))) {
+        if (slotName && this.isShowSlot(actor, index) && (!showEquips || (showEquips && showEquips.some(data => data === slotName)))) {
             let sw = 0;
             let iconWidth = 0;
             if (list.Back) {
@@ -2774,6 +2784,10 @@ Window_Status.prototype.getColorCode = function(color) {
 Window_Status.prototype.nuun_setContentsFontFace = function(list) {
     this.contents.fontFace = list.FontFace ? list.FontFace : (list.ValueFontFace ? $gameSystem.numberFontFace() : $gameSystem.mainFontFace());
 }
+
+Window_Status.prototype.isShowSlot = function(actor, index) {
+    return !actor.isEquipTypeSealed(actor.equipSlots()[index]);
+};
 
 
 function Sprite_StatusHPGauge() {

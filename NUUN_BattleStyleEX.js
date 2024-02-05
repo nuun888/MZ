@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.12
+ * @version 3.12.13
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2024/2/5 Ver.3.12.13
+ * 対象選択時のアイテム、スキルヘルプを非表示にする機能を復活。
  * 2024/1/7 Ver.3.12.12
  * エフェクトの位置がずれて表示される問題を修正。
  * 2023/12/29 Ver.3.12.11
@@ -941,13 +943,15 @@ Game_Battler.prototype.battleStyleMatchChangeGraphic = function(data) {
 };
 
 Game_Actor.prototype.performVibration = function(critical) {
-    if (critical && params.CriticalVibration) {
-        if (params.CriticalVibrationSetting) {
-            NuunManager.setupGamePadVibration(params.CriticalVibrationSetting);
-        }
-    } else {
-        if (params.DamegeVibration && params.DamegeVibrationSetting) {
-            NuunManager.setupGamePadVibration(params.DamegeVibrationSetting);
+    if (Imported.NUUN_GamePadVibration) {
+        if (critical && params.CriticalVibration) {
+            if (params.CriticalVibrationSetting) {
+                NuunManager.setupGamePadVibration(params.CriticalVibrationSetting);
+            }
+        } else {
+            if (params.DamegeVibration && params.DamegeVibrationSetting) {
+                NuunManager.setupGamePadVibration(params.DamegeVibrationSetting);
+            }
         }
     }
 };
@@ -1743,8 +1747,8 @@ Scene_Battle.prototype.partyWindowAreaHeight = function() {
 const _Scene_Battle_startActorSelection = Scene_Battle.prototype.startActorSelection;
 Scene_Battle.prototype.startActorSelection = function() {
     _Scene_Battle_startActorSelection.call(this);
-    this._skillWindow.hide();
-    this._itemWindow.hide();
+    this._skillWindow.selectionHide();
+    this._itemWindow.selectionHide();
     this._statusWindow.deselect();
 };
 
@@ -1752,8 +1756,8 @@ const _Scene_Battle_startEnemySelection = Scene_Battle.prototype.startEnemySelec
 Scene_Battle.prototype.startEnemySelection = function() {
     _Scene_Battle_startEnemySelection.call(this);
     this._statusWindow.show();
-    this._skillWindow.hide();
-    this._itemWindow.hide();
+    this._skillWindow.selectionHide();
+    this._itemWindow.selectionHide();
     if (!this.commandDefaultMode()) {
         this._actorCommandWindow.hide();
     }
@@ -2906,19 +2910,35 @@ if (params.SkillMaxCol > 0) {
   };
 }
 
+Window_BattleSkill.prototype.selectionHide = function() {
+    if (params.HelpWindowSelectShow) {
+        Window_SkillList.prototype.hide.call(this);
+    } else {
+        Window_BattleSkill.prototype.hide.call(this);
+    }
+};
+  
 //Window_BattleItem
 const _Window_BattleItem_initialize =Window_BattleItem.prototype.initialize;
 Window_BattleItem.prototype.initialize = function(rect) {
-  _Window_BattleItem_initialize.call(this, rect);
-  this._bsBackground = null;
-  this.opacity = params.ItemWindowShow ? 255 : 0;
+    _Window_BattleItem_initialize.call(this, rect);
+    this._bsBackground = null;
+    this.opacity = params.ItemWindowShow ? 255 : 0;
 };
 
 if (params.ItemMaxCol > 0) {
-  Window_BattleItem.prototype.maxCols = function() {
-    return params.ItemMaxCol;
-  };
+    Window_BattleItem.prototype.maxCols = function() {
+        return params.ItemMaxCol;
+    };
 }
+
+Window_BattleItem.prototype.selectionHide = function() {
+    if (params.HelpWindowSelectShow) {
+        Window_ItemList.prototype.hide.call(this);
+    } else {
+        Window_SkillList.prototype.hide.call(this);
+    }
+};
 
 //Window_Help
 const _Window_Help_initialize = Window_Help.prototype.initialize;

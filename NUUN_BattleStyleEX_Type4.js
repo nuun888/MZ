@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_BattleStyleEX
  * @orderBefore NUUN_BattleStyleEX
- * @version 1.4.2
+ * @version 1.4.3
  * 
  * @help
  * 戦闘画面を拡張します。
@@ -82,6 +82,8 @@
  * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
  * 
  * 更新履歴
+ * 2024/2/5 Ver.1.4.3
+ * 対象選択時のアイテム、スキルヘルプを非表示にする機能を復活。
  * 2023/7/30 Ver.1.4.2
  * 味方の画像切り替えでランダムに表示できる機能を追加。
  * 2023/7/2 Ver.1.4.1
@@ -1260,11 +1262,22 @@
 * @min -9999
 * @max 9999
 * @parent AppearWindowBackGround
-* 
-* @param ItemWindow
-* @text アイテム選択ウィンドウ
-* @default ////////////////////////////////
-* 
+ * 
+ * @param SelectWindowVisibleSetting
+ * @text アイテム、スキル選択ウィンドウ
+ * @default ////////////////////////////////
+ * 
+ * @param HelpWindowSelectShow
+ * @desc 対象選択時にヘルプウィンドウを表示する。
+ * @text 対象選択時ヘルプウィンドウ表示
+ * @type boolean
+ * @default true
+ * @parent SelectWindowVisibleSetting
+ * 
+ * @param ItemWindow
+ * @text アイテム選択ウィンドウ
+ * @default ////////////////////////////////
+ * 
 * @param ItemWindowShow
 * @desc ウィンドウ画像を表示する。OFFにするとコマンド背後のウィンドウが表示されません。
 * @text ウィンドウ画像表示
@@ -2589,6 +2602,8 @@ params.AppearWindowAnchorMode = eval(parameters['AppearWindowAnchorMode']) || 'u
 params.AppearBackgroundImg = String(parameters['AppearBackgroundImg']);
 params.AppearBackground_X = Number(parameters['AppearWindowBackground_X'] || 0);
 params.AppearBackground_Y = Number(parameters['AppearWindowBackground_Y'] || 0);
+
+params.HelpWindowSelectShow = eval(parameters['HelpWindowSelectShow'] || "true");
 
 params.ItemWindowShow = eval(parameters['ItemWindowShow'] || "true");
 params.ItemWindowOpacity = Number(parameters['ItemWindowOpacity'] || 255);

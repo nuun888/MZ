@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.9
+ * @version 2.20.10
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/10/2024 Ver.2.20.10
+ * Added a function that allows you to set conditions under which commands can be selected.
  * 1/3/2024 Ver.2.20.9
  * Fixed an issue where attribute icons were not displayed correctly when attacking.
  * 12/29/2023 Ver.2.20.8
@@ -238,9 +240,9 @@
  * Fixed the behavior of some windows during battle.
  * Fixed an issue where the "ActualEnemyMask" setting was not being applied.
  * 12/10/2023 Ver.2.20.6
- * Fixed an issue where mask processing was not performed when attack persistence was not registered.
+ * Fixed an issue where mask processing was not performed when attack attributes were not registered.
  * 12/9/2023 Ver.2.20.5
- * Added attack persistence. (Self-configuration required)
+ * Added attack attributes. (Self-configuration required)
  * 11/4/2023 Ver.2.20.4
  * Minor corrections.
  * 7/22/2023 Ver.2.20.3
@@ -562,6 +564,14 @@
  * @default 0
  * @parent CommandSetting
  * 
+ * @param CondCommandEnemyBook
+ * @desc Conditions for selecting an enemy book. If it cannot be selected, it will be displayed semi-transparently.
+ * @text Menu command selection conditions
+ * @type combo
+ * @option '$gameSwitches.value(0);//スイッチ'
+ * @default 
+ * @parent CommandSetting
+ * 
  * @param ShowBattleCommand
  * @desc Adds an enemy book to party commands in battle.
  * @text Party command display
@@ -574,6 +584,14 @@
  * @text Party command display switch
  * @type switch
  * @default 0
+ * @parent CommandSetting
+ * 
+ * @param CondBattleCommandEnemyBook
+ * @desc Conditions for selecting enemy books with party commands. If it cannot be selected, it will be displayed semi-transparently.
+ * @text Party command selection conditions
+ * @type combo
+ * @option '$gameSwitches.value(0);//スイッチ'
+ * @default 
  * @parent CommandSetting
  * 
  * @param InfoCommandSetting
@@ -599,6 +617,14 @@
  * @text Enemy information party command display switch ID.
  * @type switch
  * @default 0
+ * @parent InfoCommandSetting
+ * 
+ * @param CondEnemyBookInfo
+ * @desc Conditions for selecting enemy information. If it cannot be selected, it will be displayed semi-transparently.
+ * @text Enemy information selection conditions
+ * @type combo
+ * @option '$gameSwitches.value(0);//スイッチ'
+ * @default 
  * @parent InfoCommandSetting
  * 
  * @param WindowSetting
@@ -2984,7 +3010,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.8
+ * @version 2.20.10
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3205,6 +3231,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/2/10 Ver.2.20.10
+ * コマンドの選択できる条件を設定できる機能を追加。
  * 2024/1/3 Ver.2.20.9
  * 攻撃時属性のアイコンが正常に表示されなかった問題を修正。
  * 2023/12/29 Ver.2.20.8
@@ -3214,9 +3242,9 @@
  * 戦闘中の一部のウィンドウの挙動を修正。
  * モンスター原寸大未登録シルエットの設定が適用されていなかった問題を修正。
  * 2023/12/10 Ver.2.20.6
- * 攻撃持続性の未登録時のマスク処理が行われていなかった問題を修正。
+ * 攻撃時属性の未登録時のマスク処理が行われていなかった問題を修正。
  * 2023/12/9 Ver.2.20.5
- * 攻撃持続性を追加。(要自己設定)
+ * 攻撃時属性を追加。(要自己設定)
  * 2023/11/4 Ver.2.20.4
  * 微修正。
  * 2023/7/22 Ver.2.20.3
@@ -3645,6 +3673,14 @@
  * @default 0
  * @parent CommandSetting
  * 
+ * @param CondCommandEnemyBook
+ * @desc モンスター図鑑を選択できる条件。選択できない場合は半透明で表示されます。
+ * @text メニューコマンド選択条件
+ * @type combo
+ * @option '$gameSwitches.value(0);//スイッチ'
+ * @default 
+ * @parent CommandSetting
+ * 
  * @param ShowBattleCommand
  * @desc 戦闘中のパーティコマンドにモンスター図鑑を追加します。
  * @text パーティコマンド表示
@@ -3657,6 +3693,14 @@
  * @text パーティコマンド表示スイッチ
  * @type switch
  * @default 0
+ * @parent CommandSetting
+ * 
+ * @param CondBattleCommandEnemyBook
+ * @desc パーティコマンドでモンスター図鑑を選択できる条件。選択できない場合は半透明で表示されます。
+ * @text パーティコマンド選択条件
+ * @type combo
+ * @option '$gameSwitches.value(0);//スイッチ'
+ * @default 
  * @parent CommandSetting
  * 
  * @param InfoCommandSetting
@@ -3682,6 +3726,14 @@
  * @text 敵の情報パーティコマンド表示スイッチ
  * @type switch
  * @default 0
+ * @parent InfoCommandSetting
+ * 
+ * @param CondEnemyBookInfo
+ * @desc 敵の情報を選択できる条件。選択できない場合は半透明で表示されます。
+ * @text 敵の情報選択条件
+ * @type combo
+ * @option '$gameSwitches.value(0);//スイッチ'
+ * @default 
  * @parent InfoCommandSetting
  * 
  * @param WindowSetting
@@ -6067,7 +6119,7 @@ var Imported = Imported || {};
 Imported.NUUN_EnemyBook = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_EnemyBook');console.log(PluginManager.parameters('NUUN_EnemyBook'))
+const parameters = PluginManager.parameters('NUUN_EnemyBook');
 
 const WindowMode = eval(parameters['WindowMode']) || 0;
 const DecimalMode = eval(parameters['DecimalMode'] || 'true');
@@ -6091,6 +6143,9 @@ const enemyBookSwitch = Number(parameters['enemyBookSwitch'] || 0);
 const ShowCommand = eval(parameters['ShowCommand'] || 'false');
 const ShowBattleCommand = eval(parameters['ShowBattleCommand'] || 'false');
 const enemyBookBattleSwitch = Number(parameters['enemyBookBattleSwitch'] || 0);
+const CondCommandEnemyBook = NuunManager.getEvalCode(parameters['CondCommandEnemyBook']) || true;
+const CondBattleCommandEnemyBook = NuunManager.getEvalCode(parameters['CondBattleCommandEnemyBook']) || true;
+const CondEnemyBookInfo = NuunManager.getEvalCode(parameters['CondEnemyBookInfo']) || true;
 
 const RegistrationEnemyInfo = eval(parameters['RegistrationEnemyInfo'] || 'false');
 const InfoMaskMode = eval(parameters['InfoMaskMode'] || 'false');
@@ -7306,7 +7361,7 @@ const _Window_MenuCommand_addOriginalCommands = Window_MenuCommand.prototype.add
 Window_MenuCommand.prototype.addOriginalCommands = function() {
     _Window_MenuCommand_addOriginalCommands.call(this);
     if(ShowCommand && ($gameSwitches.value(enemyBookSwitch) || enemyBookSwitch === 0)) {
-        this.addCommand(CommandName, "enemyBook");
+        this.addCommand(CommandName, "enemyBook",eval(CondCommandEnemyBook));
     }
 };
 
@@ -11254,10 +11309,10 @@ const _Window_PartyCommand_makeCommandList = Window_PartyCommand.prototype.makeC
 Window_PartyCommand.prototype.makeCommandList = function() {
   _Window_PartyCommand_makeCommandList.call(this);
   if (this.isEnemyBook()) {
-    this.addCommand(CommandName, "enemyBook");
+    this.addCommand(CommandName, "enemyBook", eval(CondBattleCommandEnemyBook));
   }
   if (this.isEnemyInfo()) {
-    this.addCommand(EnemyInfoCommandName, "enemyBookInfo");
+    this.addCommand(EnemyInfoCommandName, "enemyBookInfo", eval(CondEnemyBookInfo));
   }
 };
 

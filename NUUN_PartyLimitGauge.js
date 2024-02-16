@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.5.2
+ * @version 1.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -62,6 +62,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/17/2024 Ver.1.6.0
+ * Added turn time to limit gauge recovery.
  * 7/28/2023 Ver.1.5.2
  * Fixed the problem that display switch of display switch ID was not working.
  * Fixed an issue where enemy limit points were not displayed.
@@ -360,6 +362,13 @@
  * @default 
  * @parent ChargeSetting
  * 
+ * @param TurnAmount
+ * @desc Amount of recovery over the course of a turn.
+ * @text Recovery amount after turn
+ * @type string
+ * @default 
+ * @parent ChargeSetting
+ * 
  * @param CostSetting
  * @text Cost setting
  * @default ------------------------------
@@ -384,7 +393,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.5.2
+ * @version 1.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -442,6 +451,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/2/17 Ver.1.6.0
+ * リミットゲージの回復にターン時を追加。
  * 2023/7/28 Ver.1.5.2
  * 表示スイッチIDの表示切り替えが機能していなかった問題を修正。
  * 敵のリミットポイントの表示がされなかった問題を修正。
@@ -741,6 +752,13 @@
  * @default 
  * @parent ChargeSetting
  * 
+ * @param TurnAmount
+ * @desc ターン経過時の回復量。
+ * @text ターン経過時回復量
+ * @type string
+ * @default 
+ * @parent ChargeSetting
+ * 
  * @param CostSetting
  * @text コスト設定
  * @default ------------------------------
@@ -802,6 +820,7 @@ const LoseAmount = NuunManager.getEvalCode(parameters['LoseAmount']) || '';
 const EscapeAmount = NuunManager.getEvalCode(parameters['EscapeAmount']) || '';
 const DieAmount = NuunManager.getEvalCode(parameters['DieAmount']) || '';
 const AttackAmount = NuunManager.getEvalCode(parameters['AttackAmount']) || '';
+const TurnAmount = NuunManager.getEvalCode(parameters['TurnAmount']) || '';
 const CriticalAmount = NuunManager.getEvalCode(parameters['CriticalAmount']) || '';
 const LimitCostColor = Number(parameters['LimitCostColor'] || 0);
 const MultiCostWidth = String(parameters['CostWidth'] || '00000');
@@ -834,11 +853,25 @@ BattleManager.gainRewards = function() {
   setChargeLimit(VictoryAmount);
 };
 
-
 const _BattleManager_onEscapeSuccess = BattleManager.onEscapeSuccess;
 BattleManager.onEscapeSuccess = function() {
   setChargeLimit(EscapeAmount);
   _BattleManager_onEscapeSuccess.call(this);
+};
+
+const _BattleManager_startInput = BattleManager.startInput;
+BattleManager.startInput = function() {
+    _BattleManager_startInput.call(this);
+    this.chargeLimitByTurnInput();
+};
+
+BattleManager.chargeLimitByTurnInput = function() {
+    if (!this._surprise) {
+        $gameParty.chargeLimitByTurn(TurnAmount);
+    }
+    if (!this._preemptive) {
+        $gameTroop.chargeLimitByTurn(TurnAmount);
+    }
 };
 
 
@@ -992,6 +1025,21 @@ Game_Actor.prototype.chargeLimitByDie = function(evalStr) {
   }
 };
 
+const _Game_Battler_startTpbTurn = Game_Battler.prototype.startTpbTurn;
+Game_Battler.prototype.startTpbTurn = function() {
+    _Game_Battler_startTpbTurn.call(this);
+    this.chargeLimitByTpbTurn(TurnAmount);
+};
+
+Game_Battler.prototype.chargeLimitByTpbTurn = function(evalStr) {
+    if (evalStr) {
+      const a = this;
+      const da = this.isActor() ? this.actor() : this.enemy();
+      const val = Number(eval(evalStr));
+      this.chargeLimit(val);
+    }
+};
+
 
 const _Game_Unit_initialize = Game_Unit.prototype.initialize;
 Game_Unit.prototype.initialize = function() {
@@ -1016,6 +1064,12 @@ Game_Party.prototype.setPartyLimit = function(value) {
   }
 };
 
+Game_Party.prototype.chargeLimitByTurn = function(evalStr) {
+    const a = this;
+    const val = Number(eval(evalStr));
+    this._limitGauge = Math.min(this.isPartyLimitValue() + val, MaxLimitValue);
+};
+
 Game_Troop.prototype.initPartyLimit = function() {
   this._limitGauge = 0;
 };
@@ -1024,6 +1078,12 @@ Game_Troop.prototype.setPartyLimit = function(value) {
   if (onEnemyChargeLimitGauge()) {
     this._limitGauge = value;
   }
+};
+
+Game_Troop.prototype.chargeLimitByTurn = function(evalStr) {
+    const a = this;
+    const val = Number(eval(evalStr));
+    this._limitGauge = Math.min(this.isPartyLimitValue() + val, MaxLimitValue);
 };
 
 Game_Party.prototype.getPartyLimitSprite = function(width) {
@@ -1120,8 +1180,9 @@ function Sprite_PartyGauge() {
 Sprite_PartyGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_PartyGauge.prototype.constructor = Sprite_PartyGauge;
 
-Sprite_PartyGauge.prototype.initialize = function(width) {
+Sprite_PartyGauge.prototype.initialize = function(width, type) {
     this._gaugeWidth = width || 0;
+    this._statusType = type;
     Sprite_Gauge.prototype.initialize.call(this);
 };
 
@@ -1226,12 +1287,13 @@ function Sprite_TroopGauge() {
 Sprite_TroopGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_TroopGauge.prototype.constructor = Sprite_TroopGauge;
 
-Sprite_TroopGauge.prototype.initialize = function() {
-  Sprite_Gauge.prototype.initialize.call(this);
+Sprite_TroopGauge.prototype.initialize = function(type) {
+    this._statusType = type;
+    Sprite_Gauge.prototype.initialize.call(this);
 };
 
 Sprite_TroopGauge.prototype.initMembers = function() {
-  Sprite_Gauge.prototype.initMembers.call(this);
+    Sprite_Gauge.prototype.initMembers.call(this);
 };
 
 Sprite_TroopGauge.prototype.bitmapWidth = function() {

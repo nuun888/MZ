@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.1
+ * @version 1.6.0
  * 
  * @help
  * You can display icons in the command menu and change the text color of command names.
@@ -43,6 +43,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/17/2024 Ver.1.6.0
+ * Added the ability to change the display of command text using switches.
+ * Added a function that allows you to set conditions for command selection.
+ * Fixed an issue where the content background was not displayed correctly.
  * 4/29/2023 Ver.1.5.1
  * Fixed an issue where the font of other commands would change.
  * 4/29/2023 Ver.1.5.0
@@ -91,8 +95,8 @@
  * first edition.
  * 
  * @param CommadIcon
- * @text Command icon setting
- * @desc Set command colors and icons.
+ * @text Command setting
+ * @desc Configure command settings.
  * @default ["{\"CommadName\":\"Item\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Skill\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Equip\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Status\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Formation\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"Options\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"[\\\"'Window_MenuCommand'\\\"]\"}","{\"CommadName\":\"Save\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"End Game\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}"]
  * @type struct<CommadIconList>[]
  * 
@@ -173,6 +177,18 @@
  * @default 0
  * @min 0
  * 
+ * @param CommadSecretName
+ * @text Secret command name
+ * @desc A character string while the secret command switch is OFF.
+ * @type string
+ * @default ???
+ * 
+ * @param CommadSecretSwitch
+ * @text Secret command switch
+ * @desc While OFF, the command character display will be changed to the display set in the secret command name.
+ * @type switch
+ * @default 0
+ * 
  * @param ContentsBuckImg
  * @desc Specifies the content background image file name.
  * @text content background image
@@ -185,6 +201,18 @@
  * @text Command font
  * @type string
  * @default 
+ * 
+ * @param Enabled
+ * @text Command selection conditions
+ * @desc Enter the command selection conditions in JavaScript. (If not filled out, the original process will be used)
+ * @type combo
+ * @option 'this.areMainCommandsEnabled()'
+ * @option 'this.isFormationEnabled()'
+ * @option 'this.isSaveEnabled()'
+ * @option 'this.isOptionsEnabled()'
+ * @option 'this.isGameEndEnabled()'
+ * @option '$gameSwitches.value(0)'
+ * @default
  * 
  * @param CommandClassMode
  * @text Filtering class setting mode
@@ -260,7 +288,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.0
+ * @version 1.6.0
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -292,6 +320,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/2/17 Ver.1.6.0
+ * スイッチによってコマンドテキストの表示を変更する機能を追加。
+ * コマンド選択可能な条件を設定できる機能を追加。
+ * コンテンツ背景の表示が正常に行われていなかった問題を修正。
+ * 2023/4/29 Ver.1.5.2
+ * 処理の修正。
  * 2023/4/29 Ver.1.5.1
  * 他のコマンドのフォントが変更されてしまう問題を修正。
  * 2023/4/29 Ver.1.5.0
@@ -340,8 +374,8 @@
  * 初版
  * 
  * @param CommadIcon
- * @text コマンドアイコン設定
- * @desc コマンドの色、アイコンの設定をします。
+ * @text コマンド設定
+ * @desc コマンドの設定をします。
  * @default ["{\"CommadName\":\"アイテム\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"スキル\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"装備\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"ステータス\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"並び替え\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"オプション\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"CommandClassMode\":\"0\",\"CommandClass\":\"[\\\"'Window_MenuCommand'\\\"]\"}","{\"CommadName\":\"セーブ\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}","{\"CommadName\":\"ゲーム終了\",\"CommadNameColor\":\"0\",\"iconId\":\"0\",\"ContentsBuckImg\":\"\",\"CommandClassMode\":\"0\",\"CommandClass\":\"\"}"]
  * @type struct<CommadIconList>[]
  * 
@@ -422,6 +456,18 @@
  * @default 0
  * @min 0
  * 
+ * @param CommadSecretName
+ * @text シークレットコマンド名
+ * @desc シークレットコマンドスイッチがOFFの間の文字列。
+ * @type string
+ * @default ？？？
+ * 
+ * @param CommadSecretSwitch
+ * @text シークレットコマンドスイッチ
+ * @desc OFFの間、コマンドの文字表示をシークレットコマンド名で設定した表示に変更します。
+ * @type switch
+ * @default 0
+ * 
  * @param ContentsBuckImg
  * @desc コンテンツ背景画像ファイル名を指定します。
  * @text コンテンツ背景画像
@@ -434,6 +480,18 @@
  * @text コマンドフォント
  * @type string
  * @default 
+ * 
+ * @param Enabled
+ * @text コマンド選択条件
+ * @desc コマンド選択の条件をJavaScriptで記入します。(未記入の場合は元の処理)
+ * @type combo
+ * @option 'this.areMainCommandsEnabled()'
+ * @option 'this.isFormationEnabled()'
+ * @option 'this.isSaveEnabled()'
+ * @option 'this.isOptionsEnabled()'
+ * @option 'this.isGameEndEnabled()'
+ * @option '$gameSwitches.value(0)'
+ * @default
  * 
  * @param CommandClassMode
  * @text フィルタリングクラス設定モード
@@ -508,137 +566,183 @@ Imported.NUUN_CommandIcon = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_CommandIcon');
-const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
-  try {
-      return JSON.parse(value);
-  } catch (e) {
-      try {
-          return eval(value);
-      } catch (e) {
-          return value;
-      }
-  }
-}));
+const CommadData = DataManager.nuun_structureData(parameters['CommadIcon']);
+const CommandPosition = DataManager.nuun_structureData(parameters['CommandPosition']);
+const HorzCommandPosition = DataManager.nuun_structureData(parameters['HorzCommandPosition']);
+const ClassCommandPosition = DataManager.nuun_structureData(parameters['ClassCommandPosition']);
 
 const _Window_Command_initialize = Window_Command.prototype.initialize;
 Window_Command.prototype.initialize = function(rect) {
-  this._classAlign = this.itemTextAlignClass();
-  this._commadName = null;
-  this._commadSymbol = null;
-  _Window_Command_initialize.call(this, rect);
+    this.setItemTextAlign();
+    this._commadExData = null;
+    _Window_Command_initialize.call(this, rect);
 };
 
-const _Window_Command_itemTextAlign = Window_Command.prototype.itemTextAlign;
-Window_Command.prototype.itemTextAlign = function() {
-  if (this._classAlign) {
-    return this._classAlign;
-  } else {
-    return param.CommandPosition;
-  }
+const _Window_Command_addCommand = Window_Command.prototype.addCommand;
+Window_Command.prototype.addCommand = function(name, symbol, enabled = true, ext = null) {
+    _Window_Command_addCommand.call(this, name, symbol, enabled, ext);
+    this.setCommandData();
 };
 
-const _Window_HorzCommand_itemTextAlign = Window_HorzCommand.prototype.itemTextAlign;
-Window_HorzCommand.prototype.itemTextAlign = function() {
-  if (this._classAlign) {
-    return this._classAlign;
-  } else {
-    return param.HorzCommandPosition;
-  }
-};
-
-Window_Command.prototype.itemTextAlignClass = function() {
-  param.ClassCommandPosition = param.ClassCommandPosition || [];
-  const className = getClass(this);
-  const result = param.ClassCommandPosition.find(_Class => _Class.CommandClass === className);
-  return result ? result.CommandPosition : null;
-};
-
-Window_Command.prototype.getFindCommand = function(commad, commadName) {
-  if (!!commad.CommadSymbol) {
-    return commad.CommadSymbol === this._commadSymbol;
-  } else {
-    return commad.CommadName === commadName;
-  }
+Window_Command.prototype.setCommandData = function() {
+    const list = this._list[this._list.length - 1];
+    const data = CommadData ? CommadData.find(Commad => this.getFindCommand(Commad, list) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
+    if (data) {
+        const color = data.CommadNameColor ? data.CommadNameColor : 0;
+        list.commandExData = {
+            color:NuunManager.getColorCode(color),
+            name: data.CommadName,
+            iconId: data.iconId,
+            secretName: data.CommadSecretName,
+            commadSecretSwitch: data.CommadSecretSwitch,
+            contentsBuckImg: data.ContentsBuckImg,
+            font: data.FontFace
+        }
+        list.enabled = data.Enabled ? eval(data.Enabled) : list.enabled;
+    }
 };
 
 const _Window_Command_drawText = Window_Command.prototype.drawText;
 Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
     this.resetFontSettings();
-    const foundIndex = param.CommadIcon ? param.CommadIcon.findIndex(Commad => this.getFindCommand(Commad, text) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
-    if (foundIndex >= 0) {
-        const commadData = param.CommadIcon[foundIndex];
-        this.nuun_setContentsFontFace(commadData);
+    if (!!this._commadExData) {
+        const commandData = this._commadExData;
+        text = this.isCommadSecretName(commandData, text);
+        this.nuun_setContentsFontFace(commandData);
         const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
-        const textMargin = commadData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
+        const textMargin = commandData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
         const textWidth = this.textWidth(text);
         const itemWidth = Math.max(0, maxWidth - textMargin);
         width = Math.min(itemWidth, textWidth);
-        const color = commadData.CommadNameColor ? commadData.CommadNameColor : 0;
-        this.changeTextColor(NuunManager.getColorCode(color));
-        if(commadData.iconId > 0) {
-        if(align === 'center') {
-            this.drawIcon(commadData.iconId, x + (maxWidth / 2 - width / 2) - textMargin / 2, iconY);
-        } else if (align === 'left') {
-            this.drawIcon(commadData.iconId, x, iconY);
-        } else {
-            this.drawIcon(commadData.iconId, x + itemWidth - width, iconY);
-        }
+        if(commandData.iconId > 0) {
+            if(align === 'center') {
+                this.drawIcon(commandData.iconId, x + (maxWidth / 2 - width / 2) - textMargin / 2, iconY);
+            } else if (align === 'left') {
+                this.drawIcon(commandData.iconId, x, iconY);
+            } else {
+                this.drawIcon(commandData.iconId, x + itemWidth - width, iconY);
+            }
         }
         x += textMargin;
         maxWidth = itemWidth;
+        this.commandChangeTextColor(commandData);
     }
     _Window_Command_drawText.call(this, text, x, y, maxWidth, align);
 };
 
+const _Window_Command_drawItemBackground = Window_Command.prototype.drawItemBackground;
+Window_Command.prototype.drawItemBackground = function(index) {
+    this._commadExData = this.getCommandExData(index);
+    if (!!this._commadExData && !!this._commadExData.contentsBuckImg) {
+        const bitmap = ImageManager.nuun_LoadPictures(this._commadExData.contentsBuckImg);
+        bitmap.addLoadListener(function() {
+        this.drawContentsBack(bitmap, index);
+        }.bind(this));
+    } else {
+        _Window_Command_drawItemBackground.call(this, index);
+    }   
+};
+
+Window_Command.prototype.drawContentsBack = function(bitmap, index) {
+    const rect = this.itemRect(index);
+    const width = Math.min(bitmap.width, rect.width);
+    const height = Math.min(bitmap.height, rect.height);
+    this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x + 1, rect.y + 1, width, height);
+};
+
+Window_Command.prototype.setItemTextAlign = function() {
+    const align = this.itemTextAlignClass();
+    this._classAlign = !!align ? align : this.commandExItemTextAlign();
+};
+
+Window_Command.prototype.itemTextAlignClass = function() {
+    const commandPosition = ClassCommandPosition || [];
+    const className = getClass(this);
+    const result = commandPosition.find(_Class => _Class.CommandClass === className);
+    return result ? result.CommandPosition : null;
+};
+
+const _Window_Command_itemTextAlign = Window_Command.prototype.itemTextAlign;
+Window_Command.prototype.itemTextAlign = function() {
+    return this._classAlign ? this._classAlign : _Window_Command_itemTextAlign.call(this);
+};
+
+const _Window_HorzCommand_itemTextAlign = Window_HorzCommand.prototype.itemTextAlign;
+Window_HorzCommand.prototype.itemTextAlign = function() {
+    return this._classAlign ? this._classAlign : _Window_HorzCommand_itemTextAlign.call(this);
+};
+
+Window_Command.prototype.commandExItemTextAlign = function() {
+    if (CommandPosition !== 'None') {
+        return CommandPosition;
+    } else {
+        return _Window_Command_itemTextAlign.call(this);
+    }
+};
+
+Window_HorzCommand.prototype.commandExItemTextAlign = function() {
+    if (HorzCommandPosition !== 'None') {
+        return HorzCommandPosition;
+    } else {
+        return _Window_HorzCommand_itemTextAlign.call(this);
+    }
+};
+
+Window_Command.prototype.commandChangeTextColor = function(commandData) {
+    this.changeTextColor(commandData.color);
+};
+
+Window_Command.prototype.nuun_setContentsFontFace = function(data) {
+    this.contents.fontFace = data.font ? data.font : $gameSystem.mainFontFace();
+};
+
+Window_Command.prototype.getFindCommand = function(data, list) {
+    if (!!data.CommadSymbol) {
+      return data.CommadSymbol === list.symbol;
+    } else {
+      return data.CommadName === list.name;
+    }
+};
+
+Window_Command.prototype.isClass = function(Command, mode) {
+    if (Command && Command.length > 0) {
+        const className = getClass(this);
+        const result = Command.some(_Class => _Class === className);
+        if (mode === 0 || mode === undefined) {
+            return result;
+        } else {
+            return result ? false : true;
+        }
+    }
+    return true;
+};
+
+Window_Command.prototype.isCommadSecretName = function(data, text) {
+    if (!!data.secretName) {
+        if (!isCommadSecret(data)) {
+            text = unknownDataLength(data.secretName , text);
+        }
+    }
+    return text;
+};
+
+Window_Command.prototype.getCommandExData = function(index) {
+    return this._list[index].commandExData;
+};
+
+
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
-  this._commadName = this.commandName(index);
-  this._commadSymbol = this.commandSymbol(index);
-  _Window_Command_drawItem.call(this, index);
+    this._commadExData = this.getCommandExData(index);
+    _Window_Command_drawItem.call(this, index);
 };
 
 const _Window_Options_drawItem = Window_Options.prototype.drawItem;
 Window_Options.prototype.drawItem = function(index) {
-    this._commadName = this.commandName(index);
+    this._commadExData = this.getCommandExData(index);
     _Window_Options_drawItem.call(this, index);
 };
 
-Window_Command.prototype.isClass = function(Command, mode) {
-  if (Command && Command.length > 0) {
-    const className = getClass(this);
-    const result = Command.some(_Class => _Class === className);
-    if (mode === 0 || mode === undefined) {
-      return result;
-    } else {
-      return result ? false : true;
-    }
-  }
-  return true;
-};
-
-const _Window_Command_drawItemBackground = Window_Command.prototype.drawItemBackground;
-Window_Command.prototype.drawItemBackground = function(index) {
-  const find = param.CommadIcon ? param.CommadIcon.find(Commad => this.getFindCommand(Commad, this._commadName) && this.isClass(Commad.CommandClass, Commad.CommandClassMode) && !!Commad.ContentsBuckImg) : null;
-  if (find) {
-    const bitmap = ImageManager.nuun_LoadPictures(find.ContentsBuckImg);
-    bitmap.addLoadListener(function() {
-      this.drawContentsBack(bitmap, index);
-    }.bind(this));
-  } else {
-    _Window_Command_drawItemBackground.call(this, index);
-  }
-};
-
-Window_Command.prototype.drawContentsBack = function(bitmap, index) {
-  const rect = this.itemRect(index);
-  const width = Math.min(bitmap.width, rect.width);
-  const height = Math.min(bitmap.height, rect.height);
-  this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x + 1, rect.y + 1, width, height);
-};
-
-Window_Command.prototype.nuun_setContentsFontFace = function(data) {
-    this.contents.fontFace = data.FontFace ? data.FontFace : $gameSystem.mainFontFace();
-};
 
 function getClass(_class) {
     try {
@@ -648,5 +752,24 @@ function getClass(_class) {
     }
 };
 
+function unknownDataLength(secretName, name) {
+    if(secretName === '？' || secretName === '?') {
+        const name_length = commandNameLength(name);
+        return secretName.repeat(name_length);
+    } else {
+        return secretName;
+    }
+};
+
+function commandNameLength(name) {
+    return name.length;
+};
+
+function isCommadSecret(data) {
+    if (data.commadSecretSwitch > 0) {
+        return $gameSwitches.value(data.commadSecretSwitch)
+    }
+    return true;
+};
 
 })();

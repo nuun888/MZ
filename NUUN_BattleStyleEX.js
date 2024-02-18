@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.13
+ * @version 3.12.14
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2024/2/18 Ver.3.12.14
+ * 表示させるステートアイコン指定時に戦闘開始するとエラーが出る問題を修正。
  * 2024/2/5 Ver.3.12.13
  * 対象選択時のアイテム、スキルヘルプを非表示にする機能を復活。
  * 2024/1/7 Ver.3.12.12
@@ -414,22 +416,25 @@ BattleManager.isOnActorPictureEX = function() {
 }
 
 BattleManager.getVisibleBuffIcons = function(list) {
-  const icons = [];
-  for (const buff of list) {
-    if (buff >= 0 && buff < 8) {
-      for (const i = 0; i < 2; i++) {
-        icons.push(Game_BattlerBase.ICON_BUFF_START + i * 8 + buff);
-      }
-    } else if (buff >= 10 && buff < 18) {
-      icons.push(Game_BattlerBase.ICON_DEBUFF_START + -i * 8 + buff - 10);
+    const icons = [];
+    for (const buff of list) {
+        if (buff >= 0 && buff < 8) {
+            for (let i = 0; i < 2; i++) {
+                icons.push(Game_BattlerBase.ICON_BUFF_START + (i * 8) + buff);
+            }
+        } else if (buff >= 10 && buff < 18) {
+            for (let i = 0; i < 2; i++) {
+                //icons.push(Game_BattlerBase.ICON_DEBUFF_START + (-i * 8) + buff - 10);
+                icons.push(Game_BattlerBase.ICON_DEBUFF_START + (i * 8) + buff - 10);
+            }
+        }
     }
-  }
-  return icons;
+    return icons;
 };
 
 BattleManager.statusWindowOpacity = function(flag, opacity) {
-  this.actorStatusWindowOpacity = flag;
-  this.actorStatusWindowOpacityValue = flag ? opacity : 255;
+    this.actorStatusWindowOpacity = flag;
+    this.actorStatusWindowOpacityValue = flag ? opacity : 255;
 };
 
 const _BattleManager_displayStartMessages = BattleManager.displayStartMessages;

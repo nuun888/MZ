@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.2.2
+ * @version 2.2.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/2/23 Ver.2.2.3
+ * Fixed an issue where saving could not be executed during event testing.
  * 2023/8/21 Ver.2.2.2
  * Fixed the problem that 0 is not displayed in the original parameter.
  * 2023/7/15 Ver.2.2.1
@@ -661,7 +663,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.2.2
+ * @version 2.2.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -712,6 +714,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/2/23 Ver.2.2.3
+ * イベントテストでセーブが実行できない問題を修正。
  * 2023/8/21 Ver.2.2.2
  * オリジナルパラメータで0が表示されない問題を修正。
  * 2023/7/15 Ver.2.2.1
@@ -1383,8 +1387,8 @@ Imported.NUUN_SaveScreen = true;
   });
 
   function getSaveContentsBuckgroundImg() {
-    return !!$dataMap && $dataMap.meta.SaveContentsBackImg ?  ContentsBackGroundImg[Number($dataMap.meta.SaveContentsBackImg) - 1] : $gameSystem.saveContentsBuckgroundImg;
-  }
+    return !!$dataMap && $dataMap.meta && $dataMap.meta.SaveContentsBackImg ?  ContentsBackGroundImg[Number($dataMap.meta.SaveContentsBackImg) - 1] : $gameSystem.saveContentsBuckgroundImg;
+  };
 
 
   const _DataManager_loadSavefileImages = DataManager.loadSavefileImages;

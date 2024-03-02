@@ -1,4 +1,4 @@
-# [耐性表示マス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js)
+# [耐性表示マスク](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js)
 # Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_1.js)  
 #### 前提プラグイン  

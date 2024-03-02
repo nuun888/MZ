@@ -1,7 +1,7 @@
 # バトルスタイル拡張
 
 ## バトルスタイル拡張ベース
-### Ver.3.12.14
+### Ver.3.12.15
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
 ## 設定用プラグイン
 [バトルスタイル拡張デフォルト設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX_Default.js)Ver.1.11.2  
@@ -209,6 +209,8 @@ LL_StandingPictureBattle等と併用する場合は、'Scene_Battle'に設定す
 表示するステート、バフのアイコンを指定する場合、複数のステートに同じIDのアイコンを設定している場合、表示されなくなります。  
 
 ## 更新履歴
+2024/3/2 Ver.3.12.15  
+ステート表示の処理を修正。  
 2024/2/18 Ver.3.12.14  
 表示させるステートアイコン指定時に戦闘開始するとエラーが出る問題を修正。  
 2024/2/5 Ver.3.12.13  

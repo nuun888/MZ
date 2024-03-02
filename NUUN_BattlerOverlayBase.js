@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトラーオーバーレイベース
  * @author NUUN
- * @version 1.0.5
+ * @version 1.0.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/2 Ver.1.0.6
+ * 出現前のモンスターにゲージ等が表示されてしまう問題を修正。
  * 2023/8/24 Ver.1.0.5
  * 一部のプラグインと併用するとエラーが出る問題を修正。
  * 2023/7/15 Ver.1.0.4
@@ -157,7 +159,7 @@ Sprite_BattlerOverlay.prototype.setOpacity = function(opacity) {
 };
 
 Sprite_BattlerOverlay.prototype.update = function() {
-    Sprite.prototype.update.call(this); 
+    Sprite.prototype.update.call(this);
     //this.updatePosition();
 };
 
@@ -191,9 +193,14 @@ Sprite_Enemy.prototype.update = function() {
     _Sprite_Enemy_update.call(this);
     if (this.battlerOverlay) {
         this.battlerOverlayOpacity();
+        this.battlerOverlayVisible();
     } else {
         $gameTemp.refreshOverlay = true;
     }
+};
+
+Sprite_Enemy.prototype.battlerOverlayVisible = function() {//暫定処置
+    this.battlerOverlay.visible = this._appeared || this._battler.isDead();
 };
 
 Sprite_Battler.prototype.getBattlerOverlayHeight = function() {

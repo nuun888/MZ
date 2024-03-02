@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きドロップ
  * @author NUUN
- * @version 1.0.8
+ * @version 1.0.9
  * @base NUUN_ConditionsBase
  * 
  * @help
@@ -40,6 +40,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2022/6/19 Ver.1.0.9
+ * 微修正。
  * 2022/6/14 Ver.1.0.8
  * 競合対策。
  * 2021/12/25 Ver.1.0.7
@@ -92,16 +94,16 @@ Imported.NUUN_ConditionalDrops = true;
 
   Game_Enemy.prototype.getConditionalDrops = function() {
     const enemy = this.enemy();
+    const action = $gameTemp.getActionData();
     this._conditionalDropItems.forEach((condDrop, r) => {
-      const condTag = "Drop" + (String(condDrop[3]).trim() || 'Cond');
-      const action = $gameTemp.getActionData();
-      const mode = Number(condDrop[4]) || 0;
-      if (action.subject.getTriggerConditions(enemy, this, condTag, 'Target' + condTag, 'Party' + condTag, 'Troop' + condTag, action.action, action.damage, mode) && this.condDropRate(condDrop)) {
-        const drop = this.getCondDropItem(condDrop, r);
-        if (drop) {
-          this._getCondDropList.push(drop);
+        const condTag = "Drop" + (String(condDrop[3]).trim() || 'Cond');
+        const mode = Number(condDrop[4]) || 0;
+        if (action.subject.getTriggerConditions(enemy, this, condTag, 'Target' + condTag, 'Party' + condTag, 'Troop' + condTag, action.action, action.damage, mode) && this.condDropRate(condDrop)) {
+          const drop = this.getCondDropItem(condDrop, r);
+          if (drop) {
+            this._getCondDropList.push(drop);
+          }
         }
-      }
     });
   };
 

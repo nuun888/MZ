@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きドロップアイテム図鑑適用（モンスター図鑑拡張）
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * @base NUUN_EnemyBook
  * @base NUUN_ConditionalDrops
  * @orderAfter NUUN_EnemyBook
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/2 Ver.1.1.0
+ * 条件付きドロップアイテムを入手済みまたは、未入手済みにするプラグインコマンドを追加。
  * 2021/12/25 Ver.1.0.1
  * 敵の情報を登録済みにするプラグインコマンドを使用したときにエラーが出る問題を修正。
  * 2021/12/22 Ver.1.0.0
@@ -51,6 +53,38 @@
  * @default false
  * @parent CondDropItemData
  * 
+ * 
+ * @command EnemyBookGetCondDropItem
+ * @desc モンスターの条件付きドロップアイテムを取得済みにします。
+ * @text 条件付きドロップアイテム取得済み
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg dropListId
+ * @type number
+ * @default 0
+ * @text ドロップアイテムリストID
+ * @desc ドロップアイテムリストIDを指定します。（0ですべて取得済みにします）
+ * 
+ * 
+ * @command EnemyBookRemoveCondDropItem
+ * @desc モンスターの条件付きドロップアイテムを未収得にします。
+ * @text 条件付きドロップアイテム未収得
+ * 
+ * @arg enemyId
+ * @type enemy
+ * @default 0
+ * @desc モンスターIDを指定します。
+ * 
+ * @arg dropListId
+ * @type number
+ * @default 0
+ * @text ドロップアイテムリストID
+ * @desc ドロップアイテムリストIDを指定します。（0ですべて未取得済みにします）
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_EnemyBookEX_2 = true;
@@ -59,6 +93,15 @@ Imported.NUUN_EnemyBookEX_2 = true;
 const parameters = PluginManager.parameters('NUUN_EnemyBookEX_2');
 const ShowCondDropItemName = eval(parameters['ShowCondDropItemName'] || 'false');
 const CondDropItemMultiCol = eval(parameters['CondDropItemMultiCol'] || 'false');
+const pluginName = "NUUN_EnemyBookEX_2";
+
+PluginManager.registerCommand(pluginName, 'EnemyBookGetCondDropItem', args => {
+    $gameSystem.condDropItemListFlag(Number(args.enemyId), Number(args.dropListId) - 1, true, Number(args.dropListId) > 0);
+});
+      
+PluginManager.registerCommand(pluginName, 'EnemyBookRemoveCondDropItem', args => {
+    $gameSystem.dropItemListFlag(Number(args.enemyId), Number(args.dropListId) - 1, false, Number(args.dropListId) > 0);
+});
 
 Window_Selectable.prototype.getShowCondDropItemName = function() {
   return ShowCondDropItemName;

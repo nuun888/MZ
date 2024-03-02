@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * Show remaining turns on the state icon.
@@ -31,6 +31,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/2/2024 Ver.1.1.5
+ * Fixed an issue where the turn display would be misaligned when the state display was specified with "NUUN_BattleStyleEX".
  * 8/23/2023 Ver.1.1.4
  * Fixed an issue where an error would occur when fighting an enemy group with monsters appearing in the middle.
  * 3/30/2022 Ver.1.1.3
@@ -121,7 +123,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * ステートアイコンに残りターンを表示します。
@@ -140,6 +142,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/2 Ver.1.1.5
+ * バトルスタイル拡張プラグインでステートの表示を指定している場合に、ターンの表示がずれて表示されてしまう問題を修正。
  * 2023/8/23 Ver.1.1.4
  * 途中から出現するモンスターがいる敵グループと戦闘を行うとエラーが出る問題を修正。
  * 2022/3/30 Ver.1.1.3
@@ -298,23 +302,31 @@ Imported.NUUN_StateTurn = true;
   };
 
   Game_BattlerBase.prototype.nuun_stateTurns = function() {
-    return this.states().reduce((r, state) => {
-      if (state.iconIndex > 0) {
-        const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id) + (state.autoRemovalTiming === 2 ? -1 : 0)), bad: !!state.meta.BatState}];
-        Array.prototype.push.apply(r, turn);
-      }
-      return r;
+    return this.nuun_stateTurnFilter().reduce((r, state) => {
+        if (state.iconIndex > 0) {
+            const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id) + (state.autoRemovalTiming === 2 ? -1 : 0)), bad: !!state.meta.BatState}];
+            Array.prototype.push.apply(r, turn);
+        }
+        return r;
     }, []);
+  };
+
+  Game_BattlerBase.prototype.nuun_stateTurnFilter = function() {
+    return this.statesFilter ? this.statesFilter() : this.states();
   };
   
   Game_BattlerBase.prototype.nuun_buffTurns = function() {
     return this._buffs.reduce((r, buff, i) => {
-      if (buff !== 0) {
-        const turn = [{turn: this.nuun_getBuffTurn(i), bad: buff < 0}];
-        Array.prototype.push.apply(r, turn);
-      }
+        if (buff !== 0 && this.nuun_buffTurnsFilter(i)) {
+            const turn = [{turn: this.nuun_getBuffTurn(i), bad: buff < 0}];
+            Array.prototype.push.apply(r, turn);
+        }
         return r;
     }, []);
+  };
+
+  Game_BattlerBase.prototype.nuun_buffTurnsFilter = function(id) {
+    return this.buffsFilter ? this.buffsFilter(id) : true;
   };
 
   Game_BattlerBase.prototype.nuun_isNonRemoval = function(state) {

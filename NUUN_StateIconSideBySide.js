@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  State side-by-side display
  * @author NUUN
- * @version 1.5.5
+ * @version 1.5.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/2/2024 Ver.1.5.6
+ * Fixed an issue where the turn display would be misaligned when the state display was specified with "NUUN_BattleStyleEX".
  * 1/3/2024 Ver.1.5.5
  * Addressing conflicts with some plugins.
  * 7/15/2023 Ver.1.5.4
@@ -279,7 +281,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.5.5
+ * @version 1.5.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -308,6 +310,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/2 Ver.1.5.6
+ * バトルスタイル拡張プラグインでステートの表示を指定している場合に、ターンの表示がずれて表示されてしまう問題を修正。
  * 2024/1/3 Ver.1.5.5
  * 一部プラグインでの競合対応。
  * 2023/7/15 Ver.1.5.4
@@ -831,7 +835,7 @@ Game_BattlerBase.prototype.allBuffTurns = function() {
 };
 
 Game_BattlerBase.prototype.nuun_stateTurns = function() {
-  return this.states().reduce((r, state) => {
+  return this.nuun_stateTurnFilter().reduce((r, state) => {
     if (state.iconIndex > 0) {
       const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id) + (state.autoRemovalTiming === 2 ? -1 : 0)), bad: !!state.meta.BatState}];
       Array.prototype.push.apply(r, turn);
@@ -842,12 +846,20 @@ Game_BattlerBase.prototype.nuun_stateTurns = function() {
 
 Game_BattlerBase.prototype.nuun_buffTurns = function() {
   return this._buffs.reduce((r, buff, i) => {
-    if (buff !== 0) {
+    if (buff !== 0 && this.nuun_buffTurnsFilter(i)) {
       const turn = [{turn: this.nuun_getBuffTurn(i), bad: buff < 0}];
       Array.prototype.push.apply(r, turn);
     }
       return r;
   }, []);
+};
+
+Game_BattlerBase.prototype.nuun_stateTurnFilter = function() {
+    return this.statesFilter ? this.statesFilter() : this.states();
+};
+
+Game_BattlerBase.prototype.nuun_buffTurnsFilter = function(id) {
+    return this.buffsFilter ? this.buffsFilter(id) : true;
 };
 
 Game_BattlerBase.prototype.nuun_isNonRemoval = function(state) {

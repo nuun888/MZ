@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.14
+ * @version 3.12.15
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2024/3/2 Ver.3.12.15
+ * ステート表示の処理を修正。
  * 2024/2/18 Ver.3.12.14
  * 表示させるステートアイコン指定時に戦闘開始するとエラーが出る問題を修正。
  * 2024/2/5 Ver.3.12.13
@@ -389,12 +391,12 @@ BattleManager.initMembers = function() {
     this.actorStatusWindowOpacity = false;
     this.actorStatusWindowOpacityValue = false;
     this.battlerSprite = [];
-    this.visibleStateIcons = [];
-    this.notIconList = this.getNotVisibleIcons();
+    this.bsVisibleStates = [];
+    this.bsVisibleBuffs = [];
+    this.notIconList = this.getNotVisibleIcons().concat(this.getNotVisibleBuffIcons());
     this.onBSStartBattle = !params.ActorStatusWindowLock;
     this._bsInterpreter = null;
     this.bsInBattle = true;
-    Array.prototype.push.apply(this.notIconList , this.getNotVisibleBuffIcons());
 };
 
 const _BattleManager_update = BattleManager.update;
@@ -604,20 +606,6 @@ Game_Temp.prototype.isBattleStyleRequested = function() {
     return this._battleStyleRefresh || false;
 };
 
-
-const _Game_BattlerBase_allIcons = Game_BattlerBase.prototype.allIcons;
-Game_BattlerBase.prototype.allIcons = function() {
-  let icons = _Game_BattlerBase_allIcons.call(this);
-  if (BattleManager.visibleStateIcons && BattleManager.visibleStateIcons.length > 0) {
-    icons = icons.filter(icon => BattleManager.visibleStateIcons.indexOf(icon) >= 0);
-    BattleManager.visibleStateIcons = [];
-  }
-  if (BattleManager.notIconList && BattleManager.notIconList.length > 0) {
-    icons = icons.filter(id => BattleManager.notIconList.indexOf(id) < 0);
-  }
-  return icons;
-};
-
 //test
 const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
 Game_Action.prototype.applyItemUserEffect = function(target) {
@@ -645,6 +633,63 @@ Game_ActionResult.prototype.clear = function() {
     this.counterExtend = false;
 };
 
+
+const _Game_BattlerBase_allIcons = Game_BattlerBase.prototype.allIcons;
+Game_BattlerBase.prototype.allIcons = function() {
+    let icons = _Game_BattlerBase_allIcons.call(this);
+    if (BattleManager.notIconList && BattleManager.notIconList.length > 0) {
+        icons = icons.filter(id => !BattleManager.notIconList.indexOf(id) >= 0);
+    }
+    return icons;
+};
+
+const _Game_BattlerBase_stateIcons = Game_BattlerBase.prototype.stateIcons;
+Game_BattlerBase.prototype.stateIcons = function() {
+    if (this.isActor() && BattleManager.bsVisibleStates && BattleManager.bsVisibleStates.length > 0) {
+        return this.statesFilter().map(state => state.iconIndex)
+        .filter(iconIndex => iconIndex > 0);
+    } else {
+        return _Game_BattlerBase_stateIcons.call(this);
+    }
+};
+
+Game_BattlerBase.prototype.statesFilter = function() {
+    return this.states().filter(state => BattleManager.bsVisibleStates.indexOf(state.id) >= 0 && this.notBsIconFilter(state.iconIndex));
+};
+
+const _Game_BattlerBase_buffIcons = Game_BattlerBase.prototype.buffIcons;
+Game_BattlerBase.prototype.buffIcons = function() {
+    if (this.isActor() && BattleManager.bsVisibleBuffs && BattleManager.bsVisibleBuffs.length > 0) {
+        const list = BattleManager.bsVisibleBuffs;
+        const icons = [];
+        let iconIndex = 0;
+        for (let i = 0; i < this._buffs.length; i++) {
+            const buffLevel = this._buffs[i];
+            if (buffLevel > 0) {
+                iconIndex = this.buffIconIndex(this._buffs[i], i);
+                if (list.indexOf(i) >= 0 && this.notBsIconFilter(iconIndex)) {
+                    icons.push(iconIndex);
+                }
+            } else if (buffLevel < 0) {
+                iconIndex = this.buffIconIndex(this._buffs[i], i);
+                if (list.indexOf(i + 10) >= 0 && this.notBsIconFilter(iconIndex)) {
+                    icons.push(iconIndex);
+                }
+            }
+        }
+        return icons;
+    } else {
+        return _Game_BattlerBase_buffIcons.call(this);
+    }
+};
+
+Game_BattlerBase.prototype.buffsFilter = function(id) {
+    return BattleManager.bsVisibleBuffs.indexOf(id) >= 0 && this.notBsIconFilter(this.buffIconIndex(this._buffs[id], id));
+};
+
+Game_BattlerBase.prototype.notBsIconFilter = function(id) {
+    return BattleManager.notIconList && BattleManager.notIconList.length > 0 ? !BattleManager.notIconList.indexOf(id) >= 0 : true;
+};
 
 const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
 Game_Battler.prototype.initMembers = function() {
@@ -4048,23 +4093,26 @@ Sprite_BSName.prototype.redraw = function() {
 
 const _Sprite_StateIcon_initMembers = Sprite_StateIcon.prototype.initMembers;
 Sprite_StateIcon.prototype.initMembers = function() {
-  _Sprite_StateIcon_initMembers.call(this);
-  this._visibleStateIcons = [];
+    _Sprite_StateIcon_initMembers.call(this);
+    this._bsVisibleStates = [];
+    this._bsVisibleBuffs = [];
 };
 
 Sprite_StateIcon.prototype.setupVisibleIcons = function(list1, list2) {
-  this._visibleStateIcons = [];
-  this._visibleStateIcons = list1.filter(stateId => stateId > 0 && $dataStates[stateId].iconIndex > 0).map(stateId => $dataStates[stateId].iconIndex);
-  Array.prototype.push.apply(this._visibleStateIcons , BattleManager.getVisibleBuffIcons(list2));
+    this._bsVisibleStates = list1;
+    this._bsVisibleBuffs = list2;
 };
 
 const _Sprite_StateIcon_shouldDisplay = Sprite_StateIcon.prototype.shouldDisplay;
 Sprite_StateIcon.prototype.shouldDisplay = function() {
-  const result = _Sprite_StateIcon_shouldDisplay.call(this);
-  if (result && this._battler && this._battler.isActor()) {
-    BattleManager.visibleStateIcons = this._visibleStateIcons;
-  }
-  return result
+    const result = _Sprite_StateIcon_shouldDisplay.call(this);
+    BattleManager.bsVisibleStates = [];
+    BattleManager.bsVisibleBuffs = [];
+    if (result && this._battler && this._battler.isActor()) {
+        BattleManager.bsVisibleStates = this._bsVisibleStates;
+        BattleManager.bsVisibleBuffs = this._bsVisibleBuffs;
+    }
+    return result
 };
 
 
@@ -4112,12 +4160,13 @@ Sprite_BSActorStateIcon.prototype.initialize = function() {
 };
 
 Sprite_BSActorStateIcon.prototype.initMembers = function() {
-  //this.userStatusParam = $gameTemp.userStatusParam;
-  this._battler = null;
-  this._animationCount = 0;
-  this.anchor.x = 0;
-  this.anchor.y = 0;
-  this._visibleIcons = [];
+    //this.userStatusParam = $gameTemp.userStatusParam;
+    this._battler = null;
+    this._animationCount = 0;
+    this.anchor.x = 0;
+    this.anchor.y = 0;
+    this._bsVisibleStates = [];
+    this._bsVisibleBuffs = [];
 };
 
 Sprite_BSActorStateIcon.prototype.bitmapWidth = function() {
@@ -4139,9 +4188,8 @@ Sprite_BSActorStateIcon.prototype.loadBitmap = function() {
 };
 
 Sprite_BSActorStateIcon.prototype.setupVisibleIcons = function(list1, list2) {
-  this._visibleIcons = [];
-  this._visibleIcons = list1.filter(stateId => stateId > 0 && $dataStates[stateId].iconIndex > 0).map(stateId => $dataStates[stateId].iconIndex);
-  Array.prototype.push.apply(this._visibleIcons , BattleManager.getVisibleBuffIcons(list2));
+    this._bsVisibleStates = list1;
+    this._bsVisibleBuffs = list2;
 };
 
 Sprite_BSActorStateIcon.prototype.setup = function(battler, data) {
@@ -4170,25 +4218,21 @@ Sprite_BSActorStateIcon.prototype.updateWait = function() {
 };
 
 Sprite_BSActorStateIcon.prototype.updateIcon = function() {
-  this.bitmap.clear();
-  let icons = [];
-  const iconWidth = ImageManager.iconWidth;
-  const actor = this._battler;
-  if (this.shouldDisplay()) {
-      if (this._visibleIcons.length > 0) {
-        icons = actor.stateIcons().filter(icon => this._visibleIcons.some(i => i === icon)).slice(0, Math.floor(this.bitmapWidth() / iconWidth));
-      } else {
-        icons = actor.stateIcons().slice(0, Math.floor(this.bitmapWidth() / iconWidth));
-      }
-  }
-  if (icons.length > 0) {
-    let iconX = 0;
-    const y = 0;
-    for (const icon of icons) {
-        this.drawIcon(icon, iconX, y);
-        iconX += iconWidth;
+    this.bitmap.clear();
+    let icons = [];
+    const iconWidth = ImageManager.iconWidth;
+    const actor = this._battler;
+    if (this.shouldDisplay()) {
+        icons.push(...actor.allIcons().slice(0, Math.floor(this.bitmapWidth() / iconWidth)));
     }
-  }
+    if (icons.length > 0) {
+        let iconX = 0;
+        const y = 0;
+        for (const icon of icons) {
+            this.drawIcon(icon, iconX, y);
+            iconX += iconWidth;
+        }
+    }    
 };
 
 Sprite_BSActorStateIcon.prototype.drawIcon = function(iconIndex, x, y) {

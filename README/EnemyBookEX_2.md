@@ -1,4 +1,4 @@
-# [耐性表示マスク](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js)
+# [条件付きドロップアイテム図鑑適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js)
 # Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEX_2.js)  
 #### 前提プラグイン  

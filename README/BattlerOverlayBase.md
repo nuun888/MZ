@@ -1,11 +1,13 @@
 # [バトラーオーバーレイベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerOverlayBase.js)
-# Ver.1.0.6  
+# Ver.1.0.7  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerOverlayBase.js)  
  
 モンスター、サイドビューアクター上に画像を表示させるベースプラグイン。  
 戦闘中にモンスター画像の色相を変更したり、攻撃時にモンスター画像と一緒にフラッシュをしないようにします。  
 
 ## 更新履歴
+2024/3/4 Ver.1.0.7  
+Ver.1.0.7で修正した処理方法の変更。  
 2024/3/2 Ver.1.0.6  
 出現前のモンスターにゲージ等が表示されてしまう問題を修正。  
 2023/8/24 Ver.1.0.5  

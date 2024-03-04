@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトラーオーバーレイベース
  * @author NUUN
- * @version 1.0.6
+ * @version 1.0.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/4 Ver.1.0.7
+ * Ver.1.0.7で修正した処理方法の変更。
  * 2024/3/2 Ver.1.0.6
  * 出現前のモンスターにゲージ等が表示されてしまう問題を修正。
  * 2023/8/24 Ver.1.0.5
@@ -100,8 +102,8 @@ Spriteset_Battle.prototype.setBattlerOverlaySprite = function(sprite, mode) {
 
 const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
 Spriteset_Battle.prototype.update = function() {
-  _Spriteset_Battle_update.call(this);
-  this.updateBattlerOverlay();
+    _Spriteset_Battle_update.call(this);
+    this.updateBattlerOverlay();
 };
 
 Spriteset_Battle.prototype.updateBattlerOverlay = function() {
@@ -171,6 +173,11 @@ Sprite_BattlerOverlay.prototype.updatePosition = function() {
 };
 
 
+const _Sprite_Enemy_initMembers = Sprite_Enemy.prototype.initMembers;
+Sprite_Enemy.prototype.initMembers = function() {
+    _Sprite_Enemy_initMembers.call(this);
+};
+
 const _Sprite_Actor_update = Sprite_Actor.prototype.update;
 Sprite_Actor.prototype.update = function() {
     _Sprite_Actor_update.call(this);
@@ -200,7 +207,7 @@ Sprite_Enemy.prototype.update = function() {
 };
 
 Sprite_Enemy.prototype.battlerOverlayVisible = function() {//暫定処置
-    this.battlerOverlay.visible = this._appeared || this._battler.isDead();
+    this.battlerOverlay.visible = this._battler.isAppeared();
 };
 
 Sprite_Battler.prototype.getBattlerOverlayHeight = function() {

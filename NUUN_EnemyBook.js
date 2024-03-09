@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.10
+ * @version 2.20.11
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/9/2024 Ver.2.20.11
+ * Fixed an issue where an error would occur when displaying the encyclopedia if items were set to be stolen.
  * 2/10/2024 Ver.2.20.10
  * Added a function that allows you to set conditions under which commands can be selected.
  * 1/3/2024 Ver.2.20.9
@@ -3010,7 +3012,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.10
+ * @version 2.20.11
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3231,6 +3233,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/9 Ver.2.20.11
+ * 盗めるアイテムを設定している場合、図鑑表示時にエラーが出る問題を修正。
  * 2024/2/10 Ver.2.20.10
  * コマンドの選択できる条件を設定できる機能を追加。
  * 2024/1/3 Ver.2.20.9
@@ -6857,18 +6861,18 @@ Game_System.prototype.dropItemListFlag = function(enemyId, dropListId, mode, Ind
 
 Game_System.prototype.stealItemListFlag = function(enemyId, stealListId, mode, Individual) {
 	if(enemyId > 0){
-    if(Individual){
-      this.setStealItemFlag (enemyId, stealListId, mode);
-    } else {
-      const enemy = $dataEnemies[enemyId];
-      const itemList = (Imported.NUUN_StealableItems ? this.getStealList(enemy) : null);
-      if(itemList) {
-        for(let i = 0; itemList.length > i; i++){
-          this.setStealItemFlag(enemyId, i, mode);
+        if(Individual){
+        this.setStealItemFlag (enemyId, stealListId, mode);
+        } else {
+        const enemy = $dataEnemies[enemyId];
+        const itemList = (Imported.NUUN_StealableItems ? this.getStealList(enemy) : null);
+        if(itemList) {
+            for(let i = 0; itemList.length > i; i++){
+            this.setStealItemFlag(enemyId, i, mode);
+            }
         }
-      }
+        }
     }
-  }
 };
 
 Game_System.prototype.dorpItemAcquired = function(switchId, enemyId, dropId) {
@@ -10038,7 +10042,7 @@ Window_EnemyBook.prototype.stealItems = function(list, enemy, x, y, width) {
         }
         this.resetTextColor();
         stealList.forEach((di, i) => {
-            if(di.kind > 0 && kind < 4){
+            if(di.kind > 0 && di.kind < 4){
                 x2 = Math.floor(stealIndex % StealItemCols) * (width + this.itemPadding()) + x;
                 y2 = Math.floor(stealIndex / StealItemCols) * lineHeight + y;
                 let width2 = width;

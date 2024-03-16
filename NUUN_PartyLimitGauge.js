@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -62,6 +62,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/16/2024 Ver.1.6.1
+ * Fixed an issue where the limit gauge would disappear on the first turn.
  * 2/17/2024 Ver.1.6.0
  * Added turn time to limit gauge recovery.
  * 7/28/2023 Ver.1.5.2
@@ -393,7 +395,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -451,6 +453,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/16 Ver.1.6.1
+ * 最初のターンでリミットゲージが消えてしまう問題を修正。
  * 2024/2/17 Ver.1.6.0
  * リミットゲージの回復にターン時を追加。
  * 2023/7/28 Ver.1.5.2
@@ -1065,9 +1069,11 @@ Game_Party.prototype.setPartyLimit = function(value) {
 };
 
 Game_Party.prototype.chargeLimitByTurn = function(evalStr) {
-    const a = this;
-    const val = Number(eval(evalStr));
-    this._limitGauge = Math.min(this.isPartyLimitValue() + val, MaxLimitValue);
+    if (!!evalStr) {
+        const a = this;
+        const val = Number(eval(evalStr));
+        this._limitGauge = Math.min(this.isPartyLimitValue() + val, MaxLimitValue);
+    }
 };
 
 Game_Troop.prototype.initPartyLimit = function() {
@@ -1081,9 +1087,11 @@ Game_Troop.prototype.setPartyLimit = function(value) {
 };
 
 Game_Troop.prototype.chargeLimitByTurn = function(evalStr) {
-    const a = this;
-    const val = Number(eval(evalStr));
-    this._limitGauge = Math.min(this.isPartyLimitValue() + val, MaxLimitValue);
+    if (!!evalStr) {
+        const a = this;
+        const val = Number(eval(evalStr));
+        this._limitGauge = Math.min(this.isPartyLimitValue() + val, MaxLimitValue);
+    }
 };
 
 Game_Party.prototype.getPartyLimitSprite = function(width) {
@@ -1355,6 +1363,13 @@ function onPartyChargeLimitGauge() {
 
 function onEnemyChargeLimitGauge() {
   return EnemyGaugeShowSwitch === 0 || $gameSwitches.value(EnemyGaugeShowSwitch);
+};
+
+function allMemberChargeLimitGauge(members) {
+    return members.aliveMembers().reduce((r, m) => {
+        r += m.actor().meta.Charge ;
+        return r;
+    });
 };
 
 })();

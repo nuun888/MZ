@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.0
+ * @version 1.7.1
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,7 +21,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 7/1/2023 Ver.1.7.0
+ * 3/17/2024 Ver.1.7.1
+ * Added font handling for numbers and units.
+ * 1/6/2023 Ver.1.7.0
  * Added plugin parameter acquisition processing. Newly released plug-ins after 2024 will be compatible with Ver.1.7.0 or later.
  * 7/1/2023 Ver.1.6.9
  * Added attack element processing.
@@ -89,7 +91,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.0
+ * @version 1.7.1
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -99,6 +101,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/17 Ver.1.7.1
+ * 数値と単位のフォント処理の追加。
  * 2024/1/6 Ver.1.7.0
  * プラグインのパラメータ取得処理の処理を追加。2024年以降の新規公開プラグインはVer.1.7.0以降の対応になります。
  * 2023/7/1 Ver.1.6.9
@@ -380,6 +384,31 @@ NuunManager.stringCodeSplit = function(code, mode) {
     return mode ? list.map(Number) : list;
 };
 
+NuunManager.setMainFontFace = function(font) {
+    this._mainFontFace = font ? font : null;
+};
+
+NuunManager.setNumberFontFace = function(font) {
+    this._numberFontFace = font ? font : null;
+};
+
+NuunManager.resetFontFace = function() {
+    this._mainFontFace = null;
+    this._numberFontFace = null;
+};
+
+NuunManager.mainFontFace = function() {
+    return this._mainFontFace || $gameSystem.mainFontFace();
+};
+
+NuunManager.numberFontFace = function() {
+    return this._numberFontFace || $gameSystem.numberFontFace();
+};
+
+NuunManager.isFontFace = function() {
+    return !!this._mainFontFace || !!this._numberFontFace;
+};
+
 const _Game_Interpreter_command357 = Game_Interpreter.prototype.command357;
 Game_Interpreter.prototype.command357 = function(params) {
     PluginManager.setNuunEventData(this._eventId);
@@ -480,6 +509,36 @@ const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
   _BattleManager_initMembers.call(this);
   this.gaugeBaseSprite = null;
+};
+
+
+const _Window_Base_resetFontSettings = Window_Base.prototype.resetFontSettings;
+Window_Base.prototype.resetFontSettings = function() {
+    _Window_Base_resetFontSettings.call(this);
+    NuunManager.resetFontFace();
+};
+
+Window_Base.prototype.nuun_setFontFace = function() {
+    this.contents.fontFace = NuunManager.mainFontFace();
+};
+
+Window_Base.prototype.nuun_setValueFontFace = function() {
+    this.contents.fontFace = NuunManager.numberFontFace();
+};
+
+const _Window_Base_drawCurrencyValue = Window_Base.prototype.drawCurrencyValue;
+Window_Base.prototype.drawCurrencyValue = function(value, unit, x, y, width) {
+    if (NuunManager.isFontFace()) {
+        const unitWidth = Math.min(80, this.textWidth(unit));
+        this.nuun_setValueFontFace();
+        this.resetTextColor();
+        this.drawText(value, x, y, width - unitWidth - 6, "right");
+        this.changeTextColor(ColorManager.systemColor());
+        this.nuun_setFontFace();
+        this.drawText(unit, x + width - unitWidth, y, unitWidth, "right");
+    } else {
+        _Window_Base_drawCurrencyValue.call(this, value, unit, x, y, width);
+    }
 };
 
 const _Window_addInnerChild = Window.prototype.addInnerChild;

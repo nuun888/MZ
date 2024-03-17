@@ -1,13 +1,13 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.7.0
+# Ver.1.7.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
-
-English available  
 
 共通処理を行うベースプラグインです。  
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2024/3/17 Ver.1.7.1  
+数値と単位のフォント処理の追加。  
 2024/1/6 Ver.1.7.0  
 プラグインのパラメータ取得処理の処理を追加。2024年以降の新規公開プラグインはVer.1.7.0以降の対応になります。  
 2023/7/1 Ver.1.6.9  

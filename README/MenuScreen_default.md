@@ -5,7 +5,7 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEX.js)  
 
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.7以降  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.7.1以降  
 
 #### 拡張プラグイン
 [メニューコマンド表示EX](https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md)  

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.2
+ * @version 3.0.3
  * 
  * @help
  * Change and extend the menu screen display.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/17/2024 Ver.3.0.3
+ * Fixed so that font settings for amount and unit can be applied separately.
  * 1/18/2024 Ver.3.0.2
  * Fixed an issue where an error was displayed when setting some items in "NUUN_SkillStatusEX".
  * 1/8/2024 Ver.3.0.1
@@ -1327,6 +1329,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/17 Ver.3.0.3
+ * 金額と単位のフォントの設定を別々に適用できるように修正。
  * 2024/1/18 Ver.3.0.2
  * スキルステータスカスタマイズプラグインで一部項目の設定でエラーが表示される問題を修正。
  * 2024/1/8 Ver.3.0.1
@@ -3690,13 +3694,14 @@ Imported.NUUN_MenuScreenEX = true;
             iconWidth = ImageManager.iconWidth + 6;
         }
         this.contents.fontSize = $gameSystem.mainFontSize() + this._infoFontSize + (data.ContentsFontSize || 0);
-        this.nuun_setContentsFontFace(data);
+        NuunManager.setMainFontFace(data.FontFace);
+        NuunManager.setNumberFontFace(data.ValueFontFace);
+        this.nuun_setFontFace();
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = data.ParamName ? data.ParamName : '';
         const systemWidth = data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.systemWidth(data.SystemItemWidth, width);
         this.drawText(nameText, x + iconWidth, y, systemWidth);
         this.resetTextColor();
-        this.nuun_setContentsValueFontFace(data);
         this.drawCurrencyValue(this.value(), this.currencyUnit(), x + systemWidth + 8 + iconWidth, y, width - (systemWidth + 8 + iconWidth));
         this.resetFontSettings();
     };

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Disable Button UI
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Disable the button in Touch UI.
@@ -20,6 +20,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/20/2024 Ver.1.0.1
+ * Fixed an issue where the button UI was displayed when there was a config file in the save folder.
  * 8/3/2023 Ver.1.0.0
  * First edition.
  * 
@@ -28,7 +30,7 @@
  * @target MZ
  * @plugindesc ボタンUI無効化
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * タッチUIのボタンを無効にします。
@@ -38,6 +40,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/20 Ver.1.0.1
+ * セーブフォルダにコンフィグファイルが存在する際に、ボタンUIが表示される問題を修正。
  * 2023/8/3 Ver.1.0.0
  * 初版
  * 
@@ -50,10 +54,21 @@ Imported.NUUN_NotButtonUI = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_NotButtonUI');
 
-    const _Scene_Boot_loadPlayerData = Scene_Boot.prototype.loadPlayerData;
-    Scene_Boot.prototype.loadPlayerData = function() {
-        _Scene_Boot_loadPlayerData.call(this);
-        ConfigManager.touchUI = false;
+    const _ConfigManager_load = ConfigManager.load;
+    ConfigManager.load = function() {
+        _ConfigManager_load.call(this);
+        ConfigManager.compulsionTouchUIOff();
+    };
+
+    const _ConfigManager_applyData = ConfigManager.applyData;
+    ConfigManager.applyData = function(config) {
+        _ConfigManager_applyData.call(this, config);
+        ConfigManager.compulsionTouchUIOff();
+    };
+    
+
+    ConfigManager.compulsionTouchUIOff = function() {
+        this.touchUI = false;
     };
 
 

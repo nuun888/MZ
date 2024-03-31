@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.10
+ * @version 2.3.11
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -39,7 +39,7 @@
  * Operation
  * ←→Key:Switch pages for acquired items and acquired skills
  * Right click: switch page
- * left click: click
+ * Page return function is not implemented.
  * 
  * plugin command
  * [Level up screen display permission]
@@ -60,6 +60,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/3/31 Ver.2.3.11
+ * Fixed processing related to side view display.
  * 2023/11/4 Ver.2.3.10
  * Fixed an issue where weapons and armor were not displayed in the drop list.
  * 2023/7/21 Ver.2.3.9
@@ -2291,7 +2293,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.10
+ * @version 2.3.11
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2318,7 +2320,7 @@
  * 操作
  * ←→キー：入手アイテム、習得スキルのページ切り替え
  * 右クリック：ページ切り替え
- * 左クリック：クリック
+ * ※ページ戻し機能は実装しておりません。
  * 
  * プラグインコマンド
  * 「レベルアップ画面表示許可」
@@ -2339,6 +2341,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/3/31 Ver.2.3.11
+ * サイドビュー表示に関する処理の修正。
  * 2023/11/4 Ver.2.3.10
  * ドロップリストに武器、防具が表示されない問題を修正。
  * 2023/7/21 Ver.2.3.9
@@ -3672,6 +3676,7 @@
  * @type boolean
  * @default true
  * @parent ExternalPluginSetting
+ * 
  * 
  * 
  * @command LevelUP_SESelect
@@ -5813,7 +5818,7 @@ Window_ResultActorExp.prototype.drawActorFace = function(data, actor, x, y, heig
 
 Window_ResultActorExp.prototype.drawSvActor = function(data, actor, x, y, width) {
   const bitmap = ImageManager.loadSvActor(actor.battlerName());
-  this.drawSvActorImg(actor, x + Math.floor(bitmap.width / 18), y);
+  this.drawSvActorImg(actor, x, y);
 };
 
 Window_ResultActorExp.prototype.drawActorImg = function(data, actor, x, y, width, height) {
@@ -5942,7 +5947,7 @@ Window_ResultActorExp.prototype.drawSvActorImg = function(actor, x, y) {
   const sprite = this.createInnerSprite(key, Sprite_ResultSvActor);
   sprite.setBattler(actor);
   sprite.show();
-  sprite.setHome(x, y);
+  sprite.setHome(x + this.x, y + this.y);
   sprite.startMotion();
 };
 
@@ -6773,8 +6778,8 @@ Window_ResultActorStatus.prototype.drawActorFace = function(data, actor, x, y) {
 };
 
 Window_ResultActorStatus.prototype.drawSvActor = function(data, actor, x, y, width) {
-  const bitmap = ImageManager.loadSvActor(actor.battlerName());
-  this.drawSvActorImg(actor, x + Math.floor(bitmap.width / 18), y);
+    const bitmap = ImageManager.loadSvActor(actor.battlerName());
+    this.drawSvActorImg(actor, x, y);
 };
 
 Window_ResultActorStatus.prototype.drawActorName = function(data, actor, x, y, width) {
@@ -6796,11 +6801,11 @@ Window_ResultActorStatus.prototype.drawActorNickname = function(data, actor, x, 
 };
 
 Window_ResultActorStatus.prototype.drawSvActorImg = function(actor, x, y) {
-  const key = "resultLevelUpSvActor%1".format(actor.actorId());
+  const key = "resultLevelUpSvActor".format();
   const sprite = this.createInnerSprite(key, Sprite_ResultSvActor);
   sprite.setBattler(actor);
   sprite.show();
-  sprite.setHome(x, y);
+  sprite.setHome(x + this.x, y + this.y);
   sprite.startMotion();
 };
 

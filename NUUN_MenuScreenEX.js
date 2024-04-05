@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.3
+ * @version 3.1.0
  * 
  * @help
  * Change and extend the menu screen display.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/6/2024 Ver.3.1.0
+ * Added a function to display current experience points and equipment in the status.
  * 3/17/2024 Ver.3.0.3
  * Fixed so that font settings for amount and unit can be applied separately.
  * 1/18/2024 Ver.3.0.2
@@ -340,6 +342,40 @@
  * @default true
  * @parent StatusSetting
  * 
+ * @param EquipSetting
+ * @text 装備設定
+ * @default ------------------------------
+ * @parent StatusSetting
+ * 
+ * @param EquipNameVisible
+ * @text Equipment part name display
+ * @desc Specify the equipment part name to be displayed.
+ * @type select
+ * @option None
+ * @value None
+ * @option Parts only
+ * @value Name
+ * @option Iicon only
+ * @value Icon
+ * @option Icon, Part
+ * @value IconName
+ * @default Name
+ * @parent EquipSetting
+ * 
+ * @param EquipIcons
+ * @type struct<EquipIconsData>[]
+ * @text Equipment icon
+ * @desc Equipment icon set. The ID is the same as the equipment slot number.
+ * @default []
+ * @parent EquipSetting
+ * 
+ * @param InvalidSlotHide
+ * @text Hide sealed equipment
+ * @desc Equipment sealed with features will not be displayed.
+ * @type boolean
+ * @default false
+ * @parent EquipSetting
+ * 
  * @param InfoSetting
  * @text Menu info setting
  * @default ------------------------------
@@ -432,8 +468,8 @@
  * @default ------------------------------
  * 
  * @param MenuCommandPosition
- * @desc メニューコマンドの表示モードを指定します。
- * @text メニューコマンド表示モード
+ * @desc Specifies the display mode of menu commands.
+ * @text Menu command display mode
  * @type select
  * @option None
  * @value 'free'
@@ -630,7 +666,9 @@
  * @value MpGauge
  * @option TP Gauge(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value TpGauge
- * @option EXP(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @option NowEXP(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @value ExpInfo
+ * @option NextEXP(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value Exp
  * @option EXP Gauge(1)(2)(3)(4)(5)(6)(7)(21)
  * @value ExpGauge
@@ -688,6 +726,8 @@
  * @value GainExpRate
  * @option Original gauge(2)(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
  * @value OrgGauge
+ * @option Equip(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @value Equip
  * @option Image(3)(4)(5)(6)(10)(25)
  * @value Imges
  * @option Character chip(3)(4)(5)(6)(25)
@@ -1272,7 +1312,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.2
+ * @version 3.1.0
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1329,6 +1369,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/6 Ver.3.1.0
+ * ステータスに現在の経験値、装備を表示する機能を追加。
  * 2024/3/17 Ver.3.0.3
  * 金額と単位のフォントの設定を別々に適用できるように修正。
  * 2024/1/18 Ver.3.0.2
@@ -1586,6 +1628,40 @@
  * @type boolean
  * @default true
  * @parent StatusSetting
+ * 
+ * @param EquipSetting
+ * @text 装備設定
+ * @default ------------------------------
+ * @parent StatusSetting
+ * 
+ * @param EquipNameVisible
+ * @text 装備部位名表示
+ * @desc 表示する装備部位名を指定します。
+ * @type select
+ * @option なし
+ * @value None
+ * @option 部位のみ
+ * @value Name
+ * @option アイコンのみ
+ * @value Icon
+ * @option アイコン、部位
+ * @value IconName
+ * @default Name
+ * @parent EquipSetting
+ * 
+ * @param EquipIcons
+ * @type struct<EquipIconsData>[]
+ * @text 装備アイコン
+ * @desc 装備アイコンを設定します。IDは装備スロットの番号と同じです。
+ * @default []
+ * @parent EquipSetting
+ * 
+ * @param InvalidSlotHide
+ * @text 封印装備非表示
+ * @desc 特徴で封印されている装備を表示しません。
+ * @type boolean
+ * @default false
+ * @parent EquipSetting
  * 
  * @param InfoSetting
  * @text メニューインフォ設定
@@ -1878,7 +1954,9 @@
  * @value MpGauge
  * @option TP(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value TpGauge
- * @option 経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @option 現在の経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @value ExpInfo
+ * @option 次のレベルまでの経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value Exp
  * @option 経験値（ゲージあり）(1)(2)(3)(4)(5)(6)(7)(21)
  * @value ExpGauge
@@ -1936,6 +2014,8 @@
  * @value GainExpRate
  * @option 独自ゲージ(2)(3)(4)(5)(6)(7)(10)(20)(21)(22)(23)(24)
  * @value OrgGauge
+ * @option 装備(1)(2)(3)(4)(5)(6)(7)(8)(13)
+ * @value Equip
  * @option 画像(3)(4)(5)(6)(10)(25)
  * @value Imges
  * @option キャラチップ(3)(4)(5)(6)(25)
@@ -2533,6 +2613,9 @@ Imported.NUUN_MenuScreenEX = true;
     const ExpDisplayMode = Number(parameters['ExpDisplayMode'] || 1);
     const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
     const LabelShow = eval(parameters['LabelShow'] || "true");
+    const EquipNameVisible = String(parameters['EquipNameVisible'] || "Name");
+    const EquipIcons = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipIcons'])) : [];
+    const InvalidSlotHide = eval(parameters['InvalidSlotHide'] || "false");
 
     let menuTextMode = null;
     let menuAlign = null;
@@ -3312,17 +3395,74 @@ Imported.NUUN_MenuScreenEX = true;
         this.nuunMenu_placeGauge(actor, data.GaugeID, x, y, "actor%1-gauge-%2");
     };
 
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsExpInfo = function(data, x, y, width, actor) {
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : TextManager.expTotal.format(TextManager.exp);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.nuunMenu_systemWidth(data.SystemItemWidth, width);
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.nuun_setContentsFontFace(data);
+        this.drawText(nameText, x, y, width);
+        this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
+        this.drawText(this.nuun_ExpTotalValue(actor), x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.resetFontSettings();
+    };
+
     Window_StatusBase.prototype.nuun_DrawMenuStatusContentsExp = function(data, x, y, width, actor) {
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
         const nameText = data.ParamName ? data.ParamName : 'NextLv';
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.nuun_setContentsFontFace(data);
         const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.nuunMenu_systemWidth(data.SystemItemWidth, width);
-        this.drawText(nameText, x + textWidth, y, textWidth);
+        this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
         let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.nextLevelExp() - actor.currentLevelExp());
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.resetFontSettings();
+    };
+
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsEquip = function(data, x, y, width, actor) {
+        const lineHeight = this.lineHeight();
+        const equips = actor.equips();
+        const showEquips = this.getMenuStatusShowEquipList(actor);
+        const e1uipsLength = equips.length;
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        let y2 = y;
+        let width2 = width;
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        this.nuun_setContentsFontFace(data);
+        const nameText = data.ParamName;
+        if (nameText) {
+            this.drawText(nameText, x + 0, y, width);
+            y2 += lineHeight;
+        }
+        let contentsY = y2;
+        for (let i = 0; i < e1uipsLength; i++) {
+            const index = i;
+            const slotName = this.actorSlotName(actor, index);
+            if (slotName && this.isShowSlot(actor, index) && (!showEquips || (showEquips && showEquips.some(data => data === slotName)))) {
+                let sw = 0;
+                let iconWidth = 0;
+                const item = equips[index];
+                if (EquipNameVisible > 1) {//アイコン表示
+                    const iconId = EquipIcons[i] ? EquipIcons[i].EquipIconId : 0;
+                    if (iconId > 0) {
+                    this.drawIcon(iconId, x, contentsY + 2);
+                    }
+                    iconWidth = ImageManager.iconWidth + (EquipNameVisible === 2 ? 24 : 4);
+                }
+                if (EquipNameVisible === 1 || EquipNameVisible === 3) {//デフォルト
+                    sw += this.systemWidth(list.SystemItemWidth, width2);
+                    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+                    this.drawText(slotName, x + iconWidth, contentsY, sw);
+                }
+                sw += iconWidth;
+                this.resetTextColor();
+                this.drawItemName(item, x + sw, contentsY, width2 - sw);
+                contentsY += lineHeight;
+            }
+        }
         this.resetFontSettings();
     };
 
@@ -3583,6 +3723,32 @@ Imported.NUUN_MenuScreenEX = true;
             menuTextMode = null;
         }
         Window_Base.prototype.drawText.call(this, text, x, y, maxWidth, align);
+    };
+
+    Window_StatusBase.prototype.getMenuStatusShowEquipList = function(actor) {
+        if (actor.actor().meta.MenuShowEquips) {
+            return actor.actor().meta.MenuShowEquips.split(',');
+        } else if (actor.currentClass().meta.MenuShowEquips) {
+            return actor.currentClass().meta.MenuShowEquips.split(',');
+        } else {
+            return null;
+        }
+    };
+
+    Window_StatusBase.prototype.isShowSlot = function(actor, index) {
+        if (InvalidSlotHide) {
+            return !actor.isEquipTypeSealed(actor.equipSlots()[index]);
+        } else {
+            return true;
+        }
+    };
+
+    Window_StatusBase.prototype.nuun_ExpTotalValue = function(actor) {
+        if (actor.isMaxLevel()) {
+            return "-------";
+        } else {
+            return actor.currentExp();
+        }
     };
 
     Window_MenuStatus.prototype.ActorImgX = function() {

@@ -49,6 +49,15 @@
  * Use it as background for menu UI.
  * If background image 1 is not changed during the game, setting the menu background to background image 2 is no problem.
  * 
+ * Equipment
+ * If equipment is set as the displayed status.
+ * Specify the equipment to display for a specific actor or class.
+ * Memo field for actor or class
+ * <MenuShowEquips:[name],[name]...>
+ * [name]:Equipment part name
+ * Only the specified equipment part will be displayed. If not specified, all parts will be displayed.
+ * If you fill in both actor and class, the actor settings will take precedence.
+ * 
  * Placement mode
  * Displays the layout of the menu status window according to the mode set in the menu command display mode.
  * Display to the right of the menu command if the menu command display mode is 'left'.
@@ -1344,6 +1353,15 @@
  * メニューUIの背景として使用します。
  * ゲーム中、背景画像1を変更しない場合は、メニュー背景を背景画像2で設定しても問題ありません。
  * 
+ * 装備
+ * 表示するステータスに装備を設定している場合
+ * 特定のアクター又は職業の表示させる装備を指定する。
+ * アクター又は職業のメモ欄
+ * <MenuShowEquips:[name],[name]...>
+ * [name]:装備部位名
+ * 指定した装備部位のみ表示されます。指定がない場合は全ての部位が表示されます。
+ * アクターと職業両方に記入した場合はアクターの設定が優先されます。
+ * 
  * 
  * 備考
  * ※1
@@ -2613,9 +2631,6 @@ Imported.NUUN_MenuScreenEX = true;
     const ExpDisplayMode = Number(parameters['ExpDisplayMode'] || 1);
     const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
     const LabelShow = eval(parameters['LabelShow'] || "true");
-    const EquipNameVisible = String(parameters['EquipNameVisible'] || "Name");
-    const EquipIcons = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EquipIcons'])) : [];
-    const InvalidSlotHide = eval(parameters['InvalidSlotHide'] || "false");
 
     let menuTextMode = null;
     let menuAlign = null;
@@ -3423,6 +3438,7 @@ Imported.NUUN_MenuScreenEX = true;
     };
 
     Window_StatusBase.prototype.nuun_DrawMenuStatusContentsEquip = function(data, x, y, width, actor) {
+        const equipNameVisible = _menuLayout.EquipNameVisible;
         const lineHeight = this.lineHeight();
         const equips = actor.equips();
         const showEquips = this.getMenuStatusShowEquipList(actor);
@@ -3445,21 +3461,21 @@ Imported.NUUN_MenuScreenEX = true;
                 let sw = 0;
                 let iconWidth = 0;
                 const item = equips[index];
-                if (EquipNameVisible > 1) {//アイコン表示
-                    const iconId = EquipIcons[i] ? EquipIcons[i].EquipIconId : 0;
+                if (equipNameVisible === "IconName" || equipNameVisible === "Icon") {//アイコン表示
+                    const iconId = _menuLayout.EquipIcons && _menuLayout.EquipIcons[i] ? _menuLayout.EquipIcons[i].EquipIconId : 0;
                     if (iconId > 0) {
                     this.drawIcon(iconId, x, contentsY + 2);
                     }
-                    iconWidth = ImageManager.iconWidth + (EquipNameVisible === 2 ? 24 : 4);
+                    iconWidth = ImageManager.iconWidth + (equipNameVisible === "Icon" ? 24 : 4);
                 }
-                if (EquipNameVisible === 1 || EquipNameVisible === 3) {//デフォルト
-                    sw += this.systemWidth(list.SystemItemWidth, width2);
-                    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+                if (equipNameVisible === "Name" || equipNameVisible === "IconName") {//デフォルト
+                    sw += this.nuunMenu_systemWidth(data.SystemItemWidth, width);
+                    this.changeTextColor(NuunManager.getColorCode(data.NameColor));
                     this.drawText(slotName, x + iconWidth, contentsY, sw);
                 }
                 sw += iconWidth;
                 this.resetTextColor();
-                this.drawItemName(item, x + sw, contentsY, width2 - sw);
+                this.drawItemName(item, x + sw, contentsY, width - sw);
                 contentsY += lineHeight;
             }
         }
@@ -3736,7 +3752,7 @@ Imported.NUUN_MenuScreenEX = true;
     };
 
     Window_StatusBase.prototype.isShowSlot = function(actor, index) {
-        if (InvalidSlotHide) {
+        if (_menuLayout.InvalidSlotHide) {
             return !actor.isEquipTypeSealed(actor.equipSlots()[index]);
         } else {
             return true;

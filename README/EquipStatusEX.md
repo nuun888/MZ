@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.4.5
+# Ver.1.4.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -53,6 +53,8 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
+2024/4/6 Ver.1.4.6  
+追加能力値の小数点の桁数が正常に機能していない問題を修正。  
 2023/7/15 Ver.1.4.5  
 独自パラメータを表示させるとエラーが出る問題を修正。  
 2023/6/17 Ver.1.4.4  

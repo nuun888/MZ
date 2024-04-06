@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.11
+ * @version 2.20.12
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/6/2024 Ver.2.20.12
+ * Fixed an issue where the number of decimal places was not working properly.
  * 3/9/2024 Ver.2.20.11
  * Fixed an issue where an error would occur when displaying the encyclopedia if items were set to be stolen.
  * 2/10/2024 Ver.2.20.10
@@ -3012,7 +3014,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.11
+ * @version 2.20.12
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3233,6 +3235,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/6 Ver.2.20.12
+ * 小数点の桁数が正常に機能していない問題を修正。
  * 2024/3/9 Ver.2.20.11
  * 盗めるアイテムを設定している場合、図鑑表示時にエラーが出る問題を修正。
  * 2024/2/10 Ver.2.20.10
@@ -9792,7 +9796,7 @@ Window_EnemyBook.prototype.enemyXParams = function(list, enemy, x, y, width) {
     if (!this.paramMask(list.MaskMode)){
         text = UnknownStatus;
     } else {
-        text = NuunManager.numPercentage(text, list.Decimal, DecimalMode);
+        text = NuunManager.numPercentage(text, (list.Decimal - 2), DecimalMode);
         this.setBuffColor(list, enemy);
     }
     text += list.paramUnit ? String(list.paramUnit) : " %";
@@ -9820,7 +9824,7 @@ Window_EnemyBook.prototype.enemySParams = function(list, enemy, x, y, width) {
     if (!this.paramMask(list.MaskMode)){
         text = UnknownStatus;
     } else {
-        text = NuunManager.numPercentage(text, list.Decimal, DecimalMode);
+        text = NuunManager.numPercentage(text, (list.Decimal - 2), DecimalMode);
         this.setBuffColor(list, enemy);
     }
     text += list.paramUnit ? String(list.paramUnit) : " %";
@@ -10240,7 +10244,7 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
                 } else if (element.ElementNo > 0) {
                     rate = enemy.elementRate(element.ElementNo) * 100;
                 }
-                rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+                rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
                 this.valueColor(rate);
                 rate += list.paramUnit ? String(list.paramUnit) : " %";
                 const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
@@ -10299,7 +10303,7 @@ Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, wi
                 }
                 if (this.resistWeakDataMask(list.MaskMode)) {
                     let rate = (enemy.isStateResist(stateId) ? 0 : enemy.stateRate(stateId)) * 100;
-                    rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+                    rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
                     this.valueColor(rate);
                     rate += list.paramUnit ? String(list.paramUnit) : " %";
                     const rateText = list.DetaEval ? eval(list.DetaEval) : rate;

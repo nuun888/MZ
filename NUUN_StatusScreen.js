@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.7
+ * @version 2.6.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/6 Ver.2.6.8
+ * 封印装備非表示をOFFにしても適用されてしまう問題を修正。
+ * 現在の経験値、次のレベルまでを１行で表示させる機能を追加。
  * 2024/2/3 Ver.2.6.7
  * 特徴で封印されている装備を表示させない機能を追加。(一部プラグインの競合対策)
  * 2024/1/8 Ver.2.6.6
@@ -560,6 +563,20 @@
  * @param EXPSetting
  * @text 経験値設定
  * @default ------------------------------
+ * 
+ * @param NowEXPOneLine
+ * @text 現在の経験値１行表示
+ * @desc 現在の経験値を１行表示にします。
+ * @type boolean
+ * @default false
+ * @parent EXPSetting
+ * 
+ * @param NextEXPOneLine
+ * @text 次の経験値１行表示
+ * @desc 次の経験値までを１行表示にします。
+ * @type boolean
+ * @default false
+ * @parent EXPSetting
  * 
  * @param EXPGaugeVisible
  * @text 経験値ゲージ表示
@@ -1035,9 +1052,9 @@
  * @value 38
  * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(15)(16)(17)(20)(21)
  * @value 39
- * @option 現在の経験値(1)(2)(4)(5)(6)(7)(8)(15)(16)(17)(20)
+ * @option 現在の経験値(1)(2)(4)(5)(6)(7)(8)(15)(16)(17)(20)(21)
  * @value 40
- * @option 次のレベルまでの経験値(1)(2)(4)(5)(6)(7)(8)(15)(16)(17)(20)
+ * @option 次のレベルまでの経験値(1)(2)(4)(5)(6)(7)(8)(15)(16)(17)(20)(21)
  * @value 41
  * @option オリジナルパラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(14)(15)(16)(17)(20)(21)
  * @value 50
@@ -1335,6 +1352,8 @@ const BackGroundImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(pa
 const BackUiWidth = eval(parameters['BackUiWidth'] || "true");
 const StatusWindowsSkin = (String(parameters['StatusWindowsSkin'])) || null;
 const EquipNameVisible = Number(parameters['EquipNameVisible'] || 1);
+const NowEXPOneLine = eval(parameters['NowEXPOneLine'] || "false");
+const NextEXPOneLine = eval(parameters['NextEXPOneLine'] || "false");
 const EXPGaugeVisible = eval(parameters['EXPGaugeVisible'] || "true");
 const EXPGaugeColor1 = (DataManager.nuun_structureData(parameters['EXPGaugeColor1'])) || 0;
 const EXPGaugeColor2 = (DataManager.nuun_structureData(parameters['EXPGaugeColor2'])) || 0;
@@ -2499,22 +2518,27 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
 
 Window_Status.prototype.drawExpInfo = function(list, actor, x, y, width) {
     this.contentsFontSize(list);
+    const systemWidth = NowEXPOneLine ? this.systemWidth(list.SystemItemWidth, width) : width;
     let margin = 0;
     if (list.IconId > 0) {
         this.drawIcon(list.IconId, x, y + list.IconY);
         margin = ImageManager.iconWidth + 4;
     }
     const expTotal = !list.ParamName ? TextManager.expTotal.format(TextManager.exp) : list.ParamName;
-    const lineHeight = this.lineHeight();
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    this.drawText(expTotal, x + margin, y, width - margin);
+    this.drawText(expTotal, x + margin, y, systemWidth - margin);
     this.resetTextColor();
     this.nuun_setContentsFontFace(list);
-    this.drawText(this.expTotalValue(), x, y + lineHeight * 1, width, "right");
+    if (NowEXPOneLine) {
+        this.drawText(this.expTotalValue(), x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+    } else {
+        this.drawText(this.expTotalValue(), x, y + this.lineHeight() * 1, width, (list.Align || 'right'));
+    }
 };
 
 Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
-    const lineHeight = this.lineHeight();
+    const systemWidth = NextEXPOneLine ? this.systemWidth(list.SystemItemWidth, width) : width;
+    const lineHeight = NextEXPOneLine ? 0 : this.lineHeight();
     this.contentsFontSize(list);
     let margin = 0;
     if (list.IconId > 0) {
@@ -2523,13 +2547,17 @@ Window_Status.prototype.drawExpGaugeInfo = function(list, actor, x, y, width) {
     }
     const expNext = !list.ParamName ? TextManager.expNext.format(TextManager.level) : list.ParamName;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    this.drawText(expNext, x + margin, y, width - margin);
+    this.drawText(expNext, x + margin, y, systemWidth - margin);
     this.resetTextColor();
     if (EXPGaugeVisible) {
         this.placeExpGauge(this._actor, x - 30 + EXPGaugeX, y + lineHeight * 1 + EXPGaugeY);
     } else {
         this.nuun_setContentsFontFace(list);
-        this.drawText(this.expNextValue(), x, y + lineHeight * 1, width, "right");
+        if (NextEXPOneLine) {
+            this.drawText(this.expNextValue(), x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+        } else {
+            this.drawText(this.expNextValue(), x, y + lineHeight * 1, width, (list.Align || 'right'));
+        }
     }
 };
 
@@ -2786,7 +2814,11 @@ Window_Status.prototype.nuun_setContentsFontFace = function(list) {
 }
 
 Window_Status.prototype.isShowSlot = function(actor, index) {
-    return !actor.isEquipTypeSealed(actor.equipSlots()[index]);
+    if (InvalidSlotHide) {
+        return !actor.isEquipTypeSealed(actor.equipSlots()[index]);
+    } else {
+        return true;
+    }
 };
 
 

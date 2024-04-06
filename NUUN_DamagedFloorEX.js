@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Famage floor EX
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/6/2024 Ver.1.2.2
+ * Fixed an issue where floor damage rate was not applied when set to 0.
  * 1/6/2024 Ver.1.2.1
  * Added a function that allows you to set the effect rate for specific floor damage.
  * 1/4/2024 Ver.1.2.0
@@ -298,7 +300,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -318,13 +320,17 @@
  * [tag]:床ダメージタグ名で設定したタグ名
  * [rate]:効果率
  * <DfrExPoison:150> タグ名がPoisonの床ダメージの効果率が1.5倍になります。
- * <DfrExPoison:70> タグ名がPoisonの床ダメージの効果率が0.7倍になります。
+ * <DfrExPoison:
+ * 
+ * > タグ名がPoisonの床ダメージの効果率が0.7倍になります。
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/6 Ver.1.2.2
+ * 床ダメージ率を0にしたときに適用されない問題を修正。
  * 2024/1/6 Ver.1.2.1
  * 特定の床ダメージに対して効果率を設定できる機能を追加。
  * 2024/1/4 Ver.1.2.0
@@ -646,7 +652,7 @@ Game_Actor.prototype.executeFloorDamage = function() {
 Game_Actor.prototype.floorDamageRate = function() {
     const tag = 'DfrEx'+ String(_damagedFloorExData.DamagedFloorName);
     return this.traitObjects().reduce((r, trait) => {
-        if (!!trait.meta[tag]) {
+        if (trait.meta[tag] !== undefined && trait.meta[tag] >= 0) {
             return r * Number(trait.meta[tag]) / 100;
         } else {
             return r;

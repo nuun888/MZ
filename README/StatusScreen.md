@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.6.7
+# Ver.2.6.8
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.4以降  
@@ -112,6 +112,9 @@ APNGを表示するには別途ApngPicture.js(トリアコンタン様)が必要
 `[text]`:任意の個別画像。  
 
 ### 更新履歴
+2024/4/6 Ver.2.6.8  
+封印装備非表示をOFFにしても適用されてしまう問題を修正。  
+現在の経験値、次のレベルまでを１行で表示させる機能を追加。  
 2024/2/3 Ver.2.6.7  
 特徴で封印されている装備を表示させない機能を追加。(一部プラグインの競合対策)  
 2024/1/8 Ver.2.6.6  

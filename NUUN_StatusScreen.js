@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/7 Ver.2.6.9
+ * 小数点の桁数が正常に機能していない問題を修正。
  * 2024/4/6 Ver.2.6.8
  * 封印装備非表示をOFFにしても適用されてしまう問題を修正。
  * 現在の経験値、次のレベルまでを１行で表示させる機能を追加。
@@ -2444,7 +2446,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
                     systemWidth += ImageManager.iconWidth + 4;
                 }
                 let rate = actor.elementRate(elementId) * 100;
-                rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+                rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
                 const r = rate;
                 rate += list.paramUnit ? String(list.paramUnit) : "%";
                 const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
@@ -2500,7 +2502,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
                     systemWidth += ImageManager.iconWidth + 4;
                 }
                 let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
-                rate = NuunManager.numPercentage(rate, list.Decimal || 0, DecimalMode);
+                rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
                 const r = rate;
                 rate += list.paramUnit ? String(list.paramUnit) : "%";
                 const rateText = list.DetaEval ? eval(list.DetaEval) : rate;

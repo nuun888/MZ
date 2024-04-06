@@ -1,5 +1,5 @@
 # [ダメージ床拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)
-# Ver.1.2.1
+# Ver.1.2.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -38,6 +38,8 @@
 フォロワー含むを指定している場合は表示されている床ダメージを受けたフォロワーにアニメーションが再生されます。  
 
 ## 更新履歴
+2024/4/6 Ver.1.2.2  
+床ダメージ率を0にしたときに適用されない問題を修正。  
 2024/1/6 Ver.1.2.1  
 特定の床ダメージに対して効果率を設定できる機能を追加。  
 2024/1/4 Ver.1.2.0  

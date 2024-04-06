@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.5
+ * @version 1.4.6
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/6/2024 Ver.1.4.6
+ * Fixed an issue where the number of decimal places for additional ability values was not working properly.
  * 7/15/2023 Ver.1.4.5
  * Fixed the problem that an error appears when displaying the original parameter.
  * 6/17/2023 Ver.1.4.4
@@ -832,7 +834,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.5
+ * @version 1.4.6
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -861,6 +863,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/6 Ver.1.4.6
+ * 追加能力値の小数点の桁数が正常に機能していない問題を修正。
  * 2023/7/15 Ver.1.4.5
  * 独自パラメータを表示させるとエラーが出る問題を修正。
  * 2023/6/17 Ver.1.4.4
@@ -2231,7 +2235,7 @@ Imported.NUUN_EquipStatusEX = true;
         } else {
             margin = 0;
         }
-        const value = NuunManager.numPercentage(actor.xparam(paramId - 30) * 100, data.Decimal || 0, DecimalMode);
+        const value = NuunManager.numPercentage(actor.xparam(paramId - 30) * 100, (data.Decimal - 2) || 0, DecimalMode);
         const paramX = this.paramX(width);
         const rightArrowWidth = this.rightArrowWidth();
         const paramWidth = this.paramWidth();
@@ -2242,7 +2246,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
         this.drawRightArrow(paramX + paramWidth + x, y);
         if (this._tempActor) {
-            const newValue = NuunManager.numPercentage(this._tempActor.xparam(paramId - 30) * 100, data.Decimal || 0, DecimalMode);
+            const newValue = NuunManager.numPercentage(this._tempActor.xparam(paramId - 30) * 100, (data.Decimal - 2) || 0, DecimalMode);
             const diffvalue = newValue - value;
             this.changeTextColor(ColorManager.paramchangeTextColor(getBatStatus(data.BatStatus, value, newValue)));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
@@ -2265,7 +2269,7 @@ Imported.NUUN_EquipStatusEX = true;
         } else {
             margin = 0;
         }
-        const value = NuunManager.numPercentage(actor.sparam(paramId - 40) * 100, data.Decimal - 2, DecimalMode);
+        const value = NuunManager.numPercentage(actor.sparam(paramId - 40) * 100, (data.Decimal - 2), DecimalMode);
         const paramX = this.paramX(width);
         const rightArrowWidth = this.rightArrowWidth();
         const paramWidth = this.paramWidth();
@@ -2276,7 +2280,7 @@ Imported.NUUN_EquipStatusEX = true;
         }
         this.drawRightArrow(paramX + paramWidth + x, y);
         if (this._tempActor) {
-            const newValue = NuunManager.numPercentage(this._tempActor.sparam(paramId - 40) * 100, data.Decimal - 2, DecimalMode);
+            const newValue = NuunManager.numPercentage(this._tempActor.sparam(paramId - 40) * 100, (data.Decimal - 2), DecimalMode);
             const diffvalue = badParams(paramId) ? getBatStatus(data.BatStatus, newValue, value) : getBatStatus(data.BatStatus, value, newValue);
             this.changeTextColor(ColorManager.paramchangeTextColor(diffvalue));
             this.drawText(newValue + (data.paramUnit ? String(data.paramUnit) : "%"), paramX + paramWidth + rightArrowWidth + x, y, paramWidth, "right");
@@ -2309,7 +2313,7 @@ Imported.NUUN_EquipStatusEX = true;
         let text = eval(data.DataEval);
         let value = 0;
         if (!isNaN(text)) {
-            value = NuunManager.numPercentage(text, data.Decimal - 2, DecimalMode);
+            value = NuunManager.numPercentage(text, (data.Decimal - 2), DecimalMode);
             text = value;
         }
         if (actor) {
@@ -2318,7 +2322,7 @@ Imported.NUUN_EquipStatusEX = true;
         this.drawRightArrow(paramX + paramWidth + x, y);
         if (this._tempActor) {
             a = this._tempActor;
-            const newValue = NuunManager.numPercentage(eval(data.DataEval), data.Decimal - 2, DecimalMode);
+            const newValue = NuunManager.numPercentage(eval(data.DataEval), (data.Decimal - 2), DecimalMode);
             if (!isNaN(text)) {
                 this.changeTextColor(ColorManager.paramchangeTextColor(getBatStatus(data.BatStatus, text, newValue)));
             } else {

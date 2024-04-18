@@ -1,4 +1,4 @@
-# [データベース上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
+# [マップ、アニメーションデータベース上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
 # Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
 #### 必須、前提プラグイン

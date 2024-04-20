@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.2.3
+ * @version 2.2.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/4/20 Ver.2.2.4
+ * Fixed an issue where the scrolling would be misaligned when saving with the number of save columns set to 2 or more.
  * 2024/2/23 Ver.2.2.3
  * Fixed an issue where saving could not be executed during event testing.
  * 2023/8/21 Ver.2.2.2
@@ -663,7 +665,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.2.3
+ * @version 2.2.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -714,6 +716,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/20 Ver.2.2.4
+ * セーブ列数を2以上にしてセーブした際に、スクロールがずれる問題を修正。
  * 2024/2/23 Ver.2.2.3
  * イベントテストでセーブが実行できない問題を修正。
  * 2023/8/21 Ver.2.2.2
@@ -1692,6 +1696,12 @@ Imported.NUUN_SaveScreen = true;
   Window_SavefileList.prototype.lineHeight = function() {
     return 30;
   };
+
+Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
+    const index = Math.max(0, this.savefileIdToIndex(savefileId));
+    this.select(index);
+    this.setTopRow(Math.floor(index / this.maxCols()) - 2);
+};
 
   const _Window_SavefileList_numVisibleRows = Window_SavefileList.prototype.numVisibleRows;
   Window_SavefileList.prototype.numVisibleRows = function() {

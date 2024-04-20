@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.0
+ * @version 3.1.1
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/20/2024 Ver.3.1.1
+ * Fixed an issue where an error occurred when setting chapters. (Reset chapter selection only)
+ * Fixed an issue where the display up to the next level was displayed based on earned experience points.
  * 4/6/2024 Ver.3.1.0
  * Added a function to display current experience points and equipment in the status.
  * 3/17/2024 Ver.3.0.3
@@ -175,8 +178,8 @@
  * @default ------------------------------
  * 
  * @param ExpDisplayMode
- * @text Display of exp
- * @desc Specifies the display of experience points.
+ * @text Display of exp gauge
+ * @desc Specifies the display of the experience value gauge.
  * @type select
  * @option None
  * @value 0
@@ -964,8 +967,8 @@
  * @value Freetext
  * @option Action target (NUUN_Destination required)(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
  * @value Destination
- * @option Captor (NUUN_Chapter required)(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
- * @value Captor
+ * @option Chapter (NUUN_Chapter required)(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
+ * @value Chapter
  * @option Limit gayge（Required "NUUN_PartyLimitGauge"）(1)(2)(3)(4)(5)
  * @value Limit_gauge
  * @option Line(1)(2)(3)(4)(5)(7)
@@ -1387,6 +1390,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/20 Ver.3.1.1
+ * チャプター設定時にエラーが出る問題を修正。(チャプター選択のみ再設定)
+ * 次のレベルまでの表示が獲得経験値で表示されていた問題を修正。
  * 2024/4/6 Ver.3.1.0
  * ステータスに現在の経験値、装備を表示する機能を追加。
  * 2024/3/17 Ver.3.0.3
@@ -1470,8 +1476,8 @@
  * @default ------------------------------
  * 
  * @param ExpDisplayMode
- * @text 経験値の表示
- * @desc 経験値の表示を指定します。
+ * @text 経験値ゲージの表示
+ * @desc 経験値ゲージの表示を指定します。
  * @type select
  * @option 表示なし
  * @value 0
@@ -2262,7 +2268,7 @@
  * @option 行動目標（要メニュー画面行動目標表示）(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
  * @value Destination
  * @option キャプター（要チャプターテキスト）(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
- * @value Captor
+ * @value Chapter
  * @option リミットゲージ（要NUUN_PartyLimitGauge）(1)(2)(3)(4)(5)
  * @value Limit_gauge
  * @option ライン(1)(2)(3)(4)(5)(7)
@@ -3432,7 +3438,7 @@ Imported.NUUN_MenuScreenEX = true;
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
-        let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.nextLevelExp() - actor.currentLevelExp());
+        let textParam = (data.DetaEval ? eval(data.DetaEval) : this.nuun_ExpNextValue(actor));
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
     };
@@ -3764,6 +3770,14 @@ Imported.NUUN_MenuScreenEX = true;
             return "-------";
         } else {
             return actor.currentExp();
+        }
+    };
+
+    Window_StatusBase.prototype.nuun_ExpNextValue = function(actor) {
+        if (actor.isMaxLevel()) {
+            return "-------";
+        } else {
+            return actor.nextRequiredExp();
         }
     };
 
@@ -4107,7 +4121,7 @@ Imported.NUUN_MenuScreenEX = true;
     Sprite_MenuGauge.prototype.displyaExp = function() {
         const mode = this.expDisplayModeParam();
         if (mode === 1) {
-            return this.currentMaxValue() - this.currentValue();
+            return this._battler.nextRequiredExp();
         } else if (mode === 2) {
             return this.currentValue();
         } else if (mode === 3) {

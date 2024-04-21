@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.4.6
+# Ver.1.4.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -53,6 +53,8 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
+2024/4/21 Ver.1.4.7  
+装備ステータス設定が1ページしか設定されていない場合、アクターを切り替えるように変更。  
 2024/4/6 Ver.1.4.6  
 追加能力値の小数点の桁数が正常に機能していない問題を修正。  
 2023/7/15 Ver.1.4.5  

@@ -1,5 +1,5 @@
 # [可変最大セーブ数](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_VariableSaveFiles.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_VariableSaveFiles.js)  
 
 
@@ -8,5 +8,7 @@
 ![gif](img/VariableSaveFiles.gif)  
 
 ## 更新履歴
+2024/4/21 Ver.1.0.1  
+新しくセーブするスロットのタイトル名を設定できる機能を追加。  
 2024/3/24 Ver.1.0.0  
 初版  

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.6
+ * @version 1.4.7
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/21/2024 Ver.1.4.7
+ * Changed to switch actors if only one page of Equipment status setting is set.
  * 4/6/2024 Ver.1.4.6
  * Fixed an issue where the number of decimal places for additional ability values was not working properly.
  * 7/15/2023 Ver.1.4.5
@@ -834,7 +836,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.6
+ * @version 1.4.7
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -863,6 +865,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/21 Ver.1.4.7
+ * 装備ステータス設定が1ページしか設定されていない場合、アクターを切り替えるように変更。
  * 2024/4/6 Ver.1.4.6
  * 追加能力値の小数点の桁数が正常に機能していない問題を修正。
  * 2023/7/15 Ver.1.4.5
@@ -1768,7 +1772,7 @@ Imported.NUUN_EquipStatusEX = true;
     };
 
     Scene_Equip.prototype.nextActor = function() {
-        if ((this._slotWindow.visible && this._slotWindow.active) || (this._itemWindow.visible && this._itemWindow.active)) {
+        if (EquipPageList.length > 1 && (this._slotWindow.visible && this._slotWindow.active) || (this._itemWindow.visible && this._itemWindow.active)) {
             this.nextPage();
         } else {
             Scene_MenuBase.prototype.nextActor.call(this);
@@ -1776,7 +1780,7 @@ Imported.NUUN_EquipStatusEX = true;
     };
     
     Scene_Equip.prototype.previousActor = function() {
-        if ((this._slotWindow.visible && this._slotWindow.active) || (this._itemWindow.visible && this._itemWindow.active)) {
+        if (EquipPageList.length > 1 && (this._slotWindow.visible && this._slotWindow.active) || (this._itemWindow.visible && this._itemWindow.active)) {
             this.previousPage();
         } else {
             Scene_MenuBase.prototype.previousActor.call(this);

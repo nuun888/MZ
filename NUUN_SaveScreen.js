@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.2.4
+ * @version 2.2.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/4/21 Ver.2.2.5
+ * Some processing changes due to variable maximum save number plugin update.
  * 2024/4/20 Ver.2.2.4
  * Fixed an issue where the scrolling would be misaligned when saving with the number of save columns set to 2 or more.
  * 2024/2/23 Ver.2.2.3
@@ -665,7 +667,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.2.4
+ * @version 2.2.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -716,6 +718,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/21 Ver.2.2.5
+ * 可変最大セーブ数プラグイン更新による一部処理の変更。
  * 2024/4/20 Ver.2.2.4
  * セーブ列数を2以上にしてセーブした際に、スクロールがずれる問題を修正。
  * 2024/2/23 Ver.2.2.3
@@ -1804,7 +1808,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
         this.drawOriginal(info, x, y, width, data, r);
         break;
       case 10:
-        this.drawTitle(info, x, y, width, data, savefileId);
+        this.drawTitle(savefileId, x, y, width, info, data);
         break;
       case 11:
         this.drawTitleName(info, x, y, width, data);
@@ -1855,7 +1859,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
   Window_SavefileList.prototype.drawContentsNotData = function(info, x, y, width, data, savefileId, r) {
     switch (data.DateSelect) {
       case 10:
-        this.drawTitle(info, x, y, width, data, savefileId);
+        this.drawTitle(savefileId, x, y, width, info, data);
         break;
       case 14:
         this.drawNotFileText(info, x, y, width, data, savefileId);
@@ -1863,7 +1867,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
     }
   };
 
-  Window_SavefileList.prototype.drawNotFileText = function(info, x, y, width, data) {
+  Window_SavefileList.prototype.drawNotFileText = function(info, x, y, width, data, savefileId) {
     if (savefileId <= 0) {
       this.drawTextEx(info.AnyName, x, y, width);
     }
@@ -1924,9 +1928,9 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
   };
 
   const _Window_SavefileList_drawTitle = Window_SavefileList.prototype.drawTitle;
-  Window_SavefileList.prototype.drawTitle = function(info, x, y, width, data, savefileId) {
+  Window_SavefileList.prototype.drawTitle = function(savefileId, x, y, width, info, data) {
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
-    _Window_SavefileList_drawTitle.call(this, savefileId, x, y);
+    _Window_SavefileList_drawTitle.apply(this, arguments);
   };
 
   Window_SavefileList.prototype.drawTitleName = function(info, x, y, width, data) {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.2.5
+ * @version 2.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/5/1 Ver.2.3.0
+ * Added a function to disable autosave execution when moving around the map or at the end of battle.
+ * Fixed so that autosave can be executed when saving is disabled.
+ * Corrected the display position of some content.
+ * Fixed many bugs.
  * 2024/4/21 Ver.2.2.5
  * Some processing changes due to variable maximum save number plugin update.
  * 2024/4/20 Ver.2.2.4
@@ -280,12 +285,30 @@
  * @min 1
  * @parent SaveFileWindow
  * 
+ * @param AutoSaveSetting
+ * @text Auto save setting
+ * @default ------------------------------
+ * 
+ * @param MapTransferAutoSave
+ * @text Auto save enabled when moving map
+ * @desc Autosave enabled when moving map.
+ * @type boolean
+ * @default true
+ * @parent AutoSaveSetting
+ * 
+ * @param BattleEndAutoSave
+ * @text Autosave enabled after battle
+ * @desc Autosave enabled after battle.
+ * @type boolean
+ * @default true
+ * @parent AutoSaveSetting
+ * 
  * @param AutoSaveEnabledSwitch
- * @desc After battle, specify a switch that prohibits auto save execution when moving. (Enabled Autosave ON)
+ * @desc After battle, specify a switch that prohibits auto save execution when moving. (0 to enable auto save)
  * @text Auto save execution prohibited when moving after battle
  * @type switch
  * @default 0
- * @parent SaveFileWindow
+ * @parent AutoSaveSetting
  * 
  * @param Contents
  * @text Each content setting
@@ -667,7 +690,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.2.5
+ * @version 2.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -718,6 +741,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/1 Ver.2.3.0
+ * マップ移動時、戦闘終了時にオートセーブの実行を非許可にする機能を追加。
+ * セーブ禁止時にオートセーブを実行できるように修正。
+ * 一部コンテンツの表示位置の修正。
+ * 多数の不具合を修正。
  * 2024/4/21 Ver.2.2.5
  * 可変最大セーブ数プラグイン更新による一部処理の変更。
  * 2024/4/20 Ver.2.2.4
@@ -942,12 +970,30 @@
  * @min 1
  * @parent SaveFileWindow
  * 
+ * @param AutoSaveSetting
+ * @text オートセーブ設定
+ * @default ------------------------------
+ * 
+ * @param MapTransferAutoSave
+ * @text マップ移動時オートセーブ有効
+ * @desc マップ移動時のオートセーブ有効。
+ * @type boolean
+ * @default true
+ * @parent AutoSaveSetting
+ * 
+ * @param BattleEndAutoSave
+ * @text 戦闘終了後オートセーブ有効
+ * @desc 戦闘終了後のオートセーブ有効。
+ * @type boolean
+ * @default true
+ * @parent AutoSaveSetting
+ * 
  * @param AutoSaveEnabledSwitch
  * @desc 戦闘後、移動時のオートセーブ実行を禁止にするスイッチを指定します。(オートセーブを有効化ON)
  * @text 戦闘後、移動時オートセーブ実行禁止
  * @type switch
  * @default 0
- * @parent SaveFileWindow
+ * @parent AutoSaveSetting
  * 
  * @param Contents
  * @text 各コンテンツ設定
@@ -957,7 +1003,7 @@
  * @desc 表示する日時フォーマット
  * @text 日時フォーマット
  * @type select
- * @option 標準（年/月/日 時：分：秒）
+ * @option 標準
  * @value 'default'
  * @option 英表記（日/月/年 時：分：秒）
  * @value 'en-GB'
@@ -1342,6 +1388,8 @@ Imported.NUUN_SaveScreen = true;
   const NumSaveCols = Number(parameters['NumSaveCols'] || 1);
   const NumSaveRows = Number(parameters['NumSaveRows'] || 5);
   const AutoSaveEnabledSwitch = Number(parameters['AutoSaveEnabledSwitch'] || 0);
+  const MapTransferAutoSave = eval(parameters['MapTransferAutoSave'] || "true");
+  const BattleEndAutoSave = eval(parameters['BattleEndAutoSave'] || "true");
   const SaveContentsCols = Number(parameters['SaveContentsCols'] || 2);
   const MaxSave = Number(parameters['MaxSave'] || 20);
   const AnyNameVariable = Number(parameters['AnyNameVariable'] || 0);
@@ -1397,6 +1445,10 @@ Imported.NUUN_SaveScreen = true;
   function getSaveContentsBuckgroundImg() {
     return !!$dataMap && $dataMap.meta && $dataMap.meta.SaveContentsBackImg ?  ContentsBackGroundImg[Number($dataMap.meta.SaveContentsBackImg) - 1] : $gameSystem.saveContentsBuckgroundImg;
   };
+
+    function isAutosaveEnabledSwitch() {
+        return AutoSaveEnabledSwitch === 0 || !$gameSwitches.value(AutoSaveEnabledSwitch);
+    };
 
 
   const _DataManager_loadSavefileImages = DataManager.loadSavefileImages;
@@ -1558,7 +1610,7 @@ Imported.NUUN_SaveScreen = true;
   const _SceneManager_push = SceneManager.push;
   SceneManager.push = function(sceneClass) {
     if (sceneClass.name === 'Scene_Battle') {
-      if ($gameSystem.isAutosaveEnabled()) {
+      if (Scene_Base.prototype.isAutosaveEnabled.call() && BattleEndAutoSave && isAutosaveEnabledSwitch()) {
         SceneManager.snapSaveBitmap(true);
       }
     }
@@ -1592,26 +1644,42 @@ Imported.NUUN_SaveScreen = true;
 
   const _Scene_Base_requestAutosave = Scene_Base.prototype.requestAutosave;
   Scene_Base.prototype.requestAutosave = function() {
-    if (AutoSaveEnabledSwitch === 0 || !$gameSwitches.value(AutoSaveEnabledSwitch)) {
-        _Scene_Base_requestAutosave.call(this);
-    }
+    _Scene_Base_requestAutosave.call(this);
   };
 
-  Scene_Base.prototype.userRequestAutosave = function() {
-    if (this.isAutosaveEnabled()) {
-        this.executeAutosave();
-    }
-  };
+    Scene_Base.prototype.userRequestAutosave = function() {
+        if (this.isUserAutosaveEnabled()) {
+            this.executeAutosave();
+        }
+    };
 
-  const _Scene_Map_updateTransferPlayer = Scene_Map.prototype.updateTransferPlayer;
-  Scene_Map.prototype.updateTransferPlayer = function() {
-    if ($gamePlayer.isTransferring()) {
-      if ($gameSystem.isAutosaveEnabled()) {
-        SceneManager.snapSaveBitmap(true);
-      }
-    }
-    _Scene_Map_updateTransferPlayer.call(this);
-  };
+    Scene_Base.prototype.isUserAutosaveEnabled = function() {
+        return (
+            !DataManager.isBattleTest() &&
+            !DataManager.isEventTest() &&
+            $gameSystem.isAutosaveEnabled()
+        );
+    };
+
+    const _Scene_Map_updateTransferPlayer = Scene_Map.prototype.updateTransferPlayer;
+    Scene_Map.prototype.updateTransferPlayer = function() {
+        if ($gamePlayer.isTransferring()) {
+            if (this.isAutosaveEnabled() && MapTransferAutoSave && isAutosaveEnabledSwitch()) {
+                SceneManager.snapSaveBitmap(true);
+            }
+        }
+        _Scene_Map_updateTransferPlayer.call(this);
+    };
+
+    const _Scene_Map_shouldAutosave = Scene_Map.prototype.shouldAutosave;
+    Scene_Map.prototype.shouldAutosave = function() {
+        return _Scene_Map_shouldAutosave.apply(this, arguments) && MapTransferAutoSave && isAutosaveEnabledSwitch();
+    };
+
+    const _Scene_Battle_shouldAutosave = Scene_Battle.prototype.shouldAutosave;
+    Scene_Battle.prototype.shouldAutosave = function() {
+        return _Scene_Battle_shouldAutosave.apply(this, arguments) && BattleEndAutoSave && isAutosaveEnabledSwitch();
+    };
   
 
   const _Scene_File_create = Scene_File.prototype.create;
@@ -1640,7 +1708,7 @@ Imported.NUUN_SaveScreen = true;
     Scene_MenuBase.prototype.createBackground.call(this);
     if (BackGroundImg) {
       let data = null;
-      if (this.mode() === 'save') {
+      if (this._mode === 'save') {
         data = $gameSystem.getSaveBuckGround();
       } else {
         data = DataManager.loadBackground() || BackGroundImg;
@@ -1875,7 +1943,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
 
   Window_SavefileList.prototype.drawPlaytime = function(info, x, y, width, data) {
     const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
-    const padding = this.itemPadding();
+    const padding = data.ParamName ? this.itemPadding() : 0;
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     this.drawSystemText(x, y , systemWidth, data);
     if (info.playtime) {
@@ -1885,7 +1953,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
 
   Window_SavefileList.prototype.drawDayTime = function(info, x, y, width, data) {
     const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
-    const padding = this.itemPadding();
+    const padding = data.ParamName ? this.itemPadding() : 0;
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     this.drawSystemText(x, y , systemWidth, data);
     if (info.timestamp) {
@@ -1897,7 +1965,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
 
   Window_SavefileList.prototype.drawMapName = function(info, x, y, width, data) {
     const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
-    const padding = this.itemPadding();
+    const padding = data.ParamName ? this.itemPadding() : 0;
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     this.drawSystemText(x, y , systemWidth, data);
     if (info.mapname) {
@@ -1907,7 +1975,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
 
   Window_SavefileList.prototype.drawGold = function(info, x, y, width, data) {
     const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
-    const padding = this.itemPadding();
+    const padding = data.ParamName ? this.itemPadding() : 0;
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     this.drawSystemText(x, y , systemWidth, data);
     if (info.gold !== undefined) {
@@ -1918,7 +1986,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
 
   Window_SavefileList.prototype.drawOriginal = function(info, x, y, width, data, index) {
     const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
-    const padding = this.itemPadding();
+    const padding = data.ParamName ? this.itemPadding() : 0;
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     this.drawSystemText(x, y , systemWidth, data);
     const text = info["orgParam_"+ String(index)];
@@ -2028,7 +2096,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
             const _info = info["svActor_"+ String(index)] || [];
             for (const data of _info) {
                 this.drawSvActor(data[0], svX, y);
-                svX += (data.ItemWidth || 48) + colSpacing / 2;
+                svX += (data.ItemWidth || 48);
             }
         } else if (info.svActor) {
             if (SvSpecifyActorOnry) {
@@ -2037,7 +2105,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
             } else {
                 for (const data of info.svActor) {
                     this.drawSvActor(data[0], svX, y);
-                    svX += (data.ItemWidth || 48) + colSpacing / 2;
+                    svX += (data.ItemWidth || 48);
                 }
             }
         }
@@ -2063,7 +2131,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
     this.resetTextColor();
     let nameX = x;
     if (!!data.ShowEval) {
-        const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+        const width2 = (data.ItemWidth || 48);
         const actorName = (info["actorName_"+ String(index)] || []);
         for (const name of actorName) {
             this.drawText(name , nameX, y, width2 - padding, data.Align);
@@ -2074,7 +2142,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
             const name = info.actorName[0];
             this.drawText(name , x, y, width, data.Align);
         } else {
-            const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+            const width2 = (data.ItemWidth || 48);
             for (const name of info.actorName) {
                 this.drawText(name , nameX, y, width2 - padding, data.Align);
                 nameX += width2;
@@ -2091,11 +2159,11 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
       this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
       this.resetTextColor();
       if (ClassSpecifyActorOnry) {
-        const name = info.actorClasse[0];
+        const name = info.actorClass[0];
         this.drawText(name , x, y, width, data.Align);
       } else {
         let nameX = x;
-        const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+        const width2 = (data.ItemWidth || 48);
         for (const name of info.actorClass) {
           this.drawText(name , nameX, y, width2 - padding, data.Align);
           nameX += width2;
@@ -2116,7 +2184,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
         this.drawText(name , x, y, width, data.Align);
       } else {
         let nameX = x;
-        const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+        const width2 = (data.ItemWidth || 48);
         for (const name of info.actorNickName) {
           this.drawText(name , nameX, y, width2 - padding, data.Align);
           nameX += width2;
@@ -2133,7 +2201,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
         let levelActorX = x;
         if (!!data.ShowEval) {
             const levelActor = (info["levelActor_"+ String(index)] || []);
-            const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+            const width2 = (data.ItemWidth || 48);
             for (const level of levelActor) {
                 this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
                 this.drawText(TextManager.levelA, levelActorX + padding / 4, y, textWidth);
@@ -2149,7 +2217,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
                 this.resetTextColor();
                 this.drawText(level, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
             } else {
-                const width2 = (data.ItemWidth || 48) + colSpacing / 2;
+                const width2 = (data.ItemWidth || 48);
                 for (const level of info.levelActor) {
                     this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
                     this.drawText(TextManager.levelA, levelActorX + padding / 4, y, textWidth);

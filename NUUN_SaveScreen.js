@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 2.3.0
+ * @version 2.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -56,6 +56,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/5/2 Ver.2.3.1
+ * Corrected an issue where an error message was not displayed when displayed alone.
  * 2024/5/1 Ver.2.3.0
  * Added a function to disable autosave execution when moving around the map or at the end of battle.
  * Fixed so that autosave can be executed when saving is disabled.
@@ -690,7 +692,7 @@
  * @target MZ
  * @plugindesc セーブ画面拡張
  * @author NUUN
- * @version 2.3.0
+ * @version 2.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -741,6 +743,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/2 Ver.2.3.1
+ * 単体表示でエラーが出る表示がされない問題を修正。
  * 2024/5/1 Ver.2.3.0
  * マップ移動時、戦闘終了時にオートセーブの実行を非許可にする機能を追加。
  * セーブ禁止時にオートセーブを実行できるように修正。
@@ -2101,7 +2105,7 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
         } else if (info.svActor) {
             if (SvSpecifyActorOnry) {
                 const data = _info[0];
-                this.drawSvActor(data, characterX, y);
+                this.drawSvActor(data, x, y);
             } else {
                 for (const data of info.svActor) {
                     this.drawSvActor(data[0], svX, y);
@@ -2390,11 +2394,11 @@ Window_SavefileList.prototype.selectSavefile = function(savefileId) {//再定義
     };
 
     Game_Party.prototype.actorLevelFilterForSavefile = function(data) {
-        return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => [actor._level]);
+        return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => actor._level);
     };
     
     Game_Party.prototype.actorNameFilterForSavefile = function(data) {
-        return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => [actor.name()]);
+        return this.allMembers().filter(actor => eval(data.ShowEval)).map(actor => actor.name());
     };
 
 })();

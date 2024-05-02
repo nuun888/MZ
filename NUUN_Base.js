@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.1
+ * @version 1.7.2
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/3/2024 Ver.1.7.2
+ * Added MV specification gauge processing.
+ * Fixed some processing.
  * 3/17/2024 Ver.1.7.1
  * Added font handling for numbers and units.
  * 1/6/2023 Ver.1.7.0
@@ -91,7 +94,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.1
+ * @version 1.7.2
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -101,6 +104,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/3 Ver.1.7.2
+ * MV仕様のゲージ処理追加。
+ * 一部処理の修正。
  * 2024/3/17 Ver.1.7.1
  * 数値と単位のフォント処理の追加。
  * 2024/1/6 Ver.1.7.0
@@ -187,49 +193,52 @@ class Nuun_PluginParams {
     static getPluginParams(text) {//document.currentScript
         const name = String(Utils.extractFileName(text.src).split('.').shift());
         const params = PluginManager.parameters(name);
-        return params ? this.getStructureData(params) : {};
+        if (params) {
+            const pluginParam = new Nuun_PluginParamData(params);
+            return pluginParam.getParameters();
+        }
+        return {};
+    }
+};
+
+window.Nuun_PluginParams = Nuun_PluginParams;
+
+class Nuun_PluginParamData {
+    constructor(text) {
+        this._parameters = JSON.parse(JSON.stringify(text, this._convertParams));
     }
 
-    static getStructureData(params) {
-        return JSON.parse(JSON.stringify(params, function(key, value) {
-            try {
-                return JSON.parse(value);
-            } catch (e) {
-                try {
-                  return Nuun_PluginParams.getEvalCode(value);
-                } catch (e) {
-                  return value;
-                }
-            }
-        }));
-    };
-
-    static getStringCode(code) {
-        if (!code) {
-            return null;
-        }
+    _convertParams(key, code) {
         try {
-            if (code.indexOf("'") === 0 || code.indexOf('"' === 0)) {
-                return eval(code);//'または"を外す。
-            }
-            return !!code ? String(code) : null;
+            return JSON.parse(code);
         } catch (e) {
-            return !!code ? String(code) : null;
-        }
-    }
-
-    static getEvalCode(code) {
-        if (isNaN(code)) {
-            if (!code) {
-                return null;
+            if (isNaN(code)) {
+                if (!code) {
+                    return null;
+                }
+                try {
+                    if (code.indexOf("'") === 0 || code.indexOf('"' === 0)) {
+                        return eval(code);//'または"を外す。
+                    }
+                    return !!code ? String(code) : null;
+                } catch (e) {
+                    if (typeof {} === "object") {
+                        return code;
+                    }
+                    return !!code ? String(code) : null;
+                }
+            } else {
+                return String(code);
             }
-            return this.stringCode(code);
-        } else {
-            return String(code);
         }
     }
 
-    static getMetaTag(object, code) {
+    getParameters() {
+        return this._parameters;
+    }
+
+
+    getMetaTag(object, code) {
         const data = object.meta[code];
         let list = [];
         if (data !== undefined) {
@@ -247,7 +256,7 @@ class Nuun_PluginParams {
         }
     }
 
-    static getTextCodeMeta(text) {
+    getTextCodeMeta(text) {
         if (isNaN(text)) {
             return text;
         } else {
@@ -256,7 +265,6 @@ class Nuun_PluginParams {
     }
 };
 
-window.Nuun_PluginParams = Nuun_PluginParams;
 
 class Nuun_TempParam {
     constructor() {
@@ -288,14 +296,26 @@ class Nuun_TempParam {
 window.Nuun_TempParam = Nuun_TempParam;
 
 function structureData(params) {
-  return JSON.parse(JSON.stringify(params, function(key, value) {
+    return JSON.parse(JSON.stringify(params, function(key, value) {
+        try {
+            return JSON.parse(value);
+        } catch (e) {
+            return NuunManager.getEvalCode(value);
+        }
+    }));
+};
+
+function stringCode(code) {
     try {
-        return JSON.parse(value);
+        if (code.indexOf("'") === 0 || code.indexOf('"' === 0)) {
+            return eval(code);//'または"を外す。
+        }
+        return !!code ? String(code) : null;
     } catch (e) {
-        return NuunManager.getEvalCode(value);
+        return code;
     }
-  }));
-}
+};
+
 
 function nuun_GausePlugins() {
     return (
@@ -360,17 +380,6 @@ NuunManager.getEvalCode = function(code) {
         return stringCode(code);
     } else {
         return String(code);
-    }
-};
-
-function stringCode(code) {
-    try {
-        if (code.indexOf("'") === 0 || code.indexOf('"' === 0)) {
-            return eval(code);//'または"を外す。
-        }
-        return !!code ? String(code) : null;
-    } catch (e) {
-        return !!code ? String(code) : null;
     }
 };
 
@@ -516,6 +525,21 @@ const _Window_Base_resetFontSettings = Window_Base.prototype.resetFontSettings;
 Window_Base.prototype.resetFontSettings = function() {
     _Window_Base_resetFontSettings.call(this);
     NuunManager.resetFontFace();
+};
+
+Window_Base.prototype.nuun_DrawActorGauge = function(text, x, y, width, param, maxParam, color1, color2, sColor = ColorManager.systemColor(), status) {
+    this.nuun_DrawGauge(x, y, width, param / maxParam, color1, color2);
+    this.changeTextColor(sColor);
+    this.drawText(text, x, y + 8, width, "left");
+    this.resetTextColor();
+    this.drawText(param, x, y + 8, width, "right");
+};
+
+Window_Base.prototype.nuun_DrawGauge = function(x, y, width, rate, color1, color2) {
+    const fillW = Math.floor((width - 2) * rate);
+    const gaugeY = y + this.lineHeight() - 8;
+    this.contents.fillRect(x, gaugeY, width, 12, ColorManager.gaugeBackColor());
+    this.contents.gradientFillRect(x + 1, gaugeY + 1, fillW, 10, color1, color2);
 };
 
 Window_Base.prototype.nuun_setFontFace = function() {

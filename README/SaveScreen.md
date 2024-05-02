@@ -12,7 +12,7 @@
 ![画像](img/NUUN_SaveScreen1.png)  
 ※![画像](img/SaveScreen2.png)  
 Type2  
-![画像](img/SaveScreen3.png)  
+![画像](img/SaveScreen6.png)  
 
 ※は設定例です。  
 ## 設定

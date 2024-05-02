@@ -10,7 +10,8 @@
 セーブ画面をカスタマイズできます。　　
 
 ![画像](img/NUUN_SaveScreen1.png)  
-※![画像](img/SaveScreen2.png)  
+※  
+![画像](img/SaveScreen2.png)  
 Type2  
 ![画像](img/SaveScreen6.png)  
 

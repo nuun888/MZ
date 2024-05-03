@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.0
+ * @version 3.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,6 +70,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/4/2024 Ver.3.0.1
+ * Fixed an issue where parameters were not retrieved.
  * 5/3/2024 Ver.3.0.0
  * First edition.
  * 
@@ -1252,7 +1254,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.0
+ * @version 3.0.1
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1315,6 +1317,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/4 Ver.3.0.1
+ * パラメータが取得されない問題を修正。
  * 2024/5/3 Ver.3.0.0
  * 初版
  * 
@@ -2507,8 +2511,7 @@ Imported.NUUN_SaveScreen_3 = true;
     };
 
     function allContentsList() {
-        const list = [];
-        list.concat(saveLayout.SaveMainWindowList.ContentsList || []);
+        const list = saveLayout.SaveMainWindowList.ContentsList.map(data => data);
         if (saveLayout.SaveStatusWindowList) {
             saveLayout.SaveStatusWindowList.forEach(data => {
                 const method = "PageList"+ data.ListDateSetting;
@@ -2604,6 +2607,7 @@ Imported.NUUN_SaveScreen_3 = true;
                     this.setOrgParams(info, contents, actor);
                     break;
                 case 'Chapter':
+                    
                     if (Imported.NUUN_Chapter) {
                         info.AnyName = $gameSystem.getChapter();
                     } else {

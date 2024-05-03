@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.2
+ * @version 1.7.3
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/4/2024 Ver.1.7.3
+ * Corrected display of MV type gauge.
  * 5/3/2024 Ver.1.7.2
  * Added MV specification gauge processing.
  * Fixed some processing.
@@ -94,7 +96,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.2
+ * @version 1.7.3
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -104,6 +106,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/4 Ver.1.7.3
+ * MV式ゲージを表示を修正。
  * 2024/5/3 Ver.1.7.2
  * MV仕様のゲージ処理追加。
  * 一部処理の修正。
@@ -528,18 +532,55 @@ Window_Base.prototype.resetFontSettings = function() {
 };
 
 Window_Base.prototype.nuun_DrawActorGauge = function(text, x, y, width, param, maxParam, color1, color2, sColor = ColorManager.systemColor(), status) {
-    this.nuun_DrawGauge(x, y, width, param / maxParam, color1, color2);
     this.changeTextColor(sColor);
-    this.drawText(text, x, y + 8, width, "left");
+    this.nuun_setFontFace();
+    this.contents.fontSize = $gameSystem.mainFontSize() - 2;
+    this.nuun_DrawGauge(x, y, width, param / maxParam, color1, color2, status);
+    this.drawText(text, x, y + 11, width, "left");
     this.resetTextColor();
+    this.nuun_setValueFontFace();
+    this.contents.fontSize = $gameSystem.mainFontSize() - 6;
     this.drawText(param, x, y + 8, width, "right");
 };
 
-Window_Base.prototype.nuun_DrawGauge = function(x, y, width, rate, color1, color2) {
+Window_Base.prototype.nuun_DrawGauge = function(x, y, width, rate, color1, color2, status) {
+    const labelWidth = status === "time" ? 0 : this.nuun_LabelWidth() + 6;
+    const gaugeX = x + labelWidth;
+    const gaugeY = y + this.lineHeight() - 10;
+    width -= labelWidth;
     const fillW = Math.floor((width - 2) * rate);
-    const gaugeY = y + this.lineHeight() - 8;
-    this.contents.fillRect(x, gaugeY, width, 12, ColorManager.gaugeBackColor());
-    this.contents.gradientFillRect(x + 1, gaugeY + 1, fillW, 10, color1, color2);
+    const fillH = 10;
+    this.contents.fillRect(gaugeX, gaugeY, width, 12, ColorManager.gaugeBackColor());
+    this.contents.gradientFillRect(gaugeX + 1, gaugeY + 1, fillW, fillH, color1, color2);
+};
+
+Window_Base.prototype.nuun_LabelWidth = function() {
+    const labels = [TextManager.hpA, TextManager.mpA, TextManager.tpA];
+    const widths = labels.map(str => this.textWidth(str));
+    return Math.ceil(Math.max(...widths));
+};
+
+Window_Base.prototype.nuun_DrawContentsParamUnitText = function(text, data, x, y, width) {
+    const padding = this.itemPadding();
+    const unit = data.paramUnit;
+    const unitWidth = unit ? this.textWidth(unit) + padding : 0;
+    this.resetTextColor();
+    if (NuunManager.isFontFace()) {
+        isNaN(text) ? this.nuun_setFontFace() : this.nuun_setValueFontFace();
+    }
+    this.drawText(text, x, y, width - unitWidth, data.Align);
+    if (unit) {
+        this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+        this.nuun_setFontFace();
+        const textWidth = Math.min(this.textWidth(text), width - unitWidth);
+        if (data.Align === 'left') {
+            this.drawText(unit, x + textWidth + padding, y, width);
+        } else if (data.Align === 'right') {
+            this.drawText(unit, x + width - unitWidth + padding, y, width);
+        } else {
+            this.drawText(unit, x + Math.floor(width / 2) + Math.floor(textWidth / 2) - padding, y, width);
+        }
+    }
 };
 
 Window_Base.prototype.nuun_setFontFace = function() {

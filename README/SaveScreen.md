@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# 新版Ver.3.0.0
+# 新版Ver.3.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen_3.js)  
 # 旧版Ver.2.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
@@ -69,6 +69,8 @@ actor:$gameActors (指定のアクター変更で指定したアクター(指定
 
 
 ## 更新履歴 
+2024/5/4 Ver.3.0.1   
+パラメータが取得されない問題を修正。 
 2024/5/3 Ver.3.0.0  
 初版
 2024/5/2 Ver.2.3.1  

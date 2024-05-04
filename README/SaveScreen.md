@@ -4,7 +4,7 @@
 # 旧版Ver.2.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
 #### 必須プラグイン
-[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)Ver.1.6.2以降  
+[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)Ver.1.7.3以降  
 
 
 セーブ画面をカスタマイズできます。　　

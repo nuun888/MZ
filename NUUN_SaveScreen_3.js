@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.1
+ * @version 3.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,6 +70,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/5/2024 Ver.3.0.2
+ * Fixed an issue where actor original parameters were not displayed.
+ * Fixed an issue where plugin commands could not be executed.
+ * Added units.
  * 5/4/2024 Ver.3.0.1
  * Fixed an issue where parameters were not retrieved.
  * 5/3/2024 Ver.3.0.0
@@ -309,7 +313,7 @@
  * @desc Set up the help window.
  * @text Save help window settings
  * @type struct<SaveHelpWindowListData>
- * @default {"MethodName":"","WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0","WindowHeightRows":"1"}
+ * @default {"MethodName":"","WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0","WindowHeightRows":"1","WindowVisible":"true"}
  * @parent ContentsSetting
  * 
  * @param SaveMainWindowList
@@ -802,7 +806,7 @@
  * @value Lcation
  * @option Money(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value Gold
- * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
+ * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)
  * @value OriginalParam
  * @option Fail name(1)(2)(3)(4)(5)(8)
  * @value FileName
@@ -810,7 +814,7 @@
  * @value Title
  * @option Chapter(1)(2)(3)(4)(5)(8)(11)
  * @value Chapter
- * @option Destination(1)(2)(3)(4)(5)(8)(11)
+ * @option Action goal(1)(2)(3)(4)(5)(8)(11)
  * @value ActionGoal
  * @option Actor name (x)(1)(2)(3)(4)(5)(8)(12)(13)
  * @value ActorName
@@ -917,7 +921,7 @@
  * @desc Align.
  * @text Align(11)
  * @type select
- * @option Text code can be used (left)
+ * @option Text code can be used (left) "Chapter" and "Action goal" only.
  * @value "TextEx"
  * @option Left
  * @value "left"
@@ -947,6 +951,12 @@
  * @type string
  * @default 
  * 
+ * @param paramUnit
+ * @desc Unit.
+ * @text Unit(15)
+ * @type string
+ * @default
+ * 
  * 
  */
 /*~struct~StatusListData:
@@ -965,7 +975,7 @@
  * @value Lcation
  * @option Money(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value Gold
- * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
+ * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)
  * @value OriginalParam
  * @option Fail name(1)(2)(3)(4)(5)(8)
  * @value FileName
@@ -973,7 +983,7 @@
  * @value Title
  * @option Chapter(1)(2)(3)(4)(5)(8)(11)
  * @value Chapter
- * @option Destination(1)(2)(3)(4)(5)(8)(11)
+ * @option Action goal(1)(2)(3)(4)(5)(8)(11)
  * @value ActionGoal
  * @option Actor name (x)(1)(2)(3)(4)(5)(8)(12)(13)
  * @value ActorName
@@ -999,19 +1009,19 @@
  * @value HP
  * @option MP (x)(1)(2)(3)(4)(5)(7)
  * @value MP
- * @option ATK (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option ATK (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Atk
- * @option DEF (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option DEF (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Def
- * @option MAT (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option MAT (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Mat
- * @option MDF (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option MDF (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Mdf
- * @option AGI (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option AGI (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Agi
- * @option LUK (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option LUK (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Luk
- * @option Actor original params (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(13)
+ * @option Actor original params (x)(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(13)(15)
  * @value ActorOriginalParam
  * @default None
  * 
@@ -1098,7 +1108,7 @@
  * @desc Align.
  * @text Align(11)
  * @type select
- * @option Text code can be used (left)
+ * @option Text code can be used (left) "Chapter" and "Action goal" only.
  * @value "TextEx"
  * @option Left
  * @value "left"
@@ -1127,6 +1137,12 @@
  * @text Text(14)
  * @type string
  * @default 
+ * 
+ * @param paramUnit
+ * @desc Unit.
+ * @text Unit(15)
+ * @type string
+ * @default
  * 
  * 
  */
@@ -1254,7 +1270,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.1
+ * @version 3.0.2
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1317,6 +1333,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/5 Ver.3.0.2
+ * アクターオリジナルパラメータが表示されない問題を修正。
+ * プラグインコマンドが実行できない問題を修正。
+ * 単位を追加。
  * 2024/5/4 Ver.3.0.1
  * パラメータが取得されない問題を修正。
  * 2024/5/3 Ver.3.0.0
@@ -1556,7 +1576,7 @@
  * @desc ヘルプウィンドウを設定する
  * @text セーブヘルプウィンドウ設定
  * @type struct<SaveHelpWindowListData>
- * @default {"MethodName":"","WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0","WindowHeightRows":"1"}
+ * @default {"MethodName":"","WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0","WindowHeightRows":"1","WindowVisible":"true"}
  * @parent ContentsSetting
  * 
  * @param SaveMainWindowList
@@ -2049,7 +2069,7 @@
  * @value Lcation
  * @option 所持金(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value Gold
- * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
+ * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)
  * @value OriginalParam
  * @option ファイル名(1)(2)(3)(4)(5)(8)
  * @value FileName
@@ -2164,7 +2184,7 @@
  * @desc 文字揃え。
  * @text 文字揃え(11)
  * @type select
- * @option 制御文字使用可(左揃え)
+ * @option 制御文字使用可(左揃え)章と行動目標のみ
  * @value "TextEx"
  * @option 左
  * @value "left"
@@ -2194,6 +2214,12 @@
  * @type string
  * @default 
  * 
+ * @param paramUnit
+ * @desc 単位。
+ * @text 単位(15)
+ * @type string
+ * @default
+ * 
  * 
  */
 /*~struct~StatusListData:ja
@@ -2212,7 +2238,7 @@
  * @value Lcation
  * @option 所持金(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value Gold
- * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)
+ * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)
  * @value OriginalParam
  * @option ファイル名(1)(2)(3)(4)(5)(8)
  * @value FileName
@@ -2246,19 +2272,19 @@
  * @value HP
  * @option MP※(1)(2)(3)(4)(5)(7)
  * @value MP
- * @option 攻撃力※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option 攻撃力※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Atk
- * @option 防御力※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option 防御力※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Def
- * @option 魔法力※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option 魔法力※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Mat
- * @option 魔法防御※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option 魔法防御※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Mdf
- * @option 敏捷性※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option 敏捷性※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Agi
- * @option 運※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
+ * @option 運※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(15)
  * @value Luk
- * @option アクターオリジナルパラメータ※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(13)
+ * @option アクターオリジナルパラメータ※(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(13)(15)
  * @value ActorOriginalParam
  * @default None
  * 
@@ -2345,7 +2371,7 @@
  * @desc 文字揃え。
  * @text 文字揃え(11)
  * @type select
- * @option 制御文字使用可(左揃え)
+ * @option 制御文字使用可(左揃え)章と行動目標のみ
  * @value "TextEx"
  * @option 左
  * @value "left"
@@ -2374,6 +2400,12 @@
  * @text テキスト(14)
  * @type string
  * @default 
+ * 
+ * @param paramUnit
+ * @desc 単位。
+ * @text 単位(15)
+ * @type string
+ * @default
  * 
  * 
  */
@@ -2525,7 +2557,7 @@ Imported.NUUN_SaveScreen_3 = true;
         return params.AutoSaveEnabledSwitch === 0 || !$gameSwitches.value(params.AutoSaveEnabledSwitch);
     };
 
-    const pluginName = "NUUN_SaveScreen_2";
+    const pluginName = "NUUN_SaveScreen_3";
     PluginManager.registerCommand(pluginName, 'ChangeBackground', args => {
         const data = String(args.BackGroundImg);
         if (data) {
@@ -2679,6 +2711,9 @@ Imported.NUUN_SaveScreen_3 = true;
                     break;
                 case 'ActorOriginalParam':
                     info["orgParam_"+ String(contents.MethodName)] = this.actorOriginalParamForSavefile();
+                    break;
+                case 'Imges':
+                    
                     break;
             }
         }
@@ -3228,17 +3263,16 @@ Imported.NUUN_SaveScreen_3 = true;
 
     Window_Base.prototype.nuun_DrawSaveContentsOriginalParam = function(info, x, y, width, data) {
         if (info) {
-            const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
-            const padding = data.ParamName ? this.itemPadding() : 0;
             this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+            const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
             this.drawSystemText(x, y , systemWidth, data);
             const text = info["orgParam_"+ String(data.MethodName)];
             if (text !== undefined) {
-                this.drawText(text, x + systemWidth + padding, y, width - (systemWidth + padding), data.Align);
+                const padding = data.ParamName ? this.itemPadding(): 0;
+                this.nuun_DrawContentsParamUnitText(text, data, x + systemWidth + padding, y, width - (systemWidth + padding));
             }
         }
     };
-
 
     Window_SavefileList.prototype.nuun_DrawSaveContentsFileName = function(info, x, y, width, data, savefileId) {
         this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
@@ -3753,7 +3787,7 @@ Imported.NUUN_SaveScreen_3 = true;
             this.nuun_DrawSaveContentsParams(info.actorLuk, x, y, width, data, 7);
         }
     };
-
+    
     Window_SaveStatusContentsWindow.prototype.nuun_DrawSaveContentsParams = function(actors, x, y, width, data, param) {
         const padding = this.itemPadding();
         this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
@@ -3763,14 +3797,33 @@ Imported.NUUN_SaveScreen_3 = true;
         if (saveLayout.PartyActorMode === 'Actor') {
             const value = actors[0];
             this.drawSystemText(x, y , systemWidth, data, name);
-            this.resetTextColor();
-            this.drawText(value, x + systemWidth + padding, y, width - (systemWidth + padding), data.Align);
+            this.nuun_DrawContentsParamUnitText(value, data, x + systemWidth + padding, y, width - (systemWidth + padding));
         } else {
             actors.forEach((value, i) => {
                 this.drawSystemText(this.nuun_ColsContentsX(x, width2, i), this.nuun_ColsContentsY(y, i) , systemWidth, data, name);
-                this.resetTextColor();
-                this.drawText(value, this.nuun_ColsContentsX(x + systemWidth + padding / 2, width2, i), this.nuun_ColsContentsY(y, i), width - (systemWidth + padding), data.Align);
+                this.nuun_DrawContentsParamUnitText(value, data, this.nuun_ColsContentsX(x + systemWidth + padding / 2, width2, i), this.nuun_ColsContentsY(y, i), width - (systemWidth + padding));
             });
+        }
+    };
+
+    Window_SaveStatusContentsWindow.prototype.nuun_DrawSaveContentsActorOriginalParam = function(info, x, y, width, data) {
+        if (info) {
+            const padding = data.ParamName ? this.itemPadding(): 0;
+            this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+            const systemWidth = data.ParamName ? (data.SystemItemWidth || 100) : 0;
+            const _info = info["orgParam_"+ String(data.MethodName)];
+            const width2 = this.getActorAreaWidth();
+            if (saveLayout.PartyActorMode === 'Actor') {
+                if (_info) {
+                    this.drawSystemText(x, y , systemWidth, data);
+                    this.nuun_DrawContentsParamUnitText(_info[0], data, x + systemWidth + padding, y, width - (systemWidth + padding));
+                }
+            } else {
+                _info.forEach((value, i) => {
+                    this.drawSystemText(this.nuun_ColsContentsX(x, width2, i), this.nuun_ColsContentsY(y, i) , systemWidth, data);
+                    this.nuun_DrawContentsParamUnitText(value, data, this.nuun_ColsContentsX(x + systemWidth + padding / 2, width2, i), this.nuun_ColsContentsY(y, i), width - (systemWidth + padding));
+                });
+            }
         }
     };
     

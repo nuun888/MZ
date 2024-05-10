@@ -1,5 +1,5 @@
 # [盗みスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)
-# Ver.1.4.1
+# Ver.1.4.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -109,6 +109,9 @@
 %1使用者　%2対象　%3盗んだアイテムまたは金額  
  
 ## 更新履歴
+2024/5/11 Ver 1.4.2  
+味方同士に対して盗みを実行しないように修正。  
+位相を修正。  
 2022/7/2 Ver 1.4.1  
 リザルトに盗んだアイテムを表示するための処理を追加。  
 2022/6/14 Ver 1.4.0  

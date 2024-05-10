@@ -223,7 +223,9 @@
  * @text 位相
  * @desc 位相。
  * @type number
- * @default 50
+ * @default 0
+ * @max 100
+ * @min -100
  * @parent SuccessSE
  * 
  * @param GoldSuccessSE

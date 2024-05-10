@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル、アイテム
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -106,6 +106,9 @@
  * 
  * 
  * 更新履歴
+ * 2024/5/11 Ver 1.4.2
+ * 味方同士に対して盗みを実行しないように修正。
+ * 位相を修正。
  * 2022/7/2 Ver 1.4.1
  * リザルトに盗んだアイテムを表示するための処理を追加。
  * 2022/6/14 Ver 1.4.0
@@ -252,7 +255,9 @@
  * @text 位相
  * @desc 位相。
  * @type number
- * @default 50
+ * @default 0
+ * @max 100
+ * @min -100
  * @parent GoldSuccessSE
  * 
  * 
@@ -412,16 +417,16 @@ Game_Action.prototype.applyItemUserEffect = function(target) {
 	_Game_Action_applyItemUserEffect.call(this, target);
 };
 
-Game_Action.prototype.getSteal = function(target){
+Game_Action.prototype.getSteal = function(target) {
 	if (target.result().isHit()) {
-		if (target.isEnemy()) {
+		if (target.isEnemy() && !this.subject().isEnemy()) {
 			if(this.item().meta.stealSkill){
 				this.stealItems(target);
 			}
 			if(this.item().meta.goldStealSkill){
 				this.stealGold(target);
 			}
-		} else {
+		} else if (target.isActor() && !this.subject().isActor()) {
 			if(this.item().meta.stealSkill){
 				this.stolenItem(target);
 			}

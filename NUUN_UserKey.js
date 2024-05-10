@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.6
+ * @version 1.2.7
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
@@ -28,6 +28,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/11/2024 Ver.1.2.7
+ * Added the ability to play SE when a valid key is pressed.
  * 8/4/2023 Ver.1.2.6
  * Added a function to enable keys and buttons (gamepad) under certain conditions.
  * 4/9/2023 Ver.1.2.5
@@ -329,6 +331,42 @@
  * @option "Scene_Battle"
  * @default
  * @parent SceneKeyAndButtonSetting
+ * 
+ * @param KeyPlaySe
+ * @text Play SE
+ * @desc Play SE.
+ * @default 
+ * @type struct<PlaySe>
+ * @parent SceneKeyAndButtonSetting
+ */
+/*~struct~PlaySe:
+ * 
+ * @param name
+ * @text SE
+ * @desc Play se.
+ * @type file
+ * @dir audio/se/
+ * 
+ * @param volume
+ * @text Volume
+ * @desc Set the volume to SE.
+ * @type number
+ * @default 90
+ * 
+ * @param pitch
+ * @text Pitch
+ * @desc Set the pitch to SE.
+ * @type number
+ * @default 100
+ * 
+ * @param pan
+ * @text Pan
+ * @desc Set the phase to SE.
+ * @type number
+ * @default 0
+ * @max 100
+ * @min -100
+ * 
  */
 /*:ja
  * @target MZ
@@ -336,7 +374,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.6
+ * @version 1.2.7
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
@@ -351,6 +389,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/4/11 Ver.1.2.7
+ * 有効なキーを押されたときにSEを再生する機能を追加。
  * 2023/8/4 Ver.1.2.6
  * 特定の条件でキー、ボタン(ゲームパッド)を有効にする機能を追加。
  * 2023/4/9 Ver.1.2.5
@@ -654,6 +694,42 @@
  * @default
  * @parent SceneKeyAndButtonSetting
  * 
+ * @param KeyPlaySe
+ * @text 再生SE
+ * @desc 再生するSE。
+ * @default 
+ * @type struct<PlaySe>
+ * @parent SceneKeyAndButtonSetting
+ * 
+ */
+/*~struct~PlaySe:ja
+ * 
+ * @param name
+ * @text SE
+ * @desc 再生SE
+ * @type file
+ * @dir audio/se/
+ * 
+ * @param volume
+ * @text 音量
+ * @desc 音量。
+ * @type number
+ * @default 90
+ * 
+ * @param pitch
+ * @text ピッチ
+ * @desc ピッチ。
+ * @type number
+ * @default 100
+ * 
+ * @param pan
+ * @text 位相
+ * @desc 位相。
+ * @type number
+ * @default 0
+ * @max 100
+ * @min -100
+ * 
  */
 
 var Imported = Imported || {};
@@ -666,6 +742,12 @@ Imported.NUUN_BankSystem = true;
 
     const keyMapper = Input.keyMapper;
     const gamepadMapper = Input.gamepadMapper;
+
+    function playUserOkSound(playSe) {
+        if (!!playSe) {
+            AudioManager.playStaticSe(playSe);
+        }
+    };
 
     for (const data of UserKey) {
         if (data.UserKey) {
@@ -766,6 +848,7 @@ Imported.NUUN_BankSystem = true;
                     if (data.UserKey.KeyCommonEvent > 0) {
                         $gameTemp.reserveCommonEvent(data.UserKey.KeyCommonEvent);
                     } else if (!!data.UserKey.KeySprict) {
+                        playUserOkSound(data.UserKey.KeyPlaySe)
                         this.callUserKey(data.UserKey.KeySprict);
                     }
                     this._userKeyCalling = false;

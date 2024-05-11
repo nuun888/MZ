@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.1
+ * @version 3.1.2
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/11/2024 Ver.3.1.2
+ * Fixed so that fonts for numbers and units can be specified separately.
+ * Fixed so that unit color can be applied with system color.
  * 4/20/2024 Ver.3.1.1
  * Fixed an issue where an error occurred when setting chapters. (Reset chapter selection only)
  * Fixed an issue where the display up to the next level was displayed based on earned experience points.
@@ -1324,7 +1327,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.0
+ * @version 3.1.2
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1390,6 +1393,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/11 Ver.3.1.2
+ * 数値と単位のフォントを別々に指定できるように修正。
+ * 単位の色をシステムカラーで適用できるように修正。
  * 2024/4/20 Ver.3.1.1
  * チャプター設定時にエラーが出る問題を修正。(チャプター選択のみ再設定)
  * 次のレベルまでの表示が獲得経験値で表示されていた問題を修正。
@@ -3218,12 +3224,12 @@ Imported.NUUN_MenuScreenEX = true;
         if (this.nuunMenu_isContents(data, battler)) {
             setTepmData(data)
             const method = 'nuun_DrawMenuStatusContents' + data.DateSelect;
-            try {
+            //try {
                 this[method](data, x, y, width, battler);
-            } catch (error) {
-                const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                throw ["DataError", log];
-            }
+            //} catch (error) {
+            //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+            //    throw ["DataError", log];
+            //}
         }
     };
 
@@ -3380,7 +3386,8 @@ Imported.NUUN_MenuScreenEX = true;
         if (data.DetaEval) {
             this.nuun_setContentsValueFontFace(data);
             const padding = textWidth > 0 ? 8 : 0;
-            this.drawText(eval(data.DetaEval), x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+            this.nuun_DrawContentsParamUnitText(eval(data.DetaEval), data, x + textWidth + padding, y, width - (textWidth + padding));
+            //this.drawText(eval(data.DetaEval), x + textWidth + padding, y, width - (textWidth + padding), data.Align);
         }
         this.resetFontSettings();
     };
@@ -3622,7 +3629,8 @@ Imported.NUUN_MenuScreenEX = true;
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
         const textParam = (data.DetaEval ? eval(data.DetaEval) : actor.param(param)) + (data.paramUnit ? String(data.paramUnit) : "");
-        this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + 8, y, width - (textWidth + 8));
+        //this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
     };
 
@@ -3637,8 +3645,8 @@ Imported.NUUN_MenuScreenEX = true;
         this.nuun_setContentsValueFontFace(data);
         let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.xparam(param) * 100);
         textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.getDecimalMode());
-        textParam += (data.paramUnit ? String(data.paramUnit) : "");
-        this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + 8, y, width - (textWidth + 8));
+        //this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
     };
 
@@ -3653,7 +3661,7 @@ Imported.NUUN_MenuScreenEX = true;
         this.nuun_setContentsValueFontFace(data);
         let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.sparam(param) * 100);
         textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.getDecimalMode());
-        textParam += (data.paramUnit ? String(data.paramUnit) : "");
+        this.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + 8, y, width - (textWidth + 8));
         this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
     };

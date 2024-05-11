@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.3
+ * @version 1.7.4
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/11/2024 Ver.1.7.4
+ * Modified to accommodate the diversity of acquisition parameters.
  * 5/4/2024 Ver.1.7.3
  * Corrected display of MV type gauge.
  * 5/3/2024 Ver.1.7.2
@@ -96,7 +98,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.3
+ * @version 1.7.4
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -106,6 +108,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/11 Ver.1.7.4
+ * 取得パラメータの多様性に対応できるように修正。
  * 2024/5/4 Ver.1.7.3
  * MV式ゲージを表示を修正。
  * 2024/5/3 Ver.1.7.2
@@ -327,6 +331,20 @@ function nuun_GausePlugins() {
         Imported.NUUN_BattlerMPGauge || Imported.NUUN_BattlerTPGauge || Imported.NUUN_BattlerTpbGauge
     )
 }
+
+function getDataSystemColor(data) {
+    if (!!data.SystemNameColor) {
+        return data.SystemNameColor;
+    } else if (!!data.NameColor) {
+        return data.NameColor;
+    }
+};
+
+function getDataUnit(data) {
+    if (!!data.paramUnit) {
+        return data.paramUnit;
+    }
+};
 
 function NuunManager() {
     throw new Error("This is a static class");
@@ -562,7 +580,7 @@ Window_Base.prototype.nuun_LabelWidth = function() {
 
 Window_Base.prototype.nuun_DrawContentsParamUnitText = function(text, data, x, y, width) {
     const padding = this.itemPadding();
-    const unit = data.paramUnit;
+    const unit = getDataUnit(data);
     const unitWidth = unit ? this.textWidth(unit) + padding : 0;
     this.resetTextColor();
     if (NuunManager.isFontFace()) {
@@ -570,7 +588,7 @@ Window_Base.prototype.nuun_DrawContentsParamUnitText = function(text, data, x, y
     }
     this.drawText(text, x, y, width - unitWidth, data.Align);
     if (unit) {
-        this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+        this.changeTextColor(NuunManager.getColorCode(getDataSystemColor(data)));
         this.nuun_setFontFace();
         const textWidth = Math.min(this.textWidth(text), width - unitWidth);
         if (data.Align === 'left') {

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.2
+ * @version 3.1.3
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/12/2024 Ver.3.1.3
+ * Added a function to skip actor target selection when there is only one member.
+ * Corrected spelling error in party limit gauge.
+ * Fixed an issue where special ability values were displayed twice.
  * 5/11/2024 Ver.3.1.2
  * Fixed so that fonts for numbers and units can be specified separately.
  * Fixed so that unit color can be applied with system color.
@@ -561,6 +565,13 @@
  * @default true
  * @parent MenuCommandSetting
  * 
+ * @param SkipSelectOneMember
+ * @text Skip single member selection
+ * @desc If there is only one member, skip actor target selection.
+ * @type boolean
+ * @default false
+ * @parent MenuCommandSetting
+ * 
  * @param ActorSetting
  * @text Actor settings
  * @default ------------------------------
@@ -973,7 +984,7 @@
  * @option Chapter (NUUN_Chapter required)(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
  * @value Chapter
  * @option Limit gayge（Required "NUUN_PartyLimitGauge"）(1)(2)(3)(4)(5)
- * @value Limit_gauge
+ * @value Limit_Gauge
  * @option Line(1)(2)(3)(4)(5)(7)
  * @value HorzLine
  * @default 0
@@ -1327,7 +1338,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.2
+ * @version 3.1.3
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1393,6 +1404,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/12 Ver.3.1.3
+ * メンバーが一人の時にアクター対象選択をスキップする機能を追加。
+ * パーティリミットゲージのスペルミス修正。
+ * 特殊能力値の数値が二重に表示される問題を修正。
  * 2024/5/11 Ver.3.1.2
  * 数値と単位のフォントを別々に指定できるように修正。
  * 単位の色をシステムカラーで適用できるように修正。
@@ -1863,6 +1878,13 @@
  * @default true
  * @parent MenuCommandSetting
  * 
+ * @param SkipSelectOneMember
+ * @text 一人メンバー選択スキップ
+ * @desc メンバーが一人のみの場合、アクターの対象選択をスキップします。
+ * @type boolean
+ * @default false
+ * @parent MenuCommandSetting
+ * 
  * @param ActorSetting
  * @text アクター設定
  * @default ------------------------------
@@ -2276,7 +2298,7 @@
  * @option キャプター（要チャプターテキスト）(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
  * @value Chapter
  * @option リミットゲージ（要NUUN_PartyLimitGauge）(1)(2)(3)(4)(5)
- * @value Limit_gauge
+ * @value Limit_Gauge
  * @option ライン(1)(2)(3)(4)(5)(7)
  * @value HorzLine
  * @default 0
@@ -2939,6 +2961,15 @@ Imported.NUUN_MenuScreenEX = true;
         }
     };
 
+    const _Scene_Menu_commandPersonal = Scene_Menu.prototype.commandPersonal;
+    Scene_Menu.prototype.commandPersonal = function() {
+        if (this._menuLayout.SkipSelectOneMember && $gameParty.size() === 1) {
+            this.onPersonalOk();
+        } else {
+            _Scene_Menu_commandPersonal.call(this);
+        }
+    };
+
 
     const _Scene_ItemBase_initialize = Scene_ItemBase.prototype.initialize;
     Scene_ItemBase.prototype.initialize = function() {
@@ -3224,12 +3255,12 @@ Imported.NUUN_MenuScreenEX = true;
         if (this.nuunMenu_isContents(data, battler)) {
             setTepmData(data)
             const method = 'nuun_DrawMenuStatusContents' + data.DateSelect;
-            //try {
+            try {
                 this[method](data, x, y, width, battler);
-            //} catch (error) {
-            //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-            //    throw ["DataError", log];
-            //}
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+                throw ["DataError", log];
+            }
         }
     };
 
@@ -3662,7 +3693,7 @@ Imported.NUUN_MenuScreenEX = true;
         let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.sparam(param) * 100);
         textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.getDecimalMode());
         this.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + 8, y, width - (textWidth + 8));
-        this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        //this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();
     };
 

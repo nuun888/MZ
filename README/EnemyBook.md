@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.20.12
+# Ver.2.20.13
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -280,6 +280,10 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2024/5/14 Ver.2.20.13  
+単位にシステムカラーを適用できるように修正。  
+属性耐性数値表示、ステート耐性数値表示がシステム文字と重なって表示される問題を修正。  
+能力値に単位を設定できるように修正。  
 2024/4/6 Ver.2.20.12  
 小数点の桁数が正常に機能していない問題を修正。  
 2024/3/9 Ver.2.20.11  

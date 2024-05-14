@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.12
+ * @version 2.20.13
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/14/2024 Ver.2.20.13
+ * Fixed to be able to apply system color to units.
+ * Fixed an issue where the attribute resistance value display and state resistance value display overlapped with system characters.
+ * Modified so that units can be set for ability values.
  * 4/6/2024 Ver.2.20.12
  * Fixed an issue where the number of decimal places was not working properly.
  * 3/9/2024 Ver.2.20.11
@@ -2249,21 +2253,21 @@
 * @type select
 * @option None
 * @value 0
-* @option MaxHP(1)~(14)(16)(20)(21)
+* @option MaxHP(1)～(16)(20)(21)
 * @value 1
-* @option MaxMP(1)~(14)(16)(20)(21)
+* @option MaxMP(1)～(16)(20)(21)
 * @value 2
-* @option ATK(1)~(14)(16)(20)(21)
+* @option ATK(1)～(16)(20)(21)
 * @value 3
-* @option DEF(1)~(14)(16)(20)(21)
+* @option DEF(1)～(16)(20)(21)
 * @value 4
-* @option MAT(1)~(14)(16)(20)(21)
+* @option MAT(1)～(16)(20)(21)
 * @value 5
-* @option MDF(1)~(14)(16)(20)(21)
+* @option MDF(1)～(16)(20)(21)
 * @value 6
-* @option AGI(1)~(14)(16)(20)(21)
+* @option AGI(1)～(16)(20)(21)
 * @value 7
-* @option LUK(1)~(14)(16)(20)(21)
+* @option LUK(1)～(16)(20)(21)
 * @value 8
 * @option TP (Only when the current status is ON)(1)~(16)(20)(21)
 * @value 9
@@ -3014,7 +3018,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.20.12
+ * @version 2.20.13
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3235,6 +3239,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/14 Ver.2.20.13
+ * 単位にシステムカラーを適用できるように修正。
+ * 属性耐性数値表示、ステート耐性数値表示がシステム文字と重なって表示される問題を修正。
+ * 能力値に単位を設定できるように修正。
  * 2024/4/6 Ver.2.20.12
  * 小数点の桁数が正常に機能していない問題を修正。
  * 2024/3/9 Ver.2.20.11
@@ -5355,21 +5363,21 @@
  * @type select
  * @option 表示なし
  * @value 0
- * @option 最大HP(1)～(14)(16)(20)(21)
+ * @option 最大HP(1)～(16)(20)(21)
  * @value 1
- * @option 最大MP(1)～(14)(16)(20)(21)
+ * @option 最大MP(1)～(16)(20)(21)
  * @value 2
- * @option 攻撃力(1)～(14)(16)(20)(21)
+ * @option 攻撃力(1)～(16)(20)(21)
  * @value 3
- * @option 防御力(1)～(14)(16)(20)(21)
+ * @option 防御力(1)～(16)(20)(21)
  * @value 4
- * @option 魔法力(1)～(14)(16)(20)(21)
+ * @option 魔法力(1)～(16)(20)(21)
  * @value 5
- * @option 魔法防御(1)～(14)(16)(20)(21)
+ * @option 魔法防御(1)～(16)(20)(21)
  * @value 6
- * @option 敏捷性(1)～(14)(16)(20)(21)
+ * @option 敏捷性(1)～(16)(20)(21)
  * @value 7
- * @option 運(1)～(14)(16)(20)(21)
+ * @option 運(1)～(16)(20)(21)
  * @value 8
  * @option TP（現在のステータスをONのときのみ）(1)～(16)(20)(21)
  * @value 9
@@ -9165,6 +9173,10 @@ Window_EnemyBook.prototype.loadWindowskin = function() {
 };
 
 Window_EnemyBook.prototype.maxCols = function() {
+    return 1;
+};
+
+Window_EnemyBook.prototype.itemContentsWidth = function() {
     return ContentCols;
 };
 
@@ -9330,8 +9342,13 @@ Window_EnemyBook.prototype.getEnemyData = function() {
 };
 
 Window_EnemyBook.prototype.drawEnemyBookContents = function() {
+    const rect = this.itemRect(0);
     const lineHeight = this.lineHeight();
     const listContents = this.listDate(this._displayList);
+    const colSpacing = this.colSpacing();
+    const padding = this.itemPadding();
+    const itemWidth = Math.floor(rect.width / this.itemContentsWidth()) - 4;
+
     const enemy = this._categoryMode ? null : this.getEnemyData();
     ge = enemy;
     de = this._enemy;
@@ -9341,12 +9358,13 @@ Window_EnemyBook.prototype.drawEnemyBookContents = function() {
     for (const data of listContents) {
         this.resetFontSettings();
         const x_Position = data.X_Position;
-        const position = Math.min(x_Position, this.maxCols());
-        const rect = this.itemRect(position - 1);
-        const x = rect.x + (data.X_Coordinate || 0);
-        const y = (data.Y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
-        const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : this.widthMode(data, rect));
-        this.dateDisplay(data, enemy, x, y, width);
+        const y_Position = data.Y_Position;
+        const position = Math.min(x_Position, this.itemContentsWidth());
+        const x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1);
+        const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0) + padding;
+        const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : this.widthMode(data, itemWidth), rect.width - x);
+        //data._width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, width) : Math.min(width, 128);
+        this.dateDisplay(data, enemy, x + rect.x, y, width);
     }
 };
 
@@ -9386,13 +9404,13 @@ Window_EnemyBook.prototype.loadBitmap = function() {
     }
 };
 
-Window_EnemyBook.prototype.widthMode = function(list, rect) {
+Window_EnemyBook.prototype.widthMode = function(list, width) {
     if (list.WideMode === 2) {
-      rect.width = rect.width * 2 + this.colSpacing();
+        width = width * 2 + this.colSpacing();
     } else if (list.WideMode === 3 && ContentCols >= 3) {
-      rect.width = rect.width * 3 + (this.colSpacing() * 2);
+        width = width * 3 + (this.colSpacing() * 2);
     }
-    return rect.width;
+    return width;
 };
 
 Window_EnemyBook.prototype.dateDisplay = function(list, enemy, x, y, width) {
@@ -9766,13 +9784,14 @@ Window_EnemyBook.prototype.enemyParams = function(list, enemy, x, y, width) {
     const systemWidth = list.SystemItemWidth || 100;
     this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
-    let text = this.paramShow(list, enemy);
     if (!this.paramMask(list.MaskMode)){
-        text = UnknownStatus;
+        this.drawText(UnknownStatus, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
     } else {
+        let text = this.paramShow(list, enemy);
         this.setBuffColor(list, enemy);
+        this.nuun_DrawContentsParamUnitText(text, list, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()));
     }
-    this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
+    
 };
 
 Window_EnemyBook.prototype.enemyXParams = function(list, enemy, x, y, width) {
@@ -9792,15 +9811,16 @@ Window_EnemyBook.prototype.enemyXParams = function(list, enemy, x, y, width) {
     const systemWidth = list.SystemItemWidth || 100;
     this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
-    let text = this.paramShow(list, enemy);
     if (!this.paramMask(list.MaskMode)){
-        text = UnknownStatus;
+        this.drawText(UnknownStatus, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
     } else {
+        let text = this.paramShow(list, enemy);
         text = NuunManager.numPercentage(text, (list.Decimal - 2), DecimalMode);
         this.setBuffColor(list, enemy);
+        this.nuun_DrawContentsParamUnitText(text, list, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), "%");
     }
-    text += list.paramUnit ? String(list.paramUnit) : " %";
-    this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
+    //text += list.paramUnit ? String(list.paramUnit) : " %";
+    //this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
 };
 
 Window_EnemyBook.prototype.enemySParams = function(list, enemy, x, y, width) {
@@ -9820,15 +9840,16 @@ Window_EnemyBook.prototype.enemySParams = function(list, enemy, x, y, width) {
     const systemWidth = list.SystemItemWidth || 100;
     this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
-    let text = this.paramShow(list, enemy);
     if (!this.paramMask(list.MaskMode)){
-        text = UnknownStatus;
+        this.drawText(UnknownStatus, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
     } else {
+        let text = this.paramShow(list, enemy);
         text = NuunManager.numPercentage(text, (list.Decimal - 2), DecimalMode);
         this.setBuffColor(list, enemy);
+        this.nuun_DrawContentsParamUnitText(text, list, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), "%");
     }
-    text += list.paramUnit ? String(list.paramUnit) : " %";
-    this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
+    //text += list.paramUnit ? String(list.paramUnit) : " %";
+    //this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
 };
 
 Window_EnemyBook.prototype.enemyExp = function(list, enemy, x, y, width) {
@@ -9878,11 +9899,10 @@ Window_EnemyBook.prototype.enemyGold = function(list, enemy, x, y, width) {
     this.resetTextColor();
     let text;
     if(this.paramMask(list.MaskMode)) {
-      text = list.DetaEval ? eval(list.DetaEval) : enemy.gold();
-      this.drawCurrencyValue(text, this.currencyUnit(), x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()));
+        text = list.DetaEval ? eval(list.DetaEval) : enemy.gold();
+        this.drawCurrencyValue(text, this.currencyUnit(), x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()));
     } else {
-      text = UnknownStatus;
-      this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), 'right');
+        this.drawText(UnknownStatus, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), 'right');
     }
 };
 
@@ -9904,16 +9924,12 @@ Window_EnemyBook.prototype.defeat = function(list, enemy, x, y, width) {
     const systemWidth = list.SystemItemWidth || 100;
     this.drawText(nameText, x + margin, y, systemWidth - margin);
     this.resetTextColor();
-    let text = null;
     if(this.paramMask(list.MaskMode)) {
-        text = list.DetaEval ? eval(list.DetaEval) : $gameSystem.defeatNumber(enemy.enemyId());
-        if (list.paramUnit) {
-            text += String(list.paramUnit);
-        }
+        const text = list.DetaEval ? eval(list.DetaEval) : $gameSystem.defeatNumber(enemy.enemyId());
+        this.nuun_DrawContentsParamUnitText(text, list, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()));
     } else {
-        text = UnknownStatus;
+        this.drawText(UnknownStatus, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
     }
-    this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
 };
 
 Window_EnemyBook.prototype.enemyLevel = function(list, enemy, x, y, width) {
@@ -9939,17 +9955,12 @@ Window_EnemyBook.prototype.originalParams = function(list, enemy, x, y, width) {
     if (nameText) {
         this.drawText(nameText, x + margin, y, systemWidth - margin);
     }
-    let text = null;
-    if(this.paramMask(list.MaskMode)) {
-        text = eval(list.DetaEval);
-        if (list.paramUnit) {
-            text += String(list.paramUnit);
-        }
-    } else {
-        text = UnknownStatus;
-    }
     this.resetTextColor();
-    this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
+    if(this.paramMask(list.MaskMode)) {
+        this.nuun_DrawContentsParamUnitText(eval(list.DetaEval), list, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()));
+    } else {
+        this.drawText(UnknownStatus, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), list.namePosition);
+    }
 };
 
 Window_EnemyBook.prototype.bookEnemyNo = function(list, enemy, x, y, width) {
@@ -10231,9 +10242,9 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
                 textWidth += ImageManager.iconWidth + 4;
             }
             if (ResistWeakElementMode !== 1) {
-                const systemWidth = nameText ? (list.SystemItemWidth || 60) : 0;
-                this.changeTextColor(NuunManager.getColorCode(list.NameColor));
                 const elementText = this.onElementsFlag(element.ElementNo) ? getElementTextName(element.ElementNo) : UnknownStatus;
+                const systemWidth = elementText ? (list.SystemItemWidth || 60) : 0;
+                this.changeTextColor(NuunManager.getColorCode(list.NameColor));
                 this.drawText(elementText, x2 + textWidth, y2, systemWidth);
                 textWidth += systemWidth;
             }
@@ -10245,13 +10256,12 @@ Window_EnemyBook.prototype.drawResistValueElement = function(list, enemy, x, y, 
                     rate = enemy.elementRate(element.ElementNo) * 100;
                 }
                 rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
-                this.valueColor(rate);
-                rate += list.paramUnit ? String(list.paramUnit) : " %";
                 const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
-                this.drawText(rateText, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), "right");
+                this.valueColor(rate);
+                this.nuun_DrawContentsParamUnitText(rateText, list, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), '%');
             } else {
                 this.resetTextColor();
-                this.drawText(UnknownStatus, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), "right");
+                this.drawText(UnknownStatus, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), list.namePosition);
             }
         }
     });
@@ -10295,9 +10305,9 @@ Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, wi
                     textWidth += ImageManager.iconWidth + 4;
                 }
                 if (ResistWeakStateMode !== 1) {
-                    const systemWidth = nameText ? (list.SystemItemWidth || 60) : 0;
-                    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
                     const stateText = this.onStateFlag(stateId) ? $dataStates[stateId].name : UnknownStatus;
+                    const systemWidth = stateText ? (list.SystemItemWidth || 60) : 0;
+                    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
                     this.drawText(stateText, x2 + textWidth, y2, systemWidth);
                     textWidth += systemWidth;
                 }
@@ -10305,12 +10315,11 @@ Window_EnemyBook.prototype.drawResistValueState = function(list, enemy, x, y, wi
                     let rate = (enemy.isStateResist(stateId) ? 0 : enemy.stateRate(stateId)) * 100;
                     rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
                     this.valueColor(rate);
-                    rate += list.paramUnit ? String(list.paramUnit) : " %";
                     const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
-                    this.drawText(rateText, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), "right");
+                    this.nuun_DrawContentsParamUnitText(rateText, list, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), '%');
                   } else {
                     this.resetTextColor();
-                    this.drawText(UnknownStatus, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), "right");
+                    this.drawText(UnknownStatus, x2 + textWidth + this.itemPadding(), y2, width2 - (textWidth + this.itemPadding()), list.namePosition);
                   }
             }
         }
@@ -10857,6 +10866,28 @@ Window_EnemyBook.prototype.drawCommonDesc = function(list, enemy, x, y, width) {
     }
 };
 
+Window_EnemyBook.prototype.nuun_DrawContentsParamUnitText = function(text, list, x, y, width, unUnit) {
+    const padding = this.itemPadding();
+    const unit = list.paramUnit ? String(list.paramUnit) : unUnit;
+    const unitWidth = unit ? this.textWidth(unit) + padding : 0;
+    if (NuunManager.isFontFace()) {
+        isNaN(text) ? this.nuun_setFontFace() : this.nuun_setValueFontFace();
+    }
+    this.drawText(text, x, y, width - unitWidth, list.namePosition);
+    if (unit) {
+        this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+        this.nuun_setFontFace();
+        const textWidth = Math.min(this.textWidth(text), width - unitWidth);
+        if (list.namePosition === 'left') {
+            this.drawText(unit, x + textWidth + padding, y, width);
+        } else if (list.namePosition === 'right') {
+            this.drawText(unit, x + width - unitWidth + padding, y, width);
+        } else {
+            this.drawText(unit, x + Math.floor(width / 2) + Math.floor(textWidth / 2) - padding, y, width);
+        }
+    }
+};
+
 Window_EnemyBook.prototype.enemyCharacter = function(list, enemy, x, y, width) {
     this.enemyCharacterChip(enemy, x, y);
 };
@@ -11126,7 +11157,7 @@ Window_BattleEnemyBook.prototype.setPage = function(index) {
     this.refresh();
 };
 
-Window_BattleEnemyBook.prototype.maxCols = function() {
+Window_BattleEnemyBook.prototype.itemContentsWidth = function() {
     switch (this._mode) {
         case 'book':
             return ContentCols;

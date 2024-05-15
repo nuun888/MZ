@@ -1,5 +1,5 @@
 # [ステート、バフ残りターン表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
-# Ver.1.1.5
+# Ver.1.1.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
 
 #### 必須、前提プラグイン
@@ -25,6 +25,8 @@
 MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
+2024/5/15 Ver.1.1.6  
+ステートターンが表示されない問題を修正。  
 2024/3/2 Ver.1.1.5  
 バトルスタイル拡張プラグインでステートの表示を指定している場合に、ターンの表示がずれて表示されてしまう問題を修正。  
 2023/8/23 Ver.1.1.4  

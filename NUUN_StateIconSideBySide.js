@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  State side-by-side display
  * @author NUUN
- * @version 1.5.6
+ * @version 1.5.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/15/2024 Ver.1.5.7
+ * Fixed an issue where state turns were not displayed.
  * 3/2/2024 Ver.1.5.6
  * Fixed an issue where the turn display would be misaligned when the state display was specified with "NUUN_BattleStyleEX".
  * 1/3/2024 Ver.1.5.5
@@ -281,7 +283,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.5.6
+ * @version 1.5.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -310,6 +312,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/15 Ver.1.5.7
+ * ステートターンが表示されない問題を修正。
  * 2024/3/2 Ver.1.5.6
  * バトルスタイル拡張プラグインでステートの表示を指定している場合に、ターンの表示がずれて表示されてしまう問題を修正。
  * 2024/1/3 Ver.1.5.5
@@ -855,7 +859,11 @@ Game_BattlerBase.prototype.nuun_buffTurns = function() {
 };
 
 Game_BattlerBase.prototype.nuun_stateTurnFilter = function() {
-    return this.statesFilter ? this.statesFilter() : this.states();
+    if (this.statesFilter && BattleManager.bsVisibleStates && BattleManager.bsVisibleStates.length > 0) {
+        return this.statesFilter();
+    } else {
+        return this.states();
+    }
 };
 
 Game_BattlerBase.prototype.nuun_buffTurnsFilter = function(id) {

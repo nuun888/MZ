@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.5
+ * @version 1.1.6
  * 
  * @help
  * Show remaining turns on the state icon.
@@ -31,6 +31,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/15/2024 Ver.1.1.6
+ * Fixed an issue where state turns were not displayed.
  * 3/2/2024 Ver.1.1.5
  * Fixed an issue where the turn display would be misaligned when the state display was specified with "NUUN_BattleStyleEX".
  * 8/23/2023 Ver.1.1.4
@@ -123,7 +125,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.5
+ * @version 1.1.6
  * 
  * @help
  * ステートアイコンに残りターンを表示します。
@@ -142,6 +144,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/15 Ver.1.1.6
+ * ステートターンが表示されない問題を修正。
  * 2024/3/2 Ver.1.1.5
  * バトルスタイル拡張プラグインでステートの表示を指定している場合に、ターンの表示がずれて表示されてしまう問題を修正。
  * 2023/8/23 Ver.1.1.4
@@ -311,9 +315,13 @@ Imported.NUUN_StateTurn = true;
     }, []);
   };
 
-  Game_BattlerBase.prototype.nuun_stateTurnFilter = function() {
-    return this.statesFilter ? this.statesFilter() : this.states();
-  };
+    Game_BattlerBase.prototype.nuun_stateTurnFilter = function() {
+        if (this.statesFilter && BattleManager.bsVisibleStates && BattleManager.bsVisibleStates.length > 0) {
+            return this.statesFilter();
+        } else {
+            return this.states();
+        }
+    };
   
   Game_BattlerBase.prototype.nuun_buffTurns = function() {
     return this._buffs.reduce((r, buff, i) => {

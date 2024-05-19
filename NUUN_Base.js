@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.4
+ * @version 1.7.5
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/20/2024 Ver.1.7.5
+ * Add processing.
  * 5/11/2024 Ver.1.7.4
  * Modified to accommodate the diversity of acquisition parameters.
  * 5/4/2024 Ver.1.7.3
@@ -98,7 +100,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.4
+ * @version 1.7.5
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -108,6 +110,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/20 Ver.1.7.5
+ * 処理の追加。
  * 2024/5/11 Ver.1.7.4
  * 取得パラメータの多様性に対応できるように修正。
  * 2024/5/4 Ver.1.7.3
@@ -279,17 +283,19 @@ class Nuun_TempParam {
         this._data = null;
     }
 
-    setGaugeData(data, type) {
+    setGaugeData(data, type, exParams) {
         this._data = data;
         this._type = type;
+        this._exParams = exParams;
     }
 
     setType(type) {
         this._type = type;
     }
 
-    setData(data) {
+    setData(data, exParams) {
         this._data = data;
+        this._exParams = exParams;
     }
 
     getType() {
@@ -299,8 +305,17 @@ class Nuun_TempParam {
     getData() {
         return this._data;
     }
-};
 
+    getExParams() {
+        return this._exParams;
+    }
+
+    clear() {
+        this._data = null;
+        this._type = "";
+        this._exParams = null;
+    }
+};
 window.Nuun_TempParam = Nuun_TempParam;
 
 function structureData(params) {
@@ -740,10 +755,11 @@ Sprite_NuunAPngImg.prototype.initMembers = function() {
   this._pictureName = null;
 };
 
-Sprite_NuunAPngImg.prototype.setup = function(battler, data, name) {
+Sprite_NuunAPngImg.prototype.setup = function(battler, data, name, mode) {
   this._battler = battler;
   this._data = data;
   this._pictureName = name.split('pictures/')[1];
+  this._actorPictureEXApp = mode;
   this.refresh();
 };
 
@@ -767,6 +783,10 @@ Sprite_NuunAPngImg.prototype.resetApngImg = function() {
   }
 };
 
+Sprite_NuunAPngImg.prototype.isActorPictureEXApp = function() {
+    return this._actorPictureEXApp;
+};
+
 Sprite_NuunAPngImg.prototype.loadApngSprite = function(name) {
   return Sprite_Picture.prototype.loadApngSprite.call(this, name);
 };
@@ -774,5 +794,7 @@ Sprite_NuunAPngImg.prototype.loadApngSprite = function(name) {
 Game_Enemy.prototype.allSkillActions = function(actionList) {
   return actionList;
 };
+
+
 
 })();

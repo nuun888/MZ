@@ -1,11 +1,13 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.7.4
+# Ver.1.7.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 共通処理を行うベースプラグインです。  
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2024/5/20 Ver.1.7.5  
+処理の追加。  
 2024/5/11 Ver.1.7.4  
 取得パラメータの多様性に対応できるように修正。  
 2024/5/4 Ver.1.7.3  

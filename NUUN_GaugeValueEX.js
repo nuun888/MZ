@@ -1328,7 +1328,7 @@ Imported.NUUN_GaugeValueEX = true;
         }
 
         gaugeStrokeColor() {
-            return this._data && this._data.GaugeStrokeColor >= 0 ? NuunManager.getColorCode(this._data.GaugeStrokeColor) : null;
+            return this._data && this._data.GaugeStrokeColor === -1 ? null : NuunManager.getColorCode(this._data.GaugeStrokeColor);
         }
 
         valueColor() {

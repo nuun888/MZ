@@ -1,5 +1,5 @@
 # [ダメージ量ゲージ可視化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamageGauge.js)
-# Ver.1.0.2
+# Ver.1.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamageGauge.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -12,6 +12,8 @@
 ゲージ画像化で適用するにはゲージ画像化Ver.1.5.2以降対応です。  
 
 ## 更新履歴
+2024/5/24 Ver.1.0.3  
+ゲージ表示拡張プラグイン更新による処理の修正。  
 2023/4/16 Ver.1.0.2  
 フィルタリングクラスの処理を汎用ゲージ追加プラグイン、カスタムメニュー作成プラグインに対応できるよう修正。  
 2022/12/6 Ver.1.0.1  

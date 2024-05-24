@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Damage amount gauge visualization
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,7 +26,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 4/16/2022 Ver.1.0.2
+ * 5/24/2024 Ver.1.0.3
+ * Corrected processing by updating "NUUN_GaugeValueEX".
+ * 4/16/2023 Ver.1.0.2
  * Modified filtering class processing to support "ExtraGauge" and "SceneCustomMenu".
  * 12/6/2022 Ver.1.0.1
  * Changed the Type of color specification plug-in parameter to color. (Core script Ver.1.6.0 or later)
@@ -111,7 +113,7 @@
  * @target MZ
  * @plugindesc ダメージ量ゲージ可視化
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -127,6 +129,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/24 Ver.1.0.3
+ * ゲージ表示拡張プラグイン更新による処理の修正。
  * 2023/4/16 Ver.1.0.2
  * フィルタリングクラスの処理を汎用ゲージ追加プラグイン、カスタムメニュー作成プラグインに対応できるよう修正。
  * 2022/12/6 Ver.1.0.1
@@ -332,28 +336,52 @@ Imported.NUUN_DamageGauge = true;
     const _Sprite_Gauge_drawGaugeRect = Sprite_Gauge.prototype.drawGaugeRect;
     Sprite_Gauge.prototype.drawGaugeRect = function(x, y, width, height) {
         if (this.gaugeDamageVisualization() && !(Imported.NUUN_GaugeImage && this._gaugeImgData)) {
-            this._drawGaugeMode = 1;
-            const drate = this.gaugeRate();
-            this._drawGaugeMode = 0;
-            const rate = this.gaugeRate();
-            const fillW = Math.floor((width - 2) * rate);
-            const dfillW = Math.floor((width - 2) * drate);
-            const fillH = height - 2;
-            const color0 = this.gaugeBackColor();
-            const color1 = this.gaugeColor1();
-            const color2 = this.gaugeColor2();
-            const dcolor1 = this.gaugeDamageColor1();
-            const dcolor2 = this.gaugeDamageColor2();
-            this.bitmap.fillRect(x, y, width, height, color0);
-            this.bitmap.gradientFillRect(x + 1, y + 1, dfillW, fillH, dcolor1, dcolor2);
-            this.bitmap.gradientFillRect(x + 1, y + 1, fillW, fillH, color1, color2);
-            if (LLparameters && LLSolidGradation) {//if内はルルの協会様のコードをお借りしています。
-                this.bitmap.gradientFillRect(x + 1, y + 1, fillW, fillH / 3, "rgba(255, 255, 255, 0.1)", "rgba(255, 255, 255, 0.7)", true);//LL
-                this.bitmap.gradientFillRect(x + 1, y + fillH / 3 + 1, fillW, fillH / 2, "rgba(0, 0, 0, 0.2)", "rgba(0, 0, 0, 0)", true);//LL
-            }
+            this.drawGaugeDamageRect(x, y, width, height);
         } else {
             this._drawGaugeMode = 0;
             _Sprite_Gauge_drawGaugeRect.call(this, x, y, width, height);
+        }
+    };
+
+    Sprite_Gauge.prototype.drawGaugeDamageRect = function(x, y, width, height) {
+        this._drawGaugeMode = 1;
+        const drate = this.gaugeRate();
+        this._drawGaugeMode = 0;
+        const rate = this.gaugeRate();
+        const fillW = Math.floor((width - 2) * rate);
+        const dfillW = Math.floor((width - 2) * drate);
+        const fillH = height - 2;
+        this.drawGaugeBackCoreEx(x, y, width, height);
+        this.drawGaugeDamageEx(x, y, dfillW, fillH);
+        this.drawGaugeMainCoreEx(x, y, fillW, fillH);
+    };
+
+    Sprite_Gauge.prototype.drawGaugeDamageEx = function(x, y, width, height) {
+        const dcolor1 = this.gaugeDamageColor1();
+        const dcolor2 = this.gaugeDamageColor2();
+        this.bitmap.gradientFillRect(x + 1, y + 1, width, height, dcolor1, dcolor2);
+    };
+
+    Sprite_Gauge.prototype.drawGaugeBackCoreEx = function(x, y, width, height) {
+        if (this._gaugeData && this._gaugeData.isData()) {
+            this.drawGaugeBackEx(x, y, width, height);
+        } else {
+            const color0 = this.gaugeBackColor();
+            this.bitmap.fillRect(x, y, width, height, color0);
+        }
+    };
+
+    Sprite_Gauge.prototype.drawGaugeMainCoreEx = function(x, y, width, height) {
+        if (this._gaugeData && this._gaugeData.isData()) {
+            this.drawGaugeMainEx(x, y, width, height); 
+        } else {
+            const color1 = this.gaugeColor1();
+            const color2 = this.gaugeColor2();
+            this.bitmap.gradientFillRect(x + 1, y + 1, width, height, color1, color2);
+            if (LLparameters && LLSolidGradation) {//if内はルルの協会様のコードをお借りしています。
+                this.bitmap.gradientFillRect(x + 1, y + 1, width, height / 3, "rgba(255, 255, 255, 0.1)", "rgba(255, 255, 255, 0.7)", true);//LL
+                this.bitmap.gradientFillRect(x + 1, y + height / 3 + 1, width, height / 2, "rgba(0, 0, 0, 0.2)", "rgba(0, 0, 0, 0)", true);//LL
+            }
         }
     };
     

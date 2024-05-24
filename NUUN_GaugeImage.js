@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc GaugeImaging
  * @author NUUN
- * @version 1.6.6
+ * @version 1.6.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -66,6 +66,8 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 5/24/2024 Ver.1.6.7
+ * Corrected processing by updating "NUUN_GaugeValueEX".
  * 4/16/2023 Ver.1.6.6
  * Modified filtering class processing to support "ExtraGauge" and "SceneCustomMenu".
  * 1/10/2023 Ver.1.6.5
@@ -428,7 +430,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.6.6
+ * @version 1.6.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -484,6 +486,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/24 Ver.1.6.7
+ * ゲージ表示拡張プラグイン更新による処理の修正。
  * 2023/4/16 Ver.1.6.6
  * フィルタリングクラスの処理を汎用ゲージ追加プラグイン、カスタムメニュー作成プラグインに対応できるよう修正。
  * 2023/1/10 Ver.1.6.5
@@ -1160,7 +1164,7 @@ Sprite_Gauge.prototype.drawValue = function() {
     let context = null;
     if (this._valueImgBitmap) {
         this._digitSprite.rotation = (this._gaugeImgData.GaugeValueAngle * Math.PI / 180);
-        if (this._gaugeData) {
+        if (this._gaugeData && this._gaugeData.isData()) {
             this.drawValueEXImg();
         } else {
             this.drawValueImg();
@@ -1182,14 +1186,7 @@ Sprite_Gauge.prototype.drawValue = function() {
 };
 
 Sprite_Gauge.prototype.drawValueEXImg = function() {
-    if (this._gaugeData.ValueVisible === 'ValueMaxValue') {
-        //this.drawValueImgMaxValue();
-        this.drawValueImg();
-    } else if (this._gaugeData.ValueVisible === 'Value') {
-        this.drawValueImg();
-    } else if (this._gaugeData.ValueVisible === 'NoValue') {
-
-    }
+    this._gaugeData.drawValueEXImg()
 };
 
 Sprite_Gauge.prototype.drawValueImg = function() {
@@ -1218,8 +1215,8 @@ Sprite_Gauge.prototype.createDigits = function(value) {
 };
 
 Sprite_Gauge.prototype.drawValueAlignImg = function() {
-    if (Imported.NUUN_GaugeValueEX) {
-        return this.valueAlign();
+    if (Imported.NUUN_GaugeValueEX && this._gaugeData) {
+        return this._gaugeData.valueAlign();
     } else {
         return 'right';
     }

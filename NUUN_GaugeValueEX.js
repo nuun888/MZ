@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Gauge display EX
  * @author NUUN
- * @version 1.4.2
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -52,7 +52,12 @@
  * https://triacontane.blogspot.com/
  * 
  * Log
- * 4/16/2022 Ver.1.4.2
+ * 5/24/2024 Ver.1.5.0
+ * System renovation.
+ * Added the ability to specify an image to the gauge.
+ * Added the ability to set a frame on the gauge.
+ * Added a function that allows you to specify the width and height of the gauge only for the default gauge.
+ * 4/16/2023 Ver.1.4.2
  * Modified filtering class processing to support "ExtraGauge" and "SceneCustomMenu".
  * 12/24/2022 Ver.1.4.1
  * Fixed an issue where normal gauge color settings were not being applied.
@@ -99,7 +104,7 @@
  * @text Gauge value setting
  * @desc Gauge value setting.
  * @type struct<ValueGauge>[]
- * @default ["{\"Type\":\"'hp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'mp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'tp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}"]
+ * @default ["{\"Type\":\"'hp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"GaugeImg\":\"\",\"GaugeDisplayRangeSetting\":\"------------------------------\",\"GaugeWidth\":\"128\",\"GaugeHeight\":\"12\",\"BitmapHeight\":\"32\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeBackColor\":\"19\",\"GaugeStrokeColor\":\"-1\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"IconSetting\":\"------------------------------\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'mp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"GaugeImg\":\"\",\"GaugeDisplayRangeSetting\":\"------------------------------\",\"GaugeWidth\":\"128\",\"GaugeHeight\":\"12\",\"BitmapHeight\":\"32\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeBackColor\":\"19\",\"GaugeStrokeColor\":\"-1\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"IconSetting\":\"------------------------------\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'tp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"GaugeImg\":\"\",\"GaugeDisplayRangeSetting\":\"------------------------------\",\"GaugeWidth\":\"128\",\"GaugeHeight\":\"12\",\"BitmapHeight\":\"32\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeBackColor\":\"19\",\"GaugeStrokeColor\":\"-1\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"IconSetting\":\"------------------------------\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}"]
  * @parent CommonSetting
  * 
  * @param ValueAlign
@@ -122,13 +127,6 @@
  * @default '0000'
  * @parent CommonSetting
  * 
- * @param GaugeHeight
- * @desc Gauge height range. 0 is the default value *Applied even if not specified in the gauge value setting.
- * @text gauge height range
- * @type number
- * @default 0
- * @parent CommonSetting
- * 
  */
  /*~struct~ValueGauge:
  * 
@@ -142,6 +140,8 @@
  * @option 'tp'
  * @option 'time'
  * @option 'limit'
+ * @option 'exp'
+ * @option 'menuexp'
  * @default 
  * 
  * @param ValueVisible
@@ -182,20 +182,6 @@
  * @type string
  * @default 
  * 
- * @param LabelIcon
- * @desc Label icon ID. 0 is displayed as a letter.
- * @text Label icon ID
- * @type icon
- * @default 0
- * @min 0
- * 
- * @param LabelIconScale
- * @desc Specifies the magnification of the label icon. (percentage)
- * @text Label icon magnification
- * @type number
- * @default 100
- * @min 0
- * 
  * @param FilteringClass
  * @text Filtering class setting
  * @desc Specifies the window class to apply. If not specified, it will be reflected in all windows. (multiple selection)
@@ -211,6 +197,41 @@
  * @option 'Sprite_Enemy'
  * @option 'Window_CustomMenuDataList'
  * @default
+ * 
+ * @param GaugeImg
+ * @desc Specify the gauge image to display. The current version does not support specific gauge color changes.
+ * @text Gauge image
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ * @param GaugeDisplayRangeSetting
+ * @text Gauge display range setting
+ * @default ------------------------------ 
+ * 
+ * @param GaugeWidth
+ * @desc Gauge width. (external plugins are not supported)
+ * @text Gauge width
+ * @type number
+ * @default 128
+ * @min 0
+ * @parent GaugeDisplayRangeSetting
+ * 
+ * @param GaugeHeight
+ * @desc Gauge height.
+ * @text Gauge height
+ * @type number
+ * @default 12
+ * @min 0
+ * @parent GaugeDisplayRangeSetting
+ * 
+ * @param BitmapHeight
+ * @desc Gauge area height. (external plugins are not supported)
+ * @text Gauge area height
+ * @type number
+ * @default 32
+ * @min 0
+ * @parent GaugeDisplayRangeSetting
  * 
  * @param CoordinateSetting
  * @text Coordinate setting
@@ -430,6 +451,20 @@
  * @text Gauge setting
  * @default ------------------------------
  * 
+ * @param GaugeBackColor
+ * @desc Background color of the gauge.
+ * @text Gauge background color
+ * @type color
+ * @default 19
+ * @parent GaugeColorSetting
+ * 
+ * @param GaugeStrokeColor
+ * @desc Gauge frame color. (-1 means no frame)
+ * @text Gauge frame color
+ * @type color
+ * @default -1
+ * @parent GaugeColorSetting
+ * 
  * @param GaugeColor1
  * @desc Gauge color left (-1 default value)
  * @text Gauge color left
@@ -445,6 +480,26 @@
  * @default -1
  * @min -1
  * @parent GaugeColorSetting
+ * 
+ * @param IconSetting
+ * @text Icon setting
+ * @default ------------------------------
+ * 
+ * @param LabelIcon
+ * @desc Label icon ID. 0 is displayed as a letter.
+ * @text Label icon ID
+ * @type icon
+ * @default 0
+ * @min 0
+ * @parent IconSetting
+ * 
+ * @param LabelIconScale
+ * @desc Specifies the magnification of the label icon. (percentage)
+ * @text Label icon magnification
+ * @type number
+ * @default 100
+ * @min 0
+ * @parent IconSetting
  * 
  * @param GaugeColorMaxSetting
  * @text Max gauge setting
@@ -523,7 +578,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.4.2
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -557,17 +612,16 @@
  * フィルタリングクラス設定
  * 適用させるウィンドウクラスまたはゲージクラスまたは識別名、識別子を記入します。
  * 
- * Ver.1.2.0での変更点
- * フォントサイズをメインフォントサイズ+デフォルトフォントサイズ+個別フォントサイズに変更しました。
- * 数値の表示処理を変更しました。
- * ダメージ可視化機能は別プラグイン化しました。
- * ゲージ数値設定で設定していないゲージはデフォルトの表示のまま表示されるようになりました。
- * 全てのゲージに適用する場合は対象を'all'を選択してください。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/24 Ver.1.5.0
+ * システムの改修
+ * ゲージに画像を指定できる機能を追加。
+ * ゲージに枠を設定できる機能を追加。
+ * デフォルトのゲージ限定でゲージの幅、高さを指定できる機能を追加。
  * 2023/4/16 Ver.1.4.2
  * フィルタリングクラスの処理を汎用ゲージ追加プラグイン、カスタムメニュー作成プラグインに対応できるよう修正。
  * 2022/12/24 Ver.1.4.1
@@ -620,7 +674,7 @@
  * @text ゲージ数値設定
  * @desc ゲージ数値設定
  * @type struct<ValueGauge>[]
- * @default ["{\"Type\":\"'hp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'mp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'tp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"FilteringClass\":\"\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}"]
+ * @default ["{\"Type\":\"'hp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"GaugeImg\":\"\",\"GaugeDisplayRangeSetting\":\"------------------------------\",\"GaugeWidth\":\"128\",\"GaugeHeight\":\"12\",\"BitmapHeight\":\"32\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeBackColor\":\"19\",\"GaugeStrokeColor\":\"-1\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"IconSetting\":\"------------------------------\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'mp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"GaugeImg\":\"\",\"GaugeDisplayRangeSetting\":\"------------------------------\",\"GaugeWidth\":\"128\",\"GaugeHeight\":\"12\",\"BitmapHeight\":\"32\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeBackColor\":\"19\",\"GaugeStrokeColor\":\"-1\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"IconSetting\":\"------------------------------\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}","{\"Type\":\"'tp'\",\"ValueVisible\":\"'Value'\",\"ValueAlign\":\"'default'\",\"GaugeVisible\":\"true\",\"ValueDigits\":\"\",\"FilteringClass\":\"\",\"GaugeImg\":\"\",\"GaugeDisplayRangeSetting\":\"------------------------------\",\"GaugeWidth\":\"128\",\"GaugeHeight\":\"12\",\"BitmapHeight\":\"32\",\"CoordinateSetting\":\"------------------------------\",\"ValueWidth\":\"0\",\"GaugeAbsoluteCoordinates\":\"false\",\"GaugeX\":\"-1\",\"GaugeY\":\"0\",\"ValueAbsoluteCoordinates\":\"false\",\"ValueX\":\"0\",\"ValueY\":\"0\",\"MaxValueX\":\"0\",\"MaxValueY\":\"0\",\"SeparationX\":\"0\",\"SeparationY\":\"0\",\"LabelAbsoluteCoordinates\":\"false\",\"LabelX\":\"0\",\"LabelY\":\"3\",\"ValueSpaceMargin\":\"0\",\"ValueMargin\":\"0\",\"UserLabelFontFace\":\"\",\"FontSetting\":\"------------------------------\",\"ValueFontSize\":\"-6\",\"MaxValueFontSize\":\"-6\",\"SeparationFontSize\":\"-6\",\"LabelFontSize\":\"-2\",\"ValueFontFace\":\"false\",\"UserValueFontFace\":\"\",\"ColorSetting\":\"------------------------------\",\"MaxValueColor\":\"0\",\"SeparationColor\":\"0\",\"LabelColor\":\"16\",\"GaugeColorSetting\":\"------------------------------\",\"GaugeBackColor\":\"19\",\"GaugeStrokeColor\":\"-1\",\"GaugeColor1\":\"-1\",\"GaugeColor2\":\"-1\",\"IconSetting\":\"------------------------------\",\"LabelIcon\":\"0\",\"LabelIconScale\":\"100\",\"GaugeColorMaxSetting\":\"------------------------------\",\"GaugeColorMaxApply\":\"false\",\"MaxGaugeColor1\":\"0\",\"MaxGaugeColor2\":\"0\",\"GaugeColorRatioSetting\":\"------------------------------\",\"GaugeColorRatioApply\":\"false\",\"RatioGauge\":\"0\",\"RatioGaugeColor1\":\"0\",\"RatioGaugeColor2\":\"0\"}"]
  * @parent CommonSetting
  * 
  * @param ValueAlign
@@ -634,19 +688,13 @@
  * @option 右揃え
  * @value 'right'
  * @default 'right'
+ * @parent CommonSetting
  * 
  * @param ValueDigits
  * @desc デフォルトのゲージ数値表示形式が現在値/最大値の数値の表示幅。(空白で数値を詰めます。現在値/最大値のみ)
  * @text デフォルト数値の表示幅
  * @type string
  * @default '0000'
- * @parent CommonSetting
- * 
- * @param GaugeHeight
- * @desc ゲージの高さ範囲。0でデフォルト値 ※ゲージ数値設定で指定していなくても適用されます。
- * @text ゲージの高さ範囲
- * @type number
- * @default 0
  * @parent CommonSetting
  * 
  */
@@ -662,6 +710,8 @@
  * @option 'tp'
  * @option 'time'
  * @option 'limit'
+ * @option 'exp'
+ * @option 'menuexp'
  * @default 
  * 
  * @param ValueVisible
@@ -702,20 +752,6 @@
  * @type string
  * @default 
  * 
- * @param LabelIcon
- * @desc ラベルアイコンID。0で文字で表示されます。
- * @text ラベルアイコンID
- * @type icon
- * @default 0
- * @min 0
- * 
- * @param LabelIconScale
- * @desc ラベルアイコンの拡大率を指定します。(百分率)
- * @text ラベルアイコン拡大率
- * @type number
- * @default 100
- * @min 0
- * 
  * @param FilteringClass
  * @text フィルタリングクラス設定
  * @desc 適用するウィンドウクラスを指定します。無指定の場合は全てのウィンドウで反映されます。(複数指定可)
@@ -731,6 +767,42 @@
  * @option 'Sprite_Enemy'
  * @option 'Window_CustomMenuDataList'
  * @default
+ * 
+ * @param GaugeImg
+ * @desc 表示するゲージ画像を指定します。現バージョンでは特定時でのゲージ色変化には対応しておりません。
+ * @text ゲージ画像
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @param GaugeDisplayRangeSetting
+ * @text ゲージ表示範囲設定
+ * @default ------------------------------ 
+ * 
+ * @param GaugeWidth
+ * @desc ゲージの横幅(外部プラグインのゲージ以外サポート)
+ * @text ゲージ横幅
+ * @type number
+ * @default 128
+ * @min 0
+ * @parent GaugeDisplayRangeSetting
+ * 
+ * @param GaugeHeight
+ * @desc ゲージの高さ
+ * @text ゲージ高さ
+ * @type number
+ * @default 12
+ * @min 0
+ * @parent GaugeDisplayRangeSetting
+ * 
+ * @param BitmapHeight
+ * @desc ゲージエリアの高さ(外部プラグインのゲージ以外サポート)
+ * @text ゲージエリア高さ
+ * @type number
+ * @default 32
+ * @min 0
+ * @parent GaugeDisplayRangeSetting
+ * 
  * 
  * @param CoordinateSetting
  * @text 座標設定
@@ -947,8 +1019,23 @@
  * @parent ColorSetting
  * 
  * @param GaugeColorSetting
- * @text ゲージ設定
+ * @text ゲージ色設定
  * @default ------------------------------
+ * @parent ColorSetting
+ * 
+ * @param GaugeBackColor
+ * @desc ゲージの背景色。
+ * @text ゲージ背景色
+ * @type color
+ * @default 19
+ * @parent GaugeColorSetting
+ * 
+ * @param GaugeStrokeColor
+ * @desc ゲージの枠色。(-1で枠無)
+ * @text ゲージ枠色
+ * @type color
+ * @default -1
+ * @parent GaugeColorSetting
  * 
  * @param GaugeColor1
  * @desc ゲージの色左(-1でデフォルト値)
@@ -965,6 +1052,26 @@
  * @default -1
  * @min -1
  * @parent GaugeColorSetting
+ * 
+ * @param IconSetting
+ * @text アイコン設定
+ * @default ------------------------------
+ * 
+ * @param LabelIcon
+ * @desc ラベルアイコンID。0で文字で表示されます。
+ * @text ラベルアイコンID
+ * @type icon
+ * @default 0
+ * @min 0
+ * @parent IconSetting
+ * 
+ * @param LabelIconScale
+ * @desc ラベルアイコンの拡大率を指定します。(百分率)
+ * @text ラベルアイコン拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * @parent IconSetting
  * 
  * @param GaugeColorMaxSetting
  * @text 最大時ゲージ設定
@@ -1044,44 +1151,363 @@ var Imported = Imported || {};
 Imported.NUUN_GaugeValueEX = true;
 
 (() => {
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const parameters = PluginManager.parameters('NUUN_GaugeValueEX');
-    const ValueDigits = String(parameters['ValueDigits']);
-    const GaugeValueSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['GaugeValueSetting'])) : null) || [];
-    const ValueAlign = eval(parameters['ValueAlign']) || 'right';
-    const GaugeHeight = Number(parameters['GaugeHeight'] || 0);
+    const _gaugeTemp = new Nuun_TempParam();
 
-    const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
-    Sprite_Gauge.prototype.initMembers = function() {
-        this._gaugeData = null;
-        this._LabelIconSprite = null;
-        _Sprite_Gauge_initMembers.call(this);
-    };
+    class Nuun_NuunExGauge {
+        constructor(_sprite) {
+            this._data = null;
+            this._sprite = _sprite;
+            this._gaugeSprite = null;
+        }
 
-    const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
-    Sprite_Gauge.prototype.setup = function(battler, statusType) {
-        this.initGaugeData(statusType);
-        this.createIconSprite();
-        _Sprite_Gauge_setup.call(this, battler, statusType);
-    };
+        setup(battler, type) {
+            this._battler = battler;
+            this._data = this.getFindGaugeData(type);
+            this._statusType = type;
+            this.loadGaugeImg();
+            this.createIconSprite();
+        }
 
-    Sprite_Gauge.prototype.createIconSprite = function() {
-        if (this._gaugeData && this._gaugeData.LabelIcon > 0) {
-            if (!this._LabelIconSprite) {
-                const sprite = new Sprite();
-                this.addChild(sprite);
-                sprite.bitmap = new Bitmap(ImageManager.iconWidth, ImageManager.iconHeight);
-                sprite.bitmap = ImageManager.loadSystem("IconSet");
-                this._LabelIconSprite = sprite;
-                sprite.setFrame(0, 0, 0, 0);
+        isData() {
+            return !!this._data;
+        }
+
+        bitmapWidth() {
+            return this._sprite.bitmapWidth ? this._sprite.bitmapWidth() : 128;
+        }
+
+        getBitmapWidth() {
+            return this._data && this._data.GaugeWidth > 0 ? this._data.GaugeWidth : _Sprite_Gauge_bitmapWidth.apply(this._sprite, arguments);
+        }
+
+        getBitmapHeight() {
+            return this._data && this._data.BitmapHeight > 0 ? this._data.BitmapHeight : _Sprite_Gauge_bitmapHeight.apply(this._sprite, arguments);
+        }
+
+        getGaugeHeight() {
+            return this._data && this._data.GaugeHeight > 0 ? this._data.GaugeHeight : _Sprite_Gauge_gaugeHeight.apply(this._sprite, arguments);
+        }
+
+        getFindGaugeData(statusType) {
+            return params.GaugeValueSetting.find(data => (data.Type === statusType || data.Type === 'all') && this._sprite.filteringGaugeDataClass(data));
+        }
+
+        valueWidth() {
+            return (this._data && this._data.ValueWidth > 0 ? Math.min(this._data.ValueWidth, this.bitmapWidth() - this.gaugeX()) : this.bitmapWidth() - this.gaugeX()) - this.valueMargin();
+        }
+
+        drawGaugeVisible() {
+            return this._data ? this._data.GaugeVisible : true;
+        }
+
+        gaugeX() {
+            return this._data && this._data.GaugeX >= 0 ? this._data.GaugeX : _Sprite_Gauge_gaugeX.apply(this._sprite, arguments);
+        }
+
+        gaugeY() {
+            return this._data ? this._data.GaugeY : this._sprite.textHeight() - this._sprite.gaugeHeight();
+        }
+
+        gaugeX_MV() {
+            return this._data && this._data.GaugeX >= 0 ? this._data.GaugeX : this._sprite.nuun_gaugeX(this._statusType);
+        }
+
+        labelX() {
+            return this._data ? this._data.LabelX : 0;
+        }
+
+        labelY() {
+            return this._data ? this._data.LabelY : _Sprite_Gauge_labelY.apply(this._sprite, arguments);
+        }
+
+        valueX() {
+            return this._data ? this._data.ValueX : 0;
+        }
+
+        valueY() {
+            return this._data ? this._data.ValueY : 0;
+        }
+
+        maxValueX() {
+            return this._data ? this._data.MaxValueX : 0;
+        }
+
+        maxValueY() {
+            return this._data ? this._data.MaxValueY : 0;
+        }
+
+        separationX() {
+            return this._data ? this._data.SeparationX : 0;
+        }
+
+        separationY() {
+            return this._data ? this._data.SeparationY : 0;
+        }
+
+        valueDigits() {
+            return this._data && this._data.ValueDigits ? this._data.ValueDigits : params.ValueDigits;
+        }
+
+        valueSpaceMargin() {
+            return this._data ? this._data.ValueSpaceMargin : 0
+        }
+
+        valueMargin() {
+            return this._data ? this._data.ValueSpaceMargin : 0
+        }
+
+        valueAlign() {
+            return this._data && this._data.ValueAlign && this._data.ValueAlign !== 'default' ? this._data.ValueAlign : params.ValueAlign;
+        }
+
+        valueAbsoluteCoordinates() {
+            return this._data && this._data.ValueAbsoluteCoordinates;
+        }
+
+        labelAbsoluteCoordinates() {
+            return this._data && this._data.LabelAbsoluteCoordinates;
+        }
+
+        gaugeAbsoluteCoordinates () {
+            return this._data && this._data.GaugeAbsoluteCoordinates;
+        }
+
+        valueFontSize() {
+            return this._data ? $gameSystem.mainFontSize() + this._data.ValueFontSize : _Sprite_Gauge_valueFontSize.apply(this._sprite, arguments);
+        }
+
+        maxValueFontSize() {
+            return $gameSystem.mainFontSize() + (this._data ? this._data.MaxValueFontSize : -6);
+        }
+
+        separationFontSize() {
+            return $gameSystem.mainFontSize() + (this._data ? this._data.SeparationFontSize : -6);
+        }
+
+        labelFontSize() {
+            return this._data ? $gameSystem.mainFontSize() + this._data.LabelFontSize : _Sprite_Gauge_labelFontSize.apply(this._sprite, arguments);
+        }
+
+        createIconSprite() {
+            if (this._data && this.labelIcon() > 0) {
+                if (!this._sprite._LabelIconSprite) {
+                    const sprite = new Sprite();
+                    this._sprite.addChild(sprite);
+                    sprite.bitmap = new Bitmap(ImageManager.iconWidth, ImageManager.iconHeight);
+                    sprite.bitmap = ImageManager.loadSystem("IconSet");
+                    this._sprite._LabelIconSprite = sprite;
+                    sprite.setFrame(0, 0, 0, 0);
+                }
             }
         }
+
+        labelIcon() {
+            return this._data.LabelIcon;
+        }
+
+        LabelIconScale() {
+            return this._data.LabelIconScale;
+        }
+
+        labelColor() {
+            return this._data ? NuunManager.getColorCode(this._data.LabelColor) : _Sprite_Gauge_labelColor.apply(this._sprite, arguments);
+        }
+
+        maxValueColor() {
+            return this._data ? (this._data.MaxValueColor === -1 ? this._sprite.valueColor() : NuunManager.getColorCode(this._data.MaxValueColor)) : ColorManager.textColor(0);
+        }
+
+        separationColor() {
+            return this._data ? (this._data.SeparationColor === -1 ? this._sprite.valueColor() : NuunManager.getColorCode(this._data.SeparationColor)) : ColorManager.textColor(0);
+        }
+
+        gaugeBackColor() {
+            return this._data ? NuunManager.getColorCode(this._data.GaugeBackColor) : ColorManager.gaugeBackColor();
+        }
+
+        gaugeStrokeColor() {
+            return this._data && this._data.GaugeStrokeColor >= 0 ? NuunManager.getColorCode(this._data.GaugeStrokeColor) : null;
+        }
+
+        valueColor() {
+            if (this._sprite && this._sprite.valueColor) {
+                this._sprite.valueColor();
+            } else {
+                Sprite_Gauge.prototype.valueColor.call(this);
+            }
+        }
+
+        gaugeColor1() {
+            const exColor = this.changeGaugeColor1();
+            return exColor ? NuunManager.getColorCode(exColor) : this._sprite.gaugeColor1();
+        }
+
+        changeGaugeColor1() {
+            if (this._data.GaugeColorMaxApply && this._sprite.currentMaxValue() === this._sprite.currentValue()) {
+                return this._data.MaxGaugeColor1 || 0;
+            } else if (this._data.GaugeColorRatioApply && this._statusType === 'hp' && this.getGaugeHpRatio()) {
+                return this._data.RatioGaugeColor1 || 0;
+            } else if (this._data.GaugeColorRatioApply && this.isRatioGauge()) {
+                return this._data.RatioGaugeColor1 || 0;
+            } else if (this._data.GaugeColor1 >= 0) {
+                return this._data.GaugeColor1;
+            }
+            return null;
+        }
+
+        gaugeColor2() {
+            const exColor = this.changeGaugeColor2();
+            return exColor ? NuunManager.getColorCode(exColor) : this._sprite.gaugeColor2();
+        }
+
+        changeGaugeColor2() {
+            if (this._data.GaugeColorMaxApply && this._sprite.currentMaxValue() === this._sprite.currentValue()) {
+                return this._data.MaxGaugeColor2 || 0;
+            } else if (this._data.GaugeColorRatioApply && this._statusType === 'hp' && this.getGaugeHpRatio()) {
+                return this._data.RatioGaugeColor2 || 0;
+            } else if (this._data.GaugeColorRatioApply && this.isRatioGauge()) {
+                return this._data.RatioGaugeColor2 || 0;
+            } else if (this._data.GaugeColor2 >= 0) {
+                return this._data.GaugeColor2;
+            }
+            return null;
+        }
+
+        gaugeColor1_MV() {
+            return Sprite_Gauge.prototype.gaugeColor1.apply(this, arguments);
+        }
+
+        gaugeColor2_MV() {
+            return Sprite_Gauge.prototype.gaugeColor2.apply(this, arguments);
+        }
+
+        getGaugeHpRatio() {
+            if (this._data.RatioGauge === 0) {
+                return this._battler.isDying();
+              } else {
+                return this.isRatioGauge();
+              }
+        }
+
+        isRatioGauge() {
+            return this._battler.isAlive() && this._sprite.currentValue() < this._sprite.currentMaxValue() * this._data.RatioGauge / 100;
+        }
+
+        drawValueValueVisible() {
+            switch (this._data.ValueVisible) {
+                case 'ValueMaxValue':
+                    this._sprite.drawValueMaxValue();
+                    break;
+                case 'Value':
+                    this._sprite.drawValue2();
+                    break; 
+                case 'NoValue':
+                    break;
+            }
+        }
+
+        drawValueEXImg() {
+            switch (this._data.ValueVisible) {
+                case 'ValueMaxValue':
+                case 'Value':
+                    this._sprite.drawValueImg();
+                    break; 
+                case 'NoValue':
+                    break;
+            }
+        }
+
+        valueXPosition(x, width, valueWidth, maxValueWidth, valueMarginX) {
+            if (this.valueAbsoluteCoordinates()) {
+                return this.valueMargin();
+            }
+            switch (this.valueAlign()) {
+                case 'left':
+                    return x;
+                case 'center':
+                    return x + width / 2 - (6 + valueWidth + valueMarginX);
+                case 'right':
+                    return x + width - (maxValueWidth + (valueMarginX * 2) + valueWidth + 12);
+                default:
+                    return x;
+            }
+        }
+
+        maxValueXPosition(x, width, valueWidth, maxValueWidth, valueMarginX) {
+            if (this.valueAbsoluteCoordinates()) {
+                return this.valueMargin();
+            }
+            switch (this.valueAlign()) {
+                case 'left':
+                    return x + (valueMarginX * 2) + valueWidth + 12;
+                case 'center':
+                    return x + width / 2 + (6 + valueMarginX);
+                case 'right':
+                    return x + (width - maxValueWidth);
+                default:
+                    return x;
+            }
+        }
+
+        separationXPosition(x, width, valueWidth, maxValueWidth, valueMarginX) {
+            if (this.valueAbsoluteCoordinates()) {
+                return this.valueMargin();
+            }
+            switch (this.valueAlign()) {
+                case 'left':
+                    return x + valueWidth + valueMarginX;
+                case 'center':
+                    return x + width / 2 - 6;
+                case 'right':
+                    return x + width - maxValueWidth - valueMarginX - 12;
+                default:
+                    return x;
+            }
+        }
+
+        valueFontFace() {
+            if (this._data) {
+                return this._data.UserValueFontFace ? this._data.UserValueFontFace : (this._data.ValueFontFace ? $gameSystem.mainFontFace() : _Sprite_Gauge_valueFontFace.call(this));
+            } else {
+                return _Sprite_Gauge_valueFontFace.call(this);
+            }
+        }
+
+        labelFontFace() {
+        if (this._data) {
+                return this._data.UserLabelFontFace ? this._data.UserLabelFontFace : _Sprite_Gauge_labelFontFace.call(this);
+            } else {
+                return _Sprite_Gauge_labelFontFace.call(this);
+            }
+        }
+
+        IconFrame(index) {
+            const pw = ImageManager.iconWidth;
+            const ph = ImageManager.iconHeight;
+            const sx = (index % 16) * pw;
+            const sy = Math.floor(index / 16) * ph;
+            this._sprite._LabelIconSprite.setFrame(sx, sy, pw, ph);
+        }
+
+        isGaugeImg() {
+            return this._data && !!this._data.GaugeImg;
+        }
+
+        getGaugeImg() {
+            return this._data.GaugeImg;
+        }
+
+        loadGaugeImg() {
+            if (this.isGaugeImg()) {
+                ImageManager.nuun_LoadPictures(this.getGaugeImg());
+            }
+        }
+
     };
 
-    Sprite_Gauge.prototype.initGaugeData = function(statusType) {
-        this._gaugeData = this.getFindGaugeData(statusType);
-    };
-
-    Sprite_Gauge.prototype.filteringGaugeDataClass = function(data) {
+    Sprite.prototype.filteringGaugeDataClass = function(data) {
         const className = this.className ? this.className : NuunManager.isFilterClass(this);
         if (data.FilteringClass && data.FilteringClass.length > 0) {
             return data.FilteringClass.some(filterClass => filterClass === className);
@@ -1090,301 +1516,210 @@ Imported.NUUN_GaugeValueEX = true;
         }
     };
 
-    Sprite_Gauge.prototype.getFindGaugeData = function(statusType) {
-        return GaugeValueSetting.find(data => (data.Type === statusType || data.Type === 'all') && this.filteringGaugeDataClass(data));
+
+    const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
+    Sprite_Gauge.prototype.initMembers = function() {
+        this._gaugeData = new Nuun_NuunExGauge(this);
+        this._LabelIconSprite = null;
+        if (!!_gaugeTemp && !!_gaugeTemp.getType()) {
+            this._battler = _gaugeTemp.getExParams();
+            this._statusType = _gaugeTemp.getType();
+            this.initGaugeData(this._battler, this._statusType);
+            this._bitmapWidth = this._gaugeData.getBitmapWidth();
+            this._bitmapHeight = this._gaugeData.getBitmapHeight();
+            _gaugeTemp.clear();
+        }
+        _Sprite_Gauge_initMembers.apply(this, arguments);
     };
 
-    Sprite_Gauge.prototype.valueWidth = function() {
-        return (this._gaugeData.ValueWidth && this._gaugeData.ValueWidth > 0 ? Math.min(this._gaugeData.ValueWidth, this.bitmapWidth() - this.gaugeX()) : this.bitmapWidth() - this.gaugeX()) - this.valueMargin();
+    const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
+    Sprite_Gauge.prototype.setup = function(battler, statusType) {
+        if (this._gaugeData && !this._gaugeData.isData()) {
+            this.initGaugeData(battler, statusType);
+        }
+        _Sprite_Gauge_setup.apply(this, arguments);
     };
 
-    Sprite_Gauge.prototype.drawGaugeVisible = function() {
-        return this._gaugeData ? this._gaugeData.GaugeVisible : true;
+    Sprite_Gauge.prototype.initGaugeData = function(battler, statusType) {
+        this._gaugeData.setup(battler, statusType);
     };
 
+    const _Sprite_Gauge_bitmapWidth = Sprite_Gauge.prototype.bitmapWidth;
+    Sprite_Gauge.prototype.bitmapWidth = function() {
+        return this._bitmapWidth ? this._bitmapWidth : _Sprite_Gauge_bitmapWidth.apply(this, arguments);
+    };
+    
     const _Sprite_Gauge_bitmapHeight = Sprite_Gauge.prototype.bitmapHeight;
     Sprite_Gauge.prototype.bitmapHeight = function() {
-        if (GaugeHeight > 0) {
-            return GaugeHeight;
-        } else {
-            return _Sprite_Gauge_bitmapHeight.call(this);
-        }
+        return this._bitmapHeight ? this._bitmapHeight : _Sprite_Gauge_bitmapHeight.apply(this, arguments);
+    };
+
+    const _Sprite_Gauge_gaugeHeight = Sprite_Gauge.prototype.gaugeHeight;
+    Sprite_Gauge.prototype.gaugeHeight = function() {
+        return this._gaugeData.isData() ? this._gaugeData.getGaugeHeight() : _Sprite_Gauge_gaugeHeight.apply(this, arguments);
     };
 
     const _Sprite_Gauge_gaugeX = Sprite_Gauge.prototype.gaugeX;
     Sprite_Gauge.prototype.gaugeX = function() {
-        return this._gaugeData && this._gaugeData.GaugeX >= 0 ? this._gaugeData.GaugeX : _Sprite_Gauge_gaugeX.call(this);
+        return this._gaugeData.isData() ? this._gaugeData.gaugeX() : _Sprite_Gauge_gaugeX.apply(this, arguments);
     };
 
     Sprite_Gauge.prototype.gaugeY = function() {
-        return this._gaugeData.GaugeY || 0;
+        return this._gaugeData.isData() ? this._gaugeData.GaugeY() : this.textHeight() - this.gaugeHeight();
     };
 
-    Sprite_Gauge.prototype.valueX = function() {
-        return this._gaugeData.ValueX || 0;
-    };
-    
-    Sprite_Gauge.prototype.valueY = function() {
-        return this._gaugeData.ValueY || 0;
-    };
-
-    Sprite_Gauge.prototype.maxValueX = function() {
-        return this._gaugeData.MaxValueX || 0;
-    };
-    
-    Sprite_Gauge.prototype.maxValueY = function() {
-        return this._gaugeData.MaxValueY || 0;
-    };
-    
-    Sprite_Gauge.prototype.separationX = function() {
-        return this._gaugeData.SeparationX || 0;
-    };
-    
-    Sprite_Gauge.prototype.separationY = function() {
-        return this._gaugeData.SeparationY || 0;
-    };
-
-    Sprite_Gauge.prototype.labelX = function() {
-        return this._gaugeData.LabelX || 0;
-    };
-    
     const _Sprite_Gauge_labelY = Sprite_Gauge.prototype.labelY;
     Sprite_Gauge.prototype.labelY = function() {
-        return this._gaugeData ? (this._gaugeData.LabelY || 0) : _Sprite_Gauge_labelY.call(this);
-    };
-
-    Sprite_Gauge.prototype.valueDigits = function() {
-        return this._gaugeData.ValueDigits ? this._gaugeData.ValueDigits : ValueDigits;
-    };
-
-    Sprite_Gauge.prototype.valueSpaceMargin = function() {
-        return this._gaugeData.ValueSpaceMargin || 0
-    };
-
-    Sprite_Gauge.prototype.valueMargin = function() {
-        return this._gaugeData.ValueMargin || 0
-    };
-
-    Sprite_Gauge.prototype.valueAlign = function() {
-        return this._gaugeData && this._gaugeData.ValueAlign && this._gaugeData.ValueAlign !== 'default' ? this._gaugeData.ValueAlign : ValueAlign;
-    };
-
-    Sprite_Gauge.prototype.valueAbsoluteCoordinates = function() {
-        return this._gaugeData.ValueAbsoluteCoordinates;
-    };
-
-    Sprite_Gauge.prototype.labelAbsoluteCoordinates = function() {
-        return this._gaugeData.LabelAbsoluteCoordinates;
+        return this._gaugeData.isData() ? this._gaugeData.labelY() : _Sprite_Gauge_labelY.apply(this, arguments);
     };
     
-    Sprite_Gauge.prototype.gaugeAbsoluteCoordinates = function() {
-        return this._gaugeData.gaugeAbsoluteCoordinates;
-    };
-
     const _Sprite_Gauge_valueFontSize = Sprite_Gauge.prototype.valueFontSize;
     Sprite_Gauge.prototype.valueFontSize  = function() {
-        return this._gaugeData ? $gameSystem.mainFontSize() + (this._gaugeData.ValueFontSize || 0) : _Sprite_Gauge_valueFontSize.call(this);
+        return this._gaugeData.isData() ? this._gaugeData.valueFontSize() : _Sprite_Gauge_valueFontSize.apply(this, arguments);
     };
     
     Sprite_Gauge.prototype.maxValueFontSize  = function() {
-        return $gameSystem.mainFontSize() + (this._gaugeData ? (this._gaugeData.MaxValueFontSize || 0) : -6);
+        return this._gaugeData.maxValueFontSize();
     };
     
     Sprite_Gauge.prototype.separationFontSize  = function() {
-        return $gameSystem.mainFontSize() + (this._gaugeData ? (this._gaugeData.SeparationFontSize || 0) : -6);
+        return this._gaugeData.separationFontSize();
     };
 
     const _Sprite_Gauge_labelFontSize = Sprite_Gauge.prototype.labelFontSize;
     Sprite_Gauge.prototype.labelFontSize = function() {
-        return this._gaugeData ? $gameSystem.mainFontSize() + (this._gaugeData.LabelFontSize || 0) : _Sprite_Gauge_labelFontSize.call(this);
+        return this._gaugeData.isData() ? this._gaugeData.labelFontSize() : _Sprite_Gauge_labelFontSize.apply(this, arguments);
     };
 
     const _Sprite_Gauge_labelColor = Sprite_Gauge.prototype.labelColor;
     Sprite_Gauge.prototype.labelColor = function() {
-        return this._gaugeData ? NuunManager.getColorCode(this._gaugeData.LabelColor || 16) : _Sprite_Gauge_labelColor.call(this);
+        return this._gaugeData.isData() ? this._gaugeData.labelColor() : _Sprite_Gauge_labelColor.apply(this, arguments);
     };
 
     Sprite_Gauge.prototype.maxValueColor  = function() {
-        return this._gaugeData ? (this._gaugeData.MaxValueColor === -1 ? this.valueColor() : NuunManager.getColorCode(this._gaugeData.MaxValueColor || 0)) : ColorManager.textColor(0);
+        return this._gaugeData.maxValueColor();
     };
     
     Sprite_Gauge.prototype.separationColor  = function() {
-        return this._gaugeData ? (this._gaugeData.SeparationColor === -1 ? this.valueColor() : NuunManager.getColorCode(this._gaugeData.SeparationColor || 0)) : ColorManager.textColor(0);
-    };
-
-    const _Sprite_Gauge_gaugeColor1 = Sprite_Gauge.prototype.gaugeColor1;
-    Sprite_Gauge.prototype.gaugeColor1 = function() {
-        if (this._gaugeData) {
-            return NuunManager.getColorCode(this.changeGaugeColor1());
-        }
-        return _Sprite_Gauge_gaugeColor1.call(this);
-    };
-
-    const _Sprite_Gauge_gaugeColor2 = Sprite_Gauge.prototype.gaugeColor2;
-    Sprite_Gauge.prototype.gaugeColor2 = function() {
-        if (this._gaugeData) {
-            return NuunManager.getColorCode(this.changeGaugeColor2());
-        }
-        return _Sprite_Gauge_gaugeColor2.call(this);
-    };
-
-    Sprite_Gauge.prototype.getGaugeHpRatio = function() {
-        if (this._gaugeData.RatioGauge === 0) {
-          return this._battler.isDying();
-        } else {
-          return this.isRatioGauge();
-        }
-    };
-
-    Sprite_Gauge.prototype.changeGaugeColor1 = function() {
-        if (this._gaugeData.GaugeColorMaxApply && this.currentMaxValue() === this.currentValue()) {
-            return this._gaugeData.MaxGaugeColor1 || 0;
-        } else if (this._gaugeData.GaugeColorRatioApply && this._statusType === 'hp' && this.getGaugeHpRatio()) {
-            return this._gaugeData.RatioGaugeColor1 || 0;
-        } else if (this._gaugeData.GaugeColorRatioApply && this.isRatioGauge()) {
-            return this._gaugeData.RatioGaugeColor1 || 0;
-        } else if (this._gaugeData.GaugeColor1 >= 0) {
-            return this._gaugeData.GaugeColor1;
-        }
-        return _Sprite_Gauge_gaugeColor1.call(this);
-    };
-    
-      Sprite_Gauge.prototype.changeGaugeColor2 = function() {
-        if (this._gaugeData.GaugeColorMaxApply && this.currentMaxValue() === this.currentValue()) {
-            return this._gaugeData.MaxGaugeColor2 || 0;
-        } else if (this._gaugeData.GaugeColorRatioApply && this._statusType === 'hp' && this.getGaugeHpRatio()) {
-            return this._gaugeData.RatioGaugeColor2 || 0;
-        } else if (this._gaugeData.GaugeColorRatioApply && this.isRatioGauge()) {
-            return this._gaugeData.RatioGaugeColor1 || 0;
-        } else if (this._gaugeData.GaugeColor2 >= 0) {
-            return this._gaugeData.GaugeColor2;
-        }
-        return _Sprite_Gauge_gaugeColor2.call(this);
+        return this._gaugeData.separationColor();
     };
 
     const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
     Sprite_Gauge.prototype.drawValue = function() {
-        if (this._gaugeData) {
-            if (this._gaugeData.ValueVisible === 'ValueMaxValue') {
-                this.drawValueMaxValue();
-              } else if (this._gaugeData.ValueVisible === 'Value') {
-                this.drawValue2(); 
-              } else if (this._gaugeData.ValueVisible === 'NoValue') {
-        
-              }
+        if (this._gaugeData.isData()) {
+            this._gaugeData.drawValueValueVisible();
         } else {
-            _Sprite_Gauge_drawValue.call(this);
+            _Sprite_Gauge_drawValue.apply(this, arguments);
         }
     };
 
-    Sprite_Gauge.prototype.valueXPosition = function(x, width, valueWidth, maxValueWidth, valueMarginX) {
-        if (this.valueAbsoluteCoordinates()) {
-            return this.valueMargin();
-        }
-        switch (this.valueAlign()) {
-            case 'left':
-                return x;
-            case 'center':
-                return x + width / 2 - (6 + valueWidth + valueMarginX);
-            case 'right':
-                return x + width - (maxValueWidth + (valueMarginX * 2) + valueWidth + 12);
-            default:
-                return x;
-        }
+    Sprite_Gauge.prototype.drawValue2 = function() {
+        const currentValue = this.currentValue();
+        const width = this.bitmapWidth() - this.gaugeX() - this._gaugeData.valueMargin();
+        const height = (this.textHeight ? this.textHeight() : 24)
+        const x = (this._gaugeData.valueAbsoluteCoordinates() ? 0 : this.gaugeX()) + this._gaugeData.valueX() + this._gaugeData.valueMargin();
+        const y = this._gaugeData.valueY();
+        this.setupValueFont();
+        this.bitmap.drawText(currentValue, x, y, width, height, this._gaugeData.valueAlign());
     };
 
-    Sprite_Gauge.prototype.maxValueXPosition = function(x, width, valueWidth, maxValueWidth, valueMarginX) {
-        if (this.valueAbsoluteCoordinates()) {
-            return this.valueMargin();
-        }
-        switch (this.valueAlign()) {
-            case 'left':
-                return x + (valueMarginX * 2) + valueWidth + 12;
-            case 'center':
-                return x + width / 2 + (6 + valueMarginX);
-            case 'right':
-                return x + (width - maxValueWidth);
-            default:
-                return x;
-        }
-    };
-
-    Sprite_Gauge.prototype.separationXPosition = function(x, width, valueWidth, maxValueWidth, valueMarginX) {
-        if (this.valueAbsoluteCoordinates()) {
-            return this.valueMargin();
-        }
-        switch (this.valueAlign()) {
-            case 'left':
-                return x + valueWidth + valueMarginX;
-            case 'center':
-                return x + width / 2 - 6;
-            case 'right':
-                return x + width - maxValueWidth - valueMarginX - 12;
-            default:
-                return x;
-        }
+    Sprite_Gauge.prototype.drawValueMaxValue = function() {
+        const valueDigits = this._gaugeData.valueDigits();
+        const currentValue = this.currentValue();
+        const currentMaxValue = this.currentMaxValue();
+        const bitmapWidth = this._gaugeData.valueWidth();
+        const ValueMarginX = this._gaugeData.valueSpaceMargin();
+        const width = Math.floor((bitmapWidth - ValueMarginX * 2 - 12) / 2);
+        const height = (this.textHeight ? this.textHeight() : 24)
+        const x = this.gaugeX() + this._gaugeData.valueMargin();
+        this.setupValueFont();
+        const valueWidth = valueDigits ? Math.min(this.getValueTextWidth(), width) : Math.min(this.bitmap.measureTextWidth(currentValue), width);
+        this.bitmap.fontSize = this._gaugeData.maxValueFontSize();
+        const maxValueWidth = valueDigits ? Math.min(this.getValueTextWidth(), width) : Math.min(this.bitmap.measureTextWidth(currentMaxValue), width);
+        this.setupValueFont();
+        this.bitmap.drawText(currentValue, this._gaugeData.valueXPosition(x, bitmapWidth, valueWidth, maxValueWidth, ValueMarginX) + this._gaugeData.valueX(), this._gaugeData.valueY(), valueWidth, height, this._gaugeData.valueAlign());
+        this.bitmap.fontSize = this._gaugeData.separationFontSize();
+        this.bitmap.textColor = this._gaugeData.separationColor();
+        this.bitmap.drawText('/', this._gaugeData.separationX() + this._gaugeData.separationXPosition(x, bitmapWidth, valueWidth, maxValueWidth, ValueMarginX), this._gaugeData.separationY(), 12, height, "center");
+        this.bitmap.fontSize = this._gaugeData.maxValueFontSize();
+        this.bitmap.textColor = this._gaugeData.maxValueColor();
+        this.bitmap.drawText(currentMaxValue, this._gaugeData.maxValueXPosition(x, bitmapWidth, valueWidth, maxValueWidth, ValueMarginX) + this._gaugeData.maxValueX(), this._gaugeData.maxValueY(), maxValueWidth, height, this._gaugeData.valueAlign());
     };
 
     Sprite_Gauge.prototype.getValueTextWidth = function() {
-        return this.bitmap.measureTextWidth(this.valueDigits());
+        return this.bitmap.measureTextWidth(this._gaugeData.valueDigits());
+    };
+
+    Sprite_Gauge.prototype.createGaugeImg = function() {
+        this._circularBitmap = ImageManager.nuun_LoadPictures(GaugeImg);
+        const sprite = new Sprite();
+        this.circularSprite = sprite;
+        this.addChild(sprite);
+        this.createCircularSpriteBitmap();
+        this.setCreatePattern(this._circularBitmap);
     };
 
     const _Sprite_Gauge_drawGauge = Sprite_Gauge.prototype.drawGauge;
     Sprite_Gauge.prototype.drawGauge = function() {//再定義
-        if (this._gaugeData) {
-            this.drawGaugeGaugeValueEX()
+        if (this._gaugeData.isData()) {
+            this.nuun_drawGaugeEX()
         } else {
-            _Sprite_Gauge_drawGauge.call(this);
+            _Sprite_Gauge_drawGauge.apply(this, arguments);
         }
     };
 
-    Sprite_Gauge.prototype.drawGaugeGaugeValueEX = function() {
-        if (this.drawGaugeVisible()) {
+    const _Sprite_Gauge_drawGaugeRect = Sprite_Gauge.prototype.drawGaugeRect;
+    Sprite_Gauge.prototype.drawGaugeRect = function(x, y, width, height) {//再定義
+        if (this._gaugeData.isData()) {
+            this.drawGaugeRectEx(x, y, width, height);
+        } else {
+            _Sprite_Gauge_drawGaugeRect.apply(this, arguments);
+        }
+    };
+
+    Sprite_Gauge.prototype.drawGaugeRectEx = function(x, y, width, height) {
+        const rate = this.gaugeRate();
+        const fillW = Math.floor((width - 2) * rate);
+        const fillH = height - 2;
+        this.drawGaugeBackEx(x, y, width, height);
+        this.drawGaugeMainEx(x, y, fillW, fillH);
+    };
+
+    Sprite_Gauge.prototype.drawGaugeBackEx = function(x, y, width, height) {
+        const color0 = this._gaugeData.isData() ? this._gaugeData.gaugeBackColor() : this.gaugeBackColor();
+        const color3 = this._gaugeData.isData() ? this._gaugeData.gaugeStrokeColor() : null;
+        if (!!color3) {
+            this.bitmap.fillRect(x, y, width, height, color3)
+            this.bitmap.fillRect(x + 1, y + 1, width - 2, height - 2, color0);
+        } else {
+            this.bitmap.fillRect(x, y, width, height, color0);
+        }
+    };
+
+    Sprite_Gauge.prototype.drawGaugeMainEx = function(x, y, width, height) {
+        const color1 = this._gaugeData.isData() ? this._gaugeData.gaugeColor1() : this.gaugeColor1();
+        const color2 = this._gaugeData.isData() ? this._gaugeData.gaugeColor2() : this.gaugeColor2();
+        if (!!this._gaugeData.isGaugeImg()) {
+            const bitmap = ImageManager.nuun_LoadPictures(this._gaugeData.getGaugeImg());
+            this.bitmap.gaugeImgRect(x + 1, y + 1, width, height, bitmap);
+        } else {
+            this.bitmap.gradientFillRect(x + 1, y + 1, width, height, color1, color2);
+        }
+    };
+
+    Sprite_Gauge.prototype.nuun_drawGaugeEX = function() {
+        if (this._gaugeData.drawGaugeVisible()) {
             const gaugeX = this.gaugeX();
-            const gaugeY = (this.gaugeAbsoluteCoordinates() ? 0 : (this.textHeight ? this.textHeight() : 24) - this.gaugeHeight()) + this.gaugeY();
+            const gaugeY = (this._gaugeData.gaugeAbsoluteCoordinates() ? 0 : (this.textHeight ? this.textHeight() : 24) - this.gaugeHeight()) + this._gaugeData.gaugeY();
             const gaugewidth = this.bitmapWidth() - gaugeX;
             const gaugeHeight = this.gaugeHeight();
             this.drawGaugeRect(gaugeX, gaugeY, gaugewidth, gaugeHeight);
         }
     };
-    
-
-    Sprite_Gauge.prototype.drawValue2 = function() {
-        const currentValue = this.currentValue();
-        const width = this.bitmapWidth() - this.gaugeX() - this.valueMargin();
-        const height = (this.textHeight ? this.textHeight() : 24)
-        const x = (this.valueAbsoluteCoordinates() ? 0 : this.gaugeX()) + this.valueX() + this.valueMargin();
-        const y = this.valueY();
-        this.setupValueFont();
-        this.bitmap.drawText(currentValue, x, y, width, height, this.valueAlign());
-    };
-
-    Sprite_Gauge.prototype.drawValueMaxValue = function() {
-        const valueDigits = this.valueDigits();
-        const currentValue = this.currentValue();
-        const currentMaxValue = this.currentMaxValue();
-        const bitmapWidth = this.valueWidth();
-        const ValueMarginX = this.valueSpaceMargin();
-        const width = Math.floor((bitmapWidth - ValueMarginX * 2 - 12) / 2);
-        const height = (this.textHeight ? this.textHeight() : 24)
-        const x = this.gaugeX() + this.valueMargin();
-        this.setupValueFont();
-        const valueWidth = valueDigits ? Math.min(this.getValueTextWidth(), width) : Math.min(this.bitmap.measureTextWidth(currentValue), width);
-        this.bitmap.fontSize = this.maxValueFontSize();
-        const maxValueWidth = valueDigits ? Math.min(this.getValueTextWidth(), width) : Math.min(this.bitmap.measureTextWidth(currentMaxValue), width);
-        this.setupValueFont();
-        this.bitmap.drawText(currentValue, this.valueXPosition(x, bitmapWidth, valueWidth, maxValueWidth, ValueMarginX) + this.valueX(), this.valueY(), valueWidth, height, this.valueAlign());
-        this.bitmap.fontSize = this.separationFontSize();
-        this.bitmap.textColor = this.separationColor();
-        this.bitmap.drawText('/', this.separationX() + this.separationXPosition(x, bitmapWidth, valueWidth, maxValueWidth, ValueMarginX), this.separationY(), 12, height, "center");
-        this.bitmap.fontSize = this.maxValueFontSize();
-        this.bitmap.textColor = this.maxValueColor();
-        this.bitmap.drawText(currentMaxValue, this.maxValueXPosition(x, bitmapWidth, valueWidth, maxValueWidth, ValueMarginX) + this.maxValueX(), this.maxValueY(), maxValueWidth, height, this.valueAlign());
-    };
 
     const _Sprite_Gauge_drawLabel = Sprite_Gauge.prototype.drawLabel;
     Sprite_Gauge.prototype.drawLabel = function() {
-        if (this._gaugeData && !this.isGaugeImageLabel()) {
+        if (this._gaugeData.isData() && !this.isGaugeImageLabel()) {
             this.drawLabel2();
         } else {
             _Sprite_Gauge_drawLabel.call(this);
@@ -1392,17 +1727,17 @@ Imported.NUUN_GaugeValueEX = true;
     };
 
     Sprite_Gauge.prototype.drawLabel2 = function() {
-        if (this._LabelIconSprite && this._gaugeData.LabelIcon > 0) {
+        if (this._LabelIconSprite && this._gaugeData.labelIcon() > 0) {
             const sprite = this._LabelIconSprite;
-            this.nuun_IconFrame(this._gaugeData.LabelIcon);
-            sprite.x = (this.labelAbsoluteCoordinates() ? 0 : this.labelOutlineWidth() / 2) + this.labelX();
-            sprite.y = this.labelY();
-            sprite.scale.x = (this._gaugeData.LabelIconScale || 100) / 100;
-            sprite.scale.y = (this._gaugeData.LabelIconScale || 100) / 100;
+            this._gaugeData.IconFrame(this._gaugeData.labelIcon());
+            sprite.x = (this._gaugeData.labelAbsoluteCoordinates() ? 0 : this.labelOutlineWidth() / 2) + this._gaugeData.labelX();
+            sprite.y = this._gaugeData.labelY();
+            sprite.scale.x = (this._gaugeData.LabelIconScale() || 100) / 100;
+            sprite.scale.y = (this._gaugeData.LabelIconScale() || 100) / 100;
         } else {
             const label = this.label();
-            const x = (this.labelAbsoluteCoordinates() ? 0 : this.labelOutlineWidth() / 2) + this.labelX();
-            const y = this.labelY();
+            const x = (this._gaugeData.labelAbsoluteCoordinates() ? 0 : this.labelOutlineWidth() / 2) + this._gaugeData.labelX();
+            const y = this._gaugeData.labelY();
             const width = this.bitmapWidth();
             const height = (this.textHeight ? this.textHeight() : 24)
             this.setupLabelFont();
@@ -1410,6 +1745,16 @@ Imported.NUUN_GaugeValueEX = true;
             this.bitmap.drawText(label, x, y, width, height, "left");
             this.bitmap.paintOpacity = 255;
         }
+    };
+
+    const _Sprite_Gauge_valueFontFace = Sprite_Gauge.prototype.valueFontFace;
+    Sprite_Gauge.prototype.valueFontFace = function() {
+        return this._gaugeData.isData() ? this._gaugeData.valueFontFace() : _Sprite_Gauge_valueFontFace.apply(this, arguments);
+    };
+
+    const _Sprite_Gauge_labelFontFace = Sprite_Gauge.prototype.labelFontFace;
+    Sprite_Gauge.prototype.labelFontFace = function() {
+        return this._gaugeData.isData() ? this._gaugeData.labelFontFace() : _Sprite_Gauge_labelFontFace.apply(this, arguments);
     };
 
     Sprite_Gauge.prototype.isGaugeImageLabel = function() {
@@ -1420,30 +1765,28 @@ Imported.NUUN_GaugeValueEX = true;
         return Imported.NUUN_GaugeImage && this._gaugeImgData;
     };
 
-    const _Sprite_Gauge_valueFontFace = Sprite_Gauge.prototype.valueFontFace;
-    Sprite_Gauge.prototype.valueFontFace = function() {
-        if (this._gaugeData) {
-            return this._gaugeData.UserValueFontFace ? this._gaugeData.UserValueFontFace : (this._gaugeData.ValueFontFace ? $gameSystem.mainFontFace() : _Sprite_Gauge_valueFontFace.call(this));
+    const _Window_StatusBase_placeGauge = Window_StatusBase.prototype.placeGauge;
+    Window_StatusBase.prototype.placeGauge = function(actor, type, x, y) {
+        _gaugeTemp.setGaugeData(null, type, actor);
+        _Window_StatusBase_placeGauge.apply(this, arguments);
+    };
+
+    Window_Base.prototype.filteringGaugeDataClass = function(data) {
+        const className = NuunManager.isFilterClass(this);
+        if (data.FilteringClass && data.FilteringClass.length > 0) {
+            return data.FilteringClass.some(filterClass => filterClass === className);
         } else {
-            return _Sprite_Gauge_valueFontFace.call(this);
+            return true;
         }
     };
 
-    const _Sprite_Gauge_labelFontFace = Sprite_Gauge.prototype.labelFontFace;
-    Sprite_Gauge.prototype.labelFontFace = function() {
-        if (this._gaugeData) {
-            return this._gaugeData.UserLabelFontFace ? this._gaugeData.UserLabelFontFace : _Sprite_Gauge_labelFontFace.call(this);
-        } else {
-            return _Sprite_Gauge_labelFontFace.call(this);
-        }
-    };
-
-    Sprite_Gauge.prototype.nuun_IconFrame = function(index) {
-        const pw = ImageManager.iconWidth;
-        const ph = ImageManager.iconHeight;
-        const sx = (index % 16) * pw;
-        const sy = Math.floor(index / 16) * ph;
-        this._LabelIconSprite.setFrame(sx, sy, pw, ph);
+    Bitmap.prototype.gaugeImgRect = function(x, y, width, height, bitmap) {
+        const context = this.context;
+        context.save();
+        context.fillStyle = context.createPattern(bitmap._image, "no-repeat");
+        context.drawImage(bitmap._image, 0, 0, bitmap.width, bitmap.height, x, y, width, height)
+        context.restore();
+        this._baseTexture.update();
     };
 
 })();

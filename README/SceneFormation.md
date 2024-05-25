@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.1.7.8
+# Ver.1.7.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -23,6 +23,8 @@
 ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）  
 
 ## 更新履歴
+2024/5/25 Ver.1.7.9  
+ターン制でメンバー変更画面を閉じた時に、行動回数が再設定される問題を修正。  
 2023/8/6 Ver.1.7.8  
 処理の修正。  
 2023/7/24 Ver.1.7.7  

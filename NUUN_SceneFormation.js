@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 1.7.8
+ * @version 1.7.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -32,6 +32,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/25 Ver.1.7.9
+ * ターン制でメンバー変更画面を閉じた時に、行動回数が再設定される問題を修正。
  * 2023/8/6 Ver.1.7.8
  * 処理の修正。
  * 2023/7/24 Ver.1.7.7
@@ -1478,7 +1480,7 @@ class Nuun_Formation {
   close() {
     $gameTemp.requestBattleRefresh();
     if (!BattleManager.isTpb()) {
-      BattleManager.startInput();
+        $gameParty.formationMakeActions();
     }
     this._battleMemberNameWindow.close();
     this._memberNameWindow.close();

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.7
+ * @version 1.3.8
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/25 Ver.1.3.8
+ * ターン制でメンバー変更画面を閉じた時に、行動回数が再設定される問題を修正。
  * 2023/8/8 Ver.1.3.7
  * メンバー入れ替え時にカーソルの位置がずれて表示される問題を修正。
  * 2023/8/6 Ver.1.3.6
@@ -277,6 +279,16 @@ const _Game_Temp_initialize = Game_Temp.prototype.initialize;
 Game_Temp.prototype.initialize = function() {
     _Game_Temp_initialize.call(this);
     this.formationRefresh = false;
+};
+
+Game_Party.prototype.formationMakeActions = function() {
+    if (Imported.NUUN_SupportActor) {
+        $gameParty.setWithSupportActorMember();
+    }
+    const members = this.members().filter(member => member._actions.length === 0);
+    for (const member of members) {
+        member.makeActions();
+    }
 };
 
 Window_Command.prototype.addFormationCommand = function() {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.5
+ * @version 1.7.6
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/25/2024 Ver.1.7.6
+ * Fixed some processing.
  * 5/20/2024 Ver.1.7.5
  * Add processing.
  * 5/11/2024 Ver.1.7.4
@@ -100,7 +102,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.5
+ * @version 1.7.6
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -110,6 +112,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/25 Ver.1.7.6
+ * 一部の処理を修正。
  * 2024/5/20 Ver.1.7.5
  * 処理の追加。
  * 2024/5/11 Ver.1.7.4
@@ -587,17 +591,24 @@ Window_Base.prototype.nuun_DrawGauge = function(x, y, width, rate, color1, color
     this.contents.gradientFillRect(gaugeX + 1, gaugeY + 1, fillW, fillH, color1, color2);
 };
 
+Window_Base.prototype.nuun_gaugeX = function(statusType) {
+    if (statusType === "time") {
+        return 0;
+    } else {
+        return this.nuun_LabelWidth() + 6;
+    }
+};
+
 Window_Base.prototype.nuun_LabelWidth = function() {
     const labels = [TextManager.hpA, TextManager.mpA, TextManager.tpA];
     const widths = labels.map(str => this.textWidth(str));
     return Math.ceil(Math.max(...widths));
 };
 
-Window_Base.prototype.nuun_DrawContentsParamUnitText = function(text, data, x, y, width) {
+Window_Base.prototype.nuun_DrawContentsParamUnitText = function(text, data, x, y, width, unit) {
     const padding = this.itemPadding();
-    const unit = getDataUnit(data);
+    unit = getDataUnit(data) || unit;
     const unitWidth = unit ? this.textWidth(unit) + padding : 0;
-    this.resetTextColor();
     if (NuunManager.isFontFace()) {
         isNaN(text) ? this.nuun_setFontFace() : this.nuun_setValueFontFace();
     }
@@ -701,8 +712,8 @@ Spriteset_Battle.prototype.createGaugeBase = function() {
 
 const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
 Spriteset_Battle.prototype.update = function() {
-  _Spriteset_Battle_update.call(this);
-  this.updateBattlerGauge();
+    _Spriteset_Battle_update.call(this);
+    this.updateBattlerGauge();
 };
 
 Spriteset_Battle.prototype.updateBattlerGauge = function() {

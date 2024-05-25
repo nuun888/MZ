@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.8
+ * @version 2.6.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/25 Ver.2.6.10
+ * 能力値、追加能力値、特殊能力値、オリジナルパラメータ、属性耐性、ステート耐性の単位にシステムカラーを適用できるように修正。
  * 2024/4/7 Ver.2.6.9
  * 小数点の桁数が正常に機能していない問題を修正。
  * 2024/4/6 Ver.2.6.8
@@ -2150,11 +2152,11 @@ Window_Status.prototype.nuunStatusDrawActorNickname = function(actor, x, y, widt
 };
 
 Window_Status.prototype.nuunStatusDrawActorFace = function(actor, x, y, width, height) {
-  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-    this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
-  } else {
-    Window_StatusBase.prototype.drawActorFace.call(this, actor, x, y, width, height);
-  }
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
+    } else {
+        Window_StatusBase.prototype.drawActorFace.call(this, actor, x, y, width, height);
+    }
 };
 
 Window_Status.prototype.nuunStatusDrawActorLevel = function(actor, x, y, width, list) {
@@ -2219,6 +2221,7 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
     } else if (params === 9) {
         this.placeGauge(actor, "tp", x, y);
     } else {
+        const padding = this.itemPadding();
         this.contentsFontSize(list);
         this.changeTextColor(NuunManager.getColorCode(list.NameColor));
         let margin = 0;
@@ -2238,13 +2241,6 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
         if (params >= 10 && params < 40) {
             text = NuunManager.numPercentage(text, (list.Decimal - 2) || 0, DecimalMode);
         }
-        if (params >= 2 && params < 8) {
-            text += list.paramUnit ? String(list.paramUnit) : "";
-        } else if (params >= 10 && params < 30) {
-            text += list.paramUnit ? String(list.paramUnit) : " %";
-        } else if (params === 42 || params === 43) {
-            text += list.paramUnit ? String(list.paramUnit) : "";
-        }
         if (params === 44) {
             this.changeTextColor(ColorManager.hpColor(actor));
         } else if (params === 45) {
@@ -2253,7 +2249,13 @@ Window_Status.prototype.drawParams = function(list, actor, x, y, width, params) 
             this.resetTextColor();
         }
         this.nuun_setContentsFontFace(list);
-        this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+        if (params >= 2 && params < 8) {
+            this.nuun_DrawContentsParamUnitText(text, list, x + systemWidth + padding, y, width - (systemWidth + padding));
+        } else if (params >= 10 && params < 30) {
+            this.nuun_DrawContentsParamUnitText(text, list, x + systemWidth + padding, y, width - (systemWidth + padding), '%');
+        } else if (params === 42 || params === 43) {
+            this.nuun_DrawContentsParamUnitText(text, list, x + systemWidth + padding, y, width - (systemWidth + padding));
+        }
     }
 };
 
@@ -2397,8 +2399,7 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
         }
         this.resetTextColor();
         this.nuun_setContentsFontFace(list);
-        text += list.paramUnit ? String(list.paramUnit) : "";
-        this.drawText(text, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+        this.nuun_DrawContentsParamUnitText(text, list, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()));
     }
 };
 
@@ -2448,11 +2449,10 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
                 let rate = actor.elementRate(elementId) * 100;
                 rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
                 const r = rate;
-                rate += list.paramUnit ? String(list.paramUnit) : "%";
                 const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
                 this.resetTextColor();
                 this.nuun_setContentsFontFace(list);
-                this.drawText(rateText, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+                this.nuun_DrawContentsParamUnitText(rateText, list, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), "%");
             }   
         }
     }
@@ -2504,15 +2504,14 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
                 let rate = actor.stateRate(stateId) * 100 * (actor.isStateResist(stateId) ? 0 : 1);
                 rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
                 const r = rate;
-                rate += list.paramUnit ? String(list.paramUnit) : "%";
                 const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
                 if (actor.isStateResist(stateId)) {
-                this.changeTextColor(NuunManager.getColorCode(StateResistColor));
+                    this.changeTextColor(NuunManager.getColorCode(StateResistColor));
                 } else {
-                this.resetTextColor();
+                    this.resetTextColor();
                 }
                 this.nuun_setContentsFontFace(list);
-                this.drawText(rateText, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), (list.Align || 'right'));
+                this.nuun_DrawContentsParamUnitText(rateText, list, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), "%");
             }
         }
     }
@@ -2741,7 +2740,7 @@ Window_StatusBase.prototype.createInnerChipSprite = function(key, id) {
 };
 
 Window_Status.prototype.placeExpGauge = function(actor, x, y) {
-  const type = 'exp'
+  const type = 'menuexp';
   if (Imported.NUUN_GaugeImage) {
     this.placeGaugeImg(actor, type, x, y);
   }

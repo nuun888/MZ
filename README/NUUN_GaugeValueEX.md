@@ -1,5 +1,5 @@
 # [ゲージ表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
-# Ver.1.5.0
+# Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeValueEX.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -59,6 +59,8 @@ Ver.1.2.0より別プラグイン化いたしました。
 [ダメージ量ゲージ可視化](https://github.com/nuun888/MZ/blob/master/README/DamageGauge.md)  
 
 ### 更新履歴
+2024/5/26 Ver.1.5.1  
+ゲージ一時データが削除されない問題を修正。  
 2024/5/24 Ver.1.5.0  
 システムの改修  
 ゲージに画像を指定できる機能を追加。  

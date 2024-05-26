@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.3
+ * @version 3.1.4
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/26/2024 Ver.3.1.4
+ * Updated with circle gauge support.
  * 5/12/2024 Ver.3.1.3
  * Added a function to skip actor target selection when there is only one member.
  * Corrected spelling error in party limit gauge.
@@ -196,6 +198,8 @@
  * @value 2
  * @option Current Acquisition Percentage Display
  * @value 3
+ * @option Level display(Circle gauge only)
+ * @value 4
  * @default 1
  * @parent ExpgaugeSetting
  * 
@@ -692,12 +696,20 @@
  * @value MpGauge
  * @option TP Gauge(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value TpGauge
+ * @option CircularHP(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value HpCircularGauge
+ * @option CircularMP(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value MpCircularGauge
+ * @option CircularTP(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value TpCircularGauge
  * @option NowEXP(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value ExpInfo
  * @option NextEXP(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value Exp
  * @option EXP Gauge(1)(2)(3)(4)(5)(6)(7)(21)
  * @value ExpGauge
+ * @option CircularExpGauge (1)(2)(3)(4)(5)(6)(7)(21)
+ * @value ExpCircularGauge
  * @option ATK(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value Atk
  * @option Def(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
@@ -1404,6 +1416,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/26 Ver.3.1.4
+ * サークルゲージ対応による更新。
  * 2024/5/12 Ver.3.1.3
  * メンバーが一人の時にアクター対象選択をスキップする機能を追加。
  * パーティリミットゲージのスペルミス修正。
@@ -1508,6 +1522,8 @@
  * @value 2
  * @option 現在の獲得経験値の百分率表示
  * @value 3
+ * @option レベル表示(サークルゲージのみ)
+ * @value 4
  * @default 1
  * @parent ExpgaugeSetting
  * 
@@ -2006,12 +2022,20 @@
  * @value MpGauge
  * @option TP(2)(3)(4)(5)(6)(7)(21)(23)(24)
  * @value TpGauge
+ * @option CircularHP(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value HpCircularGauge
+ * @option CircularMP(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value MpCircularGauge
+ * @option CircularTP(2)(3)(4)(5)(6)(7)(21)(23)(24)
+ * @value TpCircularGauge
  * @option 現在の経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value ExpInfo
  * @option 次のレベルまでの経験値(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value Exp
- * @option 経験値（ゲージあり）(1)(2)(3)(4)(5)(6)(7)(21)
+ * @option 経験値ゲージ(1)(2)(3)(4)(5)(6)(7)(21)
  * @value ExpGauge
+ * @option 経験値サークルゲージ (1)(2)(3)(4)(5)(6)(7)(21)
+ * @value ExpCircularGauge
  * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
  * @value Atk
  * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
@@ -3255,12 +3279,12 @@ Imported.NUUN_MenuScreenEX = true;
         if (this.nuunMenu_isContents(data, battler)) {
             setTepmData(data)
             const method = 'nuun_DrawMenuStatusContents' + data.DateSelect;
-            try {
+            //try {
                 this[method](data, x, y, width, battler);
-            } catch (error) {
-                const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                throw ["DataError", log];
-            }
+            //} catch (error) {
+            //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+            //    throw ["DataError", log];
+            //}
         }
     };
 
@@ -3443,6 +3467,28 @@ Imported.NUUN_MenuScreenEX = true;
     Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsExpGauge = function(data, x, y, width, actor) {
         _menutemp.setType("menuexp");
         this.nuunMenu_placeGauge(actor, "menuexp", x, y, "menuExp-%1");
+    };
+
+    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsHpCircularGauge = function(data, x, y, width, actor) {
+        _menutemp.setType("hp");
+        this.nuunMenu_placeCircularGauge(actor, "hp", x, y, "actor%1-gauge-%2");
+    };
+
+    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsMpCircularGauge = function(data, x, y, width, actor) {
+        _menutemp.setType("mp");
+        this.nuunMenu_placeCircularGauge(actor, "mp", x, y, "actor%1-gauge-%2");
+    };
+
+    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsTpCircularGauge = function(data, x, y, width, actor) {
+        if ($dataSystem.optDisplayTp) {
+            _menutemp.setType("tp");
+            this.nuunMenu_placeCircularGauge(actor, "tp", x, y, "actor%1-gauge-%2");
+        }
+    };
+
+    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsExpCircularGauge = function(data, x, y, width, actor) {
+        _menutemp.setType("menuexp");
+        this.nuunMenu_placeCircularGauge(actor, "menuexp", x, y, "menuExp-%1");
     };
 
     Window_StatusBase.prototype.setTempType = function(type) {
@@ -3724,6 +3770,26 @@ Imported.NUUN_MenuScreenEX = true;
         sprite.setup(actor, type);
         sprite.move(x, y);
         sprite.show();
+    };
+
+    Window_StatusBase.prototype.nuunMenu_placeCircularGauge = function(actor, type, x, y, fmt) {
+        if (!Imported.NUUN_CircularGauge) {
+            return;
+        }
+        const find = this.getCircularGaugeData(type);
+        if (!!find) {
+            this.nuun_drawCircularMenuGauge(find, actor, type, find.GaugeX + x, find.GaugeY + y);
+        }
+    };
+
+    Window_MenuStatus.prototype.nuun_drawCircularMenuGauge = function(data, actor, type, x, y) {
+        this.setCircularTempData(type, data);
+        const key = "resultActor%1-gauge-%2".format(actor.actorId(), type);
+        const sprite = this.createInnerSprite(key, Sprite_MenuCircularGauge);
+        sprite.setup(actor, type);
+        sprite.move(x, y);
+        sprite.show();
+        this.clearCircularTempData();
     };
 
     Window_StatusBase.prototype.nuunMenu_drawMenuStatusImg = function(data, x, y, actor) {
@@ -4220,13 +4286,17 @@ Imported.NUUN_MenuScreenEX = true;
             case "time":
                 return this.menuParam.ParamName ? this.menuParam.ParamName : Sprite_Gauge.prototype.label.call(this);
             case "menuexp":
-                return this.labelShowParam() ? this.menuParam.ParamName ? this.menuParam.ParamName : TextManager.expA : '';
+                return this.expLabel();
             default:
               return this.menuParam.ParamName;
             }
         } else {
           return Sprite_Gauge.prototype.label.call(this);
         }
+    };
+
+    Sprite_MenuGauge.prototype.expLabel = function() {
+        return this.labelShowParam() ? this.menuParam.ParamName ? this.menuParam.ParamName : TextManager.expA : '';
     };
     
     Sprite_MenuGauge.prototype.drawValue = function() {
@@ -4268,6 +4338,49 @@ Imported.NUUN_MenuScreenEX = true;
 
     Sprite_MenuGauge.prototype.labelShowParam = function() {
         return LabelShow;
+    };
+
+
+    function Sprite_MenuCircularGauge() {
+        this.initialize(...arguments);
+    }
+      
+    Sprite_MenuCircularGauge.prototype = Object.create(Sprite_MenuGauge.prototype);
+    Sprite_MenuCircularGauge.prototype.constructor = Sprite_MenuCircularGauge;
+    window.Sprite_MenuCircularGauge = Sprite_MenuCircularGauge;
+      
+    Sprite_MenuCircularGauge.prototype.initialize = function() {
+        this.setCircularData();
+        Sprite_MenuGauge.prototype.initialize.call(this);
+    };
+
+    Sprite_MenuCircularGauge.prototype.drawValueExp = function() {
+        const mode = this.expDisplayModeParam();
+        if (mode === 0) {
+            return;
+        }
+        let text = this.displyaExp();
+        if (mode === 3) {
+            //text = this._battler.isMaxLevel() ? "100%" : text +"%";
+            text = this._battler.isMaxLevel() ? "100" : text;
+        } else if (mode === 4) {
+            text = this._battler._level;
+        } else {
+            text = this._battler.isMaxLevel() ? "---" : text;
+        }
+        const width = this.circularSprite[1] ? this._circularBitmap.width : this.circularBitmapWidth();
+        const height = this.circularSprite[1] ? this._circularBitmap.height : this.circularBitmapHeight();
+        this.setupValueFont();
+        const y = this._circularData.ShowLabel ? 6 : 0;
+        this.bitmap.drawText(text, 0, y, width, height, "center");
+    };
+
+    Sprite_MenuCircularGauge.prototype.expLabel = function() {
+        if (this.labelShowParam()) {
+            return this.expDisplayModeParam() === 4 ? (this.menuParam.ParamName ? this.menuParam.ParamName : TextManager.levelA) : Sprite_MenuGauge.prototype.expLabel.call(this);
+        } else {
+            return '';
+        }
     };
 
 

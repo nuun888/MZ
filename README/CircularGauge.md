@@ -7,7 +7,7 @@
 指定のゲージをサークル型にします。  
 バトルスタイル拡張プラグインと併用する場合はこのプラグインを「NUUN_BattleStyleEX_Base」より下に配置してください。  
 
-![画像](img/TpCircularGauge1.png)  
+![画像](img/CircularGauge2.png)  
 
 ## 画像の仕様
 画像の中心を基準に弧を描くようにアニメーションします。  

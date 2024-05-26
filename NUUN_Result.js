@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.11
+ * @version 2.4.0
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -60,6 +60,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/5/26 Ver.2.4.0
+ * Added the ability to turn the experience value gauge into a circular gauge.
+ * Added a function to display the level on the experience value gauge display.
+ * Added the ability to specify the color of the experience gauge label.
+ * Fixed an issue where the decimal point of the experience gauge was not displayed correctly.
  * 2024/3/31 Ver.2.3.11
  * Fixed processing related to side view display.
  * 2023/11/4 Ver.2.3.10
@@ -686,6 +691,8 @@
  * @value 3
  * @option EXP to next level
  * @value 4
+ * @option Level
+ * @value 5
  * @default 1
  * @parent ExpSetting
  * 
@@ -709,6 +716,13 @@
  * @type number
  * @default 100
  * @min 0
+ * @parent ExpSetting
+ * 
+ * @param ExpLabelColor
+ * @desc Label color.(system color or color code)
+ * @text Label color
+ * @type color
+ * @default 16
  * @parent ExpSetting
  * 
  * @param GaugeColor1
@@ -1530,12 +1544,14 @@
  * @value 11
  * @option Gein Exp(1)(2)(3)(4)(5)(6)(8)
  * @value 12
- * @option Exp gauge(1)(2)(3)(5)
+ * @option Exp gauge(1)(2)(3)
  * @value 20
  * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)
  * @value 21
  * @option Level up(1)(2)(5)(8)
  * @value 30
+ * @option Exp value circular gauge (for NUUN_CircularGauge)(1)(2)
+ * @value 50
  * @option Line(1)(2)(3)(6)
  * @value 1000
  * @default 0
@@ -2293,7 +2309,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.3.11
+ * @version 2.4.0
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2341,6 +2357,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/26 Ver.2.4.0
+ * 経験値ゲージを円形ゲージにする機能を追加。
+ * 経験値ゲージの表示にレベルを表示する機能を追加。
+ * 経験値ゲージのラベルの色を指定できる機能を追加。
+ * 経験値ゲージの小数点数の表示が正常に行われていなかった問題を修正。
  * 2024/3/31 Ver.2.3.11
  * サイドビュー表示に関する処理の修正。
  * 2023/11/4 Ver.2.3.10
@@ -2967,6 +2988,8 @@
  * @value 3
  * @option 次のレベルまでの経験値
  * @value 4
+ * @option 現在のレベル
+ * @value 5
  * @default 1
  * @parent ExpSetting
  * 
@@ -2990,6 +3013,13 @@
  * @type number
  * @default 100
  * @min 0
+ * @parent ExpSetting
+ * 
+ * @param ExpLabelColor
+ * @desc ラベルの色(システムカラーまたはカラーコード)
+ * @text ラベルの色
+ * @type color
+ * @default 16
  * @parent ExpSetting
  * 
  * @param GaugeColor1
@@ -3811,12 +3841,14 @@
  * @value 11
  * @option 入手経験値(1)(2)(3)(4)(5)(6)(8)
  * @value 12
- * @option 経験値ゲージ(1)(2)(3)(5)
+ * @option 経験値ゲージ(1)(2)(3)
  * @value 20
  * @option 任意パラメータ(1)(2)(3)(4)(5)(6)(7)(8)
  * @value 21
  * @option レベルアップ表示(1)(2)(5)(8)
  * @value 30
+ * @option 経験値円形ゲージ(用NUUN_CircularGauge)(1)(2)
+ * @value 50
  * @option ライン(1)(2)(3)(6)
  * @value 1000
  * @default 0
@@ -4636,6 +4668,7 @@ const EXPBoostValueColor = (DataManager.nuun_structureData(parameters['EXPBoostV
 const EXPResistValueColor = (DataManager.nuun_structureData(parameters['EXPResistValueColor'])) || 0;
 const GaugeColor1 = (DataManager.nuun_structureData(parameters['GaugeColor1'])) || 0;
 const GaugeColor2 = (DataManager.nuun_structureData(parameters['GaugeColor2'])) || 0;
+const ExpLabelColor = (DataManager.nuun_structureData(parameters['ExpLabelColor'])) || 16;
 const GaugeValueShow = eval(parameters['GaugeValueShow']) || 1;
 const Gauge_Width = Number(parameters['Gauge_Width'] || 300);
 const Gauge_Height = Number(parameters['Gauge_Height'] || 12);
@@ -5792,6 +5825,9 @@ Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width,
     case 30:
       this.drawLevelUp(data, actor, x, y, width);
       break;
+    case 50:
+      this.drawCircularExpGauge(data, actor, x, y, width);
+      break;
     case 1000:
       this.drawHorzLine(data, x, y, width);
       break;
@@ -5865,7 +5901,8 @@ Window_ResultActorExp.prototype.drawActorLevel = function(data, actor, x, y, wid
     const systemWidth = data.SystemItemWidth || 30;
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
     this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
-    this.drawText(TextManager.levelA, x, y, systemWidth);
+    const text = data.ParamName ? data.ParamName : TextManager.levelA;
+    this.drawText(text, x, y, systemWidth);
     if (actor._resultLevelUp) {
       this.changeTextColor(NuunManager.getColorCode(LevelUpValueColor));
     } else {
@@ -5931,25 +5968,48 @@ Window_ResultActorExp.prototype.setLevelUpBitmap = function(bitmap, x, y, width)
 };
 
 Window_ResultActorExp.prototype.placeExpGauge = function(actor, x, y) {
-  const type = 'result_exp'
-  if (Imported.NUUN_GaugeImage) {//旧版要
-    this.placeGaugeImg(actor, type, x, y);
-  }
-  const key = "resultActor%1-gauge-%2".format(actor.actorId(), type);
-  const sprite = this.createInnerSprite(key, Sprite_ResultExpGauge);
-  sprite.setup(actor, type);
-  sprite.move(x, y);
-  sprite.show();
+    const type = 'result_exp';
+    if (Imported.NUUN_GaugeImage) {//旧版要
+        this.placeGaugeImg(actor, type, x, y);
+    }
+    const key = "resultActor%1-gauge-%2".format(actor.actorId(), type);
+    const sprite = this.createInnerSprite(key, Sprite_ResultExpGauge);
+    sprite.setup(actor, type);
+    sprite.move(x, y);
+    sprite.show();
+};
+
+Window_ResultActorExp.prototype.drawCircularExpGauge = function(data, actor, x, y, width) {
+    const type = 'result_exp';
+    if (!Imported.NUUN_CircularGauge) {
+        return;
+    }
+    const find = this.getCircularGaugeData(type);
+    if (!!find) {
+        this.placeCircularExpGauge(find, actor, type, find.GaugeX + x, find.GaugeY + y);
+    }
 };
 
 Window_ResultActorExp.prototype.drawSvActorImg = function(actor, x, y) {
-  const key = "resultSvActor%1".format(actor.actorId());
-  const sprite = this.createInnerSprite(key, Sprite_ResultSvActor);
-  sprite.setBattler(actor);
-  sprite.show();
-  sprite.setHome(x + this.x, y + this.y);
-  sprite.startMotion();
+    const key = "resultSvActor%1".format(actor.actorId());
+    const sprite = this.createInnerSprite(key, Sprite_ResultSvActor);
+    sprite.setBattler(actor);
+    sprite.show();
+    sprite.setHome(x + this.x, y + this.y);
+    sprite.startMotion();
 };
+
+Window_ResultActorExp.prototype.placeCircularExpGauge = function(data, actor, type, x, y) {
+    this.setCircularTempData(type, data);
+    const key = "resultActor%1-gauge-%2".format(actor.actorId(), type);
+    const sprite = this.createInnerSprite(key, Sprite_ResultCircularExpGauge);
+    sprite.setup(actor, type);
+    sprite.move(x, y);
+    sprite.show();
+    this.clearCircularTempData();
+};
+
+window.Window_ResultActorExp = Window_ResultActorExp;
 
 
 function Window_ResultGetInfo() {
@@ -6512,19 +6572,19 @@ Window_ResultActorStatus.prototype.maxCols = function() {
 };
 
 Window_ResultActorStatus.prototype.drawActorStatus = function() {
-  const actor = BattleManager.resultLevelUpActors[BattleManager.resultPage - 1];
-  this._oldLevelActorStatus = BattleManager.resultOldStatusActors[BattleManager.resultPage - 1];
-  const lineHeight = this.lineHeight();
-  LevelUpActorParam.forEach((data, i) => {
-    this.resetFontSettings();
-    const x_Position = data.X_Position;
-    const position = Math.min(x_Position, this.maxCols());
-    const rect = this.itemRect(position - 1);
-    const x = rect.x + data.X_Coordinate;
-    const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
-    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
-    this.dateDisplay(data, i, actor, x, y, width);
-  });
+    const actor = BattleManager.resultLevelUpActors[BattleManager.resultPage - 1];
+    this._oldLevelActorStatus = BattleManager.resultOldStatusActors[BattleManager.resultPage - 1];
+    const lineHeight = this.lineHeight();
+    LevelUpActorParam.forEach((data, i) => {
+        this.resetFontSettings();
+        const x_Position = data.X_Position;
+        const position = Math.min(x_Position, this.maxCols());
+        const rect = this.itemRect(position - 1);
+        const x = rect.x + data.X_Coordinate;
+        const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
+        const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
+        this.dateDisplay(data, i, actor, x, y, width);
+    });
 };
 
 Window_ResultActorStatus.prototype.dateDisplay = function(data, index, actor, x, y, width) {
@@ -7369,13 +7429,13 @@ Sprite_ResultExpGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_ResultExpGauge.prototype.constructor = Sprite_ResultExpGauge;
 
 Sprite_ResultExpGauge.prototype.initialize = function() {
-  this._gaugeWidth = Math.min(Gauge_Width, resultExpMaxWidth);
-  Sprite_Gauge.prototype.initialize.call(this);
-  this._currentExp = 0;
-  this._startCurrentExp = 0;
-  this._resultExpMoveMode = false;
-  this._resultExpMoveDelay = 0;
-  this._resultExpMoveValue = NaN;
+    this._gaugeWidth = Math.min(Gauge_Width, resultExpMaxWidth);
+    Sprite_Gauge.prototype.initialize.call(this);
+    this._currentExp = 0;
+    this._startCurrentExp = 0;
+    this._resultExpMoveMode = false;
+    this._resultExpMoveDelay = 0;
+    this._resultExpMoveValue = NaN;
 };
 
 Sprite_ResultExpGauge.prototype.bitmapWidth = function() {
@@ -7411,14 +7471,14 @@ Sprite_ResultExpGauge.prototype.update = function() {
 };
 
 Sprite_ResultExpGauge.prototype.updateBitmap = function() {
-  Sprite_Gauge.prototype.updateBitmap.call(this);
-  const value = this.currentValue();
-  if (this._resultExpMoveValue !== value) {
-    if (isNaN(this._resultExpMoveValue)) {
-      this._resultExpMoveValue = this.currentValue();
+    Sprite_Gauge.prototype.updateBitmap.call(this);
+    const value = this.currentValue();
+    if (this._resultExpMoveValue !== value) {
+        if (isNaN(this._resultExpMoveValue)) {
+        this._resultExpMoveValue = this.currentValue();
+        }
+        this.valueRedraw();
     }
-    this.valueRedraw();
-  }
 };
 
 Sprite_ResultExpGauge.prototype.valueRedraw = function() {
@@ -7427,36 +7487,42 @@ Sprite_ResultExpGauge.prototype.valueRedraw = function() {
 };
 
 Sprite_ResultExpGauge.prototype.drawValue = function() {
-  const width = this.bitmapWidth();
-  const height = this.textHeight ? this.textHeight() : this.bitmapHeight();
-  this._resultExpMoveMode = (GaugeRefreshFrame > 0 && GaugeValueShow > 0);
-  let expValue = this.currentValue();
-  if (GaugeValueShow > 0) {
-    this.setupValueFont();
-    if (GaugeValueShow === 3) {
-      expValue = this.maxLavel() ? this.currentMaxValue() : expValue;
-      const rate = NuunManager.numPercentage(expValue / this.currentMaxValue() * 100, Decimal, DecimalMode);
-      this.bitmap.drawText(rate +"%", 0, GaugeValueY, width, height, "right");
-    } else if (GaugeValueShow === 1) {
-      expValue = this.maxLavel() ? "----------" : expValue;
-      this.bitmap.drawText(expValue, 0, GaugeValueY, width, height, "right");
-    } else if (GaugeValueShow === 2) {
-      expValue = this.maxLavel() ? "----------" : expValue;
-      if (!this.maxLavel()) {
-        this.bitmap.fontSize = $gameSystem.mainFontSize() + GaugeMaxValueFontSize;
-        const textWidth = Math.min(this.bitmap.measureTextWidth(this.currentMaxValue()), 70);
-        this.bitmap.drawText(this.currentMaxValue(), width - textWidth, GaugeValueY, textWidth, height, "right");
-        this.bitmap.fontSize = this.valueFontSize();
-        this.bitmap.drawText("/", width - (textWidth + 40), SeparationY, 36, height, "right");
-        this.bitmap.drawText(expValue, width - (textWidth + 90), GaugeMaxValueY, 70, height, "right");
-      } else {
-        this.bitmap.drawText("----------", 0, GaugeValueY, width, height, "right");
-      }
-    } else if (GaugeValueShow === 4) {
-      expValue = this.currentMaxValue() - expValue;
-      this.bitmap.drawText(expValue, 0, GaugeValueY, width, height, "right");
+    const width = this.bitmapWidth();
+    const height = this.textHeight ? this.textHeight() : this.bitmapHeight();
+    this._resultExpMoveMode = (GaugeRefreshFrame > 0 && GaugeValueShow > 0);
+    let expValue = this.currentValue();
+    if (GaugeValueShow > 0) {
+        this.setupValueFont();
+        if (GaugeValueShow === 3) {
+            expValue = this.maxLavel() ? this.currentMaxValue() : expValue;
+            const rate = NuunManager.numPercentage(expValue / this.currentMaxValue() * 100, Decimal - 2, DecimalMode);
+            this.bitmap.drawText(rate +"%", 0, GaugeValueY, width, height, "right");
+        } else if (GaugeValueShow === 1) {
+            expValue = this.maxLavel() ? "----------" : expValue;
+            this.bitmap.drawText(expValue, 0, GaugeValueY, width, height, "right");
+        } else if (GaugeValueShow === 2) {
+            expValue = this.maxLavel() ? "----------" : expValue;
+        if (!this.maxLavel()) {
+            this.bitmap.fontSize = $gameSystem.mainFontSize() + GaugeMaxValueFontSize;
+            const textWidth = Math.min(this.bitmap.measureTextWidth(this.currentMaxValue()), 70);
+            this.bitmap.drawText(this.currentMaxValue(), width - textWidth, GaugeValueY, textWidth, height, "right");
+            this.bitmap.fontSize = this.valueFontSize();
+            this.bitmap.drawText("/", width - (textWidth + 40), SeparationY, 36, height, "right");
+            this.bitmap.drawText(expValue, width - (textWidth + 90), GaugeMaxValueY, 70, height, "right");
+        } else {
+            this.bitmap.drawText("----------", 0, GaugeValueY, width, height, "right");
+        }
+        } else if (GaugeValueShow === 4) {
+            expValue = this.currentMaxValue() - expValue;
+            this.bitmap.drawText(expValue, 0, GaugeValueY, width, height, "right");
+        } else if (GaugeValueShow === 5) {
+            const textWidth = this.bitmap.measureTextWidth(this._nowLevel);
+            this.bitmap.textColor = this.labelColor();
+            this.bitmap.drawText(TextManager.levelA, 0, GaugeValueY, width - textWidth - 8, height, "right");
+            this.bitmap.textColor = this._battler._resultLevelUp ? NuunManager.getColorCode(LevelUpValueColor) : this.valueColor();
+            this.bitmap.drawText(this._nowLevel, 0, GaugeValueY, width, height, "right");
+        }
     }
-  }
 };
 
 Sprite_ResultExpGauge.prototype.currentValue = function() {
@@ -7467,7 +7533,7 @@ Sprite_ResultExpGauge.prototype.currentValue = function() {
   return Sprite_Gauge.prototype.currentValue.call(this);
 };
 
-Sprite_ResultExpGauge.prototype.maxLavel = function() {
+Sprite_Gauge.prototype.maxLavel = function() {
   return this._nowLevel >= this._battler.maxLevel();
 };
 
@@ -7484,21 +7550,21 @@ Sprite_Gauge.prototype.currentMaxValue = function() {
 };
 
 Sprite_ResultExpGauge.prototype.currentResultValueMove = function(currentValue) {
-  if (this._resultExpMoveDelay === 0) {
-    this._resultExpMoveDelay = (currentValue - this._resultExpMoveValue) / (GaugeRefreshFrame > 0 ? this.smoothness() : 1);
-  }
-  if (this._resultExpMoveValue > currentValue) {
-    if (this._resultExpMoveValue <= currentValue) {
-      this._resultExpMoveValue = currentValue;
-      this._resultExpMoveDelay = 0;
+    if (this._resultExpMoveDelay === 0) {
+        this._resultExpMoveDelay = (currentValue - this._resultExpMoveValue) / (GaugeRefreshFrame > 0 ? this.smoothness() : 1);
     }
-  } else if (this._resultExpMoveValue < currentValue) {
-      this._resultExpMoveValue += this._resultExpMoveDelay;
-    if (this._resultExpMoveValue >= currentValue) {
-      this._resultExpMoveValue = currentValue;
-      this._resultExpMoveDelay = 0;
+    if (this._resultExpMoveValue > currentValue) {
+        if (this._resultExpMoveValue <= currentValue) {
+        this._resultExpMoveValue = currentValue;
+        this._resultExpMoveDelay = 0;
+        }
+    } else if (this._resultExpMoveValue < currentValue) {
+        this._resultExpMoveValue += this._resultExpMoveDelay;
+        if (this._resultExpMoveValue >= currentValue) {
+        this._resultExpMoveValue = currentValue;
+        this._resultExpMoveDelay = 0;
+        }
     }
-  }
 };
 
 Sprite_ResultExpGauge.prototype.updateTargetValue = function(value, maxValue) {
@@ -7545,6 +7611,73 @@ Sprite_ResultExpGauge.prototype.gaugeColor2 = function() {
   return NuunManager.getColorCode(GaugeColor2);
 };
 
+Sprite_ResultExpGauge.prototype.labelColor = function() {
+    return ExpLabelColor === -1 ? ColorManager.systemColor() : NuunManager.getColorCode(ExpLabelColor);
+};
+
+
+function Sprite_ResultCircularExpGauge() {
+    this.initialize(...arguments);
+}
+  
+Sprite_ResultCircularExpGauge.prototype = Object.create(Sprite_ResultExpGauge.prototype);
+Sprite_ResultCircularExpGauge.prototype.constructor = Sprite_ResultCircularExpGauge;
+  
+Sprite_ResultCircularExpGauge.prototype.initialize = function() {
+    this.setCircularData();
+    Sprite_ResultExpGauge.prototype.initialize.call(this);
+};
+
+Sprite_ResultCircularExpGauge.prototype.drawLabel = function() {
+    Sprite_CircularGauge.prototype.drawLabel.call(this);
+};
+
+Sprite_ResultCircularExpGauge.prototype.label = function() {
+    switch (GaugeValueShow) {
+        case 0:
+            return "";
+        case 5:
+            return TextManager.levelA;
+        default:
+            return TextManager.expA;
+    }
+};
+
+Sprite_ResultCircularExpGauge.prototype.drawValue = function() {
+    this._resultExpMoveMode = (GaugeRefreshFrame > 0 && GaugeValueShow > 0);
+    let expValue = this.currentValue();
+    if (GaugeValueShow > 0) {
+        this.setupValueFont();
+        if (GaugeValueShow === 3) {
+            expValue = this.maxLavel() ? this.currentMaxValue() : expValue;
+            const rate = NuunManager.numPercentage(expValue / this.currentMaxValue() * 100, Decimal - 2, DecimalMode);
+            this.drawCircularValue(rate);
+            return;
+        } else if (GaugeValueShow === 1) {
+            expValue = this.maxLavel() ? "---" : expValue;
+        } else if (GaugeValueShow === 2) {
+            return;//未対応
+        } else if (GaugeValueShow === 4) {
+            expValue = this.currentMaxValue() - expValue;
+        } else if (GaugeValueShow === 5) {
+            if (this._battler._resultLevelUp) {
+                this.bitmap.textColor = NuunManager.getColorCode(LevelUpValueColor);
+            }
+            expValue = this._nowLevel;
+        }
+        this.drawCircularValue(expValue);
+    }
+};
+
+Sprite_ResultCircularExpGauge.prototype.drawCircularValue = function(value, unit) {
+    const width = this.circularSprite[1] ? this._circularBitmap.width : this.circularBitmapWidth();
+    const height = this.circularSprite[1] ? this._circularBitmap.height : this.circularBitmapHeight();
+    const y = this._circularData.ShowLabel ? 6 : 0;
+    this.bitmap.drawText(value, 0, y, width, height, "center");
+};
+
+
+window.Sprite_ResultExpGauge = Sprite_ResultExpGauge;
 
 function Sprite_ResultActor() {
   this.initialize(...arguments);

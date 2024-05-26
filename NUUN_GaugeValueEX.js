@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Gauge display EX
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -52,6 +52,8 @@
  * https://triacontane.blogspot.com/
  * 
  * Log
+ * 5/26/2024 Ver.1.5.1
+ * Fixed an issue where gauge temporary data was not deleted.
  * 5/24/2024 Ver.1.5.0
  * System renovation.
  * Added the ability to specify an image to the gauge.
@@ -578,7 +580,7 @@
  * @target MZ
  * @plugindesc ゲージ表示拡張
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -617,6 +619,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/5/26 Ver.1.5.1
+ * ゲージ一時データが削除されない問題を修正。
  * 2024/5/24 Ver.1.5.0
  * システムの改修
  * ゲージに画像を指定できる機能を追加。
@@ -1328,7 +1332,7 @@ Imported.NUUN_GaugeValueEX = true;
         }
 
         gaugeStrokeColor() {
-            return this._data && this._data.GaugeStrokeColor === -1 ? null : NuunManager.getColorCode(this._data.GaugeStrokeColor);
+            return this._data && this._data.GaugeStrokeColor >= 0 ? NuunManager.getColorCode(this._data.GaugeStrokeColor) : null;
         }
 
         valueColor() {
@@ -1769,6 +1773,7 @@ Imported.NUUN_GaugeValueEX = true;
     Window_StatusBase.prototype.placeGauge = function(actor, type, x, y) {
         _gaugeTemp.setGaugeData(null, type, actor);
         _Window_StatusBase_placeGauge.apply(this, arguments);
+        _gaugeTemp.clear();
     };
 
     Window_Base.prototype.filteringGaugeDataClass = function(data) {

@@ -1,5 +1,5 @@
 # [サークルゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CircularGauge.js)
-# Ver.1.1.1
+# Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CircularGauge.js)  
 ### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)    

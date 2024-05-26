@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.3.11
+# Ver.2.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -22,6 +22,10 @@
 拡大率、不透明度は元の値(拡大率は100、不透明度は255)から指定します。現在の値から相対で指定の値まで変化します。  
 移動座標は現在の位置からの相対で移動します。  
 
+### サークルゲージ
+獲得経験値のゲージをサークル型にします。  
+表示するには[サークルゲージ](https://github.com/nuun888/MZ/blob/master/README/CircularGauge.md)が必要です。  
+
 ![画像](img/Result30.png)<br>
 ![画像](img/Result31.png)<br>
 ![画像](img/Result29.png)<br>
@@ -37,6 +41,11 @@ d:アクターのデータベースデータ
 ※右クリックはページ切り替えのみです。戻す機能は実装しておりません。  
 
 ## 更新履歴
+2024/5/26 Ver.2.4.0  
+経験値ゲージを円形ゲージにする機能を追加。  
+経験値ゲージの表示にレベルを表示する機能を追加。  
+経験値ゲージのラベルの色を指定できる機能を追加。  
+経験値ゲージの小数点数の表示が正常に行われていなかった問題を修正。  
 2024/3/31 Ver.2.3.11  
 サイドビュー表示に関する処理の修正。  
 2023/11/4 Ver.2.3.10  

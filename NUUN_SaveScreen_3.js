@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.2
+ * @version 3.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,6 +70,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/1/2024 Ver.3.0.3
+ * Fixed an issue where images were not displayed the first time.
  * 5/5/2024 Ver.3.0.2
  * Fixed an issue where actor original parameters were not displayed.
  * Fixed an issue where plugin commands could not be executed.
@@ -1333,6 +1335,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/1 Ver.3.0.3
+ * 初回時に画像が表示されない問題を修正。
  * 2024/5/5 Ver.3.0.2
  * アクターオリジナルパラメータが表示されない問題を修正。
  * プラグインコマンドが実行できない問題を修正。
@@ -3598,41 +3602,42 @@ Imported.NUUN_SaveScreen_3 = true;
 
     Window_SaveStatusContentsWindow.prototype.loadCheckBitmap = function() {
         let bitmap = null;
+        let loadBitmap = null;
         const info = this._info;
         if (!info) {
-            return false;
+            return bitmap;
         }
         if (info.characters && Symbol.iterator in info.characters) {
             for (const character of info.characters) {
-                bitmap = ImageManager.loadCharacter(character[0]);
-                if (!bitmap.isReady()) {
-                    return bitmap;
+                loadBitmap = ImageManager.loadCharacter(character[0]);
+                if (loadBitmap && !loadBitmap.isReady()) {
+                    bitmap = loadBitmap;
                 }
             }
         }
         if (info.faces && Symbol.iterator in info.faces) {
             for (const face of info.faces) {
-                bitmap = ImageManager.loadFace(face[0]);
-                if (!bitmap.isReady()) {
-                    return bitmap;
+                loadBitmap = ImageManager.loadFace(face[0]);
+                if (loadBitmap && !loadBitmap.isReady()) {
+                    bitmap = loadBitmap;
                 }
             }
         }
         if (info.svActor && Symbol.iterator in info.svActor) {
             for (const character of info.svActor) {
-                bitmap = ImageManager.loadSvActor(character[0]);
-                if (!bitmap.isReady()) {
-                    return bitmap;
+                loadBitmap = ImageManager.loadSvActor(character[0]);
+                if (loadBitmap && !loadBitmap.isReady()) {
+                    bitmap = loadBitmap;
                 }
             }
         }
         if (info.snap) {
-            bitmap = ImageManager.loadSaveSnapBitmap(info.snap);
-            if (!bitmap.isReady()) {
-                return bitmap;
+            loadBitmap = ImageManager.loadSaveSnapBitmap(info.snap);
+            if (loadBitmap && !loadBitmap.isReady()) {
+                bitmap = loadBitmap;
             }
         }
-        return false;
+        return bitmap;
     };
 
     Window_SaveStatusContentsWindow.prototype.drawContents = function(rect) {

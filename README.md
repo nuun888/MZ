@@ -51,6 +51,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [ドロップ率確率操作ベース](https://github.com/nuun888/MZ/blob/master/README/DropItemRateBase.md) |  [NUUN_DropItemRateBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DropItemRateBase.js) |  | 1.0.0 |
 | [グローバル情報ベース](https://github.com/nuun888/MZ/blob/master/README/GlobalCore.md) | [NUUN_GlobalCore](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GlobalCore.js) |  | 1.0.1 |
 | [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md) | [NUUN_BattlerOverlayBase](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerOverlayBase.js) |  | 1.0.3 |
+| ステータス項目ベースプラグイン |  |  |  |
 |  |  |  |  |
 
 | 戦闘　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
@@ -231,6 +232,9 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [ウィンドウスキン個別設定](https://github.com/nuun888/MZ/blob/master/README/WindowSkinIndividual.md) | [NUUN_WindowSkinIndividual](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_WindowSkinIndividual.js) | 共 | 1.0.0 |
 | [マルチカーソル](https://github.com/nuun888/MZ/blob/master/README/MultiCursor.md) | [NUUN_MultiCursor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiCursor.js) |  | 1.0.0 |
 | [メニューコマンド任意表示順](https://github.com/nuun888/MZ/blob/master/README/MenuCommandDisplayOrder.md) | [NUUN_MenuCommandDisplayOrder](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandDisplayOrder.js) | 共 | 1.0.0 |
+| アイテム画面拡張 |  |  |  |
+| スキル画面拡張 |  |  |  |
+| 装備画面拡張 |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -249,6 +253,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | ---------- | ------------- | ------------- | -------- |
 | [売値任意設定](https://github.com/nuun888/MZ/blob/master/README/AnySellPrice.md) | [NUUN_AnySellPrice](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js) | 共 | 1.1.0 |
 | [ショップ購入カテゴリー表示](https://github.com/nuun888/MZ/blob/master/README/PurchaseCategory.md) | [NUUN_PurchaseCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PurchaseCategory.js) | 共 | 1.1.0 |
+| ショップ画面拡張 |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
 

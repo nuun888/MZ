@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Final Attack Features
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * Implement final attack.
@@ -25,6 +25,8 @@
  * If the final attack interrupts with two or more actions, the action ends at that point.
  * 
  * Log
+ * 6/4/2024 Ver.1.1.2
+ * Fixed Final Attack skill not being added if skill cost is insufficient.
  * 11/12/2022 Ver.1.1.1
  * Changed the display in languages other than Japanese to English.
  * 5/8/2022 Ver.1.1.0
@@ -79,7 +81,7 @@
  * @target MZ
  * @plugindesc ファイナルアタック特徴
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * ファイナルアタックを実装します。
@@ -94,6 +96,8 @@
  * ２回行動以上でファイナルアタックが割り込んだ場合その時点で行動が終了します。
  * 
  * 更新履歴
+ * 2024/6/4 Ver.1.1.2
+ * スキルコストが足りない場合ファイナルアタックのスキルを追加しないように修正。
  * 2022/11/12 Ver.1.1.1
  * 日本語以外での表示を英語表示に変更。
  * 2022/5/8 Ver.1.1.0
@@ -150,155 +154,174 @@ Imported.NUUN_FinalAttack = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_FinalAttack');
-const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
-  try {
-      return JSON.parse(value);
-  } catch (e) {
-      try {
-          return eval(value);
-      } catch (e) {
-          return value;
-      }
-  }
-}));
+const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+let _costConsumption = false;
+
+class Game_FinalAttackAction extends Game_Action {
+    constructor(subject) {
+        super(subject);
+    }
+
+    setup(data) {
+        this._finalAttack = data;
+        this.finalAttackSkill = true;
+    }
+
+    setFinalAttackTarget() {
+        const index = BattleManager.getFinalAttackLastAttack();
+        if (this._finalAttack.FinalAttackTarget === 1 && index > 0) {
+            this.setTarget(index);
+        }
+    }
+
+    isCostConsumption() {
+        return this._finalAttack.CostConsumption;
+    }
+};
+
 
 const _BattleManager_initMembers = BattleManager.initMembers;
 BattleManager.initMembers = function() {
-  _BattleManager_initMembers.call(this);
-  this.finalAttackList = [];
-  this._finalAttack = false;
-  this._finalAttackLastAttack = -1;
+    _BattleManager_initMembers.call(this);
+    this.finalAttackList = [];
+    this._finalAttack = false;
+    this._finalAttackLastAttack = -1;
 };
 
 const _BattleManager_processForcedAction = BattleManager.processForcedAction;
 BattleManager.processForcedAction = function() {
-  _BattleManager_processForcedAction.call(this);
-  if (this._finalAttack) {
-    this.resetFinalAttack(this._subject);
-  }
+    _BattleManager_processForcedAction.call(this);
+    if (this._finalAttack) {
+        this.resetFinalAttack(this._subject);
+    }
 };
 
 BattleManager.resetFinalAttack = function(subject) {
-  if (subject._actions[0]) {
-    this.forceAction(subject);
-    this._finalAttack = true;
-  } else {
-    subject.finalAttackEnd = true;
-    this.removeFinalAttack();
-    if (!this.finalAttackList[0]) {
-      this._finalAttack = false;
+    if (subject._actions[0]) {
+        this.forceAction(subject);
+        this._finalAttack = true;
     } else {
-      this.forceAction(this.finalAttackList[0]);
-      this._finalAttack = true;
+        subject.finalAttackEnd = true;
+        this.removeFinalAttack();
+        if (!this.finalAttackList[0]) {
+            this._finalAttack = false;
+        } else {
+            this.forceAction(this.finalAttackList[0]);
+            this._finalAttack = true;
+        }
     }
-  }
 };
 
 BattleManager.removeFinalAttack = function() {
-  this.finalAttackList.shift();
+    this.finalAttackList.shift();
 };
 
 BattleManager.setFinalAttackLastAttack = function(mode) {
-  this._finalAttackLastAttack = mode && this._subject ? this._subject.index() : -1;
+    this._finalAttackLastAttack = mode && this._subject ? this._subject.index() : -1;
 };
 
 BattleManager.getFinalAttackLastAttack = function() {
-  return this._finalAttackLastAttack;
+    return this._finalAttackLastAttack;
 };
 
 BattleManager.setFinalAttack = function(subject) {
-  this.finalAttackList.push(subject);
-  if (!this.finalAttackList[1]) {
-    this.forceAction(this.finalAttackList[0]);
-  }
-  this._finalAttack = true;
+    this.finalAttackList.push(subject);
+    if (!this.finalAttackList[1]) {
+        this.forceAction(this.finalAttackList[0]);
+    }
+    this._finalAttack = true;
 };
 
 const _Game_Actor_performCollapse = Game_Actor.prototype.performCollapse;
 Game_Actor.prototype.performCollapse = function() {
-  if ($gameParty.inBattle()) {
-    if (!this.finalAttackEnd && this.finalAttackDate()) {
-      BattleManager.setFinalAttack(this);
-    } else {
-      this.finalAttackEnd = false;
-      _Game_Actor_performCollapse.call(this);
+    if ($gameParty.inBattle()) {
+        if (!this.finalAttackEnd && this.finalAttackDate()) {
+        BattleManager.setFinalAttack(this);
+        } else {
+        this.finalAttackEnd = false;
+        _Game_Actor_performCollapse.call(this);
+        }
     }
-  }
 };
 
 const _Game_Enemy_performCollapse = Game_Enemy.prototype.performCollapse;
 Game_Enemy.prototype.performCollapse = function() {
-  if (!this.finalAttackEnd && this.finalAttackDate()) {
-    BattleManager.setFinalAttack(this);
-  } else {
-    this.finalAttackEnd = false;
-    _Game_Enemy_performCollapse.call(this);
-  }
+    if (!this.finalAttackEnd && this.finalAttackDate()) {
+        BattleManager.setFinalAttack(this);
+    } else {
+        this.finalAttackEnd = false;
+        _Game_Enemy_performCollapse.call(this);
+    }
 };
 
 Game_BattlerBase.prototype.finalAttackDate = function(){
-  let allAction = [];
-  BattleManager.setFinalAttackLastAttack(true);
-	this.traitObjects().forEach(function(traitObject) {
-		if (traitObject.meta.FinalAttack) {
-			this.makeFinalAttackActions(Number(traitObject.meta.FinalAttack));
-      Array.prototype.push.apply(allAction, this._actions);
-      //allAction = allAction.concat(this._actions);
-		}
-	}, this);
-  if (allAction.length > 0) {
-    this._actions = allAction;
-    return true;
-  }
-  return false;
+    let allAction = [];
+    BattleManager.setFinalAttackLastAttack(true);
+        this.traitObjects().forEach(function(traitObject) {
+            if (traitObject.meta.FinalAttack) {
+                this.makeFinalAttackActions(Number(traitObject.meta.FinalAttack));
+                Array.prototype.push.apply(allAction, this._actions);
+            }
+        }, this);
+    if (allAction.length > 0) {
+        this._actions = allAction;
+        return true;
+    }
+    return false;
 };
 
 const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
 Game_Battler.prototype.initMembers = function() {
-  _Game_Battler_initMembers.call(this);
-  this.finalAttackEnd = false;
+    _Game_Battler_initMembers.call(this);
+    this.finalAttackEnd = false;
 };
 
 Game_Battler.prototype.makeFinalAttackActions = function(id) {
-  this.clearActions();
-  const finalAttack = param.FinalAttack[id - 1];
-  const actionTimes = finalAttack && finalAttack.FinalAttackSkill ? finalAttack.FinalAttackSkill.length : 0;
-  if (actionTimes > 0) {
-    const actionList = finalAttack.FinalAttackSkill;
-    for (let i = 0; i < actionTimes; i++) {
-      const actionData = actionList[i];
-      if (this.finalAttackRate(actionData)) {
-        const action = new Game_Action(this);
-        action.setSkill(actionData.FinalAttackSkillId);
-        action.setFinalAttackTarget(finalAttack);
-        this._actions.push(action);
-      }
+    this.clearActions();
+    const finalAttack = params.FinalAttack[id - 1];
+    const actionTimes = finalAttack && finalAttack.FinalAttackSkill ? finalAttack.FinalAttackSkill.length : 0;
+    if (actionTimes > 0) {
+        const actionList = finalAttack.FinalAttackSkill;
+        for (let i = 0; i < actionTimes; i++) {
+            const actionData = actionList[i];
+            if (this.finalAttackRate(actionData)) {
+                const action = new Game_FinalAttackAction(this);
+                action.setSkill(actionData.FinalAttackSkillId);
+                if (finalAttack.CostConsumption && action.isValid() || !finalAttack.CostConsumption) {
+                    action.setup(finalAttack);
+                    action.setFinalAttackTarget();
+                    this._actions.push(action);
+                }
+            }
+        }
     }
-  }
 };
 
-Game_Action.prototype.setFinalAttackTarget = function(action) {
-  const index = BattleManager.getFinalAttackLastAttack();
-  if (action.FinalAttackTarget === 1 && index > 0) {
-    this.setTarget(index);
-  }
+const _Game_Battler_useItem = Game_Battler.prototype.useItem;
+Game_Battler.prototype.useItem = function(item) {
+    if (_costConsumption) {
+        _Game_Battler_useItem.apply(this, arguments);
+    }
+    _costConsumption = false;
 };
+
+
 
 Game_Battler.prototype.finalAttackRate = function(action) {
-  return Math.floor(Math.random() * 100) < action.FinalAttackSkillRate;
+    return Math.floor(Math.random() * 100) < action.FinalAttackSkillRate;
 };
 
 const _Window_BattleLog_endAction = Window_BattleLog.prototype.endAction;
 Window_BattleLog.prototype.endAction = function(subject) {
-  _Window_BattleLog_endAction.call(this, subject);
-  this.displayfinalAttackEndCollapse(subject);
+    _Window_BattleLog_endAction.call(this, subject);
+    this.displayfinalAttackEndCollapse(subject);
 };
 
 Window_BattleLog.prototype.displayfinalAttackEndCollapse = function(subject) {
-  if (subject.finalAttackEnd && subject.hp === 0) {
-    this.push("performCollapse", subject);
-    this.push("wait");
-  }
+    if (subject.finalAttackEnd && subject.hp === 0) {
+        this.push("performCollapse", subject);
+        this.push("wait");
+    }
 };
 
 })();

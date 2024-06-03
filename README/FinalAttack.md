@@ -1,5 +1,5 @@
 # [ファイナルアタック特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FinalAttack.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FinalAttack.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -28,6 +28,8 @@
 ２回行動以上でファイナルアタックが割り込んだ場合その時点で行動が終了します。
 
 ## 更新履歴
+2024/6/4 Ver.1.1.2  
+スキルコストが足りない場合ファイナルアタックのスキルを追加しないように修正。  
 2022/11/12 Ver.1.1.1  
 日本語以外での表示を英語表示に変更。  
 2022/5/8 Ver.1.1.0  

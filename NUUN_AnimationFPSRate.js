@@ -10,19 +10,21 @@
  * @target MZ
  * @plugindesc Frame rate change when playing MV compatible animation
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * Set the frame rate for each animation when playing MV animation.
  * 
  * FPS Mode: 4 frames at 15FPS, 2 frames at 30FPS, 1 frame at 60FPS
- * Frame mode: 15FPS for frame, 30FPS for 2 frames, 60FPS for 1 frame
+ * Frame mode: 15FPS for 4frame, 30FPS for 2 frames, 60FPS for 1 frame
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 6/3/2024 Ver.1.1.3
+ * Fixed an issue where the frame rate would be set to 60 FPS in FPS mode.
  * 12/6/2022 Ver.1.1.2
  * Fixed some text.
  * 11/9/2022 Ver.1.1.1
@@ -81,18 +83,20 @@
  * @target MZ
  * @plugindesc MV互換アニメーション再生時のフレームレート変更
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * MVのアニメーションを再生するときのフレームレートをアニメーションごとに設定します。
  * 
  * FPSモード：15FPSで4フレーム、30FPSで2フレーム、60FPSで1フレーム
- * フレームモード：フレームで15FPS、2フレームで30FPS、1フレームで60FPS
+ * フレームモード：4フレームで15FPS、2フレームで30FPS、1フレームで60FPS
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/3 Ver.1.1.3
+ * FPSモードでフレームレートの設定を行っても60FPSで再生されてしまう問題を修正。
  * 2022/12/6 Ver.1.1.2
  * 一部テキストを修正。
  * 2022/11/9 Ver.1.1.1
@@ -108,7 +112,7 @@
  * 
  * @param DefaultAnimationRate
  * @text 標準アニメーション再生FPS数
- * @desc 標準の１アニメーションの再生FPS数を指定します。(15標準)
+ * @desc 標準の1アニメーションの再生FPS数を指定します。(15標準)
  * @type combo
  * @option 15
  * @option 30
@@ -172,7 +176,7 @@ Sprite_AnimationMV.prototype.getAnimationRate = function() {
     const id = this._animation.id;
     const find = param.AnimationSetting.find(data => data.AnimationID === id);
     if (param.AnimationRateMode) {
-        return Math.min(60 / (find ? Number(find.AnimationRate) : Number(param.DefaultAnimationRate)), 1);
+        return Math.max(60 / (find ? Number(find.AnimationRate) : Number(param.DefaultAnimationRate)), 1);
     } else {
         return find ? Number(find.AnimationRate) : Number(param.DefaultAnimationRate);
     }

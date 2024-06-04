@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Frame rate change when playing MV compatible animation
  * @author NUUN
- * @version 1.1.3
+ * @version 1.2.0
  * 
  * @help
  * Set the frame rate for each animation when playing MV animation.
@@ -23,6 +23,8 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 6/4/2024 Ver.1.1.4
+ * Added the ability to specify the magnification ratio.
  * 6/3/2024 Ver.1.1.3
  * Fixed an issue where the frame rate would be set to 60 FPS in FPS mode.
  * 12/6/2022 Ver.1.1.2
@@ -46,6 +48,20 @@
  * @option 30
  * @option 60
  * @default 15
+ * 
+ * @param DefaultAnimationScaleX
+ * @desc The horizontal scale of the animation.
+ * @text Animation horizontal magnification
+ * @type number
+ * @default 100
+ * @min 0
+ * 
+ * @param DefaultAnimationScaleY
+ * @desc The vertical scale of the animation.
+ * @text Animation vertical magnification
+ * @type number
+ * @default 100
+ * @min 0
  * 
  * @param AnimationSetting
  * @text Animation FPS setting
@@ -78,12 +94,26 @@
  * @option 60
  * @default 15
  * 
+ * @param AnimationScaleX
+ * @desc The horizontal scale of the animation.
+ * @text Animation horizontal magnification
+ * @type number
+ * @default 100
+ * @min 0
+ * 
+ * @param AnimationScaleY
+ * @desc The vertical scale of the animation.
+ * @text Animation vertical magnification
+ * @type number
+ * @default 100
+ * @min 0
+ * 
  */
 /*:ja
  * @target MZ
  * @plugindesc MV互換アニメーション再生時のフレームレート変更
  * @author NUUN
- * @version 1.1.3
+ * @version 1.2.0
  * 
  * @help
  * MVのアニメーションを再生するときのフレームレートをアニメーションごとに設定します。
@@ -95,6 +125,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/4 Ver.1.2.0
+ * 拡大率を指定できる機能を追加。
  * 2024/6/3 Ver.1.1.3
  * FPSモードでフレームレートの設定を行っても60FPSで再生されてしまう問題を修正。
  * 2022/12/6 Ver.1.1.2
@@ -118,6 +150,20 @@
  * @option 30
  * @option 60
  * @default 15
+ * 
+ * @param DefaultAnimationScaleX
+ * @desc アニメーションの横拡大率。
+ * @text アニメーション横拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * 
+ * @param DefaultAnimationScaleY
+ * @desc アニメーションの縦拡大率。
+ * @text アニメーション縦拡大率
+ * @type number
+ * @default 100
+ * @min 0
  * 
  * @param AnimationSetting
  * @text アニメーションFPS設定
@@ -150,23 +196,43 @@
  * @option 60
  * @default 15
  * 
+ * @param AnimationScaleX
+ * @desc アニメーションの横拡大率。
+ * @text アニメーション横拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * 
+ * @param AnimationScaleY
+ * @desc アニメーションの縦拡大率。
+ * @text アニメーション縦拡大率
+ * @type number
+ * @default 100
+ * @min 0
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_AnimationFPSRate = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_AnimationFPSRate');
-const param = JSON.parse(JSON.stringify(parameters, function(key, value) {
-    try {
-        return JSON.parse(value);
-    } catch (e) {
-        try {
-            return eval(value);
-        } catch (e) {
-            return value;
-        }
+const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+
+
+const _Sprite_AnimationMV_setup = Sprite_AnimationMV.prototype.setup;
+Sprite_AnimationMV.prototype.setup = function(targets, animation, mirror, delay) {
+    _Sprite_AnimationMV_setup.apply(this, arguments);
+    if (this._animation) {
+        this.setupScale();
     }
-}));
+};
+
+Sprite_AnimationMV.prototype.setupScale = function() {
+    const id = this._animation.id;
+    const find = params.AnimationSetting.find(data => data.AnimationID === id);
+    this.scale.x = (find ? Number(find.AnimationScaleX) : Number(params.DefaultAnimationScaleX)) / 100;
+    this.scale.y = (find ? Number(find.AnimationScaleY) : Number(params.DefaultAnimationScaleY)) / 100;
+};
 
 Sprite_AnimationMV.prototype.setupRate = function() {
     this._rate = this.getAnimationRate();
@@ -174,12 +240,14 @@ Sprite_AnimationMV.prototype.setupRate = function() {
 
 Sprite_AnimationMV.prototype.getAnimationRate = function() {
     const id = this._animation.id;
-    const find = param.AnimationSetting.find(data => data.AnimationID === id);
-    if (param.AnimationRateMode) {
-        return Math.max(60 / (find ? Number(find.AnimationRate) : Number(param.DefaultAnimationRate)), 1);
+    const find = params.AnimationSetting.find(data => data.AnimationID === id);
+    if (params.AnimationRateMode) {
+        return Math.max(60 / (find ? Number(find.AnimationRate) : Number(params.DefaultAnimationRate)), 1);
     } else {
-        return find ? Number(find.AnimationRate) : Number(param.DefaultAnimationRate);
+        return find ? Number(find.AnimationRate) : Number(params.DefaultAnimationRate);
     }
 };
+
+
 
 })();

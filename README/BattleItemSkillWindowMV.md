@@ -1,11 +1,13 @@
 # [戦闘中アイテム、スキル選択画面MV風表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)
-# Ver.1.3.1
+# Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleItemSkillWindowMV.js)
 
 戦闘中のアイテム、スキル選択画面をMV風形式に変更させます。
 ![画像](img/BattleItemSkillWindowMV1.png)  
 
 ## 更新履歴
+2024/6/8 Ver.1.3.2  
+バトルスタイル拡張プラグイン併用時にアイテム画面の表示が正常に表示されない問題を修正。  
 2022/8/27 Ver.1.3.1  
 処理の修正。  
 2022/6/5 Ver.1.3.0  

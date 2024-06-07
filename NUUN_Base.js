@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.6
+ * @version 1.7.7
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/8/2024 Ver.1.7.7
+ * Fixes for APNG related processing.
  * 5/25/2024 Ver.1.7.6
  * Fixed some processing.
  * 5/20/2024 Ver.1.7.5
@@ -102,7 +104,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.6
+ * @version 1.7.7
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -112,6 +114,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/8 Ver.1.7.7
+ * APNG関連の処理の修正。
  * 2024/5/25 Ver.1.7.6
  * 一部の処理を修正。
  * 2024/5/20 Ver.1.7.5
@@ -285,6 +289,7 @@ class Nuun_PluginParamData {
 class Nuun_TempParam {
     constructor() {
         this._data = null;
+        this._exParams = null;
     }
 
     setGaugeData(data, type, exParams) {
@@ -612,7 +617,7 @@ Window_Base.prototype.nuun_DrawContentsParamUnitText = function(text, data, x, y
     if (NuunManager.isFontFace()) {
         isNaN(text) ? this.nuun_setFontFace() : this.nuun_setValueFontFace();
     }
-    this.drawText(text, x, y, width - unitWidth, data.Align);
+    this.drawText(text, x, y, width - unitWidth, (data.Align || 'right'));
     if (unit) {
         this.changeTextColor(NuunManager.getColorCode(getDataSystemColor(data)));
         this.nuun_setFontFace();
@@ -621,8 +626,10 @@ Window_Base.prototype.nuun_DrawContentsParamUnitText = function(text, data, x, y
             this.drawText(unit, x + textWidth + padding, y, width);
         } else if (data.Align === 'right') {
             this.drawText(unit, x + width - unitWidth + padding, y, width);
-        } else {
+        } else if (data.Align === 'center') {
             this.drawText(unit, x + Math.floor(width / 2) + Math.floor(textWidth / 2) - padding, y, width);
+        } else {
+            this.drawText(unit, x + width - unitWidth + padding, y, width);
         }
     }
 };
@@ -666,39 +673,44 @@ Window_Selectable.prototype.drawItemBackground = function(index) {
 
 const _Window_Base_initialize = Window_Base.prototype.initialize;
 Window_Base.prototype.initialize = function(rect) {
-  _Window_Base_initialize.call(this, rect);
-  this._userWindowSkin = null;
+    _Window_Base_initialize.call(this, rect);
+    this._userWindowSkin = null;
 };
 
 const _Window_Base_loadWindowskin = Window_Base.prototype.loadWindowskin;
 Window_Base.prototype.loadWindowskin = function() {
-  if (this._userWindowSkin) {
-    this.windowskin = ImageManager.loadSystem(this._userWindowSkin);
-  } else {
-    _Window_Base_loadWindowskin.call(this);
-  }
+    if (this._userWindowSkin) {
+        this.windowskin = ImageManager.loadSystem(this._userWindowSkin);
+    } else {
+        _Window_Base_loadWindowskin.call(this);
+    }
+};
+
+Window_Base.prototype.nuun_addClientAreaSprite = function(sprite) {
+    const index = this._clientArea.children.indexOf(this._contentsSprite);
+    this._clientArea.addChildAt(sprite, index);
 };
 
 Window_Base.prototype.nuun_getListIdData = function(id) {
-  let newId = [];
-  if (id.includes('-')) {
-    const data = id.split('-').map(Number);
-    for (let i = data[0]; i <= data[1]; i++) {
-      Array.prototype.push.apply(newId, [i]);
+    let newId = [];
+    if (id.includes('-')) {
+        const data = id.split('-').map(Number);
+        for (let i = data[0]; i <= data[1]; i++) {
+        Array.prototype.push.apply(newId, [i]);
+        }
+        return newId;
+    } else {
+        return [Number(id)];
     }
-    return newId;
-  } else {
-    return [Number(id)];
-  }
 };
 
 
 const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
 Spriteset_Battle.prototype.createLowerLayer = function() {
-  _Spriteset_Battle_createLowerLayer.call(this);
-  if (nuun_GausePlugins()) {
-    this.createGaugeBase();
-  }
+    _Spriteset_Battle_createLowerLayer.call(this);
+    if (nuun_GausePlugins()) {
+        this.createGaugeBase();
+    }
 };
 
 Spriteset_Battle.prototype.createGaugeBase = function() {
@@ -767,18 +779,18 @@ Sprite_NuunAPngImg.prototype.initMembers = function() {
 };
 
 Sprite_NuunAPngImg.prototype.setup = function(battler, data, name, mode) {
-  this._battler = battler;
-  this._data = data;
-  this._pictureName = name.split('pictures/')[1];
-  this._actorPictureEXApp = mode;
-  this.refresh();
+    this._battler = battler;
+    this._data = data;
+    this._pictureName = name.split('pictures/')[1];
+    this._actorPictureEXApp = mode;
+    this.refresh();
 };
 
 Sprite_NuunAPngImg.prototype.refresh = function() {
-  if (this.addApngChild && this.loadApngSprite(this._pictureName)) {
-      this.addApngChild(this._pictureName);
-      this._apngMode = true;
-  }
+    if (this.addApngChild && this.loadApngSprite(this._pictureName)) {
+        this.addApngChild(this._pictureName);
+        this._apngMode = true;
+    }
 };
 
 Sprite_NuunAPngImg.prototype.destroy = function() {
@@ -799,8 +811,9 @@ Sprite_NuunAPngImg.prototype.isActorPictureEXApp = function() {
 };
 
 Sprite_NuunAPngImg.prototype.loadApngSprite = function(name) {
-  return Sprite_Picture.prototype.loadApngSprite.call(this, name);
+    return Sprite_Picture.prototype.loadApngSprite.call(this, name);
 };
+
 
 Game_Enemy.prototype.allSkillActions = function(actionList) {
   return actionList;

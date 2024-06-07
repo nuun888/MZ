@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.4
+ * @version 3.1.5
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/8/2024 Ver.3.1.5
+ * Fixed the APNG display to be displayed in front of the cursor.
+ * Fixed an issue where the APNG would remain when the cursor was moved.
  * 5/26/2024 Ver.3.1.4
  * Updated with circle gauge support.
  * 5/12/2024 Ver.3.1.3
@@ -1416,6 +1419,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/8 Ver.3.1.5
+ * APNGの表示をカーソルより前に表示するように修正。
+ * カーソル移動するとAPNGが残ってしまう問題を修正。
  * 2024/5/26 Ver.3.1.4
  * サークルゲージ対応による更新。
  * 2024/5/12 Ver.3.1.3
@@ -3169,9 +3175,8 @@ Imported.NUUN_MenuScreenEX = true;
 
     Window_MenuStatus.prototype.createApngSprite = function(actor, index, data, rect) {
         if (!this._actorsBitmap[index]) {
-            const rect = this.itemRect(index);
             const sprite = new Sprite_MenuActorImg();
-            this._contentsBackSprite.addChild(sprite);
+            this.nuun_addClientAreaSprite(sprite);
             this._actorsBitmap[index] = sprite;
         }
         const sprite = this._actorsBitmap[index];
@@ -3241,7 +3246,7 @@ Imported.NUUN_MenuScreenEX = true;
         const list = this.getStatusList();
         for (const data of list) {
             switch (data.DateSelect) {
-                case 200:
+                case "Imges":
                     loadBitmap = this.nuunMenu_loadContentsImg(data);
                     break;
             }
@@ -3279,12 +3284,12 @@ Imported.NUUN_MenuScreenEX = true;
         if (this.nuunMenu_isContents(data, battler)) {
             setTepmData(data)
             const method = 'nuun_DrawMenuStatusContents' + data.DateSelect;
-            //try {
+            try {
                 this[method](data, x, y, width, battler);
-            //} catch (error) {
-            //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-            //    throw ["DataError", log];
-            //}
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+                throw ["DataError", log];
+            }
         }
     };
 

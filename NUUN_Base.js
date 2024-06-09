@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.7
+ * @version 1.7.8
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/9/2024 Ver.1.7.8
+ * Re-fixed APNG-related processing.
  * 6/8/2024 Ver.1.7.7
  * Fixes for APNG related processing.
  * 5/25/2024 Ver.1.7.6
@@ -104,7 +106,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.7
+ * @version 1.7.8
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -114,6 +116,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/9 Ver.1.7.8
+ * APNG関連の処理の再修正。
  * 2024/6/8 Ver.1.7.7
  * APNG関連の処理の修正。
  * 2024/5/25 Ver.1.7.6
@@ -674,7 +678,14 @@ Window_Selectable.prototype.drawItemBackground = function(index) {
 const _Window_Base_initialize = Window_Base.prototype.initialize;
 Window_Base.prototype.initialize = function(rect) {
     _Window_Base_initialize.call(this, rect);
+    this.createContentsExSprite();
     this._userWindowSkin = null;
+};
+
+Window_Base.prototype.createContentsExSprite = function() {
+    this._contentsExSprite = new Sprite()
+    const index = this._clientArea.children.indexOf(this._contentsSprite);
+    this._clientArea.addChildAt(this._contentsExSprite, index);
 };
 
 const _Window_Base_loadWindowskin = Window_Base.prototype.loadWindowskin;
@@ -687,8 +698,7 @@ Window_Base.prototype.loadWindowskin = function() {
 };
 
 Window_Base.prototype.nuun_addClientAreaSprite = function(sprite) {
-    const index = this._clientArea.children.indexOf(this._contentsSprite);
-    this._clientArea.addChildAt(sprite, index);
+    this._contentsExSprite.addChild(sprite);
 };
 
 Window_Base.prototype.nuun_getListIdData = function(id) {

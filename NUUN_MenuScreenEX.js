@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.5
+ * @version 3.1.6
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/8/2024 Ver.3.1.6
+ * Fixed so that units can be set for the current experience points and experience points to the next level.
+ * Fixed an issue where ability units were displayed twice.
  * 6/8/2024 Ver.3.1.5
  * Fixed the APNG display to be displayed in front of the cursor.
  * Fixed an issue where the APNG would remain when the cursor was moved.
@@ -1353,7 +1356,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.3
+ * @version 3.1.6
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1419,6 +1422,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/9 Ver.3.1.6
+ * 能力値の単位が二重に表示される問題を修正。
+ * 現在の経験値、次のレベルまでの経験値に単位を設定できるように修正。
  * 2024/6/8 Ver.3.1.5
  * APNGの表示をカーソルより前に表示するように修正。
  * カーソル移動するとAPNGが残ってしまう問題を修正。
@@ -3447,7 +3453,6 @@ Imported.NUUN_MenuScreenEX = true;
             this.nuun_setContentsValueFontFace(data);
             const padding = textWidth > 0 ? 8 : 0;
             this.nuun_DrawContentsParamUnitText(eval(data.DetaEval), data, x + textWidth + padding, y, width - (textWidth + padding));
-            //this.drawText(eval(data.DetaEval), x + textWidth + padding, y, width - (textWidth + padding), data.Align);
         }
         this.resetFontSettings();
     };
@@ -3514,7 +3519,7 @@ Imported.NUUN_MenuScreenEX = true;
         this.drawText(nameText, x, y, width);
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
-        this.drawText(this.nuun_ExpTotalValue(actor), x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.nuun_DrawContentsParamUnitText(this.nuun_ExpTotalValue(actor), data, x + textWidth + 8, y, width - (textWidth + 8));
         this.resetFontSettings();
     };
 
@@ -3528,7 +3533,7 @@ Imported.NUUN_MenuScreenEX = true;
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
         let textParam = (data.DetaEval ? eval(data.DetaEval) : this.nuun_ExpNextValue(actor));
-        this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + 8, y, width - (textWidth + 8));
         this.resetFontSettings();
     };
 
@@ -3710,7 +3715,7 @@ Imported.NUUN_MenuScreenEX = true;
         this.drawText(nameText, x, y, textWidth);
         this.resetTextColor();
         this.nuun_setContentsValueFontFace(data);
-        const textParam = (data.DetaEval ? eval(data.DetaEval) : actor.param(param)) + (data.paramUnit ? String(data.paramUnit) : "");
+        const textParam = (data.DetaEval ? eval(data.DetaEval) : actor.param(param));
         this.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + 8, y, width - (textWidth + 8));
         //this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
         this.resetFontSettings();

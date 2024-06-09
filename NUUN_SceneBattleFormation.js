@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.8
+ * @version 1.3.9
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/9 Ver.1.3.9
+ * ターン制で並び替えをアクターコマンドに指定した際に、メンバー交代後に前のアクターのコマンドが表示されたままになる問題を修正。
  * 2024/5/25 Ver.1.3.8
  * ターン制でメンバー変更画面を閉じた時に、行動回数が再設定される問題を修正。
  * 2023/8/8 Ver.1.3.7
@@ -356,22 +358,6 @@ const _Scene_Battle_update = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
     _Scene_Battle_update.call(this);
     this._formation.update();
-    if (BattleManager.isTpb() && !this.isFormationActive() && $gameTemp.formationRefresh && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
-        $gameTemp.formationRefresh = false;
-        if (Imported.NUUN_SupportActor) {
-        $gameParty.setWithSupportActorMember();
-        }
-        const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
-        if (index >= 0) {
-            if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
-                this._statusWindow.select(index);
-            } else {
-                this._statusWindow.select(index);
-            }
-        } else {
-        this.commandCancel();
-        }
-    }
 };
 
 Scene_Battle.prototype.isFormationActive = function() {
@@ -398,6 +384,27 @@ Scene_Battle.prototype.hideSubInputWindows = function() {
 
 Game_Party.prototype.useFormationActor = function() {
     return (CondFormationActor ? eval(CondFormationActor) : true) && this.useFormation();
+};
+
+BattleManager.battleCommandRefresh = function() {
+    if ($gameTemp.formationRefresh) {
+        $gameTemp.formationRefresh = false;
+        if (this.isTpb()) {
+            if (this._currentActor) {
+                if (Imported.NUUN_SupportActor) {
+                    $gameParty.setWithSupportActorMember();
+                }
+                const index = $gameParty.battleMembers().indexOf(this._currentActor);
+                if (index >= 0) {
+                    SceneManager._scene._statusWindow.selectActor(this._currentActor);
+                } else {
+                    this._currentActor = null;
+                }
+            }
+        } else {
+            this._currentActor = null;
+        }
+    }  
 };
 
 })();

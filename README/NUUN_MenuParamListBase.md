@@ -1,4 +1,4 @@
-# [ステータス項目ベースプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)
+# [ステータス項目ベースプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)  
 #### 必須、前提プラグイン

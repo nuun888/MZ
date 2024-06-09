@@ -24,6 +24,7 @@
  * 更新履歴
  * 2024/6/9 Ver.1.3.9
  * ターン制で並び替えをアクターコマンドに指定した際に、メンバー交代後に前のアクターのコマンドが表示されたままになる問題を修正。
+ * メンバー交代をした際に、コマンド選択が初期化されない問題を修正。
  * 2024/5/25 Ver.1.3.8
  * ターン制でメンバー変更画面を閉じた時に、行動回数が再設定される問題を修正。
  * 2023/8/8 Ver.1.3.7
@@ -284,12 +285,16 @@ Game_Temp.prototype.initialize = function() {
 };
 
 Game_Party.prototype.formationMakeActions = function() {
-    if (Imported.NUUN_SupportActor) {
-        $gameParty.setWithSupportActorMember();
-    }
-    const members = this.members().filter(member => member._actions.length === 0);
-    for (const member of members) {
-        member.makeActions();
+    if ($gameTemp.formationRefresh) {
+        if (Imported.NUUN_SupportActor) {
+            $gameParty.setWithSupportActorMember();
+        }
+        for (const member of this.members()) {
+            member._actionInputIndex = 0;
+            if (member._actions.length === 0) {
+                member.makeActions();
+            }
+        }
     }
 };
 

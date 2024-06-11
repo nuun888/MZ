@@ -32,6 +32,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/11 Ver.1.7.11
+ * バトルメンバーから控えメンバーの切り替えが行われない問題を修正。
  * 2024/6/9 Ver.1.7.10
  * 処理の修正。
  * 2024/5/25 Ver.1.7.9
@@ -1817,11 +1819,10 @@ Window_FormationBattleMember.prototype.cursorDown = function(wrap) {
   const index = this.index();
   const cols = this.maxCols();
   const maxItem = this.maxItems()
-  const rowIndex = Math.max(cols * (Math.ceil(maxItem / cols) - 2) + (maxItem % cols), 0);
-  _Window_FormationBattleMember_cursorDown.call(this, wrap);
+  const rowIndex = maxItem - cols;
   if ($gameParty.formationMember().length > 0 && index >= rowIndex) {
     this.changeFormationCursor();
-  }
+    }
 };
 
 Window_FormationBattleMember.prototype.onTouchSelectActive = function() {
@@ -2074,11 +2075,11 @@ Window_FormationMember.prototype.drawPendingItemBackground = function(index) {
 
 const _Window_FormationMember_cursorUp = Window_FormationMember.prototype.cursorUp;
 Window_FormationMember.prototype.cursorUp = function(wrap) {
-  const index = this.index();
-  _Window_FormationMember_cursorUp.call(this, wrap);
-  if (index < this.maxCols()) {
-    this.changeFormationCursor();
-  }
+    const index = this.index();
+    Window_Selectable.prototype.cursorUp.apply(this, arguments);
+    if (index < this.maxCols()) {
+        this.changeFormationCursor();
+    }
 };
 
 Window_FormationMember.prototype.onTouchSelectActive = function() {

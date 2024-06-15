@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 戦闘メンバー数変更プラグイン
  * @author NUUN
- * @version 1.0.6
+ * @version 1.0.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -24,6 +24,8 @@
  * 最大戦闘メンバー数を前の数値より高く変更した場合、セーブ後のデータでは前の最大戦闘メンバー数よりフォロワーの画像が表示されません。
  * 
  * 更新履歴
+ * 2024/6/16 Ver.1.0.7
+ * 戦闘中に最大メンバーが増加したときにサイドビューアクターが表示されない問題を修正。
  * 2022/8/27 Ver.1.0.6
  * ゲージ幅補正機能を別プラグイン化。
  * 2022/8/6 Ver.1.0.5
@@ -70,54 +72,74 @@ let membersRefresh = false;
 
 const pluginName = "NUUN_MaxBattleMembers";
 PluginManager.registerCommand(pluginName, 'SetMaxBattleMember', args => {
-  $gameParty.setMaxBattleMembers(Number(args.maxBattleMember));
+    $gameParty.setMaxBattleMembers(Number(args.maxBattleMember));
 });
 
 const _Game_Party_initialize = Game_Party.prototype.initialize;
 Game_Party.prototype.initialize = function() {
-  _Game_Party_initialize.call(this);
-  this._maxBattleMembers = MaxBattleMemberNum;
+    _Game_Party_initialize.call(this);
+    this._maxBattleMembers = MaxBattleMemberNum;
 };
 
 Game_Party.prototype.maxBattleMembers = function() {//再定義
-  if (this._maxBattleMembers === undefined) {
-    this.setMaxBattleMembers(MaxBattleMemberNum);
-  }
-  return this._maxBattleMembers;
+    if (this._maxBattleMembers === undefined) {
+        this.setMaxBattleMembers(MaxBattleMemberNum);
+    }
+    return this._maxBattleMembers;
 };
 
 Game_Party.prototype.setMaxBattleMembers = function(num) {
-  this._maxBattleMembers = num;
-  if (this.inBattle()) {
-    $gameTemp.requestBattleRefresh();
-    membersRefresh = true;
-  }
-  $gamePlayer.refresh();
+    this._maxBattleMembers = num;
+    if (this.inBattle()) {
+        $gameTemp.requestBattleRefresh();
+        membersRefresh = true;
+    }
+    $gamePlayer.refresh();
 };
 
 
 const _Window_BattleStatus_initialize = Window_BattleStatus.prototype.initialize;
 Window_BattleStatus.prototype.initialize = function(rect) {
-  _Window_BattleStatus_initialize.call(this, rect);
+    _Window_BattleStatus_initialize.call(this, rect);
 
 };
 
 Window_BattleStatus.prototype.maxCols = function() {//再定義
-  return $gameParty._maxBattleMembers;
+    return $gameParty._maxBattleMembers;
 };
 
 const _Scene_Battle_update = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
-  _Scene_Battle_update.call(this);
-  if (BattleManager.isTpb() && membersRefresh && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
-    membersRefresh = false;
-    const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
-    if (index >= 0) {
-      this._statusWindow.select(index);
-    } else {
-      this.commandCancel();
+    _Scene_Battle_update.call(this);
+    if (BattleManager.isTpb() && membersRefresh && !$gameTemp.isBattleRefreshRequested() && this._actorCommandWindow.actor()) {
+        membersRefresh = false;
+        const index = $gameParty.battleMembers().indexOf(this._actorCommandWindow.actor());
+        if (index >= 0) {
+        this._statusWindow.select(index);
+        } else {
+        this.commandCancel();
+        }
     }
-  }
+};
+
+
+const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
+Spriteset_Battle.prototype.updateActors = function() {
+    this.addCreateActors();
+    _Spriteset_Battle_updateActors.apply(this, arguments);
+};
+    
+
+Spriteset_Battle.prototype.addCreateActors = function() {
+    if ($gameSystem.isSideView() && this._actorSprites && $gameParty.maxBattleMembers() > this._actorSprites.length) {
+        const count = $gameParty.maxBattleMembers() - this._actorSprites.length;
+        for (let i = 0; i < count; i++) {
+            const sprite = new Sprite_Actor();
+            sprite.startMove(0, 0, 0);
+            this._actorSprites.push(sprite);
+            this._battleField.addChild(sprite);
+        }
+    }
 };
 
 

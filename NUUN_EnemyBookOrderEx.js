@@ -8,7 +8,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc Enemy book display order expansion
+ * @plugindesc Enemy book display order ex
  * @author NUUN
  * @base NUUN_EnemyBook
  * @orderAfter NUUN_EnemyBook
@@ -21,8 +21,8 @@
  * If the following tags are not present, the enemy name will be compared.
  * 
  * Enemy notes
- * <EnemyOrder:[id]>
- * [id]: Display number
+ * <EnemyOrder:[name]>
+ * [name]:How to read
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
@@ -62,7 +62,7 @@
  * 
  * 敵キャラのメモ欄
  * <EnemyOrder:[name]>
- * [id]:文字列 
+ * [name]:読み方
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.0
+ * @version 2.4.1
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -60,6 +60,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/6/16 Ver.2.4.1
+ * Fixed an issue where the number of obtained and stolen items with the same ID was displayed as increments.
  * 2024/5/26 Ver.2.4.0
  * Added the ability to turn the experience value gauge into a circular gauge.
  * Added a function to display the level on the experience value gauge display.
@@ -2309,7 +2311,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.0
+ * @version 2.4.1
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2357,6 +2359,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/16 Ver.2.4.1
+ * 入手アイテム及び盗めたアイテムで別の同じIDの個数の表示が加算される問題を修正。
  * 2024/5/26 Ver.2.4.0
  * 経験値ゲージを円形ゲージにする機能を追加。
  * 経験値ゲージの表示にレベルを表示する機能を追加。
@@ -6316,7 +6320,7 @@ Window_ResultGetItem.prototype.getItemDropList = function() {
   const dropList = [];
   drop.forEach(item => {
     if (!item.meta.NoResultDropList && resultDropIsItem(item)) {
-        const index = dropList.findIndex(ditem => item.id === ditem.item.id);
+        const index = dropList.findIndex(ditem => this.isItemDrop(item, ditem));
         if (DropItemNumVisible && index >= 0) {
             dropList[index].num++;
         } else {
@@ -6325,6 +6329,10 @@ Window_ResultGetItem.prototype.getItemDropList = function() {
     }
   });
   this.dropList = dropList;
+};
+
+Window_ResultGetItem.prototype.isItemDrop = function(item, ditem) {
+    return item === ditem.item;
 };
 
 Window_ResultGetItem.prototype.drawGetItems = function(data, x, y, width) {
@@ -6435,7 +6443,7 @@ Window_ResultGetItem.prototype.getItemStealList = function() {
         stealList.push({item: item.money, type:'gold'});
       }
     } else {
-      const index = stealList.findIndex(sitem => item.id === sitem.item.id);
+      const index = stealList.findIndex(sitem => item === sitem.item);
       if (StealItemNumVisible && index >= 0) {
         stealList[index].num++;
       } else {

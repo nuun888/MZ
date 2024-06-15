@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 1.3.9
+ * @version 1.3.10
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/16 Ver.1.3.10
+ * 戦闘中に最大メンバーが増加したときにサイドビューアクターが表示されない問題を修正。
  * 2024/6/9 Ver.1.3.9
  * ターン制で並び替えをアクターコマンドに指定した際に、メンバー交代後に前のアクターのコマンドが表示されたままになる問題を修正。
  * メンバー交代をした際に、コマンド選択が初期化されない問題を修正。
@@ -384,6 +386,25 @@ Scene_Battle.prototype.hideSubInputWindows = function() {
     this._formation._battleMemberWindow.hide();
     this._formation._memberWindow.hide();
     this._formation._memberStatusWindow.hide();
+};
+
+
+const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
+Spriteset_Battle.prototype.updateActors = function() {
+    this.addCreateActors();
+    _Spriteset_Battle_updateActors.apply(this, arguments);
+};
+    
+Spriteset_Battle.prototype.addCreateActors = function() {
+    if ($gameSystem.isSideView() && this._actorSprites && $gameParty.maxBattleMembers() > this._actorSprites.length) {
+        const count = $gameParty.maxBattleMembers() - this._actorSprites.length;
+        for (let i = 0; i < count; i++) {
+            const sprite = new Sprite_Actor();
+            sprite.startMove(0, 0, 0);//暫定
+            this._actorSprites.push(sprite);
+            this._battleField.addChild(sprite);
+        }
+    }
 };
 
 

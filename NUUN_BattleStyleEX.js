@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.15
+ * @version 3.12.16
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2024/6/16 Ver.3.12.16
+ * 戦闘中に最大メンバーが増加したときにフロントビューでのエフェクトが表示されない問題を修正。
  * 2024/3/2 Ver.3.12.15
  * ステート表示の処理を修正。
  * 2024/2/18 Ver.3.12.14
@@ -4300,11 +4302,17 @@ Spriteset_Battle.prototype.createBattleHud = function() {
 
 const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
 Spriteset_Battle.prototype.update = function() {
-  _Spriteset_Battle_update.call(this);
-  this.updateEffects();
-  if (params.BattleShowWeather !== "None" && isBattleWeather()) {
-    this.updateWeather();
-  }
+    _Spriteset_Battle_update.call(this);
+    this.updateEffects();
+    if (params.BattleShowWeather !== "None" && isBattleWeather()) {
+        this.updateWeather();
+    }
+};
+
+const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
+Spriteset_Battle.prototype.updateActors = function() {
+    this.addBsCreateActors();
+    _Spriteset_Battle_updateActors.apply(this, arguments);
 };
 
 Spriteset_Battle.prototype.createHudBack = function() {
@@ -4330,6 +4338,17 @@ Spriteset_Battle.prototype.createDamege = function() {
   const sprite = this.setBattleBase();
   this._battleHudBase.addChild(sprite);
   this._battleDamege = sprite;
+};
+
+Spriteset_Battle.prototype.addBsCreateActors = function() {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow && this._actorSprites && $gameParty.maxBattleMembers() > this._actorSprites.length) {
+        const count = $gameParty.maxBattleMembers() - this._actorSprites.length;
+        for (let i = 0; i < count; i++) {
+            const sprite = new Sprite_Actor();
+            this._actorSprites.push(sprite);
+            this._battleDamege.addChild(sprite);
+        }
+    }  
 };
 
 Spriteset_Battle.prototype.updateEffects = function() {   

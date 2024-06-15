@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.20.13
+# Ver.2.21.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -12,6 +12,8 @@
 [（要条件付きドロップアイテムVer.1.0.6以降）](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md)  
 [モンスター図鑑全セーブ共通](https://github.com/nuun888/MZ/blob/master/README/EnemyBook_Global.md)  
 [モンスター図鑑マップ遭遇チェック](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEncounterCheck.md)Ver.1.0.2  
+[モンスター図鑑表示順変更](https://github.com/nuun888/MZ/blob/master/README/EnemyBookOrder.md)Ver.1.0.0  
+[モンスター図鑑表示順拡張](https://github.com/nuun888/MZ/blob/master/README/EnemyBookOrderEx.md)Ver.1.0.0  
 #### オプション
 [キーボタン割り当て](https://github.com/nuun888/MZ/blob/master/README/UserKey.md)  
 
@@ -280,6 +282,8 @@ PgUp PgDnキー：モンスターページ送り
 上下スワイプ：スクロール（弾くように勢いよくスワイプすることでページ送りと同等になります）  
 
 ## 更新履歴
+2024/6/16 Ver.2.21.0  
+ソート機能対応に関する修正。  
 2024/5/14 Ver.2.20.13  
 単位にシステムカラーを適用できるように修正。  
 属性耐性数値表示、ステート耐性数値表示がシステム文字と重なって表示される問題を修正。  

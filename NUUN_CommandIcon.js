@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.0
+ * @version 1.6.1
  * 
  * @help
  * You can display icons in the command menu and change the text color of command names.
@@ -43,6 +43,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/16/2024 Ver.1.6.1
+ * Processing fixes.
  * 2/17/2024 Ver.1.6.0
  * Added the ability to change the display of command text using switches.
  * Added a function that allows you to set conditions for command selection.
@@ -288,7 +290,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.0
+ * @version 1.6.1
  * 
  * @help
  * コマンドメニューにアイコンを表示やコマンド名の文字色を変更できます。
@@ -320,6 +322,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/16 Ver.1.6.1
+ * 処理の修正。
  * 2024/2/17 Ver.1.6.0
  * スイッチによってコマンドテキストの表示を変更する機能を追加。
  * コマンド選択可能な条件を設定できる機能を追加。
@@ -566,81 +570,150 @@ Imported.NUUN_CommandIcon = true;
 
 (() => {
 const parameters = PluginManager.parameters('NUUN_CommandIcon');
-const CommadData = DataManager.nuun_structureData(parameters['CommadIcon']);
-const CommandPosition = DataManager.nuun_structureData(parameters['CommandPosition']);
-const HorzCommandPosition = DataManager.nuun_structureData(parameters['HorzCommandPosition']);
-const ClassCommandPosition = DataManager.nuun_structureData(parameters['ClassCommandPosition']);
+const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+
+class Nuun_CommandEx {
+    constructor(_window) {
+        this._window = _window;
+        this._commandName = "";
+        this._commandSymbol = "";
+        this.setItemTextAlign();
+    }
+
+    setup(index) {
+        const symbol = this._window.commandSymbol(index);
+        const name = this._window.commandName(index);
+        this._commandName = name;
+        this._commandSymbol = symbol;
+        this._data = params.CommadIcon ? params.CommadIcon.find(Commad => this.getFindCommand(Commad, symbol, name) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
+    }
+
+    getFindCommand(data, symbol, name) {
+        if (!!data.CommadSymbol) {
+            return data.CommadSymbol === symbol;
+        } else {
+            return data.CommadName === name;
+        }
+    }
+
+    isClass(Command, mode) {
+        if (Command && Command.length > 0) {
+            const className = getClass(this._window);
+            const result = Command.some(_Class => _Class === className);
+            if (mode === 0 || mode === undefined) {
+                return result;
+            } else {
+                return result ? false : true;
+            }
+        }
+        return true;
+    }
+
+    setItemTextAlign() {
+        const align = this.itemTextAlignClass();
+        this._align = !!align ? align : this._window.commandExItemTextAlign();
+    }
+
+    getItemTextAlign() {
+        return this._align;
+    }
+
+    itemTextAlignClass() {
+        const commandPosition = params.ClassCommandPosition || [];
+        const className = getClass(this._window);
+        const result = commandPosition.find(_Class => _Class.CommandClass === className);
+        return result ? result.CommandPosition : null;
+    }
+
+    isCommandEx() {
+        return !!this._data;
+    }
+
+    getCommandEx() {
+        return this._data;
+    }
+
+    isCommandNameText(text) {
+        return text === this._commandName;
+    }
+
+    contentsBuckImg(index) {
+        if (this._data.ContentsBuckImg) {
+            const bitmap = ImageManager.nuun_LoadPictures(this._data.ContentsBuckImg);
+            bitmap.addLoadListener(function() {
+                this._window.drawContentsBack(bitmap, index);
+            }.bind(this));
+            return true;
+        }
+        return false;
+    }
+
+    isCommadSecretName(text) {
+        if (this._data && !!this._data.CommadSecretName) {
+            if (!this.isCommadSecret()) {
+                text = this.unknownDataLength(data.CommadSecretName , text);
+            }
+        }
+        return text;
+    }
+
+    isCommadSecret() {
+        if (this._data.CommadSecretSwitch > 0) {
+            return $gameSwitches.value(this._data.CommadSecretSwitch)
+        }
+        return true;
+    };
+
+    unknownDataLength(secretName, name) {
+        if(secretName === '？' || secretName === '?') {
+            const name_length = this.commandNameLength(name);
+            return secretName.repeat(name_length);
+        } else {
+            return secretName;
+        }
+    };
+    
+    commandNameLength(name) {
+        return name.length;
+    };
+
+    getCommandEnabled(name, symbol, ext) {
+        const data = params.CommadIcon ? params.CommadIcon.find(Commad => this.getFindCommand(Commad, symbol, name) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
+        if (data && data.Enabled) {
+            return eval(data.Enabled);
+        }
+        return ext;
+    }
+
+}
 
 const _Window_Command_initialize = Window_Command.prototype.initialize;
 Window_Command.prototype.initialize = function(rect) {
-    this.setItemTextAlign();
-    this._commadExData = null;
-    _Window_Command_initialize.call(this, rect);
+    this._commandEx = new Nuun_CommandEx(this);
+    _Window_Command_initialize.apply(this, arguments);
 };
 
 const _Window_Command_addCommand = Window_Command.prototype.addCommand;
 Window_Command.prototype.addCommand = function(name, symbol, enabled = true, ext = null) {
-    _Window_Command_addCommand.call(this, name, symbol, enabled, ext);
-    this.setCommandData();
+    ext = this._commandEx.getCommandEnabled(name, symbol, ext);
+    _Window_Command_addCommand.apply(this, arguments);
 };
 
-Window_Command.prototype.setCommandData = function() {
-    const list = this._list[this._list.length - 1];
-    const data = CommadData ? CommadData.find(Commad => this.getFindCommand(Commad, list) && this.isClass(Commad.CommandClass, Commad.CommandClassMode)) : null;
-    if (data) {
-        const color = data.CommadNameColor ? data.CommadNameColor : 0;
-        list.commandExData = {
-            color:NuunManager.getColorCode(color),
-            name: data.CommadName,
-            iconId: data.iconId,
-            secretName: data.CommadSecretName,
-            commadSecretSwitch: data.CommadSecretSwitch,
-            contentsBuckImg: data.ContentsBuckImg,
-            font: data.FontFace
-        }
-        list.enabled = data.Enabled ? eval(data.Enabled) : list.enabled;
-    }
-};
-
-const _Window_Command_drawText = Window_Command.prototype.drawText;
-Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
-    this.resetFontSettings();
-    if (!!this._commadExData) {
-        const commandData = this._commadExData;
-        text = this.isCommadSecretName(commandData, text);
-        this.nuun_setContentsFontFace(commandData);
-        const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
-        const textMargin = commandData.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
-        const textWidth = this.textWidth(text);
-        const itemWidth = Math.max(0, maxWidth - textMargin);
-        width = Math.min(itemWidth, textWidth);
-        if(commandData.iconId > 0) {
-            if(align === 'center') {
-                this.drawIcon(commandData.iconId, x + (maxWidth / 2 - width / 2) - textMargin / 2, iconY);
-            } else if (align === 'left') {
-                this.drawIcon(commandData.iconId, x, iconY);
-            } else {
-                this.drawIcon(commandData.iconId, x + itemWidth - width, iconY);
-            }
-        }
-        x += textMargin;
-        maxWidth = itemWidth;
-        this.commandChangeTextColor(commandData);
-    }
-    _Window_Command_drawText.call(this, text, x, y, maxWidth, align);
-};
+if (Window_Command.prototype.drawItemBackground == Window_Selectable.prototype.drawItemBackground) {
+    Window_Command.prototype.drawItemBackground = function(index) {
+        Window_Selectable.prototype.drawItemBackground.apply(this, arguments);
+    };
+}
 
 const _Window_Command_drawItemBackground = Window_Command.prototype.drawItemBackground;
 Window_Command.prototype.drawItemBackground = function(index) {
-    this._commadExData = this.getCommandExData(index);
-    if (!!this._commadExData && !!this._commadExData.contentsBuckImg) {
-        const bitmap = ImageManager.nuun_LoadPictures(this._commadExData.contentsBuckImg);
-        bitmap.addLoadListener(function() {
-        this.drawContentsBack(bitmap, index);
-        }.bind(this));
-    } else {
-        _Window_Command_drawItemBackground.call(this, index);
-    }   
+    this._commandEx.setup(index);
+    if (this._commandEx.isCommandEx()) {
+        if (this._commandEx.contentsBuckImg(index)) {
+            return;
+        }
+    }
+    _Window_Command_drawItemBackground.apply(this, arguments);
 };
 
 Window_Command.prototype.drawContentsBack = function(bitmap, index) {
@@ -650,99 +723,82 @@ Window_Command.prototype.drawContentsBack = function(bitmap, index) {
     this.contentsBack.blt(bitmap, 0, 0, bitmap.width, bitmap.height, rect.x + 1, rect.y + 1, width, height);
 };
 
-Window_Command.prototype.setItemTextAlign = function() {
-    const align = this.itemTextAlignClass();
-    this._classAlign = !!align ? align : this.commandExItemTextAlign();
-};
-
-Window_Command.prototype.itemTextAlignClass = function() {
-    const commandPosition = ClassCommandPosition || [];
-    const className = getClass(this);
-    const result = commandPosition.find(_Class => _Class.CommandClass === className);
-    return result ? result.CommandPosition : null;
-};
-
-const _Window_Command_itemTextAlign = Window_Command.prototype.itemTextAlign;
-Window_Command.prototype.itemTextAlign = function() {
-    return this._classAlign ? this._classAlign : _Window_Command_itemTextAlign.call(this);
-};
-
-const _Window_HorzCommand_itemTextAlign = Window_HorzCommand.prototype.itemTextAlign;
-Window_HorzCommand.prototype.itemTextAlign = function() {
-    return this._classAlign ? this._classAlign : _Window_HorzCommand_itemTextAlign.call(this);
-};
-
-Window_Command.prototype.commandExItemTextAlign = function() {
-    if (CommandPosition !== 'None') {
-        return CommandPosition;
-    } else {
-        return _Window_Command_itemTextAlign.call(this);
-    }
-};
-
-Window_HorzCommand.prototype.commandExItemTextAlign = function() {
-    if (HorzCommandPosition !== 'None') {
-        return HorzCommandPosition;
-    } else {
-        return _Window_HorzCommand_itemTextAlign.call(this);
-    }
-};
-
-Window_Command.prototype.commandChangeTextColor = function(commandData) {
-    this.changeTextColor(commandData.color);
-};
-
-Window_Command.prototype.nuun_setContentsFontFace = function(data) {
-    this.contents.fontFace = data.font ? data.font : $gameSystem.mainFontFace();
-};
-
-Window_Command.prototype.getFindCommand = function(data, list) {
-    if (!!data.CommadSymbol) {
-      return data.CommadSymbol === list.symbol;
-    } else {
-      return data.CommadName === list.name;
-    }
-};
-
-Window_Command.prototype.isClass = function(Command, mode) {
-    if (Command && Command.length > 0) {
-        const className = getClass(this);
-        const result = Command.some(_Class => _Class === className);
-        if (mode === 0 || mode === undefined) {
-            return result;
-        } else {
-            return result ? false : true;
-        }
-    }
-    return true;
-};
-
-Window_Command.prototype.isCommadSecretName = function(data, text) {
-    if (!!data.secretName) {
-        if (!isCommadSecret(data)) {
-            text = unknownDataLength(data.secretName , text);
-        }
-    }
-    return text;
-};
-
-Window_Command.prototype.getCommandExData = function(index) {
-    return this._list[index].commandExData;
-};
-
-
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
-    this._commadExData = this.getCommandExData(index);
+    if (!this._commandEx.isCommandNameText(this.commandName(index))) {
+        this._commandEx.setup(index);
+    }
     _Window_Command_drawItem.call(this, index);
 };
 
 const _Window_Options_drawItem = Window_Options.prototype.drawItem;
 Window_Options.prototype.drawItem = function(index) {
-    this._commadExData = this.getCommandExData(index);
+    if (!this._commandEx.isCommandNameText(this.commandName(index))) {
+        this._commandEx.setup(index);
+    }
     _Window_Options_drawItem.call(this, index);
 };
 
+const _Window_Command_drawText = Window_Command.prototype.drawText;
+Window_Command.prototype.drawText = function(text, x, y, maxWidth, align) {
+    if (this._commandEx.isCommandNameText(text) && this._commandEx.isCommandEx()) {
+        const data = this._commandEx.getCommandEx();
+        text = this._commandEx.isCommadSecretName(text);
+        this.nuun_setContentsFontFace(data);
+        const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+        const textMargin = data.iconId > 0 ? ImageManager.iconWidth + 4 : 0;
+        const textWidth = this.textWidth(text);
+        const itemWidth = Math.max(0, maxWidth - textMargin);
+        width = Math.min(itemWidth, textWidth);
+        if(data.iconId > 0) {
+            if(align === 'center') {
+                this.drawIcon(data.iconId, x + (maxWidth / 2 - width / 2) - textMargin / 2, iconY);
+            } else if (align === 'left') {
+                this.drawIcon(data.iconId, x, iconY);
+            } else {
+                this.drawIcon(data.iconId, x + itemWidth - width, iconY);
+            }
+        }
+        x += textMargin;
+        maxWidth = itemWidth;
+        this.commandChangeTextColor(data);
+    }
+    _Window_Command_drawText.apply(this, arguments);
+};
+
+Window_Command.prototype.commandExItemTextAlign = function() {
+    if (params.CommandPosition !== 'None') {
+        return params.CommandPosition;
+    } else {
+        return _Window_Command_itemTextAlign.apply(this, arguments);
+    }
+};
+
+Window_HorzCommand.prototype.commandExItemTextAlign = function() {
+    if (params.HorzCommandPosition !== 'None') {
+        return params.HorzCommandPosition;
+    } else {
+        return _Window_HorzCommand_itemTextAlign.apply(this, arguments);
+    }
+};
+
+const _Window_Command_itemTextAlign = Window_Command.prototype.itemTextAlign;
+Window_Command.prototype.itemTextAlign = function() {
+    return this._commandEx.getItemTextAlign() ? this._commandEx.getItemTextAlign() : _Window_Command_itemTextAlign.call(this);
+};
+
+const _Window_HorzCommand_itemTextAlign = Window_HorzCommand.prototype.itemTextAlign;
+Window_HorzCommand.prototype.itemTextAlign = function() {
+    return this._commandEx.getItemTextAlign() ? this._commandEx.getItemTextAlign() : _Window_HorzCommand_itemTextAlign.call(this);
+};
+
+Window_Command.prototype.commandChangeTextColor = function(data) {
+    this.changeTextColor(NuunManager.getColorCode(data.CommadNameColor));
+};
+
+Window_Command.prototype.nuun_setContentsFontFace = function(data) {
+    this.contents.fontFace = data.FontFace ? data.FontFace : $gameSystem.mainFontFace();
+};
 
 function getClass(_class) {
     try {
@@ -750,26 +806,6 @@ function getClass(_class) {
     } catch (error) {
         return String(_class.constructor.name);
     }
-};
-
-function unknownDataLength(secretName, name) {
-    if(secretName === '？' || secretName === '?') {
-        const name_length = commandNameLength(name);
-        return secretName.repeat(name_length);
-    } else {
-        return secretName;
-    }
-};
-
-function commandNameLength(name) {
-    return name.length;
-};
-
-function isCommadSecret(data) {
-    if (data.commadSecretSwitch > 0) {
-        return $gameSwitches.value(data.commadSecretSwitch)
-    }
-    return true;
 };
 
 })();

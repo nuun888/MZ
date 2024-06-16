@@ -2,8 +2,8 @@
 # Ver.1.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)  
 #### 必須プラグイン
-[共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
-[ステータス項目ベースプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)  
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+[ステータス項目ベースプラグイン](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)  
 
 アイテム画面をカスタマイズできます。  
 戦闘中のアイテム画面には対応しておりません。 

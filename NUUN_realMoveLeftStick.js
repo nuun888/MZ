@@ -8,7 +8,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc Left stick axis change amount proportional movement
+ * @plugindesc Analog Movement
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey
@@ -56,7 +56,7 @@
  */
 /*:ja
  * @target MZ
- * @plugindesc 左スティック軸変化量比例移動
+ * @plugindesc アナログ移動
  * @author NUUN
  * @base NUUN_UserKey
  * @orderAfter NUUN_UserKey

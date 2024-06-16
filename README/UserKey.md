@@ -1,5 +1,5 @@
 # [キーボタン割り当て](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
-# Ver.1.2.7
+# Ver.1.2.8
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -38,6 +38,8 @@
 24:右スティック →  
 
 ## 更新履歴
+2024/6/16 Ver.1.2.8  
+一部の処理を修正。  
 2024/5/11 Ver.1.2.7  
 有効なキーを押されたときにSEを再生する機能を追加。  
 2023/8/4 Ver.1.2.6  

@@ -1,4 +1,4 @@
-# [左スティック軸変化量比例移動](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStick.js)
+# [アナログ移動](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStick.js)
 # Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStick.js)
 #### 必須、前提プラグイン

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.7
+ * @version 1.2.8
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
@@ -28,6 +28,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/16/2024 Ver.1.2.8
+ * Some processing has been corrected.
  * 5/11/2024 Ver.1.2.7
  * Added the ability to play SE when a valid key is pressed.
  * 8/4/2023 Ver.1.2.6
@@ -103,6 +105,8 @@
  * @value 18
  * @option Pause
  * @value 19
+ * @option Esc
+ * @value 27
  * @option Space
  * @value 32
  * @option PageUp
@@ -221,8 +225,6 @@
  * @value 221
  * @option ]}
  * @value 222
- * @option Esc
- * @value 243
  * @default -1
  * @min -1
  * 
@@ -374,7 +376,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.7
+ * @version 1.2.8
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
@@ -389,7 +391,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2024/4/11 Ver.1.2.7
+ * 2024/6/16 Ver.1.2.8
+ * 一部の処理を修正。
+ * 2024/5/11 Ver.1.2.7
  * 有効なキーを押されたときにSEを再生する機能を追加。
  * 2023/8/4 Ver.1.2.6
  * 特定の条件でキー、ボタン(ゲームパッド)を有効にする機能を追加。
@@ -465,6 +469,8 @@
  * @value 18
  * @option Pause
  * @value 19
+ * @option Esc
+ * @value 27
  * @option Space
  * @value 32
  * @option PageUp
@@ -583,8 +589,6 @@
  * @value 221
  * @option ]}
  * @value 222
- * @option Esc
- * @value 243
  * @default -1
  * @min -1
  * 
@@ -920,6 +924,7 @@ Imported.NUUN_BankSystem = true;
                 }
             }
         }
+        this._gamepadStates[gamepad.index] = newState;
     };
 
     Input.gamepadLeftStickMaxDash = function() {

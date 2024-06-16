@@ -725,6 +725,7 @@ Window_Command.prototype.drawContentsBack = function(bitmap, index) {
 
 const _Window_Command_drawItem = Window_Command.prototype.drawItem;
 Window_Command.prototype.drawItem = function(index) {
+    this.resetFontSettings();
     if (!this._commandEx.isCommandNameText(this.commandName(index))) {
         this._commandEx.setup(index);
     }
@@ -733,6 +734,7 @@ Window_Command.prototype.drawItem = function(index) {
 
 const _Window_Options_drawItem = Window_Options.prototype.drawItem;
 Window_Options.prototype.drawItem = function(index) {
+    this.resetFontSettings();
     if (!this._commandEx.isCommandNameText(this.commandName(index))) {
         this._commandEx.setup(index);
     }

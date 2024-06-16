@@ -35,6 +35,7 @@ Ver.1.6以降の対応のみにさせていただきます。
 ス対：ステートターンカウント対応  
 グ：グローバル情報ベース対応  
 オ：要バトラーオーバーレイベース  
+メ：ステータス項目ベースプラグイン  
 ポ：ポップアップ対応  
 円：サークルゲージ対応  
 A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイン)が必要です)  
@@ -232,7 +233,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [ウィンドウスキン個別設定](https://github.com/nuun888/MZ/blob/master/README/WindowSkinIndividual.md) | [NUUN_WindowSkinIndividual](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_WindowSkinIndividual.js) | 共 | 1.0.0 |
 | [マルチカーソル](https://github.com/nuun888/MZ/blob/master/README/MultiCursor.md) | [NUUN_MultiCursor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MultiCursor.js) |  | 1.0.0 |
 | [メニューコマンド任意表示順](https://github.com/nuun888/MZ/blob/master/README/MenuCommandDisplayOrder.md) | [NUUN_MenuCommandDisplayOrder](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandDisplayOrder.js) | 共 | 1.0.0 |
-| アイテム画面拡張 |  |  |  |
+| [アイテムウィンドウカスタマイズ](https://github.com/nuun888/MZ/blob/master/README/ItemWindowEx.md) [NUUN_MenuCommandDisplayOrder](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js) | 共 メ | 1.0.0 |
 | スキル画面拡張 |  |  |  |
 | 装備画面拡張 |  |  |  |
 | オプション拡張 |  |  |  |

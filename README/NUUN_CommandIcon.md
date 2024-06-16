@@ -1,5 +1,5 @@
 # [コマンド、カテゴリー表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)
-# Ver.1.6.0
+# Ver.1.6.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CommandIcon.js)  
 
 #### 必須プラグイン
@@ -37,6 +37,8 @@ Window_EnemyBookPageCategory：モンスター図鑑情報ページ
 別途フォントを変更できるプラグインが必要です。(トリアコンタン様のFontLoad(フォントロードプラグイン)推奨)  
 
 ## 更新履歴
+2024/6/16 Ver.1.6.1  
+処理の修正。  
 2024/2/17 Ver.1.6.0  
 スイッチによってコマンドテキストの表示を変更する機能を追加。  
 コマンド選択可能な条件を設定できる機能を追加。  

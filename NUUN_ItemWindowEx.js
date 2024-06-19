@@ -561,7 +561,7 @@
  * @default 2
  * @min -99
  * 
- * @@param DetaEval
+ * @param DetaEval
  * @desc Enter an evaluation formula or string.
  * @text Evaluation formula or string(javaScript)(16)
  * @type combo

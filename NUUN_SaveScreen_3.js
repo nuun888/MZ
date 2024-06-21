@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.3
+ * @version 3.0.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,6 +70,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/22/2024 Ver.3.0.4
+ * Fixed an issue where item width was not applied wider than the width of a single item.
  * 6/1/2024 Ver.3.0.3
  * Fixed an issue where images were not displayed the first time.
  * 5/5/2024 Ver.3.0.2
@@ -1272,7 +1274,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.2
+ * @version 3.0.4
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1335,6 +1337,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/16 Ver.3.0.4
+ * 項目の横幅が1項目の横幅より広く適用されない問題を修正。
  * 2024/6/1 Ver.3.0.3
  * 初回時に画像が表示されない問題を修正。
  * 2024/5/5 Ver.3.0.2
@@ -3155,7 +3159,7 @@ Imported.NUUN_SaveScreen_3 = true;
                 const position = Math.min(x_Position, this.maxContentsCols());
                 const x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1);
                 const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
-                const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : this.widthMode(data, itemWidth), rect.width - x);
+                const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : this.widthMode(data, itemWidth), rect.width - x);
                 this.nuun_DrawContents(info, x + rect.x , y, width, data, savefileId);
             });
         }
@@ -3653,7 +3657,7 @@ Imported.NUUN_SaveScreen_3 = true;
                 const position = Math.min(x_Position, this.maxContentsCols());
                 const x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1);
                 const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
-                const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : this.widthMode(data, itemWidth), rect.width - x);
+                const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : this.widthMode(data, itemWidth), rect.width - x);
                 this.nuun_DrawContents(this._info, x + rect.x , y, width, data, this._savefileId);
             });
         }

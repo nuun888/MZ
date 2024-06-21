@@ -1,5 +1,5 @@
 # [メンバー変更画面(戦闘)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
-# Ver.1.3.10
+# Ver.2.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,6 +13,10 @@
 ※アクターコマンドの並び替え条件は選択不可時のときは現在、暫定的に不透明に表示する仕様にしてあります。  
 
 ## 更新履歴
+2024/6/22 Ver.2.0.0  
+プラグインパラメータの仕様を変更。  
+TPBでアクターコマンドからのメンバー交代後で、実行したアクターのターンを終了させる機能を追加。  
+控えメンバーから戦闘メンバーに移動したときに、ステートを付与させる機能を追加。  
 2024/6/16 Ver.1.3.10  
 戦闘中に最大メンバーが増加したときにサイドビューアクターが表示されない問題を修正。  
 2024/6/9 Ver.1.3.9  

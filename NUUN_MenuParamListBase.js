@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/22/2024 Ver.1.0.1
+ * Fixed an issue where item width was not applied wider than the width of a single item.
+ * Fixed actor front image image to fit item width.
  * 6/9/2024 Ver.1.0.0
  * First edition.
  * 
@@ -108,7 +111,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -119,6 +122,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/22 Ver.1.0.1
+ * 項目の横幅が1項目の横幅より広く適用されない問題を修正。
+ * アクターの前面画像の画像を項目幅にフィットするように修正。
  * 2024/6/9 Ver.1.0.0
  * 初版
  * 
@@ -524,7 +530,7 @@ Imported.NUUN_MenuParamListBase = true;
                 const position = Math.min(x_Position, this.nuun_MaxContentsCols());
                 const x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1) + colSpacing;
                 const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0) + w.itemPadding();
-                const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : this.widthMode(data, itemWidth), rect.width - x);
+                const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : this.widthMode(data, itemWidth), rect.width - x);
                 data._width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, width) : Math.min(width, 128);
                 this.nuun_DrawContentsBase(data, x + rect.x, y, width - colSpacing / 2, actor);
             }
@@ -544,7 +550,7 @@ Imported.NUUN_MenuParamListBase = true;
                 const position = Math.min(x_Position, this.nuun_MaxContentsCols());
                 const x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1);
                 const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
-                const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : this.widthMode(data.WideMode, itemWidth), rect.width - x);
+                const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : this.widthMode(data.WideMode, itemWidth), rect.width - x);
                 data._width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, width) : Math.min(width, 128);
                 this.nuun_DrawContentsBase(data, x + rect.x, y, width, actor);
             }
@@ -554,12 +560,12 @@ Imported.NUUN_MenuParamListBase = true;
             if (this.nuun_IsContents(data, actor)) {
                 this.setTepmData(data, this._exParams);
                 const method = 'nuun_DrawContents' + data.DateSelect;
-                //try {
+                try {
                     this[method](data, x, y, width, actor);
-                //} catch (error) {
-                //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                //    throw ["DataError", log];
-                //}
+                } catch (error) {
+                    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+                    throw ["DataError", log];
+                }
             }
         }
     
@@ -1016,7 +1022,7 @@ Imported.NUUN_MenuParamListBase = true;
                     if (equipNameVisible === "IconName" || equipNameVisible === "Icon") {//アイコン表示
                         const iconId = this.getEquipIconId(index);
                         if (iconId > 0) {
-                        w.drawIcon(iconId, x, contentsY + 2);
+                            w.drawIcon(iconId, x, contentsY + 2);
                         }
                         iconWidth = ImageManager.iconWidth + (equipNameVisible === "Icon" ? 24 : 4);
                     }
@@ -1214,7 +1220,7 @@ Imported.NUUN_MenuParamListBase = true;
         }
 
         drawContentsActorFront(bitmap, x, y, width, height) {
-            this._window.contents.blt(bitmap, 0, 0, width, height, x, y);
+            this._window.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, width, height);
         }
     
         nuun_ExpTotalValue(actor) {

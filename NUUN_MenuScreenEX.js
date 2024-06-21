@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.6
+ * @version 3.1.7
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/22/2024 Ver.3.1.7
+ * Fixed an issue where item width was not applied wider than the width of a single item.
+ * Fixed actor front image image to fit item width.
  * 6/8/2024 Ver.3.1.6
  * Fixed so that units can be set for the current experience points and experience points to the next level.
  * Fixed an issue where ability units were displayed twice.
@@ -1356,7 +1359,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.6
+ * @version 3.1.7
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1422,6 +1425,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/22 Ver.3.1.7
+ * 項目の横幅が1項目の横幅より広く適用されない問題を修正。
+ * アクターの前面画像の画像を項目幅にフィットするように修正。
  * 2024/6/9 Ver.3.1.6
  * 能力値の単位が二重に表示される問題を修正。
  * 現在の経験値、次のレベルまでの経験値に単位を設定できるように修正。
@@ -3167,7 +3173,7 @@ Imported.NUUN_MenuScreenEX = true;
     };
 
     Window_MenuStatus.prototype.drawContentsActorFront = function(bitmap, x, y, width, height) {
-        this.contents.blt(bitmap, 0, 0, width, height, x, y);
+        this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, width, height);
     };
 
     Window_StatusBase.prototype.nuunMenu_getMenuGraphicMode = function() {
@@ -3280,7 +3286,7 @@ Imported.NUUN_MenuScreenEX = true;
         const position = Math.min(x_Position, this.nuunMenu_maxContentsCols());
         const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
         const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate + this.itemPadding();
-        const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, itemWidth) : itemWidth;
+        const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - contentsX) : Math.min(itemWidth, rect.width - contentsX);
         data._width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, width) : Math.min(width, 128);
         this.nuunMenu_drawContentsBase(data, contentsX, contentsY, width - colSpacing / 2, actor);
         }
@@ -3954,7 +3960,7 @@ Imported.NUUN_MenuScreenEX = true;
             const rect = this.itemRect(position - 1);
             const x = rect.x + (data.X_Coordinate || 0);
             const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
-            const width = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : rect.width;
+            const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : rect.width - x;
             this.nuun_DrawContents(data, x, y, width);
         }
     };

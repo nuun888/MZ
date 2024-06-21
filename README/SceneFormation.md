@@ -1,8 +1,9 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.1.7.11
+# Ver.2.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+[ステータス項目ベースプラグイン](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)  
 
 #### オプション
 [メンバー変更画面(戦闘)](https://github.com/nuun888/MZ/blob/master/README/SceneBattleFormation.md)  
@@ -23,6 +24,8 @@
 ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）  
 
 ## 更新履歴
+2024/6/22 Ver.2.0.0  
+プラグインパラメータの仕様を変更。  
 2024/6/11 Ver.1.7.11  
 バトルメンバーから控えメンバーの切り替えが行われない問題を修正。  
 2024/6/9 Ver.1.7.10  

@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.2.0.0
+# Ver.2.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -25,6 +25,10 @@
 ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）  
 
 ## 更新履歴
+2024/6/23 Ver.2.0.1  
+強制戦闘メンバーのプラグインコマンドを追加。  
+強制戦闘メンバーのアクターが控えメンバーにいる場合、メンバー変更画面を閉じないように修正。  
+背景色の座標を修正。  
 2024/6/22 Ver.2.0.0  
 プラグインパラメータの仕様を変更。  
 戦闘メンバーから控えメンバーへのカーソル移動を横方向にも対応。(戦闘メンバー(左)、控えメンバー(右))  

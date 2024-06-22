@@ -22,7 +22,13 @@
 
 ウィンドウ基準0をONにした場合、ウィンドウの基準座標を0,0にします。  
 なおウィンドウ中央自動調整をONにしている場合、X座標だけ中央になるよう自動調整されてしまいますのでX座標を調整する場合はOFFにしてください。  
-ステータスウィンドウの高さは244です。（プラグインにより異なる場合があります）  
+
+## クラスウィンドウ
+`Window_FormationBattleMemberName` 戦闘メンバー名称ウィンドウ  
+`Window_FormationMemberName` 待機メンバー名称ウィンドウ  
+`Window_FormationBattleMember` 戦闘メンバーウィンドウ  
+`Window_FormationMember` 待機メンバーウィンドウ  
+`Window_FormationStatus` アクターステータスウィンドウ  
 
 ## 更新履歴
 2024/6/23 Ver.2.0.1  

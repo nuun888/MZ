@@ -95,7 +95,7 @@
  * @text Actor Command Sorting Conditions
  * @desc Specifies the conditions for opening the Actor Command Reordering screen.
  * @type combo
- * @option BattleManager.actor() === $gameParty.leader()://Leader only
+ * @option BattleManager.actor() === $gameParty.leader();//Leader only
  * @default
  * @parent BasicSetting
  * 
@@ -791,7 +791,7 @@
  * @text アクターコマンドの並び替え条件
  * @desc アクターコマンドの並び替え画面を開ける条件を指定します。
  * @type combo
- * @option BattleManager.actor() === $gameParty.leader()://リーダーのみ
+ * @option BattleManager.actor() === $gameParty.leader();//リーダーのみ
  * @default
  * @parent BasicSetting
  * 

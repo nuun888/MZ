@@ -10,7 +10,7 @@
 
 #### アクターコマンドの並び替え条件
 指定のリーダーのみアクターコマンドに並び替えを表示  
-`NuunManager.isBattleFixedActor(BattleManager.actor())`  
+`"NuunManager.isBattleFixedActorCommand()"`  
 
 ## 更新履歴
 2024/6/23 Ver.1.0.1  

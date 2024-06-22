@@ -7,6 +7,7 @@
 
 #### オプション
 [メンバー変更画面(戦闘)](https://github.com/nuun888/MZ/blob/master/README/SceneBattleFormation.md)  
+[リーダのみ自由編成可能](https://github.com/nuun888/MZ/blob/master/README/LeaderActorFormationOnly.md)  
 
 メンバーを並び変える画面を追加します。  
 メニューコマンドの並び替えを選択するとメンバー変更画面が表示されるようになります。  

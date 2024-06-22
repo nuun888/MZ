@@ -13,7 +13,7 @@
 `NuunManager.isBattleFixedActor(BattleManager.actor())`  
 
 ## 更新履歴
-2024/8/6 Ver.1.0.1  
+2024/6/23 Ver.1.0.1  
 リーダーの変更にも対応できるように修正。  
 2023/8/6 Ver.1.0.0  
 初版  

@@ -123,6 +123,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [踏み止まり特徴](https://github.com/nuun888/MZ/blob/master/README/StoppingFeature.md) | [NUUN_StoppingFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StoppingFeature.js) | 条対 | 1.1.2 |
 | [カウンター拡張](https://github.com/nuun888/MZ/blob/master/README/CounterEX.md) | [NUUN_CounterEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js) | 共 条対 | 1.1.2 |
 | [アイテム全体化特徴](https://github.com/nuun888/MZ/blob/master/README/ItemOverallEffect.md) | [NUUN_ItemOverallEffect](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemOverallEffect.js) |  | 1.0.0 |
+| [逃げられない特徴](https://github.com/nuun888/MZ/blob/master/README/FeaturesBind.md) | [NUUN_FeaturesBind](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FeaturesBind.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

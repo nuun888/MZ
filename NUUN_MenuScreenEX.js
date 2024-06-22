@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.7
+ * @version 3.1.8
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/23/2024 Ver.3.1.8
+ * Fixed an issue where items were not displayed correctly.
  * 6/22/2024 Ver.3.1.7
  * Fixed an issue where item width was not applied wider than the width of a single item.
  * Fixed actor front image image to fit item width.
@@ -1359,7 +1361,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.7
+ * @version 3.1.8
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1425,6 +1427,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/23 Ver.3.1.8
+ * 項目の表示が崩れる問題を修正。
  * 2024/6/22 Ver.3.1.7
  * 項目の横幅が1項目の横幅より広く適用されない問題を修正。
  * アクターの前面画像の画像を項目幅にフィットするように修正。
@@ -3284,11 +3288,11 @@ Imported.NUUN_MenuScreenEX = true;
         for (const data of list) {
         const x_Position = data.X_Position;
         const position = Math.min(x_Position, this.nuunMenu_maxContentsCols());
-        const contentsX = rect.x + (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
+        const contentsX = (itemWidth + colSpacing) * (position - 1) + data.X_Coordinate + colSpacing;
         const contentsY = rect.y + lineHeight * (data.Y_Position - 1) + data.Y_Coordinate + this.itemPadding();
         const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - contentsX) : Math.min(itemWidth, rect.width - contentsX);
         data._width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, width) : Math.min(width, 128);
-        this.nuunMenu_drawContentsBase(data, contentsX, contentsY, width - colSpacing / 2, actor);
+        this.nuunMenu_drawContentsBase(data, contentsX + rect.x, contentsY, width - colSpacing / 2, actor);
         }
     };
 
@@ -3958,10 +3962,10 @@ Imported.NUUN_MenuScreenEX = true;
             const x_Position = data.X_Position;
             const position = Math.min(x_Position, this.maxCols());
             const rect = this.itemRect(position - 1);
-            const x = rect.x + (data.X_Coordinate || 0);
+            const x = (data.X_Coordinate || 0);
             const y = (data.Y_Position - 1) * lineHeight + rect.y + data.Y_Coordinate;
             const width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : rect.width - x;
-            this.nuun_DrawContents(data, x, y, width);
+            this.nuun_DrawContents(data, x + rect.x, y, width);
         }
     };
 

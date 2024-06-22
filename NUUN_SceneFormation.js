@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -33,12 +33,37 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/23/2024 Ver.2.0.1
+ * Added a forced battle member plugin command.
+ * Fixed so that the member change screen does not close if a forced battle member actor is on the reserve team.
+ * Fixed background color coordinates.
  * 6/22/2024 Ver.2.0.0
  * Changed the plug-in parameter specifications.
+ * The cursor can now be moved horizontally from the battle member to the reserve member. (Battle member (left), Reserve member (right))
  * 
  * @command SceneFormationOpen
  * @desc The member change screen opens.
  * @text Open the member change screen
+ * 
+ * @command BattleActorFixed
+ * @desc Specifies the actors to force into battle.
+ * @text Forced battle member designation
+ * 
+ * @arg ActorId
+ * @type actor
+ * @default 0
+ * @text Actor id
+ * @desc Specify the actor ID. 0 for all actors
+ * 
+ * @command BattleActorFixedRelease
+ * @desc Releases the actor that is forced onto the battle members.
+ * @text Forced battle member removal
+ * 
+ * @arg ActorId
+ * @type actor
+ * @default 0
+ * @text Actor id
+ * @desc Specify the actor ID. 0 for all actors
  * 
  * 
  * @param BasicSetting
@@ -82,6 +107,14 @@
  * @desc Background color of incapacitated actors. (Common to menu and battle)
  * @type color
  * @default 18
+ * @min -1
+ * @parent BasicSetting
+ * 
+ * @param BattleFixedActorColor
+ * @text Fixed combat member actor
+ * @desc Background color of fixed actors in battle. (Common to menu and battle)
+ * @type color
+ * @default 17
  * @min -1
  * @parent BasicSetting
  * 
@@ -416,6 +449,14 @@
  * @default 3
  * @min -1
  * @parent ActorFixedSetting
+ * 
+ * @param CancelSeFormula
+ * @text Cancel SE Invalid evaluation formula
+ * @desc An evaluation expression that gets the sound data of the cancel sound effect. Leave blank to use the default cancel sound.
+ * @type combo
+ * @option '$gameSystem.getSystemSound(n) ? $gameSystem.getSystemSound(n) : $dataSystem.sounds[n];//SystemSoundCustomize'
+ * @default 
+ * @parent ConflictMeasures
  *  
  */
 /*~struct~ActorStatusList:
@@ -851,16 +892,45 @@
  * なおウィンドウ中央自動調整をONにしている場合、X座標だけ中央になるよう自動調整され
  * てしまいますのでX座標を調整する場合はOFFにしてください。
  * 
+ * アクターのメモ欄
+ * <BattleMemberFixed>
+ * 戦闘メンバーから外すことは出来ません。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/23 Ver.2.0.1
+ * 強制戦闘メンバーのプラグインコマンドを追加。
+ * 強制戦闘メンバーのアクターが控えメンバーにいる場合、メンバー変更画面を閉じないように修正。
+ * 背景色の座標を修正。
  * 2024/6/22 Ver.2.0.0
  * プラグインパラメータの仕様を変更。
+ * 戦闘メンバーから控えメンバーへのカーソル移動を横方向にも対応。(戦闘メンバー(左)、控えメンバー(右))
  * 
  * @command SceneFormationOpen
  * @desc メンバー変更画面を開きます。
  * @text メンバー変更画面を開く
+ * 
+ * @command BattleActorFixed
+ * @desc 戦闘メンバーに強制するアクターを指定します。
+ * @text 強制戦闘メンバー指定
+ * 
+ * @arg ActorId
+ * @type actor
+ * @default 0
+ * @text アクターID
+ * @desc アクターIDを指定します。0で全アクター
+ * 
+ * @command BattleActorFixedRelease
+ * @desc 戦闘メンバーに強制するアクターを解除します。
+ * @text 強制戦闘メンバー解除
+ * 
+ * @arg ActorId
+ * @type actor
+ * @default 0
+ * @text アクターID
+ * @desc アクターIDを指定します。0で全アクター
  * 
  * 
  * @param BasicSetting
@@ -904,6 +974,14 @@
  * @desc 戦闘不能アクターの背景色。(メニュー、戦闘共通)
  * @type color
  * @default 18
+ * @min -1
+ * @parent BasicSetting
+ * 
+ * @param BattleFixedActorColor
+ * @text 戦闘メンバー固定アクター
+ * @desc 戦闘メンバー固定アクターの背景色。(メニュー、戦闘共通)
+ * @type color
+ * @default 17
  * @min -1
  * @parent BasicSetting
  * 
@@ -1237,6 +1315,18 @@
  * @default 3
  * @min -1
  * @parent ActorFixedSetting
+ * 
+ * @param ConflictMeasures
+ * @text 競合対策
+ * @default ------------------------------
+ * 
+ * @param CancelSeFormula
+ * @text キャンセルSE無効評価式
+ * @desc キャンセルSEの音声データを取得する評価式。無記入でシステムのキャンセル音。
+ * @type combo
+ * @option '$gameSystem.getSystemSound(n) ? $gameSystem.getSystemSound(n) : $dataSystem.sounds[n];//システム効果音変更'
+ * @default 
+ * @parent ConflictMeasures
  *  
  */
 /*~struct~ActorStatusList:ja
@@ -1659,6 +1749,8 @@ Imported.NUUN_SceneFormation = true;
 (() => {
     const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const parameters = PluginManager.parameters('NUUN_SceneFormation');
+    const paramSupport = PluginManager.parameters('NUUN_SceneFormation_SupportActor');
+    params.SupportActorBackColor = (DataManager.nuun_structureData(paramSupport['SupportActorBackColor']));
     const paramList = {};
 
     const pluginName = "NUUN_SceneFormation";
@@ -1671,6 +1763,17 @@ Imported.NUUN_SceneFormation = true;
         }
     });
 
+    PluginManager.registerCommand(pluginName, 'BattleActorFixed', args => {
+        const actorId = Number(args.ActorId);
+        $gameParty.setBattleActorFixed(actorId);
+    });
+    
+    PluginManager.registerCommand(pluginName, 'BattleActorFixedRelease', args => {
+        const actorId = Number(args.ActorId);
+        $gameParty.setBattleActorFixedRelease(actorId);
+    });
+
+
     function isbattleMembersDead(actor, withdrawalActor) {
         const members = $gameParty.battleMembers().filter(member => member !== withdrawalActor && member.isDead());
         return members.length + (actor && actor.isDead() ? 1 : 0);
@@ -1679,6 +1782,24 @@ Imported.NUUN_SceneFormation = true;
     function _isActorPictureEXApp() {
         return Imported.NUUN_ActorPicture && paramList.ActorPictureEXApp;
     };
+
+    NuunManager.isBattleFixedActor = function(actor) {
+        return false;
+    };
+
+
+    Game_Actor.prototype.setBattleFixed = function() {
+        this._battleFixed = true;
+    };
+      
+    Game_Actor.prototype.setBattleFixedRelease = function() {
+        this._battleFixed = false;
+    };
+      
+    Game_Actor.prototype.isBattleFixed = function() {
+        return this._battleFixed || this.actor().meta.BattleMemberFixed;
+    };
+
 
     const _Game_Party_initialize = Game_Party.prototype.initialize;
     Game_Party.prototype.initialize = function() {
@@ -1763,6 +1884,24 @@ Imported.NUUN_SceneFormation = true;
         return true;
     };
 
+    Game_Party.prototype.setBattleActorFixed = function(id) {
+        if (id > 0) {
+            const actor = $gameActors.actor(id)
+            actor.setBattleFixed();
+        } else {
+            this.allMembers().forEach(actor => actor.setBattleFixed());
+        }
+    };
+
+    Game_Party.prototype.setBattleActorFixedRelease = function(id) {
+        if (id > 0) {
+            $gameActors.actor(id).setBattleFixedRelease();
+        } else {
+            this.allMembers().forEach(actor => actor.setBattleFixedRelease());
+        }
+    };
+
+
     Scene_Base.prototype.setNuun_Formation = function(mode, paramData) {
         return new Nuun_Formation(this, mode, paramData);
     };
@@ -1843,6 +1982,7 @@ Imported.NUUN_SceneFormation = true;
             this._mSelectIndex = 0; 
             this._commandWindow = null;
             this._spriteActor = null;
+            this._leader = null;
             $gameTemp.changeCursor = false;
             $gameTemp.changeTouch = false;
             this.formationIndex = -1;
@@ -2295,6 +2435,16 @@ Imported.NUUN_SceneFormation = true;
                     this.onMemberCancel();
                 }
             } else {
+                if (!this.isBattleFixedMembers()) {
+                    this.cancelSystemSe(2);
+                    SoundManager.playBuzzer();
+                    if (this.isCursorBattleMode()) {
+                        this._battleMemberWindow.activate();
+                    } else {
+                        this._memberWindow.activate();
+                    }
+                    return;
+                }
                 if (this._isBattle) {
                     this.close();
                     BattleManager.battleCommandRefresh();
@@ -2312,6 +2462,21 @@ Imported.NUUN_SceneFormation = true;
                     this._scene.popScene();
                 }
             }
+        }
+
+        isBattleFixedMembers() {
+            for (const member of $gameParty.allMembers()) {
+                if (this.isBattleFixedActor(member)) {
+                    if (!member.isBattleMember()) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        isBattleFixedActor(member) {
+            return member.isBattleFixed() || NuunManager.isBattleFixedActor(member);
         }
         
         changeActorRefresh() {
@@ -2364,6 +2529,16 @@ Imported.NUUN_SceneFormation = true;
         battleMemberWindowWidth() {
             return (paramList.BattleMember_Cols > 0 ? paramList.BattleMember_Cols : _Game_Party_maxBattleMembers.call($gameParty)) * (Imported.NUUN_SceneFormation_SupportActor && paramList.BattleMember_Rows === 1 ? 2 : 1) * (params.CharacterMode === 'face' ? 152 : 56);
         }
+
+        cancelSystemSe(n) {
+            const se = params.CancelSeFormula ? eval(params.CancelSeFormula) : $dataSystem.sounds[n];
+            for (const buffer of AudioManager._staticBuffers) {
+                if (buffer.name === se.name) {
+                    buffer.stop();
+                    break;
+                }
+            }
+        }
         
         open() {
             BattleManager.formationCommandActor = BattleManager.actor();
@@ -2404,24 +2579,25 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_StatusBase.prototype.drawBackGroundActor = function(index) {
-    const actor = this.actor(index);
-    if (index !== this._pendingIndex) {
-        const rect = this.itemRect(index);
-        const height = params.MemberHeight;
-        const y = rect.y + (this.itemHeight() - this.rowSpacing() - height);
-        this.contentsBack.paintOpacity = 128;
-        if (actor && params.DeadActorColor >= 0 && actor.isDead()) {
-            const deadcolor = NuunManager.getColorCode(params.DeadActorColor);
-            this.contentsBack.fillRect(rect.x, y, rect.width, height, deadcolor);
-        } else if (Imported.NUUN_ActorFixed && actor && params.FixedActorBackColor >= 0 && actor.isFixed()) {
-            const fixedcColor = NuunManager.getColorCode(FixedActorBackColor);
-            this.contentsBack.fillRect(rect.x, y, rect.width, height, fixedcColor);
-        } else if (Imported.NUUN_SceneFormation_SupportActor && params.SupportActorBackColor >= 0 && actor && actor.getSupportActor()) {
-            const supportcolor = NuunManager.getColorCode(params.SupportActorBackColor);
-            this.contentsBack.fillRect(rect.x, y, rect.width, height, supportcolor);
+        const actor = this.actor(index);
+        if (index !== this._pendingIndex) {
+            const rect = this.itemRect(index);
+            this.contentsBack.paintOpacity = 128;
+            if (actor && params.DeadActorColor >= 0 && actor.isDead()) {
+                const deadcolor = NuunManager.getColorCode(params.DeadActorColor);
+                this.contentsBack.fillRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, deadcolor);
+            } else if (Imported.NUUN_ActorFixed && actor && params.FixedActorBackColor >= 0 && actor.isFixed()) {
+                const fixedColor = NuunManager.getColorCode(FixedActorBackColor);
+                this.contentsBack.fillRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, fixedColor);
+            } else if (actor && params.BattleFixedActorColor >= 0 && actor.actor().meta.BattleMemberFixed) {
+                const battleFixedColor = NuunManager.getColorCode(params.BattleFixedActorColor || 0);
+                this.contentsBack.fillRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, battleFixedColor);
+            } else if (Imported.NUUN_SceneFormation_SupportActor && params.SupportActorBackColor >= 0 && actor && actor.getSupportActor()) {
+                const supportcolor = NuunManager.getColorCode(params.SupportActorBackColor);
+                this.contentsBack.fillRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, supportcolor);
+            }
+            this.contentsBack.paintOpacity = 255;
         }
-        this.contentsBack.paintOpacity = 255;
-    }
     };
 
     Window_StatusBase.prototype.drawFormationImg = function(data, actor, bitmap, x, y, width, height) {
@@ -2454,6 +2630,7 @@ Imported.NUUN_SceneFormation = true;
     Window_StatusBase.prototype.getFormationSelectActor = function() {
         return $gameParty.leader();
     };
+
 
     //戦闘メンバー名称
     function Window_FormationBattleMemberName() {
@@ -2517,7 +2694,6 @@ Imported.NUUN_SceneFormation = true;
         Window_StatusBase.prototype.initialize.call(this, rect);
         this._formationMode = true;
         this._oldActor = null;
-        this._leader = this.getFormationSelectActor();
         this.refresh();
     };
 
@@ -2672,19 +2848,19 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_FormationBattleMember.prototype.drawLavel = function(actor, x, y, width, height) {
-    if (params.LavelVisible) {
-        const padding = Math.floor(this.itemPadding() / 2);
-        this.contents.fontSize = $gameSystem.mainFontSize() + params.LevelFontSize;
-        y += height - 30;
-        x += padding;
-        width = Math.min(width - padding, 60);
-        const textWidth = this.textWidth(TextManager.levelA);
-        this.changeTextColor(ColorManager.systemColor());
-        this.drawText(TextManager.levelA, x, y, width);
-        this.resetTextColor();
-        this.drawText(actor.level, x + textWidth, y, width - textWidth - padding, "right");
-        this.contents.fontSize = $gameSystem.mainFontSize();
-    }
+        if (params.LavelVisible) {
+            const padding = Math.floor(this.itemPadding() / 2);
+            this.contents.fontSize = $gameSystem.mainFontSize() + params.LevelFontSize;
+            y += height - 30;
+            x += padding;
+            width = Math.min(width - padding, 60);
+            const textWidth = this.textWidth(TextManager.levelA);
+            this.changeTextColor(ColorManager.systemColor());
+            this.drawText(TextManager.levelA, x, y, width);
+            this.resetTextColor();
+            this.drawText(actor.level, x + textWidth, y, width - textWidth - padding, "right");
+            this.contents.fontSize = $gameSystem.mainFontSize();
+        }
     };
 
     Window_FormationBattleMember.prototype.itemRect = function(index) {
@@ -2791,7 +2967,6 @@ Imported.NUUN_SceneFormation = true;
         Window_StatusBase.prototype.initialize.call(this, rect);
         this._formationMode = true;
         this._oldActor = null;
-        this._leader = this.getFormationSelectActor();
         this.refresh();
     };
 

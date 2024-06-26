@@ -1,5 +1,5 @@
 # [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
-# Ver.1.3.2
+# Ver.1.3.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -252,6 +252,8 @@
 [エンカウント条件](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md)  
 
 ## 更新履歴
+2024/6/27 Ver.1.3.3  
+追加能力値、特殊能力値の条件が適用されていなかった問題を修正。  
 2023/9/18 Ver.1.3.2  
 条件が攻撃条件だったときにエラーが出る問題を修正。  
 2023/7/31 Ver.1.3.1  

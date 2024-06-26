@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Famage floor EX
  * @author NUUN
- * @version 1.2.2
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/27/2024 Ver.1.3.0
+ * Added the ability to specify a different type (MP, TP) as the target of slip damage.
  * 4/6/2024 Ver.1.2.2
  * Fixed an issue where floor damage rate was not applied when set to 0.
  * 1/6/2024 Ver.1.2.1
@@ -156,6 +158,18 @@
  * @default -1
  * @min -1
  * @max 7
+ * 
+ * @param DamageType
+ * @text Damege type
+ * @desc Specifies the target that will receive floor damage.
+ * @type select
+ * @option HP
+ * @value 'Hp'
+ * @option MP
+ * @value 'Mp'
+ * @option TP
+ * @value 'Tp'
+ * @default 'Hp'
  * 
  * @param Damage
  * @text Damage
@@ -300,7 +314,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.2.2
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -329,6 +343,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/27 Ver.1.3.0
+ * スリップダメージの対象に別のタイプ(MP、TP)を指定できる機能を追加。
  * 2024/4/6 Ver.1.2.2
  * 床ダメージ率を0にしたときに適用されない問題を修正。
  * 2024/1/6 Ver.1.2.1
@@ -448,6 +464,18 @@
  * @default -1
  * @min -1
  * @max 7
+ * 
+ * @param DamageType
+ * @text ダメージタイプ
+ * @desc 床ダメージを受けるダメージ対象を指定します。
+ * @type select
+ * @option HP
+ * @value 'Hp'
+ * @option MP
+ * @value 'Mp'
+ * @option TP
+ * @value 'Tp'
+ * @default 'Hp'
  * 
  * @param Damage
  * @text ダメージ
@@ -645,7 +673,17 @@ Game_Map.prototype.isDamagedFloorData = function(data, regionId, Terrain) {
 const _Game_Actor_executeFloorDamage = Game_Actor.prototype.executeFloorDamage;
 Game_Actor.prototype.executeFloorDamage = function() {
     _onMapFloorDamage = true;
-    _Game_Actor_executeFloorDamage.call(this);
+    if (!!_damagedFloorExData && _damagedFloorExData.DamageType !== 'Hp') {
+        const floorDamage = Math.floor(this.basicFloorDamage() * this.fdr);
+        const realDamage = Math.min(floorDamage, this.maxFloorDamage());
+        const methodName = 'gain' + _damagedFloorExData.DamageType;
+        this[methodName](-realDamage);
+        if (realDamage > 0) {
+            this.performMapDamage();
+        }
+    } else {
+        _Game_Actor_executeFloorDamage.call(this);
+    }
     _onMapFloorDamage = false;
 };
 

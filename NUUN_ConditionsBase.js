@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -260,6 +260,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/27 Ver.1.3.3
+ * 追加能力値、特殊能力値の条件が適用されていなかった問題を修正。
  * 2023/9/18 Ver.1.3.2
  * 条件が攻撃条件だったときにエラーが出る問題を修正。
  * 2023/7/31 Ver.1.3.1
@@ -1063,9 +1065,9 @@ function paramTriggerConditions(data, target, mode) {
 function xparamTriggerConditions(data, target, mode) {
   const unit = getUnit(target, mode);
   if (mode === 'Party' || mode === 'Troop') {
-    return unit.members().some(member => member.triggerParamConditions(data));
+    return unit.members().some(member => member.triggerXParamConditions(data));
   } else {
-    return target.triggerParamConditions(data);
+    return target.triggerXParamConditions(data);
   }
 };
 
@@ -1073,9 +1075,9 @@ function xparamTriggerConditions(data, target, mode) {
 function sparamTriggerConditions(data, target, mode) {
   const unit = getUnit(target, mode);
   if (mode === 'Party' || mode === 'Troop') {
-    return unit.members().some(member => member.triggerParamConditions(data));
+    return unit.members().some(member => member.triggerSParamConditions(data));
   } else {
-    return target.triggerParamConditions(data);
+    return target.triggerSParamConditions(data);
   }
 };
 
@@ -1727,69 +1729,85 @@ function isNoteTag(dMember) {
 };
 
 Game_BattlerBase.prototype.triggerParamConditions = function(data) {
-  if (!this._cParam) {
-    this._cParam = [];
-  }
-  switch (data.ParamConditionsType) {
-    case 'HP':
-      return this.conditionsParam(data, 0);
-    case 'MP':
-      return this.conditionsParam(data, 1);
-    case 'TP':
-      return this.conditionsParam(data, 10);
-    case 'ATK':
-      return this.conditionsStatus(data, 2);
-    case 'DEF':
-      return this.conditionsStatus(data, 3);
-    case 'MAT':
-      return this.conditionsStatus(data, 4);
-    case 'MDF':
-      return this.conditionsStatus(data, 5);
-    case 'AGI':
-      return this.conditionsStatus(data, 6);
-    case 'LUK':
-      return this.conditionsStatus(data, 7);
-    case 'HIT':
-      return this.conditionsXparam(data, 0);
-    case 'EVA':
-      return this.conditionsXparam(data, 1);
-    case 'CRI':
-      return this.conditionsXparam(data, 2)
-    case 'CEV':
-      return this.conditionsXparam(data, 3);
-    case 'MEV':
-      return this.conditionsXparam(data, 4);
-    case 'MRF':
-      return this.conditionsXparam(data, 5);
-    case 'CNT':
-      return this.conditionsXparam(data, 6);
-    case 'HRG':
-      return this.conditionsXparam(data, 7);
-    case 'MRG':
-      return this.conditionsXparam(data, 8);
-    case 'TRG':
-      return this.conditionsXparam(data, 9);
-    case 'TGR':
-      return this.conditionsSparam(data, 0);
-    case 'GRD':
-      return this.conditionsSparam(data, 1);
-    case 'REC':
-      return this.conditionsSparam(data, 2);
-    case 'PHA':
-      return this.conditionsSparam(data, 3);
-    case 'MCR':
-      return this.conditionsSparam(data, 4);
-    case 'TCR':
-      return this.conditionsSparam(data, 5);
-    case 'PDR':
-      return this.conditionsSparam(data, 6);
-    case 'MDR':
-      return this.conditionsSparam(data, 7);
-    case 'FDR':
-      return this.conditionsSparam(data, 8);
-    case 'EXR':
-      return this.conditionsSparam(data, 9);
-  }
+    if (!this._cParam) {
+        this._cParam = [];
+    }
+    switch (data.ParamConditionsType) {
+        case 'HP':
+            return this.conditionsParam(data, 0);
+        case 'MP':
+            return this.conditionsParam(data, 1);
+        case 'TP':
+            return this.conditionsParam(data, 10);
+        case 'ATK':
+            return this.conditionsStatus(data, 2);
+        case 'DEF':
+            return this.conditionsStatus(data, 3);
+        case 'MAT':
+            return this.conditionsStatus(data, 4);
+        case 'MDF':
+            return this.conditionsStatus(data, 5);
+        case 'AGI':
+            return this.conditionsStatus(data, 6);
+        case 'LUK':
+            return this.conditionsStatus(data, 7);
+    }
+};
+
+Game_BattlerBase.prototype.triggerXParamConditions = function(data) {
+    if (!this._cParam) {
+      this._cParam = [];
+    }
+    switch (data.XParamConditionsType) {
+        case 'HIT':
+            return this.conditionsXparam(data, 0);
+        case 'EVA':
+            return this.conditionsXparam(data, 1);
+        case 'CRI':
+            return this.conditionsXparam(data, 2)
+        case 'CEV':
+            return this.conditionsXparam(data, 3);
+        case 'MEV':
+            return this.conditionsXparam(data, 4);
+        case 'MRF':
+            return this.conditionsXparam(data, 5);
+        case 'CNT':
+            return this.conditionsXparam(data, 6);
+        case 'HRG':
+            return this.conditionsXparam(data, 7);
+        case 'MRG':
+            return this.conditionsXparam(data, 8);
+        case 'TRG':
+            return this.conditionsXparam(data, 9);
+    }
+};
+
+ Game_BattlerBase.prototype.triggerSParamConditions = function(data) {
+    if (!this._cParam) {
+        this._cParam = [];
+    }
+    switch (data.ParamConditionsType) {
+      case 'TGR':
+        return this.conditionsSparam(data, 0);
+      case 'GRD':
+        return this.conditionsSparam(data, 1);
+      case 'REC':
+        return this.conditionsSparam(data, 2);
+      case 'PHA':
+        return this.conditionsSparam(data, 3);
+      case 'MCR':
+        return this.conditionsSparam(data, 4);
+      case 'TCR':
+        return this.conditionsSparam(data, 5);
+      case 'PDR':
+        return this.conditionsSparam(data, 6);
+      case 'MDR':
+        return this.conditionsSparam(data, 7);
+      case 'FDR':
+        return this.conditionsSparam(data, 8);
+      case 'EXR':
+        return this.conditionsSparam(data, 9);
+    }
 };
 
 Game_BattlerBase.prototype.conditionsParam = function(data, paramId) {
@@ -1838,25 +1856,25 @@ Game_BattlerBase.prototype.conditionsStatus = function(data, paramId) {
 };
 
 Game_BattlerBase.prototype.conditionsXparam = function(data, paramId) {
-  let paramVal = 0;
-  const id = paramId + 10;
-  if (!this._cParam[id]) {
-    paramVal = this.xparam(paramId);
-    this._cParam[id] = paramVal;
-  }
-  paramVal = this._cParam[id];
-  return conditionsNum(data, paramVal);
+    let paramVal = 0;
+    const id = paramId + 10;
+    if (!this._cParam[id]) {
+        paramVal = this.xparam(paramId);
+        this._cParam[id] = paramVal;
+    }
+    paramVal = this._cParam[id] * 100;
+    return conditionsNum(data, paramVal);
 };
 
 Game_BattlerBase.prototype.conditionsSparam = function(data, paramId) {
-  let paramVal = 0;
-  const id = paramId + 20;
-  if (!this._cParam[id]) {
-    paramVal = this.sparam(paramId);
-    this._cParam[id] = paramVal;
-  }
-  paramVal = this._cParam[id];
-  return conditionsNum(data, paramVal);
+    let paramVal = 0;
+    const id = paramId + 20;
+    if (!this._cParam[id]) {
+        paramVal = this.sparam(paramId);
+        this._cParam[id] = paramVal;
+    }
+    paramVal = this._cParam[id] * 100;
+    return conditionsNum(data, paramVal);
 };
 
 Game_BattlerBase.prototype.getTraitsTriggerConditions = function(tag) {

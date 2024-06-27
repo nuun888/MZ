@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Famage floor EX
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -25,6 +25,7 @@
  * 
  * The floor damage value can use the evaluation formula.
  * a:Actor game data
+ * By entering 'NoDamage', you will not receive floor damage. (States will still be applied.)
  * 
  * Notes with features
  * <DfrEx[tag]:[rate]> Enter the floor damage rate of the specified tag name as a specified integer.
@@ -37,8 +38,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/28/2024 Ver.1.3.1
+ * Added a function that gives a chance to inflict a status effect when dealing floor damage.
  * 6/27/2024 Ver.1.3.0
- * Added the ability to specify a different type (MP, TP) as the target of slip damage.
+ * Added the ability to specify a different type (MP, TP) for the Floor Damage target.
  * 4/6/2024 Ver.1.2.2
  * Fixed an issue where floor damage rate was not applied when set to 0.
  * 1/6/2024 Ver.1.2.1
@@ -177,7 +180,20 @@
  * @type combo
  * @option '10;//default'
  * @option 'Math.max(1,Math.round(a.mhp * 0.01));//1% of maximum HP'
+ * @option 'NoDamage'
  * @default 10
+ * 
+ * @param AddState
+ * @text Add state
+ * @desc Specify the state to be applied when dealing floor damage.
+ * @type state
+ * @default 0
+ * 
+ * @param AddStateProbability
+ * @text Add state probability (%)
+ * @desc Specifies the probability of a state being inflicted when floor damage is applied.
+ * @type number
+ * @default 0
  * 
  * @param DamageActor
  * @text Applicable actor
@@ -314,7 +330,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.3.0
+ * @version 1.3.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -328,23 +344,24 @@
  * 
  * 床ダメージ値は評価式が使用できます。
  * a:アクターのゲームデータ
+ * 'NoDamage'と記入することで床ダメージを受けません。(ステートの付与は行われます)
  * 
  * 特徴を持つメモ欄
  * <DfrEx[tag]:[rate]> 指定のタグ名の床ダメージ率を指定の整数で記入します。
  * [tag]:床ダメージタグ名で設定したタグ名
  * [rate]:効果率
  * <DfrExPoison:150> タグ名がPoisonの床ダメージの効果率が1.5倍になります。
- * <DfrExPoison:
- * 
- * > タグ名がPoisonの床ダメージの効果率が0.7倍になります。
+ * <DfrExPoison:70> タグ名がPoisonの床ダメージの効果率が0.7倍になります。
  * 
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/28 Ver.1.3.1
+ * 床ダメージダメージ時に確率でステートを付与させる機能を追加。
  * 2024/6/27 Ver.1.3.0
- * スリップダメージの対象に別のタイプ(MP、TP)を指定できる機能を追加。
+ * 床ダメージダメージの対象に別のタイプ(MP、TP)を指定できる機能を追加。
  * 2024/4/6 Ver.1.2.2
  * 床ダメージ率を0にしたときに適用されない問題を修正。
  * 2024/1/6 Ver.1.2.1
@@ -483,7 +500,20 @@
  * @type combo
  * @option '10;//デフォルト'
  * @option 'Math.max(1,Math.round(a.mhp * 0.01));//最大HPの1％'
+ * @option 'NoDamage'
  * @default 10
+ * 
+ * @param AddState
+ * @text 付与ステート
+ * @desc 床ダメージ時に付与するステートを指定します。
+ * @type state
+ * @default 0
+ * 
+ * @param AddStateProbability
+ * @text 付与ステート確率(%)
+ * @desc 床ダメージ時に付与するステートの確率を指定します。
+ * @type number
+ * @default 0
  * 
  * @param DamageActor
  * @text 適用アクター
@@ -684,7 +714,16 @@ Game_Actor.prototype.executeFloorDamage = function() {
     } else {
         _Game_Actor_executeFloorDamage.call(this);
     }
+    if (!!_damagedFloorExData && _damagedFloorExData.AddState > 0) {
+        this.floorDamageAddState();
+    }
     _onMapFloorDamage = false;
+};
+
+Game_Actor.prototype.floorDamageAddState = function() {
+    if (Math.random() * 100 < _damagedFloorExData.AddStateProbability) {
+        this.addState(_damagedFloorExData.AddState);
+    }
 };
 
 Game_Actor.prototype.floorDamageRate = function() {
@@ -704,7 +743,11 @@ Game_Actor.prototype.basicFloorDamage = function() {
     const a = this;
     if (!!_damagedFloorExData) {
         const mainData = _damagedFloorExData;
-        return this.floorDamageActor(mainData.DamageActor) ? (mainData.Damage ? eval(mainData.Damage) : (DefaultDamage ? eval(DefaultDamage) : coreDamage)) * this.floorDamageRate() : 0;
+        if (this.floorDamageActor(mainData.DamageActor)) {
+            return mainData.Damage !== 'NoDamage' ? ((mainData.Damage ? eval(mainData.Damage) : (DefaultDamage ? eval(DefaultDamage) : coreDamage)) * this.floorDamageRate()) : 0;
+        } else {
+            return 0;
+        }
     } else {
         return (DefaultDamage ? eval(DefaultDamage) : coreDamage) * this.floorDamageRate();
     }
@@ -712,13 +755,16 @@ Game_Actor.prototype.basicFloorDamage = function() {
 
 const _Game_Actor_performMapDamage = Game_Actor.prototype.performMapDamage;
 Game_Actor.prototype.performMapDamage = function() {
+    const floorDamage = _onMapFloorDamage;
     _Game_Actor_performMapDamage.call(this);
-    this.exFloorDamage();
+    this.exFloorDamage(floorDamage);
 };
 
-Game_Actor.prototype.exFloorDamage = function() {
-    this.floorDamagePlaySe(_damagedFloorExData);
-    this.floorDamageAnimation(_damagedFloorExData);
+Game_Actor.prototype.exFloorDamage = function(mode) {
+    if (mode) {
+        this.floorDamagePlaySe(_damagedFloorExData);
+        this.floorDamageAnimation(_damagedFloorExData);
+    }
 };
 
 Game_Actor.prototype.floorDamagePlaySe = function(data) {

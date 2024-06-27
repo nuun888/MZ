@@ -1,5 +1,5 @@
 # [床ダメージ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)
-# Ver.1.3.0
+# Ver.1.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -43,6 +43,8 @@ HP、MP、TPのいずれかを指定します。
 フォロワー含むを指定している場合は表示されている床ダメージを受けたフォロワーにアニメーションが再生されます。  
 
 ## 更新履歴
+2024/6/28 Ver.1.3.1  
+床ダメージダメージ時に確率でステートを付与させる機能を追加。  
 2024/6/27 Ver.1.3.0  
 スリップダメージの対象に別のタイプ(MP、TP)を指定できる機能を追加。  
 2024/4/6 Ver.1.2.2  

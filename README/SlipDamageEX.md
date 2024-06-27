@@ -1,9 +1,12 @@
 # [スリップダメージ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js)
-# Ver.1.1.1
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipDamageEX.js)  
 #### 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 [ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)  
 
+スリップダメージの機能を拡張します。  
+移動時のスリップダメージ時にSE、またはフラッシュの色、無効の設定を行うことができます。  
 スリップダメージに独自の式を定義できます。  
 式は割合値になるように指定してください。  
 
@@ -27,7 +30,13 @@ st:ステートのターン
 
 ステートの経過ターンを取得するには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)が必要です。
 
+## フラッシュ
+フレーム数を0に指定することで移動中のスリップダメージを無効にできます。  
+
 ## 更新履歴
+2024/6/28 Ver.1.2.0  
+移動時のスリップダメージ時にSEを再生する機能を追加。  
+移動時のスリップダメージ時のフラッシュの色を指定、フラッシュの再生を無効にする機能を追加。  
 2022/2/19 Ver.1.1.1  
 Ver.1.0.1以降で移動中にエラーが出る問題を修正。  
 2022/1/29 Ver.1.1.0  

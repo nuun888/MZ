@@ -176,7 +176,7 @@
  * @desc Damage at default floor damage (a: actor game data)
  * @type combo
  * @option '10;//default'
- * @option 'a.mhp * 0.02;//2% of maximum HP'
+ * @option 'Math.max(1,Math.round(a.mhp * 0.01));//1% of maximum HP'
  * @default 10
  * 
  * @param DamageActor
@@ -378,7 +378,7 @@
  * @desc デフォルト床ダメージ時のダメージ（a：アクターのゲームデータ）
  * @type combo
  * @option '10;//デフォルト'
- * @option 'a.mhp * 0.02;//最大HPの２％'
+ * @option 'a.mhp * 0.02;//最大HPの2%'
  * @default 10
  * 
  * @param DefaultSE
@@ -482,7 +482,7 @@
  * @desc 床ダメージ時のダメージ（a：アクター）
  * @type combo
  * @option '10;//デフォルト'
- * @option 'Math.max(1,a.mhp * 0.01);//最大HPの1％'
+ * @option 'Math.max(1,Math.round(a.mhp * 0.01));//最大HPの1％'
  * @default 10
  * 
  * @param DamageActor

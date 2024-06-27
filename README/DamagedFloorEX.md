@@ -1,4 +1,4 @@
-# [ダメージ床拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)
+# [床ダメージ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)
 # Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)  
 #### 必須、前提プラグイン

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.0.1
+ * @version 2.0.2
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -33,6 +33,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/30/2024 Ver.2.0.2
+ * Fixed an issue where an error occurred when setting background color for fixed actors.
  * 6/23/2024 Ver.2.0.1
  * Added a forced battle member plugin command.
  * Fixed so that the member change screen does not close if a forced battle member actor is on the reserve team.
@@ -874,7 +876,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -900,6 +902,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/6/30 Ver.2.0.2
+ * 固定アクターの背景色設定でエラーが出る問題を修正。
  * 2024/6/23 Ver.2.0.1
  * 強制戦闘メンバーのプラグインコマンドを追加。
  * 強制戦闘メンバーのアクターが控えメンバーにいる場合、メンバー変更画面を閉じないように修正。
@@ -2161,7 +2165,7 @@ Imported.NUUN_SceneFormation = true;
             this._scene.addWindow(battleMemberNameWindow);
             this._battleMemberNameWindow = battleMemberNameWindow;
             if (this._isBattle) {
-              battleMemberNameWindow.openness = 0;
+                battleMemberNameWindow.openness = 0;
             }
         }
     
@@ -2174,7 +2178,7 @@ Imported.NUUN_SceneFormation = true;
             this._scene.addWindow(memberWindow);
             this._memberWindow = memberWindow;
             if (this._isBattle) {
-              memberWindow.openness = 0;
+                 memberWindow.openness = 0;
             }
         }
           
@@ -2587,7 +2591,7 @@ Imported.NUUN_SceneFormation = true;
                 const deadcolor = NuunManager.getColorCode(params.DeadActorColor);
                 this.contentsBack.fillRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, deadcolor);
             } else if (Imported.NUUN_ActorFixed && actor && params.FixedActorBackColor >= 0 && actor.isFixed()) {
-                const fixedColor = NuunManager.getColorCode(FixedActorBackColor);
+                const fixedColor = NuunManager.getColorCode(params.FixedActorBackColor);
                 this.contentsBack.fillRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, fixedColor);
             } else if (actor && params.BattleFixedActorColor >= 0 && actor.actor().meta.BattleMemberFixed) {
                 const battleFixedColor = NuunManager.getColorCode(params.BattleFixedActorColor || 0);

@@ -10,7 +10,9 @@
  * @target MZ
  * @plugindesc Final Attack Features
  * @author NUUN
- * @version 1.1.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @version 1.1.3
  * 
  * @help
  * Implement final attack.
@@ -25,6 +27,9 @@
  * If the final attack interrupts with two or more actions, the action ends at that point.
  * 
  * Log
+ * 6/30/2024 Ver.1.1.3
+ * Fixed an issue where monster images would not disappear at the end of battle and final attacks would not be executed.
+ * Added the ability to enable skill costs.
  * 6/4/2024 Ver.1.1.2
  * Fixed Final Attack skill not being added if skill cost is insufficient.
  * 11/12/2022 Ver.1.1.1
@@ -61,6 +66,12 @@
  * @value 1
  * @default 0
  * 
+ * @param CostConsumption
+ * @desc Enable consumption costs.
+ * @text Enable consumption costs
+ * @type boolean
+ * @default true
+ * 
  */
 /*~struct~FinalAttackSkillList:
  *  
@@ -81,7 +92,9 @@
  * @target MZ
  * @plugindesc ファイナルアタック特徴
  * @author NUUN
- * @version 1.1.2
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @version 1.1.3
  * 
  * @help
  * ファイナルアタックを実装します。
@@ -96,6 +109,9 @@
  * ２回行動以上でファイナルアタックが割り込んだ場合その時点で行動が終了します。
  * 
  * 更新履歴
+ * 2024/6/30 Ver.1.1.3
+ * 戦闘終了時にモンスター画像が消えず、ファイナルアタックが実行されない問題を修正。
+ * スキルコストを有効にする機能を追加。
  * 2024/6/4 Ver.1.1.2
  * スキルコストが足りない場合ファイナルアタックのスキルを追加しないように修正。
  * 2022/11/12 Ver.1.1.1
@@ -131,6 +147,12 @@
  * @option とどめを刺したバトラー（設定スキルの範囲が敵単体）
  * @value 1
  * @default 0
+ * 
+ * @param CostConsumption
+ * @desc 消費コストを有効にします。
+ * @text 消費コスト有効
+ * @type boolean
+ * @default true
  * 
  */
 /*~struct~FinalAttackSkillList:ja
@@ -232,14 +254,23 @@ BattleManager.setFinalAttack = function(subject) {
     this._finalAttack = true;
 };
 
+const _BattleManager_isActionForced = BattleManager.isActionForced;
+BattleManager.isActionForced = function() {
+    return this.isFinalAttack() || _BattleManager_isActionForced.apply(this, arguments);
+};
+
+BattleManager.isFinalAttack = function() {
+    return this.finalAttackList.length > 0;
+};
+
 const _Game_Actor_performCollapse = Game_Actor.prototype.performCollapse;
 Game_Actor.prototype.performCollapse = function() {
     if ($gameParty.inBattle()) {
         if (!this.finalAttackEnd && this.finalAttackDate()) {
-        BattleManager.setFinalAttack(this);
+            BattleManager.setFinalAttack(this);
         } else {
-        this.finalAttackEnd = false;
-        _Game_Actor_performCollapse.call(this);
+            this.finalAttackEnd = false;
+            _Game_Actor_performCollapse.call(this);
         }
     }
 };
@@ -287,7 +318,7 @@ Game_Battler.prototype.makeFinalAttackActions = function(id) {
             if (this.finalAttackRate(actionData)) {
                 const action = new Game_FinalAttackAction(this);
                 action.setSkill(actionData.FinalAttackSkillId);
-                if (finalAttack.CostConsumption && action.isValid() || !finalAttack.CostConsumption) {
+                if (finalAttack.CostConsumption && this.isFinalAttackValid(action.item()) || !finalAttack.CostConsumption) {
                     action.setup(finalAttack);
                     action.setFinalAttackTarget();
                     this._actions.push(action);
@@ -297,15 +328,9 @@ Game_Battler.prototype.makeFinalAttackActions = function(id) {
     }
 };
 
-const _Game_Battler_useItem = Game_Battler.prototype.useItem;
-Game_Battler.prototype.useItem = function(item) {
-    if (_costConsumption) {
-        _Game_Battler_useItem.apply(this, arguments);
-    }
-    _costConsumption = false;
+Game_Battler.prototype.isFinalAttackValid = function(skill) {
+    return this.canPaySkillCost(skill);
 };
-
-
 
 Game_Battler.prototype.finalAttackRate = function(action) {
     return Math.floor(Math.random() * 100) < action.FinalAttackSkillRate;

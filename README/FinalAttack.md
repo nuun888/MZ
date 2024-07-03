@@ -1,5 +1,5 @@
 # [ファイナルアタック特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FinalAttack.js)
-# Ver.1.1.3
+# Ver.1.1.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FinalAttack.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -30,6 +30,9 @@
 ※1:更新後全てのファイナルアタックのコスト有効がOFFになっています。全てのファイナルアタックのスキル設定を開きスキルコストを適用させてください。  
 
 ## 更新履歴
+2024/7/3 Ver.1.1.4  
+スキルコストが消費されない問題を修正。  
+対象のメンバー全員が戦闘不能になっている場合、スキルを発動しないように修正。  
 2024/6/30 Ver.1.1.3  
 戦闘終了時にモンスター画像が消えず、ファイナルアタックが実行されない問題を修正。  
 スキルコストを有効にする機能を追加。※1  

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * Implement final attack.
@@ -27,6 +27,9 @@
  * If the final attack interrupts with two or more actions, the action ends at that point.
  * 
  * Log
+ * 7/3/2024 Ver.1.1.4
+ * Fixed an issue where skill costs were not consumed.
+ * Fixed a problem where skills would not be activated if all target members were incapacitated.
  * 6/30/2024 Ver.1.1.3
  * Fixed an issue where monster images would not disappear at the end of battle and final attacks would not be executed.
  * Added the ability to enable skill costs.
@@ -94,7 +97,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * ファイナルアタックを実装します。
@@ -109,6 +112,9 @@
  * ２回行動以上でファイナルアタックが割り込んだ場合その時点で行動が終了します。
  * 
  * 更新履歴
+ * 2024/7/3 Ver.1.1.4
+ * スキルコストが消費されない問題を修正。
+ * 対象のメンバー全員が戦闘不能になっている場合、スキルを発動しないように修正。
  * 2024/6/30 Ver.1.1.3
  * 戦闘終了時にモンスター画像が消えず、ファイナルアタックが実行されない問題を修正。
  * スキルコストを有効にする機能を追加。
@@ -263,6 +269,13 @@ BattleManager.isFinalAttack = function() {
     return this.finalAttackList.length > 0;
 };
 
+BattleManager.isFinalAttackCostConsumption = function() {
+    const subject = this._subject;
+    const action = subject.currentAction();
+    return action.finalAttackSkill ? action.isCostConsumption() : true;
+};
+
+
 const _Game_Actor_performCollapse = Game_Actor.prototype.performCollapse;
 Game_Actor.prototype.performCollapse = function() {
     if ($gameParty.inBattle()) {
@@ -329,7 +342,22 @@ Game_Battler.prototype.makeFinalAttackActions = function(id) {
 };
 
 Game_Battler.prototype.isFinalAttackValid = function(skill) {
-    return this.canPaySkillCost(skill);
+    return this.isUnitAllDeadFinalAttack() && this.canPaySkillCost(skill);
+};
+
+Game_Actor.prototype.isUnitAllDeadFinalAttack = function() {
+    return !$gameTroop.isAllDead();
+};
+
+Game_Enemy.prototype.isUnitAllDeadFinalAttack = function() {
+    return !$gameParty.isAllDead();
+};
+
+const _Game_Battler_useItem = Game_Battler.prototype.useItem;
+Game_Battler.prototype.useItem = function(item) {
+    if (BattleManager.isFinalAttackCostConsumption()) {
+        _Game_Battler_useItem.apply(this, arguments);
+    }
 };
 
 Game_Battler.prototype.finalAttackRate = function(action) {

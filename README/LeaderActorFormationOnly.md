@@ -1,5 +1,5 @@
 # [リーダのみ自由編成可能](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LeaderActorFormationOnly.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LeaderActorFormationOnly.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,6 +13,8 @@
 `"NuunManager.isBattleFixedActorCommand()"`  
 
 ## 更新履歴
+2024/7/7 Ver.1.0.2  
+リーダー以外の並び替え時、控えメンバーと交代できる機能を追加。  
 2024/6/23 Ver.1.0.1  
 リーダーの変更にも対応できるように修正。  
 2023/8/6 Ver.1.0.0  

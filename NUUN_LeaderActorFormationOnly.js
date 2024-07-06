@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_SceneBattleFormation
  * @orderAfter NUUN_SceneBattleFormation
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * When rearranging characters using actor commands during battle, the designated character will be able to swap all characters, and all other members will only be able to swap themselves.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/7/2024 Ver.1.0.2
+ * Added a function that allows replacement with a reserve member when rearranging players other than the leader.
  * 6/23/2024 Ver.1.0.1
  * Fixed to accommodate leader changes.
  * 8/6/2023 Ver.1.0.0
@@ -33,6 +35,12 @@
  * @type actor
  * @default 0
  * 
+ * @param NotLeaderChangeSubMember
+ * @text Permission to replace players other than the leader
+ * @desc When reordering, non-leader actors are allowed to swap with sub members.
+ * @type boolean
+ * @default true
+ * 
  */
 /*:
  * @target MZ
@@ -40,7 +48,7 @@
  * @author NUUN
  * @base NUUN_SceneBattleFormation
  * @orderAfter NUUN_SceneBattleFormation
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 戦闘中でアクターコマンドから並び替えを行う時に、指定のキャラクターのみ全てのキャラクターを入れ替えを出来るようにし、
@@ -51,6 +59,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/7 Ver.1.0.2
+ * リーダー以外の並び替え時、控えメンバーと交代できる機能を追加。
  * 2024/6/23 Ver.1.0.1
  * リーダーの変更にも対応できるように修正。
  * 2023/8/6 Ver.1.0.0
@@ -62,6 +72,12 @@
  * @desc メンバーを自由に編成可能なアクターを指定します。0でリーダー
  * @type actor
  * @default 0
+ * 
+ * @param NotLeaderChangeSubMember
+ * @text リーダー以外控え入れ替え許可
+ * @desc リーダー以外で並び替え時にリーダー以外のアクターと控えメンバーとの入れ替えを許可します。
+ * @type boolean
+ * @default true
  * 
  */
 
@@ -105,7 +121,7 @@ Imported.NUUN_LeaderActorFormationOnly = true;
             if (subject === leader) {
                 return true;
             } else if (subject === actor || subject === pendingActor) {
-                return !actor || !pendingActor;
+                return params.NotLeaderChangeSubMember ? true : (!actor || !pendingActor);
             } else {
                 return false;
             }

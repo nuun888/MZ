@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.16
+ * @version 3.12.17
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2024/7/7 Ver.3.12.17
+ * 戦闘リトライプラグインでのリトライ時の不具合を修正。
  * 2024/6/16 Ver.3.12.16
  * 戦闘中に最大メンバーが増加したときにフロントビューでのエフェクトが表示されない問題を修正。
  * 2024/3/2 Ver.3.12.15
@@ -399,6 +401,20 @@ BattleManager.initMembers = function() {
     this.onBSStartBattle = !params.ActorStatusWindowLock;
     this._bsInterpreter = null;
     this.bsInBattle = true;
+};
+
+BattleManager.initBsBattleManager = function() {
+    if (!this.bsInBattle) {
+        this.bsInBattle = true;
+        this.actorStatusWindowOpacity = false;
+        this.actorStatusWindowOpacityValue = false;
+        this.battlerSprite = [];
+        this.bsVisibleStates = [];
+        this.bsVisibleBuffs = [];
+        this.notIconList = this.getNotVisibleIcons().concat(this.getNotVisibleBuffIcons());
+        this.onBSStartBattle = !params.ActorStatusWindowLock;
+        this._bsInterpreter = null;
+    }
 };
 
 const _BattleManager_update = BattleManager.update;
@@ -1224,6 +1240,7 @@ Scene_Battle.prototype.loadBattleStatusImg = function() {
 
 const _Scene_Battle_start = Scene_Battle.prototype.start;
 Scene_Battle.prototype.start = function() {
+    BattleManager.initBsBattleManager();
     BattleManager.battleStartCommon();
     _Scene_Battle_start.call(this);
     this._actorImges.refresh();
@@ -4276,7 +4293,7 @@ Spriteset_Battle.prototype.findTargetSprite = function(target) {
   return targetSprite;
 };
 
-Spriteset_Battle.prototype.animationTarget = function(targetSprites){
+Spriteset_Battle.prototype.animationTarget = function(targetSprites){console.log(targetSprites)
   if(!$gameSystem.isSideView() && params.ActorEffectShow && targetSprites && targetSprites.viewFrontActor) {
     return !!targetSprites._battler.isActor();
   }

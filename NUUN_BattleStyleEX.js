@@ -4293,7 +4293,7 @@ Spriteset_Battle.prototype.findTargetSprite = function(target) {
   return targetSprite;
 };
 
-Spriteset_Battle.prototype.animationTarget = function(targetSprites){console.log(targetSprites)
+Spriteset_Battle.prototype.animationTarget = function(targetSprites){
   if(!$gameSystem.isSideView() && params.ActorEffectShow && targetSprites && targetSprites.viewFrontActor) {
     return !!targetSprites._battler.isActor();
   }

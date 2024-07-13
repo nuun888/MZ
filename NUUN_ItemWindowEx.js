@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * You can customize the item screen.
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/13/2024 Ver.1.0.1
+ * Fixed the issue where the settings in "NUUN_ActorPicture" were not applied.
  * 6/16/2024 Ver.1.0.0
  * First edition.
  * 
@@ -561,7 +563,7 @@
  * @default 2
  * @min -99
  * 
- * @param DetaEval
+ * @@param DetaEval
  * @desc Enter an evaluation formula or string.
  * @text Evaluation formula or string(javaScript)(16)
  * @type combo
@@ -631,7 +633,6 @@
  * @parent GaugeSetting
  * 
  * @param ImgSetting
- * @@param ImgSetting
  * @text Image settings
  * @default ------------------------------
  * 
@@ -772,7 +773,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * アイテム画面をカスタマイズできます。
@@ -783,6 +784,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/13 Ver.1.0.1
+ * 立ち絵、顔グラ共通プラグインでの設定が適用されなかった問題を修正。
  * 2024/6/16 Ver.1.0.0
  * 初版
  * 
@@ -1144,17 +1147,17 @@
  * @value ExpGauge
  * @option 経験値サークルゲージ (1)(2)(3)(4)(18)(20)(23)
  * @value ExpCircularGauge
- * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
  * @value Atk
- * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
  * @value Def
- * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
  * @value Mat
- * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
  * @value Mdf
- * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
  * @value Agi
- * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
  * @value Luk
  * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
  * @value Hit
@@ -1715,6 +1718,12 @@ Imported.NUUN_ItemWindowEx = true;
         return params.SubMemberOpacity ? actor.isBattleMember() : true;
     };
 
+    Window_ItemMenuActor.prototype.setupActorImg = function() {
+        $gameParty.members().forEach((member, index) => {
+            this._contentsData[index].imgSetup(member);
+        });
+    };
+
 
     function Window_ItemInfo() {
         this.initialize(...arguments);
@@ -1724,9 +1733,13 @@ Imported.NUUN_ItemWindowEx = true;
     Window_ItemInfo.prototype.constructor = Window_ItemInfo;
     
     Window_ItemInfo.prototype.initialize = function(rect) {
+        this._contentsData = new Nuun_DrawItemInfoListData(this, params);
         Window_StatusBase.prototype.initialize.call(this, rect);
     };
 
+    Window_ItemInfo.prototype.refresh = function() {
+        this._contentsData.setItem(this._item);
+    };
 
     class Nuun_DrawMenuActorListData extends Nuun_DrawListData {
         constructor(_window, params) {
@@ -1744,6 +1757,35 @@ Imported.NUUN_ItemWindowEx = true;
         getActorsSettingList() {
             return params.ActorsImgList;
         }
+    };
+
+    function isStatusList() {
+        return params.StatusList && params.StatusList.length > 0;
+    };
+
+    class Nuun_DrawItemInfoListData extends Nuun_DrawListData {
+        constructor(_window, params) {
+            super(_window, params);
+            this._item = null;
+        }
+
+        nuun_MaxContentsCols() {
+            return 1;
+        }
+
+        getStatusParamsList() {
+            return params.ItemInfoList;
+        }
+
+        setItem(item) {
+            this._item = item;
+            refresh();
+        }
+
+        refresh() {
+            this.drawItemParams(this._item)
+        }
+
     };
 
     function isStatusList() {

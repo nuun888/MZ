@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/13/2024 Ver.1.0.2
+ * Fixed the issue where the settings in "NUUN_ActorPicture" were not applied.
  * 6/22/2024 Ver.1.0.1
  * Fixed an issue where item width was not applied wider than the width of a single item.
  * Fixed actor front image image to fit item width.
@@ -111,7 +113,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -122,6 +124,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/13 Ver.1.0.2
+ * 立ち絵、顔グラ共通プラグインでの設定が適用されなかった問題を修正。
  * 2024/6/22 Ver.1.0.1
  * 項目の横幅が1項目の横幅より広く適用されない問題を修正。
  * アクターの前面画像の画像を項目幅にフィットするように修正。
@@ -226,8 +230,8 @@ Imported.NUUN_MenuParamListBase = true;
             this._params = params;
             this._list = [];
             this._actorBitmap = null;
+            this._actorImgData = this.isActorPictureEXApp() ? new Nuun_ActorGraphics(_window) : null;
             this.language_Jp = $gameSystem.isJapanese();
-            this.loadCheckBitmap();
         }
     
         setList(list) {
@@ -238,8 +242,12 @@ Imported.NUUN_MenuParamListBase = true;
             return [];
         }
 
-        getActorsSettingList() {
+        getActorsList() {
             return this._params.ActorsImgList;
+        }
+
+        getActorsSettingList() {
+            return this.isActorPictureEXApp() ? NuunManager.getBattlerActors() : this.getActorsList();
         }
     
         nuun_MaxContentsCols() {
@@ -296,7 +304,7 @@ Imported.NUUN_MenuParamListBase = true;
 
         drawItemBackground(index) {
             const actor = this._window.actor(index);
-            const data = this.getActorImgData(actor);
+            const data = this.getActorImgData(actor, true);console.log(data)
             if (data && data.ActorBackImg) {
                 const bitmap = ImageManager.nuun_LoadPictures(data.ActorBackImg);
                 if (bitmap) {
@@ -339,6 +347,12 @@ Imported.NUUN_MenuParamListBase = true;
             this.drawItemImg(actor, index);
         }
 
+        imgSetup(actor) {
+            if (!!this._actorImgData) {
+                this._actorImgData.setup(actor);
+            }
+        }
+
         drawItemImg(actor, index) {
             if (actor) {
                 const data = this.getActorImgData(actor);
@@ -373,7 +387,7 @@ Imported.NUUN_MenuParamListBase = true;
             }
             if (bitmap) {
                 bitmap.addLoadListener(function() {
-                    this.drawActorGraphic(data, bitmap, index, rect.x, rect.y, rect.width, rect.height, actor);
+                    this.drawActorGraphic(data, bitmap, index, rect.x, rect.y, rect.width, rect.height , actor);
                 }.bind(this));
             }
         }
@@ -394,7 +408,7 @@ Imported.NUUN_MenuParamListBase = true;
             if (this._graphicMode === 'face') {
                 x += data.Actor_X + this._params.ActorImg_X;
                 y += data.Actor_Y + this._params.ActorImg_Y;
-                this.nuun_ActorFace(data, x, y, width, height, actor);
+                this.nuun_ActorFace(data, x, y, width - 2, height - 2, actor);
             } else {
                 this.nuun_drawActorGraphic(actor, data, bitmap, index, x, y, width, height);
             }
@@ -429,32 +443,32 @@ Imported.NUUN_MenuParamListBase = true;
             }
         }
 
-        getActorImgData(actor) {
-            const list = this.getActorsSettingList();
-            return list.find(data => this.condActorImg(data, actor));
+        getActorImgData(actor, mode) {
+            const list = mode ? this.getActorsList() : this.getActorsSettingList();
+            return list.find(data => this.condActorImg(data, actor, mode));
         }
 
-        condActorImg(data, actor) {
-            if (this.isActorPictureEXApp()) {
-                return data.actorId === actor.actorId();
-            } else {
-                if (data.ActorId === actor.actorId() && actor._classId === data.ClassId) {
-                    return true;
-                } else if (data.ClassId === 0 && data.ActorId === actor.actorId()) {
-                    return true;
-                } else if (data.ActorId === 0 && actor._classId === data.ClassId) {
-                    return true;
-                }
+        condActorImg(data, actor, mode) {
+            if (data[this.getActorId(mode)] === actor.actorId() && actor._classId === data.ClassId) {
+                return true;
+            } else if (data.ClassId === 0 && data[this.getActorId(mode)] === actor.actorId()) {
+                return true;
+            } else if (data[this.getActorId(mode)] === 0 && actor._classId === data.ClassId) {
+                return true;
             }
             return false;
         }
 
+        getActorId(mode) {
+            return this.isActorPictureEXApp() && !mode ? 'actorId' : 'ActorId';
+        }
+
         getFaceImg(actor) {
-            return this.isActorPictureEXApp() ? actor.loadActorFace() : ImageManager.loadFace(actor.faceName());
+            return this.isActorPictureEXApp() ? this._actorImgData.loadActorFace() : ImageManager.loadFace(actor.faceName());
         }
 
         getActorGraphicImg(data, actor) {
-            return this.isActorPictureEXApp() ? actor.loadActorGraphic() : ImageManager.nuun_LoadPictures(data.ActorImg);
+            return this.isActorPictureEXApp() ? this._actorImgData.loadActorGraphic() : ImageManager.nuun_LoadPictures(data.ActorImg);
         }
 
         setTextMode(align) {
@@ -472,6 +486,7 @@ Imported.NUUN_MenuParamListBase = true;
                 return;
             }
             const list = this.getParamsList();
+            let data = null;
             let bitmap = null;
             let loadBitmap = null;
             for (const data of list) {
@@ -500,12 +515,17 @@ Imported.NUUN_MenuParamListBase = true;
             if (loadBitmap && !loadBitmap.isReady()) {
                 bitmap = loadBitmap;
             }
-            const data = this.getActorImgData(actor);
+            data = this.getActorImgData(actor);
             if (data && this.getActorGraphicImg(data, actor)) {
                 loadBitmap = this.getActorGraphicImg(data, actor);
                 if (loadBitmap && !loadBitmap.isReady()) {
                     bitmap = loadBitmap;
                 }
+            }
+            if (this.isActorPictureEXApp()) {
+                data = this.getActorImgData(actor, true);
+            }
+            if (data && data.ActorFrontImg) {
                 loadBitmap = ImageManager.nuun_LoadPictures(data.ActorFrontImg);
                 if (loadBitmap && !loadBitmap.isReady()) {
                     bitmap = loadBitmap;
@@ -765,9 +785,54 @@ Imported.NUUN_MenuParamListBase = true;
             if (data.DetaEval) {
                 this.nuun_SetContentsValueFontFace(data);
                 const padding = textWidth > 0 ? w.itemPadding() : 0;
-                w.nuun_DrawContentsParamUnitText(eval(data.DetaEval), data, x + textWidth + padding, y, width - (textWidth + padding));
+                w.nuun_DrawContentsParamUnitText(this.getStatusEvalParam(param, actor), data, x + textWidth + padding, y, width - (textWidth + padding));
                 //this.drawText(eval(data.DetaEval), x + textWidth + padding, y, width - (textWidth + padding), data.Align);
             }
+        }
+
+        nuun_DrawContentsTurn(data, x, y, width, actor) {
+            const w = this._window;
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            this.nuun_SetContentsFontFace(data);
+            const nameText = data.ParamName ? data.ParamName : '';
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const padding = textWidth > 0 ? w.itemPadding() : 0;
+            w.nuun_DrawContentsParamUnitText(actor.turnCount(), data, x + textWidth + padding, y, width - (textWidth + padding));
+        }
+
+        nuun_DrawContentsDynamicName(data, x, y, width, actor) {
+            const key = "actor%1-name".format(actor.actorId());
+            _tempParams.setData(data);
+            const sprite = this._window.createInnerSprite(key, Sprite_DynamicName);
+            sprite.setup(actor);
+            sprite.move(x, y);
+            sprite.show();
+        }
+
+        nuun_DrawContentsDynamicOrgParam(data, x, y, width, actor) {
+            const key = "actor%1-param%2".format(actor.actorId(), data.GaugeID);
+            const status = this.getStatusEval(param, actor);
+            this.setTempType(status);
+            this.setTepmData(data)
+            const sprite = this._window.createInnerSprite(key, Sprite_DynamicParam);
+            sprite.setup(actor);
+            sprite.move(x, y);
+            sprite.show();
         }
     
         nuun_DrawContentsHpGauge(data, x, y, width, actor) {
@@ -784,6 +849,13 @@ Imported.NUUN_MenuParamListBase = true;
             if ($dataSystem.optDisplayTp) {
                 this.setTempType("tp");
                 this.nuun_PlaceGauge(actor, "tp", x, y, "actor%1-gauge-%2");
+            }
+        }
+
+        nuun_DrawContentsTpbGauge(data, x, y, width, actor) {
+            if (BattleManager.isTpb()) {
+                this.setTempType("time");
+                this.nuun_PlaceGauge(actor, "time", x, y, "actor%1-gauge-%2");
             }
         }
     
@@ -806,6 +878,13 @@ Imported.NUUN_MenuParamListBase = true;
             if ($dataSystem.optDisplayTp) {
                 this.setTempType("tp");
                 this.nuun_placeCircularGauge(actor, "tp", x, y, "actor%1-gauge-%2");
+            }
+        }
+
+        nuun_DrawContentsTpbCircularGauge(data, x, y, width, actor) {
+            if (BattleManager.isTpb()) {
+                this.setTempType("time");
+                this.nuun_placeCircularGauge(actor, "time", x, y, "actor%1-gauge-%2");
             }
         }
     
@@ -863,13 +942,13 @@ Imported.NUUN_MenuParamListBase = true;
         nuun_DrawContentsFace(data, x, y, width, actor) {
             let bitmap = null;
             if (this._window.isActorPictureEXApp()) {
-                bitmap = actor.loadActorFace();
+                bitmap = this._actorImgData.loadActorFace();
             } else {
                 bitmap = ImageManager.loadFace(actor.faceName());
             }
             const rect = this._window.itemRect(0);
             bitmap.addLoadListener(function() {
-                this.nuun_ActorFace(data, x, y, Math.min(width, ImageManager.faceWidth), Math.min(rect.height, ImageManager.faceHeight), actor);
+                this.nuun_ActorFace(data, x, y, Math.min(width, ImageManager.faceWidth), Math.min(rect.height - 2, ImageManager.faceHeight), actor);
             }.bind(this));
         };
     
@@ -1178,14 +1257,15 @@ Imported.NUUN_MenuParamListBase = true;
 
         nuun_ActorFace(data, x, y, width, height, actor) {
             this._window.changePaintOpacity(this._window.isSubMemberOpacity(actor));
+            width = Math.min(ImageManager.faceWidth, width);
+            height = Math.min(ImageManager.faceHeight, height);
             if (this.isActorPictureEXApp()) {
-                this._window.actorPictureEXDrawFace(actor, x, y, width, height);
+                this._window.actorPictureEXDrawFace(actor, x + 1, y + 1, width, height);
             } else {
                 if (actor.isRearguard && actor.isRearguard()) {
-                    this._window += w.shiftWidth;
+                    this._window += this._window.shiftWidth;
                 }
-                width = Math.min(ImageManager.faceWidth, width);
-                this._window.drawActorFace(actor, x, y, width, height);
+                this._window.drawActorFace(actor, x + 1, y + 1, width, height);
             }
             this._window.changePaintOpacity(true);
         }
@@ -1271,6 +1351,21 @@ Imported.NUUN_MenuParamListBase = true;
             return null;
         }
 
+        getStatusEval(param, actor) {
+            try {
+                return actor[param] ? 'detaEvalEx' : 'detaEval';
+            } catch (error) {
+                return 'detaEval';
+            }
+        }
+        getStatusEvalParam(param, actor) {
+            try {
+                return actor[param] ? actor[param] : eval(param);
+            } catch (error) {
+                return eval(param);
+            }
+        }
+
     };
     
     window.Nuun_DrawListData = Nuun_DrawListData;
@@ -1290,6 +1385,16 @@ Imported.NUUN_MenuParamListBase = true;
             this.clearApngImg();
         }
         _Window_Selectable_paint.apply(this, arguments);
+    };
+
+    const _Window_StatusBase_refresh = Window_StatusBase.prototype.refresh;
+    Window_StatusBase.prototype.refresh = function() {
+        this.setupActorImg();
+        _Window_StatusBase_refresh.apply(this, arguments);
+    };
+
+    Window_StatusBase.prototype.setupActorImg = function() {
+        
     };
 
     Window_StatusBase.prototype.clearApngImg= function() {
@@ -1620,6 +1725,7 @@ Imported.NUUN_MenuParamListBase = true;
     Sprite.prototype.initialize.call(this);
         this._class = _class;
         this._params = params;
+        this._actorImgData = new Nuun_ActorGraphics(_class);
         this.initMembers();
     };
 
@@ -1637,6 +1743,7 @@ Imported.NUUN_MenuParamListBase = true;
 
     Sprite_NuunActor.prototype.setup = function(actor) {
         this._actor = actor;
+        this.imgSetup(actor);
         this.refresh();
     };
 
@@ -1658,12 +1765,20 @@ Imported.NUUN_MenuParamListBase = true;
     };
 
     Sprite_NuunActor.prototype.getActorsSettingList = function() {
-        return this._params.ActorsImgList;
+        return this.isActorPictureEXApp() ? NuunManager.getBattlerActors() : this._params.ActorsImgList;
+    };
+
+    Sprite_NuunActor.prototype.imgSetup = function(actor) {
+        this._actorImgData.setup(actor);
+    };
+
+    Sprite_NuunActor.prototype.getGraphicName = function(data) {
+        return this.isActorPictureEXApp() ? this._actorImgData.getActorGraphicImg() : data.ActorImg;
     };
 
     Sprite_NuunActor.prototype.drawContentsImage = function(data, actor) {
         let bitmap = null;
-        if (isApng(data.ActorImg.split('pictures/')[1])) {
+        if (isApng(this.getGraphicName(data).split('pictures/')[1])) {
             this.createApngSprite(actor, data);
         } else {
             bitmap = this.getActorGraphicImg(data, actor);
@@ -1696,7 +1811,11 @@ Imported.NUUN_MenuParamListBase = true;
     };
 
     Sprite_NuunActor.prototype.getActorGraphicImg = function(data, actor) {
-        return this.isActorPictureEXApp() ? actor.loadActorGraphic() : ImageManager.nuun_LoadPictures(data.ActorImg);
+        return this.isActorPictureEXApp() ? this._actorImgData.loadActorGraphic() : ImageManager.nuun_LoadPictures(data.ActorImg);
+    };
+
+    Sprite_NuunActor.prototype.getActorId = function() {
+        return this.isActorPictureEXApp() ? 'actorId' : 'ActorId';
     };
 
     Sprite_NuunActor.prototype.changePaintOpacity = function(enabled) {
@@ -1713,16 +1832,12 @@ Imported.NUUN_MenuParamListBase = true;
     };
     
     Sprite_NuunActor.prototype.condActorImg = function(data, actor) {
-        if (this.isActorPictureEXApp()) {
-            return data.ActorId === actor.actorId();
-        } else {
-            if (data.ActorId === actor.actorId() && actor._classId === data.ClassId) {
-                return true;
-            } else if (data.ClassId === 0 && data.ActorId === actor.actorId()) {
-                return true;
-            } else if (data.ActorId === 0 && actor._classId === data.ClassId) {
-                return true;
-            }
+        if (data[this.getActorId()] === actor.actorId() && actor._classId === data.ClassId) {
+            return true;
+        } else if (data.ClassId === 0 && data[this.getActorId()] === actor.actorId()) {
+            return true;
+        } else if (data[this.getActorId()] === 0 && actor._classId === data.ClassId) {
+            return true;
         }
         return false;
     };
@@ -1740,8 +1855,161 @@ Imported.NUUN_MenuParamListBase = true;
         }
     };
 
-
     window.Sprite_NuunActor = Sprite_NuunActor;
+
+    function Sprite_DynamicName() {
+        this.initialize(...arguments);
+    }
+      
+    Sprite_DynamicName.prototype = Object.create(Sprite_Name.prototype);
+    Sprite_DynamicName.prototype.constructor = Sprite_DynamicName;
+      
+    Sprite_DynamicName.prototype.initialize = function() {
+        this._paramData = _tempParams.getData();
+        Sprite_Name.prototype.initialize.call(this);
+    };
+      
+    Sprite_DynamicName.prototype.bitmapWidth = function() {
+        return this._paramData.ItemWidth > 0 ? this._paramData.ItemWidth : 128;
+    };
+      
+    Sprite_DynamicName.prototype.bitmapHeight = function() {
+        return 26;
+    };
+      
+    Sprite_DynamicName.prototype.fontSize = function() {
+        return $gameSystem.mainFontSize() +  (this._paramData.FontSize || 0);
+    };
+      
+    Sprite_DynamicName.prototype.fontFace = function() {
+        return this._paramData.FontFace ? this._paramData.FontFace : Sprite_Name.prototype.fontFace.call(this);
+    };
+      
+    Sprite_DynamicName.prototype.redraw = function() {
+        const name = this.name();
+        const width = this.bitmapWidth();
+        const height = this.bitmapHeight();
+        this.setupFont();
+        this.bitmap.clear();
+        this.bitmap.drawText(name, 0, 0, width, height, (this._paramData.Align || 'left'));
+    };
+
+    window.Sprite_DynamicName = Sprite_DynamicName;
+
+    function Sprite_DynamicParam() {
+        this.initialize(...arguments);
+    }
+      
+    Sprite_DynamicParam.prototype = Object.create(Sprite.prototype);
+    Sprite_DynamicParam.prototype.constructor = Sprite_DynamicParam;
+      
+    Sprite_DynamicParam.prototype.initialize = function() {
+        this._type = _tempParams.getType();
+        this._paramData = _tempParams.getData();
+        Sprite.prototype.initialize.call(this);
+        this.initMembers();
+        this.createBitmap();
+    };
+      
+    Sprite_DynamicParam.prototype.initMembers = function() {
+        this._battler = null;
+        this._textColor = "";
+    };
+      
+    Sprite_DynamicParam.prototype.setup = function(battler) {
+        this._battler = battler;
+        this.updateBitmap();
+    };
+      
+    Sprite_DynamicParam.prototype.destroy = function(options) {
+        this.bitmap.destroy();
+        Sprite.prototype.destroy.call(this, options);
+    };
+      
+    Sprite_DynamicParam.prototype.update = function() {
+        Sprite.prototype.update.call(this);
+        this.updateBitmap();
+    };
+      
+      
+    Sprite_DynamicParam.prototype.createBitmap = function() {
+        const width = this.bitmapWidth();
+        const height = this.bitmapHeight();
+        this.bitmap = new Bitmap(width, height);
+    };
+      
+    Sprite_DynamicParam.prototype.bitmapWidth = function() {
+        return this._paramData.ItemWidth > 0 ? this._paramData.ItemWidth : 128;
+    };
+      
+    Sprite_DynamicParam.prototype.bitmapHeight = function() {
+        return 26;
+    };
+
+    Sprite_DynamicParam.prototype.currentValue = function() {
+        switch (this._type) {
+            case "detaEvalEx":
+                return this._battler[DetaEval1];
+            case "detaEval":
+                return this._paramData.DetaEval1;
+            case "turn":
+                return Math.max(1, this._battler.turnCount());
+        }
+    };
+      
+    Sprite_DynamicParam.prototype.updateBitmap = function() {
+        const _param = eval(this.currentValue());
+        if (this._paramValue !== _param) {
+            this._paramValue = _param;
+            this.redraw();
+        }
+    };
+      
+    Sprite_DynamicParam.prototype.redraw = function() {
+        const paramName = this._paramData.ParamName ? this._paramData.ParamName : '';
+        const width = this.bitmapWidth();
+        const height = this.bitmapHeight();
+        this.bitmap.clear();
+        this.setupNameFont();
+        const textWidth = Math.max(60 , this.bitmap.measureTextWidth(paramName));
+        this.bitmap.drawText(paramName, 0, 0, width - textWidth, height);
+        this.setupValueFont();
+        this.bitmap.drawText(this.currentValue(), textWidth + 8, 0, width - (textWidth + 8), height, 'right');
+    };
+
+    Sprite_DynamicParam.prototype.setupNameFont = function() {
+        this.bitmap.fontFace = this.nameFontFace();
+        this.bitmap.fontSize = this.nameFontSize();
+        this.bitmap.textColor = this.systemColor();
+    };
+
+    Sprite_DynamicParam.prototype.setupValueFont = function() {
+        this.bitmap.fontFace = this.valueFontFace();
+        this.bitmap.fontSize = this.nameFontSize();
+        this.bitmap.textColor = this.valueColor();
+    };
+
+    Sprite_DynamicParam.prototype.systemColor = function() {
+        return NuunManager.getColorCode(this._paramData.NameColor);
+    };
+      
+    Sprite_DynamicParam.prototype.nameFontSize = function() {
+        return $gameSystem.mainFontSize() +  (this._paramData.FontSize || 0);
+    };
+      
+    Sprite_DynamicParam.prototype.nameFontFace = function() {
+        return this._paramData.FontFace ? this._paramData.FontFace : Sprite_Name.prototype.fontFace.call(this);
+    };
+    
+    Sprite_DynamicParam.prototype.valueColor = function() {
+        return ColorManager.normalColor();
+    };
+    
+    Sprite_DynamicParam.prototype.valueFontFace = function() {
+        return this._paramData.alueFontFace ? this._paramData.alueFontFace : $gameSystem.mainFontFace();
+    };
+
+    window.Sprite_DynamicParam = Sprite_DynamicParam;
 
     const _Window_createContentsSprite = Window.prototype._createContentsSprite;
     Window.prototype._createContentsSprite = function() {

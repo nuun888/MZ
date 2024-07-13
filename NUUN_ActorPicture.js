@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.5
+ * @version 1.7.0
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/13 Ver.1.7.0
+ * 表示出来るクラスを指定できる機能を追加。
  * 2023/12/28 Ver.1.6.5
  * 戦闘不能時の画像設定状態が正常に取得されていなかった問題を修正。
  * 一部の処理をバトルスタイル拡張側で処理するように修正。
@@ -108,6 +110,7 @@
  * @text 表示アクター設定
  * @desc 画像を表示するアクターを指定します。
  * @type struct<ActorButlerList>[]
+ * @default []
  * 
  */
 /*~struct~ActorButlerList:
@@ -204,6 +207,19 @@
  * @type state[]
  * @default 
  * @parent AllMatch
+ * 
+ * @param FilteringClass
+ * @text フィルタリングクラス設定
+ * @desc 適用するウィンドウクラスを指定します。無指定の場合は全てのウィンドウで反映されます。(複数指定可)
+ * @type combo[]
+ * @option 'Scene_Battle'
+ * @option 'Scene_Menu'
+ * @option 'Scene_Status'
+ * @option 'Scene_Formation'
+ * @option 'Scene_Equip'
+ * @option 'Window_FormationStatus'
+ * @option 'Window_ItemMenuActor'
+ * @default []
  * 
  * @param ImgHP
  * @text 残りHP
@@ -312,272 +328,522 @@ var Imported = Imported || {};
 Imported.NUUN_ActorPicture = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_ActorPicture');
-const ButlerActors = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ButlerActors'])) : null) || [];
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const parameters = PluginManager.parameters('NUUN_ActorPicture');
 
-function condActorImg(data, actor) {
-    if (data.ClassId && data.ClassId > 0 && actor._classId === data.ClassId) {
-        return true;
-    } else if (data.actorId === actor.actorId()) {
-        return true;
-    }
-    return false;
-};
-
-NuunManager.setupClassName = function(className) {
-  this._className = className;
-};
-
-NuunManager.getClassName = function() {
-  return this._className;
-};
-
-const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
-Game_Actor.prototype.initMembers = function() {
-  _Game_Actor_initMembers.call(this);
-  this.nuun_useItemId = -1;
-  this._actorGraphicIndex = -1;
-  this._actorGraphicOpacity = 255;
-  this._actorGraphicName = null;
-  this._actorGraphicFace = null;
-  this.onImgId = 0;
-  this._imgScenes = 'default';
-};
-
-const _Game_Actor_setup = Game_Actor.prototype.setup;
-Game_Actor.prototype.setup = function(actorId) {
-  _Game_Actor_setup.call(this, actorId);
-  this.imgRefresh();
-};
-
-Game_Actor.prototype.getActorGraphicList = function() {
-    return ButlerActors.find(data => condActorImg(data, this));
-};
-
-Game_Actor.prototype.getActorGraphicIndex = function() {
-  return ButlerActors.findIndex(data => condActorImg(data, this));
-};
-
-Game_Actor.prototype.getActorGraphic = function() {
-  const imgData = this.getActorGraphicList();
-  return imgData ? imgData.ButlerActorImg.find(data => this.matchConditions(data)) : null;
-};
-
-Game_Actor.prototype.getActorGraphicData = function() {
-  const data = this.getActorGraphicList();
-  return data ? data.ButlerActorImg[this._actorGraphicIndex] : null;
-};
-
-Game_Actor.prototype.setActorGraphicData = function() {
-  const imgData = this.getActorGraphicList();
-  const index = imgData ? imgData.ButlerActorImg.findIndex(data => this.matchConditions(data)) : -1;
-  this._actorGraphicIndex = index;
-  if (index >= 0) {
-    this.setActorGraphicId();
-    const data = imgData.ButlerActorImg[index];
-    this._actorGraphicName = getActorGraphicName(data);
-    this._actorGraphicFace = data.FaceImg || this.faceName();
-    this._actorImgIndex = data.FaceIndex >= 0 ? data.FaceIndex : this.faceIndex();
-    this._actorGraphicOpacity = data.Opacity || 255;
-  } else {
-    this._actorGraphicName = null;
-    this._actorGraphicFace = this.faceName();
-    this._actorImgIndex = this.faceIndex();
-    this._actorGraphicOpacity = 255;
-  }
-};
-
-Game_Actor.prototype.setActorGraphicId = function() {
-    switch (this._imgScenes) {
-        case 'counter':
-        case 'reflection':
-        case 'counterEX':
-            this.onImgId = 30;
-            break;
-    }
-};
-
-Game_Actor.prototype.matchConditions = function(data) {
-  if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this.hp, this.param(0))) {
-    return false;
-  }
-  if (data.ImgSwitch && !this.isCondSwitchImg(data)) {
-    return false;
-  }
-  if (data.ImgWeapon && !this.isCondWeaponImg(data)) {
-    return false;
-  }
-  if (data.ImgArmor && !this.isCondArmorImg(data)) {
-    return false;
-  }
-  if (data.ImgStateAll && !this.isCondStateImg(data, data.ImgStateAll)) {
-    return false;
-  }
-  if (data.ImgClass > 0 && !this.isCondClassImg(data)) {
-    return false;
-  }
-  if (!this.matchChangeGraphic(data)) {
-    return false;
-  }
-  return true;
-};
-
-Game_Actor.prototype.matchChangeGraphic = function(data) {
-  const changeData = data.ChangeGraphicScenes;
-  this._imgScenes = changeData;
-  switch (changeData) {
-    case 'default' :
-      return true;
-    case 'death' :
-      return this.isDead();
-    case 'command' :
-      return this.isInputting();
-    case 'dying' :
-      return this.isDying();
-    case 'damage' :
-        return this.onImgId === 1 || this.onImgId === 3;
-    case 'cridamage' :
-        return this.onImgId === 3;
-    case 'recovery' :
-      return this.onImgId === 2;
-    case 'attack' :
-      return this.onImgId === 10 && this.isCondUseItemImg(data.Skill);
-    case 'recoverySkill' :
-      return this.onImgId === 11 && this.isCondUseItemImg(data.Skill);
-    case 'item' :
-      return this.onImgId === 12 && this.isCondUseItemImg(data.Item);
-    case 'chant' :
-      return this.isChanting();
-    case 'victory' :
-      return this.onImgId === 20;
-    case 'state' :
-      return this.isCondStateImg(data, data.stateId);
-    case 'counter' :
-      return this.result().counterEx;
-    case 'reflection' :
-      return this.result().reflectionEx;
-    case 'counterEX' :
-      return this.result().counterExtend && this.isCondUseItemImg(data.Id);
-    case 'guard' :
-      return this.onImgId === 15;
-  }
-};
-
-Game_Actor.prototype.isCondSwitchImg = function(data) {
-  return data.ImgSwitch.every(id => $gameSwitches.value(id));
-};
-
-Game_Actor.prototype.isCondWeaponImg = function(data) {
-  return data.ImgWeapon.every(id => this.isEquipped($dataWeapons[id]));
-};
-
-Game_Actor.prototype.isCondArmorImg = function(data) {
-  return data.ImgArmor.every(id => this.isEquipped($dataArmors[id]));
-};
-
-Game_Actor.prototype.isCondStateImg = function(data, states) {
-  return states.every(id => id > 0 ? this.isStateAffected(id) : true);
-};
-
-Game_Actor.prototype.isCondClassImg = function(data) {
-  return data.ImgClass ? this._classId === data.ImgClass : true;
-};
-
-Game_Actor.prototype.isCondUseItemImg = function(data) {
-  return data ? data.includes(this.nuun_useItemId) : true;
-};
-
-Game_Actor.prototype.isClassNameImg = function(data) {
-  const className = NuunManager.getClassName();
-  return data.some(name => className === name);
-};
-
-const _Game_Actor_refresh = Game_Actor.prototype.refresh;
-Game_Actor.prototype.refresh = function() {
-    _Game_Actor_refresh.call(this);
-    this.imgRefresh();
-};
-
-Game_Actor.prototype.imgRefresh = function() {
-  this.setActorGraphicData();
-};
-
-Game_Actor.prototype.getActorGraphicImg = function() {
-  return this._actorGraphicName;
-};
-
-Game_Actor.prototype.getActorGraphicFace = function() {
-  return this._actorGraphicFace || this.faceName();
-};
-
-Game_Actor.prototype.getActorGraphicFaceIndex = function() {
-  return this._actorImgIndex || this.faceIndex();
-};
-
-Game_Actor.prototype.getIsActorGraphicImg = function() {
-  return !!this._actorGraphicName;
-};
-
-Game_Actor.prototype.setAttackImgId = function(action) {
-    if (action.item().animationId !== 0) {
-        this.nuun_useItemId = action.item().id;
-        if (action.isRecover()) {
-            this.onImgId = 11;
-            this._actionBattlerImg = "recovery";
-        } else if (action.isAttack() && action.isDamage()) {
-            this.onImgId = 10;
-            this._actionBattlerImg = "attack";
-        } else if (action.isMagicSkill()) {
-            this.onImgId = 10;
-            this._actionBattlerImg = "attack";
-        } else if (action.isSkill() && action.isDamage()) {
-            this.onImgId = 10;
-            this._actionBattlerImg = "attack";
-        } else if (action.isItem()) {
-            this.onImgId = 12;
-            this._actionBattlerImg = "item";
-        } else {
-            this.onImgId = 0;
-            this._actionBattlerImg = null;
-            this.nuun_useItemId = -1;
+    class Nuun_ActorGraphics {
+        constructor(_class) {
+            this._class = _class;
+            this._battler = null;
+            this._data = null;
+            this._actorImgIndex = -1;
+            this._actorGraphicIndex = -1;
+            this._actorGraphicOpacity = 255;
+            this._actorGraphicName = null;
+            this._actorGraphicFace = null;
+            this._imgScenes = 'default';
         }
+
+        setup(battler) {
+            this._battler = battler;
+            this._data = this.getGraphicsData(battler);
+            this.update();
+        }
+
+        actor() {
+            return this._battler;
+        }
+
+        update() {
+            this.graphicRefresh();
+        }
+
+        getActorGraphicName(data) {
+            const images = data.GraphicImg;
+            if (Array.isArray(images)) {
+                if (images.length > 1) {
+                    return images[Math.randomInt(images.length)];
+                } else {
+                    return images[0];
+                }
+            } else {
+                return images;
+            }
+        }
+
+        getActorFaceName(data) {
+            return data && data.FaceImg ? data.FaceImg : this._battler.faceName();
+        }
+
+
+        getGraphicsData(actor) {
+            return params.ButlerActors ? params.ButlerActors.find(data => actor && data.actorId === actor.actorId()) || [] : [];
+        }
+
+        condActorImg(data, actor) {
+            if (data.actorId === actor.actorId() && actor._classId === data.ClassId) {
+                return true;
+            } else if (data.ClassId === 0 && data.actorId === actor.actorId()) {
+                return true;
+            } else if (data.actorId === 0 && actor._classId === data.ClassId) {
+                return true;
+            }
+            return false;
+        }
+        
+        graphicRefresh() {
+            if (!this._battler) {
+                return;
+            }
+            let imgIndex = -1;
+            let index = -1;
+            this._isDeadImg = false;
+            this._imgScenes = 'default';
+            index = this._data ? this._data.ButlerActorImg.findIndex(data => this.matchConditions(data)) : -1;
+            const oldFileName = this._actorGraphicName;
+            const oldFileFace = this._actorGraphicFace;
+            if (index >= 0) {
+                const data = this._data.ButlerActorImg[index];
+                this._actorGraphicName = this.getActorGraphicName(data);
+                this._actorGraphicFace = this.getActorFaceName(data);
+                imgIndex = this.getActorFaceIndex(data);
+                this._isDeadImg = this.isActorGraphicDead(data);
+                this._actorGraphicOpacity = data.Opacity || 255;
+            } else {
+                this._actorGraphicName = null;
+                this._actorGraphicFace = this.faceName();
+                imgIndex = this.faceIndex();
+                this._actorGraphicOpacity = 255;
+            }
+            this._actorGraphicIndex = index;
+            this._actorImgIndex = imgIndex;
+            if (oldFileName !== this._actorGraphicName && !!this._actorGraphicName) {
+                ImageManager.nuun_LoadPictures(this._actorGraphicName);
+            }
+            if (oldFileFace !== this._actorGraphicFace && !!this._actorGraphicFace) {
+                ImageManager.loadFace(this._actorGraphicFace);
+            }
+        }
+
+        matchConditions(data) {
+            if (data._Class > 0 && !this.filteringClass(data)) {
+                return false;
+            }
+            if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this._battler.hp, this._battler.param(0))) {
+                return false;
+            }
+            if (data.ImgSwitch && !this.isSwitchImg(data)) {
+                return false;
+            }
+            if (data.ImgWeapon && !this.isWeaponImg(data)) {
+                return false;
+            }
+            if (data.ImgArmor && !this.isArmorImg(data)) {
+                return false;
+            }
+            if (data.ImgStateAll && !this.isStateImg(data, data.ImgStateAll)) {
+                return false;
+            }
+            if (data.ImgClass > 0 && !this.isClassImg(data)) {
+                return false;
+            }
+            if (!this.matchChangeGraphic(data)) {
+                return false;
+            }
+            return true;
+        }
+
+        matchChangeGraphic(data) {
+            const changeData = data.ChangeGraphicScenes;
+            this._imgScenes = changeData;
+            switch (changeData) {
+                case 'default' :
+                    return true;
+                case 'finalAttack':
+                    return this.isFinalAttack(data.Skill);
+                case 'death' :
+                    return this.isDead();
+                case 'b_appeared' :
+                    return !this.isAppeared();
+                case 'command' :
+                    return this.isInputting();
+                case 'dying' :
+                    return this.isDying();
+                case 'damage' :
+                    return this.getImgId(1) || this.getImgId(3);
+                case 'cridamage' :
+                    return this.getImgId(3);
+                case 'recovery' :
+                    return this.getImgId(2);
+                case 'attack' :
+                    return this.getImgId(10) && this.isUseItemImg(data.Skill);
+                case 'recoverySkill' :
+                    return this.getImgId(11) && this.isUseItemImg(data.Skill);
+                case 'item' :
+                    return this.getImgId(12) && this.isUseItemImg(data.Item);
+                case 'chant' :
+                    return this.isChanting();
+                case 'victory' :
+                    return this.getImgId(20);
+                case 'state' :
+                    return this.isStateImg(data, data.stateId);
+                case 'counter' :
+                    return this.isCounter();
+                case 'reflection' :
+                    return this.isReflection();
+                case 'counterEX' :
+                    return this.isCounterEX(data);
+                case 'guard' :
+                    return this.getImgId(15);
+            }
+        }
+
+        getActorGraphicImg() {
+            return this._actorGraphicName;
+        }
+
+        getActorGraphicFace() {
+            return this._actorGraphicFace || this._battler.faceName();
+        }
+
+        getActorGraphicFaceInde() {
+            return this._actorImgIndex || this._battler.faceIndex();
+        }
+
+        loadActorGraphic() {
+            return ImageManager.nuun_LoadPictures(this.getActorGraphicImg());
+        }
+
+        loadActorFace() {
+            return ImageManager.loadFace(this.getActorGraphicFace());
+        }
+
+        isDeadImg() {
+            return this._isDeadImg;
+        }
+
+        isActorGraphicDead(data) {
+            return data && (!!data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
+        }
+
+        getStateData(data) {
+            return data.some(s => s === this._battler.deathStateId());
+        }
+
+        getActorFaceIndex(data) {
+            return data && data.FaceIndex >= 0 ? data.FaceIndex : this._battler.faceIndex();
+        }
+
+        getImgId(id) {console.log()
+            return this._battler.onImgId[id];
+        }
+
+        isDead() {
+            return this._battler.isDead();
+        }
+
+        isAppeared() {
+            return this._battler.isAppeared();
+        }
+
+        isInputting() {
+            return this._battler.isInputting();
+        }
+
+        isDying() {
+            return this._battler.isDying();
+        }
+
+        isChanting() {
+            return this._battler.isChanting();
+        }
+
+        isCounter() {
+            return this._battler.result().counterEx;
+        }
+
+        isReflection() {
+            return this._battler.result().reflectionEx;
+        }
+
+        isSwitchImg(data) {
+            return data.ImgSwitch.every(id => $gameSwitches.value(id));
+        }
+
+        isWeaponImg(data) {
+            return data.ImgWeapon.every(id => this._battler.isEquipped($dataWeapons[id]));
+        }
+
+        isArmorImg(data) {
+            return data.ImgArmor.every(id => this._battler.isEquipped($dataArmors[id]));
+        }
+
+        isClassImg(data) {
+            return data.ImgClass ? this._battler._classId === data.ImgClass : true;
+        }
+
+        isUseItemImg(item) {
+            return item && item[0] > 0 ? item.includes(this._battler.nuun_useItemId) : true;
+        }
+
+        isStateImg(data, states) {
+            return states.every(id => id > 0 ? this._battler.isStateAffected(id) : true);
+        }
+
+        filteringClass(data) {
+            const className = NuunManager.isFilterClass(this._class);
+            if (data.FilteringClass && data.FilteringClass.length > 0) {
+                return data.FilteringClass.some(filterClass => filterClass === String(SceneManager._scene.constructor.name) || filterClass === className);
+            } else {
+                return true;
+            }
+        }
+    }
+
+    window.Nuun_ActorGraphics = Nuun_ActorGraphics;
+
+    function conditionsParam(data, param, maxParam) {
+        return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
+    };
+
+    function condActorImg(data, actor) {
+        if (data.actorId === actor.actorId() && actor._classId === data.ClassId) {
+            return true;
+        } else if (data.ClassId === 0 && data.actorId === actor.actorId()) {
+            return true;
+        } else if (data.actorId === 0 && actor._classId === data.ClassId) {
+            return true;
+        }
+        return false;
+    };
+
+
+    NuunManager.getBattlerActors = function() {
+        return params.ButlerActors;
+    };
+
+    NuunManager.setupClassName = function(className) {
+        this._className = className;
+    };
+      
+    NuunManager.getClassName = function() {
+        return this._className;
+    };
+
+    const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
+    Game_Actor.prototype.initMembers = function() {
+        _Game_Actor_initMembers.call(this);
+        this.nuun_useItemId = -1;
+        this._onImgId = -1;//廃止予定
+        this.onImgId = [];
+        this._actorGraphicIndex = -1;
+        this._actorGraphicOpacity = 255;
+        this._actorGraphicName = null;
+        this._actorGraphicFace = null;
+        this._imgScenes = 'default';
+    };
+
+      
+    Game_Actor.prototype.getActorGraphicList = function() {
+        return ButlerActors.find(data => condActorImg(data, this));
+    };
+      
+    Game_Actor.prototype.getActorGraphicIndex = function() {
+        return ButlerActors.findIndex(data => condActorImg(data, this));
+    };
+      
+    Game_Actor.prototype.getActorGraphic = function() {
+        const imgData = this.getActorGraphicList();
+        return imgData ? imgData.ButlerActorImg.find(data => this.matchConditions(data)) : null;
+    };
+      
+    Game_Actor.prototype.getActorGraphicData = function() {
+        const data = this.getActorGraphicList();
+        return data ? data.ButlerActorImg[this._actorGraphicIndex] : null;
+    };
+      
+    Game_Actor.prototype.setActorGraphicData = function() {
+        const imgData = this.getActorGraphicList();
+        const index = imgData ? imgData.ButlerActorImg.findIndex(data => this.matchConditions(data)) : -1;
+        this._actorGraphicIndex = index;
+        if (index >= 0) {
+            this.setActorGraphicId();
+            const data = imgData.ButlerActorImg[index];
+            this._actorGraphicName = getActorGraphicName(data);
+            this._actorGraphicFace = data.FaceImg || this.faceName();
+            this._actorImgIndex = data.FaceIndex >= 0 ? data.FaceIndex : this.faceIndex();
+            this._actorGraphicOpacity = data.Opacity || 255;
+        } else {
+            this._actorGraphicName = null;
+            this._actorGraphicFace = this.faceName();
+            this._actorImgIndex = this.faceIndex();
+            this._actorGraphicOpacity = 255;
+        }
+    };
+      
+    Game_Actor.prototype.matchConditions = function(data) {
+        if (data._Class && data._Class > 0 && !this.filteringClass(data)) {
+            return false;
+        }
+        if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this.hp, this.param(0))) {
+            return false;
+        }
+        if (data.ImgSwitch && !this.isCondSwitchImg(data)) {
+            return false;
+        }
+        if (data.ImgWeapon && !this.isCondWeaponImg(data)) {
+            return false;
+        }
+        if (data.ImgArmor && !this.isCondArmorImg(data)) {
+            return false;
+        }
+        if (data.ImgStateAll && !this.isCondStateImg(data, data.ImgStateAll)) {
+            return false;
+        }
+        if (data.ImgClass > 0 && !this.isCondClassImg(data)) {
+            return false;
+        }
+        if (!this.matchChangeGraphic(data)) {
+            return false;
+        }
+        return true;
+    };
+      
+    Game_Actor.prototype.matchChangeGraphic = function(data) {
+        const changeData = data.ChangeGraphicScenes;
+        this._imgScenes = changeData;
+        switch (changeData) {
+          case 'default' :
+            return true;
+          case 'death' :
+            return this.isDead();
+          case 'command' :
+            return this.isInputting();
+          case 'dying' :
+            return this.isDying();
+          case 'damage' :
+              return this._onImgId === 1 || this._onImgId === 3;
+          case 'cridamage' :
+              return this._onImgId === 3;
+          case 'recovery' :
+            return this._onImgId === 2;
+          case 'attack' :
+            return this._onImgId === 10 && this.isCondUseItemImg(data.Skill);
+          case 'recoverySkill' :
+            return this._onImgId === 11 && this.isCondUseItemImg(data.Skill);
+          case 'item' :
+            return this._onImgId === 12 && this.isCondUseItemImg(data.Item);
+          case 'chant' :
+            return this.isChanting();
+          case 'victory' :
+            return this._onImgId === 20;
+          case 'state' :
+            return this.isCondStateImg(data, data.stateId);
+          case 'counter' :
+            return this.result().counterEx;
+          case 'reflection' :
+            return this.result().reflectionEx;
+          case 'counterEX' :
+            return this.result().counterExtend && this.isCondUseItemImg(data.Id);
+          case 'guard' :
+            return this._onImgId === 15;
+        }
+    };
+      
+    Game_Actor.prototype.isCondSwitchImg = function(data) {
+        return data.ImgSwitch.every(id => $gameSwitches.value(id));
+    };
+      
+    Game_Actor.prototype.isCondWeaponImg = function(data) {
+        return data.ImgWeapon.every(id => this.isEquipped($dataWeapons[id]));
+    };
+      
+    Game_Actor.prototype.isCondArmorImg = function(data) {
+        return data.ImgArmor.every(id => this.isEquipped($dataArmors[id]));
+    };
+      
+    Game_Actor.prototype.isCondStateImg = function(data, states) {
+        return states.every(id => id > 0 ? this.isStateAffected(id) : true);
+    };
+      
+    Game_Actor.prototype.isCondClassImg = function(data) {
+        return data.ImgClass ? this._classId === data.ImgClass : true;
+    };
+      
+    Game_Actor.prototype.isCondUseItemImg = function(data) {
+        return data ? data.includes(this.nuun_useItemId) : true;
+    };
+      
+    Game_Actor.prototype.isClassNameImg = function(data) {
+        const className = NuunManager.getClassName();
+        return data.some(name => className === name);
+    };
+      
+    Game_Actor.prototype.getActorGraphicImg = function() {
+        return this._actorGraphicName;
+    };
+      
+    Game_Actor.prototype.getActorGraphicFace = function() {
+        return this._actorGraphicFace || this.faceName();
+    };
+      
+    Game_Actor.prototype.getActorGraphicFaceIndex = function() {
+        return this._actorImgIndex || this.faceIndex();
+    };
+      
+    Game_Actor.prototype.getIsActorGraphicImg = function() {
+        return !!this._actorGraphicName;
+    };
+      
+    Game_Actor.prototype.setAttackImgId = function(action) {
+        if (action.item().animationId !== 0) {
+            this.nuun_useItemId = action.item().id;
+            if (action.isRecover()) {
+                this._onImgId = 11;
+                this._actionBattlerImg = "recovery";
+            } else if (action.isAttack() && action.isDamage()) {
+                this._onImgId = 10;
+                this._actionBattlerImg = "attack";
+            } else if (action.isMagicSkill()) {
+                this._onImgId = 10;
+                this._actionBattlerImg = "attack";
+            } else if (action.isSkill() && action.isDamage()) {
+                this._onImgId = 10;
+                this._actionBattlerImg = "attack";
+            } else if (action.isItem()) {
+                this._onImgId = 12;
+                this._actionBattlerImg = "item";
+            } else {
+                this._onImgId = 0;
+                this._actionBattlerImg = null;
+                this.nuun_useItemId = -1;
+            }
+            this.imgRefresh();
+        }
+    };
+      
+    Game_Actor.prototype.resetImgId = function() {
+        this._onImgId = 0;
+        this.nuun_useItemId = -1;
         this.imgRefresh();
-    }
-};
+    };
+      
+    Game_Actor.prototype.loadActorGraphic = function() {
+        return ImageManager.nuun_LoadPictures(this.getActorGraphicImg());
+    };
+      
+    Game_Actor.prototype.loadActorFace = function() {
+        return ImageManager.loadFace(this.getActorGraphicFace());
+    };
+      
+    Game_Actor.prototype.isActorGraphicDead = function(data) {
+        return data && (data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
+    };
 
-Game_Actor.prototype.resetImgId = function() {
-  this.onImgId = 0;
-  this.nuun_useItemId = -1;
-  this.imgRefresh();
-};
+    Window_StatusBase.prototype.actorPictureEXDrawFace = function(actor, x, y, width, height) {
+        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
+    };
+      
 
-Game_Actor.prototype.loadActorGraphic = function() {
-  return ImageManager.nuun_LoadPictures(this.getActorGraphicImg());
-};
-
-Game_Actor.prototype.loadActorFace = function() {
-  return ImageManager.loadFace(this.getActorGraphicFace());
-};
-
-Game_Actor.prototype.isActorGraphicDead = function(data) {
-    return data && (data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
-};
-
-function conditionsParam(data, param, maxParam) {
-  return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
-};
-
-function getActorGraphicName(data) {
-    const images = data.GraphicImg;
-    if (Array.isArray(images)) {
-        if (images.length > 1) {
-            return images[Math.randomInt(images.length)];
-        } else {
-            return images[0];
-        }
-    } else {
-        return images;
-    }
-};
 
 })();

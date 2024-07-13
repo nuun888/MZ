@@ -1,5 +1,5 @@
 # [アイテムウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -24,5 +24,7 @@
 `Window_ItemInfo` アイテムインフォ(未実装)  
 
 ## 更新履歴
+2024/7/13 Ver.1.0.1  
+立ち絵、顔グラ共通プラグインでの設定が適用されなかった問題を修正。  
 2024/6/16 Ver.1.0.0    
 初版  

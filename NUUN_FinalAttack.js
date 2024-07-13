@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * Implement final attack.
@@ -27,8 +27,11 @@
  * If the final attack interrupts with two or more actions, the action ends at that point.
  * 
  * Log
+ * 7/13/2024 Ver.1.1.5
+ * Fixed some plugin conflicts.
+ * Fixed the timing of skill selection for Final Attack.
  * 7/3/2024 Ver.1.1.4
- * Fixed an issue where skill costs were not consumed.
+ * Fixed an issue where the skill cost-free setting was not being applied.
  * Fixed a problem where skills would not be activated if all target members were incapacitated.
  * 6/30/2024 Ver.1.1.3
  * Fixed an issue where monster images would not disappear at the end of battle and final attacks would not be executed.
@@ -97,7 +100,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * ファイナルアタックを実装します。
@@ -110,10 +113,14 @@
  * 
  * 仕様
  * ２回行動以上でファイナルアタックが割り込んだ場合その時点で行動が終了します。
+ * イベントコマンドから戦闘不能にした場合はファイナルアタックを発動しません。
  * 
  * 更新履歴
+ * 2024/7/13 Ver.1.1.5
+ * 一部プラグインでの競合対応。
+ * ファイナルアタックのスキル選定のタイミングを修正。
  * 2024/7/3 Ver.1.1.4
- * スキルコストが消費されない問題を修正。
+ * スキルコストが消費されない設定が適用されない問題を修正。
  * 対象のメンバー全員が戦闘不能になっている場合、スキルを発動しないように修正。
  * 2024/6/30 Ver.1.1.3
  * 戦闘終了時にモンスター画像が消えず、ファイナルアタックが実行されない問題を修正。
@@ -227,6 +234,7 @@ BattleManager.processForcedAction = function() {
 BattleManager.resetFinalAttack = function(subject) {
     if (subject._actions[0]) {
         this.forceAction(subject);
+        subject.clearFinalAttack();
         this._finalAttack = true;
     } else {
         subject.finalAttackEnd = true;
@@ -272,30 +280,62 @@ BattleManager.isFinalAttack = function() {
 BattleManager.isFinalAttackCostConsumption = function() {
     const subject = this._subject;
     const action = subject.currentAction();
-    return action.finalAttackSkill ? action.isCostConsumption() : true;
+    return action && action.finalAttackSkill ? action.isCostConsumption() : true;
 };
 
+
+const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
+Game_Action.prototype.applyItemUserEffect = function(target) {
+    _Game_Action_applyItemUserEffect.apply(this, arguments);
+    this.setFinalAttack(target);
+};
+
+Game_Action.prototype.setFinalAttack = function(target) {
+    if ($gameParty.inBattle()) {
+        const result = target.result();
+        const states = result.addedStateObjects();
+        for (const state of states) {
+            if (state.id === target.deathStateId()) {
+                target.setFinalAttack();
+            }
+        }
+    }
+};
+
+
+Game_Battler.prototype.setFinalAttack = function() {
+    if (this.finalAttackDate()) {
+        BattleManager.setFinalAttack(this);
+    }
+};
+
+Game_Battler.prototype.resetFinalAttack = function() {
+    this.finalAttackEnd = false;
+    this.clearFinalAttack();
+};
 
 const _Game_Actor_performCollapse = Game_Actor.prototype.performCollapse;
 Game_Actor.prototype.performCollapse = function() {
     if ($gameParty.inBattle()) {
-        if (!this.finalAttackEnd && this.finalAttackDate()) {
-            BattleManager.setFinalAttack(this);
-        } else {
-            this.finalAttackEnd = false;
-            _Game_Actor_performCollapse.call(this);
+        if (this.isFinalAttack() && !this.finalAttackEnd) {
+            return;
         }
+        if (this.isFinalAttack() && this.finalAttackEnd) {
+            this.resetFinalAttack();
+        }
+        _Game_Actor_performCollapse.apply(this, arguments);
     }
 };
 
 const _Game_Enemy_performCollapse = Game_Enemy.prototype.performCollapse;
 Game_Enemy.prototype.performCollapse = function() {
-    if (!this.finalAttackEnd && this.finalAttackDate()) {
-        BattleManager.setFinalAttack(this);
-    } else {
-        this.finalAttackEnd = false;
-        _Game_Enemy_performCollapse.call(this);
+    if (this.isFinalAttack() && !this.finalAttackEnd) {
+        return;
     }
+    if (this.isFinalAttack() && this.finalAttackEnd) {
+        this.resetFinalAttack();
+    }
+    _Game_Enemy_performCollapse.apply(this, arguments);
 };
 
 Game_BattlerBase.prototype.finalAttackDate = function(){
@@ -335,10 +375,23 @@ Game_Battler.prototype.makeFinalAttackActions = function(id) {
                     action.setup(finalAttack);
                     action.setFinalAttackTarget();
                     this._actions.push(action);
+                    this.setOnFinalAttack();
                 }
             }
         }
     }
+};
+
+Game_Battler.prototype.isFinalAttack = function() {
+    return this._onFinalAttack;
+};
+
+Game_Battler.prototype.setOnFinalAttack = function() {
+    this._onFinalAttack = true;
+};
+
+Game_Battler.prototype.clearFinalAttack = function() {
+    this._onFinalAttack = false;
 };
 
 Game_Battler.prototype.isFinalAttackValid = function(skill) {

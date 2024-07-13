@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.0.2
+ * @version 2.0.3
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -33,6 +33,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/13/2024 Ver.2.0.3
+ * Fixed the issue where the settings in "NUUN_ActorPicture" were not applied.
+ * Fixed an issue where an error would occur when switching members in turn-based mode and selecting a command.
  * 6/30/2024 Ver.2.0.2
  * Fixed an issue where an error occurred when setting background color for fixed actors.
  * 6/23/2024 Ver.2.0.1
@@ -876,7 +879,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.0.2
+ * @version 2.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -902,6 +905,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/13 Ver.2.0.3
+ * 立ち絵、顔グラ表示EXでの設定が適用されない問題を修正。
+ * ターン制でメンバー交代を行い、コマンド選択するとエラーが出る問題を修正。
  * 2024/6/30 Ver.2.0.2
  * 固定アクターの背景色設定でエラーが出る問題を修正。
  * 2024/6/23 Ver.2.0.1
@@ -1749,7 +1755,6 @@
 var Imported = Imported || {};
 Imported.NUUN_SceneFormation = true;
 
-
 (() => {
     const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const parameters = PluginManager.parameters('NUUN_SceneFormation');
@@ -1786,6 +1791,10 @@ Imported.NUUN_SceneFormation = true;
     function _isActorPictureEXApp() {
         return Imported.NUUN_ActorPicture && paramList.ActorPictureEXApp;
     };
+
+    function _getActorImgData(actor) {
+        return null;
+    }
 
     NuunManager.isBattleFixedActor = function(actor) {
         return false;
@@ -2353,7 +2362,7 @@ Imported.NUUN_SceneFormation = true;
             this._battleMemberWindow.refresh();
             this._memberWindow.refresh();
             this.clearPendingMode();
-            if (this._isBattle && paramList.CommandShowMode === "Actor") {
+            if (this._isBattle) {
                 $gameTemp.formationRefresh = true;
             }
         }
@@ -2845,7 +2854,7 @@ Imported.NUUN_SceneFormation = true;
 
     Window_FormationBattleMember.prototype.drawFormationFace = function(actor, x, y, width, height) {
         if (_isActorPictureEXApp()) {
-            this.actorPictureEXDrawFace(x + 1, y + 1, width - 2, height - 2);
+            this.actorPictureEXDrawFace(actor, x + 1, y + 1, width - 2, height - 2);
         } else {
             this.drawActorFace(actor, x + 1, y + 1, width - 2, height - 2);
         }
@@ -3114,7 +3123,7 @@ Imported.NUUN_SceneFormation = true;
 
     Window_FormationMember.prototype.drawFormationFace = function(actor, x, y, width, height) {
         if (_isActorPictureEXApp()) {
-            this.actorPictureEXDrawFace(x + 1, y + 1, width - 2, height - 2);
+            this.actorPictureEXDrawFace(actor, x + 1, y + 1, width - 2, height - 2);
         } else {
             this.drawActorFace(actor, x + 1, y + 1, width - 2, height - 2);
         }
@@ -3272,6 +3281,11 @@ Imported.NUUN_SceneFormation = true;
         this._contentsData.drawStatusContents(this._actor);
     };
 
+    Window_FormationStatus.prototype.setupActorImg = function() {
+        if (this._actor) {
+            this._contentsData.imgSetup(this._actor);
+        }
+    };
 
     Window_FormationStatus.prototype.drawItemStatus = function() {
         this._contentsData.nuun_DrawStatusContents(this._actor);

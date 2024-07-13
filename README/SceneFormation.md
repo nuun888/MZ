@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.2.0.2
+# Ver.2.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,9 @@
 `Window_FormationStatus` アクターステータスウィンドウ  
 
 ## 更新履歴
+2024/7/13 Ver.2.0.3  
+立ち絵、顔グラ表示EXでの設定が適用されない問題を修正。  
+ターン制でメンバー交代を行い、コマンド選択するとエラーが出る問題を修正。  
 2024/6/30 Ver.2.0.2  
 固定アクターの背景色設定でエラーが出る問題を修正。  
 2024/6/23 Ver.2.0.1  

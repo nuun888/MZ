@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.18
+ * @version 3.12.19
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2024/7/14 Ver.3.12.19
+ * 顔グラが切り替わらない問題を修正。
  * 2024/7/13 Ver.3.12.18
  * コマンド選択を終了してもアクター画像が切り替わらなかった問題を修正。
  * 立ち絵、顔グラ表示EXの更新による修正。
@@ -403,6 +405,10 @@ function getActorWindowOrgWidth() {
 function actorWindowShiftWidth() {
     return params.PartyCommand_Width > 0 ? Math.min(params.PartyCommand_Width, Graphics.width) : 192;
 };
+
+function _getActorId() {
+    return BattleManager.isOnActorPictureEX() ? 'FaceIndex' : 'ImgIndex';
+}
 
 function loadBackground(img) {
   if (img) {
@@ -1081,12 +1087,12 @@ Game_Actor.prototype.actorGraphicName = function(data) {
 };
   
 Game_Actor.prototype.actorFaceIndex = function(data) {
-    return data && data.ImgIndex >= 0 ? data.ImgIndex : this.faceIndex();
+    const tag = _getActorId();
+    return data && data[tag] >= 0 ? data[tag] : this.faceIndex();
 };
 
 Game_Battler.prototype.batterImgIndex = function(data) {
     return -1;
-    //return data && data.ImgIndex >= 0 ? data.ImgIndex : -1;
 };
   
 Game_Battler.prototype.getBSImgName = function() {

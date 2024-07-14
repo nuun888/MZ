@@ -1,17 +1,17 @@
-# [バトルスタイル拡張設定用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
-# Ver.1.6.3
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEX.js)
+# [バトルスタイル拡張EX]
+# Ver.4.0.0  
+[ダウンロード]  
 #### 必須プラグイン
-[バトルスタイル拡張ベース](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md)  
-#### 競合パッチ
-木星ペンギン様の疑似３Dバトルと併用するときのパッチです。  
-[バトルスタイル拡張疑似３Dバトル併用パッチ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEXInMPP_Pseudo3DBattle.js)  
-ケケー様のスピードスターバトルと併用しフロントビューでアニメーションを表示するためのパッチです。  
-[バトルスタイル拡張スピードスターバトル併用](https://github.com/nuun888/MZ/blob/master/README/BSEX_Animation_KK_SSBattle.md)  
-
-戦闘レイアウト及び一部仕様を変更、拡張します。  
-このプラグインはレイアウト設定用のプラグインです。  
-バトルスタイルを変更するには「NUUN_BattleStyleEX_Base」をこのプラグインよりも下に配置してください。  
+[共通処理]   
+[ステータス項目ベース]   
+#### 対応プラグイン
+[立ち絵、顔グラ表示]   
+#### オプションプラグイン
+[戦闘中天候適用]   
+[バトラーのバトルフィールド表示]   
+[戦闘バイブレーション]   
+[アイテム、スキルウィンドウ背景画像]   
+[戦闘時メッセージ画像背景画像]   
 
 ## 設定方法
 ### 表示モードを指定

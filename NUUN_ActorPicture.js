@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.0
+ * @version 1.7.1
  * 
  * @help
  * 立ち絵、顔グラ画像を表示します。
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/15 Ver.1.7.1
+ * 特定のシーンを開くとエラーが出る問題を修正。。
  * 2024/7/13 Ver.1.7.0
  * 表示出来るクラスを指定できる機能を追加。
  * 2023/12/28 Ver.1.6.5
@@ -617,6 +619,19 @@ Imported.NUUN_ActorPicture = true;
         return false;
     };
 
+    function getActorGraphicName(data) {//廃止予定
+        const images = data.GraphicImg;
+        if (Array.isArray(images)) {
+            if (images.length > 1) {
+                return images[Math.randomInt(images.length)];
+            } else {
+                return images[0];
+            }
+        } else {
+            return images;
+        }
+    }
+
 
     NuunManager.getBattlerActors = function() {
         return params.ButlerActors;
@@ -645,11 +660,11 @@ Imported.NUUN_ActorPicture = true;
 
       
     Game_Actor.prototype.getActorGraphicList = function() {
-        return ButlerActors.find(data => condActorImg(data, this));
+        return params.ButlerActors.find(data => condActorImg(data, this));
     };
       
     Game_Actor.prototype.getActorGraphicIndex = function() {
-        return ButlerActors.findIndex(data => condActorImg(data, this));
+        return params.ButlerActors.findIndex(data => condActorImg(data, this));
     };
       
     Game_Actor.prototype.getActorGraphic = function() {
@@ -661,13 +676,16 @@ Imported.NUUN_ActorPicture = true;
         const data = this.getActorGraphicList();
         return data ? data.ButlerActorImg[this._actorGraphicIndex] : null;
     };
+
+    Game_Actor.prototype.imgRefresh = function() {
+        this.setActorGraphicData();
+    };
       
     Game_Actor.prototype.setActorGraphicData = function() {
         const imgData = this.getActorGraphicList();
         const index = imgData ? imgData.ButlerActorImg.findIndex(data => this.matchConditions(data)) : -1;
         this._actorGraphicIndex = index;
         if (index >= 0) {
-            this.setActorGraphicId();
             const data = imgData.ButlerActorImg[index];
             this._actorGraphicName = getActorGraphicName(data);
             this._actorGraphicFace = data.FaceImg || this.faceName();

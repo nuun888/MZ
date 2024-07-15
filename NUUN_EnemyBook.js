@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.21.1
+ * @version 2.21.2
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/15/2024 Ver.2.21.2
+ * Corrected the reference Y coordinate of the encyclopedia item.
  * 6/22/2024 Ver.2.21.1
  * Fixed an issue where item width was not applied wider than the width of a single item.
  * 6/16/2024 Ver.2.21.0
@@ -3022,7 +3024,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.21.1
+ * @version 2.21.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3243,7 +3245,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2024/6/16 Ver.2.21.1
+ * 2024/7/15 Ver.2.21.2
+ * 図鑑項目の基準Y座標を修正。
+ * 2024/6/22 Ver.2.21.1
  * 項目の横幅が1項目の横幅より広く適用されない問題を修正。
  * 2024/6/16 Ver.2.21.0
  * ソート機能対応に関する修正。
@@ -9375,7 +9379,7 @@ Window_EnemyBook.prototype.drawEnemyBookContents = function() {
         const y_Position = data.Y_Position;
         const position = Math.min(x_Position, this.itemContentsWidth());
         const x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1);
-        const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0) + padding;
+        const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
         const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : this.widthMode(data, itemWidth), rect.width - x);
         //data._width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, width) : Math.min(width, 128);
         this.dateDisplay(data, enemy, x + rect.x, y, width);

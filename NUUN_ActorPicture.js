@@ -8,14 +8,275 @@
  */ 
  /*:
  * @target MZ
+ * @plugindesc Actor Graphics, Face Graphics Display EX
+ * @author NUUN
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * @version 1.7.2
+ * 
+ * @help
+ * This is a plugin that processes the display of actor graphics and face graphics images.
+ * A compatible plugin is required to display them.
+ * Actor graphics and face graphics can be changed automatically depending on the conditions.
+ * 
+ * All conditions match
+ * An image will be displayed when all of the All Conditions Matched conditions are met.
+ * Conditions that are not set will not be judged and true will be returned.
+ * The priority of standing image and facial graphics display is judged from the top, and the first setting whose conditions are met will be applied.
+ * Set conditional standing image and facial graphics settings high in the list.
+ * 
+ * Condition setting
+ * Set by selecting some part in the change scene.
+ * 
+ * The index numbers of the face graphics are from the top left
+ * 0 1 2 3
+ * 4 5 6 7
+ * 8 9 10 11
+ * 12 13 14 15
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 7/16/2021 Ver.1.7.2
+ * Change display in languages ​​other than Japanese to English.
+ * 7/15/2021 Ver.1.7.1
+ * Fixed an issue where an error would occur when opening certain scenes.。
+ * 7/13/2024 Ver.1.7.0
+ * Added the ability to specify which classes can be displayed.
+ * 3/26/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * @param ButlerActors
+ * @text Display actor settings
+ * @desc Specifies the actor that will display the image.
+ * @type struct<ActorButlerList>[]
+ * @default []
+ * 
+ */
+/*~struct~ActorButlerList:
+ * 
+ * @param ImgName
+ * @text Actor Image Name
+ * @desc A name to distinguish the actor image.
+ * @type string
+ * @default
+ * 
+ * @param actorId
+ * @text Actor ID
+ * @desc Set the actor ID.
+ * @type actor
+ * @default 0
+ * 
+ * @param ClassId
+ * @text Class Id
+ * @desc Specifies the class. If a job ID is specified, this takes precedence.
+ * @type class
+ * @default 0
+ * 
+ * @param ButlerActorImg
+ * @text Image settings
+ * @desc Set the actor image.
+ * @type struct<ActorButlerImgList>[]
+ * @default []
+ * 
+ */
+/*~struct~ActorButlerImgList:
+ * 
+ * @param GraphicImg
+ * @text Actor Image
+ * @desc Set the actor image. If multiple images are specified, they will be displayed randomly.
+ * @type file[]
+ * @dir img/
+ * 
+ * @param FaceImg
+ * @text Face graphics image
+ * @desc Set the sprite sheet for the face graphic image.
+ * @type file
+ * @dir img/faces
+ * 
+ * @param FaceIndex
+ * @text Face Gra Index ID
+ * @desc he index ID of the face graphic.
+ * @type number
+ * @default -1
+ * @min -1
+ * 
+ * @param Opacity
+ * @text Image Opacity
+ * @desc Specifies the opacity of the image.
+ * @type number
+ * @default 255
+ * @min 0
+ * @max 255
+ * 
+ * @param AllMatch
+ * @text All conditions match
+ * @default ------------------------------
+ * 
+ * @param ImgHP
+ * @text Remaining HP
+ * @desc Changes when the remaining HP is within the specified range or numerical value.
+ * @type struct<CondValue>
+ * @default {"CondValid":"false","UpLimit":"0","DwLimit":"0"}
+ * @parent AllMatch
+ * 
+ * @param ImgSwitch
+ * @text Switch
+ * @desc Changes when all the specified switches are ON.
+ * @type switch[]
+ * @default
+ * @parent AllMatch
+ * 
+ * @param ImgWeapon
+ * @text Weapon
+ * @desc The condition is met when all of the specified weapons are equipped.
+ * @type weapon[]
+ * @default 
+ * @parent AllMatch
+ * 
+ * @param ImgArmor
+ * @text Armor
+ * @desc The condition is met when all of the specified armor is equipped.
+ * @type armor[]
+ * @default 
+ * @parent AllMatch
+ * 
+ * @param ImgClass
+ * @text Class
+ * @desc Certain professions qualify.
+ * @type class
+ * @default 0
+ * @parent AllMatch
+ * 
+ * @param ImgStateAll
+ * @text State
+ * @desc The condition is met when all of the specified states are applied.
+ * @type state[]
+ * @default 
+ * @parent AllMatch
+ * 
+ * @param FilteringClass
+ * @text Filtering class settings
+ * @desc Window class to apply. If not specified, it will be reflected in all windows. (Multiple specifications are possible)
+ * @type combo[]
+ * @option 'Scene_Battle'
+ * @option 'Scene_Menu'
+ * @option 'Scene_Status'
+ * @option 'Scene_Formation'
+ * @option 'Scene_Equip'
+ * @option 'Window_FormationStatus'
+ * @option 'Window_ItemMenuActor'
+ * @default []
+ * 
+ * @param ChangeGraphicScenes
+ * @text Changing scene
+ * @desc Select the graphic change scene.
+ * @type select
+ * @option Default
+ * @value 'default'
+ * @option Death
+ * @value 'death'
+ * @option Dying
+ * @value 'dying'
+ * @option Damage
+ * @value 'damage'
+ * @option Cridamage
+ * @value 'cridamage'
+ * @option Recovery
+ * @value 'recovery'
+ * @option Attack(1)
+ * @value 'attack'
+ * @option RecoverySkill(1)
+ * @value 'recoverySkill'
+ * @option UseItem(2)
+ * @value 'item'
+ * @option Counter
+ * @value 'counter'
+ * @option Reflection
+ * @value 'reflection'
+ * @option CounterEX(CounterExtend)(4)
+ * @value 'counterEX'
+ * @option Guard
+ * @value 'guard'
+ * @option Chant
+ * @value 'chant'
+ * @option Victory
+ * @value 'victory'
+ * @option State(3)
+ * @value 'state'
+ * @option Command Selection
+ * @value 'command'
+ * @option Final Attack (1) NUUN_FinalAttack required
+ * @value 'finalAttack'
+ * @default 'default'
+ * @parent AllMatch
+ * 
+ * @param CondSetting
+ * @text Condition setting
+ * @default ------------------------------
+ * 
+ * @param Skill
+ * @text Skill(1)
+ * @desc Select a skill. Applies when using any skill. Blank or none applies to all skills.
+ * @type skill[]
+ * @default
+ * @parent CondSetting
+ * 
+ * @param Item
+ * @text Item(2)
+ * @desc Select an item. Applies when using any item. Blank or None applies to all items.
+ * @type item[]
+ * @default
+ * @parent CondSetting
+ * 
+ * @param stateId
+ * @text Received state(3)
+ * @desc Select a state. Applies to all states.
+ * @type state[]
+ * @default 
+ * @parent CondSetting
+ * 
+ * @param Id
+ * @text Identification tag(4)
+ * @desc Specifies an identification tag. Applies when all identification tags are applicable.
+ * @type string[]
+ * @default 
+ * @parent CondSetting
+ * 
+ */
+/*~struct~CondValue:
+ * 
+ * @param CondValid
+ * @desc Activate the HP condition.
+ * @text HP condition valid
+ * @type boolean
+ * @default false
+ * 
+ * @param UpLimit
+ * @text Upper limit
+ * @desc Upper limit.
+ * @type number
+ * @default 0
+ * 
+ * @param DwLimit
+ * @text Lower limit
+ * @desc Lower limit.
+ * @type number
+ * @default 0
+ * 
+ */
+ /*:ja
+ * @target MZ
  * @plugindesc 立ち絵、顔グラ表示EX
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.1
+ * @version 1.7.2
  * 
  * @help
- * 立ち絵、顔グラ画像を表示します。
+ * アクターグラフィック、顔グラ画像を表示する処理を行うプラグインです。
+ * 表示されるには対応のプラグインが必要になります。
  * 立ち絵、顔グラは条件により自動的に変化させることができます。
  * 
  * 全条件一致
@@ -41,6 +302,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/16 Ver.1.7.2
+ * 日本語以外での表示を英語表示に変更。
  * 2024/7/15 Ver.1.7.1
  * 特定のシーンを開くとエラーが出る問題を修正。。
  * 2024/7/13 Ver.1.7.0
@@ -115,7 +378,7 @@
  * @default []
  * 
  */
-/*~struct~ActorButlerList:
+/*~struct~ActorButlerList:ja
  * 
  * @param actorId
  * @text アクターID
@@ -142,7 +405,7 @@
  * @default []
  * 
  */
-/*~struct~ActorButlerImgList:
+/*~struct~ActorButlerImgList:ja
  * 
  * @param GraphicImg
  * @text アクター画像
@@ -174,6 +437,13 @@
  * @param AllMatch
  * @text 全条件一致
  * @default ------------------------------
+ * 
+ * @param ImgHP
+ * @text 残りHP
+ * @desc 残りHPが指定の範囲内または数値の時に変化します。
+ * @type struct<CondValue>
+ * @default {"CondValid":"false","UpLimit":"0","DwLimit":"0"}
+ * @parent AllMatch
  * 
  * @param ImgSwitch
  * @text スイッチ
@@ -223,13 +493,6 @@
  * @option 'Window_ItemMenuActor'
  * @default []
  * 
- * @param ImgHP
- * @text 残りHP
- * @desc 残りHPが指定の範囲内または数値の時に変化します。
- * @type struct<CondValue>
- * @default {"CondValid":"false","UpLimit":"0","DwLimit":"0"}
- * @parent AllMatch
- * 
  * @param ChangeGraphicScenes
  * @text 変化シーン
  * @desc グラフィックの変化シーンを選択します。
@@ -268,6 +531,8 @@
  * @value 'state'
  * @option コマンド選択時
  * @value 'command'
+ * @option ファイナルアタック時(1) 要NUUN_FinalAttack
+ * @value 'finalAttack'
  * @default 'default'
  * @parent AllMatch
  * 
@@ -304,7 +569,7 @@
  * @parent CondSetting
  * 
  */
-/*~struct~CondValue:
+/*~struct~CondValue:ja
  * 
  * @param CondValid
  * @desc HP条件を有効にします。
@@ -536,7 +801,7 @@ Imported.NUUN_ActorPicture = true;
             return data && data.FaceIndex >= 0 ? data.FaceIndex : this._battler.faceIndex();
         }
 
-        getImgId(id) {console.log()
+        getImgId(id) {
             return this._battler.onImgId[id];
         }
 

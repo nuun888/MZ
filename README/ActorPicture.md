@@ -1,5 +1,5 @@
 # [立ち絵、顔グラ表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
-# Ver.1.7.1
+# Ver.1.7.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -49,6 +49,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2024/7/16 Ver.1.7.2  
+日本語以外での表示を英語表示に変更。  
 2024/7/15 Ver.1.7.1  
 特定のシーンを開くとエラーが出る問題を修正。  
 2024/7/13 Ver.1.7.0  

@@ -58,12 +58,6 @@ XP:XPのバトルレイアウトになります。フロントビューでアニ
 #### アクターコマンドの表示方法
 各アクターの上  
 ![画像](img/BattleStyleEX_ACActorTop.png)  
-SVアクターの上  
-![画像](img/BattleStyleEX_ACsvTop.png)  
-SVアクターの左  
-![画像](img/BattleStyleEX_ACsvLeft.png)  
-SVアクターの右  
-![画像](img/BattleStyleEX_ACsRight.png)  
 上部、中部、下部、アクターステータスウィンドウの上はパーティコマンドと同じです。  
 
 #### コマンド可変表示

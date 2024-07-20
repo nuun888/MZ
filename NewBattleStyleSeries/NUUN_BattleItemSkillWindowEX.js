@@ -19,6 +19,11 @@
  * Customize the item and skill window during battle.
  * This plugin is an extension plugin for Battle Style EX.
  * 
+ * Notes for items and skills
+ * <BattleHelp:[text]>
+ * [text]: Help text
+ * If the above tag is not present, help for database settings will be displayed.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
@@ -304,6 +309,11 @@
  * @help
  * 戦闘中のアイテム、スキルウィンドウをカスタマイズします。
  * このプラグインはバトルスタイル拡張EXの拡張プラグインです。
+ * 
+ * アイテム、スキルのメモ欄
+ * <BattleHelp:[text]>
+ * [text]:ヘルプテキスト
+ * 上記のタグがない場合は、データベースの設定のヘルプが表示されます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。

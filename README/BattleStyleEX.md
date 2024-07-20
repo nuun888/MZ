@@ -7,7 +7,7 @@
 #### 対応プラグイン
 [立ち絵、顔グラ表示](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md)   
 #### オプションプラグイン
-[敵の条件画像変更Ver.4.0.0用]   
+[敵の条件画像変更](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)   
 [戦闘中天候適用]   
 [バトラーのバトルフィールド表示]   
 [戦闘バイブレーション]   

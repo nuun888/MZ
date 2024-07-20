@@ -18,6 +18,7 @@
  * 
  * @help
  * You can change and customize the battle layout.
+ * 
  * This plugin also implements the following features:
  * Battle window customization.
  * Actor animation in the front view.
@@ -108,8 +109,8 @@
  * @type combo
  * @option 'Default'
  * @option 'List'
+ * @option 'List_NoTP'
  * @option 'XP'
- * @option 'Triangle'
  * @default 'Default'
  * @parent BattleLayoutSetting
  * 
@@ -1998,8 +1999,8 @@
  * @type combo
  * @option 'Default'
  * @option 'List'
+ * @option 'List_NoTP'
  * @option 'XP'
- * @option 'Triangle'
  * @default 'Default'
  * @parent BattleLayoutSetting
  * 

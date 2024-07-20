@@ -13,7 +13,6 @@
 [バトルアイテム、スキルウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
 [バトラーのバトルフィールド表示]   
 [戦闘バイブレーション]   
-[アイテム、スキルウィンドウ背景画像]   
 [戦闘時メッセージ画像背景画像]   
 
 ## 設定方法

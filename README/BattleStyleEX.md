@@ -138,4 +138,9 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 フロントビューアニメーションでアクターへの一部のアニメーションの表示がおかしくなる場合は'Sprite'を指定してください。  
 問題ない場合、サイドビュー戦闘の場合は'Scene_Battle'に指定しても問題ありません。  
 
+## オプションプラグイン
+### 敵の条件画像変更  
+条件により敵の画像を変更します。  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
+
 ## 更新履歴

@@ -18,7 +18,7 @@
  * 
  * @help
  * Weather conditions are applied even during battle.
- * This plugin is an extension plugin for Battle Style Expansion EX (Ver.4.0.0 or later).
+ * This plugin is an extension plugin for Battle Style EX.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
@@ -61,7 +61,7 @@
  * 
  * @help
  * 戦闘中でも天候を適用します。
- * このプラグインはバトルスタイル拡張EX(Ver.4.0.0以降)の拡張プラグインです。
+ * このプラグインはバトルスタイル拡張EXの拡張プラグインです。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。

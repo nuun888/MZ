@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.4.1
+# Ver.2.4.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -41,6 +41,8 @@ d:アクターのデータベースデータ
 ※右クリックはページ切り替えのみです。戻す機能は実装しておりません。  
 
 ## 更新履歴
+2024/7/20 Ver.2.4.2  
+リザルトを再処理しないように修正。  
 2024/6/16 Ver.2.4.1  
 入手アイテム及び盗めたアイテムで別の同じIDの個数の表示が加算される問題を修正。  
 2024/5/26 Ver.2.4.0  

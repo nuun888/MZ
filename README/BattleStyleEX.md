@@ -46,6 +46,14 @@ XP:XPのバトルレイアウトになります。フロントビューでアニ
 ![画像](img/BattleStyleEX_ACCenter.png)  
 
 #### パーティコマンドの表示方法
+上部  
+![画像](img/BattleStyleEX_PCTop.png)  
+中部  
+![画像](img/BattleStyleEX_PCMiddle.png)  
+下部  
+![画像](img/BattleStyleEX_PCUnder.png)  
+アクターステータスウィンドウの上  
+![画像](img/BattleStyleEX_PCStatusTop.png)  
 
 #### アクターコマンドの表示方法
 

@@ -1,11 +1,11 @@
-# [バトルスタイル拡張EX]
+# [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
 # Ver.1.0.0  
-[ダウンロード]  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 必須プラグイン
-[共通処理]   
-[ステータス項目ベース]   
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+[ステータス項目ベース](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)  
 #### 対応プラグイン
-[立ち絵、顔グラ表示]   
+[立ち絵、顔グラ表示](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md)   
 #### オプションプラグイン
 [敵の条件画像変更Ver.4.0.0用]   
 [戦闘中天候適用]   

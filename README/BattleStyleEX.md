@@ -10,6 +10,7 @@
 [敵の条件画像変更](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)   
 [戦闘中天候適用](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleWeather.js)   
 [バトルエネミーウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemySelectWindow.js)   
+[バトルアイテム、スキルウィンドウカスタマイズ]   
 [バトラーのバトルフィールド表示]   
 [戦闘バイブレーション]   
 [アイテム、スキルウィンドウ背景画像]   

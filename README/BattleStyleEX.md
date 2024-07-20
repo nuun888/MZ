@@ -8,7 +8,8 @@
 [立ち絵、顔グラ表示](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md)   
 #### オプションプラグイン
 [敵の条件画像変更](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)   
-[戦闘中天候適用]   
+[戦闘中天候適用](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleWeather.js)   
+[バトルエネミーウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemySelectWindow.js)   
 [バトラーのバトルフィールド表示]   
 [戦闘バイブレーション]   
 [アイテム、スキルウィンドウ背景画像]   
@@ -142,5 +143,13 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 ### 敵の条件画像変更  
 条件により敵の画像を変更します。  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)  
+### 戦闘中天候適用  
+天候の変化を戦闘中でも適用します。  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleWeather.js)  
+### バトルエネミーウィンドウカスタマイズ  
+敵対象選択画面をカスタマイズします。  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemySelectWindow.js)   
 
 ## 更新履歴
+2024/7/20 Ver.1.0.0  
+初版  

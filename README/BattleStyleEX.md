@@ -141,6 +141,6 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 ## オプションプラグイン
 ### 敵の条件画像変更  
 条件により敵の画像を変更します。  
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)  
 
 ## 更新履歴

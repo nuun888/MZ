@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_BS_ActorStatusWindowVisible.js
+ * NUUN_BattleWeather.js
  * 
  * Copyright (C) 2024 NUUN
  * This software is released under the MIT License.

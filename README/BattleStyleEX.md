@@ -38,9 +38,12 @@ XP:XPのバトルレイアウトになります。フロントビューでアニ
 下基準  
 ![画像](img/BattleStyleEX_ASUnder.png)  
 #### アクターステータスウィンドウのコンテンツの横方向表示方法
-左寄り
-右寄り
-中央
+左寄り  
+![画像](img/BattleStyleEX_ACLeft.png)  
+右寄り  
+![画像](img/BattleStyleEX_ACRight.png)  
+中央  
+![画像](img/BattleStyleEX_ACCenter.png)  
 
 #### パーティコマンドの表示方法
 

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.1
+ * @version 2.4.2
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -60,6 +60,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/7/20 Ver.2.4.2
+ * Fixed to not reprocess results.
  * 2024/6/16 Ver.2.4.1
  * Fixed an issue where the number of obtained and stolen items with the same ID was displayed as increments.
  * 2024/5/26 Ver.2.4.0
@@ -2311,7 +2313,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.1
+ * @version 2.4.2
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2359,6 +2361,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/20 Ver.2.4.2
+ * リザルトを再処理しないように修正。
  * 2024/6/16 Ver.2.4.1
  * 入手アイテム及び盗めたアイテムで別の同じIDの個数の表示が加算される問題を修正。
  * 2024/5/26 Ver.2.4.0
@@ -7082,13 +7086,16 @@ BattleManager.startResultBusy = function() {
 
 const _BattleManager_processVictory = BattleManager.processVictory;
 BattleManager.processVictory = function() {
+    if (this._resultOn) {
+        return;
+    }
     if (this.startResultBusy()) {
         this._resultOn = true;
         this.resultUserData();
         if (this.resultBusy === 0) {
-        _BattleManager_processVictory.call(this);
-        this.resultEndUserData();
-        return;
+            _BattleManager_processVictory.call(this);
+            this.resultEndUserData();
+            return;
         }
         this.displayVictoryNoBusy();
     }

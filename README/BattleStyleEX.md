@@ -27,16 +27,16 @@ XP:XPのバトルレイアウトになります。フロントビューでアニ
 ### バトルレイアウト設定
 #### アクターステータスウィンドウの横方向表示方法
 左寄り
-
+![画像](img/BattleStyleEX_ASLeft.png)  
 右寄り
-
+![画像](img/BattleStyleEX_ASRight.png)  
 中央
-
+![画像](img/BattleStyleEX_ASCenter.png)  
 #### アクターステータスウィンドウの縦方向表示方法
 上基準
-
+![画像](img/BattleStyleEX_ASTop.png)  
 下基準
-
+![画像](img/BattleStyleEX_ASUnder.png)  
 #### アクターステータスウィンドウのコンテンツの横方向表示方法
 左寄り
 右寄り

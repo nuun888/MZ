@@ -56,7 +56,7 @@ XP:XPのバトルレイアウトになります。フロントビューでアニ
 ![画像](img/BattleStyleEX_PCStatusTop.png)  
 
 #### アクターコマンドの表示方法
-各アクターの上
+各アクターの上  
 ![画像](img/BattleStyleEX_ACActorTop.png)  
 SVアクターの上  
 ![画像](img/BattleStyleEX_ACsvTop.png)  

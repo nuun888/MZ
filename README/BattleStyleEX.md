@@ -154,7 +154,7 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
 
 ## 更新履歴
-2024/7/21 Ver.1.0.1
+2024/7/21 Ver.1.0.1  
 アクターステータスウィンドウがちらつく問題を修正。  
 戦闘終了時にスタックする問題を修正。  
 2024/7/20 Ver.1.0.0  

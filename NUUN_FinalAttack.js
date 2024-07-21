@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.5
+ * @version 1.1.6
  * 
  * @help
  * Implement final attack.
@@ -27,6 +27,8 @@
  * If the final attack interrupts with two or more actions, the action ends at that point.
  * 
  * Log
+ * 7/21/2024 Ver.1.1.6
+ * Fixed an issue where an error would occur when using an item on an actor from the menu screen.
  * 7/13/2024 Ver.1.1.5
  * Fixed some plugin conflicts.
  * Fixed the timing of skill selection for Final Attack.
@@ -100,7 +102,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.5
+ * @version 1.1.6
  * 
  * @help
  * ファイナルアタックを実装します。
@@ -116,6 +118,8 @@
  * イベントコマンドから戦闘不能にした場合はファイナルアタックを発動しません。
  * 
  * 更新履歴
+ * 2024/7/21 Ver.1.1.6
+ * メニュー画面からアクターに対しアイテムを使用するとエラーが出る問題を修正。
  * 2024/7/13 Ver.1.1.5
  * 一部プラグインでの競合対応。
  * ファイナルアタックのスキル選定のタイミングを修正。
@@ -279,6 +283,9 @@ BattleManager.isFinalAttack = function() {
 
 BattleManager.isFinalAttackCostConsumption = function() {
     const subject = this._subject;
+    if (!subject) {
+        return true;
+    }
     const action = subject.currentAction();
     return action && action.finalAttackSkill ? action.isCostConsumption() : true;
 };

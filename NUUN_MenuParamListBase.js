@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/21/2024 Ver.1.1.0
+ * Fixed an issue where an error would occur when specifying a name.
  * 7/13/2024 Ver.1.0.2
  * Fixed the issue where the settings in "NUUN_ActorPicture" were not applied.
  * 6/22/2024 Ver.1.0.1
@@ -113,7 +115,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.1.0
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -124,6 +126,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/21 Ver.1.1.0
+ * 名称のみを指定するとエラーが出る問題を修正。
  * 2024/7/13 Ver.1.0.2
  * 立ち絵、顔グラ共通プラグインでの設定が適用されなかった問題を修正。
  * 2024/6/22 Ver.1.0.1
@@ -304,7 +308,7 @@ Imported.NUUN_MenuParamListBase = true;
 
         drawItemBackground(index) {
             const actor = this._window.actor(index);
-            const data = this.getActorImgData(actor, true);console.log(data)
+            const data = this.getActorImgData(actor, true);
             if (data && data.ActorBackImg) {
                 const bitmap = ImageManager.nuun_LoadPictures(data.ActorBackImg);
                 if (bitmap) {
@@ -497,6 +501,15 @@ Imported.NUUN_MenuParamListBase = true;
                             bitmap = loadBitmap;
                         }
                         break;
+                    case "IndividualImges":
+                        const dataImg = this.getItemImg(data, this.getObject(actor));
+                        if (dataImg) {
+                            loadBitmap = ImageManager.nuun_LoadPictures(dataImg[0])
+                            if (loadBitmap && !loadBitmap.isReady()) {
+                                bitmap = loadBitmap;
+                            }
+                        }
+                        break;
                     case "Charchip":
                         loadBitmap = ImageManager.loadCharacter(actor.characterName());
                         if (loadBitmap && !loadBitmap.isReady()) {
@@ -510,6 +523,9 @@ Imported.NUUN_MenuParamListBase = true;
                         }
                         break;
                     }
+            }
+            if (actor && this.isActor(actor)) {//test
+                return bitmap;
             }
             loadBitmap = this.getFaceImg(actor);
             if (loadBitmap && !loadBitmap.isReady()) {
@@ -532,6 +548,10 @@ Imported.NUUN_MenuParamListBase = true;
                 }
             }
             return bitmap;
+        }
+
+        isActor(actor) {
+            return !actor.isActor;
         }
     
         drawItemContentsParams(index) {//コンテンツ背景内の項目用
@@ -577,15 +597,15 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         nuun_DrawContentsBase(data, x, y, width, actor) {
-            if (this.nuun_IsContents(data, actor)) {
+            if (actor && this.nuun_IsContents(data, actor)) {
                 this.setTepmData(data, this._exParams);
                 const method = 'nuun_DrawContents' + data.DateSelect;
-                try {
+                //try {
                     this[method](data, x, y, width, actor);
-                } catch (error) {
-                    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                    throw ["DataError", log];
-                }
+                //} catch (error) {
+                //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+                //    throw ["DataError", log];
+                //}
             }
         }
     
@@ -680,7 +700,7 @@ Imported.NUUN_MenuParamListBase = true;
             w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
             w.changeTextColor(NuunManager.getColorCode(data.NameColor));
             const nameText = data.ParamName ? data.ParamName : '';
-            this.nuun_setContentsFontFace(data);
+            this.nuun_SetContentsFontFace(data);
             w.drawText(nameText, x, y, width, data.Align);
         }
 
@@ -894,8 +914,8 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         nuun_DrawContentsOrgGauge(data, x, y, width, actor) {
-            this.setTempType(data.GaugeID);
-            this.nuun_PlaceGauge(actor, data.GaugeID, x, y, "actor%1-gauge-%2");
+            this.setTempType(data.GaugeID || data.ParamID);
+            this.nuun_PlaceGauge(actor, data.GaugeID || data.ParamID, x, y, "actor%1-gauge-%2");
         }
     
         nuun_DrawContentsExpInfo(data, x, y, width, actor) {
@@ -954,6 +974,10 @@ Imported.NUUN_MenuParamListBase = true;
     
         nuun_DrawContentsImges(data, x, y, width, actor) {
             this.nuun_DrawImg(data, x, y, actor);
+        }
+
+        nuun_DrawContentsIndividualImges(data, x, y, width, actor) {
+            this.nuun_DrawItemImg(data, x, y, width, actor);
         }
     
         nuun_DrawContentsHp(data, x, y, width, actor) {
@@ -1245,6 +1269,24 @@ Imported.NUUN_MenuParamListBase = true;
             textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
             w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
         }
+
+        nuun_DrawDesc(data, param, x, y, width, actor) {
+            const nameText = data.paramName;
+            if (nameText) {
+                w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+                w.drawText(nameText, x, y);
+                y += w.lineHeight();
+            }
+            this.resetTextColor();
+            let text = "";
+            const method = data.TextMethod;
+            if (method) {
+                text = item.meta[method];
+            }
+            if(text){
+                w.drawTextEx(text, x, y, width);
+            }
+        }
     
         nuun_DrawSvActorImg(data, x, y, width, actor, fmt) {
             const key = fmt.format(actor.actorId());
@@ -1282,10 +1324,56 @@ Imported.NUUN_MenuParamListBase = true;
         nuun_DrawImg(data, x, y, actor) {
             const w = this._window;
             if (data.ImgData) {
-                const rect = w.itemRect(0);
                 const bitmap = ImageManager.nuun_LoadPictures(data.ImgData);
-                w.contents.blt(bitmap, 0, 0, rect.width, rect.height, x - w.colSpacing(), y - w.itemPadding());
+                if (data.ImgMaxHeight && data.ImgMaxHeight > 0) {
+                    this.drawImg(bitmap, data, x, y, width);
+                } else {
+                    const rect = w.itemRect(0);
+                    w.contents.blt(bitmap, 0, 0, rect.width, rect.height, x - w.colSpacing(), y - w.itemPadding());
+                }
             }
+        }
+
+        nuun_DrawItemImg(data, x, y, width, actor) {
+            const dataImg = this.getItemImg(data, this.getObject(actor));
+            if (dataImg) {
+                const w = this._window;
+                const bitmap = ImageManager.nuun_LoadPictures(dataImg[0]);
+                x += Number(dataImg[1]) || 0;
+                y += Number(dataImg[2]) || 0;
+                if (data.ImgMaxHeight > 0) {
+                    this.drawImg(bitmap, data, x, y, width);
+                } else {
+                    const rect = w.itemRect(0);
+                    w.contents.blt(bitmap, 0, 0, rect.width, rect.height, x - w.colSpacing(), y - w.itemPadding());
+                }
+            }
+        }
+ 
+        drawImg(bitmap, data, x, y, width) {
+            const w = this._window;
+            const rect = w.itemRect(0);
+            const height = (data.ImgMaxHeight * w.lineHeight()) || rect.height;
+            const scalex = Math.min(1.0, width / bitmap.width);
+            const scaley = Math.min(1.0, height / bitmap.height);
+            const scale = scalex > scaley ? scaley : scalex;
+            const dw = Math.floor(bitmap.width * scale);
+            const dh = Math.floor(bitmap.height * scale);
+            x += Math.floor(width / 2 - dw / 2);
+            w.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
+        }
+
+        getObject(actor) {
+            return actor.actor();
+        }
+
+        getItemImg(data, object) {
+            if (object && object.meta[data.TextMethod]) {
+                const arr = object.meta[data.TextMethod].split(',');
+                arr[0] = "pictures" +"/"+ arr[0].trim();
+                return arr;
+            }
+            return null;
         }
 
         drawActorFront(actor, rect) {

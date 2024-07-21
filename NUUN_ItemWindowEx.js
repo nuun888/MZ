@@ -14,16 +14,42 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * You can customize the item screen.
  * The item screen during battle is not supported.
  * 
+ * Item Info
+ * NUUN_MenuParamListBase Ver.1.1.0 or later
+ * 
+ * Specifying the display item list
+ * Notes for items, weapons, and armor
+ * <ItemParamListId:[id]> Specifies the list ID for the item info item settings. If not specified, item number 1 in the list will be displayed.
+ * The item info window is not displayed by default.
+ * 
+ * Description field, individual image specification
+ * Notes for items, weapons, and armor
+ * Desc
+ * <[Method]:[text]> 
+ * [Method]:The method name entered in the Description field, individual image method name.
+ * [text]:Display Text
+ * 
+ * Common Imges
+ *  <[Method]:[filePass], [x], [y]> 
+ * [Method]:The method name entered in the Description field, individual image method name.
+ * [filePass]:File names directly under img/pictures
+ * [x]:X coordinate
+ * [y]:Y coordinate
+ * Please remove the brackets [] and fill in.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/21/2024 Ver.1.1.0
+ * Added the ability to display item info.
+ * Fixed an incorrect description of window opacity.
  * 7/13/2024 Ver.1.0.1
  * Fixed the issue where the settings in "NUUN_ActorPicture" were not applied.
  * 6/16/2024 Ver.1.0.0
@@ -69,8 +95,8 @@
  * @parent HelpWindowSetting
  * 
  * @param HelpWindowVisible
- * @text Make help window transparent
- * @desc Make the help window transparent.
+ * @text Help window opacity
+ * @desc Makes the help window opaque.
  * @type boolean
  * @default true
  * @parent HelpWindowSetting
@@ -128,11 +154,97 @@
  * @parent CategoryWindowSetting
  * 
  * @param CategoryWindowVisible
- * @text Make category window transparent
- * @desc Make the category window transparent.
+ * @text Category window opacity
+ * @desc Make the category window opaque.
  * @type boolean
  * @default true
  * @parent CategoryWindowSetting
+ * 
+ * @param ItemInfoWindowSetting
+ * @text Item Info Settings
+ * @default ------------------------------
+ * 
+ * @param ShowItemInfo
+ * @text Item Info Display
+ * @desc Displays the item info window.
+ * @type boolean
+ * @default false
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ActorWindowShowItemInfo
+ * @text Displaying item info when selecting an actor
+ * @desc Displays the item info window when an actor is selected.
+ * @type boolean
+ * @default false
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoParamList
+ * @desc Set the item info item. Items without a list designation will display list number 1.
+ * @text Item Info Item Settings
+ * @type struct<ItemInfoList>[]
+ * @default 
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param WeaponInfoParamList
+ * @desc Set the item of the item info weapon. If the weapon does not have a list specified, the first item on the list will be displayed.
+ * @text Item Info Weapon Item Settings
+ * @type struct<WeaponInfoList>[]
+ * @default 
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ArmorInfoParamList
+ * @desc Set the item of the item info armor. For armor without a list specification, the first item on the list will be displayed.
+ * @text Item Info Armor Item Settings
+ * @type struct<ArmorInfoList>[]
+ * @default 
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowX
+ * @text Item window X coordinate.
+ * @desc Item window X coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowY
+ * @desc Item window Y coordinate.
+ * @text Item window Y coordinate
+ * @type number
+ * @default 68
+ * @min -9999
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowWidth
+ * @desc Item window width. 0 is UI width.
+ * @text Item window width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowHeight
+ * @text Item window height
+ * @desc Height of item window. 0 is main area height
+ * @type number
+ * @default 400
+ * @min 0
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowHeightRows
+ * @text Item Window Height
+ * @desc Item window height (number of rows) 0 specifies ItemInfoWindowHeight
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowVisible
+ * @text Item info window opacity
+ * @desc Makes the item info window opaque.
+ * @type boolean
+ * @default true
+ * @parent ItemInfoWindowSetting
  * 
  * @param ItemWindowSetting
  * @text Item Window Settings
@@ -187,8 +299,8 @@
  * @parent ItemWindowSetting
  * 
  * @param ItemWindowVisible
- * @text Make item window transparent
- * @desc Makes the item window transparent.
+ * @text Item window opacity
+ * @desc Make item window opaque.
  * @type boolean
  * @default true
  * @parent ItemWindowSetting
@@ -260,8 +372,8 @@
  * @parent ActorStatusWindowSetting
  * 
  * @param ActorWindowVisible
- * @text Make actor window transparent.
- * @desc Makes the actor window transparent.
+ * @text Actor window opacity
+ * @desc Makes the actor window opaque.
  * @type boolean
  * @default true
  * @parent ActorStatusWindowSetting
@@ -563,7 +675,7 @@
  * @default 2
  * @min -99
  * 
- * @@param DetaEval
+ * @param DetaEval
  * @desc Enter an evaluation formula or string.
  * @text Evaluation formula or string(javaScript)(16)
  * @type combo
@@ -765,6 +877,712 @@
  * @default 
  * 
  */
+/*~struct~ItemInfoList:
+ * 
+ * @param ItemInfoParams
+ * @desc Set the item info items.
+ * @text Item Info Item Settings
+ * @type struct<ItemInfoListData>[]
+ * @default 
+ * 
+ */
+/*~struct~WeaponInfoList:
+ * 
+ * @param WeaponInfoParams
+ * @desc Item Info Sets the weapon item.
+ * @text Item Info Weapon Item Settings
+ * @type struct<WeaponInfoListData>[]
+ * @default 
+ * 
+ */
+/*~struct~ArmorInfoList:
+ * 
+ * @param ArmorInfoParams
+ * @desc Item Info Set the armor item.
+ * @text Item Info Armor Item Settings
+ * @type struct<ArmorInfoListData>[]
+ * @default 
+ * 
+ */
+/*~struct~ItemInfoListData:
+ *
+ * @param DateSelect
+ * @text Items to display
+ * @desc Specify the items to display.
+ * @type select
+ * @option None
+ * @value None
+ * @option Name(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value Name
+ * @option Item name(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value ItemName
+ * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)(17)(18)
+ * @value OrgParam
+ * @option Price(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Price
+ * @option Consumption(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value Consumption
+ * @option Possession(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Num
+ * @option Max possession(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value MaxNum
+ * @option Occasion(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value Occasion
+ * @option Speed(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Speed
+ * @option Success rate(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Success
+ * @option Consumption rate(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value ConsumptionRate
+ * @option Common imges(1)(2)(3)(4)(25)(26)
+ * @value Imges
+ * @option IndividualImges(1)(2)(3)(4)(25)(26)(28)
+ * @value IndividualImges
+ * @option Free text(1)(2)(3)(4)(35)
+ * @value Freetext
+ * @option Line(1)(2)(3)(4)(5)(8)
+ * @value HorzLine
+ * @option Desc(1)(2)(3)(4)(6)(7)(8)(28)
+ * @value Desc
+ * @default None
+ * 
+ * @param X_Position
+ * @text X display col position(1)
+ * @desc X display col position
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 1
+ * 
+ * @param Y_Position
+ * @desc Y display row position
+ * @text Y display row position(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X coordinate (relative)(3)
+ * @desc X coordinate (relative coordinate from X display col position)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y coordinate (relative)(4)
+ * @desc Y coordinate (relative coordinate from Y display row position)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc Item, gauge width(0 for default width)
+ * @text Item, gauge width(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc Width of item name (default width at 0)
+ * @text Width of item name(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc Set the item name.
+ * @text Name(7)
+ * @type string
+ * @default
+ * 
+ * @param NameColor
+ * @desc System color ID for system items. You can enter the color code in the text tab.
+ * @text Name color(8)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param Align
+ * @desc Align.
+ * @text Align(9)
+ * @type select
+ * @option Left
+ * @value 'left'
+ * @option Right
+ * @value 'right'
+ * @option Center
+ * @value 'center'
+ * @default 'left'
+ * 
+ * @param paramUnit
+ * @desc Set the units.
+ * @text Unit(10)
+ * @type string
+ * @default 
+ * 
+ * @param FontSize
+ * @desc Font size (difference from main font)
+ * @text Font size(11)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param FontFace
+ * @desc Sets the font for item names.
+ * @text Item name font(12)
+ * @type string
+ * @default 
+ * 
+ * @param ValueFontFace
+ * @desc Sets the font for parameter text.
+ * @text Parameter font(13)
+ * @type string
+ * @default 
+ * 
+ * @param Icon
+ * @desc Set the icon.
+ * @text Icon(14)
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @desc Specifies the Y coordinate to adjust the icon (relative).
+ * @text Icon adjustment Y coordinate(15)
+ * @type number
+ * @default 2
+ * @min -99
+ * 
+ * @param DetaEval
+ * @desc Enter an evaluation formula or string.
+ * @text Evaluation formula or string(javaScript)(16)
+ * @type combo
+ * @option '$gameVariables.value(0);//Game variable'
+ * @option 'item;//Item data'
+ * @default 
+ * 
+ * @param Back
+ * @text Content background display(17)
+ * @desc Shows the content background.
+ * @type boolean
+ * @default false
+ * 
+ * @param Decimal
+ * @text Number of decimal places(18)
+ * @desc The number of decimal places that can be displayed.
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
+ * @param TextMethod
+ * @desc Description field, method name to link to image (individually specified image)
+ * @text Description field, individual image method name (28)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param ImgSetting
+ * @text Image settings
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc Specifies the image to display.
+ * @text Image(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param ImgMaxHeight
+ * @desc Maximum image height (specified in number of rows) 0 for no shrinking
+ * @text Maximum image height(26)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ImgSetting
+ * 
+ * @param OtherSetting
+ * @text Other settings
+ * @default ------------------------------
+ * 
+ * @param Text
+ * @desc Enter the text of the free text. (Text code can be used)
+ * @text Free text text(35)
+ * @type multiline_string
+ * @default
+ * @parent OtherSetting
+ * 
+ * @param CondSetting
+ * @text Display condition settings
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc Specify the conditions under which the item will be displayed. (JavaScript)
+ * @text Item conditions
+ * @type combo
+ * @option '$gameVariables.value(0);//Game variable'
+ * @default 
+ *
+ */
+/*~struct~WeaponInfoListData:
+ *
+ * @param DateSelect
+ * @text Items to display
+ * @desc Specify the items to display.
+ * @type select
+ * @option None
+ * @value None
+ * @option Name(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value Name
+ * @option Item name(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value ItemName
+ * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)(17)(18)
+ * @value OrgParam
+ * @option Price(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Price
+ * @option Possession(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Num
+ * @option Max possession(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value MaxNum
+ * @option Weapon type(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value Type
+ * @option Atk(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Atk
+ * @option Def(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Def
+ * @option Mat(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Mat
+ * @option Mdf(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Mdf
+ * @option Agi(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Agi
+ * @option Luk(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Luk
+ * @option Common imges(1)(2)(3)(4)(25)(26)
+ * @value Imges
+ * @option IndividualImges(1)(2)(3)(4)(25)(26)(28)
+ * @value IndividualImges
+ * @option Free text(1)(2)(3)(4)(35)
+ * @value Freetext
+ * @option Line(1)(2)(3)(4)(5)(8)
+ * @value HorzLine
+ * @option Desc(1)(2)(3)(4)(6)(7)(8)(28)
+ * @value Desc
+ * @default None
+ * 
+ * @param X_Position
+ * @text X display col position(1)
+ * @desc X display col position
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 1
+ * 
+ * @param Y_Position
+ * @desc Y display row position
+ * @text Y display row position(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X coordinate (relative)(3)
+ * @desc X coordinate (relative coordinate from X display col position)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y coordinate (relative)(4)
+ * @desc Y coordinate (relative coordinate from Y display row position)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc Item, gauge width(0 for default width)
+ * @text Item, gauge width(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc Width of item name (default width at 0)
+ * @text Width of item name(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc Set the item name.
+ * @text Name(7)
+ * @type string
+ * @default
+ * 
+ * @param NameColor
+ * @desc System color ID for system items. You can enter the color code in the text tab.
+ * @text Name color(8)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param Align
+ * @desc Align.
+ * @text Align(9)
+ * @type select
+ * @option Left
+ * @value 'left'
+ * @option Right
+ * @value 'right'
+ * @option Center
+ * @value 'center'
+ * @default 'left'
+ * 
+ * @param paramUnit
+ * @desc Set the units.
+ * @text Unit(10)
+ * @type string
+ * @default 
+ * 
+ * @param FontSize
+ * @desc Font size (difference from main font)
+ * @text Font size(11)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param FontFace
+ * @desc Sets the font for item names.
+ * @text Item name font(12)
+ * @type string
+ * @default 
+ * 
+ * @param ValueFontFace
+ * @desc Sets the font for parameter text.
+ * @text Parameter font(13)
+ * @type string
+ * @default 
+ * 
+ * @param Icon
+ * @desc Set the icon.
+ * @text Icon(14)
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @desc Specifies the Y coordinate to adjust the icon (relative).
+ * @text Icon adjustment Y coordinate(15)
+ * @type number
+ * @default 2
+ * @min -99
+ * 
+ * @param DetaEval
+ * @desc Enter an evaluation formula or string.
+ * @text Evaluation formula or string(javaScript)(16)
+ * @type combo
+ * @option '$gameVariables.value(0);//Game variable'
+ * @option 'item;//Item data'
+ * @default 
+ * 
+ * @param Back
+ * @text Content background display(17)
+ * @desc Shows the content background.
+ * @type boolean
+ * @default false
+ * 
+ * @param Decimal
+ * @text Number of decimal places(18)
+ * @desc The number of decimal places that can be displayed.
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
+ * @param TextMethod
+ * @desc Description field, method name to link to image (individually specified image)
+ * @text Description field, individual image method name (28)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param ImgSetting
+ * @text Image settings
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc Specifies the image to display.
+ * @text Image(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param ImgMaxHeight
+ * @desc Maximum image height (specified in number of rows) 0 for no shrinking
+ * @text Maximum image height(26)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ImgSetting
+ * 
+ * @param OtherSetting
+ * @text Other settings
+ * @default ------------------------------
+ * 
+ * @param Text
+ * @desc Enter the text of the free text. (Text code can be used)
+ * @text Free text text(35)
+ * @type multiline_string
+ * @default
+ * @parent OtherSetting
+ * 
+ * @param CondSetting
+ * @text Display condition settings
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc Specify the conditions under which the item will be displayed. (JavaScript)
+ * @text Item conditions
+ * @type combo
+ * @option '$gameVariables.value(0);//Game variable'
+ * @default 
+ *
+ */
+/*~struct~ArmorInfoListData:
+ *
+ * @param DateSelect
+ * @text Items to display
+ * @desc Specify the items to display.
+ * @type select
+ * @option None
+ * @value None
+ * @option Name(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value Name
+ * @option Item name(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value ItemName
+ * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)(17)(18)
+ * @value OrgParam
+ * @option Price(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Price
+ * @option Possession(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Num
+ * @option Max possession(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value MaxNum
+ * @option Armor Type(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value Type
+ * @option Equipment Type(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value EquipType
+ * @option Atk(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Atk
+ * @option Def(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Def
+ * @option Mat(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Mat
+ * @option Mdf(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Mdf
+ * @option Agi(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Agi
+ * @option Luk(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Luk
+ * @option Common imges(1)(2)(3)(4)(25)(26)
+ * @value Imges
+ * @option IndividualImges(1)(2)(3)(4)(25)(26)(28)
+ * @value IndividualImges
+ * @option Free text(1)(2)(3)(4)(35)
+ * @value Freetext
+ * @option Line(1)(2)(3)(4)(5)(8)
+ * @value HorzLine
+ * @option Desc(1)(2)(3)(4)(6)(7)(8)(28)
+ * @value Desc
+ * @default None
+ * 
+ * @param X_Position
+ * @text X display col position(1)
+ * @desc X display col position
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 1
+ * 
+ * @param Y_Position
+ * @desc Y display row position
+ * @text Y display row position(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X coordinate (relative)(3)
+ * @desc X coordinate (relative coordinate from X display col position)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y coordinate (relative)(4)
+ * @desc Y coordinate (relative coordinate from Y display row position)
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc Item, gauge width(0 for default width)
+ * @text Item, gauge width(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc Width of item name (default width at 0)
+ * @text Width of item name(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc Set the item name.
+ * @text Name(7)
+ * @type string
+ * @default
+ * 
+ * @param NameColor
+ * @desc System color ID for system items. You can enter the color code in the text tab.
+ * @text Name color(8)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param Align
+ * @desc Align.
+ * @text Align(9)
+ * @type select
+ * @option Left
+ * @value 'left'
+ * @option Right
+ * @value 'right'
+ * @option Center
+ * @value 'center'
+ * @default 'left'
+ * 
+ * @param paramUnit
+ * @desc Set the units.
+ * @text Unit(10)
+ * @type string
+ * @default 
+ * 
+ * @param FontSize
+ * @desc Font size (difference from main font)
+ * @text Font size(11)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param FontFace
+ * @desc Sets the font for item names.
+ * @text Item name font(12)
+ * @type string
+ * @default 
+ * 
+ * @param ValueFontFace
+ * @desc Sets the font for parameter text.
+ * @text Parameter font(13)
+ * @type string
+ * @default 
+ * 
+ * @param Icon
+ * @desc Set the icon.
+ * @text Icon(14)
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @desc Specifies the Y coordinate to adjust the icon (relative).
+ * @text Icon adjustment Y coordinate(15)
+ * @type number
+ * @default 2
+ * @min -99
+ * 
+ * @param DetaEval
+ * @desc Enter an evaluation formula or string.
+ * @text Evaluation formula or string(javaScript)(16)
+ * @type combo
+ * @option '$gameVariables.value(0);//Game variable'
+ * @option 'item;//Item data'
+ * @default 
+ * 
+ * @param Back
+ * @text Content background display(17)
+ * @desc Shows the content background.
+ * @type boolean
+ * @default false
+ * 
+ * @param Decimal
+ * @text Number of decimal places(18)
+ * @desc The number of decimal places that can be displayed.
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
+ * @param TextMethod
+ * @desc Description field, method name to link to image (individually specified image)
+ * @text Description field, individual image method name (28)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param ImgSetting
+ * @text Image settings
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc Specifies the image to display.
+ * @text Image(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param ImgMaxHeight
+ * @desc Maximum image height (specified in number of rows) 0 for no shrinking
+ * @text Maximum image height(26)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ImgSetting
+ * 
+ * @param OtherSetting
+ * @text Other settings
+ * @default ------------------------------
+ * 
+ * @param Text
+ * @desc Enter the text of the free text. (Text code can be used)
+ * @text Free text text(35)
+ * @type multiline_string
+ * @default
+ * @parent OtherSetting
+ * 
+ * @param CondSetting
+ * @text Display condition settings
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc Specify the conditions under which the item will be displayed. (JavaScript)
+ * @text Item conditions
+ * @type combo
+ * @option '$gameVariables.value(0);//Game variable'
+ * @default 
+ *
+ */
 /*:ja
  * @target MZ
  * @plugindesc アイテムウィンドウカスタマイズ
@@ -773,17 +1591,42 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * アイテム画面をカスタマイズできます。
  * 戦闘中のアイテム画面には対応しておりません。
- *  
+ * 
+ * アイテムインフォ
+ * NUUN_MenuParamListBase Ver.1.1.0以降
+ * 表示項目リストの指定
+ * アイテム、武器、防具のメモ欄
+ * <ItemParamListId:[id]> アイテムインフォ項目設定のリストIDを指定します。指定がない場合はリスト番号1番の項目が表示されます。
+ * 
+ * アイテムインフォウィンドウは初期設定では表示されません。
+ * 
+ * 記述欄、個別画像指定
+ * アイテム、武器、防具のメモ欄
+ * 記述欄
+ * <[Method]:[text]> 
+ * [Method]:記述欄、個別指定画像タグ名で記入したタグ名。
+ * [text]:表示テキスト
+ * 
+ * 個別画像指定
+ *  <[Method]:[filePass], [x], [y]> 
+ * [Method]:記述欄、個別指定画像タグ名で記入したタグ名。
+ * [filePass]:img/pictures直下のファイル名
+ * [x]:X座標
+ * [y]:Y座標
+ * []は外して記入して下さい。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/21 Ver.1.1.0
+ * アイテムインフォを表示できる機能を追加。
+ * ウィンドウの不透明化の説明が間違っていたため修正。
  * 2024/7/13 Ver.1.0.1
  * 立ち絵、顔グラ共通プラグインでの設定が適用されなかった問題を修正。
  * 2024/6/16 Ver.1.0.0
@@ -830,8 +1673,8 @@
  * @parent HelpWindowSetting
  * 
  * @param HelpWindowVisible
- * @text ヘルプウィンドウ透明化
- * @desc ヘルプウィンドウを透明化する。
+ * @text ヘルプウィンドウ不透明化
+ * @desc ヘルプウィンドウを不透明化する。
  * @type boolean
  * @default true
  * @parent HelpWindowSetting
@@ -889,8 +1732,8 @@
  * @parent CategoryWindowSetting
  * 
  * @param CategoryWindowVisible
- * @text カテゴリーウィンドウ透明化
- * @desc カテゴリーウィンドウを透明化する。
+ * @text カテゴリーウィンドウ不透明化
+ * @desc カテゴリーウィンドウを不透明化する。
  * @type boolean
  * @default true
  * @parent CategoryWindowSetting
@@ -948,11 +1791,97 @@
  * @parent ItemWindowSetting
  * 
  * @param ItemWindowVisible
- * @text アイテムウィンドウ透明化
- * @desc アイテムウィンドウを透明化する。
+ * @text アイテムウィンドウ不透明化
+ * @desc アイテムウィンドウを不透明化する。
  * @type boolean
  * @default true
  * @parent ItemWindowSetting
+ * 
+ * @param ItemInfoWindowSetting
+ * @text アイテムインフォ設定
+ * @default ------------------------------
+ * 
+ * @param ShowItemInfo
+ * @text アイテムインフォ表示
+ * @desc アイテムインフォウィンドウを表示します。
+ * @type boolean
+ * @default false
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ActorWindowShowItemInfo
+ * @text アクター選択時のアイテムインフォ表示
+ * @desc アクター選択時にアイテムインフォウィンドウを表示します。
+ * @type boolean
+ * @default false
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoParamList
+ * @desc アイテムインフォの項目を設定します。リスト指定のないアイテムはリスト1番が表示されます。
+ * @text アイテムインフォ項目設定
+ * @type struct<ItemInfoList>[]
+ * @default 
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param WeaponInfoParamList
+ * @desc アイテムインフォ武器の項目を設定します。リスト指定のない武器はリスト1番が表示されます。
+ * @text アイテムインフォ武器項目設定
+ * @type struct<WeaponInfoList>[]
+ * @default 
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ArmorInfoParamList
+ * @desc アイテムインフォ防具の項目を設定します。リスト指定のない防具はリスト1番が表示されます。
+ * @text アイテムインフォ防具項目設定
+ * @type struct<ArmorInfoList>[]
+ * @default 
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowX
+ * @text アイテムウィンドウX座標
+ * @desc アイテムウィンドウのX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowY
+ * @desc アイテムウィンドウのY座標
+ * @text アイテムウィンドウY座標
+ * @type number
+ * @default 68
+ * @min -9999
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowWidth
+ * @desc アイテムウィンドウの横幅。0でUI幅
+ * @text アイテムウィンドウ横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowHeight
+ * @text アイテムウィンドウ縦幅
+ * @desc アイテムウィンドウの縦幅。0でメインエリア高さ
+ * @type number
+ * @default 400
+ * @min 0
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowHeightRows
+ * @text アイテムウィンドウ高さ
+ * @desc アイテムウィンドウの高さ(行数指定) 0でItemInfoWindowHeight指定
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ItemInfoWindowSetting
+ * 
+ * @param ItemInfoWindowVisible
+ * @text アイテムインフォウィンドウ不透明化
+ * @desc アイテムインフォウィンドウを不透明化する。
+ * @type boolean
+ * @default true
+ * @parent ItemInfoWindowSetting
  * 
  * @param ActorStatusWindowSetting
  * @text アクターウィンドウ設定
@@ -1021,8 +1950,8 @@
  * @parent ActorStatusWindowSetting
  * 
  * @param ActorWindowVisible
- * @text アクターウィンドウ透明化
- * @desc アクターウィンドウを透明化します。
+ * @text アクターウィンドウ不透明化
+ * @desc アクターウィンドウを不透明化します。
  * @type boolean
  * @default true
  * @parent ActorStatusWindowSetting
@@ -1526,6 +2455,712 @@
  * @default 
  * 
  */
+/*~struct~ItemInfoList:ja
+ * 
+ * @param ItemInfoParams
+ * @desc アイテムインフォの項目を設定します。
+ * @text アイテムインフォ項目設定
+ * @type struct<ItemInfoListData>[]
+ * @default 
+ * 
+ */
+/*~struct~WeaponInfoList:ja
+ * 
+ * @param WeaponInfoParams
+ * @desc アイテムインフォ武器の項目を設定します。
+ * @text アイテムインフォ武器項目設定
+ * @type struct<WeaponInfoListData>[]
+ * @default 
+ * 
+ */
+/*~struct~ArmorInfoList:ja
+ * 
+ * @param ArmorInfoParams
+ * @desc アイテムインフォ防具の項目を設定します。
+ * @text アイテムインフォ防具項目設定
+ * @type struct<ArmorInfoListData>[]
+ * @default 
+ * 
+ */
+/*~struct~ItemInfoListData:ja
+ *
+ * @param DateSelect
+ * @text 表示する項目
+ * @desc 表示する項目を指定します。
+ * @type select
+ * @option なし
+ * @value None
+ * @option 名称のみ(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value Name
+ * @option アイテム名(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value ItemName
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)(17)(18)
+ * @value OrgParam
+ * @option 価格(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Price
+ * @option 消耗(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value Consumption
+ * @option 所持数(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Num
+ * @option 最大所持数(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value MaxNum
+ * @option 使用可能時(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value Occasion
+ * @option 速度補正(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Speed
+ * @option 成功率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Success
+ * @option 消耗率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value ConsumptionRate
+ * @option 画像（共通画像）(1)(2)(3)(4)(25)(26)
+ * @value Imges
+ * @option 画像（個別指定画像）(1)(2)(3)(4)(25)(26)(28)
+ * @value IndividualImges
+ * @option フリーテキスト(1)(2)(3)(4)(35)
+ * @value Freetext
+ * @option ライン(1)(2)(3)(4)(5)(8)
+ * @value HorzLine
+ * @option 記述欄(1)(2)(3)(4)(6)(7)(8)(28)
+ * @value Desc
+ * @default None
+ * 
+ * @param X_Position
+ * @text X表示列位置(1)
+ * @desc X表示列位置
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 4
+ * 
+ * @param Y_Position
+ * @desc Y表示行位置
+ * @text Y表示行位置(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X座標（相対）(3)
+ * @desc X座標（X表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y座標（相対）(4)
+ * @desc Y座標（Y表示行位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc 項目、ゲージ横幅（0でデフォルト幅）
+ * @text 項目、ゲージ横幅(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc 項目名称の横幅（0でデフォルト幅）
+ * @text 項目名称横幅(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc 項目の名称を設定します。
+ * @text 名称(7)
+ * @type string
+ * @default
+ * 
+ * @param NameColor
+ * @desc 項目名称のシステムカラーID。テキストタブでカラーコードを入力できます。
+ * @text 項目名称文字色(8)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param Align
+ * @desc 文字揃え。
+ * @text 文字揃え(9)
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @option 中央
+ * @value 'center'
+ * @default 'left'
+ * 
+ * @param paramUnit
+ * @desc 単位を設定します。
+ * @text 単位(10)
+ * @type string
+ * @default 
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(11)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param FontFace
+ * @desc 項目名称のフォントを設定します。
+ * @text 項目名称フォント(12)
+ * @type string
+ * @default 
+ * 
+ * @param ValueFontFace
+ * @desc 数値のフォントを設定します。
+ * @text 数値フォント(13)
+ * @type string
+ * @default 
+ * 
+ * @param Icon
+ * @desc アイコンを設定します。
+ * @text アイコン(14)
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @desc アイコンを調整するY座標を指定します。(相対)
+ * @text アイコン調整Y座標(15)
+ * @type number
+ * @default 2
+ * @min -99
+ * 
+ * @param DetaEval
+ * @desc 評価式または文字列を記入します。
+ * @text 評価式or文字列(javaScript)(16)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'item;//アイテムデータ'
+ * @default 
+ * 
+ * @param Back
+ * @text コンテンツ背景表示(17)
+ * @desc コンテンツ背景を表示させます。
+ * @type boolean
+ * @default false
+ * 
+ * @param Decimal
+ * @text 小数点桁数(18)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
+ * @param TextMethod
+ * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
+ * @text 記述欄、個別指定画像タグ名(28)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param ImgSetting
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc 表示する画像を指定します。
+ * @text 画像(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param ImgMaxHeight
+ * @desc 画像の最大縦幅（行数で指定）0で縮小無し
+ * @text 画像の最大縦幅(26)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ImgSetting
+ * 
+ * @param OtherSetting
+ * @text その他設定
+ * @default ------------------------------
+ * 
+ * @param Text
+ * @desc フリーテキストのテキストを記入します。(制御文字使用可能)
+ * @text フリーテキストのテキスト(35)
+ * @type multiline_string
+ * @default
+ * @parent OtherSetting
+ * 
+ * @param CondSetting
+ * @text 表示条件設定
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc 項目が表示される条件を指定します。(JavaScript)
+ * @text 項目条件(all)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @default 
+ *
+ */
+/*~struct~WeaponInfoListData:ja
+ *
+ * @param DateSelect
+ * @text 表示する項目
+ * @desc 表示する項目を指定します。
+ * @type select
+ * @option なし
+ * @value None
+ * @option 名称のみ(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value Name
+ * @option アイテム名(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value ItemName
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)(17)(18)
+ * @value OrgParam
+ * @option 価格(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Price
+ * @option 所持数(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Num
+ * @option 最大所持数(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value MaxNum
+ * @option 武器タイプ(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value Type
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Atk
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Def
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Mat
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Mdf
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Agi
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Luk
+ * @option 画像（共通画像）(1)(2)(3)(4)(25)(26)
+ * @value Imges
+ * @option 画像（個別指定画像）(1)(2)(3)(4)(25)(26)(28)
+ * @value IndividualImges
+ * @option フリーテキスト(1)(2)(3)(4)(35)
+ * @value Freetext
+ * @option ライン(1)(2)(3)(4)(5)(8)
+ * @value HorzLine
+ * @option 記述欄(1)(2)(3)(4)(6)(7)(8)(28)
+ * @value Desc
+ * @default None
+ * 
+ * @param X_Position
+ * @text X表示列位置(1)
+ * @desc X表示列位置
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 4
+ * 
+ * @param Y_Position
+ * @desc Y表示行位置
+ * @text Y表示行位置(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X座標（相対）(3)
+ * @desc X座標（X表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y座標（相対）(4)
+ * @desc Y座標（Y表示行位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc 項目、ゲージ横幅（0でデフォルト幅）
+ * @text 項目、ゲージ横幅(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc 項目名称の横幅（0でデフォルト幅）
+ * @text 項目名称横幅(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc 項目の名称を設定します。
+ * @text 名称(7)
+ * @type string
+ * @default
+ * 
+ * @param NameColor
+ * @desc 項目名称のシステムカラーID。テキストタブでカラーコードを入力できます。
+ * @text 項目名称文字色(8)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param Align
+ * @desc 文字揃え。
+ * @text 文字揃え(9)
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @option 中央
+ * @value 'center'
+ * @default 'left'
+ * 
+ * @param paramUnit
+ * @desc 単位を設定します。
+ * @text 単位(10)
+ * @type string
+ * @default 
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(11)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param FontFace
+ * @desc 項目名称のフォントを設定します。
+ * @text 項目名称フォント(12)
+ * @type string
+ * @default 
+ * 
+ * @param ValueFontFace
+ * @desc 数値のフォントを設定します。
+ * @text 数値フォント(13)
+ * @type string
+ * @default 
+ * 
+ * @param Icon
+ * @desc アイコンを設定します。
+ * @text アイコン(14)
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @desc アイコンを調整するY座標を指定します。(相対)
+ * @text アイコン調整Y座標(15)
+ * @type number
+ * @default 2
+ * @min -99
+ * 
+ * @param DetaEval
+ * @desc 評価式または文字列を記入します。
+ * @text 評価式or文字列(javaScript)(16)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'item;//アイテムデータ'
+ * @default 
+ * 
+ * @param Back
+ * @text コンテンツ背景表示(17)
+ * @desc コンテンツ背景を表示させます。
+ * @type boolean
+ * @default false
+ * 
+ * @param Decimal
+ * @text 小数点桁数(18)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
+ * @param TextMethod
+ * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
+ * @text 記述欄、個別指定画像タグ名(28)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param ImgSetting
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc 表示する画像を指定します。
+ * @text 画像(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param ImgMaxHeight
+ * @desc 画像の最大縦幅（行数で指定）0で縮小無し
+ * @text 画像の最大縦幅(26)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ImgSetting
+ * 
+ * @param OtherSetting
+ * @text その他設定
+ * @default ------------------------------
+ * 
+ * @param Text
+ * @desc フリーテキストのテキストを記入します。(制御文字使用可能)
+ * @text フリーテキストのテキスト(35)
+ * @type multiline_string
+ * @default
+ * @parent OtherSetting
+ * 
+ * @param CondSetting
+ * @text 表示条件設定
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc 項目が表示される条件を指定します。(JavaScript)
+ * @text 項目条件(all)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @default 
+ *
+ */
+/*~struct~ArmorInfoListData:ja
+ *
+ * @param DateSelect
+ * @text 表示する項目
+ * @desc 表示する項目を指定します。
+ * @type select
+ * @option なし
+ * @value None
+ * @option 名称のみ(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value Name
+ * @option アイテム名(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value ItemName
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)(17)(18)
+ * @value OrgParam
+ * @option 価格(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Price
+ * @option 所持数(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value Num
+ * @option 最大所持数(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value MaxNum
+ * @option 防具タイプ(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value Type
+ * @option 装備タイプ(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)(12)(13)(14)(15)(17)
+ * @value EquipType
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Atk
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Def
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Mat
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Mdf
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Agi
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)(18)
+ * @value Luk
+ * @option 画像（共通画像）(1)(2)(3)(4)(25)(26)
+ * @value Imges
+ * @option 画像（個別指定画像）(1)(2)(3)(4)(25)(26)(28)
+ * @value IndividualImges
+ * @option フリーテキスト(1)(2)(3)(4)(35)
+ * @value Freetext
+ * @option ライン(1)(2)(3)(4)(5)(8)
+ * @value HorzLine
+ * @option 記述欄(1)(2)(3)(4)(6)(7)(8)(28)
+ * @value Desc
+ * @default None
+ * 
+ * @param X_Position
+ * @text X表示列位置(1)
+ * @desc X表示列位置
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 4
+ * 
+ * @param Y_Position
+ * @desc Y表示行位置
+ * @text Y表示行位置(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X座標（相対）(3)
+ * @desc X座標（X表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y座標（相対）(4)
+ * @desc Y座標（Y表示行位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc 項目、ゲージ横幅（0でデフォルト幅）
+ * @text 項目、ゲージ横幅(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc 項目名称の横幅（0でデフォルト幅）
+ * @text 項目名称横幅(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc 項目の名称を設定します。
+ * @text 名称(7)
+ * @type string
+ * @default
+ * 
+ * @param NameColor
+ * @desc 項目名称のシステムカラーID。テキストタブでカラーコードを入力できます。
+ * @text 項目名称文字色(8)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param Align
+ * @desc 文字揃え。
+ * @text 文字揃え(9)
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @option 中央
+ * @value 'center'
+ * @default 'left'
+ * 
+ * @param paramUnit
+ * @desc 単位を設定します。
+ * @text 単位(10)
+ * @type string
+ * @default 
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(11)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param FontFace
+ * @desc 項目名称のフォントを設定します。
+ * @text 項目名称フォント(12)
+ * @type string
+ * @default 
+ * 
+ * @param ValueFontFace
+ * @desc 数値のフォントを設定します。
+ * @text 数値フォント(13)
+ * @type string
+ * @default 
+ * 
+ * @param Icon
+ * @desc アイコンを設定します。
+ * @text アイコン(14)
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @desc アイコンを調整するY座標を指定します。(相対)
+ * @text アイコン調整Y座標(15)
+ * @type number
+ * @default 2
+ * @min -99
+ * 
+ * @param DetaEval
+ * @desc 評価式または文字列を記入します。
+ * @text 評価式or文字列(javaScript)(16)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'item;//アイテムデータ'
+ * @default 
+ * 
+ * @param Back
+ * @text コンテンツ背景表示(17)
+ * @desc コンテンツ背景を表示させます。
+ * @type boolean
+ * @default false
+ * 
+ * @param Decimal
+ * @text 小数点桁数(18)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
+ * @param TextMethod
+ * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
+ * @text 記述欄、個別指定画像タグ名(28)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param ImgSetting
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc 表示する画像を指定します。
+ * @text 画像(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param ImgMaxHeight
+ * @desc 画像の最大縦幅（行数で指定）0で縮小無し
+ * @text 画像の最大縦幅(26)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ImgSetting
+ * 
+ * @param OtherSetting
+ * @text その他設定
+ * @default ------------------------------
+ * 
+ * @param Text
+ * @desc フリーテキストのテキストを記入します。(制御文字使用可能)
+ * @text フリーテキストのテキスト(35)
+ * @type multiline_string
+ * @default
+ * @parent OtherSetting
+ * 
+ * @param CondSetting
+ * @text 表示条件設定
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc 項目が表示される条件を指定します。(JavaScript)
+ * @text 項目条件(all)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @default 
+ *
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_ItemWindowEx = true;
@@ -1534,6 +3169,13 @@ Imported.NUUN_ItemWindowEx = true;
     const params = Nuun_PluginParams.getPluginParams(document.currentScript);
 
     const parameters = PluginManager.parameters('NUUN_ItemWindowEx');
+
+    const _Scene_Item_create = Scene_Item.prototype.create;
+    Scene_Item.prototype.create = function() {
+        _Scene_Item_create.call(this);
+        this.createItemInfoWindow();
+        this.setWindowOpacity();
+    };
 
     Scene_Item.prototype.createActorWindow = function() {
         const rect = this.actorWindowRect();
@@ -1544,9 +3186,16 @@ Imported.NUUN_ItemWindowEx = true;
     };
     
     Scene_Item.prototype.createItemInfoWindow = function() {
-        const rect = this.itemInfoWindowRect();
-        this._itemInfoWindow = new Window_ItemInfo(rect);
-        this.addWindow(this._itemInfoWindow);
+        if (params.ShowItemInfo) {
+            const rect = this.itemInfoWindowRect();
+            this._itemInfoWindow = new Window_ItemInfo(rect);
+            this.addWindow(this._itemInfoWindow);
+            this._itemWindow.setItemInfoWindow(this._itemInfoWindow);
+            this._categoryWindow.setItemInfoWindow(this._itemInfoWindow);
+            if (!params.ActorWindowShowItemInfo && this._actorWindow.active && this._actorWindow.visible) {
+                this._itemInfoWindow.hide();
+            }
+        }
     };
 
     Scene_Item.prototype.actorWindowRect = function() {Scene_ItemBase.prototype.actorWindowRect
@@ -1600,6 +3249,9 @@ Imported.NUUN_ItemWindowEx = true;
     Scene_Item.prototype.showActorWindow = function() {
         this._actorWindow.show();
         this._actorWindow.activate();
+        if (!params.ActorWindowShowItemInfo && this._itemInfoWindow && this._actorWindow.active) {
+            this._itemInfoWindow.hide();
+        }
     };
 
 
@@ -1611,12 +3263,9 @@ Imported.NUUN_ItemWindowEx = true;
         } else {
             _Scene_Item_hideActorWindow.apply(this, arguments);
         }
-    };
-
-    const _Scene_Item_create = Scene_Item.prototype.create;
-    Scene_Item.prototype.create = function() {
-        _Scene_Item_create.call(this);
-        this.setWindowOpacity();
+        if (this._itemInfoWindow && (!this._actorWindow.active || !this._actorWindow.visible)) {
+            this._itemInfoWindow.show();
+        }
     };
 
     Scene_Item.prototype.setWindowOpacity = function() {
@@ -1631,6 +3280,9 @@ Imported.NUUN_ItemWindowEx = true;
         }
         if (!params.ActorWindowVisible) {
             this._actorWindow.opacity = 0;
+        }
+        if (this._itemInfoWindow && !params.ItemInfoWindowVisible) {
+            this._itemInfoWindow.opacity = 0;
         }
     };
 
@@ -1659,6 +3311,20 @@ Imported.NUUN_ItemWindowEx = true;
         }
     };
 
+    const _Scene_Item_update = Scene_Item.prototype.update;
+    Scene_Item.prototype.update = function() {
+        _Scene_Item_update.apply(this, arguments);
+    };
+
+    Window_Selectable.prototype.setItemInfoWindow = function(_window) {
+        this._itemInfoWindow = _window;
+    };
+
+    Window_Selectable.prototype.setInfoWindowItem = function(item) {
+        if (this._itemInfoWindow) {
+            this._itemInfoWindow.setItem(item);
+        }
+    };
 
     Window_ItemCategory.prototype.maxCols = function() {
         return params.CategoryWindowCols;
@@ -1667,6 +3333,18 @@ Imported.NUUN_ItemWindowEx = true;
 
     Window_ItemList.prototype.maxCols = function() {
         return params.ItemWindowCols;
+    };
+
+    const _Window_Selectable_updateHelp = Window_Selectable.prototype.updateHelp;
+    Window_Selectable.prototype.updateHelp = function() {
+        _Window_Selectable_updateHelp.apply(this, arguments);
+        this.setInfoWindowItem(null);
+    };
+
+    const _Window_ItemList_updateHelp = Window_ItemList.prototype.updateHelp;
+    Window_ItemList.prototype.updateHelp = function() {
+        _Window_ItemList_updateHelp.apply(this, arguments);
+        this.setInfoWindowItem(this.item());
     };
 
 
@@ -1737,8 +3415,18 @@ Imported.NUUN_ItemWindowEx = true;
         Window_StatusBase.prototype.initialize.call(this, rect);
     };
 
+    Window_ItemInfo.prototype.itemHeight = function() {
+        return this.innerHeight;
+    };
+
+    Window_ItemInfo.prototype.setItem = function(item) {
+        this._contentsData.setItem(item);
+        this.refresh();
+    };
+
     Window_ItemInfo.prototype.refresh = function() {
-        this._contentsData.setItem(this._item);
+        this.contents.clear();
+        this._contentsData.refresh();
     };
 
     class Nuun_DrawMenuActorListData extends Nuun_DrawListData {
@@ -1779,11 +3467,415 @@ Imported.NUUN_ItemWindowEx = true;
 
         setItem(item) {
             this._item = item;
-            refresh();
+            this.itemSetList(item);
+        }
+
+        itemSetList(item) {
+            const id = item && item.meta.ItemParamListId && Number(item.meta.ItemParamListId) > 0 ? Number(item.meta.ItemParamListId) - 1 : 0
+            try {
+                if (DataManager.isItem(item)) {
+                    this.setList(params.ItemInfoParamList[id].ItemInfoParams);
+                } else if (DataManager.isWeapon(item)) {
+                    this.setList(params.WeaponInfoParamList[id].WeaponInfoParams);
+                } else if (DataManager.isArmor(item)) {
+                    this.setList(params.ArmorInfoParamList[id].ArmorInfoParams);
+                }
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "パラメータが設定されていません。" : "Parameter not set.");
+                throw ["ParameterError", log];
+            }
         }
 
         refresh() {
-            this.drawItemParams(this._item)
+            this.drawStatusContents(this._item)
+        }
+
+        drawItemImg(actor, index) {
+            
+        }
+
+        nuun_IsContents(data, item) {
+            if (!!data.Conditions) {
+                return eval(data.Conditions);
+            }
+            return true;
+        }
+
+        nuun_DrawContentsItemName(data, x, y, width, item) {
+            const w = this._window;
+            const icon = data.Icon && data.Icon > 0 ? data.Icon : item.iconIndex;
+            const iconY = y + (w.lineHeight() - ImageManager.iconHeight) / 2 + (data.IconY || 0);
+            const textMargin = ImageManager.iconWidth + 4;
+            const itemWidth = Math.max(0, width - textMargin);
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            w.drawIcon(icon, x, iconY);
+            w.drawText(item.name, x + textMargin, y, itemWidth, data.Align);
+        }
+
+        nuun_DrawContentsPrice(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : (this.language_Jp ? "価格" : "Price");
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : item.price);
+            w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+        }
+
+        nuun_DrawContentsConsumption(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : (this.language_Jp ? "消耗" : "Consumption");
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : this.consumableText(item));
+            w.drawText(textParam, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+        }
+
+        nuun_DrawContentsNum(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : (this.language_Jp ? "所持数" : "Num");
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : $gameParty.numItems(item));
+            w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+        }
+
+        nuun_DrawContentsMaxNum(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : (this.language_Jp ? "最大所持数" : "Max Num");
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : $gameParty.maxItems(item));
+            w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+        }
+
+        nuun_DrawContentsOccasion(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : (this.language_Jp ? "使用可能時" : "Occasion");
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : this.useItemOccasionName(item));
+            w.drawText(textParam, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+        }
+
+        nuun_DrawContentsSpeed(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : (this.language_Jp ? "速度補正" : "Speed");
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : item.speed);
+            w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+        }
+
+        nuun_DrawContentsSuccess(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : (this.language_Jp ? "成功率" : "Success Rate");
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : item.successRate);
+            w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+        }
+
+        nuun_DrawContentsOrgParam(data, x, y, width, item) {
+            const w = this._window;
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            this.nuun_SetContentsFontFace(data);
+            const nameText = data.ParamName ? data.ParamName : '';
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            if (data.DetaEval) {
+                this.nuun_SetContentsValueFontFace(data);
+                const padding = textWidth > 0 ? w.itemPadding() : 0;
+                w.nuun_DrawContentsParamUnitText(this.getStatusEvalParam(param, item), data, x + textWidth + padding, y, width - (textWidth + padding));
+            }
+        }
+
+        nuun_DrawParams(data, param, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = this.nuun_ParamNameData(data, param);
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : item.params[param]);
+            w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+        }
+
+        nuun_DrawContentsType(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : this.getTypeText(item);
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : this.typeIdText(item));
+            w.drawText(textParam, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+        }
+
+        nuun_DrawContentsEquipType(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : (this.language_Jp ? "装備タイプ" : "Equip Type");
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : this.equipTypeIdText(item));
+            w.drawText(textParam, x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+        }
+
+        nuun_DrawContentsConsumptionRate(data, x, y, width, item) {
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : (this.language_Jp ? "消耗率" : "Consumption Rate");
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : this.consumptionRateText(item));
+            w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+        }
+
+        getObject(item) {
+            return item;
+        }
+
+        useItemOccasionName(item) {
+            const occasion = item.occasion;
+            if (occasion === 0) {
+                return this.language_Jp ? "常時" : "Always";
+            } else if (occasion === 1) {
+                return this.language_Jp ? "戦闘時" : "Battle Screen";
+            } else if (occasion === 2) {
+                return this.language_Jp ? "移動時" : "Menu Screen";
+            } else {
+                return this.language_Jp ? "使用不可" : "Never";
+            }
+        }
+
+        consumableText(item) {
+            if (item.consumable) {
+                return this.language_Jp ? "消耗" : "Consumable";
+            } else {
+                return this.language_Jp ? "消耗なし" : "Not consumable";
+            }
+        }
+
+        getTypeText(item) {
+            if (DataManager.isWeapon(item)) {
+                return this.language_Jp ? "武器タイプ" : "Weapon Type";
+            } else if (DataManager.isArmor(item)) {
+                return this.language_Jp ? "防具タイプ" : "Armor Type";
+            }
+        }
+
+        equipTypeIdText(item) {
+            return $dataSystem.equipTypes[item.etypeId];
+        }
+
+        typeIdText(item) {
+            if (DataManager.isWeapon(item)) {
+                return $dataSystem.weaponTypes[item.wtypeId]
+            } else if (DataManager.isArmor(item)) {
+                return $dataSystem.armorTypes[item.atypeId]
+            }
+        }
+
+        consumptionRateText(item) {
+            if (item.consumable) {
+                return item.meta.ConsumptionRate || 100;
+            } else {
+                return 0;
+            }
         }
 
     };

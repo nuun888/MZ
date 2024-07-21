@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * Extend the counter.
@@ -62,6 +62,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/21/2024 Ver.1.2.1
+ * If no counter skill is set, the counterattack skill will be counterattacked with skill ID 1.
+ * Fixed an issue where reflection was not working.
  * 8/23/2023 Ver.1.2.0
  * Added ability to counterattack against specific skills and items.
  * 7/17/2023 Ver.1.1.4
@@ -327,7 +330,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1s
  * 
  * @help
  * カウンターを拡張します。
@@ -378,6 +381,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/21 Ver.1.2.1
+ * カウンタースキルが設定されていない場合、反撃スキルをスキルID1番で反撃するように修正。
+ * 反射が機能していなかった問題を修正。
  * 2023/8/23 Ver.1.2.0
  * 特定のスキル、アイテムに反撃する機能を追加。
  * 2023/7/17 Ver.1.1.4
@@ -1036,7 +1042,7 @@ Imported.NUUN_CounterEX = true;
             if (this.isCounterAction(target, trait, subject, counter)) {
                 this._counterBattlerList.push(target);
                 return;
-            };//CounterTriggerSkills
+            };
         } else if (trigger === 'Skill' && isTriggerSkill(counter, this._action) && Math.random() < this._action.itemUseSkillEx(target, counter)) {
             if (this.isCounterAction(target, trait, subject, counter)) {
                 this._counterBattlerList.push(target);
@@ -1055,9 +1061,10 @@ Imported.NUUN_CounterEX = true;
             const counterData = new CounterActionEX(target, subject);
             counterData.setup(counter);
             if (counterData.isCounterTypeReflection()) {
+                target.setupCounterReflectionAction(counterData, subject, this._action.item().id);
                 this.invokeMagicReflection(subject, target);
                 this._reflectionAction = true;
-                return true;
+                return false;
             } else if (counterData.isCounterTypeReflectionFullAction()) {
                 target.setupCounterReflectionAction(counterData, subject, this._action.item().id);
                 this._reflectionAction = true;
@@ -1128,7 +1135,7 @@ Imported.NUUN_CounterEX = true;
         const a = this;
         const list = counter.getCounterSkills().filter(skill => (skill.CondCounter ? eval(skill.CondCounter) : true));
         const id = Math.floor(Math.random() * list.length);
-        return list[id].CounterSkill;
+        return list[id] ? list[id].CounterSkill : 1;
     };
 
     Game_Battler.prototype.initCounterAction = function() {
@@ -1226,6 +1233,18 @@ Imported.NUUN_CounterEX = true;
         }
         if (counter.CounterMessage) {
             this.push("addText", counter.CounterMessage.format(subject.name()));
+        }
+    };
+
+    const _Window_BattleLog_displayReflection = Window_BattleLog.prototype.displayReflection;
+    Window_BattleLog.prototype.displayReflection = function(target) {
+        const action = target.currentCounterAction();
+        if (action) {
+            const counter = action.getCounterData();
+            this.displayReflectionEx(target, counter);
+            target.removeCounterAction();
+        } else {
+            _Window_BattleLog_displayReflection.apply(this, arguments);
         }
     };
 

@@ -1,5 +1,5 @@
 # [カウンター拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js)
 
 ### 必須、前提プラグイン
@@ -47,6 +47,9 @@ NUUN_ConditionsBaseのプラグインパラメータのリストIDを指定し�
 `[rate]`:無効化する確率。  
 
 ## 更新履歴
+2024/7/21 Ver.1.2.1  
+カウンタースキルが設定されていない場合、反撃スキルをスキルID1番で反撃するように修正。  
+反射が機能していなかった問題を修正。  
 2023/8/23 Ver.1.2.0  
 特定のスキル、アイテムに反撃する機能を追加。  
 2023/7/17 Ver.1.1.4  

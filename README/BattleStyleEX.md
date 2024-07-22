@@ -5,7 +5,7 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 [ステータス項目ベース](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)  
 #### 対応プラグイン
-[立ち絵、顔グラ表示](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md)   
+[立ち絵、顔グラ表示](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md)Ver.1.7.2以降   
 #### オプションプラグイン
 [敵の条件画像変更](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)   
 [戦闘中天候適用](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleWeather.js)   

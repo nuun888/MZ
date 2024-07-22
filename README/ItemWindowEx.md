@@ -4,6 +4,8 @@
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 [ステータス項目ベースプラグイン](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)Ver.1.1.0以降  
+#### 対応プラグイン
+[立ち絵、顔グラ表示](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md)Ver.1.7.2以降  
 
 アイテム画面をカスタマイズできます。  
 戦闘中のアイテム画面には対応しておりません。 

@@ -1,7247 +1,4437 @@
 /*:-----------------------------------------------------------------------------------
  * NUUN_BattleStyleEX.js
  * 
- * Copyright (C) 2024 NUUN
+ * Copyright (C) 2022 NUUN
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */
+ */ 
 /*:
- * @target MZ
- * @plugindesc Battle Style EX
- * @author NUUN
- * @base NUUN_Base
- * @base NUUN_MenuParamListBase
- * @orderAfter NUUN_Base
- * @orderAfter NUUN_ActorPicture
- * @version 1.0.1
- * 
- * @help
- * You can change and customize the battle layout.
- * 
- * This plugin also implements the following features:
- * Battle window customization.
- * Actor animation in the front view.
- * Display actor state animation in the front view.
- * Conditional actor image switching.
- * Status parameter customization.
- * Specify background images for each window.
- * Command window customization.
- * 
- * Face graphics and actor image settings
- * You can switch face graphics or standing images under certain conditions in the actor image settings. Standing images and face graphics display EX is also supported, but please turn on the plugin parameter "Apply NUUN_ActorPicture".
- * Conditions are applied in order of priority, with matching conditions applied from top to bottom. Set the image that is normally applied at the bottom.
- * 
- * Display status settings
- * The Display Status Settings allow you to set your own statuses to be displayed in the Actor Status.
- * Set only the items you want to display.
- * If even one item is set in the Display Status Settings, this setting will be applied.
- * 
- * 
- * Unique parameters, Unique parameters (dynamic)
- * Enter the expression to be displayed in JavaScript in evaluation expression or string A.
- * actor:$gameActors
- * actor.actor():$dataActors
- * this._battler:$gameActors
- * this._battler.actor():$dataActors
- * 
- * Original gauge
- * Enter the current value in evaluation formula or string A using JavaScript.
- * Enter the maximum value in evaluation formula or string B using JavaScript.
- * actor:$gameActors
- * actor.actor():$dataActors
- * this._battler:$gameActors
- * this._battler.actor():$dataActors
- * 
- * State,State2
- * Enter the state ID to be displayed in evaluation expression or string A.
- * Enter the buff ID to be displayed in evaluation formula or string B.
- * Buff ID
- * 0: HP increase 1: MP increase 2: Attack increase 3: Defense increase 4: Magic increase 5: Magic defense increase 6: Agility increase 7: Luck increase
- * 10: HP decrease 11: MP decrease 12: Attack decrease 13: Defense decrease 14: Magic decrease 15: Magic defense decrease 16: Agility decrease 17: Luck decrease
- * 
- * Image
- * Enter the display condition in JavaScript in Evaluation expression or String A. It will be displayed when the condition is met.
- * If left blank, it will always be displayed.
- * actor:$gameActors
- * actor.actor():$dataActors
- * this._battler:$gameActors
- * this._battler.actor():$gameActors
- * 
- * Enemy Notes
- * <AttackAnimation:[id]>
- * [id]:Animation ID
- * When an enemy character performs a normal attack, the animation with the [id] number will be played. If not specified, the default value of the plugin parameters will be applied.
- * 
- * Setting the display position of each actor's status
- * The order of the list settings will be the order of the actors displayed in the actor status window (combat characters are number 1).
- * Set the display settings for combat members to list ID number 1. Set the second to number 2. (Cannot be set by actor)
- * 
- * This plugin does not require a conflict-fixing plugin for "MPP_Pseudo3DBattle".
- * 
- * 
- * Terms of Use
- * This plugin is distributed under the MIT license.
- * 
- * Log
- * 7/21/2024 Ver.1.0.1
- * Fixed an issue where players could get stuck at the end of combat.
- * Fixed an issue that could cause the Actor Status window to flicker.
- * 7/20/2024 Ver.1.0.0
- * First edition.
- * 
- * 
- * @command ActorStatusWindowVisible
- * @desc Toggles the display of actor status.
- * @text Actor status display switch
- * 
- * @arg WindowVisible
- * @type boolean
- * @default false
- * @text Display Switching
- * @desc Switches the display. (Displays when set to true)
- * 
- * 
- * @param BattleLayoutSetting
- * @text Battle Layout
- * @default ------------------------------
- * 
- * @param BattleLayoutStyle
- * @desc Specifies the battle style.
- * @text Battle style
- * @type combo
- * @option 'Default'
- * @option 'List'
- * @option 'List_NoTP'
- * @option 'XP'
- * @default 'Default'
- * @parent BattleLayoutSetting
- * 
- * @param BattleLayoutVar
- * @desc Specifies the game variable that specifies the layout. When the variable value is 0, the plugin parameter settings are applied.
- * @text Layout Game Variables
- * @type variable
- * @default 0
- * @parent BattleLayoutSetting
- * 
- * @param ActorStatusWindowSetting
- * @text Actor Status Window
- * @default ------------------------------
- * 
- * @param BattleLayout
- * @desc Sets the battle layout. The setting value for the layout game variable is the list number.
- * @text Battle Layout Settings
- * @default []
- * @type struct<BattleLayoutList>[]
- * @parent ActorStatusWindowSetting
- * 
- * @param BattleEndActorStatusClose
- * @desc Closes actor status window at the end of combat.
- * @text Close window when battle ends
- * @type boolean
- * @default false
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorSetting
- * @text Actor Settings
- * @default ------------------------------
- * 
- * @param ActorGraphics
- * @text Actor Image Settings
- * @desc Set the actor image.
- * @default []
- * @type struct<ActorBattlerImgSetting>[]
- * @parent ActorSetting
- * 
- * @param OnActorPictureEX
- * @desc Apply the settings in "NUUN_ActorPicture".
- * @text Apply "NUUN_ActorPicture"
- * @type boolean
- * @default false
- * @parent ActorSetting
- * 
- * @param ActorEffect
- * @text Actor Effect Settings
- * @default ------------------------------
- * 
- * @param DamageImgFrame
- * @desc Actor image change frames for damage, recovery, and defense.
- * @text Damage, recovery, and defense frames
- * @type number
- * @default 30
- * @min 1
- * @max 9999
- * @parent ActorEffect
- * 
- * @param CounterImgFrame
- * @desc Actor image counterattack, image change frame when reflecting magic.
- * @text Counterattack, magic reflection image change frame
- * @type number
- * @default 60
- * @min 1
- * @max 9999
- * @parent ActorEffect
- * 
- * @param OnActorShake
- * @desc Enable shake on damage.
- * @text Damage Shake Enabled
- * @type boolean
- * @default false
- * @parent ActorEffect
- * 
- * @param ActorShakeFlame
- * @desc Shake frames when damaged. (default 36)
- * @text Shake Frame
- * @type number
- * @default 36
- * @min 0
- * @parent ActorEffect
- * 
- * @param ActorShakePower
- * @desc The amount of shake when damaged. (Default 2)
- * @text Shake size
- * @type number
- * @default 2
- * @min 0
- * @parent ActorEffect
- * 
- * @param ActorShakeSpeed
- * @desc Shake speed when damaged. (default 20)
- * @text Shake Speed
- * @type number
- * @default 20
- * @min 0
- * @parent ActorEffect
- * 
- * @param OnActionZoom
- * @desc Enables effects during actions.
- * @text Effect on action
- * @type boolean
- * @default false
- * @parent ActorEffect
- * 
- * @param ActionZoomDuration
- * @desc Action effect frames.
- * @text Action effect frames
- * @type number
- * @default 60
- * @min 0
- * @parent ActorEffect
- * 
- * @param ActorFlash
- * @desc Makes the actor image blink when an actor target is selected.
- * @text Actor image flashes when selected
- * @type boolean
- * @default true
- * @parent ActorEffect
- * 
- * @param ActorsMirror
- * @desc Reverses the actor's animation.
- * @text Actor Animation Reverse
- * @type boolean
- * @default true
- * @parent ActorEffect
- * 
- * @param EnemyEffect
- * @text Enemy Effects
- * @default ------------------------------
- * 
- * @param EnemySkillAnimation
- * @desc Enemy normal attack animation.
- * @text nemy normal attack animation
- * @type animation
- * @default 1
- * @min 0
- * @parent EnemyEffect
- * 
- * @param EnemyDamage_X
- * @desc X coordinate of the damage effect. (relative coordinates)
- * @text Damage effect X coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent EnemyEffect
- * 
- * @param EnemyDamage_Y
- * @desc Y coordinate of damage effect. (relative coordinates)
- * @text Damage effect Y coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent EnemyEffect
- * 
- * @param StateIconSettings
- * @text State Icon Settings
- * @default ------------------------------
- * 
- * @param NoStateIcon
- * @desc Icon index when no state is added. 0 is invalid.
- * @text No state icon index
- * @type icon
- * @default 0
- * @parent StateIconSettings
- * 
- * @param WindowSetting
- * @text Window Settings Settings
- * @default ------------------------------
- * 
- * @param NoAppearWindow
- * @desc Disables the message that appears when a monster appears.
- * @text Monster appearance message disabled
- * @type boolean
- * @default false
- * @parent WindowSetting
- * 
- * @param WindowHideActorStatusWindow
- * @desc Specifies what should hide the actor status window when a specific window is displayed.
- * @text Specific window Actor status window hide setting
- * @type combo[]
- * @option '_messageWindow'
- * @option '_itemWindow'
- * @option '_skillWindow'
- * @option '_enemyWindow'
- * @option '_enemyBookEnemyWindow'
- * @option '_resultWindow'
- * @option '_resultLevelUpMainWindow'
- * @default 
- * @parent WindowSetting
- * 
- * @param SpecialSetting
- * @text Special Settings
- * @default ////////////////////////////////
- * 
- * @param WindowDisplayMode
- * @text Windowed Mode
- * @desc Specifies the window display mode.
- * @type select
- * @option Spriteset_Battle
- * @value 'Spriteset_Battle'
- * @option Scene_Battle
- * @value 'Scene_Battle'
- * @default 'Spriteset_Battle'
- * @parent SpecialSetting
- * 
- */
-/*~struct~BattleLayoutList:
- * 
- * @param StyleName
- * @desc Battle layout style name.
- * @text Battle Layout Style
- * @type combo
- * @option 'Default'
- * @option 'List'
- * @option 'XP'
- * @option 'Side'
- * @default 'Default'
- * 
- * @param DisplayStatusSettings
- * @text Display Status Settings
- * @default ------------------------------
- * 
- * @param BattleStatusList
- * @desc Specifies the status to display.
- * @text Display status settings
- * @default []
- * @type struct<ActorStatusList>[]
- * @parent DisplayStatusSettings
- * 
- * @param ActorStatusWindowSetting
- * @text Actor status window basic settings
- * @default ------------------------------
- * 
- * @param ActorStatusWindowBesideMode
- * @text Horizontal display
- * @desc Select how the Actor Status window is displayed horizontally.
- * @type select
- * @option Left
- * @value 'left'
- * @option Center
- * @value 'center'
- * @option Right
- * @value 'right'
- * @default 'center'
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusWindowVerticalMode
- * @text Vertical display
- * @desc Select how the Actor Status window is displayed vertically.
- * @type select
- * @option Top
- * @value 'top'
- * @option Under
- * @value 'under'
- * @default 'under'
- * @parent ActorStatusWindowSetting
- * 
- * @param WindowShow
- * @desc Makes the window opaque.
- * @text Window Opaque
- * @type boolean
- * @default false
- * @parent ActorStatusWindowSetting
- * 
- * @param WindowFrameShow
- * @desc Show window frames.
- * @text Window Frame Display
- * @type boolean
- * @default false
- * @parent ActorStatusWindowSetting
- * 
- * @param ContentsBackShow
- * @desc Displays the window's content background.
- * @text Window content background display
- * @type boolean
- * @default false
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusBackgroundSetting
- * @text Actor Status Window Skin Settings
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusWindowBacgroundImg
- * @text Window background image settings
- * @desc Sets the background image for the actor status window.
- * @default 
- * @type struct<WindowBackgroundSetting>
- * @parent ActorStatusBackgroundSetting
- * 
- * @param BackgroundStatusWindowFit
- * @desc Aligns the image display position with the status window. OFF: UI range (0,0)
- * @text Status window position display
- * @type boolean
- * @default treu
- * @parent ActorStatusBackgroundSetting
- * 
- * @param ActorStatusWindowSkinSetting
- * @text Actor Status Window Skin Settings
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusWindowSkin
- * @text Window Skin Settings
- * @desc Sets the actor status window skin.
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorStatusWindowSkinSetting
- * 
- * @param ActorStatusWindowColor
- * @text Window Color
- * @desc et the window color. Leave blank to default.
- * @default 
- * @type struct<WindowTone>
- * @parent ActorStatusWindowSkinSetting
- * 
- * @param ActorStatuPositionSetting
- * @text Coordinate Settings
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusX
- * @desc Specifies the X coordinate of the actor status window (relative).
- * @text X coordinate
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent ActorStatuPositionSetting
- * 
- * @param ActorStatusY
- * @desc Specifies the Y coordinate of the actor status window (relative).
- * @text Y coordinate
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent ActorStatuPositionSetting
- * 
- * @param ActorStatusWidth
- * @desc Specifies the width of the actor status window.
- * @text Width
- * @type number
- * @default 0
- * @min 0
- * @parent ActorStatuPositionSetting
- * 
- * @param ActorStatusHeight
- * @desc Specifies the height of the actor status window.
- * @text Height
- * @type number
- * @default 0
- * @min 0
- * @parent ActorStatuPositionSetting
- * 
- * @param ActorStatuDisplayShiftSettings
- * @text Actor Status Window Display Settings
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param CommandShiftMode
- * @text Shift target command window
- * @desc Specifies the display position of party commands when custom selection is enabled.
- * @type select
- * @option Party Commands
- * @value 'party'
- * @option Actor Commands
- * @value 'actor'
- * @option No shift
- * @value 'none'
- * @default 'party'
- * @parent ActorStatuDisplayShiftSettings
- * 
- * @param CommandRightMode
- * @desc The position of the commands displayed when party and actor commands are in default display.
- * @text Party and actor commands displayed on the right
- * @type boolean
- * @default true
- * @parent ActorStatuDisplayShiftSettings
- * 
- * @param CommandSubtraction
- * @desc Subtract the window for the command.
- * @text Command window subtraction
- * @type boolean
- * @default false
- * @parent ActorStatuDisplayShiftSettings
- * 
- * @param WindowContentsSetting
- * @text Actor Status Content Settings
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorMaxCol
- * @desc The number of actors to line up side by side.
- * @text Actor cols
- * @type number
- * @default 4
- * @min 1
- * @max 99
- * @parent WindowContentsSetting
- * 
- * @param ActorMaxRow
- * @desc The number of actors to line up vertically.
- * @text Actor rows
- * @type number
- * @default 1
- * @min 1
- * @max 99
- * @parent WindowContentsSetting
- * 
- * @param ActorStatusBesideMode
- * @text Horizontal display
- * @desc Select how actor status content is displayed horizontally.
- * @type select
- * @option Left
- * @value 'left'
- * @option Center
- * @value 'center'
- * @option Right
- * @value 'right'
- * @option Triangle
- * @value 'triangle'
- * @default 'center'
- * @parent WindowContentsSetting
- * 
- * @param ActorStatusVerticalMode
- * @text Vertical display
- * @desc Select how the actor status content is displayed vertically.
- * @type select
- * @option Top
- * @value 'top'
- * @option Under
- * @value 'under'
- * @default 'top'
- * @parent WindowContentsSetting
- * 
- * @param SelectBackShow
- * @desc Displays the actor background that is displayed when selecting an actor's action.
- * @text Background display during actor action
- * @type boolean
- * @default true
- * @parent WindowContentsSetting
- * 
- * @param ActorSelectBackShow
- * @desc Shows the actor background that is displayed when an actor is targeted.
- * @text Background display when selecting actor target
- * @type boolean
- * @default true
- * @parent WindowContentsSetting
- * 
- * @param ActorContentsSetting
- * @text Setting the display position of each actor's status
- * @desc Specifies the display position of the content for each actor status.
- * @default []
- * @type struct<ActorContentsRect>[]
- * @parent WindowContentsSetting
- * 
- * @param Background
- * @text Content background and foreground image settings
- * @default ------------------------------
- * @parent  ActorStatusWindowSetting
- * 
- * @param ActorBackground
- * @desc pecifies the background image for the actor.
- * @text Actor Background Image
- * @type file
- * @default 
- * @dir img/
- * @parent Background
- * 
- * @param ActorFrontImg
- * @desc Specifies the foreground image for the actor (displayed between the actor graphic and the status).
- * @text Foreground Image
- * @type file
- * @dir img/
- * @default 
- * @parent Background
- * 
- * @param ActorStatusActorWindow
- * @text Actor individual window settings
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusActorWindowShow
- * @desc Displays a window for each actor.
- * @text Actor-specific window display
- * @type boolean
- * @default false
- * @parent ActorStatusActorWindow
- * 
- * @param ActorWindowSkinSetting
- * @text Actor Window Skin Settings
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorWindowSkin
- * @desc Specifies the window skin.
- * @text Window Skin Image
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorWindowSkinSetting
- * 
- * @param ActorWindowColor
- * @text Window Color
- * @desc Set the window color. Default if blank
- * @default 
- * @type struct<WindowTone>
- * @parent ActorWindowSkinSetting
- * 
- * @param ActorWindowSetting
- * @text Actor Window Settings
- * @default ////////////////////////////////
- * 
- * @param DefaultActorWindow
- * @desc Displays the default actor selection window.
- * @text Actor selection window display
- * @type boolean
- * @default false
- * @parent ActorWindowSetting
- * 
- * @param ActorWindowFrameShow
- * @desc Show window frames.
- * @text Window Frame Display
- * @type boolean
- * @default false
- * @parent ActorWindowSetting
- * 
- * @param PartyCommandSettings
- * @text Party Command Settings
- * @default ////////////////////////////////
- * 
- * @param PartyCommandPosition
- * @text Command display position
- * @desc Specifies the display position of party commands when custom selection is enabled.
- * @type select
- * @option Top
- * @value 'top'
- * @option Middle
- * @value 'middle'
- * @option Status winodw top
- * @value 'statuswindowtop'
- * @option Under
- * @value 'under'
- * @option Custom
- * @value 'custom'
- * @option Default
- * @value 'default'
- * @option Conventional Processing
- * @value 'none'
- * @default 'default'
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandMaxCol
- * @desc The number of command columns to display.
- * @text Cols
- * @type number
- * @default 1
- * @min 1
- * @max 99
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandMaxRow
- * @desc PartyCommandMaxRow
- * @text Rows
- * @type number
- * @default 4
- * @min 1
- * @max 99
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandPositionSetting
- * @text Coordinate Settings
- * @default ------------------------------
- * @parent PartyCommandSettings
- * 
- * @param PartyCommand_X
- * @desc Specifies the X coordinate of the party command window.
- * @text Command window X coordinate
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent PartyCommandPositionSetting
- * 
- * @param PartyCommand_Y
- * @desc Specifies the Y coordinate of the party command window.
- * @text Command window Y coordinate
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent PartyCommandPositionSetting
- * 
- * @param PartyCommand_Width
- * @desc Specifies the width of the party command window. 0 is the UI width.
- * @text Command window width
- * @type number
- * @default 192
- * @max 9999
- * @min 0
- * @parent PartyCommandPositionSetting
- * 
- * @param PartyCommandOption
- * @text Party Command Options
- * @default ------------------------------
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandWindowCenter
- * @text Window coordinate center display
- * @desc Centers the window (non-default).
- * @type boolean
- * @default false
- * @parent PartyCommandOption
- * 
- * @param PartyCommandMode
- * @desc Display party command items closer to the center.
- * @text Command display centered
- * @type boolean
- * @default false
- * @parent PartyCommandOption
- * 
- * @param PartyCommandBackgroundSetting
- * @text Party command window background settings
- * @default ------------------------------
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandWindowBacgroundImg
- * @text Window background image settings
- * @desc Sets the background image for the party command window.
- * @default 
- * @type struct<WindowBackgroundSetting>
- * @parent PartyCommandBackgroundSetting
- * 
- * @param BackgroundPartyCommandWindowFit
- * @desc Aligns the image display position with the party command window. OFF for UI range (0,0)
- * @text Window position display
- * @type boolean
- * @default treu
- * @parent PartyCommandBackgroundSetting
- * 
- * @param PartyCommandWindowSkinSetting
- * @text Party command window image settings
- * @default ------------------------------
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandWindowVisible
- * @desc Makes the window image opaque. Please turn it OFF when specifying a background. 
- * @text Window Opacity
- * @type boolean
- * @default true
- * @parent PartyCommandWindowSkinSetting
- * 
- * @param PartyCommandWindowSkin
- * @text Window Skin Settings
- * @desc Sets the skin for the party command window.
- * @type file
- * @dir img/system
- * @default 
- * @parent PartyCommandWindowSkinSetting
- * 
- * @param PartyCommandWindowColor
- * @text Window Color
- * @desc Set the window color. Default if blank
- * @default 
- * @type struct<WindowTone>
- * @parent PartyCommandWindowSkinSetting
- * 
- * @param ActorCommandSettings
- * @text Actor Command Settings
- * @default ////////////////////////////////
- * 
- * @param ActorCommandPosition
- * @text Command display position
- * @desc Specifies the display position of actor commands when custom selection is enabled.
- * @type select
- * @option Default (coordinates are fixed)
- * @value 'default'
- * @option Top
- * @value 'top'
- * @option Middle
- * @value 'middle'
- * @option Status winodw top
- * @value 'statuswindowtop'
- * @option Under
- * @value 'under'
- * @option Actor top
- * @value 'actor'
- * @option Above each SV actor (SV recommended)
- * @value 'svtop'
- * @option Left of each SV actor (SV recommended)
- * @value 'svleft'
- * @option Right of each SV actor (SV recommended)
- * @value 'svright'
- * @option Custom
- * @value 'custom'
- * @option Conventional Processing
- * @value 'none'
- * @default 'default'
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandMaxRow
- * @desc The maximum number of command lines that can be displayed. If variable command display is OFF, this setting applies.
- * @text Maximum number of command row displayed
- * @type number
- * @default 10
- * @min 1
- * @max 99
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandMinRow
- * @desc Minimum command rows to display。
- * @text Minimum command rows displayed when command is variable
- * @type number
- * @default 4
- * @min 1
- * @max 99
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandMaxCol
- * @desc The number of command cols to display.
- * @text Display command cols
- * @type number
- * @default 1
- * @min 1
- * @max 99
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandVariable
- * @desc The number of commands displayed will be the same as the number of commands (up to the maximum number of command rows).
- * @text Command variable display
- * @type boolean
- * @default true
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandPositionSetting
- * @text Coordinate Settings
- * @default ------------------------------
- * @parent ActorCommandSettings
- * 
- * @param ActorCommand_X
- * @desc Specifies the X coordinate of the actor command window.
- * @text Command window X coordinate
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent ActorCommandPositionSetting
- * 
- * @param ActorCommand_Y
- * @desc Specifies the Y coordinate of the actor command window.
- * @text Command window Y coordinate
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent ActorCommandPositionSetting
- * 
- * @param ActorCommand_Width
- * @desc Specifies the width of the actor command window.
- * @text Command window width
- * @type number
- * @default 192
- * @max 9999
- * @min 0
- * @parent ActorCommandPositionSetting
- * 
- * @param ActorCommandOption
- * @text Actor Command Options
- * @default ------------------------------
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandWindowCenter
- * @text Window coordinate center display
- * @desc Centers the window (non-default).
- * @type boolean
- * @default false
- * @parent ActorCommandOption
- * 
- * @param ActorCommandMode
- * @desc Display the actor command items closer to the center.
- * @text Command display centered
- * @type boolean
- * @default false
- * @parent ActorCommandOption
- * 
- * @param ActorCommandHideWindow
- * @desc Specifies a window that hides actor commands while the particular window is open.
- * @text Actor Command Hidden Target Window
- * @type combo[]
- * @option 'MessageWindow'
- * @option 'ItemWindow'
- * @option 'SkillWindow'
- * @option 'ActorWindow'
- * @option 'EnemyWindow'
- * @option 'EnemyBook'
- * @option 'Formation'
- * @default 
- * @parent ActorCommandOption
- * 
- * @param ActorCommandBackgroundSetting
- * @text Actor Command Window Background Settings
- * @default ------------------------------
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandWindowBacgroundImg
- * @text Window background image settings
- * @desc Sets the background image for the actor command window.
- * @default 
- * @type struct<WindowBackgroundSetting>
- * @parent ActorCommandBackgroundSetting
- * 
- * @param BackgroundActorCommandWindowFit
- * @desc Aligns the image display position with the actor command window. OFF for UI range (0,0)
- * @text Window position display
- * @type boolean
- * @default treu
- * @parent ActorCommandBackgroundSetting
- * 
- * @param ActorCommandWindowSkinSetting
- * @text Actor Command Window Image Settings
- * @default ------------------------------
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandWindowVisible
- * @desc Makes the window image opaque. Please turn it OFF when specifying a background. 
- * @text Window Opacity
- * @type boolean
- * @default true
- * @parent ActorCommandWindowSkinSetting
- * 
- * @param ActorCommandWindowSkin
- * @desc Specifies the window skin.
- * @text Window Skin Image
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorCommandWindowSkinSetting
- * 
- * @param ActorCommandWindowColor
- * @text Window Color
- * @desc Set the window color. Default if blank
- * @default 
- * @type struct<WindowTone>
- * @parent ActorCommandWindowSkinSetting
- * 
- * @param ActorImgSetting
- * @text Actor Image Settings
- * @default ------------------------------
- * 
- * @param ActorImgMode
- * @text Actor Image Mode
- * @desc Actor image to display in actor status.
- * @type select
- * @option None
- * @value 'none'
- * @option Face
- * @value 'face'
- * @option Imges
- * @value 'imges'
- * @default 'face'
- * @parent ActorImgSetting
- * 
- * @param ActorImg_X
- * @desc Sets the X coordinate of the image.
- * @text Image X coordinate
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param ActorImg_Y
- * @desc Sets the Y coordinate of the image.
- * @text Image Y coordinate
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param Img_SX
- * @desc The start X coordinate of the image.
- * @text Image display start coordinate X
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param Img_SY
- * @desc Image display start coordinate Y
- * @text Image display start coordinate Y
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param Img_SW
- * @desc The display width of the image.
- * @text Image display width
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param Img_SH
- * @desc The display height of the image.
- * @text Image display height
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param ActorImgHPosition
- * @text Face graphic horizontal reference display position
- * @desc Specifies the reference display position next to the face graphic.
- * @type select
- * @option Left
- * @value 'left'
- * @option Certer
- * @value 'center'
- * @default 'center'
- * @parent ActorImgSetting
- * 
- * @param ActorImgVPosition
- * @text Image vertical reference display position
- * @desc Specifies the vertical reference display position of the image (image only).
- * @type select
- * @option Top
- * @value 'top'
- * @option Under
- * @value 'under'
- * @default 'under'
- * @parent ActorImgSetting
- * 
- * @param ImgHeight
- * @desc Specifies the maximum height of the image (0 is the default).
- * @text Image Height
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param ImgHeightOnWindow
- * @desc Fits the height range of the actor image within the window.
- * @text Actor image in window display
- * @type boolean
- * @default false
- * @parent ActorImgSetting
- * 
- * @param ActorSpecificSettings
- * @text Actor-specific settings
- * @default ------------------------------
- * @parent ActorImgSetting
- * 
- * @param ActorData
- * @text Actor coordinates, image settings
- * @desc Set individual coordinates and images for each actor.
- * @default []
- * @type struct<ActorDataList>[]
- * @parent ActorImgSetting
- * 
- * @param ActorStateAnimationPosition
- * @text Actor State Animation Settings
- * @default ------------------------------
- * @parent ActorImgSetting
- * 
- * @param StateAnimationShow
- * @desc Displays the state animation of the actor image. Only when animation effect display is enabled in the front view.
- * @text Actor Image State Animation Display
- * @type boolean
- * @default true
- * @parent ActorStateAnimationPosition
- * 
- * @param ActorState_X
- * @desc X coordinate of state animation for each actor image. Only when animation effects are enabled in the front view
- * @text State animation X coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimationPosition
- * 
- * @param ActorState_Y
- * @desc The Y coordinate of the state animation for each actor image. Only when animation effects are enabled in the front view
- * @text State animation Y coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimationPosition
- * 
- * @param ActorEffectSettings
- * @text Actor Effect Settings
- * @default ////////////////////////////////
- * 
- * @param ActorEffectShow
- * @desc Animation effects are also displayed in the front view.
- * @text Front view effect display
- * @type boolean
- * @default false
- * @parent ActorEffectSettings
- * 
- * @param ActorEffect_X
- * @desc The relative x-coordinate of the animation effect.
- * @text Animation effect X coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorEffectSettings
- * 
- * @param ActorEffect_Y
- * @desc The relative y-coordinate of the animation effect.
- * @text Animation effect Y coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorEffectSettings
- * 
- * @param ActorDamage_X
- * @desc The X coordinate of the damage effect (relative coordinate).
- * @text Damage effect X coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorEffectSettings
- * 
- * @param ActorDamage_Y
- * @desc The Y coordinate of the damage effect (relative coordinate).
- * @text Damage effect Y coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorEffectSettings
- * 
- * @param SelectActorHideWindow
- * @desc Specifies which windows to hide while the actor window is visible. 
- * @text Hide specified window
- * @type combo[]
- * @option 'ItemWindow'
- * @option 'SkillWindow'
- * @default 
- * 
- */
-/*~struct~ActorStatusList:
- *
- * @param DateSelect
- * @text Status to display
- * @desc Specifies the status to display.
- * @type select
- * @option None
- * @value None
- * @option Nane(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
- * @value Name
- * @option Actor name(1)(2)(3)(4)(5)(9)(11)(12)
- * @value ActorName
- * @option Nickname(1)(2)(3)(4)(5)(9)(11)(12)
- * @value Nickname
- * @option Class(1)(2)(3)(4)(5)(9)(11)(12)
- * @value Class
- * @option Level(1)(2)(3)(4)(5)(6)(9)(11)(12)(13)
- * @value Level
- * @option State(1)(2)(3)(4)(5)(16※1)
- * @value State
- * @option State(1)(2)(3)(4)
- * @value State2
- * @option Turn(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value Turn
- * @option Original parameter(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)
- * @value OrgParam
- * @option Dynamic original parameters(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)
- * @value DynamicOrgParam
- * @option HP Gauge(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
- * @value HpGauge
- * @option MP Gauge(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
- * @value MpGauge
- * @option TP Gauge(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
- * @value TpGauge
- * @option TPBGauge(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
- * @value TpbGauge
- * @option CircularHP(1)(2)(3)(4)(7)(20)(21)(23)(24)
- * @value HpCircularGauge
- * @option CircularMP(1)(2)(3)(4)(7)(20)(23)
- * @value MpCircularGauge
- * @option CircularTP(1)(2)(3)(4)(7)(20))(23)
- * @value TpCircularGauge
- * @option CircularTPB(1)(2)(3)(4)(7)(20))(23)
- * @value TpbCircularGauge
- * @option Original gauge(1)(2)(3)(4)(5)(7)(16)(18)(20)(21)(22)(23)(24)
- * @value OrgGauge
- * @option Imges(1)(2)(3)(4)(25)
- * @value Imges
- * @option Free text(1)(2)(3)(4)(35)
- * @value Freetext
- * @option Line(1)(2)(3)(4)(5)(8)
- * @value HorzLine
- * @default None
- * 
- * @param X_Position
- * @text X display col position(1)
- * @desc X display col position
- * @type number
- * @default 1
- * @min 1
- * @max 1
- * 
- * @param Y_Position
- * @desc Y display row position
- * @text Y display row position(2)
- * @type number
- * @default 1
- * @min 1
- * @max 99
- * 
- * @param X_Coordinate
- * @text X coordinate (relative)(3)
- * @desc X coordinate (relative coordinate from X display col position)
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * 
- * @param Y_Coordinate
- * @text Y coordinate (relative)(4)
- * @desc Y coordinate (relative coordinate from Y display row position)
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * 
- * @param ItemWidth
- * @desc Item, gauge width(0 for default width)
- * @text Item, gauge width(5)
- * @type number
- * @default 0
- * @min 0
- * 
- * @param SystemItemWidth
- * @desc Width of item name (default width at 0)
- * @text Width of item name(6)
- * @type number
- * @default 0
- * @min 0
- * 
- * @param ParamName
- * @desc Set the item name.
- * @text Name(7)
- * @type string
- * @default
- * 
- * @param NameColor
- * @desc System color ID for system items. You can enter the color code in the text tab.
- * @text Name color(8)
- * @type color
- * @default 16
- * @min 0
- * 
- * @param Align
- * @desc Align.
- * @text Align(9)
- * @type select
- * @option Left
- * @value 'left'
- * @option Right
- * @value 'right'
- * @option Center
- * @value 'center'
- * @default 'left'
- * 
- * @param paramUnit
- * @desc Set the units.
- * @text Unit(10)
- * @type string
- * @default 
- * 
- * @param FontSize
- * @desc Font size (difference from main font)
- * @text Font size(11)
- * @type number
- * @default 0
- * @min -99
- * 
- * @param FontFace
- * @desc Sets the font for item names.
- * @text Item name font(12)
- * @type string
- * @default 
- * 
- * @param ValueFontFace
- * @desc Sets the font for parameter text.
- * @text Parameter font(13)
- * @type string
- * @default 
- * 
- * @param DetaEval
- * @desc Enter an evaluation formula or string. State is state ID, gauge is current value
- * @text Evaluation formula or string(javaScript)(16)
- * @type combo
- * @option '$gameVariables.value(0);//Game variable'
- * @option 'actor;//Actor game data'
- * @option 'actor.actor();//Actor system data'
- * @default 
- * 
- * @param DetaEval2
- * @desc Max value evaluation formula. State is buff, gauge is maximum value
- * @text Max evaluation formula(javaScript)(22)
- * @type combo
- * @option '$gameVariables.value(0);//Game variable'
- * @option 'actor;//Actor game data'
- * @option 'actor.actor();//Actor system data'
- * @default 
- * 
- * @param ParamID
- * @desc Identification ID of state or gauge.
- * @text Identification ID(20)
- * @type string
- * @default 
- * 
- * @param GaugeSetting
- * @text Gauge setting
- * @default ------------------------------
- * 
- * @param GaugeHeight
- * @desc Specifies the vertical width of a gauge.
- * @text Gauge vertical width(21)
- * @type number
- * @default 12
- * @min 0
- * @max 24
- * @parent GaugeSetting
- * 
- * @param Color1
- * @desc Gauge system color ID (left). You can enter the color code in the text tab.
- * @text Gauge color (left)(23)
- * @type color
- * @default -1
- * @min -1
- * @parent GaugeSetting
- * 
- * @param Color2
- * @desc Gauge system color ID (right). You can enter the color code in the text tab.
- * @text Gauge color (right)(24)
- * @type color
- * @default -1
- * @min -1
- * @parent GaugeSetting
- * 
- * @param ImgSetting
- * @text Image settings
- * @default ------------------------------
- * 
- * @param ImgData
- * @desc Specifies the image to display.
- * @text Image(25)
- * @type file
- * @dir img/
- * @default 
- * @parent ImgSetting
- * 
- * @param OtherSetting
- * @text Other settings
- * @default ------------------------------
- * 
- * @param Text
- * @desc Enter the text of the free text. (Text code can be used)
- * @text Free text text(35)
- * @type multiline_string
- * @default
- * @parent OtherSetting
- * 
- * @param CondSetting
- * @text Display condition settings
- * @default ------------------------------
- * 
- * @param Conditions
- * @desc Specify the conditions under which the item will be displayed. (JavaScript)
- * @text Item conditions
- * @type combo
- * @option '$gameVariables.value(0);//Game variable'
- * @option 'actor;//Actor game data'
- * @option 'actor.actor();//Actor system data'
- * @option '$dataSystem.optDisplayTp'//TP display
- * @default 
- *
- */
-/*~struct~ActorDataList:
- * 
- * @param ActorId
- * @text Actor
- * @desc Specify the actor. If 0 is specified, the default setting will be used.
- * @type actor
- * @default 0
- * 
- * @param ActorStatusListDataSetting
- * @text Actor Image Position Setting
- * @default When Actor Image Mode is Default, all settings in Actor Image Position Settings will be default.
- * 
- * @param StatusListData
- * @text Display Status Settings
- * @desc Sets the status information to be displayed. If any of these are not set, the default settings will be applied.
- * @default 
- * @type struct<ActorStatusList>[]
- * @parent ActorStatusListDataSetting
- * 
- * @param ActorWindowSkinSetting
- * @text Individual window settings for each actor
- * @default ------------------------------
- * 
- * @param ActorWindowSkin
- * @desc Specifies the window skin. If not specified, the default setting will be applied.
- * @text Window Skin Image
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorWindowSkinSetting
- * 
- * @param ActorWindowColor
- * @text Window Color
- * @desc Sets the window color.
- * @default 
- * @type struct<WindowTone>
- * @parent ActorWindowSkinSetting
- * 
- * @param ActorCommandBackgroundSetting
- * @text Actor Command Window Background Settings
- * @default ------------------------------
- * 
- * @param ActorCommandWindowBacgroundImg
- * @text Actor Command Window Background Image Settings
- * @desc Sets the background image for the actor command window.
- * @default 
- * @type struct<WindowBackgroundSetting>
- * @parent ActorCommandBackgroundSetting
- * 
- * @param ActorCommandSkinSetting
- * @text Actor Command Skin Settings
- * @default ------------------------------
- * 
- * @param ActorCommandWindowSkin
- * @desc Specifies the window skin. If not specified, the default setting will be applied.
- * @text Window Skin Image
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorCommandSkinSetting
- * 
- * @param ActorCommandWindowColor
- * @text Window Color
- * @desc Sets the window color.
- * @default 
- * @type struct<WindowTone>
- * @parent ActorCommandSkinSetting
- * 
- * @param Background
- * @text Actor Image Settings
- * @default ------------------------------
- * 
- * @param ActorBackground
- * @desc Specifies the background image for the actor. If not specified, the default setting will be applied.
- * @text Actor Background Image
- * @type file
- * @default 
- * @dir img/
- * @parent Background
- * 
- * @param ActorFrontImg
- * @desc Specifies the background image behind the status. If not specified, the default setting will be used.
- * @text Status background image
- * @type file
- * @dir img/
- * @default 
- * @parent Background
- * 
- * @param ActorImgPositionSetting
- * @text Actor Image Position Setting
- * @default When Actor Image Mode is Default, all settings in Actor Image Position Settings will be default.
- * 
- * @param ActorImgMode
- * @text Actor Image Mode
- * @desc Actor image to display in actor status.
- * @type select
- * @option None
- * @value 'none'
- * @option Default
- * @value 'default'
- * @option Face
- * @value 'face'
- * @option Imges
- * @value 'imges'
- * @default 'default'
- * @parent ActorImgPositionSetting
- * 
- * @param Actor_X
- * @desc Sets the X coordinate of the image.
- * @text Image X coordinate
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Actor_Y
- * @desc Sets the Y coordinate of the image.
- * @text Image Y coordinate
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Img_SX
- * @desc The start X coordinate of the image.
- * @text Image display start coordinate X
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Img_SY
- * @desc Image display start coordinate Y
- * @text Image display start coordinate Y
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Img_SW
- * @desc The display width of the image.
- * @text Image display width
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Img_SH
- * @desc The display height of the image.
- * @text Image display height
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param ActorImgHPosition
- * @text Face graphic horizontal reference display position
- * @desc Specifies the reference display position next to the face graphic.
- * @type select
- * @option Left
- * @value 'left'
- * @option Certer
- * @value 'center'
- * @default 'center'
- * @parent ActorImgPositionSetting
- * 
- * @param ActorImgVPosition
- * @text Image vertical reference display position
- * @desc Specifies the vertical reference display position of the image (image only).
- * @type select
- * @option Top
- * @value 'top'
- * @option Under
- * @value 'under'
- * @default 'under'
- * @parent ActorImgPositionSetting
- * 
- * @param ActorStateAnimationPosition
- * @text Actor State Animation Settings
- * @default ------------------------------
- * 
- * @param ActorState_X
- * @desc X coordinate of state animation for each actor image. Valid except 0
- * @text State animation X coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimationPosition
- * 
- * @param ActorState_Y
- * @desc The Y coordinate of the state animation for each actor image. Valid except 0
- * @text State animation Y coordinate (relative coordinate)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimationPosition
- * 
- */
-/*~struct~ActorBattlerImgSetting:
- * 
- * @param ActorId
- * @text Actor
- * @desc Specify the actor.
- * @type actor
- * @default 0
- * 
- * @param BattlerActorImg
- * @text Actor Image Settings
- * @desc Set the actor image.
- * @default []
- * @type struct<ActorBattlerImgList>[]
- * 
- */
-/*~struct~ActorBattlerImgList:
- * 
- * @param GraphicImg
- * @text Actor Image
- * @desc Set the actor image. If multiple images are specified, they will be displayed randomly.
- * @type file[]
- * @dir img/
- * 
- * @param FaceImg
- * @text Face graphics image
- * @desc Set the sprite sheet for the face graphic image.
- * @type file
- * @dir img/faces
- * 
- * @param FaceIndex
- * @text Face Gra Index ID
- * @desc he index ID of the face graphic.
- * @type number
- * @default -1
- * @min -1
- * 
- * @param Opacity
- * @text Image Opacity
- * @desc Specifies the opacity of the image.
- * @type number
- * @default 255
- * @min 0
- * @max 255
- * 
- * @param AllMatch
- * @text All conditions match
- * @default ------------------------------
- * 
- * @param ImgHP
- * @text Remaining HP
- * @desc Changes when the remaining HP is within the specified range or numerical value.
- * @type struct<CondValue>
- * @default {"CondValid":"false","UpLimit":"0","DwLimit":"0"}
- * @parent AllMatch
- * 
- * @param ImgSwitch
- * @text Switch
- * @desc Changes when all the specified switches are ON.
- * @type switch[]
- * @default
- * @parent AllMatch
- * 
- * @param ImgWeapon
- * @text Weapon
- * @desc The condition is met when all of the specified weapons are equipped.
- * @type weapon[]
- * @default 
- * @parent AllMatch
- * 
- * @param ImgArmor
- * @text Armor
- * @desc The condition is met when all of the specified armor is equipped.
- * @type armor[]
- * @default 
- * @parent AllMatch
- * 
- * @param ImgClass
- * @text Class
- * @desc Certain professions qualify.
- * @type class
- * @default 0
- * @parent AllMatch
- * 
- * @param ImgStateAll
- * @text State
- * @desc The condition is met when all of the specified states are applied.
- * @type state[]
- * @default 
- * @parent AllMatch
- * 
- * @param ChangeGraphicScenes
- * @text Changing scene
- * @desc Select the graphic change scene.
- * @type select
- * @option Default
- * @value 'default'
- * @option Death
- * @value 'death'
- * @option Dying
- * @value 'dying'
- * @option Damage
- * @value 'damage'
- * @option Cridamage
- * @value 'cridamage'
- * @option Recovery
- * @value 'recovery'
- * @option Attack(1)
- * @value 'attack'
- * @option RecoverySkill(1)
- * @value 'recoverySkill'
- * @option UseItem(2)
- * @value 'item'
- * @option Counter
- * @value 'counter'
- * @option Reflection
- * @value 'reflection'
- * @option CounterEX(CounterExtend)(4)
- * @value 'counterEX'
- * @option Guard
- * @value 'guard'
- * @option Chant
- * @value 'chant'
- * @option Victory
- * @value 'victory'
- * @option State(3)
- * @value 'state'
- * @option Command Selection
- * @value 'command'
- * @option Final Attack (1) NUUN_FinalAttack required
- * @value 'finalAttack'
- * @default 'default'
- * @parent AllMatch
- * 
- * @param CondSetting
- * @text Condition setting
- * @default ------------------------------
- * 
- * @param Skill
- * @text Skill(1)
- * @desc Select a skill. Applies when using any skill. Blank or none applies to all skills.
- * @type skill[]
- * @default
- * @parent CondSetting
- * 
- * @param Item
- * @text Item(2)
- * @desc Select an item. Applies when using any item. Blank or None applies to all items.
- * @type item[]
- * @default
- * @parent CondSetting
- * 
- * @param stateId
- * @text Received state(3)
- * @desc Select a state. Applies to all states.
- * @type state[]
- * @default 
- * @parent CondSetting
- * 
- * @param Id
- * @text Identification tag(4)
- * @desc Specifies an identification tag. Applies when all identification tags are applicable.
- * @type string[]
- * @default 
- * @parent CondSetting
- */
-/*~struct~CondValue:
- * 
- * @param CondValid
- * @desc Activate the HP condition.
- * @text HP condition valid
- * @type boolean
- * @default false
- * 
- * @param UpLimit
- * @text Upper limit
- * @desc Upper limit.
- * @type number
- * @default 0
- * 
- * @param DwLimit
- * @text Lower limit
- * @desc Lower limit.
- * @type number
- * @default 0
- * 
- */
-/*~struct~ActorContentsRect:
- * 
- * @param ActorContentsCoordinateMode
- * @text Coordinate Mode
- * @desc Specifies the coordinate mode. ON: Absolute coordinates OFF: Relative coordinates
- * @type boolean
- * @default false
- * 
- * @param ActorContentsX
- * @desc Specifies the X coordinate of the content display of the actor status window. (relative)
- * @text X coordinate
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * 
- * @param ActorContentsY
- * @desc Specifies the Y coordinate of the content display of the actor status window. (relative)
- * @text Y coordinate
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * 
- * @param ActorContentsWidth
- * @desc Specifies the width of the content display in the actor status window. 0 is the normal display width.
- * @text Width
- * @type number
- * @default 0
- * @min 0
- * @max 999
- * 
- * @param ActorContentsHeight
- * @desc Specifies the height of the content display of the actor status window. 0 is the normal display width.
- * @text Height
- * @type number
- * @default 0
- * @min 0
- * @max 24
- * 
- */
-/*~struct~WindowBackgroundSetting:
- * 
- * @param BackgroundImg
- * @desc Specifies the background image window.
- * @text Background Image Window
- * @type file
- * @dir img/
- * @default 
- * 
- * @param Background_X
- * @desc Background image X coordinate (relative).
- * @text Background image X coordinate (relative)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * 
- * @param Background_Y
- * @desc Background image Y coordinate (relative).
- * @text Background image Y coordinate (relative)
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * 
- */
-/*~struct~WindowTone:
- * 
- * @param red
- * @desc Red
- * @text Red
- * @type number
- * @default 0
- * @max 255
- * @min -255
- * 
- * @param green
- * @text Green
- * @desc Green
- * @type number
- * @default 0
- * @max 255
- * @min -255
- * 
- * @param bule
- * @text Bule
- * @desc Bule
- * @type number
- * @default 0
- * @max 255
- * @min -255
- * 
- */
-/*:ja
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
+ * @version 3.12.19
  * @base NUUN_Base
- * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.1
  * 
  * @help
- * 戦闘レイアウトを変更、カスタマイズできます。
- * 
- * このプラグインでは他に以下の機能を実装します。
- * 戦闘ウィンドウのカスタマイズ。
- * フロントビューでのアクターへのアニメーション。
- * フロントビューでのアクターのステートアニメーション表示。
- * 条件付きアクター画像の切り替え。
- * ステータスパラメータのカスタマイズ。
- * 各ウィンドウの背景画像指定。
- * コマンドウィンドウのカスタマイズ。
- * 
- * 顔グラ、立ち絵の設定
- * アクターの画像設定で条件で顔グラまたは立ち絵を切り替える事ができます。また立ち絵、顔グラ表示EXに対応していますが、プラグインパラメータの
- * 立ち絵表示EX適用をONにしてください。
- * 条件の優先度は上から順に一致した条件が適用されます。通常時に適用される画像は一番下に設定してください。
- * 
- * 表示するステータス設定
- * 表示ステータス設定はアクターステータスに表示するステータスを独自に設定できます。
- * 表示したい項目だけ設定してください。
- * 表示ステータス設定にひとつでも設定してある場合は、こちらの設定が適用されます。
- * 
- * 
- * 独自パラメータ、独自パラメータ(動的) 
- * 評価式or文字列Aには表示する式をjavascriptで記入します。
- * actor:アクターゲームデータ
- * actor.actor():アクターシステムデータ
- * this._battler:アクターゲームデータ
- * this._battler.actor():アクターシステムデータ
- * 
- * 独自ゲージ
- * 評価式or文字列Aに現在の値をjavascriptで記入します。
- * 評価式or文字列Bに最大値をjavascriptで記入します。
- * actor:アクターゲームデータ
- * actor.actor():アクターシステムデータ
- * this._battler:アクターゲームデータ
- * this._battler.actor():アクターシステムデータ
- * 
- * ステート,ステート2
- * 評価式or文字列Aに表示するステートIDを記入します。
- * 評価式or文字列Bに表示するバフIDを記入します。
- * バフのID
- * 0:HP上昇 1:MP上昇 2:攻撃力上昇 3:防御力上昇 4:魔法力上昇 5:魔法防御上昇 6:敏捷性上昇 7:運上昇
- * 10:HP減少 11:MP減少 12:攻撃力減少 13:防御力減少 14:魔法力減少 15:魔法防御減少 16:敏捷性減少 17:運減少
- * 
- * 画像
- * 評価式or文字列Aには表示条件をjavascriptで記入します。条件が一致しているときに表示されます。
- * 無記入の場合は常に表示されます。
- * actor:アクターゲームデータ
- * actor.actor():アクターシステムデータ
- * this._battler:アクターゲームデータ
- * this._battler.actor():アクターシステムデータ
- * 
- * 敵キャラのメモ欄
- * <AttackAnimation:[id]>
- * [id]:アニメーションID
- * 敵キャラの通常攻撃時、[id]番のアニメーションが再生されます。指定がない場合はプラグインパラメータのデフォルト値が適用されます。
- * 
- * 各アクターステータス表示位置設定
- * リストの設定順はアクターステータスウィンドウに表示されるアクター順(戦闘キャラが1)になります。
- * 戦闘メンバーの表示設定はリストID1番に設定します。2番目は2番に設定します。(アクター別には設定できません)
- * 
- * このプラグインでは木星ペンギン氏作疑似３Dバトルプラグインとの競合対応プラグインは必要ありません。
- * 
- * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
- * 2024/7/21 Ver.1.0.1
- * アクターステータスウィンドウがちらつく問題を修正。
- * 戦闘終了時にスタックする問題を修正。
- * 2024/7/20 Ver.1.0.0
- * 初版
+ * 2024/7/14 Ver.3.12.19
+ * 顔グラが切り替わらない問題を修正。
+ * 2024/7/13 Ver.3.12.18
+ * コマンド選択を終了してもアクター画像が切り替わらなかった問題を修正。
+ * 立ち絵、顔グラ表示EXの更新による修正。
+ * 2024/7/7 Ver.3.12.17
+ * 戦闘リトライプラグインでのリトライ時の不具合を修正。
+ * 2024/6/16 Ver.3.12.16
+ * 戦闘中に最大メンバーが増加したときにフロントビューでのエフェクトが表示されない問題を修正。
+ * 2024/3/2 Ver.3.12.15
+ * ステート表示の処理を修正。
+ * 2024/2/18 Ver.3.12.14
+ * 表示させるステートアイコン指定時に戦闘開始するとエラーが出る問題を修正。
+ * 2024/2/5 Ver.3.12.13
+ * 対象選択時のアイテム、スキルヘルプを非表示にする機能を復活。
+ * 2024/1/7 Ver.3.12.12
+ * エフェクトの位置がずれて表示される問題を修正。
+ * 2023/12/29 Ver.3.12.11
+ * 戦闘開始時の画像が正常に取得できない問題を修正。
+ * 2023/12/28 Ver.3.12.10
+ * 一定時間変化の画像が戻らなくなる問題を修正。
+ * 2023/12/28 Ver.3.12.9
+ * 戦闘不能時の画像非表示をOFFに設定していても、画像が消えてしまう問題を修正。
+ * 戦闘不能をアイテム、スキルから付加させたときに、アクターの不透明度が正常に適用されない問題を修正。
+ * 反撃の立ち絵切り替えが機能していない問題を修正。
+ * 2023/12/23 Ver.3.12.8
+ * 戦闘不能ステートの判定が正常に行われていなかった問題を修正。
+ * ステート条件設定に0を指定していると他の条件も一致しなくなる問題を修正。
+ * 2023/12/21 Ver.3.12.7
+ * 不透明度が適用されない問題を修正。
+ * 2023/12/18 Ver.3.12.6
+ * 立ち絵、顔グラ表示EXでの画像設定で、画像が切り替わらない問題を修正。(立ち絵、顔グラ表示EX Ver.1.6.3以降)
+ * 2023/12/17 Ver.3.12.5
+ * コマンド選択時にアクターステータスウィンドウの位置が正常にシフトしない問題を修正。
+ * アクター画像を表示していない時にアクターを選択するとエラーが出る問題を修正。
+ * コマンドの位置をデフォルトに指定している場合のコマンドの表示位置を、アクターステータスウィンドウの横に表示されるように修正。
+ * 2023/9/2 Ver.3.12.4
+ * メンバー入れ替え時のアクター画像を一旦消去するように修正。
+ * 2023/8/8 Ver.3.12.3
+ * メンバー入れ替え時にカーソルの位置がずれて表示される問題を修正。
+ * 2023/7/30 Ver.3.12.2
+ * 味方の画像切り替えでランダムに表示できる機能を追加。
+ * 2023/7/21 Ver.3.12.1
+ * 敵の攻撃時の画像切り替えが機能していなかった問題を修正。
+ * 2023/7/17 Ver.3.12.0
+ * 敵の画像切り替えに関する処理の変更。
+ * 2023/7/8 Ver.3.11.3
+ * アクターのアニメーション、ポップアップの位置を修正。
+ * 2023/7/3 Ver.3.11.2
+ * マンガ的表現のバトルビューとの競合対応。
+ * 画像切り替え機能で反撃(反射)から元に戻らない問題を修正。
+ * 2023/7/2 Ver.3.11.1
+ * 天候を戦闘中でも切り替えられるように修正。
+ * 戦闘中の天候をスイッチで切り替えられる機能を追加。
+ * 戦闘開始時及び戦闘終了時に指定のコモンイベントを指定できる機能を追加。
+ * 2023/7/2 Ver.3.11.0
+ * 戦闘中に天候を適用できる機能を追加。
+ * 2023/6/26 Ver.3.10.16
+ * カウンターの画像切り替え処理を修正。
+ * 2023/6/22 Ver.3.10.15
+ * Dynamic Motionプラグインとの競合対策。
+ * 2023/6/14 Ver.3.10.14
+ * スキル発動待機時間ゲージ表示プラグインとの競合対応。
+ * 2023/6/3 Ver.3.10.13
+ * バトルウィンドウの表示形式をVer.3.10.6以前の方式とVer.3.10.7以降の方式を選択できる機能を追加。
+ * 2023/5/27 Ver.3.10.12
+ * ヘルプウィンドウスキンが非表示にならない問題を修正。
+ * 2023/5/24 Ver.3.10.11
+ * メッセージウィンドウのウィンドウスキン表示をOFFにすると、戦闘時以外で通常のウィンドウスキンが表示されなくなる問題を修正。
+ * 2023/5/22 Ver.3.10.10
+ * マップ中でメッセージウィンドウスキンが表示されなくなる問題を修正。
+ * 条件付きアクター画像にクリティカルダメージ時を追加。
+ * ステートアニメーションが行動エフェクト時にずれる問題を修正。
+ * 2023/5/14 Ver.3.10.9
+ * アクター画像がない場合にエラーが出る問題を修正。
+ * 2023/5/7 Ver.3.10.8
+ * 戦闘中のアクターへのアニメーション実行プラグイン対応による処理追加。
+ * 2023/5/2 Ver.3.10.7
+ * 一部のアニメーションで正常に表示されない問題を修正。
+ * 2023/4/30 Ver.3.10.6
+ * 画像の表示に条件を指定できる機能を追加。
+ * 行動エフェクト時に顔グラが消える問題を修正
+ * 2023/4/16 Ver.3.10.5
+ * 行動エフェクトと攻撃時の画像切り替えで画像の座標がずれる問題を修正。
+ * 2023/4/13 Ver.3.10.4
+ * カウンター時のスキル発動時のアクター画像切り替えを行うように修正。
+ * カウンター時は行動時エフェクトを行わないように修正。
+ * 2023/4/11 Ver.3.10.3
+ * CounterExtend(トリアコンタン氏)に対応。
+ * 2023/3/27 Ver.3.10.2
+ * 複数メッセージウィンドウと競合を起こす問題を修正。
+ * 2023/3/12 Ver.3.10.1
+ * 味方へのクリティカル時と通常ダメージ時の振動設定を別々に変更。
+ * 2023/2/27 Ver.3.10.0
+ * ゲームパッドを振動させる機能を正式に追加。(要NUUN_GamePadVibration)
+ * 2023/2/26 Ver.3.9.1
+ * 通常攻撃の画像が変化しなかった問題を修正。
+ * 試験的に味方のダメージ時にゲームパッドを振動させる機能を追加。
+ * 2023/2/24 Ver.3.9.0
+ * アクターステータスの各アクター表示の位置、幅を指定できる機能を追加。
+ * 戦闘アニメーションがないスキルを使用後、ステートを付加させると攻撃時の画像が瞬間表示される問題を修正。
+ * 2023/2/23 Ver.3.8.11
+ * 戦闘中セリフ表示プラグインとの競合対策。
+ * 2023/2/11 Ver.3.8.10
+ * アクターコンテンツを下側から表示する機能を追加。
+ * 2023/1/23 Ver.3.8.9
+ * 味方対象選択時キャンセルを押すと、スキル、アイテム画面とアクターコマンドが同時に表示される問題を修正。
+ * 2023/1/22 Ver.3.8.8
+ * アクターのフラッシュを他のアクターと同期するように修正。
+ * 2023/1/21 Ver.3.8.7
+ * MVアニメーションの時にフラッシュを行うと、アクターの色が戻らない問題を修正。
+ * 2023/1/8 Ver.3.8.6
+ * アクター名、オリジナルパラメータ、レベルの表示文字揃えを行う処理を追加。
+ * 味方対象選択時キャンセルをすると、対象者の行動時背景が表示されない問題を修正。
+ * 2022/12/24 Ver.3.8.5
+ * アクター名に任意のフォントを指定できる機能を追加。
+ * 2022/12/10 Ver.3.8.4
+ * 敵のダメージポップアップの位置を指定できる機能を追加。
+ * 2022/11/26 Ver.3.8.3
+ * 行動時ズーム時にAPNGの画像の座標がずれてしまう問題を修正。
+ * 2022/11/12 Ver.3.8.2
+ * 立ち絵が切り替わると表示が消えてしまう問題を修正。
+ * 2022/11/7 Ver.3.8.1
+ * アクター画像をAPNGに対応。
+ * 2022/10/18 Ver.3.8.0
+ * スキル、アイテム選択画面の座標、横幅、行数、列数を設定できる機能を追加。
+ * 2022/10/16 Ver.3.7.10
+ * 微修正。
+ * 2022/10/16 Ver.3.7.9
+ * アクター別ウィンドウ表示時に矢印が表示されてしまう問題を修正。
+ * 2022/10/15 Ver.3.7.8
+ * ステート無付加時のステートアイコンが敵にも適用されてしまう問題を修正。
+ * 2022/10/15 Ver.3.7.7
+ * ステートが一つも付加されていないときに表示するアイコンを指定できる機能を追加。
+ * 2022/10/9 Ver.3.7.6
+ * 一部のウィンドウスキンが適用されない問題を修正。
+ * 2022/10/9 Ver.3.7.5
+ * タイプ4追加による処理追加。
+ * 戦闘開始時にウィンドウが移動しないように修正。
+ * 2022/9/17 Ver.3.7.4
+ * 敵対象選択画面のモンスター名の表示をアクター名と同じ仕様にする機能を追加。
+ * 2022/9/10 Ver.3.7.3
+ * TPBバトルでサポートアクターが最初にコマンド選択するときにパーティコマンドが２回表示されてしまう問題を修正。
+ * 2022/9/10 Ver.3.7.2
+ * 画面サイズとUIサイズが異なるときにアクターコマンドの表示位置をactorに設定したときに、コマンドの表示がずれる問題を修正。
+ * 2022/9/3 Ver.3.7.1
+ * 外部プラグインでサイドビューアクターを表示すると正常に表示されない問題を修正。
+ * 2022/8/25 Ver.3.7.0
+ * アクター画像変化条件に防御時、反撃時、魔法反射時を追加。
+ * アクターコマンド可変表示時にアクターコマンドの表示がおかしくなる問題を修正。
+ * 2022/8/24 Ver.3.6.9
+ * アクターウィンドウのX座標を変更したときに、アクターコマンドがアクターの上指定時にコマンドウィンドウがずれて表示されてしまう問題を修正。
+ * アクターウィンドウの横幅指定時にアクターウィンドウが表示されない問題を修正。
+ * サイドビューアクターが表示されない問題を修正。
+ * 2022/8/7 Ver.3.6.8
+ * ステート2の表示ステートアイコンが適用されなかった問題を修正。
+ * 2022/8/7 Ver.3.6.7
+ * アニメーションの座標が適用されない問題を修正。
+ * 戦闘終了時にチラつく問題を修正。
+ * 2022/8/6 Ver.3.6.6
+ * 旧方式で戦闘を開始するとエラーが出る問題を修正。
+ * サイドビューでアクターが表示されなくなる問題を修正。
+ * 2022/8/6 Ver.3.6.5
+ * 戦闘以外でステートアイコンを表示する処理を行うとエラーが出る問題を修正。
+ * 可変表示をOFFにするとゲージの長さが適用されない問題を修正。
+ * 2022/8/6 Ver.3.6.4
+ * バフアイコン表示指定時のバフアイコンの２段階目のアイコンが表示されてしまう問題を修正。(現状２段階まで)
+ * 旧モードで設定した状態で戦闘を行うとエラーが出る問題を修正。
+ * 2022/8/6 Ver.3.6.3
+ * 表示するステートアイコン指定時にアイコンが正常に表示されない問題を修正。
+ * 2022/8/6 Ver.3.6.2
+ * ステート2が正常に表示されない問題を修正。
+ * スピードスターバトルと併用するとアニメーションの座標が正しく表示されない問題を修正。
+ * 2022/7/31 Ver.3.6.1
+ * アクター表示範囲可変表示の時にゲージ、名前が表示範囲内に収まるように修正。
+ * 2022/7/30 Ver.3.6.0
+ * ステータスが表示されるウィンドウに表示するステータスをウィンドウ外にも表示できるように変更。
+ * 表示ステータスに画像を表示できる機能を追加。
+ * 表示ステータスにメニューで表示されるタイプのステートを表示する機能を追加。
+ * 敵選択ウィンドウの表示がずれる問題を修正。
+ * バトルステータスウィンドウの表示がおかしくなる問題を修正。
+ * 2022/7/23 Ver.3.5.4
+ * キャンセルボタンのX座標を調整できる処理の追加。
+ * 処理の修正。
+ * 2022/7/18 Ver.3.5.3
+ * キャンセルボタンの表示位置を左か右か指定できる機能を追加。
+ * 2022/7/2 Ver.3.5.2
+ * TPBバトルでパーティコマンドが表示されず進行不能になる問題を修正。
+ * 顔グラの行動時エフェクト時に座標がずれる問題を修正。
+ * メンバー交代時にステートエフェクトが残ってしまう問題を修正。
+ * 2022/6/24 Ver.3.5.1
+ * 立ち絵切り替えの画像設定でデフォルトの画像を設定しなかったときにリスト0番の画像が切り替わらない問題を修正。
+ * アクターのアニメーションをOFFにして敵から攻撃を受けるとエラーが出る問題を修正。
+ * スタンダードでアクターの画像位置がおかしくなる問題を修正。
+ * 競合対策。
+ * 2022/6/19 Ver.3.5.0
+ * 画像切り替え時に座標がリセットされてしまう問題を修正。
+ * 2022/6/18 Ver.3.4.1
+ * アニメーションの表示をステータスの背後、ダメージポップアップをステータスの前面に表示するように変更。
+ * 2022/6/15 Ver.3.4.0
+ * パーティコマンド、アクターコマンド、アクターステータスウィンドウに任意のウィンドウスキンを設定できる機能を追加。
+ * 2022/6/11 Ver.3.3.7
+ * ステートエフェクトが画像の拡大率に依存してしまう問題を修正。
+ * 2022/6/7 Ver.3.3.6
+ * アクター画像の表示幅を指定すると行動時に画像が消える問題を修正。
+ * アクター行動時にステートの表示がおかしくなる問題を修正。
+ * アクター毎にステートエフェクトの座標を調整できる機能を追加。
+ * 2022/6/5 Ver.3.3.5
+ * アクター行動時のエフェクトがおかしくなる問題を修正。
+ * 2022/6/4 Ver.3.3.4
+ * アクター画像設定をなしに設定して戦闘を行うとアニメーション時にエラーが出る問題を修正。
+ * 2022/6/2 Ver.3.3.3
+ * 立ち絵の起点を下に設定したときに、画像の下部分がウィンドウの下側から表示されない問題を修正。
+ * 2022/6/1 Ver.3.3.2
+ * ２行目のアクターステータスの表示で表示揃えを適用できるように修正。
+ * アクター画像（顔グラ）の設定方法に画像起点を追加。
+ * 2022/5/31 Ver.3.3.1
+ * 敵またはアクター対象選択をキャンセルしパーティコマンドまで戻った時に、操作を受け付けなくなる問題を修正。
+ * 2022/5/26 Ver.3.3.0
+ * アクターステータスの表示する方法に独自表示設定する機能を追加。
+ * 上記の機能に独自パラメータ、独自ゲージを表示する機能を追加。
+ * 2022/5/12 Ver.3.2.2
+ * ステートアニメーションを表示させない機能を追加。
+ * 2022/5/11 Ver.3.2.1
+ * フロントビュー時のアクターのアニメーションをOFF、サイドビューバトル時でもステートアニメーションが適用してしまう問題を修正。
+ * 2022/5/11 Ver.3.2.0
+ * アクター画像にステート画像を表示する機能を追加。
+ * パーティ、アクターコマンドの表示位置を指定できる機能を追加。
+ * 2022/5/10 Ver.3.1.6
+ * MVアニメーションを再生したときにエラーが起きる問題を修正。
+ * 2022/5/10 Ver.3.1.5
+ * アクター画像にエフェクト（アニメーション）を適用するように修正。
+ * 2022/5/4 Ver.3.1.4
+ * 攻撃時のスキルをなしに設定したときに画像が切り替わらない問題を修正。
+ * 2022/5/3 Ver.3.1.3
+ * 戦闘不能時の画像を設定しても戦闘不能時に画像が消えてしまう問題を修正。
+ * 2022/5/2 Ver.3.1.2
+ * エフェクトのプロパティを中間（アクター画像とステータスの間）か最前面に表示する機能を追加。
+ * 2022/5/1 Ver.3.1.1
+ * MP、TPゲージの座標変更許可時に座標が正常に適用されてなかった問題を修正。
+ * 2022/4/10 Ver.3.1.0
+ * アクター画像条件拡張による処理追加。
+ * アクター画像設定のスキル、アイテム条件が適用されていなかった問題を修正。
+ * 2022/4/4 Ver.3.0.7
+ * アイコンステート枠内表示をOFFにした場合、ステートアイコンがアクター画像の背後に表示されてしまう問題を修正。
+ * 2022/4/1 Ver.3.0.6
+ * アクターコマンドの項目表示位置を中央にする機能の処理を追加。
+ * 2022/3/29 Ver.3.0.5
+ * アクターコマンドを各アクターの上指定時のサポートアクターのコマンド座標の処理を追加。
+ * 2022/3/27 Ver.3.0.4
+ * アニメーション、ダメージポップアップの表示がずれるため一時的にもとに戻す修正。
+ * 2022/3/26 Ver.3.0.3
+ * アクターウィンドウステータスのアクター配置を表示範囲可変表示にする機能を追加。
+ * 2022/3/26 Ver.3.0.2
+ * 敵選択ウィンドウのスキン非表示を設定する項目がなかった問題を修正。
+ * 逃走失敗時にエラーが出る問題を修正。
+ * 敵出現、勝利、敗北、逃走時に背景画像を指定したときに、背景のY座標が正常に適用していなかった問題を修正。
+ * 2022/3/25 Ver.3.0.1
+ * 立ち絵切り替え条件にスイッチ、武器、防具装備時、特定の職業を追加
+ * プラグインコマンド「アクターステータスウィンドウ透明化表示」の表記が逆だった問題を修正。
+ * 2022/3/24 Ver.3.0.0
+ * リニューアル版初版
  * 
  * 
- * @command ActorStatusWindowVisible
- * @desc アクターステータスの表示を切り替えます。
- * @text アクターステータス表示切替
+ * @command ActorStatusWindowOpacity
+ * @desc アクターステータスウィンドウを透明化します。
+ * @text アクターステータスウィンドウ透明化表示
  * 
- * @arg WindowVisible
+ * @arg WindowOpacity
  * @type boolean
  * @default false
- * @text 表示切替
- * @desc 表示の切り替えをします。(trueで表示)
+ * @text 不透明度表示
+ * @desc ONの時、アクターステータスウィンドウが透明化します。(ONで透明化)
  * 
- * 
- * @param BattleLayoutSetting
- * @text バトルレイアウト
- * @default ------------------------------
- * 
- * @param BattleLayoutStyle
- * @desc バトルスタイルを指定します。
- * @text バトルスタイル
- * @type combo
- * @option 'Default'
- * @option 'List'
- * @option 'List_NoTP'
- * @option 'XP'
- * @default 'Default'
- * @parent BattleLayoutSetting
- * 
- * @param BattleLayoutVar
- * @desc レイアウトを指定するゲーム変数を指定します。0及び変数の値が0でプラグインパラメータの設定が適用されます。
- * @text レイアウトゲーム変数
- * @type variable
- * @default 0
- * @parent BattleLayoutSetting
- * 
- * @param ActorStatusWindowSetting
- * @text アクターステータスウィンドウ
- * @default ------------------------------
- * 
- * @param BattleLayout
- * @desc バトルレイアウトを設定します。レイアウトゲーム変数での設定値はリスト番号を指定します。
- * @text バトルレイアウト設定
- * @default []
- * @type struct<BattleLayoutList>[]
- * @parent ActorStatusWindowSetting
- * 
- * @param BattleEndActorStatusClose
- * @desc 戦闘終了時にアクターステータスウィンドウを閉じます。
- * @text 戦闘終了時ウィンドウ閉め
- * @type boolean
- * @default false
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorSetting
- * @text アクター設定
- * @default ------------------------------
- * 
- * @param ActorGraphics
- * @text アクター画像設定
- * @desc アクター画像の設定を行います。
- * @default []
- * @type struct<ActorBattlerImgSetting>[]
- * @parent ActorSetting
- * 
- * @param OnActorPictureEX
- * @desc 立ち絵表示EXでの設定を適用します。
- * @text 立ち絵表示EX適用
- * @type boolean
- * @default false
- * @parent ActorSetting
- * 
- * @param ActorEffect
- * @text アクターエフェクト設定
- * @default ------------------------------
- * 
- * @param DamageImgFrame
- * @desc アクター画像のダメージ、回復時、防御の画像変化フレーム。
- * @text ダメージ、回復、防御時変化フレーム
- * @type number
- * @default 30
- * @min 1
- * @max 9999
- * @parent ActorEffect
- * 
- * @param CounterImgFrame
- * @desc アクター画像の反撃、魔法反射時の画像変化フレーム。
- * @text 反撃、魔法反射画像変化フレーム
- * @type number
- * @default 60
- * @min 1
- * @max 9999
- * @parent ActorEffect
- * 
- * @param OnActorShake
- * @desc ダメージ時のシェイクを有効にする。
- * @text ダメージシェイク有効
- * @type boolean
- * @default false
- * @parent ActorEffect
- * 
- * @param ActorShakeFlame
- * @desc ダメージ時のシェイクフレーム。（デフォルト36）
- * @text シェイクフレーム
- * @type number
- * @default 36
- * @min 0
- * @parent ActorEffect
- * 
- * @param ActorShakePower
- * @desc ダメージ時のシェイクの大きさ。（デフォルト2）
- * @text シェイクの大きさ
- * @type number
- * @default 2
- * @min 0
- * @parent ActorEffect
- * 
- * @param ActorShakeSpeed
- * @desc ダメージ時のシェイクのスピード。（デフォルト20）
- * @text シェイクスピード
- * @type number
- * @default 20
- * @min 0
- * @parent ActorEffect
- * 
- * @param OnActionZoom
- * @desc 行動時のエフェクトを有効にする。
- * @text 行動時エフェクト有効
- * @type boolean
- * @default false
- * @parent ActorEffect
- * 
- * @param ActionZoomDuration
- * @desc 行動時のエフェクトフレーム
- * @text 行動時エフェクトフレーム
- * @type number
- * @default 60
- * @min 0
- * @parent ActorEffect
- * 
- * @param ActorFlash
- * @desc アクター対象選択時にアクター画像を点滅させます。
- * @text 選択時アクター画像点滅
- * @type boolean
- * @default true
- * @parent ActorEffect
- * 
- * @param ActorsMirror
- * @desc アクターのアニメーションを反転します。
- * @text アクターアニメーション反転
- * @type boolean
- * @default true
- * @parent ActorEffect
- * 
- * @param EnemyEffect
- * @text 敵のエフェクト
- * @default ------------------------------
- * 
- * @param EnemySkillAnimation
- * @desc 敵の通常攻撃のアニメーション。
- * @text 敵通常攻撃アニメーション
- * @type animation
- * @default 1
- * @min 0
- * @parent EnemyEffect
- * 
- * @param EnemyDamage_X
- * @desc ダメージエフェクトのX座標。（相対座標）
- * @text ダメージエフェクトX座標（相対座標）
+ * @arg WindowOpacityValue
  * @type number
  * @default 0
- * @min -9999
- * @max 9999
- * @parent EnemyEffect
+ * @text 不透明度
+ * @desc 不透明度を指定します。0で非表示
  * 
- * @param EnemyDamage_Y
- * @desc ダメージエフェクトのY座標。（相対座標）
- * @text ダメージエフェクトY座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent EnemyEffect
- * 
- * @param StateIconSettings
- * @text ステートアイコン設定
- * @default ------------------------------
- * 
- * @param NoStateIcon
- * @desc ステートが一つも付与されていないときのアイコンインデックス。0で無効になります。
- * @text ステートなしアイコンインデックス
- * @type icon
- * @default 0
- * @parent StateIconSettings
- * 
- * @param WindowSetting
- * @text ウィンドウ設定設定
- * @default ------------------------------
- * 
- * @param NoAppearWindow
- * @desc モンスター出現時のメッセージを無効にする。
- * @text モンスター出現メッセージ無効
- * @type boolean
- * @default false
- * @parent WindowSetting
- * 
- * @param WindowHideActorStatusWindow
- * @desc 特定のウィンドウが表示されているときのアクターステータスウィンドウを非表示にする対象を指定します。
- * @text 特定ウィンドウアクターステータスウィンドウ非表示設定
- * @type combo[]
- * @option 'MessageWindow'
- * @option 'ItemWindow'
- * @option 'SkillWindow'
- * @option 'ActorWindow'
- * @option 'EnemyWindow'
- * @option 'EnemyBook'
- * @option 'Formation'
- * @option 'ResultWindow'
- * @option 'ResultLevelUp'
- * @default 
- * @parent WindowSetting
- * 
- * @param SpecialSetting
- * @text 特殊設定
- * @default ////////////////////////////////
- * 
- * @param WindowDisplayMode
- * @text ウィンドウ表示モード
- * @desc ウィンドウの表示モードを指定します。
- * @type select
- * @option Spriteset_Battle
- * @value 'Spriteset_Battle'
- * @option Scene_Battle
- * @value 'Scene_Battle'
- * @default 'Spriteset_Battle'
- * @parent SpecialSetting
- * 
- */
-/*~struct~BattleLayoutList:ja
- * 
- * @param StyleName
- * @desc バトルレイアウトのスタイル名。
- * @text バトルレイアウトスタイル
- * @type combo
- * @option 'Default'
- * @option 'List'
- * @option 'XP'
- * @option 'Side'
- * @default 'Default'
- * 
- * @param DisplayStatusSettings
- * @text 表示ステータス設定
- * @default ------------------------------
- * 
- * @param BattleStatusList
- * @desc 表示するステータスを指定します。
- * @text 表示するステータス設定
- * @default []
- * @type struct<ActorStatusList>[]
- * @parent DisplayStatusSettings
- * 
- * @param ActorStatusWindowSetting
- * @text アクターステータスウィンドウ基本設定
- * @default ------------------------------
- * 
- * @param ActorStatusWindowBesideMode
- * @text 横方向表示方法1
- * @desc アクターステータスウィンドウの横方向の表示方法を選択します。
- * @type select
- * @option 左寄り
- * @value 'left'
- * @option 中央
- * @value 'center'
- * @option 右寄り
- * @value 'right'
- * @default 'center'
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusWindowVerticalMode
- * @text 縦方向表示方法2
- * @desc アクターステータスウィンドウの縦方向の表示方法を選択します。
- * @type select
- * @option 上基準
- * @value 'top'
- * @option 下基準
- * @value 'under'
- * @default 'under'
- * @parent ActorStatusWindowSetting
- * 
- * @param WindowShow
- * @desc ウィンドウを表示する。アクター画像やステータスは表示されます。
- * @text ウィンドウ表示
- * @type boolean
- * @default false
- * @parent ActorStatusWindowSetting
- * 
- * @param WindowFrameShow
- * @desc ウィンドウ枠を表示する。
- * @text ウィンドウ枠表示
- * @type boolean
- * @default false
- * @parent ActorStatusWindowSetting
- * 
- * @param ContentsBackShow
- * @desc ウィンドウのコンテンツ背景を表示する。
- * @text ウィンドウコンテンツ背景表示
- * @type boolean
- * @default false
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusBackgroundSetting
- * @text アクターステータスウィンドウスキン設定
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusWindowBacgroundImg
- * @text ウィンドウ背景画像設定
- * @desc アクターステータスウィンドウの背景画像を設定します。
- * @default 
- * @type struct<WindowBackgroundSetting>
- * @parent ActorStatusBackgroundSetting
- * 
- * @param BackgroundStatusWindowFit
- * @desc 画像の表示位置をステータスウィンドウに合わせます。OFFでUI範囲(0,0)
- * @text ステータスウィンドウ位置表示
- * @type boolean
- * @default treu
- * @parent ActorStatusBackgroundSetting
- * 
- * @param ActorStatusWindowSkinSetting
- * @text アクターステータスウィンドウスキン設定
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusWindowSkin
- * @text ウィンドウスキン設定
- * @desc アクターステータスウィンドウのスキンを設定します。
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorStatusWindowSkinSetting
- * 
- * @param ActorStatusWindowColor
- * @text ウィンドウカラー
- * @desc ウィンドウの色の設定をします。空欄でデフォルト
- * @default 
- * @type struct<WindowTone>
- * @parent ActorStatusWindowSkinSetting
- * 
- * @param ActorStatuPositionSetting
- * @text 座標設定
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusX
- * @desc アクターステータスウィンドウのX座標を指定します。(相対)
- * @text X座標
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent ActorStatuPositionSetting
- * 
- * @param ActorStatusY
- * @desc アクターステータスウィンドウのY座標を指定します。(相対)
- * @text Y座標
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent ActorStatuPositionSetting
- * 
- * @param ActorStatusWidth
- * @desc アクターステータスウィンドウの横幅を指定します。
- * @text 横幅
- * @type number
- * @default 0
- * @min 0
- * @parent ActorStatuPositionSetting
- * 
- * @param ActorStatusHeight
- * @desc アクターステータスウィンドウの縦幅を指定します。
- * @text 縦幅
- * @type number
- * @default 0
- * @min 0
- * @parent ActorStatuPositionSetting
- * 
- * @param ActorStatuDisplayShiftSettings
- * @text アクターステータスウィンドウ表示設定
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param CommandShiftMode
- * @text シフト対象コマンドウィンドウ
- * @desc カスタム選択時のパーティコマンドの表示位置を指定します。
- * @type select
- * @option パーティコマンド
- * @value 'party'
- * @option アクターコマンド
- * @value 'actor'
- * @option シフトしない
- * @value 'none'
- * @default 'party'
- * @parent ActorStatuDisplayShiftSettings
- * 
- * @param CommandRightMode
- * @desc パーティ、アクターコマンドがデフォルトの表示の時に表示されるコマンドの位置。
- * @text パーティ、アクターコマンド右側表示
- * @type boolean
- * @default true
- * @parent ActorStatuDisplayShiftSettings
- * 
- * @param CommandSubtraction
- * @desc コマンド分のウィンドウを差し引きます。
- * @text コマンド分ウィンドウ差し引き
- * @type boolean
- * @default false
- * @parent ActorStatuDisplayShiftSettings
- * 
- * @param WindowContentsSetting
- * @text アクターステータスコンテンツ設定
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorMaxCol
- * @desc 横に並べるアクター数。
- * @text 横アクター数
- * @type number
- * @default 4
- * @min 1
- * @max 99
- * @parent WindowContentsSetting
- * 
- * @param ActorMaxRow
- * @desc 縦に並べるアクター数。
- * @text 縦アクター数
- * @type number
- * @default 1
- * @min 1
- * @max 99
- * @parent WindowContentsSetting
- * 
- * @param ActorStatusBesideMode
- * @text 横方向表示方法1
- * @desc アクターステータスコンテンツの横方向の表示方法を選択します。
- * @type select
- * @option 左寄り
- * @value 'left'
- * @option 中央
- * @value 'center'
- * @option 右寄り
- * @value 'right'
- * @option ピラミッド
- * @value 'triangle'
- * @default 'center'
- * @parent WindowContentsSetting
- * 
- * @param ActorStatusVerticalMode
- * @text 縦方向表示方法2
- * @desc アクターステータスコンテンツの縦方向の表示方法を選択します。
- * @type select
- * @option 上基準
- * @value 'top'
- * @option 下基準
- * @value 'under'
- * @default 'top'
- * @parent WindowContentsSetting
- * 
- * @param SelectBackShow
- * @desc アクターの行動選択時に表示されるアクター背景を表示する。
- * @text アクター行動時背景表示
- * @type boolean
- * @default true
- * @parent WindowContentsSetting
- * 
- * @param ActorSelectBackShow
- * @desc アクターの対象選択時に表示されるアクター背景を表示する。
- * @text アクターの対象選択時背景表示
- * @type boolean
- * @default true
- * @parent WindowContentsSetting
- * 
- * @param ActorContentsSetting
- * @text 各アクターステータス表示位置設定
- * @desc 各アクターステータスのコンテンツの表示位置を指定します。
- * @default []
- * @type struct<ActorContentsRect>[]
- * @parent WindowContentsSetting
- * 
- * @param Background
- * @text コンテンツ背景、前景画像設定
- * @default ------------------------------
- * @parent  ActorStatusWindowSetting
- * 
- * @param ActorBackground
- * @desc アクターの背景画像を指定します。
- * @text アクター背景画像
- * @type file
- * @default 
- * @dir img/
- * @parent Background
- * 
- * @param ActorFrontImg
- * @desc アクターの前景画像を指定する。（アクターグラフィックとステータスの間に表示）
- * @text 前景画像
- * @type file
- * @dir img/
- * @default 
- * @parent Background
- * 
- * @param ActorStatusActorWindow
- * @text アクター個別ウィンドウ設定
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorStatusActorWindowShow
- * @desc アクター別のウィンドウを表示します。
- * @text アクター別ウィンドウ表示
- * @type boolean
- * @default false
- * @parent ActorStatusActorWindow
- * 
- * @param ActorWindowSkinSetting
- * @text アクターウィンドウスキン設定
- * @default ------------------------------
- * @parent ActorStatusWindowSetting
- * 
- * @param ActorWindowSkin
- * @desc ウィンドウスキンを指定します。
- * @text ウィンドウスキン画像
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorWindowSkinSetting
- * 
- * @param ActorWindowColor
- * @text ウィンドウカラー
- * @desc ウィンドウの色の設定をします。空欄でデフォルト
- * @default 
- * @type struct<WindowTone>
- * @parent ActorWindowSkinSetting
- * 
- * @param ActorWindowSetting
- * @text アクターウィンドウ設定
- * @default ////////////////////////////////
- * 
- * @param DefaultActorWindow
- * @desc デフォルトのアクター選択ウィンドウを表示します。
- * @text アクター選択ウィンドウ表示
- * @type boolean
- * @default false
- * @parent ActorWindowSetting
- * 
- * @param ActorWindowFrameShow
- * @desc ウィンドウ枠を表示する。
- * @text ウィンドウ枠表示
- * @type boolean
- * @default false
- * @parent ActorWindowSetting
- * 
- * @param PartyCommandSettings
- * @text パーティコマンド設定
- * @default ////////////////////////////////
- * 
- * @param PartyCommandPosition
- * @text コマンドの表示位置
- * @desc カスタム選択時のパーティコマンドの表示位置を指定します。
- * @type select
- * @option 上部
- * @value 'top'
- * @option 中間
- * @value 'middle'
- * @option アクターステータスウィンドウの上
- * @value 'statuswindowtop'
- * @option 下部
- * @value 'under'
- * @option カスタム
- * @value 'custom'
- * @option デフォルト
- * @value 'default'
- * @option 従来処理
- * @value 'none'
- * @default 'default'
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandMaxCol
- * @desc 表示するコマンド列数。
- * @text 表示コマンド列数
- * @type number
- * @default 1
- * @min 1
- * @max 99
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandMaxRow
- * @desc 表示するコマンド行数。
- * @text 表示コマンド行数
- * @type number
- * @default 4
- * @min 1
- * @max 99
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandPositionSetting
- * @text 座標設定
- * @default ------------------------------
- * @parent PartyCommandSettings
- * 
- * @param PartyCommand_X
- * @desc パーティコマンドウィンドウのX座標を指定します。
- * @text コマンドウィンドウX座標
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent PartyCommandPositionSetting
- * 
- * @param PartyCommand_Y
- * @desc パーティコマンドウィンドウのY座標を指定します。
- * @text コマンドウィンドウY座標
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent PartyCommandPositionSetting
- * 
- * @param PartyCommand_Width
- * @desc パーティコマンドウィンドウの横幅を指定します。0でUI幅
- * @text コマンドウィンドウの横幅
- * @type number
- * @default 192
- * @max 9999
- * @min 0
- * @parent PartyCommandPositionSetting
- * 
- * @param PartyCommandOption
- * @text パーティコマンドオプション
- * @default ------------------------------
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandWindowCenter
- * @text ウィンドウ座標中央表示
- * @desc ウィンドウを中央に表示させます。(デフォルト以外)
- * @type boolean
- * @default false
- * @parent PartyCommandOption
- * 
- * @param PartyCommandMode
- * @desc パーティコマンドの項目を中央寄りに表示させます。
- * @text コマンド表示中央寄り
- * @type boolean
- * @default false
- * @parent PartyCommandOption
- * 
- * @param PartyCommandBackgroundSetting
- * @text パーティコマンドウィンドウ背景設定
- * @default ------------------------------
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandWindowBacgroundImg
- * @text パーティコマンドウィンドウ背景画像設定
- * @desc パーティコマンドウィンドウの背景画像を設定します。
- * @default 
- * @type struct<WindowBackgroundSetting>
- * @parent PartyCommandBackgroundSetting
- * 
- * @param BackgroundPartyCommandWindowFit
- * @desc 画像の表示位置をパーティコマンドウィンドウに合わせます。OFFでUI範囲(0,0)
- * @text パーティコマンドウィンドウ位置表示
- * @type boolean
- * @default treu
- * @parent PartyCommandBackgroundSetting
- * 
- * @param PartyCommandWindowSkinSetting
- * @text パーティコマンドウィンドウ画像設定
- * @default ------------------------------
- * @parent PartyCommandSettings
- * 
- * @param PartyCommandWindowVisible
- * @desc ウィンドウ画像を不透明化。背景指定時はOFFにしてください。(OFFでコマンドのみ表示されます。)
- * @text ウィンドウ不透明化
- * @type boolean
- * @default true
- * @parent PartyCommandWindowSkinSetting
- * 
- * @param PartyCommandWindowSkin
- * @text ウィンドウスキン設定
- * @desc パーティコマンドウィンドウのスキンを設定します。
- * @type file
- * @dir img/system
- * @default 
- * @parent PartyCommandWindowSkinSetting
- * 
- * @param PartyCommandWindowColor
- * @text ウィンドウカラー
- * @desc ウィンドウの色の設定をします。空欄でデフォルト
- * @default 
- * @type struct<WindowTone>
- * @parent PartyCommandWindowSkinSetting
- * 
- * @param ActorCommandSettings
- * @text アクターコマンド設定
- * @default ////////////////////////////////
- * 
- * @param ActorCommandPosition
- * @text アクターコマンドの表示方法
- * @desc アクターコマンドの表示方法を選択します。
- * @type select
- * @option デフォルト(座標は固定です)
- * @value 'default'
- * @option 上部
- * @value 'top'
- * @option 中間
- * @value 'middle'
- * @option アクターステータスウィンドウの上
- * @value 'statuswindowtop'
- * @option 下部
- * @value 'under'
- * @option 各アクターの上
- * @value 'actor'
- * @option 各SVアクターの上（SV推奨）
- * @value 'svtop'
- * @option 各SVアクターの左（SV推奨）
- * @value 'svleft'
- * @option 各SVアクターの右（SV推奨）
- * @value 'svright'
- * @option カスタム
- * @value 'custom'
- * @option 従来処理
- * @value 'none'
- * @default 'default'
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandMaxRow
- * @desc 表示できる最大コマンド行数。コマンド可変表示をOFFの場合はこの設定の値が適用されます。
- * @text 最大表示コマンド行数
- * @type number
- * @default 10
- * @min 1
- * @max 99
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandMinRow
- * @desc 表示する最低コマンド行数。
- * @text コマンド可変表示時の表示最低コマンド行数
- * @type number
- * @default 4
- * @min 1
- * @max 99
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandMaxCol
- * @desc 表示するコマンド列数。
- * @text 表示コマンド列数
- * @type number
- * @default 1
- * @min 1
- * @max 99
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandVariable
- * @desc アクターコマンドの表示数をコマンド数分表示します。（最大表示コマンド行数まで表示）
- * @text コマンド可変表示
- * @type boolean
- * @default true
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandPositionSetting
- * @text 座標設定
- * @default ------------------------------
- * @parent ActorCommandSettings
- * 
- * @param ActorCommand_X
- * @desc アクターコマンドウィンドウのX座標を指定します。
- * @text コマンドウィンドウX座標
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent ActorCommandPositionSetting
- * 
- * @param ActorCommand_Y
- * @desc アクターコマンドウィンドウのY座標を指定します。
- * @text コマンドウィンドウY座標
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * @parent ActorCommandPositionSetting
- * 
- * @param ActorCommand_Width
- * @desc アクターコマンドウィンドウの横幅を指定します。
- * @text コマンドウィンドウの横幅
- * @type number
- * @default 192
- * @max 9999
- * @min 0
- * @parent ActorCommandPositionSetting
- * 
- * @param ActorCommandOption
- * @text アクターコマンドオプション
- * @default ------------------------------
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandWindowCenter
- * @text ウィンドウ座標中央表示
- * @desc ウィンドウを中央に表示させます。(デフォルト以外)
- * @type boolean
- * @default false
- * @parent ActorCommandOption
- * 
- * @param ActorCommandMode
- * @desc アクターコマンドの項目を中央寄りに表示させます。
- * @text コマンド表示中央寄り
- * @type boolean
- * @default false
- * @parent ActorCommandOption
- * 
- * @param ActorCommandHideWindow
- * @desc 特定のウィンドウが開いている間にアクターコマンドを非表示にするウィンドウを指定します。
- * @text アクターコマンド非表示対象ウィンドウ
- * @type combo[]
- * @option 'MessageWindow'
- * @option 'ItemWindow'
- * @option 'SkillWindow'
- * @option 'ActorWindow'
- * @option 'EnemyWindow'
- * @option 'EnemyBook'
- * @option 'Formation'
- * @default 
- * @parent ActorCommandOption
- * 
- * @param ActorCommandBackgroundSetting
- * @text アクターコマンドウィンドウ背景設定
- * @default ------------------------------
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandWindowBacgroundImg
- * @text アクターコマンドウィンドウ背景画像設定
- * @desc アクターコマンドウィンドウの背景画像を設定します。
- * @default 
- * @type struct<WindowBackgroundSetting>
- * @parent ActorCommandBackgroundSetting
- * 
- * @param BackgroundActorCommandWindowFit
- * @desc 画像の表示位置をアクターコマンドウィンドウに合わせます。OFFでUI範囲(0,0)
- * @text アクターコマンドウィンドウ位置表示
- * @type boolean
- * @default treu
- * @parent ActorCommandBackgroundSetting
- * 
- * @param ActorCommandWindowSkinSetting
- * @text アクターコマンドウィンドウ画像設定
- * @default ------------------------------
- * @parent ActorCommandSettings
- * 
- * @param ActorCommandWindowVisible
- * @desc ウィンドウ画像を不透明化。背景指定時はOFFにしてください。(OFFでコマンドのみ表示されます。)
- * @text ウィンドウ不透明化
- * @type boolean
- * @default true
- * @parent ActorCommandWindowSkinSetting
- * 
- * @param ActorCommandWindowSkin
- * @desc ウィンドウスキンを指定します。
- * @text ウィンドウスキン画像
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorCommandWindowSkinSetting
- * 
- * @param ActorCommandWindowColor
- * @text ウィンドウカラー
- * @desc ウィンドウの色の設定をします。空欄でデフォルト
- * @default 
- * @type struct<WindowTone>
- * @parent ActorCommandWindowSkinSetting
- * 
- * @param ActorImgSetting
- * @text アクター画像設定
- * @default ------------------------------
- * 
- * @param ActorImgMode
- * @text アクターの画像モード
- * @desc アクターステータスに表示するアクターの画像。
- * @type select
- * @option なし
- * @value 'none'
- * @option 顔グラ
- * @value 'face'
- * @option 画像
- * @value 'imges'
- * @default 'face'
- * @parent ActorImgSetting
- * 
- * @param ActorImg_X
- * @desc 画像のX座標を設定します。
- * @text 画像X座標
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param ActorImg_Y
- * @desc 画像のY座標を設定します。
- * @text 画像Y座標
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param Img_SX
- * @desc 画像の表示開始座標X。
- * @text 画像表示開始座標X
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param Img_SY
- * @desc 画像の表示開始座標Y
- * @text 画像表示開始座標Y
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param Img_SW
- * @desc 画像の表示横幅。
- * @text 画像表示横幅
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param Img_SH
- * @desc 画像の表示縦幅。
- * @text 画像表示縦幅
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param ActorImgHPosition
- * @text 顔グラ横基準表示位置
- * @desc 顔グラの横の基準表示位置を指定します。
- * @type select
- * @option 画像左基準
- * @value 'left'
- * @option 画像中央基準
- * @value 'center'
- * @default 'center'
- * @parent ActorImgSetting
- * 
- * @param ActorImgVPosition
- * @text 画像縦基準表示位置
- * @desc 画像の縦の基準表示位置を指定します。(画像のみ)
- * @type select
- * @option 画像上基準
- * @value 'top'
- * @option 画像下基準
- * @value 'under'
- * @default 'under'
- * @parent ActorImgSetting
- * 
- * @param ImgHeight
- * @desc 画像の最大縦幅を指定します。（0でデフォルト）
- * @text 画像縦幅
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgSetting
- * 
- * @param ImgHeightOnWindow
- * @desc アクター画像の高さ範囲をウィンドウ内に納めます。
- * @text アクター画像ウィンドウ内表示
- * @type boolean
- * @default false
- * @parent ActorImgSetting
- * 
- * @param ActorSpecificSettings
- * @text アクター別設定
- * @default ------------------------------
- * @parent ActorImgSetting
- * 
- * @param ActorData
- * @text アクター座標、画像設定
- * @desc アクターの個別の座標、画像設定を行います。
- * @default []
- * @type struct<ActorDataList>[]
- * @parent ActorImgSetting
- * 
- * @param ActorStateAnimationPosition
- * @text アクターステートアニメーション設定
- * @default ------------------------------
- * @parent ActorImgSetting
- * 
- * @param StateAnimationShow
- * @desc アクター画像のステートアニメーションを表示します。フロントビューでアニメーションエフェクト表示有効時のみ
- * @text アクター画像ステートアニメーション表示
- * @type boolean
- * @default true
- * @parent ActorStateAnimationPosition
- * 
- * @param ActorState_X
- * @desc アクター画像毎のステートアニメーションのX座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
- * @text ステートアニメーションX座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimationPosition
- * 
- * @param ActorState_Y
- * @desc アクター画像毎のステートアニメーションのY座標。（相対座標）フロントビューでアニメーションエフェクト表示有効時のみ
- * @text ステートアニメーションY座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimationPosition
- * 
- * @param ActorEffectSettings
- * @text アクターエフェクト設定
- * @default ////////////////////////////////
- * 
- * @param ActorEffectShow
- * @desc フロントビューでもアニメーションエフェクトを表示。
- * @text フロントビューエフェクト表示
- * @type boolean
- * @default false
- * @parent ActorEffectSettings
- * 
- * @param ActorEffect_X
- * @desc アニメーションエフェクトのX座標（相対座標）。
- * @text アニメーションエフェクトX座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorEffectSettings
- * 
- * @param ActorEffect_Y
- * @desc アニメーションエフェクトのY座標（相対座標）。
- * @text アニメーションエフェクトY座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorEffectSettings
- * 
- * @param ActorDamage_X
- * @desc ダメージエフェクトのX座標。（相対座標）
- * @text ダメージエフェクトX座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorEffectSettings
- * 
- * @param ActorDamage_Y
- * @desc ダメージエフェクトのY座標。（相対座標）
- * @text ダメージエフェクトY座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorEffectSettings
- * 
- * @param SelectActorHideWindow
- * @desc アクターウィンドウが表示されている間に非表示にするウィンドウを指定します。
- * @text 指定ウィンドウ非表示
- * @type combo[]
- * @option 'ItemWindow'
- * @option 'SkillWindow'
- * @default 
- * 
- */
-/*~struct~ActorStatusList:ja
- *
- * @param DateSelect
- * @text 表示するステータス
- * @desc 表示するステータスを指定します。
- * @type select
- * @option なし
- * @value None
- * @option 名称のみ(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
- * @value Name
- * @option アクター名(1)(2)(3)(4)(5)(9)(11)(12)
- * @value DynamicName
- * @option 二つ名(1)(2)(3)(4)(5)(9)(11)(12)
- * @value Nickname
- * @option 職業(1)(2)(3)(4)(5)(9)(11)(12)
- * @value Class
- * @option レベル(1)(2)(3)(4)(5)(6)(9)(11)(12)(13)
- * @value Level
- * @option ステート(1)(2)(3)(4)(5)(16※1)
- * @value State
- * @option ステート2(1)(2)(3)(4)
- * @value State2
- * @option ターン(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)
- * @value Turn
- * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)
- * @value OrgParam
- * @option 独自パラメータ(動的)(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)
- * @value DynamicOrgParam
- * @option HPゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
- * @value HpGauge
- * @option MPゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
- * @value MpGauge
- * @option TPゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
- * @value TpGauge
- * @option TPBゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
- * @value TpbGauge
- * @option CircularHP(1)(2)(3)(4)(7)(20)(21)(23)(24)
- * @value HpCircularGauge
- * @option CircularMP(1)(2)(3)(4)(7)(20)(23)
- * @value MpCircularGauge
- * @option CircularTP(1)(2)(3)(4)(7)(20))(23)
- * @value TpCircularGauge
- * @option CircularTPB(1)(2)(3)(4)(7)(20))(23)
- * @value TpbCircularGauge
- * @option 独自ゲージ(1)(2)(3)(4)(5)(7)(16)(18)(20)(21)(22)(23)(24)
- * @value OrgGauge
- * @option 画像(1)(2)(3)(4)(25)
- * @value Imges
- * @option フリーテキスト(1)(2)(3)(4)(35)
- * @value Freetext
- * @option ライン(1)(2)(3)(4)(5)(8)
- * @value HorzLine
- * @default None
- * 
- * @param X_Position
- * @text X表示列位置(1)
- * @desc X表示列位置
- * @type number
- * @default 1
- * @min 1
- * @max 4
- * 
- * @param Y_Position
- * @desc Y表示行位置
- * @text Y表示行位置(2)
- * @type number
- * @default 1
- * @min 1
- * @max 99
- * 
- * @param X_Coordinate
- * @text X座標（相対）(3)
- * @desc X座標（X表示列位置からの相対座標）
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * 
- * @param Y_Coordinate
- * @text Y座標（相対）(4)
- * @desc Y座標（Y表示行位置からの相対座標）
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * 
- * @param ItemWidth
- * @desc 項目、ゲージ横幅（0でデフォルト幅）
- * @text 項目、ゲージ横幅(5)
- * @type number
- * @default 0
- * @min 0
- * 
- * @param SystemItemWidth
- * @desc 項目名称の横幅（0でデフォルト幅）
- * @text 項目名称横幅(6)
- * @type number
- * @default 0
- * @min 0
- * 
- * @param ParamName
- * @desc 項目の名称を設定します。
- * @text 名称(7)
- * @type string
- * @default
- * 
- * @param NameColor
- * @desc 項目名称のシステムカラーID。テキストタブでカラーコードを入力できます。
- * @text 項目名称文字色(8)
- * @type color
- * @default 16
- * @min 0
- * 
- * @param Align
- * @desc 文字揃え。
- * @text 文字揃え(9)
- * @type select
- * @option 左
- * @value 'left'
- * @option 右
- * @value 'right'
- * @option 中央
- * @value 'center'
- * @default 'left'
- * 
- * @param paramUnit
- * @desc 単位を設定します。
- * @text 単位(10)
- * @type string
- * @default 
- * 
- * @param FontSize
- * @desc フォントサイズ（メインフォントからの差）
- * @text フォントサイズ(11)
- * @type number
- * @default 0
- * @min -99
- * 
- * @param FontFace
- * @desc 項目名称のフォントを設定します。
- * @text 項目名称フォント(12)
- * @type string
- * @default 
- * 
- * @param ValueFontFace
- * @desc 数値のフォントを設定します。
- * @text 数値フォント(13)
- * @type string
- * @default 
- * 
- * @param DetaEval
- * @desc 評価式または文字列を記入します。ステートはステートID、ゲージは現在値
- * @text 評価式or文字列(javaScript)(16)
- * @type combo
- * @option '$gameVariables.value(0);//ゲーム変数'
- * @option 'actor;//アクターのゲームデータ'
- * @option 'actor.actor();//アクターのシステムデータ'
- * @default 
- * 
- * @param DetaEval2
- * @desc 評価式または文字列を記入します。ステートはバフ、ゲージは最大値
- * @text 評価式or文字列(javaScript)(22)
- * @type combo
- * @option '$gameVariables.value(0);//ゲーム変数'
- * @option 'actor;//アクターのゲームデータ'
- * @option 'actor.actor();//アクターのシステムデータ'
- * @default 
- * 
- * @param ParamID
- * @desc ステート、ゲージの識別ID。
- * @text 識別ID(20)
- * @type string
- * @default 
- * 
- * @param GaugeSetting
- * @text ゲージ設定
- * @default ------------------------------
- * 
- * @param GaugeHeight
- * @desc ゲージの縦幅を指定します。
- * @text ゲージの縦幅(21)
- * @type number
- * @default 12
- * @min 0
- * @max 24
- * @parent GaugeSetting
- * 
- * @param Color1
- * @desc ゲージのシステムカラーID(左)。テキストタブでカラーコードを入力できます。
- * @text ゲージカラー(左)(23)
- * @type color
- * @default -1
- * @min -1
- * @parent GaugeSetting
- * 
- * @param Color2
- * @desc ゲージのシステムカラーID(右)。テキストタブでカラーコードを入力できます。
- * @text ゲージカラー(右)(24)
- * @type color
- * @default -1
- * @min -1
- * @parent GaugeSetting
- * 
- * @param ImgSetting
- * @text 画像設定
- * @default ------------------------------
- * 
- * @param ImgData
- * @desc 表示する画像を指定します。
- * @text 画像(25)
- * @type file
- * @dir img/
- * @default 
- * @parent ImgSetting
- * 
- * @param OtherSetting
- * @text その他設定
- * @default ------------------------------
- * 
- * @param Text
- * @desc フリーテキストのテキストを記入します。(制御文字使用可能)
- * @text フリーテキストのテキスト(35)
- * @type multiline_string
- * @default
- * @parent OtherSetting
- * 
- * @param CondSetting
- * @text 表示条件設定
- * @default ------------------------------
- * 
- * @param Conditions
- * @desc 項目が表示される条件を指定します。(JavaScript)
- * @text 項目条件(all)
- * @type combo
- * @option '$gameVariables.value(0);//ゲーム変数'
- * @option 'actor;//アクターのゲームデータ'
- * @option 'actor.actor();//アクターのシステムデータ'
- * @option '$dataSystem.optDisplayTp'//TP表示
- * @default 
- *
- */
-/*~struct~ActorDataList:ja
- * 
- * @param ActorId
- * @text アクター
- * @desc アクターを指定します。0指定の場合はデフォルトの設定となります。
- * @type actor
- * @default 0
- * 
- * @param ActorStatusListDataSetting
- * @text アクター画像位置設定
- * @default アクターの画像モードをデフォルトに設定した場合、アクター画像位置設定の全ての設定がデフォルトの設定で適用されます。
- * 
- * @param StatusListData
- * @text 表示ステータス設定
- * @desc 表示するステータス情報を設定します。一つでも設定されていない場合はデフォルトの設定が適用されます。
- * @default 
- * @type struct<ActorStatusList>[]
- * @parent ActorStatusListDataSetting
- * 
- * @param ActorWindowSkinSetting
- * @text アクター別個別ウィンドウ設定
- * @default ------------------------------
- * 
- * @param ActorWindowSkin
- * @desc ウィンドウスキンを指定します。未指定の場合はデフォルトの設定が適用されます。
- * @text ウィンドウスキン画像
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorWindowSkinSetting
- * 
- * @param ActorWindowColor
- * @text ウィンドウカラー
- * @desc ウィンドウの色の設定をします。
- * @default 
- * @type struct<WindowTone>
- * @parent ActorWindowSkinSetting
- * 
- * @param ActorCommandBackgroundSetting
- * @text アクターコマンドウィンドウ背景設定
- * @default ------------------------------
- * 
- * @param ActorCommandWindowBacgroundImg
- * @text アクターコマンドウィンドウ背景画像設定
- * @desc アクターコマンドウィンドウの背景画像を設定します。
- * @default 
- * @type struct<WindowBackgroundSetting>
- * @parent ActorCommandBackgroundSetting
- * 
- * @param ActorCommandSkinSetting
- * @text アクターコマンドスキン設定
- * @default ------------------------------
- * 
- * @param ActorCommandWindowSkin
- * @desc ウィンドウスキンを指定します。未指定の場合はデフォルトの設定が適用されます。
- * @text ウィンドウスキン画像
- * @type file
- * @dir img/system
- * @default 
- * @parent ActorCommandSkinSetting
- * 
- * @param ActorCommandWindowColor
- * @text ウィンドウカラー
- * @desc ウィンドウの色の設定をします。
- * @default 
- * @type struct<WindowTone>
- * @parent ActorCommandSkinSetting
- * 
- * @param Background
- * @text アクター画像設定
- * @default ------------------------------
- * 
- * @param ActorBackground
- * @desc アクターの背景画像を指定します。未指定の場合はデフォルトの設定が適用されます。
- * @text アクター背景画像
- * @type file
- * @default 
- * @dir img/
- * @parent Background
- * 
- * @param ActorFrontImg
- * @desc ステータス背後の背景画像を指定する。未指定の場合はデフォルトの設定が適用されます。
- * @text ステータス背後背景画像
- * @type file
- * @dir img/
- * @default 
- * @parent Background
- * 
- * @param ActorImgPositionSetting
- * @text アクター画像位置設定
- * @default アクターの画像モードをデフォルトに設定した場合、アクター画像位置設定の全ての設定がデフォルトの設定で適用されます。
- * 
- * @param ActorImgMode
- * @text アクターの画像モード
- * @desc アクターステータスに表示するアクターの画像。
- * @type select
- * @option なし
- * @value 'none'
- * @option デフォルト
- * @value 'default'
- * @option 顔グラ
- * @value 'face'
- * @option 画像
- * @value 'imges'
- * @default 'default'
- * @parent ActorImgPositionSetting
- * 
- * @param Actor_X
- * @desc 画像のX座標。
- * @text 画像X座標
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Actor_Y
- * @desc 画像のY座標。
- * @text 画像Y座標
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Img_SX
- * @desc 画像の表示開始座標X。
- * @text 画像表示開始座標X
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Img_SY
- * @desc 画像の表示開始座標Y
- * @text 画像表示開始座標Y
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Img_SW
- * @desc 画像の表示横幅。
- * @text 画像表示横幅
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param Img_SH
- * @desc 画像の表示縦幅。
- * @text 画像表示縦幅
- * @type number
- * @default 0
- * @min 0
- * @max 9999
- * @parent ActorImgPositionSetting
- * 
- * @param ActorImgHPosition
- * @text 顔グラ横基準表示位置
- * @desc 顔グラの横の基準表示位置を指定します。
- * @type select
- * @option 画像左基準
- * @value 'left'
- * @option 画像中央基準
- * @value 'center'
- * @default 'center'
- * @parent ActorImgPositionSetting
- * 
- * @param ActorImgVPosition
- * @text 画像縦基準表示位置
- * @desc 画像の縦の基準表示位置を指定します。(画像のみ)
- * @type select
- * @option 画像上基準
- * @value 'top'
- * @option 画像下基準
- * @value 'under'
- * @default 'under'
- * @parent ActorImgPositionSetting
- * 
- * @param ActorStateAnimationPosition
- * @text アクターステートアニメーション設定
- * @default ------------------------------
- * 
- * @param ActorState_X
- * @desc アクター画像毎のステートアニメーションのX座標。0以外で有効
- * @text ステートアニメーションX座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimationPosition
- * 
- * @param ActorState_Y
- * @desc アクター画像毎のステートアニメーションのY座標。0以外で有効
- * @text ステートアニメーションY座標（相対座標）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * @parent ActorStateAnimationPosition
- * 
- */
-/*~struct~ActorBattlerImgSetting:ja
- * 
- * @param ActorId
- * @text アクター
- * @desc アクターを指定します。
- * @type actor
- * @default 0
- * 
- * @param BattlerActorImg
- * @text アクター画像設定
- * @desc アクター画像の設定を行います。
- * @default []
- * @type struct<ActorBattlerImgList>[]
- * 
- */
-/*~struct~ActorBattlerImgList:ja
- * 
- * @param GraphicImg
- * @text アクター画像
- * @desc アクターの画像を設定します。複数指定の場合はランダムに表示されます。
- * @type file[]
- * @dir img/
- * 
- * @param FaceImg
- * @text 顔グラ画像
- * @desc 顔グラ画像のスプライトシートを設定します。
- * @type file
- * @dir img/faces
- * 
- * @param FaceIndex
- * @text 顔グラのインデックスID
- * @desc 顔グラのインデックスID。
- * @type number
- * @default -1
- * @min -1
- * 
- * @param Opacity
- * @text 画像不透明度
- * @desc 画像の不透明度を指定します。
- * @type number
- * @default 255
- * @min 0
- * @max 255
- * 
- * @param AllMatch
- * @text 全条件一致
- * @default ------------------------------
- * 
- * @param ChangeGraphicScenes
- * @text 変化シーン
- * @desc グラフィックの変化シーンを選択します。
- * @type select
- * @option 通常
- * @value 'default'
- * @option 戦闘不能
- * @value 'death'
- * @option 瀕死
- * @value 'dying'
- * @option ダメージ時
- * @value 'damage'
- * @option クリティカルダメージ時
- * @value 'cridamage'
- * @option 回復時
- * @value 'recovery'
- * @option 攻撃スキル使用時(1)
- * @value 'attack'
- * @option 回復スキル使用時(1)
- * @value 'recoverySkill'
- * @option アイテム使用時(2)
- * @value 'item'
- * @option 反撃時
- * @value 'counter'
- * @option 魔法反射時
- * @value 'reflection'
- * @option 反撃時(CounterExtend)(4)
- * @value 'counterEX'
- * @option 防御時
- * @value 'guard'
- * @option 詠唱時
- * @value 'chant'
- * @option 勝利時
- * @value 'victory'
- * @option 被ステート(3)
- * @value 'state'
- * @option コマンド選択時
- * @value 'command'
- * @option ファイナルアタック時(1) 要NUUN_FinalAttack
- * @value 'finalAttack'
- * @default 'default'
- * @parent AllMatch
- * 
- * @param ImgHP
- * @text 残りHP
- * @desc 残りHPが指定の範囲内または数値の時に変化します。
- * @type struct<CondValue>
- * @default {"CondValid":"false","UpLimit":"0","DwLimit":"0"}
- * @parent AllMatch
- * 
- * @param ImgSwitch
- * @text スイッチ
- * @desc 指定したスイッチが全てONの時に変化します。
- * @type switch[]
- * @default
- * @parent AllMatch
- * 
- * @param ImgWeapon
- * @text 武器
- * @desc 指定した武器を全て装備している時に条件を満たします。
- * @type weapon[]
- * @default 
- * @parent AllMatch
- * 
- * @param ImgArmor
- * @text 防具
- * @desc 指定した防具を全て装備している時に条件を満たします。
- * @type armor[]
- * @default 
- * @parent AllMatch
- * 
- * @param ImgClass
- * @text 職業
- * @desc 特定の職業なら条件を満たします。
- * @type class
- * @default 0
- * @parent AllMatch
- * 
- * @param ImgStateAll
- * @text ステート。
- * @desc 指定したステートに全てかかっている時に条件を満たします。
- * @type state[]
- * @default 
- * @parent AllMatch
- * 
- * @param CondSetting
- * @text 条件設定
- * @default ------------------------------
- * 
- * @param Skill
- * @text スキル(1)
- * @desc スキルを選択します。いずれかのスキル使用時に適用します。空白、なしの場合は全てのスキルが対象です。
- * @type skill[]
- * @default
- * @parent CondSetting
- * 
- * @param Item
- * @text アイテム(2)
- * @desc アイテムを選択します。いずれかのアイテム使用時に適用します。空白、なしの場合は全てのアイテムが対象です。
- * @type item[]
- * @default
- * @parent CondSetting
- * 
- * @param stateId
- * @text 被ステート(3)
- * @desc ステートを選択します。全てのステートにかかっている時に適用します。
- * @type state[]
- * @default 
- * @parent CondSetting
- * 
- * @param Id
- * @text 識別タグ(4)
- * @desc 識別タグを指定します。全ての識別タグが該当しているときに適用します。
- * @type string[]
- * @default 
- * @parent CondSetting
-*/
-/*~struct~CondValue:ja
-* 
-* @param CondValid
-* @desc HP条件を有効にします。
-* @text HP条件有効
-* @type boolean
-* @default false
-* 
-* @param UpLimit
-* @text 上限値
-* @desc 上限値
-* @type number
-* @default 0
-* 
-* @param DwLimit
-* @text 下限値
-* @desc 下限値
-* @type number
-* @default 0
-* 
-*/
-/*~struct~ActorContentsRect:ja
- * 
- * @param ActorContentsCoordinateMode
- * @text 座標モード
- * @desc 座標モードを指定します。ON:絶対座標 OFF:相対座標
- * @type boolean
- * @default false
- * 
- * @param ActorContentsX
- * @desc アクターステータスウィンドウのコンテンツ表示のX座標を指定します。(相対)
- * @text X座標
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * 
- * @param ActorContentsY
- * @desc アクターステータスウィンドウのコンテンツ表示のY座標を指定します。(相対)
- * @text Y座標
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * 
- * @param ActorContentsWidth
- * @desc アクターステータスウィンドウのコンテンツ表示の横幅を指定します。0で通常表示幅
- * @text 横幅
- * @type number
- * @default 0
- * @min 0
- * @max 999
- * 
- * @param ActorContentsHeight
- * @desc アクターステータスウィンドウのコンテンツ表示の縦幅を指定します。0で通常表示幅
- * @text 縦幅
- * @type number
- * @default 0
- * @min 0
- * @max 24
- * 
- */
-/*~struct~WindowBackgroundSetting:ja
- * 
- * @param BackgroundImg
- * @desc 背景画像ウィンドウを指定します。
- * @text 背景画像ウィンドウ
- * @type file
- * @dir img/
- * @default 
- * 
- * @param Background_X
- * @desc 背景画像X座標（相対）。
- * @text 背景画像X座標（相対）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * 
- * @param Background_Y
- * @desc 背景画像Y座標（相対）。
- * @text 背景画像Y座標（相対）
- * @type number
- * @default 0
- * @min -9999
- * @max 9999
- * 
- */
-/*~struct~WindowTone:ja
- * 
- * @param red
- * @desc 赤
- * @text 赤
- * @type number
- * @default 0
- * @max 255
- * @min -255
- * 
- * @param green
- * @text 緑
- * @desc 緑
- * @type number
- * @default 0
- * @max 255
- * @min -255
- * 
- * @param bule
- * @text 青
- * @desc 青
- * @type number
- * @default 0
- * @max 255
- * @min -255
  * 
  */
 var Imported = Imported || {};
 Imported.NUUN_BattleStyleEX = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+const parameters = PluginManager.parameters('NUUN_BattleStyleEX');
+const params = NuunManager.getBattleStyleParams();
+let statusData = null;
+let bsRect = null
 
-    const parameters = PluginManager.parameters('NUUN_BattleStyleEX');
+const pluginName = "NUUN_BattleStyleEX";
 
-    const _tempParams = new Nuun_TempParam();
-    const pluginName = "NUUN_BattleStyleEX";
+PluginManager.registerCommand(pluginName, 'ActorStatusWindowOpacity', args => {
+  BattleManager.statusWindowOpacity(eval(args.WindowOpacity), Number(args.WindowOpacityValue));
+});
 
-    PluginManager.registerCommand(pluginName, 'ChangeBattleLayout', args => {
-        const battleStyle = BattleStatusList.find(data => data.StyleName === eval(args.BattleLayoutStyle));
-        if (battleStyle && !$gameParty.inBattle()) {
-            $gameSystem.setBattleStyle(battleStyle.StyleName);
-        }
-    });
+function getActorData(actorId) {
+    return params.ActorData.find(data => data.actorId === actorId);
+};
 
-    PluginManager.registerCommand(pluginName, 'ActorStatusWindowVisible', args => {
-        BattleManager.statusWindowVisible(eval(args.WindowVisible));
-    });
+function getActorPositionData(actorId) {
+  const find = getActorData(actorId);
+  if (find && !find.DefaultStatusPosition) {
+      return find.StatusPositionData;
+  } else {
+      return params.DefaultStatusPositionData;
+  }
+};
+
+function getActorImgData(actorId) {
+    const find = getActorData(actorId);
+    if (find && find.ActorImgSetting) {
+        find.ActorImgSetting.ActorImgHPosition = getUndefinedHPosition(find.ActorImgSetting.ActorImgHPosition);
+        find.ActorImgSetting.ActorImgVPosition = getUndefinedHPosition(find.ActorImgSetting.ActorImgVPosition);
+        return find.ActorImgSetting;
+    } else {
+        params.DefaultActorImgData.ActorImgHPosition = getUndefinedHPosition(params.DefaultActorImgData.ActorImgHPosition);
+        params.DefaultActorImgData.ActorImgVPosition = getUndefinedVPosition(params.DefaultActorImgData.ActorImgVPosition);
+        return params.DefaultActorImgData;
+    }
+};
+
+function getActorImgList(actor, actorData) {
+    if (Imported.NUUN_ActorPicture && params.OnActorPictureEX) {
+        const list = NuunManager.getBattlerActors();
+        const find = list.find(data => _condActorImg(data, actor));
+        if (find) {return find};
+    }
+    return actorData;
+};
+
+function _condActorImg(data, actor) {
+    if (data.actorId === actor.actorId() && actor._classId === data.ClassId) {
+        return true;
+    } else if (data.ClassId === 0 && data.actorId === actor.actorId()) {
+        return true;
+    } else if (data.actorId === 0 && actor._classId === data.ClassId) {
+        return true;
+    }
+    return false;
+};
+
+function filteringClass(data) {
+    if (data.FilteringClass && data.FilteringClass.length > 0) {
+        return data.FilteringClass.some(filterClass => filterClass === 'Scene_Battle');
+    } else {
+        return true;
+    }
+};
+
+function getUndefinedHPosition(data) {
+  if (data) {
+    return data;
+  } else if (params.bsMode = 'Default') {
+    return 'left'
+  } else if (params.bsMode = 'Standard') {
+    return 'left'
+  } else if (params.bsMode = 'XP') {
+    return 'center'
+  }
+}
+
+function getUndefinedVPosition(data) {
+  if (data) {
+    return data;
+  } else if (params.bsMode = 'Default') {
+    return 'top'
+  } else if (params.bsMode = 'Standard') {
+    return 'under'
+  } else if (params.bsMode = 'XP') {
+    return 'under'
+  }
+}
+
+function getActorWindowCenter() {
+  return (Graphics.width - getActorWindowOrgWidth()) / 2;
+};
+
+function getActorWindowOrgWidth() {
+    return params.ActorStatusWindow_Width > 0 ? params.ActorStatusWindow_Width : Graphics.boxWidth;
+};
+
+function actorWindowShiftWidth() {
+    return params.PartyCommand_Width > 0 ? Math.min(params.PartyCommand_Width, Graphics.width) : 192;
+};
+
+function _getActorId() {
+    return BattleManager.isOnActorPictureEX() ? 'FaceIndex' : 'ImgIndex';
+}
+
+function loadBackground(img) {
+  if (img) {
+    ImageManager.nuun_LoadPictures(img);
+  }
+}
+
+function getStateAnimationShow() {
+  return !$gameSystem.isSideView() && params.ActorEffectShow && params.StateAnimationShow;
+}
 
 
-    class Nuun_BattleLayoutData {
-        constructor(_scene) {
-            this._scene = _scene;
-            this._data = null;
-            this._svActorData = [];
-        }
+NuunManager.bsAnimationShouldMirror = function() {
+    return params.ActorsMirror;
+};
 
-        setStyle() {
-            if (params.BattleLayoutVar > 0 && $gameVariables.value(params.BattleLayoutVar) > 0) {
-                const style = params.BattleLayout[$gameVariables.value(params.BattleLayoutVar) - 1];
-                this._data =  style ? style : params.BattleLayout.find(data => data.StyleName === params.BattleLayoutStyle);
-            } else {
-                this._data = params.BattleLayout.find(data => data.StyleName === params.BattleLayoutStyle);
+
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+    _BattleManager_initMembers.call(this);
+    this.actorStatusWindowOpacity = false;
+    this.actorStatusWindowOpacityValue = false;
+    this.battlerSprite = [];
+    this.bsVisibleStates = [];
+    this.bsVisibleBuffs = [];
+    this.notIconList = this.getNotVisibleIcons().concat(this.getNotVisibleBuffIcons());
+    this.onBSStartBattle = !params.ActorStatusWindowLock;
+    this._bsInterpreter = null;
+    this.bsInBattle = true;
+};
+
+BattleManager.initBsBattleManager = function() {
+    if (!this.bsInBattle) {
+        this.bsInBattle = true;
+        this.actorStatusWindowOpacity = false;
+        this.actorStatusWindowOpacityValue = false;
+        this.battlerSprite = [];
+        this.bsVisibleStates = [];
+        this.bsVisibleBuffs = [];
+        this.notIconList = this.getNotVisibleIcons().concat(this.getNotVisibleBuffIcons());
+        this.onBSStartBattle = !params.ActorStatusWindowLock;
+        this._bsInterpreter = null;
+    }
+};
+
+const _BattleManager_update = BattleManager.update;
+BattleManager.update = function(timeActive) {
+    _BattleManager_update.call(this, timeActive);
+    this.updateBsEXCommon();
+};
+
+BattleManager.getNotVisibleIcons = function() {
+  return params.NotVisibleStateIcons.filter(stateId => $dataStates[stateId]).map(stateId => $dataStates[stateId].iconIndex).filter(id => id > 0);
+};
+
+BattleManager.getNotVisibleBuffIcons = function() {
+  return this.getVisibleBuffIcons(params.NotVisibleBuffIcons);
+};
+
+BattleManager.isOnActorPictureEX = function() {
+    return Imported.NUUN_ActorPicture && params.OnActorPictureEX;
+}
+
+BattleManager.getVisibleBuffIcons = function(list) {
+    const icons = [];
+    for (const buff of list) {
+        if (buff >= 0 && buff < 8) {
+            for (let i = 0; i < 2; i++) {
+                icons.push(Game_BattlerBase.ICON_BUFF_START + (i * 8) + buff);
             }
-        }
-
-        getActorData(actor) {
-            return this._data && this._data.ActorData.find(data => actor && data.ActorId === actor.actorId()) || null;
-        }
-
-        getBattlerActors() {
-            return NuunManager.getBattlerActors();
-        }
-
-        getBattleStatusList() {
-            return this._data.BattleStatusList;
-        }
-
-        isDefaultActorWindow() {
-            return this._data.DefaultActorWindow;
-        }
-
-        getActorMaxCol() {
-            return this._data.ActorMaxCol || 4;
-        }
-
-        getActorMaxRow() {
-            return this._data.ActorMaxRow || 1;
-        }
-
-        getActorStatusWidth() {
-            return this._data.ActorStatusWidth;
-        }
-
-        getActorStatusHeight() {
-            return this._data.ActorStatusHeight;
-        }
-        
-        getActorStatusX() {
-            return this._data.ActorStatusX;
-        }
-
-        getActorStatusY() {
-            return this._data.ActorStatusY;
-        }
-
-        isPartyCommandWindowCenter() {
-            return this._data.PartyCommandWindowCenter;
-        }
-
-        isPartyCommandMode() {
-            return this._data.PartyCommandMode;
-        }
-
-        getPartyCommandPosition() {
-            return this._data.PartyCommandPosition;
-        }
-
-        getPartyCommand_Width() {
-            return this._data.PartyCommand_Width;
-        }
-
-        getPartyCommand_X() {
-            return this._data.PartyCommand_X;
-        }
-
-        getPartyCommand_Y() {
-            return this._data.PartyCommand_Y;
-        }
-
-        getPartyCommandMaxCol() {
-            return this._data.PartyCommandMaxCol;
-        }
-
-        getPartyCommandMaxRow() {
-            return this._data.PartyCommandMaxRow;
-        }
-
-        isActorCommandWindowCenter() {
-            return this._data.ActorCommandWindowCenter;
-        }
-
-        isActorCommandMode() {
-            return this._data.ActorCommandMode;
-        }
-
-        isActorCommandVariable() {
-            return this._data.ActorCommandVariable;
-        }
-
-        getActorCommandPosition() {
-            return this._data.ActorCommandPosition;
-        }
-
-        getActorCommand_Width() {
-            return this._data.ActorCommand_Width;
-        }
-
-        getActorCommand_X() {
-            return this._data.ActorCommand_X;
-        }
-
-        getActorCommand_Y() {
-            return this._data.ActorCommand_Y;
-        }
-
-        getActorCommandMaxCol() {
-            return this._data.ActorCommandMaxCol;
-        }
-
-        getActorCommandMinRow() {
-            return this._data.ActorCommandMinRow;
-        }
-
-        getActorCommandMaxRow() {
-            return this._data.ActorCommandMaxRow;
-        }
-
-        isActoyCommandWindowCenter() {
-            return this._data.ActorCommandWindowCenter;
-        }
-
-        getActorCommandHideWindow() {
-            return this._data.ActorCommandHideWindow || [];
-        }
-
-        getCommandSubtraction() {
-            return this._data.CommandSubtraction;
-        }
-
-        getCommandShiftMode() {
-            return this._data.CommandShiftMode;
-        }
-
-        isFrontViewActorEffectShow() {
-            return this._data.ActorEffectShow;
-        }
-
-        isCommandRightMode() {
-            return this._data.CommandRightMode;
-        }
-
-        getActorEffect_X() {
-            return this._data.ActorEffect_X;
-        }
-
-        getActorEffect_Y() {
-            return this._data.ActorEffect_Y;
-        }
-
-        ActorDamage_X() {
-            return this._data.ActorDamage_X;
-        }
-
-        ActorDamage_Y() {
-            return this._data.ActorDamage_Y;
-        }
-
-        isWindowShow() {
-            return this._data.WindowShow;
-        }
-
-        isWindowFrameShow() {
-            return this._data.WindowFrameShow;
-        }
-
-        isActorWindowFrameShow() {
-            return this._data.ActorWindowFrameShow;
-        }
-
-        isContentsBackShow() {
-            return this._data.ContentsBackShow;
-        }
-
-        getActorStatusWindowBacgroundImg() {
-            return this._data.ActorStatusWindowBacgroundImg ? this._data.ActorStatusWindowBacgroundImg.BackgroundImg : null;
-        }
-
-        getActorStatusWindowBacgroundImgX() {
-            return this._data.ActorStatusWindowBacgroundImg.Background_X;
-        }
-
-        getActorStatusWindowBacgroundImgY() {
-            return this._data.ActorStatusWindowBacgroundImg.Background_Y;
-        }
-
-        isBackgroundStatusWindowFit() {
-            return this._data.BackgroundStatusWindowFit;
-        }
-
-        getPartyCommandWindowBacgroundImg() {
-            return this._data.PartyCommandWindowBacgroundImg ? this._data.PartyCommandWindowBacgroundImg.BackgroundImg : null;
-        }
-
-        getPartyCommandWindowBacgroundImgX() {
-            return this._data.PartyCommandWindowBacgroundImg.Background_X;
-        }
-
-        getPartyCommandWindowBacgroundImgY() {
-            return this._data.PartyCommandWindowBacgroundImg.Background_Y;
-        }
-
-        isBackgroundPartyCommandWindowFit() {
-            return this._data.BackgroundPartyCommandWindowFit;
-        }
-
-        isActorCommandWindowBacgroundImg() {
-            return this._data.ActorCommandWindowBacgroundImg;
-        }
-
-        getActorCommandWindowBacgroundImg(data) {
-            return data && data.ActorCommandWindowBacgroundImg ? data.ActorCommandWindowBacgroundImg.BackgroundImg : this.getActorCommandCommonWindowBacgroundImg();
-        }
-
-        getActorCommandCommonWindowBacgroundImg() {
-            return this._data.ActorCommandWindowBacgroundImg ? this._data.ActorCommandWindowBacgroundImg.BackgroundImg : null;
-        }
-
-        getActorCommandWindowBacgroundImgX(data) {
-            return data && data.ActorCommandWindowBacgroundImg ? data.ActorCommandWindowBacgroundImg.Background_X : this._data.ActorCommandWindowBacgroundImg.Background_X;
-        }
-
-        getActorCommandWindowBacgroundImgY(data) {
-            return data && data.ActorCommandWindowBacgroundImg ? data.ActorCommandWindowBacgroundImg.Background_Y : this._data.ActorCommandWindowBacgroundImg.Background_Y;
-        }
-
-        isBackgroundActorCommandWindowFit() {
-            return this._data.BackgroundPartyCommandWindowFit;
-        }
-
-        isContentsBackVisible() {
-            return !this.isActorStatusActorWindowShow() && this.isContentsBackShow();
-        }
-
-        getActorStatusWindowBesideMode() {
-            return this._data.ActorStatusWindowBesideMode;
-        }
-
-        getActorStatusWindowVerticalMode() {
-            return this._data.ActorStatusWindowVerticalMode;
-        }
-
-        getActorStatusBesideMode() {
-            return this._data.ActorStatusBesideMode;
-        }
-
-        getActorStatusVerticalMode() {
-            return this._data.ActorStatusVerticalMode;
-        }
-
-        getActorContentsSetting() {
-            return this._data.ActorContentsSetting;
-        }
-
-        isStateAnimationShow() {
-            return this._data.StateAnimationShow;
-        }
-
-        isFrontAnimation() {
-            return !$gameSystem.isSideView() && this.isFrontViewActorEffectShow();
-        }
-
-        isStateAnimation() {
-            return this.isFrontAnimation() && this.isStateAnimationShow();
-        }
-
-        getActorState_X() {
-            return this._data.ActorState_X;
-        }
-
-        getActorState_Y() {
-            return this._data.ActorState_Y;
-        }
-
-        isAnimationShouldMirror() {
-            return params.ActorsMirror;
-        }
-
-        getWindowSkin(method) {
-            return this._data[method];
-        }
-
-        getWindowSkinEx(data, method) {
-            return data && data[method] ? data[method] : this.getWindowSkin(method);
-        }
-
-        getWindowColor(method) {
-            return this._data[method];
-        }
-        
-        getWindowColorEx(data, method) {
-            return data && data[method] ? data[method] : this.getWindowColor(method);
-        }
-
-        getWindowVisible(method) {
-            return this._data[method];
-        }
-
-        getActorImgModeData(data) {
-            return data ? data.ActorImgMode : this._data.ActorImgMode;
-        }
-
-        getActorImg_X(data) {
-            return data && this.getActorImgModeData(data) !== 'default' ? data.Actor_X : this._data.ActorImg_X;
-        }
-
-        getActorImg_Y(data) {
-            return data && this.getActorImgModeData(data) !== 'default' ? data.Actor_Y : this._data.ActorImg_Y;
-        }
-
-        getImg_SX(data) {
-            return data && this.getActorImgModeData(data) !== 'default' ? data.Img_SX : this._data.Img_SX;
-        }
-
-        getImg_SY(data) {
-            return data && this.getActorImgModeData(data) !== 'default' ? data.Img_SY : this._data.Img_SY;
-        }
-
-        getImg_SW(data) {
-            return data && this.getActorImgModeData(data) !== 'default' ? data.Img_SW : this._data.Img_SW;
-        }
-
-        getImg_SH(data) {
-            return data && this.getActorImgModeData(data) !== 'default' ? data.Img_SH : this._data.Img_SH;
-        }
-
-        getActorImgHPosition(data) {
-            return data && this.getActorImgModeData(data) !== 'default' ? data.ActorImgHPosition : this._data.ActorImgHPosition;
-        }
-
-        getActorImgVPosition(data) {
-            return data && this.getActorImgModeData(data) !== 'default' ? data.ActorImgVPosition : this._data.ActorImgVPosition;
-        }
-
-        getActorImgMode(data) {
-            return data && this.getActorImgModeData(data) !== 'default' ? data.ActorImgMode : this._data.ActorImgMode;
-        }
-
-        getActorBackground(data) {
-            return data && data.ActorBackground ? data.ActorBackground : this._data.ActorBackground;
-        }
-
-        getActorFrontImg(data) {
-            return data && data.ActorFrontImg ? data.ActorFrontImg : this._data.ActorFrontImg;
-        }
-
-        getActorContents(index) {
-            try {
-                return this.getActorContentsSetting()[index];
-            } catch (error) {
-                return null;
-            }
-        }
-
-        getStatusWindow() {
-            return this._scene._statusWindow;
-        }
-
-        isActorStatusActorWindowShow() {
-            return this._data.ActorStatusActorWindowShow;
-        }
-
-        getBattleActorImgMode() {
-            return this._data.BattleActorImg;
-        }
-
-        getSelectActorHideWindow() {
-            return this._data.SelectActorHideWindow || [];
-        }
-
-        isSelectBackShow() {
-            return this._data.SelectBackShow;
-        }
-
-        isActorSelectBackShow() {
-            return this._data.ActorSelectBackShow;
-        }
-
-        isActorSelectBackVisible() {
-            return !this.isActorStatusActorWindowShow() && this.isActorSelectBackShow();
-        }
-
-        getFaceHeight() {
-            return this._data.ImgHeight || 144;
-        }
-
-        getImgHeight() {
-            return this._data.ImgHeight || 0;
-        }
-
-        isFaceHeightOnWindow() {
-            return this._data.ImgHeightOnWindow;
-        }
-
-        getNoStateIcon() {
-            return params.NoStateIcon || 0;
-        }
-
-        getNotVisibleStateIcons() {
-            return this._data.NotVisibleStateIcons || [];
-        }
-
-        getNotVisibleBuffIcons() {
-            return this._data.NotVisibleBuffIcons || [];
-        }
-
-        getCommandWidth() {
-            switch (this.getCommandShiftMode()) {
-                case 'party':
-                    return this.getPartyCommandWidth();
-                case 'actor':
-                    return this.getActorCommandWidth();
-                default:
-                    return 0;
-            }
-        }
-
-        getActorWindowWidthCommandSubtraction() {
-            const ww = this.getActorStatusWindowWidth();
-            return Math.min((this.getCommandSubtraction() ? ww - this.getCommandWidth() : ww) , Graphics.width);
-        }
-
-        getActorWindowXCommandSubtraction() {
-            return (this.getCommandSubtraction() && !this._scene.isRightInputMode() ? this.getCommandWidth() : 0) + this.getActorWindowX();
-        }
-
-        getActorStatusWindowWidth() {
-            return this.getActorStatusWidth() > 0 ? this.getActorStatusWidth() : Graphics.boxWidth;
-        }
-
-        getActorStatusWindowHeight() {
-            return  this.getActorStatusHeight() > 0 ? this.getActorStatusHeight() : this._scene.windowAreaHeight() + (this.isWindowFrameShow() ? 0 : this.extra());
-        }
-
-        getActorWindowX() {
-            return this.getActorStatusX() + this.getActorStatusBesideX();
-        }
-
-        getActorWindowY() {
-            return this.getActorStatusY() + this.getActorStatusVerticalY();
-        }
-
-        extra() {
-            return 10;
-        }
-
-        activeActorWindow() {
-            return this._scene._actorWindow && this._scene._actorWindow.active;
-        }
-
-        setPartyCommandPosition(rect) {
-            switch (this.getPartyCommandPosition()) {
-                case 'default':
-                    rect.width = this.partyCommandWidth(1);
-                    rect.x = (this._scene.isRightInputMode() ? this._scene._statusWindow.x + this._scene._statusWindow.width : 0) - ((Graphics.width - Graphics.boxWidth) / 2);
-                    rect.y = this.partyCommand_YPosition();
-                    break;
-                case 'custom':
-                    rect.width = this.partyCommandWidth(1);
-                    rect.x = this.getPartyCommandX();
-                    rect.y = this.partyCommand_YPosition();  
-                case 'top':
-                    rect.width = this.partyCommandWidth(0);
-                    rect.x = this.getPartyCommandX();
-                    rect.y = this.partyCommand_YPosition();
-                    break;
-                case 'middle':
-                    rect.width = this.partyCommandWidth(0);
-                    rect.x = this.getPartyCommandX();
-                    rect.y = this.partyCommand_YPosition();
-                    break;
-                case 'under':
-                    rect.width = this.partyCommandWidth(0);
-                    rect.x = this.getPartyCommandX();
-                    rect.y = this.partyCommand_YPosition();
-                    break;
-                case 'statuswindowtop':
-                    rect.width = this.partyCommandWidth(0);
-                    rect.x = this.getPartyCommandX();
-                    rect.y = this.partyCommand_YPosition();
-                    break;
-                default:
-                    rect.x -= ((Graphics.width - Graphics.boxWidth) / 2);
-                    rect.y = this.partyCommand_YPosition();
-                    break;    
-                }
-            rect.height = this.partyWindowAreaHeight();
-            return rect;
-        }
-
-        getPartyCommandWidth() {
-            const mode = this.getPartyCommandPosition();
-            switch (mode) {
-                case 'top':
-                case 'middle':
-                case 'under':
-                case 'statuswindowtop':
-                    return this.partyCommandWidth();
-                default:
-                    return this.partyCommandDefaultWidth();
-            }
-        }
-
-        partyCommand_YPosition() {
-            const mode = this.getPartyCommandPosition();
-            switch (mode) {
-                case 'default':
-                    return this._scene._statusWindow.y + (Graphics.boxHeight - Graphics.height) / 2 + this.getCommandBoxY() + this.getPartyCommand_Y();
-                case 'custom':
-                    return this.getPartyCommand_Y();
-                case 'top':
-                    return this.getPartyCommand_Y();
-                case 'middle':
-                    return (this._scene._statusWindow.y + (Graphics.boxHeight - Graphics.height) / 2 + 4) / 2 - (this.partyWindowAreaHeight() / 2) + this.getPartyCommand_Y();
-                case 'under':
-                    return Graphics.boxHeight - this.partyWindowAreaHeight() + this.getPartyCommand_Y();
-                case 'statuswindowtop':
-                    return this._scene._statusWindow.y + ((Graphics.boxHeight - Graphics.height) / 2) - this.partyWindowAreaHeight() + this.getPartyCommand_Y();
-                default:
-                    return 0;
-            }
-        }
-
-        partyCommandDefaultWidth() {
-            return this.getPartyCommand_Width() > 0 ? Math.min(this.getPartyCommand_Width(), Graphics.width) : 192;
-        }
-        
-        partyCommandWidth() {
-            return this.getPartyCommand_Width() > 0 ? Math.min(this.getPartyCommand_Width(), Graphics.width) : Graphics.boxWidth;
-        }
-    
-        partyWindowAreaHeight() {
-            return this._scene.calcWindowHeight(this.getPartyCommandMaxRow(), true);
-        }
-    
-        getPartyCommandX() {
-            const mode = this.getPartyCommandPosition();
-            switch (mode) {
-                case 'top':
-                case 'middle':
-                case 'under':
-                case 'statuswindowtop':
-                    return this.getPartyCommand_X() + (this.isPartyCommandWindowCenter() ? this.partyCommandCenter() : 0);
-                default:
-                    return this.getPartyCommand_X();
-            }
-        }
-
-        partyCommandCenter() {
-            return (Graphics.boxWidth - this.getPartyCommandWidth()) / 2;
-        }
-
-        getActorCommandWidth() {
-            const mode = this.getActorCommandPosition();
-            switch (mode) {
-                case 'top':
-                case 'middle':
-                case 'under':
-                case 'statuswindowtop':
-                    return this.actorCommandWidth();
-                default:
-                    return this.actorCommandDefaultWidth();
-            }
-        }
-
-        getActorCommand_XPosition(rect) {
-            const mode = this.getActorCommandPosition();
-            switch (mode) {
-                case 'top':
-                case 'middle':
-                case 'under':
-                case 'statuswindowtop':
-                case 'custom':
-                    return this.getActorCommand_X() + (this.isActoyCommandWindowCenter() ? this.actorCommandCenter() : 0);
-                case 'default':
-                    return (this._scene.isRightInputMode() ? this._scene._statusWindow.x + this._scene._statusWindow.width : 0) - ((Graphics.width - Graphics.boxWidth) / 2);
-                case 'none':
-                    return rect.x;
-                default:
-                    return this.getActorCommand_X();
-            }
-        }
-        
-        getActorCommand_YPosition(rect) {
-            const mode = this.getActorCommandPosition();
-            switch (mode) {
-                case 'default':
-                    return this._scene._statusWindow.y + (Graphics.boxHeight - Graphics.height) / 2 + this.getCommandBoxY() + this.getActorCommand_Y();
-                case 'custom':
-                case 'top':
-                    return this.getActorCommand_Y();
-                case 'none': 
-                    return rect.y;
-                case 'middle':
-                case 'under':
-                case 'statuswindowtop':
-                default:
-                    return 0;
-            }
-        }
-
-        getCommandBoxY() {
-            return (this.isWindowFrameShow() ? 0 : 4)
-        }
-
-        actorCommandDefaultWidth() {
-            return this.getActorCommand_Width() > 0 ? Math.min(this.getActorCommand_Width(), Graphics.width) : 192;
-        }
-
-        actorCommandWidth() {
-            return this.getActorCommand_Width() > 0 ? Math.min(this.getActorCommand_Width(), Graphics.width) : Graphics.boxWidth;
-        }
-
-        actorCommandHeight() {
-            return this._scene.calcWindowHeight(this.getActorCommandMaxRow(), true);
-        }
-
-        actorCommandAreaHeight() {
-            return this._scene.calcWindowHeight(this.getActorCommandMaxRow(), true);
-        }
-    
-        actorCommandCenter() {
-            return (Graphics.boxWidth - this.getActorCommandWidth()) / 2;  
-        }
-
-        getActorStatusBesideX () {
-            switch (this.getActorStatusWindowBesideMode()) {
-                case 'left':
-                    return (Graphics.width - Graphics.boxWidth) / 2; 
-                case 'center':
-                    return (Graphics.width / 2) - (this.getActorStatusWindowWidth() / 2);
-                case 'right':
-                    return Graphics.boxWidth - this.getActorStatusWindowWidth() + (Graphics.width - Graphics.boxWidth) / 2;
-            };
-        }
-          
-        getActorStatusVerticalY() {
-            switch (this.getActorStatusWindowVerticalMode()) {
-                case 'top':
-                    return (Graphics.height - Graphics.boxHeight) / 2 + (this.isWindowFrameShow() ? 0 : - 4);
-                case 'under':
-                    return (Graphics.boxHeight - this.getActorStatusWindowHeight() + (this.isWindowFrameShow() ? 0 : this.extra() - 4)) + ((Graphics.height - Graphics.boxHeight) / 2);
-            };
-        }
-
-        getCommandoShiftWidth() {
-            switch (this.getCommandShiftMode()) {
-                case 'party':
-                    return this.getPartyCommandWidth();
-                case 'actor':
-                    return this.actorCommandWidth();
-                case 'none':
-                    return 0;
-                default:
-                    return 0;
-            }
-        }
-
-        actorCommandRefresh(_window) {
-            const actorIndex = _window.selectActor(_window._actor);
-            const statuWindow = this._scene._statusWindow;
-            let data = null;
-            if (statuWindow && _window._actor || actorIndex >= 0) {
-                const rect = statuWindow.itemRect(actorIndex);
-                switch (this.getActorCommandPosition()) {
-                    case 'actor':
-                        _window.x = rect.x + (statuWindow.x - ((Graphics.width - Graphics.boxWidth) / 2)) + statuWindow.itemPadding() + ((rect.width - _window.width) / 2) + this.getActorCommand_X();
-                        _window.y = (statuWindow.y + rect.y + _window._homeY) - (_window.height + 4) - ((Graphics.height - Graphics.boxHeight) / 2) + this.getActorCommand_Y();
-                        break;
-                    case 'svtop':
-                        data = this.getSvActor(actorIndex);
-                        if (data) {
-                            _window.x = data.x - (_window.width + data.width) / 2 + 32 + this.getActorCommand_X();
-                            _window.y = data.y - (_window.height + data.height + 48) + this.getActorCommand_Y();
-                        }
-                        break;
-                    case 'svleft':
-                        data = this.getSvActor(actorIndex);
-                        _window.x = data.x - _window.width - 32 + this.getActorCommand_X()
-                        _window.y = data.y - (_window.height + data.height + 48) / 2 + this.getActorCommand_Y();
-                        break;
-                    case 'svright':
-                        data = this.getSvActor(actorIndex);
-                        _window.x = data.x + 32 + this.getActorCommand_X()
-                        _window.y = data.y - (_window.height + data.height + 48) / 2 + this.getActorCommand_Y();
-                        break;
-                    case 'top':
-                        _window.y = _window._homeY;
-                        break;
-                    case 'middle':
-                        _window.y = _window._homeY - Math.floor(_window.height / 2);
-                        break;
-                    default:
-                        _window.y = this.isActorCommandVariable() ? _window._homeY + (Graphics.boxHeight - (_window._homeY + _window.height)) : _window._homeY;
-                        break;
-                }
-            }
-        }
-
-        setSvActorSprites() {
-            this._svActorData = this._scene._spriteset._actorSprites;
-        }
-
-        getSvActor(index) {
-            return this._svActorData[index];
-        }
-
-        setFrontActor(index, sprite) {
-            if (NuunManager.styleData.isFrontAnimation()) {
-                this._svActorData[index].setFrontActor(sprite);
-            }
-        }
-
-        getGraphicsData(actor) {
-            if (params.ActorGraphics) {
-                return params.ActorGraphics.find(data => data.ActorId === actor.actorId());
-            }
-        }
-
-        commandRefresh() {
-            this._commandRefresh = true;
-        }
-
-        clearCommandRefresh() {
-            this._commandRefresh = false;
-        }
-
-        isCommandRefresh() {
-            return this._commandRefresh;
-        }
-
-        getBackgroundX() {
-            return (this.isBackgroundStatusWindowFit() ? this._scene._statusWindow.x : 0) + this.getActorStatusWindowBacgroundImgX();
-        }
-
-        getBackgroundY() {
-            return (this.isBackgroundStatusWindowFit() ? this._scene._statusWindow.y : 0) + this.getActorStatusWindowBacgroundImgY();
-        }
-
-        getPartyCommandBackgroundX() {
-            return (this.isBackgroundPartyCommandWindowFit() ? this._scene._partyCommandWindow.x : 0) + this.getPartyCommandWindowBacgroundImgX();
-        }
-
-        getPartyCommandBackgroundY() {
-            return (this.isBackgroundPartyCommandWindowFit() ? this._scene._partyCommandWindow.y : 0) + this.getPartyCommandWindowBacgroundImgY();
-        }
-
-        getActorCommandBackgroundX(data) {
-            return (this.isBackgroundActorCommandWindowFit() ? this._scene._actorCommandWindow.x : 0) + this.getActorCommandWindowBacgroundImgX(data);
-        }
-
-        getActorCommandBackgroundY(data) {
-            return (this.isBackgroundActorCommandWindowFit() ? this._scene._actorCommandWindow.y : 0) + this.getActorCommandWindowBacgroundImgY(data);
-        }
-
-        getWindowMethods(name) {
-            switch (name) {
-                case 'MessageWindow':
-                    return '_messageWindow';
-                case 'ItemWindow':
-                    return '_itemWindow';
-                case 'SkillWindow':
-                    return '_skillWindow';
-                case 'ActorWindow':
-                    return '_actorWindow';
-                case 'EnemyWindow':
-                    return '_enemyWindow';
-                case 'EnemyBook':
-                    return '_enemyBookEnemyWindow';
-                case 'Formation':
-                    return '_battleFormation';
-                case 'ResultWindow':
-                    return '_resultWindow';
-                case 'ResultLevelUp':
-                    return '_resultLevelUpMainWindow';
-                default:
-                    return name;
+        } else if (buff >= 10 && buff < 18) {
+            for (let i = 0; i < 2; i++) {
+                //icons.push(Game_BattlerBase.ICON_DEBUFF_START + (-i * 8) + buff - 10);
+                icons.push(Game_BattlerBase.ICON_DEBUFF_START + (i * 8) + buff - 10);
             }
         }
     }
+    return icons;
+};
 
-    class Nuun_DrawBattleStyleListData extends Nuun_DrawListData {
-        constructor(_window, params) {
-            super(_window, params);
+BattleManager.statusWindowOpacity = function(flag, opacity) {
+    this.actorStatusWindowOpacity = flag;
+    this.actorStatusWindowOpacityValue = flag ? opacity : 255;
+};
+
+const _BattleManager_displayStartMessages = BattleManager.displayStartMessages;
+BattleManager.displayStartMessages = function() {
+  if (!params.AppearWindowVisible) {
+    _BattleManager_displayStartMessages.call(this);
+    this.setDisplayMessagePosition(params.AppearWindowAnchorMode);
+    this.displayMessageType("Appear");
+  }
+};
+
+const _BattleManager_displayVictoryMessage = BattleManager.displayVictoryMessage;
+BattleManager.displayVictoryMessage = function() {
+  _BattleManager_displayVictoryMessage.call(this);
+  this.setDisplayMessagePosition(params.VictoryWindowAnchorMode);
+  this.displayMessageType("Victory");
+};
+
+const _BattleManager_displayDefeatMessage = BattleManager.displayDefeatMessage;
+BattleManager.displayDefeatMessage = function() {
+  _BattleManager_displayDefeatMessage.call(this);
+  this.setDisplayMessagePosition(params.LoseWindowAnchorMode);
+  this.displayMessageType("Defeat");
+};
+
+const _BattleManager_displayEscapeSuccessMessage = BattleManager.displayEscapeSuccessMessage;
+BattleManager.displayEscapeSuccessMessage = function() {
+  _BattleManager_displayEscapeSuccessMessage.call(this);
+  this.setDisplayMessagePosition(params.EscapeWindowAnchorMode);
+  this.displayMessageType("Escape");
+};
+
+const _BattleManager_displayEscapeFailureMessage = BattleManager.displayEscapeFailureMessage;
+BattleManager.displayEscapeFailureMessage = function() {
+  _BattleManager_displayEscapeFailureMessage.call(this);
+  this.setDisplayMessagePosition(params.EscapeWindowAnchorMode);
+  this.displayMessageType("EscapeFailure");
+};
+
+BattleManager.setDisplayMessagePosition = function(type) {
+  switch (type) {
+    case 'top':
+      $gameMessage.setPositionType(0);
+      break;
+    case 'center':
+      $gameMessage.setPositionType(1);
+      break;
+    case 'under':
+      $gameMessage.setPositionType(2);
+      break;
+  }
+};
+
+BattleManager.displayMessageType = function(type) {
+  $gameMessage._messageType = type;
+};
+
+BattleManager.getDisplayMessageType = function() {
+  return $gameMessage._messageType;
+};
+
+
+const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
+BattleManager.invokeCounterAttack = function(subject, target) {
+    target.isCouterAction = true;
+    if (target.isActor()) {
+        target.result().counterEx = true;
+        target.battleStyleImgRefresh();
+    }
+    _BattleManager_invokeCounterAttack.call(this, subject, target);
+};
+
+const _BattleManager_invokeMagicReflection = BattleManager.invokeMagicReflection;
+BattleManager.invokeMagicReflection = function(subject, target) {
+    target.isReflectionAction = true;
+    if (target.isActor()) {
+        target.result().reflectionEx = true;
+        target.battleStyleImgRefresh();
+    }
+    _BattleManager_invokeMagicReflection.call(this, subject, target);
+};
+
+BattleManager.battleStartCommon = function() {
+    if (params.BattleStartCommonEvent > 0) {
+        this.setupBsEXCommon(params.BattleStartCommonEvent);
+    }
+};
+
+BattleManager.battleEndCommon = function() {
+    if (params.BattleEndCommonEvent > 0) {
+        $gameTemp.reserveCommonEvent(params.BattleEndCommonEvent);
+    }
+};
+
+BattleManager.setupBsEXCommon = function(id) {
+    if (this._bsInterpreter && this._bsInterpreter.isRunning()) {
+        return;
+    }
+    const commonEvent = $dataCommonEvents[id];
+    if (commonEvent) {
+        const eventId = 0;
+        if (!this._bsInterpreter) {
+            this._bsInterpreter = new Game_Interpreter();
         }
+        this._bsInterpreter.setup(commonEvent.list, eventId);
+        this._bsInterpreter.update();
+        this.resetBsEXCommon();
+    }
+};
 
-        nuun_MaxContentsCols() {
-            return 1;
-        }
+BattleManager.resetBsEXCommon = function() {
+    if (this._bsInterpreter && !this._bsInterpreter.isRunning()) {
+        this._bsInterpreter = null;
+    }
+};
 
-        getStatusParamsList() {
-            return NuunManager.styleData.getBattleStatusList();
-        }
+BattleManager.updateBsEXCommon = function() {
+    if (this._bsInterpreter && this._bsInterpreter.isRunning()) {
+        this._bsInterpreter.update();
+        this.resetBsEXCommon();
+    }
+};
 
-        getActorsSettingList() {
-            return [];
-        }
+const _BattleManager_updateBattleEnd = BattleManager.updateBattleEnd;
+BattleManager.updateBattleEnd = function() {
+    this.battleEndCommon();
+    BattleManager.bsInBattle = false;
+    _BattleManager_updateBattleEnd.call(this);
+};
 
-        contentsHeightPadding() {
-            return 0;
-        }
+BattleManager.isBsBattle = function() {
+    return BattleManager.bsInBattle;
+};
 
-        nuun_DrawContentsActorName(data, x, y, width, actor) {
-            const key = "actor%1-name".format(actor.actorId());
-            const sprite = _window.createInnerSprite(key, Sprite_Name);
-            sprite.setup(actor);
-            sprite.move(x, y);
-            sprite.show();
-        }
+//Game_Temp
+const _Game_Temp_initialize = Game_Temp.prototype.initialize;
+Game_Temp.prototype.initialize = function() {
+  _Game_Temp_initialize.call(this);
+  this._battleStyleRefresh = false;
+  this.onBSAction = false;
+};
 
-        nuun_DrawContentsTurn(data, x, y, width, actor) {
-            const key = "actor%1-turn".format(actor.actorId());
-            this.setTempType('turn');
-            this.setTepmData(data)
-            const sprite = this._window.createInnerSprite(key, Sprite_DynamicParam);
-            sprite.setup(actor);
-            sprite.move(x, y);
-            sprite.show();
-        }
+Game_Temp.prototype.setBattleStyleRefresh = function(flag) {
+    this._battleStyleRefresh = flag;
+};
+  
+Game_Temp.prototype.isBattleStyleRequested = function() {
+    return this._battleStyleRefresh || false;
+};
 
-        nuun_DrawContentsState2(data, x, y, width, actor) {
-            const hw = Math.floor(ImageManager.iconWidth / 2);
-            const key = "actor%1-stateIcon%2".format(actor.actorId(), data ? data.ParamID || 'dparam' : 'dparam');
-            const sprite = this._window.createInnerSprite(key, Sprite_StateIcon);
-            sprite.setup(actor);
-            sprite.move(x + hw, y + hw);
-            if (data) {
-                sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval), this.getVisibleBuffIcons(data.detaEval2));
-            }
-            sprite.show();
-        }
+//test
+const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
+Game_Action.prototype.applyItemUserEffect = function(target) {
+    _Game_Action_applyItemUserEffect.call(this, target);
+    //this.gamePadVibrationEffect(target);
+};
 
-        nuun_DrawContentsState(data, x, y, width, actor) {
-            const w = this._window;
-            actor.setVisibleIcons(this.getVisibleIcons(data.detaEval), this.getVisibleBuffIcons(data.detaEval2));
-            w.drawActorIcons(actor, x, y, width);
-            actor.setVisibleIcons(null, null);
-        }
+Game_Action.prototype.gamePadVibrationEffect = function(target) {
+    if (this.item().meta.VibrationEffect){
+        const data = this.item().meta.VibrationEffect.split(',');
+        const vibration = {};
+        vibration.StartDelay = Number(data[0]);
+        vibration.Duration = Number(data[1]);
+        vibration.WeakMagnitude = Number(data[2]);
+        vibration.StrongMagnitude = Number(data[3]);
+        NuunManager.setupGamePadVibration(vibration);
+    }
+};
 
-        getVisibleIcons(dataEval) {
-            let states = [];
-            if (dataEval) {
-                const stateList = dataEval.split(',');
-                for (const id of stateList) {
-                    Array.prototype.push.apply(states, NuunManager.nuun_getListIdData(id));
+const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
+Game_ActionResult.prototype.clear = function() {
+    _Game_ActionResult_clear.call(this);
+    this.counterEx = false;
+    this.reflectionEx = false;
+    this.counterExtend = false;
+};
+
+
+const _Game_BattlerBase_allIcons = Game_BattlerBase.prototype.allIcons;
+Game_BattlerBase.prototype.allIcons = function() {
+    let icons = _Game_BattlerBase_allIcons.call(this);
+    if (BattleManager.notIconList && BattleManager.notIconList.length > 0) {
+        icons = icons.filter(id => !BattleManager.notIconList.indexOf(id) >= 0);
+    }
+    return icons;
+};
+
+const _Game_BattlerBase_stateIcons = Game_BattlerBase.prototype.stateIcons;
+Game_BattlerBase.prototype.stateIcons = function() {
+    if (this.isActor() && BattleManager.bsVisibleStates && BattleManager.bsVisibleStates.length > 0) {
+        return this.statesFilter().map(state => state.iconIndex)
+        .filter(iconIndex => iconIndex > 0);
+    } else {
+        return _Game_BattlerBase_stateIcons.call(this);
+    }
+};
+
+Game_BattlerBase.prototype.statesFilter = function() {
+    return this.states().filter(state => BattleManager.bsVisibleStates.indexOf(state.id) >= 0 && this.notBsIconFilter(state.iconIndex));
+};
+
+const _Game_BattlerBase_buffIcons = Game_BattlerBase.prototype.buffIcons;
+Game_BattlerBase.prototype.buffIcons = function() {
+    if (this.isActor() && BattleManager.bsVisibleBuffs && BattleManager.bsVisibleBuffs.length > 0) {
+        const list = BattleManager.bsVisibleBuffs;
+        const icons = [];
+        let iconIndex = 0;
+        for (let i = 0; i < this._buffs.length; i++) {
+            const buffLevel = this._buffs[i];
+            if (buffLevel > 0) {
+                iconIndex = this.buffIconIndex(this._buffs[i], i);
+                if (list.indexOf(i) >= 0 && this.notBsIconFilter(iconIndex)) {
+                    icons.push(iconIndex);
                 }
-            }
-            return states.map(state => $dataStates[state].iconIndex);
-        }
-
-        getVisibleBuffIcons(dataEval) {
-            let buffs = [];
-            if (dataEval) {
-                const stateList = dataEval.split(',');
-                for (const id of stateList) {
-                    Array.prototype.push.apply(buffs, NuunManager.nuun_getListIdData(id));
-                }
-            }
-            return buffs.map(buff => {
-                if (buff >= 0 && buff < 10) {
-                    return this.buffIconIndex(this._buffs[buff], buff);
-                } else if (buff <= 10) {
-                    return this.buffIconIndex(this._buffs[buff - 10], buff - 10);
-                }
-            });
-        }
-
-    };
-
-    class Nuun_BattleStyleActorAnimation {
-        constructor() {
-            this._battler = null;
-            this._data = null;
-            this._graphicIndex = -1;
-            this._graphicOpacity = 255;
-            this._graphicName = null;
-            this._isDeadImg = false;
-            this._imgScenes = 'default';
-            this._battlerData = null;
-        }
-
-        setup(battler) {
-            this._battler = battler;
-            this._data = this.getGraphicsData(battler);
-            this._battlerData = NuunManager.styleData.getActorData(battler);
-        }
-
-        actor() {
-            return this._battler;
-        }
-
-        getGraphicsData(actor) {
-            try {
-                if (this.isOnActorPictureEX()) {
-                    const battlerActors = NuunManager.styleData.getBattlerActors();
-                    if (battlerActors) {
-                        return battlerActors.find(data => data.actorId === actor.actorId()).ButlerActorImg;
-                    }
-                } else {
-                    if (params.ActorGraphics) {
-                        return params.ActorGraphics.find(data => data.ActorId === actor.actorId()).BattlerActorImg;
-                    }
-                }
-            } catch (error) {
-                return null;
-            }
-        }
-
-        isFaceMode() {
-            return NuunManager.styleData.getActorImgMode(this._battlerData) === 'face';
-        }
-
-        getActorImg_X() {
-            return NuunManager.styleData.getActorImg_X(this._battlerData);
-        }
-
-        getActorImg_Y() {
-            return NuunManager.styleData.getActorImg_Y(this._battlerData);
-        }
-
-        getImg_SX() {
-            return NuunManager.styleData.getImg_SX(this._battlerData);
-        }
-
-        getImg_SY() {
-            return NuunManager.styleData.getImg_SY(this._battlerData);
-        }
-
-        getImg_SW() {
-            return NuunManager.styleData.getImg_SW(this._battlerData);
-        }
-
-        getImg_SH() {
-            return NuunManager.styleData.getImg_SH(this._battlerData);
-        }
-
-        getActorImgHPosition() {
-            return NuunManager.styleData.getActorImgHPosition(this._battlerData);
-        }
-
-        getActorImgVPosition() {
-            return NuunManager.styleData.getActorImgVPosition(this._battlerData);
-        }
-
-        getStateRectX() {
-            return this._battlerData && this._battlerData.ActorState_X !== 0 ? this._battlerData.ActorState_X : NuunManager.styleData.getActorState_X();
-        }
-
-        getStateRectY() {
-            return this._battlerData && this._battlerData.ActorState_Y !== 0 ? this._battlerData.ActorState_Y : NuunManager.styleData.getActorState_Y();
-        }
-
-        isActorImgHCenter() {
-            return this.getActorImgHPosition() === 'center';
-        }
-
-        isActorImgHLeft() {
-            return this.getActorImgHPosition() === 'left';
-        }
-
-        isActorImgVUnder() {
-            return this.getActorImgVPosition() === 'under';
-        }
-
-        isActorImgVTop() {
-            return this.getActorImgVPosition() === 'top';
-        }
-
-        isOnActorPictureEX() {
-            return _isOnActorPictureEX();
-        }
-
-        getBattleStyleOpacity() {
-            return this._graphicOpacity;
-        }
-
-        getActorId() {
-            return _isOnActorPictureEX() ? 'actorId' : 'ActorId';
-        }
-
-        update() {
-            this.battlerGraphicRefresh();
-        }
-
-        battlerGraphicRefresh() {
-            if (!this._battler) {
-                return;
-            }
-            let imgIndex = -1;
-            let index = -1;
-            this._isDeadImg = false;
-            this._imgScenes = 'default';
-            const imgDataList = this._data;
-            const mode = NuunManager.styleData.getActorImgMode(this._data);
-            const oldFileName = this._battleStyleGraphicName;
-            if (mode !== 'none' && imgDataList) {
-                index = imgDataList.findIndex(imgData => {
-                    return this.battleStyleMatchConditions(imgData);
-                });
-                if (index >= 0) {
-                    this.setbattleStyleGraphicId();
-                    const imgData = imgDataList[index];
-                    this._battleStyleGraphicName = this.getBattleStyleImg(imgData);
-                    imgIndex = this.getBattleStyleImgIndex(imgData);
-                    this._isDeadImg = this.isBSActorGraphicDead(imgData);
-                    this._battleStyleGraphicOpacity = imgData.Opacity || 255;
-                } else {
-                    this._battleStyleGraphicName = null;
-                }
-            } else {
-                if (this.isFaceMode()) {
-                    this._battleStyleGraphicName = this._battler.faceName();
-                    imgIndex = this._battler.faceIndex();
-                    index = 0;
-                } else {
-                    this._battleStyleGraphicName = null;
-                }
-            }
-            this._battleStyleGraphicIndex = index;
-            this._battleStyleImgIndex = imgIndex;
-            this._battler.setImgScenes(this._imgScenes);
-            if (oldFileName !== this._battleStyleGraphicName && !!this._battleStyleGraphicName) {
-                if (this.isFaceMode()) {
-                    ImageManager.loadFace(this._battleStyleGraphicName);
-                } else {
-                    ImageManager.nuun_LoadPictures(this._battleStyleGraphicName);
+            } else if (buffLevel < 0) {
+                iconIndex = this.buffIconIndex(this._buffs[i], i);
+                if (list.indexOf(i + 10) >= 0 && this.notBsIconFilter(iconIndex)) {
+                    icons.push(iconIndex);
                 }
             }
         }
+        return icons;
+    } else {
+        return _Game_BattlerBase_buffIcons.call(this);
+    }
+};
 
-        battleStyleMatchConditions(data) {
-            if (data._Class && data._Class > 0 && !this.filteringClass(data)) {
-                return false;
-            }
-            if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this._battler.hp, this._battler.param(0))) {
-                return false;
-            }
-            if (data.ImgSwitch && !this.isBattleStyleSwitchImg(data)) {
-                return false;
-            }
-            if (data.ImgWeapon && !this.isBattleStyleWeaponImg(data)) {
-                return false;
-            }
-            if (data.ImgArmor && !this.isBattleStyleArmorImg(data)) {
-                return false;
-            }
-            if (data.ImgStateAll && !this.isBattleStyleStateImg(data, data.ImgStateAll)) {
-                return false;
-            }
-            if (data.ImgClass > 0 && !this.isBattleStyleClassImg(data)) {
-                return false;
-            }
-            if (!this.battleStyleMatchChangeGraphic(data)) {
-                return false;
-            }
+Game_BattlerBase.prototype.buffsFilter = function(id) {
+    return BattleManager.bsVisibleBuffs.indexOf(id) >= 0 && this.notBsIconFilter(this.buffIconIndex(this._buffs[id], id));
+};
+
+Game_BattlerBase.prototype.notBsIconFilter = function(id) {
+    return BattleManager.notIconList && BattleManager.notIconList.length > 0 ? !BattleManager.notIconList.indexOf(id) >= 0 : true;
+};
+
+const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
+Game_Battler.prototype.initMembers = function() {
+    _Game_Battler_initMembers.call(this);
+    this.nuun_bsUseItemId = -1;
+    this._battleStyleGraphicIndex = -1;
+    this._battleStyleGraphicOpacity = 255;
+    this._battleStyleGraphicName = null;
+    this._actionBattlerImg = null;
+    this._isEffectAction = false;
+    this._onDamageEffect = false;
+    this._isDeadImg = false;
+    this._imgScenes = 'default';
+};
+
+const _Game_Actor_performActionStart = Game_Actor.prototype.performActionStart;
+Game_Actor.prototype.performActionStart = function(action) {
+    _Game_Actor_performActionStart.call(this, action);
+    if (params.OnActionZoom && !this.isCounterSkillAction()) {
+        this._isEffectAction = true;
+    }
+    if (BattleManager.isOnActorPictureEX()) {
+        this.setAttackImgId(action);
+    } else {
+        this.setBattleStyleAttackImgId(action);
+    }
+};
+
+const _Game_Enemy_performActionStart = Game_Enemy.prototype.performActionStart;
+Game_Enemy.prototype.performActionStart = function(action) {
+    _Game_Enemy_performActionStart.call(this, action);
+    this.setBattleStyleAttackImgId(action);
+};
+
+Game_Battler.prototype.setBattleStyleAttackImgId = function(action) {
+    if (action.item().animationId !== 0) {
+        if (action.isRecover()) {
+            this.setBattleImgId(11, action.item().id);
+            this.setBSActionBattlerImg("recovery");
+        } else if (action.isAttack() && action.isDamage()) {
+            this.setBattleImgId(10, action.item().id);
+            this.setBSActionBattlerImg("attack");
+        } else if (action.isMagicSkill()) {
+            this.setBattleImgId(10, action.item().id);
+            this.setBSActionBattlerImg("attack");
+        } else if (action.isSkill() && action.isDamage()) {
+            this.setBattleImgId(10, action.item().id);
+            this.setBSActionBattlerImg("attack");
+        } else if (action.isItem()) {
+            this.setBattleImgId(12, action.item().id);
+            this.setBSActionBattlerImg("item");
+        } else {
+            this.setBattleImgId(0, -1);
+            this.setBSActionBattlerImg(null);
+        }
+        this.battleStyleImgRefresh();
+    }
+};
+
+Game_Actor.prototype.setBattleStyleAttackImgId = function(action) {
+    Game_Battler.prototype.setBattleStyleAttackImgId.call(this, action);
+};
+
+const _Game_Battler_performDamage = Game_Battler.prototype.performDamage;
+Game_Battler.prototype.performDamage = function() {
+    _Game_Battler_performDamage.call(this);
+    this.setDamageEffect();
+    if (this.isGuard()) {
+        this.setBattleImgId(15);
+    }
+    if (this._imgScenes !== 'guard') {
+        this.battlerImgCritical ? this.setBattleImgId(3) : this.setBattleImgId(1);
+        this.battlerImgCritical = false;
+    }
+    this.battleStyleImgRefresh();
+};
+
+Game_Actor.prototype.setDamageEffect = function() {
+    if (params.OnActorShake) {
+        this._onDamageEffect = true;
+    }
+};
+
+Game_Enemy.prototype.setDamageEffect = function() {
+
+};
+
+const _Game_Actor_performRecovery = Game_Actor.prototype.performRecovery;
+Game_Actor.prototype.performRecovery = function() {
+    _Game_Actor_performRecovery.call(this);
+    this.setBattleImgId(2);
+    this.battleStyleImgRefresh();
+};
+
+const _Game_Actor_performVictory = Game_Actor.prototype.performVictory;
+Game_Actor.prototype.performVictory = function() {
+    _Game_Actor_performVictory.call(this);
+    this.setBattleImgId(20);
+    this.battleStyleImgRefresh();
+};
+
+const _Game_Battler_refresh = Game_Battler.prototype.refresh;
+Game_Battler.prototype.refresh = function() {
+    _Game_Battler_refresh.call(this);
+    if ($gameParty.inBattle() && this.isActor()) {
+        this.battleStyleImgRefresh();
+    }
+};
+
+Game_Actor.prototype.imgRefresh = function() {
+    this.battleStyleImgRefresh();
+};
+
+const _Game_Actor_setup = Game_Actor.prototype.setup;
+Game_Actor.prototype.setup = function(actorId) {
+    _Game_Actor_setup.call(this, actorId);
+    this.battleStyleImgRefresh();
+};
+
+const _Game_Enemy_setup = Game_Enemy.prototype.setup;
+Game_Enemy.prototype.setup = function(enemyId, x, y) {
+    _Game_Enemy_setup.call(this, enemyId, x, y);
+    this.battleStyleImgRefresh();
+};
+
+Game_Actor.prototype.battleStyleImgRefresh = function() {
+    if (!BattleManager.isBsBattle()) {
+        return;
+    }
+    let imgIndex = -1;
+    let index = -1;
+    this._isDeadImg = false;
+    this._imgScenes = 'default';
+    const actorId = this.actorId();
+    const imgData = getActorImgData(actorId);
+    const actorData = getActorData(actorId);
+    this.bsImgMode = imgData ? imgData.ActorImgMode : 'face';
+    this.faceMode = !(imgData && imgData.ActorImgMode !== 'face');
+    const list = getActorImgList(this, actorData);
+    if (imgData.ActorImgMode !== 'none' && list) {
+        index = list.ButlerActorImg.findIndex(data => {
+            return this.battleStyleMatchConditions(data);
+        });
+        if (index >= 0) {
+            this.setbattleStyleGraphicId();
+            const data = list.ButlerActorImg[index];
+            //this._battleStyleGraphicName = index !== this._battleStyleGraphicIndex ? this.getBattleStyleImg(data) : this._battleStyleGraphicName;
+            this._battleStyleGraphicName = this.getBattleStyleImg(data);
+            imgIndex = this.getBattleStyleImgIndex(data);
+            this._isDeadImg = this.isBSActorGraphicDead(data);
+            this._battleStyleGraphicOpacity = data.Opacity || 255;
+        } else {
+            this._battleStyleGraphicName = null;
+        }
+    } else {
+        if (this.faceMode) {
+            this._battleStyleGraphicName = this.faceName();
+            imgIndex = this.faceIndex();
+            index = 0;
+        } else {
+            this._battleStyleGraphicName = null;
+        }
+    }
+    this._battleStyleGraphicIndex = index;
+    this._battleStyleImgIndex = imgIndex;
+};
+
+Game_Enemy.prototype.battleStyleImgRefresh = function() {
+
+};
+
+Game_Actor.prototype.actorPictureActorGraphicData = function(imgData) {
+    if (imgData.ActorImgMode === 'none') {
+        this._battleStyleGraphicName = null;
+        this._battleStyleGraphicIndex = -1;
+        this._battleStyleImgIndex = -1;
+    } else if (imgData.ActorImgMode === 'imges') {
+        this._battleStyleGraphicName = this._actorGraphicName;
+        this._battleStyleGraphicIndex = this._actorGraphicIndex;
+        this._battleStyleImgIndex = -1;
+    } else {
+        this._battleStyleGraphicName = this.getActorGraphicFace();
+        this._battleStyleGraphicIndex = this._actorGraphicIndex >= 0 ? this._actorGraphicIndex : 9999;
+        this._battleStyleImgIndex = this.getActorGraphicFaceIndex();
+    }
+    const data = this.getActorGraphicData();
+    if (data) {
+        this._isDeadImg = this.isActorGraphicDead(data);
+        this._imgScenes = data.ChangeGraphicScenes;
+    }
+};
+
+Game_Battler.prototype.setbattleStyleGraphicId = function() {
+    switch (this._imgScenes) {
+        case 'counter':
+        case 'reflection':
+        case 'counterEX':
+            this._onImgId = 30;
+            break;
+    }
+};
+
+Game_Battler.prototype.battleStyleMatchConditions = function(data) {
+    if (data.FilteringClass && !filteringClass(data)) {
+        return false;
+    }
+    if (data.ImgHP && data.ImgHP.CondValid && !conditionsParam(data.ImgHP, this.hp, this.param(0))) {
+        return false;
+    }
+    if (data.ImgSwitch && !this.isBattleStyleSwitchImg(data)) {
+        return false;
+    }
+    if (data.ImgWeapon && !this.isBattleStyleWeaponImg(data)) {
+        return false;
+    }
+    if (data.ImgArmor && !this.isBattleStyleArmorImg(data)) {
+        return false;
+    }
+    if (data.ImgStateAll && !this.isBattleStyleStateImg(data, data.ImgStateAll)) {
+        return false;
+    }
+    if (data.ImgClass > 0 && !this.isBattleStyleClassImg(data)) {
+        return false;
+    }
+    if (!this.battleStyleMatchChangeGraphic(data)) {
+        return false;
+    }
+    return true;
+};
+  
+Game_Battler.prototype.battleStyleMatchChangeGraphic = function(data) {
+    const changeData = data.ChangeGraphicScenes;
+    this._imgScenes = changeData;
+    switch (changeData) {
+        case 'default' :
             return true;
-        }
-
-        battleStyleMatchChangeGraphic(data) {
-            const changeData = data.ChangeGraphicScenes;
-            this._imgScenes = changeData;
-            switch (changeData) {
-                case 'default' :
-                    return true;
-                case 'finalAttack':
-                    return this.isFinalAttack(data.Skill);
-                case 'death' :
-                    return this.isDead();
-                case 'b_appeared' :
-                    return !this.isAppeared();
-                case 'command' :
-                    return this.isInputting();
-                case 'dying' :
-                    return this.isDying();
-                case 'damage' :
-                    return this.getImgId(1) || this.getImgId(3);
-                case 'cridamage' :
-                    return this.getImgId(3);
-                case 'recovery' :
-                    return this.getImgId(2);
-                case 'attack' :
-                    return this.getImgId(10) && this.isBattleStyleUseItemImg(data.Skill);
-                case 'recoverySkill' :
-                    return this.getImgId(11) && this.isBattleStyleUseItemImg(data.Skill);
-                case 'item' :
-                    return this.getImgId(12) && this.isBattleStyleUseItemImg(data.Item);
-                case 'chant' :
-                    return this.isChanting();
-                case 'victory' :
-                    return this.getImgId(20);
-                case 'state' :
-                    return this.isBattleStyleStateImg(data, data.stateId);
-                case 'counter' :
-                    return this.isCounter();
-                case 'reflection' :
-                    return this.isReflection();
-                case 'counterEX' :
-                    return this.isCounterEX(data);
-                case 'guard' :
-                    return this.getImgId(15);
-            }
-        }
-
-        isFinalAttack(skill) {
-            return Imported.NUUN_FinalAttack && (this.getImgId(10) || this.getImgId(11)) && this._battler.isFinalAttack() && this.isBattleStyleUseItemImg(skill);
-        }
-
-        setbattleStyleGraphicId() {
-            switch (this._imgScenes) {
-                case 'counter':
-                case 'reflection':
-                case 'counterEX':
-                    this._battler.setBattleImgId(30);
-                    break;
-            }
-        }
-
-        getBattleStyleImg(data) {
-            if (this.isFaceMode()) {
-                return this.actorFaceName(data)
-            } else {
-                return this.graphicName(data);
-            }
-        }
-
-        actorFaceName(data) {
-            return data && data.FaceImg ? data.FaceImg : this._battler.faceName();
-        }
-
-        graphicName(data) {
-            const images = this.actorGraphicName(data);
-            if (Array.isArray(images)) {
-                if (images.length > 1) {
-                    return images[Math.randomInt(images.length)];
-                } else {
-                    return images[0];
-                }
-            } else {
-                return images;
-            }
-        }
-
-        actorGraphicName(data) {
-            return data.GraphicImg;
-        }
-
-        getGraphicName() {
-            return this._battleStyleGraphicName;
-        }
-
-        getImgIndex() {
-            return this._battleStyleImgIndex;
-        }
-
-        getGraphicIndex() {
-            return this._battleStyleGraphicIndex; 
-        }
-
-        getImgScenes() {
-            return this._imgScenes; 
-        }
-
-        isDeadImg() {
-            return this._isDeadImg;
-        }
-
-        getBattleStyleImgIndex(data) {
-            return this.isFaceMode() ? this.actorFaceIndex(data) : this.batterImgIndex(data);
-        }
-
-        actorFaceIndex(data) {
-            return data && data.FaceIndex >= 0 ? data.FaceIndex : this._battler.faceIndex();
-        }
-
-        batterImgIndex(data) {
-            return -1;
-        }
-
-        isBSActorGraphicDead(data) {
-            return data && (!!data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
-        }
-
-        getStateData(data) {
-            return data.some(s => s === this._battler.deathStateId());
-        }
-
-        getImgId(id) {
-            return this._battler.onImgId[id];
-        }
-
-        isDead() {
-            return this._battler.isDead();
-        }
-
-        isAppeared() {
-            return this._battler.isAppeared();
-        }
-
-        isInputting() {
-            return this._battler.isInputting();
-        }
-
-        isDying() {
-            return this._battler.isDying();
-        }
-
-        isChanting() {
-            return this._battler.isChanting();
-        }
-
-        isCounter() {
-            return this._battler.result().counterEx;
-        }
-
-        isReflection() {
-            return this._battler.result().reflectionEx;
-        }
-
-        isStateSprite() {
-            return !!this._stateSprite;
-        }
-
-        setStateSprite(sprite) {
-            this._stateSprite = sprite;
-        }
-
-        getStateSprite() {
-            return this._stateSprite;
-        }
-
-        isCounterEX(data) {
-            return this._battler.result().counterExtend && this.isBattleStyleUseItemImg(data.Id);
-        }
-
-        isBattleStyleSwitchImg(data) {
-            return data.ImgSwitch.every(id => $gameSwitches.value(id));
-        }
-
-        isBattleStyleWeaponImg(data) {
-            return data.ImgWeapon.every(id => this._battler.isEquipped($dataWeapons[id]));
-        }
-
-        isBattleStyleArmorImg(data) {
-            return data.ImgArmor.every(id => this._battler.isEquipped($dataArmors[id]));
-        }
-
-        isBattleStyleClassImg(data) {
-            return data.ImgClass ? this._battler._classId === data.ImgClass : true;
-        }
-
-        isBattleStyleUseItemImg(item) {
-            return item && item[0] > 0 ? item.includes(this._battler.nuun_bsUseItemId) : true;
-        }
-
-        isBattleStyleStateImg(data, states) {
-            return states.every(id => id > 0 ? this._battler.isStateAffected(id) : true);
-        }
-
-        getLoadBattleStyleImg() {
-            return this.isFaceMode() ? this.loadBattleStyleActorFace() : this.loadBattleStyleActorGraphic();
-        }
-
-        loadBattleStyleActorFace() {
-            return ImageManager.loadFace(this.getGraphicName());
-        }
-
-        loadBattleStyleActorGraphic() {
-            return ImageManager.nuun_LoadPictures(this.getGraphicName());
-        }
-
-        filteringClass(data) {
-            if (data.FilteringClass && data.FilteringClass.length > 0) {
-                return data.FilteringClass.some(filterClass => filterClass === 'Scene_Battle');
-            } else {
-                return true;
-            }
-        }
-        
-    };
-
-    window.Nuun_BattleStyleActorAnimation = Nuun_BattleStyleActorAnimation;
-
-    function _isOnActorPictureEX() {
-        return Imported.NUUN_ActorPicture && params.OnActorPictureEX;
+        case 'death' :
+            return this.isDeadImg();
+        case 'b_appeared' :
+            return !this.isAppeared();
+        case 'command' :
+            return this.isInputting();
+        case 'dying' :
+            return this.isDying();
+        case 'damage' :
+            return this._onImgId === 1 || this._onImgId === 3;
+        case 'cridamage' :
+            return this._onImgId === 3;
+        case 'recovery' :
+            return this._onImgId === 2;
+        case 'attack' :
+            return this._onImgId === 10 && this.isBattleStyleUseItemImg(data.Skill);
+        case 'recoverySkill' :
+            return this._onImgId === 11 && this.isBattleStyleUseItemImg(data.Skill);
+        case 'item' :
+            return this._onImgId === 12 && this.isBattleStyleUseItemImg(data.Item);
+        case 'chant' :
+            return this.isChanting();
+        case 'victory' :
+            return this._onImgId === 20;
+        case 'state' :
+            return this.isBattleStyleStateImg(data, data.stateId);
+        case 'counter' :
+            return this.result().counterEx;
+        case 'reflection' :
+            return this.result().reflectionEx;
+        case 'counterEX' :
+            return this.result().counterExtend && this.isBattleStyleUseItemImg(data.Id);
+        case 'guard' :
+            return this._onImgId === 15;
     }
+};
 
-    function conditionsParam(data, param, maxParam) {
-        return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
-    };
-
-    const _BattleManager_displayStartMessages = BattleManager.displayStartMessages;
-    BattleManager.displayStartMessages = function() {
-        if (!params.NoAppearWindow) {
-            _BattleManager_displayStartMessages.call(this);
+Game_Actor.prototype.performVibration = function(critical) {
+    if (Imported.NUUN_GamePadVibration) {
+        if (critical && params.CriticalVibration) {
+            if (params.CriticalVibrationSetting) {
+                NuunManager.setupGamePadVibration(params.CriticalVibrationSetting);
+            }
+        } else {
+            if (params.DamegeVibration && params.DamegeVibrationSetting) {
+                NuunManager.setupGamePadVibration(params.DamegeVibrationSetting);
+            }
         }
-    };
-
-    BattleManager.statusWindowVisible = function(flag) {
-        this._statusWindowVisible = flag;
     }
+};
 
-    BattleManager.isStatusWindowVisible = function() {
-        return this._statusWindowVisible;
+Game_Battler.prototype.isDeadImg = function() {
+    return this.isDead();
+};
+
+Game_Battler.prototype.isCounterSkillAction = function() {
+    return this._counterAction;
+};
+
+Game_Battler.prototype.setBattleImgId = function(id, itemId) {
+    if (itemId !== undefined) {
+        this.nuun_bsUseItemId = itemId;
     }
-
-    const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
-    BattleManager.invokeCounterAttack = function(subject, target) {
-        target.isCouterAction = true;
-        if (target.isActor()) {
-            target.result().counterEx = true;
-        }
-        _BattleManager_invokeCounterAttack.apply(this, arguments);
-    };
-
-    const _BattleManager_invokeMagicReflection = BattleManager.invokeMagicReflection;
-    BattleManager.invokeMagicReflection = function(subject, target) {
-        target.isReflectionAction = true;
-        if (target.isActor()) {
-            target.result().reflectionEx = true;
-        }
-        _BattleManager_invokeMagicReflection.apply(this, arguments);
-    };
-
-
-    const _Game_Temp_initialize = Game_Temp.prototype.initialize;
-    Game_Temp.prototype.initialize = function() {
-        _Game_Temp_initialize.call(this);
-        this._battleStyleRefresh = false;
-    };
-
-    Game_Temp.prototype.setBattleStyleRefresh = function(flag) {
-        this._battleStyleRefresh = flag;
-    };
-    
-    Game_Temp.prototype.isBattleStyleRequested = function() {
-        return this._battleStyleRefresh || false;
-    };
-
-
-    const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
-    Game_ActionResult.prototype.clear = function() {
-        _Game_ActionResult_clear.call(this);
-        this.counterEx = false;
-        this.reflectionEx = false;
-        this.counterExtend = false;
-    };
-
-
-    const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
-    Game_Battler.prototype.initMembers = function() {
-        _Game_Battler_initMembers.call(this);
-        this.nuun_bsUseItemId = -1;
-        this.onImgId = [];
-        this._actionBattlerImg = null;
-        this._isEffectAction = false;
-        this._onDamageEffect = false;
-        this._imgScenes = 'default';
-    };
-
-    Game_Battler.prototype.setImgScenes = function(imgScenes) {
-        this._imgScenes = imgScenes;
-    };
-
-    Game_Battler.prototype.isImgScenesGuard = function() {
-        return this._imgScenes === "guard";
-    };
-
-    const _Game_Actor_performActionStart = Game_Actor.prototype.performActionStart;
-    Game_Actor.prototype.performActionStart = function(action) {
-        _Game_Actor_performActionStart.apply(this, arguments);
-        if (params.OnActionZoom && !this.isCounterSkillAction()) {
-            this._isEffectAction = true;
-        }
-        this.setBattleStyleAttackImgId(action);
-    };
-
-    const _Game_Enemy_performActionStart = Game_Enemy.prototype.performActionStart;
-    Game_Enemy.prototype.performActionStart = function(action) {
-        _Game_Enemy_performActionStart.apply(this, arguments);
-        this.setBattleStyleAttackImgId(action);
-    };
-
-    Game_Battler.prototype.setBattleStyleAttackImgId = function(action) {
-        if (action.item().animationId !== 0) {
-            if (action.isRecover()) {
-                this.setBattleImgId(11, action.item().id);
-                this.setBSActionBattlerImg("recovery");
-            } else if (action.isAttack() && action.isDamage()) {
-                this.setBattleImgId(10, action.item().id);
-                this.setBSActionBattlerImg("attack");
-            } else if (action.isMagicSkill()) {
-                this.setBattleImgId(10, action.item().id);
-                this.setBSActionBattlerImg("attack");
-            } else if (action.isSkill() && action.isDamage()) {
-                this.setBattleImgId(10, action.item().id);
-                this.setBSActionBattlerImg("attack");
-            } else if (action.isItem()) {
-                this.setBattleImgId(12, action.item().id);
-                this.setBSActionBattlerImg("item");
-            } else {
-                this.setBattleImgId(0, -1);
-                this.setBSActionBattlerImg(null);
-            }
-            //this.battleStyleImgRefresh();
-        }
-    };
-
-    const _Game_Battler_performDamage = Game_Battler.prototype.performDamage;
-    Game_Battler.prototype.performDamage = function() {
-        _Game_Battler_performDamage.apply(this, arguments);
-        this.setDamageEffect();
-        if (this.isGuard()) {
-            this.setBattleImgId(15);
-        }
-        if (!this.isImgScenesGuard()) {
-            this.battlerImgCritical ? this.setBattleImgId(3) : this.setBattleImgId(1);
-            this.battlerImgCritical = false;
-        }
-        //this.battleStyleImgRefresh();
-    };
-
-    const _Game_Battler_performRecovery = Game_Battler.prototype.performRecovery;
-    Game_Battler.prototype.performRecovery = function() {
-        _Game_Battler_performRecovery.apply(this, arguments);
-        this.setBattleImgId(2);
-        //this.battleStyleImgRefresh();
-    };
-
-    const _Game_Actor_performVictory = Game_Actor.prototype.performVictory;
-    Game_Actor.prototype.performVictory = function() {
-        _Game_Actor_performVictory.apply(this, arguments);
-        this.setBattleImgId(20);
-        //this.battleStyleImgRefresh();
-    };
-
-    Game_Battler.prototype.isCounterSkillAction = function() {
-        return !!this._counterAction;
-    };
-
-    Game_Battler.prototype.isBSEffectAction = function() {
-        return this._isEffectAction;
-    };
-
-    Game_Actor.prototype.setDamageEffect = function() {
-        this._onDamageEffect = params.OnActorShake;
-    };
-
-    Game_Enemy.prototype.setDamageEffect = function() {
-        this._onDamageEffect = false;
-    };
-
-    Game_Battler.prototype.isBSDamageEffect = function() {
-        return this._onDamageEffect;
-    };
-
-    Game_Battler.prototype.setBSActionBattlerImg = function(state) {
-        this._actionBattlerImg = state;
-    };
-      
-    Game_Battler.prototype.isBSActionBattlerImg = function() {
-        return this._actionBattlerImg;
-    };
-    
-
-    Game_Battler.prototype.setBattleImgId = function(id, itemId) {
-        if (itemId !== undefined) {
-            this.nuun_bsUseItemId = itemId;
-        }
-        if (!this.onImgId) {
-            this.onImgId = [];
-        }
-        this.onImgId[id] = true;
-    };
-    
-    Game_Battler.prototype.resetBattleStyleImgId = function() {
-        if (!this.onImgId) {
-            this.onImgId = [];
-        }
-        for (let i = 0; i < this.onImgId.length; i++) {
-            this.onImgId[i] = false;
-        }
-    };
-
-    const _Game_Actor_isSpriteVisible = Game_Actor.prototype.isSpriteVisible;
-    Game_Actor.prototype.isSpriteVisible = function() {
-        const result = _Game_Actor_isSpriteVisible.apply(this, arguments);
-        if (result) {
-            return result;
-        }
-        return NuunManager.styleData.isFrontAnimation() && $gameParty.inBattle();
-    };
-
-    Game_Enemy.prototype.attackAnimation = function() {
-        return this.bareHandsAnimationId();
-    };
-      
-    Game_Enemy.prototype.bareHandsAnimationId = function() {
-        return this.enemy().meta.AttackAnimation ? Number(this.enemy().meta.AttackAnimation) : params.EnemySkillAnimation;
-    };
-
-    Game_Battler.prototype.setVisibleIcons = function(stateList, buffList) {
-        this._visibleStates = stateList || [];
-        this._visibleBuffs = buffList || [];
-    };
-
-    Game_Enemy.prototype.setVisibleIcons = function(stateList, buffList) {
-        this._visibleStates = [];
-        this._visibleBuffs = [];
-    };
-
-    const _Game_BattlerBase_stateIcons = Game_BattlerBase.prototype.stateIcons;
-    Game_BattlerBase.prototype.stateIcons = function() {
-        const states = _Game_BattlerBase_stateIcons.apply(this, arguments);
-        if (this._visibleStates && this._visibleStates.length > 0) {
-            states.filter(state => this._visibleStates.indexOf(state));
-        }
-        return states;
-    };
-
-    const _Game_BattlerBase_buffIcons = Game_BattlerBase.prototype.buffIcons;
-    Game_BattlerBase.prototype.buffIcons = function() {
-        const buffs = _Game_BattlerBase_buffIcons.apply(this, arguments);
-        if (this._visibleBuffs && this._visibleBuffs.length > 0) {
-            buffs.filter(buff => this._visibleBuffs.indexOf(buff));
-        }
-        return buffs;
-    };
-
-
-    const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
-    Scene_Battle.prototype.initialize = function() {
-        NuunManager.styleData = new Nuun_BattleLayoutData(this);
-        NuunManager.styleData.setStyle();
-        _Scene_Battle_initialize.call(this);
-        this._actorStatusBackground = null;
-        this._bsBattleEnd = false;
-    };
-
-    const _Scene_Battle_start = Scene_Battle.prototype.start;
-    Scene_Battle.prototype.start = function() {
-        //BattleManager.battleStartCommon();
-        _Scene_Battle_start.call(this);
-        if (this._actorImges) {
-            this._actorImges.refresh();
-        }
-        this._actorStatus.refresh();
-    };
-
-    const _Scene_Battle_updateStatusWindowVisibility = Scene_Battle.prototype.updateStatusWindowVisibility;
-    Scene_Battle.prototype.updateStatusWindowVisibility = function() {
-        _Scene_Battle_updateStatusWindowVisibility.apply(this, arguments);
-        this.updateOpenStatusWindow();
-        this.updatePartyCommandWindow();
-        this.updateActorCommandWindow();
-        this.updateBackgroundImg();
-        this.updateBattleEndActorStatus();
-    };
-
-    Scene_Battle.prototype.updateBattleEndActorStatus = function() {
-        if (BattleManager.isBattleEnd()) {
-            this._bsBattleEnd = true;
-        }
-        if (params.BattleEndActorStatusClose) {
-            if (BattleManager.isBattleEnd()) {
-              this._statusWindow.close();
-            }
-        } else if (this._bsBattleEnd) {
-            this._statusWindow.open();
-        }
-    };
-
-    Scene_Battle.prototype.updateOpenStatusWindow = function() {
-        if (params.BattleEndActorStatusClose && BattleManager.isBattleEnd()) {
-            this._statusWindow.bsHide();
-            return;
-        }
-        const result = BattleManager.isStatusWindowVisible();
-        this._statusWindow.visible = !result;
-        if (!!this._actorImges) {
-            this._actorImges.visible = !result;
-        }
-        this._actorStatus.visible = !result;
-        if (!this._statusWindow.visible) {
-            return;
-        }
-        for (const hideWindow of params.WindowHideActorStatusWindow) {
-            const _window = this[NuunManager.styleData.getWindowMethods(hideWindow)];
-            if (_window) {
-                if (_window.isOpen() || _window.isOpening() || _window.isClosing()) {
-                    this._statusWindow.visible = !_window.visible;
-                    if (!!this._actorImges) {
-                        this._actorImges.visible = !_window.visible;
-                    }
-                    this._actorStatus.visible = !_window.visible;
-                } else if (_window.visible) {
-                    this._statusWindow.visible = !_window.isOpen();
-                    if (!!this._actorImges) {
-                        this._actorImges.visible = !_window.isOpen();
-                    }
-                    this._actorStatus.visible = !_window.isOpen();
-                }
-                if (!this._statusWindow.visible) {
-                    break;
-                }
-            }
-        }
-    };
-
-    Scene_Battle.prototype.updatePartyCommandWindow = function() {
-        if ($gameTemp.onBSAction && (this._partyCommandWindow.isOpen() || this._partyCommandWindow.isOpening())) {
-            $gameTemp.onBSAction = false;
-            this._partyCommandWindow.close();
-        }
-        if ($gameTemp.onBSAction && BattleManager._phase === 'action') {
-            $gameTemp.onBSAction = false;
-        }
-    };
-
-    Scene_Battle.prototype.updateActorCommandWindow = function() {
-        const list = NuunManager.styleData.getActorCommandHideWindow();
-        for (const hideWindow of list) {
-            const _window = this[NuunManager.styleData.getWindowMethods(hideWindow)];
-            if (_window) {
-                if (_window.isOpen()) {
-                    this._actorCommandWindow.visible = !_window.visible;
-                } else if (_window.visible) {
-                    this._actorCommandWindow.visible = !_window.isOpen();
-                }
-                if (!this._actorCommandWindow.visible) {
-                    break;
-                }
-            }
-        }
-    };
-
-    Scene_Battle.prototype.isRightInputMode = function() {
-        return NuunManager.styleData.isCommandRightMode();
-    };
-
-    Scene_Battle.prototype.updateBackgroundImg = function() {
-        this.updateBackgroundActorStatus();
-        this.updateBackgroundPartyCommand();
-        this.updateBackgroundActorCommand();
-    };
-
-    Scene_Battle.prototype.updateBackgroundActorStatus = function() {
-        if(this._actorStatusBackground && this._statusWindow) {
-            this._actorStatusBackground.x = NuunManager.styleData.getBackgroundX();
-            this._actorStatusBackground.y = NuunManager.styleData.getBackgroundY();
-        }
-    };
-
-    Scene_Battle.prototype.updateBackgroundPartyCommand = function() {
-        if (this._partyCommandBackground && this._partyCommandWindow) {
-            this._partyCommandBackground.x = NuunManager.styleData.getPartyCommandBackgroundX();
-            this._partyCommandBackground.y = NuunManager.styleData.getPartyCommandBackgroundY();
-            if (this._partyCommandWindow.isOpen()) {
-                this._partyCommandBackground.visible = this._partyCommandWindow.visible;
-            } else if (this._partyCommandWindow.visible) {
-                this._partyCommandBackground.visible = this._partyCommandWindow.isOpen();
-            }
-        }
-    };
-
-    Scene_Battle.prototype.updateBackgroundActorCommand = function() {
-        if (this._actorCommandBackground && this._actorCommandWindow) {
-            const data = NuunManager.styleData.getActorData(BattleManager.actor());
-            this._actorCommandBackground.bitmap = ImageManager.nuun_LoadPictures(NuunManager.styleData.getActorCommandWindowBacgroundImg(data));
-            this._actorCommandBackground.x = NuunManager.styleData.getActorCommandBackgroundX(data);
-            this._actorCommandBackground.y = NuunManager.styleData.getActorCommandBackgroundY(data);
-            if (this._actorCommandWindow.isOpen()) {
-                this._actorCommandBackground.visible = this._actorCommandWindow.visible;
-            } else if (this._actorCommandWindow.visible) {
-                this._actorCommandBackground.visible = this._actorCommandWindow.isOpen();
-            }
-        }
-    };
-
-    Scene_Battle.prototype.createBackground = function() {
-        if (NuunManager.styleData.getActorStatusWindowBacgroundImg()) {
-            const bitmap = ImageManager.nuun_LoadPictures(NuunManager.styleData.getActorStatusWindowBacgroundImg());
-            const sprite = new Sprite(bitmap);
-            this._battleHudBack.addChild(sprite);
-            this._actorStatusBackground = sprite;
-        }
-    };
-
-
-    const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
-    Scene_Battle.prototype.createSpriteset = function() {
-        _Scene_Battle_createSpriteset.apply(this, arguments);
-        if (params.WindowDisplayMode === 'Scene_Battle') {
-            this.addChild(this._spriteset._battleHudBase);
-        }
-        NuunManager.styleData.setSvActorSprites();
-    };
-
-    const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
-    Scene_Battle.prototype.createAllWindows = function() {
-        this._battleHudBack = this._spriteset.getHudBack();
-        this._battleHudFront = this._spriteset.getHudStatus();
-        this.createBackground();
-        this.createHud();
-        _Scene_Battle_createAllWindows.call(this);
-    };
-
-    Scene_Battle.prototype.createHud = function() {
-        const rect = this.statusWindowRect();
-        this._statusWindow = new Window_BsBattleStatus(rect);
-        this._battleHudBack.addChild(this._statusWindow);
-        this.createActorSelectWindow();
-        this.createActorImges(rect);
-        this.createActorStatus(rect);
-        this._statusWindow.setActorWindow(this._actorImges, this._actorStatus);
-        this.createPartyCommandBackground();
-        this.createActorCommandBackground();
-    };
-
-    const _Scene_Battle_createStatusWindow = Scene_Battle.prototype.createStatusWindow;
-    Scene_Battle.prototype.createStatusWindow = function() {
-        
-    };
-
-    Scene_Battle.prototype.createActorImges = function(rect) {
-        this._actorImges = new Window_BattleActorImges(rect);
-        this._battleHudBack.addChild(this._actorImges);
-    };
-    
-    Scene_Battle.prototype.createActorStatus = function(rect) {
-        this._actorStatus = new Window_BattleActorStatus(rect);
-        this._battleHudFront.addChild(this._actorStatus);
-    };
-
-    const _Scene_Battle_createActorWindow = Scene_Battle.prototype.createActorWindow;
-    Scene_Battle.prototype.createActorWindow = function() {
-        if (NuunManager.styleData.isDefaultActorWindow()) {
-            _Scene_Battle_createActorWindow.apply(this, arguments);
-        }
-    };
-
-    const _Scene_Battle_statusWindowRect = Scene_Battle.prototype.statusWindowRect;
-    Scene_Battle.prototype.statusWindowRect = function() {
-        const ww = NuunManager.styleData.getActorWindowWidthCommandSubtraction();
-        const wh = NuunManager.styleData.getActorStatusWindowHeight();
-        const wx = NuunManager.styleData.getActorWindowX();
-        const wy = NuunManager.styleData.getActorWindowY();
-        return new Rectangle(wx, wy, ww, wh);
-    };
-
-    Scene_Battle.prototype.createActorSelectWindow = function() {
-        if (NuunManager.styleData.isDefaultActorWindow()) {
-            return;
-        }
-        const rect = this.actorWindowRect();
-        this._actorWindow = new Window_BsBattleActor(rect);
-        this._actorWindow.setHandler("ok", this.onActorOk.bind(this));
-        this._actorWindow.setHandler("cancel", this.onActorCancel.bind(this));
-        this._battleHudBack.addChild(this._actorWindow);
-    };
-
-    Scene_Battle.prototype.actorWindowRect = function() {
-        return NuunManager.styleData.isDefaultActorWindow() ? _Scene_Battle_statusWindowRect.apply(this, arguments) : this.statusWindowRect();
-    };
-
-    const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
-    Scene_Battle.prototype.createPartyCommandWindow = function() {
-        _Scene_Battle_createPartyCommandWindow.apply(this, arguments);
-        
-    };
-
-    const _Scene_Battle_partyCommandWindowRect = Scene_Battle.prototype.partyCommandWindowRect;
-    Scene_Battle.prototype.partyCommandWindowRect = function() {
-        const rect = _Scene_Battle_partyCommandWindowRect.call(this);
-        return NuunManager.styleData.setPartyCommandPosition(rect);
-    };
-
-    Scene_Battle.prototype.createPartyCommandBackground = function() {
-        if (NuunManager.styleData.getPartyCommandWindowBacgroundImg()) {
-            const bitmap = ImageManager.nuun_LoadPictures(NuunManager.styleData.getPartyCommandWindowBacgroundImg());
-            const sprite = new Sprite(bitmap);
-            this._battleHudFront.addChild(sprite);
-            this._partyCommandBackground = sprite;
-            sprite.hide();
-        }
-    };
-
-    const _Scene_Battle_createActorCommandWindow = Scene_Battle.prototype.createActorCommandWindow;
-    Scene_Battle.prototype.createActorCommandWindow = function() {
-        _Scene_Battle_createActorCommandWindow.apply(this, arguments);
-    };
-
-    const _Scene_Battle_actorCommandWindowRect = Scene_Battle.prototype.actorCommandWindowRect;
-    Scene_Battle.prototype.actorCommandWindowRect = function() {
-        const rect = _Scene_Battle_actorCommandWindowRect.apply(this, arguments);
-        rect.width = NuunManager.styleData.actorCommandWidth();
-        rect.height = NuunManager.styleData.actorCommandHeight();
-        rect.x = NuunManager.styleData.getActorCommand_XPosition(rect);
-        rect.y = NuunManager.styleData.getActorCommand_YPosition(rect);
-        return rect;
-    };
-
-    const _Scene_Battle_enemyWindowRect = Scene_Battle.prototype.enemyWindowRect;
-    Scene_Battle.prototype.enemyWindowRect = function() {
-        const rect = _Scene_Battle_enemyWindowRect.apply(this, arguments);
-        rect.x = rect.x - ((Graphics.width - Graphics.boxWidth) / 2);
-        return rect;
-    };
-
-    Scene_Battle.prototype.createActorCommandBackground = function() {
-        if (!!NuunManager.styleData.isActorCommandWindowBacgroundImg()) {
-            const sprite = new Sprite();
-            this._battleHudFront.addChild(sprite);
-            this._actorCommandBackground = sprite;
-            sprite.hide();
-        }
-    };
-
-    const _Scene_Battle_update  = Scene_Battle.prototype.update;
-    Scene_Battle.prototype.update = function() {
-        _Scene_Battle_update.apply(this, arguments);
-        this.updateSelectActorHideWindow();
-    };
-
-
-    Scene_Battle.prototype.updateSelectActorHideWindow = function() {
-        for (const methods of NuunManager.styleData.getSelectActorHideWindow()) {
-            const _window = this[NuunManager.styleData.getWindowMethods(methods)];
-            if (_window) {
-                _window.visible = _window.visible ? !this._actorWindow.visible : _window.visible;
-            }
-        }
-    };
-
-    const _Scene_Battle_updateVisibility = Scene_Battle.prototype.updateVisibility;
-    Scene_Battle.prototype.updateVisibility = function() {
-        _Scene_Battle_updateVisibility.apply(this, arguments);
-    };
-
-    const _Scene_Battle_updateStatusWindowPosition = Scene_Battle.prototype.updateStatusWindowPosition;
-    Scene_Battle.prototype.updateStatusWindowPosition = function() {
-        if (NuunManager.styleData.getCommandShiftMode() !== 'none') {
-            _Scene_Battle_updateStatusWindowPosition.apply(this, arguments);
-            if (this._actorImges) {
-                this._actorImges.x = this._statusWindow.x;
-            }
-            if (this._actorStatus) {
-                this._actorStatus.x = this._statusWindow.x;
-            }
-        }
-    };
-
-    const _Scene_Battle_statusWindowX = Scene_Battle.prototype.statusWindowX;
-    Scene_Battle.prototype.statusWindowX = function() {
-        let wx = _Scene_Battle_statusWindowX.apply(this, arguments);
-        if (this.isAnyInputWindowActive()) {
-            wx += (this.isRightInputMode() ? 0 : NuunManager.styleData.getCommandoShiftWidth());
+    this._onImgId = id;
+};
+
+Game_Battler.prototype.resetBattleStyleImgId = function() {
+
+};
+
+Game_Actor.prototype.resetBattleStyleImgId = function() {
+    this.setBattleImgId(0, -1);
+    this.battleStyleImgRefresh();
+};
+
+Game_Battler.prototype.isBSActorGraphicDead = function(data) {
+    return data && (data.ImgStateAll && this.getStateData(data.ImgStateAll)) || data.ChangeGraphicScenes === 'death' || (data.ChangeGraphicScenes === 'state' && (data.stateId && this.getStateData(data.stateId)));
+};
+
+Game_Battler.prototype.getStateData = function(data) {
+    return data.some(s => s === this.deathStateId());
+}
+  
+Game_Battler.prototype.getActorGraphicDead = function() {
+    return this._isDeadImg;
+};
+
+Game_Battler.prototype.getBattleStyleOpacity = function() {
+    return this._battleStyleGraphicOpacity;
+};
+
+Game_Actor.prototype.getBattleStyleOpacity = function() {
+    return Imported.NUUN_ActorPicture && params.OnActorPictureEX ? this._actorGraphicOpacity : this._battleStyleGraphicOpacity;
+};
+  
+Game_Actor.prototype.getBattleStyleImg = function(data) {
+    return this.faceMode ? this.actorFaceName(data) : this.battleStyleGraphicName(data);
+};
+
+Game_Actor.prototype.battleStyleGraphicName = function(data) {
+    const images = this.actorGraphicName(data);
+    if (Array.isArray(images)) {
+        if (images.length > 1) {
+            return images[Math.randomInt(images.length)];
         } else {
-            wx += NuunManager.styleData.getActorWindowX();
+            return images[0];
         }
-        return wx;
-    };
-
-    const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
-    Scene_Battle.prototype.onSelectAction = function() {
-        $gameTemp.onBSAction = BattleManager.isTpb();
-        _Scene_Battle_onSelectAction.call(this);
-    };
-
-    const _Scene_Battle_startActorSelection = Scene_Battle.prototype.startActorSelection;
-    Scene_Battle.prototype.startActorSelection = function() {
-        _Scene_Battle_startActorSelection.apply(this, arguments);
-        this._statusWindow.refreshCursor();
-    };
-
-    const _Scene_Battle_onActorCancel = Scene_Battle.prototype.onActorCancel;
-    Scene_Battle.prototype.onActorCancel = function() {
-        _Scene_Battle_onActorCancel.apply(this, arguments);
-        $gameTemp.onBSAction = false;
-        this._statusWindow.refreshCursor();
-    };
-
-
-    const _Window_PartyCommand_initialize = Window_PartyCommand.prototype.initialize;
-    Window_PartyCommand.prototype.initialize = function(rect) {
-        _Window_PartyCommand_initialize.call(this, rect);
-        this.opacity = NuunManager.styleData.getWindowVisible('PartyCommandWindowVisible') ? 255 : 0;
-    };
-
-    Window_PartyCommand.prototype.loadWindowskin = function() {
-        const skin = NuunManager.styleData.getWindowSkin('PartyCommandWindowSkin');
-        if (skin) {
-            this.windowskin = ImageManager.loadSystem(skin);
-        } else {
-            Window_Base.prototype.loadWindowskin.call(this);
-        }
-        this.setWindowTone();
-    };
-
-    Window_PartyCommand.prototype.setWindowTone = function() {
-        const windowColor = NuunManager.styleData.getWindowColor('PartyCommandWindowColor');
-        if (windowColor) {
-            this.windowColor = windowColor;
-        } else {
-            this.windowColor = null;
-        }
-    };
-      
-    Window_PartyCommand.prototype.updateTone = function() {
-        if (this.windowColor) {
-            const tone = this.windowColor;
-            this.setTone(tone.red, tone.green, tone.bule);
-        } else {
-            Window_Base.prototype.updateTone.call(this);
-        }
-    };
-    
-    Window_PartyCommand.prototype.maxCols = function() {;
-        return NuunManager.styleData.isPartyCommandMode() ? NuunManager.styleData.getPartyCommandMaxCol() : Math.min((this._list ? this.maxItems() : NuunManager.styleData.getPartyCommandMaxCol()), NuunManager.styleData.getPartyCommandMaxCol());
-    };
-
-    const _Window_PartyCommand_itemRect = Window_PartyCommand.prototype.itemRect;
-    Window_PartyCommand.prototype.itemRect = function(index) {
-        const rect = _Window_PartyCommand_itemRect.call(this, index);
-        if (NuunManager.styleData.isPartyCommandMode()) {
-            rect.x += this.itemWidth() / 2 * (this.maxCols() - Math.min(this.maxItems(), this.maxCols()));
-        }
-        return rect;
-    };
-
-    
-    const _Window_ActorCommand_initialize = Window_ActorCommand.prototype.initialize;
-    Window_ActorCommand.prototype.initialize = function(rect) {
-        _Window_ActorCommand_initialize.apply(this, arguments);
-        this.opacity = NuunManager.styleData.getWindowVisible('ActorCommandWindowVisible') ? 255 : 0;
-        this._homeY = rect.y;
-    };
-
-    if (Window_ActorCommand.prototype.update == Window_Command.prototype.update) {
-        Window_ActorCommand.prototype.update = function() {
-            Window_Command.prototype.update.apply(this, arguments);
-        };
+    } else {
+        return images;
     }
+};
+  
+Game_Actor.prototype.getBattleStyleImgIndex = function(data) {
+    return this.faceMode ? this.actorFaceIndex(data) : this.batterImgIndex(data);
+};
+  
+Game_Actor.prototype.actorFaceName = function(data) {
+    return data && data.FaceImg ? data.FaceImg : this.faceName();
+};
+  
+Game_Actor.prototype.actorGraphicName = function(data) {
+    return data.GraphicImg;
+};
+  
+Game_Actor.prototype.actorFaceIndex = function(data) {
+    const tag = _getActorId();
+    return data && data[tag] >= 0 ? data[tag] : this.faceIndex();
+};
 
-    const _Window_ActorCommand_update = Window_ActorCommand.prototype.update;
-    Window_ActorCommand.prototype.update = function() {
-        _Window_ActorCommand_update.apply(this, arguments);
-        const actor = this.actor();
-        if (!$gameTemp.isBattleRefreshRequested() && NuunManager.styleData.isCommandRefresh() && actor) {
-            NuunManager.styleData.clearCommandRefresh();
-            this.refresh();
-        }
-    };
+Game_Battler.prototype.batterImgIndex = function(data) {
+    return -1;
+};
+  
+Game_Battler.prototype.getBSImgName = function() {
+    return this._battleStyleGraphicName;
+};
+  
+Game_Battler.prototype.getBSImgIndex = function() {
+    return this._battleStyleImgIndex;
+};
+  
+Game_Battler.prototype.getBSGraphicIndex = function() {
+    return this._battleStyleGraphicIndex;
+};
 
-    if (Window_ActorCommand.prototype.paint == Window_Selectable.prototype.paint) {
-        Window_ActorCommand.prototype.paint = function() {
-            Window_Selectable.prototype.paint.apply(this, arguments);
-        };
+Game_Battler.prototype.isBattleStyleSwitchImg = function(data) {
+    return data.ImgSwitch.every(id => $gameSwitches.value(id));
+};
+  
+Game_Battler.prototype.isBattleStyleWeaponImg = function(data) {
+    return data.ImgWeapon.every(id => this.isEquipped($dataWeapons[id]));
+};
+  
+Game_Battler.prototype.isBattleStyleArmorImg = function(data) {
+    return data.ImgArmor.every(id => this.isEquipped($dataArmors[id]));
+};
+  
+Game_Battler.prototype.isBattleStyleStateImg = function(data, states) {
+    return states.every(id => id > 0 ? this.isStateAffected(id) : true);
+};
+  
+Game_Battler.prototype.isBattleStyleClassImg = function(data) {
+    return data.ImgClass ? this._classId === data.ImgClass : true;
+};
+  
+Game_Battler.prototype.isBattleStyleUseItemImg = function(item) {
+    return item && item[0] > 0 ? item.includes(this.nuun_bsUseItemId) : true;
+};
+  
+const _Game_Actor_isSpriteVisible = Game_Actor.prototype.isSpriteVisible;
+Game_Actor.prototype.isSpriteVisible = function() {
+    return params.ActorEffectShow && !$gameSystem.isSideView() ? ($gameParty.inBattle() ? true : _Game_Actor_isSpriteVisible.call(this)) : _Game_Actor_isSpriteVisible.call(this);
+};
+
+Game_Battler.prototype.getLoadBattleStyleImg = function() {
+    return this.loadBattleStyleActorGraphic();
+};
+
+Game_Actor.prototype.getLoadBattleStyleImg = function() {
+    return this.faceMode ? this.loadBattleStyleActorFace() : this.loadBattleStyleActorGraphic();
+};
+  
+Game_Battler.prototype.loadBattleStyleActorGraphic = function() {
+    return ImageManager.nuun_LoadPictures(this._battleStyleGraphicName);
+};
+  
+Game_Battler.prototype.loadBattleStyleActorFace = function() {
+    return ImageManager.loadFace(this._battleStyleGraphicName);
+};
+  
+Game_Battler.prototype.isBSEffectAction = function() {
+    return this._isEffectAction;
+};
+  
+Game_Battler.prototype.isBSDamageEffect = function() {
+    return this._onDamageEffect;
+};
+  
+Game_Battler.prototype.setBSActionBattlerImg = function(state) {
+    this._actionBattlerImg = state;
+};
+  
+Game_Battler.prototype.isBSActionBattlerImg = function() {
+    return this._actionBattlerImg;
+};
+
+Game_Enemy.prototype.attackAnimation = function() {
+    return this.bareHandsAnimationId();
+};
+  
+Game_Enemy.prototype.bareHandsAnimationId = function() {
+    return this.enemy().meta.AttackAnimation ? Number(this.enemy().meta.AttackAnimation) : params.EnemySkillAnimation;
+};
+
+
+const _Window_BattleLog_displayHpDamage = Window_BattleLog.prototype.displayHpDamage;
+Window_BattleLog.prototype.displayHpDamage = function(target) {
+    if (target.isActor() && target.result().hpAffected && target.result().hpDamage > 0 && !target.result().drain) {
+        this.push("performVibration", target, target.result().critical);
     }
+    _Window_BattleLog_displayHpDamage.call(this, target);
+};
 
-    const _Window_ActorCommand_paint = Window_ActorCommand.prototype.paint;
-    Window_ActorCommand.prototype.paint = function() {
-        this.setCommandHeight();
-        _Window_ActorCommand_paint.apply(this, arguments);
-    };
-
-    Window_ActorCommand.prototype.maxCols = function() {
-        return NuunManager.styleData.isActorCommandMode() ? NuunManager.styleData.getActorCommandMaxCol() : Math.min((this._list ? this.maxItems() : NuunManager.styleData.getActorCommandMaxCol()), NuunManager.styleData.getActorCommandMaxCol());
-    };
-
-    Window_ActorCommand.prototype.setCommandHeight = function() {
-        const maxCols = NuunManager.styleData.isActorCommandVariable() ? Math.ceil(this.maxItems() / NuunManager.styleData.getActorCommandMaxCol()) : NuunManager.styleData.getActorCommandMaxRow();
-        const cols = NuunManager.styleData.isActorCommandVariable() ? maxCols.clamp(NuunManager.styleData.getActorCommandMinRow(), NuunManager.styleData.getActorCommandMaxRow()) : maxCols;
-        this.height = this.fittingHeight(cols);
-    };
-
-    Window_ActorCommand.prototype.selectActor = function(actor) {
-        const members = $gameParty.battleMembers();
-        return members.indexOf(actor);
-    };
-
-    const _Window_ActorCommand_itemRect = Window_ActorCommand.prototype.itemRect;
-    Window_ActorCommand.prototype.itemRect = function(index) {
-        const rect = _Window_ActorCommand_itemRect.apply(this, arguments);
-        if (NuunManager.styleData.isActorCommandMode()) {
-            rect.x += this.itemWidth() / 2 * (this.maxCols() - Math.min(this.maxItems(), this.maxCols()));
-        }
-        return rect;
-    };
-
-    const _Window_ActorCommand_refresh = Window_ActorCommand.prototype.refresh;
-    Window_ActorCommand.prototype.refresh = function() {
-        _Window_ActorCommand_refresh.apply(this, arguments);
-        this.setupSkin();
-        NuunManager.styleData.actorCommandRefresh(this);
-    };
-
-    Window_ActorCommand.prototype.setupSkin = function() {
-        const data = NuunManager.styleData.getActorData(this.actor());
-        this.loadWindowskin(data);
-        this.setWindowTone(data);
-    };
-
-    Window_ActorCommand.prototype.loadWindowskin = function(data) {
-        const skin = NuunManager.styleData.getWindowSkinEx(data, 'ActorCommandWindowSkin');
-        if (skin) {
-            this.windowskin = ImageManager.loadSystem(skin);
-        } else {
-            Window_Base.prototype.loadWindowskin.call(this);
-        }
-    };
-
-    Window_ActorCommand.prototype.setWindowTone = function(data) {
-        const windowColor = NuunManager.styleData.getWindowColorEx(data, 'ActorCommandWindowColor');
-        if (windowColor) {
-            this.windowColor = windowColor;
-        } else {
-            this.windowColor = null;
-        }
-    };
-      
-    Window_ActorCommand.prototype.updateTone = function() {
-        if (this.windowColor) {
-            const tone = this.windowColor;
-            this.setTone(tone.red, tone.green, tone.bule);
-        } else {
-            Window_Base.prototype.updateTone.call(this);
-        }
-    };
-
-
-    function Window_BsBattleStatus() {
-        this.initialize(...arguments);
+const _Window_BattleLog_displayCritical = Window_BattleLog.prototype.displayCritical;
+Window_BattleLog.prototype.displayCritical = function(target) {
+    _Window_BattleLog_displayCritical.call(this, target);
+    if (target.result().critical) {
+        this.push("battlerImgCritical", target);
     }
-    
-    Window_BsBattleStatus.prototype = Object.create(Window_BattleStatus.prototype);
-    Window_BsBattleStatus.prototype.constructor = Window_BsBattleStatus;
+};
 
-    Window_BsBattleStatus.prototype.initialize = function(rect) {
-        Window_BattleStatus.prototype.initialize.apply(this, arguments);
-        this.frameVisible = NuunManager.styleData.isWindowFrameShow();
-        this.opacity = NuunManager.styleData.isWindowShow() ? 255 : 0;
-        this._opening = true;
-        this.visible = true;
-    };
+Window_BattleLog.prototype.battlerImgCritical = function(target) {
+    target.battlerImgCritical = true;
+};
 
-    Window_BsBattleStatus.prototype.loadWindowskin = function() {
-        const skin = NuunManager.styleData.getWindowSkin('ActorStatusWindowSkin');
-        if (skin) {
-            this.windowskin = ImageManager.loadSystem(skin);
-        } else {
-            Window_Base.prototype.loadWindowskin.apply(this, arguments);
-        }
-        this.setWindowTone();
-    };
+Window_BattleLog.prototype.performVibration = function(target, mode) {
+    target.performVibration(mode);
+};
 
-    Window_BsBattleStatus.prototype.setWindowTone = function() {
-        const windowColor = NuunManager.styleData.getWindowColor('ActorStatusWindowColor');
-        if (windowColor) {
-            this.windowColor = windowColor;
-        } else {
-            this.windowColor = null;
-        }
-    };
-      
-    Window_BsBattleStatus.prototype.updateTone = function() {
-        if (this.windowColor) {
-            const tone = this.windowColor;
-            this.setTone(tone.red, tone.green, tone.bule);
-        } else {
-            Window_Base.prototype.updateTone.apply(this, arguments);
-        }
-    };
+//Scene_Battle
+const _Scene_Battle_initialize = Scene_Battle.prototype.initialize;
+Scene_Battle.prototype.initialize = function() {
+    _Scene_Battle_initialize.call(this);
+    this.loadBackgroundImg();
+    this.loadBattleStatusImg();
+};
 
-    Window_BsBattleStatus.prototype.maxCols = function() {
-        return NuunManager.styleData.getActorMaxCol();
-    };
+Scene_Battle.prototype.loadBackgroundImg = function() {
+  loadBackground(params.AppearBackgroundImg);
+  loadBackground(params.VictoryBackgroundImg);
+  loadBackground(params.LoseBackgroundImg);
+  loadBackground(params.EscapeBackgroundImg);
+  loadBackground(params.EscapeFailureBackgroundImg);
+};
 
-    Window_BsBattleStatus.prototype.itemHeight = function() {
-        return Math.floor(Window_BattleStatus.prototype.itemHeight.apply(this, arguments) / NuunManager.styleData.getActorMaxRow());
-    };
+Scene_Battle.prototype.loadBattleStatusImg = function() {
 
-    Window_BsBattleStatus.prototype.rowSpacing = function() {
-        return Math.ceil($gameParty.battleMembers().length / this.maxCols()) > 1 ? 4 : Window_BattleStatus.prototype.rowSpacing.apply(this, arguments);
-    };
+  //$gameTemp.actorData = getActorPositionData(actor.actorId());
+  //const statusData = $gameTemp.actorData.StatusListData;
+};
 
-    Window_BsBattleStatus.prototype.maxContentsData = function() {
-        return Math.max(this.maxItems(), this._contentsData.length);
-    };
+const _Scene_Battle_start = Scene_Battle.prototype.start;
+Scene_Battle.prototype.start = function() {
+    BattleManager.initBsBattleManager();
+    BattleManager.battleStartCommon();
+    _Scene_Battle_start.call(this);
+    this._actorImges.refresh();
+    this._actorStatus.refresh();
+};
 
-    Window_BsBattleStatus.prototype.setActorWindow = function(battleActorImges, BattleActorStatus) {
-        this._window_battleActorImges = battleActorImges;
-        this._window_BattleActorStatus = BattleActorStatus;
-    };
-
-    Window_BsBattleStatus.prototype.refreshCursor = function() {
-        if (NuunManager.styleData.isSelectBackShow() && !NuunManager.styleData.activeActorWindow()) {
-            Window_BattleStatus.prototype.refreshCursor.apply(this, arguments);
-        } else {
-            this.setCursorRect(0, 0, 0, 0);
-        }
-    };
-
-    Window_BsBattleStatus.prototype.itemRect = function(index) {
-        const rect = NuunManager.styleData.getActorStatusBesideMode() === 'triangle' ? this.triangleRect(index) : Window_Selectable.prototype.itemRect.call(this, index);
-        return this.statusPosition(index, rect);
-    };
-
-    Window_BsBattleStatus.prototype.triangleRect = function(index) {
-        const maxCols = this.maxCols();
-        const topCol = this.maxItems() % maxCols;
-        const itemWidth = this.itemWidth();
-        const itemHeight = this.itemHeight();
-        const colSpacing = this.colSpacing();
-        const rowSpacing = this.rowSpacing();
-        const col = (index + (topCol > index ? 0 : maxCols - topCol)) % maxCols;
-        const shiftIndex = (NuunManager.styleData.getActorMaxRow() - Math.ceil(this.maxItems() / maxCols)) * (maxCols - col);
-        const row = Math.floor(((topCol > index || topCol === 0 ? 0 : maxCols - topCol) + index + shiftIndex) / maxCols);
-        const x = (col * itemWidth + colSpacing / 2) - this.scrollBaseX();
-        const y = (row * itemHeight + rowSpacing / 2) - this.scrollBaseY();
-        const width = itemWidth - colSpacing;
-        const height = itemHeight - rowSpacing;
-        return new Rectangle(x, y, width, height);
-    };
-
-    Window_BsBattleStatus.prototype.statusPosition = function(index, rect) {
-        const itemWidth = this.itemWidth();
-        const padding = this.itemPadding();
-        let cols = this.maxCols();
-        let maxCols = 0;
-        const data = NuunManager.styleData.getActorContents(index);
-        if (data && data.ActorContentsCoordinateMode) {
-            rect.x = 0;
-            rect.y = 0;
-        } else {
-            const mode = NuunManager.styleData.getActorStatusBesideMode();
-            if (mode === 'triangle') {
-                const topCol = this.maxItems() % this.maxCols();
-                cols = (topCol > index ? topCol : this.maxCols());
-                index += (topCol > index || topCol === 0 ? 0 : this.maxCols() - topCol);
-                maxCols = Math.min(cols, this.maxItems());
-            } else {
-                maxCols = Math.min(this.maxItems() - (Math.floor(index / cols) * cols), cols, this.maxItems());
-            }
-            if (mode === 'center') {
-                rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
-            } else if (mode === 'right') {
-                rect.x += this.width - (maxCols * itemWidth) - padding * 2;
-            } else if (mode === 'triangle') {
-                rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
-            }
-            if (NuunManager.styleData.getActorStatusVerticalMode() === 'under') {
-                rect.y = this.height - (rect.height + rect.y + padding * 2);
-            }
-        }
-        if (data) {
-            rect.x += data.ActorContentsX || 0;
-            rect.y += data.ActorContentsY || 0;
-            rect.width = data.ActorContentsWidth > 0 ? data.ActorContentsWidth : rect.width;
-            rect.height = data.ActorContentsHeight > 0 ? data.ActorContentsHeight : rect.height;
-        }
-        return rect;
-    };
-
-    Window_BsBattleStatus.prototype.preparePartyRefresh = function() {
-        this.performPartyRefresh();
-    };
-    
-    Window_BsBattleStatus.prototype.performPartyRefresh = function() {
-        $gameTemp.setBattleStyleRefresh(true);
-        this.refresh();
-        NuunManager.styleData.commandRefresh();
-    };
-
-    Window_BsBattleStatus.prototype.drawItem = function(index) {
-        if (NuunManager.styleData.isActorStatusActorWindowShow()) {
-           this.drawActorWindow(index);
-        }
-    };
-
-    Window_BsBattleStatus.prototype.drawActorWindow = function(index) {
-        const actor = this.actor(index);
-        const key = "actor%1-window".format(index);
-        const rect = this.itemRect(index);
-        _tempParams.setData(null, rect);
-        const _window = this.createInnerSprite(key, Window_BSActorWindow);
-        _window.setup(actor);
-        _window.show();
-    };
-      
-    Window_BsBattleStatus.prototype.drawItemBackground = function(index) {
-        const actor = this.actor(index);
-        const data = NuunManager.styleData.getActorData(actor);
-        if (NuunManager.styleData.getActorBackground(data)) {
-            const rect = this.itemRect(index);
-            const bitmap = ImageManager.nuun_LoadPictures(NuunManager.styleData.getActorBackground(data));
-            bitmap.addLoadListener(this.actorBackGround.bind(this, bitmap, rect.x, rect.y, rect.width, rect.height));
-        } else if (NuunManager.styleData.isContentsBackVisible()) {
-            Window_Selectable.prototype.drawItemBackground.call(this, index);
-        }
-    };
-
-    Window_BsBattleStatus.prototype.actorBackGround = function(bitmap, x, y, width, height) {
-        this.contentsBack.blt(bitmap, 0, 0, width, height, x, y);
-    };
-
-    Window_BsBattleStatus.prototype.open = function() {
-        Window_Base.prototype.open.apply(this, arguments);
-        if (this._window_battleActorImges) {
-            this._window_battleActorImges.open();
-        }
-        if (this._window_BattleActorStatus) {
-            this._window_BattleActorStatus.open();
-        }
-    };
-      
-    Window_BsBattleStatus.prototype.close = function() {
-        Window_Base.prototype.close.apply(this, arguments);
-        if (this._window_battleActorImges) {
-            this._window_battleActorImges.close();
-        }
-        if (this._window_BattleActorStatus) {
-            this._window_BattleActorStatus.close();
-        }
-    };
-    
-    Window_BsBattleStatus.prototype.show = function() {
-        Window_Base.prototype.show.apply(this, arguments);
-        if (this._window_battleActorImges) {
-            this._window_battleActorImges.show();
-        }
-        if (this._window_BattleActorStatus) {
-            this._window_BattleActorStatus.show();
-        }
-    };
-    
-    const _Window_BattleStatus_hide = Window_BattleStatus.prototype.hide
-    Window_BsBattleStatus.prototype.hide = function() {
-        SceneManager._scene.updateOpenStatusWindow();
-    };
-
-    Window_BsBattleStatus.prototype.bsHide = function() {
-        Window_BattleStatus.prototype.hide.apply(this, arguments);
-        if (this._window_battleActorImges) {
-            this._window_battleActorImges.hide();
-        }
-        if (this._window_BattleActorStatus) {
-            this._window_BattleActorStatus.hide();
-        }
-    };
-
-
-    function Window_BattleActorImges() {
-        this.initialize(...arguments);
+const _Scene_Battle_stop = Scene_Battle.prototype.stop;
+Scene_Battle.prototype.stop = function() {
+    _Scene_Battle_stop.call(this);
+    if (!params.BattleEndActorStatusClose) {
+        this._statusWindow.open();
     }
-      
-    Window_BattleActorImges.prototype = Object.create(Window_BsBattleStatus.prototype);
-    Window_BattleActorImges.prototype.constructor = Window_BattleActorImges;
-    window.Window_BattleActorImges = Window_BattleActorImges;
+};
 
-    Window_BattleActorImges.prototype.initialize = function(rect) {
-        Window_StatusBase.prototype.initialize.call(this, rect);
-        this.openness = 0;
-        this.opacity = 0;
-        this._opening = true;
-        this.visible = true;
-        this._contentsData = [];
-        this.createData();
-        this.setActorBaseSprite();
-        this.preparePartyRefresh();
-    };
+const _Scene_Battle_updateStatusWindowVisibility = Scene_Battle.prototype.updateStatusWindowVisibility;
+Scene_Battle.prototype.updateStatusWindowVisibility = function() {
+  _Scene_Battle_updateStatusWindowVisibility.call(this);
+  if (params.BattleEndActorStatusClose) {
+    if (BattleManager.isBattleEnd()) {
+      this._statusWindow.close();
+    } else if (this.isActive()) {
+      this._statusWindow.open();
+    }
+  } else {
+    this._statusWindow.open();
+  }
+};
 
-    Window_BattleActorImges.prototype.createData = function() {
-        for (let i = 0; i < this.maxItems(); i++) {
-            this._contentsData[i] = new Nuun_BattleStyleActorAnimation();
-        }
-    };
+const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
+Scene_Battle.prototype.createSpriteset = function() {
+  _Scene_Battle_createSpriteset.call(this);
+  if (params.WindowDisplayMode === 'Scene_Battle') {
+    this.addChild(this._spriteset._battleHudBase);
+  }
+};
 
-    Window_BattleActorImges.prototype.setActorBaseSprite = function() {
-        const sprite = new Sprite();
-        this._actorImgBaseSprite = sprite;
+const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
+Scene_Battle.prototype.createAllWindows = function() {
+    const spriteset = this._spriteset;
+    this._battleHudBack = spriteset._battleHudBack;
+    this._battleHudFront = spriteset._battleHudFront;
+    if (spriteset._battleEffects) {
+      this._battleEffects = spriteset._battleEffects;
+    }
+    this.createBackgroundWindow();
+    this.createHud();
+    this.createActorSelectWindow();
+    _Scene_Battle_createAllWindows.call(this);
+    if ($gameParty.inBattle()) {
+        this._bsBackground = null;
+        this.opacity = params.HelpWindowShow ? 255 : 0;
+    }
+};
+
+Scene_Battle.prototype.createBackgroundWindow = function() {
+  if (params.WindowBackground) {
+    const bitmap = ImageManager.nuun_LoadPictures(params.WindowBackground);
+    const sprite =  new Sprite(bitmap);
+    this._battleHudBack.addChild(sprite);
+    this._backgroundWindow = sprite;
+  }
+};
+
+const _Scene_Base_createWindowLayer = Scene_Base.prototype.createWindowLayer;
+Scene_Base.prototype.createWindowLayer = function() {
+    const className = String(this.constructor.name);
+    if (className === "Scene_Battle") {
+        const sprite =  new Sprite();
         this.addChild(sprite);
-        sprite.hide();
-    };
-
-    Window_BattleActorImges.prototype.drawItemBackground = function(index) {
-
-    };
-
-    Window_BattleActorImges.prototype.preparePartyRefresh = function() {
-        this.performPartyRefresh();
-    };
-    
-    Window_BattleActorImges.prototype.performPartyRefresh = function() {
-        for (let i = 0; i < this.maxContentsData(); i++) {
-            const actor = this.actor(i);
-            if (!this._contentsData[i]) {
-                this._contentsData[i] = new Nuun_BattleStyleActorAnimation();
-            }
-            this._contentsData[i].setup(actor);
-        }
-        this.refresh();
-    };
-
-    Window_BattleActorImges.prototype.drawItem = function(index) {
-        this.drawItemImage(index);
-        this.drawStatusBack(index);
-    };
-
-    Window_BattleActorImges.prototype.drawStatusBack = function(index) {
-        const actor = this.actor(index);
-        const data = NuunManager.styleData.getActorData(actor);
-        if (NuunManager.styleData.getActorFrontImg(data)) {
-            const rect = this.itemRect(index);
-            const bitmap = ImageManager.nuun_LoadPictures(NuunManager.styleData.getActorFrontImg(data));
-            bitmap.addLoadListener(this.actorFrontBackGround.bind(this, index, bitmap, rect.x, rect.y, rect.width, rect.height));
-        }
-    };
-
-
-    Window_BattleStatus.prototype.actorBackGround = function(bitmap, x, y, width, height) {
-        this.contentsBack.blt(bitmap, 0, 0, width, height, x, y);
-    };
-      
-    Window_BattleActorImges.prototype.actorFrontBackGround = function(index, bitmap, x, y, width, height) {
-        const key = "actor-Frontback-%1".format(index);
-        const sprite = this.createActorImgSprite(key, Sprite);
-        sprite.bitmap = bitmap;
-        sprite.move(x + this.colSpacing(), y + 8);
-        sprite.width = bitmap.width;
-        sprite.height = bitmap.height;
-        sprite.scale.x = width / bitmap.width;
-        sprite.scale.y = height / bitmap.height;
-        sprite.show();
-    };
-
-    Window_BattleActorImges.prototype.drawItemImage = function(index) {
-        const data = this._contentsData[index];
-        if (data.isFaceMode()) {
-            this.drawItemFace(index);
-        } else {
-            this.drawItemBattler(index);
-        }
-    };
-
-    Window_BattleActorImges.prototype.drawItemFace = function(index) {
-        const contentsData = this._contentsData[index];
-        const rect = this.faceRect(index);
-        const pw = ImageManager.faceWidth;
-        const ph = ImageManager.faceHeight;
-        let width = rect.width || pw;
-        let height = rect.height || ph;
-        const key = "actor_%1-BSImg".format(index);
-        const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
-        this.createStateAnimation(contentsData, index);
-        sprite.setup(contentsData, contentsData.getImgIndex());
-        sprite.setRect(Math.min(width, rect.width), rect.height);
-        sprite.setHome(rect.x, rect.y);
-        sprite.show();
-        NuunManager.styleData.setFrontActor(index, sprite);
-    };
-
-    Window_BattleActorImges.prototype.drawItemBattler = function(index) {
-        const contentsData = this._contentsData[index];
-        const rect = this.itemImgRect(index);
-        const key = "actor_%1-BSImg".format(index);
-        const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
-        this.createStateAnimation(contentsData, index);
-        sprite.setup(contentsData, contentsData.getImgIndex());
-        const width = NuunManager.styleData.isFaceHeightOnWindow() ? rect.width : Infinity;
-        const height = NuunManager.styleData.isFaceHeightOnWindow() ? rect.height : Infinity;
-        sprite.setRect(width, height);
-        sprite.setHome(rect.x, rect.y);
-        sprite.show();
-        NuunManager.styleData.setFrontActor(index, sprite);
-    };
-
-    Window_BattleActorImges.prototype.createStateAnimation = function(data, index) {
-        if (!data.isStateSprite() && NuunManager.styleData.isStateAnimation()) {
-            const key = "actor_%1-BSStateOverlay".format(index);
-            const sprite = this.createActorImgSprite(key, Sprite_StateOverlay);
-            data.setStateSprite(sprite);
-        }
-    };
-
-    Window_BattleActorImges.prototype.createActorImgSprite = function(key, spriteClass) {
-        const dict = this._additionalSprites;
-        if (dict[key]) {
-            return dict[key];
-        } else {
-            const sprite = new spriteClass();
-            dict[key] = sprite;
-            this._actorImgBaseSprite.addChild(sprite);
-            return sprite;
-        }
-    };
-
-    Window_BattleActorImges.prototype.faceRect = function(index) {
-        const contentsData = this._contentsData[index];
-        const rect = this.itemRect(index);
-        rect.pad(-1);
-        if (contentsData.isActorImgHCenter()) {
-            rect.x = rect.x + Math.floor(rect.width / 2);
-        } else if (contentsData.isActorImgHLeft()) {
-            rect.x = rect.x + (ImageManager.faceWidth / 2);
-        } else {
-            rect.x = (rect.x + rect.width) - (ImageManager.faceWidth);
-        }
-        rect.x += 8 + contentsData.getActorImg_X();
-        rect.y += 8 + contentsData.getActorImg_Y();
-        rect.width = rect.width;
-        rect.height = NuunManager.styleData.getFaceHeight() > 0 ? Math.min(rect.height, NuunManager.styleData.getFaceHeight()) : rect.height;
-        rect.y += Math.floor(Math.min(ImageManager.faceHeight, rect.height) / 2);
-        return rect;
-    };
-
-    Window_BattleActorImges.prototype.itemImgRect = function(index) {
-        const contentsData = this._contentsData[index];
-        const rect = this.itemRect(index);
-        rect.x += (contentsData.isActorImgHCenter() ? Math.floor(this.itemWidth() / 2) + 4 : 8) + contentsData.getActorImg_X();
-        if (NuunManager.styleData.isFaceHeightOnWindow()) {
-            rect.y += Math.floor(rect.height / 2) + this.itemPadding() + contentsData.getActorImg_Y();
-        } else {
-            rect.y += (contentsData.isActorImgVUnder() ? rect.height : 0) + this.itemPadding() + contentsData.getActorImg_Y();
-        }
-        rect.height = NuunManager.styleData.getImgHeight() > 0 ? Math.min(rect.height, NuunManager.styleData.getImgHeight()) : rect.height;
-        return rect;
-    };
-
-    Window_BattleActorImges.prototype.open = function() {
-        Window_Base.prototype.open.call(this);
-        this._actorImgBaseSprite.show();
-    };
-      
-    Window_BattleActorImges.prototype.close = function() {
-        Window_Base.prototype.close.call(this);
-        this._actorImgBaseSprite.hide();
-    };
-
-    Window_BattleActorImges.prototype.show = function() {
-        Window_Base.prototype.show.apply(this, arguments);
-        this._actorImgBaseSprite.show();
-    };
-    
-    Window_BattleActorImges.prototype.hide = function() {
-        Window_Base.prototype.hide.apply(this, arguments);
-        this._actorImgBaseSprite.hide();
-    };
-
-
-    function Window_BattleActorStatus() {
-        this.initialize(...arguments);
+        this._itemBSBackgorundWindow = sprite;
     }
-      
-    Window_BattleActorStatus.prototype = Object.create(Window_BsBattleStatus.prototype);
-    Window_BattleActorStatus.prototype.constructor = Window_BattleActorStatus;
-    window.Window_BattleActorStatus = Window_BattleActorStatus;
+  _Scene_Base_createWindowLayer.call(this);
+};
 
-    Window_BattleActorStatus.prototype.initialize = function(rect) {
-        Window_StatusBase.prototype.initialize.call(this, rect);
-        const filterArea = this._clientArea.filterArea;
-        this.openness = 0;
-        this.opacity = 0;
-        this._opening = true;
-        this.visible = true;
-        this._contentsData = [];
-        this.createData();
-        this.preparePartyRefresh();
-    };
+if (params.CommandPosition !== 'default') {
+  Scene_Battle.prototype.isRightInputMode = function() {
+    return params.CommandPosition === 'right';
+  };
+}
 
-    Window_BattleActorStatus.prototype.createData = function() {
-        for (let i = 0; i < this.maxItems(); i++) {
-            this._contentsData[i] = new Nuun_DrawBattleStyleListData(this, params);
-        }
-    };
-
-    Window_BattleActorStatus.prototype.preparePartyRefresh = function() {
-        $gameTemp.clearBattleRefreshRequest();
-        this.performPartyRefresh();
-    };
-    
-    Window_BattleActorStatus.prototype.performPartyRefresh = function() {
-        for (let i = 0; i < this.maxContentsData(); i++) {
-            if (!this._contentsData[i]) {
-                this._contentsData[i] = new Nuun_DrawBattleStyleListData(this, params);
-            }
-        }
-        this.refresh();
-    };
-
-    Window_BattleActorStatus.prototype.drawItemBackground = function(index) {
-
-    };
-
-    Window_BattleActorStatus.prototype.drawItem = function(index) {
-        this._contentsData[index].drawItemContentsParams(index);
-    };
-    
-    Window_BattleActorStatus.prototype.hide = function() {
-        Window_Base.prototype.hide.apply(this, arguments);
-    };
-    
-
-    function Window_BsBattleActor() {
-        this.initialize(...arguments);
+Scene_Battle.prototype.createHud = function() {
+    const rect = this.statusWindowRect();
+    this._statusWindow = new Window_BattleStatus(rect);
+    this._battleHudBack.addChild(this._statusWindow);
+    this.setStatusWindow_Sprite();
+    if (this._backgroundWindow) {
+      this._backgroundWindow.x = this._statusWindow.x + params.WindowBackground_X;
+      this._backgroundWindow.y = this._statusWindow.y + params.WindowBackground_Y;
     }
-    
-    Window_BsBattleActor.prototype = Object.create(Window_BattleActor.prototype);
-    Window_BsBattleActor.prototype.constructor = Window_BsBattleActor;
+};
 
-    const _Window_BattleActor_initialize = Window_BattleActor.prototype.initialize;
-    Window_BattleActor.prototype.initialize = function(rect) {
-        _Window_BattleActor_initialize.call(this, rect);
-        this.setActorWindowFrameShow();
-    };
-    
+Scene_Battle.prototype.createActorSelectWindow = function() {
+    const rect = this.actorWindowRect();
+    this._actorWindow = new Window_BattleActor(rect);
+    this._actorWindow.setHandler("ok", this.onActorOk.bind(this));
+    this._actorWindow.setHandler("cancel", this.onActorCancel.bind(this));
+    this._battleHudBack.addChild(this._actorWindow);
+};
 
-    Window_BsBattleActor.prototype.initialize = function(rect) {
-        Window_BattleActor.prototype.initialize.call(this, rect);
-        this.opacity = 0;
-    };
+Scene_Battle.prototype.createStatusWindow = function() {
+    const rect = this.statusWindowRect();
+    const rect2 = this.actorStatusWindowRect();//
+    this._actorImges = new Window_BattleActorImges(rect);
+    this._actorStatus = new Window_BattleActorStatus(rect);
+    this._actorStatus.sx = rect.x - rect2.x;//
+    this._actorStatus.sy = rect.y - rect2.y;//
+    this._battleHudBack.addChild(this._actorImges);
+    this._battleHudFront.addChild(this._actorStatus);
+    this._statusWindow.setActorWindow(this._actorImges, this._actorStatus);
+};
 
-    Window_BattleActor.prototype.setActorWindowFrameShow = function() {
-        this.frameVisible = NuunManager.styleData.isActorWindowFrameShow();
-    };
-
-    Window_BsBattleActor.prototype.setActorWindowFrameShow = function() {
-        
-    };
-
-    Window_BsBattleActor.prototype.maxCols = function() {
-        return NuunManager.styleData.getActorMaxCol();
-    };
-
-    Window_BsBattleActor.prototype.itemHeight = function() {
-        return Math.floor(Window_BattleStatus.prototype.itemHeight.apply(this, arguments) / NuunManager.styleData.getActorMaxRow());
-    };
-
-    Window_BsBattleActor.prototype.rowSpacing = function() {
-        return Math.ceil($gameParty.battleMembers().length / this.maxCols()) > 1 ? 4 : Window_BattleStatus.prototype.rowSpacing.apply(this, arguments);
-    };
-
-    Window_BsBattleActor.prototype.drawItem = function(index) {
-        this.drawItemImage(index);console.log(this.maxCols())
-        this.drawItemStatus(index);
-    };
-
-    Window_BsBattleActor.prototype.drawItemBackground = function(index) {
-
-    };
-
-    Window_BsBattleActor.prototype.preparePartyRefresh = function() {
-        this.refresh();
-    };
-
-    Window_BsBattleActor.prototype.drawItem = function(index) {
-
-    };
-
-    Window_BsBattleActor.prototype.refreshCursor = function() {
-        if (NuunManager.styleData.isActorSelectBackVisible()) {
-            Window_BattleActor.prototype.refreshCursor.apply(this, arguments);
-        } else {
-            this.setCursorRect(0, 0, 0, 0);
-        }
-    };
-
-
-    const _Window_BattleLog_showEnemyAttackAnimation = Window_BattleLog.prototype.showEnemyAttackAnimation;
-    Window_BattleLog.prototype.showEnemyAttackAnimation = function(subject, targets) {
-        const id = subject.attackAnimation();
-        if (id > 0) {
-            this.showNormalAnimation(targets, id, false);
-        } else {
-            _Window_BattleLog_showEnemyAttackAnimation.apply(this, arguments);
-        }
-    };
-
-    //Sprite_Actor
-    function Sprite_BSFrontActor() {
-        this.initialize(...arguments);
+const _Scene_Battle_createPartyCommandWindow = Scene_Battle.prototype.createPartyCommandWindow;
+Scene_Battle.prototype.createPartyCommandWindow = function() {
+  _Scene_Battle_createPartyCommandWindow.call(this);
+    if (params.PartyCommandBackgroundImg) {
+      const bitmap = ImageManager.nuun_LoadPictures(params.PartyCommandBackgroundImg);
+      const sprite =  new Sprite(bitmap);
+      this._battleHudFront.addChild(sprite);
+      this._partyCommandBackgroundWindow = sprite;
+      sprite.x = params.PartyBackground_X + this._partyCommandWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
+      sprite.y = params.PartyBackground_Y + this._partyCommandWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
+      sprite.hide();
     }
-    
-    Sprite_BSFrontActor.prototype = Object.create(Sprite_Actor.prototype);
-    Sprite_BSFrontActor.prototype.constructor = Sprite_BSFrontActor;
-    
-    Sprite_BSFrontActor.prototype.initialize = function(battler) {
-        Sprite_Actor.prototype.initialize.call(this, battler);
-    };
-    
-    Sprite_BSFrontActor.prototype.initMembers = function() {
-        Sprite_Actor.prototype.initMembers.call(this);
-        this.viewFrontActor = NuunManager.styleData.isFrontAnimation();
-    };
+};
 
-    Sprite_BSFrontActor.prototype.updateVisibility = function() {
-        Sprite_Actor.prototype.updateVisibility.apply(this, arguments);
-        if (this.viewFrontActor) {
-            //this.visible = true;
-            this.visible = false;
-            this.updateBsPosition();
-        }
-    };
-
-    Sprite_BSFrontActor.prototype.updateBsPosition = function() {
-        const index = this._actor.index();
-        const statusWindow = SceneManager._scene._statusWindow;
-        const rect = statusWindow.itemRectWithPadding(index);
-        const x = statusWindow.x + rect.x + Math.floor(rect.width / 2) + statusWindow.itemPadding() + NuunManager.styleData.getActorEffect_X();
-        const y = statusWindow.y + rect.y + Math.floor(rect.height / 2) + NuunManager.styleData.getActorEffect_Y();
-        this.setHome(x, y);
-    };
-
-    Sprite_Battler.prototype.setFrontActor = function(sprite) {
-        
-    };
-
-    Sprite_Battler.prototype.getFrontActor = function() {
-        return false;
-    };
-
-    Sprite_BSFrontActor.prototype.setFrontActor = function(sprite) {
-        this._frontActor = sprite;
-    };
-
-    Sprite_BSFrontActor.prototype.getFrontActor = function() {
-        return this._frontActor;
-    };
-
-    Sprite_BSFrontActor.prototype.startMove = function(x, y, duration) {
-
-    };
-    
-    Sprite_BSFrontActor.prototype.updateMotion = function() {
-    
-    };
-
-    Sprite_BSFrontActor.prototype.damageOffsetX = function() {
-        return NuunManager.styleData.ActorDamage_X();
-    };
-      
-    Sprite_BSFrontActor.prototype.damageOffsetY = function() {
-        return NuunManager.styleData.ActorDamage_Y();
-    };
-
-
-    const _Sprite_Enemy_damageOffsetX = Sprite_Enemy.prototype.damageOffsetX;
-    Sprite_Enemy.prototype.damageOffsetX = function() {
-        return _Sprite_Enemy_damageOffsetX.apply(this, arguments) + params.EnemyDamage_X;
-    };
-
-    const _Sprite_Enemy_damageOffsetY = Sprite_Enemy.prototype.damageOffsetY;
-    Sprite_Enemy.prototype.damageOffsetY = function() {
-        return _Sprite_Enemy_damageOffsetY.apply(this, arguments) + params.EnemyDamage_Y;
-    };
-
-
-    Sprite_StateIcon.prototype.setupVisibleIcons = function(list1, list2) {
-        this._visibleStates = list1 || [];
-        this._visibleBuffs = list2 || [];
-    };
-
-    Sprite_StateIcon.prototype.setupVisibleIcons = function() {
-        if (this._battler) {
-            this._battler.setVisibleIcons(this._visibleStates, this._visibleBuffs);
-        }
-    };
-    
-    Sprite_StateIcon.prototype.resetVisibleIcons = function() {
-        if (this._battler) {
-            this._battler.setVisibleIcons(null, null);
-        }
-    };
-
-    const _Sprite_StateIcon_update = Sprite_StateIcon.prototype.update;
-    Sprite_StateIcon.prototype.update = function() {
-        this.setupVisibleIcons();
-        _Sprite_StateIcon_update.apply(this, arguments);
-        this.resetVisibleIcons();
-    };
-
-
-    const _Sprite_StateIcon_updateIcon = Sprite_StateIcon.prototype.updateIcon;
-    Sprite_StateIcon.prototype.updateIcon = function() {
-        _Sprite_StateIcon_updateIcon.apply(this, arguments);
-        if (this._battler && this._battler.isActor() && NuunManager.styleData.getNoStateIcon() > 0 && this._iconIndex === 0) {
-            this._iconIndex = NuunManager.styleData.getNoStateIcon();
-        }
-    };
-
-
-    const _Sprite_Animation_setup = Sprite_Animation.prototype.setup;
-    Sprite_Animation.prototype.setup = function(targets, animation, mirror, delay, previous) {
-        this._frontTargets = this.getFrontTargets(targets);
-        _Sprite_Animation_setup.call(this, targets, animation, mirror, delay, previous);
-    };
-
-    Sprite_Animation.prototype.getFrontTargets = function(targets) {
-        return targets.map(target => target._actor && !!target.getFrontActor() ? target.getFrontActor() : target);
-    };
-
-    const _Sprite_Animation_updateFlash = Sprite_Animation.prototype.updateFlash;
-    Sprite_Animation.prototype.updateFlash = function() {
-        if (NuunManager.styleData.isFrontAnimation()) {
-            const t = this._targets;
-            this._targets =  this._frontTargets;
-            _Sprite_Animation_updateFlash.apply(this, arguments);
-            this._targets = t;
-        } else {
-            _Sprite_Animation_updateFlash.apply(this, arguments);
-        }
-    };
-
-    const _Sprite_AnimationMV_setup = Sprite_AnimationMV.prototype.setup;
-    Sprite_AnimationMV.prototype.setup = function(targets, animation, mirror, delay) {
-        this._frontTargets = this.getFrontTargets(targets);
-        _Sprite_AnimationMV_setup.apply(this, arguments);
-    };
-
-    Sprite_AnimationMV.prototype.getFrontTargets = function(targets) {
-        return targets.map(target => target._actor && !!target.getFrontActor() ? target.getFrontActor() : target);
-    };
-
-    const _Sprite_AnimationMV_updateFlash = Sprite_AnimationMV.prototype.updateFlash;
-    Sprite_AnimationMV.prototype.updateFlash = function() {
-        if (NuunManager.styleData.isFrontAnimation()) {
-            const t = this._targets;
-            this._targets =  this._frontTargets;
-            _Sprite_AnimationMV_updateFlash.apply(this, arguments);
-            this._targets = t;
-        } else {
-            _Sprite_AnimationMV_updateFlash.apply(this, arguments);
-        }
-    };
-
-    const _Sprite_AnimationMV_startHiding = Sprite_AnimationMV.prototype.startHiding;
-    Sprite_AnimationMV.prototype.startHiding = function(duration) {
-        if (NuunManager.styleData.isFrontAnimation()) {
-            const t = this._targets;
-            this._targets =  this._frontTargets;
-            _Sprite_AnimationMV_startHiding.apply(this, arguments);
-            this._targets = t;
-        } else {
-            _Sprite_AnimationMV_startHiding.apply(this, arguments);
-        }
-    };
-
-    const _Sprite_AnimationMV_onEnd = Sprite_AnimationMV.prototype.onEnd;
-    Sprite_AnimationMV.prototype.onEnd = function() {
-        if (NuunManager.styleData.isFrontAnimation()) {
-            const t = this._targets;
-            this._targets =  this._frontTargets;
-            _Sprite_AnimationMV_onEnd.apply(this, arguments);
-            this._targets = t;
-        } else {
-            _Sprite_AnimationMV_onEnd.apply(this, arguments);
-        }
-    };
-
-
-    if (Spriteset_Battle.prototype.createAnimationSprite == Spriteset_Base.prototype.createAnimationSprite) {
-        Spriteset_Battle.prototype.createAnimationSprite = function(targets, animation, mirror, delay) {
-            Spriteset_Base.prototype.createAnimationSprite.apply(this, arguments);
-        };
+const _Scene_Battle_createActorCommandWindow = Scene_Battle.prototype.createActorCommandWindow;
+    Scene_Battle.prototype.createActorCommandWindow = function() { 
+    _Scene_Battle_createActorCommandWindow.call(this);
+    this._actorCommandWindow.homeY = this.getActorCommandY();
+    this._actorCommandWindow.SvActorData = (params.ActorCommandPosition === 'svtop' || params.ActorCommandPosition === 'svleft' || params.ActorCommandPosition === 'svright') ? this._spriteset._actorSprites : null;
+    if (params.ActorCommandBackgroundImg) {
+      const bitmap = ImageManager.nuun_LoadPictures(params.ActorCommandBackgroundImg);
+      const sprite =  new Sprite(bitmap);
+      this._battleHudFront.addChild(sprite);
+      this._actorCommandBackgroundWindow = sprite;
+      sprite.x = params.ActorBackground_X + this._actorCommandWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
+      sprite.y = params.ActorBackground_Y + this._actorCommandWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
+      sprite.hide();
     }
+};
 
-    const _Spriteset_Battle_createAnimationSprite = Spriteset_Battle.prototype.createAnimationSprite;
-    Spriteset_Battle.prototype.createAnimationSprite = function(targets, animation, mirror, delay) {
-        const mv = this.isMVAnimation(animation);
-        const sprite = new (mv ? Sprite_AnimationMV : Sprite_Animation)();
-        const targetSprites = this.makeTargetSprites(targets);
-        if (this.animationTarget(targetSprites)) {
-            const baseDelay = this.animationBaseDelay();
-            const previous = delay > baseDelay ? this.lastAnimationSprite() : null;
-            if (this.animationShouldMirror(targets[0])) {
-                mirror = !mirror;
-            }
-            sprite.targetObjects = targets;
-            sprite.setup(targetSprites, animation, mirror, delay, previous);
-            this.getEffectsContainer().addChild(sprite);
-            this._animationSprites.push(sprite);
-        } else {
-            _Spriteset_Battle_createAnimationSprite.apply(this, arguments);
-        }
-    };
+const _Scene_Battle_actorCommandWindowRect = Scene_Battle.prototype.actorCommandWindowRect;
+Scene_Battle.prototype.actorCommandWindowRect = function() {
+  const rect = _Scene_Battle_actorCommandWindowRect.call(this);
+  rect.width = this.actorCommandWidth();
+  rect.height = this.actorCommandHeight();
+  rect.x = this.getActorCommandX();
+  return rect;
+};
 
-    Spriteset_Battle.prototype.getEffectsContainer = function(){
-        return this._effectsFrontContainer ? this._effectsFrontContainer : this._effectsContainer;
-    };
+Scene_Battle.prototype.actorCommandWidth = function() {
+  return params.ActorCommand_Width > 0 ? Math.min(params.ActorCommand_Width, Graphics.width) : 192;
+};
 
-    Spriteset_Battle.prototype.animationTarget = function(targetSprites){
-        if (NuunManager.styleData.isFrontAnimation() && targetSprites) {
-            return targetSprites.some(target => target.viewFrontActor && !!target._battler.isActor());
-        }
-        return false;
-    };
+Scene_Battle.prototype.actorCommandHeight = function() {
+  return this.calcWindowHeight(params.ActorCommandMaxRow, true);
+};
 
-    if (Spriteset_Battle.prototype.animationShouldMirror == Spriteset_Base.prototype.animationShouldMirror) {
-        Spriteset_Battle.prototype.animationShouldMirror = function(target) {
-            Spriteset_Base.prototype.animationShouldMirror.apply(this, arguments);
-        };
-    }
-    
-    const _Spriteset_Battle_animationShouldMirror = Spriteset_Battle.prototype.animationShouldMirror;
-    Spriteset_Battle.prototype.animationShouldMirror = function(target) {
-        return _Spriteset_Battle_animationShouldMirror.apply(this, arguments) ? params.ActorsMirror : false;
-    };
+Scene_Battle.prototype.getActorCommandX = function() {
+  if (params.ActorCommandPosition === 'top' || params.ActorCommandPosition === 'middle' || params.ActorCommandPosition === 'under' || params.ActorCommandPosition === 'custom') {
+    return params.ActorCommand_X + (params.ActorommandWindowCenter ? this.actorCommandCenter() : 0);
+  } else if (params.ActorCommandPosition === 'default') {
+    return this.isRightInputMode() ? this._statusWindow.x + this._statusWindow.width - 4 : 0;
+  } else {
+    return params.ActorCommand_X;
+  }
+};
 
-    const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
-    Spriteset_Battle.prototype.createLowerLayer = function() {
-        _Spriteset_Battle_createLowerLayer.apply(this, arguments);
-        this.createStatusLayer();
-    };
+Scene_Battle.prototype.getActorCommandY = function() {
+  switch (params.ActorCommandPosition) {
+    case 'default':
+      return this._statusWindow.y + this._statusWindow.height - 6 + (Graphics.boxHeight - Graphics.height) / 2 - (params.WindowFrameShow ? -6 : 0);
+    case 'top':
+    case 'svtop':
+    case 'svleft':
+    case 'svright':
+    case 'custom':
+      return params.ActorCommand_Y + (Graphics.boxHeight - Graphics.height) / 2 + 4;
+    case 'middle':
+      return this._statusWindow.y / 2 + (Graphics.boxHeight - Graphics.height) / 2 + params.ActorCommand_Y;
+    case 'under':
+    case 'actor':
+      return this._statusWindow.y - 4 + (Graphics.boxHeight - Graphics.height) / 2 + params.ActorCommand_Y;
+  }
+};
 
-    Spriteset_Battle.prototype.createStatusLayer = function() {
-        this.createBattleHud();//ベーススプライト
-        this.createHudBack();//ウィンドウ、アクターグラフィック
-        this.createEffects();//アニメーション
-        this.createHudStatus();//ステータス
-        this.createFrontActors();
-    };
+Scene_Battle.prototype.actorCommandCenter = function() {
+  return (Graphics.boxWidth - this.actorCommandWidth()) / 2;
+};
 
-    Spriteset_Battle.prototype.createBattleHud = function() {
-        const sprite = new Sprite();
+Scene_Battle.prototype.actorWindowAreaHeight = function() {
+  return this.calcWindowHeight(params.ActorCommandMaxRow, true);
+};
+
+const _Scene_Battle_createActorWindow = Scene_Battle.prototype.createActorWindow;
+Scene_Battle.prototype.createActorWindow = function() {
+    //独自に定義するので処理しない
+    //_Scene_Battle_createActorWindow.call(this);
+};
+
+const _Scene_Battle_createItemWindow = Scene_Battle.prototype.createItemWindow;
+Scene_Battle.prototype.createItemWindow = function() {
+  _Scene_Battle_createItemWindow.call(this);
+  if (params.ItemWindowBackgroundImg) {
+    const x = params.ItemBackground_X + this._itemWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
+    const y = params.ItemBackground_Y + this._itemWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
+    const background = this.setBackgroundWindow(params.ItemWindowBackgroundImg, x, y);
+    this._itemWindow.setBSBackground(background);
+  }
+};
+
+const _Scene_Battle_createSkillWindow = Scene_Battle.prototype.createSkillWindow;
+Scene_Battle.prototype.createSkillWindow = function() {
+  _Scene_Battle_createSkillWindow.call(this);
+  if (params.SkillWindowBackgroundImg) {
+    const x = params.SkillBackground_X + this._skillWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
+    const y = params.SkillBackground_Y + this._skillWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
+    const background = this.setBackgroundWindow(params.SkillWindowBackgroundImg, x, y);
+    this._skillWindow.setBSBackground(background);
+  }
+};
+
+const _Scene_Battle_createEnemyWindow = Scene_Battle.prototype.createEnemyWindow;
+Scene_Battle.prototype.createEnemyWindow = function() {
+  _Scene_Battle_createEnemyWindow.call(this);
+  if (params.EnemyWindowBackgroundImg) {
+    const x = params.EnemyWindowBackground_X + this._enemyWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
+    const y = params.EnemyWindowBackground_Y + this._enemyWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
+    const background = this.setBackgroundWindow(params.EnemyWindowBackgroundImg, x, y);
+    this._enemyWindow.setBSBackground(background);
+  }
+};
+
+const _Scene_Battle_createHelpWindow = Scene_Battle.prototype.createHelpWindow;
+Scene_Battle.prototype.createHelpWindow = function() {
+  _Scene_Battle_createHelpWindow.call(this);
+  this._helpWindow._bsBackground = null;
+  this._helpWindow.opacity = params.HelpWindowShow ? 255 : 0;
+  if (params.HelpWindowBackgroundImg) {
+    const x = params.HelpBackground_X + this._helpWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
+    const y = params.HelpBackground_Y + this._helpWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
+    const background = this.setBackgroundWindow(params.HelpWindowBackgroundImg, x, y);
+    this._helpWindow.setBSBackground(background);
+  }
+};
+
+Scene_Battle.prototype.createMessageWindow = function() {
+    Scene_Message.prototype.createMessageWindow.call(this);
+    this.MessageWindowBackGround();
+};
+
+Scene_Battle.prototype.itemWindowRect = function() {
+  const wx = params.ItemWindow_X + (params.ItemWindowMode ? 0 : (Graphics.boxWidth - Graphics.width) / 2);
+  const ww = params.ItemWindow_Width > 0 ? Math.min(params.ItemWindow_Width, Graphics.width) : Graphics.boxWidth;
+  const wh = this.calcWindowHeight(params.ItemMaxRow, true);
+  const wy = params.ItemWindow_Y + (params.ItemWindowMode ? Graphics.boxHeight - wh : (Graphics.boxHeight - Graphics.height) / 2);
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.skillWindowRect = function() {
+  const wx = params.SkillWindow_X + (params.SkillWindowMode ? 0 : (Graphics.boxWidth - Graphics.width) / 2);
+  const ww = params.SkillWindow_Width > 0 ? Math.min(params.SkillWindow_Width, Graphics.width) : Graphics.boxWidth;
+  const wh = this.calcWindowHeight(params.SkillMaxRow, true);
+  const wy = params.SkillWindow_Y + (params.SkillWindowMode ? Graphics.boxHeight - wh : (Graphics.boxHeight - Graphics.height) / 2);
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.enemyWindowRect = function() {//再定義
+  const wx = params.EnemyWindow_X + (params.EnemyWindowMode ? 0 : (Graphics.boxWidth - Graphics.width) / 2);
+  const ww = this.enemyWindowWidth();
+  const wh = this.enemyWindowAreaHeight();
+  const wy = params.EnemyWindow_Y + (params.EnemyWindowMode ? Graphics.boxHeight - wh : (Graphics.boxHeight - Graphics.height) / 2);
+  return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.enemyWindowWidth = function() {
+  return params.EnemyWindow_Width > 0 ? Math.min(params.EnemyWindow_Width, Graphics.width) : this._statusWindow.width;
+};
+
+Scene_Battle.prototype.enemyWindowAreaHeight = function() {
+  return this.calcWindowHeight(params.EnemyMaxRow, true);
+};
+
+const _Scene_Battle_partyCommandWindowRect = Scene_Battle.prototype.partyCommandWindowRect;
+Scene_Battle.prototype.partyCommandWindowRect = function() {
+  const rect = _Scene_Battle_partyCommandWindowRect.call(this);
+  if (params.PartyCommandPosition === 'default') {
+    rect.width = this.partyCommandWidth(1);
+    rect.x = this.isRightInputMode() ? this._statusWindow.x + this._statusWindow.width - 4 : 0;
+    rect.y = this.partyCommand_YPosition(0);
+  } else if (params.PartyCommandPosition === 'custom') {
+    rect.width = this.partyCommandWidth(1);
+    rect.x = this.getPartyCommandX();
+    rect.y = this.partyCommand_YPosition(10);
+  } else if (params.PartyCommandPosition === 'top') {
+    rect.width = this.partyCommandWidth(0);
+    rect.x = this.getPartyCommandX();
+    rect.y = this.partyCommand_YPosition(1);
+  } else if (params.PartyCommandPosition === 'middle') {
+    rect.width = this.partyCommandWidth(0);
+    rect.x = this.getPartyCommandX();
+    rect.y = this.partyCommand_YPosition(2);
+  } else if (params.PartyCommandPosition === 'under') {
+    rect.width = this.partyCommandWidth(0);
+    rect.x = this.getPartyCommandX();
+    rect.y = this.partyCommand_YPosition(3);
+  }
+  rect.height = this.partyWindowAreaHeight();
+  return rect;
+};
+
+Scene_Battle.prototype.getDefaultPartyCommandPositionMode = function() {
+  return params.PartyCommandPosition === 'default' || params.ActorCommandPosition === 'default';
+};
+
+Scene_Battle.prototype.statusWindowRect = function() {   
+    let ww = this.getActorWindowWidth();
+    let wh = this.getActorWindowHeight();
+    let wx = this.getActorWindowX() + (this.getDefaultPartyCommandPositionMode() ? (this.isRightInputMode() ? 0 : getActorWindowOrgWidth() - ww) : 0);
+    let wy = this.getActorWindowY();
+    return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.actorStatusWindowRect = function() {
+    let ww = Graphics.width + 40;
+    let wh = Graphics.height + 40;
+    let wx = -20;
+    let wy = -20;
+    return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_Battle.prototype.setBackgroundWindow = function(background, x, y) {
+    if (!this._itemBSBackgorundWindow) {
+        const sprite =  new Sprite();
         this.addChild(sprite);
-        this._battleHudBase = sprite;
-        this._battleHudSprite = [];
-    };
-
-    Spriteset_Battle.prototype.createActorImgBaseSprite = function() {
-        
-    };
-
-    Spriteset_Battle.prototype.createHudBack = function() {
-        const sprite = new Sprite();
-        this._battleHudBase.addChild(sprite);
-        this._battleHudSprite[0] = sprite;
-    };
-
-    Spriteset_Battle.prototype.createEffects = function() {
-        const sprite = this.setBattleBase();
-        this._battleHudBase.addChild(sprite);
-        this._battleHudSprite[1] = sprite;
-        this._effectsFrontContainer = sprite;
-    };
-
-    Spriteset_Battle.prototype.createHudStatus = function() {
-        const sprite = new Sprite();
-        this._battleHudBase.addChild(sprite);
-        this._battleHudSprite[2] = sprite;
-    };
-
-    Spriteset_Battle.prototype.createDamege = function() {
-        const sprite = this.setBattleBase();
-        this._battleHudBase.addChild(sprite);
-        this._battleHudSprite[3] = sprite;
-    };
-
-    Spriteset_Battle.prototype.getHudBack = function() {
-        return this._battleHudSprite[0];
-    };
-
-    Spriteset_Battle.prototype.getHudStatus = function() {
-        return this._battleHudSprite[2];
-    };
-
-    Spriteset_Battle.prototype.setBattleBase = function() {
-        const width = Graphics.boxWidth;
-        const height = Graphics.boxHeight;
-        const x = 0;
-        const y = 0;
-        const sprite = new Sprite();
-        sprite.setFrame(0, 0, width, height);
-        sprite.x = x;
-        sprite.y = y - this.battleFieldOffsetY();
-        sprite.home_x = x;
-        return sprite;
-    };
-
-    const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
-    Spriteset_Battle.prototype.update = function() {
-        _Spriteset_Battle_update.apply(this, arguments);
-        this.updateBsEffects();
-    };
-
-    Spriteset_Battle.prototype.updateBsEffects = function() {
-        
-    };
-
-    const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
-    Spriteset_Battle.prototype.updateActors = function() {
-        this.addBsCreateActors();
-        _Spriteset_Battle_updateActors.apply(this, arguments);
-    };
-
-    Spriteset_Battle.prototype.getFrontActorsBaseSpriteId = function() {
-        return 3;
-    };
-
-    Spriteset_Battle.prototype.createFrontActors = function() {
-        if (!$gameSystem.isSideView() && NuunManager.styleData.isFrontViewActorEffectShow()) {
-            const spriteId = this.getFrontActorsBaseSpriteId();
-            this.createDamege();
-            for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
-                const sprite = new Sprite_BSFrontActor();
-                this._actorSprites.push(sprite);
-                this._battleHudSprite[spriteId].addChild(sprite);
-            }
-        }
-    };
-
-    Spriteset_Battle.prototype.addBsCreateActors = function() {
-        if (!$gameSystem.isSideView() && NuunManager.styleData.isFrontViewActorEffectShow() && this._actorSprites && $gameParty.maxBattleMembers() > this._actorSprites.length) {
-            const count = $gameParty.maxBattleMembers() - this._actorSprites.length;
-            const spriteId = this.getFrontActorsBaseSpriteId();
-            for (let i = 0; i < count; i++) {
-                const sprite = new Sprite_BSFrontActor();
-                this._actorSprites.push(sprite);
-                this._battleHudSprite[spriteId].addChild(sprite);
-            }
-        }  
-    };
-
-    Spriteset_Battle.prototype.getFrontActorsSprite = function() {
-        return $gameSystem.isSideView() ? this._actorSprites : [];
-    };
-
-    
-    function Sprite_ActorImges() {
-        this.initialize(...arguments);
+        this._itemBSBackgorundWindow = sprite;
     }
-      
-    Sprite_ActorImges.prototype = Object.create(Sprite.prototype);
-    Sprite_ActorImges.prototype.constructor = Sprite_ActorImges;
+    const bitmap = ImageManager.nuun_LoadPictures(background);
+    const sprite =  new Sprite(bitmap);
+    this._itemBSBackgorundWindow.addChild(sprite);
+    sprite.x = x;
+    sprite.y = y;
+    return sprite;
+};
 
-    window.Sprite_ActorImges = Sprite_ActorImges;
-      
-    Sprite_ActorImges.prototype.initialize = function() {
-        Sprite.prototype.initialize.call(this);
-        this.initMembers();
-    };
-
-    Sprite_ActorImges.prototype.initMembers = function() {
-        this._battler = null;
-        this._data = null;
-        this._imgScenes = '';
-        this._imgIndex = -1;
-        this._selectionEffectCount = 0;
-        this._shake = 0;
-        this._shakePower = params.ActorShakePower;
-        this._shakeSpeed = params.ActorShakeSpeed;
-        this._shakeDuration = 0;
-        this._shakeDirection = 1;
-        this._zoomDuration = 0;
-        this._zoomScale = 1;
-        this._zoomScaleTarget = 1.2;
-        this._updateCount = 0;
-        this._imgListId = -1;
-        this._durationOpacity = 0;
-        this._bsBitmapWidth = 0;
-        this._bsBitmapHeight = 0;
-        this._startUpdate = true;
-        this._zoomEffect = false;
-        this._apngMode = false;
-        this._loadedBitmap = null;
-    };
-
-    Sprite_ActorImges.prototype.setup = function(data, index) {
-        this._battler = data._battler;
-        this._data = data;
-        this._imgIndex = index;
-        this.resetData();
-        //if (!data._actor) {
-        //    this.bitmap = null;
-        //    return;
-        //}
-        this._battler.resetBattleStyleImgId();
-        this.anchor.x = 0.5;
-        this.anchor.y = 0.5;
-        this._data.update();
-        this.updateActorGraphic();
-        const stateSprite = data.getStateSprite();
-        if (stateSprite && NuunManager.styleData.isStateAnimation()) {
-            stateSprite.setup(data._battler);
-            stateSprite.anchor.y = 0.5;
-            stateSprite.x = this.x + data.getStateRectX() + this.getStatePositionX();
-            stateSprite.y = this.y + data.getStateRectY() + this.getStatePositionY();
-            stateSprite.show();
+const _Scene_Battle_updateStatusWindowPosition = Scene_Battle.prototype.updateStatusWindowPosition;
+Scene_Battle.prototype.updateStatusWindowPosition = function() {
+    if (!params.ActorStatusWindowLock) {       
+        _Scene_Battle_updateStatusWindowPosition.call(this);
+        this._actorImges.x = this._statusWindow.x;
+        this._actorStatus.x = this._statusWindow.x;
+        if (this._backgroundWindow) {
+            this._backgroundWindow.x = this._statusWindow.x + params.WindowBackground_X;
         }
-        this.setBlendColor([0, 0, 0, 0]);
-        
-    };
-
-    Sprite_ActorImges.prototype.resetData = function() {
-        this._imgScenes = '';
-        this._imgListId = null;
-        this._updateCount = 0;
-    };
-
-    Sprite_ActorImges.prototype.setHome = function(x, y) {
-        this._homeX = x;
-        this._homeY = y;
-        this._baseScale = 1.0;
-        this.move(x, y);
-    };
-
-    Sprite_ActorImges.prototype.setRect = function(width, height) {
-        this._rectWidth = width;
-        this._rectHeight = height;
-    };
-
-    Sprite_ActorImges.prototype.resetBitmapData = function(width, height) {
-        this._bsBitmapWidth = width;
-        this._bsBitmapHeight = height;
-        this.y = this._homeY;//画像更新時に一旦戻す。
-    };
+        this.torigoyaBalloonConflict();
+        return;
+        if (statusWindowX < targetX) {
+            if (!$gameSystem.isSideView() && battleEffects) {
+                battleEffects.x = Math.min(battleEffects.x + 16, targetX);
+            }
+            this._actorImges.x = this._statusWindow.x;
+            this._actorStatus.x = this._statusWindow.x;
+            if (this._backgroundWindow) {
+              this._backgroundWindow.x = this._statusWindow.x + params.WindowBackground_X;
+            }
+        }
+        if (statusWindowX > targetX) {
+            if (!$gameSystem.isSideView() && battleEffects) {
+                battleEffects.x = Math.max(battleEffects.x - 16, targetX);
+            }
+            this._actorImges.x = Math.max(this._actorImges.x - 16, targetX);
+            this._actorStatus.x = Math.max(this._actorStatus.x - 16, targetX);
+            if (this._backgroundWindow) {
+              this._backgroundWindow.x = this._statusWindow.x + params.WindowBackground_X;
+            }
+        }
+    }
     
-    Sprite_ActorImges.prototype.getStatePositionX = function() {
-        return 0;
-    };
-      
-    Sprite_ActorImges.prototype.getStatePositionY = function() {
-        if (this._data.isFaceMode()) {
-            return 0;
-        } else if (NuunManager.styleData.isFaceHeightOnWindow()) {
-            return 0;
+};
+
+const _Scene_Battle_update  = Scene_Battle.prototype.update;
+Scene_Battle.prototype.update = function() {
+    _Scene_Battle_update.call(this);
+    this.updateBSCommandRefresh();
+    this.updateBSBuckground();
+    this.actorStatusWindowOpacity();  
+};
+
+Scene_Battle.prototype.updateBSCommandRefresh = function() {
+    const actor = this._actorCommandWindow.actor();//サポートアクターは暫定処置
+    if (this._statusWindow.isCommandRefresh() && !$gameTemp.isBattleRefreshRequested() && actor) {
+        this._statusWindow.commandRefresh(false);
+        if (Imported.NUUN_SupportActor) {
+        $gameParty.setWithSupportActorMember();
+        }
+        const index = $gameParty.battleMembers().indexOf(actor);
+        if (index >= 0) {
+            if (Imported.NUUN_SupportActor && !actor.getSupportActor()) {
+                this._statusWindow.select(index);
+            } else {
+                this._statusWindow.select(index);
+            }
         } else {
-            return Math.floor(this._bsBitmapHeight / 3) * -1;
+            this.commandCancel();
         }
-    };
+        this._actorCommandWindow.refresh();
+    }
+};
 
-    Sprite_ActorImges.prototype.update = function() {
-        Sprite.prototype.update.call(this);
-        if (this._battler) {
-            this._data.update();
-            this.updateActorGraphic();
-            this.updateMotion();
-            this.updateSelectionEffect();
+Scene_Battle.prototype.updateBSBuckground = function() {
+    if (params.ActorCommandBackgroundImg) {
+        this._actorCommandBackgroundWindow.x = params.ActorBackground_X + this._actorCommandWindow.x + (Graphics.width - Graphics.boxWidth) / 2;
+        this._actorCommandBackgroundWindow.y = params.ActorBackground_Y + this._actorCommandWindow.y + (Graphics.height - Graphics.boxHeight) / 2;
+        this._actorCommandBackgroundWindow.visible = this._actorCommandWindow.visible && this._actorCommandWindow.active && this._actorCommandWindow.openness > 0;
+    }
+    if (this._partyCommandBackgroundWindow) {
+        this._partyCommandBackgroundWindow.visible = this._partyCommandWindow.visible && this._partyCommandWindow.active;
+    }
+    this._enemyWindow.bsUpdateBackground();
+    this._itemWindow.bsUpdateBackground();
+    this._skillWindow.bsUpdateBackground();
+    this._helpWindow.bsUpdateBackground();
+    this.bsMessageBackground();
+};
+
+Scene_Battle.prototype.bsMessageBackground = function() {
+    if (BattleManager.getDisplayMessageType() === "Appear" && params.AppearBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.AppearBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.AppearBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.AppearBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else if (BattleManager.getDisplayMessageType() === "Victory" && params.VictoryBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.VictoryBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.VictoryBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.VictoryBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else if (BattleManager.getDisplayMessageType() === "Defeat" && params.LoseBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.LoseBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.LoseBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.LoseBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else if (BattleManager.getDisplayMessageType() === "Escape" && params.EscapeBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.EscapeBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.EscapeBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.EscapeBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else if (BattleManager.getDisplayMessageType() === "EscapeFailure" && params.EscapeFailureBackgroundImg) {
+        this._messageBackground.bitmap = ImageManager.nuun_LoadPictures(params.EscapeFailureBackgroundImg);
+        this._messageBackground.x = this._messageWindow.x + params.EscapeFailureBackground_X + (Graphics.width - Graphics.boxWidth) / 2;
+        this._messageBackground.y = this._messageWindow.y + params.EscapeFailureBackground_Y + (Graphics.height - Graphics.boxHeight) / 2;
+    } else {
+        this._messageBackground.bitmap = null;
+        this._messageBackground.x = this._messageWindow.x;
+        this._messageBackground.y = this._messageWindow.y;
+    }
+};
+
+Scene_Battle.prototype.actorStatusWindowOpacity = function() {
+    if (BattleManager.actorStatusWindowOpacity) {
+        this.setActorStatusWindowOpacity(BattleManager.actorStatusWindowOpacityValue);
+    } else if (this._skillWindow.active) {
+        this.setActorStatusWindowOpacity(params.SkillWindowOpacity);
+    } else if (this._itemWindow.active) {
+        this.setActorStatusWindowOpacity(params.ItemWindowOpacity);
+    } else if (this._enemyWindow.active) {
+        this.setActorStatusWindowOpacity(params.EnemyWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Appear" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.AppearWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Victory" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.VictoryWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Defeat" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.LoseWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "Escape" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.EscapeWindowOpacity);
+    } else if ($gameMessage.isBusy() && BattleManager.getDisplayMessageType() === "EscapeFailure" && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.EscapeWindowOpacity);
+    } else if ($gameMessage.isBusy() && $gameMessage.positionType() === 2) {
+        this.setActorStatusWindowOpacity(params.MessageWindowOpacity);
+    } else {
+        this.setActorStatusWindowOpacity(255);
+        if (!$gameMessage.isBusy()) {
+        BattleManager.displayMessageType(null);
+        }
+    }
+};
+
+Scene_Battle.prototype.setActorStatusWindowOpacity = function(opacity) {
+    this._battleHudBack.opacity = opacity;
+    this._battleHudFront.opacity = opacity;
+};
+
+const _Scene_Battle_createCancelButton = Scene_Battle.prototype.createCancelButton;
+Scene_Battle.prototype.createCancelButton = function() {
+    _Scene_Battle_createCancelButton.call(this);
+    if (params.ButtonMode === 'left') {
+        this._cancelButton.x = 4 + params.CancelButtonX;
+    } else {
+        this._cancelButton.x += params.CancelButtonX;
+    }
+};
+
+const _Scene_Battle_statusWindowX = Scene_Battle.prototype.statusWindowX;
+Scene_Battle.prototype.statusWindowX = function() {//再定義
+    let wx = _Scene_Battle_statusWindowX.call(this);
+    if (this.isAnyInputWindowActive()) {
+        wx += (this.getDefaultPartyCommandPositionMode() ? (this.isRightInputMode() ? 0 : getActorWindowOrgWidth() - this.getActorWindowWidth()) : 0);
+    } else {
+        wx += this.getActorWindowX();
+    }
+    return wx;
+};
+
+Scene_Battle.prototype.getActorWindowX = function() {
+    if (params.ActorStatusWindowCenter) {
+        return getActorWindowCenter() + params.ActorStatusWindow_X;
+    } else {
+        return params.ActorStatusWindow_X;
+    }
+};
+
+Scene_Battle.prototype.getActorWindowY = function() {
+    if (params.ActorStatusWindowPosition === 'ui_under') {
+        return Graphics.boxHeight - this.getActorWindowHeight() + 6 + params.ActorStatusWindow_Y + (Graphics.height - Graphics.boxHeight) / 2 + (params.WindowFrameShow ? -6 : 0);
+    } else if (params.ActorStatusWindowPosition === 'under') {
+        return Graphics.height - this.getActorWindowHeight() + params.ActorStatusWindow_Y + (params.WindowFrameShow ? -6 : 0);
+    } else {
+        return params.ActorStatusWindow_Y;
+    }
+};
+
+Scene_Battle.prototype.setStatusWindow_Sprite = function() {
+    statusData = this._statusWindow;
+};
+
+Scene_Battle.prototype.MessageWindowBackGround = function() {
+    this._messageBackground = this.setBackgroundWindow(null, 0, 0);
+};
+
+Scene_Battle.prototype.getActorWindowWidth = function() {
+    return (params.ActorStatusWindow_Width > 0 ? params.ActorStatusWindow_Width : Graphics.boxWidth) - (params.WidthWithCommand ? this.partyCommandWidth() : 0);
+};
+
+Scene_Battle.prototype.getActorWindowHeight = function() {
+    return params.ActorStatusWindow_Height > 0 ? params.ActorStatusWindow_Height : this.windowAreaHeight() + (params.WindowFrameShow ? 0 : 10);
+};
+
+Scene_Battle.prototype.getPartyCommandX = function() {
+    return params.PartyCommand_X + (params.PartyCommandWindowCenter ? this.partyCommandCenter() : 0);
+};
+
+Scene_Battle.prototype.partyCommandCenter = function() {
+    return (Graphics.boxWidth - this.partyCommandWidth(0)) / 2;
+};
+
+Scene_Battle.prototype.partyCommand_YPosition = function(mode) {
+    if (mode === 0) {//デフォルト
+        return this._statusWindow.y + (Graphics.boxHeight - Graphics.height) / 2 + (params.WindowFrameShow ? 0 : 4);
+    } else if (mode === 10) {//カスタム
+        return params.PartyCommand_Y;
+    } else if (mode === 1) {//上部
+        return params.PartyCommand_Y + (Graphics.boxHeight - Graphics.height) / 2 + 4;
+    } else if (mode === 2) {//中間
+        return this._statusWindow.y / 2 - (this.partyWindowAreaHeight() / 2) + (Graphics.boxHeight - Graphics.height) / 2 + params.PartyCommand_Y;
+    } else if (mode === 3) {//アクターステータス上
+        return this._statusWindow.y - this.partyWindowAreaHeight() + (Graphics.boxHeight - Graphics.height) / 2 + params.PartyCommand_Y;
+    }
+};
+
+Scene_Battle.prototype.partyCommandWidth = function(mode) {
+    return params.PartyCommand_Width > 0 ? Math.min(params.PartyCommand_Width, Graphics.width) : (mode === 0 ? Graphics.boxWidth : 192);
+};
+
+Scene_Battle.prototype.partyWindowAreaHeight = function() {
+    return this.calcWindowHeight(params.PartyCommandMaxRow, true);
+};
+
+const _Scene_Battle_startActorSelection = Scene_Battle.prototype.startActorSelection;
+Scene_Battle.prototype.startActorSelection = function() {
+    _Scene_Battle_startActorSelection.call(this);
+    this._skillWindow.selectionHide();
+    this._itemWindow.selectionHide();
+    this._statusWindow.deselect();
+};
+
+const _Scene_Battle_startEnemySelection = Scene_Battle.prototype.startEnemySelection;
+Scene_Battle.prototype.startEnemySelection = function() {
+    _Scene_Battle_startEnemySelection.call(this);
+    this._statusWindow.show();
+    this._skillWindow.selectionHide();
+    this._itemWindow.selectionHide();
+    if (!this.commandDefaultMode()) {
+        this._actorCommandWindow.hide();
+    }
+};
+
+const _Scene_Battle_onEnemyCancel = Scene_Battle.prototype.onEnemyCancel;
+Scene_Battle.prototype.onEnemyCancel = function() {
+    _Scene_Battle_onEnemyCancel.call(this);
+    $gameTemp.onBSAction = false;
+    switch (this._actorCommandWindow.currentSymbol()) {
+        case "attack":
+        case "special":
+        this._actorCommandWindow.show();
+        break;
+    }
+};
+
+const _Scene_Battle_onActorCancel = Scene_Battle.prototype.onActorCancel;
+Scene_Battle.prototype.onActorCancel = function() {
+    _Scene_Battle_onActorCancel.call(this);
+    $gameTemp.onBSAction = false;
+    this._statusWindow.selectActor(BattleManager.actor());
+};
+
+const _Scene_Battle_startPartyCommandSelection = Scene_Battle.prototype.startPartyCommandSelection;
+Scene_Battle.prototype.startPartyCommandSelection = function() {
+    _Scene_Battle_startPartyCommandSelection.call(this);
+    $gameTemp.onBSAction = false;
+};
+
+const _Scene_Battle_selectPreviousCommand = Scene_Battle.prototype.selectPreviousCommand;
+Scene_Battle.prototype.selectPreviousCommand = function() {
+    _Scene_Battle_selectPreviousCommand.call(this);
+    $gameTemp.onBSAction = false;
+    this._partyCommandWindow.show();
+};
+
+const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
+Scene_Battle.prototype.onSelectAction = function() {
+    $gameTemp.onBSAction = BattleManager.isTpb() && !this.commandDefaultMode();
+    _Scene_Battle_onSelectAction.call(this);
+};
+
+const _Scene_Battle_endCommandSelection = Scene_Battle.prototype.endCommandSelection;
+Scene_Battle.prototype.endCommandSelection = function() {
+    _Scene_Battle_endCommandSelection.call(this);
+    $gameTemp.onBSAction = false;
+};
+
+const _Scene_Battle_commandSkill = Scene_Battle.prototype.commandSkill;
+Scene_Battle.prototype.commandSkill = function() {
+    _Scene_Battle_commandSkill.call(this);
+    this._statusWindow.show();
+};
+
+const _Scene_Battle_commandItem = Scene_Battle.prototype.commandItem;
+Scene_Battle.prototype.commandItem = function() {
+    _Scene_Battle_commandItem.call(this);
+    this._statusWindow.show();
+};
+
+const _Scene_Battle_selectNextCommand = Scene_Battle.prototype.selectNextCommand;
+Scene_Battle.prototype.selectNextCommand = function() {
+    _Scene_Battle_selectNextCommand.call(this);
+    $gameTemp.onBSAction = false;
+};
+
+Scene_Battle.prototype.commandDefaultMode = function() {
+    return params.bsMode === 'Default' || params.bsMode === 'Standard';
+};
+
+Scene_Battle.prototype.torigoyaBalloonConflict = function() {
+    if (this._torigoyaBalloonInBattle_actorBalloonLayer) {
+        this._torigoyaBalloonInBattle_actorBalloonLayer.visible = !this.selectWindowBisy();
+    }
+};
+
+Scene_Battle.prototype.selectWindowBisy = function() {
+    const list = ["_skillWindow", "_itemWindow", "_actorWindow", "_enemyWindow"];
+    return list.some(data => this[data] && this[data].visible);
+};
+
+
+//Window_Base
+Window_Base.prototype.setBSBackground = function(background) {
+  this._bsBackground = background;
+};
+
+Window_Base.prototype.bsUpdateBackground = function() {
+  if (this._bsBackground) {
+    this._bsBackground.visible = this.visible;
+  }
+};
+
+
+const _Window_Selectable_paint = Window_Selectable.prototype.paint;
+Window_Selectable.prototype.paint = function() {
+  const className = String(this.constructor.name);
+  if (className === 'Window_ActorCommand') {
+    this.setCommandHeight();
+  }
+  _Window_Selectable_paint.call(this);
+};
+
+//Window_PartyCommand
+const _Window_PartyCommand_initialize = Window_PartyCommand.prototype.initialize;
+Window_PartyCommand.prototype.initialize = function(rect) {
+  _Window_PartyCommand_initialize.call(this, rect);
+  this.windowColor = null;
+  this.opacity = params.PartyCommandWindowShow ? 255 : 0;
+};
+
+Window_PartyCommand.prototype.loadWindowskin = function() {
+  if (params.PartyCommandWindowSkin) {
+    this.windowskin = ImageManager.loadSystem(params.PartyCommandWindowSkin);
+    this.windowColor = params.ActorStatusWindowColor;
+  } else {
+    Window_Base.prototype.loadWindowskin.call(this);
+  }
+};
+
+Window_PartyCommand.prototype.updateTone = function() {
+  if (params.PartyCommandWindowColor) {
+    const tone = params.PartyCommandWindowColor;
+    this.setTone(tone.red, tone.green, tone.bule);
+  } else {
+    Window_Base.prototype.updateTone.call(this);
+  }
+};
+
+Window_PartyCommand.prototype.maxCols = function() {;
+  return params.PartyCommandMode ? params.PartyCommandMaxCol : Math.min((this._list ? this.maxItems() : params.PartyCommandMaxCol), params.PartyCommandMaxCol);
+};
+
+const _Window_PartyCommand_itemRect = Window_PartyCommand.prototype.itemRect;
+Window_PartyCommand.prototype.itemRect = function(index) {
+  const rect = _Window_PartyCommand_itemRect.call(this, index);
+  if (params.PartyCommandMode) {
+    rect.x += this.itemWidth() / 2 * (this.maxCols() - Math.min(this.maxItems(), this.maxCols()));
+  }
+  return rect;
+};
+
+const _Window_PartyCommand_setup = Window_PartyCommand.prototype.setup;
+Window_PartyCommand.prototype.setup = function() {
+  if (!$gameTemp.onBSAction) {
+    _Window_PartyCommand_setup.call(this);
+  } else {
+    $gameTemp.onBSAction = false;
+  } 
+};
+
+
+//Window_ActorCommand
+const _Window_ActorCommand_initialize = Window_ActorCommand.prototype.initialize;
+Window_ActorCommand.prototype.initialize = function(rect) {
+  _Window_ActorCommand_initialize.call(this, rect);
+  this.opacity = params.ActorCommandWindowShow ? 255 : 0;
+};
+
+Window_ActorCommand.prototype.loadWindowskin = function() {
+  if (params.ActorCommandWindowSkin) {
+    this.windowskin = ImageManager.loadSystem(params.ActorCommandWindowSkin);
+  } else {
+    Window_Base.prototype.loadWindowskin.call(this);
+  }
+};
+
+Window_ActorCommand.prototype.setWindowSkin = function(data) {
+  if (data.WindowSkin) {
+    this.windowskin = ImageManager.loadSystem(data.WindowSkin);
+    this.windowColor = data.WindowColor;
+  } else {
+    this.loadWindowskin();
+    this.windowColor = null;
+  }
+};
+
+Window_ActorCommand.prototype.updateTone = function() {
+  if (this.windowColor) {
+    const tone = this.windowColor;
+    this.setTone(tone.red, tone.green, tone.bule);
+  } else {
+    Window_Base.prototype.updateTone.call(this);
+  }
+};
+
+Window_ActorCommand.prototype.maxCols = function() {
+  return params.ActorCommandMode ? params.ActorCommandMaxCol : Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol);
+  //return Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol);
+};
+
+Window_ActorCommand.prototype.setCommandHeight = function() {
+  const maxCols = params.ActorCommandVariable ? Math.ceil(this.maxItems() / params.ActorCommandMaxCol) : params.ActorCommandMaxRow;
+  const cols = params.ActorCommandVariable ? maxCols.clamp(params.ActorCommandMinRow, params.ActorCommandMaxRow) : maxCols;
+  this.height = this.fittingHeight(cols);
+};
+
+Window_ActorCommand.prototype.selectActor = function(actor) {
+  const members = $gameParty.battleMembers();
+  return members.indexOf(actor);
+};
+
+const _Window_ActorCommand_setup = Window_ActorCommand.prototype.setup;
+Window_ActorCommand.prototype.setup = function(actor) {
+    _Window_ActorCommand_setup.apply(this, arguments);
+    if (this._oldCommandActor !== actor) {
+        if (this._oldCommandActor) {
+            this._oldCommandActor.battleStyleImgRefresh(); 
+        }
+        if (actor) {
+            actor.battleStyleImgRefresh();
+        }
+        this._oldCommandActor = actor;
+    }
+};
+
+const _Window_ActorCommand_itemRect = Window_ActorCommand.prototype.itemRect;
+Window_ActorCommand.prototype.itemRect = function(index) {
+  const rect = _Window_ActorCommand_itemRect.call(this, index);
+  if (params.ActorCommandMode) {
+    rect.x += this.itemWidth() / 2 * (this.maxCols() - Math.min(this.maxItems(), this.maxCols()));
+  }
+  return rect;
+};
+
+
+const _Window_ActorCommand_refresh = Window_ActorCommand.prototype.refresh;
+Window_ActorCommand.prototype.refresh = function() {
+    _Window_ActorCommand_refresh.call(this);
+    const actorIndex = this.selectActor(this._actor);
+    if (statusData && this._actor || actorIndex >= 0) {
+      const data = getActorPositionData( this._actor.actorId());
+      this.setWindowSkin(data);
+      const rect = statusData.itemRect(actorIndex);
+      //this.setCommandHeight();
+      if (params.ActorCommandPosition === 'actor') {
+        if (Imported.NUUN_SupportActor && this._actor.getSupportActor()) {
+          this.x = params.SupportActorCommand_X;
+          this.y = params.SupportActorCommand_Y;
         } else {
-            this._stateSprite = null;
-            this.bitmap = null;
-        } 
-    };
+          this.x = rect.x + (statusData.x - ((Graphics.width - Graphics.boxWidth) / 2)) + statusData.itemPadding() + ((rect.width - this.width) / 2) + params.ActorCommand_X;
+          this.y = this.homeY - this.height + rect.y;
+        }
+      } else if (params.ActorCommandPosition === 'svtop') {
+        data = this.SvActorData[actorIndex];
+        this.x = data.x - (this.width + data.width) / 2 + 32 + params.ActorCommand_X;
+        this.y = data.y - (this.height + data.height + 48) + params.ActorCommand_Y;
+      } else if (params.ActorCommandPosition === 'svleft') {
+        data = this.SvActorData[actorIndex];
+        this.x = data.x - this.width - 32 + params.ActorCommand_X;
+        this.y = data.y - (this.height + data.height + 48) / 2 + params.ActorCommand_Y;
+      } else if (params.ActorCommandPosition === 'svright') {
+        data = this.SvActorData[actorIndex];
+        this.x = data.x + 32 + params.ActorCommand_X;
+        this.y = data.y - (this.height + data.height + 48) / 2 + params.ActorCommand_Y;
+      } else if (params.ActorCommandPosition === 'top') {
+        this.y = this.homeY;
+      } else if (params.ActorCommandPosition === 'middle') {
+        this.y = this.homeY - Math.floor(this.height / 2);
+      } else {
+        this.y = this.homeY - this.height;
+      }
+    }
+};
 
-    Sprite_ActorImges.prototype.updateMotion = function() {
-        this.refreshStateOverlay();
-        this.setupEffect();
-        this.updateDamage();
-        this.updateZoom();
-    };
 
-    Sprite_ActorImges.prototype.refreshStateOverlay = function() {
-        const stateSprite = this._data.getStateSprite();
-        if (stateSprite && NuunManager.styleData.isStateAnimation()) {
-            stateSprite.visible = this.visible;
-            if (this._loadedBitmap && this._loadedBitmap.isReady()) {
-                const scale = this._zoomScale * this._baseScale;
-                stateSprite.x = this.x + this._data.getStateRectX() + this.getStatePositionX();
-                stateSprite.y = this.y + this._data.getStateRectY() + this.getStatePositionY();
-            }
-        }
-    };
-    
-    Sprite_ActorImges.prototype.setupEffect = function() {
-        if (params.OnActorShake && this._battler.isBSDamageEffect()) {
-            this._shakeDuration = params.ActorShakeFlame;
-            this._battler._onDamageEffect = false;
-        }
-        if (params.OnActionZoom && this._battler.isBSEffectAction()) {
-            this._zoomDuration = params.ActionZoomDuration;
-            this._zoomEffect = true;
-            this._battler._isEffectAction = false;
-        }
-    };
-    
-    Sprite_ActorImges.prototype.updateDamage = function() {
-        if (this._shakeDuration > 0 || this._shake !== 0) {
-            const delta = (this._shakePower * this._shakeSpeed * this._shakeDirection) / 10;
-            if (this._shakeDirection <= 1 && this._shake * (this._shake + delta) < 0) {
-                this._shake = 0;
-            } else {
-                this._shake += delta;
-            }
-            if (this._shake > this._shakePower * 2) {
-                this._shakeDirection = -1;
-            }
-            if (this._shake < -this._shakePower * 2) {
-                this._shakeDirection = 1;
-            }
-            this._shakeDuration--;
-            this.x += Math.round(this._shake);
-        } else if (this.x !== this._homeX) {
-            this.resetDamage();
-        }
-    };
-    
-    Sprite_ActorImges.prototype.updateZoom = function() {
-        if (this._loadedBitmap && this._loadedBitmap.isReady()) {
-            if (this._zoomDuration > 0) {
-                const d = this._zoomDuration;
-                const t = this._zoomDuration <= params.ActionZoomDuration / 2 ? 1 : this._zoomScaleTarget;
-                this._zoomScale = ((this._zoomScale * (d - 1) + t) / d);
-                this._zoomDuration--;
-                const scale = this._zoomScale * this._baseScale;
-                this.scale.x = scale;
-                this.scale.y = scale;
-            } else {
-                if (this.scale.x !== this._baseScale) {
-                    this.resetZoom();
-                }
-                if (this._zoomEffect) {
-                    this._zoomEffect = false;
-                }
-            }
-        }
-    };
+//Window_BattleStatus
+const _Window_BattleStatus_initialize = Window_BattleStatus.prototype.initialize;
+Window_BattleStatus.prototype.initialize = function(rect) {
+  _Window_BattleStatus_initialize.call(this, rect);
+  this.frameVisible = params.WindowFrameShow;
+  this.opacity = params.WindowShow ? 255 : 0;
+  this._opening = true;
+  this.visible = true;
+  $gameTemp.actorData = null;
+};
 
-    Sprite_ActorImges.prototype.updateSelectionEffect = function() {
-        if (!params.ActorFlash || NuunManager.styleData.isDefaultActorWindow()) {
-            return;
+Window_BattleStatus.prototype.loadWindowskin = function() {
+  if (params.ActorStatusWindowSkin) {
+    this.windowskin = ImageManager.loadSystem(params.ActorStatusWindowSkin);
+  } else {
+    Window_Base.prototype.loadWindowskin.call(this);
+  }
+};
+
+Window_BattleStatus.prototype.updateTone = function() {
+  if (params.ActorStatusWindowColor) {
+    const tone = params.ActorStatusWindowColor;
+    this.setTone(tone.red, tone.green, tone.bule);
+  } else {
+    Window_Base.prototype.updateTone.call(this);
+  }
+};
+
+const _Window_BattleStatus_maxCols = Window_BattleStatus.prototype.maxCols;
+Window_BattleStatus.prototype.maxCols = function() {
+  return params.ActorStatusVariable ? Math.min($gameParty.battleMembers().length, _Window_BattleStatus_maxCols.call(this), params.ActorMaxCol) : params.ActorMaxCol;
+};
+
+const _Window_BattleStatus_itemHeight = Window_BattleStatus.prototype.itemHeight;
+Window_BattleStatus.prototype.itemHeight = function() {
+  const row = params.ActorMaxRow > 0 ? params.ActorMaxRow : Math.ceil($gameParty.battleMembers().length / this.maxCols());
+  return Math.floor(_Window_BattleStatus_itemHeight.call(this) / row);
+};
+
+const _Window_BattleStatus_rowSpacing = Window_BattleStatus.prototype.rowSpacing;
+Window_BattleStatus.prototype.rowSpacing = function() {
+  return Math.ceil($gameParty.battleMembers().length / this.maxCols()) > 1 ? 4 : _Window_BattleStatus_rowSpacing.call(this);
+};
+
+Window_BattleStatus.prototype.itemRect = function(index) {
+    let rect = params.ActorStatusMode === 'triangle' ? this.triangleRect(index) : Window_Selectable.prototype.itemRect.call(this, index);
+    rect = this.statusPosition(index, rect);
+    return rect;
+};
+
+Window_Selectable.prototype.triangleRect = function(index) {
+  const maxCols = this.maxCols();
+  const topCol = this.maxItems() % maxCols;
+  const itemWidth = this.itemWidth();
+  const itemHeight = this.itemHeight();
+  const colSpacing = this.colSpacing();
+  const rowSpacing = this.rowSpacing();
+  const col = (index + (topCol > index ? 0 : maxCols - topCol)) % maxCols;
+  const shiftIndex = (params.ActorMaxRow - Math.ceil(this.maxItems() / maxCols)) * (maxCols - col);
+  const row = Math.floor(((topCol > index || topCol === 0 ? 0 : maxCols - topCol) + index + shiftIndex) / maxCols);
+  const x = col * itemWidth + colSpacing / 2 - this.scrollBaseX();
+  const y = row * itemHeight + rowSpacing / 2 - this.scrollBaseY();
+  const width = itemWidth - colSpacing;
+  const height = itemHeight - rowSpacing;
+  return new Rectangle(x, y, width, height);
+};
+
+Window_BattleStatus.prototype.faceRect = function(index) {//再定義
+    const rect = this.itemRect(index);
+    rect.pad(-1);
+    let height;
+    if (params.bsMode === "Standard") {
+      height = params.FaceHeight > 0 ? Math.min(params.FaceHeight, ImageManager.faceHeight) : ImageManager.faceHeight;
+      rect.height = params.FaceHeightOnWindow ? Math.min(rect.height, height) : height;
+      //rect.x -= Math.floor((rect.width / 2) - (ImageManager.faceWidth / 2));
+    } else if (params.bsMode === "Type4") {
+      height = params.FaceHeight > 0 ? Math.min(params.FaceHeight, ImageManager.faceHeight) : ImageManager.faceHeight;
+      rect.height = params.FaceHeightOnWindow ? Math.min(rect.height, height) : height;
+    } else {
+      height = params.FaceHeight > 0 ? Math.min(params.FaceHeight, ImageManager.faceHeight) : this.basicGaugesY(rect) - this.gaugeLineHeight() + this.gaugeLineHeight() / 2 - rect.y;
+      rect.height = params.FaceHeightOnWindow ? Math.min(rect.height, height) : height;
+    }
+    rect.y += this.colSpacing();
+    return rect;
+};
+
+Window_BattleStatus.prototype.preparePartyRefresh = function() {
+    this.performPartyRefresh();
+};
+
+Window_BattleStatus.prototype.performPartyRefresh = function() {
+    $gameTemp.setBattleStyleRefresh(true);
+    this.refresh();
+    this.commandRefresh(true);
+};
+
+Window_BattleStatus.prototype.commandRefresh = function(flag) {
+    this._commandRefresh = flag;
+};
+
+Window_BattleStatus.prototype.isCommandRefresh = function() {
+    return this._commandRefresh;
+};
+
+Window_BattleStatus.prototype.setActorWindow = function(battleActorImges, BattleActorStatus) {
+    this._window_battleActorImges = battleActorImges;
+    this._window_BattleActorStatus = BattleActorStatus;
+};
+
+const _Window_BattleStatus_refreshCursor = Window_BattleStatus.prototype.refreshCursor;
+Window_BattleStatus.prototype.refreshCursor = function() {
+  if (params.SelectBackShow) {
+    _Window_BattleStatus_refreshCursor.call(this);
+  } else {
+    this.setCursorRect(0, 0, 0, 0);
+  }
+};
+
+Window_BattleStatus.prototype.statusPosition = function(index, rect) {
+    const itemWidth = this.itemWidth();
+    const padding = this.itemPadding();
+    let cols = this.maxCols();
+    let maxCols = 0;
+    const data = params.ActorContentsSetting ? params.ActorContentsSetting[index] : null;
+    if (data && data.ActorContentsCoordinateMode) {
+        rect.x = 0;
+        rect.y = 0;
+    } else {
+        if (params.ActorStatusMode === 'triangle') {
+            const topCol = this.maxItems() % this.maxCols();
+            cols = (topCol > index ? topCol : this.maxCols());
+            index += (topCol > index || topCol === 0 ? 0 : this.maxCols() - topCol);
+            maxCols = Math.min(cols, this.maxItems());
+        } else {
+            maxCols = Math.min(this.maxItems() - (Math.floor(index / cols) * cols), cols, this.maxItems());
         }
-        const target = this;
-        if (target && this._battler.isSelected()) {
-            this._selectionEffectCount++;
-            if (this._selectionEffectCount % 30 < 15) {
-                target.setBlendColor([255, 255, 255, 64]);
-            } else {
-                target.setBlendColor([0, 0, 0, 0]);
-            }
-        } else if (this._selectionEffectCount > 0) {
-            this._selectionEffectCount = 0;
+        if (params.ActorStatusMode === 'center') {
+            rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
+        } else if (params.ActorStatusMode === 'raigt') {
+            rect.x += this.width - (maxCols * itemWidth) - padding * 2;
+        } else if (params.ActorStatusMode === 'triangle') {
+            rect.x += Math.floor((this.width / 2) - (itemWidth * maxCols / 2)) - padding;
+        }
+        if (params.ActorStatusRowsMode === 'under') {
+            rect.y = this.height - (rect.height + rect.y + padding * 2);
+        }
+    }
+    if (data) {
+        rect.x += data.ActorContentsX || 0;
+        rect.y += data.ActorContentsY || 0;
+        rect.width = data.ActorContentsWidth > 0 ? data.ActorContentsWidth : rect.width;
+        rect.height = data.ActorContentsHeight > 0 ? data.ActorContentsHeight : rect.height;
+    }
+    return rect;
+};
+
+Window_BattleStatus.prototype.drawItem = function(index) {
+  if (params.ActorStatusActorWindowShow) {
+    this.drawActorWindow(index);
+  }
+};
+
+Window_BattleStatus.prototype.drawActorWindow = function(index) {
+  if (params.ActorStatusActorWindowShow) {
+    const actor = this.actor(index);
+    const data = getActorPositionData(actor.actorId());
+    const key = "actor%1-window".format(actor.actorId());
+    const rect = this.itemRect(index);
+    bsRect = rect;
+    const window = this.createInnerSprite(key, Window_BSActor);
+    window.setup(actor, data);
+    window.show();
+  }
+};
+
+Window_BattleStatus.prototype.drawItemBackground = function(index) {
+  const actor = this.actor(index);
+  const data = getActorPositionData(actor.actorId());
+  if (data.ActorBackground) {
+    const rect = this.itemRect(index);
+    const bitmap = ImageManager.nuun_LoadPictures(data.ActorBackground);
+    this.actorBackGround(actor, bitmap, rect.x, rect.y, rect.width, rect.height);
+  } else if (params.CursorBackShow) {
+    Window_Selectable.prototype.drawItemBackground.call(this, index);
+  }
+};
+
+Window_BattleStatus.prototype.drawItemStatus = function(index) {//再定義
+  const actor = this.actor(index);
+  $gameTemp.actorData = getActorPositionData(actor.actorId());
+  const statusData = $gameTemp.actorData.StatusListData;
+    if (statusData && statusData.length > 0) {
+      this.drawStatusListData(actor, statusData, index);
+    } else { 
+      const rect = this.itemRectWithPadding(index);
+      this.getGaugeMaxWidth(rect.width, rect.width);
+      const stateIconX = this.stateIconX(rect);
+      const stateIconY = this.stateIconY(rect);
+      if (params.StateVisible && !params.OutsideWindowVisible) {
+        this.placeStateIcon(actor, stateIconX, stateIconY);
+      }
+      if (params.TPBShow) {
+          const timeX = this.timeX(rect);
+          const timeY = this.timeY(rect);
+          this.placeTimeGauge(actor, timeX, timeY);
+      }
+      if (params.NameShow) {
+          const nameX = this.nameX(rect);
+          const nameY = this.nameY(rect);
+          this.placeActorName(actor, nameX, nameY);
+      }
+      const basicGaugesX = this.basicGaugesX(rect);
+      const basicGaugesY = this.basicGaugesY(rect);
+      this.placeBasicGauges(actor, basicGaugesX, basicGaugesY, rect);
+    }
+    $gameTemp.actorData = null;
+};
+
+Window_BattleStatus.prototype.drawStatusListData = function(actor, list, index) {
+  const rect = this.itemRectWithPadding(index);
+  list.forEach(data => {
+    this.getGaugeMaxWidth(rect.width, data.Width);
+    $gameTemp.userStatusParam = data;
+    switch (data.Status) {
+      case 'hpgauge':
+        this.placeGauge(actor, "hp", rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'mpgauge':
+        this.placeGauge(actor, "mp", rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'tpgauge':
+        this.placeGauge(actor, "tp", rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'tpb':
+        this.placeTimeGauge(actor, rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'state':
+        if (!params.OutsideWindowVisible) {
+          this.placeStateIcon(actor, rect.x + data.PositionX, rect.y + data.PositionY, data);
+        }
+        break;
+      case 'state2':
+        this.drawActorIcons(actor, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width), data);
+        break;
+      case 'name':
+        this.bs_PlaceActorName(actor, rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'lv':
+        this.drawLevel(actor, data, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      case 'param':
+        this.drawUserParam(actor, data, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      case 'usergauge':
+        this.placeGauge(actor, data.UserParamID, rect.x + data.PositionX, rect.y + data.PositionY);
+        break;
+      case 'dparam':
+        this.placeUserParam(actor, data.UserParamID, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      case 'imges':
+        this.drawActorImges(actor, data, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      default:
+        break;
+    }
+  });
+  $gameTemp.userStatusParam = null;
+};
+
+Window_BattleStatus.prototype.drawLevel = function(actor, data, x, y, width) {
+  this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+  this.changeTextColor(ColorManager.systemColor());
+  this.nuun_setContentsFontFace(data);
+  const nameText = data.ParamName ? data.ParamName : TextManager.levelA;
+  const textWidth = this.textWidth(nameText);
+  this.drawText(nameText, x, y, textWidth);
+  this.resetTextColor();
+  this.drawText(actor.level, x + textWidth + 8, y, width - (textWidth + 8), (data.NamePosition || 'right'));
+  this.resetFontSettings();
+};
+
+Window_BattleStatus.prototype.drawUserParam = function(actor, data, x, y, width) {
+  this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+  const a = actor;
+  const d = actor.actor();
+  const nameText = data.ParamName ? data.ParamName : '';
+  const textWidth = Math.max(60 , this.textWidth(nameText));
+  this.changeTextColor(ColorManager.systemColor());
+  this.nuun_setContentsFontFace(data);
+  if (nameText) {
+    this.drawText(nameText, x + textWidth, y, width - textWidth);
+  }
+  this.resetTextColor();
+  if (data.DetaEval) {
+      this.drawText(eval(data.DetaEval), x + textWidth + 8, y, width - (textWidth + 8), (data.NamePosition || 'right'));
+  }
+  this.resetFontSettings();
+};
+
+Window_BattleStatus.prototype.drawActorIcons = function(actor, x, y, width, data) {
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), (data.UserParamID || '_bsStateIcon2'));
+  const sprite = this.createInnerSprite(key, Sprite_BSActorStateIcon);
+  sprite.setup(actor, data);
+  sprite.move(x, y);
+  sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval1), this.getVisibleIcons(data.DetaEval2));
+  sprite.show();
+};
+
+Window_BattleStatus.prototype.drawActorImges = function(actor, data, x, y, width) {
+  if (data.ContentsImges) {
+    const key = "actor%1-imges%2".format(actor.actorId(), data.UserParamID || '_img');
+    const bitmap = ImageManager.nuun_LoadPictures(data.ContentsImges);
+    const sprite = this.createInnerSprite(key, Sprite_BSSprite);
+    sprite.setup(actor, data);
+    sprite.bitmap = bitmap;
+    sprite.x = x;
+    sprite.y = y;
+    sprite.anchor.x = 0.5;
+    sprite.anchor.y = 0.5;
+    sprite.show();
+  }
+};
+
+Window_BattleStatus.prototype.placeUserParam = function(actor, data, x, y) {
+  const key = "actor%1-userParam%2".format(actor.actorId(), data.UserParamID || 'dparam');
+  const sprite = this.createInnerSprite(key, Sprite_NuunUserParam);
+  sprite.setup(actor);
+  sprite.move(x, y);
+  sprite.show();
+};
+
+Window_BattleStatus.prototype.bs_PlaceActorName = function(actor, x, y) {
+  const key = "actor%1-name".format(actor.actorId());
+  const sprite = $gameTemp.userStatusParam ? this.createInnerSprite(key, Sprite_BSName) : this.createInnerSprite(key, Sprite_Name);
+  sprite.setup(actor);
+  sprite.move(x, y);
+  sprite.show();
+};
+
+Window_BattleStatus.prototype.placeStateIcon = function(actor, x, y, data) {
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), (data && data.UserParamID ? data.UserParamID : '_bsStateIcon'));
+  const sprite = this.createInnerSprite(key, Sprite_BSStateIcon);
+  sprite.setup(actor);
+  sprite.move(x, y);
+  if (data) {
+    sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval1), this.getVisibleIcons(data.DetaEval2));
+  }
+  sprite.show();
+};
+
+Window_BattleStatus.prototype.placeBasicGauges = function(actor, x, y, rect) {
+    let x2 = $gameTemp.actorData.HPChangePosition ? $gameTemp.actorData.ActorHP_X + rect.x : this.defaultGaugeX(x, 'hp');
+    let y2 = $gameTemp.actorData.HPChangePosition ? $gameTemp.actorData.ActorHP_Y + rect.y : this.defaultGaugeY(y, 'hp');
+    this.placeGauge(actor, "hp", x2, y2);
+    x2 = $gameTemp.actorData.MPChangePosition ? $gameTemp.actorData.ActorMP_X + rect.x : this.defaultGaugeX(x, 'mp');
+    y2 = $gameTemp.actorData.MPChangePosition ? $gameTemp.actorData.ActorMP_Y + rect.y : this.defaultGaugeY(y, 'mp');
+    this.placeGauge(actor, "mp", x2, y2);
+    if ($dataSystem.optDisplayTp) {
+        x2 = $gameTemp.actorData.TPChangePosition ? $gameTemp.actorData.ActorTP_X + rect.x : this.defaultGaugeX(x, 'tp');
+        y2 = $gameTemp.actorData.TPChangePosition ? $gameTemp.actorData.ActorTP_Y + rect.y : this.defaultGaugeY(y, 'tp');
+        this.placeGauge(actor, "tp", x2, y2);
+    }
+};
+
+Window_BattleStatus.prototype.getVisibleIcons = function(str) {
+  let states = [];
+  const dataEval = str;
+  if (dataEval) {
+    const stateList = dataEval.split(',');
+     for (const id of stateList) {
+        Array.prototype.push.apply(states, NuunManager.nuun_getListIdData(id));
+    }
+  }
+  return states;
+};
+
+Window_BattleStatus.prototype.defaultGaugeX = function(x, type) {
+  switch (type) {
+    case 'hp':
+      return params.bsMode === 'Standard' ? x : x;
+    case 'mp':
+      return params.bsMode === 'Standard' ? x + 134: x;
+    case 'tp':
+      return params.bsMode === 'Standard' ? x + 268: x;
+    case 'time':
+      return 
+  }
+};
+
+Window_BattleStatus.prototype.defaultGaugeY = function(y, type) {
+  switch (type) {
+    case 'hp':
+      return params.bsMode === 'Standard' ? y : y;
+    case 'mp':
+      return params.bsMode === 'Standard' ? y : y + this.gaugeLineHeight();
+    case 'tp':
+      return params.bsMode === 'Standard' ? y : y + this.gaugeLineHeight() * 2;
+    case 'time':
+      return params.bsMode === 'Standard' ? y : y;
+  }
+};
+
+Window_BattleStatus.prototype.placeGauge = function(actor, type, x, y) {
+  $gameTemp.bsGaugeType = type;
+  if (Imported.NUUN_GaugeImage) {
+    this.placeGaugeImg(actor, type, x, y);
+  }
+  const key = "actor%1-gauge-%2".format(actor.actorId(), type);
+  const sprite = $gameTemp.userStatusParam || $gameTemp.actorData ? this.createInnerSprite(key, Sprite_BSGauge) : this.createInnerSprite(key, Sprite_Gauge);
+  sprite.setup(actor, type);
+  sprite.move(x, y);
+  sprite.show();
+};
+
+const _Window_BattleStatus_nameX = Window_BattleStatus.prototype.nameX;
+Window_BattleStatus.prototype.nameX = function(rect) {
+  if (params.bsMode === 'Standard') {
+    return $gameTemp.actorData.NameChangePosition ? $gameTemp.actorData.ActorName_X + rect.x : rect.x;
+  } else {
+    return $gameTemp.actorData.NameChangePosition ? $gameTemp.actorData.ActorName_X + rect.x : _Window_BattleStatus_nameX.call(this, rect);
+  }
+};
+
+const _Window_BattleStatus_nameY = Window_BattleStatus.prototype.nameY;
+Window_BattleStatus.prototype.nameY = function(rect) {
+  if (params.bsMode === 'Standard') {
+    return $gameTemp.actorData.NameChangePosition ? $gameTemp.actorData.ActorName_Y + rect.y : rect.y + 10;
+  } else {
+    return $gameTemp.actorData.NameChangePosition ? $gameTemp.actorData.ActorName_Y + rect.y : _Window_BattleStatus_nameY.call(this, rect);
+  }
+};
+
+const _Window_BattleStatus_basicGaugesX = Window_BattleStatus.prototype.basicGaugesX;
+Window_BattleStatus.prototype.basicGaugesX = function(rect) {
+  if (params.bsMode === 'Standard') {
+    return rect.x + 180;
+  } else {
+    return _Window_BattleStatus_basicGaugesX.call(this, rect);
+  }
+};
+
+const _Window_BattleStatus_basicGaugesY = Window_BattleStatus.prototype.basicGaugesY;
+Window_BattleStatus.prototype.basicGaugesY = function(rect) {
+  if (params.bsMode === 'Standard') {
+    return rect.y + 8;
+  } else {
+    return _Window_BattleStatus_basicGaugesY.call(this, rect);
+  }
+};
+
+const _Window_BattleStatus_stateIconX = Window_BattleStatus.prototype.stateIconX;
+Window_BattleStatus.prototype.stateIconX = function(rect) {
+  if (params.bsMode === 'Standard') {
+    return $gameTemp.actorData.StateChangePosition ? $gameTemp.actorData.ActorState_X + rect.x : rect.x + 156;
+  } else {
+    return $gameTemp.actorData.StateChangePosition ? $gameTemp.actorData.ActorState_X + rect.x : _Window_BattleStatus_stateIconX.call(this, rect);
+  }
+};
+
+const _Window_BattleStatus_stateIconY = Window_BattleStatus.prototype.stateIconY;
+Window_BattleStatus.prototype.stateIconY = function(rect) {
+  if (params.bsMode === 'Standard') {
+    return $gameTemp.actorData.StateChangePosition ? $gameTemp.actorData.ActorState_Y + rect.y : rect.y + 22;
+  } else {
+    return $gameTemp.actorData.StateChangePosition ? $gameTemp.actorData.ActorState_Y + rect.y : _Window_BattleStatus_stateIconY.call(this, rect);
+  }
+};
+
+Window_BattleStatus.prototype.timeX = function(rect) {
+  if (params.bsMode === 'Standard') {
+    return $gameTemp.actorData.TPBChangePosition ? $gameTemp.actorData.ActorTPB_X + rect.x : rect.x;
+  } else {
+    return $gameTemp.actorData.TPBChangePosition ? $gameTemp.actorData.ActorTPB_X + rect.x : rect.x;
+  }
+};
+
+Window_BattleStatus.prototype.timeY = function(rect) {
+  if (params.bsMode === 'Standard') {
+    return $gameTemp.actorData.TPBChangePosition ? $gameTemp.actorData.ActorTPB_Y + rect.y : rect.y + 12;
+  } else {
+    return $gameTemp.actorData.TPBChangePosition ? $gameTemp.actorData.ActorTPB_Y + rect.y : this.basicGaugesY(rect) - this.gaugeLineHeight();
+  }
+};
+
+Window_BattleStatus.prototype.actorBackGround = function(actor, bitmap, x, y, width, height) {
+  this.contentsBack.blt(bitmap, 0, 0, width, height, x, y);
+};
+
+Window_BattleStatus.prototype.open = function() {
+    Window_Base.prototype.open.call(this);
+    if (this._window_battleActorImges) {
+        this._window_battleActorImges.open();
+        this._window_BattleActorStatus.open();
+    }
+};
+  
+Window_BattleStatus.prototype.close = function() {
+    Window_Base.prototype.close.call(this);
+    if (this._window_battleActorImges) {
+        this._window_battleActorImges.close();
+        this._window_BattleActorStatus.close();
+    }
+};
+
+const _Window_BattleStatus_show = Window_BattleStatus.prototype.show;
+  Window_BattleStatus.prototype.show = function() {
+    _Window_BattleStatus_show.call(this);
+    if (this._window_battleActorImges) {
+      this._window_battleActorImges.show();
+      this._window_BattleActorStatus.show();
+    }
+};
+
+const _Window_BattleStatus_hide = Window_BattleStatus.prototype.hide;
+Window_BattleStatus.prototype.hide = function() {
+    _Window_BattleStatus_hide.call(this);
+    if (this._window_battleActorImges) {
+      this._window_battleActorImges.hide();
+      this._window_BattleActorStatus.hide();
+    }
+};
+
+Window_BattleStatus.prototype.nuun_setContentsFontFace = function(data) {
+    this.contents.fontFace = data.FontFace ? data.FontFace : $gameSystem.mainFontFace();
+};
+
+//Window_BattleActorImges
+function Window_BattleActorImges() {
+    this.initialize(...arguments);
+}
+  
+Window_BattleActorImges.prototype = Object.create(Window_BattleStatus.prototype);
+Window_BattleActorImges.prototype.constructor = Window_BattleActorImges;
+
+Window_BattleActorImges.prototype.initialize = function(rect) {
+    Window_StatusBase.prototype.initialize.call(this, rect);
+    this.openness = 0;
+    this.opacity = 0;
+    this._opening = true;
+    this.visible = true;
+    this._bitmapsReady = 0;
+    this.setActorBaseSprite();
+    this.preparePartyRefresh();  
+};
+
+Window_BattleActorImges.prototype.setActorBaseSprite = function() {
+  const sprite = new Sprite();
+  this._actorImgBaseSprite = sprite;
+  this.addChild(sprite);
+  sprite.hide();
+};
+
+Window_BattleActorImges.prototype.drawItem = function(index) {
+  this.drawItemImage(index);
+  this.drawStatusBack(index);
+};
+
+Window_BattleActorImges.prototype.drawStatusListData = function(actor, list, index) {
+  const rect = this.itemRectWithPadding(index);
+  list.forEach(data => {
+    switch (data.Status) {
+      case 'imges':
+        this.drawActorImges(actor, data, rect.x + data.PositionX, rect.y + data.PositionY, Math.min(rect.width, data.Width));
+        break;
+      default:
+        break;
+    }
+  });
+};
+
+Window_BattleActorImges.prototype.drawItemStatus = function(index) {//再定義
+  const actor = this.actor(index);
+  const actorData = getActorPositionData(actor.actorId());
+  const statusData = actorData.StatusListData;
+    if (statusData && statusData.length > 0) {
+      this.drawStatusListData(actor, statusData, index);
+    }
+};
+
+Window_BattleActorImges.prototype.drawActorImges = function(actor, data, x, y, width) {
+  if (data.ContentsImges) {
+    const key = "actor%1-imges%2".format(actor.actorId(), data.UserParamID || '_img');
+    const bitmap = ImageManager.nuun_LoadPictures(data.ContentsImges);
+    const sprite = this.createActorImgSprite(key, Sprite);
+    sprite.bitmap = bitmap;
+    sprite.x = x;
+    sprite.y = y;
+    sprite.anchor.x = 0.5;
+    sprite.anchor.y = 0.5;
+    sprite.show();
+  }
+};
+
+Window_BattleActorImges.prototype.removeActorSprite = function() {
+    this._additionalSprites = Object.values(this._additionalSprites).filter(sprite => {
+        this._actorImgBaseSprite.removeChild(sprite);
+        return false;
+    });
+};
+
+Window_BattleActorImges.prototype.drawStatusBack = function(index) {
+  if (this._bitmapsReady >= $gameParty.members().length) {
+    const actor = this.actor(index);
+    const data = getActorPositionData(actor.actorId());
+    if (data.ActorFrontBackground) {
+      const rect = this.itemRect(index);
+      const bitmap = ImageManager.nuun_LoadPictures(data.ActorFrontBackground);
+      this.actorFrontBackGround(actor, bitmap, rect.x, rect.y, rect.width, rect.height);
+    }
+  }
+};
+
+Window_BattleActorImges.prototype.actorFrontBackGround = function(actor, bitmap, x, y, width, height) {
+  const key = "actor%1-Frontback-%2".format(actor.actorId());
+  const sprite = this.createActorImgSprite(key, Sprite);
+  sprite.bitmap = bitmap;
+  sprite.move(x + this.colSpacing(), y + 8);
+  sprite.width = width;
+  sprite.height = height;
+  sprite.show();
+};
+
+Window_BattleActorImges.prototype.drawItemBackground = function(index) {
+
+};
+
+Window_BattleActorImges.prototype.preparePartyRefresh = function() {
+    this.removeActorSprite();
+    this._bitmapsReady = 0;
+    this.actorMainSprite = [];
+    let bitmap = null;
+    for (const actor of $gameParty.members()) {
+        if (BattleManager.isOnActorPictureEX()) {
+            actor.imgRefresh();
+        } else {
+            actor.battleStyleImgRefresh();
+        }
+        bitmap = actor.getLoadBattleStyleImg();
+        this.actorMainSprite.push(bitmap);
+        if(bitmap && !bitmap.isReady()){
+        bitmap.addLoadListener(this.performPartyRefresh.bind(this, bitmap));
+        } else {
+        this.performPartyRefresh(bitmap);
+        }
+    }
+};
+
+Window_BattleActorImges.prototype.performPartyRefresh = function() {
+  this._bitmapsReady++;
+  if (this._bitmapsReady >= $gameParty.members().length) {
+      this.refresh();
+  }
+};
+
+Window_BattleActorImges.prototype.drawItemImage = function(index) {
+  const actor = this.actor(index);
+  if (actor.bsImgMode !== 'none' && actor.faceMode) {
+    this.drawItemFace(index, actor);
+  } else if (actor.bsImgMode !== 'none') {
+    this.drawItemBattler(index, actor);
+  }
+  if ($gameTemp.actorData && params.StateVisible && params.OutsideWindowVisible) {
+    const rect = this.itemRectWithPadding(index);
+    const statusData = $gameTemp.actorData.StatusListData;
+    if (statusData) {
+      const find = statusData.find(data => data.Status === 'state');
+      if (find) {
+        this.placeStateIcon(actor, rect.x + find.PositionX, rect.y + find.PositionY);
+      }
+    } else {
+      const stateIconX = this.stateIconX(rect);
+      const stateIconY = this.stateIconY(rect);
+      this.placeStateIcon(actor, stateIconX, stateIconY);
+    }
+  }
+};
+
+Window_BattleActorImges.prototype.drawItemBattler = function(index, actor) {
+  const bitmap = this.actorMainSprite[index];
+  const actorId = actor.actorId();
+  const positionData = getActorPositionData(actorId);
+  const actorImgData = getActorImgData(actorId);
+  const rect = this.itemRect(index);
+  let stateSprite = null;
+  if (bitmap) {
+    const key = "actor%1-BSImg".format(actor.actorId());
+    const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
+    const imgIndex = actor.getBSImgIndex();
+    if (!sprite._stateSprite && getStateAnimationShow()) {
+      stateSprite = new Sprite_StateOverlay();
+      this.addChild(stateSprite);
+    }
+    sprite._rectWidth = bitmap.width;
+    sprite._rectHeight = bitmap.height;
+    sprite.setup(actor, actorImgData, imgIndex, stateSprite);
+    const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 8) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
+    //const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
+    const y = rect.y + (actorImgData.ActorImgVPosition === 'under' ? this.height : 0) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + this.itemPadding() + (actorImgData ? actorImgData.Actor_Y : 0);
+    const scale = actorImgData.Actor_Scale / 100;
+    sprite.scale.x = scale;
+    sprite.scale.y = scale; 
+    sprite.setHome(x, y);
+    sprite.show();
+    if (params.Img_SW > 0 || params.Img_SH > 0) {
+      const oriScale = 1 / scale;
+      const sw = (params.Img_SW || Infinity) * oriScale;
+      const sh = (params.Img_SH || Infinity) * oriScale;
+      const sx = (actorImgData.Img_SX || 0) * oriScale + (actorImgData.ActorImgHPosition === 'center' ? (bitmap.width - sw) / 2 : 0);
+      const sy = (actorImgData.Img_SY || 0) * oriScale;
+      sprite.setFrame(sx, sy, sw, sh);
+    }
+    BattleManager.battlerSprite[index] = sprite;
+  }
+};
+
+Window_BattleActorImges.prototype.drawItemFace = function(index, actor) {
+  const actorId = actor.actorId();
+  const positionData = getActorPositionData(actorId);
+  const actorImgData = getActorImgData(actorId);
+  const rect = this.faceRect(index);
+  let stateSprite = null;
+  let width = rect.width || ImageManager.faceWidth;
+  let height = rect.height || ImageManager.faceHeight;
+  const key = "actor%1-BSImg".format(actor.actorId());
+  const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
+  const imgIndex = actor.getBSImgIndex();
+  if (!sprite._stateSprite && getStateAnimationShow()) {
+    stateSprite = new Sprite_StateOverlay();
+    this.addChild(stateSprite);
+  }
+  const scale = actorImgData.Actor_Scale / 100;
+  sprite.scale.x = scale;
+  sprite.scale.y = scale;
+  const pw = ImageManager.faceWidth;
+  const ph = ImageManager.faceHeight;
+  const sw = Math.min(width, pw);
+  const sh = Math.min(height, ph);
+  sprite._rectWidth = Math.min(pw, rect.width);
+  sprite._rectHeight = rect.height;
+  sprite.setup(actor, actorImgData, imgIndex, stateSprite);
+  const x = rect.x + (actorImgData.ActorImgHPosition === 'center' ? Math.floor(this.itemWidth() / 2) + 4 : 8) + (positionData.ImgChangePosition ? positionData.ActorImg_X : 0) + (actorImgData ? actorImgData.Actor_X : 0);
+  //const x = rect.x + (positionData.ImgChangePosition ? positionData.ActorImg_X : Math.floor(this.itemWidth() / 2) + 4) + (actorImgData ? actorImgData.Actor_X : 0);
+  const y = rect.y + (actorImgData.ActorImgVPosition === 'under' ? sh : 1) + (positionData.ImgChangePosition ? positionData.ActorImg_Y : 0) + (actorImgData ? actorImgData.Actor_Y : 0);
+  sprite.setHome(x, y);
+  const sx = Math.floor((imgIndex % 4) * pw + (pw - sw) / 2);
+  const sy = Math.floor(Math.floor(imgIndex / 4) * ph + (ph - sh) / 2);
+  sprite.setFrame(sx, sy, sw, sh);
+  sprite.show();
+  BattleManager.battlerSprite[index] = sprite;
+};
+
+Window_BattleActorImges.prototype.placeStateIcon = function(actor, x, y, data) {
+  const key = "actor%1-stateIcon%2".format(actor.actorId(), data ? data.UserParamID || 'dparam' : 'dparam');
+  const sprite = this.createActorImgSprite(key, Sprite_StateIcon);
+  sprite.setup(actor);
+  sprite.move(x, y);
+  if (data) {
+    sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval1), this.getVisibleIcons(data.detaEval2));
+  }
+  sprite.show();
+};
+
+Window_BattleActorImges.prototype.createActorImgSprite = function(key, spriteClass) {
+  const dict = this._additionalSprites;
+  if (dict[key]) {
+      return dict[key];
+  } else {
+      const sprite = new spriteClass();
+      dict[key] = sprite;
+      this._actorImgBaseSprite.addChild(sprite);
+      return sprite;
+  }
+};
+
+Window_BattleActorImges.prototype.open = function() {
+  Window_Base.prototype.open.call(this);
+  this._actorImgBaseSprite.show();
+};
+
+Window_BattleActorImges.prototype.close = function() {
+  Window_Base.prototype.close.call(this);
+  this._actorImgBaseSprite.hide();
+};
+
+
+//Window_BattleActorStatus
+function Window_BattleActorStatus() {
+    this.initialize(...arguments);
+}
+  
+Window_BattleActorStatus.prototype = Object.create(Window_BattleStatus.prototype);
+Window_BattleActorStatus.prototype.constructor = Window_BattleActorStatus;
+
+Window_BattleActorStatus.prototype.initialize = function(rect) {
+    Window_StatusBase.prototype.initialize.call(this, rect);
+    const filterArea = this._clientArea.filterArea;
+    this.openness = 0;
+    this.opacity = 0;
+    this._opening = true;
+    this.visible = true;
+    BattleManager.gaugeMaxWidth = params.ActorStatusVariable ? this.width : this.itemRectWithPadding(0).width;
+    BattleManager.rectMaxWidth = BattleManager.gaugeMaxWidth;
+    this.preparePartyRefresh();
+};
+
+Window_BattleActorStatus.prototype.getGaugeMaxWidth = function(width, width2) {
+  BattleManager.rectMaxWidth = Math.min(width, width2);
+};
+
+Window_BattleActorStatus.prototype._updateFilterArea = function() {
+  const pos = this._clientArea.worldTransform.apply(new Point(0, 0));
+  const filterArea = this._clientArea.filterArea;
+  filterArea.x = 0;
+  filterArea.y = 0;
+  filterArea.width = Graphics.width;
+  filterArea.height = Graphics.height;
+};
+
+Window_BattleActorStatus.prototype.preparePartyRefresh = function() {
+    $gameTemp.clearBattleRefreshRequest();
+    this.performPartyRefresh();
+};
+
+Window_BattleActorStatus.prototype.performPartyRefresh = function() {
+    this.refresh();
+};
+
+Window_BattleActorStatus.prototype.drawItemBackground = function(index) {
+
+};
+
+Window_BattleActorStatus.prototype.drawItem = function(index) {
+    this.drawItemStatus(index);
+};
+
+//Window_BattleActor
+const _Window_BattleActor_initialize = Window_BattleActor.prototype.initialize;
+Window_BattleActor.prototype.initialize = function(rect) {
+  _Window_BattleActor_initialize.call(this, rect);
+  this.opacity = 0;
+};
+
+Window_BattleActor.prototype.drawItemBackground = function(index) {
+
+};
+
+Window_BattleActor.prototype.preparePartyRefresh = function() {
+  this.refresh();
+};
+
+Window_BattleActor.prototype.drawItem = function(index) {
+
+};
+
+const _Window_BattleActor_refreshCursor = Window_BattleActor.prototype.refreshCursor;
+Window_BattleActor.prototype.refreshCursor = function() {
+  if (params.ActorSelectBackShow) {
+    _Window_BattleActor_refreshCursor.call(this);
+  } else {
+    this.setCursorRect(0, 0, 0, 0);
+  }
+};
+
+//Window_BattleEnemy
+const _Window_BattleEnemy_initialize = Window_BattleEnemy.prototype.initialize;
+Window_BattleEnemy.prototype.initialize = function(rect) {
+  _Window_BattleEnemy_initialize.call(this, rect);
+  this._bsBackground = null;
+  this.opacity = params.EnemyWindowShow ? 255 : 0;
+};
+
+Window_BattleEnemy.prototype.maxCols = function() {
+  return params.EnemyMaxCol;
+};
+
+if (params.EnemyNameDyingColor) {
+  Window_BattleEnemy.prototype.drawItem = function(index) {//再定義
+    const enemy = this._enemies[index];
+    this.changeTextColor(ColorManager.hpColor(enemy));
+    const name = enemy.name();
+    const rect = this.itemLineRect(index);
+    this.drawText(name, rect.x, rect.y, rect.width);
+  };
+}
+
+//Window_BattleSkill
+const _Window_BattleSkill_initialize = Window_BattleSkill.prototype.initialize;
+Window_BattleSkill.prototype.initialize = function(rect) {
+  _Window_BattleSkill_initialize.call(this, rect);
+  this._bsBackground = null;
+  this.opacity = params.SkillWindowShow ? 255 : 0;
+};
+
+if (params.SkillMaxCol > 0) {
+  Window_BattleSkill.prototype.maxCols = function() {
+    return params.SkillMaxCol;
+  };
+}
+
+Window_BattleSkill.prototype.selectionHide = function() {
+    if (params.HelpWindowSelectShow) {
+        Window_SkillList.prototype.hide.call(this);
+    } else {
+        Window_BattleSkill.prototype.hide.call(this);
+    }
+};
+  
+//Window_BattleItem
+const _Window_BattleItem_initialize =Window_BattleItem.prototype.initialize;
+Window_BattleItem.prototype.initialize = function(rect) {
+    _Window_BattleItem_initialize.call(this, rect);
+    this._bsBackground = null;
+    this.opacity = params.ItemWindowShow ? 255 : 0;
+};
+
+if (params.ItemMaxCol > 0) {
+    Window_BattleItem.prototype.maxCols = function() {
+        return params.ItemMaxCol;
+    };
+}
+
+Window_BattleItem.prototype.selectionHide = function() {
+    if (params.HelpWindowSelectShow) {
+        Window_ItemList.prototype.hide.call(this);
+    } else {
+        Window_SkillList.prototype.hide.call(this);
+    }
+};
+
+//Window_Help
+const _Window_Help_initialize = Window_Help.prototype.initialize;
+Window_Help.prototype.initialize = function(rect) {
+  _Window_Help_initialize.call(this, rect);
+};
+
+//Window_BattleLog
+const _Window_BattleLog_showEnemyAttackAnimation = Window_BattleLog.prototype.showEnemyAttackAnimation;
+  Window_BattleLog.prototype.showEnemyAttackAnimation = function(subject, targets) {
+    const id = subject.attackAnimation();
+    if (id > 0) {
+      this.showNormalAnimation(targets, id, false);
+    } else {
+      _Window_BattleLog_showEnemyAttackAnimation.call(this);
+    }
+};
+
+//Window_Message
+const _Window_Message_updateBackground = Window_Message.prototype.updateBackground;
+Window_Message.prototype.updateBackground = function() {
+    _Window_Message_updateBackground.call(this);
+    if ($gameParty.inBattle()) {
+        if (BattleManager.getDisplayMessageType() === "Appear" && params.AppearBackgroundImg) {
+            this.opacity = 0;
+        } else if (BattleManager.getDisplayMessageType() === "Victory" && params.VictoryBackgroundImg) {
+            this.opacity = 0;
+        } else if (BattleManager.getDisplayMessageType() === "Defeat" && params.LoseBackgroundImg) {
+            this.opacity = 0;
+        } else if (BattleManager.getDisplayMessageType() === "Escape" && params.EscapeBackgroundImg) {
+            this.opacity = 0;
+        } else if (BattleManager.getDisplayMessageType() === "EscapeFailure" && params.EscapeFailureBackgroundImg) {
+            this.opacity = 0;
+        }
+    }
+};
+
+function Window_BSActor() {
+  this.initialize(...arguments);
+}
+
+Window_BSActor.prototype = Object.create(Window_Selectable.prototype);
+Window_BSActor.prototype.constructor = Window_BSActor;
+
+Window_BSActor.prototype.initialize = function() {
+  this.windowSkin = ImageManager.loadSystem(params.ActorCommandWindowSkin);
+  Window_Selectable.prototype.initialize.call(this, bsRect);
+  this._actor = null;
+  this._data = null;
+};
+
+Window_BSActor.prototype.setup = function(actor, data, rect) {
+  this._actor = actor;
+  this._data = data;
+  this.move(rect);
+  this.loadWindowskin();
+  this.setWindowTone(data);
+};
+
+Window_BSActor.prototype.move = function() {
+  const rect = bsRect;
+  this.x = rect.x;
+  this.y = rect.y;
+  this.width = rect.width;
+  this.height = rect.height;
+};
+
+Window_BSActor.prototype.loadWindowskin = function() {
+  if (this._data && this._data.ActorWindowSkin) {
+    this.windowskin = ImageManager.loadSystem(this._data.ActorWindowSkin);
+  } else {
+    Window_Selectable.prototype.loadWindowskin.call(this);
+  }
+};
+
+Window_BSActor.prototype.setWindowTone = function(data) {
+  if (data.ActorWindowSkin) {
+    this.windowColor = data.ActorWindowColor;
+  } else {
+    this.windowColor = null;
+  }
+};
+
+Window_BSActor.prototype.updateTone = function() {
+  if (this.windowColor) {
+    const tone = this.windowColor;
+    this.setTone(tone.red, tone.green, tone.bule);
+  } else {
+    Window_Selectable.prototype.updateTone.call(this);
+  }
+};
+
+Window_BSActor.prototype.updateArrows = function() {
+  
+};
+
+//Sprite_Actor
+function Sprite_BSFrontActor() {
+  this.initialize(...arguments);
+}
+
+Sprite_BSFrontActor.prototype = Object.create(Sprite_Actor.prototype);
+Sprite_BSFrontActor.prototype.constructor = Sprite_BSFrontActor;
+
+Sprite_BSFrontActor.prototype.initialize = function(battler) {
+  Sprite_Actor.prototype.initialize.call(this, battler);
+};
+
+Sprite_BSFrontActor.prototype.initMembers = function() {
+    Sprite_Actor.prototype.initMembers.call(this);
+    this.viewFrontActor = (!$gameSystem.isSideView() && params.ActorEffectShow);
+    this.bsSprite = null;
+    this._bsHomeX = 0;
+    this._bsHomeY = 0;
+};
+
+Sprite_BSFrontActor.prototype.updateVisibility = function() {
+  Sprite_Actor.prototype.updateVisibility .call(this);
+    if (this.viewFrontActor) {
+      //this.visible = true;
+      this.visible = false;
+    }
+};
+
+Sprite_BSFrontActor.prototype.setActorHome = function(index) {
+  if (this.viewFrontActor) {
+    this.actorHomeRefresh(index);
+  }
+};
+
+Sprite_BSFrontActor.prototype.bsMainSprite = function() {
+    return this.bsSprite;
+};
+
+Sprite_BSFrontActor.prototype.updateSelectionEffect = function() {
+    const target = this.bsMainSprite();
+    if (target && this._battler.isSelected()) {
+        this._selectionEffectCount++;
+        if (this._selectionEffectCount % 30 < 15) {
+            target.setBlendColor([255, 255, 255, 64]);
+        } else {
             target.setBlendColor([0, 0, 0, 0]);
         }
-    };
-
-    Sprite_ActorImges.prototype.resetDamage = function() {
-        this.x = this._homeX;
-    };
-    
-    Sprite_ActorImges.prototype.resetZoom = function() {
-        this.scale.x = this._baseScale;
-        this.scale.y = this._baseScale;
-    };
-
-    Sprite_ActorImges.prototype.updateActorGraphic = function() {
-        const actor = this._battler;
-        if (actor) {
-            if (this.isFinalAttack(actor)) {
-                this._updateCount = 1;
-            } else if (actor.isDead() && !this.isDead()) {
-                this.setDeadUpdateCount();
-            } else if (actor.isAlive() && this.isDead()) {
-                this.setReviveUpdateCount();
-            } else if (actor.isAlive() && this._data.getGraphicName() && this._imgListId !== this._data.getGraphicIndex()) {
-                if (this._data.getImgId(1) || this._data.getImgId(2) || this._data.getImgId(3) || this._data.getImgId(15)) {
-                    this._updateCount = this.setDamageDuration();
-                } else if (this._data.getImgId(30)) {
-                    this._updateCount = this.setCounterDuration();
-                } else if (this._data.getImgId(20)) {
-                    this._updateCount = Infinity;
-                } else {
-                    this._updateCount = 1;
-                }
-            }
-        }
-        this.refreshActorGraphic(actor);
-        if (this._startUpdate) {
-            this._startUpdate = false;
-        }
-    };
-    
-    Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) {
-        if (actor && this._data.getGraphicName()) {
-            if (this._imgListId !== this._data.getGraphicIndex() && this._updateCount > 0) {
-                const bitmap = this._data.getLoadBattleStyleImg();
-                this._loadedBitmap = bitmap;
-                if (bitmap && !bitmap.isReady()) {
-                    bitmap.addLoadListener(this.setActorGraphic.bind(this, actor, bitmap));
-                } else if (bitmap) {
-                    this.setActorGraphic(actor, bitmap);
-                }
-                this._imgScenes = this.getImgScenes();
-                this._imgListId = this._data.getGraphicIndex();
-            }
-        }
-        const count = this._updateCount;
-        this.updateAnimation();
-        if (this._imgScenes === 'chant' && !actor.isChanting()) {
-            this.resetBattleStyleImg(actor);
-        } else if (actor.isBSActionBattlerImg()) {
-            if (!actor.isActing() && !this.isCounterSkillAction(actor)) {
-                actor.setBSActionBattlerImg(null);
-                this.resetBattleStyleImg(actor);
-            } else if (!this.isCounterSkillAction(actor) && this.isCounter()) {
-                actor.setBSActionBattlerImg(null);
-                this.resetBattleStyleImg(actor);
-            }
-        } else if (count > 0 && this._updateCount === 0) {
-            this.resetBattleStyleImg(actor);
-        }
-    };
-
-    Sprite_ActorImges.prototype.isFinalAttack = function(actor) {
-        return Imported.NUUN_FinalAttack && actor._onFinalAttack;
-    };
-    
-    Sprite_ActorImges.prototype.isCounter = function() {
-        return this._imgScenes === 'counter' || this._imgScenes === 'reflection' || this._imgScenes === 'counterEX';
-    };
-    
-    Sprite_ActorImges.prototype.isChangeOpacity = function(actor) {
-        return this.opacity !== this._data.getBattleStyleOpacity();
-    };
-    
-    Sprite_ActorImges.prototype.isCounterSkillAction = function(actor) {
-        return actor.isCounterSkillAction();
-    };
-    
-    Sprite_ActorImges.prototype.resetBattleStyleImg = function(actor) {
-        actor.resetBattleStyleImgId();
-    };
-    
-    Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
-        const pass = this._data.getGraphicName();
-        const name = pass ? pass.split('pictures/')[1] : null;
-        if (name && this.addApngChild && this.loadApngSprite(name)) {
-            this.addApngChild(name);
-            this._apngMode = true;
-            this.resetBitmapData(bitmap.width, bitmap.height);
-        } else {
-            this.resetApngActorImg();
-            this.bitmap = bitmap;
-            if (this._data.isFaceMode()) {
-                this.faceRefresh(this._data.getImgIndex());
-                this.resetBitmapData(this._rectWidth, this._rectHeight);
-            } else {
-                this.imgFrameRefresh();
-                this.resetBitmapData(bitmap.width, bitmap.height);
-            }
-            if (this.isDead()) {
-                this._actorImgesOpacity = this.isActorGraphicDead() ? (this.opacity - this._data.getBattleStyleOpacity()) : (this.opacity - 0);
-                this._durationOpacity = this.getFadeoutOpacity();
-                if (this._durationOpacity !== 0) {
-                    this._updateCount = this.setDeadDuration();
-                }
-            } else {
-                this._actorImgesOpacity = this.opacity - this._data.getBattleStyleOpacity();
-                this._durationOpacity = this.getFadeoutOpacity();
-                if (this._durationOpacity !== 0) {
-                    this._updateCount = 30;
-                }
-            }
-        }
-    };
-    
-    Sprite_ActorImges.prototype.updateAnimation = function(){
-        if (this._updateCount > 0) {
-            this._updateCount--;
-            if(this._durationOpacity > 0){
-                this.opacity -= this.getFadeoutOpacity() / this.setDeadDuration();
-                this.opacity = Math.max(this.opacity, 0);
-                this._durationOpacity = this.opacity;
-            } else if (this._durationOpacity < 0) {
-                this.opacity -= this.getFadeoutOpacity() / this.setDeadDuration();
-                this.opacity = Math.min(this.opacity, 255);
-                this._durationOpacity = this.opacity - this.getFadeoutOpacity();
-            }
-        }
-    };
-    
-    Sprite_ActorImges.prototype.getFadeoutOpacity = function() {
-        if (!this._actorImgesOpacity) {
-            this._actorImgesOpacity = 0;
-        }
-        return this._actorImgesOpacity;
-    };
-    
-    Sprite_ActorImges.prototype.getImgScenes = function() {
-        return this._data.getImgScenes();
-    };
-    
-    Sprite_ActorImges.prototype.faceRefresh = function(faceIndex) {
-        const pw = ImageManager.faceWidth;
-        const ph = ImageManager.faceHeight;
-        const sw = Math.min(this._rectWidth, pw);
-        const sh = Math.min(this._rectHeight, ph);
-        const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
-        const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
-        this.setFrame(sx, sy, sw, sh);
-        this._imgIndex = faceIndex;
-    };
-    
-    Sprite_ActorImges.prototype.imgFrameRefresh = function() {//画像を切り替えるリセットされるため再設定
-        const sw = (this._data.getImg_SW() || this._rectWidth);
-        const sh = (this._data.getImg_SH() || this._rectHeight);
-        const sx = (this._data.getImg_SX() || 0);
-        const sy = (this._data.getImg_SY() || 0);
-        this.setFrame(sx, sy, sw, sh);
-    };
-    
-    Sprite_ActorImges.prototype.setDeadUpdateCount = function() {
-        if (!params.ImgDeathHide) {
-            this._updateCount = 0;
-            this._actorImgesOpacity = 0;
-        }
-        if (this.isActorGraphicDead()) {
-            this._updateCount = 1;
-            this._actorImgesOpacity = (this.opacity - this._data.getBattleStyleOpacity());
-        } else if (params.ImgDeathHide || !this.isActorGraphicDead()) {
-            this._actorImgesOpacity = this.opacity - 0;
-        }
-        this._durationOpacity = this.getFadeoutOpacity();
-        if (this._durationOpacity !== 0) {
-            this._updateCount = this.setDeadDuration();
-        }
-        this.setActorDead(true);
-    };
-    
-    Sprite_ActorImges.prototype.setReviveUpdateCount = function(){
-        this._actorImgesOpacity = this.opacity - this._data.getBattleStyleOpacity();
-        this._durationOpacity = this.getFadeoutOpacity();
-        if (this._durationOpacity !== 0) {
-            this._updateCount = this.setDeadDuration();
-        }
-        this.setActorDead(false);
-    };
-    
-    Sprite_ActorImges.prototype.isActorGraphicDead = function() {
-        return this._data.isDeadImg();
-    };
-    
-    Sprite_ActorImges.prototype.setDeadDuration = function(){
-        return this._startUpdate ? 1 : 30;
-    };
-    
-    Sprite_ActorImges.prototype.setDamageDuration = function(){
-        return params.DamageImgFrame;
-    };
-    
-    Sprite_ActorImges.prototype.setCounterDuration = function(){
-        return params.CounterImgFrame;
-    };
-    
-    Sprite_ActorImges.prototype.setActorDead = function(flag){
-        this._isDead = flag;
-    };
-    
-    Sprite_ActorImges.prototype.isDead = function(){
-        return this._isDead;
-    };
-    
-    Sprite_ActorImges.prototype.resetApngActorImg = function() {
-        if (this._apngMode) {
-            this.destroyApngIfNeed();
-            this._apngMode = null;
-        }
-    };
-    
-    Sprite_ActorImges.prototype.destroy = function() {
-        this.resetApngActorImg();
-        Sprite.prototype.destroy.call(this);
-    };
-    
-    Sprite_ActorImges.prototype.loadApngSprite = function(name) {
-        return Sprite_Picture.prototype.loadApngSprite.call(this, name);
-    };
-
-
-    function Window_BSActorWindow() {
-        this.initialize(...arguments);
+    } else if (this._selectionEffectCount > 0) {
+        this._selectionEffectCount = 0;
+        target.setBlendColor([0, 0, 0, 0]);
     }
-      
-    Window_BSActorWindow.prototype = Object.create(Window_Selectable.prototype);
-    Window_BSActorWindow.prototype.constructor = Window_BSActorWindow;
-      
-    Window_BSActorWindow.prototype.initialize = function() {
-        Window_Selectable.prototype.initialize.call(this, _tempParams.getExParams());
-    };
+};
 
-    Window_BSActorWindow.prototype.setup = function(actor) {
-        this._actor = actor;
-        this._data = NuunManager.styleData.getActorData(actor);
-        this.loadWindowskin();
-        this.setWindowTone();
-    };
+Sprite_BSFrontActor.prototype.actorHomeRefresh = function(index) {
+    const rect = statusData.itemRectWithPadding(index);
+    let x = statusData.x + rect.x + Math.floor(rect.width / 2) + statusData.itemPadding() + params.ActorEffect_X;
+    let y = statusData.y + rect.y + Math.floor(rect.height / 2) + params.ActorEffect_Y;
+    if (params.bsMode === "Standard") {
+        y += Math.floor(ImageManager.faceHeight / 2);
+    }
+    this.setHome(x, y);
+};
 
-    Window_BSActorWindow.prototype.loadWindowskin = function() {
-        const skin = NuunManager.styleData.getWindowSkinEx(this._data, 'ActorWindowSkin');
-        if (skin) {
-            this.windowskin = ImageManager.loadSystem(skin);
-        } else {
-            Window_Base.prototype.loadWindowskin.apply(this, arguments);
+Sprite_BSFrontActor.prototype.setBattler = function(battler) {
+  Sprite_Actor.prototype.setBattler.call(this, battler);
+  const index = battler ? battler.index() : -1;
+  if (battler && battler === this._actor && this.viewFrontActor && $gameTemp.isBattleStyleRequested() && params.ActorEffectShow) {
+    this.setActorHome(index);
+  }
+  if (battler) {
+    this.bsSprite = BattleManager.battlerSprite[index];
+  }
+  $gameTemp.setBattleStyleRefresh(false);
+};
+
+Sprite_BSFrontActor.prototype.actorEffectCorrection = function() {
+    switch (params.bsMode) {
+        case "Standard":
+            return 32
+        case "Type4":
+            return 0;
+        default:
+            return -48;
+    }
+};
+
+Sprite_BSFrontActor.prototype.startMove = function(x, y, duration) {
+
+};
+
+Sprite_BSFrontActor.prototype.updateMotion = function() {
+
+};
+
+Sprite_BSFrontActor.prototype.update = function() {
+  Sprite_Actor.prototype.update.call(this);
+  if (this._actor) {
+      this.updateFrontActor();
+      this.updateBsPosition();
+  }
+};
+
+Sprite_BSFrontActor.prototype.updateFrontActor = function() {
+    if (this.viewFrontActor && $gameTemp.isBattleStyleRequested()) {
+      this.setActorHome(this._actor.index());
+    }
+};
+
+Sprite_BSFrontActor.prototype.updateBsPosition = function() {
+    if (this.viewFrontActor) {
+        const index = this._actor.index();
+        this.actorHomeRefresh(index);
+    }
+    //if (this.viewFrontActor) {
+    //   this._homeX = this._bsHomeX + statusData.x;
+    //    this._homeY = this._bsHomeY;
+    //}
+};
+
+Sprite_BSFrontActor.prototype.damageOffsetX = function() {
+  return (this.viewFrontActor ? 0 : Sprite_Actor.prototype.damageOffsetX.call(this)) + params.ActorDamage_X;
+};
+
+Sprite_BSFrontActor.prototype.damageOffsetY = function() {
+  return (this.viewFrontActor ? 0 : Sprite_Actor.prototype.damageOffsetY.call(this)) + params.ActorDamage_Y;
+};
+
+const _Sprite_Enemy_damageOffsetX = Sprite_Enemy.prototype.damageOffsetX;
+Sprite_Enemy.prototype.damageOffsetX = function() {
+  return _Sprite_Enemy_damageOffsetX.call(this) + params.EnemyDamage_X;
+};
+
+const _Sprite_Enemy_damageOffsetY = Sprite_Enemy.prototype.damageOffsetY;
+Sprite_Enemy.prototype.damageOffsetY = function() {
+  return _Sprite_Enemy_damageOffsetY.call(this) + params.EnemyDamage_Y;
+};
+
+const _Sprite_Enemy_startBossCollapse = Sprite_Enemy.prototype.startBossCollapse;
+Sprite_Enemy.prototype.startBossCollapse = function() {
+    _Sprite_Enemy_startBossCollapse.call(this);
+    if (Imported.NUUN_GamePadVibration && params.BossCollapseVibration && params.BossCollapseVibrationSetting) {
+        params.BossCollapseVibrationSetting.Duration = this.bitmap.height;
+        NuunManager.setupGamePadVibration(params.BossCollapseVibrationSetting);
+    }
+};
+
+const _Sprite_Animation_setup = Sprite_Animation.prototype.setup;
+Sprite_Animation.prototype.setup = function(targets, animation, mirror, delay, previous) {
+    this.setupFrontTargets(targets);
+    _Sprite_Animation_setup.call(this, targets, animation, mirror, delay, previous);
+};
+
+Sprite_Animation.prototype.setupFrontTargets = function(targets) {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        this._frontTargets = targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
+    }
+};
+
+const _Sprite_Animation_updateFlash = Sprite_Animation.prototype.updateFlash;
+Sprite_Animation.prototype.updateFlash = function() {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        const t = this._targets;
+        this._targets =  this._frontTargets;
+        _Sprite_Animation_updateFlash.call(this);
+        this._targets = t;
+        //target.hide();
+    } else {
+        _Sprite_Animation_updateFlash.call(this);
+    }
+};
+
+const _Sprite_AnimationMV_setup = Sprite_AnimationMV.prototype.setup;
+Sprite_AnimationMV.prototype.setup = function(targets, animation, mirror, delay) {
+    this.setupFrontTargets(targets);
+    _Sprite_AnimationMV_setup.call(this, targets, animation, mirror, delay);
+};
+
+Sprite_AnimationMV.prototype.setupFrontTargets = function(targets) {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        this._frontTargets = targets.map(sprite => sprite._actor && sprite.bsSprite ? sprite.bsSprite : sprite);
+    }
+};
+
+const _Sprite_AnimationMV_updateFlash = Sprite_AnimationMV.prototype.updateFlash;
+Sprite_AnimationMV.prototype.updateFlash = function() {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow ) {
+        const t = this._targets;
+        this._targets =  this._frontTargets;
+        _Sprite_AnimationMV_updateFlash.call(this);
+        this._targets = t;
+    } else {
+        _Sprite_AnimationMV_updateFlash.call(this);
+    }
+};
+
+const _Sprite_AnimationMV_startHiding = Sprite_AnimationMV.prototype.startHiding;
+Sprite_AnimationMV.prototype.startHiding = function(duration) {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        const t = this._targets;
+        this._targets =  this._frontTargets;
+        _Sprite_AnimationMV_startHiding.call(this, duration);
+        this._targets = t;
+    } else {
+        _Sprite_AnimationMV_startHiding.call(this, duration);
+    }
+};
+
+const _Sprite_AnimationMV_onEnd = Sprite_AnimationMV.prototype.onEnd;
+Sprite_AnimationMV.prototype.onEnd = function() {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        const t = this._targets;
+        this._targets =  this._frontTargets;
+        _Sprite_AnimationMV_onEnd.call(this);
+        this._targets = t;
+    } else {
+        _Sprite_AnimationMV_onEnd.call(this);
+    }
+};
+
+
+//Sprite_ActorImges
+function Sprite_ActorImges() {
+  this.initialize(...arguments);
+}
+
+Sprite_ActorImges.prototype = Object.create(Sprite.prototype);
+Sprite_ActorImges.prototype.constructor = Sprite_ActorImges;
+
+Sprite_ActorImges.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+};
+
+Sprite_ActorImges.prototype.initMembers = function() {
+    this._battler = null;
+    this._data = null;
+    this._imgScenes = 'default';
+    this._imgIndex = -1;
+    this._selectionEffectCount = 0;
+    this._shake = 0;
+    this._shakePower = params.ActorShakePower;
+    this._shakeSpeed = params.ActorShakeSpeed;
+    this._shakeDuration = 0;
+    this._shakeDirection = 1;
+    this._zoomDuration = 0;
+    this._zoomScale = 1;
+    this._zoomScaleTarget = 1.2;
+    this._updateCount = 0;
+    this._imgListId = -1;
+    this._durationOpacity = 0;
+    this._bsBitmapWidth = 0;
+    this._bsBitmapHeight = 0;
+    this._startUpdate = true;
+    this._zoomEffect = false;
+    this._apngMode = false;
+    this._loadedBitmap = null;
+};
+
+Sprite_ActorImges.prototype.setup = function(battler, data, index, stateSprite) {
+    this._battler = battler;
+    this._data = data;
+    this.anchor.x = data.ActorImgHPosition === 'center' ? 0.5 : 0.0 ;
+    this.anchor.y = data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
+    this._imgIndex = index;
+    battler.resetBattleStyleImgId();
+    this.updateActorGraphic();
+    this._stateSprite = stateSprite || this._stateSprite;
+    if (this._stateSprite && getStateAnimationShow()) {
+        this._stateSprite.setup(battler);
+        this._stateSprite.anchor.y = 0.5;
+        this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
+        this._stateSprite.y = this.y + this.getStateRectY() + this.getStatePositionY();
+    }
+    this.setBlendColor([0, 0, 0, 0]);
+};
+
+Sprite_ActorImges.prototype.setHome = function(x, y) {
+    this._homeX = x;
+    this._homeY = y;
+    this._baseScale = this._data ? this._data.Actor_Scale / 100 : 1;
+    this.move(x, y);
+};
+
+Sprite_ActorImges.prototype.resetBitmapData = function(width, height) {
+    this._bsBitmapWidth = width;
+    this._bsBitmapHeight = height;
+    this.y = this._homeY;//画像更新時に一旦戻す。
+};
+
+Sprite_ActorImges.prototype.update = function() {
+    Sprite.prototype.update.call(this);
+    if (this._battler) {
+        this.updateActorGraphic();
+        this.updateMotion();
+        //this.updateSelectionEffect();
+    } else {
+        this._stateSprite = null;
+        this.bitmap = null;
+    }
+};
+
+Sprite_ActorImges.prototype.refreshStateOverlay = function() {
+    if (this._stateSprite && getStateAnimationShow()) {
+        this._stateSprite.visible = this.visible;
+        if (this._loadedBitmap && this._loadedBitmap.isReady()) {
+            const scale = this._zoomScale * this._baseScale;
+            this._stateSprite.x = this.x + this.getStateRectX() + this.getStatePositionX();
+            const y = this.y + this.getStateRectY() + this.getStatePositionY();
+            this._stateSprite.y = ((this.anchor.y === 0.5 ? (this._bsBitmapHeight / 2 * scale) : 0) + y) * scale;
         }
-    };
+    }
+};
 
-    Window_BSActorWindow.prototype.setWindowTone = function() {
-        const windowColor = NuunManager.styleData.getWindowColorEx(this._data, 'ActorWindowColor');
-        if (windowColor) {
-            this.windowColor = windowColor;
+Sprite_ActorImges.prototype.updateMotion = function() {
+    this.refreshStateOverlay();
+    this.setupEffect();
+    this.updateDamage();
+    this.updateZoom();
+};
+
+Sprite_ActorImges.prototype.setupEffect = function() {
+    if (params.OnActorShake && this._battler.isBSDamageEffect()) {
+        this._shakeDuration = params.ActorShakeFlame;
+        this._battler._onDamageEffect = false;
+    }
+    if (params.OnActionZoom && this._battler.isBSEffectAction()) {
+        this._zoomDuration = params.ActionZoomDuration;
+        this._zoomEffect = true;
+        this._battler._isEffectAction = false;
+    }
+};
+
+Sprite_ActorImges.prototype.updateDamage = function() {
+  if (this._shakeDuration > 0 || this._shake !== 0) {
+    const delta = (this._shakePower * this._shakeSpeed * this._shakeDirection) / 10;
+    if (this._shakeDirection <= 1 && this._shake * (this._shake + delta) < 0) {
+      this._shake = 0;
+    } else {
+      this._shake += delta;
+    }
+    if (this._shake > this._shakePower * 2) {
+      this._shakeDirection = -1;
+    }
+    if (this._shake < -this._shakePower * 2) {
+      this._shakeDirection = 1;
+    }
+    this._shakeDuration--;
+    this.x += Math.round(this._shake);
+  } else if (this.x !== this._homeX) {
+    this.resetDamage();
+  }
+};
+
+Sprite_ActorImges.prototype.updateZoom = function() {
+    if (this._loadedBitmap && this._loadedBitmap.isReady()) {
+        if (this._zoomDuration > 0) {
+            this.anchor.y = 0.5;
+            this.anchor.x = 0.5;
+            const d = this._zoomDuration;
+            const t = this._zoomDuration <= params.ActionZoomDuration / 2 ? 1 : this._zoomScaleTarget;
+            this._zoomScale = ((this._zoomScale * (d - 1) + t) / d);
+            this._zoomDuration--;
+            const scale = this._zoomScale * this._baseScale;
+            this.scale.x = scale;
+            this.scale.y = scale;
+            if (this.x === this._homeX) {
+                this.x = this._homeX + (this._data.ActorImgHPosition === 'left' ? this._bsBitmapWidth / 2 * scale : 0);
+            }
+            if (this.y === this._homeY) {
+                this.y = this._homeY - (this._bsBitmapHeight / 2) * scale * (this._data.ActorImgVPosition === 'top' ? -1 : 1);
+            }
         } else {
-            this.windowColor = null;
+            if (this.scale.x !== this._baseScale) {
+                this.resetZoom();
+            }
+            if (this._zoomEffect) {
+                this._zoomEffect = false;
+                this.x = this._homeX;
+                this.y = this._homeY;
+                this.anchor.x = this._data.ActorImgHPosition === 'left' ? 0.0 : 0.5;
+                this.anchor.y = this._data.ActorImgVPosition === 'top' ? 0.0 : 1.0;
+            }
         }
-    };
+        if (this._apngMode) {
+            const scale = this._zoomScale * this._baseScale;
+            this._apngSprite.x = 0;
+            this._apngSprite.y = ((this.anchor.y === 0.5 ? (this._bsBitmapHeight / 2) : 0));
+        }
+    }
+};
 
-    Window_BSActorWindow.prototype.updateTone = function() {
-        if (this.windowColor) {
-            const tone = this.windowColor;
-            this.setTone(tone.red, tone.green, tone.bule);
+Sprite_ActorImges.prototype.getStateRectX = function() {
+  //const tag = 'BSStateA_X' + this._stateSprite._overlayIndex;
+    return params.ActorState_X + this._data.ActorState_X;// + (Number(this._battler.actor().meta[tag]) || 0);
+};
+
+Sprite_ActorImges.prototype.getStateRectY = function() {
+  //const tag = 'BSStateA_Y' + this._stateSprite._overlayIndex;console.log(tag)
+    return params.ActorState_Y + this._data.ActorState_Y;// + (Number(this._battler.actor().meta[tag]) || 0);
+};
+
+Sprite_ActorImges.prototype.getStatePositionX = function() {
+    return this._data.ActorImgHPosition === 'left' ? this.width / 2 : 0;
+};
+
+Sprite_ActorImges.prototype.getStatePositionY = function() {
+    return this._data.ActorImgVPosition === 'under' ? this._bsBitmapHeight * -1 : 0;
+};
+
+Sprite_ActorImges.prototype.resetDamage = function() {
+    this.x = this._homeX;
+};
+
+Sprite_ActorImges.prototype.resetZoom = function() {
+    this.scale.x = this._baseScale;
+    this.scale.y = this._baseScale;
+};
+
+Sprite_ActorImges.prototype.updateSelectionEffect = function() {
+    if (!params.ActorFlash) {
+        return;
+    }
+    const target = this;
+    if (this._battler.isSelected()) {
+        this._selectionEffectCount++;
+        if (this._selectionEffectCount % 30 < 15) {
+            target.setBlendColor([255, 255, 255, 64]);
         } else {
-            Window_Base.prototype.updateTone.apply(this, arguments);
+            target.setBlendColor([0, 0, 0, 0]);
         }
-    };
+    } else if (this._selectionEffectCount > 0) {
+        this._selectionEffectCount = 0;
+        target.setBlendColor([0, 0, 0, 0]);
+    }
+};
 
-    Window_BSActorWindow.prototype.updateArrows = function() {
+Sprite_ActorImges.prototype.updateActorGraphic = function() {
+    const actor = this._battler;
+    if (actor) {
+        if (actor.isDead() && !this.isDead()) {
+            this.setDeadUpdateCount();
+        } else if (actor.isAlive() && this.isDead()) {
+            this.setReviveUpdateCount();
+        } else if (actor.isAlive() && actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
+            if (actor.onImgId === 1 || actor.onImgId === 2 || actor.onImgId === 3 ||actor.onImgId === 15) {
+                this._updateCount = this.setDamageDuration();
+            } else if (actor.onImgId === 30) {
+                this._updateCount = this.setCounterDuration();
+            } else if (actor.onImgId === 20) {
+                this._updateCount = Infinity;
+            } else {
+                this._updateCount = 1;
+            }
+        }
+    }
+    this.refreshActorGraphic(actor);
+    if (this._startUpdate) {
+        this._startUpdate = false;
+    }
+};
+
+Sprite_ActorImges.prototype.refreshActorGraphic = function(actor) { 
+    if (actor && actor.getBSImgName()) {
+        if (this._imgListId !== actor.getBSGraphicIndex() && this._updateCount > 0) {
+            const bitmap = actor.getLoadBattleStyleImg();
+            this._loadedBitmap = bitmap;
+            if (bitmap && !bitmap.isReady()) {
+                bitmap.addLoadListener(this.setActorGraphic.bind(this, actor, bitmap));
+            } else if (bitmap) {
+                this.setActorGraphic(actor, bitmap);
+            }
+            this._imgScenes = this.getImgScenes(actor);
+            this._imgListId = actor.getBSGraphicIndex();
+        }
+    }
+    const count = this._updateCount;
+    this.updateAnimation();
+    if (this._imgScenes === 'chant' && !actor.isChanting()) {
+        this.resetBattleStyleImg(actor);
+    } else if (actor.isBSActionBattlerImg()) {
+        if (!actor.isActing() && !this.isCounterSkillAction(actor)) {
+            actor.setBSActionBattlerImg(null);
+            this.resetBattleStyleImg(actor);
+        } else if (!this.isCounterSkillAction(actor) && this.isCounter()) {
+            actor.setBSActionBattlerImg(null);
+            this.resetBattleStyleImg(actor);
+        }
+    } else if (count > 0 && this._updateCount === 0) {
+        this.resetBattleStyleImg(actor);
+    }
+};
+
+Sprite_ActorImges.prototype.isCounter = function() {
+    return this._imgScenes === 'counter' || this._imgScenes === 'reflection' || this._imgScenes === 'counterEX';
+};
+
+Sprite_ActorImges.prototype.isChangeOpacity = function(actor) {
+    return this.opacity !== actor.getBattleStyleOpacity();
+};
+
+Sprite_ActorImges.prototype.isCounterSkillAction = function(actor) {
+    return actor.isCounterSkillAction();
+};
+
+Sprite_ActorImges.prototype.resetBattleStyleImg = function(actor) {
+    actor.resetBattleStyleImgId();
+};
+
+Sprite_ActorImges.prototype.setActorGraphic = function(actor, bitmap) {
+    const pass = Imported.NUUN_ActorPicture && params.ActorPictureEXApp ? actor.getActorGraphicImg() : actor.getBSImgName();
+    const name = pass ? pass.split('pictures/')[1] : null;
+    if (name && this.addApngChild && this.loadApngSprite(name)) {
+        this.addApngChild(name);
+        this._apngMode = true;
+        this.resetBitmapData(bitmap.width, bitmap.height);
+    } else {
+        this.resetApngActorImg();
+        this.bitmap = bitmap;
+        if (actor.faceMode) {
+            this.faceRefresh(actor.getBSImgIndex());
+            this.resetBitmapData(this._rectWidth, this._rectHeight);
+        } else {
+            this.imgFrameRefresh();
+            this.resetBitmapData(bitmap.width, bitmap.height);
+        }
+        if (this.isDead()) {
+            this._actorImgesOpacity = this.isActorGraphicDead() ? (this.opacity - actor.getBattleStyleOpacity()) : (this.opacity - 0);
+            this._durationOpacity = this.getFadeoutOpacity();
+            if (this._durationOpacity !== 0) {
+                this._updateCount = this.setDeadDuration();
+            }
+        } else {
+            this._actorImgesOpacity = this.opacity - actor.getBattleStyleOpacity();
+            this._durationOpacity = this.getFadeoutOpacity();
+            if (this._durationOpacity !== 0) {
+                this._updateCount = 30;
+            }
+        }
+    }
+};
+
+Sprite_ActorImges.prototype.updateAnimation = function(){
+    if (this._updateCount > 0) {
+        this._updateCount--;
+        if(this._durationOpacity > 0){
+            this.opacity -= this.getFadeoutOpacity() / this.setDeadDuration();
+            this.opacity = Math.max(this.opacity, 0);
+            this._durationOpacity = this.opacity;
+        } else if (this._durationOpacity < 0) {
+            this.opacity -= this.getFadeoutOpacity() / this.setDeadDuration();
+            this.opacity = Math.min(this.opacity, 255);
+            this._durationOpacity = this.opacity - this.getFadeoutOpacity();
+        }
+    }
+};
+
+Sprite_ActorImges.prototype.getFadeoutOpacity = function() {
+    if (!this._actorImgesOpacity) {
+        this._actorImgesOpacity = 0;
+    }
+    return this._actorImgesOpacity;
+};
+
+Sprite_ActorImges.prototype.getImgScenes = function(actor) {
+    return actor._imgScenes;
+};
+
+Sprite_ActorImges.prototype.faceRefresh = function(faceIndex) {
+    const pw = ImageManager.faceWidth;
+    const ph = ImageManager.faceHeight;
+    const sw = Math.min(this._rectWidth, pw);
+    const sh = Math.min(this._rectHeight, ph);
+    const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+    const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+    this.setFrame(sx, sy, sw, sh);
+    this._imgIndex = faceIndex;
+};
+
+Sprite_ActorImges.prototype.imgFrameRefresh = function() {//画像を切り替えるリセットされるため再設定
+    const scale = this._data.Actor_Scale / 100;
+    if (params.Img_SW > 0 || params.Img_SH > 0) {
+        const oriScale = 1 / scale;
+        const sw = (params.Img_SW || Infinity) * oriScale;
+        const sh = (params.Img_SH || Infinity) * oriScale;
+        const sx = (this._data.Img_SX || 0) * oriScale + (this._data.ActorImgHPosition === 'center' ? (this.bitmap.width - sw) / 2 : 0);
+        const sy = (this._data.Img_SY || 0) * oriScale;
+        this.setFrame(sx, sy, sw, sh);
+    }
+};
+
+Sprite_ActorImges.prototype.setDeadUpdateCount = function() {
+    if (!params.ImgDeathHide) {
+        this._updateCount = 0;
+        this._actorImgesOpacity = 0;
+    }
+    if (this.isActorGraphicDead()) {
+        this._updateCount = 1;
+        this._actorImgesOpacity = (this.opacity - this._battler.getBattleStyleOpacity());
+    } else if (params.ImgDeathHide) {
+        this._actorImgesOpacity = this.opacity - 0;
+    }
+    this._durationOpacity = this.getFadeoutOpacity();
+    if (this._durationOpacity !== 0) {
+        this._updateCount = this.setDeadDuration();
+    }
+    this.setActorDead(true);
+};
+
+Sprite_ActorImges.prototype.setReviveUpdateCount = function(){
+    this._actorImgesOpacity = this.opacity - this._battler.getBattleStyleOpacity();
+    this._durationOpacity = this.getFadeoutOpacity();
+    if (this._durationOpacity !== 0) {
+        this._updateCount = this.setDeadDuration();
+    }
+    this.setActorDead(false);
+};
+
+Sprite_ActorImges.prototype.isActorGraphicDead = function() {
+    return this._battler.getActorGraphicDead();
+};
+
+Sprite_ActorImges.prototype.setDeadDuration = function(){
+    return this._startUpdate ? 1 : 30;
+};
+
+Sprite_ActorImges.prototype.setDamageDuration = function(){
+    return params.DamageImgFrame;
+};
+
+Sprite_ActorImges.prototype.setCounterDuration = function(){
+    return params.CounterImgFrame;
+};
+
+Sprite_ActorImges.prototype.setActorDead = function(flag){
+    this._isDead = flag;
+};
+
+Sprite_ActorImges.prototype.isDead = function(){
+    return this._isDead;
+};
+
+Sprite_ActorImges.prototype.resetApngActorImg = function() {
+    if (this._apngMode) {
+        this.destroyApngIfNeed();
+        this._apngMode = null;
+    }
+};
+
+Sprite_ActorImges.prototype.destroy = function() {
+    this.resetApngActorImg();
+    Sprite.prototype.destroy.call(this);
+};
+
+Sprite_ActorImges.prototype.loadApngSprite = function(name) {
+    return Sprite_Picture.prototype.loadApngSprite.call(this, name);
+};
+
+
+function Sprite_BSSprite() {
+    this.initialize(...arguments);
+}
   
-    };
+Sprite_BSSprite.prototype = Object.create(Sprite.prototype);
+Sprite_BSSprite.prototype.constructor = Sprite_BSSprite;
+  
+Sprite_BSSprite.prototype.initialize = function() {
+    Sprite.prototype.initialize.call(this);
+    this.initMembers();
+};
 
-   
+Sprite_BSSprite.prototype.initMembers = function() {
+    this._data = null;
+    this._battler = null;
+    this.hide();
+};
+
+Sprite_BSSprite.prototype.setup = function(battler, data) {
+    this._data = data;
+    this._battler = battler;
+};
+
+Sprite_BSSprite.prototype.update = function() {
+    this.updateImg();
+    Sprite.prototype.update.call(this);
+};
+
+Sprite_BSSprite.prototype.updateImg = function() {
+    if (this._data && !!this._data.DetaEval1) {
+        const actor = this._battler;
+        if (eval(this._data.DetaEval1)) {
+            if (this._hidden) {
+                this.show();
+            }
+        } else {
+            if (!this._hidden) {
+                this.hide();
+            }
+        }
+    }
+};
+
+//Sprite_BSGauge
+function Sprite_BSGauge() {
+  this.initialize(...arguments);
+}
+
+Sprite_BSGauge.prototype = Object.create(Sprite_Gauge.prototype);
+Sprite_BSGauge.prototype.constructor = Sprite_BSGauge;
+
+Sprite_BSGauge.prototype.initialize = function() {
+  this._statusType = $gameTemp.bsGaugeType;
+  this.userStatusParam = $gameTemp.userStatusParam;
+  this._data = $gameTemp.actorData;
+  this._gaugeHeight = this.getGBSGaugeHeight();
+  if (!params.ActorStatusVariable) {
+    this._gaugeWidth = Math.min(BattleManager.rectMaxWidth, this.getGBSGaugeWidth());
+  }
+  Sprite_Gauge.prototype.initialize.call(this);
+};
+
+Sprite_BSGauge.prototype.setup = function(battler, statusType) {
+  Sprite_Gauge.prototype.setup.call(this, battler, statusType);
+  const width = BattleManager.rectMaxWidth;
+  if (params.ActorStatusVariable && this.bitmapWidth() !== width) {
+    this._gaugeWidth = Math.min(BattleManager.rectMaxWidth, this.getGBSGaugeWidth());
+    this.redraw();
+  }
+};
+
+Sprite_BSGauge.prototype.bitmapWidth = function() {
+  return this._gaugeWidth ? this._gaugeWidth : this.bitmapBaseWidth();
+};
+
+Sprite_BSGauge.prototype.gaugeHeight = function() {
+  return this._gaugeHeight;
+};
+
+Sprite_BSGauge.prototype.bitmapBaseWidth = function() {
+  return params.ActorStatusVariable ? BattleManager.gaugeMaxWidth : Math.min(BattleManager.gaugeMaxWidth, BattleManager.rectMaxWidth);
+};
+
+Sprite_BSGauge.prototype.getGBSGaugeWidth = function() {
+  switch (this._statusType) {
+    case 'hp':
+      return this.userStatusParam ? this.userStatusParam.Width : this._data.HPGaugeWidth;
+    case 'mp':
+      return this.userStatusParam ? this.userStatusParam.Width : this._data.MPGaugeWidth;
+    case 'tp':
+      return this.userStatusParam ? this.userStatusParam.Width : this._data.TPGaugeWidth;
+    case 'time':
+    case "cast":
+      return this.userStatusParam ? this.userStatusParam.Width : this._data.TPBGaugeWidth;
+    default:
+      return this.userStatusParam ? this.userStatusParam.Width : 128;
+  }
+};
+
+Sprite_BSGauge.prototype.getGBSGaugeHeight = function() {
+  switch (this._statusType) {
+    case 'hp':
+      return this.userStatusParam ? this.userStatusParam.Height : this._data.HPGaugeHeight;
+    case 'mp':
+      return this.userStatusParam ? this.userStatusParam.Height : this._data.MPGaugeHeight;
+    case 'tp':
+      return this.userStatusParam ? this.userStatusParam.Height : this._data.TPGaugeHeight;
+    case 'time':
+    case "cast":
+      return this.userStatusParam ? this.userStatusParam.Height : this._data.TPBGaugeHeight;
+    default:
+      return this.userStatusParam ? this.userStatusParam.Height : 12;
+  }
+};
+
+Sprite_BSGauge.prototype.currentValue = function() {
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.currentValue.call(this);
+        default:
+            return eval(this.userStatusParam.DetaEval1);
+        }
+    } else {
+        return Sprite_Gauge.prototype.currentValue.call(this);
+    }
+};
+
+Sprite_BSGauge.prototype.currentMaxValue = function() {
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.currentMaxValue.call(this);
+        default:
+            return this.userStatusParam.DetaEval2 ? eval(this.userStatusParam.DetaEval2) : Sprite_Gauge.prototype.currentMaxValue.call(this);
+        }
+    } else {
+        return Sprite_Gauge.prototype.currentMaxValue.call(this);
+    }
+};
+
+Sprite_BSGauge.prototype.label = function() {
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.label.call(this);
+        default:
+            return this.userStatusParam.ParamName;
+    }
+  } else {
+    return Sprite_Gauge.prototype.label.call(this);
+  }
+};
+
+Sprite_BSGauge.prototype.gaugeColor1 = function() {
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.gaugeColor1.call(this);
+        default:
+            return NuunManager.getColorCode(this.userStatusParam.Color1);
+        }
+    } else {
+        return Sprite_Gauge.prototype.gaugeColor1.call(this);
+    }
+};
+
+Sprite_BSGauge.prototype.gaugeColor2 = function() {
+    if (this._battler && this.userStatusParam) {
+        switch (this._statusType) {
+        case "hp":
+        case "mp":
+        case "tp":
+        case "time":
+        case "cast":
+            return Sprite_Gauge.prototype.gaugeColor2.call(this);
+        default:
+            return NuunManager.getColorCode(this.userStatusParam.Color2);
+        }
+    } else {
+        return Sprite_Gauge.prototype.gaugeColor2.call(this);
+    }
+};
+
+//Sprite_NuunUserParam
+function Sprite_NuunUserParam() {
+  this.initialize(...arguments);
+}
+
+Sprite_NuunUserParam.prototype = Object.create(Sprite.prototype);
+Sprite_NuunUserParam.prototype.constructor = Sprite_NuunUserParam;
+
+Sprite_NuunUserParam.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+  this.createBitmap();
+};
+
+Sprite_NuunUserParam.prototype.initMembers = function() {
+  this._battler = null;
+  this._textColor = "";
+  this.userStatusParam = $gameTemp.userStatusParam;
+  this._gaugeWidth = this.userStatusParam.Width;
+  this._gaugeHeight = this.userStatusParam.Height;
+};
+
+Sprite_NuunUserParam.prototype.setup = function(battler) {
+  this._battler = battler;
+  this._paramData = null;
+  this.updateBitmap();
+};
+
+Sprite_NuunUserParam.prototype.destroy = function(options) {
+  this.bitmap.destroy();
+  Sprite.prototype.destroy.call(this, options);
+};
+
+Sprite_NuunUserParam.prototype.update = function() {
+  Sprite.prototype.update.call(this);
+  this.updateBitmap();
+};
+
+
+Sprite_NuunUserParam.prototype.createBitmap = function() {
+  const width = this.bitmapWidth();
+  const height = this.bitmapHeight();
+  this.bitmap = new Bitmap(width, height);
+};
+
+Sprite_NuunUserParam.prototype.bitmapWidth = function() {
+  return this._gaugeWidth;
+};
+
+Sprite_NuunUserParam.prototype.bitmapHeight = function() {
+  return this._gaugeHeight;
+};
+
+Sprite_NuunUserParam.prototype.updateBitmap = function() {
+  const _param = eval(this.userStatusParam.DetaEval1);
+  if (this._paramData !== _param) {
+    this._paramData = _param;
+    this.redraw();
+  }
+};
+
+Sprite_NuunUserParam.prototype.redraw = function() {
+  const paramName = this.userStatusParam.ParamName ? this.userStatusParam.ParamName : '';
+  const width = this.bitmapWidth();
+  const height = this.bitmapHeight();
+  this.setupFont();
+  this.bitmap.clear();
+  this.bitmap.textColor = ColorManager.systemColor();
+  const textWidth = Math.max(60 , this.bitmap.measureTextWidth(paramName));
+  this.bitmap.drawText(paramName, 0, 0, width - textWidth, height);
+  this.bitmap.textColor = ColorManager.normalColor();
+  this.bitmap.drawText(this._paramData, textWidth + 8, 0, width - (textWidth + 8), height, 'right');
+};
+
+Sprite_NuunUserParam.prototype.fontSize = function() {
+  return $gameSystem.mainFontSize() +  (this.userStatusParam.FontSize || 0);
+};
+
+Sprite_NuunUserParam.prototype.setupFont = function() {
+  this.bitmap.fontSize = this.fontSize();
+};
+
+
+function Sprite_BSName() {
+  this.initialize(...arguments);
+}
+
+Sprite_BSName.prototype = Object.create(Sprite_Name.prototype);
+Sprite_BSName.prototype.constructor = Sprite_BSName;
+
+Sprite_BSName.prototype.initialize = function() {
+  this.userStatusParam = $gameTemp.userStatusParam;
+  this._nameHeight = this.userStatusParam.Height > 24 ? this.userStatusParam.Height : 24;
+  if (!params.ActorStatusVariable) {
+    this._nameWidth = Math.min(BattleManager.rectMaxWidth, this.getGBSNameWidth());
+  }
+  Sprite_Name.prototype.initialize.call(this);
+};
+
+Sprite_BSName.prototype.setup = function(battler) {
+  Sprite_Name.prototype.setup.call(this, battler);
+  const width = BattleManager.rectMaxWidth;
+  if (params.ActorStatusVariable && this.bitmapWidth() !== width) {
+    this._nameWidth = Math.min(BattleManager.rectMaxWidth, this.getGBSNameWidth());
+    this.redraw();
+  }
+};
+
+Sprite_BSName.prototype.bitmapWidth = function() {
+  return this._nameWidth ? this._nameWidth : this.bitmapBaseWidth();
+};
+
+Sprite_BSName.prototype.bitmapHeight = function() {
+  return this._nameHeight;
+};
+
+Sprite_BSName.prototype.bitmapBaseWidth = function() {
+  return params.ActorStatusVariable ? BattleManager.gaugeMaxWidth : Math.min(BattleManager.gaugeMaxWidth, BattleManager.rectMaxWidth);
+};
+
+Sprite_BSName.prototype.getGBSNameWidth = function() {
+  return this.userStatusParam ? this.userStatusParam.Width : 128;
+};
+
+Sprite_BSName.prototype.fontSize = function() {
+  return $gameSystem.mainFontSize() +  (this.userStatusParam.FontSize || 0);
+};
+
+Sprite_BSName.prototype.fontFace = function() {
+    if (this.userStatusParam && this.userStatusParam.FontFace) {
+        return this.userStatusParam.FontFace;
+    } else if (params.ActorNameFont) {
+        return params.ActorNameFont;
+    } else {
+        return Sprite_Name.prototype.fontFace.call(this);
+    }
+};
+
+Sprite_BSName.prototype.redraw = function() {
+    const name = this.name();
+    const width = this.bitmapWidth();
+    const height = this.bitmapHeight();
+    this.setupFont();
+    this.bitmap.clear();
+    this.bitmap.drawText(name, 0, 0, width, height, (this.userStatusParam.NamePosition || 'left'));
+};
+
+
+const _Sprite_StateIcon_initMembers = Sprite_StateIcon.prototype.initMembers;
+Sprite_StateIcon.prototype.initMembers = function() {
+    _Sprite_StateIcon_initMembers.call(this);
+    this._bsVisibleStates = [];
+    this._bsVisibleBuffs = [];
+};
+
+Sprite_StateIcon.prototype.setupVisibleIcons = function(list1, list2) {
+    this._bsVisibleStates = list1;
+    this._bsVisibleBuffs = list2;
+};
+
+const _Sprite_StateIcon_shouldDisplay = Sprite_StateIcon.prototype.shouldDisplay;
+Sprite_StateIcon.prototype.shouldDisplay = function() {
+    const result = _Sprite_StateIcon_shouldDisplay.call(this);
+    BattleManager.bsVisibleStates = [];
+    BattleManager.bsVisibleBuffs = [];
+    if (result && this._battler && this._battler.isActor()) {
+        BattleManager.bsVisibleStates = this._bsVisibleStates;
+        BattleManager.bsVisibleBuffs = this._bsVisibleBuffs;
+    }
+    return result
+};
+
+
+function Sprite_BSStateIcon() {
+  this.initialize(...arguments);
+}
+
+Sprite_BSStateIcon.prototype = Object.create(Sprite_StateIcon.prototype);
+Sprite_BSStateIcon.prototype.constructor = Sprite_BSStateIcon;
+
+Sprite_BSStateIcon.prototype.initialize = function() {
+  Sprite_StateIcon.prototype.initialize.call(this);
+};
+
+Sprite_BSStateIcon.prototype.updateFrame = function() {
+  this._index = this._battler && this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : this._index;
+  Sprite_StateIcon.prototype.updateFrame.call(this);
+};
+
+Sprite_BSStateIcon.prototype.updateIcon = function() {
+  Sprite_StateIcon.prototype.updateIcon.call(this);
+  if (this._battler && this._battler.isActor() && params.NoStateIcon > 0 && this._iconIndex === 0) {
+    this._iconIndex = params.NoStateIcon;
+  }
+};
+
+Sprite_BSStateIcon.prototype.setFrameIcon = function(sprite) {
+  sprite._iconIndex = this._battler && this._battler.isActor() && params.NoneStateIcon > 0 ? params.NoneStateIcon : sprite._iconIndex;
+  Sprite_StateIcon.prototype.setFrameIcon.call(this, sprite);
+};
+
+
+function Sprite_BSActorStateIcon() {
+  this.initialize(...arguments);
+}
+
+Sprite_BSActorStateIcon.prototype = Object.create(Sprite_StateIcon.prototype);
+Sprite_BSActorStateIcon.prototype.constructor = Sprite_BSActorStateIcon;
+
+Sprite_BSActorStateIcon.prototype.initialize = function() {
+  Sprite.prototype.initialize.call(this);
+  this.initMembers();
+  this.createBitmap();
+  this.loadBitmap();
+};
+
+Sprite_BSActorStateIcon.prototype.initMembers = function() {
+    //this.userStatusParam = $gameTemp.userStatusParam;
+    this._battler = null;
+    this._animationCount = 0;
+    this.anchor.x = 0;
+    this.anchor.y = 0;
+    this._bsVisibleStates = [];
+    this._bsVisibleBuffs = [];
+};
+
+Sprite_BSActorStateIcon.prototype.bitmapWidth = function() {
+  return this._iconWidth ? this._iconWidth : BattleManager.gaugeMaxWidth;
+};
+
+Sprite_BSActorStateIcon.prototype.bitmapHeight = function() {
+  return 36;
+};
+
+Sprite_BSActorStateIcon.prototype.createBitmap = function() {
+  const width = this.bitmapWidth();
+  const height = this.bitmapHeight();
+  this.bitmap = new Bitmap(width, height);
+};
+
+Sprite_BSActorStateIcon.prototype.loadBitmap = function() {
+  this.iconBitmap = ImageManager.loadSystem("IconSet");
+};
+
+Sprite_BSActorStateIcon.prototype.setupVisibleIcons = function(list1, list2) {
+    this._bsVisibleStates = list1;
+    this._bsVisibleBuffs = list2;
+};
+
+Sprite_BSActorStateIcon.prototype.setup = function(battler, data) {
+  if (this._battler !== battler) {
+      this._battler = battler;
+      this._animationCount = this.updateWait();
+  }
+  const width = BattleManager.rectMaxWidth;
+  if (this._iconWidth !== width) {
+    this._iconWidth = width;
+    this.updateIcon();
+  }
+};
+
+Sprite_BSActorStateIcon.prototype.update = function() {
+  Sprite.prototype.update.call(this);
+  this._animationCount++;
+  if (this._animationCount >= this.updateWait()) {
+      this.updateIcon();
+      this._animationCount = 0;
+  }
+};
+
+Sprite_BSActorStateIcon.prototype.updateWait = function() {
+  return 1;
+};
+
+Sprite_BSActorStateIcon.prototype.updateIcon = function() {
+    this.bitmap.clear();
+    let icons = [];
+    const iconWidth = ImageManager.iconWidth;
+    const actor = this._battler;
+    if (this.shouldDisplay()) {
+        icons.push(...actor.allIcons().slice(0, Math.floor(this.bitmapWidth() / iconWidth)));
+    }
+    if (icons.length > 0) {
+        let iconX = 0;
+        const y = 0;
+        for (const icon of icons) {
+            this.drawIcon(icon, iconX, y);
+            iconX += iconWidth;
+        }
+    }    
+};
+
+Sprite_BSActorStateIcon.prototype.drawIcon = function(iconIndex, x, y) {
+  const bitmap = ImageManager.loadSystem("IconSet");
+  const pw = ImageManager.iconWidth;
+  const ph = ImageManager.iconHeight;
+  const sx = (iconIndex % 16) * pw;
+  const sy = Math.floor(iconIndex / 16) * ph;
+  this.bitmap.blt(bitmap, sx, sy, pw, ph, x, y);
+};
+
+
+//Spriteset_Base 
+const _Spriteset_Base_animationShouldMirror = Spriteset_Base.prototype.animationShouldMirror;
+Spriteset_Base.prototype.animationShouldMirror = function(target) {
+    return params.ActorsMirror ? _Spriteset_Base_animationShouldMirror.call(this, target) : false;
+};
+
+
+//Spriteset_Battle
+const _Spriteset_Battle_initialize = Spriteset_Battle.prototype.initialize;
+Spriteset_Battle.prototype.initialize = function() {
+    _Spriteset_Battle_initialize.call(this);
+    this.createStatusLayer();
+};
+
+const _Spriteset_Battle_createLowerLayer = Spriteset_Battle.prototype.createLowerLayer;
+Spriteset_Battle.prototype.createLowerLayer = function() {
+    _Spriteset_Battle_createLowerLayer.call(this);
+    if (params.BattleShowWeather === "Show") {
+        this.createWeather(this);//天候
+    }
+};
+
+const _Spriteset_Battle_findTargetSprite = Spriteset_Battle.prototype.findTargetSprite;
+Spriteset_Battle.prototype.findTargetSprite = function(target) {
+  const targetSprite = _Spriteset_Battle_findTargetSprite.call(this, target);
+  this._effectsContainer = this.animationTarget(targetSprite) ? this._effectsFrontContainer : this._effectsBackContainer;
+  return targetSprite;
+};
+
+Spriteset_Battle.prototype.animationTarget = function(targetSprites){
+  if(!$gameSystem.isSideView() && params.ActorEffectShow && targetSprites && targetSprites.viewFrontActor) {
+    return !!targetSprites._battler.isActor();
+  }
+  return false;
+};
+
+Spriteset_Battle.prototype.createStatusLayer = function() {
+    this.createBattleHud();//ベーススプライト
+    this.createHudBack();//ウィンドウ、アクターグラフィック
+    this.createEffects();//アニメーション
+    if (params.BattleShowWeather === "ShowFront") {
+        this.createWeather(this._battleHudBase);//天候
+    }
+    this.createHudStatus();//ステータス
+    this.createFrontActors();
+};
+
+Spriteset_Battle.prototype.createBattleHud = function() {
+    const sprite = new Sprite();
+    this.addChild(sprite);
+    this._battleHudBase = sprite;
+};
+
+const _Spriteset_Battle_update = Spriteset_Battle.prototype.update;
+Spriteset_Battle.prototype.update = function() {
+    _Spriteset_Battle_update.call(this);
+    this.updateEffects();
+    if (params.BattleShowWeather !== "None" && isBattleWeather()) {
+        this.updateWeather();
+    }
+};
+
+const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
+Spriteset_Battle.prototype.updateActors = function() {
+    this.addBsCreateActors();
+    _Spriteset_Battle_updateActors.apply(this, arguments);
+};
+
+Spriteset_Battle.prototype.createHudBack = function() {
+    const sprite = new Sprite();
+    this._battleHudBase.addChild(sprite);
+    this._battleHudBack = sprite;
+};
+
+Spriteset_Battle.prototype.createHudStatus = function() {
+    const sprite = new Sprite();
+    this._battleHudBase.addChild(sprite);
+    this._battleHudFront = sprite;
+};
+
+Spriteset_Battle.prototype.createEffects = function() {
+    const sprite = this.setBattleBase();
+    this._battleHudBase.addChild(sprite);
+    this._battleEffects = sprite;
+    this._effectsFrontContainer = sprite;
+};
+
+Spriteset_Battle.prototype.createDamege = function() {
+  const sprite = this.setBattleBase();
+  this._battleHudBase.addChild(sprite);
+  this._battleDamege = sprite;
+};
+
+Spriteset_Battle.prototype.addBsCreateActors = function() {
+    if (!$gameSystem.isSideView() && params.ActorEffectShow && this._actorSprites && $gameParty.maxBattleMembers() > this._actorSprites.length) {
+        const count = $gameParty.maxBattleMembers() - this._actorSprites.length;
+        for (let i = 0; i < count; i++) {
+            const sprite = new Sprite_Actor();
+            this._actorSprites.push(sprite);
+            this._battleDamege.addChild(sprite);
+        }
+    }  
+};
+
+Spriteset_Battle.prototype.updateEffects = function() {   
+  //this._battleDamege.x = this._battleEffects.x;
+  //this._battleDamege.y = this._battleEffects.y;
+};
+
+Spriteset_Battle.prototype.setBattleBase = function() {
+    const width = Graphics.boxWidth;
+    const height = Graphics.boxHeight;
+    const x = 0;
+    const y = 0;
+    const sprite = new Sprite();
+    sprite.setFrame(0, 0, width, height);
+    sprite.x = x;
+    sprite.y = y - this.battleFieldOffsetY();
+    sprite.home_x = x;
+    return sprite;
+};
+
+Spriteset_Battle.prototype.createFrontActors = function() {
+  this.createDamege();
+    if (!$gameSystem.isSideView() && params.ActorEffectShow) {
+        this._actorSprites = [];
+        for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
+            const sprite = new Sprite_BSFrontActor();
+            this._actorSprites.push(sprite);
+            this._battleDamege.addChild(sprite);
+        }
+    }
+};
+
+const _Spriteset_Battle_createBattleField = Spriteset_Battle.prototype.createBattleField;
+Spriteset_Battle.prototype.createBattleField = function() {
+  _Spriteset_Battle_createBattleField.call(this);
+  this._effectsBackContainer = this._battleField;
+};
+
+if (params.BattleShowWeather !== "None") {
+    Spriteset_Battle.prototype.createWeather = function(sprite) {
+        this._weather = new Weather();
+        sprite.addChild(this._weather);
+    };
+    
+    Spriteset_Battle.prototype.updateWeather = function() {    
+        this._weather.type = $gameScreen.weatherType();
+        this._weather.power = $gameScreen.weatherPower();
+    };
+}
+
+const _Game_Interpreter_command236 = Game_Interpreter.prototype.command236;
+Game_Interpreter.prototype.command236 = function(c_params) {
+    if ($gameParty.inBattle() && params.BattleShowWeather !== "None" && isBattleWeather()) {
+        $gameScreen.changeWeather(c_params[0], c_params[1], c_params[2]);
+        if (c_params[3]) {
+            this.wait(c_params[2]);
+        }
+    }
+    return _Game_Interpreter_command236.call(this, c_params);
+};
+
+function conditionsParam(data, param, maxParam) {
+  return (param >= maxParam * data.DwLimit / 100 && (data.UpLimit > 0 ? (param <= maxParam * data.UpLimit / 100) : true));
+};
+
+function isBattleWeather() {
+    return params.BattleWeatherSwitch > 0 ? $gameSwitches.value(params.BattleWeatherSwitch) : true;
+};
+
 })();

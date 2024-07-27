@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.4
+ * @version 3.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,6 +70,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/27/2024 Ver.3.0.5
+ * Added the ability to set the number of content columns in the save info window.
+ * Added the ability to specify decimal points for some items.
  * 6/22/2024 Ver.3.0.4
  * Fixed an issue where item width was not applied wider than the width of a single item.
  * 6/1/2024 Ver.3.0.3
@@ -294,8 +297,8 @@
  * @parent SaveSetting
  * 
  * @param SaveContentsCols
- * @desc Number of save items to display on screen.
- * @text Number of display save items
+ * @desc Number of save columns to display on screen.
+ * @text Number of display save item columns
  * @type number
  * @default 2
  * @min 1
@@ -729,6 +732,13 @@
  * @value 10
  * @default 0
  * 
+ * @param SaveStatusContentsCols
+ * @desc Number of save columns to display on screen.
+ * @text Number of display save item columns
+ * @type number
+ * @default 2
+ * @min 1
+ * 
  * @param WindowX
  * @text Window x coordinate
  * @desc Window x coordinate.
@@ -810,7 +820,7 @@
  * @value Lcation
  * @option Money(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value Gold
- * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)
+ * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)(16)
  * @value OriginalParam
  * @option Fail name(1)(2)(3)(4)(5)(8)
  * @value FileName
@@ -848,7 +858,7 @@
  * @type number
  * @default 1
  * @min 1
- * @max 3
+ * @max 4
  * 
  * @param Y_Position
  * @desc Y display row position.
@@ -961,6 +971,14 @@
  * @type string
  * @default
  * 
+ * @param Decimal
+ * @text Decimal digits(16)
+ * @desc The number of decimal places that can be displayed.
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
  * 
  */
 /*~struct~StatusListData:
@@ -979,7 +997,7 @@
  * @value Lcation
  * @option Money(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value Gold
- * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)
+ * @option Original param(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)(16)
  * @value OriginalParam
  * @option Fail name(1)(2)(3)(4)(5)(8)
  * @value FileName
@@ -1035,7 +1053,7 @@
  * @type number
  * @default 1
  * @min 1
- * @max 3
+ * @max 4
  * 
  * @param Y_Position
  * @desc Y display row position.
@@ -1148,6 +1166,14 @@
  * @type string
  * @default
  * 
+ * @param Decimal
+ * @text Decimal digits(16)
+ * @desc The number of decimal places that can be displayed.
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
  * 
  */
 /*~struct~NotContentsListData:
@@ -1172,7 +1198,7 @@
  * @type number
  * @default 1
  * @min 1
- * @max 3
+ * @max 4
  * 
  * @param Y_Position
  * @desc Y display row position.
@@ -1274,7 +1300,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.4
+ * @version 3.0.5
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1337,7 +1363,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2024/6/16 Ver.3.0.4
+ * 2024/7/27 Ver.3.0.5
+ * セーブインフォウィンドウでコンテンツ列数の設定を追加。
+ * 一部項目に小数点数を指定できる機能を追加。
+ * 2024/6/22 Ver.3.0.4
  * 項目の横幅が1項目の横幅より広く適用されない問題を修正。
  * 2024/6/1 Ver.3.0.3
  * 初回時に画像が表示されない問題を修正。
@@ -1996,6 +2025,13 @@
  * @value 10
  * @default 0
  * 
+ * @param SaveStatusContentsCols
+ * @desc 画面に表示するセーブの項目列数
+ * @text 表示セーブ項目列数
+ * @type number
+ * @default 2
+ * @min 1
+ * 
  * @param WindowX
  * @text ウィンドウX座標
  * @desc ウィンドウのX座標
@@ -2077,7 +2113,7 @@
  * @value Lcation
  * @option 所持金(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value Gold
- * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)
+ * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)(16)
  * @value OriginalParam
  * @option ファイル名(1)(2)(3)(4)(5)(8)
  * @value FileName
@@ -2115,7 +2151,7 @@
  * @type number
  * @default 1
  * @min 1
- * @max 3
+ * @max 4
  * 
  * @param Y_Position
  * @desc Y表示行位置
@@ -2228,6 +2264,14 @@
  * @type string
  * @default
  * 
+ * @param Decimal
+ * @text 小数点桁数(16)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
  * 
  */
 /*~struct~StatusListData:ja
@@ -2246,7 +2290,7 @@
  * @value Lcation
  * @option 所持金(1)(2)(3)(4)(5)(6)(7)(8)(9)(11)
  * @value Gold
- * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)
+ * @option オリジナル項目(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(15)(16)
  * @value OriginalParam
  * @option ファイル名(1)(2)(3)(4)(5)(8)
  * @value FileName
@@ -2302,7 +2346,7 @@
  * @type number
  * @default 1
  * @min 1
- * @max 3
+ * @max 4
  * 
  * @param Y_Position
  * @desc Y表示行位置
@@ -2415,6 +2459,14 @@
  * @type string
  * @default
  * 
+ * @param Decimal
+ * @text 小数点桁数(16)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
  * 
  */
 /*~struct~NotContentsListData:ja
@@ -2439,7 +2491,7 @@
  * @type number
  * @default 1
  * @min 1
- * @max 3
+ * @max 4
  * 
  * @param Y_Position
  * @desc Y表示行位置
@@ -2728,7 +2780,12 @@ Imported.NUUN_SaveScreen_3 = true;
     };
     
     DataManager.setOrgParams = function(info, contents, actor) {
-        info["orgParam_"+ String(contents.MethodName)] = eval(contents.DetaEval);
+        const text = eval(contents.DetaEval);
+        if (isNaN(text)) {
+            info["orgParam_"+ String(contents.MethodName)] = text;
+        } else {
+            info["orgParam_"+ String(contents.MethodName)] = NuunManager.numPercentage(text, (contents.Decimal - 2) || 0, true);
+        }
     };
 
     DataManager.actorOriginalParamForSavefile = function(info, contents, actor) {
@@ -2950,7 +3007,7 @@ Imported.NUUN_SaveScreen_3 = true;
     Scene_File.prototype.helpWindowRect = function() {
         const a = saveLayout.SaveHelpWindowList;
         const wx = a.WindowX || 0;
-        const wy = a.WindowY || 0;
+        const wy = (a.WindowY || 0);// + this.mainAreaTop();
         const ww = a.WindowWidth > 0 ? Math.min(a.WindowWidth, Graphics.boxWidth) : Graphics.boxWidth;
         const wh = a.WindowHeightRows > 0 ? this.calcWindowHeight(a.WindowHeightRows, false) : (a.WindowHeight > 0 ? a.WindowHeight : Graphics.boxHeight);
         return new Rectangle(wx, wy, ww, Math.min(wh, Graphics.boxHeight - wy));
@@ -2959,7 +3016,7 @@ Imported.NUUN_SaveScreen_3 = true;
     Scene_File.prototype.listWindowRect = function() {
         const a = saveLayout.SaveMainWindowList;
         const wx = a.WindowX || 0;
-        const wy = a.WindowY || 0;
+        const wy = (a.WindowY || 0);// + this.mainAreaTop();
         const ww = a.WindowWidth > 0 ? Math.min(a.WindowWidth, Graphics.boxWidth) : Graphics.boxWidth;
         const wh = a.WindowHeightRows > 0 ? this.calcWindowHeight(a.WindowHeightRows, false) : (a.WindowHeight > 0 ? a.WindowHeight : Graphics.boxHeight);
         return new Rectangle(wx, wy, ww, Math.min(wh, Graphics.boxHeight - wy));
@@ -2967,7 +3024,7 @@ Imported.NUUN_SaveScreen_3 = true;
 
     Scene_File.prototype.contentsWindowRect = function(data) {
         const wx = data.WindowX || 0;
-        const wy = data.WindowY || 0;
+        const wy = (data.WindowY || 0);// + this.mainAreaTop();
         const ww = data.WindowWidth > 0 ? Math.min(data.WindowWidth, Graphics.boxWidth) : Graphics.boxWidth;
         const wh = data.WindowHeightRows > 0 ? this.calcWindowHeight(data.WindowHeightRows, false) : (data.WindowHeight > 0 ? data.WindowHeight : Graphics.boxHeight);
         return new Rectangle(wx, wy, ww, Math.min(wh, Graphics.boxHeight - wy));

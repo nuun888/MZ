@@ -1,5 +1,5 @@
 # [ファイナルアタック特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FinalAttack.js)
-# Ver.1.1.6
+# Ver.1.1.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FinalAttack.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -30,6 +30,8 @@
 ※1:更新後全てのファイナルアタックのコスト有効がOFFになっています。全てのファイナルアタックのスキル設定を開きスキルコストを適用させてください。  
 
 ## 更新履歴
+2024/7/27 Ver.1.1.7  
+一部処理を修正。  
 2024/7/21 Ver.1.1.6  
 メニュー画面からアクターに対しアイテムを使用するとエラーが出る問題を修正。  
 2024/7/13 Ver.1.1.5  

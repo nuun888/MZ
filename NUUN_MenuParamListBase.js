@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/28/2024 Ver.1.1.2
+ * Fixed an issue that would cause an error when setting ability scores.
+ * Fixed an issue that would cause an error when an actor without an image set was selected.
  * 7/27/2024 Ver.1.1.1
  * Modified to allow decimal points to be applied to original parameters and ability values.
  * 7/21/2024 Ver.1.1.0
@@ -117,7 +120,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -128,6 +131,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/28 Ver.1.1.2
+ * 能力値を設定するとエラーが出る問題を修正。
+ * 画像が未設定のアクターが選択されるとエラーが出る問題を修正。
  * 2024/7/27 Ver.1.1.1
  * オリジナルパラメータ、能力値に小数点数を適用できるように修正。
  * 2024/7/21 Ver.1.1.0
@@ -1200,6 +1206,7 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         nuun_DrawParams(data, param, x, y, width, actor) {
+            
             const w = this._window;
             const padding = w.itemPadding();
             if (data.Back) {
@@ -1876,7 +1883,7 @@ Imported.NUUN_MenuParamListBase = true;
 
     Sprite_NuunActor.prototype.drawContentsImage = function(data, actor) {
         let bitmap = null;
-        if (isApng(this.getGraphicName(data).split('pictures/')[1])) {
+        if (this.isApngGraphic(data)) {
             this.createApngSprite(actor, data);
         } else {
             bitmap = this.getActorGraphicImg(data, actor);
@@ -1884,6 +1891,11 @@ Imported.NUUN_MenuParamListBase = true;
                 this.drawActorGraphic(data, bitmap, actor);
             }.bind(this));
         }
+    };
+
+    Sprite_NuunActor.prototype.isApngGraphic = function(data) {
+        const name = this.getGraphicName(data);
+        return name ? isApng(name.split('pictures/')[1]) : false;
     };
 
     Sprite_NuunActor.prototype.createApngSprite = function(actor, data) {

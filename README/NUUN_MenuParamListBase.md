@@ -3,9 +3,15 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
+#### 対応プラグイン
+[バトルスタイル拡張(新版)](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md)
+[アイテムウィンドウカスタマイズ](https://github.com/nuun888/MZ/blob/master/README/ItemWindowEx.md)   
 
 メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。  
 対応しているプラグインよりも上に設定してください。  
+
+## 設定方法
+
 
 ## 更新履歴
 2024/7/21 Ver.1.1.0  

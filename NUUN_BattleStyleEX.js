@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.19
+ * @version 3.12.20
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2024/7/27 Ver.3.12.20
+ * アクター画像が切り替わらない問題を修正。
  * 2024/7/14 Ver.3.12.19
  * 顔グラが切り替わらない問題を修正。
  * 2024/7/13 Ver.3.12.18
@@ -3547,11 +3549,11 @@ Sprite_ActorImges.prototype.updateActorGraphic = function() {
         } else if (actor.isAlive() && this.isDead()) {
             this.setReviveUpdateCount();
         } else if (actor.isAlive() && actor.getBSImgName() && this._imgListId !== actor.getBSGraphicIndex()) {
-            if (actor.onImgId === 1 || actor.onImgId === 2 || actor.onImgId === 3 ||actor.onImgId === 15) {
+            if (actor._onImgId === 1 || actor._onImgId === 2 || actor._onImgId === 3 ||actor._onImgId === 15) {
                 this._updateCount = this.setDamageDuration();
-            } else if (actor.onImgId === 30) {
+            } else if (actor._onImgId === 30) {
                 this._updateCount = this.setCounterDuration();
-            } else if (actor.onImgId === 20) {
+            } else if (actor._onImgId === 20) {
                 this._updateCount = Infinity;
             } else {
                 this._updateCount = 1;

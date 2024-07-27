@@ -1,5 +1,5 @@
 # [アイテムウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)
-# Ver.1.1.1
+# Ver.1.1.2
 通常版  
 [通常版ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)  
 アクターステータス、アイテム項目のプリセットあり(７２０P)Ver.1.1.1  
@@ -52,6 +52,9 @@
 ![画像](img/ItemWindowEx_pre.png)  
 
 ## 更新履歴
+2024/7/28 Ver.1.1.2
+能力値を設定するとエラーが出る問題を修正。  
+画像が未設定のアクターが選択されるとエラーが出る問題を修正。  
 2024/7/27 Ver.1.1.1  
 オリジナルパラメータに小数点数を適用できるように修正。  
 2024/7/21 Ver.1.1.0  

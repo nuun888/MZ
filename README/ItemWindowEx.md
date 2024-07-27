@@ -1,7 +1,7 @@
 # [アイテムウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)
 # Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)  
-プリセットあり(７２０P)Ver.1.1.1  
+アクターステータス、アイテム項目のプリセットあり(７２０P)Ver.1.1.1  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/pre/NUUN_ItemWindowEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  

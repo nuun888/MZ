@@ -1,5 +1,5 @@
 # [アイテムウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -44,6 +44,8 @@
 `Window_ItemInfo` アイテムインフォ(未実装)  
 
 ## 更新履歴
+2024/7/27 Ver.1.1.1  
+オリジナルパラメータに小数点数を適用できるように修正。  
 2024/7/21 Ver.1.1.0  
 アイテムインフォを表示できる機能を追加。  
 ウィンドウの不透明化の説明が間違っていたため修正。  

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.6
+ * @version 1.1.7
  * 
  * @help
  * Implement final attack.
@@ -27,6 +27,8 @@
  * If the final attack interrupts with two or more actions, the action ends at that point.
  * 
  * Log
+ * 7/27/2024 Ver.1.1.7
+ * Some processing has been corrected.
  * 7/21/2024 Ver.1.1.6
  * Fixed an issue where an error would occur when using an item on an actor from the menu screen.
  * 7/13/2024 Ver.1.1.5
@@ -102,7 +104,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.6
+ * @version 1.1.7
  * 
  * @help
  * ファイナルアタックを実装します。
@@ -118,6 +120,8 @@
  * イベントコマンドから戦闘不能にした場合はファイナルアタックを発動しません。
  * 
  * 更新履歴
+ * 2024/7/27 Ver.1.1.7
+ * 一部処理を修正。
  * 2024/7/21 Ver.1.1.6
  * メニュー画面からアクターに対しアイテムを使用するとエラーが出る問題を修正。
  * 2024/7/13 Ver.1.1.5
@@ -281,15 +285,6 @@ BattleManager.isFinalAttack = function() {
     return this.finalAttackList.length > 0;
 };
 
-BattleManager.isFinalAttackCostConsumption = function() {
-    const subject = this._subject;
-    if (!subject) {
-        return true;
-    }
-    const action = subject.currentAction();
-    return action && action.finalAttackSkill ? action.isCostConsumption() : true;
-};
-
 
 const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
 Game_Action.prototype.applyItemUserEffect = function(target) {
@@ -415,9 +410,14 @@ Game_Enemy.prototype.isUnitAllDeadFinalAttack = function() {
 
 const _Game_Battler_useItem = Game_Battler.prototype.useItem;
 Game_Battler.prototype.useItem = function(item) {
-    if (BattleManager.isFinalAttackCostConsumption()) {
+    if (this.isFinalAttackCostConsumption()) {
         _Game_Battler_useItem.apply(this, arguments);
     }
+};
+
+Game_Battler.prototype.isFinalAttackCostConsumption = function() {
+    const action = this.currentAction();
+    return action && action.finalAttackSkill ? action.isCostConsumption() : true;
 };
 
 Game_Battler.prototype.finalAttackRate = function(action) {

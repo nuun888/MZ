@@ -1221,7 +1221,7 @@ Imported.NUUN_MenuParamListBase = true;
             w.drawText(nameText, x, y, textWidth);
             w.resetTextColor();
             this.nuun_SetContentsValueFontFace(data);
-            const textParam = (data.DetaEval ? eval(data.DetaEval) : actor.param(param));
+            let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.param(param));
             textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
             w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
         }

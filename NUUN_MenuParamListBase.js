@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/27/2024 Ver.1.1.1
+ * Modified to allow decimal points to be applied to original parameters and ability values.
  * 7/21/2024 Ver.1.1.0
  * Fixed an issue where an error would occur when specifying a name.
  * 7/13/2024 Ver.1.0.2
@@ -115,7 +117,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -126,6 +128,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/27 Ver.1.1.1
+ * オリジナルパラメータ、能力値に小数点数を適用できるように修正。
  * 2024/7/21 Ver.1.1.0
  * 名称のみを指定するとエラーが出る問題を修正。
  * 2024/7/13 Ver.1.0.2
@@ -805,8 +809,13 @@ Imported.NUUN_MenuParamListBase = true;
             if (data.DetaEval) {
                 this.nuun_SetContentsValueFontFace(data);
                 const padding = textWidth > 0 ? w.itemPadding() : 0;
-                w.nuun_DrawContentsParamUnitText(this.getStatusEvalParam(param, actor), data, x + textWidth + padding, y, width - (textWidth + padding));
-                //this.drawText(eval(data.DetaEval), x + textWidth + padding, y, width - (textWidth + padding), data.Align);
+                const textParam = this.getStatusEvalParam(param, actor);
+                if (isNaN(textParam)) {
+                    w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+                } else {
+                    const value = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
+                    w.nuun_DrawContentsParamUnitText(value, data, x + textWidth + padding, y, width - (textWidth + padding));
+                }       
             }
         }
 
@@ -1213,6 +1222,7 @@ Imported.NUUN_MenuParamListBase = true;
             w.resetTextColor();
             this.nuun_SetContentsValueFontFace(data);
             const textParam = (data.DetaEval ? eval(data.DetaEval) : actor.param(param));
+            textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
             w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
         }
     

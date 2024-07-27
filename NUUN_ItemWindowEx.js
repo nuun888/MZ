@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * You can customize the item screen.
@@ -47,6 +47,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/27/2024 Ver.1.1.1
+ * Fixed to allow decimal points to be applied to original parameters.
  * 7/21/2024 Ver.1.1.0
  * Added the ability to display item info.
  * Fixed an incorrect description of window opacity.
@@ -1591,7 +1593,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * アイテム画面をカスタマイズできます。
@@ -1613,7 +1615,7 @@
  * [text]:表示テキスト
  * 
  * 個別画像指定
- *  <[Method]:[filePass], [x], [y]> 
+ * <[Method]:[filePass], [x], [y]> 
  * [Method]:記述欄、個別指定画像タグ名で記入したタグ名。
  * [filePass]:img/pictures直下のファイル名
  * [x]:X座標
@@ -1624,6 +1626,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/27 Ver.1.1.1
+ * オリジナルパラメータに小数点数を適用できるように修正。
  * 2024/7/21 Ver.1.1.0
  * アイテムインフォを表示できる機能を追加。
  * ウィンドウの不透明化の説明が間違っていたため修正。
@@ -3198,7 +3202,7 @@ Imported.NUUN_ItemWindowEx = true;
         }
     };
 
-    Scene_Item.prototype.actorWindowRect = function() {Scene_ItemBase.prototype.actorWindowRect
+    Scene_Item.prototype.actorWindowRect = function() {
         if (params.SameMenuWindow) {
             const rect = Scene_ItemBase.prototype.actorWindowRect.apply(this, arguments);
             rect.x += params.ActorWindowX;
@@ -3717,7 +3721,13 @@ Imported.NUUN_ItemWindowEx = true;
             if (data.DetaEval) {
                 this.nuun_SetContentsValueFontFace(data);
                 const padding = textWidth > 0 ? w.itemPadding() : 0;
-                w.nuun_DrawContentsParamUnitText(this.getStatusEvalParam(param, item), data, x + textWidth + padding, y, width - (textWidth + padding));
+                const textParam = this.getStatusEvalParam(param, actor);
+                if (isNaN(textParam)) {
+                    w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+                } else {
+                    const value = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
+                    w.nuun_DrawContentsParamUnitText(value, data, x + textWidth + padding, y, width - (textWidth + padding));
+                }   
             }
         }
 

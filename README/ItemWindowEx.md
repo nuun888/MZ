@@ -1,6 +1,8 @@
 # [アイテムウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)
 # Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)  
+プリセットあり(７２０P)Ver.1.1.1  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/pre/NUUN_ItemWindowEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 [ステータス項目ベースプラグイン](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)Ver.1.1.0以降  
@@ -42,6 +44,11 @@
 ## クラスウィンドウ
 `Window_ItemMenuActor` アクターステータス(アクターウィンドウのステータス項目設定が設定されている場合)  
 `Window_ItemInfo` アイテムインフォ(未実装)  
+
+## プリセットあり
+720P用です。
+プラグインパラメータを適用させてから最新版にアップでとしてください。  
+![画像](img/ItemWindowEx_pre.png)  
 
 ## 更新履歴
 2024/7/27 Ver.1.1.1  

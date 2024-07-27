@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# 新版Ver.3.0.4
+# 新版Ver.3.0.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen_3.js)  
 # 旧版Ver.2.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
@@ -70,6 +70,9 @@ actor:$gameActors (指定のアクター変更で指定したアクター(指定
 
 
 ## 更新履歴 
+2024/7/27 Ver.3.0.5  
+セーブインフォウィンドウでコンテンツ列数の設定を追加。  
+一部項目に小数点数を指定できる機能を追加。  
 2024/6/22 Ver.3.0.4  
 項目の横幅が1項目の横幅より広く適用されない問題を修正。  
 2024/6/1 Ver.3.0.3  

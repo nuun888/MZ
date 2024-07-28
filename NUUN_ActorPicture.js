@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.2
+ * @version 1.7.3
  * 
  * @help
  * This is a plugin that processes the display of actor graphics and face graphics images.
@@ -38,6 +38,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/27/2021 Ver.1.7.3
+ * Fixed an issue where an error would occur if an image was not set.
  * 7/16/2021 Ver.1.7.2
  * Change display in languages ​​other than Japanese to English.
  * 7/15/2021 Ver.1.7.1
@@ -272,7 +274,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.2
+ * @version 1.7.3
  * 
  * @help
  * アクターグラフィック、顔グラ画像を表示する処理を行うプラグインです。
@@ -302,6 +304,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/7/28 Ver.1.7.3
+ * 画像が未設定の場合にエラーが出る問題を修正。
  * 2024/7/16 Ver.1.7.2
  * 日本語以外での表示を英語表示に変更。
  * 2024/7/15 Ver.1.7.1
@@ -666,7 +670,7 @@ Imported.NUUN_ActorPicture = true;
             let index = -1;
             this._isDeadImg = false;
             this._imgScenes = 'default';
-            index = this._data ? this._data.ButlerActorImg.findIndex(data => this.matchConditions(data)) : -1;
+            index = this._data && this._data.ButlerActorImg ? this._data.ButlerActorImg.findIndex(data => this.matchConditions(data)) : -1;
             const oldFileName = this._actorGraphicName;
             const oldFileFace = this._actorGraphicFace;
             if (index >= 0) {
@@ -678,8 +682,8 @@ Imported.NUUN_ActorPicture = true;
                 this._actorGraphicOpacity = data.Opacity || 255;
             } else {
                 this._actorGraphicName = null;
-                this._actorGraphicFace = this.faceName();
-                imgIndex = this.faceIndex();
+                this._actorGraphicFace = this._battler.faceName();
+                imgIndex = this._battler.faceIndex();
                 this._actorGraphicOpacity = 255;
             }
             this._actorGraphicIndex = index;

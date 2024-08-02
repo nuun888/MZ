@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.0.1  
+# Ver.1.0.2  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -154,6 +154,8 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
 
 ## 更新履歴
+2024/8/2 Ver.1.0.2  
+マップ上でアニメーションを再生するとエラーが出る問題を修正。  
 2024/7/21 Ver.1.0.1  
 アクターステータスウィンドウがちらつく問題を修正。  
 2024/7/20 Ver.1.0.0  

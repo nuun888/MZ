@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/2/2024 Ver.1.0.2
+ * Fixed an issue that caused errors when playing animations on maps.
  * 7/21/2024 Ver.1.0.1
  * Fixed an issue where players could get stuck at the end of combat.
  * Fixed an issue that could cause the Actor Status window to flicker.
@@ -1907,7 +1909,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -1977,6 +1979,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/2 Ver.1.0.2
+ * マップ上でアニメーションを再生するとエラーが出る問題を修正。
  * 2024/7/21 Ver.1.0.1
  * アクターステータスウィンドウがちらつく問題を修正。
  * 戦闘終了時にスタックする問題を修正。
@@ -5316,7 +5320,7 @@ Imported.NUUN_BattleStyleEX = true;
         if (result) {
             return result;
         }
-        return NuunManager.styleData.isFrontAnimation() && $gameParty.inBattle();
+        return NuunManager.styleData && NuunManager.styleData.isFrontAnimation() && $gameParty.inBattle();
     };
 
     Game_Enemy.prototype.attackAnimation = function() {
@@ -6511,7 +6515,7 @@ Imported.NUUN_BattleStyleEX = true;
     const _Sprite_StateIcon_updateIcon = Sprite_StateIcon.prototype.updateIcon;
     Sprite_StateIcon.prototype.updateIcon = function() {
         _Sprite_StateIcon_updateIcon.apply(this, arguments);
-        if (this._battler && this._battler.isActor() && NuunManager.styleData.getNoStateIcon() > 0 && this._iconIndex === 0) {
+        if (this._battler && this._battler.isActor() && NuunManager.styleData && NuunManager.styleData.getNoStateIcon() > 0 && this._iconIndex === 0) {
             this._iconIndex = NuunManager.styleData.getNoStateIcon();
         }
     };
@@ -6529,7 +6533,7 @@ Imported.NUUN_BattleStyleEX = true;
 
     const _Sprite_Animation_updateFlash = Sprite_Animation.prototype.updateFlash;
     Sprite_Animation.prototype.updateFlash = function() {
-        if (NuunManager.styleData.isFrontAnimation()) {
+        if (NuunManager.styleData && NuunManager.styleData.isFrontAnimation()) {
             const t = this._targets;
             this._targets =  this._frontTargets;
             _Sprite_Animation_updateFlash.apply(this, arguments);
@@ -6551,7 +6555,7 @@ Imported.NUUN_BattleStyleEX = true;
 
     const _Sprite_AnimationMV_updateFlash = Sprite_AnimationMV.prototype.updateFlash;
     Sprite_AnimationMV.prototype.updateFlash = function() {
-        if (NuunManager.styleData.isFrontAnimation()) {
+        if (NuunManager.styleData && NuunManager.styleData.isFrontAnimation()) {
             const t = this._targets;
             this._targets =  this._frontTargets;
             _Sprite_AnimationMV_updateFlash.apply(this, arguments);
@@ -6563,7 +6567,7 @@ Imported.NUUN_BattleStyleEX = true;
 
     const _Sprite_AnimationMV_startHiding = Sprite_AnimationMV.prototype.startHiding;
     Sprite_AnimationMV.prototype.startHiding = function(duration) {
-        if (NuunManager.styleData.isFrontAnimation()) {
+        if (NuunManager.styleData && NuunManager.styleData.isFrontAnimation()) {
             const t = this._targets;
             this._targets =  this._frontTargets;
             _Sprite_AnimationMV_startHiding.apply(this, arguments);
@@ -6575,7 +6579,7 @@ Imported.NUUN_BattleStyleEX = true;
 
     const _Sprite_AnimationMV_onEnd = Sprite_AnimationMV.prototype.onEnd;
     Sprite_AnimationMV.prototype.onEnd = function() {
-        if (NuunManager.styleData.isFrontAnimation()) {
+        if (NuunManager.styleData && NuunManager.styleData.isFrontAnimation()) {
             const t = this._targets;
             this._targets =  this._frontTargets;
             _Sprite_AnimationMV_onEnd.apply(this, arguments);
@@ -6617,7 +6621,7 @@ Imported.NUUN_BattleStyleEX = true;
     };
 
     Spriteset_Battle.prototype.animationTarget = function(targetSprites){
-        if (NuunManager.styleData.isFrontAnimation() && targetSprites) {
+        if (NuunManager.styleData && NuunManager.styleData.isFrontAnimation() && targetSprites) {
             return targetSprites.some(target => target.viewFrontActor && !!target._battler.isActor());
         }
         return false;
@@ -6726,7 +6730,7 @@ Imported.NUUN_BattleStyleEX = true;
     };
 
     Spriteset_Battle.prototype.createFrontActors = function() {
-        if (!$gameSystem.isSideView() && NuunManager.styleData.isFrontViewActorEffectShow()) {
+        if (!$gameSystem.isSideView() && NuunManager.styleData && NuunManager.styleData.isFrontViewActorEffectShow()) {
             const spriteId = this.getFrontActorsBaseSpriteId();
             this.createDamege();
             for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
@@ -6738,7 +6742,7 @@ Imported.NUUN_BattleStyleEX = true;
     };
 
     Spriteset_Battle.prototype.addBsCreateActors = function() {
-        if (!$gameSystem.isSideView() && NuunManager.styleData.isFrontViewActorEffectShow() && this._actorSprites && $gameParty.maxBattleMembers() > this._actorSprites.length) {
+        if (!$gameSystem.isSideView() && NuunManager.styleData && NuunManager.styleData.isFrontViewActorEffectShow() && this._actorSprites && $gameParty.maxBattleMembers() > this._actorSprites.length) {
             const count = $gameParty.maxBattleMembers() - this._actorSprites.length;
             const spriteId = this.getFrontActorsBaseSpriteId();
             for (let i = 0; i < count; i++) {

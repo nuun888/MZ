@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Famage floor EX
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -38,6 +38,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/3/2024 Ver.1.3.2
+ * Fixed an issue that could cause an error when walking through unspecified damage floors.
  * 6/28/2024 Ver.1.3.1
  * Added a function that gives a chance to inflict a status effect when dealing floor damage.
  * 6/27/2024 Ver.1.3.0
@@ -330,7 +332,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.3.1
+ * @version 1.3.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -358,6 +360,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/3 Ver.1.3.2
+ * 未設定のダメージ床を通行したときにエラーが起きる問題を修正。
  * 2024/6/28 Ver.1.3.1
  * 床ダメージダメージ時に確率でステートを付与させる機能を追加。
  * 2024/6/27 Ver.1.3.0
@@ -727,9 +731,9 @@ Game_Actor.prototype.floorDamageAddState = function() {
 };
 
 Game_Actor.prototype.floorDamageRate = function() {
-    const tag = 'DfrEx'+ String(_damagedFloorExData.DamagedFloorName);
+    const tag = _damagedFloorExData ? 'DfrEx'+ String(_damagedFloorExData.DamagedFloorName) : null;
     return this.traitObjects().reduce((r, trait) => {
-        if (trait.meta[tag] !== undefined && trait.meta[tag] >= 0) {
+        if (tag && trait.meta[tag] !== undefined && trait.meta[tag] >= 0) {
             return r * Number(trait.meta[tag]) / 100;
         } else {
             return r;

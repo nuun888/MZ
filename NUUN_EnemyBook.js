@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.21.2
+ * @version 2.21.3
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/3/2024 Ver.2.21.3
+ * Fixed so that defeated monsters are not re-counted.
  * 7/15/2024 Ver.2.21.2
  * Corrected the reference Y coordinate of the encyclopedia item.
  * 6/22/2024 Ver.2.21.1
@@ -3245,6 +3247,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/3 Ver.2.21.3
+ * 撃破したモンスターの撃破カウントを再カウントしないように修正。
  * 2024/7/15 Ver.2.21.2
  * 図鑑項目の基準Y座標を修正。
  * 2024/6/22 Ver.2.21.1
@@ -7175,6 +7179,12 @@ Game_Troop.prototype.setup = function(troopId) {
 };
 
 
+const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
+Game_Enemy.prototype.initMembers = function() {
+    _Game_Enemy_initMembers .call(this);
+    this._enemyDefeat = false;
+};
+
 const _Game_BattlerBase_appear = Game_BattlerBase.prototype.appear;
 Game_BattlerBase.prototype.appear = function() {
      _Game_BattlerBase_appear.call(this);
@@ -7218,7 +7228,10 @@ Game_BattlerBase.prototype.die = function() {
             }
             $gameSystem.addStatusToEnemyBook(enemyId);
         }
-        $gameSystem.defeatCount(enemyId);
+        if (!this._enemyDefeat) {
+            $gameSystem.defeatCount(enemyId);
+            this._enemyDefeat = true;
+        }   
     }
 };
 
@@ -8730,7 +8743,7 @@ Window_EnemyBook_Index.prototype.initialize = function(rect) {
     Window_Selectable.prototype.initialize.call(this, rect);
     this._enemyList = [];
     this._category = null;
-    this.interruptWindow = true;console.log()
+    this.interruptWindow = true;
 };
 
 Window_EnemyBook_Index.prototype.loadWindowskin = function() {

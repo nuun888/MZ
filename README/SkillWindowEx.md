@@ -2,7 +2,7 @@
 # Ver 公開準備中
 通常版  
 [通常版ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillWindowEx.js)  
-アクターステータス、アイテム項目のプリセットあり(７２０P)Ver.1.1.1  
+アクターステータスプリセットあり(７２０P)Ver.1.0.0 
 [preset版ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/pre/NUUN_SkillWindowEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  

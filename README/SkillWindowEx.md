@@ -10,6 +10,7 @@
 [ステータス項目ベースプラグイン](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)Ver.1.1.0以降  
 #### 対応プラグイン
 [立ち絵、顔グラ表示](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md)Ver.1.7.2以降  
+[スキルステータス画面表示カスタマイズ](https://github.com/nuun888/MZ/blob/master/README/SkillStatusEX.md)  
 
 アイテム画面をカスタマイズできます。  
 戦闘中のアイテム画面には対応しておりません。 

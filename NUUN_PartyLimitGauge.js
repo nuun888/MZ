@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -62,6 +62,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/9/2024 Ver.1.6.2
+ * Added the ability to specify the display priority of gauge sprites.
  * 3/16/2024 Ver.1.6.1
  * Fixed an issue where the limit gauge would disappear on the first turn.
  * 2/17/2024 Ver.1.6.0
@@ -223,6 +225,19 @@
  * @text Gauge color 2
  * @type color
  * @default 14
+ * @parent GaugeSetting
+ * 
+ * @param GaugePriority
+ * @text Limit gauge display sprite
+ * @desc Specifies the display sprite for the limit gauge.
+ * @type select
+ * @option Spriteset_Battle
+ * @value 'Spriteset_Battle'
+ * @option Scene_Battle
+ * @value 'Scene_Battle'
+ * @option BattleField
+ * @value 'BattleField'
+ * @default 'Spriteset_Battle'
  * @parent GaugeSetting
  * 
  * @param EnemyGaugeSetting
@@ -395,7 +410,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -453,6 +468,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/9 Ver.1.6.2
+ * ゲージSpriteの表示優先度を指定できる機能を追加。
  * 2024/3/16 Ver.1.6.1
  * 最初のターンでリミットゲージが消えてしまう問題を修正。
  * 2024/2/17 Ver.1.6.0
@@ -615,6 +632,19 @@
  * @text ゲージの色2
  * @type color
  * @default 14
+ * @parent GaugeSetting
+ * 
+ * @param GaugePriority
+ * @text リミットゲージの表示Sprite
+ * @desc リミットゲージの表示Spriteを指定します。
+ * @type select
+ * @option Spriteset_Battle
+ * @value 'Spriteset_Battle'
+ * @option Scene_Battle
+ * @value 'Scene_Battle'
+ * @option BattleField
+ * @value 'BattleField'
+ * @default 'Spriteset_Battle'
  * @parent GaugeSetting
  * 
  * @param EnemyGaugeSetting
@@ -828,6 +858,8 @@ const TurnAmount = NuunManager.getEvalCode(parameters['TurnAmount']) || '';
 const CriticalAmount = NuunManager.getEvalCode(parameters['CriticalAmount']) || '';
 const LimitCostColor = Number(parameters['LimitCostColor'] || 0);
 const MultiCostWidth = String(parameters['CostWidth'] || '00000');
+const GaugePriority = eval(parameters['GaugePriority'] || 'Scene_Battle');
+const LimitGaugeAnimationVisible = eval(parameters['LimitGaugeAnimationVisible'] || "false");
 
 const pluginName = "NUUN_PartyLimitGauge";
 PluginManager.registerCommand(pluginName, 'LimitValue', args => {
@@ -1110,11 +1142,28 @@ Scene_Battle.prototype.createSpriteset = function() {
   }
 };
 
+Scene_Battle.prototype.addPartyGauge = function(sprite) {
+    switch (GaugePriority) {
+        case 'Scene_Battle':
+            this.addChild(sprite);
+            return;
+        case 'Spriteset_Battle':
+            this._spriteset._baseSprite.addChild(sprite);
+            return;
+        case 'BattleField':
+            this._spriteset._battleField.addChild(sprite);
+            return;
+        default:
+            break;
+    }
+};
+
 Scene_Battle.prototype.createPartyGauge = function() {
   const x = PartyGauge_X;
   const y = PartyGauge_Y;
   const sprite = new Sprite_PartyGauge();
-  this.addChild(sprite);
+  this.addPartyGauge(sprite);
+  sprite.setSpriteset(this._spriteset);
   sprite.setup('actor', 'limit');
   sprite.move(x, y);
   if (onPartyChargeLimitGauge()) {
@@ -1129,7 +1178,8 @@ Scene_Battle.prototype.createTroopGauge = function() {
   const x = EnemyGauge_X;
   const y = EnemyGauge_Y;
   const sprite = new Sprite_TroopGauge();
-  this.addChild(sprite);
+  this.addPartyGauge(sprite);
+  sprite.setSpriteset(this._spriteset);
   sprite.setup('enemy', 'limit');
   sprite.move(x, y);
   if (onEnemyChargeLimitGauge()) {
@@ -1203,8 +1253,12 @@ Sprite_PartyGauge.prototype.bitmapWidth = function() {
 };
 
 Sprite_PartyGauge.prototype.setup = function(unit, statusType) {
-  this._unit = unit;
-  Sprite_Gauge.prototype.setup.call(this, unit, statusType);
+    this._unit = unit;
+    Sprite_Gauge.prototype.setup.call(this, unit, statusType);
+};
+
+Sprite_PartyGauge.prototype.setSpriteset = function(spriteset) {
+    this._spriteset = spriteset;
 };
 
 const _Sprite_Gauge_gaugeX = Sprite_Gauge.prototype.gaugeX;
@@ -1223,6 +1277,10 @@ Sprite_PartyGauge.prototype.limitGaugeX = function() {
 Sprite_PartyGauge.prototype.measureLabelWidth = function() {
     this.setupLabelFont();
     return this.bitmap.measureTextWidth(this.label());
+};
+
+Sprite_Gauge.prototype.limitGaugeAnimationVisible = function() {
+    return true;
 };
 
 const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
@@ -1264,7 +1322,7 @@ Sprite_PartyGauge.prototype.label = function() {
 
 Sprite_PartyGauge.prototype.update = function() {
     Sprite_Gauge.prototype.update.call(this);
-    this.visible = onPartyChargeLimitGauge();
+    this.visible = this.limitGaugeAnimationVisible() && onPartyChargeLimitGauge();
 };
 
 Sprite_PartyGauge.prototype.measureLabelWidth = function() {
@@ -1313,9 +1371,13 @@ Sprite_TroopGauge.prototype.setup = function(unit, statusType) {
   Sprite_Gauge.prototype.setup.call(this, unit, statusType);
 };
 
+Sprite_TroopGauge.prototype.setSpriteset = function(spriteset) {
+    this._spriteset = spriteset;
+};
+
 Sprite_TroopGauge.prototype.update = function() {
     Sprite_Gauge.prototype.update.call(this);
-    this.visible = onEnemyChargeLimitGauge();
+    this.visible = this.limitGaugeAnimationVisible() && onEnemyChargeLimitGauge();
 };
 
 Sprite_TroopGauge.prototype.label = function() {

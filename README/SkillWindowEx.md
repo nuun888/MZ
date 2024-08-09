@@ -1,5 +1,5 @@
 # [スキルウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillWindowEx.js)
-# Ver 公開準備中
+# Ver.1.0.0
 通常版  
 [通常版ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillWindowEx.js)  
 アクターステータスプリセットあり(７２０P)Ver.1.0.0 

@@ -11,9 +11,10 @@
 [戦闘中天候適用](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleWeather.js)   
 [バトルエネミーウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemySelectWindow.js)   
 [バトルアイテム、スキルウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
+[戦闘中メッセージウィンドウ背景画像](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
 [バトラーのバトルフィールド表示]   
 [戦闘バイブレーション]   
-[戦闘時メッセージ画像背景画像]   
+
 
 ## 設定方法
 ### 敵キャラの通常攻撃のアニメーション
@@ -152,7 +153,8 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 ### バトルアイテム、スキルウィンドウカスタマイズ
 戦闘中のアイテム、スキルウィンドウをカスタマイズできます。  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
-
+### 戦闘中メッセージウィンドウ背景画像
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
 ## 更新履歴
 2024/8/9 Ver.1.0.3  
 出現、逃走、勝利、敗北ウィンドウの表示位置を指定できる機能を追加。  

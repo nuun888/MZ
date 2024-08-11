@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/11/2024 Ver.1.0.4
+ * Fixed custom Y coordinates in actor commands not displaying at 0.
  * 8/9/2024 Ver.1.0.3
  * Added the ability to specify the display position of the Appearance, Flee, Victory, and Defeat windows.
  * Fixed an issue where the actor status window was not displayed at the start of battle.
@@ -1932,7 +1934,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2002,6 +2004,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/11 Ver.1.0.4
+ * アクターコマンドのカスタムのY座標が0の位置に表示されない問題を修正。
  * 2024/8/9 Ver.1.0.3
  * 出現、逃走、勝利、敗北ウィンドウの表示位置を指定できる機能を追加。
  * 戦闘開始時にアクターステータスウィンドウが表示されなかったのを修正。
@@ -4567,6 +4571,9 @@ Imported.NUUN_BattleStyleEX = true;
                         break;
                     case 'middle':
                         _window.y = _window._homeY - Math.floor(_window.height / 2);
+                        break;
+                    case 'custom':
+                        _window.y = _window._homeY;
                         break;
                     default:
                         _window.y = this.isActorCommandVariable() ? _window._homeY + (Graphics.boxHeight - (_window._homeY + _window.height)) : _window._homeY;

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.2
+ * @version 2.4.3
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -60,6 +60,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/8/11 Ver.2.4.3
+ * Fixed a freeze at the end of battle when "Result screen delay frames after victory" was set to 2 frames or more.
  * 2024/7/20 Ver.2.4.2
  * Fixed to not reprocess results.
  * 2024/6/16 Ver.2.4.1
@@ -2313,7 +2315,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.2
+ * @version 2.4.3
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2361,6 +2363,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/11 Ver.2.4.3
+ * 勝利後リザルト画面遅延フレーム数を２フレーム以上に設定したときに、戦闘終了時にフリーズする問題を修正。
  * 2024/7/20 Ver.2.4.2
  * リザルトを再処理しないように修正。
  * 2024/6/16 Ver.2.4.1
@@ -7086,7 +7090,7 @@ BattleManager.startResultBusy = function() {
 
 const _BattleManager_processVictory = BattleManager.processVictory;
 BattleManager.processVictory = function() {
-    if (this._resultOn) {
+    if (this.resultBusy === 0 && this._resultOn) {
         return;
     }
     if (this.startResultBusy()) {

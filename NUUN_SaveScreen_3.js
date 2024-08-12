@@ -534,7 +534,7 @@
  * @parent BackGround
  * 
  */
-/*~struct~SaveHelpWindowListData:ja
+/*~struct~SaveHelpWindowListData:
  * 
  * @param MethodName
  * @desc Specifies the window's distinguished name.

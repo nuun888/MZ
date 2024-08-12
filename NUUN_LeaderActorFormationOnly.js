@@ -42,7 +42,7 @@
  * @default true
  * 
  */
-/*:
+/*:ja
  * @target MZ
  * @plugindesc リーダのみ自由編成可能
  * @author NUUN

@@ -19,6 +19,17 @@
 ### 全セーブデータ適用
 ONにすることで全てのセーブデータに適用されます。  
 
+## コマンドシンボル名
+`alwaysDash` :常時ダッシュ  
+`commandRemember` :コマンド記憶  
+`touchUI` :タッチUI  
+`bgmVolume` :BGM音量 
+`bgsVolume` :BGS音量  
+`meVolume` :ME音量  
+`seVolume` SE音量  
+`gamePadVibration` :振動 要NUUN_GamePadVibration  
+`startUpFullScreen` :フルスクリーン 要StartUpFullScreen（トリアコンタン氏）  
+
 ## キー、ゲームパッドのキー(ボタン)変更の操作
 キー、ゲームパッドのキー、ボタンの変更は変更したい項目でEnter(決定ボタン)を押し、任意のキー(ボタン)を押します。  
 既に設定済みのキー(ボタン)、予約キー(ボタン)は設定できません。  

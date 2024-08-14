@@ -238,7 +238,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [メニューコマンド任意表示順](https://github.com/nuun888/MZ/blob/master/README/MenuCommandDisplayOrder.md) | [NUUN_MenuCommandDisplayOrder](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandDisplayOrder.js) | 共 | 1.0.0 |
 | [アイテムウィンドウカスタマイズ](https://github.com/nuun888/MZ/blob/master/README/ItemWindowEx.md) | [NUUN_ItemWindowEx](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js) | 共 メ | 1.0.0 |
 | [スキルウィンドウカスタマイズ](https://github.com/nuun888/MZ/blob/master/README/SkillWindowEx.md) | [NUUN_SkillWindowEx](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillWindowEx.js) | 共 メ | 1.0.0 |
-| [オプション拡張](https://github.com/nuun888/MZ/blob/master/README/OptionEx.md) | [NUUN_SkillWindowEx](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js) | 共 | 1.0.0 |
+| [オプション拡張](https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md) | [NUUN_SkillWindowEx](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js) | 共 | 1.0.0 |
 | |  |  |  |
 |  |  |  |  |
 

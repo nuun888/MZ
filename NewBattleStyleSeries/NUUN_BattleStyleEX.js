@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.4
+ * @version 1.0.5
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/14/2024 Ver.1.0.5
+ * Fixed an issue that caused the game to freeze when returning to party commands after selecting an action for the second or subsequent times.
  * 8/11/2024 Ver.1.0.4
  * Fixed custom Y coordinates in actor commands not displaying at 0.
  * 8/9/2024 Ver.1.0.3
@@ -1934,7 +1936,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.4
+ * @version 1.0.5
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2004,6 +2006,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/14 Ver.1.0.5
+ * 2回目以降の行動選択時からパーティコマンドに戻る際にフリーズする問題を修正。
  * 2024/8/11 Ver.1.0.4
  * アクターコマンドのカスタムのY座標が0の位置に表示されない問題を修正。
  * 2024/8/9 Ver.1.0.3
@@ -5538,6 +5542,12 @@ Imported.NUUN_BattleStyleEX = true;
         if ($gameTemp.onBSAction && BattleManager._phase === 'action') {
             $gameTemp.onBSAction = false;
         }
+    };
+
+    const _Scene_Battle_startActorCommandSelection = Scene_Battle.prototype.startActorCommandSelection;
+    Scene_Battle.prototype.startActorCommandSelection = function() {
+        _Scene_Battle_startActorCommandSelection.apply(this, arguments);
+        $gameTemp.onBSAction = false;
     };
 
     Scene_Battle.prototype.updateActorCommandWindow = function() {

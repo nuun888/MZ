@@ -281,7 +281,7 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         getParamsList() {
-            return this._list;
+            return this._list || [];
         }
     
         getDecimalMode() {
@@ -368,7 +368,7 @@ Imported.NUUN_MenuParamListBase = true;
         }
 
         drawItemImg(actor, index) {
-            if (actor) {
+            if (actor && actor.isActor()) {
                 const data = this.getActorImgData(actor);
                 if (!data) {
                     this._graphicMode = this._window.defaultGraphicMode();
@@ -561,7 +561,7 @@ Imported.NUUN_MenuParamListBase = true;
         }
 
         isActor(actor) {
-            return !actor.isActor;
+            return !actor.isActor || !actor.isActor();
         }
     
         drawItemContentsParams(index) {//コンテンツ背景内の項目用
@@ -610,12 +610,12 @@ Imported.NUUN_MenuParamListBase = true;
             if (actor && this.nuun_IsContents(data, actor)) {
                 this.setTepmData(data, this._exParams);
                 const method = 'nuun_DrawContents' + data.DateSelect;
-                //try {
+                try {
                     this[method](data, x, y, width, actor);
-                //} catch (error) {
-                //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                //    throw ["DataError", log];
-                //}
+                } catch (error) {
+                    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+                    throw ["DataError", log];
+                }
             }
         }
     

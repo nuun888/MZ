@@ -1,5 +1,5 @@
 # [ステータス項目ベースプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -27,6 +27,9 @@ Y座標:Y表示列位置からの相対座標。
 記述欄、個別指定画像タグ名:記述欄、画像（個別指定画像）に紐づけするタグ名  
 
 ## 更新履歴
+2024/7/28 Ver.1.1.2  
+能力値を設定するとエラーが出る問題を修正。  
+画像が未設定のアクターが選択されるとエラーが出る問題を修正。  
 2024/7/27 Ver.1.1.1  
 オリジナルパラメータ、能力値に小数点数を適用できるように修正。  
 2024/7/21 Ver.1.1.0  

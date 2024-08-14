@@ -23,7 +23,7 @@ ONにすることで全てのセーブデータに適用されます。
 `alwaysDash` :常時ダッシュ  
 `commandRemember` :コマンド記憶  
 `touchUI` :タッチUI  
-`bgmVolume` :BGM音量 
+`bgmVolume` :BGM音量  
 `bgsVolume` :BGS音量  
 `meVolume` :ME音量  
 `seVolume` SE音量  

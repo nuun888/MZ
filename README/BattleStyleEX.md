@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.0.4  
+# Ver.1.0.5  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -155,7 +155,10 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
 ### 戦闘中メッセージウィンドウ背景画像
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
+
 ## 更新履歴
+2024/8/14 Ver.1.0.5  
+2回目以降の行動選択時からパーティコマンドに戻る際にフリーズする問題を修正。  
 2024/8/11 Ver.1.0.4  
 アクターコマンドのカスタムのY座標が0の位置に表示されない問題を修正。  
 2024/8/9 Ver.1.0.3  

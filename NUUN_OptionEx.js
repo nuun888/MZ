@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Expand the options screen.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/16/2024 Ver.1.0.1
+ * Added the ability to make windows transparent.
  * 8/15/2024 Ver.1.0.0
  * First edition.
  * 
@@ -85,6 +87,13 @@
  * @min 1
  * @parent OptionCategorySetting
  * 
+ * @param OptionCategoryWindowVisible
+ * @text Category window opacity
+ * @desc Makes the category window opaque.
+ * @type boolean
+ * @default true
+ * @parent OptionCategorySetting
+ * 
  * @param OptionPageSetting
  * @text Option Page Settings
  * @default ------------------------------
@@ -127,6 +136,13 @@
  * @type number
  * @default 7
  * @min 1
+ * @parent OptionPageSetting
+ * 
+ * @param OptionPageWindowVisible
+ * @text Option Page Window Opacity
+ * @desc Makes the options page window opaque.
+ * @type boolean
+ * @default true
  * @parent OptionPageSetting
  * 
  * @param KeyConfigSetting
@@ -350,7 +366,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * オプション画面を拡張します。
@@ -363,7 +379,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2023/8/15 Ver.1.0.0
+ * 2024/8/16 Ver.1.0.1
+ * ウィンドウを透明にする機能を追加。
+ * 2024/8/15 Ver.1.0.0
  * 初版
  * 
  * 
@@ -424,6 +442,13 @@
  * @min 1
  * @parent OptionCategorySetting
  * 
+ * @param OptionCategoryWindowVisible
+ * @text カテゴリーウィンドウ不透明化
+ * @desc カテゴリーウィンドウを不透明化する。
+ * @type boolean
+ * @default true
+ * @parent OptionCategorySetting
+ * 
  * @param OptionPageSetting
  * @text オプションページ設定
  * @default ------------------------------
@@ -466,6 +491,13 @@
  * @type number
  * @default 7
  * @min 1
+ * @parent OptionPageSetting
+ * 
+ * @param OptionPageWindowVisible
+ * @text オプションページウィンドウ不透明化
+ * @desc オプションページウィンドウを不透明化する。
+ * @type boolean
+ * @default true
  * @parent OptionPageSetting
  * 
  * @param KeyConfigSetting
@@ -829,6 +861,7 @@ Imported.NUUN_OptionEx = true;
     
     Window_CategoryOptions.prototype.initialize = function(rect) {
         Window_Command.prototype.initialize.call(this, rect);
+        this.opacity = params.OptionCategoryWindowVisible ? 255 : 0;
     };
 
     Window_CategoryOptions.prototype.setOptionWindow = function(optionWindow) {
@@ -866,6 +899,7 @@ Imported.NUUN_OptionEx = true;
         this._category = "none";
         this._configIndex = 0;
         this.setupKeyMode = false;
+        this.opacity = params.OptionPageWindowVisible ? 255 : 0;
     };
 
     Window_Options.prototype.setupEventHandlers = function() {

@@ -1,5 +1,5 @@
 # [オプション拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -44,5 +44,7 @@ ONにすることで全てのセーブデータに適用されます。
 既に設定済みのキー(ボタン)、予約キー(ボタン)は設定できません。  
 
 ## 更新履歴
-2028/8/15 Ver.1.0.0  
+2024/8/16 Ver.1.0.1  
+ウィンドウを透明にする機能を追加。  
+2024/8/15 Ver.1.0.0  
 初版  

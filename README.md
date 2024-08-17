@@ -201,6 +201,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [地域マップ名](https://github.com/nuun888/MZ/blob/master/README/RegionMapName.md) | [NUUN_RegionMapName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapName.js) | 共 | 1.0.1 |
 | [地域マップBGM](https://github.com/nuun888/MZ/blob/master/README/RegionMapBGM.md) | [NUUN_RegionMapBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapBGM.js) | 共 | 1.0.0 |
 | [複数マップ結合](https://github.com/nuun888/MZ/blob/master/README/SeamlessMap.md) | [NUUN_SeamlessMap](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js) | 共 | 1.1.6 |
+| [ファストトラベル](https://github.com/nuun888/MZ/blob/master/README/FastTravel.md) | [NUUN_SeamlessMap](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FastTravel.js) | 共 | 1.0.0 |
 |  |  |  |  |
 
 | コマンド　　　　　　　　　　　　　　　 | プラグイン　プラグイン数3　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |

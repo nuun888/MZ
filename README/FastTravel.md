@@ -1,5 +1,5 @@
 # [ファストトラベル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FastTravel.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FastTravel.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -32,5 +32,8 @@ $gameMap.openFastTravel([id], [x], [y]);
 `[y]`:移動先Y座標  
 
 ## 更新履歴
+2024/8/18 Ver.1.0.1  
+移動先の向きを指定できる機能を追加。  
+選択できない場所にスクロールしないように修正。  
 2024/8/17 Ver.1.0.0  
 初版  

@@ -49,6 +49,7 @@
  * 8/18/2024 Ver.1.0.1
  * Added the ability to specify the direction of the destination.
  * Fixed to prevent scrolling to places that cannot be selected.
+ * Added back button (only when executed from plugin command).
  * 8/17/2024 Ver.1.0.0
  * First edition.
  * 
@@ -201,6 +202,33 @@
  * @default true
  * @parent FastTravelWindowSetting
  * 
+ * @param ButtonSetting
+ * @text Button setting
+ * @default ------------------------------
+ * 
+ * @param ButtonAbsoluteCoordinates
+ * @text Button absolute coordinates
+ * @desc Makes the button coordinates absolute coordinates.
+ * @type boolean
+ * @default false
+ * @parent ButtonSetting
+ * 
+ * @param ButtonX
+ * @text Cancel button X coordinate
+ * @desc X coordinate of the cancel button
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ButtonSetting
+ * 
+ * @param ButtonY
+ * @desc Y coordinate of the cancel button
+ * @text Cancel button Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ButtonSetting
+ * 
  */
 /*~struct~fastTravelSetting:
  * 
@@ -305,7 +333,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * ファストトラベルを実装します。
@@ -343,6 +371,7 @@
  * 2024/8/18 Ver.1.0.1
  * 移動先の向きを指定できる機能を追加。
  * 選択できない場所にスクロールしないように修正。
+ * 戻るボタンを追加。(プラグインコマンドから実行時のみ)
  * 2024/8/17 Ver.1.0.0
  * 初版
  * 
@@ -494,6 +523,33 @@
  * @type boolean
  * @default true
  * @parent FastTravelWindowSetting
+ * 
+ * @param ButtonSetting
+ * @text ボタン設定
+ * @default ------------------------------
+ * 
+ * @param ButtonAbsoluteCoordinates
+ * @text ボタン絶対座標
+ * @desc ボタンの座標を絶対座標にします。
+ * @type boolean
+ * @default false
+ * @parent ButtonSetting
+ * 
+ * @param ButtonX
+ * @text キャンセルボタンX座標
+ * @desc キャンセルボタンのX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ButtonSetting
+ * 
+ * @param ButtonY
+ * @desc キャンセルボタンのY座標
+ * @text キャンセルボタンY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ButtonSetting
  * 
  */
 /*~struct~fastTravelSetting:ja
@@ -686,6 +742,31 @@ Imported.NUUN_FastTravel = true;
         $gamePlayer.setDirectionFix($dataMap && !!$dataMap.meta.FastTravelMap);
     };
 
+    const _Scene_Map_createButtons = Scene_Map.prototype.createButtons;
+    Scene_Map.prototype.createButtons = function() {
+        _Scene_Map_createButtons.apply(this, arguments);
+        if (ConfigManager.touchUI) {
+            if (this.needsCancelFastTravelButton()) {
+                this.createCancelFastTravelButton();
+            }
+        }
+    };
+
+    Scene_Map.prototype.needsCancelFastTravelButton = function() {
+        return this._cancelFastTravel;
+    };
+
+    Scene_Map.prototype.createCancelFastTravelButton = function() {
+        this._cancelFastTravelButton = new Sprite_Button("cancel");
+        this._cancelFastTravelButton.x = (params.ButtonAbsoluteCoordinates ? 0 : Graphics.boxWidth - this._cancelFastTravelButton.width - 4) + params.ButtonX;
+        this._cancelFastTravelButton.y = this.fastTravelButtonY();
+        this.addWindow(this._cancelFastTravelButton);
+    };
+
+    Scene_Map.prototype.fastTravelButtonY = function() {
+        return (params.ButtonAbsoluteCoordinates ? 0 : 72) + params.ButtonY;
+    };
+
     Scene_Map.prototype.createFastTravel = function() {
         this.createFastTravelHelpWindow();
         this.createFastTravelWindow();
@@ -726,7 +807,7 @@ Imported.NUUN_FastTravel = true;
 
     const _Scene_Map_isMenuEnabled = Scene_Map.prototype.isMenuEnabled;
     Scene_Map.prototype.isMenuEnabled = function() {
-        return _Scene_Map_isMenuEnabled.apply(this, arguments) && this.isFastTravelActive();
+        return _Scene_Map_isMenuEnabled.apply(this, arguments) && !this._fastTravelMap;
     };
 
     Scene_Map.prototype.isFastTravelActive = function() {

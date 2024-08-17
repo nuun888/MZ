@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * You can set skills that can be activated randomly.
@@ -20,11 +20,15 @@
  * Skill notes
  * <RandomSkill:[id]> Set a skill that will be activated randomly from the skill set with the specified ID.
  * [id]:List number of random activation skill settings in plugin parameters.
+ * If no skill is selected randomly, the original skill will be used to attack.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/17/2024 Ver.1.0.2
+ * Fixed an issue that caused skills to not activate under certain conditions.
+ * Fixed an issue that allowed commands to be selected again.
  * 8/3/2023 Ver.1.0.1
  * Processing fixes.
  * 7/23/2023 Ver.1.0.0
@@ -86,7 +90,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 発動するスキルがランダムに発動出来るスキルを設定できます。
@@ -94,11 +98,15 @@
  * スキルのメモ欄
  * <RandomSkill:[id]> 指定IDで設定したスキルからランダムに発動するスキルを設定します。
  * [id]:プラグインパラメータのランダム発動スキル設定のリスト番号。
+ * ランダム抽選でスキルが選ばれなかった場合、元のスキルで攻撃します。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/17 Ver.1.0.2
+ * 条件によってはスキルが発動しない問題を修正。
+ * コマンドが再度選択できてしまう問題を修正。
  * 2023/8/3 Ver.1.0.1
  * 処理の修正。
  * 2023/7/23 Ver.1.0.0
@@ -159,57 +167,64 @@ var Imported = Imported || {};
 Imported.NUUN_RandomSkill = true;
 
 (() => {
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const parameters = PluginManager.parameters('NUUN_RandomSkill');
-    const RandomSkillSetting = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['RandomSkillSetting'])) : [];
-    
+
+    const _BattleManager_startAction = BattleManager.startAction;
+    BattleManager.startAction = function() {
+        this.setRandomSkill();
+        _BattleManager_startAction.apply(this, arguments);
+    };
+
+    BattleManager.setRandomSkill = function() {
+        const subject = this._subject;
+        const action = subject.currentAction();
+        action.setRandomSkill();
+    };
+
     const _Game_Action_clear = Game_Action.prototype.clear;
     Game_Action.prototype.clear = function() {
         _Game_Action_clear.call(this);
         this.randomSkillId = -1;
+        this.randomCostSkillId = -1;
     };
 
-    const _Game_Action_setSkill = Game_Action.prototype.setSkill;
-    Game_Action.prototype.setSkill = function(skillId) {
-        skillId = this.getRandomSkill(skillId);
-        _Game_Action_setSkill.call(this, skillId);
-    };
-
-    Game_Action.prototype.getRandomSkill = function(skillId) {
-        const ramdomSkill = getRandomSkillData(skillId);
+    Game_Action.prototype.setRandomSkill = function() {
+        const skill = this.item();
+        const ramdomSkill = _getRandomSkillData(skill.id);
         if (ramdomSkill) {
-            const skillList = ramdomSkill.RandomSkillList.filter(data => isRandomSkillCond(data) && isRandomSkillRate(data)).map(data => data.RandomSkill);
+            const skillList = ramdomSkill.RandomSkillList.filter(data => isRandomSkillCond(data) && isRandomSkillRate(data) && this.subject().isRandomSkillCost(ramdomSkill.RandomSkillCost, data)).map(data => data.RandomSkill);
             if (skillList && skillList.length > 0) {
-                this.randomSkillId = skillId;
-                return skillList[Math.randomInt(skillList.length)];
+                this.randomSkillId = skill.id;
+                const randomSkillId = skillList[Math.randomInt(skillList.length)];
+                this.randomCostSkillId = ramdomSkill.RandomSkillCost ? randomSkillId : skill.id;
+                this.setSkill(randomSkillId);
             }
         }
-        return skillId;
     };
 
-    const _Game_Battler_useItem = Game_Battler.prototype.useItem;
-    Game_Battler.prototype.useItem = function(item) {
-        if (DataManager.isSkill(item)) {
-            item = this.getRandomSkillCostItem(item);
-        }
-        _Game_Battler_useItem.call(this, item);
+    Game_Action.prototype.isRandomSkill = function() {
+        return this.randomSkillId >= 0;
     };
 
-    Game_Battler.prototype.getRandomSkillCostItem = function(item) {
+
+    const _Game_BattlerBase_canPaySkillCost = Game_BattlerBase.prototype.canPaySkillCost;
+    Game_BattlerBase.prototype.canPaySkillCost = function(skill) {
+        skill = this.canRandomSkillCost(skill);
+        return _Game_BattlerBase_canPaySkillCost.apply(this, arguments);
+    };
+
+    Game_Battler.prototype.isRandomSkillCost = function(mode, data) {
+        return mode ? this.canPaySkillCost($dataSkills[data.RandomSkill]) : true;
+    };
+
+    Game_Battler.prototype.canRandomSkillCost = function(skill) {
         const action = this.currentAction();
-        if (action && action.randomSkillId >= 0) {
-            const ramdomSkill = getRandomSkillData(action.randomSkillId);
-            if (ramdomSkill) {
-                return ramdomSkill.RandomSkillCost ? item : $dataSkills[action.randomSkillId];
-            }
+        if (action && action.isRandomSkill()) {
+            return $dataSkills[action.randomCostSkillId];
         }
-        return item;
+        return skill;
     };
-
-    function getRandomSkillData(skillId) {
-        const id = $dataSkills[skillId] && $dataSkills[skillId].meta.RandomSkill ? Number($dataSkills[skillId].meta.RandomSkill) : -1;
-            return RandomSkillSetting[id - 1];
-    };
-
 
     const _Window_BattleLog_displayAction = Window_BattleLog.prototype.displayAction;
     Window_BattleLog.prototype.displayAction = function(subject, item) {
@@ -220,12 +235,17 @@ Imported.NUUN_RandomSkill = true;
     Window_BattleLog.prototype.getRandomSkillMessage = function(subject, item) {
         if (DataManager.isSkill(item)) {
             const action = subject.currentAction();
-            const ramdomSkill = getRandomSkillData(action.randomSkillId);
+            const ramdomSkill = _getRandomSkillData(action.randomSkillId);
             if (ramdomSkill && !ramdomSkill.RandomSkillMessage) {
                 item = $dataSkills[action.randomSkillId];
             }
         }
         return item;
+    };
+
+    function _getRandomSkillData(skillId) {
+        const id = $dataSkills[skillId] && $dataSkills[skillId].meta.RandomSkill ? Number($dataSkills[skillId].meta.RandomSkill) : -1;
+        return params.RandomSkillSetting[id - 1];
     };
 
     function isRandomSkillCond(data) {

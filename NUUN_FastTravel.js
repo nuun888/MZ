@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Implement Fast Travel.
@@ -46,6 +46,9 @@
  * 
  * 
  * Log
+ * 8/18/2024 Ver.1.0.1
+ * Added the ability to specify the direction of the destination.
+ * Fixed to prevent scrolling to places that cannot be selected.
  * 8/17/2024 Ver.1.0.0
  * First edition.
  * 
@@ -279,6 +282,22 @@
  * @type number
  * @default 0
  * 
+ * @param Direction
+ * @desc Character direction.
+ * @text direction
+ * @type select
+ * @option As it is
+ * @value 0
+ * @option Down
+ * @value 2
+ * @option Left
+ * @value 4
+ * @option Right
+ * @value 6
+ * @option Up
+ * @value 8
+ * @default 0
+ * 
  */
 /*:ja
  * @target MZ
@@ -286,7 +305,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * ファストトラベルを実装します。
@@ -321,6 +340,9 @@
  * 
  * 
  * 更新履歴
+ * 2024/8/18 Ver.1.0.1
+ * 移動先の向きを指定できる機能を追加。
+ * 選択できない場所にスクロールしないように修正。
  * 2024/8/17 Ver.1.0.0
  * 初版
  * 
@@ -554,6 +576,22 @@
  * @type number
  * @default 0
  * 
+ * @param Direction
+ * @desc キャラクターの向き。
+ * @text 向き
+ * @type select
+ * @option そのまま
+ * @value 0
+ * @option 下
+ * @value 2
+ * @option 左
+ * @value 4
+ * @option 右
+ * @value 6
+ * @option 上
+ * @value 8
+ * @default 0
+ * 
  */
 
 var Imported = Imported || {};
@@ -702,7 +740,8 @@ Imported.NUUN_FastTravel = true;
             if (params.TransferEventTrigger) {
                 result = $gamePlayer.startFastTravelEvent(this.getFastTravelEvent());
             } else if (data.DestinationMapId > 0) {
-                $gamePlayer.reserveTransfer((data.DestinationMapId), data.DestinationMapX, data.DestinationMapY, 2, 0);
+                $gamePlayer.setDirectionFix(false);
+                $gamePlayer.reserveTransfer((data.DestinationMapId), data.DestinationMapX, data.DestinationMapY, data.Direction, 0);
                 result = true;
             }
             if (data.CommonEvent > 0) {
@@ -838,7 +877,7 @@ Imported.NUUN_FastTravel = true;
     Window_FastTravel.prototype.select = function(index) {
         Window_Selectable.prototype.select.call(this, index);
         const event = this.getFastTravelEvent(index)
-        if (event) {
+        if (this.isCurrentItemEnabled() && event) {
             this._eventX = event.x;
             this._eventY = event.y;
             const newDisplayX = event.x - $gamePlayer.centerX();
@@ -862,7 +901,9 @@ Imported.NUUN_FastTravel = true;
     Window_FastTravel.prototype.update = function() {
         Window_Selectable.prototype.update.call(this);
         if (this.active) {
-            $gamePlayer.fastTravelLocate(this._eventX, this._eventY);
+            if (this.isCurrentItemEnabled()) {
+                $gamePlayer.fastTravelLocate(this._eventX, this._eventY);
+            }
             this.updateScroll();
         }
     };

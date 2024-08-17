@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.5
+ * @version 3.0.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,6 +70,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/17/2024 Ver.3.0.6
+ * Fixed an issue that caused the save file cursor to be unnatural when the autosave display on the save screen was disabled.
+ * Fixed a spelling mistake.
  * 7/27/2024 Ver.3.0.5
  * Added the ability to set the number of content columns in the save info window.
  * Added the ability to specify decimal points for some items.
@@ -1300,7 +1303,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.5
+ * @version 3.0.6
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1363,6 +1366,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/17 Ver.3.0.6
+ * セーブ画面のオートセーブ表示を無効にしたときに、セーブファイルのカーソルが不自然になる問題を修正。
+ * スペルミスを修正。
  * 2024/7/27 Ver.3.0.5
  * セーブインフォウィンドウでコンテンツ列数の設定を追加。
  * 一部項目に小数点数を指定できる機能を追加。
@@ -2599,7 +2605,7 @@ Imported.NUUN_SaveScreen_3 = true;
     const parameters = PluginManager.parameters('NUUN_SaveScreen_3');
 
     function getSaveContentsBackgroundImg() {
-        return !!$dataMap && $dataMap.meta && $dataMap.meta.SaveContentsBackImg ?  saveLayout.ContentsBackGroundImg[Number($dataMap.meta.SaveContentsBackImg) - 1] : $gameSystem.saveContentsBuckgroundImg;
+        return !!$dataMap && $dataMap.meta && $dataMap.meta.SaveContentsBackImg ?  saveLayout.ContentsBackGroundImg[Number($dataMap.meta.SaveContentsBackImg) - 1] : $gameSystem.saveContentsBackgroundImg;
     };
 
     function allContentsList() {
@@ -2621,7 +2627,7 @@ Imported.NUUN_SaveScreen_3 = true;
     PluginManager.registerCommand(pluginName, 'ChangeBackground', args => {
         const data = String(args.BackGroundImg);
         if (data) {
-        $gameSystem.setSaveBuckGround(data, Number(args.BackGroundId));
+        $gameSystem.setSaveBackGround(data, Number(args.BackGroundId));
         }
     });
 
@@ -2685,7 +2691,7 @@ Imported.NUUN_SaveScreen_3 = true;
             info.characters = [[actor.characterName(), actor.characterIndex()]];
             info.faces = [[actor.faceName(), actor.faceIndex()]];
         }
-        info.background = $gameSystem.saveBuckgroundImg;
+        info.background = $gameSystem.saveBackgroundImg;
         info.contentsBack = getSaveContentsBackgroundImg();
         for(const contents of allSaveContents) {
             switch (contents.DateSelect) {
@@ -3035,7 +3041,7 @@ Imported.NUUN_SaveScreen_3 = true;
         if (saveLayout.BackGroundImg) {
             let data = null;
             if (this._mode === 'save') {
-                data = $gameSystem.getSaveBuckGround();
+                data = $gameSystem.getSaveBackGround();
             } else {
                 data = DataManager.loadBackground() || BackGroundImg;
             }
@@ -3100,7 +3106,7 @@ Imported.NUUN_SaveScreen_3 = true;
     
     const _Window_SavefileList_savefileIdToIndex = Window_SavefileList.prototype.savefileIdToIndex;
     Window_SavefileList.prototype.savefileIdToIndex = function(savefileId) {
-        return _Window_SavefileList_savefileIdToIndex.apply(this, arguments) + this.isSaveFileShowAutoSave();
+        return _Window_SavefileList_savefileIdToIndex.apply(this, arguments) - this.isSaveFileShowAutoSave();
     };
     
     Window_SavefileList.prototype.lineHeight = function() {
@@ -3108,7 +3114,11 @@ Imported.NUUN_SaveScreen_3 = true;
     };
 
     Window_SavefileList.prototype.isSaveFileShowAutoSave = function() {
-        return !params.SaveFileShowAutoSave && this._mode === 'save' ? 1 : 0;
+        if (this._autosave) {
+            return !params.SaveFileShowAutoSave && this._mode === 'save' ? 1 : 0;
+        } else {
+            return 0;
+        }
     };
 
     Window_SavefileList.prototype.setSaveStatusWindowList = function(windowList) {
@@ -3162,21 +3172,21 @@ Imported.NUUN_SaveScreen_3 = true;
     Window_SavefileList.prototype.drawItemBackground = function(index) {
         const savefileId = this.indexToSavefileId(index);
         const info = DataManager.savefileInfo(savefileId);
-        const buckgroundImg = info && !!info.contentsBack ? info.contentsBack : null;
-        if (buckgroundImg) {
-            const bitmap = ImageManager.nuun_LoadPictures(buckgroundImg);
+        const backgroundImg = info && !!info.contentsBack ? info.contentsBack : null;
+        if (backgroundImg) {
+            const bitmap = ImageManager.nuun_LoadPictures(backgroundImg);
         if (bitmap && !bitmap.isReady()) {
-            bitmap.addLoadListener(this.drawContentsBack.bind(this, bitmap, index, buckgroundImg));
+            bitmap.addLoadListener(this.drawContentsBack.bind(this, bitmap, index, backgroundImg));
         } else {
-            this.drawContentsBack(bitmap, index, buckgroundImg);
+            this.drawContentsBack(bitmap, index, backgroundImg);
         }
         } else {
         _Window_SavefileList_drawItemBackground.call(this, index);
         }
     };
 
-    Window_SavefileList.prototype.drawContentsBack = function(bitmap, index , buckgroundImg) {
-        const data = saveLayout.ContentsBackSettingsList.find(imgData => buckgroundImg === imgData.ContentsBackGroundImg);
+    Window_SavefileList.prototype.drawContentsBack = function(bitmap, index , backgroundImg) {
+        const data = saveLayout.ContentsBackSettingsList.find(imgData => backgroundImg === imgData.ContentsBackGroundImg);
         let sx = 0;
         let sy = 0;
         let scale = saveLayout.ContentsBackScale;
@@ -3901,27 +3911,27 @@ Imported.NUUN_SaveScreen_3 = true;
     const _Game_System_initialize = Game_System.prototype.initialize;
     Game_System.prototype.initialize = function() {
         _Game_System_initialize.call(this);
-        this.saveBuckgroundImg = [saveLayout.BackGroundImg, 0];
-        this.saveContentsBuckgroundImg = saveLayout.ContentsBackGroundImg[0];
+        this.saveBackgroundImg = [saveLayout.BackGroundImg, 0];
+        this.saveContentsBackgroundImg = saveLayout.ContentsBackGroundImg[0];
         this.onSnap = false;
     };
 
-    Game_System.prototype.setSaveBuckGround = function(img, id) {
-        const buckgroundId = saveLayout.AutomaticSetting ? (this.buckgroundId || 0) + 1 : id;
-        this.saveBuckgroundImg = [img, buckgroundId];
+    Game_System.prototype.setSaveBackGround = function(img, id) {
+        const backgroundId = saveLayout.AutomaticSetting ? (this.backgroundId || 0) + 1 : id;
+        this.saveBackgroundImg = [img, backgroundId];
     };
 
-    Game_System.prototype.getSaveBuckGround = function() {
-        this.saveBuckgroundImg = this.saveBuckgroundImg && !!this.saveBuckgroundImg[0] ? this.saveBuckgroundImg : [saveLayout.BackGroundImg, 0];
-        return this.saveBuckgroundImg[0];
+    Game_System.prototype.getSaveBackGround = function() {
+        this.saveBackgroundImg = this.saveBackgroundImg && !!this.saveBackgroundImg[0] ? this.saveBackgroundImg : [saveLayout.BackGroundImg, 0];
+        return this.saveBackgroundImg[0];
     };
 
-    Game_System.prototype.getSaveBuckGroundId = function() {
-        return this.saveBuckgroundImg[1] || 0;
+    Game_System.prototype.getSaveBackGroundId = function() {
+        return this.saveBackgroundImg[1] || 0;
     };
 
-    Game_System.prototype.setSaveContentsBuckGround = function(img) {
-        this.saveContentsBuckgroundImg = img ? img : saveLayout.ContentsBackGroundImg[0];
+    Game_System.prototype.setSaveContentsBackGround = function(img) {
+        this.saveContentsBackgroundImg = img ? img : saveLayout.ContentsBackGroundImg[0];
     };
 
 

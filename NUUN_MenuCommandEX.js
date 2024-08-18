@@ -12,7 +12,8 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @url https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md
+ * @version 1.2.0
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
@@ -26,6 +27,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/18/2024 Ver.1.2.0
+ * Added a function to specify an image when selection is disabled.
+ * Added a function to set the opacity of the image when selection is disabled.
  * 1/7/2024 Ver.1.1.4
  * Fixed by updating menu screen Ver.3.0.0.
  * 2/24/2023 Ver.1.1.3
@@ -140,6 +144,12 @@
  * @min -9999
  * @default 0
  * 
+ * @param EnabledOpacity
+ * @desc Opacity when not selectable.
+ * @text Unselectable Opacity
+ * @type number
+ * @default 255
+ * 
  * @param ContentsBackSetting
  * @text Content background setting
  * @default ------------------------------
@@ -155,6 +165,14 @@
  * @param SelectContentsBackGroundImg
  * @desc Specifies the content background image file name when the cursor is selected.
  * @text Content background image when cursor is selected
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ContentsBackSetting
+ * 
+ * @param NoSelectContentsBackGroundImg
+ * @desc Specifies the file name of the background image for non-selectable content.
+ * @text Unselectable content background image
  * @type file
  * @dir img/
  * @default 
@@ -221,7 +239,8 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @url https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md
+ * @version 1.2.0
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
@@ -235,6 +254,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/18 Ver.1.2.0
+ * 選択不可時の画像を指定できる機能を追加。
+ * 選択不可時の画像の不透明度を設定できる機能を追加。
  * 2024/1/7 Ver.1.1.4
  * メニュー画面Ver.3.0.0更新による修正。
  * 2023/2/24 Ver.1.1.3
@@ -291,6 +313,12 @@
  * @desc 全てのコマンド座標をインデックス起点からウィンドウ左上起点にします。
  * @type boolean
  * @default false
+ * 
+ * @param EnabledOpacity
+ * @desc 選択できない時の不透明度。
+ * @text 選択不可時不透明度
+ * @type number
+ * @default 255
  * 
  * @param CommandEffectSetting
  * @text コマンドエフェクト設定
@@ -369,6 +397,14 @@
  * @default 
  * @parent ContentsBackSetting
  * 
+ * @param NoSelectContentsBackGroundImg
+ * @desc 選択不可のコンテンツ背景画像ファイル名を指定します。
+ * @text 選択不可コンテンツ背景画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ContentsBackSetting
+ * 
  * @param ContentsImgX
  * @desc コマンド背景画像のX座標。(相対)
  * @text コマンド背景画像X座標
@@ -429,17 +465,8 @@ var Imported = Imported || {};
 Imported.NUUN_MenuCommandEX = true;
 
 (() => {
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const parameters = PluginManager.parameters('NUUN_MenuCommandEX');
-    const MenuCommandSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['MenuCommandSetting'])) : null) || [];
-    const ContentsWidth = Number(parameters['ContentsWidth'] || 0);
-    const ContentsHeight = Number(parameters['ContentsHeight'] || 0);
-    const SelectContentsX = Number(parameters['SelectContentsX'] || 0);
-    const SelectContentsY = Number(parameters['SelectContentsY'] || 0);
-    const SelectContentsDuration = Number(parameters['SelectContentsDuration'] || 10);
-    const SelectOFFFlash = eval(parameters['SelectOnFlash'] || "false");
-    const HideCommandName = eval(parameters['HideCommandName'] || "false");
-    const CommandSort = eval(parameters['CommandSort'] || "false");
-    const CommandZeroPosition = eval(parameters['CommandZeroPosition'] || "false");
 
     const _Window_MenuCommand_initialize = Window_MenuCommand.prototype.initialize;
     Window_MenuCommand.prototype.initialize = function(rect) {
@@ -455,12 +482,15 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     Window_MenuCommand.prototype.loadCommandBitmap = function() {
-        for (const data of MenuCommandSetting) {
+        for (const data of params.MenuCommandSetting) {
             if (data.ContentsBackGroundImg) {
                 ImageManager.nuun_LoadPictures(data.ContentsBackGroundImg)
             }
             if (data.SelectContentsBackGroundImg) {
                 ImageManager.nuun_LoadPictures(data.SelectContentsBackGroundImg)
+            }
+            if (data.NoSelectContentsBackGroundImg) {
+                ImageManager.nuun_LoadPictures(data.NoSelectContentsBackGroundImg)
             }
             if (data.CommandImg) {
                 ImageManager.nuun_LoadPictures(data.CommandImg)
@@ -469,19 +499,19 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     Window_MenuCommand.prototype.getMenuCommandEX = function(index) {
-        return MenuCommandSetting.find(data => data.CommandName === this.commandName(index));
+        return params.MenuCommandSetting.find(data => data.CommandName === this.commandName(index));
     };
 
     Window_MenuCommand.prototype.itemWidth = function() {
-        return ContentsWidth > 0 ? ContentsWidth : Window_Selectable.prototype.itemWidth.call(this);
+        return params.ContentsWidth > 0 ? params.ContentsWidth : Window_Selectable.prototype.itemWidth.call(this);
     };
     
     Window_MenuCommand.prototype.itemHeight = function() {
-        return ContentsHeight > 0 ? ContentsHeight : Window_Selectable.prototype.itemHeight.call(this);
+        return params.ContentsHeight > 0 ? params.ContentsHeight : Window_Selectable.prototype.itemHeight.call(this);
     };
 
     Window_MenuCommand.prototype.menuCommandExData = function(index) {
-        return MenuCommandSetting[this._list[index].commandEXId];
+        return params.MenuCommandSetting[this._list[index].commandEXId];
     };
 
     Window_MenuCommand.prototype.isCurrentCommandEx = function(index) {
@@ -503,9 +533,9 @@ Imported.NUUN_MenuCommandEX = true;
         const newList = [];
         const normalList = [];
         this._list.forEach((data, index) => {
-            const find = MenuCommandSetting.findIndex(command => command.CommandName === data.name || command.CommandSymbol === data.symbol);
+            const find = params.MenuCommandSetting.findIndex(command => command.CommandName === data.name || command.CommandSymbol === data.symbol);
             data.commandEXId = find;
-            if (CommandSort) {
+            if (params.CommandSort) {
                 if (find >= 0) {
                     newList[find] = data;
                 } else {
@@ -513,7 +543,7 @@ Imported.NUUN_MenuCommandEX = true;
                 }
             }
         });
-        if (CommandSort) {
+        if (params.CommandSort) {
             this._list = newList.concat(normalList).filter(list => !!list);
         }
         this.setCommandSprite();
@@ -553,8 +583,8 @@ Imported.NUUN_MenuCommandEX = true;
         const rect = Window_Selectable.prototype.itemRect.call(this, index);
         const data = this.menuCommandExData(index);
         if (data) {
-            rect.x = (CommandZeroPosition ? 0 : rect.x) + data.ContentsX;
-            rect.y = (CommandZeroPosition ? 0 : rect.y) + data.ContentsY;
+            rect.x = (params.CommandZeroPosition ? 0 : rect.x) + data.ContentsX;
+            rect.y = (params.CommandZeroPosition ? 0 : rect.y) + data.ContentsY;
             rect.width = data.ContentsWidth > 0 ? data.ContentsWidth - this.colSpacing() : rect.width;
             rect.height = data.ContentsHeight > 0 ? data.ContentsHeight - this.rowSpacing() : rect.height;
         }
@@ -563,7 +593,7 @@ Imported.NUUN_MenuCommandEX = true;
 
     Window_MenuCommand.prototype.drawItem = function(index) {
         const data = this.menuCommandExData(index);
-        if (!data || data && !HideCommandName) {
+        if (!data || data && !params.HideCommandName) {
             Window_Command.prototype.drawItem.call(this, index);
         }
         if (data) {
@@ -599,6 +629,7 @@ Imported.NUUN_MenuCommandEX = true;
             } else {
                 sprite.resetMoveCommand();
             }
+            sprite.opacity = this.isCommandEnabled(index) ? 255 : params.EnabledOpacity;
         }
         if (!image) {
             Window_Selectable.prototype.drawItemBackground.call(this, index);
@@ -608,13 +639,19 @@ Imported.NUUN_MenuCommandEX = true;
     Window_MenuCommand.prototype.getBackgroundImg = function(index) {
         const data = this.menuCommandExData(index);
         if (data) {
-            return this.isCurrentCommandEx(index) && data.SelectContentsBackGroundImg ? data.SelectContentsBackGroundImg : data.ContentsBackGroundImg;
+            if (!this.isCommandEnabled(index) && data.NoSelectContentsBackGroundImg) {
+                return data.NoSelectContentsBackGroundImg;
+            } else if (this.isCurrentCommandEx(index) && data.SelectContentsBackGroundImg) {
+                return data.SelectContentsBackGroundImg;
+            } else if (data.ContentsBackGroundImg) {
+                return data.ContentsBackGroundImg;
+            }
         }
         return null;
     };
 
     Window_MenuCommand.prototype.refreshCursor = function() {
-        if (!SelectOFFFlash) {
+        if (!params.SelectOFFFlash) {
             Window_Selectable.prototype.refreshCursor.call(this);
         }
     };
@@ -644,11 +681,11 @@ Imported.NUUN_MenuCommandEX = true;
     };
     
     Sprite_MenuCommand.prototype.bitmapWidth = function() {
-        return this._data && this._data.ContentsWidth > 0 ? this._data.ContentsWidth : ContentsWidth;
+        return this._data && this._data.ContentsWidth > 0 ? this._data.ContentsWidth : params.ContentsWidth;
     };
     
     Sprite_MenuCommand.prototype.bitmapHeight = function() {
-        return this._data && this._data.ContentsHeight > 0 ? this._data.ContentsHeight : ContentsHeight;
+        return this._data && this._data.ContentsHeight > 0 ? this._data.ContentsHeight : params.ContentsHeight;
     };
 
     Sprite_MenuCommand.prototype.setup = function(x, y, data, symbol, lastSymbol) {
@@ -682,9 +719,9 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     Sprite_MenuCommand.prototype.moveCommand = function() {
-        this._targetX = SelectContentsX;
-        this._targetY = SelectContentsY;
-        this._isMoveing = SelectContentsX !== 0 || SelectContentsY !== 0;
+        this._targetX = params.SelectContentsX;
+        this._targetY = params.SelectContentsY;
+        this._isMoveing = params.SelectContentsX !== 0 || params.SelectContentsY !== 0;
         this._cursorOn = true;
     };
 
@@ -698,7 +735,7 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     Sprite_MenuCommand.prototype.isMovingDuration = function() {
-        return SelectContentsDuration;
+        return params.SelectContentsDuration;
     };
 
     Sprite_MenuCommand.prototype.update = function() {
@@ -709,36 +746,36 @@ Imported.NUUN_MenuCommandEX = true;
     Sprite_MenuCommand.prototype.updateMoveing = function() {
         if (this._isMoveing) {
             if (this._cursorOn) {
-                this._moveX = this._moveX + Math.floor(SelectContentsX / this.isMovingDuration());
-                this._moveY = this._moveY + Math.floor(SelectContentsY / this.isMovingDuration());
+                this._moveX = this._moveX + Math.floor(params.SelectContentsX / this.isMovingDuration());
+                this._moveY = this._moveY + Math.floor(params.SelectContentsY / this.isMovingDuration());
                 this.x = this._homeX + this._moveX;
                 this.y = this._homeY + this._moveY;
-                if (SelectContentsX > 0 && this.x >= this._homeX + this._targetX) {
+                if (params.SelectContentsX > 0 && this.x >= this._homeX + this._targetX) {
                     this.x = Math.min(this.x, this._homeX + this._targetX);
-                } else if (SelectContentsX < 0 && this.x <= this._homeX + this._targetX) {
+                } else if (params.SelectContentsX < 0 && this.x <= this._homeX + this._targetX) {
                     this.x = Math.max(this.x, this._homeX + this._targetX);
                 }
-                if (SelectContentsY > 0 && this.y >= this._homeY + this._targetY) {
+                if (params.SelectContentsY > 0 && this.y >= this._homeY + this._targetY) {
                     this.y = Math.min(this.y, this._homeY + this._targetY);
-                } else if (SelectContentsY < 0 && this.y <= this._homeY + this._targetY) {
+                } else if (params.SelectContentsY < 0 && this.y <= this._homeY + this._targetY) {
                     this.y = Math.max(this.y, this._homeY + this._targetY);
                 }
                 if (this.x === this._homeX + this._targetX && this.y === this._homeY + this._targetY) {
                     this._isMoveing = false;
                 }
             } else {
-                this._moveX = this._moveX - Math.floor(SelectContentsX / this.isMovingDuration());
-                this._moveY = this._moveY - Math.floor(SelectContentsY / this.isMovingDuration());
+                this._moveX = this._moveX - Math.floor(params.SelectContentsX / this.isMovingDuration());
+                this._moveY = this._moveY - Math.floor(params.SelectContentsY / this.isMovingDuration());
                 this.x = this._homeX + this._moveX;
                 this.y = this._homeY + this._moveY;
-                if (SelectContentsX > 0 && this.x <= this._homeX) {
+                if (params.SelectContentsX > 0 && this.x <= this._homeX) {
                     this.x = Math.max(this.x, this._homeX);
-                } else if (SelectContentsX < 0 && this.x >= this._homeX) {
+                } else if (params.SelectContentsX < 0 && this.x >= this._homeX) {
                     this.x = Math.min(this.x, this._homeX);
                 }
-                if (SelectContentsY < 0 && this.y >= this._homeY) {
+                if (params.SelectContentsY < 0 && this.y >= this._homeY) {
                     this.y = Math.min(this.y, this._homeY);
-                } else if (SelectContentsY > 0 && this.y <= this._homeY) {
+                } else if (params.SelectContentsY > 0 && this.y <= this._homeY) {
                     this.y = Math.max(this.y, this._homeY);
                 }
                 if (this.x === this._homeX && this.y === this._homeY) {

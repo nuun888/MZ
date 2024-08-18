@@ -1,11 +1,11 @@
-# [ツリー型スキル習得システム](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FTKR_SkillTreeSystem_MZ.js)
+# [ツリー型スキル習得システム](https://raw.githubusercontent.com/nuun888/MZ/master/futokoro/NUUN_FTKR_SkillTreeSystem_MZ.js)
 # Ver.1.0.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeSystem_MZ.js)
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/futokoro/NUUN_SkillTreeSystem_MZ.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 #### 拡張プラグイン
-[ツリー型スキル習得システム用 ウィンドウレイアウト変更プラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/FTKR_STS_CustomWindow_MZ.js)  
+[ツリー型スキル習得システム用 ウィンドウレイアウト変更プラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/futokoro/FTKR_STS_CustomWindow_MZ.js)  
 
 ツリー型のスキル習得システムを実装するプラグインです。  
 

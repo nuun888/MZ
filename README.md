@@ -334,7 +334,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | 他作プラグイン移植　　　　　 | プラグイン　プラグイン数　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [ツリー型スキル習得システム](https://github.com/nuun888/MZ/blob/master/README/FTKR_SkillTreeSystem.md) | [FTKR_SkillTreeSystem](https://raw.githubusercontent.com/nuun888/MZ/master/futokoro/FTKR_SkillTreeSystem_MZ.js) | 共 | 1.0.0 |
+| [ツリー型スキル習得システム] |  | 共 | 1.0.0 |
 |  |  |  |  |
 
 

@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.5
+ * @version 1.0.6
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/19/2024 Ver.1.0.6
+ * Fixed an issue where the state (menu type) display did not change.
  * 8/14/2024 Ver.1.0.5
  * Fixed an issue that caused the game to freeze when returning to party commands after selecting an action for the second or subsequent times.
  * 8/11/2024 Ver.1.0.4
@@ -1936,7 +1938,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.5
+ * @version 1.0.6
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2006,6 +2008,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/19 Ver.1.0.6
+ * ステート(メニュータイプ)の表示が切り替わらなっかた問題を修正。
  * 2024/8/14 Ver.1.0.5
  * 2回目以降の行動選択時からパーティコマンドに戻る際にフリーズする問題を修正。
  * 2024/8/11 Ver.1.0.4
@@ -2171,6 +2175,13 @@
  * @type boolean
  * @default true
  * @parent ActorEffect
+ * 
+ * @param ActorRefreshStatusWindowRefresh
+ * @desc アクターリフレッシュ時にウィンドウステータスを更新する。
+ * @text アクターリフレッシュ時ステータス更新
+ * @type boolean
+ * @default false
+ * @parent ActorStatusWindowSetting
  * 
  * @param EnemyEffect
  * @text 敵のエフェクト
@@ -5251,14 +5262,23 @@ Imported.NUUN_BattleStyleEX = true;
     Game_Temp.prototype.initialize = function() {
         _Game_Temp_initialize.call(this);
         this._battleStyleRefresh = false;
+        this._battleStyleStatusRefresh = false;
     };
 
     Game_Temp.prototype.setBattleStyleRefresh = function(flag) {
         this._battleStyleRefresh = flag;
     };
     
-    Game_Temp.prototype.isBattleStyleRequested = function() {
+    Game_Temp.prototype.isBattleStyleRequested = function() {setBattleStyleStatusRefresh
         return this._battleStyleRefresh || false;
+    };
+
+    Game_Temp.prototype.setBattleStyleStatusRefresh = function(flag) {
+        this._battleStyleStatusRefresh = flag;
+    };
+    
+    Game_Temp.prototype.isBattleStyleStatusRequested = function() {
+        return this._battleStyleStatusRefresh || false;
     };
 
 
@@ -5356,6 +5376,12 @@ Imported.NUUN_BattleStyleEX = true;
         _Game_Actor_performVictory.apply(this, arguments);
         this.setBattleImgId(20);
         //this.battleStyleImgRefresh();
+    };
+
+    const _Game_Actor_refresh = Game_Actor.prototype.refresh;
+    Game_Actor.prototype.refresh = function() {
+        _Game_Actor_refresh.apply(this, arguments);
+        $gameTemp.setBattleStyleStatusRefresh(params.ActorRefreshStatusWindowRefresh);
     };
 
     Game_Battler.prototype.isCounterSkillAction = function() {
@@ -6407,8 +6433,16 @@ Imported.NUUN_BattleStyleEX = true;
         }
     };
 
+    Window_BattleActorStatus.prototype.update = function() {
+        Window_BattleStatus.prototype.update.apply(this, arguments);
+        if (!$gameTemp.isBattleRefreshRequested() && $gameTemp.isBattleStyleStatusRequested()) {
+            this.preparePartyRefresh();
+        }
+    };
+    
     Window_BattleActorStatus.prototype.preparePartyRefresh = function() {
         $gameTemp.clearBattleRefreshRequest();
+        $gameTemp.setBattleStyleStatusRefresh(false);
         this.performPartyRefresh();
     };
     
@@ -6474,7 +6508,7 @@ Imported.NUUN_BattleStyleEX = true;
     };
 
     Window_BsBattleActor.prototype.drawItem = function(index) {
-        this.drawItemImage(index);console.log(this.maxCols())
+        this.drawItemImage(index);
         this.drawItemStatus(index);
     };
 

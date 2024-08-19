@@ -1,5 +1,5 @@
 # [メニューコマンド表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
 #### 必須、前提プラグイン
 ※[メニュー画面](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)   
@@ -12,6 +12,8 @@
 ![画像](img/MenuCommandEX1.png)   
 
 ## 更新履歴
+2024/8/19 Ver.1.2.1
+対象選択時カーソル非表示が機能していなかった問題を修正。  
 2024/8/18 Ver.1.2.0  
 選択不可時の画像を指定できる機能を追加。  
 選択不可時の画像の不透明度を設定できる機能を追加。  

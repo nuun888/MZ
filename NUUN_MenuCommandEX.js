@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/19/2024 Ver.1.2.1
+ * Fixed an issue where hiding the cursor when selecting a target was not working.
  * 8/18/2024 Ver.1.2.0
  * Added a function to specify an image when selection is disabled.
  * Added a function to set the opacity of the image when selection is disabled.
@@ -240,7 +242,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
@@ -254,6 +256,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/19 Ver.1.2.1
+ * 対象選択時カーソル非表示が機能していなかった問題を修正。
  * 2024/8/18 Ver.1.2.0
  * 選択不可時の画像を指定できる機能を追加。
  * 選択不可時の画像の不透明度を設定できる機能を追加。
@@ -651,7 +655,7 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     Window_MenuCommand.prototype.refreshCursor = function() {
-        if (!params.SelectOFFFlash) {
+        if (!params.SelectOnFlash) {
             Window_Selectable.prototype.refreshCursor.call(this);
         }
     };

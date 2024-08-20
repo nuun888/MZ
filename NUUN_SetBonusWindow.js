@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Set bonus tooltip window
  * @author NUUN
- * @version 1.0.4
+ * @version 1.0.5
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/20/2024 Ver.1.0.5
+ * Added the ability to apply text codes to set bonus text and parameters.
  * 3/18/2023 Ver.1.0.4
  * Fixed not to process when invalid ID is specified.
  * 11/17/2022 Ver.1.0.3
@@ -67,12 +69,18 @@
  * @type boolean
  * @default false
  * 
+ * @param IsTextCode
+ * @desc Apply text codes to set bonus effect text.
+ * @text Apply text code
+ * @type boolean
+ * @default false
+ * 
  */
 /*:ja
  * @target MZ
  * @plugindesc セットボーナスツールチップウィンドウ
  * @author NUUN
- * @version 1.0.4
+ * @version 1.0.5
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -81,6 +89,8 @@
  * 装備画面で装備スロット選択中の装備で現在適用しているセットボーナスを表示します。
  * 
  * 更新履歴
+ * 2024/8/20 Ver.1.0.5
+ * セットボーナステキスト、パラメータに制御文字を適用できる機能を追加。
  * 2023/3/18 Ver.1.0.4
  * 無効なIDを指定したときに処理しないように修正。
  * 2022/11/17 Ver.1.0.3
@@ -126,6 +136,12 @@
  * @type boolean
  * @default false
  * 
+ * @param IsTextCode
+ * @desc セットボーナス効果のテキストに制御文字を適用。
+ * @text 制御文字適用
+ * @type boolean
+ * @default false
+ * 
  */
 
 var Imported = Imported || {};
@@ -138,6 +154,7 @@ const SetBonusNameColor = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureDat
 const WindowDuration = Number(parameters['WindowDuration'] || 0);
 const WindowWidth = Number(parameters['WindowWidth'] || 400);
 const HelpOver = eval(parameters['HelpOver'] || 'false');
+const IsTextCode = eval(parameters['IsTextCode'] || 'false');
 
 const _Scene_Equip_create = Scene_Equip.prototype.create;
 Scene_Equip.prototype.create = function() {
@@ -317,7 +334,11 @@ Window_SetBounsEquip.prototype.drawSetBonusParam = function(data, x, y, width) {
                 text += text ? ','+ textData : textData;
             }
             if (!!text) {
-                this.drawText(text, x + textWidth, y, width - textWidth);
+                if (IsTextCode) {
+                    this.drawTextEx(text, x + textWidth, y, width - textWidth);
+                } else {
+                    this.drawText(text, x + textWidth, y, width - textWidth);
+                }
             }
         });
     }
@@ -341,7 +362,11 @@ Window_SetBounsEquip.prototype.drawSetBonusNumberEquipment = function(data, x, y
                 text += text ? ','+ textData : textData;
             }
             if (!!text) {
-                this.drawText(text, x + textWidth, y, width - textWidth);
+                if (IsTextCode) {
+                    this.drawTextEx(text, x + textWidth, y, width - textWidth);
+                } else {
+                    this.drawText(text, x + textWidth, y, width - textWidth);
+                }
             }
         });
     }

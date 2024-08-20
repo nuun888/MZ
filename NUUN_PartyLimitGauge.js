@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -62,6 +62,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/20/2024 Ver.1.6.3
+ * Added the ability to hide the gauge in certain situations.
  * 8/9/2024 Ver.1.6.2
  * Added the ability to specify the display priority of gauge sprites.
  * 3/16/2024 Ver.1.6.1
@@ -404,13 +406,47 @@
  * @default 00000
  * @parent CostSetting
  * 
+ * @param OtherSetting
+ * @text Other settings
+ * @default ------------------------------
+ * 
+ * @param WindowHideActorPartyLimit
+ * @desc Hides the ally limit gauge during certain events.
+ * @text Hide ally limit gauge specific gauge
+ * @type select[]
+ * @option Battle starts
+ * @value startBattle
+ * @option Battle end
+ * @value battleEnd
+ * @option Battle event
+ * @value battleEvent
+ * @option Animation
+ * @value animation
+ * @default []
+ * @parent OtherSetting
+ * 
+ * @param WindowHideEnemyPartyLimit
+ * @desc Hides the enemy limit gauge during certain events.
+ * @text Hide specific enemy limit gauge
+ * @type select[]
+ * @option Battle starts
+ * @value startBattle
+ * @option Battle end
+ * @value battleEnd
+ * @option Battle event
+ * @value battleEvent
+ * @option Animation
+ * @value animation
+ * @default []
+ * @parent OtherSetting
+ * 
  * 
  */
 /*:ja
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -468,6 +504,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/20 Ver.1.6.3
+ * 特定の状況でゲージを非表示にする機能を追加。
  * 2024/8/9 Ver.1.6.2
  * ゲージSpriteの表示優先度を指定できる機能を追加。
  * 2024/3/16 Ver.1.6.1
@@ -811,6 +849,40 @@
  * @default 00000
  * @parent CostSetting
  * 
+ * @param OtherSetting
+ * @text その他設定
+ * @default ------------------------------
+ * 
+ * @param WindowHideActorPartyLimit
+ * @desc 味方リミットゲージの特定のイベントでゲージを非表示にします。
+ * @text 味方リミットゲージ特定ゲージ非表示
+ * @type select[]
+ * @option バトル開始
+ * @value startBattle
+ * @option バトル終了
+ * @value battleEnd
+ * @option バトルイベント
+ * @value battleEvent
+ * @option アニメーション
+ * @value animation
+ * @default []
+ * @parent OtherSetting
+ * 
+ * @param WindowHideEnemyPartyLimit
+ * @desc 敵リミットゲージの特定のイベントでゲージを非表示にします。
+ * @text 敵リミットゲージ特定ゲージ非表示
+ * @type select[]
+ * @option バトル開始
+ * @value startBattle
+ * @option バトル終了
+ * @value battleEnd
+ * @option バトルイベント
+ * @value battleEvent
+ * @option アニメーション
+ * @value animation
+ * @default []
+ * @parent OtherSetting
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_PartyLimitGauge = true;
@@ -859,7 +931,8 @@ const CriticalAmount = NuunManager.getEvalCode(parameters['CriticalAmount']) || 
 const LimitCostColor = Number(parameters['LimitCostColor'] || 0);
 const MultiCostWidth = String(parameters['CostWidth'] || '00000');
 const GaugePriority = eval(parameters['GaugePriority'] || 'Scene_Battle');
-const LimitGaugeAnimationVisible = eval(parameters['LimitGaugeAnimationVisible'] || "false");
+const WindowHideActorPartyLimit = (DataManager.nuun_structureData(parameters['WindowHideActorPartyLimit'])) || [];
+const WindowHideEnemyPartyLimit = (DataManager.nuun_structureData(parameters['WindowHideEnemyPartyLimit'])) || [];
 
 const pluginName = "NUUN_PartyLimitGauge";
 PluginManager.registerCommand(pluginName, 'LimitValue', args => {
@@ -1133,13 +1206,13 @@ Game_Party.prototype.getPartyLimitSprite = function(width) {
 
 const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
 Scene_Battle.prototype.createSpriteset = function() {
-  _Scene_Battle_createSpriteset.call(this);
-  if (PartyGaugeVisible) {
-    this.createPartyGauge();
-  }
-  if (EnemyGaugeVisible) {
-    this.createTroopGauge();
-  }
+    _Scene_Battle_createSpriteset.call(this);
+    if (PartyGaugeVisible) {
+        this.createPartyGauge();
+    }
+    if (EnemyGaugeVisible) {
+        this.createTroopGauge();
+    }
 };
 
 Scene_Battle.prototype.addPartyGauge = function(sprite) {
@@ -1159,35 +1232,35 @@ Scene_Battle.prototype.addPartyGauge = function(sprite) {
 };
 
 Scene_Battle.prototype.createPartyGauge = function() {
-  const x = PartyGauge_X;
-  const y = PartyGauge_Y;
-  const sprite = new Sprite_PartyGauge();
-  this.addPartyGauge(sprite);
-  sprite.setSpriteset(this._spriteset);
-  sprite.setup('actor', 'limit');
-  sprite.move(x, y);
-  if (onPartyChargeLimitGauge()) {
-    sprite.show();
-  } else {
-    sprite.hide();
-  }
-  this._partyGauge = sprite;
+    const x = PartyGauge_X;
+    const y = PartyGauge_Y;
+    const sprite = new Sprite_PartyGauge();
+    this.addPartyGauge(sprite);
+    sprite.setSpriteset(this._spriteset);
+    sprite.setup('actor', 'limit');
+    sprite.move(x, y);
+    if (onPartyChargeLimitGauge()) {
+        sprite.show();
+    } else {
+        sprite.hide();
+    }
+    this._partyGauge = sprite;
 };
 
 Scene_Battle.prototype.createTroopGauge = function() {
-  const x = EnemyGauge_X;
-  const y = EnemyGauge_Y;
-  const sprite = new Sprite_TroopGauge();
-  this.addPartyGauge(sprite);
-  sprite.setSpriteset(this._spriteset);
-  sprite.setup('enemy', 'limit');
-  sprite.move(x, y);
-  if (onEnemyChargeLimitGauge()) {
-    sprite.show();
-  } else {
-    sprite.hide();
-  }
-  this._troopGauge = sprite;
+    const x = EnemyGauge_X;
+    const y = EnemyGauge_Y;
+    const sprite = new Sprite_TroopGauge();
+    this.addPartyGauge(sprite);
+    sprite.setSpriteset(this._spriteset);
+    sprite.setup('enemy', 'limit');
+    sprite.move(x, y);
+    if (onEnemyChargeLimitGauge()) {
+        sprite.show();
+    } else {
+        sprite.hide();
+    }
+    this._troopGauge = sprite;
 };
 
 if (!Imported.NUUN_SkillCostShowEX) {
@@ -1322,7 +1395,35 @@ Sprite_PartyGauge.prototype.label = function() {
 
 Sprite_PartyGauge.prototype.update = function() {
     Sprite_Gauge.prototype.update.call(this);
-    this.visible = this.limitGaugeAnimationVisible() && onPartyChargeLimitGauge();
+    this.updatePartyLimitHideSprite();
+};
+
+Sprite_PartyGauge.prototype.updatePartyLimitHideSprite = function() {
+    this.visible = onPartyChargeLimitGauge();
+    if (!this.visible) return;
+    for (const data of WindowHideActorPartyLimit) {
+        switch (data) {
+            case 'startBattle':
+                this.visible = BattleManager._phase !== 'start';
+                if (!this.visible) return;
+                break;
+            case 'battleEnd':
+                this.visible = BattleManager._phase !== 'battleEnd';
+                if (!this.visible) return;
+                break;
+            case 'battleEvent':
+                this.visible = !$gameTroop.isEventRunning();
+                if (!this.visible) return;
+                break;
+            case 'animation':
+                this.visible = !this._spriteset.isAnimationPlaying();
+                if (!this.visible) return;
+                break;
+            default:
+                break;
+        }
+    }
+    return true;
 };
 
 Sprite_PartyGauge.prototype.measureLabelWidth = function() {
@@ -1377,7 +1478,35 @@ Sprite_TroopGauge.prototype.setSpriteset = function(spriteset) {
 
 Sprite_TroopGauge.prototype.update = function() {
     Sprite_Gauge.prototype.update.call(this);
-    this.visible = this.limitGaugeAnimationVisible() && onEnemyChargeLimitGauge();
+    this.updatePartyLimitHideSprite();
+};
+
+Sprite_TroopGauge.prototype.updatePartyLimitHideSprite = function() {
+    this.visible = onEnemyChargeLimitGauge();
+    if (!this.visible) return;
+    for (const data of WindowHideEnemyPartyLimit) {
+        switch (data) {
+            case 'startBattle':
+                this.visible = BattleManager._phase !== 'start';
+                if (!this.visible) return;
+                break;
+            case 'battleEnd':
+                this.visible = BattleManager._phase !== 'battleEnd';
+                if (!this.visible) return;
+                break;
+            case 'battleEvent':
+                this.visible = !$gameTroop.isEventRunning();
+                if (!this.visible) return;
+                break;
+            case 'animation':
+                this.visible = !this._spriteset.isAnimationPlaying();
+                if (!this.visible) return;
+                break;
+            default:
+                break;
+        }
+    }
+    return true;
 };
 
 Sprite_TroopGauge.prototype.label = function() {

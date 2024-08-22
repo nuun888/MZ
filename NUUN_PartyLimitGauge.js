@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -62,6 +62,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/22/2024 Ver.1.6.4
+ * Fixed an issue where the limit gauge would be displayed after the results were displayed when choosing to end a battle without hiding certain limit gauges.
  * 8/20/2024 Ver.1.6.3
  * Added the ability to hide the gauge in certain situations.
  * 8/9/2024 Ver.1.6.2
@@ -446,7 +448,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -504,6 +506,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/22 Ver.1.6.4
+ * リミットゲージ特定ゲージ非表示でバトル終了を選択時、リザルト終了後にゲージが表示されてしまう問題を修正。
  * 2024/8/20 Ver.1.6.3
  * 特定の状況でゲージを非表示にする機能を追加。
  * 2024/8/9 Ver.1.6.2
@@ -983,6 +987,14 @@ BattleManager.chargeLimitByTurnInput = function() {
     }
 };
 
+BattleManager.setLimitGaugeBattleEnd = function() {
+    this._limitGaugeBattleEnd = true;
+};
+
+BattleManager.getLimitGaugeBattleEnd = function() {
+    return this._limitGaugeBattleEnd;
+};
+
 
 const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
 Game_Action.prototype.applyItemUserEffect = function(target) {
@@ -1263,6 +1275,19 @@ Scene_Battle.prototype.createTroopGauge = function() {
     this._troopGauge = sprite;
 };
 
+const _Scene_Battle_updateStatusWindowVisibility = Scene_Battle.prototype.updateStatusWindowVisibility;
+    Scene_Battle.prototype.updateStatusWindowVisibility = function() {
+        _Scene_Battle_updateStatusWindowVisibility.apply(this, arguments);
+        this.updateBattleEndActorStatus();
+    };
+
+Scene_Battle.prototype.updateBattleEndActorStatus = function() {
+    if (BattleManager.isBattleEnd()) {
+        BattleManager.setLimitGaugeBattleEnd();
+    }
+};
+
+
 if (!Imported.NUUN_SkillCostShowEX) {
 
     const _Window_SkillList_drawItem = Window_SkillList.prototype.drawItem;
@@ -1408,7 +1433,7 @@ Sprite_PartyGauge.prototype.updatePartyLimitHideSprite = function() {
                 if (!this.visible) return;
                 break;
             case 'battleEnd':
-                this.visible = BattleManager._phase !== 'battleEnd';
+                this.visible = !BattleManager.getLimitGaugeBattleEnd();
                 if (!this.visible) return;
                 break;
             case 'battleEvent':
@@ -1481,6 +1506,8 @@ Sprite_TroopGauge.prototype.update = function() {
     this.updatePartyLimitHideSprite();
 };
 
+
+
 Sprite_TroopGauge.prototype.updatePartyLimitHideSprite = function() {
     this.visible = onEnemyChargeLimitGauge();
     if (!this.visible) return;
@@ -1491,7 +1518,7 @@ Sprite_TroopGauge.prototype.updatePartyLimitHideSprite = function() {
                 if (!this.visible) return;
                 break;
             case 'battleEnd':
-                this.visible = BattleManager._phase !== 'battleEnd';
+                this.visible = !BattleManager.getLimitGaugeBattleEnd();
                 if (!this.visible) return;
                 break;
             case 'battleEvent':

@@ -38,7 +38,7 @@ ONにすることで全てのセーブデータに適用されます。
 `bgsVolume` :BGS音量  
 `meVolume` :ME音量  
 `seVolume` SE音量  
-`gamePadVibration` :振動 要NUUN_GamePadVibration  
+`gamePadVibration` :ゲームパッドの振動 要NUUN_GamePadVibration  
 `startUpFullScreen` :フルスクリーン 要StartUpFullScreen（トリアコンタン氏）  
 `masterVolume`　:マスター音量 要MasterVolumeOption（トリアコンタン氏）  
 

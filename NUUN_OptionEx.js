@@ -273,6 +273,7 @@
  * @option "seVolume"
  * @option "gamePadVibration"
  * @option "startUpFullScreen"
+ * @option "masterVolume"
  * @default 
  * 
  * @param OptionHidden

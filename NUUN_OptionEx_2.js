@@ -99,12 +99,12 @@ Imported.NUUN_OptionEx_2 = true;
 
     const _Window_Options_volumeStatusText = Window_Options.prototype.volumeStatusText;
     Window_Options.prototype.volumeStatusText = function(value) {
-        return _data.VolumeGauge ? '' : _Window_Options_volumeStatusText.apply(this, arguments);
+        return _data && _data.VolumeGauge ? '' : _Window_Options_volumeStatusText.apply(this, arguments);
     };
 
     const _Window_Options_statusWidth = Window_Options.prototype.statusWidth;
     Window_Options.prototype.statusWidth = function() {
-        return _data.VolumeGauge ? this.gaugeWidth() : _Window_Options_statusWidth.apply(this, arguments);
+        return _data && _data.VolumeGauge ? this.gaugeWidth() : _Window_Options_statusWidth.apply(this, arguments);
     };
     
     Window_Options.prototype.gaugeWidth = function() {
@@ -112,7 +112,7 @@ Imported.NUUN_OptionEx_2 = true;
     };
 
     Window_Options.prototype.volumeGauge = function(index, symbol) {
-        if (_data.VolumeGauge) {
+        if (_data && _data.VolumeGauge) {
             const rect = this.itemLineRect(index);
             const statusWidth = this.statusWidth();
             const titleWidth = rect.width - statusWidth;

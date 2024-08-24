@@ -40,6 +40,7 @@ ONにすることで全てのセーブデータに適用されます。
 `seVolume` SE音量  
 `gamePadVibration` :振動 要NUUN_GamePadVibration  
 `startUpFullScreen` :フルスクリーン 要StartUpFullScreen（トリアコンタン氏）  
+`masterVolume`　:マスター音量 要MasterVolumeOption（トリアコンタン氏）  
 
 ## キー、ゲームパッドのキー(ボタン)変更の操作
 キー、ゲームパッドのキー、ボタンの変更は変更したい項目でEnter(決定ボタン)を押し、任意のキー(ボタン)を押します。  

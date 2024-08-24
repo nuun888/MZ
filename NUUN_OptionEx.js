@@ -12,7 +12,8 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
+ * @version 1.1.0
  * 
  * @help
  * Expand the options screen.
@@ -25,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/25/2024 Ver.1.1.0
+ * Added volume gauge settings.
  * 8/16/2024 Ver.1.0.1
  * Added the ability to make windows transparent.
  * 8/15/2024 Ver.1.0.0
@@ -118,7 +121,7 @@
  * @desc The width of the options page window.
  * @text Option Page Window Width
  * @type number
- * @default 1000
+ * @default 1280
  * @min 0
  * @parent OptionPageSetting
  * 
@@ -285,28 +288,76 @@
  * @default ------------------------------
  * 
  * @param Var
- * @text Variable(1)(2)
+ * @text Variable
  * @desc Specify the variables.
  * @default 0
  * @type variable
+ * @parent OptionConfigSetting
  * 
  * @param Switch
- * @text Switch(2)
+ * @text Switch
  * @desc Specifies the switch.
  * @type switch
  * @default 0
+ * @parent OptionConfigSetting
  * 
  * @param OptionsStringList
- * @text Optional Parameter Name(1)
+ * @text Optional Parameter Name
  * @desc Sets the optional parameter name.
  * @default []
  * @type string[]
+ * @parent OptionConfigSetting
  * 
  * @param GlobalConfigData
  * @desc Applies to all save data.
- * @text All save data applies(2)
+ * @text All save data applies
  * @type boolean
  * @default false
+ * @parent OptionConfigSetting
+ * 
+ * @param OptionGaugeSetting
+ * @text Option Gauge Settings
+ * @default ------------------------------
+ * 
+ * @param VolumeGauge
+ * @desc Displays the volume gauge.
+ * @text Volume Gauge Display
+ * @type boolean
+ * @default false
+ * @parent OptionGaugeSetting
+ * 
+ * @param GaugeWidth
+ * @desc Specifies the width of the gauge.
+ * @text Gauge width
+ * @type number
+ * @default 280
+ * @min 0
+ * @parent OptionGaugeSetting
+ * 
+ * @param GaugeHeight
+ * @desc Specifies the height of the gauge.
+ * @text Gauge vertical width
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
+ * @parent OptionGaugeSetting
+ * 
+ * @param Color1
+ * @desc System color IDs for gauges (left). You can enter color codes in the Text tab.
+ * @text Gauge color (left)
+ * @type color
+ * @default 7
+ * @min -1
+ * @parent OptionGaugeSetting
+ * 
+ * @param Color2
+ * @desc System color IDs for gauges (right). You can enter color codes in the Text tab.
+ * @text Gauge color (right)
+ * @type color
+ * @default 8
+ * @min -1
+ * @parent OptionGaugeSetting
  * 
  */
 /*~struct~KeyConfigList:
@@ -366,7 +417,8 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
+ * @version 1.1.0
  * 
  * @help
  * オプション画面を拡張します。
@@ -379,6 +431,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/25 Ver.1.1.0
+ * 音量ゲージの設定を追加。
  * 2024/8/16 Ver.1.0.1
  * ウィンドウを透明にする機能を追加。
  * 2024/8/15 Ver.1.0.0
@@ -473,7 +527,7 @@
  * @desc オプションページウィンドウの横幅。
  * @text オプションページウィンドウ横幅
  * @type number
- * @default 1000
+ * @default 1280
  * @min 0
  * @parent OptionPageSetting
  * 
@@ -625,6 +679,7 @@
  * @option "seVolume"
  * @option "gamePadVibration"
  * @option "startUpFullScreen"
+ * @option "masterVolume"
  * @default 
  * 
  * @param OptionHidden
@@ -644,24 +699,72 @@
  * @desc 変数を指定します。
  * @default 0
  * @type variable
+ * @parent OptionConfigSetting
  * 
  * @param Switch
  * @text スイッチ
  * @desc スイッチを指定します。
  * @type switch
  * @default 0
+ * @parent OptionConfigSetting
  * 
  * @param OptionsStringList
  * @text オプションパラメータ名
  * @desc オプションのパラメータ名を設定します。
  * @default []
  * @type string[]
+ * @parent OptionConfigSetting
  * 
  * @param GlobalConfigData
  * @desc 全てのセーブデータに適用します。
  * @text 全セーブデータ適用
  * @type boolean
  * @default false
+ * @parent OptionConfigSetting
+ * 
+ * @param OptionGaugeSetting
+ * @text オプションゲージ設定
+ * @default ------------------------------
+ * 
+ * @param VolumeGauge
+ * @desc 音量のゲージを表示します。
+ * @text 音量ゲージ表示
+ * @type boolean
+ * @default false
+ * @parent OptionGaugeSetting
+ * 
+ * @param GaugeWidth
+ * @desc ゲージの横幅を指定します。
+ * @text ゲージの横幅
+ * @type number
+ * @default 280
+ * @min 0
+ * @parent OptionGaugeSetting
+ * 
+ * @param GaugeHeight
+ * @desc ゲージの縦幅を指定します。
+ * @text ゲージの縦幅
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
+ * @parent OptionGaugeSetting
+ * 
+ * @param Color1
+ * @desc ゲージのシステムカラーID(左)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(左)
+ * @type color
+ * @default 7
+ * @min -1
+ * @parent OptionGaugeSetting
+ * 
+ * @param Color2
+ * @desc ゲージのシステムカラーID(右)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(右)
+ * @type color
+ * @default 8
+ * @min -1
+ * @parent OptionGaugeSetting
  * 
  */
 /*~struct~KeyConfigList:ja
@@ -1460,6 +1563,7 @@ Imported.NUUN_OptionEx = true;
         _Scene_Boot_onDatabaseLoaded.apply(this, arguments);
     };
 
+
     function _getKeyCodeList(symbol) {
         const keyList = [];
         for (const name in keyMapper) {
@@ -1847,5 +1951,6 @@ Imported.NUUN_OptionEx = true;
         }
         return "";
     };
+    
     
 })();

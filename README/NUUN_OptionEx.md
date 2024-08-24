@@ -1,8 +1,10 @@
 # [オプション拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)
-# Ver.1.0.1
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+#### 拡張プラグイン
+[オプション拡張音量ゲージ表示](https://github.com/nuun888/MZ/blob/masterNUUN_OptionEx_2.js)  
 
 オプション画面を拡張します。  
 ![画像](img/OptionEx1.png)  
@@ -43,7 +45,15 @@ ONにすることで全てのセーブデータに適用されます。
 キー、ゲームパッドのキー、ボタンの変更は変更したい項目でEnter(決定ボタン)を押し、任意のキー(ボタン)を押します。  
 既に設定済みのキー(ボタン)、予約キー(ボタン)は設定できません。  
 
+## 拡張プラグイン
+### オプション拡張音量ゲージ表示
+音量設定にゲージを表示させます。  
+![画像](img/OptionEx3.png)  
+[ダウンロード](https://github.com/nuun888/MZ/blob/masterNUUN_OptionEx_2.js)  
+
 ## 更新履歴
+2024/8/25 Ver.1.1.0  
+音量ゲージの設定を追加。  
 2024/8/16 Ver.1.0.1  
 ウィンドウを透明にする機能を追加。  
 2024/8/15 Ver.1.0.0  

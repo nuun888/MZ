@@ -53,6 +53,8 @@ ONにすることで全てのセーブデータに適用されます。
 ※マスター音量はMasterVolumeOption.jsを使用しています。  
 [ダウンロード](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_2.js)  
 
+※ボタンの画像化、ボリュームのスライダー機能の要望は対応を行いませんので了承ください。  
+
 ## 更新履歴
 2024/8/25 Ver.1.1.0  
 音量ゲージの設定を追加。  

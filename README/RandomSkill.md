@@ -1,5 +1,5 @@
 # [ランダム発動スキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomSkill.js)
-# Ver.1.0.2
+# Ver.1.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomSkill.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,6 +13,9 @@
 ランダム抽選でスキルが選ばれなかった場合、元のスキルで攻撃します。  
 
 ## 更新履歴
+2024/8/31 Ver.1.0.3  
+元のスキルでのコストでの支払いが発動したスキルのコストで消費していた問題を修正。  
+一部プラグインの競合対応。  
 2024/8/17 Ver.1.0.2  
 条件によってはスキルが発動しない問題を修正。  
 コマンドが再度選択できてしまう問題を修正。  

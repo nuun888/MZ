@@ -12,7 +12,8 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @orderAfter NUUN_SkillCostEX
+ * @version 1.0.3
  * 
  * @help
  * You can set skills that can be activated randomly.
@@ -26,6 +27,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/31/2024 Ver.1.0.3
+ * Fixed an issue where payment for the cost of the original skill was consumed as the cost of the activated skill.
+ * Fixed some plugin conflicts.
  * 8/17/2024 Ver.1.0.2
  * Fixed an issue that caused skills to not activate under certain conditions.
  * Fixed an issue that allowed commands to be selected again.
@@ -90,7 +94,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * 発動するスキルがランダムに発動出来るスキルを設定できます。
@@ -104,6 +108,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/31 Ver.1.0.3
+ * 元のスキルでのコストでの支払いが発動したスキルのコストで消費していた問題を修正。
+ * 一部プラグインの競合対応。
  * 2024/8/17 Ver.1.0.2
  * 条件によってはスキルが発動しない問題を修正。
  * コマンドが再度選択できてしまう問題を修正。
@@ -214,6 +221,18 @@ Imported.NUUN_RandomSkill = true;
         return _Game_BattlerBase_canPaySkillCost.apply(this, arguments);
     };
 
+    const _Game_BattlerBase_paySkillCost = Game_BattlerBase.prototype.paySkillCost;
+    Game_BattlerBase.prototype.paySkillCost = function(skill) {
+        skill = this.canRandomSkillCost(skill);
+        _Game_BattlerBase_paySkillCost.apply(this, arguments);
+    };
+
+    const _Game_Battler_consumeItem = Game_Battler.prototype.consumeItem;
+    Game_Battler.prototype.consumeItem = function(item) {
+        item = this.canRandomSkillCost(item);
+        _Game_Battler_consumeItem.apply(this, arguments);
+    };
+
     Game_Battler.prototype.isRandomSkillCost = function(mode, data) {
         return mode ? this.canPaySkillCost($dataSkills[data.RandomSkill]) : true;
     };
@@ -225,6 +244,21 @@ Imported.NUUN_RandomSkill = true;
         }
         return skill;
     };
+
+    Game_Battler.prototype.getRandomOriginalSkill = function(skill) {
+        const action = this.currentAction();
+        if (action && action.isRandomSkill()) {
+            return $dataSkills[action.randomSkillId];
+        }
+        return skill;
+    };
+
+    const _Game_Battler_useItem = Game_Battler.prototype.useItem;
+    Game_Battler.prototype.useItem = function(item) {
+        const _item = this.getRandomOriginalSkill(item);//元のスキルに戻す
+        _Game_Battler_useItem.call(this, _item);
+    };
+
 
     const _Window_BattleLog_displayAction = Window_BattleLog.prototype.displayAction;
     Window_BattleLog.prototype.displayAction = function(subject, item) {

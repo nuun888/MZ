@@ -94,6 +94,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
+ * @orderAfter NUUN_SkillCostEX
  * @version 1.0.3
  * 
  * @help

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.21.3
+ * @version 2.21.4
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/31/2024 Ver.2.21.4
+ * Added a function that allows you to set windows to be hidden while a book is displayed.
  * 8/3/2024 Ver.2.21.3
  * Fixed so that defeated monsters are not re-counted.
  * 7/15/2024 Ver.2.21.2
@@ -1812,8 +1814,20 @@
 * @type boolean
 * @default false
 * @parent NUUN_EnemyBookEX_1_DeBuff
-* 
-* 
+ * 
+ * @param OtherSetting
+ * @text Other settings
+ * @default ------------------------------
+ * 
+ * @param EnemyBookHideWindow
+ * @desc Specifies the windows and sprites to hide while the encyclopedia is displayed.
+ * @text Hidden window when book is displayed
+ * @type combo[]
+ * @option '_ctbWindow'
+ * @default 
+ * @parent OtherSetting
+ * 
+ * 
 * 
 * @command EnemyBookOpen
 * @desc Open the enemy book.
@@ -3026,7 +3040,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.21.2
+ * @version 2.21.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3247,6 +3261,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/31 Ver.2.21.4
+ * 図鑑表示中に非表示にするウィンドウを設定できる機能を追加。
  * 2024/8/3 Ver.2.21.3
  * 撃破したモンスターの撃破カウントを再カウントしないように修正。
  * 2024/7/15 Ver.2.21.2
@@ -4931,6 +4947,17 @@
  * @default false
  * @parent NUUN_EnemyBookEX_1_DeBuff
  * 
+ * @param OtherSetting
+ * @text その他設定
+ * @default ------------------------------
+ * 
+ * @param EnemyBookHideWindow
+ * @desc 図鑑表示中に非表示にするウィンドウ、スプライトを指定します。
+ * @text 図鑑表示中非表示ウィンドウ
+ * @type combo[]
+ * @option '_ctbWindow'
+ * @default 
+ * @parent OtherSetting
  * 
  * 
  * @command EnemyBookOpen
@@ -6306,6 +6333,8 @@ const PercentWindowVisible = eval(parameters['PercentWindowVisible'] || 'true');
 const PageWindowVisible = eval(parameters['PageWindowVisible'] || 'true');
 const ContentWindowVisible = eval(parameters['ContentWindowVisible'] || 'true');
 const BackgoundWindowMode = eval(parameters['BackgoundWindowMode'] || 'false');
+
+const EnemyBookHideWindow = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EnemyBookHideWindow'])) : [];
 
 const bookContents = {};
 bookContents.PageList1 = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList1'])) : [];
@@ -8099,10 +8128,30 @@ Scene_Battle.prototype.enemyBookMainAreaHeight = function() {
 
 const _Scene_Battle_update = Scene_Battle.prototype.update;
 Scene_Battle.prototype.update = function() {
-  _Scene_Battle_update.call(this);
-  this.updateEnemyBookBackground();
-  this.updatePageCancelButton();
-  this.updatePageupdownButton();
+    _Scene_Battle_update.call(this);
+    this.updateEnemyBookBackground();
+    this.updatePageCancelButton();
+    this.updatePageupdownButton();
+    this.updadeEnemyBookWindow();
+};
+
+
+Scene_Battle.prototype.updadeEnemyBookWindow = function() {
+    const book = this._enemyBookEnemyWindow;
+    for (const hideWindow of EnemyBookHideWindow) {
+        const _window = this[hideWindow];
+        if (_window) {
+            try {
+                if (!(book.isOpen() || book.isOpening() || book.isClosing())) {
+                    _window.visible = !(book.isOpen() || book.isOpening() || book.isClosing());
+                } else if (book.visible) {
+                    _window.visible = !book.visible;
+                }
+            } catch (e) {
+                _window.visible = !book.visible;
+            }
+        }
+    }
 };
 
 Scene_Battle.prototype.updateEnemyBookBackground = function() {

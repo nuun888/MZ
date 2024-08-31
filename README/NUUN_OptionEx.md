@@ -51,7 +51,7 @@ ONにすることで全てのセーブデータに適用されます。
 音量設定にゲージを表示させます。  
 ![画像](img/OptionEx3.png)  
 ※マスター音量はMasterVolumeOption.jsを使用しています。  
-[ダウンロード](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_2.js)  
+[ダウンロード](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_2.js)Ver.1.0.1  
 
 ※ボタンの画像化、ボリュームのスライダー機能の要望は対応を行いませんので了承ください。  
 

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル、アイテム
  * @author NUUN
- * @version 1.4.2
+ * @version 1.5.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -34,9 +34,9 @@
  * 敵からお金を盗まれるスキルを作るには、スキル、アイテムのメモ欄に以下を記述します。
  * 以下のタグは敵専用です。
  * <goldStealSkill:[rate],[gold]>
- * [rate]:成功率　[gold]:盗める金額
+ * [rate]:成功率 [gold]:盗める金額
  * <goldStealSkillRate:[gold],[goldRate]>
- * [rate]:成功率　[goldRate]:盗める金額割合
+ * [rate]:成功率 [goldRate]:盗める金額割合
  * 
  * 例
  * <goldStealSkill:100, 400>
@@ -49,7 +49,7 @@
  * <steal [itemType]:[id], [rate], [condTag], [condMode]>
  * [itemType]：アイテムタイプ　I アイテム　W 武器　A 防具　M 金額
  * [id]:アイテム、武器、防具のID
- * [rate]：確率
+ * [rate]：確率(100分率)
  * 以下の設定は条件付きベースプラグインが必要です。条件を指定しない場合は省略できます。
  * [condTag]：条件タグ ※省略可能　条件付きベースが必要です。
  * [condMode]：条件モード ※省略可能　条件付きベースが必要です。0:一部一致 1:全て一致
@@ -97,7 +97,7 @@
  * $gameSystem.getBattleStolenGold()
  * 
  * 盗み時の確率計算
- * スキル、アイテムの成功確率 * 成功率補正% + 成功率補正+
+ * スキル、アイテムの成功確率 * (成功率補正% + 成功率補正+)
  * 成功率補正%と成功率補正+を補正した確率でステータス画面に表示させる場合、スキル、アイテムの成功確率によっては
  * 計算上と表示上の確率とは異なる確率になります。
  * 
@@ -106,6 +106,9 @@
  * 
  * 
  * 更新履歴
+ * 2024/5/11 Ver 1.5.0
+ * 敵の盗み率にブーストさせる効果を追加。
+ * 盗み確立に運を適用できるように修正。
  * 2024/5/11 Ver 1.4.2
  * 味方同士に対して盗みを実行しないように修正。
  * 位相を修正。
@@ -284,551 +287,618 @@
  * @default 0
  * 
  */
+
 var Imported = Imported || {};
 Imported.NUUN_StealableItems = true;
 
 (() => {
-'use strict';
-const parameters = PluginManager.parameters('NUUN_StealableItems');
-const StealMode = eval(parameters['StealMode'] || 'true');
-const StealProcess = Number(parameters['StealProcess'] || 0);
-const StolenItemDrop = eval(parameters['StolenItemDrop'] || 'false');
-const StolenGoldDrop = eval(parameters['StolenGoldDrop'] || 'false');
-const NotStealName = String(parameters['NotStealName'] || '%2から何も盗めなかった！');
-const NonStealName = String(parameters['NonStealName'] || '%2は何も持っていない！');
-const NonStealGoldName = String(parameters['NonStealGoldName'] || '%2は何も持っていない！');
-const GetStealName = String(parameters['GetStealName'] || '%2から%3を盗んだ！');
-const StolenName = String(parameters['StolenName'] || '%2から%3を盗み取った！');
-const stolenItems = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['stolenItems'])) : null) || [];
-const StealSuccessSE = String(parameters['StealSuccessSE'] || '');
-const volume = Number(parameters['volume'] || 90);
-const pitch = Number(parameters['pitch'] || 100);
-const pan = Number(parameters['pan'] || 50);
-const StealGoldSuccessSE = String(parameters['StealGoldSuccessSE'] || '');
-const G_volume = Number(parameters['G_volume'] || 90);
-const G_pitch = Number(parameters['G_pitch'] || 100);
-const G_pan = Number(parameters['G_pan'] || 50);
-
-function getStolenItemList(target, rate) {
-	let weightSum = 0;
-	let getItem = null;
-	if(target.getStolenRate(rate) && stolenItems){
-		let stolenItemList = stolenItems.reduce(function(r, item) {
-			if($gameParty._items[item.stolenItemId] > 0 && $gameSystem.stolenSwitch(item)) {
-				weightSum += item.weight;
-				return r.concat(item);
-			} else {
-				return r
-			}
-		},[]);
-		const value = Math.random() * weightSum;
-		const stolenLength = stolenItemList.length;
-		let probability = 0.0;
-		let i = 0;
-		if (stolenLength > 0){
-			while(stolenLength > i){
-				probability += stolenItemList[i].weight / weightSum * weightSum;
-				if(probability > value){
-					getItem = $dataItems[stolenItemList[i].stolenItemId];
-					$gameSystem.onBattleStolen();
-					break;
-				}
-				i++;
-			}
-		}
-	}
-	return getItem;
-};
-
-function randomRate(id, stealId) {
-	return StealProcess === 1 ? id === stealId : true;
-}
-
-function stealMode(type) {
-	switch (type) {
-		case 'notSteal':
-			return NotStealName;
-		case 'nonSteal':
-			return NonStealName;
-		case 'nonStealGold':
-			return NonStealGoldName
-		case 'getSteal':
-			return GetStealName;
-		case 'getGold':
-		return GetStealName;
-		case 'stolenName':
-			return StolenName;
-		case 'stolenGold':
-			return StolenName;
-	}
-}
-
-const _Game_System_initialize = Game_System.prototype.initialize;
-Game_System.prototype.initialize = function() {
-	_Game_System_initialize .call(this);
-	this._stealCount = 0;
-	this._stealGoldSum = 0;
-	this._stolenCount = 0;
-	this._stolenGoldSum = 0;
-};
-
-Game_System.prototype.onBattleSteal = function() {
-	this._stealCount = this._stealCount || 0
-	this._stealCount++;
-};
-
-Game_System.prototype.getBattleSteal = function() {
-	return this._stealCount || 0;
-};
-
-Game_System.prototype.onBattleStealGold = function(gold) {
-	this._stealGoldSum = this._stealGoldSum || 0;
-	this._stealGoldSum++;
-};
-
-Game_System.prototype.getBattleStealGold = function() {
-	return this._stealGoldSum || 0;
-};
-
-Game_System.prototype.onBattleStolen = function() {
-	this._stolenCount = this._stolenCount || 0;
-	this._stolenCount++;
-};
-
-Game_System.prototype.getBattleStolen = function() {
-	return this._stolenCount || 0;
-};
-
-Game_System.prototype.onBattleStolenGold = function(gold) {
-	this._stolenGoldSum = this._stolenGoldSum || 0;
-	this._stolenGoldSum += gold;
-};
-
-Game_System.prototype.getBattleStolenGold = function() {
-	return this._stolenGoldSum || 0;
-};
-
-Game_System.prototype.stolenSwitch = function(item){
-	return (item.stolenSwitch > 0 ? $gameSwitches.value(item.stolenSwitch) : true);
-};
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    let _stealText = [];
+    
+    function stealMode(type) {
+        switch (type) {
+            case 'notSteal':
+                return params.NotStealName || '%2から何も盗めなかった！';
+            case 'nonSteal':
+                return params.NonStealName || '%2は何も持っていない！';
+            case 'nonStealGold':
+                return params.NonStealGoldName || '%2は何も持っていない！';
+            case 'getSteal':
+                return params.GetStealName || '%2から%3を盗んだ！';
+            case 'getGold':
+            return params.GetStealName || '%2から%3を盗んだ！';
+            case 'stolenName':
+                return params.StolenName || '%2から%3を盗み取った！';
+            case 'stolenGold':
+                return params.StolenName || '%2から%3を盗み取った！';
+        }
+    };
 
 
-const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
-Game_Action.prototype.applyItemUserEffect = function(target) {
-	this.getSteal(target);
-	_Game_Action_applyItemUserEffect.call(this, target);
-};
+    const _Game_System_initialize = Game_System.prototype.initialize;
+    Game_System.prototype.initialize = function() {
+        _Game_System_initialize .call(this);
+        this._stealCount = 0;
+        this._stealGoldSum = 0;
+        this._stolenCount = 0;
+        this._stolenGoldSum = 0;
+    };
 
-Game_Action.prototype.getSteal = function(target) {
-	if (target.result().isHit()) {
-		if (target.isEnemy() && !this.subject().isEnemy()) {
-			if(this.item().meta.stealSkill){
-				this.stealItems(target);
-			}
-			if(this.item().meta.goldStealSkill){
-				this.stealGold(target);
-			}
-		} else if (target.isActor() && !this.subject().isActor()) {
-			if(this.item().meta.stealSkill){
-				this.stolenItem(target);
-			}
-			if(this.item().meta.goldStealSkill || this.item().meta.goldStealSkillRate){
-				this.stolenGold(target);
-			}
-		}
-	}
-};
-
-Game_Action.prototype.stealItems = function(target){
-	const stealItem = target.makeStealItems(this.stealRate(target));
-	if (stealItem) {
-		this.getStealItems(target, stealItem);
-	} else {
-		if (!target.isStealItems()) {
-			this.subject().result().pushSteal(null, 'nonSteal');
-		} else {
-			this.subject().result().pushSteal(null, 'notSteal');
-		}
-	}
-	this.makeSuccess(target);
-};
-
-Game_Action.prototype.stealGold = function(target){
-	const stealItem = target.makeStealGold(this.stealGoldRate(target));
-	if (stealItem) {
-		this.getStealGold(target, stealItem);
-	} else {
-		if (!target.isStealGold()) {
-			this.subject().result().pushGoldSteal(null, 'nonStealGold');
-		} else {
-			this.subject().result().pushGoldSteal(null, 'notSteal');
-		}
-	}
-	this.makeSuccess(target);
-};
-
-Game_Action.prototype.getStealItems = function(target, stealItem){
-	$gameParty.gainItem(stealItem, 1);
-	if(StealSuccessSE) {
-		AudioManager.playSe({"name":StealSuccessSE,"volume":volume,"pitch":pitch,"pan":pan});
-	}
-	this.subject().result().pushSteal(stealItem, 'getSteal');
-};
-
-Game_Action.prototype.getStealGold = function(target, stealItem){
-	$gameParty.gainGold(stealItem);
-	const itemName = stealItem + TextManager.currencyUnit;
-	if(StealGoldSuccessSE) {
-		AudioManager.playSe({"name":StealGoldSuccessSE,"volume":G_volume,"pitch":G_pitch,"pan":G_pan});
-	}
-	this.subject().result().pushGoldSteal(itemName, 'getGold');
-};
-
-Game_Action.prototype.stolenItem = function(target){
-	const item = getStolenItemList(target, this.stealRate(target));
-	this.subject().keepStolenItem(item);
-	if (item) {
-		this.lostItem(target, item);
-	} else {
-		this.subject().result().pushSteal(null, 'notSteal');
-	}
-	this.makeSuccess(target);
-};
-
-Game_Action.prototype.stolenGold = function(target){
-		const stolenGold = this.lostStolenGoldMode();
-		const rate = this.subject().getStealBoostRate(Number(stolenGold[0]));
-		const gold = this.lostStolenGold(target, rate, stolenGold);
-		this.subject().keepStolenGold(gold);
-	if (gold) {
-		this.lostGold(target, gold);
-	} else {
-		this.subject().result().pushGoldSteal(null, 'notSteal');
-	}
-	this.makeSuccess(target);
-};
-
-Game_Action.prototype.lostStolenGold = function(target, rate, stolenGold){
-	let gold = 0;
-	if(target.getStolenRate(rate)){
-		if(stolenGold[2] === 1){
-			gold = Math.floor($gameParty._gold * Number(Math.min(stolenGold[1], 100) / 100));
-		} else {
-			gold = Number(stolenGold[1]);
-		}
-		$gameSystem.onBattleStolenGold(gold);
-	}
-	return gold;
-};
-
-Game_Action.prototype.lostItem = function(target, item){
-	$gameParty.loseItem(item, 1)
-	if(StealSuccessSE) {
-		AudioManager.playSe({"name":StealSuccessSE,"volume":volume,"pitch":pitch,"pan":pan});
-	}
-	this.subject().result().pushSteal(item, 'stolenName');
-};
-
-Game_Action.prototype.lostGold = function(target, gold){
-	$gameParty.loseGold(gold);
-	const itemName = gold + TextManager.currencyUnit;
-	if(StealGoldSuccessSE) {
-		AudioManager.playSe({"name":StealGoldSuccessSE,"volume":G_volume,"pitch":G_pitch,"pan":G_pan});
-	}
-	this.subject().result().pushGoldSteal(itemName, 'stolenGold');
-};
-
-Game_Action.prototype.lostStolenGoldMode = function(){
-	const mode = this.item().meta.goldStealSkillRate;
-	let stolenGold = [];
-	if (mode){
-		stolenGold = this.item().meta.goldStealSkillRate.split(',');
-		stolenGold[2] = 1;
-	} else {
-		stolenGold = this.item().meta.goldStealSkill.split(',');
-		stolenGold[2] = 0;
-	}
-	return stolenGold;
-};
-
-Game_Action.prototype.stealRate = function(){
-	const rate = Number(this.item().meta.stealSkill);
-	return this.subject().getStealBoostRate(rate);
-};
-
-Game_Action.prototype.stealGoldRate = function(){
-	const rate = Number(this.item().meta.goldStealSkill);
-	return this.subject().getStealBoostRate(rate);
-};
+    Game_System.prototype.onBattleSteal = function() {
+        this._stealCount = this._stealCount || 0
+        this._stealCount++;
+    };
+    
+    Game_System.prototype.getBattleSteal = function() {
+        return this._stealCount || 0;
+    };
+    
+    Game_System.prototype.onBattleStealGold = function(gold) {
+        this._stealGoldSum = this._stealGoldSum || 0;
+        this._stealGoldSum++;
+    };
+    
+    Game_System.prototype.getBattleStealGold = function() {
+        return this._stealGoldSum || 0;
+    };
+    
+    Game_System.prototype.onBattleStolen = function() {
+        this._stolenCount = this._stolenCount || 0;
+        this._stolenCount++;
+    };
+    
+    Game_System.prototype.getBattleStolen = function() {
+        return this._stolenCount || 0;
+    };
+    
+    Game_System.prototype.onBattleStolenGold = function(gold) {
+        this._stolenGoldSum = this._stolenGoldSum || 0;
+        this._stolenGoldSum += gold;
+    };
+    
+    Game_System.prototype.getBattleStolenGold = function() {
+        return this._stolenGoldSum || 0;
+    };
+    
+    Game_System.prototype.stolenSwitch = function(item){
+        return (item.stolenSwitch > 0 ? $gameSwitches.value(item.stolenSwitch) : true);
+    };
 
 
-const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
-  Game_ActionResult.prototype.clear = function() {
-    _Game_ActionResult_clear.call(this);
-    this.stealResult = [];
-};
+    const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
+    Game_Action.prototype.applyItemUserEffect = function(target) {
+        this.applySteal(target);
+        _Game_Action_applyItemUserEffect.apply(this, arguments);
+    };
 
-Game_ActionResult.prototype.pushSteal = function(item, type) {
-    const result = {};
-	if (item) {
-		result.name = item.name;
-		result.id = item.id;
-		result.iconIndex = item.iconIndex;
-		if (Imported.NUUN_popUp) {
-			result.popupText = this.stealPopupText(type);//ポップアッププラグイン
-		}
-	} else {
-		result.name = null;
-		result.id = 0;
-		result.iconIndex = 0;
-	}
-	result.text = stealMode(type);
-	this.stealResult.push(result);
-};
+    Game_Action.prototype.applySteal = function(target) {
+        if (target.result().isHit()) {
+            if (target.isEnemy() && !this.subject().isEnemy()) {
+                if (this.item().meta.stealSkill){
+                    this.stealItems(target);
+                }
+                if (this.item().meta.goldStealSkill){
+                    this.stealGold(target);
+                }
+            } else if (target.isActor() && !this.subject().isActor()) {
+                if (this.item().meta.stealSkill){
+                    this.stolenItem(target);
+                }
+                if (this.item().meta.goldStealSkill || this.item().meta.goldStealSkillRate){
+                    this.stolenGold(target);
+                }
+            }
+        }
+    };
 
-Game_ActionResult.prototype.pushGoldSteal = function(gold, type) {
-    const result = {};
-	if (gold) {
-		result.name = gold;
-		result.iconIndex = 0;
-		if (Imported.NUUN_popUp) {
-			result.popupText = this.stealPopupText(type);//ポップアッププラグイン
-		}
-	} else {
-		result.name = gold;
-		result.iconIndex = 0;
-	}
-	result.id = 0;
-	result.text = stealMode(type);
-	this.stealResult.push(result);
-};
+    Game_Action.prototype.stealItems = function(target){
+        const stealItem = this.makeStealItems(target);
+        if (stealItem) {
+            this.getStealItems(target, stealItem);
+        } else {
+            if (!target.isStealItems()) {
+                this.subject().result().pushSteal(null, 'nonSteal');
+            } else {
+                this.subject().result().pushSteal(null, 'notSteal');
+            }
+        }
+        this.makeSuccess(target);
+    };
+
+    Game_Action.prototype.stealGold = function(target){
+        const stealItem = this.makeStealGold(target);
+        if (stealItem) {
+            this.getStealGold(target, stealItem);
+        } else {
+            if (!target.isStealGold()) {
+                this.subject().result().pushGoldSteal(null, 'nonStealGold');
+            } else {
+                this.subject().result().pushGoldSteal(null, 'notSteal');
+            }
+        }
+        this.makeSuccess(target);
+    };
+
+    Game_Action.prototype.stolenItem = function(target){
+        const item = this.getStolenItem(target);
+        this.subject().keepStolenItem(item);
+        if (item) {
+            this.lostStolenItem(target, item);
+        } else {
+            this.subject().result().pushSteal(null, 'notSteal');
+        }
+        this.makeSuccess(target);
+    };
+
+    Game_Action.prototype.stolenGold = function(target){
+        const gold = this.getLostStolenGold(target);
+        this.subject().keepStolenGold(gold);
+        if (gold) {
+            this.lostStolenGold(target, gold);
+        } else {
+            this.subject().result().pushGoldSteal(null, 'notSteal');
+        }
+        this.makeSuccess(target);
+    };
+
+    Game_Action.prototype.getStolenItem = function(target){
+        params.stolenItems = params.stolenItems || [];
+        let weightSum = 0;
+        let getItem = null;
+        if (this.getStolenRate(target) && params.stolenItems) {
+            let stolenItemList = params.stolenItems.reduce(function(r, item) {
+                if($gameParty._items[item.stolenItemId] > 0 && $gameSystem.stolenSwitch(item)) {
+                    weightSum += item.weight;
+                    r.push(item)
+                }
+                return r;
+            },[]);
+            const value = Math.random() * weightSum;
+            const stolenLength = stolenItemList.length;
+            let probability = 0.0;
+            let i = 0;
+            if (stolenLength > 0){
+                while(stolenLength > i){
+                    probability += stolenItemList[i].weight / weightSum * weightSum;
+                    if(probability > value){
+                        getItem = $dataItems[stolenItemList[i].stolenItemId];
+                        $gameSystem.onBattleStolen();
+                        break;
+                    }
+                    i++;
+                }
+            }
+            return getItem;
+        }
+    };
+
+    Game_Action.prototype.getLostStolenGold = function(target){
+        const stolenGold = this.lostStolenGoldMode();
+        let gold = 0;
+        if (this.getStolenGoldRate(target, stolenGold[0])) {
+            if(stolenGold[2] === 1){
+                gold = Math.floor($gameParty._gold * Math.min(stolenGold[1], 100 / 100));
+            } else {
+                gold = stolenGold[1];
+            }
+            $gameSystem.onBattleStolenGold(gold);
+        }
+        return gold;
+    };
+    
+    Game_Action.prototype.getStealItems = function(target, item){
+        $gameParty.gainItem(item, 1);
+        if(params.StealSuccessSE) {
+            AudioManager.playSe({"name":params.StealSuccessSE,"volume":params.volume,"pitch":params.pitch,"pan":params.pan});
+        }
+        this.subject().result().pushSteal(item, 'getSteal');
+    };
+
+    Game_Action.prototype.getStealGold = function(target, gold){
+        $gameParty.gainGold(gold);
+        const itemName = gold + TextManager.currencyUnit;
+        if(params.StealGoldSuccessSE) {
+            AudioManager.playSe({"name":params.StealGoldSuccessSE,"volume":params.G_volume,"pitch":params.G_pitch,"pan":params.G_pan});
+        }
+        this.subject().result().pushGoldSteal(itemName, 'getGold');
+    };
+
+    Game_Action.prototype.lostStolenItem = function(target, item){
+        $gameParty.loseItem(item, 1)
+        if(params.StealSuccessSE) {
+            AudioManager.playSe({"name":params.StealSuccessSE,"volume":params.volume,"pitch":params.pitch,"pan":params.pan});
+        }
+        this.subject().result().pushSteal(item, 'stolenName');
+    };
+
+    Game_Action.prototype.lostStolenGold = function(target, gold){
+        $gameParty.loseGold(gold);
+        const itemName = gold + TextManager.currencyUnit;
+        if(params.StealGoldSuccessSE) {
+            AudioManager.playSe({"name":params.StealGoldSuccessSE,"volume":params.G_volume,"pitch":params.G_pitch,"pan":params.G_pan});
+        }
+        this.subject().result().pushGoldSteal(itemName, 'stolenGold');
+    };
+
+    Game_Action.prototype.makeStealItems = function(target){
+        $gameSystem._stealIndex = 0;
+        if (params.StealProcess === 0) {
+            return this.farstItemSteal(target);
+        } else {
+            return this.allItemsSteal(target);
+        }
+    };
+
+    Game_Action.prototype.makeStealGold = function(target){
+        $gameSystem._stealIndex = 0;
+        if (params.StealProcess === 0) {
+            return this.farstGoldSteal(target);
+        } else {
+            return this.allGoldSteal(target);
+        }
+    };
+
+    Game_Action.prototype.farstItemSteal = function(target){
+        const list = target.getStealList();
+        const stealId = 0;
+        const index = list.findIndex(di => di && di.kind > 0 && di.kind < 4 && target.stealConditions(di) && this.getStealRate(target, di));
+        if (index >= 0) {
+            const di = list[index];
+            if (di) {
+                const r = target.stealObject(di.kind, di.dataId);
+                if (params.StealMode) {
+                    list[index] = {dataId: 1, denominator: 1, kind: 0};
+                }
+                $gameSystem._stealIndex = index;
+                $gameSystem.onBattleSteal();
+                $gameTroop.stealItems.push(r);
+                return r;
+            }
+        }
+    };
+
+    Game_Action.prototype.allItemsSteal = function(target){
+        const list = target.getStealList();
+        const stealId = target.stealRandomId();
+        const index = list.findIndex(data => stealId === data.id);
+        if (index >= 0) {
+            const di = list[index];
+            if (di && di.kind > 0 && di.kind < 4 && target.stealConditions(di) && this.getStealRate(target, di)) {
+                const r = target.stealObject(di.kind, di.dataId);
+                if (params.StealMode) {
+                    list[index] = {dataId: 1, denominator: 1, kind: 0};
+                }
+                $gameSystem._stealIndex = index;
+                $gameSystem.onBattleSteal();
+                $gameTroop.stealItems.push(r);
+                return r;
+            }
+        }
+    };
+
+    Game_Action.prototype.farstGoldSteal = function(target){
+        const list = target.getStealList();
+        const stealId = 0;
+        const index = list.findIndex(di => di && di.kind === 4 && target.stealConditions(di) && this.stealGoldRate(target, di));
+        if (index >= 0) {
+            const di = list[index];
+            if (di) {
+                let r = target.stealObject(di.kind, di.dataId);
+                if (params.StealMode) {
+                    list[index] = {dataId: 1, denominator: 1, kind: 0};
+                }
+                $gameSystem.onBattleStealGold();
+                $gameTroop.stealItems.push({money:r});
+                return r;
+            }
+        }
+    };
+
+    Game_Action.prototype.allGoldSteal = function(target){
+        const list = target.getStealList();
+        const stealId = target.stealGoldRandomId();
+        const index = list.findIndex(data => stealId === data.id);
+        if (index >= 0) {
+            const di = list[index];
+            if (di && di.kind === 4 && target.stealConditions(di) && this.getGoldRate(target, di)) {
+                const r = target.stealObject(di.kind, di.dataId);
+                if (params.StealMode) {
+                    list[index] = {dataId: 1, denominator: 1, kind: 0};
+                }
+                $gameSystem.onBattleStealGold();
+                $gameTroop.stealItems.push({money:r});
+                return r;
+            }
+        }
+    };
+
+    Game_Action.prototype.getStealRate = function(target, di){
+        const skillRate = ((Number(this.item().meta.stealSkill) || 100)) / 100;
+        const luk = this.lukEffectRate(target);
+        const subject = this.subject();
+        return Math.random() < skillRate * subject.getStealBoostRate() * luk * (di.denominator * target.stealItemResistRate());
+    };
+
+    Game_Action.prototype.getStolenRate = function(target) {
+        const skillRate = ((Number(this.item().meta.stealSkill) || 100)) / 100;
+        const luk = this.lukEffectRate(target);
+        const subject = this.subject();
+        return Math.random() < skillRate * subject.getStealBoostRate() * luk * target.stealItemResistRate();
+    };
+
+    Game_Action.prototype.stealGoldRate = function(target) {
+        const skillRate = ((Number(this.item().meta.goldStealSkill) || 100)) / 100;
+        const luk = this.lukEffectRate(target);
+        const subject = this.subject();
+        return Math.random() < skillRate * subject.getStealBoostRate() * luk * target.stealItemResistRate();
+    };
+
+    Game_Action.prototype.getStolenGoldRate = function(target, rate) {
+        const skillRate = rate / 100;
+        const luk = this.lukEffectRate(target);
+        const subject = this.subject();
+        return Math.random() < skillRate * subject.getStealBoostRate() * luk * target.stealItemResistRate(); 
+    };
+
+    Game_Action.prototype.lostStolenGoldMode = function(){
+        const mode = this.item().meta.goldStealSkillRate;
+        let stolenGold = [];
+        if (mode){
+            stolenGold = this.item().meta.goldStealSkillRate.split(',').map(Number);
+            stolenGold[2] = 1;
+        } else {
+            stolenGold = this.item().meta.goldStealSkill.split(',').map(Number);
+            stolenGold[2] = 0;
+        }
+        return stolenGold;
+    };
 
 
-Game_BattlerBase.prototype.stealBoost = function(){
-	return this.traitObjects().reduce((r, trait) => {
-		return r + (trait.meta.steal_sr ? Number(trait.meta.steal_sr) / 100 : 0);
-	}, 1.0);
-};
+    Game_BattlerBase.prototype.getStealRate = function() {
+        const subject = this.subject();
+        return subject.getStealBoostRate() * 100;
+    };
 
-Game_BattlerBase.prototype.stealPercentBoost = function(){
-	return this.traitObjects().reduce((r, trait) => {
-		return r * (trait.meta.steal_sr_Percent ? Number(trait.meta.steal_sr_Percent) / 100 : 1.0);
-	}, 1.0);
-};
+    Game_BattlerBase.prototype.stealItemResistRate = function() {
+        return this.traitObjects().reduce((r, trait) => {
+            return r * (trait.meta.stealResist ? Number(trait.meta.stealResist) / 100 : 1.0);
+        }, 1.0);
+    };
 
-Game_BattlerBase.prototype.stealItemRate = function() {
-	return this.traitObjects().reduce((r, trait) => {
-		return r * (trait.meta.stealResist ? Number(trait.meta.stealResist) / 100 : 1.0);
-	}, 1.0);
-};
+    Game_BattlerBase.prototype.getStealBoostRate = function() {
+        return this.stealPercentBoost() + this.stealBoost();
+    };
 
-Game_BattlerBase.prototype.getStealBoostRate = function(rate) {
-	return rate * this.stealPercentBoost() + this.stealBoost();
-};
+    Game_BattlerBase.prototype.stealBoost = function(){
+        return this.traitObjects().reduce((r, trait) => {
+            return r + (trait.meta.steal_sr ? Number(trait.meta.steal_sr) / 100 : 0);
+        }, 0.0);
+    };
+    
+    Game_BattlerBase.prototype.stealPercentBoost = function(){
+        return this.traitObjects().reduce((r, trait) => {
+            return r * (trait.meta.steal_sr_Percent ? Number(trait.meta.steal_sr_Percent) / 100 : 1.0);
+        }, 1.0);
+    };
 
-Game_Actor.prototype.getStolenRate = function(rate) {
-	return Math.floor(Math.random() * 100) < (rate * this.stealItemRate());
-};
+    Game_BattlerBase.prototype.stealItemRate = function() {
+        return this.traitObjects().reduce((r, trait) => {
+            return r * (trait.meta.stealResist ? Number(trait.meta.stealResist) / 100 : 1.0);
+        }, 1.0);
+    };
+    
+    const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
+    Game_Enemy.prototype.initMembers = function() {
+        _Game_Enemy_initMembers.call(this);
+        this._stealItems = [];
+        this._keepStolenItem = [];
+        this._keepStolenGold = 0;
+    };
 
-Game_BattlerBase.prototype.getStealRatePercent = function() {
-	return this.getStealBoostRate(100);
-};
+    const _Game_Enemy_gold = Game_Enemy.prototype.gold;
+    Game_Enemy.prototype.gold = function() {
+        return _Game_Enemy_gold.call(this) + this._keepStolenGold;
+    };
 
-const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
-Game_Enemy.prototype.initMembers = function() {
-	_Game_Enemy_initMembers.call(this);
-	this._stealItems = [];
-	this._keepStolenItem = [];
-	this._keepStolenGold = 0;
-};
+    const _Game_Enemy_makeDropItems = Game_Enemy.prototype.makeDropItems;
+    Game_Enemy.prototype.makeDropItems = function() {
+        let dropItems = _Game_Enemy_makeDropItems.call(this);
+        if(this._keepStolenItem.length > 0){
+        this._keepStolenItem.forEach(di => {
+                dropItems.push(this.itemObject(di.kind, di.dataId));
+            });
+        }
+        return dropItems;
+    };
 
-Game_Enemy.prototype.stealRandomId = function() {
-	let i = 0;
-	this._stealItems.forEach(di => {
-		if (di.kind > 0 && di.kind < 4) {
-			di.id = i;
-			i++;
-		}
-	});
-	return Math.randomInt(i);
-};
+    const _Game_Enemy_setup = Game_Enemy.prototype.setup;
+    Game_Enemy.prototype.setup = function(enemyId, x, y) {
+        _Game_Enemy_setup.call(this,enemyId, x, y);
+        this.stealSetup();
+    };
 
-Game_Enemy.prototype.stealGoldRandomId = function() {
-	let i = 0;
-	this._stealItems.forEach(di => {
-		if (di.kind === 4) {
-			di.id = i;
-			i++;
-		}
-	});
-	return Math.randomInt(i);
-};
+    Game_Enemy.prototype.stealSetup = function() {
+        //const re =/<(?:steal)\s*([IWAM]):\s*(\d+(?:\s*,\s*\d+)*)>/g;
+        const re =/<(?:steal)\s*([IWAM]):\s*(.*)>/g;
+        while(true) {
+            let match = re.exec(this.enemy().note);
+            if (match) {
+                let data = match[2].split(',');
+                switch (match[1]) {
+                    case 'I':
+                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:1, cond: data[2], mode: parseInt(data[3])});
+                        break;
+                    case 'W':
+                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:2, cond: data[2], mode: parseInt(data[3])});
+                        break;
+                    case 'A':
+                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:3, cond: data[2], mode: parseInt(data[3])});
+                        break;
+                    case 'M':
+                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:4, cond: data[2], mode: parseInt(data[3])});
+                        break;
+                }
+            } else {
+                return;
+            }
+        }
+    };
 
-Game_Enemy.prototype.stealConditions = function(di){
-	if (Imported.NUUN_ConditionsBase && di.cond) {
-		const action = $gameTemp.getActionData();
-		const condTag = 'Steal' + String(di.cond).trim();
-		const mode = di.mode || 0;
-		return action.subject.getTriggerConditions(this.enemy(), this, condTag, 'Target' + condTag, 'Party' + condTag, 'Troop' + condTag, action.action, action.damage, mode);
-	} else {
-		return true;
-	}
-};
+    Game_Enemy.prototype.stealRandomId = function() {
+        let i = 0;
+        this._stealItems.forEach(di => {
+            if (di.kind > 0 && di.kind < 4) {
+                di.id = i;
+                i++;
+            }
+        });
+        return Math.randomInt(i);
+    };
 
-Game_Enemy.prototype.makeStealItems = function(rate) {
-	$gameSystem._stealIndex = 0;
-	let i = 0;
-	const stealId = StealProcess === 1 ? this.stealRandomId() : 0;
-	for (const di of this._stealItems) {
-		if (di.kind > 0 && di.kind < 4 && this.stealConditions(di) && randomRate(di.id, stealId) && this.getStealRate(rate, di)) {
-			let r = this.stealObject(di.kind, di.dataId);
-			if (StealMode) {
-				this._stealItems[i] = {dataId: 1, denominator: 1, kind: 0};
-			}
-			$gameSystem._stealIndex = i;
-			$gameSystem.onBattleSteal();
-			$gameTroop.stealItems.push(r);
-			return r;
-		}
-		i++;
-	}
-};
+    Game_Enemy.prototype.stealGoldRandomId = function() {
+        let i = 0;
+        this._stealItems.forEach(di => {
+            if (di.kind === 4) {
+                di.id = i;
+                i++;
+            }
+        });
+        return Math.randomInt(i);
+    };
 
-Game_Enemy.prototype.makeStealGold = function(rate) {
-	$gameSystem._stealIndex = 0;
-	let i = 0;
-	const stealId = StealProcess === 1 ? this.stealGoldRandomId() : 0;
-	for (const di of this._stealItems) {
-		if (di.kind === 4 && this.stealConditions(di) && randomRate(di.id, stealId) && this.getStealRate(rate, di)) {
-			let r = this.stealObject(di.kind, di.dataId);
-			if (StealMode) {
-				this._stealItems[i] = {dataId: 1, denominator: 1, kind: 0};
-			}
-			$gameSystem.onBattleStealGold();
-			$gameTroop.stealItems.push({money:r});
-			return r;
-		}
-		i++;
-	}
-};
+    Game_Enemy.prototype.getStealList = function() {
+        return this._stealItems;
+    };
 
-Game_Enemy.prototype.isStealItems = function() {
-	return this._stealItems.some(item => item.kind > 0 && item.kind <= 3);
-};
+    Game_Enemy.prototype.isStealItems = function() {
+        return this._stealItems.length > 0 && this._stealItems.some(item => item.kind > 0 && item.kind <= 3);
+    };
+    
+    Game_Enemy.prototype.isStealGold = function() {
+        return this._stealItems.length > 0 && this._stealItems.some(item => item.kind === 4);
+    };
+    
+    Game_Enemy.prototype.keepStolenItem = function(item) {
+        if (params.StolenItemDrop && item){
+            this._keepStolenItem.push({dataId: item.id, denominator: 1.0, kind: 1});
+        }
+    };
+    
+    Game_Enemy.prototype.keepStolenGold = function(gold) {
+        if (params.StolenGoldDrop && gold > 0){
+            this._keepStolenGold += gold;
+        }
+    };
 
-Game_Enemy.prototype.isStealGold = function() {
-	return this._stealItems.some(item => item.kind === 4);
-};
+    Game_Enemy.prototype.stealObject = function(kind, dataId) {
+        if (kind === 1) {
+            return $dataItems[dataId];
+        } else if (kind === 2) {
+            return $dataWeapons[dataId];
+        } else if (kind === 3) {
+            return $dataArmors[dataId];
+        } else if (kind === 4) {
+            return dataId;
+        } else {
+            return null;
+        }
+    };
 
-Game_Enemy.prototype.getStealRate = function(rate, di) {
-	return Math.floor(Math.random() * 100) < rate * (di.denominator * this.stealItemRate() / 100);
-};
-
-Game_Enemy.prototype.keepStolenItem = function(item) {
-	if (StolenItemDrop && item){
-		this._keepStolenItem.push({dataId: item.id, denominator: 100, kind: 1});
-	}
-};
-
-Game_Enemy.prototype.keepStolenGold = function(gold) {
-	if (StolenGoldDrop && gold > 0){
-		this._keepStolenGold += gold;
-	}
-};
-
-const _Game_Enemy_gold = Game_Enemy.prototype.gold;
-Game_Enemy.prototype.gold = function() {
-	return _Game_Enemy_gold.call(this) + this._keepStolenGold;
-};
-
-const _Game_Enemy_setup = Game_Enemy.prototype.setup;
-Game_Enemy.prototype.setup = function(enemyId, x, y) {
-	_Game_Enemy_setup.call(this,enemyId, x, y);
-	this.stealSetup();
-};
-
-Game_Enemy.prototype.stealSetup = function() {
-	//const re =/<(?:steal)\s*([IWAM]):\s*(\d+(?:\s*,\s*\d+)*)>/g;
-	const re =/<(?:steal)\s*([IWAM]):\s*(.*)>/g;
-	while(true) {
-		let match = re.exec(this.enemy().note);
-		if (match) {
-			let data = match[2].split(',');
-			switch (match[1]) {
-				case 'I':
-					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:1, cond: data[2], mode: parseInt(data[3])});
-					break;
-				case 'W':
-					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:2, cond: data[2], mode: parseInt(data[3])});
-					break;
-				case 'A':
-					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:3, cond: data[2], mode: parseInt(data[3])});
-					break;
-				case 'M':
-					this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]), kind:4, cond: data[2], mode: parseInt(data[3])});
-					break;
-			}
-		} else {
-			return this;
-		}
-	}
-};
-
-const _Game_Enemy_makeDropItems = Game_Enemy.prototype.makeDropItems;
-Game_Enemy.prototype.makeDropItems = function() {
-	let dropItems = _Game_Enemy_makeDropItems.call(this);
-	if(this._keepStolenItem.length > 0){
-  	this._keepStolenItem.forEach(di => {
-			dropItems.push(this.itemObject(di.kind, di.dataId));
- 		});
-	}
-	return dropItems;
-};
-
-Game_Enemy.prototype.stealObject = function(kind, dataId) {
-  if (kind === 1) {
-    return $dataItems[dataId];
-  } else if (kind === 2) {
-    return $dataWeapons[dataId];
-  } else if (kind === 3) {
-    return $dataArmors[dataId];
-  } else if (kind === 4) {
-		return dataId;
-	} else {
-    return null;
-  }
-};
+    Game_Enemy.prototype.stealConditions = function(di){
+        if (Imported.NUUN_ConditionsBase && di.cond) {
+            const action = $gameTemp.getActionData();
+            const condTag = 'Steal' + String(di.cond).trim();
+            const mode = di.mode || 0;
+            return action.subject.getTriggerConditions(this.enemy(), this, condTag, 'Target' + condTag, 'Party' + condTag, 'Troop' + condTag, action.action, action.damage, mode);
+        } else {
+            return true;
+        }
+    };
 
 
-const _Game_Troop_clear = Game_Troop.prototype.clear
-Game_Troop.prototype.clear = function() {
-	_Game_Troop_clear.call(this);
-    this.stealItems = [];
-};
+    const _Game_Troop_clear = Game_Troop.prototype.clear
+    Game_Troop.prototype.clear = function() {
+        _Game_Troop_clear.call(this);
+        this.stealItems = [];
+    };
 
-Game_Troop.prototype.getStealItems = function() {
-    return this.stealItems;
-};
+    Game_Troop.prototype.getStealItems = function() {
+        return this.stealItems;
+    };
 
+    const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
+    Game_ActionResult.prototype.clear = function() {
+        _Game_ActionResult_clear.call(this);
+        this.stealResult = [];
+    };
 
-const _Window_BattleLog_displayActionResults = Window_BattleLog.prototype.displayActionResults;
-Window_BattleLog.prototype.displayActionResults = function(subject, target) {
-	_Window_BattleLog_displayActionResults.call(this, subject, target);
-	if (target.result().used) {
-		this.push("pushBaseLine");
-		this.displaySteal(subject, target);
-	}
-};
+    Game_ActionResult.prototype.pushSteal = function(item, type) {
+        const result = {};
+        if (item) {
+            result.name = item.name;
+            result.id = item.id;
+            result.iconIndex = item.iconIndex;
+            if (Imported.NUUN_popUp) {
+                result.popupText = this.stealPopupText(type);//ポップアッププラグイン
+            }
+        } else {
+            result.name = null;
+            result.id = 0;
+            result.iconIndex = 0;
+        }
+        result.text = stealMode(type);
+        this.stealResult.push(result);
+    };
 
-Window_BattleLog.prototype.displaySteal = function(subject, target) {
-	const result = subject.result();
-	result.stealResult.forEach(steal => {
-		this.push("addText", steal.text.format(subject.name(), target.name(), steal.name));
-		if (Imported.NUUN_popUp && steal.name) {
-			this.stealPopup(target, steal);
-		}
-		this.push("pushBaseLine");
-	});
-};
+    Game_ActionResult.prototype.pushGoldSteal = function(gold, type) {
+        const result = {};
+        if (gold) {
+            result.name = gold;
+            result.iconIndex = 0;
+            if (Imported.NUUN_popUp) {
+                result.popupText = this.stealPopupText(type);//ポップアッププラグイン
+            }
+        } else {
+            result.name = gold;
+            result.iconIndex = 0;
+        }
+        result.id = 0;
+        result.text = stealMode(type);
+        this.stealResult.push(result);
+    };
+
+    const _Window_BattleLog_displayActionResults = Window_BattleLog.prototype.displayActionResults;
+    Window_BattleLog.prototype.displayActionResults = function(subject, target) {
+        if (target.result().used) {
+            this.setDisplaySteal(subject, target);
+        }
+        _Window_BattleLog_displayActionResults.apply(this, arguments);
+    };
+
+    Window_BattleLog.prototype.setDisplaySteal = function(subject, target) {
+        const result = subject.result();
+        _stealText = [];
+        result.stealResult.forEach(steal => {
+            _stealText.push(steal.text.format(subject.name(), target.name(), steal.name));
+        })
+    };
+
+    const _Window_BattleLog_displayFailure = Window_BattleLog.prototype.displayFailure;
+    Window_BattleLog.prototype.displayFailure = function(target) {
+        _Window_BattleLog_displayFailure.apply(this, arguments);
+        if (target.result().used) {
+            this.displaySteal(target);
+        }
+    };
+
+    Window_BattleLog.prototype.displaySteal = function(target) {
+        _stealText.forEach(text => {
+            this.push("addText", text);
+            if (Imported.NUUN_popUp && steal.name) {
+                this.stealPopup(target, steal);
+            }
+            this.push("pushBaseLine");
+        });
+    };
 
 })();

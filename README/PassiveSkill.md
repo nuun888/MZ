@@ -1,5 +1,5 @@
 # [パッシブスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
-# Ver.1.5.7
+# Ver.1.5.8
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -85,6 +85,8 @@ Ver.1.5.5まで条件モードの説明が逆に表記されていました。
 パッシブスキルが適用された武器のステータス、特徴が適用されます。  
 
 ## 更新履歴
+2024/8/31 Ver.1.5.8  
+装備タイプの防具が機能していなかった問題を修正。  
 2023/3/4 Ver.1.5.7  
 パッシブスキル習得時に更新処理を行うように修正。  
 2023/1/28 Ver.1.5.6  

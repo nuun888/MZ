@@ -1820,7 +1820,7 @@
  * @default ------------------------------
  * 
  * @param EnemyBookHideWindow
- * @desc Specifies the windows and sprites to hide while the encyclopedia is displayed.
+ * @desc Specifies the windows and sprites to hide when the book is displayed during battle.
  * @text Hidden window when book is displayed
  * @type combo[]
  * @option '_ctbWindow'
@@ -4952,7 +4952,7 @@
  * @default ------------------------------
  * 
  * @param EnemyBookHideWindow
- * @desc 図鑑表示中に非表示にするウィンドウ、スプライトを指定します。
+ * @desc 戦闘中で図鑑表示中に非表示にするウィンドウ、スプライトを指定します。
  * @text 図鑑表示中非表示ウィンドウ
  * @type combo[]
  * @option '_ctbWindow'

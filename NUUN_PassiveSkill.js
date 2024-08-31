@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.5.7
+ * @version 1.5.8
  * @base NUUN_Base
  * 
  * @help
@@ -81,6 +81,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/31/2024 Ver.1.5.8
+ * Fixed an issue where equipped armor types were not functioning.
  * 3/4/2023 Ver.1.5.7
  * Fixed to perform update processing when passive skill is acquired.
  * 1/28/2023 Ver.1.5.6
@@ -280,7 +282,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.5.7
+ * @version 1.5.8
  * @base NUUN_Base
  * 
  * @help
@@ -341,6 +343,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/31 Ver.1.5.8
+ * 装備タイプの防具が機能していなかった問題を修正。
  * 2023/3/4 Ver.1.5.7
  * パッシブスキル習得時に更新処理を行うように修正。
  * 2023/1/28 Ver.1.5.6
@@ -698,7 +702,7 @@ Imported.NUUN_PassiveSkill = true;
         case 'Vehicle':
             return this.isVehicle(list.Vehicle[0]);
         case 'Equip':
-            return list.EquipWeapon > 0 ? this.isEquippedWeaponType(list.EquipWeapon) : this.isEquippedArmorType(list.EquipWeapon);
+            return list.EquipWeapon > 0 ? this.isEquippedWeaponType(list.EquipWeapon) : this.isEquippedArmorType(list.EquipArmor);
         case 'Turn':
             return this.turnCount() >= list.DwLimit && (list.UpLimit > 0 ? this.turnCount() <= list.UpLimit : true);
         case 'GVal':
@@ -726,9 +730,9 @@ Imported.NUUN_PassiveSkill = true;
         return this.equips().some(equip => equip && equip.wtypeId === type);
     };
 
-  Game_Actor.prototype.isEquippedArmorType = function(type) {
-    return this.equips().some(equip => equip && equip.atypeId === type);
-                            };
+    Game_Actor.prototype.isEquippedArmorType = function(type) {
+        return this.equips().some(equip => equip && equip.atypeId === type);
+    };
 
     const _Game_Battler_refresh = Game_Battler.prototype.refresh;
     Game_Battler.prototype.refresh = function() {

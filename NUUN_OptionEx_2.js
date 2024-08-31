@@ -14,7 +14,7 @@
  * @base NUUN_OptionEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Displays a gauge on the volume of the sound settings in the options screen.
@@ -24,6 +24,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/31/2024 Ver.1.0.1
+ * Fixed an issue where the gauge height was not being applied.
+ * Fixed so that the gauge settings are not applied to anything other than the volume settings.
  * 8/25/2024 Ver.1.0.0
  * First edition.
  * 
@@ -42,7 +45,7 @@
  * @base NUUN_OptionEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * オプション画面のサウンド設定の音量にゲージを表示させます。
@@ -52,6 +55,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/8/31 Ver.1.0.1
+ * ゲージ高さが適用されていなかった問題を修正。
+ * 音量設定以外にゲージ設定を適用させないように修正。
  * 2024/8/25 Ver.1.0.0
  * 初版
  * 
@@ -65,7 +71,7 @@ Imported.NUUN_OptionEx_2 = true;
 
     const parameters = PluginManager.parameters('NUUN_OptionEx_2');
     const _tempParams = new Nuun_TempParam();
-    let _data = '';
+    let _data = null;
 
     const _Window_Options_initialize = Window_Options.prototype.initialize;
     Window_Options.prototype.initialize = function(rect) {
@@ -99,12 +105,15 @@ Imported.NUUN_OptionEx_2 = true;
 
     const _Window_Options_volumeStatusText = Window_Options.prototype.volumeStatusText;
     Window_Options.prototype.volumeStatusText = function(value) {
-        return _data && _data.VolumeGauge ? '' : _Window_Options_volumeStatusText.apply(this, arguments);
+        if (!_data) return _Window_Options_volumeStatusText.apply(this, arguments);
+        return _data.VolumeGauge ? '' : _Window_Options_volumeStatusText.apply(this, arguments);
     };
 
     const _Window_Options_statusWidth = Window_Options.prototype.statusWidth;
     Window_Options.prototype.statusWidth = function() {
-        return _data && _data.VolumeGauge ? this.gaugeWidth() : _Window_Options_statusWidth.apply(this, arguments);
+        if (!_data) return _Window_Options_statusWidth.apply(this, arguments);
+        const symbol = this.commandSymbol(_data.OptionSymbol);
+        return symbol && this.isVolumeSymbol(symbol) && _data.VolumeGauge ? this.gaugeWidth() : _Window_Options_statusWidth.apply(this, arguments);
     };
     
     Window_Options.prototype.gaugeWidth = function() {
@@ -152,6 +161,10 @@ Imported.NUUN_OptionEx_2 = true;
 
     Sprite_OptionGauge.prototype.bitmapWidth = function() {
         return this._paramData._width || 128;
+    };
+
+    Sprite_OptionGauge.prototype.gaugeHeight = function() {
+        return this._paramData.GaugeHeight > 0 ? this._paramData.GaugeHeight : Sprite_Gauge.prototype.gaugeHeight.apply(this, arguments);
     };
 
     Sprite_OptionGauge.prototype.gaugeColor1 = function() {

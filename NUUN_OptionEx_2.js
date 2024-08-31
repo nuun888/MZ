@@ -112,7 +112,7 @@ Imported.NUUN_OptionEx_2 = true;
     const _Window_Options_statusWidth = Window_Options.prototype.statusWidth;
     Window_Options.prototype.statusWidth = function() {
         if (!_data) return _Window_Options_statusWidth.apply(this, arguments);
-        const symbol = this.commandSymbol(_data.OptionSymbol);
+        const symbol = this.commandSymbol(this.findSymbol(_data.OptionSymbol));
         return symbol && this.isVolumeSymbol(symbol) && _data.VolumeGauge ? this.gaugeWidth() : _Window_Options_statusWidth.apply(this, arguments);
     };
     

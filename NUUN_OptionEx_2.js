@@ -14,7 +14,7 @@
  * @base NUUN_OptionEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Displays a gauge on the volume of the sound settings in the options screen.
@@ -24,6 +24,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/1/2024 Ver.1.0.2
+ * Implemented volume knob functionality.
+ * Added functionality to set the volume to the location where you click on the volume gauge.
  * 8/31/2024 Ver.1.0.1
  * Fixed an issue where the gauge height was not being applied.
  * Fixed so that the gauge settings are not applied to anything other than the volume settings.
@@ -45,7 +48,7 @@
  * @base NUUN_OptionEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * オプション画面のサウンド設定の音量にゲージを表示させます。
@@ -55,6 +58,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/1 Ver.1.0.2
+ * 音量のつまみ機能を実装。
+ * ボリュームゲージのクリックした場所により、クリック場所の音量に設定する機能を追加。
  * 2024/8/31 Ver.1.0.1
  * ゲージ高さが適用されていなかった問題を修正。
  * 音量設定以外にゲージ設定を適用させないように修正。
@@ -76,6 +82,7 @@ Imported.NUUN_OptionEx_2 = true;
     const _Window_Options_initialize = Window_Options.prototype.initialize;
     Window_Options.prototype.initialize = function(rect) {
         this._optionGauge = {};
+        this._volumeFraction = 0;
         _Window_Options_initialize.call(this, rect);
     };
 
@@ -98,8 +105,6 @@ Imported.NUUN_OptionEx_2 = true;
         _Window_Options_drawItem.apply(this, arguments);
         if (this.isVolumeSymbol(symbol)) {
             this.volumeGauge(index, symbol);
-        } else {
-
         }
     };
 
@@ -124,8 +129,8 @@ Imported.NUUN_OptionEx_2 = true;
         if (_data && _data.VolumeGauge) {
             const rect = this.itemLineRect(index);
             const statusWidth = this.statusWidth();
-            const titleWidth = rect.width - statusWidth;
-            _data._width = statusWidth;
+            const titleWidth = rect.width - statusWidth - this.itemPadding() / 2;
+            _data._width = Math.min(statusWidth, rect.width - rect.x);
             this.placeOptionGauge(_data, symbol, rect.x + titleWidth, rect.y + 4);
         }
     };
@@ -143,8 +148,89 @@ Imported.NUUN_OptionEx_2 = true;
     Window_Options.prototype.getConfigMaxValue = function() {
         return 100;
     };
-    
-    
+
+
+    Window_Options.prototype.processTouch = function() {
+        Window_Selectable.prototype.processTouch.apply(this, arguments);
+        this.longPressedVolumeSliderTouch();
+    };
+
+    Window_Options.prototype.longPressedVolumeSliderTouch = function() {
+        if (this.isOpenAndActive()) {
+            if (TouchInput.isLongPressed()) {
+                this.volumeSliderTouch();
+            }
+        }
+    };
+
+    Window_Options.prototype.onTouchOk = function() {
+        if (this.volumeSliderTouch()) return;
+        Window_Selectable.prototype.onTouchOk.apply(this, arguments);
+        return;
+    };
+
+    Window_Options.prototype.volumeSliderTouch = function() {
+        const symbol = this.commandSymbol(this.index());
+        if (!this.isVolumeSymbol(symbol)) return;
+        const data = this.getExtData(symbol);
+        if (!data && !data.VolumeGauge) return false;
+        if (this.isTouchOkEnabled()) {
+            const hitIndex = this.hitIndex();
+            if (this._cursorFixed) {
+                if (hitIndex === this.index()) {
+                    return this.volumeSlider(symbol);
+                }
+            } else if (hitIndex >= 0) {
+                return this.volumeSlider(symbol);
+            }
+        }
+        return false;
+    };
+
+    Window_Options.prototype.volumeSlider = function(symbol) {
+        return this.isVolumeTouchZone(symbol);
+    };
+
+    Window_Options.prototype.isVolumeTouchZone = function(symbol) {
+        const rect = this.itemLineRect(this.index());
+        const gauge = this._optionGauge[symbol];
+        const touchPos = new Point(TouchInput.x, TouchInput.y);
+        const localPos = this.worldTransform.applyInverse(touchPos);
+        const gaugeX = gauge.x + gauge.gaugeX() + rect.x;
+        const gaugeY = gauge.y + (gauge.textHeight() - gauge.gaugeHeight()) + this._padding;
+        if (localPos.x >= gaugeX && localPos.x <= gaugeX + gauge.bitmapWidth() - gauge.gaugeX()  && localPos.y >= gaugeY && localPos.y <= gaugeY + gauge.gaugeHeight()) {
+            const pointX = localPos.x - gaugeX;
+            const maxPoint = gauge.bitmapWidth() - gauge.gaugeX();
+            const volume = Math.floor(pointX / maxPoint * this.getConfigMaxValue());
+            this.changeVolumeSlider(symbol, volume);
+            return true;
+        }
+        return false;
+    };
+
+    Window_Options.prototype.setVolumeSlider = function(symbol, volume) {
+        this.changeVolumeSlider(symbol, volume);
+    };
+
+    Window_Options.prototype.changeVolumeSlider = function(symbol, volume) {
+        const value = volume;
+        this.changeValue(symbol, value.clamp(0, 100));
+    };
+
+    const _Window_Options_changeVolume = Window_Options.prototype.changeVolume;
+    Window_Options.prototype.changeVolume = function(symbol, forward, wrap) {
+        const lastValue = this.getConfigValue(symbol);
+        const offset = this.volumeOffset();
+        this._volumeFraction = offset - (lastValue % offset > 0 ? lastValue % offset : 0);
+        _Window_Options_changeVolume.apply(this, arguments);
+        this._volumeFraction = 0;
+    };
+
+    const _Window_Options_volumeOffset = Window_Options.prototype.volumeOffset;
+    Window_Options.prototype.volumeOffset = function() {
+        return this._volumeFraction > 0 ? this._volumeFraction : _Window_Options_volumeOffset.apply(this, arguments);
+    };
+
     function Sprite_OptionGauge() {
         this.initialize(...arguments);
     }

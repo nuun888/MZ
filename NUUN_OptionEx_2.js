@@ -221,7 +221,7 @@ Imported.NUUN_OptionEx_2 = true;
     Window_Options.prototype.changeVolume = function(symbol, forward, wrap) {
         const lastValue = this.getConfigValue(symbol);
         const offset = this.volumeOffset();
-        this._volumeFraction = offset - (lastValue % offset > 0 ? lastValue % offset : 0);
+        this._volumeFraction = forward ? (offset - (lastValue % offset > 0 ? lastValue % offset : 0)) : (lastValue % offset > 0 ? lastValue % offset : 0);
         _Window_Options_changeVolume.apply(this, arguments);
         this._volumeFraction = 0;
     };

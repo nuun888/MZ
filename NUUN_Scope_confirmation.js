@@ -15,7 +15,7 @@
  * @base NUUN_MenuStatusAllSelectFix
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuStatusAllSelectFix
- * @version 1.6.2
+ * @version 1.6.3
  *            
  * @help  
  * 全体、ランダム、敵味方全体攻撃でも対象選択させます。
@@ -27,15 +27,15 @@
  * 
  * 対象範囲が全体、ランダム、敵味方全体時のウィンドウカーソルの表示対象を独自に定義することが出来ます。
  * なおエネミー画像、SV画像、アクター画像には反映されません。また複数対象カーソル個別表示がONの時のみ有効です。
- * subject = 使用者;
+ * subject = 使用:者;
  * members = 対象のメンバー;
  * 取得するデータはカーソル表示させるメンバーを配列として取得します。
- * 例：members.filter(member => member.isAlive() && member !== subject)
+ * 例:members.filter(member => member.isAlive() && member !== subject)
  * 使用者以外にカーソルが表示させます。
  * 
  * タグはアイテム、スキルのメモ欄に記述します。
- * <[tag]> [tag]：全カーソル表示時対象設定で設定したタグ名
- * 例：<NotUserTarget> NotUserTargetは全カーソル表示時対象設定のタグ名を変更してない限り、使用者以外のカーソルを表示します。
+ * <[tag]> [tag]:全カーソル表示時対象設定で設定したタグ名
+ * 例:<NotUserTarget> NotUserTargetは全カーソル表示時対象設定のタグ名を変更してない限り、使用者以外のカーソルを表示します。
  * 
  * 以下の機能はXPスタイル対象選択ウィンドウプラグインが必要です。
  * 敵味方対象選択時の表示名
@@ -51,6 +51,8 @@
  * 
  * 
  * 更新履歴
+ * 2024/9/5 Ver.1.6.3
+ * 防御コマンドでキャンセルを行うとコマンドカーソル位置が先頭に戻ってしまう問題を修正。
  * 2021/5/30 Ver.1.6.2
  * メニュー画面アクター全体選択時のカーソル不具合を別プラグイン化による定義修正。
  * 2021/3/27 Ver.1.6.1
@@ -188,273 +190,280 @@ const UserSelectTasg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(p
 
 const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
 Scene_Battle.prototype.onSelectAction = function() {
-  this.resetCursor();
-  const action = BattleManager.inputtingAction();
-  const item = action.item();
-  if (this.isTargetSelectForUser(action, item)) {
-    this.setActorTargetSelectData(action, TargetUser);
-    this.startActorSelection();
-    this._actorWindow.selectForItem(action);
-  } else if (this.isTargetSelectEveryone(action, item)) {
-    this.setActorTargetSelectData(action, TargetEveryone);
-    this.startEnemySelection();
-    this._enemyWindow.selectForItem(action);
-    this._actorWindow.selectForItem(action);
-  } else if (this.isTargetSelectForRandom(action, item)) {
-    if (action.isForOpponent()) {
-      this.setActorTargetSelectData(action, TargetTroopRandom);
-      this.startEnemySelection();
-      this._enemyWindow.selectForItem(action);
+    this.resetCursor();
+    const action = BattleManager.inputtingAction();
+    const item = action.item();
+    if (this.isTargetSelectForUser(action, item)) {
+        this.setActorTargetSelectData(action, TargetUser);
+        this.startActorSelection();
+        this._actorWindow.selectForItem(action);
+    } else if (this.isTargetSelectEveryone(action, item)) {
+        this.setActorTargetSelectData(action, TargetEveryone);
+        this.startEnemySelection();
+        this._enemyWindow.selectForItem(action);
+        this._actorWindow.selectForItem(action);
+    } else if (this.isTargetSelectForRandom(action, item)) {
+        if (action.isForOpponent()) {
+        this.setActorTargetSelectData(action, TargetTroopRandom);
+        this.startEnemySelection();
+        this._enemyWindow.selectForItem(action);
+        } else {
+        this.setActorTargetSelectData(action, TargetPartyRandom);
+        this.startActorSelection();
+        this._actorWindow.selectForItem(action);
+        }
+    } else if (this.isTargetSelectisForAll(action, item)) {
+        if (action.isForOpponent()) {
+        this.setActorTargetSelectData(action, TargetTroop);
+        this.startEnemySelection();
+        this._enemyWindow.selectForItem(action);  
+        } else {
+        this.setActorTargetSelectData(action, TargetParty);
+        this.startActorSelection();
+        this._actorWindow.selectForItem(action);
+        }
     } else {
-      this.setActorTargetSelectData(action, TargetPartyRandom);
-      this.startActorSelection();
-      this._actorWindow.selectForItem(action);
+        this.setActorTargetSelectData(action, null);
+        _Scene_Battle_onSelectAction.call(this);
     }
-  } else if (this.isTargetSelectisForAll(action, item)) {
-    if (action.isForOpponent()) {
-      this.setActorTargetSelectData(action, TargetTroop);
-      this.startEnemySelection();
-      this._enemyWindow.selectForItem(action);  
-    } else {
-      this.setActorTargetSelectData(action, TargetParty);
-      this.startActorSelection();
-      this._actorWindow.selectForItem(action);
-    }
-  } else {
-    this.setActorTargetSelectData(action, null);
-    _Scene_Battle_onSelectAction.call(this);
-  }
 };
 
 Scene_Battle.prototype.setActorTargetSelectData = function(action, text) {
-  const userTargetTag = UserSelectTasg.find(tag => action.item().meta[tag.UserTagName]);
-  if (userTargetTag && userTargetTag.TargetName) {
-    text = userTargetTag.TargetName;
-  }
-  if (Imported.NUUN_XPSelectWindow) {
-    const window = action.isForOpponent() ? this._enemySelectWindow : this._actorSelectWindow;
-    if (window) {
-      if (text) {
-        window.setForItem(text.format(action.item().repeats, action.numTargets()));
-      } else {
-        window.setForItem(null);
-      } 
+    const userTargetTag = UserSelectTasg.find(tag => action.item().meta[tag.UserTagName]);
+    if (userTargetTag && userTargetTag.TargetName) {
+        text = userTargetTag.TargetName;
     }
-  }//%1　連続回数　%2 ランダム回数 
+    if (Imported.NUUN_XPSelectWindow) {
+        const window = action.isForOpponent() ? this._enemySelectWindow : this._actorSelectWindow;
+        if (window) {
+        if (text) {
+            window.setForItem(text.format(action.item().repeats, action.numTargets()));
+        } else {
+            window.setForItem(null);
+        } 
+        }
+    }//%1　連続回数　%2 ランダム回数 
 };
 
 Scene_Battle.prototype.isTargetSelectForUser = function(action, item) {
-  return ForUserSelect && this.enemyOnrySelect(action) && !this.noTargetSelect(item) && action.isForUser();
+    return ForUserSelect && this.enemyOnrySelect(action) && !this.noTargetSelect(item) && action.isForUser();
 };
 
 Scene_Battle.prototype.isTargetSelectEveryone = function(action, item) {
-  return !this.noTargetSelect(item) && action.isForEveryone();
+    return !this.noTargetSelect(item) && action.isForEveryone();
 };
 
 Scene_Battle.prototype.isTargetSelectForRandom = function(action, item) {
-  return this.enemyOnrySelect(action) && !this.noTargetSelect(item) && action.isForRandom();
+    return this.enemyOnrySelect(action) && !this.noTargetSelect(item) && action.isForRandom();
 };
 
 Scene_Battle.prototype.isTargetSelectisForAll = function(action, item) {
-  return this.enemyOnrySelect(action) && !this.noTargetSelect(item) && action.isForAll();
+    return this.enemyOnrySelect(action) && !this.noTargetSelect(item) && action.isForAll();
 };
 
 Scene_Battle.prototype.noTargetSelect = function(item) {
-  return item.meta.NoTargetSelect;
+    return item.meta.NoTargetSelect;
 };
 
 Scene_Battle.prototype.enemyOnrySelect = function(action) {
-  return !EnemyOnrySelect || (EnemyOnrySelect && action.isForOpponent());
+    return !EnemyOnrySelect || (EnemyOnrySelect && action.isForOpponent());
 };
 
 Scene_Battle.prototype.resetCursor = function() {
-  this._enemyWindow.setCursorAll(false);
-  this._actorWindow.setCursorAll(false);
-  this._actorWindow.setCursorFixed(false);
-  this._enemyWindow.setMultiCursor(false);
-  this._actorWindow.setMultiCursor(false);
+    this._enemyWindow.setCursorAll(false);
+    this._actorWindow.setCursorAll(false);
+    this._actorWindow.setCursorFixed(false);
+    this._enemyWindow.setMultiCursor(false);
+    this._actorWindow.setMultiCursor(false);
 };
+
+const _Scene_Battle_onActorCancel = Scene_Battle.prototype.onActorCancel;
+Scene_Battle.prototype.onActorCancel = function() {
+    _Scene_Battle_onActorCancel.apply(this, arguments);
+    switch (this._actorCommandWindow.currentSymbol()) {
+        case "guard":
+            this._statusWindow.show();
+            this._actorCommandWindow.activate();
+            break;
+    }
+};
+
 
 const _Window_Selectable_paint = Window_Selectable.prototype.paint;
 Window_Selectable.prototype.paint = function() {
-  _Window_Selectable_paint.call(this);
-  if (this.contents && this._multiCursor) {
-    this.refreshCursorForAll();
-  }
+    _Window_Selectable_paint.call(this);
+    if (this.contents && this._multiCursor) {
+        this.refreshCursorForAll();
+    }
 };
 
 const _Window_Selectable_initialize = Window_Selectable.prototype.initialize;
 Window_Selectable.prototype.initialize = function(rect) {
-  this._multiCursor = false;
-  _Window_Selectable_initialize.call(this, rect);
+    this._multiCursor = false;
+    _Window_Selectable_initialize.call(this, rect);
 };
 
 Window_Selectable.prototype.setMultiCursor = function(mode) {
-  this._multiCursor = mode;
+    this._multiCursor = mode;
 };
 
 const _Window_Selectable_setCursorAll = Window_Selectable.prototype.setCursorAll;
 Window_Selectable.prototype.setCursorAll = function(cursorAll) {
-  _Window_Selectable_setCursorAll.call(this, cursorAll);
-  const multiCursor = MultiCursorMode ? cursorAll : false;
-  this.setMultiCursor(multiCursor);
+    _Window_Selectable_setCursorAll.call(this, cursorAll);
+    const multiCursor = MultiCursorMode ? cursorAll : false;
+    this.setMultiCursor(multiCursor);
 };
 
-Window_MenuActor.prototype.setUserTargetSubject = function(butler) {
-  this._NUUN_subject = butler;
+Window_MenuActor.prototype.setUserTargetSubject = function(batler) {
+    this._NUUN_subject = batler;
 };
 
 const _Window_MenuActor_select = Window_MenuActor.prototype.select;
 Window_MenuActor.prototype.select = function(index) {
-  if (this.cursorAll()) {
-    Window_Selectable.prototype.select.call(this, index);
-    let activeMember = [];
-    if (this._userTargetTag && this._userTargetTag.UserTagEval) {
-      const subject = this._NUUN_subject;
-      const members = $gameParty.members();
-      activeMember = eval(this._userTargetTag.UserTagEval);
+    if (this.cursorAll()) {
+        Window_Selectable.prototype.select.call(this, index);
+        let activeMember = [];
+        if (this._userTargetTag && this._userTargetTag.UserTagEval) {
+            const subject = this._NUUN_subject;
+            const members = $gameParty.members();
+            activeMember = eval(this._userTargetTag.UserTagEval);
+        } else {
+            activeMember = $gameParty.aliveMembers();
+        }
+        $gameParty.targetSelect(activeMember);
+        this.refreshCursor();
     } else {
-      activeMember = $gameParty.aliveMembers();
+        _Window_MenuActor_select.call(this, index);
     }
-    $gameParty.targetSelect(activeMember);
-    this.refreshCursor();
-  } else {
-    _Window_MenuActor_select.call(this, index);
-  }
 };
 
 const _Window_MenuActor_selectForItem = Window_MenuActor.prototype.selectForItem;
 Window_MenuActor.prototype.selectForItem = function(item) {
-  this.setCursorNotUserTarget(item);
-  this.setMultiCursor(false);
-  _Window_MenuActor_selectForItem.call(this, item);
+    this.setCursorNotUserTarget(item);
+    this.setMultiCursor(false);
+    _Window_MenuActor_selectForItem.call(this, item);
 };
 
 Window_MenuActor.prototype.setCursorNotUserTarget = function(item) {
-  this._userTargetTag = UserSelectTasg.find(tag => item.meta[tag.UserTagName]);
-  const actor = $gameParty.menuActor();
-  this.setUserTargetSubject(actor);
+    this._userTargetTag = UserSelectTasg.find(tag => item.meta[tag.UserTagName]);
+    const actor = $gameParty.menuActor();
+    this.setUserTargetSubject(actor);
 };
 
 
 Window_BattleActor.prototype.setCursorNotUserTarget = function(action) {
-  Window_Selectable.prototype.setCursorNotUserTarget.call(this, action);
-  this.setUserTargetSubject(action.subject());
+    Window_Selectable.prototype.setCursorNotUserTarget.call(this, action);
+    this.setUserTargetSubject(action.subject());
 };
 
 Window_Selectable.prototype.setCursorNotUserTarget = function(action) {
-  const item = action.item().meta;
-  this._userTargetTag = UserSelectTasg.find(tag => item[tag.UserTagName]);
+    const item = action.item().meta;
+    this._userTargetTag = UserSelectTasg.find(tag => item[tag.UserTagName]);
 };
 
-Window_BattleActor.prototype.setUserTargetSubject = function(butler) {
-  this._NUUN_subject = butler;
+Window_BattleActor.prototype.setUserTargetSubject = function(batler) {
+    this._NUUN_subject = batler;
 };
 
 Window_BattleActor.prototype.selectForItem = function(action) {
-  if (action.isForUser()) {
-    this.forceSelect(BattleManager.actor().index());
-    this.setCursorFixed(true);
-  } else if (action.isForAll()) {
-    this.setCursorAll(true);
-    this.setCursorNotUserTarget(action);
-    this.forceSelect(0);
-  } else if (action.isForRandom()) {
-    this.setCursorAll(true);
-    this.setCursorNotUserTarget(action);
-    this.forceSelect(0);
-  }
+    if (action.isForUser()) {
+        this.forceSelect(BattleManager.actor().index());
+        this.setCursorFixed(true);
+    } else if (action.isForAll()) {
+        this.setCursorAll(true);
+        this.setCursorNotUserTarget(action);
+        this.forceSelect(0);
+    } else if (action.isForRandom()) {
+        this.setCursorAll(true);
+        this.setCursorNotUserTarget(action);
+        this.forceSelect(0);
+    }
 };
 
 Window_MenuActor.prototype.selectTarget = function(index) {
-  const actor = $gameParty.members()[index];
-  return actor ? actor.isSelected() : false;
+    const actor = $gameParty.members()[index];
+    return actor ? actor.isSelected() : false;
 };
 
 const _Window_BattleEnemy_initialize = Window_BattleEnemy.prototype.initialize;
 Window_BattleEnemy.prototype.initialize = function(rect) {
-  _Window_BattleEnemy_initialize.call(this, rect);
-  this._forEveryoneSelect = false;
+    _Window_BattleEnemy_initialize.call(this, rect);
+    this._forEveryoneSelect = false;
 };
 
 Window_BattleEnemy.prototype.selectForItem = function(action) {
-  if (action.isForEveryone()) {
-    this.setCursorAll(true);
-    this.forceSelect(0);
-    this._forEveryoneSelect = true;
-  } else if (action.isForAll()) {
-    this.setCursorAll(true);
-    this.setCursorNotUserTarget(action);
-    this.forceSelect(0);
-  } else if (action.isForRandom()) {
-    this.setCursorAll(true);
-    this.setCursorNotUserTarget(action);
-    this.forceSelect(0);
-  }
+    if (action.isForEveryone()) {
+        this.setCursorAll(true);
+        this.forceSelect(0);
+        this._forEveryoneSelect = true;
+    } else if (action.isForAll()) {
+        this.setCursorAll(true);
+        this.setCursorNotUserTarget(action);
+        this.forceSelect(0);
+    } else if (action.isForRandom()) {
+        this.setCursorAll(true);
+        this.setCursorNotUserTarget(action);
+        this.forceSelect(0);
+    }
+};
+
+Window_Base.prototype.cursorAllUserSelect = function(index, unit) {
+    let activeMember = [];
+    if (this._userTargetTag && this._userTargetTag.UserTagEval) {
+        const subject = this._NUUN_subject;
+        const members = unit.members();
+        activeMember = eval(this._userTargetTag.UserTagEval);
+    } else {
+        activeMember = unit.aliveMembers();
+    }
+    unit.targetSelect(activeMember);
+    this.refreshCursor();
 };
 
 const _Window_BattleActor_select = Window_BattleActor.prototype.select;
 Window_BattleActor.prototype.select = function(index) {
-  if (this.cursorAll()) {
-    Window_Selectable.prototype.select.call(this, index);
-    let activeMember = [];
-    if (this._userTargetTag && this._userTargetTag.UserTagEval) {
-      const subject = this._NUUN_subject;
-      const members = $gameParty.members();
-      activeMember = eval(this._userTargetTag.UserTagEval);
+    if (this.cursorAll()) {
+        Window_Selectable.prototype.select.call(this, index);
+        this.cursorAllUserSelect(index, $gameParty);
     } else {
-      activeMember = $gameParty.aliveMembers();
+        _Window_BattleActor_select.call(this, index);
     }
-    $gameParty.targetSelect(activeMember);
-    this.refreshCursor();
-  } else {
-    _Window_BattleActor_select.call(this, index);
-  }
 };
 
 const _Window_BattleEnemy_select = Window_BattleEnemy.prototype.select;
 Window_BattleEnemy.prototype.select = function(index) {
-  if (this.cursorAll()) {
-    Window_Selectable.prototype.select.call(this, index);
-    let activeMember = [];
-    if (this._userTargetTag && this._userTargetTag.UserTagEval) {
-      const subject = this._NUUN_subject;
-      const members = $gameTroop.members();
-      activeMember = eval(this._userTargetTag.UserTagEval);
+    if (this.cursorAll()) {
+        Window_Selectable.prototype.select.call(this, index);
+        this.cursorAllUserSelect(index, $gameTroop);
     } else {
-      activeMember = $gameTroop.aliveMembers();
+        _Window_BattleEnemy_select.call(this, index);
     }
-    $gameTroop.targetSelect(activeMember);
-    this.refreshCursor();
-  } else {
-    _Window_BattleEnemy_select.call(this, index);
-  }
 };
 
 const _Window_BattleEnemy_hide = Window_BattleEnemy.prototype.hide;
 Window_BattleEnemy.prototype.hide = function() {
-  _Window_BattleEnemy_hide.call(this);
-  if (this._forEveryoneSelect) {
-    $gameParty.select(null);
-    this._forEveryoneSelect = false;
-  }
+    _Window_BattleEnemy_hide.call(this);
+    if (this._forEveryoneSelect) {
+        $gameParty.select(null);
+        this._forEveryoneSelect = false;
+    }
 };
 
 Game_Unit.prototype.targetSelect = function(activeMember) {
-  if (activeMember && activeMember[0]) {
-    for (const member of this.members()) {
-      const find = activeMember.find(target => member === target);
-      if (find) {
-        member.select();
-      } else {
+    if (activeMember && activeMember[0]) {
+        for (const member of this.members()) {
+        const find = activeMember.find(target => member === target);
+            if (find) {
+                member.select();
+            } else {
+                member.deselect();
+            }
+        }
+    } else {
+        for (const member of this.members()) {
         member.deselect();
-      }
+        }
     }
-  } else {
-    for (const member of this.members()) {
-      member.deselect();
-    }
-  }
 };
 
 Game_Unit.prototype.select = function(target) {
@@ -465,121 +474,117 @@ Game_Unit.prototype.select = function(target) {
 
 const _Window_Selectable_refreshCursorForAll = Window_Selectable.prototype.refreshCursorForAll;
 Window_Selectable.prototype.refreshCursorForAll = function() {
-  const maxItems = this.maxItems();
-  if (maxItems > 0) {
-    if (this._multiCursor) {
-      this.setCursorRect(0, 0, 0, 0);
-      for (let i = 0; maxItems > i; i++) {
-        const target = this.selectTarget(i);
-        if (target) {
-          const rect = this.itemRect(i);
-          this.setCursorRects(rect.x, rect.y, rect.width, rect.height, i);
+    const maxItems = this.maxItems();
+    if (maxItems > 0) {
+        if (this._multiCursor) {
+        this.setCursorRect(0, 0, 0, 0);
+        for (let i = 0; maxItems > i; i++) {
+            const target = this.selectTarget(i);
+            if (target) {
+            const rect = this.itemRect(i);
+            this.setCursorRects(rect.x, rect.y, rect.width, rect.height, i);
+            }
+        } 
+        } else {
+            _Window_Selectable_refreshCursorForAll.call(this);
         }
-      } 
     } else {
-      _Window_Selectable_refreshCursorForAll.call(this);
-      //const items = maxItems + (maxItems >= this.maxCols() && maxItems % this.maxCols() ? 0 : -1);
-      //rect = this.itemRect(0);
-      //rect.enlarge(this.itemRect(items));
-      //this.setCursorRect(rect.x, rect.y, rect.width, rect.height);
+        this.setCursorRect(0, 0, 0, 0);
     }
-  } else {
-      this.setCursorRect(0, 0, 0, 0);
-  }
 };
 
 Window_BattleEnemy.prototype.selectTarget = function(index) {
-  const enemy = $gameTroop.aliveMembers()[index];
-  return enemy ? enemy.isSelected() : false;
+    const enemy = $gameTroop.aliveMembers()[index];
+    return enemy ? enemy.isSelected() : false;
 };
 
 Window_BattleActor.prototype.selectTarget = function(index) {
-  const actor = $gameParty.members()[index];
-  return actor ? actor.isSelected() : false;
+    const actor = $gameParty.members()[index];
+    return actor ? actor.isSelected() : false;
 };
 
 
 const _Window_initialize = Window.prototype.initialize;
 Window.prototype.initialize = function() {
-  _Window_initialize.call(this);
-  this._multiCursorRect = [];
-  this._multiCursorSprite = [];
-  this._cursorIndex = 0;
+    _Window_initialize.call(this);
+    this._multiCursorRect = [];
+    this._multiCursorSprite = [];
+    this._cursorIndex = 0;
 };
 
 Window.prototype.setCursorRects = function(x, y, width, height, index) {
-  this._createCursorSprites(index);
-  this._cursorIndex = index;
-  const cw = Math.floor(width || 0);
-  const ch = Math.floor(height || 0);
-  this._multiCursorRect[index].x = Math.floor(x || 0);
-  this._multiCursorRect[index].y = Math.floor(y || 0);
-  if (this._multiCursorRect[index].width !== cw || this._multiCursorRect[index].height !== ch) {
-    this._multiCursorRect[index].width = cw;
-    this._multiCursorRect[index].height = ch;
-    this._multiRefreshCursor(index);
-  }
+    this._createCursorSprites(index);
+    this._cursorIndex = index;
+    const cw = Math.floor(width || 0);
+    const ch = Math.floor(height || 0);
+    this._multiCursorRect[index].x = Math.floor(x || 0);
+    this._multiCursorRect[index].y = Math.floor(y || 0);
+    if (this._multiCursorRect[index].width !== cw || this._multiCursorRect[index].height !== ch) {
+        this._multiCursorRect[index].width = cw;
+        this._multiCursorRect[index].height = ch;
+        this._multiRefreshCursor(index);
+    }
 };
 
 const _Window_setCursorRect = Window.prototype.setCursorRect;
 Window.prototype.setCursorRect = function(x, y, width, height) {
-  _Window_setCursorRect.call(this, x, y, width, height);
-  this._multiCursorSprite.forEach((sprite, i) => {
-    if (sprite.width > 0 && sprite.height > 0) {
-      this.setCursorRects(0, 0, 0, 0, i);
-    }
-  });
+    _Window_setCursorRect.call(this, x, y, width, height);
+    this._multiCursorSprite.forEach((sprite, i) => {
+        if (sprite.width > 0 && sprite.height > 0) {
+        this.setCursorRects(0, 0, 0, 0, i);
+        }
+    });
 };
 
 Window.prototype._createCursorSprites = function(index) {
-  if (!this._multiCursorSprite[index]) {
-    const cursorSprite = new Sprite();
-    for (let i = 0; i < 9; i++) {
-        cursorSprite.addChild(new Sprite());
+    if (!this._multiCursorSprite[index]) {
+        const cursorSprite = new Sprite();
+        for (let i = 0; i < 9; i++) {
+            cursorSprite.addChild(new Sprite());
+        }
+        this._clientArea.addChildAt(cursorSprite, 1);
+        this._multiCursorSprite[index] = cursorSprite;
+        this._multiCursorRect[index] = new Rectangle();
     }
-    this._clientArea.addChildAt(cursorSprite, 1);
-    this._multiCursorSprite[index] = cursorSprite;
-    this._multiCursorRect[index] = new Rectangle();
-  }
 };
 
 Window.prototype._multiRefreshCursor = function(index) {
-  const drect = this._multiCursorRect[index].clone();
-  const srect = { x: 96, y: 96, width: 48, height: 48 };
-  const m = 4;
-  for (const child of this._multiCursorSprite[index].children) {
-    child.bitmap = this._windowskin;
-  }
-  this._setRectPartsGeometry(this._multiCursorSprite[index], srect, drect, m);
+    const drect = this._multiCursorRect[index].clone();
+    const srect = { x: 96, y: 96, width: 48, height: 48 };
+    const m = 4;
+    for (const child of this._multiCursorSprite[index].children) {
+        child.bitmap = this._windowskin;
+    }
+    this._setRectPartsGeometry(this._multiCursorSprite[index], srect, drect, m);
 };
 
 const _Window_refreshCursor = Window.prototype._refreshCursor;
 Window.prototype._refreshCursor = function() {
-  _Window_refreshCursor.call(this);
-  if (this._multiCursor) {
-    this._multiCursorSprite.forEach((sprite, i) => {
-      const drect = this._multiCursorRect[i].clone();
-      const srect = { x: 96, y: 96, width: 48, height: 48 };
-      const m = 4;
-      for (const child of sprite.children) {
-        child.bitmap = this._windowskin;
-      }
-      this._setRectPartsGeometry(sprite, srect, drect, m);
-    });
-  }
+    _Window_refreshCursor.call(this);
+    if (this._multiCursor) {
+        this._multiCursorSprite.forEach((sprite, i) => {
+        const drect = this._multiCursorRect[i].clone();
+        const srect = { x: 96, y: 96, width: 48, height: 48 };
+        const m = 4;
+        for (const child of sprite.children) {
+            child.bitmap = this._windowskin;
+        }
+        this._setRectPartsGeometry(sprite, srect, drect, m);
+        });
+    }
 };
 
 const _Window_updateCursor = Window.prototype._updateCursor;
 Window.prototype._updateCursor = function() {
-  _Window_updateCursor.call(this);
-  if (this._multiCursor) {
-    this._multiCursorSprite.forEach((sprite, i) => {
-      sprite.alpha = this._makeCursorAlpha();
-      sprite.visible = this.isOpen() && this.cursorVisible;
-      sprite.x = this._multiCursorRect[i].x;
-      sprite.y = this._multiCursorRect[i].y;
-    });
-  }
+    _Window_updateCursor.call(this);
+    if (this._multiCursor) {
+        this._multiCursorSprite.forEach((sprite, i) => {
+        sprite.alpha = this._makeCursorAlpha();
+        sprite.visible = this.isOpen() && this.cursorVisible;
+        sprite.x = this._multiCursorRect[i].x;
+        sprite.y = this._multiCursorRect[i].y;
+        });
+    }
 };
 
 })();

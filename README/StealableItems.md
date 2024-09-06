@@ -28,6 +28,15 @@
 [condTag]：条件タグ　条件付きベースが必要です。  
 [condMode]：条件モード ※省略可能　条件付きベースが必要です。0:一部一致 1:全て一致  
 
+`<Steal_[itemType]_[itemId]:[盗める回数], [分散度]>`  
+[itemType]:  
+I:アイテム  
+W:武器  
+A:防具  
+[itemId]:アイテムID  
+[盗める回数]:盗める最大回数  
+[分散度]:分散度±  
+
 条件付き盗めるアイテム  
 `<Steal[condTag]:[id],[id],[id]...>` 盗みスキル発動者が指定したIDの条件を満たしたときに盗めます。  
 `<TargetSteal[condTag]:[id],[id],[id]...>` 盗み対象が指定したIDの条件を全て満たしたときに盗めます。  
@@ -46,8 +55,8 @@
  [rate]:成功率  
 `<stealSkill:80>` ８０％の確率でアイテムを盗めます。  
 
-`<goldStealSkill:[rate]>`　お金を盗むアイテム、スキルを設定します。  アクター専用です。
-[rate]:成功率  
+`<goldStealSkill:[rate], [gold], [variance]>`　お金を盗むアイテム、スキルを設定します。  アクター専用です。  
+[rate]:成功率  [gold]:１回で盗める金額  [variance]:分散度±  
 `<goldStealSkill:50>` ５０％の確率でお金を盗めます。  
 ※敵の所持金からは盗めません。
 

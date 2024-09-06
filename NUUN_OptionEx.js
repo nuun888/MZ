@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/7/2024 Ver.1.1.1
+ * Added gauge knob functionality.
  * 8/25/2024 Ver.1.1.0
  * Added volume gauge settings.
  * 8/16/2024 Ver.1.0.1
@@ -360,6 +362,35 @@
  * @min -1
  * @parent OptionGaugeSetting
  * 
+ * @param GaugeKnobSetting
+ * @text Gauge knob settings
+ * @default ------------------------------
+ * @parent OptionGaugeSetting
+ * 
+ * @param KnobColor
+ * @desc The system color ID for the knob. You can enter a color code in the Text tab.
+ * @text Knob Color
+ * @type color
+ * @default 0
+ * @min 0
+ * @parent GaugeKnobSetting
+ * 
+ * @param KnobY
+ * @desc The Y coordinate of the knob (relative coordinate).
+ * @text Y coordinate of the knob (relative coordinate)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeKnobSetting
+ * 
+ * @param KnobImg
+ * @desc Specifies the thumb image to display.
+ * @text Knob Image
+ * @type file
+ * @dir img/
+ * @default
+ * @parent GaugeKnobSetting
+ * 
  */
 /*~struct~KeyConfigList:
  * 
@@ -419,7 +450,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * オプション画面を拡張します。
@@ -432,6 +463,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/7 Ver.1.1.1
+ * ゲージのつまみの機能を追加。
  * 2024/8/25 Ver.1.1.0
  * 音量ゲージの設定を追加。
  * 2024/8/16 Ver.1.0.1
@@ -766,6 +799,35 @@
  * @default 8
  * @min -1
  * @parent OptionGaugeSetting
+ * 
+ * @param GaugeKnobSetting
+ * @text ゲージつまみ設定
+ * @default ------------------------------
+ * @parent OptionGaugeSetting
+ * 
+ * @param KnobColor
+ * @desc つまみのシステムカラーID。テキストタブでカラーコードを入力できます。
+ * @text つまみカラー
+ * @type color
+ * @default 0
+ * @min 0
+ * @parent GaugeKnobSetting
+ * 
+ * @param KnobY
+ * @desc つまみのY座標。(相対座標)
+ * @text つまみのY座標(相対座標)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent GaugeKnobSetting
+ * 
+ * @param KnobImg
+ * @desc 表示するつまみ画像を指定します。
+ * @text つまみ画像
+ * @type file
+ * @dir img/
+ * @default
+ * @parent GaugeKnobSetting
  * 
  */
 /*~struct~KeyConfigList:ja

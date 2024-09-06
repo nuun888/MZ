@@ -14,7 +14,7 @@
  * @base NUUN_OptionEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * Displays a gauge on the volume of the sound settings in the options screen.
@@ -24,6 +24,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/7/2024 Ver.1.0.3
+ * Fixed so that if the knob is outside the gauge range and the cursor is moved while clicking, it will go to minimum or maximum.
+ * Implemented knob display.
  * 9/1/2024 Ver.1.0.2
  * Implemented volume knob functionality.
  * Added functionality to set the volume to the location where you click on the volume gauge.
@@ -33,11 +36,26 @@
  * 8/25/2024 Ver.1.0.0
  * First edition.
  * 
- * @param SceneContinuationCommonEvent
- * @desc Specifies the ID of the common event that does not close the screen.
- * @text Screen continuation common event
- * @type common_event[]
- * @default 
+ * @param KnobWidth
+ * @desc Width of the knob. 0 is the automatic setting. Not applied to images.
+ * @text Knob width
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param KnobHeight
+ * @desc Knob height. 0 is automatic setting. Not applied in images.
+ * @text Knob Height
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param GaugeAfterMargin
+ * @desc The space behind the gauge.
+ * @text Margin after gauge
+ * @type number
+ * @default 24
+ * @min 4
  * 
  */
 /*:ja
@@ -48,7 +66,7 @@
  * @base NUUN_OptionEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * オプション画面のサウンド設定の音量にゲージを表示させます。
@@ -58,6 +76,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/7 Ver.1.0.3
+ * つまみがゲージ範囲外にクリックしたままカーソル移動した場合、最小または最大になるように修正。
+ * つまみの表示を実装。
  * 2024/9/1 Ver.1.0.2
  * 音量のつまみ機能を実装。
  * ボリュームゲージのクリックした場所により、クリック場所の音量に設定する機能を追加。
@@ -66,6 +87,27 @@
  * 音量設定以外にゲージ設定を適用させないように修正。
  * 2024/8/25 Ver.1.0.0
  * 初版
+ * 
+ * @param KnobWidth
+ * @desc つまみの横幅。0で自動設定　画像では適用されません。
+ * @text つまみ横幅
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param KnobHeight
+ * @desc つまみの高さ。0で自動設定　画像では適用されません。
+ * @text つまみ高さ
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param GaugeAfterMargin
+ * @desc ゲージ後ろの余白。
+ * @text ゲージ後余白
+ * @type number
+ * @default 24
+ * @min 4
  * 
  */
 
@@ -83,6 +125,7 @@ Imported.NUUN_OptionEx_2 = true;
     Window_Options.prototype.initialize = function(rect) {
         this._optionGauge = {};
         this._volumeFraction = 0;
+        this._sliderOn = false;
         _Window_Options_initialize.call(this, rect);
     };
 
@@ -159,6 +202,8 @@ Imported.NUUN_OptionEx_2 = true;
         if (this.isOpenAndActive()) {
             if (TouchInput.isLongPressed()) {
                 this.volumeSliderTouch();
+            } else {
+                this._sliderOn = false;
             }
         }
     };
@@ -178,31 +223,39 @@ Imported.NUUN_OptionEx_2 = true;
             const hitIndex = this.hitIndex();
             if (this._cursorFixed) {
                 if (hitIndex === this.index()) {
-                    return this.volumeSlider(symbol);
+                    return this.volumeSlider(symbol, data);
                 }
             } else if (hitIndex >= 0) {
-                return this.volumeSlider(symbol);
+                return this.volumeSlider(symbol, data);
             }
         }
         return false;
     };
 
-    Window_Options.prototype.volumeSlider = function(symbol) {
-        return this.isVolumeTouchZone(symbol);
+    Window_Options.prototype.volumeSlider = function(symbol, data) {
+        return this.isVolumeTouchZone(symbol, data);
     };
 
-    Window_Options.prototype.isVolumeTouchZone = function(symbol) {
+    Window_Options.prototype.isVolumeTouchZone = function(symbol, data) {
         const rect = this.itemLineRect(this.index());
         const gauge = this._optionGauge[symbol];
+        const knobAreaHeight = gauge.knobHeight();
         const touchPos = new Point(TouchInput.x, TouchInput.y);
         const localPos = this.worldTransform.applyInverse(touchPos);
         const gaugeX = gauge.x + gauge.gaugeX() + rect.x;
-        const gaugeY = gauge.y + (gauge.textHeight() - gauge.gaugeHeight()) + this._padding;
-        if (localPos.x >= gaugeX && localPos.x <= gaugeX + gauge.bitmapWidth() - gauge.gaugeX()  && localPos.y >= gaugeY && localPos.y <= gaugeY + gauge.gaugeHeight()) {
+        const gaugeY = this._padding + gauge.y + gauge.knobY();
+        if (localPos.x >= gaugeX && localPos.x <= gaugeX + gauge.bitmapWidth() - gauge.gaugeX()  && localPos.y >= gaugeY && localPos.y <= gaugeY + knobAreaHeight) {
             const pointX = localPos.x - gaugeX;
             const maxPoint = gauge.bitmapWidth() - gauge.gaugeX();
             const volume = Math.floor(pointX / maxPoint * this.getConfigMaxValue());
             this.changeVolumeSlider(symbol, volume);
+            this._sliderOn = true;
+            return true;
+        } else if (this._sliderOn && localPos.x <= gaugeX) {
+            this.changeVolumeSlider(symbol, 0);
+            return true;
+        } else if (this._sliderOn && localPos.x > gaugeX + gauge.bitmapWidth() - gauge.gaugeX()) {
+            this.changeVolumeSlider(symbol, this.getConfigMaxValue());
             return true;
         }
         return false;
@@ -242,15 +295,30 @@ Imported.NUUN_OptionEx_2 = true;
         this._statusType = _tempParams.getType();
         this._paramData = _tempParams.getData();
         this._drawCurrentValue = false;
+        this._gaugeAfterMargin = 0;
+        this._knobBitmap = null;
+        this.loadBitmap();
         Sprite_Gauge.prototype.initialize.call(this);
     };
 
+    Sprite_OptionGauge.prototype.loadBitmap = function() {
+        if (this.isKnobImg()) {
+            this._knobBitmap = ImageManager.nuun_LoadPictures(this._paramData.KnobImg);
+        }
+    };
+
     Sprite_OptionGauge.prototype.bitmapWidth = function() {
-        return this._paramData._width || 128;
+        return (this._paramData._width || 128) + this._gaugeAfterMargin;
     };
 
     Sprite_OptionGauge.prototype.gaugeHeight = function() {
         return this._paramData.GaugeHeight > 0 ? this._paramData.GaugeHeight : Sprite_Gauge.prototype.gaugeHeight.apply(this, arguments);
+    };
+
+    Sprite_OptionGauge.prototype.createBitmap = function() {
+        this._gaugeAfterMargin = params.GaugeAfterMargin;
+        Sprite_Gauge.prototype.createBitmap.apply(this, arguments);
+        this._gaugeAfterMargin = 0;
     };
 
     Sprite_OptionGauge.prototype.gaugeColor1 = function() {
@@ -278,6 +346,53 @@ Imported.NUUN_OptionEx_2 = true;
         this._drawCurrentValue = true;
         Sprite_Gauge.prototype.drawValue.apply(this, arguments);
         this._drawCurrentValue = false;
+    };
+
+    Sprite_OptionGauge.prototype.drawGauge = function() {
+        Sprite_Gauge.prototype.drawGauge.apply(this, arguments);
+        this.drawGaugeBar();
+    };
+
+    Sprite_OptionGauge.prototype.drawGaugeBar = function() {
+        if (this.isKnobImg()) {
+            this.drawGaugeBarImg();
+            return;
+        }
+        const gaugewidth = this.bitmapWidth() - this.gaugeX();
+        const rate = gaugewidth * this.currentValue() / 100;
+        const width = params.KnobWidth || 8;
+        const x = this.gaugeX() + rate - width / 2;
+        const y = this.knobY();
+        const height = this.knobHeight();
+        const color0 = this.gaugeBackColor();
+        const color1 = this.knobColor();
+        this.bitmap.fillRect(x, y, width, height, color0);
+        this.bitmap.fillRect(x + 1, y + 1, width - 2, height - 2, color1);
+    };
+
+    Sprite_OptionGauge.prototype.drawGaugeBarImg = function() {
+        const bitmap = this._knobBitmap;
+        const gaugewidth = this.bitmapWidth() - this.gaugeX();
+        const rate = gaugewidth * this.currentValue() / 100;
+        const x = this.gaugeX() + rate - bitmap.width / 2;
+        const y = this.knobY();
+        this.bitmap.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x , y)
+    };
+
+    Sprite_OptionGauge.prototype.knobColor = function() {
+        return NuunManager.getColorCode(this._paramData.KnobColor || 0);
+    };
+
+    Sprite_OptionGauge.prototype.isKnobImg = function() {
+        return this._paramData.KnobImg;
+    };
+
+    Sprite_OptionGauge.prototype.knobY = function() {
+        return (this.isKnobImg() ? (this.textHeight() - this.gaugeHeight() - this._knobBitmap.height / 2 + this.gaugeHeight() / 2) : (this.textHeight() - this.gaugeHeight() - 4)) + (this._paramData.KnobY || 0);
+    };
+
+    Sprite_OptionGauge.prototype.knobHeight = function() {
+        return this.isKnobImg() ? Math.min(this._knobBitmap.height, this.bitmapHeight()) : (params.KnobHeight || 0) > 0 ? params.KnobHeight : this.gaugeHeight() + 8;
     };
 
 })();

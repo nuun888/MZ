@@ -1,5 +1,5 @@
 # [盗みスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)
-# Ver.1.5.0
+# Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -109,6 +109,10 @@
 %1使用者　%2対象　%3盗んだアイテムまたは金額  
  
 ## 更新履歴
+2024/9/7 Ver 1.5.1  
+盗める回数を指定できる機能を追加。  
+メンバーの所持金がない場合のメッセージを表示できるように修正。  
+盗んだ金額がメンバーの所持金以上の金額で表示されてしまう問題を修正。  
 2024/9/1 Ver 1.5.0  
 敵の盗み率にブーストさせる効果を追加。  
 盗み確立に運を適用できるように修正。  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル、アイテム
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -27,8 +27,8 @@
  * 
  * 敵からお金を盗むスキルを作るには、スキル、アイテムのメモ欄に以下を記述します。
  * このタグはアクター専用です。
- * <goldStealSkill:[rate]>
- * [rate]:成功率
+ * <goldStealSkill:[rate], [gold], [variance]>
+ * [rate]:成功率 [gold]:１回で盗める金額 [variance]:分散度±
  * <goldStealSkill:50>
  * 
  * 敵からお金を盗まれるスキルを作るには、スキル、アイテムのメモ欄に以下を記述します。
@@ -72,6 +72,16 @@
  * [id]：条件リストのID
  * <StealCond1:1,14,15> 
  * 
+ * 敵のメモ欄
+ * <Steal_[itemType]_[itemId]:[盗める回数], [分散度]>
+ * [itemType]:
+ * I:アイテム
+ * W:武器
+ * A:防具
+ * [itemId]:アイテムID
+ * [盗める回数]:盗める最大回数
+ * [分散度]:分散度±
+ * 
  * 敵から盗まれるアイテムを設定するには、プラグインパラメータの「敵から奪われるアイテム設定」から設定します。
  * 
  * アクター、職業、武器、防具、ステート、エネミーのメモ欄
@@ -106,7 +116,11 @@
  * 
  * 
  * 更新履歴
- * 2024/5/11 Ver 1.5.0
+ * 2024/9/7 Ver 1.5.1
+ * 盗める回数を指定できる機能を追加。
+ * メンバーの所持金がない場合のメッセージを表示できるように修正。
+ * 盗んだ金額がメンバーの所持金以上の金額で表示されてしまう問題を修正。
+ * 2024/9/1 Ver 1.5.0
  * 敵の盗み率にブーストさせる効果を追加。
  * 盗み確立に運を適用できるように修正。
  * 2024/5/11 Ver 1.4.2
@@ -139,10 +153,16 @@
  * 初版
  * 
  * @param StealMode
- * @text 盗みモード
- * @desc 盗み取ったアイテムは再取得しない。
+ * @text お金の盗みモード
+ * @desc 盗み取ったお金は再取得しない。
  * @type boolean
  * @default true
+ * 
+ * @param StealCount
+ * @text 盗めるアイテム回数
+ * @desc 1アイテムの盗める回数。0で無制限
+ * @type number
+ * @default 1
  * 
  * @param StealProcess
  * @text 盗むときの処理
@@ -314,6 +334,12 @@ Imported.NUUN_StealableItems = true;
         }
     };
 
+    function _getStealVariance(count, variance) {
+        const amp = Math.floor(Math.max((Math.abs(count) * variance) / 100, 0));
+        const v = Math.randomInt(amp + 1) + Math.randomInt(amp + 1) - amp;
+        return Math.max((count >= 0 ? count + v : count - v), 0);
+    };
+
 
     const _Game_System_initialize = Game_System.prototype.initialize;
     Game_System.prototype.initialize = function() {
@@ -433,7 +459,9 @@ Imported.NUUN_StealableItems = true;
     Game_Action.prototype.stolenGold = function(target){
         const gold = this.getLostStolenGold(target);
         this.subject().keepStolenGold(gold);
-        if (gold) {
+        if ($gameParty._gold <= 0) {
+            this.subject().result().pushGoldSteal(null, 'nonStealGold');
+        } else if (gold) {
             this.lostStolenGold(target, gold);
         } else {
             this.subject().result().pushGoldSteal(null, 'notSteal');
@@ -479,7 +507,7 @@ Imported.NUUN_StealableItems = true;
             if(stolenGold[2] === 1){
                 gold = Math.floor($gameParty._gold * Math.min(stolenGold[1], 100 / 100));
             } else {
-                gold = stolenGold[1];
+                gold = Math.min(stolenGold[1], $gameParty._gold);
             }
             $gameSystem.onBattleStolenGold(gold);
         }
@@ -545,9 +573,12 @@ Imported.NUUN_StealableItems = true;
         if (index >= 0) {
             const di = list[index];
             if (di) {
-                const r = target.stealObject(di.kind, di.dataId);
-                if (params.StealMode) {
-                    list[index] = {dataId: 1, denominator: 1, kind: 0};
+                const r = this.stealObject(di.kind, di.dataId);
+                if (di.count > 0) {
+                    list[index].count--;
+                    if (di.count === 0) {
+                        list[index] = {dataId: 1, denominator: 1, kind: 0};
+                    }
                 }
                 $gameSystem._stealIndex = index;
                 $gameSystem.onBattleSteal();
@@ -564,9 +595,12 @@ Imported.NUUN_StealableItems = true;
         if (index >= 0) {
             const di = list[index];
             if (di && di.kind > 0 && di.kind < 4 && target.stealConditions(di) && this.getStealRate(target, di)) {
-                const r = target.stealObject(di.kind, di.dataId);
-                if (params.StealMode) {
-                    list[index] = {dataId: 1, denominator: 1, kind: 0};
+                const r = this.stealObject(di.kind, di.dataId);
+                if (di.count > 0) {
+                    list[index].count--;
+                    if (di.count === 0) {
+                        list[index] = {dataId: 1, denominator: 1, kind: 0};
+                    }
                 }
                 $gameSystem._stealIndex = index;
                 $gameSystem.onBattleSteal();
@@ -583,9 +617,17 @@ Imported.NUUN_StealableItems = true;
         if (index >= 0) {
             const di = list[index];
             if (di) {
-                let r = target.stealObject(di.kind, di.dataId);
-                if (params.StealMode) {
-                    list[index] = {dataId: 1, denominator: 1, kind: 0};
+                let r = this.stealObject(di.kind, di.dataId);
+                const data = this.item().meta.goldStealSkill.split(',').map(Number);
+                if (data[1] > 0) {
+                    const value = _getStealVariance(data[1], data[2]);
+                    r = Math.min(r, value);
+                    di.dataId -= r;
+                    if (di.dataId <= 0) {
+                        list[index] = {dataId: 0, denominator: 1, kind: 0};
+                    }
+                } else if (params.StealMode) {
+                    list[index] = {dataId: 0, denominator: 1, kind: 0};
                 }
                 $gameSystem.onBattleStealGold();
                 $gameTroop.stealItems.push({money:r});
@@ -601,9 +643,16 @@ Imported.NUUN_StealableItems = true;
         if (index >= 0) {
             const di = list[index];
             if (di && di.kind === 4 && target.stealConditions(di) && this.getGoldRate(target, di)) {
-                const r = target.stealObject(di.kind, di.dataId);
-                if (params.StealMode) {
-                    list[index] = {dataId: 1, denominator: 1, kind: 0};
+                const r = this.stealObject(di.kind, di.dataId);
+                if (data[1] > 0) {
+                    const value = _getStealVariance(data[1], data[2]);
+                    r = Math.min(r, value);
+                    di.dataId -= r;
+                    if (di.dataId <= 0) {
+                        list[index] = {dataId: 0, denominator: 1, kind: 0};
+                    }
+                } else if (params.StealMode) {
+                    list[index] = {dataId: 0, denominator: 1, kind: 0};
                 }
                 $gameSystem.onBattleStealGold();
                 $gameTroop.stealItems.push({money:r});
@@ -627,7 +676,8 @@ Imported.NUUN_StealableItems = true;
     };
 
     Game_Action.prototype.stealGoldRate = function(target) {
-        const skillRate = ((Number(this.item().meta.goldStealSkill) || 100)) / 100;
+        const data = this.item().meta.goldStealSkill.split(',').map(Number);
+        const skillRate = (data[0] || 100) / 100;
         const luk = this.lukEffectRate(target);
         const subject = this.subject();
         return Math.random() < skillRate * subject.getStealBoostRate() * luk * target.stealItemResistRate();
@@ -651,6 +701,20 @@ Imported.NUUN_StealableItems = true;
             stolenGold[2] = 0;
         }
         return stolenGold;
+    };
+
+    Game_Action.prototype.stealObject = function(kind, dataId) {
+        if (kind === 1) {
+            return $dataItems[dataId];
+        } else if (kind === 2) {
+            return $dataWeapons[dataId];
+        } else if (kind === 3) {
+            return $dataArmors[dataId];
+        } else if (kind === 4) {
+            return dataId;
+        } else {
+            return null;
+        }
     };
 
 
@@ -726,21 +790,42 @@ Imported.NUUN_StealableItems = true;
                 let data = match[2].split(',');
                 switch (match[1]) {
                     case 'I':
-                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:1, cond: data[2], mode: parseInt(data[3])});
+                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:1, cond: data[2], mode: parseInt(data[3]), count: this.getStealData(1, parseInt(data[0]))});
                         break;
                     case 'W':
-                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:2, cond: data[2], mode: parseInt(data[3])});
+                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:2, cond: data[2], mode: parseInt(data[3]), count: this.getStealData(2, parseInt(data[0]))});
                         break;
                     case 'A':
-                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:3, cond: data[2], mode: parseInt(data[3])});
+                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:3, cond: data[2], mode: parseInt(data[3]), count: this.getStealData(3, parseInt(data[0]))});
                         break;
                     case 'M':
-                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:4, cond: data[2], mode: parseInt(data[3])});
+                        this._stealItems.push({dataId: parseInt(data[0]), denominator: parseInt(data[1]) / 100, kind:4, cond: data[2], mode: parseInt(data[3]), count: 0});
                         break;
                 }
             } else {
                 return;
             }
+        }
+    };
+
+    Game_Enemy.prototype.getStealData = function(kind, dataId) {
+        const data = this.stealCountTag(kind, dataId);
+        if (!data) return params.StealCount || 1;
+        const splitData = data.split(',').map(Number);
+        return _getStealVariance(splitData[0], splitData[1])
+    };
+
+    Game_Enemy.prototype.stealCountTag = function(kind, dataId) {
+        if (kind === 1) {
+            return this.enemy().meta["Steal_I_" + dataId];
+        } else if (kind === 2) {
+            return this.enemy().meta["Steal_W_" + dataId];
+        } else if (kind === 3) {
+            return this.enemy().meta["Steal_A_" + dataId];
+        } else if (kind === 4) {
+            return null;
+        } else {
+            return null;
         }
     };
 
@@ -787,20 +872,6 @@ Imported.NUUN_StealableItems = true;
     Game_Enemy.prototype.keepStolenGold = function(gold) {
         if (params.StolenGoldDrop && gold > 0){
             this._keepStolenGold += gold;
-        }
-    };
-
-    Game_Enemy.prototype.stealObject = function(kind, dataId) {
-        if (kind === 1) {
-            return $dataItems[dataId];
-        } else if (kind === 2) {
-            return $dataWeapons[dataId];
-        } else if (kind === 3) {
-            return $dataArmors[dataId];
-        } else if (kind === 4) {
-            return dataId;
-        } else {
-            return null;
         }
     };
 

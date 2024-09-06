@@ -1,5 +1,5 @@
 # [オプション拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -53,11 +53,16 @@ ONにすることで全てのセーブデータに適用されます。
 ※マスター音量はMasterVolumeOption.jsを使用しています。  
 [ダウンロード](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_2.js)Ver.1.0.2  
 
+2024/9/7 Ver.1.0.3  
+つまみがゲージ範囲外にクリックしたままカーソル移動した場合、最小または最大になるように修正。  
+つまみの表示を実装。  
 Ver.1.0.2   
 音量のつまみ機能を実装。  
 ボリュームゲージのクリックした場所により、クリック場所の音量に設定する機能を追加。  
 
 ## 更新履歴
+2024/9/7 Ver.1.1.1  
+ゲージのつまみの機能を追加。  
 2024/8/25 Ver.1.1.0  
 音量ゲージの設定を追加。  
 2024/8/16 Ver.1.0.1  

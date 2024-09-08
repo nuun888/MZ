@@ -11,8 +11,10 @@
  * @plugindesc XP風対象選択ウィンドウ
  * @author NUUN
  * @base NUUN_Base
+ * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @orderAfter NUUN_MenuParamListBase
+ * @version 1.2.0
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -25,10 +27,21 @@
  * [indexId]:顔グラのインデックスID
  * ※[]は記入しないでください。
  * 
+ * 記述欄のテキスト 制御文字が使用可能です。
+ * <[tag]:[text]> 記述欄のテキスト
+ * [tag]:記述欄タグ名
+ * [text]:表示するテキスト。
+ * 改行すれば何行でも表示可能ですので、独自の項目を追加することも可能です。
+ * <desc:ああああ> descとタグ付けされた項目に「ああああ」が表示されます。
+ * 
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/1/10 Ver.1.2.0
+ * ステータス項目ベースプラグインを介しての処理に仕様変更。
+ * 幾つかのプラグインパラメータのスペルミスを修正。
  * 2023/1/10 Ver.1.1.4
  * 対象選択画面表示位置が上部しか適用されていなかった問題を修正。
  * 2023/1/9 Ver.1.1.3
@@ -67,7 +80,7 @@
  * @value 'under'
  * @default 'top'
  * 
- * @param AcrotXPSelect
+ * @param ActorXPSelect
  * @desc アクター対象選択画面をXPスタイルに変更します。
  * @text アクター対象選択画面XP有効
  * @type boolean
@@ -82,14 +95,14 @@
  * @param ActorData
  * @text 表示アクターデータ
  * @desc 選択時に表示するアクターのデータを選択します。
- * @default ["{\"DataMode\":\"'Face'\",\"Contents_X\":\"0\",\"Contents_Width\":\"0\",\"Contents_Align\":\"'center'\",\"Contents_Eval\":\"\"}","{\"DataMode\":\"'name'\",\"Contents_X\":\"160\",\"Contents_Width\":\"600\",\"Contents_Align\":\"'left'\",\"Contents_Eval\":\"\"}"]
- * @type struct<DataList>[]
+ * @default ["{\"DateSelect\":\"Face\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"ActorName\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"152\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"288\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"State2\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"448\",\"Y_Coordinate\":\"-8\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"HpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"500\",\"Y_Coordinate\":\"6\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"MpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"640\",\"Y_Coordinate\":\"6\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}"]
+ * @type struct<DataActorList>[]
  * 
  * @param EnemyData
  * @text 表示敵キャラデータ
- * @desc 選択時に表示する敵キャラのデータを選択します。顔グラは選択しても表示されません。
- * @default ["{\"DataMode\":\"'name'\",\"Contents_X\":\"0\",\"Contents_Width\":\"700\",\"Contents_Align\":\"'center'\",\"Contents_Eval\":\"\"}","{\"DataMode\":\"'State'\",\"Contents_X\":\"730\",\"Contents_Width\":\"128\",\"Contents_Align\":\"'center'\",\"Contents_Eval\":\"\"}"]
- * @type struct<DataList>[]
+ * @desc 選択時に表示する敵キャラのデータを選択します。
+ * @default ["{\"DateSelect\":\"EnemyName\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'center'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}"]
+ * @type struct<DataEnemyList>[]
  * 
  * @param ActorSelect_X
  * @desc アクターコマンドウィンドウのX座標を指定します。
@@ -131,7 +144,7 @@
  * @max 9999
  * @min -9999
  * 
- * @param EnemySelectd_Width
+ * @param EnemySelect_Width
  * @desc アクターコマンドウィンドウの横幅を指定します。0でUIサイズ 画面より大きい値にすると自動的に画面の横幅になります。
  * @text 敵キャラコマンドウィンドウの横幅
  * @type number
@@ -145,142 +158,702 @@
  * @type boolean
  * @default true
  * 
+ * @param ActorSelectionHelpWindowHide
+ * @desc 味方対象選択時のヘルプウィンドウの表示。
+ * @text 味方対象選択時ヘルプウィンドウの表示
+ * @type boolean
+ * @default false
+ * 
  * @param ActorPictureSetting
  * @text 立ち絵、顔グラ表示EX設定
  * @default ------------------------------
  * 
  * @param DynamicFace
- * @desc 顔グラを条件による変化させます。（要立ち絵、顔グラ表示EX）
+ * @desc アクターの顔グラを条件による変化させます。（要立ち絵、顔グラ表示EX）
  * @text 条件顔グラ変化
  * @type boolean
  * @default true
  * @parent ActorPictureSetting
  * 
  */
-/*~struct~DataList:
+/*~struct~DataActorList:
  * 
- * @param DataMode
- * @text ウィンドウ基準表示位置
- * @desc アクターステータスウィンドウの基準表示位置
+ * @param DateSelect
+ * @text 表示するステータス
+ * @desc 表示するステータスを指定します。
  * @type select
- * @option 名前(1)(2)(3)
- * @value 'name'
- * @option HPゲージ(1)(2)
- * @value 'HPGauge'
- * @option MPゲージ(1)(2)
- * @value 'MPGauge'
- * @option TPゲージ(1)(2)
- * @value 'TPGauge'
- * @option ステート(1)(2)
- * @value 'State'
- * @option 任意ステータス(1)(2)(3)(4)
- * @value 'original'
- * @option 顔グラ(1)(2)
- * @value 'Face'
- * @default 'name'
+ * @option なし
+ * @value None
+ * @option 名称のみ(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value Name
+ * @option バトラー名(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value ActorName
+ * @option 二つ名(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value Nickname
+ * @option 職業(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value Class
+ * @option レベル(1)(2)(3)(4)(5)(6)(9)(11)(12)(13)
+ * @value Level
+ * @option ステート(1)(2)(3)(4)(5)(16※1)
+ * @value State
+ * @option ステート(戦闘用と同じ表示)(1)(2)(3)(4)
+ * @value State2
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)(18)
+ * @value OrgParam
+ * @option HPゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
+ * @value HpGauge
+ * @option MPゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
+ * @value MpGauge
+ * @option TPゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
+ * @value TpGauge
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Atk
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Def
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Mat
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Mdf
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Agi
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Luk
+ * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Hit
+ * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Eva
+ * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Cri
+ * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value CritcalEvade
+ * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MagicEvade
+ * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MagicrEflect
+ * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Counter
+ * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value HpRegen
+ * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MpRegen
+ * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value TpRegen
+ * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Aggro
+ * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Guard
+ * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Recovery
+ * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value ItemEffect
+ * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MpCost
+ * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value TpCharge
+ * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value PhysicalDamage
+ * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MagicalDamage
+ * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value FloorDamage
+ * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value GainExpRate
+ * @option 独自ゲージ(1)(2)(3)(4)(5)(7)(16)(18)(20)(21)(22)(23)(24)
+ * @value OrgGauge
+ * @option 画像(1)(2)(3)(4)(25)
+ * @value Imges
+ * @option 顔グラ(1)(2)(3)(4)(26)
+ * @value Face
+ * @option フリーテキスト(1)(2)(3)(4)(35)
+ * @value Freetext
+ * @option ライン(1)(2)(3)(4)(5)(8)
+ * @value HorzLine
+ * @option 記述欄(1)(2)(3)(4)(6)(7)(8)(19)
+ * @value Desc
+ * @default None
  * 
- * @param Contents_X
- * @desc コンテンツのX座標。
- * @text X座標(1)
+ * @param X_Position
+ * @text X表示列位置(1)
+ * @desc X表示列位置
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 4
+ * 
+ * @param Y_Position
+ * @desc Y表示行位置
+ * @text Y表示行位置(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X座標（相対）(3)
+ * @desc X座標（X表示列位置からの相対座標）
  * @type number
  * @default 0
  * @max 9999
- * @min 0
+ * @min -9999
  * 
- * @param Contents_Width
- * @desc コンテンツの横幅 0で画面サイズ。
- * @text コンテンツ横幅(2)
+ * @param Y_Coordinate
+ * @text Y座標（相対）(4)
+ * @desc Y座標（Y表示行位置からの相対座標）
  * @type number
  * @default 0
  * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc 項目、ゲージ横幅（0でデフォルト幅）
+ * @text 項目、ゲージ横幅(5)
+ * @type number
+ * @default 0
  * @min 0
  * 
- * @param Contents_Align
- * @text 文字揃え(3)
- * @desc 文字揃え
+ * @param SystemItemWidth
+ * @desc 項目名称の横幅（0でデフォルト幅）
+ * @text 項目名称横幅(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc 項目の名称を設定します。
+ * @text 名称(7)
+ * @type string
+ * @default
+ * 
+ * @param NameColor
+ * @desc 項目名称のシステムカラーID。テキストタブでカラーコードを入力できます。
+ * @text 項目名称文字色(8)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param Align
+ * @desc 文字揃え。
+ * @text 文字揃え(9)
  * @type select
  * @option 左
  * @value 'left'
- * @option 中央
- * @value 'center'
  * @option 右
  * @value 'right'
- * @default 'center'
+ * @option 中央
+ * @value 'center'
+ * @default 'left'
  * 
- * @param Contents_Eval
- * @desc 評価式
- * @text 評価式(4)
+ * @param paramUnit
+ * @desc 単位を設定します。
+ * @text 単位(10)
+ * @type string
+ * @default 
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(11)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param FontFace
+ * @desc 項目名称のフォントを設定します。
+ * @text 項目名称フォント(12)
+ * @type string
+ * @default 
+ * 
+ * @param ValueFontFace
+ * @desc 数値のフォントを設定します。
+ * @text 数値フォント(13)
+ * @type string
+ * @default 
+ * 
+ * @param Icon
+ * @desc アイコンを設定します。
+ * @text アイコン(14)
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @desc アイコンを調整するY座標を指定します。(相対)
+ * @text アイコン調整Y座標(15)
+ * @type number
+ * @default 2
+ * @min -99
+ * 
+ * @param DetaEval
+ * @desc 評価式または文字列を記入します。
+ * @text 評価式or文字列(javaScript)(16)
  * @type combo
  * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'actor;//アクターのゲームデータ'
+ * @option 'actor.actor();//アクターのシステムデータ'
  * @option 'battler.turnCount()+"ターン";//ターン'
+ * @default 
+ * 
+ * @param Decimal
+ * @text 小数点桁数(18)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
+ * @param TextMethod
+ * @desc 記述欄に紐づけするタグ名
+ * @text 記述欄タグ名(19)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param GaugeSetting
+ * @text ゲージ設定
+ * @default ------------------------------
+ * 
+ * @param GaugeID
+ * @desc 識別ID。
+ * @text 識別ID(20)
+ * @type string
+ * @default 
+ * @parent GaugeSetting
+ * 
+ * @param GaugeHeight
+ * @desc ゲージの縦幅を指定します。
+ * @text ゲージの縦幅(21)
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
+ * @parent GaugeSetting
+ * 
+ * @param DetaEval2
+ * @desc 最大値の評価式。
+ * @text 最大値評価式(javaScript)(22)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'actor;//アクターのゲームデータ'
+ * @option 'actor.actor();//アクターのシステムデータ'
+ * @default 
+ * @parent GaugeSetting
+ * 
+ * @param Color1
+ * @desc ゲージのシステムカラーID(左)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(左)(23)
+ * @type color
+ * @default -1
+ * @min -1
+ * @parent GaugeSetting
+ * 
+ * @param Color2
+ * @desc ゲージのシステムカラーID(右)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(右)(24)
+ * @type color
+ * @default -1
+ * @min -1
+ * @parent GaugeSetting
+ * 
+ * @param ImgSetting
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc 表示する画像を指定します。
+ * @text 画像(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param OtherSetting
+ * @text その他設定
+ * @default ------------------------------
+ * 
+ * @param Text
+ * @desc フリーテキストのテキストを記入します。(制御文字使用可能)
+ * @text フリーテキストのテキスト(35)
+ * @type multiline_string
  * @default
+ * @parent OtherSetting
+ * 
+ * @param CondSetting
+ * @text 表示条件設定
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc 項目が表示される条件を指定します。(JavaScript)
+ * @text 項目条件(all)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'actor;//アクターのゲームデータ'
+ * @option 'actor.actor();//アクターのシステムデータ'
+ * @option '$dataSystem.optDisplayTp'//TP表示
+ * @default 
+ * 
+ */
+/*~struct~DataEnemyList:
+ * 
+ * @param DateSelect
+ * @text 表示するステータス
+ * @desc 表示するステータスを指定します。
+ * @type select
+ * @option なし
+ * @value None
+ * @option 名称のみ(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value Name
+ * @option モンスター名(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value EnemyName
+ * @option ステート(1)(2)(3)(4)(5)(16※1)
+ * @value State
+ * @option ステート(戦闘用と同じ表示)(1)(2)(3)(4)
+ * @value State2
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)(18)
+ * @value OrgParam
+ * @option HPゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
+ * @value HpGauge
+ * @option MPゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
+ * @value MpGauge
+ * @option TPゲージ(1)(2)(3)(4)(5)(7)(20)(21)(23)(24)
+ * @value TpGauge
+ * @option 攻撃力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Atk
+ * @option 防御力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Def
+ * @option 魔法力(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Mat
+ * @option 魔法防御(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Mdf
+ * @option 敏捷性(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Agi
+ * @option 運(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Luk
+ * @option 命中率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Hit
+ * @option 回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Eva
+ * @option 会心率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Cri
+ * @option 会心回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value CritcalEvade
+ * @option 魔法回避率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MagicEvade
+ * @option 魔法反射率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MagicrEflect
+ * @option 反撃率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Counter
+ * @option HP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value HpRegen
+ * @option MP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MpRegen
+ * @option TP再生率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value TpRegen
+ * @option 狙われ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Aggro
+ * @option 防御効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Guard
+ * @option 回復効果率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value Recovery
+ * @option 薬の知識(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value ItemEffect
+ * @option MP消費率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MpCost
+ * @option TPチャージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value TpCharge
+ * @option 物理ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value PhysicalDamage
+ * @option 魔法ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value MagicalDamage
+ * @option 床ダメージ率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value FloorDamage
+ * @option 獲得経験値率(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(18)
+ * @value GainExpRate
+ * @option 独自ゲージ(1)(2)(3)(4)(5)(7)(16)(18)(20)(21)(22)(23)(24)
+ * @value OrgGauge
+ * @option 画像(1)(2)(3)(4)(25)
+ * @value Imges
+ * @option フリーテキスト(1)(2)(3)(4)(35)
+ * @value Freetext
+ * @option ライン(1)(2)(3)(4)(5)(8)
+ * @value HorzLine
+ * @option 記述欄(1)(2)(3)(4)(6)(7)(8)(19)
+ * @value Desc
+ * @default None
+ * 
+ * @param X_Position
+ * @text X表示列位置(1)
+ * @desc X表示列位置
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 4
+ * 
+ * @param Y_Position
+ * @desc Y表示行位置
+ * @text Y表示行位置(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X座標（相対）(3)
+ * @desc X座標（X表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y座標（相対）(4)
+ * @desc Y座標（Y表示行位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc 項目、ゲージ横幅（0でデフォルト幅）
+ * @text 項目、ゲージ横幅(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc 項目名称の横幅（0でデフォルト幅）
+ * @text 項目名称横幅(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc 項目の名称を設定します。
+ * @text 名称(7)
+ * @type string
+ * @default
+ * 
+ * @param NameColor
+ * @desc 項目名称のシステムカラーID。テキストタブでカラーコードを入力できます。
+ * @text 項目名称文字色(8)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param Align
+ * @desc 文字揃え。
+ * @text 文字揃え(9)
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @option 中央
+ * @value 'center'
+ * @default 'left'
+ * 
+ * @param paramUnit
+ * @desc 単位を設定します。
+ * @text 単位(10)
+ * @type string
+ * @default 
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(11)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param FontFace
+ * @desc 項目名称のフォントを設定します。
+ * @text 項目名称フォント(12)
+ * @type string
+ * @default 
+ * 
+ * @param ValueFontFace
+ * @desc 数値のフォントを設定します。
+ * @text 数値フォント(13)
+ * @type string
+ * @default 
+ * 
+ * @param Icon
+ * @desc アイコンを設定します。
+ * @text アイコン(14)
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @desc アイコンを調整するY座標を指定します。(相対)
+ * @text アイコン調整Y座標(15)
+ * @type number
+ * @default 2
+ * @min -99
+ * 
+ * @param DetaEval
+ * @desc 評価式または文字列を記入します。
+ * @text 評価式or文字列(javaScript)(16)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'actor;//アクターのゲームデータ'
+ * @option 'actor.actor();//アクターのシステムデータ'
+ * @option 'battler.turnCount()+"ターン";//ターン'
+ * @default 
+ * 
+ * @param Decimal
+ * @text 小数点桁数(18)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
+ * @param TextMethod
+ * @desc 記述欄に紐づけするタグ名
+ * @text 記述欄タグ名(19)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param GaugeSetting
+ * @text ゲージ設定
+ * @default ------------------------------
+ * 
+ * @param GaugeID
+ * @desc 識別ID。
+ * @text 識別ID(20)
+ * @type string
+ * @default 
+ * @parent GaugeSetting
+ * 
+ * @param GaugeHeight
+ * @desc ゲージの縦幅を指定します。
+ * @text ゲージの縦幅(21)
+ * @type number
+ * @default 12
+ * @min 0
+ * @max 24
+ * @parent GaugeSetting
+ * 
+ * @param DetaEval2
+ * @desc 最大値の評価式。
+ * @text 最大値評価式(javaScript)(22)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'actor;//アクターのゲームデータ'
+ * @option 'actor.actor();//アクターのシステムデータ'
+ * @default 
+ * @parent GaugeSetting
+ * 
+ * @param Color1
+ * @desc ゲージのシステムカラーID(左)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(左)(23)
+ * @type color
+ * @default -1
+ * @min -1
+ * @parent GaugeSetting
+ * 
+ * @param Color2
+ * @desc ゲージのシステムカラーID(右)。テキストタブでカラーコードを入力できます。
+ * @text ゲージカラー(右)(24)
+ * @type color
+ * @default -1
+ * @min -1
+ * @parent GaugeSetting
+ * 
+ * @param ImgSetting
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc 表示する画像を指定します。
+ * @text 画像(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param OtherSetting
+ * @text その他設定
+ * @default ------------------------------
+ * 
+ * @param Text
+ * @desc フリーテキストのテキストを記入します。(制御文字使用可能)
+ * @text フリーテキストのテキスト(35)
+ * @type multiline_string
+ * @default
+ * @parent OtherSetting
+ * 
+ * @param CondSetting
+ * @text 表示条件設定
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc 項目が表示される条件を指定します。(JavaScript)
+ * @text 項目条件(all)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'actor;//アクターのゲームデータ'
+ * @option 'actor.actor();//アクターのシステムデータ'
+ * @option '$dataSystem.optDisplayTp'//TP表示
+ * @default 
  * 
  */
 var Imported = Imported || {};
 Imported.NUUN_XPSelectWindow = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_XPSelectWindow');
-const XPSelectPosition = eval(parameters['XPSelectPosition']) || 'top';
-const ActorXPSelect = eval(parameters['AcrotXPSelect'] || "true");
-const EnemyXPSelect = eval(parameters['EnemyXPSelect'] || "true");
-const ActorSelect_X = Number(parameters['ActorSelect_X'] || 0);
-const ActorSelect_Y = Number(parameters['ActorSelect_Y'] || 0);
-const ActorSelect_Width = Number(parameters['ActorSelect_Width'] || 0);
-const EnemySelect_X = Number(parameters['EnemySelect_X'] || 0);
-const EnemySelect_Y = Number(parameters['EnemySelect_Y'] || 0);
-const EnemySelect_Width = Number(parameters['EnemySelect_Width'] || 0);
-const ActorData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorData'])) : null) || [];
-const EnemyData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['EnemyData'])) : null) || [];
-const DynamicFace = eval(parameters['DynamicFace'] || "true");
-const EnemySelectdScrollSE = eval(parameters['EnemySelectdScrollSE'] || "true");
-let contentsWidth = 0;
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const parameters = PluginManager.parameters('NUUN_XPSelectWindow');
+    let contentsWidth = 0;
 
 function actorSelectWindowWidth() {
-    return ActorSelect_Width > 0 ? Math.min(ActorSelect_Width, Graphics.width) : Graphics.boxWidth;
+    return params.ActorSelect_Width > 0 ? Math.min(params.ActorSelect_Width, Graphics.width) : Graphics.boxWidth;
 };
 
 function enemySelectWindowWidth() {
-    return EnemySelect_Width > 0 ? Math.min(EnemySelect_Width, Graphics.width) : Graphics.boxWidth;
+    return params.EnemySelect_Width > 0 ? Math.min(params.EnemySelect_Width, Graphics.width) : Graphics.boxWidth;
 };
 
-function getFace(battler) {
-    return battler.meta.XPBattlerFace ? battler.meta.XPBattlerFace.split(',') : null;
-}
 
 const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
-    _Scene_Battle_createAllWindows.call(this);
-    if (EnemyXPSelect) {
+    _Scene_Battle_createAllWindows.apply(this, arguments);
+    if (params.EnemyXPSelect) {
         this.createSelectEnemyWindow();
     }
 };
 
 const _Scene_Battle_createActorWindow = Scene_Battle.prototype.createActorWindow;
 Scene_Battle.prototype.createActorWindow = function() {
-    _Scene_Battle_createActorWindow.call(this);
-    if (ActorXPSelect) {
+    _Scene_Battle_createActorWindow.apply(this, arguments);
+    if (params.ActorXPSelect) {
         this.createSelectActorWindow();
+    }
+};
+
+const _Scene_Battle_createEnemyWindow = Scene_Battle.prototype.createEnemyWindow;
+Scene_Battle.prototype.createEnemyWindow = function() {
+    _Scene_Battle_createEnemyWindow.apply(this, arguments);
+    if (params.EnemyXPSelect) {
+        this._enemyWindow.y = Graphics.height;//ウィンドウを隠す
     }
 };
 
 Scene_Battle.prototype.createSelectActorWindow = function() {
     const rect = this.actorSelectWindowRect();
-    this._actorSelectWindow = new Window_BattleSelectActor(rect);
+    this._actorSelectWindow = new Window_BattleSelectBattler(rect);
     this.addWindow(this._actorSelectWindow);
-    this._actorWindow.selectActorWindow = this._actorSelectWindow;
+    this._actorWindow.setActorSelectWindow(this._actorSelectWindow);
 };
 
 Scene_Battle.prototype.createSelectEnemyWindow = function() {
     const rect = this.enemySelectWindowRect();
     this._enemySelectWindow = new Window_BattleSelectEnemy(rect);
     this.addWindow(this._enemySelectWindow);
-    this._enemyWindow.selectEnemyWindow = this._enemySelectWindow;
+    this._enemyWindow.setEnemySelectWindow(this._enemySelectWindow);
 };
 
 Scene_Battle.prototype.actorSelectWindowRect = function() {
     const ww = actorSelectWindowWidth();
-    const wx = ActorSelect_X;
+    const wx = params.ActorSelect_X;
     const wh = this.calcWindowHeight(1, true);
     const wy = this.XPActorSelectY();
     return new Rectangle(wx, wy, ww, wh);
@@ -288,24 +861,38 @@ Scene_Battle.prototype.actorSelectWindowRect = function() {
 
 Scene_Battle.prototype.enemySelectWindowRect = function() {
     const ww = enemySelectWindowWidth();
-    const wx = EnemySelect_X;
+    const wx = params.EnemySelect_X;
     const wh = this.calcWindowHeight(1, true);
     const wy = this.XPEnemySelectY();
     return new Rectangle(wx, wy, ww, wh);
 };
 
-const _Scene_Battle_createEnemyWindow = Scene_Battle.prototype.createEnemyWindow;
-Scene_Battle.prototype.createEnemyWindow = function() {
-    _Scene_Battle_createEnemyWindow.call(this);
-    if (EnemyXPSelect) {
-        this._enemyWindow.y = Graphics.height;
+Scene_Battle.prototype.XPActorSelectY = function() {
+    switch (params.XPSelectPosition) {
+        case 'top':
+            return params.ActorSelect_Y;
+        case 'under':
+            return this._statusWindow.y - this.calcWindowHeight(1, true) + params.ActorSelect_Y - 6;
+        case 'middle':
+            return this._statusWindow.y / 2 - this.calcWindowHeight(1, true) / 2 + params.ActorSelect_Y;
+    }
+};
+
+Scene_Battle.prototype.XPEnemySelectY = function() {
+    switch (params.XPSelectPosition) {
+        case 'top':
+            return params.EnemySelect_Y;
+        case 'under':
+            return this._statusWindow.y - this.calcWindowHeight(1, true) + params.EnemySelect_Y - 6;
+        case 'middle':
+            return this._statusWindow.y / 2 - this.calcWindowHeight(1, true) / 2 + params.EnemySelect_Y;
     }
 };
 
 const _Scene_Battle_startEnemySelection = Scene_Battle.prototype.startEnemySelection;
 Scene_Battle.prototype.startEnemySelection = function() {
-    _Scene_Battle_startEnemySelection.call(this);
-    if (EnemyXPSelect) {
+    _Scene_Battle_startEnemySelection.apply(this, arguments);
+    if (params.EnemyXPSelect) {
         this._skillWindow.hide();
         this._itemWindow.hide();
         this._statusWindow.show();
@@ -316,79 +903,73 @@ Scene_Battle.prototype.startEnemySelection = function() {
 
 const _Scene_Battle_startActorSelection = Scene_Battle.prototype.startActorSelection;
 Scene_Battle.prototype.startActorSelection = function() {
-    _Scene_Battle_startActorSelection.call(this);
-    if (ActorXPSelect) {
+    _Scene_Battle_startActorSelection.apply(this, arguments);
+    if (params.ActorXPSelect) {
         this._actorSelectWindow.show();
         this._actorSelectWindow.open();
+        if (params.ActorSelectionHelpWindowHide) {
+            this._helpWindow.hide();
+        }
     }
 };
 
 const _Scene_Battle_onEnemyOk = Scene_Battle.prototype.onEnemyOk;
 Scene_Battle.prototype.onEnemyOk = function() {
-    _Scene_Battle_onEnemyOk.call(this);
-    if (EnemyXPSelect) {
+    _Scene_Battle_onEnemyOk.apply(this, arguments);
+    if (params.EnemyXPSelect) {
         this._enemySelectWindow.close();
     }
 };
 
 const _Scene_Battle_onEnemyCancel = Scene_Battle.prototype.onEnemyCancel;
 Scene_Battle.prototype.onEnemyCancel = function() {
-    _Scene_Battle_onEnemyCancel.call(this);
-    if (EnemyXPSelect) {
+    _Scene_Battle_onEnemyCancel.apply(this, arguments);
+    if (params.EnemyXPSelect) {
         this._enemySelectWindow.close();
     }
 };
 
 const _Scene_Battle_onActorOk = Scene_Battle.prototype.onActorOk;
 Scene_Battle.prototype.onActorOk = function() {
-    _Scene_Battle_onActorOk.call(this);
-    if (ActorXPSelect) {
+    _Scene_Battle_onActorOk.apply(this, arguments);
+    if (params.ActorXPSelect) {
         this._actorSelectWindow.close();
     }
 };
 
 const _Scene_Battle_onActorCancel  =Scene_Battle.prototype.onActorCancel;
 Scene_Battle.prototype.onActorCancel = function() {
-    _Scene_Battle_onActorCancel.call(this);
-    if (ActorXPSelect) {
+    _Scene_Battle_onActorCancel.apply(this, arguments);
+    if (params.ActorXPSelect) {
         this._actorSelectWindow.close();
+        if (params.ActorSelectionHelpWindowHide) {
+            this._helpWindow.show();
+        }
     }
 };
 
 const _Scene_Battle_hideSubInputWindows = Scene_Battle.prototype.hideSubInputWindows;
 Scene_Battle.prototype.hideSubInputWindows = function() {
-    _Scene_Battle_hideSubInputWindows.call(this);
-    if (ActorXPSelect) {
+    _Scene_Battle_hideSubInputWindows.apply(this, arguments);
+    if (params.ActorXPSelect) {
         this._actorSelectWindow.deactivate();
         this._actorSelectWindow.hide();
     }
-    if (EnemyXPSelect) {
+    if (params.EnemyXPSelect) {
         this._enemySelectWindow.deactivate();
         this._enemySelectWindow.hide();
     }
 };
 
-Scene_Battle.prototype.XPActorSelectY = function() {
-    switch (XPSelectPosition) {
-        case 'top':
-            return ActorSelect_Y;
-        case 'under':
-            return this._statusWindow.y - this.calcWindowHeight(1, true) + ActorSelect_Y - 6;
-        case 'middle':
-            return this._statusWindow.y / 2 - this.calcWindowHeight(1, true) / 2 + ActorSelect_Y;
-    }
+
+Window_Selectable.prototype.setActorSelectWindow = function(actorSelectWindow) {
+    this.selectActorWindow = actorSelectWindow;
 };
 
-Scene_Battle.prototype.XPEnemySelectY = function() {console.log(XPSelectPosition)
-    switch (XPSelectPosition) {
-        case 'top':
-            return EnemySelect_Y;
-        case 'under':
-            return this._statusWindow.y - this.calcWindowHeight(1, true) + EnemySelect_Y - 6;
-        case 'middle':
-            return this._statusWindow.y / 2 - this.calcWindowHeight(1, true) / 2 + EnemySelect_Y;
-    }
+Window_Selectable.prototype.setEnemySelectWindow = function(enemySelectWindow) {
+    this.selectEnemyWindow = enemySelectWindow;
 };
+
 
 function Window_BattleSelectBattler() {
     this.initialize(...arguments);
@@ -398,10 +979,15 @@ Window_BattleSelectBattler.prototype = Object.create(Window_StatusBase.prototype
 Window_BattleSelectBattler.prototype.constructor = Window_BattleSelectBattler;
 
 Window_BattleSelectBattler.prototype.initialize = function(rect) {
+    this.createData();
     Window_StatusBase.prototype.initialize.call(this, rect);
     this.openness = 0;
     this._battler = null;
     this._targetSelect = null;
+};
+
+Window_BattleSelectBattler.prototype.createData = function() {
+    this._contentsData = new Nuun_DrawSelectListData(this, params);
 };
 
 Window_BattleSelectBattler.prototype.colSpacing = function() {
@@ -410,101 +996,20 @@ Window_BattleSelectBattler.prototype.colSpacing = function() {
 
 Window_BattleSelectBattler.prototype.setBattler = function(battler) {
     this._battler = battler;
+    this._contentsData.imgSetup(battler);
     this.refresh();
 };
 
-Window_BattleSelectBattler.prototype.battlerDataMode = function(data, x, y, width) {
-    const mode = data.DataMode;
-    contentsWidth = width;
-    switch (mode) {   
-        case 'name':
-            this.placeBattlerName(this._battler, data, x, y);
-            break;
-        case 'HPGauge':
-            this.placeGauge(this._battler, 'hp', x, y);
-            break;
-        case 'MPGauge':
-            this.placeGauge(this._battler, 'mp', x, y);
-            break;
-        case 'TPGauge':
-            this.placeGauge(this._battler, 'tp', x, y);
-            break;
-        case 'State':
-            this.placeStateIcon(this._battler, x, y);
-            break;
-        case 'original':
-            this.battlerOriginal(this._battler, data, x, y - 6, width);
-            break;
-        case 'Face':
-            this.battlerFace(this._battler, data, x, y);
-            break;
-    }
-};
-
-Window_BattleSelectBattler.prototype.setForItem = function(text) {
-    this._targetSelect = text;
-};
-
-Window_BattleSelectBattler.prototype.drawEXTargetSelect = function(x, y, width) {
-    this.drawText(this._targetSelect, x, y, width, 'center');
-};
-
-function Window_BattleSelectActor() {
-    this.initialize(...arguments);
-}
-
-Window_BattleSelectActor.prototype = Object.create(Window_BattleSelectBattler.prototype);
-Window_BattleSelectActor.prototype.constructor = Window_BattleSelectActor;
-
-Window_BattleSelectActor.prototype.initialize = function(rect) {
-    Window_BattleSelectBattler.prototype.initialize.call(this, rect);
-};
-
-Window_BattleSelectActor.prototype.refresh = function() {
+Window_BattleSelectBattler.prototype.refresh = function() {
     Window_StatusBase.prototype.refresh.call(this);
-    let bitmap = null;
-    const battler = this._battler;
-    if (battler) {
-        const faceData = getFace(battler.actor());
-        if (faceData) {
-            bitmap = ImageManager.loadFace(faceData[0]);
-        } else {
-            if (Imported.NUUN_ActorPicture && DynamicFace) {
-                this._battler.resetImgId();
-                bitmap = ImageManager.loadFace(this._battler.getActorGraphicFace());
-            } else {
-                bitmap = ImageManager.loadFace(this._battler.faceName());
-            }
-        }
-        if (!bitmap.isReady()) {
-            bitmap.addLoadListener(this.drawListData.bind(this));
-        } else {
-            this.drawListData();
-        }
-    }
+    this.drawItem();
 };
 
-Window_BattleSelectActor.prototype.drawListData = function() {
-    const rect = this.itemLineRect(0);
-    if (this._targetSelect) {
-        this.drawEXTargetSelect(rect.x, rect.y, rect.width);
-    } else {
-        ActorData.forEach(data => {
-            const width = data.Contents_Width > 0 ? data.Contents_Width : rect.width;
-            this.battlerDataMode(data, rect.x + data.Contents_X, rect.y + 6, width);
-        });
-    }
+Window_BattleSelectBattler.prototype.drawItem = function() {
+    this._contentsData.drawStatusContents(this._battler);
 };
 
-Window_BattleSelectActor.prototype.placeBattlerName = function(battler, data, x, y) {
-    const key = "ActorSelectName";
-    const sprite = this.createInnerSprite(key, Sprite_BattlerName);
-    sprite.setup(battler, data);
-    sprite.move(x, y);
-    sprite.show();
-};
-
-Window_BattleSelectActor.prototype.placeStateIcon = function(battler, x, y) {
+Window_BattleSelectBattler.prototype.placeStateIcon = function(battler, x, y) {
     const key = "ActorSelectStateIcon";
     const sprite = this.createInnerSprite(key, Sprite_StateIcon);
     sprite.setup(battler);
@@ -512,41 +1017,19 @@ Window_BattleSelectActor.prototype.placeStateIcon = function(battler, x, y) {
     sprite.show();
 };
 
-Window_BattleSelectActor.prototype.placeGauge = function(battler, type, x, y) {
+Window_BattleSelectBattler.prototype.placeGauge = function(battler, type, x, y) {
     if (Imported.NUUN_GaugeImage) {
         this.placeGaugeImg(actor, type, x, y);
     }
     const key = "ActorSelectGauge-%1".format(type);
-    const sprite = this.createInnerSprite(key, Sprite_XPGauge);
+    const sprite = this.createInnerSprite(key, Sprite_NuunGauge);
     sprite.setup(battler, type);
     sprite.move(x, y);
     sprite.show();
 };
 
-Window_BattleSelectActor.prototype.battlerOriginal = function(battler, data, x, y, width) {
-    if (battler) {
-        const param = eval(data.Contents_Eval);
-        this.drawText(param, x, y, width, data.Contents_Align);
-    }
-};
-
-Window_BattleSelectActor.prototype.battlerFace = function(actor, data, x, y) {
-    if (actor) {
-        const width = ImageManager.faceWidth;
-        y -= (ImageManager.faceHeight / 2) - 6;
-        this.drawActorFace(actor, x, y, width);
-    }
-};
-
-Window_BattleSelectActor.prototype.drawActorFace = function(actor, x, y, width, height) {
-    const faceData = getFace(actor.actor());
-    if (faceData) {
-        this.drawFace(faceData[0], Math.max(faceData[1], 0), x, y, width, height);
-    } else if (Imported.NUUN_ActorPicture && DynamicFace) {
-        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, width, height);
-    } else {
-        Window_StatusBase.prototype.drawActorFace.call(this, actor, x, y, width, height);
-    }
+Window_BattleSelectBattler.prototype.isActorPictureEXApp = function() {
+    return Imported.NUUN_ActorPicture && params.DynamicFace;
 };
 
 
@@ -561,41 +1044,8 @@ Window_BattleSelectEnemy.prototype.initialize = function(rect) {
     Window_BattleSelectBattler.prototype.initialize.call(this, rect);
 };
 
-Window_BattleSelectEnemy.prototype.refresh = function() {
-    Window_StatusBase.prototype.refresh.call(this);
-    let bitmap = null;
-    const battler = this._battler;
-    if (battler) {
-        const faceData = getFace(battler.enemy());
-        if (faceData) {
-            bitmap = ImageManager.loadFace(faceData[0]);
-        }
-        if (faceData && !bitmap.isReady()) {
-            bitmap.addLoadListener(this.drawListData.bind(this));
-        } else {
-            this.drawListData();
-        }
-    }
-};
-
-Window_BattleSelectEnemy.prototype.drawListData = function() {
-    const rect = this.itemLineRect(0);
-    if (this._targetSelect) {
-        this.drawEXTargetSelect(rect.x, rect.y, rect.width);
-    } else {
-        EnemyData.forEach(data => {
-            const width = data.Contents_Width > 0 ? data.Contents_Width : rect.width;
-            this.battlerDataMode(data, rect.x + data.Contents_X, rect.y + 6, width);
-        });
-    }
-};
-
-Window_BattleSelectEnemy.prototype.placeBattlerName = function(battler, data, x, y) {
-    const key = "EnemySelectName";
-    const sprite = this.createInnerSprite(key, Sprite_BattlerName);
-    sprite.setup(battler, data);
-    sprite.move(x, y);
-    sprite.show();
+Window_BattleSelectEnemy.prototype.createData = function() {
+    this._contentsData = new Nuun_DrawEnemySelectListData(this, params);
 };
 
 Window_BattleSelectEnemy.prototype.placeStateIcon = function(battler, x, y) {
@@ -611,32 +1061,10 @@ Window_BattleSelectEnemy.prototype.placeGauge = function(battler, type, x, y) {
         this.placeGaugeImg(actor, type, x, y);
     }
     const key = "EnemySelectGauge-%1".format(type);
-    const sprite = this.createInnerSprite(key, Sprite_XPGauge);
+    const sprite = this.createInnerSprite(key, Sprite_NuunGauge);
     sprite.setup(battler, type);
     sprite.move(x, y);
     sprite.show();
-};
-
-Window_BattleSelectEnemy.prototype.battlerOriginal = function(battler, data, x, y, width) {
-    if (battler) {
-        const param = eval(data.Contents_Eval);
-        this.drawText(param, x, y, width, data.Contents_Align);
-    }
-};
-
-Window_BattleSelectEnemy.prototype.battlerFace = function(enemy, data, x, y) {
-    if (enemy) {
-        const width = ImageManager.faceWidth;
-        y -= (ImageManager.faceHeight / 2) - 6;
-        this.drawEnemyFace(enemy, x, y, width);
-    }
-};
-
-Window_BattleSelectEnemy.prototype.drawEnemyFace = function(enemy, x, y, width, height) {
-    const faceData = getFace(enemy.enemy());
-    if (faceData) {
-        this.drawFace(faceData[0], Math.max(faceData[1], 0), x, y, width, height);
-    }
 };
 
 
@@ -667,73 +1095,66 @@ Window_BattleEnemy.prototype.processWheelScroll = function() {
         const oldIndex = this.index();
         if (TouchInput.wheelY >= threshold) {
             this.cursorRight(Input.isTriggered("right"));
-            if (EnemySelectdScrollSE && this.index() !== oldIndex) {
+            if (params.EnemySelectdScrollSE && this.index() !== oldIndex) {
                 this.playCursorSound();
             }
         }
         if (TouchInput.wheelY <= -threshold) {
             this.cursorLeft(Input.isTriggered("left"));
-            if (EnemySelectdScrollSE && this.index() !== oldIndex) {
+            if (params.EnemySelectdScrollSE && this.index() !== oldIndex) {
                 this.playCursorSound();
             }
         }
     }
 };
 
-function Sprite_BattlerName() {
-    this.initialize(...arguments);
-}
 
-Sprite_BattlerName.prototype = Object.create(Sprite_Name.prototype);
-Sprite_BattlerName.prototype.constructor = Sprite_BattlerName;
+class Nuun_DrawSelectListData extends Nuun_DrawListData {
+    constructor(_window, params) {
+        super(_window, params);
+    }
 
-Sprite_BattlerName.prototype.initialize = function() {
-    this._nameWidth = contentsWidth;
-    Sprite_Name.prototype.initialize.call(this);
-    this._align = 'center'
+    getParamsList() {
+        return params.ActorData;
+    }
+
+    getActorsList() {
+        return [];
+    }
+
+    nuun_PlaceGauge(actor, type, x, y, fmt) {
+        this._window.placeGauge(actor, type, x, y);
+        this.tempParamsClear();
+    }
+
+    drawItemImg(actor, index) {
+        
+    }
+
+    isActorPictureEXApp() {
+        return this._window.isActorPictureEXApp();
+    }
+    
 };
 
-Sprite_BattlerName.prototype.bitmapWidth = function() {
-    return this._nameWidth || 128;
-};
+class Nuun_DrawEnemySelectListData extends Nuun_DrawListData {
+    constructor(_window, params) {
+        super(_window, params);
+    }
 
-Sprite_BattlerName.prototype.setup = function(battler, data) {
-    this._align = data.Contents_Align || 'center';
-    this._battler = battler;
-    this.updateBitmap();
-};
+    getParamsList() {
+        return params.EnemyData;
+    }
 
-Sprite_BattlerName.prototype.redraw = function() {
-    const name = this.name();
-    const width = this.bitmapWidth();
-    const height = this.bitmapHeight();
-    this.setupFont();
-    this.bitmap.clear();
-    this.bitmap.drawText(name, 0, 0, width, height, this._align);
-};
+    nuun_PlaceGauge(enemy, type, x, y, fmt) {
+        this._window.placeGauge(enemy, type, x, y);
+        this.tempParamsClear();
+    }
 
+    getBattlerFace(battler) {
+        return battler.enemy().meta.XPBattlerFace ? battler.enemy().meta.XPBattlerFace.split(',') : null;
+    }
 
-function Sprite_XPGauge() {
-    this.initialize(...arguments);
-}
-
-Sprite_XPGauge.prototype = Object.create(Sprite_Gauge.prototype);
-Sprite_XPGauge.prototype.constructor = Sprite_XPGauge;
-
-Sprite_XPGauge.prototype.initialize = function() {
-    this._gaugeWidth = contentsWidth;
-    Sprite_Gauge.prototype.initialize.call(this);
-};
-
-Sprite_XPGauge.prototype.bitmapWidth = function() {
-    return this._gaugeWidth || 128;
-};
-
-
-const _Sprite_Enemy_updateStateSprite = Sprite_Enemy.prototype.updateStateSprite;
-Sprite_Enemy.prototype.updateStateSprite = function() {
-    _Sprite_Enemy_updateStateSprite.call(this);
-    this._stateIconSprite.visible = false;
 };
 
 })();

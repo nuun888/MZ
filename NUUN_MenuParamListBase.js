@@ -618,12 +618,12 @@ Imported.NUUN_MenuParamListBase = true;
             if (actor && this.nuun_IsContents(data, actor)) {
                 this.setTepmData(data, this._exParams);
                 const method = 'nuun_DrawContents' + data.DateSelect;
-                //try {
+                try {
                     this[method](data, x, y, width, actor);
-                //} catch (error) {
-                //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                //    throw ["DataError", log];
-                //}
+                } catch (error) {
+                    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+                    throw ["DataError", log];
+                }
             }
         }
     
@@ -1321,18 +1321,20 @@ Imported.NUUN_MenuParamListBase = true;
             w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
         }
 
-        nuun_DrawDesc(data, param, x, y, width, battler) {
+        nuun_DrawContentsDesc(data, x, y, width, battler) {
+            const w = this._window;
             const nameText = data.paramName;
+            const obj = battler.isActor() ? battler.actor() : battler.enemy();
             if (nameText) {
                 w.changeTextColor(NuunManager.getColorCode(data.NameColor));
                 w.drawText(nameText, x, y);
                 y += w.lineHeight();
             }
-            this.resetTextColor();
+            w.resetTextColor();
             let text = "";
             const method = data.TextMethod;
             if (method) {
-                text = battler.meta[method];
+                text = obj.meta[method];
             }
             if (text){
                 w.drawTextEx(text, x, y, width);

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.20
+ * @version 3.12.21
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2024/9/8 Ver.3.12.21
+ * 立ち絵、顔グラ表示EXで他プラグインで画像が表示されなくなる問題を修正。
  * 2024/7/27 Ver.3.12.20
  * アクター画像が切り替わらない問題を修正。
  * 2024/7/14 Ver.3.12.19
@@ -409,7 +411,11 @@ function actorWindowShiftWidth() {
 };
 
 function _getActorId() {
-    return BattleManager.isOnActorPictureEX() ? 'FaceIndex' : 'ImgIndex';
+    return _isOnActorPictureEX() ? 'FaceIndex' : 'ImgIndex';
+}
+
+function _isOnActorPictureEX() {
+    return Imported.NUUN_ActorPicture && params.OnActorPictureEX;
 }
 
 function loadBackground(img) {
@@ -469,10 +475,6 @@ BattleManager.getNotVisibleIcons = function() {
 BattleManager.getNotVisibleBuffIcons = function() {
   return this.getVisibleBuffIcons(params.NotVisibleBuffIcons);
 };
-
-BattleManager.isOnActorPictureEX = function() {
-    return Imported.NUUN_ActorPicture && params.OnActorPictureEX;
-}
 
 BattleManager.getVisibleBuffIcons = function(list) {
     const icons = [];
@@ -749,7 +751,7 @@ Game_Actor.prototype.performActionStart = function(action) {
     if (params.OnActionZoom && !this.isCounterSkillAction()) {
         this._isEffectAction = true;
     }
-    if (BattleManager.isOnActorPictureEX()) {
+    if (_isOnActorPictureEX()) {
         this.setAttackImgId(action);
     } else {
         this.setBattleStyleAttackImgId(action);
@@ -837,8 +839,14 @@ Game_Battler.prototype.refresh = function() {
     }
 };
 
+const _Game_Actor_imgRefresh = Game_Actor.prototype.imgRefresh;
 Game_Actor.prototype.imgRefresh = function() {
-    this.battleStyleImgRefresh();
+    if ($gameParty.inBattle()) {
+        this.battleStyleImgRefresh();
+    } else {
+        _Game_Actor_imgRefresh.apply(this, arguments);
+    }
+    
 };
 
 const _Game_Actor_setup = Game_Actor.prototype.setup;
@@ -855,6 +863,9 @@ Game_Enemy.prototype.setup = function(enemyId, x, y) {
 
 Game_Actor.prototype.battleStyleImgRefresh = function() {
     if (!BattleManager.isBsBattle()) {
+        if (_isOnActorPictureEX()) {
+            this.setActorGraphicData();
+        }
         return;
     }
     let imgIndex = -1;
@@ -2713,7 +2724,7 @@ Window_BattleActorImges.prototype.preparePartyRefresh = function() {
     this.actorMainSprite = [];
     let bitmap = null;
     for (const actor of $gameParty.members()) {
-        if (BattleManager.isOnActorPictureEX()) {
+        if (_isOnActorPictureEX()) {
             actor.imgRefresh();
         } else {
             actor.battleStyleImgRefresh();
@@ -2721,9 +2732,9 @@ Window_BattleActorImges.prototype.preparePartyRefresh = function() {
         bitmap = actor.getLoadBattleStyleImg();
         this.actorMainSprite.push(bitmap);
         if(bitmap && !bitmap.isReady()){
-        bitmap.addLoadListener(this.performPartyRefresh.bind(this, bitmap));
+            bitmap.addLoadListener(this.performPartyRefresh.bind(this, bitmap));
         } else {
-        this.performPartyRefresh(bitmap);
+            this.performPartyRefresh(bitmap);
         }
     }
 };

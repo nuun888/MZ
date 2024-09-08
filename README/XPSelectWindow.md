@@ -1,9 +1,10 @@
 # [XP風対象選択ウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)
-# Ver.1.1.4
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)  
 
 ## 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+[ステータス項目ベース](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)  
 
 敵、味方の対象選択時のウィンドウをXP風に変更します。  
 対象選択時に名前、顔グラ、ステート、HP、MP、TPを表示できます。  
@@ -17,6 +18,9 @@
 ![画像](img/XPSelectWindow3.png)  
 
 ## 更新履歴
+2024/9/8 Ver.1.2.0  
+ステータス項目ベースプラグインを介しての処理に仕様変更。  
+幾つかのプラグインパラメータのスペルミスを修正。  
 2023/1/10 Ver.1.1.4  
 対象選択画面表示位置が上部しか適用されていなかった問題を修正。  
 2023/1/9 Ver.1.1.3  

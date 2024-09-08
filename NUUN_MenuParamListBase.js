@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/8/2024 Ver.1.1.3
+ * Fixed an issue where the description field was not working.
+ * Fixed an issue where arbitrary evaluation expressions were not working in dynamic parameters.
+ * Added definitions for enemy parameters.
  * 7/28/2024 Ver.1.1.2
  * Fixed an issue that would cause an error when setting ability scores.
  * Fixed an issue that would cause an error when an actor without an image set was selected.
@@ -120,7 +124,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -131,6 +135,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/8 Ver.1.1.3
+ * 記述欄が機能していない問題を修正。
+ * 動的パラメータで任意の評価式が機能していなかった問題を修正。
+ * 敵のパラメータの定義追加。
  * 2024/7/28 Ver.1.1.2
  * 能力値を設定するとエラーが出る問題を修正。
  * 画像が未設定のアクターが選択されるとエラーが出る問題を修正。
@@ -610,12 +618,12 @@ Imported.NUUN_MenuParamListBase = true;
             if (actor && this.nuun_IsContents(data, actor)) {
                 this.setTepmData(data, this._exParams);
                 const method = 'nuun_DrawContents' + data.DateSelect;
-                try {
+                //try {
                     this[method](data, x, y, width, actor);
-                } catch (error) {
-                    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                    throw ["DataError", log];
-                }
+                //} catch (error) {
+                //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+                //    throw ["DataError", log];
+                //}
             }
         }
     
@@ -735,6 +743,15 @@ Imported.NUUN_MenuParamListBase = true;
             w.drawActorName(actor, x, y, width);
             this.textModeClear();
         }
+
+        nuun_DrawContentsEnemyName(data, x, y, width, enemy) {
+            if (!enemy.isEnemy()) return;
+            const w = this._window;
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            w.changeTextColor(ColorManager.hpColor(enemy));
+            w.drawText(enemy.enemy().name, x, y, width, data.Align);
+        }
     
         nuun_DrawContentsNickname(data, x, y, width, actor) {
             const w = this._window;
@@ -793,6 +810,7 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         nuun_DrawContentsOrgParam(data, x, y, width, actor) {
+            const enemy = actor.isEnemy() ? actor : null;
             const w = this._window;
             w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
             if (data.Back) {
@@ -815,7 +833,7 @@ Imported.NUUN_MenuParamListBase = true;
             if (data.DetaEval) {
                 this.nuun_SetContentsValueFontFace(data);
                 const padding = textWidth > 0 ? w.itemPadding() : 0;
-                const textParam = this.getStatusEvalParam(param, actor);
+                const textParam = this.getStatusEvalParam(param, actor, enemy);
                 if (isNaN(textParam)) {
                     w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
                 } else {
@@ -975,6 +993,10 @@ Imported.NUUN_MenuParamListBase = true;
         }
 
         nuun_DrawContentsFace(data, x, y, width, actor) {
+            if (actor.isEnemy()) {
+                this.nuun_DrawEnemyFace(data, x, y, width, actor);
+                return;
+            }
             let bitmap = null;
             if (this._window.isActorPictureEXApp()) {
                 bitmap = this._actorImgData.loadActorFace();
@@ -985,8 +1007,18 @@ Imported.NUUN_MenuParamListBase = true;
             bitmap.addLoadListener(function() {
                 this.nuun_ActorFace(data, x, y, Math.min(width, ImageManager.faceWidth), Math.min(rect.height - 2, ImageManager.faceHeight), actor);
             }.bind(this));
-        };
-    
+        }
+
+        nuun_DrawEnemyFace(data, x, y, width, enemy) {
+            const faceData = this.getBattlerFace(enemy);
+            if (!faceData) return;
+            const bitmap = ImageManager.loadFace(faceData[0]);
+            const rect = this._window.itemRect(0);
+            bitmap.addLoadListener(function() {
+                this.nuun_EnemyFace(data, faceData, x, y, Math.min(width, ImageManager.faceWidth), Math.min(rect.height - 2, ImageManager.faceHeight), enemy);
+            }.bind(this));
+        }
+
         nuun_DrawContentsImges(data, x, y, width, actor) {
             this.nuun_DrawImg(data, x, y, actor);
         }
@@ -1206,7 +1238,7 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         nuun_DrawParams(data, param, x, y, width, actor) {
-            
+            const enemy = actor.isEnemy() ? actor : null;
             const w = this._window;
             const padding = w.itemPadding();
             if (data.Back) {
@@ -1234,6 +1266,7 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         nuun_DrawXParams(data, param, x, y, width, actor) {
+            const enemy = actor.isEnemy() ? actor : null;
             const w = this._window;
             const padding = w.itemPadding();
             if (data.Back) {
@@ -1261,6 +1294,7 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         nuun_DrawSParams(data, param, x, y, width, actor) {
+            const enemy = actor.isEnemy() ? actor : null;
             const w = this._window;
             const padding = w.itemPadding();
             if (data.Back) {
@@ -1287,7 +1321,7 @@ Imported.NUUN_MenuParamListBase = true;
             w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
         }
 
-        nuun_DrawDesc(data, param, x, y, width, actor) {
+        nuun_DrawDesc(data, param, x, y, width, battler) {
             const nameText = data.paramName;
             if (nameText) {
                 w.changeTextColor(NuunManager.getColorCode(data.NameColor));
@@ -1298,9 +1332,9 @@ Imported.NUUN_MenuParamListBase = true;
             let text = "";
             const method = data.TextMethod;
             if (method) {
-                text = item.meta[method];
+                text = battler.meta[method];
             }
-            if(text){
+            if (text){
                 w.drawTextEx(text, x, y, width);
             }
         }
@@ -1315,7 +1349,10 @@ Imported.NUUN_MenuParamListBase = true;
         }
 
         nuun_ActorFace(data, x, y, width, height, actor) {
-            this._window.changePaintOpacity(this._window.isSubMemberOpacity(actor));
+            const opacityMode = this._window.isSubMemberOpacity ? true : false;
+            if (opacityMode) {
+                this._window.changePaintOpacity(this._window.isSubMemberOpacity(actor));
+            }
             width = Math.min(ImageManager.faceWidth, width);
             height = Math.min(ImageManager.faceHeight, height);
             if (this.isActorPictureEXApp()) {
@@ -1326,7 +1363,15 @@ Imported.NUUN_MenuParamListBase = true;
                 }
                 this._window.drawActorFace(actor, x + 1, y + 1, width, height);
             }
-            this._window.changePaintOpacity(true);
+            if (opacityMode) {
+                this._window.changePaintOpacity(true);
+            }
+        }
+
+        nuun_EnemyFace(data, faceData, x, y, width, height, enemy) {
+            width = Math.min(ImageManager.faceWidth, width);
+            height = Math.min(ImageManager.faceHeight, height);
+            this._window.drawFace(faceData[0], Number(faceData[1]), x + 1, y + 1, width, height);
         }
         
         nuun_ActorCharacterChip(actor, data, x, y, fmt) {
@@ -1456,6 +1501,14 @@ Imported.NUUN_MenuParamListBase = true;
             return null;
         }
 
+        tempParamsClear() {
+            _tempParams.clear();
+        }
+
+        getBattlerFace(battler) {
+            return null;
+        }
+
         getStatusEval(param, actor) {
             try {
                 return actor[param] ? 'detaEvalEx' : 'detaEval';
@@ -1463,7 +1516,8 @@ Imported.NUUN_MenuParamListBase = true;
                 return 'detaEval';
             }
         }
-        getStatusEvalParam(param, actor) {
+
+        getStatusEvalParam(param, actor, enemy) {
             try {
                 return actor[param] ? actor[param] : eval(param);
             } catch (error) {
@@ -1648,12 +1702,14 @@ Imported.NUUN_MenuParamListBase = true;
     };
 
     Sprite_NuunGauge.prototype.orgGaugeValue = function() {
-        const actor = this._battler;
+        const actor = this._battler.isActor() ? this._battler : null;
+        const enemy = this._battler.isEnemy() ? this._battler : null;
         return eval(this._paramData.DetaEval);
     };
 
     Sprite_NuunGauge.prototype.orgGaugeMaxValue = function() {
-        const actor = this._battler;
+        const actor = this._battler.isActor() ? this._battler : null;
+        const enemy = this._battler.isEnemy() ? this._battler : null;
         return eval(this._paramData.DetaEval2);
     };
 
@@ -2061,7 +2117,9 @@ Imported.NUUN_MenuParamListBase = true;
             case "detaEvalEx":
                 return this._battler[DetaEval1];
             case "detaEval":
-                return this._paramData.DetaEval1;
+                const acotr = this._battler.isActor() ? this._battler : null;
+                const enemy = this._battler.isEnemy() ? this._battler : null;
+                return eval(this._paramData.DetaEval1);
             case "turn":
                 return Math.max(1, this._battler.turnCount());
         }

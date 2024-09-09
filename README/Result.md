@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.4.3
+# Ver.2.4.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -41,6 +41,8 @@ d:アクターのデータベースデータ
 ※右クリックはページ切り替えのみです。戻す機能は実装しておりません。  
 
 ## 更新履歴
+2024/9/9 Ver.2.4.4  
+NUUN_ActorPictureでの立ち絵表示で画像が表示されない問題を修正。  
 2024/8/11 Ver.2.4.3  
 勝利後リザルト画面遅延フレーム数を２フレーム以上に設定したときに、戦闘終了時にフリーズする問題を修正。  
 2024/7/20 Ver.2.4.2  

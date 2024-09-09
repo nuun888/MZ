@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.3
+ * @version 2.4.4
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -60,6 +60,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/9/11 Ver.2.4.4
+ * Fixed the issue where the image was not displayed when displaying a standing character using "NUUN_ActorPicture".
  * 2024/8/11 Ver.2.4.3
  * Fixed a freeze at the end of battle when "Result screen delay frames after victory" was set to 2 frames or more.
  * 2024/7/20 Ver.2.4.2
@@ -2315,7 +2317,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.3
+ * @version 2.4.4
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2363,6 +2365,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/9 Ver.2.4.4
+ * NUUN_ActorPictureでの立ち絵表示で画像が表示されない問題を修正。
  * 2024/8/11 Ver.2.4.3
  * 勝利後リザルト画面遅延フレーム数を２フレーム以上に設定したときに、戦闘終了時にフリーズする問題を修正。
  * 2024/7/20 Ver.2.4.2
@@ -5659,21 +5663,21 @@ Window_Result.prototype.processCancel = function() {
 };
 
 Window_Result.prototype.resultRefresh = function(actor) {
-  this.contents.clear();
-  if (actor) {
-    const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
-    if (LevelUpActorArea === 'window') {
-      this.setupResultBitmap(actor, data);
-    } else {
-      if (data) {
-        this._actorSprite.setup(actor, data, this.windowResultFilterWidthArea());
-        this._actorSprite.move(this.windowResultFilteX(), this.windowResultFilterHeightArea());
-        this._actorSprite.show();
-      } else {
-        this._actorSprite.setup(null, null, this.windowResultFilterWidthArea());
-      }
+    this.contents.clear();
+    if (actor) {
+        const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
+        if (LevelUpActorArea === 'window') {
+        this.setupResultBitmap(actor, data);
+        } else {
+        if (data) {
+            this._actorSprite.setup(actor, data, this.windowResultFilterWidthArea());
+            this._actorSprite.move(this.windowResultFilteX(), this.windowResultFilterHeightArea());
+            this._actorSprite.show();
+        } else {
+            this._actorSprite.setup(null, null, this.windowResultFilterWidthArea());
+        }
+        }
     }
-  }
 };
 
 function Window_ResultActorExp() {
@@ -5873,6 +5877,7 @@ Window_ResultActorExp.prototype.drawActorImg = function(data, actor, x, y, width
   let bitmap = null;
   const actorData = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
   if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+    actor.resetImgId();
     bitmap = actor.getActorGraphicImg();
   } else {
     bitmap = actor.getResultActorImg(actor.actorId());
@@ -6515,12 +6520,12 @@ Window_ResultLevelUpMain.prototype.loadBitmap = function() {
       ImageManager.nuun_LoadPictures(data.LevelUpActorBackGroundImg);
     }
     if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-      bitmap = member.getActorGraphicImg();
+        bitmap = member.getActorGraphicImg();
     } else {
-      bitmap = member.getResultActorImg(member.actorId());
+        bitmap = member.getResultActorImg(member.actorId());
     }
     if (bitmap) {
-      ImageManager.nuun_LoadPictures(bitmap);
+        ImageManager.nuun_LoadPictures(bitmap);
     }
   }
 };
@@ -6535,6 +6540,9 @@ Window_ResultLevelUpMain.prototype.refresh = function() {
   const actor = BattleManager.resultLevelUpActors[BattleManager.resultPage - 1];
   const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
   this.resultBackgroundRefresh(data);
+  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+    actor.resetImgId();
+  }
   if (LevelUpActorArea === 'window') {
     this.setupResultBitmap(actor, data);
   } else {

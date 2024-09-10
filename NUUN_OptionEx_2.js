@@ -14,7 +14,7 @@
  * @base NUUN_OptionEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * Displays a gauge on the volume of the sound settings in the options screen.
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/10/2024 Ver.1.0.4
+ * Implemented touch operation for slider only.
  * 9/7/2024 Ver.1.0.3
  * Fixed so that if the knob is outside the gauge range and the cursor is moved while clicking, it will go to minimum or maximum.
  * Implemented knob display.
@@ -57,6 +59,12 @@
  * @default 24
  * @min 4
  * 
+ * @param TouchAreaSliderZoonOnly
+ * @desc Implement touch zone only on slider part.
+ * @text Touch slider only
+ * @type boolean
+ * @default true
+ * 
  */
 /*:ja
  * @target MZ
@@ -66,7 +74,7 @@
  * @base NUUN_OptionEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * オプション画面のサウンド設定の音量にゲージを表示させます。
@@ -76,6 +84,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/10 Ver.1.0.4
+ * スライダーのみタッチ操作可能を実装。
  * 2024/9/7 Ver.1.0.3
  * つまみがゲージ範囲外にクリックしたままカーソル移動した場合、最小または最大になるように修正。
  * つまみの表示を実装。
@@ -108,6 +118,12 @@
  * @type number
  * @default 24
  * @min 4
+ * 
+ * @param TouchAreaSliderZoonOnly
+ * @desc タッチゾーンをスライダー部分のみ実行します。
+ * @text スライダーのみタッチ
+ * @type boolean
+ * @default true
  * 
  */
 
@@ -258,7 +274,7 @@ Imported.NUUN_OptionEx_2 = true;
             this.changeVolumeSlider(symbol, this.getConfigMaxValue());
             return true;
         }
-        return false;
+        return params.TouchAreaSliderZoonOnly;
     };
 
     Window_Options.prototype.setVolumeSlider = function(symbol, volume) {

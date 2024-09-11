@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @base NUUN_BattlerOverlayBase
- * @version 1.7.5
+ * @version 1.7.6
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -63,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/11 Ver.1.7.6
+ * 特定のスクリプトを記入した場合、スタックエラーが起きる問題を修正。
  * 2023/11/4 Ver.1.7.5
  * <HPGaugeVisible>が機能していなかった問題を修正。
  * 2023/8/3 Ver.1.7.4
@@ -424,14 +426,14 @@ function getEnemyGaugePosition(troop) {
 
 const _Sprite_Actor_update = Sprite_Actor.prototype.update;
 Sprite_Actor.prototype.update = function() {
-  _Sprite_Actor_update.call(this);
-  this.updateHpGauge();
+    _Sprite_Actor_update.call(this);
+    this.updateHpGauge();
 };
 
 const _Sprite_Enemy_update = Sprite_Enemy.prototype.update;
 Sprite_Enemy.prototype.update = function() {
-  _Sprite_Enemy_update.call(this);
-  this.updateHpGauge();
+    _Sprite_Enemy_update.call(this);
+    this.updateHpGauge();
 };
 
 Sprite_Battler.prototype.updateHpGauge = function() {
@@ -636,42 +638,42 @@ Sprite_BattlerHPGauge.prototype.gaugeVisibleResult = function() {
 };
 
 Sprite_BattlerHPGauge.prototype.updateTargetValue = function(value, maxValue) {
-  if (!this._startVisible && !isNaN(this._value) && this.getHPVisible() >= 2) {
-    this._gaugeDuration = 60;
-  } else if (this._startVisible) {
-    this._startVisible = false;
-  }
-  Sprite_Gauge.prototype.updateTargetValue.call(this, value, maxValue);
+    if (!this._startVisible && !isNaN(this._value) && this.getHPVisible() >= 2) {
+        this._gaugeDuration = 60;
+    } else if (this._startVisible) {
+        this._startVisible = false;
+    }
+    Sprite_Gauge.prototype.updateTargetValue.call(this, value, maxValue);
 };
 
 Sprite_BattlerHPGauge.prototype.updateGaugeAnimation = function() {
-  if (this._gaugeDuration > 0) {
-    this._gaugeDuration--;
-  }
-  Sprite_Gauge.prototype.updateGaugeAnimation.call(this);
+    if (this._gaugeDuration > 0) {
+        this._gaugeDuration--;
+    }
+    Sprite_Gauge.prototype.updateGaugeAnimation.call(this);
 };
 
 Sprite_BattlerHPGauge.prototype.gaugeVisibleInDamage = function() {
-  if (this.getHPVisible() >= 2) {
-    return this._gaugeDuration > 0;
-  } else if (this.getHPVisible() === 1) {
-    return false;
-  }
-  return true;
+    if (this.getHPVisible() >= 2) {
+        return this._gaugeDuration > 0;
+    } else if (this.getHPVisible() === 1) {
+        return false;
+    }
+    return true;
 };
 
 Sprite_BattlerHPGauge.prototype.gaugeVisibleInSelect = function() {
-  if (this.getHPVisible() === 1 || this.getHPVisible() === 3) {
-    return this._battler.isSelected();
-  } else if (this.getHPVisible() === 2) {
-    return false;
-  }
-  return true;
+    if (this.getHPVisible() === 1 || this.getHPVisible() === 3) {
+        return this._battler.isSelected();
+    } else if (this.getHPVisible() === 2) {
+        return false;
+    }
+    return true;
 };
 
 
 function Sprite_EnemyHPGauge() {
-  this.initialize(...arguments);
+    this.initialize(...arguments);
 }
 
 Sprite_EnemyHPGauge.prototype = Object.create(Sprite_BattlerHPGauge.prototype);
@@ -684,19 +686,19 @@ Sprite_EnemyHPGauge.prototype.initialize = function() {
 };
 
 Sprite_EnemyHPGauge.prototype.bitmapWidth = function() {
-  return this._enemyGaugeWidth > 0 ? this._enemyGaugeWidth : (GaugeWidth > 0 ? GaugeWidth : 128);
+    return this._enemyGaugeWidth > 0 ? this._enemyGaugeWidth : (GaugeWidth > 0 ? GaugeWidth : 128);
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeHeight = function() {
-  return this._enemyGaugeHeight > 0 ? this._enemyGaugeHeight : (GaugeHeight > 0 ? GaugeHeight : 12);
+    return this._enemyGaugeHeight > 0 ? this._enemyGaugeHeight : (GaugeHeight > 0 ? GaugeHeight : 12);
 };
 
 Sprite_EnemyHPGauge.prototype.labelFontSize = function() {
-  return this._gaugeData ? Sprite_Gauge.prototype.labelFontSize.call(this) : $gameSystem.mainFontSize() + LabelFontSize;
+    return this._gaugeData ? Sprite_Gauge.prototype.labelFontSize.call(this) : $gameSystem.mainFontSize() + LabelFontSize;
 };
 
 Sprite_EnemyHPGauge.prototype.valueFontSize = function() {
-  return this._gaugeData ? Sprite_Gauge.prototype.valueFontSize.call(this) : $gameSystem.mainFontSize() + ValueFontSize;
+    return this._gaugeData ? Sprite_Gauge.prototype.valueFontSize.call(this) : $gameSystem.mainFontSize() + ValueFontSize;
 };
 
 Sprite_EnemyHPGauge.prototype.isHPLabelVisible = function() {
@@ -716,40 +718,40 @@ Sprite_EnemyHPGauge.prototype.isVisibleValue = function() {
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeVisibleResult = function() {
-  if (HPVisibleMode === 1) {
-    const result = this.gaugeVisibleBattler();
-    if (HPEnemyBookVisible === 0) {
-      return result;
+    if (HPVisibleMode === 1) {
+        const result = this.gaugeVisibleBattler();
+        if (HPEnemyBookVisible === 0) {
+        return result;
+        }
+        return result || this.gaugeEnemyBookVisible();
+    } else {
+        return true;
     }
-    return result || this.gaugeEnemyBookVisible();
-  } else {
-    return true;
-  }
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeVisibleBattler = function() {
-  return BattleManager.visibleHpGauge || this._battler._visibleHpGauge;
+  return $gameParty.getHpGaugeVisible() || this._battler._visibleHpGauge;
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeEnemyBookVisible = function() {
-  if (Imported.NUUN_EnemyBook) {
-    if (HPEnemyBookVisible === 1) {
-      return $gameSystem.isInEnemyBook(this._battler.enemy());
-    } else if (HPEnemyBookVisible === 2) {
-      return $gameSystem.isInEnemyBookStatus(this._battler.enemy());
+    if (Imported.NUUN_EnemyBook) {
+        if (HPEnemyBookVisible === 1) {
+        return $gameSystem.isInEnemyBook(this._battler.enemy());
+        } else if (HPEnemyBookVisible === 2) {
+        return $gameSystem.isInEnemyBookStatus(this._battler.enemy());
+        }
     }
-  }
-  return true;
+    return true;
 };
 
 
 const _Spriteset_Battle_updateBattlerOverlay = Spriteset_Battle.prototype.updateBattlerOverlay;
 Spriteset_Battle.prototype.updateBattlerOverlay = function() {
-  _Spriteset_Battle_updateBattlerOverlay.call(this);
-  if ($gameTemp.enemyHPGaugeRefresh) {
-    this.setHPGaugePosition();
-    $gameTemp.enemyHPGaugeRefresh = false;
-  }
+    _Spriteset_Battle_updateBattlerOverlay.call(this);
+    if ($gameTemp.enemyHPGaugeRefresh) {
+        this.setHPGaugePosition();
+        $gameTemp.enemyHPGaugeRefresh = false;
+    }
 };
 
 Spriteset_Battle.prototype.setHPGaugePosition = function() {
@@ -763,16 +765,15 @@ Spriteset_Battle.prototype.setHPGaugePosition = function() {
 };
 
 Game_Actor.prototype.HpGaugeVisibleTrait = function(){
-  return this.traitObjects().some(traitObject => traitObject.meta.HPGaugeVisible);
+    return this.traitObjects().some(traitObject => traitObject.meta.HPGaugeVisible);
 };
 
 Game_Actor.prototype.HpGaugeVisible = function(){
-  this._visibleHpGauge = this.HpGaugeVisibleTrait();
-  BattleManager.hpGaugeVisible();
+    this._visibleHpGauge = this.HpGaugeVisibleTrait();
 };
 
 Game_Actor.prototype.HpGaugeMask = function(){
-  this._HPGaugeMask = false;
+    this._HPGaugeMask = false;
 };
 
 const _Game_Battler_refresh = Game_Battler.prototype.refresh;
@@ -784,53 +785,53 @@ Game_Battler.prototype.refresh = function() {
 
 const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
 Game_Enemy.prototype.initMembers = function() {
-  _Game_Enemy_initMembers.call(this);
-  this._visibleHpGauge = false;
-  this._HPGaugeMask = false;
-  this._battlerHpPositionX = 0;
-  this._battlerHpPositionY = 0;
+    _Game_Enemy_initMembers.call(this);
+    this._visibleHpGauge = false;
+    this._HPGaugeMask = false;
+    this._battlerHpPositionX = 0;
+    this._battlerHpPositionY = 0;
 };
 
 const _Game_Enemy_setup = Game_Enemy.prototype.setup;
 Game_Enemy.prototype.setup = function(enemyId, x, y) {
-  _Game_Enemy_setup.call(this, enemyId, x, y);
-  this._HPGaugeValueVisible = this.enemy().meta.HPGaugeMask ? true : false;
+    _Game_Enemy_setup.call(this, enemyId, x, y);
+    this._HPGaugeValueVisible = this.enemy().meta.HPGaugeMask ? true : false;
 };
 
 Game_Enemy.prototype.HpGaugeVisibleTrait = function(){
-  return this.traitObjects().some(traitObject => traitObject.meta.EnemyHPGaugeVisible);
+    return this.traitObjects().some(traitObject => traitObject.meta.EnemyHPGaugeVisible);
 };
 
 Game_Enemy.prototype.HpGaugeVisible = function(){
-  this._visibleHpGauge = this.HpGaugeVisibleTrait();
+    this._visibleHpGauge = this.HpGaugeVisibleTrait();
 };
 
 Game_Enemy.prototype.HpGaugeMask = function(){
-  if (this._HPGaugeValueVisible) {
-    this._HPGaugeMask = eval(this.enemy().meta.HPGaugeMask);
-  }
+    if (this._HPGaugeValueVisible) {
+        this._HPGaugeMask = eval(this.enemy().meta.HPGaugeMask);
+    }
 };
 
 Game_Enemy.prototype.setHPGaugePosition = function(x, y){
-  this._battlerHpPositionX = x;
-  this._battlerHpPositionY = y;
+    this._battlerHpPositionX = x;
+    this._battlerHpPositionY = y;
 };
 
 Game_Enemy.prototype.getHPGaugePositionX = function(){
-  return this._battlerHpPositionX;
+    return this._battlerHpPositionX;
 };
 
 Game_Enemy.prototype.getHPGaugePositionY = function(){
-  return this._battlerHpPositionY;
+    return this._battlerHpPositionY;
 };
 
 
-BattleManager.hpGaugeVisible = function() {
-  this.visibleHpGauge = $gameParty.battleMembers().some(actor => actor._visibleHpGauge);
+Game_Party.prototype.getHpGaugeVisible = function(){
+    return this.battleMembers().some(actor => actor._visibleHpGauge);
 };
 
 function getSplit(tag) {
-  return tag ? tag.split(',') : null;
+    return tag ? tag.split(',') : null;
 }
 
 })();

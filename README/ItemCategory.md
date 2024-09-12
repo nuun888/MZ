@@ -1,5 +1,5 @@
 # [アイテムカテゴリーカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)
-# Ver.1.5.0
+# Ver.1.5.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemCategory.js)
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -32,6 +32,8 @@
 データベースのアイテムカテゴリーのチェックを外した場合、このプラグインで設定してもチェックを外したカテゴリーは表示はされません。  
 
 ## 更新履歴
+2024/9/12 Ver.1.5.1  
+指定の売却カテゴリーを表示できるプラグインコマンドを追加。  
 2023/10/14 Ver.1.5.0  
 売却時の表示するカテゴリーを設定できる機能を追加。  
 2023/7/16 Ver.1.4.0  

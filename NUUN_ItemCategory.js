@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Item category customization
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -45,9 +45,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 10/14/2022 Ver.1.5.0
+ * 9/12/2024 Ver.1.5.1
+ * Added a plugin command that allows you to display specified sales categories.
+ * 10/14/2023 Ver.1.5.0
  * Added a function that allows you to set the category to be displayed when selling.
- * 7/16/2022 Ver.1.4.0
+ * 7/16/2023 Ver.1.4.0
  * Added ability to hide the number of specific items, weapons, and armor.
  * 11/12/2022 Ver.1.3.2
  * Changed the display in languages other than Japanese to English.
@@ -84,6 +86,20 @@
  * @command ResetCategory
  * @desc Returns the category to be displayed.
  * @text Display category reset
+ * 
+ * @command SaleCategoryCommand
+ * @desc Change the categories displayed for sale.
+ * @text Change display sales category
+ * 
+ * @arg  SaleCategoryList
+ * @text Selling category items
+ * @desc Setting up sale category items.
+ * @default 
+ * @type struct<ItemCategoryList>[]
+ * 
+ * @command ResetSaleCategory
+ * @desc Change back to the original sales category displayed.
+ * @text Display sale category reset
  * 
  * 
  * @param CategoryCols
@@ -147,7 +163,7 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.5.0
+ * @version 1.5.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -182,6 +198,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/12 Ver.1.5.1
+ * 指定の売却カテゴリーを表示できるプラグインコマンドを追加。
  * 2023/10/14 Ver.1.5.0
  * 売却時の表示するカテゴリーを設定できる機能を追加。
  * 2023/7/16 Ver.1.4.0
@@ -221,6 +239,20 @@
  * @command ResetCategory
  * @desc 表示するカテゴリーをもとに戻します。
  * @text 表示カテゴリーリセット
+ * 
+ * @command SaleCategoryCommand
+ * @desc 売却カテゴリーの表示するカテゴリーを変更します。
+ * @text 表示売却カテゴリー変更
+ * 
+ * @arg  SaleCategoryList
+ * @text 売却カテゴリー項目
+ * @desc 売却カテゴリー項目の設定。設定がない場合はカテゴリー項目で設定したカテゴリーが表示されます。
+ * @default 
+ * @type struct<ItemCategoryList>[]
+ * 
+ * @command ResetSaleCategory
+ * @desc 表示する売却カテゴリーをもとに戻します。
+ * @text 表示売却カテゴリーリセット
  * 
  * 
  * @param CategoryCols
@@ -293,26 +325,62 @@ let itemData = null;
 
 const pluginName = "NUUN_ItemCategory";
 PluginManager.registerCommand(pluginName, 'AddCategory', args => {
-  $gameSystem.itemCategory = DataManager.nuun_structureData(args.ItemCategory) || null;
+    $gameSystem.itemCategory = DataManager.nuun_structureData(args.ItemCategory) || null;
 });
 
 PluginManager.registerCommand(pluginName, 'ResetCategory', args => {
-  $gameSystem.itemCategory = null;
+    $gameSystem.itemCategory = null;
 });
 
+PluginManager.registerCommand(pluginName, 'SaleCategoryCommand', args => {
+    const data = DataManager.nuun_structureData(args.SaleCategoryList);
+    NuunManager.setSaleCategory(data);
+});
+
+PluginManager.registerCommand(pluginName, 'ResetSaleCategory', args => {
+    NuunManager.resetSaleCategory();
+});
+
+NuunManager.setSaleCategory = function(data) {
+    this._saleCategory = data;
+};
+
+NuunManager.resetSaleCategory = function() {
+    this._saleCategory = null;
+};
+
+NuunManager.isSaleCategory = function() {
+    return !!this._saleCategory;
+};
+
+NuunManager.getSaleCategory = function() {
+    return this._saleCategory;
+};
 
 const _Scene_Item_categoryWindowRect = Scene_Item.prototype.categoryWindowRect;
 Scene_Item.prototype.categoryWindowRect = function() {
-  const rect = _Scene_Item_categoryWindowRect.call(this);
-  rect.height = this.calcWindowHeight(CategoryRows, true);
-  return rect;
+    const rect = _Scene_Item_categoryWindowRect.call(this);
+    rect.height = this.calcWindowHeight(CategoryRows, true);
+    return rect;
+};
+
+
+Scene_Shop.prototype.createCategoryWindow = function() {
+    const rect = this.categoryWindowRect();console.log(_isSaleCategory())
+    this._categoryWindow = _isSaleCategory() ? new Window_ItemShopCategory(rect) : new Window_ItemCategory(rect);
+    this._categoryWindow.setHelpWindow(this._helpWindow);
+    this._categoryWindow.hide();
+    this._categoryWindow.deactivate();
+    this._categoryWindow.setHandler("ok", this.onCategoryOk.bind(this));
+    this._categoryWindow.setHandler("cancel", this.onCategoryCancel.bind(this));
+    this.addWindow(this._categoryWindow);
 };
 
 const _Scene_Shop_categoryWindowRect = Scene_Shop.prototype.categoryWindowRect;
 Scene_Shop.prototype.categoryWindowRect = function() {
-  const rect = _Scene_Shop_categoryWindowRect.call(this);
-  rect.height = this.calcWindowHeight(CategoryRows, true);
-  return rect;
+    const rect = _Scene_Shop_categoryWindowRect.call(this);
+    rect.height = this.calcWindowHeight(CategoryRows, true);
+    return rect;
 };
 
 Window_Selectable.prototype.getItemCategoryList = function() {
@@ -324,60 +392,60 @@ Window_ItemCategory.prototype.maxCols = function() {
 };
 
 Window_ItemCategory.prototype.makeCommandList = function() {
-  const list = this.getItemCategoryList();
-    if(!list) {
-    return;
-  }
-  list.forEach(names => {
-    if(this.needsCommand(names.Categorykey) && names.Categorykey === 'item') {
-      this.addCommand(TextManager.item, names.Categorykey);
-    } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'weapon') {
-      this.addCommand(TextManager.weapon, names.Categorykey);
-    } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'armor') {
-      this.addCommand(TextManager.armor, names.Categorykey);
-    } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'keyItem') {
-      this.addCommand(TextManager.keyItem, names.Categorykey);
-    } else if (this.needsCommand(names.Categorykey) && names.Categorykey === 'allItems') {
-      this.addCommand(names.CategoryName, names.Categorykey);
-    } else if(this.needsCommand(names.Categorykey) && names.CategoryName) { 
-      this.addCommand(names.CategoryName, names.Categorykey);
+    const list = this.getItemCategoryList();
+        if(!list) {
+        return;
     }
-  });
+    list.forEach(names => {
+        if(this.needsCommand(names.Categorykey) && names.Categorykey === 'item') {
+        this.addCommand(TextManager.item, names.Categorykey);
+        } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'weapon') {
+        this.addCommand(TextManager.weapon, names.Categorykey);
+        } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'armor') {
+        this.addCommand(TextManager.armor, names.Categorykey);
+        } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'keyItem') {
+        this.addCommand(TextManager.keyItem, names.Categorykey);
+        } else if (this.needsCommand(names.Categorykey) && names.Categorykey === 'allItems') {
+        this.addCommand(names.CategoryName, names.Categorykey);
+        } else if(this.needsCommand(names.Categorykey) && names.CategoryName) { 
+        this.addCommand(names.CategoryName, names.Categorykey);
+        }
+    });
 };
 
 const _Window_ItemList_includes = Window_ItemList.prototype.includes;
 Window_ItemList.prototype.includes = function(item) {
-  if (this.isConstructor()) {
-    return _Window_ItemList_includes.call(this, item);
-  }
-  if(this._category === 'allItems' && !this.secretItem(item) && item) {
-    return true;
-  } else if (this._category === 'allItem' && DataManager.isItem(item) && (item.itypeId === 1 || item.itypeId === 2)) {
-    return true;
-  }
-  const type = item ? item.meta.CategoryType : null;
-  const category = _Window_ItemList_includes.call(this, item);
-  if(category && !type) {
-    return category;
-  }
-  if (this._category === type) {
-    return true;
-  }
-  return false;
+    if (this.isConstructor()) {
+        return _Window_ItemList_includes.call(this, item);
+    }
+    if(this._category === 'allItems' && !this.secretItem(item) && item) {
+        return true;
+    } else if (this._category === 'allItem' && DataManager.isItem(item) && (item.itypeId === 1 || item.itypeId === 2)) {
+        return true;
+    }
+    const type = item ? item.meta.CategoryType : null;
+    const category = _Window_ItemList_includes.call(this, item);
+    if(category && !type) {
+        return category;
+    }
+    if (this._category === type) {
+        return true;
+    }
+    return false;
 };
 
 Window_ItemList.prototype.secretItem = function(item) {
-  if(DataManager.isItem(item) && item.itypeId > 2) {
-    return true;
-  }
-  return false;
+    if(DataManager.isItem(item) && item.itypeId > 2) {
+        return true;
+    }
+    return false;
 };
 
 const _Window_ItemList_drawItemNumber = Window_ItemList.prototype.drawItemNumber;
 Window_ItemList.prototype.drawItemNumber = function(item, x, y, width) {
-  if (this.allItemsNeedsNumber(item)) {
-    _Window_ItemList_drawItemNumber.call(this, item, x, y, width);
-  }
+    if (this.allItemsNeedsNumber(item)) {
+        _Window_ItemList_drawItemNumber.call(this, item, x, y, width);
+    }
 };
 
 const _Window_ItemList_drawItem = Window_ItemList.prototype.drawItem;
@@ -400,63 +468,55 @@ Window_ItemList.prototype.needsNumber = function() {
 };
 
 Window_ItemList.prototype.allItemsNeedsNumber = function(item) {
-  if (this._category === "allItems") {
-    if (item.itypeId === 2) {
-      return $dataSystem.optKeyItemsNumber;
-    } else if (item.meta.CategoryType) {
-      const list = this.getItemCategoryList();
-      const find = list.find(date => date.Categorykey === item.meta.CategoryType);
-      if (find && find.NumShow !== undefined) {
-        return find.NumShow;
-      }
-      return true;
-    } 
-  }
-  return true;
+    if (this._category === "allItems") {
+        if (item.itypeId === 2) {
+        return $dataSystem.optKeyItemsNumber;
+        } else if (item.meta.CategoryType) {
+        const list = this.getItemCategoryList();
+        const find = list.find(date => date.Categorykey === item.meta.CategoryType);
+        if (find && find.NumShow !== undefined) {
+            return find.NumShow;
+        }
+        return true;
+        } 
+    }
+    return true;
 };
 
 const _Window_ItemList_setCategory = Window_ItemList.prototype.setCategory;
 Window_ItemList.prototype.setCategory = function(category) {
-  if (this._category !== category) {
-    this._needsCategory = true;
-    const list = this.getItemCategoryList();
-    if (list) {
-      const find = list.find(date => date.Categorykey === category);
-      if (find) {
-        this._needsCategory = (find.NumShow === undefined ? true : find.NumShow);
-      }
+    if (this._category !== category) {
+        this._needsCategory = true;
+        const list = this.getItemCategoryList();
+        if (list) {
+            const find = list.find(date => date.Categorykey === category);
+            if (find) {
+                this._needsCategory = (find.NumShow === undefined ? true : find.NumShow);
+            }
+        }
     }
-  }
-  _Window_ItemList_setCategory.call(this, category)
+    _Window_ItemList_setCategory.call(this, category);
 };
 
-if (SaleCategory && SaleCategory.length > 0) {
-    Scene_Shop.prototype.createCategoryWindow = function() {
-        const rect = this.categoryWindowRect();
-        this._categoryWindow = new Window_ItemShopCategory(rect);
-        this._categoryWindow.setHelpWindow(this._helpWindow);
-        this._categoryWindow.hide();
-        this._categoryWindow.deactivate();
-        this._categoryWindow.setHandler("ok", this.onCategoryOk.bind(this));
-        this._categoryWindow.setHandler("cancel", this.onCategoryCancel.bind(this));
-        this.addWindow(this._categoryWindow);
-    };
 
-    function Window_ItemShopCategory() {
-        this.initialize(...arguments);
-    }
-    
-    Window_ItemShopCategory.prototype = Object.create(Window_ItemCategory.prototype);
-    Window_ItemShopCategory.prototype.constructor = Window_ItemShopCategory;
-    
-    Window_ItemShopCategory.prototype.initialize = function(rect) {
-        Window_ItemCategory.prototype.initialize.call(this, rect);
-    };
-
-    Window_ItemShopCategory.prototype.getItemCategoryList = function() {
-        return SaleCategory;
-    };
-
+function Window_ItemShopCategory() {
+    this.initialize(...arguments);
 }
+
+Window_ItemShopCategory.prototype = Object.create(Window_ItemCategory.prototype);
+Window_ItemShopCategory.prototype.constructor = Window_ItemShopCategory;
+
+Window_ItemShopCategory.prototype.initialize = function(rect) {
+    Window_ItemCategory.prototype.initialize.call(this, rect);
+};
+
+Window_ItemShopCategory.prototype.getItemCategoryList = function() {
+    return NuunManager.isSaleCategory() ? NuunManager.getSaleCategory() : SaleCategory;
+};
+
+
+function _isSaleCategory() {
+    return NuunManager.isSaleCategory() || SaleCategory && SaleCategory.length > 0;
+};
 
 })();

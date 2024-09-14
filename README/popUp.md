@@ -1,5 +1,5 @@
 # [ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
-# Ver.2.0.5
+# Ver.2.0.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -60,6 +60,8 @@ Ver.2.0.0でプラグインパラメータの見直しを行いました関係�
 各ポップアップ毎にポップアップの種類を変えたい場合は、各ポップアッププラグインの適用クラスから'Sprite_PopUpEX'を外してください。  
 
 ## 更新履歴
+2024/9/14 Ver 2.0.6  
+解除時のバフ、デバフのポップアップが表示されない問題を修正。  
 2023/7/13 Ver 2.0.5  
 盗みスキル、アイテムでのポップアップでエラーが出る問題を修正。  
 2023/5/22 Ver 2.0.4  

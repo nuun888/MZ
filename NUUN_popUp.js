@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Pop up
  * @author NUUN
- * @version 2.0.5
+ * @version 2.0.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -68,6 +68,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/14/2024 Ver 2.0.6
+ * Fixed an issue where the popup for buffs and debuffs would not appear when removed.
  * 7/13/2023 Ver 2.0.5
  * Fixed an issue where an error popped up in "NUUN_StealableItems".
  * 5/22/2023 Ver 2.0.4
@@ -425,7 +427,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 2.0.5
+ * @version 2.0.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -483,6 +485,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/14 Ver 2.0.6
+ * 解除時のバフ、デバフのポップアップが表示されない問題を修正。
  * 2023/7/13 Ver 2.0.5
  * 盗みスキル、アイテムでのポップアップでエラーが出る問題を修正。
  * 2023/5/22 Ver 2.0.4
@@ -1111,7 +1115,7 @@ class PopUpData {
         const find = AppliBuffPopUp.find(buff => buff.StateType === id);
         if (find) {
           const data = mode ? PopUpDebuff : PopUpBuff;
-          if (data && (find.StatePopUpMode === 0 || find.StatePopUpMode === 2)) {
+          if (data && (find.BuffPopUpMode === 0 || find.BuffPopUpMode === 2)) {
             const paramId = id < 10 ? id : id - 10;
             const color = this.setupBuffPopUpColor(id, find, data);
             const name = find.PopUpName ? find.PopUpName : TextManager.param(paramId);

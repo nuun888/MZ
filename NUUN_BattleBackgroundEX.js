@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Battle background change
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -39,6 +39,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/17/2024 Ver.1.2.2
+ * Fixed an issue where battle backgrounds were not being applied for regions and tags.
  * 7/22/2023 Ver.1.2.1
  * Added a function to synchronize the Y coordinate of the background and the Y coordinate of the monster.
  * 12/11/2022 Ver.1.2.0
@@ -313,7 +315,7 @@
  * @target MZ
  * @plugindesc  戦闘背景変更プラグイン
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -342,6 +344,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/17 Ver.1.2.2
+ * リージョン、タグでのバトル背景が適用されていなかった問題を修正。
  * 2023/7/22 Ver.1.2.1
  * 背景Y座標とモンスターのY座標を同期させる機能を追加。
  * 2022/12/11 Ver.1.2.0
@@ -686,12 +690,11 @@ Game_Troop.prototype.battleBackSetup = function() {
     const regionBattleback = $gameMap.regionBattleBackSetup(x, y);
     const mapTagBattleback = $gameMap.mapTagBattleBackSetup(x, y);
     if (regionBattleback) {
-      battleback1 = getBattlebacks1(regionBattleback.Battlebackground);
-      battleback2 = getBattlebacks2(regionBattleback.Battlebackground);
+      battleback1 = getBattlebacks1(regionBattleback);
+      battleback2 = getBattlebacks2(regionBattleback);
     } else if (mapTagBattleback) {
-      battleback1 = getBattlebacks1(mapTagBattleback.Battlebackground);
-      battleback2 = getBattlebacks2(mapTagBattleback.Battlebackground);
-      
+      battleback1 = getBattlebacks1(mapTagBattleback);
+      battleback2 = getBattlebacks2(mapTagBattleback);
     }
     battleback1Name = battleback1 ? battleback1 : battleback1Name;
     battleback2Name = battleback2 ? battleback2 : battleback2Name;
@@ -751,11 +754,14 @@ Game_Map.prototype.regionBattleBack = function() {
 	while(true) {
     let match = reRegion.exec($dataMap.note);
 		if (match) {
-      let data = match[1].split(',').map(Number);
-      if(data[0] > 0 && data[1] > 0) {
-        const back = BattleBackground[Number(data[1]) - 1];
-        list.push({battlebacks1:back.battlebacks1, battlebacks2:back.battlebacks2, regionId:data[0]});
-      }
+        let data = match[1].split(',').map(Number);
+        if(data[0] > 0 && data[1] > 0) {
+            const back = BattleBackground[Number(data[1]) - 1];
+            if (back.Battlebackground) {
+                const battlebackground = back.Battlebackground;
+                list.push({Battlebacks1:battlebackground.Battlebacks1, Battlebacks2:battlebackground.Battlebacks2, regionId:data[0]});
+            }
+        }
     } else {
       return list;
     }
@@ -771,7 +777,10 @@ Game_Map.prototype.mapTagBattleBack = function() {
       let data = match[1].split(',').map(Number);
       if(data[0] > 0 && data[1] > 0) {
         const back = BattleBackground[Number(data[1]) - 1];
-        list.push({battlebacks1:back.battlebacks1, battlebacks2:back.battlebacks2, tagId:data[0]});
+        if (back.Battlebackground) {
+            const battlebackground = back.Battlebackground;
+            list.push({Battlebacks1:battlebackground.Battlebacks1, Battlebacks2:battlebackground.Battlebacks2, regionId:data[0]});
+        }
       }
     } else {
       return list;

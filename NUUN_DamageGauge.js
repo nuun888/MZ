@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Damage amount gauge visualization
  * @author NUUN
- * @version 1.0.3
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/17/2024 Ver.1.1.0
+ * Fixed so that the recovery visualization gauge can also be applied.
  * 5/24/2024 Ver.1.0.3
  * Corrected processing by updating "NUUN_GaugeValueEX".
  * 4/16/2023 Ver.1.0.2
@@ -108,12 +110,28 @@
  * @min 0
  * @parent DamageGaugeSetting
  * 
+ * @param RecoveryColor1
+ * @desc Gauge color when recovering (left) (System Color or Color Index (Text tab))
+ * @text Recovery gauge color left
+ * @type color
+ * @default 3
+ * @min 0
+ * @parent DamageGaugeSetting
+ * 
+ * @param RecoveryColor2
+ * @desc Gauge color when recovering (right) (System Color or Color Index (Text tab))
+ * @text Recovery gauge color right
+ * @type color
+ * @default 3
+ * @min 0
+ * @parent DamageGaugeSetting
+ * 
  */
 /*:ja
  * @target MZ
  * @plugindesc ダメージ量ゲージ可視化
  * @author NUUN
- * @version 1.0.3
+ * @version 1.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -125,10 +143,14 @@
  * フィルタリングクラス設定
  * 適用させるウィンドウクラスまたはゲージクラスまたは識別名、識別子を記入します。
  * 
+ * メニュー時の表示は別途NUUN_GaugeValueAnimationが必要になります。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/17 Ver.1.1.0
+ * 回復時の可視化ゲージも適用できるように修正。
  * 2024/5/24 Ver.1.0.3
  * ゲージ表示拡張プラグイン更新による処理の修正。
  * 2023/4/16 Ver.1.0.2
@@ -196,18 +218,34 @@
  * @parent DamageGaugeSetting
  * 
  * @param DamageColor1
- * @desc ゲージの色左(システムカラーまたはカラーインデックス(テキストタブ))
- * @text ゲージ色左
+ * @desc ダメージ時のゲージの色左(システムカラーまたはカラーインデックス(テキストタブ))
+ * @text ダメージ時ゲージ色左
  * @type color
  * @default 18
  * @min 0
  * @parent DamageGaugeSetting
  * 
  * @param DamageColor2
- * @desc ゲージの色右(システムカラーまたはカラーインデックス(テキストタブ))
- * @text ゲージ色右
+ * @desc ダメージ時のゲージの色右(システムカラーまたはカラーインデックス(テキストタブ))
+ * @text ダメージ時ゲージ色右
  * @type color
  * @default 18
+ * @min 0
+ * @parent DamageGaugeSetting
+ * 
+ * @param RecoveryColor1
+ * @desc 回復時のゲージの色左(システムカラーまたはカラーインデックス(テキストタブ))
+ * @text 回復時ゲージ色左
+ * @type color
+ * @default 3
+ * @min 0
+ * @parent DamageGaugeSetting
+ * 
+ * @param RecoveryColor2
+ * @desc 回復時のゲージの色右(システムカラーまたはカラーインデックス(テキストタブ))
+ * @text 回復時ゲージ色右
+ * @type color
+ * @default 3
  * @min 0
  * @parent DamageGaugeSetting
  * 
@@ -221,6 +259,7 @@ Imported.NUUN_DamageGauge = true;
     const DamageGaugeSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DamageGaugeSetting'])) : null) || [];
     const LLparameters = PluginManager._parameters['LL_ExGaugeDrawing'];
     const LLSolidGradation = LLparameters ? eval(LLparameters["solidGradation"] || "true") : null;
+    const _damageGaugeParams = new Nuun_TempParam();
 
     const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
     Sprite_Gauge.prototype.initMembers = function() {
@@ -230,20 +269,21 @@ Imported.NUUN_DamageGauge = true;
         this._damageValueWait = 0;
         this._damageDuration = 0;
         this._drawGaugeMode = 0;
+        this._omDamage = "normal";
     };
 
     const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
     Sprite_Gauge.prototype.setup = function(battler, statusType) {
         this.initGaugeDamageData(statusType);
         _Sprite_Gauge_setup.call(this, battler, statusType);
-        this._damageValue = this.currentValue();
+        this._damageValue = $gameParty.inBattle() || isNaN(this._targetValue) ? this.currentValue() : this._targetValue;
     };
 
     Sprite_Gauge.prototype.initGaugeDamageData = function(statusType) {
         this._gaugeDamageData = this.getFindGaugeDamageData(statusType);
     };
 
-    Sprite_Gauge.prototype.filteringGaugeDamageDataClass = function(data) {
+    Sprite_Gauge.prototype.filteringGaugeDamageDataClass = function(data) {       
         const className = this.className ? this.className : NuunManager.isFilterClass(this);
         if (data.FilteringClass && data.FilteringClass.length > 0) {
             return data.FilteringClass.some(filterClass => filterClass === className);
@@ -258,19 +298,44 @@ Imported.NUUN_DamageGauge = true;
 
     const _Sprite_Gauge_updateBitmap = Sprite_Gauge.prototype.updateBitmap;
     Sprite_Gauge.prototype.updateBitmap = function() {
+        this.updateDamageGaugeValue();
+        _Sprite_Gauge_updateBitmap.call(this);
+    };
+
+    Sprite_Gauge.prototype.updateDamageGaugeValue = function() {
         const value = this.currentValue();
         if (value !== this._targetValue) {
             this.updateDamageValue(value);
         }
-        _Sprite_Gauge_updateBitmap.call(this);
     };
 
     const _Sprite_Gauge_updateTargetValue = Sprite_Gauge.prototype.updateTargetValue;
     Sprite_Gauge.prototype.updateTargetValue = function(value, maxValue) {
         if (!isNaN(this._value) && this.gaugeDamageVisualization()) {
-        this._damageValueWait = this.getDamageValueWait();
+            this._damageValueWait = this.getDamageValueWait();
+            this._omDamage = this.battleDamageMode(value);
         }
         _Sprite_Gauge_updateTargetValue.call(this, value, maxValue);
+    };
+
+    Sprite_Gauge.prototype.battleDamageMode = function(value) {
+        if (this._damageValue === value) {
+            return "normal";
+        } else if (this._damageValue > value) {
+            return "damage";
+        } else {
+            return "recovery";
+        }
+    };
+
+    Sprite_Gauge.prototype.damageMode = function(value) {
+        if (this._damageValue === value) {
+            return "normal";
+        } else if (this._damageValue < value) {
+            return "damage";
+        } else {
+            return "recovery";
+        }
     };
 
     Sprite_Gauge.prototype.updateDamageValue = function(value) {
@@ -299,23 +364,43 @@ Imported.NUUN_DamageGauge = true;
 
     const _Sprite_Gauge_updateGaugeAnimation = Sprite_Gauge.prototype.updateGaugeAnimation;
     Sprite_Gauge.prototype.updateGaugeAnimation = function() {
-        _Sprite_Gauge_updateGaugeAnimation.call(this);
         if (this._damageValueWait > 0) {
             this._damageValueWait--;
-        } else if (this._damageDuration > 0) {
+        }
+        if ((this._omDamage === "recovery" && this._damageValueWait === 0) || this._omDamage !== "recovery") {
+            _Sprite_Gauge_updateGaugeAnimation.call(this);
+        }
+        if (this._damageDuration > 0 && ((this._omDamage === "damage" && this._damageValueWait === 0) || this._omDamage === "recovery")) {
             const d = this._damageDuration;
             this._damageValue = (this._damageValue * (d - 1) + this._targetValue) / d;
             this._damageDuration--;
             this.redraw();
         }
+        if (this._damageDuration === 0 && this._duration === 0) {
+            this._omDamage = "normal";
+        }
     };
 
     Sprite_Gauge.prototype.gaugeDamageColor1 = function() {
-        return NuunManager.getColorCode(this._gaugeDamageData.DamageColor1);
+        switch (this._omDamage) {
+            case "damage":
+                return NuunManager.getColorCode(this._gaugeDamageData.DamageColor1);
+            case "recovery":
+                return NuunManager.getColorCode(this._gaugeDamageData.RecoveryColor1);
+            default:
+                return NuunManager.getColorCode(this._gaugeDamageData.DamageColor1);
+        }
     };
     
     Sprite_Gauge.prototype.gaugeDamageColor2 = function() {
-        return NuunManager.getColorCode(this._gaugeDamageData.DamageColor2);
+        switch (this._omDamage) {
+            case "damage":
+                return NuunManager.getColorCode(this._gaugeDamageData.DamageColor2);
+            case "recovery":
+                return NuunManager.getColorCode(this._gaugeDamageData.RecoveryColor2);
+            default:
+                return NuunManager.getColorCode(this._gaugeDamageData.DamageColor2);
+        }
     };
 
     const _Sprite_Gauge_gaugeRate = Sprite_Gauge.prototype.gaugeRate;

@@ -13,13 +13,15 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.2
  * 
  * @help
  * Make the target gauge into a circle shape.
  * 
  * Log
- * 5/26/2024 Ver.1.0.0
+ * 9/17/2024 Ver.1.0.2
+ * Applying NUUN_DamageGauge.
+ * 5/26/2024 Ver.1.0.1
  * first edition
  * 
  * @param CircularGaugeSetting
@@ -41,12 +43,14 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 対象のゲージをサークル型にします。
  * 
  * 更新履歴
+ * 2024/9/17 Ver.1.0.1
+ * NUUN_DamageGaugeの適用。
  * 2024/5/26 Ver.1.0.0
  * 初版
  * 
@@ -342,6 +346,7 @@ Imported.NUUN_CircularGauge = true;
         this._sweepAngle = this.sweepAngle();
         this._startTPAngle = this.startTPAngle();
         this._sweepTPAngle = this.sweepTPAngle();
+        this._pattern = [];
         this.circularSprite = [];
         preloadGaugeImg();
     };
@@ -358,12 +363,32 @@ Imported.NUUN_CircularGauge = true;
     Sprite_Gauge.prototype.createCircularGaugeImg = function() {
         if (this._circularData.GaugeBackImg && this._circularData.GaugeImg) {
             this._circularBitmap = ImageManager.nuun_LoadPictures(this._circularData.GaugeImg);
+            if (Imported.NUUN_DamageGauge && this.isDamageCircularGaugeImg()) {
+                this.createCircularDamageGaugeImg();
+            }
             const sprite = new Sprite();
             this.circularSprite[1] = sprite;
             this.addChild(sprite);
-            this.createCircularSpriteBitmap(this.circularSprite[0].bitmap);
-            this.setCreatePattern(this._circularBitmap);
+            this.createCircularSpriteBitmap(1, this.circularSprite[0].bitmap);
+            this.setCreatePattern(1, 1, this._circularBitmap);
         }
+    };
+
+    Sprite_Gauge.prototype.createCircularDamageGaugeImg = function() {
+        const imgName = this._circularData.GaugeImg;
+        const dagameGauge = imgName +"_damage";
+        const recoveryGauge = imgName +"_recovery";
+        this._circularDagameBitmap = ImageManager.nuun_LoadPictures(dagameGauge);
+        this._circularRecoveryBitmap = ImageManager.nuun_LoadPictures(recoveryGauge);
+        this.circularSprite[5] = new Sprite();
+        this.addChild(this.circularSprite[5]);
+        this.createCircularSpriteBitmap(5, this.circularSprite[0].bitmap);
+        this.setCreatePattern(5, 4, this._circularRecoveryBitmap);
+        this.setCreatePattern(5, 5, this._circularDagameBitmap);
+    };
+
+    Sprite_Gauge.prototype.isDamageCircularGaugeImg = function() {
+        return !!this.getFindGaugeDamageData(this._circularData.Type);
     };
 
     Sprite_Gauge.prototype.createCircularLabelImg = function() {
@@ -407,15 +432,15 @@ Imported.NUUN_CircularGauge = true;
         this.bitmap = this.textSprite.bitmap;
     };
 
-    Sprite_Gauge.prototype.setCreatePattern = function(bitmap) {
-        const context = this.circularSprite[1].bitmap.context;
-        this._pattern = context.createPattern(bitmap._image, "no-repeat");
+    Sprite_Gauge.prototype.setCreatePattern = function(id, patternId, bitmap) {
+        const context = this.circularSprite[id].bitmap.context;
+        this._pattern[patternId] = context.createPattern(bitmap._image, "no-repeat");
     };
       
-    Sprite_Gauge.prototype.createCircularSpriteBitmap = function(bitmap) {
+    Sprite_Gauge.prototype.createCircularSpriteBitmap = function(id, bitmap) {
         const width = bitmap.width;
         const height = bitmap.height;
-        this.circularSprite[1].bitmap = new Bitmap(width, height);
+        this.circularSprite[id].bitmap = new Bitmap(width, height);
     };
 
     Sprite_Gauge.prototype.circularBitmapWidth = function() {
@@ -532,6 +557,9 @@ Imported.NUUN_CircularGauge = true;
             const gaugeY = this.radius() + this.gaugeHeight();
             const gaugeHeight = this.gaugeHeight() - 2;
             this.drawCircularGaugeBackEx(gaugeX, gaugeY, gaugeHeight);
+            if (Imported.NUUN_DamageGauge && this.gaugeDamageVisualization()) {
+                this.drawCircularGaugeDamageEx(gaugeX, gaugeY, gaugeHeight);
+            }
             this.drawCircularGaugeMainEx(gaugeX, gaugeY, gaugeHeight);
         }
     };
@@ -545,6 +573,13 @@ Imported.NUUN_CircularGauge = true;
         } else {
             this.arcGaugeBackRect(x, y, this.gaugeHeight(), color0);
         }
+    };
+
+    Sprite_Gauge.prototype.drawCircularGaugeDamageEx = function(x, y, height) {
+        dcolor1 = this.gaugeDamageColor1();
+        this._drawGaugeMode = 1;
+        this.arcGaugeRect(x, y, height, dcolor1, false);
+        this._drawGaugeMode = 0;
     };
 
     Sprite_Gauge.prototype.drawCircularGaugeMainEx = function(x, y, height) {
@@ -576,22 +611,64 @@ Imported.NUUN_CircularGauge = true;
     };
 
     Sprite_Gauge.prototype.arcGaugeImgRect = function(option) {
-        const bitmap = this.circularSprite[1].bitmap;
+        if (this._drawGaugeMode === 0 && Imported.NUUN_DamageGauge && this.gaugeDamageVisualization()) {
+            this.arcDamageGaugeImgRect(option);
+        }
+        const bitmap = this.getCircularGaugeBitmap();
+        const bitmap2 = this.getCircularGaugeImg();
         bitmap.clear();
-        const x = this._circularBitmap.width / 2;
-        const y = this._circularBitmap.height / 2;
+        const x = bitmap2.width / 2;
+        const y = bitmap2.height / 2;
         const context = bitmap.context;
         context.save();
         context.beginPath();
-        context.lineWidth = this._circularBitmap.width / 2;
-        context.strokeStyle = this._pattern;
+        context.lineWidth = bitmap2.width / 2;
+        context.strokeStyle = this.getCircularGaugeImgPattern();
         const rate = (this._sweepTPAngle - this._startTPAngle) * this.gaugeRate() + this._startTPAngle;
         context.arc(x, y, this.radius(), this._startTPAngle, rate, option);
         context.stroke();
         bitmap._baseTexture.update();
     };
 
+    Sprite_Gauge.prototype.arcDamageGaugeImgRect = function(option) {
+        this._drawGaugeMode = 1;
+        this.arcGaugeImgRect(option);
+        this._drawGaugeMode = 0;
+    };
+
+    Sprite_Gauge.prototype.getCircularGaugeBitmap = function() {
+        if (this._drawGaugeMode === 0) {
+            return this.circularSprite[1].bitmap;
+        } else if (this._drawGaugeMode === 1 && this.circularSprite[5]) {
+            return this.circularSprite[5].bitmap;
+        }
+        return this.circularSprite[1].bitmap;
+    };
+
+    Sprite_Gauge.prototype.getCircularGaugeImgPattern = function() {
+        if (this._drawGaugeMode === 0) {
+            return this._pattern[1];
+        } else if (this._omDamage === "damage") {
+            return this._pattern[5];
+        } else if (this._omDamage === "recovery") {
+            return this._pattern[4];
+        }
+        return this._pattern[1];
+    };
+
+    Sprite_Gauge.prototype.getCircularGaugeImg = function() {
+        if (this._drawGaugeMode === 0) {
+            return this._circularBitmap;
+        } else if (this._circularDagameBitmap && this._omDamage === "damage") {
+            return this._circularDagameBitmap;
+        } else if (this._circularRecoveryBitmap && this._omDamage === "recovery") {
+            return this._circularRecoveryBitmap;
+        }
+        return this._circularBitmap;
+    };
+
     Sprite_Gauge.prototype.setCircularData = function() {
+        this.className = _circularParams.getData();//外部プラグインのフィルタリングが行えないのでここで追加。
         this._statusType = _circularParams.getType();
         this._circularData = _circularParams.getExParams();
         _circularParams.clear();
@@ -650,6 +727,9 @@ Imported.NUUN_CircularGauge = true;
             const gaugeY = this.radius() + this.gaugeHeight();
             const gaugeHeight = this.gaugeHeight() - 2;
             this.drawCircularGaugeBackEx(gaugeX, gaugeY, gaugeHeight);
+            if (Imported.NUUN_DamageGauge && this.gaugeDamageVisualization()) {
+                this.drawCircularGaugeDamageEx(gaugeX, gaugeY, gaugeHeight);
+            }
             this.drawCircularGaugeMainEx(gaugeX, gaugeY, gaugeHeight);
         }
     };
@@ -684,7 +764,7 @@ Imported.NUUN_CircularGauge = true;
     };
 
     Window_StatusBase.prototype.placeCircularGauge = function(data, actor, type, x, y, fmt) {
-        setTempType(type, data);
+        setTempType(NuunManager.isFilterClass(this), type, data);
         const key = fmt ? fmt.format(actor.actorId(), type) : "actor%1-gauge-%2".format(actor.actorId(), type);
         const sprite = this.createInnerSprite(key, Sprite_CircularGauge);
         sprite.setup(actor, type);
@@ -694,7 +774,7 @@ Imported.NUUN_CircularGauge = true;
     };
 
     Window_StatusBase.prototype.setCircularTempData = function(type, data) {
-        _circularParams.setGaugeData(null, type, data);
+        _circularParams.setGaugeData(NuunManager.isFilterClass(this), type, data);
     };
 
     Window_StatusBase.prototype.clearCircularTempData = function() {
@@ -715,8 +795,8 @@ Imported.NUUN_CircularGauge = true;
         };
     }
 
-    function setTempType(type, data) {
-        _circularParams.setGaugeData(null, type, data);
+    function setTempType(_class, type, data) {
+        _circularParams.setGaugeData(_class, type, data);
     };
 
     function filteringDataClass(data, className) {
@@ -732,6 +812,12 @@ Imported.NUUN_CircularGauge = true;
             ImageManager.nuun_LoadPictures(data.GaugeBackImg);
             ImageManager.nuun_LoadPictures(data.GaugeImg);
             ImageManager.nuun_LoadPictures(data.LabelImg);
+            if (Imported.NUUN_DamageGauge && data.GaugeImg) {
+                const dagameGauge = data.GaugeImg +"_damage";
+                const recoveryGauge = data.GaugeImg +"_recovery";
+                ImageManager.nuun_LoadPictures(dagameGauge);
+                ImageManager.nuun_LoadPictures(recoveryGauge);
+            }
         });
     };
 

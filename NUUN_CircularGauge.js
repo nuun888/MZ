@@ -13,15 +13,15 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.1
  * 
  * @help
  * Make the target gauge into a circle shape.
  * 
  * Log
- * 9/17/2024 Ver.1.0.2
+ * 9/17/2024 Ver.1.0.1
  * Applying NUUN_DamageGauge.
- * 5/26/2024 Ver.1.0.1
+ * 5/26/2024 Ver.1.0.0
  * first edition
  * 
  * @param CircularGaugeSetting

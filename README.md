@@ -296,7 +296,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [戦闘背景の変更](https://github.com/nuun888/MZ/blob/master/README/BattleBackgroundEX.md) | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) | 共 | 1.2.0 |
 | [データベース上限突破](https://github.com/nuun888/MZ/blob/master/README/SystemDatabaseUnlimited.md) | [NUUN_SystemDatabaseUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js) | 共 | 1.0.1 |
 | [追加アニメーション表示](https://github.com/nuun888/MZ/blob/master/README/AddAnimation.md) | [NUUN_AddAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddAnimation.js) |  | 1.0.0 |
-| [会心力](https://github.com/nuun888/MZ/blob/master/README/CriticalPower.md) | [NUUN_AddAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CriticalPower.js) | 共 | 1.0.0 |
+| [会心力](https://github.com/nuun888/MZ/blob/master/README/CriticalPower.md) | [NUUN_CriticalPower](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CriticalPower.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

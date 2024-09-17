@@ -18,6 +18,17 @@
 ゲージ半径、ゲージ縦幅は画像のサイズで計算されます。  
 画像はゲージ背景画像、ゲージ画像両方設定してください。  
 
+## NUUN_DamageGaugeで差分ゲージ表示
+当プラグインとNUUN_DamageGaugeで該当のゲージを設定してください。   
+ダメージ、リカバリーゲージの色はNUUN_DamageGaugeで設定します。  
+サークルゲージで画像指定の場合は、画像指定しているファイルの名前を  
+ダメージ:[通常サークルゲージ]_damage  
+リカバリー:[通常サークルゲージ]_recovery  
+例  
+通常ゲージ:Gauge_hp  
+ダメージ:Gauge_hp_damage  
+リカバリー:Gauge_hp_recovery  
+
 ## 更新履歴
 2024/9/17 Ver.1.0.1  
 NUUN_DamageGaugeの適用。  

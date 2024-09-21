@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Implement Fast Travel.
@@ -46,6 +46,10 @@
  * 
  * 
  * Log
+ * 9/21/2024 Ver.1.0.2
+ * Fixed an issue where the help window and fast travel window would not become transparent.
+ * Fixed the initial cursor index to be the index of the closest event from the destination coordinates.
+ * Added a function to set the initial cursor index to a specified index.
  * 8/18/2024 Ver.1.0.1
  * Added the ability to specify the direction of the destination.
  * Fixed to prevent scrolling to places that cannot be selected.
@@ -75,6 +79,17 @@
  * @type number
  * @default 0
  * @desc Specifies the Y coordinate of the destination.
+ * 
+ * @command FastTravelSelectIndex
+ * @desc Specifies the initial cursor index for the fast label. It is initialized after the move.
+ * @text Fast Label Initial Cursor Index
+ * 
+ * @arg FastTravelListId
+ * @text Cursor Index
+ * @type number
+ * @default -1
+ * @min -1
+ * @desc Enter the cursor index.
  * 
  * 
  * @param FastTravelSetting
@@ -368,6 +383,10 @@
  * 
  * 
  * 更新履歴
+ * 2024/9/21 Ver.1.0.2
+ * ヘルプウィンドウ、ファストトラベルウィンドウのウィンドウが透明化しない問題を修正。
+ * カーソルの初期インデックスを移動先の座標から一番近いイベントのインデックスになるように修正。
+ * カーソルの初期インデックスを指定のインデックスにする機能を追加。
  * 2024/8/18 Ver.1.0.1
  * 移動先の向きを指定できる機能を追加。
  * 選択できない場所にスクロールしないように修正。
@@ -397,6 +416,18 @@
  * @type number
  * @default 0
  * @desc 移動先のY座標を指定します。
+ * 
+ * 
+ * @command FastTravelSelectIndex
+ * @desc ファストラベルの初期カーソルインデックスを指定します。移動後に初期化されます。
+ * @text ファストラベル初期カーソルインデックス
+ * 
+ * @arg FastTravelListId
+ * @text カーソルインデックス
+ * @type number
+ * @default -1
+ * @min -1
+ * @desc カーソルインデックスを記入します。
  * 
  * 
  * @param FastTravelSetting
@@ -541,6 +572,7 @@
  * @type number
  * @default 0
  * @min -9999
+ * 
  * @parent ButtonSetting
  * 
  * @param ButtonY
@@ -649,6 +681,213 @@
  * @default 0
  * 
  */
+/*~struct~FastTravelSub:ja
+ *
+ * @param DateSelect
+ * @text 表示する項目
+ * @desc 表示する項目を指定します。
+ * @type select
+ * @option なし
+ * @value None
+ * @option 名称のみ(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value Name
+ * @option マップ名(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
+ * @value MapName
+ * @option 変数(1)(2)(3)(4)(5)(9)(11)(12)
+ * @value ItemName
+ * @option 独自パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(16)(17)(18)
+ * @value OrgParam
+ * @option 画像（共通画像）(1)(2)(3)(4)(25)(26)
+ * @value Imges
+ * @option フリーテキスト(1)(2)(3)(4)(35)
+ * @value Freetext
+ * @option ライン(1)(2)(3)(4)(5)(8)
+ * @value HorzLine
+ * @option 記述欄(1)(2)(3)(4)(6)(7)(8)(28)
+ * @value Desc
+ * @default None
+ * 
+ * @param X_Position
+ * @text X表示列位置(1)
+ * @desc X表示列位置
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 4
+ * 
+ * @param Y_Position
+ * @desc Y表示行位置
+ * @text Y表示行位置(2)
+ * @type number
+ * @default 1
+ * @min 1
+ * @max 99
+ * 
+ * @param X_Coordinate
+ * @text X座標（相対）(3)
+ * @desc X座標（X表示列位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param Y_Coordinate
+ * @text Y座標（相対）(4)
+ * @desc Y座標（Y表示行位置からの相対座標）
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * 
+ * @param ItemWidth
+ * @desc 項目、ゲージ横幅（0でデフォルト幅）
+ * @text 項目、ゲージ横幅(5)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param SystemItemWidth
+ * @desc 項目名称の横幅（0でデフォルト幅）
+ * @text 項目名称横幅(6)
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ParamName
+ * @desc 項目の名称を設定します。
+ * @text 名称(7)
+ * @type string
+ * @default
+ * 
+ * @param NameColor
+ * @desc 項目名称のシステムカラーID。テキストタブでカラーコードを入力できます。
+ * @text 項目名称文字色(8)
+ * @type color
+ * @default 16
+ * @min 0
+ * 
+ * @param Align
+ * @desc 文字揃え。
+ * @text 文字揃え(9)
+ * @type select
+ * @option 左
+ * @value 'left'
+ * @option 右
+ * @value 'right'
+ * @option 中央
+ * @value 'center'
+ * @default 'left'
+ * 
+ * @param paramUnit
+ * @desc 単位を設定します。
+ * @text 単位(10)
+ * @type string
+ * @default 
+ * 
+ * @param FontSize
+ * @desc フォントサイズ（メインフォントからの差）
+ * @text フォントサイズ(11)
+ * @type number
+ * @default 0
+ * @min -99
+ * 
+ * @param FontFace
+ * @desc 項目名称のフォントを設定します。
+ * @text 項目名称フォント(12)
+ * @type string
+ * @default 
+ * 
+ * @param ValueFontFace
+ * @desc 数値のフォントを設定します。
+ * @text 数値フォント(13)
+ * @type string
+ * @default 
+ * 
+ * @param Icon
+ * @desc アイコンを設定します。
+ * @text アイコン(14)
+ * @type icon
+ * @default 0
+ * 
+ * @param IconY
+ * @desc アイコンを調整するY座標を指定します。(相対)
+ * @text アイコン調整Y座標(15)
+ * @type number
+ * @default 2
+ * @min -99
+ * 
+ * @param DetaEval
+ * @desc 評価式または文字列を記入します。
+ * @text 評価式or文字列(javaScript)(16)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @option 'item;//アイテムデータ'
+ * @default 
+ * 
+ * @param VariableId
+ * @desc 変数IDを指定します。
+ * @text 変数(17)
+ * @type variable
+ * @default 0
+ * 
+ * @param Decimal
+ * @text 小数点桁数(18)
+ * @desc 表示出来る小数点桁数。
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 99
+ * 
+ * @param TextMethod
+ * @desc 記述欄、画像（個別指定画像）に紐づけするタグ名
+ * @text 記述欄、個別指定画像タグ名(28)
+ * @type string
+ * @default 
+ * @parent textSetting
+ * 
+ * @param ImgSetting
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ImgData
+ * @desc 表示する画像を指定します。
+ * @text 画像(25)
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ImgSetting
+ * 
+ * @param ImgMaxHeight
+ * @desc 画像の最大縦幅（行数で指定）0で縮小無し
+ * @text 画像の最大縦幅(26)
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent ImgSetting
+ * 
+ * @param OtherSetting
+ * @text その他設定
+ * @default ------------------------------
+ * 
+ * @param Text
+ * @desc フリーテキストのテキストを記入します。(制御文字使用可能)
+ * @text フリーテキストのテキスト(35)
+ * @type multiline_string
+ * @default
+ * @parent OtherSetting
+ * 
+ * @param CondSetting
+ * @text 表示条件設定
+ * @default ------------------------------
+ * 
+ * @param Conditions
+ * @desc 項目が表示される条件を指定します。(JavaScript)
+ * @text 項目条件(all)
+ * @type combo
+ * @option '$gameVariables.value(0);//ゲーム変数'
+ * @default 
+ *
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_FastTravel = true;
@@ -665,27 +904,70 @@ Imported.NUUN_FastTravel = true;
         _openFastTravel(args);
     });
 
+    PluginManager.registerCommand(pluginName, 'FastTravelOpen', args => {
+        $gameTemp.fastTravelId = Number(args.Id) || 0;
+        _openFastTravel(args);
+    });
+
+    PluginManager.registerCommand(pluginName, 'FastTravelSelectIndex', args => {
+        _fastTravelData.setIndex(Number(args.FastTravelListId) || 0);
+    });
+
+    class FastTravelData {
+        constructor() {
+            this.index = -1;
+            this.mapId = 0;
+            this.direction = 0;
+            this.mapX = 0;
+            this.mapY = 0;
+            this.characterName = null;
+            this.characterIndex = 0;
+        }
+
+        setFastTravelMapData() {
+            this.mapId = $gameMap.mapId();
+            this.direction = $gamePlayer.direction();
+            this.mapX = $gamePlayer.x;
+            this.mapY = $gamePlayer.y;
+        }
+
+        setFastTravelCharacterChipData() {
+            this.characterName = $gamePlayer.characterName();
+            this.characterIndex = $gamePlayer.characterIndex();
+        }
+
+        setIndex(index) {
+            this.index = index;
+        }
+
+        getIndex() {
+            const index = this.index;
+            this.index = -1;
+            return index;
+        }
+
+        isCharacterName() {
+            return !!this.characterName;
+        }
+
+        clear() {
+            this.characterName = null;
+            this.characterIndex = 0;
+        }
+    };
+    const _fastTravelData = new FastTravelData();
+
+
     function _openFastTravel(args) {
         const mapId = Number(args.MapId);
         if (mapId <= 0 || $gameParty.inBattle() || $gameMessage.isBusy()) return;
         const x = Number(args.MapX);
         const y = Number(args.MapY);
         $gameTemp.fastTravelCommand = true;
-        _setFastTravelMapData();
+        _fastTravelData.setFastTravelMapData();
         $gamePlayer.reserveTransfer(mapId, x, y, 2, 0);
     };
 
-    function _setFastTravelCharacterChipData() {
-        _fastTravelCharacterChip.characterName = $gamePlayer.characterName();
-        _fastTravelCharacterChip.characterIndex = $gamePlayer.characterIndex();
-    };
-
-    function _setFastTravelMapData() {
-        _fastTravelMapData.mapId = $gameMap.mapId();
-        _fastTravelMapData.mapX = $gamePlayer.x;
-        _fastTravelMapData.mapY = $gamePlayer.y;
-        _fastTravelMapData.direction = $gamePlayer.direction();
-    };
 
     const _Scene_Map_initialize = Scene_Map.prototype.initialize;
     Scene_Map.prototype.initialize = function() {
@@ -706,14 +988,14 @@ Imported.NUUN_FastTravel = true;
             this._cancelFastTravel = $gameTemp.fastTravelCommand || false;
             $gameTemp.fastTravelCommand = false;
             this.setFastTravelCharacter();
-        } else if (_fastTravelCharacterChip.characterName) {
+        } else if (_fastTravelData.isCharacterName()) {
             this.resetFastTravel();
         }
     };
 
     Scene_Map.prototype.setFastTravelCharacter = function() {
         if (params.FastTravelCharacterName) {
-            _setFastTravelCharacterChipData();
+            _fastTravelData.setFastTravelCharacterChipData();
             const actor = $gameParty.leader();
             actor.setCharacterImage(params.FastTravelCharacterName, params.FastTravelCharacterIndex);
             $gamePlayer.refresh();
@@ -722,8 +1004,8 @@ Imported.NUUN_FastTravel = true;
 
     Scene_Map.prototype.resetFastTravel = function() {
         const actor = $gameParty.leader();
-        actor.setCharacterImage(_fastTravelCharacterChip.characterName, _fastTravelCharacterChip.characterIndex);
-        _fastTravelCharacterChip.characterName = null;
+        actor.setCharacterImage(_fastTravelData.characterName, _fastTravelData.characterIndex);
+        _fastTravelData.clear();
         $gamePlayer.refresh();
     };
 
@@ -770,6 +1052,7 @@ Imported.NUUN_FastTravel = true;
     Scene_Map.prototype.createFastTravel = function() {
         this.createFastTravelHelpWindow();
         this.createFastTravelWindow();
+        //this.createFastTravelSubWindow();
         this._fastTravel.hide();
     };
 
@@ -802,6 +1085,21 @@ Imported.NUUN_FastTravel = true;
         const wy = params.FastTravelWindowY;
         const ww = params.FastTravelWindowWidth > 0 ? Math.min(params.FastTravelWindowWidth, Graphics.boxWidth - wx) : Graphics.boxWidth;
         const wh = this.calcWindowHeight(params.FastTravelWindowRows, true);
+        return new Rectangle(wx, wy, ww, wh);
+    };
+
+    Scene_Map.prototype.createFastTravelSubWindow = function() {
+        const rect = this.fastTravelSubWindowRect();
+        this._fastTravelSubWindow = new Window_FastTravelSub(rect);
+        this.addWindow(this._fastTravelSubWindow);
+        this._fastTravel.setSubWindow(this._fastTravelSubWindow);
+    };
+
+    Scene_Map.prototype.fastTravelSubWindowRect = function() {
+        const wx = params.FastTravelSubWindowX;
+        const wy = params.FastTravelSubWindowY;
+        const ww = params.FastTravelSubWindowWidth > 0 ? Math.min(params.FastTravelSubWindowWidth, Graphics.boxWidth - wx) : Graphics.boxWidth;
+        const wh = this.calcWindowHeight(params.FastTravelSubWindowRows, true);
         return new Rectangle(wx, wy, ww, wh);
     };
 
@@ -839,10 +1137,9 @@ Imported.NUUN_FastTravel = true;
     };
     
     Scene_Map.prototype.fastTravelCancel = function() {
-        const data = _fastTravelMapData;
-        if (this._cancelFastTravel && data && data.mapId) {
+        if (this._cancelFastTravel && _fastTravelData && _fastTravelData.mapId > 0) {
             $gamePlayer.setDirectionFix(false);
-            $gamePlayer.reserveTransfer(data.mapId, data.mapX, data.mapY, data.direction, 0);
+            $gamePlayer.reserveTransfer(_fastTravelData.mapId, _fastTravelData.mapX, _fastTravelData.mapY, _fastTravelData.direction, 0);
             this._fastTravel.deactivate();
             this._fastTravel.hide();
         } else {
@@ -853,7 +1150,7 @@ Imported.NUUN_FastTravel = true;
     Scene_Map.prototype.openFastTravel = function(id) {
         this._fastTravel.show();
         this._fastTravel.setup(id);
-        this._fastTravel.select(0);
+        this._fastTravel.select(this.getFastTravelSelectId(id));
         this._fastTravel.activate();
         //if (params.StartCommonEvent > 0) {
         //    $gameTemp.reserveCommonEvent(params.StartCommonEvent);
@@ -863,6 +1160,30 @@ Imported.NUUN_FastTravel = true;
     Scene_Map.prototype.getFastTravelEvent = function() {
         const fastTravel = this._fastTravel.getFastTravelData();
         return fastTravel ? $gameMap.getFastTravelEvent(fastTravel.EventId) : null;
+    };
+
+    Scene_Map.prototype.getFastTravelSelectId = function(id) {
+        const data = params.FastTravelSetting[id - 1];
+        if (!data && !data.FastTravelList) return 0;
+        if (_fastTravelData.index >= 0) {
+            return _fastTravelData.getIndex();
+        }
+        const x = $gamePlayer.x;
+        const y = $gamePlayer.y;
+        let appX = 99999999;
+        let appY = 99999999;
+        let appIndex = 0;
+        data.FastTravelList.forEach((fastTravel, index) => {
+            const event = $gameMap.getFastTravelEvent(fastTravel.EventId);
+            if (event) {
+                if (Math.abs(x - event._x) <= appX && Math.abs(y - event._y) <= appY) {
+                    appX = Math.abs(x - event._x);
+                    appY = Math.abs(y - event._y);
+                    appIndex = index;
+                }
+            }
+        });
+        return appIndex;
     };
 
 
@@ -881,7 +1202,7 @@ Imported.NUUN_FastTravel = true;
         this._scrollRestY = 0;
         this._scrollSpeedX = 0;
         this._scrollSpeedY = 0;
-        this.opacity = params.HelpWindowVisible ? 255 : 0;
+        this.opacity = params.FastTravelWindowVisible ? 255 : 0;
     };
 
     Window_FastTravel.prototype.setup = function(id) {
@@ -957,7 +1278,7 @@ Imported.NUUN_FastTravel = true;
 
     Window_FastTravel.prototype.select = function(index) {
         Window_Selectable.prototype.select.call(this, index);
-        const event = this.getFastTravelEvent(index)
+        const event = this.getFastTravelEvent(index);
         if (this.isCurrentItemEnabled() && event) {
             this._eventX = event.x;
             this._eventY = event.y;
@@ -970,6 +1291,7 @@ Imported.NUUN_FastTravel = true;
             const fastTravel = this.itemAt(this.index());
             if (fastTravel) {
                 this.setHelpText(fastTravel.FastTravelText);
+                this.setFastTravelSubWindow(fastTravel);
             }
         }
     };
@@ -1007,11 +1329,19 @@ Imported.NUUN_FastTravel = true;
     };
 
     Window_FastTravel.prototype.setHelpWindow = function(helpWindow) {
-        this._hastTravelHelpWindow = helpWindow;
+        this._fastTravelHelpWindow = helpWindow;
+    };
+
+    Window_FastTravel.prototype.setSubWindow = function(setSubWindow) {
+        this._setSubWindow = setSubWindow;
     };
 
     Window_FastTravel.prototype.setHelpText = function(text) {
-        this._hastTravelHelpWindow.setHelpText(text);
+        this._fastTravelHelpWindow.setHelpText(text);
+    };
+
+    Window_FastTravel.prototype.setFastTravelSubWindow = function(fastTravel) {
+        //this._setSubWindow.setFastTravel(fastTravel);
     };
 
 
@@ -1025,6 +1355,7 @@ Imported.NUUN_FastTravel = true;
     Window_FastTravelHelp.prototype.initialize = function(rect) {
         Window_Selectable.prototype.initialize.call(this, rect);
         this.fastTravelText = null;
+        this.opacity = params.HelpWindowVisible ? 255 : 0;
     };
 
     Window_FastTravelHelp.prototype.setHelpText = function(text) {
@@ -1041,9 +1372,106 @@ Imported.NUUN_FastTravel = true;
     };
 
 
+    function Window_FastTravelSub() {
+        this.initialize(...arguments);
+    }
+    
+    Window_FastTravelSub.prototype = Object.create(Window_Selectable.prototype);
+    Window_FastTravelSub.prototype.constructor = Window_FastTravelSub;
+    
+    Window_FastTravel.prototype.initialize = function(rect) {
+        Window_Selectable.prototype.initialize.call(this, rect);
+        this.opacity = params.FastTravelSubWindowVisible ? 255 : 0;
+        this._contentsData = new Nuun_DrawFastTravelListData(this, params);
+    };
+
+    Window_FastTravelSub.prototype.setFastTravel = function(fastTravel) {
+        this._contentsData.setItem(fastTravel);
+        this.refresh();
+    };
+
+    Window_FastTravelSub.prototype.refresh = function() {
+        this.contents.clear();
+        this._contentsData.refresh();
+    };
+
+
+    class Nuun_DrawFastTravelListData extends Nuun_DrawListData {
+        constructor(_window, params) {
+            super(_window, params);
+            this._item = null;
+        }
+
+        nuun_MaxContentsCols() {
+            return 1;
+        }
+
+        getStatusParamsList() {
+            return params.FastTravelSubParamList;
+        }
+
+        setItem(item) {
+            this._item = item;
+        }
+
+        refresh() {
+            this.drawStatusContents(this._item)
+        }
+
+        drawItemImg(actor, index) {
+            
+        }
+
+        nuun_DrawContentsMapName(data, x, y, width) {
+            const w = this._window;
+            if (this._item.IconIndex && this._item.IconIndex > 0) {
+                const iconY = y + (w.lineHeight() - ImageManager.iconHeight) / 2;
+                w.drawIcon(this._item.IconIndex, x, y + (iconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.ParamName ? data.ParamName : this._item.FastTravelName;
+            this.nuun_SetContentsFontFace(data);
+            w.drawText(nameText, x, y, width, data.Align);
+        }
+
+        nuun_DrawContentsOrgParam(data, x, y, width) {
+            const map = $dataMap;
+            const w = this._window;
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            this.nuun_SetContentsFontFace(data);
+            const nameText = data.ParamName ? data.ParamName : '';
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            if (data.DetaEval) {
+                this.nuun_SetContentsValueFontFace(data);
+                const padding = textWidth > 0 ? w.itemPadding() : 0;
+                const textParam = this.getStatusEvalParam(param, actor, enemy);
+                if (isNaN(textParam)) {
+                    w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+                } else {
+                    const value = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
+                    w.nuun_DrawContentsParamUnitText(value, data, x + textWidth + padding, y, width - (textWidth + padding));
+                }       
+            }
+        }
+
+    }
+
+
     const _Game_Map_setup = Game_Map.prototype.setup;
     Game_Map.prototype.setup = function(mapId) {
-        _Game_Map_setup.apply(this, arguments); 
+        _Game_Map_setup.apply(this, arguments);
     };
 
     Game_Map.prototype.scrollDisplayPosX = function(x) {
@@ -1077,7 +1505,7 @@ Imported.NUUN_FastTravel = true;
     Game_Map.prototype.openFastTravel = function(id, x, y) {
         if (id <= 0 || $gameParty.inBattle() || $gameMessage.isBusy()) return;
         $gameTemp.fastTravelCommand = true;
-        _setFastTravelMapData();
+        _fastTravelData.setFastTravelMapData();
         $gamePlayer.reserveTransfer(id, x, y, 2, 0);
     };
 

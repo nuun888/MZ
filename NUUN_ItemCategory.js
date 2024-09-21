@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Item category customization
  * @author NUUN
- * @version 1.5.1
+ * @version 1.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -45,6 +45,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/22/2024 Ver.1.6.0
+ * Added a function to display only items of a specified category on the item selection screen.
  * 9/12/2024 Ver.1.5.1
  * Added a plugin command that allows you to display specified sales categories.
  * 10/14/2023 Ver.1.5.0
@@ -100,6 +102,23 @@
  * @command ResetSaleCategory
  * @desc Change back to the original sales category displayed.
  * @text Display sale category reset
+ * 
+ * @command SelectCategoryItem
+ * @desc Display the item selection screen.
+ * @text Item selection screen display
+ * 
+ * @arg CategoryItemIdVariable
+ * @desc Variable that stores the item ID.
+ * @text Storage Variables
+ * @type variable
+ * @default 0
+ * 
+ * @arg Categorykey
+ * @text Category Key
+ * @desc Set the category key. If the key is not in the list, enter it directly.
+ * @type combo
+ * @option 'allItem'
+ * @default
  * 
  * 
  * @param CategoryCols
@@ -163,7 +182,7 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.5.1
+ * @version 1.6.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -198,6 +217,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/22 Ver.1.6.0
+ * アイテム選択画面で指定のカテゴリーアイテムのみを表示させる機能を追加。
  * 2024/9/12 Ver.1.5.1
  * 指定の売却カテゴリーを表示できるプラグインコマンドを追加。
  * 2023/10/14 Ver.1.5.0
@@ -253,6 +274,23 @@
  * @command ResetSaleCategory
  * @desc 表示する売却カテゴリーをもとに戻します。
  * @text 表示売却カテゴリーリセット
+ * 
+ * @command SelectCategoryItem
+ * @desc アイテム選択画面を表示します。
+ * @text アイテム選択画面表示
+ * 
+ * @arg CategoryItemIdVariable
+ * @desc アイテムIDを格納する変数。
+ * @text 格納変数
+ * @type variable
+ * @default 0
+ * 
+ * @arg Categorykey
+ * @text カテゴリーキー
+ * @desc カテゴリーキーを設定します。リストにないキーは直接記入してください。
+ * @type combo
+ * @option 'allItem'
+ * @default
  * 
  * 
  * @param CategoryCols
@@ -340,6 +378,18 @@ PluginManager.registerCommand(pluginName, 'SaleCategoryCommand', args => {
 PluginManager.registerCommand(pluginName, 'ResetSaleCategory', args => {
     NuunManager.resetSaleCategory();
 });
+
+PluginManager.registerCommand(pluginName, 'SelectCategoryItem', args => {
+    Game_Interpreter.prototype.command104([Number(args.CategoryItemIdVariable), getKey(args.Categorykey)]);
+});
+
+function getKey(param) {
+    try {
+        return eval(param)
+    } catch (error) {
+        return String(param);
+    }
+};
 
 NuunManager.setSaleCategory = function(data) {
     this._saleCategory = data;
@@ -461,7 +511,7 @@ Window_ItemList.prototype.needsNumber = function() {
     if (this._category === "keyItem") {  
         return $dataSystem.optKeyItemsNumber;
     }
-    if (itemData.meta.NoItemNum) {
+    if (itemData && itemData.meta.NoItemNum) {
         return false;
     }
     return this._needsCategory === undefined || this._needsCategory === null ? true : this._needsCategory;
@@ -512,6 +562,28 @@ Window_ItemShopCategory.prototype.initialize = function(rect) {
 
 Window_ItemShopCategory.prototype.getItemCategoryList = function() {
     return NuunManager.isSaleCategory() ? NuunManager.getSaleCategory() : SaleCategory;
+};
+
+
+const _Window_EventItem_includes = Window_EventItem.prototype.includes;
+Window_EventItem.prototype.includes = function(item) {
+    const itypeId = $gameMessage.itemChoiceItypeId();
+    if (DataManager.isItem(item) && isNaN(itypeId)) {
+        if (itypeId === 'allItems' && !this.secretItem(item)) {
+            return true;
+        } else if (itypeId === 'allItem' && DataManager.isItem(item) && (item.itypeId === 1 || item.itypeId === 2)) {
+            return true;
+        } else if (itypeId === this.getItemType(item)) {
+            return true;
+        }
+        return false;
+    } else {
+        return _Window_EventItem_includes.apply(this, arguments);
+    }
+};
+
+Window_EventItem.prototype.getItemType = function(item) {
+    return item.meta.CategoryType;
 };
 
 

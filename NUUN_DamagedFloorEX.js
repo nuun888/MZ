@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Famage floor EX
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -38,6 +38,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/21/2024 Ver.1.3.3
+ * Fixed an issue that caused errors when traversing maps that use tilesets that do not have the Damage Floor setting applied.
  * 8/3/2024 Ver.1.3.2
  * Fixed an issue that could cause an error when walking through unspecified damage floors.
  * 6/28/2024 Ver.1.3.1
@@ -332,7 +334,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -360,6 +362,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/21 Ver.1.3.3
+ * ダメージ床適用設定が適用されていないタイルセットを使用しているマップを移動するとエラーが出る問題を修正。
  * 2024/8/3 Ver.1.3.2
  * 未設定のダメージ床を通行したときにエラーが起きる問題を修正。
  * 2024/6/28 Ver.1.3.1
@@ -691,7 +695,7 @@ Game_Map.prototype.setFloorDamageData = function() {
     const y = $gamePlayer._y;
     const regionId = $gameMap.regionId(x, y);
     const Terrain = $gameMap.terrainTag(x, y);
-    const damagedFloorData = DamagedFloorList[damagedFloorId].DamagedFloorRegion || [];
+    const damagedFloorData = DamagedFloorList[damagedFloorId] ? DamagedFloorList[damagedFloorId].DamagedFloorRegion : [];
     _damagedFloorExData = damagedFloorData.find(data => this.isDamagedFloorData(data, regionId, Terrain));
 };
 

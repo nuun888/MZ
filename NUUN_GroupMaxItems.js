@@ -6,12 +6,106 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
- */ 
+ */
 /*:
+ * @target MZ
+ * @plugindesc Item group possession limit
+ * @author NUUN
+ * @version 1.0.1
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ * 
+ * @help
+ * You can set a maximum total number of items per group.
+ * Priority
+ * Changed Max Sum > Group Max Sum > Default Max Sum
+ * 
+ * <ItemGroup:[GroupName]> [GroupName]:Sets the group name for items, weapons, and armor.
+ * Any items that exceed the maximum total number using plugin commands will remain as is.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 9/21/2024 Ver.1.0.1
+ * Fixed an issue that caused items to be unable to be purchased even if the purchase conditions were met.
+ * 10/20/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * 
+ * @command ChangeMaxItemSum
+ * @desc Change the maximum number of items you can own.
+ * @text Change in maximum number of items you can own
+ * 
+ * @arg MaxSum
+ * @type number
+ * @default 1
+ * @min 1
+ * @text Maximum number of possessions after change
+ * @desc Specify the maximum number of possessions to be changed.
+ * 
+ * @arg ItemKey
+ * @desc Set the group to be processed (enter list number 1).
+ * @text Key
+ * @type combo[]
+ * @option 'item'
+ * @option 'weapon'
+ * @option 'armor'
+ * @default 
+ * 
+ * 
+ * @param ItemGroupMax
+ * @desc Default total maximum number of items to have. (0 = unlimited)
+ * @text Maximum total number of items
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param WeaponGroupMax
+ * @desc Default total maximum number of weapons you can carry. (0 = unlimited)
+ * @text Maximum total number of weapons
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ArmorGroupMax
+ * @desc Default total maximum number of armor you can carry. (0 = unlimited)
+ * @text Maximum total number of armors
+ * @type number
+ * @default 0
+ * @min 0
+ * 
+ * @param ItemGroupMaxItems
+ * @desc Set the number of items each group can own.
+ * @text Maximum number of possessions per group
+ * @type struct<ItemGroupDefaultList>[]
+ * @default []
+ * 
+ */
+/*~struct~ItemGroupDefaultList:
+ *
+ * @param ItemDefaultGroupKey
+ * @desc Set the item group name. (enter list number 1)
+ * @text Item Group Name
+ * @type combo[]
+ * @option 'item'
+ * @option 'weapon'
+ * @option 'armor'
+ * @default 
+ * 
+ * @param GroupDefaultSumMax
+ * @desc Default total max number of item groups you can carry. (0 = unlimited)
+ * @text Maximum total number of items in a group
+ * @type number
+ * @default 0
+ * @min 0
+ *
+ */
+/*:ja
  * @target MZ
  * @plugindesc アイテムグループ所持制限
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -27,6 +121,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/21 Ver 1.0.1
+ * 購入条件を満たしていてもアイテムが購入できなくなる問題を修正。
  * 2021/10/20 Ver 1.0.0
  * 初版
  * 
@@ -80,7 +176,7 @@
  * @default []
  * 
  */
-/*~struct~ItemGroupDefaultList:
+/*~struct~ItemGroupDefaultList:ja
  *
  * @param ItemDefaultGroupKey
  * @desc アイテムグループ名を設定します。(リスト番号1に記入)
@@ -206,8 +302,8 @@ Imported.NUUN_GroupMaxItems = true;
   
   Game_Party.prototype.hasGroupMaxItems = function(item) {
     const maxGroupItems = this.groupMaxItems(item);
-    const num = Math.max(maxGroupItems - $gameParty.getGroupMaxItems(), 0);
-    return this.numItems(item) >= num;
+    const groupMaxItems = $gameParty.getGroupMaxItems();
+    return groupMaxItems >= maxGroupItems;
   };
 
 

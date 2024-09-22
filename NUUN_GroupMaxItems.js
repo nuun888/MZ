@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Item group possession limit
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -27,6 +27,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/22/2024 Ver.1.0.2
+ * Fixed an issue where items could not be acquired if the default maximum total number of possessions was set to 0.
+ * Fixed the plugin command to change the maximum total number of possessions so that it can be set to 0, meaning unlimited.
  * 9/21/2024 Ver.1.0.1
  * Fixed an issue that caused items to be unable to be purchased even if the purchase conditions were met.
  * 10/20/2021 Ver.1.0.0
@@ -42,7 +45,7 @@
  * @default 1
  * @min 1
  * @text Maximum number of possessions after change
- * @desc Specify the maximum number of possessions to be changed.
+ * @desc Specify the maximum number of possessions to be changed.(0 = unlimited)
  * 
  * @arg ItemKey
  * @desc Set the group to be processed (enter list number 1).
@@ -105,7 +108,7 @@
  * @target MZ
  * @plugindesc アイテムグループ所持制限
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -121,6 +124,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/22 Ver 1.0.2
+ * デフォルト合計最大所持数を0に設定していた場合、アイテムを取得できない問題を修正。
+ * プラグインコマンドのアイテム合計最大所持数変更で0で無制限に設定できるように修正。
  * 2024/9/21 Ver 1.0.1
  * 購入条件を満たしていてもアイテムが購入できなくなる問題を修正。
  * 2021/10/20 Ver 1.0.0
@@ -134,9 +140,9 @@
  * @arg MaxSum
  * @type number
  * @default 1
- * @min 1
+ * @min 0
  * @text 変更後の最大所持数
- * @desc 変更する最大所持数を指定します。
+ * @desc 変更する最大所持数を指定します。（0で無制限）
  * 
  * @arg ItemKey
  * @desc 処理を行うグループを設定します。(リスト番号1に記入)
@@ -200,122 +206,122 @@ var Imported = Imported || {};
 Imported.NUUN_GroupMaxItems = true;
 
 (() => {
-  const parameters = PluginManager.parameters('NUUN_GroupMaxItems');
-  const ItemGroupMaxItems = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemGroupMaxItems'])) : null) || [];
-  const ItemGroupMax = Number(parameters['ItemGroupMax'] || 0);
-  const WeaponGroupMax = Number(parameters['WeaponGroupMax'] || 0);
-  const ArmorGroupMax = Number(parameters['ArmorGroupMax'] || 0);
-  let itemType = null;
+    const parameters = PluginManager.parameters('NUUN_GroupMaxItems');
+    const ItemGroupMaxItems = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemGroupMaxItems'])) : null) || [];
+    const ItemGroupMax = Number(parameters['ItemGroupMax'] || 0);
+    const WeaponGroupMax = Number(parameters['WeaponGroupMax'] || 0);
+    const ArmorGroupMax = Number(parameters['ArmorGroupMax'] || 0);
+    let itemType = null;
 
-  const pluginName = 'NUUN_GroupMaxItems';
-  PluginManager.registerCommand(pluginName, 'ChangeMaxItemSum', args => {
-    changeMaxItemSum(args);
-  });
+    const pluginName = 'NUUN_GroupMaxItems';
+    PluginManager.registerCommand(pluginName, 'ChangeMaxItemSum', args => {
+        changeMaxItemSum(args);
+    });
 
-  function changeMaxItemSum(args) {
-    const key = args.ItemKey ? DataManager.nuun_structureData(args.ItemKey)[0] : null;
-    if (key === 'item') {
-      $gameParty._groupMaxItems = Number(args.MaxSum);
-    } else if (key === 'weapon') {
-      $gameParty._groupMaxWeapons = Number(args.MaxSum);
-    } else if (key === 'armor') {
-      $gameParty._groupMaxArmors = Number(args.MaxSum);
-    } else if (key) {
-      const index = ItemGroupMaxItems.findIndex(data => data.ItemDefaultGroupKey[0] === key);
-      if (!this._groupMaxGroupItems) {
+    function changeMaxItemSum(args) {
+        const key = args.ItemKey ? DataManager.nuun_structureData(args.ItemKey)[0] : null;
+        if (key === 'item') {
+            $gameParty._groupMaxItems = Number(args.MaxSum) || Infinity;
+        } else if (key === 'weapon') {
+            $gameParty._groupMaxWeapons = Number(args.MaxSum) || Infinity;
+        } else if (key === 'armor') {
+            $gameParty._groupMaxArmors = Number(args.MaxSum) || Infinity;
+        } else if (key) {
+            const index = ItemGroupMaxItems.findIndex(data => data.ItemDefaultGroupKey[0] === key);
+        if (!this._groupMaxGroupItems) {
+            this._groupMaxGroupItems = [];
+        }
+        this._groupMaxGroupItems[index] = Number(args.MaxSum) || Infinity;
+        }
+    };
+
+    const _Game_Party_initialize = Game_Party.prototype.initialize;
+    Game_Party.prototype.initialize = function() {
+        _Game_Party_initialize.call(this);
+        this.initGroupMaxItems();
+    };
+
+    Game_Party.prototype.initGroupMaxItems = function() {
+        this._groupMaxItems = 0;
+        this._groupMaxWeapons = 0;
+        this._groupMaxArmors = 0;
         this._groupMaxGroupItems = [];
-      }
-      this._groupMaxGroupItems[index] = Number(args.MaxSum);
-    }
-  };
+    };
 
-  const _Game_Party_initialize = Game_Party.prototype.initialize;
-  Game_Party.prototype.initialize = function() {
-    _Game_Party_initialize.call(this);
-    this.initGroupMaxItems();
-  };
+    Game_Party.prototype.groupMaxItems = function(item) {
+        itemType = null;
+        const index = this.groupMaxItemsIndex(item);
+        const find = ItemGroupMaxItems[index];
+        if (find && find.GroupDefaultSumMax >= 0) {
+            if (this._groupMaxGroupItems && this._groupMaxGroupItems[index] > 0) {
+                return this._groupMaxGroupItems[index];
+            }
+            itemType = find.ItemDefaultGroupKey[0];
+            return find.GroupDefaultSumMax || Infinity;
+        } else if (DataManager.isItem(item)) {
+            itemType = 'item';
+            return this._groupMaxItems > 0 ? this._groupMaxItems : (ItemGroupMax || Infinity);
+        } else if (DataManager.isWeapon(item)) {
+            itemType = 'weapon';
+            return this._groupMaxWeapons > 0 ? this._groupMaxWeapons : (WeaponGroupMax || Infinity);
+        } else if (DataManager.isArmor(item)) {
+            itemType = 'armor';
+            return this._groupMaxArmors > 0 ? this._groupMaxArmors : (ArmorGroupMax || Infinity);
+        } else {
+            return Infinity;
+        }
+    };
 
-  Game_Party.prototype.initGroupMaxItems = function() {
-    this._groupMaxItems = 0;
-    this._groupMaxWeapons = 0;
-    this._groupMaxArmors = 0;
-    this._groupMaxGroupItems = [];
-  };
+    Game_Party.prototype.groupMaxItemsIndex = function(item) {
+        return ItemGroupMaxItems.findIndex(data => data.ItemDefaultGroupKey[0] === item.meta.ItemGroup);
+    };
 
-  Game_Party.prototype.groupMaxItems = function(item) {
-    itemType = null;
-    const index = this.groupMaxItemsIndex(item);
-    const find = ItemGroupMaxItems[index];
-    if (find && find.GroupDefaultSumMax > 0) {
-      if (this._groupMaxGroupItems && this._groupMaxGroupItems[index] > 0) {
-        return this._groupMaxGroupItems[index];
-      }
-      itemType = find.ItemDefaultGroupKey[0];
-      return find.GroupDefaultSumMax;
-    } else if (DataManager.isItem(item)) {
-      itemType = 'item';
-      return this._groupMaxItems > 0 ? this._groupMaxItems : ItemGroupMax;
-    } else if (DataManager.isWeapon(item)) {
-      itemType = 'weapon';
-      return this._groupMaxWeapons > 0 ? this._groupMaxWeapons : WeaponGroupMax;
-    } else if (DataManager.isArmor(item)) {
-      itemType = 'armor';
-      return this._groupMaxArmors > 0 ? this._groupMaxArmors : ArmorGroupMax;
-    } else {
-      return 0;
-    }
-  };
-
-  Game_Party.prototype.groupMaxItemsIndex = function(item) {
-    return ItemGroupMaxItems.findIndex(data => data.ItemDefaultGroupKey[0] === item.meta.ItemGroup);
-  };
-
-  const _Game_Party_gainItem = Game_Party.prototype.gainItem;
-  Game_Party.prototype.gainItem = function(item, amount, includeEquip) {
-    const container = this.itemContainer(item);
-    if (container && amount > 0) {
-      const maxGroupItems = this.groupMaxItems(item);
-      if (maxGroupItems > 0) {
-        const num = Math.max(maxGroupItems - this.getGroupMaxItems(), 0);
-        amount = amount.clamp(0, num);
-      }
-    }
-    _Game_Party_gainItem.call(this, item, amount, includeEquip);
-  };
+    const _Game_Party_gainItem = Game_Party.prototype.gainItem;
+    Game_Party.prototype.gainItem = function(item, amount, includeEquip) {
+        const container = this.itemContainer(item);
+        if (container && amount > 0) {
+            const maxGroupItems = this.groupMaxItems(item);
+            if (maxGroupItems > 0) {
+                const num = Math.max(maxGroupItems - this.getGroupMaxItems(), 0);
+                amount = amount.clamp(0, num);
+            }
+        }
+        _Game_Party_gainItem.call(this, item, amount, includeEquip);
+    };
   
-  Game_Party.prototype.getGroupMaxItems = function() {
-    if (itemType === 'item') {
-      return this.items().reduce((r, item) => r + this.numItems(item), 0);
-    } else if (itemType === 'weapon') {
-      return this.weapons().reduce((r, item) => r + this.numItems(item), 0);
-    } else if (itemType === 'armor') {
-      return this.armors().reduce((r, item) => r + this.numItems(item), 0);
-    } else {
-      return this.allItems().reduce((r, item) => r + (item.meta.ItemGroup === itemType ? this.numItems(item) : 0), 0);
-    }
-  };
+    Game_Party.prototype.getGroupMaxItems = function() {
+        if (itemType === 'item') {
+            return this.items().reduce((r, item) => r + this.numItems(item), 0);
+        } else if (itemType === 'weapon') {
+            return this.weapons().reduce((r, item) => r + this.numItems(item), 0);
+        } else if (itemType === 'armor') {
+            return this.armors().reduce((r, item) => r + this.numItems(item), 0);
+        } else {
+            return this.allItems().reduce((r, item) => r + (item.meta.ItemGroup === itemType ? this.numItems(item) : 0), 0);
+        }
+    };
 
-  const _Game_Party_hasMaxItems =Game_Party.prototype.hasMaxItems;
-  Game_Party.prototype.hasMaxItems = function(item) {
-    return _Game_Party_hasMaxItems.call(this, item) || this.hasGroupMaxItems(item);
-  };
-  
-  Game_Party.prototype.hasGroupMaxItems = function(item) {
-    const maxGroupItems = this.groupMaxItems(item);
-    const groupMaxItems = $gameParty.getGroupMaxItems();
-    return groupMaxItems >= maxGroupItems;
-  };
+    const _Game_Party_hasMaxItems =Game_Party.prototype.hasMaxItems;
+    Game_Party.prototype.hasMaxItems = function(item) {
+        return _Game_Party_hasMaxItems.call(this, item) || this.hasGroupMaxItems(item);
+    };
+    
+    Game_Party.prototype.hasGroupMaxItems = function(item) {
+        const maxGroupItems = this.groupMaxItems(item);
+        const groupMaxItems = $gameParty.getGroupMaxItems();
+        return groupMaxItems >= maxGroupItems;
+    };
 
 
-  const _Scene_Shop_maxBuy = Scene_Shop.prototype.maxBuy;
-  Scene_Shop.prototype.maxBuy = function() {
-    let max = _Scene_Shop_maxBuy.call(this);
-    const maxGroupItems = $gameParty.groupMaxItems(this._item);
-    if (maxGroupItems > 0) {
-      const num = Math.max(maxGroupItems - $gameParty.getGroupMaxItems(), 0);
-      return max.clamp(0, num);
-    }
-    return max;
-  };
+    const _Scene_Shop_maxBuy = Scene_Shop.prototype.maxBuy;
+    Scene_Shop.prototype.maxBuy = function() {
+        let max = _Scene_Shop_maxBuy.call(this);
+        const maxGroupItems = $gameParty.groupMaxItems(this._item);
+        if (maxGroupItems > 0) {
+            const num = Math.max(maxGroupItems - $gameParty.getGroupMaxItems(), 0);
+            return max.clamp(0, num);
+        }
+        return max;
+    };
 
 })();

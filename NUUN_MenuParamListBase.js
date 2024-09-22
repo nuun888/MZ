@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/22/2024 Ver.1.1.4
+ * Fixed an issue where an error would occur when selecting free text in the description field.
  * 9/8/2024 Ver.1.1.3
  * Fixed an issue where the description field was not working.
  * Fixed an issue where arbitrary evaluation expressions were not working in dynamic parameters.
@@ -124,7 +126,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -135,6 +137,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/22 Ver.1.1.4
+ * 記述欄、フリーテキストを選択したときにエラーが出る問題を修正。
  * 2024/9/8 Ver.1.1.3
  * 記述欄が機能していない問題を修正。
  * 動的パラメータで任意の評価式が機能していなかった問題を修正。
@@ -988,7 +992,7 @@ Imported.NUUN_MenuParamListBase = true;
             this.nuun_drawSvActorImg(data, x, y, width, actor, "actor%1-menuStatusSvActor");
         }
 
-        nuun_DrawContentsFreeText(data, x, y, width, actor) {
+        nuun_DrawContentsFreetext(data, x, y, width, actor) {
             this._window.drawTextEx(data.Text, x, y, width);
         }
 
@@ -1324,7 +1328,7 @@ Imported.NUUN_MenuParamListBase = true;
         nuun_DrawContentsDesc(data, x, y, width, battler) {
             const w = this._window;
             const nameText = data.paramName;
-            const obj = battler.isActor() ? battler.actor() : battler.enemy();
+            const obj = this.getObj(battler);
             if (nameText) {
                 w.changeTextColor(NuunManager.getColorCode(data.NameColor));
                 w.drawText(nameText, x, y);
@@ -1524,6 +1528,14 @@ Imported.NUUN_MenuParamListBase = true;
                 return actor[param] ? actor[param] : eval(param);
             } catch (error) {
                 return eval(param);
+            }
+        }
+
+        getObj(obj) {
+            try {
+                return obj.isActor() ? obj.actor() : obj.enemy();
+            } catch (error) {
+                return obj;
             }
         }
 

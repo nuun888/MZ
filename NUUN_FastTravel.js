@@ -559,56 +559,6 @@
  * @default true
  * @parent FastTravelWindowSetting
  * 
- * @param FastTravelSubWindowSetting
- * @text ファストトラベルサブウィンドウ設定
- * @default ------------------------------
- * 
- * @param FastTravelSubParamList
- * @desc ファストトラベルサブウィンドウの項目を設定します。
- * @text ファストトラベルサブ項目設定
- * @type struct<FastTravelSub>[]
- * @default 
- * @parent FastTravelSubWindowSetting
- * 
- * @param FastTravelSubWindowX
- * @text ファストトラベルサブウィンドウX座標
- * @desc ファストトラベルサブウィンドウのX座標
- * @type number
- * @default 0
- * @min -9999
- * @parent FastTravelSubWindowSetting
- * 
- * @param FastTravelSubWindowY
- * @desc ファストトラベルサブウィンドウのY座標
- * @text ファストトラベルサブウィンドウY座標
- * @type number
- * @default 68
- * @min -9999
- * @parent FastTravelSubWindowSetting
- * 
- * @param FastTravelSubWindowWidth
- * @desc ファストトラベルサブウィンドウの横幅。
- * @text ファストトラベルサブウィンドウ横幅
- * @type number
- * @default 240
- * @min 0
- * @parent FastTravelSubWindowSetting
- * 
- * @param FastTravelSubWindowRows
- * @desc ファストトラベルサブウィンドウの行数。
- * @text ファストトラベルサブウィンドウ行数
- * @type number
- * @default 10
- * @min 1
- * @parent FastTravelSubWindowSetting
- * 
- * @param FastTravelSubWindowVisible
- * @text ファストトラベルウィンドウ不透明化
- * @desc ファストトラベルウィンドウを不透明化する。
- * @type boolean
- * @default true
- * @parent FastTravelSubWindowSetting
- * 
  * @param ButtonSetting
  * @text ボタン設定
  * @default ------------------------------

@@ -1,5 +1,5 @@
 # [ファストトラベル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FastTravel.js)
-# Ver.1.0.2
+# Ver.1.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FastTravel.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -32,6 +32,8 @@ $gameMap.openFastTravel([id], [x], [y]);
 `[y]`:移動先Y座標  
 
 ## 更新履歴
+2024/9/22 Ver.1.0.3  
+カーソルの初期位置のスクロールの挙動を修正。  
 2024/9/21 Ver.1.0.2  
 ヘルプウィンドウ、ファストトラベルウィンドウのウィンドウが透明化しない問題を修正。  
 カーソルの初期インデックスを移動先の座標から一番近いイベントのインデックスになるように修正。  

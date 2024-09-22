@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * Implement Fast Travel.
@@ -46,6 +46,8 @@
  * 
  * 
  * Log
+ * 9/22/2024 Ver.1.0.3
+ * Fixed scrolling behavior of initial cursor position.
  * 9/21/2024 Ver.1.0.2
  * Fixed an issue where the help window and fast travel window would not become transparent.
  * Fixed the initial cursor index to be the index of the closest event from the destination coordinates.
@@ -348,7 +350,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * ファストトラベルを実装します。
@@ -383,6 +385,8 @@
  * 
  * 
  * 更新履歴
+ * 2024/9/22 Ver.1.0.3
+ * カーソルの初期位置のスクロールの挙動を修正。
  * 2024/9/21 Ver.1.0.2
  * ヘルプウィンドウ、ファストトラベルウィンドウのウィンドウが透明化しない問題を修正。
  * カーソルの初期インデックスを移動先の座標から一番近いイベントのインデックスになるように修正。
@@ -554,6 +558,56 @@
  * @type boolean
  * @default true
  * @parent FastTravelWindowSetting
+ * 
+ * @param FastTravelSubWindowSetting
+ * @text ファストトラベルサブウィンドウ設定
+ * @default ------------------------------
+ * 
+ * @param FastTravelSubParamList
+ * @desc ファストトラベルサブウィンドウの項目を設定します。
+ * @text ファストトラベルサブ項目設定
+ * @type struct<FastTravelSub>[]
+ * @default 
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowX
+ * @text ファストトラベルサブウィンドウX座標
+ * @desc ファストトラベルサブウィンドウのX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowY
+ * @desc ファストトラベルサブウィンドウのY座標
+ * @text ファストトラベルサブウィンドウY座標
+ * @type number
+ * @default 68
+ * @min -9999
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowWidth
+ * @desc ファストトラベルサブウィンドウの横幅。
+ * @text ファストトラベルサブウィンドウ横幅
+ * @type number
+ * @default 240
+ * @min 0
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowRows
+ * @desc ファストトラベルサブウィンドウの行数。
+ * @text ファストトラベルサブウィンドウ行数
+ * @type number
+ * @default 10
+ * @min 1
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowVisible
+ * @text ファストトラベルウィンドウ不透明化
+ * @desc ファストトラベルウィンドウを不透明化する。
+ * @type boolean
+ * @default true
+ * @parent FastTravelSubWindowSetting
  * 
  * @param ButtonSetting
  * @text ボタン設定
@@ -895,8 +949,6 @@ Imported.NUUN_FastTravel = true;
 (() => {
     const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const parameters = PluginManager.parameters('NUUN_FastTravel');
-    const _fastTravelMapData = {};
-    const _fastTravelCharacterChip = {};
 
     const pluginName = "NUUN_FastTravel";
     PluginManager.registerCommand(pluginName, 'FastTravelOpen', args => {
@@ -922,6 +974,11 @@ Imported.NUUN_FastTravel = true;
             this.mapY = 0;
             this.characterName = null;
             this.characterIndex = 0;
+        }
+
+        setup() {
+            const id = Number($dataMap.meta.FastTravelMap);
+            this.setFastTravelSelect(id);
         }
 
         setFastTravelMapData() {
@@ -954,9 +1011,46 @@ Imported.NUUN_FastTravel = true;
             this.characterName = null;
             this.characterIndex = 0;
         }
+
+        setFastTravelSelect(id) {
+            const data = params.FastTravelSetting[id - 1];
+            if (!data && !data.FastTravelList) return this.setIndex(0);
+            if (this.index >= 0) {
+                return this.setInitFastTravelLocate(data, this.index);
+            }
+            const x = $gamePlayer._newX;
+            const y = $gamePlayer._newY;
+            let appX = 99999999;
+            let appY = 99999999;
+            let appIndex = 0;
+            data.FastTravelList.forEach((fastTravel, index) => {
+                const event = $gameMap.getFastTravelEvent(fastTravel.EventId);
+                if (event) {
+                    if (Math.abs(x - event.x) <= appX && Math.abs(y - event.y) <= appY) {
+                        appX = Math.abs(x - event.x);
+                        appY = Math.abs(y - event.y);
+                        appIndex = index;
+                    }
+                }
+            });
+            this.setInitFastTravelLocate(data, appIndex);
+            this.setIndex(appIndex);
+        }
+
+        setInitFastTravelLocate(data, index) {
+            const fastTravel = this.fastTravelAt(data, index);
+            const event = $gameMap.getFastTravelEvent(fastTravel.EventId);
+            if (event) {
+                $gamePlayer.fastTravelLocateTransfer(event.x, event.y);
+            }
+        }
+
+        fastTravelAt(data, index) {
+            return data.FastTravelList && index >= 0 ? data.FastTravelList[index] : null;
+        }
+
     };
     const _fastTravelData = new FastTravelData();
-
 
     function _openFastTravel(args) {
         const mapId = Number(args.MapId);
@@ -1150,7 +1244,7 @@ Imported.NUUN_FastTravel = true;
     Scene_Map.prototype.openFastTravel = function(id) {
         this._fastTravel.show();
         this._fastTravel.setup(id);
-        this._fastTravel.select(this.getFastTravelSelectId(id));
+        this._fastTravel.select(_fastTravelData.getIndex());
         this._fastTravel.activate();
         //if (params.StartCommonEvent > 0) {
         //    $gameTemp.reserveCommonEvent(params.StartCommonEvent);
@@ -1160,30 +1254,6 @@ Imported.NUUN_FastTravel = true;
     Scene_Map.prototype.getFastTravelEvent = function() {
         const fastTravel = this._fastTravel.getFastTravelData();
         return fastTravel ? $gameMap.getFastTravelEvent(fastTravel.EventId) : null;
-    };
-
-    Scene_Map.prototype.getFastTravelSelectId = function(id) {
-        const data = params.FastTravelSetting[id - 1];
-        if (!data && !data.FastTravelList) return 0;
-        if (_fastTravelData.index >= 0) {
-            return _fastTravelData.getIndex();
-        }
-        const x = $gamePlayer.x;
-        const y = $gamePlayer.y;
-        let appX = 99999999;
-        let appY = 99999999;
-        let appIndex = 0;
-        data.FastTravelList.forEach((fastTravel, index) => {
-            const event = $gameMap.getFastTravelEvent(fastTravel.EventId);
-            if (event) {
-                if (Math.abs(x - event._x) <= appX && Math.abs(y - event._y) <= appY) {
-                    appX = Math.abs(x - event._x);
-                    appY = Math.abs(y - event._y);
-                    appIndex = index;
-                }
-            }
-        });
-        return appIndex;
     };
 
 
@@ -1472,6 +1542,13 @@ Imported.NUUN_FastTravel = true;
     const _Game_Map_setup = Game_Map.prototype.setup;
     Game_Map.prototype.setup = function(mapId) {
         _Game_Map_setup.apply(this, arguments);
+        if (this.isFastTravelMap()) {
+            _fastTravelData.setup();
+        }
+    };
+
+    Game_Map.prototype.isFastTravelMap = function() {
+        return $dataMap && $dataMap.meta.FastTravelMap;
     };
 
     Game_Map.prototype.scrollDisplayPosX = function(x) {
@@ -1507,6 +1584,12 @@ Imported.NUUN_FastTravel = true;
         $gameTemp.fastTravelCommand = true;
         _fastTravelData.setFastTravelMapData();
         $gamePlayer.reserveTransfer(id, x, y, 2, 0);
+    };
+
+
+    Game_Player.prototype.fastTravelLocateTransfer = function(x, y) {
+        this._newX = x;
+        this._newY = y;
     };
 
     Game_Player.prototype.fastTravelLocate = function(x, y) {

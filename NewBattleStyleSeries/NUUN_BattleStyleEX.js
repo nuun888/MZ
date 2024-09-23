@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.6
+ * @version 1.0.7
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/22/2024 Ver.1.0.7
+ * Fixed an issue where the actor selection cursor would appear misaligned.
  * 8/19/2024 Ver.1.0.6
  * Fixed an issue where the state (menu type) display did not change.
  * 8/14/2024 Ver.1.0.5
@@ -1938,7 +1940,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.6
+ * @version 1.0.7
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2008,6 +2010,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/23 Ver.1.0.7
+ * アクター選択のカーソルがずれて表示される問題を修正。
  * 2024/8/19 Ver.1.0.6
  * ステート(メニュータイプ)の表示が切り替わらなっかた問題を修正。
  * 2024/8/14 Ver.1.0.5
@@ -6530,6 +6534,18 @@ Imported.NUUN_BattleStyleEX = true;
         } else {
             this.setCursorRect(0, 0, 0, 0);
         }
+    };
+
+    Window_BsBattleActor.prototype.itemRect = function(index) {
+        return Window_BsBattleStatus.prototype.itemRect.apply(this, arguments);
+    };
+
+    Window_BsBattleActor.prototype.triangleRect = function(index) {
+        return Window_BsBattleStatus.prototype.triangleRect.apply(this, arguments);
+    };
+
+    Window_BsBattleActor.prototype.statusPosition = function(index, rect) {
+        return Window_BsBattleStatus.prototype.statusPosition.apply(this, arguments);
     };
 
 

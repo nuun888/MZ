@@ -1,5 +1,5 @@
 # [サークルゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CircularGauge.js)
-# Ver.1.0.1
+# Ver.1.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CircularGauge.js)  
 ### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)    
@@ -30,6 +30,10 @@
 リカバリー:Gauge_hp_recovery  
 
 ## 更新履歴
+2024/9/29 Ver.1.0.3  
+処理の修正。  
+2024/9/28 Ver.1.0.2  
+画像が表示されない問題を修正。  
 2024/9/17 Ver.1.0.1  
 NUUN_DamageGaugeの適用。  
 2024/5/26 Ver.1.0.0  

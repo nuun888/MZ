@@ -1,11 +1,13 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.7.8
+# Ver.1.7.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 共通処理を行うベースプラグインです。  
 プラグインリストの上に配置してください。  
 
 ## 更新内容
+2024/9/28 Ver.1.7.9  
+ファイル名を取得する処理を追加。  
 2024/6/9 Ver.1.7.8  
 APNG関連の処理の再修正。  
 2024/6/8 Ver.1.7.7  

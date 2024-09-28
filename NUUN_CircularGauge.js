@@ -13,12 +13,16 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.3
  * 
  * @help
  * Make the target gauge into a circle shape.
  * 
  * Log
+ * 9/29/2024 Ver.1.0.3
+ * Processing fixes.
+ * 9/28/2024 Ver.1.0.2
+ * Fixed an issue where images were not displayed.
  * 9/17/2024 Ver.1.0.1
  * Applying NUUN_DamageGauge.
  * 5/26/2024 Ver.1.0.0
@@ -43,12 +47,16 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.3
  * 
  * @help
  * 対象のゲージをサークル型にします。
  * 
  * 更新履歴
+ * 2024/9/29 Ver.1.0.3
+ * 処理の修正。
+ * 2024/9/28 Ver.1.0.2
+ * 画像が表示されない問題を修正。
  * 2024/9/17 Ver.1.0.1
  * NUUN_DamageGaugeの適用。
  * 2024/5/26 Ver.1.0.0
@@ -315,8 +323,13 @@ Imported.NUUN_CircularGauge = true;
 
     const LL_parameters = PluginManager.parameters('LL_ExGaugeDrawing');
     const _circularParams = new Nuun_TempParam();
+    const _circularBitmap = [];
 
-    preloadGaugeImg();
+    const _Scene_Boot_onDatabaseLoaded = Scene_Boot.prototype.onDatabaseLoaded;
+    Scene_Boot.prototype.onDatabaseLoaded = function() {
+        _Scene_Boot_onDatabaseLoaded.apply(this, arguments);
+        _preloadGaugeImg();
+    };
 
     const _Sprite_Gauge_initialize = Sprite_Gauge.prototype.initialize;
     Sprite_Gauge.prototype.initialize = function() {
@@ -348,7 +361,7 @@ Imported.NUUN_CircularGauge = true;
         this._sweepTPAngle = this.sweepTPAngle();
         this._pattern = [];
         this.circularSprite = [];
-        preloadGaugeImg();
+        _preloadGaugeImg();
     };
 
     Sprite_Gauge.prototype.createCircularGaugeBackImg = function() {
@@ -529,8 +542,8 @@ Imported.NUUN_CircularGauge = true;
     };
 
     Sprite_Gauge.prototype.drawCircularValue = function() {
-        if (Imported.NUUN_GaugeValueAnimation) {
-            this._moveMode = true;
+        if (this.setMoveMode) {
+            this.setMoveMode();
         }
         const currentValue = this.currentValue();
         const width = this.circularSprite[1] ? this._circularBitmap.width : this.circularBitmapWidth();
@@ -807,16 +820,16 @@ Imported.NUUN_CircularGauge = true;
         }
     };
 
-    function preloadGaugeImg() {
+    function _preloadGaugeImg() {
         params.CircularGaugeSetting.forEach(data => {
-            ImageManager.nuun_LoadPictures(data.GaugeBackImg);
-            ImageManager.nuun_LoadPictures(data.GaugeImg);
-            ImageManager.nuun_LoadPictures(data.LabelImg);
+            _circularBitmap[0] = ImageManager.nuun_LoadPictures(data.GaugeBackImg);
+            _circularBitmap[1] = ImageManager.nuun_LoadPictures(data.GaugeImg);
+            _circularBitmap[2] = ImageManager.nuun_LoadPictures(data.LabelImg);
             if (Imported.NUUN_DamageGauge && data.GaugeImg) {
                 const dagameGauge = data.GaugeImg +"_damage";
                 const recoveryGauge = data.GaugeImg +"_recovery";
-                ImageManager.nuun_LoadPictures(dagameGauge);
-                ImageManager.nuun_LoadPictures(recoveryGauge);
+                _circularBitmap[3] = ImageManager.nuun_LoadPictures(dagameGauge);
+                _circularBitmap[4] = ImageManager.nuun_LoadPictures(recoveryGauge);
             }
         });
     };

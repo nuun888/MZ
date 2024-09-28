@@ -1,5 +1,5 @@
 # [ステータス項目ベースプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)
-# Ver.1.1.6
+# Ver.1.1.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -29,7 +29,6 @@ Y座標:Y表示列位置からの相対座標。
 ## 更新履歴
 2024/9/28 Ver.1.1.6  
 処理の修正。  
-2024/9/22 Ver.1.1.5  
 EXPゲージの横幅の設定が機能していなかった問題を修正。  
 2024/9/22 Ver.1.1.4  
 記述欄、フリーテキストを選択したときにエラーが出る問題を修正。  

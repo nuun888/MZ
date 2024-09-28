@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.6
+ * @version 1.1.5
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,9 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 9/28/2024 Ver.1.1.6
+ * 9/28/2024 Ver.1.1.5
  * Processing fixes.
- * 9/22/2024 Ver.1.1.5
  * Fixed an issue where the EXP gauge width setting was not working.
  * 9/22/2024 Ver.1.1.4
  * Fixed an issue where an error would occur when selecting free text in the description field.
@@ -130,7 +129,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.6
+ * @version 1.1.5
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -141,9 +140,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2024/9/28 Ver.1.1.6
+ * 2024/9/28 Ver.1.1.5
  * 処理の修正。
- * 2024/9/22 Ver.1.1.5
  * EXPゲージの横幅の設定が機能していなかった問題を修正。
  * 2024/9/22 Ver.1.1.4
  * 記述欄、フリーテキストを選択したときにエラーが出る問題を修正。

@@ -1,5 +1,5 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_MenuScreen_default.js
+ * NUUN_MenuScreenEX.js
  * 
  * Copyright (C) 2022 NUUN
  * This software is released under the MIT License.
@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.8
+ * @version 3.1.9
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/28/2024 Ver.3.1.9
+ * Correction of acquisition parameters.
  * 6/23/2024 Ver.3.1.8
  * Fixed an issue where items were not displayed correctly.
  * 6/22/2024 Ver.3.1.7
@@ -1361,7 +1363,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.8
+ * @version 3.1.9
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1427,6 +1429,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/28 Ver.3.1.9
+ * 取得パラメータの修正。
  * 2024/6/23 Ver.3.1.8
  * 項目の表示が崩れる問題を修正。
  * 2024/6/22 Ver.3.1.7
@@ -2697,20 +2701,19 @@ var Imported = Imported || {};
 Imported.NUUN_MenuScreenEX = true;
 
 (() => {
-    const parameters = PluginManager.parameters('NUUN_MenuScreenEX');
-    Nuun_PluginParams.getPluginParams(document.currentScript);
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const _menutemp = new Nuun_TempParam();
 
-    const MenuLayoutStyle = DataManager.nuun_structureData(parameters['MenuLayoutStyle']);
-    const MenuLayout = DataManager.nuun_structureData(parameters['MenuLayout']);
-    const DecimalMode= eval(parameters['DecimalMode'] || "false");
-    const SubMemberOpacity = eval(parameters['SubMemberOpacity'] || "true");
-    const BackGroundImges = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['BackGroundImges'])) : null) || [];
-    const BackUiWidth1 = eval(parameters['BackUiWidth1'] || "true");
-    const HelpList = DataManager.nuun_structureData(parameters['HelpList']);
-    const ExpDisplayMode = Number(parameters['ExpDisplayMode'] || 1);
-    const EXPDecimal = Number(parameters['EXPDecimal'] || 2);
-    const LabelShow = eval(parameters['LabelShow'] || "true");
+    const MenuLayoutStyle = params.MenuLayoutStyle || "Default";
+    const MenuLayout = params.MenuLayout || {};
+    const DecimalMode= params.DecimalMode;
+    const SubMemberOpacity = params.SubMemberOpacity;
+    const BackGroundImges = params.BackGroundImges || "";
+    const BackUiWidth1 = params.BackUiWidth1;
+    const HelpList = params.HelpList || {};
+    const ExpDisplayMode = params.ExpDisplayMode;
+    const EXPDecimal = params.EXPDecimal;
+    const LabelShow = params.LabelShow;
 
     let menuTextMode = null;
     let menuAlign = null;
@@ -2718,7 +2721,7 @@ Imported.NUUN_MenuScreenEX = true;
     let _commandText = '';
     let _menuLayout = {};
 
-    pluginName = "NUUN_MenuScreenEX";
+    pluginName = params.pluginName;
     PluginManager.registerCommand(pluginName, 'ChangeBackgroundId', args => {
         $gameSystem.menuBackgroundId = Number(args.backgroundId);
     });
@@ -4320,6 +4323,9 @@ Imported.NUUN_MenuScreenEX = true;
     };
     
     Sprite_MenuGauge.prototype.drawValue = function() {
+        if (this.setMoveMode) {
+            this.setMoveMode();
+        }
         if (this._statusType === "menuexp") {
             this.drawValueExp();
         } else {

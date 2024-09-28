@@ -13,15 +13,14 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.3
+ * @version 1.0.2
  * 
  * @help
  * Make the target gauge into a circle shape.
  * 
  * Log
- * 9/29/2024 Ver.1.0.3
+ * 9/29/2024 Ver.1.0.2
  * Processing fixes.
- * 9/28/2024 Ver.1.0.2
  * Fixed an issue where images were not displayed.
  * 9/17/2024 Ver.1.0.1
  * Applying NUUN_DamageGauge.
@@ -47,15 +46,14 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.3
+ * @version 1.0.2
  * 
  * @help
  * 対象のゲージをサークル型にします。
  * 
  * 更新履歴
- * 2024/9/29 Ver.1.0.3
+ * 2024/9/29 Ver.1.0.2
  * 処理の修正。
- * 2024/9/28 Ver.1.0.2
  * 画像が表示されない問題を修正。
  * 2024/9/17 Ver.1.0.1
  * NUUN_DamageGaugeの適用。

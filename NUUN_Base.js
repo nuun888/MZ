@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.8
+ * @version 1.7.9
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/28/2024 Ver.1.7.9
+ * Added a process to get the file name.
  * 6/9/2024 Ver.1.7.8
  * Re-fixed APNG-related processing.
  * 6/8/2024 Ver.1.7.7
@@ -106,7 +108,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.8
+ * @version 1.7.9
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -116,6 +118,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/28 Ver.1.7.9
+ * ファイル名を取得する処理を追加。
  * 2024/6/9 Ver.1.7.8
  * APNG関連の処理の再修正。
  * 2024/6/8 Ver.1.7.7
@@ -219,9 +223,10 @@ class Nuun_PluginParams {
         const params = PluginManager.parameters(name);
         if (params) {
             const pluginParam = new Nuun_PluginParamData(params);
+            pluginParam.setPluginName(name);
             return pluginParam.getParameters();
         }
-        return {};
+        return {pluginName: name};
     }
 };
 
@@ -229,7 +234,7 @@ window.Nuun_PluginParams = Nuun_PluginParams;
 
 class Nuun_PluginParamData {
     constructor(text) {
-        this._parameters = JSON.parse(JSON.stringify(text, this._convertParams));
+        this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
     }
 
     _convertParams(key, code) {
@@ -259,6 +264,10 @@ class Nuun_PluginParamData {
 
     getParameters() {
         return this._parameters;
+    }
+
+    setPluginName(name) {
+        this._parameters.pluginName = name;
     }
 
 
@@ -391,15 +400,15 @@ NuunManager.isFilterClass = function(_class) {
 };
 
 NuunManager.getColorCode = function(color) {
-  if (typeof(color) === "string") {
-    return color;
-  }
-  return ColorManager.textColor(color);
+    if (typeof(color) === "string" && color.indexOf('#') === 0) {
+        return color;
+    }
+    return ColorManager.textColor(color);
 };
 
 NuunManager.numPercentage = function(num, digits, mode) {
-  if (isNaN(num)) { return num }
-  return (mode ? Math.round(num * Math.pow(10, digits + 2)) : Math.floor(num * Math.pow(10, digits + 2))) / Math.pow(10, digits + 2);
+    if (isNaN(num)) { return num }
+    return (mode ? Math.round(num * Math.pow(10, digits + 2)) : Math.floor(num * Math.pow(10, digits + 2))) / Math.pow(10, digits + 2);
 };
 
 NuunManager.nuun_getListIdData = function(id) {
@@ -441,6 +450,20 @@ NuunManager.stringCodeSplit = function(code, mode) {
         }
     }
     return mode ? list.map(Number) : list;
+};
+
+NuunManager.paramClone = function(param) {
+    return JSON.parse(JSON.stringify(param));
+};
+
+NuunManager.getMetaCode = function(object, method) {
+    const meta = object.meta[method];
+    if (!meta) return null;
+    if (meta.indexOf('[') >= 0) {
+        const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+        throw ["ParameterError", log];
+    }
+    const list = meta.split(',');
 };
 
 NuunManager.setMainFontFace = function(font) {
@@ -527,24 +550,24 @@ ImageManager.nuun_LoadPictures = function(filename) {
 
 const _ImageManager_throwLoadError = ImageManager.throwLoadError;
 ImageManager.throwLoadError = function(bitmap) {
-  if (bitmap.nuun_LoadBitmap) {
-    try {
-      _ImageManager_throwLoadError.call(this, bitmap);
-    } catch (e) {
-        
+    if (bitmap.nuun_LoadBitmap) {
+        try {
+            _ImageManager_throwLoadError.call(this, bitmap);
+        } catch (e) {
+            
+        }
+    } else {
+        _ImageManager_throwLoadError.call(this, bitmap);
     }
-  } else {
-    _ImageManager_throwLoadError.call(this, bitmap);
-  }
 };
 
 
 const _Bitmap_isReady = Bitmap.prototype.isReady;
 Bitmap.prototype.isReady = function() {
-  if (this.nuun_LoadBitmap && this.isError()) {
-    this._loadingState = "none";
-  }
-  return _Bitmap_isReady.call(this);
+    if (this.nuun_LoadBitmap && this.isError()) {
+        this._loadingState = "none";
+    }
+    return _Bitmap_isReady.call(this);
 };
 
 
@@ -739,24 +762,24 @@ Spriteset_Battle.prototype.update = function() {
 };
 
 Spriteset_Battle.prototype.updateBattlerGauge = function() {
-  if (this._battlerGaugeBase) {
-    for (const sprite of this._battlerGaugeBase.children) {
-      const spriteData = this._enemySprites.some(enemy => enemy.spriteId === sprite.enemySpriteId);
-      if (!spriteData) {
-        this._battlerGaugeBase.removeChild(sprite);
-      }
+    if (this._battlerGaugeBase) {
+        for (const sprite of this._battlerGaugeBase.children) {
+            const spriteData = this._enemySprites.some(enemy => enemy.spriteId === sprite.enemySpriteId);
+        if (!spriteData) {
+            this._battlerGaugeBase.removeChild(sprite);
+        }
+        }
     }
-  }
 };
 
 const _Window_ItemList_initialize  = Window_ItemList.prototype.initialize;
 Window_ItemList.prototype.initialize = function(rect) {
-  _Window_ItemList_initialize.call(this, rect);
-  this._className = NuunManager.isFilterClass(this);
+    _Window_ItemList_initialize.call(this, rect);
+    this._className = NuunManager.isFilterClass(this);
 };
 
 Window_ItemList.prototype.isConstructor = function() {
-  return false;
+    return false;
 };
 
 
@@ -767,25 +790,25 @@ Game_Action.prototype.clear = function() {
 };
 //以下2つは新バージョンでは必要なし。
 Game_Action.prototype.getAttackElementsList = function() {
-  return Imported.NUUN_MultiElement ? this.getAttackElements() : this.subject().attackElements();
+    return Imported.NUUN_MultiElement ? this.getAttackElements() : this.subject().attackElements();
 };
 
 Game_Action.prototype.getItemElementsList = function() {
-  return Imported.NUUN_MultiElement ? this.getItemElements() : [this.item().damage.elementId];
+    return Imported.NUUN_MultiElement ? this.getItemElements() : [this.item().damage.elementId];
 };
 
 
 
 Sprite_NuunAPngImg.prototype.initialize = function() {
-  Sprite.prototype.initialize.call(this);
-  this.initMembers();
+    Sprite.prototype.initialize.call(this);
+    this.initMembers();
 };
 
 Sprite_NuunAPngImg.prototype.initMembers = function() {
-  this._battler = null;
-  this._apngMode = null;
-  this._data = null;
-  this._pictureName = null;
+    this._battler = null;
+    this._apngMode = null;
+    this._data = null;
+    this._pictureName = null;
 };
 
 Sprite_NuunAPngImg.prototype.setup = function(battler, data, name, mode) {
@@ -804,16 +827,16 @@ Sprite_NuunAPngImg.prototype.refresh = function() {
 };
 
 Sprite_NuunAPngImg.prototype.destroy = function() {
-  this.resetApngImg();
-  Sprite.prototype.destroy.call(this);
+    this.resetApngImg();
+    Sprite.prototype.destroy.call(this);
 };
 
 Sprite_NuunAPngImg.prototype.resetApngImg = function() {
-  this._battler = null;
-  if (this._apngMode) {
-      this.destroyApngIfNeed();
-      this._apngMode = null;
-  }
+    this._battler = null;
+    if (this._apngMode) {
+        this.destroyApngIfNeed();
+        this._apngMode = null;
+    }
 };
 
 Sprite_NuunAPngImg.prototype.isActorPictureEXApp = function() {
@@ -826,7 +849,7 @@ Sprite_NuunAPngImg.prototype.loadApngSprite = function(name) {
 
 
 Game_Enemy.prototype.allSkillActions = function(actionList) {
-  return actionList;
+    return actionList;
 };
 
 

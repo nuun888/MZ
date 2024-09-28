@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.1.6
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/28/2024 Ver.1.1.6
+ * Processing fixes.
+ * 9/22/2024 Ver.1.1.5
+ * Fixed an issue where the EXP gauge width setting was not working.
  * 9/22/2024 Ver.1.1.4
  * Fixed an issue where an error would occur when selecting free text in the description field.
  * 9/8/2024 Ver.1.1.3
@@ -126,7 +130,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.4
+ * @version 1.1.6
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -137,6 +141,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/9/28 Ver.1.1.6
+ * 処理の修正。
+ * 2024/9/22 Ver.1.1.5
+ * EXPゲージの横幅の設定が機能していなかった問題を修正。
  * 2024/9/22 Ver.1.1.4
  * 記述欄、フリーテキストを選択したときにエラーが出る問題を修正。
  * 2024/9/8 Ver.1.1.3
@@ -241,7 +249,7 @@ var Imported = Imported || {};
 Imported.NUUN_MenuParamListBase = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);//params.pluginName
 
     const parameters = PluginManager.parameters('NUUN_MenuParamListBase');
     const _tempParams = new Nuun_TempParam();
@@ -622,12 +630,12 @@ Imported.NUUN_MenuParamListBase = true;
             if (actor && this.nuun_IsContents(data, actor)) {
                 this.setTepmData(data, this._exParams);
                 const method = 'nuun_DrawContents' + data.DateSelect;
-                try {
+                //try {
                     this[method](data, x, y, width, actor);
-                } catch (error) {
-                    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                    throw ["DataError", log];
-                }
+                //} catch (error) {
+                //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+                //    throw ["DataError", log];
+                //}
             }
         }
     
@@ -917,11 +925,12 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         nuun_DrawContentsExpGauge(data, x, y, width, actor) {
-            this.setTepmData("menuexp", this.getTempExParams());
+            this.setTempType("menuexp");
+            this.setTepmData(data, this.getTempExParams());
             this.nuun_PlaceGauge(actor, "menuexp", x, y, "menuExp-%1");
         }
 
-        nuun_DrawContentsHpCircularGauge(data, x, y, width, actor) {setTempExParams()
+        nuun_DrawContentsHpCircularGauge(data, x, y, width, actor) {
             this.setTempType("hp");
             this.nuun_placeCircularGauge(actor, "hp", x, y, "actor%1-gauge-%2");
         }
@@ -946,7 +955,8 @@ Imported.NUUN_MenuParamListBase = true;
         }
     
         nuun_DrawContentsExpCircularGauge(data, x, y, width, actor) {
-            this.setTepmData("menuexp", this.getTempExParams());
+            this.setTempType("menuexp");
+            this.setTepmData(data, this.getTempExParams());
             this.nuun_placeCircularGauge(actor, "menuexp", x, y, "menuExp-%1");
         }
     
@@ -1615,10 +1625,12 @@ Imported.NUUN_MenuParamListBase = true;
     window.Sprite_NuunGauge = Sprite_NuunGauge;
       
     Sprite_NuunGauge.prototype.initialize = function() {
-        this._statusType = _tempParams.getType();
+        const statusType = _tempParams.getType();
+        this._statusType = statusType;
         this._paramData = _tempParams.getData();
         this._exParams = _tempParams.getExParams();
         Sprite_Gauge.prototype.initialize.call(this);
+        this._statusType = statusType;//再度代入
     };
 
     Sprite_NuunGauge.prototype.bitmapWidth = function() {
@@ -1651,7 +1663,7 @@ Imported.NUUN_MenuParamListBase = true;
         if (this._battler) {
             switch (this._statusType) {
                 case "menuexp":
-                    return  this._battler.isMaxLevel() ? this.currentMaxValue() : this._battler.currentExp() - this._battler.currentLevelExp();
+                    return this.currentExpValue();
                 default:
                     return this._paramData.DateSelect === "OrgGauge" ? this.orgGaugeValue() : Sprite_Gauge.prototype.currentValue.call(this);
             }
@@ -1662,11 +1674,19 @@ Imported.NUUN_MenuParamListBase = true;
         if (this._battler) {
             switch (this._statusType) {
                 case "menuexp":
-                    return this._battler.nextLevelExp() - this._battler.currentLevelExp();
+                    return this.currentExpMaxValue();
                 default:
                     return this._paramData.DateSelect === "OrgGauge" ? this.orgGaugeMaxValue() : Sprite_Gauge.prototype.currentMaxValue.call(this);
             }
         }
+    };
+
+    Sprite_Gauge.prototype.currentExpValue = function() {
+        return this._battler.isMaxLevel() ? this.currentMaxValue() : this._battler.currentExp() - this._battler.currentLevelExp();
+    };
+
+    Sprite_Gauge.prototype.currentExpMaxValue = function() {
+        return this._battler.nextLevelExp() - this._battler.currentLevelExp();
     };
 
     Sprite_NuunGauge.prototype.label = function() {
@@ -1679,6 +1699,9 @@ Imported.NUUN_MenuParamListBase = true;
     };
 
     Sprite_NuunGauge.prototype.drawValue = function() {
+        if (this.setMoveMode) {
+            this.setMoveMode();
+        }
         if (this._statusType === "menuexp") {
             this.drawValueExp();
         } else {

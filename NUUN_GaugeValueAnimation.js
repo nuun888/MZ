@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Gauge numerical update animation
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 10/28/2024 Ver.1.2.3
+ * Processing fixes.
  * 11/13/2022 Ver.1.2.2
  * Fixed an issue where gauges would not switch with some plugins.
  * Changed the display in languages other than Japanese to English.
@@ -82,7 +84,7 @@
  * @target MZ
  * @plugindesc ゲージの数値更新アニメーション
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -98,6 +100,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/28 Ver.1.2.3
+ * 処理の修正。
  * 2022/11/13 Ver.1.2.2
  * 一部のプラグインでゲージが切り替わらない問題を修正。
  * 日本語以外での表示を英語表示に変更。
@@ -154,47 +158,305 @@ var Imported = Imported || {};
 Imported.NUUN_GaugeValueAnimation = true;
 
 (() => {
-  const parameters = PluginManager.parameters('NUUN_GaugeValueAnimation');
-  const UpdateFlameValue = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['UpdateFlameValue'])) : null) || [];
+    const parameters = PluginManager.parameters('NUUN_GaugeValueAnimation');
+    const UpdateFlameValue = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['UpdateFlameValue'])) : null) || [];
 
-  const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
-  Sprite_Gauge.prototype.initMembers = function() {
-    _Sprite_Gauge_initMembers.call(this);
-    this._smoothnessMode = null;
-    this._moveMode = false;
-  };
+    function _clone(param) {
+        return JSON.parse(JSON.stringify(param));
+    };
 
-  const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
-  Sprite_Gauge.prototype.setup = function(battler, statusType) {
-    if (!this._smoothnessMode || this._battler !== battler) {
-      this._smoothnessMode = false;
-      _Sprite_Gauge_setup.call(this, battler, statusType);
-      this._smoothnessMode = this.getFlameStatus();
-    }
-  };
+    const _Sprite_Gauge_initMembers = Sprite_Gauge.prototype.initMembers;
+    Sprite_Gauge.prototype.initMembers = function() {
+        this._looping = this.isLoopingGauge();
+        _Sprite_Gauge_initMembers.call(this);
+        this._smoothnessMode = null;
+        this._valueDelay = 0;
+        this._moveMode = false;
+        if (this._looping) {
+            this.initLoopingGauge();
+        }
+    };
 
-  const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
-  Sprite_Gauge.prototype.drawValue = function() {
-    this._moveMode = this._smoothnessMode && this._smoothnessMode.OnUpdateValue;
-    _Sprite_Gauge_drawValue.call(this);
-  };
+    Sprite_Gauge.prototype.initLoopingGauge = function() {
+        this._nowLevel = 0;
+        this._instant = 0;
+        this._gainValue = 0;
+        this._loopingMoveDelay = 0;
+        this._currentMoveValue = 0;
+        this._startCurrentValue = 0;
+        this._endCurrentValue = 0;
+        this._startCurrentMoveValue = 0;
+        this._loopingMoveValue = NaN;
+    };
 
-  const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
-  Sprite_Gauge.prototype.currentValue = function() {
-    if (this._battler && this._moveMode) {
-      this._moveMode = false;
-      return Math.round(this._value);
-    }
-    return _Sprite_Gauge_currentValue.call(this);
-  };
+    Sprite_Gauge.prototype.isLoopingGauge = function() {
+        return false;
+        if (this._statusType === undefined) return NaN;
+        switch (this._statusType) {
+            case "menuexp":
+                return true;
+            default:
+                return false;
+        }
+    };
 
-  Sprite_Gauge.prototype.getFlameStatus = function() {
-    return UpdateFlameValue ? UpdateFlameValue.find(value => (this._statusType === value.StatusType)) : null;
-  };
+    const _Sprite_Gauge_setup = Sprite_Gauge.prototype.setup;
+    Sprite_Gauge.prototype.setup = function(battler, statusType) {
+        if (!this._smoothnessMode || this._battler !== battler) {
+            this._smoothnessMode = false;
+            _Sprite_Gauge_setup.call(this, battler, statusType);
+            this._smoothnessMode = this.getFlameStatus();
+            if (isNaN(this._looping)) {
+                this._looping = this.isLoopingGauge();
+                if (this._looping) {
+                    this.initLoopingGauge();
+                }
+            }
+            if (this._looping) {
+                this.loopingSetup();
+            }
+        }
+    };
 
-  const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;
-  Sprite_Gauge.prototype.smoothness = function() {
-    return this._smoothnessMode ? this._smoothnessMode.UpdateFlame : _Sprite_Gauge_smoothness.call(this);
-  };
-  
+    Sprite_Gauge.prototype.loopingSetup = function() {
+        this._instant = 0;
+        this._nowLevel = _clone(this.getLoopingLevel());
+        this._gainValue = this.getLoopingValue();
+        this._startCurrentValue = this.getLoopingValue() - this.getLoopingEndValue();
+        this._endCurrentValue = this._startCurrentValue;
+        this._currentMoveValue = this._gainValue;
+        this._loopingMoveValue = isNaN(this._loopingMoveValue) ? this.currentValue() : this._loopingMoveValue;
+        this._startCurrentMoveValue = this._gainValue;
+        this._loopingMoveDelay = 0;
+    };
+
+    const _Sprite_Gauge_updateBitmap = Sprite_Gauge.prototype.updateBitmap;
+    Sprite_Gauge.prototype.updateBitmap = function() {
+        if (this._looping) {
+            this.updateTargetLoopingValue();
+        }
+        _Sprite_Gauge_updateBitmap.call(this);
+        if (this._looping) {
+            const value = this.currentValue();
+            if (this._loopingMoveValue !== value) {
+                if (isNaN(this._loopingMoveValue)) {
+                    this._loopingMoveValue = value;
+                }
+                this.valueLoopingRedraw();
+            }
+        }
+    };
+
+    Sprite_Gauge.prototype.updateTargetLoopingValue = function() {
+        const value = this.getLoopingValue();
+        if (this._currentMoveValue !== value) {
+            if (this._duration === 0) {
+                this._startCurrentMoveValue = this._currentMoveValue;
+            }
+            this._gainValue = value - Math.floor(this._startCurrentMoveValue);
+            this._currentMoveValue = value;
+            this._startCurrentValue = this._duration > 0 ? this._loopingMoveValue : this._endCurrentValue;
+            this._endCurrentValue = value - this.getLoopingEndValue();
+            this._loopingMoveValue = isNaN(this._loopingMoveValue) ? this.currentValue() : this._loopingMoveValue;
+            this._loopingMoveDelay = 0;
+            this.valueLoopingRedraw();       
+        }
+    };
+
+    const _Sprite_Gauge_updateGaugeAnimation = Sprite_Gauge.prototype.updateGaugeAnimation;
+    Sprite_Gauge.prototype.updateGaugeAnimation = function() {
+        if (this._looping && this._instant !== 0) {
+            this._value = this.maxLavel() || (this._instant < 0 && this._nowLevel > 1) ? this._targetMaxValue : 0;
+            this._maxValue = this._targetMaxValue;
+            this.redraw();
+            this._instant = 0;
+        } else {
+            _Sprite_Gauge_updateGaugeAnimation.call(this);
+        }
+        if (this._looping && this.isLoopingNextLevel() && this._duration === 0) {
+            this._nowLevel++;
+            this._instant = 1;
+            this._loopingMoveValue = 0;
+            this._startCurrentMoveValue = Math.floor(this._startCurrentMoveValue);
+            this._startCurrentValue = 0;
+        } else if (this._looping && this.isLoopingDownLevel() && this._duration === 0) {
+            this._nowLevel--;
+            this._instant = -1;
+            this._loopingMoveValue = this._battler.expForLevel(this._nowLevel);
+            this._startCurrentMoveValue = Math.ceil(this._startCurrentMoveValue);
+            this._startCurrentValue = this._loopingMoveValue;
+        }
+    };
+
+    Sprite_Gauge.prototype.getFlameStatus = function() {
+        return UpdateFlameValue ? UpdateFlameValue.find(value => (this._statusType === value.StatusType)) : null;
+    };
+
+    Sprite_Gauge.prototype.valueLoopingRedraw = function() {
+        this.currentLoopingValueMove(this.currentValue());
+        Sprite_Gauge.prototype.redraw.call(this);
+    };
+
+    Sprite_Gauge.prototype.currentLoopingValueMove = function(currentValue) {
+        if (this._loopingMoveDelay === 0) {
+            this._loopingMoveDelay = (currentValue - this._loopingMoveValue) / (this._smoothnessMode.UpdateFlame > 0 ? this.smoothness() : 1);
+        }
+        if (this._loopingMoveValue > currentValue) {
+            this._loopingMoveValue += this._loopingMoveDelay;
+            this._startCurrentMoveValue += this._loopingMoveDelay;
+            if (this._loopingMoveValue <= currentValue) {
+                this._loopingMoveValue = currentValue;
+                this._loopingMoveDelay = 0;
+            }
+        } else if (this._loopingMoveValue < currentValue) {
+            this._loopingMoveValue += this._loopingMoveDelay;
+            this._startCurrentMoveValue += this._loopingMoveDelay;
+            if (this._loopingMoveValue >= currentValue) {
+                this._loopingMoveValue = currentValue;
+                this._loopingMoveDelay = 0;
+            }
+        }
+    };
+
+    const _Sprite_Gauge_drawValue = Sprite_Gauge.prototype.drawValue;
+    Sprite_Gauge.prototype.drawValue = function() {
+        this.setMoveMode();
+        _Sprite_Gauge_drawValue.call(this);
+    };
+
+    Sprite_Gauge.prototype.setMoveMode = function() {
+        this._moveMode = this._smoothnessMode && this._smoothnessMode.OnUpdateValue;
+    };
+
+    const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
+    Sprite_Gauge.prototype.currentValue = function() {
+        if (this._battler && this._looping) {
+            return this.currentLoopingValue();
+        } else {
+            if (this._battler && this._moveMode) {
+                this._moveMode = false;
+                return Math.round(this.getValue());
+            }
+            return _Sprite_Gauge_currentValue.call(this);
+        }
+    };
+
+    Sprite_Gauge.prototype.currentLoopingValue = function() {
+        if (this._battler && this._moveMode) {
+            this._moveMode = false;
+            return Math.round(this.getValue());
+        }
+        switch (this._statusType) {
+            case "menuexp":
+                return this.currentExpValue();
+            default:
+                return 0;
+        }
+    };
+
+    Sprite_Gauge.prototype.currentExpValue = function() {
+        if (this._battler && this._moveMode) {
+            this._moveMode = false;
+            return Math.round(this.getValue());
+        }
+        if (this.getLoopingLevel() > this._nowLevel) {
+            return this.maxLavel() ? this.currentMaxValue() : Math.min(this._battler.currentExp() - this._battler.expForLevel(this._nowLevel), this.currentMaxValue())
+        } else {
+            return Math.max(this._battler.currentExp() - this._battler.expForLevel(this._nowLevel), 0);
+        }
+    };
+
+    Sprite_Gauge.prototype.getValue = function() {
+        return this._looping ? this._loopingMoveValue : this._value;
+    };
+
+    const _Sprite_Gauge_currentMaxValue = Sprite_Gauge.prototype.currentMaxValue;
+    Sprite_Gauge.prototype.currentMaxValue = function() {
+        return this._battler && this._looping ? this.currentLoopingMaxValue() : _Sprite_Gauge_currentMaxValue.call(this);
+    };
+
+    Sprite_Gauge.prototype.currentLoopingMaxValue = function() {
+        switch (this._statusType) {
+            case "menuexp":
+                return this.currentExpMaxValue();
+            default:
+                return 0;
+        }
+    };
+
+    Sprite_Gauge.prototype.currentExpMaxValue = function() {
+        return this._battler.expForLevel(this._nowLevel + 1) - this._battler.expForLevel(this._nowLevel);
+    };
+
+    const _Sprite_Gauge_smoothness = Sprite_Gauge.prototype.smoothness;
+    Sprite_Gauge.prototype.smoothness = function() {
+        if (this._looping) {
+            return this._smoothnessMode ? this.loopingSmoothness() : _Sprite_Gauge_smoothness.call(this);
+        } else {
+            return this._smoothnessMode ? this._smoothnessMode.UpdateFlame : _Sprite_Gauge_smoothness.call(this);
+        }
+    };
+
+    Sprite_Gauge.prototype.loopingSmoothness = function() {
+        return Math.max(Math.floor(this._smoothnessMode.UpdateFlame * this.smoothSpeed()), 1);
+    };
+
+    Sprite_Gauge.prototype.smoothSpeed = function() {
+        switch (this._statusType) {
+            case "menuexp":
+                return (this.currentValue() - this._startCurrentValue) / (this._gainValue * this._battler.finalExpRate());
+            default:
+                return 0;
+        }
+    };
+
+    Sprite_Gauge.prototype.maxLavel = function() {
+        return this._nowLevel >= this._battler.maxLevel();
+    };
+
+    Sprite_Gauge.prototype.getLoopingLevel = function() {
+        switch (this._statusType) {
+            case "menuexp":
+                return this._battler._level;
+            default:
+                return 0;
+        }
+    };
+
+    Sprite_Gauge.prototype.getLoopingValue = function() {
+        switch (this._statusType) {
+            case "menuexp":
+                return this._battler.currentExp();
+            default:
+                return false;
+        }
+    };
+
+    Sprite_Gauge.prototype.isLoopingNextLevel = function() {
+        switch (this._statusType) {
+            case "menuexp":
+                return this._nowLevel < this._battler._level;
+            default:
+                return false;
+        }
+    };
+
+    Sprite_Gauge.prototype.isLoopingDownLevel = function() {
+        switch (this._statusType) {
+            case "menuexp":
+                return this._nowLevel > this._battler._level;
+            default:
+                return false;
+        }
+    };
+
+    Sprite_Gauge.prototype.getLoopingEndValue = function() {
+        switch (this._statusType) {
+            case "menuexp":
+                return this._battler.currentLevelExp();
+            default:
+                return false;
+        }
+    };
+
 })();

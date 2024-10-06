@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.9
+ * @version 3.1.10
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 10/06/2024 Ver.3.1.10
+ * Fixed an issue where an error would occur when opening the menu after setting a custom gauge.
  * 9/28/2024 Ver.3.1.9
  * Correction of acquisition parameters.
  * 6/23/2024 Ver.3.1.8
@@ -1363,7 +1365,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.9
+ * @version 3.1.10
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1429,6 +1431,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/6 Ver.3.1.10
+ * 独自ゲージを設定してメニューを開いたときにエラーが出る問題を修正。
  * 2024/9/28 Ver.3.1.9
  * 取得パラメータの修正。
  * 2024/6/23 Ver.3.1.8
@@ -2793,7 +2797,7 @@ Imported.NUUN_MenuScreenEX = true;
             case 'commandtop':
                 return this._menuLayout.MenuStatusY + this.nuun_mainCommandY() - this.nuun_statusWindowHeight();
             case 'commandunder':
-                return this._menuLayout.MenuStatusY + this.nuun_mainCommandY() + this.nuun_mainCommandHeight()
+                return this._menuLayout.MenuStatusY + this.nuun_mainCommandY() + this.nuun_mainCommandHeight();
             }
     };
 
@@ -3518,7 +3522,7 @@ Imported.NUUN_MenuScreenEX = true;
         _menutemp.setType(type);
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsOrgGauge = function(data, x, y, actor) {
+    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsOrgGauge = function(data, x, y, width, actor) {
         _menutemp.setType(data.GaugeID);
         this.nuunMenu_placeGauge(actor, data.GaugeID, x, y, "actor%1-gauge-%2");
     };

@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.7
+ * @version 1.0.8
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 10/8/2024 Ver.1.0.8
+ * Fixed an issue where state filtering was not working.
  * 9/22/2024 Ver.1.0.7
  * Fixed an issue where the actor selection cursor would appear misaligned.
  * 8/19/2024 Ver.1.0.6
@@ -1940,7 +1942,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.7
+ * @version 1.0.8
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2010,6 +2012,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/8 Ver.1.0.8
+ * ステートのフィルター機能が機能していなかった問題を修正。
  * 2024/9/23 Ver.1.0.7
  * アクター選択のカーソルがずれて表示される問題を修正。
  * 2024/8/19 Ver.1.0.6
@@ -4729,16 +4733,16 @@ Imported.NUUN_BattleStyleEX = true;
             sprite.setup(actor);
             sprite.move(x + hw, y + hw);
             if (data) {
-                sprite.setupVisibleIcons(this.getVisibleIcons(data.detaEval), this.getVisibleBuffIcons(data.detaEval2));
+                sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval), this.getVisibleBuffIcons(data.DetaEval2));
             }
             sprite.show();
         }
 
         nuun_DrawContentsState(data, x, y, width, actor) {
             const w = this._window;
-            actor.setVisibleIcons(this.getVisibleIcons(data.detaEval), this.getVisibleBuffIcons(data.detaEval2));
+            actor.setupVisibleIcons(this.getVisibleIcons(data.DetaEval), this.getVisibleBuffIcons(data.DetaEval2));
             w.drawActorIcons(actor, x, y, width);
-            actor.setVisibleIcons(null, null);
+            actor.setupVisibleIcons(null, null);
         }
 
         getVisibleIcons(dataEval) {
@@ -4754,21 +4758,24 @@ Imported.NUUN_BattleStyleEX = true;
 
         getVisibleBuffIcons(dataEval) {
             let buffs = [];
+            const icons = [];
             if (dataEval) {
                 const stateList = dataEval.split(',');
                 for (const id of stateList) {
                     Array.prototype.push.apply(buffs, NuunManager.nuun_getListIdData(id));
                 }
             }
-            return buffs.map(buff => {
+            buffs.forEach(buff => {
                 if (buff >= 0 && buff < 10) {
-                    return this.buffIconIndex(this._buffs[buff], buff);
+                    icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, 1, buff));
+                    icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, 2, buff));
                 } else if (buff <= 10) {
-                    return this.buffIconIndex(this._buffs[buff - 10], buff - 10);
+                    icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, -1, buff));
+                    icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, -2, buff));
                 }
             });
+            return icons;
         }
-
     };
 
     class Nuun_BattleStyleActorAnimation {
@@ -5467,7 +5474,7 @@ Imported.NUUN_BattleStyleEX = true;
     Game_BattlerBase.prototype.stateIcons = function() {
         const states = _Game_BattlerBase_stateIcons.apply(this, arguments);
         if (this._visibleStates && this._visibleStates.length > 0) {
-            states.filter(state => this._visibleStates.indexOf(state));
+            return states.filter(state => this._visibleStates.indexOf(state) >= 0);
         }
         return states;
     };
@@ -5476,7 +5483,7 @@ Imported.NUUN_BattleStyleEX = true;
     Game_BattlerBase.prototype.buffIcons = function() {
         const buffs = _Game_BattlerBase_buffIcons.apply(this, arguments);
         if (this._visibleBuffs && this._visibleBuffs.length > 0) {
-            buffs.filter(buff => this._visibleBuffs.indexOf(buff));
+            return buffs.filter(buff => this._visibleBuffs.indexOf(buff) >= 0);
         }
         return buffs;
     };
@@ -6643,7 +6650,7 @@ Imported.NUUN_BattleStyleEX = true;
         this._visibleBuffs = list2 || [];
     };
 
-    Sprite_StateIcon.prototype.setupVisibleIcons = function() {
+    Sprite_StateIcon.prototype.setVisibleIcons = function() {
         if (this._battler) {
             this._battler.setVisibleIcons(this._visibleStates, this._visibleBuffs);
         }
@@ -6657,7 +6664,7 @@ Imported.NUUN_BattleStyleEX = true;
 
     const _Sprite_StateIcon_update = Sprite_StateIcon.prototype.update;
     Sprite_StateIcon.prototype.update = function() {
-        this.setupVisibleIcons();
+        this.setVisibleIcons();
         _Sprite_StateIcon_update.apply(this, arguments);
         this.resetVisibleIcons();
     };

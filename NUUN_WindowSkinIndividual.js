@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * ウィンドウスキンをウィンドウ毎に設定できます。
@@ -23,6 +23,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/8 Ver.1.0.3
+ * セーブ画面を開くとエラーが出る問題を修正。
  * 2023/4/29 Ver.1.0.2
  * ヘルプウィンドウを表示するシーンを表示する際に、エラーが出る問題を修正。
  * 2023/4/10 Ver.1.0.1
@@ -219,7 +221,7 @@ Imported.NUUN_WindowSkinIndividual = true;
             className = String(this.constructor.name);
         }
         this._customWindowSkin = WindowSkinIndividual.find(data => data.ClassName === className);
-        _Window_Base_initialize.call(this, rect);
+        _Window_Base_initialize.apply(this, arguments);
     };
 
     const _Window_Base_loadWindowskin = Window_Base.prototype.loadWindowskin;
@@ -227,13 +229,13 @@ Imported.NUUN_WindowSkinIndividual = true;
         if (this._customWindowSkin && this._customWindowSkin.WindowSkin) {
             this.windowskin = ImageManager.loadSystem(this._customWindowSkin.WindowSkin);
         } else {
-            _Window_Base_loadWindowskin.call(this);
+            _Window_Base_loadWindowskin.apply(this, arguments);
         }
     };
 
     const _Window_Help_initialize = Window_Help.prototype.initialize;
     Window_Help.prototype.initialize = function(rect) {
-        _Window_Help_initialize .call(this, rect);
+        _Window_Help_initialize.apply(this, arguments);
         this._skinTone = getTone();
     };
 
@@ -257,7 +259,7 @@ Imported.NUUN_WindowSkinIndividual = true;
             const tone = this._skinTone ? this._skinTone : this._customWindowSkin.windowColor;
             this.setTone(tone.red, tone.green, tone.bule);
         } else {
-            _Window_Base_updateTone.call(this);
+            _Window_Base_updateTone.apply(this, arguments);
         }
     };
 
@@ -265,21 +267,21 @@ Imported.NUUN_WindowSkinIndividual = true;
     const _Scene_Status_createProfileWindow = Scene_Status.prototype.createProfileWindow;
     Scene_Status.prototype.createProfileWindow = function() {
         sceneSkinMode = 'status';
-        _Scene_Status_createProfileWindow.call(this);
+        _Scene_Status_createProfileWindow.apply(this, arguments);
         sceneSkinMode = null;
     };
 
     const _Scene_File_createHelpWindow = Scene_File.prototype.createHelpWindow;
     Scene_File.prototype.createHelpWindow = function() {
         sceneSkinMode = 'save';
-        _Scene_File_createHelpWindow.call(this, rect);
+        _Scene_File_createHelpWindow.apply(this, arguments);
         sceneSkinMode = null;
     };
 
     const _Scene_MenuBase_createHelpWindow = Scene_MenuBase.prototype.createHelpWindow;
     Scene_MenuBase.prototype.createHelpWindow = function() {
         sceneSkinMode = this.getSceneSkinMode();
-        _Scene_MenuBase_createHelpWindow .call(this);
+        _Scene_MenuBase_createHelpWindow.apply(this, arguments);
         sceneSkinMode = null;
     };
 

@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.8
+ * @version 1.0.9
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 10/8/2024 Ver.1.0.9
+ * Fixed an issue where an error occurred when setting State 2.
  * 10/8/2024 Ver.1.0.8
  * Fixed an issue where state filtering was not working.
  * 9/22/2024 Ver.1.0.7
@@ -1942,7 +1944,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.8
+ * @version 1.0.9
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2012,6 +2014,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/8 Ver.1.0.9
+ * ステート2の設定でエラーが出る問題を修正。
  * 2024/10/8 Ver.1.0.8
  * ステートのフィルター機能が機能していなかった問題を修正。
  * 2024/9/23 Ver.1.0.7
@@ -4740,9 +4744,9 @@ Imported.NUUN_BattleStyleEX = true;
 
         nuun_DrawContentsState(data, x, y, width, actor) {
             const w = this._window;
-            actor.setupVisibleIcons(this.getVisibleIcons(data.DetaEval), this.getVisibleBuffIcons(data.DetaEval2));
+            actor.setVisibleIcons(this.getVisibleIcons(data.DetaEval), this.getVisibleBuffIcons(data.DetaEval2));
             w.drawActorIcons(actor, x, y, width);
-            actor.setupVisibleIcons(null, null);
+            actor.setVisibleIcons(null, null);
         }
 
         getVisibleIcons(dataEval) {
@@ -5392,7 +5396,9 @@ Imported.NUUN_BattleStyleEX = true;
     const _Game_Actor_refresh = Game_Actor.prototype.refresh;
     Game_Actor.prototype.refresh = function() {
         _Game_Actor_refresh.apply(this, arguments);
-        $gameTemp.setBattleStyleStatusRefresh(params.ActorRefreshStatusWindowRefresh);
+        if ($gameParty.inBattle()) {
+            $gameTemp.setBattleStyleStatusRefresh(params.ActorRefreshStatusWindowRefresh);
+        }
     };
 
     Game_Battler.prototype.isCounterSkillAction = function() {

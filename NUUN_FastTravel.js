@@ -1402,91 +1402,18 @@ Imported.NUUN_FastTravel = true;
     Window_FastTravel.prototype.initialize = function(rect) {
         Window_Selectable.prototype.initialize.call(this, rect);
         this.opacity = params.FastTravelSubWindowVisible ? 255 : 0;
-        this._contentsData = new Nuun_DrawFastTravelListData(this, params);
+        //this._contentsData = new Nuun_DrawFastTravelListData(this, params);
     };
 
     Window_FastTravelSub.prototype.setFastTravel = function(fastTravel) {
-        this._contentsData.setItem(fastTravel);
+        //this._contentsData.setItem(fastTravel);
         this.refresh();
     };
 
     Window_FastTravelSub.prototype.refresh = function() {
         this.contents.clear();
-        this._contentsData.refresh();
+        //this._contentsData.refresh();
     };
-
-
-    class Nuun_DrawFastTravelListData extends Nuun_DrawListData {
-        constructor(_window, params) {
-            super(_window, params);
-            this._item = null;
-        }
-
-        nuun_MaxContentsCols() {
-            return 1;
-        }
-
-        getStatusParamsList() {
-            return params.FastTravelSubParamList;
-        }
-
-        setItem(item) {
-            this._item = item;
-        }
-
-        refresh() {
-            this.drawStatusContents(this._item)
-        }
-
-        drawItemImg(actor, index) {
-            
-        }
-
-        nuun_DrawContentsMapName(data, x, y, width) {
-            const w = this._window;
-            if (this._item.IconIndex && this._item.IconIndex > 0) {
-                const iconY = y + (w.lineHeight() - ImageManager.iconHeight) / 2;
-                w.drawIcon(this._item.IconIndex, x, y + (iconY || 0));
-                const iconWidth = ImageManager.iconWidth + 4;
-                x += iconWidth;
-                width -= iconWidth;
-            }
-            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
-            const nameText = data.ParamName ? data.ParamName : this._item.FastTravelName;
-            this.nuun_SetContentsFontFace(data);
-            w.drawText(nameText, x, y, width, data.Align);
-        }
-
-        nuun_DrawContentsOrgParam(data, x, y, width) {
-            const map = $dataMap;
-            const w = this._window;
-            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
-            if (data.Icon && data.Icon > 0) {
-                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
-                const iconWidth = ImageManager.iconWidth + 4;
-                x += iconWidth;
-                width -= iconWidth;
-            }
-            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
-            this.nuun_SetContentsFontFace(data);
-            const nameText = data.ParamName ? data.ParamName : '';
-            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
-            w.drawText(nameText, x, y, textWidth);
-            w.resetTextColor();
-            if (data.DetaEval) {
-                this.nuun_SetContentsValueFontFace(data);
-                const padding = textWidth > 0 ? w.itemPadding() : 0;
-                const textParam = this.getStatusEvalParam(param, actor, enemy);
-                if (isNaN(textParam)) {
-                    w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
-                } else {
-                    const value = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
-                    w.nuun_DrawContentsParamUnitText(value, data, x + textWidth + padding, y, width - (textWidth + padding));
-                }       
-            }
-        }
-
-    }
 
 
     const _Game_Map_setup = Game_Map.prototype.setup;

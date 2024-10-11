@@ -6,13 +6,13 @@
 
 アイテム一覧に画像を表示させます。  
 
+![画像](img/ItemListImage1.png)  
+![画像](img/ItemListImage2.png)  
+
 ## 設定
 アイテムのメモ欄
 `<ItemListImg:[url]>` 画像を表示します。  
 `[url]`:pictures直下の画像  
-
-![画像](img/ItemListImage1.png)  
-![画像](img/ItemListImage2.png)  
 
 ## 更新履歴  
 2024/10/12 Ver.1.0.0  

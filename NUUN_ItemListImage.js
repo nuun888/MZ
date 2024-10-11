@@ -43,7 +43,7 @@
  * @desc Sets the display settings for the item window.
  * @text Item window display settings
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"5","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent ItemSetting
  * 
  * @param ShopItemSetting
@@ -54,14 +54,14 @@
  * @desc Sets the display settings for the shop window when purchasing.
  * @text Shop window purchase display settings
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"3","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent ShopItemSetting
  * 
  * @param ShopWindowSellSetting
  * @desc Sets the display settings for the shop window when selling.
  * @text Shop window display settings when selling
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"5","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent ShopItemSetting
  * 
  * @param EquipItemSetting
@@ -72,7 +72,7 @@
  * @desc Sets the display settings for the equipment window.
  * @text Equipment window display settings
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"3","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent EquipItemSetting
  * 
  * @param BattleItemSetting
@@ -83,7 +83,7 @@
  * @desc Sets the display settings for the battle item window.
  * @text Battle item window display settings
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"5","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent BattleItemSetting
  * 
  */
@@ -175,7 +175,7 @@
  * @desc アイテムウィンドウの表示設定を行います。
  * @text アイテムウィンドウ表示設定
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"5","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent ItemSetting
  * 
  * @param ShopItemSetting
@@ -186,14 +186,14 @@
  * @desc ショップウィンドウの購入時の表示設定を行います。
  * @text ショップウィンドウ購入時表示設定
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"3","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent ShopItemSetting
  * 
  * @param ShopWindowSellSetting
  * @desc ショップウィンドウの売却時の表示設定を行います。
  * @text ショップウィンドウ売却時表示設定
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"5","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent ShopItemSetting
  * 
  * @param EquipItemSetting
@@ -204,7 +204,7 @@
  * @desc 装備ウィンドウの表示設定を行います。
  * @text 装備ウィンドウ表示設定
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"3","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent EquipItemSetting
  * 
  * @param BattleItemSetting
@@ -215,7 +215,7 @@
  * @desc 戦闘アイテムウィンドウの表示設定を行います。
  * @text 戦闘アイテムウィンドウ表示設定
  * @type struct<ItemImgSetting>
- * @default 
+ * @default {"ItemImgCols":"5","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent BattleItemSetting
  * 
  */

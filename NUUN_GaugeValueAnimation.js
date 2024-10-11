@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Gauge numerical update animation
  * @author NUUN
- * @version 1.2.3
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -23,11 +23,17 @@
  * Also, on the map, the gauge will change without animation, but with this plug-in, both the gauge and the numerical value will change gradually.
  * If you do not want to animate the numerical value of the gauge, set the value of "OnUpdateValue" (numerical change animation) of the corresponding plug-in parameter to false.
  * 
+ * Experience value animation
+ * Experience value animation only supports the currently acquired experience value.
+ * Only compatible with NUUN plugins.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 10/28/2024 Ver.1.2.3
+ * 9/28/2024 Ver.1.3.0
+ * Supports gauge loop processing.
+ * 9/28/2024 Ver.1.2.3
  * Processing fixes.
  * 11/13/2022 Ver.1.2.2
  * Fixed an issue where gauges would not switch with some plugins.
@@ -65,6 +71,7 @@
  * @option 'hp'
  * @option 'mp'
  * @option 'tp'
+ * @option 'menuexp'
  * @default 
  * 
  * @param UpdateFlame
@@ -84,7 +91,7 @@
  * @target MZ
  * @plugindesc ゲージの数値更新アニメーション
  * @author NUUN
- * @version 1.2.3
+ * @version 1.3.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -96,11 +103,17 @@
  * またマップ上ではゲージの変化はアニメーションをせずに変化してしまいますが、このプラグインではゲージ、数値ともに徐々に変化するようになります。
  * ゲージの数値のアニメーションをさせない場合は、該当のプラグインパラメータの「OnUpdateValue」（数値変化アニメーショ）の値をfalseに設定してください。
  * 
+ * 経験値の数値アニメーション
+ * 経験値の数値アニメーションの対象は現在の獲得経験値のみ対応しています。
+ * NUUN系プラグインのみの対応です。
+ * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2024/10/28 Ver.1.2.3
+ * 2024/10/12 Ver.1.3.0
+ * ゲージのループ処理に対応。
+ * 2024/9/28 Ver.1.2.3
  * 処理の修正。
  * 2022/11/13 Ver.1.2.2
  * 一部のプラグインでゲージが切り替わらない問題を修正。
@@ -138,6 +151,7 @@
  * @option 'hp'
  * @option 'mp'
  * @option 'tp'
+ * @option 'menuexp'
  * @default 
  * 
  * @param UpdateFlame
@@ -190,7 +204,6 @@ Imported.NUUN_GaugeValueAnimation = true;
     };
 
     Sprite_Gauge.prototype.isLoopingGauge = function() {
-        return false;
         if (this._statusType === undefined) return NaN;
         switch (this._statusType) {
             case "menuexp":

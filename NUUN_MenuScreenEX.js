@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.10
+ * @version 3.1.11
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 10/12/2024 Ver.3.1.11
+ * Added processing to accommodate gauge loop processing.
  * 10/06/2024 Ver.3.1.10
  * Fixed an issue where an error would occur when opening the menu after setting a custom gauge.
  * 9/28/2024 Ver.3.1.9
@@ -1365,7 +1367,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.10
+ * @version 3.1.11
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1431,6 +1433,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/12 Ver.3.1.11
+ * ゲージループ処理に対応させる処理を追加。
  * 2024/10/6 Ver.3.1.10
  * 独自ゲージを設定してメニューを開いたときにエラーが出る問題を修正。
  * 2024/9/28 Ver.3.1.9
@@ -4275,7 +4279,7 @@ Imported.NUUN_MenuScreenEX = true;
             case "time":
                 return Sprite_Gauge.prototype.currentValue.call(this);
             case "menuexp":
-                return  this._battler.isMaxLevel() ? this.currentMaxValue() : this._battler.currentExp() - this._battler.currentLevelExp();
+                return  this.currentExpValue();
             default:
                 const actor = this._battler;
                 return eval(this.menuParam.DetaEval);
@@ -4283,6 +4287,14 @@ Imported.NUUN_MenuScreenEX = true;
         } else {
           return Sprite_Gauge.prototype.currentValue.call(this);
         }
+    };
+
+    const _Sprite_Gauge_currentExpValue = Sprite_Gauge.prototype.currentExpValue;
+    Sprite_Gauge.prototype.currentExpValue = function() {
+        if (!!_Sprite_Gauge_currentExpValue) {
+            return _Sprite_Gauge_currentExpValue.call(this);
+        }
+        return this._battler.isMaxLevel() ? this.currentMaxValue() : this._battler.currentExp() - this._battler.currentLevelExp();
     };
       
     Sprite_MenuGauge.prototype.currentMaxValue = function() {
@@ -4294,7 +4306,7 @@ Imported.NUUN_MenuScreenEX = true;
             case "time":
                 return Sprite_Gauge.prototype.currentMaxValue.call(this);
             case "menuexp":
-                return this._battler.nextLevelExp() - this._battler.currentLevelExp();
+                return this.currentExpMaxValue();
             default:
                 const actor = this._battler;
                 return eval(this.menuParam.DetaEval2);
@@ -4302,6 +4314,14 @@ Imported.NUUN_MenuScreenEX = true;
         } else {
           return Sprite_Gauge.prototype.currentMaxValue.call(this);
         }
+    };
+
+    const _Sprite_Gauge_currentExpMaxValue = Sprite_Gauge.prototype.currentExpMaxValue;
+    Sprite_Gauge.prototype.currentExpMaxValue = function() {
+        if (!!_Sprite_Gauge_currentExpMaxValue) {
+            return _Sprite_Gauge_currentExpMaxValue.call(this);
+        }
+        return this._battler.nextLevelExp() - this._battler.currentLevelExp();
     };
     
     Sprite_MenuGauge.prototype.label = function() {

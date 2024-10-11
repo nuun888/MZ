@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.6.4
+ * @version 1.6.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -114,6 +114,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2024/10/12 Ver.1.6.5
+ * 一部プラグインでの競合対応。
  * 2023/12/29 Ver.1.6.4
  * アイテムカテゴリー名称の未設定時の不具合修正。
  * 2023/9/10 Ver.1.6.3
@@ -2096,6 +2098,7 @@ Scene_ItemBook.prototype.createIndexWindow = function() {
   this.addWindow(this._indexWindow);
   this._indexWindow.setHandler("cancel", this.onItemIndexCancel.bind(this));
   this._indexWindow.hide();
+  this._indexWindow.setHelpWindow(this._helpWindow);
   this.backgroundOpacity(this._indexWindow);
 };
 
@@ -2453,6 +2456,7 @@ function Window_ItemBook_Index() {
 
 Window_ItemBook_Index.prototype = Object.create(Window_ItemList.prototype);
 Window_ItemBook_Index.prototype.constructor = Window_ItemBook_Index;
+window.Window_ItemBook_Index = Window_ItemBook_Index;
 
 Window_ItemBook_Index._lastTopRow = 0;
 Window_ItemBook_Index._lastIndex = 0;
@@ -2577,29 +2581,29 @@ Window_ItemBook_Index.prototype.allItemData = function() {
 };
 
 Window_ItemBook_Index.prototype.drawItem = function(index) {
-  const item = this.itemAt(index);
-  if (item) {
-    const rect = this.itemLineRect(index);
-    if(NumberType > 0) {
-      let numberText = NumberMode ? index + 1 : $gameSystem.getItemBookNumber(item);
-      const numberWidth = this.numberWidth(numberText);
-      if (NumberType === 2) {
-        numberText = this.numberWidthSlice(numberText);
-      }
-      this.drawText(numberText, rect.x, rect.y, numberWidth);
-      this.drawText(":", rect.x + numberWidth + 6, rect.y);
-      if ($gameSystem.isInItemBook(item)) {
-        this.drawItemName(item, rect.x + numberWidth + 24, rect.y, rect.width - numberWidth - 24);
-      } else {
-        this.drawText(this.unknownDataLength(item), rect.x + numberWidth + 24, rect.y, rect.width - numberWidth - 24);
-      }
-    } else {
-      if ($gameSystem.isInItemBook(item)) {
-        this.drawItemName(item, rect.x, rect.y, rect.width);
-      } else {
-        this.drawText(this.unknownDataLength(item), rect.x, rect.y, rect.width);
-      }
-    }
+    const item = this.itemAt(index);
+    if (item) {
+        const rect = this.itemLineRect(index);
+        if(NumberType > 0) {
+        let numberText = NumberMode ? index + 1 : $gameSystem.getItemBookNumber(item);
+        const numberWidth = this.numberWidth(numberText);
+        if (NumberType === 2) {
+            numberText = this.numberWidthSlice(numberText);
+        }
+        this.drawText(numberText, rect.x, rect.y, numberWidth);
+        this.drawText(":", rect.x + numberWidth + 6, rect.y);
+        if ($gameSystem.isInItemBook(item)) {
+            this.drawItemName(item, rect.x + numberWidth + 24, rect.y, rect.width - numberWidth - 24);
+        } else {
+            this.drawText(this.unknownDataLength(item), rect.x + numberWidth + 24, rect.y, rect.width - numberWidth - 24);
+        }
+        } else {
+        if ($gameSystem.isInItemBook(item)) {
+            this.drawItemName(item, rect.x, rect.y, rect.width);
+        } else {
+            this.drawText(this.unknownDataLength(item), rect.x, rect.y, rect.width);
+        }
+        }
   }
 };
 
@@ -2665,18 +2669,18 @@ Window_ItemBook.prototype = Object.create(Window_Selectable.prototype);
 Window_ItemBook.prototype.constructor = Window_ItemBook;
 
 Window_ItemBook.prototype.initialize = function(rect) {
-  //this._userWindowSkin = param.ContentWindowsSkin;
-  Window_Selectable.prototype.initialize.call(this, rect);
-  this.language_Jp = $gameSystem.isJapanese();
-  this._additionalSprites = {};
-  this._item = null;
-  this._itemData = [];
-  this._weaponData = [];
-  this._armorData = [];
-  this._pageMode = 0;
-  this.displayList = null;
-  this._itemType = null;
-  this.refresh();
+    //this._userWindowSkin = param.ContentWindowsSkin;
+    Window_Selectable.prototype.initialize.call(this, rect);
+    this.language_Jp = $gameSystem.isJapanese();
+    this._additionalSprites = {};
+    this._item = null;
+    this._itemData = [];
+    this._weaponData = [];
+    this._armorData = [];
+    this._pageMode = 0;
+    this.displayList = null;
+    this._itemType = null;
+    this.refresh();
 };
 
 Window_ItemBook.prototype.setHelpWindow = function(helpWindow) {
@@ -2684,54 +2688,62 @@ Window_ItemBook.prototype.setHelpWindow = function(helpWindow) {
 };
 
 Window_ItemBook.prototype.getBackgroundId = function() {
-  const displayList = this.setDisplayList(this._item);
-  return displayList && displayList.length > 0 ? 
-  (Math.max(displayList[this._pageMode].PageBackGroundId, 1) - 1 || 0) : 0;
+    const displayList = this.setDisplayList(this._item);
+    return displayList && displayList.length > 0 ? 
+    (Math.max(displayList[this._pageMode].PageBackGroundId, 1) - 1 || 0) : 0;
 };
 
 Window_ItemBook.prototype.setItem = function(item) {
-  if(this._item !== item) {
-    this._item = item;
-    this.refresh();
-  }
+    if(this._item !== item) {
+        this._item = item;
+        this.refresh();
+    }
 };
 
-Window_ItemBook.prototype.maxCols = function() {
-  return ContentCols;
+Window_ItemBook.prototype.nuun_MaxContentsCols = function() {
+    return ContentCols;
+};
+
+Window_ItemBook.prototype.nuun_ItemWidth = function(width) {
+    return Math.floor(width / this.nuun_MaxContentsCols());
+};
+
+Window_ItemBook.prototype.nuun_ItemContentsWidth = function(width) {
+    return Math.floor(width / this.nuun_MaxContentsCols()) - this.colSpacing() - 4;
 };
 
 Window_ItemBook.prototype.refresh = function() {
-  if (!this._item || this._pageMode < 0) {
+    if (!this._item || this._pageMode < 0) {
+        this.contents.clear();
+        this.updateHelp();
+        return;
+    }
     this.contents.clear();
+    if (!$gameSystem.isInItemBook(this._item)) {
+        this.setHelpWindowItem(null);
+        return;
+    }
     this.updateHelp();
-    return;
-  }
-  this.contents.clear();
-  if (!$gameSystem.isInItemBook(this._item)) {
-    this.setHelpWindowItem(null);
-    return;
-  }
-  this.updateHelp();
-  this.page(this._item);
+    this.page(this._item);
 };
 
 Window_ItemBook.prototype.updateHelp = function() {
-  this.setHelpWindowItem(this._item);
+    //this.setHelpWindowItem(this._item);
 };
 
 Window_ItemBook.prototype.getItemBitmap = function(listContent, item) {
-  let bitmap = null;
-  for (const data of listContent) {
-    const commonItemBitmap = data.DateSelect === 100 && data.ImgData && data.ImgData[0] ? ImageManager.nuun_LoadPictures(data.ImgData[0]) : null;
-    const itemBitmapData = data.DateSelect === 101 ? this.getItemImg(data, item) : null;
-    const itemBitmap = itemBitmapData ? ImageManager.nuun_LoadPictures(itemBitmapData[0]) : null;
-    if (commonItemBitmap && !commonItemBitmap.isReady()) {
-      bitmap = commonItemBitmap;
-    } else if (itemBitmap && !itemBitmap.isReady()) {
-      bitmap = itemBitmap;
+    let bitmap = null;
+    for (const data of listContent) {
+        const commonItemBitmap = data.DateSelect === 100 && data.ImgData && data.ImgData[0] ? ImageManager.nuun_LoadPictures(data.ImgData[0]) : null;
+        const itemBitmapData = data.DateSelect === 101 ? this.getItemImg(data, item) : null;
+        const itemBitmap = itemBitmapData ? ImageManager.nuun_LoadPictures(itemBitmapData[0]) : null;
+        if (commonItemBitmap && !commonItemBitmap.isReady()) {
+        bitmap = commonItemBitmap;
+        } else if (itemBitmap && !itemBitmap.isReady()) {
+        bitmap = itemBitmap;
+        }
     }
-  }
-  return bitmap;
+    return bitmap;
 };
 
 Window_ItemBook.prototype.getItemImg = function(data, item) {
@@ -2760,54 +2772,58 @@ Window_ItemBook.prototype.getItemImg = function(data, item) {
 };
 
 Window_ItemBook.prototype.page = function(item) {
-  const displayList = this.setDisplayList(item);
-  if (!displayList || displayList.length <= 0) {
-    return;
-  }
-  const listContent = displayList[this._pageMode].displayData;
-  const bitmap = this.getItemBitmap(listContent, item);
-  if (bitmap) {
-    bitmap.addLoadListener(this.drawPage.bind(this, listContent, item));
-  } else {
-    this.drawPage(listContent, item);
-  }
+    const displayList = this.setDisplayList(item);
+    if (!displayList || displayList.length <= 0) {
+        return;
+    }
+    const listContent = displayList[this._pageMode].displayData;
+    const bitmap = this.getItemBitmap(listContent, item);
+    if (bitmap) {
+        bitmap.addLoadListener(this.drawPage.bind(this, listContent, item));
+    } else {
+        this.drawPage(listContent, item);
+    }
 };
 
 Window_ItemBook.prototype.drawPage = function(listContent, item) {
-  const lineHeight = this.lineHeight();
-  for (const data of listContent) {
-    const x_Position = data.X_Position;
-    const position = Math.min(x_Position, this.maxCols());
-    const rect = this.itemRect(position - 1);
-    const x = rect.x + (data.X_Coordinate || 0);
-    const y = (data.Y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
-    const width = data.ItemWidth && data.ItemWidth > 0 ? data.ItemWidth : this.widthMode(data, rect);
-    this.dataDisplay(data, item, x, y, width);
-  }
+    const rect = this.itemRect(0);
+    const lineHeight = this.lineHeight();
+    const itemWidth = this.nuun_ItemWidth(rect.width);
+    const colSpacing = this.colSpacing();
+    for (const data of listContent) {
+        this.resetFontSettings();
+        const x_Position = data.X_Position;
+        const y_Position = data.Y_Position;
+        const position = Math.min(x_Position, this.nuun_MaxContentsCols());
+        const x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1);
+        const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
+        const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : this.widthMode(data.WideMode, itemWidth), rect.width - x);
+        this.dataDisplay(data, item, x + rect.x, y, width);
+    }
 };
 
 Window_ItemBook.prototype.setDisplayList = function(item) {
-  if (DataManager.isItem(item)) {
-    this._itemType = 'item';
-    return ItemPageSetting;
-  } else if (DataManager.isWeapon(item)) {
-    this._itemType = 'weapon';
-    return WeaponPageSetting;
-  } else if (DataManager.isArmor(item)) {
-    this._itemType = 'armor';
-    return ArmorPageSetting;
-  }
-  this._itemType = null;
-  return null;
+    if (DataManager.isItem(item)) {
+        this._itemType = 'item';
+        return ItemPageSetting;
+    } else if (DataManager.isWeapon(item)) {
+        this._itemType = 'weapon';
+        return WeaponPageSetting;
+    } else if (DataManager.isArmor(item)) {
+        this._itemType = 'armor';
+        return ArmorPageSetting;
+    }
+    this._itemType = null;
+    return null;
 };
 
-Window_ItemBook.prototype.widthMode = function(list, rect) {
-  if (list.WideMode === 2) {
-    rect.width = rect.width * 2 + this.colSpacing();
-  } else if (list.WideMode === 3 && ContentCols === 3) {
-    rect.width = rect.width * 3 + (this.colSpacing() * 2);
+Window_ItemBook.prototype.widthMode = function(mode, width) {
+  if (mode === 2) {
+    width = width * 2 + this.colSpacing();
+  } else if (mode === 3 && ContentCols === 3) {
+    width = width * 3 + (this.colSpacing() * 2);
   }
-  return rect.width;
+  return width;
 };
 
 Window_ItemBook.prototype.dataDisplay = function(list, item, x, y, width) {

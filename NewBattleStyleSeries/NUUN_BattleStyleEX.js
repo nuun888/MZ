@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.9
+ * @version 1.0.10
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 10/13/2024 Ver.1.0.10
+ * Fixed an issue where party commands would not appear and the game would freeze after canceling enemy targeting.
  * 10/8/2024 Ver.1.0.9
  * Fixed an issue where an error occurred when setting State 2.
  * 10/8/2024 Ver.1.0.8
@@ -2014,6 +2016,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/13 Ver.1.0.10
+ * 敵対象キャンセル後、パーティコマンドが表示されずにフリーズする問題を修正。
  * 2024/10/8 Ver.1.0.9
  * ステート2の設定でエラーが出る問題を修正。
  * 2024/10/8 Ver.1.0.8
@@ -5607,6 +5611,9 @@ Imported.NUUN_BattleStyleEX = true;
                     break;
                 }
             }
+        }
+        if (this._actorCommandWindow.isOpen() && this._actorCommandWindow.visible) {
+            $gameTemp.onBSAction = false;
         }
     };
 

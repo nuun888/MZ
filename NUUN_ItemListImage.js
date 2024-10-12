@@ -88,6 +88,11 @@
  * @default {"ItemImgCols":"5","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent BattleItemSetting
  * 
+ * @noteParam ItemListImg
+ * @noteDir img/pictures
+ * @noteType file
+ * @noteData items
+ * 
  */
 /*~struct~ItemImgSetting:
  * 

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderBefore NUUN_ItemNum
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Displays images in the item list.
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 10/13/2024 Ver.1.0.1
+ * Fixed Exclude unused files in settings images to exclude them.
  * 10/12/2024 Ver.1.0.0
  * First edition.
  * 
@@ -145,7 +147,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderBefore NUUN_ItemNum
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * アイテム一覧に画像を表示させます。
@@ -158,6 +160,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/13 Ver.1.0.1
+ * 設定画像の未使用ファイルを除外するを除外するように修正。
  * 2024/10/12 Ver.1.0.0
  * 初版
  * 
@@ -217,6 +221,11 @@
  * @type struct<ItemImgSetting>
  * @default {"ItemImgCols":"5","ItemRectHeight":"0","ItemNameX":"0","ItemNameY":"112","ItemNumberX":"0","ItemNumberY":"0","ItemBitmapX":"-1"}
  * @parent BattleItemSetting
+ * 
+ * @noteParam ItemListImg
+ * @noteDir img/pictures
+ * @noteType file
+ * @noteData items
  * 
  */
 /*~struct~ItemImgSetting:ja

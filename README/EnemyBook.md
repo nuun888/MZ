@@ -14,6 +14,7 @@
 [モンスター図鑑マップ遭遇チェック](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEncounterCheck.md)Ver.1.0.2  
 [モンスター図鑑表示順変更](https://github.com/nuun888/MZ/blob/master/README/EnemyBookOrder.md)Ver.1.0.0  
 [モンスター図鑑表示順拡張](https://github.com/nuun888/MZ/blob/master/README/EnemyBookOrderEx.md)Ver.1.0.0  
+[モンスター図鑑レイアウトカスタマイズ](https://github.com/nuun888/MZ/blob/master/README/EnemyBookCustomLayout.md)Ver.1.0.0  
 #### オプション
 [キーボタン割り当て](https://github.com/nuun888/MZ/blob/master/README/UserKey.md)  
 

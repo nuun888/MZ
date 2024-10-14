@@ -1,11 +1,11 @@
 /*:-----------------------------------------------------------------------------------
  * NUUN_BattlerOverlayBase.js
- * 
+ *
  * Copyright (C) 2022 NUUN
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
- */ 
+ */
 /*:
  * @target MZ
  * @plugindesc バトラーオーバーレイベース
@@ -13,18 +13,18 @@
  * @version 1.0.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * 
+ *
  * @help
  * モンスター、サイドビューアクター上に画像を表示させるベースプラグイン。
  * モンスター、アクターのスプライトの子にスプライトを追加してしまうとゲージ、ステートアイコン等にまで影響を及ば差ないようにします。
  * （バトラーグラフィック表示拡張プラグインでバトラーの色調を変化させるとバトラーとともにゲージ、ステートアイコンの変色を防ぐ目的等）
- * 
+ *
  * 木星ペンギン氏の疑似３Dバトル、蒼竜氏のSVアクター適用エネミーと併用する場合、このプラグインをこれらのプラグインより
  * 下に配置する必要があります。
- * 
+ *
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
- * 
+ *
  * 更新履歴
  * 2024/3/4 Ver.1.0.7
  * Ver.1.0.7で修正した処理方法の変更。
@@ -42,8 +42,8 @@
  * 微修正。
  * 2022/5/10 Ver.1.0.0
  * 初版
- * 
- * 
+ *
+ *
  * @param ConflictScale
  * @desc 敵画像の上設定時の拡大率の考慮
  * @text 拡大率の考慮
@@ -53,7 +53,7 @@
  * @option 画像のサイズ基準
  * @value 'Img'
  * @default 'Img'
- * 
+ *
  * @param CoordinateMode
  * @desc 座標の計算モード。
  * @text 座標計算モード
@@ -63,8 +63,8 @@
  * @option 小数切り捨て
  * @value 'Floor'
  * @default 'Default'
- * 
- * 
+ *
+ *
  */
 var Imported = Imported || {};
 Imported.NUUN_BattlerOverlayBase = true;
@@ -114,7 +114,7 @@ Spriteset_Battle.prototype.updateBattlerOverlay = function() {
             }
         }
         $gameTemp.refreshOverlay = false;
-    }  
+    }
     this.updateBattlerOverlaySprite();
 };
 
@@ -138,10 +138,10 @@ Spriteset_Battle.prototype.updateBattlerOverlaySprite = function() {
 function Sprite_BattlerOverlay() {
     this.initialize(...arguments);
 }
-  
+
 Sprite_BattlerOverlay.prototype = Object.create(Sprite.prototype);
 Sprite_BattlerOverlay.prototype.constructor = Sprite_BattlerOverlay;
-  
+
 Sprite_BattlerOverlay.prototype.initialize = function() {
     Sprite.prototype.initialize.call(this);
     this._battlerSprite = null;
@@ -207,7 +207,7 @@ Sprite_Enemy.prototype.update = function() {
 };
 
 Sprite_Enemy.prototype.battlerOverlayVisible = function() {//暫定処置
-    this.battlerOverlay.visible = this._battler.isAppeared();
+    this.battlerOverlay.visible = this._appeared;
 };
 
 Sprite_Battler.prototype.getBattlerOverlayHeight = function() {
@@ -219,7 +219,7 @@ Sprite_Battler.prototype.getBattlerOverlayHeight = function() {
       return Math.floor(((this.bitmap.height) * 0.9));
     }
 };
-  
+
 Sprite_Battler.prototype.getBattlerOverlayConflict = function() {
     if (ConflictScale === 'Img' && this.battlerOverlay) {
       return this.battlerOverlay.battlerSpriteScale_y;

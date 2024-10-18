@@ -1,5 +1,8 @@
 # [アイテムネームカラー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js)
-# Ver.1.1.2
+# Ver.1.1.3
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemNameColor.js)
+#### 必須、前提プラグイン
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 アイテム、スキルの文字色の色を変更できます。  
 ![画像](img/ItemNameColor_1.png)  
@@ -13,6 +16,8 @@
 `<NameColor:#00bfff>`  
 
 ### 更新履歴
+2024/10/19 Ver.1.1.3  
+一部プラグインの競合対応。  
 2022/12/17 Ver.1.1.2  
 日本語以外での表示を英語表示に変更。  
 処理の修正。  

@@ -4,8 +4,6 @@
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)Ver.1.0.2以降  
 
-バグ、競合報告はツクールフォーラム(日本)のスレッド、会話、ツクマテのスレッド、X(Twitter)のDMでお願いいたします。　　
-
 敵またはSVアクターのバトラー上にHPゲージを表示します。  
 
 ![画像](img/hpGauge1.png)  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc アクター並び替え固定
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * アクターの並び替えを固定します。
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/22 Ver.1.2.2
+ * NUUN_SceneFormationを使用していない場合に、エラーが出る問題を修正。
  * 2023/7/24 Ver.1.2.1
  * 処理の修正。
  * 2022/2/23 Ver.1.2.0
@@ -94,7 +96,7 @@ let onFixedMovable = false;
 const pluginName = "NUUN_ActorFixed";
 
 PluginManager.registerCommand(pluginName, 'ActorFixed', args => {
-  const actorId = Number(args.ActorId);console.log(actorId)
+  const actorId = Number(args.ActorId);
   if (actorId > 0) {
     const actor = $gameActors.actor(actorId)
     actor.setFixed();
@@ -195,66 +197,69 @@ Window_StatusBase.prototype.isCurrentActorFixedEnabled = function(cursor, pendin
   }
 };
 
-const _Window_FormationBattleMember_isCurrentItemEnabled = Window_FormationBattleMember.prototype.isCurrentItemEnabled;
-Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
-    return _Window_FormationBattleMember_isCurrentItemEnabled.call(this);
-};
-
-const _Window_FormationMember_isCurrentItemEnabled =Window_FormationMember.prototype.isCurrentItemEnabled;
-Window_FormationMember.prototype.isCurrentItemEnabled = function() {
-    return _Window_FormationMember_isCurrentItemEnabled.call(this);
-};
-
-const _Window_FormationBattleMember_isChangeActorEnabled = Window_FormationBattleMember.prototype.isChangeActorEnabled;
-Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
-    if (ActorFixedMovable && actor) {
-        if (pendingActor) {
-            return !pendingActor.isBattleMember() ? _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor) : true;
-        } else {
-            return this.getPendingMode() === 'battle' || !this.getPendingMode() ? true : _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor);
-        }
-    } else if (actor) {
-        return _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor);
-    } else {
-        return true;
-    }
-};
-
-const _Window_FormationMember_isChangeActorEnabled = Window_FormationMember.prototype.isChangeActorEnabled;
-Window_FormationMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
-    if (pendingActor && pendingActor.isBattleMember()) {
-        return _Window_FormationMember_isChangeActorEnabled.call(this, pendingActor);
-    } else {
-        return true;
-    }
-};
-
 Window_MenuStatus.prototype.getFormationActor = function() {
-  return this.actor(this.index());
-};
-
-Window_FormationBattleMember.prototype.getFormationActor = function(cursor) {
-  const index = (cursor === 'member' ? $gameParty.maxBattleMembers() : 0) + this.index();
-  return $gameParty.allMembers()[index];
-};
-
-Window_FormationMember.prototype.getFormationActor = function(cursor) {
-  const index = (cursor === 'member' ? $gameParty.maxBattleMembers() : 0) + this.index();
-  return $gameParty.allMembers()[index];
+    return this.actor(this.index());
 };
 
 Window_MenuStatus.prototype.getPendingActor = function() {
-  return this.actor(this._pendingIndex);
+    return this.actor(this._pendingIndex);
 };
 
-Window_FormationBattleMember.prototype.getPendingActor = function(pending) {
-  const index = (pending === 'member' ? $gameParty.maxBattleMembers() : 0) + this.formationPendingIndex();
-  return $gameParty.allMembers()[index];
-};
+if (Imported.NUUN_SceneFormation) {
+    const _Window_FormationBattleMember_isCurrentItemEnabled = Window_FormationBattleMember.prototype.isCurrentItemEnabled;
+    Window_FormationBattleMember.prototype.isCurrentItemEnabled = function() {
+        return _Window_FormationBattleMember_isCurrentItemEnabled.call(this);
+    };
+    
+    const _Window_FormationMember_isCurrentItemEnabled =Window_FormationMember.prototype.isCurrentItemEnabled;
+    Window_FormationMember.prototype.isCurrentItemEnabled = function() {
+        return _Window_FormationMember_isCurrentItemEnabled.call(this);
+    };
+    
+    const _Window_FormationBattleMember_isChangeActorEnabled = Window_FormationBattleMember.prototype.isChangeActorEnabled;
+    Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
+        if (ActorFixedMovable && actor) {
+            if (pendingActor) {
+                return !pendingActor.isBattleMember() ? _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor) : true;
+            } else {
+                return this.getPendingMode() === 'battle' || !this.getPendingMode() ? true : _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor);
+            }
+        } else if (actor) {
+            return _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor);
+        } else {
+            return true;
+        }
+    };
+    
+    const _Window_FormationMember_isChangeActorEnabled = Window_FormationMember.prototype.isChangeActorEnabled;
+    Window_FormationMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
+        if (pendingActor && pendingActor.isBattleMember()) {
+            return _Window_FormationMember_isChangeActorEnabled.call(this, pendingActor);
+        } else {
+            return true;
+        }
+    };
 
-Window_FormationMember.prototype.getPendingActor = function(pending) {
-  const index = (pending === 'member' ? $gameParty.maxBattleMembers() : 0) + this.formationPendingIndex();
-  return $gameParty.allMembers()[index];
-};
+    Window_FormationBattleMember.prototype.getFormationActor = function(cursor) {
+        const index = (cursor === 'member' ? $gameParty.maxBattleMembers() : 0) + this.index();
+        return $gameParty.allMembers()[index];
+    };
+      
+    Window_FormationMember.prototype.getFormationActor = function(cursor) {
+        const index = (cursor === 'member' ? $gameParty.maxBattleMembers() : 0) + this.index();
+        return $gameParty.allMembers()[index];
+    };
+
+    Window_FormationBattleMember.prototype.getPendingActor = function(pending) {
+        const index = (pending === 'member' ? $gameParty.maxBattleMembers() : 0) + this.formationPendingIndex();
+        return $gameParty.allMembers()[index];
+    };
+      
+    Window_FormationMember.prototype.getPendingActor = function(pending) {
+        const index = (pending === 'member' ? $gameParty.maxBattleMembers() : 0) + this.formationPendingIndex();
+        return $gameParty.allMembers()[index];
+    };
+}
+
 
 })();

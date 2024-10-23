@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.6
+ * @version 3.0.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,6 +70,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 10/23/2024 Ver.3.0.7
+ * Added a function to not close the save screen after saving.
  * 8/17/2024 Ver.3.0.6
  * Fixed an issue that caused the save file cursor to be unnatural when the autosave display on the save screen was disabled.
  * Fixed a spelling mistake.
@@ -211,7 +213,14 @@
  * @option Japanese era notation
  * @value 'ja-JP-u-ca-japanese'
  * @default 'default'
- * @parent Contents
+ * @parent BasicSetting
+ * 
+ * @param ContinuousSave
+ * @text Do not exit screen after saving
+ * @desc Prevents the save screen from closing after saving.
+ * @type boolean
+ * @default false
+ * @parent BasicSetting
  * 
  * @param AutoSaveSetting
  * @text Auto save settings
@@ -1303,7 +1312,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.6
+ * @version 3.0.7
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1366,6 +1375,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/23 Ver.3.0.7
+ * セーブ後にセーブ画面を閉じない機能を追加。
  * 2024/8/17 Ver.3.0.6
  * セーブ画面のオートセーブ表示を無効にしたときに、セーブファイルのカーソルが不自然になる問題を修正。
  * スペルミスを修正。
@@ -1509,6 +1520,14 @@
  * @value 'en-GB'
  * @default 'default'
  * @parent BasicSetting
+ * 
+ * @param ContinuousSave
+ * @text セーブ後画面を終了しない
+ * @desc セーブ後にセーブ画面を閉じないようにします。
+ * @type boolean
+ * @default false
+ * @parent BasicSetting
+ * 
  * 
  * @param AutoSaveSetting
  * @text オートセーブ設定
@@ -2960,6 +2979,16 @@ Imported.NUUN_SaveScreen_3 = true;
     };
 
 
+    const _Scene_Save_onSaveSuccess = Scene_Save.prototype.onSaveSuccess;
+    Scene_Save.prototype.onSaveSuccess = function() {
+        if (!params.ContinuousSave) {
+            _Scene_Save_onSaveSuccess.apply(this, arguments);
+        } else {
+            this.activateListWindowRefresh();
+        }
+    };
+
+
     const _Scene_File_create = Scene_File.prototype.create;
     Scene_File.prototype.create = function() {
         this.createBackground();
@@ -3077,6 +3106,12 @@ Imported.NUUN_SaveScreen_3 = true;
                 sprite.scale.y = (Graphics.height !== sprite.bitmap.height ? Graphics.height / sprite.bitmap.height : 1);
             }
         }
+    };
+
+    Scene_File.prototype.activateListWindowRefresh = function() {
+        SoundManager.playSave();
+        this._listWindow.refresh();
+        this.activateListWindow();
     };
 
 

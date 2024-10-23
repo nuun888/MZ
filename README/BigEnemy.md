@@ -1,5 +1,6 @@
 # [巨大モンスター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js)
 # Ver.1.2.1
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BigEnemy.js)
 
 エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
 

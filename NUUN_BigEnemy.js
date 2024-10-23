@@ -8,12 +8,13 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc 巨大エネミー
+ * @plugindesc 巨大モンスター
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  *            
- * @help エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
- * エネミーのメモ欄に以下のいずれかを記入してください。
+ * @help
+ * エネミー画像を画面一杯またはゲーム画面下に合わせて表示します。
+ * 敵キャラのメモ欄
  * 以下のタグは画面の横サイズに合わせて拡大されます。
  * <BigEnemy> 画像を画面サイズに合わせます。
  * <BigEnemy:OriginalRatio> 比率を変更せず横幅の倍率基準で拡大します。
@@ -47,6 +48,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/23 Ver.1.2.1
+ * 外部プラグインでエネミーの倍率補正をかけている場合に、敵消滅時にサイズが元のサイズに戻ってしまう問題を修正。
  * 2021/11/7 Ver.1.2.0
  * ダメージエフェクトを調整できる機能を追加。
  * 一部の計算が間違っていたため修正。
@@ -154,11 +157,11 @@ Imported.NUUN_BigEnemy = true;
   };
 
   Sprite_Enemy.prototype.updateBigEnemy = function () {
-    if (this._appeared && this._bigEnemy && this.scale.x !== this._originalscaleX) {
-      this.scale.x *= this._originalscaleX;
+    if (this._bigEnemy && this.scale.x !== this._originalscaleX) {
+        this.scale.x *= this._originalscaleX;
     }
-    if (this._appeared && this._bigEnemy && this.scale.y !== this._originalscaleY) {
-      this.scale.y *= this._originalscaleY;
+    if (this._bigEnemy && this.scale.y !== this._originalscaleY) {
+        this.scale.y *= this._originalscaleY;
     }
   };
 
@@ -166,7 +169,7 @@ Imported.NUUN_BigEnemy = true;
   Sprite_Enemy.prototype.updateStateSprite = function() {
     _Sprite_Enemy_updateStateSprite.call(this);
     if(this._bigEnemy && this._bigEnemy !== "UnderPosition"){
-      const correctionScale = this._enemy.enemy().meta.CorrectionScale;console.log(this.scale.x)
+      const correctionScale = this._enemy.enemy().meta.CorrectionScale;
       this._stateIconSprite.y = (40 - this.y) / this.scale.y;
       this._stateIconSprite.scale.x = 1 / this.scale.x * 0.5;
       this._stateIconSprite.scale.y = 1 / this.scale.y;

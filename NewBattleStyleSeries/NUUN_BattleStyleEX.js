@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.10
+ * @version 1.0.11
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/4/2024 Ver.1.0.11
+ * Fixed an issue where actor commands would not appear above the Actor Status window when specified to be located above the Actor Status window.
  * 10/13/2024 Ver.1.0.10
  * Fixed an issue where party commands would not appear and the game would freeze after canceling enemy targeting.
  * 10/8/2024 Ver.1.0.9
@@ -360,6 +362,13 @@
  * @option Scene_Battle
  * @value 'Scene_Battle'
  * @default 'Spriteset_Battle'
+ * @parent SpecialSetting
+ * 
+ * @param PartyCommandFlickerPrevention
+ * @desc Prevents party commands from flickering when acting during TPB.
+ * @text Party command flicker prevention
+ * @type boolean
+ * @default true
  * @parent SpecialSetting
  * 
  */
@@ -1946,7 +1955,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.9
+ * @version 1.0.11
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2016,6 +2025,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/11/4 Ver.1.0.11
+ * アクターコマンドの位置をアクターステータスウインドウの上に指定したときに、アクターステータスウインドウの上に表示されない問題を修正。
  * 2024/10/13 Ver.1.0.10
  * 敵対象キャンセル後、パーティコマンドが表示されずにフリーズする問題を修正。
  * 2024/10/8 Ver.1.0.9
@@ -2300,6 +2311,13 @@
  * @option Scene_Battle
  * @value 'Scene_Battle'
  * @default 'Spriteset_Battle'
+ * @parent SpecialSetting
+ * 
+ * @param PartyCommandFlickerPrevention
+ * @desc TPB時の行動時のパーティコマンドのちらつきを防止します。
+ * @text パーティコマンドちらつき防止
+ * @type boolean
+ * @default true
  * @parent SpecialSetting
  * 
  */
@@ -4606,6 +4624,9 @@ Imported.NUUN_BattleStyleEX = true;
                     case 'custom':
                         _window.y = _window._homeY;
                         break;
+                    case 'statuswindowtop':
+                        _window.y = _window._homeY + statuWindow.y - _window.height - ((Graphics.height - Graphics.boxHeight) / 2);
+                        break;
                     default:
                         _window.y = this.isActorCommandVariable() ? _window._homeY + (Graphics.boxHeight - (_window._homeY + _window.height)) : _window._homeY;
                         break;
@@ -5846,7 +5867,7 @@ Imported.NUUN_BattleStyleEX = true;
 
     const _Scene_Battle_onSelectAction = Scene_Battle.prototype.onSelectAction;
     Scene_Battle.prototype.onSelectAction = function() {
-        $gameTemp.onBSAction = BattleManager.isTpb();
+        $gameTemp.onBSAction = params.PartyCommandFlickerPrevention && BattleManager.isTpb();
         _Scene_Battle_onSelectAction.call(this);
     };
 

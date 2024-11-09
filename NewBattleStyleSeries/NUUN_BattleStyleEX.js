@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.11
+ * @version 1.0.12
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/9/2024 Ver.1.0.12
+ * Fixed an issue where debuffs were not displayed on state icons that had display buffs set.
  * 11/4/2024 Ver.1.0.11
  * Fixed an issue where actor commands would not appear above the Actor Status window when specified to be located above the Actor Status window.
  * 10/13/2024 Ver.1.0.10
@@ -1955,7 +1957,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.11
+ * @version 1.0.12
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2025,6 +2027,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/11/9 Ver.1.0.12
+ * 表示バフの設定を行ったステートアイコンでデバフが表示されない問題を修正。
  * 2024/11/4 Ver.1.0.11
  * アクターコマンドの位置をアクターステータスウインドウの上に指定したときに、アクターステータスウインドウの上に表示されない問題を修正。
  * 2024/10/13 Ver.1.0.10
@@ -4759,11 +4763,11 @@ Imported.NUUN_BattleStyleEX = true;
             const hw = Math.floor(ImageManager.iconWidth / 2);
             const key = "actor%1-stateIcon%2".format(actor.actorId(), data ? data.ParamID || 'dparam' : 'dparam');
             const sprite = this._window.createInnerSprite(key, Sprite_StateIcon);
-            sprite.setup(actor);
-            sprite.move(x + hw, y + hw);
             if (data) {
                 sprite.setupVisibleIcons(this.getVisibleIcons(data.DetaEval), this.getVisibleBuffIcons(data.DetaEval2));
             }
+            sprite.setup(actor);
+            sprite.move(x + hw, y + hw);
             sprite.show();
         }
 
@@ -4798,9 +4802,9 @@ Imported.NUUN_BattleStyleEX = true;
                 if (buff >= 0 && buff < 10) {
                     icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, 1, buff));
                     icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, 2, buff));
-                } else if (buff <= 10) {
-                    icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, -1, buff));
-                    icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, -2, buff));
+                } else if (buff >= 10) {
+                    icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, -1, buff - 10));
+                    icons.push(Game_BattlerBase.prototype.buffIconIndex.call(this, -2, buff - 10));
                 }
             });
             return icons;
@@ -6923,6 +6927,7 @@ Imported.NUUN_BattleStyleEX = true;
 
     Spriteset_Battle.prototype.createFrontActors = function() {
         if (!$gameSystem.isSideView() && NuunManager.styleData && NuunManager.styleData.isFrontViewActorEffectShow()) {
+            this._actorSprites = [];//ロールバックの可能性あり
             const spriteId = this.getFrontActorsBaseSpriteId();
             this.createDamege();
             for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {

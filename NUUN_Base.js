@@ -1,4 +1,4 @@
-﻿/*:-----------------------------------------------------------------------------------
+/*:-----------------------------------------------------------------------------------
  * NUUN_Base.js
  * 
  * Copyright (C) 2020 NUUN
@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.9
+ * @version 1.7.10
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/9/2024 Ver.1.0.0
+ * Added a warning display process when entering [] when acquiring meta.
  * 9/28/2024 Ver.1.7.9
  * Added a process to get the file name.
  * 6/9/2024 Ver.1.7.8
@@ -108,7 +110,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.9
+ * @version 1.7.10
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -117,7 +119,23 @@
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
+ * @param RequireFiles
+ * @desc メモ欄から画像指定を行う画像で、デプロイメント時に削除を禁止する画像ファイルを指定します。
+ * @text デプロイメント時削除禁止画像ファイル
+ * @type file[]
+ * @dir img/
+ * @default []
+ * 
+ * @param RequireAudio
+ * @desc メモ欄から音声指定を行う画像で、デプロイメント時に削除を禁止する音声ファイルを指定します。
+ * @text デプロイメント時削除禁止音声ファイル
+ * @type file[]
+ * @dir audio/
+ * @default []
+ * 
  * 更新履歴
+ * 2024/11/9 Ver.1.7.10
+ * メタ取得時の[]記入の警告表示処理を追加。
  * 2024/9/28 Ver.1.7.9
  * ファイル名を取得する処理を追加。
  * 2024/6/9 Ver.1.7.8
@@ -463,7 +481,17 @@ NuunManager.getMetaCode = function(object, method) {
         const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
         throw ["ParameterError", log];
     }
-    const list = meta.split(',');
+    return meta;
+};
+
+NuunManager.getMetaCodeList = function(object, method) {
+    const meta = object.meta[method];
+    if (!meta) return null;
+    if (meta.indexOf('[') >= 0) {
+        const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+        throw ["ParameterError", log];
+    }
+    return meta.split(',');
 };
 
 NuunManager.setMainFontFace = function(font) {

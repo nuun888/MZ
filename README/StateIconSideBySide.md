@@ -1,5 +1,5 @@
 # [ステート横並び表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
-# Ver.1.5.7
+# Ver.1.5.8
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
 
 戦闘中に表示するステートを横並び表示にします。  
@@ -25,6 +25,8 @@
 MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
+2024/11/9 Ver.1.5.8  
+バトルスタイル拡張プラグイン併用時にステートターンが正常に表示されない問題を修正。  
 2024/5/15 Ver.1.5.7    
 ステートターンが表示されない問題を修正。  
 2024/3/2 Ver.1.5.6  

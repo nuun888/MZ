@@ -119,6 +119,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [敵のドロップアイテム追加](https://github.com/nuun888/MZ/blob/master/README/AddDropItems.md)  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js) |  | 1.0.1 |
 | [条件付きドロップアイテム](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md) | [NUUN_ConditionalDrops](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalDrops.js) | 条 | 1.0.8 |
 | [ユニークモンスター](https://github.com/nuun888/MZ/blob/master/README/UniqueEnemy.md) | [NUUN_UniqueEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js) | 共 | 1.0.2 |
+| [敵のモンスター](https://github.com/nuun888/MZ/blob/master/README/EnemyLevel.md) | [NUUN_UniqueEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

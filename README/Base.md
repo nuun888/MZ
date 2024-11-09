@@ -1,5 +1,5 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.7.9
+# Ver.1.7.10
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 共通処理を行うベースプラグインです。  
@@ -8,6 +8,8 @@
 バグ、競合報告はツクールフォーラム(日本)のスレッド、会話、ツクマテのスレッド、X(Twitter)のDMでお願いいたします。　　
 
 ## 更新内容
+2024/11/9 Ver.1.7.10
+メタ取得時の[]記入の警告表示処理を追加。
 2024/9/28 Ver.1.7.9  
 ファイル名を取得する処理を追加。  
 2024/6/9 Ver.1.7.8  

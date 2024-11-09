@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.6
+ * @version 1.1.7
  * 
  * @help
  * Show remaining turns on the state icon.
@@ -31,6 +31,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/9/2024 Ver.1.1.7
+ * Fixed an issue where state turns were not displayed correctly when using the Battle Style Extension Plugin.
  * 5/15/2024 Ver.1.1.6
  * Fixed an issue where state turns were not displayed.
  * 3/2/2024 Ver.1.1.5
@@ -144,6 +146,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/11/9 Ver.1.1.7
+ * バトルスタイル拡張プラグイン併用時にステートターンが正常に表示されない問題を修正。
  * 2024/5/15 Ver.1.1.6
  * ステートターンが表示されない問題を修正。
  * 2024/3/2 Ver.1.1.5
@@ -248,72 +252,72 @@ Imported.NUUN_StateTurn = true;
   const TurnColor = (DataManager.nuun_structureData(parameters['TurnColor'])) || 0;
   const BadTurnColor = (DataManager.nuun_structureData(parameters['BadTurnColor'])) || 0;
 
-  const _Sprite_StateIcon_initialize = Sprite_StateIcon.prototype.initialize;
-  Sprite_StateIcon.prototype.initialize = function() {
-    _Sprite_StateIcon_initialize.call(this);
-    this.textTurn();
-  };
+    const _Sprite_StateIcon_initialize = Sprite_StateIcon.prototype.initialize;
+    Sprite_StateIcon.prototype.initialize = function() {
+        _Sprite_StateIcon_initialize.call(this);
+        this.textTurn();
+    };
 
-  Sprite_StateIcon.prototype.textTurn = function() {
-    const sprite = new Sprite();
-    this.addChild(sprite);
-    this.textSprite = sprite;
-    this.textSprite.x = this.x + TurnX;
-    this.textSprite.y = this.y + TurnY;
-    this.textSprite.bitmap = new Bitmap(this.bitmap.width, this.bitmap.height);
-  };
+    Sprite_StateIcon.prototype.textTurn = function() {
+        const sprite = new Sprite();
+        this.addChild(sprite);
+        this.textSprite = sprite;
+        this.textSprite.x = this.x + TurnX;
+        this.textSprite.y = this.y + TurnY;
+        this.textSprite.bitmap = new Bitmap(this.bitmap.width, this.bitmap.height);
+    };
 
-  const _Sprite_StateIcon_updateIcon = Sprite_StateIcon.prototype.updateIcon;
-  Sprite_StateIcon.prototype.updateIcon = function() {
-    _Sprite_StateIcon_updateIcon.call(this);
-    const icons = [];
-    let turns = [];
-    if (this.shouldDisplay()) {
-      icons.push(...this._battler.allIcons());
-      if (this._battler.isActor() && ActorStateIconVisible) {
-        turns = this._battler.allStateTurns();
-      } else if (this._battler.isEnemy() && EnemyStateIconVisible) {
-        turns = this._battler.allStateTurns();
-      }
-    }
-    this.createStateIcons(icons, turns);
-  };
-
-  Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
-    const state = turns[this._animationIndex];
-    this._stateBuffTurns = state && state.turn > 0 ? turns[this._animationIndex].turn : 0;
-    this._trunTextColor = state && state.bad ? BadTurnColor : TurnColor;
-  };
-
-  const _Sprite_StateIcon_updateFrame = Sprite_StateIcon.prototype.updateFrame;
-  Sprite_StateIcon.prototype.updateFrame = function() {
-    _Sprite_StateIcon_updateFrame.call(this);
-    this.textSprite.bitmap.clear();
-    if (this._stateBuffTurns > 0) {
-      this.setupFont();
-      this.textSprite.bitmap.drawText(this._stateBuffTurns, 0, 0, ImageManager.iconWidth, ImageManager.iconHeight);
-    }
-  };
-
-  Game_BattlerBase.prototype.allStateTurns = function() {
-    const turns = this.nuun_stateTurns();
-    Array.prototype.push.apply(turns, this.allBuffTurns());
-    return turns;
-  };
-  
-  Game_BattlerBase.prototype.allBuffTurns = function() {
-    return this.nuun_buffTurns();
-  };
-
-  Game_BattlerBase.prototype.nuun_stateTurns = function() {
-    return this.nuun_stateTurnFilter().reduce((r, state) => {
-        if (state.iconIndex > 0) {
-            const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id) + (state.autoRemovalTiming === 2 ? -1 : 0)), bad: !!state.meta.BatState}];
-            Array.prototype.push.apply(r, turn);
+    const _Sprite_StateIcon_updateIcon = Sprite_StateIcon.prototype.updateIcon;
+    Sprite_StateIcon.prototype.updateIcon = function() {
+        _Sprite_StateIcon_updateIcon.call(this);
+        const icons = [];
+        let turns = [];
+        if (this.shouldDisplay()) {
+            icons.push(...this._battler.allIcons());
+            if (this._battler.isActor() && ActorStateIconVisible) {
+                turns = this._battler.allStateTurns();
+            } else if (this._battler.isEnemy() && EnemyStateIconVisible) {
+                turns = this._battler.allStateTurns();
+            }
         }
-        return r;
-    }, []);
-  };
+        this.createStateIcons(icons, turns);
+    };
+
+    Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
+        const state = turns[this._animationIndex];
+        this._stateBuffTurns = state && state.turn > 0 ? turns[this._animationIndex].turn : 0;
+        this._trunTextColor = state && state.bad ? BadTurnColor : TurnColor;
+    };
+
+    const _Sprite_StateIcon_updateFrame = Sprite_StateIcon.prototype.updateFrame;
+    Sprite_StateIcon.prototype.updateFrame = function() {
+        _Sprite_StateIcon_updateFrame.call(this);
+        this.textSprite.bitmap.clear();
+        if (this._stateBuffTurns > 0) {
+            this.setupFont();
+            this.textSprite.bitmap.drawText(this._stateBuffTurns, 0, 0, ImageManager.iconWidth, ImageManager.iconHeight);
+        }
+    };
+
+    Game_BattlerBase.prototype.allStateTurns = function() {
+        const turns = this.nuun_stateTurns();
+        Array.prototype.push.apply(turns, this.allBuffTurns());
+        return turns;
+    };
+  
+    Game_BattlerBase.prototype.allBuffTurns = function() {
+        return this.nuun_buffTurns();
+    };
+
+    Game_BattlerBase.prototype.nuun_stateTurns = function() {
+        return this.nuun_stateTurnFilter().reduce((r, state) => {
+            if (state.iconIndex > 0) {
+                const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id) + (state.autoRemovalTiming === 2 ? -1 : 0)), bad: !!state.meta.BatState}];
+                Array.prototype.push.apply(r, turn);
+            }
+            return r;
+        }, []);
+    };
 
     Game_BattlerBase.prototype.nuun_stateTurnFilter = function() {
         if (this.statesFilter && BattleManager.bsVisibleStates && BattleManager.bsVisibleStates.length > 0) {
@@ -323,53 +327,62 @@ Imported.NUUN_StateTurn = true;
         }
     };
   
-  Game_BattlerBase.prototype.nuun_buffTurns = function() {
-    return this._buffs.reduce((r, buff, i) => {
-        if (buff !== 0 && this.nuun_buffTurnsFilter(i)) {
-            const turn = [{turn: this.nuun_getBuffTurn(i), bad: buff < 0}];
-            Array.prototype.push.apply(r, turn);
-        }
-        return r;
-    }, []);
-  };
+    Game_BattlerBase.prototype.nuun_buffTurns = function() {
+        const buffs = this.buffIcons();
+        let buffId = 0;
+        const turns = [];
+        buffs.forEach(buffIcon => {
+            if (buffIcon > Game_BattlerBase.ICON_DEBUFF_START) {
+                buffId = (buffIcon - Game_BattlerBase.ICON_DEBUFF_START) % 8;
+            } else if (buffIcon > Game_BattlerBase.ICON_BUFF_START) {
+                buffId = (buffIcon - Game_BattlerBase.ICON_BUFF_START) % 8;
+            }
+            const buff = this._buffs[buffId];
+            if (buff !== 0 && this.nuun_buffTurnsFilter(buffId)) {
+                const turn = [{turn: this.nuun_getBuffTurn(buffId), bad: buff < 0}];
+                Array.prototype.push.apply(turns, turn);
+            }
+        });
+        return turns;
+    };
 
-  Game_BattlerBase.prototype.nuun_buffTurnsFilter = function(id) {
-    return this.buffsFilter ? this.buffsFilter(id) : true;
-  };
+    Game_BattlerBase.prototype.nuun_buffTurnsFilter = function(id) {
+        return this.buffsFilter ? this.buffsFilter(id) : true;
+    };
 
-  Game_BattlerBase.prototype.nuun_isNonRemoval = function(state) {
-    return state.autoRemovalTiming === 0;
-  };
+    Game_BattlerBase.prototype.nuun_isNonRemoval = function(state) {
+        return state.autoRemovalTiming === 0;
+    };
   
-  Game_BattlerBase.prototype.nuun_getStateTurn = function(id) {
-    return (Imported.NUUN_StateTurnCount && TurnMode === 'elapsed' ? this.isStateNowTurn(id) : this._stateTurns[id]) + TurnCorrection;
-  };
+    Game_BattlerBase.prototype.nuun_getStateTurn = function(id) {
+        return (Imported.NUUN_StateTurnCount && TurnMode === 'elapsed' ? this.isStateNowTurn(id) : this._stateTurns[id]) + TurnCorrection;
+    };
   
-  Game_BattlerBase.prototype.nuun_getBuffTurn = function(id) {
-    return (Imported.NUUN_StateTurnCount && TurnMode === 'elapsed' ? this.getBuffNowTurn(id) : this._buffTurns[id]) + TurnCorrection;
-  };
+    Game_BattlerBase.prototype.nuun_getBuffTurn = function(id) {
+        return (Imported.NUUN_StateTurnCount && TurnMode === 'elapsed' ? this.getBuffNowTurn(id) : this._buffTurns[id]) + TurnCorrection;
+    };
 
-  Sprite_StateIcon.prototype.setupFont = function() {
-    this.textSprite.bitmap.fontSize = this.nuun_fontSize() + TurnFontSize;
-    this.textSprite.bitmap.textColor = this.nuun_textColor();
-    this.textSprite.bitmap.outlineColor = this.nuun_outlineColor();
-    this.textSprite.bitmap.outlineWidth = this.nuun_outlineWidth();
-  };
+    Sprite_StateIcon.prototype.setupFont = function() {
+        this.textSprite.bitmap.fontSize = this.nuun_fontSize() + TurnFontSize;
+        this.textSprite.bitmap.textColor = this.nuun_textColor();
+        this.textSprite.bitmap.outlineColor = this.nuun_outlineColor();
+        this.textSprite.bitmap.outlineWidth = this.nuun_outlineWidth();
+    };
 
-  Sprite_StateIcon.prototype.nuun_textColor = function() {
-    return NuunManager.getColorCode(this._trunTextColor);
-  };
+    Sprite_StateIcon.prototype.nuun_textColor = function() {
+        return NuunManager.getColorCode(this._trunTextColor);
+    };
 
-  Sprite_StateIcon.prototype.nuun_outlineColor = function() {
-    return ColorManager.outlineColor();
-  };
+    Sprite_StateIcon.prototype.nuun_outlineColor = function() {
+        return ColorManager.outlineColor();
+    };
 
-  Sprite_StateIcon.prototype.nuun_outlineWidth = function() {
-    return 3;
-  };
+    Sprite_StateIcon.prototype.nuun_outlineWidth = function() {
+        return 3;
+    };
 
-  Sprite_StateIcon.prototype.nuun_fontSize = function() {
-    return $gameSystem.mainFontSize();
-  };
+    Sprite_StateIcon.prototype.nuun_fontSize = function() {
+        return $gameSystem.mainFontSize();
+    };
 
 })();

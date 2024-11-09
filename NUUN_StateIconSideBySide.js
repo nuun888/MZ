@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  State side-by-side display
  * @author NUUN
- * @version 1.5.7
+ * @version 1.5.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/9/2024 Ver.1.5.8
+ * Fixed an issue where state turns were not displayed correctly when using the Battle Style Extension Plugin.
  * 5/15/2024 Ver.1.5.7
  * Fixed an issue where state turns were not displayed.
  * 3/2/2024 Ver.1.5.6
@@ -283,7 +285,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 1.5.7
+ * @version 1.5.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -300,7 +302,7 @@
  * 
  * ターンの文字色
  * ステートのメモ欄  
- * <BatState>　子のタグがあるステートは不利なステートになります。よって不利ステート、デバフターンの色が適用されます。  
+ * <BatState> 子のタグがあるステートは不利なステートになります。よって不利ステート、デバフターンの色が適用されます。  
  * 上記タグがないステートは有利ステート、バフターンの色が適用されます。  
  * 
  * 敵キャラの画像を拡大等をするプラグインと併用する場合、画像に乱れが生じる場合があります。
@@ -312,6 +314,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/11/9 Ver.1.5.8
+ * バトルスタイル拡張プラグイン併用時にステートターンが正常に表示されない問題を修正。
  * 2024/5/15 Ver.1.5.7
  * ステートターンが表示されない問題を修正。
  * 2024/3/2 Ver.1.5.6
@@ -849,13 +853,22 @@ Game_BattlerBase.prototype.nuun_stateTurns = function() {
 };
 
 Game_BattlerBase.prototype.nuun_buffTurns = function() {
-  return this._buffs.reduce((r, buff, i) => {
-    if (buff !== 0 && this.nuun_buffTurnsFilter(i)) {
-      const turn = [{turn: this.nuun_getBuffTurn(i), bad: buff < 0}];
-      Array.prototype.push.apply(r, turn);
-    }
-      return r;
-  }, []);
+    const buffs = this.buffIcons();
+    let buffId = 0;
+    const turns = [];
+    buffs.forEach(buffIcon => {
+        if (buffIcon > Game_BattlerBase.ICON_DEBUFF_START) {
+            buffId = (buffIcon - Game_BattlerBase.ICON_DEBUFF_START) % 8;
+        } else if (buffIcon > Game_BattlerBase.ICON_BUFF_START) {
+            buffId = (buffIcon - Game_BattlerBase.ICON_BUFF_START) % 8;
+        }
+        const buff = this._buffs[buffId];
+        if (buff !== 0 && this.nuun_buffTurnsFilter(buffId)) {
+            const turn = [{turn: this.nuun_getBuffTurn(buffId), bad: buff < 0}];
+            Array.prototype.push.apply(turns, turn);
+        }
+    });
+    return turns;
 };
 
 Game_BattlerBase.prototype.nuun_stateTurnFilter = function() {

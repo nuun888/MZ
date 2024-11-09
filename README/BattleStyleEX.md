@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.0.11  
+# Ver.1.0.12  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -157,6 +157,8 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
 
 ## 更新履歴
+2024/11/9 Ver.1.0.12  
+表示バフの設定を行ったステートアイコンでデバフが表示されない問題を修正。  
 2024/11/4 Ver.1.0.11  
 アクターコマンドの位置をアクターステータスウインドウの上に指定したときに、アクターステータスウインドウの上に表示されない問題を修正。  
 2024/10/13 Ver.1.0.10  

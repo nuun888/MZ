@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  State side-by-side display
  * @author NUUN
- * @version 1.5.8
+ * @version 1.5.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,6 +37,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/10/2024 Ver.1.5.9
+ * Re-corrected.
  * 11/9/2024 Ver.1.5.8
  * Fixed an issue where state turns were not displayed correctly when using the Battle Style Extension Plugin.
  * 5/15/2024 Ver.1.5.7
@@ -314,6 +316,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/11/10 Ver.1.5.9
+ * 再修正。
  * 2024/11/9 Ver.1.5.8
  * バトルスタイル拡張プラグイン併用時にステートターンが正常に表示されない問題を修正。
  * 2024/5/15 Ver.1.5.7
@@ -843,13 +847,17 @@ Game_BattlerBase.prototype.allBuffTurns = function() {
 };
 
 Game_BattlerBase.prototype.nuun_stateTurns = function() {
-  return this.nuun_stateTurnFilter().reduce((r, state) => {
-    if (state.iconIndex > 0) {
-      const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id) + (state.autoRemovalTiming === 2 ? -1 : 0)), bad: !!state.meta.BatState}];
-      Array.prototype.push.apply(r, turn);
-    }
-    return r;
-  }, []);
+    const states = this.nuun_stateTurnFilter();
+    const stateIcons = this.stateIcons();
+    const turns = [];
+    stateIcons.forEach(icon => {
+        const state = states.find(state => state.iconIndex === icon);
+        if (state.iconIndex > 0) {
+            const turn = [{turn: (this.nuun_isNonRemoval(state) ? 0 : this.nuun_getStateTurn(state.id) + (state.autoRemovalTiming === 2 ? -1 : 0)), bad: !!state.meta.BatState}];
+            Array.prototype.push.apply(turns, turn);
+        }
+    });
+    return turns;
 };
 
 Game_BattlerBase.prototype.nuun_buffTurns = function() {

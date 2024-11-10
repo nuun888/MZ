@@ -628,6 +628,7 @@ Imported.NUUN_MenuParamListBase = true;
             if (actor && this.nuun_IsContents(data, actor)) {
                 this.setTepmData(data, this._exParams);
                 const method = 'nuun_DrawContents' + data.DateSelect;
+                if (this[method] === undefined) return;
                 try {
                     this[method](data, x, y, width, actor);
                 } catch (error) {

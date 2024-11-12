@@ -142,7 +142,7 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 
 ## オプションプラグイン
 ### 敵の条件画像変更  
-条件により敵の画像を変更します。  
+条件により敵の画像を変更します。当プラグインVer.1.0.13以降  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)  
 ### 戦闘中天候適用  
 天候の変化を戦闘中でも適用します。  

@@ -14,7 +14,7 @@
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * Switch the image of the enemy according to the conditions.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/12/2024 Ver.2.0.1
+ * Add level to the condition.NUUN_BattleStyleEX new version Ver.1.0.13 or later
  * 7/20/2024 Ver.2.0.0
  * Compatible with Battle Style EX (new version)
  * Added during casting.
@@ -206,6 +208,13 @@
  * @default 
  * @parent AllMatch
  * 
+ * @param Level
+ * @text Level
+ * @desc The condition is met when the enemy level is equal to or higher than the specified level. (Requires NUUN_EnemyLevel)
+ * @type number
+ * @default 1
+ * @parent AllMatch
+ * 
  * @param CondSetting
  * @text Condition setting
  * @default ------------------------------
@@ -268,7 +277,7 @@
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_BattleStyleEX
- * @version 2.0.0
+ * @version 2.0.1
  * 
  * @help
  * 敵の画像を条件により切り替えます。
@@ -279,6 +288,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/11/12 Ver 2.0.1
+ * 条件にレベルを追加。NUUN_BattleStyleEX新版Ver.1.0.13以降
  * 2024/7/20 Ver 2.0.0
  * バトルスタイル拡張EX(新版)対応版
  * 詠唱時を追加。
@@ -460,6 +471,13 @@
  * @desc 指定したステートに全てかかっている時に条件を満たします。
  * @type state[]
  * @default 
+ * @parent AllMatch
+ * 
+ * @param Level
+ * @text レベル
+ * @desc 敵のレベルが指定のレベル以上の時に条件を満たします。(要NUUN_EnemyLevel)
+ * @type number
+ * @default 1
  * @parent AllMatch
  * 
  * @param CondSetting

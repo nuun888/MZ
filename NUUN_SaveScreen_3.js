@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.7
+ * @version 3.0.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,6 +70,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 11/26/2024 Ver.3.0.8
+ * Fixed an issue that would cause an error when setting a background image.
+ * Fixed an issue where the setting to hide window skin image display in the Save Main Window settings was not being applied.
  * 10/23/2024 Ver.3.0.7
  * Added a function to not close the save screen after saving.
  * 8/17/2024 Ver.3.0.6
@@ -1312,7 +1315,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.7
+ * @version 3.0.8
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1375,6 +1378,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/11/26 Ver.3.0.8
+ * 背景画像を設定するとエラーが出る問題を修正。
+ * セーブメインウィンドウ設定のウィンドウスキン画像表示の非表示が適用されていなかった問題を修正。
  * 2024/10/23 Ver.3.0.7
  * セーブ後にセーブ画面を閉じない機能を追加。
  * 2024/8/17 Ver.3.0.6
@@ -2998,7 +3004,7 @@ Imported.NUUN_SaveScreen_3 = true;
     const _Scene_File_createListWindow = Scene_File.prototype.createListWindow;
     Scene_File.prototype.createListWindow = function() {
         _Scene_File_createListWindow.call(this);
-        if (!saveLayout.SaveMainWindowList) {
+        if (saveLayout.SaveMainWindowList && !saveLayout.SaveMainWindowList.WindowVisible) {
             this._listWindow.opacity = 0;
         }
         this.createContentsWindow();
@@ -3072,7 +3078,7 @@ Imported.NUUN_SaveScreen_3 = true;
             if (this._mode === 'save') {
                 data = $gameSystem.getSaveBackGround();
             } else {
-                data = DataManager.loadBackground() || BackGroundImg;
+                data = DataManager.loadBackground() || saveLayout.BackGroundImg;
             }
             if (data) {
                 const sprite = new Sprite();

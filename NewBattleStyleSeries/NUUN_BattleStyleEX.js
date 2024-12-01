@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.13
+ * @version 1.0.14
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/1/2024 Ver.1.0.14
+ * Fixed an issue where animations would not play correctly when played in front view with some plug-ins.
  * 11/12/2024 Ver.1.0.13
  * Some processing has been corrected.
  * 11/9/2024 Ver.1.0.12
@@ -1959,7 +1961,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.13
+ * @version 1.0.14
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2029,6 +2031,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/1 Ver.1.0.14
+ * 一部プラグインにてフロントビューでアニメーションを再生させたときに、アニメーションが正常に再生されない問題を修正いたしました。
  * 2024/11/12 Ver.1.0.13
  * 一部の処理を修正。
  * 2024/11/9 Ver.1.0.12
@@ -6796,15 +6800,16 @@ Imported.NUUN_BattleStyleEX = true;
         }
     };
 
+    const _Spriteset_Base_createAnimationSprite = Spriteset_Base.prototype.createAnimationSprite;
+    Spriteset_Base.prototype.createAnimationSprite = function(targets, animation, mirror, delay) {
+        if (String(this.constructor.name) === 'Spriteset_Battle') {
+            this.createBsAnimationSprite(targets, animation, mirror, delay);
+        } else {
+            _Spriteset_Base_createAnimationSprite.apply(this, arguments);
+        }
+    };
 
-    if (Spriteset_Battle.prototype.createAnimationSprite == Spriteset_Base.prototype.createAnimationSprite) {
-        Spriteset_Battle.prototype.createAnimationSprite = function(targets, animation, mirror, delay) {
-            Spriteset_Base.prototype.createAnimationSprite.apply(this, arguments);
-        };
-    }
-
-    const _Spriteset_Battle_createAnimationSprite = Spriteset_Battle.prototype.createAnimationSprite;
-    Spriteset_Battle.prototype.createAnimationSprite = function(targets, animation, mirror, delay) {
+    Spriteset_Battle.prototype.createBsAnimationSprite = function(targets, animation, mirror, delay) {
         const mv = this.isMVAnimation(animation);
         const sprite = new (mv ? Sprite_AnimationMV : Sprite_Animation)();
         const targetSprites = this.makeTargetSprites(targets);
@@ -6819,7 +6824,7 @@ Imported.NUUN_BattleStyleEX = true;
             this.getEffectsContainer().addChild(sprite);
             this._animationSprites.push(sprite);
         } else {
-            _Spriteset_Battle_createAnimationSprite.apply(this, arguments);
+            _Spriteset_Base_createAnimationSprite.apply(this, arguments);
         }
     };
 

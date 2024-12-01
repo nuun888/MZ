@@ -1,5 +1,5 @@
 # [ステート付与の仕様変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js)
-# Ver.1.1.0
+# Ver.1.1.1
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddStateDeviation.js)  
  #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)Ver.1.7.2以降  
@@ -30,6 +30,8 @@
 ステート無効化を設定している場合、有効度を無視する攻撃をしてもステートは無効化されます。  
   
 ## 更新履歴
+2024/12/2 Ver.1.1.1  
+特定のステートに掛かっている場合に強制付加するステートの機能が行えなかった問題を修正。  
 2024/5/11 Ver.1.1.0  
 付加モードの追加  
 特定のステートに掛かっている場合に強制付加するステートを設定できる機能を追加。  

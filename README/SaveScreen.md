@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# 新版Ver.3.0.8
+# 新版Ver.3.0.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen_3.js)  
 # 旧版Ver.2.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
@@ -70,6 +70,8 @@ actor:$gameActors (指定のアクター変更で指定したアクター(指定
 
 
 ## 更新履歴 
+2024/12/1 Ver.3.0.9  
+背景画像が見つからない場合にエラーが出る問題を修正。  
 2024/11/26 Ver.3.0.8  
 背景画像を設定するとエラーが出る問題を修正。  
 セーブメインウィンドウ設定のウィンドウスキン画像表示の非表示が適用されていなかった問題を修正。  

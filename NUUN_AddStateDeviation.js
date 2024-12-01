@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Specification change of state assignment
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -54,6 +54,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/2/2024 Ver.1.1.1
+ * Fixed an issue where the forced state function could not be used when certain states were applied.
  * 5/11/2024 Ver.1.1.0
  * Addition of append mode
  * Added a function that allows you to set a state to be forcibly added when the state is suspended in a specific state.
@@ -79,7 +81,7 @@
  * @target MZ
  * @plugindesc ステート付与の仕様変更、拡張
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 必中攻撃ではステートを付与する際に有効度、運を無視して付与されてしまいます。
@@ -120,6 +122,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/2 Ver.1.1.1
+ * 特定のステートに掛かっている場合に強制付加するステートの機能が行えなかった問題を修正。
  * 2024/5/11 Ver.1.1.0
  * 付加モードの追加
  * 特定のステートに掛かっている場合に強制付加するステートを設定できる機能を追加。
@@ -152,7 +156,7 @@ const params = Nuun_PluginParams.getPluginParams(document.currentScript);
 
 
     Game_Action.prototype.certainState = function(target, id){
-        if (this.item().AddCertainState) {
+        if (this.item().meta.AddCertainState) {
             if (this.isAddCertainState(target)) {
                 return true;
             }

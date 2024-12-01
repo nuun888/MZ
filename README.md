@@ -122,6 +122,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [敵のレベル](https://github.com/nuun888/MZ/blob/master/README/EnemyLevel.md) | [NUUN_EnemyLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
+|  |  |  |  |
 
 | 能力拡張　　　　　　　　　　　　　　　 | プラグイン　プラグイン数8　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
@@ -160,6 +161,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [設置型スキル](https://github.com/nuun888/MZ/blob/master/README/StationarySkill.md) | [NUUN_StationarySkill](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StationarySkill.js) | 共 | 1.0.0 |
 | [ランダム発動スキル](https://github.com/nuun888/MZ/blob/master/README/RandomSkill.md) | [NUUN_RandomSkill](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomSkill.js) | 共 | 1.0.0 |
 | [アイテム、スキルの使用効果でコモンイベント実行で画面を閉じない](https://github.com/nuun888/MZ/blob/master/README/ContinuationItemWindowCommon.md) | [NUUN_ContinuationItemWindowCommon](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ContinuationItemWindowCommon.js) | 共 | 1.0.0 |
+| [敵が仲間を呼ぶスキル](https://github.com/nuun888/MZ/blob/master/README/CallingEnemy.md) | [NUUN_CallingEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CallingEnemy.js) | 共 | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 

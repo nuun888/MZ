@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.8
+ * @version 3.0.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -70,6 +70,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/1/2024 Ver.3.0.9
+ * Fixed an issue where an error would occur if a background image was not found.
  * 11/26/2024 Ver.3.0.8
  * Fixed an issue that would cause an error when setting a background image.
  * Fixed an issue where the setting to hide window skin image display in the Save Main Window settings was not being applied.
@@ -1315,7 +1317,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.8
+ * @version 3.0.9
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1378,6 +1380,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/1 Ver.3.0.9
+ * 背景画像が見つからない場合にエラーが出る問題を修正。
  * 2024/11/26 Ver.3.0.8
  * 背景画像を設定するとエラーが出る問題を修正。
  * セーブメインウィンドウ設定のウィンドウスキン画像表示の非表示が適用されていなかった問題を修正。
@@ -2652,14 +2656,14 @@ Imported.NUUN_SaveScreen_3 = true;
     PluginManager.registerCommand(pluginName, 'ChangeBackground', args => {
         const data = String(args.BackGroundImg);
         if (data) {
-        $gameSystem.setSaveBackGround(data, Number(args.BackGroundId));
+            $gameSystem.setSaveBackGround(data, Number(args.BackGroundId));
         }
     });
 
     PluginManager.registerCommand(pluginName, 'ChangeContentsBackground', args => {
         const data = String(args.BackGroundImg);
         if (data) {
-        $gameSystem.setSaveContentsBackGround(data);
+            $gameSystem.setSaveContentsBackGround(data);
         }
     });
 
@@ -2837,10 +2841,11 @@ Imported.NUUN_SaveScreen_3 = true;
     
     DataManager.loadBackground = function() {
         const globalInfo = this._globalInfo;
+        if (!globalInfo) return null;
         const validInfo = globalInfo.slice(1).filter(x => x);
         const id = Math.max(...validInfo.map(x => this.backgroundId(x)));
         const index = globalInfo.findIndex(x => x && this.backgroundId(x) === id);
-        return globalInfo[index].background ? globalInfo[index].background[0] : null;
+        return globalInfo[index] && globalInfo[index].background ? globalInfo[index].background[0] : null;
     };
     
     DataManager.backgroundId = function(x) {

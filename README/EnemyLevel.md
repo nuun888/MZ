@@ -28,9 +28,12 @@
 
 #### 任意
 敵のメモ欄  
+敵のレベル適用  
 `<Level:[level], [variance]>` 戦闘開始時に指定のレベルで開始します。  
 `[level]`:レベル  
 `[variance]`:分散度  
+
+敵のスキルの習得レベルまたは忘却レベル  
 `<EnemyLevelLearnSkill[skillId]:[minlevel],[maxLevel]>` 敵のレベルが[minlevel]以上[maxLevel]以下なら[skillId]が敵の行動に追加されます。  
 [maxLevel]は省略できます。その場合、敵のレベルが[minlevel]以上なら[skillId]が敵の行動に追加されます。  
 `[skillId]`:スキルID  

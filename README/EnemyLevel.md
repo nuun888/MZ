@@ -1,5 +1,5 @@
 # [敵レベル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.7.10以降  
@@ -53,5 +53,7 @@
 他作者様のモンスター図鑑プラグインへの競合サポートは行いませんのでご了承ください。  
 
 ## 更新履歴
-2024/11/9 Ver 1.0.0
+2024/12/7 Ver 1.0.1  
+モンスター図鑑でレベルステータス、分散を無効にする機能を追加。
+2024/11/9 Ver 1.0.0  
 初版

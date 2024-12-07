@@ -1,4 +1,4 @@
-﻿/*:-----------------------------------------------------------------------------------
+/*:-----------------------------------------------------------------------------------
  * NUUN_EnemyLevel.js
  * 
  * Copyright (C) 2024 NUUN
@@ -13,6 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
+ * @version 1.0.1
  * 
  * @help
  * Sets the enemy's level.
@@ -48,6 +49,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/7/2024 Ver.1.0.1
+ * Added the ability to disable level status and dispersion in the enemy book.
  * 11/9/2024 Ver.1.0.0
  * First edition.
  * 
@@ -73,6 +76,24 @@
  * @type variable
  * @default 0
  * @parent VariableSetting
+ * 
+ * @param EnemyBookSetting
+ * @text Enemy book setting
+ * @default ------------------------------
+ * 
+ * @param EnemyBookNoMapLevel
+ * @type boolean
+ * @default true
+ * @text Enemy book map setting level invalid
+ * @desc Disables the map setting level in the enemy book (NUUN_EnemyBook).
+ * @parent OtherSetting
+ * 
+ * @param EnemyBookNoVariance
+ * @type boolean
+ * @default true
+ * @text Enemy book Dispersion Ignored
+ * @desc Disables the dispersion in the enemy book (NUUN_EnemyBook).
+ * @parent OtherSetting
  * 
  */
 /*~struct~EnemyLevelDataList:
@@ -282,6 +303,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
+ * @version 1.0.1
  * 
  * @help
  * 敵にレベルを設定します。
@@ -317,6 +339,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/7 Ver 1.0.1
+ * モンスター図鑑でレベルステータス、分散を無効にする機能を追加。
  * 2024/11/9 Ver 1.0.0
  * 初版
  * 
@@ -342,6 +366,24 @@
  * @type variable
  * @default 0
  * @parent VariableSetting
+ * 
+ * @param EnemyBookSetting
+ * @text モンスター図鑑設定
+ * @default ------------------------------
+ * 
+ * @param EnemyBookNoMapLevel
+ * @type boolean
+ * @default true
+ * @text モンスター図鑑マップ設定レベル無効
+ * @desc モンスター図鑑(NUUN_EnemyBook)でのマップ設定レベルを無効にします。
+ * @parent OtherSetting
+ * 
+ * @param EnemyBookNoVariance
+ * @type boolean
+ * @default true
+ * @text モンスター図鑑分散無効
+ * @desc モンスター図鑑(NUUN_EnemyBook)での分散度を無効にします。
+ * @parent OtherSetting
  * 
  */
 /*~struct~EnemyLevelDataList:ja
@@ -611,6 +653,7 @@ Imported.NUUN_EnemyLevel = true;
     Game_Enemy.prototype.getParamEnemyLevel = function(base, paramId) {
         if (this._levelData === 0) return 0;
         const data = params.EnemyLevelData[this._levelData - 1];
+        
         switch (paramId) {
             case 0:
                 return (base * (data.HpIncreaseRate / 100) - base) * (this._level - 1) + data.FixedHpIncrease * (this._level - 1);
@@ -681,6 +724,7 @@ Imported.NUUN_EnemyLevel = true;
     };
 
     Game_Enemy.prototype.mapEnemyLevel = function() {
+        if (params.EnemyBookNoMapLevel && this.isEnemybookLevelStatus()) return 1;
         const map = $dataMap;
         if (!map) return 1;
         const tag = 'MapEnemyLevel' + this.enemyId();
@@ -690,9 +734,20 @@ Imported.NUUN_EnemyLevel = true;
     };
 
     Game_Enemy.prototype.enemyLevelVariance = function(level, variance = 0) {
+        if (params.EnemyBookNoVariance && this.isEnemybookLevelStatus()) return level;
         const amp = Math.floor(Math.max((Math.abs(level) * variance) / 100, 0));
         const v = Math.randomInt(amp + 1) + Math.randomInt(amp + 1) - amp;
         return level >= 0 ? level + v : level - v;
     };
 
+    Game_Enemy.prototype.isEnemybookLevelStatus = function() {
+        if (!Imported.NUUN_EnemyBook) return false;
+        if ($gameParty.inBattle() && String(this._scene.constructor.name) === 'Scene_Battle') {
+            return BattleManager.isOpenEnemyBook();
+        } else {
+            return String(this._scene.constructor.name) === 'Scene_EnemyBook';
+        }
+    };
+
+ 
 })();

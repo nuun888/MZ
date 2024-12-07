@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.0
+ * @version 2.22.1
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/7/2024 Ver.2.22.1
+ * Added a process to determine the encyclopedia mode during battle.
  * 10/14/2024 Ver.2.22.0
  * Changed the specifications of the encyclopedia window during battle.
  * Added a function that changes the color of the enemy name during battle according to the remaining HP. When the monster name item text color is set to -1 in the current status
@@ -3044,7 +3046,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.21.3
+ * @version 2.22.1
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3265,6 +3267,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/7 Ver.2.22.1
+ * 戦闘中の図鑑のモードを判定する処理を追加。
  * 2024/10/14 Ver.2.22.0
  * 戦闘中の図鑑ウィンドウの仕様を変更。
  * 戦闘中の敵名色を残りHPに応じて変化する機能を追加。現在のステータスでモンスター名の項目文字色を-1に指定時
@@ -6610,6 +6614,20 @@ const _DataManager_extractSaveContents = DataManager.extractSaveContents;
 DataManager.extractSaveContents = function(contents) {
     _DataManager_extractSaveContents.call(this, contents);
     _initEnemyBookList();
+};
+
+BattleManager.isOpenEnemyBook = function() {
+    if (this.enemyBook_Open) {
+        switch (_bookMode) {
+            case 'book':
+                return true;
+            case 'info':
+                return false;
+            case 'analyze':
+                return false;
+        }
+    }
+    return false;
 };
 
 //Game_System

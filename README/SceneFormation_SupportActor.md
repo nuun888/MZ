@@ -1,5 +1,5 @@
 # [メンバー変更画面(サポートアクター反映)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation_SupportActor.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation_SupportActor.js)
 #### 必須、前提プラグイン
 [サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md)  

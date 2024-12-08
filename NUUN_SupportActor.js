@@ -8,9 +8,90 @@
  */ 
 /*:
  * @target MZ
+ * @plugindesc Supported Actor
+ * @author NUUN
+ * @version 2.0.0
+ * @base NUUN_Base
+ * @orderAfter NUUN_Base
+ *            
+ * @help
+ * Set the actor to support in battle.
+ * Support Actors do not appear on the battle screen, do not appear in the Actor Status window, and cannot be attacked.
+ * If all members except the support member are wiped out, the team will lose.
+ * Please set the settings for auto-battle and experience point acquisition based on the actor's characteristics.
+ * 
+ * Actor's notes
+ * <SupportActor> Actors with this tag are support actors.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/8/2024 Ver.2.0.0
+ * Significant changes to processing methods
+ * Added the ability to specify the maximum number of support actors.
+ * 8/1/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * @command SupportActorSetting
+ * @desc Set the actor to be made or removed as a support actor.
+ * @text Support actor settings
+ * 
+ * @arg Actor
+ * @text Actor
+ * @desc Specify the actor.
+ * @type actor
+ * @default 0
+ * 
+ * @arg SupportActorsSwitch
+ * @desc Support actor ON or OFF (ON makes him a support actor)
+ * @text Support Actor Switch
+ * @type boolean
+ * @default true
+ * 
+ * @arg SupportActorTurn
+ * @text Support Actor Turn
+ * @desc Sets the turn the support actor is called for (-1 for unlimited, -2 for until the end of the battle).
+ * @type number
+ * @default -1
+ * @min -2
+ * 
+ * 
+ * @param SupportActorSV
+ * @text Side view support actor settings
+ * @desc Side view support actor coordinate settings.
+ * @default []
+ * @type struct<SupportActorSVList>[]
+ * 
+ * @param MaxSupportActor
+ * @text Max number of support actors
+ * @desc Number of members you can support during battle. 0 is unlimited
+ * @type number
+ * @default 0
+ * 
+ */
+/*~struct~SupportActorSVList:
+ * 
+ * @param SupportActorSV_X
+ * @text Support actor SV coordinate X
+ * @desc Support actor SV coordinate X.
+ * @type number
+ * @min -9999
+ * @default 0
+ * 
+ * @param SupportActorSV_Y
+ * @text Support actor SV coordinate Y
+ * @desc Support actor SV coordinate Y.
+ * @type number
+ * @min -9999
+ * @default 96
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 1.4.5
+ * @version 2.0.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -21,12 +102,15 @@
  * 自動戦闘、経験値の入手に関して設定はアクターの特徴から設定してください。
  * 
  * アクターのメモ欄
- * <SupportActor>　このタグがあるアクターはサポートアクターとなります。
+ * <SupportActor> このタグがあるアクターはサポートアクターとなります。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/8 Ver.2.0.0
+ * 処理方法を大幅に変更
+ * サポートアクターの最大数を指定できる機能を追加。
  * 2023/11/23 Ver.1.4.5
  * 通常メンバー全員が行動不能になった時にサポートアクターがアイテムを使用すると、一覧に表示されない問題を修正。
  * 2023/4/9 Ver.1.4.4
@@ -97,31 +181,33 @@
  * @min -2
  * 
  * 
- * @param SupportActorMode
- * @desc サポートアクターを常に通常戦闘メンバーの後に表示。
- * @text サポートアクター適用順
- * @type boolean
- * @default false
- * 
  * @param SupportActorSV
  * @text サイドビューサポートアクター設定
- * @desc サイドビューサポートアクター設定。
+ * @desc サイドビューサポートアクター座標設定。
  * @default []
  * @type struct<SupportActorSVList>[]
  * 
+ * @param MaxSupportActor
+ * @text 最大サポートアクター数
+ * @desc 戦闘中にサポートできるメンバー数。0で無制限
+ * @type number
+ * @default 0
+ * 
  */
-/*~struct~SupportActorSVList:
+/*~struct~SupportActorSVList:ja
  * 
  * @param SupportActorSV_X
  * @text サポートアクターSV座標X
  * @desc サポートアクターSV座標X
  * @type number
+ * @min -9999
  * @default 0
  * 
  * @param SupportActorSV_Y
  * @text サポートアクターSV座標Y
  * @desc サポートアクターSV座標Y
  * @type number
+ * @min -9999
  * @default 96
  * 
  */
@@ -129,375 +215,322 @@ var Imported = Imported || {};
 Imported.NUUN_SupportActor = true;
 
 (() => {
-  const parameters = PluginManager.parameters('NUUN_SupportActor');
-  const SupportActorSV = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SupportActorSV'])) : null) || [];
-  const SupportActorMode = eval(parameters['SupportActorMode'] || 'false');
-
-  const pluginName = "NUUN_SupportActor";
-  PluginManager.registerCommand(pluginName, 'SupportActorSetting', args => {
-    const actorId = Number(args.Actor);
-    if (actorId > 0) {
-        const actor = $gameActors.actor(actorId);
-        if (!!actor) {
-            actor.setAddSupportActor(args);
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+    const SupportActorSV = params.SupportActorSV || [];
+    
+    PluginManager.registerCommand(pluginName, 'SupportActorSetting', args => {
+        const actorId = Number(args.Actor);
+        if (actorId > 0) {
+            const actor = $gameActors.actor(actorId);
+            if (!!actor) {
+                actor.setAddSupportActor(args);
+            }
         }
-    }
-  });
-
-  const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
-  Game_Actor.prototype.initMembers = function() {
-    _Game_Actor_initMembers.call(this);
-    this._supportActorTurn = -1;
-    this._supportActorCallActor = 0;
-    this._supportActorDeadCallActor = false;
-    this._supportActor = false;
-  };
-
-  const _Game_Actor_setup = Game_Actor.prototype.setup;
-  Game_Actor.prototype.setup = function(actorId) {
-    _Game_Actor_setup.call(this, actorId);
-    this._supportActor = this.isSupportActor();
-  };
-
-  Game_Actor.prototype.setAddSupportActor = function(args) {
-    const flag = eval(args.SupportActorsSwitch);
-    this.setSupportActor(flag);
-    this.setSupportActorTurn(Number(args.SupportActorTurn));
-  };
-
-  Game_Actor.prototype.updateSupportActorTurn = function() {
-    if (this._supportActorTurn > 0) {
-        this._supportActorTurn--;
-    }
-  };
-
-  Game_Actor.prototype.setSupportActorTurn = function(turn) {
-    this._supportActorTurn = turn;
-  };
-
-  Game_Actor.prototype.getSupportActorTurn = function() {
-    return this._supportActorTurn;
-  };
-
-  const _Game_Actor_isBattleMember = Game_Actor.prototype.isBattleMember;
-  Game_Actor.prototype.isBattleMember = function() {
-    return _Game_Actor_isBattleMember.call(this) || $gameParty.supportActorMembers().includes(this);
-  };
-
-  Game_Actor.prototype.setSupportActor = function(flag) {
-    this._supportActor = flag;
-  };
-
-  Game_Actor.prototype.isSupportActor = function() {
-    return !!this.actor().meta.SupportActor;
-  };
-
-  Game_Actor.prototype.getSupportActor = function() {
-    if (!this._supportActor) {
-      this._supportActor = this.isSupportActor();
-    }
-    return this._supportActor;
-  };
-
-  Game_Actor.prototype.supportActorindex = function() {
-    return $gameParty.supportActorMembers().indexOf(this);
-  };
-
-  Game_Actor.prototype.setSupportActorCallActor = function(actorId) {
-    this._supportActorCallActor = actorId;
-  };
-
-  Game_Actor.prototype.getSupportActorCallActor = function() {
-    return this._supportActorCallActor;
-  };
-
-  Game_Actor.prototype.setSupportActorDeahCall = function(flag) {
-    this._supportActorDeadCallActor = !!flag;
-  };
-
-  Game_Actor.prototype.getSupportActorDeahCall = function() {
-    return this._supportActorDeadCallActor;
-  };
-
-  Game_Actor.prototype.updateRemoveSupportActor = function() {
-    if (this._supportActorTurn === 0) {
-      this.removeSupportActor();
-    }
-  };
-
-  Game_Actor.prototype.supportActorDeathCallActor = function() {
-    if (this._supportActorDeadCallActor) {
-      if (this._supportActorCallActor > 0 && $gameActors.actor(this.getSupportActorCallActor()).isDead()) {
-        this.removeSupportActor();
-      }
-    }
-  };
-
-  const _Game_Actor_onTurnEnd = Game_Actor.prototype.onTurnEnd;
-  Game_Actor.prototype.onTurnEnd = function() {
-    _Game_Actor_onTurnEnd.call(this);
-    this.updateSupportActorTurn();
-    this.updateRemoveSupportActor();
-  };
-
-  const _Game_Actor_onBattleEnd = Game_Actor.prototype.onBattleEnd;
-  Game_Actor.prototype.onBattleEnd = function() {
-    _Game_Actor_onBattleEnd.call(this);
-    const turn = this.getSupportActorTurn();
-    if (turn === -2 || turn >= 0) {
-      this.removeSupportActor();
-    }
-  };
-
-  Game_Actor.prototype.removeSupportActor = function() {
-    $gameParty.removeActor(this.actorId());
-    this._supportActorCallActor = 0;
-    this._supportActorDeadCallActor =false;
-    if (!this.getSupportActor()) {
-      this._supportActor = false;
-    }
-  };
-
-  
-  const _Game_Party_initialize = Game_Party.prototype.initialize;
-  Game_Party.prototype.initialize = function() {
-    _Game_Party_initialize.call(this);
-    this._withSuppoter =  false;
-    this._withRearSuppoter =  false;
-  };
-
-  const _Game_Party_makeActions = Game_Party.prototype.makeActions;
-  Game_Party.prototype.makeActions = function() {
-    _Game_Party_makeActions.call(this);
-    for (const member of this.supportActorMembers()) {
-        member.makeActions();
-    }
-  };
-
-  const _Game_Party_updateTpb = Game_Party.prototype.updateTpb;
-  Game_Party.prototype.updateTpb = function() {
-    _Game_Party_updateTpb.call(this);
-    for (const member of this.supportActorMembers()) {
-      member.updateTpb();  
-    }
-  };
-
-  const _Game_Party_battleMembers = Game_Party.prototype.battleMembers;
-  Game_Party.prototype.battleMembers = function() {
-    const members = _Game_Party_battleMembers.call(this);
-    if (this.isWithRearSupportActor()) {
-      this._withRearSuppoter = false;
-      return this.rearSupportActorBattleMembers(members);
-    } else if (this.isWithSupportActorMember()) {
-      this._withSuppoter = false;
-      return this.withSupportActorBattleMembers(members);
-    } else {
-      return this.normalOnlyBattleMembers(members);
-    }
-  };
-
-  Game_Party.prototype.membersInSupportActorNum = function(members) {//メンバー内のサポートアクター人数
-    return members.reduce((r, member) => r + (member && member.getSupportActor() ? 1 : 0), 0);
-  };
-
-  Game_Party.prototype.normalOnlyBattleMembers = function(members) {
-    const maxMember = this.maxBattleMembers();
-    let i = maxMember - this.membersInSupportActorNum(members);
-    members = members.filter(member => !member.getSupportActor());//メンバーからサポートアクターを外す
-    const concatMembers = this.allMembers().slice(this.maxBattleMembers()).filter(member => {
-      if (i < maxMember && member.isAppeared() && !member.getSupportActor()) {
-        i++;
-        return true;
-      }
-      return false;
     });
-    Array.prototype.push.apply(members, concatMembers);
-    return members;
-  };
-
-  Game_Party.prototype.withSupportActorBattleMembers = function(members) {
-    const maxMember = this.maxBattleMembers();
-    let i = maxMember - this.membersInSupportActorNum(members);
-    const concatMembers = this.allMembers().slice(this.maxBattleMembers()).filter(member => {
-      if (i < maxMember && member.isAppeared() && !member.getSupportActor()) {
-        i++;
-        return true;
-      }
-      if (member.getSupportActor() && member.isAppeared()) {
-        return true;
-      }
-      return false;
-    });
-    Array.prototype.push.apply(members, concatMembers);
-    return members;
-  };
-
-  Game_Party.prototype.rearSupportActorBattleMembers = function(members) {
-    members = this.normalOnlyBattleMembers(members);
-    const concatMembers = this.supportActorMembers();
-    Array.prototype.push.apply(members, concatMembers);
-    return members;
-  };
-
-  Game_Party.prototype.supportActorMembers = function() {//全てのサポートアクターを取得
-    return this.allMembers().filter(member => member.getSupportActor());
-  };
-
-  Game_Party.prototype.supportActorWithinMembers = function() {//バトルメンバー内のサポートアクターを取得
-    return this.allMembers().slice(0, this.maxBattleMembers()).filter(member => member.getSupportActor());
-  };
-
-  Game_Party.prototype.setWithSupportActorMember = function() {
-    this._withSuppoter = true;
-  };
-
-  Game_Party.prototype.isWithSupportActorMember = function() {
-    return this._withSuppoter;
-  };
-
-  Game_Party.prototype.setWithRearSupportActor = function() {
-    this._withRearSuppoter = true;
-  };
-
-  Game_Party.prototype.isWithRearSupportActor = function() {
-    return this._withRearSuppoter;
-  };
-  
-  const _Game_Party_canInput = Game_Party.prototype.canInput;
-  Game_Party.prototype.canInput = function() {
-    if (this.inBattle()) {
-      this.setWithRearSupportActor();
-    }
-    return _Game_Party_canInput.call(this);
-  };
-
-  const _Game_Party_addActor = Game_Party.prototype.addActor;
-  Game_Party.prototype.addActor = function(actorId) {
-    const inc = !this._actors.includes(actorId);
-    _Game_Party_addActor.call(this, actorId)
-    if (inc && this._actors.includes(actorId)) {
-      if (this.inBattle()) {
-        const actor = $gameActors.actor(actorId);
-        if (this.supportActorMembers().includes(actor)) {
-          actor.onBattleStart();
-        }
-      }
-    }
-  };
 
 
-  const _Game_Player_refresh = Game_Player.prototype.refresh;
-  Game_Player.prototype.refresh = function() {
-    $gameParty.setWithSupportActorMember();
-    _Game_Player_refresh.call(this);
-  };
-
-
-  const _Game_Follower_actor = Game_Follower.prototype.actor;
-  Game_Follower.prototype.actor = function() {
-    $gameParty.setWithSupportActorMember();
-    return _Game_Follower_actor.call(this);
-  };
-
-
-  const _BattleManager_changeCurrentActor = BattleManager.changeCurrentActor;
-  BattleManager.changeCurrentActor = function(forward) {
-    $gameParty.setWithSupportActorMember();
-    _BattleManager_changeCurrentActor.call(this, forward);
-  };
-
-  const _BattleManager_makeActionOrders = BattleManager.makeActionOrders;
-  BattleManager.makeActionOrders = function() {
-    _BattleManager_makeActionOrders.call(this);
-    const battlers = this._actionBattlers;
-    if (!this._surprise) {
-      Array.prototype.push.apply(battlers, $gameParty.supportActorMembers());
-    }
-    for (const battler of battlers) {
-      battler.makeSpeed();
-    }
-    battlers.sort((a, b) => b.speed() - a.speed());
-    this._actionBattlers = battlers;
-  };
-
-  const _BattleManager_displayBattlerStatus = BattleManager.displayBattlerStatus;
-  BattleManager.displayBattlerStatus = function(battler, current) {
-    _BattleManager_displayBattlerStatus.call(this, battler, current);
-    if (battler.isActor()) {
-      battler.supportActorDeathCallActor();
-    }
-  };
-
-  const _BattleManager_allBattleMembers = BattleManager.allBattleMembers;
-  BattleManager.allBattleMembers = function() {
-    const members = _BattleManager_allBattleMembers.call(this);
-    Array.prototype.push.apply(members, $gameParty.supportActorMembers());
-    return members;
-  };
-
-
-  const _Spriteset_Battle_createActors = Spriteset_Battle.prototype.createActors;
-  Spriteset_Battle.prototype.createActors = function() {
-    _Spriteset_Battle_createActors.call(this);
-    const SupportActorSVLength = SupportActorSV.length;
-    if (SupportActorSV.length > 0 && $gameSystem.isSideView()){
-      this._supportActorSprites = [];
-      for (let i = 0; i < SupportActorSVLength; i++) {
-        const sprite = new Sprite_Actor();
-        this._supportActorSprites.push(sprite);
-        this._battleField.addChild(sprite);
-      }
-    }
-  };
-
-  const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
-  Spriteset_Battle.prototype.updateActors = function() {
-    _Spriteset_Battle_updateActors.call(this);
-    if (this._supportActorSprites) {
-      const members = $gameParty.supportActorMembers();
-      this._supportActorSprites.forEach((actor, i) => {
-        actor.setBattler(members[i]);
-      });
-    }
-  };
-
-  const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
-  Sprite_Actor.prototype.setActorHome = function(index) {
-    this._sIndex = -1;
-    if (this._actor && this._actor.getSupportActor()) {
-      index = this._actor.supportActorindex();
-      if (!SupportActorSV[index]) {
-        return;
-      }
-      this._sIndex = index;
-    }
-    _Sprite_Actor_setActorHome.call(this, index);
-  };
-
-  const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
-  Sprite_Actor.prototype.setHome = function(x, y) {
-    if (this._actor && this._actor.getSupportActor() && this._sIndex >= 0) {
-      x += SupportActorSV[this._sIndex].SupportActorSV_X;
-      y += SupportActorSV[this._sIndex].SupportActorSV_Y;
-    }
-    _Sprite_Actor_setHome.call(this, x, y);
-  };
-
-  const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
-  Scene_Battle.prototype.createAllWindows = function() {
-    _Scene_Battle_createAllWindows.call(this);
-    this.createSupportActorWindow();
-  };
-
-  Scene_Battle.prototype.createSupportActorWindow = function() {
-
-  };
-
-    const _Game_Party_canUse = Game_Party.prototype.canUse;
-    Game_Party.prototype.canUse = function(item) {
-        this.setWithSupportActorMember();
-        return _Game_Party_canUse.call(this, item);
+    const _Game_Action_makeTargets = Game_Action.prototype.makeTargets;
+    Game_Action.prototype.makeTargets = function() {
+        this.isSupportActorSpecialAttack();
+        const targets = _Game_Action_makeTargets.apply(this, arguments);
+        $gameTemp.omitSupportMember = false;
+        return targets;
     };
 
+    Game_Action.prototype.isSupportActorSpecialAttack = function() {
+        $gameTemp.supportMemberAttack = false;
+        if (this.item().meta.SupportActorAttack) {
+            $gameTemp.supportMemberAttack = true;
+        } else {
+            $gameTemp.omitSupportMember = true;//サポートアクターはターゲットにしない
+        }
+    };
+
+
+    const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
+    Game_Actor.prototype.initMembers = function() {
+        _Game_Actor_initMembers.call(this);
+        this._supportActorTurn = -1;
+        this._supportActorCallActor = 0;
+        this._supportActorDeadCallActor = false;
+        this._supportActor = false;
+    };
+
+    const _Game_Actor_setup = Game_Actor.prototype.setup;
+    Game_Actor.prototype.setup = function(actorId) {
+        _Game_Actor_setup.call(this, actorId);
+        this._supportActor = this.isSupportActor();
+    };
+  
+    Game_Actor.prototype.setAddSupportActor = function(args) {
+        if ($gameParty.isAddSupportActor()) {
+            const flag = eval(args.SupportActorsSwitch);
+            this.setSupportActor(flag);
+            this.setSupportActorTurn(Number(args.SupportActorTurn));
+        }
+    };
+
+    Game_Actor.prototype.updateSupportActorTurn = function() {
+        if (this._supportActorTurn > 0) {
+            this._supportActorTurn--;
+        }
+    };
+    
+    Game_Actor.prototype.setSupportActorTurn = function(turn) {
+        this._supportActorTurn = turn;
+    };
+    
+    Game_Actor.prototype.getSupportActorTurn = function() {
+        return this._supportActorTurn;
+    };
+  
+    Game_Actor.prototype.setSupportActor = function(flag) {
+        this._supportActor = flag;
+    };
+  
+    Game_Actor.prototype.isSupportActor = function() {
+        return !!this.actor().meta.SupportActor;
+    };
+
+    Game_Actor.prototype.getSupportActor = function() {
+        if (!this._supportActor) {
+            this._supportActor = this.isSupportActor();
+        }
+        return this._supportActor;
+    };
+  
+    Game_Actor.prototype.supportActorindex = function() {
+        return $gameParty.supportActorMembers().indexOf(this);
+    };
+    
+    Game_Actor.prototype.setSupportActorCallActor = function(actorId) {
+        this._supportActorCallActor = actorId;
+    };
+    
+    Game_Actor.prototype.getSupportActorCallActor = function() {
+        return this._supportActorCallActor;
+    };
+    
+    Game_Actor.prototype.setSupportActorDeahCall = function(flag) {
+        this._supportActorDeadCallActor = !!flag;
+    };
+    
+    Game_Actor.prototype.getSupportActorDeahCall = function() {
+        return this._supportActorDeadCallActor;
+    };
+    
+    Game_Actor.prototype.updateRemoveSupportActor = function() {
+        if (this._supportActorTurn === 0) {
+            this.removeSupportActor();
+        }
+    };
+  
+    Game_Actor.prototype.supportActorDeathCallActor = function() {
+        if (this._supportActorDeadCallActor) {
+          if (this._supportActorCallActor > 0 && $gameActors.actor(this.getSupportActorCallActor()).isDead()) {
+            this.removeSupportActor();
+          }
+        }
+    };
+    
+    const _Game_Actor_onTurnEnd = Game_Actor.prototype.onTurnEnd;
+    Game_Actor.prototype.onTurnEnd = function() {
+        _Game_Actor_onTurnEnd.call(this);
+        this.updateSupportActorTurn();
+        this.updateRemoveSupportActor();
+    };
+    
+    const _Game_Actor_onBattleEnd = Game_Actor.prototype.onBattleEnd;
+    Game_Actor.prototype.onBattleEnd = function() {
+        _Game_Actor_onBattleEnd.call(this);
+        const turn = this.getSupportActorTurn();
+        if (turn === -2 || turn >= 0) {
+            this.removeSupportActor();
+        }
+    };
+  
+    Game_Actor.prototype.removeSupportActor = function() {
+        $gameParty.removeActor(this.actorId());
+        this._supportActorCallActor = 0;
+        this._supportActorDeadCallActor =false;
+        if (!this.getSupportActor()) {
+            this._supportActor = false;
+        }
+    };
+
+    const _Game_Actor_index = Game_Actor.prototype.index;
+    Game_Actor.prototype.index = function() {
+        if ($gameParty.inBattle()) {
+            $gameTemp.omitSupportMember = true;
+        }
+        return _Game_Actor_index.apply(this, arguments)
+    };
+
+
+    Game_Party.prototype.allBattleMembers = function() {//再定義
+        const members = [];
+        let i = 0;
+        for (const member of this.allMembers()) {
+            if (i >= this.maxBattleMembers()) {
+                break;
+            }
+            if (!member || !member.getSupportActor()) {
+                i++;
+            }
+            members.push(member);
+        }
+        return members;
+    };
+
+    //サポートアクター 戦闘画面から省く 攻撃対象にされない コマンド選択は並び順通り
+    const _Game_Party_battleMembers = Game_Party.prototype.battleMembers;
+    Game_Party.prototype.battleMembers = function() {
+        return this.battleOmitSupportMembers(_Game_Party_battleMembers.apply(this, arguments));
+    };
+  
+    Game_Party.prototype.battleOmitSupportMembers = function(members) {
+        const omitSupportMember = $gameTemp.omitSupportMember;
+        $gameTemp.omitSupportMember = false;
+        if (!omitSupportMember) return members;
+        return members.filter(member => {
+            return !member.getSupportActor();
+        });
+    };
+
+    const _Game_Unit_aliveMembers = Game_Unit.prototype.aliveMembers;
+    Game_Unit.prototype.aliveMembers = function() {
+        if (!!this._actors) {
+            $gameTemp.omitSupportMember = !$gameTemp.supportMemberAttack;
+        }
+        return _Game_Unit_aliveMembers.apply(this, arguments);
+    };
+    
+    const _Game_Unit_deadMembers = Game_Unit.prototype.deadMembers;
+    Game_Unit.prototype.deadMembers = function() {
+        if (!!this._actors) {
+            $gameTemp.omitSupportMember = !$gameTemp.supportMemberAttack;
+        }
+        return _Game_Unit_deadMembers.apply(this, arguments);
+    };
+
+    Game_Party.prototype.supportActorMembers = function() {//全てのサポートアクターを取得
+        return this.allMembers().filter(member => member.getSupportActor());
+    };
+    
+    Game_Party.prototype.supportActorWithinMembers = function() {//バトルメンバー内のサポートアクターを取得
+        return this.battleMembers().filter(member => member.getSupportActor());
+    };
+
+    Game_Party.prototype.maxSupportActor = function() {
+        const max = params.MaxSupportActor > 0 ? params.MaxSupportActor : Infinity;
+        return $gameSystem.isSideView() ? Math.min(SupportActorSV.length, max) : max;
+    };
+
+    Game_Party.prototype.isAddSupportActor = function() {
+        return this.supportActorWithinMembers().length < this.maxSupportActor();
+    };
+
+    const _Game_Party_addActor = Game_Party.prototype.addActor;
+    Game_Party.prototype.addActor = function(actorId) {
+        const inc = !this._actors.includes(actorId);
+        _Game_Party_addActor.apply(this, arguments);
+        if (inc && this._actors.includes(actorId)) {
+            if (this.inBattle()) {
+                const actor = $gameActors.actor(actorId);
+                if (this.supportActorMembers().includes(actor)) {
+                    actor.onBattleStart();
+                }
+            }
+        }
+    };
+  
+
+    const _Window_BattleStatus_maxItems = Window_BattleStatus.prototype.maxItems;
+    Window_BattleStatus.prototype.maxItems = function() {
+        $gameTemp.omitSupportMember = true;
+        return _Window_BattleStatus_maxItems.apply(this, arguments);
+    };
+
+    const _Window_BattleStatus_actor = Window_BattleStatus.prototype.actor;
+    Window_BattleStatus.prototype.actor = function(index) {
+        $gameTemp.omitSupportMember = true;
+        return _Window_BattleStatus_actor.apply(this, arguments);
+    };
+    
+    const _Window_BattleStatus_selectActor = Window_BattleStatus.prototype.selectActor;
+    Window_BattleStatus.prototype.selectActor = function(actor) {
+        $gameTemp.omitSupportMember = true;
+        _Window_BattleStatus_selectActor.apply(this, arguments);
+    };
+
+
+
+    const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
+    Scene_Battle.prototype.createAllWindows = function() {
+        _Scene_Battle_createAllWindows.apply(this, arguments);
+        this.createSupportActorWindow();
+    };
+
+    Scene_Battle.prototype.createSupportActorWindow = function() {
+
+    };
+
+
+    const _Spriteset_Battle_createActors = Spriteset_Battle.prototype.createActors;
+    Spriteset_Battle.prototype.createActors = function() {
+        _Spriteset_Battle_createActors.apply(this, arguments);
+        if (SupportActorSV.length > 0 && $gameSystem.isSideView()) {
+            for (let i = 0; i < $gameParty.maxSupportActor(); i++) {
+                const sprite = new Sprite_Actor();
+                this._actorSprites.push(sprite);
+                this._battleField.addChild(sprite);
+            }
+            //this._battleField.children.sort(this.nuun_sortActor.bind(this));
+        }
+    };
+
+    const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
+    Spriteset_Battle.prototype.updateActors = function() {
+        _Spriteset_Battle_updateActors.apply(this, arguments);
+    };
+
+    Spriteset_Battle.prototype.nuun_sortActor = function(a, b) {
+        if (a.onSupportActor && b.onSupportActor) {
+            if (a.y !== b.y) {
+                return a.y - b.y;
+            }
+        }
+    };
+
+
+    const _Sprite_Actor_initialize = Sprite_Actor.prototype.initialize;
+    Sprite_Actor.prototype.initialize = function(battler) {
+        _Sprite_Actor_initialize.call(this, battler);
+        this.onSupportActor = true;
+        this._sIndex = -1;
+    };
+
+    const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
+    Sprite_Actor.prototype.setActorHome = function(index) {
+        this._sIndex = -1;
+        if (this._actor && this._actor.getSupportActor()) {
+            index = this._actor.supportActorindex();
+            if (!SupportActorSV[index]) {
+                return;
+            }
+            this._sIndex = index;
+        }
+        _Sprite_Actor_setActorHome.apply(this, arguments);
+    };
+
+    const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
+    Sprite_Actor.prototype.setHome = function(x, y) {
+        if (this._actor && this._actor.getSupportActor() && this._sIndex >= 0) {
+            x += SupportActorSV[this._sIndex].SupportActorSV_X;
+            y += SupportActorSV[this._sIndex].SupportActorSV_Y;
+        }
+        _Sprite_Actor_setHome.apply(this, arguments);
+    };
 
 })();

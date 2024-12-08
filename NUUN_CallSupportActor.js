@@ -83,7 +83,7 @@
  * @text Call Turn
  * @type number
  * @min -2
- * @default 0
+ * @default -1
  * 
  * @param DeadCallActor
  * @text Leaves at the end of the turn after being unable to fight
@@ -169,7 +169,7 @@
  * @text 呼び出しターン
  * @type number
  * @min -2
- * @default 0
+ * @default -1
  * 
  * @param DeadCallActor
  * @text 戦闘不能ターン離脱

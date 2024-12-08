@@ -1,11 +1,11 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
-# Ver.1.4.5
+# Ver.2.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)
+[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.7.10以降  
 #### 拡張プラグイン
 [サポートアクターインジケーター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js) Ver.1.3.1  
-[サポートアクター呼び出し](https://github.com/nuun888/MZ/blob/master/README/CallSupportActor.md) Ver.1.0.0  
+[サポートアクター呼び出し](https://github.com/nuun888/MZ/blob/master/README/CallSupportActor.md)Ver.1.1.0以降  
 召喚アクター
 
 戦闘でサポートするアクターを設定します。  
@@ -13,9 +13,6 @@
 サポートメンバー以外のメンバーが全滅した場合、敗北となります。  
 自動戦闘、経験値の入手に関して設定はアクターの特徴から設定してください。  
 
-追記  
-Ver.1.3.4  
-プラグインパラメータ「サポートアクター適用順」は現在未実装です。  
 
 ## 設定方法
 アクターのメモ欄  
@@ -30,6 +27,8 @@ Ver.1.3.4
  MV用のプラグインとの競合対応は行いません。  
   
 ## 更新履歴
+2024/12/8 Ver.2.0.0  
+処理方法を大幅に変更  
 2023/11/23 Ver.1.4.5  
 通常メンバー全員が行動不能になった時にサポートアクターがアイテムを使用すると、一覧に表示されない問題を修正。  
 2023/4/9 Ver.1.4.4  

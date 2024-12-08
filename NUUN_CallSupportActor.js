@@ -222,7 +222,7 @@ Imported.NUUN_CallSupportActor = true;
             callTurn = Number(data[1]);
             deadCallActor = Number(data[2]) ? true : false;
         } else {
-            const data = _getCallSupportActorData(NuunManager.getMetaCode(this.item(), "CallSupportActorId"));
+            const data = params.CallSupportActorList[_getCallSupportActorData(NuunManager.getMetaCode(this.item(), "CallSupportActorId"))];
             actorsId = data.CallActors || [];
             callTurn = data.CallTurn;
             deadCallActor = data.DeadCallActor;

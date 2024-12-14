@@ -1,15 +1,18 @@
 # [サポートアクターインジケータ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js)
-# Ver.1.5.1
+# Ver.1.6.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DisplaySupportActor.js)
 #### 必須、前提プラグイン
 [サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md)  
 
 参加しているサポートアクターを表示させます。  
-このプラグインはサポートアクター（NUUN_SupportActor）の拡張機能です。  
+このプラグインはサポートアクター（NUUN_SupportActor）Ver.2.0.0以降の拡張機能です。  
 
 ![画像](img/NUUN_SupportActor2.png)  
 
 ## 更新履歴
+2024/12/14 Ver.1.6.0  
+サポートアクターVer.2.0.0用の更新。  
+控えサポートメンバーまで表示されてしまう問題を修正。  
 2022/9/14 Ver.1.5.1  
 プラグインコマンドが正常に機能していなかった問題を修正。  
 2022/9/10 Ver.1.5.0  

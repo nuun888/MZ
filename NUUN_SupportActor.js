@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Supported Actor
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/14/2024 Ver.2.0.1
+ * Fixed a bug that allowed support actors who were added as battle members to fight as battle support members.
+ * Fixed an issue where support actors would join battles when the support limit was exceeded.
  * 12/8/2024 Ver.2.0.0
  * Significant changes to processing methods
  * Added the ability to specify the maximum number of support actors.
@@ -91,7 +94,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -108,6 +111,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/14 Ver.2.0.1
+ * バトルメンバー後のサポートアクターを戦闘サポートメンバーとして戦闘できるように修正。
+ * サポート人数制限を超えてサポートアクターが戦闘に参加してしまう問題を修正。
  * 2024/12/8 Ver.2.0.0
  * 処理方法を大幅に変更
  * サポートアクターの最大数を指定できる機能を追加。
@@ -372,13 +378,15 @@ Imported.NUUN_SupportActor = true;
         const members = [];
         let i = 0;
         for (const member of this.allMembers()) {
-            if (i >= this.maxBattleMembers()) {
+            if (i <= this.maxBattleMembers() && !!member && member.getSupportActor()) {
+                members.push(member);
+            } else if (i >= this.maxBattleMembers()) {
                 break;
             }
             if (!member || !member.getSupportActor()) {
+                members.push(member);
                 i++;
             }
-            members.push(member);
         }
         return members;
     };
@@ -465,6 +473,39 @@ Imported.NUUN_SupportActor = true;
     };
 
 
+    const _Window_MenuStatus_isCurrentItemEnabled = Window_MenuStatus.prototype.isCurrentItemEnabled;
+    Window_MenuStatus.prototype.isCurrentItemEnabled = function() {
+        if (this._formationMode) {
+            return this.isChangeSupportActor() && _Window_MenuStatus_isCurrentItemEnabled.apply(this, arguments);
+        }
+        return _Window_MenuStatus_isCurrentItemEnabled.apply(this, arguments);
+    };
+
+    Window_MenuStatus.prototype.isChangeSupportActor = function() {
+        const pactor = this.actor(this.pendingIndex());
+        const actor = this.actor(this.index());
+        const num = $gameParty.battleMembers().length;
+        if (!!pactor && pactor.getSupportActor() && this.index() <= num) {
+            if (!!actor && !actor.getSupportActor() && this.pendingIndex() < num) {
+                return true;
+            } else if (!!actor && !actor.getSupportActor() && this.isMaxSupportActor() || actor && actor.getSupportActor()) {
+                return true;
+            }
+            return false;
+        } else if (!!pactor && !pactor.getSupportActor() && this.pendingIndex() <= num) {
+            if (!!actor && actor.getSupportActor() && this.index() < num) {
+                return true;
+            } else if (!!actor && (!actor.getSupportActor() || actor.getSupportActor() && this.isMaxSupportActor() && this.index() >= $gameParty.maxBattleMembers())) {
+                return true;
+            }
+            return false;
+        } 
+        return true;
+    };
+
+    Window_MenuStatus.prototype.isMaxSupportActor = function() {
+        return $gameParty.supportActorWithinMembers().length < $gameParty.maxSupportActor();
+    };
 
     const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
     Scene_Battle.prototype.createAllWindows = function() {
@@ -514,6 +555,7 @@ Imported.NUUN_SupportActor = true;
     const _Sprite_Actor_setActorHome = Sprite_Actor.prototype.setActorHome;
     Sprite_Actor.prototype.setActorHome = function(index) {
         this._sIndex = -1;
+        if (!$gameSystem.isSideView()) return;
         if (this._actor && this._actor.getSupportActor()) {
             index = this._actor.supportActorindex();
             if (!SupportActorSV[index]) {
@@ -526,6 +568,7 @@ Imported.NUUN_SupportActor = true;
 
     const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
     Sprite_Actor.prototype.setHome = function(x, y) {
+        if (!$gameSystem.isSideView()) return;
         if (this._actor && this._actor.getSupportActor() && this._sIndex >= 0) {
             x += SupportActorSV[this._sIndex].SupportActorSV_X;
             y += SupportActorSV[this._sIndex].SupportActorSV_Y;

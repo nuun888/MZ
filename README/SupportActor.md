@@ -1,5 +1,5 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
-# Ver.2.0.1
+# Ver.2.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.7.10以降  
@@ -27,6 +27,8 @@
  MV用のプラグインとの競合対応は行いません。  
   
 ## 更新履歴
+2024/12/15 Ver.2.0.2  
+メンバー変更画面への適用するための処理を追加。  
 2024/12/14 Ver.2.0.1  
 バトルメンバー後のサポートアクターを戦闘サポートメンバーとして戦闘できるように修正。  
 サポート人数制限を超えてサポートアクターが戦闘に参加してしまう問題を修正。  

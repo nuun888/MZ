@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Supported Actor
  * @author NUUN
- * @version 2.0.1
+ * @version 2.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            

@@ -8,9 +8,71 @@
  */
 /*:
  * @target MZ
+ * @plugindesc Fixed actor formation
+ * @author NUUN
+ * @version 1.2.3
+ * 
+ * @help
+ * Fixes the actor's formation.
+ * Actor fixing can be set from the actor's memo field or plugin command.
+ * 
+ * Plugin command sorting Fixed party member destination index ID will force the fixed actor to move to the specified member position if it is among the party members.
+ * Disabled by specifying 0.
+ * Member indexes start from 1. The index of the first actor is 1.
+ * Cannot be specified if the actor ID is specified as 0.
+ * 
+ * Actor's notes
+ * <FixedActor> Fixes the movement of the actor.
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * 更新履歴
+ * 12/15/2024 Ver.1.2.3
+ * Fixed an issue where an error would occur when switching members if movement to fixed actor battle members was turned on.
+ * 8/17/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * @command ActorFixed
+ * @desc Fixed the formation.
+ * @text Fixed formation
+ * 
+ * @arg ActorId
+ * @type actor
+ * @default 0
+ * @text Actor ID
+ * @desc Specify the actor ID. 0 for all actors
+ * 
+ * @arg memberIndex
+ * @type number
+ * @default 0
+ * @text Party member destination index ID
+ * @desc Specifies the index ID to move to the party member. Only valid when specifying an actor ID. 0 means no specification.
+ * 
+ * @command ActorFixedRelease
+ * @desc Cancels the fixed formation.
+ * @text Formation fixation release
+ * 
+ * @arg ActorId
+ * @type actor
+ * @default 0
+ * @text Actor ID
+ * @desc Specify the actor ID. 0 for all actors
+ * 
+ * 
+ * @param ActorFixedMovable
+ * @text Can be moved to fixed actor battle members
+ * @desc Allows moving fixed actors to battle members. Also, the moved actor can move within the battle members.
+ * @type boolean
+ * @default false
+ * @parent ActorFixedSetting
+ * 
+ */
+/*:ja
+ * @target MZ
  * @plugindesc アクター並び替え固定
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * アクターの並び替えを固定します。
@@ -28,6 +90,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/10/22 Ver.1.2.3
+ * 固定アクター戦闘メンバーへの移動可をONにしている場合、メンバー交代時にエラーが起きる問題を修正。
  * 2024/10/22 Ver.1.2.2
  * NUUN_SceneFormationを使用していない場合に、エラーが出る問題を修正。
  * 2023/7/24 Ver.1.2.1
@@ -218,11 +282,15 @@ if (Imported.NUUN_SceneFormation) {
     
     const _Window_FormationBattleMember_isChangeActorEnabled = Window_FormationBattleMember.prototype.isChangeActorEnabled;
     Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
+        return this.isChangeActorFixed(actor, pendingActor);
+    };
+
+    Window_FormationBattleMember.prototype.isChangeActorFixed = function(actor, pendingActor) {
         if (ActorFixedMovable && actor) {
             if (pendingActor) {
-                return !pendingActor.isBattleMember() ? _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor) : true;
+                return !pendingActor.isBattleMember() ? _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor) : true;
             } else {
-                return this.getPendingMode() === 'battle' || !this.getPendingMode() ? true : _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor);
+                return this._formation.isPendingBattleMode() || !this._formation.pendingMode ? true : _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor);
             }
         } else if (actor) {
             return _Window_FormationBattleMember_isChangeActorEnabled.call(this, actor, pendingActor);
@@ -233,7 +301,11 @@ if (Imported.NUUN_SceneFormation) {
     
     const _Window_FormationMember_isChangeActorEnabled = Window_FormationMember.prototype.isChangeActorEnabled;
     Window_FormationMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
-        if (pendingActor && pendingActor.isBattleMember()) {
+        return this.isChangeActorFixed(actor, pendingActor);
+    };
+
+    Window_FormationMember.prototype.isChangeActorFixed = function(actor, pendingActor) {
+        if (!!pendingActor && pendingActor.isBattleMember()) {
             return _Window_FormationMember_isChangeActorEnabled.call(this, pendingActor);
         } else {
             return true;

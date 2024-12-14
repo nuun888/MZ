@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/15/2024 Ver.2.0.2
+ * Added processing to apply to the Screen Formation.
  * 12/14/2024 Ver.2.0.1
  * Fixed a bug that allowed support actors who were added as battle members to fight as battle support members.
  * Fixed an issue where support actors would join battles when the support limit was exceeded.
@@ -94,7 +96,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 2.0.1
+ * @version 2.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -111,6 +113,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/15 Ver.2.0.2
+ * メンバー変更画面への適用するための処理を追加。
  * 2024/12/14 Ver.2.0.1
  * バトルメンバー後のサポートアクターを戦闘サポートメンバーとして戦闘できるように修正。
  * サポート人数制限を超えてサポートアクターが戦闘に参加してしまう問題を修正。
@@ -377,9 +381,13 @@ Imported.NUUN_SupportActor = true;
     Game_Party.prototype.allBattleMembers = function() {//再定義
         const members = [];
         let i = 0;
+        let s = 0;
         for (const member of this.allMembers()) {
             if (i <= this.maxBattleMembers() && !!member && member.getSupportActor()) {
-                members.push(member);
+                if (this.maxSupportActor() > s) {
+                    members.push(member);
+                    s++;
+                }
             } else if (i >= this.maxBattleMembers()) {
                 break;
             }
@@ -503,7 +511,7 @@ Imported.NUUN_SupportActor = true;
         return true;
     };
 
-    Window_MenuStatus.prototype.isMaxSupportActor = function() {
+    Window_Base.prototype.isMaxSupportActor = function() {
         return $gameParty.supportActorWithinMembers().length < $gameParty.maxSupportActor();
     };
 

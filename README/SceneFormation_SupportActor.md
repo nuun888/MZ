@@ -1,9 +1,9 @@
 # [メンバー変更画面(サポートアクター反映)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation_SupportActor.js)
-# Ver.1.1.1
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation_SupportActor.js)
 #### 必須、前提プラグイン
-[サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md)  
-[メンバー変更画面](https://github.com/nuun888/MZ/blob/master/README/SceneFormation.md)  
+[サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md)Ver.2.0.2以降  
+[メンバー変更画面](https://github.com/nuun888/MZ/blob/master/README/SceneFormation.md)Ver.2.0.4以降  
 
 メンバー変更画面に[サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md)の機能を反映できるようにします。  
 このプラグインは[メンバー変更画面](https://github.com/nuun888/MZ/blob/master/README/SceneFormation.md)及び[サポートアクター](https://github.com/nuun888/MZ/blob/master/README/SupportActor.md)の拡張機能です。  
@@ -14,6 +14,9 @@
 戦闘メンバーの列数を0に設定した場合、最大メンバー数に応じて画面が拡大されます。なお行数を2以上にした場合は変化はありません。  
 
 ## 更新履歴
+2024/12/15 Ver.2.0.4  
+戦闘メンバー数可変で最大バトルメンバー数が増加しない問題を修正。  
+サポートアクター2.0.0適用に関する処理の修正。  
 2022/3/30 Ver.1.1.1  
 メンバー変更プラグインの処理追加による修正。  
 2022/3/30 Ver.1.1.0  

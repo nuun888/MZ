@@ -8,12 +8,52 @@
  */
 /*:
  * @target MZ
- * @plugindesc メンバー変更画面(サポートアクター反映)
+ * @plugindesc Member change screen (reflects support actors)
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  * @base NUUN_SceneFormation
  * @base NUUN_SupportActor
  * @orderAfter NUUN_SceneFormation
+ * @orderAfter NUUN_ActorFixed
+ * 
+ * @help
+ * The functionality of the support actor (NUUN_SupportActor) will be reflected on the member change screen.
+ * This plugin is an extension of the member change screen (NUUN_SceneFormation) and support actor (NUUN_SupportActor).
+ * 
+ * Terms of Use
+ * This plugin is distributed under the MIT license.
+ * 
+ * Log
+ * 12/15/2024 Ver.1.2.0
+ * Fixed by Support Actors 2.0.0 update.
+ * 3/30/2022 Ver.1.1.1
+ * Fixed by adding processing for member change plugin.
+ * 3/30/2022 Ver.1.1.0
+ * Member change screen, definition changes due to review of support actor processing.
+ * 8/19/2021 Ver.1.0.2
+ * Fixed an issue where a team would lose a battle when all battle members were support members.
+ * 8/18/2021 Ver.1.0.1
+ * Fixed an issue where an error would occur when the number of battle members was less than the maximum number of battle members.
+ * 8/17/2021 Ver.1.0.0
+ * First edition.
+ * 
+ * @param SupportActorBackColor
+ * @text Support actor background color
+ * @desc Background color for supporting actors.
+ * @type color
+ * @default 5
+ * @min -1
+ * 
+ */
+/*:ja
+ * @target MZ
+ * @plugindesc メンバー変更画面(サポートアクター反映)
+ * @author NUUN
+ * @version 1.2.0
+ * @base NUUN_SceneFormation
+ * @base NUUN_SupportActor
+ * @orderAfter NUUN_SceneFormation
+ * @orderAfter NUUN_ActorFixed
  * 
  * @help
  * メンバー変更画面にサポートアクター（NUUN_SupportActor）の機能を反映できるようにします。
@@ -23,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/15 Ver.1.2.0
+ * サポートアクター2.0.0更新による修正。
  * 2022/3/30 Ver.1.1.1
  * メンバー変更プラグインの処理追加による修正。
  * 2022/3/30 Ver.1.1.0
@@ -37,7 +79,7 @@
  * @param SupportActorBackColor
  * @text サポートアクター背景色
  * @desc サポートアクターの背景色。
- * @type number
+ * @type color
  * @default 5
  * @min -1
  * 
@@ -46,56 +88,78 @@ var Imported = Imported || {};
 Imported.NUUN_SceneFormation_SupportActor = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_SceneFormation_SupportActor');
-const parameters2 = PluginManager.parameters('NUUN_SceneFormation');
-const VariableBattleMember = eval(parameters2['VariableBattleMember'] || "true");
-const BattleMember_Cols = Number(parameters2['BattleMember_Cols'] || 4);
-const BattleMember_Rows = Number(parameters2['BattleMember_Rows'] || 1);
-const parameters3 = PluginManager.parameters('NUUN_SceneBattleFormation');
-const BattleMember_ColsInBattle = Number(parameters3['BattleMember_Cols'] || 4);
-const BattleMember_RowsInBattle = Number(parameters3['BattleMember_Rows'] || 1);
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
 
-Game_Party.prototype.formationBattleMember = function() {
-  const members = this.withSupportActorInBattleMembers();
-  if (VariableBattleMember) {
-    members.push(null);
-  }
-  return members;
-};
+    const _Window_FormationBattleMember_originalMaxBattleMembers = Window_FormationBattleMember.prototype.originalMaxBattleMembers;
+    Window_FormationBattleMember.prototype.originalMaxBattleMembers = function() {
+        return _Window_FormationBattleMember_originalMaxBattleMembers.apply(this, arguments) + Math.min($gameParty.maxSupportActor(), $gameParty.supportActorWithinMembers().length);
+    };
 
-Game_Party.prototype.withSupportActorInBattleMembers = function() {
-  const members = this.allBattleMembers().filter(actor => actor.isAppeared());
-  const maxMember = this.maxBattleMembers();
-  let i = maxMember - this.membersInSupportActorNum(members);
-  const concatMembers = this.allMembers().slice(this.maxBattleMembers()).filter(member => {
-    if (!member.getSupportActor()) {
-      i++;
-    }
-    if (i <= maxMember && member.isAppeared() && !member.getSupportActor()) {
-      return true;
-    }
-    if (i < maxMember && member.isAppeared() && member.getSupportActor()) {
-      return true;
-    }
-    return false;
-  });
-  Array.prototype.push.apply(members, concatMembers);
-  return members;
-};
+    const _Window_FormationBattleMember_maxCols = Window_FormationBattleMember.prototype.maxCols;
+    Window_FormationBattleMember.prototype.maxCols = function() {
+        return _Window_FormationBattleMember_maxCols.apply(this, arguments) + Math.ceil(Math.min($gameParty.maxSupportActor(), $gameParty.supportActorMembers().length) / this.getParamBattleMember_Rows());
+    };
 
-Game_Party.prototype.allStandByMembers = function() {
-  return this.allMembers().filter(member => member.isAppeared()).slice(this.withSupportActorInBattleMembers().length);
-};
+    Scene_Base.prototype.exFormationMembers = function() {
+        return Math.ceil(Math.min($gameParty.maxSupportActor(), $gameParty.supportActorMembers().length) / this.getParamBattleMember_Rows());
+    };
 
-const _Game_Party_checkSwap = Game_Party.prototype.checkSwap;
-Game_Party.prototype.checkSwap = function(index) {
-  const actor = this.allMembers()[index];
-  return actor && !actor.getSupportActor() && _Game_Party_checkSwap.call(this);
-};
+    const _Game_Party_checkSwap = Game_Party.prototype.checkSwap;
+    Game_Party.prototype.checkSwap = function(index) {
+        const actor = this.allMembers()[index];
+        return actor && !actor.getSupportActor() && _Game_Party_checkSwap.apply(this, arguments);
+    };
 
-const _Window_FormationBattleMember_maxCols = Window_FormationBattleMember.prototype.maxCols;
-Window_FormationBattleMember.prototype.maxCols = function() {
-  return _Window_FormationBattleMember_maxCols.call(this) * (this.getParamBattleMember_Rows() === 1 ? 2 : 1);
-};
+    const _Game_Party_changeEntryBattleMember = Game_Party.prototype.changeEntryBattleMember;
+    Game_Party.prototype.changeEntryBattleMember = function() {
+        $gameTemp.omitSupportMember = true;
+        _Game_Party_changeEntryBattleMember.apply(this, arguments);
+    };
+
+    const _Window_FormationBattleMember_isChangeActorEnabled = Window_FormationBattleMember.prototype.isChangeActorEnabled;
+    Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
+        return this.isChangeSupportActor(actor, pendingActor) && _Window_FormationBattleMember_isChangeActorEnabled.apply(this, arguments);
+    };
+
+    Window_FormationBattleMember.prototype.isChangeSupportActor = function(actor, pendingActor) {
+        const num = $gameParty.battleMembers().length;
+        const index = (this._formation.isPendingMemberMode() ? num : 0) + this.getPendingIndex();
+        if (!!pendingActor && pendingActor.getSupportActor()) {
+            if (!!actor && !actor.getSupportActor() && index < num) {
+                return true;
+            } else if (!!actor && !actor.getSupportActor() && this.isMaxSupportActor() || actor && actor.getSupportActor()) {
+                return true;
+            } else if (!this.actor(this.index()) && this.isMaxSupportActor()) {
+                return true;
+            }
+            return false;
+        } else if (!!pendingActor && !pendingActor.getSupportActor()) {
+            if (!!actor && !actor.getSupportActor()) {
+                return true;
+            } else if (!!actor && !actor.getSupportActor() && this.isMaxSupportActor() || actor && actor.getSupportActor()) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    };
+
+    const _Window_FormationMember_isChangeActorEnabled = Window_FormationMember.prototype.isChangeActorEnabled;
+    Window_FormationMember.prototype.isChangeActorEnabled = function(actor, pendingActor) {
+        return this.isChangeSupportActor(actor, pendingActor) && _Window_FormationMember_isChangeActorEnabled.apply(this, arguments);
+    };
+
+    Window_FormationMember.prototype.isChangeSupportActor = function(actor, pendingActor) {
+        if (!!pendingActor && !pendingActor.getSupportActor()) {
+            if (!!actor && actor.getSupportActor()) {
+                return this.isMaxSupportActor();
+            } else if (!actor || !!actor && !actor.getSupportActor()) {
+                return true;
+            }
+            return false;
+        }
+        return true;
+    };
 
 })();

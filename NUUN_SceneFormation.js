@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.0.3
+ * @version 2.0.4
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -33,6 +33,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/15/2024 Ver.2.0.4
+ * Fixed an issue where the maximum number of battle members would not increase when the number of battle members was variable.
+ * Fixed the process for applying Support Actor 2.0.0.
  * 7/13/2024 Ver.2.0.3
  * Fixed the issue where the settings in "NUUN_ActorPicture" were not applied.
  * Fixed an issue where an error would occur when switching members in turn-based mode and selecting a command.
@@ -879,7 +882,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.0.3
+ * @version 2.0.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -905,6 +908,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/15 Ver.2.0.4
+ * 戦闘メンバー数可変で最大バトルメンバー数が増加しない問題を修正。
+ * サポートアクター2.0.0適用に関する処理の修正。
  * 2024/7/13 Ver.2.0.3
  * 立ち絵、顔グラ表示EXでの設定が適用されない問題を修正。
  * ターン制でメンバー交代を行い、コマンド選択するとエラーが出る問題を修正。
@@ -1816,22 +1822,21 @@ Imported.NUUN_SceneFormation = true;
 
     const _Game_Party_initialize = Game_Party.prototype.initialize;
     Game_Party.prototype.initialize = function() {
-        this._formationBattleMembers = null;
+        this._formationBattleMembers = 0;
         _Game_Party_initialize.call(this);
     };
 
+    const _Game_Party_maxBattleMembers = Game_Party.prototype.maxBattleMembers;
     Game_Party.prototype.getFormationBattleMember = function() {
+        if (!this._formationBattleMembers) {
+            this._formationBattleMembers = _Game_Party_maxBattleMembers.call(this);
+        }
         return this._formationBattleMembers;
     };
 
-    const _Game_Party_maxBattleMembers = Game_Party.prototype.maxBattleMembers;
+    
     Game_Party.prototype.maxBattleMembers = function() {
-        if (this._formationBattleMembers) {
-            return Math.min(this.getFormationBattleMember(), _Game_Party_maxBattleMembers.call(this));
-        } else {
-            this._formationBattleMembers = _Game_Party_maxBattleMembers.call(this);
-            return this._formationBattleMembers;
-        }
+        return Math.min(this.getFormationBattleMember(), _Game_Party_maxBattleMembers.call(this));
     };
 
     Game_Party.prototype.originalMaxBattleMembers = function() {
@@ -1855,7 +1860,7 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Game_Party.prototype.allStandByMembers = function() {
-        return this.allMembers().filter(member => member.isAppeared()).slice(this.maxBattleMembers());
+        return this.allMembers().filter(member => member.isAppeared()).slice(this.battleMembers().length);
     };
 
     Game_Party.prototype.checkFormationBattleMember = function(addActor, withdrawalActor) {
@@ -1917,6 +1922,14 @@ Imported.NUUN_SceneFormation = true;
 
     Scene_Base.prototype.setNuun_Formation = function(mode, paramData) {
         return new Nuun_Formation(this, mode, paramData);
+    };
+
+    Scene_Base.prototype.exFormationMembers = function() {
+        return 0;
+    };
+
+    Scene_Base.prototype.getParamBattleMember_Rows = function() {
+        return paramList.BattleMember_Rows;
     };
       
     Scene_Menu.prototype.commandFormation = function() {//再定義
@@ -2540,7 +2553,17 @@ Imported.NUUN_SceneFormation = true;
         }
         
         battleMemberWindowWidth() {
-            return (paramList.BattleMember_Cols > 0 ? paramList.BattleMember_Cols : _Game_Party_maxBattleMembers.call($gameParty)) * (Imported.NUUN_SceneFormation_SupportActor && paramList.BattleMember_Rows === 1 ? 2 : 1) * (params.CharacterMode === 'face' ? 152 : 56);
+            return ((paramList.BattleMember_Cols > 0 ? paramList.BattleMember_Cols : _Game_Party_maxBattleMembers.call($gameParty))
+            + this._scene.exFormationMembers()) * this.characterModeWidth();
+        }
+
+        characterModeWidth() {
+            switch (params.CharacterMode) {
+                case 'face':
+                    return 152;
+                case 'chip':
+                    return 56;
+            }
         }
 
         cancelSystemSe(n) {
@@ -2716,7 +2739,11 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_FormationBattleMember.prototype.maxItems = function() {
-        return Math.min(this._members.length, _Game_Party_maxBattleMembers.call($gameParty) + (Imported.NUUN_SceneFormation_SupportActor ? $gameParty.membersInSupportActorNum(this._members) : 0));
+        return Math.min(this._members.length, this.originalMaxBattleMembers());
+    };
+
+    Window_FormationBattleMember.prototype.originalMaxBattleMembers = function() {
+        return _Game_Party_maxBattleMembers.call($gameParty);
     };
 
     Window_FormationBattleMember.prototype.maxCols = function() {
@@ -2750,7 +2777,7 @@ Imported.NUUN_SceneFormation = true;
         if (pendingActor) {
             return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
         } else if (actor) {
-            return this.isChangeActorEnabled(actor) && this.isFormationChangeActorEnabled(actor, pendingActor);
+            return this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
         } else if (!!this._formation.pendingMode && !actor && !pendingActor) {
             return false;
         } else {
@@ -2848,7 +2875,7 @@ Imported.NUUN_SceneFormation = true;
 
     Window_FormationBattleMember.prototype.drawFormationCharacter = function(actor, x, y, width) {
         let x2 = x + Math.floor(width / 2);
-        let y2 = y +  + this.itemHeight() - this.rowSpacing();
+        let y2 = y + this.itemHeight() - this.rowSpacing() * 2;
         this.drawCharacter(actor.characterName(), actor.characterIndex(), x2, y2);
     };
 
@@ -3019,7 +3046,7 @@ Imported.NUUN_SceneFormation = true;
         if (pendingActor) {
             return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
         } else if (actor) {
-            return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor) && this.isFormationChangeActorEnabled(actor, pendingActor);
+            return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
         } else if (!!this._formation.pendingMode && !actor && !pendingActor) {
             return false;
         } else {
@@ -3042,7 +3069,7 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_FormationMember.prototype.isChangeActorEnabled = function(actor) {
-    return actor ? actor.isFormationChangeOk() : true;
+        return actor ? actor.isFormationChangeOk() : true;
     };
 
     Window_FormationMember.prototype.isFormationChangeActorEnabled = function(actor, pendingActor) {
@@ -3117,7 +3144,7 @@ Imported.NUUN_SceneFormation = true;
 
     Window_FormationMember.prototype.drawFormationCharacter = function(actor, x, y, width) {
         let x2 = x + Math.floor(width / 2);
-        let y2 = y + this.itemHeight() - this.rowSpacing();
+        let y2 = y + this.itemHeight() - (this.rowSpacing() * 2);
         this.drawCharacter(actor.characterName(), actor.characterIndex(), x2, y2);
     };
 

@@ -1,5 +1,5 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
-# Ver.2.0.2
+# Ver.2.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.7.10以降  
@@ -27,6 +27,9 @@
  MV用のプラグインとの競合対応は行いません。  
   
 ## 更新履歴
+2024/12/16 Ver.2.0.3  
+フォロワーの人数をサポートアクター込みで表示されるように修正。  
+フォロワーのサポートアクターを表示させない機能を追加。  
 2024/12/15 Ver.2.0.2  
 メンバー変更画面への適用するための処理を追加。  
 2024/12/14 Ver.2.0.1  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Supported Actor
  * @author NUUN
- * @version 2.0.2
+ * @version 2.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/16/2024 Ver.2.0.3
+ * Fixed the number of followers to be displayed including support actors.
+ * Added the ability to hide follower support actors.
  * 12/15/2024 Ver.2.0.2
  * Added processing to apply to the Screen Formation.
  * 12/14/2024 Ver.2.0.1
@@ -68,11 +71,24 @@
  * @default []
  * @type struct<SupportActorSVList>[]
  * 
+ * @param MaxFollowers
+ * @text Maximum number of followers displayed
+ * @desc Set the maximum number of followers to display.
+ * @type number
+ * @default 6
+ * @min 1
+ * 
  * @param MaxSupportActor
  * @text Max number of support actors
  * @desc Number of members you can support during battle. 0 is unlimited
  * @type number
  * @default 0
+ * 
+ * @param ShowSupportActorFollowers
+ * @text Follower support actor display
+ * @desc Displays support actors for followers.
+ * @type boolean
+ * @default true
  * 
  */
 /*~struct~SupportActorSVList:
@@ -96,7 +112,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 2.0.2
+ * @version 2.0.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -113,6 +129,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/16 Ver.2.0.3
+ * フォロワーの人数をサポートアクター込みで表示されるように修正。
+ * フォロワーのサポートアクターを表示させない機能を追加。
  * 2024/12/15 Ver.2.0.2
  * メンバー変更画面への適用するための処理を追加。
  * 2024/12/14 Ver.2.0.1
@@ -203,6 +222,19 @@
  * @type number
  * @default 0
  * 
+ * @param MaxFollowers
+ * @text フォロワー最大表示数
+ * @desc フォロワーの最大表示数を設定します。
+ * @type number
+ * @default 6
+ * @min 1
+ * 
+ * @param ShowSupportActorFollowers
+ * @text フォロワーのサポートアクター表示
+ * @desc フォロワーのサポートアクターを表示します。
+ * @type boolean
+ * @default true
+ * 
  */
 /*~struct~SupportActorSVList:ja
  * 
@@ -245,6 +277,7 @@ Imported.NUUN_SupportActor = true;
         this.isSupportActorSpecialAttack();
         const targets = _Game_Action_makeTargets.apply(this, arguments);
         $gameTemp.omitSupportMember = false;
+        $gameTemp.supportMemberAttack = false;
         return targets;
     };
 
@@ -374,7 +407,7 @@ Imported.NUUN_SupportActor = true;
         if ($gameParty.inBattle()) {
             $gameTemp.omitSupportMember = true;
         }
-        return _Game_Actor_index.apply(this, arguments)
+        return _Game_Actor_index.apply(this, arguments);
     };
 
 
@@ -425,7 +458,7 @@ Imported.NUUN_SupportActor = true;
     const _Game_Unit_deadMembers = Game_Unit.prototype.deadMembers;
     Game_Unit.prototype.deadMembers = function() {
         if (!!this._actors) {
-            $gameTemp.omitSupportMember = !$gameTemp.supportMemberAttack;
+            $gameTemp.omitSupportMember = true;
         }
         return _Game_Unit_deadMembers.apply(this, arguments);
     };
@@ -460,7 +493,64 @@ Imported.NUUN_SupportActor = true;
             }
         }
     };
-  
+
+    const _Game_Followers_setup = Game_Followers.prototype.setup;
+    Game_Followers.prototype.setup = function() {
+        _Game_Followers_setup.apply(this, arguments);
+        if (this._data.length > params.MaxFollowers) return;
+        for (let i = this._data.length + 1; i <= params.MaxFollowers; i++) {
+            this._data.push(new Game_Follower(i));
+        }
+    };
+
+    const _Game_Follower_actor = Game_Follower.prototype.actor;
+    Game_Follower.prototype.actor = function() {
+        $gameTemp.omitSupportMember = !params.ShowSupportActorFollowers;
+        return _Game_Follower_actor.apply(this, arguments);
+    };
+
+    if (false) {
+        const _Game_Player_refresh = Game_Player.prototype.refresh;
+        Game_Player.prototype.refresh = function() {
+            this._followers.setupSupportActor();
+            _Game_Player_refresh.apply(this, arguments);
+            this.synchronizeSupportActor();
+        };
+    
+        Game_Player.prototype.synchronizeSupportActor = function() {
+            if (this._followers.newSupportActor) {
+                this._followers.synchronize(this._x, this._y, this.direction());
+                this._followers.newSupportActor = false;
+            }
+        };
+    
+        Game_Followers.prototype.setupSupportActor = function() {
+            if (!params.ShowSupportActorFollowers) return;
+            const dataLength = this._data.length;
+            const index = dataLength + 1;
+            const max = $gameParty.maxBattleMembers() + $gameParty.supportActorWithinMembers().length;
+            for (let i = index; i < max; i++) {
+                this._data.push(new Game_Follower(i));
+            }
+            if (this._data.length > dataLength) {
+                this.newSupportActor = true;
+            }
+        };
+    
+    
+        const _Spriteset_Map_update = Spriteset_Map.prototype.update;
+        Spriteset_Map.prototype.update = function() {
+            _Spriteset_Map_update.call(this);
+            this.updateSupportActorCharacters();
+        };
+    
+        Spriteset_Map.prototype.updateSupportActorCharacters = function() {
+            if ($gamePlayer._followers.newSupportActor) {
+                this.createCharacters();
+                $gamePlayer._followers.newSupportActor = false;
+            }
+        };
+    }
 
     const _Window_BattleStatus_maxItems = Window_BattleStatus.prototype.maxItems;
     Window_BattleStatus.prototype.maxItems = function() {

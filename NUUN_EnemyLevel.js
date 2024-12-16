@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * Sets the enemy's level.
@@ -49,6 +49,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/16/2024 Ver.1.1.0
+ * Fixed to display enemy levels in names.
  * 12/7/2024 Ver.1.0.1
  * Added the ability to disable level status and dispersion in the enemy book.
  * 11/9/2024 Ver.1.0.0
@@ -65,6 +67,12 @@
  * @text Maximum Level
  * @type number
  * @default 99
+ * 
+ * @param LevelName
+ * @desc The level display name to be added to the enemy name. Leave blank for no display.
+ * @text Enemy name level display name
+ * @type string
+ * @default Level
  * 
  * @param VariableSetting
  * @text Variable settings
@@ -303,7 +311,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * 敵にレベルを設定します。
@@ -339,6 +347,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/16 Ver 1.1.0
+ * 敵名にレベルを表示出来るように修正。
  * 2024/12/7 Ver 1.0.1
  * モンスター図鑑でレベルステータス、分散を無効にする機能を追加。
  * 2024/11/9 Ver 1.0.0
@@ -355,6 +365,12 @@
  * @text 最大レベル
  * @type number
  * @default 99
+ * 
+ * @param LevelName
+ * @desc 敵名の後につけるレベル表示名。指定の文字の後にレベル数が追加されます。空白で表示なし
+ * @text 敵名後レベル表示名
+ * @type string
+ * @default Level
  * 
  * @param VariableSetting
  * @text 変数設定
@@ -747,6 +763,15 @@ Imported.NUUN_EnemyLevel = true;
         } else {
             return String(this._scene.constructor.name) === 'Scene_EnemyBook';
         }
+    };
+
+    const _Game_Enemy_name = Game_Enemy.prototype.name;
+    Game_Enemy.prototype.name = function() {
+        return _Game_Enemy_name.apply(this, arguments) + this.getNameLevel();
+    };
+
+    Game_Enemy.prototype.getNameLevel = function() {
+        return this.enemy().meta.EnemyLevel && !!params.LevelName ? " "+ params.LevelName + String(this._level) : "";
     };
 
  

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Supported Actor
  * @author NUUN
- * @version 2.0.3
+ * @version 2.0.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/18/2024 Ver.2.0.4
+ * Fixed an issue that could cause animations to not display in the front view.
  * 12/16/2024 Ver.2.0.3
  * Fixed the number of followers to be displayed including support actors.
  * Added the ability to hide follower support actors.
@@ -112,7 +114,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 2.0.3
+ * @version 2.0.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -129,6 +131,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/18 Ver.2.0.4
+ * フロントビューでのアニメーションが表示されない可能性がある問題を修正。
  * 2024/12/16 Ver.2.0.3
  * フォロワーの人数をサポートアクター込みで表示されるように修正。
  * フォロワーのサポートアクターを表示させない機能を追加。
@@ -666,10 +670,11 @@ Imported.NUUN_SupportActor = true;
 
     const _Sprite_Actor_setHome = Sprite_Actor.prototype.setHome;
     Sprite_Actor.prototype.setHome = function(x, y) {
-        if (!$gameSystem.isSideView()) return;
-        if (this._actor && this._actor.getSupportActor() && this._sIndex >= 0) {
-            x += SupportActorSV[this._sIndex].SupportActorSV_X;
-            y += SupportActorSV[this._sIndex].SupportActorSV_Y;
+        if ($gameSystem.isSideView()) {
+            if (this._actor && this._actor.getSupportActor() && this._sIndex >= 0) {
+                x += SupportActorSV[this._sIndex].SupportActorSV_X;
+                y += SupportActorSV[this._sIndex].SupportActorSV_Y;
+            }
         }
         _Sprite_Actor_setHome.apply(this, arguments);
     };

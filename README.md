@@ -257,6 +257,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [アイテムリスト画像化](https://github.com/nuun888/MZ/blob/master/README/ItemListImage.md) | [NUUN_ItemListImage](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemListImage.js) | 共 | 1.0.0 |
 | [クエストジャーナル](https://github.com/nuun888/MZ/blob/master/README/QuestJournal.md) |  | 共 |  |
 |  |  |  |  |
+|  |  |  |  |
 
 | 装備　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |

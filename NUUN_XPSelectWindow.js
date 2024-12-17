@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -39,6 +39,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/17 Ver.1.2.1
+ * 対象選択時にエラーが出る問題を修正。
  * 2024/1/10 Ver.1.2.0
  * ステータス項目ベースプラグインを介しての処理に仕様変更。
  * 幾つかのプラグインパラメータのスペルミスを修正。
@@ -983,7 +985,7 @@ Window_BattleSelectBattler.prototype.initialize = function(rect) {
     Window_StatusBase.prototype.initialize.call(this, rect);
     this.openness = 0;
     this._battler = null;
-    this._targetSelect = null;
+    this.targetSelect = null;
 };
 
 Window_BattleSelectBattler.prototype.createData = function() {
@@ -1007,6 +1009,14 @@ Window_BattleSelectBattler.prototype.refresh = function() {
 
 Window_BattleSelectBattler.prototype.drawItem = function() {
     this._contentsData.drawStatusContents(this._battler);
+};
+
+Window_BattleSelectBattler.prototype.setForItem = function(text) {
+    this.targetSelect = text;
+};
+
+Window_BattleSelectBattler.prototype.drawEXTargetSelect = function(x, y, width) {
+    this.drawText(this.targetSelect, x, y, width, 'center');
 };
 
 Window_BattleSelectBattler.prototype.placeStateIcon = function(battler, x, y) {
@@ -1134,7 +1144,16 @@ class Nuun_DrawSelectListData extends Nuun_DrawListData {
     isActorPictureEXApp() {
         return this._window.isActorPictureEXApp();
     }
-    
+
+    drawItemParams(actor) {
+        const w = this._window;
+        if (w.targetSelect) {
+            const rect = w.itemLineRect(0);
+            w.drawEXTargetSelect(rect.x, rect.y, rect.width);
+        } else {
+            super.drawItemParams(actor);
+        }
+    }
 };
 
 class Nuun_DrawEnemySelectListData extends Nuun_DrawListData {
@@ -1155,6 +1174,15 @@ class Nuun_DrawEnemySelectListData extends Nuun_DrawListData {
         return battler.enemy().meta.XPBattlerFace ? battler.enemy().meta.XPBattlerFace.split(',') : null;
     }
 
+    drawItemParams(battler) {
+        const w = this._window;
+        if (w.targetSelect) {
+            const rect = w.itemLineRect(0);
+            w.drawEXTargetSelect(rect.x, rect.y, rect.width);
+        } else {
+            super.drawItemParams(battler);
+        }
+    }
 };
 
 })();

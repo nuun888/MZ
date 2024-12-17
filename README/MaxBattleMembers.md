@@ -1,5 +1,5 @@
 # [戦闘メンバー数変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js)
-# Ver.1.0.7
+# Ver.1.0.8
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxBattleMembers.js)  
 ## オプション
 [バトルステータスゲージ幅修正](https://github.com/nuun888/MZ/blob/master/README/BattleGaugeWidthFix.md)  
@@ -12,6 +12,8 @@
 最大戦闘メンバー数を前の数値より高く変更した場合、セーブ後のデータでは前の最大戦闘メンバー数よりフォロワーの画像が表示されません。  
 
 ## 更新履歴
+2024/12/17 Ver.1.0.8  
+隊列が5人以上で表示されるように修正。  
 2024/6/16 Ver.1.0.7  
 戦闘中に最大メンバーが増加したときにサイドビューアクターが表示されない問題を修正。  
 2022/8/27 Ver.1.0.6  

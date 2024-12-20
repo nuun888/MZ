@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.14
+ * @version 1.0.15
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/21/2024 Ver.1.0.15
+ * Added levels to actor image conditions.
+ * Fixed an issue where the display status of actor-specific settings was not being applied.
  * 12/1/2024 Ver.1.0.14
  * Fixed an issue where animations would not play correctly when played in front view with some plug-ins.
  * 11/12/2024 Ver.1.0.13
@@ -1763,6 +1766,13 @@
  * @default 
  * @parent AllMatch
  * 
+ * @param Level
+ * @text Level
+ * @desc The condition is met when the level is equal to or higher than the specified level.
+ * @type number
+ * @default 1
+ * @parent AllMatch
+ * 
  * @param ChangeGraphicScenes
  * @text Changing scene
  * @desc Select the graphic change scene.
@@ -1961,7 +1971,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.14
+ * @version 1.0.15
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2031,6 +2041,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/21 Ver.1.0.15
+ * アクター画像条件にレベルを追加。
+ * アクター別設定の表示ステータスが適用されていなかった問題を修正。
  * 2024/12/1 Ver.1.0.14
  * 一部プラグインにてフロントビューでアニメーションを再生させたときに、アニメーションが正常に再生されない問題を修正いたしました。
  * 2024/11/12 Ver.1.0.13
@@ -3761,6 +3774,13 @@
  * @default 
  * @parent AllMatch
  * 
+ * @param Level
+ * @text レベル
+ * @desc レベルが指定のレベル以上の時に条件を満たします。
+ * @type number
+ * @default 1
+ * @parent AllMatch
+ * 
  * @param CondSetting
  * @text 条件設定
  * @default ------------------------------
@@ -3920,7 +3940,7 @@ Imported.NUUN_BattleStyleEX = true;
     const pluginName = "NUUN_BattleStyleEX";
 
     PluginManager.registerCommand(pluginName, 'ChangeBattleLayout', args => {
-        const battleStyle = BattleStatusList.find(data => data.StyleName === eval(args.BattleLayoutStyle));
+        const battleStyle = BattleLayout.find(data => data.StyleName === eval(args.BattleLayoutStyle));
         if (battleStyle && !$gameParty.inBattle()) {
             $gameSystem.setBattleStyle(battleStyle.StyleName);
         }
@@ -3957,6 +3977,12 @@ Imported.NUUN_BattleStyleEX = true;
 
         getBattleStatusList() {
             return this._data.BattleStatusList;
+        }
+
+        getActorBattleStatusList(battler) {
+            if (!battler || !battler.isActor()) return this.getBattleStatusList();
+            const data = this.getActorData(battler);
+            return data && data.StatusListData && data.StatusListData.length > 0 ? data.StatusListData : this.getBattleStatusList();
         }
 
         isDefaultActorWindow() {
@@ -4607,6 +4633,9 @@ Imported.NUUN_BattleStyleEX = true;
                 const rect = statuWindow.itemRect(actorIndex);
                 switch (this.getActorCommandPosition()) {
                     case 'actor':
+                        if (!!_window.supportActorCommandPosition && _window.supportActorCommandPosition()) {
+                            break;
+                        }
                         _window.x = rect.x + (statuWindow.x - ((Graphics.width - Graphics.boxWidth) / 2)) + statuWindow.itemPadding() + ((rect.width - _window.width) / 2) + this.getActorCommand_X();
                         _window.y = (statuWindow.y + rect.y + _window._homeY) - (_window.height + 4) - ((Graphics.height - Graphics.boxHeight) / 2) + this.getActorCommand_Y();
                         break;
@@ -4738,7 +4767,7 @@ Imported.NUUN_BattleStyleEX = true;
         }
 
         getStatusParamsList() {
-            return NuunManager.styleData.getBattleStatusList();
+            return NuunManager.styleData.getActorBattleStatusList(this._battler);
         }
 
         getActorsSettingList() {
@@ -4747,6 +4776,10 @@ Imported.NUUN_BattleStyleEX = true;
 
         contentsHeightPadding() {
             return 0;
+        }
+
+        drawItemContentsImg(index) {
+            
         }
 
         nuun_DrawContentsActorName(data, x, y, width, actor) {
@@ -5568,6 +5601,14 @@ Imported.NUUN_BattleStyleEX = true;
         this.updateBattleEndActorStatus();
     };
 
+    const _Scene_Battle_stop = Scene_Battle.prototype.stop;
+    Scene_Battle.prototype.stop = function() {
+        _Scene_Battle_stop.apply(this, arguments);
+        if (!params.BattleEndActorStatusClose) {
+            this._statusWindow.open();
+        }
+    };
+
     Scene_Battle.prototype.updateBattleEndActorStatus = function() {
         if (BattleManager.isBattleEnd()) {
             this._bsBattleEnd = true;
@@ -6058,6 +6099,7 @@ Imported.NUUN_BattleStyleEX = true;
     
     Window_BsBattleStatus.prototype = Object.create(Window_BattleStatus.prototype);
     Window_BsBattleStatus.prototype.constructor = Window_BsBattleStatus;
+    window.Window_BsBattleStatus = Window_BsBattleStatus;
 
     Window_BsBattleStatus.prototype.initialize = function(rect) {
         Window_BattleStatus.prototype.initialize.apply(this, arguments);
@@ -6104,7 +6146,11 @@ Imported.NUUN_BattleStyleEX = true;
     };
 
     Window_BsBattleStatus.prototype.rowSpacing = function() {
-        return Math.ceil($gameParty.battleMembers().length / this.maxCols()) > 1 ? 4 : Window_BattleStatus.prototype.rowSpacing.apply(this, arguments);
+        return Math.ceil(this.bsBattleMembers().length / this.maxCols()) > 1 ? 4 : Window_BattleStatus.prototype.rowSpacing.apply(this, arguments);
+    };
+
+    Window_BsBattleStatus.prototype.bsBattleMembers = function() {
+        return $gameParty.battleMembers();
     };
 
     Window_BsBattleStatus.prototype.maxContentsData = function() {
@@ -6524,7 +6570,7 @@ Imported.NUUN_BattleStyleEX = true;
     };
 
     Window_BattleActorStatus.prototype.drawItem = function(index) {
-        this._contentsData[index].drawItemContentsParams(index);
+        this._contentsData[index].drawItemContents(index);
     };
     
     Window_BattleActorStatus.prototype.hide = function() {
@@ -6568,7 +6614,7 @@ Imported.NUUN_BattleStyleEX = true;
     };
 
     Window_BsBattleActor.prototype.rowSpacing = function() {
-        return Math.ceil($gameParty.battleMembers().length / this.maxCols()) > 1 ? 4 : Window_BattleStatus.prototype.rowSpacing.apply(this, arguments);
+        return Math.ceil(this.bsBattleMembers().length / this.maxCols()) > 1 ? 4 : Window_BattleStatus.prototype.rowSpacing.apply(this, arguments);
     };
 
     Window_BsBattleActor.prototype.drawItem = function(index) {
@@ -6626,6 +6672,8 @@ Imported.NUUN_BattleStyleEX = true;
     
     Sprite_BSFrontActor.prototype = Object.create(Sprite_Actor.prototype);
     Sprite_BSFrontActor.prototype.constructor = Sprite_BSFrontActor;
+
+    window.Sprite_BSFrontActor = Sprite_BSFrontActor;
     
     Sprite_BSFrontActor.prototype.initialize = function(battler) {
         Sprite_Actor.prototype.initialize.call(this, battler);

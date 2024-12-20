@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.5
+ * @version 1.1.6
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/21/2024 Ver.1.1.6
+ * Processing fixes.
  * 9/28/2024 Ver.1.1.5
  * Processing fixes.
  * Fixed an issue where the EXP gauge width setting was not working.
@@ -129,7 +131,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.5
+ * @version 1.1.6
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -140,6 +142,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/21 Ver.1.1.6
+ * 処理の修正。
  * 2024/9/28 Ver.1.1.5
  * 処理の修正。
  * EXPゲージの横幅の設定が機能していなかった問題を修正。
@@ -261,6 +265,7 @@ Imported.NUUN_MenuParamListBase = true;
             this._window = _window;
             this._params = params;
             this._list = [];
+            this._battler = null;
             this._actorBitmap = null;
             this._actorImgData = this.isActorPictureEXApp() ? new Nuun_ActorGraphics(_window) : null;
             this.language_Jp = $gameSystem.isJapanese();
@@ -355,8 +360,9 @@ Imported.NUUN_MenuParamListBase = true;
         }
 
         drawItemContents(index) {
-            const unLoadBitmap = this.loadCheckBitmap(this._window.actor(index));
-            if(unLoadBitmap){
+            this._battler = this._window.actor(index);
+            const unLoadBitmap = this.loadCheckBitmap(this._battler);
+            if (unLoadBitmap){
                 unLoadBitmap.addLoadListener(this.drawItemContents.bind(this, index));//再トライ
             } else {
                 this.drawItemContentsImg(index);
@@ -366,7 +372,8 @@ Imported.NUUN_MenuParamListBase = true;
 
         drawStatusContents(actor) {
             const unLoadBitmap = this.loadCheckBitmap(actor);
-            if(unLoadBitmap){
+            this._battler = actor;
+            if (unLoadBitmap){
                 unLoadBitmap.addLoadListener(this.drawStatusContents.bind(this, actor));//再トライ
             } else {
                 this.drawItemImg(actor, -1);
@@ -628,13 +635,12 @@ Imported.NUUN_MenuParamListBase = true;
             if (actor && this.nuun_IsContents(data, actor)) {
                 this.setTepmData(data, this._exParams);
                 const method = 'nuun_DrawContents' + data.DateSelect;
-                if (this[method] === undefined) return;
-                try {
+                //try {
                     this[method](data, x, y, width, actor);
-                } catch (error) {
-                    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                    throw ["DataError", log];
-                }
+                //} catch (error) {
+                //    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
+                //    throw ["DataError", log];
+                //}
             }
         }
     

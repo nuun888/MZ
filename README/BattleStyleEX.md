@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.0.15  
+# Ver.1.0.16  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -162,6 +162,8 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 [ページ表示](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXWithSupportActor.md)  
 
 ## 更新履歴
+2024/12/21 Ver.1.0.16  
+味方の対象選択時にエラーが出る問題を修正。  
 2024/12/21 Ver.1.0.15  
 アクター画像条件にレベルを追加。  
 アクター別設定の表示ステータスが適用されていなかった問題を修正。  

@@ -13,7 +13,7 @@
 [バトルアイテム、スキルウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
 [戦闘中メッセージウィンドウ背景画像](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
 [バトルスタイル拡張サポートアクターVer2.0対応](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXWithSupportActor.md)  
-[バトラーのバトルフィールド表示]   
+[バトラーのバトルフィールド表示](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BS_BattleFieldActors.js)   
 [戦闘バイブレーション]   
 
 
@@ -156,6 +156,10 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
 ### 戦闘中メッセージウィンドウ背景画像
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
+### バトラーのバトルフィールド表示
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BS_BattleFieldActors.js)   
+### バトルスタイル拡張サポートアクターVer2.0対応
+[ダウンロード](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXWithSupportActor.md)  
 
 ## 更新履歴
 2024/12/21 Ver.1.0.15  

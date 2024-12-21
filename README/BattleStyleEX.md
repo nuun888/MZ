@@ -159,7 +159,7 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 ### バトラーのバトルフィールド表示
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BS_BattleFieldActors.js)   
 ### バトルスタイル拡張サポートアクターVer2.0対応
-[ダウンロード](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXWithSupportActor.md)  
+[ページ表示](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXWithSupportActor.md)  
 
 ## 更新履歴
 2024/12/21 Ver.1.0.15  

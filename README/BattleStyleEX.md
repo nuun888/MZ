@@ -157,7 +157,6 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 ### 戦闘中メッセージウィンドウ背景画像
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
 ### バトラーのバトルフィールド表示
-![gif](img/BattleFieldActors1.gif)  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BS_BattleFieldActors.js)   
 ### バトルスタイル拡張サポートアクターVer2.0対応
 [ページ表示](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXWithSupportActor.md)  

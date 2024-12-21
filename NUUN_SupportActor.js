@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Supported Actor
  * @author NUUN
- * @version 2.0.4
+ * @version 2.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/21/2024 Ver.2.0.5
+ * Processing fixes.
  * 12/18/2024 Ver.2.0.4
  * Fixed an issue that could cause animations to not display in the front view.
  * 12/16/2024 Ver.2.0.3
@@ -114,7 +116,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 2.0.4
+ * @version 2.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -131,6 +133,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/21 Ver.2.0.5
+ * 処理の修正。
  * 2024/12/18 Ver.2.0.4
  * フロントビューでのアニメーションが表示されない可能性がある問題を修正。
  * 2024/12/16 Ver.2.0.3
@@ -301,19 +305,19 @@ Imported.NUUN_SupportActor = true;
         this._supportActorTurn = -1;
         this._supportActorCallActor = 0;
         this._supportActorDeadCallActor = false;
-        this._supportActor = false;
+        this._supportActor = null;
     };
 
     const _Game_Actor_setup = Game_Actor.prototype.setup;
     Game_Actor.prototype.setup = function(actorId) {
         _Game_Actor_setup.call(this, actorId);
-        this._supportActor = this.isSupportActor();
+        this._supportActor = this.isSupportActor() ? 'support' : null;
     };
   
     Game_Actor.prototype.setAddSupportActor = function(args) {
         if ($gameParty.isAddSupportActor()) {
-            const flag = eval(args.SupportActorsSwitch);
-            this.setSupportActor(flag);
+            const mode = eval(args.SupportActorsSwitch) ? 'support' : null;
+            this.setSupportActor(mode);
             this.setSupportActorTurn(Number(args.SupportActorTurn));
         }
     };
@@ -332,8 +336,8 @@ Imported.NUUN_SupportActor = true;
         return this._supportActorTurn;
     };
   
-    Game_Actor.prototype.setSupportActor = function(flag) {
-        this._supportActor = flag;
+    Game_Actor.prototype.setSupportActor = function(mode) {
+        this._supportActor = mode;
     };
   
     Game_Actor.prototype.isSupportActor = function() {
@@ -345,6 +349,10 @@ Imported.NUUN_SupportActor = true;
             this._supportActor = this.isSupportActor();
         }
         return this._supportActor;
+    };
+
+    Game_Actor.prototype.isSummonActor = function() {
+        return this.getSupportActor() === 'summon';
     };
   
     Game_Actor.prototype.supportActorindex = function() {
@@ -392,7 +400,7 @@ Imported.NUUN_SupportActor = true;
     Game_Actor.prototype.onBattleEnd = function() {
         _Game_Actor_onBattleEnd.call(this);
         const turn = this.getSupportActorTurn();
-        if (turn === -2 || turn >= 0) {
+        if (turn === -2 || turn >= 0 || this.isSummonActor()) {
             this.removeSupportActor();
         }
     };
@@ -635,6 +643,9 @@ Imported.NUUN_SupportActor = true;
 
     const _Spriteset_Battle_updateActors = Spriteset_Battle.prototype.updateActors;
     Spriteset_Battle.prototype.updateActors = function() {
+        if (!$gameSystem.isSideView()) {
+            $gameTemp.omitSupportMember = true;
+        }
         _Spriteset_Battle_updateActors.apply(this, arguments);
     };
 

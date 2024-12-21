@@ -115,19 +115,7 @@ IDはマップのタグまたはプラグインコマンドで設定します。
 `<MenuShowEquips:[name],[name]...>`  
 `[name]`:装備部位名  
 指定した装備部位のみ表示されます。指定がない場合は全ての部位が表示されます。  
-アクターと職業両方に記入した場合はアクターの設定が優先されます。  
-
-# 旧版
-## メニュー画面ベース
-### Ver.2.1.5  
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEXBase.js)  
-## 設定用プラグイン
-メニュー画面デフォルトタイプVer.2.1.1    
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_default.js)  
-メニュー画面タイプ１Ver.2.1.1    
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen.js)  
-メニュー画面タイプ２Ver.2.1.1    
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreen_2.js)  
+アクターと職業両方に記入した場合はアクターの設定が優先されます。 　
 
 
 ## 更新履歴

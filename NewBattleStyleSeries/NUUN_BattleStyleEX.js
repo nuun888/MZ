@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.15
+ * @version 1.0.16
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/21/2024 Ver.1.0.16
+ * Fixed an issue that caused an error when selecting an ally target.
  * 12/21/2024 Ver.1.0.15
  * Added levels to actor image conditions.
  * Fixed an issue where the display status of actor-specific settings was not being applied.
@@ -1971,7 +1973,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.15
+ * @version 1.0.16
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2041,6 +2043,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/21 Ver.1.0.16
+ * 味方の対象選択時にエラーが出る問題を修正。
  * 2024/12/21 Ver.1.0.15
  * アクター画像条件にレベルを追加。
  * アクター別設定の表示ステータスが適用されていなかった問題を修正。
@@ -6149,7 +6153,7 @@ Imported.NUUN_BattleStyleEX = true;
         return Math.ceil(this.bsBattleMembers().length / this.maxCols()) > 1 ? 4 : Window_BattleStatus.prototype.rowSpacing.apply(this, arguments);
     };
 
-    Window_BsBattleStatus.prototype.bsBattleMembers = function() {
+    Window_BattleStatus.prototype.bsBattleMembers = function() {
         return $gameParty.battleMembers();
     };
 

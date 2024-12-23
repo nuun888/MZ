@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.3
+ * @version 1.7.4
  * 
  * @help
  * This is a plugin that processes the display of actor graphics and face graphics images.
@@ -38,11 +38,13 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 7/27/2021 Ver.1.7.3
+ * 12/23/2024 Ver.1.7.4
+ * Add level to the condition.
+ * 7/27/2024 Ver.1.7.3
  * Fixed an issue where an error would occur if an image was not set.
- * 7/16/2021 Ver.1.7.2
+ * 7/16/2024 Ver.1.7.2
  * Change display in languages ​​other than Japanese to English.
- * 7/15/2021 Ver.1.7.1
+ * 7/15/2024 Ver.1.7.1
  * Fixed an issue where an error would occur when opening certain scenes.。
  * 7/13/2024 Ver.1.7.0
  * Added the ability to specify which classes can be displayed.
@@ -156,6 +158,13 @@
  * @desc The condition is met when all of the specified states are applied.
  * @type state[]
  * @default 
+ * @parent AllMatch
+ * 
+ * @param Level
+ * @text Level
+ * @desc The condition is met when the level is equal to or higher than the specified level.
+ * @type number
+ * @default 1
  * @parent AllMatch
  * 
  * @param FilteringClass
@@ -274,7 +283,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.3
+ * @version 1.7.4
  * 
  * @help
  * アクターグラフィック、顔グラ画像を表示する処理を行うプラグインです。
@@ -304,6 +313,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/23 Ver.1.7.4
+ * 条件にレベルを追加。
  * 2024/7/28 Ver.1.7.3
  * 画像が未設定の場合にエラーが出る問題を修正。
  * 2024/7/16 Ver.1.7.2
@@ -482,6 +493,13 @@
  * @desc 指定したステートに全てかかっている時に条件を満たします。
  * @type state[]
  * @default 
+ * @parent AllMatch
+ * 
+ * @param Level
+ * @text レベル
+ * @desc レベルが指定のレベル以上の時に条件を満たします。
+ * @type number
+ * @default 1
  * @parent AllMatch
  * 
  * @param FilteringClass
@@ -718,6 +736,9 @@ Imported.NUUN_ActorPicture = true;
             if (data.ImgClass > 0 && !this.isClassImg(data)) {
                 return false;
             }
+            if (data.Level && data.Level > 0 && !this.isActorLevel(data)) {
+                return false;
+            }
             if (!this.matchChangeGraphic(data)) {
                 return false;
             }
@@ -861,6 +882,10 @@ Imported.NUUN_ActorPicture = true;
             return states.every(id => id > 0 ? this._battler.isStateAffected(id) : true);
         }
 
+        isActorLevel(data) {
+            return !!this._battler._level && data.Level && data.Level > 0 ? this._battler._level >= data.Level : true;
+        }
+
         filteringClass(data) {
             const className = NuunManager.isFilterClass(this._class);
             if (data.FilteringClass && data.FilteringClass.length > 0) {
@@ -990,6 +1015,9 @@ Imported.NUUN_ActorPicture = true;
         if (data.ImgClass > 0 && !this.isCondClassImg(data)) {
             return false;
         }
+        if (data.Level && data.Level > 0 && !this.isActorLevelImg(data)) {
+            return false;
+        }
         if (!this.matchChangeGraphic(data)) {
             return false;
         }
@@ -1064,6 +1092,10 @@ Imported.NUUN_ActorPicture = true;
     Game_Actor.prototype.isClassNameImg = function(data) {
         const className = NuunManager.getClassName();
         return data.some(name => className === name);
+    };
+
+    Game_Actor.prototype.isActorLevelImg = function(data) {
+        return data.Level && data.Level > 0 ? this._level >= data.Level : true;
     };
       
     Game_Actor.prototype.getActorGraphicImg = function() {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Supported Actor
  * @author NUUN
- * @version 2.0.5
+ * @version 2.0.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/24/2024 Ver.2.0.6
+ * Fixed the overlapping display between support actors and actors in side view.
  * 12/21/2024 Ver.2.0.5
  * Processing fixes.
  * 12/18/2024 Ver.2.0.4
@@ -116,7 +118,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 2.0.5
+ * @version 2.0.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -133,6 +135,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/24 Ver.2.0.6
+ * サイドビュー時のサポートアクターとアクターとの重なり表示を修正。
  * 2024/12/21 Ver.2.0.5
  * 処理の修正。
  * 2024/12/18 Ver.2.0.4
@@ -305,19 +309,23 @@ Imported.NUUN_SupportActor = true;
         this._supportActorTurn = -1;
         this._supportActorCallActor = 0;
         this._supportActorDeadCallActor = false;
-        this._supportActor = null;
+        //this._supportActor = null;
+        this._supportActor = false;
     };
 
     const _Game_Actor_setup = Game_Actor.prototype.setup;
     Game_Actor.prototype.setup = function(actorId) {
         _Game_Actor_setup.call(this, actorId);
-        this._supportActor = this.isSupportActor() ? 'support' : null;
+        //this._supportActor = this.isSupportActor() ? 'support' : null;
+        this._supportActor = this.isSupportActor();
     };
   
     Game_Actor.prototype.setAddSupportActor = function(args) {
         if ($gameParty.isAddSupportActor()) {
-            const mode = eval(args.SupportActorsSwitch) ? 'support' : null;
-            this.setSupportActor(mode);
+            //const mode = eval(args.SupportActorsSwitch) ? 'support' : null;
+            //this.setSupportActor(mode);
+            const flag = eval(args.SupportActorsSwitch);
+            this.setSupportActor(flag);
             this.setSupportActorTurn(Number(args.SupportActorTurn));
         }
     };
@@ -336,8 +344,12 @@ Imported.NUUN_SupportActor = true;
         return this._supportActorTurn;
     };
   
-    Game_Actor.prototype.setSupportActor = function(mode) {
-        this._supportActor = mode;
+    //Game_Actor.prototype.setSupportActor = function(mode) {
+    //    this._supportActor = mode;
+    //};
+
+    Game_Actor.prototype.setSupportActor = function(flag) {
+        this._supportActor = flag;
     };
   
     Game_Actor.prototype.isSupportActor = function() {
@@ -637,7 +649,6 @@ Imported.NUUN_SupportActor = true;
                 this._actorSprites.push(sprite);
                 this._battleField.addChild(sprite);
             }
-            //this._battleField.children.sort(this.nuun_sortActor.bind(this));
         }
     };
 
@@ -647,6 +658,10 @@ Imported.NUUN_SupportActor = true;
             $gameTemp.omitSupportMember = true;
         }
         _Spriteset_Battle_updateActors.apply(this, arguments);
+        if ($gameTemp.spriteActorOnSort) {
+            this._battleField.children.sort(this.nuun_sortActor.bind(this));
+            $gameTemp.spriteActorOnSort = false;
+        }
     };
 
     Spriteset_Battle.prototype.nuun_sortActor = function(a, b) {
@@ -676,6 +691,7 @@ Imported.NUUN_SupportActor = true;
             }
             this._sIndex = index;
         }
+        $gameTemp.spriteActorOnSort = true;
         _Sprite_Actor_setActorHome.apply(this, arguments);
     };
 

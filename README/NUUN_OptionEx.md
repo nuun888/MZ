@@ -1,5 +1,5 @@
 # [オプション拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -63,6 +63,9 @@ Ver.1.0.2
 ボリュームゲージのクリックした場所により、クリック場所の音量に設定する機能を追加。  
 
 ## 更新履歴
+2024/12/25 Ver.1.1.2  
+ローカルオプションが保存されていなかった問題を修正。  
+変数指定のクリック時の設定値変更が1までしか適用されていなかった問題を修正。  
 2024/9/7 Ver.1.1.1  
 ゲージのつまみの機能を追加。  
 2024/8/25 Ver.1.1.0  

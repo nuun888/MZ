@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/25/2024 Ver.1.1.2
+ * Fixed an issue where local options were not being saved.
+ * Fixed an issue where changing the setting value when clicking a variable was only applied up to 1.
  * 9/7/2024 Ver.1.1.1
  * Added gauge knob functionality.
  * 8/25/2024 Ver.1.1.0
@@ -450,7 +453,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * オプション画面を拡張します。
@@ -463,6 +466,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/25 Ver.1.1.2
+ * ローカルオプションが保存されていなかった問題を修正。
+ * 変数指定のクリック時の設定値変更が1までしか適用されていなかった問題を修正。
  * 2024/9/7 Ver.1.1.1
  * ゲージのつまみの機能を追加。
  * 2024/8/25 Ver.1.1.0
@@ -1308,7 +1314,7 @@ Imported.NUUN_OptionEx = true;
     Window_Options.prototype.changeValue = function(symbol, value) {
         const data = this.getExtData(symbol);
         if (data && data.Var > 0) {
-            value = this.changeVariables(data, symbol, value);
+            value = this.changeVariables(data, symbol, true);
         } else if (data && data.Switch > 0) {
             this.changeSwitches(data, symbol, value);
         }
@@ -1318,7 +1324,7 @@ Imported.NUUN_OptionEx = true;
     Window_Options.prototype.changeVariables = function(data, symbol, value) {
         let varValue = $gameVariables.value(data.Var);
         varValue += value ? 1 : -1;
-        varValue = varValue.clamp(0, data.OptionsStringList.length - 1);
+        varValue = varValue >= data.OptionsStringList.length ? 0 : varValue.clamp(0, data.OptionsStringList.length - 1);
         $gameVariables.setValue(data.Var, varValue);
         return varValue;
     };
@@ -1502,7 +1508,6 @@ Imported.NUUN_OptionEx = true;
                 this.refresh();
             }
         }
-        
     };
 
 
@@ -1563,11 +1568,21 @@ Imported.NUUN_OptionEx = true;
     ConfigManager.applyOptionsData = function(config) {
         params.CommandOptions.forEach(optionList => {
             optionList.OptionsData.forEach(data => {
-                if (data.Var > 0 || data.Switch > 0) {
-                    this[data.OptionSymbol] = this.readVolume(config, data.OptionSymbol);
+                if (data.Var > 0) {
+                    this[data.OptionSymbol] = data.GlobalConfigData ? this.readValue(config, data, 0) : $gameVariables.value(data.Var);
+                } else if (data.Switch > 0) {
+                    this[data.OptionSymbol] = data.GlobalConfigData ? this.readFlag(config, data.OptionSymbol, false) : $gameSwitches.value(data.Switch);
                 }
-            })
-        })
+            });
+        });
+    };
+
+    ConfigManager.readValue = function(config, data, defaultValue) {
+        if (data.OptionSymbol in config) {
+            return Number(config[data.OptionSymbol]).clamp(0, data.OptionsStringList.length - 1);
+        } else {
+            return defaultValue;
+        }
     };
 
     ConfigManager.applyKeyConfig = function(config) {

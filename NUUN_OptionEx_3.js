@@ -6,7 +6,7 @@
  * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
-/*:ja
+/*:
  * @target MZ
  * @plugindesc Option extension item style change
  * @author NUUN

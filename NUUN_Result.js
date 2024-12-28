@@ -5793,8 +5793,8 @@ Window_ResultActorExp.prototype.members = function() {
     if (ReserveMembers) {
         return $gameParty.allMembers();
     } else {
-        if (Imported.NUUN_SupportActor && ShowSupportActor) {
-            if ($gameParty.setWithSupportActorMember) {
+        if (Imported.NUUN_SupportActor) {
+            if (ShowSupportActor && $gameParty.setWithSupportActorMember) {
                 $gameParty.setWithSupportActorMember();
             } else {
                 $gameTemp.omitSupportMember = !ShowSupportActor;

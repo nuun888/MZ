@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.1.2
+ * @version 1.2.0
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,12 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/28/2024 Ver.1.2.0
+ * Added a function to set initial values.
+ * Added a setting to disable specific keys when configuring keys.
+ * Option parameter names also applied to Boolean types.
+ * Fixed a problem where local options were not displayed in the options screen from the title screen.
+ * Fixed an issue where key configurations could not be canceled.
  * 12/25/2024 Ver.1.1.2
  * Fixed an issue where local options were not being saved.
  * Fixed an issue where changing the setting value when clicking a variable was only applied up to 1.
@@ -152,6 +158,188 @@
  * @type boolean
  * @default true
  * @parent OptionPageSetting
+ * 
+ * @param OptionSetting
+ * @text Option setting
+ * @default ------------------------------
+ * 
+ * @param InitValueThisPlugin
+ * @text Apply initial values ​​except for variables and switches
+ * @desc The settings in this plugin will be applied to the initial values ​​other than variables and switches.
+ * @type boolean
+ * @default false
+ * @parent OptionSetting
+ * 
+ * @param InvalidKey
+ * @text Disabled key settings
+ * @desc Disables a specific key when setting keys.
+ * @type select[]
+ * @option None
+ * @value -1
+ * @option BackSpace
+ * @value 8
+ * @option Tab
+ * @value 9
+ * @option Enter
+ * @value 13
+ * @option Shift
+ * @value 16
+ * @option Ctrl
+ * @value 17
+ * @option Alt
+ * @value 18
+ * @option Pause
+ * @value 19
+ * @option Esc
+ * @value 27
+ * @option Space
+ * @value 32
+ * @option PageUp
+ * @value 33
+ * @option PageDown
+ * @value 34
+ * @option End
+ * @value 35
+ * @option Home
+ * @value 36
+ * @option ←
+ * @value 37
+ * @option ↑
+ * @value 38
+ * @option →
+ * @value 39
+ * @option ↓
+ * @value 40
+ * @option Insert
+ * @value 45
+ * @option 0
+ * @value 48
+ * @option 1
+ * @value 49
+ * @option 2
+ * @value 50
+ * @option 3
+ * @value 51
+ * @option 4
+ * @value 52
+ * @option 5
+ * @value 53
+ * @option 6
+ * @value 54
+ * @option 7
+ * @value 55
+ * @option 8
+ * @value 56
+ * @option 9
+ * @value 57
+ * @option A
+ * @value 65
+ * @option B
+ * @value 66
+ * @option C
+ * @value 67
+ * @option D
+ * @value 68
+ * @option E
+ * @value 69
+ * @option F
+ * @value 70
+ * @option G
+ * @value 71
+ * @option H
+ * @value 72
+ * @option I
+ * @value 73
+ * @option J
+ * @value 74
+ * @option K
+ * @value 75
+ * @option L
+ * @value 76
+ * @option M
+ * @value 77
+ * @option N
+ * @value 78
+ * @option O
+ * @value 79
+ * @option P
+ * @value 80
+ * @option Q
+ * @value 81
+ * @option R
+ * @value 82
+ * @option S
+ * @value 83
+ * @option T
+ * @value 84
+ * @option U
+ * @value 85
+ * @option V
+ * @value 86
+ * @option W
+ * @value 87
+ * @option X
+ * @value 88
+ * @option Y
+ * @value 89
+ * @option Z
+ * @value 90
+ * @option Win
+ * @value 91
+ * @option Apps
+ * @value 92
+ * @option F1
+ * @value 112
+ * @option F2
+ * @value 113
+ * @option F3
+ * @value 114
+ * @option F4
+ * @value 115
+ * @option F5
+ * @value 116
+ * @option F6
+ * @value 117
+ * @option F7
+ * @value 118
+ * @option F8
+ * @value 119
+ * @option F9
+ * @value 120
+ * @option F10
+ * @value 121
+ * @option F11
+ * @value 122
+ * @option F12
+ * @value 123
+ * @option NumLock
+ * @value 144
+ * @option Scroll
+ * @value 145
+ * @option :*
+ * @value 186
+ * @option ;+
+ * @value 187
+ * @option ,<
+ * @value 188
+ * @option -=
+ * @value 189
+ * @option .>
+ * @value 190
+ * @option /?
+ * @value 191
+ * @option `
+ * @value 192
+ * @option [{
+ * @value 220
+ * @option |
+ * @value 221
+ * @option ]}
+ * @value 222
+ * @option CapsLock
+ * @value 240
+ * @default ["112","113","114","115","116","117","118","119","120","121","122","123","144","145","240"]
+ * @parent OptionSetting
  * 
  * @param KeyConfigSetting
  * @text Key Settings
@@ -289,6 +477,24 @@
  * @option '!!navigator.getGamepads()[0];//Gamepad in use detection'
  * @default
  * 
+ * @param CommonOptionConfigSetting
+ * @text Common option settings
+ * @default ------------------------------
+ * 
+ * @param InitValue
+ * @desc Sets the initial value. For switches, 1 is ON, 0 is OFF. For variables, the specified value.
+ * @text Initial Value
+ * @type number
+ * @default 0
+ * @parent CommonOptionConfigSetting
+ * 
+ * @param OptionsStringList
+ * @text Optional Parameter Name
+ * @desc Sets the optional parameter name.
+ * @default []
+ * @type string[]
+ * @parent CommonOptionConfigSetting
+ * 
  * @param OptionConfigSetting
  * @text Optional Advanced Settings
  * @default ------------------------------
@@ -305,13 +511,6 @@
  * @desc Specifies the switch.
  * @type switch
  * @default 0
- * @parent OptionConfigSetting
- * 
- * @param OptionsStringList
- * @text Optional Parameter Name
- * @desc Sets the optional parameter name.
- * @default []
- * @type string[]
  * @parent OptionConfigSetting
  * 
  * @param GlobalConfigData
@@ -453,7 +652,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.1.2
+ * @version 1.2.0
  * 
  * @help
  * オプション画面を拡張します。
@@ -466,6 +665,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/28 Ver.1.2.0
+ * 初期値を設定できる機能を追加。
+ * キー設定時の特定のキーを無効にする設定を追加。
+ * オプションパラメータ名をbooleanタイプにも適用。
+ * ローカルオプションをタイトル画面からのオプション画面で表示させないように修正。
+ * キーの設定が解除出来ない問題を修正。
  * 2024/12/25 Ver.1.1.2
  * ローカルオプションが保存されていなかった問題を修正。
  * 変数指定のクリック時の設定値変更が1までしか適用されていなかった問題を修正。
@@ -593,6 +798,188 @@
  * @type boolean
  * @default true
  * @parent OptionPageSetting
+ * 
+ * @param OptionSetting
+ * @text オプション設定
+ * @default ------------------------------
+ * 
+ * @param InitValueThisPlugin
+ * @text 変数、スイッチ以外初期値適用
+ * @desc 変数、スイッチ指定以外の初期値をこのプラグインでの設定を適用させます。
+ * @type boolean
+ * @default false
+ * @parent OptionSetting
+ * 
+ * @param InvalidKey
+ * @text 無効キー設定
+ * @desc キー設定時の特定のキーを無効にします。
+ * @type select[]
+ * @option None
+ * @value -1
+ * @option BackSpace
+ * @value 8
+ * @option Tab
+ * @value 9
+ * @option Enter
+ * @value 13
+ * @option Shift
+ * @value 16
+ * @option Ctrl
+ * @value 17
+ * @option Alt
+ * @value 18
+ * @option Pause
+ * @value 19
+ * @option Esc
+ * @value 27
+ * @option Space
+ * @value 32
+ * @option PageUp
+ * @value 33
+ * @option PageDown
+ * @value 34
+ * @option End
+ * @value 35
+ * @option Home
+ * @value 36
+ * @option ←
+ * @value 37
+ * @option ↑
+ * @value 38
+ * @option →
+ * @value 39
+ * @option ↓
+ * @value 40
+ * @option Insert
+ * @value 45
+ * @option 0
+ * @value 48
+ * @option 1
+ * @value 49
+ * @option 2
+ * @value 50
+ * @option 3
+ * @value 51
+ * @option 4
+ * @value 52
+ * @option 5
+ * @value 53
+ * @option 6
+ * @value 54
+ * @option 7
+ * @value 55
+ * @option 8
+ * @value 56
+ * @option 9
+ * @value 57
+ * @option A
+ * @value 65
+ * @option B
+ * @value 66
+ * @option C
+ * @value 67
+ * @option D
+ * @value 68
+ * @option E
+ * @value 69
+ * @option F
+ * @value 70
+ * @option G
+ * @value 71
+ * @option H
+ * @value 72
+ * @option I
+ * @value 73
+ * @option J
+ * @value 74
+ * @option K
+ * @value 75
+ * @option L
+ * @value 76
+ * @option M
+ * @value 77
+ * @option N
+ * @value 78
+ * @option O
+ * @value 79
+ * @option P
+ * @value 80
+ * @option Q
+ * @value 81
+ * @option R
+ * @value 82
+ * @option S
+ * @value 83
+ * @option T
+ * @value 84
+ * @option U
+ * @value 85
+ * @option V
+ * @value 86
+ * @option W
+ * @value 87
+ * @option X
+ * @value 88
+ * @option Y
+ * @value 89
+ * @option Z
+ * @value 90
+ * @option Win
+ * @value 91
+ * @option Apps
+ * @value 92
+ * @option F1
+ * @value 112
+ * @option F2
+ * @value 113
+ * @option F3
+ * @value 114
+ * @option F4
+ * @value 115
+ * @option F5
+ * @value 116
+ * @option F6
+ * @value 117
+ * @option F7
+ * @value 118
+ * @option F8
+ * @value 119
+ * @option F9
+ * @value 120
+ * @option F10
+ * @value 121
+ * @option F11
+ * @value 122
+ * @option F12
+ * @value 123
+ * @option NumLock
+ * @value 144
+ * @option Scroll
+ * @value 145
+ * @option :*
+ * @value 186
+ * @option ;+
+ * @value 187
+ * @option ,<
+ * @value 188
+ * @option -=
+ * @value 189
+ * @option .>
+ * @value 190
+ * @option /?
+ * @value 191
+ * @option `
+ * @value 192
+ * @option [{
+ * @value 220
+ * @option |
+ * @value 221
+ * @option ]}
+ * @value 222
+ * @option CapsLock
+ * @value 240
+ * @default ["112","113","114","115","116","117","118","119","120","121","122","123","144","145","240"]
+ * @parent OptionSetting
  * 
  * @param KeyConfigSetting
  * @text キー設定
@@ -730,6 +1117,24 @@
  * @option '!!navigator.getGamepads()[0];//ゲームパッド使用中判定'
  * @default
  * 
+ * @param CommonOptionConfigSetting
+ * @text 共通オプション設定
+ * @default ------------------------------
+ * 
+ * @param InitValue
+ * @desc 初期値を設定します。スイッチの場合は1がON 0がOFF。 変数の場合は指定の数値。
+ * @text 初期値
+ * @type number
+ * @default 0
+ * @parent CommonOptionConfigSetting
+ * 
+ * @param OptionsStringList
+ * @text オプションパラメータ名
+ * @desc オプションのパラメータ名を設定します。
+ * @default []
+ * @type string[]
+ * @parent CommonOptionConfigSetting
+ * 
  * @param OptionConfigSetting
  * @text オプション詳細設定
  * @default ------------------------------
@@ -748,15 +1153,8 @@
  * @default 0
  * @parent OptionConfigSetting
  * 
- * @param OptionsStringList
- * @text オプションパラメータ名
- * @desc オプションのパラメータ名を設定します。
- * @default []
- * @type string[]
- * @parent OptionConfigSetting
- * 
  * @param GlobalConfigData
- * @desc 全てのセーブデータに適用します。
+ * @desc 全てのセーブデータに適用します。変数、スイッチ指定時のみ有効
  * @text 全セーブデータ適用
  * @type boolean
  * @default false
@@ -897,6 +1295,8 @@ Imported.NUUN_OptionEx = true;
     const parameters = PluginManager.parameters('NUUN_OptionEx');
     const keyMapper = Input.keyMapper;
     const gamepadMapper = Input.gamepadMapper;
+    let _tempData = null;
+    let _nunnTitleScene = false;
 
     params.KeyConfigData.forEach(list => {
         const data = list.OptionSymbol;
@@ -905,6 +1305,24 @@ Imported.NUUN_OptionEx = true;
             throw ["DataError", log];
         }
     })
+
+    const _Scene_Base_create = Scene_Base.prototype.create;
+    Scene_Base.prototype.create = function() {
+        _Scene_Base_create.apply(this, arguments);
+        this.nuunSetIsTitleScene();
+    };
+
+    Scene_Base.prototype.nuunSetIsTitleScene = function() {
+        _nunnTitleScene = false;
+    };
+
+    Scene_Title.prototype.nuunSetIsTitleScene = function() {
+        _nunnTitleScene = true;
+    };
+
+    Scene_Options.prototype.nuunSetIsTitleScene = function() {
+
+    };
 
     Scene_Options.prototype.create = function() {
         Scene_MenuBase.prototype.create.call(this);
@@ -1143,10 +1561,18 @@ Imported.NUUN_OptionEx = true;
 
     Window_Options.prototype.commandOptionsData = function(list) {
         for (const data of list.OptionsData) {
-            if (!data.OptionHidden || eval(data.OptionHidden)) {
+            if ((!data.OptionHidden || eval(data.OptionHidden)) && this.isShowGlobalConfig(data)) {
                 this.addCommand(data.OptionName, data.OptionSymbol, true, data);
             }
         }
+    };
+
+    Window_Options.prototype.isShowGlobalConfig = function(data) {
+        return data.GlobalConfigData ? true : !_nunnTitleScene;
+    };
+
+    Window_Options.prototype.isShowOptionItem = function(data) {
+        return data && (data.Var > 0 || data.Switch > 0) && data.GlobalConfigData;
     };
 
     const _Window_Options_processOk = Window_Options.prototype.processOk;
@@ -1314,7 +1740,7 @@ Imported.NUUN_OptionEx = true;
     Window_Options.prototype.changeValue = function(symbol, value) {
         const data = this.getExtData(symbol);
         if (data && data.Var > 0) {
-            value = this.changeVariables(data, symbol, true);
+            value = this.changeVariables(data, symbol, value);
         } else if (data && data.Switch > 0) {
             this.changeSwitches(data, symbol, value);
         }
@@ -1323,7 +1749,11 @@ Imported.NUUN_OptionEx = true;
 
     Window_Options.prototype.changeVariables = function(data, symbol, value) {
         let varValue = $gameVariables.value(data.Var);
-        varValue += value ? 1 : -1;
+        if (Number.isInteger(value)) {
+            varValue = value;
+        } else {
+            varValue += value ? 1 : -1;
+        }
         varValue = varValue >= data.OptionsStringList.length ? 0 : varValue.clamp(0, data.OptionsStringList.length - 1);
         $gameVariables.setValue(data.Var, varValue);
         return varValue;
@@ -1346,6 +1776,7 @@ Imported.NUUN_OptionEx = true;
         const symbol = this.commandSymbol(index);
         const value = this.getConfigValue(symbol);
         const data = this.getExtData(symbol);
+        this.setTempdata(data);
         if (data && data.Var > 0) {
             return this.variablesStatusText(data, value);
         } else if (data && data.Switch > 0) {
@@ -1353,6 +1784,10 @@ Imported.NUUN_OptionEx = true;
         } else {
             return _Window_Options_statusText.apply(this, arguments);
         }
+    };
+
+    Window_Options.prototype.setTempdata = function(data) {
+        _tempData = data;
     };
 
     Window_Options.prototype.isReset = function(index) {
@@ -1373,6 +1808,12 @@ Imported.NUUN_OptionEx = true;
 
     Window_Options.prototype.variablesStatusText = function(data, value = $gameVariables.value(data.Var)) {
         return data.OptionsStringList[value];
+    };
+
+    const _Window_Options_booleanStatusText = Window_Options.prototype.booleanStatusText;
+    Window_Options.prototype.booleanStatusText = function(value) {
+        if (!_tempData || !_tempData.OptionsStringList || _tempData.OptionsStringList.length === 0) return _Window_Options_booleanStatusText.apply(this, arguments);
+        return value ? _tempData.OptionsStringList[1] : _tempData.OptionsStringList[0];
     };
 
     Window_Options.prototype.keyMapperStatusText = function(value) {
@@ -1511,6 +1952,12 @@ Imported.NUUN_OptionEx = true;
     };
 
 
+    const _ConfigManager_load = ConfigManager.load;
+    ConfigManager.load = function() {
+        this.applyDataEx();
+        _ConfigManager_load.apply(this, arguments);
+    };
+
     const _ConfigManager_makeData = ConfigManager.makeData;
     ConfigManager.makeData = function() {
         let config = _ConfigManager_makeData.apply(this, arguments);
@@ -1560,21 +2007,49 @@ Imported.NUUN_OptionEx = true;
     const _ConfigManager_applyData = ConfigManager.applyData;
     ConfigManager.applyData = function(config) {
         _ConfigManager_applyData.apply(this, arguments);
-        this.applyOptionsData(config);
+        this.applyDataEx(config);
+    };
+
+    ConfigManager.applyDataEx = function(config) {
+        this.applyOptionsData(config, params.InitValueThisPlugin);
         this.applyKeyConfig(config);
         this.applyGamePadConfig(config);
     };
 
-    ConfigManager.applyOptionsData = function(config) {
+    ConfigManager.applyOptionsData = function(config, mode) {
         params.CommandOptions.forEach(optionList => {
-            optionList.OptionsData.forEach(data => {
-                if (data.Var > 0) {
-                    this[data.OptionSymbol] = data.GlobalConfigData ? this.readValue(config, data, 0) : $gameVariables.value(data.Var);
-                } else if (data.Switch > 0) {
-                    this[data.OptionSymbol] = data.GlobalConfigData ? this.readFlag(config, data.OptionSymbol, false) : $gameSwitches.value(data.Switch);
-                }
-            });
+            if (optionList.OptionsData) {
+                optionList.OptionsData.forEach(data => {
+                    if (data.Var > 0) {
+                        this[data.OptionSymbol] = data.GlobalConfigData ? (!!config ? this.readValue(config, data, (data.InitValue || 0)) : (data.InitValue || 0)) : this.readVariablesValue(config, data, (data.InitValue || 0));
+                    } else if (data.Switch > 0) {
+                        this[data.OptionSymbol] = data.GlobalConfigData ? (!!config ? this.readFlag(config, data.OptionSymbol, (!!data.InitValue || false)) : (!!data.InitValue || false)) : this.readSwitchesValue(config, data, (!!data.InitValue || false));
+                    } else if (mode && data.OptionSymbol.includes("Volume")) {
+                        this[data.OptionSymbol] = !!config ? this.readVolume(config, data, (data.InitValue || 100)) : (data.InitValue || 100);
+                    } else if (mode) {
+                        this[data.OptionSymbol] = !!config ? this.readFlag(config, data, (!!data.InitValue || false)) : (!!data.InitValue || false);
+                    }
+                });
+            }
         });
+    };
+
+    if (params.InitValueThisPlugin) {
+        ConfigManager.readVolume = function(config, name, defaultValue) {
+            if (name in config) {
+                return Number(config[name]).clamp(0, 100);
+            } else {
+                return defaultValue;
+            }
+        };
+    }
+
+    ConfigManager.readVariablesValue = function(config, data, defaultValue) {
+        return !!config && $gameVariables ? $gameVariables.value(data.Var) : defaultValue;
+    };
+
+    ConfigManager.readSwitchesValue = function(config, data, defaultValue) {
+        return !!config && $gameSwitches ? $gameSwitches.value(data.Switch) : defaultValue;
     };
 
     ConfigManager.readValue = function(config, data, defaultValue) {
@@ -1586,6 +2061,7 @@ Imported.NUUN_OptionEx = true;
     };
 
     ConfigManager.applyKeyConfig = function(config) {
+        if (!config) return;
         const keyConfig = config.keyConfig;
         if (keyConfig) {
             this.keyConfig = {};
@@ -1598,6 +2074,7 @@ Imported.NUUN_OptionEx = true;
     };
 
     ConfigManager.applyGamePadConfig = function(config) {
+        if (!config) return;
         const gamePadConfig = config.gamePadConfig;
         if (gamePadConfig) {
             this.gamePadConfig = {};
@@ -1695,153 +2172,16 @@ Imported.NUUN_OptionEx = true;
     };
 
     function _invalidKeyList() {
-        return [46, 145, 240, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 144];
+        if (params.InvalidKey) {
+            return params.InvalidKey;
+        }
+        return [145, 240, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 144];
     }
 
     function _getKey(code) {
         switch (code) {
             case -1:
                 return "[Add Key]";
-            case 8:
-                return "BackSpace";
-            case 9:
-                return "Tab";
-            case 13:
-                return "Enter";
-            case 16:
-                return "Shift";
-            case 17:
-                return "Ctrl";
-            case 18:
-                return "Alt";
-            case 19:
-                return "Pause"
-            case 27:
-                return "Esc";
-            case 32:
-                return "Pause";
-            case 33:
-                return "PageUp";
-            case 34:
-                return "PageDown";
-            case 35:
-                return "End";
-            case 36:
-                return "Home";
-            case 37:
-                return "←";
-            case 38:
-                return "↑";
-            case 39:
-                return "→";
-            case 40:
-                return "↓";
-            case 45:
-                return "Insert";
-            case 46:
-                return "Delete";
-            case 48:
-                return "0";
-            case 49:
-                return "1";
-            case 50:
-                return "2";
-            case 51:
-                return "3";
-            case 52:
-                return "4";
-            case 53:
-                return "5";
-            case 54:
-                return "6";
-            case 55:
-                return "7";
-            case 56:
-                return "8";
-            case 57:
-                return "9";
-            case 65:
-                return "A";
-            case 66:
-                return "B";
-            case 67:
-                return "C";
-            case 68:
-                return "D";
-            case 69:
-                return "E";
-            case 70:
-                return "F";
-            case 71:
-                return "G";
-            case 72:
-                return "H";
-            case 73:
-                return "I";
-            case 74:
-                return "J";
-            case 75:
-                return "K";
-            case 76:
-                return "L";
-            case 77:
-                return "M";
-            case 78:
-                return "N";
-            case 79:
-                return "O";
-            case 80:
-                return "P";
-            case 81:
-                return "Q";
-            case 82:
-                return "R";
-            case 83:
-                return "S";
-            case 84:
-                return "T";
-            case 85:
-                return "U";
-            case 86:
-                return "V";
-            case 87:
-                return "W";
-            case 88:
-                return "X";
-            case 89:
-                return "Y";
-            case 90:
-                return "Z";
-            case 91:
-                return "Win";
-            case 92:
-                return "Apps";
-            case 96:
-                return "Num pad 0";
-            case 97:
-                return "Num pad 1";
-            case 98:
-                return "Num pad 2";
-            case 99:
-                return "Num pad 3";
-            case 100:
-                return "Num pad 4";
-            case 101:
-                return "Num pad 5";
-            case 102:
-                return "Num pad 6";
-            case 103:
-                return "Num pad 7";
-            case 104:
-                return "Num pad 8";
-            case 105:
-                return "Num pad 9";
-        }
-        return "";
-    };
-
-    function _invalidKey(code) {
-        switch (code) {
             case 8:
                 return "BackSpace";
             case 9:

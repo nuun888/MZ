@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Result
  * @orderAfter NUUN_Result
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * Display the MVP actor for this battle in the results displayed after winning.
@@ -28,6 +28,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/29/2024 Ver.1.1.4
+ * Corrected to not add total damage when recovering.
+ * Fixed an issue that caused an error at the end of battle.
  * 12/11/2022 Ver.1.1.3
  * Changed the display in languages other than Japanese to English.
  * 9/14/2022 Ver.1.1.2
@@ -65,7 +68,7 @@
  * @author NUUN
  * @base NUUN_Result
  * @orderAfter NUUN_Result
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * 勝利後に表示されるリザルトにこの戦闘でのMVPアクターを表示します。
@@ -82,6 +85,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/29 Ver.1.1.4
+ * 回復時の総ダメージ加算を実行しないように修正。
+ * 戦闘終了時にエラーが出る問題を修正。
  * 2022/12/11 Ver.1.1.3
  * 日本語以外での表示を英語表示に変更。
  * 2022/9/14 Ver.1.1.2
@@ -133,14 +139,15 @@ Imported.NUUN_ResultMVPActor = true;
     const _Game_Action_executeHpDamage = Game_Action.prototype.executeHpDamage;
     Game_Action.prototype.executeHpDamage = function(target, value) {
         _Game_Action_executeHpDamage.call(this, target, value);
-        this.subject().nuun_SetTotalDamege(value);
+        this.subject().nuun_SetTotalDamege(target, value);
     };
     
     Game_BattlerBase.prototype.nuun_clearTotalDamege = function() {
         this._resultTotalDamege = 0;
     };
 
-    Game_BattlerBase.prototype.nuun_SetTotalDamege = function(value) {
+    Game_BattlerBase.prototype.nuun_SetTotalDamege = function(target, value) {
+        if (target.isActor() || value < 0) return;
         this._resultTotalDamege += value;
     };
 
@@ -244,7 +251,7 @@ Imported.NUUN_ResultMVPActor = true;
 
     BattleManager.resultMVPActorBatteleVoice = function() {//以下は神無月サスケ氏から
         const actor = $gameParty.getMvpActor();
-        if (actor.actor().meta.victoryVoice || (actor.battleVoices && actor.battleVoices.victory)) {
+        if (actor && actor.actor().meta.victoryVoice || (actor.battleVoices && actor.battleVoices.victory)) {
             const data = (actor.battleVoices ? actor.battleVoices.victory : null) || actor.actor().meta.victoryVoice;
             if (data) {
                 const names = data.split(',');

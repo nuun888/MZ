@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.4
+ * @version 2.4.5
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -60,6 +60,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2024/12/29 Ver.2.4.5
+ * Fixed an issue where images were not displayed when displaying a character portrait using NUUN_ActorPicture for MVP actors.
+ * Compatible with support actor Ver.2.0.
  * 2024/9/11 Ver.2.4.4
  * Fixed the issue where the image was not displayed when displaying a standing character using "NUUN_ActorPicture".
  * 2024/8/11 Ver.2.4.3
@@ -2317,7 +2320,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.4
+ * @version 2.4.5
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2365,6 +2368,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2024/12/29 Ver.2.4.5
+ * MVPアクターでNUUN_ActorPictureでの立ち絵表示で画像が表示されない問題を修正。
+ * サポートアクターVer.2.0に対応。
  * 2024/9/9 Ver.2.4.4
  * NUUN_ActorPictureでの立ち絵表示で画像が表示されない問題を修正。
  * 2024/8/11 Ver.2.4.3
@@ -5425,71 +5431,71 @@ Window_Base.prototype.isFadein = function() {
 };
 
 Window_Base.prototype.setResultWindowMode = function(mode) {
-  if (!mode) {
-    this.opacity = 0;
-    this.frameVisible = false;
-    this.resultWindowVisible = true;
-  }
+    if (!mode) {
+        this.opacity = 0;
+        this.frameVisible = false;
+        this.resultWindowVisible = true;
+    }
 };
 
 Window_StatusBase.prototype.setResultBaseActorSprite = function() {
-  const sprite = new Sprite_ResultActor();
-  this.addChild(sprite);
-  this._actorSprite = sprite;
-  sprite.hide();
+    const sprite = new Sprite_ResultActor();
+    this.addChild(sprite);
+    this._actorSprite = sprite;
+    sprite.hide();
 };
 
 Window_StatusBase.prototype.setupResultBitmap = function(actor, data) {
-  let bitmap = null;
-  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-    bitmap = actor.getActorGraphicImg();
-  } else {
-    bitmap = actor.getResultActorImg(actor.actorId());
-  }
-  if (bitmap) {
-    bitmap = ImageManager.nuun_LoadPictures(bitmap);
-    if (bitmap && !bitmap.isReady()) {
-      bitmap.addLoadListener(this.setResultBitmap.bind(this, bitmap, data));
-    } else if (bitmap) {
-      this.setResultBitmap(bitmap, data);
+    let bitmap = null;
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        bitmap = actor.getActorGraphicImg();
+    } else {
+        bitmap = actor.getResultActorImg(actor.actorId());
     }
-  }
+    if (bitmap) {
+        bitmap = ImageManager.nuun_LoadPictures(bitmap);
+        if (bitmap && !bitmap.isReady()) {
+            bitmap.addLoadListener(this.setResultBitmap.bind(this, bitmap, data));
+        } else if (bitmap) {
+            this.setResultBitmap(bitmap, data);
+        }
+    }
 };
 
 Window_StatusBase.prototype.setResultBitmap = function(bitmap, data) {
-  let x = data.Actor_X;
-  const scale = (data.Actor_Scale || 100) / 100;
-  if(ActorPosition === 'left') {
-    x += 0;
-  } else if (ActorPosition === 'center') {
-    x += Math.floor(this.width / 2 - ((bitmap.width * scale) / 2));
-  } else {
-    x += this.width - (bitmap.width * scale) - 24;
-  }
-  const dw = bitmap.width * scale;
-  const dh = bitmap.height * scale;
-  const y = data.Actor_Y + (this.height - (bitmap.height * scale)) - 24;
-  this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
+    let x = data.Actor_X;
+    const scale = (data.Actor_Scale || 100) / 100;
+    if(ActorPosition === 'left') {
+        x += 0;
+    } else if (ActorPosition === 'center') {
+        x += Math.floor(this.width / 2 - ((bitmap.width * scale) / 2));
+    } else {
+        x += this.width - (bitmap.width * scale) - 24;
+    }
+    const dw = bitmap.width * scale;
+    const dh = bitmap.height * scale;
+    const y = data.Actor_Y + (this.height - (bitmap.height * scale)) - 24;
+    this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, dw, dh);
 };
 
 Window_StatusBase.prototype.windowResultFilteX = function() {
-  switch (LevelUpActorArea) {
-    case 'ui':
-      return 0;
-    case 'screen':
-      return 0 + (Graphics.boxWidth - Graphics.width) / 2;
-  }
+    switch (LevelUpActorArea) {
+        case 'ui':
+        return 0;
+        case 'screen':
+        return 0 + (Graphics.boxWidth - Graphics.width) / 2;
+    }
 };
 
 Window_StatusBase.prototype.windowResultFilterWidthArea = function() {
-  switch (LevelUpActorArea) {
-    case 'window':
-      return this.innerWidth;
-    case 'ui':
-      return this.width;
-    case 'screen':
-      return Graphics.width;
-  }
+    switch (LevelUpActorArea) {
+        case 'window':
+        return this.innerWidth;
+        case 'ui':
+        return this.width;
+        case 'screen':
+        return Graphics.width;
+    }
 };
 
 Window_StatusBase.prototype.windowResultFilterHeightArea = function() {
@@ -5550,124 +5556,127 @@ Window_ResultHelp.prototype.open = function() {
 };
 
 Window_ResultHelp.prototype.loadWindowskin = function() {
-  if (ResultHelpWindowsSkin) {
-    this.windowskin = ImageManager.loadSystem(ResultHelpWindowsSkin);
-  } else {
-    Window_Base.prototype.loadWindowskin.call(this);
-  }
+    if (ResultHelpWindowsSkin) {
+        this.windowskin = ImageManager.loadSystem(ResultHelpWindowsSkin);
+    } else {
+        Window_Base.prototype.loadWindowskin.call(this);
+    }
 };
 
 
 function Window_ResultLevelUpHelp() {
-  this.initialize(...arguments);
+    this.initialize(...arguments);
 }
 
 Window_ResultLevelUpHelp.prototype = Object.create(Window_Help.prototype);
 Window_ResultLevelUpHelp.prototype.constructor = Window_ResultLevelUpHelp;
 
 Window_ResultLevelUpHelp.prototype.initialize = function(rect) {
-  Window_Help.prototype.initialize.call(this, rect);
-  this.openness = 255;
-  this.openOpacity = 0;
-  this.setResultWindowMode(ResultLevelUpHelpWindowVisible);
+    Window_Help.prototype.initialize.call(this, rect);
+    this.openness = 255;
+    this.openOpacity = 0;
+    this.setResultWindowMode(ResultLevelUpHelpWindowVisible);
 };
 
 Window_ResultLevelUpHelp.prototype.refresh = function() {
-  const rect = this.baseTextRect();
-  this.contents.clear();
-  if (LevelUpResultTextPosition === 'TextEx') {
-    this.drawTextEx(this._text, rect.x, rect.y, rect.width);
-  } else {
-    this.drawText(this._text, rect.x, rect.y, rect.width, LevelUpResultTextPosition);
-  }
+    const rect = this.baseTextRect();
+    this.contents.clear();
+    if (LevelUpResultTextPosition === 'TextEx') {
+        this.drawTextEx(this._text, rect.x, rect.y, rect.width);
+    } else {
+        this.drawText(this._text, rect.x, rect.y, rect.width, LevelUpResultTextPosition);
+    }
 };
 
 Window_ResultLevelUpHelp.prototype.loadWindowskin = function() {
-  if (LevelUpResultHelpWindowsSkin) {
-    this.windowskin = ImageManager.loadSystem(LevelUpResultHelpWindowsSkin);
-  } else {
-    Window_Base.prototype.loadWindowskin.call(this);
-  }
+    if (LevelUpResultHelpWindowsSkin) {
+        this.windowskin = ImageManager.loadSystem(LevelUpResultHelpWindowsSkin);
+    } else {
+        Window_Base.prototype.loadWindowskin.call(this);
+    }
 };
 
 
 function Window_Result() {
-  this.initialize(...arguments);
+    this.initialize(...arguments);
 }
 
 Window_Result.prototype = Object.create(Window_StatusBase.prototype);
 Window_Result.prototype.constructor = Window_Result;
 
 Window_Result.prototype.initialize = function(rect) {
-  Window_StatusBase.prototype.initialize.call(this, rect);
-  this.openness = 0;
-  this.setResultFadein();
-  this.resultFadein = false;
-  this._canRepeat = false;
-  this.resultBackgroundSprite = null;
-  this.setResultWindowMode(ResultWindowVisible);
+    Window_StatusBase.prototype.initialize.call(this, rect);
+    this.openness = 0;
+    this.setResultFadein();
+    this.resultFadein = false;
+    this._canRepeat = false;
+    this.resultBackgroundSprite = null;
+    this.setResultWindowMode(ResultWindowVisible);
 };
 
 Window_Result.prototype.setResultBackground = function(sprite) {
-  this.resultBackgroundSprite = sprite;
+    this.resultBackgroundSprite = sprite;
 };
 
 Window_Result.prototype.loadWindowskin = function() {
-  if (GetWindowsSkin) {
-    this.windowskin = ImageManager.loadSystem(GetWindowsSkin);
-  } else {
-    Window_Base.prototype.loadWindowskin.call(this);
-  }
+    if (GetWindowsSkin) {
+        this.windowskin = ImageManager.loadSystem(GetWindowsSkin);
+    } else {
+        Window_Base.prototype.loadWindowskin.call(this);
+    }
 };
 
 Window_Result.prototype.refresh = function() {
-  this.resultBackgroundSprite.setBackground(GetWindowBackGroundImg);
+    this.resultBackgroundSprite.setBackground(GetWindowBackGroundImg);
 };
 
 Window_Result.prototype.processOk = function() {
-  if (BattleManager.resultRefresh === 0) {
-    Window_StatusBase.prototype.processOk.call(this);
-  }
+    if (BattleManager.resultRefresh === 0) {
+        Window_StatusBase.prototype.processOk.call(this);
+    }
 };
 
 const _Window_Result_updateOpen = Window_Result.prototype.updateOpen;
 Window_Result.prototype.updateOpen = function() {
-  this.updateResultFadein();
-  this.updateResultBackgrounfFadein();
-  _Window_Result_updateOpen.call(this);
+    this.updateResultFadein();
+    this.updateResultBackgrounfFadein();
+    _Window_Result_updateOpen.call(this);
 };
 
 const _Window_Result_isOpen = Window_Result.prototype.isOpen;
 Window_Result.prototype.isOpen = function() {
-  return this.isFadein() ? this.isResultFadein() && _Window_Result_isOpen.call(this) : 
-  _Window_Result_isOpen.call(this);
+    return this.isFadein() ? this.isResultFadein() && _Window_Result_isOpen.call(this) : 
+    _Window_Result_isOpen.call(this);
 };
 
 const _Window_Result_open = Window_Result.prototype.open;
 Window_Result.prototype.open = function() {
-  _Window_Result_open.call(this);
-  this.onResultFadein();
+    _Window_Result_open.call(this);
+    this.onResultFadein();
 };
 
 Window_Result.prototype.updateResultBackgrounfFadein = function() {
-  if (this.resultBackgroundSprite) {
-    this.resultBackgroundSprite.setOpacity(this.openOpacity);
-  }
+    if (this.resultBackgroundSprite) {
+        this.resultBackgroundSprite.setOpacity(this.openOpacity);
+    }
 };
 
 Window_Result.prototype.processCancel = function() {
-  SoundManager.playOk();
-  this.updateInputData();
-  this.deactivate();
-  this.callCancelHandler();
+    SoundManager.playOk();
+    this.updateInputData();
+    this.deactivate();
+    this.callCancelHandler();
 };
 
 Window_Result.prototype.resultRefresh = function(actor) {
     this.contents.clear();
     if (actor) {
         const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
+        if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+            actor.resetImgId();
+        }
         if (LevelUpActorArea === 'window') {
-        this.setupResultBitmap(actor, data);
+            this.setupResultBitmap(actor, data);
         } else {
         if (data) {
             this._actorSprite.setup(actor, data, this.windowResultFilterWidthArea());
@@ -5769,87 +5778,91 @@ Window_ResultActorExp.prototype.maxItems = function() {
 };
 
 Window_ResultActorExp.prototype.contentsHeight = function() {
-  return this.innerHeight;
+    return this.innerHeight;
 };
 
 Window_ResultActorExp.prototype.actor = function(index) {
-  return this.members()[index];
+    return this.members()[index];
 };
 
 Window_ResultActorExp.prototype.actorMembers = function() {
-  return this.members().length;
+    return this.members().length;
 };
 
 Window_ResultActorExp.prototype.members = function() {
-  if (ReserveMembers) {
-    return $gameParty.allMembers();
-  } else {
-    if (Imported.NUUN_SupportActor && ShowSupportActor) {
-      $gameParty.setWithSupportActorMember();
+    if (ReserveMembers) {
+        return $gameParty.allMembers();
+    } else {
+        if (Imported.NUUN_SupportActor && ShowSupportActor) {
+            if ($gameParty.setWithSupportActorMember) {
+                $gameParty.setWithSupportActorMember();
+            } else {
+                $gameTemp.omitSupportMember = !ShowSupportActor;
+            }
+        }
+        return $gameParty.battleMembers();
     }
-    return $gameParty.battleMembers();
-  }
 };
 
 Window_ResultActorExp.prototype.drawItem = function(index) {
-  this.drawActorExp(index);
+    this.drawActorExp(index);
 };
 
 Window_ResultActorExp.prototype.drawActorExp = function(index) {
-  const rect = this.itemRect(index);
-  const actor = this.actor(index);
-  for (const data of ActorExpDataList) {
-    this.resetFontSettings();
-    const x = rect.x + data.X_Coordinate;
-    const y = rect.y + data.Y_Coordinate;
-    const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
-    this.dateDisplay(data, actor, x, y, width, rect.height);
-  }
+    const rect = this.itemRect(index);
+    const actor = this.actor(index);
+    for (const data of ActorExpDataList) {
+        this.resetFontSettings();
+        const x = rect.x + data.X_Coordinate;
+        const y = rect.y + data.Y_Coordinate;
+        const width = (data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - data.X_Coordinate) : rect.width - data.X_Coordinate);
+        this.dateDisplay(data, actor, x, y, width, rect.height);
+    }
 };
 
 Window_ResultActorExp.prototype.dateDisplay = function(data, actor, x, y, width, height) {
-  switch (data.DateSelect) {
-    case 0:
-      break;
-    case 1:
-      this.drawResultActorCharacter(actor, x, y);
-      break;
-    case 2:
-      this.drawActorFace(data, actor, x, y, height);
-      break;
-    case 3:
-      this.drawSvActor(data, actor, x, y, width);
-      break;
-    case 4:
-      this.drawActorImg(data, actor, x, y, width, height);
-      break;
-    case 10:
-      this.drawActorName(data, actor, x, y, width);
-      break;
-    case 11:
-      this.drawActorLevel(data, actor, x, y, width);
-      break;
-    case 12:
-      this.drawGetActorExp(data, actor, x, y, width);
-      break;
-    case 20:
-      this.drawExpGauge(data, actor, x, y, width);
-      break;
-    case 21:
-      this.drawParams(data, actor, x, y, width);
-      break;
-    case 30:
-      this.drawLevelUp(data, actor, x, y, width);
-      break;
-    case 50:
-      this.drawCircularExpGauge(data, actor, x, y, width);
-      break;
-    case 1000:
-      this.drawHorzLine(data, x, y, width);
-      break;
-    default:
-      break;
-  }
+    switch (data.DateSelect) {
+        case 0:
+        break;
+        case 1:
+        this.drawResultActorCharacter(actor, x, y);
+        break;
+        case 2:
+        this.drawActorFace(data, actor, x, y, height);
+        break;
+        case 3:
+        this.drawSvActor(data, actor, x, y, width);
+        break;
+        case 4:
+        this.drawActorImg(data, actor, x, y, width, height);
+        break;
+        case 10:
+        this.drawActorName(data, actor, x, y, width);
+        break;
+        case 11:
+        this.drawActorLevel(data, actor, x, y, width);
+        break;
+        case 12:
+        this.drawGetActorExp(data, actor, x, y, width);
+        break;
+        case 20:
+        this.drawExpGauge(data, actor, x, y, width);
+        break;
+        case 21:
+        this.drawParams(data, actor, x, y, width);
+        break;
+        case 30:
+        this.drawLevelUp(data, actor, x, y, width);
+        break;
+        case 50:
+        this.drawCircularExpGauge(data, actor, x, y, width);
+        break;
+        case 1000:
+        this.drawHorzLine(data, x, y, width);
+        break;
+        default:
+        break;
+    }
 };
 
 Window_ResultActorExp.prototype.drawHorzLine = function(data, x, y, width) {
@@ -5860,36 +5873,36 @@ Window_ResultActorExp.prototype.drawHorzLine = function(data, x, y, width) {
 };  
 
 Window_ResultActorExp.prototype.drawActorFace = function(data, actor, x, y, height) {
-  height = Math.min(ActorFaceHeight, height, ImageManager.faceHeight);
-  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-    this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, ImageManager.faceWidth, height);
-  } else {
-    this.drawFace(actor.faceName(), actor.faceIndex(), x, y, ImageManager.faceWidth, height);
-  }
+    height = Math.min(ActorFaceHeight, height, ImageManager.faceHeight);
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        this.drawFace(actor.getActorGraphicFace(), actor.getActorGraphicFaceIndex(), x, y, ImageManager.faceWidth, height);
+    } else {
+        this.drawFace(actor.faceName(), actor.faceIndex(), x, y, ImageManager.faceWidth, height);
+    }
 };
 
 Window_ResultActorExp.prototype.drawSvActor = function(data, actor, x, y, width) {
-  const bitmap = ImageManager.loadSvActor(actor.battlerName());
-  this.drawSvActorImg(actor, x, y);
+    const bitmap = ImageManager.loadSvActor(actor.battlerName());
+    this.drawSvActorImg(actor, x, y);
 };
 
 Window_ResultActorExp.prototype.drawActorImg = function(data, actor, x, y, width, height) {
-  let bitmap = null;
-  const actorData = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
-  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-    actor.resetImgId();
-    bitmap = actor.getActorGraphicImg();
-  } else {
-    bitmap = actor.getResultActorImg(actor.actorId());
-  }
-  if (bitmap) {
-    bitmap = ImageManager.nuun_LoadPictures(bitmap);
-    if (bitmap && !bitmap.isReady()) {
-      bitmap.addLoadListener(this.setResultBitmap.bind(this, bitmap, actorData, x, y, width, height));
-    } else if (bitmap) {
-      this.setResultBitmap(bitmap, actorData, x, y, width, height);
+    let bitmap = null;
+    const actorData = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        actor.resetImgId();
+        bitmap = actor.getActorGraphicImg();
+    } else {
+        bitmap = actor.getResultActorImg(actor.actorId());
     }
-  }
+    if (bitmap) {
+        bitmap = ImageManager.nuun_LoadPictures(bitmap);
+        if (bitmap && !bitmap.isReady()) {
+        bitmap.addLoadListener(this.setResultBitmap.bind(this, bitmap, actorData, x, y, width, height));
+        } else if (bitmap) {
+        this.setResultBitmap(bitmap, actorData, x, y, width, height);
+        }
+    }
 };
 
 Window_ResultActorExp.prototype.setResultBitmap = function(bitmap, data, x, y, width, height) {
@@ -6501,33 +6514,33 @@ Window_ResultLevelUpMain.prototype.initialize = function(rect) {
 };
 
 Window_ResultLevelUpMain.prototype.loadWindowskin = function() {
-  if (ResultLevelUpWindowsSkin) {
-    this.windowskin = ImageManager.loadSystem(ResultLevelUpWindowsSkin);
-  } else {
-    Window_Base.prototype.loadWindowskin.call(this);
-  }
+    if (ResultLevelUpWindowsSkin) {
+        this.windowskin = ImageManager.loadSystem(ResultLevelUpWindowsSkin);
+    } else {
+        Window_Base.prototype.loadWindowskin.call(this);
+    }
 };
 
 Window_ResultLevelUpMain.prototype.setResultBackground = function(sprite) {
-  this.resultBackgroundSprite = sprite;
+    this.resultBackgroundSprite = sprite;
 };
 
 Window_ResultLevelUpMain.prototype.loadBitmap = function() {
-  let bitmap = null;
-  for (const member of $gameParty.resultMembers()) {
-    const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(member.actorId()) : member.getResultActorData(member.actorId());
-    if (data && data.LevelUpActorBackGroundImg) {
-      ImageManager.nuun_LoadPictures(data.LevelUpActorBackGroundImg);
+    let bitmap = null;
+    for (const member of $gameParty.resultMembers()) {
+        const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(member.actorId()) : member.getResultActorData(member.actorId());
+        if (data && data.LevelUpActorBackGroundImg) {
+            ImageManager.nuun_LoadPictures(data.LevelUpActorBackGroundImg);
+        }
+        if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+            bitmap = member.getActorGraphicImg();
+        } else {
+            bitmap = member.getResultActorImg(member.actorId());
+        }
+        if (bitmap) {
+            ImageManager.nuun_LoadPictures(bitmap);
+        }
     }
-    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-        bitmap = member.getActorGraphicImg();
-    } else {
-        bitmap = member.getResultActorImg(member.actorId());
-    }
-    if (bitmap) {
-        ImageManager.nuun_LoadPictures(bitmap);
-    }
-  }
 };
 
 Window_ResultLevelUpMain.prototype.resultBackgroundRefresh = function(data) {
@@ -6536,35 +6549,35 @@ Window_ResultLevelUpMain.prototype.resultBackgroundRefresh = function(data) {
 };
 
 Window_ResultLevelUpMain.prototype.refresh = function() {
-  this.contents.clear();
-  const actor = BattleManager.resultLevelUpActors[BattleManager.resultPage - 1];
-  const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
-  this.resultBackgroundRefresh(data);
-  if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
-    actor.resetImgId();
-  }
-  if (LevelUpActorArea === 'window') {
-    this.setupResultBitmap(actor, data);
-  } else {
-    if (data) {
-      this._actorSprite.setup(actor, data, this.windowResultFilterWidthArea());
-      this._actorSprite.move(this.windowResultFilteX(), this.windowResultFilterHeightArea());
-      this._actorSprite.show();
-    } else {
-      this._actorSprite.setup(null, null, this.windowResultFilterWidthArea());
+    this.contents.clear();
+    const actor = BattleManager.resultLevelUpActors[BattleManager.resultPage - 1];
+    const data = Imported.NUUN_ActorPicture && ActorPictureEXApp ? battlreActorPicture(actor.actorId()) : actor.getResultActorData(actor.actorId());
+    this.resultBackgroundRefresh(data);
+    if (Imported.NUUN_ActorPicture && ActorPictureEXApp) {
+        actor.resetImgId();
     }
-  }
+    if (LevelUpActorArea === 'window') {
+        this.setupResultBitmap(actor, data);
+    } else {
+        if (data) {
+        this._actorSprite.setup(actor, data, this.windowResultFilterWidthArea());
+        this._actorSprite.move(this.windowResultFilteX(), this.windowResultFilterHeightArea());
+        this._actorSprite.show();
+        } else {
+        this._actorSprite.setup(null, null, this.windowResultFilterWidthArea());
+        }
+    }
 };
 
 Window_ResultLevelUpMain.prototype.processCancel = function() {
-  SoundManager.playOk();
-  this.updateInputData();
-  this.deactivate();
-  this.callCancelHandler();
+    SoundManager.playOk();
+    this.updateInputData();
+    this.deactivate();
+    this.callCancelHandler();
 };
 
 function Window_ResultActorStatus() {
-  this.initialize(...arguments);
+    this.initialize(...arguments);
 }
 
 Window_ResultActorStatus.prototype = Object.create(Window_StatusBase.prototype);

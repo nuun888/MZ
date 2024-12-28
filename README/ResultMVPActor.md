@@ -2,7 +2,7 @@
 # Ver.1.1.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js)  
 #### 必須プラグイン
-[リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)Ver.2.0.5以降  
+[リザルト](https://github.com/nuun888/MZ/blob/master/README/Result.md)Ver.2.0.5以降  
 
 ## 概要
 勝利後に表示されるリザルトにこの戦闘でのMVPアクターを表示します。  

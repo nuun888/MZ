@@ -5,6 +5,7 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 #### 拡張プラグイン
 [オプション拡張音量ゲージ表示](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_2.js)  
+[オプション拡張項目スタイル変更](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_3.js)  
 
 オプション画面を拡張します。  
 ![画像](img/OptionEx1.png)  
@@ -67,6 +68,11 @@ ONにすることで全てのセーブデータに適用されます。変数、
 Ver.1.0.2   
 音量のつまみ機能を実装。  
 ボリュームゲージのクリックした場所により、クリック場所の音量に設定する機能を追加。  
+
+### オプション拡張項目スタイル変更
+オプションの項目を選択式に変更します。  
+![画像](img/OptionEx4.png)  
+[ダウンロード](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_3.js)Ver.1.0.0  
 
 ## 更新履歴
 2024/12/28 Ver.1.2.0  

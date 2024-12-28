@@ -1,5 +1,5 @@
 # [MVPアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js)
-# Ver.1.1.3
+# Ver.1.1.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js)  
 #### 必須プラグイン
 [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)Ver.2.0.5以降  
@@ -13,6 +13,9 @@ MVPアクターは与ダメージが一番高いアクターが選ばれます�
 ![画像](img/ResultMVPActor.png)  
 
 ## 更新履歴
+2024/12/29 Ver.1.1.4  
+回復時の総ダメージ加算を実行しないように修正。  
+戦闘終了時にエラーが出る問題を修正。  
 2022/12/11 Ver.1.1.3  
 日本語以外での表示を英語表示に変更。  
 2022/9/14 Ver.1.1.2  

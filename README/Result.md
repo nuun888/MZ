@@ -1,11 +1,11 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.4.4
+# Ver.2.4.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
 #### 拡張プラグイン
 [リザルト時ウィンドウスプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) Ver.1.0.0  
-[MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) Ver.1.0.0  
+[MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) Ver.1.1.4  
 
 ## 概要
 戦闘終了時にリザルト画面を表示します。  
@@ -41,6 +41,9 @@ d:アクターのデータベースデータ
 ※右クリックはページ切り替えのみです。戻す機能は実装しておりません。  
 
 ## 更新履歴
+2024/12/29 Ver.2.4.5  
+MVPアクターでNUUN_ActorPictureでの立ち絵表示で画像が表示されない問題を修正。  
+サポートアクターVer.2.0に対応。  
 2024/9/9 Ver.2.4.4  
 NUUN_ActorPictureでの立ち絵表示で画像が表示されない問題を修正。  
 2024/8/11 Ver.2.4.3  

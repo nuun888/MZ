@@ -1,5 +1,5 @@
 # [バトラー名前表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)
-# Ver.1.4.0  
+# Ver.1.4.1  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)  
  
 ## 必須、前提プラグイン
@@ -20,6 +20,8 @@
 `[id]`は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。  
 
 ## 更新履歴
+2025/1/1 Ver.1.4.1  
+変身後でも名前が変身前のまま表示されていた問題を修正。  
 2023/6/2 Ver.1.4.0  
 SVアクターに名前を表示する機能を追加。  
 2023/5/6 Ver.1.3.1  

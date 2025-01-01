@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラー名前表示
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -36,6 +36,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/1 Ver.1.4.1
+ * 変身後でも名前が変身前のまま表示されていた問題を修正。
  * 2023/6/2 Ver.1.4.0
  * SVアクターに名前を表示する機能を追加。
  * 2023/5/6 Ver.1.3.1
@@ -394,7 +396,7 @@ Sprite_BattlerName.prototype.battlerNameVisibleInSelect = function() {
 };
   
 Sprite_BattlerName.prototype.update = function() {
-    Sprite.prototype.update.call(this);
+    Sprite_Name.prototype.update.call(this);
     this.battlerNameVisible();
 };
 

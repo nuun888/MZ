@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  Party limit gauge
  * @author NUUN
- * @version 1.6.4
+ * @version 1.6.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -41,9 +41,21 @@
  * If the target is an actor, the limit gauge of the ally will increase or decrease, and if it is an enemy, the limit gauge of the enemy group will increase or decrease.
  * 
  * Skill or item notes
- * <LimitAttacklStr:[eval]> Increases limit gauge when attacking.
- * <LimitCriticalStr:[eval]> Increases the limit gauge when critical.
+ * <LimitAttackStr:[eval]> When attacking with this skill or item, the limit gauge increases. If this description is present, this setting will be applied to the "AttackAmount".
+ * <LimitCriticalStr:[eval]> When this skill or item is used, the limit gauge increases when a critical hit is made. If this description exists, this setting will be applied to the "CriticalAmount".
+ * <LimitDamageStr:[eval]> When you receive damage from this skill or item, the limit gauge increases. If this description exists, this setting will be applied to "DamageAmount".
  * [eval]:Evaluation formula
+ * 
+ * Evaluation formula
+ * Damage received
+ * a: Target damage battler b: Attacker da: Damage battler database damage: Damage value cri: Critical
+ * rate:Target attribute resistance value
+ * 
+ * Successful attack, critical
+ * a: Attacker butler da: Attacker butler database cri: Critical success target: Target rate: Target attribute resistance value
+ * 
+ * Defeat
+ * a: Defeated Battler data da: Defeated Battler database
  * 
  * Evaluation formula
  * Damage received
@@ -62,6 +74,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/2/2025 Ver.1.6.5
+ * Fixed the attack calculation formula to use target and elemental resistance.
+ * Fixed the damage calculation formula to use attacker and elemental resistance.
  * 8/22/2024 Ver.1.6.4
  * Fixed an issue where the limit gauge would be displayed after the results were displayed when choosing to end a battle without hiding certain limit gauges.
  * 8/20/2024 Ver.1.6.3
@@ -448,7 +463,7 @@
  * @target MZ
  * @plugindesc  パーティリミットゲージ
  * @author NUUN
- * @version 1.6.4
+ * @version 1.6.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_GaugeValueEX
@@ -479,17 +494,22 @@
  * 単体選択のスキル、アイテムの場合は対象がアクターなら味方のリミットゲージ、敵なら敵グループのリミットゲージが増減します。
  * 
  * スキル、アイテムのメモ欄
- * <LimitAttackStr:[eval]> 攻撃時にリミットゲージが増加します。
- * <LimitCriticalStr:[eval]> クリティカル時にリミットゲージが増加します。
+ * <LimitAttackStr:[eval]> このスキル、アイテムでの攻撃時にリミットゲージが増加します。攻撃成功時回復量はこちらの記述が適用されます。
+ * <LimitCriticalStr:[eval]> このスキル、アイテムでのクリティカル時にリミットゲージが増加します。クリティカル時の回復量はこちらの記述が適用されます。
+ * <LimitDamageStr:[eval]> このスキル、アイテムでのダメージ時にリミットゲージが増加します。攻撃成功時回復量はこちらの記述が適用されます。
  * [eval]:評価式
  * 
  * 評価式(JavaScript)
  * 被ダメージ時
- * a:被ダメージバトラーデータ　da：被ダメージバトラーデータベース　damage:ダメージ値 cri:クリティカル
+ * a:対象者ダメージバトラーデータ b:攻撃実行者 da:被ダメージバトラーデータベース damage:ダメージ値 cri:クリティカル
+ * rate::対象者属性耐性値
+ * 
  * 攻撃成功時、クリティカル時
- * a:攻撃者バトラーデータ　da：攻撃者バトラーデータベース cri:クリティカル成功
+ * a:攻撃実行者バトラーデータ da:攻撃実行者バトラーデータベース cri:クリティカル成功 target:対象者 rate:対象者属性耐性値
+ * 
  * 撃破時
- * a:撃破されたバトラーデータ　da：撃破されたバトラーデータベース
+ * a:撃破されたバトラーデータ da:撃破されたバトラーデータベース
+ * 
  * 
  * 設定例
  * Math.floor(25 * damage / a.mhp) ダメージ量に応じて最大25回復
@@ -506,6 +526,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/2 Ver.1.6.5
+ * 攻撃時の計算式に対象、属性耐性を使用できるように修正。
+ * ダメージ時の計算式に攻撃実行者、属性耐性を使用できるように修正。
  * 2024/8/22 Ver.1.6.4
  * リミットゲージ特定ゲージ非表示でバトル終了を選択時、リザルト終了後にゲージが表示されてしまう問題を修正。
  * 2024/8/20 Ver.1.6.3
@@ -998,15 +1021,52 @@ BattleManager.getLimitGaugeBattleEnd = function() {
 
 const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
 Game_Action.prototype.applyItemUserEffect = function(target) {
-  _Game_Action_applyItemUserEffect.call(this, target);
-  const item = this.item();
-  if (item.damage.type > 0) {
-    this.subject().chargeLimitByAttack(item, target.result().critical);
-  }
-  if (this.isLimitIncreaseItem()) {
-    target.limitIncreaseItem(this.subject(), item);
-    this.makeSuccess(target);
-  }
+    _Game_Action_applyItemUserEffect.call(this, target);
+    const item = this.item();
+    if (target.onDamageLimitEffect) {
+        this.chargeLimitByDamage(item, target);
+        target.onDamageLimitEffect = false;
+    }
+    if (item.damage.type > 0) {
+        this.chargeLimitByAttack(item, target);
+    }
+    if (this.isLimitIncreaseItem()) {hpDamag
+        target.limitIncreaseItem(this.subject(), item);
+        this.makeSuccess(target);
+    }
+};
+
+Game_Action.prototype.chargeLimitByDamage = function(item, target) {
+    const evalStr = item && item.meta.LimitDamageStr ? String(item.meta.LimitDamageStr) : DamageAmount;
+    if (evalStr) {
+        const result = target.result();
+        const a = target;
+        const b = this.subject();
+        const da = target.isActor() ? target.actor() : target.enemy();//データベース
+        const damage = result.hpDamage;//ダメージ
+        const cri = result.critical;//クリティカル
+        const rate = this.calcElementRate(target);
+        const val = Number(eval(evalStr));
+        target.chargeLimit(val);
+    }
+};
+
+Game_Action.prototype.chargeLimitByAttack = function(item, target) {
+    const a = this.subject();
+    const result = target.result();
+    if (result.critical) {
+        evalStr = item && item.meta.LimitCriticalStr ? String(item.meta.LimitCriticalStr) : CriticalAmount;
+    } else {
+        evalStr = item && item.meta.LimitAttackStr ? String(item.meta.LimitAttackStr) : AttackAmount;
+    }
+    if (evalStr) {
+        const da = a.isActor() ? a.actor() : a.enemy();//データベース
+        const damage = result.hpDamage;//ダメージ
+        const cri = result.critical;
+        const rate = this.calcElementRate(target);
+        const val = Number(eval(evalStr));
+        a.chargeLimit(val);
+    }
 };
 
 Game_Action.prototype.isLimitIncreaseItem = function() {
@@ -1059,41 +1119,42 @@ Game_BattlerBase.prototype.paySkillCost = function(skill) {
 
 const _Game_Battler_onDamage = Game_Battler.prototype.onDamage;
 Game_Battler.prototype.onDamage = function(value) {
-  _Game_Battler_onDamage.call(this, value);
-  this.chargeLimitByDamage(DamageAmount, value, this.result().critical);
+    _Game_Battler_onDamage.call(this, value);
+    this.onDamageLimitEffect = true;
+    //this.chargeLimitByDamage(DamageAmount, value, this.result().critical);
 };
 
-Game_Battler.prototype.chargeLimitByDamage = function(evalStr, damage, critical) {
-  if (evalStr) {
-    const a = this;
-    const da = this.isActor() ? this.actor() : this.enemy();
-    const cri = critical;
-    const val = Number(eval(evalStr));
-    this.chargeLimit(val);
-  }
+Game_Battler.prototype.chargeLimitByDamage = function(evalStr, damage, critical) {//旧
+    if (evalStr) {
+        const a = this;
+        const da = this.isActor() ? this.actor() : this.enemy();
+        const cri = critical;
+        const val = Number(eval(evalStr));
+        this.chargeLimit(val);
+    }
 };
 
-Game_Battler.prototype.chargeLimitByAttack = function(item, critical) {
+Game_Battler.prototype.chargeLimitByAttack = function(item, target) {//旧
     if (critical) {
         evalStr = item && item.meta.LimitCriticalStr ? String(item.meta.LimitCriticalStr) : CriticalAmount;
     } else {
         evalStr = item && item.meta.LimitAttackStr ? String(item.meta.LimitAttackStr) : AttackAmount;
     }
     if (evalStr) {
-      const a = this;
-      const da = this.isActor() ? this.actor() : this.enemy();
-      const cri = critical;
-      const val = Number(eval(evalStr));
-      this.chargeLimit(val);
+        const a = this;
+        const da = this.isActor() ? this.actor() : this.enemy();
+        const cri = target.result().critical;
+        const val = Number(eval(evalStr));
+        this.chargeLimit(val);
     }
-  };
+};
 
 Game_Actor.prototype.chargeLimit = function(value) {
-  this.setLimitGauge($gameParty.isPartyLimitValue() + value);
+  this.setLimitGauge($gameParty.isPartyLimitValue() + Math.floor(value));
 };
 
 Game_Enemy.prototype.chargeLimit = function(value) {
-  this.setLimitGauge($gameTroop.isPartyLimitValue() + value);
+  this.setLimitGauge($gameTroop.isPartyLimitValue() + Math.floor(value));
 };
 
 Game_Actor.prototype.setLimitGauge = function(value) {

@@ -1,5 +1,5 @@
 # [パーティリミットゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
-# Ver.1.6.4
+# Ver.1.6.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PartyLimitGauge.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -54,6 +54,9 @@ a:撃破されたバトラーデータ　da：撃破されたバトラーデー�
 色設定はテキストタブでカラーコードが入力できます。  
 
 ## 更新履歴
+2025/1/2 Ver.1.6.5  
+攻撃時の計算式に対象、属性耐性を使用できるように修正。  
+ダメージ時の計算式に攻撃実行者、属性耐性を使用できるように修正。  
 2024/8/22 Ver.1.6.4  
 リミットゲージ特定ゲージ非表示でバトル終了を選択時、リザルト終了後にゲージが表示されてしまう問題を修正。  
 2024/8/20 Ver.1.6.3  

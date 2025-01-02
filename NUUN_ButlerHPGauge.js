@@ -13,7 +13,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @base NUUN_BattlerOverlayBase
- * @version 1.7.6
+ * @version 1.7.7
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -63,6 +63,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/2 Ver.1.7.7
+ * 変身後のモンスターのゲージが非表示に設定されている場合、ゲージが表示がされたままになる問題を修正。
  * 2024/9/11 Ver.1.7.6
  * 特定のスクリプトを記入した場合、スタックエラーが起きる問題を修正。
  * 2023/11/4 Ver.1.7.5
@@ -410,18 +412,18 @@ const MaskValueName = String(parameters['MaskValueName'] || '????');
 let enemyHPGaugeLength = null;
 
 function getEnemyGaugePosition(troop) {
-  const pages = troop.pages[0];
-  list = [];
-  const re = /<(?:HPGaugePosition):\s*(.*)>/;
-  pages.list.forEach(tag => {
-    if (tag.code === 108 || tag.code === 408) {
-      let match = re.exec(tag.parameters[0]);
-      if (match) {
-        list.push(match[1].split(',').map(Number));
-      }
-    }
-  });
-  return list;
+    const pages = troop.pages[0];
+    list = [];
+    const re = /<(?:HPGaugePosition):\s*(.*)>/;
+    pages.list.forEach(tag => {
+        if (tag.code === 108 || tag.code === 408) {
+            let match = re.exec(tag.parameters[0]);
+            if (match) {
+                list.push(match[1].split(',').map(Number));
+            }
+        }
+    });
+    return list;
 };
 
 const _Sprite_Actor_update = Sprite_Actor.prototype.update;
@@ -443,6 +445,7 @@ Sprite_Battler.prototype.updateHpGauge = function() {
     if (this.battlerOverlay && !this._battlerHp) {
         this.createHPGauge();
     }
+
     this.setHpGaugePosition();
 };
 
@@ -582,6 +585,10 @@ Sprite_BattlerHPGauge.prototype.getHPVisible = function() {
     return ActorHPVisible;
 };
 
+Sprite_BattlerHPGauge.prototype.noHpGauge = function() {
+    return this._battler.isEnemy() ? this._battler.enemy().meta.NoHPGauge : false;
+};
+
 Sprite_BattlerHPGauge.prototype.setup = function(battler, type) {
     Sprite_Gauge.prototype.setup.call(this, battler, type);
     this.opacity = (this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect())) ? 255 : 0;
@@ -634,7 +641,7 @@ Sprite_BattlerHPGauge.prototype.gaugeVisible = function() {
 };
 
 Sprite_BattlerHPGauge.prototype.gaugeVisibleResult = function() {
-    return true;
+    return !this.noHpGauge();
 };
 
 Sprite_BattlerHPGauge.prototype.updateTargetValue = function(value, maxValue) {
@@ -718,7 +725,9 @@ Sprite_EnemyHPGauge.prototype.isVisibleValue = function() {
 };
 
 Sprite_EnemyHPGauge.prototype.gaugeVisibleResult = function() {
-    if (HPVisibleMode === 1) {
+    if (this.noHpGauge()) {
+        return false;
+    } else if (HPVisibleMode === 1) {
         const result = this.gaugeVisibleBattler();
         if (HPEnemyBookVisible === 0) {
         return result;

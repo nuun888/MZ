@@ -1,5 +1,5 @@
 # [バトラーMPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerMPGauge.js)
-# Ver.1.2.4
+# Ver.1.2.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattlerMPGauge.js)  
 #### 必須、前提プラグイン
 [バトラーオーバーレイベース](https://github.com/nuun888/MZ/blob/master/README/BattlerOverlayBase.md)  
@@ -68,6 +68,8 @@ this.enemy() 敵のデータベースデータ
 図鑑にモンスター情報が登録後にMPゲージを表示します。  
 
 ## 更新履歴
+2025/1/3 Ver.1.2.5  
+変身後のモンスターのゲージが非表示に設定されている場合、ゲージが表示がされたままになる問題を修正。  
 2023/8/3 Ver.1.2.4  
 一部のプラグインにてNoMPGaugeが機能していなかった問題を修正。  
 2023/7/7 Ver.1.2.3  

@@ -12,7 +12,7 @@
  * @plugindesc  バトラーMPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.2.4
+ * @version 1.2.5
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -60,6 +60,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/3 Ver.1.2.5
+ * 変身後のモンスターのゲージが非表示に設定されている場合、ゲージが表示がされたままになる問題を修正。
  * 2023/8/3 Ver.1.2.4
  * 一部のプラグインにてNoMPGaugeが機能していなかった問題を修正。
  * 2023/7/7 Ver.1.2.3
@@ -536,6 +538,10 @@ Sprite_BattlerMPGauge.prototype.getMPVisible = function() {
     return ActorMPVisible;
 };
 
+Sprite_BattlerMPGauge.prototype.noMpGauge = function() {
+    return this._battler.isEnemy() ? this._battler.enemy().meta.NoMPGauge : false;
+};
+
 Sprite_BattlerMPGauge.prototype.setup = function(battler, type) {
     Sprite_Gauge.prototype.setup.call(this, battler, type);
     this.opacity = (this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect())) ? 255 : 0;
@@ -588,7 +594,7 @@ Sprite_BattlerMPGauge.prototype.gaugeVisible = function() {
 };
 
 Sprite_BattlerMPGauge.prototype.gaugeVisibleResult = function() {
-    return true;
+    return !this.noMpGauge();
 };
 
 Sprite_BattlerMPGauge.prototype.updateTargetValue = function(value, maxValue) {
@@ -672,7 +678,9 @@ Sprite_EnemyMPGauge.prototype.isVisibleValue = function() {
 };
 
 Sprite_EnemyMPGauge.prototype.gaugeVisibleResult = function() {
-    if (MPVisibleMode === 1) {
+    if (this.noMpGauge()) {
+        return false;
+    } else if (MPVisibleMode === 1) {
         const result = this.gaugeVisibleBattler();
         if (MPEnemyBookVisible === 0) {
             return result;

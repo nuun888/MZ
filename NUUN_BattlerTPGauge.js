@@ -12,7 +12,7 @@
  * @plugindesc  バトラーTPゲージ
  * @author NUUN
  * @base NUUN_Base
- * @version 1.2.3
+ * @version 1.2.4
  * @orderAfter NUUN_Base
  * 
  * @help
@@ -59,6 +59,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/3 Ver.1.2.4
+ * 変身後のモンスターのゲージが非表示に設定されている場合、ゲージが表示がされたままになる問題を修正。
  * 2023/8/3 Ver.1.2.3
  * 一部のプラグインにてNoTPGaugeが機能していなかった問題を修正。
  * 2023/7/7 Ver.1.2.2
@@ -537,6 +539,10 @@ Sprite_BattlerTPGauge.prototype.getTPVisible = function() {
     return ActorTPVisible;
 };
 
+Sprite_BattlerTPGauge.prototype.noTpGauge = function() {
+    return this._battler.isEnemy() ? this._battler.enemy().meta.NoTPGauge : false;
+};
+
 Sprite_BattlerTPGauge.prototype.setup = function(battler, type) {
     Sprite_Gauge.prototype.setup.call(this, battler, type);
     this.opacity = (this.gaugeVisibleResult() && (this.gaugeVisibleInDamage() || this.gaugeVisibleInSelect())) ? 255 : 0;
@@ -589,7 +595,7 @@ Sprite_BattlerTPGauge.prototype.gaugeVisible = function() {
 };
 
 Sprite_BattlerTPGauge.prototype.gaugeVisibleResult = function() {
-    return true;
+    return !this.noTpGauge();
 };
 
 Sprite_BattlerTPGauge.prototype.updateTargetValue = function(value, maxValue) {
@@ -667,13 +673,17 @@ Sprite_EnemyTPGauge.prototype.isTPValueVisible = function() {
 Sprite_EnemyTPGauge.prototype.getTPVisible = function() {
     return TPVisible;
 };
+
+
   
 Sprite_EnemyTPGauge.prototype.isVisibleValue = function() {
     return this._battler._TPGaugeValueVisible && !this._battler._TPGaugeMask;
 };
 
 Sprite_EnemyTPGauge.prototype.gaugeVisibleResult = function() {
-    if (TPVisibleMode === 1) {
+    if (this.noTpGauge()) {
+        return false;
+    } else if (TPVisibleMode === 1) {
         const result = this.gaugeVisibleBattler();
         if (TPEnemyBookVisible === 0) {
             return result;

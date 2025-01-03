@@ -1,5 +1,5 @@
 # [オプション拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -72,11 +72,18 @@ Ver.1.0.2
 ### オプション拡張項目スタイル変更
 オプションの項目を選択式に変更します。  
 ![画像](img/OptionEx4.png)  
-[ダウンロード](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_3.js)Ver.1.0.0  
+[ダウンロード](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_3.js)Ver.1.0.1  
 難易度はトリアコンタン氏の難易度設定プラグインを使用した例となります。  
 クモ恐怖症は使用プラグインはありません。  
 
+2025/1/28 Ver.1.0.1  
+スイッチのタッチ操作が機能していなかった問題を修正。  
+
 ## 更新履歴
+2025/1/3 Ver.1.2.1  
+ローカルオプションの設定値がゲーム再起動後にリセットされてしまう問題を修正。    
+変数オプションの設定値が決定で2項目目までしか切り替わらない問題を修正。  
+キー設定、ゲームパッド以外の設定にリセットを追加。  
 2024/12/28 Ver.1.2.0  
 初期値を設定できる機能を追加。  
 キー設定時の特定のキーを無効にする設定を追加。  

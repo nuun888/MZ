@@ -1,5 +1,5 @@
 # [バトラー名前表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)
-# Ver.1.4.1  
+# Ver.1.4.2   
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerName.js)  
  
 ## 必須、前提プラグイン
@@ -12,6 +12,8 @@
 `<EnemyNameX:[position]>` モンスター名のX座標を調整します。（相対座標）  
 `<EnemyNameY:[position]>` モンスター名のY座標を調整します。（相対座標）  
 
+`<NoBattlerName>` 名前を表示しません。  
+
 #### バトルイベントの注釈(Comment)  
 `<EnemyNamePosition:[Id],[x],[y]>` 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）  
 `[Id]`:表示順番号  
@@ -20,6 +22,8 @@
 `[id]`は敵グループ設定で配置した順番のIDで指定します。配置ビューのモンスター画像の左上に番号が表示されますのでその番号を記入します。  
 
 ## 更新履歴
+2025/1/4 Ver.1.4.2  
+名前を非表示にする機能を追加。  
 2025/1/1 Ver.1.4.1  
 変身後でも名前が変身前のまま表示されていた問題を修正。  
 2023/6/2 Ver.1.4.0  

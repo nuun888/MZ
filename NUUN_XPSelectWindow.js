@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.2.1
+ * @version 1.3.0
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -39,6 +39,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/4 Ver.1.3.0
+ * 背景画像を表示する機能を追加。
  * 2024/12/17 Ver.1.2.1
  * 対象選択時にエラーが出る問題を修正。
  * 2024/9/8 Ver.1.2.0
@@ -82,29 +84,36 @@
  * @value 'under'
  * @default 'top'
  * 
+ * @param OriginPositionMode
+ * @text 背景基準位置
+ * @desc 背景の基準位置をUIに合わせます。
+ * @type boolean
+ * @default false
+ * 
+ * @param ActorSetting
+ * @text アクター設定
+ * @default ------------------------------
+ * 
  * @param ActorXPSelect
  * @desc アクター対象選択画面をXPスタイルに変更します。
  * @text アクター対象選択画面XP有効
  * @type boolean
  * @default true
- * 
- * @param EnemyXPSelect
- * @desc 敵キャラ対象選択画面をXPスタイルに変更します。
- * @text 敵キャラ対象選択画面XP有効
- * @type boolean
- * @default true
+ * @parent ActorSetting
  * 
  * @param ActorData
  * @text 表示アクターデータ
  * @desc 選択時に表示するアクターのデータを選択します。
  * @default ["{\"DateSelect\":\"Face\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"ActorName\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"152\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"288\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"State2\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"448\",\"Y_Coordinate\":\"-8\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"HpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"500\",\"Y_Coordinate\":\"6\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"MpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"640\",\"Y_Coordinate\":\"6\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}"]
  * @type struct<DataActorList>[]
+ * @parent ActorSetting
  * 
- * @param EnemyData
- * @text 表示敵キャラデータ
- * @desc 選択時に表示する敵キャラのデータを選択します。
- * @default ["{\"DateSelect\":\"EnemyName\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'center'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}"]
- * @type struct<DataEnemyList>[]
+ * @param ActorXPSelectWindowVisible
+ * @desc ウィンドウ画像を不透明化。背景指定時はOFFにしてください。
+ * @text ウィンドウ不透明化
+ * @type boolean
+ * @default true
+ * @parent ActorSetting
  * 
  * @param ActorSelect_X
  * @desc アクターコマンドウィンドウのX座標を指定します。
@@ -113,6 +122,7 @@
  * @default 0
  * @max 9999
  * @min -9999
+ * @parent ActorSetting
  * 
  * @param ActorSelect_Y
  * @desc アクターコマンドウィンドウのY座標を指定します。
@@ -121,6 +131,7 @@
  * @default 0
  * @max 9999
  * @min -9999
+ * @parent ActorSetting
  * 
  * @param ActorSelect_Width
  * @desc アクターコマンドウィンドウの横幅を指定します。0でUIサイズ 画面より大きい値にすると自動的に画面の横幅になります。
@@ -129,42 +140,133 @@
  * @default 0
  * @max 9999
  * @min 0
- * 
- * @param EnemySelect_X
- * @desc アクターコマンドウィンドウのX座標を指定します。
- * @text 敵キャラコマンドウィンドウX座標
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * 
- * @param EnemySelect_Y
- * @desc アクターコマンドウィンドウのY座標を指定します。
- * @text 敵キャラコマンドウィンドウY座標
- * @type number
- * @default 0
- * @max 9999
- * @min -9999
- * 
- * @param EnemySelect_Width
- * @desc アクターコマンドウィンドウの横幅を指定します。0でUIサイズ 画面より大きい値にすると自動的に画面の横幅になります。
- * @text 敵キャラコマンドウィンドウの横幅
- * @type number
- * @default 0
- * @max 9999
- * @min 0
- * 
- * @param EnemySelectdScrollSE
- * @desc 敵対象選択時のスクロールをしたときにカーソルSEをならします。
- * @text 敵対象スクロール時カーソルSE_ON
- * @type boolean
- * @default true
+ * @parent ActorSetting
  * 
  * @param ActorSelectionHelpWindowHide
  * @desc 味方対象選択時のヘルプウィンドウの表示。
  * @text 味方対象選択時ヘルプウィンドウの表示
  * @type boolean
  * @default false
+ * @parent ActorSetting
+ * 
+ * @param ActorBackGroundImgSetting
+ * @text 味方対象選択時背景設定
+ * @default ------------------------------
+ * 
+ * @param ActorBackGroundImg
+ * @desc 味方対象味方対象選択時の背景画像ファイル名を指定します。
+ * @text 味方対象背景画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ActorBackGroundImgSetting
+ * 
+ * @param ActorBackGroundImg_X
+ * @desc 背景画像のX座標を指定します。
+ * @text 背景画像X座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent ActorBackGroundImgSetting
+ * 
+ * @param ActorBackGroundImg_Y
+ * @desc 背景画像のY座標を指定します。
+ * @text 背景画像Y座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent ActorBackGroundImgSetting
+ * 
+ * @param EnemySetting
+ * @text 敵キャラ設定
+ * @default ------------------------------
+ * 
+ * @param EnemyXPSelect
+ * @desc 敵キャラ対象選択画面をXPスタイルに変更します。
+ * @text 敵キャラ対象選択画面XP有効
+ * @type boolean
+ * @default true
+ * @parent EnemySetting
+ * 
+ * @param EnemyData
+ * @text 表示敵キャラデータ
+ * @desc 選択時に表示する敵キャラのデータを選択します。
+ * @default ["{\"DateSelect\":\"EnemyName\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"0\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'center'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Decimal\":\"0\",\"TextMethod\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}"]
+ * @type struct<DataEnemyList>[]
+ * @parent EnemySetting
+ * 
+ * @param EnemyXPSelectWindowVisible
+ * @desc ウィンドウ画像を不透明化。背景指定時はOFFにしてください。
+ * @text ウィンドウ不透明化
+ * @type boolean
+ * @default true
+ * @parent EnemySetting
+ * 
+ * @param EnemySelect_X
+ * @desc 敵キャラコマンドウィンドウのX座標を指定します。
+ * @text 敵キャラコマンドウィンドウX座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent EnemySetting
+ * 
+ * @param EnemySelect_Y
+ * @desc 敵キャラコマンドウィンドウのY座標を指定します。
+ * @text 敵キャラコマンドウィンドウY座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent EnemySetting
+ * 
+ * @param EnemySelect_Width
+ * @desc 敵キャラコマンドウィンドウの横幅を指定します。0でUIサイズ 画面より大きい値にすると自動的に画面の横幅になります。
+ * @text 敵キャラコマンドウィンドウの横幅
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min 0
+ * @parent EnemySetting
+ * 
+ * @param EnemySelectdScrollSE
+ * @desc 敵対象選択時のスクロールをしたときにカーソルSEをならします。
+ * @text 敵対象スクロール時カーソルSE_ON
+ * @type boolean
+ * @default true
+ * @parent EnemySetting
+ * 
+ * @param EnemyBackGroundImgSetting
+ * @text 味方対象選択時背景設定
+ * @default ------------------------------
+ * 
+ * @param EnemyBackGroundImg
+ * @desc 敵対象味方対象選択時の背景画像ファイル名を指定します。
+ * @text 敵対象背景画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent EnemyBackGroundImgSetting
+ * 
+ * @param EnemyBackGroundImg_X
+ * @desc 背景画像のX座標を指定します。
+ * @text 背景画像X座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent EnemyBackGroundImgSetting
+ * 
+ * @param EnemyBackGroundImg_Y
+ * @desc 背景画像のY座標を指定します。
+ * @text 背景画像Y座標
+ * @type number
+ * @default 0
+ * @max 9999
+ * @min -9999
+ * @parent EnemyBackGroundImgSetting
  * 
  * @param ActorPictureSetting
  * @text 立ち絵、顔グラ表示EX設定
@@ -819,6 +921,7 @@ const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
 Scene_Battle.prototype.createAllWindows = function() {
     _Scene_Battle_createAllWindows.apply(this, arguments);
     if (params.EnemyXPSelect) {
+        this.createEnemySelectBackground();
         this.createSelectEnemyWindow();
     }
 };
@@ -827,6 +930,7 @@ const _Scene_Battle_createActorWindow = Scene_Battle.prototype.createActorWindow
 Scene_Battle.prototype.createActorWindow = function() {
     _Scene_Battle_createActorWindow.apply(this, arguments);
     if (params.ActorXPSelect) {
+        this.createActorSelectBackground();
         this.createSelectActorWindow();
     }
 };
@@ -842,15 +946,29 @@ Scene_Battle.prototype.createEnemyWindow = function() {
 Scene_Battle.prototype.createSelectActorWindow = function() {
     const rect = this.actorSelectWindowRect();
     this._actorSelectWindow = new Window_BattleSelectBattler(rect);
-    this.addWindow(this._actorSelectWindow);
+    if (!!this._actorSelectBackground && !NuunManager.styleData) {
+        this.addChild(this._actorSelectWindow);
+        this._actorSelectWindow.x += ((Graphics.width - Graphics.boxWidth) / 2);
+        this._actorSelectWindow.y += ((Graphics.height - Graphics.boxHeight) / 2);
+    } else {
+        this.addWindow(this._actorSelectWindow);
+    }
     this._actorWindow.setActorSelectWindow(this._actorSelectWindow);
+    this._actorSelectWindow.opacity = params.ActorXPSelectWindowVisible ? 255 : 0;
 };
 
 Scene_Battle.prototype.createSelectEnemyWindow = function() {
     const rect = this.enemySelectWindowRect();
     this._enemySelectWindow = new Window_BattleSelectEnemy(rect);
-    this.addWindow(this._enemySelectWindow);
+    if (!!this._enemySelectBackground && !NuunManager.styleData) {
+        this.addChild(this._enemySelectWindow);
+        this._enemySelectWindow.x += ((Graphics.width - Graphics.boxWidth) / 2);
+        this._enemySelectWindow.y += ((Graphics.height - Graphics.boxHeight) / 2);
+    } else {
+        this.addWindow(this._enemySelectWindow);
+    }
     this._enemyWindow.setEnemySelectWindow(this._enemySelectWindow);
+    this._enemySelectWindow.opacity = params.EnmeyXPSelectWindowVisible ? 255 : 0;
 };
 
 Scene_Battle.prototype.actorSelectWindowRect = function() {
@@ -891,6 +1009,30 @@ Scene_Battle.prototype.XPEnemySelectY = function() {
     }
 };
 
+Scene_Battle.prototype.createActorSelectBackground = function() {
+    if (params.ActorBackGroundImg) {
+        const bitmap = ImageManager.nuun_LoadPictures(params.ActorBackGroundImg);
+        const sprite = new Sprite(bitmap);
+        const base = NuunManager.styleData ? this._battleHudBack : this;
+        base.addChild(sprite);
+        this._actorSelectBackground = sprite;
+        sprite.hide();
+        this.setXpSelectBackGround(sprite, (params.ActorBackGroundImg_X || 0), (params.ActorBackGroundImg_Y || 0));
+    }
+};
+
+Scene_Battle.prototype.createEnemySelectBackground = function() {
+    if (params.EnemyBackGroundImg) {
+        const bitmap = ImageManager.nuun_LoadPictures(params.EnemyBackGroundImg);
+        const sprite = new Sprite(bitmap);
+        const base = NuunManager.styleData ? this._battleHudBack : this;
+        base.addChild(sprite);
+        this._enemySelectBackground = sprite;
+        sprite.hide();
+        this.setXpSelectBackGround(sprite, (params.EnemyBackGroundImg_X || 0), (params.EnemyBackGroundImg_Y || 0));
+    }
+};
+
 const _Scene_Battle_startEnemySelection = Scene_Battle.prototype.startEnemySelection;
 Scene_Battle.prototype.startEnemySelection = function() {
     _Scene_Battle_startEnemySelection.apply(this, arguments);
@@ -900,6 +1042,9 @@ Scene_Battle.prototype.startEnemySelection = function() {
         this._statusWindow.show();
         this._enemySelectWindow.show();
         this._enemySelectWindow.open();
+        if (!!this._enemySelectBackground) {
+            this._enemySelectBackground.show();
+        }
     }
 };
 
@@ -912,6 +1057,16 @@ Scene_Battle.prototype.startActorSelection = function() {
         if (params.ActorSelectionHelpWindowHide) {
             this._helpWindow.hide();
         }
+        if (!!this._actorSelectBackground) {
+            this._actorSelectBackground.show();
+        }
+    }
+};
+
+Scene_Battle.prototype.setXpSelectBackGround = function(sprite, x, y) {
+    if (params.OriginPositionMode) {
+        sprite.x = ((Graphics.width - (Graphics.boxWidth + 8)) / 2) + x;
+        sprite.y = ((Graphics.height - (Graphics.boxHeight + 8)) / 2) + y;
     }
 };
 
@@ -920,6 +1075,9 @@ Scene_Battle.prototype.onEnemyOk = function() {
     _Scene_Battle_onEnemyOk.apply(this, arguments);
     if (params.EnemyXPSelect) {
         this._enemySelectWindow.close();
+        if (!!this._enemySelectBackground) {
+            this._enemySelectBackground.hide();
+        }
     }
 };
 
@@ -928,6 +1086,9 @@ Scene_Battle.prototype.onEnemyCancel = function() {
     _Scene_Battle_onEnemyCancel.apply(this, arguments);
     if (params.EnemyXPSelect) {
         this._enemySelectWindow.close();
+        if (!!this._enemySelectBackground) {
+            this._enemySelectBackground.hide();
+        }
     }
 };
 
@@ -936,6 +1097,9 @@ Scene_Battle.prototype.onActorOk = function() {
     _Scene_Battle_onActorOk.apply(this, arguments);
     if (params.ActorXPSelect) {
         this._actorSelectWindow.close();
+        if (!!this._actorSelectBackground) {
+            this._actorSelectBackground.hide();
+        }
     }
 };
 
@@ -947,6 +1111,9 @@ Scene_Battle.prototype.onActorCancel = function() {
         if (params.ActorSelectionHelpWindowHide) {
             this._helpWindow.show();
         }
+        if (!!this._actorSelectBackground) {
+            this._actorSelectBackground.hide();
+        }
     }
 };
 
@@ -956,10 +1123,16 @@ Scene_Battle.prototype.hideSubInputWindows = function() {
     if (params.ActorXPSelect) {
         this._actorSelectWindow.deactivate();
         this._actorSelectWindow.hide();
+        if (!!this._actorSelectBackground) {
+            this._actorSelectBackground.hide();
+        }
     }
     if (params.EnemyXPSelect) {
         this._enemySelectWindow.deactivate();
         this._enemySelectWindow.hide();
+        if (!!this._enemySelectBackground) {
+            this._enemySelectBackground.hide();
+        }
     }
 };
 

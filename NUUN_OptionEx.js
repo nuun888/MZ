@@ -471,6 +471,7 @@
  * @option "gamePadVibration"
  * @option "startUpFullScreen"
  * @option "masterVolume"
+ * @option "reset"
  * @default 
  * 
  * @param OptionHidden

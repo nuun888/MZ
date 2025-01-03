@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  バトラー名前表示
  * @author NUUN
- * @version 1.4.1
+ * @version 1.4.2
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -21,6 +21,8 @@
  * 敵キャラまたはアクターのメモ欄
  * <EnemyNameX:[position]> モンスター名のX座標を調整します。（相対座標）
  * <EnemyNameY:[position]> モンスター名のY座標を調整します。（相対座標）
+ * 
+ * <NoBattlerName> 名前を表示しません。
  * 
  * バトルイベントの注釈
  * <EnemyNamePosition:[Id],[x],[y]> 敵グループの[Id]番目のモンスターのゲージの位置を調整します。（相対座標）
@@ -36,6 +38,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/4 Ver.1.4.2
+ * 名前を非表示にする機能を追加。
  * 2025/1/1 Ver.1.4.1
  * 変身後でも名前が変身前のまま表示されていた問題を修正。
  * 2023/6/2 Ver.1.4.0
@@ -253,7 +257,7 @@ Sprite_Enemy.prototype.update = function() {
 };
 
 Sprite_Battler.prototype.updateBattlerName = function() {
-    if (!this._battler || this.noBattlerNamePosition()) {
+    if (!this._battler || this.noBattlerNamePosition() || this.noBattlerName()) {
         return;
     }
     if (this.battlerOverlay && !this.nameSprite) {
@@ -268,6 +272,14 @@ Sprite_Enemy.prototype.noBattlerNamePosition = function() {
 
 Sprite_Actor.prototype.noBattlerNamePosition = function() {
     return (this._battler.isEnemy() ? EnemyNamePosition : ActorNamePosition) < 0;
+};
+
+Sprite_Actor.prototype.noBattlerName = function() {
+    return this._battler.isEnemy() ? this._battler.enemy().meta.NoBattlerName : false;
+};
+
+Sprite_Enemy.prototype.noBattlerName = function() {
+    return this._enemy.enemy().meta.NoBattlerName;
 };
 
 Sprite_Enemy.prototype.setBattlerNamePosition = function() {
@@ -373,6 +385,9 @@ Sprite_BattlerName.prototype.redraw = function() {
 };
 
 Sprite_BattlerName.prototype.battlerNameVisible = function() {
+    if (!this.battlerNameVisibleResult()) {
+        return this.visible = false;
+    }
     const _visible = this.battlerNameVisibleInSelect();
     if (_visible && this.opacity < 255) {
         this.opacity += 25;
@@ -386,6 +401,7 @@ Sprite_BattlerName.prototype.battlerNameVisible = function() {
     } else {
         this.visible = false;
     }
+    
 };
 
 Sprite_BattlerName.prototype.battlerNameVisibleInSelect = function() {
@@ -403,6 +419,15 @@ Sprite_BattlerName.prototype.update = function() {
 Sprite_BattlerName.prototype.getBattlerNameVisible = function() {
     return ActorNameVisible;
 };
+
+Sprite_BattlerName.prototype.battlerNameVisibleResult = function() {
+    return !this.noBattlerName();
+};
+
+Sprite_BattlerName.prototype.noBattlerName = function() {
+    return this._battler.isEnemy() ? this._battler.enemy().meta.NoBattlerName : false;
+};
+
 
 function Sprite_EnemyName() {
   this.initialize(...arguments);

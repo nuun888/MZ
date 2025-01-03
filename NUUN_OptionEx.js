@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/3/2025 Ver.1.2.1
+ * Fixed an issue where local option settings would be reset after restarting the game.
+ * Fixed an issue where variable option settings would only change up to the second item when confirmed.
+ * Added reset function to settings other than key settings and gamepad.
  * 12/28/2024 Ver.1.2.0
  * Added a function to set initial values.
  * Added a setting to disable specific keys when configuring keys.
@@ -652,7 +656,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * オプション画面を拡張します。
@@ -665,6 +669,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/3 Ver.1.2.1
+ * ローカルオプションの設定値がゲーム再起動後にリセットされてしまう問題を修正。
+ * 変数オプションの設定値が決定で2項目目までしか切り替わらない問題を修正。
+ * キー設定、ゲームパッド以外の設定にリセットを追加。
  * 2024/12/28 Ver.1.2.0
  * 初期値を設定できる機能を追加。
  * キー設定時の特定のキーを無効にする設定を追加。
@@ -1107,6 +1115,7 @@
  * @option "gamePadVibration"
  * @option "startUpFullScreen"
  * @option "masterVolume"
+ * @option "reset"
  * @default 
  * 
  * @param OptionHidden
@@ -1563,6 +1572,8 @@ Imported.NUUN_OptionEx = true;
         for (const data of list.OptionsData) {
             if ((!data.OptionHidden || eval(data.OptionHidden)) && this.isShowGlobalConfig(data)) {
                 this.addCommand(data.OptionName, data.OptionSymbol, true, data);
+            } else if (this.isResetSymbol(data.OptionSymbol)) {
+                this.addCommand(data.OptionName, data.OptionSymbol, true, data);
             }
         }
     };
@@ -1575,10 +1586,21 @@ Imported.NUUN_OptionEx = true;
         return data && (data.Var > 0 || data.Switch > 0) && data.GlobalConfigData;
     };
 
+    Window_Options.prototype.isResetSymbol = function(symbol) {
+        return symbol === "reset";
+    };
+
     const _Window_Options_processOk = Window_Options.prototype.processOk;
     Window_Options.prototype.processOk = function() {
+        const index = this.index();
+        const symbol = this.commandSymbol(index);
+        const data = this.getExtData(symbol);
         if (this.isKeyConfig() || this.isGamePadConfig()) {
             this.setupKey();
+        } else if (this.isReset(this.index())) {
+            this.resetConfig();
+        } else if (data && data.Var > 0) {
+            this.changeValue(symbol, true);
         } else {
             _Window_Options_processOk.apply(this, arguments);
         }
@@ -1643,6 +1665,21 @@ Imported.NUUN_OptionEx = true;
         }
     };
 
+    Window_Options.prototype.resetConfig = function() {
+        const list = params.CommandOptions.find(category => this._category === category.OptionCommandSymbol);
+        if (!list.OptionsData) {
+            this.playBuzzerSound();
+            return;
+        }
+        for (const data of list.OptionsData) {
+            if (data.OptionSymbol && this.isShowGlobalConfig(data)) {
+                this.changeValue(data.OptionSymbol, ConfigManager.defaultConfig[data.OptionSymbol]);
+            }
+        }
+        this.refresh();
+        _playResetSound(params.ResetPlaySe)
+    };
+
     Window_Options.prototype.setupKey = function() {
         if (this.isReset(this.index())) {
             this.resetKey();
@@ -1683,9 +1720,19 @@ Imported.NUUN_OptionEx = true;
             this.drawKeyConfig(index);
         } else if (this.isGamePadConfig()) {
             this.drawGamePadConfig(index);
+        } else if (this.isReset(index)) {
+            this.drawReset(index);
         } else {
             _Window_Options_drawItem.apply(this, arguments);
         }
+    };
+
+    Window_Options.prototype.drawReset = function(index) {
+        const title = this.commandName(index);
+        const rect = this.itemLineRect(index);
+        this.resetTextColor();
+        this.changePaintOpacity(this.isCommandEnabled(index));
+        this.drawText(title || this.resetText(), rect.x, rect.y, rect.width, "center");
     };
 
     Window_Options.prototype.drawKeyConfig = function(index) {
@@ -1748,13 +1795,13 @@ Imported.NUUN_OptionEx = true;
     };
 
     Window_Options.prototype.changeVariables = function(data, symbol, value) {
-        let varValue = $gameVariables.value(data.Var);
+        let varValue = this.getConfigValueEx(symbol, data);
         if (Number.isInteger(value)) {
             varValue = value;
         } else {
             varValue += value ? 1 : -1;
         }
-        varValue = varValue >= data.OptionsStringList.length ? 0 : varValue.clamp(0, data.OptionsStringList.length - 1);
+        varValue = varValue.clamp(0, data.OptionsStringList.length - 1);
         $gameVariables.setValue(data.Var, varValue);
         return varValue;
     };
@@ -1774,8 +1821,8 @@ Imported.NUUN_OptionEx = true;
     const _Window_Options_statusText = Window_Options.prototype.statusText;
     Window_Options.prototype.statusText = function(index) {
         const symbol = this.commandSymbol(index);
-        const value = this.getConfigValue(symbol);
         const data = this.getExtData(symbol);
+        const value = this.getConfigValueEx(symbol, data);
         this.setTempdata(data);
         if (data && data.Var > 0) {
             return this.variablesStatusText(data, value);
@@ -1784,6 +1831,20 @@ Imported.NUUN_OptionEx = true;
         } else {
             return _Window_Options_statusText.apply(this, arguments);
         }
+    };
+
+    Window_Options.prototype.getConfigValueEx = function(symbol, data) {
+        if (data && data.Var > 0) {
+            return data.GlobalConfigData ? this.getConfigValue(symbol) : ConfigManager.readVariablesValue(true, data, (data.InitValue || 0));
+        } else if (data && data.Switch > 0) {
+            return data.GlobalConfigData ? this.getConfigValue(symbol) : ConfigManager.readSwitchesValue(true, data, (data.InitValue || 0));
+        } else {
+            return this.getConfigValue(symbol);
+        }
+    };
+
+    Window_Options.prototype.resetText = function() {
+        return $gameSystem.isJapanese() ? "リセット" : "reset";
     };
 
     Window_Options.prototype.setTempdata = function(data) {
@@ -1954,8 +2015,8 @@ Imported.NUUN_OptionEx = true;
 
     const _ConfigManager_load = ConfigManager.load;
     ConfigManager.load = function() {
-        this.applyDataEx();
         _ConfigManager_load.apply(this, arguments);
+        this.initApplyDataEx();
     };
 
     const _ConfigManager_makeData = ConfigManager.makeData;
@@ -2010,8 +2071,13 @@ Imported.NUUN_OptionEx = true;
         this.applyDataEx(config);
     };
 
+    ConfigManager.initApplyDataEx = function() {
+        this.applyDataEx();
+        this.setDefaultConfig();
+    };
+
     ConfigManager.applyDataEx = function(config) {
-        this.applyOptionsData(config, params.InitValueThisPlugin);
+        this.applyOptionsData(config, params.InitValueThisPlugin, false);
         this.applyKeyConfig(config);
         this.applyGamePadConfig(config);
     };
@@ -2027,7 +2093,7 @@ Imported.NUUN_OptionEx = true;
                     } else if (mode && data.OptionSymbol.includes("Volume")) {
                         this[data.OptionSymbol] = !!config ? this.readVolume(config, data, (data.InitValue || 100)) : (data.InitValue || 100);
                     } else if (mode) {
-                        this[data.OptionSymbol] = !!config ? this.readFlag(config, data, (!!data.InitValue || false)) : (!!data.InitValue || false);
+                        this[data.OptionSymbol] = !!config ? this.readFlag(config, data.OptionSymbol, (!!data.InitValue || false)) : (!!data.InitValue || false);
                     }
                 });
             }
@@ -2084,6 +2150,28 @@ Imported.NUUN_OptionEx = true;
                 gamepadMapper[code] = key;
             }
         }
+    };
+
+    ConfigManager.setDefaultConfig = function() {
+        const config = this.getConfigData();
+        this.applyData({});
+        this.defaultConfig = {}
+        for (const name in config) {
+            this.defaultConfig[name] = this[name];
+            this[name] = config[name];
+        }
+    };
+
+    ConfigManager.getConfigData = function() {
+        const config = {};
+        params.CommandOptions.forEach(optionList => {
+            if (optionList.OptionsData) {
+                optionList.OptionsData.forEach(data => {
+                    config[data.OptionSymbol] = this[data.OptionSymbol];
+                });
+            }
+        });
+        return config;
     };
 
     ConfigManager.setDefaultMapper = function() {

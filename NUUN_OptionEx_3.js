@@ -15,7 +15,7 @@
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Change the option items to selection type.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/3/2024 Ver.1.0.1
+ * Fixed an issue where touch controls on switches were not working.
  * 12/28/2024 Ver.1.0.0
  * First edition.
  * 
@@ -45,7 +47,7 @@
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * オプションの項目を選択式に変更します。
@@ -55,6 +57,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/28 Ver.1.0.1
+ * スイッチのタッチ操作が機能していなかった問題を修正。
  * 2024/12/28 Ver.1.0.0
  * 初版
  * 
@@ -77,7 +81,7 @@ Imported.NUUN_OptionEx_3 = true;
 
     Window_Options.prototype.drawItemBackground = function(index) {
         const symbol = this.commandSymbol(index);
-        if (this.isVolumeSymbol(symbol) || this.isKeyConfig() || this.isGamePadConfig()) {
+        if (this.isVolumeSymbol(symbol) || this.isKeyConfig() || this.isGamePadConfig() || this.isResetSymbol(symbol)) {
             Window_Selectable.prototype.drawItemBackground.apply(this, arguments);
             return;
         }
@@ -92,10 +96,12 @@ Imported.NUUN_OptionEx_3 = true;
     Window_Options.prototype.drawItem = function(index) {
         if (this.isKeyConfig() || this.isGamePadConfig()) {
             _Window_Options_drawItem.apply(this, arguments);
+        } else if (this.isReset(index)) {
+            this.drawReset(index);
         } else {
             const symbol = this.commandSymbol(index);
             const data = this.getExtData(symbol);
-            if (this.isVolumeSymbol(symbol)) {
+            if (this.isVolumeSymbol(symbol) || this.isResetSymbol(symbol)) {
                 _Window_Options_drawItem.apply(this, arguments);
             } else if (data && data.Var > 0) {
                 this.drawItemOptionVar(data, index);
@@ -111,7 +117,7 @@ Imported.NUUN_OptionEx_3 = true;
         const title = this.commandName(index);
         const rect = this.itemLineRect(index);
         const symbol = this.commandSymbol(index);
-        const value = this.getConfigValue(symbol);
+        const value = this.getConfigValueEx(symbol, data);
         this.resetTextColor();
         this.changePaintOpacity(this.isCommandEnabled(index));
         this.drawText(title, rect.x, rect.y, this.titleWidth(), "left");
@@ -128,7 +134,7 @@ Imported.NUUN_OptionEx_3 = true;
         const title = this.commandName(index);
         const rect = this.itemLineRect(index);
         const symbol = this.commandSymbol(index);
-        const value = this.getConfigValue(symbol);
+        const value = this.getConfigValueEx(symbol, data);
         this.resetTextColor();
         this.changePaintOpacity(this.isCommandEnabled(index));
         this.drawText(title, rect.x, rect.y, this.titleWidth(), "left");
@@ -146,7 +152,7 @@ Imported.NUUN_OptionEx_3 = true;
         const title = this.commandName(index);
         const rect = this.itemLineRect(index);
         const symbol = this.commandSymbol(index);
-        const value = this.getConfigValue(symbol) || 0;
+        const value = this.getConfigValueEx(symbol, data) || 0;
         this.resetTextColor();
         this.changePaintOpacity(this.isCommandEnabled(index));
         this.drawText(title, rect.x, rect.y, this.titleWidth(), "left");
@@ -209,14 +215,14 @@ Imported.NUUN_OptionEx_3 = true;
     Window_Options.prototype.optionValueTouch = function() {
         if (this.isKeyConfig() || this.isGamePadConfig()) return false;
         const symbol = this.commandSymbol(this.index());
-        if (this.isVolumeSymbol(symbol)) return false;
+        if (this.isVolumeSymbol(symbol) || symbol === "reset") return false;
         const data = this.getExtData(symbol);
         const index = this.optionContentsTouchIndex(data);
         if (index >= 0) {
             if (data && data.Var > 0) {
                 this.changeValue(symbol, index);
             } else if (data && data.Switch > 0) {
-                this.changeSwitches(data, symbol, index > 0);
+                this.changeValue(symbol, index > 0);
             } else {
                 this.changeValue(symbol, index > 0);
             }

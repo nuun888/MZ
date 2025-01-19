@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.1
+ * @version 2.22.2
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/19/2025 Ver.2.22.2
+ * Fixed an issue where pressing the Confirm key during Analyze would cause the key to become unresponsive.
+ * Fixed an issue where the monster information page would not display during battle.
  * 12/7/2024 Ver.2.22.1
  * Added a process to determine the encyclopedia mode during battle.
  * 10/14/2024 Ver.2.22.0
@@ -3046,7 +3049,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.1
+ * @version 2.22.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3267,6 +3270,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/19 Ver.2.22.2
+ * アナライズ時に決定キーを押すと、キーが反応しなくなる問題を修正。
+ * 戦闘時のモンスター情報のページが表示されない問題を修正。
  * 2024/12/7 Ver.2.22.1
  * 戦闘中の図鑑のモードを判定する処理を追加。
  * 2024/10/14 Ver.2.22.0
@@ -8072,14 +8078,18 @@ Scene_Battle.prototype.onEnemyActual = function() {
     } else {
         this._enemyBookActualSprite.showActualEnemy();
     }
-    if (this._enemyBookIndexWindow.visible) {
-        this._enemyBookIndexWindow.activate();
-        this._enemyBookPageWindow.activate();
-    } else if (this._enemyBookInfoIndexWindow.visible) {
-        this._enemyBookInfoIndexWindow.activate();
-        this._enemyInfoPageWindow.activate();
-    } else if (this._analyzePageWindow.visible) {
-        this._analyzePageWindow.activate();
+    switch (_bookMode) {
+        case 'book':
+            this._enemyBookIndexWindow.activate();
+            this._enemyBookPageWindow.activate();
+            break;
+        case 'info':
+            this._enemyBookInfoIndexWindow.activate();
+            this._enemyInfoPageWindow.activate();
+            break;
+        case 'analyze':
+            this._analyzePageWindow.activate();
+            break;
     }
 };
 
@@ -8151,7 +8161,7 @@ Scene_Battle.prototype.analyzePageWindowRect = function() {
 
 Scene_Battle.prototype.enemyBookWindowRect = function() {
     const wx = WindowMode === 0 ? this.enemyBookIndexWidth() : 0;
-    const wy = this.enemyBookMainAreaTop();
+    const wy = this.enemyBookMainAreaTop() + (this.isPageWindowsShow() ? this._enemyBookPageWindow.height : 0);
     const ww = this.enemyBookWindowWidth();
     const wh = Math.min(Graphics.boxHeight, Graphics.boxHeight - wy);
     return new Rectangle(wx, wy, ww, wh);
@@ -8479,9 +8489,9 @@ Scene_Battle.prototype.setEnemyBookEnemyAnalyze = function(target, analyzeDate) 
 Scene_Battle.prototype.setupAnalyzeRect = function(data) {
     const rect = this.analyzeWindowRect();
     const pageRect = this.analyzePageWindowRect();
-    this._analyzePageWindow.y = pageRect.y - (this.pageWindowsShowMode(data) ? 0 : this._analyzePageWindow.height + pageRect.y) + this.enemyBookWindowUi_Y() - (Graphics.height - Graphics.boxHeight) / 2;
+    this._analyzePageWindow.y = pageRect.y - (this.pageWindowsShowMode(data) ? 0 : this._analyzePageWindow.height + pageRect.y) + this.enemyBookWindowUi_Y();
     this._analyzeEnemyWindow.y = rect.y + (this.pageWindowsShowMode(data) ? this._analyzePageWindow.height : 0) + this.enemyBookWindowUi_Y();
-    this._analyzeEnemyWindow.height = rect.height - (this.pageWindowsShowMode(data) ? this._analyzePageWindow.height : 0)
+    this._analyzeEnemyWindow.height = rect.height - (this.pageWindowsShowMode(data) ? this._analyzePageWindow.height : 0);
 };
 
 Scene_Battle.prototype.commandEnemyBook = function() {

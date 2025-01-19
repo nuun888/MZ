@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.22.1
+# Ver.2.22.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -286,6 +286,9 @@ PgUp PgDnキー：モンスターページ送り
 `_ctbWindow`: NRP_VisualTurn  
 
 ## 更新履歴
+2025/1/19 Ver.2.22.2  
+アナライズ時に決定キーを押すと、キーが反応しなくなる問題を修正。  
+戦闘時のモンスター情報のページが表示されない問題を修正。  
 2024/12/7 Ver.2.22.1  
 戦闘中の図鑑のモードを判定する処理を追加。  
 2024/10/14 Ver.2.22.0  

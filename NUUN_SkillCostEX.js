@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill cost EX
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * 
  * @help
  * You can set various costs for skill costs.
@@ -96,6 +96,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/26/2025 Ver.1.3.3
+ * Fixed an issue where if you had enabled incapacitation due to consumption when consuming HP cost, you couldn't use skills with a cost higher than the current HP.
+ * Fixed an issue where enemy graphics would remain displayed when you were incapacitated due to consuming HP cost.
  * 1/13/2024 Ver.1.3.2
  * Supported SkillCostRateCustomize so that it functions other than MP and TP.
  * 7/23/2023 Ver.1.3.1
@@ -126,7 +129,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.3.2
+ * @version 1.3.3
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -211,6 +214,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/26 Ver.1.3.3
+ * HPコスト消費時で消費による戦闘不能を有効にした場合で、現在のHPを超えるコストを持つスキルを使用できない問題を修正。
+ * HPコスト消費で戦闘不能になった場合、敵のグラフィックが表示されたままになる問題を修正。
  * 2024/1/13 Ver.1.3.2
  * スキルコスト倍率調整プラグインでMP、TP以外でも機能するように対応。
  * 2023/7/23 Ver.1.3.1
@@ -365,7 +371,7 @@ Game_BattlerBase.prototype.canPaySkillCost = function(skill) {
 Game_BattlerBase.prototype.canSkillHpCost = function(skill) {
     const cost = this.skillHpCost(skill);
     if (skill.meta.HPCostDead) {
-        return this._hp >= cost;
+        return true;
     } else {
         return this._hp > cost || cost === 0;
     }
@@ -447,9 +453,11 @@ Game_BattlerBase.prototype.paySkillMpTpCost = function(skill) {
     _Game_BattlerBase_paySkillCost.call(this, skill);
     if (mp > this._mp && this.isNoConsumptionRate(1)) {
         this._mp = mp;
+        this._mp = this._mp.clamp(0, this.mmp);
     }
     if (tp > this._tp && this.isNoConsumptionRate(2)) {
         this._tp = tp;
+        this._tp = this._tp.clamp(0, this.maxTp());
     }
 };
 
@@ -457,7 +465,12 @@ Game_BattlerBase.prototype.paySkillHpCost = function(skill) {
     const cost = this.skillHpCost(skill);
     if (cost > 0 && !this.isNoConsumptionRate(3)) {
         this._hp -= cost;
+        this._hp = this._hp.clamp(0, this.mhp);
+        if (this.hp === 0) {
+            this.addState(this.deathStateId());
+        }
     }
+    this._payCostKill = this.hp === 0;
 };
 
 Game_BattlerBase.prototype.paySkillGoldCost = function(skill) {
@@ -560,6 +573,22 @@ Game_BattlerBase.prototype.getTraitNoConsumptionRate = function(id) {
 
 Game_BattlerBase.prototype.isNoConsumptionRate = function(id) {
     return Math.randomInt(100) < this.getTraitNoConsumptionRate(id);
+};
+
+Game_BattlerBase.prototype.isPayCostKill = function() {
+    return this._payCostKill;
+};
+
+const _Window_BattleLog_endAction = Window_BattleLog.prototype.endAction;
+Window_BattleLog.prototype.endAction = function(subject) {
+    _Window_BattleLog_endAction.apply(this, arguments);
+    this.displayPayCostKill(subject);
+};
+
+Window_BattleLog.prototype.displayPayCostKill = function(subject) {
+    if (subject.isPayCostKill() && subject.isEnemy()) {
+        this.push("performCollapse", subject);
+    }
 };
 
 

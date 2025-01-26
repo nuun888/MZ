@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.3.2
+# Ver.1.3.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)  
 [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md)  
 
@@ -81,6 +81,9 @@ Gold:Gold
 経験値:Exp  
 
 ## 更新履歴
+2025/1/26 Ver.1.3.3  
+HPコスト消費時で消費による戦闘不能を有効にした場合で、現在のHPを超えるコストを持つスキルを使用できない問題を修正。  
+HPコスト消費で戦闘不能になった場合、敵のグラフィックが表示されたままになる問題を修正。  
 2024/1/13 Ver.1.3.2  
 スキルコスト倍率調整プラグインでMP、TP以外でも機能するように対応。  
 2023/7/23 Ver.1.3.1  

@@ -1,10 +1,10 @@
 # [ステート横並び表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
-# Ver.1.5.9
+# Ver.2.0.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateIconSideBySide.js)
 
 戦闘中に表示するステートを横並び表示にします。  
 総ステート数が表示できる個数を超えた場合はアイコンが切り替わります。  
-このプラグインには残りターンを表示する機能が備わっているため、ステート、バフ残りターン表示プラグインとの併用はできません。  
+Ver.2以降、ターンの表示はNUUN_StateTurnが必要になりました。  
 
 ![画像](img/StateIconSideBySide1.png)  
 
@@ -14,17 +14,20 @@
 'elapsed'指定時はターン数補正を-1に設定してください。  
 経過ターンを表示させるには[ステート経過ターンカウント](https://github.com/nuun888/MZ/blob/master/README/StateTurnCount.md)プラグインが必要です。  
 
-#### ターンの文字色
+#### ターンの文字色(Ver.1まで)
 ステートのメモ欄  
 `<BatState>`  このタグがあるステートは不利なステートになります。よって不利ステート、デバフターンの色が適用されます。  
 上記タグがないステートは有利ステート、バフターンの色が適用されます。  
 
+#### 座標設定
 ステートアイコンの座標を変更するプラグインを使用している場合は、味方アイコン表示位置座標の設定をデフォルトにしてください。  
 
 ## 競合情報
 MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
+2025/1/29 Ver.2.0.0  
+システムのリファクタリング  
 2024/11/10 Ver.1.5.9  
 再修正。  
 2024/11/9 Ver.1.5.8  

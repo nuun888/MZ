@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.8
+ * @version 1.1.9
  * 
  * @help
  * Show remaining turns on the state icon.
@@ -31,6 +31,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/29/2025 Ver.1.1.9
+ * Compatible with "NUUN_StateIconSideBySide" Ver.2.0.0.
  * 11/10/2024 Ver.1.1.8
  * Re-corrected.
  * 11/9/2024 Ver.1.1.7
@@ -129,7 +131,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.8
+ * @version 1.1.9
  * 
  * @help
  * ステートアイコンに残りターンを表示します。
@@ -148,6 +150,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/29 Ver.1.1.9
+ * ステート横並び表示Ver.2.0.0での対応。
  * 2024/11/10 Ver.1.1.8
  * 再修正。
  * 2024/11/9 Ver.1.1.7
@@ -274,6 +278,10 @@ Imported.NUUN_StateTurn = true;
     const _Sprite_StateIcon_updateIcon = Sprite_StateIcon.prototype.updateIcon;
     Sprite_StateIcon.prototype.updateIcon = function() {
         _Sprite_StateIcon_updateIcon.call(this);
+        this.updateTurn(this._animationIndex);
+    };
+
+    Sprite_StateIcon.prototype.updateTurn = function(index) {
         const icons = [];
         let turns = [];
         if (this.shouldDisplay()) {
@@ -284,12 +292,13 @@ Imported.NUUN_StateTurn = true;
                 turns = this._battler.allStateTurns();
             }
         }
-        this.createStateIcons(icons, turns);
+        this.createStateIcons(icons, turns, index);
     };
 
-    Sprite_StateIcon.prototype.createStateIcons = function(icons, turns) {
-        const state = turns[this._animationIndex];
-        this._stateBuffTurns = state && state.turn > 0 ? turns[this._animationIndex].turn : 0;
+
+    Sprite_StateIcon.prototype.createStateIcons = function(icons, turns, index) {
+        const state = turns[index];
+        this._stateBuffTurns = state && state.turn > 0 ? turns[index].turn : 0;
         this._trunTextColor = state && state.bad ? BadTurnColor : TurnColor;
     };
 

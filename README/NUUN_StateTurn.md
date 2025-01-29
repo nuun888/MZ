@@ -1,5 +1,5 @@
 # [ステート、バフ残りターン表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
-# Ver.1.1.8
+# Ver.1.1.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StateTurn.js)
 
 #### 必須、前提プラグイン
@@ -25,6 +25,8 @@
 MOG_BattleHudには対応しておりません。  
 
 ## 更新履歴
+2025/1/29 Ver.1.1.9  
+ステート横並び表示Ver.2.0.0での対応。  
 2024/11/10 Ver.1.1.8  
 再修正。  
 2024/11/9 Ver.1.1.7  

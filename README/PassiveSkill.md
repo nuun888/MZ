@@ -84,6 +84,10 @@ Ver.1.5.5まで条件モードの説明が逆に表記されていました。
 
 パッシブスキルが適用された武器のステータス、特徴が適用されます。  
 
+### 競合
+NRP_TraitsPlusへの特徴適用  
+[NRP_TraitsPlus能力値特徴適用](https://github.com/nuun888/MZ/blob/master/README/TraitsPlusNuunTraitObjects.md)  
+
 ## 更新履歴
 2024/8/31 Ver.1.5.8  
 装備タイプの防具が機能していなかった問題を修正。  

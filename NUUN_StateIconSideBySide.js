@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  State side-by-side display
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_StateTurn
@@ -28,6 +28,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/30/2025 Ver.2.0.1
+ * Fixed an issue where an error would occur when starting a battle.
  * 1/29/2025 Ver.2.0.0
  * Re-corrected.
  * 1/2/2021 Ver.1.0.0
@@ -111,6 +113,22 @@
  * @default 'auto'
  * @parent ActorStateIcon
  * 
+ * @param ActorStateIconX
+ * @desc Party state X coordinate (relative).
+ * @text Party state X coordinate (relative).
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorStateIcon
+ * 
+ * @param ActorStateIconY
+ * @desc Party state Y coordinate (relative).
+ * @text Party state Y coordinate (relative).
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorStateIcon
+ * 
  * 
  * @param EnemyStateIcon
  * @text Enemy state icon
@@ -162,7 +180,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_StateTurn
@@ -180,6 +198,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/30 Ver.2.0.1
+ * 戦闘開始時にエラーが出る問題を修正。
  * 2025/1/29 Ver.2.0.0
  * システムのリファクタリング
  * 2021/1/2 Ver.1.0.0
@@ -263,6 +283,22 @@
  * @default 'auto'
  * @parent ActorStateIcon
  * 
+ * @param ActorStateIconX
+ * @desc 味方のステートX座標(相対)。
+ * @text 味方ステートX座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorStateIcon
+ * 
+ * @param ActorStateIconY
+ * @desc 味方のステートYY座標(相対)。
+ * @text 味方ステートY座標(相対)
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ActorStateIcon
+ * 
  * 
  * @param EnemyStateIcon
  * @text 敵ステートアイコン
@@ -320,6 +356,14 @@ Imported.NUUN_StateIconSideBySide = true;
     Sprite_Enemy.prototype.initMembers = function() {
         NuunManager.isEnemyStateIconMode = true;
         _Sprite_Enemy_initMembers.call(this);
+    };
+
+    Sprite_StateIcon.prototype.move = function(x, y) {
+        Sprite.prototype.move.call(this, x + params.ActorStateIconX, y + params.ActorStateIconY);
+    };
+
+    Sprite_SideBySideStateIcon.prototype.move = function(x, y) {
+        Sprite.prototype.move.apply(this, arguments);
     };
 
     const _Sprite_StateIcon_initMembers = Sprite_StateIcon.prototype.initMembers;
@@ -531,8 +575,9 @@ Imported.NUUN_StateIconSideBySide = true;
                 iconWidth = ImageManager.iconWidth;
             }
         }
-        this.x = this.stateIconDisplay(iconWidth, iconNum.clamp(0, cols), iconIndex, cols);
-        this.y = (ImageManager.iconHeight + (params.StateHeightInterval || 0)) * Math.floor(this._spriteIndex / cols);
+        const x = this.stateIconDisplay(iconWidth, iconNum.clamp(0, cols), iconIndex, cols);
+        const y = (ImageManager.iconHeight + (params.StateHeightInterval || 0)) * Math.floor(this._spriteIndex / cols);
+        this.move(x, y);
     };
     
     Sprite_SideBySideStateIcon.prototype.stateIconDisplay = function(width, iconlength, index, cols) {
@@ -585,7 +630,7 @@ Imported.NUUN_StateIconSideBySide = true;
     const _Window_BattleStatus_stateIconX = Window_BattleStatus.prototype.stateIconX;
     Window_BattleStatus.prototype.stateIconX = function(rect) {
         let mode = params.ActorStateIconPosition;
-        if (ActorStateIconPosition === 'auto') {
+        if (params.ActorStateIconPosition === 'auto') {
             mode = params.ActorStateIconAlign;
         }
         if (mode=== 'center') {

@@ -49,6 +49,10 @@ SetBonusタグがある装備が装備されており、条件を満たしてい
 
 ![画像](img/SetBonusEquip1.png)  
 
+### 競合
+NRP_TraitsPlusへの特徴適用  
+[NRP_TraitsPlus能力値特徴適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TraitsPlusNuunTraitObjects.js)  
+
 ## 更新履歴
 2023/3/18 Ver.1.3.5  
 無効なIDを指定したときに処理しないように修正。  

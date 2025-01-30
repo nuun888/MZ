@@ -343,9 +343,10 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | 競合対策、他作プラグイン対応　　　　　 | プラグイン　プラグイン数3　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | ゲージ、名前疑似３Dバトル併用パッチ | [NUUN_ButlerGaugeNameIn3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ButlerGaugeNameIn3DBattle.js) |  | 1.0.0 |
-| バトルスタイル拡張疑似３Dバトル併用パッチ | [NUUN_BattleStyleEXInMPP_Pseudo3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEXInMPP_Pseudo3DBattle.js) |  | 1.1.0 |
-| [バトルスタイル拡張スピードスターバトル併用](https://github.com/nuun888/MZ/blob/master/README/BSEX_Animation_KK_SSBattle.md) | [NUUN_BSEX_Animation_KK_SSBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BSEX_Animation_KK_SSBattle.js) |  | 1.0.0 |
+| 旧版バトルスタイル拡張疑似３Dバトル併用パッチ | [NUUN_BattleStyleEXInMPP_Pseudo3DBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleStyleEXInMPP_Pseudo3DBattle.js) |  | 1.1.0 |
+| [旧版バトルスタイル拡張スピードスターバトル併用](https://github.com/nuun888/MZ/blob/master/README/BSEX_Animation_KK_SSBattle.md) | [NUUN_BSEX_Animation_KK_SSBattle](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BSEX_Animation_KK_SSBattle.js) |  | 1.0.0 |
 | [経験値ゲージ](https://github.com/nuun888/MZ/blob/master/README/ExpGauge.md) | [NUUN_ExpGauge](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ExpGauge.js) |  | 1.0.1 |
+| [NRP_TraitsPlus能力値特徴適用](https://github.com/nuun888/MZ/blob/master/README/TraitsPlusNuunTraitObjects.md) | [NUUN_TraitsPlusNuunTraitObjects](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TraitsPlusNuunTraitObjects.js) |  | 1.0.1 |
 |  |  |  |  |
 |  |  |  |  |
 

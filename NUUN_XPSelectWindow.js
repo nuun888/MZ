@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -39,6 +39,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/2 Ver.1.3.1
+ * 敵のウィンドウの透明度が適用されていなかった問題を修正。
+ * ウィンドウ開閉時のアニメーションの有効無効化する機能を追加。
  * 2025/1/4 Ver.1.3.0
  * 背景画像を表示する機能を追加。
  * 2024/12/17 Ver.1.2.1
@@ -89,6 +92,12 @@
  * @desc 背景の基準位置をUIに合わせます。
  * @type boolean
  * @default false
+ * 
+ * @param OpenAnimation
+ * @desc ウィンドウ開閉時のアニメーションを有効にします。
+ * @text ウィンドウ開閉時のアニメーション有効
+ * @type boolean
+ * @default true
  * 
  * @param ActorSetting
  * @text アクター設定
@@ -968,7 +977,7 @@ Scene_Battle.prototype.createSelectEnemyWindow = function() {
         this.addWindow(this._enemySelectWindow);
     }
     this._enemyWindow.setEnemySelectWindow(this._enemySelectWindow);
-    this._enemySelectWindow.opacity = params.EnmeyXPSelectWindowVisible ? 255 : 0;
+    this._enemySelectWindow.opacity = params.EnemyXPSelectWindowVisible ? 255 : 0;
 };
 
 Scene_Battle.prototype.actorSelectWindowRect = function() {
@@ -1040,8 +1049,7 @@ Scene_Battle.prototype.startEnemySelection = function() {
         this._skillWindow.hide();
         this._itemWindow.hide();
         this._statusWindow.show();
-        this._enemySelectWindow.show();
-        this._enemySelectWindow.open();
+        this.openSelectWindow(this._enemySelectWindow);
         if (!!this._enemySelectBackground) {
             this._enemySelectBackground.show();
         }
@@ -1052,8 +1060,7 @@ const _Scene_Battle_startActorSelection = Scene_Battle.prototype.startActorSelec
 Scene_Battle.prototype.startActorSelection = function() {
     _Scene_Battle_startActorSelection.apply(this, arguments);
     if (params.ActorXPSelect) {
-        this._actorSelectWindow.show();
-        this._actorSelectWindow.open();
+        this.openSelectWindow(this._actorSelectWindow);
         if (params.ActorSelectionHelpWindowHide) {
             this._helpWindow.hide();
         }
@@ -1074,7 +1081,7 @@ const _Scene_Battle_onEnemyOk = Scene_Battle.prototype.onEnemyOk;
 Scene_Battle.prototype.onEnemyOk = function() {
     _Scene_Battle_onEnemyOk.apply(this, arguments);
     if (params.EnemyXPSelect) {
-        this._enemySelectWindow.close();
+        this.closeSelectWindow(this._enemySelectWindow);
         if (!!this._enemySelectBackground) {
             this._enemySelectBackground.hide();
         }
@@ -1085,7 +1092,7 @@ const _Scene_Battle_onEnemyCancel = Scene_Battle.prototype.onEnemyCancel;
 Scene_Battle.prototype.onEnemyCancel = function() {
     _Scene_Battle_onEnemyCancel.apply(this, arguments);
     if (params.EnemyXPSelect) {
-        this._enemySelectWindow.close();
+        this.closeSelectWindow(this._enemySelectWindow);
         if (!!this._enemySelectBackground) {
             this._enemySelectBackground.hide();
         }
@@ -1096,7 +1103,7 @@ const _Scene_Battle_onActorOk = Scene_Battle.prototype.onActorOk;
 Scene_Battle.prototype.onActorOk = function() {
     _Scene_Battle_onActorOk.apply(this, arguments);
     if (params.ActorXPSelect) {
-        this._actorSelectWindow.close();
+        this.closeSelectWindow(this._actorSelectWindow);
         if (!!this._actorSelectBackground) {
             this._actorSelectBackground.hide();
         }
@@ -1107,7 +1114,7 @@ const _Scene_Battle_onActorCancel  =Scene_Battle.prototype.onActorCancel;
 Scene_Battle.prototype.onActorCancel = function() {
     _Scene_Battle_onActorCancel.apply(this, arguments);
     if (params.ActorXPSelect) {
-        this._actorSelectWindow.close();
+        this.closeSelectWindow(this._actorSelectWindow);
         if (params.ActorSelectionHelpWindowHide) {
             this._helpWindow.show();
         }
@@ -1136,6 +1143,21 @@ Scene_Battle.prototype.hideSubInputWindows = function() {
     }
 };
 
+Scene_Battle.prototype.openSelectWindow = function(selectWindow) {
+    selectWindow.show();
+    if (params.OpenAnimation) {
+        selectWindow.open();
+    }
+};
+
+Scene_Battle.prototype.closeSelectWindow = function(selectWindow) {
+    if (params.OpenAnimation) {
+        selectWindow.close();
+    } else {
+        selectWindow.hide();
+    }
+};
+
 
 Window_Selectable.prototype.setActorSelectWindow = function(actorSelectWindow) {
     this.selectActorWindow = actorSelectWindow;
@@ -1156,7 +1178,7 @@ Window_BattleSelectBattler.prototype.constructor = Window_BattleSelectBattler;
 Window_BattleSelectBattler.prototype.initialize = function(rect) {
     this.createData();
     Window_StatusBase.prototype.initialize.call(this, rect);
-    this.openness = 0;
+    this.openness = params.OpenAnimation ? 0 : 255;
     this._battler = null;
     this.targetSelect = null;
 };

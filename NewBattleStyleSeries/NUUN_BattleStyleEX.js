@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.16
+ * @version 1.0.17
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/1/2025 Ver.1.0.17
+ * Fixed an issue where the Actor Commands item would not display when scrolling.
  * 12/21/2024 Ver.1.0.16
  * Fixed an issue that caused an error when selecting an ally target.
  * 12/21/2024 Ver.1.0.15
@@ -1973,7 +1975,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.16
+ * @version 1.0.17
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2043,6 +2045,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/1 Ver.1.0.17
+ * スクロールを行うとアクターコマンドの項目が表示されない問題を修正。
  * 2024/12/21 Ver.1.0.16
  * 味方の対象選択時にエラーが出る問題を修正。
  * 2024/12/21 Ver.1.0.15
@@ -5984,7 +5988,7 @@ Imported.NUUN_BattleStyleEX = true;
     };
     
     Window_PartyCommand.prototype.maxCols = function() {;
-        return NuunManager.styleData.isPartyCommandMode() ? NuunManager.styleData.getPartyCommandMaxCol() : Math.min((this._list ? this.maxItems() : NuunManager.styleData.getPartyCommandMaxCol()), NuunManager.styleData.getPartyCommandMaxCol());
+        return (NuunManager.styleData.isPartyCommandMode() ? NuunManager.styleData.getPartyCommandMaxCol() : Math.min((this._list ? this.maxItems() : NuunManager.styleData.getPartyCommandMaxCol()), NuunManager.styleData.getPartyCommandMaxCol())) || 1;
     };
 
     const _Window_PartyCommand_itemRect = Window_PartyCommand.prototype.itemRect;
@@ -6028,12 +6032,14 @@ Imported.NUUN_BattleStyleEX = true;
 
     const _Window_ActorCommand_paint = Window_ActorCommand.prototype.paint;
     Window_ActorCommand.prototype.paint = function() {
-        this.setCommandHeight();
+        if (this.contents) {
+            this.setCommandHeight();
+        }
         _Window_ActorCommand_paint.apply(this, arguments);
     };
 
     Window_ActorCommand.prototype.maxCols = function() {
-        return NuunManager.styleData.isActorCommandMode() ? NuunManager.styleData.getActorCommandMaxCol() : Math.min((this._list ? this.maxItems() : NuunManager.styleData.getActorCommandMaxCol()), NuunManager.styleData.getActorCommandMaxCol());
+        return (NuunManager.styleData.isActorCommandMode() ? NuunManager.styleData.getActorCommandMaxCol() : Math.min((this._list ? this.maxItems() : NuunManager.styleData.getActorCommandMaxCol()), NuunManager.styleData.getActorCommandMaxCol())) || 1;
     };
 
     Window_ActorCommand.prototype.setCommandHeight = function() {

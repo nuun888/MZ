@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.6
+ * @version 1.1.7
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/2/2025 Ver.1.1.7
+ * Fixed enemy name display.
  * 12/21/2024 Ver.1.1.6
  * Processing fixes.
  * 9/28/2024 Ver.1.1.5
@@ -131,7 +133,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.6
+ * @version 1.1.7
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -142,6 +144,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/2 Ver.1.1.7
+ * 敵の名前の表示を修正。
  * 2024/12/21 Ver.1.1.6
  * 処理の修正。
  * 2024/9/28 Ver.1.1.5
@@ -767,7 +771,7 @@ Imported.NUUN_MenuParamListBase = true;
             w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
             this.nuun_SetContentsFontFace(data);
             w.changeTextColor(ColorManager.hpColor(enemy));
-            w.drawText(enemy.enemy().name, x, y, width, data.Align);
+            w.drawText(enemy.name(), x, y, width, data.Align);
         }
     
         nuun_DrawContentsNickname(data, x, y, width, actor) {

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/2/2025 Ver.1.2.3
+ * Fixed an issue where the cursor would not become active even if any key was set when the maximum key setting was set to 1.
+ * Fixed a bug that prevented cancellation when no key was set.
  * 2/1/2025 Ver.1.2.2
  * Added the ability to specify the maximum number of key settings.
  * 1/3/2025 Ver.1.2.1
@@ -629,6 +632,12 @@
  * @option "reset"
  * @default 
  * 
+ * @param OptionNotSetValid
+ * @text Not set Valid
+ * @desc Enables unset key.
+ * @type boolean
+ * @default false
+ * 
  * 
  */
 /*~struct~PlaySe:
@@ -667,7 +676,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * オプション画面を拡張します。
@@ -680,6 +689,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/2 Ver.1.2.3
+ * キーの最大設定を1に設定したときに、任意のキーを設定してもカーソルがアクティブ状態にならない問題を修正。
+ * キーの設定されていない時にキャンセル出来ないように修正。
  * 2025/2/1 Ver.1.2.2
  * キーの最大設定数を指定できる機能を追加。
  * 2025/1/3 Ver.1.2.1
@@ -1284,6 +1296,11 @@
  * @option "reset"
  * @default 
  * 
+ * @param OptionNotSetValid
+ * @text 未設定有効
+ * @desc キーの未設定を有効にします。
+ * @type boolean
+ * @default false
  * 
  */
 /*~struct~PlaySe:ja
@@ -1579,7 +1596,7 @@ Imported.NUUN_OptionEx = true;
 
     Window_Options.prototype.commandOptionsKeyConfig = function(list) {
         for (const data of params.KeyConfigData) {
-            this.addCommand(data.OptionName, data.OptionSymbol);
+            this.addCommand(data.OptionName, data.OptionSymbol, true, data.OptionNotSetValid);
         }
     };
 
@@ -1942,6 +1959,10 @@ Imported.NUUN_OptionEx = true;
         const symbol = this.commandSymbol(this.index());
         const list = _getKeyCodeList(symbol);
         if (keyMapper[code] === "escape" || keyMapper[code] === "cancel") {
+            if (!this.getExtData(symbol) && _getKeyCodeList(symbol)[0] === -1) {//現状キーが設定されていなければ戻れない仕様
+                this.playBuzzerSound();
+                return;
+            }
             SoundManager.playCancel();
             this.activate();
             return;
@@ -1962,7 +1983,8 @@ Imported.NUUN_OptionEx = true;
         }
         this.redrawItem(this.findSymbol(symbol));
         this.playOkSound();
-        if (_getKeyCodeList(symbol).length > 1) {
+        const keyCodeList = _getKeyCodeList(symbol);
+        if (this.getExtData(symbol) || keyCodeList.length > 1 || keyCodeList[0] >= 0) {
             this.setKeyConfigValue(symbol, code);
             this.setupKeyMode = false;
             this.activate();

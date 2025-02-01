@@ -1,5 +1,5 @@
 # [オプション拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)
-# Ver.1.2.1
+# Ver.1.2.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -92,6 +92,8 @@ Ver.1.0.2
 マスターボリューム設定プラグイン、オプションデフォルト値設定プラグインはこのプラグインよりも上に設定してください。  
 
 ## 更新履歴
+2025/2/1 Ver.1.2.2  
+キーの最大設定数を指定できる機能を追加。  
 2025/1/3 Ver.1.2.1  
 ローカルオプションの設定値がゲーム再起動後にリセットされてしまう問題を修正。    
 変数オプションの設定値が決定で2項目目までしか切り替わらない問題を修正。  

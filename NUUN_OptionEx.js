@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/1/2025 Ver.1.2.2
+ * Added the ability to specify the maximum number of key settings.
  * 1/3/2025 Ver.1.2.1
  * Fixed an issue where local option settings would be reset after restarting the game.
  * Fixed an issue where variable option settings would only change up to the second item when confirmed.
@@ -379,6 +381,14 @@
  * @default false
  * @parent KeyConfigSetting
  * 
+ * @param KeyMaxNum
+ * @text Max number of keys
+ * @desc Specifies the max number of settings for the key. 0 for unlimited
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent KeyConfigSetting
+ * 
  * @param GamePadConfigSetting
  * @text Gamepad Settings
  * @default ------------------------------
@@ -657,7 +667,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * オプション画面を拡張します。
@@ -670,6 +680,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/1 Ver.1.2.2
+ * キーの最大設定数を指定できる機能を追加。
  * 2025/1/3 Ver.1.2.1
  * ローカルオプションの設定値がゲーム再起動後にリセットされてしまう問題を修正。
  * 変数オプションの設定値が決定で2項目目までしか切り替わらない問題を修正。
@@ -1022,6 +1034,14 @@
  * @desc キーコンフィグ設定選択時にオプションウィンドウを消去します。
  * @type boolean
  * @default false
+ * @parent KeyConfigSetting
+ * 
+ * @param KeyMaxNum
+ * @text キー最大設定数
+ * @desc キーに最大設定数を指定します。0で無制限
+ * @type number
+ * @default 0
+ * @min 0
  * @parent KeyConfigSetting
  * 
  * @param GamePadConfigSetting
@@ -1929,12 +1949,11 @@ Imported.NUUN_OptionEx = true;
         if (Input._currentState[symbol]) {
             Input._currentState[symbol] = false;
         }
-        if (!!keyMapper[code] || this.isInvalidKey(code)) {
-            this.playBuzzerSound();
-            return;
-        }
         if (code === 46) {
             keyMapper[list[this._configIndex]] = "";
+        } else if (!!keyMapper[code] || this.isInvalidKey(code)) {
+            this.playBuzzerSound();
+            return;
         } else if (list[this._configIndex] < 0) {
             keyMapper[code] = symbol;
         } else {
@@ -2210,13 +2229,16 @@ Imported.NUUN_OptionEx = true;
 
     function _getKeyCodeList(symbol) {
         const keyList = [];
+        const keyMaxNum = params.KeyMaxNum > 0 ? params.KeyMaxNum : Infinity;
         for (const name in keyMapper) {
             if (keyMapper[name] === symbol) {
                 keyList.push(Number(name));
             }
         }
-        keyList.push(-1);
-        return keyList;
+        if (keyList.length < keyMaxNum) {
+            keyList.push(-1);
+        }
+        return keyList.slice(0, keyMaxNum);
     };
 
     function _getGamePadCodeList(symbol) {

@@ -1,5 +1,5 @@
 # [XP風対象選択ウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)
-# Ver.1.3.0
+# Ver.1.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js)  
 
 ## 必須、前提プラグイン
@@ -18,6 +18,9 @@
 ![画像](img/XPSelectWindow3.png)  
 
 ## 更新履歴
+2025/2/2 Ver.1.3.1  
+敵のウィンドウの透明度が適用されていなかった問題を修正。  
+ウィンドウ開閉時のアニメーションの有効無効化する機能を追加。  
 2025/1/4 Ver.1.3.0  
 背景画像を表示する機能を追加。  
 2024/12/17 Ver.1.2.1  

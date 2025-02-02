@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル、アイテム
  * @author NUUN
- * @version 1.5.1
+ * @version 1.5.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -116,6 +116,8 @@
  * 
  * 
  * 更新履歴
+ * 2025/2/2 Ver 1.5.2
+ * ポップアップの処理の修正。
  * 2024/9/7 Ver 1.5.1
  * 盗める回数を指定できる機能を追加。
  * メンバーの所持金がない場合のメッセージを表示できるように修正。
@@ -918,6 +920,7 @@ Imported.NUUN_StealableItems = true;
             result.iconIndex = 0;
         }
         result.text = stealMode(type);
+        result.type = type;
         this.stealResult.push(result);
     };
 
@@ -935,6 +938,7 @@ Imported.NUUN_StealableItems = true;
         }
         result.id = 0;
         result.text = stealMode(type);
+        result.type = type;
         this.stealResult.push(result);
     };
 
@@ -949,8 +953,11 @@ Imported.NUUN_StealableItems = true;
     Window_BattleLog.prototype.setDisplaySteal = function(subject, target) {
         const result = subject.result();
         _stealText = [];
-        result.stealResult.forEach(steal => {
+        result.stealResult.forEach(steal => {console.log(steal)
             _stealText.push(steal.text.format(subject.name(), target.name(), steal.name));
+            if ((Imported.NUUN_popUp || Imported.NUUN_PopupEx) && steal.name) {
+                this.stealPopup(target, steal);
+            }
         })
     };
 
@@ -965,9 +972,6 @@ Imported.NUUN_StealableItems = true;
     Window_BattleLog.prototype.displaySteal = function(target) {
         _stealText.forEach(text => {
             this.push("addText", text);
-            if (Imported.NUUN_popUp && steal.name) {
-                this.stealPopup(target, steal);
-            }
             this.push("pushBaseLine");
         });
     };

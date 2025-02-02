@@ -1,5 +1,5 @@
 # [バウンドポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LateralBoundPopUp.js)
-# Ver.1.1.2
+# Ver.1.1.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LateralBoundPopUp.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)
@@ -9,6 +9,8 @@
 ![gif](img/LateralBoundPopUp.gif)  
  
 ## 更新履歴 
+2025/2/2 Ver.1.1.3  
+競合が起きる可能性がある処理を修正。  
 2022/12/5 Ver.1.1.2  
 ポップアッププラグイン更新による定義修正。  
 2022/12/4 Ver.1.1.1  

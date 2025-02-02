@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Bound popup
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @orderBefore BattleEffectPopup
  * 
  * @help
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/2/2025 Ver.1.1.3
+ * Fixed a possible conflict.
  * 12/5/2022 Ver.1.1.2
  * Definition correction by "NUUN_popUp" update.
  * 12/4/2022 Ver.1.1.1
@@ -97,7 +99,7 @@
  * @target MZ
  * @plugindesc バウンドポップアップ
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @orderBefore BattleEffectPopup
  * 
  * @help
@@ -113,6 +115,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/2 Ver.1.1.3
+ * 競合が起きる可能性がある処理を修正。
  * 2022/12/5 Ver.1.1.2
  * ポップアッププラグイン更新による定義修正。
  * 2022/12/4 Ver.1.1.1
@@ -203,7 +207,9 @@ function LateralBoundPupupSprite(className) {
 const _Sprite_Battler_createDamageSprite = Sprite_Battler.prototype.createDamageSprite;
 Sprite_Battler.prototype.createDamageSprite = function() {
     _Sprite_Battler_createDamageSprite.call(this);
-    this._damages[this._damages.length - 1].setupPosition(this.x + this.damageOffsetX(), this.y + this.damageOffsetY());
+    if (this._damages[this._damages.length - 1]) {
+        this._damages[this._damages.length - 1].setupPosition(this.x + this.damageOffsetX(), this.y + this.damageOffsetY());
+    }
 };
 
 

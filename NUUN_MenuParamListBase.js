@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.7
+ * @version 1.1.8
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/8/2025 Ver.1.1.8
+ * Fixed an issue that could cause an error when viewing side view actors.
  * 2/2/2025 Ver.1.1.7
  * Fixed enemy name display.
  * 12/21/2024 Ver.1.1.6
@@ -133,7 +135,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.7
+ * @version 1.1.8
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -144,6 +146,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/8 Ver.1.1.8
+ * サイドビューアクターを表示するときにエラーが出る問題を修正。
  * 2025/2/2 Ver.1.1.7
  * 敵の名前の表示を修正。
  * 2024/12/21 Ver.1.1.6
@@ -1364,7 +1368,7 @@ Imported.NUUN_MenuParamListBase = true;
             }
         }
     
-        nuun_DrawSvActorImg(data, x, y, width, actor, fmt) {
+        nuun_drawSvActorImg(data, x, y, width, actor, fmt) {
             const key = fmt.format(actor.actorId());
             const sprite = this._window.createInnerSprite(key, Sprite_MenuSvActor);
             sprite.setup(actor, data);

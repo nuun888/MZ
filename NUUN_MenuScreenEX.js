@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.11
+ * @version 3.1.12
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/11/2025 Ver.3.1.12
+ * Fixed an issue where an error would occur when the status window display position was set to the right or bottom of the screen.
  * 10/12/2024 Ver.3.1.11
  * Added processing to accommodate gauge loop processing.
  * 10/06/2024 Ver.3.1.10
@@ -1433,6 +1435,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/11 Ver.3.1.12
+ * ステータスウィンドウの表示位置を右及び画面下に設定した場合にエラーが出る問題を修正。
  * 2024/10/12 Ver.3.1.11
  * ゲージループ処理に対応させる処理を追加。
  * 2024/10/6 Ver.3.1.10
@@ -2785,7 +2789,7 @@ Imported.NUUN_MenuScreenEX = true;
             case 'left':
                 return this._menuLayout.MenuStatusX + (this.isWindowUiIgnore() ? (Graphics.boxWidth - Graphics.width) / 2 : 0);
             case 'right':
-                return (this.isWindowUiIgnore() ? Graphics.width + (Graphics.boxWidth - Graphics.width) / 2 : Graphics.boxWidth) - this.nuun_infoWindowWidth(data) + this._menuLayout.MenuStatusX;
+                return (this.isWindowUiIgnore() ? Graphics.width + (Graphics.boxWidth - Graphics.width) / 2 : Graphics.boxWidth) - this.nuun_statusWindowWidth() + this._menuLayout.MenuStatusX;
             case 'command':
                 return this._menuLayout.MenuStatusX + this.nuun_mainCommandX() + (this.isRightInputMode() ? -this.nuun_statusWindowWidth() : this.nuun_mainCommandWidth());
         }
@@ -2797,7 +2801,7 @@ Imported.NUUN_MenuScreenEX = true;
             case 'top':
                 return this._menuLayout.MenuStatusY + (this.isWindowUiIgnore() ? 0 : this.nuun_menuHelpAreaHeight());
             case 'under':
-                return (this.isWindowUiIgnore() ? Graphics.height + ((Graphics.boxHeight - Graphics.height) / 2) : Graphics.boxHeight) - this.nuun_infoWindowHeight(data) + this._menuLayout.MenuStatusY;
+                return (this.isWindowUiIgnore() ? Graphics.height + ((Graphics.boxHeight - Graphics.height) / 2) : Graphics.boxHeight) - this.nuun_statusWindowHeight() + this._menuLayout.MenuStatusY;
             case 'commandtop':
                 return this._menuLayout.MenuStatusY + this.nuun_mainCommandY() - this.nuun_statusWindowHeight();
             case 'commandunder':

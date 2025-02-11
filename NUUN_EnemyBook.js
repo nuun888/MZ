@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.2
+ * @version 2.22.3
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/11/2025 Ver.2.22.3
+ * Fixed handling of actor and party command activations when cancelled.
  * 1/19/2025 Ver.2.22.2
  * Fixed an issue where pressing the Confirm key during Analyze would cause the key to become unresponsive.
  * Fixed an issue where the monster information page would not display during battle.
@@ -3049,7 +3051,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.2
+ * @version 2.22.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3270,6 +3272,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/11 Ver.2.22.3
+ * キャンセル時のアクターコマンド、パーティコマンドのアクティブ化の処理を修正。
  * 2025/1/19 Ver.2.22.2
  * アナライズ時に決定キーを押すと、キーが反応しなくなる問題を修正。
  * 戦闘時のモンスター情報のページが表示されない問題を修正。
@@ -8442,6 +8446,7 @@ Scene_Battle.prototype.getEnemyBookBackground = function() {
 };
 
 Scene_Battle.prototype.setEnemyBook = function() {
+    this.enemyBookSetActiveWindow();
     this._enemyBookEnemyWindow.setMode('book');
     this._enemyBookEnemyWindow.setEnemyData(null);
     this._enemyBookPageWindow.setPageList(PageSetting, PageSetting.length);
@@ -8452,6 +8457,7 @@ Scene_Battle.prototype.setEnemyBook = function() {
 };
 
 Scene_Battle.prototype.setEnemyBookInfo = function() {
+    this.enemyBookSetActiveWindow();
     this._enemyBookEnemyWindow.setMode('info');
     this._enemyInfoEnemyWindow.setEnemyData(null);
     this._enemyInfoPageWindow.setPageList(InfoPageSetting, InfoPageSetting.length);
@@ -8590,9 +8596,9 @@ Scene_Battle.prototype.onEnemyBookInfoCancel = function() {
     this._enemyBookBackgroundSprite.hide();
     if (this._partyCommandWindow.isOpen()) {
         this._partyCommandWindow.activate();
-    } else if (this._actorCommandWindow.isOpen()) {
+    } else if (this._actorCommandWindow.isOpen() && this.enemyBookIsActorCommandActive()) {
         this._actorCommandWindow.activate();
-    } else {
+    } else if (this.enemyBookIsPartyCommandActive()) {
         this._partyCommandWindow.activate();
     }
     this._enemyBookActualSprite.hideActualEnemy();
@@ -8634,13 +8640,28 @@ Scene_Battle.prototype.cancelEnemyBook = function() {
     this._enemyBookBackgroundSprite.hide();
     if (this._partyCommandWindow.isOpen()) {
         this._partyCommandWindow.activate();
-    } else if (this._actorCommandWindow.isOpen()) {
+    } else if (this._actorCommandWindow.isOpen() && this.enemyBookIsActorCommandActive()) {
         this._actorCommandWindow.activate();
-    } else {
+    } else if (this.enemyBookIsPartyCommandActive()) {
         this._partyCommandWindow.activate();
     }
     this._enemyBookActualSprite.hideActualEnemy();
 };
+
+Scene_Battle.prototype.enemyBookSetActiveWindow = function() {
+    this._nuun_ActiveWindowList = {};
+    this._nuun_ActiveWindowList.partyActive = this._partyCommandWindow.active;
+    this._nuun_ActiveWindowList.actorActive = this._actorCommandWindow.active;
+};
+
+Scene_Battle.prototype.enemyBookIsPartyCommandActive = function() {
+    return this._nuun_ActiveWindowList.partyActive;
+};
+
+Scene_Battle.prototype.enemyBookIsActorCommandActive = function() {
+    return this._nuun_ActiveWindowList.actorActive;
+};
+
 
 const _Scene_Battle_isAnyInputWindowActive  = Scene_Battle.prototype.isAnyInputWindowActive;
 Scene_Battle.prototype.isAnyInputWindowActive = function() {
@@ -9308,6 +9329,7 @@ Window_EnemyBookPage.prototype.initialize = function(rect) {
     Window_HorzCommand.prototype.initialize.call(this, rect);
     this._data = null;
     this.interruptWindow = true;
+    this._pageCols = 0;
 };
 
 Window_EnemyBookPage.prototype.loadWindowskin = function() {

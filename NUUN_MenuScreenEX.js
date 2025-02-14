@@ -3397,7 +3397,7 @@ Imported.NUUN_MenuScreenEX = true;
         
     };
 
-    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsHorzLine = function(x, y, width, data) {
+    Window_MenuStatus.prototype.nuun_DrawMenuStatusContentsHorzLine = function(data, x, y, width) {
         const lineY = y + this.lineHeight() / 2 - 1;
         this.contents.paintOpacity = 48;
         this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(data.NameColor));
@@ -4106,6 +4106,10 @@ Imported.NUUN_MenuScreenEX = true;
     };
     
     Window_InfoMenu.prototype.nuun_DrawMenuInfoContentsFreeText = function(data, x, y, width) {   
+        this.drawTextEx(data.Text, x, y, width);
+    };
+
+    Window_InfoMenu.prototype.nuun_DrawMenuInfoContentsFreetext = function(data, x, y, width) {   
         this.drawTextEx(data.Text, x, y, width);
     };
     

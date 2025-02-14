@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.12
+ * @version 3.1.13
  * 
  * @help
  * Change and extend the menu screen display.
@@ -93,6 +93,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/14/2025 Ver.3.1.13
+ * Fixed an issue where an error would occur when setting free text.
+ * Fixed an issue where an error would occur when setting a line.
  * 2/11/2025 Ver.3.1.12
  * Fixed an issue where an error would occur when the status window display position was set to the right or bottom of the screen.
  * 10/12/2024 Ver.3.1.11
@@ -1009,7 +1012,7 @@
  * @option Menu command description(1)(2)(3)(4)(5)(7)(8)
  * @value CommandDescription
  * @option Free text(1)(2)(3)(4)(12)
- * @value Freetext
+ * @value FreeText
  * @option Action target (NUUN_Destination required)(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
  * @value Destination
  * @option Chapter (NUUN_Chapter required)(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
@@ -1369,7 +1372,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.11
+ * @version 3.1.13
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1435,6 +1438,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/14 Ver.3.1.13
+ * フリーテキストを設定した際にエラーが出る問題を修正。
+ * ラインを設定した際にエラーが出る問題を修正。
  * 2025/2/11 Ver.3.1.12
  * ステータスウィンドウの表示位置を右及び画面下に設定した場合にエラーが出る問題を修正。
  * 2024/10/12 Ver.3.1.11
@@ -2354,7 +2360,7 @@
  * @option メニューコマンド説明(1)(2)(3)(4)(5)(7)(8)
  * @value CommandDescription
  * @option フリーテキスト(1)(2)(3)(4)(12)
- * @value Freetext
+ * @value FreeText
  * @option 行動目標（要メニュー画面行動目標表示）(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)
  * @value Destination
  * @option キャプター（要チャプターテキスト）(1)(2)(3)(4)(6)(7)(8)(11)(13)(15)

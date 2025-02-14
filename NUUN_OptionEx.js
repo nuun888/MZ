@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/15/2025 Ver.1.2.4
+ * Fixed so that the cursor on the options screen is not displayed when selecting an option command.
  * 2/2/2025 Ver.1.2.3
  * Fixed an issue where the cursor would not become active even if any key was set when the maximum key setting was set to 1.
  * Fixed a bug that prevented cancellation when no key was set.
@@ -676,7 +678,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * オプション画面を拡張します。
@@ -689,6 +691,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/15 Ver.1.2.4
+ * オプションコマンド選択時にオプション画面のカーソルを表示しないように修正。
  * 2025/2/2 Ver.1.2.3
  * キーの最大設定を1に設定したときに、任意のキーを設定してもカーソルがアクティブ状態にならない問題を修正。
  * キーの設定されていない時にキャンセル出来ないように修正。
@@ -1391,6 +1395,7 @@ Imported.NUUN_OptionEx = true;
         const rect = this.optionsWindowRect();
         this._optionsWindow = new Window_Options(rect);
         this._optionsWindow.setHandler("cancel", this.cancelOption.bind(this));
+        this._optionsWindow.deselect();
         this.addWindow(this._optionsWindow);
     };
     
@@ -1429,7 +1434,7 @@ Imported.NUUN_OptionEx = true;
             eval(params.GamePadFormat);
         } else {
             this._optionsWindow.activate();
-            this._optionsWindow.select(0);
+            this._optionsWindow.selectLast();
             this._optionsWindow.configIndexClear();
             this._optionsWindow.refresh();
         }
@@ -1439,10 +1444,12 @@ Imported.NUUN_OptionEx = true;
         if (this._optionsWindow.setupKeyMode) {
             this._optionsWindow.setupKeyMode = false;
             this._optionsWindow.activate();
+            this._optionsWindow.deselect();
         } else {
             if (this._optionsCategoryWindow) {
                 this._optionsCategoryWindow.activate();
                 this._optionsWindow.deactivate();
+                this._optionsWindow.deselect();
             } else {
                 this.popScene();
             }
@@ -1535,6 +1542,7 @@ Imported.NUUN_OptionEx = true;
         this.setupEventHandlers();
         this._category = "none";
         this._configIndex = 0;
+        this._lastIndex = 0;
         this.setupKeyMode = false;
         this.opacity = params.OptionPageWindowVisible ? 255 : 0;
     };
@@ -1545,6 +1553,18 @@ Imported.NUUN_OptionEx = true;
 
     Window_Options.prototype.configIndexClear = function() {
         this._configIndex = 0;
+    };
+
+    Window_Options.prototype.select = function(index) {
+        Window_Selectable.prototype.select.apply(this, arguments);
+        if (index >= 0) {
+            this._lastIndex = index;
+        }
+    };
+
+    Window_Options.prototype.selectLast = function() {
+        const index = this._lastIndex.clamp(0, this._list.length - 1);
+        this.forceSelect(index);
     };
 
     Window_Options.prototype.setCategory = function(category) {

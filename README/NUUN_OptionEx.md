@@ -1,5 +1,5 @@
 # [オプション拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)
-# Ver.1.2.3
+# Ver.1.2.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -92,6 +92,8 @@ Ver.1.0.2
 マスターボリューム設定プラグイン、オプションデフォルト値設定プラグインはこのプラグインよりも上に設定してください。  
 
 ## 更新履歴
+2025/2/15 Ver.1.2.4  
+オプションコマンド選択時にオプション画面のカーソルを表示しないように修正。  
 2025/2/2 Ver.1.2.3  
 キーの最大設定を1に設定したときに、任意のキーを設定してもカーソルがアクティブ状態にならない問題を修正。  
 キーの設定されていない時にキャンセル出来ないように修正。  

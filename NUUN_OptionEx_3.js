@@ -15,7 +15,7 @@
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Change the option items to selection type.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/16/2024 Ver.1.0.2
+ * Added the ability to display non-selected items transparently.
  * 1/3/2024 Ver.1.0.1
  * Fixed an issue where touch controls on switches were not working.
  * 12/28/2024 Ver.1.0.0
@@ -37,6 +39,13 @@
  * @default 17
  * @min 0
  * 
+ * @param DeselectOpacity
+ * @text Items not selected transparent
+ * @desc Makes unselected text characters transparent.
+ * @type boolean
+ * @default false
+ * @min 0
+ * 
  */
 /*:ja
  * @target MZ
@@ -47,7 +56,7 @@
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_OptionEx
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * オプションの項目を選択式に変更します。
@@ -57,6 +66,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/2/16 Ver.1.0.2
+ * 非選択項目を透明で表示させる機能を追加。
  * 2025/1/28 Ver.1.0.1
  * スイッチのタッチ操作が機能していなかった問題を修正。
  * 2024/12/28 Ver.1.0.0
@@ -69,6 +80,13 @@
  * @default 17
  * @min 0
  * 
+ * @param DeselectOpacity
+ * @text 項目選択外透明
+ * @desc 選択以外のテキストの文字を透明化します。
+ * @type boolean
+ * @default false
+ * @min 0
+ * 
  */
 
 var Imported = Imported || {};
@@ -76,8 +94,6 @@ Imported.NUUN_OptionEx_3 = true;
 
 (() => {
     const params = Nuun_PluginParams.getPluginParams(document.currentScript);
-
-    const parameters = PluginManager.parameters('NUUN_OptionEx_3');
 
     Window_Options.prototype.drawItemBackground = function(index) {
         const symbol = this.commandSymbol(index);
@@ -118,14 +134,21 @@ Imported.NUUN_OptionEx_3 = true;
         const rect = this.itemLineRect(index);
         const symbol = this.commandSymbol(index);
         const value = this.getConfigValueEx(symbol, data);
+        const enabled = this.isCommandEnabled(index);
         this.resetTextColor();
-        this.changePaintOpacity(this.isCommandEnabled(index));
+        this.changePaintOpacity(enabled);
         this.drawText(title, rect.x, rect.y, this.titleWidth(), "left");
         for (let i = 0; i < this.maxItemCols(index, data); i++) {
             const rect2 = this.itemOptionRect(data, index, i);
             const status = this.statusBooleanText(data, i);
-            i === 0 && !value || i === 1 && value ? this.changeTextColor(NuunManager.getColorCode(params.SelectValueColor || 0)) : this.resetTextColor();
+            if (i === 0 && !value || i === 1 && value) {
+                this.changeTextColor(NuunManager.getColorCode(params.SelectValueColor || 0));
+            } else {
+                this.resetTextColor();
+                this.changePaintOpacity(!params.DeselectOpacity);
+            }
             this.drawText(status, rect2.x, rect.y, rect2.width, "center");
+            this.changePaintOpacity(enabled);
             this.optionHorzLine(rect2.x, rect.y, rect2.width, (i === 0 && !value || i === 1 && value));
         };
     };
@@ -135,14 +158,21 @@ Imported.NUUN_OptionEx_3 = true;
         const rect = this.itemLineRect(index);
         const symbol = this.commandSymbol(index);
         const value = this.getConfigValueEx(symbol, data);
+        const enabled = this.isCommandEnabled(index);
         this.resetTextColor();
-        this.changePaintOpacity(this.isCommandEnabled(index));
+        this.changePaintOpacity(enabled);
         this.drawText(title, rect.x, rect.y, this.titleWidth(), "left");
         for (let i = 0; i < this.maxItemCols(index, data); i++) {
             const rect2 = this.itemOptionRect(data, index, i);
             const status = this.statusBooleanText(data, i);
-            i === 0 && !value || i === 1 && value ? this.changeTextColor(NuunManager.getColorCode(params.SelectValueColor || 0)) : this.resetTextColor();
+            if (i === 0 && !value || i === 1 && value) {
+                this.changeTextColor(NuunManager.getColorCode(params.SelectValueColor || 0))
+            } else {
+                this.resetTextColor();
+                this.changePaintOpacity(!params.DeselectOpacity);
+            }
             this.drawText(status, rect2.x, rect.y, rect2.width, "center");
+            this.changePaintOpacity(enabled);
             this.optionHorzLine(rect2.x, rect.y, rect2.width, (i === 0 && !value || i === 1 && value));
         }
     };
@@ -153,14 +183,21 @@ Imported.NUUN_OptionEx_3 = true;
         const rect = this.itemLineRect(index);
         const symbol = this.commandSymbol(index);
         const value = this.getConfigValueEx(symbol, data) || 0;
+        const enabled = this.isCommandEnabled(index);
         this.resetTextColor();
-        this.changePaintOpacity(this.isCommandEnabled(index));
+        this.changePaintOpacity(enabled);
         this.drawText(title, rect.x, rect.y, this.titleWidth(), "left");
         for (let i = 0; i < this.maxItemCols(index, data); i++) {
             const rect2 = this.itemOptionRect(data, index, i);
             const status = this.statusVariablesText(data, i);
-            i ===  value ? this.changeTextColor(NuunManager.getColorCode(params.SelectValueColor || 0)) : this.resetTextColor();
+            if (i ===  value) {
+                this.changeTextColor(NuunManager.getColorCode(params.SelectValueColor || 0));
+            } else {
+                this.resetTextColor();
+                this.changePaintOpacity(!params.DeselectOpacity);
+            }
             this.drawText(status, rect2.x + padding, rect.y, rect2.width - padding * 2, "center");
+            this.changePaintOpacity(enabled);
             this.optionHorzLine(rect2.x, rect.y, rect2.width, (i ===  value));
         }
     };

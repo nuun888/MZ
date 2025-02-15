@@ -81,7 +81,7 @@ Ver.1.0.2
 ### オプション拡張項目スタイル変更
 オプションの項目を選択式に変更します。  
 ![画像](img/OptionEx4.png)  
-[ダウンロード](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_3.js)Ver.1.0.1  
+[ダウンロード](https://github.com/nuun888/MZ/blob/master/NUUN_OptionEx_3.js)Ver.1.0.2  
 難易度はトリアコンタン氏の難易度設定プラグインを使用した例となります。  
 クモ恐怖症は使用プラグインはありません。  
 

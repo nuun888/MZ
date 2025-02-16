@@ -13,7 +13,7 @@
 特徴を有するメモ欄  
 `<CrpEffectRate:[rate]>`   
 [rate]:会心効果率(整数)  
-`<CrdEffectRate:[rate]>` 
+`<CrdEffectRate:[rate]>`   
 [rate]:会心防御率(整数)  
 
 スキル、アイテムのメモ欄

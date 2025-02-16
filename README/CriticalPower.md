@@ -20,10 +20,9 @@
 `<CrpDamageFormula:[Formula]>` アイテム、スキルごとの会心ダメージの式を設定します。
 
 取得パラメータ
-Game_BattlerBase  
-`damage`:ダメージ
-`subject`:攻撃実行者
-`target`:対象
+`damage`:ダメージ  
+`subject`:攻撃実行者  
+`target`:対象  
 以下のパラメータはsubject.またはtarget.の後に記入します。  
 `crp`:会心効果率  
 `crd`:会心防御率  

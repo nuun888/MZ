@@ -24,8 +24,12 @@ Game_BattlerBase
 `damage`:ダメージ
 `subject`:攻撃実行者
 `target`:対象
-`crp`:会心効果率
-`crd`:会心防御率
+以下のパラメータはsubject.またはtarget.の後に記入します。  
+`crp`:会心効果率  
+`crd`:会心防御率  
+例  
+`subject.crp`  
+`target.crd`  
 
 ## 更新履歴  
 2025/2/16 Ver.1.1.0

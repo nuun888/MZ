@@ -16,7 +16,7 @@
 `<CrdEffectRate:[rate]>`   
 [rate]:会心防御率(整数)  
 
-スキル、アイテムのメモ欄
+スキル、アイテムのメモ欄  
 `<CrpDamageFormula:[Formula]>` アイテム、スキルごとの会心ダメージの式を設定します。
 
 取得パラメータ

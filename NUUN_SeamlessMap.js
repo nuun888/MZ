@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Combine multiple maps
  * @author NUUN
- * @version 1.1.6
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -43,6 +43,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/26/2025 Ver.1.2.0
+ * Added the ability to specify maps as variables.
  * 2/8/2023 Ver.1.1.6
  * Fixed a conflict with the Template Events plugin.
  * 11/12/2022 Ver.1.1.5
@@ -139,12 +141,18 @@
  * @type number
  * @default 0
  * 
+ * @param SeamlessMapVariable
+ * @text Combined map ID variable
+ * @desc Set the variable that specifies the map ID. The map ID set at the top will be the base map.
+ * @type variable
+ * @default 0
+ * 
  */
 /*:ja
  * @target MZ
  * @plugindesc 複数マップ結合
  * @author NUUN
- * @version 1.1.6
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -177,6 +185,8 @@
  * 該当のイベントコマンドを設定した後にリセットします。
  * 
  * 更新履歴
+ * 2025/2/26 Ver.1.2.0
+ * マップを変数で指定できる機能を追加。
  * 2023/2/8 Ver.1.1.6
  * テンプレートイベントプラグインと競合を起こす問題を修正。
  * 2022/11/12 Ver.1.1.5
@@ -273,6 +283,12 @@
  * @type number
  * @default 0
  * 
+ * @param SeamlessMapVariable
+ * @text 結合マップID変数
+ * @desc マップIDを指定する変数を設定します。一番上に設定したマップIDが基準となるマップになります。
+ * @type variable
+ * @default 0
+ * 
  */
 var Imported = Imported || {};
 Imported.NUUN_SeamlessMap = true;
@@ -281,8 +297,8 @@ Imported.NUUN_SeamlessMap = true;
 const parameters = PluginManager.parameters('NUUN_SeamlessMap');
 const SeamlessMapSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SeamlessMapSetting'])) : null) || [];
 let SeamlessMaps = [];
+let _seamlessMapData = null;
 $dataSeamlessMap = [];
-getSeamlessMapDatas();
 
 const pluginName = "NUUN_SeamlessMap";
 PluginManager.registerCommand(pluginName, 'SeamlessMapEventId', args => {
@@ -295,25 +311,40 @@ PluginManager.registerCommand(pluginName, 'SetEventData', args => {
     $gameTemp.seamlessEventId = index;
 });
 
-function getSeamlessMapDatas() {
-    SeamlessMapSetting.forEach((data, r) => {
+
+function _getSeamlessMapData(mapId) {
+    return SeamlessMapSetting.find(data => {
         const seamlessMap = data.SeamlessMapList;
         if (seamlessMap && seamlessMap.length > 1) {
-            seamlessMap.forEach(id => {
-                if (id.SeamlessMapId > 0) {
-                    SeamlessMaps[id.SeamlessMapId] = seamlessMap[0].SeamlessMapId;
-                }
-            });
+            if ($gameVariables && seamlessMap[0].SeamlessMapVariable > 0) {
+                return $gameVariables.value(seamlessMap[0].SeamlessMapVariable) === mapId;
+            } else {
+                return seamlessMap[0].SeamlessMapId === mapId;
+            }
         }
     });
 };
+
+function _getSeamlessMaps(mapId) {
+    SeamlessMaps = [];
+    _seamlessMapData = _getSeamlessMapData(mapId);
+    if (!_seamlessMapData) return;
+    const seamlessMap = _seamlessMapData.SeamlessMapList;
+    seamlessMap.forEach(data => {
+        if ($gameVariables && data.SeamlessMapVariable > 0) {
+            SeamlessMaps[$gameVariables.value(data.SeamlessMapVariable)] = $gameVariables.value(seamlessMap[0].SeamlessMapVariable);
+        } else {
+            SeamlessMaps[data.SeamlessMapId] = seamlessMap[0].SeamlessMapId;
+        }
+    });
+}
 
 function isSeamlessMapIndex(mapId) {
     return SeamlessMaps[mapId] ? SeamlessMaps[mapId] : -1;
 };
 
-function getSeamlessMapData(mapId) {
-    return SeamlessMapSetting.find(data => data.SeamlessMapList[0].SeamlessMapId === isSeamlessMapIndex(mapId));
+function getSeamlessMapData() {
+    return _seamlessMapData;
 };
 
 function seamlessMapCheck(seamlessMap, width, height) {
@@ -332,13 +363,24 @@ function getSeamlessMapPosition(mapId) {
 };
 
 function getSeamlessMapIndex(data, mapId) {
-    return data.SeamlessMapList.map(id => id.SeamlessMapId).indexOf(mapId);
+    return _getSeamlessMap(data).indexOf(mapId);
 };
+
+function _getSeamlessMap(data) {
+    return data.SeamlessMapList.map(id => {
+        return _getSeamlessMapId(id);
+    });
+};
+
+function _getSeamlessMapId(data) {
+    return $gameVariables && data.SeamlessMapVariable > 0 ? $gameVariables.value(data.SeamlessMapVariable) :data.SeamlessMapId;
+};
+
 
 DataManager.loadSeamlessMap = function(mapId) {
     const mapData = getSeamlessMapData(mapId);
     if (mapData) {
-        const mapList = mapData.SeamlessMapList.map(data => data.SeamlessMapId);
+        const mapList = mapData.SeamlessMapList.map(data => _getSeamlessMapId(data));
         if (this._loadedMapId !== mapList[0]) {//ランダムマップ生成時注意
             mapList.forEach((id, r) => {
                 if (id > 0) {
@@ -374,6 +416,7 @@ DataManager.onXhrSeamlessMapLoad = function(xhr, name, src, url, r) {
 const _DataManager_loadMapData = DataManager.loadMapData;
 DataManager.loadMapData = function(mapId) {
     this.seamlessMapId = [];
+    _getSeamlessMaps(mapId);
     const id = isSeamlessMapIndex(mapId);
     if (id > 0) {
         this.loadSeamlessMap(mapId);

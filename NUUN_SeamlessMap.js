@@ -138,7 +138,7 @@
  * @param SeamlessMapId
  * @text Combined map id
  * @desc Set map id. The map ID set at the top will be the base map.
- * @type number
+ * @type map
  * @default 0
  * 
  * @param SeamlessMapVariable
@@ -280,7 +280,7 @@
  * @param SeamlessMapId
  * @text 結合マップID
  * @desc マップIDを設定します。一番上に設定したマップIDが基準となるマップになります。
- * @type number
+ * @type map
  * @default 0
  * 
  * @param SeamlessMapVariable

@@ -11,7 +11,7 @@
 /*:
  * @target MZ
  * @plugindesc Enemy group BGM settings
- * @version 1.1.2
+ * @version 1.2.0
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
@@ -38,6 +38,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/1/2025 Ver 1.2.0
+ * Added the ability to replay selected battle BGM.
  * 1/8/2024 Ver 1.1.2
  * Processing correction.
  * 1/7/2024 Ver 1.1.1
@@ -47,6 +49,11 @@
  * Added a function that can be set from enemy group ID.
  * 7/4/2023 Ver 1.0.0
  * First edition.
+ * 
+ * @command BgmResumes
+ * @desc Replays the battle BGM.
+ * @text Battle BGM replay
+ * 
  * 
  * @param BGMList
  * @text Battle BGM
@@ -133,7 +140,7 @@
 /*:ja
  * @target MZ
  * @plugindesc 敵グループのBGM設定
- * @version 1.1.2
+ * @version 1.2.0
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
@@ -161,6 +168,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/1 Ver 1.2.0
+ * 選定された戦闘BGMを再再生する機能を追加。
  * 2024/1/8 Ver 1.1.2
  * 処理の修正。
  * 2024/1/7 Ver 1.1.1
@@ -170,6 +179,12 @@
  * 敵グループIDから設定できる機能を追加。
  * 2023/7/4 Ver 1.0.0
  * 初版
+ * 
+ * 
+ * @command BgmResumes
+ * @desc 戦闘BGMを再演奏します。
+ * @text 戦闘BGM再演奏
+ * 
  *  
  * @param BGMList
  * @text 戦闘ＢＧＭ
@@ -262,11 +277,17 @@ Imported.NUUN_BattleTroopBGM = true;
     const BattleBgmOnSwitch = Number(parameters['BattleBgmOnSwitch'] || 0);
     const PreemptiveBGM = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PreemptiveBGM'])) : [];
     const SurpriseBGM = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SurpriseBGM'])) : [];
+    const pluginName = "NUUN_BattleTroopBGM";
+
+    PluginManager.registerCommand(pluginName, 'BgmResumes', args => {
+        BattleManager.bgmResumes();
+    });
 
     const _BattleManager_initMembers = BattleManager.initMembers;
     BattleManager.initMembers = function() {
         _BattleManager_initMembers.call(this);
         this._playBattleBGM = 'step1';
+        this.troopBattleBgm = null;
     };
 
     const _BattleManager_playBattleBgm = BattleManager.playBattleBgm;
@@ -289,6 +310,13 @@ Imported.NUUN_BattleTroopBGM = true;
         _BattleManager_startBattle.call(this);
         this._playBattleBGM = 'step3';
     };
+
+    BattleManager.bgmResumes = function() {
+        if (this.troopBattleBgm) {
+            AudioManager.playBgm(this.troopBattleBgm);
+        }
+    };
+
 
     Game_Troop.prototype.setupBattleBGM = function() {
         if (BattleBgmOnSwitch === 0 || $gameSwitches.value(BattleBgmOnSwitch)) {
@@ -324,6 +352,7 @@ Imported.NUUN_BattleTroopBGM = true;
         if (bgm) {
             const setBgm = {name: bgm.name, volume: bgm.volume, pitch: bgm.pitch, pan: bgm.pan};
             AudioManager.playBgm(setBgm);
+            BattleManager.troopBattleBgm = setBgm;
         }
     };
 
@@ -352,7 +381,7 @@ Imported.NUUN_BattleTroopBGM = true;
     };
 
     Game_Troop.prototype.battleBgmRequest = function(id) {
-        const bgm = isNaN(id) ? getBgmNameData(id) : getBgmNumberData(id)
+        const bgm = isNaN(id) ? getBgmNameData(id) : getBgmNumberData(id);
         if (bgm && bgm.TroopBGMList) {
             return this.getBattleBgm(bgm.TroopBGMList);
         }

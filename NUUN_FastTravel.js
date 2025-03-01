@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * Implement Fast Travel.
@@ -46,6 +46,8 @@
  * 
  * 
  * Log
+ * 3/1/2025 Ver.1.0.4
+ * Supports annotation location. (Versions before 1.8 used the old method.)
  * 9/22/2024 Ver.1.0.3
  * Fixed scrolling behavior of initial cursor position.
  * 9/21/2024 Ver.1.0.2
@@ -309,11 +311,17 @@
  */
 /*~struct~DestinationSetting:
  * 
+ * @param DestinationMapLocation
+ * @desc Specify destination map (Editor 1.9.0 later)
+ * @text Move destination map
+ * @type location
+ * @default 
+ * 
  * @param DestinationMapId
  * @desc Specify the destination map ID.
  * @text Move destination map ID
- * @type string
- * @default 
+ * @type number
+ * @default 0
  * 
  * @param DestinationMapX
  * @desc Specify the X coordinate of the destination map.
@@ -350,7 +358,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * ファストトラベルを実装します。
@@ -385,6 +393,8 @@
  * 
  * 
  * 更新履歴
+ * 2025/3/1 Ver.1.0.4
+ * アノテーションlocationに対応。(1.8以前のバージョンは従来の方式)
  * 2024/9/22 Ver.1.0.3
  * カーソルの初期位置のスクロールの挙動を修正。
  * 2024/9/21 Ver.1.0.2
@@ -559,6 +569,56 @@
  * @default true
  * @parent FastTravelWindowSetting
  * 
+ * @param FastTravelSubWindowSetting
+ * @text ファストトラベルサブウィンドウ設定
+ * @default ------------------------------
+ * 
+ * @param FastTravelSubParamList
+ * @desc ファストトラベルサブウィンドウの項目を設定します。
+ * @text ファストトラベルサブ項目設定
+ * @type struct<FastTravelSub>[]
+ * @default 
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowX
+ * @text ファストトラベルサブウィンドウX座標
+ * @desc ファストトラベルサブウィンドウのX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowY
+ * @desc ファストトラベルサブウィンドウのY座標
+ * @text ファストトラベルサブウィンドウY座標
+ * @type number
+ * @default 68
+ * @min -9999
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowWidth
+ * @desc ファストトラベルサブウィンドウの横幅。
+ * @text ファストトラベルサブウィンドウ横幅
+ * @type number
+ * @default 240
+ * @min 0
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowRows
+ * @desc ファストトラベルサブウィンドウの行数。
+ * @text ファストトラベルサブウィンドウ行数
+ * @type number
+ * @default 10
+ * @min 1
+ * @parent FastTravelSubWindowSetting
+ * 
+ * @param FastTravelSubWindowVisible
+ * @text ファストトラベルウィンドウ不透明化
+ * @desc ファストトラベルウィンドウを不透明化する。
+ * @type boolean
+ * @default true
+ * @parent FastTravelSubWindowSetting
+ * 
  * @param ButtonSetting
  * @text ボタン設定
  * @default ------------------------------
@@ -650,11 +710,17 @@
  */
 /*~struct~DestinationSetting:ja
  * 
+ * @param DestinationMapLocation
+ * @desc 移動先マップを指定します。(エディタ1.9.0以降)
+ * @text 移動先マップ
+ * @type location
+ * @default 
+ * 
  * @param DestinationMapId
  * @desc 移動先マップIDを指定します。
  * @text 移動先マップID
- * @type string
- * @default 
+ * @type number
+ * @default 0
  * 
  * @param DestinationMapX
  * @desc 移動先マップのX座標を指定します。
@@ -1162,7 +1228,11 @@ Imported.NUUN_FastTravel = true;
         if (data) {
             if (params.TransferEventTrigger) {
                 result = $gamePlayer.startFastTravelEvent(this.getFastTravelEvent());
-            } else if (data.DestinationMapId > 0) {
+            } else if(data.DestinationMapLocation && data.DestinationMapLocation.mapId > 0) {
+                $gamePlayer.setDirectionFix(false);
+                $gamePlayer.reserveTransfer((data.DestinationMapLocation.mapId), data.DestinationMapLocation.x, data.DestinationMapLocation.y, data.Direction, 0);
+                result = true;
+            } else if(data.DestinationMapId > 0) {
                 $gamePlayer.setDirectionFix(false);
                 $gamePlayer.reserveTransfer((data.DestinationMapId), data.DestinationMapX, data.DestinationMapY, data.Direction, 0);
                 result = true;
@@ -1416,77 +1486,77 @@ Imported.NUUN_FastTravel = true;
     };
 
     if (Imported.NUUN_MenuParamListBase) {
-    class Nuun_DrawFastTravelListData extends Nuun_DrawListData {
-        constructor(_window, params) {
-            super(_window, params);
-            this._item = null;
-        }
-
-        nuun_MaxContentsCols() {
-            return 1;
-        }
-
-        getStatusParamsList() {
-            return params.FastTravelSubParamList;
-        }
-
-        setItem(item) {
-            this._item = item;
-        }
-
-        refresh() {
-            this.drawStatusContents(this._item)
-        }
-
-        drawItemImg(actor, index) {
-            
-        }
-
-        nuun_DrawContentsMapName(data, x, y, width) {
-            const w = this._window;
-            if (this._item.IconIndex && this._item.IconIndex > 0) {
-                const iconY = y + (w.lineHeight() - ImageManager.iconHeight) / 2;
-                w.drawIcon(this._item.IconIndex, x, y + (iconY || 0));
-                const iconWidth = ImageManager.iconWidth + 4;
-                x += iconWidth;
-                width -= iconWidth;
+        class  Nuun_DrawFastTravelListData extends Nuun_DrawListData {
+            constructor(_window, params) {
+                super(_window, params);
+                this._item = null;
             }
-            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
-            const nameText = data.ParamName ? data.ParamName : this._item.FastTravelName;
-            this.nuun_SetContentsFontFace(data);
-            w.drawText(nameText, x, y, width, data.Align);
-        }
-
-        nuun_DrawContentsOrgParam(data, x, y, width) {
-            const map = $dataMap;
-            const w = this._window;
-            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
-            if (data.Icon && data.Icon > 0) {
-                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
-                const iconWidth = ImageManager.iconWidth + 4;
-                x += iconWidth;
-                width -= iconWidth;
+    
+            nuun_MaxContentsCols() {
+                return 1;
             }
-            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
-            this.nuun_SetContentsFontFace(data);
-            const nameText = data.ParamName ? data.ParamName : '';
-            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
-            w.drawText(nameText, x, y, textWidth);
-            w.resetTextColor();
-            if (data.DetaEval) {
-                this.nuun_SetContentsValueFontFace(data);
-                const padding = textWidth > 0 ? w.itemPadding() : 0;
-                const textParam = this.getStatusEvalParam(param, actor, enemy);
-                if (isNaN(textParam)) {
-                    w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
-                } else {
-                    const value = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
-                    w.nuun_DrawContentsParamUnitText(value, data, x + textWidth + padding, y, width - (textWidth + padding));
-                }       
+    
+            getStatusParamsList() {
+                return params.FastTravelSubParamList;
             }
+    
+            setItem(item) {
+                this._item = item;
+            }
+    
+            refresh() {
+                this.drawStatusContents(this._item)
+            }
+    
+            drawItemImg(actor, index) {
+                
+            }
+    
+            nuun_DrawContentsMapName(data, x, y, width) {
+                const w = this._window;
+                if (this._item.IconIndex && this._item.IconIndex > 0) {
+                    const iconY = y + (w.lineHeight() - ImageManager.iconHeight) / 2;
+                    w.drawIcon(this._item.IconIndex, x, y + (iconY || 0));
+                    const iconWidth = ImageManager.iconWidth + 4;
+                    x += iconWidth;
+                    width -= iconWidth;
+                }
+                w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+                const nameText = data.ParamName ? data.ParamName : this._item.FastTravelName;
+                this.nuun_SetContentsFontFace(data);
+                w.drawText(nameText, x, y, width, data.Align);
+            }
+    
+            nuun_DrawContentsOrgParam(data, x, y, width) {
+                const map = $dataMap;
+                const w = this._window;
+                w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+                if (data.Icon && data.Icon > 0) {
+                    w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                    const iconWidth = ImageManager.iconWidth + 4;
+                    x += iconWidth;
+                    width -= iconWidth;
+                }
+                w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+                this.nuun_SetContentsFontFace(data);
+                const nameText = data.ParamName ? data.ParamName : '';
+                const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+                w.drawText(nameText, x, y, textWidth);
+                w.resetTextColor();
+                if (data.DetaEval) {
+                    this.nuun_SetContentsValueFontFace(data);
+                    const padding = textWidth > 0 ? w.itemPadding() : 0;
+                    const textParam = this.getStatusEvalParam(param, actor, enemy);
+                    if (isNaN(textParam)) {
+                        w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+                    } else {
+                        const value = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
+                        w.nuun_DrawContentsParamUnitText(value, data, x + textWidth + padding, y, width - (textWidth + padding));
+                    }       
+                }
+            }
+    
         }
-
-    }
     }
 
 

@@ -243,6 +243,7 @@
 指定のID(3) 10  
 
 ## 対応プラグイン
+[パッシブスキル](https://github.com/nuun888/MZ/blob/master/README/PassiveSkill.md)  
 [盗みスキル](https://github.com/nuun888/MZ/blob/master/README/StealableItems.md)  
 [スキル、アイテム使用条件](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalSkills.js)  
 [踏み止まり特徴](https://github.com/nuun888/MZ/blob/master/README/StoppingFeature.md)  

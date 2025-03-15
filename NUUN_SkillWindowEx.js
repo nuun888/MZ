@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * You can customize the skill screen.
@@ -25,6 +25,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2025/3/15 Ver.1.0.1
+ * Fixed an issue where an error would occur if the status item settings were not set.
  * 2024/8/9 Ver.1.0.0
  * 初版
  * 
@@ -55,7 +57,7 @@
  * @desc Y coordinate of the help window.
  * @text Help window Y coordinate
  * @type number
- * @default 468
+ * @default 564
  * @min -9999
  * @parent HelpWindowSetting
  * 
@@ -63,7 +65,7 @@
  * @desc The width of the help window.
  * @text Help window width
  * @type number
- * @default 0
+ * @default 846
  * @min 0
  * @parent HelpWindowSetting
  * 
@@ -82,7 +84,7 @@
  * @text Skill Type Window X Coordinate
  * @desc X coordinate of the skill type window.
  * @type number
- * @default 624
+ * @default 0
  * @min -9999
  * @parent SkillTypeWindowSetting
  * 
@@ -98,7 +100,7 @@
  * @desc Skill type window width.
  * @text Skill Type Window Width
  * @type number
- * @default 192
+ * @default 846
  * @min 0
  * @parent SkillTypeWindowSetting
  * 
@@ -114,7 +116,7 @@
  * @text Skill Type Window Height
  * @desc Skill type window height (number of rows) 0 specifies SkillTypeWindowHeight
  * @type number
- * @default 3
+ * @default 1
  * @min 0
  * @parent SkillTypeWindowSetting
  * 
@@ -122,7 +124,7 @@
  * @desc Number of skill type cols.
  * @text Skill type cols
  * @type number
- * @default 1
+ * @default 4
  * @min 1
  * @parent SkillTypeWindowSetting
  * 
@@ -149,7 +151,7 @@
  * @text Skill window Y coordinate
  * @desc Y coordinate of the skill window.
  * @type number
- * @default 156
+ * @default 68
  * @min -9999
  * @parent SkillWindowSetting
  * 
@@ -157,7 +159,7 @@
  * @desc Skill window width.
  * @text Skill Window Width
  * @type number
- * @default 0
+ * @default 846
  * @min 0
  * @parent SkillWindowSetting
  * 
@@ -165,7 +167,7 @@
  * @text Skill Window Height
  * @desc Skill window height. 0 is main area height
  * @type number
- * @default 312
+ * @default 498
  * @min 0
  * @parent SkillWindowSetting
  * 
@@ -216,7 +218,7 @@
  * @desc Status window width.
  * @text status window width
  * @type number
- * @default 624
+ * @default 0
  * @min 0
  * @parent StatusWindowSetting
  * 
@@ -247,7 +249,7 @@
  * @text Status window display
  * @desc Show the status window.
  * @type boolean
- * @default true
+ * @default false
  * @parent StatusWindowSetting
  * 
  * @param ActorStatusWindowSetting
@@ -258,21 +260,21 @@
  * @text Same as the menu screen
  * @desc Display the same as the menu screen. If true, the coordinates will be relative.
  * @type boolean
- * @default true
+ * @default false
  * @parent ActorStatusWindowSetting
  * 
  * @param StatusList
  * @desc Set the status item. If not set, the same display as the menu screen will be displayed.
  * @text Status item settings
  * @type struct<StatusListData>[]
- * @default []
+ * @default ["{\"DateSelect\":\"ActorName\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"Level\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"80\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"HpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"-4\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Back\":\"false\",\"Decimal\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"MpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"20\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Back\":\"false\",\"Decimal\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"TpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"44\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Back\":\"false\",\"Decimal\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"State\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"248\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}"]
  * @parent ActorStatusWindowSetting
  * 
  * @param ActorWindowX
  * @text Actor Window X Coordinate
  * @desc Actor window X coordinate.
  * @type number
- * @default 0
+ * @default 846
  * @min -9999
  * @parent ActorStatusWindowSetting
  * 
@@ -288,7 +290,7 @@
  * @desc Actor window width.
  * @text Actor window width
  * @type number
- * @default 0
+ * @default 434
  * @min 0
  * @parent ActorStatusWindowSetting
  * 
@@ -296,7 +298,7 @@
  * @text Actor window height
  * @desc Actor window height. 0 is the main area height.
  * @type number
- * @default 0
+ * @default 678
  * @min 0
  * @parent ActorStatusWindowSetting
  * 
@@ -327,7 +329,7 @@
  * @text Actor window always visible
  * @desc Always show the actor window.
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorStatusWindowSetting
  * 
  * @param ActorSetting
@@ -821,7 +823,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * メニュー時のスキル画面をカスタマイズできます。
@@ -831,6 +833,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/15 Ver.1.0.1
+ * ステータス項目設定が未設定の場合にエラーが出る問題を修正。
  * 2024/8/9 Ver.1.0.0
  * 初版
  * 
@@ -861,7 +865,7 @@
  * @desc ヘルプウィンドウのY座標
  * @text ヘルプウィンドウY座標
  * @type number
- * @default 468
+ * @default 564
  * @min -9999
  * @parent HelpWindowSetting
  * 
@@ -869,7 +873,7 @@
  * @desc ヘルプウィンドウの横幅。
  * @text ヘルプウィンドウ横幅
  * @type number
- * @default 0
+ * @default 846
  * @min 0
  * @parent HelpWindowSetting
  * 
@@ -888,7 +892,7 @@
  * @text スキルタイプウィンドウX座標
  * @desc スキルタイプウィンドウのX座標
  * @type number
- * @default 624
+ * @default 0
  * @min -9999
  * @parent SkillTypeWindowSetting
  * 
@@ -904,7 +908,7 @@
  * @desc スキルタイプウィンドウの横幅。
  * @text スキルタイプウィンドウ横幅
  * @type number
- * @default 192
+ * @default 846
  * @min 0
  * @parent SkillTypeWindowSetting
  * 
@@ -920,7 +924,7 @@
  * @text スキルタイプウィンドウ高さ
  * @desc スキルタイプウィンドウの高さ(行数指定) 0でSkillTypeWindowHeight指定
  * @type number
- * @default 3
+ * @default 1
  * @min 0
  * @parent SkillTypeWindowSetting
  * 
@@ -928,7 +932,7 @@
  * @desc スキルタイプ列数
  * @text スキルタイプ列数
  * @type number
- * @default 1
+ * @default 4
  * @min 1
  * @parent SkillTypeWindowSetting
  * 
@@ -955,7 +959,7 @@
  * @desc スキルウィンドウのY座標
  * @text スキルウィンドウY座標
  * @type number
- * @default 156
+ * @default 68
  * @min -9999
  * @parent SkillWindowSetting
  * 
@@ -963,7 +967,7 @@
  * @desc スキルウィンドウの横幅。
  * @text スキルウィンドウ横幅
  * @type number
- * @default 0
+ * @default 846
  * @min 0
  * @parent SkillWindowSetting
  * 
@@ -971,7 +975,7 @@
  * @text スキルウィンドウ縦幅
  * @desc スキルウィンドウの縦幅。0でメインエリア高さ
  * @type number
- * @default 312
+ * @default 498
  * @min 0
  * @parent SkillWindowSetting
  * 
@@ -1053,7 +1057,7 @@
  * @text ステータスウィンドウ表示
  * @desc ステータスウィンドウを表示する。
  * @type boolean
- * @default true
+ * @default false
  * @parent StatusWindowSetting
  * 
  * @param ActorStatusWindowSetting
@@ -1064,21 +1068,21 @@
  * @text メニュー画面と同じ
  * @desc 表示をメニュー画面と同じ表示にする。trueの場合、座標は相対座標になります。
  * @type boolean
- * @default true
+ * @default false
  * @parent ActorStatusWindowSetting
  * 
  * @param StatusList
  * @desc ステータス項目設定
  * @text ステータス項目設定
  * @type struct<StatusListData>[]
- * @default 
+ * @default ["{\"DateSelect\":\"ActorName\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"1\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"Level\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"80\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"HpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"-4\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Back\":\"false\",\"Decimal\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"MpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"20\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Back\":\"false\",\"Decimal\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"TpGauge\",\"X_Position\":\"1\",\"Y_Position\":\"3\",\"X_Coordinate\":\"150\",\"Y_Coordinate\":\"44\",\"ItemWidth\":\"180\",\"SystemItemWidth\":\"0\",\"ParamName\":\"\",\"NameColor\":\"16\",\"Align\":\"'left'\",\"paramUnit\":\"\",\"FontSize\":\"0\",\"FontFace\":\"\",\"ValueFontFace\":\"\",\"Icon\":\"0\",\"IconY\":\"2\",\"DetaEval\":\"\",\"Back\":\"false\",\"Decimal\":\"0\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"EquipSetting\":\"------------------------------\",\"EquipStartIndex\":\"0\",\"EquipNum\":\"0\",\"OtherSetting\":\"------------------------------\",\"Text\":\"\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}","{\"DateSelect\":\"State\",\"NameColor\":\"16\",\"ParamName\":\"\",\"X_Position\":\"1\",\"Y_Position\":\"2\",\"X_Coordinate\":\"248\",\"Y_Coordinate\":\"0\",\"ItemWidth\":\"0\",\"SystemItemWidth\":\"0\",\"Align\":\"'left'\",\"DetaEval\":\"\",\"paramUnit\":\"\",\"Decimal\":\"0\",\"FontSize\":\"0\",\"ValueFontFace\":\"\",\"FontFace\":\"\",\"GaugeSetting\":\"------------------------------\",\"GaugeID\":\"\",\"GaugeHeight\":\"12\",\"DetaEval2\":\"\",\"Color1\":\"-1\",\"Color2\":\"-1\",\"ImgSetting\":\"------------------------------\",\"ImgData\":\"\",\"BattleMemberOpacity\":\"true\",\"CondSetting\":\"------------------------------\",\"Conditions\":\"\"}"]
  * @parent ActorStatusWindowSetting
  * 
  * @param ActorWindowX
  * @text アクターウィンドウX座標
  * @desc アクターウィンドウのX座標
  * @type number
- * @default 0
+ * @default 846
  * @min -9999
  * @parent ActorStatusWindowSetting
  * 
@@ -1094,7 +1098,7 @@
  * @desc アクターウィンドウの横幅。
  * @text アクターウィンドウ横幅
  * @type number
- * @default 0
+ * @default 434
  * @min 0
  * @parent ActorStatusWindowSetting
  * 
@@ -1102,7 +1106,7 @@
  * @text アクターウィンドウ縦幅
  * @desc アクターウィンドウの縦幅。0でメインエリア高さ
  * @type number
- * @default 0
+ * @default 678
  * @min 0
  * @parent ActorStatusWindowSetting
  * 
@@ -1133,7 +1137,7 @@
  * @text アクターウィンドウ常時表示
  * @desc アクターウィンドウを常時表示する。
  * @type boolean
- * @default false
+ * @default true
  * @parent ActorStatusWindowSetting
  * 
  * @param ActorSetting
@@ -1877,6 +1881,10 @@ Imported.NUUN_ItemWindowEx = true;
         return params.StatusList && params.StatusList.length > 0;
     };
 
+    function _isSceneSkill() {
+        return String(SceneManager._scene.constructor.name) === 'Scene_Skill';
+    }
+
     const _Scene_Menu_commandPersonal = Scene_Menu.prototype.commandPersonal;
     Scene_Menu.prototype.commandPersonal = function() {
         if (this._commandWindow.currentSymbol() === "skill" && params.ShowActorWindow) {
@@ -2042,7 +2050,7 @@ Imported.NUUN_ItemWindowEx = true;
     const _Scene_Skill_update = Scene_Skill.prototype.update;
     Scene_Skill.prototype.update = function() {
         _Scene_Skill_update.call(this);////
-        if (params.ShowActorWindow && this._actorWindow.isSelectActor() && this.actor() !== $gameParty.menuActor()) {
+        if (params.ShowActorWindow && this.isSelectActor() && this.actor() !== $gameParty.menuActor()) {
             this.updateActor();
             this.refreshActor();
             this._skillTypeWindow.deselect();
@@ -2064,7 +2072,7 @@ Imported.NUUN_ItemWindowEx = true;
 
     const _Scene_Skill_onActorOk = Scene_Skill.prototype.onActorOk;
     Scene_Skill.prototype.onActorOk = function() {
-        if (this._actorWindow.isSelectActor()) {
+        if (this.isSelectActor()) {
             this.refreshActor();
             this._actorWindow.deselect();
             this._actorWindow.deactivate();
@@ -2099,9 +2107,13 @@ Imported.NUUN_ItemWindowEx = true;
         }
     };
 
+    Scene_Skill.prototype.isSelectActor = function() {
+        return !!this._actorWindow.isSelectActor ? this._actorWindow.isSelectActor() : false;
+    };
+
     const _Scene_Skill_onActorCancel = Scene_Skill.prototype.onActorCancel;
     Scene_Skill.prototype.onActorCancel = function() {
-        if (params.ShowActorWindow && this._actorWindow.isSelectActor()) {
+        if (params.ShowActorWindow && this.isSelectActor()) {
             _Scene_Skill_popScene.apply(this, arguments);////
         } else {
             _Scene_Skill_onActorCancel.apply(this, arguments);/////
@@ -2161,32 +2173,50 @@ Imported.NUUN_ItemWindowEx = true;
     
     Window_SkillMenuActor.prototype = Object.create(Window_MenuActor.prototype);
     Window_SkillMenuActor.prototype.constructor = Window_SkillMenuActor;
+
+    const _Window_MenuActor_initialize = Window_MenuActor.prototype.initialize;
+    Window_MenuActor.prototype.initialize = function(rect) {
+        _Window_MenuActor_initialize.apply(this, arguments);
+        if (_isSceneSkill()) {
+            this.initializeSkill();
+        }
+    };
     
     Window_SkillMenuActor.prototype.initialize = function(rect) {
         this._contentsData = [];
         this.createData();
-        this._selectMode = 'actor';
         Window_MenuActor.prototype.initialize.call(this, rect);
+    };
+
+    Window_MenuActor.prototype.initializeSkill = function() {
+        this._selectMode = 'actor';
         if (params.ShowActorWindow) {
             this.show();
         }
     };
 
-    Window_SkillMenuActor.prototype.selectActor = function() {
+    Window_MenuActor.prototype.selectActor = function() {
         this._selectMode = 'actor';
     };
 
-    Window_SkillMenuActor.prototype.selectSkill = function() {
+    Window_MenuActor.prototype.selectSkill = function() {
         this._selectMode = 'skill';
     };
 
-    Window_SkillMenuActor.prototype.isSelectActor = function() {
+    Window_MenuActor.prototype.isSelectActor = function() {
         return this._selectMode === 'actor';
     };
 
-    Window_SkillMenuActor.prototype.select = function(index) {
-        Window_MenuActor.prototype.select.call(this, index);
-        if (index >= 0 && this.isSelectActor()) {
+    if (Window_MenuActor.prototype.select == Window_Selectable.prototype.select) {
+        Window_MenuActor.prototype.select = function() {
+            Window_Selectable.prototype.select.apply(this, arguments);
+        };
+    }
+
+    const _Window_MenuActor_select = Window_MenuActor.prototype.select;
+    Window_MenuActor.prototype.select = function(index) {
+        _Window_MenuActor_select.apply(this, arguments);
+        if (_isSceneSkill() && index >= 0 && this.isSelectActor()) {
             $gameParty.setMenuActor($gameParty.members()[index]);
         }
     };

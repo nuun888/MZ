@@ -4,7 +4,7 @@
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 #### 対応ポップアッププラグイン
-[盗みスキルのポップアップ](https://github.com/nuun888/MZ/blob/master/README/UpFadeoutPopup.md)  
+[盗みスキルのポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealPopUp.js)  
 [アップフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/UpFadeoutPopup.md)  
 [スライドフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/SlideFadeoutPopup.md)  
 [バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md)  
@@ -67,7 +67,7 @@
 
 #### 盗み時のポップアップ
 盗みを行って成功した時または、盗まれたときにポップアップを行います。なおNUUN_StealableItemsが必要です。  
-
+[盗みスキルのポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealPopUp.js)  
 
 ## 更新履歴
 2025/3/21 Ver.1.0.0

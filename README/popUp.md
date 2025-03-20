@@ -1,4 +1,4 @@
-# [ポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
+# [ポップアップ(旧)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
 # Ver.2.0.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_popUp.js)
 #### 必須、前提プラグイン

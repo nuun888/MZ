@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.10
+ * @version 2.6.11
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/21 Ver.2.6.11
+ * 装備、属性、ステートでコンテンツ背景をOFFにしたときに、表示がずれる問題を修正。
  * 2024/5/25 Ver.2.6.10
  * 能力値、追加能力値、特殊能力値、オリジナルパラメータ、属性耐性、ステート耐性の単位にシステムカラーを適用できるように修正。
  * 2024/4/7 Ver.2.6.9
@@ -2284,6 +2286,8 @@ Window_Status.prototype.drawEquip = function(list, actor, x, y, width) {
     if (list.Back) {
         width2 = this.contensWidth(width);
         x2 = this.contensX(x);
+    } else {
+        x2 = x;
     }
     let contentsY = y2;
     for (let i = 0; i < e1uipsLength; i++) {
@@ -2435,6 +2439,8 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
                     this.drawContentsBackground(list.Back, x2, y2, width); 
                     x2 = this.contensX(x2);
                     width2 = this.contensWidth(width);
+                } else {
+                    width2 = width;
                 }
                 let iconId = ElementResist[i].ElementIconId;
                 if (ElementResistText || !iconId) {
@@ -2490,6 +2496,8 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
                     this.drawContentsBackground(list.Back, x2, y2, width); 
                     x2 = this.contensX(x2);
                     width2 = this.contensWidth(width);
+                } else {
+                    width2 = width;
                 }
                 let iconId = StateResist[i].StateIconId > 0 ? StateResist[i].StateIconId : $dataStates[stateId].iconIndex;
                 if (StateResistText || iconId === 0) {

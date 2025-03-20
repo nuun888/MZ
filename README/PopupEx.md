@@ -66,7 +66,7 @@
 %1:パラメータ(クリティカル等)  
 
 #### 盗み時のポップアップ
-盗みを行って成功した時または、盗まれたときにポップアップを行います。なおNUUN_StealableItemsが必要です。  
+盗みを行って成功した時または、盗まれたときにポップアップを行います。なおNUUN_StealableItems Ver.1.5.2以降が必要です。  
 [盗みスキルのポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealPopUp.js)  
 
 ## 更新履歴

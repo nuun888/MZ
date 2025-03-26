@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.1
+ * @version 1.3.0
  * 
  * @help
  * Extend the counter.
@@ -62,6 +62,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/27/2024 Ver.1.3.0
+ * Added a function to limit the number of counters that can be activated when multiple counters are active.
+ * Added the ability to specify activation priority when multiple counters are executable.
  * 7/21/2024 Ver.1.2.1
  * If no counter skill is set, the counterattack skill will be counterattacked with skill ID 1.
  * Fixed an issue where reflection was not working.
@@ -90,6 +93,23 @@
  * @text Counter setting
  * @type struct<CounterList>[]
  * @default 
+ * 
+ * @param CounterSkillNum
+ * @text Number of simultaneous counter activation skills
+ * @desc Maximum skill count when processing multiple counters. (0 means unlimited)
+ * @type number
+ * @default 1
+ * @min 0
+ * 
+ * @param CounterPriority
+ * @desc Execution priority when multiple counters are enabled
+ * @text Counter Execution Priority
+ * @type select
+ * @option Feature reference order
+ * @value 'trait'
+ * @option Plug-in Parameter List Order(Counter setting)
+ * @value 'list'
+ * @default 'list'
  * 
  */
 /*~struct~CounterList:
@@ -330,7 +350,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.1s
+ * @version 1.3.0
  * 
  * @help
  * カウンターを拡張します。
@@ -381,6 +401,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/27 Ver.1.3.0
+ * 複数のカウンターが実行可能の場合、発動数を制限する機能を追加。
+ * 複数のカウンターが実行可能の場合、発動優先度を指定する機能を追加。
  * 2024/7/21 Ver.1.2.1
  * カウンタースキルが設定されていない場合、反撃スキルをスキルID1番で反撃するように修正。
  * 反射が機能していなかった問題を修正。
@@ -409,6 +432,23 @@
  * @text カウンター設定
  * @type struct<CounterList>[]
  * @default 
+ * 
+ * @param CounterSkillNum
+ * @text 同時カウンター発動スキル数
+ * @desc 複数のカウンターを処理するときの最大スキル回数。(0で無制限)
+ * @type number
+ * @default 1
+ * @min 0
+ * 
+ * @param CounterPriority
+ * @desc 複数のカウンターが有効の場合の実行優先度
+ * @text カウンター実行優先度
+ * @type select
+ * @option 特徴参照順
+ * @value 'trait'
+ * @option プラグインパラメータリスト順（カウンター設定）
+ * @value 'list'
+ * @default 'list'
  * 
  */
 /*~struct~CounterList:ja
@@ -650,6 +690,8 @@ Imported.NUUN_CounterEX = true;
 (() => {
     const parameters = PluginManager.parameters('NUUN_CounterEX');
     const CounterData = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CounterData'])) : [];
+    const CounterSkillNum = Number(parameters['CounterSkillNum'] || 1);
+    const CounterPriority = DataManager.nuun_structureData(parameters['CounterPriority']);
 
     class CounterActionEX {
         constructor(counterSubject, subject) {
@@ -995,14 +1037,28 @@ Imported.NUUN_CounterEX = true;
     };
 
     BattleManager.condCounterAction = function(subject, battler, target, mode) {
-        battler.traitObjects().some(trait => {
-            const counterData = getCounterdata(trait);
-            if (!!counterData && !noCounterTagItem(this._action, counterData) && this.isCounterActionMode(target, counterData, mode)) {
-                if (battler === target) {
-                    this.setCounterTriggers(battler, trait, subject, counterData);
-                } else if (isCounterAlwaysTrigger(counterData)) {
-                    this.setCounterTriggers(battler, trait, subject, counterData);
+        const list = [];
+        battler.traitObjects().forEach(trait => {
+            const id = _getCounterId(trait);
+            if (id !== null && id >= 0) {
+                if (CounterPriority === 'list') {
+                    list[id] = trait;
+                } else if (CounterPriority === 'trait') {
+                    list.push(trait);
                 }
+            }
+        });
+        list.some((trait, index) => {
+            if (!!trait) {
+                const counterData = CounterData[index];
+                if (!!counterData && !noCounterTagItem(this._action, counterData) && this.isCounterActionMode(target, counterData, mode)) {
+                    if (battler === target) {
+                        this.setCounterTriggers(battler, trait, subject, counterData);
+                    } else if (isCounterAlwaysTrigger(counterData)) {
+                        this.setCounterTriggers(battler, trait, subject, counterData);
+                    }
+                }
+                return CounterSkillNum > 0 ? this._counterBattlerList.length >= CounterSkillNum : false;
             }
         });
     };
@@ -1028,6 +1084,7 @@ Imported.NUUN_CounterEX = true;
     };
 
     BattleManager.setCounterTrigger = function(target, trait, subject, counter, trigger) {
+        //優先度リスト設定順
         if (trigger === 'Physical' && Math.random() < this._action.itemCntEx(target, counter)) {
             if (this.isCounterAction(target, trait, subject, counter)) {
                 this._counterBattlerList.push(target);
@@ -1221,6 +1278,9 @@ Imported.NUUN_CounterEX = true;
         if (counter.CounterMessage) {
             this.push("addText", counter.CounterMessage.format(subject.name()));
         }
+        if (Imported.NUUN_PopupEx) {
+            this.counterExPopup("counter", subject);
+        }
     };
     
     Window_BattleLog.prototype.displayReflectionEx = function(subject, counter) {
@@ -1233,6 +1293,9 @@ Imported.NUUN_CounterEX = true;
         }
         if (counter.CounterMessage) {
             this.push("addText", counter.CounterMessage.format(subject.name()));
+        }
+        if (Imported.NUUN_PopupEx) {
+            this.counterExPopup("reflection", subject);
         }
     };
 
@@ -1278,6 +1341,18 @@ Imported.NUUN_CounterEX = true;
         } else {
             return CounterData[Number(trait.meta.CounterEX) - 1];
         }
+    };
+
+    function _getCounterId(trait) {
+        const data = trait.meta.CounterEX;
+        if (!data) {
+            return null;
+        } else if (isNaN(data)) {
+            return getCounterNameIndex(data);
+        } else {
+            return Number(trait.meta.CounterEX) - 1;
+        }
+        return 0;
     };
 
     function getCounterNameIndex(name) {

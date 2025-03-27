@@ -2312,6 +2312,7 @@ Imported.NUUN_OptionEx = true;
         const w = Math.floor(width / list.length);
         list.forEach((code, i) => {
             this.resetTextColor();
+            this.changePaintOpacity(this.index() === index && this._configIndex === i);
             const x2 = x + (i * w);
             if (!!_readPadImgList[code]) {
                 const bitmap = _readPadImgList[code];
@@ -2319,7 +2320,7 @@ Imported.NUUN_OptionEx = true;
             } else {
                 this.drawText(_getGamePadKey(code), x2, y, w - this.itemPadding(), "center");
             }
-        })
+        });
     };
 
     Window_Options.prototype.drawKeyImg = function(bitmap, x, y, w) {

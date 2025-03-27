@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/27/2025 Ver.1.3.1
+ * Fixed to make the text color (image) of non-selected key settings opaque when a key is selected.
  * 3/27/2025 Ver.1.3.0
  * Added the ability to set images to keys and buttons in key and gamepad settings.
  * Changed the specifications of applicable keys.
@@ -908,7 +910,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * オプション画面を拡張します。
@@ -921,6 +923,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/27 Ver.1.3.1
+ * キー選択時に非選択時のキー設定の文字色(画像)を不透明にするように修正。
  * 2025/3/27 Ver.1.3.0
  * キー、ゲームパッド設定でキー、ボタンに画像を設定できる機能を追加。
  * 適用できるキーの仕様を変更。
@@ -1295,7 +1299,7 @@
  * @parent KeyConfigSetting
  * 
  * @param ConfigurableKey
- * @text 設定可能キーコード、画像設定。
+ * @text 設定可能キーコード、画像設定
  * @desc 設定可能なキーコード、画像を指定します。
  * @default ["{\"ConfigurableKeyCode\":\"8\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"9\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"13\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"16\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"17\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"18\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"19\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"27\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"33\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"34\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"35\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"36\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"45\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"48\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"49\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"50\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"51\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"52\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"53\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"54\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"55\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"56\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"57\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"65\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"66\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"67\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"68\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"69\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"70\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"71\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"72\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"73\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"74\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"75\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"76\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"77\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"78\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"79\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"80\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"81\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"82\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"83\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"84\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"85\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"86\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"87\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"88\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"89\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"90\",\"KeyImg\":\"\"}"]
  * @type struct<KeyConfigImgList>[]
@@ -2277,6 +2281,7 @@ Imported.NUUN_OptionEx = true;
         const w = Math.floor(width / list.length);
         list.forEach((code, i) => {
             this.index() === index && this._configIndex === i ? this.changeTextColor(NuunManager.getColorCode(params.SelectNameColor)) : this.resetTextColor();
+            this.changePaintOpacity(this.index() === index && this._configIndex === i);
             const x2 = x + (i * w);
             if (!!_readKeyImgList[code]) {
                 const bitmap = _readKeyImgList[code];

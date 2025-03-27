@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.4
+ * @version 1.3.0
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/27/2025 Ver.1.3.0
+ * Added the ability to set images to keys and buttons in key and gamepad settings.
+ * Changed the specifications of applicable keys.
+ * Fixed an issue where an error would occur if you canceled without making any key changes in the Key and Gamepad Settings.
  * 2/15/2025 Ver.1.2.4
  * Fixed so that the cursor on the options screen is not displayed when selecting an option command.
  * 2/2/2025 Ver.1.2.3
@@ -394,6 +398,13 @@
  * @min 0
  * @parent KeyConfigSetting
  * 
+ * @param ConfigurableKey
+ * @text Configurable keycode, image settings.
+ * @desc Specify the settable key code and image.
+ * @default ["{\"ConfigurableKeyCode\":\"8\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"9\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"13\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"16\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"17\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"18\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"19\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"27\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"33\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"34\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"35\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"36\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"45\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"48\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"49\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"50\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"51\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"52\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"53\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"54\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"55\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"56\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"57\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"65\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"66\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"67\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"68\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"69\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"70\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"71\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"72\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"73\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"74\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"75\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"76\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"77\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"78\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"79\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"80\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"81\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"82\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"83\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"84\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"85\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"86\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"87\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"88\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"89\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"90\",\"KeyImg\":\"\"}"]
+ * @type struct<KeyConfigImgList>[]
+ * @parent KeyConfigSetting
+ * 
  * @param GamePadConfigSetting
  * @text Gamepad Settings
  * @default ------------------------------
@@ -418,6 +429,13 @@
  * @desc Dismiss the options window when selecting a gamepad setting.
  * @type boolean
  * @default false
+ * @parent GamePadConfigSetting
+ * 
+ * @param ConfigurableGamepad
+ * @text Gamepad button image settings
+ * @desc Specifies the image for the gamepad button.
+ * @default ["{\"GamepadCode\":\"0\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"1\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"2\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"3\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"4\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"5\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"6\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"7\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"8\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"9\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"10\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"11\",\"GamepadImg\":\"\"}"]
+ * @type struct<GamepadConfigImgList>[]
  * @parent GamePadConfigSetting
  * 
  * @param BackGroundSetting
@@ -671,6 +689,218 @@
  * @min -100
  * 
  */
+ /*~struct~KeyConfigImgList:
+ * 
+ * @param ConfigurableKeyCode
+ * @desc Specify a configurable keycode.
+ * @text Configurable Key Codes
+ * @type select
+ * @option None
+ * @value -1
+ * @option BackSpace
+ * @value 8
+ * @option Tab
+ * @value 9
+ * @option Enter
+ * @value 13
+ * @option Shift
+ * @value 16
+ * @option Ctrl
+ * @value 17
+ * @option Alt
+ * @value 18
+ * @option Pause
+ * @value 19
+ * @option Esc
+ * @value 27
+ * @option Space
+ * @value 32
+ * @option PageUp
+ * @value 33
+ * @option PageDown
+ * @value 34
+ * @option End
+ * @value 35
+ * @option Home
+ * @value 36
+ * @option ←
+ * @value 37
+ * @option ↑
+ * @value 38
+ * @option →
+ * @value 39
+ * @option ↓
+ * @value 40
+ * @option Insert
+ * @value 45
+ * @option 0
+ * @value 48
+ * @option 1
+ * @value 49
+ * @option 2
+ * @value 50
+ * @option 3
+ * @value 51
+ * @option 4
+ * @value 52
+ * @option 5
+ * @value 53
+ * @option 6
+ * @value 54
+ * @option 7
+ * @value 55
+ * @option 8
+ * @value 56
+ * @option 9
+ * @value 57
+ * @option A
+ * @value 65
+ * @option B
+ * @value 66
+ * @option C
+ * @value 67
+ * @option D
+ * @value 68
+ * @option E
+ * @value 69
+ * @option F
+ * @value 70
+ * @option G
+ * @value 71
+ * @option H
+ * @value 72
+ * @option I
+ * @value 73
+ * @option J
+ * @value 74
+ * @option K
+ * @value 75
+ * @option L
+ * @value 76
+ * @option M
+ * @value 77
+ * @option N
+ * @value 78
+ * @option O
+ * @value 79
+ * @option P
+ * @value 80
+ * @option Q
+ * @value 81
+ * @option R
+ * @value 82
+ * @option S
+ * @value 83
+ * @option T
+ * @value 84
+ * @option U
+ * @value 85
+ * @option V
+ * @value 86
+ * @option W
+ * @value 87
+ * @option X
+ * @value 88
+ * @option Y
+ * @value 89
+ * @option Z
+ * @value 90
+ * @option Win
+ * @value 91
+ * @option Apps
+ * @value 92
+ * @option :*
+ * @value 186
+ * @option ;+
+ * @value 187
+ * @option ,<
+ * @value 188
+ * @option -=
+ * @value 189
+ * @option .>
+ * @value 190
+ * @option /?
+ * @value 191
+ * @option `
+ * @value 192
+ * @option [{
+ * @value 220
+ * @option |
+ * @value 221
+ * @option ]}
+ * @value 222
+ * @default
+ * @min -1
+ * 
+ * @param KeyImg
+ * @desc Specifies the name of the key image file to display.
+ * @text Key Image
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ */
+ /*~struct~GamepadConfigImgList:
+ * 
+ * @param GamepadCode
+ * @desc Gamepad code.
+ * @text Gamepad code
+ * @type select
+ * @option None
+ * @value -1
+ * @option A(Down button)
+ * @value 0
+ * @option B(Right button)
+ * @value 1
+ * @option X(Left button)
+ * @value 2
+ * @option Y(Up button)
+ * @value 3
+ * @option LB
+ * @value 4
+ * @option RB
+ * @value 5
+ * @option LT
+ * @value 6
+ * @option RT
+ * @value 7
+ * @option Back
+ * @value 8
+ * @option Start
+ * @value 9
+ * @option Left stick push
+ * @value 10
+ * @option Right stick push
+ * @value 11
+ * @option Left stick ↑
+ * @value 12
+ * @option Left stick ↓
+ * @value 13
+ * @option Left stick ←
+ * @value 14
+ * @option Left stick →
+ * @value 15
+ * @option 
+ * @value 16
+ * @option Right stick ↑
+ * @value 21
+ * @option Right stick ↓
+ * @value 22
+ * @option Right stick ←
+ * @value 23
+ * @option Right stick →
+ * @value 24
+ * @default -1
+ * @min -1
+ * 
+ * @param GamepadImg
+ * @desc Specifies the file name of the gamepad button image to be displayed.
+ * @text Gamepad button images
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ */
 /*:ja
  * @target MZ
  * @plugindesc オプション拡張
@@ -678,7 +908,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.2.4
+ * @version 1.3.0
  * 
  * @help
  * オプション画面を拡張します。
@@ -691,6 +921,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/27 Ver.1.3.0
+ * キー、ゲームパッド設定でキー、ボタンに画像を設定できる機能を追加。
+ * 適用できるキーの仕様を変更。
+ * キー、ゲームパッド設定でキー変更を行わずキャンセルをした場合、エラーが出る問題を修正。
  * 2025/2/15 Ver.1.2.4
  * オプションコマンド選択時にオプション画面のカーソルを表示しないように修正。
  * 2025/2/2 Ver.1.2.3
@@ -1060,6 +1294,13 @@
  * @min 0
  * @parent KeyConfigSetting
  * 
+ * @param ConfigurableKey
+ * @text 設定可能キーコード、画像設定。
+ * @desc 設定可能なキーコード、画像を指定します。
+ * @default ["{\"ConfigurableKeyCode\":\"8\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"9\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"13\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"16\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"17\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"18\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"19\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"27\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"33\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"34\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"35\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"36\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"45\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"48\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"49\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"50\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"51\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"52\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"53\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"54\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"55\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"56\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"57\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"65\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"66\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"67\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"68\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"69\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"70\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"71\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"72\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"73\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"74\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"75\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"76\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"77\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"78\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"79\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"80\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"81\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"82\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"83\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"84\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"85\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"86\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"87\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"88\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"89\",\"KeyImg\":\"\"}","{\"ConfigurableKeyCode\":\"90\",\"KeyImg\":\"\"}"]
+ * @type struct<KeyConfigImgList>[]
+ * @parent KeyConfigSetting
+ * 
  * @param GamePadConfigSetting
  * @text ゲームパッド設定
  * @default ------------------------------
@@ -1084,6 +1325,13 @@
  * @desc ゲームパッド設定選択時にオプションウィンドウを消去します。
  * @type boolean
  * @default false
+ * @parent GamePadConfigSetting
+ * 
+ * @param ConfigurableGamepad
+ * @text ゲームパッドボタン画像設定
+ * @desc ゲームパッドボタンの画像を指定します。
+ * @default ["{\"GamepadCode\":\"0\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"1\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"2\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"3\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"4\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"5\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"6\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"7\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"8\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"9\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"10\",\"GamepadImg\":\"\"}","{\"GamepadCode\":\"11\",\"GamepadImg\":\"\"}"]
+ * @type struct<GamepadConfigImgList>[]
  * @parent GamePadConfigSetting
  * 
  * @param BackGroundSetting
@@ -1336,6 +1584,218 @@
  * @min -100
  * 
  */
+ /*~struct~KeyConfigImgList:ja
+ * 
+ * @param ConfigurableKeyCode
+ * @desc 設定可能なキーコードを指定します。
+ * @text 設定可能キーコード
+ * @type select
+ * @option None
+ * @value -1
+ * @option BackSpace
+ * @value 8
+ * @option Tab
+ * @value 9
+ * @option Enter
+ * @value 13
+ * @option Shift
+ * @value 16
+ * @option Ctrl
+ * @value 17
+ * @option Alt
+ * @value 18
+ * @option Pause
+ * @value 19
+ * @option Esc
+ * @value 27
+ * @option Space
+ * @value 32
+ * @option PageUp
+ * @value 33
+ * @option PageDown
+ * @value 34
+ * @option End
+ * @value 35
+ * @option Home
+ * @value 36
+ * @option ←
+ * @value 37
+ * @option ↑
+ * @value 38
+ * @option →
+ * @value 39
+ * @option ↓
+ * @value 40
+ * @option Insert
+ * @value 45
+ * @option 0
+ * @value 48
+ * @option 1
+ * @value 49
+ * @option 2
+ * @value 50
+ * @option 3
+ * @value 51
+ * @option 4
+ * @value 52
+ * @option 5
+ * @value 53
+ * @option 6
+ * @value 54
+ * @option 7
+ * @value 55
+ * @option 8
+ * @value 56
+ * @option 9
+ * @value 57
+ * @option A
+ * @value 65
+ * @option B
+ * @value 66
+ * @option C
+ * @value 67
+ * @option D
+ * @value 68
+ * @option E
+ * @value 69
+ * @option F
+ * @value 70
+ * @option G
+ * @value 71
+ * @option H
+ * @value 72
+ * @option I
+ * @value 73
+ * @option J
+ * @value 74
+ * @option K
+ * @value 75
+ * @option L
+ * @value 76
+ * @option M
+ * @value 77
+ * @option N
+ * @value 78
+ * @option O
+ * @value 79
+ * @option P
+ * @value 80
+ * @option Q
+ * @value 81
+ * @option R
+ * @value 82
+ * @option S
+ * @value 83
+ * @option T
+ * @value 84
+ * @option U
+ * @value 85
+ * @option V
+ * @value 86
+ * @option W
+ * @value 87
+ * @option X
+ * @value 88
+ * @option Y
+ * @value 89
+ * @option Z
+ * @value 90
+ * @option Win
+ * @value 91
+ * @option Apps
+ * @value 92
+ * @option :*
+ * @value 186
+ * @option ;+
+ * @value 187
+ * @option ,<
+ * @value 188
+ * @option -=
+ * @value 189
+ * @option .>
+ * @value 190
+ * @option /?
+ * @value 191
+ * @option `
+ * @value 192
+ * @option [{
+ * @value 220
+ * @option |
+ * @value 221
+ * @option ]}
+ * @value 222
+ * @default
+ * @min -1
+ * 
+ * @param KeyImg
+ * @desc 表示するキー画像ファイル名を指定します。
+ * @text キー画像
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ */
+ /*~struct~GamepadConfigImgList:ja
+ * 
+ * @param GamepadCode
+ * @desc ゲームパッドコード
+ * @text ゲームパッドコード
+ * @type select
+ * @option None
+ * @value -1
+ * @option A(下ボタン)
+ * @value 0
+ * @option B(右ボタン)
+ * @value 1
+ * @option X(左ボタン)
+ * @value 2
+ * @option Y(上ボタン)
+ * @value 3
+ * @option LB
+ * @value 4
+ * @option RB
+ * @value 5
+ * @option LT
+ * @value 6
+ * @option RT
+ * @value 7
+ * @option Back
+ * @value 8
+ * @option Start
+ * @value 9
+ * @option Left stick push
+ * @value 10
+ * @option Right stick push
+ * @value 11
+ * @option Left stick ↑
+ * @value 12
+ * @option Left stick ↓
+ * @value 13
+ * @option Left stick ←
+ * @value 14
+ * @option Left stick →
+ * @value 15
+ * @option 
+ * @value 16
+ * @option Right stick ↑
+ * @value 21
+ * @option Right stick ↓
+ * @value 22
+ * @option Right stick ←
+ * @value 23
+ * @option Right stick →
+ * @value 24
+ * @default -1
+ * @min -1
+ * 
+ * @param GamepadImg
+ * @desc 表示するゲームパッドボタン画像ファイル名を指定します。
+ * @text ゲームパッドボタン画像
+ * @type file
+ * @dir img/
+ * @default 
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_OptionEx = true;
@@ -1348,6 +1808,8 @@ Imported.NUUN_OptionEx = true;
     const gamepadMapper = Input.gamepadMapper;
     let _tempData = null;
     let _nunnTitleScene = false;
+    const _readKeyImgList = [];
+    const _readPadImgList = [];
 
     params.KeyConfigData.forEach(list => {
         const data = list.OptionSymbol;
@@ -1376,6 +1838,7 @@ Imported.NUUN_OptionEx = true;
     };
 
     Scene_Options.prototype.create = function() {
+        _readKeyImg();
         Scene_MenuBase.prototype.create.call(this);
         this.createCategoryWindow();
         this.createOptionsWindow();
@@ -1445,6 +1908,7 @@ Imported.NUUN_OptionEx = true;
             this._optionsWindow.setupKeyMode = false;
             this._optionsWindow.activate();
             this._optionsWindow.deselect();
+            this._optionsWindow.selectLast();
         } else {
             if (this._optionsCategoryWindow) {
                 this._optionsCategoryWindow.activate();
@@ -1662,7 +2126,7 @@ Imported.NUUN_OptionEx = true;
         } else {
             _Window_Options_processOk.apply(this, arguments);
         }
-    };
+    };  
 
     const _Window_Options_cursorRight = Window_Options.prototype.cursorRight;
     Window_Options.prototype.cursorRight = function(wrap) {
@@ -1813,7 +2277,13 @@ Imported.NUUN_OptionEx = true;
         const w = Math.floor(width / list.length);
         list.forEach((code, i) => {
             this.index() === index && this._configIndex === i ? this.changeTextColor(NuunManager.getColorCode(params.SelectNameColor)) : this.resetTextColor();
-            this.drawText(_getKey(code), x + (i * w), y, w - this.itemPadding(), "center");
+            const x2 = x + (i * w);
+            if (!!_readKeyImgList[code]) {
+                const bitmap = _readKeyImgList[code];
+                bitmap.addLoadListener(this.drawKeyImg.bind(this, bitmap, x2, y, w));
+            } else {
+                this.drawText(_getKey(code), x2, y, w - this.itemPadding(), "center");
+            }
         })
     };
 
@@ -1837,8 +2307,18 @@ Imported.NUUN_OptionEx = true;
         const w = Math.floor(width / list.length);
         list.forEach((code, i) => {
             this.resetTextColor();
-            this.drawText(_getGamePadKey(code), x + (i * w), y, w - this.itemPadding(), "center");
+            const x2 = x + (i * w);
+            if (!!_readPadImgList[code]) {
+                const bitmap = _readPadImgList[code];
+                bitmap.addLoadListener(this.drawKeyImg.bind(this, bitmap, x2, y, w));
+            } else {
+                this.drawText(_getGamePadKey(code), x2, y, w - this.itemPadding(), "center");
+            }
         })
+    };
+
+    Window_Options.prototype.drawKeyImg = function(bitmap, x, y, w) {
+        this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x + Math.floor(w / 2) - Math.floor(bitmap.width / 2), y);
     };
 
     const _Window_Options_changeValue = Window_Options.prototype.changeValue;
@@ -1992,7 +2472,7 @@ Imported.NUUN_OptionEx = true;
         }
         if (code === 46) {
             keyMapper[list[this._configIndex]] = "";
-        } else if (!!keyMapper[code] || this.isInvalidKey(code)) {
+        } else if (!!keyMapper[code] || !this.isConfigurableKey(code) || this.isInvalidKey(code)) {
             this.playBuzzerSound();
             return;
         } else if (list[this._configIndex] < 0) {
@@ -2009,6 +2489,10 @@ Imported.NUUN_OptionEx = true;
             this.setupKeyMode = false;
             this.activate();
         }
+    };
+
+    Window_Options.prototype.isConfigurableKey = function(code) {
+        return params.ConfigurableKey.map(data => data.ConfigurableKeyCode).includes(code);
     };
 
     Window_Options.prototype.isInvalidKey = function(code) {
@@ -2269,6 +2753,15 @@ Imported.NUUN_OptionEx = true;
     };
 
 
+    function _readKeyImg() {
+        params.ConfigurableKey.forEach(data => {
+            _readKeyImgList[data.ConfigurableKeyCode] = !!data.KeyImg ? ImageManager.nuun_LoadPictures(data.KeyImg) : null;
+        });
+        params.ConfigurableGamepad.forEach(data => {
+            _readPadImgList[data.GamepadCode] = !!data.GamepadImg ? ImageManager.nuun_LoadPictures(data.GamepadImg) : null;
+        });
+    };
+
     function _getKeyCodeList(symbol) {
         const keyList = [];
         const keyMaxNum = params.KeyMaxNum > 0 ? params.KeyMaxNum : Infinity;
@@ -2521,6 +3014,15 @@ Imported.NUUN_OptionEx = true;
                 return "Right stick →";
         }
         return "";
+    };
+
+    function _isRegulation(data) {
+        const regulation = data.Regulation || "";
+        return !!regulation ? $dataSystem.locale.indexOf(String(regulation)) < 0 : true;
+    };
+
+    function _getInitValue(data) {
+        return _isRegulation(data) ? data.RegulationValue : data.InitValue;
     };
     
     

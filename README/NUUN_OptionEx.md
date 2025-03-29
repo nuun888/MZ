@@ -1,5 +1,5 @@
 # [オプション拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)
-# Ver.1.3.1
+# Ver.1.3.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_OptionEx.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -96,6 +96,8 @@ Ver.1.0.2
 マスターボリューム設定プラグイン、オプションデフォルト値設定プラグインはこのプラグインよりも上に設定してください。  
 
 ## 更新履歴
+2025/3/29 Ver.1.3.2  
+キー、ゲームパッド設定をアクティブしていない時、不透明化しないように修正。  
 2025/3/27 Ver.1.3.1  
 キー選択時に非選択時のキー設定の文字色(画像)を不透明にするように修正。  
 2025/3/27 Ver.1.3.0  

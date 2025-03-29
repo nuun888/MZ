@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Skill learning
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -74,6 +74,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/29/2025 Ver.1.1.3
+ * Fixed to support NUUN_PopupEx.
+ * Fixed the popup display target.
  * 12/28/2022 Ver.1.1.2
  * Added definitions for popup support.
  * 12/27/2022 Ver.1.1.1
@@ -130,7 +133,7 @@
  * @target MZ
  * @plugindesc スキルラーニング
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -195,6 +198,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/29 Ver.1.1.3
+ * NUUN_PopupEx対応のための修正。
+ * ポップアップの表示対象を修正。
  * 2022/12/28 Ver.1.1.2
  * ポップアップ対応による定義追加。
  * 2022/12/27 Ver.1.1.1
@@ -256,6 +262,16 @@ Imported.NUUN_SkillLearning = true;
     const SkillLearningText = String(parameters['SkillLearningText']);
     const SkillLearningSe = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SkillLearningSe'])) : null;
 
+    class LearningSkillData {
+        constructor(target, id, skillName, iconIndex) {
+            this.target = target;
+            this.id = id;
+            this.skillName = skillName;
+            this.name = target.name();
+            this.iconIndex = iconIndex;
+        }
+    };
+
     const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
     Game_Action.prototype.applyItemUserEffect = function(target) {
         _Game_Action_applyItemUserEffect.call(this, target);
@@ -279,7 +295,8 @@ Imported.NUUN_SkillLearning = true;
                 if ((battler === target && battler.isSkillLearningAbility()) || battler.isWatchingSkillLearningAbility()) {
                     if (!this.isSkillLearningSkill(battler, skillId) && Math.random() < battler.skillLearningRate(data[0])) {
                         battler.skillLearning(skillId);
-                        this.setSkillLearningLog(target, battler.name(), skill);
+                        const learning = new LearningSkillData(battler, skill.id, skill.name, skill.iconIndex);
+                        this.setSkillLearningLog(target, learning);
                     }
                 }
             }
@@ -301,7 +318,8 @@ Imported.NUUN_SkillLearning = true;
                 if (battler.isAllSkillLearningAbility()) {
                     if (!this.isSkillLearningSkill(battler, skillId) && Math.random() < battler.skillLearningRate(data[0])) {
                         battler.skillLearning(skillId);
-                        this.setSkillLearningLog(target, battler.name(), skill);
+                        const learning = new LearningSkillData(battler, skill.id, skill.name, skill.iconIndex);
+                        this.setSkillLearningLog(target, learning);
                     }
                 }
             }
@@ -328,12 +346,16 @@ Imported.NUUN_SkillLearning = true;
             if (data[1] === 0) {
                 for (const id of skills) {
                     subject.skillLearning(id);
-                    this.setSkillLearningLog(target, subject.name(), $dataSkills[id]);
+                    const skill = $dataSkills[id];
+                    const learning = new LearningSkillData(subject, skill.id, skill.name, skill.iconIndex);
+                    this.setSkillLearningLog(target, learning);
                 }
             } else if (data[1] === 1) {
                 const id = skills[Math.floor(Math.random() * skills.length)];
                 subject.skillLearning(id);
-                this.setSkillLearningLog(target, subject.name(), $dataSkills[id]);
+                const skill = $dataSkills[id];
+                const learning = new LearningSkillData(subject, skill.id, skill.name, skill.iconIndex);
+                this.setSkillLearningLog(target, learning);
             }
             this.makeSuccess(target);
         }
@@ -364,10 +386,10 @@ Imported.NUUN_SkillLearning = true;
         return battler.isActor() ? battler.isLearnedSkill(skillId) : battler.isEnemyLearningSkills(skillId);
     };
 
-    Game_Action.prototype.setSkillLearningLog = function(target, name, skill) {
+    Game_Action.prototype.setSkillLearningLog = function(target, learning) {
         const result = target.result();
         result.isSkillLearning = true;
-        result.learningSkill.push({id: skill.id, skillName:skill.name, name:name});
+        result.learningSkill.push(learning);
     };
 
     Game_Enemy.prototype.skillLearning = function(skillId) {
@@ -474,8 +496,8 @@ Imported.NUUN_SkillLearning = true;
     Window_BattleLog.prototype.displayActionResults = function(subject, target) {
         const result = target.result();
         if (result.used && result.isSkillLearning) {
-            if (Imported.NUUN_popUp && !!target.shouldPopupSkillLearning && target.shouldPopupSkillLearning()) {
-                this.displayAffectedSkillLearning(subject, result.learningSkill);
+            if (_isPopup() && !!target.shouldPopupSkillLearning && target.shouldPopupSkillLearning()) {
+                this.displayAffectedSkillLearning(target, result.learningSkill);
             }
         }
         _Window_BattleLog_displayActionResults.call(this, subject, target);
@@ -486,5 +508,9 @@ Imported.NUUN_SkillLearning = true;
             AudioManager.playSe(SkillLearningSe);
         }
     };
+
+    function _isPopup() {
+        return Imported.NUUN_popUp || Imported.NUUN_PopupEx;
+    }
     
 })();

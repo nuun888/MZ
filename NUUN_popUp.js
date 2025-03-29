@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Pop up
  * @author NUUN
- * @version 2.0.6
+ * @version 2.0.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -68,6 +68,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/29/2025 Ver 2.0.7
+ * Fixed skill learning popup target.
  * 9/14/2024 Ver 2.0.6
  * Fixed an issue where the popup for buffs and debuffs would not appear when removed.
  * 7/13/2023 Ver 2.0.5
@@ -427,7 +429,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 2.0.6
+ * @version 2.0.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -485,6 +487,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/29 Ver 2.0.7
+ * スキルラーニングのポップアップ対象を修正。
  * 2024/9/14 Ver 2.0.6
  * 解除時のバフ、デバフのポップアップが表示されない問題を修正。
  * 2023/7/13 Ver 2.0.5
@@ -1153,7 +1157,7 @@ class PopUpData {
         for (const skill of skills) {
           const name = data.PopUpText.format(skill.skillName);
           const iconIndex = data.PopupIconIndex > 0 ? data.PopupIconIndex : $dataSkills[skill.id].iconIndex;
-          this.setupPopup(target, data, skill.id, name, data.PopupColor, iconIndex, 255, 'Learn');
+          this.setupPopup(skill.target, data, skill.id, name, data.PopupColor, iconIndex, 255, 'Learn');
         }
       }
     }
@@ -1464,18 +1468,18 @@ function _setupStatePopUpColor(state, data) {
     return state.meta.PopUpColor ? (isNaN(Number(state.meta.PopUpColor)) ? state.meta.PopUpColor : Number(state.meta.PopUpColor)) : data.PopupColor;
 };
 
-  function getPopupClass(mode) {
+function getPopupClass(mode) {
     switch (mode) {
-      case 'LateralBoundPopUp':
-        return 1;
-      case 'SlideFadeoutPopup':
-        return 2;
-      case 'UpFadeoutPopup':
-        return 3;
-      case 'Default':
-      default:
-        return 0;
+        case 'LateralBoundPopUp':
+            return 1;
+        case 'SlideFadeoutPopup':
+            return 2;
+        case 'UpFadeoutPopup':
+            return 3;
+        case 'Default':
+        default:
+            return 0;
     }
-  }
+}
 
 })();

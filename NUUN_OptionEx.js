@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * Expand the options screen.
@@ -26,6 +26,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/29/2025 Ver.1.3.2
+ * Fixed key and gamepad settings to not be opaque when not active.
  * 3/27/2025 Ver.1.3.1
  * Fixed to make the text color (image) of non-selected key settings opaque when a key is selected.
  * 3/27/2025 Ver.1.3.0
@@ -910,7 +912,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/NUUN_OptionEx.md
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * オプション画面を拡張します。
@@ -923,6 +925,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/29 Ver.1.3.2
+ * キー、ゲームパッド設定をアクティブしていない時、不透明化しないように修正。
  * 2025/3/27 Ver.1.3.1
  * キー選択時に非選択時のキー設定の文字色(画像)を不透明にするように修正。
  * 2025/3/27 Ver.1.3.0
@@ -1918,6 +1922,7 @@ Imported.NUUN_OptionEx = true;
                 this._optionsCategoryWindow.activate();
                 this._optionsWindow.deactivate();
                 this._optionsWindow.deselect();
+                this._optionsWindow.refresh();
             } else {
                 this.popScene();
             }
@@ -2281,7 +2286,9 @@ Imported.NUUN_OptionEx = true;
         const w = Math.floor(width / list.length);
         list.forEach((code, i) => {
             this.index() === index && this._configIndex === i ? this.changeTextColor(NuunManager.getColorCode(params.SelectNameColor)) : this.resetTextColor();
-            this.changePaintOpacity(this.index() === index && this._configIndex === i);
+            if (this.index() >= 0) {
+                this.changePaintOpacity(this.index() === index && this._configIndex === i);
+            }
             const x2 = x + (i * w);
             if (!!_readKeyImgList[code]) {
                 const bitmap = _readKeyImgList[code];
@@ -2312,7 +2319,9 @@ Imported.NUUN_OptionEx = true;
         const w = Math.floor(width / list.length);
         list.forEach((code, i) => {
             this.resetTextColor();
-            this.changePaintOpacity(this.index() === index && this._configIndex === i);
+            if (this.index() >= 0) {
+                this.changePaintOpacity(this.index() === index && this._configIndex === i);
+            }
             const x2 = x + (i * w);
             if (!!_readPadImgList[code]) {
                 const bitmap = _readPadImgList[code];

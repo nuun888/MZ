@@ -1,5 +1,5 @@
 # [スキルラーニング](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js)
-# Ver.1.1.2
+# Ver.1.1.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -58,6 +58,9 @@
 敵が習得したスキルのレーティングは全て5で設定されます。  
 
 ## 更新履歴
+2025/3/29 Ver.1.1.3  
+NUUN_PopupEx対応のための修正。  
+ポップアップの表示対象を修正。  
 2022/12/28 Ver.1.1.2  
 ポップアップ対応による定義追加。  
 2022/12/27 Ver.1.1.1  

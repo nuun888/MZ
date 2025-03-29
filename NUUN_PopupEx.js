@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Expands popups.
@@ -77,6 +77,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/29/2025 Ver.1.0.1
+ * Fixed so that the popup will be displayed even when a state is applied or removed via an event command.
  * 3/21/2025 Ver.1.0.0
  * First edition.
  * 
@@ -506,7 +508,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * ポップアップを拡張します。
@@ -567,6 +569,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/3/29 Ver.1.0.1
+ * イベントコマンドからステート付与、解除した場合でもポップアップが表示されるように修正。
  * 2025/3/21 Ver.1.0.0
  * 初版
  * 
@@ -1432,6 +1436,13 @@ Imported.NUUN_PopupEx = true;
         this.buffLevel = [0, 0, 0, 0, 0, 0, 0, 0];
     };
 
+    const _Game_Battler_clearResult = Game_Battler.prototype.clearResult;
+    Game_Battler.prototype.clearResult = function() {
+        if (!$gameTemp.noClearResult) {
+            _Game_Battler_clearResult.call(this);
+        }
+    };
+
 
     Game_Battler.prototype.addSetPopUpData = function(data) {
         this.nuun_popupData = data;
@@ -1845,6 +1856,79 @@ Imported.NUUN_PopupEx = true;
 
     Sprite_PopUpEX.prototype.damageColor = function() {
         return NuunManager.getColorCode(this._colorType);
+    };
+
+
+    const _Game_Interpreter_command313 = Game_Interpreter.prototype.command313;
+    Game_Interpreter.prototype.command313 = function(params) {
+        $gameTemp.noClearResult = $gameParty.inBattle();
+        const result = _Game_Interpreter_command313.call(this, params);
+        if (result && $gameParty.inBattle()) {
+            this.popupCommandActorState(params);
+        }
+        $gameTemp.noClearResult = false;
+        return result;
+    };
+
+    Game_Interpreter.prototype.popupCommandActorState = function(params) {
+        this.iterateActorEx(params[0], params[1], actor => {
+            _displayPopUpState(actor)
+            _displayRemovedPopUpState(actor);
+            const sprite = SceneManager._scene._spriteset.battlerSprites().find(sprite => sprite._battler === actor);
+            if (sprite) {
+                sprite.updateDamagePopup();//手動で実行
+            }
+            actor.clearResult();
+        });
+    };
+
+    const _Game_Interpreter_command333 = Game_Interpreter.prototype.command333;
+    Game_Interpreter.prototype.command333 = function(params) {
+        $gameTemp.noClearResult = $gameParty.inBattle();
+        const result = _Game_Interpreter_command333.call(this, params);
+        if (result && $gameParty.inBattle()) {
+            this.popupCommandEnemyState(params);
+        }
+        $gameTemp.noClearResult = false;
+        return result;
+    };
+
+    Game_Interpreter.prototype.popupCommandEnemyState = function(params) {
+        this.iterateEnemyIndex(params[0], enemy => {
+            _displayPopUpState(enemy)
+            _displayRemovedPopUpState(enemy);
+            const sprite = SceneManager._scene._spriteset.battlerSprites().find(sprite => sprite._battler === enemy);
+            if (sprite) {
+                sprite.updateDamagePopup();//手動で実行
+            }
+            enemy.clearResult();
+        });
+    };
+
+    function _displayPopUpState(target) {
+        const states = target.result().addedStateObjects();
+        for (const state of states) {
+            const data = new PopupData("addState");
+            data.setup(state);
+            if ((data.popUpPattern() === 0 || data.popUpPattern() === 3)) {
+                if (data.isPopup()) {
+                    target.addSetPopUpData(data);
+                }
+            }
+        }
+    };
+
+    function _displayRemovedPopUpState(target) {
+        const states = target.result().removedStateObjects();
+        for (const state of states) {
+            const data = new PopupData("removedState");
+            data.setup(state);
+            if ((data.popUpPattern() === 0 || data.popUpPattern() === 2)) {
+                if (data.isPopup()) {
+                    target.addSetPopUpData(data);
+                }
+            }      
+        }
     };
 
     function _noneStatePopupData() {

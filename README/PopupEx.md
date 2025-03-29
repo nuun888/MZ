@@ -1,5 +1,5 @@
 # [ポップアップ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PopupEx.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PopupEx.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -75,5 +75,7 @@
 [スキルラーニングポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearningPopUp.js)  
 
 ## 更新履歴
+2025/3/29 Ver.1.0.1  
+イベントコマンドからステート付与、解除した場合でもポップアップが表示されるように修正。  
 2025/3/21 Ver.1.0.0
 初版

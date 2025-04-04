@@ -1,5 +1,5 @@
 # [メンバー変更画面(戦闘)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
-# Ver.2.0.0
+# Ver.2.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,6 +13,9 @@
 ※アクターコマンドの並び替え条件は選択不可時のときは現在、暫定的に不透明に表示する仕様にしてあります。  
 
 ## 更新履歴
+2025/4/4 Ver.2.1.0  
+戦闘終了後に戦闘開始前のメンバーの並び順に戻す機能を実装。  
+戦闘開始前のメンバーの並び順に戻す有効時に、固定アクターを移動可能にする機能を追加。  
 2024/6/22 Ver.2.0.0  
 プラグインパラメータの仕様を変更。  
 TPBでアクターコマンドからのメンバー交代後で、実行したアクターのターンを終了させる機能を追加。  

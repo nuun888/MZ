@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.0.4
+ * @version 2.0.5
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -33,6 +33,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/4/2025 Ver.2.0.5
+ * Added processing by updating "NUUN_SceneBattleFormation".
  * 12/15/2024 Ver.2.0.4
  * Fixed an issue where the maximum number of battle members would not increase when the number of battle members was variable.
  * Fixed the process for applying Support Actor 2.0.0.
@@ -882,7 +884,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.0.4
+ * @version 2.0.5
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -908,6 +910,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/4 Ver.2.0.5
+ * メンバー変更画面(戦闘)更新による処理の追加。
  * 2024/12/15 Ver.2.0.4
  * 戦闘メンバー数可変で最大バトルメンバー数が増加しない問題を修正。
  * サポートアクター2.0.0適用に関する処理の修正。
@@ -2775,9 +2779,9 @@ Imported.NUUN_SceneFormation = true;
         const actor = this.actor(this.index());
         const pendingActor = this._formation.isPendingBattleMode() ? this.actor(this.getPendingIndex()) : $gameParty.formationMember()[this.getPendingIndex()];
         if (pendingActor) {
-            return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
+            return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabledOk(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
         } else if (actor) {
-            return this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
+            return this.isChangeActorEnabledOk(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
         } else if (!!this._formation.pendingMode && !actor && !pendingActor) {
             return false;
         } else {
@@ -2798,6 +2802,10 @@ Imported.NUUN_SceneFormation = true;
             Array.prototype.push.apply(members, [pendingActor]);
         }
         return members.every(member => member.isDead());
+    };
+
+    Window_FormationBattleMember.prototype.isChangeActorEnabledOk = function(actor, pendingActor) {
+        return this.isChangeActorEnabled(actor, pendingActor);
     };
 
     Window_FormationBattleMember.prototype.isChangeActorEnabled = function(actor) {
@@ -3044,9 +3052,9 @@ Imported.NUUN_SceneFormation = true;
         const actor = this.actor(this.index());
         const pendingActor = this._formation.isPendingBattleMode() ? $gameParty.formationBattleMember()[this.getPendingIndex()] : this.actor(this.getPendingIndex());
         if (pendingActor) {
-            return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
+            return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabledOk(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
         } else if (actor) {
-            return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabled(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
+            return !this.isFormationMembersDead(actor, pendingActor) && this.isChangeActorEnabledOk(actor, pendingActor) && this.isFormationChangeActorEnabled(actor, pendingActor);
         } else if (!!this._formation.pendingMode && !actor && !pendingActor) {
             return false;
         } else {
@@ -3066,6 +3074,10 @@ Imported.NUUN_SceneFormation = true;
             Array.prototype.push.apply(members, [actor]);
         }
         return members.every(member => member.isDead());
+    };
+
+    Window_FormationMember.prototype.isChangeActorEnabledOk = function(actor, pendingActor) {
+        return this.isChangeActorEnabled(actor, pendingActor);
     };
 
     Window_FormationMember.prototype.isChangeActorEnabled = function(actor) {

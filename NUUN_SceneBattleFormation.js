@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation (battle)
  * @author NUUN
- * @version 2.0.0
+ * @version 2.1.0
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/4/2025 Ver.2.1.0
+ * Implemented a function to restore the member order to the order before the battle started after the battle ends.
+ * Added a function to make fixed actors movable when restoring member order to the order before the battle starts is enabled.
  * 6/22/2024 Ver.2.0.0
  * Changed the plug-in parameter specifications.
  * Added a function to end the turn of the actor who executed the command after switching members via actor command in TPB.
@@ -112,6 +115,24 @@
  * @type boolean
  * @default false
  * @parent BasicSetting
+ * 
+ * @param MemberSortOrderInitializationSettings
+ * @text Initialize member order after battle
+ * @default ------------------------------
+ * 
+ * @param ReturnPartyMember
+ * @text Restore member order after battle ends
+ * @desc The order of party members after the battle will be restored to the state before the battle began.
+ * @type boolean
+ * @default false
+ * @parent MemberSortOrderInitializationSettings
+ * 
+ * @param FixedActorOnChange
+ * @text Fixed members can be moved during battle
+ * @desc Allows fixed members to move during battle.
+ * @type boolean
+ * @default true
+ * @parent MemberSortOrderInitializationSettings
  * 
  * @param BattleMemberWindowSetting
  * @text Formation Window Settings
@@ -706,7 +727,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 2.0.0
+ * @version 2.1.0
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -718,6 +739,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/4 Ver.2.1.0
+ * 戦闘終了後に戦闘開始前のメンバーの並び順に戻す機能を実装。
+ * 戦闘開始前のメンバーの並び順に戻す有効時に、固定アクターを移動可能にする機能を追加。
  * 2024/6/22 Ver.2.0.0
  * プラグインパラメータの仕様を変更。
  * TPBでアクターコマンドからのメンバー交代後で、実行したアクターのターンを終了させる機能を追加。
@@ -808,6 +832,24 @@
  * @type boolean
  * @default false
  * @parent BasicSetting
+ * 
+ * @param MemberSortOrderInitializationSettings
+ * @text 戦闘終了後のメンバー並び順初期化設定
+ * @default ------------------------------
+ * 
+ * @param ReturnPartyMember
+ * @text 戦闘終了後メンバー並び順戻し
+ * @desc 戦闘後のパーティメンバーの並び順を戦闘開始前の状態に戻します。
+ * @type boolean
+ * @default false
+ * @parent MemberSortOrderInitializationSettings
+ * 
+ * @param FixedActorOnChange
+ * @text 戦闘中固定メンバー移動可能
+ * @desc 戦闘中の固定メンバーの移動を許可します。
+ * @type boolean
+ * @default true
+ * @parent MemberSortOrderInitializationSettings
  * 
  * @param BattleMemberWindowSetting
  * @text メンバー変更ウィンドウ設定
@@ -1519,6 +1561,17 @@ Imported.NUUN_SceneBattleFormation = true;
         }
     };
 
+    const _Window_FormationBattleMember_isChangeActorEnabledOk = Window_FormationBattleMember.prototype.isChangeActorEnabledOk;
+    Window_FormationBattleMember.prototype.isChangeActorEnabledOk = function(actor, pendingActor) {
+        return $gameParty.inBattle() && params.ReturnPartyMember && params.FixedActorOnChange ? true : _Window_FormationBattleMember_isChangeActorEnabledOk.apply(this, arguments);
+    };
+
+    const _Window_FormationMember_isChangeActorEnabledOk = Window_FormationMember.prototype.isChangeActorEnabledOk;
+    Window_FormationMember.prototype.isChangeActorEnabledOk = function(actor, pendingActor) {
+        return $gameParty.inBattle() && params.ReturnPartyMember && params.FixedActorOnChange ? true : _Window_FormationMember_isChangeActorEnabledOk.apply(this, arguments);
+    };
+    
+
     const _Scene_Battle_createAllWindows = Scene_Battle.prototype.createAllWindows;
     Scene_Battle.prototype.createAllWindows = function() {
         _Scene_Battle_createAllWindows.call(this);
@@ -1606,6 +1659,25 @@ Imported.NUUN_SceneBattleFormation = true;
         }
     };
 
+
+    const _BattleManager_setup = BattleManager.setup;
+    BattleManager.setup = function(troopId, canEscape, canLose) {
+        _BattleManager_setup.apply(this, arguments);
+        this.setMemoryPartyMembers();
+    };
+
+    BattleManager.setMemoryPartyMembers = function() {
+        this._memoryPartyMembers = this._memoryPartyMembers ? this._memoryPartyMembers : $gameParty._actors.clone();
+    };
+
+    const _BattleManager_updateBattleEnd = BattleManager.updateBattleEnd;
+    BattleManager.updateBattleEnd = function() {
+        if (params.ReturnPartyMember) {
+            $gameParty._actors = this._memoryPartyMembers;
+        }
+        this._memoryPartyMembers = null;
+        _BattleManager_updateBattleEnd.apply(this, arguments);
+    };
 
     BattleManager.battleCommandRefresh = function() {
         if ($gameTemp.formationRefresh) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation (battle)
  * @author NUUN
- * @version 2.1.0
+ * @version 2.1.1
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/6/2025 Ver.2.1.1
+ * Fixed an issue where returning to pre-battle member order would result in the formation being displayed with members changed during battle.
+ * Changed the function that returns the member order to the pre-battle member order after the battle to a switch function.
  * 4/4/2025 Ver.2.1.0
  * Implemented a function to restore the member order to the order before the battle started after the battle ends.
  * Added a function to make fixed actors movable when restoring member order to the order before the battle starts is enabled.
@@ -121,10 +124,10 @@
  * @default ------------------------------
  * 
  * @param ReturnPartyMember
- * @text Restore member order after battle ends
- * @desc The order of party members after the battle will be restored to the state before the battle began.
- * @type boolean
- * @default false
+ * @text Switch to restore order of members after battle
+ * @desc Specify the switch ID that returns the party member order to the state before the battle begins after the battle. (ON is effective)
+ * @type switch
+ * @default 0
  * @parent MemberSortOrderInitializationSettings
  * 
  * @param FixedActorOnChange
@@ -727,7 +730,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 2.1.0
+ * @version 2.1.1
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -739,6 +742,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/6 Ver.2.1.1
+ * 戦闘前のメンバーに戻した場合に、戦闘中に変更したメンバーで隊列が表示されてしまう問題を修正。
+ * 戦闘終了後に戦闘開始前のメンバーの並び順に戻す機能をスイッチ仕様に変更。
  * 2025/4/4 Ver.2.1.0
  * 戦闘終了後に戦闘開始前のメンバーの並び順に戻す機能を実装。
  * 戦闘開始前のメンバーの並び順に戻す有効時に、固定アクターを移動可能にする機能を追加。
@@ -838,10 +844,10 @@
  * @default ------------------------------
  * 
  * @param ReturnPartyMember
- * @text 戦闘終了後メンバー並び順戻し
- * @desc 戦闘後のパーティメンバーの並び順を戦闘開始前の状態に戻します。
- * @type boolean
- * @default false
+ * @text 戦闘終了後メンバー並び順戻しスイッチ
+ * @desc 戦闘後のパーティメンバーの並び順を戦闘開始前の状態に戻すスイッチIDを指定します。(ONで有効)
+ * @type switch
+ * @default 0
  * @parent MemberSortOrderInitializationSettings
  * 
  * @param FixedActorOnChange
@@ -1563,12 +1569,12 @@ Imported.NUUN_SceneBattleFormation = true;
 
     const _Window_FormationBattleMember_isChangeActorEnabledOk = Window_FormationBattleMember.prototype.isChangeActorEnabledOk;
     Window_FormationBattleMember.prototype.isChangeActorEnabledOk = function(actor, pendingActor) {
-        return $gameParty.inBattle() && params.ReturnPartyMember && params.FixedActorOnChange ? true : _Window_FormationBattleMember_isChangeActorEnabledOk.apply(this, arguments);
+        return $gameParty.inBattle() && _isReturnPartyMember() && params.FixedActorOnChange ? true : _Window_FormationBattleMember_isChangeActorEnabledOk.apply(this, arguments);
     };
 
     const _Window_FormationMember_isChangeActorEnabledOk = Window_FormationMember.prototype.isChangeActorEnabledOk;
     Window_FormationMember.prototype.isChangeActorEnabledOk = function(actor, pendingActor) {
-        return $gameParty.inBattle() && params.ReturnPartyMember && params.FixedActorOnChange ? true : _Window_FormationMember_isChangeActorEnabledOk.apply(this, arguments);
+        return $gameParty.inBattle() && _isReturnPartyMember() && params.FixedActorOnChange ? true : _Window_FormationMember_isChangeActorEnabledOk.apply(this, arguments);
     };
     
 
@@ -1672,8 +1678,9 @@ Imported.NUUN_SceneBattleFormation = true;
 
     const _BattleManager_updateBattleEnd = BattleManager.updateBattleEnd;
     BattleManager.updateBattleEnd = function() {
-        if (params.ReturnPartyMember) {
+        if (_isReturnPartyMember()) {
             $gameParty._actors = this._memoryPartyMembers;
+            $gamePlayer.refresh();
         }
         this._memoryPartyMembers = null;
         _BattleManager_updateBattleEnd.apply(this, arguments);
@@ -1699,6 +1706,10 @@ Imported.NUUN_SceneBattleFormation = true;
                 this._currentActor = null;
             }
         }  
+    };
+
+    function _isReturnPartyMember() {
+        return params.ReturnPartyMember > 0 && $gameSwitches.value(params.ReturnPartyMember);
     };
     
 })();

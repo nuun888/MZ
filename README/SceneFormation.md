@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.2.0.5
+# Ver.2.0.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,8 @@
 `Window_FormationStatus` アクターステータスウィンドウ  
 
 ## 更新履歴
+2025/4/6 Ver.2.0.6  
+1.9の仕様変更による修正。  
 2025/4/4 Ver.2.0.5  
 メンバー変更画面(戦闘)更新による処理の追加。  
 2024/12/15 Ver.2.0.4  

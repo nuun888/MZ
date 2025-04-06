@@ -1,5 +1,5 @@
 # [メンバー変更画面(戦闘)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
-# Ver.2.1.0
+# Ver.2.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,6 +13,9 @@
 ※アクターコマンドの並び替え条件は選択不可時のときは現在、暫定的に不透明に表示する仕様にしてあります。  
 
 ## 更新履歴
+2025/4/6 Ver.2.1.1  
+戦闘前のメンバーに戻した場合に、戦闘中に変更したメンバーで隊列が表示されてしまう問題を修正。  
+戦闘終了後に戦闘開始前のメンバーの並び順に戻す機能をスイッチ仕様に変更。  
 2025/4/4 Ver.2.1.0  
 戦闘終了後に戦闘開始前のメンバーの並び順に戻す機能を実装。  
 戦闘開始前のメンバーの並び順に戻す有効時に、固定アクターを移動可能にする機能を追加。(NUUN_ActorFixed)  

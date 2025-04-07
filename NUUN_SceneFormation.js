@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.0.5
+ * @version 2.0.6
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -33,6 +33,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/6/2025 Ver.2.0.6
+ * Fixed due to specification changes in 1.9.
  * 4/4/2025 Ver.2.0.5
  * Added processing by updating "NUUN_SceneBattleFormation".
  * 12/15/2024 Ver.2.0.4
@@ -884,7 +886,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.0.5
+ * @version 2.0.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -910,6 +912,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/6 Ver.2.0.6
+ * 1.9の仕様変更による修正。
  * 2025/4/4 Ver.2.0.5
  * メンバー変更画面(戦闘)更新による処理の追加。
  * 2024/12/15 Ver.2.0.4
@@ -2154,6 +2158,9 @@ Imported.NUUN_SceneFormation = true;
             this.createMemberWindow();
             this.createMemberNameWindow();
             this.createMemberStatusWindow();
+            if (Imported.NUUN_SaveMembers) {
+                this.createSaveMembersWindow();
+            }
             this.initSelect();
         }
         
@@ -2228,6 +2235,17 @@ Imported.NUUN_SceneFormation = true;
                 memberStatusWindow.openness = 0;
             }
         }
+
+        createSaveMembersWindow() {
+            const scene = this._scene;
+            const rect = this.saveMembersWindowRect();
+            const saveMembersWindow = new Window_SaveMembers(rect, this);
+            scene.addWindow(saveMembersWindow);
+            this._saveMembersWindow = saveMembersWindow;
+            if (this._isBattle) {
+                saveMembersWindow.openness = 0;
+            }
+        }
         
         battleMemberNameWindowRect() {
             const wx = paramList.BattleMemberName_X + (paramList.WindowCenter ? (Graphics.boxWidth - this.memberWindowWidth()) / 2 : 0);
@@ -2266,6 +2284,14 @@ Imported.NUUN_SceneFormation = true;
             const wh = paramList.Status_Height > 0 ? paramList.Status_Height : this._scene.calcWindowHeight(5, true);
             const wy = paramList.Status_Y + (paramList.WindowZero ? 0 : Graphics.boxHeight - wh);
             const ww = paramList.Status_Width > 0 ? paramList.Status_Width : Graphics.boxWidth;
+            return new Rectangle(wx, wy, ww, wh);
+        }
+
+        saveMembersWindowRect() {
+            const wx = paramList.SaveMembers_X;
+            const wy = paramList.SaveMembers_Y;
+            const ww = $gameParty.maxBattleMembers() * this.saveMemberWindowWidth();
+            const wh = this._scene.calcWindowHeight(1, true);
             return new Rectangle(wx, wy, ww, wh);
         }
 
@@ -2545,7 +2571,7 @@ Imported.NUUN_SceneFormation = true;
         }
         
         memberWindowWidth() {
-            return $gameSystem.windowPadding() * 2 + paramList.Member_Cols * (params.CharacterMode === 'face' ? 152 : 56);
+            return $gameSystem.windowPadding() * 2 + paramList.Member_Cols * this.characterModeWidth();
         }
           
         nameWidth() {
@@ -2561,10 +2587,14 @@ Imported.NUUN_SceneFormation = true;
             + this._scene.exFormationMembers()) * this.characterModeWidth();
         }
 
+        saveMemberWindowWidth() {
+            return $gameSystem.windowPadding() * 2 + paramList.Member_Cols * this.characterModeWidth();
+        }
+
         characterModeWidth() {
             switch (params.CharacterMode) {
                 case 'face':
-                    return 152;
+                    return ImageManager.faceWidth + this.itemPadding();
                 case 'chip':
                     return 56;
             }

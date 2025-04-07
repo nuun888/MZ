@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation (battle)
  * @author NUUN
- * @version 2.1.1
+ * @version 2.1.2
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/7/2025 Ver.2.1.2
+ * Changed the functionality for restoring pre-battle members to the method used in 2.1.0.
+ * Changed the specification so that the switch to return to pre-battle members can only be set when "ReturnPartyMember" is enabled.
  * 4/6/2025 Ver.2.1.1
  * Fixed an issue where returning to pre-battle member order would result in the formation being displayed with members changed during battle.
  * Changed the function that returns the member order to the pre-battle member order after the battle to a switch function.
@@ -124,8 +127,15 @@
  * @default ------------------------------
  * 
  * @param ReturnPartyMember
+ * @text Restore member order after battle ends
+ * @desc The order of party members after the battle will be restored to the state before the battle began.
+ * @type switch
+ * @default 0
+ * @parent MemberSortOrderInitializationSettings
+ * 
+ * @param ReturnPartyMemberSwitch
  * @text Switch to restore order of members after battle
- * @desc Specify the switch ID that returns the party member order to the state before the battle begins after the battle. (ON is effective)
+ * @desc When "ReturnPartyMember" is enabled, specify the switch ID that allows returning members after battle.
  * @type switch
  * @default 0
  * @parent MemberSortOrderInitializationSettings
@@ -730,7 +740,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 2.1.1
+ * @version 2.1.2
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -742,6 +752,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/7 Ver.2.1.2
+ * 戦闘前のメンバーに戻す機能を2.1.0時の方式に仕様変更。
+ * 戦闘前のメンバーに戻すスイッチを戦闘前のメンバーに戻す有効時にのみ設定できるように仕様変更。
  * 2025/4/6 Ver.2.1.1
  * 戦闘前のメンバーに戻した場合に、戦闘中に変更したメンバーで隊列が表示されてしまう問題を修正。
  * 戦闘終了後に戦闘開始前のメンバーの並び順に戻す機能をスイッチ仕様に変更。
@@ -844,8 +857,15 @@
  * @default ------------------------------
  * 
  * @param ReturnPartyMember
+ * @text 戦闘終了後メンバー並び順戻し
+ * @desc 戦闘後のパーティメンバーの並び順を戦闘開始前の状態に戻します。
+ * @type boolean
+ * @default false
+ * @parent MemberSortOrderInitializationSettings
+ * 
+ * @param ReturnPartyMemberSwitch
  * @text 戦闘終了後メンバー並び順戻しスイッチ
- * @desc 戦闘後のパーティメンバーの並び順を戦闘開始前の状態に戻すスイッチIDを指定します。(ONで有効)
+ * @desc 戦闘終了後メンバー並び順戻し有効時、戦闘後のメンバー戻しを許可するスイッチIDを指定します。
  * @type switch
  * @default 0
  * @parent MemberSortOrderInitializationSettings
@@ -1709,7 +1729,7 @@ Imported.NUUN_SceneBattleFormation = true;
     };
 
     function _isReturnPartyMember() {
-        return params.ReturnPartyMember > 0 && $gameSwitches.value(params.ReturnPartyMember);
+        return params.ReturnPartyMember && (params.ReturnPartyMemberSwitch > 0 ? $gameSwitches.value(params.ReturnPartyMemberSwitch) : true);
     };
     
 })();

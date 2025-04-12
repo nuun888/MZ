@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.11
+ * @version 2.6.12
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/12 Ver.2.6.12
+ * ゲージ画像化で経験値の数値を画像化できるように修正。(NUUN_GaugeImageVer.1.6.8以降)
  * 2025/3/21 Ver.2.6.11
  * 装備、属性、ステートでコンテンツ背景をOFFにしたときに、表示がずれる問題を修正。
  * 2024/5/25 Ver.2.6.10
@@ -2895,6 +2897,7 @@ function Sprite_StatusExpGauge() {
 
 Sprite_StatusExpGauge.prototype = Object.create(Sprite_Gauge.prototype);
 Sprite_StatusExpGauge.prototype.constructor = Sprite_StatusExpGauge;
+window.Sprite_StatusExpGauge = Sprite_StatusExpGauge;
 
 Sprite_StatusExpGauge.prototype.initialize = function() {
   Sprite_Gauge.prototype.initialize.call(this);
@@ -2909,16 +2912,21 @@ Sprite_StatusExpGauge.prototype.gaugeHeight = function() {
 };
 
 Sprite_StatusExpGauge.prototype.drawValue = function() {
-  let currentValue = 0;
-  const width = this.bitmapWidth();
-  const height = typeof this.textHeight === 'function' ? this.textHeight() : this.bitmapHeight();
-  this.setupValueFont();
-  if (ExpPercent) {
-    currentValue = this._battler.isMaxLevel() ? "100%" : NuunManager.numPercentage(this.currentPercent(), EXPDecimal, DecimalMode) +"%";
-  } else {
-    currentValue = this._battler.isMaxLevel() ? "-------" : this._battler.nextRequiredExp();
-  }
-  this.bitmap.drawText(currentValue, 0, 0, width, height, "right");
+    this.drawValueExp();
+};
+
+Sprite_StatusExpGauge.prototype.drawValueExp = function() {
+    const mode = this.expDisplayModeParam();
+    let currentValue = this.displyaExp();
+    if (mode) {
+        currentValue = this._battler.isMaxLevel() ? "100%" : currentValue +"%";
+    } else {
+        currentValue = this._battler.isMaxLevel() ? "-------" : currentValue;
+    }
+    const width = this.bitmapWidth();
+    const height = this.textHeight();
+    this.setupValueFont();
+    this.bitmap.drawText(currentValue, 0, 0, width, height, "right");
 };
 
 Sprite_StatusExpGauge.prototype.currentPercent = function() {
@@ -2952,6 +2960,20 @@ Sprite_StatusExpGauge.prototype.gaugeColor1 = function() {
 Sprite_StatusExpGauge.prototype.gaugeColor2 = function() {
   return NuunManager.getColorCode(EXPGaugeColor2)
 };
+
+Sprite_StatusExpGauge.prototype.expDisplayModeParam = function() {
+    return ExpPercent;
+};
+
+Sprite_StatusExpGauge.prototype.displyaExp = function() {
+    const mode = this.expDisplayModeParam();
+    if (mode) {
+        return NuunManager.numPercentage(this.currentPercent(), EXPDecimal, DecimalMode);
+    } else {
+        return this._battler.nextRequiredExp();
+    }
+};
+
 
 ColorManager.expGaugeColor1 = function() {
   return this.textColor(EXPGaugeColor1);

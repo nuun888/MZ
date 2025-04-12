@@ -1,5 +1,5 @@
 # [ゲージ画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js)
-# Ver.1.6.8
+# Ver.1.6.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GaugeImage.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -49,6 +49,8 @@ TPBゲージ:TPBがキャストタイム中なら設定した画像に切り替�
 このプラグインは共通処理プラグインVer.1.4.4以降が必要になります。  
 
 ## 更新履歴
+2025/4/13 Ver.1.6.9  
+一部プラグインを導入していない時にエラーが出る問題を暫定修正。  
 2025/4/12 Ver.1.6.8  
 NUUN_StatusScreen、NUUN_MenuScreenEX、NUUN_MenuParamListBaseの経験値ゲージの数値にも画像を適用できるように修正。  
 画像の角度の処理を現座標を基準に回転させるように修正(数値以外)。  

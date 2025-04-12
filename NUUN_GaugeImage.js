@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc GaugeImaging
  * @author NUUN
- * @version 1.6.7
+ * @version 1.6.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -37,7 +37,7 @@
  * Image coordinate X and image coordinate Y are applied even if the label does not specify an image. Set the gauge display offset position of the label image.
  * 
  * GaugeImgAngle
- * Rotate the gauge to the left. Positive numbers rotate clockwise. Base height, XY coordinates need to be adjusted.
+ * Rotates the gauge to the left. A positive number rotates clockwise. The origin of rotation rotates from the center of "GaugeImgWidth" and "GaugeImgHeight".
  * With the core script default, the display height range of the gauge is 36, so if you don't change the base height, the image will be cut off.
  * 
  * GaugeInclined
@@ -66,6 +66,9 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 4/12/2025 Ver.1.6.8
+ * Fixed so that images can be applied to the experience gauge values ​​of NUUN_StatusScreen, NUUN_MenuScreenEX, and NUUN_MenuParamListBase.
+ * Fixed image angle processing to rotate based on the current coordinates (non-numeric values).
  * 5/24/2024 Ver.1.6.7
  * Corrected processing by updating "NUUN_GaugeValueEX".
  * 4/16/2023 Ver.1.6.6
@@ -173,7 +176,7 @@
  * 
  * @param GaugeImgAngle
  * @text Image rotation angle
- * @desc Specify the rotation angle of the image. A positive number rotates clockwise about the left side of the gauge.
+ * @desc Specify the skew rate for the image. A positive number skews the image to the left.
  * @type number
  * @min -999
  * @default 0
@@ -371,6 +374,7 @@
  * @option 'Sprite_EnemyTPBGauge'
  * @option 'Window_EnemyBook'
  * @option 'Sprite_ExtraGauge'
+ * @option 'Sprite_NuunGauge'
  * @default
  * 
  */
@@ -430,7 +434,7 @@
  * @target MZ
  * @plugindesc ゲージ画像化
  * @author NUUN
- * @version 1.6.7
+ * @version 1.6.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -458,7 +462,7 @@
  * 
  * 
  * 画像回転角度
- * ゲージを左基準に回転させます。正の数で時計回りに回転します。 ベース高さ、XY座標を調整する必要があります。
+ * ゲージを左基準に回転させます。正の数で時計回りに回転します。 回転の原点はベース横、高さの中心から回転します。
  * コアスクリプトデフォルトだとゲージの表示高さ範囲は36になっていますので、ベース高さを変更しないと画像が途切れてしまいます。
  * 
  * 傾斜率
@@ -486,6 +490,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/12 Ver.1.6.8
+ * NUUN_StatusScreen、NUUN_MenuScreenEX、NUUN_MenuParamListBaseの経験値ゲージの数値にも画像を適用できるように修正。
+ * 画像の角度の処理を現座標を基準に回転させるように修正(数値以外)。
  * 2024/5/24 Ver.1.6.7
  * ゲージ表示拡張プラグイン更新による処理の修正。
  * 2023/4/16 Ver.1.6.6
@@ -565,6 +572,7 @@
  * @text 画像座標X
  * @desc 画像のX座標を一括で移動します。(ラベルは画像指定してない場合でも適用されます)
  * @type number
+ * @min -9999
  * @default 0
  * 
  * @param GaugeImgY
@@ -593,7 +601,7 @@
  * 
  * @param GaugeImgAngle
  * @text 画像回転角度
- * @desc 画像を回転角度を指定。正の数でゲージの左側基準で時計回りに回転します。
+ * @desc 画像を回転角度を指定。正の数で時計回りに回転します。
  * @type number
  * @min -999
  * @default 0
@@ -791,6 +799,7 @@
  * @option 'Sprite_EnemyTPBGauge'
  * @option 'Window_EnemyBook'
  * @option 'Sprite_ExtraGauge'
+ * @option 'Sprite_NuunGauge'
  * @default
  * 
  */
@@ -983,7 +992,7 @@ Sprite_Gauge.prototype.setupBackBitmap = function(sprite, bitmap) {
     const sy = this._gaugeImgData.GaugeBaukImg.GaugeSY;
     const scale = this.gaugeScaleRate();
     context.setTransform(scale, 0, this.gaugeInclinedRate(), scale, 0, 0);
-    context.rotate(this._gaugeImgData.GaugeImgAngle * Math.PI / 180);
+    this.gaugeRotate(context);
     const correctionWidth = this._gaugeImgData.GaugeImgVariable ? this._gaugeImgData.GaugeBackCorrectionWidth : 0;
     const inclinedX = this._gaugeImgData.GaugeInclined < 0 ? Math.abs((height * this.gaugeInclinedRate()) * (this.anchor.x > 0 ? 4 : 2)) : 0;
     sprite.bitmap.blt(bitmap, sx, sy, width, height, dx + inclinedX, dy, width * this.getVariableScale(width) + correctionWidth);
@@ -1020,7 +1029,7 @@ Sprite_Gauge.prototype.setupFrontBitmap = function(sprite, bitmap) {
     const sy = this._gaugeImgData.GaugeFrontImg.GaugeSY;
     const scale = this.gaugeScaleRate();
     context.setTransform(scale, 0, this.gaugeInclinedRate(), scale, 0, 0);
-    context.rotate(this._gaugeImgData.GaugeImgAngle * Math.PI / 180);
+    this.gaugeRotate(context);
     if (this._gaugeImgData.GaugeImgVariable) {
         const leftWidth = this._gaugeImgData.GaugeLeftWidth;
         const rightWidth = this._gaugeImgData.GaugeLeftWidth;
@@ -1052,7 +1061,7 @@ Sprite_Gauge.prototype.createGaugeMainImg = function() {
     const scale = this.gaugeScaleRate();
     const context = this._gaugeImgSprite.bitmap.context;
     context.setTransform(scale, 0, this.gaugeInclinedRate(), scale, 0, 0);
-    context.rotate(this._gaugeImgData.GaugeImgAngle * Math.PI / 180);
+    this.gaugeRotate(context);
 };
 
 Sprite_Gauge.prototype.loadVauleImg = function() {
@@ -1124,7 +1133,7 @@ Sprite_Gauge.prototype.drawLabel = function() {
     if (this._gaugeImgData) {
         context.beginPath();
         context.save();
-        context.rotate(this._gaugeImgData.GaugeLabelAngle * Math.PI / 180);
+        this.gaugeRotate(context);
     }
     if (this._gaugeImgData && this._gaugeImgData.LabelGaugeImg && this._gaugeImgData.LabelGaugeImg.Gaugeimage) {
         const bitmapImg = this._gaugeImgData.LabelGaugeImg.Gaugeimage;
@@ -1175,9 +1184,65 @@ Sprite_Gauge.prototype.drawValue = function() {
         if (this._gaugeImgData) {
             context.beginPath();
             context.save();
-            context.rotate(this._gaugeImgData.GaugeValueAngle * Math.PI / 180);
+            this.gaugeRotate(context);
         }
         _Sprite_Gauge_drawValue.call(this);
+    }
+    if (this._gaugeImgData && !!context) {
+        context.restore();
+        this.bitmap = oldBitmap;
+    }
+};
+
+Sprite_Gauge.prototype.gaugeRotate = function(context) {
+    const tsx = this._gaugeImgData.GaugeImgWidth / 2;
+    const tsy = this._gaugeImgData.GaugeImgHeight / 2;
+    context.translate(tsx, tsy);
+    context.rotate(this._gaugeImgData.GaugeImgAngle * Math.PI / 180);
+    context.translate(-tsx, -tsy);
+};
+
+const _Sprite_NuunGauge_drawValueExp = Sprite_NuunGauge.prototype.drawValueExp;
+Sprite_NuunGauge.prototype.drawValueExp = function() {
+    Sprite_Gauge.prototype.drawValueExp.call(this, "base");
+};
+
+const _Sprite_MenuGauge_drawValueExp = Sprite_MenuGauge.prototype.drawValueExp;
+Sprite_MenuGauge.prototype.drawValueExp = function() {
+    Sprite_Gauge.prototype.drawValueExp.call(this, "menu");
+};
+
+const _Sprite_StatusExpGauge_drawValueExp = Sprite_MenuGauge.prototype.drawValueExp;
+Sprite_StatusExpGauge.prototype.drawValueExp = function() {
+    Sprite_Gauge.prototype.drawValueExp.call(this, "status");
+};
+
+
+Sprite_Gauge.prototype.drawValueExp = function(param) {
+    const mode = this.expDisplayModeParam();
+    if (mode === 0) {
+        return;
+    }
+    const oldBitmap = this.bitmap;
+    let context = null;
+    if (this._valueImgBitmap) {
+        this._digitSprite.rotation = (this._gaugeImgData.GaugeValueAngle * Math.PI / 180);
+        this.drawExpValueImg();
+    } else {
+        this.bitmap = this.textSprite ? this.textSprite.bitmap : this.bitmap;
+        context = this.bitmap.context;
+        if (this._gaugeImgData) {
+            context.beginPath();
+            context.save();
+            this.gaugeRotate(context);
+        }
+        if (param === "base") {
+            _Sprite_NuunGauge_drawValueExp.call(this);
+        } else if (param === "menu") {
+            _Sprite_MenuGauge_drawValueExp.call(this);
+        } else if (param === "status") {
+            _Sprite_StatusExpGauge_drawValueExp.call(this);
+        }
         if (this._gaugeImgData) {
             context.restore();
             this.bitmap = oldBitmap;
@@ -1187,6 +1252,19 @@ Sprite_Gauge.prototype.drawValue = function() {
 
 Sprite_Gauge.prototype.drawValueEXImg = function() {
     this._gaugeData.drawValueEXImg()
+};
+
+Sprite_Gauge.prototype.drawExpValueImg = function() {
+    const mode = this.expDisplayModeParam();
+    let currentValue = this.displyaExp();
+    if (mode === 3) {
+        currentValue = this._battler.isMaxLevel() ? "100" : currentValue;
+    } else {
+        currentValue = this._battler.isMaxLevel() ? "-------" : currentValue;
+    }
+    if (!isNaN(currentValue)) {
+        this.createDigits(currentValue);
+    }
 };
 
 Sprite_Gauge.prototype.drawValueImg = function() {

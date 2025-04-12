@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc GaugeImaging
  * @author NUUN
- * @version 1.6.8
+ * @version 1.6.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -66,6 +66,8 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 4/13/2025 Ver.1.6.9
+ * Temporarily fixed an issue where an error occurred when some plugins were not installed.
  * 4/12/2025 Ver.1.6.8
  * Fixed so that images can be applied to the experience gauge values ​​of NUUN_StatusScreen, NUUN_MenuScreenEX, and NUUN_MenuParamListBase.
  * Fixed image angle processing to rotate based on the current coordinates (non-numeric values).
@@ -490,6 +492,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/13 Ver.1.6.9
+ * 一部プラグインを導入していない時にエラーが出る問題を暫定修正。
  * 2025/4/12 Ver.1.6.8
  * NUUN_StatusScreen、NUUN_MenuScreenEX、NUUN_MenuParamListBaseの経験値ゲージの数値にも画像を適用できるように修正。
  * 画像の角度の処理を現座標を基準に回転させるように修正(数値以外)。
@@ -1202,21 +1206,32 @@ Sprite_Gauge.prototype.gaugeRotate = function(context) {
     context.translate(-tsx, -tsy);
 };
 
-const _Sprite_NuunGauge_drawValueExp = Sprite_NuunGauge.prototype.drawValueExp;
-Sprite_NuunGauge.prototype.drawValueExp = function() {
-    Sprite_Gauge.prototype.drawValueExp.call(this, "base");
-};
+try {
+    const _Sprite_NuunGauge_drawValueExp = Sprite_NuunGauge.prototype.drawValueExp;
+    Sprite_NuunGauge.prototype.drawValueExp = function() {
+        Sprite_Gauge.prototype.drawValueExp.call(this, "base");
+    };
+} catch (error) {
+    
+}
 
-const _Sprite_MenuGauge_drawValueExp = Sprite_MenuGauge.prototype.drawValueExp;
-Sprite_MenuGauge.prototype.drawValueExp = function() {
-    Sprite_Gauge.prototype.drawValueExp.call(this, "menu");
-};
+try {
+    const _Sprite_MenuGauge_drawValueExp = Sprite_MenuGauge.prototype.drawValueExp;
+    Sprite_MenuGauge.prototype.drawValueExp = function() {
+        Sprite_Gauge.prototype.drawValueExp.call(this, "menu");
+    };
+} catch (error) {
+    
+}
 
-const _Sprite_StatusExpGauge_drawValueExp = Sprite_MenuGauge.prototype.drawValueExp;
-Sprite_StatusExpGauge.prototype.drawValueExp = function() {
-    Sprite_Gauge.prototype.drawValueExp.call(this, "status");
-};
-
+try {
+    const _Sprite_StatusExpGauge_drawValueExp = Sprite_StatusExpGauge.prototype.drawValueExp;
+    Sprite_StatusExpGauge.prototype.drawValueExp = function() {
+        Sprite_Gauge.prototype.drawValueExp.call(this, "status");
+    };
+} catch (error) {
+    
+}
 
 Sprite_Gauge.prototype.drawValueExp = function(param) {
     const mode = this.expDisplayModeParam();
@@ -1242,6 +1257,8 @@ Sprite_Gauge.prototype.drawValueExp = function(param) {
             _Sprite_MenuGauge_drawValueExp.call(this);
         } else if (param === "status") {
             _Sprite_StatusExpGauge_drawValueExp.call(this);
+        } else if (param === "result") {
+            //_Sprite_StatusExpGauge_drawValueExp.call(this);
         }
         if (this._gaugeImgData) {
             context.restore();

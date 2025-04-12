@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.6.11
+# Ver.2.6.12
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.4以降  
@@ -112,6 +112,8 @@ APNGを表示するには別途ApngPicture.js(トリアコンタン様)が必要
 `[text]`:任意の個別画像。  
 
 ### 更新履歴
+2025/4/12 Ver.2.6.12  
+ゲージ画像化で経験値の数値を画像化できるように修正。(NUUN_GaugeImageVer.1.6.8以降)  
 2025/3/21 Ver.2.6.11  
 装備、属性、ステートでコンテンツ背景をOFFにしたときに、表示がずれる問題を修正。  
 2024/5/25 Ver.2.6.10  

@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Customize the item and skill window during battle.
@@ -28,6 +28,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/13/2025 Ver.1.0.1
+ * Fixed an issue where background images were not being applied.
  * 7/20/2024 Ver.1.0.0
  * First edition.
  * 
@@ -122,7 +124,7 @@
  * @default ------------------------------
  * @parent SkillWindowSettings
  * 
- * @param SkillWindowWindowBacgroundImg
+ * @param SkillWindowBackgroundImg
  * @text Skill window background image setting
  * @desc Sets the background image for the skill window.
  * @default 
@@ -221,7 +223,7 @@
  * @default ------------------------------
  * @parent ItemWindowSettings
  * 
- * @param ItemWindowWindowBacgroundImg
+ * @param ItemWindowBackgroundImg
  * @text Item window background image settings
  * @desc Sets the background image of the item window.
  * @default 
@@ -304,7 +306,7 @@
  * @base NUUN_Base
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 戦闘中のアイテム、スキルウィンドウをカスタマイズします。
@@ -319,7 +321,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2023/7/20 Ver.1.0.0
+ * 2025/4/13 Ver.1.0.1
+ * 背景画像が適用されていなかった問題を修正。
+ * 2024/7/20 Ver.1.0.0
  * 初版
  * 
  * 
@@ -414,7 +418,7 @@
  * @default ------------------------------
  * @parent SkillWindowSettings
  * 
- * @param SkillWindowWindowBacgroundImg
+ * @param SkillWindowBackgroundImg
  * @text スキルウィンドウ背景画像設定
  * @desc スキルウィンドウの背景画像を設定します。
  * @default 
@@ -513,7 +517,7 @@
  * @default ------------------------------
  * @parent ItemWindowSettings
  * 
- * @param ItemWindowWindowBacgroundImg
+ * @param ItemWindowBackgroundImg
  * @text アイテムウィンドウ背景画像設定
  * @desc アイテムウィンドウの背景画像を設定します。
  * @default 
@@ -598,12 +602,13 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
     const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const parameters = PluginManager.parameters('NUUN_BattleItemSkillWindowEX');
 
-    function _getBackground() {
-        return params.WindowBacgroundImg ? params.WindowBacgroundImg : null;
+    function _getBackground(type) {
+        const method = (type === "item" ? "Item" : "Skill") + "WindowBackgroundImg";
+        return params[method] ? params[method] : null;
     };
 
-    function _getBackgroundImg() {
-        const background = _getBackground();
+    function _getBackgroundImg(type) {
+        const background = _getBackground(type);
         return background ? background.BackgroundImg : null;
     };
 
@@ -615,7 +620,7 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
     };
 
     Scene_Battle.prototype.createBattleItemBackground = function() {
-        const data = _getBackgroundImg();
+        const data = _getBackgroundImg("item");
         if (data) {
             const bitmap = ImageManager.nuun_LoadPictures(data);
             const sprite = new Sprite(bitmap);
@@ -626,7 +631,7 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
     };
 
     Scene_Battle.prototype.createBattleSkillBackground = function() {
-        const data = _getBackgroundImg();
+        const data = _getBackgroundImg("skill");
         if (data) {
             const bitmap = ImageManager.nuun_LoadPictures(data);
             const sprite = new Sprite(bitmap);
@@ -694,17 +699,17 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
 
     Scene_Battle.prototype.itemBackgroundPosition = function() {
         if (this._itemWindowBackground && this._itemWindow) {
-            const data = _getBackground();
-            this._itemWindowBackground.x = (params.BackgroundWindowFit ? this._itemWindow.x : 0) + data.Background_X;
-            this._itemWindowBackground.y = (params.BackgroundWindowFit ? this._itemWindow.y : 0) + data.Background_Y;
+            const data = _getBackground("item");
+            this._itemWindowBackground.x = (params.ItemWindowBackgroundWindowFit ? this._itemWindow.x : 0) + data.Background_X;
+            this._itemWindowBackground.y = (params.ItemWindowBackgroundWindowFit ? this._itemWindow.y : 0) + data.Background_Y;
         }
     };
 
     Scene_Battle.prototype.skillBackgroundPosition = function() {
         if (this._skillWindowBackground && this._skillWindow) {
-            const data = _getBackground();
-            this._skillWindowBackground.x = (params.BackgroundWindowFit ? this._skillWindow.x : 0) + data.Background_X;
-            this._skillWindowBackground.y = (params.BackgroundWindowFit ? this._skillWindow.y : 0) + data.Background_Y;
+            const data = _getBackground("skill");
+            this._skillWindowBackground.x = (params.SkillWindowBackgroundWindowFit ? this._skillWindow.x : 0) + data.Background_X;
+            this._skillWindowBackground.y = (params.SkillWindowBackgroundWindowFit ? this._skillWindow.y : 0) + data.Background_Y;
         }
     };
 

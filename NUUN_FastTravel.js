@@ -227,6 +227,13 @@
  * @text Fast Travel Sub Window Settings
  * @default ------------------------------
  * 
+ * @param FastTravelWindowShow
+ * @text Display fast travel sub window
+ * @desc Displays the Fast Travel subwindow.
+ * @type boolean
+ * @default false
+ * @parent FastTravelSubWindowSetting
+ * 
  * @param FastTravelSubParamList
  * @desc Configure the items in the fast travel subwindow.
  * @text Fast Travel Sub-Item Settings
@@ -865,6 +872,13 @@
  * @param FastTravelSubWindowSetting
  * @text ファストトラベルサブウィンドウ設定
  * @default ------------------------------
+ * 
+ * @param FastTravelWindowShow
+ * @text ファストトラベルサブウィンドウ表示
+ * @desc ファストトラベルサブウィンドウを表示します。
+ * @type boolean
+ * @default false
+ * @parent FastTravelSubWindowSetting
  * 
  * @param FastTravelSubParamList
  * @desc ファストトラベルサブウィンドウの項目を設定します。
@@ -1525,6 +1539,7 @@ Imported.NUUN_FastTravel = true;
     };
 
     Scene_Map.prototype.createFastTravelSubWindow = function() {
+        if (!params.FastTravelWindowShow) return;
         const rect = this.fastTravelSubWindowRect();
         this._fastTravelSubWindow = new Window_FastTravelSub(rect);
         this.addWindow(this._fastTravelSubWindow);
@@ -1709,6 +1724,9 @@ Imported.NUUN_FastTravel = true;
                 this.setHelpText(fastTravel.FastTravelText);
                 this.setFastTravelSubWindow(fastTravel);
             }
+        } else if (event) {
+            this.setHelpText("");
+            this.setFastTravelSubWindow(null);
         }
     };
 
@@ -1753,11 +1771,15 @@ Imported.NUUN_FastTravel = true;
     };
 
     Window_FastTravel.prototype.setHelpText = function(text) {
-        this._fastTravelHelpWindow.setHelpText(text);
+        if (this._fastTravelHelpWindow) {
+            this._fastTravelHelpWindow.setHelpText(text);
+        }
     };
 
     Window_FastTravel.prototype.setFastTravelSubWindow = function(fastTravel) {
-        this._setSubWindow.setFastTravel(fastTravel);
+        if (this._setSubWindow) {
+            this._setSubWindow.setFastTravel(fastTravel);
+        }
     };
 
 
@@ -1803,12 +1825,16 @@ Imported.NUUN_FastTravel = true;
     };
 
     Window_FastTravelSub.prototype.setFastTravel = function(fastTravel) {
-        this._contentsData.setItem(fastTravel);
         this.contentsBack.clear();
-        if (fastTravel.SubImgSetting) {
-            this.fastTravelSunImg(fastTravel.SubImgSetting)
+        this.contents.clear();
+        if (fastTravel) {
+            this._contentsData.setItem(fastTravel);
+            this.contentsBack.clear();
+            if (fastTravel.SubImgSetting) {
+                this.fastTravelSunImg(fastTravel.SubImgSetting)
+            }
+            this.refresh();
         }
-        this.refresh();
     };
 
     Window_FastTravelSub.prototype.fastTravelSunImg = function(list) {

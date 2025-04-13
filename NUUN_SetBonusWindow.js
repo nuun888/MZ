@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Set bonus tooltip window
  * @author NUUN
- * @version 1.0.5
+ * @version 1.0.6
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/13/2024 Ver.1.0.6
+ * Fixed so that it will not be displayed if an ID that is not set is specified.
  * 8/20/2024 Ver.1.0.5
  * Added the ability to apply text codes to set bonus text and parameters.
  * 3/18/2023 Ver.1.0.4
@@ -80,7 +82,7 @@
  * @target MZ
  * @plugindesc セットボーナスツールチップウィンドウ
  * @author NUUN
- * @version 1.0.5
+ * @version 1.0.6
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -89,6 +91,8 @@
  * 装備画面で装備スロット選択中の装備で現在適用しているセットボーナスを表示します。
  * 
  * 更新履歴
+ * 2025/4/13 Ver.1.0.6
+ * 設定されていないIDが指定されている場合は表示しないように修正。
  * 2024/8/20 Ver.1.0.5
  * セットボーナステキスト、パラメータに制御文字を適用できる機能を追加。
  * 2023/3/18 Ver.1.0.4
@@ -247,7 +251,7 @@ Window_SetBounsEquip.prototype.clearOnRefresh = function() {
 
 Window_SetBounsEquip.prototype.update = function() {
     Window_Selectable.prototype.update.call(this);
-    if (!this._equip || !this._equip.meta.SetBonus) {
+    if (!this._equip || !this.isSetBonus()) {
         this.hide();
         return;
     }
@@ -261,6 +265,14 @@ Window_SetBounsEquip.prototype.update = function() {
     }
 };
 
+Window_SetBounsEquip.prototype.isSetBonus = function() {
+    const bounu = NuunManager.getMetaCodeList(this._equip, "SetBonus");
+    if (!bounu) return false;
+    return bounu.some(id => {
+        return (isNaN(id) ? NuunManager.getSetBonusDataName(id) : NuunManager.getSetBonusData(Number(id)));
+    })
+};
+
 Window_SetBounsEquip.prototype.refresh = function() {
     this.contents.clear();
     const rect = this.itemLineRect(0);
@@ -270,7 +282,7 @@ Window_SetBounsEquip.prototype.refresh = function() {
     let setBonusSum = 0;
     this.contents.fontSize = this.getFontSize();
     if (this._equip && this._equip.meta.SetBonus) {
-        const list = this._equip.meta.SetBonus.split(',');
+        const list = NuunManager.getMetaCodeList(this._equip, "SetBonus") || [];
         list.forEach(setBonusId => {
             const data = isNaN(setBonusId) ? NuunManager.getSetBonusDataName(setBonusId) : NuunManager.getSetBonusData(Number(setBonusId));
             if (data) {

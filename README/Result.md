@@ -43,8 +43,8 @@ d:アクターのデータベースデータ
 
 ## 獲得経験値数値画像化
 獲得経験値の数値を画像化します。  
-![画像](img/ExpValueImg.png)<br>
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultExpValue.js)  
+![画像](img/ExpValueImg.png)<br>
 
 ## 更新履歴
 2025/4/13 Ver.2.4.6  

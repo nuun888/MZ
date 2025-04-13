@@ -1,5 +1,5 @@
 # [セットボーナスツールチップウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusWindow.js)
-# Ver.1.0.5
+# Ver.1.0.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusWindow.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -10,6 +10,8 @@
 ![画像](img/SetBonusEquip1.png)  
 
 ## 更新履歴
+2025/4/13 Ver.1.0.6  
+設定されていないIDが指定されている場合は表示しないように修正。  
 2024/8/20 Ver.1.0.5  
 セットボーナステキスト、パラメータに制御文字を適用できる機能を追加。  
 2023/3/18 Ver.1.0.4  

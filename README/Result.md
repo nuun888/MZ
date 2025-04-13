@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.4.5
+# Ver.2.4.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -41,6 +41,8 @@ d:アクターのデータベースデータ
 ※右クリックはページ切り替えのみです。戻す機能は実装しておりません。  
 
 ## 更新履歴
+2025/4/13 Ver.2.4.6  
+ゲージ画像化更新による処理の修正。  
 2024/12/29 Ver.2.4.5  
 MVPアクターでNUUN_ActorPictureでの立ち絵表示で画像が表示されない問題を修正。  
 サポートアクターVer.2.0に対応。  

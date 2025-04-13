@@ -1,5 +1,5 @@
 # [ステータス項目ベースプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)
-# Ver.1.1.8
+# Ver.1.1.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -27,6 +27,8 @@ Y座標:Y表示列位置からの相対座標。
 記述欄、個別指定画像タグ名:記述欄、画像（個別指定画像）に紐づけするタグ名  
 
 ## 更新履歴
+2025/4/13 Ver.1.1.9  
+ゲージ画像化更新による処理の修正。  
 2025/2/8 Ver.1.1.8  
 サイドビューアクターを表示するときにエラーが出る問題を修正。  
 2025/2/2 Ver.1.1.7  

@@ -227,7 +227,7 @@
  * @text Fast Travel Sub Window Settings
  * @default ------------------------------
  * 
- * @param FastTravelWindowShow
+ * @param FastTravelSubWindowShow
  * @text Display fast travel sub window
  * @desc Displays the Fast Travel subwindow.
  * @type boolean
@@ -873,7 +873,7 @@
  * @text ファストトラベルサブウィンドウ設定
  * @default ------------------------------
  * 
- * @param FastTravelWindowShow
+ * @param FastTravelSubWindowShow
  * @text ファストトラベルサブウィンドウ表示
  * @desc ファストトラベルサブウィンドウを表示します。
  * @type boolean
@@ -1539,7 +1539,7 @@ Imported.NUUN_FastTravel = true;
     };
 
     Scene_Map.prototype.createFastTravelSubWindow = function() {
-        if (!params.FastTravelWindowShow) return;
+        if (!params.FastTravelSubWindowShow) return;
         const rect = this.fastTravelSubWindowRect();
         this._fastTravelSubWindow = new Window_FastTravelSub(rect);
         this.addWindow(this._fastTravelSubWindow);

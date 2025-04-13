@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc GaugeImaging
  * @author NUUN
- * @version 1.6.9
+ * @version 1.6.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -66,6 +66,8 @@
  * This plugin can be used for free or for a fee.
  * 
  * Log
+ * 4/13/2025 Ver.1.6.10
+ * Changed the process of numerical display of experience points.
  * 4/13/2025 Ver.1.6.9
  * Temporarily fixed an issue where an error occurred when some plugins were not installed.
  * 4/12/2025 Ver.1.6.8
@@ -492,6 +494,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/13 Ver.1.6.10
+ * 経験値数値の処理を変更。
  * 2025/4/13 Ver.1.6.9
  * 一部プラグインを導入していない時にエラーが出る問題を暫定修正。
  * 2025/4/12 Ver.1.6.8
@@ -1206,34 +1210,7 @@ Sprite_Gauge.prototype.gaugeRotate = function(context) {
     context.translate(-tsx, -tsy);
 };
 
-try {
-    const _Sprite_NuunGauge_drawValueExp = Sprite_NuunGauge.prototype.drawValueExp;
-    Sprite_NuunGauge.prototype.drawValueExp = function() {
-        Sprite_Gauge.prototype.drawValueExp.call(this, "base");
-    };
-} catch (error) {
-    
-}
-
-try {
-    const _Sprite_MenuGauge_drawValueExp = Sprite_MenuGauge.prototype.drawValueExp;
-    Sprite_MenuGauge.prototype.drawValueExp = function() {
-        Sprite_Gauge.prototype.drawValueExp.call(this, "menu");
-    };
-} catch (error) {
-    
-}
-
-try {
-    const _Sprite_StatusExpGauge_drawValueExp = Sprite_StatusExpGauge.prototype.drawValueExp;
-    Sprite_StatusExpGauge.prototype.drawValueExp = function() {
-        Sprite_Gauge.prototype.drawValueExp.call(this, "status");
-    };
-} catch (error) {
-    
-}
-
-Sprite_Gauge.prototype.drawValueExp = function(param) {
+Sprite_Gauge.prototype.drawValueExp_GaugeImg = function() {
     const mode = this.expDisplayModeParam();
     if (mode === 0) {
         return;
@@ -1251,14 +1228,11 @@ Sprite_Gauge.prototype.drawValueExp = function(param) {
             context.save();
             this.gaugeRotate(context);
         }
-        if (param === "base") {
-            _Sprite_NuunGauge_drawValueExp.call(this);
-        } else if (param === "menu") {
-            _Sprite_MenuGauge_drawValueExp.call(this);
-        } else if (param === "status") {
-            _Sprite_StatusExpGauge_drawValueExp.call(this);
-        } else if (param === "result") {
-            //_Sprite_StatusExpGauge_drawValueExp.call(this);
+        try {
+            this.drawValueExperiencePoints();
+        } catch (error) {
+            const log = ($gameSystem.isJapanese() ? "対応しているプラグインを最新版にしてください。" : "Please update the supported plug-ins to the latest version.");
+            throw ["PluginError", log];
         }
         if (this._gaugeImgData) {
             context.restore();
@@ -1268,7 +1242,7 @@ Sprite_Gauge.prototype.drawValueExp = function(param) {
 };
 
 Sprite_Gauge.prototype.drawValueEXImg = function() {
-    this._gaugeData.drawValueEXImg()
+    this._gaugeData.drawValueEXImg();
 };
 
 Sprite_Gauge.prototype.drawExpValueImg = function() {

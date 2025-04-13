@@ -93,6 +93,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/12/2025 Ver.3.1.14
+ * Fixed processing due to gauge imaging update.
  * 2/14/2025 Ver.3.1.13
  * Fixed an issue where an error would occur when setting free text.
  * Fixed an issue where an error would occur when setting a line.
@@ -1372,7 +1374,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.13
+ * @version 3.1.14
  * 
  * @help
  * メニュー画面の表示を変更、拡張します。
@@ -1438,6 +1440,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/13 Ver.3.1.14
+ * ゲージ画像化更新による処理の修正。
  * 2025/2/14 Ver.3.1.13
  * フリーテキストを設定した際にエラーが出る問題を修正。
  * ラインを設定した際にエラーが出る問題を修正。
@@ -4372,6 +4376,13 @@ Imported.NUUN_MenuScreenEX = true;
     };
 
     Sprite_MenuGauge.prototype.drawValueExp = function() {
+        if (!!this._gaugeImgData) {
+            return this.drawValueExp_GaugeImg();
+        }
+        this.drawValueExperiencePoints();
+    };
+
+    Sprite_MenuGauge.prototype.drawValueExperiencePoints = function() {
         const mode = this.expDisplayModeParam();
         if (mode === 0) {
             return;
@@ -4385,7 +4396,7 @@ Imported.NUUN_MenuScreenEX = true;
         const width = this.bitmapWidth();
         const height = this.textHeight();
         this.setupValueFont();
-        this.bitmap.drawText(text, 0, 0, width, height, "right");;
+        this.bitmap.drawText(text, 0, 0, width, height, "right");
     };
 
     Sprite_MenuGauge.prototype.decimalModeParam = function() {

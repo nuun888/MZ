@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.12
+ * @version 2.6.13
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/13 Ver.2.6.13
+ * ゲージ画像化更新による処理の修正。
  * 2025/4/12 Ver.2.6.12
  * ゲージ画像化で経験値の数値を画像化できるように修正。(NUUN_GaugeImageVer.1.6.8以降)
  * 2025/3/21 Ver.2.6.11
@@ -2916,6 +2918,13 @@ Sprite_StatusExpGauge.prototype.drawValue = function() {
 };
 
 Sprite_StatusExpGauge.prototype.drawValueExp = function() {
+    if (!!this._gaugeImgData) {
+        return this.drawValueExp_GaugeImg();
+    }
+    this.drawValueExperiencePoints();
+};
+
+Sprite_StatusExpGauge.prototype.drawValueExperiencePoints = function() {
     const mode = this.expDisplayModeParam();
     let currentValue = this.displyaExp();
     if (mode) {

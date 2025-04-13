@@ -153,7 +153,7 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemySelectWindow.js)   
 ### バトルアイテム、スキルウィンドウカスタマイズ
 戦闘中のアイテム、スキルウィンドウをカスタマイズできます。  
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)Ver.1.0.1   
 ### 戦闘中メッセージウィンドウ背景画像
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
 ### バトラーのバトルフィールド表示

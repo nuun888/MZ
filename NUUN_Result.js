@@ -7546,7 +7546,7 @@ Sprite_ResultExpGauge.prototype.drawValueExperiencePoints = function() {
         this.setupValueFont();
         if (GaugeValueShow === 3) {
             expValue = this.maxLavel() ? this.currentMaxValue() : expValue;
-            const rate = NuunManager.numPercentage(expValue / this.currentMaxValue() * 100, Decimal, DecimalMode);
+            const rate = NuunManager.numPercentage(expValue / this.currentMaxValue() * 100, Decimal - 2, DecimalMode);
             this.bitmap.drawText(rate +"%", 0, GaugeValueY, width, height, "right");
         } else if (GaugeValueShow === 1) {
             expValue = this.maxLavel() ? "----------" : expValue;
@@ -7605,7 +7605,7 @@ Sprite_ResultExpGauge.prototype.displyaExp = function() {
         case 2:
             return this.currentValue();
         case 3:
-            return NuunManager.numPercentage(this.currentValue() / this.currentMaxValue() * 100, Decimal, DecimalMode);
+            return NuunManager.numPercentage(this.currentValue() / this.currentMaxValue() * 100, Decimal - 2, DecimalMode);
         case 4:
             return this.currentValue();//対応していません
         case 5:

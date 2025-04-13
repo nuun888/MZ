@@ -4,6 +4,7 @@
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
 #### 拡張プラグイン
+[獲得経験値数値画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultExpValue.js)  
 [リザルト時ウィンドウスプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) Ver.1.0.0  
 [MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) Ver.1.1.4  
 
@@ -39,6 +40,11 @@ d:アクターのデータベースデータ
 `<NoResultDropList>` アイテム入手のドロップリストに表示しません。  
 
 ※右クリックはページ切り替えのみです。戻す機能は実装しておりません。  
+
+## 獲得経験値数値画像化
+獲得経験値の数値を画像化します。  
+![画像](img/ExpValueImg.png)<br>
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultExpValue.js)  
 
 ## 更新履歴
 2025/4/13 Ver.2.4.6  

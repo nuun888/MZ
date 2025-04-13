@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.5
+ * @version 2.4.6
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -60,6 +60,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/13/2025 Ver.2.4.6
+ * Fixed processing due to gauge imaging update.
  * 2024/12/29 Ver.2.4.5
  * Fixed an issue where images were not displayed when displaying a character portrait using NUUN_ActorPicture for MVP actors.
  * Compatible with support actor Ver.2.0.
@@ -2368,6 +2370,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/13 Ver.2.4.6
+ * ゲージ画像化更新による処理の修正。
  * 2024/12/29 Ver.2.4.5
  * MVPアクターでNUUN_ActorPictureでの立ち絵表示で画像が表示されない問題を修正。
  * サポートアクターVer.2.0に対応。
@@ -7169,19 +7173,19 @@ BattleManager.makeRewards = function() {
 };
 
 BattleManager.actorLevelUpStatus = function() {
-  const exp = BattleManager._rewards.exp;
-  for (const actor of $gameParty.resultMembers()) {
-    actor._resultLevelUp = false;
-    const level = actor.resultGainExp(exp);
-    if (level > actor._level) {
-        actor._resultLevelUp = true;
-        const levelUpPageEnable = this._levelUpPageEnable === undefined || this._levelUpPageEnable === null ? LevelUpWindowShow : this._levelUpPageEnable;
-        if (levelUpPageEnable) {
-            this.resultLevelUpActors.push(actor);
-            this.resultOldStatusActors.push(this.getResultOldStatus(actor));
+    const exp = BattleManager._rewards.exp;
+    for (const actor of $gameParty.resultMembers()) {
+        actor._resultLevelUp = false;
+        const level = actor.resultGainExp(exp);
+        if (level > actor._level) {
+            actor._resultLevelUp = true;
+            const levelUpPageEnable = this._levelUpPageEnable === undefined || this._levelUpPageEnable === null ? LevelUpWindowShow : this._levelUpPageEnable;
+            if (levelUpPageEnable) {
+                this.resultLevelUpActors.push(actor);
+                this.resultOldStatusActors.push(this.getResultOldStatus(actor));
+            }
         }
     }
-  }
 };
 
 BattleManager.getResultOldStatus = function(actor) {
@@ -7527,6 +7531,13 @@ Sprite_ResultExpGauge.prototype.valueRedraw = function() {
 };
 
 Sprite_ResultExpGauge.prototype.drawValue = function() {
+    if (!!this._gaugeImgData) {
+        return this.drawValueExp_GaugeImg();
+    }
+    this.drawValueExperiencePoints();
+};
+
+Sprite_ResultExpGauge.prototype.drawValueExperiencePoints = function() {
     const width = this.bitmapWidth();
     const height = this.textHeight ? this.textHeight() : this.bitmapHeight();
     this._resultExpMoveMode = (GaugeRefreshFrame > 0 && GaugeValueShow > 0);
@@ -7535,7 +7546,7 @@ Sprite_ResultExpGauge.prototype.drawValue = function() {
         this.setupValueFont();
         if (GaugeValueShow === 3) {
             expValue = this.maxLavel() ? this.currentMaxValue() : expValue;
-            const rate = NuunManager.numPercentage(expValue / this.currentMaxValue() * 100, Decimal - 2, DecimalMode);
+            const rate = NuunManager.numPercentage(expValue / this.currentMaxValue() * 100, Decimal, DecimalMode);
             this.bitmap.drawText(rate +"%", 0, GaugeValueY, width, height, "right");
         } else if (GaugeValueShow === 1) {
             expValue = this.maxLavel() ? "----------" : expValue;
@@ -7562,6 +7573,45 @@ Sprite_ResultExpGauge.prototype.drawValue = function() {
             this.bitmap.textColor = this._battler._resultLevelUp ? NuunManager.getColorCode(LevelUpValueColor) : this.valueColor();
             this.bitmap.drawText(this._nowLevel, 0, GaugeValueY, width, height, "right");
         }
+    }
+};
+
+Sprite_ResultExpGauge.prototype.expDisplayModeParam = function() {
+    switch (GaugeValueShow) {
+        case 0:
+            return 0;
+        case 1:
+            return 2;
+        case 2:
+            return 2;
+        case 3:
+            return 3;
+        case 4:
+            return 1;
+        case 5:
+            return 5;
+        default:
+    }
+};
+
+Sprite_ResultExpGauge.prototype.displyaExp = function() {
+    const mode = this.expDisplayModeParam();
+    this._resultExpMoveMode = (GaugeRefreshFrame > 0 && GaugeValueShow > 0);
+    switch (mode) {
+        case 0:
+            return 0;
+        case 1:
+            return this._battler.nextRequiredExp();
+        case 2:
+            return this.currentValue();
+        case 3:
+            return NuunManager.numPercentage(this.currentValue() / this.currentMaxValue() * 100, Decimal, DecimalMode);
+        case 4:
+            return this.currentValue();//対応していません
+        case 5:
+            return this._nowLevel;
+        default:
+            return this.currentValue();
     }
 };
 
@@ -7808,6 +7858,7 @@ function Sprite_ResultExpValue() {
 
 Sprite_ResultExpValue.prototype = Object.create(Sprite.prototype);
 Sprite_ResultExpValue.prototype.constructor = Sprite_ResultExpValue;
+window.Sprite_ResultExpValue = Sprite_ResultExpValue;
 
 Sprite_ResultExpValue.prototype.initialize = function() {
   this._gaugeWidth = resultExpMaxWidth;

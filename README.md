@@ -198,6 +198,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | ┗ [メンバー変更画面（サポートアクター対応）](https://github.com/nuun888/MZ/blob/master/README/SceneFormation_SupportActor.md) | [NUUN_SceneFormation_SupportActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation_SupportActor.js) |  | 1.1.0 |
 | [アクター並び替え固定](https://github.com/nuun888/MZ/blob/master/README/ActorFixed.md) | [NUUN_ActorFixed](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js) |  | 1.2.0 |
 | [隊列控えメンバー表示](https://github.com/nuun888/MZ/blob/master/README/StandbyMemberFollowers.md) | [NUUN_StandbyMemberFollowers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StandbyMemberFollowers.js) |  | 1.0.0 |
+| [パーティメンバーの保存、呼び出し](https://github.com/nuun888/MZ/blob/master/README/SaveMembers.md) | [NUUN_SaveMembers](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js) |  | 1.0.0 |
 |  |  |  |  |
 
 | 敵グループ　　　　　　　　　　　　　　 | プラグイン　プラグイン数3　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |

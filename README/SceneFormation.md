@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.2.0.6
+# Ver.2.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,9 @@
 `Window_FormationStatus` アクターステータスウィンドウ  
 
 ## 更新履歴
+2025/4/19 Ver.2.1.0  
+メンバーの表示に画像を表示できる機能を追加。  
+NUUN_SaveMembers適用による処理の追加。  
 2025/4/6 Ver.2.0.6  
 1.9の仕様変更による修正。  
 2025/4/4 Ver.2.0.5  

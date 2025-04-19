@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Customize the item and skill window during battle.
@@ -28,6 +28,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/19/2025 Ver.1.0.2
+ * Added the ability to specify a background image for the help.
  * 4/13/2025 Ver.1.0.1
  * Fixed an issue where background images were not being applied.
  * 7/20/2024 Ver.1.0.0
@@ -117,6 +119,13 @@
  * @desc Sets the help for the skill window. Leave blank for default display.
  * @default 
  * @type struct<HelpWindowData>
+ * @parent SkillWindowHelpSetting
+ * 
+ * @param SkillHelpWindowBackgroundImg
+ * @text Skill help window background image setting
+ * @desc Sets the background image for the skill help window.
+ * @default 
+ * @type struct<WindowBackgroundSetting>
  * @parent SkillWindowHelpSetting
  * 
  * @param SkillWindowBackgroundSetting
@@ -218,6 +227,13 @@
  * @type struct<HelpWindowData>
  * @parent ItemWindowHelpSetting
  * 
+ * @param ItemHelpWindowBackgroundImg
+ * @text Item help window background image settings
+ * @desc Sets the background image for the item help window.
+ * @default 
+ * @type struct<WindowBackgroundSetting>
+ * @parent ItemWindowHelpSetting
+ * 
  * @param ItemWindowBackgroundSetting
  * @text Item window background settings
  * @default ------------------------------
@@ -306,7 +322,7 @@
  * @base NUUN_Base
  * @base NUUN_BattleStyleEX
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 戦闘中のアイテム、スキルウィンドウをカスタマイズします。
@@ -321,6 +337,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/19 Ver.1.0.2
+ * ヘルプに背景画像を指定できる機能を追加。
  * 2025/4/13 Ver.1.0.1
  * 背景画像が適用されていなかった問題を修正。
  * 2024/7/20 Ver.1.0.0
@@ -411,6 +429,13 @@
  * @desc スキルウィンドウのヘルプを設定します。空白でデフォルトの表示になります。
  * @default 
  * @type struct<HelpWindowData>
+ * @parent SkillWindowHelpSetting
+ * 
+ * @param SkillHelpWindowBackgroundImg
+ * @text スキルヘルプウィンドウ背景画像設定
+ * @desc スキルヘルプウィンドウの背景画像を設定します。
+ * @default 
+ * @type struct<WindowBackgroundSetting>
  * @parent SkillWindowHelpSetting
  * 
  * @param SkillWindowBackgroundSetting
@@ -512,6 +537,13 @@
  * @type struct<HelpWindowData>
  * @parent ItemWindowHelpSetting
  * 
+ * @param ItemHelpWindowBackgroundImg
+ * @text アイテムヘルプウィンドウ背景画像設定
+ * @desc アイテムヘルプウィンドウの背景画像を設定します。
+ * @default 
+ * @type struct<WindowBackgroundSetting>
+ * @parent ItemWindowHelpSetting
+ * 
  * @param ItemWindowBackgroundSetting
  * @text アイテムウィンドウ背景設定
  * @default ------------------------------
@@ -603,8 +635,21 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
     const parameters = PluginManager.parameters('NUUN_BattleItemSkillWindowEX');
 
     function _getBackground(type) {
-        const method = (type === "item" ? "Item" : "Skill") + "WindowBackgroundImg";
+        const method = _getBackgroundTag(type) + "WindowBackgroundImg";
         return params[method] ? params[method] : null;
+    };
+
+    function _getBackgroundTag(type) {
+        switch (type) {
+            case "item":
+                return "Item";
+            case "itemHelp":
+                return  "ItemHelp";
+            case "skill":
+                return  "Skill";
+            case "skillHelp":
+                return  "SkillHelp";
+        }
     };
 
     function _getBackgroundImg(type) {
@@ -615,8 +660,11 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
     const _Scene_Battle_createSpriteset = Scene_Battle.prototype.createSpriteset;
     Scene_Battle.prototype.createSpriteset = function() {
         _Scene_Battle_createSpriteset.apply(this, arguments);
+        this.createBattleItemHelpBackground();
         this.createBattleItemBackground();
+        this.createBattleSkillHelpBackground();
         this.createBattleSkillBackground();
+        
     };
 
     Scene_Battle.prototype.createBattleItemBackground = function() {
@@ -627,6 +675,17 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
             this.addChild(sprite);
             sprite.hide();
             this._itemWindowBackground = sprite;
+        }
+    };
+
+    Scene_Battle.prototype.createBattleItemHelpBackground = function() {
+        const data = _getBackgroundImg("itemHelp");
+        if (data) {
+            const bitmap = ImageManager.nuun_LoadPictures(data);
+            const sprite = new Sprite(bitmap);
+            this.addChild(sprite);
+            sprite.hide();
+            this._itemHelpWindowBackground = sprite;
         }
     };
 
@@ -641,6 +700,17 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
         }
     };
 
+    Scene_Battle.prototype.createBattleSkillHelpBackground = function() {
+        const data = _getBackgroundImg("skillHelp");
+        if (data) {
+            const bitmap = ImageManager.nuun_LoadPictures(data);
+            const sprite = new Sprite(bitmap);
+            this.addChild(sprite);
+            sprite.hide();
+            this._skillHelpWindowBackground = sprite;
+        }
+    };
+
     const _Scene_Battle_updateVisibility = Scene_Battle.prototype.updateVisibility;
     Scene_Battle.prototype.updateVisibility = function() {
         _Scene_Battle_updateVisibility.apply(this, arguments);
@@ -648,7 +718,18 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
         this.updateBackgroundBattleSkill();
     };
 
+    Scene_Battle.prototype.updateBackgroundBattleItemHelp = function() {
+        if (this._itemHelpWindowBackground && this._itemWindow) {
+            if (this._itemWindow.isOpen()) {
+                this._itemHelpWindowBackground.visible = this._itemWindow.visible;
+            } else if (this._itemWindow.visible) {
+                this._itemHelpWindowBackground.visible = this._itemWindow.isOpen();
+            }
+        }
+    };
+
     Scene_Battle.prototype.updateBackgroundBattleItem = function() {
+        this.updateBackgroundBattleItemHelp();
         if (this._itemWindowBackground && this._itemWindow) {
             if (this._itemWindow.isOpen()) {
                 this._itemWindowBackground.visible = this._itemWindow.visible;
@@ -658,7 +739,18 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
         }
     };
 
+    Scene_Battle.prototype.updateBackgroundBattleSkillHelp = function() {
+        if (this._skillHelpWindowBackground && this._skillWindow) {
+            if (this._skillWindow.isOpen()) {
+                this._skillHelpWindowBackground.visible = this._skillWindow.visible;
+            } else if (this._skillWindow.visible) {
+                this._skillHelpWindowBackground.visible = this._skillWindow.isOpen();
+            }
+        }
+    };
+
     Scene_Battle.prototype.updateBackgroundBattleSkill = function() {
+        this.updateBackgroundBattleSkillHelp();
         if (this._skillWindowBackground && this._skillWindow) {
             if (this._skillWindow.isOpen()) {
                 this._skillWindowBackground.visible = this._skillWindow.visible;
@@ -698,14 +790,31 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
     };
 
     Scene_Battle.prototype.itemBackgroundPosition = function() {
+        if (this._itemHelpWindowBackground && this._itemWindow) {
+            const data = _getBackground("itemHelp");
+            const helpData = params.ItemWindowHelp;
+            if (helpData) {
+                this._itemHelpWindowBackground.x = (params.ItemWindowBackgroundWindowFit ? this._helpWindow.x + helpData.HelpX : 0) + data.Background_X;
+                this._itemHelpWindowBackground.y = (params.ItemWindowBackgroundWindowFit ? this._helpWindow.y + helpData.HelpY : 0) + data.Background_Y;
+            }
+        }
         if (this._itemWindowBackground && this._itemWindow) {
             const data = _getBackground("item");
             this._itemWindowBackground.x = (params.ItemWindowBackgroundWindowFit ? this._itemWindow.x : 0) + data.Background_X;
             this._itemWindowBackground.y = (params.ItemWindowBackgroundWindowFit ? this._itemWindow.y : 0) + data.Background_Y;
         }
+        
     };
 
     Scene_Battle.prototype.skillBackgroundPosition = function() {
+        if (this._skillHelpWindowBackground && this._skillWindow) {
+            const data = _getBackground("skillHelp");
+            const helpData = params.SkillWindowHelp;
+            if (helpData) {
+                this._skillHelpWindowBackground.x = (params.SkillWindowBackgroundWindowFit ? this._helpWindow.x + helpData.HelpX : 0) + data.Background_X;
+                this._skillHelpWindowBackground.y = (params.SkillWindowBackgroundWindowFit ? this._helpWindow.y + helpData.HelpY : 0) + data.Background_Y;
+            }
+        }
         if (this._skillWindowBackground && this._skillWindow) {
             const data = _getBackground("skill");
             this._skillWindowBackground.x = (params.SkillWindowBackgroundWindowFit ? this._skillWindow.x : 0) + data.Background_X;
@@ -725,7 +834,7 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
 
     const _Scene_Battle_itemWindowRect = Scene_Battle.prototype.itemWindowRect;
     Scene_Battle.prototype.itemWindowRect = function() {
-        const rect = _Scene_Battle_skillWindowRect.apply(this, arguments);
+        const rect = _Scene_Battle_itemWindowRect.apply(this, arguments);
         rect.x = (params.ItemWindowMode ? rect.x : 0) + params.ItemWindow_X;
         rect.width = params.ItemWindow_Width > 0 ? Math.min(Graphics.boxWidth, params.ItemWindow_Width) - rect.x : rect.width;
         rect.height = this.calcWindowHeight(params.ItemWindowRows, true);
@@ -770,6 +879,7 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
     Window_BattleItem.prototype.setHelpRect = function() {
         if (this._helpWindow) {
             const data = params.ItemWindowHelp;
+            this._helpWindow.opacity = this.opacity;
             if (data) {
                 this._helpWindow.setBsParams(data.HelpX ,data.HelpY ,data.HelpWidth, data.HelpRows);
             } else {
@@ -781,6 +891,7 @@ Imported.NUUN_BattleItemSkillWindowEX = true;
     Window_BattleSkill.prototype.setHelpRect = function() {
         if (this._helpWindow) {
             const data = params.SkillWindowHelp;
+            this._helpWindow.opacity = this.opacity;
             if (data) {
                 this._helpWindow.setBsParams(data.HelpX ,data.HelpY ,data.HelpWidth, data.HelpRows);
             } else {

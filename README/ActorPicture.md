@@ -1,5 +1,5 @@
 # [立ち絵、顔グラ表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
-# Ver.1.7.4
+# Ver.1.7.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorPicture.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -49,6 +49,8 @@
 再度再設定をお願いいたします。  
 
 ## 更新履歴
+2025/4/19 Ver.1.7.5  
+職業条件が適用されない問題を修正。  
 2024/12/23 Ver.1.7.4  
 条件にレベルを追加。  
 2024/7/28 Ver.1.7.3  

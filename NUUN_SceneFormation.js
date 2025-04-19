@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.0
+ * @version 2.1.1
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -33,6 +33,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/19/2025 Ver.2.1.1
+ * Fixed the processing of member facial graphics.
+ * Fixed the problem that the "NUUN_ActorPicture" setting could not be applied.
  * 4/19/2025 Ver.2.1.0
  * Added a function to display images when displaying members.
  * Added processing by applying "NUUN_SaveMembers".
@@ -914,7 +917,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.0
+ * @version 2.1.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -940,6 +943,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/19 Ver.2.1.1
+ * メンバーの顔グラの処理を修正。
+ * NUUN_ActorPictureの設定が適用できない問題を修正。
  * 2025/4/19 Ver.2.1.0
  * メンバーの表示に画像を表示できる機能を追加。
  * NUUN_SaveMembers適用による処理の追加。
@@ -1863,7 +1869,7 @@ Imported.NUUN_SceneFormation = true;
     };
 
     function _isMemberActorPictureEXApp() {
-        return Imported.NUUN_ActorPicture && paramList.MemberImgActorPictureEXApp;
+        return Imported.NUUN_ActorPicture && params.MemberImgActorPictureEXApp;
     };
 
     function _getActorsSettingList() {
@@ -2240,7 +2246,7 @@ Imported.NUUN_SceneFormation = true;
             this.createMemberWindow();
             this.createMemberNameWindow();
             this.createMemberStatusWindow();
-            if (Imported.NUUN_SaveMembers && !!NuunManager.getSceneFormationOpenSaveMembers() && $gameSystem.getSaveMembersNum() > 0) {
+            if (!this._isBattle && Imported.NUUN_SaveMembers && !!NuunManager.getSceneFormationOpenSaveMembers() && $gameSystem.getSaveMembersNum() > 0) {
                 this.createSaveMembersWindow();
             }
             this.initSelect();
@@ -2917,7 +2923,7 @@ Imported.NUUN_SceneFormation = true;
         this._formation = formation;
         this._members = $gameParty.formationBattleMember();
         Window_StatusBase.prototype.initialize.call(this, rect);
-        this._actorImgData = params.CharacterMode === 'img' && _isMemberActorPictureEXApp() ? new Nuun_ActorGraphics(this) : null;
+        this._actorImgData = params.CharacterMode !== 'chip' && _isMemberActorPictureEXApp() ? new Nuun_ActorGraphics(this) : null;
         this._formationMode = true;
         this._oldActor = null;
         this.refresh();
@@ -3019,7 +3025,12 @@ Imported.NUUN_SceneFormation = true;
         if (params.CharacterMode === 'chip') {
             loadBitmap = ImageManager.loadCharacter(actor.characterName());
         } else if (params.CharacterMode === 'face') {
-            loadBitmap = _isMemberActorPictureEXApp() ? actor.loadActorFace() : ImageManager.loadFace(actor.faceName());
+            if (this._actorImgData) {
+                this._actorImgData.setup(actor);
+                loadBitmap = this._actorImgData.loadActorFace();
+            } else {
+                loadBitmap = ImageManager.loadFace(actor.faceName());
+            }
         } else if (params.CharacterMode === 'img') {
             loadBitmap = this.getFormationActorImgDataBitmap(actor);
         }
@@ -3080,10 +3091,15 @@ Imported.NUUN_SceneFormation = true;
 
     Window_FormationBattleMember.prototype.drawFormationFace = function(actor, x, y, width, height) {
         if (_isMemberActorPictureEXApp()) {
+            this._actorImgData.setup(actor);
             this.actorPictureEXDrawFace(actor, x + 1, y + 1, width - 2, height - 2);
         } else {
             this.drawActorFace(actor, x + 1, y + 1, width - 2, height - 2);
         }
+    };
+
+    Window_FormationBattleMember.prototype.actorPictureEXDrawFace = function(actor, x, y, width, height) {
+        this.drawFace(this._actorImgData.getActorGraphicFace(), this._actorImgData.getActorGraphicFaceInde(), x, y, width, height);
     };
 
     Window_FormationBattleMember.prototype.drawLavel = function(actor, x, y, width, height) {
@@ -3204,7 +3220,7 @@ Imported.NUUN_SceneFormation = true;
         this._formation = formation;
         this._members = $gameParty.formationMember();
         Window_StatusBase.prototype.initialize.call(this, rect);
-        this._actorImgData = params.CharacterMode === 'img' && _isMemberActorPictureEXApp() ? new Nuun_ActorGraphics(this) : null;
+        this._actorImgData = params.CharacterMode !== 'chip' && _isMemberActorPictureEXApp() ? new Nuun_ActorGraphics(this) : null;
         this._formationMode = true;
         this._oldActor = null;
         this.refresh();
@@ -3297,7 +3313,12 @@ Imported.NUUN_SceneFormation = true;
         if (params.CharacterMode === 'chip') {
             loadBitmap = ImageManager.loadCharacter(actor.characterName());
         } else if (params.CharacterMode === 'face') {
-            loadBitmap = _isMemberActorPictureEXApp() ? actor.loadActorFace() : ImageManager.loadFace(actor.faceName());
+            if (this._actorImgData) {
+                this._actorImgData.setup(actor);
+                loadBitmap = this._actorImgData.loadActorFace();
+            } else {
+                loadBitmap = ImageManager.loadFace(actor.faceName());
+            }
         } else if (params.CharacterMode === 'img') {
             loadBitmap = this.getFormationActorImgDataBitmap(actor);
         }
@@ -3359,10 +3380,15 @@ Imported.NUUN_SceneFormation = true;
 
     Window_FormationMember.prototype.drawFormationFace = function(actor, x, y, width, height) {
         if (_isMemberActorPictureEXApp()) {
+            this._actorImgData.setup(actor);
             this.actorPictureEXDrawFace(actor, x + 1, y + 1, width - 2, height - 2);
         } else {
             this.drawActorFace(actor, x + 1, y + 1, width - 2, height - 2);
         }
+    };
+
+    Window_FormationMember.prototype.actorPictureEXDrawFace = function(actor, x, y, width, height) {
+        this.drawFace(this._actorImgData.getActorGraphicFace(), this._actorImgData.getActorGraphicFaceInde(), x, y, width, height);
     };
 
     Window_FormationMember.prototype.drawLavel = function(actor, x, y, width, height) {

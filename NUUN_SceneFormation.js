@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.0.6
+ * @version 2.1.0
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -33,6 +33,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/19/2025 Ver.2.1.0
+ * Added a function to display images when displaying members.
+ * Added processing by applying "NUUN_SaveMembers".
  * 4/6/2025 Ver.2.0.6
  * Fixed due to specification changes in 1.9.
  * 4/4/2025 Ver.2.0.5
@@ -165,6 +168,8 @@
  * @value 'chip'
  * @option Face
  * @value 'face'
+ * @option Image
+ * @value 'img'
  * @default 'chip'
  * @parent MemberImgSetting
  * 
@@ -184,6 +189,29 @@
  * @max 9999
  * @min -9999
  * @default 0
+ * @parent MemberImgSetting
+ * 
+ * @param CharacterWidth
+ * @text Character chip and image display interval
+ * @desc Set the display interval for character chips and images.
+ * @type number
+ * @max 9999
+ * @min 0
+ * @default 56
+ * @parent MemberImgSetting
+ * 
+ * @param MemberImgActorsImgList
+ * @text Display member image settings
+ * @desc Image settings for members displayed when Image is specified
+ * @default []
+ * @type struct<actorImgList>[]
+ * @parent MemberImgSetting
+ * 
+ * @param MemberImgActorPictureEXApp
+ * @text Display member NUUN_ActorPicture applied
+ * @desc Applies the image change of "NUUN_ActorPicture" to the display member. If it is turned OFF, the settings of this plugin will be applied.
+ * @type boolean
+ * @default false
  * @parent MemberImgSetting
  * 
  * @param BattleMemberNameSetting
@@ -387,9 +415,23 @@
  * @default true
  * @parent BackGroundSetting
  * 
- * @param ActorImgSetting
- * @text Status Window Actor Image Settings
+ * @param StatusWindowActorImgSetting
+ * @text Actor Image Settings
  * @default ------------------------------
+ * 
+ * @param ActorsImgList
+ * @text Image Settings
+ * @desc Actor Image Settings
+ * @default []
+ * @type struct<actorImgList>[]
+ * @parent StatusWindowActorImgSetting
+ * 
+ * @param ActorPictureEXApp
+ * @text Apply NUUN_ActorPicture
+ * @desc Apply the image change of "NUUN_ActorPicture". If you turn it off, the settings in this plugin will be applied.
+ * @type boolean
+ * @default true
+ * @parent StatusWindowActorImgSetting
  * 
  * @param GraphicMode
  * @desc Specifies the actor image to display.
@@ -403,21 +445,7 @@
  * @value 's_img'
  * @default 'face'
  * @default 'none'
- * @parent ActorImgSetting
- * 
- * @param ActorsImgList
- * @text Image Settings
- * @desc Actor Image Settings
- * @default []
- * @type struct<actorImgList>[]
- * @parent ActorImgSetting
- * 
- * @param ActorPictureEXApp
- * @text Apply NUUN_ActorPicture
- * @desc Apply the image change of "NUUN_ActorPicture". If you turn it off, the settings in this plugin will be applied.
- * @type boolean
- * @default true
- * @parent ActorImgSetting
+ * @parent StatusWindowActorImgSetting
  * 
  * @param ActorImg_X
  * @text Actor image base X coordinate
@@ -426,7 +454,7 @@
  * @max 9999
  * @min -9999
  * @default 0
- * @parent ActorImgSetting
+ * @parent StatusWindowActorImgSetting
  * 
  * @param ActorImg_Y
  * @text Actor image base Y coordinate
@@ -435,7 +463,7 @@
  * @max 9999
  * @min -9999
  * @default 0
- * @parent ActorImgSetting
+ * @parent StatusWindowActorImgSetting
  * 
  * @param ActorPosition
  * @text Standing picture display position
@@ -448,7 +476,7 @@
  * @option Right
  * @value Right
  * @default Right
- * @parent ActorImgSetting
+ * @parent StatusWindowActorImgSetting
  * 
  * @param ActorFixedSetting
  * @text Fixed actor sorting settings (requires NUUN_ActorFixed)
@@ -886,7 +914,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.0.6
+ * @version 2.1.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -912,6 +940,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/19 Ver.2.1.0
+ * メンバーの表示に画像を表示できる機能を追加。
+ * NUUN_SaveMembers適用による処理の追加。
  * 2025/4/6 Ver.2.0.6
  * 1.9の仕様変更による修正。
  * 2025/4/4 Ver.2.0.5
@@ -1044,6 +1075,8 @@
  * @value 'chip'
  * @option 顔グラフィック
  * @value 'face'
+ * @option 画像
+ * @value 'img'
  * @default 'chip'
  * @parent MemberImgSetting
  * 
@@ -1063,6 +1096,29 @@
  * @max 9999
  * @min -9999
  * @default 0
+ * @parent MemberImgSetting
+ * 
+ * @param CharacterWidth
+ * @text キャラチップ、画像の表示間隔
+ * @desc キャラチップ、画像の表示間隔を設定します。
+ * @type number
+ * @max 9999
+ * @min 0
+ * @default 56
+ * @parent MemberImgSetting
+ * 
+ * @param MemberImgActorsImgList
+ * @text 表示メンバー画像設定
+ * @desc 画像設定時の表示メンバーの画像設定
+ * @default []
+ * @type struct<actorImgList>[]
+ * @parent MemberImgSetting
+ * 
+ * @param MemberImgActorPictureEXApp
+ * @text 表示メンバー立ち絵表示EX適用
+ * @desc 表示メンバーで立ち絵表示EXの画像変更を適用します。OFFにした場合はこのプラグインでの設定が適用されます。
+ * @type boolean
+ * @default false
  * @parent MemberImgSetting
  * 
  * @param BattleMemberNameSetting
@@ -1266,9 +1322,23 @@
  * @default true
  * @parent BackGroundSetting
  * 
- * @param ActorImgSetting
- * @text ステータスウィンドウアクター画像設定
+ * @param StatusWindowActorImgSetting
+ * @text アクター画像設定
  * @default ------------------------------
+ * 
+ * @param ActorsImgList
+ * @text 画像設定
+ * @desc アクターの画像設定
+ * @default []
+ * @type struct<actorImgList>[]
+ * @parent StatusWindowActorImgSetting
+ * 
+ * @param ActorPictureEXApp
+ * @text 立ち絵表示EX適用
+ * @desc 立ち絵表示EXの画像変更を適用します。OFFにした場合はこのプラグインでの設定が適用されます。
+ * @type boolean
+ * @default false
+ * @parent StatusWindowActorImgSetting
  * 
  * @param GraphicMode
  * @desc ステータスウィンドウに表示するアクター画像を指定します。
@@ -1281,21 +1351,7 @@
  * @option 画像
  * @value 's_img'
  * @default 'none'
- * @parent ActorImgSetting
- * 
- * @param ActorsImgList
- * @text 画像設定
- * @desc アクターの画像設定
- * @default []
- * @type struct<actorImgList>[]
- * @parent ActorImgSetting
- * 
- * @param ActorPictureEXApp
- * @text 立ち絵表示EX適用
- * @desc 立ち絵表示EXの画像変更を適用します。OFFにした場合はこのプラグインでの設定が適用されます。
- * @type boolean
- * @default false
- * @parent ActorImgSetting
+ * @parent StatusWindowActorImgSetting
  * 
  * @param ActorImg_X
  * @text アクター画像基本X座標
@@ -1304,7 +1360,7 @@
  * @max 9999
  * @min -9999
  * @default 0
- * @parent ActorImgSetting
+ * @parent StatusWindowActorImgSetting
  * 
  * @param ActorImg_Y
  * @text アクター画像基本Y座標
@@ -1313,11 +1369,11 @@
  * @max 9999
  * @min -9999
  * @default 0
- * @parent ActorImgSetting
+ * @parent StatusWindowActorImgSetting
  * 
  * @param ActorPosition
  * @text 立ち絵表示位置
- * @desc 立ち絵の表示位置を指定します。Apengは適用されません。
+ * @desc ステータスウィンドウの立ち絵の表示位置を指定します。Apengは適用されません。
  * @type select
  * @option 左
  * @value Left
@@ -1326,7 +1382,7 @@
  * @option 右
  * @value Right
  * @default Right
- * @parent ActorImgSetting
+ * @parent StatusWindowActorImgSetting
  * 
  * @param ActorFixedSetting
  * @text アクター並び替え固定設定(要NUUN_ActorFixed)
@@ -1806,9 +1862,31 @@ Imported.NUUN_SceneFormation = true;
         return Imported.NUUN_ActorPicture && paramList.ActorPictureEXApp;
     };
 
+    function _isMemberActorPictureEXApp() {
+        return Imported.NUUN_ActorPicture && paramList.MemberImgActorPictureEXApp;
+    };
+
+    function _getActorsSettingList() {
+        return _isMemberActorPictureEXApp() ? NuunManager.getBattlerActors() : params.MemberImgActorsImgList;
+    };
+
     function _getActorImgData(actor) {
-        return null;
-    }
+        const list = _getActorsSettingList();
+        return list.find(data => {
+            if (data[_getActorId()] === actor.actorId() && actor._classId === data.ClassId) {
+                return true;
+            } else if (data.ClassId === 0 && data[_getActorId()] === actor.actorId()) {
+                return true;
+            } else if (data[_getActorId()] === 0 && actor._classId === data.ClassId) {
+                return true;
+            }
+            return false;
+        });
+    };
+
+    function _getActorId() {
+        return _isMemberActorPictureEXApp() ? 'actorId' : 'ActorId';
+    };
 
     NuunManager.isBattleFixedActor = function(actor) {
         return false;
@@ -1938,6 +2016,10 @@ Imported.NUUN_SceneFormation = true;
 
     Scene_Base.prototype.getParamBattleMember_Rows = function() {
         return paramList.BattleMember_Rows;
+    };
+
+    Scene_Base.prototype.nuun_GetMemberHeight = function() {
+        return params.MemberHeight;
     };
       
     Scene_Menu.prototype.commandFormation = function() {//再定義
@@ -2158,7 +2240,7 @@ Imported.NUUN_SceneFormation = true;
             this.createMemberWindow();
             this.createMemberNameWindow();
             this.createMemberStatusWindow();
-            if (Imported.NUUN_SaveMembers) {
+            if (Imported.NUUN_SaveMembers && !!NuunManager.getSceneFormationOpenSaveMembers() && $gameSystem.getSaveMembersNum() > 0) {
                 this.createSaveMembersWindow();
             }
             this.initSelect();
@@ -2239,12 +2321,20 @@ Imported.NUUN_SceneFormation = true;
         createSaveMembersWindow() {
             const scene = this._scene;
             const rect = this.saveMembersWindowRect();
-            const saveMembersWindow = new Window_SaveMembers(rect, this);
+            const saveMembersWindow = new Window_SaveMembers(rect);
+            this._memberWindow.setHandler(NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
+            this._battleMemberWindow.setHandler(NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
+            saveMembersWindow.setHandler("ok", this.onSaveMembersOk.bind(this));
+            saveMembersWindow.setHandler("cancel", this.onSaveMembersCancel.bind(this));
+            saveMembersWindow.setHandler(NuunManager.getSaveMembersEraseSymbol(), this.onSaveMembersEraseOk.bind(this));
             scene.addWindow(saveMembersWindow);
+            this._memberWindow.setSaveMembersWindow(saveMembersWindow);
+            this._battleMemberWindow.setSaveMembersWindow(saveMembersWindow);
             this._saveMembersWindow = saveMembersWindow;
             if (this._isBattle) {
                 saveMembersWindow.openness = 0;
             }
+            saveMembersWindow.hide();
         }
         
         battleMemberNameWindowRect() {
@@ -2288,11 +2378,7 @@ Imported.NUUN_SceneFormation = true;
         }
 
         saveMembersWindowRect() {
-            const wx = paramList.SaveMembers_X;
-            const wy = paramList.SaveMembers_Y;
-            const ww = $gameParty.maxBattleMembers() * this.saveMemberWindowWidth();
-            const wh = this._scene.calcWindowHeight(1, true);
-            return new Rectangle(wx, wy, ww, wh);
+            return this._scene.saveMembersWindowRect();
         }
 
         initSelect() {
@@ -2408,6 +2494,52 @@ Imported.NUUN_SceneFormation = true;
             if (this._isBattle) {
                 $gameTemp.formationRefresh = true;
             }
+        }
+
+        onSaveMembersOpenOk() {
+            this._memberWindow.deselect();
+            this._battleMemberWindow.deselect();
+            this._memberWindow.deactivate();
+            this._battleMemberWindow.deactivate();
+            this._saveMembersWindow.show();
+            this._saveMembersWindow.activate();
+            this._saveMembersWindow.select(0);
+            this._memberStatusWindow.hide();
+        }
+
+        onSaveMembersOk() {
+            if ($gameSystem.setSavePartyMembers(this._saveMembersWindow.index())) {
+                this._memberWindow.refresh();
+                this._battleMemberWindow.refresh();
+                this.onSaveMembersCancel();
+            } else {
+                SoundManager.playBuzzer();
+                this._saveMembersWindow.activate();
+            }
+        }
+
+        onSaveMembersEraseOk() {
+            $gameSystem.eraseSaveMembers(this._saveMembersWindow.index());
+            this._saveMembersWindow.refresh();
+            this._saveMembersWindow.activate();
+            const index = Math.min(this._saveMembersWindow.index(), $gameSystem.getSaveMembersNum() - 1);
+            this._saveMembersWindow.forceSelect(index);
+            NuunManager.playSaveMembersEraseSe();
+            if ($gameSystem.getSaveMembersNum() === 0) {
+                this.onSaveMembersCancel();
+            }
+        }
+
+        onSaveMembersCancel() {
+            this._saveMembersWindow.hide();
+            if (this.isCursorBattleMode()) {
+                this._battleMemberWindow.activate();
+                this._battleMemberWindow.select(0);
+            } else {
+                this._memberWindow.activate();
+                this._memberWindow.select(0);
+            }
+            this._memberStatusWindow.show();
         }
         
         selectOrder(index) {
@@ -2587,16 +2719,13 @@ Imported.NUUN_SceneFormation = true;
             + this._scene.exFormationMembers()) * this.characterModeWidth();
         }
 
-        saveMemberWindowWidth() {
-            return $gameSystem.windowPadding() * 2 + paramList.Member_Cols * this.characterModeWidth();
-        }
-
         characterModeWidth() {
             switch (params.CharacterMode) {
                 case 'face':
-                    return ImageManager.faceWidth + this.itemPadding();
+                    return ImageManager.faceWidth + Window_Base.prototype.itemPadding.call(this);
                 case 'chip':
-                    return 56;
+                case 'img':
+                    return params.CharacterWidth || 56;
             }
         }
 
@@ -2677,10 +2806,10 @@ Imported.NUUN_SceneFormation = true;
             const scale = (data.wActor_Scale || 100) / 100;
             const sw = width * scale;
             const sh = height * scale;
-            const sx = data.wImg_SX || 0;
-            const sy = data.wImg_SY || 0;
-            const x2 = x + 1 + (data.wActor_X || 0);// + ActorImg_X;
-            const y2 = y + 1 + (data.wActor_Y || 0);// + ActorImg_Y;
+            const sx = data.Img_SX || 0;
+            const sy = data.Img_SY || 0;
+            const x2 = x + 1 + (data.Actor_X || 0);// + ActorImg_X;
+            const y2 = y + 1 + (data.Actor_Y || 0);// + ActorImg_Y;
             this.contents.blt(bitmap, sx, sy, width + (width - sw), height + (height - sh), x2, y2, width, height);
         }
         this.drawLavel(actor, x, y, width);
@@ -2697,8 +2826,34 @@ Imported.NUUN_SceneFormation = true;
         }
     };
 
+    Window_StatusBase.prototype.getFormationActorImgData = function(actor) {
+        const data = _getActorImgData(actor);
+        if (this._actorImgData) {
+            this._actorImgData.setup(actor);
+        }
+        return data;
+    };
+
+    Window_StatusBase.prototype.getFormationActorImgDataBitmap = function(actor) {
+        const data = this.getFormationActorImgData(actor);
+        if (!data) return null;
+        return this.getFormationActorImgBitmap(data);
+    };
+
+    Window_StatusBase.prototype.getFormationActorImgBitmap = function(data) {
+        return _isMemberActorPictureEXApp() ? this._actorImgData.loadActorGraphic() : ImageManager.nuun_LoadPictures(data.ActorImg);
+    };
+
     Window_StatusBase.prototype.getFormationSelectActor = function() {
         return $gameParty.leader();
+    };
+
+    Window_StatusBase.prototype.setSaveMembersWindow = function(saveMembersWindow) {
+        this._saveMembersWindow = saveMembersWindow;
+    };
+
+    Window_StatusBase.prototype.activeSaveMembersWindow = function() {
+        return this._saveMembersWindow && this._saveMembersWindow.active;
     };
 
 
@@ -2762,6 +2917,7 @@ Imported.NUUN_SceneFormation = true;
         this._formation = formation;
         this._members = $gameParty.formationBattleMember();
         Window_StatusBase.prototype.initialize.call(this, rect);
+        this._actorImgData = params.CharacterMode === 'img' && _isMemberActorPictureEXApp() ? new Nuun_ActorGraphics(this) : null;
         this._formationMode = true;
         this._oldActor = null;
         this.refresh();
@@ -2863,12 +3019,9 @@ Imported.NUUN_SceneFormation = true;
         if (params.CharacterMode === 'chip') {
             loadBitmap = ImageManager.loadCharacter(actor.characterName());
         } else if (params.CharacterMode === 'face') {
-            loadBitmap = _isActorPictureEXApp() ? actor.loadActorFace() : ImageManager.loadFace(actor.faceName());
+            loadBitmap = _isMemberActorPictureEXApp() ? actor.loadActorFace() : ImageManager.loadFace(actor.faceName());
         } else if (params.CharacterMode === 'img') {
-            const data = _getActorImgData(actor);
-            if (data) {
-                loadBitmap = _isActorPictureEXApp() ? actor.loadActorGraphic() : ImageManager.nuun_LoadPictures(data.ActorImg);
-            }
+            loadBitmap = this.getFormationActorImgDataBitmap(actor);
         }
         if (loadBitmap && !loadBitmap.isReady()) {
             bitmap = loadBitmap;
@@ -2903,7 +3056,15 @@ Imported.NUUN_SceneFormation = true;
         } else if (params.CharacterMode === 'face') {
             this.drawFormationFace(actor, rect.x, rect.y, Math.min(rect.width, ImageManager.faceWidth), Math.min(rect.height, ImageManager.faceHeight));
         } else if (params.CharacterMode === 'img') {
-            this.drawFormationImg(actor, rect.x, rect.y, rect.width, rect.height);
+            this.formationActorImg(actor, rect.x, rect.y, rect.width, rect.height);
+        }
+    };
+
+    Window_FormationBattleMember.prototype.formationActorImg = function(actor, x, y, width, height) {
+        const data = this.getFormationActorImgData(actor);
+        if (data) {
+            const bitmap = this.getFormationActorImgBitmap(data);
+            this.drawFormationImg(data, actor, bitmap, x, y, width, height);
         }
     };
 
@@ -2918,7 +3079,7 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_FormationBattleMember.prototype.drawFormationFace = function(actor, x, y, width, height) {
-        if (_isActorPictureEXApp()) {
+        if (_isMemberActorPictureEXApp()) {
             this.actorPictureEXDrawFace(actor, x + 1, y + 1, width - 2, height - 2);
         } else {
             this.drawActorFace(actor, x + 1, y + 1, width - 2, height - 2);
@@ -2989,7 +3150,7 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_FormationBattleMember.prototype.onTouchSelectActive = function() {
-        if (this.isHoverEnabled() && this._formation.isCursorMemberMode()) {
+        if (!this.activeSaveMembersWindow() && this.isHoverEnabled() && this._formation.isCursorMemberMode()) {
             const hitIndex = this.hitIndex();
             if (hitIndex >= 0) {
                 this.activate();
@@ -3043,6 +3204,7 @@ Imported.NUUN_SceneFormation = true;
         this._formation = formation;
         this._members = $gameParty.formationMember();
         Window_StatusBase.prototype.initialize.call(this, rect);
+        this._actorImgData = params.CharacterMode === 'img' && _isMemberActorPictureEXApp() ? new Nuun_ActorGraphics(this) : null;
         this._formationMode = true;
         this._oldActor = null;
         this.refresh();
@@ -3135,12 +3297,9 @@ Imported.NUUN_SceneFormation = true;
         if (params.CharacterMode === 'chip') {
             loadBitmap = ImageManager.loadCharacter(actor.characterName());
         } else if (params.CharacterMode === 'face') {
-            loadBitmap = _isActorPictureEXApp() ? actor.loadActorFace() : ImageManager.loadFace(actor.faceName());
+            loadBitmap = _isMemberActorPictureEXApp() ? actor.loadActorFace() : ImageManager.loadFace(actor.faceName());
         } else if (params.CharacterMode === 'img') {
-            const data = _getActorImgData(actor);
-            if (data) {
-                loadBitmap = _isActorPictureEXApp() ? actor.loadActorGraphic() : ImageManager.nuun_LoadPictures(data.ActorImg);
-            }
+            loadBitmap = this.getFormationActorImgDataBitmap(actor);
         }
         if (loadBitmap && !loadBitmap.isReady()) {
             bitmap = loadBitmap;
@@ -3176,7 +3335,15 @@ Imported.NUUN_SceneFormation = true;
         } else if (params.CharacterMode === 'face') {
             this.drawFormationFace(actor, rect.x, rect.y, Math.min(rect.width, ImageManager.faceWidth), Math.min(rect.height, ImageManager.faceHeight));
         } else if (params.CharacterMode === 'img') {
-            this.drawFormationImg(actor, rect.x, rect.y, rect.width, rect.height);
+            this.formationActorImg(actor, rect.x, rect.y, rect.width, rect.height);
+        }
+    };
+
+    Window_FormationMember.prototype.formationActorImg = function(actor, x, y, width, height) {
+        const data = this.getFormationActorImgData(actor);
+        if (data) {
+            const bitmap = this.getFormationActorImgBitmap(data);
+            this.drawFormationImg(data, actor, bitmap, x, y, width, height);
         }
     };
 
@@ -3191,7 +3358,7 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_FormationMember.prototype.drawFormationFace = function(actor, x, y, width, height) {
-        if (_isActorPictureEXApp()) {
+        if (_isMemberActorPictureEXApp()) {
             this.actorPictureEXDrawFace(actor, x + 1, y + 1, width - 2, height - 2);
         } else {
             this.drawActorFace(actor, x + 1, y + 1, width - 2, height - 2);
@@ -3259,11 +3426,11 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_FormationMember.prototype.onTouchSelectActive = function() {
-        if (this.isHoverEnabled() && this._formation.isCursorBattleMode()) {
+        if (!this.activeSaveMembersWindow() && this.isHoverEnabled() && this._formation.isCursorBattleMode()) {
             const hitIndex = this.hitIndex();
             if (hitIndex >= 0) {
-            $gameTemp.changeTouch = true;
-            this.activate();
+                $gameTemp.changeTouch = true;
+                this.activate();
             }
         }
     };

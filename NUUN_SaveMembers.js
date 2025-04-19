@@ -162,7 +162,7 @@
  * @text Registration Party Window X Coordinate
  * @desc Registration Party Window X Coordinate.
  * @type number
- * @default 0
+ * @default 320
  * @min -9999
  * @parent SaveMembersWindowSetting
  * 
@@ -178,7 +178,7 @@
  * @text Registration Party Window Display rows
  * @desc Display rows and maximum number of registrations in the registered party window.
  * @type number
- * @default 8
+ * @default 4
  * @min 1
  * @parent SaveMembersWindowSetting
  * 
@@ -390,7 +390,7 @@
  * @text 登録パーティウィンドウX座標
  * @desc 登録パーティウィンドウX座標
  * @type number
- * @default 0
+ * @default 320
  * @min -9999
  * @parent SaveMembersWindowSetting
  * 
@@ -406,7 +406,7 @@
  * @text 登録パーティウィンドウ表示行
  * @desc 登録パーティウィンドウの表示行及び最大登録数。
  * @type number
- * @default 8
+ * @default 4
  * @min 1
  * @parent SaveMembersWindowSetting
  * 
@@ -579,7 +579,7 @@ Imported.NUUN_SaveMembers = true;
 
     Scene_Base.prototype.saveMembersWindowRect = function() {
         const wx = params.SaveMembers_X;
-        const wy = params.SaveMembers_Y;
+        const wy = params.SaveMembers_Y + (this.mainAreaTop ? this.mainAreaTop() : 0);
         const ww = this.nuun_SaveMemberWindowWidth();
         const wh = 32 + params.SaveMembers_Rows * (params.MemberHeight + Window_Selectable.prototype.rowSpacing.call(this));
         return new Rectangle(wx, wy, ww, wh);
@@ -626,7 +626,7 @@ Imported.NUUN_SaveMembers = true;
         const ww = params.Command_Width > 0 ? params.Command_Width : this.mainCommandWidth();
         const wh = this.calcWindowHeight(3, true);
         const wx = params.Command_X;
-        const wy = params.Command_Y;
+        const wy = params.Command_Y + this.mainAreaTop();
         return new Rectangle(wx, wy, ww, wh);
     };
 

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.4
+ * @version 1.7.5
  * 
  * @help
  * This is a plugin that processes the display of actor graphics and face graphics images.
@@ -38,6 +38,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/19/2025 Ver.1.7.5
+ * Fixed an issue where job requirements were not being applied.
  * 12/23/2024 Ver.1.7.4
  * Add level to the condition.
  * 7/27/2024 Ver.1.7.3
@@ -283,7 +285,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.4
+ * @version 1.7.5
  * 
  * @help
  * アクターグラフィック、顔グラ画像を表示する処理を行うプラグインです。
@@ -313,6 +315,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/19 Ver.1.7.5
+ * 職業条件が適用されない問題を修正。
  * 2024/12/23 Ver.1.7.4
  * 条件にレベルを追加。
  * 2024/7/28 Ver.1.7.3
@@ -666,7 +670,7 @@ Imported.NUUN_ActorPicture = true;
 
 
         getGraphicsData(actor) {
-            return params.ButlerActors ? params.ButlerActors.find(data => actor && data.actorId === actor.actorId()) || [] : [];
+            return params.ButlerActors ? params.ButlerActors.find(data => actor && condActorImg(data, actor)) || [] : [];
         }
 
         condActorImg(data, actor) {

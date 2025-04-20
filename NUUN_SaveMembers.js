@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Implement a function to register and call parties in a specified party order.
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/20/2025 Ver.1.0.1
+ * Fixed an issue where an error would occur when pressing the Confirm key when there was no registered party.
  * 4/19/2025 Ver.1.0.0
  * First edition.
  * 
@@ -88,6 +90,13 @@
  * @option Face graphics
  * @value 'face'
  * @default 'chip'
+ * @parent BasicSetting
+ * 
+ * @param RegistrationSe
+ * @text SE when registering
+ * @desc Specify the SE at the time of registration.
+ * @type struct<SoundEffect>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  * @parent BasicSetting
  * 
  * @param EraseSe
@@ -239,7 +248,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 指定のパーティの並び順をパーティを登録、呼び出しする機能を実装します。
@@ -251,6 +260,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/20 Ver.1.0.1
+ * 登録パーティがいない状態で決定キーを押すとエラーが出る問題を修正。
  * 2025/4/19 Ver.1.0.0
  * 初版
  * 
@@ -316,6 +327,13 @@
  * @option 顔グラフィック
  * @value 'face'
  * @default 'chip'
+ * @parent BasicSetting
+ * 
+ * @param RegistrationSe
+ * @text 登録時SE
+ * @desc 登録時のSEを指定します。
+ * @type struct<SoundEffect>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
  * @parent BasicSetting
  * 
  * @param EraseSe
@@ -502,7 +520,7 @@ Imported.NUUN_SaveMembers = true;
     };
     
     NuunManager.playSaveMembersEraseSe = function() {
-        AudioManager.playSe(params.EraseSe);
+        params.EraseSe ? AudioManager.playSe(params.EraseSe) : SoundManager.playCancel();
     };
 
     const _Game_System_initialize = Game_System.prototype.initialize;
@@ -558,12 +576,12 @@ Imported.NUUN_SaveMembers = true;
 
     Game_System.prototype.isSavePartyMembersEvery = function(index) {
         const members = this._saveMembers[index];
-        return members.every(member => $gameParty._actors.includes(member));
+        return !!members && members.every(member => $gameParty._actors.includes(member));
     };
 
     Game_System.prototype.isSavePartyMembersSome = function(index) {
         const members = this._saveMembers[index];
-        return members.some(member => $gameParty._actors.includes(member));
+        return !!members && members.some(member => $gameParty._actors.includes(member));
     };
  
 
@@ -720,6 +738,10 @@ Imported.NUUN_SaveMembers = true;
     Window_SavePartyCommand.prototype.processOk = function() {
         Window_SavePartyCommand._lastCommandSymbol = this.currentSymbol();
         Window_Command.prototype.processOk.call(this);
+    };
+
+    Window_SavePartyCommand.prototype.playOkSound = function() {
+        params.RegistrationSe ? AudioManager.playSe(params.RegistrationSe) : Window_Base.prototype.playBuzzerSound.apply(this, arguments);;
     };
     
     Window_SavePartyCommand.prototype.selectLast = function() {

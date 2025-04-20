@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.9
+ * @version 3.0.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -39,7 +39,8 @@
  * 
  * ShowEval
  * actor:$gameActors (Actor specified by "SpecifyActor" (leader if not specified))
- * The only variables that can be referenced in the free text display conditions are info information, file name numbers, and display window objects.
+ * If you want to specify the display conditions using free text, enter any characters in Method (13).
+ * If method (13) is not filled in, the judgment will be made while the save screen is open.
  * 
  * The drawTextEx display does not apply the font size of the plugin parameter.
  * Set the text with \FS[x].
@@ -70,6 +71,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/20/2025 Ver.3.0.10
+ * Expanded scope of free text display conditions.
  * 12/1/2024 Ver.3.0.9
  * Fixed an issue where an error would occur if a background image was not found.
  * 11/26/2024 Ver.3.0.8
@@ -1161,6 +1164,7 @@
  * @desc Enter the display conditions in Javascript.
  * @text Display condition (javaScript)(12)
  * @type combo
+ * @option '!!info'
  * @option '$gameSwitches.value(Number(actor.actor().meta.SaveActorShowSwitch))'
  * @option '(!info && $gameSystem.getVariableSaveFiles() <= savefileId);//Variable maximum save number final file judgment'
  * @default 
@@ -1346,7 +1350,8 @@
  * 
  * 表示条件
  * actor:$gameActors (指定のアクター変更で指定したアクター(指定してない場合はリーダー))
- * フリーテキストの表示条件で参照できる変数はインフォ情報とファイル名番号及び表示ウィンドウのオブジェクトのみになります。
+ * フリーテキストで表示条件を指定する場合はメソッド(13)に任意の文字を記入して下さい。
+ * メソッド(13)に記入がない場合、セーブ画面を開いている段階での判定になります。
  * 
  * drawTextEx表示はプラグインパラメータのフォントサイズが適用されません。
  * テキストに\FS[x]で設定してください。
@@ -1380,6 +1385,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/20 Ver.3.0.10
+ * フリーテキストの表示条件の適用範囲を拡大。
  * 2024/12/1 Ver.3.0.9
  * 背景画像が見つからない場合にエラーが出る問題を修正。
  * 2024/11/26 Ver.3.0.8
@@ -2472,6 +2479,7 @@
  * @desc 表示条件をJavascriptで記入します。
  * @text 表示条件(javaScript)(12)
  * @type combo
+ * @option '!!info'
  * @option '$gameSwitches.value(Number(actor.actor().meta.SaveActorShowSwitch))'
  * @option '(!info && $gameSystem.getVariableSaveFiles() <= savefileId);//可変最大セーブ数最終ファイル判定'
  * @default 
@@ -2734,7 +2742,6 @@ Imported.NUUN_SaveScreen_3 = true;
                     this.setOrgParams(info, contents, actor);
                     break;
                 case 'Chapter':
-                    
                     if (Imported.NUUN_Chapter) {
                         info.AnyName = $gameSystem.getChapter();
                     } else {
@@ -2807,6 +2814,9 @@ Imported.NUUN_SaveScreen_3 = true;
                 case 'ActorOriginalParam':
                     info["orgParam_"+ String(contents.MethodName)] = this.actorOriginalParamForSavefile();
                     break;
+                case 'FreeText':
+                    this.setShowEval(info, contents);
+                    break;
                 case 'Imges':
                     
                     break;
@@ -2815,6 +2825,25 @@ Imported.NUUN_SaveScreen_3 = true;
     };
     
     DataManager.setOrgParams = function(info, contents, actor) {
+        const text = eval(contents.DetaEval);
+        if (isNaN(text)) {
+            info["orgParam_"+ String(contents.MethodName)] = text;
+        } else {
+            info["orgParam_"+ String(contents.MethodName)] = NuunManager.numPercentage(text, (contents.Decimal - 2) || 0, true);
+        }
+    };
+
+    DataManager.setShowEval = function(info, contents) {
+        if (!contents.ShowEval || !contents.MethodName) return;
+        const text = eval(contents.ShowEval);
+        if (isNaN(text)) {
+            info["showEval_"+ String(contents.MethodName)] = text;
+        } else {
+            info["showEval_"+ String(contents.MethodName)] = NuunManager.numPercentage(text, (contents.Decimal - 2) || 0, true);
+        }
+    };
+
+    DataManager.setShowOrgParams = function(info, contents, actor) {
         const text = eval(contents.DetaEval);
         if (isNaN(text)) {
             info["orgParam_"+ String(contents.MethodName)] = text;
@@ -3320,7 +3349,7 @@ Imported.NUUN_SaveScreen_3 = true;
     };
 
     Window_Base.prototype.nuun_DrawSaveContentsFreeText = function(info, x, y, width, data, savefileId) {
-        if (!data.ShowEval || eval(data.ShowEval)) {
+        if (this.nuun_IsSaveContentsShow(info, data)) {
             this.drawTextEx(data.FreeText, x, y, width);
         }
     };
@@ -3658,6 +3687,11 @@ Imported.NUUN_SaveScreen_3 = true;
             this.drawText(data.ParamName || '', x, y, width);
             this.resetTextColor();
         }
+    };
+
+    Window_Base.prototype.nuun_IsSaveContentsShow = function(info, data) {
+        if (!data.ShowEval) return true;
+        return !!info && info["showEval_"+ String(data.MethodName)] !== undefined && !!data.MethodName ? info["showEval_"+ String(data.MethodName)] : eval(data.ShowEval);
     };
     
     Window_SavefileList.prototype.systemWidth = function(swidth, width) {

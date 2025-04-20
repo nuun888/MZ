@@ -26,6 +26,7 @@
  * Log
  * 4/20/2025 Ver.1.0.1
  * Fixed an issue where an error would occur when pressing the Confirm key when there was no registered party.
+ * Added a function to set the sound effects when registering.
  * 4/19/2025 Ver.1.0.0
  * First edition.
  * 
@@ -262,6 +263,7 @@
  * 更新履歴
  * 2025/4/20 Ver.1.0.1
  * 登録パーティがいない状態で決定キーを押すとエラーが出る問題を修正。
+ * 登録時のSEを設定できる機能を追加。
  * 2025/4/19 Ver.1.0.0
  * 初版
  * 

@@ -737,7 +737,7 @@
  */
 
 var Imported = Imported || {};
-Imported.NUUN_BankSystem = true;
+Imported.NUUN_UserKey = true;
 
 (() => {
     const parameters = PluginManager.parameters('NUUN_UserKey');

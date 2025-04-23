@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * Sets the enemy's level.
@@ -49,6 +49,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/23/2025 Ver.1.1.1
+ * Fixed an issue where an error would occur when starting a battle.
  * 12/16/2024 Ver.1.1.0
  * Fixed to display enemy levels in names.
  * 12/7/2024 Ver.1.0.1
@@ -311,7 +313,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 敵にレベルを設定します。
@@ -347,6 +349,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/23 Ver 1.1.1
+ * 戦闘開始時にエラーが出る問題を修正。
  * 2024/12/16 Ver 1.1.0
  * 敵名にレベルを表示出来るように修正。
  * 2024/12/7 Ver 1.0.1
@@ -628,7 +632,7 @@ Imported.NUUN_EnemyLevel = true;
     const _Game_Enemy_setup = Game_Enemy.prototype.setup
     Game_Enemy.prototype.setup = function(enemyId, x, y) {
         this.setupLevelData(enemyId);
-        this.setupLevel();
+        this.setupLevel(enemyId);
         _Game_Enemy_setup.apply(this, arguments);
     };
 
@@ -640,11 +644,12 @@ Imported.NUUN_EnemyLevel = true;
         this._levelData = dataId;
     };
 
-    Game_Enemy.prototype.setupLevel = function() {
+    Game_Enemy.prototype.setupLevel = function(enemyId) {
         if (this._levelData === 0) return;
         const data = params.EnemyLevelData[this._levelData - 1];
+        const enemy = $dataEnemies[enemyId];
         let level = 1;
-        if (enemy.meta.Level) {
+        if (enemy && enemy.meta.Level) {
             level = this.getIndividualEnemyLevel();
         } else if (data.EnemyLevelVariable > 0) {
             level = $gameVariables.value(data.EnemyLevelVariable) || 1;

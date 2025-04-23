@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation (battle)
  * @author NUUN
- * @version 2.1.2
+ * @version 2.1.3
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/23/2025 Ver.2.1.3
+ * Added the ability to revert to members before the change.
  * 4/7/2025 Ver.2.1.2
  * Changed the functionality for restoring pre-battle members to the method used in 2.1.0.
  * Changed the specification so that the switch to return to pre-battle members can only be set when "ReturnPartyMember" is enabled.
@@ -121,6 +123,28 @@
  * @type boolean
  * @default false
  * @parent BasicSetting
+ * 
+ * @param BeforeMemberSetting
+ * @text Revert settings before change
+ * @default ------------------------------
+ * 
+ * @param BeforeMemberButton_X
+ * @text Button X coordinate
+ * @desc X coordinate of the undo button.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 4
+ * @parent BeforeMemberSetting
+ * 
+ * @param BeforeMemberButton_Y
+ * @text Button Y coordinate
+ * @desc Y coordinate of the undo button.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
+ * @parent BeforeMemberSetting
  * 
  * @param MemberSortOrderInitializationSettings
  * @text Initialize member order after battle
@@ -740,7 +764,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 2.1.2
+ * @version 2.1.3
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -752,6 +776,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/23 Ver.2.1.3
+ * 変更前のメンバーに戻す機能を追加。
  * 2025/4/7 Ver.2.1.2
  * 戦闘前のメンバーに戻す機能を2.1.0時の方式に仕様変更。
  * 戦闘前のメンバーに戻すスイッチを戦闘前のメンバーに戻す有効時にのみ設定できるように仕様変更。
@@ -851,6 +877,28 @@
  * @type boolean
  * @default false
  * @parent BasicSetting
+ * 
+ * @param BeforeMemberSetting
+ * @text 変更前戻し設定 
+ * @default ------------------------------
+ * 
+ * @param BeforeMemberButton_X
+ * @text ボタンX座標
+ * @desc 変更前戻しボタンのX座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 4
+ * @parent BeforeMemberSetting
+ * 
+ * @param BeforeMemberButton_Y
+ * @text ボタンY座標
+ * @desc 変更前戻しボタンのY座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
+ * @parent BeforeMemberSetting
  * 
  * @param MemberSortOrderInitializationSettings
  * @text 戦闘終了後のメンバー並び順初期化設定
@@ -1633,11 +1681,29 @@ Imported.NUUN_SceneBattleFormation = true;
         this._formation._battleMemberWindow.active ||
         this._formation._memberWindow.active);
     };
+
+    const _Scene_Battle_updateVisibility = Scene_Battle.prototype.updateVisibility;
+    Scene_Battle.prototype.updateVisibility = function() {
+        _Scene_Battle_updateVisibility.apply(this, arguments);
+        this.updateBeforeMemberButton();
+    };
     
     const _Scene_Battle_update = Scene_Battle.prototype.update;
     Scene_Battle.prototype.update = function() {
         _Scene_Battle_update.call(this);
         this._formation.update();
+    };
+
+    Scene_Battle.prototype.updateBeforeMemberButton = function() {
+        if (this._beforeMemberButton) {
+            const enabled = this.areBeforeMemberButtonsEnabled();
+            this._beforeMemberButton.visible = enabled;
+        }
+    };
+
+    Scene_Battle.prototype.areBeforeMemberButtonsEnabled = function() {
+        const f = this._formation;
+        return f && (f._memberWindow.active || f._battleMemberWindow.active);
     };
 
     Scene_Battle.prototype.isFormationActive = function() {

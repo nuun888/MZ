@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.1
+ * @version 2.1.2
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -29,10 +29,15 @@
  * If Window Reference 0 is turned ON, the reference coordinates of the window will be 0,0.
  * If Auto Window Center is turned ON, only the X coordinate will be automatically adjusted to be in the center, so turn it OFF if you want to adjust the X coordinate.
  * 
+ * Key operation
+ * Q key (default) Return to the previous member.
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/23/2025 Ver.2.1.2
+ * Added the ability to revert to members before the change.
  * 4/19/2025 Ver.2.1.1
  * Fixed the processing of member facial graphics.
  * Fixed the problem that the "NUUN_ActorPicture" setting could not be applied.
@@ -158,6 +163,44 @@
  * @default -10
  * @min 99
  * @parent BasicSetting
+ * 
+ * @param BeforeMemberSetting
+ * @text Revert settings before change
+ * @default ------------------------------
+ * 
+ * @param BeforeMemberSymbol
+ * @desc The key symbol name to revert to the previous member.(Common to menu and battle)
+ * @text Previous key symbol name
+ * @type combo
+ * @option "pageup"
+ * @option "pagedown"
+ * @default "pageup"
+ * @parent BeforeMemberSetting
+ * 
+ * @param BeforeMemberSe
+ * @text SE when reverting to before change
+ * @desc Specify the SE to revert to the member before the change.(Common to menu and battle)
+ * @type struct<SoundEffect>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * @parent BeforeMemberSetting
+ * 
+ * @param BeforeMemberButton_X
+ * @text Button X coordinate
+ * @desc X coordinate of the undo button.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 4
+ * @parent BeforeMemberSetting
+ * 
+ * @param BeforeMemberButton_Y
+ * @text Button Y coordinate
+ * @desc Y coordinate of the undo button.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
+ * @parent BeforeMemberSetting
  * 
  * @param MemberImgSetting
  * @text Member image settings
@@ -913,11 +956,41 @@
  * @max 9999
  *  
  */
+/*~struct~SoundEffect:
+ * 
+ * @param name
+ * @text SE file
+ * @desc Specify SE.
+ * @type file
+ * @dir audio/se
+ * 
+ * @param volume
+ * @text SE volume
+ * @desc Set the SE volume.
+ * @type number
+ * @default 90
+ * @min 0
+ * 
+ * @param pitch
+ * @text SE Pitch
+ * @desc Sets the pitch of SE.
+ * @type number
+ * @default 100
+ * 
+ * @param pan
+ * @text SE pan
+ * @desc Set the pan to SE.
+ * @type number
+ * @default 0
+ * @max 100
+ * @min -100
+ * 
+ */
 /*:ja
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.1
+ * @version 2.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -935,6 +1008,9 @@
  * なおウィンドウ中央自動調整をONにしている場合、X座標だけ中央になるよう自動調整され
  * てしまいますのでX座標を調整する場合はOFFにしてください。
  * 
+ * キー操作
+ * Qキー(デフォルト)変更前のメンバーに戻す。
+ * 
  * アクターのメモ欄
  * <BattleMemberFixed>
  * 戦闘メンバーから外すことは出来ません。
@@ -943,6 +1019,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/23 Ver.2.1.2
+ * 変更前のメンバーに戻す機能を追加。
  * 2025/4/19 Ver.2.1.1
  * メンバーの顔グラの処理を修正。
  * NUUN_ActorPictureの設定が適用できない問題を修正。
@@ -1068,6 +1146,44 @@
  * @default -10
  * @min 99
  * @parent BasicSetting
+ * 
+ * @param BeforeMemberSetting
+ * @text 変更前戻し設定
+ * @default ------------------------------
+ * 
+ * @param BeforeMemberSymbol
+ * @desc 変更前のメンバーに戻すキーシンボル名。(メニュー、戦闘共通)
+ * @text 変更前戻しキーシンボル名
+ * @type combo
+ * @option "pageup"
+ * @option "pagedown"
+ * @default "pageup"
+ * @parent BeforeMemberSetting
+ * 
+ * @param BeforeMemberSe
+ * @text 変更前戻し時SE
+ * @desc 変更前のメンバーに戻す時のSEを指定します。(メニュー、戦闘共通)
+ * @type struct<SoundEffect>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * @parent BeforeMemberSetting
+ * 
+ * @param BeforeMemberButton_X
+ * @text ボタンX座標
+ * @desc 変更前戻しボタンのX座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 4
+ * @parent BeforeMemberSetting
+ * 
+ * @param BeforeMemberButton_Y
+ * @text ボタンY座標
+ * @desc 変更前戻しボタンのY座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
+ * @parent BeforeMemberSetting
  * 
  * @param MemberImgSetting
  * @text メンバー画像設定
@@ -1827,6 +1943,35 @@
  * 
  *  
  */
+/*~struct~SoundEffect:ja
+ * 
+ * @param name
+ * @text SEファイル
+ * @desc SEを指定します。
+ * @type file
+ * @dir audio/se
+ * 
+ * @param volume
+ * @text SEの音量
+ * @desc SEを音量を設定します。
+ * @type number
+ * @min 0
+ * @default 90
+ * 
+ * @param pitch
+ * @text SEのピッチ
+ * @desc SEをピッチを設定します。
+ * @type number
+ * @default 100
+ * 
+ * @param pan
+ * @text SEの位相
+ * @desc SEを位相を設定します。
+ * @default 0
+ * @max 100
+ * @min -100
+ * 
+ */
 
 var Imported = Imported || {};
 Imported.NUUN_SceneFormation = true;
@@ -2039,6 +2184,8 @@ Imported.NUUN_SceneFormation = true;
       
     Scene_Formation.prototype = Object.create(Scene_MenuBase.prototype);
     Scene_Formation.prototype.constructor = Scene_Formation;
+
+    window.Scene_Formation = Scene_Formation;
       
     Scene_Formation.prototype.initialize = function() {
         Scene_MenuBase.prototype.initialize.call(this);
@@ -2086,6 +2233,19 @@ Imported.NUUN_SceneFormation = true;
         }
     };
 
+    Scene_Formation.prototype.updatePageButtons = function() {
+        Scene_MenuBase.prototype.updatePageButtons.apply(this, arguments);
+        if (this._beforeMemberButton) {
+            const enabled = this.areBeforeMemberButtonsEnabled();
+            this._beforeMemberButton.visible = enabled;
+        }
+    };
+
+    Scene_Formation.prototype.areBeforeMemberButtonsEnabled = function() {
+        const f = this._formation;
+        return f && (f._memberWindow.active || f._battleMemberWindow.active);
+    };
+
     class Nuun_Formation {
         constructor(scene, mode , paramData) {
             this._scene = scene;
@@ -2114,6 +2274,7 @@ Imported.NUUN_SceneFormation = true;
             this.formationOldActor = null;
             this._baseSprite = null;
             this._changeMembers = [];
+            this._beforeChangeParty = [];
         }
 
         setBattleCursorMode() {
@@ -2203,6 +2364,8 @@ Imported.NUUN_SceneFormation = true;
             paramList.ActorsImgList = paramData.ActorsImgList ? paramData.ActorsImgList : params.ActorsImgList;
             paramList.ActorImg_X = paramData.ActorImg_X;
             paramList.ActorImg_Y = paramData.ActorImg_Y;
+            paramList.BeforeMemberButton_X = paramData.BeforeMemberButton_X;
+            paramList.BeforeMemberButton_Y = paramData.BeforeMemberButton_Y;
         }
         
         setParamData() {
@@ -2235,8 +2398,8 @@ Imported.NUUN_SceneFormation = true;
             paramList.ActorPosition = params.ActorPosition;
             paramList.ActorPictureEXApp = params.ActorPictureEXApp;
             paramList.ActorsImgList = params.ActorsImgList;
-            paramList.ActorImg_X = params.ActorImg_X;
-            paramList.ActorImg_Y = params.ActorImg_Y;
+            paramList.BeforeMemberButton_X = params.BeforeMemberButton_X;
+            paramList.BeforeMemberButton_Y = params.BeforeMemberButton_Y;
         }
 
         create() {
@@ -2246,11 +2409,34 @@ Imported.NUUN_SceneFormation = true;
             this.createMemberWindow();
             this.createMemberNameWindow();
             this.createMemberStatusWindow();
-            if (!this._isBattle && Imported.NUUN_SaveMembers && !!NuunManager.getSceneFormationOpenSaveMembers() && $gameSystem.getSaveMembersNum() > 0) {
+            if (!this._isBattle && Imported.NUUN_SaveMembers && !!NuunManager.getSceneFormationOpenSaveMembers()) {
                 this.createSaveMembersWindow();
             }
+            this.createButtons();
             this.initSelect();
         }
+
+        createButtons() {
+            if (ConfigManager.touchUI) {
+                if (this.needsBeforeMemberButton()) {
+                    this.createBeforeMemberButton();
+                }
+            }
+        }
+
+        createBeforeMemberButton() {
+            const _scene = this._scene;
+            _scene._beforeMemberButton = new Sprite_Button(params.BeforeMemberSymbol);
+            _scene._beforeMemberButton.x = paramList.BeforeMemberButton_X;
+            _scene._beforeMemberButton.y = paramList.BeforeMemberButton_Y;
+            _scene.addWindow(_scene._beforeMemberButton);
+            _scene._beforeMemberButton.visible = false;
+        }
+
+        needsBeforeMemberButton() {
+            return true;
+        }
+
         
         createBackground() {
             
@@ -2270,6 +2456,7 @@ Imported.NUUN_SceneFormation = true;
             const battleMemberWindow = new Window_FormationBattleMember(rect, this);
             battleMemberWindow.setHandler("ok", this.onBattleMemberOk.bind(this));
             battleMemberWindow.setHandler("cancel", this.onCancel.bind(this));
+            battleMemberWindow.setHandler(params.BeforeMemberSymbol, this.onBeforeMember.bind(this));
             battleMemberWindow.setSpriteActor(this._spriteActor);
             this._scene.addWindow(battleMemberWindow);
             this._battleMemberWindow = battleMemberWindow;
@@ -2295,6 +2482,7 @@ Imported.NUUN_SceneFormation = true;
             const memberWindow = new Window_FormationMember(rect, this);
             memberWindow.setHandler("ok", this.onBattleMemberOk.bind(this));
             memberWindow.setHandler("cancel", this.onCancel.bind(this));
+            memberWindow.setHandler(params.BeforeMemberSymbol, this.onBeforeMember.bind(this));
             memberWindow.setSpriteActor(this._spriteActor);
             this._scene.addWindow(memberWindow);
             this._memberWindow = memberWindow;
@@ -2330,6 +2518,8 @@ Imported.NUUN_SceneFormation = true;
             const saveMembersWindow = new Window_SaveMembers(rect);
             this._memberWindow.setHandler(NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
             this._battleMemberWindow.setHandler(NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
+            //this._memberWindow.setHandler(NuunManager.getRegistrationSymbol(), this.onSaveMembersRegistrationOk.bind(this));
+            //this._battleMemberWindow.setHandler(NuunManager.getRegistrationSymbol(), this.onSaveMembersRegistrationOk.bind(this));
             saveMembersWindow.setHandler("ok", this.onSaveMembersOk.bind(this));
             saveMembersWindow.setHandler("cancel", this.onSaveMembersCancel.bind(this));
             saveMembersWindow.setHandler(NuunManager.getSaveMembersEraseSymbol(), this.onSaveMembersEraseOk.bind(this));
@@ -2398,6 +2588,7 @@ Imported.NUUN_SceneFormation = true;
 
         initBattleMembers() {
             this._changeMembers = $gameParty.battleMembers().map(member => member);
+            this._beforeChangeParty = $gameParty._actors.clone();
         }
         
         setCommand(command) {
@@ -2499,6 +2690,34 @@ Imported.NUUN_SceneFormation = true;
             this.clearPendingMode();
             if (this._isBattle) {
                 $gameTemp.formationRefresh = true;
+            }
+        }
+
+        onBeforeMember() {
+            $gameParty._actors = this._beforeChangeParty.clone();
+            $gamePlayer.refresh();
+            AudioManager.playSe(params.BeforeMemberSe);
+            this._battleMemberWindow.refresh();
+            this._memberWindow.refresh();
+            if (this.isCursorBattleMode()) {
+                this._battleMemberWindow.activate();
+            } else {
+                this._memberWindow.activate();
+            }
+        }
+
+        onSaveMembersRegistrationOk() {
+            if (NuunManager.isSaveMembersRegistration()) {
+                AudioManager.playOkRegistrationSe();
+                $gameSystem.setSaveMembers();
+                this._saveMembersWindow.refresh();
+            } else {
+                SoundManager.playBuzzer();
+            }
+            if (this.isCursorBattleMode()) {
+                this._battleMemberWindow.activate();
+            } else {
+                this._memberWindow.activate();
             }
         }
 
@@ -2747,6 +2966,7 @@ Imported.NUUN_SceneFormation = true;
         
         open() {
             BattleManager.formationCommandActor = BattleManager.actor();
+            this._beforeChangeParty = $gameParty._actors.clone();
             this._battleMemberNameWindow.open();
             this._memberNameWindow.open();
             this._battleMemberWindow.open();

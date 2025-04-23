@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc  State side-by-side display
  * @author NUUN
- * @version 2.0.1
+ * @version 2.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_StateTurn
@@ -28,6 +28,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/23/2025 Ver.2.0.2
+ * Fixed an issue where the icon would remain when a member with a displayed state was moved to a reserve member.
  * 1/30/2025 Ver.2.0.1
  * Fixed an issue where an error would occur when starting a battle.
  * 1/29/2025 Ver.2.0.0
@@ -180,7 +182,7 @@
  * @target MZ
  * @plugindesc  ステート横並び表示
  * @author NUUN
- * @version 2.0.1
+ * @version 2.0.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_StateTurn
@@ -198,6 +200,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/23 Ver.2.0.2
+ * ステートが表示されたメンバーを控えに移動させたときにアイコンが残ってしまう問題を修正。
  * 2025/1/30 Ver.2.0.1
  * 戦闘開始時にエラーが出る問題を修正。
  * 2025/1/29 Ver.2.0.0
@@ -461,7 +465,7 @@ Imported.NUUN_StateIconSideBySide = true;
     const _Sprite_StateIcon_updateVisibility = Sprite_StateIcon.prototype.updateVisibility;
     Sprite_StateIcon.prototype.updateVisibility = function() {
         _Sprite_StateIcon_updateVisibility.apply(this, arguments);
-        this.visible = true;
+        this.visible = this.visible = !this._hidden;
     };
     
 
@@ -538,7 +542,7 @@ Imported.NUUN_StateIconSideBySide = true;
         }
         this.updateIconPosition(icons);
         this.updateTurn(index);
-        this.updateLevelIcon(index)
+        this.updateLevelIcon(index);
     };
 
     Sprite_SideBySideStateIcon.prototype.updateTurn = function(index) {

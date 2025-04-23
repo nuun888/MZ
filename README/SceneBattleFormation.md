@@ -1,5 +1,5 @@
 # [メンバー変更画面(戦闘)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
-# Ver.2.1.2
+# Ver.2.1.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,6 +13,8 @@
 ※アクターコマンドの並び替え条件は選択不可時のときは現在、暫定的に不透明に表示する仕様にしてあります。  
 
 ## 更新履歴
+2025/4/23 Ver.2.1.3  
+変更前のメンバーに戻す機能を追加。  
 2025/4/7 Ver.2.1.2  
 戦闘前のメンバーに戻す機能を2.1.0時の方式に仕様変更。  
 戦闘前のメンバーに戻すスイッチを戦闘前のメンバーに戻す有効時にのみ設定できるように仕様変更。  

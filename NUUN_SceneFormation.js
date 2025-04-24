@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.2
+ * @version 2.1.3
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -36,6 +36,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/24/2025 Ver.2.1.3
+ * Fixed by updating "NUUN_SaveMembers".
  * 4/23/2025 Ver.2.1.2
  * Added the ability to revert to members before the change.
  * 4/19/2025 Ver.2.1.1
@@ -1019,6 +1021,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/24 Ver.2.1.3
+ * NUUN_SaveMembers更新による修正。
  * 2025/4/23 Ver.2.1.2
  * 変更前のメンバーに戻す機能を追加。
  * 2025/4/19 Ver.2.1.1
@@ -2410,6 +2414,7 @@ Imported.NUUN_SceneFormation = true;
             this.createMemberNameWindow();
             this.createMemberStatusWindow();
             if (!this._isBattle && Imported.NUUN_SaveMembers && !!NuunManager.getSceneFormationOpenSaveMembers()) {
+                this.createSaveMembersCommandWindow();
                 this.createSaveMembersWindow();
             }
             this.createButtons();
@@ -2512,18 +2517,34 @@ Imported.NUUN_SceneFormation = true;
             }
         }
 
+        createSaveMembersCommandWindow() {
+            const _scene = this._scene;
+            const rect = _scene.saveMembersCommandWindowRect();
+            const commandWindow = new Window_SavePartyCommand(rect);
+            this._memberWindow.setHandler(NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
+            this._battleMemberWindow.setHandler( NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
+            commandWindow.setHandler("selectMembers", this.onSaveMembersSelectOk.bind(this));
+            commandWindow.setHandler("saveMembers", this.onSaveMembersRegistrationOk.bind(this));
+            commandWindow.setHandler("cancel", this.onSaveMembersCancel.bind(this));
+            this._memberWindow.setSaveMembersCommandWindow(commandWindow);
+            this._battleMemberWindow.setSaveMembersCommandWindow(commandWindow);
+            _scene.addWindow(commandWindow);
+            this._saveMembersCommandWindow = commandWindow;
+            if (this._isBattle) {
+                commandWindow.openness = 0;
+            }
+            commandWindow.hide();
+            commandWindow.deactivate();
+        }
+
         createSaveMembersWindow() {
-            const scene = this._scene;
+            const _scene = this._scene;
             const rect = this.saveMembersWindowRect();
             const saveMembersWindow = new Window_SaveMembers(rect);
-            this._memberWindow.setHandler(NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
-            this._battleMemberWindow.setHandler(NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
-            //this._memberWindow.setHandler(NuunManager.getRegistrationSymbol(), this.onSaveMembersRegistrationOk.bind(this));
-            //this._battleMemberWindow.setHandler(NuunManager.getRegistrationSymbol(), this.onSaveMembersRegistrationOk.bind(this));
             saveMembersWindow.setHandler("ok", this.onSaveMembersOk.bind(this));
-            saveMembersWindow.setHandler("cancel", this.onSaveMembersCancel.bind(this));
+            saveMembersWindow.setHandler("cancel", this.onSaveMembersSelectCancel.bind(this));
             saveMembersWindow.setHandler(NuunManager.getSaveMembersEraseSymbol(), this.onSaveMembersEraseOk.bind(this));
-            scene.addWindow(saveMembersWindow);
+            _scene.addWindow(saveMembersWindow);
             this._memberWindow.setSaveMembersWindow(saveMembersWindow);
             this._battleMemberWindow.setSaveMembersWindow(saveMembersWindow);
             this._saveMembersWindow = saveMembersWindow;
@@ -2714,11 +2735,7 @@ Imported.NUUN_SceneFormation = true;
             } else {
                 SoundManager.playBuzzer();
             }
-            if (this.isCursorBattleMode()) {
-                this._battleMemberWindow.activate();
-            } else {
-                this._memberWindow.activate();
-            }
+            this._saveMembersCommandWindow.activate();
         }
 
         onSaveMembersOpenOk() {
@@ -2726,17 +2743,30 @@ Imported.NUUN_SceneFormation = true;
             this._battleMemberWindow.deselect();
             this._memberWindow.deactivate();
             this._battleMemberWindow.deactivate();
+            this._saveMembersCommandWindow.show();
             this._saveMembersWindow.show();
+            this._saveMembersCommandWindow.activate();
+            this._saveMembersCommandWindow.select(0);
+            this._memberStatusWindow.hide();
+        }
+
+        onSaveMembersSelectOk() {
+            this._saveMembersCommandWindow.deselect();
             this._saveMembersWindow.activate();
             this._saveMembersWindow.select(0);
-            this._memberStatusWindow.hide();
+        }
+
+        onSaveMembersSelectCancel() {
+            this._saveMembersCommandWindow.activate();
+            this._saveMembersCommandWindow.selectLast();
+            this._saveMembersWindow.deselect();
         }
 
         onSaveMembersOk() {
             if ($gameSystem.setSavePartyMembers(this._saveMembersWindow.index())) {
                 this._memberWindow.refresh();
                 this._battleMemberWindow.refresh();
-                this.onSaveMembersCancel();
+                this.onSaveMembersSelectCancel();
             } else {
                 SoundManager.playBuzzer();
                 this._saveMembersWindow.activate();
@@ -2751,11 +2781,12 @@ Imported.NUUN_SceneFormation = true;
             this._saveMembersWindow.forceSelect(index);
             NuunManager.playSaveMembersEraseSe();
             if ($gameSystem.getSaveMembersNum() === 0) {
-                this.onSaveMembersCancel();
+                this.onSaveMembersSelectCancel();
             }
         }
 
         onSaveMembersCancel() {
+            this._saveMembersCommandWindow.hide();
             this._saveMembersWindow.hide();
             if (this.isCursorBattleMode()) {
                 this._battleMemberWindow.activate();
@@ -3078,8 +3109,12 @@ Imported.NUUN_SceneFormation = true;
         this._saveMembersWindow = saveMembersWindow;
     };
 
+    Window_StatusBase.prototype.setSaveMembersCommandWindow = function(saveMembersWindow) {
+        this._saveMembersCommandWindow = saveMembersWindow;
+    };
+
     Window_StatusBase.prototype.activeSaveMembersWindow = function() {
-        return this._saveMembersWindow && this._saveMembersWindow.active;
+        return (this._saveMembersWindow && this._saveMembersWindow.active) || (this._saveMembersCommandWindow && this._saveMembersCommandWindow.active);
     };
 
 

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Implement a function to register and call parties in a specified party order.
@@ -24,6 +24,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/24/2025 Ver.1.0.2
+ * Fixed so that the registered party screen can be opened with "NUUN_SceneFormation" (Ver.2.1.3 or later).
+ * Added a button to delete registered parties.
+ * Fixed an issue where the registration sound effect would play when opening member selection.
+ * Fixed an issue where a buzzer sound would play if the registration sound effect had not been set.
  * 4/20/2025 Ver.1.0.1
  * Fixed an issue where an error would occur when pressing the Confirm key when there was no registered party.
  * Added a function to set the sound effects when registering.
@@ -93,19 +98,16 @@
  * @default 'chip'
  * @parent BasicSetting
  * 
- * @param RegistrationSe
- * @text SE when registering
- * @desc Specify the SE at the time of registration.
- * @type struct<SoundEffect>
- * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * @param ActorPictureEXApp
+ * @text FApply NUUN_ActorPicture
+ * @desc Apply the image change of "NUUN_ActorPicture". If you turn it off, the settings in this plugin will be applied.
+ * @type boolean
+ * @default false
  * @parent BasicSetting
  * 
- * @param EraseSe
- * @text Registration deletion SE
- * @desc Set the SE when registering is deleted.
- * @type struct<SoundEffect>
- * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
- * @parent BasicSetting
+ * @param EraseSetting
+ * @text Registration deletion settings
+ * @default ------------------------------
  * 
  * @param EraseSymbol
  * @desc The key symbol name to unregister.
@@ -113,15 +115,44 @@
  * @type combo
  * @option "pageup"
  * @option "pagedown"
- * @default "pageup"
- * @parent BasicSetting
+ * @default "pagedown"
+ * @parent EraseSetting
  * 
- * @param ActorPictureEXApp
- * @text FApply NUUN_ActorPicture
- * @desc Apply the image change of "NUUN_ActorPicture". If you turn it off, the settings in this plugin will be applied.
- * @type boolean
- * @default false
- * @parent BasicSetting
+ * @param EraseSe
+ * @text Registration deletion SE
+ * @desc Set the SE when registering is deleted.
+ * @type struct<SoundEffect>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * @parent EraseSetting
+ * 
+ * @param EraseButton_X
+ * @text Button X coordinate
+ * @desc X coordinate of the delete registration button.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 4
+ * @parent EraseSetting
+ * 
+ * @param EraseButton_Y
+ * @text Button Y coordinate
+ * @desc Y coordinate of the delete registration button.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
+ * @parent EraseSetting
+ * 
+ * @param RegistrationSetting
+ * @text Registration settings
+ * @default ------------------------------
+ * 
+ * @param RegistrationSe
+ * @text SE when registering
+ * @desc Specify the SE at the time of registration.
+ * @type struct<SoundEffect>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * @parent RegistrationSetting
  * 
  * @param CommandWindowSetting
  * @text Command Window Settings
@@ -209,7 +240,25 @@
  * @type combo
  * @option "pageup"
  * @option "pagedown"
- * @default "pageup"
+ * @default "pagedown"
+ * @parent SceneFormationSetting
+ * 
+ * @param OpenSaveMembersButton_X
+ * @text Button X coordinate
+ * @desc X coordinate of the registered party display button.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 56
+ * @parent SceneFormationSetting
+ * 
+ * @param OpenSaveMembersButton_Y
+ * @text Button Y coordinate
+ * @desc Y coordinate of the registered party display button.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
  * @parent SceneFormationSetting
  * 
  */
@@ -249,7 +298,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * 指定のパーティの並び順をパーティを登録、呼び出しする機能を実装します。
@@ -261,6 +310,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/24 Ver.1.0.2
+ * NUUN_SceneFormation(Ver.2.1.3以降)で登録パーティ画面を開けるように修正。
+ * 登録パーティ消去のボタンを追加。
+ * メンバー選択を開くと登録時SEが再生される問題を修正。
+ * 登録時SEが設定されていない場合、ブザー音が再生される問題を修正。
  * 2025/4/20 Ver.1.0.1
  * 登録パーティがいない状態で決定キーを押すとエラーが出る問題を修正。
  * 登録時のSEを設定できる機能を追加。
@@ -331,19 +385,16 @@
  * @default 'chip'
  * @parent BasicSetting
  * 
- * @param RegistrationSe
- * @text 登録時SE
- * @desc 登録時のSEを指定します。
- * @type struct<SoundEffect>
- * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * @param ActorPictureEXApp
+ * @text 顔グラ表示EX適用
+ * @desc 顔グラ表示EXの画像変更を適用します。
+ * @type boolean
+ * @default false
  * @parent BasicSetting
  * 
- * @param EraseSe
- * @text 登録消去時SE
- * @desc 登録消去時のSEを指定します。
- * @type struct<SoundEffect>
- * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
- * @parent BasicSetting
+ * @param EraseSetting
+ * @text 登録消去設定
+ * @default ------------------------------
  * 
  * @param EraseSymbol
  * @desc 登録削除のキーシンボル名。
@@ -351,15 +402,44 @@
  * @type combo
  * @option "pageup"
  * @option "pagedown"
- * @default "pageup"
- * @parent BasicSetting
+ * @default "pagedown"
+ * @parent EraseSetting
  * 
- * @param ActorPictureEXApp
- * @text 顔グラ表示EX適用
- * @desc 顔グラ表示EXの画像変更を適用します。
- * @type boolean
- * @default false
- * @parent BasicSetting
+ * @param EraseSe
+ * @text 登録消去時SE
+ * @desc 登録消去時のSEを指定します。
+ * @type struct<SoundEffect>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * @parent EraseSetting
+ * 
+ * @param EraseButton_X
+ * @text ボタンX座標
+ * @desc 登録消去ボタンのX座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 4
+ * @parent EraseSetting
+ * 
+ * @param EraseButton_Y
+ * @text ボタンY座標
+ * @desc 登録消去ボタンのY座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
+ * @parent EraseSetting
+ * 
+ * @param RegistrationSetting
+ * @text 登録時設定
+ * @default ------------------------------
+ * 
+ * @param RegistrationSe
+ * @text 登録時SE
+ * @desc 登録時のSEを指定します。
+ * @type struct<SoundEffect>
+ * @default {"name":"","volume":"90","pitch":"100","pan":"0"}
+ * @parent RegistrationSetting
  * 
  * @param CommandWindowSetting
  * @text コマンドウィンドウ設定
@@ -447,7 +527,25 @@
  * @type combo
  * @option "pageup"
  * @option "pagedown"
- * @default "pageup"
+ * @default "pagedown"
+ * @parent SceneFormationSetting
+ * 
+ * @param OpenSaveMembersButton_X
+ * @text ボタンX座標
+ * @desc 登録パーティ表示ボタンのX座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 56
+ * @parent SceneFormationSetting
+ * 
+ * @param OpenSaveMembersButton_Y
+ * @text ボタンY座標
+ * @desc 登録パーティ表示ボタンのY座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
  * @parent SceneFormationSetting
  * 
  */
@@ -517,12 +615,24 @@ Imported.NUUN_SaveMembers = true;
         return params.OpenSaveMembersSymbol;
     };
 
+    NuunManager.getRegistrationSymbol = function() {
+        return params.RegistrationSymbol;
+    };
+
     NuunManager.getSceneFormationOpenSaveMembers = function() {
         return params.SceneFormationOpenSaveMembers;
     };
     
     NuunManager.playSaveMembersEraseSe = function() {
         params.EraseSe ? AudioManager.playSe(params.EraseSe) : SoundManager.playCancel();
+    };
+
+    NuunManager.isSaveMembersRegistration = function() {
+        return params.SaveMembers_Rows > $gameSystem.getSaveMembersNum();
+    };
+
+    AudioManager.playOkRegistrationSe = function() {
+        params.RegistrationSe ? this.playSe(params.RegistrationSe) : SoundManager.playOk();
     };
 
     const _Game_System_initialize = Game_System.prototype.initialize;
@@ -632,6 +742,39 @@ Imported.NUUN_SaveMembers = true;
         this.createSavePartyMembersWindow();
     };
 
+    Scene_SavePartyMembers.prototype.createButtons = function() {
+        Scene_MenuBase.prototype.createButtons.apply(this, arguments);
+        if (ConfigManager.touchUI) {
+            if (this.needsEraseButton()) {
+                this.createEraseButton();
+            }
+        }
+    };
+
+    Scene_SavePartyMembers.prototype.createEraseButton = function() {
+        this._eraseButton = new Sprite_Button(NuunManager.getSaveMembersEraseSymbol());
+        this._eraseButton.x = params.EraseButton_X;
+        this._eraseButton.y = params.EraseButton_Y;
+        this.addWindow(this._eraseButton);
+        this._eraseButton.visible = false;
+    };
+
+    Scene_SavePartyMembers.prototype.needsEraseButton = function() {
+        return true;
+    };
+
+    Scene_SavePartyMembers.prototype.updatePageButtons = function() {
+        Scene_MenuBase.prototype.updatePageButtons.apply(this, arguments);
+        if (this._eraseButton) {
+            const enabled = this.arePageButtonsEnabled();
+            this._eraseButton.visible = enabled;
+        }
+    };
+
+    Scene_SavePartyMembers.prototype.arePageButtonsEnabled = function() {
+        return this._saveMembersWindow.visible && this._saveMembersWindow.active;
+    };
+
     Scene_SavePartyMembers.prototype.createSavePartyCommandWindow = function() {
         const rect = this.commandWindowRect();
         const commandWindow = new Window_SavePartyCommand(rect);
@@ -704,6 +847,75 @@ Imported.NUUN_SaveMembers = true;
     };
 
 
+    const _Scene_Formation_createButtons = Scene_Formation.prototype.createButtons;
+    Scene_Formation.prototype.createButtons = function() {
+        _Scene_Formation_createButtons.apply(this, arguments);
+        if (ConfigManager.touchUI) {
+            if (this.needsEraseButton()) {
+                this.createEraseButton();
+            }
+            if (this.needsRegistrationButton()) {
+                this.createRegistrationButton();
+            }
+        }
+    };
+
+    Scene_Formation.prototype.saveMembersCommandWindowRect = function() {
+        const ww = params.Command_Width > 0 ? params.Command_Width : this.mainCommandWidth();
+        const wh = this.calcWindowHeight(3, true);
+        const wx = params.Command_X;
+        const wy = params.Command_Y + this.mainAreaTop();
+        return new Rectangle(wx, wy, ww, wh);
+    };
+
+    Scene_Formation.prototype.createEraseButton = function() {
+        this._eraseButton = new Sprite_Button(NuunManager.getSaveMembersEraseSymbol());
+        this._eraseButton.x = params.EraseButton_X;
+        this._eraseButton.y = params.EraseButton_Y;
+        this.addWindow(this._eraseButton);
+        this._eraseButton.visible = false;
+    };
+
+    Scene_Formation.prototype.createRegistrationButton = function() {
+        this._registrationButton = new Sprite_Button(params.OpenSaveMembersSymbol);
+        this._registrationButton.x = params.OpenSaveMembersButton_X;
+        this._registrationButton.y = params.OpenSaveMembersButton_Y;
+        this.addWindow(this._registrationButton);
+        this._registrationButton.visible = false;
+    };
+
+    Scene_Formation.prototype.needsEraseButton = function() {
+        return true;
+    };
+
+    Scene_Formation.prototype.needsRegistrationButton = function() {
+        return true;
+    };
+
+    const _Scene_Formation_updatePageButtons = Scene_Formation.prototype.updatePageButtons;
+    Scene_Formation.prototype.updatePageButtons = function() {
+        _Scene_Formation_updatePageButtons.apply(this, arguments);
+        if (this._eraseButton) {
+            const enabled = this.arePageButtonsEnabled();
+            this._eraseButton.visible = enabled;
+        }
+        if (this._registrationButton) {
+            const enabled = this.areRegistrationButtonsEnabled();
+            this._registrationButton.visible = enabled;
+        }
+    };
+
+    Scene_Formation.prototype.arePageButtonsEnabled = function() {
+        const f = this._formation;
+        return f && f._saveMembersWindow && f._saveMembersWindow.visible && f._saveMembersWindow.active;
+    };
+
+    Scene_Formation.prototype.areRegistrationButtonsEnabled = function() {
+        const f = this._formation;
+        return f && f._saveMembersWindow && !f._saveMembersWindow.visible;
+    };
+
+
     const _Window_MenuCommand_addFormationCommand = Window_MenuCommand.prototype.addFormationCommand;
     Window_MenuCommand.prototype.addFormationCommand = function() {
         _Window_MenuCommand_addFormationCommand.apply(this, arguments);
@@ -719,6 +931,8 @@ Imported.NUUN_SaveMembers = true;
     
     Window_SavePartyCommand.prototype = Object.create(Window_Command.prototype);
     Window_SavePartyCommand.prototype.constructor = Window_SavePartyCommand;
+
+    window.Window_SavePartyCommand = Window_SavePartyCommand;
     
     Window_SavePartyCommand._lastCommandSymbol = null;
 
@@ -743,7 +957,11 @@ Imported.NUUN_SaveMembers = true;
     };
 
     Window_SavePartyCommand.prototype.playOkSound = function() {
-        params.RegistrationSe ? AudioManager.playSe(params.RegistrationSe) : Window_Base.prototype.playBuzzerSound.apply(this, arguments);;
+        if (this.currentSymbol() === "saveMembers" && params.RegistrationSe) {
+            AudioManager.playSe(params.RegistrationSe)
+        } else {
+            Window_Base.prototype.playOkSound.apply(this, arguments);
+        }
     };
     
     Window_SavePartyCommand.prototype.selectLast = function() {

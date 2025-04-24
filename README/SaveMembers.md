@@ -10,7 +10,7 @@
 登録パーティの消去 登録パーティ画面でQ（Oageup）キー  
 
 ## NUUN_SceneFormationから表示
-この機能を行うには別途 [NUUN_SceneFormation](https://github.com/nuun888/MZ/blob/master/README/SceneFormation.md)Ver.2.1.0以降が必要です。  
+この機能を行うには別途 [NUUN_SceneFormation](https://github.com/nuun888/MZ/blob/master/README/SceneFormation.md)Ver.2.1.3以降が必要です。  
 当プラグインのSceneFormation登録画面表示をtrueに設定することでNUUN_SceneFormationからQキー(デフォルト)で開くことが出来ます。  
 
 ## 更新履歴

@@ -1,5 +1,5 @@
 # [盗みスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)
-# Ver.1.5.2
+# Ver.1.5.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealableItems.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -120,6 +120,8 @@ A:防具
 %1使用者　%2対象　%3盗んだアイテムまたは金額  
  
 ## 更新履歴
+2025/4/25 Ver 1.5.3  
+モンスター図鑑で盗みアイテム表示時のエラーを修正。  
 2025/2/2 Ver 1.5.2  
 ポップアップの処理の修正。  
 2024/9/7 Ver 1.5.1  

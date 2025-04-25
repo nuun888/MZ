@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 盗みスキル、アイテム
  * @author NUUN
- * @version 1.5.2
+ * @version 1.5.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -116,6 +116,8 @@
  * 
  * 
  * 更新履歴
+ * 2025/4/25 Ver 1.5.3
+ * モンスター図鑑で盗みアイテム表示時のエラーを修正。
  * 2025/2/2 Ver 1.5.2
  * ポップアップの処理の修正。
  * 2024/9/7 Ver 1.5.1
@@ -715,6 +717,20 @@ Imported.NUUN_StealableItems = true;
         } else if (kind === 4) {
             return dataId;
         } else {
+            return null;
+        }
+    };
+
+    Game_Enemy.prototype.stealObject = function(kind, dataId) {//モンスター図鑑
+        if (kind === 1) {
+            return $dataItems[dataId];
+        } else if (kind === 2) {
+            return $dataWeapons[dataId];
+        } else if (kind === 3) {
+            return $dataArmors[dataId];
+        } else if (kind === 4) {
+            return dataId;
+            } else {
             return null;
         }
     };

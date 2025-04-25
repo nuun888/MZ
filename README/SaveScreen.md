@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# 新版Ver.3.0.10
+# 新版Ver.3.0.11
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen_3.js)  
 # 旧版Ver.2.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
@@ -71,6 +71,8 @@ actor:$gameActors (指定のアクター変更で指定したアクター(指定
 
 
 ## 更新履歴
+2025/4/26 Ver.3.0.11  
+セーブ後画面を終了しないをtrueにして保存を行うと、画像が表示されなくなる問題を修正。  
 2025/4/20 Ver.3.0.10  
 フリーテキストの表示条件の適用範囲を拡大。  
 2024/12/1 Ver.3.0.9  

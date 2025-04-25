@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.10
+ * @version 3.0.11
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -71,6 +71,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/25/2025 Ver.3.0.11
+ * Fixed an issue where images would not be displayed when saving with "Do not exit screen after saving" set to true.
  * 4/20/2025 Ver.3.0.10
  * Expanded scope of free text display conditions.
  * 12/1/2024 Ver.3.0.9
@@ -1321,7 +1323,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.9
+ * @version 3.0.11
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1385,6 +1387,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/26 Ver.3.0.11
+ * セーブ後画面を終了しないをtrueにして保存を行うと、画像が表示されなくなる問題を修正。
  * 2025/4/20 Ver.3.0.10
  * フリーテキストの表示条件の適用範囲を拡大。
  * 2024/12/1 Ver.3.0.9
@@ -2646,6 +2650,7 @@ Imported.NUUN_SaveScreen_3 = true;
     };
 
     function allContentsList() {
+        if (!saveLayout) return {};
         const list = saveLayout.SaveMainWindowList.ContentsList.map(data => data);
         if (saveLayout.SaveStatusWindowList) {
             saveLayout.SaveStatusWindowList.forEach(data => {
@@ -3283,9 +3288,19 @@ Imported.NUUN_SaveScreen_3 = true;
         const savefileId = this.indexToSavefileId(index);
         const info = DataManager.savefileInfo(savefileId);
         const rect = this.itemRectWithPadding(index);
-        this.resetTextColor();
-        this.changePaintOpacity(this.isEnabled(savefileId));
-        this.drawContents(info, rect, savefileId);
+        const unLoadBitmap = this.nuun_saveFileLoadCheckBitmap(info);
+        if(unLoadBitmap){
+            unLoadBitmap.addLoadListener(function() {
+                this.resetTextColor();
+                this.changePaintOpacity(this.isEnabled(savefileId));
+                this.drawContents(info, rect, savefileId);
+            }.bind(this));
+        } else {
+            this.resetTextColor();
+            this.changePaintOpacity(this.isEnabled(savefileId));
+            this.drawContents(info, rect, savefileId);
+        }
+       
     };
 
     Window_SavefileList.prototype.drawContents = function(info, rect, savefileId) {
@@ -3325,6 +3340,47 @@ Imported.NUUN_SaveScreen_3 = true;
 
     Window_SavefileList.prototype.itemContentsWidth = function(width) {
         return Math.floor(width / this.maxContentsCols()) - this.colSpacing();
+    };
+
+    Window_Base.prototype.nuun_saveFileLoadCheckBitmap = function(info) {
+        let bitmap = null;
+        let loadBitmap = null;
+        if (!info) {
+            return bitmap;
+        }
+        if (info.characters && Symbol.iterator in info.characters) {
+            for (const character of info.characters) {
+                loadBitmap = ImageManager.loadCharacter(character[0]);
+                if (loadBitmap && !loadBitmap.isReady()) {
+                    bitmap = loadBitmap;
+                }
+            }
+        }
+        if (info.faces && Symbol.iterator in info.faces) {
+            for (const face of info.faces) {
+                loadBitmap = ImageManager.loadFace(face[0]);
+                if (loadBitmap && !loadBitmap.isReady()) {
+                    bitmap = loadBitmap;
+                }
+            }
+        }
+        if (info.svActor && Symbol.iterator in info.svActor) {
+            for (const character of info.svActor) {
+                loadBitmap = ImageManager.loadSvActor(character[0]);
+                if (loadBitmap && !loadBitmap.isReady()) {
+                    bitmap = loadBitmap;
+                }
+            }
+        }
+        
+        //const bitmap = ImageManager.loadSaveSnapBitmap(info.snap);
+        if (info.snap) {
+            loadBitmap = ImageManager.loadSaveSnapBitmap(info.snap);
+            if (loadBitmap && !loadBitmap.isReady()) {
+                bitmap = loadBitmap;
+            }
+        }
+        return bitmap;
     };
 
     Window_SavefileList.prototype.nuun_DrawContents = function(info, x, y, width, data, savefileId) {
@@ -3689,9 +3745,13 @@ Imported.NUUN_SaveScreen_3 = true;
         }
     };
 
-    Window_Base.prototype.nuun_IsSaveContentsShow = function(info, data) {
+    Window_Base.prototype.nuun_IsSaveContentsShow = function(info, data) {console.log(data.ShowEval)
         if (!data.ShowEval) return true;
-        return !!info && info["showEval_"+ String(data.MethodName)] !== undefined && !!data.MethodName ? info["showEval_"+ String(data.MethodName)] : eval(data.ShowEval);
+        try {
+            return !!info && info["showEval_"+ String(data.MethodName)] !== undefined && !!data.MethodName ? info["showEval_"+ String(data.MethodName)] : eval(data.ShowEval);
+        } catch (error) {
+            
+        }
     };
     
     Window_SavefileList.prototype.systemWidth = function(swidth, width) {
@@ -3731,7 +3791,7 @@ Imported.NUUN_SaveScreen_3 = true;
     Window_SaveStatusContentsWindow.prototype.refresh = function() {
         Window_StatusBase.prototype.refresh.call(this);
         const rect = this.itemRect(0);
-        const unLoadBitmap = this.loadCheckBitmap();
+        const unLoadBitmap = this.nuun_saveFileLoadCheckBitmap(this._info);
         if(unLoadBitmap){
             unLoadBitmap.addLoadListener(this.refresh.bind(this));//再トライ
         } else {
@@ -3749,46 +3809,6 @@ Imported.NUUN_SaveScreen_3 = true;
 
     Window_SaveStatusContentsWindow.prototype.getActorAreaWidth = function() {
         return this._contents.ActorAreaWidth || 200;
-    };
-
-    Window_SaveStatusContentsWindow.prototype.loadCheckBitmap = function() {
-        let bitmap = null;
-        let loadBitmap = null;
-        const info = this._info;
-        if (!info) {
-            return bitmap;
-        }
-        if (info.characters && Symbol.iterator in info.characters) {
-            for (const character of info.characters) {
-                loadBitmap = ImageManager.loadCharacter(character[0]);
-                if (loadBitmap && !loadBitmap.isReady()) {
-                    bitmap = loadBitmap;
-                }
-            }
-        }
-        if (info.faces && Symbol.iterator in info.faces) {
-            for (const face of info.faces) {
-                loadBitmap = ImageManager.loadFace(face[0]);
-                if (loadBitmap && !loadBitmap.isReady()) {
-                    bitmap = loadBitmap;
-                }
-            }
-        }
-        if (info.svActor && Symbol.iterator in info.svActor) {
-            for (const character of info.svActor) {
-                loadBitmap = ImageManager.loadSvActor(character[0]);
-                if (loadBitmap && !loadBitmap.isReady()) {
-                    bitmap = loadBitmap;
-                }
-            }
-        }
-        if (info.snap) {
-            loadBitmap = ImageManager.loadSaveSnapBitmap(info.snap);
-            if (loadBitmap && !loadBitmap.isReady()) {
-                bitmap = loadBitmap;
-            }
-        }
-        return bitmap;
     };
 
     Window_SaveStatusContentsWindow.prototype.drawContents = function(rect) {

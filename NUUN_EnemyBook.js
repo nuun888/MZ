@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.3
+ * @version 2.22.4
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/27/2025 Ver.2.22.4
+ * Added processing by updating "NUUN_EnemyBookEX_1".
  * 2/11/2025 Ver.2.22.3
  * Fixed handling of actor and party command activations when cancelled.
  * 1/19/2025 Ver.2.22.2
@@ -3272,6 +3274,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/27 Ver.2.22.4
+ * NUUN_EnemyBookEX_1更新による処理の追加。
  * 2025/2/11 Ver.2.22.3
  * キャンセル時のアクターコマンド、パーティコマンドのアクティブ化の処理を修正。
  * 2025/1/19 Ver.2.22.2
@@ -6620,6 +6624,10 @@ NuunManager.isMapEncountEnemList = function() {
     return !!MapEncountEnemiesList && MapEncountEnemiesList.length > 0;
 };
 
+NuunManager.getAnalyzeSkillMode = function(id) {
+    return AnalyzeSkillMode[id - 1];
+};
+
 const _DataManager_extractSaveContents = DataManager.extractSaveContents;
 DataManager.extractSaveContents = function(contents) {
     _DataManager_extractSaveContents.call(this, contents);
@@ -7284,20 +7292,24 @@ const _Game_BattlerBase_die = Game_BattlerBase.prototype.die;
 Game_BattlerBase.prototype.die = function() {
     _Game_BattlerBase_die.call(this);
     if (this.isEnemy()) {
-        const enemyId = this.enemyId();
-        if ($gameSystem.registrationTiming(1)) {
+        this.dieSetEnemyBook();
+    }
+};
+
+Game_BattlerBase.prototype.dieSetEnemyBook = function() {
+    const enemyId = this.enemyId();
+    if ($gameSystem.registrationTiming(1)) {
+        $gameSystem.addToEnemyBook(enemyId);
+    }
+    if ($gameSystem.registrationStatusTiming(1)) {
+        if (!$gameSystem.getEnemyBookFlag(enemyId)) {
             $gameSystem.addToEnemyBook(enemyId);
         }
-        if ($gameSystem.registrationStatusTiming(1)) {
-            if (!$gameSystem.getEnemyBookFlag(enemyId)) {
-                $gameSystem.addToEnemyBook(enemyId);
-            }
-            $gameSystem.addStatusToEnemyBook(enemyId);
-        }
-        if (!this._enemyDefeat) {
-            $gameSystem.defeatCount(enemyId);
-            this._enemyDefeat = true;
-        }   
+        $gameSystem.addStatusToEnemyBook(enemyId);
+    }
+    if (!this._enemyDefeat) {
+        $gameSystem.defeatCount(enemyId);
+        this._enemyDefeat = true;
     }
 };
 
@@ -7406,7 +7418,7 @@ Game_Action.prototype.analyzeSkill = function(target) {
             if (analyzeSkill) {
                 target.result().analyzeSkill = true;
                 const rate = this.item().meta.CertainAnalyze || !target.enemy().meta.AnalyzeResist ? 100 : Number(target.enemy().meta.AnalyzeResist);
-                if (Math.floor(Math.random() * 100 >= rate)) {
+                if (Math.floor(Math.random() * 100) >= rate) {
                     target.result().missed = true;
                     BattleManager.analyzeMissMessage = analyzeSkill.AnalyzeMissMessage.format(target.name(), this.subject().name());
                     return;
@@ -7419,6 +7431,7 @@ Game_Action.prototype.analyzeSkill = function(target) {
                 } else {
                     SceneManager._scene.setEnemyBookEnemyAnalyze(target, analyzeSkill);
                 }
+                this.successAnalyze(target);
             }
         }
     }
@@ -7429,14 +7442,19 @@ Game_Action.prototype.seeThrougSkill = function(target) {
         if (this.item().meta.SeeThrough) {
             target.result().analyzeSkill = true;
             const rate = this.item().meta.CertainAnalyze || !target.enemy().meta.AnalyzeResist ? 100 : Number(target.enemy().meta.AnalyzeResist);
-            if (Math.floor(Math.random() * 100 >= rate)) {
+            if (Math.floor(Math.random() * 100) >= rate) {
                 target.result().missed = true;
                 return;
             }
             this.makeSuccess(target);
             SceneManager._scene.addEnemyDataEnemyBook(target);
+            this.successAnalyze(target);
         }
     }
+};
+
+Game_Action.prototype.successAnalyze = function(target) {
+    
 };
 
 const _Game_ActionResult_clear = Game_ActionResult.prototype.clear;
@@ -10626,7 +10644,7 @@ Window_EnemyBook.prototype.drawResistElement = function(list, enemy, x, y, width
     }
     if(!this.resistWeakDataMask(list.MaskMode)){
         if (ElementUnknownIconId === 0) {
-          return;
+            return;
         }
         Unknown = true;
     }
@@ -11682,7 +11700,7 @@ Window_BattleLog.prototype.displayMiss = function(target) {
         this.push("pushBaseLine");
         this.push("addText", fmt);
     } else {
-    _Window_BattleLog_displayMiss.call(this, target);
+        _Window_BattleLog_displayMiss.call(this, target);
     }
 };
 

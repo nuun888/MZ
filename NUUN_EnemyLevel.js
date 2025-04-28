@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * Sets the enemy's level.
@@ -49,6 +49,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/28/2025 Ver.1.1.2
+ * Fixed an issue where an error would occur when starting at a specified level.
+ * Fixed an issue where an error would occur if "NUUN_EnemyBook" was installed.
  * 4/23/2025 Ver.1.1.1
  * Fixed an issue where an error would occur when starting a battle.
  * 12/16/2024 Ver.1.1.0
@@ -313,7 +316,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * 敵にレベルを設定します。
@@ -349,6 +352,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/28 Ver 1.1.2
+ * 指定のレベルで開始させるとエラーが出る問題を修正。
+ * NUUN_EnemyBookを導入している場合、エラーが出る問題を修正。
  * 2025/4/23 Ver 1.1.1
  * 戦闘開始時にエラーが出る問題を修正。
  * 2024/12/16 Ver 1.1.0
@@ -650,7 +656,7 @@ Imported.NUUN_EnemyLevel = true;
         const enemy = $dataEnemies[enemyId];
         let level = 1;
         if (enemy && enemy.meta.Level) {
-            level = this.getIndividualEnemyLevel();
+            level = this.getIndividualEnemyLevel(enemy);
         } else if (data.EnemyLevelVariable > 0) {
             level = $gameVariables.value(data.EnemyLevelVariable) || 1;
         } else if (params.EnemyLevelVariable > 0) {
@@ -738,8 +744,8 @@ Imported.NUUN_EnemyLevel = true;
         return (base * (data.GoldIncreaseRate / 100) - base) * (this._level - 1) + data.FixedGoldIncrease * (this._level - 1);
     };
 
-    Game_Enemy.prototype.getIndividualEnemyLevel = function() {
-        const data = NuunManager.getMetaCodeList(this, "Level");//レベル, 分散度
+    Game_Enemy.prototype.getIndividualEnemyLevel = function(enemy) {
+        const data = NuunManager.getMetaCodeList(enemy, "Level");//レベル, 分散度
         if (!data) return 1;
         return this.enemyLevelVariance(Number(data[0]), Number(data[1]));
     };
@@ -763,10 +769,10 @@ Imported.NUUN_EnemyLevel = true;
 
     Game_Enemy.prototype.isEnemybookLevelStatus = function() {
         if (!Imported.NUUN_EnemyBook) return false;
-        if ($gameParty.inBattle() && String(this._scene.constructor.name) === 'Scene_Battle') {
+        if ($gameParty.inBattle() && String(SceneManager._scene.constructor.name) === 'Scene_Battle') {
             return BattleManager.isOpenEnemyBook();
         } else {
-            return String(this._scene.constructor.name) === 'Scene_EnemyBook';
+            return String(SceneManager._scene.constructor.name) === 'Scene_EnemyBook';
         }
     };
 

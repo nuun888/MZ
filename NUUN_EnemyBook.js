@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.4
+ * @version 2.22.5
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/28/2025 Ver.2.22.5
+ * Fixed an issue where the page screen would be displayed at the top of the screen when the page display was hidden during analysis.
  * 5/27/2025 Ver.2.22.4
  * Added processing by updating "NUUN_EnemyBookEX_1".
  * 2/11/2025 Ver.2.22.3
@@ -3053,7 +3055,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.3
+ * @version 2.22.5
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3274,6 +3276,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/28 Ver.2.22.5
+ * アナライズ時にページ表示を非表示にした際に、画面上部にページ画面が表示されてしまう問題を修正。
  * 2025/5/27 Ver.2.22.4
  * NUUN_EnemyBookEX_1更新による処理の追加。
  * 2025/2/11 Ver.2.22.3
@@ -8513,7 +8517,7 @@ Scene_Battle.prototype.setEnemyBookEnemyAnalyze = function(target, analyzeDate) 
 Scene_Battle.prototype.setupAnalyzeRect = function(data) {
     const rect = this.analyzeWindowRect();
     const pageRect = this.analyzePageWindowRect();
-    this._analyzePageWindow.y = pageRect.y - (this.pageWindowsShowMode(data) ? 0 : this._analyzePageWindow.height + pageRect.y) + this.enemyBookWindowUi_Y();
+    this._analyzePageWindow.y = pageRect.y - (this.pageWindowsShowMode(data) ? 0 : Graphics.height + pageRect.height + pageRect.y) + this.enemyBookWindowUi_Y();
     this._analyzeEnemyWindow.y = rect.y + (this.pageWindowsShowMode(data) ? this._analyzePageWindow.height : 0) + this.enemyBookWindowUi_Y();
     this._analyzeEnemyWindow.height = rect.height - (this.pageWindowsShowMode(data) ? this._analyzePageWindow.height : 0);
 };

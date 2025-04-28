@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.22.4
+# Ver.2.22.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -286,6 +286,8 @@ PgUp PgDnキー：モンスターページ送り
 `_ctbWindow`: NRP_VisualTurn  
 
 ## 更新履歴
+2025/5/28 Ver.2.22.5  
+アナライズ時にページ表示を非表示にした際に、画面上部にページ画面が表示されてしまう問題を修正。  
 2025/5/27 Ver.2.22.4  
 NUUN_EnemyBookEX_1更新による処理の追加。  
 2025/2/11 Ver.2.22.3  

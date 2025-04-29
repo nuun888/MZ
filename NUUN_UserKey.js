@@ -12,13 +12,25 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.8
+ * @version 1.3.0
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
  * 
  * The button layout of the gamepad is based on the Xbox360 controller.
  * If the keyboard or gamepad code is set to -1, the original value is set.
+ * 
+ * If you want to execute a script by key input from a specific scene, enter the script in "Any script".
+ * If there is processing in "Any script", it will not be executed from the handler.
+ * 
+ * Button UI Settings
+ * If neither "Button Image" nor "Button image when pressed" is specified, the button image called from the handler will be set to the image in "ButtonSet.png".
+ * The X position of the button will be displayed every 48 pixels from the left edge of the image.
+ * To specify a decision button, set "Image X Position" to 8 and "Width" to 2.
+ * 
+ * Independent button UI settings
+ * If executing from "Any script", set the button to be displayed directly on the scene.
+ * Set the button UI position using the coordinates "Image X coordinate" and "Image Y coordinate".
  * 
  * specification
  * When applying key and button settings on the scene, the key or button will not respond unless a script or common event is specified.
@@ -28,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/29/2025 Ver.1.3.0
+ * Added button settings.
  * 6/16/2024 Ver.1.2.8
  * Some processing has been corrected.
  * 5/11/2024 Ver.1.2.7
@@ -81,6 +95,68 @@
  * @text Key setting
  * @desc Key setting.
  * @default 
+ * 
+ * @param ButtonImgSetting
+ * @text Button UI Settings
+ * @default ------------------------------
+ * 
+ * @param ButtonImg
+ * @desc Specifies the button image.
+ * @text Button Image
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ButtonImgSetting
+ * 
+ * @param ButtonPressedImg
+ * @desc Specifies the image of the button when it is pressed.
+ * @text Button image when pressed
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ButtonImgSetting
+ * 
+ * @param SymbolButtonSetting
+ * @text Symbol button UI settings
+ * @default ------------------------------
+ * @parent ButtonImgSetting
+ * 
+ * @param ButtonSpriteX
+ * @text Image X Position
+ * @desc Specifies the display position of "ButtonSet" when no image is specified.
+ * @type number
+ * @min 0
+ * @default 11
+ * @parent SymbolButtonSetting
+ * 
+ * @param ButtonSpriteWidth
+ * @text Width
+ * @desc If no image is specified, specifies the width of the "ButtonSet".
+ * @type number
+ * @min 0
+ * @default 1
+ * @parent SymbolButtonSetting
+ * 
+ * @param IndependenceButtonSetting
+ * @text Independent button UI setting
+ * @default ------------------------------
+ * @parent ButtonImgSetting
+ * 
+ * @param IndependenceButtonSpriteX
+ * @text Image X coordinate
+ * @desc Specifies the X coordinate of the image.
+ * @type number
+ * @min 0
+ * @default 0
+ * @parent IndependenceButtonSetting
+ * 
+ * @param IndependenceButtonSpriteY
+ * @text Image Y coordinate
+ * @desc Specifies the Y coordinate of the image.
+ * @type number
+ * @min 0
+ * @default 0
+ * @parent IndependenceButtonSetting
  * 
  */
 /*~struct~UserKeyData:
@@ -311,12 +387,23 @@
  * @default 0
  * @parent SceneKeyAndButtonSetting
  * 
- * @param ValidCond
- * @desc Conditions to apply keys, buttons.
- * @text Applicable condition
- * @type combo
- * @default
+ * @param KeyPlaySe
+ * @text Play SE
+ * @desc The sound effect that plays when pressed.
+ * @default 
+ * @type struct<PlaySe>
  * @parent SceneKeyAndButtonSetting
+ * 
+ * @param CondSetting
+ * @text Cond setting
+ * @default ------------------------------
+ * 
+ * @param CondValidSwitch
+ * @desc Condition to apply key or button if specific switch is true. 0 is always true
+ * @text Switch Condition
+ * @type switch
+ * @default 0
+ * @parent CondSetting
  * 
  * @param ValidScene
  * @desc The scene to apply the key, button.
@@ -332,14 +419,16 @@
  * @option "Scene_Shop"
  * @option "Scene_Battle"
  * @default
- * @parent SceneKeyAndButtonSetting
+ * @parent CondSetting
  * 
- * @param KeyPlaySe
- * @text Play SE
- * @desc Play SE.
- * @default 
- * @type struct<PlaySe>
- * @parent SceneKeyAndButtonSetting
+ * @param ValidCond
+ * @desc Conditions to apply keys, buttons.
+ * @text Applicable condition
+ * @type combo
+ * @default
+ * @parent CondSetting
+ * 
+ * 
  */
 /*~struct~PlaySe:
  * 
@@ -376,12 +465,24 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.8
+ * @version 1.3.0
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
  * ゲームパッドのボタン配置はXbox360コントローラ基準になっております。
  * キーボード、ゲームパッドのコードが-1に設定されている場合は元の値が設定されます。
+ * 
+ * 特定シーンからキー入力で実行する場合は任意スクリプトにスクリプトを記入して下さい。
+ * 任意スクリプトに処理がある場合、ハンドラからは実行されません。
+ * 
+ * ボタンUI設定
+ * ハンドラから呼び出すボタン画像はボタン画像または押し時ボタン画像どちらかが指定されていない場合、ButtonSet.pngの画像が設定されます。
+ * ボタンのX位置は画像の左端から48ピクセル毎の表示になります。
+ * 決定ボタンを指定する場合は画像X位置を8、横幅を2に設定。
+ * 
+ * 独立ボタン設定
+ * 任意スクリプトから実行する場合、シーン上に直接表示するボタンを設定します。
+ * 座標は画像X座標、画像X座標でボタンUIの位置を設定します。
  * 
  * 仕様
  * シーン上でのキー、ボタン設定適用は、スクリプト又はコモンイベントが指定されてなければキーまたはボタンは反応しません。
@@ -391,6 +492,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/4/29 Ver.1.3.0
+ * ボタンの設定を追加。
  * 2024/6/16 Ver.1.2.8
  * 一部の処理を修正。
  * 2024/5/11 Ver.1.2.7
@@ -425,7 +528,6 @@
  * @desc キーの設定。
  * @default ["{\"UserKey\":\"{\\\"KeyCode\\\":\\\"65\\\",\\\"GamePadCode\\\":\\\"6\\\",\\\"KeyName\\\":\\\"\\\\\\\"pagedown2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"83\\\",\\\"GamePadCode\\\":\\\"7\\\",\\\"KeyName\\\":\\\"\\\\\\\"pageup2\\\\\\\"\\\",\\\"Repeated\\\":\\\"true\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"10\\\",\\\"KeyName\\\":\\\"\\\\\\\"leftstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}","{\"UserKey\":\"{\\\"KeyCode\\\":\\\"-1\\\",\\\"GamePadCode\\\":\\\"11\\\",\\\"KeyName\\\":\\\"\\\\\\\"rightstick\\\\\\\"\\\",\\\"Repeated\\\":\\\"false\\\",\\\"KeySprict\\\":\\\"\\\",\\\"MapValid\\\":\\\"true\\\",\\\"BattleValid\\\":\\\"false\\\"}\"}"]
  * 
- * 
  * @param GamepadSetting
  * @text ゲームパッド設定
  * @default ------------------------------
@@ -445,6 +547,68 @@
  * @text キー設定
  * @desc キー設定。
  * @default 
+ * 
+ * @param ButtonImgSetting
+ * @text ボタンUI設定
+ * @default ------------------------------
+ * 
+ * @param ButtonImg
+ * @desc ボタン画像を指定します。
+ * @text ボタン画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ButtonImgSetting
+ * 
+ * @param ButtonPressedImg
+ * @desc 押されたときのボタン画像を指定します。
+ * @text 押し時ボタン画像
+ * @type file
+ * @dir img/
+ * @default 
+ * @parent ButtonImgSetting
+ * 
+ * @param SymbolButtonSetting
+ * @text シンボルボタンUI設定
+ * @default ------------------------------
+ * @parent ButtonImgSetting
+ * 
+ * @param ButtonSpriteX
+ * @text 画像X位置
+ * @desc 画像が指定されていない場合のButtonSetの表示位置を指定。
+ * @type number
+ * @min 0
+ * @default 11
+ * @parent SymbolButtonSetting
+ * 
+ * @param ButtonSpriteWidth
+ * @text 横幅
+ * @desc 画像が指定されていない場合はButtonSetの横幅を指定。
+ * @type number
+ * @min 0
+ * @default 1
+ * @parent SymbolButtonSetting
+ * 
+ * @param IndependenceButtonSetting
+ * @text 独立ボタンUI設定
+ * @default ------------------------------
+ * @parent ButtonImgSetting
+ * 
+ * @param IndependenceButtonSpriteX
+ * @text 画像X座標
+ * @desc 画像のX座標を指定します。
+ * @type number
+ * @min 0
+ * @default 0
+ * @parent IndependenceButtonSetting
+ * 
+ * @param IndependenceButtonSpriteY
+ * @text 画像Y座標
+ * @desc 画像のY座標を指定します。
+ * @type number
+ * @min 0
+ * @default 0
+ * @parent IndependenceButtonSetting
  * 
  */
 /*~struct~UserKeyData:ja
@@ -675,12 +839,23 @@
  * @default 0
  * @parent SceneKeyAndButtonSetting
  * 
- * @param ValidCond
- * @desc キー、ボタンを適用する条件。
- * @text 適用条件
- * @type combo
- * @default
+ * @param KeyPlaySe
+ * @text 再生SE
+ * @desc 押されたときに再生するSE。
+ * @default 
+ * @type struct<PlaySe>
  * @parent SceneKeyAndButtonSetting
+ * 
+ * @param CondSetting
+ * @text 条件設定
+ * @default ------------------------------
+ * 
+ * @param CondValidSwitch
+ * @desc 特定のスイッチがtrueならキー、ボタンを適用する条件。0で常にtrue
+ * @text スイッチ条件
+ * @type switch
+ * @default 0
+ * @parent CondSetting
  * 
  * @param ValidScene
  * @desc キー、ボタンを適用するシーン。
@@ -696,14 +871,14 @@
  * @option "Scene_Shop"
  * @option "Scene_Battle"
  * @default
- * @parent SceneKeyAndButtonSetting
+ * @parent CondSetting
  * 
- * @param KeyPlaySe
- * @text 再生SE
- * @desc 再生するSE。
- * @default 
- * @type struct<PlaySe>
- * @parent SceneKeyAndButtonSetting
+ * @param ValidCond
+ * @desc キー、ボタンを適用する条件。
+ * @text 適用条件
+ * @type combo
+ * @default
+ * @parent CondSetting
  * 
  */
 /*~struct~PlaySe:ja
@@ -827,12 +1002,24 @@ Imported.NUUN_UserKey = true;
         }
     };
 
-    Scene_Base.prototype.isValidCond = function(data, _class) {
+    Scene_Base.prototype.isKeyValidCond = function(data, _class) {
+        const _scene = this.isValidScene(data, _class);
+        if (!_scene) {
+            return false;
+        }
+        return this.isValidCond(data);
+    };
+
+    Scene_Base.prototype.isValidScene = function(data, _class) {
         if (!!data.ValidScene && data.ValidScene.length > 0) {
-            const _scene = data.ValidScene.some(scene => scene === _class);
-            if (!_scene) {
-                return false;
-            }
+            return data.ValidScene.some(scene => scene === _class);
+        }
+        return true;
+    };
+
+    Scene_Base.prototype.isValidCond = function(data) {
+        if (data.CondValidSwitch > 0 && !$gameSwitches.value(data.CondValidSwitch)) {
+            return false;
         }
         if (!!data.ValidCond) {
             return eval(data.ValidCond);
@@ -843,7 +1030,8 @@ Imported.NUUN_UserKey = true;
     Scene_Base.prototype.updateUserKey = function() {
         const _className = String(this.constructor.name);
         for (const data of UserKey) {
-            if (data.UserKey && this.isValidCond(data.UserKey, _className) && (!!data.UserKey.KeySprict || data.UserKey.KeyCommonEvent > 0) && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
+            this.updateUserButtons(data);
+            if (data.UserKey && this.isKeyValidCond(data.UserKey, _className) && (!!data.UserKey.KeySprict || data.UserKey.KeyCommonEvent > 0) && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
                 const keyName = data.UserKey.KeyName;
                 if (isRepeated(data.UserKey.Repeated, keyName)) {
                     this._userKeyCalling = true;
@@ -863,6 +1051,60 @@ Imported.NUUN_UserKey = true;
 
     Scene_Base.prototype.callUserKey = function(keySprict) {
         eval(keySprict);
+    };
+
+
+    const _Scene_Map_createButtons = Scene_Map.prototype.createButtons;
+    Scene_Map.prototype.createButtons = function() {
+        _Scene_Map_createButtons.apply(this, arguments);
+        if (ConfigManager.touchUI) {
+            this.createUserButtons();
+        }
+    };
+
+    const _Scene_MenuBase_createButtons = Scene_MenuBase.prototype.createButtons;
+    Scene_MenuBase.prototype.createButtons = function() {
+        _Scene_MenuBase_createButtons.apply(this, arguments);
+        if (ConfigManager.touchUI) {
+            this.createUserButtons();
+        }
+    };
+
+    const _Scene_Battle_createButtons = Scene_Battle.prototype.createButtons;
+    Scene_Battle.prototype.createButtons = function() {
+        _Scene_Battle_createButtons.apply(this, arguments);
+        if (ConfigManager.touchUI) {
+            this.createUserButtons();
+        }
+    };
+
+    Scene_Base.prototype.createUserButtons = function() {
+        const _className = String(this.constructor.name);
+        for (const data of UserKey) {
+            if (data.UserKey && this.isValidScene(data.UserKey, _className) && (!!data.UserKey.KeySprict || data.UserKey.KeyCommonEvent > 0) && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
+                this.createUserButton(data);
+            }
+        }
+    };
+    
+    Scene_Base.prototype.createUserButton = function(data) {
+        this._userButton = {};
+        this._userButton[data.UserKey.KeyName] = new Sprite_UserButton(data.UserKey.KeyName);
+        const method = this._userButton[data.UserKey.KeyName];
+        method.x = data.IndependenceButtonSpriteX;
+        method.y = data.IndependenceButtonSpriteY;
+        method.visible = this.areUserButtonsEnabled(data);
+        this.addChild(method);
+    };
+
+    Scene_Base.prototype.updateUserButtons = function(data) {
+        if (this._userButton && this._userButton[data.UserKey.KeyName]) {
+            this._userButton[data.UserKey.KeyName].visible = this.areUserButtonsEnabled(data);
+        }
+    };
+
+    Scene_Base.prototype.areUserButtonsEnabled = function(data) {
+        return this.isValidCond(data.UserKey);
     };
 
     const _Input_clear = Input.clear;
@@ -945,6 +1187,77 @@ Imported.NUUN_UserKey = true;
             return true;
         }
         return _Game_Player_isDashButtonPressed.call(this);
+    };
+
+
+    const _Sprite_Button_initialize = Sprite_Button.prototype.initialize;
+    Sprite_Button.prototype.initialize = function(buttonType) {
+        this._buttonData = _getAddSymbol(buttonType);
+        _Sprite_Button_initialize.apply(this, arguments);
+    };
+
+    const _Sprite_Button_loadButtonImage = Sprite_Button.prototype.loadButtonImage;
+    Sprite_Button.prototype.loadButtonImage = function() {
+        if (this.isButtonBitmap()) {
+            this._buttonBitmap = ImageManager.nuun_LoadPictures(this._buttonData.ButtonImg);
+            this._buttonPressedBitmap = ImageManager.nuun_LoadPictures(this._buttonData.ButtonPressedImg);
+        } else {
+            _Sprite_Button_loadButtonImage.apply(this, arguments);
+        } 
+    };
+
+    const _Sprite_Button_checkBitmap = Sprite_Button.prototype.checkBitmap;
+    Sprite_Button.prototype.checkBitmap = function() {
+        if (this.isButtonBitmap()) return;
+        _Sprite_Button_checkBitmap.apply(this, arguments);
+    };
+
+    const _Sprite_Button_buttonData = Sprite_Button.prototype.buttonData;
+    Sprite_Button.prototype.buttonData = function() {
+        if (this.isButtonBitmap()) {
+            return { x: 0, w: this._buttonData.ButtonSpriteWidth};
+        } else if (this.notButtonBitmap()) {
+            return { x: this._buttonData.ButtonSpriteX, w: this._buttonData.ButtonSpriteWidth};
+        } else {
+            return _Sprite_Button_buttonData.apply(this, arguments);
+        }
+    };
+
+    const _Sprite_Button_updateFrame = Sprite_Button.prototype.updateFrame;
+    Sprite_Button.prototype.updateFrame = function() {
+        if (this.isButtonBitmap()) {
+            this.bitmap = this.isPressed() ? this._buttonPressedBitmap : this._buttonBitmap;
+        } else {
+            _Sprite_Button_updateFrame.apply(this, arguments);
+        }
+    };
+
+    Sprite_Button.prototype.isButtonBitmap = function() {
+        return !!this._buttonData && this._buttonData.ButtonImg && this._buttonData.ButtonPressedImg;
+    };
+
+    Sprite_Button.prototype.notButtonBitmap = function() {
+        return !!this._buttonData && !(this._buttonData.ButtonImg && this._buttonData.ButtonPressedImg);
+    };
+
+
+    function Sprite_UserButton() {
+        this.initialize(...arguments);
+    }
+    
+    Sprite_UserButton.prototype = Object.create(Sprite_Button.prototype);
+    Sprite_UserButton.prototype.constructor = Sprite_UserButton;
+    
+    Sprite_UserButton.prototype.initialize = function(buttonType) {
+        Sprite_Button.prototype.initialize.apply(this, arguments);
+    };
+
+    Sprite_UserButton.prototype.buttonData = function() {
+        return { x: 0, w: this._buttonData.ButtonSpriteWidth};
+    };
+
+    function _getAddSymbol(buttonType) {
+        return UserKey.find(data => data.UserKey && data.UserKey.KeyName === buttonType);
     };
 
 })();

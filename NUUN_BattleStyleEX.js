@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc バトルスタイル拡張
  * @author NUUN
- * @version 3.12.22
+ * @version 3.12.23
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
@@ -19,6 +19,8 @@
  * バトルスタイル拡張プラグインのベースプラグインです。単体では動作しません。
  * 
  * 更新履歴
+ * 2025/5/2 Ver.3.12.23
+ * スクロールを行うとコマンドが表示させない問題を修正。
  * 2024/10/8 Ver.3.12.22
  * ステート表示の処理を修正。
  * 2024/9/8 Ver.3.12.21
@@ -1902,11 +1904,13 @@ Window_Base.prototype.bsUpdateBackground = function() {
 
 const _Window_Selectable_paint = Window_Selectable.prototype.paint;
 Window_Selectable.prototype.paint = function() {
-  const className = String(this.constructor.name);
-  if (className === 'Window_ActorCommand') {
-    this.setCommandHeight();
-  }
-  _Window_Selectable_paint.call(this);
+    const className = String(this.constructor.name);
+    if (className === 'Window_ActorCommand') {
+        if (this.contents) {
+            this.setCommandHeight();
+        }
+    }
+    _Window_Selectable_paint.call(this);
 };
 
 //Window_PartyCommand
@@ -1936,7 +1940,7 @@ Window_PartyCommand.prototype.updateTone = function() {
 };
 
 Window_PartyCommand.prototype.maxCols = function() {;
-  return params.PartyCommandMode ? params.PartyCommandMaxCol : Math.min((this._list ? this.maxItems() : params.PartyCommandMaxCol), params.PartyCommandMaxCol);
+  return (params.PartyCommandMode ? params.PartyCommandMaxCol : Math.min((this._list ? this.maxItems() : params.PartyCommandMaxCol), params.PartyCommandMaxCol) || 1);
 };
 
 const _Window_PartyCommand_itemRect = Window_PartyCommand.prototype.itemRect;
@@ -1993,8 +1997,7 @@ Window_ActorCommand.prototype.updateTone = function() {
 };
 
 Window_ActorCommand.prototype.maxCols = function() {
-  return params.ActorCommandMode ? params.ActorCommandMaxCol : Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol);
-  //return Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol);
+  return (params.ActorCommandMode ? params.ActorCommandMaxCol : Math.min((this._list ? this.maxItems() : params.ActorCommandMaxCol), params.ActorCommandMaxCol)) || 1;
 };
 
 Window_ActorCommand.prototype.setCommandHeight = function() {

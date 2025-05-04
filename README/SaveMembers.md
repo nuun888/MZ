@@ -1,5 +1,5 @@
 # [パーティメンバーの保存、呼び出し](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)
-# Ver.1.0.2  
+# Ver.1.0.3  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -14,6 +14,8 @@
 当プラグインのSceneFormation登録画面表示をtrueに設定することでNUUN_SceneFormationからQキー(デフォルト)で開くことが出来ます。  
 
 ## 更新履歴
+2025/5/4 Ver.1.0.3  
+NUUN_SceneFormation(Ver.2.1.4以降)で戦闘中に実行できる機能を追加。  
 2025/4/24 Ver.1.0.2  
 NUUN_SceneFormation(Ver.2.1.3以降)で登録パーティ画面を開けるように修正。  
 登録パーティ消去のボタンを追加。  

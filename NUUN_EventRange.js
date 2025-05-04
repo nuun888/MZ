@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Event contact detection EX
  * @author NUUN
- * @version 1.5.3
+ * @version 1.5.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -81,6 +81,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/5/2025 Ver.1.5.4
+ * Fixed an issue where collision detection was not working properly with circle and triangle.
+ * Fixed an issue where collision detection was working behind the object with frontRange.
  * 4/2/2023 Ver.1.5.3
  * Added a function to turn on the specified self switch when the player leaves the range.
  * Added functionality to keep event direction unchanged when player enters range.
@@ -211,6 +214,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/5 Ver.1.5.4
+ * circle、triangleで正常に接触判定を行っていなかった問題を修正。
+ * frontRangeで背後でも接触判定する問題を修正。
  * 2023/4/2 Ver.1.5.3
  * プレイヤーが範囲外に離れた時に指定のセルフスイッチをONにする機能を追加。
  * プレイヤーが範囲内に入っても、イベントの方向が変わらない機能を追加。
@@ -483,15 +489,17 @@ Imported.NUUN_EventRange = true;
     };
 
     Game_Character.prototype.frontRange = function(x, y, h) {
+        const sx = this.deltaXFrom(x);
+        const sy = this.deltaYFrom(y);
         switch (this.direction()) {
             case 2:
-                return this.deltaYFrom(y) >= h * -1 && this.x === x;
+                return sy < 0 && sy >= h * -1 && this.x === x;
             case 4:
-                return this.deltaXFrom(x) <= h && this.y === y;
+                return sx > 0 && sx <= h && this.y === y;
             case 6:
-                return this.deltaXFrom(x) >= h * -1 && this.y === y;
+                return sx < 0 && sx >= h * -1 && this.y === y;
             case 8:
-                return this.deltaYFrom(y) <= h && this.x === x;
+                return sy > 0 && sy <= h && this.x === x;
         }
         return false;
     };
@@ -515,17 +523,17 @@ Imported.NUUN_EventRange = true;
         }
         rad = Math.min(rad, 180);
         const radian = (rad / 2) * (Math.PI / 180);
-        const ry = NuunManager.numPercentage(Math.abs(Math.tan(radian) * a), 6, true);
-        const rx = NuunManager.numPercentage(Math.abs(Math.tan(radian) * b), 6, true);
+        const ry = NuunManager.numPercentage(Math.abs(Math.tan(radian) * (a || 0.1)), 6, true);
+        const rx = NuunManager.numPercentage(Math.abs(Math.tan(radian) * (b || 0.1)), 6, true);
         switch (this.direction()) {
             case 2:
-                return b <= r && rx >= a && sy <= 0;
+                return h <= r && rx >= a && sy <= 0;
             case 4:
-                return b <= r && ry >= b && sx >= 0;
+                return h <= r && ry >= b && sx >= 0;
             case 6:
-                return b <= r && ry >= b && sx <= 0;
+                return h <= r && ry >= b && sx <= 0;
             case 8:
-                return b <= r && rx >= a && sy >= 0;
+                return h <= r && rx >= a && sy >= 0;
         }
         return false;
     };
@@ -537,15 +545,15 @@ Imported.NUUN_EventRange = true;
         const b = Math.abs(sy);
         rad = Math.min(rad, 180);
         const radian = (rad / 2) * (Math.PI / 180);
-        const ry = NuunManager.numPercentage(Math.abs(Math.tan(radian) * a), 6, true);
-        const rx = NuunManager.numPercentage(Math.abs(Math.tan(radian) * b), 6, true);
+        const ry = NuunManager.numPercentage(Math.abs(Math.tan(radian) * (a || 0.1)), 6, true);
+        const rx = NuunManager.numPercentage(Math.abs(Math.tan(radian) * (b || 0.1)), 6, true);
         switch (this.direction()) {
             case 2:
                 return b <= r && rx >= a && sy <= 0;
             case 4:
-                return b <= r && ry >= b && sx >= 0;
+                return a <= r && ry >= b && sx >= 0;
             case 6:
-                return b <= r && ry >= b && sx <= 0;
+                return a <= r && ry >= b && sx <= 0;
             case 8:
                 return b <= r && rx >= a && sy >= 0;
         }

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.3
+ * @version 2.1.4
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -32,10 +32,16 @@
  * Key operation
  * Q key (default) Return to the previous member.
  * 
+ * アクターのメモ欄
+ * <BattleMemberFixed>
+ * 戦闘メンバーから外すことは出来ません。
+ * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/4/2025 Ver.2.1.4
+ * Fixed "NUUN_SaveMembers" to be able to be executed during battle.
  * 4/24/2025 Ver.2.1.3
  * Fixed by updating "NUUN_SaveMembers".
  * 4/23/2025 Ver.2.1.2
@@ -992,7 +998,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.2
+ * @version 2.1.4
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1021,6 +1027,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/4 Ver.2.1.4
+ * NUUN_SaveMembersを戦闘中に実行できるように修正。
  * 2025/4/24 Ver.2.1.3
  * NUUN_SaveMembers更新による修正。
  * 2025/4/23 Ver.2.1.2
@@ -2413,7 +2421,7 @@ Imported.NUUN_SceneFormation = true;
             this.createMemberWindow();
             this.createMemberNameWindow();
             this.createMemberStatusWindow();
-            if (!this._isBattle && Imported.NUUN_SaveMembers && !!NuunManager.getSceneFormationOpenSaveMembers()) {
+            if (Imported.NUUN_SaveMembers && NuunManager.isSaveMembersValidBattle() && !!NuunManager.getSceneFormationOpenSaveMembers()) {
                 this.createSaveMembersCommandWindow();
                 this.createSaveMembersWindow();
             }
@@ -2445,6 +2453,10 @@ Imported.NUUN_SceneFormation = true;
         
         createBackground() {
             
+        }
+
+        isSaveMembersValidBattle() {
+            return this._isBattle || (this._isBattle && NuunManager.isSaveMembersValidBattle());
         }
 
         createBattleMemberActor() {
@@ -2519,7 +2531,7 @@ Imported.NUUN_SceneFormation = true;
 
         createSaveMembersCommandWindow() {
             const _scene = this._scene;
-            const rect = _scene.saveMembersCommandWindowRect();
+            const rect = this.saveMembersCommandWindowRect();
             const commandWindow = new Window_SavePartyCommand(rect);
             this._memberWindow.setHandler(NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
             this._battleMemberWindow.setHandler( NuunManager.getOpenSaveMembersSymbol(), this.onSaveMembersOpenOk.bind(this));
@@ -2552,6 +2564,10 @@ Imported.NUUN_SceneFormation = true;
                 saveMembersWindow.openness = 0;
             }
             saveMembersWindow.hide();
+        }
+
+        saveMembersCommandWindowRect() {
+            return this._scene.saveMembersCommandWindowRect();
         }
         
         battleMemberNameWindowRect() {
@@ -2739,6 +2755,10 @@ Imported.NUUN_SceneFormation = true;
         }
 
         onSaveMembersOpenOk() {
+            if (this._isBattle) {
+                this._saveMembersCommandWindow.open();
+                this._saveMembersWindow.open();
+            }
             this._memberWindow.deselect();
             this._battleMemberWindow.deselect();
             this._memberWindow.deactivate();
@@ -2786,8 +2806,13 @@ Imported.NUUN_SceneFormation = true;
         }
 
         onSaveMembersCancel() {
-            this._saveMembersCommandWindow.hide();
-            this._saveMembersWindow.hide();
+            if (this._isBattle) {
+                this._saveMembersCommandWindow.close();
+                this._saveMembersWindow.close();
+            } else {
+                this._saveMembersCommandWindow.hide();
+                this._saveMembersWindow.hide();
+            }
             if (this.isCursorBattleMode()) {
                 this._battleMemberWindow.activate();
                 this._battleMemberWindow.select(0);
@@ -3031,6 +3056,13 @@ Imported.NUUN_SceneFormation = true;
             this._commandWindow.show();
             this._commandWindow.open();
             this._commandWindow.activate();
+        }
+
+        isOpenFormation() {
+            return (
+                (this._memberWindow.isOpen() || this._memberWindow.isOpening()) ||
+                (this._battleMemberWindow.isOpen() || this._battleMemberWindow.isOpening())
+            )
         }
     };
 

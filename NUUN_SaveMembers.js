@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * Implement a function to register and call parties in a specified party order.
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/4/2025 Ver.1.0.3
+ * Added functions that can be executed during battle in "NUUN_SceneFormation" (Ver.2.1.4 or later).
  * 4/24/2025 Ver.1.0.2
  * Fixed so that the registered party screen can be opened with "NUUN_SceneFormation" (Ver.2.1.3 or later).
  * Added a button to delete registered parties.
@@ -234,6 +236,13 @@
  * @default true
  * @parent SceneFormationSetting
  * 
+ * @param ValidBattle
+ * @text Valid battle
+ * @desc "NUUN_SceneFormation" displays the party registration screen during battle.
+ * @type boolean
+ * @default false
+ * @parent SceneFormationSetting
+ * 
  * @param OpenSaveMembersSymbol
  * @desc Key symbol name when displaying registered parties in "NUUN_SceneFormation".
  * @text Registered Party Display Symbol Name
@@ -298,7 +307,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * 指定のパーティの並び順をパーティを登録、呼び出しする機能を実装します。
@@ -310,6 +319,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/4 Ver.1.0.3
+ * NUUN_SceneFormation(Ver.2.1.4以降)で戦闘中に実行できる機能を追加。
  * 2025/4/24 Ver.1.0.2
  * NUUN_SceneFormation(Ver.2.1.3以降)で登録パーティ画面を開けるように修正。
  * 登録パーティ消去のボタンを追加。
@@ -521,6 +532,13 @@
  * @default true
  * @parent SceneFormationSetting
  * 
+ * @param ValidBattle
+ * @text 戦闘中有効
+ * @desc NUUN_SceneFormationで戦闘中のパーティ登録画面の表示をします。
+ * @type boolean
+ * @default false
+ * @parent SceneFormationSetting
+ * 
  * @param OpenSaveMembersSymbol
  * @desc NUUN_SceneFormationで登録パーティを表示するときのキーシンボル名。
  * @text 登録パーティ表示シンボル名
@@ -629,6 +647,10 @@ Imported.NUUN_SaveMembers = true;
 
     NuunManager.isSaveMembersRegistration = function() {
         return params.SaveMembers_Rows > $gameSystem.getSaveMembersNum();
+    };
+
+    NuunManager.isSaveMembersValidBattle = function() {
+        return params.ValidBattle;
     };
 
     AudioManager.playOkRegistrationSe = function() {
@@ -745,7 +767,7 @@ Imported.NUUN_SaveMembers = true;
     Scene_SavePartyMembers.prototype.createButtons = function() {
         Scene_MenuBase.prototype.createButtons.apply(this, arguments);
         if (ConfigManager.touchUI) {
-            if (this.needsEraseButton()) {
+            if (this.needsSaveMembersEraseButton()) {
                 this.createEraseButton();
             }
         }
@@ -759,7 +781,7 @@ Imported.NUUN_SaveMembers = true;
         this._eraseButton.visible = false;
     };
 
-    Scene_SavePartyMembers.prototype.needsEraseButton = function() {
+    Scene_SavePartyMembers.prototype.needsSaveMembersEraseButton = function() {
         return true;
     };
 
@@ -851,11 +873,24 @@ Imported.NUUN_SaveMembers = true;
     Scene_Formation.prototype.createButtons = function() {
         _Scene_Formation_createButtons.apply(this, arguments);
         if (ConfigManager.touchUI) {
-            if (this.needsEraseButton()) {
-                this.createEraseButton();
+            if (this.needsSaveMembersEraseButton()) {
+                this.createSaveMembersEraseButton();
             }
-            if (this.needsRegistrationButton()) {
-                this.createRegistrationButton();
+            if (this.needsSaveMembersRegistrationButton()) {
+                this.createSaveMembersRegistrationButton();
+            }
+        }
+    };
+
+    const _Scene_Battle_createButtons = Scene_Battle.prototype.createButtons;
+    Scene_Battle.prototype.createButtons = function() {
+        _Scene_Battle_createButtons.apply(this, arguments);
+        if (ConfigManager.touchUI) {
+            if (this.needsSaveMembersEraseButton()) {
+                this.createSaveMembersEraseButton();
+            }
+            if (this.needsSaveMembersRegistrationButton()) {
+                this.createSaveMembersRegistrationButton();
             }
         }
     };
@@ -868,7 +903,15 @@ Imported.NUUN_SaveMembers = true;
         return new Rectangle(wx, wy, ww, wh);
     };
 
-    Scene_Formation.prototype.createEraseButton = function() {
+    Scene_Battle.prototype.saveMembersCommandWindowRect = function() {
+        const ww = params.Command_Width > 0 ? params.Command_Width : this.mainCommandWidth();
+        const wh = this.calcWindowHeight(3, true);
+        const wx = params.Command_X;
+        const wy = params.Command_Y + this.buttonY();
+        return new Rectangle(wx, wy, ww, wh);
+    };
+
+    Scene_Base.prototype.createSaveMembersEraseButton = function() {
         this._eraseButton = new Sprite_Button(NuunManager.getSaveMembersEraseSymbol());
         this._eraseButton.x = params.EraseButton_X;
         this._eraseButton.y = params.EraseButton_Y;
@@ -876,7 +919,7 @@ Imported.NUUN_SaveMembers = true;
         this._eraseButton.visible = false;
     };
 
-    Scene_Formation.prototype.createRegistrationButton = function() {
+    Scene_Base.prototype.createSaveMembersRegistrationButton = function() {
         this._registrationButton = new Sprite_Button(params.OpenSaveMembersSymbol);
         this._registrationButton.x = params.OpenSaveMembersButton_X;
         this._registrationButton.y = params.OpenSaveMembersButton_Y;
@@ -884,35 +927,57 @@ Imported.NUUN_SaveMembers = true;
         this._registrationButton.visible = false;
     };
 
-    Scene_Formation.prototype.needsEraseButton = function() {
+    Scene_Base.prototype.needsSaveMembersEraseButton = function() {
         return true;
     };
 
-    Scene_Formation.prototype.needsRegistrationButton = function() {
+    Scene_Base.prototype.needsSaveMembersRegistrationButton = function() {
         return true;
     };
 
     const _Scene_Formation_updatePageButtons = Scene_Formation.prototype.updatePageButtons;
     Scene_Formation.prototype.updatePageButtons = function() {
         _Scene_Formation_updatePageButtons.apply(this, arguments);
+        this.updateSaveMembersButtons();
+    };
+
+    const _Scene_Battle_updateVisibility = Scene_Battle.prototype.updateVisibility;
+    Scene_Battle.prototype.updateVisibility = function() {
+        _Scene_Battle_updateVisibility.apply(this, arguments);
+        this.updateSaveMembersButtons();
+    };
+
+    Scene_Base.prototype.updateSaveMembersButtons = function() {
         if (this._eraseButton) {
-            const enabled = this.arePageButtonsEnabled();
+            const enabled = this.areSaveMembersEraseButtonsEnabled();
             this._eraseButton.visible = enabled;
         }
         if (this._registrationButton) {
-            const enabled = this.areRegistrationButtonsEnabled();
+            const enabled = this.areSaveMembersRegistrationButtonsEnabled();
             this._registrationButton.visible = enabled;
         }
     };
 
-    Scene_Formation.prototype.arePageButtonsEnabled = function() {
+    Scene_Formation.prototype.areSaveMembersEraseButtonsEnabled = function() {
         const f = this._formation;
         return f && f._saveMembersWindow && f._saveMembersWindow.visible && f._saveMembersWindow.active;
     };
 
-    Scene_Formation.prototype.areRegistrationButtonsEnabled = function() {
+    Scene_Battle.prototype.areSaveMembersEraseButtonsEnabled = function() {
+        const f = this._formation;
+        return f && f._saveMembersWindow && (f._saveMembersWindow.isOpen() || f._saveMembersWindow.isOpening()) && f._saveMembersWindow.active;
+    };
+
+    Scene_Formation.prototype.areSaveMembersRegistrationButtonsEnabled = function() {
         const f = this._formation;
         return f && f._saveMembersWindow && !f._saveMembersWindow.visible;
+    };
+
+    Scene_Battle.prototype.areSaveMembersRegistrationButtonsEnabled = function() {
+        const f = this._formation;
+        return (f && f.isOpenFormation() && f._saveMembersWindow && 
+             (f._saveMembersWindow.isClosed() || f._saveMembersWindow.isClosing())
+        )
     };
 
 

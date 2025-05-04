@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation (battle)
  * @author NUUN
- * @version 2.1.3
+ * @version 2.1.4
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/4/2025 Ver.2.1.4
+ * Fixed "NUUN_SaveMembers" to be able to be executed during battle.
  * 4/23/2025 Ver.2.1.3
  * Added the ability to revert to members before the change.
  * 4/7/2025 Ver.2.1.2
@@ -764,7 +766,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 2.1.3
+ * @version 2.1.4
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -776,7 +778,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2025/5/23 Ver.2.1.3
+ * 2025/5/4 Ver.2.1.4
+ * NUUN_SaveMembersを戦闘中に実行できるように修正。
+ * 2025/4/23 Ver.2.1.3
  * 変更前のメンバーに戻す機能を追加。
  * 2025/4/7 Ver.2.1.2
  * 戦闘前のメンバーに戻す機能を2.1.0時の方式に仕様変更。
@@ -1703,7 +1707,7 @@ Imported.NUUN_SceneBattleFormation = true;
 
     Scene_Battle.prototype.areBeforeMemberButtonsEnabled = function() {
         const f = this._formation;
-        return f && (f._memberWindow.active || f._battleMemberWindow.active);
+        return f && f.isOpenFormation() && (f._memberWindow.active || f._battleMemberWindow.active);
     };
 
     Scene_Battle.prototype.isFormationActive = function() {

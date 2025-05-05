@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Symbol encounter
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_Base
  * @base NUUN_EventRange
  * @orderAfter NUUN_Base
@@ -120,6 +120,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/5/2025 Ver.1.0.4
+ * Fixed an issue where an error would occur when specifying a dash reaction.
  * 4/29/2023 Ver.1.0.3
  * Fixed an issue where missing a player was not working properly.
  * 2/17/2023 Ver.1.0.2
@@ -441,7 +443,7 @@
  * @target MZ
  * @plugindesc シンボルエンカウント
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_Base
  * @base NUUN_EventRange
  * @orderAfter NUUN_Base
@@ -556,6 +558,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/5 Ver.1.0.4
+ * ダッシュ反応を指定しているとエラーが出る問題を修正。
  * 2023/4/29 Ver.1.0.3
  * プレイヤーを見失った時の処理が正しく行われていなかった問題を修正。
  * 2023/2/17 Ver.1.0.2
@@ -1666,7 +1670,7 @@ Imported.NUUN_SymbolEncounter = true;
             case 1:
                 return false;
             case 2:
-                return $gameParty.isDashing();
+                return $gamePlayer.isDashing();
             case 3:
                 return $gamePlayer.isMoving();
         }

@@ -1,5 +1,5 @@
 # [パーティメンバーの保存、呼び出し](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)
-# Ver.1.0.3  
+# Ver.1.0.4  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -14,6 +14,9 @@
 当プラグインのSceneFormation登録画面表示をtrueに設定することでNUUN_SceneFormationからQキー(デフォルト)で開くことが出来ます。  
 
 ## 更新履歴
+2025/5/5 Ver.1.0.4  
+戦闘中に登録メンバーウィンドウがずれて表示される問題を修正。  
+戦闘中にパーティ登録画面を表示するときに、メンバー変更画面が閉じ、アクターコマンドがアクティブ化する問題を修正。  
 2025/5/4 Ver.1.0.3  
 NUUN_SceneFormation(Ver.2.1.4以降)で戦闘中に実行できる機能を追加。  
 2025/4/24 Ver.1.0.2  

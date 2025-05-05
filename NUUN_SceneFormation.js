@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.4
+ * @version 2.1.5
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -40,6 +40,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/5/2025 Ver.2.1.5
+ * Fixed an issue that caused the party registration screen to not open when on the menu screen.
+ * Fixed an issue that caused the cursor to not switch between the member screen and battle screen when deleting a registered member.
  * 5/4/2025 Ver.2.1.4
  * Fixed "NUUN_SaveMembers" to be able to be executed during battle.
  * 4/24/2025 Ver.2.1.3
@@ -1027,6 +1030,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/5 Ver.2.1.5
+ * メニュー画面でパーティ登録画面が開けなくなる問題を修正。
+ * 登録メンバーを削除した際に、メンバー画面と戦闘画面のカーソルアクティブの移行が行われなくなる問題を修正。
  * 2025/5/4 Ver.2.1.4
  * NUUN_SaveMembersを戦闘中に実行できるように修正。
  * 2025/4/24 Ver.2.1.3
@@ -2421,7 +2427,7 @@ Imported.NUUN_SceneFormation = true;
             this.createMemberWindow();
             this.createMemberNameWindow();
             this.createMemberStatusWindow();
-            if (Imported.NUUN_SaveMembers && NuunManager.isSaveMembersValidBattle() && !!NuunManager.getSceneFormationOpenSaveMembers()) {
+            if (Imported.NUUN_SaveMembers && this.isSaveMembersValidBattle() && !!NuunManager.getSceneFormationOpenSaveMembers()) {
                 this.createSaveMembersCommandWindow();
                 this.createSaveMembersWindow();
             }
@@ -2456,7 +2462,7 @@ Imported.NUUN_SceneFormation = true;
         }
 
         isSaveMembersValidBattle() {
-            return this._isBattle || (this._isBattle && NuunManager.isSaveMembersValidBattle());
+            return !this._isBattle || (this._isBattle && NuunManager.isSaveMembersValidBattle());
         }
 
         createBattleMemberActor() {
@@ -2771,6 +2777,7 @@ Imported.NUUN_SceneFormation = true;
         }
 
         onSaveMembersSelectOk() {
+            this._saveMembersCommandWindow.deactivate();
             this._saveMembersCommandWindow.deselect();
             this._saveMembersWindow.activate();
             this._saveMembersWindow.select(0);
@@ -2779,6 +2786,7 @@ Imported.NUUN_SceneFormation = true;
         onSaveMembersSelectCancel() {
             this._saveMembersCommandWindow.activate();
             this._saveMembersCommandWindow.selectLast();
+            this._saveMembersWindow.deactivate();
             this._saveMembersWindow.deselect();
         }
 

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * Implement a function to register and call parties in a specified party order.
@@ -24,6 +24,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/5/2025 Ver.1.0.4
+ * Fixed an issue where the registered member window would appear misaligned during battle.
+ * Fixed an issue where the member change screen would close and actor commands would be activated when viewing the party registration screen during battle.
  * 5/4/2025 Ver.1.0.3
  * Added functions that can be executed during battle in "NUUN_SceneFormation" (Ver.2.1.4 or later).
  * 4/24/2025 Ver.1.0.2
@@ -307,7 +310,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * 指定のパーティの並び順をパーティを登録、呼び出しする機能を実装します。
@@ -319,6 +322,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/5 Ver.1.0.4
+ * 戦闘中に登録メンバーウィンドウがずれて表示される問題を修正。
+ * 戦闘中にパーティ登録画面を表示するときに、メンバー変更画面が閉じ、アクターコマンドがアクティブ化する問題を修正。
  * 2025/5/4 Ver.1.0.3
  * NUUN_SceneFormation(Ver.2.1.4以降)で戦闘中に実行できる機能を追加。
  * 2025/4/24 Ver.1.0.2
@@ -911,6 +917,14 @@ Imported.NUUN_SaveMembers = true;
         return new Rectangle(wx, wy, ww, wh);
     };
 
+    Scene_Battle.prototype.saveMembersWindowRect = function() {
+        const wx = params.SaveMembers_X;
+        const wy = params.SaveMembers_Y + this.buttonY();
+        const ww = this.nuun_SaveMemberWindowWidth();
+        const wh = 32 + params.SaveMembers_Rows * (params.MemberHeight + Window_Selectable.prototype.rowSpacing.call(this));
+        return new Rectangle(wx, wy, ww, wh);
+    };
+
     Scene_Base.prototype.createSaveMembersEraseButton = function() {
         this._eraseButton = new Sprite_Button(NuunManager.getSaveMembersEraseSymbol());
         this._eraseButton.x = params.EraseButton_X;
@@ -980,6 +994,17 @@ Imported.NUUN_SaveMembers = true;
         )
     };
 
+    Scene_Battle.prototype.isSaveMemberActive = function() {
+        const f = this._formation;
+        return (f._saveMembersCommandWindow && f._saveMembersCommandWindow.active) ||
+        (f._saveMembersWindow && f._saveMembersWindow.active)
+    };
+
+    const _Scene_Battle_needsInputWindowChange = Scene_Battle.prototype.needsInputWindowChange;
+    Scene_Battle.prototype.needsInputWindowChange = function() {
+        if (this.isSaveMemberActive()) return false;
+        return _Scene_Battle_needsInputWindowChange.call(this);
+    };
 
     const _Window_MenuCommand_addFormationCommand = Window_MenuCommand.prototype.addFormationCommand;
     Window_MenuCommand.prototype.addFormationCommand = function() {

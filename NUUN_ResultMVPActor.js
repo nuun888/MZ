@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Result
  * @orderAfter NUUN_Result
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * Display the MVP actor for this battle in the results displayed after winning.
@@ -28,6 +28,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/5/2025 Ver.1.1.5
+ * Fixed an issue where an error would occur when the MVP actor did not exist.
  * 12/29/2024 Ver.1.1.4
  * Corrected to not add total damage when recovering.
  * Fixed an issue that caused an error at the end of battle.
@@ -68,7 +70,7 @@
  * @author NUUN
  * @base NUUN_Result
  * @orderAfter NUUN_Result
- * @version 1.1.4
+ * @version 1.1.5
  * 
  * @help
  * 勝利後に表示されるリザルトにこの戦闘でのMVPアクターを表示します。
@@ -85,6 +87,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/5 Ver.1.1.5
+ * MVPアクターが存在しない時にエラーが出る問題を修正。
  * 2024/12/29 Ver.1.1.4
  * 回復時の総ダメージ加算を実行しないように修正。
  * 戦闘終了時にエラーが出る問題を修正。
@@ -251,7 +255,7 @@ Imported.NUUN_ResultMVPActor = true;
 
     BattleManager.resultMVPActorBatteleVoice = function() {//以下は神無月サスケ氏から
         const actor = $gameParty.getMvpActor();
-        if (actor && actor.actor().meta.victoryVoice || (actor.battleVoices && actor.battleVoices.victory)) {
+        if (actor && (actor.actor().meta.victoryVoice || (actor.battleVoices && actor.battleVoices.victory))) {
             const data = (actor.battleVoices ? actor.battleVoices.victory : null) || actor.actor().meta.victoryVoice;
             if (data) {
                 const names = data.split(',');

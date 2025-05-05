@@ -1,5 +1,5 @@
 # [シンボルエンカウント](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SymbolEncounter.js)
-# Ver.1.0.3
+# Ver.1.0.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SymbolEncounter.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.3以降  
@@ -106,6 +106,8 @@ p:プレイヤー
 シンボルエンカウントの現在のモードが撃破時か返します。  
 
 ## 更新履歴
+2025/5/5 Ver.1.0.4  
+ダッシュ反応を指定しているとエラーが出る問題を修正。  
 2023/4/29 Ver.1.0.3  
 プレイヤーを見失った時の処理が正しく行われていなかった問題を修正。  
 2023/2/17 Ver.1.0.2  

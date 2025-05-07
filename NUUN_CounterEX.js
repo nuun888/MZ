@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * Extend the counter.
@@ -62,7 +62,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 3/27/2024 Ver.1.3.0
+ * 5/7/2025 Ver.1.3.1
+ * Added the ability to disable counters for parties.
+ * 3/27/2025 Ver.1.3.0
  * Added a function to limit the number of counters that can be activated when multiple counters are active.
  * Added the ability to specify activation priority when multiple counters are executable.
  * 7/21/2024 Ver.1.2.1
@@ -155,6 +157,12 @@
  * @text Counter skill
  * @type struct<CounterSkillList>[]
  * @default 
+ * 
+ * @param FriendlyCounterEnabled
+ * @desc Valid against party.
+ * @text Counter (reflection) enabled for party
+ * @type boolean
+ * @default false
  * 
  * @param CounterRate
  * @text Counter activation rate
@@ -350,7 +358,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * カウンターを拡張します。
@@ -401,6 +409,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/7 Ver.1.3.1
+ * 味方に対してカウンターを無効化できる機能を追加。
  * 2025/3/27 Ver.1.3.0
  * 複数のカウンターが実行可能の場合、発動数を制限する機能を追加。
  * 複数のカウンターが実行可能の場合、発動優先度を指定する機能を追加。
@@ -494,6 +504,12 @@
  * @text カウンタースキル
  * @type struct<CounterSkillList>[]
  * @default 
+ * 
+ * @param FriendlyCounterEnabled
+ * @desc 味方に対して有効。
+ * @text 味方反撃(反射)有効
+ * @type boolean
+ * @default false
  * 
  * @param CounterRate
  * @text カウンター発動率
@@ -1051,16 +1067,25 @@ Imported.NUUN_CounterEX = true;
         list.some((trait, index) => {
             if (!!trait) {
                 const counterData = CounterData[index];
-                if (!!counterData && !noCounterTagItem(this._action, counterData) && this.isCounterActionMode(target, counterData, mode)) {
-                    if (battler === target) {
-                        this.setCounterTriggers(battler, trait, subject, counterData);
-                    } else if (isCounterAlwaysTrigger(counterData)) {
-                        this.setCounterTriggers(battler, trait, subject, counterData);
+                if (!!counterData) {
+                    if (this.isFriendCounter(this._action, counterData) && !noCounterTagItem(this._action, counterData) && this.isCounterActionMode(target, counterData, mode)) {
+                        if (battler === target) {
+                            this.setCounterTriggers(battler, trait, subject, counterData);
+                        } else if (isCounterAlwaysTrigger(counterData)) {
+                            this.setCounterTriggers(battler, trait, subject, counterData);
+                        }
                     }
                 }
                 return CounterSkillNum > 0 ? this._counterBattlerList.length >= CounterSkillNum : false;
             }
         });
+    };
+
+    BattleManager.isFriendCounter = function(action, counter) {
+        if (counter.FriendlyCounterEnabled) {
+            return true;
+        }
+        return !action.isForFriend();
     };
 
     BattleManager.isCounterActionMode = function(target, counter, mode) {

@@ -1,5 +1,5 @@
 # [カウンター拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js)
-# Ver.1.3.0
+# Ver.1.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CounterEX.js)
 
 ### 必須、前提プラグイン
@@ -53,6 +53,8 @@ NUUN_ConditionsBaseのプラグインパラメータのリストIDを指定し�
 プラグインパラメータのカウンター設定で上位の設定から条件判定し実行いたします。  
 
 ## 更新履歴
+2025/5/7 Ver.1.3.1  
+味方に対してカウンターを無効化できる機能を追加。  
 2025/3/27 Ver.1.3.0  
 複数のカウンターが実行可能の場合、発動数を制限する機能を追加。  
 複数のカウンターが実行可能の場合、発動優先度を指定する機能を追加。  

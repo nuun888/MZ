@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.3.1
+ * @version 1.3.2
  * 
  * @help
  * 敵、味方の対象選択時のウィンドウをXP風に変更します。
@@ -39,6 +39,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/10 Ver.1.3.2
+ * ゲージ表示を行っている場合にエラーが出る問題を修正。
  * 2025/2/2 Ver.1.3.1
  * 敵のウィンドウの透明度が適用されていなかった問題を修正。
  * ウィンドウ開閉時のアニメーションの有効無効化する機能を追加。
@@ -1224,7 +1226,7 @@ Window_BattleSelectBattler.prototype.placeStateIcon = function(battler, x, y) {
 
 Window_BattleSelectBattler.prototype.placeGauge = function(battler, type, x, y) {
     if (Imported.NUUN_GaugeImage) {
-        this.placeGaugeImg(actor, type, x, y);
+        this.placeGaugeImg(battler, type, x, y);
     }
     const key = "ActorSelectGauge-%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NuunGauge);
@@ -1263,7 +1265,7 @@ Window_BattleSelectEnemy.prototype.placeStateIcon = function(battler, x, y) {
 
 Window_BattleSelectEnemy.prototype.placeGauge = function(battler, type, x, y) {
     if (Imported.NUUN_GaugeImage) {
-        this.placeGaugeImg(actor, type, x, y);
+        this.placeGaugeImg(battler, type, x, y);
     }
     const key = "EnemySelectGauge-%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NuunGauge);

@@ -28,7 +28,7 @@
  * 
  * Log
  * 5/11/2025 Ver.1.2.2
- * Fixed an issue where commands would not move if the movement frame count was set to 61 or more.
+ * Fixed an issue where the command would not move if the number of movement frames was set higher than the destination coordinates.
  * 8/19/2024 Ver.1.2.1
  * Fixed an issue where hiding the cursor when selecting a target was not working.
  * 8/18/2024 Ver.1.2.0
@@ -259,7 +259,7 @@
  * 
  * 更新履歴
  * 2025/5/11 Ver.1.2.2
- * 移動フレーム数を61以上に設定するとコマンドが移動しない問題を修正。
+ * 移動フレーム数を移動先座標以上に設定するとコマンドが移動しない問題を修正。
  * 2024/8/19 Ver.1.2.1
  * 対象選択時カーソル非表示が機能していなかった問題を修正。
  * 2024/8/18 Ver.1.2.0

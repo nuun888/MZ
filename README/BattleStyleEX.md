@@ -10,6 +10,7 @@
 [敵の条件画像変更](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)   
 [戦闘中天候適用](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleWeather.js)   
 [バトルエネミーウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemySelectWindow.js)   
+[バトルアクターウィンドウカスタマイズ]  
 [バトルアイテム、スキルウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
 [戦闘中メッセージウィンドウ背景画像](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
 [バトルスタイル拡張サポートアクターVer2.0対応](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXWithSupportActor.md)  

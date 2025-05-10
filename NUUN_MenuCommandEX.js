@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/11/2025 Ver.1.2.2
+ * Fixed an issue where commands would not move if the movement frame count was set to 61 or more.
  * 8/19/2024 Ver.1.2.1
  * Fixed an issue where hiding the cursor when selecting a target was not working.
  * 8/18/2024 Ver.1.2.0
@@ -242,7 +244,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
@@ -256,6 +258,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/11 Ver.1.2.2
+ * 移動フレーム数を61以上に設定するとコマンドが移動しない問題を修正。
  * 2024/8/19 Ver.1.2.1
  * 対象選択時カーソル非表示が機能していなかった問題を修正。
  * 2024/8/18 Ver.1.2.0
@@ -682,6 +686,7 @@ Imported.NUUN_MenuCommandEX = true;
         this._targetX = 0;
         this._targetY = 0;
         this._cursorOn = false;
+        this._isMoveing = false;
     };
     
     Sprite_MenuCommand.prototype.bitmapWidth = function() {
@@ -750,8 +755,8 @@ Imported.NUUN_MenuCommandEX = true;
     Sprite_MenuCommand.prototype.updateMoveing = function() {
         if (this._isMoveing) {
             if (this._cursorOn) {
-                this._moveX = this._moveX + Math.floor(params.SelectContentsX / this.isMovingDuration());
-                this._moveY = this._moveY + Math.floor(params.SelectContentsY / this.isMovingDuration());
+                this._moveX = this._moveX + Math.ceil(params.SelectContentsX / this.isMovingDuration());
+                this._moveY = this._moveY + Math.ceil(params.SelectContentsY / this.isMovingDuration());
                 this.x = this._homeX + this._moveX;
                 this.y = this._homeY + this._moveY;
                 if (params.SelectContentsX > 0 && this.x >= this._homeX + this._targetX) {
@@ -768,8 +773,8 @@ Imported.NUUN_MenuCommandEX = true;
                     this._isMoveing = false;
                 }
             } else {
-                this._moveX = this._moveX - Math.floor(params.SelectContentsX / this.isMovingDuration());
-                this._moveY = this._moveY - Math.floor(params.SelectContentsY / this.isMovingDuration());
+                this._moveX = this._moveX - Math.ceil(params.SelectContentsX / this.isMovingDuration());
+                this._moveY = this._moveY - Math.ceil(params.SelectContentsY / this.isMovingDuration());
                 this.x = this._homeX + this._moveX;
                 this.y = this._homeY + this._moveY;
                 if (params.SelectContentsX > 0 && this.x <= this._homeX) {

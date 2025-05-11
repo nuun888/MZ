@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.5
+ * @version 2.23.0
  * 
  * @help
  * Implement an enemy book.
@@ -229,9 +229,12 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 5/28/2025 Ver.2.22.5
+ * 5/12/2025 Ver.2.22.5
+ * Added the ability to register when you win.
+ * Added a function to update the encyclopedia only when you win.
+ * 4/28/2025 Ver.2.22.5
  * Fixed an issue where the page screen would be displayed at the top of the screen when the page display was hidden during analysis.
- * 5/27/2025 Ver.2.22.4
+ * 4/27/2025 Ver.2.22.4
  * Added processing by updating "NUUN_EnemyBookEX_1".
  * 2/11/2025 Ver.2.22.3
  * Fixed handling of actor and party command activations when cancelled.
@@ -456,41 +459,6 @@
  * @default 0
  * @parent BasicSetting
  * 
- * @param RegistrationTiming
- * @desc Set the registration method for the enemy book.
- * @text Enemy book registration settings
- * @type struct<RegistrationTimingList>[]
- * @default ["{\"RegistrationTiming\":\"0\",\"RegisterStatus\":\"true\"}"]
- * @parent BasicSetting
- * 
- * @param TransformDefeat
- * @desc Assumes that the enemy before transformation has been defeated.
- * @text Defeat before transformation
- * @type boolean
- * @default true
- * @parent BasicSetting
- * 
- * @param NoDataName
- * @desc Specify a name that is not registered in the enemy book. Name blanks are not registered by default.
- * @text Names not registered in the enemy book
- * @type string
- * @default 
- * @parent BasicSetting
- * 
- * @param NoBookTag
- * @desc Tag names that will not be registered in the enemy book.
- * @text Tag without enemy book registration
- * @type string
- * @default NoBook
- * @parent BasicSetting
- * 
- * @param NoBookDataTag
- * @desc Tag names that will not be registered in the enemy book.Enemy information will be displayed during analysis.
- * @text Tag without enemy book registration2
- * @type string
- * @default NoBookData
- * @parent BasicSetting
- * 
  * @param DecimalMode
  * @text rounding off
  * @desc Round off the non-display decimal point. (truncated at false)
@@ -553,12 +521,75 @@
  * @default pagedown
  * @parent BasicSetting
  * 
+ * @param RegistrationSetting
+ * @text Enemy book registration settings
+ * @default ------------------------------
+ * 
+ * @param RegistrationTiming
+ * @desc Set the registration method for the enemy book.
+ * @text Enemy book registration settings
+ * @type struct<RegistrationTimingList>[]
+ * @default ["{\"RegistrationTiming\":\"0\",\"RegisterStatus\":\"true\"}"]
+ * @parent RegistrationSetting
+ * 
+ * @param TransformDefeat
+ * @desc Assumes that the enemy before transformation has been defeated.
+ * @text Defeat before transformation
+ * @type boolean
+ * @default true
+ * @parent RegistrationSetting
+ * 
+ * @param NoDataName
+ * @desc Specify a name that is not registered in the enemy book. Name blanks are not registered by default.
+ * @text Names not registered in the enemy book
+ * @type string
+ * @default 
+ * @parent RegistrationSetting
+ * 
+ * @param NoBookTag
+ * @desc Tag names that will not be registered in the enemy book.
+ * @text Tag without enemy book registration
+ * @type string
+ * @default NoBook
+ * @parent RegistrationSetting
+ * 
+ * @param NoBookDataTag
+ * @desc Tag names that will not be registered in the enemy book.Enemy information will be displayed during analysis.
+ * @text Tag without enemy book registration2
+ * @type string
+ * @default NoBookData
+ * @parent RegistrationSetting
+ * 
  * @param ActualEnemyMask
  * @type boolean
  * @default true
  * @text Full size image unregistered silhouette
  * @desc Creates a full-size silhouette of a monster whose information has not yet been registered.
- * @parent BasicSetting
+ * @parent RegistrationSetting
+ * 
+ * @param FlagOnVictory
+ * @desc Only winning registration flags will be updated.
+ * @text Registration Flag Update Win Only
+ * @type boolean
+ * @default false
+ * @parent RegistrationSetting
+ * 
+ * @param FlagReturnTarget
+ * @desc "Registration Flag Update Win Only" sets the targets for which flag updates will not be performed.
+ * @text Registration flag update target
+ * @type combo[]
+ * @option "_enemyBookFlags"
+ * @option "_enemyBookStatusFlags"
+ * @option "_defeatNumber"
+ * @option "_itemDorps"
+ * @option "_condItemDorps"
+ * @option "_stealItem"
+ * @option "_enemyBookElementFlags"
+ * @option "_enemyBookStateFlags"
+ * @option "_enemyBookActionFlags"
+ * @option "_enemyBookDebuffFlags"
+ * @default ["\"_enemyBookStatusFlags\"","\"_defeatNumber\"","\"_itemDorps\""]
+ * @parent FlagOnVictory
  * 
  * @param MapEncountEnemySetting
  * @text Map encounter enemy character setting
@@ -2267,6 +2298,8 @@
 * @value 2
 * @option End of battle
 * @value 4
+* @option Victory
+* @value 5
 * @option No registration
 * @value 10
 * @default 0
@@ -3055,7 +3088,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.22.5
+ * @version 2.23.0
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3276,9 +3309,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2025/5/28 Ver.2.22.5
+ * 2025/5/12 Ver.2.23.0
+ * 登録対象に勝利時を追加。
+ * 勝利した時のみ図鑑を更新する機能を追加。
+ * 2025/4/28 Ver.2.22.5
  * アナライズ時にページ表示を非表示にした際に、画面上部にページ画面が表示されてしまう問題を修正。
- * 2025/5/27 Ver.2.22.4
+ * 2025/4/27 Ver.2.22.4
  * NUUN_EnemyBookEX_1更新による処理の追加。
  * 2025/2/11 Ver.2.22.3
  * キャンセル時のアクターコマンド、パーティコマンドのアクティブ化の処理を修正。
@@ -3606,41 +3642,6 @@
  * @default 0
  * @parent BasicSetting
  * 
- * @param RegistrationTiming
- * @desc モンスターの図鑑への登録方法を設定します。
- * @text 図鑑登録設定
- * @type struct<RegistrationTimingList>[]
- * @default ["{\"RegistrationTiming\":\"0\",\"RegisterStatus\":\"true\"}"]
- * @parent BasicSetting
- * 
- * @param TransformDefeat
- * @desc 変身前の敵を撃破したものとみなします。
- * @text 変身前撃破
- * @type boolean
- * @default true
- * @parent BasicSetting
- * 
- * @param NoDataName
- * @desc 図鑑に登録しない名前を指定します。名前空欄はデフォルトで登録されません。
- * @text 登録しない名前
- * @type string
- * @default 
- * @parent BasicSetting
- * 
- * @param NoBookTag
- * @desc 図鑑に登録しないタグ名。
- * @text 図鑑登録なしタグ
- * @type string
- * @default NoBook
- * @parent BasicSetting
- * 
- * @param NoBookDataTag
- * @desc 図鑑に登録しないタグ名。敵の情報、アナライズ時は表示されます。
- * @text 図鑑登録なしタグ2
- * @type string
- * @default NoBookData
- * @parent BasicSetting
- * 
  * @param DecimalMode
  * @text 端数処理四捨五入
  * @desc 表示外小数点を四捨五入で丸める。（falseで切り捨て）
@@ -3707,12 +3708,75 @@
  * @default 
  * @parent BasicSetting
  * 
+ * @param RegistrationSetting
+ * @text 図鑑登録設定
+ * @default ------------------------------
+ * 
+ * @param RegistrationTiming
+ * @desc モンスターの図鑑への登録方法を設定します。
+ * @text 図鑑登録設定
+ * @type struct<RegistrationTimingList>[]
+ * @default ["{\"RegistrationTiming\":\"0\",\"RegisterStatus\":\"true\"}"]
+ * @parent RegistrationSetting
+ * 
+ * @param TransformDefeat
+ * @desc 変身前の敵を撃破したものとみなします。
+ * @text 変身前撃破
+ * @type boolean
+ * @default true
+ * @parent RegistrationSetting
+ * 
+ * @param NoDataName
+ * @desc 図鑑に登録しない名前を指定します。名前空欄はデフォルトで登録されません。
+ * @text 登録しない名前
+ * @type string
+ * @default 
+ * @parent RegistrationSetting
+ * 
+ * @param NoBookTag
+ * @desc 図鑑に登録しないタグ名。
+ * @text 図鑑登録なしタグ
+ * @type string
+ * @default NoBook
+ * @parent RegistrationSetting
+ * 
+ * @param NoBookDataTag
+ * @desc 図鑑に登録しないタグ名。敵の情報、アナライズ時は表示されます。
+ * @text 図鑑登録なしタグ2
+ * @type string
+ * @default NoBookData
+ * @parent RegistrationSetting
+ * 
  * @param ActualEnemyMask
  * @type boolean
  * @default true
  * @text モンスター原寸大未登録シルエット
  * @desc 情報が未登録のモンスターの原寸大表示をシルエットにします。
- * @parent BasicSetting
+ * @parent RegistrationSetting
+ * 
+ * @param FlagOnVictory
+ * @desc 勝利のみフラグの更新を行います。
+ * @text フラグ更新勝利のみ
+ * @type boolean
+ * @default false
+ * @parent RegistrationSetting
+ * 
+ * @param FlagReturnTarget
+ * @desc フラグ更新勝利のみでフラグ更新を行わない対象を設定します。
+ * @text フラグ更新対象
+ * @type combo[]
+ * @option "_enemyBookFlags"
+ * @option "_enemyBookStatusFlags"
+ * @option "_defeatNumber"
+ * @option "_itemDorps"
+ * @option "_condItemDorps"
+ * @option "_stealItem"
+ * @option "_enemyBookElementFlags"
+ * @option "_enemyBookStateFlags"
+ * @option "_enemyBookActionFlags"
+ * @option "_enemyBookDebuffFlags"
+ * @default ["\"_enemyBookStatusFlags\"","\"_defeatNumber\"","\"_itemDorps\""]
+ * @parent FlagOnVictory
  * 
  * @param MapEncountEnemySetting
  * @text マップエンカウント敵キャラ設定
@@ -5413,6 +5477,8 @@
  * @value 2
  * @option 戦闘終了時
  * @value 4
+ * @option 勝利時
+ * @value 5
  * @option 登録なし
  * @value 10
  * @default 0
@@ -6222,6 +6288,8 @@ const PageNextSymbol = NuunManager.getStringCode(parameters['PageNextSymbol']);
 const PagePreviousSymbol = NuunManager.getStringCode(parameters['PagePreviousSymbol']);
 const ActualEnemyMask = eval(parameters['ActualEnemyMask'] || 'true');
 const EnemyGraphicMode = Number(parameters['EnemyGraphicMode'] || 0);
+const FlagOnVictory = eval(parameters['FlagOnVictory'] || 'false');
+const FlagReturnTarget = DataManager.nuun_structureData(parameters['FlagReturnTarget']);
 
 const RegistrationTiming = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['RegistrationTiming'])) : [];
 const RegistrationEnemyColor = (DataManager.nuun_structureData(parameters['RegistrationEnemyColor'])) || 0;
@@ -6638,6 +6706,49 @@ DataManager.extractSaveContents = function(contents) {
     _initEnemyBookList();
 };
 
+
+const _BattleManager_initMembers = BattleManager.initMembers;
+BattleManager.initMembers = function() {
+    _BattleManager_initMembers.call(this);
+    this.analyzeMissMessage = null;
+    this.enemyBook_Open = false;
+    this._enemyBookData = {};
+    this._updateBookEnemies = [];
+    this.setEnemyDataBeforeBattleStart();
+};
+
+const _BattleManager_isBusy = BattleManager.isBusy;
+BattleManager.isBusy = function() {
+    return this.enemyBookIsBusy() || _BattleManager_isBusy.call(this);
+};
+
+BattleManager.enemyBookIsBusy = function() {
+    return this.enemyBook_Open;
+};
+
+BattleManager.setEnemyBookWinsow = function(window) {
+    return this.enemyBookWindow = window;
+};
+
+const _BattleManager_startAction = BattleManager.startAction;
+BattleManager.startAction = function() {
+    _BattleManager_startAction.call(this);
+    this.setEnemyBookAction();
+};
+
+BattleManager.setEnemyBookAction = function() {
+    const subject = this._subject;
+    if (subject.isEnemy() && this._action) {
+        const actionId = subject.enemy().actions.findIndex(action => action.skillId === this._action.item().id);
+        $gameSystem.setEnemyBookActionFlag(subject.enemyId(), actionId, true);
+    }
+};
+
+const _BattleManager_setup = BattleManager.setup;
+BattleManager.setup = function(troopId, canEscape, canLose) {
+    _BattleManager_setup.apply(this, arguments);
+};
+
 BattleManager.isOpenEnemyBook = function() {
     if (this.enemyBook_Open) {
         switch (_bookMode) {
@@ -6650,6 +6761,63 @@ BattleManager.isOpenEnemyBook = function() {
         }
     }
     return false;
+};
+
+BattleManager.setEnemyDataBeforeBattleStart = function() {
+    if (!FlagOnVictory) return;
+    //戦闘開始時に図鑑情報を保存
+    for (const target of FlagReturnTarget) {
+        const method = $gameSystem[target] || [];
+        this._enemyBookData[target] = method.clone();
+    }
+};
+
+BattleManager.setUpdateBookEnemy = function(id) {
+    if (!this._updateBookEnemies.includes(id)) {
+        this._updateBookEnemies.push(id);
+    }
+};
+
+const _BattleManager_endBattle = BattleManager.endBattle;
+BattleManager.endBattle = function(result) {
+    _BattleManager_endBattle.apply(this, arguments);
+    this.isReturnEnemyData(result);
+};
+
+BattleManager.registrationVictory = function(result) {
+    if (result !== 0) return;
+    const registrationTiming = $gameSystem.registrationTiming(5);
+    const registrationStatusTiming = $gameSystem.registrationStatusTiming(5);
+    if (registrationTiming || registrationStatusTiming) {
+        for (const id of this._updateBookEnemies) {
+            const enemyId = getTransformEnemy(id);
+            if (registrationTiming) {
+                $gameSystem.addToEnemyBook(enemyId);
+            }
+            if (registrationStatusTiming) {
+                if (!$gameSystem.getEnemyBookFlag(enemyId)) {
+                    $gameSystem.addToEnemyBook(enemyId);
+                }
+                $gameSystem.addStatusToEnemyBook(enemyId);
+            }
+        }
+    } 
+};
+
+BattleManager.isReturnEnemyData = function(result) {
+    if (FlagOnVictory && result !== 0) {
+        this.returnEnemyData();
+    }
+};
+
+BattleManager.returnEnemyData = function() {
+    for (const id of this._updateBookEnemies) {
+        const enemyId = getTransformEnemy(id);
+        for (const data in this._enemyBookData) {
+            const method = $gameSystem[data] || [];
+            method[enemyId] = this._enemyBookData[data][enemyId];
+        }
+    }
 };
 
 //Game_System
@@ -6781,21 +6949,21 @@ Game_System.prototype.clearEnemyBook = function() {
 };
 
 Game_System.prototype.completeEnemyBook = function() {
-  for (let i = 1; i < $dataEnemies.length; i++) {
-    this.addToEnemyBook(i);
-    this.addStatusToEnemyBook(i);
-    this.dropItemListFlag(i, 0, true, false);
-    this.stealItemListFlag(i, 0, true, false);
-    this.enemyBookActionList(i, 0, false, true);
-    if (Imported.NUUN_EnemyBookEX_1) {
-      this.enemyBookElementList(i, 0, false, true);
-      this.enemyBookStateList(i, 0, false, true);
-      this.enemyBookDebuffList(i, 0, false, true);
+    for (let i = 1; i < $dataEnemies.length; i++) {
+        this.addToEnemyBook(i);
+        this.addStatusToEnemyBook(i);
+        this.dropItemListFlag(i, 0, true, false);
+        this.stealItemListFlag(i, 0, true, false);
+        this.enemyBookActionList(i, 0, false, true);
+        if (Imported.NUUN_EnemyBookEX_1) {
+        this.enemyBookElementList(i, 0, false, true);
+        this.enemyBookStateList(i, 0, false, true);
+        this.enemyBookDebuffList(i, 0, false, true);
+        }
+        if (Imported.NUUN_EnemyBookEX_2) {
+        this.condDropItemListFlag(i, 0, true, false);
+        }
     }
-    if (Imported.NUUN_EnemyBookEX_2) {
-      this.condDropItemListFlag(i, 0, true, false);
-    }
-  }
 };
 
 Game_System.prototype.getEnemyBookFlag = function(enemyId) {
@@ -6804,7 +6972,7 @@ Game_System.prototype.getEnemyBookFlag = function(enemyId) {
 
 Game_System.prototype.getEnemyBookStatusFlag = function(enemyId) {
     return this._enemyBookStatusFlags ? this._enemyBookStatusFlags[enemyId] : false;
-  };
+};
 
 Game_System.prototype.isInEnemyBook = function(enemy) {
   return enemy && enemy.name && this.noEnemyBookEnemyName(enemy) && this._enemyBookFlags && this._enemyBookFlags[enemy.id];
@@ -7243,6 +7411,7 @@ Game_Troop.prototype.setup = function(troopId) {
     for (const enemy of this.members()) {
         if (enemy.isAppeared()) {
         const enemyId = enemy.enemyId();
+        BattleManager.setUpdateBookEnemy(enemyId);
         if ($gameSystem.registrationTiming(0)) {
             $gameSystem.addToEnemyBook(enemyId);
         }
@@ -7256,19 +7425,13 @@ Game_Troop.prototype.setup = function(troopId) {
     }
 };
 
-
-const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
-Game_Enemy.prototype.initMembers = function() {
-    _Game_Enemy_initMembers .call(this);
-    this._enemyDefeat = false;
-};
-
 const _Game_BattlerBase_appear = Game_BattlerBase.prototype.appear;
 Game_BattlerBase.prototype.appear = function() {
      _Game_BattlerBase_appear.call(this);
     if (this.isEnemy()) {
         const enemyId = this.enemyId();
         if ($gameTroop.inBattle()) {
+            BattleManager.setUpdateBookEnemy(enemyId);
             if ($gameSystem.registrationTiming(0)) {
                 $gameSystem.addToEnemyBook(enemyId);
             }
@@ -11437,6 +11600,15 @@ Window_EnemyBook.prototype.unknownDataLength = function(name) {
     }
 };
 
+Window_EnemyBook.prototype.resetTextColor = function() {
+    if (this.enmeyBookItemColor > 0) {
+        this.changeTextColor(ColorManager.textColor(this.enmeyBookItemColor));
+        this.enmeyBookItemColor = 0;
+    } else {
+        Window_Base.prototype.resetTextColor.apply(this, arguments);
+    }
+};
+
 function Window_BattleEnemyBook() {
     this.initialize(...arguments);
 }
@@ -12101,40 +12273,6 @@ Sprite_EnemyBookCharacter.prototype.setup = function(battler) {
     this.setCharacter(character);
 };
 
-
-const _BattleManager_initMembers = BattleManager.initMembers;
-BattleManager.initMembers = function() {
-    _BattleManager_initMembers.call(this);
-    this.analyzeMissMessage = null;
-    this.enemyBook_Open = false;
-};
-
-const _BattleManager_isBusy = BattleManager.isBusy;
-BattleManager.isBusy = function() {
-    return this.enemyBookIsBusy() || _BattleManager_isBusy.call(this);
-};
-
-BattleManager.enemyBookIsBusy = function() {
-    return this.enemyBook_Open;
-};
-
-BattleManager.setEnemyBookWinsow = function(window) {
-    return this.enemyBookWindow = window;
-};
-
-const _BattleManager_startAction = BattleManager.startAction;
-BattleManager.startAction = function() {
-    _BattleManager_startAction.call(this);
-    this.setEnemyBookAction();
-};
-
-BattleManager.setEnemyBookAction = function() {
-    const subject = this._subject;
-    if (subject.isEnemy() && this._action) {
-        const actionId = subject.enemy().actions.findIndex(action => action.skillId === this._action.item().id);
-        $gameSystem.setEnemyBookActionFlag(subject.enemyId(), actionId, true);
-    }
-};
 
 function getElementTextName(no) {
     if (no < 0) {

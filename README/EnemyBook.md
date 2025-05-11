@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.22.5
+# Ver.2.23.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -259,6 +259,20 @@ mapEnemyを記入の場合は現在のマップのモンスターが表示され
 `<NoDropProbability>`  
 このタグを記入したアイテムはドロップアイテムの確率表示を表示しません。  
 
+### 勝利のみフラグの更新
+モンスターの登録を勝利時のみ更新いたします。戦闘中は更新されますが勝利以外で戦闘終了した場合は戦闘開始時の登録情報に戻されます。  
+_enemyBookFlags：登録情報  
+_enemyBookStatusFlags：ステータス登録情報  
+_defeatNumber：撃破数  
+_itemDorps：ドロップアイテム  
+_condItemDorps：条件付きドロップアイテム  
+_stealItem：盗んだアイテム  
+_enemyBookElementFlags：属性耐性情報  
+_enemyBookStateFlags：ステート耐性情報  
+_enemyBookActionFlags：スキル情報  
+_enemyBookDebuffFlags：デバフ耐性情報  
+
+
 ### 完成度ウィンドウ設定
 図鑑の完成度などを表示します。複数設定の場合はスクロールして表示させます。  
 表示させる完成度の項目設定は表示項目設定から設定します。  
@@ -286,6 +300,9 @@ PgUp PgDnキー：モンスターページ送り
 `_ctbWindow`: NRP_VisualTurn  
 
 ## 更新履歴
+2025/5/12 Ver.2.23.0  
+登録対象に勝利時を追加。  
+勝利した時のみ図鑑を更新する機能を追加。  
 2025/5/28 Ver.2.22.5  
 アナライズ時にページ表示を非表示にした際に、画面上部にページ画面が表示されてしまう問題を修正。  
 2025/5/27 Ver.2.22.4  

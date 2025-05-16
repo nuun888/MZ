@@ -4,6 +4,8 @@
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 #### オプションプラグイン
+※Ver.1.1.1よりNUUN_MenuParamListBaseが必要になってしまった関係で別プラグイン化になりました。  
+サブウィンドウの設定のみ別プラグインの設定となりますのでVer.1.1.0での設定をコピペ等で移行してから更新を行ってください。  
 [ファストトラベルサブウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FastTravel_SubWindow.js)  
 
 ファストトラベルを実装します。  

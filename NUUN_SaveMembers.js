@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.4
+ * @version 1.0.5
  * 
  * @help
  * Implement a function to register and call parties in a specified party order.
@@ -24,6 +24,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/23/2025 Ver.1.0.5
+ * Added the ability to specify the coordinates of the window during battle (when using NUUN_SceneFormation).
  * 5/5/2025 Ver.1.0.4
  * Fixed an issue where the registered member window would appear misaligned during battle.
  * Fixed an issue where the member change screen would close and actor commands would be activated when viewing the party registration screen during battle.
@@ -262,7 +264,7 @@
  * @max 9999
  * @min -9999
  * @default 56
- * @parent SceneFormationSetting
+ * @parent OpenSaveMembersSymbol
  * 
  * @param OpenSaveMembersButton_Y
  * @text Button Y coordinate
@@ -271,7 +273,79 @@
  * @max 9999
  * @min -9999
  * @default 2
+ * @parent OpenSaveMembersSymbol
+ * 
+ * @param SceneFormationCommandWindowSetting
+ * @text In-battle command window settings
+ * @default ------------------------------
  * @parent SceneFormationSetting
+ * 
+ * @param BattleCommand_X
+ * @text X coordinate of command window during battle
+ * @desc X coordinate of command window during battle.
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SceneFormationCommandWindowSetting
+ * 
+ * @param BattleCommand_Y
+ * @text Y coordinate of command window during battle
+ * @desc Y coordinate of command window during battle.
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SceneFormationCommandWindowSetting
+ * 
+ * @param BattleCommand_Width
+ * @text Command window width during battle
+ * @desc Command window width during battle.
+ * @type number
+ * @default 0
+ * @parent SceneFormationCommandWindowSetting
+ * 
+ * @param SceneFormationSaveMembersWindowSetting
+ * @text In-battle registration party window settings
+ * @default ------------------------------
+ * @parent SceneFormationSetting
+ * 
+ * @param BattleSaveMembers_X
+ * @text X coordinate of registered party window during battle
+ * @desc X coordinate of registered party window during battle.
+ * @type number
+ * @default 320
+ * @min -9999
+ * @parent SceneFormationSaveMembersWindowSetting
+ * 
+ * @param BattleSaveMembers_Y
+ * @text Y coordinate of registered party window during battle
+ * @desc Y coordinate of registered party window during battle.
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SceneFormationSaveMembersWindowSetting
+ * 
+ * @param SceneFormationSaveMembersButtonSetting
+ * @text In-battle button settings
+ * @default ------------------------------
+ * @parent SceneFormationSetting
+ * 
+ * @param OpenSaveMembersBattleButton_X
+ * @text Button X coordinate during battle
+ * @desc X coordinate of registered party display button during battle.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 56
+ * @parent SceneFormationSaveMembersButtonSetting
+ * 
+ * @param OpenSaveMembersBattleButton_Y
+ * @text Button Y coordinate during battle
+ * @desc Y coordinate of registered party display button during battle.
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
+ * @parent SceneFormationSaveMembersButtonSetting
  * 
  */
 /*~struct~SoundEffect:
@@ -310,7 +384,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.4
+ * @version 1.0.5
  * 
  * @help
  * 指定のパーティの並び順をパーティを登録、呼び出しする機能を実装します。
@@ -322,6 +396,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/5/23 Ver.1.0.5
+ * 戦闘中のウィンドウの座標を指定できる機能を追加。(NUUN_SceneFormation使用時)
  * 2025/5/5 Ver.1.0.4
  * 戦闘中に登録メンバーウィンドウがずれて表示される問題を修正。
  * 戦闘中にパーティ登録画面を表示するときに、メンバー変更画面が閉じ、アクターコマンドがアクティブ化する問題を修正。
@@ -561,7 +637,7 @@
  * @max 9999
  * @min -9999
  * @default 56
- * @parent SceneFormationSetting
+ * @parent OpenSaveMembersSymbol
  * 
  * @param OpenSaveMembersButton_Y
  * @text ボタンY座標
@@ -570,7 +646,79 @@
  * @max 9999
  * @min -9999
  * @default 2
+ * @parent OpenSaveMembersSymbol
+ * 
+ * @param SceneFormationCommandWindowSetting
+ * @text 戦闘中コマンドウィンドウ設定
+ * @default ------------------------------
  * @parent SceneFormationSetting
+ * 
+ * @param BattleCommand_X
+ * @text 戦闘中コマンドウィンドウX座標
+ * @desc 戦闘中のコマンドウィンドウX座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SceneFormationCommandWindowSetting
+ * 
+ * @param BattleCommand_Y
+ * @text 戦闘中コマンドウィンドウY座標
+ * @desc 戦闘中のコマンドウィンドウY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SceneFormationCommandWindowSetting
+ * 
+ * @param BattleCommand_Width
+ * @text 戦闘中コマンドウィンドウ横幅
+ * @desc 戦闘中のコマンドーウィンドウ横幅
+ * @type number
+ * @default 0
+ * @parent SceneFormationCommandWindowSetting
+ * 
+ * @param SceneFormationSaveMembersWindowSetting
+ * @text 戦闘中登録パーティウィンドウ設定
+ * @default ------------------------------
+ * @parent SceneFormationSetting
+ * 
+ * @param BattleSaveMembers_X
+ * @text 戦闘中登録パーティウィンドウX座標
+ * @desc 戦闘中の登録パーティウィンドウX座標
+ * @type number
+ * @default 320
+ * @min -9999
+ * @parent SceneFormationSaveMembersWindowSetting
+ * 
+ * @param BattleSaveMembers_Y
+ * @text 戦闘中登録パーティウィンドウY座標
+ * @desc 戦闘中の登録パーティウィンドウY座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent SceneFormationSaveMembersWindowSetting
+ * 
+ * @param SceneFormationSaveMembersButtonSetting
+ * @text 戦闘中ボタン設定
+ * @default ------------------------------
+ * @parent SceneFormationSetting
+ * 
+ * @param OpenSaveMembersBattleButton_X
+ * @text 戦闘中ボタンX座標
+ * @desc 戦闘中の登録パーティ表示ボタンのX座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 56
+ * @parent SceneFormationSaveMembersButtonSetting
+ * 
+ * @param OpenSaveMembersBattleButton_Y
+ * @text 戦闘中ボタンY座標
+ * @desc 戦闘中の登録パーティ表示ボタンのY座標
+ * @type number
+ * @max 9999
+ * @min -9999
+ * @default 2
+ * @parent SceneFormationSaveMembersButtonSetting
  * 
  */
 /*~struct~SoundEffect:ja
@@ -910,16 +1058,16 @@ Imported.NUUN_SaveMembers = true;
     };
 
     Scene_Battle.prototype.saveMembersCommandWindowRect = function() {
-        const ww = params.Command_Width > 0 ? params.Command_Width : this.mainCommandWidth();
+        const ww = params.BattleCommand_Width > 0 ? params.BattleCommand_Width : this.mainCommandWidth();
         const wh = this.calcWindowHeight(3, true);
-        const wx = params.Command_X;
-        const wy = params.Command_Y + this.buttonY();
+        const wx = params.BattleCommand_X;
+        const wy = params.BattleCommand_Y + this.buttonY();
         return new Rectangle(wx, wy, ww, wh);
     };
 
     Scene_Battle.prototype.saveMembersWindowRect = function() {
-        const wx = params.SaveMembers_X;
-        const wy = params.SaveMembers_Y + this.buttonY();
+        const wx = params.BattleSaveMembers_X;
+        const wy = params.BattleSaveMembers_Y + this.buttonY();
         const ww = this.nuun_SaveMemberWindowWidth();
         const wh = 32 + params.SaveMembers_Rows * (params.MemberHeight + Window_Selectable.prototype.rowSpacing.call(this));
         return new Rectangle(wx, wy, ww, wh);
@@ -935,10 +1083,18 @@ Imported.NUUN_SaveMembers = true;
 
     Scene_Base.prototype.createSaveMembersRegistrationButton = function() {
         this._registrationButton = new Sprite_Button(params.OpenSaveMembersSymbol);
-        this._registrationButton.x = params.OpenSaveMembersButton_X;
-        this._registrationButton.y = params.OpenSaveMembersButton_Y;
+        this._registrationButton.x = this.getOpenSaveMembersButtonX();
+        this._registrationButton.y = this.getOpenSaveMembersButtonY();
         this.addWindow(this._registrationButton);
         this._registrationButton.visible = false;
+    };
+
+    Scene_Base.prototype.getOpenSaveMembersButtonX = function() {
+        return params.OpenSaveMembersButton_X;
+    };
+
+    Scene_Base.prototype.getOpenSaveMembersButtonY = function() {
+        return params.OpenSaveMembersButton_Y;
     };
 
     Scene_Base.prototype.needsSaveMembersEraseButton = function() {
@@ -948,6 +1104,15 @@ Imported.NUUN_SaveMembers = true;
     Scene_Base.prototype.needsSaveMembersRegistrationButton = function() {
         return true;
     };
+
+    Scene_Battle.prototype.getOpenSaveMembersButtonX = function() {
+        return params.OpenSaveMembersBattleButton_X;
+    };
+
+    Scene_Battle.prototype.getOpenSaveMembersButtonY = function() {
+        return params.OpenSaveMembersBattleButton_Y;
+    };
+
 
     const _Scene_Formation_updatePageButtons = Scene_Formation.prototype.updatePageButtons;
     Scene_Formation.prototype.updatePageButtons = function() {

@@ -1,5 +1,5 @@
 # [ダメージポップアップ画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpImg.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagePopUpImg.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -15,6 +15,8 @@ TP用のポップアップ（ダメージ用、回復用）を追加する場合
 画像のインデックス番号は一番上から0で始まります。  
 
 ## 更新履歴
+2025/5/24 Ver 1.1.2  
+英語対応。  
 2022/3/27 Ver 1.1.1  
 ダメージポップアップのイメージインデックスがずれる問題を修正。  
 2022/1/8 Ver 1.1.0  

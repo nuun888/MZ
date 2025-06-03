@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.9
+ * @version 1.1.10
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/3/2025 Ver.1.1.10
+ * Fixed to allow equipment display settings to be made from external plugins.
  * 4/12/2025 Ver.1.1.9
  * Fixed processing due to gauge imaging update.
  * 2/8/2025 Ver.1.1.8
@@ -137,7 +139,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.9
+ * @version 1.1.10
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -148,6 +150,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/6/3 Ver.1.1.10
+ * 装備表示の外部プラグインからの設定を行えるように修正。
  * 2025/4/13 Ver.1.1.9
  * ゲージ画像化更新による処理の修正。
  * 2025/2/8 Ver.1.1.8
@@ -1371,6 +1375,91 @@ Imported.NUUN_MenuParamListBase = true;
                 w.drawTextEx(text, x, y, width);
             }
         }
+
+        nuun_DrawContentsElementChart(data, x, y, width, battler) {
+            if (!Imported.NUUN_RadarChartBase) {
+                return;
+            }
+            const w = this._window;
+            const nameText = data.ParamName;
+            let lineHeight = 0;
+            if (nameText) {
+                if (data.Icon && data.Icon > 0) {
+                    w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                    const iconWidth = ImageManager.iconWidth + 4;
+                    x += iconWidth;
+                    width -= iconWidth;
+                }
+                w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+                w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+                this.nuun_SetContentsFontFace(data);
+                const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+                w.drawText(nameText, x, y, textWidth);
+                lineHeight += w.lineHeight();
+            }
+            w.resetTextColor();
+            this.drawRadarChart(this.setElementChart(battler), battler, x, y + lineHeight ,'element');
+        }
+
+        setElementChart(battler) {
+            const data = [];
+            const list = this._window.getRadarChartElementList();
+            for (const element of list) {
+                let rate = battler.elementRate(element.ElementNo);
+                const elementName = $dataSystem.elements[element.ElementNo];
+                const elementIconId = element.ElementIconId || 0;
+                data.push(this._window.setRadarChart(elementName, rate, elementIconId, element.ValueX, element.ValueY));
+            }
+            return data;
+        }
+
+        nuun_DrawContentsStateChart(data, x, y, width, battler) {
+            if (!Imported.NUUN_RadarChartBase) {
+                return;
+            }
+            const w = this._window;
+            const nameText = data.ParamName;
+            let lineHeight = 0;
+            if (nameText) {
+                if (data.Icon && data.Icon > 0) {
+                    w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                    const iconWidth = ImageManager.iconWidth + 4;
+                    x += iconWidth;
+                    width -= iconWidth;
+                }
+                w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+                w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+                this.nuun_SetContentsFontFace(data);
+                const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+                w.drawText(nameText, x, y, textWidth);
+                lineHeight += w.lineHeight();
+            }
+            w.resetTextColor();
+            this.drawRadarChart(this.setStateChart(battler), battler, x, y + lineHeight ,'element');
+        }
+
+        setStateChart(battler) {
+            const data = [];
+            const list = this._window.getRadarChartStateList();
+            for (const state of list) {
+                let stateId = state.StateId;
+                let rate = battler.stateRate(stateId);
+                rate *= battler.isStateResist(stateId) ? 0 : 1;
+                const stateName = $dataStates[stateId].name;
+                const iconId = $dataStates[stateId].iconIndex || 0;
+                data.push(this.setRadarChart(stateName, rate, iconId, state.ValueX, state.ValueY));
+            }
+            return data;
+        }
+
+        drawRadarChart(list, battler, x, y, type) {
+            const key = "radarChart_%1".format(type);
+            const sprite = this._window.createInnerSprite(key, Sprite_NUUN_RadarChart);
+            sprite.setupChartColor(type);
+            sprite.setup(battler, type, list);
+            sprite.move(x, y);
+            sprite.show();
+        }
     
         nuun_drawSvActorImg(data, x, y, width, actor, fmt) {
             const key = fmt.format(actor.actorId());
@@ -1511,15 +1600,23 @@ Imported.NUUN_MenuParamListBase = true;
         }
 
         getEquipNameVisible() {
-            return params.EquipNameVisible;
+            return this.getExEquipBaseApply() ? this.getExEquipNameVisible() : params.EquipNameVisible;
         }
 
         getEquipIconId(index) {
-            return params.EquipIcons && params.EquipIcons[index] ? params.EquipIcons[index].EquipIconId : 0;
+            return this.getExEquipBaseApply() ? this.getExEquipIconId(index) : (params.EquipIcons && params.EquipIcons[index] ? params.EquipIcons[index].EquipIconId : 0);
+        }
+
+        getInvalidSlotHide() {
+            return this.getExEquipBaseApply() ? this.getExInvalidSlotHide() : params.InvalidSlotHide;
+        }
+
+        getExEquipBaseApply() {
+            return false;
         }
     
         isShowSlot(actor, index) {
-            if (params.InvalidSlotHide) {
+            if (this.getInvalidSlotHide()) {
                 return !actor.isEquipTypeSealed(actor.equipSlots()[index]);
             } else {
                 return true;

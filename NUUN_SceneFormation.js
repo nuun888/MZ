@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.5
+ * @version 2.1.6
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -32,14 +32,16 @@
  * Key operation
  * Q key (default) Return to the previous member.
  * 
- * アクターのメモ欄
+ * Actor's notes
  * <BattleMemberFixed>
- * 戦闘メンバーから外すことは出来ません。
+ * They cannot be removed from the battle team.
  * 
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/3/2025 Ver.2.1.6
+ * Fixed so that equipment display can be done from this plugin.
  * 5/5/2025 Ver.2.1.5
  * Fixed an issue that caused the party registration screen to not open when on the menu screen.
  * Fixed an issue that caused the cursor to not switch between the member screen and battle screen when deleting a registered member.
@@ -452,6 +454,42 @@
  * @min 1
  * @max 4
  * @parent ContentsSetting
+ * 
+ * @param EquipSetting
+ * @text Equipment Settings
+ * @default 
+ * @parent ContentsSetting
+ * 
+ * @param EquipNameVisible
+ * @text Equipment part name display
+ * @desc Specify the equipment part name to be displayed.
+ * @type select
+ * @option None
+ * @value None
+ * @option Settings in "NUUN_MenuParamListBase"
+ * @value Base
+ * @option Parts only
+ * @value Name
+ * @option Iicon only
+ * @value Icon
+ * @option Icon, Part
+ * @value IconName
+ * @default Name
+ * @parent EquipSetting
+ * 
+ * @param EquipIcons
+ * @type struct<EquipIconsData>[]
+ * @text Equipment icon
+ * @desc Equipment icon set. The ID is the same as the equipment slot number.
+ * @default []
+ * @parent EquipSetting
+ * 
+ * @param InvalidSlotHide
+ * @text Hide sealed equipment
+ * @desc Equipment sealed with features will not be displayed.
+ * @type boolean
+ * @default false
+ * @parent EquipSetting
  * 
  * @param BackGroundSetting
  * @text Background Settings
@@ -1001,7 +1039,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.4
+ * @version 2.1.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1030,6 +1068,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/6/3 Ver.2.1.6
+ * 装備表示を当プラグインから行えるように修正。
  * 2025/5/5 Ver.2.1.5
  * メニュー画面でパーティ登録画面が開けなくなる問題を修正。
  * 登録メンバーを削除した際に、メンバー画面と戦闘画面のカーソルアクティブの移行が行われなくなる問題を修正。
@@ -1442,6 +1482,42 @@
  * @min 1
  * @max 4
  * @parent ContentsSetting
+ * 
+ * @param EquipSetting
+ * @text 装備設定
+ * @default 
+ * @parent ContentsSetting
+ * 
+ * @param EquipNameVisible
+ * @text 装備部位名表示
+ * @desc 表示する装備部位名を指定します。
+ * @type select
+ * @option なし
+ * @value None
+ * @option NUUN_MenuParamListBaseでの設定
+ * @value Base
+ * @option 部位のみ
+ * @value Name
+ * @option アイコンのみ
+ * @value Icon
+ * @option アイコン、部位
+ * @value IconName
+ * @default Name
+ * @parent EquipSetting
+ * 
+ * @param EquipIcons
+ * @type struct<EquipIconsData>[]
+ * @text 装備アイコン
+ * @desc 装備アイコンを設定します。IDは装備スロットの番号と同じです。
+ * @default []
+ * @parent EquipSetting
+ * 
+ * @param InvalidSlotHide
+ * @text 封印装備非表示
+ * @desc 特徴で封印されている装備を表示しません。
+ * @type boolean
+ * @default false
+ * @parent EquipSetting
  * 
  * @param BackGroundSetting
  * @text 背景設定
@@ -3880,6 +3956,22 @@ Imported.NUUN_SceneFormation = true;
 
         isActorPictureEXApp() {
             return _isActorPictureEXApp();
+        }
+
+        getExEquipNameVisible() {
+            return params.EquipNameVisible;
+        }
+
+        getExEquipBaseApply() {
+            return params.EquipNameVisible !== "Base";
+        }
+
+        getExEquipIconId(index) {
+            return params.EquipIcons && params.EquipIcons[index] ? params.EquipIcons[index].EquipIconId : 0;
+        }
+
+        getExInvalidSlotHide() {
+            return params.InvalidSlotHide;
         }
 
     };

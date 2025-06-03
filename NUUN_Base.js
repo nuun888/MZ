@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.10
+ * @version 1.7.11
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,7 +21,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 11/9/2024 Ver.1.0.0
+ * 6/3/2025 Ver.1.7.11
+ * Added error logging for certain processes.
+ * 11/9/2024 Ver.1.7.10
  * Added a warning display process when entering [] when acquiring meta.
  * 9/28/2024 Ver.1.7.9
  * Added a process to get the file name.
@@ -110,7 +112,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.10
+ * @version 1.7.11
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -120,6 +122,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/6/3 Ver.1.7.11
+ * 特定の処理でのエラーログを追加。
  * 2024/11/9 Ver.1.7.10
  * メタ取得時の[]記入の警告表示処理を追加。
  * 2024/9/28 Ver.1.7.9
@@ -223,14 +227,19 @@ const parameters = PluginManager.parameters('NUUN_Base');
 
 class Nuun_PluginParams {
     static getPluginParams(text) {//document.currentScript
-        const name = String(Utils.extractFileName(text.src).split('.').shift());
-        const params = PluginManager.parameters(name);
-        if (params) {
-            const pluginParam = new Nuun_PluginParamData(params);
-            pluginParam.setPluginName(name);
-            return pluginParam.getParameters();
+        try {
+            const name = String(Utils.extractFileName(text.src).split('.').shift());
+            const params = PluginManager.parameters(name);
+            if (params) {
+                const pluginParam = new Nuun_PluginParamData(params);
+                pluginParam.setPluginName(name);
+                return pluginParam.getParameters();
+            }
+            return {pluginName: name};
+        } catch (error) {
+            const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+            throw ["ParameterError", log];
         }
-        return {pluginName: name};
     }
 };
 

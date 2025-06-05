@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.13
+ * @version 2.6.14
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/6/5 Ver.2.6.14
+ * レーダーチャートに数値を表示する機能実装による更新。
  * 2025/4/13 Ver.2.6.13
  * ゲージ画像化更新による処理の修正。
  * 2025/4/12 Ver.2.6.12
@@ -767,6 +769,13 @@
  * @max 9999
  * @parent ElementRadarChart
  * 
+ * @param ElementRadarChartValueData
+ * @desc レーダーチャートに表示する数値設定。
+ * @text 数値設定
+ * @type struct<RadarChartValue>
+ * @default
+ * @parent ElementRadarChart
+ * 
  * @param StateRadarChart
  * @text ステート耐性レーダーチャート
  * @default ------------------------------
@@ -828,6 +837,13 @@
  * @type number
  * @default -12
  * @min -9999
+ * @parent StateRadarChart
+ * 
+ * @param StateRadarChartValueData
+ * @desc レーダーチャートに表示する数値設定。
+ * @text 数値設定
+ * @type struct<RadarChartValue>
+ * @default
  * @parent StateRadarChart
  * 
  */
@@ -943,6 +959,26 @@
  * @desc アイコンのIDを指定します。0の場合はデータベースのアイコンが表示されます。
  * @type icon
  * @default 0
+ * 
+ * @param RadarChartShowValue
+ * @text 数値の座標
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc レーダーチャートの数値の個別X座標。
+ * @text レーダーチャート数値個別X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc レーダーチャートの数値の個別Y座標。
+ * @text レーダーチャート数値個別Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
  *
  */
 /*~struct~EquipIconsData:
@@ -953,6 +989,26 @@
  * @type icon
  * @min 0
  * @default 0
+ * 
+ * @param RadarChartShowValue
+ * @text 数値の座標
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc レーダーチャートの数値の個別X座標。
+ * @text レーダーチャート数値個別X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc レーダーチャートの数値の個別Y座標。
+ * @text レーダーチャート数値個別Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
  *
  */
 /*~struct~PageListData:
@@ -1275,6 +1331,45 @@
  * @parent ImgSetting
  * 
  */
+/*~struct~RadarChartValue:
+ * 
+ * @param ShowValue
+ * @text 数値の表示
+ * @desc 数値を表示します。
+ * @type boolean
+ * @default false
+ * 
+ * @param ChartInsideValueX
+ * @desc レーダーチャートの数値のX座標。
+ * @text レーダーチャート数値X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ShowValue
+ * 
+ * @param ChartInsideValueY
+ * @desc レーダーチャートの数値のY座標。
+ * @text レーダーチャート数値Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ShowValue
+ * 
+ * @param UnitText
+ * @text 単位
+ * @desc 単位を記入します。
+ * @type string
+ * @default "%"
+ * @parent ShowValue
+ * 
+ * @param SystemUnitColor
+ * @text 単位色
+ * @desc 単位を色を指定します。
+ * @type color
+ * @default 16
+ * @parent ShowValue
+ * 
+ */
 /*~struct~ActorPictureDataList:
  * 
  * @param actorId
@@ -1397,6 +1492,7 @@ const ElementRadarChartMainColor2 = (DataManager.nuun_structureData(parameters['
 const ElementRadarChartX = Number(parameters['ElementRadarChartX'] || 0);
 const ElementRadarChartY = Number(parameters['ElementRadarChartY'] || 0);
 const ElementRadarChart_FontSize = Number(parameters['ElementRadarChart_FontSize'] || 0);
+const ElementRadarChartValueData = (DataManager.nuun_structureData(parameters['ElementRadarChartValueData']));
 const StateRadarChartRadius = Number(parameters['StateRadarChartRadius'] || 100);
 const StateRadarChartFramecolor = (DataManager.nuun_structureData(parameters['StateRadarChartFramecolor'])) || 0;
 const StateRadarChartLineColor = (DataManager.nuun_structureData(parameters['StateRadarChartFramecolor'])) || 0;
@@ -1406,6 +1502,7 @@ const StateRadarChartX = Number(parameters['StateRadarChartX'] || 0);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 0);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);
 const StartPage = Number(parameters['StartPage'] || 1);
+const StateRadarChartValueData = (DataManager.nuun_structureData(parameters['StateRadarChartValueData']));
 const ActorPictureData = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ActorPictureData'])) : null) || [];
 const ActorPictureEXApp = eval(parameters['ActorPictureEXApp'] || "true");
 
@@ -2668,87 +2765,91 @@ Window_Status.prototype.setActorStatusChart = function(actor) {
 };
 
 Window_Status.prototype.setActorElementChart = function(actor) {
-  const data = [];
-  for (const element of ElementResist) {
-    let rate = actor.elementRate(element.ElementNo);
-    const elementName = $dataSystem.elements[element.ElementNo];
-    const elementIconId = element.ElementIconId || 0;
-    data.push(this.setRadarChart(elementName, rate, elementIconId));
-  }
-  return data;
+    const data = [];
+    for (const element of ElementResist) {
+        let rate = actor.elementRate(element.ElementNo);
+        const elementName = $dataSystem.elements[element.ElementNo];
+        const elementIconId = element.ElementIconId || 0;
+        const x = element.ValueX || 0;
+        const y = element.ValueY || 0;
+        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y));
+    }
+    return data;
 };
 
 Window_Status.prototype.setActorStateChart = function(actor) {
-  const data = [];
-  for (const state of StateResist) {
-    let stateId = state.StateNo;
-    let rate = actor.stateRate(stateId);
-    rate *= actor.isStateResist(stateId) ? 0 : 1;
-    const stateName = $dataStates[stateId].name;
-    const iconId = !StateResistText ? $dataStates[stateId].iconIndex : 0;
-    data.push(this.setRadarChart(stateName, rate, iconId));
-  }
-  return data;
+    const data = [];
+    for (const state of StateResist) {
+        let stateId = state.StateNo;
+        let rate = actor.stateRate(stateId);
+        rate *= actor.isStateResist(stateId) ? 0 : 1;
+        const stateName = $dataStates[stateId].name;
+        const iconId = !StateResistText ? $dataStates[stateId].iconIndex : 0;
+        const x = state.ValueX || 0;
+        const y = state.ValueY || 0;
+        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y));
+    }
+    return data;
 };
 
 Window_Status.prototype.actorStatusRadarChart = function(list, actor, x, y, type) { 
-  const key = "actorRadarChart_%1".format(type);
-  const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
-  sprite.setupColor(StatusRadarChartFramecolor, StatusRadarChartLineColor, StatusRadarChartMainColor1, StatusRadarChartMainColor2);
-  sprite.setup(actor, type, list, StatusRadarChartRadius, StatusRadarChartX, StatusRadarChartY, StatusRadarChart_FontSize);
-  sprite.move(x, y);
-  sprite.show();
+    const key = "actorRadarChart_%1".format(type);
+    const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
+    sprite.setupColor(StatusRadarChartFramecolor, StatusRadarChartLineColor, StatusRadarChartMainColor1, StatusRadarChartMainColor2, type);
+    sprite.setup(actor, type, list, StatusRadarChartRadius, StatusRadarChartX, StatusRadarChartY, StatusRadarChart_FontSize);
+    sprite.move(x, y);
+    sprite.show();
 };
 
 Window_Status.prototype.actorElementRadarChart = function(list, actor, x, y, type) { 
-  const key = "actorRadarChart_%1".format(type);
-  const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
-  sprite.setupColor(ElementRadarChartFramecolor, ElementRadarChartLineColor, ElementRadarChartMainColor1, ElementRadarChartMainColor2);
-  sprite.setup(actor, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize);
-  sprite.move(x, y);
-  sprite.show();
+    const key = "actorRadarChart_%1".format(type);
+    const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
+    sprite.setupColor(ElementRadarChartFramecolor, ElementRadarChartLineColor, ElementRadarChartMainColor1, ElementRadarChartMainColor2, type);
+    sprite.setup(actor, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize, ElementRadarChartValueData);
+    sprite.move(x, y);
+    sprite.show();
 };
 
 Window_Status.prototype.actorStateRadarChart = function(list, actor, x, y, type) { 
-  const key = "actorRadarChart_%1".format(type);
-  const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
-  sprite.setupColor(StateRadarChartFramecolor, StateRadarChartLineColor, StateRadarChartMainColor1, StateRadarChartMainColor2);
-  sprite.setup(actor, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize);
-  sprite.move(x, y);
-  sprite.show();
+    const key = "actorRadarChart_%1".format(type);
+    const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
+    sprite.setupColor(StateRadarChartFramecolor, StateRadarChartLineColor, StateRadarChartMainColor1, StateRadarChartMainColor2, type);
+    sprite.setup(actor, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize, StateRadarChartValueData);
+    sprite.move(x, y);
+    sprite.show();
 };
 
 Window_Status.prototype.characterChipSprite = function(actor, x, y) {
-  const id = actor.actorId();
-  const type = 'character'
-  const key = "menu_%1".format(type);
-  const sprite = this.createInnerChipSprite(key, id, x, y);
-  sprite._character.setPosition(x + this.x, y + this.y);
-  sprite.updatePosition();
-  sprite.show();
+    const id = actor.actorId();
+    const type = 'character'
+    const key = "menu_%1".format(type);
+    const sprite = this.createInnerChipSprite(key, id, x, y);
+    sprite._character.setPosition(x + this.x, y + this.y);
+    sprite.updatePosition();
+    sprite.show();
 };
 
 Window_Status.prototype.svActoeSprite = function(actor, x, y) {
-  const type = 'sv_Actor'
-  const key = "menu_%1".format(type);
-  const sprite = this.createInnerSprite(key, Sprite_StatusSvActor);
-  sprite.setBattler(actor);
-  sprite.setActorPosition(x + this.x, y + this.y);
-  sprite.show();
+    const type = 'sv_Actor'
+    const key = "menu_%1".format(type);
+    const sprite = this.createInnerSprite(key, Sprite_StatusSvActor);
+    sprite.setBattler(actor);
+    sprite.setActorPosition(x + this.x, y + this.y);
+    sprite.show();
 };
 
 Window_StatusBase.prototype.createInnerChipSprite = function(key, id) {
-  const actorCharacter = new Game_MenuCharacter(id);
-  const dict = this._additionalSprites;
-  if (dict[key]) {
-    dict[key].setCharacter(actorCharacter);
-    return dict[key];
-  } else {
-    const sprite = new Sprite_MenuCharacter(actorCharacter);
-    dict[key] = sprite;
-    this.addInnerChild(sprite);
-    return sprite;
-  }
+    const actorCharacter = new Game_MenuCharacter(id);
+    const dict = this._additionalSprites;
+    if (dict[key]) {
+        dict[key].setCharacter(actorCharacter);
+        return dict[key];
+    } else {
+        const sprite = new Sprite_MenuCharacter(actorCharacter);
+        dict[key] = sprite;
+        this.addInnerChild(sprite);
+        return sprite;
+    }
 };
 
 Window_Status.prototype.placeExpGauge = function(actor, x, y) {

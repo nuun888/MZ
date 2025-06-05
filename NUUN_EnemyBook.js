@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.23.0
+ * @version 2.23.1
  * 
  * @help
  * Implement an enemy book.
@@ -229,7 +229,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 5/12/2025 Ver.2.22.5
+ * 6/5/2025 Ver.2.23.1
+ * Updated with the implementation of the function to display numerical values ​​on the radar chart.
+ * 5/12/2025 Ver.2.23.0
  * Added the ability to register when you win.
  * Added a function to update the encyclopedia only when you win.
  * 4/28/2025 Ver.2.22.5
@@ -1644,7 +1646,14 @@
 * @default -12
 * @min -9999
 * @parent ElementRadarChart
-* 
+ * 
+ * @param ElementRadarChartValueData
+ * @desc Set the values ​​to be displayed on the radar chart.
+ * @text Numerical Settings
+ * @type struct<RadarChartValue>
+ * @default
+ * @parent ElementRadarChart
+ * 
 * @param NUUN_EnemyBookEX_1
 * @text (Required NUUN_EnemyBookEX_1)
 * @default ------------------------------
@@ -1802,7 +1811,14 @@
 * @type boolean
 * @default true
 * @parent StateRadarChart
-* 
+ * 
+ * @param StateRadarChartValueData
+ * @desc Set the values ​​to be displayed on the radar chart.
+ * @text Numerical Settings
+ * @type struct<RadarChartValue>
+ * @default
+ * @parent StateRadarChart
+ * 
 * @param NUUN_EnemyBookEX_1_State
 * @text (requires NUUN_EnemyBookEX_1)
 * @default ------------------------------
@@ -2908,27 +2924,68 @@
 *
 */
 /*~struct~ElementData:
-* 
-* @param ElementNo
-* @desc Element number to display. (0: none, -1: physical damage rate, -2: magic damage rate)
-* @text Element number
-* @type number
-* @min -2
-* 
-* @param ElementIconId
-* @desc Specifies the ID of the icon.
-* @text Icon Id
-* @type icon
-* @min 0
-*/
-/*~struct~StateData:
-*
-* @param StateId
-* @desc The state to display.
-* @text display state
-* @type state
-*
-*/
+ * 
+ * @param ElementNo
+ * @desc Element number to display. (0: none, -1: physical damage rate, -2: magic damage rate)
+ * @text Element number
+ * @type number
+ * @min -2
+ * 
+ * @param ElementIconId
+ * @desc Specifies the ID of the icon.
+ * @text Icon Id
+ * @type icon
+ * @min 0
+ * 
+ * @param RadarChartShowValue
+ * @text Numeric coordinates
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc The individual x coordinate of a radar chart value.
+ * @text Radar chart numerical individual x coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc The individual y coordinate of a radar chart value.
+ * @text Radar chart numerical individual y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ */
+ /*~struct~StateData:
+ *
+ * @param StateId
+ * @desc The state to display.
+ * @text display state
+ * @type state
+ * 
+ * @param RadarChartShowValue
+ * @text Numeric coordinates
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc The individual x coordinate of a radar chart value.
+ * @text Radar chart numerical individual x coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc The individual y coordinate of a radar chart value.
+ * @text Radar chart numerical individual y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ *
+ */
 /*~struct~DebuffData:
 * 
 * @param ParamId
@@ -3039,6 +3096,45 @@
  * @default {"red":"0","green":"0","bule":"0"}
  * @type struct<WindowTone>
  *
+ */
+/*~struct~RadarChartValue:
+ * 
+ * @param ShowValue
+ * @text Numerical display
+ * @desc Displays numerical values.
+ * @type boolean
+ * @default false
+ * 
+ * @param ChartInsideValueX
+ * @desc The x-coordinate of the radar chart value.
+ * @text Radar chart numerical x coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ShowValue
+ * 
+ * @param ChartInsideValueY
+ * @desc The y-coordinate of the radar chart value.
+ * @text Radar chart numerical Y coordinate
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ShowValue
+ * 
+ * @param UnitText
+ * @text Unit
+ * @desc Enter the units.
+ * @type string
+ * @default "%"
+ * @parent ShowValue
+ * 
+ * @param SystemUnitColor
+ * @text Unit Color
+ * @desc Specify the unit as a color.
+ * @type color
+ * @default 16
+ * @parent ShowValue
+ * 
  */
 /*~struct~WindowTone:
  * 
@@ -3309,6 +3405,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/6/5 Ver.2.23.1
+ * レーダーチャートに数値を表示する機能実装による更新。
  * 2025/5/12 Ver.2.23.0
  * 登録対象に勝利時を追加。
  * 勝利した時のみ図鑑を更新する機能を追加。
@@ -4825,6 +4923,13 @@
  * @min -9999
  * @parent ElementRadarChart
  * 
+ * @param ElementRadarChartValueData
+ * @desc レーダーチャートに表示する数値設定。
+ * @text 数値設定
+ * @type struct<RadarChartValue>
+ * @default
+ * @parent ElementRadarChart
+ * 
  * @param NUUN_EnemyBookEX_1
  * @text (要NUUN_EnemyBookEX_1)
  * @default ------------------------------
@@ -4981,6 +5086,13 @@
  * @text アイコン表示
  * @type boolean
  * @default true
+ * @parent StateRadarChart
+ * 
+ * @param StateRadarChartValueData
+ * @desc レーダーチャートに表示する数値設定。
+ * @text 数値設定
+ * @type struct<RadarChartValue>
+ * @default
  * @parent StateRadarChart
  * 
  * @param NUUN_EnemyBookEX_1_State
@@ -6092,6 +6204,27 @@
  * @text アイコンID
  * @type icon
  * @min 0
+ * 
+ * @param RadarChartShowValue
+ * @text 数値の座標
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc レーダーチャートの数値の個別X座標。
+ * @text レーダーチャート数値個別X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc レーダーチャートの数値の個別Y座標。
+ * @text レーダーチャート数値個別Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
  */
 /*~struct~StateData:ja
  *
@@ -6099,6 +6232,26 @@
  * @desc 表示するステートです。
  * @text 表示ステート
  * @type state
+ * 
+ * @param RadarChartShowValue
+ * @text 数値の座標
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc レーダーチャートの数値の個別X座標。
+ * @text レーダーチャート数値個別X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc レーダーチャートの数値の個別Y座標。
+ * @text レーダーチャート数値個別Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
  *
  */
 /*~struct~DebuffData:ja
@@ -6210,7 +6363,47 @@
  * @desc ウィンドウの色の設定をします。
  * @default {"red":"0","green":"0","bule":"0"}
  * @type struct<WindowTone>
+ * 
  *
+ */
+/*~struct~RadarChartValue:ja
+ * 
+ * @param ShowValue
+ * @text 数値の表示
+ * @desc 数値を表示します。
+ * @type boolean
+ * @default false
+ * 
+ * @param ChartInsideValueX
+ * @desc レーダーチャートの数値のX座標。
+ * @text レーダーチャート数値X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ShowValue
+ * 
+ * @param ChartInsideValueY
+ * @desc レーダーチャートの数値のY座標。
+ * @text レーダーチャート数値Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent ShowValue
+ * 
+ * @param UnitText
+ * @text 単位
+ * @desc 単位を記入します。
+ * @type string
+ * @default "%"
+ * @parent ShowValue
+ * 
+ * @param SystemUnitColor
+ * @text 単位色
+ * @desc 単位を色を指定します。
+ * @type color
+ * @default 16
+ * @parent ShowValue
+ * 
  */
 /*~struct~WindowTone:ja
  * 
@@ -6394,6 +6587,7 @@ const ElementRadarChartMainColor2 = Number(parameters['ElementRadarChartMainColo
 const ElementRadarChartX = Number(parameters['ElementRadarChartX'] || 48);
 const ElementRadarChartY = Number(parameters['ElementRadarChartY'] || 48);
 const ElementRadarChart_FontSize = Number(parameters['ElementRadarChart_FontSize'] || 0);
+const ElementRadarChartValueData = (DataManager.nuun_structureData(parameters['ElementRadarChartValueData']));
 
 const StateList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StateList'])) : [];
 const StateUnknownIconId = Number(parameters['StateUnknownIconId'] || 1);
@@ -6410,6 +6604,7 @@ const StateRadarChartMainColor2 = Number(parameters['StateRadarChartMainColor2']
 const StateRadarChartX = Number(parameters['StateRadarChartX'] || 48);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 48);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);
+const StateRadarChartValueData = (DataManager.nuun_structureData(parameters['StateRadarChartValueData']));
 const RadarChartIcon = eval(parameters['RadarChartIcon'] || 'false');
 const ResistDebuffInState = eval(parameters['ResistDebuffInState'] || 'false');
 
@@ -11397,10 +11592,12 @@ Window_EnemyBook.prototype.enemyStateChart = function(list, enemy, x, y, width) 
 Window_EnemyBook.prototype.setEnemyElementChart = function(enemy) {
     const data = [];
     for (const element of ElementList) {
-      let rate = enemy.elementRate(element.ElementNo);
-      const elementName = $dataSystem.elements[element.ElementNo];
-      const elementIconId = element.ElementIconId || 0;
-      data.push(this.setRadarChart(elementName, rate, elementIconId));
+        let rate = enemy.elementRate(element.ElementNo);
+        const elementName = $dataSystem.elements[element.ElementNo];
+        const elementIconId = element.ElementIconId || 0;
+        const x = element.ValueX || 0;
+        const y = element.ValueY || 0;
+        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y));
     }
     return data;
 };
@@ -11408,12 +11605,14 @@ Window_EnemyBook.prototype.setEnemyElementChart = function(enemy) {
 Window_EnemyBook.prototype.setEnemyStateChart = function(enemy) {
     const data = [];
     for (const state of StateList) {
-      let stateId = state.StateId;
-      let rate = enemy.stateRate(stateId);
-      rate *= enemy.isStateResist(stateId) ? 0 : 1;
-      const stateName = $dataStates[stateId].name;
-      const iconId = RadarChartIcon ? $dataStates[stateId].iconIndex : 0;
-      data.push(this.setRadarChart(stateName, rate, iconId));
+        let stateId = state.StateId;
+        let rate = enemy.stateRate(stateId);
+        rate *= enemy.isStateResist(stateId) ? 0 : 1;
+        const stateName = $dataStates[stateId].name;
+        const iconId = RadarChartIcon ? $dataStates[stateId].iconIndex : 0;
+        const x = state.ValueX || 0;
+        const y = state.ValueY || 0;
+        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y));
     }
     return data;
 };
@@ -11422,7 +11621,7 @@ Window_EnemyBook.prototype.enemyElementRadarChart = function(list, enemy, x, y, 
     const key = "enemyRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(ElementRadarChartFramecolor, ElementRadarChartLineColor, ElementRadarChartMainColor1, ElementRadarChartMainColor2);
-    sprite.setup(enemy, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize);
+    sprite.setup(enemy, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize, ElementRadarChartValueData);
     sprite.move(x, y);
     sprite.show();
 };
@@ -11431,7 +11630,7 @@ Window_EnemyBook.prototype.enemyStateRadarChart = function(list, enemy, x, y, ty
     const key = "enemyRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(StateRadarChartFramecolor, StateRadarChartLineColor, StateRadarChartMainColor1, StateRadarChartMainColor2);
-    sprite.setup(enemy, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize);
+    sprite.setup(enemy, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize, StateRadarChartValueData);
     sprite.move(x, y);
     sprite.show();
 };

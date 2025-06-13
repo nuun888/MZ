@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc TPBタイムライン
  * @author NUUN
- * @version 1.1.8
+ * @version 1.1.9
  * 
  * @help
  * 戦闘画面にTPBタイムラインを表示します。
@@ -30,6 +30,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/6/14 Ver.1.1.9
+ * サポートアクターVer.2に対応。
  * 2023/7/17 Ver.1.1.8
  * キャストアイコンが表示されない問題を修正。
  * 2023/7/15 Ver.1.1.7
@@ -404,7 +406,7 @@
  * @min -9999
  * @parent EnemyActionSetting
  * 
- * @param Anti-conflict settings
+ * @param Anti-conflictSettings
  * @text 競合対策設定
  * @default ////////////////////////////////
  * 
@@ -417,7 +419,14 @@
  * @option Scene_Battle
  * @value 'Scene_Battle'
  * @default 'Sprite'
- * @parent SpecialSetting
+ * @parent Anti-conflictSettings
+ * 
+ * @param ShowSupportActor
+ * @desc タイムラインにサポートアクターを表示します。(Ver.2.0.0以降)
+ * @text サポートアクター表示
+ * @type boolean
+ * @default false
+ * @parent Anti-conflictSettings
  * 
  * 
  */
@@ -459,9 +468,14 @@ const EnemyLetterShow = eval(parameters['EnemyLetterShow'] || "true");
 const ActorCharged = Number(parameters['ActorCharged'] || 0);
 const EnemyCharged = Number(parameters['EnemyCharged'] || 0);
 const TimeLineDisplayMode = eval(parameters['TimeLineDisplayMode']) || 'Sprite';
+const ShowSupportActor = eval(parameters['ShowSupportActor'] || "true");
 
 function isDirectionUpDown() {
     return TimeLineDirection === 'up' || TimeLineDirection === 'down';
+};
+
+function _isShowSupportActor() {
+    return Imported.NUUN_SupportActor && !!$gameParty.battleOmitSupportMembers && ShowSupportActor;
 };
 
 const _Game_Temp_requestBattleRefresh = Game_Temp.prototype.requestBattleRefresh;
@@ -574,6 +588,9 @@ Spriteset_Battle.prototype.createTimeLineActor = function() {
         this.timeLineBattler = sprite;
     }
     this.timeLineActor = [];
+    if (!_isShowSupportActor()) {
+        $gameTemp.omitSupportMember = true;
+    }
     const members = $gameParty.battleMembers();
     for (let i = 0; i < members.length; i++) {
         const sprite = new Sprite_TimeLineActor();
@@ -605,8 +622,11 @@ Spriteset_Battle.prototype.updateTimeLineActor = function() {
         actor.setup(null);
         actor._battlerName = null;
     }
+    if (!_isShowSupportActor()) {
+        $gameTemp.omitSupportMember = true;
+    }
     const members = $gameParty.battleMembers();
-    this._tpbTimeLineActorMaxMembers = $gameParty.maxBattleMembers();
+    this._tpbTimeLineActorMaxMembers = members.length;
     for (let i = 0; i < this._tpbTimeLineActorMaxMembers; i++) {
         if (!this.timeLineActor[i]) {
             const sprite = new Sprite_TimeLineActor();

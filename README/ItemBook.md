@@ -1,5 +1,5 @@
 # [アイテム図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)
-# Ver.1.6.5
+# Ver.1.6.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemBook.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -90,6 +90,8 @@ desc1と記入した場合はアイテム、武器、防具のメモ欄に<desc1
 メモ欄のタグ記入時では付けないでください。  
 
 ## 更新履歴
+2025/6/14 Ver.1.6.6  
+カテゴリーが1以下の場合、カテゴリーを表示しないように修正。  
 2024/10/12 Ver.1.6.5  
 一部プラグインでの競合対応。  
 2023/12/29 Ver.1.6.4  

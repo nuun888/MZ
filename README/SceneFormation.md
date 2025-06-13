@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.2.1.6
+# Ver.2.1.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,8 @@
 `Window_FormationStatus` アクターステータスウィンドウ  
 
 ## 更新履歴
+2025/6/13 Ver.2.1.7  
+登録メンバーを登録した後、メンバー変更ウィンドウを閉じた場合にアクションが正しく設定されない問題を修正。  
 2025/6/3 Ver.2.1.6  
 装備表示を当プラグインから行えるように修正。  
 2025/5/5 Ver.2.1.5  

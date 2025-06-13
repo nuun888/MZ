@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.6
+ * @version 2.1.7
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/13/2025 Ver.2.1.7
+ * Fixed an issue where actions were not set correctly when closing the member change window after registering a member.
  * 6/3/2025 Ver.2.1.6
  * Fixed so that equipment display can be done from this plugin.
  * 5/5/2025 Ver.2.1.5
@@ -1039,7 +1041,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.6
+ * @version 2.1.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1068,6 +1070,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/6/13 Ver.2.1.7
+ * 登録メンバーを登録した後、メンバー変更ウィンドウを閉じた場合にアクションが正しく設定されない問題を修正。
  * 2025/6/3 Ver.2.1.6
  * 装備表示を当プラグインから行えるように修正。
  * 2025/5/5 Ver.2.1.5
@@ -2830,6 +2834,9 @@ Imported.NUUN_SceneFormation = true;
                 AudioManager.playOkRegistrationSe();
                 $gameSystem.setSaveMembers();
                 this._saveMembersWindow.refresh();
+                if (this._isBattle) {
+                    $gameTemp.formationRefresh = true;
+                }
             } else {
                 SoundManager.playBuzzer();
             }
@@ -2871,6 +2878,9 @@ Imported.NUUN_SceneFormation = true;
                 this._memberWindow.refresh();
                 this._battleMemberWindow.refresh();
                 this.onSaveMembersSelectCancel();
+                if (this._isBattle) {
+                    $gameTemp.formationRefresh = true;
+                }
             } else {
                 SoundManager.playBuzzer();
                 this._saveMembersWindow.activate();

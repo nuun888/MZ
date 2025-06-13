@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム図鑑
  * @author NUUN
- * @version 1.6.5
+ * @version 1.6.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -114,6 +114,8 @@
  * このプラグインはNUUN_Base Ver.1.3.0以降が必要です。
  * 
  * 更新履歴
+ * 2025/6/14 Ver.1.6.6
+ * カテゴリーが1以下の場合、カテゴリーを表示しないように修正。
  * 2024/10/12 Ver.1.6.5
  * 一部プラグインでの競合対応。
  * 2023/12/29 Ver.1.6.4
@@ -167,6 +169,19 @@
  * 特定の武器、防具タイプを表示しない機能を追加。
  * 2021/8/11 Ver.1.0.0
  * 初版
+ * 
+ * 
+ * @param RequireFiles
+ * @desc メモ欄から画像指定を行う画像で、デプロイメント時に削除を禁止する素材ファイルを指定します。
+ * @text デプロイメント時削除禁止ファイル
+ * @type file[]
+ * @dir img/
+ * @default 
+ * 
+ * @noteParam Itemimg
+ * @noteDir img/pictures
+ * @noteType file
+ * @noteData items
  * 
  * @command ItemBookOpen
  * @desc アイテム図鑑を開きます。
@@ -2073,14 +2088,16 @@ Scene_ItemBook.prototype.initialize = function() {
 };
 
 Scene_ItemBook.prototype.create = function() {
-  Scene_MenuBase.prototype.create.call(this);
-  this.createHelpWindow();
-  this.createPercentWindow();
-  this.createIndexWindow();
-  this.createItemPageWindow();
-  this.createItemWindow();
-  this.createCategoryWindow();
-  this.backgroundOpacity(this._helpWindow);
+    Scene_MenuBase.prototype.create.call(this);
+    this.createHelpWindow();
+    this.createPercentWindow();
+    this.createIndexWindow();
+    this.createItemPageWindow();
+    this.createItemWindow();
+    if (ItemBookCategory.length > 1) {
+        this.createCategoryWindow();
+    }
+    this.backgroundOpacity(this._helpWindow);
 };
 
 Scene_ItemBook.prototype.createPercentWindow = function() {
@@ -2093,45 +2110,53 @@ Scene_ItemBook.prototype.createPercentWindow = function() {
 };
 
 Scene_ItemBook.prototype.createIndexWindow = function() {
-  const rect = this.indexWindowRect();
-  this._indexWindow = new Window_ItemBook_Index(rect);
-  this.addWindow(this._indexWindow);
-  this._indexWindow.setHandler("cancel", this.onItemIndexCancel.bind(this));
-  this._indexWindow.hide();
-  this._indexWindow.setHelpWindow(this._helpWindow);
-  this.backgroundOpacity(this._indexWindow);
+    const rect = this.indexWindowRect();
+    this._indexWindow = new Window_ItemBook_Index(rect);
+    this.addWindow(this._indexWindow);
+    this._indexWindow.setHandler("cancel", this.onItemIndexCancel.bind(this));
+    this._indexWindow.hide();
+    this._indexWindow.setHelpWindow(this._helpWindow);
+    this.backgroundOpacity(this._indexWindow);
 };
 
 Scene_ItemBook.prototype.createCategoryWindow = function() {
-  const rect = this.indexWindowRect();
-  this._categoryWindow = new Window_ItemBook_Category(rect);
-  this._categoryWindow.setHandler("cancel", this.popScene.bind(this));
-  this._categoryWindow.setHandler("ok", this.onCategoryOk.bind(this));
-  this.addWindow(this._categoryWindow);
-  this._categoryWindow.activate();
-  this._categoryWindow.setItemWindow(this._indexWindow);
-  this._itemPageWindow.deselect();
-  this._itemPageWindow.deactivate();
-  this._indexWindow.setCategoryWindow(this._categoryWindow);
-  this._indexWindow.setPercentWindow(this._percentWindow);
-  if (!this._categoryWindow.needsSelection()) {
-    this._categoryWindow.update();
-    this._categoryWindow.hide();
-    this.onCategoryOk();
-  }
-  this.backgroundOpacity(this._categoryWindow);
+    const rect = this.indexWindowRect();
+    this._categoryWindow = new Window_ItemBook_Category(rect);
+    this._categoryWindow.setHandler("cancel", this.popScene.bind(this));
+    this._categoryWindow.setHandler("ok", this.onCategoryOk.bind(this));
+    this.addWindow(this._categoryWindow);
+    this._categoryWindow.activate();
+    this._categoryWindow.setItemWindow(this._indexWindow);
+    this._itemPageWindow.deselect();
+    this._itemPageWindow.deactivate();
+    this._indexWindow.setCategoryWindow(this._categoryWindow);
+    this._indexWindow.setPercentWindow(this._percentWindow);
+    if (!this._categoryWindow.needsSelection()) {
+        this._categoryWindow.update();
+        this._categoryWindow.hide();
+        this.onCategoryOk();
+    }
+    this.backgroundOpacity(this._categoryWindow);
 };
 
 Scene_ItemBook.prototype.createItemWindow = function() {
-  const rect = this.itemWindowRect();
-  this._itembookWindow = new Window_ItemBook(rect);
-  this.addWindow(this._itembookWindow);
-  this._indexWindow.setItemWindow(this._itembookWindow);
-  this._itemPageWindow.setItemWindow(this._itembookWindow);
-  this._indexWindow.select(Window_ItemBook_Index._lastIndex);
-  this._itembookWindow.setHelpWindow(this._helpWindow);
-  this.backgroundOpacity(this._itembookWindow);
-  this.setMaxPage(ItemPageSetting);
+    const rect = this.itemWindowRect();
+    this._itembookWindow = new Window_ItemBook(rect);
+    this.addWindow(this._itembookWindow);
+    this._indexWindow.setItemWindow(this._itembookWindow);
+    this._itemPageWindow.setItemWindow(this._itembookWindow);
+    this._indexWindow.select(Window_ItemBook_Index._lastIndex);
+    this._itembookWindow.setHelpWindow(this._helpWindow);
+    this.backgroundOpacity(this._itembookWindow);
+    const length = ItemBookCategory.length;
+    if (length === 0) {
+        this._indexWindow.setCategory("allItems");
+        this.onCategoryOk();
+    } else if (length <= 1) {
+        this._indexWindow.setCategory(ItemBookCategory[0].CategoryKey[0]);
+        this.onCategoryOk();
+    }
+    this.setMaxPage(ItemPageSetting);
 };
 
 Scene_ItemBook.prototype.createItemPageWindow = function() {
@@ -2206,7 +2231,7 @@ Scene_ItemBook.prototype.setMaxPage = function(page) {
 };
 
 Scene_ItemBook.prototype.onItemIndexCancel = function() {
-  if (this._categoryWindow.needsSelection()) {
+  if (this._categoryWindow && this._categoryWindow.needsSelection()) {
     this._categoryWindow.setSelect();
     this._categoryWindow.show();
     this._categoryWindow.activate();
@@ -2221,14 +2246,16 @@ Scene_ItemBook.prototype.onItemIndexCancel = function() {
 };
 
 Scene_ItemBook.prototype.onCategoryOk = function() {
-  this._categoryWindow.hide();
-  this._categoryWindow.deselect();
-  this._categoryWindow.deactivate();
-  this._indexWindow.refresh();
-  this._indexWindow.show();
-  this._indexWindow.activate();
-  this._itemPageWindow.setPage();
-  this._itemPageWindow.activate();
+    if (this._categoryWindow) {
+        this._categoryWindow.hide();
+        this._categoryWindow.deselect();
+        this._categoryWindow.deactivate();
+    }
+    this._indexWindow.refresh();
+    this._indexWindow.show();
+    this._indexWindow.activate();
+    this._itemPageWindow.setPage();
+    this._itemPageWindow.activate();
 };
 
 Scene_ItemBook.prototype.createBackground = function() {
@@ -2469,7 +2496,7 @@ Window_ItemBook_Index.prototype.initialize = function(rect) {
 };
 
 Window_ItemBook_Index.prototype.setSelect = function() {
-  if (this._categoryWindow.needsSelection()) {
+  if (this._categoryWindow && this._categoryWindow.needsSelection()) {
     Window_ItemBook_Index._lastIndex = this.maxItems() > 0 ? Math.min(Window_ItemBook_Index._lastIndex, this.maxItems() - 1) : 0;
   }
   if (Window_ItemBook_Index._lastTopRow + this.maxPageRows() - 1 < Window_ItemBook_Index._lastIndex) {

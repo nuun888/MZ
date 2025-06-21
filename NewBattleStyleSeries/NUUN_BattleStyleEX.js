@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.18
+ * @version 1.0.19
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/21/2025 Ver.1.0.19
+ * Added a setting to display actor images when incapacitated.
  * 2/11/2025 Ver.1.0.18
  * Fixed spelling mistakes.
  * 2/1/2025 Ver.1.0.17
@@ -194,6 +196,13 @@
  * @text Apply "NUUN_ActorPicture"
  * @type boolean
  * @default false
+ * @parent ActorSetting
+ * 
+ * @param ImgDeathHide
+ * @desc When dead, the actor image (face graphic) will be hidden.
+ * @text Hide actor image when dead
+ * @type boolean
+ * @default true
  * @parent ActorSetting
  * 
  * @param ActorEffect
@@ -1977,7 +1986,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.18
+ * @version 1.0.19
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2047,6 +2056,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/6/21 Ver.1.0.19
+ * 戦闘不能時のアクター画像の表示設定を追加。
  * 2025/2/11 Ver.1.0.18
  * スペルミスを修正。
  * 2025/2/1 Ver.1.0.17
@@ -2156,6 +2167,13 @@
  * @text 立ち絵表示EX適用
  * @type boolean
  * @default false
+ * @parent ActorSetting
+ * 
+ * @param ImgDeathHide
+ * @desc 戦闘不能になった場合、アクター画像（顔グラ）を非表示にします。
+ * @text 戦闘不能時アクター画像非表示
+ * @type boolean
+ * @default true
  * @parent ActorSetting
  * 
  * @param ActorEffect
@@ -7301,6 +7319,8 @@ Imported.NUUN_BattleStyleEX = true;
             } else if (!this.isCounterSkillAction(actor) && this.isCounter()) {
                 actor.setBSActionBattlerImg(null);
                 this.resetBattleStyleImg(actor);
+            } else if (count > 0 && this._updateCount === 0) {
+                this.resetBattleStyleImg(actor);
             }
         } else if (count > 0 && this._updateCount === 0) {
             this.resetBattleStyleImg(actor);
@@ -7413,7 +7433,7 @@ Imported.NUUN_BattleStyleEX = true;
         if (this.isActorGraphicDead()) {
             this._updateCount = 1;
             this._actorImgesOpacity = (this.opacity - this._data.getBattleStyleOpacity());
-        } else if (params.ImgDeathHide || !this.isActorGraphicDead()) {
+        } else if (params.ImgDeathHide && !this.isActorGraphicDead()) {
             this._actorImgesOpacity = this.opacity - 0;
         }
         this._durationOpacity = this.getFadeoutOpacity();

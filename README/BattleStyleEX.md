@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.0.18  
+# Ver.1.0.19  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -166,6 +166,8 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 ステートの表示フィルタリング機能は、他者製作者様のプラグインとの競合対応は行いませんのでご了承ください。  
 
 ## 更新履歴
+2025/6/21 Ver.1.0.19  
+戦闘不能時のアクター画像の表示設定を追加。  
 2025/2/11 Ver.1.0.18  
 スペルミスを修正。  
 2025/2/1 Ver.1.0.17  

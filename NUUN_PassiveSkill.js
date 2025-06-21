@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.5.8
+ * @version 1.5.9
  * @base NUUN_Base
  * 
  * @help
@@ -81,6 +81,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/22/2025 Ver.1.5.9
+ * Changed processing to prevent performance degradation.
  * 8/31/2024 Ver.1.5.8
  * Fixed an issue where equipped armor types were not functioning.
  * 3/4/2023 Ver.1.5.7
@@ -282,7 +284,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.5.8
+ * @version 1.5.9
  * @base NUUN_Base
  * 
  * @help
@@ -343,6 +345,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/6/22 Ver.1.5.9
+ * パフォーマンス低下防止のため処理を変更。
  * 2024/8/31 Ver.1.5.8
  * 装備タイプの防具が機能していなかった問題を修正。
  * 2023/3/4 Ver.1.5.7
@@ -544,17 +548,42 @@ var Imported = Imported || {};
 Imported.NUUN_PassiveSkill = true;
 
 (() => {
-                                                                                                                                                                    const parameters = PluginManager.parameters('NUUN_PassiveSkill');
-    const PassiveSkillConditions = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PassiveSkillConditions'])) : null) || [];
-    const PassiveSkillType = Number(parameters['PassiveSkillType'] || 0);
-    const CondBasePassive = eval(parameters['CondBasePassive'] || "false");
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    const PassiveSkillConditions = params.PassiveSkillConditions || [];
+    const PassiveSkillType = params.PassiveSkillType;
+    const CondBasePassive = params.CondBasePassive;
 
     const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
     Game_Actor.prototype.initMembers = function() {
         _Game_Actor_initMembers.call(this);
         this._passiveSkillList = [];
+        this._passiveSkillId = [];
         //this._passiveCalc = false;
     };
+
+    const _Game_Actor_refresh = Game_Actor.prototype.refresh;
+    Game_Actor.prototype.refresh = function() {
+        _Game_Actor_refresh.apply(this, arguments);
+        this.setPassiveSkill();
+    };
+
+    Game_Actor.prototype.setPassiveSkill = function() {
+        this._passiveSkillList = [];
+        this._passiveSkillId = [];
+        let index = 0;
+        this.skills().forEach(skill => {
+            if (this.isPassiveSkill(skill)) {
+                const weapon = this.getPassiveSkillWeapon(skill);
+                if (weapon > 0) {
+                    this._passiveSkillList[index] = $dataWeapons[weapon];
+                    this._passiveSkillId[index] = skill;
+                    index++;
+                }
+            }
+        });
+    };    
 
     Game_Actor.prototype.isPassiveSkill = function(item) {
         return !!item.meta.PassiveSkill;
@@ -584,7 +613,6 @@ Imported.NUUN_PassiveSkill = true;
         let objects = _Game_Actor_traitObjects.call(this);
         //パッシブスキルのオブジェクトを取得
         Array.prototype.push.apply(objects, this.passiveObject());
-        //objects = objects.concat(this.passiveObject());
         return objects;
     };
 
@@ -594,41 +622,6 @@ Imported.NUUN_PassiveSkill = true;
 
     Game_Actor.prototype.passiveObject = function() {
         return this.getPassiveObject(); 
-    };
-
-    Game_Actor.prototype.getPassiveSkill = function(paramId) {
-        let value = 0;
-        if (!this._passiveCalc) {
-        this._passiveCalc = true;
-        this.skills().forEach(skill => {
-            if (this.isPassiveSkill(skill) && this.condPassiveSkill(skill)) {
-            const weapon = this.getPassiveSkillWeapon(skill);
-            if (weapon > 0) {
-                value += $dataWeapons[weapon].params[paramId];
-            }
-            }
-        });
-        this._passiveCalc = false;
-        }
-        return value;
-    };
-
-    Game_Actor.prototype.getPassiveObject = function() {
-        const passiveSkills = [];
-        if (!this._passiveCalc) {
-        this._passiveCalc = true;
-        this.skills().forEach(skill => {
-            if (this.isPassiveSkill(skill) && this.condPassiveSkill(skill)) {
-            const weapon = this.getPassiveSkillWeapon(skill);
-            if (weapon > 0) {
-                Array.prototype.push.apply(passiveSkills, [$dataWeapons[weapon]]);
-                //passiveSkills.push($dataWeapons[weapon]);
-            }
-            }
-        });
-        this._passiveCalc = false;
-        }
-        return passiveSkills;
     };
 
     Game_Actor.prototype.condPassiveSkill = function(skill) {
@@ -759,6 +752,32 @@ Imported.NUUN_PassiveSkill = true;
         if ($dataSkills[skillId] && $dataSkills[skillId].meta.PassiveSkill) {
             this.refresh();
         }
+    };
+
+    Game_Actor.prototype.getPassive = function() {
+        const passiveSkills = this._passiveSkillList;
+        this._passiveCalc = true;
+        const list = passiveSkills.filter((data, index) => {
+            return this.condPassiveSkill(this._passiveSkillId[index]);
+        });
+        this._passiveCalc = false;
+        return list;
+    };
+
+    Game_Actor.prototype.getPassiveSkill = function(paramId) {
+        let value = 0;
+        if (this._passiveCalc) return value;
+        this.getPassive().forEach(skill => {
+            if (skill) {
+                value += skill.params[paramId];
+            }
+        });
+        return value;
+    };
+
+    Game_Actor.prototype.getPassiveObject = function() {
+        if (this._passiveCalc) return [];
+        return this.getPassive();
     };
 
 })();

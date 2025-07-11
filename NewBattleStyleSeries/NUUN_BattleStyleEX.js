@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.19
+ * @version 1.0.20
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/12/2025 Ver.1.0.20
+ * Fixed an issue where reverse animations were not working.
  * 6/21/2025 Ver.1.0.19
  * Added a setting to display actor images when incapacitated.
  * 2/11/2025 Ver.1.0.18
@@ -1986,7 +1988,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.19
+ * @version 1.0.20
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2056,6 +2058,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/7/12 Ver.1.0.20
+ * アニメーションの反転が機能していなかった問題を修正。
  * 2025/6/21 Ver.1.0.19
  * 戦闘不能時のアクター画像の表示設定を追加。
  * 2025/2/11 Ver.1.0.18
@@ -6921,7 +6925,7 @@ Imported.NUUN_BattleStyleEX = true;
 
     if (Spriteset_Battle.prototype.animationShouldMirror == Spriteset_Base.prototype.animationShouldMirror) {
         Spriteset_Battle.prototype.animationShouldMirror = function(target) {
-            Spriteset_Base.prototype.animationShouldMirror.apply(this, arguments);
+            return Spriteset_Base.prototype.animationShouldMirror.apply(this, arguments);
         };
     }
     
@@ -7320,7 +7324,7 @@ Imported.NUUN_BattleStyleEX = true;
                 actor.setBSActionBattlerImg(null);
                 this.resetBattleStyleImg(actor);
             } else if (count > 0 && this._updateCount === 0) {
-                this.resetBattleStyleImg(actor);
+                //this.resetBattleStyleImg(actor);いったん取り消し
             }
         } else if (count > 0 && this._updateCount === 0) {
             this.resetBattleStyleImg(actor);

@@ -1,5 +1,5 @@
 # [レーダーチャートベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js)
-# Ver.1.1.0
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RadarChartBase.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -16,6 +16,10 @@
 `[id]`:ステータス最大値設定のID  
 
 ## 更新履歴
+2025/7/20 Ver.1.2.0  
+ステータスのレーダーチャート機能を追加。  
+レーダーチャートの最大表示値を設定できる機能を追加。  
+耐性値の表示を修正。  
 2025/6/5 Ver.1.1.0  
 数値を表示する機能を追加。  
 2022/2/6 Ver.1.0.2  

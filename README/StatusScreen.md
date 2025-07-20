@@ -1,5 +1,5 @@
 # [ステータス画面表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
-# Ver.2.6.14
+# Ver.2.7.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StatusScreen.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.4以降  
@@ -112,6 +112,10 @@ APNGを表示するには別途ApngPicture.js(トリアコンタン様)が必要
 `[text]`:任意の個別画像。  
 
 ### 更新履歴
+2025/7/20 Ver.2.7.0  
+ステータスのレーダーチャートを追加。  
+属性のレーダーチャート数値座標設定が無かった問題を修正。  
+レーダーチャートの数値の修正。  
 2025/6/5 Ver.2.6.14  
 レーダーチャートに数値を表示する機能実装による更新。  
 2025/4/13 Ver.2.6.13  

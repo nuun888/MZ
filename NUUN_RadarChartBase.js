@@ -11,18 +11,28 @@
  * @target MZ
  * @plugindesc Radar Chart Base
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * This is the base plugin for implementing radar charts.
  * 
+ * Class notes
+ * <ChartStatusId:[id]> Specifies the ID of the maximum status setting.
+ * The radar chart status is displayed based on the status closest to the maximum display value.
+ * If not specified, the topmost ID setting in the plugin parameter "ChartMaxStatusParams" will be applied.
+ * [id]: ID of "ChartMaxStatusParams"
+ * 
  * reference
  * TOMY (Kamesoft)
  * 
  * 
  * log
+ * 7/20/2025 Ver.1.2.0
+ * Added a status radar chart feature.
+ * Added the ability to set the maximum display value for the radar chart.
+ * Fixed the display of resistance values.
  * 6/5/2025 Ver.1.1.0
  * Added the function to display numerical values.
  * 2/6/2022 Ver.1.0.2
@@ -47,24 +57,112 @@
  * @default 4
  * @min 0
  * 
+ * @param ChartMaxElementsParam
+ * @desc Specifies the maximum resistance value of the attribute as an integer.
+ * @text Maximum element resistance
+ * @type number
+ * @default 200
+ * @min 0
+ * 
+ * @param ChartMaxStateParam
+ * @desc Specifies the maximum resistance value of the state as an integer.
+ * @text Maximum state resistance
+ * @type number
+ * @default 200
+ * @min 0
+ * 
+ * @param ChartMaxStatusParams
+ * @desc Set the maximum number of statuses to display.
+ * @text Status maximum value setting
+ * @type struct<StatusParams>[]
+ * @default ["{\"ChartMaxHPParam\":\"9999\",\"ChartMaxMPParam\":\"2000\",\"ChartMaxAtkParam\":\"999\",\"ChartMaxDefParam\":\"999\",\"ChartMaxMatParam\":\"999\",\"ChartMaxMdfParam\":\"999\",\"ChartMaxAgiParam\":\"999\",\"ChartMaxLukParam\":\"999\"}"]
+ * 
+ * 
+ */
+/*~struct~StatusParams:
+ * 
+ * @param ChartMaxHPParam
+ * @desc Specify the maximum HP value as an integer.
+ * @text Max HP
+ * @type number
+ * @default 9999
+ * @min 0
+ * 
+ * @param ChartMaxMPParam
+ * @desc Specify the maximum MP value as an integer.
+ * @text Max MP
+ * @type number
+ * @default 9999
+ * @min 0
+ * 
+ * @param ChartMaxAtkParam
+ * @desc Specifies the maximum attack power as an integer.
+ * @text Maximum attack
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxDefParam
+ * @desc Specifies the maximum defense value as an integer.
+ * @text Maximum defense power
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxMatParam
+ * @desc Specifies the maximum magic power as an integer.
+ * @text Maximum magic power
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxMdfParam
+ * @desc Specifies the maximum magic defense value as an integer.
+ * @text Max magic defense
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxAgiParam
+ * @desc Specifies the maximum agility value as an integer.
+ * @text Maximum agility
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxLukParam
+ * @desc Specifies the maximum luck value as an integer.
+ * @text Maximum luck
+ * @type number
+ * @default 999
+ * @min 0
  * 
  */
 /*:ja
  * @target MZ
  * @plugindesc レーダーチャートベース
  * @author NUUN
- * @version 1.1.0
+ * @version 1.2.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
  * @help
  * レーダーチャートを実装するためのベースプラグインです。
  * 
+ * 職業のメモ欄
+ * <ChartStatusId:[id]> ステータス最大値設定のIDを指定します。レーダーチャートのステータスは表示最大値から一番近いステータスを元に表示されます。
+ * 指定がない場合はプラグインパラメータ「ステータス最大値設定」の一番上のIDの設定が適用されます。
+ * [id]:ステータス最大値設定のID
+ * 
  * 参考
- * TOMY (Kamesoft)　様
+ * TOMY (Kamesoft) 様
  * 
  * 
  * 更新履歴
+ * 2025/7/20 Ver.1.2.0
+ * ステータスのレーダーチャート機能を追加。
+ * レーダーチャートの最大表示値を設定できる機能を追加。
+ * 耐性値の表示を修正。
  * 2025/6/5 Ver.1.1.0
  * 数値を表示する機能を追加。
  * 2022/2/6 Ver.1.0.2
@@ -89,6 +187,84 @@
  * @default 4
  * @min 0
  * 
+ * @param ChartMaxElementsParam
+ * @desc 属性の最大耐性値を整数で指定します。
+ * @text 属性の最大耐性値
+ * @type number
+ * @default 200
+ * @min 0
+ * 
+ * @param ChartMaxStateParam
+ * @desc ステートの最大耐性値を整数で指定します。
+ * @text ステートの最大耐性値
+ * @type number
+ * @default 200
+ * @min 0
+ * 
+ * @param ChartMaxStatusParams
+ * @desc 表示するステータスの最大値を設定します。
+ * @text ステータス最大値設定
+ * @type struct<StatusParams>[]
+ * @default ["{\"ChartMaxHPParam\":\"9999\",\"ChartMaxMPParam\":\"2000\",\"ChartMaxAtkParam\":\"999\",\"ChartMaxDefParam\":\"999\",\"ChartMaxMatParam\":\"999\",\"ChartMaxMdfParam\":\"999\",\"ChartMaxAgiParam\":\"999\",\"ChartMaxLukParam\":\"999\"}"]
+ * 
+ */
+/*~struct~StatusParams:ja
+ * 
+ * @param ChartMaxHPParam
+ * @desc HPの最大値を整数で指定します。
+ * @text HPの最大値
+ * @type number
+ * @default 9999
+ * @min 0
+ * 
+ * @param ChartMaxMPParam
+ * @desc MPの最大値を整数で指定します。
+ * @text MPの最大値
+ * @type number
+ * @default 9999
+ * @min 0
+ * 
+ * @param ChartMaxAtkParam
+ * @desc 攻撃力の最大値を整数で指定します。
+ * @text 攻撃力の最大値
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxDefParam
+ * @desc 防御力の最大値を整数で指定します。
+ * @text 防御力の最大値
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxMatParam
+ * @desc 魔法力の最大値を整数で指定します。
+ * @text 魔法力の最大値
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxMdfParam
+ * @desc 魔法防御の最大値を整数で指定します。
+ * @text 魔法防御の最大値
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxAgiParam
+ * @desc 敏捷性の最大値を整数で指定します。
+ * @text 敏捷性の最大値
+ * @type number
+ * @default 999
+ * @min 0
+ * 
+ * @param ChartMaxLukParam
+ * @desc 運の最大値を整数で指定します。
+ * @text 運の最大値
+ * @type number
+ * @default 999
+ * @min 0
  * 
  */
 
@@ -109,8 +285,8 @@ Imported.NUUN_RadarChartBase = true;
         return _getChartData(type);
     };
 
-    Window_Base.prototype.setRadarChart = function(name, rate, iconId, value, x, y) {
-        return new RadarChart(name, rate, value, iconId, x, y);
+    Window_Base.prototype.setRadarChart = function(name, rate, iconId, value, x, y, decimal) {
+        return new RadarChart(name, rate, value, iconId, x, y, decimal);
     };
 
     Window_Base.prototype.getRadarChartElementList = function() {
@@ -122,9 +298,9 @@ Imported.NUUN_RadarChartBase = true;
     };
 
     class RadarChart {
-        constructor(name, rate, value = null, iconId, x, y) {
+        constructor(name, rate, value = null, iconId, x, y, decimal = 0) {
             this._name = name;
-            this._value = value !== null ? value : (Number(rate * 100));
+            this._value = value !== null ? value : NuunManager.numPercentage((Number(rate * 100)), (decimal - 2) || 0, true);
             this._rate = rate;
             this._iconId = iconId;
             this._x = x;
@@ -177,11 +353,14 @@ Imported.NUUN_RadarChartBase = true;
         this._valueData = valueData;
         this._battler = battler;
         this._chartType = chartType;
+        this._chartId = this.getChartId();
         this._dataList = list;//データはname:名称 rate:割合100%の場合は1 iconId:アイコンインデックス
         this._mainFontSize = fontSize;//フォントサイズ
         this.radarChartRadius = radius;//半径
         this.offsetX = offsetX || 0;
         this.offsetY = offsetY || 0;
+        this._maxParamRate = 1.0;
+        //this._nameDisplayMode = mode;
         this.updateBitmap();
     };
 
@@ -193,6 +372,14 @@ Imported.NUUN_RadarChartBase = true;
         this._mainFrameColor = ColorManager.textColor(mainColor2);
         this._mainColor1 = "rgba("+ rgb1.red +","+ rgb1.green +","+ rgb1.blue +",0.2)";
         this._mainColor2 = "rgba("+ rgb2.red +","+ rgb2.green +","+ rgb2.blue +",0.9)";
+    };
+
+    Sprite_NUUN_RadarChart.prototype.getChartId = function() {
+        if (this._chartType === 'status' && this._battler.isActor()) {
+            const _class = this._battler.currentClass();
+            return NuunManager.getMetaCode(_class, "ChartStatusId") || 0;
+        }
+        return 0;
     };
 
     Sprite_NUUN_RadarChart.prototype.setupOption = function(overMode) {
@@ -226,12 +413,77 @@ Imported.NUUN_RadarChartBase = true;
         return this.radius() + this.offsetY;
     };
 
+    Sprite_NUUN_RadarChart.prototype.chartMaxParam = function() {
+        switch (this._chartType) {
+            case 'element':
+                return params.ChartMaxElementsParam || 200;
+            case 'state':
+                return params.ChartMaxStateParam || 200;
+        }
+    };
+
+    Sprite_NUUN_RadarChart.prototype.chartMaxStatusParam = function(param) {
+        const data = params.ChartMaxStatusParams[this._chartId];
+        switch (param) {
+            case 0:
+                return data.ChartMaxHPParam || 9999;
+            case 1:
+                return data.ChartMaxMPParam || 9999;
+            case 2:
+                return data.ChartMaxAtkParam || 999;
+            case 3:
+                return data.ChartMaxDefParam || 999;
+            case 4:
+                return data.ChartMaxMatParam || 999;
+            case 5:
+                return data.ChartMaxMdfParam || 999;
+            case 6:
+                return data.ChartMaxAgiParam || 999;
+            case 7:
+                return data.ChartMaxLukParam || 999;
+        }
+    };
+
+    Sprite_NUUN_RadarChart.prototype.chartMaxStatusTag = function() {
+        let id = 0;
+        const re = /<(?:ChartStatusId):\s*(.*)>/;
+        const battler = this._battler.actor();
+        while(true) {
+            const match = re.exec(battler.note);
+            if (match) {
+                const data = match[2].split(',');
+                if (params.ChartMaxStatusParams[Number(data[0]) - 1]) {
+                    if (!data[1]) {
+                        id = params.ChartMaxStatusParams[Number(data[0]) - 1];
+                        break;
+                    } else if (!!data[1] && this._battler._level >= params.ChartMaxStatusParams[Number(data[1])]) {
+                        id = params.ChartMaxStatusParams[Number(data[0]) - 1];
+                        break;
+                    }
+                }
+            }
+        }
+        return id;
+    };
+
+    Sprite_NUUN_RadarChart.prototype.chartCorrectionMaxStatusParam = function(param) {
+        return this.chartMaxStatusParam(param) * this._maxParamRate;
+    };
+
+    Sprite_NUUN_RadarChart.prototype.getChartMaxParamRate = function(index) {
+        return (this._chartType === 'status' ? this.chartCorrectionMaxStatusParam(index) : this.chartMaxParam()) / 100;
+    };
+
+    Sprite_NUUN_RadarChart.prototype.getChartMaxParamRatio = function(index) {
+        return this._chartType === 'status' ? 1 : 1 / this.getChartMaxParamRate(index);
+    };
+
     Sprite_NUUN_RadarChart.prototype.radius = function() {
         return this.radarChartRadius;
     };
 
-    Sprite_NUUN_RadarChart.prototype.radiusRate = function(param) {
-        return (this.radarChartRadius * 0.5) * Math.min(param, 2);
+    Sprite_NUUN_RadarChart.prototype.radiusRate = function(index, param) {
+        return (this.radarChartRadius * this.getChartMaxParamRatio(index)) * Math.min(param, this.getChartMaxParamRate(index));
     };
 
     Sprite_NUUN_RadarChart.prototype.getAngle = function(index, list) {
@@ -246,12 +498,12 @@ Imported.NUUN_RadarChartBase = true;
         return (position + Math.sin(angle) * radius) + this.chartY();
     };
 
-    Sprite_NUUN_RadarChart.prototype.chartStatusPointX = function(position, angle, param) {
-        return (position + Math.cos(angle) * this.radiusRate(param)) + this.chartX();
+    Sprite_NUUN_RadarChart.prototype.chartStatusPointX = function(index, position, angle, param) {
+        return (position + Math.cos(angle) * this.radiusRate(index, param)) + this.chartX();
     };
 
-    Sprite_NUUN_RadarChart.prototype.chartStatusPointY = function(position, angle, param) {
-        return (position + Math.sin(angle) * this.radiusRate(param)) + this.chartY();
+    Sprite_NUUN_RadarChart.prototype.chartStatusPointY = function(index, position, angle, param) {
+        return (position + Math.sin(angle) * this.radiusRate(index, param)) + this.chartY();
     };
 
     Sprite_NUUN_RadarChart.prototype.isIcon = function(data) {
@@ -280,13 +532,18 @@ Imported.NUUN_RadarChartBase = true;
         this.drawRadarChartMain(this._dataList, x, y, 2, this.radius());
     };
 
+    Sprite_NUUN_RadarChart.prototype.getMaxParamRate = function(data) {
+        if (this._chartType !== 'status') return 1.0;
+        return Math.max(...data.map((a, index) => a.getValue() / this.chartMaxStatusParam(index)));
+    };
+
     Sprite_NUUN_RadarChart.prototype.drawRadarChartMain = function(data, x, y, width, radius) {
+        this._maxParamRate = this.getMaxParamRate(data);
         const dataPoint = [];
         data.forEach((a, i) => {
-            //const rate = Math.abs(a.rate);
-            const rate = Math.max(a.getRate(), 0);
+            const rate = this._chartType === 'status' ? (a.getValue() / this.chartCorrectionMaxStatusParam(i)) : Math.max(a.getRate(), 0);
             const angle = this.getAngle(i, data);
-            dataPoint.push(new Point(this.chartStatusPointX(x, angle, rate), this.chartStatusPointY(y, angle, rate)));
+            dataPoint.push(new Point(this.chartStatusPointX(i, x, angle, rate), this.chartStatusPointY(i, y, angle, rate)));
         });
         this.drawMainRadaChart(dataPoint, width, this._mainColor1, this._mainColor2);
     };
@@ -340,19 +597,34 @@ Imported.NUUN_RadarChartBase = true;
     };
 
     Sprite_NUUN_RadarChart.prototype.drawName = function(x, y, data) {
-        if (this.isIcon(data)) {
-            this.drawIcon(x, y, data.getIconId());
-        } else if (data.getName()) {
+        this._nameDisplayMode = this.isIcon(data) ? "icon" : "name";
+        //this._nameDisplayMode = "nameIcon";
+        if (this._nameDisplayMode === "name") {
             this.bitmap.fontSize = this.fontSize();
             this.bitmap.drawText(data.getName(), x - 32, y - 16, 64, 32, 'center');
+        } else if (this._nameDisplayMode === "nameIcon") {
+            this.drawNameIcon(x, y, data);
+        } else if (this._nameDisplayMode === "icon" && this.isIcon(data)) {
+            this.drawIcon(x, y, data.getIconId());
         }
+    };
+
+    Sprite_NUUN_RadarChart.prototype.drawNameIcon = function(x, y, data) {
+        let margin = 0;
+        if (this.isIcon(data)) {
+            this.drawIcon(x, y, data.getIconId());
+            margin = ImageManager.iconWidth + 4;
+        }
+        this.bitmap.fontSize = this.fontSize();
+        this.bitmap.drawText(data.getName(), x - 32 + margin, y - 16, 64, 32, 'center');
     };
 
     Sprite_NUUN_RadarChart.prototype.drawValue = function(x, y, data) {
         if (!!data && !!this._valueData) {
             x += -32 + this._valueData.ChartInsideValueX + data.getX();
             y += -16 + this._valueData.ChartInsideValueY + data.getY();
-            this.nuun_DrawContentsParamUnitText(data, data.getValue(), x, y, 64, this._valueData.UnitText);
+            const value = this._chartType !== 'status' ? data.getValue() : NuunManager.numPercentage(data.getValue(), (params.Decimal - 2) || 0, true);
+            this.nuun_DrawContentsParamUnitText(data, value, x, y, 64, this._valueData.UnitText);
         }
     };
 

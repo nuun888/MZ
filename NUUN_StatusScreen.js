@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.6.14
+ * @version 2.7.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -104,6 +104,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/7/20 Ver.2.7.0
+ * ステータスのレーダーチャートを追加。
+ * 属性のレーダーチャート数値座標設定が無かった問題を修正。
+ * レーダーチャートの数値の修正。
  * 2025/6/5 Ver.2.6.14
  * レーダーチャートに数値を表示する機能実装による更新。
  * 2025/4/13 Ver.2.6.13
@@ -703,9 +707,96 @@
  * @default 0
  * @parent StateStateSetting
  * 
+ * 
+ * @param RadarChartSetting
+ * @text レーダーチャート設定
+ * @default 要NUUN_RadarChartBase
+ * 
+ * @param StatusRadarChart
+ * @text ステータスレーダーチャート
+ * @default ------------------------------
+ * @parent RadarChartSetting
+ * 
+ * @param StatusRadarChartParamList
+ * @desc 表示するステータス。
+ * @text 表示ステータス
+ * @type struct<RadarChartParamList>[]
+ * @default 
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartRadius
+ * @desc レーダチャートの半径。
+ * @text レーダチャート半径
+ * @type number
+ * @default 100
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartFramecolor
+ * @desc レーダチャートの枠の色を設定します。
+ * @text レーダチャート枠色
+ * @type color
+ * @default 15
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartLineColor
+ * @desc レーダチャートの線の色を設定します。
+ * @text レーダチャート線色
+ * @type color
+ * @default 15
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartMainColor1
+ * @desc レーダチャートの中心の背景色を設定します。
+ * @text レーダチャート中心背景色
+ * @type color
+ * @default 3
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartMainColor2
+ * @desc レーダチャートの外側背景色を設定します。
+ * @text レーダチャート外側背景色
+ * @type color
+ * @default 3
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartX
+ * @desc レーダチャートのX座標（相対）。
+ * @text レーダチャートX座標
+ * @type number
+ * @min -9999
+ * @max 9999
+ * @default 48
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartY
+ * @desc レーダチャートのY座標（相対）。
+ * @text レーダチャートY座標
+ * @type number
+ * @min -9999
+ * @max 9999
+ * @default 48
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChart_FontSize
+ * @desc フォントサイズ。（メインフォントから）
+ * @text フォントサイズ
+ * @type number
+ * @default -12
+ * @min -9999
+ * @max 9999
+ * @parent StatusRadarChart
+ * 
+ * @param StatusRadarChartValueData
+ * @desc レーダーチャートに表示する数値設定。
+ * @text 数値設定
+ * @type struct<RadarChartValue>
+ * @default
+ * @parent StatusRadarChart
+ * 
  * @param ElementRadarChart
  * @text 属性耐性レーダーチャート
  * @default ------------------------------
+ * @parent RadarChartSetting
  * 
  * @param ElementRadarChartRadius
  * @desc レーダチャートの半径。
@@ -779,6 +870,7 @@
  * @param StateRadarChart
  * @text ステート耐性レーダーチャート
  * @default ------------------------------
+ * @parent RadarChartSetting
  * 
  * @param StateRadarChartRadius
  * @desc レーダチャートの半径。
@@ -849,7 +941,7 @@
  */
 /*~struct~RadarChartParamList:
  * 
- * @param ParamLists
+ * @param Param
  * @desc レーダーチャートに表示する項目を指定します。
  * @text 表示する項目
  * @type select
@@ -884,6 +976,26 @@
  * @default 0
  * @min 0
  * @max 99999
+ * 
+ * @param RadarChartShowValue
+ * @text 数値の座標
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc レーダーチャートの数値の個別X座標。
+ * @text レーダーチャート数値個別X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc レーダーチャートの数値の個別Y座標。
+ * @text レーダーチャート数値個別Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
  *  
  */
 /*~struct~actorImgList:
@@ -945,6 +1057,27 @@
  * @min 0
  * @max 99999
  * @default 0
+ * 
+ * @param RadarChartShowValue
+ * @text 数値の座標
+ * @desc ----------------------------------
+ * 
+ * @param ValueX
+ * @desc レーダーチャートの数値の個別X座標。
+ * @text レーダーチャート数値個別X座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
+ * @param ValueY
+ * @desc レーダーチャートの数値の個別Y座標。
+ * @text レーダーチャート数値個別Y座標
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent RadarChartShowValue
+ * 
  */
 /*~struct~StateData:
  *
@@ -989,26 +1122,6 @@
  * @type icon
  * @min 0
  * @default 0
- * 
- * @param RadarChartShowValue
- * @text 数値の座標
- * @desc ----------------------------------
- * 
- * @param ValueX
- * @desc レーダーチャートの数値の個別X座標。
- * @text レーダーチャート数値個別X座標
- * @type number
- * @default 0
- * @min -9999
- * @parent RadarChartShowValue
- * 
- * @param ValueY
- * @desc レーダーチャートの数値の個別Y座標。
- * @text レーダーチャート数値個別Y座標
- * @type number
- * @default 0
- * @min -9999
- * @parent RadarChartShowValue
  *
  */
 /*~struct~PageListData:
@@ -1142,6 +1255,8 @@
  * @value 101
  * @option サイドビューアクター画像(4)(5)(6)(7)(8)(10)
  * @value 102
+ * @option ステータスレーダーチャート(4)(5)(6)(7)(8)(10)(15)
+ * @value 200
  * @option 属性耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
  * @value 201
  * @option ステート耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
@@ -1484,6 +1599,7 @@ const StatusRadarChartX = Number(parameters['StatusRadarChartX'] || 0);
 const StatusRadarChartY = Number(parameters['StatusRadarChartY'] || 0);
 const StatusRadarChart_FontSize = Number(parameters['StatusRadarChart_FontSize'] || 0);
 const StatusRadarChartParamList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StatusRadarChartParamList'])) : [];
+const StatusRadarChartValueData = (DataManager.nuun_structureData(parameters['StatusRadarChartValueData']));
 const ElementRadarChartRadius = Number(parameters['ElementRadarChartRadius'] || 100);
 const ElementRadarChartFramecolor = (DataManager.nuun_structureData(parameters['ElementRadarChartFramecolor'])) || 0;
 const ElementRadarChartLineColor = (DataManager.nuun_structureData(parameters['ElementRadarChartLineColor'])) || 0;
@@ -2736,35 +2852,37 @@ Window_Status.prototype.drawStatusRadarChart = function(list, actor, x, y) {
   if (!Imported.NUUN_RadarChartBase) {
     return;
   }
-  this.actorStatusRadarChart(this.setActorStatusChart(actor), actor, x, y,'status');
+  this.actorStatusRadarChart(this.setActorStatusChart(actor, list), actor, x, y,'status');
 };
 
 Window_Status.prototype.drawElementRadarChart = function(list, actor, x, y) {
-  if (!Imported.NUUN_RadarChartBase) {
-    return;
-  }
-  this.actorElementRadarChart(this.setActorElementChart(actor), actor, x, y,'element');
+    if (!Imported.NUUN_RadarChartBase) {
+        return;
+    }
+    this.actorElementRadarChart(this.setActorElementChart(actor, list), actor, x, y,'element');
 };
 
 Window_Status.prototype.drawStateRadarChart = function(list, actor, x, y) {
-  if (!Imported.NUUN_RadarChartBase) {
-    return;
-  }
-  this.actorStateRadarChart(this.setActorStateChart(actor), actor, x, y,'state');
+    if (!Imported.NUUN_RadarChartBase) {
+        return;
+    }
+    this.actorStateRadarChart(this.setActorStateChart(actor, list), actor, x, y,'state');
 };
 
-Window_Status.prototype.setActorStatusChart = function(actor) {
-  const data = [];
-  for (const status of StatusRadarChartParamList) {
-    let rate = 1;
-    const statusName = status.RadarChartParamName ? status.RadarChartParamName : TextManager.param(status.ParamLists);
-    const statusIconId = status.RadarChartIconIndex || 0;
-    data.push(this.setRadarChart(statusName, rate, statusIconId));
-  }
-  return data;
+Window_Status.prototype.setActorStatusChart = function(actor, list) {
+    const data = [];
+    for (const status of StatusRadarChartParamList) {
+        let value = actor.param(status.Param);
+        const statusName = status.RadarChartParamName ? status.RadarChartParamName : TextManager.param(status.Param);
+        const statusIconId = status.RadarChartIconIndex || 0;
+        const x = status.ValueX || 0;
+        const y = status.ValueY || 0;
+        data.push(this.setRadarChart(statusName, null, statusIconId, value, x, y));
+    }
+    return data;
 };
 
-Window_Status.prototype.setActorElementChart = function(actor) {
+Window_Status.prototype.setActorElementChart = function(actor, list) {
     const data = [];
     for (const element of ElementResist) {
         let rate = actor.elementRate(element.ElementNo);
@@ -2772,12 +2890,12 @@ Window_Status.prototype.setActorElementChart = function(actor) {
         const elementIconId = element.ElementIconId || 0;
         const x = element.ValueX || 0;
         const y = element.ValueY || 0;
-        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y));
+        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y, list.Decimal));
     }
     return data;
 };
 
-Window_Status.prototype.setActorStateChart = function(actor) {
+Window_Status.prototype.setActorStateChart = function(actor, list) {
     const data = [];
     for (const state of StateResist) {
         let stateId = state.StateNo;
@@ -2787,7 +2905,7 @@ Window_Status.prototype.setActorStateChart = function(actor) {
         const iconId = !StateResistText ? $dataStates[stateId].iconIndex : 0;
         const x = state.ValueX || 0;
         const y = state.ValueY || 0;
-        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y));
+        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y, list.Decimal));
     }
     return data;
 };
@@ -2796,7 +2914,7 @@ Window_Status.prototype.actorStatusRadarChart = function(list, actor, x, y, type
     const key = "actorRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(StatusRadarChartFramecolor, StatusRadarChartLineColor, StatusRadarChartMainColor1, StatusRadarChartMainColor2, type);
-    sprite.setup(actor, type, list, StatusRadarChartRadius, StatusRadarChartX, StatusRadarChartY, StatusRadarChart_FontSize);
+    sprite.setup(actor, type, list, StatusRadarChartRadius, StatusRadarChartX, StatusRadarChartY, StatusRadarChart_FontSize, StatusRadarChartValueData);
     sprite.move(x, y);
     sprite.show();
 };

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.23.1
+ * @version 2.23.2
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/20/2025 Ver.2.23.2
+ * Correction of radar chart numbers.
  * 6/5/2025 Ver.2.23.1
  * Updated with the implementation of the function to display numerical values ​​on the radar chart.
  * 5/12/2025 Ver.2.23.0
@@ -3184,7 +3186,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.23.0
+ * @version 2.23.2
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3405,6 +3407,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/7/20 Ver.2.23.2
+ * レーダーチャートの数値の修正。
  * 2025/6/5 Ver.2.23.1
  * レーダーチャートに数値を表示する機能実装による更新。
  * 2025/5/12 Ver.2.23.0
@@ -11569,7 +11573,7 @@ Window_EnemyBook.prototype.enemyElementChart = function(list, enemy, x, y, width
     }
     this.drawText(nameText, x + margin, y, width - margin);
     const lineHeight = this.lineHeight();
-    this.enemyElementRadarChart(this.setEnemyElementChart(enemy), enemy, x, y + lineHeight ,'element');
+    this.enemyElementRadarChart(this.setEnemyElementChart(enemy, list), enemy, x, y + lineHeight ,'element');
 };
 
 Window_EnemyBook.prototype.enemyStateChart = function(list, enemy, x, y, width) {
@@ -11586,10 +11590,10 @@ Window_EnemyBook.prototype.enemyStateChart = function(list, enemy, x, y, width) 
     }
     this.drawText(nameText, x + margin, y, width - margin);
     const lineHeight = this.lineHeight();
-    this.enemyStateRadarChart(this.setEnemyStateChart(enemy), enemy, x, y + lineHeight ,'state');
+    this.enemyStateRadarChart(this.setEnemyStateChart(enemy, list), enemy, x, y + lineHeight ,'state');
 };
 
-Window_EnemyBook.prototype.setEnemyElementChart = function(enemy) {
+Window_EnemyBook.prototype.setEnemyElementChart = function(enemy, list) {
     const data = [];
     for (const element of ElementList) {
         let rate = enemy.elementRate(element.ElementNo);
@@ -11597,12 +11601,12 @@ Window_EnemyBook.prototype.setEnemyElementChart = function(enemy) {
         const elementIconId = element.ElementIconId || 0;
         const x = element.ValueX || 0;
         const y = element.ValueY || 0;
-        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y));
+        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y, list.Decimal));
     }
     return data;
 };
 
-Window_EnemyBook.prototype.setEnemyStateChart = function(enemy) {
+Window_EnemyBook.prototype.setEnemyStateChart = function(enemy, list) {
     const data = [];
     for (const state of StateList) {
         let stateId = state.StateId;
@@ -11612,7 +11616,7 @@ Window_EnemyBook.prototype.setEnemyStateChart = function(enemy) {
         const iconId = RadarChartIcon ? $dataStates[stateId].iconIndex : 0;
         const x = state.ValueX || 0;
         const y = state.ValueY || 0;
-        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y));
+        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y, list.Decimal));
     }
     return data;
 };

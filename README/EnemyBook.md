@@ -1,5 +1,5 @@
 # [モンスター図鑑](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
-# Ver.2.23.1
+# Ver.2.23.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
@@ -300,6 +300,8 @@ PgUp PgDnキー：モンスターページ送り
 `_ctbWindow`: NRP_VisualTurn  
 
 ## 更新履歴
+2025/7/20 Ver.2.23.2  
+レーダーチャートの数値の修正。  
 2025/6/5 Ver.2.23.1  
 レーダーチャートに数値を表示する機能実装による更新。  
 2025/5/12 Ver.2.23.0  

@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.20
+ * @version 1.0.21
  * 
  * @help
  * You can change and customize the battle layout.
@@ -84,6 +84,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/26/2025 Ver.1.0.21
+ * Fixed an issue where actor images would not change under certain conditions when performing consecutive actions.
+ * Fixed so that display range can be specified for face graphics.
  * 7/12/2025 Ver.1.0.20
  * Fixed an issue where reverse animations were not working.
  * 6/21/2025 Ver.1.0.19
@@ -1988,7 +1991,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.20
+ * @version 1.0.21
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2058,6 +2061,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/7/26 Ver.1.0.21
+ * 連続行動時に特定の条件でアクターの画像が切り替わらない問題を修正。
+ * 顔グラに表示範囲指定を適用できるように修正。
  * 2025/7/12 Ver.1.0.20
  * アニメーションの反転が機能していなかった問題を修正。
  * 2025/6/21 Ver.1.0.19
@@ -5482,10 +5488,12 @@ Imported.NUUN_BattleStyleEX = true;
         this.setDamageEffect();
         if (this.isGuard()) {
             this.setBattleImgId(15);
+            this.setBSActionBattlerImg(null);
         }
         if (!this.isImgScenesGuard()) {
             this.battlerImgCritical ? this.setBattleImgId(3) : this.setBattleImgId(1);
             this.battlerImgCritical = false;
+            this.setBSActionBattlerImg(null);
         }
         //this.battleStyleImgRefresh();
     };
@@ -5494,6 +5502,7 @@ Imported.NUUN_BattleStyleEX = true;
     Game_Battler.prototype.performRecovery = function() {
         _Game_Battler_performRecovery.apply(this, arguments);
         this.setBattleImgId(2);
+        this.setBSActionBattlerImg(null);
         //this.battleStyleImgRefresh();
     };
 
@@ -5501,6 +5510,7 @@ Imported.NUUN_BattleStyleEX = true;
     Game_Actor.prototype.performVictory = function() {
         _Game_Actor_performVictory.apply(this, arguments);
         this.setBattleImgId(20);
+        this.setBSActionBattlerImg(null);
         //this.battleStyleImgRefresh();
     };
 
@@ -7312,6 +7322,10 @@ Imported.NUUN_BattleStyleEX = true;
                 this._imgListId = this._data.getGraphicIndex();
             }
         }
+        this.refreshActorCount(actor);
+    };
+
+    Sprite_ActorImges.prototype.refreshActorCount = function(actor) {
         const count = this._updateCount;
         this.updateAnimation();
         if (this._imgScenes === 'chant' && !actor.isChanting()) {
@@ -7323,10 +7337,9 @@ Imported.NUUN_BattleStyleEX = true;
             } else if (!this.isCounterSkillAction(actor) && this.isCounter()) {
                 actor.setBSActionBattlerImg(null);
                 this.resetBattleStyleImg(actor);
-            } else if (count > 0 && this._updateCount === 0) {
-                //this.resetBattleStyleImg(actor);いったん取り消し
             }
         } else if (count > 0 && this._updateCount === 0) {
+            actor.setBSActionBattlerImg(null);
             this.resetBattleStyleImg(actor);
         }
     };
@@ -7413,10 +7426,10 @@ Imported.NUUN_BattleStyleEX = true;
     Sprite_ActorImges.prototype.faceRefresh = function(faceIndex) {
         const pw = ImageManager.faceWidth;
         const ph = ImageManager.faceHeight;
-        const sw = Math.min(this._rectWidth, pw);
-        const sh = Math.min(this._rectHeight, ph);
-        const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
-        const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+        const sw = Math.min((this._data.getImg_SW() || pw), this._rectWidth, pw);
+        const sh = Math.min((this._data.getImg_SH() || ph), this._rectHeight, ph);
+        const sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2) + this._data.getImg_SX();
+        const sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2) + this._data.getImg_SY();
         this.setFrame(sx, sy, sw, sh);
         this._imgIndex = faceIndex;
     };

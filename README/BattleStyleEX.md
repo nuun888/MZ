@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.0.20  
+# Ver.1.0.21   
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -166,6 +166,9 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 ステートの表示フィルタリング機能は、他者製作者様のプラグインとの競合対応は行いませんのでご了承ください。  
 
 ## 更新履歴
+2025/7/26 Ver.1.0.21  
+連続行動時に特定の条件でアクターの画像が切り替わらない問題を修正。  
+顔グラに表示範囲指定を適用できるように修正。  
 2025/7/12 Ver.1.0.20  
 アニメーションの反転が機能していなかった問題を修正。  
 2025/6/21 Ver.1.0.19  

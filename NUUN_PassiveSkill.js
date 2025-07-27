@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.5.9
+ * @version 1.6.0
  * @base NUUN_Base
  * 
  * @help
@@ -19,6 +19,10 @@
  * By specifying the activation conditions, you can create a passive skill that activates only under specific conditions.
  * The conditions are set by plug-in parameters and judged by specifying the list ID. Multiple conditions can be specified.
  * If the activation condition does not have a "PassiveMatch" tag, the passive skill will be applied when all conditions are met.
+ * 
+ * Enemy passive skill settings
+ * Please set it as enemies' initial equipment.
+ * Only passive skills that meet the conditions of the initial equipment and this plugin will be applied.
  * 
  * skill Note
  * Applying Passive Skills
@@ -81,6 +85,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 7/27/2025 Ver.1.6.0
+ * Passive skills also apply to enemies.
  * 6/22/2025 Ver.1.5.9
  * Changed processing to prevent performance degradation.
  * 8/31/2024 Ver.1.5.8
@@ -284,7 +290,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.5.9
+ * @version 1.6.0
  * @base NUUN_Base
  * 
  * @help
@@ -293,6 +299,10 @@
  * 発動条件は指定することで特定の条件でのみ発動するパッシブスキルを作ることが出来ます。条件はプラグインパラメータで
  * 設定し、そのリストIDを指定することで判定します。条件は複数指定可能です。
  * 発動条件はPassiveMatchタグがない場合は、すべての条件が一致したときにパッシブスキルが適用されます。
+ * 
+ * 敵のパッシブスキル設定
+ * 敵キャラの行動パターンに設定してください。
+ * 行動パターンの条件、当プラグインの条件が一致のパッシブスキルのみ適用されます。
  * 
  * スキルのメモ欄
  * パッシブスキルの適用
@@ -345,6 +355,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/7/27 Ver.1.6.0
+ * パッシブスキルを敵にも適用。
  * 2025/6/22 Ver.1.5.9
  * パフォーマンス低下防止のため処理を変更。
  * 2024/8/31 Ver.1.5.8
@@ -555,76 +567,84 @@ Imported.NUUN_PassiveSkill = true;
     const PassiveSkillType = params.PassiveSkillType;
     const CondBasePassive = params.CondBasePassive;
 
-    const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
-    Game_Actor.prototype.initMembers = function() {
-        _Game_Actor_initMembers.call(this);
+    const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
+    Game_Battler.prototype.initMembers = function() {
+        _Game_Battler_initMembers.call(this);
         this._passiveSkillList = [];
         this._passiveSkillId = [];
         //this._passiveCalc = false;
     };
 
-    const _Game_Actor_refresh = Game_Actor.prototype.refresh;
-    Game_Actor.prototype.refresh = function() {
-        _Game_Actor_refresh.apply(this, arguments);
+    const _Game_Battler_refresh = Game_Battler.prototype.refresh;
+    Game_Battler.prototype.refresh = function() {
+        _Game_Battler_refresh.apply(this, arguments);
+        this.resetRassiveParam();
         this.setPassiveSkill();
     };
 
-    Game_Actor.prototype.setPassiveSkill = function() {
+    Game_Battler.prototype.setPassiveSkill = function() {
         this._passiveSkillList = [];
         this._passiveSkillId = [];
         let index = 0;
-        this.skills().forEach(skill => {
-            if (this.isPassiveSkill(skill)) {
-                const weapon = this.getPassiveSkillWeapon(skill);
-                if (weapon > 0) {
-                    this._passiveSkillList[index] = $dataWeapons[weapon];
-                    this._passiveSkillId[index] = skill;
-                    index++;
-                }
+        const skills = this.getPassiveAllActions();console.log(skills)
+        skills.forEach(skill => {
+            const weapon = this.getPassiveSkillWeapon(skill);
+            if (weapon > 0) {
+                this._passiveSkillList[index] = $dataWeapons[weapon];
+                this._passiveSkillId[index] = skill;
+                index++;
             }
         });
-    };    
+    };
 
-    Game_Actor.prototype.isPassiveSkill = function(item) {
+    Game_Actor.prototype.getPassiveAllActions = function() {
+        return this.skills().filter(skill => this.isPassiveSkill(skill));
+    };
+
+    Game_Enemy.prototype.getPassiveAllActions = function() {
+        return this.enemy().actions.filter(action => this.meetsCondition(action) && this.isPassiveSkill($dataSkills[action.skillId])).map(action => $dataSkills[action.skillId]);
+    };
+
+    Game_Battler.prototype.isPassiveSkill = function(item) {
         return !!item.meta.PassiveSkill;
     };
 
-    Game_Actor.prototype.getPassiveSkillId = function(item) {
+    Game_Battler.prototype.getPassiveSkillId = function(item) {
         return item.meta.PassiveSkill ? Number(item.meta.PassiveSkill) : 0;
     };
 
-    Game_Actor.prototype.getPassiveConditions = function(item) {
+    Game_Battler.prototype.getPassiveConditions = function(item) {
         return item.meta.PassiveConditions ? item.meta.PassiveConditions.split(',').map(Number) : [];
     };
 
-    Game_Actor.prototype.getPassiveMode = function(item) {
+    Game_Battler.prototype.getPassiveMode = function(item) {
         return item.meta.PassiveMatch ? Number(item.meta.PassiveMatch) : 1;
     };
 
-    const _Game_Actor_paramPlus = Game_Actor.prototype.paramPlus;
-    Game_Actor.prototype.paramPlus = function(paramId) {
-        let value = _Game_Actor_paramPlus.call(this, paramId);
+    const _Game_Battler_paramPlus = Game_Battler.prototype.paramPlus;
+    Game_Battler.prototype.paramPlus = function(paramId) {
+        let value = _Game_Battler_paramPlus.call(this, paramId);
         value += this.passiveParam(paramId);
         return value;
     };
 
-    const _Game_Actor_traitObjects = Game_Actor.prototype.traitObjects;
-    Game_Actor.prototype.traitObjects = function() {
-        let objects = _Game_Actor_traitObjects.call(this);
+    const _Game_Battler_traitObjects = Game_Battler.prototype.traitObjects;
+    Game_Battler.prototype.traitObjects = function() {
+        let objects = _Game_Battler_traitObjects.call(this);
         //パッシブスキルのオブジェクトを取得
         Array.prototype.push.apply(objects, this.passiveObject());
         return objects;
     };
 
-    Game_Actor.prototype.passiveParam = function(paramId) {
+    Game_Battler.prototype.passiveParam = function(paramId) {
         return this.getPassiveSkill(paramId);
     };
 
-    Game_Actor.prototype.passiveObject = function() {
+    Game_Battler.prototype.passiveObject = function() {
         return this.getPassiveObject(); 
     };
 
-    Game_Actor.prototype.condPassiveSkill = function(skill) {
+    Game_Battler.prototype.condPassiveSkill = function(skill) {
         if (Imported.NUUN_ConditionsBase && CondBasePassive) {
         return this.getCondition(skill);
         }
@@ -641,14 +661,13 @@ Imported.NUUN_PassiveSkill = true;
         return result;
     };
 
-    Game_Actor.prototype.getCondition = function(skill) {
+    Game_Battler.prototype.getCondition = function(skill) {
         const condTag = "PassiveConditions";
         const action = $gameTemp.getActionData();
-        
         return this.getTriggerConditions(skill, this, condTag , null, 'Party'+ condTag, 'Troop'+ condTag, action.action, action.damage, this.getPassiveMode(skill));
     };
 
-    Game_Actor.prototype.getPassiveSkillWeapon = function(skill) {
+    Game_Battler.prototype.getPassiveSkillWeapon = function(skill) {
         return this.getPassiveSkillId(skill);
     };
     
@@ -661,7 +680,7 @@ Imported.NUUN_PassiveSkill = true;
         return traits;
     };
 
-    Game_Actor.prototype.skillConditions = function(list) {
+    Game_Battler.prototype.skillConditions = function(list) {
         if (!list) {
         return true;
         }
@@ -707,7 +726,7 @@ Imported.NUUN_PassiveSkill = true;
         return false;
     };
 
-    Game_Actor.prototype.isVehicle = function(type) {
+    Game_Battler.prototype.isVehicle = function(type) {
         if (type === 'boat') {
         return $gamePlayer.isInBoat();
         } else if (type === 'ship') {
@@ -727,10 +746,12 @@ Imported.NUUN_PassiveSkill = true;
         return this.equips().some(equip => equip && equip.atypeId === type);
     };
 
-    const _Game_Battler_refresh = Game_Battler.prototype.refresh;
-    Game_Battler.prototype.refresh = function() {
-        _Game_Battler_refresh.call(this);
-        this.resetRassiveParam();
+    Game_Enemy.prototype.isEquippedWeaponType = function(type) {
+        return true;
+    };
+
+    Game_Enemy.prototype.isEquippedArmorType = function(type) {
+        return true;
     };
 
     Game_Battler.prototype.resetRassiveParam = function() {
@@ -754,7 +775,12 @@ Imported.NUUN_PassiveSkill = true;
         }
     };
 
-    Game_Actor.prototype.getPassive = function() {
+    const _Game_Enemy_isActionValid = Game_Enemy.prototype.isActionValid;
+    Game_Enemy.prototype.isActionValid = function(action) {
+        return _Game_Enemy_isActionValid.apply(this, arguments) && !this.isPassiveSkill($dataSkills[action.skillId]);
+    };
+
+    Game_Battler.prototype.getPassive = function() {
         const passiveSkills = this._passiveSkillList;
         this._passiveCalc = true;
         const list = passiveSkills.filter((data, index) => {
@@ -764,7 +790,7 @@ Imported.NUUN_PassiveSkill = true;
         return list;
     };
 
-    Game_Actor.prototype.getPassiveSkill = function(paramId) {
+    Game_Battler.prototype.getPassiveSkill = function(paramId) {
         let value = 0;
         if (this._passiveCalc) return value;
         this.getPassive().forEach(skill => {
@@ -775,7 +801,7 @@ Imported.NUUN_PassiveSkill = true;
         return value;
     };
 
-    Game_Actor.prototype.getPassiveObject = function() {
+    Game_Battler.prototype.getPassiveObject = function() {
         if (this._passiveCalc) return [];
         return this.getPassive();
     };

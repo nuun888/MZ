@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Radar Chart Base
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -29,6 +29,9 @@
  * 
  * 
  * log
+ * 8/2/2025 Ver.1.2.1
+ * Fixed so that evaluation formulas can be applied to numerical values.
+ * Fixed so that the text color for resistances and weaknesses can be changed for attribute and state resistance rates.
  * 7/20/2025 Ver.1.2.0
  * Added a status radar chart feature.
  * Added the ability to set the maximum display value for the radar chart.
@@ -142,7 +145,7 @@
  * @target MZ
  * @plugindesc レーダーチャートベース
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -159,6 +162,9 @@
  * 
  * 
  * 更新履歴
+ * 2025/8/2 Ver.1.2.1
+ * 数値に評価式を適用できるように修正。
+ * 属性、ステートの耐性率に耐性、弱点による文字色を変更できるように修正。
  * 2025/7/20 Ver.1.2.0
  * ステータスのレーダーチャート機能を追加。
  * レーダーチャートの最大表示値を設定できる機能を追加。
@@ -285,8 +291,8 @@ Imported.NUUN_RadarChartBase = true;
         return _getChartData(type);
     };
 
-    Window_Base.prototype.setRadarChart = function(name, rate, iconId, value, x, y, decimal) {
-        return new RadarChart(name, rate, value, iconId, x, y, decimal);
+    Window_Base.prototype.setRadarChart = function(name, rate, iconId, value, x, y, decimal, formula) {
+        return new RadarChart(name, rate, value, iconId, x, y, decimal, formula);
     };
 
     Window_Base.prototype.getRadarChartElementList = function() {
@@ -349,7 +355,7 @@ Imported.NUUN_RadarChartBase = true;
         this.createBitmap();
     };
 
-    Sprite_NUUN_RadarChart.prototype.setup = function(battler, chartType, list, radius, offsetX, offsetY, fontSize, valueData) {
+    Sprite_NUUN_RadarChart.prototype.setup = function(battler, chartType, list, radius, offsetX, offsetY, fontSize, valueData, chartData) {
         this._valueData = valueData;
         this._battler = battler;
         this._chartType = chartType;
@@ -360,6 +366,11 @@ Imported.NUUN_RadarChartBase = true;
         this.offsetX = offsetX || 0;
         this.offsetY = offsetY || 0;
         this._maxParamRate = 1.0;
+        if (chartData) {
+            this._formula = chartData.formula;
+            this._resistanceColor = chartData.resistanceColor;
+            this._weaknessColor = chartData.weaknessColor;
+        }
         //this._nameDisplayMode = mode;
         this.updateBitmap();
     };
@@ -611,12 +622,14 @@ Imported.NUUN_RadarChartBase = true;
 
     Sprite_NUUN_RadarChart.prototype.drawNameIcon = function(x, y, data) {
         let margin = 0;
-        if (this.isIcon(data)) {
-            this.drawIcon(x, y, data.getIconId());
-            margin = ImageManager.iconWidth + 4;
-        }
         this.bitmap.fontSize = this.fontSize();
-        this.bitmap.drawText(data.getName(), x - 32 + margin, y - 16, 64, 32, 'center');
+        const textWidth = this.bitmap.measureTextWidth(data.getName());
+        if (this.isIcon(data)) {
+            margin = ImageManager.iconWidth / 2 + 4;
+            this.drawIcon(x - (textWidth / 2), y, data.getIconId());
+        }
+        this.bitmap.drawText(data.getName(), x + margin - (textWidth / 2), y - 16, 64, 32, 'left');
+        //this.fontSize() - $gameSystem.mainFontSize();
     };
 
     Sprite_NUUN_RadarChart.prototype.drawValue = function(x, y, data) {
@@ -624,8 +637,18 @@ Imported.NUUN_RadarChartBase = true;
             x += -32 + this._valueData.ChartInsideValueX + data.getX();
             y += -16 + this._valueData.ChartInsideValueY + data.getY();
             const value = this._chartType !== 'status' ? data.getValue() : NuunManager.numPercentage(data.getValue(), (params.Decimal - 2) || 0, true);
-            this.nuun_DrawContentsParamUnitText(data, value, x, y, 64, this._valueData.UnitText);
+            if (this._chartType !== 'status') {
+                this.changeParamColor(value);
+            } else {
+                this.bitmap.textColor = ColorManager.normalColor();
+            }
+            this.nuun_DrawContentsParamUnitText(data, this.getFormulaValue(value), x, y, 64, this._valueData.UnitText);
         }
+    };
+
+    Sprite_NUUN_RadarChart.prototype.getFormulaValue = function(value) {
+        const formula = this._formula;
+        return formula ? eval(formula) : value;
     };
 
 
@@ -633,7 +656,6 @@ Imported.NUUN_RadarChartBase = true;
         const padding = Window_Base.prototype.itemPadding.call(this);
         this.bitmap.fontSize = this.fontSize();
         const unitWidth = unit ? this.bitmap.measureTextWidth(unit) : 0;
-        this.bitmap.textColor = ColorManager.normalColor();
         this.bitmap.drawText(text, x, y, width - unitWidth, 32, 'center');
         if (unit) {
             this.bitmap.textColor = NuunManager.getColorCode(this._valueData.SystemUnitColor);
@@ -696,7 +718,22 @@ Imported.NUUN_RadarChartBase = true;
         const ph = ImageManager.iconHeight;
         const sx = (iconIndex % 16) * pw;
         const sy = Math.floor(iconIndex / 16) * ph;
-        sprite.setFrame(sx, sy, pw, ph);
+        sprite.setFrame(sx, sy, pw, ph); 
+        //const scale = NuunManager.numPercentage(this.fontSize() / $gameSystem.mainFontSize(), 0 || 0, true);console.log(scale)
+        //sprite.scale.x = scale;
+        //sprite.scale.y = scale;
+    };
+
+    Sprite_NUUN_RadarChart.prototype.changeParamColor = function(value) {
+        if (value === 100) {
+            this.bitmap.textColor = ColorManager.normalColor();
+        } else if (this._weaknessColor !== undefined && value > 100) {
+            this.bitmap.textColor = NuunManager.getColorCode(this._weaknessColor);
+        } else if (this._resistanceColor !== undefined) {
+            this.bitmap.textColor = NuunManager.getColorCode(this._resistanceColor);
+        } else {
+            this.bitmap.textColor = ColorManager.normalColor();
+        }
     };
 
 })();

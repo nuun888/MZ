@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.7.0
+ * @version 2.7.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -45,6 +45,14 @@
  * this._actorまたはactor 表示中のアクターのゲームデータ
  * dactor 表示中のアクターのデータベース
  * aclass 表示中のアクターの職業データ
+ * 
+ * ステート、属性耐性
+ * rate:耐性率
+ * 
+ * レーダーチャート
+ * レーダーチャートに表示する数値に適用されます。
+ * value:パラメータ
+ * 
  * 
  * 属性耐性、属性耐性
  * rate 単位付きの属性、ステート有効度
@@ -104,6 +112,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/2 Ver.2.7.1
+ * 属性、ステートの耐性率に耐性、弱点による文字色を変更できる機能を追加。(一覧表示、レーダーチャート)
+ * 評価式or文字列(3)をレーダーチャートにも適用できるように修正。
  * 2025/7/20 Ver.2.7.0
  * ステータスのレーダーチャートを追加。
  * 属性のレーダーチャート数値座標設定が無かった問題を修正。
@@ -415,6 +426,20 @@
  * @option 
  * @option pagedown2
  * @default 
+ * @parent Setting
+ * 
+ * @param ResistanceColor
+ * @desc 耐性のパラメータの数値色。(属性、ステート)
+ * @text 耐性数値色
+ * @type color
+ * @default 0
+ * @parent Setting
+ * 
+ * @param WeaknessColor
+ * @desc 弱点のパラメータの数値色。(属性、ステート)
+ * @text 弱点数値色
+ * @type color
+ * @default 0
  * @parent Setting
  * 
  * @param PageSetting
@@ -1255,11 +1280,11 @@
  * @value 101
  * @option サイドビューアクター画像(4)(5)(6)(7)(8)(10)
  * @value 102
- * @option ステータスレーダーチャート(4)(5)(6)(7)(8)(10)(15)
+ * @option ステータスレーダーチャート(3)(4)(5)(6)(7)(8)(10)(15)
  * @value 200
- * @option 属性耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
+ * @option 属性耐性レーダーチャート(3)(4)(5)(6)(7)(8)(10)(15)
  * @value 201
- * @option ステート耐性レーダーチャート(4)(5)(6)(7)(8)(10)(15)
+ * @option ステート耐性レーダーチャート(3)(4)(5)(6)(7)(8)(10)(15)
  * @value 202
  * @option 画像（共通画像）(3)(4)～(7)(22)
  * @value 300
@@ -1562,6 +1587,8 @@ const DefaultFontSize = Number(parameters['DefaultFontSize'] || 0);
 const FontMargin = Number(parameters['FontMargin'] || 10);
 const PageNextSymbol = NuunManager.getStringCode(parameters['PageNextSymbol']);
 const PagePreviousSymbol = NuunManager.getStringCode(parameters['PagePreviousSymbol']);
+const ResistanceColor = (DataManager.nuun_structureData(parameters['ResistanceColor'])) || 0;
+const WeaknessColor = (DataManager.nuun_structureData(parameters['WeaknessColor'])) || 0;
 const PageList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PageList'])) : null) || [];
 const ParamList_1Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_1Page'])) : null) || [];
 const ParamList_2Page = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ParamList_2Page'])) : null) || [];
@@ -2673,7 +2700,7 @@ Window_Status.prototype.drawElement = function(list, actor, x, y, width) {
                 rate = NuunManager.numPercentage(rate, (list.Decimal - 2) || 0, DecimalMode);
                 const r = rate;
                 const rateText = list.DetaEval ? eval(list.DetaEval) : rate;
-                this.resetTextColor();
+                this.changeParamColor(rate);
                 this.nuun_setContentsFontFace(list);
                 this.nuun_DrawContentsParamUnitText(rateText, list, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), "%");
             }   
@@ -2733,7 +2760,7 @@ Window_Status.prototype.drawStates = function(list, actor, x, y, width) {
                 if (actor.isStateResist(stateId)) {
                     this.changeTextColor(NuunManager.getColorCode(StateResistColor));
                 } else {
-                    this.resetTextColor();
+                    this.changeParamColor(rate);
                 }
                 this.nuun_setContentsFontFace(list);
                 this.nuun_DrawContentsParamUnitText(rateText, list, x2 + systemWidth + this.itemPadding(), y2, width2 - (systemWidth + this.itemPadding()), "%");
@@ -2852,21 +2879,21 @@ Window_Status.prototype.drawStatusRadarChart = function(list, actor, x, y) {
   if (!Imported.NUUN_RadarChartBase) {
     return;
   }
-  this.actorStatusRadarChart(this.setActorStatusChart(actor, list), actor, x, y,'status');
+  this.actorStatusRadarChart(list, this.setActorStatusChart(actor, list), actor, x, y,'status');
 };
 
 Window_Status.prototype.drawElementRadarChart = function(list, actor, x, y) {
     if (!Imported.NUUN_RadarChartBase) {
         return;
     }
-    this.actorElementRadarChart(this.setActorElementChart(actor, list), actor, x, y,'element');
+    this.actorElementRadarChart(list, this.setActorElementChart(actor, list), actor, x, y,'element');
 };
 
 Window_Status.prototype.drawStateRadarChart = function(list, actor, x, y) {
     if (!Imported.NUUN_RadarChartBase) {
         return;
     }
-    this.actorStateRadarChart(this.setActorStateChart(actor, list), actor, x, y,'state');
+    this.actorStateRadarChart(list, this.setActorStateChart(actor, list), actor, x, y,'state');
 };
 
 Window_Status.prototype.setActorStatusChart = function(actor, list) {
@@ -2910,29 +2937,29 @@ Window_Status.prototype.setActorStateChart = function(actor, list) {
     return data;
 };
 
-Window_Status.prototype.actorStatusRadarChart = function(list, actor, x, y, type) { 
+Window_Status.prototype.actorStatusRadarChart = function(data, list, actor, x, y, type) { 
     const key = "actorRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(StatusRadarChartFramecolor, StatusRadarChartLineColor, StatusRadarChartMainColor1, StatusRadarChartMainColor2, type);
-    sprite.setup(actor, type, list, StatusRadarChartRadius, StatusRadarChartX, StatusRadarChartY, StatusRadarChart_FontSize, StatusRadarChartValueData);
+    sprite.setup(actor, type, list, StatusRadarChartRadius, StatusRadarChartX, StatusRadarChartY, StatusRadarChart_FontSize, StatusRadarChartValueData, this.setChartData(data));
     sprite.move(x, y);
     sprite.show();
 };
 
-Window_Status.prototype.actorElementRadarChart = function(list, actor, x, y, type) { 
+Window_Status.prototype.actorElementRadarChart = function(data, list, actor, x, y, type) { 
     const key = "actorRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(ElementRadarChartFramecolor, ElementRadarChartLineColor, ElementRadarChartMainColor1, ElementRadarChartMainColor2, type);
-    sprite.setup(actor, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize, ElementRadarChartValueData);
+    sprite.setup(actor, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize, ElementRadarChartValueData, this.setChartData(data));
     sprite.move(x, y);
     sprite.show();
 };
 
-Window_Status.prototype.actorStateRadarChart = function(list, actor, x, y, type) { 
+Window_Status.prototype.actorStateRadarChart = function(data, list, actor, x, y, type) { 
     const key = "actorRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(StateRadarChartFramecolor, StateRadarChartLineColor, StateRadarChartMainColor1, StateRadarChartMainColor2, type);
-    sprite.setup(actor, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize, StateRadarChartValueData);
+    sprite.setup(actor, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize, StateRadarChartValueData, this.setChartData(data));
     sprite.move(x, y);
     sprite.show();
 };
@@ -3053,6 +3080,23 @@ Window_Status.prototype.isShowSlot = function(actor, index) {
     }
 };
 
+Window_Status.prototype.changeParamColor = function(value) {
+    if (value === 100) {
+        this.resetTextColor();
+    } else if (value > 100) {
+        this.changeTextColor(NuunManager.getColorCode(WeaknessColor));
+    } else {
+        this.changeTextColor(NuunManager.getColorCode(ResistanceColor));
+    }
+};
+
+Window_Status.prototype.setChartData = function(list) {
+    return {
+        formula:list.DetaEval,
+        resistanceColor:ResistanceColor,
+        weaknessColor:WeaknessColor
+    }
+};
 
 function Sprite_StatusHPGauge() {
   this.initialize(...arguments);

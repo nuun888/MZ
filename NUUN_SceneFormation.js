@@ -40,8 +40,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 6/13/2025 Ver.2.1.7
- * Fixed an issue where actions were not set correctly when closing the member change window after registering a member.
+ * 8/3/2025 Ver.2.1.7
+ * Fixed an issue where the behavior when switching was unnatural when a hidden actor was in the combat member.
+ * When applying variable number of battle members when hidden actors are in the battle members, the specifications have been changed so that the maximum number of members is subtracted by the number of hidden actors.
+ * Added a function that allows you to replace up to the original maximum number of party members when a hidden actor is in the combat member.
  * 6/3/2025 Ver.2.1.6
  * Fixed so that equipment display can be done from this plugin.
  * 5/5/2025 Ver.2.1.5
@@ -111,6 +113,13 @@
  * @param VariableBattleMember
  * @text Number of combat members
  * @desc Variable number of combat members.
+ * @type boolean
+ * @default false
+ * @parent BasicSetting
+ * 
+ * @param BreakawayBattleMember
+ * @text Breakaway members can be replaced
+ * @desc Even if Breakaway members are present, you will be able to replace up to the maximum number of party members.
  * @type boolean
  * @default false
  * @parent BasicSetting
@@ -1041,7 +1050,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.7
+ * @version 2.1.6
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1070,8 +1079,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2025/6/13 Ver.2.1.7
- * 登録メンバーを登録した後、メンバー変更ウィンドウを閉じた場合にアクションが正しく設定されない問題を修正。
+ * 2025/8/3 Ver.2.1.7
+ * hiddenアクターが戦闘メンバーにいる場合に、交代時の挙動が不自然になる問題を修正。
+ * hiddenアクターが戦闘メンバーにいる場合に戦闘メンバー数可変を適用時、最大メンバー数をhiddenアクター人数分差し引くように仕様変更。
+ * hiddenアクターが戦闘メンバーにいる場合に、元の最大パーティメンバー数まで入れ替えできる機能を追加。
  * 2025/6/3 Ver.2.1.6
  * 装備表示を当プラグインから行えるように修正。
  * 2025/5/5 Ver.2.1.5
@@ -1141,6 +1152,13 @@
  * @param VariableBattleMember
  * @text 戦闘メンバー数可変
  * @desc 戦闘メンバー数。(メニュー、戦闘共通)
+ * @type boolean
+ * @default false
+ * @parent BasicSetting
+ * 
+ * @param BreakawayBattleMember
+ * @text 離脱メンバー枠交代可能
+ * @desc 離脱メンバーがいる場合でも最大パーティメンバーまで入れ替え出来るようにします。
  * @type boolean
  * @default false
  * @parent BasicSetting
@@ -2182,6 +2200,8 @@ Imported.NUUN_SceneFormation = true;
         const members = this.battleMembers();
         if (params.VariableBattleMember) {
             members.push(null);
+        } else if (this.hiddenBattleMembers().length > 0) {
+            members.push(null);
         }
         return members;
     };
@@ -2214,19 +2234,27 @@ Imported.NUUN_SceneFormation = true;
     Game_Party.prototype.entryOrder = function(index) {
         const entryActor = this._actors[index];
         const members = this.formationBattleMember();
-        index += index >= members.length ? 1 : 0;
-        this._actors.splice(members.length - 1, 0, entryActor);
+        const hiddenNum = this.hiddenBattleMembers().length;
+        const isEntry = index >= members.length;
+        index += isEntry ? 1 : 0;
+        this._actors.splice(members.length + hiddenNum - 1, 0, entryActor);
         this._actors.splice(index, 1);
+        if (params.BreakawayBattleMember && isEntry) {
+            const actorIndex = this.allBattleMembers().findIndex(actor => actor.isHidden());
+            if (actorIndex >= 0) {
+                this.withdrawalOrder(actorIndex);
+            }
+        }   
     };
 
     Game_Party.prototype.changeWithdrawaBattleMember = function() {
         const members = this._formationBattleMembers - 1;
-        this._formationBattleMembers = members.clamp(1, this.battleMembers().length - 1);
+        this._formationBattleMembers = members.clamp(1, this.originalMaxBattleMembers());
     };
 
     Game_Party.prototype.changeEntryBattleMember = function() {
-        const members = this._formationBattleMembers + (this.battleMembers().length === this._formationBattleMembers ? 1 : 0);
-        this._formationBattleMembers = members.clamp(1, _Game_Party_maxBattleMembers.call(this));
+        const members = this._formationBattleMembers + 1;
+        this._formationBattleMembers = members.clamp(1, this.originalMaxBattleMembers());
     };
 
     Game_Party.prototype.useFormation = function() {
@@ -2834,9 +2862,6 @@ Imported.NUUN_SceneFormation = true;
                 AudioManager.playOkRegistrationSe();
                 $gameSystem.setSaveMembers();
                 this._saveMembersWindow.refresh();
-                if (this._isBattle) {
-                    $gameTemp.formationRefresh = true;
-                }
             } else {
                 SoundManager.playBuzzer();
             }
@@ -2878,9 +2903,6 @@ Imported.NUUN_SceneFormation = true;
                 this._memberWindow.refresh();
                 this._battleMemberWindow.refresh();
                 this.onSaveMembersSelectCancel();
-                if (this._isBattle) {
-                    $gameTemp.formationRefresh = true;
-                }
             } else {
                 SoundManager.playBuzzer();
                 this._saveMembersWindow.activate();
@@ -3303,6 +3325,7 @@ Imported.NUUN_SceneFormation = true;
     Window_FormationBattleMember.prototype.initialize = function(rect, formation) {
         this._formation = formation;
         this._members = $gameParty.formationBattleMember();
+        this._hiddenNum = $gameParty.hiddenBattleMembers().length;
         Window_StatusBase.prototype.initialize.call(this, rect);
         this._actorImgData = params.CharacterMode !== 'chip' && _isMemberActorPictureEXApp() ? new Nuun_ActorGraphics(this) : null;
         this._formationMode = true;
@@ -3312,6 +3335,7 @@ Imported.NUUN_SceneFormation = true;
 
     Window_FormationBattleMember.prototype.refresh = function() {
         this._members = $gameParty.formationBattleMember();
+        this._hiddenNum = $gameParty.hiddenBattleMembers().length;
         Window_StatusBase.prototype.refresh.call(this);
     };
 
@@ -3319,8 +3343,8 @@ Imported.NUUN_SceneFormation = true;
         return Math.min(this._members.length, this.originalMaxBattleMembers());
     };
 
-    Window_FormationBattleMember.prototype.originalMaxBattleMembers = function() {
-        return _Game_Party_maxBattleMembers.call($gameParty);
+    Window_FormationBattleMember.prototype.originalMaxBattleMembers = function() {//
+        return _Game_Party_maxBattleMembers.call($gameParty) - (params.BreakawayBattleMember ? 0 : this._hiddenNum);
     };
 
     Window_FormationBattleMember.prototype.maxCols = function() {

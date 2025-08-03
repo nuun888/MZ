@@ -40,10 +40,12 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 8/3/2025 Ver.2.1.7
+ * 8/3/2025 Ver.2.1.8
  * Fixed an issue where the behavior when switching was unnatural when a hidden actor was in the combat member.
  * When applying variable number of battle members when hidden actors are in the battle members, the specifications have been changed so that the maximum number of members is subtracted by the number of hidden actors.
  * Added a function that allows you to replace up to the original maximum number of party members when a hidden actor is in the combat member.
+ * 6/13/2025 Ver.2.1.7
+ * Fixed an issue where actions were not set correctly when closing the member change window after registering a member.
  * 6/3/2025 Ver.2.1.6
  * Fixed so that equipment display can be done from this plugin.
  * 5/5/2025 Ver.2.1.5
@@ -1050,7 +1052,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.6
+ * @version 2.1.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1079,10 +1081,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
- * 2025/8/3 Ver.2.1.7
+ * 2025/8/3 Ver.2.1.8
  * hiddenアクターが戦闘メンバーにいる場合に、交代時の挙動が不自然になる問題を修正。
  * hiddenアクターが戦闘メンバーにいる場合に戦闘メンバー数可変を適用時、最大メンバー数をhiddenアクター人数分差し引くように仕様変更。
  * hiddenアクターが戦闘メンバーにいる場合に、元の最大パーティメンバー数まで入れ替えできる機能を追加。
+ * 2025/6/13 Ver.2.1.7
+ * 登録メンバーを登録した後、メンバー変更ウィンドウを閉じた場合にアクションが正しく設定されない問題を修正。
  * 2025/6/3 Ver.2.1.6
  * 装備表示を当プラグインから行えるように修正。
  * 2025/5/5 Ver.2.1.5
@@ -2862,6 +2866,9 @@ Imported.NUUN_SceneFormation = true;
                 AudioManager.playOkRegistrationSe();
                 $gameSystem.setSaveMembers();
                 this._saveMembersWindow.refresh();
+                if (this._isBattle) {
+                    $gameTemp.formationRefresh = true;
+                }
             } else {
                 SoundManager.playBuzzer();
             }
@@ -2903,6 +2910,9 @@ Imported.NUUN_SceneFormation = true;
                 this._memberWindow.refresh();
                 this._battleMemberWindow.refresh();
                 this.onSaveMembersSelectCancel();
+                if (this._isBattle) {
+                    $gameTemp.formationRefresh = true;
+                }
             } else {
                 SoundManager.playBuzzer();
                 this._saveMembersWindow.activate();

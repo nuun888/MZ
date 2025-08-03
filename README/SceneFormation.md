@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.2.1.7
+# Ver.2.1.8
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,10 @@
 `Window_FormationStatus` アクターステータスウィンドウ  
 
 ## 更新履歴
+2025/8/3 Ver.2.1.8  
+hiddenアクターが戦闘メンバーにいる場合に、交代時の挙動が不自然になる問題を修正。  
+hiddenアクターが戦闘メンバーにいる場合に戦闘メンバー数可変を適用時、最大メンバー数をhiddenアクター人数分差し引くように仕様変更。  
+hiddenアクターが戦闘メンバーにいる場合に、元の最大パーティメンバー数まで入れ替えできる機能を追加。  
 2025/6/13 Ver.2.1.7  
 登録メンバーを登録した後、メンバー変更ウィンドウを閉じた場合にアクションが正しく設定されない問題を修正。  
 2025/6/3 Ver.2.1.6  

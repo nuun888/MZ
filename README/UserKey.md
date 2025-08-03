@@ -1,5 +1,5 @@
 # [キーボタン割り当て](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
-# Ver.1.3.0
+# Ver.1.3.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -47,6 +47,8 @@
 24:右スティック →  
 
 ## 更新履歴
+2025/8/3 Ver.1.3.1  
+ボタンを表示させない機能を追加。  
 2025/4/29 Ver.1.3.0  
 ボタンの設定を追加。  
 2024/6/16 Ver.1.2.8  

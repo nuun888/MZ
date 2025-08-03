@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * You can change keyboard keys and gamepad button assignments or set new ones.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/3/2025 Ver.1.3.1
+ * Added a feature to hide buttons.
  * 4/29/2025 Ver.1.3.0
  * Added button settings.
  * 6/16/2024 Ver.1.2.8
@@ -99,6 +101,13 @@
  * @param ButtonImgSetting
  * @text Button UI Settings
  * @default ------------------------------
+ * 
+ * @param ShowButton
+ * @desc Display the button.
+ * @text Button display
+ * @type boolean
+ * @default true
+ * @parent ButtonImgSetting
  * 
  * @param ButtonImg
  * @desc Specifies the button image.
@@ -465,7 +474,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * キーボードのキー及び、ゲームパッドのボタン割り当てを変更したり新規に設定したり出来ます。
@@ -492,6 +501,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/3 Ver.1.3.1
+ * ボタンを表示させない機能を追加。
  * 2025/4/29 Ver.1.3.0
  * ボタンの設定を追加。
  * 2024/6/16 Ver.1.2.8
@@ -551,6 +562,13 @@
  * @param ButtonImgSetting
  * @text ボタンUI設定
  * @default ------------------------------
+ * 
+ * @param ShowButton
+ * @desc ボタンを表示します。
+ * @text ボタン表示
+ * @type boolean
+ * @default true
+ * @parent ButtonImgSetting
  * 
  * @param ButtonImg
  * @desc ボタン画像を指定します。
@@ -1081,7 +1099,7 @@ Imported.NUUN_UserKey = true;
     Scene_Base.prototype.createUserButtons = function() {
         const _className = String(this.constructor.name);
         for (const data of UserKey) {
-            if (data.UserKey && this.isValidScene(data.UserKey, _className) && (!!data.UserKey.KeySprict || data.UserKey.KeyCommonEvent > 0) && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
+            if (data.ShowButton && data.UserKey && this.isValidScene(data.UserKey, _className) && (!!data.UserKey.KeySprict || data.UserKey.KeyCommonEvent > 0) && (data.UserKey.KeyCode >= 0 || data.UserKey.GamePadCode >= 0)) {
                 this.createUserButton(data);
             }
         }

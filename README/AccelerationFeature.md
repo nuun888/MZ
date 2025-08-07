@@ -1,5 +1,5 @@
 # [能力値ターン毎増減特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js)
-# Ver.2.0.2
+# Ver.2.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AccelerationFeature.js)  
 
 ターンごとに徐々に通常能力値が上昇していく特徴を設定できます。
@@ -19,6 +19,8 @@
 3ターンの加算率は1.5倍  
 
 ## 更新履歴
+2025/8/8 Ver.2.0.3  
+移動中に能力が上昇してしまう問題を修正。  
 2022/11/25 Ver.2.0.2  
 日本語以外での表示を英語表示に変更。  
 2022/1/26 Ver.2.0.1  

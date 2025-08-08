@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.23.2
+ * @version 2.23.3
  * 
  * @help
  * Implement an enemy book.
@@ -229,6 +229,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/8/2025 Ver.2.23.3
+ * Changed the specifications for how parameter names are displayed on the radar chart.
+ * Fixed so that evaluation formulas can be applied to radar chart values.
+ * Fixed so that the text color can be changed for attribute and state resistance rates, resistances, and weaknesses.
  * 7/20/2025 Ver.2.23.2
  * Correction of radar chart numbers.
  * 6/5/2025 Ver.2.23.1
@@ -1589,6 +1593,19 @@
 * @text Element resistance radar chart
 * @default ------------------------------
 * @parent ResistWeakElementData
+ * 
+ * @param ElementRadarChartDisplayNameModo
+ * @desc Specifies the parameter name display for the radar chart.
+ * @text Parameter name display settings
+ * @type select
+ * @option Icon
+ * @value icon
+ * @option Parameter name
+ * @value param
+ * @option Icon & Parameter name
+ * @value iconparam
+ * @default icon
+ * @parent ElementRadarChart
 * 
 * @param ElementRadarChartRadius
 * @desc Radar chart radius.
@@ -1641,13 +1658,20 @@
 * @default 48
 * @parent ElementRadarChart
 * 
-* @param ElementRadarChart_FontSize
-* @desc Font size. (from main font)
-* @text Font siz
-* @type number
-* @default -12
-* @min -9999
-* @parent ElementRadarChart
+ * @param ElementRadarChart_FontSize
+ * @desc Font size. (from main font)
+ * @text Font size
+ * @type number
+ * @default -12
+ * @min -9999
+ * @parent ElementRadarChart
+ * 
+ * @param ElementRadarChart_IconSize
+ * @desc Specifies the icon size. 0 is the default size.
+ * @text Icon size
+ * @type number
+ * @default 0
+ * @parent ElementRadarChart
  * 
  * @param ElementRadarChartValueData
  * @desc Set the values ​​to be displayed on the radar chart.
@@ -1747,6 +1771,19 @@
 * @text State resistance radar chart
 * @default ------------------------------
 * @parent ResistWeakStateData
+ * 
+ * @param StateRadarChartDisplayNameModo
+ * @desc Specifies the parameter name display for the radar chart.
+ * @text Parameter name display settings
+ * @type select
+ * @option Icon
+ * @value icon
+ * @option @option Parameter name
+ * @value param
+ * @option Icon & Parameter name
+ * @value iconparam
+ * @default icon
+ * @parent StateRadarChart
 * 
 * @param StateRadarChartRadius
 * @desc Radar chart radius.
@@ -1806,13 +1843,14 @@
 * @default -12
 * @min -9999
 * @parent StateRadarChart
-* 
-* @param RadarChartIcon
-* @desc Display the state display as an icon. OFF is the state name
-* @text Icon display
-* @type boolean
-* @default true
-* @parent StateRadarChart
+ * 
+ * @param StateRadarChart_IconSize
+ * @desc Specifies the icon size. 0 is the default size.
+ * @text Icon size
+ * @type number
+ * @default 0
+ * @parent StateRadarChart
+ * 
  * 
  * @param StateRadarChartValueData
  * @desc Set the values ​​to be displayed on the radar chart.
@@ -2449,9 +2487,9 @@
 * @value 90
 * @option Enemy use skill(1)~(15)(20)(21)
 * @value 100
-* @option Element radar chart(1)~(5)(8)(9)(12)(20)(21)
+* @option Element radar chart(1)~(5)(8)(9)(10)(12)(20)(21)
 * @value 121
-* @option State radar chart(1)~(5)(8)(9)(12)(20)(21)
+* @option State radar chart(1)~(5)(8)(9)(10)(12)(20)(21)
 * @value 122
 * @option Enemy picture(1)(2)(3)(4)(5)(7)(19)
 * @value 200
@@ -3186,7 +3224,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.23.2
+ * @version 2.23.3
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3407,6 +3445,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/8 Ver.2.23.3
+ * レーダーチャートのパラメータ名の表示方法の仕様を変更。
+ * レーダーチャートの数値に評価式を適用できるように修正。
+ * 属性、ステートの耐性率に耐性、弱点による文字色を変更できるように修正。
  * 2025/7/20 Ver.2.23.2
  * レーダーチャートの数値の修正。
  * 2025/6/5 Ver.2.23.1
@@ -3810,6 +3852,22 @@
  * @default 
  * @parent BasicSetting
  * 
+ * @param ResistanceColor
+ * @desc 耐性のパラメータの数値色。(属性、ステート) 
+ * @text 耐性数値色
+ * @type color
+ * @default 0
+ * @min 0
+ * @parent BasicSetting
+ * 
+ * @param WeaknessColor
+ * @desc 弱点のパラメータの数値色。(属性、ステート)
+ * @text 弱点数値色
+ * @type color
+ * @default 0
+ * @min 0
+ * @parent BasicSetting
+ * 
  * @param RegistrationSetting
  * @text 図鑑登録設定
  * @default ------------------------------
@@ -4153,7 +4211,7 @@
  * @desc 登録済みモンスター名の色。
  * @text 登録済みモンスター名文字色
  * @type color
- * @default 0
+ * @default -1
  * @max 999
  * @parent SelectEnemySetting
  * 
@@ -4161,7 +4219,7 @@
  * @desc ステータス情報登録済みモンスター名の色。
  * @text ステータス情報登録済みモンスター名文字色
  * @type color
- * @default 0
+ * @default -1
  * @max 999
  * @parent SelectEnemySetting
  * 
@@ -4868,6 +4926,19 @@
  * @default ------------------------------
  * @parent ResistWeakElementData
  * 
+ * @param ElementRadarChartDisplayNameModo
+ * @desc レーダーチャートのパラメータ名表示を指定します。
+ * @text パラメータ名表示
+ * @type select
+ * @option アイコンのみ
+ * @value icon
+ * @option パラメータ名のみ
+ * @value param
+ * @option アイコン及びパラメータ名
+ * @value iconparam
+ * @default icon
+ * @parent ElementRadarChart
+ * 
  * @param ElementRadarChartRadius
  * @desc レーダチャートの半径。
  * @text レーダチャート半径
@@ -4925,6 +4996,13 @@
  * @type number
  * @default -12
  * @min -9999
+ * @parent ElementRadarChart
+ * 
+ * @param ElementRadarChart_IconSize
+ * @desc アイコンサイズを指定します。0でデフォルトサイズ
+ * @text アイコンサイズ
+ * @type number
+ * @default 0
  * @parent ElementRadarChart
  * 
  * @param ElementRadarChartValueData
@@ -5026,6 +5104,19 @@
  * @default ------------------------------
  * @parent ResistWeakStateData
  * 
+ * @param StateRadarChartDisplayNameModo
+ * @desc レーダーチャートのパラメータ名表示を指定します。
+ * @text パラメータ名表示
+ * @type select
+ * @option アイコンのみ
+ * @value icon
+ * @option パラメータ名のみ
+ * @value param
+ * @option アイコン及びパラメータ名
+ * @value iconparam
+ * @default icon
+ * @parent StateRadarChart
+ * 
  * @param StateRadarChartRadius
  * @desc レーダチャートの半径。
  * @text レーダチャート半径
@@ -5085,11 +5176,11 @@
  * @min -9999
  * @parent StateRadarChart
  * 
- * @param RadarChartIcon
- * @desc ステートの表示をアイコンで表示する。OFFはステート名
- * @text アイコン表示
- * @type boolean
- * @default true
+ * @param StateRadarChart_IconSize
+ * @desc アイコンサイズを指定します。0でデフォルトサイズ
+ * @text アイコンサイズ
+ * @type number
+ * @default 0
  * @parent StateRadarChart
  * 
  * @param StateRadarChartValueData
@@ -5728,9 +5819,9 @@
  * @value 90
  * @option 敵の使用スキル(1)～(15)(20)(21)
  * @value 100
- * @option 属性レーダーチャート(1)～(5)(8)(9)(12)(20)(21)
+ * @option 属性レーダーチャート(1)～(5)(8)(9)(10)(12)(20)(21)
  * @value 121
- * @option ステートレーダーチャート(1)～(5)(8)(9)(12)(20)(21)
+ * @option ステートレーダーチャート(1)～(5)(8)(9)(10)(12)(20)(21)
  * @value 122
  * @option モンスター画像(1)(2)(3)(4)(5)(7)(19)
  * @value 200
@@ -6487,6 +6578,8 @@ const ActualEnemyMask = eval(parameters['ActualEnemyMask'] || 'true');
 const EnemyGraphicMode = Number(parameters['EnemyGraphicMode'] || 0);
 const FlagOnVictory = eval(parameters['FlagOnVictory'] || 'false');
 const FlagReturnTarget = DataManager.nuun_structureData(parameters['FlagReturnTarget']);
+const ResistanceColor = (DataManager.nuun_structureData(parameters['ResistanceColor'])) || 0;
+const WeaknessColor = (DataManager.nuun_structureData(parameters['WeaknessColor'])) || 0;
 
 const RegistrationTiming = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['RegistrationTiming'])) : [];
 const RegistrationEnemyColor = (DataManager.nuun_structureData(parameters['RegistrationEnemyColor'])) || 0;
@@ -6591,7 +6684,9 @@ const ElementRadarChartMainColor2 = Number(parameters['ElementRadarChartMainColo
 const ElementRadarChartX = Number(parameters['ElementRadarChartX'] || 48);
 const ElementRadarChartY = Number(parameters['ElementRadarChartY'] || 48);
 const ElementRadarChart_FontSize = Number(parameters['ElementRadarChart_FontSize'] || 0);
+const ElementRadarChart_IconSize = Number(parameters['ElementRadarChart_IconSize'] || 0);
 const ElementRadarChartValueData = (DataManager.nuun_structureData(parameters['ElementRadarChartValueData']));
+const ElementRadarChartDisplayNameModo = String(parameters['ElementRadarChartDisplayNameModo'] || "icon");
 
 const StateList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['StateList'])) : [];
 const StateUnknownIconId = Number(parameters['StateUnknownIconId'] || 1);
@@ -6608,8 +6703,9 @@ const StateRadarChartMainColor2 = Number(parameters['StateRadarChartMainColor2']
 const StateRadarChartX = Number(parameters['StateRadarChartX'] || 48);
 const StateRadarChartY = Number(parameters['StateRadarChartY'] || 48);
 const StateRadarChart_FontSize = Number(parameters['StateRadarChart_FontSize'] || 0);
+const StateRadarChart_IconSize = Number(parameters['StateRadarChart_IconSize'] || 0);
 const StateRadarChartValueData = (DataManager.nuun_structureData(parameters['StateRadarChartValueData']));
-const RadarChartIcon = eval(parameters['RadarChartIcon'] || 'false');
+const StateRadarChartDisplayNameModo = String(parameters['StateRadarChartDisplayNameModo'] || "icon");
 const ResistDebuffInState = eval(parameters['ResistDebuffInState'] || 'false');
 
 const DeBuffList = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DeBuffList'])) : [];
@@ -6885,6 +6981,15 @@ function getTransformEnemy(enemyId) {
         enemyId = Number($dataEnemies[enemyId].meta.TransformEnemy);
     }
     return enemyId;
+};
+
+function _getIconSize(type) {
+    switch (type) {
+        case "element":
+            return ElementRadarChart_IconSize;
+        case "state":
+            return StateRadarChart_IconSize;
+    }
 };
 
 NuunManager.getMapEncountEnemyList = function() {
@@ -11573,7 +11678,7 @@ Window_EnemyBook.prototype.enemyElementChart = function(list, enemy, x, y, width
     }
     this.drawText(nameText, x + margin, y, width - margin);
     const lineHeight = this.lineHeight();
-    this.enemyElementRadarChart(this.setEnemyElementChart(enemy, list), enemy, x, y + lineHeight ,'element');
+    this.enemyElementRadarChart(list, this.setEnemyElementChart(enemy, list), enemy, x, y + lineHeight ,'element');
 };
 
 Window_EnemyBook.prototype.enemyStateChart = function(list, enemy, x, y, width) {
@@ -11590,7 +11695,7 @@ Window_EnemyBook.prototype.enemyStateChart = function(list, enemy, x, y, width) 
     }
     this.drawText(nameText, x + margin, y, width - margin);
     const lineHeight = this.lineHeight();
-    this.enemyStateRadarChart(this.setEnemyStateChart(enemy, list), enemy, x, y + lineHeight ,'state');
+    this.enemyStateRadarChart(list, this.setEnemyStateChart(enemy, list), enemy, x, y + lineHeight ,'state');
 };
 
 Window_EnemyBook.prototype.setEnemyElementChart = function(enemy, list) {
@@ -11601,7 +11706,7 @@ Window_EnemyBook.prototype.setEnemyElementChart = function(enemy, list) {
         const elementIconId = element.ElementIconId || 0;
         const x = element.ValueX || 0;
         const y = element.ValueY || 0;
-        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y, list.Decimal));
+        data.push(this.setRadarChart(elementName, rate, elementIconId, null, x, y, list.Decimal, ElementRadarChartDisplayNameModo));
     }
     return data;
 };
@@ -11613,30 +11718,39 @@ Window_EnemyBook.prototype.setEnemyStateChart = function(enemy, list) {
         let rate = enemy.stateRate(stateId);
         rate *= enemy.isStateResist(stateId) ? 0 : 1;
         const stateName = $dataStates[stateId].name;
-        const iconId = RadarChartIcon ? $dataStates[stateId].iconIndex : 0;
+        const iconId = $dataStates[stateId].iconIndex || 0;
         const x = state.ValueX || 0;
         const y = state.ValueY || 0;
-        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y, list.Decimal));
+        data.push(this.setRadarChart(stateName, rate, iconId, null, x, y, list.Decimal, StateRadarChartDisplayNameModo));
     }
     return data;
 };
 
-Window_EnemyBook.prototype.enemyElementRadarChart = function(list, enemy, x, y, type) { 
+Window_EnemyBook.prototype.enemyElementRadarChart = function(data, list, enemy, x, y, type) { 
     const key = "enemyRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(ElementRadarChartFramecolor, ElementRadarChartLineColor, ElementRadarChartMainColor1, ElementRadarChartMainColor2);
-    sprite.setup(enemy, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize, ElementRadarChartValueData);
+    sprite.setup(enemy, type, list, ElementRadarChartRadius, ElementRadarChartX, ElementRadarChartY, ElementRadarChart_FontSize, ElementRadarChartValueData, this.setChartData(data, type));
     sprite.move(x, y);
     sprite.show();
 };
 
-Window_EnemyBook.prototype.enemyStateRadarChart = function(list, enemy, x, y, type) { 
+Window_EnemyBook.prototype.enemyStateRadarChart = function(data, list, enemy, x, y, type) { 
     const key = "enemyRadarChart_%1".format(type);
     const sprite = this.createInnerSprite(key, Sprite_NUUN_RadarChart);
     sprite.setupColor(StateRadarChartFramecolor, StateRadarChartLineColor, StateRadarChartMainColor1, StateRadarChartMainColor2);
-    sprite.setup(enemy, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize, StateRadarChartValueData);
+    sprite.setup(enemy, type, list, StateRadarChartRadius, StateRadarChartX, StateRadarChartY, StateRadarChart_FontSize, StateRadarChartValueData, this.setChartData(data, type));
     sprite.move(x, y);
     sprite.show();
+};
+
+Window_EnemyBook.prototype.setChartData = function(data, type) {
+    return {
+        formula: data.DetaEval,
+        resistanceColor: ResistanceColor,
+        weaknessColor: WeaknessColor,
+        iconSize: _getIconSize(type)
+    }
 };
 
 Window_EnemyBook.prototype.commonEnemyBitmap = function(list, enemy, x, y, width) {
@@ -11748,12 +11862,12 @@ Window_EnemyBook.prototype.buffIconIndex = function(rate, paramId) {
 };
 
 Window_EnemyBook.prototype.valueColor = function(value) {
-    if (value > 100) {
-        this.changeTextColor(ColorManager.powerDownColor())
-    } else if (value < 100) {
-        this.changeTextColor(ColorManager.powerUpColor())
-    } else {
+    if (value === 100) {
         this.resetTextColor();
+    } else if (value > 100) {
+        this.changeTextColor((WeaknessColor >= 0 ? NuunManager.getColorCode(WeaknessColor) : ColorManager.powerDownColor()));
+    } else {
+        this.changeTextColor(ResistanceColor >= 0 ? NuunManager.getColorCode(ResistanceColor) : ColorManager.powerUpColor());
     }
 };
 

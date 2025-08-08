@@ -1,5 +1,5 @@
 # [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)
-# Ver.1.7.11
+# Ver.1.7.12
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
 
 共通処理を行うベースプラグインです。  
@@ -8,6 +8,8 @@
 バグ、競合報告はツクールフォーラム(日本)のスレッド、会話、ツクマテのスレッド、X(Twitter)のDMでお願いいたします。　　
 
 ## 更新内容
+2025/8/9 Ver.1.7.12  
+メタタグ取得の処理を修正。  
 2025/6/3 Ver.1.7.11  
 特定の処理でのエラーログを追加。  
 2024/11/9 Ver.1.7.10  

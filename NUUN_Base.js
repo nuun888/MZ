@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  NuuNBasePlugin
  * @author NUUN
- * @version 1.7.11
+ * @version 1.7.12
  * 
  * @help
  * This is a base plugin that performs common processing.
@@ -21,6 +21,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/9/2025 Ver.1.7.12
+ * Fixed meta tag retrieval processing.
  * 6/3/2025 Ver.1.7.11
  * Added error logging for certain processes.
  * 11/9/2024 Ver.1.7.10
@@ -112,7 +114,7 @@
  * @target MZ
  * @plugindesc  共通処理
  * @author NUUN
- * @version 1.7.11
+ * @version 1.7.12
  * 
  * @help
  * 共通処理を行うベースプラグインです。
@@ -122,6 +124,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/9 Ver.1.7.12
+ * メタタグ取得の処理を修正。
  * 2025/6/3 Ver.1.7.11
  * 特定の処理でのエラーログを追加。
  * 2024/11/9 Ver.1.7.10
@@ -472,6 +476,9 @@ NuunManager.paramClone = function(param) {
 NuunManager.getMetaCode = function(object, method) {
     const meta = object.meta[method];
     if (!meta) return null;
+    if (meta === true) {
+        return null;
+    }
     if (meta.indexOf('[') >= 0) {
         const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
         throw ["ParameterError", log];

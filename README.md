@@ -236,7 +236,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | メニュー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数10　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [スキルツリー](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [公開準備中](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) |  | |
+| [スキルツリー](https://github.com/nuun888/MZ/blob/master/README/SkillTree.md) | [公開準備中](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js) |  | |
 | [所持金拡張](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) | 共 | 1.2.1 |
 | [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md) | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ グ A | 2.18.5 |
 | ┣　[モンスター図鑑マップ遭遇チェック](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEncounterCheck.md) | [NUUN_EnemyBookEncounterCheck](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEncounterCheck.js) | 共 | 1.0.0 |

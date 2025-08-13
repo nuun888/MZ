@@ -74,6 +74,5 @@ $gameActors
 `nsp`:スキルポイント  
 `this.getSkillTreeCount(skillId)`:対象のスキルの習得回数  
 `this.isSkillTreeLearned(skillId)`:対象のスキルが習得済みか  
-`this.isClass($dataClasses[classId])`対象のアクターが指定の職業か   
 
 ## 更新履歴

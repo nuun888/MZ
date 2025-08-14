@@ -15,7 +15,7 @@
  * @version 1.0.0
  * 
  * @help
- * We will implement a tree-type skill acquisition system.
+ * Implement a tree-type skill learning system.
  * 
  * This plugin requires the following plugins.
  * NUUN_Base

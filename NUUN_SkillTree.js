@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -85,6 +85,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/15/2025 Ver.1.0.1
+ * Updates regarding "Skill Tree Status Screen Customization".
  * 8/14/2025 Ver.1.0.0
  * First edition.
  * 
@@ -1188,7 +1190,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1258,6 +1260,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/15 Ver.1.0.1
+ * スキルツリーステータス画面カスタマイズに関する更新。
  * 2025/8/14 Ver.1.0.0
  * 初版
  * 
@@ -2480,6 +2484,10 @@ Imported.NUUN_SkillTree = true;
         return new SkillTreeData(data, actor);
     };
 
+    NuunManager.getSkillPointParamName = function() {
+        return params.SkillPointName;
+    }
+
 
     class SkillTreeData {
         constructor(data, actor) {
@@ -2913,7 +2921,7 @@ Imported.NUUN_SkillTree = true;
         return new Rectangle(wx, wy, ww, wh);
     };
 
-    Scene_MenuBase.prototype.setupActor = function(actor) {
+    Scene_SkillTree.prototype.setupActor = function(actor) {
         this._actor = actor;
     };
 
@@ -3412,8 +3420,12 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.drawAllItems = function() {
-        this.drawDerivedSkillTreeLineBase();
+        this.drawBaseAreaContens();
         Window_Selectable.prototype.drawAllItems.call(this);
+    };
+
+    Window_SkillTree.prototype.drawBaseAreaContens = function() {
+        this.drawDerivedSkillTreeLineBase();
     };
 
     Window_SkillTree.prototype.drawDerivedSkillTreeLineBase = function() {

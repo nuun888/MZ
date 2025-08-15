@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * @base NUUN_Base
  * 
  * @help
@@ -85,6 +85,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/15/2025 Ver.1.6.1
+ * Corrected some processing.
  * 7/27/2025 Ver.1.6.0
  * Passive skills also apply to enemies.
  * 6/22/2025 Ver.1.5.9
@@ -290,7 +292,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.6.0
+ * @version 1.6.1
  * @base NUUN_Base
  * 
  * @help
@@ -355,6 +357,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/15 Ver.1.6.1
+ * 一部処理の修正。
  * 2025/7/27 Ver.1.6.0
  * パッシブスキルを敵にも適用。
  * 2025/6/22 Ver.1.5.9
@@ -586,15 +590,15 @@ Imported.NUUN_PassiveSkill = true;
         this._passiveSkillList = [];
         this._passiveSkillId = [];
         let index = 0;
-        const skills = this.getPassiveAllActions();console.log(skills)
-        skills.forEach(skill => {
+        const skills = this.getPassiveAllActions();
+        for (const skill of skills) {
             const weapon = this.getPassiveSkillWeapon(skill);
             if (weapon > 0) {
                 this._passiveSkillList[index] = $dataWeapons[weapon];
                 this._passiveSkillId[index] = skill;
                 index++;
             }
-        });
+        }
     };
 
     Game_Actor.prototype.getPassiveAllActions = function() {
@@ -641,22 +645,22 @@ Imported.NUUN_PassiveSkill = true;
     };
 
     Game_Battler.prototype.passiveObject = function() {
-        return this.getPassiveObject(); 
+        return this.getPassiveObject();
     };
 
     Game_Battler.prototype.condPassiveSkill = function(skill) {
         if (Imported.NUUN_ConditionsBase && CondBasePassive) {
-        return this.getCondition(skill);
+            return this.getCondition(skill);
         }
         let result = true;
         const conditions = this.getPassiveConditions(skill);
         if (conditions.length > 0) {
-        const list = PassiveSkillConditions;
-        if (this.getPassiveMode(skill) === 0) {
-            result = conditions.some(id => this.skillConditions(list[id - 1]));
-        } else {
-            result = conditions.every(id => this.skillConditions(list[id - 1]));
-        }
+            const list = PassiveSkillConditions;
+            if (this.getPassiveMode(skill) === 0) {
+                result = conditions.some(id => this.skillConditions(list[id - 1]));
+            } else {
+                result = conditions.every(id => this.skillConditions(list[id - 1]));
+            }
         }
         return result;
     };
@@ -682,7 +686,7 @@ Imported.NUUN_PassiveSkill = true;
 
     Game_Battler.prototype.skillConditions = function(list) {
         if (!list) {
-        return true;
+            return true;
         }
         switch (list.ParamConditions) {
         case 'HP':
@@ -793,11 +797,12 @@ Imported.NUUN_PassiveSkill = true;
     Game_Battler.prototype.getPassiveSkill = function(paramId) {
         let value = 0;
         if (this._passiveCalc) return value;
-        this.getPassive().forEach(skill => {
+        const list = this.getPassive();
+        for (const skill of list) {
             if (skill) {
                 value += skill.params[paramId];
             }
-        });
+        }
         return value;
     };
 

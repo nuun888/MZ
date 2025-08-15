@@ -3,6 +3,9 @@
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+#### オプション
+※大量のパッシブスキルを持たせる場合は必須  
+[特徴パフォーマンス改善](https://github.com/nuun888/MZ/blob/master/README/TraitsFPSImprovement.md)  
 
 Ver.1.5.5まで条件モードの説明が逆に表記されていました。  
 正しくは  

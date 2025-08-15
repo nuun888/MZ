@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.10
+ * @version 1.1.11
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/15/2025 Ver.1.1.11
+ * Fixed an issue where an error would occur when displaying the screen when applying "NUUN_ActorPicture".
+ * Fixed the display of facial graphics.
+ * Added a skill point item.
  * 6/3/2025 Ver.1.1.10
  * Fixed to allow equipment display settings to be made from external plugins.
  * 4/12/2025 Ver.1.1.9
@@ -139,7 +143,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.10
+ * @version 1.1.11
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -150,6 +154,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/15 Ver.1.1.11
+ * 立ち絵、顔グラ共通プラグインを適用する場合に、画面表示時にエラーが出る問題を修正。
+ * 顔グラの表示を修正。
+ * スキルポイントの項目を追加。
  * 2025/6/3 Ver.1.1.10
  * 装備表示の外部プラグインからの設定を行えるように修正。
  * 2025/4/13 Ver.1.1.9
@@ -284,6 +292,7 @@ Imported.NUUN_MenuParamListBase = true;
             this._battler = null;
             this._actorBitmap = null;
             this._actorImgData = this.isActorPictureEXApp() ? new Nuun_ActorGraphics(_window) : null;
+            this._isContents = false;
             this.language_Jp = $gameSystem.isJapanese();
         }
     
@@ -377,6 +386,7 @@ Imported.NUUN_MenuParamListBase = true;
 
         drawItemContents(index) {
             this._battler = this._window.actor(index);
+            this._isContents = true;
             const unLoadBitmap = this.loadCheckBitmap(this._battler);
             if (unLoadBitmap){
                 unLoadBitmap.addLoadListener(this.drawItemContents.bind(this, index));//再トライ
@@ -397,6 +407,10 @@ Imported.NUUN_MenuParamListBase = true;
             }
         }
 
+        isItemContents() {
+            return this._isContents;
+        }
+
         drawItemContentsImg(index) {
             const actor = this._window.actor(index);
             this.drawItemImg(actor, index);
@@ -410,7 +424,7 @@ Imported.NUUN_MenuParamListBase = true;
 
         drawItemImg(actor, index) {
             if (actor && actor.isActor()) {
-                const data = this.getActorImgData(actor);
+                const data = this.getActorImgData(actor, true);
                 if (!data) {
                     this._graphicMode = this._window.defaultGraphicMode();
                     if (this._graphicMode !== 'none') {
@@ -418,7 +432,7 @@ Imported.NUUN_MenuParamListBase = true;
                     }
                 } else {
                     this._graphicMode = this.getGraphicMode();
-                    if (this._graphicMode !== 'none' && this._graphicMode !== 's_img') {
+                    if (this._graphicMode === 'face' || this._graphicMode === 'img') {
                         this.drawContentsImage(data, actor, index);
                     }
                 }
@@ -433,7 +447,8 @@ Imported.NUUN_MenuParamListBase = true;
                 if (this._graphicMode === 'face') {
                     bitmap = this.getFaceImg(actor);
                 } else {
-                    if (isApng(data.ActorImg.split('pictures/')[1])) {
+                    const imageName = this.getGraphicName(data);
+                    if (isApng(imageName.split('pictures/')[1])) {
                         this.createApngSprite(data, actor, index);
                     } else {
                         bitmap = this.getActorGraphicImg(data, actor);
@@ -442,7 +457,7 @@ Imported.NUUN_MenuParamListBase = true;
             }
             if (bitmap) {
                 bitmap.addLoadListener(function() {
-                    this.drawActorGraphic(data, bitmap, index, rect.x, rect.y, rect.width, rect.height , actor);
+                    this.drawActorGraphic(data, bitmap, index, rect.x, rect.y, rect.width, this.getFaceHeight(rect) , actor);
                 }.bind(this));
             }
         }
@@ -456,7 +471,7 @@ Imported.NUUN_MenuParamListBase = true;
             const rect = this._window.itemRect(index);
             const sprite = this._actorBitmap;
             sprite.setup(actor, data, data.ActorImg, !!this.isActorPictureEXApp());
-            sprite.move(rect.x + 50 + data.Actor_X + this._params.ActorImg_X, rect.y + data.Actor_Y + this._params.ActorImg_Y, rect.width, rect.height);
+            sprite.move(rect.x + 50 + data.Actor_X + this._params.ActorImg_X, rect.y + data.Actor_Y + this._params.ActorImg_Y, rect.width, this.getFaceHeight(rect));
         }
         
         drawActorGraphic(data, bitmap, index, x, y, width, height, actor) {
@@ -472,15 +487,15 @@ Imported.NUUN_MenuParamListBase = true;
         nuun_drawActorGraphic(actor, data, bitmap, index, x, y, width, height) {
             const w = this._window;
             w.changePaintOpacity(w.isSubMemberOpacity(actor));
-            const ww = Math.min(width + (index >= 0 ? -2 : 0), bitmap.width);
-            const wh = Math.min(height + (index >= 0 ? -2 : 0), bitmap.height);
+            const ww = bitmap.width;
+            const wh = bitmap.height;
             const scale = (data.Actor_Scale || 100) / 100;
             const sw = width * scale;
             const sh = height * scale;
             const sx = data.Img_SX || 0;
             const sy = data.Img_SY || 0;
-            x += data.Actor_X + this._params.ActorImg_X + (index >= 0 ? 1 : this.getActorGraphicPosition(bitmap));
-            y += data.Actor_Y + this._params.ActorImg_Y + (index >= 0 ? 1 : (this._window.innerHeight - bitmap.height));
+            x += data.Actor_X + (this._params.ActorImg_X || 0) + (this.isItemContents() ? 1 : this.getActorGraphicPosition(bitmap));
+            y += data.Actor_Y + (this._params.ActorImg_Y || 0) + (this.isItemContents() ? 1 : (this._window.innerHeight - bitmap.height));
             w.contents.blt(bitmap, sx, sy, ww, wh, x, y, ww, wh);
             w.changePaintOpacity(true);
         }
@@ -524,6 +539,10 @@ Imported.NUUN_MenuParamListBase = true;
 
         getActorGraphicImg(data, actor) {
             return this.isActorPictureEXApp() ? this._actorImgData.loadActorGraphic() : ImageManager.nuun_LoadPictures(data.ActorImg);
+        }
+
+        getGraphicName(data) {
+            return this.isActorPictureEXApp() ? this._actorImgData.getActorGraphicImg() : data.ActorImg;
         }
 
         setTextMode(align) {
@@ -1040,7 +1059,7 @@ Imported.NUUN_MenuParamListBase = true;
             }
             const rect = this._window.itemRect(0);
             bitmap.addLoadListener(function() {
-                this.nuun_ActorFace(data, x, y, Math.min(width, ImageManager.faceWidth), Math.min(rect.height - 2, ImageManager.faceHeight), actor);
+                this.nuun_ActorFace(data, x, y, Math.min(this.getFaceWidth(rect), ImageManager.faceWidth), Math.min(this.getFaceHeight(rect), ImageManager.faceHeight), actor);
             }.bind(this));
         }
 
@@ -1050,7 +1069,7 @@ Imported.NUUN_MenuParamListBase = true;
             const bitmap = ImageManager.loadFace(faceData[0]);
             const rect = this._window.itemRect(0);
             bitmap.addLoadListener(function() {
-                this.nuun_EnemyFace(data, faceData, x, y, Math.min(width, ImageManager.faceWidth), Math.min(rect.height - 2, ImageManager.faceHeight), enemy);
+                this.nuun_EnemyFace(data, faceData, x, y, Math.min(this.getFaceWidth(rect), ImageManager.faceWidth), Math.min(this.getFaceHeight(rect), ImageManager.faceHeight), enemy);
             }.bind(this));
         }
 
@@ -1176,6 +1195,10 @@ Imported.NUUN_MenuParamListBase = true;
     
         nuun_DrawContentsGainExpRate(data, x, y, width, actor) {
             this.nuun_DrawSParams(data, 9, x, y, width, actor);
+        }
+
+        nuun_DrawContentsSkillPoint(data, x, y, width, actor) {
+            this.nuun_DrawSkillPoint(data, x, y, width, actor);
         }
 
         nuun_DrawContentsEquip(data, x, y, width, actor) {
@@ -1353,6 +1376,33 @@ Imported.NUUN_MenuParamListBase = true;
             this.nuun_SetContentsValueFontFace(data);
             let textParam = (data.DetaEval ? eval(data.DetaEval) : actor.sparam(param) * 100);
             textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, true);
+            w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
+        }
+
+        nuun_DrawSkillPoint(data, x, y, width, actor) {
+            const enemy = actor.isEnemy() ? actor : null;
+            const w = this._window;
+            const padding = w.itemPadding();
+            if (data.Back) {
+                w.drawContentsBackground(x, y, width);
+                x = this.contensX(x);
+                width = this.contensWidth(width);
+            }
+            if (data.Icon && data.Icon > 0) {
+                w.drawIcon(data.Icon, x, y + (data.IconY || 0));
+                const iconWidth = ImageManager.iconWidth + 4;
+                x += iconWidth;
+                width -= iconWidth;
+            }
+            w.changeTextColor(NuunManager.getColorCode(data.NameColor));
+            const nameText = data.paramName ? data.paramName : NuunManager.getSkillPointParamName();
+            w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+            this.nuun_SetContentsFontFace(data);
+            const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
+            w.drawText(nameText, x, y, textWidth);
+            w.resetTextColor();
+            this.nuun_SetContentsValueFontFace(data);
+            const textParam = (data.DetaEval ? eval(data.DetaEval) : actor.nsp);
             w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
         }
 
@@ -1574,6 +1624,14 @@ Imported.NUUN_MenuParamListBase = true;
         drawContentsActorFront(bitmap, x, y, width, height) {
             this._window.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x, y, width, height);
         }
+
+        getFaceHeight(rect) {
+            return this.isItemContents() ? rect.height - 2 : this._window.innerHeight;
+        }
+
+        getFaceWidth(rect) {
+            return this.isItemContents() ? rect.width : this._window.innerWidth;
+        }
     
         nuun_ExpTotalValue(actor) {
             if (actor.isMaxLevel()) {
@@ -1674,6 +1732,10 @@ Imported.NUUN_MenuParamListBase = true;
         } else {
             _Window_StatusBase_drawActorName.apply(this, arguments);
         }
+    };
+
+    Window_StatusBase.prototype.isSubMemberOpacity = function(actor) {
+        return true;
     };
 
     const _Window_Selectable_paint = Window_Selectable.prototype.paint;//修正予定
@@ -2147,7 +2209,7 @@ Imported.NUUN_MenuParamListBase = true;
     };
 
     Sprite_NuunActor.prototype.isSubMemberOpacity = function(actor) {
-        return this._class.isSubMemberOpacity ? this._class.isSubMemberOpacity(actor) : true;
+        return !!this._class.isSubMemberOpacity ? this._class.isSubMemberOpacity(actor) : true;
     };
 
     Sprite_NuunActor.prototype.getActorImgData = function(actor) {

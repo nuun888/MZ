@@ -88,6 +88,10 @@ $gameActors
 ダウンロード  
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
+#### 更新履歴
+2025/8/15 Ver.1.0.0  
+初版  
+
 ## スキルツリースキルコスト拡張  
 スキルコストにJavaScriptを使用できるようにしたり、条件でコスト設定を指定できるようにします。  
 

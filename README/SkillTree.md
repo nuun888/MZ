@@ -5,7 +5,7 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 #### オプション
-スキルツリーステータス画面カスタマイズ  
+[スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 スキルツリースキルコスト拡張  
 前提スキルウィンドウ  
 
@@ -85,6 +85,8 @@ $gameActors
 
 ## スキルツリーステータス画面カスタマイズ 
 スキルツリーステータスウィンドウの表示するアクターステータスをカスタイマイズします。  
+ダウンロード  
+[スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
 ## スキルツリースキルコスト拡張  
 スキルコストにJavaScriptを使用できるようにしたり、条件でコスト設定を指定できるようにします。  

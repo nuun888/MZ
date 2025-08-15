@@ -84,7 +84,7 @@ $gameActors
 `this.isSkillTreeLearned(skillId)`:対象のスキルが習得済みか  
 
 ## スキルツリーステータス画面カスタマイズ 
-スキルツリーステータスウィンドウの表示するアクターステータスをカスタイマイズします。  
+スキルツリーステータスウィンドウの表示するアクターステータスをカスタイマイズ、ステータスウィンドウ、スキルツリーウィンドウ、スキルシーン内のいずれかにアクター画像を表示します。  
 ダウンロード  
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 

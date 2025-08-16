@@ -89,12 +89,12 @@ $gameActors
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
 #### クラス
-`Scene_SkillTree` スキルツリーシーン
-`Window_SkillTreeType` スキルツリータイプウィンドウ
-`Window_SkillTree` スキルツリーウィンドウ
-`Window_SkillTreeCost` スキルツリーコストウィンドウ
-`Window_SkillTreeStatus` スキルツリーステータスウィンドウ
-`Window_SkillTreeConfirmation` 習得確認ウィンドウ
+`Scene_SkillTree` スキルツリーシーン  
+`Window_SkillTreeType` スキルツリータイプウィンドウ  
+`Window_SkillTree` スキルツリーウィンドウ  
+`Window_SkillTreeCost` スキルツリーコストウィンドウ  
+`Window_SkillTreeStatus` スキルツリーステータスウィンドウ  
+`Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 #### 更新履歴
 2025/8/15 Ver.1.0.0  

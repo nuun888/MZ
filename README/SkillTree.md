@@ -88,7 +88,7 @@ $gameActors
 ダウンロード  
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
-#### クラス
+## クラス
 `Scene_SkillTree` スキルツリーシーン  
 `Window_SkillTreeType` スキルツリータイプウィンドウ  
 `Window_SkillTree` スキルツリーウィンドウ  

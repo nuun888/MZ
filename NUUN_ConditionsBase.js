@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.3.3
+ * @version 1.4.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -260,6 +260,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/15 Ver.1.4.0
+ * 指定の数値、指定のID、文字列を配列で指定できるように修正。
  * 2024/6/27 Ver.1.3.3
  * 追加能力値、特殊能力値の条件が適用されていなかった問題を修正。
  * 2023/9/18 Ver.1.3.2
@@ -762,15 +764,30 @@
  * 
  * @param ValList
  * @text 指定の数値(2)
- * @desc 指定の数値（複数の場合は,で区切り''又は""で囲む　例'10, 11, 13'）(2)
+ * @desc 指定の数値（複数の場合は,で区切り''又は""で囲む　例'10, 11, 13'）(2)非推奨
  * @type string
  * @default
  * @parent CommonSetting
  * 
+ * @param ValListArray
+ * @text 指定の数値(2)
+ * @desc 指定の数値(2)
+ * @type number[]
+ * @default
+ * @parent CommonSetting
+ * 
+ * 
  * @param IDList
  * @text 指定のID、文字列(3)
- * @desc 指定のIDまたは文字列（複数の場合は,で区切り''又は""で囲む　例'10, 11, 13'）(3)
+ * @desc 指定のIDまたは文字列（複数の場合は,で区切り''又は""で囲む　例'10, 11, 13'）(3)非推奨
  * @type string
+ * @default
+ * @parent CommonSetting
+ * 
+ * @param IDListArray
+ * @text 指定のID、文字列(3)
+ * @desc 指定のIDまたは文字列(3)
+ * @type string[]
  * @default
  * @parent CommonSetting
  * 
@@ -997,12 +1014,12 @@ function battlerTriggerConditions(data, target, mode) {
   const unit = getUnit(target, mode);
   if (data.BattlerConditionsType === 'ID') {
     if (mode === 'Party' || mode === 'Troop') {
-      return unit.members().some(member => memberId(data.IDList, member));
+      return unit.members().some(member => memberId(getIdList(data), member));
     } else {
-      return memberId(data.IDList, target);
+      return memberId(getIdList(data), target);
     }
   } else if (data.BattlerConditionsType === 'IDNum') {
-    sum = membersSum(data.IDList, unit);
+    sum = membersSum(getIdList(data), unit);
     return conditionsNum(data, sum);
   } else if (data.BattlerConditionsType === 'IsActor') {
     if (mode === 'Party') {
@@ -1024,14 +1041,14 @@ function classTriggerConditions(data, target, mode) {
   const unit = getUnit(target, mode);
   if (data.ClassConditionsType === 'ID') {
     if (mode === 'Party') {
-      return unit.members().some(member => classId(data.IDList, member));
+      return unit.members().some(member => classId(getIdList(data), member));
     } else if (target && target.isActor()) {
-      return classId(data.IDList, target);
+      return classId(getIdList(data), target);
     }
   } else if (data.ClassConditionsType === 'IDNum') {
     if (mode === 'Party' || target && target.isActor()) {
       let sum = 0;
-      sum = classSum(data.IDList, $gameParty);
+      sum = classSum(getIdList(data), $gameParty);
       return conditionsNum(data, sum);
     }
   }
@@ -1155,27 +1172,27 @@ function equipTriggerConditions(data, target, mode) {
   const unit = getUnit(target, mode);
   if (data.EquipConditionsType === 'Weapon') {
     if (mode === 'Party') {
-      return unit.members().some(member => equipWeapon(data.IDList, member));
+      return unit.members().some(member => equipWeapon(getIdList(data), member));
     } else {
-      return equipWeapon(data.IDList, target);
+      return equipWeapon(getIdList(data), target);
     }
   } else if (data.EquipConditionsType === 'Armor') {
     if (mode === 'Party') {
-      return unit.members().some(member => equipArmor(data.IDList, member));
+      return unit.members().some(member => equipArmor(getIdList(data), member));
     } else {
-      return equipArmorn(data.IDList, target);
+      return equipArmorn(getIdList(data), target);
     }
   } else if (data.EquipConditionsType === 'WeaponType') {
     if (mode === 'Party') {
-      return unit.members().some(member => equipWeaponType(data.IDList, member));
+      return unit.members().some(member => equipWeaponType(getIdList(data), member));
     } else {
-      return equipWeaponType(data.IDList, target);
+      return equipWeaponType(getIdList(data), target);
     }
   } else if (data.EquipConditionsType === 'ArmorType') {
     if (mode === 'Party') {
-      return unit.members().some(member => equipArmorType(data.IDList, member));
+      return unit.members().some(member => equipArmorType(getIdList(data), member));
     } else {
-      return equipArmorType(data.IDList, target);
+      return equipArmorType(getIdList(data), target);
     }
   }
   return false;
@@ -1199,7 +1216,7 @@ function elementTriggerConditions(data, target, mode, action) {
     return false;
   }
   if (data.ElementConditionsType === 'Element') {
-    return attackElement(data.IDList, action);
+    return attackElement(getIdList(data), action);
   }
 };
 
@@ -1227,11 +1244,11 @@ function useItemSkillTriggerConditions(data, target, mode, action) {
     return false;
   }
   if (data.ItemSkillConditionsType === 'Item') {
-    return action.isItem() ? useItem(data.IDList, action.item().id) : false;
+    return action.isItem() ? useItem(getIdList(data), action.item().id) : false;
   } else if (data.ItemSkillConditionsType === 'Skill') {
-    return action.isSkill() ? useItem(data.IDList, action.item().id) : false;
+    return action.isSkill() ? useItem(getIdList(data), action.item().id) : false;
   } else if (data.ItemSkillConditionsType === 'SkillType') {
-    return action.isSkill() ? useSkillType(data.IDList, action.item()) : false;
+    return action.isSkill() ? useSkillType(getIdList(data), action.item()) : false;
   }
 };
 
@@ -1353,19 +1370,21 @@ function vehicleiggerConditions(data) {
 //変数
 function variableTriggerConditions(data) {
   if (data.VariableConditionsType === 'Var') {
-    return getValList(data.IDList).some(listId => conditionsNum(data, $gameVariables.value(listId)));
+    const list = isIdListArray(data) ? data.IDListArray : getValList(data.IDList);
+    return list.some(listId => conditionsNum(data, $gameVariables.value(listId)));
   }
   return false;
 };
 
 //スイッチ
 function switchTriggerConditions(data) {
-  if (data.SwitchConditionsType === 'ONSwitch') {
-    return getValList(data.IDList).some(listId => $gameSwitches.value(listId));
-  } else if (data.SwitchConditionsType === 'OFFSwitch') {
-    return getValList(data.IDList).some(listId => !$gameSwitches.value(listId));
-  }
-  return false;
+    const list = isIdListArray(data) ? data.IDListArray : getValList(data.IDList);
+    if (data.SwitchConditionsType === 'ONSwitch') {
+        return list.some(listId => $gameSwitches.value(listId));
+    } else if (data.SwitchConditionsType === 'OFFSwitch') {
+        return list.some(listId => !$gameSwitches.value(listId));
+    }
+    return false;
 };
 
 //所持金
@@ -1439,18 +1458,36 @@ function getValList(valList) {
   return valList ? valList.split(',').map(Number) : [];
 };
 
+function isIdListArray(data) {
+    return !!data.IDListArray && data.IDListArray.length > 0;
+};
+
+function isValListArray(data) {
+    return !!data.ValListArray && data.ValListArray.length > 0;
+};
+
+function getIdList(data) {
+    return isIdListArray(data) ? data.IDListArray : getValList(data.IDList);
+};
+
+function getVarList(data) {
+    return isValListArray(data) ? data.ValListArray : getValList(data.ValList);
+};
+
 function conditionsNum(data, num) {
-  if (data.ValList) {
-    return getValList(data.ValList).some(val => val === num);
-  }
-  return (num >= data.DwLimit && (data.UpLimit > 0 ? (num <= data.UpLimit) : true));
+    const list = isValListArray(data) ? data.ValListArray : getValList(data.ValList);
+    if (list.length > 0) {
+        return list.some(val => val === num);
+    }
+    return (num >= data.DwLimit && (data.UpLimit > 0 ? (num <= data.UpLimit) : true));
 };
 
 function conditionsRate(data, num, paramMax) {
-  if (data.ValList) {
-    return getValList(data.ValList).some(val => val === num);
-  }
-  return num >= paramMax * data.DwLimit / 100 && (data.UpLimit > 0 ? (num <= paramMax * data.UpLimit / 100) : true);
+    const list = isValListArray(data) ? data.ValListArray : getValList(data.ValList);
+    if (list.length > 0) {
+        return list.some(val => val === num);
+    }
+    return num >= paramMax * data.DwLimit / 100 && (data.UpLimit > 0 ? (num <= paramMax * data.UpLimit / 100) : true);
 };
 
 function getUnit(target, mode) {
@@ -1464,7 +1501,7 @@ function getUnit(target, mode) {
 
 function memberId(idList, member) {
   const id = member.isActor() ? member.actorId() : member.enemyId();
-  return getValList(idList).some(listId => listId === id);
+  return idList.some(listId => listId === id);
 };
 
 function membersSum(idList, unit) {
@@ -1479,7 +1516,7 @@ function membersSum(idList, unit) {
 
 function classId(idList, member) {
   const id = member._classId;
-  return getValList(idList).some(listId => listId === id);
+  return idList.some(listId => listId === id);
 };
 
 function classSum(IdList, unit) {
@@ -1505,13 +1542,13 @@ function conditionsAve(data, unit) {
 
 function state(data, member) {
   const states = member._states;
-  const list = getValList(data.IDList);
+  const list = getIdList(data);
   return list.some(id => id > 0 && stateTurn(data, getStateId(id, states), member));
 }
 
 function stateTurnCount(data, member) {
   const states = member._states;
-  const list = getValList(data.IDList);
+  const list = getIdList(data);
   return list.some(id => id > 0 && getStateTurnCount(data, getStateId(id, states), member));
 }
 
@@ -1525,50 +1562,50 @@ function stateTurn(data, id, member) {
 };
 
 function getStateTurnCount(data, id, member) {
-  const turn = member.getStateNowTurn(id) - 1;
-  return conditionsNum(data, turn);
+    const turn = member.getStateNowTurn(id) - 1;
+    return conditionsNum(data, turn);
 };
 
 function notStates(data, member) {
-  const states = member._states;
-  if (data.IDList) {
-    const list = getValList(data.IDList);
-    return list.some(id => !getStateId(id, states))
-  } else {
-    return !(states.some(id => id > 0));
-  }
+    const states = member._states;
+    const list = getIdList(data);
+    if (list.length > 0) {
+        return list.some(id => !getStateId(id, states))
+    } else {
+        return !(states.some(id => id > 0));
+    }
 };
 
 function buffs(data, member) {
-  const buffs = member._buffs;
-  const list = getValList(data.IDList);
-  return list.some(id => buffsLavel(data, id, buffs))
+    const buffs = member._buffs;
+    const list = getIdList(data);
+    return list.some(id => buffsLavel(data, id, buffs))
 };
 
 function deBuffs(data, member) {
-  const buffs = member._buffs;
-  const list = getValList(data.IDList);
-  return list.some(id => deBuffsLavel(data, id, buffs))
+    const buffs = member._buffs;
+    const list = getIdList(data);
+    return list.some(id => deBuffsLavel(data, id, buffs))
 };
 
 function notBuffs(data, member) {
-  const buffs = member._buffs;
-  if (data.IDList) {
-    const list = getValList(data.IDList);
-    return list.some(id => !buffsLavel(data, id, buffs))
-  } else {
-    return !(buffs.some(buff => buff > 0));
-  }
+    const buffs = member._buffs;
+    const list = getIdList(data);
+    if (list.length > 0) {
+        return list.some(id => !buffsLavel(data, id, buffs))
+    } else {
+        return !(buffs.some(buff => buff > 0));
+    }
 };
 
 function notDebuffs(data, member) {
-  const buffs = member._buffs;
-  if (data.IDList) {
-    const list = getValList(data.IDList);
-    return list.some(id => !deBuffsLavel(data, id, buffs))
-  } else {
-    return !(buffs.some(buff => buff < 0));
-  }
+    const buffs = member._buffs;
+    const list = getIdList(data);
+    if (list.length > 0) {
+        return list.some(id => !deBuffsLavel(data, id, buffs))
+    } else {
+        return !(buffs.some(buff => buff < 0));
+    }
 };
 
 function buffsLavel(data, id, buffs) {
@@ -1593,69 +1630,69 @@ function buffsTurn(data, id, member) {
   return conditionsNum(data, turn);
 };
 
-function useItem(idList, item) {
-  return getValList(idList).some(listId => listId === item);
+function useItem(list, item) {
+  return list.some(listId => listId === item);
 };
 
-function useSkillType(idList, item) {
-  return getValList(idList).some(listId => listId === item.stypeId);
+function useSkillType(list, item) {
+  return list.some(listId => listId === item.stypeId);
 };
 
 function possessionItems(data) {
-  return getValList(data.IDList).some(listId => conditionsNum(data, $gameParty.numItems($dataItems[listId])));
+  return getIdList(data).some(listId => conditionsNum(data, $gameParty.numItems($dataItems[listId])));
 };
 
 function possessionWeapons(data) {
-  return getValList(data.IDList).some(listId => conditionsNum(data, $gameParty.numItems($dataWeapons[listId])));
+  return getIdList(data).some(listId => conditionsNum(data, $gameParty.numItems($dataWeapons[listId])));
 };
 
 function possessionArmors(data) {
-  return getValList(data.IDList).some(listId => conditionsNum(data, $gameParty.numItems($dataArmors[listId])));
+  return getIdList(data).some(listId => conditionsNum(data, $gameParty.numItems($dataArmors[listId])));
 };
 
 function notPossessionItems(data) {
-    return !getValList(data.IDList).some(listId => $gameParty.hasItem($dataItems[listId]));
+    return !getIdList(data).some(listId => $gameParty.hasItem($dataItems[listId]));
 };
   
 function notPossessionWeapons(data) {
-    return !getValList(data.IDList).some(listId => $gameParty.hasItem($dataWeapons[listId]));
+    return !getIdList(data).some(listId => $gameParty.hasItem($dataWeapons[listId]));
 };
   
 function notPossessionArmors(data) {
-    return !getValList(data.IDList).some(listId => $gameParty.hasItem($dataArmors[listId]));
+    return !getIdList(data).some(listId => $gameParty.hasItem($dataArmors[listId]));
 };
 
 function masterSkill(data, member) {
-  return getValList(data.IDList).some(listId => member.skills().some(skill => skill.id === listId));
+  return getIdList(data).some(listId => member.skills().some(skill => skill.id === listId));
 };
 
 function masterEnemySkill(data, member) {
-  return getValList(data.IDList).some(listId => member.enemy().actions.some(action => action.skillId === listId));
+  return getIdList(data).some(listId => member.enemy().actions.some(action => action.skillId === listId));
 };
 
 function equipWeapon(idList, member) {
-  if (idList == 0) {
+  if (idList.length === 0) {
     return member.weapons().length === 0;
   } else {
-    return getValList(idList).some(listId => member.hasWeapon($dataWeapons[listId]));
+    return idList.some(listId => member.hasWeapon($dataWeapons[listId]));
   }
 };
 
 function equipArmor(idList, member) {
-  if (idList == 0) {
+  if (idList.length === 0) {
     return member.armors().length === 0;
   } else {
-    return getValList(idList).some(listId => member.hasArmor($dataArmors[listId]));
+    return idList.some(listId => member.hasArmor($dataArmors[listId]));
   }
 };
 
 function equipWeaponType(idList, member) {
-  const list = getValList(idList);
+  const list = idList;
   return member.weapons().some(weapon => isEquipType(weapon.wtypeId, list));
 };
 
 function equipArmorType(idList, member) {
-  const list = getValList(idList);
+  const list = idList;
   return member.armors().some(armor => isEquipType(armor.atypeId, list));
 };
 
@@ -1684,7 +1721,7 @@ function attackElement(idList, action) {
             elementsList = action.getItemElementsList();
         }
     }
-    const list = getValList(idList);
+    const list = idList;
     return elementsList.some(id => elements(list, id));
 };
 
@@ -1693,11 +1730,11 @@ function elements(list, id) {
 };
 
 function elementValidity(data, battler) {
-  return getValList(data.IDList).some(id => conditionsNum(data, battler.elementRate(id) * 100));
+  return getIdList(data).some(id => conditionsNum(data, battler.elementRate(id) * 100));
 };
 
 function stateValidity(data, battler) {
-  return getValList(data.IDList).some(id => conditionsNum(data, battler.stateRate(id) * 100));
+  return getIdList(data).some(id => conditionsNum(data, battler.stateRate(id) * 100));
 };
 
 function getPartyGold(data) {
@@ -1717,14 +1754,14 @@ function getTriggerConditionsParam(params) {
 };
 
 function isTraitNoteTag(member) {
-    const data = data.IDList.split(',');
+    const data = isIdListArray(data) ? data.IDListArray : data.IDList.split(',');
     return member.traitObjects().some(trait => {
         return data.some(tag => !!trait.meta[tag]);
     });
 };
 
 function isNoteTag(dMember) {
-    const data = data.IDList.split(',');
+    const data = isIdListArray(data) ? data.IDListArray : data.IDList.split(',');
     return data.some(tag => !!dMember.meta[tag]);
 };
 
@@ -1811,38 +1848,33 @@ Game_BattlerBase.prototype.triggerXParamConditions = function(data) {
 };
 
 Game_BattlerBase.prototype.conditionsParam = function(data, paramId) {
-  let paramVal = 0;
-  let paramMaxVal = 0;
-  if (paramId === 0) {
-    paramVal = this._hp;
-    if (!this._cParam[paramId]) {
-      paramMaxVal = this.mhp;
-      this._cParam[paramId] = paramMaxVal;
+    let paramVal = 0;
+    let paramMaxVal = 0;
+    if (paramId === 0) {
+        paramVal = this._hp;
+        if (!this._cParam[paramId]) {
+        paramMaxVal = this.mhp;
+        this._cParam[paramId] = paramMaxVal;
+        }
+    } else if (paramId === 1) {
+        paramVal = this._mp;
+        if (!this._cParam[paramId]) {
+        paramMaxVal = this.mmp;
+        this._cParam[paramId] = paramMaxVal;
+        }
+    } else if (paramId === 10) {
+        paramVal = this._tp;
+        if (!this._cParam[paramId]) {
+        paramMaxVal = this.maxTp();
+        this._cParam[paramId] = paramMaxVal;
+        }
     }
-  } else if (paramId === 1) {
-    paramVal = this._mp;
-    if (!this._cParam[paramId]) {
-      paramMaxVal = this.mmp;
-      this._cParam[paramId] = paramMaxVal;
+    paramMaxVal = this._cParam[paramId];
+    const list = getVarList(data);
+    if (list.length > 0) {
+        return list.some(val => val === paramVal);
     }
-  } else if (paramId === 10) {
-    paramVal = this._tp;
-    if (!this._cParam[paramId]) {
-      paramMaxVal = this.maxTp();
-      this._cParam[paramId] = paramMaxVal;
-    }
-  }
-  paramMaxVal = this._cParam[paramId];
-  if (data.ValList) {
-    let valList = [];
-    if (isNaN(data.ValList)) {
-        valList = data.ValList.split(',').map(Number);
-    } else {
-        valList = [data.ValList];
-    }
-    return valList.some(val => val === paramVal);
-  }
-  return paramVal >= paramMaxVal * data.DwLimit / 100 && (data.UpLimit > 0 ? (paramVal <= paramMaxVal * data.UpLimit / 100) : true);
+    return paramVal >= paramMaxVal * data.DwLimit / 100 && (data.UpLimit > 0 ? (paramVal <= paramMaxVal * data.UpLimit / 100) : true);
 };
 
 Game_BattlerBase.prototype.conditionsStatus = function(data, paramId) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * @base NUUN_Base
  * 
  * @help
@@ -85,6 +85,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/17/2025 Ver.1.6.2
+ * Fixed an issue that caused save data to become large.
+ * Fixed to cache passive skills applied on the equipment screen.
  * 8/15/2025 Ver.1.6.1
  * Corrected some processing.
  * 7/27/2025 Ver.1.6.0
@@ -292,7 +295,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.6.1
+ * @version 1.6.2
  * @base NUUN_Base
  * 
  * @help
@@ -357,6 +360,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/17 Ver.1.6.2
+ * セーブデータ量が大きくなる問題を修正。
+ * 装備画面で適用されたパッシブスキルをキャッシュするように修正。
  * 2025/8/15 Ver.1.6.1
  * 一部処理の修正。
  * 2025/7/27 Ver.1.6.0
@@ -571,34 +577,118 @@ Imported.NUUN_PassiveSkill = true;
     const PassiveSkillType = params.PassiveSkillType;
     const CondBasePassive = params.CondBasePassive;
 
+    const _Game_Temp_initialize = Game_Temp.prototype.initialize;
+    Game_Temp.prototype.initialize = function() {
+        _Game_Temp_initialize.apply(this, arguments);
+        this.cachePassiveObjects = [];
+        this.onPassiveCache = false;
+    };
+
+    Game_Temp.prototype.setPassiveCache = function(actorId, objects) {
+        if (this.onPassiveCache) {
+            this.cachePassiveObjects[actorId] = objects;
+        }
+    };
+
+    Game_Temp.prototype.getPassiveCache = function(actorId) {
+        return this.onPassiveCache ? this.cachePassiveObjects[actorId] : null;
+    };
+
+
     const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
     Game_Battler.prototype.initMembers = function() {
         _Game_Battler_initMembers.call(this);
-        this._passiveSkillList = [];
-        this._passiveSkillId = [];
-        //this._passiveCalc = false;
+        this._passiveCalc = false;
+        this._passiveSkillsList = [];
+    };
+
+    Game_Battler.prototype._oldVersionCheck = function() {
+        if (!!this._passiveSkillId) {//旧版
+            this._passiveSkillList = this._passiveSkillId;
+            this._passiveSkillId = null;
+        }
     };
 
     const _Game_Battler_refresh = Game_Battler.prototype.refresh;
     Game_Battler.prototype.refresh = function() {
         _Game_Battler_refresh.apply(this, arguments);
-        this.resetRassiveParam();
-        this.setPassiveSkill();
+        this.setPassiveSkillList();
     };
 
-    Game_Battler.prototype.setPassiveSkill = function() {
-        this._passiveSkillList = [];
-        this._passiveSkillId = [];
-        let index = 0;
-        const skills = this.getPassiveAllActions();
-        for (const skill of skills) {
-            const weapon = this.getPassiveSkillWeapon(skill);
-            if (weapon > 0) {
-                this._passiveSkillList[index] = $dataWeapons[weapon];
-                this._passiveSkillId[index] = skill;
-                index++;
+    const _Game_Battler_paramPlus = Game_Battler.prototype.paramPlus;
+    Game_Battler.prototype.paramPlus = function(paramId) {
+        let value = _Game_Battler_paramPlus.call(this, paramId);
+        value += this.passiveSkillParam(paramId);
+        return value;
+    };
+
+    const _Game_Battler_traitObjects = Game_Battler.prototype.traitObjects;
+    Game_Battler.prototype.traitObjects = function() {
+        let objects = _Game_Battler_traitObjects.call(this);
+        //パッシブスキルのオブジェクトを取得
+        Array.prototype.push.apply(objects, this.passiveSkillObject());
+        return objects;
+    };
+
+    Game_Battler.prototype.passiveSkillParam = function(paramId) {
+        return this.getPassiveSkill(paramId);
+    };
+
+    Game_Battler.prototype.passiveSkillObject = function() {
+        return this.getPassiveObject();
+    };
+
+    Game_Actor.prototype.passiveSkillObject = function() {
+        return $gameTemp.getPassiveCache(this.actorId()) || this.getPassiveObject();
+    };
+
+    Game_Battler.prototype.getPassiveSkill = function(paramId) {
+        let value = 0;
+        if (this._passiveCalc) return value;
+        const list = this.passiveSkillObject();
+        for (const skill of list) {
+            if (skill) {
+                value += skill.params[paramId];
+
             }
         }
+        return value;
+    };
+
+    Game_Battler.prototype.getPassiveObject = function() {
+        if (this._passiveCalc) return [];
+        return this.getPassiveObjects();
+    };
+
+    Game_Battler.prototype.getPassiveObjects = function() {
+        const list = [];
+        const skills = this.getPassiveSkillsList();
+        this._passiveCalc = true;
+        for (const skillId of skills) {
+            if (this.condPassiveSkill(skillId)) {
+                const weapon = this.getPassiveSkillWeapon(skillId);
+                if (weapon > 0) {
+                    list.push($dataWeapons[weapon]);
+                }
+            }
+        }
+        this.setPassiveCache(list);
+        this._passiveCalc = false;
+        return list;
+    };
+
+    Game_Battler.prototype.setPassiveSkillList = function() {
+        this._oldVersionCheck();
+        this.clearcachePassiveObjects();
+        this._passiveSkillsList = this.getPassiveAllActions();//全てのパッシブスキルを習得　条件フィルターはかけない
+    };
+
+    Game_Battler.prototype.getPassiveSkillsList = function() {
+        if (!this._passiveSkillsList) {
+            this._passiveSkillsList = [];
+            this.setPassiveSkillList();
+        }
+        return this._passiveSkillsList;
     };
 
     Game_Actor.prototype.getPassiveAllActions = function() {
@@ -607,6 +697,10 @@ Imported.NUUN_PassiveSkill = true;
 
     Game_Enemy.prototype.getPassiveAllActions = function() {
         return this.enemy().actions.filter(action => this.meetsCondition(action) && this.isPassiveSkill($dataSkills[action.skillId])).map(action => $dataSkills[action.skillId]);
+    };
+
+    Game_Battler.prototype.getPassiveSkillWeapon = function(skill) {
+        return this.getPassiveSkillId(skill);
     };
 
     Game_Battler.prototype.isPassiveSkill = function(item) {
@@ -625,27 +719,20 @@ Imported.NUUN_PassiveSkill = true;
         return item.meta.PassiveMatch ? Number(item.meta.PassiveMatch) : 1;
     };
 
-    const _Game_Battler_paramPlus = Game_Battler.prototype.paramPlus;
-    Game_Battler.prototype.paramPlus = function(paramId) {
-        let value = _Game_Battler_paramPlus.call(this, paramId);
-        value += this.passiveParam(paramId);
-        return value;
+    Game_Battler.prototype.setPassiveCache = function(objects) {
+        
     };
 
-    const _Game_Battler_traitObjects = Game_Battler.prototype.traitObjects;
-    Game_Battler.prototype.traitObjects = function() {
-        let objects = _Game_Battler_traitObjects.call(this);
-        //パッシブスキルのオブジェクトを取得
-        Array.prototype.push.apply(objects, this.passiveObject());
-        return objects;
+    Game_Actor.prototype.setPassiveCache = function(objects) {
+        $gameTemp.setPassiveCache(this.actorId(), objects);
     };
 
-    Game_Battler.prototype.passiveParam = function(paramId) {
-        return this.getPassiveSkill(paramId);
+    Game_Battler.prototype.clearcachePassiveObjects = function() {
+
     };
 
-    Game_Battler.prototype.passiveObject = function() {
-        return this.getPassiveObject();
+    Game_Actor.prototype.clearcachePassiveObjects = function() {
+        $gameTemp.cachePassiveObjects[this.actorId()] = null;
     };
 
     Game_Battler.prototype.condPassiveSkill = function(skill) {
@@ -669,19 +756,6 @@ Imported.NUUN_PassiveSkill = true;
         const condTag = "PassiveConditions";
         const action = $gameTemp.getActionData();
         return this.getTriggerConditions(skill, this, condTag , null, 'Party'+ condTag, 'Troop'+ condTag, action.action, action.damage, this.getPassiveMode(skill));
-    };
-
-    Game_Battler.prototype.getPassiveSkillWeapon = function(skill) {
-        return this.getPassiveSkillId(skill);
-    };
-    
-    const _Game_Actor_addedSkillTypes = Game_Actor.prototype.addedSkillTypes;
-    Game_Actor.prototype.addedSkillTypes = function() {
-        const traits = _Game_Actor_addedSkillTypes.call(this);
-        if ($gameParty.inBattle()) {
-        return traits.filter(id => id !== PassiveSkillType);
-        }
-        return traits;
     };
 
     Game_Battler.prototype.skillConditions = function(list) {
@@ -761,13 +835,22 @@ Imported.NUUN_PassiveSkill = true;
     Game_Battler.prototype.resetRassiveParam = function() {
         this._pmhp = null;
         this._pmmp = null;
-    };                            
+    };
+
+    const _Game_Actor_addedSkillTypes = Game_Actor.prototype.addedSkillTypes;
+    Game_Actor.prototype.addedSkillTypes = function() {
+        const traits = _Game_Actor_addedSkillTypes.call(this);
+        if ($gameParty.inBattle()) {
+        return traits.filter(id => id !== PassiveSkillType);
+        }
+        return traits;
+    };
 
     const _Game_Actor_learnSkill = Game_Actor.prototype.learnSkill;
     Game_Actor.prototype.learnSkill = function(skillId) {
         _Game_Actor_learnSkill.call(this, skillId);
         if ($dataSkills[skillId] && $dataSkills[skillId].meta.PassiveSkill) {
-            this.refresh();
+            this.setPassiveSkillList();
         }
     };
 
@@ -775,7 +858,7 @@ Imported.NUUN_PassiveSkill = true;
     Game_Actor.prototype.forgetSkill = function(skillId) {
         _Game_Actor_forgetSkill.call(this, skillId);
         if ($dataSkills[skillId] && $dataSkills[skillId].meta.PassiveSkill) {
-            this.refresh();
+            this.setPassiveSkillList();
         }
     };
 
@@ -784,31 +867,28 @@ Imported.NUUN_PassiveSkill = true;
         return _Game_Enemy_isActionValid.apply(this, arguments) && !this.isPassiveSkill($dataSkills[action.skillId]);
     };
 
-    Game_Battler.prototype.getPassive = function() {
-        const passiveSkills = this._passiveSkillList;
-        this._passiveCalc = true;
-        const list = passiveSkills.filter((data, index) => {
-            return this.condPassiveSkill(this._passiveSkillId[index]);
-        });
-        this._passiveCalc = false;
-        return list;
-    };
 
-    Game_Battler.prototype.getPassiveSkill = function(paramId) {
-        let value = 0;
-        if (this._passiveCalc) return value;
-        const list = this.getPassive();
-        for (const skill of list) {
-            if (skill) {
-                value += skill.params[paramId];
-            }
+    const _Scene_Base_initialize = Scene_Base.prototype.initialize;
+    Scene_Base.prototype.initialize = function() {
+        _Scene_Base_initialize.call(this);
+        if (!!$gameTemp) {
+            $gameTemp.onPassiveCache = false;
         }
-        return value;
     };
 
-    Game_Battler.prototype.getPassiveObject = function() {
-        if (this._passiveCalc) return [];
-        return this.getPassive();
+
+    const _Window_Base_initialize = Window_Base.prototype.initialize;
+    Window_Base.prototype.initialize = function(rect) {
+        _Window_Base_initialize.apply(this, arguments);
+        this.cachePassive();
+    };
+
+    Window_Base.prototype.cachePassive = function() {
+        
+    };
+
+    Window_EquipSlot.prototype.cachePassive = function() {
+        $gameTemp.onPassiveCache = true;
     };
 
 })();

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -85,6 +85,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/17/2025 Ver.1.0.2
+ * Fixed an issue that caused an error to occur when trying to learn a skill in the skill tree with loaded data.
+ * Fixed so that costs can be set using an evaluation formula.
+ * Fixed an issue that caused skill items to become translucent even when the conditions for learning were met.
  * 8/15/2025 Ver.1.0.1
  * Updates regarding "Skill Tree Status Screen Customization".
  * 8/14/2025 Ver.1.0.0
@@ -980,8 +984,8 @@
  * 
  * @param Cost
  * @text Skill point cost
- * @desc Set the cost of skill points to be consumed.
- * @type number
+ * @desc Set the cost of skill points to be consumed.(You can also enter an evaluation formula)
+ * @type string
  * @default 0
  * @parent CostSetting
  * 
@@ -999,8 +1003,8 @@
  * 
  * @param ConsumeItemCost
  * @text Number of consumable items
- * @desc Set the number of items to be consumed.
- * @type number
+ * @desc Set the number of items to be consumed.(You can also enter an evaluation formula)
+ * @type string
  * @default 0
  * @parent CostItemSetting
  * 
@@ -1018,8 +1022,8 @@
  * 
  * @param ConsumeWeaponCost
  * @text Number of weapons consumed
- * @desc Set the number of weapons to be consumed.
- * @type number
+ * @desc Set the number of weapons to be consumed.(You can also enter an evaluation formula)
+ * @type string
  * @default 0
  * @parent CostWeaponSetting
  * 
@@ -1037,8 +1041,8 @@
  * 
  * @param ConsumeArmorCost
  * @text Number of armors consumed
- * @desc Set the number of armor pieces to be consumed.
- * @type number
+ * @desc Set the number of armor pieces to be consumed.(You can also enter an evaluation formula)
+ * @type string
  * @default 0
  * @parent CostArmorSetting
  * 
@@ -1049,8 +1053,8 @@
  * 
  * @param CostGold
  * @text Gold consumption
- * @desc Set the gold to be consumed as a cost.
- * @type number
+ * @desc Set the gold to be consumed as a cost.(You can also enter an evaluation formula)
+ * @type string
  * @default 0
  * @parent CostGoldSetting
  * 
@@ -1068,8 +1072,8 @@
  * 
  * @param ConsumeVariablesCost
  * @text Consumption game variables
- * @desc Set the number of game variables to consume.
- * @type number
+ * @desc Set the number of game variables to consume.(You can also enter an evaluation formula)
+ * @type string
  * @default 0
  * @parent CostVariablesSetting
  * 
@@ -1190,7 +1194,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1260,6 +1264,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/17 Ver.1.0.2
+ * ロードしたデータでスキルツリーでスキルを習得しようとした場合にエラーが出る問題を修正。
+ * コストに評価式で設定できるように修正。
+ * 習得条件を満たしているにもかかわらず、スキル項目が選択不能状態になる問題を修正。
  * 2025/8/15 Ver.1.0.1
  * スキルツリーステータス画面カスタマイズに関する更新。
  * 2025/8/14 Ver.1.0.0
@@ -2155,8 +2163,8 @@
  * 
  * @param Cost
  * @text 消費スキルポイント
- * @desc 消費するスキルポイントを設定します
- * @type number
+ * @desc 消費するスキルポイントを設定します。(式でも記入できます)
+ * @type string
  * @default 0
  * @parent CostSetting
  * 
@@ -2174,8 +2182,8 @@
  * 
  * @param ConsumeItemCost
  * @text 消費アイテム個数
- * @desc 消費するアイテムの個数を設定します。
- * @type number
+ * @desc 消費するアイテムの個数を設定します。(式でも記入できます)
+ * @type string
  * @default 0
  * @parent CostItemSetting
  * 
@@ -2193,8 +2201,8 @@
  * 
  * @param ConsumeWeaponCost
  * @text 消費武器個数
- * @desc 消費する武器の個数を設定します。
- * @type number
+ * @desc 消費する武器の個数を設定します。(式でも記入できます)
+ * @type string
  * @default 0
  * @parent CostWeaponSetting
  * 
@@ -2212,8 +2220,8 @@
  * 
  * @param ConsumeArmorCost
  * @text 消費防具個数
- * @desc 消費する防具の個数を設定します。
- * @type number
+ * @desc 消費する防具の個数を設定します。(式でも記入できます)
+ * @type string
  * @default 0
  * @parent CostArmorSetting
  * 
@@ -2224,8 +2232,8 @@
  * 
  * @param CostGold
  * @text 消費金額
- * @desc コストとして消費する金額を設定します
- * @type number
+ * @desc コストとして消費する金額を設定します。(式でも記入できます)
+ * @type string
  * @default 0
  * @parent CostGoldSetting
  * 
@@ -2243,8 +2251,8 @@
  * 
  * @param ConsumeVariablesCost
  * @text 消費ゲーム変数
- * @desc 消費するゲーム変数内の個数を設定します。
- * @type number
+ * @desc 消費するゲーム変数内の個数を設定します。(式でも記入できます)
+ * @type string
  * @default 0
  * @parent CostVariablesSetting
  * 
@@ -2480,8 +2488,8 @@ Imported.NUUN_SkillTree = true;
         return list;
     };
 
-    function _getSkillTreeData(data, actor) {
-        return new SkillTreeData(data, actor);
+    function _getSkillTreeData(data, type, actor) {
+        return new SkillTreeData(data, type, actor);
     };
 
     NuunManager.getSkillPointParamName = function() {
@@ -2490,8 +2498,9 @@ Imported.NUUN_SkillTree = true;
 
 
     class SkillTreeData {
-        constructor(data, actor) {
+        constructor(data, type, actor) {
             this._id = data.SkillId;
+            this._type = type;
             this._actor = actor;
             this._derivedSkill = data.DerivedSkill || [];
             this._x = data.DerivedSkillX || 0;
@@ -2501,7 +2510,7 @@ Imported.NUUN_SkillTree = true;
             this._learnCond = data.LearnCond || "";
             this._enabled = true;
             this.setupCost(data);
-            //this.updateCost();
+            this.updateCost();
             this._spriteIndex = _isSpriteSheet() ? this.getSkillFrame(data) : 0;
             this._derivedLineType = data.LineType === "none" ? params.LineType : (data.LineType || params.LineType);
             this._maxCount = data.MaxCount || 0;
@@ -2509,14 +2518,12 @@ Imported.NUUN_SkillTree = true;
 
         setSKillPointCost(data) {
             const tagCost = _getSkillCostTag($dataSkills[this._id], "SKillPointCost");
-            this._cost = tagCost !== null ? tagCost : (!!data.Cost ? Number(data.Cost) : params.DefaultSkillPointCost);
-            //this._costFormula = tagCost !== null ? tagCost : (!!data.Cost ? data.Cost : params.DefaultSkillPointCost);
+            this._costFormula = tagCost !== null ? tagCost : (!!data.Cost ? data.Cost : params.DefaultSkillPointCost);
         }
 
         setSKillTreeGoldCost(data) {
             const tagCost = _getSkillCostTag($dataSkills[this._id], "SkillTreeGoldCost");
-            this._costGold = tagCost !== null ? tagCost : Number(data.CostGold) || 0;
-            //this._costGoldFormula = tagCost !== null ? tagCost : data.CostGold || 0;
+            this._costGoldFormula = tagCost !== null ? tagCost : data.CostGold || 0;
         }
 
         setupCost(data) {
@@ -2527,7 +2534,7 @@ Imported.NUUN_SkillTree = true;
             this.setItemCost(data, "SkillTreeVariablesCost", "Variables");
             this.setSKillTreeGoldCost(data);
             this._DisplayVariablesCostText = data.DisplayVariablesCostText || "";
-            this.setCostList();//updateCost()を実行する場合は削除
+            //this.setCostList();//updateCost()を実行する場合は削除
         }
 
         updateCost() {
@@ -2542,7 +2549,7 @@ Imported.NUUN_SkillTree = true;
         }
 
         refresh() {
-            //this.updateCost();
+            this.updateCost();
         }
 
         setCostList() {
@@ -2587,8 +2594,7 @@ Imported.NUUN_SkillTree = true;
 
         setItemCost(data, tag, type) {
             const tag1 = String("_cost" + type);
-            const tag2 = String("_consume" + type);
-            //const tag2 = String("_consume" + type + "Formula");
+            const tag2 = String("_consume" + type + "Formula");
             const tag3 = String("Cost" + type);
             const tag4 = String("Consume" + type +"Cost");
             const tagCost = _getSkillCostTagList($dataSkills[this._id], tag);
@@ -2603,6 +2609,7 @@ Imported.NUUN_SkillTree = true;
                 }
                 const actor = this._actor;
                 const skillId = this._id;
+                const count = actor.getSkillTreeCount(this._id);
                 const d = this;
                 const v = $gameVariables._data;
                 const s = $gameSwitches._data;
@@ -3239,6 +3246,10 @@ Imported.NUUN_SkillTree = true;
         return list.findIndex(s => s && s._id === id);
     };
 
+    Window_SkillTree.prototype.getSkillTreeType = function() {
+        return params.SkillTreeSetting[this._skillTreeId].SymbolName;
+    };
+
     Window_SkillTree.prototype.getSkillTreeList = function() {
         const treeData = params.SkillTreeSetting[this._skillTreeId];
         if (!treeData) return null;
@@ -3408,7 +3419,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.getSkillTreeData = function(data) {
-        return _getSkillTreeData(data, this._actor);
+        return _getSkillTreeData(data, this.getSkillTreeType(), this._actor);
     };
 
     Window_SkillTree.prototype.itemAt = function(index) {
@@ -4085,16 +4096,17 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeConfirmation.prototype.confirmationMessage = function() {
-        const rect = this.itemLineRect(-4);
+        const rect = this.itemRect(-4);
         const lineHeight = this.lineHeight();
-        this.drawText(params.ConfirmationWindowTitle, rect.x, rect.y, rect.width);
-        this.contentsHorzLine(rect.x, rect.y + lineHeight, rect.width);
+        const width = this.innerWidth - this.colSpacing();
+        this.drawText(params.ConfirmationWindowTitle, rect.x, rect.y, width);
+        this.contentsHorzLine(rect.x, rect.y + lineHeight, width);
     };
 
     Window_SkillTreeConfirmation.prototype.contentsHorzLine = function(x, y, width) {
         const lineY = y + this.lineHeight() / 2 - 1;
         this.contents.paintOpacity = 48;
-        this.contents.fillRect(x, lineY, this.contentsWidth(), 2, ColorManager.normalColor());
+        this.contents.fillRect(x, lineY, width, 2, ColorManager.normalColor());
         this.contents.paintOpacity = 255;
     };
 
@@ -4140,6 +4152,15 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeCount = [];
         this._skillTreeList = null
         this.learnCount = 0;
+    };
+
+    Game_Actor.prototype.initSkillCount = function(skillId) {
+        if (!this._skillTreeCount) {
+            this._skillTreeCount = [];
+        }
+        if (this._skillTreeCount[skillId] === undefined) {
+            this._skillTreeCount[skillId] = 0;
+        }
     };
 
     const _Game_Actor_setup = Game_Actor.prototype.setup;
@@ -4261,7 +4282,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.isPaySkillTreeCostOk = function(data) {
-        if (data.getCost() > 0 && !data.isCanCost(this._nsp)) {
+        if (data.getCost() > 0 && !data.isCanCost(this.nsp)) {
             return false;
         }
         if (data.getCostItem() > 0 && $gameParty.numItems($dataItems[data.getCostItem()]) < data.getItemNum()) {
@@ -4339,18 +4360,18 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.setSkillCount = function(skillId ,maxCount) {
-        if (this._skillTreeCount[skillId] === undefined) {
-            this._skillTreeCount[skillId] = 0;
-        }
+        this.initSkillCount(skillId);
         this._skillTreeCount[skillId] = Math.min(this._skillTreeCount[skillId] + 1, maxCount);
     };
 
     Game_Actor.prototype.isMultipleCount = function(skillId ,maxCount) {
+        this.initSkillCount(skillId);
         return maxCount <= (this._skillTreeCount[skillId] || 0);
     };
 
     Game_Actor.prototype.getSkillTreeCount = function(skillId) {
-        return this._skillTreeCount[skillId] || 0;
+        this.initSkillCount(skillId);
+        return !!this._skillTreeCount ? (this._skillTreeCount[skillId] || 0) : 0;
     };
 
     const _Game_Actor_levelUp = Game_Actor.prototype.levelUp;
@@ -4370,7 +4391,7 @@ Imported.NUUN_SkillTree = true;
         if (!skillTree || !skillTree.SkillTreeList) return;
         for (const data of skillTree.SkillTreeList) {
             if (this.isSkillTreeLearned(data.SkillId) && this.notDeletionSkillTreeSkill(data.SkillId)) {
-                const treeData = _getSkillTreeData(data, this);
+                const treeData = _getSkillTreeData(data, skillTree.SymbolName, this);
                 this.forgetSkill(treeData._id);
                 if (treeData.getMaxCount() > 0) {
                     this.countGainSkillPoint(treeData);
@@ -4404,7 +4425,7 @@ Imported.NUUN_SkillTree = true;
             if (!!skillTree || !!skillTree.SkillTreeList) {
                 for (const data of skillTree.SkillTreeList) {
                     if (data.SkillId === skillId && !this.isSkillTreeLearned(skillId) && this.isSkillTreeReqSkill(skillTree.SkillTreeList, skillId)) {
-                        const t = _getSkillTreeData(data, this);
+                        const t = _getSkillTreeData(data, skillTree.SymbolName, this);
                         if (this.isPaySkillTreeCostOk(t) && this.isSkillTreeEvalCond(t)) {
                             this.paySkillTreeCost(t);
                             this.learnSkillTree(skillId);
@@ -4426,6 +4447,7 @@ Imported.NUUN_SkillTree = true;
         const d = data;
         const v = $gameVariables._data;
         const s = $gameSwitches._data;
+        const count = this.getSkillTreeCount(data._id);
         const actor = this;
         return eval(cond);
     };
@@ -4436,6 +4458,7 @@ Imported.NUUN_SkillTree = true;
         const d = data;
         const v = $gameVariables._data;
         const s = $gameSwitches._data;
+        const count = this.getSkillTreeCount(data._id);
         const actor = this;
         return eval(cond);
     };
@@ -4446,6 +4469,7 @@ Imported.NUUN_SkillTree = true;
         const d = data;
         const v = $gameVariables._data;
         const s = $gameSwitches._data;
+        const count = this.getSkillTreeCount(data._id);
         const actor = this;
         return eval(cond);
     };

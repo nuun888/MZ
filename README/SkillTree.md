@@ -99,6 +99,8 @@ $gameActors
 ダウンロード  
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
+## 仕様
+横方向のスクロールの機能は実装いたしません。  
 
 #### 更新履歴
 2025/8/15 Ver.1.0.0  

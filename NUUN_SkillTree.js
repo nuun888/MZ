@@ -87,7 +87,8 @@
  * Log
  * 8/18/2025 Ver.1.0.3
  * Added a feature to display skill costs even when they are 0.
- * Fixed an issue where an error would appear when increasing or decreasing skill points after installation.
+ * Fixed to display SP gained when leveling up.
+ * Fixed an issue where an error would occur when increasing or decreasing skill points after installation.
  * Fixed an issue where an error would occur at the end of battle.
  * 8/17/2025 Ver.1.0.2
  * Fixed an issue that caused an error to occur when trying to learn a skill in the skill tree with loaded data.
@@ -1284,7 +1285,8 @@
  * 更新履歴
  * 2025/8/18 Ver.1.0.3
  * 消費スキルコストが0の時でもコストを表示する機能を追加。
- * 導入後にスキルポイントを増減させるとえあらーが出る問題を修正。
+ * レベルアップ時に獲得SPを表示するように修正。
+ * 導入後にスキルポイントを増減させるとエラーが出る問題を修正。
  * 戦闘終了時にエラーが出る問題を修正。
  * 2025/8/17 Ver.1.0.2
  * ロードしたデータでスキルツリーでスキルを習得しようとした場合にエラーが出る問題を修正。

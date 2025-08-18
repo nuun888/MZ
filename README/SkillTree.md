@@ -90,7 +90,7 @@
 
 #### 取得できるパラメータ
 $gameActors  
-`nsp`:スキルポイント  
+`this.nsp`:スキルポイント  
 `this.getSkillTreeCount(skillId)`:対象のスキルの習得回数  
 `this.isSkillTreeLearned(skillId)`:対象のスキルが習得済みか  
 

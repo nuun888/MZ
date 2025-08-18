@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -85,6 +85,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/18/2025 Ver.1.0.3
+ * Added a feature to display skill costs even when they are 0.
+ * Fixed an issue where an error would appear when increasing or decreasing skill points after installation.
+ * Fixed an issue where an error would occur at the end of battle.
  * 8/17/2025 Ver.1.0.2
  * Fixed an issue that caused an error to occur when trying to learn a skill in the skill tree with loaded data.
  * Fixed so that costs can be set using an evaluation formula.
@@ -435,6 +439,13 @@
  * @default type3
  * @parent SkillTreeCostSetting
  * 
+ * @param VisibleSkillPointZero
+ * @desc Skill points will be displayed in the cost window even if the cost is 0.
+ * @text Skill point cost 0 display
+ * @type boolean
+ * @default false
+ * @parent SkillTreeCostSetting
+ * 
  * @param SkillTreeStatusSetting
  * @text Status window settings
  * @default ------------------------------
@@ -606,6 +617,13 @@
  * @desc Skill points gained when leveling up.
  * @type number
  * @default 1
+ * @parent SkillPointSetting
+ * 
+ * @param DisplayLevelUpMessage
+ * @text Level-up skill point acquisition message
+ * @desc Skill point acquisition message displayed when leveling up. %1: Actor name %2: Amount of SP acquired %3: Skill point name
+ * @type string
+ * @default %1 received %2 %3!
  * @parent SkillPointSetting
  * 
  * @param BenchMembarsGainSkillPoint
@@ -1194,7 +1212,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1264,6 +1282,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/18 Ver.1.0.3
+ * 消費スキルコストが0の時でもコストを表示する機能を追加。
+ * 導入後にスキルポイントを増減させるとえあらーが出る問題を修正。
+ * 戦闘終了時にエラーが出る問題を修正。
  * 2025/8/17 Ver.1.0.2
  * ロードしたデータでスキルツリーでスキルを習得しようとした場合にエラーが出る問題を修正。
  * コストに評価式で設定できるように修正。
@@ -1614,6 +1636,13 @@
  * @default type3
  * @parent SkillTreeCostSetting
  * 
+ * @param VisibleSkillPointZero
+ * @desc スキルポイントのコストが0でもコストウィンドウに表示させます。
+ * @text スキルポイントコスト0表示
+ * @type boolean
+ * @default false
+ * @parent SkillTreeCostSetting
+ * 
  * @param SkillTreeStatusSetting
  * @text ステータスウィンドウ設定
  * @default ------------------------------
@@ -1785,6 +1814,13 @@
  * @desc レベルアップ時の取得スキルポイント。
  * @type number
  * @default 1
+ * @parent SkillPointSetting
+ * 
+ * @param DisplayLevelUpMessage
+ * @text レベルアップスキルポイント獲得メッセージ
+ * @desc レベルアップに表示されるスキルポイントの入手メッセージ。%1:アクター名 %2:獲得SP量 %3:スキルポイント名
+ * @type string
+ * @default %1は%3 %2を獲得！
  * @parent SkillPointSetting
  * 
  * @param BenchMembarsGainSkillPoint
@@ -2554,7 +2590,7 @@ Imported.NUUN_SkillTree = true;
 
         setCostList() {
             const list = [];
-            if (this._cost > 0) {
+            if (params.VisibleSkillPointZero || this._cost > 0) {
                 list.push("sp");
             }
             if (this._costItem > 0 && this._consumeItem > 0) {
@@ -4261,6 +4297,23 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
+    const _Game_Actor_changeExp = Game_Actor.prototype.changeExp;
+    Game_Actor.prototype.changeExp = function(exp, show) {
+        const lastSP = this.nsp;
+        _Game_Actor_changeExp.apply(this, arguments);
+        if (show) {
+            this.displayLevelUpSkillPoint(this.nsp - lastSP);
+        }
+    };
+
+    Game_Actor.prototype.displayLevelUpSkillPoint = function(sp) {
+        if (sp > 0) {
+            const text = params.DisplayLevelUpMessage.format(this._name, sp, params.SkillPointName);
+            const tests = $gameMessage._texts;
+            $gameMessage.add(text);
+        }
+    };
+
     Game_Actor.prototype.changeClassResetSkillTree = function(classId) {
         const list = this._skillTreeList.filter(array => {
             if (array[1] > 0) {
@@ -4346,7 +4399,7 @@ Imported.NUUN_SkillTree = true;
 
     Game_Actor.prototype.gainSkillPoint = function(sp) {
         if (isNaN(this._nsp)) {
-            this._nsp = this.initSkillPoint(actorId);
+            this._nsp = this.initSkillPoint(this.actorId());
         }
         this._nsp += sp;
         this._nsp = this._nsp.clamp(0, this.maxSkillTreePoint());
@@ -4381,9 +4434,12 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.levelSkillPoint = function() {
+        this.gainSkillPoint(this.getLevelSkillPoint());
+    };
+
+    Game_Actor.prototype.getLevelSkillPoint = function() {
         const actor = this.actor();
-        const sp = NuunManager.getMetaCode(actor, "LevelupSkillPoint") || params.LevelupGainSkillPoint;
-        this.gainSkillPoint(sp);
+        return NuunManager.getMetaCode(actor, "LevelupSkillPoint") || params.LevelupGainSkillPoint;
     };
 
     Game_Actor.prototype.skillTreeReset = function(id) {
@@ -4486,7 +4542,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.benchMembersSkillPoint = function() {
-        return !params.BenchMembarsGainSkillPoint && !this.isBattleMembar() ? 0 : 1;
+        return !params.BenchMembarsGainSkillPoint && !this.isBattleMember() ? 0 : 1;
     };
 
     Game_Enemy.prototype.getSkillPoint = function() {

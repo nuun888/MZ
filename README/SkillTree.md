@@ -95,7 +95,7 @@ $gameActors
 `this.isSkillTreeLearned(skillId)`:対象のスキルが習得済みか  
 
 ## スキルツリーステータス画面カスタマイズ 
-####必須プラグイン
+#### 必須プラグイン
 [ステータス項目ベースプラグイン](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)  
 
 スキルツリーステータスウィンドウの表示するアクターステータスをカスタイマイズ、ステータスウィンドウ、スキルツリーウィンドウ、スキルシーン内のいずれかにアクター画像を表示します。  

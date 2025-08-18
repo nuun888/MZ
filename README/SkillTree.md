@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.0.2
+# Ver.1.0.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -95,6 +95,9 @@ $gameActors
 `this.isSkillTreeLearned(skillId)`:対象のスキルが習得済みか  
 
 ## スキルツリーステータス画面カスタマイズ 
+####必須プラグイン
+[ステータス項目ベースプラグイン](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)  
+
 スキルツリーステータスウィンドウの表示するアクターステータスをカスタイマイズ、ステータスウィンドウ、スキルツリーウィンドウ、スキルシーン内のいずれかにアクター画像を表示します。  
 ダウンロード  
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
@@ -118,6 +121,10 @@ $gameActors
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/8/18 Ver.1.0.3  
+消費スキルコストが0の時でもコストを表示する機能を追加。  
+導入後にスキルポイントを増減させるとえあらーが出る問題を修正。  
+戦闘終了時にエラーが出る問題を修正。  
 2025/8/17 Ver.1.0.2  
 ロードしたデータでスキルツリーでスキルを習得しようとした場合にエラーが出る問題を修正。  
 コストに評価式で設定できるように修正。  

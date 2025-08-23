@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.0.3
+# Ver.1.0.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -125,6 +125,10 @@ $gameActors
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/8/23 Ver.1.0.4  
+スキル習得後の処理の仕様を変更。(全バージョンとのセーブの互換性なし)  
+プラグインコマンドのスキル習得を実行した際に、習得最大回数を超えて実行できてしまう問題を修正。  
+派生元のスキルが未習得の場合、線の色を習得条件未達成の色で表示するように修正。  
 2025/8/18 Ver.1.0.3  
 消費スキルポイントコストが0の時でもコストを表示する機能を追加。  
 レベルアップ時に獲得SPを表示するように修正。  

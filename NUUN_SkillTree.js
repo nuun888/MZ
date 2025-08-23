@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.4
+ * @version 1.0.5
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -85,6 +85,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/24/2025 Ver.1.0.5
+ * Individual settings for initial skill points and skill points gained upon leveling up now also apply to jobs.
+ * Fixed an issue where some other starting skills would not be displayed if a starting skill without a column specification was set.
+ * Added a function to force the X coordinate to be displayed at a specified position.
  * 8/23/2025 Ver.1.0.4
  * Changed the processing specifications after skill acquisition. (Save files are not compatible with all versions.)
  * Fixed an issue where skill learning via plugin commands could be executed more than the maximum number of times allowed.
@@ -1001,6 +1005,12 @@
  * @type number
  * @default 0
  * 
+ * @param ForcedPlacement
+ * @text Fixed column position enabled
+ * @desc Forces it to appear at the specified column position.
+ * @type boolean
+ * @default false
+ * 
  * @param CostSetting
  * @text Cost setting
  * @default ------------------------------
@@ -1217,7 +1227,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.4
+ * @version 1.0.5
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1239,7 +1249,7 @@
  * (code):テキストタブでカラーコードを記入できます。
  * 
  * 
- * アクターのメモ欄
+ * アクター、職業のメモ欄
  * <LevelupSkillPoint:[sp]> レベルアップ時に指定のスキルポイントを得ます。記入がない場合はプラグインパラメータの設定が適用されます。
  * [sp]:スキルポイント
  * 
@@ -1287,6 +1297,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/24 Ver.1.0.5
+ * 初期スキルポイント、レベルアップ時の獲得スキルポイントの個別設定を職業にも適用。
+ * 起点スキルで列指定がないスキルが設定されている場合、一部の他起点スキルが表示されなくなる問題を修正。
+ * X座標を強制的に指定の位置に表示させる機能を追加。
  * 2025/8/23 Ver.1.0.4
  * スキル習得後の処理の仕様を変更。(全バージョンとのセーブの互換性なし)
  * プラグインコマンドのスキル習得を実行した際に、習得最大回数を超えて実行できてしまう問題を修正。
@@ -2203,6 +2217,12 @@
  * @type number
  * @default 0
  * 
+ * @param ForcedPlacement
+ * @text 固定列位置有効
+ * @desc 指定の列位置に強制的に表示させます。
+ * @type boolean
+ * @default false
+ * 
  * @param CostSetting
  * @text コスト設定
  * @default ------------------------------
@@ -2538,6 +2558,29 @@ Imported.NUUN_SkillTree = true;
         return new SkillTreeData(data, type, actor);
     };
 
+    function _returnSkillTreeItem(data) {
+        const item = $dataItems[data.item];
+        if (item.meta.SkillTreeCostNoReturn) return;
+        $gameParty.gainItem(item, data.itemCost);
+    };
+
+    function _returnSkillTreeWeapon(data) {
+        const item = $dataWeapons[data.weapon];
+        if (item.meta.SkillTreeCostNoReturn) return;
+        $gameParty.gainItem(item, data.weaponCost);
+    };
+
+    function _returnSkillTreeArmor(data) {
+        const item = $dataArmors[data.armor];
+        if (item.meta.SkillTreeCostNoReturn) return;
+        $gameParty.gainItem(item, data.armorCost);
+    };
+
+    function _returnSkillTreeVar(data) {
+        const value = $gameVariables.value(data.var);
+        $gameVariables.setValue(value - data.varCost);
+    };
+
     NuunManager.getSkillPointParamName = function() {
         return params.SkillPointName;
     }
@@ -2555,6 +2598,7 @@ Imported.NUUN_SkillTree = true;
             this._secret = data.SkillTreeSecret || "";
             this._learnCond = data.LearnCond || "";
             this._enabled = true;
+            this._force = data.ForcedPlacement;
             this.setupCost(data);
             this.updateCost();
             this._spriteIndex = _isSpriteSheet() ? this.getSkillFrame(data) : 0;
@@ -2760,6 +2804,10 @@ Imported.NUUN_SkillTree = true;
 
         getDerivedLineType() {
             return this._derivedLineType;
+        }
+
+        isForce() {
+            return this._force;
         }
 
     }
@@ -3335,7 +3383,12 @@ Imported.NUUN_SkillTree = true;
                             const dt = this.getDerivedTreeData(list, skillId);
                             let x = 0;
                             while(true) {
-                                x = dt._x > 0 ? Math.max(colsCount + 1, dt._x - 1) : colsCount;
+                                if (dt.isForce() && dt._x > 0) {
+                                    x = dt._x - 1;
+                                    break;
+                                } else {
+                                    x = dt._x > 0 ? Math.max(colsCount + 1, dt._x - 1) : colsCount;
+                                }
                                 if (nextList[0][x]) {
                                     colsCount++;
                                 } else {
@@ -3351,12 +3404,12 @@ Imported.NUUN_SkillTree = true;
                                 if (index < 0) {
                                     nextList[ycols][x] = this.isSkillTreeCond(dt) ? dt : "null";
                                 }
-                                colsCount = Math.max(x + 1, colsCount + 1);
+                                colsCount = Math.max(x + 1, colsCount + (dt.isForce() && dt._x > 0 ? 0 : 1));
                             } else {
                                 const index = this.checkDeduplicationIndex(nextList[0], skillId);
                                 if (index < 0) {
                                     nextList[0][x] = this.isSkillTreeCond(dt) ? dt : "null";
-                                    colsCount = Math.max(x + 1, colsCount + 1);
+                                    colsCount = Math.max(x + 1, colsCount + (dt.isForce() && dt._x > 0 ? 0 : 1));
                                 }
                             }
                         }
@@ -3375,7 +3428,12 @@ Imported.NUUN_SkillTree = true;
         const count = [];
         for (const data of list) {
             let y = data._y > 1 ? data._y - 1 : 0;
-            let x = data._x > 0 ? data._x - 1 : (count[y] || 0);
+            let x = 0;
+            if (data.isForce() && data._x > 0) {
+                x = data._x - 1;
+            } else {
+                x = data._x > 0 ? data._x - 1 : (count[y] || 0);
+            }
             if (y >= 1) {
                 const rows = y - 1;
                 if (!nextList[rows]) {
@@ -3388,7 +3446,7 @@ Imported.NUUN_SkillTree = true;
             if (data._x > 0) {
                 count[y] = Math.max(data._x, (count[y] || 0));
             } else {
-                count[y]++;
+                count[y] = (count[y] || 0) + 1;
             }
         }
         return tree;
@@ -4389,7 +4447,8 @@ Imported.NUUN_SkillTree = true;
 
     Game_Actor.prototype.initSkillPoint = function(actorId) {
         const actor = $dataActors[actorId];
-        const cost = NuunManager.getMetaCode(actor, "InitSkillPoint");
+        const _class = this.currentClass();
+        const cost = NuunManager.getMetaCode(_class, "InitSkillPoint") || NuunManager.getMetaCode(actor, "InitSkillPoint");
         return !!cost && cost >= 0 ? cost : params.DefaultInitSkillPoint;
     };
 
@@ -4556,7 +4615,8 @@ Imported.NUUN_SkillTree = true;
 
     Game_Actor.prototype.getLevelSkillPoint = function() {
         const actor = this.actor();
-        return NuunManager.getMetaCode(actor, "LevelupSkillPoint") || params.LevelupGainSkillPoint;
+        const _class = this.currentClass();
+        return NuunManager.getMetaCode(_class, "LevelupSkillPoint") || (NuunManager.getMetaCode(actor, "LevelupSkillPoint") || params.LevelupGainSkillPoint);
     };
 
     Game_Actor.prototype.skillTreeReset = function(id) {
@@ -4583,7 +4643,22 @@ Imported.NUUN_SkillTree = true;
         if (data.cost > 0) {
             this.gainSkillPoint(data.cost);
         }
-        return;
+        return;//Ver.1.1.0で実装
+        if (data.item > 0) {
+            _returnSkillTreeItem(data);
+        }
+        if (data.weapon > 0) {
+            _returnSkillTreeWeapon(data);
+        }
+        if (data.armor > 0) {
+            _returnSkillTreeArmor(data);
+        }
+        if (data.goldCost > 0) {
+            $gameParty.gainGold(data.goldCost);
+        }
+        if (data.var > 0) {
+            _returnSkillTreeVar(data);
+        }
     };
 
     Game_Actor.prototype.notDeletionSkillTreeSkill = function(skillId) {

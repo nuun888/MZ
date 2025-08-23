@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.0.4
+# Ver.1.0.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -125,6 +125,10 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/8/24 Ver.1.0.5  
+初期スキルポイント、レベルアップ時の獲得スキルポイントの個別設定を職業にも適用。  
+起点スキルで列指定がないスキルが設定されている場合、一部の他起点スキルが表示されなくなる問題を修正。  
+X座標を強制的に指定の位置に表示させる機能を追加。  
 2025/8/23 Ver.1.0.4  
 スキル習得後の処理の仕様を変更。(全バージョンとのセーブの互換性なし)  
 プラグインコマンドのスキル習得を実行した際に、習得最大回数を超えて実行できてしまう問題を修正。  

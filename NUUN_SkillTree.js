@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -85,6 +85,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/23/2025 Ver.1.0.4
+ * Changed the processing specifications after skill acquisition. (Save files are not compatible with all versions.)
+ * Fixed an issue where skill learning via plugin commands could be executed more than the maximum number of times allowed.
+ * If the skill it is derived from has not been acquired, the line color will now be displayed in the color that indicates the acquisition conditions have not been met.
  * 8/18/2025 Ver.1.0.3
  * Added a feature to display skill costs even when they are 0.
  * Fixed to display SP gained when leveling up.
@@ -1213,7 +1217,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.3
+ * @version 1.0.4
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1283,6 +1287,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/23 Ver.1.0.4
+ * スキル習得後の処理の仕様を変更。(全バージョンとのセーブの互換性なし)
+ * プラグインコマンドのスキル習得を実行した際に、習得最大回数を超えて実行できてしまう問題を修正。
+ * 派生元のスキルが未習得の場合、線の色を習得条件未達成の色で表示するように修正。
  * 2025/8/18 Ver.1.0.3
  * 消費スキルコストが0の時でもコストを表示する機能を追加。
  * レベルアップ時に獲得SPを表示するように修正。
@@ -2519,7 +2527,7 @@ Imported.NUUN_SkillTree = true;
                     typeList.push(...data.SkillTreeCategoryList);
                 }
                 for (const type of typeList) {
-                    list.push([type, data.ClassId])
+                    list.push([type, data.ClassId]);
                 }
             }
         }
@@ -2991,7 +2999,7 @@ Imported.NUUN_SkillTree = true;
     Scene_SkillTree.prototype.skillTreeLearnConfirmation = function() {
         this._skillTreeWindow.activate();
         this._skillTreeWindow.learnSkillTree();
-    };
+    };　
 
     Scene_SkillTree.prototype.onSkillTreeOk = function() {
         if (this._skillTreeWindow.isLearnEnabled()) {
@@ -3112,7 +3120,6 @@ Imported.NUUN_SkillTree = true;
     Window_SkillTree.prototype.initialize = function(rect) {
         this._learnedSkillColor = null;
         this._skillTreeImages = this.loadSkillTreeImages();
-        $testData = [];
         this._learnOk = true;
         Window_Selectable.prototype.initialize.call(this, rect);
     };
@@ -3581,9 +3588,13 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Window_SkillTree.prototype.getLineColor = function(learned, enabled) {
-        if (learned) {
+    Window_SkillTree.prototype.getLineColor = function(data, learned) {
+        const enabled = this.isEnabled(data);
+        const derivedLearned = this._actor.isSkillTreeLearned(data._id);
+        if (derivedLearned && learned) {
             return NuunManager.getColorCode(params.LearnedLineColor);
+        } else if (derivedLearned && !learned) {
+            return NuunManager.getColorCode(params.NormalLineColor);
         } else if (enabled) {
             return NuunManager.getColorCode(params.UnlearnedLineColor);
         } else {
@@ -3598,10 +3609,9 @@ Imported.NUUN_SkillTree = true;
         for (const skillId of data._derivedSkill) {
             const index = this.getSkillTreeDataIndex(skillId);
             const derivedData = this._data[index];
+            const learned = this._actor.isSkillTreeLearned(data._id);
             if (!!derivedData && this.isSkillTreeCond(derivedData)) {
-                const enabled = this.isEnabled(derivedData);
-                const learned = this._actor.isSkillTreeLearned(derivedData._id);
-                const colorId = this.getLineColor(learned, enabled);
+                const colorId = this.getLineColor(derivedData, learned);
                 const derivedRect = this.itemLineRect(index);
                 const color = NuunManager.getColorCode(colorId);
                 const x2 = derivedRect.x + (derivedRect.width / 2);
@@ -3785,7 +3795,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.isMultipleCount = function(data) {
-        if (data.getMaxCount() === 0) return !!this._actor.isSkillTreeLearned(data._id);
+        if (data.getMaxCount() === 0) return this._actor.isSkillTreeLearned(data._id);
         return this._actor.isMultipleCount(data._id, data.getMaxCount());
     };
 
@@ -3798,8 +3808,7 @@ Imported.NUUN_SkillTree = true;
         _setConfirmation(params.LearnConfirmation)
         //if (this.isMultipleCount(data)) return;
         this._actor.paySkillTreeCost(data);
-        this._actor.learnSkillTree(data._id);
-        this._actor.setSkillCount(data._id, data.getMaxCount());
+        this._actor.learnSkillTreeSkill(data);
         this.refresh();
         this._skillTreeStatusWindow.refresh();
         this._skillTreeCostWindow.refresh();
@@ -4187,35 +4196,132 @@ Imported.NUUN_SkillTree = true;
     Game_Actor.prototype.initMembers = function() {
         _Game_Actor_initMembers.call(this);
         this._nsp = 0;
-        this._skillTreeCount = [];
-        this._skillTreeList = null
-        this.learnCount = 0;
-    };
-
-    Game_Actor.prototype.initSkillCount = function(skillId) {
-        if (!this._skillTreeCount) {
-            this._skillTreeCount = [];
-        }
-        if (this._skillTreeCount[skillId] === undefined) {
-            this._skillTreeCount[skillId] = 0;
-        }
+        this._skillTreeList = null;
+        this._learnSkillTreeSkillList = null;
+        this.learnCount = 0;//総スキル習得回数
+        this.totalSp = 0;//最大スキルポイント
     };
 
     const _Game_Actor_setup = Game_Actor.prototype.setup;
     Game_Actor.prototype.setup = function(actorId) {
         _Game_Actor_setup.apply(this, arguments);
         this._nsp = this.initSkillPoint(actorId);
+        this.gainTotalSkillPoint(this._nsp);
         this.setupSkillTreeList();
+        this.initLearnSkillList();
+    };
+
+    Game_Actor.prototype.learnSkillTreeData = function() {
+        return {
+            skillId:0 ,
+            count:0 ,
+            cost:0 ,
+            item:[0],
+            itemCost:[0],
+            weapon:[0],
+            weaponCost:[0],
+            armor:[0],
+            armorCost:[0],
+            goldCost:0,
+            var:[0],
+            varCost:[0],
+        }
+    };
+
+    Game_Actor.prototype.setupLearnSkillTreeData = function(data) {
+        let learnData = this.getLearnSkillTreeSkill(data._id);
+        if (!learnData) {
+            learnData = this.learnSkillTreeData();
+        }
+        learnData.skillId = data._id;
+        learnData.count = Math.min(learnData.count + 1, data.getMaxCount());
+        if (data.getCost() > 0) {
+            learnData.cost = data.getCost();
+        }
+        if (data.getCostItem() > 0) {
+            learnData.item[0] = data.getCostItem();
+            learnData.itemCost[0] += data.getItemNum();
+        }
+        if (data.getCostWeapon() > 0) {
+            learnData.weapon[0] = data.getCostWeapon();
+            learnData.weaponCost[0] += data.getWeaponNum();
+        }
+        if (data.getCostArmor() > 0) {
+            learnData.armor[0] = data.getCostArmor();
+            learnData.armorCost[0] += data.getArmorNum();
+        }
+        if (data.getCostGold() > 0) {
+            learnData.goldCost += data.getCostGold();
+        }
+        if (data.getCostVariables() > 0) {
+            learnData.var[0] = data.getCostVariables();
+            learnData.varCost[0] += data.getVariablesNum();
+        }
+        this._learnSkillTreeSkillList[data._id] = learnData;
+        this.learnCount++;
+    };
+
+    Game_Actor.prototype.initLearnSkillList = function() {
+        if (!this._learnSkillTreeSkillList) {
+            this._learnSkillTreeSkillList = [];
+            this.setStartLearnSkillTreeList();
+        }
+    };
+
+    Game_Actor.prototype.setStartLearnSkillTreeList = function() {
+        const list = this.getAllSkillTreeList();
+        for (const id of list) {
+            const skillTree = params.SkillTreeSetting[id];
+            if (!!skillTree && !!skillTree.SkillTreeList) {
+                for (const data of skillTree.SkillTreeList) {
+                    if (this.isLearnedSkill(data.SkillId) && !this.isSkillTreeLearn(data.SkillId)) {
+                        this.setupLearnSkillTreeData(_getSkillTreeData(data, skillTree.SymbolName, this));
+                    }
+                }
+            }
+        }
+    };
+
+    Game_Actor.prototype.changeClassResetSkillTree = function(classId) {
+        const list = this._skillTreeList.filter(array => {
+            if (array[1] > 0) {
+                if (array[1] === classId) {
+                    return true;
+                }
+            }
+            return false;
+        }).map(array => array[0]);
+        for (const id of list) {
+            if (!this.isDuplicationSkillTree(id, classId)) {
+                this.skillTreeReset(id);
+            }
+        }
+    };
+
+    Game_Actor.prototype.setLearnSkillTreeSkill = function(data) {
+        this.initLearnSkillList();
+        this.setupLearnSkillTreeData(data);
+    };
+
+    Game_Actor.prototype.removeLearnSkillTreeSkill = function(skillId) {
+        if (!!this._learnSkillTreeSkillList && !!this._learnSkillTreeSkillList[skillId]) {
+            this._learnSkillTreeSkillList[skillId] = null;
+        }
+    };
+
+    Game_Actor.prototype.getLearnSkillTreeSkill = function(skillId) {
+        this.initLearnSkillList();
+        return this._learnSkillTreeSkillList[skillId];
     };
 
     Game_Actor.prototype.setupSkillTreeList = function() {
-        const list = _matchSkillTreeActor(this);
+        const list = _matchSkillTreeActor(this);//[スキルツリーID,クラスID]
         if (!this._skillTreeList) {
             this._skillTreeList = [];
         }
         for (const array of list) {
             array[0] = _getSkillTreeSettingIndex(array[0]);
-            if (!this._skillTreeList.some(a => a[0] === array[0] && a[1] === array[1])) {
+            if (array[0] >= 0 && !this._skillTreeList.some(a => a[0] === array[0] && a[1] === array[1])) {
                 this._skillTreeList.push(array);
             }
         }
@@ -4290,10 +4396,8 @@ Imported.NUUN_SkillTree = true;
     const _Game_Actor_changeClass = Game_Actor.prototype.changeClass;
     Game_Actor.prototype.changeClass = function(classId, keepExp) {
         const oldClassId = this._classId;
-        const sp = this.nsp;
         _Game_Actor_changeClass.apply(this, arguments);
         this.setupSkillTreeList();
-        this._nsp = sp;
         if (params.ChangeClassResetSkillTree) {
             this.changeClassResetSkillTree(oldClassId);
         }
@@ -4301,17 +4405,16 @@ Imported.NUUN_SkillTree = true;
 
     const _Game_Actor_changeExp = Game_Actor.prototype.changeExp;
     Game_Actor.prototype.changeExp = function(exp, show) {
-        const lastSP = this.nsp;
+        const lastSp = this.nsp;
         _Game_Actor_changeExp.apply(this, arguments);
         if (show) {
-            this.displayLevelUpSkillPoint(this.nsp - lastSP);
+            this.displayLevelUpSkillPoint(this.nsp - lastSp);
         }
     };
 
     Game_Actor.prototype.displayLevelUpSkillPoint = function(sp) {
         if (sp > 0) {
             const text = params.DisplayLevelUpMessage.format(this._name, sp, params.SkillPointName);
-            const tests = $gameMessage._texts;
             $gameMessage.add(text);
         }
     };
@@ -4381,14 +4484,18 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.isSkillTreeLearned = function(skillId) {
-        return this.isLearnedSkill(skillId);
+        return this.isLearnedSkill(skillId) && this.isSkillTreeLearn(skillId);
     };
 
-    Game_Actor.prototype.learnSkillTree = function(skillId) {
-        this.learnCount++;
-        if (!this.isSkillTreeLearned()) {
-            this.learnSkill(skillId);
+    Game_Actor.prototype.isSkillTreeLearn = function(skillId) {
+        return !!this._learnSkillTreeSkillList[skillId];
+    };
+
+    Game_Actor.prototype.learnSkillTreeSkill = function(data) {
+        if (!this.isSkillTreeLearned() && !this.isSkillTreeLearn(data._id)) {
+            this.learnSkill(data._id);
         }
+        this.setLearnSkillTreeSkill(data);
     };
 
     Game_Actor.prototype.maxSkillTreePoint = function() {
@@ -4407,6 +4514,13 @@ Imported.NUUN_SkillTree = true;
         this._nsp = this._nsp.clamp(0, this.maxSkillTreePoint());
     };
 
+    Game_Actor.prototype.gainTotalSkillPoint = function(sp) {
+        if (this.totalSp === undefined) {
+            this.totalSp = 0;
+        }
+        this.totalSp += sp;
+    };
+
     Game_Actor.prototype.getSkillPoint = function() {
         if (isNaN(this._nsp)) {
             this._nsp = this.initSkillPoint(this.actorId());
@@ -4414,19 +4528,16 @@ Imported.NUUN_SkillTree = true;
         return this._nsp;
     };
 
-    Game_Actor.prototype.setSkillCount = function(skillId ,maxCount) {
-        this.initSkillCount(skillId);
-        this._skillTreeCount[skillId] = Math.min(this._skillTreeCount[skillId] + 1, maxCount);
-    };
-
     Game_Actor.prototype.isMultipleCount = function(skillId ,maxCount) {
-        this.initSkillCount(skillId);
-        return maxCount <= (this._skillTreeCount[skillId] || 0);
+        this.initLearnSkillList();
+        const learnSkill = this._learnSkillTreeSkillList[skillId];
+        return maxCount <= (!!learnSkill ? learnSkill.count : 0);
     };
 
     Game_Actor.prototype.getSkillTreeCount = function(skillId) {
-        this.initSkillCount(skillId);
-        return !!this._skillTreeCount ? (this._skillTreeCount[skillId] || 0) : 0;
+        this.initLearnSkillList();
+        const learnSkill = this._learnSkillTreeSkillList[skillId];
+        return !!learnSkill ? (learnSkill.count) : 0;
     };
 
     const _Game_Actor_levelUp = Game_Actor.prototype.levelUp;
@@ -4436,7 +4547,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.levelSkillPoint = function() {
-        this.gainSkillPoint(this.getLevelSkillPoint());
+        if (this._level > 1) {
+            const gainSp = this.getLevelSkillPoint();
+            this.gainSkillPoint(gainSp);
+            this.gainTotalSkillPoint(gainSp);
+        }
     };
 
     Game_Actor.prototype.getLevelSkillPoint = function() {
@@ -4449,26 +4564,26 @@ Imported.NUUN_SkillTree = true;
         if (!skillTree || !skillTree.SkillTreeList) return;
         for (const data of skillTree.SkillTreeList) {
             if (this.isSkillTreeLearned(data.SkillId) && this.notDeletionSkillTreeSkill(data.SkillId)) {
-                const treeData = _getSkillTreeData(data, skillTree.SymbolName, this);
-                this.forgetSkill(treeData._id);
-                if (treeData.getMaxCount() > 0) {
-                    this.countGainSkillPoint(treeData);
-                } else {
-                    this.gainSkillPoint(treeData.getCost());
+                const learnData = this._learnSkillTreeSkillList[data.SkillId];
+                if (!!learnData) {
+                    this.gainSkillTreeCost(learnData);
+                    this.forgetSkill(data.SkillId);
                 }
             }
         }
     };
 
-    Game_Actor.prototype.countGainSkillPoint = function(data) {
-        const count = this.getSkillTreeCount(data._id);
-        for (let i = 0; i < count; i++) {
-            this.getCountSkillPoint(data, index);
-        }
+    const _Game_Actor_forgetSkill = Game_Actor.prototype.forgetSkill;
+    Game_Actor.prototype.forgetSkill = function(skillId) {
+        _Game_Actor_forgetSkill.apply(this, arguments);
+        this.removeLearnSkillTreeSkill(skillId);
     };
 
-    Game_Actor.prototype.getCountSkillPoint = function(data, index) {
-        this.gainSkillPoint(data.getCost());
+    Game_Actor.prototype.gainSkillTreeCost = function(data) {
+        if (data.cost > 0) {
+            this.gainSkillPoint(data.cost);
+        }
+        return;
     };
 
     Game_Actor.prototype.notDeletionSkillTreeSkill = function(skillId) {
@@ -4484,9 +4599,9 @@ Imported.NUUN_SkillTree = true;
                 for (const data of skillTree.SkillTreeList) {
                     if (data.SkillId === skillId && !this.isSkillTreeLearned(skillId) && this.isSkillTreeReqSkill(skillTree.SkillTreeList, skillId)) {
                         const t = _getSkillTreeData(data, skillTree.SymbolName, this);
-                        if (this.isPaySkillTreeCostOk(t) && this.isSkillTreeEvalCond(t)) {
+                        if (this.isMultipleCount(t._id ,t.getMaxCount()) && this.isPaySkillTreeCostOk(t) && this.isSkillTreeEvalCond(t)) {
                             this.paySkillTreeCost(t);
-                            this.learnSkillTree(skillId);
+                            this.learnSkillTreeSkill(t);
                             return;
                         }
                     }
@@ -4580,7 +4695,9 @@ Imported.NUUN_SkillTree = true;
     BattleManager.gainSkillPoint = function() {
         const sp = this._rewards.skillPoint;
         for (const actor of $gameParty.allMembers()) {
-            actor.gainSkillPoint(sp * actor.benchMembersSkillPoint());
+            const gainSp = sp * actor.benchMembersSkillPoint();
+            actor.gainSkillPoint(gainSp);
+            actor.gainTotalSkillPoint(gainSp);
         }
     };
 

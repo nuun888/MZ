@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * @base NUUN_Base
  * 
  * @help
@@ -85,6 +85,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/23/2025 Ver.1.6.3
+ * Fixed an issue where some passive skills were not being applied in the differential parameters on the equipment screen.
  * 8/17/2025 Ver.1.6.2
  * Fixed an issue that caused save data to become large.
  * Fixed to cache passive skills applied on the equipment screen.
@@ -149,6 +151,12 @@
  * @desc Skill type ID of the passive skill. Makes it invisible to actor commands in combat.
  * @type number
  * @default 0
+ * 
+ * @param EquipScreenCacheEnabled
+ * @text Equip screen passive skill cache
+ * @desc Cache passive skills on the equipment screen.
+ * @type boolean
+ * @default true
  * 
  * 
  */
@@ -295,7 +303,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.6.2
+ * @version 1.6.3
  * @base NUUN_Base
  * 
  * @help
@@ -360,6 +368,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/23 Ver.1.6.3
+ * 装備画面の差分パラメータで一部パッシブスキルが適用されない問題を修正。
  * 2025/8/17 Ver.1.6.2
  * セーブデータ量が大きくなる問題を修正。
  * 装備画面で適用されたパッシブスキルをキャッシュするように修正。
@@ -425,6 +435,11 @@
  * @type number
  * @default 0
  * 
+ * @param EquipScreenCacheEnabled
+ * @text 装備画面パッシブスキルキャッシュ
+ * @desc 装備画面でのパッシブスキルのキャッシュを実行します。
+ * @type boolean
+ * @default true
  * 
  */
 /*~struct~Conditions:ja
@@ -594,6 +609,10 @@ Imported.NUUN_PassiveSkill = true;
         return this.onPassiveCache ? this.cachePassiveObjects[actorId] : null;
     };
 
+    Game_Temp.prototype.clearcachePassiveObjects = function(actorId) {
+        return $gameTemp.cachePassiveObjects[actorId] = null;
+    };
+
 
     const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
     Game_Battler.prototype.initMembers = function() {
@@ -639,6 +658,9 @@ Imported.NUUN_PassiveSkill = true;
     };
 
     Game_Actor.prototype.passiveSkillObject = function() {
+        if (this._noCachePassive) {
+            return this.getPassiveObject();
+        }
         return $gameTemp.getPassiveCache(this.actorId()) || this.getPassiveObject();
     };
 
@@ -672,7 +694,9 @@ Imported.NUUN_PassiveSkill = true;
                 }
             }
         }
-        this.setPassiveCache(list);
+        if (!this._noCachePassive) {
+            this.setPassiveCache(list);
+        }
         this._passiveCalc = false;
         return list;
     };
@@ -680,7 +704,9 @@ Imported.NUUN_PassiveSkill = true;
     Game_Battler.prototype.setPassiveSkillList = function() {
         this._oldVersionCheck();
         this.clearcachePassiveObjects();
+        this._noCachePassive = true;
         this._passiveSkillsList = this.getPassiveAllActions();//全てのパッシブスキルを習得　条件フィルターはかけない
+        this._noCachePassive = false;
     };
 
     Game_Battler.prototype.getPassiveSkillsList = function() {
@@ -732,7 +758,7 @@ Imported.NUUN_PassiveSkill = true;
     };
 
     Game_Actor.prototype.clearcachePassiveObjects = function() {
-        $gameTemp.cachePassiveObjects[this.actorId()] = null;
+        $gameTemp.clearcachePassiveObjects(this.actorId());
     };
 
     Game_Battler.prototype.condPassiveSkill = function(skill) {
@@ -880,7 +906,9 @@ Imported.NUUN_PassiveSkill = true;
     const _Window_Base_initialize = Window_Base.prototype.initialize;
     Window_Base.prototype.initialize = function(rect) {
         _Window_Base_initialize.apply(this, arguments);
-        this.cachePassive();
+        if (params.EquipScreenCacheEnabled) {
+            this.cachePassive();
+        }
     };
 
     Window_Base.prototype.cachePassive = function() {
@@ -889,6 +917,15 @@ Imported.NUUN_PassiveSkill = true;
 
     Window_EquipSlot.prototype.cachePassive = function() {
         $gameTemp.onPassiveCache = true;
+    };
+
+    const _Window_EquipStatus_setTempActor = Window_EquipStatus.prototype.setTempActor;
+    Window_EquipStatus.prototype.setTempActor = function(tempActor) {
+        if (!!tempActor) {
+            tempActor.setPassiveSkillList();
+            tempActor._noCachePassive = true;
+        }
+        _Window_EquipStatus_setTempActor.apply(this, arguments);
     };
 
 })();

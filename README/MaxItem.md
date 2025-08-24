@@ -1,5 +1,5 @@
 # [アイテム最大所持数変更](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxItem.js)
-# Ver.1.4.0  
+# Ver.1.4.1  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MaxItem.js)  
  #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -30,6 +30,8 @@
 `HiddenItemB`：隠しアイテムB  
 
 ## 更新履歴
+2025/8/25 Ver 1.4.1  
+コードの整理  
 2022/6/11 Ver 1.4.0  
 変更した最大数と個別に設定した最大数の適用優先度を変更。  
 個数表示を別プラグイン化。  

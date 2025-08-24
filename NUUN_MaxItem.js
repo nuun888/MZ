@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc アイテム最大所持数変更
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * 
  * @help
@@ -41,6 +41,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/25 Ver 1.4.1
+ * コードの整理
  * 2022/6/11 Ver 1.4.0
  * 変更した最大数と個別に設定した最大数の適用優先度を変更。
  * 個数表示を別プラグイン化。
@@ -177,217 +179,221 @@
  * @min 1
  *
  */
+var Imported = Imported || {};
+Imported.NUUN_MaxItem = true;
 
 (() => {
-  const parameters = PluginManager.parameters('NUUN_MaxItem');
-  const defaultMaxItem = Number(parameters['DefaultMaxItem'] || 99);
-  const defaultMaxWeapon = Number(parameters['DefaultMaxWeapon'] || 99);
-  const defaultMaxArmor = Number(parameters['DefaultMaxArmor'] || 99);
-  const CustomDefault = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CustomDefault'])) : null) || [];
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
 
-  const pluginName = 'NUUN_MaxItem';
-  PluginManager.registerCommand(pluginName, 'ChangeMaxItem', args => {
-    changeMaxItem(args);
-  });
+    const parameters = PluginManager.parameters('NUUN_MaxItem');
+    const defaultMaxItem = params.DefaultMaxItem || 99;
+    const defaultMaxWeapon = params.DefaultMaxWeapon || 99;
+    const defaultMaxArmor = params.DefaultMaxArmor || 99;
+    const CustomDefault = params.CustomDefault || [];
 
-  PluginManager.registerCommand(pluginName, 'ChangeMaxWeapon', args => {
-    changeMaxWeapon(args);
-  });
-
-  PluginManager.registerCommand(pluginName, 'ChangeMaxArmor', args => {
-    changeMaxArmor(args);
-  });
-
-  function changeMaxItem(args) {
-    if (Number(args.Item) > 0) {
-      $gameParty.setMaxItem(Number(args.Item), Number(args.MaxNum));
-    } else {
-      for (const item of $dataItems) {
-        if (item && item.name) {
-          if (args.ItemKey) {
-            if (args.ItemKey === $gameParty.getCategoryType(item, 'item')) {
-              $gameParty.setMaxItem(item.id, Number(args.MaxNum));
-              $gameParty.setGroopMaxItem(args.ItemKey, Number(args.MaxNum));
-            }
-          } else {
-            $gameParty.setMaxItem(item.id, Number(args.MaxNum));
-          }
-        }
-      }
-    }
-  };
-
-  function changeMaxWeapon(args) {
-    if (Number(args.Weapon) > 0) {
-      $gameParty.setWeaponMaxItem(Number(args.Weapon), Number(args.MaxNum));
-    } else {
-      for (const item of $dataWeapons) {
-        if (item && item.name) {
-          if (args.ItemKey) {
-            if (args.ItemKey === $gameParty.getCategoryType(item, 'weapon')) {
-              $gameParty.setWeaponMaxItem(item.id, Number(args.MaxNum));
-              $gameParty.setGroopMaxItem(args.ItemKey, Number(args.MaxNum));
-            }
-          } else {
-            $gameParty.setWeaponMaxItem(item.id, Number(args.MaxNum));
-          }
-        }
-      }
-    }
-  };
-
-  function changeMaxArmor(args) {
-    if (Number(args.Armor) > 0) {
-      $gameParty.setArmorMaxItem(Number(args.Armor), Number(args.MaxNum));
-    } else {
-      for (const item of $dataArmors) {
-        if (item && item.name) {
-          if (args.ItemKey) {
-            if (args.ItemKey === $gameParty.getCategoryType(item, 'armor')) {
-              $gameParty.setArmorMaxItem(item.id, Number(args.MaxNum));
-              $gameParty.setGroopMaxItem(args.ItemKey, Number(args.MaxNum));
-            }
-          } else {
-            $gameParty.setArmorMaxItem(item.id, Number(args.MaxNum));
-          }
-        }
-      }
-    }
-  };
-
-  function getCategoryKeyItem(item, type) {
-    if (type === 'item') {
-      if (item.itypeId === 2) {
-        return "keyItem";
-      } else if (item.itypeId === 3) {
-        return "HiddenItemA";
-      } else if (item.itypeId === 4) {
-        return "HiddenItemB";
-      }
-    }
-    return null;
-  };
-
-  const _Game_Party_initialize = Game_Party.prototype.initialize;
-  Game_Party.prototype.initialize = function() {
-    _Game_Party_initialize.call(this);
-    this._itemsMaxItem = [];
-    this._weaponsMaxItem = [];
-    this._armorsMaxItem = [];
-  };
-
-  Game_Party.prototype.initGroopMaxItems = function() {
-    CustomDefault.forEach(data => {
-      const method = '_nuunMaxItems' + data.CustomDefaultKey;
-      if (!this[method]) {
-        this[method] = data.CustomDefaultMax;
-      }
+    PluginManager.registerCommand(pluginName, 'ChangeMaxItem', args => {
+        changeMaxItem(args);
     });
-  };
 
-  Game_Party.prototype.setGroopMaxItem = function(group, max) {
-    const method = '_nuunMaxItems' + group;
-    this[method] = max;
-  };
+    PluginManager.registerCommand(pluginName, 'ChangeMaxWeapon', args => {
+        changeMaxWeapon(args);
+    });
 
-  Game_Party.prototype.getGroopMaxItem = function(item) {
-    const tag = item.meta.ItemGroup;
-    const method = '_nuunMaxItems' + tag;
-    if (tag && !this[method]) {
-      const find = CustomDefault.find(data => data.CustomDefaultKey === tag);
-      if (find) {
-        this.setGroopMaxItem(tag, find.CustomDefaultMax);
-      }
-    }
-    return this[method] || 0;
-  };
+    PluginManager.registerCommand(pluginName, 'ChangeMaxArmor', args => {
+        changeMaxArmor(args);
+    });
 
-  Game_Party.prototype.getMaxItemNum = function(item, type) {
-    const individualNum = this.individualMax(item.id, type);
-    if (individualNum > 0) {
-      return individualNum;
-    } else if (item.meta.MaxItems) {
-      return Number(item.meta.MaxItems);
-    } else {
-      const maxNum = this.getGroopMaxItem(item);
-      return maxNum > 0 ? maxNum : this.defaultMax(type);
-    }
-  };
+    function changeMaxItem(args) {
+        if (Number(args.Item) > 0) {
+            $gameParty.setMaxItem(Number(args.Item), Number(args.MaxNum));
+        } else {
+            for (const item of $dataItems) {
+                if (item && item.name) {
+                    if (args.ItemKey) {
+                        if (args.ItemKey === $gameParty.getCategoryType(item, 'item')) {
+                        $gameParty.setMaxItem(item.id, Number(args.MaxNum));
+                        $gameParty.setGroopMaxItem(args.ItemKey, Number(args.MaxNum));
+                        }
+                    } else {
+                        $gameParty.setMaxItem(item.id, Number(args.MaxNum));
+                    }
+                }
+            }
+        }
+    };
 
-  Game_Party.prototype.individualMax = function(id, type) {
-    switch (type) {
-      case 'item':
-        return this._itemsMaxItem ? (this._itemsMaxItem[id] || 0) : 0;
-      case 'weapon':
-        return this._weaponsMaxItem ? (this._weaponsMaxItem[id] || 0) : 0;
-      case 'armor' :
-        return this._armorsMaxItem ? (this._armorsMaxItem[id] || 0) : 0;
-      default:
-        return 0;
-    }
-  };
+    function changeMaxWeapon(args) {
+        if (Number(args.Weapon) > 0) {
+            $gameParty.setWeaponMaxItem(Number(args.Weapon), Number(args.MaxNum));
+        } else {
+            for (const item of $dataWeapons) {
+                if (item && item.name) {
+                    if (args.ItemKey) {
+                        if (args.ItemKey === $gameParty.getCategoryType(item, 'weapon')) {
+                        $gameParty.setWeaponMaxItem(item.id, Number(args.MaxNum));
+                        $gameParty.setGroopMaxItem(args.ItemKey, Number(args.MaxNum));
+                        }
+                    } else {
+                        $gameParty.setWeaponMaxItem(item.id, Number(args.MaxNum));
+                    }
+                }
+            }
+        }
+    };
 
-  Game_Party.prototype.defaultMax = function(type) {
-    switch (type) {
-      case 'item':
-        return defaultMaxItem;
-      case 'weapon':
-        return defaultMaxWeapon;
-      case 'armor' :
-        return defaultMaxArmor;
-      default:
-        return 99;
-    }
-  };
+    function changeMaxArmor(args) {
+        if (Number(args.Armor) > 0) {
+            $gameParty.setArmorMaxItem(Number(args.Armor), Number(args.MaxNum));
+        } else {
+            for (const item of $dataArmors) {
+                if (item && item.name) {
+                    if (args.ItemKey) {
+                        if (args.ItemKey === $gameParty.getCategoryType(item, 'armor')) {
+                        $gameParty.setArmorMaxItem(item.id, Number(args.MaxNum));
+                        $gameParty.setGroopMaxItem(args.ItemKey, Number(args.MaxNum));
+                        }
+                    } else {
+                        $gameParty.setArmorMaxItem(item.id, Number(args.MaxNum));
+                    }
+                }
+            }
+        }
+    };
 
-  Game_Party.prototype.maxItems = function(item) {//再定義
-    if (DataManager.isItem(item)) {
-      return this.getMaxItemNum(item, 'item');
-    } else if (DataManager.isWeapon(item)) {
-      return this.getMaxItemNum(item, 'weapon');
-    } else if (DataManager.isArmor(item)) {
-      return this.getMaxItemNum(item, 'armor');
-    }
-  };
+    function getCategoryKeyItem(item, type) {
+        if (type === 'item') {
+            if (item.itypeId === 2) {
+                return "keyItem";
+            } else if (item.itypeId === 3) {
+                return "HiddenItemA";
+            } else if (item.itypeId === 4) {
+                return "HiddenItemB";
+            }
+        }
+        return null;
+    };
 
-  Game_Party.prototype.numMaxItems = function(item) {
-    const nowNumber = this.numItems(item);
-    if (nowNumber > this.maxItems(item)) {
-      const container = this.itemContainer(item);
-      container[id] = Math.min(nowNumber, this.maxItems(item));
-    }
-  };
+    const _Game_Party_initialize = Game_Party.prototype.initialize;
+    Game_Party.prototype.initialize = function() {
+        _Game_Party_initialize.call(this);
+        this._itemsMaxItem = [];
+        this._weaponsMaxItem = [];
+        this._armorsMaxItem = [];
+    };
 
-  Game_Party.prototype.setMaxItem = function(id, maxNum) {
-    if (!this._itemsMaxItem) {
-      this._itemsMaxItem = [];
-    }
-    this._itemsMaxItem[id] = maxNum;
-    this.numMaxItems($dataItems[id]);
-  };
+    Game_Party.prototype.initGroopMaxItems = function() {
+        for (const data of CustomDefault) {
+            const method = '_nuunMaxItems' + data.CustomDefaultKey;
+            if (!this[method]) {
+                this[method] = data.CustomDefaultMax;
+            }
+        }
+    };
 
-  Game_Party.prototype.setWeaponMaxItem = function(id, maxNum) {
-    if (!this._weaponsMaxItem) {
-      this._weaponsMaxItem = [];
-    }
-    this._weaponsMaxItem[id] = maxNum;
-    this.numMaxItems($dataWeapons[id]);
-  };
+    Game_Party.prototype.setGroopMaxItem = function(group, max) {
+        const method = '_nuunMaxItems' + group;
+        this[method] = max;
+    };
 
-  Game_Party.prototype.setArmorMaxItem = function(id, maxNum) {
-    if (!this._armorsMaxItem) {
-      this._armorsMaxItem = [];
-    }
-    this._armorsMaxItem[id] = maxNum;
-    this.numMaxItems($$dataArmors[id]);
-  };
+    Game_Party.prototype.getGroopMaxItem = function(item) {
+        const tag = item.meta.ItemGroup;
+        const method = '_nuunMaxItems' + tag;
+        if (tag && !this[method]) {
+            const find = CustomDefault.find(data => data.CustomDefaultKey === tag);
+            if (find) {
+                this.setGroopMaxItem(tag, find.CustomDefaultMax);
+            }
+        }
+        return this[method] || 0;
+    };
 
-  Game_Party.prototype.getCategoryType = function(item, type) {
-    if (item.meta.ItemGroup) {
-      return (item.meta.ItemGroup).trim();
-    }
-    return Imported.NUUN_ItemCategory && item.meta.CategoryType ? (item.meta.CategoryType).trim() : getCategoryKeyItem(item, type);
-  };
+    Game_Party.prototype.getMaxItemNum = function(item, type) {
+        const individualNum = this.individualMax(item.id, type);
+        if (individualNum > 0) {
+            return individualNum;
+        } else if (item.meta.MaxItems) {
+            return Number(item.meta.MaxItems);
+        } else {
+            const maxNum = this.getGroopMaxItem(item);
+            return maxNum > 0 ? maxNum : this.defaultMax(type);
+        }
+    };
+
+    Game_Party.prototype.individualMax = function(id, type) {
+        switch (type) {
+            case 'item':
+                return this._itemsMaxItem ? (this._itemsMaxItem[id] || 0) : 0;
+            case 'weapon':
+                return this._weaponsMaxItem ? (this._weaponsMaxItem[id] || 0) : 0;
+            case 'armor' :
+                return this._armorsMaxItem ? (this._armorsMaxItem[id] || 0) : 0;
+            default:
+                return 0;
+        }
+    };
+
+    Game_Party.prototype.defaultMax = function(type) {
+        switch (type) {
+            case 'item':
+                return defaultMaxItem;
+            case 'weapon':
+                return defaultMaxWeapon;
+            case 'armor' :
+                return defaultMaxArmor;
+            default:
+                return 99;
+        }
+    };
+
+    Game_Party.prototype.maxItems = function(item) {//再定義
+        if (DataManager.isItem(item)) {
+            return this.getMaxItemNum(item, 'item');
+        } else if (DataManager.isWeapon(item)) {
+            return this.getMaxItemNum(item, 'weapon');
+        } else if (DataManager.isArmor(item)) {
+            return this.getMaxItemNum(item, 'armor');
+        }
+    };
+
+    Game_Party.prototype.numMaxItems = function(item) {
+        const nowNumber = this.numItems(item);
+        if (nowNumber > this.maxItems(item)) {
+            const container = this.itemContainer(item);
+            container[id] = Math.min(nowNumber, this.maxItems(item));
+        }
+    };
+
+    Game_Party.prototype.setMaxItem = function(id, maxNum) {
+        if (!this._itemsMaxItem) {
+            this._itemsMaxItem = [];
+        }
+        this._itemsMaxItem[id] = maxNum;
+        this.numMaxItems($dataItems[id]);
+    };
+
+    Game_Party.prototype.setWeaponMaxItem = function(id, maxNum) {
+        if (!this._weaponsMaxItem) {
+            this._weaponsMaxItem = [];
+        }
+        this._weaponsMaxItem[id] = maxNum;
+        this.numMaxItems($dataWeapons[id]);
+    };
+
+    Game_Party.prototype.setArmorMaxItem = function(id, maxNum) {
+        if (!this._armorsMaxItem) {
+            this._armorsMaxItem = [];
+        }
+        this._armorsMaxItem[id] = maxNum;
+        this.numMaxItems($$dataArmors[id]);
+    };
+
+    Game_Party.prototype.getCategoryType = function(item, type) {
+        if (item.meta.ItemGroup) {
+            return (item.meta.ItemGroup).trim();
+        }
+        return Imported.NUUN_ItemCategory && item.meta.CategoryType ? (item.meta.CategoryType).trim() : getCategoryKeyItem(item, type);
+    };
 
 
 })();

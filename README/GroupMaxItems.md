@@ -1,5 +1,5 @@
-# [アイテム全体所持制限](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js)
-# Ver.1.0.2
+# [アイテムグループ所持制限](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js)
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -12,6 +12,10 @@
 プラグインコマンドを使用して最大合計個数を超えてしまったアイテムはそのまま残ります。  
 
 ## 更新履歴  
+2025/8/25 Ver 1.1.0  
+プラグインコマンドが機能していなかった問題を修正。  
+最大数を変更する際、1回のコマンド操作で複数のグループの最大数変更を実行できるように変更。  
+最大数を増減できる機能を追加。  
 2024/9/22 Ver 1.0.2  
 デフォルト合計最大所持数を0に設定していた場合、アイテムを取得できない問題を修正。  
 プラグインコマンドのアイテム合計最大所持数変更で0で無制限に設定できるように修正。  

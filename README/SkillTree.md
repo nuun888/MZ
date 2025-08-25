@@ -94,6 +94,7 @@ $gameActors
 `this.nsp`:スキルポイント  
 `this.getSkillTreeCount(skillId)`:対象のスキルの習得回数  
 `this.isSkillTreeLearned(skillId)`:対象のスキルが習得済みか  
+`this.totalSp`:獲得した総スキルポイント  
 
 ## スキルツリーステータス画面カスタマイズ 
 #### 必須プラグイン

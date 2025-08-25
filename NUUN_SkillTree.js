@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.6
+ * @version 1.1.0
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -76,6 +76,9 @@
  * <SKillTreeImageImdex:[index]> Specify the index number of the sprite sheet. If nothing is entered, the settings in the plugin parameters will be applied.
  * [index]:Index id
  * 
+ * Item, Weapon, and Armor Notes
+ * <SkillTreeCostNoReturn> Items will not be refunded upon reset.
+ * 
  * Enemy Notes
  * <DropSkillPoint:[sp], [rate]> Drop skill points.
  * [sp]:Skill point
@@ -85,6 +88,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/26/2025 Ver.1.1.0
+ * Skill learning cost refunds now apply to items, weapons, armor, amounts, and variables.
+ * Added a setting to not refund skill learning costs when clearing or resetting the skill tree.
+ * Added a plugin command to determine if a skill has been learned in the skill tree.
+ * Updated to support the Extended Skill Learning plugin.
  * 8/25/2025 Ver.1.0.6
  * Fixed an issue where an error would occur when increasing or decreasing skill points if the initial skill points were set from the actor or job.
  * 8/24/2025 Ver.1.0.5
@@ -149,6 +157,13 @@
  * @type string
  * @default 0
  * 
+ * @arg ReturnSkillTreeCost
+ * @desc Skill costs are not refunded. (Costs that are not eligible for refund will not be refunded.)
+ * @text No skill cost refund
+ * @type boolean
+ * @default false
+ * 
+ * 
  * @command SkillTreeLearnSkill
  * @desc You can learn a skill. If you do not meet the learning conditions, you will not be able to learn the skill.
  * @text Skills Learning
@@ -206,6 +221,37 @@
  * @text Clear all skills
  * @type boolean
  * @default true
+ * 
+ * @arg ReturnSkillTreeCost
+ * @desc Skill costs are not refunded. (Costs that are not eligible for refund will not be refunded.)
+ * @text No skill cost refund
+ * @type boolean
+ * @default false
+ * 
+ * 
+ * @command IsSkillTreeLearnedSkill
+ * @desc Determines whether the specified skill has been learned in the skill tree and assigns it to the specified switch.
+ * @text Skill learned switch
+ * 
+ * @arg ActorId
+ * @text Actor id
+ * @desc Specifies the actor ID.
+ * @type actor
+ * @min 0
+ * @default 0
+ * 
+ * @arg SkillId
+ * @text Skill id
+ * @desc Specify the skill ID.
+ * @type skill
+ * @min 0
+ * @default 0
+ * 
+ * @arg SwitchesId
+ * @text Switch
+ * @desc Specify the switch ID to be assigned.
+ * @type switch
+ * @default 0
  * 
  * 
  * 
@@ -1229,7 +1275,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.6
+ * @version 1.1.0
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1290,6 +1336,9 @@
  * <SKillTreeImageImdex:[index]> スプライトシートのインデックス番号を指定します。記入がない場合はプラグインパラメータの設定が適用されます。
  * [index]:インデックス番号
  * 
+ * アイテム、武器、防具のメモ欄
+ * <SkillTreeCostNoReturn> リセット時にアイテムの返還はありません。
+ * 
  * 敵キャラのメモ欄
  * <DropSkillPoint:[sp], [rate]> スキルポイントをドロップします。
  * [sp]:スキルポイント
@@ -1299,6 +1348,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/26 Ver.1.1.0
+ * スキル習得コストの返還をアイテム、武器、防具、金額、変数にも適用。
+ * スキルツリー消去、スキルツリーリセットでスキル習得コストを返還されない設定を追加。
+ * スキルがスキルツリーで習得済みか判定するプラグインコマンドを追加。
+ * 拡張スキル習得プラグインに対応するための更新。
  * 2025/8/25 Ver.1.0.6
  * アクター、職業から初期スキルポイントを設定した場合に、スキルポイント増減時にエラーが起きる問題を修正。
  * 2025/8/24 Ver.1.0.5
@@ -1363,6 +1417,13 @@
  * @type string
  * @default
  * 
+ * @arg ReturnSkillTreeCost
+ * @desc スキルコストを返還しない。(返還対象外のコストは戻りません)
+ * @text スキルコスト返還なし
+ * @type boolean
+ * @default false
+ * 
+ * 
  * @command SkillTreeLearnSkill
  * @desc スキルを習得します。習得条件を満たしていない場合は習得出来ません。
  * @text スキル習得
@@ -1420,6 +1481,37 @@
  * @text スキル全消去
  * @type boolean
  * @default true
+ * 
+ * @arg ReturnSkillTreeCost
+ * @desc スキルコストを返還しない。(返還対象外のコストは戻りません)
+ * @text スキルコスト返還なし
+ * @type boolean
+ * @default false
+ * 
+ * 
+ * @command IsSkillTreeLearnedSkill
+ * @desc 指定のスキルがスキルツリーで習得済みか判定し、指定のスイッチに代入します。
+ * @text スキル習得済みスイッチ
+ * 
+ * @arg ActorId
+ * @text アクターID
+ * @desc アクターIDを指定します。
+ * @type actor
+ * @min 0
+ * @default 0
+ * 
+ * @arg SkillId
+ * @text スキルID
+ * @desc スキルIDを指定します。
+ * @type skill
+ * @min 0
+ * @default 0
+ * 
+ * @arg SwitchesId
+ * @text スイッチ
+ * @desc 代入するスイッチIDを指定します。
+ * @type switch
+ * @default 0
  * 
  * 
  * 
@@ -2461,9 +2553,9 @@ Imported.NUUN_SkillTree = true;
         if (Number(args.ActorId) > 0) {
             const actor = $gameActors.actor(Number(args.ActorId));
             if (!!args.SkillTreeType) {
-                _SkillTreeReset(actor, Number(args.SkillTreeType));
+                _SkillTreeReset(actor, Number(args.SkillTreeType), !eval(args.ReturnSkillTreeCost));
             } else {
-                _SkillTreeResets(actor);
+                _SkillTreeResets(actor, !eval(args.ReturnSkillTreeCost));
             }
         }
     });
@@ -2478,14 +2570,22 @@ Imported.NUUN_SkillTree = true;
     PluginManager.registerCommand(pluginName, 'AddSkillTreeType', args => {
         if (Number(args.ActorId) > 0) {
             const actor = $gameActors.actor(Number(args.ActorId));
-            actor.addSkillTree(Number(args.SkillTreeId));
+            actor.addSkillTree(args.SkillTreeId);
         }
     });
 
     PluginManager.registerCommand(pluginName, 'RemoveSkillTreeType', args => {
         if (Number(args.ActorId) > 0) {
             const actor = $gameActors.actor(Number(args.ActorId));
-            actor.removeSkillTree(Number(args.SkillTreeId), eval(args.SkillTreeReset));
+            actor.removeSkillTree(args.SkillTreeId, eval(args.SkillTreeReset), !eval(args.ReturnSkillTreeCost));
+        }
+    });
+
+    PluginManager.registerCommand(pluginName, 'IsSkillTreeLearnedSkill', args => {
+        if (Number(args.ActorId) > 0) {
+            const actor = $gameActors.actor(Number(args.ActorId));
+            const result = actor.isSkillTreeLearned(Number(args.SkillId));
+            $gameSwitches.setValue(Number(args.SwitchesId), result);
         }
     });
 
@@ -2496,6 +2596,16 @@ Imported.NUUN_SkillTree = true;
         } else {
             return Number(id) - 1;
         }
+    };
+
+    function _getSkillTreeSettingSymbolName(symbol) {
+        return symbol;
+        //if (isNaN(symbol)) {
+        //    return symbol;
+        //} else {
+        //    const find = params.SkillTreeSetting.find(data => data.SymbolName === symbol);
+        //    return find ? find.SymbolName : null;
+        //}
     };
 
     function _getWindowData(method) {
@@ -2526,15 +2636,15 @@ Imported.NUUN_SkillTree = true;
         _confirmation = flag;
     };
 
-    function _SkillTreeReset(actor, type) {
+    function _SkillTreeReset(actor, type, r) {
         const id = _getSkillTreeSettingIndex(type)
-        actor.skillTreeReset(id);
+        actor.skillTreeReset(id, r);
     };
 
-    function _SkillTreeResets(actor) {
+    function _SkillTreeResets(actor, r) {
         const list = actor.getAllSkillTreeList();
         for (const id of list) {
-            actor.skillTreeReset(id);
+            actor.skillTreeReset(id, r);
         }
     };
 
@@ -2825,15 +2935,21 @@ Imported.NUUN_SkillTree = true;
             if (!Imported.NUUN_SkillTreeLearnEx) return null;
             const list = NuunManager.getSkillTreeLearnExSetting();
             if (!list) return null;
-            return list.find(data => this.isLearnExData(data) && this.isCountLearnExData(data)) || null;
+            for (const data of list) {
+                if (this.isLearnExData(data)) {
+                    return this.isCountLearnExData(data.SkillLearnExList);
+                }
+            }
+            return null
         }
 
         isLearnExData(data) {
-            return (!data.SymbolName || data.SymbolName === this._type) && data.SkillId === this._id;
+            const symbol = _getSkillTreeSettingSymbolName(data.TypeId);
+            return (!symbol || symbol === this._type) && data.SkillId === this._id;
         }
 
-        isCountLearnExData(data) {
-            return data.Count <= this._actor.getSkillTreeCount(this._id);
+        isCountLearnExData(list) {
+            return list.find(data => data.Count <= this._actor.getSkillTreeCount(this._id));
         }
 
         getLearnSkill() {
@@ -2855,8 +2971,10 @@ Imported.NUUN_SkillTree = true;
                 }
             }
         }
-
     }
+
+    window.SkillTreeData = SkillTreeData;
+
 
     const _Scene_Menu_createCommandWindow = Scene_Menu.prototype.createCommandWindow;
     Scene_Menu.prototype.createCommandWindow = function() {
@@ -4319,6 +4437,7 @@ Imported.NUUN_SkillTree = true;
     Game_Actor.prototype.learnSkillTreeData = function() {
         return {
             skillId:0 ,
+            higherSkills:[],
             count:0 ,
             cost:0 ,
             item:[0],
@@ -4477,14 +4596,14 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Game_Actor.prototype.removeSkillTree = function(type, b) {
+    Game_Actor.prototype.removeSkillTree = function(type, b, r) {
         const id = _getSkillTreeSettingIndex(type);
         if (!this._skillTreeList) {
             this._skillTreeList = [];
             return;
         }
         if (b) {
-            this.skillTreeReset(id);
+            this.skillTreeReset(id, r);
         }
         const index = this._skillTreeList.findIndex(a => a[0] === id && a[1] === 0);
         if (index >= 0) {
@@ -4590,10 +4709,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.isSkillTreeLearned = function(skillId) {
-        return this.isLearnedSkill(skillId) && this.isSkillTreeLearn(skillId);
+        return this.isLearnedSkill(skillId) || this.isSkillTreeLearn(skillId);
     };
 
     Game_Actor.prototype.isSkillTreeLearn = function(skillId) {
+        if (!this._learnSkillTreeSkillList) return false;
         return !!this._learnSkillTreeSkillList[skillId];
     };
 
@@ -4679,30 +4799,36 @@ Imported.NUUN_SkillTree = true;
         return NuunManager.getMetaCode(_class, "LevelupSkillPoint") || (NuunManager.getMetaCode(actor, "LevelupSkillPoint") || params.LevelupGainSkillPoint);
     };
 
-    Game_Actor.prototype.skillTreeReset = function(id) {
+    Game_Actor.prototype.skillTreeReset = function(id, r) {
         const skillTree = params.SkillTreeSetting[id];
         if (!skillTree || !skillTree.SkillTreeList) return;
-        for (const data of skillTree.SkillTreeList) {
+        for (const data of skillTree.SkillTreeList) {//プラグインパラメータのデータを参照
             if (this.isSkillTreeLearned(data.SkillId) && this.notDeletionSkillTreeSkill(data.SkillId)) {
-                const learnData = this._learnSkillTreeSkillList[data.SkillId];
-                if (!!learnData) {
-                    this.gainSkillTreeCost(learnData);
-                    this.forgetSkillTreeSkill(data);
-                }
+                const t = _getSkillTreeData(data, skillTree.SymbolName, this);
+                this.removeSkillTreeSkill(t, r);
             }
         }
     };
 
-    Game_Actor.prototype.forgetSkillTreeSkill = function(data) {
-        this.forgetSkill(data.SkillId);
-        this.removeLearnSkillTreeSkill(data.SkillId);
+    Game_Actor.prototype.removeSkillTreeSkill = function(data, r) {
+        const learnData = this._learnSkillTreeSkillList[data._id];
+        if (!!learnData) {
+            if (r) {
+                this.returnSkillTreeCost(learnData);
+            }
+            this.forgetSkillTreeSkill(data);
+        }
     };
 
-    Game_Actor.prototype.gainSkillTreeCost = function(data) {
+    Game_Actor.prototype.forgetSkillTreeSkill = function(data) {
+        this.forgetSkill(data._id);
+        this.removeLearnSkillTreeSkill(data._id);
+    };
+
+    Game_Actor.prototype.returnSkillTreeCost = function(data) {
         if (data.cost > 0) {
             this.gainSkillPoint(data.cost);
         }
-        return;
         if (data.item > 0) {
             _returnSkillTreeItem(data);
         }

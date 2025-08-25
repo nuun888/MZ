@@ -104,6 +104,8 @@ $gameActors
 ダウンロード  
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
+## 拡張スキル習得
+
 ## 仕様
 横方向のスクロールの機能は今のところ実装いたしません。  
 Ver.1.0.4での更新によりスキル習得後の処理方法を変更した関係で、Ver.1.0.3以前とのセーブデータの互換性はありません。  

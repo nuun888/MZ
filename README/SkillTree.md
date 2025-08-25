@@ -107,10 +107,18 @@ $gameActors
 ダウンロード  
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
+#### 更新履歴
+2025/8/15 Ver.1.0.0  
+初版  
+
 ## 拡張スキル習得
 習得回数に応じて習得するスキルに対し別のスキルを習得させたりできます。  
 ダウンロード  
 [拡張スキル習得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeLearnEx.js)  
+
+#### 更新履歴
+2025/8/26 Ver.1.0.0  
+初版  
 
 ## 仕様
 横方向のスクロールの機能は今のところ実装いたしません。  
@@ -118,10 +126,6 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 スキルツリータイプのアイコン表示は外部プラグインで表示させてください。スキルツリータイプの表示はコマンドタイプです。  
 
 既知の問題
-
-#### 更新履歴
-2025/8/15 Ver.1.0.0  
-初版  
 
 ## クラス
 `Scene_SkillTree` スキルツリーシーン  

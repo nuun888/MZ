@@ -1,11 +1,12 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.0.6
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 #### オプション
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
+[拡張スキル習得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeLearnEx.js)  
 前提スキルウィンドウ  
 
 ツリー型のスキル習得システムを実装します。  
@@ -73,9 +74,11 @@
 `[id]`:ゲーム変数ID  
 `[num]`:消費数  
 
-
 `<SKillTreeImageImdex:[index]>` スプライトシートのインデックス番号を指定します。記入がない場合はプラグインパラメータの設定が適用されます。  
 `[index]`:インデックス番号  
+
+アイテム、武器、防具のメモ欄  
+`<SkillTreeCostNoReturn>` リセット時にアイテムの返還はありません。  
 
 敵キャラのメモ欄  
 `<DropSkillPoint:[sp], [rate]>` スキルポイントをドロップします。  
@@ -105,6 +108,9 @@ $gameActors
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
 ## 拡張スキル習得
+習得回数に応じて習得するスキルに対し別のスキルを習得させたりできます。  
+ダウンロード  
+[拡張スキル習得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeLearnEx.js)  
 
 ## 仕様
 横方向のスクロールの機能は今のところ実装いたしません。  
@@ -126,6 +132,11 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/8/26 Ver.1.1.0  
+スキル習得コストの返還をアイテム、武器、防具、金額、変数にも適用。  
+スキルツリー消去、スキルツリーリセットでスキル習得コストを返還されない設定を追加。  
+スキルがスキルツリーで習得済みか判定するプラグインコマンドを追加。  
+拡張スキル習得プラグインに対応するための更新。  
 2025/8/25 Ver.1.0.6  
 アクター、職業から初期スキルポイントを設定した場合に、スキルポイント増減時にエラーが起きる問題を修正。  
 2025/8/24 Ver.1.0.5  

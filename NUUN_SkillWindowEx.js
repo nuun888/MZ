@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * You can customize the skill screen.
@@ -25,10 +25,12 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 2025/3/15 Ver.1.0.1
+ * 8/26/2025 Ver.1.1.2  
+ * Added skill points (NUUN_SkillTree) to the actor's display status.  
+ * 3/15/2025 Ver.1.0.1
  * Fixed an issue where an error would occur if the status item settings were not set.
- * 2024/8/9 Ver.1.0.0
- * 初版
+ * 8/9/2024 Ver.1.0.0
+ * First edition.
  * 
  * @param Setting
  * @text Common setting
@@ -419,6 +421,8 @@
  * @value Class
  * @option Level(1)(2)(3)(4)(5)(6)(9)(11)(12)(13)
  * @value Level
+ * @option Skill point(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value SkillPoint
  * @option State(1)(2)(3)(4)(5)(16※1)
  * @value State
  * @option State (same display as for battle)(1)(2)(3)(4)
@@ -823,7 +827,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * メニュー時のスキル画面をカスタマイズできます。
@@ -833,6 +837,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/26 Ver.1.0.2
+ * アクターの表示ステータスにスキルポイント(NUUN_SkillTree)を追加。
  * 2025/3/15 Ver.1.0.1
  * ステータス項目設定が未設定の場合にエラーが出る問題を修正。
  * 2024/8/9 Ver.1.0.0
@@ -1227,6 +1233,8 @@
  * @value Class
  * @option レベル(1)(2)(3)(4)(5)(6)(9)(11)(12)(13)
  * @value Level
+ * @option スキルポイント(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value SkillPoint
  * @option ステート(1)(2)(3)(4)(5)(16※1)
  * @value State
  * @option ステート(戦闘用と同じ表示)(1)(2)(3)(4)

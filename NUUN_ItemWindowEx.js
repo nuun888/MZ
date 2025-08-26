@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * You can customize the item screen.
@@ -47,6 +47,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/26/2025 Ver.1.1.2
+ * Added skill points (NUUN_SkillTree) to the actor's display status.
  * 7/27/2024 Ver.1.1.1
  * Fixed to allow decimal points to be applied to original parameters.
  * 7/21/2024 Ver.1.1.0
@@ -474,6 +476,8 @@
  * @value Class
  * @option Level(1)(2)(3)(4)(5)(6)(9)(11)(12)(13)
  * @value Level
+ * @option Skill point(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value SkillPoint
  * @option State(1)(2)(3)(4)(5)(16※1)
  * @value State
  * @option State (same display as for battle)(1)(2)(3)(4)
@@ -1593,7 +1597,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * アイテム画面をカスタマイズできます。
@@ -1626,6 +1630,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/26 Ver.1.1.2
+ * アクターの表示ステータスにスキルポイント(NUUN_SkillTree)を追加。
  * 2024/7/27 Ver.1.1.1
  * オリジナルパラメータに小数点数を適用できるように修正。
  * 2024/7/21 Ver.1.1.0
@@ -2054,6 +2060,8 @@
  * @value Class
  * @option レベル(1)(2)(3)(4)(5)(6)(9)(11)(12)(13)
  * @value Level
+ * @option スキルポイント(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(12)(13)(14)(15)(17)
+ * @value SkillPoint
  * @option ステート(1)(2)(3)(4)(5)(16※1)
  * @value State
  * @option ステート(戦闘用と同じ表示)(1)(2)(3)(4)

@@ -1,5 +1,5 @@
 # [リザルト](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)
-# Ver.2.4.6
+# Ver.2.4.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js)  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js) 
@@ -47,6 +47,8 @@ d:アクターのデータベースデータ
 ![画像](img/ExpValueImg.png)<br>
 
 ## 更新履歴
+2025/8/27 Ver.2.4.7  
+入手項目、レベルアップステータスに表示項目にスキルポイントを追加。  
 2025/4/13 Ver.2.4.6  
 ゲージ画像化更新による処理の修正。  
 2024/12/29 Ver.2.4.5  

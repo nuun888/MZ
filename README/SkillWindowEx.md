@@ -1,5 +1,5 @@
 # [スキルウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillWindowEx.js)
-# Ver.1.0.1
+# Ver.1.0.2
 通常版  
 [通常版ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillWindowEx.js)  
 アクターステータスのプリセットあり(７２０P)Ver.1.0.0  
@@ -30,6 +30,8 @@
 ![画像](img/SkillWindowEx_pre.png)  
 
 ## 更新履歴
+2025/8/26 Ver.1.0.2  
+アクターの表示ステータスにスキルポイント(NUUN_SkillTree)を追加。  
 2025/3/15 Ver.1.0.1  
 ステータス項目設定が未設定の場合にエラーが出る問題を修正。  
 2024/8/9 Ver.1.0.0  

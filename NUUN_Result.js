@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.6
+ * @version 2.4.7
  * 
  * @help
  * Display the result screen at the end of the battle.
@@ -60,6 +60,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/27/2025 Ver.2.4.7
+ * Skill points have been added to the display items for acquired items and level-up status.
  * 4/13/2025 Ver.2.4.6
  * Fixed processing due to gauge imaging update.
  * 2024/12/29 Ver.2.4.5
@@ -2322,7 +2324,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter BattleVoiceMZ
- * @version 2.4.5
+ * @version 2.4.7
  * 
  * @help
  * 戦闘終了時にリザルト画面を表示します。
@@ -2370,6 +2372,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/27 Ver.2.4.7
+ * 入手項目、レベルアップステータスに表示項目にスキルポイントを追加。
  * 2025/4/13 Ver.2.4.6
  * ゲージ画像化更新による処理の修正。
  * 2024/12/29 Ver.2.4.5
@@ -3954,6 +3958,8 @@
  * @value 1
  * @option 獲得経験値(1)(2)(3)(4)(5)(6)(7)(9)
  * @value 2
+ * @option スキルポイント(1)(2)(3)(4)(5)(6)(7)(9)
+ * @value 3
  * @option 任意パラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)
  * @value 10
  * @option ライン
@@ -4015,7 +4021,7 @@
  * @desc 評価式または文字列を記入します。
  * @text 評価式or文字列(9)
  * @type combo
- * @option 'BattleManager._rewards.sp;//Skill tree Get Sp'
+ * @option 'BattleManager._rewards.sp;//うなぎおおとろ氏 SkillTree'
  * @default 
  * @param FontSize
  * @desc フォントサイズ（メインフォントからの差）
@@ -4166,6 +4172,8 @@
  * @value 33
  * @option オリジナルパラメータ(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)
  * @value 40
+ * @option スキルポイント(1)(2)(3)(4)(5)(6)(8)(10)(11)
+ * @value 50
  * @option ライン(1)(2)(3)(4)(5)(8)
  * @value 1000
  * @default 0
@@ -4233,7 +4241,7 @@
  * @desc 評価式または文字列を記入します。
  * @text 評価式or文字列(9)
  * @type combo
- * @option '$skillTreeData.sp(a.actorId());//Skill tree Get Sp'
+ * @option '$skillTreeData.sp(a.actorId());//うなぎおおとろ氏 SkillTree'
  * @default 
  * 
  * @param FontSize
@@ -6119,6 +6127,9 @@ Window_ResultGetInfo.prototype.dateDisplay = function(data, x, y, width) {
     case 2:
       this.drawGainExp(data, x, y, width);
       break;
+    case 3:
+      this.drawGainSkillPoint(data, x, y, width);
+      break;
     case 10:
       this.drawPartyOriginalParam(data, x, y, width)
       break;
@@ -6145,8 +6156,7 @@ Window_ResultGetInfo.prototype.drawGainGold = function(data, x, y, width) {
 };
 
 Window_ResultGetInfo.prototype.drawGainExp = function(data, x, y, width) {
-  const exp = BattleManager._rewards.exp;
-  if (!isNaN(exp)) {
+  if (!isNaN(BattleManager._rewards.exp)) {
     const exp = data.DetaEval ? eval(data.DetaEval) : BattleManager._rewards.exp;
     this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
     this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
@@ -6158,6 +6168,22 @@ Window_ResultGetInfo.prototype.drawGainExp = function(data, x, y, width) {
     this.resetTextColor();
     this.drawText(exp, x + systemWidth, y,  width - systemWidth, "right");
   }
+};
+
+Window_ResultGetInfo.prototype.drawGainSkillPoint = function(data, x, y, width) {
+    if (!Imported.NUUN_SkillTree) return;
+    if (!isNaN(BattleManager._rewards.skillPoint)) {
+        const skillPoint = data.DetaEval ? eval(data.DetaEval) : BattleManager._rewards.skillPoint;
+        this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+        this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+        let systemWidth = 0;
+        if (data.ParamName) {
+            systemWidth = data.SystemItemWidth || 120;
+            this.drawText(data.ParamName, x, y, systemWidth, "left");
+        }
+        this.resetTextColor();
+        this.drawText(skillPoint, x + systemWidth, y,  width - systemWidth, "right");
+    }
 };
 
 Window_ResultGetInfo.prototype.drawPartyOriginalParam = function(data, x, y, width) {
@@ -6674,6 +6700,9 @@ Window_ResultActorStatus.prototype.dateDisplay = function(data, index, actor, x,
     case 40:
       this.drawParams(data, index, actor, x, y, width);
       break;
+    case 50:
+      this.drawSkillPoint(data, index, actor, x, y, width);
+      break;
     case 1000:
       this.drawHorzLine(data, x, y, width);
       break;
@@ -6738,10 +6767,6 @@ Window_ResultActorStatus.prototype.paramValue = function(actor, param) {
   }
 };
 
-Window_ResultActorStatus.prototype.paramOld = function(index) {
-  return this._oldLevelActorStatus[index];
-};
-
 Window_ResultActorStatus.prototype.drawStatusParam = function(data, index, actor, x, y, width) {
   let x2 = x;
   let systemWidth = data.SystemItemWidth || 160;
@@ -6753,7 +6778,7 @@ Window_ResultActorStatus.prototype.drawStatusParam = function(data, index, actor
   if (actor) {
     const value = this.paramValue(actor, data.StatusParamDate);
     if (data.DifferenceVisible && this._oldLevelActorStatus) {
-      const oldValue = this.paramOld(index);
+      const oldValue = this.paramValue(this._oldLevelActorStatus, data.StatusParamDate);
       this.drawText(oldValue, x2, y, 48, 'right');
       x2 += 48;
       this.changeTextColor(ColorManager.systemColor());
@@ -6782,7 +6807,7 @@ Window_ResultActorStatus.prototype.drawOriginalStatusParam = function(data, inde
   if (actor) {
     const value = this.paramValue(actor, data.StatusParamDate);
     if (data.DifferenceVisible && this._oldLevelActorStatus) {
-      const oldValue = this.paramOld(index);
+      const oldValue = this.paramValue(this._oldLevelActorStatus, data.StatusParamDate);
       this.drawText(oldValue, x2, y, 48, 'right');
       x2 += 48;
       this.changeTextColor(ColorManager.systemColor());
@@ -6800,6 +6825,38 @@ Window_ResultActorStatus.prototype.drawOriginalStatusParam = function(data, inde
   }
 };
 
+Window_ResultActorStatus.prototype.drawSkillPoint = function(data, index, actor, x, y, width) {
+    if (!Imported.NUUN_SkillTree) return;
+    const text = data.ParamName ? data.ParamName : NuunManager.getSkillPointParamName();
+    let x2 = x;
+    let systemWidth = data.SystemItemWidth || 160;
+    this.changeTextColor(NuunManager.getColorCode(data.SystemNameColor));
+    this.contents.fontSize = $gameSystem.mainFontSize() + data.FontSize;
+    this.drawText(text, x, y, systemWidth, "left");
+    this.resetTextColor();
+    x2 += systemWidth + this.itemPadding() * 2;
+    if (actor) {
+        const value = actor.nsp;
+        if (data.DifferenceVisible && this._oldLevelActorStatus) {
+            const sp = BattleManager._rewards.skillPoint;
+            const oldValue = this._oldLevelActorStatus.nsp + (sp * actor.benchMembersSkillPoint());
+            this.drawText(oldValue, x2, y, 48, 'right');
+            x2 += 48;
+            this.changeTextColor(ColorManager.systemColor());
+            this.drawText("\u2192", x2, y, 32, "center");
+            if (oldValue < value) {
+                this.changeTextColor(NuunManager.getColorCode(DifferenceStatusColor));
+            } else {
+                this.resetTextColor();
+            }
+            x2 += 32;
+        } else {
+            x2 += 80;
+        }
+        this.drawText(value, x2, y, 48, "right");
+    }
+};
+
 Window_ResultActorStatus.prototype.drawActorLevel = function(data, index, actor, x, y, width) {
   let x2 = x;
   let systemWidth = data.SystemItemWidth || 160;
@@ -6811,7 +6868,7 @@ Window_ResultActorStatus.prototype.drawActorLevel = function(data, index, actor,
   if (actor) {
     const value = actor._level;
     if (data.DifferenceVisible && this._oldLevelActorStatus) {
-      const oldValue = this.paramOld(index);
+      const oldValue = this._oldLevelActorStatus._level;
       this.drawText(oldValue, x2, y, 48, 'right');
       x2 += 48;
       this.changeTextColor(ColorManager.systemColor());
@@ -6834,8 +6891,6 @@ Window_ResultActorStatus.prototype.drawParams = function(data, index, actor, x, 
         return;
     }
     try {
-        const a = actor;
-        const d = actor.actor();
         let x2 = x;
         let systemWidth = data.SystemItemWidth || 160;
         if (data.ParamName) {
@@ -6845,9 +6900,9 @@ Window_ResultActorStatus.prototype.drawParams = function(data, index, actor, x, 
         this.resetTextColor();
         x2 += systemWidth + this.itemPadding() * 2;
         if (actor) {
-            const value = eval(data.DetaEval);
+            const value = this.getEvalExpressionParam(data, actor);
             if (data.DifferenceVisible && this._oldLevelActorStatus) {
-            const oldValue = this.paramOld(index);
+            const oldValue = this.getEvalExpressionParam(data, this._oldLevelActorStatus);
             this.drawText(oldValue, x2, y, 48, 'right');
             x2 += 48;
             this.changeTextColor(ColorManager.systemColor());
@@ -6915,6 +6970,12 @@ Window_ResultActorStatus.prototype.drawHorzLine = function(data, x, y, width) {
   this.contents.paintOpacity = 48;
   this.contents.fillRect(x, lineY, width, 2, NuunManager.getColorCode(data.SystemNameColor));
   this.contents.paintOpacity = 255;
+};
+
+Window_ResultActorStatus.prototype.getEvalExpressionParam = function(data, actor) {
+        const a = actor;
+        const d = actor.actor();
+        return eval(data.DetaEval);
 };
 
 
@@ -7182,7 +7243,8 @@ BattleManager.actorLevelUpStatus = function() {
             const levelUpPageEnable = this._levelUpPageEnable === undefined || this._levelUpPageEnable === null ? LevelUpWindowShow : this._levelUpPageEnable;
             if (levelUpPageEnable) {
                 this.resultLevelUpActors.push(actor);
-                this.resultOldStatusActors.push(this.getResultOldStatus(actor));
+                const tempActor = JsonEx.makeDeepCopy(actor);
+                this.resultOldStatusActors.push(tempActor);
             }
         }
     }

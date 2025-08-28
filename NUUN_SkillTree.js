@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -88,6 +88,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/28/2025 Ver.1.1.1
+ * Added the ability to specify the frame color of skills that can be relearned.
+ * Added the ability to set learning condition text to cost conditions.
  * 8/26/2025 Ver.1.1.0
  * Skill learning cost refunds now apply to items, weapons, armor, amounts, and variables.
  * Added a setting to not refund skill learning costs when clearing or resetting the skill tree.
@@ -330,6 +333,59 @@
  * @default 0
  * @min 0
  * @parent SkillTreeTextSetting
+ * 
+ * @param SkillPointSetting
+ * @text Skill point settings
+ * @default ------------------------------
+ * 
+ * @param SkillPointName
+ * @text Skill point display name
+ * @desc The display name of the skill point.
+ * @type string
+ * @default SP
+ * @parent SkillPointSetting
+ * 
+ * @param DefaultInitSkillPoint
+ * @text Default starting skill points
+ * @desc Default starting skill points.
+ * @type number
+ * @default 0
+ * @parent SkillPointSetting
+ * 
+ * @param MaxSkillPoint
+ * @text Maximum skill points
+ * @desc Maximum skill points.
+ * @type number
+ * @default Infinity
+ * @parent SkillPointSetting
+ * 
+ * @param DefaultSkillPointCost
+ * @text Default skill point cost
+ * @desc Default skill point cost.
+ * @type number
+ * @default 0
+ * @parent SkillPointSetting
+ * 
+ * @param LevelupGainSkillPoint
+ * @text Skill points acquired when leveling up
+ * @desc Skill points gained when leveling up.
+ * @type number
+ * @default 1
+ * @parent SkillPointSetting
+ * 
+ * @param DisplayLevelUpMessage
+ * @text Level-up skill point acquisition message
+ * @desc Skill point acquisition message displayed when leveling up. %1: Actor name %2: Amount of SP acquired %3: Skill point name
+ * @type string
+ * @default %1 received %2 %3!
+ * @parent SkillPointSetting
+ * 
+ * @param BenchMembarsGainSkillPoint
+ * @desc Bench members will also earn skill points when they win battles.
+ * @text Bench Member Skill Point Acquisition
+ * @type boolean
+ * @default false
+ * @parent SkillPointSetting
  * 
  * @param ClassSetting
  * @text Class setting
@@ -637,59 +693,6 @@
  * @min 0
  * @parent LearnedIconSetting
  * 
- * @param SkillPointSetting
- * @text Skill point settings
- * @default ------------------------------
- * 
- * @param SkillPointName
- * @text Skill point display name
- * @desc The display name of the skill point.
- * @type string
- * @default SP
- * @parent SkillPointSetting
- * 
- * @param DefaultInitSkillPoint
- * @text Default starting skill points
- * @desc Default starting skill points.
- * @type number
- * @default 0
- * @parent SkillPointSetting
- * 
- * @param MaxSkillPoint
- * @text Maximum skill points
- * @desc Maximum skill points.
- * @type number
- * @default Infinity
- * @parent SkillPointSetting
- * 
- * @param DefaultSkillPointCost
- * @text Default skill point cost
- * @desc Default skill point cost.
- * @type number
- * @default 0
- * @parent SkillPointSetting
- * 
- * @param LevelupGainSkillPoint
- * @text Skill points acquired when leveling up
- * @desc Skill points gained when leveling up.
- * @type number
- * @default 1
- * @parent SkillPointSetting
- * 
- * @param DisplayLevelUpMessage
- * @text Level-up skill point acquisition message
- * @desc Skill point acquisition message displayed when leveling up. %1: Actor name %2: Amount of SP acquired %3: Skill point name
- * @type string
- * @default %1 received %2 %3!
- * @parent SkillPointSetting
- * 
- * @param BenchMembarsGainSkillPoint
- * @desc Bench members will also earn skill points when they win battles.
- * @text Bench Member Skill Point Acquisition
- * @type boolean
- * @default false
- * @parent SkillPointSetting
- * 
  * @param SkillSetting
  * @text Skill content setting
  * @default ------------------------------
@@ -864,6 +867,14 @@
  * @desc Specifies the color of the frames for items that have not yet been mastered but meet the mastery requirements.
  * @type color
  * @default 0
+ * @min 0
+ * @parent FrameSetting
+ * 
+ * @param CountFrameColor
+ * @text Relearnable frame color (code)
+ * @desc Specifies the color of the skill slot that can be relearned.
+ * @type color
+ * @default 23
  * @min 0
  * @parent FrameSetting
  * 
@@ -1176,8 +1187,15 @@
  * @default 0
  * @parent LearnSetting
  * 
+ * @param LearnCondText
+ * @text Learning condition text
+ * @desc The text of the learning conditions to be displayed in the cost window. Control characters can be used.
+ * @type multiline_string
+ * @default 
+ * @parent LearnSetting
+ * 
  * @param LearnCond
- * @text learning conditions
+ * @text Learning conditions
  * @desc Enter the conditions for acquiring skills in JavaScript.
  * @type combo
  * @option 'v[0];//Variables'
@@ -1275,7 +1293,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1348,6 +1366,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/28 Ver.1.1.1
+ * 再習得可能なスキルの枠の色を指定できる機能を追加。
+ * コスト条件に習得条件のテキストを設定できる機能を追加。
  * 2025/8/26 Ver.1.1.0
  * スキル習得コストの返還をアイテム、武器、防具、金額、変数にも適用。
  * スキルツリー消去、スキルツリーリセットでスキル習得コストを返還されない設定を追加。
@@ -1590,6 +1611,59 @@
  * @default 0
  * @min 0
  * @parent SkillTreeTextSetting
+ * 
+ * @param SkillPointSetting
+ * @text スキルポイント設定
+ * @default ------------------------------
+ * 
+ * @param SkillPointName
+ * @text スキルポイント表示名
+ * @desc スキルポイントの表示名。
+ * @type string
+ * @default SP
+ * @parent SkillPointSetting
+ * 
+ * @param DefaultInitSkillPoint
+ * @text デフォルト初期スキルポイント
+ * @desc デフォルトの初期スキルポイント。
+ * @type number
+ * @default 0
+ * @parent SkillPointSetting
+ * 
+ * @param MaxSkillPoint
+ * @text スキルポイント最大値
+ * @desc スキルポイントの最大値。
+ * @type number
+ * @default Infinity
+ * @parent SkillPointSetting
+ * 
+ * @param DefaultSkillPointCost
+ * @text デフォルトスキルポイントコスト
+ * @desc デフォルトのスキルポイントコスト。
+ * @type number
+ * @default 0
+ * @parent SkillPointSetting
+ * 
+ * @param LevelupGainSkillPoint
+ * @text レベルアップ時取得スキルポイント
+ * @desc レベルアップ時の取得スキルポイント。
+ * @type number
+ * @default 1
+ * @parent SkillPointSetting
+ * 
+ * @param DisplayLevelUpMessage
+ * @text レベルアップスキルポイント獲得メッセージ
+ * @desc レベルアップに表示されるスキルポイントの入手メッセージ。%1:アクター名 %2:獲得SP量 %3:スキルポイント名
+ * @type string
+ * @default %1は%3 %2を獲得！
+ * @parent SkillPointSetting
+ * 
+ * @param BenchMembarsGainSkillPoint
+ * @desc 控えメンバーにも戦闘勝利時にスキルポイントを獲得させます。
+ * @text 控えメンバースキルポイント獲得
+ * @type boolean
+ * @default false
+ * @parent SkillPointSetting
  * 
  * @param ClassSetting
  * @text クラス設定
@@ -1897,59 +1971,6 @@
  * @min 0
  * @parent LearnedIconSetting
  * 
- * @param SkillPointSetting
- * @text スキルポイント設定
- * @default ------------------------------
- * 
- * @param SkillPointName
- * @text スキルポイント表示名
- * @desc スキルポイントの表示名。
- * @type string
- * @default SP
- * @parent SkillPointSetting
- * 
- * @param DefaultInitSkillPoint
- * @text デフォルト初期スキルポイント
- * @desc デフォルトの初期スキルポイント。
- * @type number
- * @default 0
- * @parent SkillPointSetting
- * 
- * @param MaxSkillPoint
- * @text スキルポイント最大値
- * @desc スキルポイントの最大値。
- * @type number
- * @default Infinity
- * @parent SkillPointSetting
- * 
- * @param DefaultSkillPointCost
- * @text デフォルトスキルポイントコスト
- * @desc デフォルトのスキルポイントコスト。
- * @type number
- * @default 0
- * @parent SkillPointSetting
- * 
- * @param LevelupGainSkillPoint
- * @text レベルアップ時取得スキルポイント
- * @desc レベルアップ時の取得スキルポイント。
- * @type number
- * @default 1
- * @parent SkillPointSetting
- * 
- * @param DisplayLevelUpMessage
- * @text レベルアップスキルポイント獲得メッセージ
- * @desc レベルアップに表示されるスキルポイントの入手メッセージ。%1:アクター名 %2:獲得SP量 %3:スキルポイント名
- * @type string
- * @default %1は%3 %2を獲得！
- * @parent SkillPointSetting
- * 
- * @param BenchMembarsGainSkillPoint
- * @desc 控えメンバーにも戦闘勝利時にスキルポイントを獲得させます。
- * @text 控えメンバースキルポイント獲得
- * @type boolean
- * @default false
- * @parent SkillPointSetting
- * 
  * @param SkillSetting
  * @text スキル項目設定
  * @default ------------------------------
@@ -2124,6 +2145,14 @@
  * @desc 習得条件を満たしている未習得の枠の色を指定します。
  * @type color
  * @default 0
+ * @min 0
+ * @parent FrameSetting
+ * 
+ * @param CountFrameColor
+ * @text 再習得可能な枠の色(code)
+ * @desc 再習得できるスキル枠の色を指定します。
+ * @type color
+ * @default 23
  * @min 0
  * @parent FrameSetting
  * 
@@ -2446,6 +2475,13 @@
  * @default 
  * @parent LearnSetting
  * 
+ * @param LearnCondText
+ * @text 習得条件のテキスト
+ * @desc コストウィンドウに表示させる習得条件のテキスト。制御文字使用可能
+ * @type multiline_string
+ * @default 
+ * @parent LearnSetting
+ * 
  * @param IndividualSetting
  * @text 個別設定
  * @default ------------------------------
@@ -2711,6 +2747,7 @@ Imported.NUUN_SkillTree = true;
             this._cond = data.SkillTreeCond || "";
             this._secret = data.SkillTreeSecret || "";
             this._learnCond = data.LearnCond || "";
+            this._learnCondText = data.LearnCondText || "";
             this._enabled = true;
             this._force = data.ForcedPlacement;
             this._spriteIndex = _isSpriteSheet() ? this.getSkillFrame(data) : 0;
@@ -2904,6 +2941,10 @@ Imported.NUUN_SkillTree = true;
 
         getLearn() {
             return this._learnCond;
+        }
+
+        getLearnCondText() {
+            return this._learnCondText;
         }
 
         getMaxCount() {
@@ -3729,7 +3770,7 @@ Imported.NUUN_SkillTree = true;
             this.changePaintOpacity(enabled);
             this._learnedSkillColor = learned && params.LearnedColor >= 0 ? NuunManager.getColorCode(params.LearnedColor) : null;
             this.drawSkillTreeText(data, skill, rect, enabled);
-            this.drawSkillTreeContentsFrame(index, learned, enabled);
+            this.drawSkillTreeContentsFrame(index, data, learned, enabled);
             this.learnedDrawIcon(learned, rect);
             this.drawSkillCount(data, learned, rect);
             this.changePaintOpacity(1);
@@ -3761,14 +3802,14 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Window_SkillTree.prototype.drawSkillTreeContentsFrame = function(index, learned, enabled) {
+    Window_SkillTree.prototype.drawSkillTreeContentsFrame = function(index, data, learned, enabled) {
         if (!this.isSkillTreeSkillCount()) return;
         const rect = this.itemRect(index);
         const width = params.FrameWidth > 0 ? Math.min(params.FrameWidth, rect.width) : rect.width;
         const height = rect.height;
         const x = rect.x + params.FrameX;
         const y = rect.y;
-        const color = this.getFrameColor(learned, enabled);
+        const color = this.getFrameColor(data, learned, enabled);
         const thick = (params.FrameThick || 3);
         this.drawSkillTreeFrame(x, y, width, height, thick, color);
     };
@@ -3801,9 +3842,9 @@ Imported.NUUN_SkillTree = true;
         this.contents.fontSize = $gameSystem.mainFontSize();
     };
 
-    Window_SkillTree.prototype.getFrameColor = function(learned, enabled) {
+    Window_SkillTree.prototype.getFrameColor = function(data, learned, enabled) {
         if (learned) {
-            return NuunManager.getColorCode(params.LearnedFrameColor);
+            return this.isMultipleCount(data) ? NuunManager.getColorCode(params.LearnedFrameColor) : NuunManager.getColorCode(params.CountFrameColor);
         } else if (enabled) {
             return NuunManager.getColorCode(params.UnlearnedFrameColor);
         } else {
@@ -4165,6 +4206,7 @@ Imported.NUUN_SkillTree = true;
         const type = this.itemAt(index);
         this.drawCost(type, this._treeData, rect.x, rect.y, rect.width - textWidth);
         this.drawSkillTreeCost(type, this._treeData, rect.x, rect.y, rect.width);
+        this.drawCostTextEx(this._treeData, rect.x, rect.y + this.lineHeight() * this.maxItems());
     };
 
     Window_SkillTreeCost.prototype.drawCostTitle = function(x, y) {
@@ -4253,6 +4295,12 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTreeCost.prototype.drawCostName = function(text, x, y, width) {
         this.drawText(text, x, y, width);
+    };
+
+    Window_SkillTreeCost.prototype.drawCostTextEx = function(data, x, y) {
+        if (data.getLearnCondText()) {
+            this.drawTextEx(data.getLearnCondText(), x, y);
+        }
     };
 
     Window_SkillTreeCost.prototype.getParam = function(data, type) {
@@ -4982,6 +5030,71 @@ Imported.NUUN_SkillTree = true;
             }
         }
     };
+    //以下は試験的
+    Window_SkillTree.prototype.itemWidth = function() {
+        return Math.floor(this.skillTreeInnerWidth() / this.maxCols());
+    };
 
+    Window_SkillTree.prototype.skillTreeInnerWidth = function() {
+        return params.InnerWidth > 0 ? Math.min(params.InnerWidth, this.innerWidth) : this.innerWidth;
+    };
+
+    Window_SkillTree.prototype.skillTreeCol = function() {
+        return this.index() % this.maxCols();
+    };
+
+    Window_SkillTree.prototype.overallWidth = function() {
+        return this.maxCols() * this.itemWidth();
+    };
+
+    Window_SkillTree.prototype.ensureCursorVisible = function(smooth) {
+        if (params.InnerWidth > 0) {
+            if (this._cursorAll) {
+                this.scrollTo(0, 0);
+            } else {
+                const scrollX = this.scrollX();
+                const scrollY = this.scrollY();
+                let itemTop = 0;
+                let itemBottom = 0;
+                let scrollMin = 0;
+                let itemLeft = 0;
+                let itemRight = 0;
+                let scrollMin2 = 0;
+                if (this.innerHeight > 0 && this.row() >= 0) {
+                    itemTop = this.row() * this.itemHeight();
+                    itemBottom = itemTop + this.itemHeight();
+                    scrollMin = itemBottom - this.innerHeight;
+                }
+                if (this.innerWidth > 0 && this.skillTreeCol() >= 0) {
+                    itemLeft = this.skillTreeCol() * this.itemWidth();
+                    itemRight = itemLeft + this.itemWidth();
+                    scrollMin2 = itemRight - this.innerWidth;
+                }
+                if (scrollY > itemTop) {
+                    this.setEnsureCursor(smooth, scrollX, itemTop);
+                } else if (scrollY < Math.min(this.maxScrollY(), scrollMin)) {
+                    this.setEnsureCursor(smooth, scrollX, scrollMin);
+                } else if (scrollX > itemLeft) {
+                    this.setEnsureCursor(smooth, itemLeft, scrollY);
+                } else if (scrollX < scrollMin2) {
+                    this.setEnsureCursor(smooth, scrollMin2, scrollY);
+                }
+            }
+        } else {
+            Window_Selectable.prototype.ensureCursorVisible.apply(this, arguments);
+        }
+    };
+
+    Window_SkillTree.prototype.setEnsureCursor = function(smooth, x, y) {
+        if (smooth) {
+            this.smoothScrollTo(x, y);
+        } else {
+            this.scrollTo(x, y);
+        }
+    };
+
+    Window_SkillTree.prototype.contentsWidth = function() {
+        return this.innerWidth + this.itemWidth();
+    };
 
 })();

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.11
+ * @version 1.1.12
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/30/2025 Ver.1.1.12
+ * Fixed an issue where an error occurred when setting "Original parameter".
  * 8/15/2025 Ver.1.1.11
  * Fixed an issue where an error would occur when displaying the screen when applying "NUUN_ActorPicture".
  * Fixed the display of facial graphics.
@@ -143,7 +145,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.11
+ * @version 1.1.12
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -154,6 +156,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/30 Ver.1.1.12
+ * 独自パラメータを設定した場合に、エラーが出る問題を修正。
  * 2025/8/15 Ver.1.1.11
  * 立ち絵、顔グラ共通プラグインを適用する場合に、画面表示時にエラーが出る問題を修正。
  * 顔グラの表示を修正。
@@ -885,7 +889,7 @@ Imported.NUUN_MenuParamListBase = true;
             if (data.DetaEval) {
                 this.nuun_SetContentsValueFontFace(data);
                 const padding = textWidth > 0 ? w.itemPadding() : 0;
-                const textParam = this.getStatusEvalParam(param, actor, enemy);
+                const textParam = this.getStatusEvalParam(data.DetaEval, actor, enemy);
                 if (isNaN(textParam)) {
                     w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
                 } else {

@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * You can customize the item screen.
@@ -47,6 +47,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/30/2025 Ver.1.1.3
+ * Fixed an issue where an error occurred when setting "Original parameter".
  * 8/26/2025 Ver.1.1.2
  * Added skill points (NUUN_SkillTree) to the actor's display status.
  * 7/27/2024 Ver.1.1.1
@@ -1597,7 +1599,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * アイテム画面をカスタマイズできます。
@@ -1630,6 +1632,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/30 Ver.1.1.3
+ * 独自パラメータを設定した場合に、エラーが出る問題を修正。
  * 2025/8/26 Ver.1.1.2
  * アクターの表示ステータスにスキルポイント(NUUN_SkillTree)を追加。
  * 2024/7/27 Ver.1.1.1
@@ -3729,7 +3733,7 @@ Imported.NUUN_ItemWindowEx = true;
             if (data.DetaEval) {
                 this.nuun_SetContentsValueFontFace(data);
                 const padding = textWidth > 0 ? w.itemPadding() : 0;
-                const textParam = this.getStatusEvalParam(param, actor);
+                const textParam = this.getStatusEvalParam(data.DetaEval, actor);
                 if (isNaN(textParam)) {
                     w.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + padding, y, width - (textWidth + padding));
                 } else {

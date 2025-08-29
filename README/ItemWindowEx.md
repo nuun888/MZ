@@ -1,5 +1,5 @@
 # [アイテムウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)
-# Ver.1.1.2
+# Ver.1.1.3
 通常版  
 [通常版ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ItemWindowEx.js)  
 アクターステータス、アイテム項目のプリセットあり(７２０P)Ver.1.1.1  
@@ -52,6 +52,8 @@
 ![画像](img/ItemWindowEx_pre.png)  
 
 ## 更新履歴
+2025/8/30 Ver.1.1.3  
+独自パラメータを設定した場合に、エラーが出る問題を修正。  
 2025/8/26 Ver.1.1.2  
 アクターの表示ステータスにスキルポイント(NUUN_SkillTree)を追加。  
 2024/7/27 Ver.1.1.1  

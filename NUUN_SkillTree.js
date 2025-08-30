@@ -377,6 +377,21 @@
  * @min 0
  * @parent SkillTreeTextSetting
  * 
+ * @param SkillTreeNumText
+ * @text Numeric text
+ * @desc Sets the numeric text.(Javascript)
+ * @type combo
+ * @option 'count +"/"+ maxCount'
+ * @default 
+ * @parent SkillTreeTextSetting
+ * 
+ * @param SkillTreeTextWidth
+ * @text Numeric character length
+ * @desc Set the character length of the numeric text. Example: 3 digits with 3 zeros (000).
+ * @type string
+ * @default 000
+ * @parent SkillTreeTextSetting
+ * 
  * @param SkillPointSetting
  * @text Skill point settings
  * @default ------------------------------
@@ -514,6 +529,14 @@
  * @min 1
  * @parent SkillTreeWindowSetting
  * 
+ * @param InnerWidth
+ * @text Window inner width
+ * @desc Specifies the width of the window. Scrolls to a width equal to or greater than the window width. 0 is the original inner width
+ * @type number
+ * @default 0
+ * @min 0
+ * @parent SkillTreeWindowSetting
+ * 
  * @param SkillTreeCostSetting
  * @text Skill tree cost window settings
  * @default ------------------------------
@@ -539,7 +562,7 @@
  * @type number
  * @default 1
  * @min 1
- * @parent SkillTreeWindowSetting
+ * @parent SkillTreeCostSetting
  * 
  * @param SkillCostName
  * @text Skill cost display name
@@ -1409,6 +1432,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/31 Ver.1.2.0
+ * 内幅を指定できる機能を追加。
+ * スキルツリーウィンドウのスキル項目に任意の数字テキストを設定できる機能を追加。
+ * 列指定した項目がずれて表示される問題を修正。
  * 2025/8/30 Ver.1.1.2
  * プラグインコマンドのスキル習得の習得対象を現在適用されているスキルツリータイプに修正。
  * プラグインコマンドのスキル習得に前提スキル無視及びスキルの習得回数を指定できる機能を追加。
@@ -1699,6 +1726,21 @@
  * @min 0
  * @parent SkillTreeTextSetting
  * 
+ * @param SkillTreeNumText
+ * @text 数値テキスト
+ * @desc 数値テキストを設定します。(Javascript)
+ * @type combo
+ * @option 'count +"/"+ maxCount'
+ * @default 
+ * @parent SkillTreeTextSetting
+ * 
+ * @param SkillTreeTextWidth
+ * @text 数値文字長
+ * @desc 数値テキストの文字長を設定します。例:0が3つで3桁分(000)
+ * @type string
+ * @default 000
+ * @parent SkillTreeTextSetting
+ * 
  * @param SkillPointSetting
  * @text スキルポイント設定
  * @default ------------------------------
@@ -1810,7 +1852,7 @@
  * @parent SkillTypeSetting
  * 
  * @param SkillTreeWindowSetting
- * @text スキルタイプウィンドウ設定
+ * @text スキルツリーウィンドウ設定
  * @default ------------------------------
  * @parent WindowSetting
  * 
@@ -1834,6 +1876,14 @@
  * @type number
  * @default 4
  * @min 1
+ * @parent SkillTreeWindowSetting
+ * 
+ * @param InnerWidth
+ * @text ウィンドウ内幅
+ * @desc ウィンドウの内部の横幅を指定します。ウィンドウ以上の幅でスクロールします。0で元の内幅
+ * @type number
+ * @default 0
+ * @min 0
  * @parent SkillTreeWindowSetting
  * 
  * @param SkillTreeCostSetting
@@ -1861,7 +1911,7 @@
  * @type number
  * @default 1
  * @min 1
- * @parent SkillTreeWindowSetting
+ * @parent SkillTreeCostSetting
  * 
  * @param SkillCostName
  * @text スキルコスト表示名
@@ -2948,6 +2998,7 @@ Imported.NUUN_SkillTree = true;
                 const actor = this._actor;
                 const skillId = this._id;
                 const count = actor.getSkillTreeCount(this._id);
+                const maxCount = this.getMaxCount() || 1;
                 const d = this;
                 const v = $gameVariables._data;
                 const s = $gameSwitches._data;
@@ -3602,12 +3653,28 @@ Imported.NUUN_SkillTree = true;
         return params.RowsMargin;
     };
 
+    Window_SkillTree.prototype.itemWidth = function() {
+        return Math.floor(this.skillTreeInnerWidth() / this.maxCols());
+    };
+
     Window_SkillTree.prototype.itemHeight = function() {
         return Window_Selectable.prototype.itemHeight.call(this) + this.rowsMargin();
     };
 
+    Window_SkillTree.prototype.overallWidth = function() {
+        return this.maxCols() * this.itemWidth();
+    };
+
     Window_SkillTree.prototype.overallHeight = function() {
         return Window_Selectable.prototype.overallHeight.apply(this, arguments) - this.rowsMargin();
+    };
+
+    Window_SkillTree.prototype.skillTreeInnerWidth = function() {
+        return params.InnerWidth > 0 ? Math.max(params.InnerWidth, this.innerWidth) : this.innerWidth;
+    };
+
+    Window_SkillTree.prototype.skillTreeCol = function() {
+        return this.index() % this.maxCols();
     };
 
     Window_SkillTree.prototype.itemRect = function(index) {
@@ -3751,7 +3818,7 @@ Imported.NUUN_SkillTree = true;
                                     x = dt._x - 1;
                                     break;
                                 } else {
-                                    x = dt._x > 0 ? Math.max(colsCount + 1, dt._x - 1) : colsCount;
+                                    x = dt._x > 0 ? Math.max(colsCount, dt._x - 1) : colsCount;
                                 }
                                 if (nextList[0][x]) {
                                     colsCount++;
@@ -3929,6 +3996,7 @@ Imported.NUUN_SkillTree = true;
             this.changePaintOpacity(enabled);
             this._learnedSkillColor = learned && params.LearnedColor >= 0 ? NuunManager.getColorCode(params.LearnedColor) : null;
             this.drawSkillTreeText(data, skill, rect, enabled);
+            this.drawItemNumber(data, rect.x, rect.y, rect.width)
             this.drawSkillTreeContentsFrame(index, data, learned, enabled);
             this.learnedDrawIcon(learned, rect);
             this.drawSkillCount(data, learned, rect);
@@ -3942,7 +4010,7 @@ Imported.NUUN_SkillTree = true;
                 const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
                 this.drawIcon(this.getSecretIcon(), rect.x, iconY);
             } else {
-                this.drawText(this.getSecretText(skill), rect.x, rect.y, rect.width);
+                this.drawText(this.getSecretText(skill), rect.x, rect.y, rect.width - this.numberWidth());
             }
             data.enabled();
         } else {
@@ -3952,12 +4020,25 @@ Imported.NUUN_SkillTree = true;
                     this.drawIcon(skill.iconIndex, rect.x, iconY);
                     break;
                 case "default":
-                    this.drawItemName(skill, rect.x, rect.y, rect.width);
+                    this.drawItemName(skill, rect.x, rect.y, rect.width - this.numberWidth());
                     break;
                 case "name":
-                    this.drawText(skill.name, rect.x, rect.y, rect.width);
+                    this.drawText(skill.name, rect.x, rect.y, rect.width - this.numberWidth());
                     break;
             }
+        }
+    };
+
+    Window_SkillTree.prototype.drawItemNumber = function(data, x, y, width) {
+        if (params.SkillTreeNumText) {
+            const actor = this._actor;
+            const count = actor.getSkillTreeCount(data._id);
+            const maxCount = data.getMaxCount() || 1;
+            const d = data;
+            const v = $gameVariables._data;
+            const s = $gameSwitches._data;
+            const itemWidth = this.numberWidth() - this.itemPadding();
+            this.drawText(eval(params.SkillTreeNumText), x + (width - itemWidth), y, itemWidth, "right");
         }
     };
 
@@ -4187,6 +4268,10 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
+    Window_SkillTree.prototype.numberWidth = function() {
+        return params.SkillTreeNumText ? this.textWidth(params.SkillTreeTextWidth) : 0;
+    };
+
     Window_SkillTree.prototype.secretTextLength = function(skill) {
         return skill.name.length;
     };
@@ -4289,6 +4374,56 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.setSkillTreeConfirmationWindow = function(skillTreeWindow) {
         this._skillTreeConfirmationWindow = skillTreeWindow;
+    };
+
+    Window_SkillTree.prototype.ensureCursorVisible = function(smooth) {
+        if (params.InnerWidth > 0) {
+            if (this._cursorAll) {
+                this.scrollTo(0, 0);
+            } else {
+                const scrollX = this.scrollX();
+                const scrollY = this.scrollY();
+                let itemTop = 0;
+                let itemBottom = 0;
+                let scrollMin = 0;
+                let itemLeft = 0;
+                let itemRight = 0;
+                let scrollMin2 = 0;
+                if (this.innerHeight > 0 && this.row() >= 0) {
+                    itemTop = this.row() * this.itemHeight();
+                    itemBottom = itemTop + this.itemHeight();
+                    scrollMin = itemBottom - this.innerHeight;
+                }
+                if (this.innerWidth > 0 && this.skillTreeCol() >= 0) {
+                    itemLeft = this.skillTreeCol() * this.itemWidth();
+                    itemRight = itemLeft + this.itemWidth();
+                    scrollMin2 = itemRight - this.innerWidth;
+                }
+                if (scrollY > itemTop) {
+                    this.setEnsureCursor(smooth, scrollX, itemTop);
+                } else if (scrollY < Math.min(this.maxScrollY(), scrollMin)) {
+                    this.setEnsureCursor(smooth, scrollX, scrollMin);
+                } else if (scrollX > itemLeft) {
+                    this.setEnsureCursor(smooth, itemLeft, scrollY);
+                } else if (scrollX < scrollMin2) {
+                    this.setEnsureCursor(smooth, scrollMin2, scrollY);
+                }
+            }
+        } else {
+            Window_Selectable.prototype.ensureCursorVisible.apply(this, arguments);
+        }
+    };
+
+    Window_SkillTree.prototype.setEnsureCursor = function(smooth, x, y) {
+        if (smooth) {
+            this.smoothScrollTo(x, y);
+        } else {
+            this.scrollTo(x, y);
+        }
+    };
+
+    Window_SkillTree.prototype.contentsWidth = function() {
+        return this.innerWidth + this.itemWidth();
     };
 
 
@@ -5058,6 +5193,7 @@ Imported.NUUN_SkillTree = true;
         const v = $gameVariables._data;
         const s = $gameSwitches._data;
         const count = this.getSkillTreeCount(data._id);
+        const maxCount = data.getMaxCount() || 1;
         const actor = this;
         return eval(cond);
     };
@@ -5069,6 +5205,7 @@ Imported.NUUN_SkillTree = true;
         const v = $gameVariables._data;
         const s = $gameSwitches._data;
         const count = this.getSkillTreeCount(data._id);
+        const maxCount = data.getMaxCount() || 1;
         const actor = this;
         return eval(cond);
     };
@@ -5080,6 +5217,7 @@ Imported.NUUN_SkillTree = true;
         const v = $gameVariables._data;
         const s = $gameSwitches._data;
         const count = this.getSkillTreeCount(data._id);
+        const maxCount = data.getMaxCount() || 1;
         const actor = this;
         return eval(cond);
     };
@@ -5159,71 +5297,6 @@ Imported.NUUN_SkillTree = true;
             }
         }
     };
-    //以下は試験的
-    Window_SkillTree.prototype.itemWidth = function() {
-        return Math.floor(this.skillTreeInnerWidth() / this.maxCols());
-    };
 
-    Window_SkillTree.prototype.skillTreeInnerWidth = function() {
-        return params.InnerWidth > 0 ? Math.min(params.InnerWidth, this.innerWidth) : this.innerWidth;
-    };
-
-    Window_SkillTree.prototype.skillTreeCol = function() {
-        return this.index() % this.maxCols();
-    };
-
-    Window_SkillTree.prototype.overallWidth = function() {
-        return this.maxCols() * this.itemWidth();
-    };
-
-    Window_SkillTree.prototype.ensureCursorVisible = function(smooth) {
-        if (params.InnerWidth > 0) {
-            if (this._cursorAll) {
-                this.scrollTo(0, 0);
-            } else {
-                const scrollX = this.scrollX();
-                const scrollY = this.scrollY();
-                let itemTop = 0;
-                let itemBottom = 0;
-                let scrollMin = 0;
-                let itemLeft = 0;
-                let itemRight = 0;
-                let scrollMin2 = 0;
-                if (this.innerHeight > 0 && this.row() >= 0) {
-                    itemTop = this.row() * this.itemHeight();
-                    itemBottom = itemTop + this.itemHeight();
-                    scrollMin = itemBottom - this.innerHeight;
-                }
-                if (this.innerWidth > 0 && this.skillTreeCol() >= 0) {
-                    itemLeft = this.skillTreeCol() * this.itemWidth();
-                    itemRight = itemLeft + this.itemWidth();
-                    scrollMin2 = itemRight - this.innerWidth;
-                }
-                if (scrollY > itemTop) {
-                    this.setEnsureCursor(smooth, scrollX, itemTop);
-                } else if (scrollY < Math.min(this.maxScrollY(), scrollMin)) {
-                    this.setEnsureCursor(smooth, scrollX, scrollMin);
-                } else if (scrollX > itemLeft) {
-                    this.setEnsureCursor(smooth, itemLeft, scrollY);
-                } else if (scrollX < scrollMin2) {
-                    this.setEnsureCursor(smooth, scrollMin2, scrollY);
-                }
-            }
-        } else {
-            Window_Selectable.prototype.ensureCursorVisible.apply(this, arguments);
-        }
-    };
-
-    Window_SkillTree.prototype.setEnsureCursor = function(smooth, x, y) {
-        if (smooth) {
-            this.smoothScrollTo(x, y);
-        } else {
-            this.scrollTo(x, y);
-        }
-    };
-
-    Window_SkillTree.prototype.contentsWidth = function() {
-        return this.innerWidth + this.itemWidth();
-    };
 
 })();

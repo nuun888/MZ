@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.2.0
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -88,6 +88,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/31/2025 Ver.1.2.0
+ * Added a feature to specify the inner width.
+ * Added a feature to set arbitrary numeric text for skill items in the skill tree window.
+ * Fixed an issue where items specified in columns were displayed misaligned.
  * 8/30/2025 Ver.1.1.2
  * Fixed the learning target for skill learning plugin commands to the currently applied skill tree type.
  * Added the ability to ignore prerequisite skills and specify the number of times a skill can be learned to skill learning plugin commands.
@@ -1359,7 +1363,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.2.0
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。

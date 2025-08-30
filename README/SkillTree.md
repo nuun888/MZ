@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -136,6 +136,10 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/8/30 Ver.1.1.2  
+プラグインコマンドのスキル習得の習得対象を現在適用されているスキルツリータイプに修正。  
+プラグインコマンドのスキル習得に前提スキル無視及びスキルの習得回数を指定できる機能を追加。  
+プラグインコマンドにスキルの削除を追加。  
 2025/8/28 Ver.1.1.1  
 再習得可能なスキルの枠の色を指定できる機能を追加。  
 コスト条件に習得条件のテキストを設定できる機能を追加。  

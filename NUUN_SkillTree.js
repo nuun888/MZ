@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -88,6 +88,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/30/2025 Ver.1.1.2
+ * Fixed the learning target for skill learning plugin commands to the currently applied skill tree type.
+ * Added the ability to ignore prerequisite skills and specify the number of times a skill can be learned to skill learning plugin commands.
+ * Added the ability to delete skills to the plugin commands.
  * 8/28/2025 Ver.1.1.1
  * Added the ability to specify the frame color of skills that can be relearned.
  * Added the ability to set learning condition text to cost conditions.
@@ -184,6 +188,45 @@
  * @type skill
  * @min 0
  * @default 0
+ * 
+ * @arg Count
+ * @text Skill learning count
+ * @desc Specifies the number of times to learn the specified skill. 0 is the maximum number of times
+ * @type number
+ * @min 0
+ * @default 1
+ * 
+ * @arg Forced
+ * @text Ignore prerequisite skills
+ * @desc Learn without regard for prerequisite skills.
+ * @type boolean
+ * @default false
+ * 
+ * 
+ * @command SkillTreeRemoveSkill
+ * @desc Removes a learned skill from the skill tree.
+ * @text Skill remove
+ * 
+ * @arg ActorId
+ * @text Actor id
+ * @desc Specifies the actor ID.
+ * @type actor
+ * @min 0
+ * @default 0
+ * 
+ * @arg SkillId
+ * @text Skill id
+ * @desc Specify the skill ID.
+ * @type skill
+ * @min 0
+ * @default 0
+ * 
+ * @arg ReturnSkillTreeCost
+ * @desc Skill costs are not refunded. (Costs that are not eligible for refund will not be refunded.)
+ * @text No skill cost refund
+ * @type boolean
+ * @default false
+ * 
  * 
  * @command AddSkillTreeType
  * @desc Add a skill tree type.
@@ -316,7 +359,7 @@
  * @value "default"
  * @option Skill
  * @value "name"
- * @default default
+ * @default "default"
  * @parent SkillTreeTextSetting
  * 
  * @param SkillTreeSecretText
@@ -1293,7 +1336,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1366,6 +1409,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/8/30 Ver.1.1.2
+ * プラグインコマンドのスキル習得の習得対象を現在適用されているスキルツリータイプに修正。
+ * プラグインコマンドのスキル習得に前提スキル無視及びスキルの習得回数を指定できる機能を追加。
+ * プラグインコマンドにスキルの削除を追加。
  * 2025/8/28 Ver.1.1.1
  * 再習得可能なスキルの枠の色を指定できる機能を追加。
  * コスト条件に習得条件のテキストを設定できる機能を追加。
@@ -1463,6 +1510,45 @@
  * @min 0
  * @default 0
  * 
+ * @arg Count
+ * @text スキル習得回数
+ * @desc 指定のスキルの習得回数を指定します。0で最大回数
+ * @type number
+ * @min 0
+ * @default 1
+ * 
+ * @arg Forced
+ * @text 前提スキル無視
+ * @desc 前提スキルを無視して習得します。
+ * @type boolean
+ * @default false
+ * 
+ * 
+ * @command SkillTreeRemoveSkill
+ * @desc スキルツリーで習得済みのスキルを削除します。
+ * @text スキル削除
+ * 
+ * @arg ActorId
+ * @text アクターID
+ * @desc アクターIDを指定します。
+ * @type actor
+ * @min 0
+ * @default 0
+ * 
+ * @arg SkillId
+ * @text スキルID
+ * @desc スキルIDを指定します。
+ * @type skill
+ * @min 0
+ * @default 0
+ * 
+ * @arg ReturnSkillTreeCost
+ * @desc スキルコストを返還しない。(返還対象外のコストは戻りません)
+ * @text スキルコスト返還なし
+ * @type boolean
+ * @default false
+ * 
+ * 
  * @command AddSkillTreeType
  * @desc スキルツリータイプを追加します。
  * @text スキルツリータイプ追加
@@ -1479,6 +1565,7 @@
  * @desc スキルツリー設定のリストIDまたは識別名を指定します。
  * @type string
  * @default 0
+ * 
  * 
  * @command RemoveSkillTreeType
  * @desc スキルツリータイプを削除します。アクター、クラススキルツリー設定で追加されたスキルツリーは対象外です。
@@ -1594,7 +1681,7 @@
  * @value "default"
  * @option スキル名のみ
  * @value "name"
- * @default default
+ * @default "default"
  * @parent SkillTreeTextSetting
  * 
  * @param SkillTreeSecretText
@@ -2599,7 +2686,14 @@ Imported.NUUN_SkillTree = true;
     PluginManager.registerCommand(pluginName, 'SkillTreeLearnSkill', args => {
         if (Number(args.ActorId) > 0) {
             const actor = $gameActors.actor(Number(args.ActorId));
-            actor.skillTreeLearnSkill(Number(args.SkillId))
+            actor.skillTreeLearnSkill(Number(args.SkillId), Number(args.Count), eval(args.Forced))
+        }
+    });
+
+    PluginManager.registerCommand(pluginName, 'SkillTreeRemoveSkill', args => {
+        if (Number(args.ActorId) > 0) {
+            const actor = $gameActors.actor(Number(args.ActorId));
+            actor.skillTreeRemoveSkill(Number(args.SkillId), !eval(args.ReturnSkillTreeCost))
         }
     });
 
@@ -3010,6 +3104,71 @@ Imported.NUUN_SkillTree = true;
                 if (skill > 0 && this._actor.isLearnedSkill(skill) && !this._actor.isSkillTreeLearn(skill)) {
                     this._actor.forgetSkill(skill);
                 }
+            }
+        }
+
+        returnSkillTreeCost() {
+            if (this.cost > 0) {
+                this._actor.gainSkillPoint(this.cost);
+            }
+            if (this.item > 0) {
+                _returnSkillTreeItem(this);
+            }
+            if (this.weapon > 0) {
+                _returnSkillTreeWeapon(this);
+            }
+            if (this.armor > 0) {
+                _returnSkillTreeArmor(this);
+            }
+            if (this.goldCost > 0) {
+                $gameParty.gainGold(this.goldCost);
+            }
+            if (this.var > 0) {
+                _returnSkillTreeVar(this);
+            }
+        }
+
+        isPaySkillTreeCostOk() {
+            if (this.getCost() > 0 && !this.isCanCost(this._actor.nsp)) {
+                return false;
+            }
+            if (this.getCostItem() > 0 && $gameParty.numItems($dataItems[this.getCostItem()]) < this.getItemNum()) {
+                return false;
+            }
+            if (this.getCostWeapon() > 0 && $gameParty.numItems($dataWeapons[this.getCostWeapon()]) < this.getWeaponNum()) {
+                return false;
+            }
+            if (this.getCostArmor() > 0 && $gameParty.numItems($dataArmors[this.getCostArmor()]) < this.getArmorNum()) {
+                return false;
+            }
+            if (this.getCostGold() > 0 && !this.getCanGold($gameParty.gold())) {
+                return false;
+            }
+            if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables() < this.getVariableNum())) {
+                return false;
+            }
+            return true;
+        }
+
+        paySkillTreeCost() {
+            if (this.getCost() > 0 && this.isCanCost(this._actor.nsp)) {
+                this._actor.paySkillTreePoint(this.getCost());
+            }
+            if (this.getCostItem() > 0 && $gameParty.numItems($dataItems[this.getCostItem()]) < this.getItemNum()) {
+                $gameParty.gainItem($dataItems[this.getCostItem()], this.getItemNum());
+            }
+            if (this.getCostWeapon() > 0 && $gameParty.numItems($dataWeapons[this.getCostWeapon()]) <this.getWeaponNum()) {
+                $gameParty.gainItem($dataWeapons[this.getCostWeapon()], this.getWeaponNum());
+            }
+            if (this.getCostArmor() > 0 && $gameParty.numItems($dataArmors[this.getCostArmor()]) < this.getArmorNum()) {
+                $gameParty.gainItem($dataArmors[this.getCostArmor()], this.getArmorNum());
+            }
+            if (this.getCostGold() > 0 && !this.getCanGold($gameParty.gold())) {
+                $gameParty.loseGold(this.getCostGold());
+            }
+            if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables()) < this.getVariableNum()) {
+                const value = $gameVariables.value(this.getCostVariables());
+                $gameVariables.setValue(value - this.getVariableNum());
             }
         }
     }
@@ -4037,7 +4196,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.isEnabled = function(data) {
-        return !!data && this.isMultipleCount(data) || !!data && this.isReqSkill(data) && this._actor.isPaySkillTreeCostOk(data) && this.isSkillTreeEvalCond(data);
+        return !!data && this.isMultipleCount(data) || !!data && this.isReqSkill(data) && data.isPaySkillTreeCostOk() && this.isSkillTreeEvalCond(data);
     };
 
     Window_SkillTree.prototype.isSkillTreeEvalCond = function(data) {
@@ -4071,7 +4230,7 @@ Imported.NUUN_SkillTree = true;
         const data = this.itemAt(this.index());
         _setConfirmation(params.LearnConfirmation)
         //if (this.isMultipleCount(data)) return;
-        this._actor.paySkillTreeCost(data);
+        data.paySkillTreeCost();
         this._actor.learnSkillTreeSkill(data);
         this.refresh();
         this._skillTreeStatusWindow.refresh();
@@ -4500,6 +4659,13 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
+    Game_Actor.prototype.initLearnSkillList = function() {
+        if (!this._learnSkillTreeSkillList) {
+            this._learnSkillTreeSkillList = [];
+            this.setStartLearnSkillTreeList();
+        }
+    };
+
     Game_Actor.prototype.setupLearnSkillTreeData = function(data) {
         let learnData = this.getLearnSkillTreeSkill(data._id);
         if (!learnData) {
@@ -4531,13 +4697,6 @@ Imported.NUUN_SkillTree = true;
         }
         this._learnSkillTreeSkillList[data._id] = learnData;
         this.learnCount++;
-    };
-
-    Game_Actor.prototype.initLearnSkillList = function() {
-        if (!this._learnSkillTreeSkillList) {
-            this._learnSkillTreeSkillList = [];
-            this.setStartLearnSkillTreeList();
-        }
     };
 
     Game_Actor.prototype.setStartLearnSkillTreeList = function() {
@@ -4712,50 +4871,6 @@ Imported.NUUN_SkillTree = true;
         return this._skillTreeList.some(array => array[0] === id && array[1] !== classId);
     };
 
-    Game_Actor.prototype.isPaySkillTreeCostOk = function(data) {
-        if (data.getCost() > 0 && !data.isCanCost(this.nsp)) {
-            return false;
-        }
-        if (data.getCostItem() > 0 && $gameParty.numItems($dataItems[data.getCostItem()]) < data.getItemNum()) {
-            return false;
-        }
-        if (data.getCostWeapon() > 0 && $gameParty.numItems($dataWeapons[data.getCostWeapon()]) < data.getWeaponNum()) {
-            return false;
-        }
-        if (data.getCostArmor() > 0 && $gameParty.numItems($dataArmors[data.getCostArmor()]) < data.getArmorNum()) {
-            return false;
-        }
-        if (data.getCostGold() > 0 && !data.getCanGold($gameParty.gold())) {
-            return false;
-        }
-        if (data.getCostVariables() > 0 && $gameVariables.value(data.getCostVariables() < data.getVariableNum())) {
-            return false;
-        }
-        return true;
-    };
-
-    Game_Actor.prototype.paySkillTreeCost = function(data) {
-        if (data.getCost() > 0 && data.isCanCost(this.nsp)) {
-            this.paySkillTreePoint(data.getCost());
-        }
-        if (data.getCostItem() > 0 && $gameParty.numItems($dataItems[data.getCostItem()]) < data.getItemNum()) {
-            $gameParty.gainItem($dataItems[data.getCostItem()], data.getItemNum());
-        }
-        if (data.getCostWeapon() > 0 && $gameParty.numItems($dataWeapons[data.getCostWeapon()]) < data.getWeaponNum()) {
-            $gameParty.gainItem($dataWeapons[data.getCostWeapon()], data.getWeaponNum());
-        }
-        if (data.getCostArmor() > 0 && $gameParty.numItems($dataArmors[data.getCostArmor()]) < data.getArmorNum()) {
-            $gameParty.gainItem($dataArmors[data.getCostArmor()], data.getArmorNum());
-        }
-        if (data.getCostGold() > 0 && !data.getCanGold($gameParty.gold())) {
-            $gameParty.loseGold(data.getCostGold());
-        }
-        if (data.getCostVariables() > 0 && $gameVariables.value(data.getCostVariables()) < data.getVariableNum()) {
-            const value = $gameVariables.value(data.getCostVariables());
-            $gameVariables.setValue(value - data.getVariableNum());
-        }
-    };
-
     Game_Actor.prototype.isSkillTreeLearned = function(skillId) {
         return this.isLearnedSkill(skillId) || this.isSkillTreeLearn(skillId);
     };
@@ -4862,7 +4977,7 @@ Imported.NUUN_SkillTree = true;
         const learnData = this._learnSkillTreeSkillList[data._id];
         if (!!learnData) {
             if (r) {
-                this.returnSkillTreeCost(learnData);
+                learnData.returnSkillTreeCost();
             }
             this.forgetSkillTreeSkill(data);
         }
@@ -4873,49 +4988,63 @@ Imported.NUUN_SkillTree = true;
         this.removeLearnSkillTreeSkill(data._id);
     };
 
-    Game_Actor.prototype.returnSkillTreeCost = function(data) {
-        if (data.cost > 0) {
-            this.gainSkillPoint(data.cost);
-        }
-        if (data.item > 0) {
-            _returnSkillTreeItem(data);
-        }
-        if (data.weapon > 0) {
-            _returnSkillTreeWeapon(data);
-        }
-        if (data.armor > 0) {
-            _returnSkillTreeArmor(data);
-        }
-        if (data.goldCost > 0) {
-            $gameParty.gainGold(data.goldCost);
-        }
-        if (data.var > 0) {
-            _returnSkillTreeVar(data);
-        }
-    };
-
     Game_Actor.prototype.notDeletionSkillTreeSkill = function(skillId) {
         const skill = $dataSkills[skillId];
         if (!skill) return true;
         return !skill.meta.SkillTreeNotDeletion;
     };
 
-    Game_Actor.prototype.skillTreeLearnSkill = function(skillId) {
-        for (const id of this._skillTreeList) {
-            const skillTree = params.SkillTreeSetting[id];
-            if (!!skillTree || !!skillTree.SkillTreeList) {
-                for (const data of skillTree.SkillTreeList) {
-                    if (data.SkillId === skillId && !this.isSkillTreeLearned(skillId) && this.isSkillTreeReqSkill(skillTree.SkillTreeList, skillId)) {
-                        const t = _getSkillTreeData(data, skillTree.SymbolName, this);
-                        if (this.isMultipleCount(t._id ,t.getMaxCount()) && this.isPaySkillTreeCostOk(t) && this.isSkillTreeEvalCond(t)) {
-                            this.paySkillTreeCost(t);
-                            this.learnSkillTreeSkill(t);
-                            return;
-                        }
+    Game_Actor.prototype.skillTreeLearnSkill = function(skillId, count = 0, forced = false) {
+        const data = this.getSkillTreeIsLearnSkillData(skillId, forced);
+        if (!!data) {
+            const maxCount = (count > 0 ? Math.min(count, data.getMaxCount()) : data.getMaxCount()) || 1;
+            for (let i = 0; i < maxCount; i++) {
+                if (!this.isMultipleCount(data._id ,data.getMaxCount() || 1) && data.isPaySkillTreeCostOk() && this.isSkillTreeEvalCond(data)) {
+                    data.paySkillTreeCost();
+                    this.learnSkillTreeSkill(data);
+                    if (i < maxCount - 1) {
+                        data.refresh();
                     }
-                }   
+                }
             }
         }
+    };
+
+    Game_Actor.prototype.skillTreeRemoveSkill = function(skillId, r) {
+        const data = this.getSkillTreeIsRemoveSkillData(skillId);
+        if (!!data) {
+            this.removeSkillTreeSkill(data, r);
+        }
+    };
+
+    Game_Actor.prototype.getSkillTreeIsLearnSkillData = function(skillId, forced) {
+        const list = this.getSkillTreeList();
+        for (const id of list) {
+            const skillTree = params.SkillTreeSetting[id];
+            if (!!skillTree && !!skillTree.SkillTreeList) {
+                for (const data of skillTree.SkillTreeList) {
+                    if (data.SkillId === skillId && !this.isSkillTreeLearned(skillId) && (forced || this.isSkillTreeReqSkill(skillTree.SkillTreeList, skillId))) {
+                        return _getSkillTreeData(data, skillTree.SymbolName, this);
+                    }
+                }
+            }
+        }
+        return null;
+    };
+
+    Game_Actor.prototype.getSkillTreeIsRemoveSkillData = function(skillId) {
+        const list = this.getSkillTreeList();
+        for (const id of list) {
+            const skillTree = params.SkillTreeSetting[id];
+            if (!!skillTree && !!skillTree.SkillTreeList) {
+                for (const data of skillTree.SkillTreeList) {
+                    if (data.SkillId === skillId && this.notDeletionSkillTreeSkill(skillId) && this.isSkillTreeLearned(skillId)) {
+                        return _getSkillTreeData(data, skillTree.SymbolName, this);
+                    }
+                }
+            }
+        }
+        return null;
     };
 
     Game_Actor.prototype.isSkillTreeEvalCond = function(data) {

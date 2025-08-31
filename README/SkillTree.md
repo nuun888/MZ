@@ -95,10 +95,10 @@
 
 #### 取得できるパラメータ
 $gameActors  
-`this.nsp`:スキルポイント  
-`this.getSkillTreeCount(skillId)`:対象のスキルの習得回数  
-`this.isSkillTreeLearned(skillId)`:対象のスキルが習得済みか  
-`this.totalSp`:獲得した総スキルポイント  
+`actor.nsp`:スキルポイント  
+`actor.getSkillTreeCount(skillId)`:対象のスキルの習得回数  
+`actor.isSkillTreeLearned(skillId)`:対象のスキルが習得済みか  
+`actor.totalSp`:獲得した総スキルポイント  
 
 #### 横方向に表示を拡大
 プラグインパラメータのウィンドウ内幅をウィンドウサイズ以上に設定することで、横方向にスクロールできるようになります。  

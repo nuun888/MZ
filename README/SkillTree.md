@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -89,6 +89,7 @@
 `d`:スキルツリーデータ  
 `v`:ゲーム変数　v[id]で指定。[]は付ける。  
 `s`:スイッチ　s[id]で指定。[]は付ける。  
+`skillId`:スキルID  
 `count`:スキルの習得回数  
 `maxCount`:スキルの最大習得回数  
 `actor`:ゲームアクター  
@@ -143,6 +144,12 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/9/1 Ver.1.2.1  
+初期の座標設定を修正。  
+特定のプラグインでヘルプウィンドウの位置が下にずれて表示される問題を修正。  
+ヘルプを下側に表示できる機能を追加。  
+ヘルプ座標の考慮を無効にする機能を追加。  
+skillIdでスキルIDを参照できない問題を修正。  
 2025/8/31 Ver.1.2.0  
 内幅を指定できる機能を追加。  
 スキルツリーウィンドウのスキル項目に任意の数字テキストを設定できる機能を追加。  

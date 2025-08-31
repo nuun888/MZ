@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -88,6 +88,12 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/1/2025 Ver.1.2.1
+ * Fixed the initial coordinate settings.
+ * Fixed an issue where the help window was displayed shifted downwards with certain plugins.
+ * Added a feature to display help at the bottom.
+ * Added a feature to disable consideration of help coordinates.
+ * Fixed an issue where skill ID could not be referenced by skillId.
  * 8/31/2025 Ver.1.2.0
  * Added a feature to specify the inner width.
  * Added a feature to set arbitrary numeric text for skill items in the skill tree window.
@@ -514,7 +520,7 @@
  * @param SkillTreeWindow
  * @text Skill tree window settings
  * @desc Configure the Skill Tree window.
- * @default {"WindowX":"240","WindowY":"96","WindowWidth":"576","WindowHeight":"0"}
+ * @default {"WindowX":"240","WindowY":"0","WindowWidth":"576","WindowHeight":"0"}
  * @type struct<WindowSetting>
  * @parent SkillTreeWindowSetting
  * 
@@ -549,7 +555,7 @@
  * @param SkillTreeCostWindow
  * @text Skill tree cost window settings
  * @desc Configure the skill cost window settings.
- * @default {"WindowX":"0","WindowY":"384","WindowWidth":"240","WindowHeight":"0"}
+ * @default {"WindowX":"0","WindowY":"288","WindowWidth":"240","WindowHeight":"0"}
  * @type struct<WindowSetting>
  * @parent SkillTreeCostSetting
  * 
@@ -637,7 +643,7 @@
  * @param SkillTreeStatusWindow
  * @text Status window settings
  * @desc Configure the status window settings.
- * @default {"WindowX":"0","WindowY":"96","WindowWidth":"240","WindowHeight":"134"}
+ * @default {"WindowX":"0","WindowY":"0","WindowWidth":"240","WindowHeight":"134"}
  * @type struct<WindowSetting>
  * @parent SkillTreeStatusSetting
  * 
@@ -658,6 +664,20 @@
  * @desc Configure the Help window.
  * @default {"WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0"}
  * @type struct<WindowSetting>
+ * @parent SkillTreeHelpSetting
+ * 
+ * @param HelpBottomMode
+ * @desc The help window will be displayed at the bottom.
+ * @text Help window bottom display
+ * @type boolean
+ * @default false
+ * @parent SkillTreeHelpSetting
+ * 
+ * @param HelpAreaInvalidated
+ * @desc Disables the influence of help window coordinates on other windows.
+ * @text Help window coordinate consideration disabled
+ * @type boolean
+ * @default false
  * @parent SkillTreeHelpSetting
  * 
  * @param HelpWindowTransparent
@@ -1363,7 +1383,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.1.2
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1436,6 +1456,12 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/9/1 Ver.1.2.1
+ * 初期の座標設定を修正。
+ * 特定のプラグインでヘルプウィンドウの位置が下にずれて表示される問題を修正。
+ * ヘルプを下側に表示できる機能を追加。
+ * ヘルプ座標の考慮を無効にする機能を追加。
+ * skillIdでスキルIDを参照できない問題を修正。
  * 2025/8/31 Ver.1.2.0
  * 内幅を指定できる機能を追加。
  * スキルツリーウィンドウのスキル項目に任意の数字テキストを設定できる機能を追加。
@@ -1828,7 +1854,7 @@
  * @param SkillTypeWindow
  * @text スキルツリータイプウィンドウ設定
  * @desc スキルツリータイプウィンドウの設定を行います。
- * @default {"WindowX":"0","WindowY":"230","WindowWidth":"240"}
+ * @default {"WindowX":"0","WindowY":"134","WindowWidth":"240"}
  * @type struct<CommandWindowSetting>
  * @parent SkillTypeSetting
  * 
@@ -1863,7 +1889,7 @@
  * @param SkillTreeWindow
  * @text スキルツリーウィンドウ設定
  * @desc スキルツリーウィンドウの設定を行います。
- * @default {"WindowX":"240","WindowY":"96","WindowWidth":"576","WindowHeight":"0"}
+ * @default {"WindowX":"240","WindowY":"0","WindowWidth":"576","WindowHeight":"0"}
  * @type struct<WindowSetting>
  * @parent SkillTreeWindowSetting
  * 
@@ -1898,7 +1924,7 @@
  * @param SkillTreeCostWindow
  * @text スキルツリーコストウィンドウ設定
  * @desc スキルツリーコストウィンドウの設定を行います。
- * @default {"WindowX":"0","WindowY":"384","WindowWidth":"240","WindowHeight":"0"}
+ * @default {"WindowX":"0","WindowY":"288","WindowWidth":"240","WindowHeight":"0"}
  * @type struct<WindowSetting>
  * @parent SkillTreeCostSetting
  * 
@@ -1986,7 +2012,7 @@
  * @param SkillTreeStatusWindow
  * @text ステータスウィンドウ設定
  * @desc ステータスウィンドウの設定を行います。
- * @default {"WindowX":"0","WindowY":"96","WindowWidth":"240","WindowHeight":"134"}
+ * @default {"WindowX":"0","WindowY":"0","WindowWidth":"240","WindowHeight":"134"}
  * @type struct<WindowSetting>
  * @parent SkillTreeStatusSetting
  * 
@@ -2007,6 +2033,20 @@
  * @desc ヘルプウィンドウの設定を行います。
  * @default {"WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0"}
  * @type struct<WindowSetting>
+ * @parent SkillTreeHelpSetting
+ * 
+ * @param HelpBottomMode
+ * @desc ヘルプウィンドウを下側に表示します。
+ * @text ヘルプウィンドウ下側表示
+ * @type boolean
+ * @default false
+ * @parent SkillTreeHelpSetting
+ * 
+ * @param HelpAreaInvalidated
+ * @desc ヘルプウィンドウ座標を他ウィンドウへの影響を無効にします。
+ * @text ヘルプウィンドウ座標考慮無効
+ * @type boolean
+ * @default false
  * @parent SkillTreeHelpSetting
  * 
  * @param HelpWindowTransparent
@@ -3226,6 +3266,46 @@ Imported.NUUN_SkillTree = true;
                 $gameVariables.setValue(value - this.getVariableNum());
             }
         }
+
+        isSkillTreeCond() {
+            const cond = this.getCond();
+            if (!cond) return true;
+            const d = this;
+            const v = $gameVariables._data;
+            const s = $gameSwitches._data;
+            const skillId = this._id;
+            const actor = this._actor;
+            const count = actor.getSkillTreeCount(this._id);
+            const maxCount = this.getMaxCount() || 1;
+            return eval(cond);
+        }
+
+        isSkillTreeSecretCond() {
+            const cond = this.getSecret();
+            if (!cond) return true;
+            const d = this;
+            const v = $gameVariables._data;
+            const s = $gameSwitches._data;
+            const skillId = this._id;
+            const actor = this._actor;
+            const count = actor.getSkillTreeCount(this._id);
+            const maxCount = this.getMaxCount() || 1;
+            return eval(cond);
+        }
+
+        isSkillTreeLearnCond() {
+            const cond = this.getLearn();
+            if (!cond) return true;
+            const d = this;
+            const v = $gameVariables._data;
+            const s = $gameSwitches._data;
+            const skillId = this._id;
+            const actor = this._actor;
+            const count = actor.getSkillTreeCount(this._id);
+            const maxCount = this.getMaxCount() || 1;
+            return eval(cond);
+        };
+
     }
 
     window.SkillTreeData = SkillTreeData;
@@ -3392,7 +3472,7 @@ Imported.NUUN_SkillTree = true;
         const wy = w.WindowY + this.mainAreaTop();
         const wh = this.calcWindowHeight(params.SkillTypeRows, true);
         const wx = w.WindowX;
-        const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
+        const ww = Math.min(Graphics.boxWidth - wx - this.helpAreaBottomY(), w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         return new Rectangle(wx, wy, ww, wh);
     };
 
@@ -3401,7 +3481,7 @@ Imported.NUUN_SkillTree = true;
         const wy = w.WindowY + this.mainAreaTop();
         const wx = w.WindowX;
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
-        const wh = Math.min(Graphics.boxHeight - wy, (w.WindowHeight > 0 ? w.WindowHeight : Graphics.boxHeight));
+        const wh = Math.min(Graphics.boxHeight - wy - this.helpAreaBottomY(), (w.WindowHeight > 0 ? w.WindowHeight : Graphics.boxHeight));
         return new Rectangle(wx, wy, ww, wh);
     };
 
@@ -3410,7 +3490,7 @@ Imported.NUUN_SkillTree = true;
         const wy = w.WindowY + this.mainAreaTop();
         const wx = w.WindowX;
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
-        const wh = Math.min(Graphics.boxHeight - wy, (w.WindowHeight > 0 ? w.WindowHeight : Graphics.boxHeight));
+        const wh = Math.min(Graphics.boxHeight - wy - this.helpAreaBottomY(), (w.WindowHeight > 0 ? w.WindowHeight : Graphics.boxHeight));
         return new Rectangle(wx, wy, ww, wh);
     };
 
@@ -3419,14 +3499,14 @@ Imported.NUUN_SkillTree = true;
         const wy = w.WindowY + this.mainAreaTop();
         const wx = w.WindowX;
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
-        const wh = Math.min(Graphics.boxHeight - wy, (w.WindowHeight > 0 ? w.WindowHeight : Graphics.boxHeight));
+        const wh = Math.min(Graphics.boxHeight - wy - this.helpAreaBottomY(), (w.WindowHeight > 0 ? w.WindowHeight : Graphics.boxHeight));
         return new Rectangle(wx, wy, ww, wh);
     };
 
     Scene_SkillTree.prototype.skillTreeHelpWindowRect = function() {
         const w = _getWindowData("SkillTreeHelpWindow");
-        const wy = w.WindowY + this.mainAreaTop();
-        const wh = Math.min(Graphics.boxHeight - wy, (w.WindowHeight > 0 ? w.WindowHeight : this.helpAreaHeight()));
+        const wy = w.WindowY + this.helpAreaTop();
+        const wh = Math.min(Graphics.boxHeight - wy, (w.WindowHeight > 0 ? w.WindowHeight : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments)));
         const wx = w.WindowX;
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         return new Rectangle(wx, wy, ww, wh);
@@ -3439,6 +3519,18 @@ Imported.NUUN_SkillTree = true;
         const wx = w.WindowX;
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         return new Rectangle(wx, wy, ww, wh);
+    };
+
+    Scene_SkillTree.prototype.helpAreaBottomY = function() {
+        return this.isBottomHelpMode() ? this.helpAreaHeight() : 0;
+    };
+
+    Scene_SkillTree.prototype.helpAreaHeight = function() {
+        return params.HelpAreaInvalidated ? 0 : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments);
+    };
+
+    Scene_SkillTree.prototype.isBottomHelpMode = function() {
+        return params.HelpBottomMode;
     };
 
     Scene_SkillTree.prototype.setupActor = function(actor) {
@@ -3466,7 +3558,7 @@ Imported.NUUN_SkillTree = true;
     Scene_SkillTree.prototype.skillTreeLearnConfirmation = function() {
         this._skillTreeWindow.activate();
         this._skillTreeWindow.learnSkillTree();
-    };　
+    };
 
     Scene_SkillTree.prototype.onSkillTreeOk = function() {
         if (this._skillTreeWindow.isLearnEnabled()) {
@@ -5196,6 +5288,7 @@ Imported.NUUN_SkillTree = true;
         const d = data;
         const v = $gameVariables._data;
         const s = $gameSwitches._data;
+        const skillId = data._id;
         const count = this.getSkillTreeCount(data._id);
         const maxCount = data.getMaxCount() || 1;
         const actor = this;
@@ -5208,6 +5301,7 @@ Imported.NUUN_SkillTree = true;
         const d = data;
         const v = $gameVariables._data;
         const s = $gameSwitches._data;
+        const skillId = data._id;
         const count = this.getSkillTreeCount(data._id);
         const maxCount = data.getMaxCount() || 1;
         const actor = this;
@@ -5220,6 +5314,7 @@ Imported.NUUN_SkillTree = true;
         const d = data;
         const v = $gameVariables._data;
         const s = $gameSwitches._data;
+        const skillId = data._id;
         const count = this.getSkillTreeCount(data._id);
         const maxCount = data.getMaxCount() || 1;
         const actor = this;

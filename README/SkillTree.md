@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.2.1
+# Ver.1.2.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -144,6 +144,11 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/9/6 Ver.1.2.2  
+スキルが習得済みの場合は、習得済みと表示するように修正。  
+スキルが習得済みの場合は、スキルコスト、条件を表示させない機能を追加。  
+最大習得回数が0のスキルでも習得回数をカウントするように修正。  
+習得確認ウィンドウを中央に表示させる機能を追加。  
 2025/9/1 Ver.1.2.1  
 初期の座標設定を修正。  
 特定のプラグインでヘルプウィンドウの位置が下にずれて表示される問題を修正。  

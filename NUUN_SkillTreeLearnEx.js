@@ -14,7 +14,7 @@
  * @base NUUN_SkillTree
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_SkillTree
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Expand the skills you learn with the skill tree.
@@ -24,6 +24,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/6/2025 Ver.1.0.1
+ * Fixed so that conditions can be set.
+ * Fixed so that condition text can be set.
  * 8/26/2025 Ver.1.0.0
  * First edition.
  * 
@@ -62,7 +65,21 @@
  * @desc Specify the number of learnings to apply.
  * @type number
  * @default 0
- * @parent LearnSetting
+ * 
+ * @param LearnCond
+ * @text Learning conditions
+ * @desc Enter the conditions for acquiring skills in JavaScript.
+ * @type combo
+ * @option 'v[0];//Variables'
+ * @option 's[0];//Switches'
+ * @option 'actor._level >= 10;//Actor level 10 or higher'
+ * @default 
+ * 
+ * @param LearnCondText
+ * @text Learning condition text
+ * @desc The text of the learning conditions to be displayed in the cost window. Control characters can be used.
+ * @type multiline_string
+ * @default 
  * 
  * @param LearnSkillId
  * @text Learning skill Id
@@ -86,7 +103,7 @@
  * @base NUUN_SkillTree
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_SkillTree
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * スキルツリーで習得するスキルを拡張させます。
@@ -96,6 +113,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/9/6 Ver.1.0.1
+ * 条件設定を行えるように修正。
+ * 条件テキストを設定できるように修正。
  * 2025/8/26 Ver.1.0.0
  * 初版
  * 
@@ -136,7 +156,21 @@
  * @desc 適用する習得回数を指定します。
  * @type number
  * @default 0
- * @parent LearnSetting
+ * 
+ * @param LearnCond
+ * @text 習得条件
+ * @desc スキルを習得する条件をJavaScriptで記入します。
+ * @type combo
+ * @option 'v[0];//Variables'
+ * @option 's[0];//Switches'
+ * @option 'actor._level >= 10;//Actor level 10 or higher'
+ * @default 
+ * 
+ * @param LearnCondText
+ * @text 習得条件のテキスト
+ * @desc コストウィンドウに表示させる習得条件のテキスト。制御文字使用可能
+ * @type multiline_string
+ * @default 
  * 
  * @param LearnSkillId
  * @text 習得スキルID

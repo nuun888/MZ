@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -88,6 +88,11 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/6/2025 Ver.1.2.2
+ * Fixed an issue whereby "learned" is displayed if a skill has already been learned.
+ * Added a function to not display the skill cost and conditions if a skill has already been learned.
+ * Fixed an issue whereby the number of times a skill has been learned is counted even if the maximum number of times it can be learned is 0.
+ * Added a function to display the learning confirmation window in the center.
  * 9/1/2025 Ver.1.2.1
  * Fixed the initial coordinate settings.
  * Fixed an issue where the help window was displayed shifted downwards with certain plugins.
@@ -576,9 +581,16 @@
  * 
  * @param SkillCostName
  * @text Skill cost display name
- * @desc The display name for the skill cost.
+ * @desc The display name for the skill cost. %1:Skill name
  * @type string
  * @default "Learning Cost"
+ * @parent SkillTreeCostSetting
+ * 
+ * @param LearnedName
+ * @text Learned names
+ * @desc Learned display name.
+ * @type string
+ * @default 習得済み
  * @parent SkillTreeCostSetting
  * 
  * @param SkillCostIcon
@@ -626,6 +638,13 @@
  * @option Cost/Skill Points
  * @value type4
  * @default type3
+ * @parent SkillTreeCostSetting
+ * 
+ * @param VisibleLearnedSkillCost
+ * @desc If a skill has been fully mastered or mastered multiple times, the cost will not be displayed.
+ * @text No learned cost displayed
+ * @type boolean
+ * @default false
  * @parent SkillTreeCostSetting
  * 
  * @param VisibleSkillPointZero
@@ -695,6 +714,13 @@
  * @param LearnConfirmation
  * @desc A confirmation window will be displayed when learning a skill.
  * @text Confirmation window displayed when acquiring skills
+ * @type boolean
+ * @default true
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param ConfirmationWindowCenter
+ * @desc The confirmation window is displayed in the center.
+ * @text Auto center display
  * @type boolean
  * @default true
  * @parent SkillTreeConfirmationSetting
@@ -1383,7 +1409,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.2.2
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1456,6 +1482,11 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/9/6 Ver.1.2.2
+ * スキルが習得済みの場合は、習得済みと表示するように修正。
+ * スキルが習得済みの場合は、スキルコスト、条件を表示させない機能を追加。
+ * 最大習得回数が0のスキルでも習得回数をカウントするように修正。
+ * 習得確認ウィンドウを中央に表示させる機能を追加。
  * 2025/9/1 Ver.1.2.1
  * 初期の座標設定を修正。
  * 特定のプラグインでヘルプウィンドウの位置が下にずれて表示される問題を修正。
@@ -1945,9 +1976,16 @@
  * 
  * @param SkillCostName
  * @text スキルコスト表示名
- * @desc スキルコストの表示名。
+ * @desc スキルコストの表示名。%1:スキル名
  * @type string
  * @default 習得コスト
+ * @parent SkillTreeCostSetting
+ * 
+ * @param LearnedName
+ * @text 習得済み名称
+ * @desc 習得済みの表示名。
+ * @type string
+ * @default 習得済み
  * @parent SkillTreeCostSetting
  * 
  * @param SkillCostIcon
@@ -1995,6 +2033,13 @@
  * @option 消費コスト/スキルポイント
  * @value type4
  * @default type3
+ * @parent SkillTreeCostSetting
+ * 
+ * @param VisibleLearnedSkillCost
+ * @desc スキルが回数含め習得済みの場合コストを表示しません。
+ * @text 習得済みコスト表示なし
+ * @type boolean
+ * @default false
  * @parent SkillTreeCostSetting
  * 
  * @param VisibleSkillPointZero
@@ -2064,6 +2109,13 @@
  * @param LearnConfirmation
  * @desc スキル習得時に確認ウィンドウを表示します。
  * @text スキル習得時確認ウィンドウ表示
+ * @type boolean
+ * @default true
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param ConfirmationWindowCenter
+ * @desc 確認ウィンドウを中央に表示します。
+ * @text 自動中央表示
  * @type boolean
  * @default true
  * @parent SkillTreeConfirmationSetting
@@ -3129,10 +3181,16 @@ Imported.NUUN_SkillTree = true;
         }
 
         getLearn() {
+            if (!!this._countLearnSkillData && !!this._countLearnSkillData.LearnCond) {
+                return this._countLearnSkillData.LearnCond || this._learnCond;
+            }
             return this._learnCond;
         }
 
         getLearnCondText() {
+            if (!!this._countLearnSkillData && !!this._countLearnSkillData.LearnCondText) {
+                return this._countLearnSkillData.LearnCondText || this._learnCond;
+            }
             return this._learnCondText;
         }
 
@@ -3516,8 +3574,8 @@ Imported.NUUN_SkillTree = true;
         const w = _getWindowData("SkillTreeConfirmationWindow");
         const wy = w.WindowY + this.mainAreaTop();
         const wh = this.calcWindowHeight(3, true);
-        const wx = w.WindowX;
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
+        const wx = params.ConfirmationWindowCenter ? Math.floor(Graphics.boxWidth / 2) - Math.floor(ww / 2) : w.WindowX;
         return new Rectangle(wx, wy, ww, wh);
     };
 
@@ -3681,6 +3739,7 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeImages = this.loadSkillTreeImages();
         this._learnOk = true;
         Window_Selectable.prototype.initialize.call(this, rect);
+        //this.createLineSprite();
     };
 
     Window_SkillTree.prototype.loadSkillTreeImages = function() {
@@ -4130,6 +4189,7 @@ Imported.NUUN_SkillTree = true;
             const actor = this._actor;
             const count = actor.getSkillTreeCount(data._id);
             const maxCount = data.getMaxCount() || 1;
+            const skillId = data._id;
             const d = data;
             const v = $gameVariables._data;
             const s = $gameSwitches._data;
@@ -4246,65 +4306,65 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.drawSkillTreeType1Line = function(x1, y1, x2, y2, thick, color) {
         const rowSpacing = this.rowSpacing();
-        const h = this.rowsMargin() + rowSpacing;
-        const t = Math.floor(h / 2) * this.getDirection(x1, x2);
-        const xm1 = x1 + t;
-        const xm2 = x2 - t;
-        const ym1 = y2 - h;
-        const ym2 = y2 - Math.floor(h / 2);
-        this.drawSkillTreeLine(x1, y1, x1, ym1, thick, color);
-        this.drawSkillTreeLine(x1, ym1, xm1, ym2, thick, color);
-        this.drawSkillTreeLine(xm1, ym2, xm2, ym2, thick, color);
-        this.drawSkillTreeLine(xm2, ym2, x2, y2, thick, color);
+        const height = this.rowsMargin() + rowSpacing;
+        const halfHeight = Math.floor(height / 2) * this.getDirection(x1, x2);
+        const line_x1 = x1 + halfHeight;
+        const line_x2 = x2 - halfHeight;
+        const line_y1 = y2 - height;
+        const line_y2 = y2 - Math.floor(height / 2);
+        this.drawSkillTreeLine(x1, y1, x1, line_y1, thick, color);
+        this.drawSkillTreeLine(x1, line_y1, line_x1, line_y2, thick, color);
+        this.drawSkillTreeLine(line_x1, line_y2, line_x2, line_y2, thick, color);
+        this.drawSkillTreeLine(line_x2, line_y2, x2, y2, thick, color);
     };
 
     Window_SkillTree.prototype.drawSkillTreeType2Line = function(x1, y1, x2, y2, thick, color) {
         const rowSpacing = this.rowSpacing();
-        const h = this.rowsMargin() + rowSpacing;
-        const t = Math.floor(h / 2) * this.getDirection(x1, x2);
-        const xm1 = x1 + t;
-        const xm2 = x2 - t;
-        const ym1 = y1 + Math.floor(h / 2);
-        const ym2 = y1 + h;
-        this.drawSkillTreeLine(x1, y1, xm1, ym1, thick, color);
-        this.drawSkillTreeLine(xm1, ym1, xm2, ym1, thick, color);
-        this.drawSkillTreeLine(xm2, ym1, x2, ym2, thick, color);
-        this.drawSkillTreeLine(x2, ym2, x2, y2, thick, color);
+        const height = this.rowsMargin() + rowSpacing;
+        const halfHeight = Math.floor(height / 2) * this.getDirection(x1, x2);
+        const line_x1 = x1 + halfHeight;
+        const line_x2 = x2 - halfHeight;
+        const line_y1 = y1 + Math.floor(height / 2);
+        const line_y2 = y1 + height;
+        this.drawSkillTreeLine(x1, y1, line_x1, line_y1, thick, color);
+        this.drawSkillTreeLine(line_x1, line_y1, line_x2, line_y1, thick, color);
+        this.drawSkillTreeLine(line_x2, line_y1, x2, line_y2, thick, color);
+        this.drawSkillTreeLine(x2, line_y2, x2, y2, thick, color);
     };
 
     Window_SkillTree.prototype.drawSkillTreeType3Line = function(x1, y1, x2, y2, thick, color) {
         const rowSpacing = this.rowSpacing();
-        const h = this.rowsMargin() + rowSpacing;
-        const t = Math.floor(h / 2) * this.getDirection(x1, x2);
-        const xm1 = x1 + t;
-        const xm2 = x2 - t;
-        const ym1 = y1 + Math.floor(y2 - y1) / 2;
-        const ym2 = ym1 - Math.floor(h / 2);
-        const ym3 = ym1 + Math.floor(h / 2);
-        this.drawSkillTreeLine(x1, y1, x1, ym2, thick, color);
-        this.drawSkillTreeLine(x1, ym2, xm1, ym1, thick, color);
-        this.drawSkillTreeLine(xm1, ym1, xm2, ym1, thick, color);
-        this.drawSkillTreeLine(xm2, ym1, x2, ym3, thick, color);
-        this.drawSkillTreeLine(x2, ym3, x2, y2, thick, color);
+        const height = this.rowsMargin() + rowSpacing;
+        const halfHeight = Math.floor(heighth / 2) * this.getDirection(x1, x2);
+        const line_x1 = x1 + halfHeight;
+        const line_x2 = x2 - halfHeight;
+        const line_y1 = y1 + Math.floor(y2 - y1) / 2;
+        const line_y2 = line_y1 - Math.floor(height / 2);
+        const line_y3 = line_y1 + Math.floor(height / 2);
+        this.drawSkillTreeLine(x1, y1, x1, line_y2, thick, color);
+        this.drawSkillTreeLine(x1, line_y2, line_x1, line_y1, thick, color);
+        this.drawSkillTreeLine(line_x1, line_y1, line_x2, line_y1, thick, color);
+        this.drawSkillTreeLine(line_x2, line_y1, x2, line_y3, thick, color);
+        this.drawSkillTreeLine(x2, line_y3, x2, y2, thick, color);
     };
 
     Window_SkillTree.prototype.drawSkillTreeType4Line = function(x1, y1, x2, y2, thick, color) {
         const rowSpacing = this.rowSpacing();
-        const h = this.rowsMargin() + rowSpacing;
-        const ym1 = y2 - Math.floor(h / 2);
-        this.drawSkillTreeLine(x1, y1, x1, ym1, thick, color);
-        this.drawSkillTreeLine(x1, ym1, x2, ym1, thick, color);
-        this.drawSkillTreeLine(x2, ym1, x2, y2, thick, color);
+        const height = this.rowsMargin() + rowSpacing;
+        const line_y1 = y2 - Math.floor(height / 2);
+        this.drawSkillTreeLine(x1, y1, x1, line_y1, thick, color);
+        this.drawSkillTreeLine(x1, line_y1, x2, line_y1, thick, color);
+        this.drawSkillTreeLine(x2, line_y1, x2, y2, thick, color);
     };
 
     Window_SkillTree.prototype.drawSkillTreeType7Line = function(x1, y1, x2, y2, thick, color) {
         const rowSpacing = this.rowSpacing();
-        const h = this.rowsMargin() + rowSpacing;
-        const ym1 = y1 + Math.floor(h / 3);
-        const ym2 = y2 - Math.floor(h / 3);
-        this.drawSkillTreeLine(x1, y1, x1, ym1, thick, color);
-        this.drawSkillTreeLine(x1, ym1, x2, ym2, thick, color);
-        this.drawSkillTreeLine(x2, ym2, x2, y2, thick, color);
+        const height = this.rowsMargin() + rowSpacing;
+        const line_y1 = y1 + Math.floor(height / 3);
+        const line_y2 = y2 - Math.floor(height / 3);
+        this.drawSkillTreeLine(x1, y1, x1, line_y1, thick, color);
+        this.drawSkillTreeLine(x1, line_y1, x2, line_y2, thick, color);
+        this.drawSkillTreeLine(x2, line_y2, x2, y2, thick, color);
     };
 
     Window_SkillTree.prototype.drawSkillTreeLine = function(x1, y1, x2, y2, thick, color) {
@@ -4594,14 +4654,27 @@ Imported.NUUN_SkillTree = true;
         const textWidth = this.textWidth("0000");
         const rect = this.itemRect(index);
         const type = this.itemAt(index);
-        this.drawCost(type, this._treeData, rect.x, rect.y, rect.width - textWidth);
-        this.drawSkillTreeCost(type, this._treeData, rect.x, rect.y, rect.width);
-        this.drawCostTextEx(this._treeData, rect.x, rect.y + this.lineHeight() * this.maxItems());
+        const data = this._treeData;
+        if (!(params.VisibleLearnedSkillCost && this.isMultipleCount(data))) {
+            this.drawCost(type, data, rect.x, rect.y, rect.width - textWidth);
+            this.drawSkillTreeCost(type, data, rect.x, rect.y, rect.width);
+            this.drawCostTextEx(data, rect.x, rect.y + this.lineHeight() * this.maxItems());
+        }
     };
 
     Window_SkillTreeCost.prototype.drawCostTitle = function(x, y) {
-        this.changeTextColor(ColorManager.systemColor());
-        this.drawText(params.SkillCostName, x, y);
+        let text = '';
+        const data = this._treeData;
+        if (!!data) {
+            if (this.isMultipleCount(data)) {
+                this.changeTextColor(ColorManager.systemColor());
+                text = params.LearnedName;
+            } else {
+                this.resetTextColor();
+                text = params.SkillCostName.format($dataSkills[data.getLearnSkill()].name);
+            }
+        }
+        this.drawText(text, x, y);
     };
 
     Window_SkillTreeCost.prototype.drawCount = function(data, x, y, width) {
@@ -4708,6 +4781,11 @@ Imported.NUUN_SkillTree = true;
             case 'var':
                 return data.getCostVariables();
         }
+    };
+
+    Window_SkillTreeCost.prototype.isMultipleCount = function(data) {
+        if (data.getMaxCount() === 0) return this._actor.isSkillTreeLearned(data._id);
+        return this._actor.isMultipleCount(data._id, data.getMaxCount());
     };
 
 
@@ -4903,7 +4981,7 @@ Imported.NUUN_SkillTree = true;
             learnData = this.learnSkillTreeData();
         }
         learnData.skillId = data._id;
-        learnData.count = Math.min(learnData.count + 1, data.getMaxCount());
+        learnData.count = Math.min(learnData.count + 1, (data.getMaxCount() || 1));
         if (data.getCost() > 0) {
             learnData.cost = data.getCost();
         }
@@ -5338,6 +5416,14 @@ Imported.NUUN_SkillTree = true;
 
     Game_Enemy.prototype.getSkillPoint = function() {
         return 0;
+    };
+
+    Game_Enemy.prototype.getSkillTreeCount = function(skillId) {
+        return 1;
+    };
+
+    Game_Enemy.prototype.isSkillTreeLearned = function(skillId) {
+        return true;
     };
 
     Game_Enemy.prototype.getGainSkillPoint = function() {

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -88,6 +88,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/6/2025 Ver.1.2.3
+ * Fixed an issue where the frame border would still appear even when disabled.
  * 9/6/2025 Ver.1.2.2
  * Fixed an issue whereby "learned" is displayed if a skill has already been learned.
  * Added a function to not display the skill cost and conditions if a skill has already been learned.
@@ -1409,7 +1411,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1482,6 +1484,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/9/6 Ver.1.2.3
+ * フレーム枠を無効にしても表示されてしまう問題を修正。
  * 2025/9/6 Ver.1.2.2
  * スキルが習得済みの場合は、習得済みと表示するように修正。
  * スキルが習得済みの場合は、スキルコスト、条件を表示させない機能を追加。
@@ -4199,7 +4203,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.drawSkillTreeContentsFrame = function(index, data, learned, enabled) {
-        if (!this.isSkillTreeSkillCount()) return;
+        if (!this.isSkillTreeFrame()) return;
         const rect = this.itemRect(index);
         const width = params.FrameWidth > 0 ? Math.min(params.FrameWidth, rect.width) : rect.width;
         const height = rect.height;
@@ -4211,7 +4215,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.drawSkillCount = function(data, learned, rect) {
-        if (!this.isSkillTreeFrame() || data.getMaxCount() <= 1 || !learned) return;
+        if (!this.isSkillTreeSkillCount() || data.getMaxCount() <= 1 || !learned) return;
         const width = 20;
         const height = 20;
         const x = rect.x + rect.width + params.SkillCountFrameX;

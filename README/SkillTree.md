@@ -123,6 +123,9 @@ $gameActors
 [拡張スキル習得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeLearnEx.js)  
 
 #### 更新履歴
+2025/9/6 Ver.1.0.1  
+条件設定を行えるように修正。  
+条件テキストを設定できるように修正。  
 2025/8/26 Ver.1.0.0  
 初版  
 

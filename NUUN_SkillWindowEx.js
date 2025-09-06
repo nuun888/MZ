@@ -14,7 +14,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * You can customize the skill screen.
@@ -25,7 +25,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 8/26/2025 Ver.1.1.2  
+ * 9/6/2025 Ver.1.0.3
+ * Fixed an issue where selecting a target would return to skill selection if the actor window was not always visible.
+ * 8/26/2025 Ver.1.0.2  
  * Added skill points (NUUN_SkillTree) to the actor's display status.  
  * 3/15/2025 Ver.1.0.1
  * Fixed an issue where an error would occur if the status item settings were not set.
@@ -827,7 +829,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * メニュー時のスキル画面をカスタマイズできます。
@@ -837,6 +839,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/9/6 Ver.1.0.3
+ * アクターウィンドウを常時表示にしていない場合に、対象選択時にスキル選択に戻ってしまう問題を修正。
  * 2025/8/26 Ver.1.0.2
  * アクターの表示ステータスにスキルポイント(NUUN_SkillTree)を追加。
  * 2025/3/15 Ver.1.0.1
@@ -1978,7 +1982,7 @@ Imported.NUUN_ItemWindowEx = true;
             const ww = params.ActorWindowWidth > 0 ? Math.min(params.ActorWindowWidth, Graphics.boxWidth - wx) : Graphics.boxWidth;
             const wh = params.ActorWindowHeight > 0 ? Math.min(params.ActorWindowHeight, Graphics.boxHeight - wy) : Graphics.boxHeight;
             return new Rectangle(wx, wy, ww, wh);
-        }
+        }this._actorWindow.selectSkill();
     };
 
     Scene_Skill.prototype.skillInfoWindowRect = function() {
@@ -2197,9 +2201,11 @@ Imported.NUUN_ItemWindowEx = true;
     };
 
     Window_MenuActor.prototype.initializeSkill = function() {
-        this._selectMode = 'actor';
         if (params.ShowActorWindow) {
+            this._selectMode = 'actor';
             this.show();
+        } else {
+            this._selectMode = 'skill';
         }
     };
 

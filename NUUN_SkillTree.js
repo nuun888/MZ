@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -88,6 +88,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/7/2025 Ver.1.2.4
+ * Fixed an issue where the skill name in the skill cost window would display the name of a secret skill.
+ * Fixed to prevent numerical text from displaying for items set to Secret.
  * 9/6/2025 Ver.1.2.3
  * Fixed an issue where the frame border would still appear even when disabled.
  * 9/6/2025 Ver.1.2.2
@@ -1411,7 +1414,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1484,6 +1487,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/9/7 Ver.1.2.4
+ * スキルコストウィンドウのスキル名でシークレット状態のスキル名が表示されてしまう問題を修正。
+ * シークレット表示の項目に対して、数値テキストを表示しないように修正。
  * 2025/9/6 Ver.1.2.3
  * フレーム枠を無効にしても表示されてしまう問題を修正。
  * 2025/9/6 Ver.1.2.2
@@ -2977,7 +2983,24 @@ Imported.NUUN_SkillTree = true;
 
     NuunManager.getSkillPointParamName = function() {
         return params.SkillPointName;
-    }
+    };
+
+    NuunManager.getSkillTreeReqSkillList = function(list, skillId) {
+        return list.filter(req => {
+            if (!!req.DerivedSkill) {
+                return req.DerivedSkill.includes(skillId);
+            }
+            return false;
+        });
+    };
+
+    NuunManager.getSkillTreeReqSkillListId = function(list, skillId) {
+        return this.getSkillTreeReqSkillList(list, skillId).map(t => t.SkillId);
+    };
+
+    NuunManager.getSkillTreeData = function(data, type, actor) {
+        return new SkillTreeData(data, type, actor);
+    };
 
 
     class SkillTreeData {
@@ -3247,6 +3270,30 @@ Imported.NUUN_SkillTree = true;
         getLearnSkill() {
             if (!this._countLearnSkillData || this._countLearnSkillData.LearnSkillId === 0) return this._id;
             return this._countLearnSkillData.LearnSkillId;
+        }
+
+        getSkillName(skill) {
+            skill = !!skill ? skill : $dataSkills[this.getLearnSkill()];
+            return this.isSkillTreeSecretCond() ? skill.name : this.getSecretText(skill);
+        }
+
+        getSkillSecretName(skill) {
+            skill = !!skill ? skill : $dataSkills[this.getLearnSkill()];
+            return this.getSecretText(skill);
+        }
+
+        getSecretText(skill) {
+            const text = params.SkillTreeSecretText;
+            if(text === '？' || text === '?') {
+                const name_length = skill.name.length;
+                return text.repeat(name_length);
+            } else {
+                return text;
+            }
+        }
+
+        getSecretIcon() {
+            return params.SecretIcon;
         }
 
         getRemoveSkill() {
@@ -3743,7 +3790,6 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeImages = this.loadSkillTreeImages();
         this._learnOk = true;
         Window_Selectable.prototype.initialize.call(this, rect);
-        //this.createLineSprite();
     };
 
     Window_SkillTree.prototype.loadSkillTreeImages = function() {
@@ -3772,13 +3818,29 @@ Imported.NUUN_SkillTree = true;
             this._data = [];
             this.refresh();
             this.scrollTo(0, 0);
+            if (this._skillTreeTooltipsWindow) {
+                this._skillTreeTooltipsWindow.setList(this.getSkillTreeList());
+            }
         }
+    };
+
+    Window_SkillTree.prototype.update = function() {
+        Window_Selectable.prototype.update.apply(this, arguments);
     };
 
     Window_SkillTree.prototype.callUpdateHelp = function() {
         Window_Selectable.prototype.callUpdateHelp.apply(this, arguments);
-        if (this.active && this._skillTreeCostWindow) {
+        if (this.active) {
+            this.updateSkillTreeWindow();
+        }
+    };
+
+    Window_SkillTree.prototype.updateSkillTreeWindow = function() {
+        if (this._skillTreeCostWindow) {
             this.updateCostWindow();
+        }
+        if (this._skillTreeTooltipsWindow) {
+            this.updateLearnWindow();
         }
     };
 
@@ -4152,10 +4214,13 @@ Imported.NUUN_SkillTree = true;
             const skill = $dataSkills[skillId];
             const enabled = this.isEnabled(data);
             const learned = this._actor.isSkillTreeLearned(data._id);
+            const secret = this.isSkillTreeSecretCond(data);
             this.changePaintOpacity(enabled);
             this._learnedSkillColor = learned && params.LearnedColor >= 0 ? NuunManager.getColorCode(params.LearnedColor) : null;
-            this.drawSkillTreeText(data, skill, rect, enabled);
-            this.drawItemNumber(data, rect.x, rect.y, rect.width)
+            this.drawSkillTreeText(data, skill, rect, enabled, secret);
+            if (secret) {
+                this.drawItemNumber(data, rect.x, rect.y, rect.width);
+            }
             this.drawSkillTreeContentsFrame(index, data, learned, enabled);
             this.learnedDrawIcon(learned, rect);
             this.drawSkillCount(data, learned, rect);
@@ -4163,13 +4228,13 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Window_SkillTree.prototype.drawSkillTreeText = function(data, skill, rect, enabled) {
-        if (!enabled && !this.isSkillTreeSecretCond(data)) {
+    Window_SkillTree.prototype.drawSkillTreeText = function(data, skill, rect, enabled, secret) {
+        if (!enabled && !secret) {
             if (params.SkillTreeTextType === "icon") {
                 const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
-                this.drawIcon(this.getSecretIcon(), rect.x, iconY);
+                this.drawIcon(data.getSecretIcon(), rect.x, iconY);
             } else {
-                this.drawText(this.getSecretText(skill), rect.x, rect.y, rect.width - this.numberWidth());
+                this.drawText(data.getSkillSecretName(skill), rect.x, rect.y, rect.width - this.numberWidth());
             }
             data.enabled();
         } else {
@@ -4305,73 +4370,6 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.drawSkillTreeStraightLine = function(x1, y1, x2, y2, thick, color) {
-        this.drawSkillTreeLine(x1, y1, x2, y2, thick, color);
-    };
-
-    Window_SkillTree.prototype.drawSkillTreeType1Line = function(x1, y1, x2, y2, thick, color) {
-        const rowSpacing = this.rowSpacing();
-        const height = this.rowsMargin() + rowSpacing;
-        const halfHeight = Math.floor(height / 2) * this.getDirection(x1, x2);
-        const line_x1 = x1 + halfHeight;
-        const line_x2 = x2 - halfHeight;
-        const line_y1 = y2 - height;
-        const line_y2 = y2 - Math.floor(height / 2);
-        this.drawSkillTreeLine(x1, y1, x1, line_y1, thick, color);
-        this.drawSkillTreeLine(x1, line_y1, line_x1, line_y2, thick, color);
-        this.drawSkillTreeLine(line_x1, line_y2, line_x2, line_y2, thick, color);
-        this.drawSkillTreeLine(line_x2, line_y2, x2, y2, thick, color);
-    };
-
-    Window_SkillTree.prototype.drawSkillTreeType2Line = function(x1, y1, x2, y2, thick, color) {
-        const rowSpacing = this.rowSpacing();
-        const height = this.rowsMargin() + rowSpacing;
-        const halfHeight = Math.floor(height / 2) * this.getDirection(x1, x2);
-        const line_x1 = x1 + halfHeight;
-        const line_x2 = x2 - halfHeight;
-        const line_y1 = y1 + Math.floor(height / 2);
-        const line_y2 = y1 + height;
-        this.drawSkillTreeLine(x1, y1, line_x1, line_y1, thick, color);
-        this.drawSkillTreeLine(line_x1, line_y1, line_x2, line_y1, thick, color);
-        this.drawSkillTreeLine(line_x2, line_y1, x2, line_y2, thick, color);
-        this.drawSkillTreeLine(x2, line_y2, x2, y2, thick, color);
-    };
-
-    Window_SkillTree.prototype.drawSkillTreeType3Line = function(x1, y1, x2, y2, thick, color) {
-        const rowSpacing = this.rowSpacing();
-        const height = this.rowsMargin() + rowSpacing;
-        const halfHeight = Math.floor(heighth / 2) * this.getDirection(x1, x2);
-        const line_x1 = x1 + halfHeight;
-        const line_x2 = x2 - halfHeight;
-        const line_y1 = y1 + Math.floor(y2 - y1) / 2;
-        const line_y2 = line_y1 - Math.floor(height / 2);
-        const line_y3 = line_y1 + Math.floor(height / 2);
-        this.drawSkillTreeLine(x1, y1, x1, line_y2, thick, color);
-        this.drawSkillTreeLine(x1, line_y2, line_x1, line_y1, thick, color);
-        this.drawSkillTreeLine(line_x1, line_y1, line_x2, line_y1, thick, color);
-        this.drawSkillTreeLine(line_x2, line_y1, x2, line_y3, thick, color);
-        this.drawSkillTreeLine(x2, line_y3, x2, y2, thick, color);
-    };
-
-    Window_SkillTree.prototype.drawSkillTreeType4Line = function(x1, y1, x2, y2, thick, color) {
-        const rowSpacing = this.rowSpacing();
-        const height = this.rowsMargin() + rowSpacing;
-        const line_y1 = y2 - Math.floor(height / 2);
-        this.drawSkillTreeLine(x1, y1, x1, line_y1, thick, color);
-        this.drawSkillTreeLine(x1, line_y1, x2, line_y1, thick, color);
-        this.drawSkillTreeLine(x2, line_y1, x2, y2, thick, color);
-    };
-
-    Window_SkillTree.prototype.drawSkillTreeType7Line = function(x1, y1, x2, y2, thick, color) {
-        const rowSpacing = this.rowSpacing();
-        const height = this.rowsMargin() + rowSpacing;
-        const line_y1 = y1 + Math.floor(height / 3);
-        const line_y2 = y2 - Math.floor(height / 3);
-        this.drawSkillTreeLine(x1, y1, x1, line_y1, thick, color);
-        this.drawSkillTreeLine(x1, line_y1, x2, line_y2, thick, color);
-        this.drawSkillTreeLine(x2, line_y2, x2, y2, thick, color);
-    };
-
-    Window_SkillTree.prototype.drawSkillTreeLine = function(x1, y1, x2, y2, thick, color) {
         const context = this.contents._context;
         context.strokeStyle = color;
         context.lineWidth = thick;
@@ -4379,6 +4377,83 @@ Imported.NUUN_SkillTree = true;
         context.moveTo(x1, y1);
         context.lineTo(x2, y2);
         context.stroke();
+    };
+
+    Window_SkillTree.prototype.drawSkillTreeType1Line = function(x1, y1, x2, y2, thick, color) {
+        const context = this.contents._context;
+        context.strokeStyle = color;
+        context.lineWidth = thick;
+        const height = this.rowsMarginHeight();
+        const diagonal = Math.floor(height / 2) * this.getDirection(x1, x2);
+        context.beginPath();
+        context.moveTo(x1, y1);
+        context.lineTo(x1, y2 - height);
+        context.lineTo(x1 + diagonal, y2 - Math.floor(height / 2));
+        context.lineTo(x2 - diagonal, y2 - Math.floor(height / 2));
+        context.lineTo(x2, y2);
+        context.stroke();
+    };
+
+    Window_SkillTree.prototype.drawSkillTreeType2Line = function(x1, y1, x2, y2, thick, color) {
+        const context = this.contents._context;
+        context.strokeStyle = color;
+        context.lineWidth = thick;
+        const height = this.rowsMarginHeight();
+        const diagonal = Math.floor(height / 2) * this.getDirection(x1, x2);
+        context.beginPath();
+        context.moveTo(x1, y1);
+        context.lineTo(x1 + diagonal, y1 + Math.floor(height / 2));
+        context.lineTo(x2 - diagonal, y1 + Math.floor(height / 2));
+        context.lineTo(x2, y1 + height);
+        context.lineTo(x2, y2);
+        context.stroke();
+    };
+
+    Window_SkillTree.prototype.drawSkillTreeType3Line = function(x1, y1, x2, y2, thick, color) {//EX
+        const context = this.contents._context;
+        context.strokeStyle = color;
+        context.lineWidth = thick;
+        const height = this.rowsMarginHeight();
+        const diagonal = Math.floor(height / 2) * this.getDirection(x1, x2);
+        const diagonal_h = Math.floor(y2 - y1) / 2;
+        context.beginPath();
+        context.moveTo(x1, y1);
+        context.lineTo(x1, y1 + diagonal_h - Math.floor(height / 2));
+        context.lineTo(x1 + diagonal, y1 + diagonal_h);
+        context.lineTo(x2 - diagonal, y1 + diagonal_h);
+        context.lineTo(x2, y1 + diagonal_h + Math.floor(height / 2));
+        context.lineTo(x2, y2);
+        context.stroke();
+    };
+
+    Window_SkillTree.prototype.drawSkillTreeType4Line = function(x1, y1, x2, y2, thick, color) {//EX
+        const context = this.contents._context;
+        context.strokeStyle = color;
+        context.lineWidth = thick;
+        const height = this.rowsMarginHeight();
+        context.beginPath();
+        context.moveTo(x1, y1);
+        context.lineTo(x1, y2 - Math.floor(height / 2));
+        context.lineTo(x2, y2 - Math.floor(height / 2));
+        context.lineTo(x2, y2);
+        context.stroke();
+    };
+
+    Window_SkillTree.prototype.drawSkillTreeType7Line = function(x1, y1, x2, y2, thick, color) {//EX
+        const context = this.contents._context;
+        context.strokeStyle = color;
+        context.lineWidth = thick;
+        const height = this.rowsMarginHeight();
+        context.beginPath();
+        context.moveTo(x1, y1);
+        context.lineTo(x1, y1 + Math.floor(height / 3));
+        context.lineTo(x2, y2 - Math.floor(height / 3));
+        context.lineTo(x2, y2);
+        context.stroke();
+    };
+
+    Window_SkillTree.prototype.rowsMarginHeight = function() {
+        return this.rowsMargin() + this.rowSpacing();
     };
 
     Window_SkillTree.prototype.drawCountBackgroundRect = function(x, y ,w, h) {
@@ -4419,25 +4494,8 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Window_SkillTree.prototype.getSecretText = function(skill) {
-        if(params.SkillTreeSecretText === '？' || params.SkillTreeSecretText === '?') {
-            const name_length = this.secretTextLength(skill);
-            return params.SkillTreeSecretText.repeat(name_length);
-        } else {
-            return params.SkillTreeSecretText;
-        }
-    };
-
     Window_SkillTree.prototype.numberWidth = function() {
         return params.SkillTreeNumText ? this.textWidth(params.SkillTreeTextWidth) : 0;
-    };
-
-    Window_SkillTree.prototype.secretTextLength = function(skill) {
-        return skill.name.length;
-    };
-
-    Window_SkillTree.prototype.getSecretIcon = function() {
-        return params.SecretIcon;
     };
 
     Window_SkillTree.prototype.isEnabled = function(data) {
@@ -4675,7 +4733,7 @@ Imported.NUUN_SkillTree = true;
                 text = params.LearnedName;
             } else {
                 this.resetTextColor();
-                text = params.SkillCostName.format($dataSkills[data.getLearnSkill()].name);
+                text = params.SkillCostName.format(data.getSkillName());
             }
         }
         this.drawText(text, x, y);
@@ -5404,12 +5462,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.isSkillTreeReqSkill = function(list, skillId) {
-        const reqList = list.filter(req => {
-            if (!!req.DerivedSkill) {
-                return req.DerivedSkill.includes(skillId);
-            }
-            return false;
-        }).map(t => t.SkillId);
+        const reqList = NuunManager.getSkillTreeReqSkillListId(list, skillId);
         if (reqList.length === 0) return true;
         return reqList.every(id => this.isSkillTreeLearned(id));
     };
@@ -5486,6 +5539,5 @@ Imported.NUUN_SkillTree = true;
             }
         }
     };
-
 
 })();

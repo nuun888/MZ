@@ -91,6 +91,7 @@
  * 9/7/2025 Ver.1.2.4
  * Fixed an issue where the skill name in the skill cost window would display the name of a secret skill.
  * Fixed to prevent numerical text from displaying for items set to Secret.
+ * Fixed an issue where an error would occur when opening the Skill Tree when the confirmation window was set to show.
  * 9/6/2025 Ver.1.2.3
  * Fixed an issue where the frame border would still appear even when disabled.
  * 9/6/2025 Ver.1.2.2
@@ -1490,6 +1491,7 @@
  * 2025/9/7 Ver.1.2.4
  * スキルコストウィンドウのスキル名でシークレット状態のスキル名が表示されてしまう問題を修正。
  * シークレット表示の項目に対して、数値テキストを表示しないように修正。
+ * 確認ウィンドウを表示に設定しているときに、スキルツリーを開くとエラーが出る問題を修正。
  * 2025/9/6 Ver.1.2.3
  * フレーム枠を無効にしても表示されてしまう問題を修正。
  * 2025/9/6 Ver.1.2.2
@@ -3578,17 +3580,17 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.skillTreeTypeWindowRect = function() {
         const w = _getWindowData("SkillTypeWindow");
-        const wy = w.WindowY + this.mainAreaTop();
+        const wy = (w.WindowY || 0) + this.mainAreaTop();
         const wh = this.calcWindowHeight(params.SkillTypeRows, true);
-        const wx = w.WindowX;
+        const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx - this.helpAreaBottomY(), w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         return new Rectangle(wx, wy, ww, wh);
     };
 
     Scene_SkillTree.prototype.skillTreeWindowRect = function() {
         const w = _getWindowData("SkillTreeWindow");
-        const wy = w.WindowY + this.mainAreaTop();
-        const wx = w.WindowX;
+        const wy = (w.WindowY || 0) + this.mainAreaTop();
+        const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         const wh = Math.min(Graphics.boxHeight - wy - this.helpAreaBottomY(), (w.WindowHeight > 0 ? w.WindowHeight : Graphics.boxHeight));
         return new Rectangle(wx, wy, ww, wh);
@@ -3596,8 +3598,8 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.skillTreeCostWindowRect = function() {
         const w = _getWindowData("SkillTreeCostWindow");
-        const wy = w.WindowY + this.mainAreaTop();
-        const wx = w.WindowX;
+        const wy = (w.WindowY || 0) + this.mainAreaTop();
+        const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         const wh = Math.min(Graphics.boxHeight - wy - this.helpAreaBottomY(), (w.WindowHeight > 0 ? w.WindowHeight : Graphics.boxHeight));
         return new Rectangle(wx, wy, ww, wh);
@@ -3605,8 +3607,8 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.skillTreeStatusWindowRect = function() {
         const w = _getWindowData("SkillTreeStatusWindow");
-        const wy = w.WindowY + this.mainAreaTop();
-        const wx = w.WindowX;
+        const wy = (w.WindowY || 0) + this.mainAreaTop();
+        const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         const wh = Math.min(Graphics.boxHeight - wy - this.helpAreaBottomY(), (w.WindowHeight > 0 ? w.WindowHeight : Graphics.boxHeight));
         return new Rectangle(wx, wy, ww, wh);
@@ -3614,20 +3616,20 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.skillTreeHelpWindowRect = function() {
         const w = _getWindowData("SkillTreeHelpWindow");
-        const wy = w.WindowY + this.helpAreaTop();
+        const wy = (w.WindowY || 0) + this.helpAreaTop();
         const wh = Math.min(Graphics.boxHeight - wy, (w.WindowHeight > 0 ? w.WindowHeight : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments)));
-        const wx = w.WindowX;
+        const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         return new Rectangle(wx, wy, ww, wh);
     };
 
     Scene_SkillTree.prototype.skillTreeConfirmationWindowRect = function() {
         const w = _getWindowData("SkillTreeConfirmationWindow");
-        const wy = w.WindowY + this.mainAreaTop();
+        const wy = (w.WindowY || 0) + this.mainAreaTop();
         const wh = this.calcWindowHeight(3, true);
-        const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
-        const wx = params.ConfirmationWindowCenter ? Math.floor(Graphics.boxWidth / 2) - Math.floor(ww / 2) : w.WindowX;
-        return new Rectangle(wx, wy, ww, wh);
+        const ww = w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth;
+        const wx = params.ConfirmationWindowCenter ? Math.floor(Graphics.boxWidth / 2) - Math.floor(ww / 2) : (w.WindowX || 0);
+        return new Rectangle(wx, wy, Math.min(Graphics.boxWidth - wx, ww), wh);
     };
 
     Scene_SkillTree.prototype.helpAreaBottomY = function() {

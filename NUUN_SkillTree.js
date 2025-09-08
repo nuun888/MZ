@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.4
+ * @version 1.2.5
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -88,6 +88,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/8/2025 Ver.1.2.5
+ * Fixed an issue where an error would occur when deleting a skill if cost refunds were enabled.
  * 9/7/2025 Ver.1.2.4
  * Fixed an issue where the skill name in the skill cost window would display the name of a secret skill.
  * Fixed to prevent numerical text from displaying for items set to Secret.
@@ -1415,7 +1417,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.4
+ * @version 1.2.5
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1488,6 +1490,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/9/8 Ver.1.2.5
+ * スキル削除時にコストの返還を有効にしている場合、エラーが出る問題を修正。
  * 2025/9/7 Ver.1.2.4
  * スキルコストウィンドウのスキル名でシークレット状態のスキル名が表示されてしまう問題を修正。
  * シークレット表示の項目に対して、数値テキストを表示しないように修正。
@@ -2961,26 +2965,26 @@ Imported.NUUN_SkillTree = true;
     };
 
     function _returnSkillTreeItem(data) {
-        const item = $dataItems[data.item];
+        const item = $dataItems[data.item[0]];
         if (item.meta.SkillTreeCostNoReturn) return;
-        $gameParty.gainItem(item, data.itemCost);
+        $gameParty.gainItem(item, data.itemCost[0]);
     };
 
     function _returnSkillTreeWeapon(data) {
-        const item = $dataWeapons[data.weapon];
+        const item = $dataWeapons[data.weapon[0]];
         if (item.meta.SkillTreeCostNoReturn) return;
-        $gameParty.gainItem(item, data.weaponCost);
+        $gameParty.gainItem(item, data.weaponCost[0]);
     };
 
     function _returnSkillTreeArmor(data) {
-        const item = $dataArmors[data.armor];
+        const item = $dataArmors[data.armor[0]];
         if (item.meta.SkillTreeCostNoReturn) return;
-        $gameParty.gainItem(item, data.armorCost);
+        $gameParty.gainItem(item, data.armorCost[0]);
     };
 
     function _returnSkillTreeVar(data) {
-        const value = $gameVariables.value(data.var);
-        $gameVariables.setValue(value - data.varCost);
+        const value = $gameVariables.value(data.var[0]);
+        $gameVariables.setValue(value - data.varCost[0]);
     };
 
     NuunManager.getSkillPointParamName = function() {
@@ -3313,24 +3317,24 @@ Imported.NUUN_SkillTree = true;
             }
         }
 
-        returnSkillTreeCost() {
-            if (this.cost > 0) {
-                this._actor.gainSkillPoint(this.cost);
+        returnSkillTreeCost(data) {
+            if (data.cost > 0) {
+                this._actor.gainSkillPoint(data.cost);
             }
-            if (this.item > 0) {
-                _returnSkillTreeItem(this);
+            if (data.item > 0) {
+                _returnSkillTreeItem(data);
             }
-            if (this.weapon > 0) {
-                _returnSkillTreeWeapon(this);
+            if (data.weapon > 0) {
+                _returnSkillTreeWeapon(data);
             }
-            if (this.armor > 0) {
-                _returnSkillTreeArmor(this);
+            if (data.armor > 0) {
+                _returnSkillTreeArmor(data);
             }
-            if (this.goldCost > 0) {
-                $gameParty.gainGold(this.goldCost);
+            if (data.goldCost > 0) {
+                $gameParty.gainGold(data.goldCost);
             }
-            if (this.var > 0) {
-                _returnSkillTreeVar(this);
+            if (data.var > 0) {
+                _returnSkillTreeVar(data);
             }
         }
 
@@ -5350,7 +5354,7 @@ Imported.NUUN_SkillTree = true;
         const learnData = this._learnSkillTreeSkillList[data._id];
         if (!!learnData) {
             if (r) {
-                learnData.returnSkillTreeCost();
+                data.returnSkillTreeCost(learnData);
             }
             this.forgetSkillTreeSkill(data);
         }

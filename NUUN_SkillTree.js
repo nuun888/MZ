@@ -90,6 +90,7 @@
  * Log
  * 9/8/2025 Ver.1.2.5
  * Fixed an issue where an error would occur when deleting a skill if cost refunds were enabled.
+ * Fixed an issue where costs for items, weapons, and armor were not being paid.
  * 9/7/2025 Ver.1.2.4
  * Fixed an issue where the skill name in the skill cost window would display the name of a secret skill.
  * Fixed to prevent numerical text from displaying for items set to Secret.
@@ -1492,6 +1493,7 @@
  * 更新履歴
  * 2025/9/8 Ver.1.2.5
  * スキル削除時にコストの返還を有効にしている場合、エラーが出る問題を修正。
+ * アイテム、武器、防具のコストが支払われていなかった問題を修正。
  * 2025/9/7 Ver.1.2.4
  * スキルコストウィンドウのスキル名でシークレット状態のスキル名が表示されてしまう問題を修正。
  * シークレット表示の項目に対して、数値テキストを表示しないように修正。
@@ -3364,19 +3366,19 @@ Imported.NUUN_SkillTree = true;
             if (this.getCost() > 0 && this.isCanCost(this._actor.nsp)) {
                 this._actor.paySkillTreePoint(this.getCost());
             }
-            if (this.getCostItem() > 0 && $gameParty.numItems($dataItems[this.getCostItem()]) < this.getItemNum()) {
-                $gameParty.gainItem($dataItems[this.getCostItem()], this.getItemNum());
+            if (this.getCostItem() > 0 && $gameParty.numItems($dataItems[this.getCostItem()]) >= this.getItemNum()) {
+                $gameParty.loseItem($dataItems[this.getCostItem()], this.getItemNum());
             }
-            if (this.getCostWeapon() > 0 && $gameParty.numItems($dataWeapons[this.getCostWeapon()]) <this.getWeaponNum()) {
-                $gameParty.gainItem($dataWeapons[this.getCostWeapon()], this.getWeaponNum());
+            if (this.getCostWeapon() > 0 && $gameParty.numItems($dataWeapons[this.getCostWeapon()]) >= this.getWeaponNum()) {
+                $gameParty.loseItem($dataWeapons[this.getCostWeapon()], this.getWeaponNum());
             }
-            if (this.getCostArmor() > 0 && $gameParty.numItems($dataArmors[this.getCostArmor()]) < this.getArmorNum()) {
-                $gameParty.gainItem($dataArmors[this.getCostArmor()], this.getArmorNum());
+            if (this.getCostArmor() > 0 && $gameParty.numItems($dataArmors[this.getCostArmor()]) >= this.getArmorNum()) {
+                $gameParty.loseItem($dataArmors[this.getCostArmor()], this.getArmorNum());
             }
             if (this.getCostGold() > 0 && !this.getCanGold($gameParty.gold())) {
                 $gameParty.loseGold(this.getCostGold());
             }
-            if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables()) < this.getVariableNum()) {
+            if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables()) >= this.getVariableNum()) {
                 const value = $gameVariables.value(this.getCostVariables());
                 $gameVariables.setValue(value - this.getVariableNum());
             }
@@ -5043,7 +5045,7 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Game_Actor.prototype.setupLearnSkillTreeData = function(data) {
+    Game_Actor.prototype.setupLearnSkillTreeData = function(data) {console.log("ccc")
         let learnData = this.getLearnSkillTreeSkill(data._id);
         if (!learnData) {
             learnData = this.learnSkillTreeData();

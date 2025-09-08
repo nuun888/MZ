@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.2.4
+# Ver.1.2.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -147,6 +147,8 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/9/8 Ver.1.2.5  
+スキル削除時にコストの返還を有効にしている場合、エラーが出る問題を修正。  
 2025/9/7 Ver.1.2.4  
 スキルコストウィンドウのスキル名でシークレット状態のスキル名が表示されてしまう問題を修正。  
 シークレット表示の項目に対して、数値テキストを表示しないように修正。  

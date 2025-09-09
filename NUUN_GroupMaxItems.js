@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Item group possession limit
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MaxItem
@@ -30,6 +30,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/9/2025 Ver.1.1.2
+ * Fixed an issue where items with group key settings were being calculated including the total number of items.
  * 8/31/2025 Ver.1.1.1
  * Fixed an issue where group totals were not being applied.
  * 8/25/2025 Ver.1.1.0

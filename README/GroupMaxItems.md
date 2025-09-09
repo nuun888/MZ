@@ -1,5 +1,5 @@
 # [アイテムグループ所持制限](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js)
-# Ver.1.1.1
+# Ver.1.1.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GroupMaxItems.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -12,6 +12,8 @@
 プラグインコマンドを使用して最大合計個数を超えてしまったアイテムはそのまま残ります。  
 
 ## 更新履歴  
+2025/9/9 Ver 1.1.2  
+グループキー設定しているアイテムがアイテム全体個数を含んで計算されていた問題を修正。  
 2025/8/31 Ver 1.1.1　　
 グループ合計数が適用されていなかった問題を修正。　　
 2025/8/25 Ver 1.1.0  

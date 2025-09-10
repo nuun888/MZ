@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.5
+ * @version 1.2.6
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -88,6 +88,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 9/10/2025 Ver.1.2.6
+ * Fixed an issue where the cost display of weapons and armor was not displaying the correct number of items.
  * 9/8/2025 Ver.1.2.5
  * Fixed an issue where an error would occur when deleting a skill if cost refunds were enabled.
  * Fixed an issue where costs for items, weapons, and armor were not being paid.
@@ -1418,7 +1420,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.5
+ * @version 1.2.6
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1491,6 +1493,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/9/10 Ver.1.2.6
+ * コスト表示の武器、防具の所持数が正常に表示されていなかった問題を修正。
  * 2025/9/8 Ver.1.2.5
  * スキル削除時にコストの返還を有効にしている場合、エラーが出る問題を修正。
  * アイテム、武器、防具のコストが支払われていなかった問題を修正。
@@ -3362,6 +3366,30 @@ Imported.NUUN_SkillTree = true;
             return true;
         }
 
+        isPaySkillTreeSkillPointCostOk() {
+            return this.isCanCost(this._actor.nsp);
+        }
+
+        isPaySkillTreeItemCostOk() {
+            return $gameParty.numItems($dataItems[this.getCostItem()]) >= this.getItemNum();
+        }
+
+        isPaySkillTreeWeaponCostOk() {
+            return $gameParty.numItems($dataWeapons[this.getCostWeapon()]) >= this.getWeaponNum();
+        }
+
+        isPaySkillTreeArmorCostOk() {
+            return $gameParty.numItems($dataArmors[this.getCostArmor()]) >= this.getArmorNum();
+        }
+
+        isPaySkillTreeGoldCostOk() {
+            return this.getCanGold($gameParty.gold());
+        }
+
+        isPaySkillTreeVariablesCostOk() {
+            return $gameVariables.value(this.getCostVariables() >= this.getVariableNum());
+        }
+
         paySkillTreeCost() {
             if (this.getCost() > 0 && this.isCanCost(this._actor.nsp)) {
                 this._actor.paySkillTreePoint(this.getCost());
@@ -4843,9 +4871,9 @@ Imported.NUUN_SkillTree = true;
             case 'item':
                 return $gameParty.numItems($dataItems[data.getCostItem()]);
             case 'weapon':
-                return $gameParty.numItems($dataItems[data.getCostWeapon()]);
+                return $gameParty.numItems($dataWeapons[data.getCostWeapon()]);
             case 'armor':
-                return $gameParty.numItems($dataItems[data.getCostArmor()]);
+                return $gameParty.numItems($dataArmors[data.getCostArmor()]);
             case 'gold':
                 return $gameParty.gold();
             case 'var':
@@ -5045,7 +5073,7 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Game_Actor.prototype.setupLearnSkillTreeData = function(data) {console.log("ccc")
+    Game_Actor.prototype.setupLearnSkillTreeData = function(data) {
         let learnData = this.getLearnSkillTreeSkill(data._id);
         if (!learnData) {
             learnData = this.learnSkillTreeData();

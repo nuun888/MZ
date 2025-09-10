@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.2.5
+# Ver.1.2.6
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -147,6 +147,8 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/9/10 Ver.1.2.6  
+コスト表示の武器、防具の所持数が正常に表示されていなかった問題を修正。  
 2025/9/8 Ver.1.2.5  
 スキル削除時にコストの返還を有効にしている場合、エラーが出る問題を修正。  
 アイテム、武器、防具のコストが支払われていなかった問題を修正。  

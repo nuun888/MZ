@@ -2,8 +2,6 @@
  * NUUN_SkillTree.js
  * 
  * Copyright (C) 2025 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
@@ -12,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.6
+ * @version 1.2.7
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -85,9 +83,18 @@
  * [rate]:Probability
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/12/2025 Ver.1.2.7
+ * Added a feature to set the level numerically in the learning conditions.
+ * Fixed an issue where the acquisition count was set to 0 when acquiring a skill outside of the skill tree.
+ * Changed some processing.
  * 9/10/2025 Ver.1.2.6
  * Fixed an issue where the cost display of weapons and armor was not displaying the correct number of items.
  * 9/8/2025 Ver.1.2.5
@@ -601,7 +608,14 @@
  * @text Learned names
  * @desc Learned display name.
  * @type string
- * @default 習得済み
+ * @default "Already learned"
+ * @parent SkillTreeCostSetting
+ * 
+ * @param LearningLevelName
+ * @text Name of the learnable level
+ * @desc The display name of the level that can be learned.
+ * @type string
+ * @default Learning Level
  * @parent SkillTreeCostSetting
  * 
  * @param SkillCostIcon
@@ -1314,6 +1328,13 @@
  * @default 0
  * @parent LearnSetting
  * 
+ * @param LearningLevel
+ * @text Levels at which learning is possible
+ * @desc Specify the level you can learn. 0 means no limit
+ * @type number
+ * @default 0
+ * @parent LearnSetting
+ * 
  * @param LearnCondText
  * @text Learning condition text
  * @desc The text of the learning conditions to be displayed in the cost window. Control characters can be used.
@@ -1420,7 +1441,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.6
+ * @version 1.2.7
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1490,9 +1511,18 @@
  * [rate]:確率
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/12 Ver.1.2.7
+ * 習得条件にレベルを数値で設定できる機能を追加。
+ * スキルツリー習得以外でスキルを習得した際に、習得カウント回数が0になっていた問題を修正。
+ * 一部の処理を変更。
  * 2025/9/10 Ver.1.2.6
  * コスト表示の武器、防具の所持数が正常に表示されていなかった問題を修正。
  * 2025/9/8 Ver.1.2.5
@@ -2010,6 +2040,13 @@
  * @default 習得済み
  * @parent SkillTreeCostSetting
  * 
+ * @param LearningLevelName
+ * @text 習得可能レベル名称
+ * @desc 習得可能レベルの表示名。
+ * @type string
+ * @default 習得可能レベル
+ * @parent SkillTreeCostSetting
+ * 
  * @param SkillCostIcon
  * @text スキルポイント消費アイコン
  * @desc スキルポイントを消費するテキストのアイコンを指定します。
@@ -2067,6 +2104,13 @@
  * @param VisibleSkillPointZero
  * @desc スキルポイントのコストが0でもコストウィンドウに表示させます。
  * @text スキルポイントコスト0表示
+ * @type boolean
+ * @default false
+ * @parent SkillTreeCostSetting
+ * 
+ * @param VisibleLearningLevel
+ * @desc 習得可能レベルを表示しません。
+ * @text 習得可能レベル表示なし
  * @type boolean
  * @default false
  * @parent SkillTreeCostSetting
@@ -2720,6 +2764,13 @@
  * @default 0
  * @parent LearnSetting
  * 
+ * @param LearningLevel
+ * @text 習得可能レベル
+ * @desc 習得可能なレベルを指定します。0で制限なし
+ * @type number
+ * @default 0
+ * @parent LearnSetting
+ * 
  * @param LearnCond
  * @text 習得条件
  * @desc スキルを習得する条件をJavaScriptで記入します。
@@ -3028,11 +3079,13 @@ Imported.NUUN_SkillTree = true;
             this._learnCond = data.LearnCond || "";
             this._learnCondText = data.LearnCondText || "";
             this._enabled = true;
+            this._isPrerequisiteSkill = false;
             this._force = data.ForcedPlacement;
             this._spriteIndex = _isSpriteSheet() ? this.getSkillFrame(data) : 0;
             this._derivedLineType = data.LineType === "none" ? params.LineType : (data.LineType || params.LineType);
             this._maxCount = data.MaxCount || 0;
             this._countLearnSkillList = data.CountLearnSkill;
+            this._learningLevel = data.LearningLevel || 0;
             this.setCountLearnSkillData();
             this.setupCost(data);
             this.updateCost();
@@ -3095,23 +3148,37 @@ Imported.NUUN_SkillTree = true;
             if (this._costVariables > 0 && this._consumeVariables > 0) {
                 list.push("var");
             }
+            if (this._learningLevel > 0) {
+                list.push("level");
+            }
             this._displayCostList = list;
         }
 
         getCostNum(type) {
             switch (type) {
-            case "sp":
-                return this.getCost();
-            case 'item':
-                return this.getItemNum();
-            case 'weapon':
-                return this.getWeaponNum();
-            case 'armor':
-                return this.getArmorNum();
-            case 'gold':
-                return this.getCostGold();
-            case 'var':
-                return this.getVariableNum();
+                case "sp":
+                    return this.getCost();
+                case 'item':
+                    return this.getItemNum();
+                case 'weapon':
+                    return this.getWeaponNum();
+                case 'armor':
+                    return this.getArmorNum();
+                case 'gold':
+                    return this.getCostGold();
+                case 'var':
+                    return this.getVariableNum();
+                case 'level':
+                    return this._learningLevel;
+            }
+        }
+
+        isVisibleCost(type) {
+            switch (type) {
+                case 'level':
+                    return params.VisibleLearningLevel;
+                default:
+                    return false;
             }
         }
 
@@ -3217,6 +3284,14 @@ Imported.NUUN_SkillTree = true;
 
         getSecret() {
             return this._secret;
+        }
+
+        setupPrerequisiteSkill(flag) {
+            this._isPrerequisiteSkill = flag;
+        }
+
+        getPrerequisiteSkill() {
+            return this._isPrerequisiteSkill;
         }
 
         getLearn() {
@@ -3451,6 +3526,14 @@ Imported.NUUN_SkillTree = true;
             return eval(cond);
         };
 
+        isLearningLevel() {
+            return this._actor._level >= this._learningLevel;
+        }
+
+        getLearningLevel() {
+            return this._learningLevel;
+        }
+
     }
 
     window.SkillTreeData = SkillTreeData;
@@ -3485,7 +3568,6 @@ Imported.NUUN_SkillTree = true;
                 break;
         }
     };
-
 
 
     const _Window_MenuCommand_addOriginalCommands = Window_MenuCommand.prototype.addOriginalCommands;
@@ -3576,7 +3658,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.createSkillTreeConfirmationWindow = function() {
-        _setConfirmation(params.LearnConfirmation)
+        _setConfirmation(params.LearnConfirmation);
         if (params.LearnConfirmation) {
             const rect = this.skillTreeConfirmationWindowRect();
             this._confirmationWindow = new Window_SkillTreeConfirmation(rect);
@@ -4198,15 +4280,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.isSkillTreeCond = function(data) {
-        return this._actor.isSkillTreeCond(data);
-    };
-
-    Window_SkillTree.prototype.isSkillTreeSecretCond = function(data) {
-        return this._actor.isSkillTreeSecretCond(data);
-    };
-
-    Window_SkillTree.prototype.isSkillTreeLearnCond = function(data) {
-        return this._actor.isSkillTreeLearnCond(data);
+        return data.isSkillTreeCond();
     };
 
     Window_SkillTree.prototype.getSkillTreeData = function(data) {
@@ -4250,7 +4324,7 @@ Imported.NUUN_SkillTree = true;
             const skill = $dataSkills[skillId];
             const enabled = this.isEnabled(data);
             const learned = this._actor.isSkillTreeLearned(data._id);
-            const secret = this.isSkillTreeSecretCond(data);
+            const secret = data.isSkillTreeSecretCond();
             this.changePaintOpacity(enabled);
             this._learnedSkillColor = learned && params.LearnedColor >= 0 ? NuunManager.getColorCode(params.LearnedColor) : null;
             this.drawSkillTreeText(data, skill, rect, enabled, secret);
@@ -4535,11 +4609,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.isEnabled = function(data) {
-        return !!data && this.isMultipleCount(data) || !!data && this.isReqSkill(data) && data.isPaySkillTreeCostOk() && this.isSkillTreeEvalCond(data);
+        return !!data && this.isMultipleCount(data) || !!data && this.isPrerequisiteSkill(data) && data.isPaySkillTreeCostOk() && this.isSkillTreeEvalCond(data);
     };
 
     Window_SkillTree.prototype.isSkillTreeEvalCond = function(data) {
-        return this.isSkillTreeSecretCond(data) && this.isSkillTreeLearnCond(data);
+        return data.isSkillTreeSecretCond() && data.isSkillTreeLearnCond() && data.isLearningLevel();
     };
 
     Window_SkillTree.prototype.isCurrentItemEnabled = function() {
@@ -4550,10 +4624,15 @@ Imported.NUUN_SkillTree = true;
         return this._learnOk;
     };
 
-    Window_SkillTree.prototype.isReqSkill = function(data) {
+    Window_SkillTree.prototype.setIsPrerequisitSkill = function(data) {
         const list = this.getSkillTreeList();
         if (!list) return [];
-        return this._actor.isSkillTreeReqSkill(list, data._id);
+        data.setupPrerequisiteSkill(this._actor.isSkillTreeReqSkill(list, data._id));
+    };
+
+    Window_SkillTree.prototype.isPrerequisiteSkill = function(data) {
+        this.setIsPrerequisitSkill(data);
+        return data.getPrerequisiteSkill();
     };
 
     Window_SkillTree.prototype.isMultipleCount = function(data) {
@@ -4718,7 +4797,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeCost.prototype.makeItemList = function() {
-        this._data = this._treeData ? this._treeData.getCostList() : [];
+        this._data = this._treeData ? this.showCostList(this._treeData) : [];
+    };
+
+    Window_SkillTreeCost.prototype.showCostList = function(data) {
+        return data.getCostList().filter(type => !data.isVisibleCost(type));
     };
 
     Window_SkillTreeCost.prototype.itemAt = function(index) {
@@ -4746,7 +4829,6 @@ Imported.NUUN_SkillTree = true;
     Window_SkillTreeCost.prototype.drawItemBackground = function(index) {
 
     };
-
 
     Window_SkillTreeCost.prototype.drawItem = function(index) {
         const textWidth = this.textWidth("0000");
@@ -4782,7 +4864,6 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-
     Window_SkillTreeCost.prototype.drawCost = function(type, data, x, y, width) {
         this.changeTextColor(ColorManager.systemColor());
         switch (type) {
@@ -4803,6 +4884,9 @@ Imported.NUUN_SkillTree = true;
                 break;
             case 'var':
                 this.drawSkillCostIconName(data.getVariablesText(), params.VarCostIcon, x, y, width);
+                break;
+            case 'level':
+                this.drawLevel(x, y, width);
                 break;
         }
     };
@@ -4858,6 +4942,10 @@ Imported.NUUN_SkillTree = true;
         this.drawText(text, x, y, width);
     };
 
+    Window_SkillTreeCost.prototype.drawLevel = function(x, y, width) {
+        this.drawText(params.LearningLevelName, x, y, width);
+    };
+
     Window_SkillTreeCost.prototype.drawCostTextEx = function(data, x, y) {
         if (data.getLearnCondText()) {
             this.drawTextEx(data.getLearnCondText(), x, y);
@@ -4878,6 +4966,8 @@ Imported.NUUN_SkillTree = true;
                 return $gameParty.gold();
             case 'var':
                 return data.getCostVariables();
+            case 'level':
+                return this._actor._level;
         }
     };
 
@@ -5033,16 +5123,17 @@ Imported.NUUN_SkillTree = true;
     Game_Actor.prototype.initMembers = function() {
         _Game_Actor_initMembers.call(this);
         this._nsp = 0;
+        this._cnsp = [];
         this._skillTreeList = null;
         this._learnSkillTreeSkillList = null;
         this.learnCount = 0;//総スキル習得回数
-        this.totalSp = 0;//最大スキルポイント
+        this.totalSp = 0;//総スキルポイント
     };
 
     const _Game_Actor_setup = Game_Actor.prototype.setup;
     Game_Actor.prototype.setup = function(actorId) {
         _Game_Actor_setup.apply(this, arguments);
-        this._nsp = this.initSkillPoint(actorId);
+        this.setSkillPoint(this.initSkillPoint(actorId));
         this.gainTotalSkillPoint(this._nsp);
         this.setupSkillTreeList();
         this.initLearnSkillList();
@@ -5070,6 +5161,16 @@ Imported.NUUN_SkillTree = true;
         if (!this._learnSkillTreeSkillList) {
             this._learnSkillTreeSkillList = [];
             this.setStartLearnSkillTreeList();
+        }
+    };
+
+    Game_Actor.prototype.initSkillPoint = function() {
+        if (params.IsClassSp && !this._cnsp) {
+            this._cnsp = [];
+        }
+        const sp = params.IsClassSp ? this._cnsp[this._classId] : this._nsp;
+        if (isNaN(sp)) {
+            this.setSkillPoint(this.initBattlerSkillPoint(this.actorId()));
         }
     };
 
@@ -5225,7 +5326,7 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Game_Actor.prototype.initSkillPoint = function(actorId) {
+    Game_Actor.prototype.initBattlerSkillPoint = function(actorId) {
         const actor = $dataActors[actorId];
         const _class = this.currentClass();
         const cost = NuunManager.getMetaCode(_class, "InitSkillPoint") || NuunManager.getMetaCode(actor, "InitSkillPoint");
@@ -5316,11 +5417,22 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.gainSkillPoint = function(sp) {
-        if (isNaN(this._nsp)) {
-            this._nsp = this.initSkillPoint(this.actorId());
+        this.initSkillPoint();
+        const newSp = (params.IsClassSp ? this._cnsp[this._classId] : this._nsp) + sp;
+        this.setSkillPoint(newSp.clamp(0, this.maxSkillTreePoint()));
+    };
+
+    Game_Actor.prototype.setSkillPoint = function(sp) {
+        if (params.IsClassSp) {
+            this._cnsp[this._classId] = sp;
+        } else{
+            this._nsp = sp;
         }
-        this._nsp += sp;
-        this._nsp = this._nsp.clamp(0, this.maxSkillTreePoint());
+    };
+
+    Game_Actor.prototype.getSkillPoint = function() {
+        this.initSkillPoint();
+        return params.IsClassSp ? this._cnsp[this._classId] : this._nsp;
     };
 
     Game_Actor.prototype.gainTotalSkillPoint = function(sp) {
@@ -5328,13 +5440,6 @@ Imported.NUUN_SkillTree = true;
             this.totalSp = 0;
         }
         this.totalSp += sp;
-    };
-
-    Game_Actor.prototype.getSkillPoint = function() {
-        if (isNaN(this._nsp)) {
-            this._nsp = this.initSkillPoint(this.actorId());
-        }
-        return this._nsp;
     };
 
     Game_Actor.prototype.isMultipleCount = function(skillId ,maxCount) {
@@ -5346,7 +5451,7 @@ Imported.NUUN_SkillTree = true;
     Game_Actor.prototype.getSkillTreeCount = function(skillId) {
         this.initLearnSkillList();
         const learnSkill = this._learnSkillTreeSkillList[skillId];
-        return !!learnSkill ? (learnSkill.count) : 0;
+        return !!learnSkill ? (learnSkill.count) : (this.isLearnedSkill(skillId) ? 1 : 0);
     };
 
     const _Game_Actor_levelUp = Game_Actor.prototype.levelUp;
@@ -5455,46 +5560,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.isSkillTreeEvalCond = function(data) {
-        return this.isSkillTreeCond(data) && this.isSkillTreeSecretCond(data) && this.isSkillTreeLearnCond(data);
-    };
-
-    Game_Actor.prototype.isSkillTreeCond = function(data) {
-        const cond = data.getCond();
-        if (!cond) return true;
-        const d = data;
-        const v = $gameVariables._data;
-        const s = $gameSwitches._data;
-        const skillId = data._id;
-        const count = this.getSkillTreeCount(data._id);
-        const maxCount = data.getMaxCount() || 1;
-        const actor = this;
-        return eval(cond);
-    };
-
-    Game_Actor.prototype.isSkillTreeSecretCond = function(data) {
-        const cond = data.getSecret();
-        if (!cond) return true;
-        const d = data;
-        const v = $gameVariables._data;
-        const s = $gameSwitches._data;
-        const skillId = data._id;
-        const count = this.getSkillTreeCount(data._id);
-        const maxCount = data.getMaxCount() || 1;
-        const actor = this;
-        return eval(cond);
-    };
-
-    Game_Actor.prototype.isSkillTreeLearnCond = function(data) {
-        const cond = data.getLearn();
-        if (!cond) return true;
-        const d = data;
-        const v = $gameVariables._data;
-        const s = $gameSwitches._data;
-        const skillId = data._id;
-        const count = this.getSkillTreeCount(data._id);
-        const maxCount = data.getMaxCount() || 1;
-        const actor = this;
-        return eval(cond);
+        return data.isSkillTreeCond() && data.isSkillTreeSecretCond() && data.isSkillTreeLearnCond() && data.isLearningLevel();
     };
 
     Game_Actor.prototype.isSkillTreeReqSkill = function(list, skillId) {

@@ -679,6 +679,13 @@
  * @default false
  * @parent SkillTreeCostSetting
  * 
+ * @param VisibleLearningLevel
+ * @desc Does not display the level available for learning.
+ * @text No learning level display
+ * @type boolean
+ * @default false
+ * @parent SkillTreeCostSetting
+ * 
  * @param SkillTreeStatusSetting
  * @text Status window settings
  * @default ------------------------------

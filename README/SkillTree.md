@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.2.6
+# Ver.1.2.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -154,6 +154,10 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/9/12 Ver.1.2.7  
+習得条件にレベルを数値で設定できる機能を追加。  
+スキルツリー習得以外でスキルを習得した際に、習得カウント回数が0になっていた問題を修正。  
+一部の処理を変更。  
 2025/9/10 Ver.1.2.6  
 コスト表示の武器、防具の所持数が正常に表示されていなかった問題を修正。  
 2025/9/8 Ver.1.2.5  

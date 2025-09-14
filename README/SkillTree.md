@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.2.8
+# Ver.1.2.9
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -154,6 +154,10 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
 
 ## 更新履歴
+2025/9/14 Ver.1.2.9  
+スキル項目のアイコン、文字の位置を調整する機能を追加。  
+スキルポイント増減アイテム、リセットアイテムでアクターを選択できない問題を修正。  
+複数回習得でスキルポイントが全て返還されていなかった問題を修正。  
 2025/9/13 Ver.1.2.8  
 横余白の修正。  
 2025/9/12 Ver.1.2.7  

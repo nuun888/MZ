@@ -12,8 +12,8 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 #### オプション
-[スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
-[拡張スキル習得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeLearnEx.js)  
+[スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)MITライセンス  
+[拡張スキル習得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeLearnEx.js)MITライセンス  
 前提スキルウィンドウ  
 
 ツリー型のスキル習得システムを実装します。  

@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.8
+ * @version 1.2.9
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -91,6 +91,10 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/14/2025 Ver.1.2.9
+ * Added the ability to adjust the position of skill item icons and text.
+ * Fixed an issue where actors could not be selected for skill point increase/decrease items and reset items.
+ * Fixed an issue where not all skill points were refunded when learning a skill multiple times.
  * 9/13/2025 Ver.1.2.8
  * Corrected horizontal margins.
  * 9/12/2025 Ver.1.2.7
@@ -395,6 +399,13 @@
  * @option Skill
  * @value "name"
  * @default "default"
+ * @parent SkillTreeTextSetting
+ * 
+ * @param SkillTreeTextX
+ * @text Text position X (relative)
+ * @desc Adjusts the X position of the skill (icon).
+ * @type number
+ * @default 0
  * @parent SkillTreeTextSetting
  * 
  * @param SkillTreeSecretText
@@ -894,6 +905,13 @@
  * @option None
  * @value none
  * @default type1
+ * @parent LineSetting
+ * 
+ * @param LineDiagonalWidth
+ * @text Hook mark length
+ * @desc Specifies the length of the hook mark.
+ * @type number
+ * @default 30
  * @parent LineSetting
  * 
  * @param LineThick
@@ -1450,7 +1468,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.8
+ * @version 1.2.9
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1528,6 +1546,10 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/14 Ver.1.2.9
+ * スキル項目のアイコン、文字の位置を調整する機能を追加。
+ * スキルポイント増減アイテム、リセットアイテムでアクターを選択できない問題を修正。
+ * 複数回習得でスキルポイントが全て返還されていなかった問題を修正。
  * 2025/9/13 Ver.1.2.8
  * 横余白の修正。
  * 2025/9/12 Ver.1.2.7
@@ -1833,6 +1855,13 @@
  * @option スキル名のみ
  * @value "name"
  * @default "default"
+ * @parent SkillTreeTextSetting
+ * 
+ * @param SkillTreeTextX
+ * @text 文字位置X(相対)
+ * @desc 項目(アイコン)のX位置を調整します。
+ * @type number
+ * @default 0
  * @parent SkillTreeTextSetting
  * 
  * @param SkillTreeSecretText
@@ -2332,6 +2361,13 @@
  * @option なし
  * @value none
  * @default type1
+ * @parent LineSetting
+ * 
+ * @param LineDiagonalWidth
+ * @text カギ線長さ
+ * @desc カギ線の長さを指定します。
+ * @type number
+ * @default 30
  * @parent LineSetting
  * 
  * @param LineThick
@@ -3033,26 +3069,46 @@ Imported.NUUN_SkillTree = true;
     };
 
     function _returnSkillTreeItem(data) {
-        const item = $dataItems[data.item[0]];
-        if (item.meta.SkillTreeCostNoReturn) return;
-        $gameParty.gainItem(item, data.itemCost[0]);
+        const list = data.item;
+        if ($dataItems[list[0]].meta.SkillTreeCostNoReturn) return;
+        for (let i = 0; i < list.length; i++) {
+            if (!isNaN(list[i])) {
+                const item = $dataItems[list[i]];
+                $gameParty.gainItem(item, data.itemCost[i]);
+            }
+        }
     };
 
     function _returnSkillTreeWeapon(data) {
-        const item = $dataWeapons[data.weapon[0]];
-        if (item.meta.SkillTreeCostNoReturn) return;
-        $gameParty.gainItem(item, data.weaponCost[0]);
+        const list = data.weapon;
+        if ($dataWeapons[list[0]].meta.SkillTreeCostNoReturn) return;
+        for (let i = 0; i < list.length; i++) {
+            if (!isNaN(list[i])) {
+                const item = $dataWeapons[list[i]];
+                $gameParty.gainItem(item, data.weaponCost[i]);
+            }
+        }
     };
 
     function _returnSkillTreeArmor(data) {
-        const item = $dataArmors[data.armor[0]];
-        if (item.meta.SkillTreeCostNoReturn) return;
-        $gameParty.gainItem(item, data.armorCost[0]);
+        const list = data.armor;
+        if ($dataArmors[list[0]].meta.SkillTreeCostNoReturn) return;
+        for (let i = 0; i < list.length; i++) {
+            if (!isNaN(list[i])) {
+                const item = $dataArmors[list[i]];
+                $gameParty.gainItem(item, data.armorCost[i]);
+            }
+        }
     };
 
     function _returnSkillTreeVar(data) {
-        const value = $gameVariables.value(data.var[0]);
-        $gameVariables.setValue(value - data.varCost[0]);
+        const list = data.var;
+        for (let i = 0; i < list.length; i++) {
+            if (!isNaN(list[i])) {
+                const value = $gameVariables.value(list[i]);
+                $gameVariables.setValue(value - data.varCost[i]);
+            }
+        }
     };
 
     NuunManager.getSkillPointParamName = function() {
@@ -3379,6 +3435,10 @@ Imported.NUUN_SkillTree = true;
             return this._countLearnSkillData.LearnSkillId;
         }
 
+        isCostValid() {
+            return this._countLearnSkillData && this._countLearnSkillData.CostValid;
+        }
+
         getSkillName(skill) {
             skill = !!skill ? skill : $dataSkills[this.getLearnSkill()];
             return this.isSkillTreeSecretCond() ? skill.name : this.getSecretText(skill);
@@ -3422,19 +3482,19 @@ Imported.NUUN_SkillTree = true;
             if (data.cost > 0) {
                 this._actor.gainSkillPoint(data.cost);
             }
-            if (data.item > 0) {
+            if (!!data.item && data.item[0] > 0) {
                 _returnSkillTreeItem(data);
             }
-            if (data.weapon > 0) {
+            if (!!data.weapon && data.weapon[0] > 0) {
                 _returnSkillTreeWeapon(data);
             }
-            if (data.armor > 0) {
+            if (!!data.armor && data.armor[0] > 0) {
                 _returnSkillTreeArmor(data);
             }
             if (data.goldCost > 0) {
                 $gameParty.gainGold(data.goldCost);
             }
-            if (data.var > 0) {
+            if (!!data.var && data.var[0] > 0) {
                 _returnSkillTreeVar(data);
             }
         }
@@ -4360,25 +4420,27 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.drawSkillTreeText = function(data, skill, rect, enabled, secret) {
+        const x = rect.x + (params.SkillTreeTextX || 0);
+        const w = rect.width - (this.numberWidth() + (params.SkillTreeTextX || 0));
         if (!enabled && !secret) {
             if (params.SkillTreeTextType === "icon") {
-                const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+                const iconY = x + (this.lineHeight() - ImageManager.iconHeight) / 2;
                 this.drawIcon(data.getSecretIcon(), rect.x, iconY);
             } else {
-                this.drawText(data.getSkillSecretName(skill), rect.x, rect.y, rect.width - this.numberWidth());
+                this.drawText(data.getSkillSecretName(skill), x, rect.y, w);
             }
             data.enabled();
         } else {
             switch (params.SkillTreeTextType) {
                 case "icon":
                     const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
-                    this.drawIcon(skill.iconIndex, rect.x, iconY);
+                    this.drawIcon(skill.iconIndex, x, iconY);
                     break;
                 case "default":
-                    this.drawItemName(skill, rect.x, rect.y, rect.width - this.numberWidth());
+                    this.drawItemName(skill, x, rect.y, w);
                     break;
                 case "name":
-                    this.drawText(skill.name, rect.x, rect.y, rect.width - this.numberWidth());
+                    this.drawText(skill.name, x, rect.y, w);
                     break;
             }
         }
@@ -4584,7 +4646,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.rowsMarginHeight = function() {
-        return this.rowsMargin() + this.rowSpacing();
+        return Math.min((params.LineDiagonalWidth || 30), this.rowsMargin() + this.rowSpacing());
     };
 
     Window_SkillTree.prototype.getLineX = function(rect) {
@@ -5141,9 +5203,19 @@ Imported.NUUN_SkillTree = true;
     Game_Action.prototype.skillTreeResetItem = function(target) {
         const item = this.item();
         if (!!item.meta.SkillTreeReset) {
-            _SkillTreeResets(target);
+            _SkillTreeResets(target, true);
             this.makeSuccess(target);
         }
+    };
+
+    const _Game_Action_testApply = Game_Action.prototype.testApply;
+    Game_Action.prototype.testApply = function(target) {
+        return _Game_Action_testApply.call(this, target) || this.isSkillTreeItems();
+    };
+
+    Game_Action.prototype.isSkillTreeItems = function() {
+        const item = this.item();
+        return !!item.meta.SkillTreeReset || !!item.meta.GainSkillPoint;
     };
 
 
@@ -5182,15 +5254,15 @@ Imported.NUUN_SkillTree = true;
             higherSkills:[],
             count:0 ,
             cost:0 ,
-            item:[0],
-            itemCost:[0],
-            weapon:[0],
-            weaponCost:[0],
-            armor:[0],
-            armorCost:[0],
+            item:[],
+            itemCost:[],
+            weapon:[],
+            weaponCost:[],
+            armor:[],
+            armorCost:[],
             goldCost:0,
-            var:[0],
-            varCost:[0],
+            var:[],
+            varCost:[],
         }
     };
 
@@ -5219,26 +5291,34 @@ Imported.NUUN_SkillTree = true;
         learnData.skillId = data._id;
         learnData.count = Math.min(learnData.count + 1, (data.getMaxCount() || 1));
         if (data.getCost() > 0) {
-            learnData.cost = data.getCost();
+            learnData.cost += data.getCost();
         }
         if (data.getCostItem() > 0) {
-            learnData.item[0] = data.getCostItem();
-            learnData.itemCost[0] += data.getItemNum();
+            const i = learnData.item.indexOf(data.getCostItem());
+            const index = i >= 0 ? i : learnData.item.length;
+            learnData.item[index] = data.getCostItem();
+            learnData.itemCost[index] = (learnData.itemCost[index] || 0) + data.getItemNum();
         }
         if (data.getCostWeapon() > 0) {
-            learnData.weapon[0] = data.getCostWeapon();
-            learnData.weaponCost[0] += data.getWeaponNum();
+            const i = learnData.weapon.indexOf(data.getCostWeapon());
+            const index = i >= 0 ? i : learnData.weapon.length;
+            learnData.weapon[index] = data.getCostWeapon();
+            learnData.weaponCost[index] = (learnData.weaponCost[index] || 0) + data.getWeaponNum();
         }
         if (data.getCostArmor() > 0) {
-            learnData.armor[0] = data.getCostArmor();
-            learnData.armorCost[0] += data.getArmorNum();
+            const i = learnData.armor.indexOf(data.getCostArmor());
+            const index = i >= 0 ? i : learnData.armor.length;
+            learnData.armor[index] = data.getCostArmor();
+            learnData.armorCost[index] = (learnData.armorCost[index] || 0) + data.getArmorNum();
         }
         if (data.getCostGold() > 0) {
             learnData.goldCost += data.getCostGold();
         }
         if (data.getCostVariables() > 0) {
-            learnData.var[0] = data.getCostVariables();
-            learnData.varCost[0] += data.getVariablesNum();
+            const i = learnData.varindexOf(data.getCostVariables());
+            const index = i >= 0 ? i : learnData.var.length;
+            learnData.var[index] = data.getCostVariables();
+            learnData.varCost[index] = (learnData.varCost[index] || 0) + data.getVariablesNum();
         }
         this._learnSkillTreeSkillList[data._id] = learnData;
         this.learnCount++;

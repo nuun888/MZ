@@ -152,6 +152,9 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeCost` スキルツリーコストウィンドウ  
 `Window_SkillTreeStatus` スキルツリーステータスウィンドウ  
 `Window_SkillTreeConfirmation` 習得確認ウィンドウ  
+`Window_SkillTreeConfirmation` 習得確認ウィンドウ  
+`Window_SkillTreeHelp` スキルツリーヘルプウィンドウ  
+`Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
 2025/9/15 Ver.1.2.10  

@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.9
+ * @version 1.2.10
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -91,6 +91,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/15/2025 Ver.1.2.10
+ * Added a feature to specify the width of items in the skill tree window.
+ * Fixed an issue where skill cost information was displayed when returning to the Skill Tree Type window from the Skill Tree window.
  * 9/14/2025 Ver.1.2.9
  * Added the ability to adjust the position of skill item icons and text.
  * Fixed an issue where actors could not be selected for skill point increase/decrease items and reset items.
@@ -316,7 +319,7 @@
  * 
  * @command IsSkillTreeLearnedSkill
  * @desc Determines whether the specified skill has been learned in the skill tree and assigns it to the specified switch.
- * @text Skill learned switch
+ * @text Skill learning completion status
  * 
  * @arg ActorId
  * @text Actor id
@@ -406,6 +409,14 @@
  * @desc Adjusts the X position of the skill (icon).
  * @type number
  * @default 0
+ * @parent SkillTreeTextSetting
+ * 
+ * @param SkillTypeContentsWidth
+ * @text Skill item width
+ * @desc Set the width of the skill item. Set automatically at 0.
+ * @type number
+ * @default 0
+ * @min 0
  * @parent SkillTreeTextSetting
  * 
  * @param SkillTreeSecretText
@@ -1468,7 +1479,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.9
+ * @version 1.2.10
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1546,6 +1557,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/15 Ver.1.2.10
+ * スキルツリーウインドウの項目の横幅を指定できる機能を追加。
+ * スキルツリーウィンドウからスキルツリータイプウィンドウに戻る際に、スキルコスト情報を表示しないように修正。
  * 2025/9/14 Ver.1.2.9
  * スキル項目のアイコン、文字の位置を調整する機能を追加。
  * スキルポイント増減アイテム、リセットアイテムでアクターを選択できない問題を修正。
@@ -1772,7 +1786,7 @@
  * 
  * @command IsSkillTreeLearnedSkill
  * @desc 指定のスキルがスキルツリーで習得済みか判定し、指定のスイッチに代入します。
- * @text スキル習得済みスイッチ
+ * @text スキル習得済み判定
  * 
  * @arg ActorId
  * @text アクターID
@@ -1862,6 +1876,14 @@
  * @desc 項目(アイコン)のX位置を調整します。
  * @type number
  * @default 0
+ * @parent SkillTreeTextSetting
+ * 
+ * @param SkillTypeContentsWidth
+ * @text スキル項目の横幅
+ * @desc スキル項目の横幅を設定します。0で自動設定。
+ * @type number
+ * @default 0
+ * @min 0
  * @parent SkillTreeTextSetting
  * 
  * @param SkillTreeSecretText
@@ -3729,7 +3751,7 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.createSkillTreeHelpWindow = function() {
         const rect = this.skillTreeHelpWindowRect();
-        this._helpWindow = new Window_Help(rect);
+        this._helpWindow = new Window_SkillTreeHelp(rect);
         this.addWindow(this._helpWindow);
         this._skillTreeWindow.setHelpWindow(this._helpWindow);
         if (params.HelpWindowTransparent) {
@@ -3883,6 +3905,7 @@ Imported.NUUN_SkillTree = true;
     Scene_SkillTree.prototype.cancelSkillTree = function() {
         this._skillTreeType.activate();
         this._skillTreeWindow.deselect();
+        this._skillTreeCostWindow.setData(null);
     };
 
     Scene_SkillTree.prototype.onActorChange = function() {
@@ -3914,6 +3937,26 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.needsPageButtons = function() {
         return true;
+    };
+
+
+    function Window_SkillTreeHelp() {
+        this.initialize(...arguments);
+    }
+
+    Window_SkillTreeHelp.prototype = Object.create(Window_Help.prototype);
+    Window_SkillTreeHelp.prototype.constructor = Window_SkillTreeHelp;
+
+    Window_SkillTreeHelp.prototype.initialize = function(rect) {
+        Window_Help.prototype.initialize.call(this, rect);
+    };
+
+    Window_SkillTreeHelp.prototype.setItem = function(item) {
+        //if (item && item.meta.SkillTreeSkillText) {
+        //    this.setText(item.meta.SkillTreeSkillText);
+        //} else {
+            Window_Help.prototype.setItem.call(this, item);
+        //}
     };
 
 
@@ -4057,7 +4100,7 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.helpItem = function() {
         const data = this.itemAt(this.index());
-        return data && data._id && data.isEnabled() > 0 ? $dataSkills[data._id] : null;
+        return data && data._id > 0 && data.isEnabled() ? $dataSkills[data._id] : null;
     };
 
     Window_SkillTree.prototype.colsMargin = function() {
@@ -4069,7 +4112,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.itemWidth = function() {
-        return Math.floor(this.skillTreeInnerWidth() / this.maxCols()) + this.colsMargin();
+        return (params.SkillTypeContentsWidth > 0 ? params.SkillTypeContentsWidth : Math.floor(this.skillTreeInnerWidth() / this.maxCols())) + this.colsMargin();
+    };
+
+    Window_SkillTree.prototype.skillTreeItemHeight = function() {
+        return params.SkillTypeContentsWidth;
     };
 
     Window_SkillTree.prototype.itemHeight = function() {

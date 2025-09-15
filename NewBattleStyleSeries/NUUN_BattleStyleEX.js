@@ -2,8 +2,6 @@
  * NUUN_BattleStyleEX.js
  * 
  * Copyright (C) 2024 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
@@ -81,7 +79,12 @@
  * 
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
  * 7/26/2025 Ver.1.0.21
@@ -2058,7 +2061,12 @@
  * このプラグインでは木星ペンギン氏作疑似３Dバトルプラグインとの競合対応プラグインは必要ありません。
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
  * 2025/7/26 Ver.1.0.21

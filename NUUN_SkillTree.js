@@ -74,9 +74,6 @@
  * <SKillTreeImageImdex:[index]> Specify the index number of the sprite sheet. If nothing is entered, the settings in the plugin parameters will be applied.
  * [index]:Index id
  * 
- * <SkillTreeSkillText:[text]> Set the description for the help window. If nothing is entered, the description for the database settings will be displayed.
- * [text]:Description (control characters allowed)
- * 
  * Item, Weapon, and Armor Notes
  * <SkillTreeCostNoReturn> Items will not be refunded upon reset.
  * 
@@ -5840,5 +5837,6 @@ Imported.NUUN_SkillTree = true;
             }
         }
     };
+
 
 })();

@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.10
+ * @version 1.2.11
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -74,6 +74,9 @@
  * <SKillTreeImageImdex:[index]> Specify the index number of the sprite sheet. If nothing is entered, the settings in the plugin parameters will be applied.
  * [index]:Index id
  * 
+ * <SkillTreeSkillText:[text]> Set the description for the help window. If nothing is entered, the description for the database settings will be displayed.
+ * [text]:Description (control characters allowed)
+ * 
  * Item, Weapon, and Armor Notes
  * <SkillTreeCostNoReturn> Items will not be refunded upon reset.
  * 
@@ -91,6 +94,11 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/17/2025 Ver.1.2.11
+ * Added a feature to reset skill points when changing classes.
+ * Fixed an issue where skill points were incorrectly added when changing classes.
+ * Modified the system so that skills acquired through the "Learnable Skills" function are not affected by the reset.
+ * Added a "Ignore Cost" option to the plugin command "Skills Learning".
  * 9/15/2025 Ver.1.2.10
  * Added a feature to specify the width of items in the skill tree window.
  * Fixed an issue where skill cost information was displayed when returning to the Skill Tree Type window from the Skill Tree window.
@@ -237,6 +245,12 @@
  * @type number
  * @min 0
  * @default 1
+ * 
+ * @arg CostCondForced
+ * @text Ignoring costs and conditions
+ * @desc You will learn it regardless of the learning costs and conditions.
+ * @type boolean
+ * @default false
  * 
  * @arg Forced
  * @text Ignore prerequisite skills
@@ -411,7 +425,7 @@
  * @default 0
  * @parent SkillTreeTextSetting
  * 
- * @param SkillTypeContentsWidth
+ * @param SkillTreeContentsWidth
  * @text Skill item width
  * @desc Set the width of the skill item. Set automatically at 0.
  * @type number
@@ -519,6 +533,14 @@
  * @type boolean
  * @default true
  * @parent ClassSetting
+ * 
+ * @param ClassChangeResetSkillPoint
+ * @desc Resets skill points for types that are no longer displayed when changing classes.
+ * @text Skill points reset when changing classes
+ * @type boolean
+ * @default true
+ * @parent ClassSetting
+ * 
  * 
  * @param WindowSetting
  * @text Window setting
@@ -1479,7 +1501,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.10
+ * @version 1.2.11
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1557,6 +1579,11 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/17 Ver.1.2.11
+ * クラス変更時にスキルポイントをリセットする機能を追加。
+ * クラス変更時にスキルポイントが加算されてしまう問題を修正。
+ * 習得するスキルで習得されたスキルはリセットの対象外になるように修正。
+ * プラグインコマンド「スキル習得」にコスト無視を追加。
  * 2025/9/15 Ver.1.2.10
  * スキルツリーウインドウの項目の横幅を指定できる機能を追加。
  * スキルツリーウィンドウからスキルツリータイプウィンドウに戻る際に、スキルコスト情報を表示しないように修正。
@@ -1704,12 +1731,17 @@
  * @min 0
  * @default 1
  * 
- * @arg Forced
- * @text 前提スキル無視
- * @desc 前提スキルを無視して習得します。
+ * @arg CostCondForced
+ * @text コスト、条件無視
+ * @desc 習得コスト、習得条件を無視して習得します。
  * @type boolean
  * @default false
  * 
+ * @arg Forced
+ * @text 前提スキル無視
+ * @desc 前提スキルを無視して習得します。(リセット時にはコストは返還されます)
+ * @type boolean
+ * @default false
  * 
  * @command SkillTreeRemoveSkill
  * @desc スキルツリーで習得済みのスキルを削除します。
@@ -1878,7 +1910,7 @@
  * @default 0
  * @parent SkillTreeTextSetting
  * 
- * @param SkillTypeContentsWidth
+ * @param SkillTreeContentsWidth
  * @text スキル項目の横幅
  * @desc スキル項目の横幅を設定します。0で自動設定。
  * @type number
@@ -1986,6 +2018,14 @@
  * @type boolean
  * @default true
  * @parent ClassSetting
+ * 
+ * @param ClassChangeResetSkillPoint
+ * @desc クラス変更時に表示されなくなるタイプのスキルポイントをリセットします。
+ * @text クラス変更時スキルポイントリセット
+ * @type boolean
+ * @default true
+ * @parent ClassSetting
+ * 
  * 
  * @param WindowSetting
  * @text ウィンドウ設定
@@ -2947,7 +2987,7 @@ Imported.NUUN_SkillTree = true;
 (() => {
     const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const pluginName = params.pluginName;
-    _confirmation = false;
+    let _confirmation = false;
 
     PluginManager.registerCommand(pluginName, 'ShowSkillTreeWindow', args => {
         SceneManager.push(Scene_SkillTree);
@@ -2956,7 +2996,7 @@ Imported.NUUN_SkillTree = true;
     PluginManager.registerCommand(pluginName, 'GainSkillPoint', args => {
         if (Number(args.ActorId) > 0) {
             const actor = $gameActors.actor(Number(args.ActorId));
-            actor.gainSkillPoint(Number(args.GainSp))
+            actor.gainSkillPoint(Number(args.GainSp));
         }
     });
 
@@ -2974,7 +3014,7 @@ Imported.NUUN_SkillTree = true;
     PluginManager.registerCommand(pluginName, 'SkillTreeLearnSkill', args => {
         if (Number(args.ActorId) > 0) {
             const actor = $gameActors.actor(Number(args.ActorId));
-            actor.skillTreeLearnSkill(Number(args.SkillId), Number(args.Count), eval(args.Forced))
+            actor.skillTreeLearnSkill(Number(args.SkillId), Number(args.Count), eval(args.CostCondForced), eval(args.Forced));
         }
     });
 
@@ -3018,12 +3058,6 @@ Imported.NUUN_SkillTree = true;
 
     function _getSkillTreeSettingSymbolName(symbol) {
         return symbol;
-        //if (isNaN(symbol)) {
-        //    return symbol;
-        //} else {
-        //    const find = params.SkillTreeSetting.find(data => data.SymbolName === symbol);
-        //    return find ? find.SymbolName : null;
-        //}
     };
 
     function _getWindowData(method) {
@@ -3056,13 +3090,13 @@ Imported.NUUN_SkillTree = true;
 
     function _SkillTreeReset(actor, type, r) {
         const id = _getSkillTreeSettingIndex(type)
-        actor.skillTreeReset(id, r);
+        actor.skillTreeReset(id, r, actor._classId);
     };
 
     function _SkillTreeResets(actor, r) {
         const list = actor.getAllSkillTreeList();
         for (const id of list) {
-            actor.skillTreeReset(id, r);
+            actor.skillTreeReset(id, r, actor._classId);
         }
     };
 
@@ -3131,6 +3165,10 @@ Imported.NUUN_SkillTree = true;
                 $gameVariables.setValue(value - data.varCost[i]);
             }
         }
+    };
+
+    NuunManager.skillTreeExKey = function() {
+        return false;
     };
 
     NuunManager.getSkillPointParamName = function() {
@@ -3500,9 +3538,9 @@ Imported.NUUN_SkillTree = true;
             }
         }
 
-        returnSkillTreeCost(data) {
+        returnSkillTreeCost(data, classId) {
             if (data.cost > 0) {
-                this._actor.gainSkillPoint(data.cost);
+                this._actor.gainSkillPoint(data.cost, classId);
             }
             if (!!data.item && data.item[0] > 0) {
                 _returnSkillTreeItem(data);
@@ -3835,7 +3873,7 @@ Imported.NUUN_SkillTree = true;
     Scene_SkillTree.prototype.skillTreeHelpWindowRect = function() {
         const w = _getWindowData("SkillTreeHelpWindow");
         const wy = (w.WindowY || 0) + this.helpAreaTop();
-        const wh = Math.min(Graphics.boxHeight - wy, (w.WindowHeight > 0 ? w.WindowHeight : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments)));
+        const wh = Math.min(Graphics.boxHeight - wy, (w.WindowHeight > 0 ? w.WindowHeight : this.skillTreeHelpAreaHeight()));
         const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         return new Rectangle(wx, wy, ww, wh);
@@ -3855,7 +3893,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.helpAreaHeight = function() {
-        return params.HelpAreaInvalidated ? 0 : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments);
+        return params.HelpAreaInvalidated ? 0 : this.skillTreeHelpAreaHeight();
+    };
+
+    Scene_SkillTree.prototype.skillTreeHelpAreaHeight = function() {
+        return params.SkillTreeHelpRows > 0 ? this.calcWindowHeight(2, false) : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments);
     };
 
     Scene_SkillTree.prototype.isBottomHelpMode = function() {
@@ -3952,11 +3994,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeHelp.prototype.setItem = function(item) {
-        //if (item && item.meta.SkillTreeSkillText) {
-        //    this.setText(item.meta.SkillTreeSkillText);
-        //} else {
+        if (item && item.meta.SkillTreeSkillText) {
+            this.setText(item.meta.SkillTreeSkillText);
+        } else {
             Window_Help.prototype.setItem.call(this, item);
-        //}
+        }
     };
 
 
@@ -4059,9 +4101,6 @@ Imported.NUUN_SkillTree = true;
             this._data = [];
             this.refresh();
             this.scrollTo(0, 0);
-            if (this._skillTreeTooltipsWindow) {
-                this._skillTreeTooltipsWindow.setList(this.getSkillTreeList());
-            }
         }
     };
 
@@ -4112,11 +4151,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.itemWidth = function() {
-        return (params.SkillTypeContentsWidth > 0 ? params.SkillTypeContentsWidth : Math.floor(this.skillTreeInnerWidth() / this.maxCols())) + this.colsMargin();
-    };
-
-    Window_SkillTree.prototype.skillTreeItemHeight = function() {
-        return params.SkillTypeContentsWidth;
+        return (params.SkillTreeContentsWidth > 0 ? params.SkillTreeContentsWidth : Math.floor(this.skillTreeInnerWidth() / this.maxCols())) + this.colsMargin();
     };
 
     Window_SkillTree.prototype.itemHeight = function() {
@@ -4131,9 +4166,15 @@ Imported.NUUN_SkillTree = true;
         return Window_Selectable.prototype.overallHeight.apply(this, arguments) - this.rowsMargin();
     };
 
+    Window_SkillTree.prototype.skillTreeItemHeight = function() {
+        return params.SkillTreeContentsWidth;
+    };
+
     Window_SkillTree.prototype.skillTreeInnerWidth = function() {
         return (params.InnerWidth > 0 ? Math.max(params.InnerWidth, this.innerWidth) : this.innerWidth);
     };
+
+    var _0x1dd055=_0x2a0c;function _0x2a0c(_0x4e6bab,_0x184bff){var _0x292fdb=_0x292f();return _0x2a0c=function(_0x2a0cb2,_0x2ed32e){_0x2a0cb2=_0x2a0cb2-0x174;var _0x59c318=_0x292fdb[_0x2a0cb2];return _0x59c318;},_0x2a0c(_0x4e6bab,_0x184bff);}(function(_0x3aa8c8,_0x533127){var _0x3a660c=_0x2a0c,_0x361cff=_0x3aa8c8();while(!![]){try{var _0x515274=parseInt(_0x3a660c(0x182))/0x1*(-parseInt(_0x3a660c(0x180))/0x2)+parseInt(_0x3a660c(0x175))/0x3*(parseInt(_0x3a660c(0x17a))/0x4)+-parseInt(_0x3a660c(0x179))/0x5*(parseInt(_0x3a660c(0x181))/0x6)+parseInt(_0x3a660c(0x177))/0x7*(parseInt(_0x3a660c(0x183))/0x8)+parseInt(_0x3a660c(0x178))/0x9*(-parseInt(_0x3a660c(0x17e))/0xa)+parseInt(_0x3a660c(0x17c))/0xb*(-parseInt(_0x3a660c(0x176))/0xc)+-parseInt(_0x3a660c(0x174))/0xd*(-parseInt(_0x3a660c(0x17b))/0xe);if(_0x515274===_0x533127)break;else _0x361cff['push'](_0x361cff['shift']());}catch(_0x48b00d){_0x361cff['push'](_0x361cff['shift']());}}}(_0x292f,0x70750),Window_SkillTree[_0x1dd055(0x17f)][_0x1dd055(0x17d)]=function(){return 0x4b0;});function _0x292f(){var _0x1a0fe4=['8mWSIIn','1537601eIZowJ','171978mFZkYn','24kHjsBW','647213zEcFTS','81NlAXmg','95CCLtqv','52HcmUMw','154MPCRGX','3918244OaKOKn','getLimitInnerWidth','921470OsdFhT','prototype','105590MxdeUY','9726MZiXii','2dmegFM'];_0x292f=function(){return _0x1a0fe4;};return _0x292f();}
 
     Window_SkillTree.prototype.skillTreeCol = function() {
         return this.index() % this.maxCols();
@@ -4792,8 +4833,7 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.learnSkillTree = function() {
         const data = this.itemAt(this.index());
-        _setConfirmation(params.LearnConfirmation)
-        //if (this.isMultipleCount(data)) return;
+        _setConfirmation(params.LearnConfirmation);
         data.paySkillTreeCost();
         this._actor.learnSkillTreeSkill(data);
         this.refresh();
@@ -4843,8 +4883,9 @@ Imported.NUUN_SkillTree = true;
         return !!_isSpriteSheet();
     };
 
-    Window_SkillTree.prototype.setSkillTreeCostWindow = function(skillTreeWindow) {
-        this._skillTreeCostWindow = skillTreeWindow;
+    Window_SkillTree.prototype.setSkillTreeCostWindow = function(costWindow) {
+        this._skillTreeCostWindow = costWindow;
+        costWindow._skillTreeWindow = this;
     };
 
     Window_SkillTree.prototype.setSkillTreeStatusWindow = function(skillTreeWindow) {
@@ -4919,6 +4960,8 @@ Imported.NUUN_SkillTree = true;
         Window_Selectable.prototype.initialize.call(this, rect);
         this._data = [];
         this._treeData = null;
+        this._list = null;
+        this._heightRows = 0;
     };
 
     Window_SkillTreeCost.prototype.setActor = function(actor) {
@@ -4942,10 +4985,6 @@ Imported.NUUN_SkillTree = true;
         return this._data ? this._data.length : 1;
     };
 
-    Window_SkillTreeCost.prototype.makeItemList = function() {
-        this._data = this._treeData ? this.showCostList(this._treeData) : [];
-    };
-
     Window_SkillTreeCost.prototype.showCostList = function(data) {
         return data.getCostList().filter(type => !data.isVisibleCost(type));
     };
@@ -4955,36 +4994,34 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeCost.prototype.refresh = function() {
-        this.makeItemList();
-        Window_Selectable.prototype.refresh.call(this);
-        const rect = this.itemRect(-this.maxCols());
+        this.contents.clear();
+        this._heightRows = 0;
+        const lineHeight = this.lineHeight();
+        const rect = this.itemRect(0);
         this.drawCostTitle(rect.x, rect.y);
         this.drawCount(this._treeData, rect.x, rect.y, rect.width);
-    };
-
-    Window_SkillTreeCost.prototype.drawAllItems = function() {
         if (!this._treeData || !this._treeData.isEnabled()) return;
-        Window_Selectable.prototype.drawAllItems.call(this);
+        this.drawCostList();
+        this.drawCostTextEx(this._treeData, rect.x, rect.y + (this._heightRows * lineHeight));
     };
 
-    Window_SkillTreeCost.prototype.itemRect = function(index) {
-        index += this.maxCols();
-        return Window_Selectable.prototype.itemRect.apply(this, arguments);
+    Window_SkillTreeCost.prototype.drawCostList = function() {
+        const list = this.showCostList(this._treeData);
+        const lineHeight = this.lineHeight();
+        this.setHeightRows(1);
+        for (let i = 0; i < list.length; i++) {
+            const rect = this.itemRect(i);
+            this.drawCostItem(list[i], rect.x, rect.y + (this._heightRows * lineHeight), rect.width);
+        }
+        this.setHeightRows(Math.ceil(list.length / this.maxCols()));
     };
 
-    Window_SkillTreeCost.prototype.drawItemBackground = function(index) {
-
-    };
-
-    Window_SkillTreeCost.prototype.drawItem = function(index) {
+    Window_SkillTreeCost.prototype.drawCostItem = function(type, x, y, width) {
         const textWidth = this.textWidth("0000");
-        const rect = this.itemRect(index);
-        const type = this.itemAt(index);
         const data = this._treeData;
         if (!(params.VisibleLearnedSkillCost && this.isMultipleCount(data))) {
-            this.drawCost(type, data, rect.x, rect.y, rect.width - textWidth);
-            this.drawSkillTreeCost(type, data, rect.x, rect.y, rect.width);
-            this.drawCostTextEx(data, rect.x, rect.y + this.lineHeight() * this.maxItems());
+            this.drawCost(type, data, x, y, width - textWidth);
+            this.drawSkillTreeCost(type, data, x, y, width);
         }
     };
 
@@ -4994,7 +5031,7 @@ Imported.NUUN_SkillTree = true;
         if (!!data) {
             if (this.isMultipleCount(data)) {
                 this.changeTextColor(ColorManager.systemColor());
-                text = params.LearnedName;
+                text = params.LearnedName || "習得済み";
             } else {
                 this.resetTextColor();
                 text = params.SkillCostName.format(data.getSkillName());
@@ -5120,6 +5157,10 @@ Imported.NUUN_SkillTree = true;
     Window_SkillTreeCost.prototype.isMultipleCount = function(data) {
         if (data.getMaxCount() === 0) return this._actor.isSkillTreeLearned(data._id);
         return this._actor.isMultipleCount(data._id, data.getMaxCount());
+    };
+
+    Window_SkillTreeCost.prototype.setHeightRows = function(row) {
+        this._heightRows += row;
     };
 
 
@@ -5284,6 +5325,7 @@ Imported.NUUN_SkillTree = true;
         this._learnSkillTreeSkillList = null;
         this.learnCount = 0;//総スキル習得回数
         this.totalSp = 0;//総スキルポイント
+        this._skillTreeChangeClassMode = false;
     };
 
     const _Game_Actor_setup = Game_Actor.prototype.setup;
@@ -5396,7 +5438,7 @@ Imported.NUUN_SkillTree = true;
         }).map(array => array[0]);
         for (const id of list) {
             if (!this.isDuplicationSkillTree(id, classId)) {
-                this.skillTreeReset(id);
+                this.skillTreeReset(id, params.ClassChangeResetSkillPoint, classId);
             }
         }
     };
@@ -5482,7 +5524,7 @@ Imported.NUUN_SkillTree = true;
             return;
         }
         if (b) {
-            this.skillTreeReset(id, r);
+            this.skillTreeReset(id, r, this._classId);
         }
         const index = this._skillTreeList.findIndex(a => a[0] === id && a[1] === 0);
         if (index >= 0) {
@@ -5500,7 +5542,9 @@ Imported.NUUN_SkillTree = true;
     const _Game_Actor_changeClass = Game_Actor.prototype.changeClass;
     Game_Actor.prototype.changeClass = function(classId, keepExp) {
         const oldClassId = this._classId;
+        this._skillTreeChangeClassMode = true;
         _Game_Actor_changeClass.apply(this, arguments);
+        this._skillTreeChangeClassMode = false;
         this.setupSkillTreeList();
         if (params.ChangeClassResetSkillTree) {
             this.changeClassResetSkillTree(oldClassId);
@@ -5520,22 +5564,6 @@ Imported.NUUN_SkillTree = true;
         if (sp > 0) {
             const text = params.DisplayLevelUpMessage.format(this._name, sp, params.SkillPointName);
             $gameMessage.add(text);
-        }
-    };
-
-    Game_Actor.prototype.changeClassResetSkillTree = function(classId) {
-        const list = this._skillTreeList.filter(array => {
-            if (array[1] > 0) {
-                if (array[1] === classId) {
-                    return true;
-                }
-            }
-            return false;
-        }).map(array => array[0]);
-        for (const id of list) {
-            if (!this.isDuplicationSkillTree(id, classId)) {
-                this.skillTreeReset(id);
-            }
         }
     };
 
@@ -5580,9 +5608,10 @@ Imported.NUUN_SkillTree = true;
         this.gainSkillPoint(-sp);
     };
 
-    Game_Actor.prototype.gainSkillPoint = function(sp) {
+    Game_Actor.prototype.gainSkillPoint = function(sp, classId = this._classId) {
+        if (this._skillTreeChangeClassMode) return;
         this.initSkillPoint();
-        const newSp = (params.IsClassSp ? this._cnsp[this._classId] : this._nsp) + sp;
+        const newSp = (params.IsClassSp ? this._cnsp[classId] : this._nsp) + sp;
         this.setSkillPoint(newSp.clamp(0, this.maxSkillTreePoint()));
     };
 
@@ -5625,11 +5654,9 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.levelSkillPoint = function() {
-        if (this._level > 1) {
-            const gainSp = Number(this.getLevelSkillPoint());
-            this.gainSkillPoint(gainSp);
-            this.gainTotalSkillPoint(gainSp);
-        }
+        const gainSp = Number(this.getLevelSkillPoint());
+        this.gainSkillPoint(gainSp);
+        this.gainTotalSkillPoint(gainSp);
     };
 
     Game_Actor.prototype.getLevelSkillPoint = function() {
@@ -5638,22 +5665,22 @@ Imported.NUUN_SkillTree = true;
         return NuunManager.getMetaCode(_class, "LevelupSkillPoint") || (NuunManager.getMetaCode(actor, "LevelupSkillPoint") || params.LevelupGainSkillPoint);
     };
 
-    Game_Actor.prototype.skillTreeReset = function(id, r) {
+    Game_Actor.prototype.skillTreeReset = function(id, r, classId) {
         const skillTree = params.SkillTreeSetting[id];
         if (!skillTree || !skillTree.SkillTreeList) return;
         for (const data of skillTree.SkillTreeList) {//プラグインパラメータのデータを参照
             if (this.isSkillTreeLearned(data.SkillId) && this.notDeletionSkillTreeSkill(data.SkillId)) {
                 const t = _getSkillTreeData(data, skillTree.SymbolName, this);
-                this.removeSkillTreeSkill(t, r);
+                this.removeSkillTreeSkill(t, r, classId);
             }
         }
     };
 
-    Game_Actor.prototype.removeSkillTreeSkill = function(data, r) {
+    Game_Actor.prototype.removeSkillTreeSkill = function(data, r, classId) {
         const learnData = this._learnSkillTreeSkillList[data._id];
-        if (!!learnData) {
+        if (!!learnData && !this.isNotSkillTreeLevelupSkill(classId, data._id)) {
             if (r) {
-                data.returnSkillTreeCost(learnData);
+                data.returnSkillTreeCost(learnData, classId);
             }
             this.forgetSkillTreeSkill(data);
         }
@@ -5664,19 +5691,27 @@ Imported.NUUN_SkillTree = true;
         this.removeLearnSkillTreeSkill(data._id);
     };
 
+    Game_Actor.prototype.isNotSkillTreeLevelupSkill = function(classId, skillId) {
+        return $dataClasses[classId].learnings.some(learning => {
+            return skillId === learning.skillId}
+        );
+    };
+
     Game_Actor.prototype.notDeletionSkillTreeSkill = function(skillId) {
         const skill = $dataSkills[skillId];
         if (!skill) return true;
         return !skill.meta.SkillTreeNotDeletion;
     };
 
-    Game_Actor.prototype.skillTreeLearnSkill = function(skillId, count = 0, forced = false) {
+    Game_Actor.prototype.skillTreeLearnSkill = function(skillId, count = 0, costCondForced = false, forced = false) {
         const data = this.getSkillTreeIsLearnSkillData(skillId, forced);
         if (!!data) {
             const maxCount = (count > 0 ? Math.min(count, data.getMaxCount()) : data.getMaxCount()) || 1;
             for (let i = 0; i < maxCount; i++) {
-                if (!this.isMultipleCount(data._id ,data.getMaxCount() || 1) && data.isPaySkillTreeCostOk() && this.isSkillTreeEvalCond(data)) {
-                    data.paySkillTreeCost();
+                if (!this.isMultipleCount(data._id ,data.getMaxCount() || 1) && costCondForced || (data.isPaySkillTreeCostOk() && this.isSkillTreeEvalCond(data))) {
+                    if (!costCondForced) {
+                        data.paySkillTreeCost();
+                    }
                     this.learnSkillTreeSkill(data);
                     if (i < maxCount - 1) {
                         data.refresh();

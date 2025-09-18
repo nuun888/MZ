@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.11
+ * @version 1.2.12
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -74,6 +74,9 @@
  * <SKillTreeImageImdex:[index]> Specify the index number of the sprite sheet. If nothing is entered, the settings in the plugin parameters will be applied.
  * [index]:Index id
  * 
+ * <SkillTreeSkillText:[text]> Set the description for the help window. If nothing is entered, the description for the database settings will be displayed.
+ * [text]:Description (control characters allowed)
+ * 
  * Item, Weapon, and Armor Notes
  * <SkillTreeCostNoReturn> Items will not be refunded upon reset.
  * 
@@ -91,6 +94,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/18/2025 Ver.1.2.12
+ * Fixed scrolling.
  * 9/17/2025 Ver.1.2.11
  * Added a feature to reset skill points when changing classes.
  * Fixed an issue where skill points were incorrectly added when changing classes.
@@ -1498,7 +1503,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.11
+ * @version 1.2.12
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1576,6 +1581,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/18 Ver.1.2.12
+ * スクロール処理を修正。
  * 2025/9/17 Ver.1.2.11
  * クラス変更時にスキルポイントをリセットする機能を追加。
  * クラス変更時にスキルポイントが加算されてしまう問題を修正。
@@ -4148,7 +4155,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.itemWidth = function() {
-        return (params.SkillTreeContentsWidth > 0 ? params.SkillTreeContentsWidth : Math.floor(this.skillTreeInnerWidth() / this.maxCols())) + this.colsMargin();
+        return (params.SkillTreeContentsWidth > 0 ? params.SkillTreeContentsWidth : Math.floor(this.skillTreeInnerWidth() / this.maxCols())) + this.colsMargin() / this.maxCols();
     };
 
     Window_SkillTree.prototype.itemHeight = function() {
@@ -5837,6 +5844,5 @@ Imported.NUUN_SkillTree = true;
             }
         }
     };
-
 
 })();

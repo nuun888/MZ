@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.2.11
+# Ver.1.2.12
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -157,6 +157,8 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2025/9/18 Ver.1.2.12  
+スクロール処理を修正。  
 2025/9/17 Ver.1.2.11  
 クラス変更時にスキルポイントをリセットする機能を追加。  
 クラス変更時にスキルポイントが加算されてしまう問題を修正。  

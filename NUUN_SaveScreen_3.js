@@ -68,7 +68,12 @@
  * [filename]:list number of content background image
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
  * 4/25/2025 Ver.3.0.11
@@ -1383,8 +1388,12 @@
  * 設定された画像は適用されずマップに設定された画像が適用されます。
  * [filename]:コンテンツ背景画像のリスト番号
  * 
- * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
  * 2025/4/26 Ver.3.0.11

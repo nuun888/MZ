@@ -2,8 +2,6 @@
  * NUUN_OptionEx.js
  * 
  * Copyright (C) 2024 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
@@ -23,7 +21,12 @@
  * You cannot set keys (buttons) that have already been set or reserved keys (buttons).
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
  * 3/29/2025 Ver.1.3.2
@@ -922,7 +925,12 @@
  * 既に設定済みのキー(ボタン)、予約キー(ボタン)は設定できません。
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
  * 2025/3/29 Ver.1.3.2

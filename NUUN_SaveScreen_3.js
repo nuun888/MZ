@@ -2,8 +2,6 @@
  * NUUN_SaveScreen_3.js
  * 
  * Copyright (C) 2024 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
@@ -1388,6 +1386,7 @@
  * 設定された画像は適用されずマップに設定された画像が適用されます。
  * [filename]:コンテンツ背景画像のリスト番号
  * 
+ * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
  * 成人向け：可能

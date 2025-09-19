@@ -2,8 +2,6 @@
  * NUUN_MenuScreenEX.js
  * 
  * Copyright (C) 2022 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
@@ -1441,6 +1439,7 @@
  * 画像のアクターが表示されている部分を中央に表示させたい場合は各アクター画像設定の画像表示開始座標X、画像表示開始座標Y
  * で設定します。
  * 
+ * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
  * 成人向け：可能

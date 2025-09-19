@@ -1,8 +1,13 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
 # 新版Ver.3.0.11
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen_3.js)  
-# 旧版Ver.2.3.1
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)  
+#### 無償ライセンス
+クレジット表記：任意  
+商業利用：可能  
+成人向け：可能  
+改変：可能  
+再配布：可能  
+当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
 #### 必須プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)Ver.1.7.3以降  
 
@@ -69,6 +74,7 @@ actor:$gameActors (指定のアクター変更で指定したアクター(指定
 #### オートセーブ時のスナップショット
 オートセーブ時のスナップショットは戦闘開始直前のマップ、移動直前のマップが撮影されます。  
 
+旧版の配布は終了いたしました。  
 
 ## 更新履歴
 2025/4/26 Ver.3.0.11  

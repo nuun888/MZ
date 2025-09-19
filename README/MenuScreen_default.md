@@ -1,6 +1,5 @@
 # メニュー画面
 
-# 新版
 ### Ver.3.1.14 
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuScreenEX.js)  
 

@@ -91,8 +91,6 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | 戦闘　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数5　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
 | [バトルスタイル拡張新版](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEX.md) |  | 共 メ 立対 |  |
-| [バトルスタイル拡張旧版](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXBase.md) |  | 共 立対 | 3.10.1 |
-| ┗ [敵の条件画像変更](https://github.com/nuun888/MZ/blob/master/README/EnemyCondPicture.md) | [NUUN_EnemyCondPicture](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyCondPicture.js) | 共 | 1.0.0 |
 | [XPスタイル対象選択ウィンドウ](https://github.com/nuun888/MZ/blob/master/README/XPSelectWindow.md) | [NUUN_XPSelectWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_XPSelectWindow.js) | 共 | 1.1.4 |
 | [リザルト](https://github.com/nuun888/MZ/blob/master/README/Result.md) | [NUUN_Result](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.js) | 共 立対 円 | 2.4.0 |
 | ┣  [MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) | [NUUN_ResultMVPActor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultMVPActor.js) |  | 1.1.3 |

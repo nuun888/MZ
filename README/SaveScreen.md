@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# 新版Ver.3.0.11
+# Ver.3.0.11
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen_3.js)  
 #### 無償ライセンス
 クレジット表記：任意  

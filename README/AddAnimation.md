@@ -1,6 +1,13 @@
 # [追加アニメーション表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddAnimation.js)
 # Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddAnimation.js)  
+#### 無償ライセンス
+クレジット表記：任意  
+商業利用：可能  
+成人向け：可能  
+改変：可能  
+再配布：可能  
+当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
 
 アイテム、スキルのアニメーションを複数または追加で再生させます。  
 

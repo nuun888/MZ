@@ -12,7 +12,7 @@
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 #### オプション
-[スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)MITライセンス  
+[スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)
 [拡張スキル習得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeLearnEx.js)  
 
 ツリー型のスキル習得システムを実装します。  
@@ -115,6 +115,14 @@ $gameActors
 数値を0にした場合はウィンドウ幅になります。  
 
 ## スキルツリーステータス画面カスタマイズ 
+### 無償ライセンス
+クレジット表記：任意  
+商業利用：可能  
+成人向け：可能  
+改変：可能  
+再配布：可能  
+当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
+  
 #### 必須プラグイン
 [ステータス項目ベースプラグイン](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)  
 

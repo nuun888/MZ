@@ -2,8 +2,6 @@
  * NUUN_GroupMaxItems.js
  * 
  * Copyright (C) 2021 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
  */
@@ -11,7 +9,7 @@
  * @target MZ
  * @plugindesc Item group possession limit
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MaxItem
@@ -27,9 +25,16 @@
  * If you want to change the number of items per group, be sure to set the specified group in the plugin parameter "ItemGroupMaxItems".
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/22/2025 Ver.1.1.3
+ * Fixed an issue where players could not acquire items even if their inventory capacity was below the maximum limit.
  * 9/9/2025 Ver.1.1.2
  * Fixed an issue where items with group key settings were being calculated including the total number of items.
  * 8/31/2025 Ver.1.1.1
@@ -139,7 +144,7 @@
  * @target MZ
  * @plugindesc アイテムグループ所持制限
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MaxItem
@@ -155,9 +160,16 @@
  * グループ毎のアイテム数を変更する場合は、プラグインパラメータのグループごと最大所持数に必ず指定のグループを設定してください。
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * ※https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/22 Ver 1.1.3
+ * アイテム所持数が最大所持数以下の場合でもアイテム取得が出来なくなる問題を修正。
  * 2025/9/9 Ver 1.1.2
  * キー設定しているアイテムがアイテム全体個数を含んで計算されていた問題を修正。
  * 2025/8/31 Ver 1.1.1
@@ -474,7 +486,7 @@ Imported.NUUN_GroupMaxItems = true;
     const _Game_Party_maxItems = Game_Party.prototype.maxItems;
     Game_Party.prototype.maxItems = function(item) {
         this.initGroupMaxItemsNum();
-        return Math.min(this.maxValidNumber(item), _Game_Party_maxItems.apply(this, arguments));
+        return Math.min(this.numItems(item) + this.maxValidNumber(item), _Game_Party_maxItems.apply(this, arguments));
     };
 
     Game_Party.prototype.maxValidNumber = function(item) {

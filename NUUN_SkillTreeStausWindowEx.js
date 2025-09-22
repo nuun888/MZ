@@ -2,8 +2,6 @@
  * NUUN_SkillTreeStausWindowEx.js
  * 
  * Copyright (C) 2025 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
@@ -23,7 +21,12 @@
  * You can also display actor images in the status window, skill tree window, or skill tree scene.
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
  * 8/15/2025 Ver.1.0.0
@@ -42,8 +45,6 @@
  * @min 1
  * @max 99
  * @default 4
- * 
- * 
  * 
  * @param StatusWindowActorImgSetting
  * @text Actor Image Settings
@@ -507,7 +508,12 @@
  * また、ステータスウィンドウ、スキルツリーウィンドウ、スキルツリーシーンのいずれかにアクター画像を表示できます。
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
  * 2025/8/15 Ver.1.0.0

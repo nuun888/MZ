@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.12
+ * @version 1.2.13
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -94,6 +94,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/23/2025 Ver.1.2.13
+ * Fixed an issue where the skill tree type window did not display at full width within the UI area.
  * 9/18/2025 Ver.1.2.12
  * Fixed scrolling.
  * 9/17/2025 Ver.1.2.11
@@ -1503,7 +1505,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.12
+ * @version 1.2.13
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1581,6 +1583,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/23 Ver.1.2.13
+ * スキルツリータイプウィンドウの横幅がUIエリア最大まで表示されない問題を修正。
  * 2025/9/18 Ver.1.2.12
  * スクロール処理を修正。
  * 2025/9/17 Ver.1.2.11
@@ -3843,7 +3847,7 @@ Imported.NUUN_SkillTree = true;
         const wy = (w.WindowY || 0) + this.mainAreaTop();
         const wh = this.calcWindowHeight(params.SkillTypeRows, true);
         const wx = (w.WindowX || 0);
-        const ww = Math.min(Graphics.boxWidth - wx - this.helpAreaBottomY(), w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
+        const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         return new Rectangle(wx, wy, ww, wh);
     };
 
